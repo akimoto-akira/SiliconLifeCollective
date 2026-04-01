@@ -35,50 +35,20 @@ public class Program
         Console.WriteLine(localization.WelcomeMessage);
         Console.WriteLine();
 
-        OllamaClient aiClient = new OllamaClient(
-            configData.OllamaEndpoint,
-            configData.DefaultModel
-        );
+        IAIClientFactory aiClientFactory = new OllamaClientFactory();
+        IAIClient aiClient = aiClientFactory.CreateClient(configData.OllamaEndpoint, configData.DefaultModel);
 
-        while (true)
+        ConsoleTickObject consoleTickObject = new ConsoleTickObject(aiClient, localization);
+        TestTickObject testTickObject = new TestTickObject();
+        
+        MainLoop.Start();
+
+        while (!consoleTickObject.ShouldExit)
         {
-            Console.Write(localization.InputPrompt);
-            string? input = Console.ReadLine();
-
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                continue;
-            }
-
-            if (input.Equals("exit", StringComparison.OrdinalIgnoreCase) ||
-                input.Equals("quit", StringComparison.OrdinalIgnoreCase))
-            {
-                Console.WriteLine(localization.ShutdownMessage);
-                break;
-            }
-
-            try
-            {
-                Console.WriteLine("Thinking...");
-                AIResponse response = await aiClient.ChatAsync(input);
-
-                if (response.Success)
-                {
-                    Console.WriteLine(response.Content);
-                    Console.WriteLine();
-                }
-                else
-                {
-                    Console.WriteLine($"Error: {response.ErrorMessage}");
-                    Console.WriteLine();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Unexpected error: {ex.Message}");
-                Console.WriteLine();
-            }
+            await Task.Delay(100);
         }
+
+        MainLoop.Stop();
     }
 
     /// <summary>
