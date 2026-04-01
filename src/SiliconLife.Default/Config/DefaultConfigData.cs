@@ -20,6 +20,8 @@ namespace SiliconLife.Default;
 /// </summary>
 public class DefaultConfigData : ConfigDataBase
 {
+    public override string ConfigType { get; set; } = "Default";
+
     /// <summary>
     /// Gets or sets the data directory path for storing all application data
     /// </summary>
@@ -34,6 +36,16 @@ public class DefaultConfigData : ConfigDataBase
     /// Gets or sets the language setting for the application
     /// </summary>
     public override Language Language { get; set; } = Language.ZhCN;
+
+    /// <summary>
+    /// Gets or sets the timeout duration for each tick execution
+    /// </summary>
+    public override TimeSpan TickTimeout { get; set; } = TimeSpan.FromSeconds(1);
+
+    /// <summary>
+    /// Gets or sets the maximum number of consecutive timeouts allowed before circuit breaker triggers
+    /// </summary>
+    public override int MaxTimeoutCount { get; set; } = 3;
 
     /// <summary>
     /// Gets or sets the Ollama API endpoint URL

@@ -1,7 +1,10 @@
 {
-  "DataDirectory": "./data",
-  "CuratorGuid": "00000000-0000-0000-0000-000000000000",
-  "Language": "zh-CN",
-  "OllamaEndpoint": "http://localhost:11434",
-  "DefaultModel": "llama3.2"
+  "configType": "Default",
+  "dataDirectory": "./data",
+  "curatorGuid": "11111111-1111-1111-1111-111111111111",
+  "language": "ZhCN",
+  "tickTimeout": "00:00:01",
+  "maxTimeoutCount": 3,
+  "ollamaEndpoint": "http://localhost:11434",
+  "defaultModel": "qwen3:4b"
 }

@@ -67,4 +67,19 @@ public class ZhCN : DefaultLocalizationBase
     /// Gets the data directory create error message
     /// </summary>
     public override string DataDirectoryCreateError => "无法创建数据目录";
+
+    /// <summary>
+    /// Gets the thinking message
+    /// </summary>
+    public override string ThinkingMessage => "思考中...";
+
+    /// <summary>
+    /// Gets the error message
+    /// </summary>
+    public override string ErrorMessage => "错误";
+
+    /// <summary>
+    /// Gets the unexpected error message
+    /// </summary>
+    public override string UnexpectedErrorMessage => "意外错误";
 }

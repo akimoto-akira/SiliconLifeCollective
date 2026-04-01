@@ -67,4 +67,19 @@ public class EnUS : DefaultLocalizationBase
     /// Gets the data directory create error message
     /// </summary>
     public override string DataDirectoryCreateError => "Cannot create data directory";
+
+    /// <summary>
+    /// Gets the thinking message
+    /// </summary>
+    public override string ThinkingMessage => "Thinking...";
+
+    /// <summary>
+    /// Gets the error message
+    /// </summary>
+    public override string ErrorMessage => "Error";
+
+    /// <summary>
+    /// Gets the unexpected error message
+    /// </summary>
+    public override string UnexpectedErrorMessage => "Unexpected error";
 }

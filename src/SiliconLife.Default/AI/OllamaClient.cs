@@ -98,6 +98,14 @@ public class OllamaClient : IAIClient
     /// <summary>
     /// Sends a chat request to Ollama and returns the response
     /// </summary>
+    public AIResponse Chat(AIRequest request)
+    {
+        return ChatAsync(request).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Sends a chat request to Ollama and returns the response asynchronously
+    /// </summary>
     public async Task<AIResponse> ChatAsync(AIRequest request)
     {
         try
@@ -163,6 +171,16 @@ public class OllamaClient : IAIClient
     /// <summary>
     /// Sends a chat request with a single user message
     /// </summary>
+    public AIResponse Chat(string userMessage)
+    {
+        AIRequest request = new AIRequest(DefaultModel);
+        request.AddMessage(MessageRole.User, userMessage);
+        return Chat(request);
+    }
+
+    /// <summary>
+    /// Sends a chat request with a single user message asynchronously
+    /// </summary>
     public async Task<AIResponse> ChatAsync(string userMessage)
     {
         AIRequest request = new AIRequest(DefaultModel);
@@ -172,6 +190,17 @@ public class OllamaClient : IAIClient
 
     /// <summary>
     /// Sends a chat request with system prompt and user message
+    /// </summary>
+    public AIResponse Chat(string systemPrompt, string userMessage)
+    {
+        AIRequest request = new AIRequest(DefaultModel);
+        request.AddMessage(MessageRole.System, systemPrompt);
+        request.AddMessage(MessageRole.User, userMessage);
+        return Chat(request);
+    }
+
+    /// <summary>
+    /// Sends a chat request with system prompt and user message asynchronously
     /// </summary>
     public async Task<AIResponse> ChatAsync(string systemPrompt, string userMessage)
     {

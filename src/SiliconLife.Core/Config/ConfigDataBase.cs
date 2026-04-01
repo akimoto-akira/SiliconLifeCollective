@@ -19,6 +19,11 @@ namespace SiliconLife.Collective;
 public abstract class ConfigDataBase
 {
     /// <summary>
+    /// Gets or sets the configuration type identifier for polymorphic deserialization
+    /// </summary>
+    public abstract string ConfigType { get; set; }
+
+    /// <summary>
     /// Gets or sets the data directory path for storing all application data
     /// </summary>
     public abstract string DataDirectory { get; set; }
@@ -32,4 +37,14 @@ public abstract class ConfigDataBase
     /// Gets or sets the language setting for the application
     /// </summary>
     public abstract Language Language { get; set; }
+
+    /// <summary>
+    /// Gets or sets the timeout duration for each tick execution
+    /// </summary>
+    public abstract TimeSpan TickTimeout { get; set; }
+
+    /// <summary>
+    /// Gets or sets the maximum number of consecutive timeouts allowed before circuit breaker triggers
+    /// </summary>
+    public abstract int MaxTimeoutCount { get; set; }
 }

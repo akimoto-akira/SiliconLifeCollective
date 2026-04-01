@@ -16,30 +16,24 @@ using SiliconLife.Collective;
 namespace SiliconLife.Default;
 
 /// <summary>
-/// Tick object for handling console input and AI chat
+/// Tick object for handling console input and forwarding to silicon beings
 /// </summary>
 public class ConsoleTickObject : TickObject
 {
-    private readonly IAIClient _aiClient;
+    private readonly DefaultSiliconBeing _siliconBeing;
     private readonly DefaultLocalizationBase _localization;
-    private bool _shouldExit = false;
 
     /// <summary>
     /// Initializes a new instance of the ConsoleTickObject class
     /// </summary>
-    /// <param name="aiClient">The AI client</param>
+    /// <param name="siliconBeing">The silicon being to forward messages to</param>
     /// <param name="localization">The localization instance</param>
-    public ConsoleTickObject(IAIClient aiClient, DefaultLocalizationBase localization)
+    public ConsoleTickObject(DefaultSiliconBeing siliconBeing, DefaultLocalizationBase localization)
         : base(TimeSpan.Zero, true)
     {
-        _aiClient = aiClient;
+        _siliconBeing = siliconBeing;
         _localization = localization;
     }
-
-    /// <summary>
-    /// Gets whether the console should exit
-    /// </summary>
-    public bool ShouldExit => _shouldExit;
 
     /// <summary>
     /// Called when the tick interval has elapsed
@@ -61,40 +55,11 @@ public class ConsoleTickObject : TickObject
                 input.Equals("quit", StringComparison.OrdinalIgnoreCase))
             {
                 Console.WriteLine(_localization.ShutdownMessage);
-                _shouldExit = true;
+                Program.RequestExit();
                 return;
             }
 
-            ProcessInputAsync(input).ConfigureAwait(false);
-        }
-    }
-
-    /// <summary>
-    /// Processes user input and gets AI response
-    /// </summary>
-    /// <param name="input">The user input</param>
-    private async Task ProcessInputAsync(string input)
-    {
-        try
-        {
-            Console.WriteLine("Thinking...");
-            AIResponse response = await _aiClient.ChatAsync(input);
-
-            if (response.Success)
-            {
-                Console.WriteLine(response.Content);
-                Console.WriteLine();
-            }
-            else
-            {
-                Console.WriteLine($"Error: {response.ErrorMessage}");
-                Console.WriteLine();
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Unexpected error: {ex.Message}");
-            Console.WriteLine();
+            _siliconBeing.ChatService?.AddMessage(Guid.Empty, _siliconBeing.Id, input);
         }
     }
 }

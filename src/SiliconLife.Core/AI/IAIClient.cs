@@ -33,6 +33,13 @@ public interface IAIClient
     /// </summary>
     /// <param name="request">The AI request to send</param>
     /// <returns>The AI response</returns>
+    AIResponse Chat(AIRequest request);
+
+    /// <summary>
+    /// Sends a chat request to the AI service and returns the response asynchronously
+    /// </summary>
+    /// <param name="request">The AI request to send</param>
+    /// <returns>The AI response</returns>
     Task<AIResponse> ChatAsync(AIRequest request);
 
     /// <summary>
@@ -40,10 +47,25 @@ public interface IAIClient
     /// </summary>
     /// <param name="userMessage">The user message to send</param>
     /// <returns>The AI response</returns>
+    AIResponse Chat(string userMessage);
+
+    /// <summary>
+    /// Sends a chat request with a single user message asynchronously
+    /// </summary>
+    /// <param name="userMessage">The user message to send</param>
+    /// <returns>The AI response</returns>
     Task<AIResponse> ChatAsync(string userMessage);
 
     /// <summary>
     /// Sends a chat request with system prompt and user message
+    /// </summary>
+    /// <param name="systemPrompt">The system prompt</param>
+    /// <param name="userMessage">The user message</param>
+    /// <returns>The AI response</returns>
+    AIResponse Chat(string systemPrompt, string userMessage);
+
+    /// <summary>
+    /// Sends a chat request with system prompt and user message asynchronously
     /// </summary>
     /// <param name="systemPrompt">The system prompt</param>
     /// <param name="userMessage">The user message</param>

@@ -21,14 +21,22 @@ namespace SiliconLife.Default;
 /// </summary>
 public class Program
 {
+    private static SiliconBeingManager? _siliconBeingManager;
+    private static DefaultSiliconBeing? _defaultBeing;
+    private static bool _shouldExit = false;
+
     /// <summary>
     /// Main method
     /// </summary>
-    public static async Task Main(string[] args)
+    public static void Main(string[] args)
     {
         RegisterLocalizations();
+        ConfigDataBaseConverter.RegisterConfigType("Default", typeof(DefaultConfigData));
 
         Config config = Config.Instance;
+        config.Initialize(new DefaultConfigData());
+        config.LoadOrCreateConfig();
+        
         DefaultConfigData configData = (DefaultConfigData)config.Data;
         DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(configData.Language);
 
@@ -38,14 +46,36 @@ public class Program
         IAIClientFactory aiClientFactory = new OllamaClientFactory();
         IAIClient aiClient = aiClientFactory.CreateClient(configData.OllamaEndpoint, configData.DefaultModel);
 
-        ConsoleTickObject consoleTickObject = new ConsoleTickObject(aiClient, localization);
-        TestTickObject testTickObject = new TestTickObject();
-        
+        IStorage storage = new FileSystemStorage(configData.DataDirectory);
+
+        IChatService chatService = new SimpleChatService();
+
+        DefaultSiliconBeingFactory beingFactory = new DefaultSiliconBeingFactory(
+            aiClient,
+            storage,
+            configData.DataDirectory);
+
+        _siliconBeingManager = new SiliconBeingManager();
+
+        _defaultBeing = (DefaultSiliconBeing)beingFactory.CreateBeing(configData.CuratorGuid, "Default");
+        _defaultBeing.ChatService = chatService;
+
+        _siliconBeingManager.RegisterBeing(_defaultBeing);
+
+        ConsoleTickObject consoleTickObject = new ConsoleTickObject(_defaultBeing, localization);
+
+        // Set config for MainLoop
+        MainLoop.SetConfig(configData);
+
+        // Register tick objects
+        MainLoop.Register(_siliconBeingManager);
+        MainLoop.Register(consoleTickObject);
+
         MainLoop.Start();
 
-        while (!consoleTickObject.ShouldExit)
+        while (!_shouldExit)
         {
-            await Task.Delay(100);
+            Thread.Sleep(100);
         }
 
         MainLoop.Stop();
@@ -58,5 +88,13 @@ public class Program
     {
         LocalizationManager.Instance.Register<ZhCN>(Language.ZhCN);
         LocalizationManager.Instance.Register<EnUS>(Language.EnUS);
+    }
+
+    /// <summary>
+    /// Signals the application to exit
+    /// </summary>
+    public static void RequestExit()
+    {
+        _shouldExit = true;
     }
 }

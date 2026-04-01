@@ -60,4 +60,19 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the error message when data directory cannot be created
     /// </summary>
     public abstract string DataDirectoryCreateError { get; }
+
+    /// <summary>
+    /// Gets the message displayed when a silicon being is thinking
+    /// </summary>
+    public abstract string ThinkingMessage { get; }
+
+    /// <summary>
+    /// Gets the error message when an operation fails
+    /// </summary>
+    public abstract string ErrorMessage { get; }
+
+    /// <summary>
+    /// Gets the error message when an unexpected error occurs
+    /// </summary>
+    public abstract string UnexpectedErrorMessage { get; }
 }
