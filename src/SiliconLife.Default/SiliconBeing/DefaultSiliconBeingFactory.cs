@@ -23,6 +23,9 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     private readonly IAIClient _aiClient;
     private readonly IStorage _storage;
     private readonly string _dataDirectory;
+    private readonly ChatSystem? _chatSystem;
+    private readonly IMManager? _imManager;
+    private readonly Guid _userId;
 
     /// <summary>
     /// Initializes a new instance of the DefaultSiliconBeingFactory class
@@ -34,10 +37,27 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         IAIClient aiClient,
         IStorage storage,
         string dataDirectory)
+        : this(aiClient, storage, dataDirectory, null, null, Guid.Empty)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the DefaultSiliconBeingFactory class with ChatSystem and IMManager
+    /// </summary>
+    public DefaultSiliconBeingFactory(
+        IAIClient aiClient,
+        IStorage storage,
+        string dataDirectory,
+        ChatSystem chatSystem,
+        IMManager imManager,
+        Guid userId)
     {
         _aiClient = aiClient;
         _storage = storage;
         _dataDirectory = dataDirectory;
+        _chatSystem = chatSystem;
+        _imManager = imManager;
+        _userId = userId;
     }
 
     /// <summary>
@@ -56,6 +76,11 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         }
 
         string? soulContent = SoulFileManager.LoadSoul(beingDirectory);
+
+        if (_chatSystem != null && _imManager != null)
+        {
+            return new DefaultSiliconBeing(id, name, _aiClient, beingDirectory, soulContent, _chatSystem, _imManager, _userId);
+        }
 
         return new DefaultSiliconBeing(id, name, _aiClient, beingDirectory, soulContent);
     }
@@ -97,6 +122,11 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
             }
 
             string? soulContent = SoulFileManager.LoadSoul(beingDirectory);
+
+            if (_chatSystem != null && _imManager != null)
+            {
+                return new DefaultSiliconBeing(id, name, _aiClient, beingDirectory, soulContent, _chatSystem, _imManager, _userId);
+            }
 
             return new DefaultSiliconBeing(id, name, _aiClient, beingDirectory, soulContent);
         }

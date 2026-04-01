@@ -15,78 +15,45 @@ using System.Diagnostics;
 
 namespace SiliconLife.Collective;
 
-/// <summary>
-/// Main loop that drives all tick objects
-/// </summary>
 public static class MainLoop
 {
-    private static readonly List<TickObject> _tickObjects = new List<TickObject>();
-    private static readonly List<Action<TimeSpan>> _preTickCallbacks = new List<Action<TimeSpan>>();
-    private static readonly List<Action<TimeSpan>> _postTickCallbacks = new List<Action<TimeSpan>>();
-    private static readonly Thread _thread;
-    private static readonly Thread _watchdogThread;
-    private static readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-    private static readonly object _lock = new object();
-    private static bool _isRunning = false;
+    private static readonly List<TickObject> _tickObjects = [];
+    private static readonly Dictionary<TickObject, int> _consecutiveTimeoutCounts = [];
+    private static readonly Dictionary<TickObject, DateTime> _circuitBreakerResetTimes = [];
+    private static readonly List<Action<TimeSpan>> _preTickCallbacks = [];
+    private static readonly List<Action<TimeSpan>> _postTickCallbacks = [];
+    private static CancellationTokenSource _mainCts = new();
+    private static readonly CancellationTokenSource _watchdogCts = new();
+    private static readonly object _lock = new();
+    private static Thread? _thread;
+    private static Thread? _watchdogThread;
+    private static volatile bool _isRunning;
+    private static long _lastHeartbeatTicks = DateTime.MinValue.Ticks;
     private static ConfigDataBase? _config;
-    private static readonly object _executionLock = new object();
-    private static DateTime _lastTickStartTime;
-    private static int _consecutiveTimeoutCount = 0;
-    private static bool _circuitBreakerTripped = false;
-    private static DateTime _circuitBreakerResetTime;
-    private static bool _temporarilyDisableCircuitBreaker = false;
-
-    static MainLoop()
-    {
-        _thread = new Thread(Run);
-        _thread.IsBackground = true;
-        _thread.Name = "MainLoop";
-
-        _watchdogThread = new Thread(WatchdogRun);
-        _watchdogThread.IsBackground = true;
-        _watchdogThread.Name = "MainLoopWatchdog";
-    }
+    private static SiliconBeingManager _beingManager = new();
 
     /// <summary>
-    /// Gets whether the main loop is running
+    /// Gets the singleton <see cref="SiliconBeingManager"/> instance.
+    /// Not automatically registered to the tick loop.
     /// </summary>
+    public static SiliconBeingManager BeingManager => _beingManager;
+
     public static bool IsRunning => _isRunning;
 
     /// <summary>
-    /// Gets whether the circuit breaker is tripped
+    /// Update the watchdog heartbeat timestamp.
+    /// Called by long-running operations to prevent watchdog false-positives.
     /// </summary>
-    public static bool IsCircuitBreakerTripped => _circuitBreakerTripped;
-
-    /// <summary>
-    /// Temporarily disables circuit breaker for the next operation
-    /// This is only valid for the next tick callback or TickObject execution
-    /// </summary>
-    public static void TemporarilyDisableCircuitBreaker()
+    public static void UpdateHeartbeat()
     {
-        _temporarilyDisableCircuitBreaker = true;
+        Interlocked.Exchange(ref _lastHeartbeatTicks, DateTime.UtcNow.Ticks);
     }
 
-    /// <summary>
-    /// Manually resets the circuit breaker
-    /// </summary>
-    public static void ResetCircuitBreakerManually()
-    {
-        ResetCircuitBreaker();
-    }
-
-    /// <summary>
-    /// Sets the configuration for the main loop
-    /// </summary>
-    /// <param name="config">The configuration data</param>
     public static void SetConfig(ConfigDataBase config)
     {
         _config = config;
     }
 
-    /// <summary>
-    /// Registers a tick object to be updated by the main loop
-    /// </summary>
-    /// <param name="tickObject">The tick object to register</param>
     public static void Register(TickObject tickObject)
     {
         lock (_lock)
@@ -94,27 +61,21 @@ public static class MainLoop
             if (!_tickObjects.Contains(tickObject))
             {
                 _tickObjects.Add(tickObject);
-                SortTickObjects();
+                _tickObjects.Sort((a, b) => a.Priority.CompareTo(b.Priority));
             }
         }
     }
 
-    /// <summary>
-    /// Unregisters a tick object from the main loop
-    /// </summary>
-    /// <param name="tickObject">The tick object to unregister</param>
     public static void Unregister(TickObject tickObject)
     {
         lock (_lock)
         {
             _tickObjects.Remove(tickObject);
+            _consecutiveTimeoutCounts.Remove(tickObject);
+            _circuitBreakerResetTimes.Remove(tickObject);
         }
     }
 
-    /// <summary>
-    /// Registers a pre-tick callback function (executed before TickObjects)
-    /// </summary>
-    /// <param name="callback">The callback function that receives deltaTime</param>
     public static void RegisterPreTickCallback(Action<TimeSpan> callback)
     {
         lock (_lock)
@@ -126,10 +87,6 @@ public static class MainLoop
         }
     }
 
-    /// <summary>
-    /// Unregisters a pre-tick callback function
-    /// </summary>
-    /// <param name="callback">The callback function to unregister</param>
     public static void UnregisterPreTickCallback(Action<TimeSpan> callback)
     {
         lock (_lock)
@@ -138,10 +95,6 @@ public static class MainLoop
         }
     }
 
-    /// <summary>
-    /// Registers a post-tick callback function (executed after TickObjects)
-    /// </summary>
-    /// <param name="callback">The callback function that receives deltaTime</param>
     public static void RegisterPostTickCallback(Action<TimeSpan> callback)
     {
         lock (_lock)
@@ -153,10 +106,6 @@ public static class MainLoop
         }
     }
 
-    /// <summary>
-    /// Unregisters a post-tick callback function
-    /// </summary>
-    /// <param name="callback">The callback function to unregister</param>
     public static void UnregisterPostTickCallback(Action<TimeSpan> callback)
     {
         lock (_lock)
@@ -165,9 +114,6 @@ public static class MainLoop
         }
     }
 
-    /// <summary>
-    /// Starts the main loop
-    /// </summary>
     public static void Start()
     {
         if (_isRunning)
@@ -176,13 +122,23 @@ public static class MainLoop
         }
 
         _isRunning = true;
+        Interlocked.Exchange(ref _lastHeartbeatTicks, DateTime.UtcNow.Ticks);
+
+        _thread = new Thread(Run)
+        {
+            IsBackground = true,
+            Name = "MainLoop"
+        };
         _thread.Start();
+
+        _watchdogThread = new Thread(WatchdogRun)
+        {
+            IsBackground = true,
+            Name = "MainLoop-Watchdog"
+        };
         _watchdogThread.Start();
     }
 
-    /// <summary>
-    /// Stops the main loop
-    /// </summary>
     public static void Stop()
     {
         if (!_isRunning)
@@ -191,274 +147,208 @@ public static class MainLoop
         }
 
         _isRunning = false;
-        _cancellationTokenSource.Cancel();
-        _thread.Join(1000);
-        _watchdogThread.Join(1000);
+        _mainCts.Cancel();
+        _watchdogCts.Cancel();
+
+        _watchdogThread?.Join(1000);
+        _thread?.Join(1000);
     }
 
-    /// <summary>
-    /// Main loop execution method
-    /// Runs at full speed, measuring time between ticks
-    /// </summary>
     private static void Run()
     {
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
+        Stopwatch stopwatch = Stopwatch.StartNew();
+        TimeSpan lastTickTime = TimeSpan.Zero;
 
-        TimeSpan lastTickTime = stopwatch.Elapsed;
-
-        while (!_cancellationTokenSource.IsCancellationRequested)
+        while (!_mainCts.Token.IsCancellationRequested)
         {
-            // Check if circuit breaker is tripped and if it's time to reset
-            if (_circuitBreakerTripped && DateTime.Now > _circuitBreakerResetTime)
-            {
-                ResetCircuitBreaker();
-            }
-
-            // Skip execution if circuit breaker is still tripped and not temporarily disabled
-            if (_circuitBreakerTripped && !_temporarilyDisableCircuitBreaker)
-            {
-                Thread.Sleep(100); // Wait a bit before checking again
-                continue;
-            }
-
             TimeSpan currentTickTime = stopwatch.Elapsed;
             TimeSpan deltaTime = currentTickTime - lastTickTime;
             lastTickTime = currentTickTime;
 
-            UpdateTickObjects(deltaTime);
+            Interlocked.Exchange(ref _lastHeartbeatTicks, DateTime.UtcNow.Ticks);
+            ExecuteTick(deltaTime);
         }
 
         stopwatch.Stop();
     }
 
     /// <summary>
-    /// Watchdog thread that monitors tick execution time
+    /// Watchdog: monitors MainLoop thread health.
+    /// If the main loop stops updating heartbeat, it is considered hung and will be restarted.
     /// </summary>
     private static void WatchdogRun()
     {
-        while (!_cancellationTokenSource.IsCancellationRequested)
-        {
-            try
-            {
-                if (_isRunning && _config != null && !_circuitBreakerTripped)
-                {
-                    TimeSpan timeout = _config.TickTimeout;
-                    DateTime currentTime = DateTime.Now;
+        TimeSpan watchdogTimeout = _config?.WatchdogTimeout ?? TimeSpan.FromSeconds(10);
 
-                    lock (_executionLock)
+        while (!_watchdogCts.Token.IsCancellationRequested)
+        {
+            Thread.Sleep(watchdogTimeout);
+
+            if (!_isRunning)
+            {
+                continue;
+            }
+
+            if (_thread is null || !_thread.IsAlive)
+            {
+                // Main thread is dead, restart it
+                RestartMainThread();
+            }
+            else if ((DateTime.UtcNow - new DateTime(Interlocked.Read(ref _lastHeartbeatTicks))) > watchdogTimeout)
+            {
+                // Main thread is hung, kill and restart
+                try { _thread.Interrupt(); } catch { }
+                if (_thread.Join(TimeSpan.FromSeconds(1)))
+                {
+                    RestartMainThread();
+                }
+            }
+        }
+    }
+
+    private static void RestartMainThread()
+    {
+        _mainCts.Cancel();
+
+        lock (_lock)
+        {
+            _consecutiveTimeoutCounts.Clear();
+            _circuitBreakerResetTimes.Clear();
+        }
+
+        _mainCts.Dispose();
+        var newCts = new CancellationTokenSource();
+        _mainCts = newCts;
+
+        _thread = new Thread(Run)
+        {
+            IsBackground = true,
+            Name = "MainLoop"
+        };
+        _lastHeartbeatTicks = DateTime.UtcNow.Ticks;
+        _thread.Start();
+    }
+
+    private static void ExecuteTick(TimeSpan deltaTime)
+    {
+        TimeSpan timeout = _config?.TickTimeout ?? TimeSpan.FromSeconds(1);
+        int maxTimeoutCount = _config?.MaxTimeoutCount ?? 3;
+
+        lock (_lock)
+        {
+            TickObject[] tickObjectsCopy = [.. _tickObjects];
+            Action<TimeSpan>[] preCallbacksCopy = [.. _preTickCallbacks];
+            Action<TimeSpan>[] postCallbacksCopy = [.. _postTickCallbacks];
+
+            foreach (Action<TimeSpan> callback in preCallbacksCopy)
+            {
+                ExecuteWithTimeout(callback, deltaTime, timeout);
+            }
+
+            // Tick BeingManager directly, no circuit breaker protection
+            // Heartbeat is updated by SiliconBeingManager before each being
+            _beingManager?.Tick(deltaTime);
+
+            foreach (TickObject tickObject in tickObjectsCopy)
+            {
+                // Circuit breaker: skip if in cooldown
+                if (_circuitBreakerResetTimes.TryGetValue(tickObject, out DateTime resetTime)
+                    && DateTime.Now < resetTime)
+                {
+                    continue;
+                }
+
+                if (_circuitBreakerResetTimes.Remove(tickObject))
+                {
+                    _consecutiveTimeoutCounts.Remove(tickObject);
+                }
+
+                if (ExecuteWithTimeout(tickObject.Tick, deltaTime, timeout))
+                {
+                    _consecutiveTimeoutCounts[tickObject] = 0;
+                }
+                else
+                {
+                    _consecutiveTimeoutCounts.TryGetValue(tickObject, out int count);
+                    _consecutiveTimeoutCounts[tickObject] = count + 1;
+
+                    if (_consecutiveTimeoutCounts[tickObject] >= maxTimeoutCount)
                     {
-                        if (currentTime - _lastTickStartTime > timeout)
-                        {
-                            // Tick execution timed out
-                            HandleTimeout();
-                        }
+                        _circuitBreakerResetTimes[tickObject] = DateTime.Now + TimeSpan.FromMinutes(1);
+                        _consecutiveTimeoutCounts[tickObject] = 0;
                     }
                 }
             }
-            catch (Exception)
-            {
-                // Watchdog should never crash
-            }
 
-            Thread.Sleep(50); // Check every 50ms
+            foreach (Action<TimeSpan> callback in postCallbacksCopy)
+            {
+                ExecuteWithTimeout(callback, deltaTime, timeout);
+            }
         }
     }
 
     /// <summary>
-    /// Updates all registered tick objects
+    /// Execute action on a temporary thread with timeout.
+    /// Returns true if completed within timeout, false if timed out.
     /// </summary>
-    /// <param name="deltaTime">Time elapsed since the last update</param>
-    private static void UpdateTickObjects(TimeSpan deltaTime)
+    private static bool ExecuteWithTimeout(Action<TimeSpan> action, TimeSpan deltaTime, TimeSpan timeout)
     {
-        // Update last tick start time (without holding the lock)
-        DateTime tickStart = DateTime.Now;
-        lock (_executionLock)
-        {
-            _lastTickStartTime = tickStart;
-        }
+        bool completed = false;
+        Thread? worker = null;
 
         try
         {
-            List<TickObject> tickObjectsCopy;
-            List<Action<TimeSpan>> preTickCallbacksCopy;
-            List<Action<TimeSpan>> postTickCallbacksCopy;
-
-            lock (_lock)
-            {
-                tickObjectsCopy = new List<TickObject>(_tickObjects);
-                preTickCallbacksCopy = new List<Action<TimeSpan>>(_preTickCallbacks);
-                postTickCallbacksCopy = new List<Action<TimeSpan>>(_postTickCallbacks);
-            }
-
-            // Track if any timeout occurred during this tick
-            bool timeoutOccurred = false;
-
-            // Execute pre-tick callbacks with timeout monitoring
-            foreach (Action<TimeSpan> callback in preTickCallbacksCopy)
+            worker = new Thread(() =>
             {
                 try
                 {
-                    DateTime callbackStart = DateTime.Now;
-                    TimeSpan timeout = _config?.TickTimeout ?? TimeSpan.FromSeconds(5);
-                    
-                    // Create a task to execute the callback
-                    Task task = new Task(() => callback(deltaTime));
-                    task.Start();
-                    
-                    // Wait for the task to complete or timeout
-                    if (!task.Wait(timeout))
-                    {
-                        // Callback timed out
-                        timeoutOccurred = true;
-                        HandleTimeout();
-                    }
+                    action(deltaTime);
+                    completed = true;
                 }
-                catch (Exception)
+                catch (ThreadAbortException)
                 {
-                    // Exception occurred, treat as timeout
-                    timeoutOccurred = true;
-                    HandleTimeout();
+                    // Thread was killed due to timeout
                 }
+                catch
+                {
+                }
+            })
+            {
+                IsBackground = true
+            };
+
+            worker.Start();
+
+            if (worker.Join(timeout))
+            {
+                return true;
             }
 
-            // Execute tick objects with timeout monitoring
-            foreach (TickObject tickObject in tickObjectsCopy)
+            worker.Interrupt();
+            if (!worker.Join(TimeSpan.FromMilliseconds(200)))
             {
                 try
                 {
-                    DateTime tickObjectStart = DateTime.Now;
-                    TimeSpan timeout = _config?.TickTimeout ?? TimeSpan.FromSeconds(5);
-                    
-                    // Create a task to execute the tick object
-                    Task task = new Task(() => tickObject.Tick(deltaTime));
-                    task.Start();
-                    
-                    // Wait for the task to complete or timeout
-                    if (!task.Wait(timeout))
-                    {
-                        // TickObject timed out
-                        timeoutOccurred = true;
-                        HandleTimeout();
-                    }
+                    worker.Abort();
                 }
-                catch (Exception)
+                catch (PlatformNotSupportedException)
                 {
-                    // Exception occurred, treat as timeout
-                    timeoutOccurred = true;
-                    HandleTimeout();
+                    // .NET Core+ does not support Abort; thread must be cancelled cooperatively via Interrupt/CancellationToken
+                }
+
+                if (!worker.Join(TimeSpan.FromMilliseconds(500)))
+                {
+                    // Watchdog: thread is still alive, considered out of control
+                    // TODO: Log warning
                 }
             }
 
-            // Execute post-tick callbacks with timeout monitoring
-            foreach (Action<TimeSpan> callback in postTickCallbacksCopy)
-            {
-                try
-                {
-                    DateTime callbackStart = DateTime.Now;
-                    TimeSpan timeout = _config?.TickTimeout ?? TimeSpan.FromSeconds(5);
-                    
-                    // Create a task to execute the callback
-                    Task task = new Task(() => callback(deltaTime));
-                    task.Start();
-                    
-                    // Wait for the task to complete or timeout
-                    if (!task.Wait(timeout))
-                    {
-                        // Callback timed out
-                        timeoutOccurred = true;
-                        HandleTimeout();
-                    }
-                }
-                catch (Exception)
-                {
-                    // Exception occurred, treat as timeout
-                    timeoutOccurred = true;
-                    HandleTimeout();
-                }
-            }
-
-            // Reset timeout count only if no timeouts occurred in this tick
-            if (!timeoutOccurred)
-            {
-                _consecutiveTimeoutCount = 0;
-            }
-
-            // Reset temporary circuit breaker disable flag
-            _temporarilyDisableCircuitBreaker = false;
+            return false;
         }
-        catch (Exception)
+        catch (ThreadInterruptedException)
         {
-            // Reset timeout count even on exceptions
-            _consecutiveTimeoutCount = 0;
-            // Reset temporary circuit breaker disable flag
-            _temporarilyDisableCircuitBreaker = false;
+            // Main thread was interrupted (e.g., by watchdog), worker may still be running fine
+            return false;
         }
-    }
-
-    /// <summary>
-    /// Executes an action with timeout monitoring
-    /// </summary>
-    /// <param name="action">The action to execute</param>
-    private static void ExecuteWithTimeout(Action action)
-    {
-        if (_circuitBreakerTripped)
-        {
-            return;
-        }
-
-        DateTime startTime = DateTime.Now;
-        TimeSpan timeout = _config?.TickTimeout ?? TimeSpan.FromSeconds(5);
-
-        // Create a task to execute the action
-        Task task = new Task(action);
-        task.Start();
-
-        // Wait for the task to complete or timeout
-        if (!task.Wait(timeout))
-        {
-            // Action timed out
-            HandleTimeout();
-        }
-    }
-
-    /// <summary>
-    /// Handles a timeout event
-    /// </summary>
-    private static void HandleTimeout()
-    {
-        _consecutiveTimeoutCount++;
-
-        if (_config != null && _consecutiveTimeoutCount >= _config.MaxTimeoutCount)
-        {
-            TripCircuitBreaker();
-        }
-    }
-
-    /// <summary>
-    /// Trips the circuit breaker
-    /// </summary>
-    private static void TripCircuitBreaker()
-    {
-        _circuitBreakerTripped = true;
-        _circuitBreakerResetTime = DateTime.Now + TimeSpan.FromMinutes(1); // Reset after 1 minute
-        _consecutiveTimeoutCount = 0;
-    }
-
-    /// <summary>
-    /// Resets the circuit breaker
-    /// </summary>
-    private static void ResetCircuitBreaker()
-    {
-        _circuitBreakerTripped = false;
-        _consecutiveTimeoutCount = 0;
-    }
-
-    /// <summary>
-    /// Sorts tick objects by priority (lower value = higher priority)
-    /// </summary>
-    private static void SortTickObjects()
-    {
-        _tickObjects.Sort((a, b) => a.Priority.CompareTo(b.Priority));
     }
 }

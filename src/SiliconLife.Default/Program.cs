@@ -21,9 +21,10 @@ namespace SiliconLife.Default;
 /// </summary>
 public class Program
 {
-    private static SiliconBeingManager? _siliconBeingManager;
     private static DefaultSiliconBeing? _defaultBeing;
     private static bool _shouldExit = false;
+    private static ChatSystem? _chatSystem;
+    private static IMManager? _imManager;
 
     /// <summary>
     /// Main method
@@ -47,31 +48,35 @@ public class Program
         IAIClient aiClient = aiClientFactory.CreateClient(configData.OllamaEndpoint, configData.DefaultModel);
 
         IStorage storage = new FileSystemStorage(configData.DataDirectory);
+        ITimeStorage timeStorage = new FileSystemTimeStorage(
+            Path.Combine(configData.DataDirectory, "chat"));
 
-        IChatService chatService = new SimpleChatService();
+        _chatSystem = new ChatSystem(timeStorage);
+
+        IIMProvider imProvider = new ConsoleIMProvider(configData.UserGuid, configData.CuratorGuid);
+        imProvider.ExitRequested += (s, e) => RequestExit();
+
+        SiliconBeingManager beingManager = MainLoop.BeingManager;
+
+        _imManager = new IMManager(imProvider, _chatSystem, beingManager);
 
         DefaultSiliconBeingFactory beingFactory = new DefaultSiliconBeingFactory(
             aiClient,
             storage,
-            configData.DataDirectory);
-
-        _siliconBeingManager = new SiliconBeingManager();
+            configData.DataDirectory,
+            _chatSystem,
+            _imManager,
+            configData.UserGuid);
 
         _defaultBeing = (DefaultSiliconBeing)beingFactory.CreateBeing(configData.CuratorGuid, "Default");
-        _defaultBeing.ChatService = chatService;
 
-        _siliconBeingManager.RegisterBeing(_defaultBeing);
+        beingManager.RegisterBeing(_defaultBeing);
 
-        ConsoleTickObject consoleTickObject = new ConsoleTickObject(_defaultBeing, localization);
-
-        // Set config for MainLoop
         MainLoop.SetConfig(configData);
-
-        // Register tick objects
-        MainLoop.Register(_siliconBeingManager);
-        MainLoop.Register(consoleTickObject);
-
+        MainLoop.Register(beingManager);
         MainLoop.Start();
+
+        _ = _imManager.StartAsync();
 
         while (!_shouldExit)
         {

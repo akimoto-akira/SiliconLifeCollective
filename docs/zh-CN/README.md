@@ -83,7 +83,7 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] 第一阶段：控制台 AI 对话
 - [x] 第二阶段：框架骨架（MainLoop + TickObject）
 - [x] 第三阶段：第一个硅基人（灵魂文件驱动）
-- [ ] 第四阶段：持久化记忆（ChatSystem）
+- [x] 第四阶段：持久化记忆（ChatSystem）
 - [ ] 第五阶段：工具系统 + 执行器
 - [ ] 第六阶段：权限系统
 - [ ] 第七阶段：动态编译 + 自我进化

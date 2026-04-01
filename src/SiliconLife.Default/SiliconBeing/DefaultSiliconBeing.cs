@@ -22,12 +22,25 @@ public class DefaultSiliconBeing : SiliconBeingBase
 {
     private readonly IAIClient _aiClient;
     private readonly string? _soulContent;
-    private bool _isProcessing;
+    private readonly ChatSystem? _chatSystem;
+    private readonly IMManager? _imManager;
+    private readonly Guid _userId;
+    private volatile bool _isProcessing;
 
     /// <summary>
     /// Gets whether this silicon being is idle (no pending tasks)
     /// </summary>
-    public override bool IsIdle => ChatService?.GetPendingMessages(Id).Count == 0 && !_isProcessing;
+    public override bool IsIdle
+    {
+        get
+        {
+            if (_chatSystem != null)
+            {
+                return _chatSystem.GetPendingMessages(Id).Count == 0 && !_isProcessing;
+            }
+            return ChatService?.GetPendingMessages(Id).Count == 0 && !_isProcessing;
+        }
+    }
 
     /// <summary>
     /// Initializes a new instance of the DefaultSiliconBeing class
@@ -43,10 +56,29 @@ public class DefaultSiliconBeing : SiliconBeingBase
         IAIClient aiClient,
         string beingDirectory,
         string? soulContent)
+        : this(id, name, aiClient, beingDirectory, soulContent, null, null, Guid.Empty)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the DefaultSiliconBeing class with ChatSystem and IMManager
+    /// </summary>
+    public DefaultSiliconBeing(
+        Guid id,
+        string name,
+        IAIClient aiClient,
+        string beingDirectory,
+        string? soulContent,
+        ChatSystem chatSystem,
+        IMManager imManager,
+        Guid userId)
         : base(id, name)
     {
         _aiClient = aiClient;
         _soulContent = soulContent;
+        _chatSystem = chatSystem;
+        _imManager = imManager;
+        _userId = userId;
         _isProcessing = false;
     }
 
@@ -57,11 +89,30 @@ public class DefaultSiliconBeing : SiliconBeingBase
     /// <param name="deltaTime">Time elapsed since the last tick</param>
     public override void Tick(TimeSpan deltaTime)
     {
-        if (!_isProcessing && ChatService != null)
+        if (!_isProcessing)
         {
-            ContextManager contextManager = new ContextManager(_aiClient, _soulContent, ChatService, Id);
+            ContextManager contextManager;
 
-            if (!contextManager.HasPendingMessages())
+            if (_chatSystem != null)
+            {
+                List<ChatMessage> pendingMessages = _chatSystem.GetPendingMessages(Id);
+                if (pendingMessages.Count == 0)
+                {
+                    return;
+                }
+
+                contextManager = new ContextManager(_aiClient, _soulContent, _chatSystem, Id, _userId);
+            }
+            else if (ChatService != null)
+            {
+                contextManager = new ContextManager(_aiClient, _soulContent, ChatService, Id);
+
+                if (!contextManager.HasPendingMessages())
+                {
+                    return;
+                }
+            }
+            else
             {
                 return;
             }
@@ -69,21 +120,32 @@ public class DefaultSiliconBeing : SiliconBeingBase
             _isProcessing = true;
             try
             {
-                // Get current localization
                 Language language = Config.Instance.Data.Language;
                 DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(language);
                 
                 Console.WriteLine($"{Name}: {localization.ThinkingMessage}");
 
-                contextManager.FetchPendingMessages();
+                if (_chatSystem == null)
+                {
+                    contextManager.FetchPendingMessages();
+                }
 
                 AIResponse response = contextManager.GetResponse();
 
                 if (response.Success && !string.IsNullOrEmpty(response.Content))
                 {
-                    Console.WriteLine($"{Name}: {response.Content}");
-                    Console.WriteLine();
+                    _chatSystem?.AddMessage(Id, _userId, response.Content);
                     contextManager.MarkMessageProcessed();
+
+                    if (_imManager != null)
+                    {
+                        _ = _imManager.SendMessageAsync(Id, _userId, $"{Name}: {response.Content}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{Name}: {response.Content}");
+                    }
+                    Console.WriteLine();
                 }
                 else
                 {
@@ -93,7 +155,6 @@ public class DefaultSiliconBeing : SiliconBeingBase
             }
             catch (Exception ex)
             {
-                // Get current localization
                 Language language = Config.Instance.Data.Language;
                 DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(language);
                 

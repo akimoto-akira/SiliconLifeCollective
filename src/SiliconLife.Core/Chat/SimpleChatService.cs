@@ -18,76 +18,46 @@ namespace SiliconLife.Collective;
 /// </summary>
 public class SimpleChatService : IChatService
 {
-    private readonly Dictionary<Guid, Dictionary<Guid, List<string>>> _channels;
+    private readonly Dictionary<Guid, List<ChatMessage>> _inbox;
     private readonly object _lock = new object();
 
     public SimpleChatService()
     {
-        _channels = new Dictionary<Guid, Dictionary<Guid, List<string>>>();
-    }
-
-    private Guid GetChannelKey(Guid senderId, Guid receiverId)
-    {
-        return senderId < receiverId ? senderId : receiverId;
-    }
-
-    private (Guid sender, Guid receiver) GetChannelPair(Guid channelKey, Guid originalSender, Guid originalReceiver)
-    {
-        if (channelKey == originalSender)
-        {
-            return (originalSender, originalReceiver);
-        }
-        return (originalReceiver, originalSender);
+        _inbox = new Dictionary<Guid, List<ChatMessage>>();
     }
 
     /// <summary>
     /// Gets pending messages for a specific silicon being (where receiver = beingId)
     /// </summary>
-    /// <param name="beingId">The silicon being ID (receiver)</param>
-    /// <returns>List of pending messages</returns>
-    public List<string> GetPendingMessages(Guid beingId)
+    public List<ChatMessage> GetPendingMessages(Guid beingId)
     {
         lock (_lock)
         {
-            List<string> result = new List<string>();
-
-            foreach (KeyValuePair<Guid, Dictionary<Guid, List<string>>> channel in _channels)
+            if (!_inbox.TryGetValue(beingId, out List<ChatMessage>? messages))
             {
-                foreach (KeyValuePair<Guid, List<string>> senderMessages in channel.Value)
-                {
-                    Guid sender = senderMessages.Key;
-                    List<string> messages = senderMessages.Value;
-
-                    if (channel.Key == beingId)
-                    {
-                        result.AddRange(messages);
-                    }
-                }
+                return [];
             }
 
-            return result;
+            return messages.Where(m => !m.IsProcessed).ToList();
         }
     }
 
     /// <summary>
     /// Marks a message as processed
     /// </summary>
-    /// <param name="receiverId">The silicon being ID (receiver)</param>
-    /// <param name="message">The message to mark as processed</param>
-    public void MarkMessageProcessed(Guid receiverId, string message)
+    public void MarkMessageProcessed(Guid receiverId, Guid messageId)
     {
         lock (_lock)
         {
-            foreach (Dictionary<Guid, List<string>> channel in _channels.Values)
+            if (!_inbox.TryGetValue(receiverId, out List<ChatMessage>? messages))
             {
-                foreach (List<string> messages in channel.Values)
-                {
-                    if (messages.Contains(message))
-                    {
-                        messages.Remove(message);
-                        return;
-                    }
-                }
+                return;
+            }
+
+            ChatMessage? msg = messages.FirstOrDefault(m => m.Id == messageId);
+            if (msg != null)
+            {
+                msg.IsProcessed = true;
             }
         }
     }
@@ -95,26 +65,16 @@ public class SimpleChatService : IChatService
     /// <summary>
     /// Adds a message to a channel (sender -> receiver)
     /// </summary>
-    /// <param name="senderId">The sender ID (0 for user)</param>
-    /// <param name="receiverId">The receiver ID (silicon being)</param>
-    /// <param name="message">The message content</param>
-    public void AddMessage(Guid senderId, Guid receiverId, string message)
+    public void AddMessage(Guid senderId, Guid receiverId, ChatMessage message)
     {
         lock (_lock)
         {
-            Guid channelKey = receiverId;
-
-            if (!_channels.ContainsKey(channelKey))
+            if (!_inbox.ContainsKey(receiverId))
             {
-                _channels[channelKey] = new Dictionary<Guid, List<string>>();
+                _inbox[receiverId] = new List<ChatMessage>();
             }
 
-            if (!_channels[channelKey].ContainsKey(senderId))
-            {
-                _channels[channelKey][senderId] = new List<string>();
-            }
-
-            _channels[channelKey][senderId].Add(message);
+            _inbox[receiverId].Add(message);
         }
     }
 }

@@ -23,20 +23,20 @@ public interface IChatService
     /// </summary>
     /// <param name="beingId">The silicon being ID (receiver)</param>
     /// <returns>List of pending messages</returns>
-    List<string> GetPendingMessages(Guid beingId);
+    List<ChatMessage> GetPendingMessages(Guid beingId);
 
     /// <summary>
     /// Marks a message as processed
     /// </summary>
     /// <param name="receiverId">The silicon being ID (receiver)</param>
-    /// <param name="message">The message to mark as processed</param>
-    void MarkMessageProcessed(Guid receiverId, string message);
+    /// <param name="messageId">The message ID to mark as processed</param>
+    void MarkMessageProcessed(Guid receiverId, Guid messageId);
 
     /// <summary>
     /// Adds a message to a channel (sender -> receiver)
     /// </summary>
-    /// <param name="senderId">The sender ID (0 for user)</param>
+    /// <param name="senderId">The sender ID</param>
     /// <param name="receiverId">The receiver ID (silicon being)</param>
-    /// <param name="message">The message content</param>
-    void AddMessage(Guid senderId, Guid receiverId, string message);
+    /// <param name="message">The message to add</param>
+    void AddMessage(Guid senderId, Guid receiverId, ChatMessage message);
 }

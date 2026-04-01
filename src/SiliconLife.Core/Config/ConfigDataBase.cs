@@ -47,4 +47,16 @@ public abstract class ConfigDataBase
     /// Gets or sets the maximum number of consecutive timeouts allowed before circuit breaker triggers
     /// </summary>
     public abstract int MaxTimeoutCount { get; set; }
+
+    /// <summary>
+    /// Gets or sets the watchdog timeout duration.
+    /// If the main loop thread does not update heartbeat within this duration,
+    /// the watchdog will consider it hung and attempt to restart it.
+    /// </summary>
+    public abstract TimeSpan WatchdogTimeout { get; set; }
+
+    /// <summary>
+    /// Gets the reserved GUID representing the human user
+    /// </summary>
+    public Guid UserGuid { get; } = new Guid("00000000-0000-0000-0000-000000000001");
 }

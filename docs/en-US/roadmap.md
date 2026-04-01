@@ -64,7 +64,7 @@ Every phase ends with a **runnable, observable** system. No phase produces "a pi
 
 ---
 
-## Phase 4: Has Memory
+## ~~Phase 4: Has Memory~~ ✅ Done
 
 **Goal**: Conversations persist across restarts.
 

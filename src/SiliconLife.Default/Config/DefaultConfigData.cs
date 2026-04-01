@@ -48,6 +48,11 @@ public class DefaultConfigData : ConfigDataBase
     public override int MaxTimeoutCount { get; set; } = 3;
 
     /// <summary>
+    /// Gets or sets the watchdog timeout duration.
+    /// </summary>
+    public override TimeSpan WatchdogTimeout { get; set; } = TimeSpan.FromSeconds(10);
+
+    /// <summary>
     /// Gets or sets the Ollama API endpoint URL
     /// </summary>
     public string OllamaEndpoint { get; set; } = "http://localhost:11434";
