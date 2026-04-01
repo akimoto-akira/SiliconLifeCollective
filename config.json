@@ -1,0 +1,7 @@
+{
+  "DataDirectory": "./data",
+  "CuratorGuid": "00000000-0000-0000-0000-000000000000",
+  "Language": "zh-CN",
+  "OllamaEndpoint": "http://localhost:11434",
+  "DefaultModel": "llama3.2"
+}

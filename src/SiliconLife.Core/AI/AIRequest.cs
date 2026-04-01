@@ -1,0 +1,56 @@
+// Copyright (c) 2026 Hoshino Kennji
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+namespace SiliconLife.Collective;
+
+/// <summary>
+/// Request to AI service
+/// </summary>
+public class AIRequest
+{
+    /// <summary>
+    /// Gets or sets the model name to use
+    /// </summary>
+    public string Model { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the list of messages in the conversation
+    /// </summary>
+    public List<Message> Messages { get; set; } = new List<Message>();
+
+    /// <summary>
+    /// Gets or sets the temperature for response generation (0.0 to 1.0)
+    /// </summary>
+    public double Temperature { get; set; } = 0.7;
+
+    /// <summary>
+    /// Gets or sets the maximum number of tokens to generate
+    /// </summary>
+    public int? MaxTokens { get; set; }
+
+    /// <summary>
+    /// Creates a new AI request with the specified model
+    /// </summary>
+    public AIRequest(string model)
+    {
+        Model = model;
+    }
+
+    /// <summary>
+    /// Adds a message to the conversation
+    /// </summary>
+    public void AddMessage(MessageRole role, string content)
+    {
+        Messages.Add(new Message(role, content));
+    }
+}
