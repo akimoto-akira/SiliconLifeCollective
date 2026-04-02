@@ -8,7 +8,7 @@ Every phase ends with a **runnable, observable** system. No phase produces "a pi
 
 ---
 
-## Phase 1: Can Chat
+## ~~Phase 1: Can Chat~~ ✅ Done
 
 **Goal**: Console input → AI call → Console output. Minimum verifiable unit.
 
@@ -27,7 +27,7 @@ Every phase ends with a **runnable, observable** system. No phase produces "a pi
 
 ---
 
-## Phase 2: Has Skeleton
+## ~~Phase 2: Has Skeleton~~ ✅ Done
 
 **Goal**: Replace the "bare loop" with a framework structure. Behavior unchanged.
 
@@ -44,7 +44,7 @@ Every phase ends with a **runnable, observable** system. No phase produces "a pi
 
 ---
 
-## Phase 3: Has a Soul
+## ~~Phase 3: Has a Soul~~ ✅ Done
 
 **Goal**: The first Silicon Being is alive within the framework.
 
@@ -81,7 +81,7 @@ Every phase ends with a **runnable, observable** system. No phase produces "a pi
 
 ---
 
-## Phase 5: Can Act (Tool System)
+## ~~Phase 5: Can Act (Tool System)~~ ✅ Done
 
 **Goal**: Silicon Beings can execute operations, not just talk.
 

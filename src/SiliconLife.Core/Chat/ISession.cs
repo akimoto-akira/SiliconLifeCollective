@@ -53,21 +53,24 @@ public interface ISession
     List<ChatMessage> GetMessages(int offset = 0, int limit = 50);
 
     /// <summary>
-    /// Get pending messages
+    /// Get pending (unread) messages for a specific participant.
+    /// A message is pending if the participant's ID is not in the message's ReadBy list.
     /// </summary>
-    /// <param name="receiverId">Receiver GUID</param>
+    /// <param name="participantId">The participant (reader) to check unread messages for</param>
     /// <returns>Unread message list</returns>
-    List<ChatMessage> GetPendingMessages(Guid receiverId);
+    List<ChatMessage> GetPendingMessages(Guid participantId);
 
     /// <summary>
-    /// Mark single message as processed
+    /// Mark a single message as read by a specific participant.
     /// </summary>
     /// <param name="messageId">Message ID</param>
-    void MarkMessageAsProcessed(Guid messageId);
+    /// <param name="readerId">The participant who read the message</param>
+    void MarkMessageAsRead(Guid messageId, Guid readerId);
 
     /// <summary>
-    /// Mark multiple messages as processed
+    /// Mark multiple messages as read by a specific participant.
     /// </summary>
     /// <param name="messageIds">Message ID collection</param>
-    void MarkMessagesAsProcessed(IEnumerable<Guid> messageIds);
+    /// <param name="readerId">The participant who read the messages</param>
+    void MarkMessagesAsRead(IEnumerable<Guid> messageIds, Guid readerId);
 }

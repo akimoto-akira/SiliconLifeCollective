@@ -35,14 +35,40 @@ public class ChatMessage
     public Guid ReceiverId { get; set; }
     public string Content { get; set; } = string.Empty;
     public DateTime Timestamp { get; set; }
-    public bool IsProcessed { get; set; }
     public MessageType Type { get; set; }
+
+    /// <summary>
+    /// List of participant IDs who have read this message.
+    /// A message is "unread" for a participant if their ID is not in this list.
+    /// </summary>
+    public List<Guid> ReadBy { get; set; } = [];
+
+    /// <summary>
+    /// Optional explicit message role for AI conversation context.
+    /// When null, role is inferred from SenderId (User or Assistant).
+    /// Used to persist Tool-related messages that cannot be inferred from sender alone.
+    /// </summary>
+    public MessageRole? Role { get; set; }
+
+    /// <summary>
+    /// Tool call ID for tool result messages, matching the originating ToolCall.
+    /// </summary>
+    public string? ToolCallId { get; set; }
+
+    /// <summary>
+    /// Serialized tool calls JSON for assistant messages that requested tool execution.
+    /// </summary>
+    public string? ToolCallsJson { get; set; }
+
+    /// <summary>
+    /// Thinking content (chain-of-thought reasoning from the AI).
+    /// </summary>
+    public string? Thinking { get; set; }
 
     public ChatMessage()
     {
         Id = Guid.NewGuid();
         Timestamp = DateTime.UtcNow;
-        IsProcessed = false;
         Type = MessageType.Text;
     }
 

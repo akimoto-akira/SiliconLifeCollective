@@ -40,6 +40,17 @@ public class ChatSystem
     }
 
     /// <summary>
+    /// Add a pre-constructed ChatMessage to the appropriate session.
+    /// Used for persisting messages with rich metadata (e.g. tool-related fields).
+    /// Creates the session if it does not exist yet.
+    /// </summary>
+    public void AddMessage(ChatMessage message)
+    {
+        ISession session = GetOrCreateSession(message.SenderId, message.ReceiverId);
+        session.AddMessage(message);
+    }
+
+    /// <summary>
     /// Retrieve recent messages from the session between the given user and being.
     /// Creates the session if it does not exist yet.
     /// </summary>
@@ -131,18 +142,17 @@ public class ChatSystem
     }
 
     /// <summary>
-    /// Mark a single message as processed by finding the session that contains it.
+    /// Mark a single message as read by a specific reader across all sessions.
     /// </summary>
-    public void MarkMessageAsProcessed(Guid messageId)
+    public void MarkMessageAsRead(Guid messageId, Guid readerId)
     {
         lock (_lock)
         {
             foreach (ISession session in _sessions.Values)
             {
-                if (session.GetPendingMessages(Guid.Empty).Any(m => m.Id == messageId) ||
-                    session.GetMessages(0, int.MaxValue).Any(m => m.Id == messageId))
+                if (session.GetMessages(0, int.MaxValue).Any(m => m.Id == messageId))
                 {
-                    session.MarkMessageAsProcessed(messageId);
+                    session.MarkMessageAsRead(messageId, readerId);
                     return;
                 }
             }
@@ -150,15 +160,15 @@ public class ChatSystem
     }
 
     /// <summary>
-    /// Mark multiple messages as processed across all sessions.
+    /// Mark multiple messages as read by a specific reader across all sessions.
     /// </summary>
-    public void MarkMessagesAsProcessed(IEnumerable<Guid> messageIds)
+    public void MarkMessagesAsRead(IEnumerable<Guid> messageIds, Guid readerId)
     {
         lock (_lock)
         {
             foreach (ISession session in _sessions.Values)
             {
-                session.MarkMessagesAsProcessed(messageIds);
+                session.MarkMessagesAsRead(messageIds, readerId);
             }
         }
     }

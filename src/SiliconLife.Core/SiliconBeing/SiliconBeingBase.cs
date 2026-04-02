@@ -29,9 +29,25 @@ public abstract class SiliconBeingBase
     public string Name { get; protected set; }
 
     /// <summary>
-    /// Gets or sets the chat service for this silicon being
+    /// Gets or sets the AI client for this silicon being
     /// </summary>
-    public IChatService? ChatService { get; set; }
+    public IAIClient? AIClient { get; set; }
+
+    /// <summary>
+    /// Gets or sets the soul content (system prompt) for this silicon being
+    /// </summary>
+    public string? SoulContent { get; set; }
+
+    /// <summary>
+    /// Gets or sets the user ID associated with this silicon being
+    /// </summary>
+    public Guid UserId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the tool manager for this silicon being.
+    /// Each being holds its own ToolManager instance.
+    /// </summary>
+    public ToolManager? ToolManager { get; set; }
 
     /// <summary>
     /// Gets whether this silicon being is idle (no pending tasks)

@@ -67,6 +67,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string ThinkingMessage { get; }
 
     /// <summary>
+    /// Gets the message displayed when a silicon being executes tool calls
+    /// </summary>
+    public abstract string ToolCallMessage { get; }
+
+    /// <summary>
     /// Gets the error message when an operation fails
     /// </summary>
     public abstract string ErrorMessage { get; }

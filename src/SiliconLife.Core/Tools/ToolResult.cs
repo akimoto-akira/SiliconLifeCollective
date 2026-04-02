@@ -14,39 +14,45 @@
 namespace SiliconLife.Collective;
 
 /// <summary>
-/// Request to AI service
+/// Result of a tool execution
 /// </summary>
-public class AIRequest
+public class ToolResult
 {
     /// <summary>
-    /// Gets or sets the model name to use
+    /// Gets whether the tool execution was successful
     /// </summary>
-    public string Model { get; set; } = string.Empty;
+    public bool Success { get; }
 
     /// <summary>
-    /// Gets or sets the list of messages in the conversation
+    /// Gets the result message (may be displayed to the user)
     /// </summary>
-    public List<Message> Messages { get; set; } = new List<Message>();
+    public string Message { get; }
 
     /// <summary>
-    /// Gets or sets the list of tools available for the AI to call.
-    /// Null or empty means no tools are available.
+    /// Gets optional structured data returned by the tool
     /// </summary>
-    public List<ToolDefinition>? Tools { get; set; }
+    public object? Data { get; }
 
-    /// <summary>
-    /// Creates a new AI request with the specified model
-    /// </summary>
-    public AIRequest(string model)
+    private ToolResult(bool success, string message, object? data)
     {
-        Model = model;
+        Success = success;
+        Message = message;
+        Data = data;
     }
 
     /// <summary>
-    /// Adds a message to the conversation
+    /// Creates a successful tool result
     /// </summary>
-    public void AddMessage(MessageRole role, string content)
+    public static ToolResult Successful(string message, object? data = null)
     {
-        Messages.Add(new Message(role, content));
+        return new ToolResult(true, message, data);
+    }
+
+    /// <summary>
+    /// Creates a failed tool result
+    /// </summary>
+    public static ToolResult Failed(string message)
+    {
+        return new ToolResult(false, message, null);
     }
 }

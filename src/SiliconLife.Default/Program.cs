@@ -21,10 +21,7 @@ namespace SiliconLife.Default;
 /// </summary>
 public class Program
 {
-    private static DefaultSiliconBeing? _defaultBeing;
     private static bool _shouldExit = false;
-    private static ChatSystem? _chatSystem;
-    private static IMManager? _imManager;
 
     /// <summary>
     /// Main method
@@ -37,7 +34,7 @@ public class Program
         Config config = Config.Instance;
         config.Initialize(new DefaultConfigData());
         config.LoadOrCreateConfig();
-        
+
         DefaultConfigData configData = (DefaultConfigData)config.Data;
         DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(configData.Language);
 
@@ -51,32 +48,32 @@ public class Program
         ITimeStorage timeStorage = new FileSystemTimeStorage(
             Path.Combine(configData.DataDirectory, "chat"));
 
-        _chatSystem = new ChatSystem(timeStorage);
+        ChatSystem chatSystem = new ChatSystem(timeStorage);
+        ServiceRegistry.Instance.ChatSystem = chatSystem;
 
         IIMProvider imProvider = new ConsoleIMProvider(configData.UserGuid, configData.CuratorGuid);
         imProvider.ExitRequested += (s, e) => RequestExit();
 
         SiliconBeingManager beingManager = MainLoop.BeingManager;
 
-        _imManager = new IMManager(imProvider, _chatSystem, beingManager);
+        IMManager imManager = new IMManager(imProvider, chatSystem, beingManager);
+        ServiceRegistry.Instance.IMManager = imManager;
 
         DefaultSiliconBeingFactory beingFactory = new DefaultSiliconBeingFactory(
             aiClient,
             storage,
             configData.DataDirectory,
-            _chatSystem,
-            _imManager,
             configData.UserGuid);
 
-        _defaultBeing = (DefaultSiliconBeing)beingFactory.CreateBeing(configData.CuratorGuid, "Default");
+        SiliconBeingBase defaultBeing = beingFactory.CreateBeing(configData.CuratorGuid, "Default");
 
-        beingManager.RegisterBeing(_defaultBeing);
+        beingManager.RegisterBeing(defaultBeing);
 
         MainLoop.SetConfig(configData);
         MainLoop.Register(beingManager);
         MainLoop.Start();
 
-        _ = _imManager.StartAsync();
+        _ = imManager.StartAsync();
 
         while (!_shouldExit)
         {

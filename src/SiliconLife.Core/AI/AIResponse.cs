@@ -2,9 +2,9 @@
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//
+
 //     http://www.apache.org/licenses/LICENSE-2.0
-//
+
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,6 +27,17 @@ public class AIResponse
     /// Gets or sets the generated content
     /// </summary>
     public string Content { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the thinking content (chain-of-thought reasoning)
+    /// </summary>
+    public string? Thinking { get; set; }
+
+    /// <summary>
+    /// Gets or sets the tool calls requested by the AI.
+    /// Null or empty means the AI responded with plain text (no tool calls).
+    /// </summary>
+    public List<ToolCall>? ToolCalls { get; set; }
 
     /// <summary>
     /// Gets or sets the number of tokens in the prompt
@@ -52,6 +63,11 @@ public class AIResponse
     /// Gets or sets the error message if the request failed
     /// </summary>
     public string? ErrorMessage { get; set; }
+
+    /// <summary>
+    /// Gets whether this response contains tool calls
+    /// </summary>
+    public bool HasToolCalls => ToolCalls != null && ToolCalls.Count > 0;
 
     /// <summary>
     /// Creates a successful response with the specified content

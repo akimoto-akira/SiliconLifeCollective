@@ -74,6 +74,11 @@ public class ZhCN : DefaultLocalizationBase
     public override string ThinkingMessage => "思考中...";
 
     /// <summary>
+    /// Gets the tool call message
+    /// </summary>
+    public override string ToolCallMessage => "执行工具中...";
+
+    /// <summary>
     /// Gets the error message
     /// </summary>
     public override string ErrorMessage => "错误";

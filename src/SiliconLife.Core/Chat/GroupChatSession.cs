@@ -150,32 +150,32 @@ public class GroupChatSession : ISession
     }
 
     /// <inheritdoc/>
-    public List<ChatMessage> GetPendingMessages(Guid receiverId)
+    public List<ChatMessage> GetPendingMessages(Guid participantId)
     {
         lock (_lock)
         {
             return _messages
-                .Where(m => m.ReceiverId == receiverId && !m.IsProcessed)
+                .Where(m => m.SenderId != participantId && !m.ReadBy.Contains(participantId))
                 .ToList();
         }
     }
 
     /// <inheritdoc/>
-    public void MarkMessageAsProcessed(Guid messageId)
+    public void MarkMessageAsRead(Guid messageId, Guid readerId)
     {
         lock (_lock)
         {
             ChatMessage? message = _messages.FirstOrDefault(m => m.Id == messageId);
-            if (message != null)
+            if (message != null && !message.ReadBy.Contains(readerId))
             {
-                message.IsProcessed = true;
+                message.ReadBy.Add(readerId);
                 SaveMessage(message);
             }
         }
     }
 
     /// <inheritdoc/>
-    public void MarkMessagesAsProcessed(IEnumerable<Guid> messageIds)
+    public void MarkMessagesAsRead(IEnumerable<Guid> messageIds, Guid readerId)
     {
         lock (_lock)
         {
@@ -183,9 +183,9 @@ public class GroupChatSession : ISession
 
             foreach (ChatMessage message in _messages)
             {
-                if (ids.Contains(message.Id) && !message.IsProcessed)
+                if (ids.Contains(message.Id) && !message.ReadBy.Contains(readerId))
                 {
-                    message.IsProcessed = true;
+                    message.ReadBy.Add(readerId);
                     SaveMessage(message);
                 }
             }

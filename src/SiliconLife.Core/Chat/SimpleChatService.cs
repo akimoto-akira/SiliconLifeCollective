@@ -38,12 +38,12 @@ public class SimpleChatService : IChatService
                 return [];
             }
 
-            return messages.Where(m => !m.IsProcessed).ToList();
+            return messages.Where(m => !m.ReadBy.Contains(beingId)).ToList();
         }
     }
 
     /// <summary>
-    /// Marks a message as processed
+    /// Marks a message as read by a receiver
     /// </summary>
     public void MarkMessageProcessed(Guid receiverId, Guid messageId)
     {
@@ -55,9 +55,9 @@ public class SimpleChatService : IChatService
             }
 
             ChatMessage? msg = messages.FirstOrDefault(m => m.Id == messageId);
-            if (msg != null)
+            if (msg != null && !msg.ReadBy.Contains(receiverId))
             {
-                msg.IsProcessed = true;
+                msg.ReadBy.Add(receiverId);
             }
         }
     }

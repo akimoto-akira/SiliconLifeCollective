@@ -1,0 +1,195 @@
+// Copyright (c) 2026 Hoshino Kennji
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System.Reflection;
+
+namespace SiliconLife.Collective;
+
+/// <summary>
+/// Manages tools available to a silicon being.
+/// Each silicon being holds its own ToolManager instance.
+/// Supports reflection-based assembly scanning for tool discovery.
+/// </summary>
+public class ToolManager
+{
+    private readonly Dictionary<string, ITool> _tools = new();
+    private readonly object _lock = new();
+    private readonly bool _curatorOnly;
+
+    /// <summary>
+    /// Gets the number of registered tools
+    /// </summary>
+    public int ToolCount
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _tools.Count;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new ToolManager
+    /// </summary>
+    /// <param name="curatorOnly">If true, only tools with [SiliconManagerOnly] are registered during scanning</param>
+    public ToolManager(bool curatorOnly = false)
+    {
+        _curatorOnly = curatorOnly;
+    }
+
+    /// <summary>
+    /// Registers a tool instance
+    /// </summary>
+    /// <param name="tool">The tool to register</param>
+    public void RegisterTool(ITool tool)
+    {
+        lock (_lock)
+        {
+            _tools[tool.Name] = tool;
+        }
+    }
+
+    /// <summary>
+    /// Scans the specified assembly for ITool implementations and registers them.
+    /// Only non-abstract types with parameterless constructors are discovered.
+    /// </summary>
+    /// <param name="assembly">The assembly to scan</param>
+    /// <returns>The number of tools discovered and registered</returns>
+    public int ScanAssembly(Assembly assembly)
+    {
+        int count = 0;
+
+        foreach (Type type in assembly.GetTypes())
+        {
+            if (!typeof(ITool).IsAssignableFrom(type) || type.IsAbstract || type.IsInterface)
+            {
+                continue;
+            }
+
+            bool hasManagerOnlyAttr = type.GetCustomAttribute<SiliconManagerOnlyAttribute>() != null;
+
+            if (_curatorOnly && !hasManagerOnlyAttr)
+            {
+                continue;
+            }
+
+            if (!_curatorOnly && hasManagerOnlyAttr)
+            {
+                continue;
+            }
+
+            try
+            {
+                ITool? tool = Activator.CreateInstance(type) as ITool;
+                if (tool != null)
+                {
+                    RegisterTool(tool);
+                    count++;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ToolManager] Failed to instantiate tool '{type.Name}': {ex.Message}");
+            }
+        }
+
+        return count;
+    }
+
+    /// <summary>
+    /// Gets tool definitions for all registered tools (for AI request)
+    /// </summary>
+    /// <returns>List of tool definitions</returns>
+    public List<ToolDefinition> GetToolDefinitions()
+    {
+        lock (_lock)
+        {
+            return _tools.Values.Select(t => new ToolDefinition(
+                t.Name,
+                t.Description,
+                t.GetParameterSchema()
+            )).ToList();
+        }
+    }
+
+    /// <summary>
+    /// Executes a tool by name with the given parameters
+    /// </summary>
+    /// <param name="name">The tool name</param>
+    /// <param name="callerId">The GUID of the silicon being invoking this tool</param>
+    /// <param name="parameters">The parameters for the tool</param>
+    /// <returns>The tool execution result</returns>
+    public ToolResult ExecuteTool(string name, Guid callerId, Dictionary<string, object> parameters)
+    {
+        ITool? tool;
+        lock (_lock)
+        {
+            _tools.TryGetValue(name, out tool);
+        }
+
+        if (tool == null)
+        {
+            return ToolResult.Failed($"Tool '{name}' not found");
+        }
+
+        try
+        {
+            return tool.Execute(callerId, parameters);
+        }
+        catch (Exception ex)
+        {
+            return ToolResult.Failed($"Tool '{name}' execution failed: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Gets a registered tool by name
+    /// </summary>
+    /// <param name="name">The tool name</param>
+    /// <returns>The tool, or null if not found</returns>
+    public ITool? GetTool(string name)
+    {
+        lock (_lock)
+        {
+            _tools.TryGetValue(name, out ITool? tool);
+            return tool;
+        }
+    }
+
+    /// <summary>
+    /// Checks if a tool with the given name is registered
+    /// </summary>
+    /// <param name="name">The tool name</param>
+    /// <returns>True if the tool is registered</returns>
+    public bool HasTool(string name)
+    {
+        lock (_lock)
+        {
+            return _tools.ContainsKey(name);
+        }
+    }
+
+    /// <summary>
+    /// Gets the names of all registered tools
+    /// </summary>
+    /// <returns>List of tool names</returns>
+    public List<string> GetToolNames()
+    {
+        lock (_lock)
+        {
+            return _tools.Keys.ToList();
+        }
+    }
+}

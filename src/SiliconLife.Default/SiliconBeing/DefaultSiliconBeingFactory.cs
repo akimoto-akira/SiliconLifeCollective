@@ -2,9 +2,9 @@
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//
+
 //     http://www.apache.org/licenses/LICENSE-2.0
-//
+
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,8 +23,6 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     private readonly IAIClient _aiClient;
     private readonly IStorage _storage;
     private readonly string _dataDirectory;
-    private readonly ChatSystem? _chatSystem;
-    private readonly IMManager? _imManager;
     private readonly Guid _userId;
 
     /// <summary>
@@ -37,31 +35,29 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         IAIClient aiClient,
         IStorage storage,
         string dataDirectory)
-        : this(aiClient, storage, dataDirectory, null, null, Guid.Empty)
+        : this(aiClient, storage, dataDirectory, Guid.Empty)
     {
     }
 
     /// <summary>
-    /// Initializes a new instance of the DefaultSiliconBeingFactory class with ChatSystem and IMManager
+    /// Initializes a new instance of the DefaultSiliconBeingFactory class with user ID
     /// </summary>
     public DefaultSiliconBeingFactory(
         IAIClient aiClient,
         IStorage storage,
         string dataDirectory,
-        ChatSystem chatSystem,
-        IMManager imManager,
         Guid userId)
     {
         _aiClient = aiClient;
         _storage = storage;
         _dataDirectory = dataDirectory;
-        _chatSystem = chatSystem;
-        _imManager = imManager;
         _userId = userId;
     }
 
     /// <summary>
-    /// Creates a silicon being with the specified ID and name
+    /// Creates a silicon being with the specified ID and name.
+    /// Automatically creates a ToolManager, scans the Default assembly for tools,
+    /// and assigns it to the created being.
     /// </summary>
     /// <param name="id">The unique identifier for the silicon being</param>
     /// <param name="name">The name of the silicon being</param>
@@ -75,14 +71,7 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
             Directory.CreateDirectory(beingDirectory);
         }
 
-        string? soulContent = SoulFileManager.LoadSoul(beingDirectory);
-
-        if (_chatSystem != null && _imManager != null)
-        {
-            return new DefaultSiliconBeing(id, name, _aiClient, beingDirectory, soulContent, _chatSystem, _imManager, _userId);
-        }
-
-        return new DefaultSiliconBeing(id, name, _aiClient, beingDirectory, soulContent);
+        return CreateAndConfigureBeing(id, name, beingDirectory);
     }
 
     /// <summary>
@@ -121,18 +110,32 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
                 }
             }
 
-            string? soulContent = SoulFileManager.LoadSoul(beingDirectory);
-
-            if (_chatSystem != null && _imManager != null)
-            {
-                return new DefaultSiliconBeing(id, name, _aiClient, beingDirectory, soulContent, _chatSystem, _imManager, _userId);
-            }
-
-            return new DefaultSiliconBeing(id, name, _aiClient, beingDirectory, soulContent);
+            return CreateAndConfigureBeing(id, name, beingDirectory);
         }
         catch
         {
             return null;
         }
+    }
+
+    /// <summary>
+    /// Creates a DefaultSiliconBeing and configures its properties and ToolManager
+    /// </summary>
+    private SiliconBeingBase CreateAndConfigureBeing(Guid id, string name, string beingDirectory)
+    {
+        string? soulContent = SoulFileManager.LoadSoul(beingDirectory);
+
+        DefaultSiliconBeing being = new DefaultSiliconBeing(id, name);
+        being.AIClient = _aiClient;
+        being.SoulContent = soulContent;
+        being.UserId = _userId;
+
+        // Create and configure ToolManager for this being
+        ToolManager toolManager = new ToolManager();
+        toolManager.ScanAssembly(typeof(DefaultSiliconBeingFactory).Assembly);
+
+        being.ToolManager = toolManager;
+
+        return being;
     }
 }

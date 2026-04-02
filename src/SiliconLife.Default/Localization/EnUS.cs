@@ -74,6 +74,11 @@ public class EnUS : DefaultLocalizationBase
     public override string ThinkingMessage => "Thinking...";
 
     /// <summary>
+    /// Gets the tool call message
+    /// </summary>
+    public override string ToolCallMessage => "Executing tools...";
+
+    /// <summary>
     /// Gets the error message
     /// </summary>
     public override string ErrorMessage => "Error";

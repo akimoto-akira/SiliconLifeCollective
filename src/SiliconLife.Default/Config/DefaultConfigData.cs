@@ -60,5 +60,5 @@ public class DefaultConfigData : ConfigDataBase
     /// <summary>
     /// Gets or sets the default AI model to use
     /// </summary>
-    public string DefaultModel { get; set; } = "qwen3:14b";
+    public string DefaultModel { get; set; } = "qwen3.5:cloud";
 }

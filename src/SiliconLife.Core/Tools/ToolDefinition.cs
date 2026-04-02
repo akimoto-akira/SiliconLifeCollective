@@ -14,39 +14,33 @@
 namespace SiliconLife.Collective;
 
 /// <summary>
-/// Request to AI service
+/// Definition of a tool, describing its name, description, and parameter schema
+/// for inclusion in AI requests
 /// </summary>
-public class AIRequest
+public class ToolDefinition
 {
     /// <summary>
-    /// Gets or sets the model name to use
+    /// Gets the tool name (used as function name)
     /// </summary>
-    public string Model { get; set; } = string.Empty;
+    public string Name { get; }
 
     /// <summary>
-    /// Gets or sets the list of messages in the conversation
+    /// Gets the tool description
     /// </summary>
-    public List<Message> Messages { get; set; } = new List<Message>();
+    public string Description { get; }
 
     /// <summary>
-    /// Gets or sets the list of tools available for the AI to call.
-    /// Null or empty means no tools are available.
+    /// Gets the JSON Schema describing the tool parameters
     /// </summary>
-    public List<ToolDefinition>? Tools { get; set; }
+    public Dictionary<string, object> Parameters { get; }
 
     /// <summary>
-    /// Creates a new AI request with the specified model
+    /// Creates a new tool definition
     /// </summary>
-    public AIRequest(string model)
+    public ToolDefinition(string name, string description, Dictionary<string, object> parameters)
     {
-        Model = model;
-    }
-
-    /// <summary>
-    /// Adds a message to the conversation
-    /// </summary>
-    public void AddMessage(MessageRole role, string content)
-    {
-        Messages.Add(new Message(role, content));
+        Name = name;
+        Description = description;
+        Parameters = parameters;
     }
 }
