@@ -30,7 +30,7 @@ public class DefaultConfigData : ConfigDataBase
     /// <summary>
     /// Gets or sets the GUID of the curator (main administrator)
     /// </summary>
-    public override Guid CuratorGuid { get; set; } = Guid.Empty;
+    public override Guid CuratorGuid { get; set; } = new Guid("73696c69-636f-6e00-0000-000000000000");
 
     /// <summary>
     /// Gets or sets the language setting for the application
@@ -40,7 +40,7 @@ public class DefaultConfigData : ConfigDataBase
     /// <summary>
     /// Gets or sets the timeout duration for each tick execution
     /// </summary>
-    public override TimeSpan TickTimeout { get; set; } = TimeSpan.FromSeconds(1);
+    public override TimeSpan TickTimeout { get; set; } = TimeSpan.FromMinutes(10);
 
     /// <summary>
     /// Gets or sets the maximum number of consecutive timeouts allowed before circuit breaker triggers
@@ -50,7 +50,7 @@ public class DefaultConfigData : ConfigDataBase
     /// <summary>
     /// Gets or sets the watchdog timeout duration.
     /// </summary>
-    public override TimeSpan WatchdogTimeout { get; set; } = TimeSpan.FromSeconds(10);
+    public override TimeSpan WatchdogTimeout { get; set; } = TimeSpan.FromMinutes(10);
 
     /// <summary>
     /// Gets or sets the Ollama API endpoint URL
@@ -60,5 +60,5 @@ public class DefaultConfigData : ConfigDataBase
     /// <summary>
     /// Gets or sets the default AI model to use
     /// </summary>
-    public string DefaultModel { get; set; } = "qwen3:4b";
+    public string DefaultModel { get; set; } = "qwen3:14b";
 }

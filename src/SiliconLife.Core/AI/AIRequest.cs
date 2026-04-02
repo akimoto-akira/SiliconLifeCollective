@@ -29,16 +29,6 @@ public class AIRequest
     public List<Message> Messages { get; set; } = new List<Message>();
 
     /// <summary>
-    /// Gets or sets the temperature for response generation (0.0 to 1.0)
-    /// </summary>
-    public double Temperature { get; set; } = 0.7;
-
-    /// <summary>
-    /// Gets or sets the maximum number of tokens to generate
-    /// </summary>
-    public int? MaxTokens { get; set; }
-
-    /// <summary>
     /// Creates a new AI request with the specified model
     /// </summary>
     public AIRequest(string model)

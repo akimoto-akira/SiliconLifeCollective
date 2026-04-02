@@ -12,6 +12,7 @@
 // limitations under the License.
 
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using SiliconLife.Collective;
 
 namespace SiliconLife.Default;
@@ -45,6 +46,8 @@ internal class OllamaResponse
     public string Model { get; set; } = string.Empty;
     public OllamaMessage? Message { get; set; }
     public bool Done { get; set; }
+    [JsonPropertyName("done_reason")]
+    public string? DoneReason { get; set; }
     public OllamaUsage? Usage { get; set; }
     public string? Error { get; set; }
 }
@@ -120,39 +123,23 @@ public class OllamaClient : IAIClient
                     Role = MapRole(m.Role),
                     Content = m.Content
                 }).ToList(),
-                Temperature = request.Temperature,
-                NumPredict = request.MaxTokens,
                 Stream = false
             };
 
             string json = JsonSerializer.Serialize(ollamaRequest, _jsonOptions);
             StringContent content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _httpClient.PostAsync($"{Endpoint}/api/chat", content);
-            response.EnsureSuccessStatusCode();
+            AIResponse? result = await SendAndParseAsync(content);
+            if (result != null)
+                return result;
 
-            string responseJson = await response.Content.ReadAsStringAsync();
-            OllamaResponse? ollamaResponse = JsonSerializer.Deserialize<OllamaResponse>(responseJson, _jsonOptions);
+            // Model is still loading, wait and retry once
+            await Task.Delay(3000);
+            result = await SendAndParseAsync(content);
+            if (result != null)
+                return result;
 
-            if (ollamaResponse == null)
-            {
-                return AIResponse.Failed("Failed to deserialize Ollama response");
-            }
-
-            if (!string.IsNullOrEmpty(ollamaResponse.Error))
-            {
-                return AIResponse.Failed(ollamaResponse.Error);
-            }
-
-            return new AIResponse
-            {
-                Model = ollamaResponse.Model,
-                Content = ollamaResponse.Message?.Content ?? string.Empty,
-                PromptTokens = ollamaResponse.Usage?.PromptTokens,
-                CompletionTokens = ollamaResponse.Usage?.CompletionTokens,
-                TotalTokens = ollamaResponse.Usage?.TotalTokens,
-                Success = true
-            };
+            return AIResponse.Failed($"Model '{model}' is still loading after retry.");
         }
         catch (HttpRequestException ex)
         {
@@ -166,6 +153,39 @@ public class OllamaClient : IAIClient
         {
             return AIResponse.Failed($"Unexpected error: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Sends the request and parses the response.
+    /// Returns null if done_reason is "load" (model still loading, caller should retry).
+    /// Returns a non-null AIResponse for success or other failures.
+    /// </summary>
+    private async Task<AIResponse?> SendAndParseAsync(StringContent content)
+    {
+        HttpResponseMessage response = await _httpClient.PostAsync($"{Endpoint}/api/chat", content);
+        response.EnsureSuccessStatusCode();
+
+        string responseJson = await response.Content.ReadAsStringAsync();
+        OllamaResponse? ollamaResponse = JsonSerializer.Deserialize<OllamaResponse>(responseJson, _jsonOptions);
+
+        if (ollamaResponse == null)
+            return AIResponse.Failed("Failed to deserialize Ollama response");
+
+        if (!string.IsNullOrEmpty(ollamaResponse.Error))
+            return AIResponse.Failed(ollamaResponse.Error);
+
+        if (ollamaResponse.DoneReason == "load")
+            return null; // Signal caller to retry
+
+        return new AIResponse
+        {
+            Model = ollamaResponse.Model,
+            Content = ollamaResponse.Message?.Content ?? string.Empty,
+            PromptTokens = ollamaResponse.Usage?.PromptTokens,
+            CompletionTokens = ollamaResponse.Usage?.CompletionTokens,
+            TotalTokens = ollamaResponse.Usage?.TotalTokens,
+            Success = true
+        };
     }
 
     /// <summary>
