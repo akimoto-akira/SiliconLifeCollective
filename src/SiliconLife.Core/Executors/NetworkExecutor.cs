@@ -16,7 +16,8 @@ namespace SiliconLife.Collective;
 /// <summary>
 /// Static executor for HTTP network requests.
 /// Provides timeout control for AI-initiated network operations.
-/// Circuit breaker is not implemented in Phase 5.
+/// Permission checking via <see cref="PermissionManager"/> through <see cref="ServiceRegistry"/>.
+/// Circuit breaker is not implemented yet.
 /// </summary>
 public static class NetworkExecutor
 {
@@ -24,10 +25,16 @@ public static class NetworkExecutor
     private static readonly HttpClient HttpClient = new() { Timeout = DefaultTimeout };
 
     /// <summary>
-    /// Executes a network request synchronously with timeout
+    /// Executes a network request synchronously with timeout.
+    /// Checks permission via the caller's PermissionManager before executing.
     /// </summary>
     public static ExecutorResult Execute(ExecutorRequest request, TimeSpan? timeout = null)
     {
+        if (!CheckPermission(request))
+        {
+            return ExecutorResult.Failed($"Permission denied: network access to '{request.ResourcePath}'");
+        }
+
         TimeSpan actualTimeout = timeout ?? DefaultTimeout;
 
         try
@@ -99,5 +106,15 @@ public static class NetworkExecutor
         {
             return ExecutorResult.Failed($"Network error: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Checks permission for a network operation via the caller's PermissionManager.
+    /// </summary>
+    private static bool CheckPermission(ExecutorRequest request)
+    {
+        PermissionManager? pm = ServiceRegistry.Instance.GetPermissionManager(request.CallerId);
+        if (pm == null) return true;
+        return pm.CheckPermission(request.CallerId, PermissionType.NetworkAccess, request.ResourcePath);
     }
 }

@@ -77,7 +77,7 @@ public class DiskTool : ITool
             requestParams["content"] = contentObj.ToString()!;
         }
 
-        ExecutorRequest request = new(Guid.Empty, path, action, requestParams);
+        ExecutorRequest request = new(callerId, path, action, requestParams);
         ExecutorResult result = DiskExecutor.Execute(request);
 
         if (result.Success)

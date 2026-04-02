@@ -25,6 +25,20 @@ public class ConsoleIMProvider : IIMProvider
     private readonly Guid _userId;
     private readonly Guid _curatorGuid;
 
+    /// <summary>
+    /// Modes for the input loop to know how to route the next line of input.
+    /// </summary>
+    private enum InputMode
+    {
+        Normal,
+        Permission,
+        Cache
+    }
+
+    private readonly object _modeLock = new();
+    private InputMode _mode = InputMode.Normal;
+    private TaskCompletionSource<string>? _inputTcs;
+
     public ConsoleIMProvider(Guid userId, Guid curatorGuid)
     {
         _userId = userId;
@@ -50,6 +64,58 @@ public class ConsoleIMProvider : IIMProvider
         return Task.CompletedTask;
     }
 
+    public Task<AskPermissionResult> AskPermissionAsync(PermissionType permissionType, string resource, string allowCode, string denyCode)
+    {
+        DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(
+            Config.Instance.Data.Language);
+
+        // Switch to permission mode and wait for user input
+        TaskCompletionSource<string> tcs;
+        lock (_modeLock)
+        {
+            _mode = InputMode.Permission;
+            _inputTcs = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+            tcs = _inputTcs;
+        }
+
+        Console.WriteLine();
+        Console.WriteLine($"{localization.PermissionRequestHeader} {localization.GetPermissionTypeName(permissionType)}: {resource}");
+        Console.WriteLine($"  {localization.AllowCodeLabel}: {allowCode}");
+        Console.WriteLine($"  {localization.DenyCodeLabel}:  {denyCode}");
+        Console.WriteLine($"  {localization.PermissionReplyInstruction}");
+        Console.Write("> ");
+
+        string input = tcs.Task.GetAwaiter().GetResult();
+
+        bool allowed = string.Equals(input, allowCode, StringComparison.OrdinalIgnoreCase);
+        bool addToCache = false;
+
+        if (allowed)
+        {
+            // Switch to cache mode and wait for the next input
+            TaskCompletionSource<string> cacheTcs;
+            lock (_modeLock)
+            {
+                _mode = InputMode.Cache;
+                _inputTcs = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+                cacheTcs = _inputTcs;
+            }
+
+            Console.Write($"{localization.AddToCachePrompt} ");
+            string? cacheInput = cacheTcs.Task.GetAwaiter().GetResult();
+            addToCache = string.Equals(cacheInput, "y", StringComparison.OrdinalIgnoreCase);
+        }
+
+        // Return to normal mode
+        lock (_modeLock)
+        {
+            _mode = InputMode.Normal;
+            _inputTcs = null;
+        }
+
+        return Task.FromResult(new AskPermissionResult { Allowed = allowed, AddToCache = addToCache });
+    }
+
     private async Task RunInputLoop()
     {
         while (_isRunning)
@@ -62,14 +128,33 @@ public class ConsoleIMProvider : IIMProvider
                 continue;
             }
 
-            if (line.Equals("exit", StringComparison.OrdinalIgnoreCase) ||
-                line.Equals("quit", StringComparison.OrdinalIgnoreCase))
+            string trimmed = line.Trim();
+
+            if (trimmed.Equals("exit", StringComparison.OrdinalIgnoreCase) ||
+                trimmed.Equals("quit", StringComparison.OrdinalIgnoreCase))
             {
                 ExitRequested?.Invoke(this, EventArgs.Empty);
                 return;
             }
 
-            MessageReceived?.Invoke(this, new IMMessageEventArgs(new ChatMessage(_userId, _curatorGuid, line)));
+            TaskCompletionSource<string>? tcs;
+            InputMode currentMode;
+            lock (_modeLock)
+            {
+                currentMode = _mode;
+                tcs = _inputTcs;
+            }
+
+            if (tcs != null && currentMode != InputMode.Normal)
+            {
+                tcs.TrySetResult(trimmed);
+                continue;
+            }
+
+            // Dispatch message processing to a background thread
+            // so RunInputLoop is never blocked by event handlers
+            ChatMessage msg = new(_userId, _curatorGuid, trimmed);
+            _ = Task.Run(() => MessageReceived?.Invoke(this, new IMMessageEventArgs(msg)));
         }
     }
 }

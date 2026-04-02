@@ -63,7 +63,7 @@ public class SystemTool : ITool
 
         return action.ToLowerInvariant() switch
         {
-            "list_processes" => ExecuteListProcesses(),
+            "list_processes" => ExecuteListProcesses(callerId),
             "get_env" => ExecuteGetEnv(parameters),
             "get_env_all" => ExecuteGetEnvAll(),
             "system_info" => ExecuteSystemInfo(),
@@ -71,13 +71,13 @@ public class SystemTool : ITool
         };
     }
 
-    private ToolResult ExecuteListProcesses()
+    private ToolResult ExecuteListProcesses(Guid callerId)
     {
         string command = OperatingSystem.IsWindows()
             ? "tasklist /FO CSV /NH"
             : "ps aux --no-headers";
 
-        ExecutorRequest request = new(Guid.Empty, command, "list_processes");
+        ExecutorRequest request = new(callerId, command, "list_processes");
         ExecutorResult result = CommandLineExecutor.Execute(request, TimeSpan.FromSeconds(10));
 
         if (result.Success)

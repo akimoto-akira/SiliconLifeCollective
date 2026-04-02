@@ -16,17 +16,23 @@ namespace SiliconLife.Collective;
 /// <summary>
 /// Static executor for file system operations.
 /// Provides a safe wrapper for disk IO initiated by AI tools.
-/// Permission checking is NOT implemented in Phase 5 (deferred to Phase 6).
+/// Permission checking via <see cref="PermissionManager"/> through <see cref="ServiceRegistry"/>.
 /// </summary>
 public static class DiskExecutor
 {
     private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);
 
     /// <summary>
-    /// Executes a disk operation request synchronously with timeout
+    /// Executes a disk operation request synchronously with timeout.
+    /// Checks permission via the caller's PermissionManager before executing.
     /// </summary>
     public static ExecutorResult Execute(ExecutorRequest request, TimeSpan? timeout = null)
     {
+        if (!CheckPermission(request))
+        {
+            return ExecutorResult.Failed($"Permission denied: file access to '{request.ResourcePath}'");
+        }
+
         TimeSpan actualTimeout = timeout ?? DefaultTimeout;
 
         try
@@ -247,5 +253,15 @@ public static class DiskExecutor
         {
             return ExecutorResult.Failed($"Failed to get file info: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Checks permission for a disk operation via the caller's PermissionManager.
+    /// </summary>
+    private static bool CheckPermission(ExecutorRequest request)
+    {
+        PermissionManager? pm = ServiceRegistry.Instance.GetPermissionManager(request.CallerId);
+        if (pm == null) return true; // No manager = no restriction (bootstrap)
+        return pm.CheckPermission(request.CallerId, PermissionType.FileAccess, request.ResourcePath);
     }
 }

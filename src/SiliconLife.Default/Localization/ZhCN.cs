@@ -11,6 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using SiliconLife.Collective;
+
 namespace SiliconLife.Default;
 
 /// <summary>
@@ -87,4 +89,52 @@ public class ZhCN : DefaultLocalizationBase
     /// Gets the unexpected error message
     /// </summary>
     public override string UnexpectedErrorMessage => "意外错误";
+
+    /// <summary>
+    /// Gets the permission denied message
+    /// </summary>
+    public override string PermissionDeniedMessage => "权限被拒绝";
+
+    /// <summary>
+    /// Gets the permission ask prompt
+    /// </summary>
+    public override string PermissionAskPrompt => "是否允许？(y/n): ";
+
+    /// <summary>
+    /// Gets the header displayed for permission requests
+    /// </summary>
+    public override string PermissionRequestHeader => "[权限请求]";
+
+    /// <summary>
+    /// Gets the label for the allow code in permission prompts
+    /// </summary>
+    public override string AllowCodeLabel => "允许码";
+
+    /// <summary>
+    /// Gets the label for the deny code in permission prompts
+    /// </summary>
+    public override string DenyCodeLabel => "拒绝码";
+
+    /// <summary>
+    /// Gets the instruction text for replying to permission prompts
+    /// </summary>
+    public override string PermissionReplyInstruction => "输入验证码确认，或输入其他内容拒绝";
+
+    /// <summary>
+    /// Gets the prompt for asking whether to cache a permission decision
+    /// </summary>
+    public override string AddToCachePrompt => "是否缓存此决定？(y/n): ";
+
+    /// <summary>
+    /// Gets the localized display name for a permission type
+    /// </summary>
+    public override string GetPermissionTypeName(PermissionType permissionType) => permissionType switch
+    {
+        PermissionType.NetworkAccess => "网络访问",
+        PermissionType.CommandLine => "命令行执行",
+        PermissionType.FileAccess => "文件访问",
+        PermissionType.Function => "函数调用",
+        PermissionType.DataAccess => "数据访问",
+        _ => permissionType.ToString()
+    };
 }

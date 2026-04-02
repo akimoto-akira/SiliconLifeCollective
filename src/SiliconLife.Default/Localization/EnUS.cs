@@ -11,6 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using SiliconLife.Collective;
+
 namespace SiliconLife.Default;
 
 /// <summary>
@@ -87,4 +89,52 @@ public class EnUS : DefaultLocalizationBase
     /// Gets the unexpected error message
     /// </summary>
     public override string UnexpectedErrorMessage => "Unexpected error";
+
+    /// <summary>
+    /// Gets the permission denied message
+    /// </summary>
+    public override string PermissionDeniedMessage => "Permission denied";
+
+    /// <summary>
+    /// Gets the permission ask prompt
+    /// </summary>
+    public override string PermissionAskPrompt => "Allow? (y/n): ";
+
+    /// <summary>
+    /// Gets the header displayed for permission requests
+    /// </summary>
+    public override string PermissionRequestHeader => "[PERMISSION]";
+
+    /// <summary>
+    /// Gets the label for the allow code in permission prompts
+    /// </summary>
+    public override string AllowCodeLabel => "Allow code";
+
+    /// <summary>
+    /// Gets the label for the deny code in permission prompts
+    /// </summary>
+    public override string DenyCodeLabel => "Deny code";
+
+    /// <summary>
+    /// Gets the instruction text for replying to permission prompts
+    /// </summary>
+    public override string PermissionReplyInstruction => "Reply code to confirm, or anything else to deny";
+
+    /// <summary>
+    /// Gets the prompt for asking whether to cache a permission decision
+    /// </summary>
+    public override string AddToCachePrompt => "Add to cache? (y/n): ";
+
+    /// <summary>
+    /// Gets the localized display name for a permission type
+    /// </summary>
+    public override string GetPermissionTypeName(PermissionType permissionType) => permissionType switch
+    {
+        PermissionType.NetworkAccess => "Network access",
+        PermissionType.CommandLine => "Command execution",
+        PermissionType.FileAccess => "File access",
+        PermissionType.Function => "Function invocation",
+        PermissionType.DataAccess => "Data access",
+        _ => permissionType.ToString()
+    };
 }

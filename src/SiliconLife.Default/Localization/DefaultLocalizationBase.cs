@@ -80,4 +80,46 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the error message when an unexpected error occurs
     /// </summary>
     public abstract string UnexpectedErrorMessage { get; }
+
+    /// <summary>
+    /// Gets the message when a permission request is denied
+    /// </summary>
+    public abstract string PermissionDeniedMessage { get; }
+
+    /// <summary>
+    /// Gets the prompt for user permission decision
+    /// </summary>
+    public abstract string PermissionAskPrompt { get; }
+
+    /// <summary>
+    /// Gets the header displayed for permission requests
+    /// </summary>
+    public abstract string PermissionRequestHeader { get; }
+
+    /// <summary>
+    /// Gets the label for the allow code in permission prompts
+    /// </summary>
+    public abstract string AllowCodeLabel { get; }
+
+    /// <summary>
+    /// Gets the label for the deny code in permission prompts
+    /// </summary>
+    public abstract string DenyCodeLabel { get; }
+
+    /// <summary>
+    /// Gets the instruction text for replying to permission prompts
+    /// </summary>
+    public abstract string PermissionReplyInstruction { get; }
+
+    /// <summary>
+    /// Gets the prompt for asking whether to cache a permission decision
+    /// </summary>
+    public abstract string AddToCachePrompt { get; }
+
+    /// <summary>
+    /// Gets the localized display name for a permission type
+    /// </summary>
+    /// <param name="permissionType">The permission type</param>
+    /// <returns>The localized display name</returns>
+    public abstract string GetPermissionTypeName(PermissionType permissionType);
 }

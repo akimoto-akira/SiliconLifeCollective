@@ -51,8 +51,20 @@ public class Program
         ChatSystem chatSystem = new ChatSystem(timeStorage);
         ServiceRegistry.Instance.ChatSystem = chatSystem;
 
+        // Phase 6: Permission system setup
+        ITimeStorage auditStorage = new FileSystemTimeStorage(
+            Path.Combine(configData.DataDirectory, "audit"));
+        AuditLogger auditLogger = new AuditLogger(auditStorage);
+        ServiceRegistry.Instance.AuditLogger = auditLogger;
+
+        GlobalACL globalAcl = new GlobalACL(storage);
+        ServiceRegistry.Instance.GlobalAcl = globalAcl;
+
         IIMProvider imProvider = new ConsoleIMProvider(configData.UserGuid, configData.CuratorGuid);
         imProvider.ExitRequested += (s, e) => RequestExit();
+
+        DefaultPermissionCallback permissionCallback = new DefaultPermissionCallback(configData.DataDirectory);
+        IMPermissionAskHandler askHandler = new IMPermissionAskHandler(imProvider);
 
         SiliconBeingManager beingManager = MainLoop.BeingManager;
 
@@ -63,7 +75,9 @@ public class Program
             aiClient,
             storage,
             configData.DataDirectory,
-            configData.UserGuid);
+            configData.UserGuid,
+            permissionCallback,
+            askHandler);
 
         SiliconBeingBase defaultBeing = beingFactory.CreateBeing(configData.CuratorGuid, "Default");
 

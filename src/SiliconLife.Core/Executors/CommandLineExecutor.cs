@@ -138,4 +138,14 @@ public static class CommandLineExecutor
         }
         return null;
     }
+
+    /// <summary>
+    /// Checks permission for a command-line operation via the caller's PermissionManager.
+    /// </summary>
+    private static bool CheckPermission(ExecutorRequest request)
+    {
+        PermissionManager? pm = ServiceRegistry.Instance.GetPermissionManager(request.CallerId);
+        if (pm == null) return true;
+        return pm.CheckPermission(request.CallerId, PermissionType.CommandLine, request.ResourcePath);
+    }
 }

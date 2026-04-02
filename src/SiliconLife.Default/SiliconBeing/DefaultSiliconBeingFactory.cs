@@ -2,9 +2,9 @@
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,8 @@ using SiliconLife.Collective;
 namespace SiliconLife.Default;
 
 /// <summary>
-/// Default factory for creating silicon being instances
+/// Default factory for creating silicon being instances.
+/// Creates ToolManager and PermissionManager for each being.
 /// </summary>
 public class DefaultSiliconBeingFactory : ISiliconBeingFactory
 {
@@ -24,6 +25,8 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     private readonly IStorage _storage;
     private readonly string _dataDirectory;
     private readonly Guid _userId;
+    private readonly IPermissionCallback? _permissionCallback;
+    private readonly IPermissionAskHandler? _askHandler;
 
     /// <summary>
     /// Initializes a new instance of the DefaultSiliconBeingFactory class
@@ -35,7 +38,7 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         IAIClient aiClient,
         IStorage storage,
         string dataDirectory)
-        : this(aiClient, storage, dataDirectory, Guid.Empty)
+        : this(aiClient, storage, dataDirectory, Guid.Empty, null, null)
     {
     }
 
@@ -47,17 +50,32 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         IStorage storage,
         string dataDirectory,
         Guid userId)
+        : this(aiClient, storage, dataDirectory, userId, null, null)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance with permission components
+    /// </summary>
+    public DefaultSiliconBeingFactory(
+        IAIClient aiClient,
+        IStorage storage,
+        string dataDirectory,
+        Guid userId,
+        IPermissionCallback? permissionCallback,
+        IPermissionAskHandler? askHandler)
     {
         _aiClient = aiClient;
         _storage = storage;
         _dataDirectory = dataDirectory;
         _userId = userId;
+        _permissionCallback = permissionCallback;
+        _askHandler = askHandler;
     }
 
     /// <summary>
     /// Creates a silicon being with the specified ID and name.
-    /// Automatically creates a ToolManager, scans the Default assembly for tools,
-    /// and assigns it to the created being.
+    /// Automatically creates a ToolManager and PermissionManager.
     /// </summary>
     /// <param name="id">The unique identifier for the silicon being</param>
     /// <param name="name">The name of the silicon being</param>
@@ -119,7 +137,7 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     }
 
     /// <summary>
-    /// Creates a DefaultSiliconBeing and configures its properties and ToolManager
+    /// Creates a DefaultSiliconBeing and configures its properties, ToolManager, and PermissionManager
     /// </summary>
     private SiliconBeingBase CreateAndConfigureBeing(Guid id, string name, string beingDirectory)
     {
@@ -133,8 +151,21 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         // Create and configure ToolManager for this being
         ToolManager toolManager = new ToolManager();
         toolManager.ScanAssembly(typeof(DefaultSiliconBeingFactory).Assembly);
-
         being.ToolManager = toolManager;
+
+        // Create PermissionManager for this being
+        GlobalACL? globalAcl = ServiceRegistry.Instance.GlobalAcl;
+        if (globalAcl != null)
+        {
+            PermissionManager pm = new PermissionManager(
+                being,
+                globalAcl,
+                _permissionCallback,
+                _askHandler);
+
+            being.PermissionManager = pm;
+            ServiceRegistry.Instance.RegisterPermissionManager(id, pm);
+        }
 
         return being;
     }

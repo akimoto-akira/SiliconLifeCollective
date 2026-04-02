@@ -50,6 +50,17 @@ public abstract class SiliconBeingBase
     public ToolManager? ToolManager { get; set; }
 
     /// <summary>
+    /// Gets or sets the permission manager for this silicon being.
+    /// Each being holds its own PermissionManager instance.
+    /// </summary>
+    public PermissionManager? PermissionManager { get; set; }
+
+    /// <summary>
+    /// Gets whether this silicon being is a curator (highest privilege level)
+    /// </summary>
+    public virtual bool IsCurator => false;
+
+    /// <summary>
     /// Gets whether this silicon being is idle (no pending tasks)
     /// </summary>
     public abstract bool IsIdle { get; }

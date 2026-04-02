@@ -93,7 +93,7 @@ public class NetworkTool : ITool
             requestParams["headers"] = headers;
         }
 
-        ExecutorRequest request = new(Guid.Empty, url, method, requestParams);
+        ExecutorRequest request = new(callerId, url, method, requestParams);
         ExecutorResult result = NetworkExecutor.Execute(request);
 
         if (result.Success)
