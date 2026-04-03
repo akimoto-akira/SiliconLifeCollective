@@ -183,7 +183,7 @@ Every phase ends with a **runnable, observable** system. No phase produces "a pi
 
 ---
 
-## Phase 10: Goes Web
+## ~~Phase 10: Goes Web~~ ✅ Done
 
 **Goal**: Migrate from console to browser interface.
 

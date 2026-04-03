@@ -13,6 +13,9 @@
 
 using SiliconLife.Collective;
 using SiliconLife.Default;
+using SiliconLife.Default.IM;
+using SiliconLife.Default.Web;
+using System.Text;
 
 namespace SiliconLife.Default;
 
@@ -20,6 +23,7 @@ public class Program
 {
     private static bool _shouldExit = false;
     private static CoreHost? _host;
+    private static WebHost? _webHost;
 
     public static async Task Main(string[] args)
     {
@@ -51,7 +55,8 @@ public class Program
 
         GlobalACL globalAcl = new GlobalACL(storage);
 
-        IIMProvider imProvider = new ConsoleIMProvider(configData.UserGuid, configData.CuratorGuid);
+        var router = new Router();
+        IIMProvider imProvider = new WebUIProvider(router);
         imProvider.ExitRequested += (s, e) => RequestExit();
 
         DefaultPermissionCallback permissionCallback = new DefaultPermissionCallback(configData.DataDirectory);
@@ -123,6 +128,8 @@ public class Program
             }
         }
 
+        await StartWebServerAsync(configData, router, chatSystem, configData.UserGuid, (WebUIProvider)imProvider);
+
         Console.CancelKeyPress += async (s, e) =>
         {
             e.Cancel = true;
@@ -139,11 +146,52 @@ public class Program
 
     private static async Task ShutdownAsync()
     {
+        if (_webHost != null)
+        {
+            await _webHost.StopAsync();
+            _webHost.Dispose();
+        }
+
         if (_host != null)
         {
             await _host.StopAsync();
         }
+
         _shouldExit = true;
+    }
+
+    private static async Task StartWebServerAsync(DefaultConfigData configData, Router router, ChatSystem chatSystem, Guid userId, WebUIProvider webUiProvider)
+    {
+        var beingManager = MainLoop.BeingManager;
+        var codeBrowser = new WebCodeBrowser();
+        router.RegisterControllers(beingManager, chatSystem, userId, webUiProvider.GetPermissionTcs, codeBrowser, configData);
+
+        if (!string.IsNullOrEmpty(configData.StaticFilesPath) && Directory.Exists(configData.StaticFilesPath))
+        {
+            router.SetStaticFilesPath(configData.StaticFilesPath);
+        }
+
+        _webHost = new WebHost(configData.WebPort, router, configData.AllowIntranet);
+
+        try
+        {
+            await _webHost.StartAsync();
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = $"http://localhost:{configData.WebPort}/",
+                    UseShellExecute = true
+                });
+            }
+            catch
+            {
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to start web server: {ex.Message}");
+        }
     }
 
     private static void RegisterLocalizations()

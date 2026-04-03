@@ -61,4 +61,19 @@ public class DefaultConfigData : ConfigDataBase
     /// Gets or sets the default AI model to use
     /// </summary>
     public string DefaultModel { get; set; } = "qwen3.5:cloud";
+
+    /// <summary>
+    /// Gets or sets the static files directory path
+    /// </summary>
+    public string StaticFilesPath { get; set; } = "./wwwroot";
+
+    /// <summary>
+    /// Gets or sets the web server port
+    /// </summary>
+    public int WebPort { get; set; } = 8080;
+
+    /// <summary>
+    /// Gets or sets whether to allow intranet access (requires admin)
+    /// </summary>
+    public bool AllowIntranet { get; set; } = false;
 }

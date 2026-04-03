@@ -2,6 +2,8 @@
 
 **⚠️ WARNING: Dynamic compilation has not been thoroughly tested, but it does work. Templates must be added in the code for it to function properly.**
 
+**⚠️ WARNING: Web UI is in rapid adjustment period, page functionality may not work properly.**
+
 A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Beings** self-evolve through Roslyn dynamic compilation.
 
 [中文文档](docs/zh-CN/README.md)
@@ -122,7 +124,7 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] Phase 7: Dynamic compilation + self-evolution (Roslyn)
 - [x] Phase 8: Long-term memory + Task + Timer
 - [x] Phase 9: CoreHost + multi-agent collaboration
-- [ ] Phase 10: Web UI (HTTP + WebSocket)
+- [x] Phase 10: Web UI (HTTP + WebSocket)
 - [ ] Phase 11: External IM (Feishu / WhatsApp / Telegram)
 - [ ] Phase 12: Knowledge graph, plugins, and extras
 
