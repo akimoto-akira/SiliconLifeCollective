@@ -36,7 +36,7 @@ A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Bei
 SiliconLifeCollective.sln
 ├── src/
 │   ├── SiliconLife.Core/                  # Core library (interfaces, abstractions)
-│   │   ├── ServiceRegistry.cs             # Global singleton: ChatSystem, IMManager, AuditLogger, GlobalACL
+│   │   ├── ServiceLocator.cs             # Global service locator: Register/Get, ChatSystem, IMManager, AuditLogger, GlobalACL
 │   │   ├── Runtime/                       # MainLoop, TickObject (threaded scheduling, watchdog, circuit breaker)
 │   │   ├── SiliconBeing/                  # SiliconBeingBase, ISiliconBeingFactory, SiliconBeingManager, SoulFileManager
 │   │   ├── AI/                            # IAIClient, ContextManager ("brain"), Message, AIRequest/AIResponse
@@ -121,7 +121,7 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] Phase 6: Permission system (5-level chain, AuditLogger, GlobalACL)
 - [x] Phase 7: Dynamic compilation + self-evolution (Roslyn)
 - [x] Phase 8: Long-term memory + Task + Timer
-- [ ] Phase 9: CoreHost + multi-agent collaboration
+- [x] Phase 9: CoreHost + multi-agent collaboration
 - [ ] Phase 10: Web UI (HTTP + WebSocket)
 - [ ] Phase 11: External IM (Feishu / WhatsApp / Telegram)
 - [ ] Phase 12: Knowledge graph, plugins, and extras

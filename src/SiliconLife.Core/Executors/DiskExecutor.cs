@@ -16,7 +16,7 @@ namespace SiliconLife.Collective;
 /// <summary>
 /// Static executor for file system operations.
 /// Provides a safe wrapper for disk IO initiated by AI tools.
-/// Permission checking via <see cref="PermissionManager"/> through <see cref="ServiceRegistry"/>.
+/// Permission checking via <see cref="PermissionManager"/> through <see cref="ServiceLocator"/>.
 /// </summary>
 public static class DiskExecutor
 {
@@ -260,7 +260,7 @@ public static class DiskExecutor
     /// </summary>
     private static bool CheckPermission(ExecutorRequest request)
     {
-        PermissionManager? pm = ServiceRegistry.Instance.GetPermissionManager(request.CallerId);
+        PermissionManager? pm = ServiceLocator.Instance.GetPermissionManager(request.CallerId);
         if (pm == null) return true; // No manager = no restriction (bootstrap)
         return pm.CheckPermission(request.CallerId, PermissionType.FileAccess, request.ResourcePath);
     }

@@ -144,7 +144,7 @@ public static class CommandLineExecutor
     /// </summary>
     private static bool CheckPermission(ExecutorRequest request)
     {
-        PermissionManager? pm = ServiceRegistry.Instance.GetPermissionManager(request.CallerId);
+        PermissionManager? pm = ServiceLocator.Instance.GetPermissionManager(request.CallerId);
         if (pm == null) return true;
         return pm.CheckPermission(request.CallerId, PermissionType.CommandLine, request.ResourcePath);
     }

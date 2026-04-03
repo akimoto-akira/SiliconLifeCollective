@@ -16,7 +16,7 @@ namespace SiliconLife.Collective;
 /// <summary>
 /// Static executor for HTTP network requests.
 /// Provides timeout control for AI-initiated network operations.
-/// Permission checking via <see cref="PermissionManager"/> through <see cref="ServiceRegistry"/>.
+/// Permission checking via <see cref="PermissionManager"/> through <see cref="ServiceLocator"/>.
 /// Circuit breaker is not implemented yet.
 /// </summary>
 public static class NetworkExecutor
@@ -113,7 +113,7 @@ public static class NetworkExecutor
     /// </summary>
     private static bool CheckPermission(ExecutorRequest request)
     {
-        PermissionManager? pm = ServiceRegistry.Instance.GetPermissionManager(request.CallerId);
+        PermissionManager? pm = ServiceLocator.Instance.GetPermissionManager(request.CallerId);
         if (pm == null) return true;
         return pm.CheckPermission(request.CallerId, PermissionType.NetworkAccess, request.ResourcePath);
     }

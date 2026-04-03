@@ -31,12 +31,18 @@ public static class MainLoop
     private static long _lastHeartbeatTicks = DateTime.MinValue.Ticks;
     private static ConfigDataBase? _config;
     private static SiliconBeingManager _beingManager = new();
+    private static PerformanceMonitor _performanceMonitor = new();
 
     /// <summary>
     /// Gets the singleton <see cref="SiliconBeingManager"/> instance.
     /// Not automatically registered to the tick loop.
     /// </summary>
     public static SiliconBeingManager BeingManager => _beingManager;
+
+    /// <summary>
+    /// Gets the performance monitor for tracking tick execution times.
+    /// </summary>
+    public static PerformanceMonitor PerformanceMonitor => _performanceMonitor;
 
     public static bool IsRunning => _isRunning;
 

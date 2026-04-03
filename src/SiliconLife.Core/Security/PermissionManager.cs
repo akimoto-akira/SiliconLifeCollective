@@ -175,7 +175,7 @@ public class PermissionManager
     /// </summary>
     protected virtual void AuditLog(Guid callerId, PermissionType permissionType, string resource, PermissionResult result, string reason)
     {
-        // Audit log is handled by AuditLogger injected via ServiceRegistry
-        ServiceRegistry.Instance.AuditLogger?.Log(callerId, permissionType, resource, result, reason);
+        // Audit log is handled by AuditLogger injected via ServiceLocator
+        ServiceLocator.Instance.AuditLogger?.Log(callerId, permissionType, resource, result, reason);
     }
 }

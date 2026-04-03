@@ -126,7 +126,7 @@ public class TaskTool : ITool
 
     private SiliconBeingBase? GetSiliconBeing(Guid callerId)
     {
-        var manager = ServiceRegistry.Instance.BeingManager;
+        var manager = ServiceLocator.Instance.BeingManager;
         if (manager == null)
             return null;
 

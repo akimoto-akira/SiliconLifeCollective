@@ -58,7 +58,7 @@ public class ContextManager
         _contextMessageIds = new HashSet<Guid>();
         _unreadMessageIds = new List<Guid>();
 
-        ChatSystem? chatSystem = ServiceRegistry.Instance.ChatSystem;
+        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
         if (chatSystem != null && _being.Id != Guid.Empty && _being.UserId != Guid.Empty)
         {
             LoadHistoryMessages();
@@ -74,7 +74,7 @@ public class ContextManager
     /// </summary>
     private void LoadHistoryMessages()
     {
-        ChatSystem? chatSystem = ServiceRegistry.Instance.ChatSystem;
+        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
         if (chatSystem == null || _being.Id == Guid.Empty || _being.UserId == Guid.Empty)
         {
             return;
@@ -113,7 +113,7 @@ public class ContextManager
     /// <returns>True if the last history message is a Tool result</returns>
     public static bool NeedsContinuation(SiliconBeingBase being)
     {
-        ChatSystem? chatSystem = ServiceRegistry.Instance.ChatSystem;
+        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
         if (chatSystem == null || being.Id == Guid.Empty || being.UserId == Guid.Empty)
         {
             return false;
@@ -136,7 +136,7 @@ public class ContextManager
     /// </summary>
     private void FetchUnreadMessages()
     {
-        ChatSystem? chatSystem = ServiceRegistry.Instance.ChatSystem;
+        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
         if (chatSystem == null || _being.Id == Guid.Empty)
         {
             return;
@@ -210,7 +210,7 @@ public class ContextManager
     /// </summary>
     public void MarkMessageProcessed()
     {
-        ChatSystem? chatSystem = ServiceRegistry.Instance.ChatSystem;
+        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
         if (chatSystem != null && _unreadMessageIds.Count > 0 && _being.Id != Guid.Empty)
         {
             chatSystem.MarkMessagesAsRead(_unreadMessageIds, _being.Id);
@@ -225,7 +225,7 @@ public class ContextManager
     {
         _messages.Add(new Message(MessageRole.Assistant, content));
 
-        ChatSystem? chatSystem = ServiceRegistry.Instance.ChatSystem;
+        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
         if (chatSystem != null && _being.Id != Guid.Empty && _being.UserId != Guid.Empty)
         {
             chatSystem.AddMessage(_being.Id, _being.UserId, content);
@@ -520,7 +520,7 @@ public class ContextManager
     /// </summary>
     private void DeliverOutput(string content)
     {
-        IMManager? imManager = ServiceRegistry.Instance.IMManager;
+        IMManager? imManager = ServiceLocator.Instance.IMManager;
         if (imManager != null)
         {
             _ = imManager.SendMessageAsync(_being.Id, _being.UserId, $"{_being.Name}: {content}");
@@ -553,7 +553,7 @@ public class ContextManager
     /// </summary>
     private void PersistToolRoundToChatSystem()
     {
-        ChatSystem? chatSystem = ServiceRegistry.Instance.ChatSystem;
+        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
         if (chatSystem == null || _being.Id == Guid.Empty || _being.UserId == Guid.Empty)
         {
             return;

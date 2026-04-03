@@ -277,8 +277,17 @@ public class SiliconBeingManager : TickObject
                 continue;
             }
 
-            MainLoop.UpdateHeartbeat();
-            runner.Execute(deltaTime);
+            try
+            {
+                MainLoop.UpdateHeartbeat();
+                var sw = System.Diagnostics.Stopwatch.StartNew();
+                runner.Execute(deltaTime);
+                sw.Stop();
+                MainLoop.PerformanceMonitor.Record($"SiliconBeing-{runner.BeingId}", sw.Elapsed);
+            }
+            catch
+            {
+            }
         }
     }
 
@@ -345,7 +354,7 @@ public class SiliconBeingManager : TickObject
             // Update PermissionManager registry
             if (newBeing.PermissionManager != null)
             {
-                ServiceRegistry.Instance.RegisterPermissionManager(newBeing.Id, newBeing.PermissionManager);
+                ServiceLocator.Instance.RegisterPermissionManager(newBeing.Id, newBeing.PermissionManager);
             }
 
             return true;
@@ -360,7 +369,7 @@ public class SiliconBeingManager : TickObject
     /// <param name="beingId">The GUID of the being to revert</param>
     public void ReplaceWithDefault(Guid beingId)
     {
-        ISiliconBeingFactory? factory = ServiceRegistry.Instance.BeingFactory;
+        ISiliconBeingFactory? factory = ServiceLocator.Instance.BeingFactory;
         if (factory == null)
         {
             return;
@@ -390,7 +399,7 @@ public class SiliconBeingManager : TickObject
 
             if (newBeing.PermissionManager != null)
             {
-                ServiceRegistry.Instance.RegisterPermissionManager(newBeing.Id, newBeing.PermissionManager);
+                ServiceLocator.Instance.RegisterPermissionManager(newBeing.Id, newBeing.PermissionManager);
             }
         }
     }

@@ -173,7 +173,7 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         being.ToolManager = toolManager;
 
         // Create PermissionManager for this being
-        GlobalACL? globalAcl = ServiceRegistry.Instance.GlobalAcl;
+        GlobalACL? globalAcl = ServiceLocator.Instance.GlobalAcl;
         if (globalAcl != null)
         {
             PermissionManager pm = new PermissionManager(
@@ -183,7 +183,7 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
                 _askHandler);
 
             being.PermissionManager = pm;
-            ServiceRegistry.Instance.RegisterPermissionManager(id, pm);
+            ServiceLocator.Instance.RegisterPermissionManager(id, pm);
         }
 
         // Create TimeStorage for this being (separate directory per being)

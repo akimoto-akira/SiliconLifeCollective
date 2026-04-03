@@ -52,7 +52,7 @@ public class ChatTool : ITool
 
     public ToolResult Execute(Guid callerId, Dictionary<string, object> parameters)
     {
-        ChatSystem? chatSystem = ServiceRegistry.Instance.ChatSystem;
+        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
         if (chatSystem == null)
         {
             return ToolResult.Failed("ChatSystem is not configured");

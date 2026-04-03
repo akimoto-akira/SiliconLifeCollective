@@ -16,17 +16,12 @@ using SiliconLife.Default;
 
 namespace SiliconLife.Default;
 
-/// <summary>
-/// Main program entry point
-/// </summary>
 public class Program
 {
     private static bool _shouldExit = false;
+    private static CoreHost? _host;
 
-    /// <summary>
-    /// Main method
-    /// </summary>
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         RegisterLocalizations();
         ConfigDataBaseConverter.RegisterConfigType("Default", typeof(DefaultConfigData));
@@ -49,16 +44,12 @@ public class Program
             Path.Combine(configData.DataDirectory, "chat"));
 
         ChatSystem chatSystem = new ChatSystem(timeStorage);
-        ServiceRegistry.Instance.ChatSystem = chatSystem;
 
-        // Phase 6: Permission system setup
         ITimeStorage auditStorage = new FileSystemTimeStorage(
             Path.Combine(configData.DataDirectory, "audit"));
         AuditLogger auditLogger = new AuditLogger(auditStorage);
-        ServiceRegistry.Instance.AuditLogger = auditLogger;
 
         GlobalACL globalAcl = new GlobalACL(storage);
-        ServiceRegistry.Instance.GlobalAcl = globalAcl;
 
         IIMProvider imProvider = new ConsoleIMProvider(configData.UserGuid, configData.CuratorGuid);
         imProvider.ExitRequested += (s, e) => RequestExit();
@@ -66,10 +57,7 @@ public class Program
         DefaultPermissionCallback permissionCallback = new DefaultPermissionCallback(configData.DataDirectory);
         IMPermissionAskHandler askHandler = new IMPermissionAskHandler(imProvider);
 
-        SiliconBeingManager beingManager = MainLoop.BeingManager;
-
-        IMManager imManager = new IMManager(imProvider, chatSystem, beingManager);
-        ServiceRegistry.Instance.IMManager = imManager;
+        IMManager imManager = new IMManager(imProvider, chatSystem, MainLoop.BeingManager);
 
         DefaultSiliconBeingFactory beingFactory = new DefaultSiliconBeingFactory(
             aiClient,
@@ -79,18 +67,30 @@ public class Program
             configData.UserGuid,
             permissionCallback,
             askHandler);
-        ServiceRegistry.Instance.BeingFactory = beingFactory;
 
-        // Phase 7: Dynamic compilation support
         DynamicBeingLoader dynamicBeingLoader = new DynamicBeingLoader();
-        ServiceRegistry.Instance.DynamicBeingLoader = dynamicBeingLoader;
+
+        CoreHostBuilder builder = new CoreHostBuilder()
+            .SetConfig(configData)
+            .SetAIClient(aiClient)
+            .SetStorage(storage)
+            .SetTimeStorage(timeStorage)
+            .SetChatSystem(chatSystem)
+            .SetAuditLogger(auditLogger)
+            .SetGlobalACL(globalAcl)
+            .SetIMProvider(imProvider)
+            .SetIMManager(imManager)
+            .SetBeingFactory(beingFactory)
+            .SetDynamicBeingLoader(dynamicBeingLoader);
+
+        _host = builder.Build();
+
+        await _host.StartAsync();
 
         SiliconBeingBase defaultBeing = beingFactory.CreateBeing(configData.CuratorGuid, "Default");
 
-        // Phase 7: Load custom compiled code and permission callbacks at startup
         string beingDirectory = Path.Combine(configData.DataDirectory, "SiliconManager", configData.CuratorGuid.ToString());
 
-        // Load custom permission callback (stealth channel — loaded independently from being code)
         if (DynamicBeingLoader.HasCustomPermissionCallback(beingDirectory))
         {
             try
@@ -98,18 +98,16 @@ public class Program
                 CompilationResult permResult = dynamicBeingLoader.LoadPermissionCallback(configData.CuratorGuid, beingDirectory);
                 if (permResult.Success && permResult.CompiledType != null)
                 {
-                    beingManager.ReplacePermissionCallback(configData.CuratorGuid, permResult.CompiledType);
+                    MainLoop.BeingManager.ReplacePermissionCallback(configData.CuratorGuid, permResult.CompiledType);
                 }
             }
             catch
             {
-                // Stealth channel — failure is silent, use default callback
             }
         }
 
-        beingManager.RegisterBeing(defaultBeing);
+        MainLoop.BeingManager.RegisterBeing(defaultBeing);
 
-        // Load custom being code and hot-swap if available (after registration so ReplaceBeing works)
         if (DynamicBeingLoader.HasCustomCode(beingDirectory))
         {
             try
@@ -117,41 +115,43 @@ public class Program
                 Type? customType = dynamicBeingLoader.LoadBeingType(configData.CuratorGuid, beingDirectory);
                 if (customType != null)
                 {
-                    beingManager.ReplaceBeing(configData.CuratorGuid, customType);
+                    MainLoop.BeingManager.ReplaceBeing(configData.CuratorGuid, customType);
                 }
             }
             catch
             {
-                // Compilation failed — keep the default implementation
             }
         }
 
-        MainLoop.SetConfig(configData);
-        MainLoop.Register(beingManager);
-        MainLoop.Start();
-
-        _ = imManager.StartAsync();
+        Console.CancelKeyPress += async (s, e) =>
+        {
+            e.Cancel = true;
+            await ShutdownAsync();
+        };
 
         while (!_shouldExit)
         {
-            Thread.Sleep(100);
+            await Task.Delay(100);
         }
 
-        MainLoop.Stop();
+        await ShutdownAsync();
     }
 
-    /// <summary>
-    /// Registers all available localizations
-    /// </summary>
+    private static async Task ShutdownAsync()
+    {
+        if (_host != null)
+        {
+            await _host.StopAsync();
+        }
+        _shouldExit = true;
+    }
+
     private static void RegisterLocalizations()
     {
         LocalizationManager.Instance.Register<ZhCN>(Language.ZhCN);
         LocalizationManager.Instance.Register<EnUS>(Language.EnUS);
     }
 
-    /// <summary>
-    /// Signals the application to exit
-    /// </summary>
     public static void RequestExit()
     {
         _shouldExit = true;

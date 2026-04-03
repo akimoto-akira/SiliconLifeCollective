@@ -36,7 +36,7 @@
 SiliconLifeCollective.sln
 ├── src/
 │   ├── SiliconLife.Core/                  # 核心库（接口、抽象类）
-│   │   ├── ServiceRegistry.cs             # 全局单例：ChatSystem、IMManager、AuditLogger、GlobalACL
+│   │   ├── ServiceLocator.cs             # 全局服务定位器：Register/Get、ChatSystem、IMManager、AuditLogger、GlobalACL
 │   │   ├── Runtime/                       # MainLoop、TickObject（线程化调度、看门狗、熔断器）
 │   │   ├── SiliconBeing/                  # SiliconBeingBase、ISiliconBeingFactory、SiliconBeingManager、SoulFileManager
 │   │   ├── AI/                            # IAIClient、ContextManager（"大脑"）、Message、AIRequest/AIResponse
@@ -121,7 +121,7 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] 第六阶段：权限系统（5 级查询链、审计日志、全局 ACL）
 - [x] 第七阶段：动态编译 + 自我进化（Roslyn）
 - [x] 第八阶段：长期记忆 + 任务 + 定时器
-- [ ] 第九阶段：CoreHost + 多硅基人协作
+- [x] 第九阶段：CoreHost + 多硅基人协作
 - [ ] 第十阶段：Web 界面（HTTP + WebSocket）
 - [ ] 第十一阶段：外接 IM（飞书 / WhatsApp / Telegram）
 - [ ] 第十二阶段：知识图谱、插件及其他
