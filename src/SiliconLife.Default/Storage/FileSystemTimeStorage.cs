@@ -94,6 +94,20 @@ public class FileSystemTimeStorage : ITimeStorage
         File.WriteAllBytes(filePath, data);
     }
 
+    public void Write(string key, IncompleteDate timestamp, byte[] data)
+    {
+        string filePath = GetTimeFilePath(key, timestamp);
+        string? dir = Path.GetDirectoryName(filePath);
+        if (dir != null) Directory.CreateDirectory(dir);
+        
+        foreach (var f in Directory.GetFiles(dir, "*.json"))
+        {
+            File.Delete(f);
+        }
+        
+        File.WriteAllBytes(filePath.Replace("*.json", "0.json"), data);
+    }
+
     public byte[]? Read(string key, DateTime timestamp)
     {
         string dir = GetKeyDirectory(key);
@@ -118,7 +132,28 @@ public class FileSystemTimeStorage : ITimeStorage
         return best;
     }
 
+    public byte[]? Read(string key, IncompleteDate timestamp)
+    {
+        string dir = GetKeyDirectory(key);
+        string patternPath = GetTimeFilePath(key, timestamp);
+        string? dirPattern = Path.GetDirectoryName(patternPath);
+        
+        if (dirPattern == null || !Directory.Exists(dirPattern))
+            return null;
+
+        var files = Directory.GetFiles(dirPattern, "*.json");
+        if (files.Length == 0)
+            return null;
+
+        return File.ReadAllBytes(files[0]);
+    }
+
     public bool Exists(string key, DateTime timestamp)
+    {
+        return Read(key, timestamp) != null;
+    }
+
+    public bool Exists(string key, IncompleteDate timestamp)
     {
         return Read(key, timestamp) != null;
     }
@@ -129,6 +164,21 @@ public class FileSystemTimeStorage : ITimeStorage
         if (File.Exists(filePath))
         {
             File.Delete(filePath);
+        }
+    }
+
+    public void Delete(string key, IncompleteDate timestamp)
+    {
+        string dir = GetKeyDirectory(key);
+        string patternPath = GetTimeFilePath(key, timestamp);
+        string? dirPattern = Path.GetDirectoryName(patternPath);
+        
+        if (dirPattern == null || !Directory.Exists(dirPattern))
+            return;
+
+        foreach (var f in Directory.GetFiles(dirPattern, "*.json"))
+        {
+            File.Delete(f);
         }
     }
 
@@ -219,6 +269,28 @@ public class FileSystemTimeStorage : ITimeStorage
             timestamp.Hour.ToString("D2"),
             timestamp.Minute.ToString("D2"),
             $"{timestamp.Second:D2}.json");
+    }
+
+    private string GetTimeFilePath(string key, IncompleteDate timestamp)
+    {
+        var parts = new List<string> { GetKeyDirectory(key) };
+
+        if (timestamp.Year > 0)
+            parts.Add(timestamp.Year.ToString());
+        if (timestamp.Month.HasValue)
+            parts.Add(timestamp.Month.Value.ToString("D2"));
+        if (timestamp.Day.HasValue)
+            parts.Add(timestamp.Day.Value.ToString("D2"));
+        if (timestamp.Hour.HasValue)
+            parts.Add(timestamp.Hour.Value.ToString("D2"));
+        if (timestamp.Minute.HasValue)
+            parts.Add(timestamp.Minute.Value.ToString("D2"));
+        if (timestamp.Second.HasValue)
+            parts.Add($"{timestamp.Second.Value:D2}.json");
+        else
+            parts.Add("*.json");
+
+        return Path.Combine(parts.ToArray());
     }
 
     /// <summary>

@@ -13,6 +13,8 @@
 
 using System.Text.Json;
 
+using SiliconLife.Collective;
+
 namespace SiliconLife.Collective;
 
 /// <summary>
@@ -427,6 +429,90 @@ public class ContextManager
         AIResponse response = GetResponse();
         MarkMessageProcessed();
         return response;
+    }
+
+    /// <summary>
+    /// Scene: memory compression.
+    /// Compresses old memories level by level: second -> minute -> hour -> day -> month -> year.
+    /// Uses Generate API (non-chat) for pure text compression.
+    /// </summary>
+    /// <returns>The AI response</returns>
+    public AIResponse ThinkOnMemoryCompress()
+    {
+        if (_being.Memory == null)
+        {
+            return new AIResponse { Success = false, ErrorMessage = "Memory not initialized" };
+        }
+
+        var compressData = _being.Memory.FindLevelToCompress();
+        if (!compressData.HasValue)
+        {
+            return new AIResponse { Success = true, Content = "No level to compress" };
+        }
+
+        var (level, entries) = compressData.Value;
+
+        if (entries.Count == 0)
+        {
+            return new AIResponse { Success = true, Content = "No entries to compress" };
+        }
+
+        var memoryEntries = entries
+            .Select(e => JsonSerializer.Deserialize<MemoryEntry>(System.Text.Encoding.UTF8.GetString(e.Data)))
+            .Where(e => e != null)
+            .Cast<MemoryEntry>()
+            .ToList();
+
+        string levelDesc = GetLevelDescription(level);
+        string rangeDesc = GetLevelRangeDescription(level);
+        string contentText = string.Join("\n", memoryEntries.Select(e => $"[{e.Timestamp}] {e.Content}"));
+
+        var language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+        var localization = LocalizationManager.Instance.GetLocalization(language);
+        string systemPrompt = localization.MemoryCompressionSystemPrompt;
+        string userPrompt = localization.GetMemoryCompressionUserPrompt(levelDesc, rangeDesc, contentText);
+
+        AIResponse response = _aiClient.Generate(systemPrompt, userPrompt);
+
+        if (response.Success && !string.IsNullOrEmpty(response.Content))
+        {
+            _being.Memory.Add($"[{level} Compression] {response.Content}", null);
+            _being.Memory.RemoveEntriesByTimestamp(level);
+        }
+
+        return response;
+    }
+
+    private string GetLevelDescription(IncompleteDate level)
+    {
+        if (level.Second.HasValue)
+            return $"second {level.Year}-{level.Month:D2}-{level.Day:D2} {level.Hour:D2}:{level.Minute:D2}:{level.Second:D2}";
+        if (level.Minute.HasValue)
+            return $"minute {level.Year}-{level.Month:D2}-{level.Day:D2} {level.Hour:D2}:{level.Minute:D2}";
+        if (level.Hour.HasValue)
+            return $"hour {level.Year}-{level.Month:D2}-{level.Day:D2} {level.Hour:D2}";
+        if (level.Day.HasValue)
+            return $"day {level.Year}-{level.Month:D2}-{level.Day:D2}";
+        if (level.Month.HasValue)
+            return $"month {level.Year}-{level.Month:D2}";
+        return $"year {level.Year}";
+    }
+
+    private string GetLevelRangeDescription(IncompleteDate level)
+    {
+        var (start, end) = level.GetRange();
+        
+        if (level.Second.HasValue)
+            return $"{start:yyyy-MM-dd HH:mm:ss} to {end:yyyy-MM-dd HH:mm:ss}";
+        if (level.Minute.HasValue)
+            return $"{start:yyyy-MM-dd HH:mm} to {end:yyyy-MM-dd HH:mm}";
+        if (level.Hour.HasValue)
+            return $"{start:yyyy-MM-dd HH} to {end:yyyy-MM-dd HH}";
+        if (level.Day.HasValue)
+            return $"{start:yyyy-MM-dd} to {end:yyyy-MM-dd}";
+        if (level.Month.HasValue)
+            return $"{start:yyyy-MM} to {end:yyyy-MM}";
+        return $"{start:yyyy} to {end:yyyy}";
     }
 
     /// <summary>

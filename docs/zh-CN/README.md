@@ -120,7 +120,7 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] 第五阶段：工具系统 + 执行器
 - [x] 第六阶段：权限系统（5 级查询链、审计日志、全局 ACL）
 - [x] 第七阶段：动态编译 + 自我进化（Roslyn）
-- [ ] 第八阶段：长期记忆 + 任务 + 定时器
+- [x] 第八阶段：长期记忆 + 任务 + 定时器
 - [ ] 第九阶段：CoreHost + 多硅基人协作
 - [ ] 第十阶段：Web 界面（HTTP + WebSocket）
 - [ ] 第十一阶段：外接 IM（飞书 / WhatsApp / Telegram）

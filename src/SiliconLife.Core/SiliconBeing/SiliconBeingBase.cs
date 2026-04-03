@@ -56,6 +56,30 @@ public abstract class SiliconBeingBase
     public PermissionManager? PermissionManager { get; set; }
 
     /// <summary>
+    /// Gets or sets the time storage for this silicon being.
+    /// Used by Memory for time-indexed queries.
+    /// </summary>
+    public ITimeStorage? TimeStorage { get; set; }
+
+    /// <summary>
+    /// Gets or sets the memory system for this silicon being.
+    /// Each being holds its own Memory instance.
+    /// </summary>
+    public Memory? Memory { get; set; }
+
+    /// <summary>
+    /// Gets or sets the task system for this silicon being.
+    /// Each being holds its own TaskSystem instance.
+    /// </summary>
+    public TaskSystem? TaskSystem { get; set; }
+
+    /// <summary>
+    /// Gets or sets the timer system for this silicon being.
+    /// Each being holds its own TimerSystem instance.
+    /// </summary>
+    public TimerSystem? TimerSystem { get; set; }
+
+    /// <summary>
     /// Gets whether this silicon being is a curator (highest privilege level).
     /// Determined by comparing Id with Config.CuratorGuid.
     /// </summary>

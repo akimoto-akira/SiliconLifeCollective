@@ -28,4 +28,18 @@ public abstract class LocalizationBase
     /// Gets the language name (e.g., "简体中文", "English")
     /// </summary>
     public abstract string LanguageName { get; }
+
+    /// <summary>
+    /// Gets the system prompt for memory compression
+    /// </summary>
+    public abstract string MemoryCompressionSystemPrompt { get; }
+
+    /// <summary>
+    /// Gets the user prompt template for memory compression
+    /// </summary>
+    /// <param name="levelDesc">The level description (e.g., "hour", "day")</param>
+    /// <param name="rangeDesc">The time range description</param>
+    /// <param name="contentText">The memory content to compress</param>
+    /// <returns>The formatted user prompt</returns>
+    public abstract string GetMemoryCompressionUserPrompt(string levelDesc, string rangeDesc, string contentText);
 }

@@ -30,11 +30,34 @@ public enum MessageType
 
 public class ChatMessage
 {
+    /// <summary>
+    /// Gets or sets the unique identifier of the message.
+    /// </summary>
     public Guid Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the sender's unique identifier.
+    /// </summary>
     public Guid SenderId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the receiver's unique identifier.
+    /// </summary>
     public Guid ReceiverId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the content of the message.
+    /// </summary>
     public string Content { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the timestamp when the message was sent.
+    /// </summary>
     public DateTime Timestamp { get; set; }
+
+    /// <summary>
+    /// Gets or sets the type of the message.
+    /// </summary>
     public MessageType Type { get; set; }
 
     /// <summary>
@@ -65,6 +88,9 @@ public class ChatMessage
     /// </summary>
     public string? Thinking { get; set; }
 
+    /// <summary>
+    /// Initializes a new instance of the ChatMessage class.
+    /// </summary>
     public ChatMessage()
     {
         Id = Guid.NewGuid();
@@ -72,6 +98,12 @@ public class ChatMessage
         Type = MessageType.Text;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the ChatMessage class with sender, receiver, and content.
+    /// </summary>
+    /// <param name="senderId">The sender's unique identifier.</param>
+    /// <param name="receiverId">The receiver's unique identifier.</param>
+    /// <param name="content">The message content.</param>
     public ChatMessage(Guid senderId, Guid receiverId, string content)
         : this()
     {
@@ -80,6 +112,13 @@ public class ChatMessage
         Content = content;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the ChatMessage class with all parameters.
+    /// </summary>
+    /// <param name="senderId">The sender's unique identifier.</param>
+    /// <param name="receiverId">The receiver's unique identifier.</param>
+    /// <param name="content">The message content.</param>
+    /// <param name="type">The message type.</param>
     public ChatMessage(Guid senderId, Guid receiverId, string content, MessageType type)
         : this(senderId, receiverId, content)
     {

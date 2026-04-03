@@ -137,4 +137,17 @@ public class EnUS : DefaultLocalizationBase
         PermissionType.DataAccess => "Data access",
         _ => permissionType.ToString()
     };
+
+    /// <summary>
+    /// Gets the system prompt for memory compression
+    /// </summary>
+    public override string MemoryCompressionSystemPrompt => "You are a memory compression assistant. Please compress the following memories into a concise summary while retaining key information.";
+
+    /// <summary>
+    /// Gets the user prompt template for memory compression
+    /// </summary>
+    public override string GetMemoryCompressionUserPrompt(string levelDesc, string rangeDesc, string contentText)
+    {
+        return $"Memory compression: {levelDesc}. Time range: {rangeDesc}.\n\nMemory content:\n{contentText}";
+    }
 }

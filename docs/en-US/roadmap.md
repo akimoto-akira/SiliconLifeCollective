@@ -146,7 +146,7 @@ Every phase ends with a **runnable, observable** system. No phase produces "a pi
 
 ---
 
-## Phase 8: Remembers and Plans
+## ~~Phase 8: Remembers and Plans~~ ✅ Completed
 
 **Goal**: Long-term memory, task management, scheduled triggers.
 

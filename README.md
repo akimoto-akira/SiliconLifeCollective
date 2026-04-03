@@ -120,7 +120,7 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] Phase 5: Tool system + Executors
 - [x] Phase 6: Permission system (5-level chain, AuditLogger, GlobalACL)
 - [x] Phase 7: Dynamic compilation + self-evolution (Roslyn)
-- [ ] Phase 8: Long-term memory + Task + Timer
+- [x] Phase 8: Long-term memory + Task + Timer
 - [ ] Phase 9: CoreHost + multi-agent collaboration
 - [ ] Phase 10: Web UI (HTTP + WebSocket)
 - [ ] Phase 11: External IM (Feishu / WhatsApp / Telegram)

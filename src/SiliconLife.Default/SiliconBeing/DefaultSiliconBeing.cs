@@ -45,6 +45,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
     /// <summary>
     /// Called by SiliconBeingManager on each tick.
     /// Detects the trigger scene and calls the corresponding brain method.
+    /// Priority: Continuation > Chat > Timer > Task > MemoryCompression
     /// </summary>
     /// <param name="deltaTime">Time elapsed since the last tick</param>
     public override void Tick(TimeSpan deltaTime)
@@ -57,23 +58,36 @@ public class DefaultSiliconBeing : SiliconBeingBase
         _isProcessing = true;
         try
         {
-            // Priority 1: Tool call continuation from previous tick
             if (_awaitingContinuation || ContextManager.NeedsContinuation(this))
             {
                 ExecuteBrain("ThinkContinuation", brain => brain.ThinkOnChat());
                 return;
             }
 
-            // Priority 2: Create brain and check for pending work
             ContextManager brain = new ContextManager(this);
-            if (!brain.HasWork)
+            if (brain.HasWork)
             {
+                ExecuteBrain("ThinkOnChat", _ => brain.ThinkOnChat());
                 return;
             }
 
-            // TODO: Detect GroupChat / Task / Timer triggers
-            // For now, all pending work goes through Chat
-            ExecuteBrain("ThinkOnChat", _ => brain.ThinkOnChat());
+            if (TimerSystem != null && TimerSystem.HasPendingTimers())
+            {
+                ExecuteBrain("ThinkOnTimer", _ => brain.ThinkOnTimer());
+                return;
+            }
+
+            if (TaskSystem != null && TaskSystem.HasPendingTasks())
+            {
+                ExecuteBrain("ThinkOnTask", _ => brain.ThinkOnTask());
+                return;
+            }
+
+            if (Memory != null && Memory.ShouldCompress())
+            {
+                ExecuteBrain("ThinkOnMemoryCompress", _ => brain.ThinkOnMemoryCompress());
+                return;
+            }
         }
         catch (Exception ex)
         {

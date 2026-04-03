@@ -23,6 +23,7 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
 {
     private readonly IAIClient _aiClient;
     private readonly IStorage _storage;
+    private readonly ITimeStorage _timeStorage;
     private readonly string _dataDirectory;
     private readonly Guid _userId;
     private readonly IPermissionCallback? _permissionCallback;
@@ -37,8 +38,9 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     public DefaultSiliconBeingFactory(
         IAIClient aiClient,
         IStorage storage,
+        ITimeStorage timeStorage,
         string dataDirectory)
-        : this(aiClient, storage, dataDirectory, Guid.Empty, null, null)
+        : this(aiClient, storage, timeStorage, dataDirectory, Guid.Empty, null, null)
     {
     }
 
@@ -48,9 +50,10 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     public DefaultSiliconBeingFactory(
         IAIClient aiClient,
         IStorage storage,
+        ITimeStorage timeStorage,
         string dataDirectory,
         Guid userId)
-        : this(aiClient, storage, dataDirectory, userId, null, null)
+        : this(aiClient, storage, timeStorage, dataDirectory, userId, null, null)
     {
     }
 
@@ -60,6 +63,7 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     public DefaultSiliconBeingFactory(
         IAIClient aiClient,
         IStorage storage,
+        ITimeStorage timeStorage,
         string dataDirectory,
         Guid userId,
         IPermissionCallback? permissionCallback,
@@ -67,6 +71,7 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     {
         _aiClient = aiClient;
         _storage = storage;
+        _timeStorage = timeStorage;
         _dataDirectory = dataDirectory;
         _userId = userId;
         _permissionCallback = permissionCallback;
@@ -180,6 +185,16 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
             being.PermissionManager = pm;
             ServiceRegistry.Instance.RegisterPermissionManager(id, pm);
         }
+
+        // Create TimeStorage for this being (separate directory per being)
+        string beingTimeStorageDir = Path.Combine(_dataDirectory, "SiliconManager", id.ToString(), "memory");
+        ITimeStorage beingTimeStorage = new FileSystemTimeStorage(beingTimeStorageDir);
+        being.TimeStorage = beingTimeStorage;
+
+        // Create Memory, TaskSystem, TimerSystem for this being
+        being.Memory = new Memory(beingTimeStorage);
+        being.TaskSystem = new TaskSystem(_storage);
+        being.TimerSystem = new TimerSystem(_storage);
 
         return being;
     }

@@ -79,6 +79,15 @@ public class Message
     }
 
     /// <summary>
+    /// Creates a system message
+    /// </summary>
+    /// <param name="content">The system message content</param>
+    public static Message System(string content)
+    {
+        return new Message(MessageRole.System, content);
+    }
+
+    /// <summary>
     /// Creates a tool result message
     /// </summary>
     /// <param name="toolCallId">The ID of the originating tool call</param>

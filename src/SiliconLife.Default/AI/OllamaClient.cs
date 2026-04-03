@@ -375,4 +375,66 @@ public class OllamaClient : IAIClient
             _ => "user"
         };
     }
+
+    public AIResponse Generate(string prompt)
+    {
+        return GenerateAsync(prompt).GetAwaiter().GetResult();
+    }
+
+    public async Task<AIResponse> GenerateAsync(string prompt)
+    {
+        return await GenerateAsync(null, prompt);
+    }
+
+    public AIResponse Generate(string systemPrompt, string prompt)
+    {
+        return GenerateAsync(systemPrompt, prompt).GetAwaiter().GetResult();
+    }
+
+    public async Task<AIResponse> GenerateAsync(string? systemPrompt, string prompt)
+    {
+        var requestBody = new
+        {
+            model = DefaultModel,
+            prompt = prompt,
+            system = systemPrompt,
+            stream = false
+        };
+
+        string json = JsonSerializer.Serialize(requestBody);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+        try
+        {
+            HttpResponseMessage response = await _httpClient.PostAsync($"{Endpoint}/api/generate", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                string error = await response.Content.ReadAsStringAsync();
+                return new AIResponse
+                {
+                    Success = false,
+                    ErrorMessage = $"Ollama Generate failed: {response.StatusCode} - {error}"
+                };
+            }
+
+            string responseJson = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(responseJson);
+            string responseText = doc.RootElement.GetProperty("response").GetString() ?? "";
+
+            return new AIResponse
+            {
+                Success = true,
+                Content = responseText
+            };
+        }
+        catch (Exception ex)
+        {
+            return new AIResponse
+            {
+                Success = false,
+                ErrorMessage = $"Ollama Generate error: {ex.Message}"
+            };
+        }
+    }
 }

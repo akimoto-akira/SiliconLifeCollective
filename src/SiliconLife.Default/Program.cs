@@ -74,6 +74,7 @@ public class Program
         DefaultSiliconBeingFactory beingFactory = new DefaultSiliconBeingFactory(
             aiClient,
             storage,
+            timeStorage,
             configData.DataDirectory,
             configData.UserGuid,
             permissionCallback,

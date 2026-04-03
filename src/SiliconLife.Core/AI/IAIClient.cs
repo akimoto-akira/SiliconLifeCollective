@@ -71,4 +71,34 @@ public interface IAIClient
     /// <param name="userMessage">The user message</param>
     /// <returns>The AI response</returns>
     Task<AIResponse> ChatAsync(string systemPrompt, string userMessage);
+
+    /// <summary>
+    /// Sends a generation request to the AI service (non-chat, e.g. Ollama /api/generate)
+    /// </summary>
+    /// <param name="prompt">The prompt to generate from</param>
+    /// <returns>The AI response</returns>
+    AIResponse Generate(string prompt);
+
+    /// <summary>
+    /// Sends a generation request to the AI service asynchronously
+    /// </summary>
+    /// <param name="prompt">The prompt to generate from</param>
+    /// <returns>The AI response</returns>
+    Task<AIResponse> GenerateAsync(string prompt);
+
+    /// <summary>
+    /// Sends a generation request with system prompt
+    /// </summary>
+    /// <param name="systemPrompt">The system prompt</param>
+    /// <param name="prompt">The user prompt</param>
+    /// <returns>The AI response</returns>
+    AIResponse Generate(string systemPrompt, string prompt);
+
+    /// <summary>
+    /// Sends a generation request with system prompt asynchronously
+    /// </summary>
+    /// <param name="systemPrompt">The system prompt</param>
+    /// <param name="prompt">The user prompt</param>
+    /// <returns>The AI response</returns>
+    Task<AIResponse> GenerateAsync(string systemPrompt, string prompt);
 }

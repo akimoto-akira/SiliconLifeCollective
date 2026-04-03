@@ -137,4 +137,17 @@ public class ZhCN : DefaultLocalizationBase
         PermissionType.DataAccess => "数据访问",
         _ => permissionType.ToString()
     };
+
+    /// <summary>
+    /// Gets the system prompt for memory compression
+    /// </summary>
+    public override string MemoryCompressionSystemPrompt => "你是一个记忆压缩助手。请将以下时间范围内的记忆内容压缩成简洁的摘要，保留关键信息。";
+
+    /// <summary>
+    /// Gets the user prompt template for memory compression
+    /// </summary>
+    public override string GetMemoryCompressionUserPrompt(string levelDesc, string rangeDesc, string contentText)
+    {
+        return $"记忆压缩：{levelDesc}。时间范围：{rangeDesc}。\n\n记忆内容：\n{contentText}";
+    }
 }

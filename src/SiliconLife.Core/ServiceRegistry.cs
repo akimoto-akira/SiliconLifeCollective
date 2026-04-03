@@ -55,6 +55,12 @@ public class ServiceRegistry
     public ISiliconBeingFactory? BeingFactory { get; set; }
 
     /// <summary>
+    /// Gets or sets the shared silicon being manager for accessing beings.
+    /// Used by tools to access silicon being components.
+    /// </summary>
+    public SiliconBeingManager? BeingManager { get; set; }
+
+    /// <summary>
     /// Gets or sets the dynamic being loader for compilation lifecycle.
     /// </summary>
     public DynamicBeingLoader? DynamicBeingLoader { get; set; }

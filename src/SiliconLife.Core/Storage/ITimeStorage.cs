@@ -23,18 +23,22 @@ public interface ITimeStorage : IStorage
     /// <summary>
     /// Writes data indexed by a composite key and timestamp.
     /// </summary>
-    /// <param name="key">The logical key (e.g. category prefix).</param>
-    /// <param name="timestamp">The timestamp to index this entry under.</param>
-    /// <param name="data">The data bytes to write.</param>
     void Write(string key, DateTime timestamp, byte[] data);
+
+    /// <summary>
+    /// Writes data indexed by a composite key and IncompleteDate timestamp.
+    /// </summary>
+    void Write(string key, IncompleteDate timestamp, byte[] data);
 
     /// <summary>
     /// Reads data by exact key and timestamp.
     /// </summary>
-    /// <param name="key">The logical key.</param>
-    /// <param name="timestamp">The exact timestamp.</param>
-    /// <returns>The data bytes, or null if not found.</returns>
     byte[]? Read(string key, DateTime timestamp);
+
+    /// <summary>
+    /// Reads data by exact key and IncompleteDate timestamp.
+    /// </summary>
+    byte[]? Read(string key, IncompleteDate timestamp);
 
     /// <summary>
     /// Checks if an entry exists for the exact key and timestamp.
@@ -42,9 +46,19 @@ public interface ITimeStorage : IStorage
     bool Exists(string key, DateTime timestamp);
 
     /// <summary>
+    /// Checks if an entry exists for the exact key and IncompleteDate timestamp.
+    /// </summary>
+    bool Exists(string key, IncompleteDate timestamp);
+
+    /// <summary>
     /// Deletes the entry at the exact key and timestamp.
     /// </summary>
     void Delete(string key, DateTime timestamp);
+
+    /// <summary>
+    /// Deletes the entry at the exact key and IncompleteDate timestamp.
+    /// </summary>
+    void Delete(string key, IncompleteDate timestamp);
 
     /// <summary>
     /// Queries entries matching the given key prefix and time range.
