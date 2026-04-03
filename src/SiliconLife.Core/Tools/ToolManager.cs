@@ -64,6 +64,8 @@ public class ToolManager
     /// <summary>
     /// Scans the specified assembly for ITool implementations and registers them.
     /// Only non-abstract types with parameterless constructors are discovered.
+    /// When curatorOnly=true, only tools with [SiliconManagerOnly] are registered.
+    /// When curatorOnly=false, only tools without [SiliconManagerOnly] are registered.
     /// </summary>
     /// <param name="assembly">The assembly to scan</param>
     /// <returns>The number of tools discovered and registered</returns>
@@ -86,6 +88,42 @@ public class ToolManager
             }
 
             if (!_curatorOnly && hasManagerOnlyAttr)
+            {
+                continue;
+            }
+
+            try
+            {
+                ITool? tool = Activator.CreateInstance(type) as ITool;
+                if (tool != null)
+                {
+                    RegisterTool(tool);
+                    count++;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ToolManager] Failed to instantiate tool '{type.Name}': {ex.Message}");
+            }
+        }
+
+        return count;
+    }
+
+    /// <summary>
+    /// Scans the specified assembly for ALL ITool implementations regardless of
+    /// [SiliconManagerOnly] attribute. Used by curator beings that have access
+    /// to every tool (both normal and curator-only).
+    /// </summary>
+    /// <param name="assembly">The assembly to scan</param>
+    /// <returns>The number of tools discovered and registered</returns>
+    public int ScanAssemblyAll(Assembly assembly)
+    {
+        int count = 0;
+
+        foreach (Type type in assembly.GetTypes())
+        {
+            if (!typeof(ITool).IsAssignableFrom(type) || type.IsAbstract || type.IsInterface)
             {
                 continue;
             }

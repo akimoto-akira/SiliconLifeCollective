@@ -48,6 +48,17 @@ public class ServiceRegistry
     /// </summary>
     public GlobalACL? GlobalAcl { get; set; }
 
+    /// <summary>
+    /// Gets or sets the shared silicon being factory for creating/loading beings.
+    /// Used by SiliconBeingManager for ReplaceWithDefault operations.
+    /// </summary>
+    public ISiliconBeingFactory? BeingFactory { get; set; }
+
+    /// <summary>
+    /// Gets or sets the dynamic being loader for compilation lifecycle.
+    /// </summary>
+    public DynamicBeingLoader? DynamicBeingLoader { get; set; }
+
     private ServiceRegistry() { }
 
     /// <summary>

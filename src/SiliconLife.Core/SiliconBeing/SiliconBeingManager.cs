@@ -281,4 +281,200 @@ public class SiliconBeingManager : TickObject
             runner.Execute(deltaTime);
         }
     }
+
+    #region Phase 7: Dynamic Compilation — Replace & Migrate
+
+    /// <summary>
+    /// Replaces a silicon being's implementation with a dynamically compiled type.
+    /// Creates a new instance from the compiled type and migrates state from the old instance.
+    /// The old instance is unregistered and the new one takes its place.
+    /// </summary>
+    /// <param name="beingId">The GUID of the being to replace</param>
+    /// <param name="newType">The compiled Type (must inherit SiliconBeingBase)</param>
+    /// <returns>True if replacement succeeded</returns>
+    public bool ReplaceBeing(Guid beingId, Type newType)
+    {
+        if (!typeof(SiliconBeingBase).IsAssignableFrom(newType))
+        {
+            return false;
+        }
+
+        lock (_lock)
+        {
+            SiliconBeingBase? oldBeing = _beings.FirstOrDefault(b => b.Id == beingId);
+            if (oldBeing == null)
+            {
+                return false;
+            }
+
+            // Create new instance from compiled type
+            // Compiled types must have a constructor matching: (Guid id, string name)
+            SiliconBeingBase? newBeing = null;
+            try
+            {
+                newBeing = (SiliconBeingBase?)Activator.CreateInstance(newType, oldBeing.Id, oldBeing.Name);
+            }
+            catch
+            {
+                // Fallback: try parameterless constructor
+                try
+                {
+                    newBeing = (SiliconBeingBase?)Activator.CreateInstance(newType);
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+            if (newBeing == null)
+            {
+                return false;
+            }
+
+            // Migrate state from old to new
+            MigrateState(oldBeing, newBeing);
+
+            // Swap registration
+            _runners.Remove(oldBeing);
+            _beings.Remove(oldBeing);
+
+            _beings.Add(newBeing);
+            _runners[newBeing] = new SiliconBeingRunner(newBeing, MaxTimeoutCount, Config.Instance?.Data!);
+
+            // Update PermissionManager registry
+            if (newBeing.PermissionManager != null)
+            {
+                ServiceRegistry.Instance.RegisterPermissionManager(newBeing.Id, newBeing.PermissionManager);
+            }
+
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Replaces a silicon being with its default implementation.
+    /// Used when custom code is removed or fails to compile.
+    /// The factory creates a new default instance and state is migrated.
+    /// </summary>
+    /// <param name="beingId">The GUID of the being to revert</param>
+    public void ReplaceWithDefault(Guid beingId)
+    {
+        ISiliconBeingFactory? factory = ServiceRegistry.Instance.BeingFactory;
+        if (factory == null)
+        {
+            return;
+        }
+
+        lock (_lock)
+        {
+            SiliconBeingBase? oldBeing = _beings.FirstOrDefault(b => b.Id == beingId);
+            if (oldBeing == null)
+            {
+                return;
+            }
+
+            SiliconBeingBase? newBeing = factory.CreateBeing(oldBeing.Id, oldBeing.Name);
+            if (newBeing == null)
+            {
+                return;
+            }
+
+            MigrateState(oldBeing, newBeing);
+
+            _runners.Remove(oldBeing);
+            _beings.Remove(oldBeing);
+
+            _beings.Add(newBeing);
+            _runners[newBeing] = new SiliconBeingRunner(newBeing, MaxTimeoutCount, Config.Instance?.Data!);
+
+            if (newBeing.PermissionManager != null)
+            {
+                ServiceRegistry.Instance.RegisterPermissionManager(newBeing.Id, newBeing.PermissionManager);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Replaces the permission callback for a specific being.
+    /// Loads the compiled IPermissionCallback and injects it into the being's PermissionManager.
+    /// Stealth channel — this operation is not visible to the AI.
+    /// </summary>
+    /// <param name="beingId">The GUID of the being</param>
+    /// <param name="callbackType">The compiled Type implementing IPermissionCallback</param>
+    public void ReplacePermissionCallback(Guid beingId, Type callbackType)
+    {
+        if (!typeof(IPermissionCallback).IsAssignableFrom(callbackType))
+        {
+            return;
+        }
+
+        lock (_lock)
+        {
+            SiliconBeingBase? being = _beings.FirstOrDefault(b => b.Id == beingId);
+            if (being?.PermissionManager == null)
+            {
+                return;
+            }
+
+            try
+            {
+                IPermissionCallback? callback = (IPermissionCallback?)Activator.CreateInstance(callbackType);
+                if (callback != null)
+                {
+                    being.PermissionManager.SetCustomCallback(callback);
+                }
+            }
+            catch
+            {
+                // Failed to instantiate callback — silently ignore (stealth channel)
+            }
+        }
+    }
+
+    /// <summary>
+    /// Resets a being's permission callback to the system default.
+    /// </summary>
+    /// <param name="beingId">The GUID of the being</param>
+    public void ResetPermissionCallback(Guid beingId)
+    {
+        lock (_lock)
+        {
+            SiliconBeingBase? being = _beings.FirstOrDefault(b => b.Id == beingId);
+            if (being?.PermissionManager == null)
+            {
+                return;
+            }
+
+            being.PermissionManager.ResetCallback();
+        }
+    }
+
+    /// <summary>
+    /// Migrates state from an old silicon being to a new one.
+    /// Copies all mutable properties: AIClient, SoulContent, UserId, ToolManager, PermissionManager.
+    /// </summary>
+    /// <param name="oldBeing">The old being instance</param>
+    /// <param name="newBeing">The new being instance</param>
+    private static void MigrateState(SiliconBeingBase oldBeing, SiliconBeingBase newBeing)
+    {
+        newBeing.AIClient = oldBeing.AIClient;
+        newBeing.SoulContent = oldBeing.SoulContent;
+        newBeing.UserId = oldBeing.UserId;
+        newBeing.ToolManager = oldBeing.ToolManager;
+
+        // Migrate PermissionManager — create new one with same owner (newBeing) but keep the old callback
+        PermissionManager? oldPm = oldBeing.PermissionManager;
+        if (oldPm != null)
+        {
+            PermissionManager newPm = new PermissionManager(
+                newBeing,
+                oldPm.GlobalAcl,
+                oldPm.CustomCallback,
+                oldPm.AskHandler);
+            newBeing.PermissionManager = newPm;
+        }
+    }
+
+    #endregion
 }

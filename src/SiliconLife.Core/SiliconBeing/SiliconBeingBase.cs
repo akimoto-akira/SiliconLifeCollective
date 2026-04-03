@@ -56,9 +56,10 @@ public abstract class SiliconBeingBase
     public PermissionManager? PermissionManager { get; set; }
 
     /// <summary>
-    /// Gets whether this silicon being is a curator (highest privilege level)
+    /// Gets whether this silicon being is a curator (highest privilege level).
+    /// Determined by comparing Id with Config.CuratorGuid.
     /// </summary>
-    public virtual bool IsCurator => false;
+    public bool IsCurator => Id == (Config.Instance?.Data?.CuratorGuid ?? Guid.Empty);
 
     /// <summary>
     /// Gets whether this silicon being is idle (no pending tasks)

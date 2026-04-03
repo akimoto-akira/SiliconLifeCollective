@@ -1,5 +1,7 @@
 # Silicon Life Collective
 
+**⚠️ WARNING: Dynamic compilation has not been thoroughly tested, but it does work. Templates must be added in the code for it to function properly.**
+
 A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Beings** self-evolve through Roslyn dynamic compilation.
 
 [中文文档](docs/zh-CN/README.md)
@@ -117,7 +119,7 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] Phase 4: Persistent memory (ChatSystem + ITimeStorage)
 - [x] Phase 5: Tool system + Executors
 - [x] Phase 6: Permission system (5-level chain, AuditLogger, GlobalACL)
-- [ ] Phase 7: Dynamic compilation + self-evolution (Roslyn)
+- [x] Phase 7: Dynamic compilation + self-evolution (Roslyn)
 - [ ] Phase 8: Long-term memory + Task + Timer
 - [ ] Phase 9: CoreHost + multi-agent collaboration
 - [ ] Phase 10: Web UI (HTTP + WebSocket)

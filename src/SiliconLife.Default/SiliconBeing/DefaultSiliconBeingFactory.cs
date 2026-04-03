@@ -137,20 +137,34 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     }
 
     /// <summary>
-    /// Creates a DefaultSiliconBeing and configures its properties, ToolManager, and PermissionManager
+    /// Creates a DefaultSiliconBeing and configures its properties, ToolManager, and PermissionManager.
+    /// Curators (IsCurator=true) get ALL tools; normal beings get only non-curator tools.
+    /// The only difference between curator and normal being is tool access.
     /// </summary>
     private SiliconBeingBase CreateAndConfigureBeing(Guid id, string name, string beingDirectory)
     {
         string? soulContent = SoulFileManager.LoadSoul(beingDirectory);
 
-        DefaultSiliconBeing being = new DefaultSiliconBeing(id, name);
+        // Determine if this is the curator
+        Guid curatorGuid = Config.Instance?.Data?.CuratorGuid ?? Guid.Empty;
+        bool isCurator = id == curatorGuid;
+
+        DefaultSiliconBeing being = new(id, name);
         being.AIClient = _aiClient;
         being.SoulContent = soulContent;
         being.UserId = _userId;
 
         // Create and configure ToolManager for this being
-        ToolManager toolManager = new ToolManager();
-        toolManager.ScanAssembly(typeof(DefaultSiliconBeingFactory).Assembly);
+        // Curators get ALL tools (normal + curator-only); normal beings get only non-curator tools
+        ToolManager toolManager = new ToolManager(curatorOnly: isCurator);
+        if (isCurator)
+        {
+            toolManager.ScanAssemblyAll(typeof(DefaultSiliconBeingFactory).Assembly);
+        }
+        else
+        {
+            toolManager.ScanAssembly(typeof(DefaultSiliconBeingFactory).Assembly);
+        }
         being.ToolManager = toolManager;
 
         // Create PermissionManager for this being

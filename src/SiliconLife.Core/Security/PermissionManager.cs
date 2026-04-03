@@ -29,8 +29,9 @@ public class PermissionManager
     private readonly SiliconBeingBase _owner;
     private readonly UserFrequencyCache _frequencyCache;
     private readonly GlobalACL _globalAcl;
-    private readonly IPermissionCallback? _callback;
+    private IPermissionCallback? _callback;
     private readonly IPermissionAskHandler? _askHandler;
+    private readonly IPermissionCallback? _defaultCallback;
 
     /// <summary>
     /// Gets the owner being's GUID (computed in real-time from the owner)
@@ -53,6 +54,18 @@ public class PermissionManager
     public GlobalACL GlobalAcl => _globalAcl;
 
     /// <summary>
+    /// Gets the current permission callback (may be custom or default).
+    /// Used for state migration.
+    /// </summary>
+    public IPermissionCallback? CustomCallback => _callback;
+
+    /// <summary>
+    /// Gets the current ask handler.
+    /// Used for state migration.
+    /// </summary>
+    public IPermissionAskHandler? AskHandler => _askHandler;
+
+    /// <summary>
     /// Creates a new PermissionManager for a silicon being.
     /// OwnerId and IsCurator are computed in real-time from the owner being.
     /// </summary>
@@ -71,8 +84,27 @@ public class PermissionManager
         _owner = owner;
         _globalAcl = globalAcl;
         _callback = callback;
+        _defaultCallback = callback;
         _askHandler = askHandler;
         _frequencyCache = new UserFrequencyCache(cacheExpiration ?? TimeSpan.FromHours(1));
+    }
+
+    /// <summary>
+    /// Replaces the permission callback with a custom compiled one.
+    /// Used by the stealth channel (DynamicCompilationExecutor → Curator → this).
+    /// </summary>
+    /// <param name="customCallback">The custom permission callback</param>
+    public void SetCustomCallback(IPermissionCallback customCallback)
+    {
+        _callback = customCallback ?? throw new ArgumentNullException(nameof(customCallback));
+    }
+
+    /// <summary>
+    /// Resets the permission callback to the original default.
+    /// </summary>
+    public void ResetCallback()
+    {
+        _callback = _defaultCallback;
     }
 
     /// <summary>

@@ -1,5 +1,7 @@
 # 硅基生命群
 
+**⚠️ 警告：动态编译没有经过深度测试，但确实生效了。必须在代码中增加模板才可以正常工作**
+
 基于 .NET 9 的多智能体协作平台，AI 智能体（硅基人）可通过 Roslyn 动态编译实现自我进化。
 
 [English](../../README.md)
@@ -117,7 +119,7 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] 第四阶段：持久化记忆（ChatSystem + ITimeStorage）
 - [x] 第五阶段：工具系统 + 执行器
 - [x] 第六阶段：权限系统（5 级查询链、审计日志、全局 ACL）
-- [ ] 第七阶段：动态编译 + 自我进化（Roslyn）
+- [x] 第七阶段：动态编译 + 自我进化（Roslyn）
 - [ ] 第八阶段：长期记忆 + 任务 + 定时器
 - [ ] 第九阶段：CoreHost + 多硅基人协作
 - [ ] 第十阶段：Web 界面（HTTP + WebSocket）

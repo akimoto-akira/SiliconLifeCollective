@@ -78,10 +78,52 @@ public class Program
             configData.UserGuid,
             permissionCallback,
             askHandler);
+        ServiceRegistry.Instance.BeingFactory = beingFactory;
+
+        // Phase 7: Dynamic compilation support
+        DynamicBeingLoader dynamicBeingLoader = new DynamicBeingLoader();
+        ServiceRegistry.Instance.DynamicBeingLoader = dynamicBeingLoader;
 
         SiliconBeingBase defaultBeing = beingFactory.CreateBeing(configData.CuratorGuid, "Default");
 
+        // Phase 7: Load custom compiled code and permission callbacks at startup
+        string beingDirectory = Path.Combine(configData.DataDirectory, "SiliconManager", configData.CuratorGuid.ToString());
+
+        // Load custom permission callback (stealth channel — loaded independently from being code)
+        if (DynamicBeingLoader.HasCustomPermissionCallback(beingDirectory))
+        {
+            try
+            {
+                CompilationResult permResult = dynamicBeingLoader.LoadPermissionCallback(configData.CuratorGuid, beingDirectory);
+                if (permResult.Success && permResult.CompiledType != null)
+                {
+                    beingManager.ReplacePermissionCallback(configData.CuratorGuid, permResult.CompiledType);
+                }
+            }
+            catch
+            {
+                // Stealth channel — failure is silent, use default callback
+            }
+        }
+
         beingManager.RegisterBeing(defaultBeing);
+
+        // Load custom being code and hot-swap if available (after registration so ReplaceBeing works)
+        if (DynamicBeingLoader.HasCustomCode(beingDirectory))
+        {
+            try
+            {
+                Type? customType = dynamicBeingLoader.LoadBeingType(configData.CuratorGuid, beingDirectory);
+                if (customType != null)
+                {
+                    beingManager.ReplaceBeing(configData.CuratorGuid, customType);
+                }
+            }
+            catch
+            {
+                // Compilation failed — keep the default implementation
+            }
+        }
 
         MainLoop.SetConfig(configData);
         MainLoop.Register(beingManager);
