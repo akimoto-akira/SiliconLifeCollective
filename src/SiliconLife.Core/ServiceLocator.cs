@@ -13,6 +13,10 @@
 
 namespace SiliconLife.Collective;
 
+/// <summary>
+/// Thread-safe singleton service locator that provides a central registry
+/// for core services and per-being <see cref="PermissionManager"/> instances.
+/// </summary>
 public class ServiceLocator
 {
     private static readonly Lazy<ServiceLocator> _instance = new(() => new ServiceLocator());
@@ -20,18 +24,37 @@ public class ServiceLocator
     private readonly Dictionary<Guid, PermissionManager> _permissionManagers = new();
     private readonly object _lock = new();
 
+    /// <summary>Gets the singleton instance of <see cref="ServiceLocator"/>.</summary>
     public static ServiceLocator Instance => _instance.Value;
 
     private ServiceLocator() { }
 
+    /// <summary>Gets the registered <see cref="ChatSystem"/>, or <c>null</c>.</summary>
     public ChatSystem? ChatSystem => Get<ChatSystem>();
+
+    /// <summary>Gets the registered <see cref="IMManager"/>, or <c>null</c>.</summary>
     public IMManager? IMManager => Get<IMManager>();
+
+    /// <summary>Gets the registered <see cref="AuditLogger"/>, or <c>null</c>.</summary>
     public AuditLogger? AuditLogger => Get<AuditLogger>();
+
+    /// <summary>Gets the registered <see cref="GlobalACL"/>, or <c>null</c>.</summary>
     public GlobalACL? GlobalAcl => Get<GlobalACL>();
+
+    /// <summary>Gets the registered <see cref="ISiliconBeingFactory"/>, or <c>null</c>.</summary>
     public ISiliconBeingFactory? BeingFactory => Get<ISiliconBeingFactory>();
+
+    /// <summary>Gets the registered <see cref="SiliconBeingManager"/>, or <c>null</c>.</summary>
     public SiliconBeingManager? BeingManager => Get<SiliconBeingManager>();
+
+    /// <summary>Gets the registered <see cref="DynamicBeingLoader"/>, or <c>null</c>.</summary>
     public DynamicBeingLoader? DynamicBeingLoader => Get<DynamicBeingLoader>();
 
+    /// <summary>
+    /// Registers a service instance under its concrete type.
+    /// </summary>
+    /// <typeparam name="T">The service type used as the lookup key.</typeparam>
+    /// <param name="service">The service instance to register.</param>
     public void Register<T>(T service) where T : class
     {
         lock (_lock)
@@ -40,6 +63,10 @@ public class ServiceLocator
         }
     }
 
+    /// <summary>
+    /// Retrieves a previously registered service by type, or <c>null</c>
+    /// if no service of the requested type has been registered.
+    /// </summary>
     public T? Get<T>() where T : class
     {
         lock (_lock)
@@ -52,6 +79,11 @@ public class ServiceLocator
         }
     }
 
+    /// <summary>
+    /// Registers a <see cref="PermissionManager"/> for a specific being.
+    /// </summary>
+    /// <param name="beingId">The unique ID of the silicon being.</param>
+    /// <param name="manager">The permission manager to associate.</param>
     public void RegisterPermissionManager(Guid beingId, PermissionManager manager)
     {
         lock (_lock)
@@ -60,6 +92,10 @@ public class ServiceLocator
         }
     }
 
+    /// <summary>
+    /// Retrieves the <see cref="PermissionManager"/> registered for the
+    /// specified being, or <c>null</c> if none exists.
+    /// </summary>
     public PermissionManager? GetPermissionManager(Guid beingId)
     {
         lock (_lock)
@@ -69,6 +105,10 @@ public class ServiceLocator
         }
     }
 
+    /// <summary>
+    /// Removes the <see cref="PermissionManager"/> registered for the
+    /// specified being.
+    /// </summary>
     public void UnregisterPermissionManager(Guid beingId)
     {
         lock (_lock)
@@ -77,6 +117,10 @@ public class ServiceLocator
         }
     }
 
+    /// <summary>
+    /// Clears all registered services and permission managers.
+    /// Typically called during host shutdown.
+    /// </summary>
     public void Clear()
     {
         lock (_lock)

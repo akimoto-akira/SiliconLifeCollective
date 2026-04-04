@@ -87,6 +87,11 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     /// <returns>The created silicon being instance</returns>
     public SiliconBeingBase CreateBeing(Guid id, string name)
     {
+        if (id == Guid.Empty)
+        {
+            id = Guid.NewGuid();
+        }
+
         string beingDirectory = Path.Combine(_dataDirectory, "SiliconManager", id.ToString());
 
         if (!Directory.Exists(beingDirectory))
@@ -113,27 +118,9 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
                 return null;
             }
 
-            string stateFilePath = Path.Combine(beingDirectory, "state.json");
-
-            string name = "Unknown";
-
-            if (File.Exists(stateFilePath))
-            {
-                try
-                {
-                    string json = File.ReadAllText(stateFilePath);
-                    Dictionary<string, string>? state = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(json);
-                    if (state != null && state.ContainsKey("name"))
-                    {
-                        name = state["name"];
-                    }
-                }
-                catch
-                {
-                }
-            }
-
-            return CreateAndConfigureBeing(id, name, beingDirectory);
+            DefaultSiliconBeing being = (DefaultSiliconBeing)CreateAndConfigureBeing(id, "", beingDirectory);
+            being.LoadState();
+            return being;
         }
         catch
         {
@@ -155,9 +142,16 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         bool isCurator = id == curatorGuid;
 
         DefaultSiliconBeing being = new(id, name);
+        being.BeingDirectory = beingDirectory;
         being.AIClient = _aiClient;
         being.SoulContent = soulContent;
         being.UserId = _userId;
+
+        // Load or save state — the being manages its own data
+        if (!being.LoadState() && !string.IsNullOrEmpty(name))
+        {
+            being.SaveState();
+        }
 
         // Create and configure ToolManager for this being
         // Curators get ALL tools (normal + curator-only); normal beings get only non-curator tools

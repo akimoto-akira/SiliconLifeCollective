@@ -143,6 +143,7 @@ public class ChatSystem
 
     /// <summary>
     /// Mark a single message as read by a specific reader across all sessions.
+    /// Broadcasts to all sessions; each session scans storage and updates if found.
     /// </summary>
     public void MarkMessageAsRead(Guid messageId, Guid readerId)
     {
@@ -150,11 +151,7 @@ public class ChatSystem
         {
             foreach (ISession session in _sessions.Values)
             {
-                if (session.GetMessages(0, int.MaxValue).Any(m => m.Id == messageId))
-                {
-                    session.MarkMessageAsRead(messageId, readerId);
-                    return;
-                }
+                session.MarkMessageAsRead(messageId, readerId);
             }
         }
     }
@@ -170,6 +167,26 @@ public class ChatSystem
             {
                 session.MarkMessagesAsRead(messageIds, readerId);
             }
+        }
+    }
+
+    /// <summary>
+    /// Get all sessions that involve the specified user.
+    /// Ensures sessions exist for all known user-being pairs by creating them if needed.
+    /// </summary>
+    public List<ISession> GetSessionsForUser(Guid userId, IEnumerable<Guid> beingIds)
+    {
+        // Ensure sessions exist for all known user-being pairs
+        foreach (Guid beingId in beingIds)
+        {
+            GetOrCreateSession(userId, beingId);
+        }
+
+        lock (_lock)
+        {
+            return _sessions.Values
+                .Where(s => s.Members.Contains(userId))
+                .ToList();
         }
     }
 }

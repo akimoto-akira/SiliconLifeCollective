@@ -64,24 +64,19 @@ public class PermissionRequestController : Controller
             return;
         }
 
-        var html = HtmlBuilder.Create()
-            .DocType()
-            .Html()
-            .Head()
-                .MetaCharset()
-                .MetaViewport()
-                .Title("权限请求 - Silicon Life Collective")
-                .Style(GetStyles())
-                .Script(GetScripts(userId.ToString()))
-            .EndBlock()
-            .Body()
-                .Div()
-                    .Class("permission-container")
-                    .Div()
-                        .Class("permission-box")
-                        .H1("权限请求")
-                        .P("一个硅基人请求您的授权：")
-                        .Raw($@"
+        var html = H.HtmlPage("权限请求 - Silicon Life Collective",
+            new object[]
+            {
+                H.Style(GetStyles()),
+                H.Script(GetScripts(userId.ToString())),
+            },
+            new object[]
+            {
+                H.Div(
+                    H.Div(
+                        H.H1("权限请求"),
+                        H.P("一个硅基人请求您的授权："),
+                        H.Raw($@"
                             <div class=""permission-details"">
                                 <div class=""detail-row"">
                                     <span class=""label"">权限类型:</span>
@@ -98,10 +93,9 @@ public class PermissionRequestController : Controller
                             </div>
                             <div class=""auto-close"">等待响应...</div>
                         ")
-                    .EndBlock()
-                .EndBlock()
-            .EndBlock()
-            .Build();
+                    ).Class("permission-box")
+                ).Class("permission-container"),
+            });
 
         RenderHtml(html);
     }

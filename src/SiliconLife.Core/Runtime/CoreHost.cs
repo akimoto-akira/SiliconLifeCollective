@@ -13,23 +13,46 @@
 
 namespace SiliconLife.Collective;
 
+/// <summary>
+/// Root host that owns the application lifecycle. Built via
+/// <see cref="CoreHostBuilder"/>, it registers services into
+/// <see cref="ServiceLocator"/>, starts the <see cref="MainLoop"/>,
+/// and manages graceful shutdown.
+/// </summary>
 public class CoreHost
 {
     private readonly CoreHostBuilder _builder;
     private CancellationTokenSource _shutdownCts = new();
     private Task? _imManagerTask;
 
+    /// <summary>
+    /// Initializes a new <see cref="CoreHost"/> from the given builder configuration.
+    /// </summary>
     internal CoreHost(CoreHostBuilder builder)
     {
         _builder = builder;
     }
 
+    /// <summary>Gets the chat system, or <c>null</c> if not configured.</summary>
     public ChatSystem? ChatSystem => _builder.ChatSystem;
+
+    /// <summary>Gets the IM manager, or <c>null</c> if not configured.</summary>
     public IMManager? IMManager => _builder.IMManager;
+
+    /// <summary>Gets the silicon-being manager from <see cref="MainLoop"/>.</summary>
     public SiliconBeingManager? BeingManager => MainLoop.BeingManager;
+
+    /// <summary>Gets the configuration data, or <c>null</c> if not configured.</summary>
     public ConfigDataBase? Config => _builder.Config;
+
+    /// <summary>Gets the storage backend, or <c>null</c> if not configured.</summary>
     public IStorage? Storage => _builder.Storage;
 
+    /// <summary>
+    /// Starts the host: registers all configured services into
+    /// <see cref="ServiceLocator"/>, configures and starts the
+    /// <see cref="MainLoop"/>, and activates the IM manager if present.
+    /// </summary>
     public async Task StartAsync()
     {
         if (_builder.ChatSystem != null)
@@ -58,6 +81,11 @@ public class CoreHost
         await Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Stops the host gracefully: signals cancellation, stops the
+    /// <see cref="MainLoop"/>, awaits the IM manager shutdown, and
+    /// clears the <see cref="ServiceLocator"/>.
+    /// </summary>
     public async Task StopAsync()
     {
         _shutdownCts.Cancel();

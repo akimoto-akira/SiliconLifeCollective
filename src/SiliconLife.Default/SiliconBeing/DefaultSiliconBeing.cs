@@ -26,6 +26,11 @@ public class DefaultSiliconBeing : SiliconBeingBase
     private volatile bool _awaitingContinuation;
 
     /// <summary>
+    /// Gets the data directory path for this silicon being
+    /// </summary>
+    public string? BeingDirectory { get; set; }
+
+    /// <summary>
     /// Gets whether this silicon being is idle (no pending tasks and not thinking).
     /// </summary>
     public override bool IsIdle => !_isProcessing && !_awaitingContinuation;
@@ -40,6 +45,50 @@ public class DefaultSiliconBeing : SiliconBeingBase
     {
         _isProcessing = false;
         _awaitingContinuation = false;
+    }
+
+    /// <summary>
+    /// Saves this being's state (name) to state.json in its directory.
+    /// Called by the factory on first creation.
+    /// </summary>
+    public void SaveState()
+    {
+        if (BeingDirectory == null) return;
+        try
+        {
+            var state = new Dictionary<string, string> { ["name"] = Name };
+            string json = System.Text.Json.JsonSerializer.Serialize(state, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(Path.Combine(BeingDirectory, "state.json"), json);
+        }
+        catch
+        {
+        }
+    }
+
+    /// <summary>
+    /// Loads this being's name from state.json in its directory.
+    /// Returns true if state was loaded successfully.
+    /// </summary>
+    public bool LoadState()
+    {
+        if (BeingDirectory == null) return false;
+        try
+        {
+            string stateFilePath = Path.Combine(BeingDirectory, "state.json");
+            if (!File.Exists(stateFilePath)) return false;
+
+            string json = File.ReadAllText(stateFilePath);
+            var state = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            if (state != null && state.TryGetValue("name", out string? name))
+            {
+                Name = name;
+                return true;
+            }
+        }
+        catch
+        {
+        }
+        return false;
     }
 
     /// <summary>

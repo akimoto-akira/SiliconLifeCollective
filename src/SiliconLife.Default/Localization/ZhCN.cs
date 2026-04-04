@@ -174,4 +174,13 @@ public class ZhCN : DefaultLocalizationBase
     public override string InitFooterHint => "配置完成后可随时在设置页面修改";
     public override string InitNicknameRequiredError => "请输入用户昵称";
     public override string InitDataDirectoryRequiredError => "请选择数据目录";
+    public override string InitCuratorNameLabel => "硅基人名称";
+    public override string InitCuratorNamePlaceholder => "请输入第一个硅基人的名称";
+    public override string InitCuratorNameRequiredError => "请输入硅基人名称";
+    public override string InitLanguageLabel => "语言 / Language";
+    public override string InitLanguageSwitchBtn => "应用";
+
+    // ===== Chat Localization =====
+
+    public override string SingleChatNameFormat => "与{0}聊天";
 }

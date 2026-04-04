@@ -22,7 +22,6 @@ public class GroupChatSession : ISession
 {
     private readonly ITimeStorage _storage;
     private readonly string _storageKey;
-    private readonly List<ChatMessage> _messages = [];
     private readonly object _lock = new();
 
     /// <inheritdoc/>
@@ -30,6 +29,9 @@ public class GroupChatSession : ISession
 
     /// <inheritdoc/>
     public SessionType Type => SessionType.GroupChat;
+
+    /// <inheritdoc/>
+    public string Name { get; set; }
 
     /// <inheritdoc/>
     public List<Guid> Members { get; private set; }
@@ -46,53 +48,6 @@ public class GroupChatSession : ISession
         Members = new(members);
         _storage = storage;
         _storageKey = $"sessions/group/{Id}";
-
-        LoadMessages();
-    }
-
-    /// <summary>
-    /// Earliest year that has been fully loaded from disk.
-    /// </summary>
-    private int _loadedEarliestYear = DateTime.UtcNow.Year;
-
-    private void LoadMessages()
-    {
-        LoadMessagesForYear(DateTime.UtcNow.Year);
-    }
-
-    /// <summary>
-    /// Load messages for a specific year from storage into _messages.
-    /// </summary>
-    private void LoadMessagesForYear(int year)
-    {
-        lock (_lock)
-        {
-            HashSet<Guid> existingIds = [.. _messages.Select(m => m.Id)];
-
-            IncompleteDate range = new(year);
-            List<TimeEntry> entries = _storage.Query(_storageKey, range);
-            foreach (TimeEntry entry in entries)
-            {
-                ChatMessage? msg = JsonSerializer.Deserialize<ChatMessage>(entry.Data);
-                if (msg != null && !existingIds.Contains(msg.Id))
-                {
-                    _messages.Add(msg);
-                    existingIds.Add(msg.Id);
-                }
-            }
-            _messages.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
-
-            if (year < _loadedEarliestYear)
-            {
-                _loadedEarliestYear = year;
-            }
-        }
-    }
-
-    private void SaveMessage(ChatMessage message)
-    {
-        byte[] data = JsonSerializer.SerializeToUtf8Bytes(message);
-        _storage.Write(_storageKey, message.Timestamp, data);
     }
 
     /// <summary>
@@ -125,8 +80,8 @@ public class GroupChatSession : ISession
     {
         lock (_lock)
         {
-            _messages.Add(message);
-            SaveMessage(message);
+            byte[] data = JsonSerializer.SerializeToUtf8Bytes(message);
+            _storage.Write(_storageKey, message.Timestamp, data);
         }
     }
 
@@ -135,17 +90,24 @@ public class GroupChatSession : ISession
     {
         lock (_lock)
         {
-            // If in-memory messages don't have enough, load earlier years from disk
-            while (_messages.Count - offset < limit && _loadedEarliestYear > 1)
+            List<ChatMessage> allMessages = new();
+            int year = DateTime.UtcNow.Year;
+
+            while (allMessages.Count < offset + limit && year >= 1)
             {
-                _loadedEarliestYear--;
-                LoadMessagesForYear(_loadedEarliestYear);
+                IncompleteDate range = new(year);
+                List<TimeEntry> entries = _storage.Query(_storageKey, range);
+                foreach (TimeEntry entry in entries)
+                {
+                    ChatMessage? msg = JsonSerializer.Deserialize<ChatMessage>(entry.Data);
+                    if (msg != null)
+                        allMessages.Add(msg);
+                }
+                year--;
             }
 
-            return _messages
-                .Skip(offset)
-                .Take(limit)
-                .ToList();
+            allMessages.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
+            return allMessages.Skip(offset).Take(limit).ToList();
         }
     }
 
@@ -154,9 +116,32 @@ public class GroupChatSession : ISession
     {
         lock (_lock)
         {
-            return _messages
-                .Where(m => m.SenderId != participantId && !m.ReadBy.Contains(participantId))
-                .ToList();
+            List<ChatMessage> pending = new();
+            int year = DateTime.UtcNow.Year;
+
+            while (year >= 1)
+            {
+                IncompleteDate range = new(year);
+                List<TimeEntry> entries = _storage.Query(_storageKey, range);
+                bool foundAny = false;
+
+                foreach (TimeEntry entry in entries)
+                {
+                    ChatMessage? msg = JsonSerializer.Deserialize<ChatMessage>(entry.Data);
+                    if (msg != null && msg.SenderId != participantId && !msg.ReadBy.Contains(participantId))
+                    {
+                        pending.Add(msg);
+                        foundAny = true;
+                    }
+                }
+
+                if (foundAny)
+                    break;
+                year--;
+            }
+
+            pending.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
+            return pending;
         }
     }
 
@@ -165,11 +150,26 @@ public class GroupChatSession : ISession
     {
         lock (_lock)
         {
-            ChatMessage? message = _messages.FirstOrDefault(m => m.Id == messageId);
-            if (message != null && !message.ReadBy.Contains(readerId))
+            int year = DateTime.UtcNow.Year;
+
+            while (year >= 1)
             {
-                message.ReadBy.Add(readerId);
-                SaveMessage(message);
+                IncompleteDate range = new(year);
+                List<TimeEntry> entries = _storage.Query(_storageKey, range);
+
+                foreach (TimeEntry entry in entries)
+                {
+                    ChatMessage? msg = JsonSerializer.Deserialize<ChatMessage>(entry.Data);
+                    if (msg != null && msg.Id == messageId && !msg.ReadBy.Contains(readerId))
+                    {
+                        msg.ReadBy.Add(readerId);
+                        byte[] data = JsonSerializer.SerializeToUtf8Bytes(msg);
+                        _storage.Write(_storageKey, entry.Timestamp, data);
+                        return;
+                    }
+                }
+
+                year--;
             }
         }
     }
@@ -180,14 +180,26 @@ public class GroupChatSession : ISession
         lock (_lock)
         {
             HashSet<Guid> ids = new(messageIds);
+            int year = DateTime.UtcNow.Year;
 
-            foreach (ChatMessage message in _messages)
+            while (year >= 1 && ids.Count > 0)
             {
-                if (ids.Contains(message.Id) && !message.ReadBy.Contains(readerId))
+                IncompleteDate range = new(year);
+                List<TimeEntry> entries = _storage.Query(_storageKey, range);
+
+                foreach (TimeEntry entry in entries)
                 {
-                    message.ReadBy.Add(readerId);
-                    SaveMessage(message);
+                    ChatMessage? msg = JsonSerializer.Deserialize<ChatMessage>(entry.Data);
+                    if (msg != null && ids.Contains(msg.Id) && !msg.ReadBy.Contains(readerId))
+                    {
+                        msg.ReadBy.Add(readerId);
+                        byte[] data = JsonSerializer.SerializeToUtf8Bytes(msg);
+                        _storage.Write(_storageKey, entry.Timestamp, data);
+                        ids.Remove(msg.Id);
+                    }
                 }
+
+                year--;
             }
         }
     }

@@ -49,35 +49,35 @@ public interface ISkin
     /// Gets preview information for displaying in the skin selector on the init page.
     /// </summary>
     SkinPreviewInfo PreviewInfo { get; }
-    HtmlBuilder RenderHtml(string content);
-    HtmlBuilder RenderError(string message);
+    H RenderHtml(H content);
+    H RenderError(H message);
     CssBuilder GetStyles();
     JsBuilder GetScripts();
 
-    HtmlBuilder RenderButton(string text, string variant = "primary", string size = "medium");
-    HtmlBuilder RenderInput(string placeholder = "", string size = "medium", string? value = null);
-    HtmlBuilder RenderTextarea(string placeholder = "", int rows = 4);
-    HtmlBuilder RenderSelect(IEnumerable<string> options, string? selected = null);
-    HtmlBuilder RenderCheckbox(string label, bool isChecked = false);
-    HtmlBuilder RenderBadge(string text, string variant = "primary");
-    HtmlBuilder RenderTag(string text);
-    HtmlBuilder RenderCard(string title, string content);
-    HtmlBuilder RenderAvatar(string text, string size = "medium");
-    HtmlBuilder RenderBubble(string text, bool isMine = false);
-    HtmlBuilder RenderSwitch(bool isChecked = false);
-    HtmlBuilder RenderProgress(double value, string variant = "primary");
-    HtmlBuilder RenderTabs(IEnumerable<string> tabs, int activeIndex = 0);
-    HtmlBuilder RenderListItem(string title, string? subtitle = null, string? avatar = null, bool active = false);
-    HtmlBuilder RenderDivider();
-    HtmlBuilder RenderCode(string code);
-    HtmlBuilder RenderStatCard(string label, string value, string variant = "primary");
-    HtmlBuilder RenderBreadcrumb(IEnumerable<string> items);
-    HtmlBuilder RenderTable(IEnumerable<string> headers, IEnumerable<IEnumerable<string>> rows);
-    HtmlBuilder RenderPagination(int totalPages, int currentPage = 1);
-    HtmlBuilder RenderDropdown(string triggerText, IEnumerable<string> items);
-    HtmlBuilder RenderStatusIndicator(string status);
-    HtmlBuilder RenderQuote(string text);
-    HtmlBuilder RenderInspirationCard(string icon, string text);
+    H RenderButton(string text, string variant = "primary", string size = "medium");
+    H RenderInput(string placeholder = "", string size = "medium", string? value = null);
+    H RenderTextarea(string placeholder = "", int rows = 4);
+    H RenderSelect(IEnumerable<string> options, string? selected = null);
+    H RenderCheckbox(string label, bool isChecked = false);
+    H RenderBadge(string text, string variant = "primary");
+    H RenderTag(string text);
+    H RenderCard(string title, string content);
+    H RenderAvatar(string text, string size = "medium");
+    H RenderBubble(string text, bool isMine = false);
+    H RenderSwitch(bool isChecked = false);
+    H RenderProgress(double value, string variant = "primary");
+    H RenderTabs(IEnumerable<string> tabs, int activeIndex = 0);
+    H RenderListItem(string title, string? subtitle = null, string? avatar = null, bool active = false);
+    H RenderDivider();
+    H RenderCode(string code);
+    H RenderStatCard(string label, string value, string variant = "primary");
+    H RenderBreadcrumb(IEnumerable<string> items);
+    H RenderTable(IEnumerable<string> headers, IEnumerable<IEnumerable<string>> rows);
+    H RenderPagination(int totalPages, int currentPage = 1);
+    H RenderDropdown(string triggerText, IEnumerable<string> items);
+    H RenderStatusIndicator(string status);
+    H RenderQuote(string text);
+    H RenderInspirationCard(string icon, string text);
     CssBuilder GetThemeCss();
 }
 

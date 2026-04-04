@@ -31,7 +31,7 @@ public class DefaultConfigData : ConfigDataBase
     /// <summary>
     /// Gets or sets the GUID of the curator (main administrator)
     /// </summary>
-    public override Guid CuratorGuid { get; set; } = new Guid("73696c69-636f-6e00-0000-000000000000");
+    public override Guid CuratorGuid { get; set; }
 
     /// <summary>
     /// Gets or sets the language setting for the application

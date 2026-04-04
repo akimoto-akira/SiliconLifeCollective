@@ -42,4 +42,20 @@ public abstract class LocalizationBase
     /// <param name="contentText">The memory content to compress</param>
     /// <returns>The formatted user prompt</returns>
     public abstract string GetMemoryCompressionUserPrompt(string levelDesc, string rangeDesc, string contentText);
+
+    // ===== Chat Localization =====
+
+    /// <summary>
+    /// Format string for single chat session display name.
+    /// {0} is replaced with the partner's display name.
+    /// </summary>
+    public abstract string SingleChatNameFormat { get; }
+
+    /// <summary>
+    /// Get a formatted single chat display name with the given partner name.
+    /// </summary>
+    /// <param name="partnerName">The partner's display name</param>
+    /// <returns>The formatted session name</returns>
+    public string GetSingleChatDisplayName(string partnerName) =>
+        string.Format(SingleChatNameFormat, partnerName);
 }

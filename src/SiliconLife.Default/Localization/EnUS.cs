@@ -174,4 +174,13 @@ public class EnUS : DefaultLocalizationBase
     public override string InitFooterHint => "You can modify settings at any time on the settings page";
     public override string InitNicknameRequiredError => "Please enter a nickname";
     public override string InitDataDirectoryRequiredError => "Please select a data directory";
+    public override string InitCuratorNameLabel => "Silicon Being Name";
+    public override string InitCuratorNamePlaceholder => "Enter a name for the first silicon being";
+    public override string InitCuratorNameRequiredError => "Please enter a silicon being name";
+    public override string InitLanguageLabel => "Language / 语言";
+    public override string InitLanguageSwitchBtn => "Apply";
+
+    // ===== Chat Localization =====
+
+    public override string SingleChatNameFormat => "Chat with {0}";
 }

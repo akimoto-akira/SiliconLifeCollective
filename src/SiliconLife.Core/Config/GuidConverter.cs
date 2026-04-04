@@ -16,8 +16,19 @@ using System.Text.Json.Serialization;
 
 namespace SiliconLife.Collective;
 
+/// <summary>
+/// Custom JSON converter for <see cref="Guid"/> that supports both string
+/// and byte-array representations during deserialization.
+/// Serialization always outputs the standard string format.
+/// </summary>
 public class GuidConverter : JsonConverter<Guid>
 {
+    /// <summary>
+    /// Reads a <see cref="Guid"/> from JSON.
+    /// Supports string format (e.g. "550e8400-e29b-41d4-a716-446655440000")
+    /// and byte-array format (16-element JSON array).
+    /// Returns <see cref="Guid.Empty"/> for empty strings or unrecognised tokens.
+    /// </summary>
     public override Guid Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.String)
@@ -29,7 +40,7 @@ public class GuidConverter : JsonConverter<Guid>
             }
             return Guid.Parse(value);
         }
-        
+
         if (reader.TokenType == JsonTokenType.StartArray)
         {
             byte[] bytes = new byte[16];
@@ -48,6 +59,9 @@ public class GuidConverter : JsonConverter<Guid>
         return Guid.Empty;
     }
 
+    /// <summary>
+    /// Writes a <see cref="Guid"/> to JSON in standard string format.
+    /// </summary>
     public override void Write(Utf8JsonWriter writer, Guid value, JsonSerializerOptions options)
     {
         writer.WriteStringValue(value.ToString());

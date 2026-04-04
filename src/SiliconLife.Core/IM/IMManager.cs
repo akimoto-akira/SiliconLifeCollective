@@ -13,6 +13,11 @@
 
 namespace SiliconLife.Collective;
 
+/// <summary>
+/// Manages instant-messaging (IM) integration, bridging incoming IM messages
+/// into the internal <see cref="ChatSystem"/> and enabling outbound messages
+/// through the configured <see cref="IIMProvider"/>.
+/// </summary>
 public class IMManager
 {
     private readonly IIMProvider _imProvider;
@@ -20,6 +25,13 @@ public class IMManager
     private readonly SiliconBeingManager _beingManager;
     private bool _isRunning;
 
+    /// <summary>
+    /// Initializes a new <see cref="IMManager"/> and subscribes to the
+    /// provider's <see cref="IIMProvider.MessageReceived"/> event.
+    /// </summary>
+    /// <param name="imProvider">The IM transport provider.</param>
+    /// <param name="chatSystem">The internal chat system to route messages into.</param>
+    /// <param name="beingManager">The being manager used to resolve default receivers.</param>
     public IMManager(IIMProvider imProvider, ChatSystem chatSystem, SiliconBeingManager beingManager)
     {
         _imProvider = imProvider;
@@ -30,6 +42,10 @@ public class IMManager
         _imProvider.MessageReceived += OnMessageReceived;
     }
 
+    /// <summary>
+    /// Handles an incoming IM message. If the receiver ID is empty, the message
+    /// is routed to the first available <see cref="SiliconBeingBase"/>.
+    /// </summary>
     private void OnMessageReceived(object? sender, IMMessageEventArgs e)
     {
         ChatMessage msg = e.Message;
@@ -48,17 +64,29 @@ public class IMManager
         }
     }
 
+    /// <summary>
+    /// Sends a message through the IM provider.
+    /// </summary>
+    /// <param name="senderId">The ID of the message sender.</param>
+    /// <param name="receiverId">The ID of the intended recipient.</param>
+    /// <param name="content">The message content.</param>
     public async Task SendMessageAsync(Guid senderId, Guid receiverId, string content)
     {
         await _imProvider.SendMessageAsync(senderId, receiverId, content);
     }
 
+    /// <summary>
+    /// Starts the IM manager and activates the underlying IM provider.
+    /// </summary>
     public async Task StartAsync()
     {
         _isRunning = true;
         await _imProvider.StartAsync();
     }
 
+    /// <summary>
+    /// Stops the IM manager and deactivates the underlying IM provider.
+    /// </summary>
     public async Task StopAsync()
     {
         _isRunning = false;

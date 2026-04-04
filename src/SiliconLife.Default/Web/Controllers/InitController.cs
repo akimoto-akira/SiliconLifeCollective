@@ -18,11 +18,11 @@ namespace SiliconLife.Default.Web;
 public class InitController : Controller
 {
     private readonly DefaultConfigData _configData;
-    private readonly DefaultLocalizationBase _localization;
+    private DefaultLocalizationBase _localization;
     private readonly SkinManager _skinManager;
-    private readonly Action _onInitialized;
+    private readonly Action<string> _onInitialized;
 
-    public InitController(DefaultConfigData configData, DefaultLocalizationBase localization, SkinManager skinManager, Action onInitialized)
+    public InitController(DefaultConfigData configData, DefaultLocalizationBase localization, SkinManager skinManager, Action<string> onInitialized)
     {
         _configData = configData;
         _localization = localization;
@@ -42,7 +42,19 @@ public class InitController : Controller
         }
         else
         {
+            ResolveLocalizationFromQuery();
             ShowForm();
+        }
+    }
+
+    private void ResolveLocalizationFromQuery()
+    {
+        var langParam = GetQueryValue("lang");
+        if (!string.IsNullOrEmpty(langParam) && Enum.TryParse<Language>(langParam, ignoreCase: true, out var lang))
+        {
+            var resolved = LocalizationManager.Instance.GetLocalization(lang) as DefaultLocalizationBase;
+            if (resolved != null)
+                _localization = resolved;
         }
     }
 
@@ -58,67 +70,144 @@ public class InitController : Controller
 
     private void ShowFormInternal(string? error)
     {
-        var html = HtmlBuilder.Create()
-            .DocType()
-            .Html()
-            .Head()
-                .MetaCharset()
-                .MetaViewport()
-                .Title($"{_localization.InitPageTitle} - Silicon Life Collective")
-                .Style(GetStyles())
-                .Raw(GetSkinSwitchScript())
-            .EndBlock()
-            .Body()
-                .Div()
-                    .Class("init-container")
-                    .Div()
-                        .Class("init-card")
-                        .H1("Silicon Life Collective")
-                        .P(_localization.InitDescription)
-                        .Div()
-                            .Class("form-error")
-                            .P(error ?? "")
-                        .EndBlock()
-                        .Form("/init", "post")
-                            .Class("init-form")
-                            .Attr("onsubmit", "return validateInitForm()")
-                            .Div()
-                                .Class("form-group")
-                                .Label(_localization.InitNicknameLabel, "nickname")
-                                .InputText("nickname", _localization.InitNicknamePlaceholder, _configData.UserNickname)
-                                .Attr("required", "required")
-                            .EndBlock()
-                            .Div()
-                                .Class("form-group")
-                                .Label(_localization.InitEndpointLabel, "ollamaEndpoint")
-                                .InputText("ollamaEndpoint", _localization.InitEndpointPlaceholder, _configData.OllamaEndpoint)
-                            .EndBlock()
-                            .Div()
-                                .Class("form-group")
-                                .Label(_localization.InitDataDirectoryLabel, "dataDirectory")
-                                .Raw(BuildDataDirectoryInput())
-                            .EndBlock()
-                            .Div()
-                                .Class("form-group")
-                                .Label(_localization.InitSkinLabel, "webSkin")
-                                .Raw(BuildSkinCards())
-                                .Raw(BuildPreviewSection())
-                            .EndBlock()
-                            .Div()
-                                .Class("form-actions")
-                                .Button(_localization.InitSubmitButton, "submit")
-                            .EndBlock()
-                        .EndBlock()
-                        .Div()
-                            .Class("init-footer")
-                            .P(_localization.InitFooterHint)
-                        .EndBlock()
-                    .EndBlock()
-                .EndBlock()
-            .EndBlock()
-            .Build();
+        var form = new List<object>();
+
+        // Language selector group
+        BuildLanguageFormGroup(form);
+
+        // Nickname group
+        form.Add(H.Div(H.Label(_localization.InitNicknameLabel).For("nickname"),
+            H.InputText("nickname", _localization.InitNicknamePlaceholder, _configData.UserNickname).Required()).Class("form-group"));
+
+        // Curator name group
+        form.Add(H.Div(H.Label(_localization.InitCuratorNameLabel).For("curatorName"),
+            H.InputText("curatorName", _localization.InitCuratorNamePlaceholder, "").Required()).Class("form-group"));
+
+        // Endpoint group
+        form.Add(H.Div(H.Label(_localization.InitEndpointLabel).For("ollamaEndpoint")).Class("form-group"));
+
+        // Data directory group
+        BuildDataDirectoryFormGroup(form);
+
+        // Skin group
+        BuildSkinFormGroup(form);
+
+        // Submit button
+        form.Add(H.Div(H.Button(_localization.InitSubmitButton).Type("submit")).Class("form-actions"));
+
+        var html = H.DocType().Build()
+            + H.Tag("html",
+                H.Tag("head",
+                    H.MetaCharset(),
+                    H.MetaViewport(),
+                    H.Tag("title", $"{_localization.InitPageTitle} - Silicon Life Collective"),
+                    H.Style(GetStyles()),
+                    H.Raw(GetSkinSwitchScript())
+                ),
+                H.Body(
+                    H.Div(
+                        H.Div(
+                            H.H1("Silicon Life Collective"),
+                            H.P(_localization.InitDescription),
+                            H.When(!string.IsNullOrEmpty(error), H.Div(H.P(error ?? "")).Class("form-error")),
+                            H.Form(form.ToArray()).Action("/init").Method("post").Class("init-form")
+                                .Attr("onsubmit", "return validateInitForm()"),
+                            H.Div(H.P(_localization.InitFooterHint)).Class("init-footer")
+                        ).Class("init-card")
+                    ).Class("init-container")
+                )
+            ).Build();
 
         RenderHtml(html);
+    }
+
+    private void BuildLanguageFormGroup(List<object> form)
+    {
+        var currentLang = _localization.LanguageCode;
+        var options = new List<object>();
+        foreach (var lang in LocalizationManager.Instance.GetRegisteredLanguages())
+        {
+            var loc = LocalizationManager.Instance.GetLocalization(lang);
+            var opt = H.Option(loc.LanguageName).Attr("value", lang.ToString());
+            if (loc.LanguageCode == currentLang) opt.Selected();
+            options.Add(opt);
+        }
+        form.Add(H.Div(
+            H.Label(_localization.InitLanguageLabel).For("language"),
+            H.Div(
+                H.Select(options.ToArray()).Name("language").Id("languageSelect")
+                    .Data("current", currentLang).OnChange("switchLanguage(this.value)"),
+                H.Button(_localization.InitLanguageSwitchBtn).Type("button")
+                    .Class("lang-switch-btn").Style("display:none;").OnClick("applyLanguage()")
+            ).Class("lang-selector-row")
+        ).Class("form-group"));
+    }
+
+    private void BuildDataDirectoryFormGroup(List<object> form)
+    {
+        form.Add(H.Div(
+            H.Label(_localization.InitDataDirectoryLabel).For("dataDirectory"),
+            H.Div(
+                H.InputText("dataDirectory", _localization.InitDataDirectoryPlaceholder, _configData.DataDirectory).Id("dataDirInput"),
+                H.Button(_localization.InitDataDirectoryBrowse).Type("button")
+                    .Class("dir-browse-btn").OnClick("openDirBrowser()")
+            ).Class("dir-input-row"),
+            H.Div().Id("dirBrowser").Class("dir-browser").Style("display:none;")
+        ).Class("form-group"));
+    }
+
+    private void BuildSkinFormGroup(List<object> form)
+    {
+        var skins = _skinManager.GetAvailableSkins()
+            .Select(c => (Code: c, Skin: _skinManager.GetSkin(c)!))
+            .OrderBy(s => s.Code)
+            .ToList();
+        var currentSkin = _configData.WebSkin ?? skins.FirstOrDefault().Code;
+
+        var skinCards = new List<object>();
+        foreach (var (code, skin) in skins)
+        {
+            var p = skin.PreviewInfo;
+            var gradient = $"linear-gradient(135deg,{p.BackgroundColor} 0%,{p.CardColor} 100%)";
+            var card = H.Div(
+                H.Div(p.Icon).Class("skin-icon"),
+                H.Div(skin.Name).Class("skin-name"),
+                H.Div(p.Description).Class("skin-desc"),
+                H.Div(
+                    H.Span().Class("color-dot").Style($"background:{p.BackgroundColor};"),
+                    H.Span().Class("color-dot").Style($"background:{p.CardColor};"),
+                    H.Span().Class("color-dot").Style($"background:{p.AccentColor};")
+                ).Class("skin-colors")
+            ).Class("skin-option" + (code == currentSkin ? " selected" : ""))
+             .Data("skin", code).OnClick($"selectSkin('{code}')")
+             .Style($"border-color:{p.BorderColor};background:{gradient};color:{p.TextColor};");
+            skinCards.Add(card);
+        }
+
+        var previewP = _skinManager.GetSkin(currentSkin)?.PreviewInfo ?? skins.First().Skin.PreviewInfo;
+        var previewSection = H.Div(
+            H.H3("Preview").Class("skin-preview-title"),
+            H.Div(
+                H.Div(
+                    H.H4(_localization.InitSkinPreviewCardTitle),
+                    H.P(_localization.InitSkinPreviewCardContent)
+                ).Class("preview-card").Style($"background:{previewP.CardColor};border-color:{previewP.BorderColor};"),
+                H.Div(
+                    H.Button(_localization.InitSkinPreviewPrimaryBtn).Type("button")
+                        .Class("preview-btn").Style($"background:{previewP.AccentColor};color:#fff;"),
+                    H.Button(_localization.InitSkinPreviewSecondaryBtn).Type("button")
+                        .Class("preview-btn").Style($"background:{previewP.AccentColor};opacity:0.6;color:#fff;")
+                ).Class("preview-btns")
+            ).Class("preview-inner"),
+            H.InputHidden("webSkin", currentSkin).Id("skinInput")
+        ).Id("preview").Class("skin-preview-box")
+         .Style($"background:{previewP.BackgroundColor};color:{previewP.TextColor};border-color:{previewP.BorderColor};");
+
+        form.Add(H.Div(
+            H.Label(_localization.InitSkinLabel).For("webSkin"),
+            H.Div(skinCards.ToArray()).Class("skin-grid"),
+            H.Div(previewSection).Class("skin-preview-section")
+        ).Class("form-group"));
     }
 
     private void HandleBrowse()
@@ -208,6 +297,13 @@ public class InitController : Controller
         _configData.UserNickname = nickname;
         _configData.DataDirectory = dataDir;
 
+        var curatorName = form.GetValueOrDefault("curatorName", "").Trim();
+        if (string.IsNullOrEmpty(curatorName))
+        {
+            ShowFormWithError(_localization.InitCuratorNameRequiredError);
+            return;
+        }
+
         var endpoint = form.GetValueOrDefault("ollamaEndpoint", "").Trim();
         if (!string.IsNullOrEmpty(endpoint))
         {
@@ -217,77 +313,16 @@ public class InitController : Controller
         var skin = form.GetValueOrDefault("webSkin", "").Trim();
         _configData.WebSkin = string.IsNullOrEmpty(skin) ? null! : skin;
 
+        var language = form.GetValueOrDefault("language", "").Trim();
+        if (!string.IsNullOrEmpty(language) && Enum.TryParse<Language>(language, ignoreCase: true, out var lang))
+        {
+            _configData.Language = lang;
+        }
+
         _configData.SaveConfig();
-        _onInitialized();
+        _onInitialized(curatorName);
 
         Redirect("/");
-    }
-
-    private string BuildDataDirectoryInput()
-    {
-        var currentDir = _configData.DataDirectory;
-        return $"<div class=\"dir-input-row\"><input type=\"text\" name=\"dataDirectory\" id=\"dataDirInput\" value=\"{currentDir}\" placeholder=\"{_localization.InitDataDirectoryPlaceholder}\"><button type=\"button\" class=\"dir-browse-btn\" onclick=\"openDirBrowser()\">{_localization.InitDataDirectoryBrowse}</button></div><div id=\"dirBrowser\" class=\"dir-browser\" style=\"display:none;\"></div>";
-    }
-
-    private string BuildSkinCards()
-    {
-        var skins = _skinManager.GetAvailableSkins()
-            .Select(c => (Code: c, Skin: _skinManager.GetSkin(c)!))
-            .OrderBy(s => s.Code)
-            .ToList();
-
-        var currentSkin = _configData.WebSkin ?? skins.FirstOrDefault().Code;
-
-        var sb = new System.Text.StringBuilder();
-        sb.Append("<div class=\"skin-grid\">");
-        foreach (var (code, skin) in skins)
-        {
-            var p = skin.PreviewInfo;
-            var selected = code == currentSkin ? " selected" : "";
-            sb.Append($"<div class=\"skin-option{selected}\" data-skin=\"{code}\" onclick=\"selectSkin('{code}')\" ");
-            sb.Append($"style=\"border-color:{p.BorderColor};background:linear-gradient(135deg,{p.BackgroundColor} 0%,{p.CardColor} 100%);color:{p.TextColor};\">");
-            sb.Append($"<div class=\"skin-icon\">{p.Icon}</div>");
-            sb.Append($"<div class=\"skin-name\">{skin.Name}</div>");
-            sb.Append($"<div class=\"skin-desc\">{p.Description}</div>");
-            sb.Append("<div class=\"skin-colors\">");
-            sb.Append($"<span class=\"color-dot\" style=\"background:{p.BackgroundColor};\"></span>");
-            sb.Append($"<span class=\"color-dot\" style=\"background:{p.CardColor};\"></span>");
-            sb.Append($"<span class=\"color-dot\" style=\"background:{p.AccentColor};\"></span>");
-            sb.Append("</div>");
-            sb.Append("</div>");
-        }
-        sb.Append("</div>");
-        sb.Append($"<input type=\"hidden\" name=\"webSkin\" id=\"skinInput\" value=\"{currentSkin}\">");
-        return sb.ToString();
-    }
-
-    private string BuildPreviewSection()
-    {
-        var skins = _skinManager.GetAvailableSkins()
-            .Select(c => (Code: c, Skin: _skinManager.GetSkin(c)!))
-            .OrderBy(s => s.Code)
-            .ToList();
-        var currentSkin = _configData.WebSkin ?? skins.FirstOrDefault().Code;
-        var p = _skinManager.GetSkin(currentSkin)?.PreviewInfo ?? skins.First().Skin.PreviewInfo;
-
-        var sb = new System.Text.StringBuilder();
-        sb.Append("<div class=\"skin-preview-section\">");
-        sb.Append("<h3 class=\"skin-preview-title\">Preview</h3>");
-        sb.Append("<div id=\"preview\" class=\"skin-preview-box\" ");
-        sb.Append($"style=\"background:{p.BackgroundColor};color:{p.TextColor};border-color:{p.BorderColor};\">");
-        sb.Append("<div class=\"preview-inner\">");
-        sb.Append($"<div class=\"preview-card\" style=\"background:{p.CardColor};border-color:{p.BorderColor};\">");
-        sb.Append($"<h4>{_localization.InitSkinPreviewCardTitle}</h4>");
-        sb.Append($"<p>{_localization.InitSkinPreviewCardContent}</p>");
-        sb.Append("</div>");
-        sb.Append("<div class=\"preview-btns\">");
-        sb.Append($"<button class=\"preview-btn\" style=\"background:{p.AccentColor};color:#fff;\">{_localization.InitSkinPreviewPrimaryBtn}</button>");
-        sb.Append($"<button class=\"preview-btn\" style=\"background:{p.AccentColor};opacity:0.6;color:#fff;\">{_localization.InitSkinPreviewSecondaryBtn}</button>");
-        sb.Append("</div>");
-        sb.Append("</div>");
-        sb.Append("</div>");
-        sb.Append("</div>");
-        return sb.ToString();
     }
 
     private string GetSkinSwitchScript()
@@ -304,7 +339,7 @@ public class InitController : Controller
             entries.Add($"\"{code}\":{{bg:\"{p.BackgroundColor}\",card:\"{p.CardColor}\",accent:\"{p.AccentColor}\",text:\"{p.TextColor}\",border:\"{p.BorderColor}\"}}");
         }
 
-        return $"<script>const skinData={{{string.Join(',', entries)}}};function selectSkin(code){{document.querySelectorAll('.skin-option').forEach(el=>el.classList.remove('selected'));document.querySelector('[data-skin=\"'+code+'\"]').classList.add('selected');document.getElementById('skinInput').value=code;const s=skinData[code],pv=document.getElementById('preview');pv.style.background=s.bg;pv.style.color=s.text;pv.style.borderColor=s.border;pv.querySelectorAll('.preview-card').forEach(c=>{{c.style.background=s.card;c.style.borderColor=s.border;}});pv.querySelectorAll('.preview-btn').forEach(b=>{{b.style.background=s.accent;}});}}function validateInitForm(){{var n=document.getElementById('nickname'),d=document.getElementById('dataDirInput');if(!n.value.trim()){{n.focus();return false;}}if(!d.value.trim()){{d.focus();return false;}}return true;}}let dirBrowserOpen=false;function openDirBrowser(){{const db=document.getElementById('dirBrowser');if(dirBrowserOpen){{db.style.display='none';dirBrowserOpen=false;return;}}dirBrowserOpen=true;db.style.display='block';browseDir(document.getElementById('dataDirInput').value||'/');}}function browseDir(path){{fetch('/init/browse?dir='+encodeURIComponent(path)).then(r=>r.json()).then(data=>{{const db=document.getElementById('dirBrowser');let html='<div class=\"dir-header\"><span class=\"dir-current\">'+data.currentPath+'</span></div><div class=\"dir-list\">';data.directories.forEach(d=>{{html+='<div class=\"dir-item'+(d.isParent?' dir-parent':'')+'\" onclick=\"browseDir(\\''+d.path+'\\')\"><span class=\"dir-icon\">'+(d.isParent?'\u2190':'\U0001f4c1')+'</span><span>'+d.name+'</span></div>';}});html+='</div>';db.innerHTML=html;}});}}</script>";
+        return $"<script>const skinData={{{string.Join(',', entries)}}};function selectSkin(code){{document.querySelectorAll('.skin-option').forEach(el=>el.classList.remove('selected'));document.querySelector('[data-skin=\"'+code+'\"]').classList.add('selected');document.getElementById('skinInput').value=code;const s=skinData[code],pv=document.getElementById('preview');pv.style.background=s.bg;pv.style.color=s.text;pv.style.borderColor=s.border;pv.querySelectorAll('.preview-card').forEach(c=>{{c.style.background=s.card;c.style.borderColor=s.border;}});pv.querySelectorAll('.preview-btn').forEach(b=>{{b.style.background=s.accent;}});}}function validateInitForm(){{var n=document.getElementById('nickname'),d=document.getElementById('dataDirInput'),c=document.getElementById('curatorName');if(!n.value.trim()){{n.focus();return false;}}if(!c.value.trim()){{c.focus();return false;}}if(!d.value.trim()){{d.focus();return false;}}return true;}}let dirBrowserOpen=false;function openDirBrowser(){{const db=document.getElementById('dirBrowser');if(dirBrowserOpen){{db.style.display='none';dirBrowserOpen=false;return;}}dirBrowserOpen=true;db.style.display='block';browseDir(document.getElementById('dataDirInput').value||'/');}}function browseDir(path){{fetch('/init/browse?dir='+encodeURIComponent(path)).then(r=>r.json()).then(data=>{{const db=document.getElementById('dirBrowser');let html='<div class=\"dir-header\"><span class=\"dir-current\">'+data.currentPath+'</span></div><div class=\"dir-list\">';data.directories.forEach(d=>{{html+='<div class=\"dir-item'+(d.isParent?' dir-parent':'')+'\" onclick=\"browseDir(\\''+d.path+'\\')\"><span class=\"dir-icon\">'+(d.isParent?'\u2190':'\U0001f4c1')+'</span><span>'+d.name+'</span></div>';}});html+='</div>';db.innerHTML=html;}});}}function switchLanguage(val){{var btn=document.querySelector('.lang-switch-btn');if(val===document.getElementById('languageSelect').dataset.current){{btn.style.display='none';}}else{{btn.style.display='inline-block';}}}}function applyLanguage(){{var lang=document.getElementById('languageSelect').value;window.location.href='/init?lang='+lang;}}</script>";
     }
 
     private Dictionary<string, string> ParseFormData()
@@ -562,6 +597,45 @@ public class InitController : Controller
             .init-footer p {
                 font-size: 12px;
                 color: #64748b;
+            }
+            .lang-selector-row {
+                display: flex;
+                gap: 8px;
+                align-items: center;
+                width: 100%;
+            }
+            .lang-selector-row select {
+                flex: 1;
+                padding: 10px 14px;
+                border: 1px solid rgba(148, 163, 184, 0.2);
+                border-radius: 8px;
+                background: rgba(15, 23, 42, 0.6);
+                color: #f1f5f9;
+                font-size: 14px;
+                outline: none;
+                transition: border-color 0.2s;
+                cursor: pointer;
+            }
+            .lang-selector-row select:focus {
+                border-color: #3b82f6;
+            }
+            .lang-selector-row select option {
+                background: #1e293b;
+                color: #f1f5f9;
+            }
+            .lang-switch-btn {
+                padding: 10px 16px;
+                border: 1px solid rgba(148, 163, 184, 0.3);
+                border-radius: 8px;
+                background: rgba(51, 65, 85, 0.6);
+                color: #cbd5e1;
+                font-size: 13px;
+                cursor: pointer;
+                transition: background 0.2s;
+                white-space: nowrap;
+            }
+            .lang-switch-btn:hover {
+                background: rgba(51, 65, 85, 0.9);
             }
         ";
     }

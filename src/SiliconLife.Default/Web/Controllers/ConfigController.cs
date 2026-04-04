@@ -2,16 +2,13 @@
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//
 //     http://www.apache.org/licenses/LICENSE-2.0
-//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
 using SiliconLife.Collective;
 
 namespace SiliconLife.Default.Web;
@@ -19,22 +16,21 @@ namespace SiliconLife.Default.Web;
 [WebCode]
 public class ConfigController : Controller
 {
-    public ConfigController()
+    private readonly SkinManager _skinManager;
+
+    public ConfigController(SkinManager skinManager)
     {
+        _skinManager = skinManager;
     }
 
     public override void Handle()
     {
         var path = Request.Url?.AbsolutePath ?? "/config";
-        
+
         if (path == "/config" || path == "/config/index")
-        {
             Index();
-        }
         else if (path == "/api/config/get")
-        {
             GetConfig();
-        }
         else
         {
             Response.StatusCode = 404;
@@ -44,31 +40,10 @@ public class ConfigController : Controller
 
     private void Index()
     {
-        var html = HtmlBuilder.Create()
-            .DocType()
-            .Html()
-            .Head()
-                .MetaCharset()
-                .MetaViewport()
-                .Title("系统配置 - Silicon Life Collective")
-                .Style(GetStyles())
-                .Script(GetScripts())
-            .EndBlock()
-            .Body()
-                .Div()
-                    .Class("container")
-                    .Div()
-                        .Class("header")
-                        .H1("系统配置")
-                    .EndBlock()
-                    .Div()
-                        .Class("config-list")
-                        .Id("config-list")
-                    .EndBlock()
-                .EndBlock()
-            .EndBlock()
-            .Build();
-
+        var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
+        var view = new Views.ConfigView();
+        var vm = new Models.ConfigViewModel { Skin = skin, ActiveMenu = "config" };
+        var html = view.Render(vm);
         RenderHtml(html);
     }
 
@@ -81,7 +56,7 @@ public class ConfigController : Controller
             return;
         }
 
-        var result = new Dictionary<string, object?>
+        RenderJson(new Dictionary<string, object?>
         {
             { "ConfigType", config.ConfigType },
             { "DataDirectory", config.DataDirectory },
@@ -93,45 +68,6 @@ public class ConfigController : Controller
             { "OllamaEndpoint", config.OllamaEndpoint },
             { "DefaultModel", config.DefaultModel },
             { "WebPort", config.WebPort }
-        };
-        
-        RenderJson(result);
-    }
-
-    private string GetStyles()
-    {
-        return @"
-            * { box-sizing: border-box; margin: 0; padding: 0; }
-            body { font-family: Arial, sans-serif; background: #f5f7fa; }
-            .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-            .header { margin-bottom: 30px; }
-            .header h1 { font-size: 28px; color: #333; }
-            .config-list { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-            .config-item { display: flex; padding: 15px 0; border-bottom: 1px solid #eee; }
-            .config-label { font-weight: bold; color: #666; width: 200px; }
-            .config-value { color: #333; flex: 1; }
-        ";
-    }
-
-    private string GetScripts()
-    {
-        return @"
-            function loadConfig() {
-                fetch('/api/config/get')
-                    .then(r => r.json())
-                    .then(data => {
-                        var list = document.getElementById('config-list');
-                        var html = '';
-                        for (var key in data) {
-                            html += '<div class=""config-item""><span class=""config-label"">' + key + '</span><span class=""config-value"">' + data[key] + '</span></div>';
-                        }
-                        list.innerHTML = html || '<p>暂无配置</p>';
-                    });
-            }
-
-            window.onload = function() {
-                loadConfig();
-            };
-        ";
+        });
     }
 }

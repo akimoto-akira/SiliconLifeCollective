@@ -35,6 +35,9 @@ public interface ISession
     /// <summary>Session type</summary>
     SessionType Type { get; }
 
+    /// <summary>Session display name</summary>
+    string Name { get; }
+
     /// <summary>Member list</summary>
     List<Guid> Members { get; }
 

@@ -32,7 +32,6 @@ public class ContextManager
 
     private readonly List<Message> _messages;
     private readonly HashSet<Guid> _contextMessageIds;
-    private readonly List<Guid> _unreadMessageIds;
     private bool _needsContinuation;
     private bool _hasNewPendingMessages;
 
@@ -56,7 +55,6 @@ public class ContextManager
         _aiClient = being.AIClient ?? throw new ArgumentNullException(nameof(being.AIClient));
         _messages = new List<Message>();
         _contextMessageIds = new HashSet<Guid>();
-        _unreadMessageIds = new List<Guid>();
 
         ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
         if (chatSystem != null && _being.Id != Guid.Empty && _being.UserId != Guid.Empty)
@@ -151,9 +149,8 @@ public class ContextManager
                 continue;
             }
 
-            // Context already loaded by LoadHistoryMessages — just track for read marking
+            // Context already loaded by LoadHistoryMessages — just track
             _contextMessageIds.Add(msg.Id);
-            _unreadMessageIds.Add(msg.Id);
             _hasNewPendingMessages = true;
         }
     }
@@ -201,20 +198,6 @@ public class ContextManager
         else
         {
             _messages.Add(new Message(role, msg.Content) { Thinking = msg.Thinking });
-        }
-    }
-
-    /// <summary>
-    /// Marks truly unread messages as read by this being in ChatSystem.
-    /// Only messages fetched by FetchUnreadMessages are marked, not history.
-    /// </summary>
-    public void MarkMessageProcessed()
-    {
-        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
-        if (chatSystem != null && _unreadMessageIds.Count > 0 && _being.Id != Guid.Empty)
-        {
-            chatSystem.MarkMessagesAsRead(_unreadMessageIds, _being.Id);
-            _unreadMessageIds.Clear();
         }
     }
 
@@ -378,7 +361,6 @@ public class ContextManager
             DeliverOutput(response.Content);
         }
 
-        MarkMessageProcessed();
         return response;
     }
 
@@ -401,7 +383,6 @@ public class ContextManager
             DeliverOutput(response.Content);
         }
 
-        MarkMessageProcessed();
         return response;
     }
 
@@ -414,7 +395,6 @@ public class ContextManager
     {
         // TODO: Load task context, write back result
         AIResponse response = GetResponse();
-        MarkMessageProcessed();
         return response;
     }
 
@@ -427,7 +407,6 @@ public class ContextManager
     {
         // TODO: Load timer context
         AIResponse response = GetResponse();
-        MarkMessageProcessed();
         return response;
     }
 

@@ -13,22 +13,49 @@
 
 namespace SiliconLife.Collective;
 
+/// <summary>
+/// Represents a snapshot of performance statistics for a named operation,
+/// including average, min, max execution times and invocation count.
+/// </summary>
 public class PerformanceRecord
 {
+    /// <summary>The name of the tracked operation.</summary>
     public string Name { get; set; } = string.Empty;
+
+    /// <summary>The average execution time across all recorded samples.</summary>
     public TimeSpan AverageExecutionTime { get; set; }
+
+    /// <summary>The maximum observed execution time.</summary>
     public TimeSpan MaxExecutionTime { get; set; }
+
+    /// <summary>The minimum observed execution time.</summary>
     public TimeSpan MinExecutionTime { get; set; }
+
+    /// <summary>Total number of recorded executions.</summary>
     public int ExecutionCount { get; set; }
+
+    /// <summary>UTC timestamp of the most recent execution sample.</summary>
     public DateTime LastExecutedAt { get; set; }
 }
 
+/// <summary>
+/// Thread-safe performance monitor that records execution times for named
+/// operations and computes rolling statistics over the most recent
+/// <see cref="MaxSamples"/> samples.
+/// </summary>
 public class PerformanceMonitor
 {
     private readonly Dictionary<string, List<TimeSpan>> _executionTimes = new();
     private readonly object _lock = new();
     private const int MaxSamples = 100;
 
+    /// <summary>
+    /// Records a single execution time sample for the named operation.
+    /// When the sample count exceeds <see cref="MaxSamples"/>, the oldest
+    /// sample is discarded to maintain a rolling window.
+    /// </summary>
+    /// <param name="name">The operation name to record under.</param>
+    /// <param name="executionTime">The elapsed time of this execution.</param>
     public void Record(string name, TimeSpan executionTime)
     {
         lock (_lock)
@@ -48,6 +75,10 @@ public class PerformanceMonitor
         }
     }
 
+    /// <summary>
+    /// Returns a computed <see cref="PerformanceRecord"/> for the named
+    /// operation, or <c>null</c> if no samples have been recorded.
+    /// </summary>
     public PerformanceRecord? GetRecord(string name)
     {
         lock (_lock)
@@ -69,6 +100,9 @@ public class PerformanceMonitor
         }
     }
 
+    /// <summary>
+    /// Returns performance records for all tracked operations.
+    /// </summary>
     public Dictionary<string, PerformanceRecord> GetAllRecords()
     {
         lock (_lock)
@@ -88,6 +122,9 @@ public class PerformanceMonitor
         }
     }
 
+    /// <summary>
+    /// Clears all recorded samples for every operation.
+    /// </summary>
     public void Clear()
     {
         lock (_lock)

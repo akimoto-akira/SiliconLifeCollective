@@ -29,40 +29,37 @@ public class ChatSkin : ISkin
         BorderColor = "#0f3460"
     };
 
-    public HtmlBuilder RenderHtml(string content)
+    public H RenderHtml(H content)
     {
-        return HtmlBuilder.Create()
-            .DocType("html")
-            .Html()
-            .Head()
-            .MetaCharset("utf-8")
-            .MetaViewport("width=device-width, initial-scale=1")
-            .Title("Silicon Life Collective")
-            .Style(GetStyles() + GetThemeCss().Build())
-            .ScriptInline(GetScripts().Build())
-            .EndBlock()
-            .Body()
-            .Div().Class("container").Raw(content).EndBlock().EndBlock();
+        return H.PageElement("Silicon Life Collective",
+            new object[]
+            {
+                H.Style(GetStyles() + GetThemeCss().Build()),
+                H.Script(GetScripts().Build()),
+            },
+            new object[]
+            {
+                H.Div(content).Class("container"),
+            });
     }
 
-    public HtmlBuilder RenderError(string message)
+    public H RenderError(H message)
     {
-        return HtmlBuilder.Create()
-            .DocType("html")
-            .Html()
-            .Head()
-            .MetaCharset("utf-8")
-            .MetaViewport("width=device-width, initial-scale=1")
-            .Title("错误 - Silicon Life Collective")
-            .Style(GetStyles() + GetThemeCss().Build())
-            .EndBlock()
-            .Body()
-            .Div().Class("container")
-            .Div().Class("error")
-            .H1().Text("出错了").EndBlock()
-            .P().Text(message).EndBlock()
-            .A().Text("返回首页").Href("/").EndBlock()
-            .EndBlock().EndBlock().EndBlock().EndBlock();
+        return H.PageElement("错误 - Silicon Life Collective",
+            new object[]
+            {
+                H.Style(GetStyles() + GetThemeCss().Build()),
+            },
+            new object[]
+            {
+                H.Div(
+                    H.Div(
+                        H.H1("出错了"),
+                        message,
+                        H.A("返回首页").Href("/")
+                    ).Class("error")
+                ).Class("container"),
+            });
     }
 
     public CssBuilder GetStyles()
@@ -115,222 +112,207 @@ public class ChatSkin : ISkin
         return JsBuilder.Create();
     }
 
-    public HtmlBuilder RenderButton(string text, string variant = "primary", string size = "medium")
+    public H RenderButton(string text, string variant = "primary", string size = "medium")
     {
         var cls = $"btn btn-{variant}";
         if (size != "medium") cls += $" btn-{size}";
-        
-        return HtmlBuilder.Create()
-            .Button().Text(text).Class(cls).EndBlock();
+
+        return H.Button(text).Class(cls);
     }
 
-    public HtmlBuilder RenderInput(string placeholder = "", string size = "medium", string? value = null)
+    public H RenderInput(string placeholder = "", string size = "medium", string? value = null)
     {
         var cls = "input";
         if (size != "medium") cls += $" input-{size}";
-        
-        return HtmlBuilder.Create()
-            .InputText().Placeholder(placeholder).Class(cls).EndBlock();
+
+        return H.InputText(placeholder: placeholder, value: value).Class(cls);
     }
 
-    public HtmlBuilder RenderTextarea(string placeholder = "", int rows = 4)
+    public H RenderTextarea(string placeholder = "", int rows = 4)
     {
-        return HtmlBuilder.Create()
-            .Textarea().Attr("placeholder", placeholder).Attr("rows", rows).Class("input textarea").EndBlock();
+        return H.Textarea().Placeholder(placeholder).Attr("rows", rows).Class("input textarea");
     }
 
-    public HtmlBuilder RenderSelect(IEnumerable<string> options, string? selected = null)
+    public H RenderSelect(IEnumerable<string> options, string? selected = null)
     {
-        var builder = HtmlBuilder.Create().Select();
+        var select = H.Select();
         foreach (var opt in options)
         {
-            builder.Option(opt, opt, opt == selected);
+            var option = H.Option(opt).Value(opt);
+            if (opt == selected) option.Selected();
+            select.Add(option);
         }
-        return builder.EndBlock();
+        return select;
     }
 
-    public HtmlBuilder RenderCheckbox(string label, bool isChecked = false)
+    public H RenderCheckbox(string label, bool isChecked = false)
     {
         var checkMark = isChecked ? "✓" : string.Empty;
         var checkboxBoxClass = "checkbox-box" + (isChecked ? " checked" : string.Empty);
-        return HtmlBuilder.Create()
-            .Div().Class("checkbox")
-            .Div().Class(checkboxBoxClass).Text(checkMark).EndBlock()
-            .Span().Text(label).EndBlock()
-            .EndBlock();
+        return H.Div(
+            H.Div(checkMark).Class(checkboxBoxClass),
+            H.Span(label)
+        ).Class("checkbox");
     }
 
-    public HtmlBuilder RenderBadge(string text, string variant = "primary")
+    public H RenderBadge(string text, string variant = "primary")
     {
-        return HtmlBuilder.Create()
-            .Span().Text(text).Class($"badge badge-{variant}").EndBlock();
+        return H.Span(text).Class($"badge badge-{variant}");
     }
 
-    public HtmlBuilder RenderTag(string text)
+    public H RenderTag(string text)
     {
-        return HtmlBuilder.Create()
-            .Span().Text(text).Class("tag").EndBlock();
+        return H.Span(text).Class("tag");
     }
 
-    public HtmlBuilder RenderCard(string title, string content)
+    public H RenderCard(string title, string content)
     {
-        return HtmlBuilder.Create()
-            .Div().Class("card")
-            .Div().Class("card-header").Text(title).EndBlock()
-            .Div().Class("card-body").Raw(content).EndBlock()
-            .EndBlock();
+        return H.Div(
+            H.Div(title).Class("card-header"),
+            H.Div(H.Raw(content)).Class("card-body")
+        ).Class("card");
     }
 
-    public HtmlBuilder RenderAvatar(string text, string size = "medium")
+    public H RenderAvatar(string text, string size = "medium")
     {
-        return HtmlBuilder.Create()
-            .Div().Text(text).Class($"avatar avatar-{size}").EndBlock();
+        return H.Div(text).Class($"avatar avatar-{size}");
     }
 
-    public HtmlBuilder RenderBubble(string text, bool isMine = false)
+    public H RenderBubble(string text, bool isMine = false)
     {
-        return HtmlBuilder.Create()
-            .Div().Text(text).Class($"bubble{(isMine ? " mine" : string.Empty)}").EndBlock();
+        return H.Div(text).Class($"bubble{(isMine ? " mine" : string.Empty)}");
     }
 
-    public HtmlBuilder RenderSwitch(bool isChecked = false)
+    public H RenderSwitch(bool isChecked = false)
     {
         var switchClass = "switch" + (isChecked ? " active" : string.Empty);
-        return HtmlBuilder.Create()
-            .Div().Class(switchClass).EndBlock();
+        return H.Div().Class(switchClass);
     }
 
-    public HtmlBuilder RenderProgress(double value, string variant = "primary")
+    public H RenderProgress(double value, string variant = "primary")
     {
-        return HtmlBuilder.Create()
-            .Div().Class("progress")
-            .Div().Class($"progress-bar").Attr("style", $"width: {value}%").EndBlock()
-            .EndBlock();
+        return H.Div(
+            H.Div().Class("progress-bar").Style($"width: {value}%")
+        ).Class("progress");
     }
 
-    public HtmlBuilder RenderTabs(IEnumerable<string> tabs, int activeIndex = 0)
+    public H RenderTabs(IEnumerable<string> tabs, int activeIndex = 0)
     {
-        var builder = HtmlBuilder.Create();
+        var items = new List<object>();
         var idx = 0;
         foreach (var tab in tabs)
         {
-            builder.Span().Text(tab).Class($"tab{(idx == activeIndex ? " active" : string.Empty)}").EndBlock();
+            items.Add(H.Span(tab).Class($"tab{(idx == activeIndex ? " active" : string.Empty)}"));
             idx++;
         }
-        return builder;
+        return H.Div(items);
     }
 
-    public HtmlBuilder RenderListItem(string title, string? subtitle = null, string? avatar = null, bool active = false)
+    public H RenderListItem(string title, string? subtitle = null, string? avatar = null, bool active = false)
     {
-        var builder = HtmlBuilder.Create()
-            .Div().Class($"list-item{(active ? " active" : string.Empty)}");
-        
+        var children = new List<object>();
         if (!string.IsNullOrEmpty(avatar))
         {
-            builder.Div().Text(avatar).Class("avatar").EndBlock();
+            children.Add(H.Div(avatar).Class("avatar"));
         }
-        
-        builder.Div();
-        builder.Text(title);
+
+        var innerChildren = new List<object> { title };
         if (!string.IsNullOrEmpty(subtitle))
         {
-            builder.Raw($"<div style=\"font-size: 12px; color: var(--text-secondary);\">{subtitle}</div>");
+            innerChildren.Add(H.Raw($"<div style=\"font-size: 12px; color: var(--text-secondary);\">{subtitle}</div>"));
         }
-        builder.EndBlock().EndBlock();
-        
-        return builder;
+        children.Add(H.Div(innerChildren));
+
+        return H.Div(children).Class($"list-item{(active ? " active" : string.Empty)}");
     }
 
-    public HtmlBuilder RenderDivider()
+    public H RenderDivider()
     {
-        return HtmlBuilder.Create().Hr();
+        return H.Hr();
     }
 
-    public HtmlBuilder RenderCode(string code)
+    public H RenderCode(string code)
     {
-        return HtmlBuilder.Create()
-            .Pre().Code().Text(code).EndBlock().EndBlock();
+        return H.Pre(H.Code(code));
     }
 
-    public HtmlBuilder RenderStatCard(string label, string value, string variant = "primary")
+    public H RenderStatCard(string label, string value, string variant = "primary")
     {
-        return HtmlBuilder.Create()
-            .Div().Class("stat-card")
-            .Div().Text(value).Class("stat-value").Attr("style", $"color: var(--accent-{variant})").EndBlock()
-            .Div().Text(label).Class("stat-label").EndBlock()
-            .EndBlock();
+        return H.Div(
+            H.Div(value).Class("stat-value").Style($"color: var(--accent-{variant})"),
+            H.Div(label).Class("stat-label")
+        ).Class("stat-card");
     }
 
-    public HtmlBuilder RenderBreadcrumb(IEnumerable<string> items)
+    public H RenderBreadcrumb(IEnumerable<string> items)
     {
-        var builder = HtmlBuilder.Create().Div().Class("breadcrumb");
+        var children = new List<object>();
         var isFirst = true;
         foreach (var item in items)
         {
-            if (!isFirst) builder.Raw(" / ");
-            builder.Span().Text(item).EndBlock();
+            if (!isFirst) children.Add(H.Raw(" / "));
+            children.Add(H.Span(item));
             isFirst = false;
         }
-        return builder.EndBlock();
+        return H.Div(children).Class("breadcrumb");
     }
 
-    public HtmlBuilder RenderTable(IEnumerable<string> headers, IEnumerable<IEnumerable<string>> rows)
+    public H RenderTable(IEnumerable<string> headers, IEnumerable<IEnumerable<string>> rows)
     {
-        var builder = HtmlBuilder.Create().Table();
-        
-        builder.Thead();
-        builder.Tr();
+        var thCells = new List<object>();
         foreach (var header in headers)
         {
-            builder.Th().Text(header).EndBlock();
+            thCells.Add(H.Th(header));
         }
-        builder.EndBlock().EndBlock();
-        
-        builder.Tbody();
+
+        var bodyRows = new List<object>();
         foreach (var row in rows)
         {
-            builder.Tr();
+            var cells = new List<object>();
             foreach (var cell in row)
             {
-                builder.Td().Raw(cell).EndBlock();
+                cells.Add(H.Td(H.Raw(cell)));
             }
-            builder.EndBlock();
+            bodyRows.Add(H.Tr(cells));
         }
-        builder.EndBlock().EndBlock();
-        
-        return builder;
+
+        return H.Table(
+            H.Thead(H.Tr(thCells)),
+            H.Tbody(bodyRows)
+        );
     }
 
-    public HtmlBuilder RenderPagination(int totalPages, int currentPage = 1)
+    public H RenderPagination(int totalPages, int currentPage = 1)
     {
-        var builder = HtmlBuilder.Create().Div().Class("pagination");
-        builder.Div().Text("‹").Class("page-btn").EndBlock();
-        
+        var items = new List<object>
+        {
+            H.Div("‹").Class("page-btn"),
+        };
+
         for (int i = 1; i <= totalPages; i++)
         {
-            builder.Div().Text(i.ToString()).Class($"page-btn{(i == currentPage ? " active" : string.Empty)}").EndBlock();
+            items.Add(H.Div(i.ToString()).Class($"page-btn{(i == currentPage ? " active" : string.Empty)}"));
         }
-        
-        builder.Div().Text("›").Class("page-btn").EndBlock();
-        return builder.EndBlock();
+
+        items.Add(H.Div("›").Class("page-btn"));
+        return H.Div(items).Class("pagination");
     }
 
-    public HtmlBuilder RenderDropdown(string triggerText, IEnumerable<string> items)
+    public H RenderDropdown(string triggerText, IEnumerable<string> items)
     {
-        var builder = HtmlBuilder.Create().Div().Class("dropdown");
-        builder.Button().Text(triggerText + " ▼").Class("btn btn-primary").EndBlock();
-        
-        var menuBuilder = HtmlBuilder.Create().Div().Class("dropdown-menu");
+        var menuItems = new List<object>();
         foreach (var item in items)
         {
-            menuBuilder.Div().Text(item).Class("dropdown-item").EndBlock();
+            menuItems.Add(H.Div(item).Class("dropdown-item"));
         }
-        
-        builder.Raw(menuBuilder.Build());
-        return builder.EndBlock();
+
+        return H.Div(
+            H.Button($"{triggerText} ▼").Class("btn btn-primary"),
+            H.Div(menuItems).Class("dropdown-menu")
+        ).Class("dropdown");
     }
 
-    public HtmlBuilder RenderStatusIndicator(string status)
+    public H RenderStatusIndicator(string status)
     {
         var statusClass = status.ToLower() switch
         {
@@ -339,24 +321,21 @@ public class ChatSkin : ISkin
             "busy" => "status-busy",
             _ => "status-offline"
         };
-        
-        return HtmlBuilder.Create()
-            .Span().Class($"status-dot {statusClass}").EndBlock();
+
+        return H.Span().Class($"status-dot {statusClass}");
     }
 
-    public HtmlBuilder RenderQuote(string text)
+    public H RenderQuote(string text)
     {
-        return HtmlBuilder.Create()
-            .Blockquote().Text(text).EndBlock();
+        return H.Blockquote(text);
     }
 
-    public HtmlBuilder RenderInspirationCard(string icon, string text)
+    public H RenderInspirationCard(string icon, string text)
     {
-        return HtmlBuilder.Create()
-            .Div().Class("inspiration-card")
-            .Div().Text(icon).Class("inspiration-icon").EndBlock()
-            .Div().Text($"\"{text}\"").Class("inspiration-text").EndBlock()
-            .EndBlock();
+        return H.Div(
+            H.Div(icon).Class("inspiration-icon"),
+            H.Div($"\"{text}\"").Class("inspiration-text")
+        ).Class("inspiration-card");
     }
 
     public CssBuilder GetThemeCss()

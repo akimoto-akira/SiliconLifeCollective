@@ -229,4 +229,29 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the validation error message when data directory is empty
     /// </summary>
     public abstract string InitDataDirectoryRequiredError { get; }
+
+    /// <summary>
+    /// Gets the label for the curator (first silicon being) name field
+    /// </summary>
+    public abstract string InitCuratorNameLabel { get; }
+
+    /// <summary>
+    /// Gets the placeholder for the curator name input
+    /// </summary>
+    public abstract string InitCuratorNamePlaceholder { get; }
+
+    /// <summary>
+    /// Gets the validation error message when curator name is empty
+    /// </summary>
+    public abstract string InitCuratorNameRequiredError { get; }
+
+    /// <summary>
+    /// Gets the label for the language selector field
+    /// </summary>
+    public abstract string InitLanguageLabel { get; }
+
+    /// <summary>
+    /// Gets the button text for applying language switch
+    /// </summary>
+    public abstract string InitLanguageSwitchBtn { get; }
 }

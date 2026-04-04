@@ -2,9 +2,7 @@
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//
 //     http://www.apache.org/licenses/LICENSE-2.0
-//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,48 +20,33 @@ public class KnowledgeView : ViewBase
     {
         var vm = model as KnowledgeViewModel;
         if (vm == null) return string.Empty;
+        var body = RenderBody(vm);
+        return RenderPage(vm.Skin, "知识图谱 - Silicon Life Collective", "knowledge", body, GetScripts(), GetStyles());
+    }
 
-        Sb.Append(RenderCommonHead(vm));
-        Sb.AppendLine("<div class=\"dashboard-container\">");
-        Sb.AppendLine(RenderSidebar());
-        Sb.AppendLine("<div class=\"main-content\">");
-        Sb.AppendLine("<div class=\"header\"><h1>知识库</h1></div>");
-        
-        Sb.AppendLine("<div class=\"card\">");
-        Sb.AppendLine("<div class=\"search-bar\">");
-        Sb.AppendLine($"<input type=\"text\" id=\"search\" placeholder=\"搜索知识...\" value=\"{EscapeHtml(vm.SearchQuery)}\">");
-        Sb.AppendLine("<button class=\"btn\" onclick=\"search()\">搜索</button>");
-        Sb.AppendLine("</div>");
-        
-        if (vm.KnowledgeBase.Count == 0)
-        {
-            Sb.AppendLine("<p>暂无知识条目</p>");
-        }
-        else
-        {
-            Sb.AppendLine("<div class=\"knowledge-list\">");
-            foreach (var item in vm.KnowledgeBase)
-            {
-                Sb.AppendLine($"<div class=\"knowledge-item\">");
-                Sb.AppendLine($"<h4>{EscapeHtml(item.Title)}</h4>");
-                Sb.AppendLine($"<p>{EscapeHtml(item.Content)}</p>");
-                Sb.AppendLine($"<div class=\"meta\">");
-                Sb.AppendLine($"<span class=\"category\">{EscapeHtml(item.Category)}</span>");
-                foreach (var tag in item.Tags)
-                {
-                    Sb.AppendLine($"<span class=\"tag\">{EscapeHtml(tag)}</span>");
-                }
-                Sb.AppendLine($"</div>");
-                Sb.AppendLine("</div>");
-            }
-            Sb.AppendLine("</div>");
-        }
-        Sb.AppendLine("</div>");
-        
-        Sb.AppendLine("</div>");
-        Sb.AppendLine("</div>");
-        Sb.AppendLine(RenderFooter());
-        
-        return Sb.ToString();
+    private static string RenderBody(KnowledgeViewModel vm)
+    {
+        return @"
+<div class=""page-content"">
+    <div class=""page-header""><h1>知识图谱可视化</h1></div>
+    <div class=""graph-container"" id=""graph-container""></div>
+</div>";
+    }
+
+    private static string GetStyles()
+    {
+        return ".graph-container { background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); min-height: 500px; }";
+    }
+
+    private static string GetScripts()
+    {
+        return @"
+function loadGraph() {
+    fetch('/api/knowledge/graph').then(function(r) { return r.json(); }).then(function(data) {
+        var container = document.getElementById('graph-container');
+        container.innerHTML = '<p>知识图谱数据加载中...</p>';
+    });
+}
+window.onload = function() { loadGraph(); };";
     }
 }

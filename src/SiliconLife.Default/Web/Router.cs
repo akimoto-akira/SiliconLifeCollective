@@ -27,6 +27,7 @@ public class Router
     private string _staticFilesPath = string.Empty;
     private WebSocketRouteHandler? _webSocketHandler;
     private bool _isInitialized = false;
+    private Action<string>? _onFirstInit;
     private const string InitPath = "/init";
 
     public delegate Task WebSocketRouteHandler(WebSocketHandler handler, string message);
@@ -36,24 +37,25 @@ public class Router
         InitializeMimeTypes();
     }
 
-    public void RegisterControllers(SiliconBeingManager beingManager, ChatSystem chatSystem, Guid userId, Func<Guid, TaskCompletionSource<AskPermissionResult>> getPermissionTcs, WebCodeBrowser codeBrowser, DefaultConfigData configData, DefaultLocalizationBase localization, SkinManager skinManager)
+    public void RegisterControllers(SiliconBeingManager beingManager, ChatSystem chatSystem, Guid userId, Func<Guid, TaskCompletionSource<AskPermissionResult>> getPermissionTcs, WebCodeBrowser codeBrowser, DefaultConfigData configData, DefaultLocalizationBase localization, SkinManager skinManager, Action<string>? onFirstInit = null)
     {
-        RegisterController(() => new DashboardController(beingManager, chatSystem), "/dashboard");
-        RegisterController(() => new ChatController(beingManager, chatSystem, userId), "/chat");
-        RegisterController(() => new BeingController(beingManager), "/beings");
-        RegisterController(() => new TaskController(), "/tasks");
-        RegisterController(() => new PermissionController(), "/permissions");
-        RegisterController(() => new LogController(), "/logs");
-        RegisterController(() => new ConfigController(), "/config");
-        RegisterController(() => new MemoryController(), "/memory");
-        RegisterController(() => new KnowledgeController(), "/knowledge");
-        RegisterController(() => new ProjectController(), "/project");
-        RegisterController(() => new ExecutorController(), "/executor");
-        RegisterController(() => new CodeBrowserController(codeBrowser), "/code");
+        _onFirstInit = onFirstInit;
+        RegisterController(() => new DashboardController(beingManager, chatSystem, skinManager), "/dashboard");
+        RegisterController(() => new ChatController(beingManager, chatSystem, skinManager, userId), "/chat");
+        RegisterController(() => new BeingController(beingManager, skinManager), "/beings");
+        RegisterController(() => new TaskController(skinManager), "/tasks");
+        RegisterController(() => new PermissionController(skinManager), "/permissions");
+        RegisterController(() => new LogController(skinManager), "/logs");
+        RegisterController(() => new ConfigController(skinManager), "/config");
+        RegisterController(() => new MemoryController(skinManager), "/memory");
+        RegisterController(() => new KnowledgeController(skinManager), "/knowledge");
+        RegisterController(() => new ProjectController(skinManager), "/project");
+        RegisterController(() => new ExecutorController(skinManager), "/executor");
+        RegisterController(() => new CodeBrowserController(codeBrowser, skinManager), "/code");
         RegisterController(() => new PermissionRequestController(getPermissionTcs), "/permission-request");
-        RegisterController(() => new InitController(configData, localization, skinManager, () => SetInitialized(true)), "/init", "GET");
-        RegisterController(() => new InitController(configData, localization, skinManager, () => SetInitialized(true)), "/init", "POST");
-        RegisterController(() => new InitController(configData, localization, skinManager, () => SetInitialized(true)), "/init/browse", "GET");
+        RegisterController(() => new InitController(configData, localization, skinManager, OnInitialized), "/init", "GET");
+        RegisterController(() => new InitController(configData, localization, skinManager, OnInitialized), "/init", "POST");
+        RegisterController(() => new InitController(configData, localization, skinManager, OnInitialized), "/init/browse", "GET");
     }
 
     private static readonly HashSet<string> StaticExtensions = new(StringComparer.OrdinalIgnoreCase)
@@ -98,6 +100,12 @@ public class Router
     public void SetInitialized(bool initialized)
     {
         _isInitialized = initialized;
+    }
+
+    private void OnInitialized(string curatorName)
+    {
+        _onFirstInit?.Invoke(curatorName);
+        SetInitialized(true);
     }
 
     public void RegisterWebSocket(string path, WebSocketRouteHandler handler)
@@ -164,7 +172,15 @@ public class Router
             if (_isInitialized && path == InitPath)
             {
                 response.StatusCode = 302;
-                response.Headers["Location"] = "/";
+                response.Headers["Location"] = "/chat";
+                response.Close();
+                return;
+            }
+
+            if (_isInitialized && (path == "/" || path == ""))
+            {
+                response.StatusCode = 302;
+                response.Headers["Location"] = "/chat";
                 response.Close();
                 return;
             }

@@ -16,15 +16,35 @@ using System.Text.Json.Serialization;
 
 namespace SiliconLife.Collective;
 
+/// <summary>
+/// Polymorphic JSON converter for <see cref="ConfigDataBase"/> that dispatches
+/// deserialization based on a <c>"configType"</c> discriminator property.
+/// Concrete config types must be registered via <see cref="RegisterConfigType"/>
+/// before deserialization.
+/// </summary>
 public class ConfigDataBaseConverter : JsonConverter<ConfigDataBase>
 {
     private static readonly Dictionary<string, Type> _configTypes = new();
 
+    /// <summary>
+    /// Registers a concrete <see cref="ConfigDataBase"/> subtype for a given
+    /// <paramref name="configType"/> discriminator string.
+    /// </summary>
+    /// <param name="configType">The discriminator value found in JSON.</param>
+    /// <param name="type">The concrete CLR type to deserialize into.</param>
     public static void RegisterConfigType(string configType, Type type)
     {
         _configTypes[configType] = type;
     }
 
+    /// <summary>
+    /// Reads a JSON object, extracts the <c>"configType"</c> discriminator,
+    /// resolves the registered concrete type, and deserializes the payload.
+    /// </summary>
+    /// <exception cref="JsonException">
+    /// Thrown when the <c>"configType"</c> property is missing or the discriminator
+    /// value is not registered.
+    /// </exception>
     public override ConfigDataBase? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         using JsonDocument doc = JsonDocument.ParseValue(ref reader);
@@ -36,7 +56,7 @@ public class ConfigDataBaseConverter : JsonConverter<ConfigDataBase>
         }
 
         string configType = typeProperty.GetString() ?? "";
-        
+
         if (!_configTypes.TryGetValue(configType, out Type? targetType))
         {
             throw new JsonException($"Unknown config type: {configType}");
@@ -46,6 +66,10 @@ public class ConfigDataBaseConverter : JsonConverter<ConfigDataBase>
         return (ConfigDataBase?)JsonSerializer.Deserialize(json, targetType, options);
     }
 
+    /// <summary>
+    /// Serializes a <see cref="ConfigDataBase"/> instance using its actual runtime type
+    /// so that the concrete JSON structure (including the discriminator) is preserved.
+    /// </summary>
     public override void Write(Utf8JsonWriter writer, ConfigDataBase value, JsonSerializerOptions options)
     {
         JsonSerializer.Serialize(writer, value, value.GetType(), options);
