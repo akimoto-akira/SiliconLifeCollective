@@ -26,21 +26,21 @@ public class BeingController : Controller
         _beingManager = beingManager;
     }
 
-    public override async Task HandleAsync()
+    public override void Handle()
     {
         var path = Request.Url?.AbsolutePath ?? "/beings";
         
         if (path == "/beings" || path == "/beings/index")
         {
-            await Index();
+            Index();
         }
         else if (path == "/api/beings/list")
         {
-            await GetList();
+            GetList();
         }
         else if (path == "/api/beings/detail")
         {
-            await GetDetail();
+            GetDetail();
         }
         else
         {
@@ -49,7 +49,7 @@ public class BeingController : Controller
         }
     }
 
-    private async Task Index()
+    private void Index()
     {
         var html = HtmlBuilder.Create()
             .DocType()
@@ -60,15 +60,18 @@ public class BeingController : Controller
                 .Title("硅基人管理 - Silicon Life Collective")
                 .Style(GetBeingStyles())
                 .Script(GetBeingScripts())
+            .EndBlock()
             .Body()
                 .Div()
                     .Class("container")
                     .Div()
                         .Class("header")
                         .H1("硅基人管理")
+                    .EndBlock()
                     .Div()
                         .Class("beings-grid")
                         .Id("beings-grid")
+                    .EndBlock()
                     .Div()
                         .Class("detail-panel")
                         .Id("detail-panel")
@@ -77,12 +80,15 @@ public class BeingController : Controller
                                 <p>选择一个硅基人查看详情</p>
                             </div>
                         ")
-                .Build();
+                    .EndBlock()
+                .EndBlock()
+            .EndBlock()
+            .Build();
 
-        await RenderHtmlAsync(html);
+        RenderHtml(html);
     }
 
-    private async Task GetList()
+    private void GetList()
     {
         var beings = _beingManager.GetAllBeings();
         var list = beings.Select(b => new
@@ -95,22 +101,22 @@ public class BeingController : Controller
             customTypeName = b.CustomTypeName ?? ""
         }).ToList();
         
-        await RenderJsonAsync(list);
+        RenderJson(list);
     }
 
-    private async Task GetDetail()
+    private void GetDetail()
     {
         var idStr = Request.QueryString["id"];
         if (string.IsNullOrEmpty(idStr) || !Guid.TryParse(idStr, out var id))
         {
-            await RenderJsonAsync(new { error = "Invalid ID" });
+            RenderJson(new { error = "Invalid ID" });
             return;
         }
 
         var being = _beingManager.GetBeing(id);
         if (being == null)
         {
-            await RenderJsonAsync(new { error = "Not found" });
+            RenderJson(new { error = "Not found" });
             return;
         }
 
@@ -125,7 +131,7 @@ public class BeingController : Controller
             soulContent = being.SoulContent ?? ""
         };
         
-        await RenderJsonAsync(detail);
+        RenderJson(detail);
     }
 
     private string GetBeingStyles()

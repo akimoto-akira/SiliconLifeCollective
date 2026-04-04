@@ -15,7 +15,19 @@ namespace SiliconLife.Default.Web.Skins;
 
 public class ChatSkin : ISkin
 {
+    public string Code => "chat";
     public string Name => "Chat";
+
+    public SkinPreviewInfo PreviewInfo => new()
+    {
+        Icon = "\U0001f4ac",
+        Description = "Modern dark blue",
+        BackgroundColor = "#1a1a2e",
+        CardColor = "#16213e",
+        AccentColor = "#4d96ff",
+        TextColor = "#eaeaea",
+        BorderColor = "#0f3460"
+    };
 
     public HtmlBuilder RenderHtml(string content)
     {

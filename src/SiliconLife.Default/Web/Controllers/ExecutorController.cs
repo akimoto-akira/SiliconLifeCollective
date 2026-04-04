@@ -22,17 +22,17 @@ public class ExecutorController : Controller
     {
     }
 
-    public override async Task HandleAsync()
+    public override void Handle()
     {
         var path = Request.Url?.AbsolutePath ?? "/executors";
         
         if (path == "/executors" || path == "/executors/index")
         {
-            await Index();
+            Index();
         }
         else if (path == "/api/executors/status")
         {
-            await GetStatus();
+            GetStatus();
         }
         else
         {
@@ -41,7 +41,7 @@ public class ExecutorController : Controller
         }
     }
 
-    private async Task Index()
+    private void Index()
     {
         var html = HtmlBuilder.Create()
             .DocType()
@@ -52,21 +52,26 @@ public class ExecutorController : Controller
                 .Title("执行器监控 - Silicon Life Collective")
                 .Style(GetStyles())
                 .Script(GetScripts())
+            .EndBlock()
             .Body()
                 .Div()
                     .Class("container")
                     .Div()
                         .Class("header")
                         .H1("执行器监控")
+                    .EndBlock()
                     .Div()
                         .Class("executors-grid")
                         .Id("executors-grid")
-                .Build();
+                    .EndBlock()
+                .EndBlock()
+            .EndBlock()
+            .Build();
 
-        await RenderHtmlAsync(html);
+        RenderHtml(html);
     }
 
-    private async Task GetStatus()
+    private void GetStatus()
     {
         var status = new[]
         {
@@ -75,7 +80,7 @@ public class ExecutorController : Controller
             new { name = "CommandLineExecutor", status = "Idle", queueCount = 0 }
         };
         
-        await RenderJsonAsync(status);
+        RenderJson(status);
     }
 
     private string GetStyles()

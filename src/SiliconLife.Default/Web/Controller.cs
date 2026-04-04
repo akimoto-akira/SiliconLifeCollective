@@ -30,9 +30,9 @@ public abstract class Controller
         Parameters = parameters;
     }
 
-    public abstract Task HandleAsync();
+    public abstract void Handle();
 
-    protected async Task RenderHtmlAsync(string html, int statusCode = 200)
+    protected void RenderHtml(string html, int statusCode = 200)
     {
         Response.StatusCode = statusCode;
         Response.ContentType = "text/html; charset=utf-8";
@@ -40,11 +40,11 @@ public abstract class Controller
         
         byte[] buffer = Encoding.UTF8.GetBytes(html);
         Response.ContentLength64 = buffer.Length;
-        await Response.OutputStream.WriteAsync(buffer);
+        Response.OutputStream.Write(buffer);
         Response.Close();
     }
 
-    protected async Task RenderJsonAsync(object? data, int statusCode = 200)
+    protected void RenderJson(object? data, int statusCode = 200)
     {
         Response.StatusCode = statusCode;
         Response.ContentType = "application/json; charset=utf-8";
@@ -58,22 +58,22 @@ public abstract class Controller
         
         byte[] buffer = Encoding.UTF8.GetBytes(json);
         Response.ContentLength64 = buffer.Length;
-        await Response.OutputStream.WriteAsync(buffer);
+        Response.OutputStream.Write(buffer);
         Response.Close();
     }
 
-    protected async Task RenderTextAsync(string text, string contentType = "text/plain; charset=utf-8", int statusCode = 200)
+    protected void RenderText(string text, string contentType = "text/plain; charset=utf-8", int statusCode = 200)
     {
         Response.StatusCode = statusCode;
         Response.ContentType = contentType;
         
         byte[] buffer = Encoding.UTF8.GetBytes(text);
         Response.ContentLength64 = buffer.Length;
-        await Response.OutputStream.WriteAsync(buffer);
+        Response.OutputStream.Write(buffer);
         Response.Close();
     }
 
-    protected async Task RedirectAsync(string location, int statusCode = 302)
+    protected void Redirect(string location, int statusCode = 302)
     {
         Response.StatusCode = statusCode;
         Response.Headers["Location"] = location;
@@ -85,10 +85,10 @@ public abstract class Controller
         return Request.QueryString[key] ?? defaultValue;
     }
 
-    protected async Task<string> GetRequestBodyAsync()
+    protected string GetRequestBody()
     {
         using var reader = new StreamReader(Request.InputStream, Request.ContentEncoding);
-        return await reader.ReadToEndAsync();
+        return reader.ReadToEnd();
     }
 
     protected T? GetJsonBody<T>() where T : class

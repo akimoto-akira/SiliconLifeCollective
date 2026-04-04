@@ -15,7 +15,19 @@ namespace SiliconLife.Default.Web.Skins;
 
 public class DevSkin : ISkin
 {
+    public string Code => "dev";
     public string Name => "Dev";
+
+    public SkinPreviewInfo PreviewInfo => new()
+    {
+        Icon = "\u2699\ufe0f",
+        Description = "Geek dark theme",
+        BackgroundColor = "#0d1117",
+        CardColor = "#161b22",
+        AccentColor = "#58a6ff",
+        TextColor = "#c9d1d9",
+        BorderColor = "#30363d"
+    };
 
     public HtmlBuilder RenderHtml(string content)
     {

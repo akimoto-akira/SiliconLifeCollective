@@ -26,21 +26,21 @@ public class PermissionRequestController : Controller
         _getPermissionTcs = getPermissionTcs;
     }
 
-    public override async Task HandleAsync()
+    public override void Handle()
     {
         var path = Request.Url?.AbsolutePath ?? "/permission/request";
         
         if (path == "/permission/request" || path == "/permission/request/index")
         {
-            await Index();
+            Index();
         }
         else if (path == "/permission/check")
         {
-            await CheckPending();
+            CheckPending();
         }
         else if (path == "/permission/respond")
         {
-            await Respond();
+            Respond();
         }
         else
         {
@@ -49,7 +49,7 @@ public class PermissionRequestController : Controller
         }
     }
 
-    private async Task Index()
+    private void Index()
     {
         var userIdStr = Request.QueryString["userId"];
         var permissionType = Request.QueryString["type"] ?? "Unknown";
@@ -60,7 +60,7 @@ public class PermissionRequestController : Controller
         if (!Guid.TryParse(userIdStr, out var userId))
         {
             Response.StatusCode = 400;
-            await RenderTextAsync("Invalid user ID");
+            RenderText("Invalid user ID");
             return;
         }
 
@@ -73,6 +73,7 @@ public class PermissionRequestController : Controller
                 .Title("权限请求 - Silicon Life Collective")
                 .Style(GetStyles())
                 .Script(GetScripts(userId.ToString()))
+            .EndBlock()
             .Body()
                 .Div()
                     .Class("permission-container")
@@ -97,25 +98,28 @@ public class PermissionRequestController : Controller
                             </div>
                             <div class=""auto-close"">等待响应...</div>
                         ")
-                .Build();
+                    .EndBlock()
+                .EndBlock()
+            .EndBlock()
+            .Build();
 
-        await RenderHtmlAsync(html);
+        RenderHtml(html);
     }
 
-    private async Task CheckPending()
+    private void CheckPending()
     {
         var userIdStr = Request.QueryString["userId"];
         if (!Guid.TryParse(userIdStr, out var userId))
         {
-            await RenderJsonAsync(new { pending = false });
+            RenderJson(new { pending = false });
             return;
         }
 
         var hasPending = _getPermissionTcs(userId) != null;
-        await RenderJsonAsync(new { pending = hasPending });
+        RenderJson(new { pending = hasPending });
     }
 
-    private async Task Respond()
+    private void Respond()
     {
         var userIdStr = Request.QueryString["userId"];
         var allowedStr = Request.QueryString["allowed"];
@@ -123,7 +127,7 @@ public class PermissionRequestController : Controller
         if (!Guid.TryParse(userIdStr, out var userId) || !bool.TryParse(allowedStr, out var allowed))
         {
             Response.StatusCode = 400;
-            await RenderTextAsync("Invalid parameters");
+            RenderText("Invalid parameters");
             return;
         }
 
@@ -133,7 +137,7 @@ public class PermissionRequestController : Controller
             tcs.SetResult(new AskPermissionResult { Allowed = allowed });
         }
 
-        await RenderJsonAsync(new { success = true });
+        RenderJson(new { success = true });
     }
 
     private string GetStyles()

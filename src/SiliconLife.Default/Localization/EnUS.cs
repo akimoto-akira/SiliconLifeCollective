@@ -150,4 +150,28 @@ public class EnUS : DefaultLocalizationBase
     {
         return $"Memory compression: {levelDesc}. Time range: {rangeDesc}.\n\nMemory content:\n{contentText}";
     }
+
+    // ===== Init Page Localization =====
+
+    public override string InitPageTitle => "Setup";
+    public override string InitDescription => "First time setup, please complete the basic configuration";
+    public override string InitNicknameLabel => "Nickname";
+    public override string InitNicknamePlaceholder => "Enter your nickname";
+    public override string InitEndpointLabel => "AI API Endpoint";
+    public override string InitEndpointPlaceholder => "e.g. http://localhost:11434";
+    public override string InitSkinLabel => "Skin";
+    public override string InitSkinPlaceholder => "Leave empty for default skin";
+    public override string InitDataDirectoryLabel => "Data Directory";
+    public override string InitDataDirectoryPlaceholder => "e.g. ./data";
+    public override string InitDataDirectoryBrowse => "Browse...";
+    public override string InitSkinSelected => "\u2713 Selected";
+    public override string InitSkinPreviewTitle => "Preview";
+    public override string InitSkinPreviewCardTitle => "Card Title";
+    public override string InitSkinPreviewCardContent => "This is a sample card showing the UI style of this skin.";
+    public override string InitSkinPreviewPrimaryBtn => "Primary";
+    public override string InitSkinPreviewSecondaryBtn => "Secondary";
+    public override string InitSubmitButton => "Complete Setup";
+    public override string InitFooterHint => "You can modify settings at any time on the settings page";
+    public override string InitNicknameRequiredError => "Please enter a nickname";
+    public override string InitDataDirectoryRequiredError => "Please select a data directory";
 }

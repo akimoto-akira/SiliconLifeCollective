@@ -32,7 +32,7 @@ public class Program
 
         Config config = Config.Instance;
         config.Initialize(new DefaultConfigData());
-        config.LoadOrCreateConfig();
+        config.LoadConfig();
 
         DefaultConfigData configData = (DefaultConfigData)config.Data;
         DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(configData.Language);
@@ -56,6 +56,7 @@ public class Program
         GlobalACL globalAcl = new GlobalACL(storage);
 
         var router = new Router();
+        router.SetInitialized(File.Exists(configData.GetConfigPath()));
         IIMProvider imProvider = new WebUIProvider(router);
         imProvider.ExitRequested += (s, e) => RequestExit();
 
@@ -164,7 +165,10 @@ public class Program
     {
         var beingManager = MainLoop.BeingManager;
         var codeBrowser = new WebCodeBrowser();
-        router.RegisterControllers(beingManager, chatSystem, userId, webUiProvider.GetPermissionTcs, codeBrowser, configData);
+        var localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(configData.Language);
+        var skinManager = new SkinManager();
+        skinManager.DiscoverSkins(typeof(SkinManager).Assembly);
+        router.RegisterControllers(beingManager, chatSystem, userId, webUiProvider.GetPermissionTcs, codeBrowser, configData, localization, skinManager);
 
         if (!string.IsNullOrEmpty(configData.StaticFilesPath) && Directory.Exists(configData.StaticFilesPath))
         {

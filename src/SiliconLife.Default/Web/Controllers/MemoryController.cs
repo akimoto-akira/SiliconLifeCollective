@@ -22,17 +22,17 @@ public class MemoryController : Controller
     {
     }
 
-    public override async Task HandleAsync()
+    public override void Handle()
     {
         var path = Request.Url?.AbsolutePath ?? "/memory";
         
         if (path == "/memory" || path == "/memory/index")
         {
-            await Index();
+            Index();
         }
         else if (path == "/api/memory/list")
         {
-            await GetList();
+            GetList();
         }
         else
         {
@@ -41,7 +41,7 @@ public class MemoryController : Controller
         }
     }
 
-    private async Task Index()
+    private void Index()
     {
         var html = HtmlBuilder.Create()
             .DocType()
@@ -52,25 +52,30 @@ public class MemoryController : Controller
                 .Title("记忆浏览 - Silicon Life Collective")
                 .Style(GetStyles())
                 .Script(GetScripts())
+            .EndBlock()
             .Body()
                 .Div()
                     .Class("container")
                     .Div()
                         .Class("header")
                         .H1("记忆浏览")
+                    .EndBlock()
                     .Div()
                         .Class("memory-list")
                         .Id("memory-list")
-                .Build();
+                    .EndBlock()
+                .EndBlock()
+            .EndBlock()
+            .Build();
 
-        await RenderHtmlAsync(html);
+        RenderHtml(html);
     }
 
-    private async Task GetList()
+    private void GetList()
     {
         var memories = new List<object>();
         
-        await RenderJsonAsync(memories);
+        RenderJson(memories);
     }
 
     private string GetStyles()

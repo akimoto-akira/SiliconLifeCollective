@@ -59,4 +59,25 @@ public abstract class ConfigDataBase
     /// Gets the reserved GUID representing the human user
     /// </summary>
     public Guid UserGuid { get; } = new Guid("00000000-0000-0000-0000-000000000001");
+
+    /// <summary>
+    /// Gets or sets the nickname of the human user
+    /// </summary>
+    public abstract string UserNickname { get; set; }
+
+    /// <summary>
+    /// Gets the configuration file path
+    /// </summary>
+    /// <returns>The full path to the configuration file</returns>
+    public abstract string GetConfigPath();
+
+    /// <summary>
+    /// Loads configuration from the configuration file
+    /// </summary>
+    public abstract void LoadConfig();
+
+    /// <summary>
+    /// Saves current configuration to the configuration file
+    /// </summary>
+    public abstract void SaveConfig();
 }

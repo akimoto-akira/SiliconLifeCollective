@@ -29,21 +29,21 @@ public class DashboardController : Controller
         _chatSystem = chatSystem;
     }
 
-    public override async Task HandleAsync()
+    public override void Handle()
     {
         var path = Request.Url?.AbsolutePath ?? "/dashboard";
         
         if (path == "/dashboard" || path == "/dashboard/index")
         {
-            await Index();
+            Index();
         }
         else if (path == "/api/dashboard/stats")
         {
-            await GetStats();
+            GetStats();
         }
         else if (path == "/api/dashboard/metrics")
         {
-            await GetMetrics();
+            GetMetrics();
         }
         else
         {
@@ -52,7 +52,7 @@ public class DashboardController : Controller
         }
     }
 
-    private async Task Index()
+    private void Index()
     {
         var html = HtmlBuilder.Create()
             .DocType()
@@ -63,6 +63,7 @@ public class DashboardController : Controller
                 .Title("仪表盘 - Silicon Life Collective")
                 .Style(GetDashboardStyles())
                 .Script(GetDashboardScripts())
+            .EndBlock()
             .Body()
                 .Div()
                     .Class("dashboard-container")
@@ -80,11 +81,13 @@ public class DashboardController : Controller
                                 <li><a href=""/config"">配置</a></li>
                             </ul>
                         ")
+                    .EndBlock()
                     .Div()
                         .Class("main-content")
                         .Div()
                             .Class("header")
                             .H1("仪表盘")
+                        .EndBlock()
                         .Div()
                             .Class("stats-grid")
                             .Raw(@"
@@ -105,6 +108,7 @@ public class DashboardController : Controller
                                     <div class=""stat-value"" id=""memory"">0 MB</div>
                                 </div>
                             ")
+                        .EndBlock()
                         .Div()
                             .Class("chart-section")
                             .Raw(@"
@@ -113,12 +117,16 @@ public class DashboardController : Controller
                                     <svg id=""message-chart"" viewBox=""0 0 800 300"" preserveAspectRatio=""xMidYMid meet""></svg>
                                 </div>
                             ")
-                .Build();
+                        .EndBlock()
+                    .EndBlock()
+                .EndBlock()
+            .EndBlock()
+            .Build();
 
-        await RenderHtmlAsync(html);
+        RenderHtml(html);
     }
 
-    private async Task GetStats()
+    private void GetStats()
     {
         var beings = _beingManager.GetAllBeings();
         var process = Process.GetCurrentProcess();
@@ -132,10 +140,10 @@ public class DashboardController : Controller
             memoryMB = Math.Round(process.WorkingSet64 / 1024.0 / 1024.0, 2)
         };
         
-        await RenderJsonAsync(stats);
+        RenderJson(stats);
     }
 
-    private async Task GetMetrics()
+    private void GetMetrics()
     {
         var metrics = new
         {
@@ -143,7 +151,7 @@ public class DashboardController : Controller
             messageCounts = Enumerable.Range(0, 20).Select(_ => Random.Shared.Next(0, 100)).ToList()
         };
         
-        await RenderJsonAsync(metrics);
+        RenderJson(metrics);
     }
 
     private string GetDashboardStyles()

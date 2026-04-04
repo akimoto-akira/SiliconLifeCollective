@@ -22,12 +22,13 @@ namespace SiliconLife.Default.Web;
 
 public class Router
 {
-    private readonly Dictionary<string, RouteHandler> _routes = new();
+    private readonly Dictionary<string, Func<Controller>> _controllers = new();
     private readonly Dictionary<string, string> _mimeTypes = new();
     private string _staticFilesPath = string.Empty;
-    private WebSocketHandler? _webSocketHandler;
+    private WebSocketRouteHandler? _webSocketHandler;
+    private bool _isInitialized = false;
+    private const string InitPath = "/init";
 
-    public delegate Task RouteHandler(HttpListenerContext context, Dictionary<string, string> parameters);
     public delegate Task WebSocketRouteHandler(WebSocketHandler handler, string message);
 
     public Router()
@@ -35,73 +36,37 @@ public class Router
         InitializeMimeTypes();
     }
 
-    public void RegisterControllers(SiliconBeingManager beingManager, ChatSystem chatSystem, Guid userId, Func<Guid, TaskCompletionSource<AskPermissionResult>> getPermissionTcs, WebCodeBrowser codeBrowser, DefaultConfigData configData)
+    public void RegisterControllers(SiliconBeingManager beingManager, ChatSystem chatSystem, Guid userId, Func<Guid, TaskCompletionSource<AskPermissionResult>> getPermissionTcs, WebCodeBrowser codeBrowser, DefaultConfigData configData, DefaultLocalizationBase localization, SkinManager skinManager)
     {
-        Register("GET:/", async (context, parameters) =>
-        {
-            var html = HtmlBuilder.Create()
-                .DocType()
-                .Html()
-                .Head()
-                    .MetaCharset()
-                    .MetaViewport()
-                    .Title("Silicon Life Collective")
-                    .Style(@"
-                        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
-                        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-                        h1 { color: #333; }
-                        .status { padding: 10px; background: #e7f3e7; border-left: 4px solid #4caf50; margin: 10px 0; }
-                        .info { color: #666; margin: 5px 0; }
-                    ")
-                .Body()
-                    .Div()
-                        .H1("Silicon Life Collective")
-                        .Div("Welcome to Silicon Life Collective")
-                        .Div()
-                            .Class("status")
-                            .Text($"System Status: Running")
-                        .Div()
-                            .Class("info")
-                            .Text($"Curator GUID: {configData.CuratorGuid}")
-                        .Div()
-                            .Class("info")
-                            .Text($"Data Directory: {configData.DataDirectory}")
-                    .Build();
+        RegisterController(() => new DashboardController(beingManager, chatSystem), "/dashboard");
+        RegisterController(() => new ChatController(beingManager, chatSystem, userId), "/chat");
+        RegisterController(() => new BeingController(beingManager), "/beings");
+        RegisterController(() => new TaskController(), "/tasks");
+        RegisterController(() => new PermissionController(), "/permissions");
+        RegisterController(() => new LogController(), "/logs");
+        RegisterController(() => new ConfigController(), "/config");
+        RegisterController(() => new MemoryController(), "/memory");
+        RegisterController(() => new KnowledgeController(), "/knowledge");
+        RegisterController(() => new ProjectController(), "/project");
+        RegisterController(() => new ExecutorController(), "/executor");
+        RegisterController(() => new CodeBrowserController(codeBrowser), "/code");
+        RegisterController(() => new PermissionRequestController(getPermissionTcs), "/permission-request");
+        RegisterController(() => new InitController(configData, localization, skinManager, () => SetInitialized(true)), "/init", "GET");
+        RegisterController(() => new InitController(configData, localization, skinManager, () => SetInitialized(true)), "/init", "POST");
+        RegisterController(() => new InitController(configData, localization, skinManager, () => SetInitialized(true)), "/init/browse", "GET");
+    }
 
-            await context.Response.OutputStream.WriteAsync(Encoding.UTF8.GetBytes(html));
-            context.Response.ContentType = "text/html; charset=utf-8";
-            context.Response.StatusCode = 200;
-            context.Response.Close();
-        });
+    private static readonly HashSet<string> StaticExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".html", ".htm", ".css", ".js", ".json", ".xml", ".txt",
+        ".png", ".jpg", ".jpeg", ".gif", ".ico", ".svg",
+        ".woff", ".woff2", ".ttf", ".eot", ".map"
+    };
 
-        Register("GET:/health", async (context, parameters) =>
-        {
-            var json = System.Text.Json.JsonSerializer.Serialize(new
-            {
-                status = "ok",
-                timestamp = DateTime.UtcNow,
-                curator = configData.CuratorGuid.ToString()
-            });
-
-            await context.Response.OutputStream.WriteAsync(Encoding.UTF8.GetBytes(json));
-            context.Response.ContentType = "application/json; charset=utf-8";
-            context.Response.StatusCode = 200;
-            context.Response.Close();
-        });
-
-        RegisterController(new DashboardController(beingManager, chatSystem), "/dashboard");
-        RegisterController(new ChatController(beingManager, chatSystem, userId), "/chat");
-        RegisterController(new BeingController(beingManager), "/beings");
-        RegisterController(new TaskController(), "/tasks");
-        RegisterController(new PermissionController(), "/permissions");
-        RegisterController(new LogController(), "/logs");
-        RegisterController(new ConfigController(), "/config");
-        RegisterController(new MemoryController(), "/memory");
-        RegisterController(new KnowledgeController(), "/knowledge");
-        RegisterController(new ProjectController(), "/project");
-        RegisterController(new ExecutorController(), "/executor");
-        RegisterController(new CodeBrowserController(codeBrowser), "/code");
-        RegisterController(new PermissionRequestController(getPermissionTcs), "/permission-request");
+    private bool IsStaticFileRequest(string path)
+    {
+        var extension = Path.GetExtension(path);
+        return !string.IsNullOrEmpty(extension) && StaticExtensions.Contains(extension);
     }
 
     private void InitializeMimeTypes()
@@ -130,51 +95,44 @@ public class Router
         _staticFilesPath = path;
     }
 
-    public void Register(string pattern, RouteHandler handler)
+    public void SetInitialized(bool initialized)
     {
-        _routes[pattern] = handler;
+        _isInitialized = initialized;
     }
 
     public void RegisterWebSocket(string path, WebSocketRouteHandler handler)
     {
-        _webSocketHandler = new WebSocketHandler();
-        _webSocketHandler.OnMessageReceived += async (ws, msg) =>
-        {
-            try
-            {
-                await handler(_webSocketHandler, msg);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"WebSocket handler error: {ex.Message}");
-            }
-        };
+        _webSocketHandler = handler;
     }
 
-    public void RegisterController(Controller controller, string basePath)
+    public void RegisterController(Func<Controller> controllerFactory, string basePath)
     {
-        Register("GET:" + basePath, async (ctx, p) =>
-        {
-            controller.SetContext(ctx, p);
-            await controller.HandleAsync();
-        });
+        RegisterController(controllerFactory, basePath, "GET");
     }
 
-    public void RegisterController(Controller controller, string basePath, string httpMethod)
+    public void RegisterController(Func<Controller> controllerFactory, string basePath, string httpMethod)
     {
         var key = httpMethod.ToUpper() + ":" + basePath;
-        _routes[key] = async (ctx, p) =>
-        {
-            controller.SetContext(ctx, p);
-            await controller.HandleAsync();
-        };
+        _controllers[key] = controllerFactory;
     }
 
     public async Task HandleWebSocket(HttpListenerContext context)
     {
         if (_webSocketHandler != null)
         {
-            await _webSocketHandler.HandleWebSocketRequest(context);
+            var handler = new WebSocketHandler();
+            handler.OnMessageReceived += async (ws, msg) =>
+            {
+                try
+                {
+                    await _webSocketHandler(handler, msg);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"WebSocket handler error: {ex.Message}");
+                }
+            };
+            await handler.HandleWebSocketRequest(context);
         }
         else
         {
@@ -192,11 +150,32 @@ public class Router
 
         try
         {
-            var (handler, parameters) = MatchRoute(path, method);
-
-            if (handler != null)
+            if (!_isInitialized && path != InitPath && !path.StartsWith(InitPath + "/") && method != "POST")
             {
-                await handler(context, parameters);
+                if (!IsStaticFileRequest(path))
+                {
+                    response.StatusCode = 302;
+                    response.Headers["Location"] = InitPath;
+                    response.Close();
+                    return;
+                }
+            }
+
+            if (_isInitialized && path == InitPath)
+            {
+                response.StatusCode = 302;
+                response.Headers["Location"] = "/";
+                response.Close();
+                return;
+            }
+
+            var (controllerFactory, parameters) = MatchRoute(path, method);
+
+            if (controllerFactory != null)
+            {
+                var controller = controllerFactory();
+                controller.SetContext(context, parameters);
+                controller.Handle();
             }
             else if (!string.IsNullOrEmpty(_staticFilesPath))
             {
@@ -213,9 +192,9 @@ public class Router
         }
     }
 
-    private (RouteHandler? handler, Dictionary<string, string> parameters) MatchRoute(string path, string method)
+    private (Func<Controller>? controllerFactory, Dictionary<string, string> parameters) MatchRoute(string path, string method)
     {
-        foreach (var route in _routes.Keys)
+        foreach (var route in _controllers.Keys)
         {
             if (!route.StartsWith(method + ":"))
                 continue;
@@ -225,7 +204,7 @@ public class Router
 
             if (TryMatchPattern(pattern, path, parameters))
             {
-                return (_routes[route], parameters);
+                return (_controllers[route], parameters);
             }
         }
 

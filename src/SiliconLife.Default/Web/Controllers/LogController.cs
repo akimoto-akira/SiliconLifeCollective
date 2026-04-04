@@ -22,17 +22,17 @@ public class LogController : Controller
     {
     }
 
-    public override async Task HandleAsync()
+    public override void Handle()
     {
         var path = Request.Url?.AbsolutePath ?? "/logs";
         
         if (path == "/logs" || path == "/logs/index")
         {
-            await Index();
+            Index();
         }
         else if (path == "/api/logs/list")
         {
-            await GetList();
+            GetList();
         }
         else
         {
@@ -41,7 +41,7 @@ public class LogController : Controller
         }
     }
 
-    private async Task Index()
+    private void Index()
     {
         var html = HtmlBuilder.Create()
             .DocType()
@@ -52,12 +52,14 @@ public class LogController : Controller
                 .Title("日志查询 - Silicon Life Collective")
                 .Style(GetStyles())
                 .Script(GetScripts())
+            .EndBlock()
             .Body()
                 .Div()
                     .Class("container")
                     .Div()
                         .Class("header")
                         .H1("日志查询")
+                    .EndBlock()
                     .Div()
                         .Class("filters")
                         .Raw(@"
@@ -70,19 +72,23 @@ public class LogController : Controller
                             <input type=""date"" id=""log-date"" />
                             <button onclick=""loadLogs()"">查询</button>
                         ")
+                    .EndBlock()
                     .Div()
                         .Class("logs-list")
                         .Id("logs-list")
-                .Build();
+                    .EndBlock()
+                .EndBlock()
+            .EndBlock()
+            .Build();
 
-        await RenderHtmlAsync(html);
+        RenderHtml(html);
     }
 
-    private async Task GetList()
+    private void GetList()
     {
         var logs = new List<object>();
         
-        await RenderJsonAsync(logs);
+        RenderJson(logs);
     }
 
     private string GetStyles()

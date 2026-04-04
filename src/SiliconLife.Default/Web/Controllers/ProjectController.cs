@@ -22,17 +22,17 @@ public class ProjectController : Controller
     {
     }
 
-    public override async Task HandleAsync()
+    public override void Handle()
     {
         var path = Request.Url?.AbsolutePath ?? "/projects";
         
         if (path == "/projects" || path == "/projects/index")
         {
-            await Index();
+            Index();
         }
         else if (path == "/api/projects/list")
         {
-            await GetList();
+            GetList();
         }
         else
         {
@@ -41,7 +41,7 @@ public class ProjectController : Controller
         }
     }
 
-    private async Task Index()
+    private void Index()
     {
         var html = HtmlBuilder.Create()
             .DocType()
@@ -52,25 +52,30 @@ public class ProjectController : Controller
                 .Title("项目空间管理 - Silicon Life Collective")
                 .Style(GetStyles())
                 .Script(GetScripts())
+            .EndBlock()
             .Body()
                 .Div()
                     .Class("container")
                     .Div()
                         .Class("header")
                         .H1("项目空间管理")
+                    .EndBlock()
                     .Div()
                         .Class("projects-list")
                         .Id("projects-list")
-                .Build();
+                    .EndBlock()
+                .EndBlock()
+            .EndBlock()
+            .Build();
 
-        await RenderHtmlAsync(html);
+        RenderHtml(html);
     }
 
-    private async Task GetList()
+    private void GetList()
     {
         var projects = new List<object>();
         
-        await RenderJsonAsync(projects);
+        RenderJson(projects);
     }
 
     private string GetStyles()

@@ -15,7 +15,19 @@ namespace SiliconLife.Default.Web.Skins;
 
 public class AdminSkin : ISkin
 {
+    public string Code => "admin";
     public string Name => "Admin";
+
+    public SkinPreviewInfo PreviewInfo => new()
+    {
+        Icon = "\U0001f4ca",
+        Description = "Classic dashboard",
+        BackgroundColor = "#f4f6f8",
+        CardColor = "#ffffff",
+        AccentColor = "#0366d6",
+        TextColor = "#24292e",
+        BorderColor = "#e1e4e8"
+    };
 
     public HtmlBuilder RenderHtml(string content)
     {

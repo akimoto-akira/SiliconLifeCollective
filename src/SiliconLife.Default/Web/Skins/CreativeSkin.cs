@@ -15,7 +15,19 @@ namespace SiliconLife.Default.Web.Skins;
 
 public class CreativeSkin : ISkin
 {
+    public string Code => "creative";
     public string Name => "Creative";
+
+    public SkinPreviewInfo PreviewInfo => new()
+    {
+        Icon = "\u270f\ufe0f",
+        Description = "Warm artistic",
+        BackgroundColor = "#fdf6e3",
+        CardColor = "#fffef9",
+        AccentColor = "#d4a574",
+        TextColor = "#5c4b37",
+        BorderColor = "#e8dfd0"
+    };
 
     public HtmlBuilder RenderHtml(string content)
     {

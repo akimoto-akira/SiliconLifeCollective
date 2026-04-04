@@ -33,21 +33,21 @@ public class ChatController : Controller
         _userId = userId;
     }
 
-    public override async Task HandleAsync()
+    public override void Handle()
     {
         _currentPath = Request.Url?.AbsolutePath ?? "/chat";
         
         if (_currentPath == "/chat" || _currentPath == "/chat/index")
         {
-            await Index();
+            Index();
         }
         else if (_currentPath == "/api/chat/conversations")
         {
-            await GetConversations();
+            GetConversations();
         }
         else if (_currentPath == "/api/chat/messages")
         {
-            await GetMessages();
+            GetMessages();
         }
         else
         {
@@ -56,7 +56,7 @@ public class ChatController : Controller
         }
     }
 
-    private async Task Index()
+    private void Index()
     {
         var html = HtmlBuilder.Create()
             .DocType()
@@ -67,6 +67,7 @@ public class ChatController : Controller
                 .Title("Chat - Silicon Life Collective")
                 .Style(GetChatStyles())
                 .Script(GetChatScripts())
+            .EndBlock()
             .Body()
                 .Div()
                     .Class("chat-container")
@@ -76,15 +77,19 @@ public class ChatController : Controller
                         .Div()
                             .Class("beings-list")
                             .Id("beings-list")
+                        .EndBlock()
+                    .EndBlock()
                     .Div()
                         .Class("chat-main")
                         .Div()
                             .Class("chat-header")
                             .Id("chat-header")
                             .Text("选择会话开始聊天")
+                        .EndBlock()
                         .Div()
                             .Class("chat-messages")
                             .Id("chat-messages")
+                        .EndBlock()
                         .Div()
                             .Class("chat-input-area")
                             .Textarea("message-input", "输入消息...")
@@ -92,12 +97,17 @@ public class ChatController : Controller
                                 .Class("send-button")
                                 .Button("发送")
                                 .OnClick("sendMessage()")
-                .Build();
+                            .EndBlock()
+                        .EndBlock()
+                    .EndBlock()
+                .EndBlock()
+            .EndBlock()
+            .Build();
 
-        await RenderHtmlAsync(html);
+        RenderHtml(html);
     }
 
-    private async Task GetConversations()
+    private void GetConversations()
     {
         var conversations = new List<object>();
         var beings = _beingManager.GetAllBeings();
@@ -115,16 +125,16 @@ public class ChatController : Controller
             });
         }
 
-        await RenderJsonAsync(conversations);
+        RenderJson(conversations);
     }
 
-    private async Task GetMessages()
+    private void GetMessages()
     {
         var beingIdStr = Request.QueryString["beingId"];
         
         if (string.IsNullOrEmpty(beingIdStr) || !Guid.TryParse(beingIdStr, out var beingId))
         {
-            await RenderJsonAsync(Array.Empty<object>());
+            RenderJson(Array.Empty<object>());
             return;
         }
 
@@ -139,7 +149,7 @@ public class ChatController : Controller
             isOwn = m.SenderId == _userId
         });
 
-        await RenderJsonAsync(result);
+        RenderJson(result);
     }
 
     private Guid GetChannelGuid(Guid userId, Guid beingId)

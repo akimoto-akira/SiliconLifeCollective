@@ -23,17 +23,17 @@ public class ConfigController : Controller
     {
     }
 
-    public override async Task HandleAsync()
+    public override void Handle()
     {
         var path = Request.Url?.AbsolutePath ?? "/config";
         
         if (path == "/config" || path == "/config/index")
         {
-            await Index();
+            Index();
         }
         else if (path == "/api/config/get")
         {
-            await GetConfig();
+            GetConfig();
         }
         else
         {
@@ -42,7 +42,7 @@ public class ConfigController : Controller
         }
     }
 
-    private async Task Index()
+    private void Index()
     {
         var html = HtmlBuilder.Create()
             .DocType()
@@ -53,26 +53,31 @@ public class ConfigController : Controller
                 .Title("系统配置 - Silicon Life Collective")
                 .Style(GetStyles())
                 .Script(GetScripts())
+            .EndBlock()
             .Body()
                 .Div()
                     .Class("container")
                     .Div()
                         .Class("header")
                         .H1("系统配置")
+                    .EndBlock()
                     .Div()
                         .Class("config-list")
                         .Id("config-list")
-                .Build();
+                    .EndBlock()
+                .EndBlock()
+            .EndBlock()
+            .Build();
 
-        await RenderHtmlAsync(html);
+        RenderHtml(html);
     }
 
-    private async Task GetConfig()
+    private void GetConfig()
     {
         var config = Config.Instance?.Data as DefaultConfigData;
         if (config == null)
         {
-            await RenderJsonAsync(new { error = "Config not available" });
+            RenderJson(new { error = "Config not available" });
             return;
         }
 
@@ -90,7 +95,7 @@ public class ConfigController : Controller
             { "WebPort", config.WebPort }
         };
         
-        await RenderJsonAsync(result);
+        RenderJson(result);
     }
 
     private string GetStyles()

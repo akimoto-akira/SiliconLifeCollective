@@ -22,17 +22,17 @@ public class TaskController : Controller
     {
     }
 
-    public override async Task HandleAsync()
+    public override void Handle()
     {
         var path = Request.Url?.AbsolutePath ?? "/tasks";
         
         if (path == "/tasks" || path == "/tasks/index")
         {
-            await Index();
+            Index();
         }
         else if (path == "/api/tasks/list")
         {
-            await GetList();
+            GetList();
         }
         else
         {
@@ -41,7 +41,7 @@ public class TaskController : Controller
         }
     }
 
-    private async Task Index()
+    private void Index()
     {
         var html = HtmlBuilder.Create()
             .DocType()
@@ -52,25 +52,30 @@ public class TaskController : Controller
                 .Title("任务管理 - Silicon Life Collective")
                 .Style(GetTaskStyles())
                 .Script(GetTaskScripts())
+            .EndBlock()
             .Body()
                 .Div()
                     .Class("container")
                     .Div()
                         .Class("header")
                         .H1("任务管理")
+                    .EndBlock()
                     .Div()
                         .Class("tasks-list")
                         .Id("tasks-list")
-                .Build();
+                    .EndBlock()
+                .EndBlock()
+            .EndBlock()
+            .Build();
 
-        await RenderHtmlAsync(html);
+        RenderHtml(html);
     }
 
-    private async Task GetList()
+    private void GetList()
     {
         var tasks = new List<object>();
         
-        await RenderJsonAsync(tasks);
+        RenderJson(tasks);
     }
 
     private string GetTaskStyles()

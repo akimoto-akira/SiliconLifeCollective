@@ -21,7 +21,6 @@ namespace SiliconLife.Collective;
 public class Config
 {
     private static readonly Lazy<Config> _instance = new Lazy<Config>(() => new Config());
-    private const string ConfigFileName = "config.json";
     private ConfigDataBase _data;
     private readonly JsonSerializerOptions _jsonOptions;
 
@@ -59,52 +58,29 @@ public class Config
         };
     }
 
-    private string GetConfigFilePath()
-    {
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string configPath = Path.Combine(baseDir, ConfigFileName);
-
-        if (File.Exists(configPath))
-        {
-            return configPath;
-        }
-
-        return Path.Combine(Directory.GetCurrentDirectory(), ConfigFileName);
-    }
-
     /// <summary>
-    /// Loads configuration from file or creates default configuration
+    /// Gets the configuration file path from the configuration data
     /// </summary>
-    public void LoadOrCreateConfig()
+    /// <returns>The full path to the configuration file</returns>
+    public string GetConfigPath()
     {
-        string configPath = GetConfigFilePath();
-
-        if (File.Exists(configPath))
-        {
-            try
-            {
-                string json = File.ReadAllText(configPath);
-                ConfigDataBase? loadedData = JsonSerializer.Deserialize<ConfigDataBase>(json, _jsonOptions);
-                if (loadedData != null)
-                {
-                    _data = loadedData;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Config Load Error: {ex.Message}");
-            }
-        }
+        return _data.GetConfigPath();
     }
 
     /// <summary>
-    /// Saves current configuration to file
+    /// Loads configuration from file using the configuration data's LoadConfig method
+    /// </summary>
+    public void LoadConfig()
+    {
+        _data.LoadConfig();
+    }
+
+    /// <summary>
+    /// Saves current configuration to file using the configuration data's SaveConfig method
     /// </summary>
     public void SaveConfig()
     {
-        string json = JsonSerializer.Serialize(_data, _jsonOptions);
-        string configPath = GetConfigFilePath();
-        File.WriteAllText(configPath, json);
+        _data.SaveConfig();
     }
 
     /// <summary>
@@ -112,6 +88,6 @@ public class Config
     /// </summary>
     public void Reload()
     {
-        LoadOrCreateConfig();
+        LoadConfig();
     }
 }

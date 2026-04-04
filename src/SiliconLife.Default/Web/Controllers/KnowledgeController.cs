@@ -22,17 +22,17 @@ public class KnowledgeController : Controller
     {
     }
 
-    public override async Task HandleAsync()
+    public override void Handle()
     {
         var path = Request.Url?.AbsolutePath ?? "/knowledge";
         
         if (path == "/knowledge" || path == "/knowledge/index")
         {
-            await Index();
+            Index();
         }
         else if (path == "/api/knowledge/graph")
         {
-            await GetGraph();
+            GetGraph();
         }
         else
         {
@@ -41,7 +41,7 @@ public class KnowledgeController : Controller
         }
     }
 
-    private async Task Index()
+    private void Index()
     {
         var html = HtmlBuilder.Create()
             .DocType()
@@ -52,21 +52,26 @@ public class KnowledgeController : Controller
                 .Title("知识图谱 - Silicon Life Collective")
                 .Style(GetStyles())
                 .Script(GetScripts())
+            .EndBlock()
             .Body()
                 .Div()
                     .Class("container")
                     .Div()
                         .Class("header")
                         .H1("知识图谱可视化")
+                    .EndBlock()
                     .Div()
                         .Class("graph-container")
                         .Id("graph-container")
-                .Build();
+                    .EndBlock()
+                .EndBlock()
+            .EndBlock()
+            .Build();
 
-        await RenderHtmlAsync(html);
+        RenderHtml(html);
     }
 
-    private async Task GetGraph()
+    private void GetGraph()
     {
         var graph = new
         {
@@ -74,7 +79,7 @@ public class KnowledgeController : Controller
             edges = new[] { new { from = "1", to = "1" } }
         };
         
-        await RenderJsonAsync(graph);
+        RenderJson(graph);
     }
 
     private string GetStyles()

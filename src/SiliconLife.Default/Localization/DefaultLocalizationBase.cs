@@ -122,4 +122,111 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <param name="permissionType">The permission type</param>
     /// <returns>The localized display name</returns>
     public abstract string GetPermissionTypeName(PermissionType permissionType);
+
+    // ===== Init Page Localization =====
+
+    /// <summary>
+    /// Gets the page title for the initialization page
+    /// </summary>
+    public abstract string InitPageTitle { get; }
+
+    /// <summary>
+    /// Gets the description text displayed below the title on the init page
+    /// </summary>
+    public abstract string InitDescription { get; }
+
+    /// <summary>
+    /// Gets the label for the nickname field
+    /// </summary>
+    public abstract string InitNicknameLabel { get; }
+
+    /// <summary>
+    /// Gets the placeholder for the nickname input
+    /// </summary>
+    public abstract string InitNicknamePlaceholder { get; }
+
+    /// <summary>
+    /// Gets the label for the AI API endpoint field
+    /// </summary>
+    public abstract string InitEndpointLabel { get; }
+
+    /// <summary>
+    /// Gets the placeholder for the AI API endpoint input
+    /// </summary>
+    public abstract string InitEndpointPlaceholder { get; }
+
+    /// <summary>
+    /// Gets the label for the skin field
+    /// </summary>
+    public abstract string InitSkinLabel { get; }
+
+    /// <summary>
+    /// Gets the placeholder for the skin input
+    /// </summary>
+    public abstract string InitSkinPlaceholder { get; }
+
+    /// <summary>
+    /// Gets the label for the data directory field
+    /// </summary>
+    public abstract string InitDataDirectoryLabel { get; }
+
+    /// <summary>
+    /// Gets the placeholder text for the data directory input
+    /// </summary>
+    public abstract string InitDataDirectoryPlaceholder { get; }
+
+    /// <summary>
+    /// Gets the text for the browse folder button
+    /// </summary>
+    public abstract string InitDataDirectoryBrowse { get; }
+
+    /// <summary>
+    /// Gets the text shown after "already selected" on a skin card
+    /// </summary>
+    public abstract string InitSkinSelected { get; }
+
+    /// <summary>
+    /// Gets the preview section title
+    /// </summary>
+    public abstract string InitSkinPreviewTitle { get; }
+
+    /// <summary>
+    /// Gets the preview card title text
+    /// </summary>
+    public abstract string InitSkinPreviewCardTitle { get; }
+
+    /// <summary>
+    /// Gets the preview card content text
+    /// </summary>
+    public abstract string InitSkinPreviewCardContent { get; }
+
+    /// <summary>
+    /// Gets the preview primary button text
+    /// </summary>
+    public abstract string InitSkinPreviewPrimaryBtn { get; }
+
+    /// <summary>
+    /// Gets the preview secondary button text
+    /// </summary>
+    public abstract string InitSkinPreviewSecondaryBtn { get; }
+
+    /// <summary>
+    /// Gets the text for the submit button
+    /// </summary>
+    public abstract string InitSubmitButton { get; }
+
+    /// <summary>
+    /// Gets the footer hint text about modifying settings later
+    /// </summary>
+    public abstract string InitFooterHint { get; }
+
+    /// <summary>
+    /// Gets the validation error message when nickname is empty
+    /// </summary>
+    public abstract string InitNicknameRequiredError { get; }
+
+    /// <summary>
+    /// Gets the validation error message when data directory is empty
+    /// </summary>
+    public abstract string InitDataDirectoryRequiredError { get; }
 }

@@ -25,21 +25,21 @@ public class CodeBrowserController : Controller
         _codeBrowser = codeBrowser;
     }
 
-    public override async Task HandleAsync()
+    public override void Handle()
     {
         var path = Request.Url?.AbsolutePath ?? "/code";
         
         if (path == "/code" || path == "/code/index")
         {
-            await Index();
+            Index();
         }
         else if (path == "/api/code/types")
         {
-            await GetTypes();
+            GetTypes();
         }
         else if (path == "/api/code/detail")
         {
-            await GetDetail();
+            GetDetail();
         }
         else
         {
@@ -48,7 +48,7 @@ public class CodeBrowserController : Controller
         }
     }
 
-    private async Task Index()
+    private void Index()
     {
         var html = HtmlBuilder.Create()
             .DocType()
@@ -59,48 +59,55 @@ public class CodeBrowserController : Controller
                 .Title("代码浏览 - Silicon Life Collective")
                 .Style(GetStyles())
                 .Script(GetScripts())
+            .EndBlock()
             .Body()
                 .Div()
                     .Class("container")
                     .Div()
                         .Class("header")
                         .H1("代码浏览")
+                    .EndBlock()
                     .Div()
                         .Class("code-browser")
                         .Div()
                             .Class("types-list")
                             .Id("types-list")
+                        .EndBlock()
                         .Div()
                             .Class("type-detail")
                             .Id("type-detail")
-                .Build();
+                        .EndBlock()
+                    .EndBlock()
+                .EndBlock()
+            .EndBlock()
+            .Build();
 
-        await RenderHtmlAsync(html);
+        RenderHtml(html);
     }
 
-    private async Task GetTypes()
+    private void GetTypes()
     {
         var types = _codeBrowser.GetAllTypes();
-        await RenderJsonAsync(types);
+        RenderJson(types);
     }
 
-    private async Task GetDetail()
+    private void GetDetail()
     {
         var fullName = Request.QueryString["name"];
         if (string.IsNullOrEmpty(fullName))
         {
-            await RenderJsonAsync(new { error = "Name required" });
+            RenderJson(new { error = "Name required" });
             return;
         }
 
         var detail = _codeBrowser.GetType(fullName);
         if (detail == null)
         {
-            await RenderJsonAsync(new { error = "Type not found" });
+            RenderJson(new { error = "Type not found" });
             return;
         }
 
-        await RenderJsonAsync(detail);
+        RenderJson(detail);
     }
 
     private string GetStyles()

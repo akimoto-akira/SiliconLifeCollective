@@ -12,6 +12,7 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
+using System.Text.Json;
 
 namespace SiliconLife.Default;
 
@@ -76,4 +77,94 @@ public class DefaultConfigData : ConfigDataBase
     /// Gets or sets whether to allow intranet access (requires admin)
     /// </summary>
     public bool AllowIntranet { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets the web skin name
+    /// </summary>
+    public string WebSkin { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the nickname of the human user
+    /// </summary>
+    public override string UserNickname { get; set; } = "User";
+
+    private string GetConfigFilePath()
+    {
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string configPath = Path.Combine(baseDir, "config.json");
+
+        if (File.Exists(configPath))
+        {
+            return configPath;
+        }
+
+        return Path.Combine(Directory.GetCurrentDirectory(), "config.json");
+    }
+
+    public override string GetConfigPath()
+    {
+        return GetConfigFilePath();
+    }
+
+    public override void LoadConfig()
+    {
+        string configPath = GetConfigFilePath();
+
+        if (File.Exists(configPath))
+        {
+            try
+            {
+                string json = File.ReadAllText(configPath);
+                DefaultConfigData? loadedData = JsonSerializer.Deserialize<DefaultConfigData>(json, new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    Converters = 
+                    { 
+                        new System.Text.Json.Serialization.JsonStringEnumConverter(),
+                        new GuidConverter(),
+                        new ConfigDataBaseConverter()
+                    }
+                });
+                if (loadedData != null)
+                {
+                    ConfigType = loadedData.ConfigType;
+                    DataDirectory = loadedData.DataDirectory;
+                    CuratorGuid = loadedData.CuratorGuid;
+                    Language = loadedData.Language;
+                    TickTimeout = loadedData.TickTimeout;
+                    MaxTimeoutCount = loadedData.MaxTimeoutCount;
+                    WatchdogTimeout = loadedData.WatchdogTimeout;
+                    OllamaEndpoint = loadedData.OllamaEndpoint;
+                    DefaultModel = loadedData.DefaultModel;
+                    StaticFilesPath = loadedData.StaticFilesPath;
+                    WebPort = loadedData.WebPort;
+                    AllowIntranet = loadedData.AllowIntranet;
+                    WebSkin = loadedData.WebSkin;
+                    UserNickname = loadedData.UserNickname;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Config Load Error: {ex.Message}");
+            }
+        }
+    }
+
+    public override void SaveConfig()
+    {
+        string json = JsonSerializer.Serialize(this, new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters = 
+            { 
+                new System.Text.Json.Serialization.JsonStringEnumConverter(),
+                new GuidConverter(),
+                new ConfigDataBaseConverter()
+            }
+        });
+        string configPath = GetConfigFilePath();
+        File.WriteAllText(configPath, json);
+    }
 }

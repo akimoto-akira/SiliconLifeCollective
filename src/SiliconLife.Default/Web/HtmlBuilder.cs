@@ -119,8 +119,7 @@ public class HtmlBuilder
 
     public HtmlBuilder Div()
     {
-        AddChild("div");
-        return this;
+        return AddChild("div");
     }
 
     public HtmlBuilder Div(string? text)
@@ -235,7 +234,7 @@ public class HtmlBuilder
         form.AddAttr("method", method);
         if (!string.IsNullOrEmpty(action))
             form.AddAttr("action", action);
-        return this;
+        return form;
     }
 
     public HtmlBuilder Input(string? name = null, string type = "text", string? value = null)
@@ -777,7 +776,7 @@ public class HtmlBuilder
     {
         var child = new HtmlBuilder(this, tagName, isSelfClosing);
         _children.Add(child);
-        return this;
+        return child;
     }
 
     public HtmlBuilder Child()

@@ -22,17 +22,17 @@ public class PermissionController : Controller
     {
     }
 
-    public override async Task HandleAsync()
+    public override void Handle()
     {
         var path = Request.Url?.AbsolutePath ?? "/permissions";
         
         if (path == "/permissions" || path == "/permissions/index")
         {
-            await Index();
+            Index();
         }
         else if (path == "/api/permissions/list")
         {
-            await GetList();
+            GetList();
         }
         else
         {
@@ -41,7 +41,7 @@ public class PermissionController : Controller
         }
     }
 
-    private async Task Index()
+    private void Index()
     {
         var html = HtmlBuilder.Create()
             .DocType()
@@ -52,25 +52,30 @@ public class PermissionController : Controller
                 .Title("权限管理 - Silicon Life Collective")
                 .Style(GetStyles())
                 .Script(GetScripts())
+            .EndBlock()
             .Body()
                 .Div()
                     .Class("container")
                     .Div()
                         .Class("header")
                         .H1("权限管理")
+                    .EndBlock()
                     .Div()
                         .Class("permissions-list")
                         .Id("permissions-list")
-                .Build();
+                    .EndBlock()
+                .EndBlock()
+            .EndBlock()
+            .Build();
 
-        await RenderHtmlAsync(html);
+        RenderHtml(html);
     }
 
-    private async Task GetList()
+    private void GetList()
     {
         var permissions = new List<object>();
         
-        await RenderJsonAsync(permissions);
+        RenderJson(permissions);
     }
 
     private string GetStyles()

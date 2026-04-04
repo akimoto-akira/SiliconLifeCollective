@@ -150,4 +150,28 @@ public class ZhCN : DefaultLocalizationBase
     {
         return $"记忆压缩：{levelDesc}。时间范围：{rangeDesc}。\n\n记忆内容：\n{contentText}";
     }
+
+    // ===== Init Page Localization =====
+
+    public override string InitPageTitle => "初始化";
+    public override string InitDescription => "首次使用，请完成基本配置";
+    public override string InitNicknameLabel => "用户昵称";
+    public override string InitNicknamePlaceholder => "请输入你的昵称";
+    public override string InitEndpointLabel => "AI API 端点";
+    public override string InitEndpointPlaceholder => "例如: http://localhost:11434";
+    public override string InitSkinLabel => "皮肤";
+    public override string InitSkinPlaceholder => "留空使用默认皮肤";
+    public override string InitDataDirectoryLabel => "数据目录";
+    public override string InitDataDirectoryPlaceholder => "例如: ./data";
+    public override string InitDataDirectoryBrowse => "浏览...";
+    public override string InitSkinSelected => "\u2713 已选择";
+    public override string InitSkinPreviewTitle => "预览效果";
+    public override string InitSkinPreviewCardTitle => "卡片标题";
+    public override string InitSkinPreviewCardContent => "这是一个示例卡片，展示了该皮肤风格下的UI效果。";
+    public override string InitSkinPreviewPrimaryBtn => "主要按钮";
+    public override string InitSkinPreviewSecondaryBtn => "次要按钮";
+    public override string InitSubmitButton => "完成初始化";
+    public override string InitFooterHint => "配置完成后可随时在设置页面修改";
+    public override string InitNicknameRequiredError => "请输入用户昵称";
+    public override string InitDataDirectoryRequiredError => "请选择数据目录";
 }
