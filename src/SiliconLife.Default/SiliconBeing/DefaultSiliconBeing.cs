@@ -23,7 +23,6 @@ namespace SiliconLife.Default;
 public class DefaultSiliconBeing : SiliconBeingBase
 {
     private volatile bool _isProcessing;
-    private volatile bool _awaitingContinuation;
 
     /// <summary>
     /// Gets the data directory path for this silicon being
@@ -33,7 +32,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
     /// <summary>
     /// Gets whether this silicon being is idle (no pending tasks and not thinking).
     /// </summary>
-    public override bool IsIdle => !_isProcessing && !_awaitingContinuation;
+    public override bool IsIdle => !_isProcessing;
 
     /// <summary>
     /// Initializes a new instance of the DefaultSiliconBeing class
@@ -44,7 +43,6 @@ public class DefaultSiliconBeing : SiliconBeingBase
         : base(id, name)
     {
         _isProcessing = false;
-        _awaitingContinuation = false;
     }
 
     /// <summary>
@@ -107,40 +105,49 @@ public class DefaultSiliconBeing : SiliconBeingBase
         _isProcessing = true;
         try
         {
-            if (_awaitingContinuation || ContextManager.NeedsContinuation(this))
+            var partnerIds = BuildPartnerList();
+
+            // Check continuation across all sessions (highest priority)
+            foreach (var partnerId in partnerIds)
             {
-                ExecuteBrain("ThinkContinuation", brain => brain.ThinkOnChat());
-                return;
+                if (ContextManager.NeedsContinuation(this, partnerId))
+                {
+                    ExecuteBrain("ThinkContinuation", partnerId, brain => brain.ThinkOnChat());
+                    return;
+                }
             }
 
-            ContextManager brain = new ContextManager(this);
-            if (brain.HasWork)
+            // Check for pending messages from any partner
+            foreach (var partnerId in partnerIds)
             {
-                ExecuteBrain("ThinkOnChat", _ => brain.ThinkOnChat());
-                return;
+                ContextManager brain = new ContextManager(this, partnerId);
+                if (brain.HasWork)
+                {
+                    ExecuteBrain("ThinkOnChat", partnerId, _ => brain.ThinkOnChat());
+                    return;
+                }
             }
 
             if (TimerSystem != null && TimerSystem.HasPendingTimers())
             {
-                ExecuteBrain("ThinkOnTimer", _ => brain.ThinkOnTimer());
+                ExecuteBrain("ThinkOnTimer", Guid.Empty, _ => new ContextManager(this, Guid.Empty).ThinkOnTimer());
                 return;
             }
 
             if (TaskSystem != null && TaskSystem.HasPendingTasks())
             {
-                ExecuteBrain("ThinkOnTask", _ => brain.ThinkOnTask());
+                ExecuteBrain("ThinkOnTask", Guid.Empty, _ => new ContextManager(this, Guid.Empty).ThinkOnTask());
                 return;
             }
 
             if (Memory != null && Memory.ShouldCompress())
             {
-                ExecuteBrain("ThinkOnMemoryCompress", _ => brain.ThinkOnMemoryCompress());
+                ExecuteBrain("ThinkOnMemoryCompress", Guid.Empty, _ => new ContextManager(this, Guid.Empty).ThinkOnMemoryCompress());
                 return;
             }
         }
         catch (Exception ex)
         {
-            _awaitingContinuation = false;
             Language language = Config.Instance.Data.Language;
             DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(language);
 
@@ -154,31 +161,55 @@ public class DefaultSiliconBeing : SiliconBeingBase
     }
 
     /// <summary>
+    /// Builds the list of potential conversation partners:
+    /// the project user ID + all other silicon being IDs (excluding self).
+    /// </summary>
+    private List<Guid> BuildPartnerList()
+    {
+        var partners = new List<Guid>();
+
+        Guid userId = Config.Instance.Data.UserGuid;
+        if (userId != Guid.Empty)
+        {
+            partners.Add(userId);
+        }
+
+        SiliconBeingManager? beingManager = ServiceLocator.Instance.BeingManager;
+        if (beingManager != null)
+        {
+            foreach (var other in beingManager.GetAllBeings())
+            {
+                if (other.Id != Id)
+                {
+                    partners.Add(other.Id);
+                }
+            }
+        }
+
+        return partners;
+    }
+
+    /// <summary>
     /// Executes a brain function with logging and continuation tracking.
     /// </summary>
-    private void ExecuteBrain(string sceneName, Func<ContextManager, AIResponse> thinkFunc)
+    private void ExecuteBrain(string sceneName, Guid partnerId, Func<ContextManager, AIResponse> thinkFunc)
     {
         Language language = Config.Instance.Data.Language;
         DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(language);
 
         Console.WriteLine($"{Name}: {localization.ThinkingMessage}");
 
-        ContextManager brain = new ContextManager(this);
+        ContextManager brain = new ContextManager(this, partnerId);
         AIResponse response = thinkFunc(brain);
 
         if (response.Success && response.HasToolCalls)
         {
-            _awaitingContinuation = true;
             Console.WriteLine($"{Name}: {localization.ToolCallMessage}");
         }
-        else
+        else if (!response.Success)
         {
-            _awaitingContinuation = false;
-            if (!response.Success)
-            {
-                Console.WriteLine($"{Name}: {localization.ErrorMessage} {response.ErrorMessage}");
-                Console.WriteLine();
-            }
+            Console.WriteLine($"{Name}: {localization.ErrorMessage} {response.ErrorMessage}");
+            Console.WriteLine();
         }
     }
 }

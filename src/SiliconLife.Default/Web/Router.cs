@@ -16,7 +16,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SiliconLife.Collective;
-using SiliconLife.Default.IM;
 
 namespace SiliconLife.Default.Web;
 
@@ -37,25 +36,34 @@ public class Router
         InitializeMimeTypes();
     }
 
-    public void RegisterControllers(SiliconBeingManager beingManager, ChatSystem chatSystem, Guid userId, Func<Guid, TaskCompletionSource<AskPermissionResult>> getPermissionTcs, WebCodeBrowser codeBrowser, DefaultConfigData configData, DefaultLocalizationBase localization, SkinManager skinManager, Action<string>? onFirstInit = null)
+    public void RegisterControllers()
     {
-        _onFirstInit = onFirstInit;
-        RegisterController(() => new DashboardController(beingManager, chatSystem, skinManager), "/dashboard");
-        RegisterController(() => new ChatController(beingManager, chatSystem, skinManager, userId), "/chat");
-        RegisterController(() => new BeingController(beingManager, skinManager), "/beings");
-        RegisterController(() => new TaskController(skinManager), "/tasks");
-        RegisterController(() => new PermissionController(skinManager), "/permissions");
-        RegisterController(() => new LogController(skinManager), "/logs");
-        RegisterController(() => new ConfigController(skinManager), "/config");
-        RegisterController(() => new MemoryController(skinManager), "/memory");
-        RegisterController(() => new KnowledgeController(skinManager), "/knowledge");
-        RegisterController(() => new ProjectController(skinManager), "/project");
-        RegisterController(() => new ExecutorController(skinManager), "/executor");
-        RegisterController(() => new CodeBrowserController(codeBrowser, skinManager), "/code");
-        RegisterController(() => new PermissionRequestController(getPermissionTcs), "/permission-request");
-        RegisterController(() => new InitController(configData, localization, skinManager, OnInitialized), "/init", "GET");
-        RegisterController(() => new InitController(configData, localization, skinManager, OnInitialized), "/init", "POST");
-        RegisterController(() => new InitController(configData, localization, skinManager, OnInitialized), "/init/browse", "GET");
+        RegisterController(() => new DashboardController(), "/dashboard");
+        RegisterController(() => new ChatController(), "/chat");
+        RegisterController(() => new ChatController(), "/api/chat/conversations");
+        RegisterController(() => new ChatController(), "/api/chat/messages");
+        RegisterController(() => new ChatController(), "/api/chat/history");
+        RegisterController(() => new ChatController(), "/api/chat/send", "POST");
+        RegisterController(() => new BeingController(), "/beings");
+        RegisterController(() => new TaskController(), "/tasks");
+        RegisterController(() => new PermissionController(), "/permissions");
+        RegisterController(() => new LogController(), "/logs");
+        RegisterController(() => new ConfigController(), "/config");
+        RegisterController(() => new MemoryController(), "/memory");
+        RegisterController(() => new KnowledgeController(), "/knowledge");
+        RegisterController(() => new ProjectController(), "/project");
+        RegisterController(() => new ExecutorController(), "/executor");
+        RegisterController(() => new CodeBrowserController(), "/code");
+        RegisterController(() => new PermissionRequestController(), "/permission-request");
+        RegisterController(() => new InitController(), "/init", "GET");
+        RegisterController(() => new InitController(), "/init", "POST");
+        RegisterController(() => new InitController(), "/init/browse", "GET");
+    }
+
+    /// <summary>Sets the callback invoked when first-run initialization completes.</summary>
+    public void SetOnFirstInit(Action<string>? callback)
+    {
+        _onFirstInit = callback;
     }
 
     private static readonly HashSet<string> StaticExtensions = new(StringComparer.OrdinalIgnoreCase)
@@ -102,7 +110,7 @@ public class Router
         _isInitialized = initialized;
     }
 
-    private void OnInitialized(string curatorName)
+    public void NotifyInitialized(string curatorName)
     {
         _onFirstInit?.Invoke(curatorName);
         SetInitialized(true);

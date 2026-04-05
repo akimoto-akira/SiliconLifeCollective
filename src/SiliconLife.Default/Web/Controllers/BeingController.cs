@@ -19,10 +19,11 @@ public class BeingController : Controller
     private readonly SiliconBeingManager _beingManager;
     private readonly SkinManager _skinManager;
 
-    public BeingController(SiliconBeingManager beingManager, SkinManager skinManager)
+    public BeingController()
     {
-        _beingManager = beingManager;
-        _skinManager = skinManager;
+        var locator = ServiceLocator.Instance;
+        _beingManager = locator.BeingManager!;
+        _skinManager = locator.GetService<SkinManager>()!;
     }
 
     public override void Handle()
@@ -58,7 +59,6 @@ public class BeingController : Controller
         {
             id = b.Id.ToString(),
             name = b.Name,
-            userId = b.UserId.ToString(),
             isIdle = b.IsIdle,
             isCustomCompiled = b.IsCustomCompiled,
             customTypeName = b.CustomTypeName ?? ""
@@ -87,7 +87,6 @@ public class BeingController : Controller
         {
             id = being.Id.ToString(),
             name = being.Name,
-            userId = being.UserId.ToString(),
             isIdle = being.IsIdle,
             isCustomCompiled = being.IsCustomCompiled,
             customTypeName = being.CustomTypeName ?? "",

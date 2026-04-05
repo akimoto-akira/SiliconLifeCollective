@@ -9,6 +9,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using SiliconLife.Collective;
+
 namespace SiliconLife.Default.Web;
 
 [WebCode]
@@ -16,9 +18,9 @@ public class MemoryController : Controller
 {
     private readonly SkinManager _skinManager;
 
-    public MemoryController(SkinManager skinManager)
+    public MemoryController()
     {
-        _skinManager = skinManager;
+        _skinManager = ServiceLocator.Instance.GetService<SkinManager>()!;
     }
 
     public override void Handle()

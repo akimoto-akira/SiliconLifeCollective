@@ -165,7 +165,7 @@ public class CreativeSkin : ISkin
     {
         return H.Div(
             H.Div(title).Class("card-header"),
-            H.Div(H.Raw(content)).Class("card-body")
+            H.Div(content).Class("card-body")
         ).Class("card");
     }
 
@@ -215,7 +215,7 @@ public class CreativeSkin : ISkin
         var innerChildren = new List<object> { title };
         if (!string.IsNullOrEmpty(subtitle))
         {
-            innerChildren.Add(H.Raw($"<div style=\"font-size: 12px; color: var(--text-secondary);\">{subtitle}</div>"));
+            innerChildren.Add(H.Div(subtitle).Style("font-size: 12px; color: var(--text-secondary);"));
         }
         children.Add(H.Div(innerChildren));
 
@@ -246,7 +246,7 @@ public class CreativeSkin : ISkin
         var isFirst = true;
         foreach (var item in items)
         {
-            if (!isFirst) children.Add(H.Raw(" / "));
+            if (!isFirst) children.Add(H.Text(" / "));
             children.Add(H.Span(item));
             isFirst = false;
         }
@@ -267,7 +267,7 @@ public class CreativeSkin : ISkin
             var cells = new List<object>();
             foreach (var cell in row)
             {
-                cells.Add(H.Td(H.Raw(cell)));
+                cells.Add(H.Td(cell));
             }
             bodyRows.Add(H.Tr(cells));
         }
@@ -323,7 +323,7 @@ public class CreativeSkin : ISkin
 
     public H RenderQuote(string text)
     {
-        return H.Div(H.Raw($"\"{text}\"")).Class("quote");
+        return H.Div(H.Text($"\"{text}\"")).Class("quote");
     }
 
     public H RenderInspirationCard(string icon, string text)

@@ -29,6 +29,7 @@ public class ContextManager
 {
     private readonly IAIClient _aiClient;
     private readonly SiliconBeingBase _being;
+    private readonly Guid _partnerId;
 
     private readonly List<Message> _messages;
     private readonly HashSet<Guid> _contextMessageIds;
@@ -48,16 +49,18 @@ public class ContextManager
     /// left off mid-tool-call (continuation needed).
     /// </summary>
     /// <param name="being">The silicon being that owns this context</param>
+    /// <param name="partnerId">The conversation partner's ID</param>
     /// <exception cref="ArgumentNullException">Thrown when being or its AIClient is null</exception>
-    public ContextManager(SiliconBeingBase being)
+    public ContextManager(SiliconBeingBase being, Guid partnerId)
     {
         _being = being ?? throw new ArgumentNullException(nameof(being));
         _aiClient = being.AIClient ?? throw new ArgumentNullException(nameof(being.AIClient));
+        _partnerId = partnerId;
         _messages = new List<Message>();
         _contextMessageIds = new HashSet<Guid>();
 
         ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
-        if (chatSystem != null && _being.Id != Guid.Empty && _being.UserId != Guid.Empty)
+        if (chatSystem != null && _being.Id != Guid.Empty && _partnerId != Guid.Empty)
         {
             LoadHistoryMessages();
             FetchUnreadMessages();
@@ -73,12 +76,12 @@ public class ContextManager
     private void LoadHistoryMessages()
     {
         ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
-        if (chatSystem == null || _being.Id == Guid.Empty || _being.UserId == Guid.Empty)
+        if (chatSystem == null || _being.Id == Guid.Empty || _partnerId == Guid.Empty)
         {
             return;
         }
 
-        List<ChatMessage> history = chatSystem.GetMessages(_being.UserId, _being.Id);
+        List<ChatMessage> history = chatSystem.GetMessages(_partnerId, _being.Id);
         foreach (ChatMessage msg in history)
         {
             AddMessageToContext(msg);
@@ -104,20 +107,21 @@ public class ContextManager
     }
 
     /// <summary>
-    /// Checks if a being needs tool call continuation (for the body to detect before creating brain).
-    /// Looks at the last message in ChatSystem history.
+    /// Checks if a being needs tool call continuation with a specific partner.
+    /// Looks at the last message in ChatSystem history for that session.
     /// </summary>
     /// <param name="being">The silicon being to check</param>
+    /// <param name="partnerId">The conversation partner's ID</param>
     /// <returns>True if the last history message is a Tool result</returns>
-    public static bool NeedsContinuation(SiliconBeingBase being)
+    public static bool NeedsContinuation(SiliconBeingBase being, Guid partnerId)
     {
         ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
-        if (chatSystem == null || being.Id == Guid.Empty || being.UserId == Guid.Empty)
+        if (chatSystem == null || being.Id == Guid.Empty || partnerId == Guid.Empty)
         {
             return false;
         }
 
-        List<ChatMessage> history = chatSystem.GetMessages(being.UserId, being.Id);
+        List<ChatMessage> history = chatSystem.GetMessages(partnerId, being.Id);
         if (history.Count == 0)
         {
             return false;
@@ -164,7 +168,7 @@ public class ContextManager
         else
         {
             // Legacy behavior: infer role from SenderId
-            if (msg.SenderId == _being.UserId)
+            if (msg.SenderId == _partnerId)
             {
                 _messages.Add(new Message(MessageRole.User, msg.Content));
             }
@@ -209,9 +213,9 @@ public class ContextManager
         _messages.Add(new Message(MessageRole.Assistant, content));
 
         ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
-        if (chatSystem != null && _being.Id != Guid.Empty && _being.UserId != Guid.Empty)
+        if (chatSystem != null && _being.Id != Guid.Empty && _partnerId != Guid.Empty)
         {
-            chatSystem.AddMessage(_being.Id, _being.UserId, content);
+            chatSystem.AddMessage(_being.Id, _partnerId, content);
         }
     }
 
@@ -502,7 +506,7 @@ public class ContextManager
         IMManager? imManager = ServiceLocator.Instance.IMManager;
         if (imManager != null)
         {
-            _ = imManager.SendMessageAsync(_being.Id, _being.UserId, $"{_being.Name}: {content}");
+            _ = imManager.SendMessageAsync(_being.Id, _partnerId, $"{_being.Name}: {content}");
         }
         else
         {
@@ -533,7 +537,7 @@ public class ContextManager
     private void PersistToolRoundToChatSystem()
     {
         ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
-        if (chatSystem == null || _being.Id == Guid.Empty || _being.UserId == Guid.Empty)
+        if (chatSystem == null || _being.Id == Guid.Empty || _partnerId == Guid.Empty)
         {
             return;
         }
@@ -560,7 +564,7 @@ public class ContextManager
             Message msg = _messages[i];
             if (msg.Role == MessageRole.Assistant)
             {
-                ChatMessage chatMsg = new(_being.Id, _being.UserId, msg.Content)
+                ChatMessage chatMsg = new(_being.Id, _partnerId, msg.Content)
                 {
                     Role = MessageRole.Assistant,
                     Thinking = msg.Thinking,
@@ -573,7 +577,7 @@ public class ContextManager
             }
             else if (msg.Role == MessageRole.Tool)
             {
-                ChatMessage chatMsg = new(_being.Id, _being.UserId, msg.Content)
+                ChatMessage chatMsg = new(_being.Id, _partnerId, msg.Content)
                 {
                     Role = MessageRole.Tool,
                     ToolCallId = msg.ToolCallId,

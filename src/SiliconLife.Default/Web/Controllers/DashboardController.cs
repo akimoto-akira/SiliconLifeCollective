@@ -21,11 +21,12 @@ public class DashboardController : Controller
     private readonly ChatSystem _chatSystem;
     private readonly SkinManager _skinManager;
 
-    public DashboardController(SiliconBeingManager beingManager, ChatSystem chatSystem, SkinManager skinManager)
+    public DashboardController()
     {
-        _beingManager = beingManager;
-        _chatSystem = chatSystem;
-        _skinManager = skinManager;
+        var locator = ServiceLocator.Instance;
+        _beingManager = locator.BeingManager!;
+        _chatSystem = locator.ChatSystem!;
+        _skinManager = locator.GetService<SkinManager>()!;
     }
 
     public override void Handle()

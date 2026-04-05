@@ -18,9 +18,9 @@ public class ConfigController : Controller
 {
     private readonly SkinManager _skinManager;
 
-    public ConfigController(SkinManager skinManager)
+    public ConfigController()
     {
-        _skinManager = skinManager;
+        _skinManager = ServiceLocator.Instance.GetService<SkinManager>()!;
     }
 
     public override void Handle()

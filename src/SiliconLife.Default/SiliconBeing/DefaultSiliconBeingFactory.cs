@@ -25,7 +25,6 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     private readonly IStorage _storage;
     private readonly ITimeStorage _timeStorage;
     private readonly string _dataDirectory;
-    private readonly Guid _userId;
     private readonly IPermissionCallback? _permissionCallback;
     private readonly IPermissionAskHandler? _askHandler;
 
@@ -40,20 +39,7 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         IStorage storage,
         ITimeStorage timeStorage,
         string dataDirectory)
-        : this(aiClient, storage, timeStorage, dataDirectory, Guid.Empty, null, null)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the DefaultSiliconBeingFactory class with user ID
-    /// </summary>
-    public DefaultSiliconBeingFactory(
-        IAIClient aiClient,
-        IStorage storage,
-        ITimeStorage timeStorage,
-        string dataDirectory,
-        Guid userId)
-        : this(aiClient, storage, timeStorage, dataDirectory, userId, null, null)
+        : this(aiClient, storage, timeStorage, dataDirectory, null, null)
     {
     }
 
@@ -65,7 +51,6 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         IStorage storage,
         ITimeStorage timeStorage,
         string dataDirectory,
-        Guid userId,
         IPermissionCallback? permissionCallback,
         IPermissionAskHandler? askHandler)
     {
@@ -73,7 +58,6 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         _storage = storage;
         _timeStorage = timeStorage;
         _dataDirectory = dataDirectory;
-        _userId = userId;
         _permissionCallback = permissionCallback;
         _askHandler = askHandler;
     }
@@ -145,7 +129,6 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         being.BeingDirectory = beingDirectory;
         being.AIClient = _aiClient;
         being.SoulContent = soulContent;
-        being.UserId = _userId;
 
         // Load or save state — the being manages its own data
         if (!being.LoadState() && !string.IsNullOrEmpty(name))

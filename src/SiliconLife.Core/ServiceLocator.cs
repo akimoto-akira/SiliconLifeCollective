@@ -50,6 +50,9 @@ public class ServiceLocator
     /// <summary>Gets the registered <see cref="DynamicBeingLoader"/>, or <c>null</c>.</summary>
     public DynamicBeingLoader? DynamicBeingLoader => Get<DynamicBeingLoader>();
 
+    /// <summary>Gets the registered <typeparamref name="T"/> service, or <c>null</c>.</summary>
+    public T? GetService<T>() where T : class => Get<T>();
+
     /// <summary>
     /// Registers a service instance under its concrete type.
     /// </summary>

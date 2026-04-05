@@ -19,7 +19,7 @@ public class JsBuilder
 {
     private readonly StringBuilder _sb = new();
     internal int _indentLevel = 0;
-    private readonly Stack<string> _blockStack = new();
+    internal readonly Stack<string> _blockStack = new();
 
     public static JsBuilder Create() => new();
 
@@ -118,6 +118,68 @@ public class JsBuilder
         return this;
     }
 
+    public JsBuilder Assign(string target, string value)
+    {
+        Indent();
+        _sb.AppendLine($"{target} = {value};");
+        return this;
+    }
+
+    public JsBuilder AppendAssign(string target, string value)
+    {
+        Indent();
+        _sb.AppendLine($"{target} += {value};");
+        return this;
+    }
+
+    public JsBuilder ConsoleError(params string[] args)
+    {
+        Indent();
+        _sb.Append("console.error(");
+        _sb.Append(string.Join(", ", args));
+        _sb.AppendLine(");");
+        return this;
+    }
+
+    public JsBuilder On(string target, string eventName, string param, Action<JsBuilder> body)
+    {
+        Indent();
+        _sb.AppendLine($"{target}.addEventListener('{eventName}', {param} => {{");
+        _blockStack.Push("callback");
+        _indentLevel++;
+        body(this);
+        return this;
+    }
+
+    public JsBuilder ForEach(string iterable, string item, Action<JsBuilder> body)
+    {
+        Indent();
+        _sb.AppendLine($"{iterable}.forEach({item} => {{");
+        _blockStack.Push("callback");
+        _indentLevel++;
+        body(this);
+        return this;
+    }
+
+    public JsBuilder ForEachExpr(string iterable, string item, string body)
+    {
+        Indent();
+        _sb.AppendLine($"{iterable}.forEach({item} => {body});");
+        return this;
+    }
+
+    public JsBuilder Fetch(string url, string? options = null, Action<PromiseChain>? chain = null)
+    {
+        Indent();
+        _sb.Append($"fetch({url}");
+        if (!string.IsNullOrEmpty(options))
+            _sb.Append($", {options}");
+        _sb.AppendLine(")");
+        if (chain != null)
+            chain(new PromiseChain(this, _sb));
+        return this;
+    }
+
     public JsBuilder If(string condition)
     {
         Indent();
@@ -132,9 +194,8 @@ public class JsBuilder
     {
         _indentLevel--;
         Indent();
-        _sb.Append($"else if ({condition}) {{");
-        _sb.AppendLine();
-        _blockStack.Push("if");
+        _sb.Append("} ");
+        _sb.AppendLine($"else if ({condition}) {{");
         _indentLevel++;
         return this;
     }
@@ -143,7 +204,10 @@ public class JsBuilder
     {
         _indentLevel--;
         Indent();
+        _sb.Append("} ");
         _sb.AppendLine("else {");
+        if (_blockStack.Count > 0)
+            _blockStack.Pop();
         _blockStack.Push("else");
         _indentLevel++;
         return this;
@@ -442,13 +506,6 @@ public class JsBuilder
         return this;
     }
 
-    public JsBuilder Raw(string code)
-    {
-        Indent();
-        _sb.AppendLine(code);
-        return this;
-    }
-
     public JsBuilder EndBlock()
     {
         if (_blockStack.Count > 0)
@@ -456,16 +513,7 @@ public class JsBuilder
             var blockType = _blockStack.Pop();
             _indentLevel--;
             Indent();
-            _sb.AppendLine("}");
-        }
-        return this;
-    }
-
-    public JsBuilder EndAllBlocks()
-    {
-        while (_blockStack.Count > 0)
-        {
-            EndBlock();
+            _sb.AppendLine(blockType is "callback" ? "});" : "}");
         }
         return this;
     }
@@ -518,6 +566,8 @@ public class FunctionBuilder
     {
         _sb.Append(") {");
         _sb.AppendLine();
+        _parent._blockStack.Push("function");
+        _parent._indentLevel++;
         return _parent;
     }
 }
@@ -614,5 +664,66 @@ public class JsModuleBuilder
         }
         
         return sb.ToString();
+    }
+}
+
+public class PromiseChain
+{
+    private readonly JsBuilder _js;
+    private readonly StringBuilder _sb;
+    private readonly int _baseIndent;
+
+    internal PromiseChain(JsBuilder js, StringBuilder sb)
+    {
+        _js = js;
+        _sb = sb;
+        _baseIndent = js._indentLevel;
+    }
+
+    private void WriteChainIndent()
+    {
+        _sb.Append(new string(' ', _js._indentLevel * 4));
+    }
+
+    public PromiseChain Then(string param, Action<JsBuilder> body)
+    {
+        _js._indentLevel = _baseIndent;
+        WriteChainIndent();
+        _sb.AppendLine($".then({param} => {{");
+        _js._indentLevel++;
+        body(_js);
+        _js._indentLevel--;
+        WriteChainIndent();
+        _sb.AppendLine("})");
+        return this;
+    }
+
+    public PromiseChain ThenReturn(string param, string expression)
+    {
+        _js._indentLevel = _baseIndent;
+        WriteChainIndent();
+        _sb.AppendLine($".then({param} => {expression})");
+        return this;
+    }
+
+    public PromiseChain Catch(string param, Action<JsBuilder> body)
+    {
+        _js._indentLevel = _baseIndent;
+        WriteChainIndent();
+        _sb.AppendLine($".catch({param} => {{");
+        _js._indentLevel++;
+        body(_js);
+        _js._indentLevel--;
+        WriteChainIndent();
+        _sb.AppendLine("})");
+        return this;
+    }
+
+    public PromiseChain CatchLog(string param, string message)
+    {
+        _js._indentLevel = _baseIndent;
+        WriteChainIndent();
+        _sb.AppendLine($".catch({param} => console.error({message}, {param}))");
+        return this;
     }
 }

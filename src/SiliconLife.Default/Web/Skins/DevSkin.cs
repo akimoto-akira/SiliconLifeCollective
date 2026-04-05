@@ -160,8 +160,8 @@ public class DevSkin : ISkin
     public H RenderCard(string title, string content)
     {
         return H.Div(
-            H.Div(H.Raw($"// {title}")).Class("card-header"),
-            H.Div(H.Raw(content)).Class("card-body")
+            H.Div(H.Text($"// {title}")).Class("card-header"),
+            H.Div(content).Class("card-body")
         ).Class("card");
     }
 
@@ -239,7 +239,7 @@ public class DevSkin : ISkin
         var isFirst = true;
         foreach (var item in items)
         {
-            if (!isFirst) children.Add(H.Raw(" / "));
+            if (!isFirst) children.Add(H.Text(" / "));
             children.Add(H.Span(item));
             isFirst = false;
         }
@@ -260,7 +260,7 @@ public class DevSkin : ISkin
             var cells = new List<object>();
             foreach (var cell in row)
             {
-                cells.Add(H.Td(H.Raw(cell)));
+                cells.Add(H.Td(cell));
             }
             bodyRows.Add(H.Tr(cells));
         }

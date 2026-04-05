@@ -39,11 +39,6 @@ public abstract class SiliconBeingBase
     public string? SoulContent { get; set; }
 
     /// <summary>
-    /// Gets or sets the user ID associated with this silicon being
-    /// </summary>
-    public Guid UserId { get; set; }
-
-    /// <summary>
     /// Gets or sets the tool manager for this silicon being.
     /// Each being holds its own ToolManager instance.
     /// </summary>

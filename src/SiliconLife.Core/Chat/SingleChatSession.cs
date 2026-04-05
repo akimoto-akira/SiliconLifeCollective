@@ -78,6 +78,10 @@ public class SingleChatSession : ISession
     {
         lock (_lock)
         {
+            // Early exit: if no data exists for this session key, skip the year loop
+            if (!_storage.Exists(_storageKey))
+                return [];
+
             List<ChatMessage> allMessages = new();
             int year = DateTime.UtcNow.Year;
 

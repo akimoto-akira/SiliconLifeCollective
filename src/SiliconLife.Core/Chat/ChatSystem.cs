@@ -105,6 +105,18 @@ public class ChatSystem
     }
 
     /// <summary>
+    /// Get any session (single or group) by its unique ID.
+    /// Returns null if not found.
+    /// </summary>
+    public ISession? GetSession(Guid sessionId)
+    {
+        lock (_lock)
+        {
+            return _sessions.TryGetValue(sessionId, out var session) ? session : null;
+        }
+    }
+
+    /// <summary>
     /// Retrieve a group chat session by its group ID.
     /// Returns null if not found or if the session is not a group session.
     /// </summary>

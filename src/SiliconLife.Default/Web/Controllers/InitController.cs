@@ -20,14 +20,14 @@ public class InitController : Controller
     private readonly DefaultConfigData _configData;
     private DefaultLocalizationBase _localization;
     private readonly SkinManager _skinManager;
-    private readonly Action<string> _onInitialized;
+    private readonly Router _router;
 
-    public InitController(DefaultConfigData configData, DefaultLocalizationBase localization, SkinManager skinManager, Action<string> onInitialized)
+    public InitController()
     {
-        _configData = configData;
-        _localization = localization;
-        _skinManager = skinManager;
-        _onInitialized = onInitialized;
+        _configData = (DefaultConfigData)Config.Instance.Data;
+        _localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(_configData.Language);
+        _skinManager = ServiceLocator.Instance.GetService<SkinManager>()!;
+        _router = ServiceLocator.Instance.Get<Router>()!;
     }
 
     public override void Handle()
@@ -102,7 +102,7 @@ public class InitController : Controller
                     H.MetaViewport(),
                     H.Tag("title", $"{_localization.InitPageTitle} - Silicon Life Collective"),
                     H.Style(GetStyles()),
-                    H.Raw(GetSkinSwitchScript())
+                    H.Script(GetSkinSwitchScript())
                 ),
                 H.Body(
                     H.Div(
@@ -320,7 +320,7 @@ public class InitController : Controller
         }
 
         _configData.SaveConfig();
-        _onInitialized(curatorName);
+        _router.NotifyInitialized(curatorName);
 
         Redirect("/");
     }
@@ -339,7 +339,7 @@ public class InitController : Controller
             entries.Add($"\"{code}\":{{bg:\"{p.BackgroundColor}\",card:\"{p.CardColor}\",accent:\"{p.AccentColor}\",text:\"{p.TextColor}\",border:\"{p.BorderColor}\"}}");
         }
 
-        return $"<script>const skinData={{{string.Join(',', entries)}}};function selectSkin(code){{document.querySelectorAll('.skin-option').forEach(el=>el.classList.remove('selected'));document.querySelector('[data-skin=\"'+code+'\"]').classList.add('selected');document.getElementById('skinInput').value=code;const s=skinData[code],pv=document.getElementById('preview');pv.style.background=s.bg;pv.style.color=s.text;pv.style.borderColor=s.border;pv.querySelectorAll('.preview-card').forEach(c=>{{c.style.background=s.card;c.style.borderColor=s.border;}});pv.querySelectorAll('.preview-btn').forEach(b=>{{b.style.background=s.accent;}});}}function validateInitForm(){{var n=document.getElementById('nickname'),d=document.getElementById('dataDirInput'),c=document.getElementById('curatorName');if(!n.value.trim()){{n.focus();return false;}}if(!c.value.trim()){{c.focus();return false;}}if(!d.value.trim()){{d.focus();return false;}}return true;}}let dirBrowserOpen=false;function openDirBrowser(){{const db=document.getElementById('dirBrowser');if(dirBrowserOpen){{db.style.display='none';dirBrowserOpen=false;return;}}dirBrowserOpen=true;db.style.display='block';browseDir(document.getElementById('dataDirInput').value||'/');}}function browseDir(path){{fetch('/init/browse?dir='+encodeURIComponent(path)).then(r=>r.json()).then(data=>{{const db=document.getElementById('dirBrowser');let html='<div class=\"dir-header\"><span class=\"dir-current\">'+data.currentPath+'</span></div><div class=\"dir-list\">';data.directories.forEach(d=>{{html+='<div class=\"dir-item'+(d.isParent?' dir-parent':'')+'\" onclick=\"browseDir(\\''+d.path+'\\')\"><span class=\"dir-icon\">'+(d.isParent?'\u2190':'\U0001f4c1')+'</span><span>'+d.name+'</span></div>';}});html+='</div>';db.innerHTML=html;}});}}function switchLanguage(val){{var btn=document.querySelector('.lang-switch-btn');if(val===document.getElementById('languageSelect').dataset.current){{btn.style.display='none';}}else{{btn.style.display='inline-block';}}}}function applyLanguage(){{var lang=document.getElementById('languageSelect').value;window.location.href='/init?lang='+lang;}}</script>";
+        return $"const skinData={{{string.Join(',', entries)}}};function selectSkin(code){{document.querySelectorAll('.skin-option').forEach(el=>el.classList.remove('selected'));document.querySelector('[data-skin=\"'+code+'\"]').classList.add('selected');document.getElementById('skinInput').value=code;const s=skinData[code],pv=document.getElementById('preview');pv.style.background=s.bg;pv.style.color=s.text;pv.style.borderColor=s.border;pv.querySelectorAll('.preview-card').forEach(c=>{{c.style.background=s.card;c.style.borderColor=s.border;}});pv.querySelectorAll('.preview-btn').forEach(b=>{{b.style.background=s.accent;}});}}function validateInitForm(){{var n=document.getElementById('nickname'),d=document.getElementById('dataDirInput'),c=document.getElementById('curatorName');if(!n.value.trim()){{n.focus();return false;}}if(!c.value.trim()){{c.focus();return false;}}if(!d.value.trim()){{d.focus();return false;}}return true;}}let dirBrowserOpen=false;function openDirBrowser(){{const db=document.getElementById('dirBrowser');if(dirBrowserOpen){{db.style.display='none';dirBrowserOpen=false;return;}}dirBrowserOpen=true;db.style.display='block';browseDir(document.getElementById('dataDirInput').value||'/');}}function browseDir(path){{fetch('/init/browse?dir='+encodeURIComponent(path)).then(r=>r.json()).then(data=>{{const db=document.getElementById('dirBrowser');let html='<div class=\"dir-header\"><span class=\"dir-current\">'+data.currentPath+'</span></div><div class=\"dir-list\">';data.directories.forEach(d=>{{html+='<div class=\"dir-item'+(d.isParent?' dir-parent':'')+'\" onclick=\"browseDir(\\''+d.path+'\\')\"><span class=\"dir-icon\">'+(d.isParent?'\u2190':'\U0001f4c1')+'</span><span>'+d.name+'</span></div>';}});html+='</div>';db.innerHTML=html;}});}}function switchLanguage(val){{var btn=document.querySelector('.lang-switch-btn');if(val===document.getElementById('languageSelect').dataset.current){{btn.style.display='none';}}else{{btn.style.display='inline-block';}}}}function applyLanguage(){{var lang=document.getElementById('languageSelect').value;window.location.href='/init?lang='+lang;}}";
     }
 
     private Dictionary<string, string> ParseFormData()

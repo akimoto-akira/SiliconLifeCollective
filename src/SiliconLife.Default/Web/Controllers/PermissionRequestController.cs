@@ -21,9 +21,9 @@ public class PermissionRequestController : Controller
 {
     private readonly Func<Guid, TaskCompletionSource<AskPermissionResult>> _getPermissionTcs;
 
-    public PermissionRequestController(Func<Guid, TaskCompletionSource<AskPermissionResult>> getPermissionTcs)
+    public PermissionRequestController()
     {
-        _getPermissionTcs = getPermissionTcs;
+        _getPermissionTcs = ServiceLocator.Instance.Get<Func<Guid, TaskCompletionSource<AskPermissionResult>>>()!;
     }
 
     public override void Handle()
@@ -76,23 +76,23 @@ public class PermissionRequestController : Controller
                     H.Div(
                         H.H1("权限请求"),
                         H.P("一个硅基人请求您的授权："),
-                        H.Raw($@"
-                            <div class=""permission-details"">
-                                <div class=""detail-row"">
-                                    <span class=""label"">权限类型:</span>
-                                    <span class=""value"">{permissionType}</span>
-                                </div>
-                                <div class=""detail-row"">
-                                    <span class=""label"">请求资源:</span>
-                                    <span class=""value"">{resource}</span>
-                                </div>
-                            </div>
-                            <div class=""permission-buttons"">
-                                <button class=""btn-allow"" onclick=""respond(true)"">允许</button>
-                                <button class=""btn-deny"" onclick=""respond(false)"">拒绝</button>
-                            </div>
-                            <div class=""auto-close"">等待响应...</div>
-                        ")
+                        H.Div(
+                            H.Div(
+                                H.Div(
+                                    H.Span("权限类型:").Class("label"),
+                                    H.Span(permissionType).Class("value")
+                                ).Class("detail-row"),
+                                H.Div(
+                                    H.Span("请求资源:").Class("label"),
+                                    H.Span(resource).Class("value")
+                                ).Class("detail-row")
+                            ).Class("permission-details"),
+                            H.Div(
+                                H.Button("允许").Class("btn-allow").OnClick("respond(true)"),
+                                H.Button("拒绝").Class("btn-deny").OnClick("respond(false)")
+                            ).Class("permission-buttons"),
+                            H.Div("等待响应...").Class("auto-close")
+                        )
                     ).Class("permission-box")
                 ).Class("permission-container"),
             });

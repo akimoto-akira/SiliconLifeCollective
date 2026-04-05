@@ -29,7 +29,7 @@ public class H
 
     private readonly string _tag;
     private readonly Dictionary<string, string> _attrs = new();
-    private readonly List<object> _children = new(); // H | string | RawNode
+    private readonly List<object> _children = new(); // H | string | TextNode | CommentNode
     private bool _isVoid;
     private string? _text;
 
@@ -122,9 +122,6 @@ public class H
 
     /// <summary>Create a plain text node (no wrapping tag).</summary>
     public static TextNode Text(string text) => new(text);
-
-    /// <summary>Create a raw HTML node (no escaping).</summary>
-    public static RawNode Raw(string html) => new(html);
 
     /// <summary>Create an HTML comment node.</summary>
     public static CommentNode Comment(string text) => new(text);
@@ -350,9 +347,6 @@ public class H
                 case TextNode tn:
                     sb.Append(EscapeText(tn.Text));
                     break;
-                case RawNode rn:
-                    sb.Append(rn.Html);
-                    break;
                 case CommentNode cn:
                     sb.Append("<!-- ").Append(cn.Text).Append(" -->");
                     break;
@@ -400,12 +394,6 @@ public sealed class TextNode
 {
     public string Text { get; }
     public TextNode(string text) => Text = text;
-}
-
-public sealed class RawNode
-{
-    public string Html { get; }
-    public RawNode(string html) => Html = html;
 }
 
 public sealed class CommentNode

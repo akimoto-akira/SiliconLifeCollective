@@ -461,7 +461,7 @@ public class SiliconBeingManager : TickObject
 
     /// <summary>
     /// Migrates state from an old silicon being to a new one.
-    /// Copies all mutable properties: AIClient, SoulContent, UserId, ToolManager, PermissionManager.
+    /// Copies all mutable properties: AIClient, SoulContent, ToolManager, PermissionManager.
     /// </summary>
     /// <param name="oldBeing">The old being instance</param>
     /// <param name="newBeing">The new being instance</param>
@@ -469,7 +469,6 @@ public class SiliconBeingManager : TickObject
     {
         newBeing.AIClient = oldBeing.AIClient;
         newBeing.SoulContent = oldBeing.SoulContent;
-        newBeing.UserId = oldBeing.UserId;
         newBeing.ToolManager = oldBeing.ToolManager;
 
         // Migrate PermissionManager — create new one with same owner (newBeing) but keep the old callback

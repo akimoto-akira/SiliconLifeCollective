@@ -9,6 +9,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using SiliconLife.Collective;
+
 namespace SiliconLife.Default.Web;
 
 [WebCode]
@@ -17,10 +19,11 @@ public class CodeBrowserController : Controller
     private readonly WebCodeBrowser _codeBrowser;
     private readonly SkinManager _skinManager;
 
-    public CodeBrowserController(WebCodeBrowser codeBrowser, SkinManager skinManager)
+    public CodeBrowserController()
     {
-        _codeBrowser = codeBrowser;
-        _skinManager = skinManager;
+        var locator = ServiceLocator.Instance;
+        _codeBrowser = locator.GetService<WebCodeBrowser>()!;
+        _skinManager = locator.GetService<SkinManager>()!;
     }
 
     public override void Handle()
