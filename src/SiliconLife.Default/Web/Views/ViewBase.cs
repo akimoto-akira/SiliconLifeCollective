@@ -32,56 +32,62 @@ public abstract class ViewBase
             .Replace("'", "&#39;");
     }
 
-    protected string RenderPage(ISkin skin, string title, string activeMenu, string bodyContent,
-        string? inlineScripts = null, string? inlineStyles = null)
+    protected string RenderPage(ISkin skin, string title, string activeMenu, H bodyContent,
+        JsSyntax? inlineScripts = null, CssBuilder? inlineStyles = null)
     {
-        var sb = new StringBuilder();
         var themeCss = skin.GetThemeCss().Build();
         var baseCss = skin.GetStyles().Build();
+        var shellCss = GetShellCss().Build();
+        var commonCss = GetCommonCss().Build();
 
-        sb.AppendLine("<!DOCTYPE html>");
-        sb.AppendLine("<html>");
-        sb.AppendLine("<head>");
-        sb.AppendLine("<meta charset=\"utf-8\">");
-        sb.AppendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-        sb.AppendLine($"<title>{EscapeHtml(title)}</title>");
-        sb.AppendLine($"<style>{baseCss}</style>");
-        sb.AppendLine($"<style>{GetShellCss()}{GetCommonCss()}</style>");
+        var headChildren = new List<object>
+        {
+            H.Meta().Attr("charset", "utf-8"),
+            H.Meta().Attr("name", "viewport").Attr("content", "width=device-width, initial-scale=1"),
+            H.Title(title),
+            H.Style(baseCss),
+            H.Style(shellCss + commonCss)
+        };
+
         if (!string.IsNullOrEmpty(themeCss))
-            sb.AppendLine($"<style>{themeCss}</style>");
-        if (!string.IsNullOrEmpty(inlineStyles))
-            sb.AppendLine($"<style>{inlineStyles}</style>");
-        sb.AppendLine("</head>");
-        sb.AppendLine("<body>");
+            headChildren.Add(H.Style(themeCss));
 
-        sb.AppendLine("<div class=\"shell\">");
-        sb.AppendLine(RenderHeader());
-        sb.AppendLine("<div class=\"shell-body\">");
-        sb.AppendLine(RenderSidebar(activeMenu));
-        sb.AppendLine($"<main class=\"shell-content\">{bodyContent}</main>");
-        sb.AppendLine("</div>");
-        sb.AppendLine("</div>");
+        if (inlineStyles != null)
+            headChildren.Add(H.Style(inlineStyles));
 
-        if (!string.IsNullOrEmpty(inlineScripts))
-            sb.AppendLine($"<script>{inlineScripts}</script>");
+        var bodyChildren = new List<object>
+        {
+            H.Div(
+                RenderHeader(),
+                H.Div(
+                    RenderSidebar(activeMenu),
+                    H.MainElement(bodyContent).Class("shell-content")
+                ).Class("shell-body")
+            ).Class("shell")
+        };
 
-        sb.AppendLine("</body>");
-        sb.AppendLine("</html>");
-        return sb.ToString();
+        if (inlineScripts != null)
+            bodyChildren.Add(H.Script(inlineScripts));
+
+        var html = H.Html(
+            H.Head(headChildren.ToArray()),
+            H.Body(bodyChildren.ToArray())
+        );
+
+        return H.DocType() + "\n" + html.Build();
     }
 
-    private static string RenderHeader()
+    private static H RenderHeader()
     {
-        return @"
-<header class=""shell-header"">
-    <div class=""shell-brand"">🜲 硅基生命群</div>
-    <div class=""shell-header-actions"">
-        <a class=""shell-header-link"" href=""/config"">⚙</a>
-    </div>
-</header>";
+        return H.Header(
+            H.Div("🜲 硅基生命群").Class("shell-brand"),
+            H.Div(
+                H.A("⚙").Class("shell-header-link").Href("/config")
+            ).Class("shell-header-actions")
+        ).Class("shell-header");
     }
 
-    private static string RenderSidebar(string activeMenu)
+    private static H RenderSidebar(string activeMenu)
     {
         var items = new (string Id, string Icon, string Label, string Href)[]
         {
@@ -96,90 +102,340 @@ public abstract class ViewBase
             ("config", "⚙", "配置", "/config"),
         };
 
-        var sb = new StringBuilder();
-        sb.AppendLine("<aside class=\"shell-sidebar\">");
+        var menuItems = new List<H>();
         foreach (var (id, icon, label, href) in items)
         {
-            var active = id == activeMenu ? " active" : "";
-            sb.AppendLine($"<a class=\"shell-menu-item{active}\" href=\"{href}\">");
-            sb.AppendLine($"<span class=\"shell-menu-icon\">{icon}</span>");
-            sb.AppendLine($"<span class=\"shell-menu-text\">{label}</span>");
-            sb.AppendLine("</a>");
+            var activeClass = id == activeMenu ? "shell-menu-item active" : "shell-menu-item";
+            menuItems.Add(H.A(
+                H.Span(icon).Class("shell-menu-icon"),
+                H.Span(label).Class("shell-menu-text")
+            ).Class(activeClass).Href(href));
         }
-        sb.AppendLine("</aside>");
-        return sb.ToString();
+
+        return H.Aside(menuItems.ToArray()).Class("shell-sidebar");
     }
 
-    protected static string GetShellCss()
+    protected static CssBuilder GetShellCss()
     {
-        return @"
-.shell { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: var(--bg-primary); color: var(--text-primary); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-.shell-header { display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 48px; background: var(--bg-card); border-bottom: 1px solid var(--border); flex-shrink: 0; }
-.shell-brand { font-size: 16px; font-weight: bold; }
-.shell-header-actions { display: flex; gap: 12px; align-items: center; }
-.shell-header-link { color: var(--text-secondary); text-decoration: none; font-size: 18px; cursor: pointer; transition: color 0.2s; }
-.shell-header-link:hover { color: var(--accent-primary); }
-.shell-body { display: flex; flex: 1; overflow: hidden; }
-.shell-sidebar { width: 200px; background: var(--bg-card); border-right: 1px solid var(--border); padding: 12px 0; overflow-y: auto; flex-shrink: 0; }
-.shell-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-.shell-menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; color: var(--text-secondary); text-decoration: none; font-size: 14px; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
-.shell-menu-item:hover { color: var(--text-primary); background: var(--bg-secondary, rgba(255,255,255,0.05)); }
-.shell-menu-item.active { color: var(--accent-primary); border-left-color: var(--accent-primary); background: var(--bg-secondary, rgba(255,255,255,0.05)); }
-.shell-menu-icon { width: 20px; text-align: center; flex-shrink: 0; }
-@media (max-width: 768px) {
-    .shell-sidebar { width: 60px; padding: 8px 0; }
-    .shell-menu-text { display: none; }
-    .shell-menu-item { justify-content: center; padding: 10px; }
-    .shell-menu-icon { width: auto; }
-}
-@media (max-width: 480px) {
-    .shell-sidebar { display: none; }
-}
-";
+        return CssBuilder.Create()
+            .Selector("body")
+                .Property("margin", "0")
+                .Property("padding", "0")
+            .EndSelector()
+            .Selector(".shell")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+                .Property("height", "100vh")
+                .Property("overflow", "hidden")
+                .Property("background", "var(--bg-primary)")
+                .Property("color", "var(--text-primary)")
+                .Property("font-family", "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif")
+            .EndSelector()
+            .Selector(".shell-header")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("justify-content", "space-between")
+                .Property("padding", "0 20px")
+                .Property("height", "48px")
+                .Property("background", "var(--bg-card)")
+                .Property("border-bottom", "1px solid var(--border)")
+                .Property("flex-shrink", "0")
+            .EndSelector()
+            .Selector(".shell-brand")
+                .Property("font-size", "16px")
+                .Property("font-weight", "bold")
+            .EndSelector()
+            .Selector(".shell-header-actions")
+                .Property("display", "flex")
+                .Property("gap", "12px")
+                .Property("align-items", "center")
+            .EndSelector()
+            .Selector(".shell-header-link")
+                .Property("color", "var(--text-secondary)")
+                .Property("text-decoration", "none")
+                .Property("font-size", "18px")
+                .Property("cursor", "pointer")
+                .Property("transition", "color 0.2s")
+            .EndSelector()
+            .Selector(".shell-header-link:hover")
+                .Property("color", "var(--accent-primary)")
+            .EndSelector()
+            .Selector(".shell-body")
+                .Property("display", "flex")
+                .Property("flex", "1")
+                .Property("overflow", "hidden")
+            .EndSelector()
+            .Selector(".shell-sidebar")
+                .Property("width", "200px")
+                .Property("background", "var(--bg-card)")
+                .Property("border-right", "1px solid var(--border)")
+                .Property("padding", "12px 0")
+                .Property("overflow-y", "auto")
+                .Property("flex-shrink", "0")
+            .EndSelector()
+            .Selector(".shell-content")
+                .Property("flex", "1")
+                .Property("overflow", "hidden")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+            .EndSelector()
+            .Selector(".shell-menu-item")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("gap", "10px")
+                .Property("padding", "10px 20px")
+                .Property("color", "var(--text-secondary)")
+                .Property("text-decoration", "none")
+                .Property("font-size", "14px")
+                .Property("cursor", "pointer")
+                .Property("transition", "all 0.2s")
+                .Property("border-left", "3px solid transparent")
+            .EndSelector()
+            .Selector(".shell-menu-item:hover")
+                .Property("color", "var(--text-primary)")
+                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.05))")
+            .EndSelector()
+            .Selector(".shell-menu-item.active")
+                .Property("color", "var(--accent-primary)")
+                .Property("border-left-color", "var(--accent-primary)")
+                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.05))")
+            .EndSelector()
+            .Selector(".shell-menu-icon")
+                .Property("width", "20px")
+                .Property("text-align", "center")
+                .Property("flex-shrink", "0")
+            .EndSelector()
+            .Media("(max-width: 768px)")
+                .Selector(".shell-sidebar")
+                    .Property("width", "60px")
+                    .Property("padding", "8px 0")
+                .EndSelector()
+                .Selector(".shell-menu-text")
+                    .Property("display", "none")
+                .EndSelector()
+                .Selector(".shell-menu-item")
+                    .Property("justify-content", "center")
+                    .Property("padding", "10px")
+                .EndSelector()
+                .Selector(".shell-menu-icon")
+                    .Property("width", "auto")
+                .EndSelector()
+            .EndMedia()
+            .Media("(max-width: 480px)")
+                .Selector(".shell-sidebar")
+                    .Property("display", "none")
+                .EndSelector()
+            .EndMedia();
     }
 
-    protected static string GetCommonCss()
+    protected static CssBuilder GetCommonCss()
     {
-        return @"
-.page-content { flex: 1; overflow-y: auto; padding: 24px; }
-.page-header { margin-bottom: 24px; }
-.page-header h1 { font-size: 24px; font-weight: 600; }
-.page-header-actions { display: flex; gap: 10px; margin-top: 12px; }
-.card { background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
-.card h3 { font-size: 16px; margin-bottom: 12px; }
-.btn { display: inline-block; padding: 10px 20px; background: var(--accent-primary); color: #fff; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; font-size: 14px; transition: opacity 0.2s; }
-.btn:hover { opacity: 0.85; }
-.btn-danger { background: var(--accent-error, #ff6b6b); }
-.btn-sm { padding: 6px 14px; font-size: 13px; }
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card); color: var(--text-primary); box-sizing: border-box; font-size: 14px; }
-.form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--accent-primary); }
-table { width: 100%; border-collapse: collapse; }
-table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
-table th { font-weight: 600; }
-table tbody tr:hover { background: var(--bg-secondary, rgba(255,255,255,0.03)); }
-.badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; }
-.badge-success { background: rgba(107,203,119,0.15); color: var(--accent-success, #6bcb77); }
-.badge-warning { background: rgba(255,217,61,0.15); color: var(--accent-warning, #ffd93d); }
-.badge-error { background: rgba(255,107,107,0.15); color: var(--accent-error, #ff6b6b); }
-.filter-bar { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
-.filter-bar select, .filter-bar input, .filter-bar button { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card); color: var(--text-primary); font-size: 14px; }
-.filter-bar button { background: var(--accent-primary); color: #fff; border: none; cursor: pointer; }
-.pagination { display: flex; gap: 8px; margin-top: 20px; align-items: center; justify-content: center; }
-.pagination a, .pagination span { padding: 8px 14px; border: 1px solid var(--border); border-radius: 6px; text-decoration: none; color: var(--text-primary); background: var(--bg-card); }
-.pagination a:hover { background: var(--accent-primary); color: #fff; border-color: var(--accent-primary); }
-.search-bar { display: flex; gap: 10px; margin-bottom: 20px; }
-.search-bar input { flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card); color: var(--text-primary); }
-.search-bar button { padding: 10px 20px; background: var(--accent-primary); color: #fff; border: none; border-radius: 6px; cursor: pointer; }
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.stat-card { background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
-.stat-card h3 { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
-.stat-value { font-size: 28px; font-weight: bold; }
-.alert { padding: 15px; border-radius: 6px; margin-bottom: 20px; }
-.alert-success { background: var(--accent-success, #6bcb77); color: #fff; }
-.alert-error { background: var(--accent-error, #ff6b6b); color: #fff; }
-.alert-warning { background: var(--accent-warning, #ffd93d); color: #333; }
-";
+        return CssBuilder.Create()
+            .Selector(".page-content")
+                .Property("flex", "1")
+                .Property("overflow-y", "auto")
+                .Property("padding", "24px")
+            .EndSelector()
+            .Selector(".page-header")
+                .Property("margin-bottom", "24px")
+            .EndSelector()
+            .Selector(".page-header h1")
+                .Property("font-size", "24px")
+                .Property("font-weight", "600")
+            .EndSelector()
+            .Selector(".page-header-actions")
+                .Property("display", "flex")
+                .Property("gap", "10px")
+                .Property("margin-top", "12px")
+            .EndSelector()
+            .Selector(".card")
+                .Property("background", "var(--bg-card)")
+                .Property("padding", "20px")
+                .Property("border-radius", "12px")
+                .Property("border", "1px solid var(--border)")
+                .Property("margin-bottom", "20px")
+            .EndSelector()
+            .Selector(".card h3")
+                .Property("font-size", "16px")
+                .Property("margin-bottom", "12px")
+            .EndSelector()
+            .Selector(".btn")
+                .Property("display", "inline-block")
+                .Property("padding", "10px 20px")
+                .Property("background", "var(--accent-primary)")
+                .Property("color", "#fff")
+                .Property("border", "none")
+                .Property("border-radius", "6px")
+                .Property("cursor", "pointer")
+                .Property("text-decoration", "none")
+                .Property("font-size", "14px")
+                .Property("transition", "opacity 0.2s")
+            .EndSelector()
+            .Selector(".btn:hover")
+                .Property("opacity", "0.85")
+            .EndSelector()
+            .Selector(".btn-danger")
+                .Property("background", "var(--accent-error, #ff6b6b)")
+            .EndSelector()
+            .Selector(".btn-sm")
+                .Property("padding", "6px 14px")
+                .Property("font-size", "13px")
+            .EndSelector()
+            .Selector(".form-group")
+                .Property("margin-bottom", "15px")
+            .EndSelector()
+            .Selector(".form-group label")
+                .Property("display", "block")
+                .Property("margin-bottom", "5px")
+                .Property("font-weight", "500")
+            .EndSelector()
+            .Selector(".form-group input, .form-group textarea, .form-group select")
+                .Property("width", "100%")
+                .Property("padding", "10px")
+                .Property("border", "1px solid var(--border)")
+                .Property("border-radius", "6px")
+                .Property("background", "var(--bg-card)")
+                .Property("color", "var(--text-primary)")
+                .Property("box-sizing", "border-box")
+                .Property("font-size", "14px")
+            .EndSelector()
+            .Selector(".form-group input:focus, .form-group textarea:focus, .form-group select:focus")
+                .Property("outline", "none")
+                .Property("border-color", "var(--accent-primary)")
+            .EndSelector()
+            .Selector("table")
+                .Property("width", "100%")
+                .Property("border-collapse", "collapse")
+            .EndSelector()
+            .Selector("table th, table td")
+                .Property("padding", "12px")
+                .Property("text-align", "left")
+                .Property("border-bottom", "1px solid var(--border)")
+            .EndSelector()
+            .Selector("table th")
+                .Property("font-weight", "600")
+            .EndSelector()
+            .Selector("table tbody tr:hover")
+                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.03))")
+            .EndSelector()
+            .Selector(".badge")
+                .Property("display", "inline-block")
+                .Property("padding", "4px 12px")
+                .Property("border-radius", "12px")
+                .Property("font-size", "12px")
+                .Property("font-weight", "500")
+            .EndSelector()
+            .Selector(".badge-success")
+                .Property("background", "rgba(107,203,119,0.15)")
+                .Property("color", "var(--accent-success, #6bcb77)")
+            .EndSelector()
+            .Selector(".badge-warning")
+                .Property("background", "rgba(255,217,61,0.15)")
+                .Property("color", "var(--accent-warning, #ffd93d)")
+            .EndSelector()
+            .Selector(".badge-error")
+                .Property("background", "rgba(255,107,107,0.15)")
+                .Property("color", "var(--accent-error, #ff6b6b)")
+            .EndSelector()
+            .Selector(".filter-bar")
+                .Property("display", "flex")
+                .Property("gap", "10px")
+                .Property("margin-bottom", "20px")
+                .Property("align-items", "center")
+                .Property("flex-wrap", "wrap")
+            .EndSelector()
+            .Selector(".filter-bar select, .filter-bar input, .filter-bar button")
+                .Property("padding", "8px 12px")
+                .Property("border", "1px solid var(--border)")
+                .Property("border-radius", "6px")
+                .Property("background", "var(--bg-card)")
+                .Property("color", "var(--text-primary)")
+                .Property("font-size", "14px")
+            .EndSelector()
+            .Selector(".filter-bar button")
+                .Property("background", "var(--accent-primary)")
+                .Property("color", "#fff")
+                .Property("border", "none")
+                .Property("cursor", "pointer")
+            .EndSelector()
+            .Selector(".pagination")
+                .Property("display", "flex")
+                .Property("gap", "8px")
+                .Property("margin-top", "20px")
+                .Property("align-items", "center")
+                .Property("justify-content", "center")
+            .EndSelector()
+            .Selector(".pagination a, .pagination span")
+                .Property("padding", "8px 14px")
+                .Property("border", "1px solid var(--border)")
+                .Property("border-radius", "6px")
+                .Property("text-decoration", "none")
+                .Property("color", "var(--text-primary)")
+                .Property("background", "var(--bg-card)")
+            .EndSelector()
+            .Selector(".pagination a:hover")
+                .Property("background", "var(--accent-primary)")
+                .Property("color", "#fff")
+                .Property("border-color", "var(--accent-primary)")
+            .EndSelector()
+            .Selector(".search-bar")
+                .Property("display", "flex")
+                .Property("gap", "10px")
+                .Property("margin-bottom", "20px")
+            .EndSelector()
+            .Selector(".search-bar input")
+                .Property("flex", "1")
+                .Property("padding", "10px 14px")
+                .Property("border", "1px solid var(--border)")
+                .Property("border-radius", "6px")
+                .Property("background", "var(--bg-card)")
+                .Property("color", "var(--text-primary)")
+            .EndSelector()
+            .Selector(".search-bar button")
+                .Property("padding", "10px 20px")
+                .Property("background", "var(--accent-primary)")
+                .Property("color", "#fff")
+                .Property("border", "none")
+                .Property("border-radius", "6px")
+                .Property("cursor", "pointer")
+            .EndSelector()
+            .Selector(".stats-grid")
+                .Property("display", "grid")
+                .Property("grid-template-columns", "repeat(auto-fit, minmax(180px, 1fr))")
+                .Property("gap", "16px")
+                .Property("margin-bottom", "24px")
+            .EndSelector()
+            .Selector(".stat-card")
+                .Property("background", "var(--bg-card)")
+                .Property("padding", "20px")
+                .Property("border-radius", "12px")
+                .Property("border", "1px solid var(--border)")
+            .EndSelector()
+            .Selector(".stat-card h3")
+                .Property("font-size", "13px")
+                .Property("color", "var(--text-secondary)")
+                .Property("margin-bottom", "8px")
+            .EndSelector()
+            .Selector(".stat-value")
+                .Property("font-size", "28px")
+                .Property("font-weight", "bold")
+            .EndSelector()
+            .Selector(".alert")
+                .Property("padding", "15px")
+                .Property("border-radius", "6px")
+                .Property("margin-bottom", "20px")
+            .EndSelector()
+            .Selector(".alert-success")
+                .Property("background", "var(--accent-success, #6bcb77)")
+                .Property("color", "#fff")
+            .EndSelector()
+            .Selector(".alert-error")
+                .Property("background", "var(--accent-error, #ff6b6b)")
+                .Property("color", "#fff")
+            .EndSelector()
+            .Selector(".alert-warning")
+                .Property("background", "var(--accent-warning, #ffd93d)")
+                .Property("color", "#333")
+            .EndSelector();
     }
 }

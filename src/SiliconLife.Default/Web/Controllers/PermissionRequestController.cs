@@ -64,7 +64,7 @@ public class PermissionRequestController : Controller
             return;
         }
 
-        var html = H.HtmlPage("权限请求 - Silicon Life Collective",
+        var html = H.PageElement("权限请求 - Silicon Life Collective",
             new object[]
             {
                 H.Style(GetStyles()),
@@ -97,7 +97,7 @@ public class PermissionRequestController : Controller
                 ).Class("permission-container"),
             });
 
-        RenderHtml(html);
+        RenderHtml(html.Build());
     }
 
     private void CheckPending()

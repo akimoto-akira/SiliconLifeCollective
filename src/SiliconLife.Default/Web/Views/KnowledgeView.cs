@@ -9,7 +9,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text;
 using SiliconLife.Default.Web.Models;
 
 namespace SiliconLife.Default.Web.Views;
@@ -24,29 +23,39 @@ public class KnowledgeView : ViewBase
         return RenderPage(vm.Skin, "知识图谱 - Silicon Life Collective", "knowledge", body, GetScripts(), GetStyles());
     }
 
-    private static string RenderBody(KnowledgeViewModel vm)
+    private static H RenderBody(KnowledgeViewModel vm)
     {
-        return @"
-<div class=""page-content"">
-    <div class=""page-header""><h1>知识图谱可视化</h1></div>
-    <div class=""graph-container"" id=""graph-container""></div>
-</div>";
+        return H.Div(
+            H.Div(
+                H.H1("知识图谱可视化")
+            ).Class("page-header"),
+            H.Div().Id("graph-container").Class("graph-container")
+        ).Class("page-content");
     }
 
-    private static string GetStyles()
+    private static CssBuilder GetStyles()
     {
-        return ".graph-container { background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); min-height: 500px; }";
+        return CssBuilder.Create()
+            .Selector(".graph-container")
+                .Property("background", "var(--bg-card)")
+                .Property("padding", "20px")
+                .Property("border-radius", "12px")
+                .Property("border", "1px solid var(--border)")
+                .Property("min-height", "500px")
+            .EndSelector();
     }
 
-    private static string GetScripts()
+    private static JsSyntax GetScripts()
     {
-        return @"
-function loadGraph() {
-    fetch('/api/knowledge/graph').then(function(r) { return r.json(); }).then(function(data) {
-        var container = document.getElementById('graph-container');
-        container.innerHTML = '<p>知识图谱数据加载中...</p>';
-    });
-}
-window.onload = function() { loadGraph(); };";
+        var thenBody = Js.Block()
+            .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "graph-container"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Str(() => "<p>知识图谱数据加载中...</p>")));
+
+        var loadGraphBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/knowledge/graph")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
+
+        return Js.Block()
+            .Add(() => Js.Func(() => "loadGraph", () => new List<string>(), () => loadGraphBody))
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "loadGraph").Invoke())));
     }
 }

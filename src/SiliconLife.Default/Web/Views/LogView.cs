@@ -9,7 +9,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text;
 using SiliconLife.Default.Web.Models;
 
 namespace SiliconLife.Default.Web.Views;
@@ -24,36 +23,39 @@ public class LogView : ViewBase
         return RenderPage(vm.Skin, "日志查询 - Silicon Life Collective", "logs", body, GetScripts());
     }
 
-    private static string RenderBody(LogViewModel vm)
+    private static H RenderBody(LogViewModel vm)
     {
-        return @"
-<div class=""page-content"">
-    <div class=""page-header""><h1>日志查询</h1></div>
-    <div class=""filter-bar"">
-        <select id=""log-level"">
-            <option value="""">全部级别</option>
-            <option value=""Info"">Info</option>
-            <option value=""Warning"">Warning</option>
-            <option value=""Error"">Error</option>
-        </select>
-        <input type=""date"" id=""log-date"" />
-        <button onclick=""loadLogs()"">查询</button>
-    </div>
-    <div class=""card"">
-        <div class=""logs-list"" id=""logs-list""></div>
-    </div>
-</div>";
+        return H.Div(
+            H.Div(
+                H.H1("日志查询")
+            ).Class("page-header"),
+            H.Div(
+                H.Select(
+                    H.Option("全部级别").Value(""),
+                    H.Option("Info").Value("Info"),
+                    H.Option("Warning").Value("Warning"),
+                    H.Option("Error").Value("Error")
+                ).Id("log-level"),
+                H.Input().Attr("type", "date").Id("log-date"),
+                H.Button("查询").OnClick("loadLogs()")
+            ).Class("filter-bar"),
+            H.Div(
+                H.Div().Id("logs-list").Class("logs-list")
+            ).Class("card")
+        ).Class("page-content");
     }
 
-    private static string GetScripts()
+    private static JsSyntax GetScripts()
     {
-        return @"
-function loadLogs() {
-    fetch('/api/logs/list').then(function(r) { return r.json(); }).then(function(data) {
-        var list = document.getElementById('logs-list');
-        list.innerHTML = '<p>暂无日志</p>';
-    });
-}
-window.onload = function() { loadLogs(); };";
+        var thenBody = Js.Block()
+            .Add(() => Js.Const(() => "list", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "logs-list"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => "<p>暂无日志</p>")));
+
+        var loadLogsBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/logs/list")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
+
+        return Js.Block()
+            .Add(() => Js.Func(() => "loadLogs", () => new List<string>(), () => loadLogsBody))
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "loadLogs").Invoke())));
     }
 }

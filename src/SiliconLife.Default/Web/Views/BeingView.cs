@@ -9,7 +9,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text;
 using SiliconLife.Default.Web.Models;
 
 namespace SiliconLife.Default.Web.Views;
@@ -24,77 +23,144 @@ public class BeingView : ViewBase
         return RenderPage(vm.Skin, "硅基人管理 - Silicon Life Collective", "beings", body, GetScripts(), GetStyles());
     }
 
-    private static string RenderBody(BeingViewModel vm)
+    private static H RenderBody(BeingViewModel vm)
     {
-        return @"
-<div class=""page-content"">
-    <div class=""page-header""><h1>硅基人管理</h1></div>
-    <div class=""beings-grid"" id=""beings-grid""></div>
-    <div class=""detail-panel"" id=""detail-panel"">
-        <div class=""detail-content"" id=""detail-content""><p>选择一个硅基人查看详情</p></div>
-    </div>
-</div>";
+        return H.Div(
+            H.Div(
+                H.H1("硅基人管理")
+            ).Class("page-header"),
+            H.Div().Id("beings-grid").Class("beings-grid"),
+            H.Div(
+                H.Div(
+                    H.P("选择一个硅基人查看详情")
+                ).Id("detail-content").Class("detail-content")
+            ).Id("detail-panel").Class("detail-panel")
+        ).Class("page-content");
     }
 
-    private static string GetStyles()
+    private static CssBuilder GetStyles()
     {
-        return @"
-.beings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
-.being-card { background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
-.being-card:hover { transform: translateY(-4px); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
-.being-card.selected { border: 2px solid var(--accent-primary); }
-.being-name { font-size: 18px; font-weight: bold; color: var(--text-primary); margin-bottom: 8px; }
-.being-status { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; }
-.being-status.idle { background: rgba(107,203,119,0.15); color: var(--accent-success); }
-.being-status.running { background: rgba(77,150,255,0.15); color: var(--accent-primary); }
-.being-info { font-size: 12px; color: var(--text-secondary); margin-top: 8px; }
-.detail-panel { background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
-.detail-content h2 { font-size: 22px; color: var(--text-primary); margin-bottom: 15px; }
-.detail-row { display: flex; margin-bottom: 10px; }
-.detail-label { font-weight: bold; color: var(--text-secondary); width: 120px; }
-.detail-value { color: var(--text-primary); }
-.action-buttons { margin-top: 20px; display: flex; gap: 10px; }
-.action-btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; color: #fff; }
-.action-btn.pause { background: var(--accent-warning); }
-.action-btn.resume { background: var(--accent-success); }";
+        return CssBuilder.Create()
+            .Selector(".beings-grid")
+                .Property("display", "grid")
+                .Property("grid-template-columns", "repeat(auto-fill, minmax(280px, 1fr))")
+                .Property("gap", "20px")
+                .Property("margin-bottom", "30px")
+            .EndSelector()
+            .Selector(".being-card")
+                .Property("background", "var(--bg-card)")
+                .Property("padding", "20px")
+                .Property("border-radius", "12px")
+                .Property("border", "1px solid var(--border)")
+                .Property("cursor", "pointer")
+                .Property("transition", "transform 0.2s, box-shadow 0.2s")
+            .EndSelector()
+            .Selector(".being-card:hover")
+                .Property("transform", "translateY(-4px)")
+                .Property("box-shadow", "0 4px 16px rgba(0,0,0,0.12)")
+            .EndSelector()
+            .Selector(".being-card.selected")
+                .Property("border", "2px solid var(--accent-primary)")
+            .EndSelector()
+            .Selector(".being-name")
+                .Property("font-size", "18px")
+                .Property("font-weight", "bold")
+                .Property("color", "var(--text-primary)")
+                .Property("margin-bottom", "8px")
+            .EndSelector()
+            .Selector(".being-status")
+                .Property("display", "inline-block")
+                .Property("padding", "4px 12px")
+                .Property("border-radius", "12px")
+                .Property("font-size", "12px")
+            .EndSelector()
+            .Selector(".being-status.idle")
+                .Property("background", "rgba(107,203,119,0.15)")
+                .Property("color", "var(--accent-success)")
+            .EndSelector()
+            .Selector(".being-status.running")
+                .Property("background", "rgba(77,150,255,0.15)")
+                .Property("color", "var(--accent-primary)")
+            .EndSelector()
+            .Selector(".being-info")
+                .Property("font-size", "12px")
+                .Property("color", "var(--text-secondary)")
+                .Property("margin-top", "8px")
+            .EndSelector()
+            .Selector(".detail-panel")
+                .Property("background", "var(--bg-card)")
+                .Property("padding", "20px")
+                .Property("border-radius", "12px")
+                .Property("border", "1px solid var(--border)")
+            .EndSelector()
+            .Selector(".detail-content h2")
+                .Property("font-size", "22px")
+                .Property("color", "var(--text-primary)")
+                .Property("margin-bottom", "15px")
+            .EndSelector()
+            .Selector(".detail-row")
+                .Property("display", "flex")
+                .Property("margin-bottom", "10px")
+            .EndSelector()
+            .Selector(".detail-label")
+                .Property("font-weight", "bold")
+                .Property("color", "var(--text-secondary)")
+                .Property("width", "120px")
+            .EndSelector()
+            .Selector(".detail-value")
+                .Property("color", "var(--text-primary)")
+            .EndSelector()
+            .Selector(".action-buttons")
+                .Property("margin-top", "20px")
+                .Property("display", "flex")
+                .Property("gap", "10px")
+            .EndSelector()
+            .Selector(".action-btn")
+                .Property("padding", "10px 20px")
+                .Property("border", "none")
+                .Property("border-radius", "6px")
+                .Property("cursor", "pointer")
+                .Property("font-size", "14px")
+                .Property("color", "#fff")
+            .EndSelector()
+            .Selector(".action-btn.pause")
+                .Property("background", "var(--accent-warning)")
+            .EndSelector()
+            .Selector(".action-btn.resume")
+                .Property("background", "var(--accent-success)")
+            .EndSelector();
     }
 
-    private static string GetScripts()
+    private static JsSyntax GetScripts()
     {
-        var sb = new StringBuilder();
-        sb.AppendLine("var selectedBeingId = null;");
-        sb.AppendLine("function loadBeings() {");
-        sb.AppendLine("    fetch('/api/beings/list').then(function(r) { return r.json(); }).then(function(data) {");
-        sb.AppendLine("        var grid = document.getElementById('beings-grid');");
-        sb.AppendLine("        grid.innerHTML = '';");
-        sb.AppendLine("        data.forEach(function(b) {");
-        sb.AppendLine("            var card = document.createElement('div');");
-        sb.AppendLine("            card.className = 'being-card' + (b.id === selectedBeingId ? ' selected' : '');");
-        sb.AppendLine("            card.onclick = function() { selectBeing(b.id, b.name); };");
-        sb.AppendLine(@"            card.innerHTML = '<div class=""being-name"">' + b.name + '</div>'");
-        sb.AppendLine("                + '<span class=\"being-status ' + (b.isIdle ? 'idle' : 'running') + \"' + \">\" + (b.isIdle ? '空闲' : '运行中') + '</span>'");
-        sb.AppendLine(@"            + '<div class=""being-info"">' + (b.customTypeName || '标准硅基人') + '</div>';");
-        sb.AppendLine("            grid.appendChild(card);");
-        sb.AppendLine("        });");
-        sb.AppendLine("    });");
-        sb.AppendLine("}");
-        sb.AppendLine("function selectBeing(id, name) {");
-        sb.AppendLine("    selectedBeingId = id;");
-        sb.AppendLine("    loadBeings();");
-        sb.AppendLine("    fetch('/api/beings/detail?id=' + id).then(function(r) { return r.json(); }).then(function(data) {");
-        sb.AppendLine("        if (data.error) {");
-        sb.AppendLine("            document.getElementById('detail-content').innerHTML = '<p>' + data.error + '</p>';");
-        sb.AppendLine("            return;");
-        sb.AppendLine("        }");
-        sb.AppendLine("        var content = '<h2>' + data.name + '</h2>';");
-        sb.AppendLine(@"        content += '<div class=""detail-row""><span class=""detail-label"">状态:</span><span class=""detail-value"">' + (data.isIdle ? '空闲' : '运行中') + '</span></div>';");
-        sb.AppendLine(@"        content += '<div class=""detail-row""><span class=""detail-label"">用户ID:</span><span class=""detail-value"">' + data.userId + '</span></div>';");
-        sb.AppendLine(@"        content += '<div class=""detail-row""><span class=""detail-label"">类型:</span><span class=""detail-value"">' + (data.customTypeName || '标准') + '</span></div>';");
-        sb.AppendLine(@"        content += '<div class=""detail-row""><span class=""detail-label"">灵魂:</span><span class=""detail-value"">' + (data.soulContent || '无') + '</span></div>';");
-        sb.AppendLine("        document.getElementById('detail-content').innerHTML = content;");
-        sb.AppendLine("    });");
-        sb.AppendLine("}");
-        sb.AppendLine("window.onload = function() { loadBeings(); };");
-        return sb.ToString();
+        var forEachBody = Js.Block()
+            .Add(() => Js.Const(() => "card", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "card").Prop(() => "className"), () => Js.Str(() => "being-card")))
+            .Add(() => Js.Assign(() => Js.Id(() => "card").Prop(() => "onclick"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "selectBeing").Invoke(() => Js.Id(() => "b").Prop(() => "id"), () => Js.Id(() => "b").Prop(() => "name")))))
+            .Add(() => Js.Assign(() => Js.Id(() => "card").Prop(() => "innerHTML"), () => Js.Str(() => "'<div class=\"being-name\">' + b.name + '</div>'")))
+            .Add(() => Js.Id(() => "grid").Call(() => "appendChild", () => Js.Id(() => "card")).Stmt());
+
+        var thenBody = Js.Block()
+            .Add(() => Js.Const(() => "grid", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "beings-grid"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "grid").Prop(() => "innerHTML"), () => Js.Str(() => "")))
+            .Add(() => Js.Id(() => "data").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "b" }, () => forEachBody)).Stmt());
+
+        var loadBeingsBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/beings/list")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
+
+        var selectThenBody = Js.Block()
+            .Add(() => Js.Const(() => "content", () => Js.Str(() => "'<h2>' + data.name + '</h2>'")))
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "detail-content")).Prop(() => "innerHTML"), () => Js.Id(() => "content")));
+
+        var selectBeingBody = Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "selectedBeingId"), () => Js.Id(() => "id")))
+            .Add(() => Js.Id(() => "loadBeings").Invoke().Stmt())
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/beings/detail?id=").Op(() => "+", () => (JsSyntax)Js.Id(() => "id"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => selectThenBody)).Stmt());
+
+        return Js.Block()
+            .Add(() => Js.Let(() => "selectedBeingId", () => Js.Id(() => "null")))
+            .Add(() => Js.Func(() => "loadBeings", () => new List<string>(), () => loadBeingsBody))
+            .Add(() => Js.Func(() => "selectBeing", () => new List<string> { "id", "name" }, () => selectBeingBody))
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "loadBeings").Invoke())));
     }
 }

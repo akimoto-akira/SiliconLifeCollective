@@ -9,7 +9,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text;
 using SiliconLife.Default.Web.Models;
 
 namespace SiliconLife.Default.Web.Views;
@@ -24,26 +23,29 @@ public class MemoryView : ViewBase
         return RenderPage(vm.Skin, "记忆浏览 - Silicon Life Collective", "memory", body, GetScripts());
     }
 
-    private static string RenderBody(MemoryViewModel vm)
+    private static H RenderBody(MemoryViewModel vm)
     {
-        return @"
-<div class=""page-content"">
-    <div class=""page-header""><h1>记忆浏览</h1></div>
-    <div class=""card"">
-        <div class=""memory-list"" id=""memory-list""></div>
-    </div>
-</div>";
+        return H.Div(
+            H.Div(
+                H.H1("记忆浏览")
+            ).Class("page-header"),
+            H.Div(
+                H.Div().Id("memory-list").Class("memory-list")
+            ).Class("card")
+        ).Class("page-content");
     }
 
-    private static string GetScripts()
+    private static JsSyntax GetScripts()
     {
-        return @"
-function loadMemories() {
-    fetch('/api/memory/list').then(function(r) { return r.json(); }).then(function(data) {
-        var list = document.getElementById('memory-list');
-        list.innerHTML = '<p>暂无记忆数据</p>';
-    });
-}
-window.onload = function() { loadMemories(); };";
+        var thenBody = Js.Block()
+            .Add(() => Js.Const(() => "list", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "memory-list"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => "<p>暂无记忆数据</p>")));
+
+        var loadMemoriesBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/memory/list")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
+
+        return Js.Block()
+            .Add(() => Js.Func(() => "loadMemories", () => new List<string>(), () => loadMemoriesBody))
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "loadMemories").Invoke())));
     }
 }

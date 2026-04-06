@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text;
 using SiliconLife.Collective;
 
 namespace SiliconLife.Default.Web;
@@ -72,47 +73,48 @@ public class InitController : Controller
     {
         var form = new List<object>();
 
-        // Language selector group
         BuildLanguageFormGroup(form);
 
-        // Nickname group
-        form.Add(H.Div(H.Label(_localization.InitNicknameLabel).For("nickname"),
-            H.InputText("nickname", _localization.InitNicknamePlaceholder, _configData.UserNickname).Required()).Class("form-group"));
+        form.Add(H.Create("div",
+            H.Create("label", _localization.InitNicknameLabel).Attr("for", "nickname"),
+            H.Input().Attr("type", "text").Attr("name", "nickname").Attr("placeholder", _localization.InitNicknamePlaceholder).Attr("value", _configData.UserNickname).Attr("required", "required")
+        ).Class("form-group"));
 
-        // Curator name group
-        form.Add(H.Div(H.Label(_localization.InitCuratorNameLabel).For("curatorName"),
-            H.InputText("curatorName", _localization.InitCuratorNamePlaceholder, "").Required()).Class("form-group"));
+        form.Add(H.Create("div",
+            H.Create("label", _localization.InitCuratorNameLabel).Attr("for", "curatorName"),
+            H.Input().Attr("type", "text").Attr("name", "curatorName").Attr("placeholder", _localization.InitCuratorNamePlaceholder).Attr("required", "required")
+        ).Class("form-group"));
 
-        // Endpoint group
-        form.Add(H.Div(H.Label(_localization.InitEndpointLabel).For("ollamaEndpoint")).Class("form-group"));
+        form.Add(H.Create("div",
+            H.Create("label", _localization.InitEndpointLabel).Attr("for", "ollamaEndpoint")
+        ).Class("form-group"));
 
-        // Data directory group
         BuildDataDirectoryFormGroup(form);
 
-        // Skin group
         BuildSkinFormGroup(form);
 
-        // Submit button
-        form.Add(H.Div(H.Button(_localization.InitSubmitButton).Type("submit")).Class("form-actions"));
+        form.Add(H.Create("div",
+            H.Create("button", _localization.InitSubmitButton).Attr("type", "submit")
+        ).Class("form-actions"));
 
-        var html = H.DocType().Build()
-            + H.Tag("html",
-                H.Tag("head",
-                    H.MetaCharset(),
-                    H.MetaViewport(),
-                    H.Tag("title", $"{_localization.InitPageTitle} - Silicon Life Collective"),
-                    H.Style(GetStyles()),
-                    H.Script(GetSkinSwitchScript())
+        var html = H.DocType() + 
+            H.Create("html",
+                H.Create("head",
+                    H.Meta().Attr("charset", "utf-8"),
+                    H.Meta().Attr("name", "viewport").Attr("content", "width=device-width, initial-scale=1"),
+                    H.Create("title", $"{_localization.InitPageTitle} - Silicon Life Collective"),
+                    H.Create("style", GetStyles()),
+                    H.Create("script", GetSkinSwitchScript())
                 ),
-                H.Body(
-                    H.Div(
-                        H.Div(
-                            H.H1("Silicon Life Collective"),
-                            H.P(_localization.InitDescription),
-                            H.When(!string.IsNullOrEmpty(error), H.Div(H.P(error ?? "")).Class("form-error")),
-                            H.Form(form.ToArray()).Action("/init").Method("post").Class("init-form")
+                H.Create("body",
+                    H.Create("div",
+                        H.Create("div",
+                            H.Create("h1", "Silicon Life Collective"),
+                            H.Create("p", _localization.InitDescription),
+                            !string.IsNullOrEmpty(error) ? new object[] { H.Create("div", H.Create("p", error ?? "")).Class("form-error") } : Array.Empty<object>(),
+                            H.Create("form", form.ToArray()).Attr("action", "/init").Attr("method", "post").Class("init-form")
                                 .Attr("onsubmit", "return validateInitForm()"),
-                            H.Div(H.P(_localization.InitFooterHint)).Class("init-footer")
+                            H.Create("div", H.Create("p", _localization.InitFooterHint)).Class("init-footer")
                         ).Class("init-card")
                     ).Class("init-container")
                 )
@@ -128,31 +130,31 @@ public class InitController : Controller
         foreach (var lang in LocalizationManager.Instance.GetRegisteredLanguages())
         {
             var loc = LocalizationManager.Instance.GetLocalization(lang);
-            var opt = H.Option(loc.LanguageName).Attr("value", lang.ToString());
-            if (loc.LanguageCode == currentLang) opt.Selected();
+            var opt = H.Create("option", loc.LanguageName).Attr("value", lang.ToString());
+            if (loc.LanguageCode == currentLang) opt.Attr("selected", "selected");
             options.Add(opt);
         }
-        form.Add(H.Div(
-            H.Label(_localization.InitLanguageLabel).For("language"),
-            H.Div(
-                H.Select(options.ToArray()).Name("language").Id("languageSelect")
-                    .Data("current", currentLang).OnChange("switchLanguage(this.value)"),
-                H.Button(_localization.InitLanguageSwitchBtn).Type("button")
-                    .Class("lang-switch-btn").Style("display:none;").OnClick("applyLanguage()")
+        form.Add(H.Create("div",
+            H.Create("label", _localization.InitLanguageLabel).Attr("for", "language"),
+            H.Create("div",
+                H.Create("select", options.ToArray()).Attr("name", "language").Attr("id", "languageSelect")
+                    .Attr("data-current", currentLang).Attr("onchange", "switchLanguage(this.value)"),
+                H.Create("button", _localization.InitLanguageSwitchBtn).Attr("type", "button")
+                    .Class("lang-switch-btn").Attr("style", "display:none;").Attr("onclick", "applyLanguage()")
             ).Class("lang-selector-row")
         ).Class("form-group"));
     }
 
     private void BuildDataDirectoryFormGroup(List<object> form)
     {
-        form.Add(H.Div(
-            H.Label(_localization.InitDataDirectoryLabel).For("dataDirectory"),
-            H.Div(
-                H.InputText("dataDirectory", _localization.InitDataDirectoryPlaceholder, _configData.DataDirectory).Id("dataDirInput"),
-                H.Button(_localization.InitDataDirectoryBrowse).Type("button")
-                    .Class("dir-browse-btn").OnClick("openDirBrowser()")
+        form.Add(H.Create("div",
+            H.Create("label", _localization.InitDataDirectoryLabel).Attr("for", "dataDirectory"),
+            H.Create("div",
+                H.Input().Attr("type", "text").Attr("name", "dataDirectory").Attr("placeholder", _localization.InitDataDirectoryPlaceholder).Attr("value", _configData.DataDirectory).Attr("id", "dataDirInput"),
+                H.Create("button", _localization.InitDataDirectoryBrowse).Attr("type", "button")
+                    .Class("dir-browse-btn").Attr("onclick", "openDirBrowser()")
             ).Class("dir-input-row"),
-            H.Div().Id("dirBrowser").Class("dir-browser").Style("display:none;")
+            H.Create("div").Attr("id", "dirBrowser").Class("dir-browser").Attr("style", "display:none;")
         ).Class("form-group"));
     }
 
@@ -167,46 +169,47 @@ public class InitController : Controller
         var skinCards = new List<object>();
         foreach (var (code, skin) in skins)
         {
+            var codeStr = code;
             var p = skin.PreviewInfo;
             var gradient = $"linear-gradient(135deg,{p.BackgroundColor} 0%,{p.CardColor} 100%)";
-            var card = H.Div(
-                H.Div(p.Icon).Class("skin-icon"),
-                H.Div(skin.Name).Class("skin-name"),
-                H.Div(p.Description).Class("skin-desc"),
-                H.Div(
-                    H.Span().Class("color-dot").Style($"background:{p.BackgroundColor};"),
-                    H.Span().Class("color-dot").Style($"background:{p.CardColor};"),
-                    H.Span().Class("color-dot").Style($"background:{p.AccentColor};")
+            var card = H.Create("div",
+                H.Create("div", p.Icon).Class("skin-icon"),
+                H.Create("div", skin.Name).Class("skin-desc"),
+                H.Create("div", p.Description).Class("skin-desc"),
+                H.Create("div",
+                    H.Create("span").Class("color-dot").Attr("style", $"background:{p.BackgroundColor};"),
+                    H.Create("span").Class("color-dot").Attr("style", $"background:{p.CardColor};"),
+                    H.Create("span").Class("color-dot").Attr("style", $"background:{p.AccentColor};")
                 ).Class("skin-colors")
             ).Class("skin-option" + (code == currentSkin ? " selected" : ""))
-             .Data("skin", code).OnClick($"selectSkin('{code}')")
-             .Style($"border-color:{p.BorderColor};background:{gradient};color:{p.TextColor};");
+             .Attr("data-skin", code).Attr("onclick", $"selectSkin('{code}')")
+             .Attr("style", $"border-color:{p.BorderColor};background:{gradient};color:{p.TextColor};");
             skinCards.Add(card);
         }
 
         var previewP = _skinManager.GetSkin(currentSkin)?.PreviewInfo ?? skins.First().Skin.PreviewInfo;
-        var previewSection = H.Div(
-            H.H3("Preview").Class("skin-preview-title"),
-            H.Div(
-                H.Div(
-                    H.H4(_localization.InitSkinPreviewCardTitle),
-                    H.P(_localization.InitSkinPreviewCardContent)
-                ).Class("preview-card").Style($"background:{previewP.CardColor};border-color:{previewP.BorderColor};"),
-                H.Div(
-                    H.Button(_localization.InitSkinPreviewPrimaryBtn).Type("button")
-                        .Class("preview-btn").Style($"background:{previewP.AccentColor};color:#fff;"),
-                    H.Button(_localization.InitSkinPreviewSecondaryBtn).Type("button")
-                        .Class("preview-btn").Style($"background:{previewP.AccentColor};opacity:0.6;color:#fff;")
+        var previewSection = H.Create("div",
+            H.Create("h3", "Preview").Class("skin-preview-title"),
+            H.Create("div",
+                H.Create("div",
+                    H.Create("h4", _localization.InitSkinPreviewCardTitle),
+                    H.Create("p", _localization.InitSkinPreviewCardContent)
+                ).Class("preview-card").Attr("style", $"background:{previewP.CardColor};border-color:{previewP.BorderColor};"),
+                H.Create("div",
+                    H.Create("button", _localization.InitSkinPreviewPrimaryBtn).Attr("type", "button")
+                        .Class("preview-btn").Attr("style", $"background:{previewP.AccentColor};color:#fff;"),
+                    H.Create("button", _localization.InitSkinPreviewSecondaryBtn).Attr("type", "button")
+                        .Class("preview-btn").Attr("style", $"background:{previewP.AccentColor};opacity:0.6;color:#fff;")
                 ).Class("preview-btns")
             ).Class("preview-inner"),
-            H.InputHidden("webSkin", currentSkin).Id("skinInput")
-        ).Id("preview").Class("skin-preview-box")
-         .Style($"background:{previewP.BackgroundColor};color:{previewP.TextColor};border-color:{previewP.BorderColor};");
+            H.Input().Attr("type", "hidden").Attr("name", "webSkin").Attr("value", currentSkin).Attr("id", "skinInput")
+        ).Attr("id", "preview").Class("skin-preview-box")
+         .Attr("style", $"background:{previewP.BackgroundColor};color:{previewP.TextColor};border-color:{previewP.BorderColor};");
 
-        form.Add(H.Div(
-            H.Label(_localization.InitSkinLabel).For("webSkin"),
-            H.Div(skinCards.ToArray()).Class("skin-grid"),
-            H.Div(previewSection).Class("skin-preview-section")
+        form.Add(H.Create("div",
+            H.Create("label", _localization.InitSkinLabel).Attr("for", "webSkin"),
+            H.Create("div", skinCards.ToArray()).Class("skin-grid"),
+            H.Create("div", previewSection).Class("skin-preview-section")
         ).Class("form-group"));
     }
 
@@ -325,21 +328,137 @@ public class InitController : Controller
         Redirect("/");
     }
 
-    private string GetSkinSwitchScript()
+    private JsSyntax GetSkinSwitchScript()
     {
         var skins = _skinManager.GetAvailableSkins()
             .Select(c => (Code: c, Skin: _skinManager.GetSkin(c)!))
             .OrderBy(s => s.Code)
             .ToList();
 
-        var entries = new List<string>();
-        foreach (var (code, skin) in skins)
+        var js = Js.Block()
+            .Add(() => Js.Const(() => "skinData", () => Js.Obj()));
+
+        foreach (var (skinCode, skin) in skins)
         {
             var p = skin.PreviewInfo;
-            entries.Add($"\"{code}\":{{bg:\"{p.BackgroundColor}\",card:\"{p.CardColor}\",accent:\"{p.AccentColor}\",text:\"{p.TextColor}\",border:\"{p.BorderColor}\"}}");
+            var code = skinCode;
+            var bgColor = p.BackgroundColor;
+            var cardColor = p.CardColor;
+            var accentColor = p.AccentColor;
+            var textColor = p.TextColor;
+            var borderColor = p.BorderColor;
+            var obj = Js.Obj()
+                .Prop(() => "bg", () => Js.Str(() => bgColor))
+                .Prop(() => "card", () => Js.Str(() => cardColor))
+                .Prop(() => "accent", () => Js.Str(() => accentColor))
+                .Prop(() => "text", () => Js.Str(() => textColor))
+                .Prop(() => "border", () => Js.Str(() => borderColor));
+            js.Add(() => Js.Assign(() => Js.Id(() => "skinData").Index(() => Js.Str(() => code)), () => obj));
         }
 
-        return $"const skinData={{{string.Join(',', entries)}}};function selectSkin(code){{document.querySelectorAll('.skin-option').forEach(el=>el.classList.remove('selected'));document.querySelector('[data-skin=\"'+code+'\"]').classList.add('selected');document.getElementById('skinInput').value=code;const s=skinData[code],pv=document.getElementById('preview');pv.style.background=s.bg;pv.style.color=s.text;pv.style.borderColor=s.border;pv.querySelectorAll('.preview-card').forEach(c=>{{c.style.background=s.card;c.style.borderColor=s.border;}});pv.querySelectorAll('.preview-btn').forEach(b=>{{b.style.background=s.accent;}});}}function validateInitForm(){{var n=document.getElementById('nickname'),d=document.getElementById('dataDirInput'),c=document.getElementById('curatorName');if(!n.value.trim()){{n.focus();return false;}}if(!c.value.trim()){{c.focus();return false;}}if(!d.value.trim()){{d.focus();return false;}}return true;}}let dirBrowserOpen=false;function openDirBrowser(){{const db=document.getElementById('dirBrowser');if(dirBrowserOpen){{db.style.display='none';dirBrowserOpen=false;return;}}dirBrowserOpen=true;db.style.display='block';browseDir(document.getElementById('dataDirInput').value||'/');}}function browseDir(path){{fetch('/init/browse?dir='+encodeURIComponent(path)).then(r=>r.json()).then(data=>{{const db=document.getElementById('dirBrowser');let html='<div class=\"dir-header\"><span class=\"dir-current\">'+data.currentPath+'</span></div><div class=\"dir-list\">';data.directories.forEach(d=>{{html+='<div class=\"dir-item'+(d.isParent?' dir-parent':'')+'\" onclick=\"browseDir(\\''+d.path+'\\')\"><span class=\"dir-icon\">'+(d.isParent?'\u2190':'\U0001f4c1')+'</span><span>'+d.name+'</span></div>';}});html+='</div>';db.innerHTML=html;}});}}function switchLanguage(val){{var btn=document.querySelector('.lang-switch-btn');if(val===document.getElementById('languageSelect').dataset.current){{btn.style.display='none';}}else{{btn.style.display='inline-block';}}}}function applyLanguage(){{var lang=document.getElementById('languageSelect').value;window.location.href='/init?lang='+lang;}}";
+        var removeSelectedArrow = Js.Arrow(() => new List<string> { "el" }, () => Js.Id(() => "el").Prop(() => "classList").Call(() => "remove", () => Js.Str(() => "selected")));
+        var selectSkinBody = Js.Block()
+            .Add(() => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => ".skin-option")).Call(() => "forEach", () => removeSelectedArrow).Stmt())
+            .Add(() => Js.Const(() => "selectedEl", () => Js.Id(() => "document").Call(() => "querySelector", () => Js.Str(() => "[data-skin='").Op(() => "+", () => (JsSyntax)Js.Id(() => "code")).Op(() => "+", () => (JsSyntax)Js.Str(() => "']")))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "selectedEl"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "selectedEl").Prop(() => "classList").Call(() => "add", () => Js.Str(() => "selected")).Stmt()
+                    })
+                }
+            }))
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "skinInput")).Prop(() => "value"), () => Js.Id(() => "code")))
+            .Add(() => Js.Id(() => "updatePreview").Invoke(() => Js.Id(() => "code")).Stmt());
+        js.Add(() => Js.Func(() => "selectSkin", () => new List<string> { "code" }, () => selectSkinBody));
+
+        var updateCardArrow = Js.Arrow(() => new List<string> { "c" }, () => Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "c").Prop(() => "style").Prop(() => "background"), () => Js.Id(() => "s").Prop(() => "card")))
+            .Add(() => Js.Assign(() => Js.Id(() => "c").Prop(() => "style").Prop(() => "borderColor"), () => Js.Id(() => "s").Prop(() => "border"))));
+        var updateBtnArrow = Js.Arrow(() => new List<string> { "b" }, () => Js.Assign(() => Js.Id(() => "b").Prop(() => "style").Prop(() => "background"), () => Js.Id(() => "s").Prop(() => "accent")));
+        var updatePreviewBody = Js.Block()
+            .Add(() => Js.Const(() => "s", () => Js.Id(() => "skinData").Index(() => Js.Id(() => "code"))))
+            .Add(() => Js.Const(() => "pv", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "preview"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "pv").Prop(() => "style").Prop(() => "background"), () => Js.Id(() => "s").Prop(() => "bg")))
+            .Add(() => Js.Assign(() => Js.Id(() => "pv").Prop(() => "style").Prop(() => "color"), () => Js.Id(() => "s").Prop(() => "text")))
+            .Add(() => Js.Assign(() => Js.Id(() => "pv").Prop(() => "style").Prop(() => "borderColor"), () => Js.Id(() => "s").Prop(() => "border")))
+            .Add(() => Js.Id(() => "pv").Call(() => "querySelectorAll", () => Js.Str(() => ".preview-card")).Call(() => "forEach", () => updateCardArrow).Stmt())
+            .Add(() => Js.Id(() => "pv").Call(() => "querySelectorAll", () => Js.Str(() => ".preview-btn")).Call(() => "forEach", () => updateBtnArrow).Stmt());
+        js.Add(() => Js.Func(() => "updatePreview", () => new List<string> { "code" }, () => updatePreviewBody));
+
+        var validateBody = Js.Block()
+            .Add(() => Js.Const(() => "n", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "nickname"))))
+            .Add(() => Js.Const(() => "d", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dataDirInput"))))
+            .Add(() => Js.Const(() => "c", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "curatorName"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "n").Prop(() => "value").Call(() => "trim").Not(), new List<JsSyntax> { Js.Id(() => "n").Call(() => "focus").Stmt(), Js.Return(() => Js.Bool(() => false)) }) },
+                { (Js.Id(() => "c").Prop(() => "value").Call(() => "trim").Not(), new List<JsSyntax> { Js.Id(() => "c").Call(() => "focus").Stmt(), Js.Return(() => Js.Bool(() => false)) }) },
+                { (Js.Id(() => "d").Prop(() => "value").Call(() => "trim").Not(), new List<JsSyntax> { Js.Id(() => "d").Call(() => "focus").Stmt(), Js.Return(() => Js.Bool(() => false)) }) },
+                { (null, new List<JsSyntax> { Js.Return(() => Js.Bool(() => true)) }) }
+            }));
+        js.Add(() => Js.Func(() => "validateInitForm", () => new List<string>(), () => validateBody));
+
+        js.Add(() => Js.Let(() => "dirBrowserOpen", () => Js.Bool(() => false)));
+
+        var openDirBody = Js.Block()
+            .Add(() => Js.Const(() => "db", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirBrowser"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "dirBrowserOpen"), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "db").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "none")),
+                        Js.Assign(() => Js.Id(() => "dirBrowserOpen"), () => Js.Bool(() => false)),
+                        Js.Return(() => Js.Str(() => ""))
+                    })
+                }
+            }))
+            .Add(() => Js.Assign(() => Js.Id(() => "dirBrowserOpen"), () => Js.Bool(() => true)))
+            .Add(() => Js.Assign(() => Js.Id(() => "db").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "block")))
+            .Add(() => Js.Id(() => "browseDir").Invoke(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dataDirInput")).Prop(() => "value").Op(() => "||", () => (JsSyntax)Js.Str(() => "/"))).Stmt());
+        js.Add(() => Js.Func(() => "openDirBrowser", () => new List<string>(), () => openDirBody));
+
+        var browseDirBody = Js.Block()
+            .Add(() => Js.Const(() => "url", () => Js.Str(() => "/init/browse?dir=").Op(() => "+", () => (JsSyntax)Js.Id(() => "encodeURIComponent").Invoke(() => Js.Id(() => "path")))))
+            .Add(() => Js.Const(() => "db", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirBrowser"))));
+
+        var escapeHtml = Js.Id(() => "s")
+            .Call(() => "replace", () => Js.Regex(() => @"\&", () => "g"), () => Js.Str(() => "&amp;"))
+            .Call(() => "replace", () => Js.Regex(() => "\"", () => "g"), () => Js.Str(() => "&quot;"))
+            .Call(() => "replace", () => Js.Regex(() => "<", () => "g"), () => Js.Str(() => "&lt;"))
+            .Call(() => "replace", () => Js.Regex(() => ">", () => "g"), () => Js.Str(() => "&gt;"));
+        browseDirBody.Add(() => Js.Const(() => "h", () => Js.Arrow(() => new List<string> { "s" }, () => escapeHtml)));
+
+        browseDirBody
+            .Add(() => Js.Const(() => "html", () => Js.Str(() => "<div class=\"dir-header\"><span class=\"dir-current\">")))
+            .Add(() => Js.Id(() => "html").Call(() => "concat", () => Js.Id(() => "h").Invoke(() => Js.Id(() => "data").Prop(() => "currentPath"))).Stmt())
+            .Add(() => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "</span></div><div class=\"dir-list\">")).Stmt());
+        js.Add(() => Js.Func(() => "browseDir", () => new List<string> { "path" }, () => browseDirBody));
+
+        var switchLangBody = Js.Block()
+            .Add(() => Js.Const(() => "current", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "languageSelect")).Prop(() => "dataset").Prop(() => "current")))
+            .Add(() => Js.Const(() => "btn", () => Js.Id(() => "document").Call(() => "querySelector", () => Js.Str(() => ".lang-switch-btn"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "lang").Op(() => "===", () => (JsSyntax)Js.Id(() => "current")), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "btn").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "none"))
+                    })
+                },
+                { (null, new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "btn").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "inline-block"))
+                    })
+                }
+            }));
+        js.Add(() => Js.Func(() => "switchLanguage", () => new List<string> { "lang" }, () => switchLangBody));
+
+        var applyLangBody = Js.Block()
+            .Add(() => Js.Const(() => "selectedLang", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "languageSelect")).Prop(() => "value")))
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "location").Prop(() => "href"), () => Js.Str(() => "/init?lang=").Op(() => "+", () => (JsSyntax)Js.Id(() => "selectedLang"))));
+        js.Add(() => Js.Func(() => "applyLanguage", () => new List<string>(), () => applyLangBody));
+
+        return js;
     }
 
     private Dictionary<string, string> ParseFormData()
@@ -366,277 +485,346 @@ public class InitController : Controller
 
     private static string GetStyles()
     {
-        return @"
-            * { box-sizing: border-box; margin: 0; padding: 0; }
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-                min-height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #e2e8f0;
-            }
-            .init-container {
-                width: 100%;
-                max-width: 460px;
-                padding: 20px;
-            }
-            .init-card {
-                background: rgba(30, 41, 59, 0.8);
-                border: 1px solid rgba(148, 163, 184, 0.1);
-                border-radius: 16px;
-                padding: 40px 32px;
-                backdrop-filter: blur(20px);
-                max-width: 600px;
-                width: 100%;
-            }
-            .init-card h1 {
-                font-size: 24px;
-                font-weight: 600;
-                margin-bottom: 8px;
-                color: #f1f5f9;
-            }
-            .init-card > p {
-                font-size: 14px;
-                color: #94a3b8;
-                margin-bottom: 32px;
-            }
-            .init-form {
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-            }
-            .form-group {
-                display: flex;
-                flex-direction: column;
-                gap: 6px;
-            }
-            .form-group label {
-                font-size: 13px;
-                font-weight: 500;
-                color: #cbd5e1;
-            }
-            .form-group input {
-                width: 100%;
-                padding: 10px 14px;
-                border: 1px solid rgba(148, 163, 184, 0.2);
-                border-radius: 8px;
-                background: rgba(15, 23, 42, 0.6);
-                color: #f1f5f9;
-                font-size: 14px;
-                outline: none;
-                transition: border-color 0.2s;
-            }
-            .form-group input::placeholder {
-                color: #64748b;
-            }
-            .form-group input:focus {
-                border-color: #3b82f6;
-            }
-            .dir-input-row {
-                display: flex;
-                gap: 8px;
-            }
-            .dir-input-row input {
-                flex: 1;
-            }
-            .dir-browse-btn {
-                padding: 10px 16px;
-                border: 1px solid rgba(148, 163, 184, 0.3);
-                border-radius: 8px;
-                background: rgba(51, 65, 85, 0.6);
-                color: #cbd5e1;
-                font-size: 13px;
-                cursor: pointer;
-                transition: background 0.2s;
-                white-space: nowrap;
-            }
-            .dir-browse-btn:hover {
-                background: rgba(51, 65, 85, 0.9);
-            }
-            .dir-browser {
-                margin-top: 8px;
-                border: 1px solid rgba(148, 163, 184, 0.2);
-                border-radius: 8px;
-                background: rgba(15, 23, 42, 0.8);
-                max-height: 220px;
-                overflow-y: auto;
-            }
-            .dir-header {
-                padding: 10px 12px;
-                border-bottom: 1px solid rgba(148, 163, 184, 0.15);
-                position: sticky;
-                top: 0;
-                background: rgba(15, 23, 42, 0.95);
-            }
-            .dir-current {
-                font-size: 12px;
-                color: #94a3b8;
-                font-family: 'SF Mono', Consolas, monospace;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                display: block;
-            }
-            .dir-list { padding: 4px 0; }
-            .dir-item {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                padding: 8px 12px;
-                cursor: pointer;
-                font-size: 13px;
-                color: #cbd5e1;
-                transition: background 0.15s;
-            }
-            .dir-item:hover { background: rgba(59, 130, 246, 0.1); }
-            .dir-parent { color: #94a3b8; }
-            .dir-icon { font-size: 14px; width: 20px; text-align: center; }
-            .dir-browser::-webkit-scrollbar { width: 6px; }
-            .dir-browser::-webkit-scrollbar-track { background: transparent; }
-            .dir-browser::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.3); border-radius: 3px; }
-            .skin-grid {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 12px;
-                margin-top: 6px;
-            }
-            .skin-option {
-                cursor: pointer;
-                transition: all 0.3s ease;
-                text-align: center;
-                padding: 14px 8px;
-                border-radius: 10px;
-                border: 2px solid transparent;
-                position: relative;
-                user-select: none;
-            }
-            .skin-option:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 6px 16px rgba(0,0,0,0.25);
-            }
-            .skin-option.selected::after {
-                content: '\2713';
-                position: absolute;
-                top: 6px;
-                right: 8px;
-                font-size: 14px;
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .skin-icon { font-size: 24px; margin-bottom: 6px; }
-            .skin-name { font-weight: 600; font-size: 13px; margin-bottom: 2px; }
-            .skin-desc { font-size: 11px; opacity: 0.7; }
-            .skin-colors { margin-top: 8px; display: flex; justify-content: center; gap: 4px; }
-            .color-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-            .skin-preview-section { margin-top: 12px; }
-            .skin-preview-title { font-size: 13px; font-weight: 500; color: #cbd5e1; margin-bottom: 8px; }
-            .skin-preview-box {
-                border-radius: 10px;
-                border: 1px solid;
-                padding: 20px;
-                transition: all 0.3s ease;
-                min-height: 160px;
-            }
-            .preview-inner { display: flex; flex-direction: column; gap: 12px; }
-            .preview-card {
-                padding: 14px;
-                border-radius: 8px;
-                border: 1px solid;
-                transition: all 0.3s ease;
-            }
-            .preview-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-            .preview-card p { font-size: 12px; opacity: 0.8; line-height: 1.5; }
-            .preview-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-            .preview-btn {
-                padding: 6px 14px;
-                border-radius: 6px;
-                border: none;
-                cursor: pointer;
-                font-size: 12px;
-                transition: all 0.3s ease;
-            }
-            .form-error {
-                background: rgba(239, 68, 68, 0.1);
-                border: 1px solid rgba(239, 68, 68, 0.3);
-                border-radius: 8px;
-                padding: 10px 14px;
-                margin-bottom: 8px;
-            }
-            .form-error p {
-                font-size: 13px;
-                color: #fca5a5;
-            }
-            .form-actions {
-                margin-top: 8px;
-            }
-            .form-actions button {
-                width: 100%;
-                padding: 12px;
-                border: none;
-                border-radius: 8px;
-                background: #3b82f6;
-                color: white;
-                font-size: 15px;
-                font-weight: 500;
-                cursor: pointer;
-                transition: background 0.2s;
-            }
-            .form-actions button:hover {
-                background: #2563eb;
-            }
-            .init-footer {
-                margin-top: 24px;
-                text-align: center;
-            }
-            .init-footer p {
-                font-size: 12px;
-                color: #64748b;
-            }
-            .lang-selector-row {
-                display: flex;
-                gap: 8px;
-                align-items: center;
-                width: 100%;
-            }
-            .lang-selector-row select {
-                flex: 1;
-                padding: 10px 14px;
-                border: 1px solid rgba(148, 163, 184, 0.2);
-                border-radius: 8px;
-                background: rgba(15, 23, 42, 0.6);
-                color: #f1f5f9;
-                font-size: 14px;
-                outline: none;
-                transition: border-color 0.2s;
-                cursor: pointer;
-            }
-            .lang-selector-row select:focus {
-                border-color: #3b82f6;
-            }
-            .lang-selector-row select option {
-                background: #1e293b;
-                color: #f1f5f9;
-            }
-            .lang-switch-btn {
-                padding: 10px 16px;
-                border: 1px solid rgba(148, 163, 184, 0.3);
-                border-radius: 8px;
-                background: rgba(51, 65, 85, 0.6);
-                color: #cbd5e1;
-                font-size: 13px;
-                cursor: pointer;
-                transition: background 0.2s;
-                white-space: nowrap;
-            }
-            .lang-switch-btn:hover {
-                background: rgba(51, 65, 85, 0.9);
-            }
-        ";
+        return CssBuilder.Create()
+            .Selector("*")
+                .Property("box-sizing", "border-box")
+                .Property("margin", "0")
+                .Property("padding", "0")
+            .EndSelector()
+            .Selector("body")
+                .Property("font-family", "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif")
+                .Property("background", "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)")
+                .Property("min-height", "100vh")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("justify-content", "center")
+                .Property("color", "#e2e8f0")
+            .EndSelector()
+            .Selector(".init-container")
+                .Property("width", "100%")
+                .Property("max-width", "460px")
+                .Property("padding", "20px")
+            .EndSelector()
+            .Selector(".init-card")
+                .Property("background", "rgba(30, 41, 59, 0.8)")
+                .Property("border", "1px solid rgba(148, 163, 184, 0.1)")
+                .Property("border-radius", "16px")
+                .Property("padding", "40px 32px")
+                .Property("backdrop-filter", "blur(20px)")
+                .Property("max-width", "600px")
+                .Property("width", "100%")
+            .EndSelector()
+            .Selector(".init-card h1")
+                .Property("font-size", "24px")
+                .Property("font-weight", "600")
+                .Property("margin-bottom", "8px")
+                .Property("color", "#f1f5f9")
+            .EndSelector()
+            .Selector(".init-card > p")
+                .Property("font-size", "14px")
+                .Property("color", "#94a3b8")
+                .Property("margin-bottom", "32px")
+            .EndSelector()
+            .Selector(".init-form")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+                .Property("gap", "20px")
+            .EndSelector()
+            .Selector(".form-group")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+                .Property("gap", "6px")
+            .EndSelector()
+            .Selector(".form-group label")
+                .Property("font-size", "13px")
+                .Property("font-weight", "500")
+                .Property("color", "#cbd5e1")
+            .EndSelector()
+            .Selector(".form-group input")
+                .Property("width", "100%")
+                .Property("padding", "10px 14px")
+                .Property("border", "1px solid rgba(148, 163, 184, 0.2)")
+                .Property("border-radius", "8px")
+                .Property("background", "rgba(15, 23, 42, 0.6)")
+                .Property("color", "#f1f5f9")
+                .Property("font-size", "14px")
+                .Property("outline", "none")
+                .Property("transition", "border-color 0.2s")
+            .EndSelector()
+            .Selector(".form-group input::placeholder")
+                .Property("color", "#64748b")
+            .EndSelector()
+            .Selector(".form-group input:focus")
+                .Property("border-color", "#3b82f6")
+            .EndSelector()
+            .Selector(".dir-input-row")
+                .Property("display", "flex")
+                .Property("gap", "8px")
+            .EndSelector()
+            .Selector(".dir-input-row input")
+                .Property("flex", "1")
+            .EndSelector()
+            .Selector(".dir-browse-btn")
+                .Property("padding", "10px 16px")
+                .Property("border", "1px solid rgba(148, 163, 184, 0.3)")
+                .Property("border-radius", "8px")
+                .Property("background", "rgba(51, 65, 85, 0.6)")
+                .Property("color", "#cbd5e1")
+                .Property("font-size", "13px")
+                .Property("cursor", "pointer")
+                .Property("transition", "background 0.2s")
+                .Property("white-space", "nowrap")
+            .EndSelector()
+            .Selector(".dir-browse-btn:hover")
+                .Property("background", "rgba(51, 65, 85, 0.9)")
+            .EndSelector()
+            .Selector(".dir-browser")
+                .Property("margin-top", "8px")
+                .Property("border", "1px solid rgba(148, 163, 184, 0.2)")
+                .Property("border-radius", "8px")
+                .Property("background", "rgba(15, 23, 42, 0.8)")
+                .Property("max-height", "220px")
+                .Property("overflow-y", "auto")
+            .EndSelector()
+            .Selector(".dir-browser::-webkit-scrollbar")
+                .Property("width", "6px")
+            .EndSelector()
+            .Selector(".dir-browser::-webkit-scrollbar-track")
+                .Property("background", "transparent")
+            .EndSelector()
+            .Selector(".dir-browser::-webkit-scrollbar-thumb")
+                .Property("background", "rgba(148,163,184,0.3)")
+                .Property("border-radius", "3px")
+            .EndSelector()
+            .Selector(".dir-header")
+                .Property("padding", "10px 12px")
+                .Property("border-bottom", "1px solid rgba(148, 163, 184, 0.15)")
+                .Property("position", "sticky")
+                .Property("top", "0")
+                .Property("background", "rgba(15, 23, 42, 0.95)")
+            .EndSelector()
+            .Selector(".dir-current")
+                .Property("font-size", "12px")
+                .Property("color", "#94a3b8")
+                .Property("font-family", "'SF Mono', Consolas, monospace")
+                .Property("overflow", "hidden")
+                .Property("text-overflow", "ellipsis")
+                .Property("white-space", "nowrap")
+                .Property("display", "block")
+            .EndSelector()
+            .Selector(".dir-list")
+                .Property("padding", "4px 0")
+            .EndSelector()
+            .Selector(".dir-item")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("gap", "8px")
+                .Property("padding", "8px 12px")
+                .Property("cursor", "pointer")
+                .Property("font-size", "13px")
+                .Property("color", "#cbd5e1")
+                .Property("transition", "background 0.15s")
+            .EndSelector()
+            .Selector(".dir-item:hover")
+                .Property("background", "rgba(59, 130, 246, 0.1)")
+            .EndSelector()
+            .Selector(".dir-parent")
+                .Property("color", "#94a3b8")
+            .EndSelector()
+            .Selector(".dir-icon")
+                .Property("font-size", "14px")
+                .Property("width", "20px")
+                .Property("text-align", "center")
+            .EndSelector()
+            .Media("(max-width: 480px)")
+                .Selector(".skin-grid")
+                    .Property("grid-template-columns", "repeat(2, 1fr)")
+                .EndSelector()
+            .EndMedia()
+            .Selector(".skin-grid")
+                .Property("display", "grid")
+                .Property("grid-template-columns", "repeat(4, 1fr)")
+                .Property("gap", "12px")
+                .Property("margin-top", "6px")
+            .EndSelector()
+            .Selector(".skin-option")
+                .Property("cursor", "pointer")
+                .Property("transition", "all 0.3s ease")
+                .Property("text-align", "center")
+                .Property("padding", "14px 8px")
+                .Property("border-radius", "10px")
+                .Property("border", "2px solid transparent")
+                .Property("position", "relative")
+                .Property("user-select", "none")
+            .EndSelector()
+            .Selector(".skin-option:hover")
+                .Property("transform", "translateY(-3px)")
+                .Property("box-shadow", "0 6px 16px rgba(0,0,0,0.25)")
+            .EndSelector()
+            .Selector(".skin-option.selected::after")
+                .Property("content", "\"\\2713\"")
+                .Property("position", "absolute")
+                .Property("top", "6px")
+                .Property("right", "8px")
+                .Property("font-size", "14px")
+                .Property("width", "20px")
+                .Property("height", "20px")
+                .Property("border-radius", "50%")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("justify-content", "center")
+            .EndSelector()
+            .Selector(".skin-icon")
+                .Property("font-size", "24px")
+                .Property("margin-bottom", "6px")
+            .EndSelector()
+            .Selector(".skin-name")
+                .Property("font-weight", "600")
+                .Property("font-size", "13px")
+                .Property("margin-bottom", "2px")
+            .EndSelector()
+            .Selector(".skin-desc")
+                .Property("font-size", "11px")
+                .Property("opacity", "0.7")
+            .EndSelector()
+            .Selector(".skin-colors")
+                .Property("margin-top", "8px")
+                .Property("display", "flex")
+                .Property("justify-content", "center")
+                .Property("gap", "4px")
+            .EndSelector()
+            .Selector(".color-dot")
+                .Property("width", "10px")
+                .Property("height", "10px")
+                .Property("border-radius", "50%")
+                .Property("display", "inline-block")
+            .EndSelector()
+            .Selector(".skin-preview-section")
+                .Property("margin-top", "12px")
+            .EndSelector()
+            .Selector(".skin-preview-title")
+                .Property("font-size", "13px")
+                .Property("font-weight", "500")
+                .Property("color", "#cbd5e1")
+                .Property("margin-bottom", "8px")
+            .EndSelector()
+            .Selector(".skin-preview-box")
+                .Property("border-radius", "10px")
+                .Property("border", "1px solid")
+                .Property("padding", "20px")
+                .Property("transition", "all 0.3s ease")
+                .Property("min-height", "160px")
+            .EndSelector()
+            .Selector(".preview-inner")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+                .Property("gap", "12px")
+            .EndSelector()
+            .Selector(".preview-card")
+                .Property("padding", "14px")
+                .Property("border-radius", "8px")
+                .Property("border", "1px solid")
+                .Property("transition", "all 0.3s ease")
+            .EndSelector()
+            .Selector(".preview-card h4")
+                .Property("font-size", "14px")
+                .Property("font-weight", "600")
+                .Property("margin-bottom", "6px")
+            .EndSelector()
+            .Selector(".preview-card p")
+                .Property("font-size", "12px")
+                .Property("opacity", "0.8")
+                .Property("line-height", "1.5")
+            .EndSelector()
+            .Selector(".preview-btns")
+                .Property("display", "flex")
+                .Property("gap", "8px")
+                .Property("flex-wrap", "wrap")
+            .EndSelector()
+            .Selector(".preview-btn")
+                .Property("padding", "6px 14px")
+                .Property("border-radius", "6px")
+                .Property("border", "none")
+                .Property("cursor", "pointer")
+                .Property("font-size", "12px")
+                .Property("transition", "all 0.3s ease")
+            .EndSelector()
+            .Selector(".form-error")
+                .Property("background", "rgba(239, 68, 68, 0.1)")
+                .Property("border", "1px solid rgba(239, 68, 68, 0.3)")
+                .Property("border-radius", "8px")
+                .Property("padding", "10px 14px")
+                .Property("margin-bottom", "8px")
+            .EndSelector()
+            .Selector(".form-error p")
+                .Property("font-size", "13px")
+                .Property("color", "#fca5a5")
+            .EndSelector()
+            .Selector(".form-actions")
+                .Property("margin-top", "8px")
+            .EndSelector()
+            .Selector(".form-actions button")
+                .Property("width", "100%")
+                .Property("padding", "12px")
+                .Property("border", "none")
+                .Property("border-radius", "8px")
+                .Property("background", "#3b82f6")
+                .Property("color", "white")
+                .Property("font-size", "15px")
+                .Property("font-weight", "500")
+                .Property("cursor", "pointer")
+                .Property("transition", "background 0.2s")
+            .EndSelector()
+            .Selector(".form-actions button:hover")
+                .Property("background", "#2563eb")
+            .EndSelector()
+            .Selector(".init-footer")
+                .Property("margin-top", "24px")
+                .Property("text-align", "center")
+            .EndSelector()
+            .Selector(".init-footer p")
+                .Property("font-size", "12px")
+                .Property("color", "#64748b")
+            .EndSelector()
+            .Selector(".lang-selector-row")
+                .Property("display", "flex")
+                .Property("gap", "8px")
+                .Property("align-items", "center")
+                .Property("width", "100%")
+            .EndSelector()
+            .Selector(".lang-selector-row select")
+                .Property("flex", "1")
+                .Property("padding", "10px 14px")
+                .Property("border", "1px solid rgba(148, 163, 184, 0.2)")
+                .Property("border-radius", "8px")
+                .Property("background", "rgba(15, 23, 42, 0.6)")
+                .Property("color", "#f1f5f9")
+                .Property("font-size", "14px")
+                .Property("outline", "none")
+                .Property("transition", "border-color 0.2s")
+                .Property("cursor", "pointer")
+            .EndSelector()
+            .Selector(".lang-selector-row select:focus")
+                .Property("border-color", "#3b82f6")
+            .EndSelector()
+            .Selector(".lang-selector-row select option")
+                .Property("background", "#1e293b")
+                .Property("color", "#f1f5f9")
+            .EndSelector()
+            .Selector(".lang-switch-btn")
+                .Property("padding", "10px 16px")
+                .Property("border", "1px solid rgba(148, 163, 184, 0.3)")
+                .Property("border-radius", "8px")
+                .Property("background", "rgba(51, 65, 85, 0.6)")
+                .Property("color", "#cbd5e1")
+                .Property("font-size", "13px")
+                .Property("cursor", "pointer")
+                .Property("transition", "background 0.2s")
+                .Property("white-space", "nowrap")
+            .EndSelector()
+            .Selector(".lang-switch-btn:hover")
+                .Property("background", "rgba(51, 65, 85, 0.9)")
+            .EndSelector()
+            .Build();
     }
 }

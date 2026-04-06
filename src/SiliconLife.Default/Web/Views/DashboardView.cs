@@ -9,7 +9,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text;
 using SiliconLife.Default.Web.Models;
 
 namespace SiliconLife.Default.Web.Views;
@@ -24,59 +23,73 @@ public class DashboardView : ViewBase
         return RenderPage(vm.Skin, "仪表盘 - Silicon Life Collective", "dashboard", body, GetScripts(), GetStyles());
     }
 
-    private static string RenderBody(DashboardViewModel vm)
+    private static H RenderBody(DashboardViewModel vm)
     {
-        return @"
-<div class=""page-content"">
-    <div class=""page-header""><h1>仪表盘</h1></div>
-    <div class=""stats-grid"">
-        <div class=""stat-card""><h3>硅基人数量</h3><div class=""stat-value"" id=""being-count"">0</div></div>
-        <div class=""stat-card""><h3>活跃硅基人</h3><div class=""stat-value"" id=""active-beings"">0</div></div>
-        <div class=""stat-card""><h3>运行时间</h3><div class=""stat-value"" id=""uptime"">00:00:00</div></div>
-        <div class=""stat-card""><h3>内存占用</h3><div class=""stat-value"" id=""memory"">0 MB</div></div>
-    </div>
-    <div class=""card"">
-        <h3>消息频率</h3>
-        <div class=""chart-container""><svg id=""message-chart"" viewBox=""0 0 800 300"" preserveAspectRatio=""xMidYMid meet""></svg></div>
-    </div>
-</div>";
+        return H.Div(
+            H.Div(
+                H.H1("仪表盘")
+            ).Class("page-header"),
+            H.Div(
+                H.Div(
+                    H.H3("硅基人数量"),
+                    H.Div("0").Id("being-count").Class("stat-value")
+                ).Class("stat-card"),
+                H.Div(
+                    H.H3("活跃硅基人"),
+                    H.Div("0").Id("active-beings").Class("stat-value")
+                ).Class("stat-card"),
+                H.Div(
+                    H.H3("运行时间"),
+                    H.Div("00:00:00").Id("uptime").Class("stat-value")
+                ).Class("stat-card"),
+                H.Div(
+                    H.H3("内存占用"),
+                    H.Div("0 MB").Id("memory").Class("stat-value")
+                ).Class("stat-card")
+            ).Class("stats-grid"),
+            H.Div(
+                H.H3("消息频率"),
+                H.Div(
+                    H.Svg().Id("message-chart").Attr("viewBox", "0 0 800 300").Attr("preserveAspectRatio", "xMidYMid meet")
+                ).Class("chart-container")
+            ).Class("card")
+        ).Class("page-content");
     }
 
-    private static string GetStyles()
+    private static CssBuilder GetStyles()
     {
-        return @"
-.chart-container { width: 100%; }
-.chart-container svg { width: 100%; height: 300px; }";
+        return CssBuilder.Create()
+            .Selector(".chart-container")
+                .Property("width", "100%")
+            .EndSelector()
+            .Selector(".chart-container svg")
+                .Property("width", "100%")
+                .Property("height", "300px")
+            .EndSelector();
     }
 
-    private static string GetScripts()
+    private static JsSyntax GetScripts()
     {
-        var sb = new StringBuilder();
-        sb.AppendLine("function updateStats() {");
-        sb.AppendLine("    fetch('/api/dashboard/stats').then(function(r) { return r.json(); }).then(function(data) {");
-        sb.AppendLine("        document.getElementById('being-count').textContent = data.beingCount;");
-        sb.AppendLine("        document.getElementById('uptime').textContent = data.uptime;");
-        sb.AppendLine("        document.getElementById('memory').textContent = data.memoryMB + ' MB';");
-        sb.AppendLine("    });");
-        sb.AppendLine("}");
-        sb.AppendLine("function updateChart() {");
-        sb.AppendLine("    fetch('/api/dashboard/metrics').then(function(r) { return r.json(); }).then(function(data) {");
-        sb.AppendLine("        var svg = document.getElementById('message-chart');");
-        sb.AppendLine("        var width = 800, height = 300, padding = 40;");
-        sb.AppendLine("        var maxVal = Math.max.apply(null, data.messageCounts.concat([10]));");
-        sb.AppendLine("        var xStep = (width - padding * 2) / (data.timestamps.length - 1);");
-        sb.AppendLine("        var points = data.messageCounts.map(function(val, i) {");
-        sb.AppendLine("            return (padding + i * xStep) + ',' + (height - padding - (val / maxVal) * (height - padding * 2));");
-        sb.AppendLine("        }).join(' ');");
-        sb.AppendLine("        var polyline = '<polyline points=\"' + points + '\" fill=\"none\" stroke=\"var(--accent-primary)\" stroke-width=\"2\"/>';");
-        sb.AppendLine("        var axes = '<line x1=\"' + padding + '\" y1=\"' + (height-padding) + '\" x2=\"' + (width-padding) + '\" y2=\"' + (height-padding) + '\" stroke=\"var(--border)\" stroke-width=\"1\"/>';");
-        sb.AppendLine("        axes += '<line x1=\"' + padding + '\" y1=\"' + padding + '\" x2=\"' + padding + '\" y2=\"' + (height-padding) + '\" stroke=\"var(--border)\" stroke-width=\"1\"/>';");
-        sb.AppendLine("        svg.innerHTML = axes + polyline;");
-        sb.AppendLine("    });");
-        sb.AppendLine("}");
-        sb.AppendLine("setInterval(updateStats, 5000);");
-        sb.AppendLine("setInterval(updateChart, 10000);");
-        sb.AppendLine("window.onload = function() { updateStats(); updateChart(); };");
-        return sb.ToString();
+        var updateStatsThenBody = Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "being-count")).Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "beingCount")))
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "uptime")).Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "uptime")))
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "memory")).Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "memoryMB").Op(() => "+", () => (JsSyntax)Js.Str(() => " MB"))));
+
+        var updateStatsBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/dashboard/stats")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => updateStatsThenBody)).Stmt());
+
+        var updateChartThenBody = Js.Block()
+            .Add(() => Js.Const(() => "svg", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "message-chart"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "svg").Prop(() => "innerHTML"), () => Js.Str(() => "")));
+
+        var updateChartBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/dashboard/metrics")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => updateChartThenBody)).Stmt());
+
+        return Js.Block()
+            .Add(() => Js.Func(() => "updateStats", () => new List<string>(), () => updateStatsBody))
+            .Add(() => Js.Func(() => "updateChart", () => new List<string>(), () => updateChartBody))
+            .Add(() => Js.Id(() => "setInterval").Invoke(() => Js.Id(() => "updateStats"), () => Js.Num(() => "5000")).Stmt())
+            .Add(() => Js.Id(() => "setInterval").Invoke(() => Js.Id(() => "updateChart"), () => Js.Num(() => "10000")).Stmt())
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Block().Add(() => Js.Id(() => "updateStats").Invoke().Stmt()).Add(() => Js.Id(() => "updateChart").Invoke().Stmt()))));
     }
 }

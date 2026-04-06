@@ -24,10 +24,10 @@ public class ChatView : ViewBase
 
         var body = RenderChatBody(vm);
         return RenderPage(vm.Skin, "聊天 - Silicon Life Collective", vm.ActiveMenu, body,
-            GetScripts(vm).Build(), GetStyles().Build());
+            GetScripts(vm), GetStyles());
     }
 
-    private static string RenderChatBody(ChatViewModel vm)
+    private static H RenderChatBody(ChatViewModel vm)
     {
         var sessionItems = new List<object>();
         foreach (var session in vm.Sessions)
@@ -36,7 +36,7 @@ public class ChatView : ViewBase
             sessionItems.Add(H.Div(
                 H.Div(session.Name).Class("being-name"),
                 H.Div(session.LastMessage).Class("being-last-message")
-            ).Class("being-item" + (isActive ? " active" : "")).Data("id", session.Id));
+            ).Class("being-item" + (isActive ? " active" : "")).Data("id", session.Id.ToString()));
         }
 
         var msgItems = new List<object>();
@@ -45,7 +45,7 @@ public class ChatView : ViewBase
             msgItems.Add(RenderMessage(msg));
         }
 
-        var html = H.Div(
+        return H.Div(
             H.Div(
                 H.Div("会话").Class("chat-conversations-header"),
                 H.Div(sessionItems.ToArray()).Id("beings-list").Class("chat-conversations-list")
@@ -62,20 +62,18 @@ public class ChatView : ViewBase
                 ).Class("chat-input-area")
             ).Class("chat-main")
         ).Class("chat-layout");
-
-        return html.Build();
     }
 
     private static H RenderMessage(ChatMessage msg)
     {
         if (msg.IsUser)
         {
-            return H.Div(
-                H.Div(
-                    msg.Text ?? "",
-                    H.When(!string.IsNullOrEmpty(msg.Time), H.Div(msg.Time!).Class("msg-time"))
-                ).Class("msg-user-bubble")
-            ).Class("msg-user");
+            var bubble = H.Div(
+                msg.Text ?? ""
+            ).Class("msg-user-bubble");
+            if (!string.IsNullOrEmpty(msg.Time))
+                bubble.Add(H.Div(msg.Time).Class("msg-time"));
+            return H.Div(bubble).Class("msg-user");
         }
 
         var children = new List<object>();
@@ -380,200 +378,133 @@ public class ChatView : ViewBase
             .EndMedia();
     }
 
-    private static JsBuilder GetScripts(ChatViewModel vm)
+    private static JsSyntax GetScripts(ChatViewModel vm)
     {
-        var js = JsBuilder.Create();
         var currentSessionId = vm.CurrentBeingId?.ToString() ?? "null";
 
-        js.Comment("Chat page initialization")
-            .Let("currentSessionId", currentSessionId)
-            .EmptyLine()
-            .Comment("Auto-resize textarea")
-            .Function("autoResize", fb => fb
-                .Param("textarea")
-                .EndParams()
-                .Assign("textarea.style.height", "'auto'")
-                .Assign("textarea.style.height", "Math.min(textarea.scrollHeight, 120) + 'px'")
-                .EndBlock()
-            )
-            .EmptyLine()
-            .Comment("Send message")
-            .Function("sendMessage", fb => fb
-                .EndParams()
-                .Let("input", "document.getElementById('message-input')")
-                .Let("text", "input.value.trim()")
-                .If("!text || !currentSessionId")
-                    .Return()
-                .EndBlock()
-                .Let("messages", "document.getElementById('chat-messages')")
-                .Let("userDiv", "document.createElement('div')")
-                .Assign("userDiv.className", "'msg-user'")
-                .Assign("userDiv.innerHTML", "'<div class=\"msg-user-bubble\">' + text + '</div>'")
-                .CallMethod("messages", "appendChild", "userDiv")
-                .Assign("input.value", "''")
-                .Call("autoResize", "input")
-                .CallMethod("messages", "scrollTo",
-                    "{ top: messages.scrollHeight, behavior: 'smooth' }")
-                .EmptyLine()
-                .Comment("Send to server")
-                .Fetch("'/api/chat/send'",
-                    "{ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: currentSessionId, message: text }) }",
-                    chain => chain
-                        .ThenReturn("r", "r.json()")
-                        .Then("data", d => d
-                            .If("data.reply")
-                                .Call("appendMessage", "data.reply")
-                            .EndBlock()
-                        )
-                        .CatchLog("err", "'Send failed:'")
-                )
-                .EndBlock()
-            )
-            .EmptyLine()
-            .Comment("Append a message (user or being)")
-            .Function("appendMessage", fb => fb
-                .Param("msg")
-                .EndParams()
-                .Let("messages", "document.getElementById('chat-messages')")
-                .If("msg.isUser")
-                    .Let("div", "document.createElement('div')")
-                    .Assign("div.className", "'msg-user'")
-                    .Let("bubble", "document.createElement('div')")
-                    .Assign("bubble.className", "'msg-user-bubble'")
-                    .Assign("bubble.textContent", "msg.text || ''")
-                    .CallMethod("div", "appendChild", "bubble")
-                    .If("msg.time")
-                        .Let("timeEl", "document.createElement('div')")
-                        .Assign("timeEl.className", "'msg-time'")
-                        .Assign("timeEl.textContent", "msg.time")
-                        .CallMethod("div", "appendChild", "timeEl")
-                    .EndBlock()
-                    .CallMethod("messages", "appendChild", "div")
-                .Else()
-                    .Let("div", "document.createElement('div')")
-                    .Assign("div.className", "'msg-being'")
-                    .Let("html", "'<div class=\"msg-being-card\"><div class=\"msg-being-body\">'")
-                    .If("msg.senderName")
-                        .AppendAssign("html", "'<div class=\"msg-being-sender\">' + msg.senderName + '</div>'")
-                    .EndBlock()
-                    .AppendAssign("html", "'<div class=\"msg-being-text\">' + (msg.text || '') + '</div>'")
-                    .If("msg.thinking")
-                        .AppendAssign("html", "'<details class=\"msg-collapsible\"><summary>💭 思考过程</summary><div class=\"msg-thinking-content\">' + msg.thinking + '</div></details>'")
-                    .EndBlock()
-                    .If("msg.toolCalls && msg.toolCalls.length > 0")
-                        .AppendAssign("html", "'<details class=\"msg-collapsible\"><summary>🔧 工具调用 (' + msg.toolCalls.length + '项)</summary><div class=\"msg-tools-list\">'")
-                        .ForEach("msg.toolCalls", "t", t => t
-                            .Const("icon", "t.success ? '✓' : '✗'")
-                            .Const("cls", "t.success ? 'msg-tool-success' : 'msg-tool-fail'")
-                            .AppendAssign("html", "'<div class=\"msg-tool-item\"><span class=\"tool-status ' + cls + '\">' + icon + '</span><span>' + t.name + (t.target ? ' · ' + t.target : '') + '</span></div>'")
-                            .EndBlock()
-                        )
-                        .AppendAssign("html", "'</div></details>'")
-                    .EndBlock()
-                    .AppendAssign("html", "'</div></div>'")
-                    .If("msg.time")
-                        .AppendAssign("html", "'<div class=\"msg-time\">' + msg.time + '</div>'")
-                    .EndBlock()
-                    .Assign("div.innerHTML", "html")
-                    .CallMethod("messages", "appendChild", "div")
-                .EndBlock()
-                .CallMethod("messages", "scrollTo",
-                    "{ top: messages.scrollHeight, behavior: 'smooth' }")
-                .EndBlock()
-            )
-            .EmptyLine()
-            .Comment("Session selection")
-            .Function("selectSession", fb => fb
-                .Param("sessionId").Param("name")
-                .EndParams()
-                .Assign("currentSessionId", "sessionId")
-                .Assign("document.querySelector('.chat-header-name').textContent", "name")
-                .CallMethod("document.getElementById('chat-messages')", "setAttribute",
-                    "'data-session-id'", "sessionId")
-                .Comment("Load history for selected session")
-                .Fetch("'/api/chat/history?sessionId=' + sessionId", chain: chain =>
-                    chain.ThenReturn("r", "r.json()")
-                    .Then("data", d => d
-                        .Const("container", "document.getElementById('chat-messages')")
-                        .Assign("container.innerHTML", "''")
-                        .ForEachExpr("data.messages", "m", "appendMessage(m)")
-                        .Assign("container.scrollTop", "container.scrollHeight")
-                    )
-                    .CatchLog("err", "'Load history failed:'")
-                )
-                .EndBlock()
-            )
-            .EmptyLine()
-            .Comment("Keyboard shortcut: Enter to send")
-            .Function("initInput", fb => fb
-                .EndParams()
-                .Let("input", "document.getElementById('message-input')")
-                .On("input", "keydown", "e", e => e
-                    .If("e.key === 'Enter' && !e.shiftKey")
-                        .CallMethod("e", "preventDefault")
-                        .Call("sendMessage")
-                    .EndBlock()
-                    .EndBlock()
-                )
-                .Call("autoResize", "input")
-                .EndBlock()
-            )
-            .EmptyLine()
-            .Comment("Bind click events to session items")
-            .Function("initSessionList", fb => fb
-                .EndParams()
-                .ForEach("document.querySelectorAll('.being-item')", "item", item => item
-                    .On("item", "click", "e", body => body
-                        .ForEachExpr("document.querySelectorAll('.being-item')", "el", "el.classList.remove('active')")
-                        .CallMethod("item.classList", "add", "'active'")
-                        .Call("selectSession", "item.dataset.id", "item.querySelector('.being-name').textContent")
-                        .EndBlock()
-                    )
-                    .EndBlock()
-                )
-                .EndBlock()
-            )
-            .EmptyLine()
-            .Comment("Load conversation list from API")
-            .Function("loadConversations", fb => fb
-                .EndParams()
-                .Fetch("'/api/chat/conversations'", chain: chain =>
-                    chain.Then("r", r => r
-                        .If("!r.ok")
-                            .Throw("'HTTP ' + r.status")
-                        .EndBlock()
-                        .Return("r.json()")
-                    )
-                    .Then("data", d => d
-                        .If("data.error")
-                            .Assign("document.getElementById('beings-list').innerHTML", "'<div style=\"padding:12px 20px;color:var(--text-secondary);font-size:12px;\">Error: ' + data.error + '</div>'")
-                            .Return()
-                        .EndBlock()
-                        .Let("list", "document.getElementById('beings-list')")
-                        .Assign("list.innerHTML", "''")
-                        .ForEach("data", "item", item => item
-                            .Let("div", "document.createElement('div')")
-                            .Assign("div.className", "'being-item'")
-                            .Assign("div.dataset.id", "item.sessionId")
-                            .Assign("div.innerHTML", "'<div class=\"being-name\">' + item.displayName + '</div>' + '<div class=\"being-last-message\">' + (item.lastMessage || '') + '</div>'")
-                            .CallMethod("list", "appendChild", "div")
-                            .EndBlock()
-                        )
-                        .Call("initSessionList")
-                    )
-                    .Catch("err", e => e
-                        .ConsoleError("'Load conversations failed:'", "err")
-                        .Assign("document.getElementById('beings-list').innerHTML", "'<div style=\"padding:12px 20px;color:var(--text-secondary);font-size:12px;\">Failed to load conversations</div>'")
-                    )
-                )
-                .EndBlock()
-            )
-            .EmptyLine()
-            .Comment("Init on load")
-            .Call("initInput")
-            .Call("loadConversations")
-            .CallMethod("document.getElementById('chat-messages')", "scrollTo",
-                "{ top: 999999, behavior: 'auto' }");
+        var js = Js.Block()
+            .Add(() => Js.Let(() => "currentSessionId", () => Js.Str(() => currentSessionId)));
+
+        var autoResizeBody = Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "textarea").Prop(() => "style").Prop(() => "height"), () => Js.Str(() => "auto")))
+            .Add(() => Js.Assign(() => Js.Id(() => "textarea").Prop(() => "style").Prop(() => "height"), () => Js.Id(() => "Math").Call(() => "min", () => Js.Id(() => "textarea").Prop(() => "scrollHeight"), () => Js.Num(() => "120")).Op(() => "+", () => (JsSyntax)Js.Str(() => "px"))));
+        js.Add(() => Js.Func(() => "autoResize", () => new List<string> { "textarea" }, () => autoResizeBody));
+
+        var textEmptyCond = Js.Id(() => "text").Not().Op(() => "||", () => (JsSyntax)Js.Id(() => "currentSessionId").Not());
+        var dataReplyCond = Js.Id(() => "data").Prop(() => "reply");
+        var appendReplyStmt = Js.Id(() => "appendMessage").Invoke(() => Js.Id(() => "data").Prop(() => "reply")).Stmt();
+        var sendMessageThenBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (dataReplyCond, new List<JsSyntax> { appendReplyStmt }) }
+            }));
+        var sendMessageBody = Js.Block()
+            .Add(() => Js.Const(() => "input", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "message-input"))))
+            .Add(() => Js.Const(() => "text", () => Js.Id(() => "input").Prop(() => "value").Call(() => "trim")))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (textEmptyCond, new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
+            }))
+            .Add(() => Js.Const(() => "messages", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))))
+            .Add(() => Js.Const(() => "userDiv", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "userDiv").Prop(() => "className"), () => Js.Str(() => "msg-user")))
+            .Add(() => Js.Assign(() => Js.Id(() => "userDiv").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-user-bubble\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"))))
+            .Add(() => Js.Id(() => "messages").Call(() => "appendChild", () => Js.Id(() => "userDiv")).Stmt())
+            .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "value"), () => Js.Str(() => "")))
+            .Add(() => Js.Id(() => "autoResize").Invoke(() => Js.Id(() => "input")).Stmt())
+            .Add(() => Js.Id(() => "messages").Call(() => "scrollTo", () => Js.Obj().Prop(() => "top", () => Js.Id(() => "messages").Prop(() => "scrollHeight")).Prop(() => "behavior", () => Js.Str(() => "smooth"))).Stmt())
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/chat/send")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => sendMessageThenBody)).Call(() => "catch", () => Js.Arrow(() => new List<string> { "err" }, () => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Send failed:"), () => Js.Id(() => "err")))).Stmt());
+        js.Add(() => Js.Func(() => "sendMessage", () => new List<string>(), () => sendMessageBody));
+
+        var dataMessagesCond = Js.Id(() => "data").Prop(() => "messages");
+        var forEachMsgStmt = Js.Id(() => "data").Prop(() => "messages").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "m" }, () => Js.Id(() => "appendMessage").Invoke(() => Js.Id(() => "m")))).Stmt();
+        var dataMessagesBody = new List<JsSyntax> { forEachMsgStmt };
+        var historyThenBody = Js.Block()
+            .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Str(() => "")))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (dataMessagesCond, dataMessagesBody) }
+            }))
+            .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "scrollTop"), () => Js.Id(() => "container").Prop(() => "scrollHeight")));
+        var selectSessionBody = Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "currentSessionId"), () => Js.Id(() => "sessionId")))
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "querySelector", () => Js.Str(() => ".chat-header-name")).Prop(() => "textContent"), () => Js.Id(() => "name")))
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages")).Call(() => "setAttribute", () => Js.Str(() => "data-session-id"), () => Js.Id(() => "sessionId")).Stmt())
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/chat/history?sessionId=").Op(() => "+", () => (JsSyntax)Js.Id(() => "sessionId"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => historyThenBody)).Call(() => "catch", () => Js.Arrow(() => new List<string> { "err" }, () => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Load history failed:"), () => Js.Id(() => "err")))).Stmt());
+        js.Add(() => Js.Func(() => "selectSession", () => new List<string> { "sessionId", "name" }, () => selectSessionBody));
+
+        var initInputBody = Js.Block()
+            .Add(() => Js.Const(() => "input", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "message-input"))))
+            .Add(() => Js.Id(() => "autoResize").Invoke(() => Js.Id(() => "input")).Stmt());
+        js.Add(() => Js.Func(() => "initInput", () => new List<string>(), () => initInputBody));
+
+        var removeActiveArrow = Js.Arrow(() => new List<string> { "el" }, () => Js.Id(() => "el").Prop(() => "classList").Call(() => "remove", () => Js.Str(() => "active")));
+        var clickHandlerBody = Js.Block()
+            .Add(() => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => ".being-item")).Call(() => "forEach", () => removeActiveArrow).Stmt())
+            .Add(() => Js.Id(() => "item").Prop(() => "classList").Call(() => "add", () => Js.Str(() => "active")).Stmt())
+            .Add(() => Js.Id(() => "selectSession").Invoke(() => Js.Id(() => "item").Prop(() => "dataset").Prop(() => "id"), () => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".being-name")).Prop(() => "textContent")).Stmt());
+        var forEachItemBody = Js.Block()
+            .Add(() => Js.Id(() => "item").Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string>(), () => clickHandlerBody)).Stmt());
+        var initSessionListBody = Js.Block()
+            .Add(() => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => ".being-item")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "item" }, () => forEachItemBody)).Stmt());
+        js.Add(() => Js.Func(() => "initSessionList", () => new List<string>(), () => initSessionListBody));
+
+        var dataErrorCond = Js.Id(() => "data").Prop(() => "error");
+        var errorDivHtml = Js.Str(() => "<div style=\"padding:12px 20px;color:var(--text-secondary);font-size:12px;\">Error: ").Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "error")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"));
+        var errorBody = new List<JsSyntax>
+        {
+            Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "beings-list")).Prop(() => "innerHTML"), () => errorDivHtml),
+            Js.Return(() => Js.Id(() => "undefined"))
+        };
+        var loadConversationsThenBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (dataErrorCond, errorBody) }
+            }))
+            .Add(() => Js.Const(() => "list", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "beings-list"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => "")))
+            .Add(() => Js.Id(() => "data").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "item" }, () => Js.Block()
+                .Add(() => Js.Const(() => "div", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+                .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "being-item")))
+                .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "dataset").Prop(() => "id"), () => Js.Id(() => "item").Prop(() => "sessionId")))
+                .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"being-name\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "item").Prop(() => "displayName")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><div class=\"being-last-message\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "item").Prop(() => "lastMessage")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"))))
+                .Add(() => Js.Id(() => "list").Call(() => "appendChild", () => Js.Id(() => "div")).Stmt())
+            )))
+            .Add(() => Js.Id(() => "initSessionList").Invoke().Stmt());
+        var loadConversationsCatchBody = Js.Block()
+            .Add(() => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Load conversations failed:"), () => Js.Id(() => "err")).Stmt())
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "beings-list")).Prop(() => "innerHTML"), () => Js.Str(() => "<div style=\"padding:12px 20px;color:var(--text-secondary);font-size:12px;\">Failed to load conversations</div>")));
+        var loadConversationsBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/chat/conversations")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => loadConversationsThenBody)).Call(() => "catch", () => Js.Arrow(() => new List<string> { "err" }, () => loadConversationsCatchBody)).Stmt());
+        js.Add(() => Js.Func(() => "loadConversations", () => new List<string>(), () => loadConversationsBody));
+
+        var msgIsUserCond = Js.Id(() => "msg").Prop(() => "isUser");
+        var userMsgBody = new List<JsSyntax>
+        {
+            Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "msg-user")),
+            Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-user-bubble\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>")))
+        };
+        var beingMsgBody = new List<JsSyntax>
+        {
+            Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "msg-being")),
+            Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-being-card\"><div class=\"msg-being-body\"><div class=\"msg-being-text\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div></div>")))
+        };
+        var appendMessageBody = Js.Block()
+            .Add(() => Js.Const(() => "messages", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))))
+            .Add(() => Js.Const(() => "div", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (msgIsUserCond, userMsgBody) },
+                { (null, beingMsgBody) }
+            }))
+            .Add(() => Js.Id(() => "messages").Call(() => "appendChild", () => Js.Id(() => "div")).Stmt())
+            .Add(() => Js.Id(() => "messages").Call(() => "scrollTo", () => Js.Obj().Prop(() => "top", () => Js.Id(() => "messages").Prop(() => "scrollHeight")).Prop(() => "behavior", () => Js.Str(() => "smooth"))).Stmt());
+        js.Add(() => Js.Func(() => "appendMessage", () => new List<string> { "msg" }, () => appendMessageBody));
+
+        js.Add(() => Js.Id(() => "initInput").Invoke().Stmt());
+        js.Add(() => Js.Id(() => "loadConversations").Invoke().Stmt());
+        js.Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages")).Call(() => "scrollTo", () => Js.Obj().Prop(() => "top", () => Js.Num(() => "999999")).Prop(() => "behavior", () => Js.Str(() => "auto"))).Stmt());
 
         return js;
     }

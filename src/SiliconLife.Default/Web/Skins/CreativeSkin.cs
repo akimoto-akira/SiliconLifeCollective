@@ -98,9 +98,9 @@ public class CreativeSkin : ISkin
             .EndSelector();
     }
 
-    public JsBuilder GetScripts()
+    public JsSyntax GetScripts()
     {
-        return JsBuilder.Create();
+        return new JsBlock();
     }
 
     public H RenderButton(string text, string variant = "primary", string size = "medium")
@@ -121,12 +121,12 @@ public class CreativeSkin : ISkin
         var cls = "input";
         if (size != "medium") cls += $" input-{size}";
 
-        return H.InputText(placeholder: placeholder, value: value).Class(cls);
+        return H.InputText().Placeholder(placeholder).Value(value ?? "").Class(cls);
     }
 
     public H RenderTextarea(string placeholder = "", int rows = 4)
     {
-        return H.Textarea().Placeholder(placeholder).Attr("rows", rows).Class("input textarea");
+        return H.Textarea().Placeholder(placeholder).Attr("rows", rows.ToString()).Class("input textarea");
     }
 
     public H RenderSelect(IEnumerable<string> options, string? selected = null)
@@ -246,7 +246,7 @@ public class CreativeSkin : ISkin
         var isFirst = true;
         foreach (var item in items)
         {
-            if (!isFirst) children.Add(H.Text(" / "));
+            if (!isFirst) children.Add(" / ");
             children.Add(H.Span(item));
             isFirst = false;
         }
@@ -323,7 +323,7 @@ public class CreativeSkin : ISkin
 
     public H RenderQuote(string text)
     {
-        return H.Div(H.Text($"\"{text}\"")).Class("quote");
+        return H.Div($"\"{text}\"").Class("quote");
     }
 
     public H RenderInspirationCard(string icon, string text)

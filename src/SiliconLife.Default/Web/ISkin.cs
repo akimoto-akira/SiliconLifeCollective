@@ -52,7 +52,7 @@ public interface ISkin
     H RenderHtml(H content);
     H RenderError(H message);
     CssBuilder GetStyles();
-    JsBuilder GetScripts();
+    JsSyntax GetScripts();
 
     H RenderButton(string text, string variant = "primary", string size = "medium");
     H RenderInput(string placeholder = "", string size = "medium", string? value = null);

@@ -9,7 +9,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text;
 using SiliconLife.Default.Web.Models;
 
 namespace SiliconLife.Default.Web.Views;
@@ -24,68 +23,99 @@ public class CodeBrowserView : ViewBase
         return RenderPage(vm.Skin, "代码浏览 - Silicon Life Collective", "beings", body, GetScripts(), GetStyles());
     }
 
-    private static string RenderBody(CodeBrowserViewModel vm)
+    private static H RenderBody(CodeBrowserViewModel vm)
     {
-        return @"
-<div class=""page-content"">
-    <div class=""page-header""><h1>代码浏览</h1></div>
-    <div class=""code-browser"">
-        <div class=""types-list"" id=""types-list""></div>
-        <div class=""type-detail"" id=""type-detail""></div>
-    </div>
-</div>";
+        return H.Div(
+            H.Div(
+                H.H1("代码浏览")
+            ).Class("page-header"),
+            H.Div(
+                H.Div().Id("types-list").Class("types-list"),
+                H.Div().Id("type-detail").Class("type-detail")
+            ).Class("code-browser")
+        ).Class("page-content");
     }
 
-    private static string GetStyles()
+    private static CssBuilder GetStyles()
     {
-        return @"
-.code-browser { display: flex; gap: 20px; }
-.types-list { width: 300px; background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); overflow-y: auto; }
-.type-item { padding: 10px; cursor: pointer; border-radius: 6px; color: var(--text-primary); }
-.type-item:hover { background: var(--bg-secondary, rgba(255,255,255,0.05)); }
-.type-detail { flex: 1; background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); overflow-y: auto; }
-.type-name { font-size: 20px; font-weight: bold; color: var(--text-primary); margin-bottom: 15px; }
-.type-section { margin-bottom: 20px; }
-.type-section h3 { font-size: 16px; color: var(--text-secondary); margin-bottom: 10px; }
-.member-item { padding: 8px 0; border-bottom: 1px solid var(--border); color: var(--text-primary); }";
+        return CssBuilder.Create()
+            .Selector(".code-browser")
+                .Property("display", "flex")
+                .Property("gap", "20px")
+            .EndSelector()
+            .Selector(".types-list")
+                .Property("width", "300px")
+                .Property("background", "var(--bg-card)")
+                .Property("padding", "20px")
+                .Property("border-radius", "12px")
+                .Property("border", "1px solid var(--border)")
+                .Property("overflow-y", "auto")
+            .EndSelector()
+            .Selector(".type-item")
+                .Property("padding", "10px")
+                .Property("cursor", "pointer")
+                .Property("border-radius", "6px")
+                .Property("color", "var(--text-primary)")
+            .EndSelector()
+            .Selector(".type-item:hover")
+                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.05))")
+            .EndSelector()
+            .Selector(".type-detail")
+                .Property("flex", "1")
+                .Property("background", "var(--bg-card)")
+                .Property("padding", "20px")
+                .Property("border-radius", "12px")
+                .Property("border", "1px solid var(--border)")
+                .Property("overflow-y", "auto")
+            .EndSelector()
+            .Selector(".type-name")
+                .Property("font-size", "20px")
+                .Property("font-weight", "bold")
+                .Property("color", "var(--text-primary)")
+                .Property("margin-bottom", "15px")
+            .EndSelector()
+            .Selector(".type-section")
+                .Property("margin-bottom", "20px")
+            .EndSelector()
+            .Selector(".type-section h3")
+                .Property("font-size", "16px")
+                .Property("color", "var(--text-secondary)")
+                .Property("margin-bottom", "10px")
+            .EndSelector()
+            .Selector(".member-item")
+                .Property("padding", "8px 0")
+                .Property("border-bottom", "1px solid var(--border)")
+                .Property("color", "var(--text-primary)")
+            .EndSelector();
     }
 
-    private static string GetScripts()
+    private static JsSyntax GetScripts()
     {
-        return @"
-function loadTypes() {
-    fetch('/api/code/types').then(function(r) { return r.json(); }).then(function(data) {
-        var list = document.getElementById('types-list');
-        list.innerHTML = '';
-        data.forEach(function(t) {
-            var item = document.createElement('div');
-            item.className = 'type-item';
-            item.textContent = t.name;
-            item.onclick = function() { showType(t.fullName); };
-            list.appendChild(item);
-        });
-    });
-}
-function showType(fullName) {
-    fetch('/api/code/detail?name=' + encodeURIComponent(fullName)).then(function(r) { return r.json(); }).then(function(data) {
-        if (data.error) {
-            document.getElementById('type-detail').innerHTML = '<p>' + data.error + '</p>';
-            return;
-        }
-        var html = '<div class=""type-name"">' + data.name + '</div><p>' + (data.description || '') + '</p>';
-        if (data.properties && data.properties.length > 0) {
-            html += '<div class=""type-section""><h3>属性</h3>';
-            data.properties.forEach(function(p) { html += '<div class=""member-item"">' + p.type + ' ' + p.name + '</div>'; });
-            html += '</div>';
-        }
-        if (data.methods && data.methods.length > 0) {
-            html += '<div class=""type-section""><h3>方法</h3>';
-            data.methods.forEach(function(m) { html += '<div class=""member-item"">' + m.returnType + ' ' + m.name + '(' + m.parameters.join(', ') + ')</div>'; });
-            html += '</div>';
-        }
-        document.getElementById('type-detail').innerHTML = html;
-    });
-}
-window.onload = function() { loadTypes(); };";
+        var forEachBody = Js.Block()
+            .Add(() => Js.Const(() => "item", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "item").Prop(() => "className"), () => Js.Str(() => "type-item")))
+            .Add(() => Js.Assign(() => Js.Id(() => "item").Prop(() => "textContent"), () => Js.Id(() => "t").Prop(() => "name")))
+            .Add(() => Js.Assign(() => Js.Id(() => "item").Prop(() => "onclick"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "showType").Invoke(() => Js.Id(() => "t").Prop(() => "fullName")))))
+            .Add(() => Js.Id(() => "list").Call(() => "appendChild", () => Js.Id(() => "item")).Stmt());
+
+        var loadTypesThenBody = Js.Block()
+            .Add(() => Js.Const(() => "list", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "types-list"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => "")))
+            .Add(() => Js.Id(() => "data").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "t" }, () => forEachBody)).Stmt());
+
+        var loadTypesBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/code/types")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => loadTypesThenBody)).Stmt());
+
+        var showTypeThenBody = Js.Block()
+            .Add(() => Js.Const(() => "html", () => Js.Str(() => "'<div class=\"type-name\">' + data.name + '</div>'")))
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "type-detail")).Prop(() => "innerHTML"), () => Js.Id(() => "html")));
+
+        var showTypeBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/code/detail?name=").Op(() => "+", () => (JsSyntax)Js.Id(() => "encodeURIComponent").Invoke(() => Js.Id(() => "fullName")))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => showTypeThenBody)).Stmt());
+
+        return Js.Block()
+            .Add(() => Js.Func(() => "loadTypes", () => new List<string>(), () => loadTypesBody))
+            .Add(() => Js.Func(() => "showType", () => new List<string> { "fullName" }, () => showTypeBody))
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "loadTypes").Invoke())));
     }
 }

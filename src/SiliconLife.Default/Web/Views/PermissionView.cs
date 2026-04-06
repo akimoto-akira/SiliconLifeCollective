@@ -9,7 +9,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text;
 using SiliconLife.Default.Web.Models;
 
 namespace SiliconLife.Default.Web.Views;
@@ -24,26 +23,29 @@ public class PermissionView : ViewBase
         return RenderPage(vm.Skin, "权限管理 - Silicon Life Collective", "beings", body, GetScripts());
     }
 
-    private static string RenderBody(PermissionViewModel vm)
+    private static H RenderBody(PermissionViewModel vm)
     {
-        return @"
-<div class=""page-content"">
-    <div class=""page-header""><h1>权限管理</h1></div>
-    <div class=""card"">
-        <div class=""permissions-list"" id=""permissions-list""></div>
-    </div>
-</div>";
+        return H.Div(
+            H.Div(
+                H.H1("权限管理")
+            ).Class("page-header"),
+            H.Div(
+                H.Div().Id("permissions-list").Class("permissions-list")
+            ).Class("card")
+        ).Class("page-content");
     }
 
-    private static string GetScripts()
+    private static JsSyntax GetScripts()
     {
-        return @"
-function loadPermissions() {
-    fetch('/api/permissions/list').then(function(r) { return r.json(); }).then(function(data) {
-        var list = document.getElementById('permissions-list');
-        list.innerHTML = '<p>暂无权限记录</p>';
-    });
-}
-window.onload = function() { loadPermissions(); };";
+        var thenBody = Js.Block()
+            .Add(() => Js.Const(() => "list", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permissions-list"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => "<p>暂无权限记录</p>")));
+
+        var loadPermissionsBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/permissions/list")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
+
+        return Js.Block()
+            .Add(() => Js.Func(() => "loadPermissions", () => new List<string>(), () => loadPermissionsBody))
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "loadPermissions").Invoke())));
     }
 }

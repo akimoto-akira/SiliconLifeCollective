@@ -9,7 +9,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text;
 using SiliconLife.Default.Web.Models;
 
 namespace SiliconLife.Default.Web.Views;
@@ -24,26 +23,29 @@ public class TaskView : ViewBase
         return RenderPage(vm.Skin, "任务管理 - Silicon Life Collective", "tasks", body, GetScripts());
     }
 
-    private static string RenderBody(TaskViewModel vm)
+    private static H RenderBody(TaskViewModel vm)
     {
-        return @"
-<div class=""page-content"">
-    <div class=""page-header""><h1>任务管理</h1></div>
-    <div class=""card"">
-        <div class=""tasks-list"" id=""tasks-list""></div>
-    </div>
-</div>";
+        return H.Div(
+            H.Div(
+                H.H1("任务管理")
+            ).Class("page-header"),
+            H.Div(
+                H.Div().Id("tasks-list").Class("tasks-list")
+            ).Class("card")
+        ).Class("page-content");
     }
 
-    private static string GetScripts()
+    private static JsSyntax GetScripts()
     {
-        return @"
-function loadTasks() {
-    fetch('/api/tasks/list').then(function(r) { return r.json(); }).then(function(data) {
-        var list = document.getElementById('tasks-list');
-        list.innerHTML = '<p>暂无任务</p>';
-    });
-}
-window.onload = function() { loadTasks(); };";
+        var thenBody = Js.Block()
+            .Add(() => Js.Const(() => "list", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "tasks-list"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => "<p>暂无任务</p>")));
+
+        var loadTasksBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/tasks/list")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
+
+        return Js.Block()
+            .Add(() => Js.Func(() => "loadTasks", () => new List<string>(), () => loadTasksBody))
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "loadTasks").Invoke())));
     }
 }

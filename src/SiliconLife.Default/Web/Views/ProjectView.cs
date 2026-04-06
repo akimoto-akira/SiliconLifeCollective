@@ -9,7 +9,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text;
 using SiliconLife.Default.Web.Models;
 
 namespace SiliconLife.Default.Web.Views;
@@ -24,26 +23,29 @@ public class ProjectView : ViewBase
         return RenderPage(vm.Skin, "项目空间管理 - Silicon Life Collective", "projects", body, GetScripts());
     }
 
-    private static string RenderBody(ProjectViewModel vm)
+    private static H RenderBody(ProjectViewModel vm)
     {
-        return @"
-<div class=""page-content"">
-    <div class=""page-header""><h1>项目空间管理</h1></div>
-    <div class=""card"">
-        <div class=""projects-list"" id=""projects-list""></div>
-    </div>
-</div>";
+        return H.Div(
+            H.Div(
+                H.H1("项目空间管理")
+            ).Class("page-header"),
+            H.Div(
+                H.Div().Id("projects-list").Class("projects-list")
+            ).Class("card")
+        ).Class("page-content");
     }
 
-    private static string GetScripts()
+    private static JsSyntax GetScripts()
     {
-        return @"
-function loadProjects() {
-    fetch('/api/projects/list').then(function(r) { return r.json(); }).then(function(data) {
-        var list = document.getElementById('projects-list');
-        list.innerHTML = '<p>暂无项目</p>';
-    });
-}
-window.onload = function() { loadProjects(); };";
+        var thenBody = Js.Block()
+            .Add(() => Js.Const(() => "list", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "projects-list"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => "<p>暂无项目</p>")));
+
+        var loadProjectsBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/projects/list")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
+
+        return Js.Block()
+            .Add(() => Js.Func(() => "loadProjects", () => new List<string>(), () => loadProjectsBody))
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "loadProjects").Invoke())));
     }
 }

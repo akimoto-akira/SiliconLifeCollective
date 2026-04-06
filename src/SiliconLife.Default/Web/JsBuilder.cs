@@ -1,729 +1,385 @@
 // Copyright (c) 2026 Hoshino Kennji
+// 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//
+// 
 //     http://www.apache.org/licenses/LICENSE-2.0
-//
+// 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// JsBuilder 设计规则：
+// 1. 所有 JS 语法元素都继承自 JsSyntax
+// 2. 禁止 ElseIf()/Else() 方法 - 用 Dictionary 参数替代
+// 3. 禁止 Case()/AddBody() 方法 - 用 Dictionary 参数替代
+// 4. Body/Cases 元素必须是 JsSyntax，不能是 string
+// 5. 禁止直接字符串拼接生成代码
+// 6. 所有参数使用回调形式，便于调试追踪
+
 using System.Text;
 
 namespace SiliconLife.Default.Web;
 
-public class JsBuilder
+public abstract class JsSyntax
 {
-    private readonly StringBuilder _sb = new();
-    internal int _indentLevel = 0;
-    internal readonly Stack<string> _blockStack = new();
-
-    public static JsBuilder Create() => new();
-
-    public JsBuilder Variable(string name, string value)
+    public abstract string Build();
+    public JsPropAccess Prop(Func<string> property) => new(() => this, property);
+    public JsCall Call(Func<string> method, params Func<JsSyntax>[] args)
     {
-        Indent();
-        _sb.AppendLine($"const {name} = {value};");
-        return this;
+        var call = new JsCall(() => this, method);
+        foreach (var arg in args) call.Args.Add(arg);
+        return call;
     }
+    public JsIndex Index(Func<JsSyntax> index) => new(() => this, index);
+    public JsBinOp Op(Func<string> op, Func<JsSyntax> right) => new(() => (JsSyntax)this, op, right);
+    public JsUnaryOp Not() => new(() => "!", () => (JsSyntax)this);
 
-    public JsBuilder Let(string name, string value)
-    {
-        Indent();
-        _sb.AppendLine($"let {name} = {value};");
-        return this;
-    }
-
-    public JsBuilder Const(string name, string value)
-    {
-        Indent();
-        _sb.AppendLine($"const {name} = {value};");
-        return this;
-    }
-
-    public JsBuilder Function(string name, Action<FunctionBuilder> configure)
-    {
-        Indent();
-        _sb.Append($"function {name}(");
-        var builder = new FunctionBuilder(this, _sb);
-        configure(builder);
-        return this;
-    }
-
-    public JsBuilder ArrowFunction(string name, Action<FunctionBuilder> configure)
-    {
-        Indent();
-        _sb.Append($"const {name} = (");
-        var builder = new FunctionBuilder(this, _sb);
-        configure(builder);
-        _sb.AppendLine(" => {");
-        _blockStack.Push("arrow");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder AnonymousFunction(Action<FunctionBuilder> configure)
-    {
-        Indent();
-        _sb.Append("function (");
-        var builder = new FunctionBuilder(this, _sb);
-        configure(builder);
-        _sb.AppendLine(" {");
-        _blockStack.Push("function");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder AnonymousArrowFunction(Action<FunctionBuilder> configure)
-    {
-        Indent();
-        _sb.Append("(");
-        var builder = new FunctionBuilder(this, _sb);
-        configure(builder);
-        _sb.AppendLine(" => {");
-        _blockStack.Push("arrow");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder Return(string? value = null)
-    {
-        Indent();
-        if (value == null)
-            _sb.AppendLine("return;");
-        else
-            _sb.AppendLine($"return {value};");
-        return this;
-    }
-
-    public JsBuilder Call(string name, params string[] args)
-    {
-        Indent();
-        _sb.Append(name);
-        _sb.Append("(");
-        _sb.Append(string.Join(", ", args));
-        _sb.AppendLine(");");
-        return this;
-    }
-
-    public JsBuilder CallMethod(string obj, string method, params string[] args)
-    {
-        Indent();
-        _sb.Append($"{obj}.{method}(");
-        _sb.Append(string.Join(", ", args));
-        _sb.AppendLine(");");
-        return this;
-    }
-
-    public JsBuilder Assign(string target, string value)
-    {
-        Indent();
-        _sb.AppendLine($"{target} = {value};");
-        return this;
-    }
-
-    public JsBuilder AppendAssign(string target, string value)
-    {
-        Indent();
-        _sb.AppendLine($"{target} += {value};");
-        return this;
-    }
-
-    public JsBuilder ConsoleError(params string[] args)
-    {
-        Indent();
-        _sb.Append("console.error(");
-        _sb.Append(string.Join(", ", args));
-        _sb.AppendLine(");");
-        return this;
-    }
-
-    public JsBuilder On(string target, string eventName, string param, Action<JsBuilder> body)
-    {
-        Indent();
-        _sb.AppendLine($"{target}.addEventListener('{eventName}', {param} => {{");
-        _blockStack.Push("callback");
-        _indentLevel++;
-        body(this);
-        return this;
-    }
-
-    public JsBuilder ForEach(string iterable, string item, Action<JsBuilder> body)
-    {
-        Indent();
-        _sb.AppendLine($"{iterable}.forEach({item} => {{");
-        _blockStack.Push("callback");
-        _indentLevel++;
-        body(this);
-        return this;
-    }
-
-    public JsBuilder ForEachExpr(string iterable, string item, string body)
-    {
-        Indent();
-        _sb.AppendLine($"{iterable}.forEach({item} => {body});");
-        return this;
-    }
-
-    public JsBuilder Fetch(string url, string? options = null, Action<PromiseChain>? chain = null)
-    {
-        Indent();
-        _sb.Append($"fetch({url}");
-        if (!string.IsNullOrEmpty(options))
-            _sb.Append($", {options}");
-        _sb.AppendLine(")");
-        if (chain != null)
-            chain(new PromiseChain(this, _sb));
-        return this;
-    }
-
-    public JsBuilder If(string condition)
-    {
-        Indent();
-        _sb.Append($"if ({condition}) {{");
-        _sb.AppendLine();
-        _blockStack.Push("if");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder ElseIf(string condition)
-    {
-        _indentLevel--;
-        Indent();
-        _sb.Append("} ");
-        _sb.AppendLine($"else if ({condition}) {{");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder Else()
-    {
-        _indentLevel--;
-        Indent();
-        _sb.Append("} ");
-        _sb.AppendLine("else {");
-        if (_blockStack.Count > 0)
-            _blockStack.Pop();
-        _blockStack.Push("else");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder For(string init, string condition, string increment)
-    {
-        Indent();
-        _sb.Append($"for ({init}; {condition}; {increment}) {{");
-        _sb.AppendLine();
-        _blockStack.Push("for");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder ForIn(string variable, string iterable)
-    {
-        Indent();
-        _sb.Append($"for (const {variable} in {iterable}) {{");
-        _sb.AppendLine();
-        _blockStack.Push("for");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder ForOf(string variable, string iterable)
-    {
-        Indent();
-        _sb.Append($"for (const {variable} of {iterable}) {{");
-        _sb.AppendLine();
-        _blockStack.Push("for");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder While(string condition)
-    {
-        Indent();
-        _sb.Append($"while ({condition}) {{");
-        _sb.AppendLine();
-        _blockStack.Push("while");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder Switch(string expression)
-    {
-        Indent();
-        _sb.Append($"switch ({expression}) {{");
-        _sb.AppendLine();
-        _blockStack.Push("switch");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder Case(string value)
-    {
-        _indentLevel--;
-        Indent();
-        _sb.AppendLine($"case {value}:");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder Default()
-    {
-        _indentLevel--;
-        Indent();
-        _sb.AppendLine("default:");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder Break()
-    {
-        Indent();
-        _sb.AppendLine("break;");
-        return this;
-    }
-
-    public JsBuilder Continue()
-    {
-        Indent();
-        _sb.AppendLine("continue;");
-        return this;
-    }
-
-    public JsBuilder Throw(string message)
-    {
-        Indent();
-        _sb.AppendLine($"throw new Error({message});");
-        return this;
-    }
-
-    public JsBuilder Try(Action<JsBuilder> configure)
-    {
-        Indent();
-        _sb.AppendLine("try {");
-        _blockStack.Push("try");
-        _indentLevel++;
-        configure(this);
-        return this;
-    }
-
-    public JsBuilder Catch(string? variable = null)
-    {
-        _indentLevel--;
-        Indent();
-        if (variable == null)
-            _sb.AppendLine("catch {");
-        else
-            _sb.AppendLine($"catch ({variable}) {{");
-        _blockStack.Push("catch");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder Finally()
-    {
-        _indentLevel--;
-        Indent();
-        _sb.AppendLine("finally {");
-        _blockStack.Push("finally");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder Class(string name, string? extends = null)
-    {
-        Indent();
-        if (extends == null)
-            _sb.AppendLine($"class {name} {{");
-        else
-            _sb.AppendLine($"class {name} extends {extends} {{");
-        _blockStack.Push("class");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder Method(string name, Action<FunctionBuilder> configure)
-    {
-        Indent();
-        _sb.Append($"{name}(");
-        var builder = new FunctionBuilder(this, _sb);
-        configure(builder);
-        _sb.AppendLine(" {");
-        _blockStack.Push("method");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder Getter(string name)
-    {
-        Indent();
-        _sb.Append($"get {name}() {{");
-        _sb.AppendLine();
-        _blockStack.Push("getter");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder Setter(string name)
-    {
-        Indent();
-        _sb.Append($"set {name}(");
-        var builder = new FunctionBuilder(this, _sb);
-        builder.Param("value");
-        _sb.AppendLine(" {");
-        _blockStack.Push("setter");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder StaticMethod(string name, Action<FunctionBuilder> configure)
-    {
-        Indent();
-        _sb.Append($"static {name}(");
-        var builder = new FunctionBuilder(this, _sb);
-        configure(builder);
-        _sb.AppendLine(" {");
-        _blockStack.Push("static");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder New(string className, params string[] args)
-    {
-        Indent();
-        _sb.Append($"new {className}(");
-        _sb.Append(string.Join(", ", args));
-        _sb.AppendLine(");");
-        return this;
-    }
-
-    public JsBuilder Object(Action<ObjectBuilder> configure)
-    {
-        Indent();
-        _sb.Append("{");
-        _sb.AppendLine();
-        _blockStack.Push("object");
-        _indentLevel++;
-        var builder = new ObjectBuilder(this, _sb);
-        configure(builder);
-        _indentLevel--;
-        Indent();
-        _sb.AppendLine("},");
-        _blockStack.Pop();
-        return this;
-    }
-
-    public JsBuilder Array(string[] items)
-    {
-        Indent();
-        _sb.Append("[");
-        _sb.Append(string.Join(", ", items));
-        _sb.AppendLine("];");
-        return this;
-    }
-
-    public JsBuilder Await(string expression)
-    {
-        Indent();
-        _sb.AppendLine($"await {expression};");
-        return this;
-    }
-
-    public JsBuilder Async(string name, Action<FunctionBuilder> configure)
-    {
-        Indent();
-        _sb.Append($"async function {name}(");
-        var builder = new FunctionBuilder(this, _sb);
-        configure(builder);
-        return this;
-    }
-
-    public JsBuilder AsyncArrowFunction(string name, Action<FunctionBuilder> configure)
-    {
-        Indent();
-        _sb.Append($"const {name} = async (");
-        var builder = new FunctionBuilder(this, _sb);
-        configure(builder);
-        _sb.AppendLine(" => {");
-        _blockStack.Push("async-arrow");
-        _indentLevel++;
-        return this;
-    }
-
-    public JsBuilder Import(string module, string? alias = null)
-    {
-        Indent();
-        if (alias == null)
-            _sb.AppendLine($"import {module};");
-        else
-            _sb.AppendLine($"import {alias} from {module};");
-        return this;
-    }
-
-    public JsBuilder ImportDefault(string module, string alias)
-    {
-        Indent();
-        _sb.AppendLine($"import {alias} from {module};");
-        return this;
-    }
-
-    public JsBuilder Export(string name)
-    {
-        Indent();
-        _sb.AppendLine($"export {name};");
-        return this;
-    }
-
-    public JsBuilder ExportDefault(string name)
-    {
-        Indent();
-        _sb.AppendLine($"export default {name};");
-        return this;
-    }
-
-    public JsBuilder Comment(string text)
-    {
-        Indent();
-        _sb.AppendLine($"// {text}");
-        return this;
-    }
-
-    public JsBuilder MultiLineComment(string text)
-    {
-        Indent();
-        _sb.AppendLine($"/* {text} */");
-        return this;
-    }
-
-    public JsBuilder EmptyLine()
-    {
-        _sb.AppendLine();
-        return this;
-    }
-
-    public JsBuilder EndBlock()
-    {
-        if (_blockStack.Count > 0)
-        {
-            var blockType = _blockStack.Pop();
-            _indentLevel--;
-            Indent();
-            _sb.AppendLine(blockType is "callback" ? "});" : "}");
-        }
-        return this;
-    }
-
-    private void Indent()
-    {
-        _sb.Append(new string(' ', _indentLevel * 4));
-    }
-
-    public override string ToString()
-    {
-        return _sb.ToString();
-    }
-
-    public string Build() => ToString();
+    public override bool Equals(object? obj) => obj is JsSyntax other && Build() == other.Build();
+    public override int GetHashCode() => Build().GetHashCode();
+    public static bool operator ==(JsSyntax? left, JsSyntax? right)
+        => left is null ? right is null : left.Equals(right);
+    public static bool operator !=(JsSyntax? left, JsSyntax? right) => !(left == right);
 }
 
-public class FunctionBuilder
+public class JsIdent : JsSyntax
 {
-    private readonly JsBuilder _parent;
-    private readonly StringBuilder _sb;
-    private bool _firstParam = true;
-    private bool _isFirstStatement = true;
-
-    public FunctionBuilder(JsBuilder parent, StringBuilder sb)
-    {
-        _parent = parent;
-        _sb = sb;
-    }
-
-    public FunctionBuilder Param(string name)
-    {
-        if (!_firstParam)
-            _sb.Append(", ");
-        _sb.Append(name);
-        _firstParam = false;
-        return this;
-    }
-
-    public FunctionBuilder Param(string name, string defaultValue)
-    {
-        if (!_firstParam)
-            _sb.Append(", ");
-        _sb.Append($"{name} = {defaultValue}");
-        _firstParam = false;
-        return this;
-    }
-
-    public JsBuilder EndParams()
-    {
-        _sb.Append(") {");
-        _sb.AppendLine();
-        _parent._blockStack.Push("function");
-        _parent._indentLevel++;
-        return _parent;
-    }
+    public Func<string> Name { get; }
+    public JsIdent(Func<string> name) => Name = name;
+    public override string Build() => Name();
 }
 
-public class ObjectBuilder
+public class JsString : JsSyntax
 {
-    private readonly JsBuilder _parent;
-    private readonly StringBuilder _sb;
-    private bool _first = true;
-
-    public ObjectBuilder(JsBuilder parent, StringBuilder sb)
-    {
-        _parent = parent;
-        _sb = sb;
-    }
-
-    public ObjectBuilder Property(string key, string value)
-    {
-        if (!_first)
-            _sb.AppendLine(",");
-        _sb.Append(new string(' ', (_parent._indentLevel + 1) * 4));
-        _sb.Append($"{key}: {value}");
-        _first = false;
-        return this;
-    }
-
-    public ObjectBuilder Property(string key, Action<JsBuilder> configure)
-    {
-        if (!_first)
-            _sb.AppendLine(",");
-        _sb.Append(new string(' ', (_parent._indentLevel + 1) * 4));
-        _sb.Append($"{key}: ");
-        _parent._indentLevel++;
-        configure(_parent);
-        _parent._indentLevel--;
-        _first = false;
-        _sb.AppendLine(",");
-        return this;
-    }
-
-    public JsBuilder EndObject()
-    {
-        _sb.AppendLine();
-        return _parent;
-    }
+    public Func<string> Value { get; }
+    public JsString(Func<string> value) => Value = value;
+    public override string Build() => $"\"{Value().Replace("\\", "\\\\").Replace("\"", "\\\"")}\"";
 }
 
-public class JsModuleBuilder
+public class JsNumber : JsSyntax
 {
-    private readonly JsBuilder _js = new();
-    private readonly List<string> _imports = new();
-    private readonly List<string> _exports = new();
+    public Func<string> Value { get; }
+    public JsNumber(Func<string> value) => Value = value;
+    public override string Build() => Value();
+}
 
-    public JsModuleBuilder Import(string module, string? alias = null)
+public class JsBool : JsSyntax
+{
+    public Func<bool> Value { get; }
+    public JsBool(Func<bool> value) => Value = value;
+    public override string Build() => Value() ? "true" : "false";
+}
+
+public class JsProp : JsSyntax
+{
+    public Func<string> Key { get; }
+    public Func<JsSyntax> Value { get; }
+    public JsProp(Func<string> key, Func<JsSyntax> value)
     {
-        if (alias == null)
-            _imports.Add($"import {module};");
-        else
-            _imports.Add($"import {alias} from {module};");
+        Key = key;
+        Value = value;
+    }
+    public override string Build() => $"{Key()}: {Value().Build()}";
+}
+
+public class JsObj : JsSyntax
+{
+    private readonly List<Func<JsProp>> _props = new();
+    public JsObj() { }
+    public JsObj Prop(Func<string> key, Func<JsSyntax> value)
+    {
+        _props.Add(() => new JsProp(key, value));
         return this;
     }
+    public override string Build() => $"{{ {string.Join(", ", _props.Select(p => p().Build()))} }}";
+}
 
-    public JsModuleBuilder Export(string name)
+public class JsCall : JsSyntax
+{
+    public Func<JsSyntax> Target { get; }
+    public Func<string> Method { get; }
+    public List<Func<JsSyntax>> Args { get; } = new();
+    public JsCall(Func<JsSyntax> target, Func<string> method)
     {
-        _exports.Add(name);
-        return this;
+        Target = target;
+        Method = method;
+    }
+    public override string Build() => $"{Target().Build()}.{Method()}({string.Join(", ", Args.Select(a => a().Build()))})";
+}
+
+public class JsFuncCall : JsSyntax
+{
+    public Func<JsSyntax> Func { get; }
+    public List<Func<JsSyntax>> Args { get; } = new();
+    public JsFuncCall(Func<JsSyntax> func, params Func<JsSyntax>[] args)
+    {
+        Func = func;
+        foreach (var arg in args) Args.Add(arg);
+    }
+    public override string Build() => $"{Func().Build()}({string.Join(", ", Args.Select(a => a().Build()))})";
+}
+
+public class JsBinOp : JsSyntax
+{
+    public Func<JsSyntax> Left { get; }
+    public Func<string> Operator { get; }
+    public Func<JsSyntax> Right { get; }
+    public JsBinOp(Func<JsSyntax> left, Func<string> op, Func<JsSyntax> right)
+    {
+        Left = left;
+        Operator = op;
+        Right = right;
+    }
+    public override string Build() => $"{Left().Build()} {Operator()} {Right().Build()}";
+}
+
+public class JsUnaryOp : JsSyntax
+{
+    public Func<string> Operator { get; }
+    public Func<JsSyntax> Value { get; }
+    public JsUnaryOp(Func<string> op, Func<JsSyntax> value)
+    {
+        Operator = op;
+        Value = value;
+    }
+    public override string Build() => $"{Operator()}{Value().Build()}";
+}
+
+public class JsIndex : JsSyntax
+{
+    public Func<JsSyntax> Target { get; }
+    public Func<JsSyntax> Index { get; }
+    public JsIndex(Func<JsSyntax> target, Func<JsSyntax> index)
+    {
+        Target = target;
+        Index = index;
+    }
+    public override string Build() => $"{Target().Build()}[{Index().Build()}]";
+}
+
+public class JsPropAccess : JsSyntax
+{
+    public Func<JsSyntax> Target { get; }
+    public Func<string> Property { get; }
+    public JsPropAccess(Func<JsSyntax> target, Func<string> property)
+    {
+        Target = target;
+        Property = property;
+    }
+    public override string Build() => $"{Target().Build()}.{Property()}";
+}
+
+public class JsIf : JsSyntax
+{
+    public Func<List<(JsSyntax? Condition, List<JsSyntax> Body)>> Branches { get; }
+
+    public JsIf(Func<List<(JsSyntax? Condition, List<JsSyntax> Body)>> branches)
+    {
+        Branches = branches;
     }
 
-    public JsBuilder Js => _js;
+    public static JsIf If(Func<List<(JsSyntax? Condition, List<JsSyntax> Body)>> branches) => new(branches);
 
-    public string Build()
+    public override string Build()
     {
         var sb = new StringBuilder();
-        
-        foreach (var imp in _imports)
+        var isFirst = true;
+        foreach (var (condition, body) in Branches())
         {
-            sb.AppendLine(imp);
-        }
-        
-        if (_imports.Count > 0 && _exports.Count > 0)
-        {
-            sb.AppendLine();
-        }
-        
-        sb.Append(_js.ToString());
-        
-        if (_exports.Count > 0)
-        {
-            sb.AppendLine();
-            foreach (var exp in _exports)
+            if (isFirst)
             {
-                sb.AppendLine($"export {exp};");
+                sb.Append($"if ({condition?.Build()}) {{ {string.Join(" ", body.Select(b => b.Build()))} }}");
+                isFirst = false;
+            }
+            else if (condition == null)
+            {
+                sb.Append($" else {{ {string.Join(" ", body.Select(b => b.Build()))} }}");
+            }
+            else
+            {
+                sb.Append($" else if ({condition.Build()}) {{ {string.Join(" ", body.Select(b => b.Build()))} }}");
             }
         }
-        
         return sb.ToString();
     }
 }
 
-public class PromiseChain
+public class JsSwitch : JsSyntax
 {
-    private readonly JsBuilder _js;
-    private readonly StringBuilder _sb;
-    private readonly int _baseIndent;
+    public Func<JsSyntax> Expression { get; }
+    public Func<List<(JsSyntax? Value, List<JsSyntax> Body)>> Cases { get; }
 
-    internal PromiseChain(JsBuilder js, StringBuilder sb)
+    public JsSwitch(Func<JsSyntax> expression, Func<List<(JsSyntax? Value, List<JsSyntax> Body)>> cases)
     {
-        _js = js;
-        _sb = sb;
-        _baseIndent = js._indentLevel;
+        Expression = expression;
+        Cases = cases;
     }
 
-    private void WriteChainIndent()
-    {
-        _sb.Append(new string(' ', _js._indentLevel * 4));
-    }
+    public static JsSwitch Switch(Func<JsSyntax> expression, Func<List<(JsSyntax? Value, List<JsSyntax> Body)>> cases)
+        => new(expression, cases);
 
-    public PromiseChain Then(string param, Action<JsBuilder> body)
+    public override string Build()
     {
-        _js._indentLevel = _baseIndent;
-        WriteChainIndent();
-        _sb.AppendLine($".then({param} => {{");
-        _js._indentLevel++;
-        body(_js);
-        _js._indentLevel--;
-        WriteChainIndent();
-        _sb.AppendLine("})");
+        var sb = new StringBuilder();
+        sb.Append($"switch ({Expression().Build()}) {{");
+        foreach (var (value, body) in Cases())
+        {
+            if (value == null)
+                sb.Append($" default: {{ {string.Join(" ", body.Select(b => b.Build()))} }}");
+            else
+                sb.Append($" case {value.Build()}: {{ {string.Join(" ", body.Select(b => b.Build()))} }}");
+        }
+        sb.Append(" }");
+        return sb.ToString();
+    }
+}
+
+public class JsBlock : JsSyntax
+{
+    internal readonly List<Func<JsSyntax>> _statements = new();
+    public JsBlock() { }
+    public JsBlock Add(Func<JsSyntax> stmt)
+    {
+        _statements.Add(stmt);
         return this;
     }
+    public override string Build() => string.Join("\n", _statements.Select(s => s().Build()));
+}
 
-    public PromiseChain ThenReturn(string param, string expression)
-    {
-        _js._indentLevel = _baseIndent;
-        WriteChainIndent();
-        _sb.AppendLine($".then({param} => {expression})");
-        return this;
-    }
+public class JsConst : JsSyntax
+{
+    public Func<string> Name { get; }
+    public Func<JsSyntax> Value { get; }
+    public JsConst(Func<string> name, Func<JsSyntax> value) { Name = name; Value = value; }
+    public override string Build() => $"const {Name()} = {Value().Build()};";
+}
 
-    public PromiseChain Catch(string param, Action<JsBuilder> body)
-    {
-        _js._indentLevel = _baseIndent;
-        WriteChainIndent();
-        _sb.AppendLine($".catch({param} => {{");
-        _js._indentLevel++;
-        body(_js);
-        _js._indentLevel--;
-        WriteChainIndent();
-        _sb.AppendLine("})");
-        return this;
-    }
+public class JsLet : JsSyntax
+{
+    public Func<string> Name { get; }
+    public Func<JsSyntax> Value { get; }
+    public JsLet(Func<string> name, Func<JsSyntax> value) { Name = name; Value = value; }
+    public override string Build() => $"let {Name()} = {Value().Build()};";
+}
 
-    public PromiseChain CatchLog(string param, string message)
+public class JsAssign : JsSyntax
+{
+    public Func<JsSyntax> Target { get; }
+    public Func<JsSyntax> Value { get; }
+    public JsAssign(Func<JsSyntax> target, Func<JsSyntax> value) { Target = target; Value = value; }
+    public override string Build() => $"{Target().Build()} = {Value().Build()};";
+}
+
+public class JsReturn : JsSyntax
+{
+    public Func<JsSyntax> Value { get; }
+    public JsReturn(Func<JsSyntax> value) => Value = value;
+    public override string Build() => $"return {Value().Build()};";
+}
+
+public class JsExprStmt : JsSyntax
+{
+    public Func<JsSyntax> Expr { get; }
+    public JsExprStmt(Func<JsSyntax> expr) => Expr = expr;
+    public override string Build() => $"{Expr().Build()};";
+}
+
+public class JsFuncDecl : JsSyntax
+{
+    public Func<string> Name { get; }
+    public Func<List<string>> Params { get; }
+    public Func<JsSyntax> Body { get; }
+    public JsFuncDecl(Func<string> name, Func<List<string>> @params, Func<JsSyntax> body)
     {
-        _js._indentLevel = _baseIndent;
-        WriteChainIndent();
-        _sb.AppendLine($".catch({param} => console.error({message}, {param}))");
-        return this;
+        Name = name;
+        Params = @params;
+        Body = body;
     }
+    public override string Build() => $"function {Name()}({string.Join(", ", Params())}) {{ {Body().Build()} }}";
+}
+
+public class JsArrowFunc : JsSyntax
+{
+    public Func<List<string>> Params { get; }
+    public Func<JsSyntax> Body { get; }
+    public JsArrowFunc(Func<List<string>> @params, Func<JsSyntax> body)
+    {
+        Params = @params;
+        Body = body;
+    }
+    public override string Build()
+    {
+        var body = Body();
+        if (body is JsBlock block)
+        {
+            var stmts = string.Join("\n", block._statements.Select(s => s().Build()));
+            return $"({string.Join(", ", Params())}) => {{\n{stmts}\n}}";
+        }
+        var bodyStr = body.Build();
+        if (bodyStr.EndsWith(";"))
+            bodyStr = bodyStr.Substring(0, bodyStr.Length - 1);
+        return $"({string.Join(", ", Params())}) => {bodyStr}";
+    }
+}
+
+public class JsRegex : JsSyntax
+{
+    public Func<string> Pattern { get; }
+    public Func<string> Flags { get; }
+    public JsRegex(Func<string> pattern, Func<string> flags)
+    {
+        Pattern = pattern;
+        Flags = flags;
+    }
+    public override string Build() => string.IsNullOrEmpty(Flags()) ? $"/{Pattern()}/" : $"/{Pattern()}/{Flags()}";
+}
+
+public static class Js
+{
+    public static JsIdent Id(Func<string> name) => new(name);
+    public static JsString Str(Func<string> value) => new(value);
+    public static JsNumber Num(Func<string> value) => new(value);
+    public static JsBool Bool(Func<bool> value) => new(value);
+    public static JsObj Obj() => new();
+    public static JsBlock Block() => new();
+    public static JsConst Const(Func<string> name, Func<JsSyntax> value) => new(name, value);
+    public static JsLet Let(Func<string> name, Func<JsSyntax> value) => new(name, value);
+    public static JsAssign Assign(Func<JsSyntax> target, Func<JsSyntax> value) => new(target, value);
+    public static JsReturn Return(Func<JsSyntax> value) => new(value);
+    public static JsExprStmt Expr(Func<JsSyntax> expr) => new(expr);
+    public static JsCall Call(Func<JsSyntax> target, Func<string> method, params Func<JsSyntax>[] args)
+    {
+        var call = new JsCall(target, method);
+        foreach (var arg in args) call.Args.Add(arg);
+        return call;
+    }
+    public static JsFuncCall Invoke(Func<JsSyntax> func, params Func<JsSyntax>[] args) => new(func, args);
+    public static JsIndex Index(Func<JsSyntax> target, Func<JsSyntax> index) => new(target, index);
+    public static JsPropAccess Prop(Func<JsSyntax> target, Func<string> property) => new(target, property);
+    public static JsBinOp Op(Func<JsSyntax> left, Func<string> op, Func<JsSyntax> right) => new(left, op, right);
+    public static JsUnaryOp Not(Func<JsSyntax> value) => new(() => "!", value);
+    public static JsIf If(Func<List<(JsSyntax? Condition, List<JsSyntax> Body)>> branches) => new(branches);
+    public static JsFuncDecl Func(Func<string> name, Func<List<string>> @params, Func<JsSyntax> body) => new(name, @params, body);
+    public static JsArrowFunc Arrow(Func<List<string>> @params, Func<JsSyntax> body) => new(@params, body);
+    public static JsRegex Regex(Func<string> pattern, Func<string> flags) => new(pattern, flags);
+}
+
+public static class JsSyntaxExtensions
+{
+    public static JsPropAccess Prop(this JsSyntax syntax, Func<string> property) => new(() => syntax, property);
+    public static JsCall Call(this JsSyntax syntax, Func<string> method, params Func<JsSyntax>[] args)
+    {
+        var call = new JsCall(() => syntax, method);
+        foreach (var arg in args) call.Args.Add(arg);
+        return call;
+    }
+    public static JsFuncCall Invoke(this JsSyntax syntax, params Func<JsSyntax>[] args) => new(() => syntax, args);
+    public static JsIndex Index(this JsSyntax syntax, Func<JsSyntax> index) => new(() => syntax, index);
+    public static JsBinOp Op(this JsSyntax left, Func<string> op, Func<JsSyntax> right) => new(() => (JsSyntax)left, op, right);
+    public static JsUnaryOp Not(this JsSyntax syntax) => new(() => "!", () => (JsSyntax)syntax);
+    public static JsExprStmt Stmt(this JsSyntax syntax) => new(() => syntax);
+    public static JsAssign Assign(this JsSyntax target, Func<JsSyntax> value) => new(() => target, value);
 }

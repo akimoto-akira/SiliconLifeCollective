@@ -9,7 +9,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text;
 using SiliconLife.Default.Web.Models;
 
 namespace SiliconLife.Default.Web.Views;
@@ -24,41 +23,70 @@ public class ExecutorView : ViewBase
         return RenderPage(vm.Skin, "执行器监控 - Silicon Life Collective", "beings", body, GetScripts(), GetStyles());
     }
 
-    private static string RenderBody()
+    private static H RenderBody()
     {
-        return @"
-<div class=""page-content"">
-    <div class=""page-header""><h1>执行器监控</h1></div>
-    <div class=""executors-grid"" id=""executors-grid""></div>
-</div>";
+        return H.Div(
+            H.Div(
+                H.H1("执行器监控")
+            ).Class("page-header"),
+            H.Div().Id("executors-grid").Class("executors-grid")
+        ).Class("page-content");
     }
 
-    private static string GetStyles()
+    private static CssBuilder GetStyles()
     {
-        return @"
-.executors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-.executor-card { background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
-.executor-name { font-size: 18px; font-weight: bold; color: var(--text-primary); margin-bottom: 10px; }
-.executor-status { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; background: rgba(107,203,119,0.15); color: var(--accent-success); }
-.executor-queue { font-size: 14px; color: var(--text-secondary); margin-top: 8px; }";
+        return CssBuilder.Create()
+            .Selector(".executors-grid")
+                .Property("display", "grid")
+                .Property("grid-template-columns", "repeat(auto-fill, minmax(280px, 1fr))")
+                .Property("gap", "20px")
+            .EndSelector()
+            .Selector(".executor-card")
+                .Property("background", "var(--bg-card)")
+                .Property("padding", "20px")
+                .Property("border-radius", "12px")
+                .Property("border", "1px solid var(--border)")
+            .EndSelector()
+            .Selector(".executor-name")
+                .Property("font-size", "18px")
+                .Property("font-weight", "bold")
+                .Property("color", "var(--text-primary)")
+                .Property("margin-bottom", "10px")
+            .EndSelector()
+            .Selector(".executor-status")
+                .Property("display", "inline-block")
+                .Property("padding", "4px 12px")
+                .Property("border-radius", "12px")
+                .Property("font-size", "12px")
+                .Property("background", "rgba(107,203,119,0.15)")
+                .Property("color", "var(--accent-success)")
+            .EndSelector()
+            .Selector(".executor-queue")
+                .Property("font-size", "14px")
+                .Property("color", "var(--text-secondary)")
+                .Property("margin-top", "8px")
+            .EndSelector();
     }
 
-    private static string GetScripts()
+    private static JsSyntax GetScripts()
     {
-        return @"
-function loadExecutors() {
-    fetch('/api/executors/status').then(function(r) { return r.json(); }).then(function(data) {
-        var grid = document.getElementById('executors-grid');
-        grid.innerHTML = '';
-        data.forEach(function(e) {
-            var card = document.createElement('div');
-            card.className = 'executor-card';
-            card.innerHTML = '<div class=""executor-name"">' + e.name + '</div><span class=""executor-status"">' + e.status + '</span><div class=""executor-queue"">队列: ' + e.queueCount + '</div>';
-            grid.appendChild(card);
-        });
-    });
-}
-setInterval(loadExecutors, 5000);
-window.onload = function() { loadExecutors(); };";
+        var forEachBody = Js.Block()
+            .Add(() => Js.Const(() => "card", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "card").Prop(() => "className"), () => Js.Str(() => "executor-card")))
+            .Add(() => Js.Assign(() => Js.Id(() => "card").Prop(() => "innerHTML"), () => Js.Str(() => "'<div class=\"executor-name\">' + e.name + '</div>'")))
+            .Add(() => Js.Id(() => "grid").Call(() => "appendChild", () => Js.Id(() => "card")).Stmt());
+
+        var thenBody = Js.Block()
+            .Add(() => Js.Const(() => "grid", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "executors-grid"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "grid").Prop(() => "innerHTML"), () => Js.Str(() => "")))
+            .Add(() => Js.Id(() => "data").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "e" }, () => forEachBody)).Stmt());
+
+        var loadExecutorsBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/executors/status")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
+
+        return Js.Block()
+            .Add(() => Js.Func(() => "loadExecutors", () => new List<string>(), () => loadExecutorsBody))
+            .Add(() => Js.Id(() => "setInterval").Invoke(() => Js.Id(() => "loadExecutors"), () => Js.Num(() => "5000")).Stmt())
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "loadExecutors").Invoke())));
     }
 }

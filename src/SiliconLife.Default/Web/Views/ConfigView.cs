@@ -9,7 +9,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text;
 using SiliconLife.Default.Web.Models;
 
 namespace SiliconLife.Default.Web.Views;
@@ -24,28 +23,27 @@ public class ConfigView : ViewBase
         return RenderPage(vm.Skin, "系统配置 - Silicon Life Collective", "config", body, GetScripts());
     }
 
-    private static string RenderBody(ConfigViewModel vm)
+    private static H RenderBody(ConfigViewModel vm)
     {
-        return @"
-<div class=""page-content"">
-    <div class=""page-header""><h1>系统配置</h1></div>
-    <div class=""config-list"" id=""config-list""></div>
-</div>";
+        return H.Div(
+            H.Div(
+                H.H1("系统配置")
+            ).Class("page-header"),
+            H.Div().Id("config-list").Class("config-list")
+        ).Class("page-content");
     }
 
-    private static string GetScripts()
+    private static JsSyntax GetScripts()
     {
-        return @"
-function loadConfig() {
-    fetch('/api/config/get').then(function(r) { return r.json(); }).then(function(data) {
-        var list = document.getElementById('config-list');
-        var html = '';
-        for (var key in data) {
-            html += '<div class=""config-item""><span class=""config-label"">' + key + '</span><span class=""config-value"">' + data[key] + '</span></div>';
-        }
-        list.innerHTML = html || '<p>暂无配置</p>';
-    });
-}
-window.onload = function() { loadConfig(); };";
+        var thenBody = Js.Block()
+            .Add(() => Js.Const(() => "list", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "config-list"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => "<p>暂无配置</p>")));
+
+        var loadConfigBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/config/get")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
+
+        return Js.Block()
+            .Add(() => Js.Func(() => "loadConfig", () => new List<string>(), () => loadConfigBody))
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "loadConfig").Invoke())));
     }
 }

@@ -1,24 +1,10 @@
 // Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 using System.Text;
 
 namespace SiliconLife.Default.Web;
 
-/// <summary>
-/// XElement-style HTML element builder.
-/// Structure = hierarchy. No EndBlock needed. Attributes always apply to the correct element.
-/// </summary>
 public class H
 {
     private static readonly HashSet<string> VoidElements = new(StringComparer.OrdinalIgnoreCase)
@@ -27,89 +13,39 @@ public class H
         "link", "meta", "param", "source", "track", "wbr"
     };
 
-    private readonly string _tag;
+    public string TagName { get; }
     private readonly Dictionary<string, string> _attrs = new();
-    private readonly List<object> _children = new(); // H | string | TextNode | CommentNode
-    private bool _isVoid;
+    private readonly List<object> _children = new();
     private string? _text;
+    private bool _isVoid;
 
-    private H(string tag, bool isVoid = false)
+    private H(string tagName, bool isVoid = false)
     {
-        _tag = tag;
+        TagName = tagName;
         _isVoid = isVoid;
     }
 
-    // ── Factory: Tag(name, children...) ──────────────────────────────────
-
-    /// <summary>Create an element: <c>H.Tag("div", "hello", H.Tag("span", "world"))</c></summary>
-    public static H Tag(string tag, params object?[] children)
+    public static H Create(string tagName, params object[] children)
     {
-        var el = new H(tag);
-        el.AddChildren(children);
+        var el = new H(tagName);
+        foreach (var child in children)
+        {
+            if (child is null) continue;
+            if (child is H h) el._children.Add(h);
+            else if (child is string s) el._children.Add(s);
+            else if (child is JsSyntax js) el._children.Add(js);
+            else if (child is CssBuilder css) el._children.Add(css);
+            else if (child is RawHtml raw) el._children.Add(raw);
+        }
         return el;
     }
 
-    // ── Convenience: H.Div(...), H.P(...), H.Span(...) etc. ─────────────
-
-    public static H Div(params object?[] children) => Tag("div", children);
-    public static H Span(params object?[] children) => Tag("span", children);
-    public static H P(params object?[] children) => Tag("p", children);
-    public static H A(params object?[] children) => Tag("a", children);
-    public static H Ul(params object?[] children) => Tag("ul", children);
-    public static H Ol(params object?[] children) => Tag("ol", children);
-    public static H Li(params object?[] children) => Tag("li", children);
-    public static H Nav(params object?[] children) => Tag("nav", children);
-    public static H Main(params object?[] children) => Tag("main", children);
-    public static H Section(params object?[] children) => Tag("section", children);
-    public static H Article(params object?[] children) => Tag("article", children);
-    public static H Aside(params object?[] children) => Tag("aside", children);
-    public static H Header(params object?[] children) => Tag("header", children);
-    public static H Footer(params object?[] children) => Tag("footer", children);
-    public static H Details(params object?[] children) => Tag("details", children);
-    public static H Summary(params object?[] children) => Tag("summary", children);
-    public static H Form(params object?[] children) => Tag("form", children);
-    public static H Fieldset(params object?[] children) => Tag("fieldset", children);
-    public static H Legend(params object?[] children) => Tag("legend", children);
-    public static H Pre(params object?[] children) => Tag("pre", children);
-    public static H Code(params object?[] children) => Tag("code", children);
-    public static H Blockquote(params object?[] children) => Tag("blockquote", children);
-    public static H Table(params object?[] children) => Tag("table", children);
-    public static H Thead(params object?[] children) => Tag("thead", children);
-    public static H Tbody(params object?[] children) => Tag("tbody", children);
-    public static H Tr(params object?[] children) => Tag("tr", children);
-    public static H Th(params object?[] children) => Tag("th", children);
-    public static H Td(params object?[] children) => Tag("td", children);
-    public static H Button(params object?[] children) => Tag("button", children);
-    public static H Select(params object?[] children) => Tag("select", children);
-    public static H Option(params object?[] children) => Tag("option", children);
-    public static H Optgroup(params object?[] children) => Tag("optgroup", children);
-    public static H Textarea(params object?[] children) => Tag("textarea", children);
-    public static H Label(params object?[] children) => Tag("label", children);
-    public static H Script(params object?[] children) => Tag("script", children);
-    public static H Style(params object?[] children) => Tag("style", children);
-    public static H I(params object?[] children) => Tag("i", children);
-    public static H B(params object?[] children) => Tag("b", children);
-    public static H Em(params object?[] children) => Tag("em", children);
-    public static H Strong(params object?[] children) => Tag("strong", children);
-    public static H Small(params object?[] children) => Tag("small", children);
-    public static H H1(params object?[] children) => Tag("h1", children);
-    public static H H2(params object?[] children) => Tag("h2", children);
-    public static H H3(params object?[] children) => Tag("h3", children);
-    public static H H4(params object?[] children) => Tag("h4", children);
-    public static H H5(params object?[] children) => Tag("h5", children);
-    public static H H6(params object?[] children) => Tag("h6", children);
-    public static H Dl(params object?[] children) => Tag("dl", children);
-    public static H Dt(params object?[] children) => Tag("dt", children);
-    public static H Dd(params object?[] children) => Tag("dd", children);
-    public static H Figure(params object?[] children) => Tag("figure", children);
-    public static H Figcaption(params object?[] children) => Tag("figcaption", children);
-    public static H Video(params object?[] children) => Tag("video", children);
-    public static H Audio(params object?[] children) => Tag("audio", children);
-    public static H Canvas(params object?[] children) => Tag("canvas", children);
-    public static H Iframe(params object?[] children) => Tag("iframe", children);
-    public static H Body(params object?[] children) => Tag("body", children);
-
-    // ── Void (self-closing) elements ─────────────────────────────────────
+    public static H Create(string tagName, string text)
+    {
+        var el = new H(tagName);
+        el._text = text;
+        return el;
+    }
 
     public static H Br() => new("br", true);
     public static H Hr() => new("hr", true);
@@ -117,29 +53,64 @@ public class H
     public static H Input() => new("input", true);
     public static H Meta() => new("meta", true);
     public static H Link() => new("link", true);
+    public static H Div(params object[] children) => Create("div", children);
+    public static H Span(params object[] children) => Create("span", children);
+    public static H P(params object[] children) => Create("p", children);
+    public static H A(params object[] children) => Create("a", children);
+    public static H H1(params object[] children) => Create("h1", children);
+    public static H H2(params object[] children) => Create("h2", children);
+    public static H H3(params object[] children) => Create("h3", children);
+    public static H H4(params object[] children) => Create("h4", children);
+    public static H Button(params object[] children) => Create("button", children);
+    public static H InputText(params object[] children) => Create("input", children);
+    public static H Textarea(params object[] children) => Create("textarea", children);
+    public static H Select(params object[] children) => Create("select", children);
+    public static H Option(params object[] children) => Create("option", children);
+    public static H Table(params object[] children) => Create("table", children);
+    public static H Tr(params object[] children) => Create("tr", children);
+    public static H Th(params object[] children) => Create("th", children);
+    public static H Td(params object[] children) => Create("td", children);
+    public static H Thead(params object[] children) => Create("thead", children);
+    public static H Tbody(params object[] children) => Create("tbody", children);
+    public static H Pre(params object[] children) => Create("pre", children);
+    public static H Code(params object[] children) => Create("code", children);
+    public static H Blockquote(params object[] children) => Create("blockquote", children);
+    public static H Ul(params object[] children) => Create("ul", children);
+    public static H Li(params object[] children) => Create("li", children);
+    public static H Label(params object[] children) => Create("label", children);
+    public static H Form(params object[] children) => Create("form", children);
+    public static H Script(params object[] children) => Create("script", children);
+    public static H Style(params object[] children) => Create("style", children);
+    public static H Details(params object[] children) => Create("details", children);
+    public static H Summary(params object[] children) => Create("summary", children);
+    public static H Header(params object[] children) => Create("header", children);
+    public static H Aside(params object[] children) => Create("aside", children);
+    public static H MainElement(params object[] children) => Create("main", children);
+    public static H Nav(params object[] children) => Create("nav", children);
+    public static H Section(params object[] children) => Create("section", children);
+    public static H Article(params object[] children) => Create("article", children);
+    public static H Footer(params object[] children) => Create("footer", children);
+    public static H Svg(params object[] children) => Create("svg", children);
+    public static H Html(params object[] children) => Create("html", children);
+    public static H Head(params object[] children) => Create("head", children);
+    public static H Body(params object[] children) => Create("body", children);
+    public static H Title(params object[] children) => Create("title", children);
+    public static H PageElement(string title, params object[] children) => Create("html", 
+        Create("head", Create("title", title)),
+        Create("body", children)
+    );
 
-    // ── Special: text node shorthand ─────────────────────────────────────
+    public static string T(string text) => text;
 
-    /// <summary>Create a plain text node (no wrapping tag).</summary>
-    public static TextNode Text(string text) => new(text);
+    public static string DocType() => "<!DOCTYPE html>";
 
-    /// <summary>Create an HTML comment node.</summary>
-    public static CommentNode Comment(string text) => new(text);
-
-    /// <summary>Conditional: if true, include the node; otherwise null.</summary>
-    public static object? When(bool condition, object? node) => condition ? node : null;
-
-    // ── Attribute setters (all return this) ──────────────────────────────
-
-    public H Attr(string name, object? value)
+    public H Attr(string name, string value)
     {
-        if (value != null)
-            _attrs[name] = value.ToString()!;
+        _attrs[name] = value;
         return this;
     }
 
     public H Id(string id) => Attr("id", id);
-
     public H Class(string className)
     {
         if (_attrs.TryGetValue("class", out var existing))
@@ -148,232 +119,118 @@ public class H
             _attrs["class"] = className;
         return this;
     }
+    public H OnClick(string handler) => Attr("onclick", handler);
+    public H Placeholder(string text) => Attr("placeholder", text);
+    public H Data(string name, string value) => Attr($"data-{name}", value);
+    public H Value(string value) => Attr("value", value);
+    public H Href(string url) => Attr("href", url);
+    public H Style(string style) => Attr("style", style);
+    public H Selected() => Attr("selected", "selected");
+    public H Checked() => Attr("checked", "checked");
+    public H Disabled() => Attr("disabled", "disabled");
 
-    public H Cls(params string[] classes)
+    public H Text(string text)
     {
-        if (classes.Length > 0)
-            _attrs["class"] = string.Join(" ", classes);
+        _text = text;
         return this;
     }
 
-    public H Data(string key, object value) => Attr($"data-{key}", value);
-
-    public H Href(string href) => Attr("href", href);
-
-    public H Src(string src) => Attr("src", src);
-
-    public H Alt(string alt) => Attr("alt", alt);
-
-    public H Type(string type) => Attr("type", type);
-
-    public H Name(string name) => Attr("name", name);
-
-    public H Value(string value) => Attr("value", value);
-
-    public H Placeholder(string ph) => Attr("placeholder", ph);
-
-    public H For(string @for) => Attr("for", @for);
-
-    public H Action(string action) => Attr("action", action);
-
-    public H Method(string method) => Attr("method", method);
-
-    public H Rel(string rel) => Attr("rel", rel);
-
-    public H Charset(string charset) => Attr("charset", charset);
-
-    public H Defer() => Attr("defer", "defer");
-
-    public H OnClick(string handler) => Attr("onclick", handler);
-
-    public H OnSubmit(string handler) => Attr("onsubmit", handler);
-
-    public H OnChange(string handler) => Attr("onchange", handler);
-
-    public H Style(string style) => Attr("style", style);
-
-    public H Title(string title) => Attr("title", title);
-
-    public H Checked() => Attr("checked", "checked");
-
-    public H Selected() => Attr("selected", "selected");
-
-    public H Disabled() => Attr("disabled", "disabled");
-
-    public H Readonly() => Attr("readonly", "readonly");
-
-    public H Required() => Attr("required", "required");
-
-    public H Hidden() => Attr("hidden", "hidden");
-
-    public H Role(string role) => Attr("role", role);
-
-    // ── Convenience shortcuts for common elements ────────────────────────
-
-    public static H InputText(string? name = null, string? placeholder = null, string? value = null)
-        => Input().Type("text").Name(name ?? "").Placeholder(placeholder ?? "").Value(value ?? "");
-
-    public static H InputPassword(string? name = null, string? placeholder = null)
-        => Input().Type("password").Name(name ?? "").Placeholder(placeholder ?? "");
-
-    public static H InputHidden(string? name = null, string? value = null)
-        => Input().Type("hidden").Name(name ?? "").Value(value ?? "");
-
-    public static H InputEmail(string? name = null, string? placeholder = null)
-        => Input().Type("email").Name(name ?? "").Placeholder(placeholder ?? "");
-
-    public static H InputNumber(string? name = null, string? placeholder = null, string? value = null)
-        => Input().Type("number").Name(name ?? "").Placeholder(placeholder ?? "").Value(value ?? "");
-
-    public static H InputCheckbox(string? name = null, string? value = null, bool @checked = false)
+    public H Add(H child)
     {
-        var input = Input().Type("checkbox").Name(name ?? "").Value(value ?? "");
-        if (@checked) input.Checked();
-        return input;
+        _children.Add(child);
+        return this;
     }
 
-    public static H InputRadio(string? name = null, string? value = null, bool @checked = false)
+    public H Add(string text)
     {
-        var input = Input().Type("radio").Name(name ?? "").Value(value ?? "");
-        if (@checked) input.Checked();
-        return input;
+        _children.Add(text);
+        return this;
     }
 
-    public static H InputSubmit(string? value = null, string? name = null)
-        => Input().Type("submit").Value(value ?? "").Name(name ?? "");
-
-    public static H InputFile(string? name = null)
-        => Input().Type("file").Name(name ?? "");
-
-    public static H InputSearch(string? name = null, string? placeholder = null)
-        => Input().Type("search").Name(name ?? "").Placeholder(placeholder ?? "");
-
-    public static H InputDate(string? name = null, string? value = null)
-        => Input().Type("date").Name(name ?? "").Value(value ?? "");
-
-    public static H InputTime(string? name = null, string? value = null)
-        => Input().Type("time").Name(name ?? "").Value(value ?? "");
-
-    public static H InputColor(string? name = null, string? value = null)
-        => Input().Type("color").Name(name ?? "").Value(value ?? "");
-
-    public static H MetaCharset(string charset = "utf-8")
-        => Meta().Charset(charset);
-
-    public static H MetaViewport(string content = "width=device-width, initial-scale=1")
-        => Meta().Attr("name", "viewport").Attr("content", content);
-
-    public static H MetaName(string name, string content)
-        => Meta().Attr("name", name).Attr("content", content);
-
-    public static H Stylesheet(string href)
-        => Link().Rel("stylesheet").Href(href);
-
-    public static H ScriptSrc(string src, bool defer = false)
+    public H Add(JsSyntax js)
     {
-        var s = Script().Src(src);
-        if (defer) s.Defer();
-        return s;
+        _children.Add(js);
+        return this;
     }
 
-    // ── DocType + HTML page skeleton ─────────────────────────────────────
+    public H Add(CssBuilder css)
+    {
+        _children.Add(css);
+        return this;
+    }
 
-    public static DocTypeNode DocType(string doctype = "html") => new(doctype);
+    public H Add(RawHtml raw)
+    {
+        _children.Add(raw);
+        return this;
+    }
 
-    /// <summary>Build an HTML page element (without DOCTYPE): <c>H.PageElement(title, headChildren, bodyChildren)</c></summary>
-    public static H PageElement(string title, object?[] headExtras, object?[] bodyContent)
-        => Tag("html",
-            Tag("head",
-                MetaCharset(),
-                MetaViewport(),
-                Tag("title", title),
-                headExtras
-            ),
-            Tag("body", bodyContent)
-        );
-
-    /// <summary>Build a full HTML page string: <c>H.HtmlPage(title, headChildren, bodyChildren)</c></summary>
-    public static string HtmlPage(string title, object?[] headExtras, object?[] bodyContent)
-        => new DocTypeNode().Build() + PageElement(title, headExtras, bodyContent).Build();
-
-    // ── Render ───────────────────────────────────────────────────────────
+    private const string IndentString = "    ";
 
     public string Build()
     {
         var sb = new StringBuilder();
-        BuildTo(sb);
+        BuildTo(sb, 0);
         return sb.ToString();
     }
 
     public override string ToString() => Build();
 
-    private void BuildTo(StringBuilder sb)
+    private void BuildTo(StringBuilder sb, int indentLevel)
     {
-        sb.Append('<');
-        sb.Append(_tag);
+        string indent = new string(' ', indentLevel * 4);
+
+        sb.Append(indent).Append('<').Append(TagName);
 
         foreach (var (k, v) in _attrs)
-        {
             sb.Append(' ').Append(k).Append("=\"").Append(EscapeAttr(v)).Append('"');
-        }
 
-        if (_isVoid || VoidElements.Contains(_tag))
+        if (_isVoid || VoidElements.Contains(TagName))
         {
-            sb.Append(" />");
+            sb.Append(" />\n");
             return;
         }
 
         sb.Append('>');
 
-        // Direct text content
         if (_text != null)
         {
-            sb.Append(EscapeText(_text));
+            sb.Append(EscapeText(_text)).Append("</").Append(TagName).Append(">\n");
+            return;
         }
 
-        // Children
+        if (_children.Count == 0)
+        {
+            sb.Append("</").Append(TagName).Append(">\n");
+            return;
+        }
+
+        sb.Append('\n');
+
         foreach (var child in _children)
         {
             switch (child)
             {
-                case null:
-                    break;
                 case H h:
-                    h.BuildTo(sb);
+                    h.BuildTo(sb, indentLevel + 1);
                     break;
                 case string s:
-                    sb.Append(EscapeText(s));
+                    sb.Append(indent).Append(IndentString).Append(EscapeText(s)).Append('\n');
                     break;
-                case TextNode tn:
-                    sb.Append(EscapeText(tn.Text));
+                case JsSyntax js:
+                    sb.Append(indent).Append(IndentString).Append(js.Build()).Append('\n');
                     break;
-                case CommentNode cn:
-                    sb.Append("<!-- ").Append(cn.Text).Append(" -->");
+                case CssBuilder css:
+                    sb.Append(indent).Append(IndentString).Append(css.Build()).Append('\n');
+                    break;
+                case RawHtml raw:
+                    sb.Append(raw.Content).Append('\n');
                     break;
             }
         }
 
-        sb.Append("</").Append(_tag).Append('>');
+        sb.Append(indent).Append("</").Append(TagName).Append(">\n");
     }
-
-    internal void AddChildren(object?[] children)
-    {
-        foreach (var child in children)
-        {
-            if (child is null) continue;
-            if (child is IEnumerable<object> items && child is not string)
-            {
-                foreach (var item in items)
-                    _children.Add(item);
-            }
-            else
-            {
-                _children.Add(child);
-            }
-        }
-    }
-
-    internal void SetText(string text) => _text = text;
 
     private static string EscapeText(string s) => s
         .Replace("&", "&amp;")
@@ -384,54 +241,33 @@ public class H
         .Replace("&", "&amp;")
         .Replace("<", "&lt;")
         .Replace(">", "&gt;")
-        .Replace("\"", "&quot;")
-        .Replace("'", "&#39;");
+        .Replace("\"", "&quot;");
 }
-
-// ── Special node types ──────────────────────────────────────────────────
-
-public sealed class TextNode
-{
-    public string Text { get; }
-    public TextNode(string text) => Text = text;
-}
-
-public sealed class CommentNode
-{
-    public string Text { get; }
-    public CommentNode(string text) => Text = text;
-}
-
-public sealed class DocTypeNode
-{
-    private readonly string _doctype;
-    public DocTypeNode(string doctype = "html") => _doctype = doctype;
-    public string Build() => $"<!DOCTYPE {_doctype}>";
-}
-
-// ── Extension: conditional rendering ────────────────────────────────────
 
 public static class HExtensions
 {
-    /// <summary>Conditionally add children to an existing H element.</summary>
-    public static H When(this H el, bool condition, params object?[] children)
+    public static H When(this H el, bool condition, object child)
     {
         if (condition)
-            el.Add(children);
+        {
+            if (child is H h) el.Add(h);
+            else if (child is string s) el.Add(s);
+            else if (child is JsSyntax js) el.Add(js);
+            else if (child is CssBuilder css) el.Add(css);
+            else if (child is RawHtml raw) el.Add(raw);
+        }
         return el;
+    }
+}
+
+public class RawHtml
+{
+    public string Content { get; }
+
+    public RawHtml(string content)
+    {
+        Content = content;
     }
 
-    /// <summary>Add children to an existing H element (for loops etc).</summary>
-    public static H Add(this H el, params object?[] children)
-    {
-        el.AddChildren(children);
-        return el;
-    }
-
-    /// <summary>Set text content on an element.</summary>
-    public static H Text(this H el, string text)
-    {
-        el.SetText(text);
-        return el;
-    }
+    public static RawHtml From(string content) => new(content);
 }
