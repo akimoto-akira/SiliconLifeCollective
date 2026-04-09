@@ -73,6 +73,23 @@ public class JsBool : JsSyntax
     public override string Build() => Value() ? "true" : "false";
 }
 
+public class JsNull : JsSyntax
+{
+    public override string Build() => "null";
+}
+
+public class JsNew : JsSyntax
+{
+    public Func<JsSyntax> Constructor { get; }
+    public List<Func<JsSyntax>> Args { get; } = new();
+    public JsNew(Func<JsSyntax> constructor, params Func<JsSyntax>[] args)
+    {
+        Constructor = constructor;
+        foreach (var arg in args) Args.Add(arg);
+    }
+    public override string Build() => $"new {Constructor().Build()}({string.Join(", ", Args.Select(a => a().Build()))})";
+}
+
 public class JsProp : JsSyntax
 {
     public Func<string> Key { get; }
@@ -343,6 +360,8 @@ public static class Js
     public static JsString Str(Func<string> value) => new(value);
     public static JsNumber Num(Func<string> value) => new(value);
     public static JsBool Bool(Func<bool> value) => new(value);
+    public static JsNull Null() => new();
+    public static JsNew New(Func<JsSyntax> constructor, params Func<JsSyntax>[] args) => new(constructor, args);
     public static JsObj Obj() => new();
     public static JsBlock Block() => new();
     public static JsConst Const(Func<string> name, Func<JsSyntax> value) => new(name, value);

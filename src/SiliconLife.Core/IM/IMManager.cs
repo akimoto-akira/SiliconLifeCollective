@@ -49,18 +49,18 @@ public class IMManager
     private void OnMessageReceived(object? sender, IMMessageEventArgs e)
     {
         ChatMessage msg = e.Message;
-        if (msg.ReceiverId == Guid.Empty)
+        if (msg.ChannelId == Guid.Empty)
         {
             List<SiliconBeingBase> beings = _beingManager.GetAllBeings();
             if (beings.Count > 0)
             {
-                msg.ReceiverId = beings[0].Id;
-                _chatSystem.AddMessage(msg.SenderId, msg.ReceiverId, msg.Content);
+                msg.ChannelId = beings[0].Id;
+                _chatSystem.AddMessage(msg.SenderId, msg.ChannelId, msg.Content);
             }
         }
         else
         {
-            _chatSystem.AddMessage(msg.SenderId, msg.ReceiverId, msg.Content);
+            _chatSystem.AddMessage(msg.SenderId, msg.ChannelId, msg.Content);
         }
     }
 
@@ -68,11 +68,23 @@ public class IMManager
     /// Sends a message through the IM provider.
     /// </summary>
     /// <param name="senderId">The ID of the message sender.</param>
-    /// <param name="receiverId">The ID of the intended recipient.</param>
+    /// <param name="channelId">The channel ID.</param>
     /// <param name="content">The message content.</param>
-    public async Task SendMessageAsync(Guid senderId, Guid receiverId, string content)
+    public async Task SendMessageAsync(Guid senderId, Guid channelId, string content)
     {
-        await _imProvider.SendMessageAsync(senderId, receiverId, content);
+        await _imProvider.SendMessageAsync(senderId, channelId, content);
+    }
+
+    /// <summary>
+    /// Sends a streaming chunk through the IM provider.
+    /// Used for real-time streaming responses like AI text generation.
+    /// </summary>
+    /// <param name="senderId">The ID of the message sender.</param>
+    /// <param name="channelId">The channel ID.</param>
+    /// <param name="chunk">The stream chunk to send.</param>
+    public async Task SendStreamChunkAsync(Guid senderId, Guid channelId, StreamChunk chunk)
+    {
+        await _imProvider.SendStreamChunkAsync(senderId, channelId, chunk);
     }
 
     /// <summary>

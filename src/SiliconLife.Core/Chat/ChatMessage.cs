@@ -41,9 +41,9 @@ public class ChatMessage
     public Guid SenderId { get; set; }
 
     /// <summary>
-    /// Gets or sets the receiver's unique identifier.
+    /// Gets or sets the channel identifier (conversation or group ID).
     /// </summary>
-    public Guid ReceiverId { get; set; }
+    public Guid ChannelId { get; set; }
 
     /// <summary>
     /// Gets or sets the content of the message.
@@ -94,21 +94,21 @@ public class ChatMessage
     public ChatMessage()
     {
         Id = Guid.NewGuid();
-        Timestamp = DateTime.UtcNow;
+        Timestamp = DateTime.Now;
         Type = MessageType.Text;
     }
 
     /// <summary>
-    /// Initializes a new instance of the ChatMessage class with sender, receiver, and content.
+    /// Initializes a new instance of the ChatMessage class with sender, channel, and content.
     /// </summary>
     /// <param name="senderId">The sender's unique identifier.</param>
-    /// <param name="receiverId">The receiver's unique identifier.</param>
+    /// <param name="channelId">The channel identifier.</param>
     /// <param name="content">The message content.</param>
-    public ChatMessage(Guid senderId, Guid receiverId, string content)
+    public ChatMessage(Guid senderId, Guid channelId, string content)
         : this()
     {
         SenderId = senderId;
-        ReceiverId = receiverId;
+        ChannelId = channelId;
         Content = content;
     }
 
@@ -116,11 +116,11 @@ public class ChatMessage
     /// Initializes a new instance of the ChatMessage class with all parameters.
     /// </summary>
     /// <param name="senderId">The sender's unique identifier.</param>
-    /// <param name="receiverId">The receiver's unique identifier.</param>
+    /// <param name="channelId">The channel identifier.</param>
     /// <param name="content">The message content.</param>
     /// <param name="type">The message type.</param>
-    public ChatMessage(Guid senderId, Guid receiverId, string content, MessageType type)
-        : this(senderId, receiverId, content)
+    public ChatMessage(Guid senderId, Guid channelId, string content, MessageType type)
+        : this(senderId, channelId, content)
     {
         Type = type;
     }

@@ -28,6 +28,7 @@ public class WebUIProvider : IIMProvider
     private readonly Dictionary<Guid, TaskCompletionSource<AskPermissionResult>> _pendingPermissionRequests = new();
 
     public event EventHandler<IMMessageEventArgs>? MessageReceived;
+    public event EventHandler<StreamChunkEventArgs>? StreamChunkReceived;
     public event EventHandler? ExitRequested;
 
     public Func<Guid, TaskCompletionSource<AskPermissionResult>> GetPermissionTcs => (Guid userId) =>
@@ -52,7 +53,7 @@ public class WebUIProvider : IIMProvider
         {
             try
             {
-                var wsMessage = JsonSerializer.Deserialize<WebSocketMessage>(message);
+                var wsMessage = JsonSerializer.Deserialize<WebSocketMessage>(message, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 if (wsMessage == null) return;
 
                 switch (wsMessage.Type)
@@ -78,17 +79,17 @@ public class WebUIProvider : IIMProvider
                         break;
 
                     case "chat":
-                        if (!string.IsNullOrEmpty(wsMessage.SenderId) && !string.IsNullOrEmpty(wsMessage.ReceiverId))
+                        if (!string.IsNullOrEmpty(wsMessage.SenderId) && !string.IsNullOrEmpty(wsMessage.ChannelId))
                         {
-                            if (Guid.TryParse(wsMessage.SenderId, out var sender) && Guid.TryParse(wsMessage.ReceiverId, out var receiver))
+                            if (Guid.TryParse(wsMessage.SenderId, out var sender) && Guid.TryParse(wsMessage.ChannelId, out var channel))
                             {
                                 var chatMessage = new ChatMessage
                                 {
                                     Id = Guid.NewGuid(),
                                     SenderId = sender,
-                                    ReceiverId = receiver,
+                                    ChannelId = channel,
                                     Content = wsMessage.Content,
-                                    Timestamp = DateTime.UtcNow,
+                                    Timestamp = DateTime.Now,
                                     Type = MessageType.Text
                                 };
                                 MessageReceived?.Invoke(this, new IMMessageEventArgs(chatMessage));
@@ -107,6 +108,20 @@ public class WebUIProvider : IIMProvider
                                 };
                                 tcs.SetResult(result);
                                 _pendingPermissionRequests.Remove(userGuid);
+                            }
+                        }
+                        break;
+
+                    case "stream_chunk":
+                        if (!string.IsNullOrEmpty(wsMessage.SenderId) && !string.IsNullOrEmpty(wsMessage.ChannelId))
+                        {
+                            if (Guid.TryParse(wsMessage.SenderId, out var streamSender) && Guid.TryParse(wsMessage.ChannelId, out var streamChannel))
+                            {
+                                var chunk = JsonSerializer.Deserialize<StreamChunk>(wsMessage.Content ?? "{}", new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                                if (chunk != null)
+                                {
+                                    StreamChunkReceived?.Invoke(this, new StreamChunkEventArgs(streamSender, streamChannel, chunk));
+                                }
                             }
                         }
                         break;
@@ -129,15 +144,34 @@ public class WebUIProvider : IIMProvider
         return Task.CompletedTask;
     }
 
-    public async Task SendMessageAsync(Guid senderId, Guid receiverId, string content)
+    public async Task SendMessageAsync(Guid senderId, Guid channelId, string content)
     {
         var message = new WebSocketMessage
         {
             Type = "chat",
             SenderId = senderId.ToString(),
-            ReceiverId = receiverId.ToString(),
+            ChannelId = channelId.ToString(),
             Content = content,
             Timestamp = DateTime.UtcNow
+        };
+
+        if (_webSocketHandler != null)
+        {
+            await _webSocketHandler.SendToAllAsync(message.ToJson());
+        }
+    }
+
+    public async Task SendStreamChunkAsync(Guid senderId, Guid channelId, StreamChunk chunk)
+    {
+        var message = new WebSocketMessage
+        {
+            Type = "stream_chunk",
+            SenderId = senderId.ToString(),
+            ChannelId = channelId.ToString(),
+            Content = JsonSerializer.Serialize(chunk),
+            Timestamp = DateTime.UtcNow,
+            StreamId = chunk.StreamId,
+            IsFinal = chunk.IsFinal
         };
 
         if (_webSocketHandler != null)

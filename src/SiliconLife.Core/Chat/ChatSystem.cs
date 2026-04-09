@@ -11,6 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Security.Cryptography;
+
 namespace SiliconLife.Collective;
 
 /// <summary>
@@ -29,14 +31,30 @@ public class ChatSystem
     }
 
     /// <summary>
-    /// Add a message to the session between the given sender and receiver.
+    /// Computes a deterministic channel ID for a single chat session between two participants.
+    /// The ID is derived from sorted participant GUIDs via MD5 hash.
+    /// </summary>
+    /// <param name="participant1">First participant's ID</param>
+    /// <param name="participant2">Second participant's ID</param>
+    /// <returns>The deterministic channel ID for this conversation</returns>
+    public static Guid ComputeSingleChatChannelId(Guid participant1, Guid participant2)
+    {
+        string sorted = string.Compare(participant1.ToString(), participant2.ToString(), StringComparison.Ordinal) <= 0
+            ? $"{participant1}{participant2}"
+            : $"{participant2}{participant1}";
+        byte[] hash = MD5.HashData(System.Text.Encoding.UTF8.GetBytes(sorted));
+        return new Guid(hash);
+    }
+
+    /// <summary>
+    /// Add a message to the session for the given channel.
     /// Creates the session if it does not exist yet.
     /// </summary>
-    public void AddMessage(Guid senderId, Guid receiverId, string content)
+    public void AddMessage(Guid senderId, Guid channelId, string content)
     {
-        ISession session = GetOrCreateSession(senderId, receiverId);
-        ChatMessage message = new(senderId, receiverId, content);
-        session.AddMessage(message);
+        ISession? session = GetSessionByChannelId(channelId);
+        ChatMessage message = new(senderId, channelId, content);
+        session?.AddMessage(message);
     }
 
     /// <summary>
@@ -46,7 +64,7 @@ public class ChatSystem
     /// </summary>
     public void AddMessage(ChatMessage message)
     {
-        ISession session = GetOrCreateSession(message.SenderId, message.ReceiverId);
+        ISession session = GetOrCreateSession(message.SenderId, message.ChannelId);
         session.AddMessage(message);
     }
 
@@ -86,6 +104,20 @@ public class ChatSystem
             SingleChatSession newSession = new(participant1, participant2, _storage);
             _sessions[newSession.Id] = newSession;
             return newSession;
+        }
+    }
+
+    /// <summary>
+    /// Get or create a session by channel ID.
+    /// For single chat, the channel ID is derived from participant GUIDs.
+    /// For group chat, the channel ID is the group ID.
+    /// If the session does not exist, returns null.
+    /// </summary>
+    public ISession? GetSessionByChannelId(Guid channelId)
+    {
+        lock (_lock)
+        {
+            return _sessions.TryGetValue(channelId, out var session) ? session : null;
         }
     }
 

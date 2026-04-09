@@ -136,12 +136,23 @@ public class WebSocketMessage
     public string Type { get; set; } = "";
     public string Content { get; set; } = "";
     public string? SenderId { get; set; }
-    public string? ReceiverId { get; set; }
+    public string? ChannelId { get; set; }
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+
+    /// <summary>
+    /// Stream ID for streaming messages.
+    /// All chunks in the same stream share this ID.
+    /// </summary>
+    public Guid? StreamId { get; set; }
+
+    /// <summary>
+    /// Whether this is the final chunk in a stream.
+    /// </summary>
+    public bool? IsFinal { get; set; }
 
     public static WebSocketMessage FromJson(string json)
     {
-        return System.Text.Json.JsonSerializer.Deserialize<WebSocketMessage>(json) ?? new WebSocketMessage();
+        return System.Text.Json.JsonSerializer.Deserialize<WebSocketMessage>(json, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new WebSocketMessage();
     }
 
     public string ToJson()

@@ -16,11 +16,21 @@ namespace SiliconLife.Collective;
 public interface IIMProvider
 {
     event EventHandler<IMMessageEventArgs>? MessageReceived;
+    event EventHandler<StreamChunkEventArgs>? StreamChunkReceived;
     event EventHandler? ExitRequested;
 
     Task StartAsync();
     Task StopAsync();
-    Task SendMessageAsync(Guid senderId, Guid receiverId, string content);
+    Task SendMessageAsync(Guid senderId, Guid channelId, string content);
+
+    /// <summary>
+    /// Sends a streaming chunk to the channel.
+    /// Used for real-time streaming responses like AI text generation.
+    /// </summary>
+    /// <param name="senderId">The sender ID</param>
+    /// <param name="channelId">The channel ID</param>
+    /// <param name="chunk">The stream chunk to send</param>
+    Task SendStreamChunkAsync(Guid senderId, Guid channelId, StreamChunk chunk);
 
     /// <summary>
     /// Asks the user for a permission decision.
@@ -58,5 +68,101 @@ public class IMMessageEventArgs : EventArgs
     public IMMessageEventArgs(ChatMessage message)
     {
         Message = message;
+    }
+}
+
+/// <summary>
+/// Represents a single chunk in a streaming response.
+/// Used for real-time streaming like AI text generation.
+/// </summary>
+public class StreamChunk
+{
+    /// <summary>
+    /// Unique identifier for the stream session.
+    /// All chunks in the same stream share this ID.
+    /// </summary>
+    public Guid StreamId { get; init; }
+
+    /// <summary>
+    /// The chunk content (partial text or data).
+    /// </summary>
+    public string Content { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Whether this is the final chunk of the stream.
+    /// When true, the stream is complete.
+    /// </summary>
+    public bool IsFinal { get; init; }
+
+    /// <summary>
+    /// Optional thinking content (chain-of-thought) for this chunk.
+    /// </summary>
+    public string? Thinking { get; init; }
+
+    /// <summary>
+    /// Optional sequence number for ordering (0-based).
+    /// </summary>
+    public int? Sequence { get; init; }
+
+    /// <summary>
+    /// Creates a start chunk to begin a new stream.
+    /// </summary>
+    public static StreamChunk Start(Guid streamId, string content = "", string? thinking = null)
+    {
+        return new StreamChunk
+        {
+            StreamId = streamId,
+            Content = content,
+            IsFinal = false,
+            Thinking = thinking,
+            Sequence = 0
+        };
+    }
+
+    /// <summary>
+    /// Creates a continuation chunk.
+    /// </summary>
+    public static StreamChunk Continue(Guid streamId, string content, int sequence, string? thinking = null)
+    {
+        return new StreamChunk
+        {
+            StreamId = streamId,
+            Content = content,
+            IsFinal = false,
+            Thinking = thinking,
+            Sequence = sequence
+        };
+    }
+
+    /// <summary>
+    /// Creates a final chunk to end the stream.
+    /// </summary>
+    public static StreamChunk End(Guid streamId, string content = "", int? sequence = null, string? thinking = null)
+    {
+        return new StreamChunk
+        {
+            StreamId = streamId,
+            Content = content,
+            IsFinal = true,
+            Thinking = thinking,
+            Sequence = sequence
+        };
+    }
+}
+
+/// <summary>
+/// Event arguments for stream chunk received events.
+/// </summary>
+public class StreamChunkEventArgs : EventArgs
+{
+    public Guid SenderId { get; }
+    public Guid ChannelId { get; }
+    public StreamChunk Chunk { get; }
+
+    public StreamChunkEventArgs(Guid senderId, Guid channelId, StreamChunk chunk)
+    {
+        SenderId = senderId;
+        ChannelId = channelId;
+        Chunk = chunk;
     }
 }

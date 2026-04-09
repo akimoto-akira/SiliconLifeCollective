@@ -105,44 +105,44 @@ public class DefaultSiliconBeing : SiliconBeingBase
         _isProcessing = true;
         try
         {
-            var partnerIds = BuildPartnerList();
+            var sessions = BuildSessionList();
 
             // Check continuation across all sessions (highest priority)
-            foreach (var partnerId in partnerIds)
+            foreach (var session in sessions)
             {
-                if (ContextManager.NeedsContinuation(this, partnerId))
+                if (ContextManager.NeedsContinuation(this, session))
                 {
-                    ExecuteBrain("ThinkContinuation", partnerId, brain => brain.ThinkOnChat());
+                    ExecuteBrain("ThinkContinuation", session, brain => brain.ThinkOnChat());
                     return;
                 }
             }
 
-            // Check for pending messages from any partner
-            foreach (var partnerId in partnerIds)
+            // Check for pending messages from any session
+            foreach (var session in sessions)
             {
-                ContextManager brain = new ContextManager(this, partnerId);
+                ContextManager brain = new ContextManager(this, session);
                 if (brain.HasWork)
                 {
-                    ExecuteBrain("ThinkOnChat", partnerId, _ => brain.ThinkOnChat());
+                    ExecuteBrain("ThinkOnChat", session, _ => brain.ThinkOnChat());
                     return;
                 }
             }
 
             if (TimerSystem != null && TimerSystem.HasPendingTimers())
             {
-                ExecuteBrain("ThinkOnTimer", Guid.Empty, _ => new ContextManager(this, Guid.Empty).ThinkOnTimer());
+                ExecuteBrain("ThinkOnTimer", null, _ => new ContextManager(this, null).ThinkOnTimer());
                 return;
             }
 
             if (TaskSystem != null && TaskSystem.HasPendingTasks())
             {
-                ExecuteBrain("ThinkOnTask", Guid.Empty, _ => new ContextManager(this, Guid.Empty).ThinkOnTask());
+                ExecuteBrain("ThinkOnTask", null, _ => new ContextManager(this, null).ThinkOnTask());
                 return;
             }
 
             if (Memory != null && Memory.ShouldCompress())
             {
-                ExecuteBrain("ThinkOnMemoryCompress", Guid.Empty, _ => new ContextManager(this, Guid.Empty).ThinkOnMemoryCompress());
+                ExecuteBrain("ThinkOnMemoryCompress", null, _ => new ContextManager(this, null).ThinkOnMemoryCompress());
                 return;
             }
         }
@@ -161,17 +161,23 @@ public class DefaultSiliconBeing : SiliconBeingBase
     }
 
     /// <summary>
-    /// Builds the list of potential conversation partners:
-    /// the project user ID + all other silicon being IDs (excluding self).
+    /// Builds the list of chat sessions:
+    /// single chat sessions with the project user ID + all other silicon beings (excluding self).
     /// </summary>
-    private List<Guid> BuildPartnerList()
+    private List<ISession> BuildSessionList()
     {
-        var partners = new List<Guid>();
+        var sessions = new List<ISession>();
+        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
+        if (chatSystem == null)
+        {
+            return sessions;
+        }
 
         Guid userId = Config.Instance.Data.UserGuid;
         if (userId != Guid.Empty)
         {
-            partners.Add(userId);
+            ISession session = chatSystem.GetOrCreateSession(Id, userId);
+            sessions.Add(session);
         }
 
         SiliconBeingManager? beingManager = ServiceLocator.Instance.BeingManager;
@@ -181,25 +187,26 @@ public class DefaultSiliconBeing : SiliconBeingBase
             {
                 if (other.Id != Id)
                 {
-                    partners.Add(other.Id);
+                    ISession session = chatSystem.GetOrCreateSession(Id, other.Id);
+                    sessions.Add(session);
                 }
             }
         }
 
-        return partners;
+        return sessions;
     }
 
     /// <summary>
     /// Executes a brain function with logging and continuation tracking.
     /// </summary>
-    private void ExecuteBrain(string sceneName, Guid partnerId, Func<ContextManager, AIResponse> thinkFunc)
+    private void ExecuteBrain(string sceneName, ISession? session, Func<ContextManager, AIResponse> thinkFunc)
     {
         Language language = Config.Instance.Data.Language;
         DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(language);
 
         Console.WriteLine($"{Name}: {localization.ThinkingMessage}");
 
-        ContextManager brain = new ContextManager(this, partnerId);
+        ContextManager brain = new ContextManager(this, session);
         AIResponse response = thinkFunc(brain);
 
         if (response.Success && response.HasToolCalls)
