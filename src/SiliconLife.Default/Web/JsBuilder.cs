@@ -165,6 +165,13 @@ public class JsUnaryOp : JsSyntax
     public override string Build() => $"{Operator()}{Value().Build()}";
 }
 
+public class JsParen : JsSyntax
+{
+    public Func<JsSyntax> Inner { get; }
+    public JsParen(Func<JsSyntax> inner) => Inner = inner;
+    public override string Build() => $"({Inner().Build()})";
+}
+
 public class JsIndex : JsSyntax
 {
     public Func<JsSyntax> Target { get; }
@@ -399,6 +406,7 @@ public static class JsSyntaxExtensions
     public static JsIndex Index(this JsSyntax syntax, Func<JsSyntax> index) => new(() => syntax, index);
     public static JsBinOp Op(this JsSyntax left, Func<string> op, Func<JsSyntax> right) => new(() => (JsSyntax)left, op, right);
     public static JsUnaryOp Not(this JsSyntax syntax) => new(() => "!", () => (JsSyntax)syntax);
+    public static JsParen Paren(this JsSyntax syntax) => new(() => (JsSyntax)syntax);
     public static JsExprStmt Stmt(this JsSyntax syntax) => new(() => syntax);
     public static JsAssign Assign(this JsSyntax target, Func<JsSyntax> value) => new(() => target, value);
 }

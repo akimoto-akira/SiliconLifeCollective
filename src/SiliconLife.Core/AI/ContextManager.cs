@@ -207,7 +207,7 @@ public class ContextManager
     /// <summary>
     /// Adds an assistant message to the context and persists it
     /// </summary>
-    private void AddAssistantMessage(string content)
+    private void AddAssistantMessage(string content, string? thinking = null)
     {
         _messages.Add(new Message(MessageRole.Assistant, content));
 
@@ -216,7 +216,7 @@ public class ContextManager
             ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
             if (chatSystem != null && _being.Id != Guid.Empty)
             {
-                chatSystem.AddMessage(_being.Id, _session.Id, content);
+                chatSystem.AddMessage(_being.Id, _session.Id, content, thinking);
             }
         }
     }
@@ -322,7 +322,7 @@ public class ContextManager
         }
         else if (response.Success && !string.IsNullOrEmpty(response.Content))
         {
-            AddAssistantMessage(response.Content);
+            AddAssistantMessage(response.Content, response.Thinking);
         }
 
         return response;
@@ -343,7 +343,7 @@ public class ContextManager
         }
         else if (response.Success && !string.IsNullOrEmpty(response.Content))
         {
-            AddAssistantMessage(response.Content);
+            AddAssistantMessage(response.Content, response.Thinking);
         }
 
         return response;
@@ -364,7 +364,7 @@ public class ContextManager
         }
         else if (response.Success && !string.IsNullOrEmpty(response.Content))
         {
-            DeliverOutput(response.Content);
+            DeliverOutput(response.Content, response.Thinking);
         }
 
         return response;
@@ -386,7 +386,7 @@ public class ContextManager
         }
         else if (response.Success && !string.IsNullOrEmpty(response.Content))
         {
-            DeliverOutput(response.Content);
+            DeliverOutput(response.Content, response.Thinking);
         }
 
         return response;
@@ -503,12 +503,12 @@ public class ContextManager
     /// <summary>
     /// Delivers the AI's response to the user via IM or console.
     /// </summary>
-    private void DeliverOutput(string content)
+    private void DeliverOutput(string content, string? thinking = null)
     {
         IMManager? imManager = ServiceLocator.Instance.IMManager;
         if (imManager != null && _session != null)
         {
-            _ = imManager.SendMessageAsync(_being.Id, _session.Id, $"{_being.Name}: {content}");
+            _ = imManager.SendMessageAsync(_being.Id, _session.Id, content, thinking, _being.Name);
         }
         else
         {

@@ -21,7 +21,7 @@ namespace SiliconLife.Default.IM;
 public class WebUIProvider : IIMProvider
 {
     private readonly Router _router;
-    private WebSocketHandler? _webSocketHandler;
+    private WebSocketHandler _webSocketHandler;
     private readonly Dictionary<Guid, WebSocket> _userConnections = new();
     private readonly object _lock = new();
     private readonly Queue<(Guid senderId, Guid receiverId, string content)> _messageQueue = new();
@@ -44,94 +44,92 @@ public class WebUIProvider : IIMProvider
     public WebUIProvider(Router router)
     {
         _router = router;
-        InitializeWebSocket();
+        _webSocketHandler = new WebSocketHandler();
+        _webSocketHandler.OnMessageReceived += OnWebSocketMessageReceived;
+        _router.SetSharedWebSocketHandler(_webSocketHandler);
+        _webSocketHandler.StartHealthCheck();
     }
 
-    private void InitializeWebSocket()
+    private async void OnWebSocketMessageReceived(WebSocket ws, string message)
     {
-        _router.RegisterWebSocket("/ws", async (handler, message) =>
+        try
         {
-            try
+            WebSocketMessage? wsMessage = JsonSerializer.Deserialize<WebSocketMessage>(message, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (wsMessage == null) return;
+
+            switch (wsMessage.Type)
             {
-                var wsMessage = JsonSerializer.Deserialize<WebSocketMessage>(message, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (wsMessage == null) return;
-
-                switch (wsMessage.Type)
-                {
-                    case "connect":
-                        var userId = wsMessage.SenderId;
-                        if (!string.IsNullOrEmpty(userId) && Guid.TryParse(userId, out var guid))
+                case "connect":
+                    string? userId = wsMessage.SenderId;
+                    if (!string.IsNullOrEmpty(userId) && Guid.TryParse(userId, out Guid guid))
+                    {
+                        WebSocketMessage connectMsg = new WebSocketMessage
                         {
-                            foreach (var ws in _userConnections.Values)
+                            Type = "user_connected",
+                            Content = userId,
+                            Timestamp = DateTime.UtcNow
+                        };
+                        await _webSocketHandler.SendToAllAsync(connectMsg.ToJson());
+                    }
+                    break;
+
+                case "chat":
+                    if (!string.IsNullOrEmpty(wsMessage.SenderId) && !string.IsNullOrEmpty(wsMessage.ChannelId))
+                    {
+                        if (Guid.TryParse(wsMessage.SenderId, out Guid sender) && Guid.TryParse(wsMessage.ChannelId, out Guid channel))
+                        {
+                            ChatMessage chatMessage = new ChatMessage
                             {
-                                if (ws.State == System.Net.WebSockets.WebSocketState.Open)
-                                {
-                                    var connectMsg = new WebSocketMessage
-                                    {
-                                        Type = "user_connected",
-                                        Content = userId,
-                                        Timestamp = DateTime.UtcNow
-                                    };
-                                    await handler.SendToAsync(ws, connectMsg.ToJson());
-                                }
+                                Id = Guid.NewGuid(),
+                                SenderId = sender,
+                                ChannelId = channel,
+                                Content = wsMessage.Content,
+                                Timestamp = DateTime.Now,
+                                Type = MessageType.Text
+                            };
+                            MessageReceived?.Invoke(this, new IMMessageEventArgs(chatMessage));
+                        }
+                    }
+                    break;
+
+                case "permission_response":
+                    if (!string.IsNullOrEmpty(wsMessage.SenderId) && Guid.TryParse(wsMessage.SenderId, out Guid userGuid))
+                    {
+                        if (_pendingPermissionRequests.TryGetValue(userGuid, out TaskCompletionSource<AskPermissionResult>? tcs))
+                        {
+                            AskPermissionResult result = new AskPermissionResult
+                            {
+                                Allowed = wsMessage.Content?.ToLower() == "allow"
+                            };
+                            tcs.SetResult(result);
+                            _pendingPermissionRequests.Remove(userGuid);
+                        }
+                    }
+                    break;
+
+                case "stream_chunk":
+                    if (!string.IsNullOrEmpty(wsMessage.SenderId) && !string.IsNullOrEmpty(wsMessage.ChannelId))
+                    {
+                        if (Guid.TryParse(wsMessage.SenderId, out Guid streamSender) && Guid.TryParse(wsMessage.ChannelId, out Guid streamChannel))
+                        {
+                            StreamChunk? chunk = JsonSerializer.Deserialize<StreamChunk>(wsMessage.Content ?? "{}", new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                            if (chunk != null)
+                            {
+                                StreamChunkReceived?.Invoke(this, new StreamChunkEventArgs(streamSender, streamChannel, chunk));
                             }
                         }
-                        break;
+                    }
+                    break;
 
-                    case "chat":
-                        if (!string.IsNullOrEmpty(wsMessage.SenderId) && !string.IsNullOrEmpty(wsMessage.ChannelId))
-                        {
-                            if (Guid.TryParse(wsMessage.SenderId, out var sender) && Guid.TryParse(wsMessage.ChannelId, out var channel))
-                            {
-                                var chatMessage = new ChatMessage
-                                {
-                                    Id = Guid.NewGuid(),
-                                    SenderId = sender,
-                                    ChannelId = channel,
-                                    Content = wsMessage.Content,
-                                    Timestamp = DateTime.Now,
-                                    Type = MessageType.Text
-                                };
-                                MessageReceived?.Invoke(this, new IMMessageEventArgs(chatMessage));
-                            }
-                        }
-                        break;
-
-                    case "permission_response":
-                        if (!string.IsNullOrEmpty(wsMessage.SenderId) && Guid.TryParse(wsMessage.SenderId, out var userGuid))
-                        {
-                            if (_pendingPermissionRequests.TryGetValue(userGuid, out var tcs))
-                            {
-                                var result = new AskPermissionResult
-                                {
-                                    Allowed = wsMessage.Content?.ToLower() == "allow"
-                                };
-                                tcs.SetResult(result);
-                                _pendingPermissionRequests.Remove(userGuid);
-                            }
-                        }
-                        break;
-
-                    case "stream_chunk":
-                        if (!string.IsNullOrEmpty(wsMessage.SenderId) && !string.IsNullOrEmpty(wsMessage.ChannelId))
-                        {
-                            if (Guid.TryParse(wsMessage.SenderId, out var streamSender) && Guid.TryParse(wsMessage.ChannelId, out var streamChannel))
-                            {
-                                var chunk = JsonSerializer.Deserialize<StreamChunk>(wsMessage.Content ?? "{}", new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                                if (chunk != null)
-                                {
-                                    StreamChunkReceived?.Invoke(this, new StreamChunkEventArgs(streamSender, streamChannel, chunk));
-                                }
-                            }
-                        }
-                        break;
-                }
+                case "pong":
+                    _webSocketHandler.UpdateActivity(ws);
+                    break;
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"WebSocket message error: {ex.Message}");
-            }
-        });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"WebSocket message error: {ex.Message}");
+        }
     }
 
     public Task StartAsync()
@@ -141,29 +139,29 @@ public class WebUIProvider : IIMProvider
 
     public Task StopAsync()
     {
+        _webSocketHandler.Dispose();
         return Task.CompletedTask;
     }
 
-    public async Task SendMessageAsync(Guid senderId, Guid channelId, string content)
+    public async Task SendMessageAsync(Guid senderId, Guid channelId, string content, string? thinking = null, string? senderName = null)
     {
-        var message = new WebSocketMessage
+        WebSocketMessage message = new WebSocketMessage
         {
             Type = "chat",
             SenderId = senderId.ToString(),
+            SenderName = senderName,
             ChannelId = channelId.ToString(),
             Content = content,
-            Timestamp = DateTime.UtcNow
+            Thinking = thinking,
+            Timestamp = DateTime.Now
         };
 
-        if (_webSocketHandler != null)
-        {
-            await _webSocketHandler.SendToAllAsync(message.ToJson());
-        }
+        await _webSocketHandler.SendToAllAsync(message.ToJson());
     }
 
     public async Task SendStreamChunkAsync(Guid senderId, Guid channelId, StreamChunk chunk)
     {
-        var message = new WebSocketMessage
+        WebSocketMessage message = new WebSocketMessage
         {
             Type = "stream_chunk",
             SenderId = senderId.ToString(),
@@ -174,25 +172,19 @@ public class WebUIProvider : IIMProvider
             IsFinal = chunk.IsFinal
         };
 
-        if (_webSocketHandler != null)
-        {
-            await _webSocketHandler.SendToAllAsync(message.ToJson());
-        }
+        await _webSocketHandler.SendToAllAsync(message.ToJson());
     }
 
     public async Task<AskPermissionResult> AskPermissionAsync(PermissionType permissionType, string resource, string allowCode, string denyCode)
     {
-        var message = new WebSocketMessage
+        WebSocketMessage message = new WebSocketMessage
         {
             Type = "permission_ask",
             Content = $"Permission required: {permissionType}\nResource: {resource}\nAllow code: {allowCode}\nDeny code: {denyCode}",
             Timestamp = DateTime.UtcNow
         };
 
-        if (_webSocketHandler != null)
-        {
-            await _webSocketHandler.SendToAllAsync(message.ToJson());
-        }
+        await _webSocketHandler.SendToAllAsync(message.ToJson());
 
         var tcs = new TaskCompletionSource<AskPermissionResult>();
         var userId = Guid.Empty;

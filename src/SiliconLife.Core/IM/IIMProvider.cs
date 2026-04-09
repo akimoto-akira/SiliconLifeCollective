@@ -21,7 +21,7 @@ public interface IIMProvider
 
     Task StartAsync();
     Task StopAsync();
-    Task SendMessageAsync(Guid senderId, Guid channelId, string content);
+    Task SendMessageAsync(Guid senderId, Guid channelId, string content, string? thinking = null, string? senderName = null);
 
     /// <summary>
     /// Sends a streaming chunk to the channel.

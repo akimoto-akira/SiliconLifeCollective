@@ -70,9 +70,9 @@ public class IMManager
     /// <param name="senderId">The ID of the message sender.</param>
     /// <param name="channelId">The channel ID.</param>
     /// <param name="content">The message content.</param>
-    public async Task SendMessageAsync(Guid senderId, Guid channelId, string content)
+    public async Task SendMessageAsync(Guid senderId, Guid channelId, string content, string? thinking = null, string? senderName = null)
     {
-        await _imProvider.SendMessageAsync(senderId, channelId, content);
+        await _imProvider.SendMessageAsync(senderId, channelId, content, thinking, senderName);
     }
 
     /// <summary>

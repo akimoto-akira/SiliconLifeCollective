@@ -25,6 +25,7 @@ public class Router
     private readonly Dictionary<string, string> _mimeTypes = new();
     private string _staticFilesPath = string.Empty;
     private WebSocketRouteHandler? _webSocketHandler;
+    private WebSocketHandler? _sharedWebSocketHandler;
     private bool _isInitialized = false;
     private Action<string>? _onFirstInit;
     private const string InitPath = "/init";
@@ -121,6 +122,11 @@ public class Router
         _webSocketHandler = handler;
     }
 
+    public void SetSharedWebSocketHandler(WebSocketHandler handler)
+    {
+        _sharedWebSocketHandler = handler;
+    }
+
     public void RegisterController(Func<Controller> controllerFactory, string basePath)
     {
         RegisterController(controllerFactory, basePath, "GET");
@@ -128,15 +134,19 @@ public class Router
 
     public void RegisterController(Func<Controller> controllerFactory, string basePath, string httpMethod)
     {
-        var key = httpMethod.ToUpper() + ":" + basePath;
+        string key = httpMethod.ToUpper() + ":" + basePath;
         _controllers[key] = controllerFactory;
     }
 
     public async Task HandleWebSocket(HttpListenerContext context)
     {
-        if (_webSocketHandler != null)
+        if (_sharedWebSocketHandler != null)
         {
-            var handler = new WebSocketHandler();
+            await _sharedWebSocketHandler.HandleWebSocketRequest(context);
+        }
+        else if (_webSocketHandler != null)
+        {
+            WebSocketHandler handler = new WebSocketHandler();
             handler.OnMessageReceived += async (ws, msg) =>
             {
                 try

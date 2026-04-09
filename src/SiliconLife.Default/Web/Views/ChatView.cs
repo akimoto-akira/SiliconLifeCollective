@@ -71,10 +71,15 @@ public class ChatView : ViewBase
             var bubble = H.Div(
                 msg.Text ?? ""
             ).Class("msg-user-bubble");
+            var content = H.Div(bubble).Class("msg-user-content");
             if (!string.IsNullOrEmpty(msg.Time))
-                bubble.Add(H.Div(msg.Time).Class("msg-time"));
-            return H.Div(bubble).Class("msg-user");
+                content.Add(H.Div(msg.Time).Class("msg-time"));
+            var avatar = H.Div(H.Div("U").Class("msg-avatar-icon"), H.Div("我").Class("msg-avatar-name")).Class("msg-user-avatar");
+            return H.Div(content, avatar).Class("msg-user");
         }
+
+        var beingDisplayName = !string.IsNullOrEmpty(msg.SenderName) ? msg.SenderName : "AI";
+        var avatar2 = H.Div(H.Div(beingDisplayName.Substring(0, 1)).Class("msg-avatar-icon"), H.Div(beingDisplayName).Class("msg-avatar-name")).Class("msg-being-avatar");
 
         var children = new List<object>();
 
@@ -82,16 +87,15 @@ public class ChatView : ViewBase
             children.Add(H.Div(msg.SenderName).Class("msg-being-sender"));
 
         var bodyChildren = new List<object>();
+
+        var thinkContent = msg.Thinking ?? "";
+        bodyChildren.Add(H.Details(
+            H.Summary("💭 Think"),
+            H.Div(thinkContent).Class("msg-thinking-content")
+        ).Class("msg-collapsible"));
+
         if (!string.IsNullOrEmpty(msg.Text))
             bodyChildren.Add(H.Div(msg.Text).Class("msg-being-text"));
-
-        if (!string.IsNullOrEmpty(msg.Thinking))
-        {
-            bodyChildren.Add(H.Details(
-                H.Summary("💭 思考过程"),
-                H.Div(msg.Thinking).Class("msg-thinking-content")
-            ).Class("msg-collapsible"));
-        }
 
         var tools = msg.ToolCalls?.ToList();
         if (tools != null && tools.Count > 0)
@@ -118,9 +122,11 @@ public class ChatView : ViewBase
         if (!string.IsNullOrEmpty(msg.Time))
             children.Add(H.Div(msg.Time).Class("msg-time"));
 
-        return H.Div(
+        var content2 = H.Div(
             H.Div(children.ToArray()).Class("msg-being-card")
-        ).Class("msg-being");
+        ).Class("msg-being-content");
+
+        return H.Div(avatar2, content2).Class("msg-being");
     }
 
     private static CssBuilder GetStyles()
@@ -218,13 +224,62 @@ public class ChatView : ViewBase
             .Selector(".msg-user")
                 .Property("display", "flex")
                 .Property("justify-content", "flex-end")
+                .Property("align-items", "flex-start")
+                .Property("gap", "10px")
+            .EndSelector()
+            .Selector(".msg-user-avatar")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+                .Property("align-items", "center")
+                .Property("gap", "4px")
+                .Property("flex-shrink", "0")
+            .EndSelector()
+            .Selector(".msg-being-avatar")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+                .Property("align-items", "center")
+                .Property("gap", "4px")
+                .Property("flex-shrink", "0")
+            .EndSelector()
+            .Selector(".msg-avatar-icon")
+                .Property("width", "36px")
+                .Property("height", "36px")
+                .Property("border-radius", "50%")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("justify-content", "center")
+                .Property("font-weight", "600")
+                .Property("flex-shrink", "0")
+            .EndSelector()
+            .Selector(".msg-user-avatar .msg-avatar-icon")
+                .Property("background", "var(--accent-primary)")
+                .Property("color", "#fff")
+                .Property("font-size", "14px")
+            .EndSelector()
+            .Selector(".msg-being-avatar .msg-avatar-icon")
+                .Property("background", "linear-gradient(135deg, #a855f7, #6366f1)")
+                .Property("color", "#fff")
+                .Property("font-size", "11px")
+            .EndSelector()
+            .Selector(".msg-avatar-name")
+                .Property("font-size", "11px")
+                .Property("color", "var(--text-secondary)")
+                .Property("white-space", "nowrap")
+                .Property("max-width", "48px")
+                .Property("overflow", "hidden")
+                .Property("text-overflow", "ellipsis")
+                .Property("text-align", "center")
+            .EndSelector()
+            .Selector(".msg-user-content")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+                .Property("align-items", "flex-end")
             .EndSelector()
             .Selector(".msg-user-bubble")
                 .Property("background", "var(--accent-primary)")
                 .Property("color", "#fff")
                 .Property("padding", "10px 16px")
                 .Property("border-radius", "16px 16px 4px 16px")
-                .Property("max-width", "70%")
                 .Property("font-size", "14px")
                 .Property("line-height", "1.6")
                 .Property("word-break", "break-word")
@@ -234,6 +289,13 @@ public class ChatView : ViewBase
             .Selector(".msg-being")
                 .Property("display", "flex")
                 .Property("justify-content", "flex-start")
+                .Property("align-items", "flex-start")
+                .Property("gap", "10px")
+            .EndSelector()
+            .Selector(".msg-being-content")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+                .Property("align-items", "flex-start")
             .EndSelector()
             .Selector(".msg-being-card")
                 .Property("background", "var(--bg-card)")
@@ -382,9 +444,11 @@ public class ChatView : ViewBase
     {
         var currentSessionId = vm.CurrentBeingId?.ToString() ?? "null";
         var userId = vm.UserId.ToString();
+        var beingName = vm.CurrentBeingName ?? "AI";
 
         var js = Js.Block()
             .Add(() => Js.Let(() => "currentSessionId", () => Js.Str(() => currentSessionId)))
+            .Add(() => Js.Let(() => "beingName", () => Js.Str(() => beingName)))
             .Add(() => Js.Let(() => "ws", () => Js.Null()))
             .Add(() => Js.Let(() => "currentStreamId", () => Js.Null()))
             .Add(() => Js.Let(() => "streamingMessage", () => Js.Null()));
@@ -415,6 +479,11 @@ public class ChatView : ViewBase
                         {
                             Js.Id(() => "handleStreamChunk").Invoke(() => Js.Id(() => "msg")).Stmt()
                         }
+                    )},
+                    { (Js.Id(() => "msg").Prop(() => "type").Op(() => "===", () => (JsSyntax)Js.Str(() => "ping")), new List<JsSyntax>
+                        {
+                            Js.Id(() => "ws").Call(() => "send", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj().Prop(() => "type", () => Js.Str(() => "pong")))).Stmt()
+                        }
                     )}
                 }))
             )))
@@ -429,15 +498,21 @@ public class ChatView : ViewBase
         var handleChatMessageBody = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
-                { (Js.Id(() => "msg").Prop(() => "channelId").Not(), new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
+                { (Js.Id(() => "msg").Prop(() => "channelId").Not().Op(() => "||", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "channelId").Op(() => "!==", () => Js.Id(() => "currentSessionId"))), new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
             }))
             .Add(() => Js.Const(() => "isCurrentUser", () => Js.Id(() => "msg").Prop(() => "senderId").Op(() => "===", () => (JsSyntax)Js.Str(() => userId))))
             .Add(() => Js.Id(() => "appendMessage").Invoke(() => Js.Obj()
                 .Prop(() => "isUser", () => Js.Id(() => "isCurrentUser"))
-                .Prop(() => "text", () => Js.Id(() => "msg").Prop(() => "content"))).Stmt());
+                .Prop(() => "text", () => Js.Id(() => "msg").Prop(() => "content"))
+                .Prop(() => "thinking", () => Js.Id(() => "msg").Prop(() => "thinking"))
+                .Prop(() => "senderName", () => Js.Id(() => "msg").Prop(() => "senderName"))).Stmt());
         js.Add(() => Js.Func(() => "handleChatMessage", () => new List<string> { "msg" }, () => handleChatMessageBody));
 
         var handleStreamChunkBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "msg").Prop(() => "channelId").Not().Op(() => "||", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "channelId").Op(() => "!==", () => Js.Id(() => "currentSessionId"))), new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
+            }))
             .Add(() => Js.Const(() => "chunk", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "msg").Prop(() => "content"))))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
@@ -447,6 +522,7 @@ public class ChatView : ViewBase
                         Js.Assign(() => Js.Id(() => "streamingMessage"), () => Js.Obj()
                             .Prop(() => "isUser", () => Js.Bool(() => false))
                             .Prop(() => "text", () => Js.Str(() => ""))
+                            .Prop(() => "thinking", () => Js.Str(() => ""))
                             .Prop(() => "elementId", () => Js.Str(() => "stream-").Op(() => "+", () => (JsSyntax)Js.Id(() => "chunk").Prop(() => "streamId")))),
                         Js.Id(() => "appendMessage").Invoke(() => Js.Id(() => "streamingMessage")).Stmt()
                     }
@@ -458,7 +534,16 @@ public class ChatView : ViewBase
                 { (Js.Id(() => "streamEl"), new List<JsSyntax>
                     {
                         Js.Assign(() => Js.Id(() => "streamingMessage").Prop(() => "text"), () => Js.Id(() => "streamingMessage").Prop(() => "text").Op(() => "+", () => (JsSyntax)Js.Id(() => "chunk").Prop(() => "content"))),
-                        Js.Assign(() => Js.Id(() => "streamEl").Prop(() => "textContent"), () => Js.Id(() => "streamingMessage").Prop(() => "text"))
+                        Js.Assign(() => Js.Id(() => "streamEl").Call(() => "querySelector", () => Js.Str(() => ".msg-being-text")).Prop(() => "textContent"), () => Js.Id(() => "streamingMessage").Prop(() => "text")),
+                        Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                        {
+                            { (Js.Id(() => "chunk").Prop(() => "thinking"), new List<JsSyntax>
+                                {
+                                    Js.Assign(() => Js.Id(() => "streamingMessage").Prop(() => "thinking"), () => Js.Id(() => "streamingMessage").Prop(() => "thinking").Op(() => "+", () => (JsSyntax)Js.Id(() => "chunk").Prop(() => "thinking"))),
+                                    Js.Assign(() => Js.Id(() => "streamEl").Call(() => "querySelector", () => Js.Str(() => ".msg-thinking-content")).Prop(() => "textContent"), () => Js.Id(() => "streamingMessage").Prop(() => "thinking"))
+                                }
+                            )}
+                        })
                     }
                 )}
             }))
@@ -485,7 +570,7 @@ public class ChatView : ViewBase
             .Add(() => Js.Const(() => "messages", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))))
             .Add(() => Js.Const(() => "userDiv", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
             .Add(() => Js.Assign(() => Js.Id(() => "userDiv").Prop(() => "className"), () => Js.Str(() => "msg-user")))
-            .Add(() => Js.Assign(() => Js.Id(() => "userDiv").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-user-bubble\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "userDiv").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-user-content\"><div class=\"msg-user-bubble\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div><div class=\"msg-user-avatar\"><div class=\"msg-avatar-icon\">U</div><div class=\"msg-avatar-name\">我</div></div>"))))
             .Add(() => Js.Id(() => "messages").Call(() => "appendChild", () => Js.Id(() => "userDiv")).Stmt())
             .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "value"), () => Js.Str(() => "")))
             .Add(() => Js.Id(() => "autoResize").Invoke(() => Js.Id(() => "input")).Stmt())
@@ -587,13 +672,13 @@ public class ChatView : ViewBase
         var userMsgBody = new List<JsSyntax>
         {
             Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "msg-user")),
-            Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-user-bubble\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>")))
+            Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-user-content\"><div class=\"msg-user-bubble\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div><div class=\"msg-user-avatar\"><div class=\"msg-avatar-icon\">U</div><div class=\"msg-avatar-name\">我</div></div>")))
         };
         var beingMsgBody = new List<JsSyntax>
         {
             Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "msg-being")),
             Js.Assign(() => Js.Id(() => "div").Prop(() => "id"), () => Js.Id(() => "msg").Prop(() => "elementId").Op(() => "||", () => (JsSyntax)Js.Str(() => ""))),
-            Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-being-card\"><div class=\"msg-being-body\"><div class=\"msg-being-text\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div></div>")))
+            Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-being-avatar\"><div class=\"msg-avatar-icon\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "senderName").Op(() => "||", () => (JsSyntax)Js.Id(() => "beingName")).Paren().Call(() => "charAt", () => Js.Num(() => "0"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><div class=\"msg-avatar-name\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "senderName").Op(() => "||", () => (JsSyntax)Js.Id(() => "beingName")).Paren()).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div><div class=\"msg-being-content\"><div class=\"msg-being-card\"><div class=\"msg-being-body\"><details class=\"msg-collapsible\"><summary>💭 Think</summary><div class=\"msg-thinking-content\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "thinking").Op(() => "||", () => (JsSyntax)Js.Str(() => "")).Paren()).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></details><div class=\"msg-being-text\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div></div></div>")))
         };
         var appendMessageBody = Js.Block()
             .Add(() => Js.Const(() => "messages", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))))

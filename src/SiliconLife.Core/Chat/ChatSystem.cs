@@ -50,10 +50,10 @@ public class ChatSystem
     /// Add a message to the session for the given channel.
     /// Creates the session if it does not exist yet.
     /// </summary>
-    public void AddMessage(Guid senderId, Guid channelId, string content)
+    public void AddMessage(Guid senderId, Guid channelId, string content, string? thinking = null)
     {
         ISession? session = GetSessionByChannelId(channelId);
-        ChatMessage message = new(senderId, channelId, content);
+        ChatMessage message = new(senderId, channelId, content) { Thinking = thinking };
         session?.AddMessage(message);
     }
 
