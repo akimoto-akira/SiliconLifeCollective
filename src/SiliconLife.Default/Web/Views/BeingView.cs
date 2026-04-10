@@ -20,7 +20,7 @@ public class BeingView : ViewBase
         var vm = model as BeingViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, "硅基人管理 - Silicon Life Collective", "beings", body, GetScripts(), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleBeings, "beings", vm.Localization, body, GetScripts(), GetStyles());
     }
 
     private static H RenderBody(BeingViewModel vm)

@@ -20,7 +20,7 @@ public class LogView : ViewBase
         var vm = model as LogViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, "日志查询 - Silicon Life Collective", "logs", body, GetScripts());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleLogs, "logs", vm.Localization, body, GetScripts());
     }
 
     private static H RenderBody(LogViewModel vm)

@@ -180,6 +180,33 @@ public class EnUS : DefaultLocalizationBase
     public override string InitLanguageLabel => "Language / 语言";
     public override string InitLanguageSwitchBtn => "Apply";
 
+    // ===== Navigation Menu Localization =====
+
+    public override string NavMenuChat => "Chat";
+    public override string NavMenuDashboard => "Dashboard";
+    public override string NavMenuBeings => "Beings";
+    public override string NavMenuTasks => "Tasks";
+    public override string NavMenuMemory => "Memory";
+    public override string NavMenuKnowledge => "Knowledge";
+    public override string NavMenuProjects => "Projects";
+    public override string NavMenuLogs => "Logs";
+    public override string NavMenuConfig => "Config";
+
+    // ===== Page Title Localization =====
+
+    public override string PageTitleChat => "Chat - Silicon Life Collective";
+    public override string PageTitleDashboard => "Dashboard - Silicon Life Collective";
+    public override string PageTitleBeings => "Beings - Silicon Life Collective";
+    public override string PageTitleTasks => "Tasks - Silicon Life Collective";
+    public override string PageTitleMemory => "Memory - Silicon Life Collective";
+    public override string PageTitleKnowledge => "Knowledge - Silicon Life Collective";
+    public override string PageTitleProjects => "Projects - Silicon Life Collective";
+    public override string PageTitleLogs => "Logs - Silicon Life Collective";
+    public override string PageTitleConfig => "Config - Silicon Life Collective";
+    public override string PageTitleExecutor => "Executor - Silicon Life Collective";
+    public override string PageTitleCodeBrowser => "Code Browser - Silicon Life Collective";
+    public override string PageTitlePermission => "Permission - Silicon Life Collective";
+
     // ===== Chat Localization =====
 
     public override string SingleChatNameFormat => "Chat with {0}";

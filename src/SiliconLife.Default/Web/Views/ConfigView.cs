@@ -20,7 +20,7 @@ public class ConfigView : ViewBase
         var vm = model as ConfigViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, "系统配置 - Silicon Life Collective", "config", body, GetScripts());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleConfig, "config", vm.Localization, body, GetScripts());
     }
 
     private static H RenderBody(ConfigViewModel vm)

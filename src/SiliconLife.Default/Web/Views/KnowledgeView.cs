@@ -20,7 +20,7 @@ public class KnowledgeView : ViewBase
         var vm = model as KnowledgeViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, "知识图谱 - Silicon Life Collective", "knowledge", body, GetScripts(), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleKnowledge, "knowledge", vm.Localization, body, GetScripts(), GetStyles());
     }
 
     private static H RenderBody(KnowledgeViewModel vm)

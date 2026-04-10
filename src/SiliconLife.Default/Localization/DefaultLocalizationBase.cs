@@ -254,4 +254,113 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the button text for applying language switch
     /// </summary>
     public abstract string InitLanguageSwitchBtn { get; }
+
+    // ===== Navigation Menu Localization =====
+
+    /// <summary>
+    /// Gets the label for the chat menu item
+    /// </summary>
+    public abstract string NavMenuChat { get; }
+
+    /// <summary>
+    /// Gets the label for the dashboard menu item
+    /// </summary>
+    public abstract string NavMenuDashboard { get; }
+
+    /// <summary>
+    /// Gets the label for the beings menu item
+    /// </summary>
+    public abstract string NavMenuBeings { get; }
+
+    /// <summary>
+    /// Gets the label for the tasks menu item
+    /// </summary>
+    public abstract string NavMenuTasks { get; }
+
+    /// <summary>
+    /// Gets the label for the memory menu item
+    /// </summary>
+    public abstract string NavMenuMemory { get; }
+
+    /// <summary>
+    /// Gets the label for the knowledge menu item
+    /// </summary>
+    public abstract string NavMenuKnowledge { get; }
+
+    /// <summary>
+    /// Gets the label for the projects menu item
+    /// </summary>
+    public abstract string NavMenuProjects { get; }
+
+    /// <summary>
+    /// Gets the label for the logs menu item
+    /// </summary>
+    public abstract string NavMenuLogs { get; }
+
+    /// <summary>
+    /// Gets the label for the config menu item
+    /// </summary>
+    public abstract string NavMenuConfig { get; }
+
+    // ===== Page Title Localization =====
+
+    /// <summary>
+    /// Gets the page title for chat page
+    /// </summary>
+    public abstract string PageTitleChat { get; }
+
+    /// <summary>
+    /// Gets the page title for dashboard page
+    /// </summary>
+    public abstract string PageTitleDashboard { get; }
+
+    /// <summary>
+    /// Gets the page title for beings page
+    /// </summary>
+    public abstract string PageTitleBeings { get; }
+
+    /// <summary>
+    /// Gets the page title for tasks page
+    /// </summary>
+    public abstract string PageTitleTasks { get; }
+
+    /// <summary>
+    /// Gets the page title for memory page
+    /// </summary>
+    public abstract string PageTitleMemory { get; }
+
+    /// <summary>
+    /// Gets the page title for knowledge page
+    /// </summary>
+    public abstract string PageTitleKnowledge { get; }
+
+    /// <summary>
+    /// Gets the page title for projects page
+    /// </summary>
+    public abstract string PageTitleProjects { get; }
+
+    /// <summary>
+    /// Gets the page title for logs page
+    /// </summary>
+    public abstract string PageTitleLogs { get; }
+
+    /// <summary>
+    /// Gets the page title for config page
+    /// </summary>
+    public abstract string PageTitleConfig { get; }
+
+    /// <summary>
+    /// Gets the page title for executor page
+    /// </summary>
+    public abstract string PageTitleExecutor { get; }
+
+    /// <summary>
+    /// Gets the page title for code browser page
+    /// </summary>
+    public abstract string PageTitleCodeBrowser { get; }
+
+    /// <summary>
+    /// Gets the page title for permission page
+    /// </summary>
+    public abstract string PageTitlePermission { get; }
 }

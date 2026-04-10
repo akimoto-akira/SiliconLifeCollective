@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text;
 using System.Text.Json;
 
 using SiliconLife.Collective;
@@ -140,6 +141,8 @@ public class ContextManager
         }
 
         List<ChatMessage> unread = chatSystem.GetPendingMessages(_being.Id);
+        List<Guid> messageIdsToMark = new List<Guid>();
+        
         foreach (ChatMessage msg in unread)
         {
             // Skip messages already processed in a previous FetchUnreadMessages call
@@ -151,6 +154,13 @@ public class ContextManager
             // Context already loaded by LoadHistoryMessages — just track
             _contextMessageIds.Add(msg.Id);
             _hasNewPendingMessages = true;
+            messageIdsToMark.Add(msg.Id);
+        }
+        
+        // Mark messages as read in the session
+        if (messageIdsToMark.Count > 0 && _session != null)
+        {
+            _session.MarkMessagesAsRead(messageIdsToMark, _being.Id);
         }
     }
 
@@ -350,6 +360,118 @@ public class ContextManager
     }
 
     /// <summary>
+    /// Sends the current context to AI using streaming and gets the response asynchronously.
+    /// Streams incremental tokens to the IM layer for real-time frontend display.
+    /// Falls back to non-streaming if the AI client does not support streaming.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token to abort the stream</param>
+    /// <returns>The final AI response (assembled from all stream chunks)</returns>
+    public async Task<AIResponse> GetResponseStreamAsync(CancellationToken cancellationToken = default)
+    {
+        bool? streamingMode = _aiClient.StreamingMode;
+        if (streamingMode == false)
+        {
+            return await GetResponseAsync();
+        }
+
+        AIRequest request = BuildRequest();
+        StringBuilder contentBuilder = new();
+        StringBuilder thinkingBuilder = new();
+        List<ToolCall>? toolCalls = null;
+        string model = string.Empty;
+        int? promptTokens = null;
+        int? completionTokens = null;
+        int? totalTokens = null;
+        bool streamSucceeded = false;
+
+        Guid streamId = Guid.NewGuid();
+
+        try
+        {
+            await foreach (AIResponse chunk in _aiClient.ChatStreamAsync(request, cancellationToken))
+            {
+                if (!chunk.Success)
+                {
+                    return chunk;
+                }
+
+                if (!string.IsNullOrEmpty(chunk.Content))
+                {
+                    contentBuilder.Append(chunk.Content);
+                    StreamChunk streamChunk = StreamChunk.Continue(streamId, chunk.Content, contentBuilder.Length, chunk.Thinking);
+                    DeliverStreamChunk(streamChunk);
+                }
+                else if (!string.IsNullOrEmpty(chunk.Thinking))
+                {
+                    thinkingBuilder.Append(chunk.Thinking);
+                    StreamChunk streamChunk = StreamChunk.Continue(streamId, "", contentBuilder.Length, chunk.Thinking);
+                    DeliverStreamChunk(streamChunk);
+                }
+
+                if (chunk.HasToolCalls)
+                {
+                    toolCalls = chunk.ToolCalls;
+                }
+
+                if (chunk.IsStreamFinal)
+                {
+                    streamSucceeded = true;
+                    model = chunk.Model;
+                    promptTokens = chunk.PromptTokens;
+                    completionTokens = chunk.CompletionTokens;
+                    totalTokens = chunk.TotalTokens;
+                }
+            }
+        }
+        catch (NotImplementedException)
+        {
+            if (streamingMode == true)
+            {
+                return AIResponse.Failed("AI client requires streaming but ChatStreamAsync is not implemented");
+            }
+            return await GetResponseAsync();
+        }
+
+        if (!streamSucceeded)
+        {
+            if (streamingMode == true)
+            {
+                return AIResponse.Failed("AI client requires streaming but stream ended without final chunk");
+            }
+            return await GetResponseAsync();
+        }
+
+        StreamChunk endChunk = StreamChunk.End(streamId);
+        DeliverStreamChunk(endChunk);
+
+        string fullContent = contentBuilder.ToString();
+        string? fullThinking = thinkingBuilder.Length > 0 ? thinkingBuilder.ToString() : null;
+
+        AIResponse response = new AIResponse
+        {
+            Model = model,
+            Content = fullContent,
+            Thinking = fullThinking,
+            ToolCalls = toolCalls,
+            PromptTokens = promptTokens,
+            CompletionTokens = completionTokens,
+            TotalTokens = totalTokens,
+            Success = true
+        };
+
+        if (response.Success && response.HasToolCalls)
+        {
+            PersistToolCallRound(response);
+        }
+        else if (response.Success && !string.IsNullOrEmpty(response.Content))
+        {
+            AddAssistantMessage(response.Content, response.Thinking);
+        }
+
+        return response;
+    }
+
+    /// <summary>
     /// Scene: 1-on-1 chat.
     /// Perceives chat messages, calls AI, delivers response via IM.
     /// </summary>
@@ -357,6 +479,28 @@ public class ContextManager
     public AIResponse ThinkOnChat()
     {
         AIResponse response = GetResponse();
+
+        if (response.Success && response.HasToolCalls)
+        {
+            // Tool calls executed, results persisted — yield time slice
+        }
+        else if (response.Success && !string.IsNullOrEmpty(response.Content))
+        {
+            DeliverOutput(response.Content, response.Thinking);
+        }
+
+        return response;
+    }
+
+    /// <summary>
+    /// Scene: 1-on-1 chat with streaming support.
+    /// Uses streaming when the AI client supports it, falling back to non-streaming otherwise.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token to abort the stream</param>
+    /// <returns>The AI response</returns>
+    public async Task<AIResponse> ThinkOnChatStreamAsync(CancellationToken cancellationToken = default)
+    {
+        AIResponse response = await GetResponseStreamAsync(cancellationToken);
 
         if (response.Success && response.HasToolCalls)
         {
@@ -379,6 +523,28 @@ public class ContextManager
     {
         // TODO: Load group context, deliver to group
         AIResponse response = GetResponse();
+
+        if (response.Success && response.HasToolCalls)
+        {
+            // Tool calls executed, results persisted — yield time slice
+        }
+        else if (response.Success && !string.IsNullOrEmpty(response.Content))
+        {
+            DeliverOutput(response.Content, response.Thinking);
+        }
+
+        return response;
+    }
+
+    /// <summary>
+    /// Scene: group chat with streaming support.
+    /// Uses streaming when the AI client supports it, falling back to non-streaming otherwise.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token to abort the stream</param>
+    /// <returns>The AI response</returns>
+    public async Task<AIResponse> ThinkOnGroupChatStreamAsync(CancellationToken cancellationToken = default)
+    {
+        AIResponse response = await GetResponseStreamAsync(cancellationToken);
 
         if (response.Success && response.HasToolCalls)
         {
@@ -515,6 +681,20 @@ public class ContextManager
             Console.WriteLine($"{_being.Name}: {content}");
         }
         Console.WriteLine();
+    }
+
+    /// <summary>
+    /// Delivers a streaming chunk to the IM layer for real-time frontend display.
+    /// The chunk is accumulated in the WebUIProvider's streaming buffer,
+    /// which the frontend polls via WebSocket.
+    /// </summary>
+    private void DeliverStreamChunk(StreamChunk chunk)
+    {
+        IMManager? imManager = ServiceLocator.Instance.IMManager;
+        if (imManager != null && _session != null)
+        {
+            _ = imManager.SendStreamChunkAsync(_being.Id, _session.Id, chunk);
+        }
     }
 
     /// <summary>

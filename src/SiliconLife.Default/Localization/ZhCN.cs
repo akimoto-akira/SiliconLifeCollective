@@ -180,6 +180,33 @@ public class ZhCN : DefaultLocalizationBase
     public override string InitLanguageLabel => "语言 / Language";
     public override string InitLanguageSwitchBtn => "应用";
 
+    // ===== Navigation Menu Localization =====
+
+    public override string NavMenuChat => "聊天";
+    public override string NavMenuDashboard => "仪表盘";
+    public override string NavMenuBeings => "硅基人";
+    public override string NavMenuTasks => "任务";
+    public override string NavMenuMemory => "记忆";
+    public override string NavMenuKnowledge => "知识";
+    public override string NavMenuProjects => "项目";
+    public override string NavMenuLogs => "日志";
+    public override string NavMenuConfig => "配置";
+
+    // ===== Page Title Localization =====
+
+    public override string PageTitleChat => "聊天 - 硅基生命群";
+    public override string PageTitleDashboard => "仪表盘 - 硅基生命群";
+    public override string PageTitleBeings => "硅基人管理 - 硅基生命群";
+    public override string PageTitleTasks => "任务管理 - 硅基生命群";
+    public override string PageTitleMemory => "记忆浏览 - 硅基生命群";
+    public override string PageTitleKnowledge => "知识图谱 - 硅基生命群";
+    public override string PageTitleProjects => "项目空间管理 - 硅基生命群";
+    public override string PageTitleLogs => "日志查询 - 硅基生命群";
+    public override string PageTitleConfig => "系统配置 - 硅基生命群";
+    public override string PageTitleExecutor => "执行器监控 - 硅基生命群";
+    public override string PageTitleCodeBrowser => "代码浏览 - 硅基生命群";
+    public override string PageTitlePermission => "权限管理 - 硅基生命群";
+
     // ===== Chat Localization =====
 
     public override string SingleChatNameFormat => "与{0}聊天";

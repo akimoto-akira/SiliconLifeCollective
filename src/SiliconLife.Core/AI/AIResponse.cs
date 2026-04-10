@@ -65,6 +65,13 @@ public class AIResponse
     public string? ErrorMessage { get; set; }
 
     /// <summary>
+    /// Gets or sets whether this is the final chunk in a streaming response.
+    /// Only meaningful when using ChatStreamAsync.
+    /// When true, the stream is complete and this chunk may contain usage stats.
+    /// </summary>
+    public bool IsStreamFinal { get; set; }
+
+    /// <summary>
     /// Gets whether this response contains tool calls
     /// </summary>
     public bool HasToolCalls => ToolCalls != null && ToolCalls.Count > 0;

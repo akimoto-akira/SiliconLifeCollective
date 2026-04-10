@@ -20,7 +20,7 @@ public class MemoryView : ViewBase
         var vm = model as MemoryViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, "记忆浏览 - Silicon Life Collective", "memory", body, GetScripts());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleMemory, "memory", vm.Localization, body, GetScripts());
     }
 
     private static H RenderBody(MemoryViewModel vm)

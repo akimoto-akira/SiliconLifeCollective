@@ -32,7 +32,7 @@ public abstract class ViewBase
             .Replace("'", "&#39;");
     }
 
-    protected string RenderPage(ISkin skin, string title, string activeMenu, H bodyContent,
+    protected string RenderPage(ISkin skin, string title, string activeMenu, DefaultLocalizationBase localization, H bodyContent,
         JsSyntax? inlineScripts = null, CssBuilder? inlineStyles = null)
     {
         var themeCss = skin.GetThemeCss().Build();
@@ -60,7 +60,7 @@ public abstract class ViewBase
             H.Div(
                 RenderHeader(),
                 H.Div(
-                    RenderSidebar(activeMenu),
+                    RenderSidebar(activeMenu, localization),
                     H.MainElement(bodyContent).Class("shell-content")
                 ).Class("shell-body")
             ).Class("shell")
@@ -87,19 +87,19 @@ public abstract class ViewBase
         ).Class("shell-header");
     }
 
-    private static H RenderSidebar(string activeMenu)
+    private static H RenderSidebar(string activeMenu, DefaultLocalizationBase localization)
     {
         var items = new (string Id, string Icon, string Label, string Href)[]
         {
-            ("chat", "💬", "聊天", "/chat"),
-            ("dashboard", "📊", "仪表盘", "/dashboard"),
-            ("beings", "🧠", "硅基人", "/beings"),
-            ("tasks", "📋", "任务", "/tasks"),
-            ("memory", "📂", "记忆", "/memory"),
-            ("knowledge", "📚", "知识", "/knowledge"),
-            ("projects", "📁", "项目", "/project"),
-            ("logs", "📝", "日志", "/logs"),
-            ("config", "⚙", "配置", "/config"),
+            ("chat", "💬", localization.NavMenuChat, "/chat"),
+            ("dashboard", "📊", localization.NavMenuDashboard, "/dashboard"),
+            ("beings", "🧠", localization.NavMenuBeings, "/beings"),
+            ("tasks", "📋", localization.NavMenuTasks, "/tasks"),
+            ("memory", "📂", localization.NavMenuMemory, "/memory"),
+            ("knowledge", "📚", localization.NavMenuKnowledge, "/knowledge"),
+            ("projects", "📁", localization.NavMenuProjects, "/project"),
+            ("logs", "📝", localization.NavMenuLogs, "/logs"),
+            ("config", "⚙", localization.NavMenuConfig, "/config"),
         };
 
         var menuItems = new List<H>();

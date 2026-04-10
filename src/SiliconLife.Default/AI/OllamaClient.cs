@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using SiliconLife.Collective;
@@ -134,6 +135,12 @@ public class OllamaClient : IAIClient
     /// Gets the default model name
     /// </summary>
     public string DefaultModel { get; }
+
+    /// <summary>
+    /// Ollama supports both streaming and non-streaming modes.
+    /// Returns null to indicate both are supported, with streaming preferred.
+    /// </summary>
+    public bool? StreamingMode => null;
 
     /// <summary>
     /// Creates a new Ollama client with the specified endpoint
@@ -262,6 +269,153 @@ public class OllamaClient : IAIClient
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Sends a streaming chat request to Ollama, yielding incremental token responses.
+    /// Each yielded AIResponse contains only the new token content.
+    /// The final yield has IsStreamFinal = true and contains usage statistics.
+    /// </summary>
+    public async IAsyncEnumerable<AIResponse> ChatStreamAsync(AIRequest request, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        string model = string.IsNullOrEmpty(request.Model) ? DefaultModel : request.Model;
+
+        OllamaRequest ollamaRequest = new OllamaRequest
+        {
+            Model = model,
+            Messages = MapMessages(request.Messages),
+            Stream = true
+        };
+
+        if (request.Tools != null && request.Tools.Count > 0)
+        {
+            ollamaRequest.Tools = request.Tools.Select(t => new OllamaTool
+            {
+                Type = "function",
+                Function = new OllamaToolFunction
+                {
+                    Name = t.Name,
+                    Description = t.Description,
+                    Parameters = t.Parameters
+                }
+            }).ToList();
+        }
+
+        string json = JsonSerializer.Serialize(ollamaRequest, _jsonOptions);
+        StringContent content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+        HttpResponseMessage? response = null;
+        AIResponse? errorResponse = null;
+        try
+        {
+            response = await _httpClient.PostAsync($"{Endpoint}/api/chat", content, cancellationToken);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException ex)
+        {
+            errorResponse = AIResponse.Failed($"Connection error: {ex.Message}");
+        }
+        catch (OperationCanceledException)
+        {
+            yield break;
+        }
+
+        if (errorResponse != null)
+        {
+            yield return errorResponse;
+            yield break;
+        }
+
+        Stream stream = await response!.Content.ReadAsStreamAsync(cancellationToken);
+        using StreamReader reader = new StreamReader(stream);
+
+        List<ToolCall>? accumulatedToolCalls = null;
+        string accumulatedContent = string.Empty;
+        string? accumulatedThinking = null;
+
+        while (!reader.EndOfStream && !cancellationToken.IsCancellationRequested)
+        {
+            string? line = await reader.ReadLineAsync(cancellationToken);
+            if (string.IsNullOrEmpty(line))
+                continue;
+
+            OllamaResponse? ollamaResponse;
+            try
+            {
+                ollamaResponse = JsonSerializer.Deserialize<OllamaResponse>(line, _jsonOptions);
+            }
+            catch
+            {
+                continue;
+            }
+
+            if (ollamaResponse == null)
+                continue;
+
+            if (!string.IsNullOrEmpty(ollamaResponse.Error))
+            {
+                yield return AIResponse.Failed(ollamaResponse.Error);
+                yield break;
+            }
+
+            if (ollamaResponse.Message != null)
+            {
+                string tokenContent = ollamaResponse.Message.Content ?? string.Empty;
+                string? tokenThinking = ollamaResponse.Message.Thinking;
+
+                if (ollamaResponse.Message.ToolCalls != null && ollamaResponse.Message.ToolCalls.Count > 0)
+                {
+                    accumulatedToolCalls = new List<ToolCall>();
+                    foreach (OllamaToolCall? ollamaToolCall in ollamaResponse.Message.ToolCalls)
+                    {
+                        if (ollamaToolCall?.Function != null)
+                        {
+                            accumulatedToolCalls.Add(new ToolCall
+                            {
+                                Id = ollamaToolCall.Id ?? Guid.NewGuid().ToString(),
+                                Name = ollamaToolCall.Function.Name,
+                                Arguments = ollamaToolCall.Function.Arguments ?? new Dictionary<string, object>()
+                            });
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(tokenContent) || tokenThinking != null)
+                {
+                    AIResponse chunk = new AIResponse
+                    {
+                        Model = ollamaResponse.Model,
+                        Content = tokenContent,
+                        Thinking = tokenThinking,
+                        Success = true,
+                        IsStreamFinal = false
+                    };
+                    yield return chunk;
+                }
+            }
+
+            if (ollamaResponse.Done)
+            {
+                AIResponse finalChunk = new AIResponse
+                {
+                    Model = ollamaResponse.Model,
+                    Content = string.Empty,
+                    Success = true,
+                    IsStreamFinal = true,
+                    PromptTokens = ollamaResponse.PromptEvalCount,
+                    CompletionTokens = ollamaResponse.EvalCount,
+                    TotalTokens = (ollamaResponse.PromptEvalCount ?? 0) + (ollamaResponse.EvalCount ?? 0)
+                };
+
+                if (accumulatedToolCalls != null && accumulatedToolCalls.Count > 0)
+                {
+                    finalChunk.ToolCalls = accumulatedToolCalls;
+                }
+
+                yield return finalChunk;
+                yield break;
+            }
+        }
     }
 
     /// <summary>

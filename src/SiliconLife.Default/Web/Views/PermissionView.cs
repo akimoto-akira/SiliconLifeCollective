@@ -20,7 +20,7 @@ public class PermissionView : ViewBase
         var vm = model as PermissionViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, "权限管理 - Silicon Life Collective", "beings", body, GetScripts());
+        return RenderPage(vm.Skin, vm.Localization.PageTitlePermission, "beings", vm.Localization, body, GetScripts());
     }
 
     private static H RenderBody(PermissionViewModel vm)

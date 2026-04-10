@@ -20,7 +20,7 @@ public class ExecutorView : ViewBase
         var vm = model as ViewModelBase;
         if (vm == null) return string.Empty;
         var body = RenderBody();
-        return RenderPage(vm.Skin, "执行器监控 - Silicon Life Collective", "beings", body, GetScripts(), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleExecutor, "beings", vm.Localization, body, GetScripts(), GetStyles());
     }
 
     private static H RenderBody()

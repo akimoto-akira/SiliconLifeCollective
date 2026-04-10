@@ -20,7 +20,7 @@ public class DashboardView : ViewBase
         var vm = model as DashboardViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, "仪表盘 - Silicon Life Collective", "dashboard", body, GetScripts(), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleDashboard, "dashboard", vm.Localization, body, GetScripts(), GetStyles());
     }
 
     private static H RenderBody(DashboardViewModel vm)

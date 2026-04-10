@@ -29,6 +29,14 @@ public interface IAIClient
     string DefaultModel { get; }
 
     /// <summary>
+    /// Gets the streaming mode supported by this AI client.
+    /// true  = must use streaming access only;
+    /// false = must use non-streaming access only;
+    /// null  = both modes supported, prefer streaming.
+    /// </summary>
+    bool? StreamingMode { get; }
+
+    /// <summary>
     /// Sends a chat request to the AI service and returns the response
     /// </summary>
     /// <param name="request">The AI request to send</param>
@@ -41,6 +49,16 @@ public interface IAIClient
     /// <param name="request">The AI request to send</param>
     /// <returns>The AI response</returns>
     Task<AIResponse> ChatAsync(AIRequest request);
+
+    /// <summary>
+    /// Sends a streaming chat request to the AI service, yielding incremental responses.
+    /// Each yielded AIResponse contains only the incremental token content.
+    /// The final yield has IsStreamFinal set to true and contains usage stats.
+    /// </summary>
+    /// <param name="request">The AI request to send</param>
+    /// <param name="cancellationToken">Cancellation token to abort the stream</param>
+    /// <returns>An async enumerable of incremental AI responses</returns>
+    IAsyncEnumerable<AIResponse> ChatStreamAsync(AIRequest request, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Sends a chat request with a single user message

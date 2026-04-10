@@ -56,6 +56,12 @@ public abstract class ConfigDataBase
     public abstract TimeSpan WatchdogTimeout { get; set; }
 
     /// <summary>
+    /// Gets or sets the global minimum log level.
+    /// Log entries below this level will not be recorded.
+    /// </summary>
+    public abstract LogLevel MinimumLogLevel { get; set; }
+
+    /// <summary>
     /// Gets the reserved GUID representing the human user
     /// </summary>
     public Guid UserGuid { get; } = new Guid("00000000-0000-0000-0000-000000000001");

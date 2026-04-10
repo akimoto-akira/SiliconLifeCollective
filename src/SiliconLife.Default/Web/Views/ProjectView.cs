@@ -20,7 +20,7 @@ public class ProjectView : ViewBase
         var vm = model as ProjectViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, "项目空间管理 - Silicon Life Collective", "projects", body, GetScripts());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleProjects, "projects", vm.Localization, body, GetScripts());
     }
 
     private static H RenderBody(ProjectViewModel vm)

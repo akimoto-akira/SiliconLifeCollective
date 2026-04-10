@@ -207,7 +207,16 @@ public class DefaultSiliconBeing : SiliconBeingBase
         Console.WriteLine($"{Name}: {localization.ThinkingMessage}");
 
         ContextManager brain = new ContextManager(this, session);
-        AIResponse response = thinkFunc(brain);
+
+        AIResponse response;
+        if (sceneName == "ThinkOnChat" || sceneName == "ThinkContinuation")
+        {
+            response = brain.ThinkOnChatStreamAsync().GetAwaiter().GetResult();
+        }
+        else
+        {
+            response = thinkFunc(brain);
+        }
 
         if (response.Success && response.HasToolCalls)
         {

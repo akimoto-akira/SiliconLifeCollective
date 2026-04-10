@@ -20,7 +20,7 @@ public class CodeBrowserView : ViewBase
         var vm = model as CodeBrowserViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, "代码浏览 - Silicon Life Collective", "beings", body, GetScripts(), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleCodeBrowser, "beings", vm.Localization, body, GetScripts(), GetStyles());
     }
 
     private static H RenderBody(CodeBrowserViewModel vm)

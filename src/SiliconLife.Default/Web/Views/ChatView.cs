@@ -23,7 +23,7 @@ public class ChatView : ViewBase
         if (vm == null) return string.Empty;
 
         var body = RenderChatBody(vm);
-        return RenderPage(vm.Skin, "聊天 - Silicon Life Collective", vm.ActiveMenu, body,
+        return RenderPage(vm.Skin, vm.Localization.PageTitleChat, vm.ActiveMenu, vm.Localization, body,
             GetScripts(vm), GetStyles());
     }
 
@@ -451,7 +451,10 @@ public class ChatView : ViewBase
             .Add(() => Js.Let(() => "beingName", () => Js.Str(() => beingName)))
             .Add(() => Js.Let(() => "ws", () => Js.Null()))
             .Add(() => Js.Let(() => "currentStreamId", () => Js.Null()))
-            .Add(() => Js.Let(() => "streamingMessage", () => Js.Null()));
+            .Add(() => Js.Let(() => "streamingMessage", () => Js.Null()))
+            .Add(() => Js.Let(() => "streamingPollTimer", () => Js.Null()))
+            .Add(() => Js.Let(() => "messageCache", () => Js.New(() => Js.Id(() => "Array"))))
+            .Add(() => Js.Let(() => "lastHistoryId", () => Js.Str(() => "")));
 
         var autoResizeBody = Js.Block()
             .Add(() => Js.Assign(() => Js.Id(() => "textarea").Prop(() => "style").Prop(() => "height"), () => Js.Str(() => "auto")))
@@ -465,19 +468,31 @@ public class ChatView : ViewBase
                 .Add(() => Js.Id(() => "ws").Call(() => "send", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj()
                     .Prop(() => "type", () => Js.Str(() => "connect"))
                     .Prop(() => "senderId", () => Js.Str(() => userId)))).Stmt())
+                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                {
+                    { (Js.Id(() => "streamingPollTimer"), new List<JsSyntax>
+                        {
+                            Js.Id(() => "clearInterval").Invoke(() => Js.Id(() => "streamingPollTimer")).Stmt()
+                        }
+                    )}
+                }))
+                .Add(() => Js.Assign(() => Js.Id(() => "streamingPollTimer"), () => Js.Id(() => "setInterval").Invoke(() => Js.Arrow(() => new List<string>(), () => Js.Block()
+                    .Add(() => Js.Id(() => "pollStreaming").Invoke().Stmt())
+                    .Add(() => Js.Id(() => "pollHistory").Invoke().Stmt())
+                ), () => Js.Num(() => "200"))))
             )))
             .Add(() => Js.Id(() => "ws").Prop(() => "onmessage").Assign(() => Js.Arrow(() => new List<string> { "event" }, () => Js.Block()
                 .Add(() => Js.Const(() => "msg", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "event").Prop(() => "data"))))
                 .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                 {
-                    { (Js.Id(() => "msg").Prop(() => "type").Op(() => "===", () => (JsSyntax)Js.Str(() => "chat")), new List<JsSyntax>
+                    { (Js.Id(() => "msg").Prop(() => "type").Op(() => "===", () => (JsSyntax)Js.Str(() => "streaming_data")), new List<JsSyntax>
                         {
-                            Js.Id(() => "handleChatMessage").Invoke(() => Js.Id(() => "msg")).Stmt()
+                            Js.Id(() => "handleStreamingData").Invoke(() => Js.Id(() => "msg")).Stmt()
                         }
                     )},
-                    { (Js.Id(() => "msg").Prop(() => "type").Op(() => "===", () => (JsSyntax)Js.Str(() => "stream_chunk")), new List<JsSyntax>
+                    { (Js.Id(() => "msg").Prop(() => "type").Op(() => "===", () => (JsSyntax)Js.Str(() => "history_data")), new List<JsSyntax>
                         {
-                            Js.Id(() => "handleStreamChunk").Invoke(() => Js.Id(() => "msg")).Stmt()
+                            Js.Id(() => "handleHistoryData").Invoke(() => Js.Id(() => "msg")).Stmt()
                         }
                     )},
                     { (Js.Id(() => "msg").Prop(() => "type").Op(() => "===", () => (JsSyntax)Js.Str(() => "ping")), new List<JsSyntax>
@@ -508,22 +523,58 @@ public class ChatView : ViewBase
                 .Prop(() => "senderName", () => Js.Id(() => "msg").Prop(() => "senderName"))).Stmt());
         js.Add(() => Js.Func(() => "handleChatMessage", () => new List<string> { "msg" }, () => handleChatMessageBody));
 
-        var handleStreamChunkBody = Js.Block()
+        var handleStreamingDataBody = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 { (Js.Id(() => "msg").Prop(() => "channelId").Not().Op(() => "||", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "channelId").Op(() => "!==", () => Js.Id(() => "currentSessionId"))), new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
             }))
-            .Add(() => Js.Const(() => "chunk", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "msg").Prop(() => "content"))))
+            .Add(() => Js.Const(() => "streamContent", () => Js.Id(() => "msg").Prop(() => "content")))
+            .Add(() => Js.Const(() => "streamThinking", () => Js.Id(() => "msg").Prop(() => "thinking")))
+            .Add(() => Js.Const(() => "streamId", () => Js.Id(() => "msg").Prop(() => "streamId")))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
-                { (Js.Id(() => "currentStreamId").Not().Op(() => "||", () => (JsSyntax)Js.Id(() => "currentStreamId").Op(() => "!==", () => Js.Id(() => "chunk").Prop(() => "streamId"))), new List<JsSyntax>
+                { (Js.Id(() => "streamContent").Not().Op(() => "&&", () => (JsSyntax)Js.Id(() => "streamThinking").Not()), new List<JsSyntax>
                     {
-                        Js.Assign(() => Js.Id(() => "currentStreamId"), () => Js.Id(() => "chunk").Prop(() => "streamId")),
+                        Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                        {
+                            { (Js.Id(() => "currentStreamId"), new List<JsSyntax>
+                                {
+                                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                                    {
+                                        { (Js.Id(() => "streamingMessage").Prop(() => "elementId"), new List<JsSyntax>
+                                            {
+                                                Js.Const(() => "removeEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Id(() => "streamingMessage").Prop(() => "elementId"))),
+                                                Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                                                {
+                                                    { (Js.Id(() => "removeEl"), new List<JsSyntax>
+                                                        {
+                                                            Js.Id(() => "removeEl").Call(() => "remove").Stmt()
+                                                        }
+                                                    )}
+                                                })
+                                            }
+                                        )}
+                                    }),
+                                    Js.Assign(() => Js.Id(() => "currentStreamId"), () => Js.Null()),
+                                    Js.Assign(() => Js.Id(() => "streamingMessage"), () => Js.Null()),
+                                    Js.Id(() => "pollHistory").Invoke().Stmt()
+                                }
+                            )}
+                        }),
+                        Js.Return(() => Js.Id(() => "undefined"))
+                    }
+                )}
+            }))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "currentStreamId").Not().Op(() => "||", () => (JsSyntax)Js.Id(() => "currentStreamId").Op(() => "!==", () => Js.Id(() => "streamId"))), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "currentStreamId"), () => Js.Id(() => "streamId")),
                         Js.Assign(() => Js.Id(() => "streamingMessage"), () => Js.Obj()
                             .Prop(() => "isUser", () => Js.Bool(() => false))
                             .Prop(() => "text", () => Js.Str(() => ""))
                             .Prop(() => "thinking", () => Js.Str(() => ""))
-                            .Prop(() => "elementId", () => Js.Str(() => "stream-").Op(() => "+", () => (JsSyntax)Js.Id(() => "chunk").Prop(() => "streamId")))),
+                            .Prop(() => "elementId", () => Js.Str(() => "stream-").Op(() => "+", () => (JsSyntax)Js.Id(() => "streamId")))),
                         Js.Id(() => "appendMessage").Invoke(() => Js.Id(() => "streamingMessage")).Stmt()
                     }
                 )}
@@ -533,30 +584,91 @@ public class ChatView : ViewBase
             {
                 { (Js.Id(() => "streamEl"), new List<JsSyntax>
                     {
-                        Js.Assign(() => Js.Id(() => "streamingMessage").Prop(() => "text"), () => Js.Id(() => "streamingMessage").Prop(() => "text").Op(() => "+", () => (JsSyntax)Js.Id(() => "chunk").Prop(() => "content"))),
-                        Js.Assign(() => Js.Id(() => "streamEl").Call(() => "querySelector", () => Js.Str(() => ".msg-being-text")).Prop(() => "textContent"), () => Js.Id(() => "streamingMessage").Prop(() => "text")),
+                        Js.Assign(() => Js.Id(() => "streamingMessage").Prop(() => "text"), () => Js.Id(() => "streamContent")),
+                        Js.Assign(() => Js.Id(() => "streamEl").Call(() => "querySelector", () => Js.Str(() => ".msg-being-text")).Prop(() => "textContent"), () => Js.Id(() => "streamContent")),
                         Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                         {
-                            { (Js.Id(() => "chunk").Prop(() => "thinking"), new List<JsSyntax>
+                            { (Js.Id(() => "streamThinking"), new List<JsSyntax>
                                 {
-                                    Js.Assign(() => Js.Id(() => "streamingMessage").Prop(() => "thinking"), () => Js.Id(() => "streamingMessage").Prop(() => "thinking").Op(() => "+", () => (JsSyntax)Js.Id(() => "chunk").Prop(() => "thinking"))),
-                                    Js.Assign(() => Js.Id(() => "streamEl").Call(() => "querySelector", () => Js.Str(() => ".msg-thinking-content")).Prop(() => "textContent"), () => Js.Id(() => "streamingMessage").Prop(() => "thinking"))
+                                    Js.Assign(() => Js.Id(() => "streamingMessage").Prop(() => "thinking"), () => Js.Id(() => "streamThinking")),
+                                    Js.Assign(() => Js.Id(() => "streamEl").Call(() => "querySelector", () => Js.Str(() => ".msg-thinking-content")).Prop(() => "textContent"), () => Js.Id(() => "streamThinking"))
                                 }
                             )}
                         })
                     }
                 )}
-            }))
+            }));
+        js.Add(() => Js.Func(() => "handleStreamingData", () => new List<string> { "msg" }, () => handleStreamingDataBody));
+
+        var renderMessagesBody = Js.Block()
+            .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Str(() => "")))
+            .Add(() => Js.Id(() => "messageCache").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "m" }, () => Js.Block()
+                .Add(() => Js.Id(() => "appendMessage").Invoke(() => Js.Obj()
+                    .Prop(() => "isUser", () => Js.Id(() => "m").Prop(() => "role").Op(() => "===", () => Js.Str(() => "User")))
+                    .Prop(() => "text", () => Js.Id(() => "m").Prop(() => "content"))
+                    .Prop(() => "thinking", () => Js.Id(() => "m").Prop(() => "thinking"))
+                    .Prop(() => "senderName", () => Js.Id(() => "m").Prop(() => "senderName"))).Stmt())
+            )))
+            .Add(() => Js.Id(() => "container").Call(() => "scrollTo", () => Js.Obj().Prop(() => "top", () => Js.Id(() => "container").Prop(() => "scrollHeight")).Prop(() => "behavior", () => Js.Str(() => "smooth"))).Stmt());
+        js.Add(() => Js.Func(() => "renderMessages", () => new List<string>(), () => renderMessagesBody));
+
+        var handleHistoryDataBody = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
-                { (Js.Id(() => "chunk").Prop(() => "isFinal"), new List<JsSyntax>
+                { (Js.Id(() => "msg").Prop(() => "channelId").Not().Op(() => "||", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "channelId").Op(() => "!==", () => Js.Id(() => "currentSessionId"))), new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
+            }))
+            .Add(() => Js.Const(() => "messages", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "msg").Prop(() => "content"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "messageCache"), () => Js.Id(() => "messageCache").Call(() => "filter", () => Js.Arrow(() => new List<string> { "m" }, () => (JsSyntax)Js.Id(() => "m").Prop(() => "id").Op(() => "!==", () => Js.Str(() => "00000000-0000-0000-0000-000000000000")).Op(() => "&&", () => (JsSyntax)Js.Id(() => "m").Prop(() => "id").Op(() => "!==", () => Js.Str(() => "")))))))
+            .Add(() => Js.Const(() => "existingIds", () => Js.Id(() => "new").Invoke(() => Js.Id(() => "Set"), () => Js.Id(() => "messageCache").Call(() => "map", () => Js.Arrow(() => new List<string> { "m" }, () => Js.Id(() => "m").Prop(() => "id"))))))
+            .Add(() => Js.Id(() => "messages").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "m" }, () => Js.Block()
+                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                {
+                    { (Js.Id(() => "existingIds").Call(() => "has", () => Js.Id(() => "m").Prop(() => "id")).Not(), new List<JsSyntax>
+                        {
+                            Js.Id(() => "messageCache").Call(() => "push", () => Js.Id(() => "m")).Stmt()
+                        }
+                    )}
+                }))
+            )))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "messages").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0")), new List<JsSyntax>
                     {
-                        Js.Assign(() => Js.Id(() => "currentStreamId"), () => Js.Null()),
-                        Js.Assign(() => Js.Id(() => "streamingMessage"), () => Js.Null())
+                        Js.Assign(() => Js.Id(() => "lastHistoryId"), () => (JsSyntax)Js.Id(() => "messages").Index(() => Js.Id(() => "messages").Prop(() => "length").Op(() => "-", () => Js.Num(() => "1"))).Prop(() => "id")).Stmt()
+                    }
+                )}
+            }))
+            .Add(() => Js.Id(() => "renderMessages").Invoke().Stmt());
+        js.Add(() => Js.Func(() => "handleHistoryData", () => new List<string> { "msg" }, () => handleHistoryDataBody));
+
+        var pollStreamingBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "ws").Op(() => "&&", () => (JsSyntax)Js.Id(() => "ws").Prop(() => "readyState").Op(() => "===", () => Js.Id(() => "WebSocket").Prop(() => "OPEN"))).Op(() => "&&", () => (JsSyntax)Js.Id(() => "currentSessionId")), new List<JsSyntax>
+                    {
+                        Js.Id(() => "ws").Call(() => "send", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj()
+                            .Prop(() => "type", () => Js.Str(() => "poll_streaming"))
+                            .Prop(() => "channelId", () => Js.Id(() => "currentSessionId")))).Stmt()
                     }
                 )}
             }));
-        js.Add(() => Js.Func(() => "handleStreamChunk", () => new List<string> { "msg" }, () => handleStreamChunkBody));
+        js.Add(() => Js.Func(() => "pollStreaming", () => new List<string>(), () => pollStreamingBody));
+
+        var pollHistoryBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "ws").Op(() => "&&", () => (JsSyntax)Js.Id(() => "ws").Prop(() => "readyState").Op(() => "===", () => Js.Id(() => "WebSocket").Prop(() => "OPEN"))).Op(() => "&&", () => (JsSyntax)Js.Id(() => "currentSessionId")), new List<JsSyntax>
+                    {
+                        Js.Id(() => "ws").Call(() => "send", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj()
+                            .Prop(() => "type", () => Js.Str(() => "poll_history"))
+                            .Prop(() => "channelId", () => Js.Id(() => "currentSessionId"))
+                            .Prop(() => "senderId", () => Js.Str(() => userId))
+                            .Prop(() => "content", () => Js.Id(() => "lastHistoryId")))).Stmt()
+                    }
+                )}
+            }));
+        js.Add(() => Js.Func(() => "pollHistory", () => new List<string>(), () => pollHistoryBody));
 
         var textEmptyCond = Js.Id(() => "text").Not().Op(() => "||", () => (JsSyntax)Js.Id(() => "currentSessionId").Not());
         var wsReadyCond = Js.Id(() => "ws").Op(() => "&&", () => (JsSyntax)Js.Id(() => "ws").Prop(() => "readyState").Op(() => "===", () => Js.Id(() => "WebSocket").Prop(() => "OPEN")));
@@ -567,14 +679,14 @@ public class ChatView : ViewBase
             {
                 { (textEmptyCond, new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
             }))
-            .Add(() => Js.Const(() => "messages", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))))
-            .Add(() => Js.Const(() => "userDiv", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "userDiv").Prop(() => "className"), () => Js.Str(() => "msg-user")))
-            .Add(() => Js.Assign(() => Js.Id(() => "userDiv").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-user-content\"><div class=\"msg-user-bubble\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div><div class=\"msg-user-avatar\"><div class=\"msg-avatar-icon\">U</div><div class=\"msg-avatar-name\">我</div></div>"))))
-            .Add(() => Js.Id(() => "messages").Call(() => "appendChild", () => Js.Id(() => "userDiv")).Stmt())
             .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "value"), () => Js.Str(() => "")))
             .Add(() => Js.Id(() => "autoResize").Invoke(() => Js.Id(() => "input")).Stmt())
-            .Add(() => Js.Id(() => "messages").Call(() => "scrollTo", () => Js.Obj().Prop(() => "top", () => Js.Id(() => "messages").Prop(() => "scrollHeight")).Prop(() => "behavior", () => Js.Str(() => "smooth"))).Stmt())
+            .Add(() => Js.Id(() => "messageCache").Call(() => "push", () => Js.Obj()
+                .Prop(() => "id", () => Js.Str(() => "00000000-0000-0000-0000-000000000000"))
+                .Prop(() => "role", () => Js.Str(() => "User"))
+                .Prop(() => "content", () => Js.Id(() => "text"))
+                .Prop(() => "timestamp", () => Js.Id(() => "Date").Call(() => "now"))).Stmt())
+            .Add(() => Js.Id(() => "renderMessages").Invoke().Stmt())
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 { (wsReadyCond, new List<JsSyntax>
@@ -595,16 +707,16 @@ public class ChatView : ViewBase
         js.Add(() => Js.Func(() => "sendMessage", () => new List<string>(), () => sendMessageBody));
 
         var dataMessagesCond = Js.Id(() => "data").Prop(() => "messages");
-        var forEachMsgStmt = Js.Id(() => "data").Prop(() => "messages").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "m" }, () => Js.Id(() => "appendMessage").Invoke(() => Js.Id(() => "m")))).Stmt();
+        var forEachMsgStmt = Js.Id(() => "data").Prop(() => "messages").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "m" }, () => Js.Id(() => "messageCache").Call(() => "push", () => Js.Id(() => "m")))).Stmt();
         var dataMessagesBody = new List<JsSyntax> { forEachMsgStmt };
         var historyThenBody = Js.Block()
-            .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Str(() => "")))
+            .Add(() => Js.Assign(() => Js.Id(() => "messageCache"), () => Js.New(() => Js.Id(() => "Array"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "lastHistoryId"), () => Js.Str(() => "")))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 { (dataMessagesCond, dataMessagesBody) }
             }))
-            .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "scrollTop"), () => Js.Id(() => "container").Prop(() => "scrollHeight")));
+            .Add(() => Js.Id(() => "renderMessages").Invoke().Stmt());
         var selectSessionBody = Js.Block()
             .Add(() => Js.Assign(() => Js.Id(() => "currentSessionId"), () => Js.Id(() => "sessionId")))
             .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "querySelector", () => Js.Str(() => ".chat-header-name")).Prop(() => "textContent"), () => Js.Id(() => "name")))

@@ -54,6 +54,11 @@ public class DefaultConfigData : ConfigDataBase
     public override TimeSpan WatchdogTimeout { get; set; } = TimeSpan.FromMinutes(10);
 
     /// <summary>
+    /// Gets or sets the global minimum log level.
+    /// </summary>
+    public override LogLevel MinimumLogLevel { get; set; } = LogLevel.Trace;
+
+    /// <summary>
     /// Gets or sets the Ollama API endpoint URL
     /// </summary>
     public string OllamaEndpoint { get; set; } = "http://localhost:11434";
@@ -135,6 +140,7 @@ public class DefaultConfigData : ConfigDataBase
                     TickTimeout = loadedData.TickTimeout;
                     MaxTimeoutCount = loadedData.MaxTimeoutCount;
                     WatchdogTimeout = loadedData.WatchdogTimeout;
+                    MinimumLogLevel = loadedData.MinimumLogLevel;
                     OllamaEndpoint = loadedData.OllamaEndpoint;
                     DefaultModel = loadedData.DefaultModel;
                     StaticFilesPath = loadedData.StaticFilesPath;
