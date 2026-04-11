@@ -47,6 +47,8 @@ public class Router
         RegisterController(() => new ChatController(), "/api/chat/history");
         RegisterController(() => new ChatController(), "/api/chat/send", "POST");
         RegisterController(() => new BeingController(), "/beings");
+        RegisterController(() => new BeingController(), "/api/beings/list");
+        RegisterController(() => new BeingController(), "/api/beings/detail");
         RegisterController(() => new TaskController(), "/tasks");
         RegisterController(() => new PermissionController(), "/permissions");
         RegisterController(() => new LogController(), "/logs");
@@ -57,6 +59,7 @@ public class Router
         RegisterController(() => new ExecutorController(), "/executor");
         RegisterController(() => new CodeBrowserController(), "/code");
         RegisterController(() => new PermissionRequestController(), "/permission-request");
+        RegisterController(() => new AboutController(), "/about");
         RegisterController(() => new InitController(), "/init", "GET");
         RegisterController(() => new InitController(), "/init", "POST");
         RegisterController(() => new InitController(), "/init/browse", "GET");

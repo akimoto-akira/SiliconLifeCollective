@@ -22,7 +22,7 @@ A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Bei
 - **Localization** — Built-in Chinese and English support
 - **Web UI** — Built-in HTTP server with WebSocket/SSE support, multiple skins, and comprehensive dashboard
   - **Skin System** — 4 built-in skins (Admin, Chat, Creative, Dev) with complete UI component library
-  - **14 Controllers** — Being, Chat, CodeBrowser, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task
+  - **15 Controllers** — About, Being, Chat, CodeBrowser, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task
   - **Real-time Updates** — SSE (Server-Sent Events) for live data streaming
 
 ## Tech Stack
@@ -44,8 +44,8 @@ SiliconLifeCollective.sln
 ├── src/
 │   ├── SiliconLife.Core/                  # Core library (interfaces, abstractions)
 │   │   ├── ServiceLocator.cs             # Global service locator: Register/Get, ChatSystem, IMManager, AuditLogger, GlobalACL
-│   │   ├── Runtime/                       # MainLoop, TickObject, CoreHost, CoreHostBuilder, PerformanceMonitor
-│   │   ├── SiliconBeing/                  # SiliconBeingBase, ISiliconBeingFactory, SiliconBeingManager, SoulFileManager, TaskSystem, TimerSystem
+│   │       ├── Runtime/                       # MainLoop, TickObject, CoreHost, CoreHostBuilder, PerformanceMonitor, TestTickObject
+│   │   ├── SiliconBeing/                  # SiliconBeingBase, ISiliconBeingFactory, SiliconBeingManager, SoulFileManager, TaskSystem, TimerSystem, SiliconCurator, Memory
 │   │   ├── AI/                            # IAIClient, IAIClientFactory, ContextManager ("brain"), Message, AIRequest/AIResponse
 │   │   ├── Chat/                          # ChatSystem, IChatService, SimpleChatService, ISession, SingleChatSession, GroupChatSession, ChatMessage
 │   │   ├── Executors/                     # ExecutorBase, DiskExecutor, NetworkExecutor, CommandLineExecutor, ExecutorRequest, ExecutorResult
@@ -72,15 +72,19 @@ SiliconLifeCollective.sln
 │       ├── Storage/                       # FileSystemStorage, FileSystemTimeStorage
 │       ├── Security/                      # DefaultPermissionCallback, IMPermissionAskHandler
 │       └── Web/                           # Web UI implementation
-│           ├── Controllers/               # 14 controllers: Being, Chat, CodeBrowser, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task
-│           ├── Models/                    # ViewModels for all controllers
-│           ├── Views/                     # HTML views
+│           ├── Controllers/               # 15 controllers: About, Being, Chat, CodeBrowser, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task
+│           ├── Models/                    # ViewModels for all controllers (AboutViewModel, BeingViewModel, etc.)
+│           ├── Views/                     # HTML views (ViewBase, AboutView, BeingView, ChatView, etc.)
 │           ├── Skins/                     # 4 skins: Admin (professional), Chat (conversational), Creative (artistic), Dev (developer-focused)
 │           ├── ISkin.cs                   # Skin interface with UI component library
+│           ├── Controller.cs              # Base controller class
 │           ├── WebHost.cs                 # HTTP server
 │           ├── Router.cs                  # Request routing
 │           ├── SSEHandler.cs              # Server-Sent Events
-│           └── WebSecurity.cs             # Web security utilities
+│           ├── WebSecurity.cs             # Web security utilities
+│           ├── H.cs                       # HTML helper utilities
+│           ├── CssBuilder.cs              # CSS builder utility
+│           └── JsBuilder.cs               # JavaScript builder utility
 │
 ├── docs/
 │   ├── en-US/                             # English documentation

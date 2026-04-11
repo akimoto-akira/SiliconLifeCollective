@@ -187,6 +187,20 @@ public class JsParen : JsSyntax
     public override string Build() => $"({Inner().Build()})";
 }
 
+public class JsTernary : JsSyntax
+{
+    public Func<JsSyntax> Condition { get; }
+    public Func<JsSyntax> TrueValue { get; }
+    public Func<JsSyntax> FalseValue { get; }
+    public JsTernary(Func<JsSyntax> condition, Func<JsSyntax> trueValue, Func<JsSyntax> falseValue)
+    {
+        Condition = condition;
+        TrueValue = trueValue;
+        FalseValue = falseValue;
+    }
+    public override string Build() => $"({Condition().Build()} ? {TrueValue().Build()} : {FalseValue().Build()})";
+}
+
 public class JsIndex : JsSyntax
 {
     public Func<JsSyntax> Target { get; }
@@ -402,6 +416,7 @@ public static class Js
     public static JsPropAccess Prop(Func<JsSyntax> target, Func<string> property) => new(target, property);
     public static JsBinOp Op(Func<JsSyntax> left, Func<string> op, Func<JsSyntax> right) => new(left, op, right);
     public static JsUnaryOp Not(Func<JsSyntax> value) => new(() => "!", value);
+    public static JsTernary Ternary(Func<JsSyntax> condition, Func<JsSyntax> trueValue, Func<JsSyntax> falseValue) => new(condition, trueValue, falseValue);
     public static JsIf If(Func<List<(JsSyntax? Condition, List<JsSyntax> Body)>> branches) => new(branches);
     public static JsFuncDecl Func(Func<string> name, Func<List<string>> @params, Func<JsSyntax> body) => new(name, @params, body);
     public static JsArrowFunc Arrow(Func<List<string>> @params, Func<JsSyntax> body) => new(@params, body);

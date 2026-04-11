@@ -22,7 +22,7 @@
 - **国际化** — 内置中文和英文支持
 - **Web 界面** — 内置 HTTP 服务器，支持 WebSocket/SSE，多种皮肤，完整的仪表盘
   - **皮肤系统** — 4 种内置皮肤（Admin、Chat、Creative、Dev），提供完整的 UI 组件库
-  - **14 个控制器** — Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task
+  - **15 个控制器** — About、Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task
   - **实时更新** — 通过 SSE（Server-Sent Events）实现实时数据流
 
 ## 技术栈
@@ -44,8 +44,8 @@ SiliconLifeCollective.sln
 ├── src/
 │   ├── SiliconLife.Core/                  # 核心库（接口、抽象类）
 │   │   ├── ServiceLocator.cs             # 全局服务定位器：Register/Get、ChatSystem、IMManager、AuditLogger、GlobalACL
-│   │   ├── Runtime/                       # MainLoop、TickObject、CoreHost、CoreHostBuilder、PerformanceMonitor
-│   │   ├── SiliconBeing/                  # SiliconBeingBase、ISiliconBeingFactory、SiliconBeingManager、SoulFileManager、TaskSystem、TimerSystem
+│   │       ├── Runtime/                       # MainLoop、TickObject、CoreHost、CoreHostBuilder、PerformanceMonitor、TestTickObject
+│   │   ├── SiliconBeing/                  # SiliconBeingBase、ISiliconBeingFactory、SiliconBeingManager、SoulFileManager、TaskSystem、TimerSystem、SiliconCurator、Memory
 │   │   ├── AI/                            # IAIClient、IAIClientFactory、ContextManager（"大脑"）、Message、AIRequest/AIResponse
 │   │   ├── Chat/                          # ChatSystem、IChatService、SimpleChatService、ISession、SingleChatSession、GroupChatSession、ChatMessage
 │   │   ├── Executors/                     # ExecutorBase、DiskExecutor、NetworkExecutor、CommandLineExecutor、ExecutorRequest、ExecutorResult
@@ -72,15 +72,19 @@ SiliconLifeCollective.sln
 │       ├── Storage/                       # FileSystemStorage、FileSystemTimeStorage
 │       ├── Security/                      # DefaultPermissionCallback、IMPermissionAskHandler
 │       └── Web/                           # Web UI 实现
-│           ├── Controllers/               # 14 个控制器：Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task
-│           ├── Models/                    # 所有控制器的 ViewModel
-│           ├── Views/                     # HTML 视图
+│           ├── Controllers/               # 15 个控制器：About、Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task
+│           ├── Models/                    # 所有控制器的 ViewModel（AboutViewModel、BeingViewModel 等）
+│           ├── Views/                     # HTML 视图（ViewBase、AboutView、BeingView、ChatView 等）
 │           ├── Skins/                     # 4 种皮肤：Admin（专业）、Chat（对话）、Creative（创意）、Dev（开发者）
 │           ├── ISkin.cs                   # 皮肤接口，包含 UI 组件库
+│           ├── Controller.cs              # 控制器基类
 │           ├── WebHost.cs                 # HTTP 服务器
 │           ├── Router.cs                  # 请求路由
 │           ├── SSEHandler.cs              # 服务器推送事件
-│           └── WebSecurity.cs             # Web 安全工具
+│           ├── WebSecurity.cs             # Web 安全工具
+│           ├── H.cs                       # HTML 辅助工具
+│           ├── CssBuilder.cs              # CSS 构建工具
+│           └── JsBuilder.cs               # JavaScript 构建工具
 │
 ├── docs/
 │   ├── en-US/                             # 英文文档

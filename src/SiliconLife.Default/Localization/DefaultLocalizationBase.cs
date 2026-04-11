@@ -307,6 +307,16 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// </summary>
     public abstract string NavMenuConfig { get; }
 
+    /// <summary>
+    /// Gets the label for the help menu item
+    /// </summary>
+    public abstract string NavMenuHelp { get; }
+
+    /// <summary>
+    /// Gets the label for the about menu item
+    /// </summary>
+    public abstract string NavMenuAbout { get; }
+
     // ===== Page Title Localization =====
 
     /// <summary>
@@ -369,6 +379,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// </summary>
     public abstract string PageTitlePermission { get; }
 
+    /// <summary>
+    /// Gets the page title for about page
+    /// </summary>
+    public abstract string PageTitleAbout { get; }
+
     // ===== Dashboard Localization =====
 
     /// <summary>
@@ -400,6 +415,73 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the label for message frequency chart
     /// </summary>
     public abstract string DashboardChartMessageFrequency { get; }
+
+    // ===== Beings Page Localization =====
+
+    /// <summary>
+    /// Gets the beings page header text
+    /// </summary>
+    public abstract string BeingsPageHeader { get; }
+
+    /// <summary>
+    /// Gets the label for total beings count
+    /// </summary>
+    public abstract string BeingsTotalCount { get; }
+
+    /// <summary>
+    /// Gets the placeholder text when no being is selected
+    /// </summary>
+    public abstract string BeingsNoSelectionPlaceholder { get; }
+
+    /// <summary>
+    /// Gets the empty state text when no beings exist
+    /// </summary>
+    public abstract string BeingsEmptyState { get; }
+
+    /// <summary>
+    /// Gets the idle status text
+    /// </summary>
+    public abstract string BeingsStatusIdle { get; }
+
+    /// <summary>
+    /// Gets the running status text
+    /// </summary>
+    public abstract string BeingsStatusRunning { get; }
+
+    /// <summary>
+    /// Gets the ID label in detail view
+    /// </summary>
+    public abstract string BeingsDetailIdLabel { get; }
+
+    /// <summary>
+    /// Gets the status label in detail view
+    /// </summary>
+    public abstract string BeingsDetailStatusLabel { get; }
+
+    /// <summary>
+    /// Gets the custom compilation label in detail view
+    /// </summary>
+    public abstract string BeingsDetailCustomCompileLabel { get; }
+
+    /// <summary>
+    /// Gets the soul content label in detail view
+    /// </summary>
+    public abstract string BeingsDetailSoulContentLabel { get; }
+
+    /// <summary>
+    /// Gets the "Yes" text for boolean values
+    /// </summary>
+    public abstract string BeingsYes { get; }
+
+    /// <summary>
+    /// Gets the "No" text for boolean values
+    /// </summary>
+    public abstract string BeingsNo { get; }
+
+    /// <summary>
+    /// Gets the "Not set" placeholder text
+    /// </summary>
+    public abstract string BeingsNotSet { get; }
 
     // ===== Chat Page Localization =====
 
@@ -444,4 +526,68 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <param name="count">The number of tool calls</param>
     /// <returns>The formatted summary text</returns>
     public abstract string GetChatToolCallsSummary(int count);
+
+    // ===== About Page Localization =====
+
+    /// <summary>
+    /// Gets the about page header text
+    /// </summary>
+    public abstract string AboutPageHeader { get; }
+
+    /// <summary>
+    /// Gets the application name for about page
+    /// </summary>
+    public abstract string AboutAppName { get; }
+
+    /// <summary>
+    /// Gets the version label for about page
+    /// </summary>
+    public abstract string AboutVersionLabel { get; }
+
+    /// <summary>
+    /// Gets the description text for about page
+    /// </summary>
+    public abstract string AboutDescription { get; }
+
+    /// <summary>
+    /// Gets the author label for about page
+    /// </summary>
+    public abstract string AboutAuthorLabel { get; }
+
+    /// <summary>
+    /// Gets the author name for about page
+    /// </summary>
+    public abstract string AboutAuthorName { get; }
+
+    /// <summary>
+    /// Gets the license label for about page
+    /// </summary>
+    public abstract string AboutLicenseLabel { get; }
+
+    /// <summary>
+    /// Gets the copyright text for about page
+    /// </summary>
+    public abstract string AboutCopyright { get; }
+
+    /// <summary>
+    /// Gets the GitHub repository link text for about page
+    /// </summary>
+    public abstract string AboutGitHubLink { get; }
+
+    /// <summary>
+    /// Gets the Gitee mirror link text for about page
+    /// </summary>
+    public abstract string AboutGiteeLink { get; }
+
+    /// <summary>
+    /// Gets the social media section label for about page
+    /// </summary>
+    public abstract string AboutSocialMediaLabel { get; }
+
+    /// <summary>
+    /// Gets the localized display name for a social media platform
+    /// </summary>
+    /// <param name="platform">The platform identifier</param>
+    /// <returns>The localized display name</returns>
+    public abstract string GetSocialMediaName(string platform);
 }

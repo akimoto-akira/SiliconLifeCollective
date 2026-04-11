@@ -196,6 +196,8 @@ public class ZhCN : DefaultLocalizationBase
     public override string NavMenuProjects => "项目";
     public override string NavMenuLogs => "日志";
     public override string NavMenuConfig => "配置";
+    public override string NavMenuHelp => "帮助";
+    public override string NavMenuAbout => "关于";
 
     // ===== Page Title Localization =====
 
@@ -211,6 +213,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string PageTitleExecutor => "执行器监控 - 硅基生命群";
     public override string PageTitleCodeBrowser => "代码浏览 - 硅基生命群";
     public override string PageTitlePermission => "权限管理 - 硅基生命群";
+    public override string PageTitleAbout => "关于 - 硅基生命群";
 
     // ===== Chat Localization =====
 
@@ -232,4 +235,48 @@ public class ZhCN : DefaultLocalizationBase
     public override string DashboardStatUptime => "运行时间";
     public override string DashboardStatMemory => "内存占用";
     public override string DashboardChartMessageFrequency => "消息频率";
+
+    // ===== Beings Localization =====
+
+    public override string BeingsPageHeader => "硅基人管理";
+    public override string BeingsTotalCount => "共 {0} 个硅基人";
+    public override string BeingsNoSelectionPlaceholder => "选择一个硅基人查看详情";
+    public override string BeingsEmptyState => "暂无硅基人";
+    public override string BeingsStatusIdle => "空闲";
+    public override string BeingsStatusRunning => "运行中";
+    public override string BeingsDetailIdLabel => "ID：";
+    public override string BeingsDetailStatusLabel => "状态：";
+    public override string BeingsDetailCustomCompileLabel => "自定义编译：";
+    public override string BeingsDetailSoulContentLabel => "灵魂内容：";
+    public override string BeingsYes => "是";
+    public override string BeingsNo => "否";
+    public override string BeingsNotSet => "未设置";
+
+    // ===== About Page Localization =====
+
+    public override string AboutPageHeader => "关于";
+    public override string AboutAppName => "硅基生命群";
+    public override string AboutVersionLabel => "版本";
+    public override string AboutDescription => "一个基于 AI 的硅基生命群管理系统，支持多个 AI 智能体的协同工作、记忆管理、知识图谱构建等功能。";
+    public override string AboutAuthorLabel => "作者";
+    public override string AboutAuthorName => "天源垦骥";
+    public override string AboutLicenseLabel => "许可证";
+    public override string AboutCopyright => "版权所有 (c) 2026 天源垦骥";
+    public override string AboutGitHubLink => "GitHub 仓库";
+    public override string AboutGiteeLink => "Gitee 镜像";
+    public override string AboutSocialMediaLabel => "自媒体平台";
+    public override string GetSocialMediaName(string platform) => platform switch
+    {
+        "Bilibili" => "B站",
+        "YouTube" => "YouTube",
+        "X" => "X（推特）",
+        "Douyin" => "抖音",
+        "Weibo" => "微博",
+        "WeChat" => "微信公众号",
+        "Xiaohongshu" => "小红书",
+        "Zhihu" => "知乎",
+        "TouTiao" => "今日头条",
+        "Kuaishou" => "快手",
+        _ => platform
+    };
 }

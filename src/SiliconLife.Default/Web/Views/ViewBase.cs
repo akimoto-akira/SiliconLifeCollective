@@ -100,6 +100,8 @@ public abstract class ViewBase
             ("projects", "📁", localization.NavMenuProjects, "/project"),
             ("logs", "📝", localization.NavMenuLogs, "/logs"),
             ("config", "⚙", localization.NavMenuConfig, "/config"),
+            ("help", "❓", localization.NavMenuHelp, "/help"),
+            ("about", "ℹ", localization.NavMenuAbout, "/about"),
         };
 
         var menuItems = new List<H>();

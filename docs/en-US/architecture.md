@@ -180,10 +180,11 @@ The Web UI features a **pluggable skin system** that allows complete UI customiz
 
 ### Controller System
 
-The Web UI follows a **MVC-like pattern** with 14 controllers handling different aspects:
+The Web UI follows a **MVC-like pattern** with 15 controllers handling different aspects:
 
 | Controller | Purpose |
 |------------|---------|
+| About | About page and project information |
 | Being | Silicon Being management and status |
 | Chat | Real-time chat interface with SSE |
 | CodeBrowser | Code viewing and editing |

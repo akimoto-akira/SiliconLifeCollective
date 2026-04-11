@@ -196,6 +196,8 @@ public class EnUS : DefaultLocalizationBase
     public override string NavMenuProjects => "Projects";
     public override string NavMenuLogs => "Logs";
     public override string NavMenuConfig => "Config";
+    public override string NavMenuHelp => "Help";
+    public override string NavMenuAbout => "About";
 
     // ===== Page Title Localization =====
 
@@ -211,6 +213,7 @@ public class EnUS : DefaultLocalizationBase
     public override string PageTitleExecutor => "Executor - Silicon Life Collective";
     public override string PageTitleCodeBrowser => "Code Browser - Silicon Life Collective";
     public override string PageTitlePermission => "Permission - Silicon Life Collective";
+    public override string PageTitleAbout => "About - Silicon Life Collective";
 
     // ===== Chat Localization =====
 
@@ -232,4 +235,48 @@ public class EnUS : DefaultLocalizationBase
     public override string DashboardStatUptime => "Uptime";
     public override string DashboardStatMemory => "Memory Usage";
     public override string DashboardChartMessageFrequency => "Message Frequency";
+
+    // ===== Beings Localization =====
+
+    public override string BeingsPageHeader => "Silicon Beings Management";
+    public override string BeingsTotalCount => "Total {0} beings";
+    public override string BeingsNoSelectionPlaceholder => "Select a being to view details";
+    public override string BeingsEmptyState => "No beings found";
+    public override string BeingsStatusIdle => "Idle";
+    public override string BeingsStatusRunning => "Running";
+    public override string BeingsDetailIdLabel => "ID: ";
+    public override string BeingsDetailStatusLabel => "Status: ";
+    public override string BeingsDetailCustomCompileLabel => "Custom Compilation: ";
+    public override string BeingsDetailSoulContentLabel => "Soul Content: ";
+    public override string BeingsYes => "Yes";
+    public override string BeingsNo => "No";
+    public override string BeingsNotSet => "Not set";
+
+    // ===== About Page Localization =====
+
+    public override string AboutPageHeader => "About";
+    public override string AboutAppName => "Silicon Life Collective";
+    public override string AboutVersionLabel => "Version";
+    public override string AboutDescription => "An AI-based silicon life collective management system that supports collaborative work of multiple AI agents, memory management, knowledge graph construction, and more.";
+    public override string AboutAuthorLabel => "Author";
+    public override string AboutAuthorName => "Hoshino Kennji";
+    public override string AboutLicenseLabel => "License";
+    public override string AboutCopyright => "Copyright (c) 2026 Hoshino Kennji";
+    public override string AboutGitHubLink => "GitHub Repository";
+    public override string AboutGiteeLink => "Gitee Mirror";
+    public override string AboutSocialMediaLabel => "Social Media";
+    public override string GetSocialMediaName(string platform) => platform switch
+    {
+        "Bilibili" => "Bilibili",
+        "YouTube" => "YouTube",
+        "X" => "X (Twitter)",
+        "Douyin" => "Douyin",
+        "Weibo" => "Weibo",
+        "WeChat" => "WeChat Official Account",
+        "Xiaohongshu" => "Xiaohongshu",
+        "Zhihu" => "Zhihu",
+        "TouTiao" => "Toutiao",
+        "Kuaishou" => "Kuaishou",
+        _ => platform
+    };
 }
