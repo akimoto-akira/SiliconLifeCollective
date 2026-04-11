@@ -21,6 +21,7 @@ namespace SiliconLife.Collective;
 /// </summary>
 public class CoreHost
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<CoreHost>();
     private readonly CoreHostBuilder _builder;
     private CancellationTokenSource _shutdownCts = new();
     private Task? _imManagerTask;
@@ -55,29 +56,55 @@ public class CoreHost
     /// </summary>
     public async Task StartAsync()
     {
+        _logger.Info("CoreHost starting...");
+
         if (_builder.ChatSystem != null)
+        {
             ServiceLocator.Instance.Register<ChatSystem>(_builder.ChatSystem);
+            _logger.Debug("Registered service: {0}", nameof(ChatSystem));
+        }
         if (_builder.IMManager != null)
+        {
             ServiceLocator.Instance.Register<IMManager>(_builder.IMManager);
+            _logger.Debug("Registered service: {0}", nameof(IMManager));
+        }
         if (MainLoop.BeingManager != null)
+        {
             ServiceLocator.Instance.Register<SiliconBeingManager>(MainLoop.BeingManager);
+            _logger.Debug("Registered service: {0}", nameof(SiliconBeingManager));
+        }
         if (_builder.AuditLogger != null)
+        {
             ServiceLocator.Instance.Register<AuditLogger>(_builder.AuditLogger);
+            _logger.Debug("Registered service: {0}", nameof(AuditLogger));
+        }
         if (_builder.GlobalAcl != null)
+        {
             ServiceLocator.Instance.Register<GlobalACL>(_builder.GlobalAcl);
+            _logger.Debug("Registered service: {0}", nameof(GlobalACL));
+        }
         if (_builder.BeingFactory != null)
+        {
             ServiceLocator.Instance.Register<ISiliconBeingFactory>(_builder.BeingFactory);
+            _logger.Debug("Registered service: {0}", nameof(ISiliconBeingFactory));
+        }
         if (_builder.DynamicBeingLoader != null)
+        {
             ServiceLocator.Instance.Register<DynamicBeingLoader>(_builder.DynamicBeingLoader);
+            _logger.Debug("Registered service: {0}", nameof(DynamicBeingLoader));
+        }
 
         MainLoop.SetConfig(_builder.Config!);
         MainLoop.Start();
+        _logger.Info("MainLoop started");
 
         if (_builder.IMManager != null)
         {
             _imManagerTask = _builder.IMManager.StartAsync();
+            _logger.Info("IM manager started");
         }
 
+        _logger.Info("CoreHost started successfully");
         await Task.CompletedTask;
     }
 
@@ -88,15 +115,21 @@ public class CoreHost
     /// </summary>
     public async Task StopAsync()
     {
+        _logger.Info("CoreHost stopping...");
+
         _shutdownCts.Cancel();
 
         MainLoop.Stop();
+        _logger.Debug("Stopped: MainLoop");
 
         if (_imManagerTask != null)
         {
             await _imManagerTask;
+            _logger.Debug("Stopped: IMManager");
         }
 
         ServiceLocator.Instance.Clear();
+        _logger.Debug("Stopped: ServiceLocator");
+        _logger.Info("CoreHost stopped");
     }
 }

@@ -12,11 +12,13 @@
 // limitations under the License.
 
 using System.Net;
+using SiliconLife.Collective;
 
 namespace SiliconLife.Default.Web;
 
 public class WebHost : IDisposable
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<WebHost>();
     private HttpListener? _listener;
     private readonly Router _router;
     private readonly int _port;
@@ -41,6 +43,7 @@ public class WebHost : IDisposable
         if (_isRunning)
             return;
 
+        _logger.Info($"Web server starting on port {_port}");
         _listener = new HttpListener();
         string prefix = _allowIntranet ? $"http://+:{_port}/" : $"http://localhost:{_port}/";
         _listener.Prefixes.Add(prefix);
@@ -51,7 +54,7 @@ public class WebHost : IDisposable
         }
         catch (HttpListenerException ex)
         {
-            Console.WriteLine($"Failed to start web server on port {_port}: {ex.Message}");
+            _logger.Error($"Failed to start web server on port {_port}: {ex.Message}");
             Console.WriteLine("Try running as administrator or use netsh to reserve the port.");
             throw;
         }
@@ -61,7 +64,7 @@ public class WebHost : IDisposable
 
         _listenerTask = Task.Run(() => ListenAsync(_cts.Token));
         
-        Console.WriteLine($"Web server started on port {_port}");
+        _logger.Info($"Web server started on port {_port}");
     }
 
     public async Task StopAsync()
@@ -69,6 +72,7 @@ public class WebHost : IDisposable
         if (!_isRunning)
             return;
 
+        _logger.Info("Web server stopping...");
         _cts?.Cancel();
         
         if (_listenerTask != null)
@@ -89,7 +93,7 @@ public class WebHost : IDisposable
         _listener?.Close();
         _isRunning = false;
 
-        Console.WriteLine("Web server stopped.");
+        _logger.Info("Web server stopped");
     }
 
     private async Task ListenAsync(CancellationToken token)
@@ -102,10 +106,12 @@ public class WebHost : IDisposable
                 
                 if (context.Request.IsWebSocketRequest)
                 {
+                    _logger.Debug("WebSocket request received");
                     _ = Task.Run(() => HandleWebSocketRequestAsync(context), token);
                 }
                 else
                 {
+                    _logger.Trace($"Accepted request: {context.Request.HttpMethod} {context.Request.Url?.AbsolutePath}");
                     _ = Task.Run(() => HandleRequestAsync(context), token);
                 }
             }
@@ -119,7 +125,7 @@ public class WebHost : IDisposable
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error accepting request: {ex.Message}");
+                _logger.Error($"Error accepting request: {ex.Message}");
             }
         }
     }
@@ -132,7 +138,7 @@ public class WebHost : IDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error handling WebSocket: {ex.Message}");
+            _logger.Error($"Error handling WebSocket: {ex.Message}");
             try
             {
                 context.Response.StatusCode = 500;
@@ -152,7 +158,7 @@ public class WebHost : IDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error handling request: {ex.Message}");
+            _logger.Error($"Error handling request: {ex.Message}");
             try
             {
                 var response = context.Response;

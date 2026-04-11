@@ -20,6 +20,7 @@ namespace SiliconLife.Collective;
 /// </summary>
 public static class DiskExecutor
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger(typeof(DiskExecutor));
     private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);
 
     /// <summary>
@@ -87,10 +88,12 @@ public static class DiskExecutor
             }
 
             string content = File.ReadAllText(path);
+            _logger.Info("Disk read: {Path}, size={Size}", path, content.Length);
             return ExecutorResult.Successful(content);
         }
         catch (Exception ex)
         {
+            _logger.Error("Disk read failed: {Path}, {Exception}", ex, path);
             return ExecutorResult.Failed($"Failed to read file: {ex.Message}");
         }
     }
@@ -110,11 +113,14 @@ public static class DiskExecutor
                 Directory.CreateDirectory(directory);
             }
 
-            File.WriteAllText(path, contentObj.ToString());
+            string content = contentObj.ToString() ?? string.Empty;
+            File.WriteAllText(path, content);
+            _logger.Info("Disk write: {Path}, size={Size}", path, content.Length);
             return ExecutorResult.Successful($"File written successfully: {path}");
         }
         catch (Exception ex)
         {
+            _logger.Error("Disk write failed: {Path}, {Exception}", ex, path);
             return ExecutorResult.Failed($"Failed to write file: {ex.Message}");
         }
     }
@@ -134,11 +140,14 @@ public static class DiskExecutor
                 Directory.CreateDirectory(directory);
             }
 
-            File.AppendAllText(path, contentObj.ToString());
+            string content = contentObj.ToString() ?? string.Empty;
+            File.AppendAllText(path, content);
+            _logger.Info("Disk append: {Path}, size={Size}", path, content.Length);
             return ExecutorResult.Successful($"Content appended to file: {path}");
         }
         catch (Exception ex)
         {
+            _logger.Error("Disk append failed: {Path}, {Exception}", ex, path);
             return ExecutorResult.Failed($"Failed to append to file: {ex.Message}");
         }
     }
@@ -150,12 +159,14 @@ public static class DiskExecutor
             if (File.Exists(path))
             {
                 File.Delete(path);
+                _logger.Info("Disk delete: {Path}", path);
                 return ExecutorResult.Successful($"File deleted: {path}");
             }
 
             if (Directory.Exists(path))
             {
                 Directory.Delete(path, recursive: true);
+                _logger.Info("Disk delete directory: {Path}", path);
                 return ExecutorResult.Successful($"Directory deleted: {path}");
             }
 
@@ -163,6 +174,7 @@ public static class DiskExecutor
         }
         catch (Exception ex)
         {
+            _logger.Error("Disk delete failed: {Path}, {Exception}", ex, path);
             return ExecutorResult.Failed($"Failed to delete: {ex.Message}");
         }
     }
@@ -192,10 +204,13 @@ public static class DiskExecutor
                 return ExecutorResult.Successful("(empty directory)");
             }
 
-            return ExecutorResult.Successful(string.Join("\n", entries));
+            string result = string.Join("\n", entries);
+            _logger.Info("Disk list directory: {Path}, entries={Count}", path, entries.Count);
+            return ExecutorResult.Successful(result);
         }
         catch (Exception ex)
         {
+            _logger.Error("Disk list directory failed: {Path}, {Exception}", ex, path);
             return ExecutorResult.Failed($"Failed to list directory: {ex.Message}");
         }
     }
@@ -205,10 +220,12 @@ public static class DiskExecutor
         try
         {
             Directory.CreateDirectory(path);
+            _logger.Info("Disk create directory: {Path}", path);
             return ExecutorResult.Successful($"Directory created: {path}");
         }
         catch (Exception ex)
         {
+            _logger.Error("Disk create directory failed: {Path}, {Exception}", ex, path);
             return ExecutorResult.Failed($"Failed to create directory: {ex.Message}");
         }
     }
@@ -231,6 +248,7 @@ public static class DiskExecutor
                     $"Created: {fi.CreationTime:yyyy-MM-dd HH:mm:ss}\n" +
                     $"Modified: {fi.LastWriteTime:yyyy-MM-dd HH:mm:ss}\n" +
                     $"Attributes: {fi.Attributes}";
+                _logger.Info("Disk get file info: {Path}, size={Size}", path, fi.Length);
                 return ExecutorResult.Successful(info);
             }
 
@@ -244,6 +262,7 @@ public static class DiskExecutor
                     $"Subdirectories: {dirCount}\n" +
                     $"Created: {di.CreationTime:yyyy-MM-dd HH:mm:ss}\n" +
                     $"Modified: {di.LastWriteTime:yyyy-MM-dd HH:mm:ss}";
+                _logger.Info("Disk get directory info: {Path}, files={Files}, dirs={Dirs}", path, fileCount, dirCount);
                 return ExecutorResult.Successful(info);
             }
 
@@ -251,6 +270,7 @@ public static class DiskExecutor
         }
         catch (Exception ex)
         {
+            _logger.Error("Disk get file info failed: {Path}, {Exception}", ex, path);
             return ExecutorResult.Failed($"Failed to get file info: {ex.Message}");
         }
     }

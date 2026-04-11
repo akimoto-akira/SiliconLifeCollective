@@ -19,6 +19,7 @@ namespace SiliconLife.Collective;
 /// </summary>
 public class ServiceLocator
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<ServiceLocator>();
     private static readonly Lazy<ServiceLocator> _instance = new(() => new ServiceLocator());
     private readonly Dictionary<Type, object> _services = new();
     private readonly Dictionary<Guid, PermissionManager> _permissionManagers = new();
@@ -64,6 +65,7 @@ public class ServiceLocator
         {
             _services[typeof(T)] = service;
         }
+        _logger.Debug($"Service registered: {typeof(T).Name}");
     }
 
     /// <summary>
@@ -78,6 +80,7 @@ public class ServiceLocator
             {
                 return service as T;
             }
+            _logger.Trace($"Service not found: {typeof(T).Name}");
             return null;
         }
     }
@@ -93,6 +96,7 @@ public class ServiceLocator
         {
             _permissionManagers[beingId] = manager;
         }
+        _logger.Debug($"Permission manager registered for being {beingId}");
     }
 
     /// <summary>
@@ -131,5 +135,6 @@ public class ServiceLocator
             _services.Clear();
             _permissionManagers.Clear();
         }
+        _logger.Info("Service locator cleared");
     }
 }

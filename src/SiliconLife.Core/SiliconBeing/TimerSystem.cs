@@ -299,6 +299,7 @@ public sealed class TimerCallbackInfo
 /// </summary>
 public sealed class TimerSystem
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<TimerSystem>();
     private readonly IStorage _storage;
     private readonly string _storageKey;
     private readonly object _lock = new();
@@ -354,8 +355,9 @@ public sealed class TimerSystem
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.Warn("Failed to load timers from storage", ex);
             _timers = new List<TimerItem>();
         }
     }
@@ -365,9 +367,16 @@ public sealed class TimerSystem
     /// </summary>
     public void Save()
     {
-        string json = JsonSerializer.Serialize(_timers);
-        byte[] data = System.Text.Encoding.UTF8.GetBytes(json);
-        _storage.Write(_storageKey, data);
+        try
+        {
+            string json = JsonSerializer.Serialize(_timers);
+            byte[] data = System.Text.Encoding.UTF8.GetBytes(json);
+            _storage.Write(_storageKey, data);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error("Failed to save timers to storage", ex);
+        }
     }
 
     /// <summary>
@@ -388,6 +397,8 @@ public sealed class TimerSystem
 
             _timers.Add(timer);
             Save();
+
+            _logger.Info("Timer added: {0} ({1}), type={2}, triggerAt={3}", name, timer.Id, TimerType.Once, triggerTime);
 
             return timer;
         }
@@ -417,6 +428,8 @@ public sealed class TimerSystem
 
             _timers.Add(timer);
             Save();
+
+            _logger.Info("Timer added: {0} ({1}), type={2}, triggerAt={3}", name, timer.Id, TimerType.Recurring, triggerTime);
 
             return timer;
         }
@@ -474,7 +487,9 @@ public sealed class TimerSystem
     {
         lock (_lock)
         {
-            return _timers.Any(t => t.ShouldTrigger());
+            int pendingCount = _timers.Count(t => t.Status == TimerStatus.Active && t.ShouldTrigger());
+            _logger.Debug("Checking pending timers: {0} pending", pendingCount);
+            return pendingCount > 0;
         }
     }
 
@@ -506,6 +521,7 @@ public sealed class TimerSystem
             {
                 timer.Pause();
                 Save();
+                _logger.Debug("Timer paused: {0} ({1})", timer.Name, timer.Id);
             }
         }
     }
@@ -523,6 +539,7 @@ public sealed class TimerSystem
             {
                 timer.Resume();
                 Save();
+                _logger.Debug("Timer resumed: {0} ({1})", timer.Name, timer.Id);
             }
         }
     }
@@ -639,6 +656,13 @@ public sealed class TimerSystem
             {
                 timer.Trigger();
                 triggered.Add(timer);
+
+                _logger.Info("Timer triggered: {0} ({1}), timesTriggered={2}", timer.Name, timer.Id, timer.TimesTriggered);
+
+                if (timer.Type == TimerType.Once || (timer.MaxTriggers.HasValue && timer.TimesTriggered >= timer.MaxTriggers.Value))
+                {
+                    _logger.Debug("One-shot timer completed: {0} ({1})", timer.Name, timer.Id);
+                }
 
                 var info = new TimerCallbackInfo
                 {

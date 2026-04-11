@@ -57,6 +57,7 @@ public sealed class CachedPermission
 /// </summary>
 public class UserFrequencyCache
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<UserFrequencyCache>();
     private readonly List<CachedPermission> _cache = new();
     private readonly TimeSpan _expiration;
     private readonly object _lock = new();
@@ -92,7 +93,6 @@ public class UserFrequencyCache
 
         lock (_lock)
         {
-            // Update existing entry if present
             for (int i = 0; i < _cache.Count; i++)
             {
                 CachedPermission entry = _cache[i];
@@ -100,12 +100,13 @@ public class UserFrequencyCache
                     resource.StartsWith(entry.ResourcePrefix, StringComparison.OrdinalIgnoreCase))
                 {
                     _cache[i] = new CachedPermission(permissionType, resource, result, DateTime.UtcNow + _expiration);
+                    _logger.Debug("Frequency cache recorded: type={Type}, resource={Resource}, result={Result}", permissionType, resource, result);
                     return;
                 }
             }
 
-            // Add new entry
             _cache.Add(new CachedPermission(permissionType, resource, result, DateTime.UtcNow + _expiration));
+            _logger.Debug("Frequency cache recorded: type={Type}, resource={Resource}, result={Result}", permissionType, resource, result);
             CleanExpired();
         }
     }
@@ -128,10 +129,12 @@ public class UserFrequencyCache
                 if (entry.PermissionType == permissionType &&
                     resource.StartsWith(entry.ResourcePrefix, StringComparison.OrdinalIgnoreCase))
                 {
+                    _logger.Trace("Frequency cache hit: type={Type}, resource={Resource}, result={Result}", permissionType, resource, entry.Result);
                     return entry.Result;
                 }
             }
         }
+        _logger.Trace("Frequency cache miss: type={Type}, resource={Resource}", permissionType, resource);
         return null;
     }
 
@@ -180,6 +183,10 @@ public class UserFrequencyCache
     /// </summary>
     private void CleanExpired()
     {
-        _cache.RemoveAll(e => e.IsExpired);
+        int removed = _cache.RemoveAll(e => e.IsExpired);
+        if (removed > 0)
+        {
+            _logger.Debug("Frequency cache cleanup: removed {Count} expired entries", removed);
+        }
     }
 }

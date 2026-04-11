@@ -21,6 +21,7 @@ namespace SiliconLife.Default.Web;
 
 public class Router
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<Router>();
     private readonly Dictionary<string, Func<Controller>> _controllers = new();
     private readonly Dictionary<string, string> _mimeTypes = new();
     private string _staticFilesPath = string.Empty;
@@ -113,6 +114,7 @@ public class Router
 
     public void NotifyInitialized(string curatorName)
     {
+        _logger.Info("First-time initialization triggered");
         _onFirstInit?.Invoke(curatorName);
         SetInitialized(true);
     }
@@ -238,10 +240,12 @@ public class Router
 
             if (TryMatchPattern(pattern, path, parameters))
             {
+                _logger.Debug($"Route matched: {method} {path} -> {pattern}");
                 return (_controllers[route], parameters);
             }
         }
 
+        _logger.Warn($"No route matched: {method} {path}");
         return (null, new Dictionary<string, string>());
     }
 
@@ -290,6 +294,8 @@ public class Router
             await Send404(response);
             return;
         }
+
+        _logger.Trace($"Serving static file: {path}");
 
         var extension = Path.GetExtension(filePath).ToLowerInvariant();
         var contentType = _mimeTypes.GetValueOrDefault(extension, "application/octet-stream");

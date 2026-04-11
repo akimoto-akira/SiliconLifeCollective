@@ -21,12 +21,15 @@ namespace SiliconLife.Default;
 
 public class Program
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<Program>();
     private static bool _shouldExit = false;
     private static CoreHost? _host;
     private static WebHost? _webHost;
 
     public static async Task Main(string[] args)
     {
+        _logger.Info("Application starting...");
+
         RegisterLocalizations();
         ConfigDataBaseConverter.RegisterConfigType("Default", typeof(DefaultConfigData));
 
@@ -35,6 +38,8 @@ public class Program
         config.LoadConfig();
 
         DefaultConfigData configData = (DefaultConfigData)config.Data;
+        _logger.Info("Configuration loaded: endpoint={Endpoint}, model={Model}", configData.OllamaEndpoint, configData.DefaultModel);
+
         DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(configData.Language);
 
         Console.WriteLine(localization.WelcomeMessage);
@@ -42,20 +47,24 @@ public class Program
 
         IAIClientFactory aiClientFactory = new OllamaClientFactory();
         IAIClient aiClient = aiClientFactory.CreateClient(configData.OllamaEndpoint, configData.DefaultModel);
+        _logger.Info("Initialized: AIClient");
 
         IStorage storage = new FileSystemStorage(configData.DataDirectory);
         ITimeStorage timeStorage = new FileSystemTimeStorage(
             Path.Combine(configData.DataDirectory, "chat"));
 
         ChatSystem chatSystem = new ChatSystem(timeStorage);
+        _logger.Info("Initialized: ChatSystem");
 
         ITimeStorage auditStorage = new FileSystemTimeStorage(
             Path.Combine(configData.DataDirectory, "audit"));
         AuditLogger auditLogger = new AuditLogger(auditStorage);
+        _logger.Info("Initialized: AuditLogger");
 
         GlobalACL globalAcl = new GlobalACL(storage);
+        _logger.Info("Initialized: GlobalACL");
 
-        var router = new Router();
+        Router router = new Router();
         router.SetInitialized(File.Exists(configData.GetConfigPath()));
         IIMProvider imProvider = new WebUIProvider(router);
         imProvider.ExitRequested += (s, e) => RequestExit();
@@ -64,6 +73,7 @@ public class Program
         IMPermissionAskHandler askHandler = new IMPermissionAskHandler(imProvider);
 
         IMManager imManager = new IMManager(imProvider, chatSystem, MainLoop.BeingManager);
+        _logger.Info("Initialized: IMManager");
 
         DefaultSiliconBeingFactory beingFactory = new DefaultSiliconBeingFactory(
             aiClient,
@@ -91,11 +101,13 @@ public class Program
         _host = builder.Build();
 
         await _host.StartAsync();
+        _logger.Info("CoreHost started");
 
         // Only create curator if it was previously initialized (CuratorGuid is set)
         if (configData.CuratorGuid != Guid.Empty)
         {
             SiliconBeingBase defaultBeing = beingFactory.CreateBeing(configData.CuratorGuid, "");
+            _logger.Info("Curator created: {Name} ({Id})", defaultBeing.Name, defaultBeing.Id);
             RegisterAndConfigureCurator(defaultBeing, configData, dynamicBeingLoader);
         }
 
@@ -117,6 +129,8 @@ public class Program
 
     private static async Task ShutdownAsync()
     {
+        _logger.Info("Application shutting down...");
+
         if (_webHost != null)
         {
             await _webHost.StopAsync();
@@ -129,15 +143,16 @@ public class Program
         }
 
         _shouldExit = true;
+        _logger.Info("Application shutdown complete");
     }
 
     private static async Task StartWebServerAsync(DefaultConfigData configData, Router router, WebUIProvider webUiProvider, DefaultSiliconBeingFactory beingFactory, DynamicBeingLoader dynamicBeingLoader)
     {
-        var codeBrowser = new WebCodeBrowser();
-        var skinManager = new SkinManager();
+        WebCodeBrowser codeBrowser = new WebCodeBrowser();
+        SkinManager skinManager = new SkinManager();
         skinManager.DiscoverSkins(typeof(SkinManager).Assembly);
 
-        var locator = ServiceLocator.Instance;
+        ServiceLocator locator = ServiceLocator.Instance;
         locator.Register(skinManager);
         locator.Register(codeBrowser);
         locator.Register(router);
@@ -149,6 +164,7 @@ public class Program
             SiliconBeingBase curator = beingFactory.CreateBeing(Guid.Empty, curatorName);
             configData.CuratorGuid = curator.Id;
             configData.SaveConfig();
+            _logger.Info("Curator created: {Name} ({Id})", curator.Name, curator.Id);
             RegisterAndConfigureCurator(curator, configData, dynamicBeingLoader);
         });
 
@@ -164,6 +180,7 @@ public class Program
         try
         {
             await _webHost.StartAsync();
+            _logger.Info("Web server started on port {Port}", configData.WebPort);
             try
             {
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
@@ -178,7 +195,7 @@ public class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to start web server: {ex.Message}");
+            _logger.Error("Failed to start web server: {Message}", ex, ex.Message);
         }
     }
 
@@ -208,14 +225,17 @@ public class Program
                 if (permResult.Success && permResult.CompiledType != null)
                 {
                     MainLoop.BeingManager.ReplacePermissionCallback(curator.Id, permResult.CompiledType);
+                    _logger.Info("Loaded custom permission callback for curator {Id}", curator.Id);
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.Warn("Failed to load custom permission callback for curator {Id}", ex, curator.Id);
             }
         }
 
         MainLoop.BeingManager.RegisterBeing(curator);
+        _logger.Info("Registered curator: {Name} ({Id})", curator.Name, curator.Id);
 
         if (DynamicBeingLoader.HasCustomCode(beingDirectory))
         {
@@ -225,10 +245,12 @@ public class Program
                 if (customType != null)
                 {
                     MainLoop.BeingManager.ReplaceBeing(curator.Id, customType);
+                    _logger.Info("Loaded custom code for curator {Id}: {TypeName}", curator.Id, customType.Name);
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.Warn("Failed to load custom code for curator {Id}", ex, curator.Id);
             }
         }
     }

@@ -43,6 +43,8 @@ public sealed class SecurityScanResult
 /// </summary>
 public static class SecurityScanner
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger(typeof(SecurityScanner));
+
     /// <summary>
     /// Dangerous patterns that are absolutely forbidden.
     /// Each entry: (pattern, description, severity)
@@ -116,6 +118,8 @@ public static class SecurityScanner
     {
         ArgumentNullException.ThrowIfNull(sourceCode);
 
+        _logger.Debug("Security scanning source code, length={Length}", sourceCode.Length);
+
         var violations = new List<string>();
         string worstSeverity = "none";
 
@@ -124,12 +128,18 @@ public static class SecurityScanner
             if (pattern.IsMatch(sourceCode))
             {
                 violations.Add($"[{severity.ToUpperInvariant()}] {description} (pattern: {pattern})");
+                _logger.Warn("Security violation: [{Severity}] {Description}", severity.ToUpperInvariant(), description);
 
                 if (GetSeverityLevel(severity) > GetSeverityLevel(worstSeverity))
                 {
                     worstSeverity = severity;
                 }
             }
+        }
+
+        if (violations.Count == 0)
+        {
+            _logger.Debug("Security scan passed");
         }
 
         return new SecurityScanResult(violations.Count == 0, violations, worstSeverity);
@@ -146,7 +156,6 @@ public static class SecurityScanner
 
         foreach (string assembly in referencedAssemblies)
         {
-            // Strip .dll extension if present
             string cleanName = assembly.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
                 ? assembly[..^4]
                 : assembly;
@@ -154,6 +163,7 @@ public static class SecurityScanner
             if (!AllowedAssemblyNames.Contains(cleanName))
             {
                 unauthorized.Add(cleanName);
+                _logger.Warn("Unauthorized assembly reference: {AssemblyName}", cleanName);
             }
         }
 

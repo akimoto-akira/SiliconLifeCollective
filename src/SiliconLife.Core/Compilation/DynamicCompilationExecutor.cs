@@ -54,6 +54,7 @@ public sealed class CompilationResult
 /// </summary>
 public class DynamicCompilationExecutor
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<DynamicCompilationExecutor>();
     private readonly string[] _allowedAssemblyPaths;
 
     /// <summary>
@@ -89,10 +90,12 @@ public class DynamicCompilationExecutor
     {
         ArgumentNullException.ThrowIfNull(sourceCode);
 
-        // Step 1: Security scan
+        _logger.Info("Starting compilation for type hint: {TypeNameHint}", typeNameHint ?? "(auto-detect)");
+
         SecurityScanResult scanResult = SecurityScanner.Scan(sourceCode);
         if (!scanResult.Passed)
         {
+            _logger.Error("Security scan failed: {Violations}", string.Join("; ", scanResult.Violations));
             return new CompilationResult(
                 false, null,
                 ["Security scan failed: " + string.Join("; ", scanResult.Violations)],
@@ -136,6 +139,7 @@ public class DynamicCompilationExecutor
         (bool refsValid, List<string> unauthorized) = SecurityScanner.ValidateReferences(referencedNames);
         if (!refsValid)
         {
+            _logger.Error("Unauthorized assembly references: {References}", string.Join(", ", unauthorized));
             return new CompilationResult(
                 false, null,
                 [$"Unauthorized assembly references: {string.Join(", ", unauthorized)}"],
@@ -162,6 +166,7 @@ public class DynamicCompilationExecutor
                 .Select(d => d.ToString())
                 .ToList();
 
+            _logger.Error("Compilation failed with {Count} errors", errors.Count);
             return new CompilationResult(false, null, errors, scanResult);
         }
 
@@ -192,12 +197,14 @@ public class DynamicCompilationExecutor
 
         if (targetType == null)
         {
+            _logger.Warn("No type inheriting {BaseType} found in compiled code", typeof(TBase).Name);
             return new CompilationResult(
                 false, null,
                 [$"No type inheriting {typeof(TBase).Name} found in compiled code."],
                 scanResult, assembly);
         }
 
+        _logger.Info("Compilation successful: type={TypeName}, assembly={AssemblyName}", targetType.Name, assemblyName);
         return new CompilationResult(true, targetType, [], scanResult, assembly);
     }
 
@@ -211,10 +218,12 @@ public class DynamicCompilationExecutor
     {
         ArgumentNullException.ThrowIfNull(sourceCode);
 
-        // Security scan
+        _logger.Info("Starting permission callback compilation");
+
         SecurityScanResult scanResult = SecurityScanner.Scan(sourceCode);
         if (!scanResult.Passed)
         {
+            _logger.Error("Security scan failed for permission callback: {Violations}", string.Join("; ", scanResult.Violations));
             return new CompilationResult(
                 false, null,
                 ["Security scan failed: " + string.Join("; ", scanResult.Violations)],
@@ -252,6 +261,7 @@ public class DynamicCompilationExecutor
                 .Select(d => d.ToString())
                 .ToList();
 
+            _logger.Error("Permission callback compilation failed with {Count} errors", errors.Count);
             return new CompilationResult(false, null, errors, scanResult);
         }
 
@@ -271,12 +281,14 @@ public class DynamicCompilationExecutor
 
         if (targetType == null)
         {
+            _logger.Warn("No type implementing IPermissionCallback found in compiled code");
             return new CompilationResult(
                 false, null,
                 ["No type implementing IPermissionCallback found in compiled code."],
                 scanResult, assembly);
         }
 
+        _logger.Info("Permission callback compilation successful: type={TypeName}", targetType.Name);
         return new CompilationResult(true, targetType, [], scanResult, assembly);
     }
 

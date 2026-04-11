@@ -47,6 +47,7 @@ public sealed class AclRule
 /// </summary>
 public class GlobalACL
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<GlobalACL>();
     private readonly List<AclRule> _rules = new();
     private readonly IStorage? _storage;
     private readonly object _lock = new();
@@ -76,6 +77,7 @@ public class GlobalACL
     {
         _storage = storage;
         LoadFromStorage();
+        _logger.Info("GlobalACL initialized with storage, loaded {Count} rules", _rules.Count);
     }
 
     /// <summary>
@@ -94,10 +96,12 @@ public class GlobalACL
                 if (rule.PermissionType == permissionType &&
                     resource.StartsWith(rule.ResourcePrefix, StringComparison.OrdinalIgnoreCase))
                 {
+                    _logger.Debug("ACL match: type={Type}, prefix={Prefix}, result={Result}", permissionType, rule.ResourcePrefix, rule.Result);
                     return rule.Result;
                 }
             }
         }
+        _logger.Trace("ACL no match: type={Type}, resource={Resource}", permissionType, resource);
         return null;
     }
 
@@ -111,6 +115,7 @@ public class GlobalACL
         {
             _rules.Add(rule);
             SaveToStorage();
+            _logger.Info("ACL rule added: type={Type}, prefix={Prefix}, result={Result}", rule.PermissionType, rule.ResourcePrefix, rule.Result);
         }
     }
 
@@ -129,6 +134,7 @@ public class GlobalACL
                 r.PermissionType == permissionType &&
                 r.ResourcePrefix.Equals(resourcePrefix, StringComparison.OrdinalIgnoreCase));
             SaveToStorage();
+            _logger.Info("ACL rule removed: type={Type}, prefix={Prefix}, count={Removed}", permissionType, resourcePrefix, removed);
         }
         return removed;
     }
@@ -161,9 +167,9 @@ public class GlobalACL
             string json = System.Text.Json.JsonSerializer.Serialize(ruleData);
             _storage.Write(RulesKey, System.Text.Encoding.UTF8.GetBytes(json));
         }
-        catch
+        catch (Exception ex)
         {
-            // Persistence failure should not crash the permission system
+            _logger.Warn("Failed to persist ACL rules: {Exception}", ex.Message);
         }
     }
 
@@ -199,9 +205,9 @@ public class GlobalACL
                 _rules.Add(new AclRule(permType, prefix, result, desc));
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Load failure — start fresh
+            _logger.Warn("Failed to load ACL rules from storage: {Exception}", ex.Message);
         }
     }
 }

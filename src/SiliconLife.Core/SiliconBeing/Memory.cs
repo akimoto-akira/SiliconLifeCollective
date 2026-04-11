@@ -98,6 +98,7 @@ public sealed class MemoryStatistics
 /// </summary>
 public sealed class Memory
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<Memory>();
     private readonly ITimeStorage _timeStorage;
     private readonly string _storageKey;
 
@@ -119,6 +120,7 @@ public sealed class Memory
         _storageKey = "memory";
 
         Load();
+        _logger.Info("Memory system initialized with {0}", _storageKey);
     }
 
     private void Load()
@@ -131,9 +133,11 @@ public sealed class Memory
                 .Where(e => e != null)
                 .Cast<MemoryEntry>()
                 .ToList();
+            _logger.Debug("Loading memories from storage, found {0} entries", _memories.Count);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.Warn("Failed to load memories, starting with empty collection", ex);
             _memories = new List<MemoryEntry>();
         }
     }
@@ -170,6 +174,8 @@ public sealed class Memory
         _memories.Add(entry);
         Save(entry);
 
+        _logger.Debug("Memory added: {0}..., id={1}", content.Length > 30 ? content[..30] : content, entry.Id);
+
         return entry;
     }
 
@@ -197,6 +203,8 @@ public sealed class Memory
 
         _memories.Add(entry);
         Save(entry);
+
+        _logger.Debug("Memory added: {0}..., id={1}", content.Length > 30 ? content[..30] : content, entry.Id);
 
         return entry;
     }
@@ -287,6 +295,10 @@ public sealed class Memory
     public bool ShouldCompress()
     {
         var compressLevel = FindLevelToCompress();
+        if (compressLevel.HasValue)
+        {
+            _logger.Debug("Memory compression check: {0} entries, compression needed", _memories.Count);
+        }
         return compressLevel.HasValue;
     }
 

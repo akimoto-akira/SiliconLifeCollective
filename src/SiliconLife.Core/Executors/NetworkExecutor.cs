@@ -21,6 +21,7 @@ namespace SiliconLife.Collective;
 /// </summary>
 public static class NetworkExecutor
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger(typeof(NetworkExecutor));
     private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);
     private static readonly HttpClient HttpClient = new() { Timeout = DefaultTimeout };
 
@@ -63,6 +64,8 @@ public static class NetworkExecutor
             ? bodyObj?.ToString()
             : null;
 
+        _logger.Info("Network request: {Method} {Url}", method, request.ResourcePath);
+
         try
         {
             HttpMethod httpMethod = new(method);
@@ -73,7 +76,6 @@ public static class NetworkExecutor
                 httpRequest.Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
             }
 
-            // Add custom headers
             if (request.Parameters.TryGetValue("headers", out object? headersObj) && headersObj is Dictionary<string, object> headers)
             {
                 foreach (KeyValuePair<string, object> header in headers)
@@ -84,6 +86,8 @@ public static class NetworkExecutor
 
             HttpResponseMessage httpResponse = HttpClient.SendAsync(httpRequest).GetAwaiter().GetResult();
             string responseContent = httpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+            _logger.Debug("Network response: {StatusCode}, size={Size}", (int)httpResponse.StatusCode, responseContent.Length);
 
             if (httpResponse.IsSuccessStatusCode)
             {
@@ -96,14 +100,17 @@ public static class NetworkExecutor
         }
         catch (HttpRequestException ex)
         {
+            _logger.Error("Network error: {Url}, {Exception}", ex, request.ResourcePath);
             return ExecutorResult.Failed($"Network error: {ex.Message}");
         }
         catch (TaskCanceledException)
         {
+            _logger.Warn("Network request timed out: {Url}", request.ResourcePath);
             return ExecutorResult.Failed("Request timed out");
         }
         catch (Exception ex)
         {
+            _logger.Error("Network error: {Url}, {Exception}", ex, request.ResourcePath);
             return ExecutorResult.Failed($"Network error: {ex.Message}");
         }
     }

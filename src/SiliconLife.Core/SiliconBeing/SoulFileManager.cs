@@ -18,6 +18,7 @@ namespace SiliconLife.Collective;
 /// </summary>
 public static class SoulFileManager
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger(typeof(SoulFileManager));
     private const string SoulFileName = "soul.md";
 
     /// <summary>
@@ -31,15 +32,19 @@ public static class SoulFileManager
 
         if (!File.Exists(soulFilePath))
         {
+            _logger.Debug("Soul file not found: {0}", soulFilePath);
             return null;
         }
 
         try
         {
-            return File.ReadAllText(soulFilePath);
+            string content = File.ReadAllText(soulFilePath);
+            _logger.Info("Soul loaded from {0}, length={1}", soulFilePath, content.Length);
+            return content;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.Warn("Failed to load soul from {0}", soulFilePath, ex);
             return null;
         }
     }
@@ -61,10 +66,12 @@ public static class SoulFileManager
 
             string soulFilePath = Path.Combine(beingDirectory, SoulFileName);
             File.WriteAllText(soulFilePath, soulContent);
+            _logger.Info("Soul saved to {0}, length={1}", soulFilePath, soulContent.Length);
             return true;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.Error("Failed to save soul to {0}", Path.Combine(beingDirectory, SoulFileName), ex);
             return false;
         }
     }
@@ -77,6 +84,8 @@ public static class SoulFileManager
     public static bool SoulExists(string beingDirectory)
     {
         string soulFilePath = Path.Combine(beingDirectory, SoulFileName);
-        return File.Exists(soulFilePath);
+        bool exists = File.Exists(soulFilePath);
+        _logger.Trace("Soul file exists check: {0} = {1}", soulFilePath, exists);
+        return exists;
     }
 }

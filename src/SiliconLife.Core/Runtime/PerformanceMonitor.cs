@@ -45,6 +45,7 @@ public class PerformanceRecord
 /// </summary>
 public class PerformanceMonitor
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<PerformanceMonitor>();
     private readonly Dictionary<string, List<TimeSpan>> _executionTimes = new();
     private readonly object _lock = new();
     private const int MaxSamples = 100;
@@ -71,7 +72,10 @@ public class PerformanceMonitor
             if (samples.Count > MaxSamples)
             {
                 samples.RemoveAt(0);
+                _logger.Debug("Performance sample overflow for {0}, discarding oldest", name);
             }
+
+            _logger.Trace("Performance recorded: {0} = {1}ms", name, executionTime.TotalMilliseconds);
         }
     }
 

@@ -21,6 +21,7 @@ namespace SiliconLife.Collective;
 /// </summary>
 public class SiliconBeingRunner
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger(typeof(SiliconBeingRunner));
     private readonly SiliconBeingBase _being;
     private readonly int _maxTimeoutCount;
     private readonly ConfigDataBase _config;
@@ -48,6 +49,8 @@ public class SiliconBeingRunner
         bool success = false;
         Thread? worker = null;
 
+        _logger.Debug("Executing being tick: {0} ({1})", _being.Name, _being.Id);
+
         try
         {
             worker = new Thread(() =>
@@ -59,10 +62,10 @@ public class SiliconBeingRunner
                 }
                 catch (ThreadAbortException)
                 {
-                    // Thread was killed due to timeout
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _logger.Error("Being tick failed with exception: {0}", _being.Name, ex);
                 }
             })
             {
@@ -75,22 +78,22 @@ public class SiliconBeingRunner
             if (worker.Join(timeout))
             {
                 _consecutiveTimeoutCount = 0;
+                _logger.Debug("Being tick completed: {0} in {1}ms", _being.Name, timeout.TotalMilliseconds);
                 return true;
             }
 
-            // Timeout: try to kill the thread
-            KillThread(worker);
+            _logger.Warn("Being tick timed out: {0} after {1}ms", _being.Name, timeout.TotalMilliseconds);
+            KillThread(worker, _being.Name);
             HandleTimeout();
             return false;
         }
         catch (ThreadInterruptedException)
         {
-            // Main thread was interrupted (e.g., by watchdog), worker may still be running fine
             return false;
         }
         catch
         {
-            KillThread(worker);
+            KillThread(worker, _being.Name);
             return false;
         }
     }
@@ -98,7 +101,7 @@ public class SiliconBeingRunner
     /// <summary>
     /// Kill a thread aggressively: Interrupt → Abort → verify.
     /// </summary>
-    private static void KillThread(Thread? worker)
+    private static void KillThread(Thread? worker, string beingName)
     {
         if (worker is null || !worker.IsAlive)
         {
@@ -114,13 +117,11 @@ public class SiliconBeingRunner
             }
             catch (PlatformNotSupportedException)
             {
-                // .NET Core+ does not support Abort; thread must be cancelled cooperatively
             }
 
             if (!worker.Join(TimeSpan.FromMilliseconds(500)))
             {
-                // Thread is still alive, considered out of control
-                // TODO: Log warning
+                _logger.Error("Worker thread for being {0} is out of control", beingName);
             }
         }
     }
@@ -142,6 +143,7 @@ public class SiliconBeingRunner
             _circuitBreakerTripped = true;
             _circuitBreakerResetTime = DateTime.UtcNow + TimeSpan.FromMinutes(1);
             _consecutiveTimeoutCount = 0;
+            _logger.Warn("Circuit breaker tripped for being {0}, cooldown for 1 minute", _being.Name);
         }
     }
 
@@ -154,6 +156,7 @@ public class SiliconBeingRunner
         {
             _circuitBreakerTripped = false;
             _consecutiveTimeoutCount = 0;
+            _logger.Info("Circuit breaker reset for being {0}", _being.Name);
         }
     }
 }
@@ -165,6 +168,7 @@ public class SiliconBeingRunner
 /// </summary>
 public class SiliconBeingManager : TickObject
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<SiliconBeingManager>();
     private readonly List<SiliconBeingBase> _beings = [];
     private readonly Dictionary<SiliconBeingBase, SiliconBeingRunner> _runners = [];
     private readonly object _lock = new();
@@ -193,6 +197,7 @@ public class SiliconBeingManager : TickObject
     public void Start()
     {
         _managerRunning = true;
+        _logger.Info("SiliconBeingManager starting...");
     }
 
     public void Stop()
@@ -201,6 +206,7 @@ public class SiliconBeingManager : TickObject
 
         lock (_lock)
         {
+            _logger.Info("SiliconBeingManager stopping, clearing {0} beings", _beings.Count);
             _runners.Clear();
             _beings.Clear();
         }
@@ -214,6 +220,8 @@ public class SiliconBeingManager : TickObject
             {
                 _beings.Add(being);
                 _runners[being] = new SiliconBeingRunner(being, MaxTimeoutCount, Config.Instance?.Data!);
+                bool isCurator = Config.Instance?.Data?.CuratorGuid == being.Id;
+                _logger.Info("Registered being: {0} ({1}), isCurator={2}", being.Name, being.Id, isCurator);
             }
         }
     }
@@ -224,6 +232,7 @@ public class SiliconBeingManager : TickObject
         {
             _runners.Remove(being);
             _beings.Remove(being);
+            _logger.Info("Unregistered being: {0} ({1})", being.Name, being.Id);
         }
     }
 
@@ -274,6 +283,7 @@ public class SiliconBeingManager : TickObject
 
             if (runner.IsCircuitBreakerTripped)
             {
+                _logger.Debug("Skipping being {0}: circuit breaker tripped", runner.BeingId);
                 continue;
             }
 
@@ -305,6 +315,7 @@ public class SiliconBeingManager : TickObject
     {
         if (!typeof(SiliconBeingBase).IsAssignableFrom(newType))
         {
+            _logger.Error("Cannot replace being {0}: type {1} does not inherit SiliconBeingBase", beingId, newType.Name);
             return false;
         }
 
@@ -316,8 +327,8 @@ public class SiliconBeingManager : TickObject
                 return false;
             }
 
-            // Create new instance from compiled type
-            // Compiled types must have a constructor matching: (Guid id, string name)
+            _logger.Info("Replacing being {0} with compiled type {1}", beingId, newType.Name);
+
             SiliconBeingBase? newBeing = null;
             try
             {
@@ -325,19 +336,20 @@ public class SiliconBeingManager : TickObject
             }
             catch
             {
-                // Fallback: try parameterless constructor
                 try
                 {
                     newBeing = (SiliconBeingBase?)Activator.CreateInstance(newType);
                 }
                 catch
                 {
+                    _logger.Error("Failed to create instance of {0} for being {1}", newType.Name, beingId);
                     return false;
                 }
             }
 
             if (newBeing == null)
             {
+                _logger.Error("Failed to create instance of {0} for being {1}", newType.Name, beingId);
                 return false;
             }
 
@@ -382,6 +394,8 @@ public class SiliconBeingManager : TickObject
             {
                 return;
             }
+
+            _logger.Info("Reverting being {0} to default implementation", beingId);
 
             SiliconBeingBase? newBeing = factory.CreateBeing(oldBeing.Id, oldBeing.Name);
             if (newBeing == null)
@@ -467,6 +481,8 @@ public class SiliconBeingManager : TickObject
     /// <param name="newBeing">The new being instance</param>
     private static void MigrateState(SiliconBeingBase oldBeing, SiliconBeingBase newBeing)
     {
+        _logger.Debug("Migrating state from {0} to {1} for being {2}", oldBeing.GetType().Name, newBeing.GetType().Name, oldBeing.Id);
+
         newBeing.AIClient = oldBeing.AIClient;
         newBeing.SoulContent = oldBeing.SoulContent;
         newBeing.ToolManager = oldBeing.ToolManager;

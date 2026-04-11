@@ -28,6 +28,7 @@ namespace SiliconLife.Collective;
 /// </summary>
 public class ContextManager
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<ContextManager>();
     private readonly IAIClient _aiClient;
     private readonly SiliconBeingBase _being;
     private readonly ISession? _session;
@@ -72,6 +73,8 @@ public class ContextManager
             FetchUnreadMessages();
             DetectContinuationFromHistory();
         }
+
+        _logger.Info("ContextManager created for being {0}, session={1}", _being.Name, _session?.Id.ToString() ?? "null");
     }
 
     /// <summary>
@@ -87,12 +90,13 @@ public class ContextManager
         foreach (ChatMessage msg in history)
         {
             AddMessageToContext(msg);
-            // Only track read messages — unread ones will be picked up by FetchUnreadMessages
             if (msg.ReadBy.Contains(_being.Id))
             {
                 _contextMessageIds.Add(msg.Id);
             }
         }
+
+        _logger.Debug("Loaded {0} history messages from session {1}", history.Count, _session.Id);
     }
 
     /// <summary>
@@ -105,6 +109,7 @@ public class ContextManager
         if (_messages.Count > 0 && _messages[^1].Role == MessageRole.Tool)
         {
             _needsContinuation = true;
+            _logger.Info("Detected continuation from history for being {0}", _being.Name);
         }
     }
 
@@ -161,6 +166,7 @@ public class ContextManager
         if (messageIdsToMark.Count > 0 && _session != null)
         {
             _session.MarkMessagesAsRead(messageIdsToMark, _being.Id);
+            _logger.Debug("Fetched {0} unread messages for being {1}", messageIdsToMark.Count, _being.Id);
         }
     }
 
@@ -245,12 +251,13 @@ public class ContextManager
 
         request.Messages.AddRange(_messages);
 
-        // Add tool definitions if ToolManager is available and has tools
         ToolManager? toolManager = _being.ToolManager;
         if (toolManager != null && toolManager.ToolCount > 0)
         {
             request.Tools = toolManager.GetToolDefinitions();
         }
+
+        _logger.Debug("Building AI request: {0} messages, {1} tools", request.Messages.Count, request.Tools?.Count ?? 0);
 
         return request;
     }
@@ -261,6 +268,8 @@ public class ContextManager
     /// </summary>
     private List<Message> ExecuteToolCalls(List<ToolCall> toolCalls)
     {
+        _logger.Info("Executing {0} tool calls for being {1}", toolCalls.Count, _being.Name);
+
         List<Message> toolResultMessages = new List<Message>();
         ToolManager? toolManager = _being.ToolManager;
 
@@ -275,6 +284,8 @@ public class ContextManager
             {
                 result = ToolResult.Failed($"No tool manager available for tool '{toolCall.Name}'");
             }
+
+            _logger.Info("Tool call: {0}, success={1}", toolCall.Name, result.Success);
 
             string resultContent = SerializeToolResult(result);
             string toolCallId = string.IsNullOrEmpty(toolCall.Id)
@@ -323,15 +334,19 @@ public class ContextManager
     /// <returns>The AI response (may contain tool_calls or plain text)</returns>
     public AIResponse GetResponse()
     {
+        _logger.Info("Getting AI response for being {0}", _being.Name);
+
         AIRequest request = BuildRequest();
         AIResponse response = _aiClient.Chat(request);
 
         if (response.Success && response.HasToolCalls)
         {
+            _logger.Debug("AI returned tool calls, persisting intermediate round");
             PersistToolCallRound(response);
         }
         else if (response.Success && !string.IsNullOrEmpty(response.Content))
         {
+            _logger.Debug("AI returned text response, length={0}", response.Content.Length);
             AddAssistantMessage(response.Content, response.Thinking);
         }
 
@@ -349,10 +364,12 @@ public class ContextManager
 
         if (response.Success && response.HasToolCalls)
         {
+            _logger.Debug("AI returned tool calls (async), persisting intermediate round");
             PersistToolCallRound(response);
         }
         else if (response.Success && !string.IsNullOrEmpty(response.Content))
         {
+            _logger.Debug("AI returned text response (async), length={0}", response.Content.Length);
             AddAssistantMessage(response.Content, response.Thinking);
         }
 
@@ -371,6 +388,7 @@ public class ContextManager
         bool? streamingMode = _aiClient.StreamingMode;
         if (streamingMode == false)
         {
+            _logger.Warn("Falling back to non-streaming mode");
             return await GetResponseAsync();
         }
 
@@ -429,6 +447,7 @@ public class ContextManager
             {
                 return AIResponse.Failed("AI client requires streaming but ChatStreamAsync is not implemented");
             }
+            _logger.Warn("Streaming not implemented, falling back to non-streaming mode");
             return await GetResponseAsync();
         }
 
@@ -438,6 +457,7 @@ public class ContextManager
             {
                 return AIResponse.Failed("AI client requires streaming but stream ended without final chunk");
             }
+            _logger.Warn("Stream ended without final chunk, falling back to non-streaming mode");
             return await GetResponseAsync();
         }
 
@@ -478,6 +498,8 @@ public class ContextManager
     /// <returns>The AI response</returns>
     public AIResponse ThinkOnChat()
     {
+        _logger.Info("ThinkOnChat: being={0}, session={1}", _being.Name, _session?.Id.ToString() ?? "null");
+
         AIResponse response = GetResponse();
 
         if (response.Success && response.HasToolCalls)
@@ -500,6 +522,8 @@ public class ContextManager
     /// <returns>The AI response</returns>
     public async Task<AIResponse> ThinkOnChatStreamAsync(CancellationToken cancellationToken = default)
     {
+        _logger.Info("ThinkOnChatStream: being={0}, session={1}", _being.Name, _session?.Id.ToString() ?? "null");
+
         AIResponse response = await GetResponseStreamAsync(cancellationToken);
 
         if (response.Success && response.HasToolCalls)
@@ -521,7 +545,8 @@ public class ContextManager
     /// <returns>The AI response</returns>
     public AIResponse ThinkOnGroupChat()
     {
-        // TODO: Load group context, deliver to group
+        _logger.Info("ThinkOnGroupChat: being={0}", _being.Name);
+
         AIResponse response = GetResponse();
 
         if (response.Success && response.HasToolCalls)
@@ -544,6 +569,8 @@ public class ContextManager
     /// <returns>The AI response</returns>
     public async Task<AIResponse> ThinkOnGroupChatStreamAsync(CancellationToken cancellationToken = default)
     {
+        _logger.Info("ThinkOnGroupChatStream: being={0}", _being.Name);
+
         AIResponse response = await GetResponseStreamAsync(cancellationToken);
 
         if (response.Success && response.HasToolCalls)
@@ -565,7 +592,8 @@ public class ContextManager
     /// <returns>The AI response</returns>
     public AIResponse ThinkOnTask()
     {
-        // TODO: Load task context, write back result
+        _logger.Info("ThinkOnTask: being={0}", _being.Name);
+
         AIResponse response = GetResponse();
         return response;
     }
@@ -577,7 +605,8 @@ public class ContextManager
     /// <returns>The AI response</returns>
     public AIResponse ThinkOnTimer()
     {
-        // TODO: Load timer context
+        _logger.Info("ThinkOnTimer: being={0}", _being.Name);
+
         AIResponse response = GetResponse();
         return response;
     }
@@ -590,6 +619,8 @@ public class ContextManager
     /// <returns>The AI response</returns>
     public AIResponse ThinkOnMemoryCompress()
     {
+        _logger.Info("ThinkOnMemoryCompress: being={0}", _being.Name);
+
         if (_being.Memory == null)
         {
             return new AIResponse { Success = false, ErrorMessage = "Memory not initialized" };
@@ -671,6 +702,8 @@ public class ContextManager
     /// </summary>
     private void DeliverOutput(string content, string? thinking = null)
     {
+        _logger.Debug("Delivering output for being {0}, length={1}", _being.Name, content.Length);
+
         IMManager? imManager = ServiceLocator.Instance.IMManager;
         if (imManager != null && _session != null)
         {

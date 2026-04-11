@@ -226,6 +226,7 @@ public sealed class TaskStatistics
 /// </summary>
 public sealed class TaskSystem
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<TaskSystem>();
     private readonly IStorage _storage;
     private readonly string _storageKey;
     private readonly object _lock = new();
@@ -271,8 +272,9 @@ public sealed class TaskSystem
             string json = System.Text.Encoding.UTF8.GetString(data);
             _tasks = JsonSerializer.Deserialize<List<TaskItem>>(json) ?? new List<TaskItem>();
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.Warn("Failed to load tasks from storage", ex);
             _tasks = new List<TaskItem>();
         }
     }
@@ -282,9 +284,16 @@ public sealed class TaskSystem
     /// </summary>
     public void Save()
     {
-        string json = JsonSerializer.Serialize(_tasks);
-        byte[] data = System.Text.Encoding.UTF8.GetBytes(json);
-        _storage.Write(_storageKey, data);
+        try
+        {
+            string json = JsonSerializer.Serialize(_tasks);
+            byte[] data = System.Text.Encoding.UTF8.GetBytes(json);
+            _storage.Write(_storageKey, data);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error("Failed to save tasks to storage", ex);
+        }
     }
 
     /// <summary>
@@ -311,6 +320,8 @@ public sealed class TaskSystem
 
             _tasks.Add(task);
             Save();
+
+            _logger.Info("Task added: {0} ({1}), priority={2}", title, task.Id, priority);
 
             return task;
         }
@@ -393,6 +404,7 @@ public sealed class TaskSystem
             {
                 task.Start();
                 Save();
+                _logger.Info("Task started: {0} ({1})", task.Title, task.Id);
                 return true;
             }
 
@@ -408,7 +420,9 @@ public sealed class TaskSystem
     {
         lock (_lock)
         {
-            return _tasks.Any(t => t.CanRun(_tasks));
+            bool hasPending = _tasks.Any(t => t.CanRun(_tasks));
+            _logger.Debug("Checking pending tasks: {0} pending", _tasks.Count(t => t.Status == TaskStatus.Pending));
+            return hasPending;
         }
     }
 
@@ -425,6 +439,7 @@ public sealed class TaskSystem
             {
                 task.Complete();
                 Save();
+                _logger.Info("Task completed: {0} ({1})", task.Title, task.Id);
             }
         }
     }
@@ -443,6 +458,7 @@ public sealed class TaskSystem
             {
                 task.Fail(error);
                 Save();
+                _logger.Warn("Task failed: {0} ({1}), error={2}", task.Title, task.Id, error);
             }
         }
     }
@@ -460,6 +476,7 @@ public sealed class TaskSystem
             {
                 task.Cancel();
                 Save();
+                _logger.Info("Task cancelled: {0} ({1})", task.Title, task.Id);
             }
         }
     }

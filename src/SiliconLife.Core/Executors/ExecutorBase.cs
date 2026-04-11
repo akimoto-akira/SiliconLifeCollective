@@ -23,6 +23,7 @@ namespace SiliconLife.Collective;
 /// </summary>
 public abstract class ExecutorBase : IDisposable
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<ExecutorBase>();
     private readonly BlockingCollection<ExecutorRequest> _requestQueue;
     private Thread? _workerThread;
     private volatile bool _isRunning;
@@ -63,19 +64,23 @@ public abstract class ExecutorBase : IDisposable
     public ExecutorResult Execute(ExecutorRequest request, TimeSpan? timeout = null)
     {
         TimeSpan actualTimeout = timeout ?? DefaultTimeout;
+        _logger.Debug("Executing request: {Request}", request);
 
         try
         {
             Task<ExecutorResult> task = Task.Run(() => ExecuteCore(request));
             if (task.Wait(actualTimeout))
             {
+                _logger.Debug("Execution completed successfully");
                 return task.Result;
             }
+            _logger.Warn("Execution timed out after {Timeout}ms", actualTimeout.TotalMilliseconds);
             return ExecutorResult.Failed("Operation timed out");
         }
         catch (AggregateException ex)
         {
             Exception? inner = ex.InnerException;
+            _logger.Error("Execution failed: {Exception}", ex);
             return ExecutorResult.Failed(inner?.Message ?? ex.Message);
         }
     }
@@ -89,9 +94,12 @@ public abstract class ExecutorBase : IDisposable
     {
         if (!_isRunning)
         {
+            _logger.Warn("Cannot enqueue: executor not running");
             return false;
         }
-        return _requestQueue.TryAdd(request);
+        bool result = _requestQueue.TryAdd(request);
+        _logger.Debug("Request enqueued, queue size={Size}", _requestQueue.Count);
+        return result;
     }
 
     /// <summary>
@@ -114,6 +122,7 @@ public abstract class ExecutorBase : IDisposable
             Name = $"Executor-{GetType().Name}"
         };
         _workerThread.Start();
+        _logger.Info("Executor started");
     }
 
     /// <summary>
@@ -121,6 +130,7 @@ public abstract class ExecutorBase : IDisposable
     /// </summary>
     public virtual void Stop()
     {
+        _logger.Info("Executor stopped");
         _isRunning = false;
         _requestQueue.CompleteAdding();
         _workerThread?.Join(3000);

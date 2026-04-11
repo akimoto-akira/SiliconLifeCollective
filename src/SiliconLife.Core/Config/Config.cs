@@ -20,6 +20,7 @@ namespace SiliconLife.Collective;
 /// </summary>
 public class Config
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<Config>();
     private static readonly Lazy<Config> _instance = new Lazy<Config>(() => new Config());
     private ConfigDataBase _data;
     private readonly JsonSerializerOptions _jsonOptions;
@@ -41,6 +42,7 @@ public class Config
     public void Initialize(ConfigDataBase data)
     {
         _data = data;
+        _logger.Info($"Config initialized with data type: {data.GetType().Name}");
     }
 
     private Config()
@@ -72,7 +74,16 @@ public class Config
     /// </summary>
     public void LoadConfig()
     {
-        _data.LoadConfig();
+        try
+        {
+            _data.LoadConfig();
+            _logger.Info($"Config loaded from {_data.GetConfigPath()}");
+        }
+        catch (Exception)
+        {
+            _logger.Error($"Failed to load config from {_data.GetConfigPath()}");
+            throw;
+        }
     }
 
     /// <summary>
@@ -80,7 +91,16 @@ public class Config
     /// </summary>
     public void SaveConfig()
     {
-        _data.SaveConfig();
+        try
+        {
+            _data.SaveConfig();
+            _logger.Info($"Config saved to {_data.GetConfigPath()}");
+        }
+        catch (Exception)
+        {
+            _logger.Error($"Failed to save config to {_data.GetConfigPath()}");
+            throw;
+        }
     }
 
     /// <summary>
@@ -89,5 +109,6 @@ public class Config
     public void Reload()
     {
         LoadConfig();
+        _logger.Info($"Config reloaded from {_data.GetConfigPath()}");
     }
 }

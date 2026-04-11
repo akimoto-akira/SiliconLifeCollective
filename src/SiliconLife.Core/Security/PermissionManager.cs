@@ -26,6 +26,7 @@ namespace SiliconLife.Collective;
 /// </summary>
 public class PermissionManager
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<PermissionManager>();
     private readonly SiliconBeingBase _owner;
     private readonly UserFrequencyCache _frequencyCache;
     private readonly GlobalACL _globalAcl;
@@ -87,6 +88,7 @@ public class PermissionManager
         _defaultCallback = callback;
         _askHandler = askHandler;
         _frequencyCache = new UserFrequencyCache(cacheExpiration ?? TimeSpan.FromHours(1));
+        _logger.Info("PermissionManager created for being {BeingName} ({BeingId})", owner.Name, owner.Id);
     }
 
     /// <summary>
@@ -97,6 +99,7 @@ public class PermissionManager
     public void SetCustomCallback(IPermissionCallback customCallback)
     {
         _callback = customCallback ?? throw new ArgumentNullException(nameof(customCallback));
+        _logger.Info("Custom permission callback set for being {BeingId}", OwnerId);
     }
 
     /// <summary>
@@ -105,6 +108,7 @@ public class PermissionManager
     public void ResetCallback()
     {
         _callback = _defaultCallback;
+        _logger.Info("Permission callback reset to default for being {BeingId}", OwnerId);
     }
 
     /// <summary>

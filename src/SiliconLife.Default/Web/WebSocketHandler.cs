@@ -14,6 +14,7 @@
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
+using SiliconLife.Collective;
 
 namespace SiliconLife.Default.Web;
 
@@ -25,6 +26,7 @@ namespace SiliconLife.Default.Web;
 /// </summary>
 public class WebSocketHandler : IDisposable
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<WebSocketHandler>();
     private readonly List<WebSocket> _clients = new();
     private readonly Dictionary<WebSocket, DateTime> _clientLastActivity = new();
     private readonly object _lock = new();
@@ -130,6 +132,9 @@ public class WebSocketHandler : IDisposable
             System.Net.WebSockets.WebSocketContext wsContext = await context.AcceptWebSocketAsync(null);
             webSocket = wsContext.WebSocket;
 
+            string clientId = webSocket.GetHashCode().ToString();
+            _logger.Info($"WebSocket connected: {clientId}");
+
             lock (_lock)
             {
                 _clients.Add(webSocket);
@@ -157,23 +162,26 @@ public class WebSocketHandler : IDisposable
                     }
 
                     string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    _logger.Debug($"WebSocket message received: type=text, size={result.Count}");
                     OnMessageReceived?.Invoke(webSocket, message);
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"WebSocket error: {ex.Message}");
+            _logger.Error($"WebSocket error: {ex.Message}");
         }
         finally
         {
             if (webSocket != null)
             {
+                string clientId = webSocket.GetHashCode().ToString();
                 lock (_lock)
                 {
                     _clients.Remove(webSocket);
                     _clientLastActivity.Remove(webSocket);
                 }
+                _logger.Info($"WebSocket disconnected: {clientId}");
                 OnDisconnected?.Invoke(webSocket);
                 webSocket.Dispose();
             }
@@ -184,6 +192,8 @@ public class WebSocketHandler : IDisposable
     {
         byte[] bytes = Encoding.UTF8.GetBytes(message);
         ArraySegment<byte> segment = new ArraySegment<byte>(bytes);
+
+        _logger.Debug($"WebSocket message sent: type=broadcast, size={bytes.Length}");
 
         List<WebSocket> clientsCopy;
         lock (_lock)
@@ -211,6 +221,7 @@ public class WebSocketHandler : IDisposable
         if (client.State == WebSocketState.Open)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(message);
+            _logger.Debug($"WebSocket message sent: type=unicast, size={bytes.Length}");
             await client.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
         }
     }

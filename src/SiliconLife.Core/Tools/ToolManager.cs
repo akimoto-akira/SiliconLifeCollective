@@ -22,6 +22,7 @@ namespace SiliconLife.Collective;
 /// </summary>
 public class ToolManager
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<ToolManager>();
     private readonly Dictionary<string, ITool> _tools = new();
     private readonly object _lock = new();
     private readonly bool _curatorOnly;
@@ -59,6 +60,7 @@ public class ToolManager
         {
             _tools[tool.Name] = tool;
         }
+        _logger.Debug($"Tool registered: {tool.Name}");
     }
 
     /// <summary>
@@ -103,10 +105,11 @@ public class ToolManager
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ToolManager] Failed to instantiate tool '{type.Name}': {ex.Message}");
+                _logger.Warn($"Failed to instantiate tool '{type.Name}': {ex.Message}");
             }
         }
 
+        _logger.Info($"Assembly scan: found {count} tools from {assembly.GetName().Name}");
         return count;
     }
 
@@ -139,10 +142,11 @@ public class ToolManager
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ToolManager] Failed to instantiate tool '{type.Name}': {ex.Message}");
+                _logger.Warn($"Failed to instantiate tool '{type.Name}': {ex.Message}");
             }
         }
 
+        _logger.Info($"Assembly scan (all): found {count} tools from {assembly.GetName().Name}");
         return count;
     }
 
@@ -179,15 +183,20 @@ public class ToolManager
 
         if (tool == null)
         {
+            _logger.Warn($"Tool not found: {name}");
             return ToolResult.Failed($"Tool '{name}' not found");
         }
 
+        _logger.Info($"Tool execution: {name}, caller={callerId}");
         try
         {
-            return tool.Execute(callerId, parameters);
+            ToolResult result = tool.Execute(callerId, parameters);
+            _logger.Debug($"Tool execution succeeded: {name}");
+            return result;
         }
         catch (Exception ex)
         {
+            _logger.Error($"Tool execution failed: {name}, error={ex.Message}", ex);
             return ToolResult.Failed($"Tool '{name}' execution failed: {ex.Message}");
         }
     }

@@ -20,6 +20,8 @@ namespace SiliconLife.Collective;
 /// </summary>
 public class CoreHostBuilder
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<CoreHostBuilder>();
+
     /// <summary>Gets the configuration data attached to this builder.</summary>
     public ConfigDataBase? Config { get; private set; }
 
@@ -57,6 +59,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetConfig(ConfigDataBase config)
     {
         Config = config;
+        _logger.Debug("Set Config");
         return this;
     }
 
@@ -64,6 +67,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetAIClient(IAIClient client)
     {
         AIClient = client;
+        _logger.Debug("Set AIClient: {0}", client?.GetType().Name ?? "null");
         return this;
     }
 
@@ -71,6 +75,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetStorage(IStorage storage)
     {
         Storage = storage;
+        _logger.Debug("Set Storage: {0}", storage?.GetType().Name ?? "null");
         return this;
     }
 
@@ -78,6 +83,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetTimeStorage(ITimeStorage timeStorage)
     {
         TimeStorage = timeStorage;
+        _logger.Debug("Set TimeStorage: {0}", timeStorage?.GetType().Name ?? "null");
         return this;
     }
 
@@ -85,6 +91,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetChatSystem(ChatSystem chatSystem)
     {
         ChatSystem = chatSystem;
+        _logger.Debug("Set ChatSystem");
         return this;
     }
 
@@ -92,6 +99,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetAuditLogger(AuditLogger auditLogger)
     {
         AuditLogger = auditLogger;
+        _logger.Debug("Set AuditLogger");
         return this;
     }
 
@@ -99,6 +107,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetGlobalACL(GlobalACL globalAcl)
     {
         GlobalAcl = globalAcl;
+        _logger.Debug("Set GlobalACL");
         return this;
     }
 
@@ -106,6 +115,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetIMProvider(IIMProvider provider)
     {
         IMProvider = provider;
+        _logger.Debug("Set IMProvider: {0}", provider?.GetType().Name ?? "null");
         return this;
     }
 
@@ -113,6 +123,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetIMManager(IMManager imManager)
     {
         IMManager = imManager;
+        _logger.Debug("Set IMManager");
         return this;
     }
 
@@ -120,6 +131,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetBeingFactory(ISiliconBeingFactory factory)
     {
         BeingFactory = factory;
+        _logger.Debug("Set BeingFactory: {0}", factory?.GetType().Name ?? "null");
         return this;
     }
 
@@ -127,6 +139,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetDynamicBeingLoader(DynamicBeingLoader loader)
     {
         DynamicBeingLoader = loader;
+        _logger.Debug("Set DynamicBeingLoader");
         return this;
     }
 
@@ -135,6 +148,20 @@ public class CoreHostBuilder
     /// </summary>
     public CoreHost Build()
     {
+        int componentCount = 0;
+        if (Config != null) componentCount++;
+        if (AIClient != null) componentCount++;
+        if (Storage != null) componentCount++;
+        if (TimeStorage != null) componentCount++;
+        if (ChatSystem != null) componentCount++;
+        if (AuditLogger != null) componentCount++;
+        if (GlobalAcl != null) componentCount++;
+        if (IMProvider != null) componentCount++;
+        if (IMManager != null) componentCount++;
+        if (BeingFactory != null) componentCount++;
+        if (DynamicBeingLoader != null) componentCount++;
+
+        _logger.Info("Building CoreHost with {0} components", componentCount);
         return new CoreHost(this);
     }
 }

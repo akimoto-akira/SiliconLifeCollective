@@ -23,6 +23,7 @@ namespace SiliconLife.Collective;
 /// </summary>
 public static class CodeEncryption
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger(typeof(CodeEncryption));
     private const int KeySize = 256;
     private const int BlockSize = 128;
     private const int Iterations = 100_000;
@@ -70,6 +71,8 @@ public static class CodeEncryption
     {
         ArgumentNullException.ThrowIfNull(plainBytes);
 
+        _logger.Debug("Encrypting data for GUID {Guid}, input size={Size}", guid, plainBytes.Length);
+
         byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
         (byte[] key, _) = DeriveKey(guid, salt);
 
@@ -84,7 +87,6 @@ public static class CodeEncryption
         using var encryptor = aes.CreateEncryptor();
         byte[] cipherBytes = encryptor.TransformFinalBlock(plainBytes, 0, plainBytes.Length);
 
-        // Concatenate: salt + IV + ciphertext
         byte[] result = new byte[SaltSize + IvSize + cipherBytes.Length];
         Buffer.BlockCopy(salt, 0, result, 0, SaltSize);
         Buffer.BlockCopy(aes.IV, 0, result, SaltSize, IvSize);
@@ -119,6 +121,7 @@ public static class CodeEncryption
 
         if (encryptedBytes == null || encryptedBytes.Length < SaltSize + IvSize + 1)
         {
+            _logger.Warn("Decryption failed: data too short ({Size} bytes)", encryptedBytes?.Length ?? 0);
             return false;
         }
 
@@ -145,10 +148,12 @@ public static class CodeEncryption
             using var decryptor = aes.CreateDecryptor();
             decryptedBytes = decryptor.TransformFinalBlock(cipherBytes, 0, cipherBytes.Length);
 
+            _logger.Debug("Decryption successful for GUID {Guid}", guid);
             return true;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.Warn("Decryption failed for GUID {Guid}: {Exception}", guid, ex.Message);
             return false;
         }
     }

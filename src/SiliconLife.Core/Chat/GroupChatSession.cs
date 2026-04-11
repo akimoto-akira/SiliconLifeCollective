@@ -20,6 +20,7 @@ namespace SiliconLife.Collective;
 /// </summary>
 public class GroupChatSession : ISession
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<GroupChatSession>();
     private readonly ITimeStorage _storage;
     private readonly string _storageKey;
     private readonly object _lock = new();
@@ -82,6 +83,7 @@ public class GroupChatSession : ISession
         {
             byte[] data = JsonSerializer.SerializeToUtf8Bytes(message);
             _storage.Write(_storageKey, message.Timestamp, data);
+            _logger.Debug("Session {Id}: message added from {SenderId}", Id, message.SenderId);
         }
     }
 
@@ -107,6 +109,7 @@ public class GroupChatSession : ISession
             }
 
             allMessages.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
+            _logger.Trace("Session {Id}: retrieving {Count} messages", Id, allMessages.Count);
             return allMessages.Skip(offset).Take(limit).ToList();
         }
     }
@@ -141,6 +144,7 @@ public class GroupChatSession : ISession
             }
 
             pending.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
+            _logger.Debug("Session {Id}: {Count} pending messages for {ParticipantId}", Id, pending.Count, participantId);
             return pending;
         }
     }
@@ -165,6 +169,7 @@ public class GroupChatSession : ISession
                         msg.ReadBy.Add(readerId);
                         byte[] data = JsonSerializer.SerializeToUtf8Bytes(msg);
                         _storage.Write(_storageKey, entry.Timestamp, data);
+                        _logger.Trace("Session {Id}: message {MessageId} read by {ReaderId}", Id, messageId, readerId);
                         return;
                     }
                 }

@@ -53,6 +53,7 @@ public sealed class AuditEntry
 /// </summary>
 public class AuditLogger
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<AuditLogger>();
     private readonly ITimeStorage? _timeStorage;
     private const string AuditKey = "audit";
 
@@ -98,14 +99,14 @@ public class AuditLogger
                 });
 
                 _timeStorage.Write(AuditKey, entry.Timestamp, System.Text.Encoding.UTF8.GetBytes(json));
+                _logger.Debug("Audit logged: {Result} | {Type} | {Resource} | {Reason}", result, permissionType, resource, reason);
             }
-            catch
+            catch (Exception ex)
             {
-                // Audit log failure should not block the operation
+                _logger.Warn("Failed to persist audit entry: {Exception}", ex.Message);
             }
         }
 
-        // Always log to console for visibility
         string resultStr = result == PermissionResult.Allowed ? "ALLOW" : result == PermissionResult.Denied ? "DENY" : "ASK";
         Console.WriteLine($"[AUDIT] {resultStr} | {permissionType} | {resource} | {reason}");
     }
@@ -152,8 +153,9 @@ public class AuditLogger
 
             return results;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.Warn("Failed to query audit entries: {Exception}", ex.Message);
             return new List<AuditEntry>();
         }
     }

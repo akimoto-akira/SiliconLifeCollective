@@ -123,6 +123,7 @@ internal class OllamaResponse
 /// </summary>
 public class OllamaClient : IAIClient
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<OllamaClient>();
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
 
@@ -178,6 +179,8 @@ public class OllamaClient : IAIClient
         {
             string model = string.IsNullOrEmpty(request.Model) ? DefaultModel : request.Model;
 
+            _logger.Info("AI request: model={0}, messages={1}, hasTools={2}", model, request.Messages.Count, request.Tools != null && request.Tools.Count > 0);
+
             OllamaRequest ollamaRequest = new OllamaRequest
             {
                 Model = model,
@@ -205,26 +208,35 @@ public class OllamaClient : IAIClient
 
             AIResponse? result = await SendAndParseAsync(content);
             if (result != null)
+            {
+                _logger.Info("AI response: model={0}, tokens={1}/{2}/{3}, hasToolCalls={4}", model, result.PromptTokens, result.CompletionTokens, result.TotalTokens, result.HasToolCalls);
                 return result;
+            }
 
-            // Model is still loading, wait and retry once
+            _logger.Warn("Model '{0}' is still loading, retrying in 3s...", model);
             await Task.Delay(3000);
             result = await SendAndParseAsync(content);
             if (result != null)
+            {
+                _logger.Info("AI response (after retry): model={0}, tokens={1}/{2}/{3}, hasToolCalls={4}", model, result.PromptTokens, result.CompletionTokens, result.TotalTokens, result.HasToolCalls);
                 return result;
+            }
 
             return AIResponse.Failed($"Model '{model}' is still loading after retry.");
         }
         catch (HttpRequestException ex)
         {
+            _logger.Error("AI connection error: {0}", ex.Message);
             return AIResponse.Failed($"Connection error: {ex.Message}");
         }
         catch (TaskCanceledException ex)
         {
+            _logger.Warn("AI request timeout: {0}", ex.Message);
             return AIResponse.Failed($"Request timeout: {ex.Message}");
         }
         catch (Exception ex)
         {
+            _logger.Error("AI request failed: {0}", ex.Message);
             return AIResponse.Failed($"Unexpected error: {ex.Message}");
         }
     }
@@ -280,6 +292,8 @@ public class OllamaClient : IAIClient
     {
         string model = string.IsNullOrEmpty(request.Model) ? DefaultModel : request.Model;
 
+        _logger.Info("AI stream started: model={0}", model);
+
         OllamaRequest ollamaRequest = new OllamaRequest
         {
             Model = model,
@@ -313,10 +327,12 @@ public class OllamaClient : IAIClient
         }
         catch (HttpRequestException ex)
         {
+            _logger.Error("AI stream connection error: {0}", ex.Message);
             errorResponse = AIResponse.Failed($"Connection error: {ex.Message}");
         }
         catch (OperationCanceledException)
         {
+            _logger.Debug("AI stream cancelled");
             yield break;
         }
 
@@ -396,6 +412,8 @@ public class OllamaClient : IAIClient
 
             if (ollamaResponse.Done)
             {
+                _logger.Info("AI stream completed: model={0}, totalTokens={1}", ollamaResponse.Model, (ollamaResponse.PromptEvalCount ?? 0) + (ollamaResponse.EvalCount ?? 0));
+
                 AIResponse finalChunk = new AIResponse
                 {
                     Model = ollamaResponse.Model,
@@ -560,6 +578,7 @@ public class OllamaClient : IAIClient
 
         try
         {
+            _logger.Debug("AI generate request: model={0}", DefaultModel);
             HttpResponseMessage response = await _httpClient.PostAsync($"{Endpoint}/api/generate", content);
 
             if (!response.IsSuccessStatusCode)
@@ -584,6 +603,7 @@ public class OllamaClient : IAIClient
         }
         catch (Exception ex)
         {
+            _logger.Error("AI generate error: {0}", ex.Message);
             return new AIResponse
             {
                 Success = false,

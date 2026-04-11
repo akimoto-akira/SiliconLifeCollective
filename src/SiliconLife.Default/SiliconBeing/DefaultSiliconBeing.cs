@@ -22,6 +22,7 @@ namespace SiliconLife.Default;
 /// </summary>
 public class DefaultSiliconBeing : SiliconBeingBase
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<DefaultSiliconBeing>();
     private volatile bool _isProcessing;
 
     /// <summary>
@@ -57,9 +58,11 @@ public class DefaultSiliconBeing : SiliconBeingBase
             var state = new Dictionary<string, string> { ["name"] = Name };
             string json = System.Text.Json.JsonSerializer.Serialize(state, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(Path.Combine(BeingDirectory, "state.json"), json);
+            _logger.Debug("Being {0}: state saved to {1}", Name, Path.Combine(BeingDirectory, "state.json"));
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.Warn("Being {0}: failed to save state", Name, ex);
         }
     }
 
@@ -80,11 +83,13 @@ public class DefaultSiliconBeing : SiliconBeingBase
             if (state != null && state.TryGetValue("name", out string? name))
             {
                 Name = name;
+                _logger.Debug("Being {0}: state loaded from {1}", Name, stateFilePath);
                 return true;
             }
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.Warn("Being {0}: failed to load state", Name, ex);
         }
         return false;
     }
@@ -107,22 +112,22 @@ public class DefaultSiliconBeing : SiliconBeingBase
         {
             var sessions = BuildSessionList();
 
-            // Check continuation across all sessions (highest priority)
             foreach (var session in sessions)
             {
                 if (ContextManager.NeedsContinuation(this, session))
                 {
+                    _logger.Info("Being {0}: detected continuation in session {1}", Name, session.Id);
                     ExecuteBrain("ThinkContinuation", session, brain => brain.ThinkOnChat());
                     return;
                 }
             }
 
-            // Check for pending messages from any session
             foreach (var session in sessions)
             {
                 ContextManager brain = new ContextManager(this, session);
                 if (brain.HasWork)
                 {
+                    _logger.Info("Being {0}: detected pending messages in session {1}", Name, session.Id);
                     ExecuteBrain("ThinkOnChat", session, _ => brain.ThinkOnChat());
                     return;
                 }
@@ -130,24 +135,29 @@ public class DefaultSiliconBeing : SiliconBeingBase
 
             if (TimerSystem != null && TimerSystem.HasPendingTimers())
             {
+                _logger.Info("Being {0}: timer triggered", Name);
                 ExecuteBrain("ThinkOnTimer", null, _ => new ContextManager(this, null).ThinkOnTimer());
                 return;
             }
 
             if (TaskSystem != null && TaskSystem.HasPendingTasks())
             {
+                _logger.Info("Being {0}: pending task detected", Name);
                 ExecuteBrain("ThinkOnTask", null, _ => new ContextManager(this, null).ThinkOnTask());
                 return;
             }
 
             if (Memory != null && Memory.ShouldCompress())
             {
+                _logger.Debug("Being {0}: memory compression needed", Name);
                 ExecuteBrain("ThinkOnMemoryCompress", null, _ => new ContextManager(this, null).ThinkOnMemoryCompress());
                 return;
             }
         }
         catch (Exception ex)
         {
+            _logger.Error("Being {0}: unexpected error during tick", Name, ex);
+
             Language language = Config.Instance.Data.Language;
             DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(language);
 
@@ -201,6 +211,8 @@ public class DefaultSiliconBeing : SiliconBeingBase
     /// </summary>
     private void ExecuteBrain(string sceneName, ISession? session, Func<ContextManager, AIResponse> thinkFunc)
     {
+        _logger.Info("Being {0}: executing brain scene {1}", Name, sceneName);
+
         Language language = Config.Instance.Data.Language;
         DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(language);
 
@@ -224,8 +236,13 @@ public class DefaultSiliconBeing : SiliconBeingBase
         }
         else if (!response.Success)
         {
+            _logger.Error("Being {0}: brain scene {1} failed: {2}", Name, sceneName, response.ErrorMessage ?? "unknown");
             Console.WriteLine($"{Name}: {localization.ErrorMessage} {response.ErrorMessage}");
             Console.WriteLine();
+        }
+        else
+        {
+            _logger.Debug("Being {0}: brain scene {1} completed", Name, sceneName);
         }
     }
 }
