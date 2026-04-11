@@ -71,7 +71,7 @@ public static class CodeEncryption
     {
         ArgumentNullException.ThrowIfNull(plainBytes);
 
-        _logger.Debug("Encrypting data for GUID {Guid}, input size={Size}", guid, plainBytes.Length);
+        _logger.Debug("Encrypting data for GUID {0}, input size={1}", guid, plainBytes.Length);
 
         byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
         (byte[] key, _) = DeriveKey(guid, salt);
@@ -121,7 +121,7 @@ public static class CodeEncryption
 
         if (encryptedBytes == null || encryptedBytes.Length < SaltSize + IvSize + 1)
         {
-            _logger.Warn("Decryption failed: data too short ({Size} bytes)", encryptedBytes?.Length ?? 0);
+            _logger.Warn("Decryption failed: data too short ({0} bytes)", encryptedBytes?.Length ?? 0);
             return false;
         }
 
@@ -148,12 +148,12 @@ public static class CodeEncryption
             using var decryptor = aes.CreateDecryptor();
             decryptedBytes = decryptor.TransformFinalBlock(cipherBytes, 0, cipherBytes.Length);
 
-            _logger.Debug("Decryption successful for GUID {Guid}", guid);
+            _logger.Debug("Decryption successful for GUID {0}", guid);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.Warn("Decryption failed for GUID {Guid}: {Exception}", guid, ex.Message);
+            _logger.Warn("Decryption failed for GUID {0}: {1}", guid, ex.Message);
             return false;
         }
     }

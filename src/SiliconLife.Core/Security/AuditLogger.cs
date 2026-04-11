@@ -99,11 +99,11 @@ public class AuditLogger
                 });
 
                 _timeStorage.Write(AuditKey, entry.Timestamp, System.Text.Encoding.UTF8.GetBytes(json));
-                _logger.Debug("Audit logged: {Result} | {Type} | {Resource} | {Reason}", result, permissionType, resource, reason);
+                _logger.Debug("Audit logged: {0} | {1} | {2} | {3}", result, permissionType, resource, reason);
             }
             catch (Exception ex)
             {
-                _logger.Warn("Failed to persist audit entry: {Exception}", ex.Message);
+                _logger.Warn("Failed to persist audit entry: {0}", ex.Message);
             }
         }
 
@@ -155,7 +155,7 @@ public class AuditLogger
         }
         catch (Exception ex)
         {
-            _logger.Warn("Failed to query audit entries: {Exception}", ex.Message);
+            _logger.Warn("Failed to query audit entries: {0}", ex.Message);
             return new List<AuditEntry>();
         }
     }

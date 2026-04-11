@@ -11,7 +11,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 using SiliconLife.Collective;
@@ -22,7 +21,6 @@ namespace SiliconLife.Default.IM;
 /// <summary>
 /// Streaming buffer state for a single session.
 /// Accumulates incremental content from AI streaming responses.
-/// Cleared immediately when the stream ends to prevent duplication with persisted chat history.
 /// </summary>
 internal class StreamingBuffer
 {
@@ -46,11 +44,9 @@ internal class StreamingBuffer
 
 public class WebUIProvider : IIMProvider
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<WebUIProvider>();
     private readonly Router _router;
-    private WebSocketHandler _webSocketHandler;
-    private readonly Dictionary<Guid, WebSocket> _userConnections = new();
-    private readonly object _lock = new();
-    private readonly Queue<(Guid senderId, Guid receiverId, string content)> _messageQueue = new();
+    private readonly SSEHandler _sseHandler;
     private readonly Dictionary<Guid, TaskCompletionSource<AskPermissionResult>> _pendingPermissionRequests = new();
     private readonly Dictionary<Guid, StreamingBuffer> _streamingBuffers = new();
     private readonly object _streamingLock = new();
@@ -69,200 +65,91 @@ public class WebUIProvider : IIMProvider
         return tcs;
     };
 
+    public SSEHandler SSEHandler => _sseHandler;
+
     public WebUIProvider(Router router)
     {
         _router = router;
-        _webSocketHandler = new WebSocketHandler();
-        _webSocketHandler.OnMessageReceived += OnWebSocketMessageReceived;
-        _router.SetSharedWebSocketHandler(_webSocketHandler);
-        _webSocketHandler.StartHealthCheck();
+        _sseHandler = new SSEHandler();
+        _sseHandler.OnConnected += OnSSEConnected;
+        _sseHandler.OnDisconnected += OnSSEDisconnected;
+        _router.SetSharedSSEHandler(_sseHandler);
+        _logger.Info("WebUIProvider initialized with SSE");
     }
 
-    private async void OnWebSocketMessageReceived(WebSocket ws, string message)
+    private void OnSSEConnected(SSEClient client)
     {
-        try
+        _logger.Info($"SSE client connected: userId={client.UserId}, channelId={client.ChannelId}");
+
+        if (client.ChannelId.HasValue)
         {
-            WebSocketMessage? wsMessage = JsonSerializer.Deserialize<WebSocketMessage>(message, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-            if (wsMessage == null) return;
-
-            switch (wsMessage.Type)
-            {
-                case "connect":
-                    string? userId = wsMessage.SenderId;
-                    if (!string.IsNullOrEmpty(userId) && Guid.TryParse(userId, out Guid guid))
-                    {
-                        WebSocketMessage connectMsg = new WebSocketMessage
-                        {
-                            Type = "user_connected",
-                            Content = userId,
-                            Timestamp = DateTime.UtcNow
-                        };
-                        await _webSocketHandler.SendToAllAsync(connectMsg.ToJson());
-                    }
-                    break;
-
-                case "chat":
-                    if (!string.IsNullOrEmpty(wsMessage.SenderId) && !string.IsNullOrEmpty(wsMessage.ChannelId))
-                    {
-                        if (Guid.TryParse(wsMessage.SenderId, out Guid sender) && Guid.TryParse(wsMessage.ChannelId, out Guid channel))
-                        {
-                            ChatMessage chatMessage = new ChatMessage
-                            {
-                                Id = Guid.NewGuid(),
-                                SenderId = sender,
-                                ChannelId = channel,
-                                Content = wsMessage.Content,
-                                Timestamp = DateTime.Now,
-                                Type = MessageType.Text
-                            };
-                            MessageReceived?.Invoke(this, new IMMessageEventArgs(chatMessage));
-                        }
-                    }
-                    break;
-
-                case "permission_response":
-                    if (!string.IsNullOrEmpty(wsMessage.SenderId) && Guid.TryParse(wsMessage.SenderId, out Guid userGuid))
-                    {
-                        if (_pendingPermissionRequests.TryGetValue(userGuid, out TaskCompletionSource<AskPermissionResult>? tcs))
-                        {
-                            AskPermissionResult result = new AskPermissionResult
-                            {
-                                Allowed = wsMessage.Content?.ToLower() == "allow"
-                            };
-                            tcs.SetResult(result);
-                            _pendingPermissionRequests.Remove(userGuid);
-                        }
-                    }
-                    break;
-
-                case "stream_chunk":
-                    if (!string.IsNullOrEmpty(wsMessage.SenderId) && !string.IsNullOrEmpty(wsMessage.ChannelId))
-                    {
-                        if (Guid.TryParse(wsMessage.SenderId, out Guid streamSender) && Guid.TryParse(wsMessage.ChannelId, out Guid streamChannel))
-                        {
-                            StreamChunk? chunk = JsonSerializer.Deserialize<StreamChunk>(wsMessage.Content ?? "{}", new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                            if (chunk != null)
-                            {
-                                StreamChunkReceived?.Invoke(this, new StreamChunkEventArgs(streamSender, streamChannel, chunk));
-                            }
-                        }
-                    }
-                    break;
-
-                case "pong":
-                    _webSocketHandler.UpdateActivity(ws);
-                    break;
-
-                case "poll_streaming":
-                    if (!string.IsNullOrEmpty(wsMessage.ChannelId) && Guid.TryParse(wsMessage.ChannelId, out Guid pollSessionId))
-                    {
-                        StreamingBuffer? buffer = null;
-                        lock (_streamingLock)
-                        {
-                            _streamingBuffers.TryGetValue(pollSessionId, out buffer);
-                        }
-
-                        WebSocketMessage streamingResponse = new WebSocketMessage
-                        {
-                            Type = "streaming_data",
-                            ChannelId = pollSessionId.ToString(),
-                            Timestamp = DateTime.UtcNow
-                        };
-
-                        if (buffer != null && buffer.IsActive)
-                        {
-                            streamingResponse.Content = buffer.Content.ToString();
-                            streamingResponse.Thinking = buffer.Thinking.Length > 0 ? buffer.Thinking.ToString() : null;
-                            streamingResponse.SenderId = buffer.SenderId.ToString();
-                            streamingResponse.SenderName = buffer.SenderName;
-                            streamingResponse.StreamId = buffer.StreamId;
-                        }
-                        else
-                        {
-                            streamingResponse.Content = string.Empty;
-                        }
-
-                        await _webSocketHandler.SendToAsync(ws, streamingResponse.ToJson());
-                    }
-                    break;
-
-                case "poll_history":
-                    if (!string.IsNullOrEmpty(wsMessage.ChannelId) && Guid.TryParse(wsMessage.ChannelId, out Guid historySessionId))
-                    {
-                        Guid? requestUserId = null;
-                        if (!string.IsNullOrEmpty(wsMessage.SenderId) && Guid.TryParse(wsMessage.SenderId, out Guid parsedUserId))
-                        {
-                            requestUserId = parsedUserId;
-                        }
-
-                        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
-                        if (chatSystem != null)
-                        {
-                            ISession? session = chatSystem.GetSessionByChannelId(historySessionId);
-                            if (session == null)
-                            {
-                                session = chatSystem.GetSession(historySessionId);
-                            }
-
-                            List<ChatMessage> messages = session?.GetMessages(0, 500) ?? new List<ChatMessage>();
-                            string? afterId = wsMessage.Content;
-                            List<ChatMessage> filtered = messages;
-                            if (!string.IsNullOrEmpty(afterId) && Guid.TryParse(afterId, out Guid afterGuid))
-                            {
-                                int idx = messages.FindIndex(m => m.Id == afterGuid);
-                                if (idx >= 0)
-                                {
-                                    filtered = messages.Skip(idx + 1).ToList();
-                                }
-                                else
-                                {
-                                    filtered = new List<ChatMessage>();
-                                }
-                            }
-
-                            var historyData = filtered.Select(m =>
-                            {
-                                string roleStr;
-                                if (m.Role != null)
-                                {
-                                    roleStr = m.Role.Value.ToString();
-                                }
-                                else if (requestUserId.HasValue && m.SenderId == requestUserId.Value)
-                                {
-                                    roleStr = "User";
-                                }
-                                else
-                                {
-                                    roleStr = "Assistant";
-                                }
-                                return new
-                                {
-                                    id = m.Id.ToString(),
-                                    senderId = m.SenderId.ToString(),
-                                    content = m.Content,
-                                    thinking = m.Thinking,
-                                    role = roleStr,
-                                    timestamp = m.Timestamp
-                                };
-                            }).ToList();
-
-                            WebSocketMessage historyResponse = new WebSocketMessage
-                            {
-                                Type = "history_data",
-                                ChannelId = historySessionId.ToString(),
-                                Content = JsonSerializer.Serialize(historyData),
-                                Timestamp = DateTime.UtcNow
-                            };
-
-                            await _webSocketHandler.SendToAsync(ws, historyResponse.ToJson());
-                        }
-                    }
-                    break;
-            }
+            _ = SendHistoryToClientAsync(client);
         }
-        catch (Exception ex)
+    }
+
+    private void OnSSEDisconnected(SSEClient client)
+    {
+        _logger.Info($"SSE client disconnected: userId={client.UserId}");
+    }
+
+    private async Task SendHistoryToClientAsync(SSEClient client)
+    {
+        if (!client.ChannelId.HasValue)
         {
-            Console.WriteLine($"WebSocket message error: {ex.Message}");
+            _logger.Debug("SendHistoryToClientAsync: channelId is null");
+            return;
+        }
+
+        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
+        if (chatSystem == null)
+        {
+            _logger.Debug("SendHistoryToClientAsync: chatSystem is null");
+            return;
+        }
+
+        _logger.Info($"SendHistoryToClientAsync: looking for session with channelId={client.ChannelId.Value}");
+        ISession? session = chatSystem.GetSessionByChannelId(client.ChannelId.Value);
+        if (session == null)
+        {
+            _logger.Debug("SendHistoryToClientAsync: GetSessionByChannelId returned null, trying GetSession");
+            session = chatSystem.GetSession(client.ChannelId.Value);
+        }
+
+        if (session == null)
+        {
+            _logger.Warn($"SendHistoryToClientAsync: session not found for channelId={client.ChannelId.Value}");
+            return;
+        }
+
+        List<ChatMessage> messages = session.GetMessages(0, 500);
+        _logger.Info($"SendHistoryToClientAsync: found {messages.Count} messages for session {session.Id}");
+        await _sseHandler.SendHistoryAsync(client, messages, client.UserId);
+    }
+
+    public void HandleChatMessage(Guid senderId, Guid channelId, string content)
+    {
+        ChatMessage chatMessage = new ChatMessage
+        {
+            Id = Guid.NewGuid(),
+            SenderId = senderId,
+            ChannelId = channelId,
+            Content = content,
+            Timestamp = DateTime.Now,
+            Type = MessageType.Text
+        };
+        MessageReceived?.Invoke(this, new IMMessageEventArgs(chatMessage));
+    }
+
+    public void HandlePermissionResponse(Guid userId, bool allowed)
+    {
+        if (_pendingPermissionRequests.TryGetValue(userId, out TaskCompletionSource<AskPermissionResult>? tcs))
+        {
+            AskPermissionResult result = new AskPermissionResult
+            {
+                Allowed = allowed
+            };
+            tcs.SetResult(result);
+            _pendingPermissionRequests.Remove(userId);
         }
     }
 
@@ -273,24 +160,25 @@ public class WebUIProvider : IIMProvider
 
     public Task StopAsync()
     {
-        _webSocketHandler.Dispose();
+        _sseHandler.Dispose();
         return Task.CompletedTask;
     }
 
     public async Task SendMessageAsync(Guid senderId, Guid channelId, string content, string? thinking = null, string? senderName = null)
     {
-        WebSocketMessage message = new WebSocketMessage
+        var message = new
         {
-            Type = "chat",
-            SenderId = senderId.ToString(),
-            SenderName = senderName,
-            ChannelId = channelId.ToString(),
-            Content = content,
-            Thinking = thinking,
-            Timestamp = DateTime.Now
+            type = "chat",
+            senderId = senderId.ToString(),
+            senderName,
+            channelId = channelId.ToString(),
+            content,
+            thinking,
+            timestamp = DateTime.Now
         };
 
-        await _webSocketHandler.SendToAllAsync(message.ToJson());
+        await _sseHandler.SendToChannelAsync(channelId, "message", message);
+        _logger.Debug($"Message sent to channel {channelId}");
     }
 
     public async Task SendStreamChunkAsync(Guid senderId, Guid channelId, StreamChunk chunk)
@@ -334,31 +222,32 @@ public class WebUIProvider : IIMProvider
             }
         }
 
-        WebSocketMessage message = new WebSocketMessage
+        var message = new
         {
-            Type = "streaming_data",
-            SenderId = senderId.ToString(),
-            ChannelId = channelId.ToString(),
-            Content = accumulatedContent,
-            Thinking = accumulatedThinking,
-            StreamId = chunk.StreamId,
-            IsFinal = chunk.IsFinal,
-            Timestamp = DateTime.UtcNow
+            type = "streaming",
+            senderId = senderId.ToString(),
+            channelId = channelId.ToString(),
+            content = accumulatedContent,
+            thinking = accumulatedThinking,
+            streamId = chunk.StreamId.ToString(),
+            isFinal = chunk.IsFinal,
+            timestamp = DateTime.UtcNow
         };
 
-        await _webSocketHandler.SendToAllAsync(message.ToJson());
+        await _sseHandler.SendToChannelAsync(channelId, "streaming", message);
+        _logger.Trace($"Stream chunk sent to channel {channelId}, isFinal={chunk.IsFinal}");
     }
 
     public async Task<AskPermissionResult> AskPermissionAsync(PermissionType permissionType, string resource, string allowCode, string denyCode)
     {
-        WebSocketMessage message = new WebSocketMessage
+        var message = new
         {
-            Type = "permission_ask",
-            Content = $"Permission required: {permissionType}\nResource: {resource}\nAllow code: {allowCode}\nDeny code: {denyCode}",
-            Timestamp = DateTime.UtcNow
+            type = "permission_ask",
+            content = $"Permission required: {permissionType}\nResource: {resource}\nAllow code: {allowCode}\nDeny code: {denyCode}",
+            timestamp = DateTime.UtcNow
         };
 
-        await _webSocketHandler.SendToAllAsync(message.ToJson());
+        await _sseHandler.SendToAllAsync("permission", message);
 
         var tcs = new TaskCompletionSource<AskPermissionResult>();
         var userId = Guid.Empty;
@@ -379,19 +268,13 @@ public class WebUIProvider : IIMProvider
         }
     }
 
-    public void AddConnection(Guid userId, System.Net.WebSockets.WebSocket webSocket)
+    public async Task NotifyChannelChanged(Guid userId, Guid channelId)
     {
-        lock (_lock)
+        SSEClient? client = _sseHandler.GetClient(userId);
+        if (client != null)
         {
-            _userConnections[userId] = webSocket;
-        }
-    }
-
-    public void RemoveConnection(Guid userId)
-    {
-        lock (_lock)
-        {
-            _userConnections.Remove(userId);
+            client.ChannelId = channelId;
+            await SendHistoryToClientAsync(client);
         }
     }
 }

@@ -99,7 +99,22 @@ public class JsProp : JsSyntax
         Key = key;
         Value = value;
     }
-    public override string Build() => $"{Key()}: {Value().Build()}";
+    private static bool IsValidIdentifier(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return false;
+        if (!char.IsLetter(name[0]) && name[0] != '_' && name[0] != '$') return false;
+        for (int i = 1; i < name.Length; i++)
+        {
+            if (!char.IsLetterOrDigit(name[i]) && name[i] != '_' && name[i] != '$') return false;
+        }
+        return true;
+    }
+    public override string Build()
+    {
+        var key = Key();
+        var keyStr = IsValidIdentifier(key) ? key : $"\"{key}\"";
+        return $"{keyStr}: {Value().Build()}";
+    }
 }
 
 public class JsObj : JsSyntax

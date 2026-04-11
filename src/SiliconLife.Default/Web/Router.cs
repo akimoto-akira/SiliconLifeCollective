@@ -25,13 +25,10 @@ public class Router
     private readonly Dictionary<string, Func<Controller>> _controllers = new();
     private readonly Dictionary<string, string> _mimeTypes = new();
     private string _staticFilesPath = string.Empty;
-    private WebSocketRouteHandler? _webSocketHandler;
-    private WebSocketHandler? _sharedWebSocketHandler;
+    private SSEHandler? _sharedSSEHandler;
     private bool _isInitialized = false;
     private Action<string>? _onFirstInit;
     private const string InitPath = "/init";
-
-    public delegate Task WebSocketRouteHandler(WebSocketHandler handler, string message);
 
     public Router()
     {
@@ -42,6 +39,7 @@ public class Router
     {
         RegisterController(() => new DashboardController(), "/dashboard");
         RegisterController(() => new ChatController(), "/chat");
+        RegisterController(() => new ChatController(), "/api/chat/stream");
         RegisterController(() => new ChatController(), "/api/chat/conversations");
         RegisterController(() => new ChatController(), "/api/chat/messages");
         RegisterController(() => new ChatController(), "/api/chat/history");
@@ -119,14 +117,9 @@ public class Router
         SetInitialized(true);
     }
 
-    public void RegisterWebSocket(string path, WebSocketRouteHandler handler)
+    public void SetSharedSSEHandler(SSEHandler handler)
     {
-        _webSocketHandler = handler;
-    }
-
-    public void SetSharedWebSocketHandler(WebSocketHandler handler)
-    {
-        _sharedWebSocketHandler = handler;
+        _sharedSSEHandler = handler;
     }
 
     public void RegisterController(Func<Controller> controllerFactory, string basePath)
@@ -140,27 +133,11 @@ public class Router
         _controllers[key] = controllerFactory;
     }
 
-    public async Task HandleWebSocket(HttpListenerContext context)
+    public async Task HandleSSE(HttpListenerContext context, Guid userId, Guid? channelId)
     {
-        if (_sharedWebSocketHandler != null)
+        if (_sharedSSEHandler != null)
         {
-            await _sharedWebSocketHandler.HandleWebSocketRequest(context);
-        }
-        else if (_webSocketHandler != null)
-        {
-            WebSocketHandler handler = new WebSocketHandler();
-            handler.OnMessageReceived += async (ws, msg) =>
-            {
-                try
-                {
-                    await _webSocketHandler(handler, msg);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"WebSocket handler error: {ex.Message}");
-                }
-            };
-            await handler.HandleWebSocketRequest(context);
+            await _sharedSSEHandler.HandleSSERequest(context, userId, channelId);
         }
         else
         {

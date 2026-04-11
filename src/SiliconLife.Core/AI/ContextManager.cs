@@ -530,10 +530,6 @@ public class ContextManager
         {
             // Tool calls executed, results persisted — yield time slice
         }
-        else if (response.Success && !string.IsNullOrEmpty(response.Content))
-        {
-            DeliverOutput(response.Content, response.Thinking);
-        }
 
         return response;
     }
@@ -576,10 +572,6 @@ public class ContextManager
         if (response.Success && response.HasToolCalls)
         {
             // Tool calls executed, results persisted — yield time slice
-        }
-        else if (response.Success && !string.IsNullOrEmpty(response.Content))
-        {
-            DeliverOutput(response.Content, response.Thinking);
         }
 
         return response;

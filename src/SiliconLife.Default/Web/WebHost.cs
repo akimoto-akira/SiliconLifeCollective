@@ -104,16 +104,8 @@ public class WebHost : IDisposable
             {
                 var context = await _listener.GetContextAsync().WaitAsync(token);
                 
-                if (context.Request.IsWebSocketRequest)
-                {
-                    _logger.Debug("WebSocket request received");
-                    _ = Task.Run(() => HandleWebSocketRequestAsync(context), token);
-                }
-                else
-                {
-                    _logger.Trace($"Accepted request: {context.Request.HttpMethod} {context.Request.Url?.AbsolutePath}");
-                    _ = Task.Run(() => HandleRequestAsync(context), token);
-                }
+                _logger.Trace($"Accepted request: {context.Request.HttpMethod} {context.Request.Url?.AbsolutePath}");
+                _ = Task.Run(() => HandleRequestAsync(context), token);
             }
             catch (OperationCanceledException)
             {
@@ -126,26 +118,6 @@ public class WebHost : IDisposable
             catch (Exception ex)
             {
                 _logger.Error($"Error accepting request: {ex.Message}");
-            }
-        }
-    }
-
-    private async Task HandleWebSocketRequestAsync(HttpListenerContext context)
-    {
-        try
-        {
-            await _router.HandleWebSocket(context);
-        }
-        catch (Exception ex)
-        {
-            _logger.Error($"Error handling WebSocket: {ex.Message}");
-            try
-            {
-                context.Response.StatusCode = 500;
-                context.Response.Close();
-            }
-            catch
-            {
             }
         }
     }

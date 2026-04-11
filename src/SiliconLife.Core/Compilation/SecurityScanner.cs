@@ -118,7 +118,7 @@ public static class SecurityScanner
     {
         ArgumentNullException.ThrowIfNull(sourceCode);
 
-        _logger.Debug("Security scanning source code, length={Length}", sourceCode.Length);
+        _logger.Debug("Security scanning source code, length={0}", sourceCode.Length);
 
         var violations = new List<string>();
         string worstSeverity = "none";
@@ -128,7 +128,7 @@ public static class SecurityScanner
             if (pattern.IsMatch(sourceCode))
             {
                 violations.Add($"[{severity.ToUpperInvariant()}] {description} (pattern: {pattern})");
-                _logger.Warn("Security violation: [{Severity}] {Description}", severity.ToUpperInvariant(), description);
+                _logger.Warn("Security violation: [{0}] {1}", severity.ToUpperInvariant(), description);
 
                 if (GetSeverityLevel(severity) > GetSeverityLevel(worstSeverity))
                 {
@@ -163,7 +163,7 @@ public static class SecurityScanner
             if (!AllowedAssemblyNames.Contains(cleanName))
             {
                 unauthorized.Add(cleanName);
-                _logger.Warn("Unauthorized assembly reference: {AssemblyName}", cleanName);
+                _logger.Warn("Unauthorized assembly reference: {0}", cleanName);
             }
         }
 

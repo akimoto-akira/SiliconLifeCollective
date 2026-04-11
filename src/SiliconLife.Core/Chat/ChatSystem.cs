@@ -57,7 +57,7 @@ public class ChatSystem
         ISession? session = GetSessionByChannelId(channelId);
         ChatMessage message = new(senderId, channelId, content) { Thinking = thinking };
         session?.AddMessage(message);
-        _logger.Debug("Message added: sender={SenderId}, channel={ChannelId}, length={Length}", senderId, channelId, content.Length);
+        _logger.Debug("Message added: sender={0}, channel={1}, length={2}", senderId, channelId, content.Length);
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public class ChatSystem
     public List<ChatMessage> GetMessages(Guid userId, Guid beingId, int limit = 50)
     {
         ISession session = GetOrCreateSession(userId, beingId);
-        _logger.Debug("Retrieving messages: user={UserId}, being={BeingId}, limit={Limit}", userId, beingId, limit);
+        _logger.Debug("Retrieving messages: user={0}, being={1}, limit={2}", userId, beingId, limit);
         return session.GetMessages(0, limit);
     }
 
@@ -96,20 +96,20 @@ public class ChatSystem
                 if (session is SingleChatSession single &&
                     single.Participant1 == participant1 && single.Participant2 == participant2)
                 {
-                    _logger.Trace("Reusing existing session: {SessionId}", session.Id);
+                    _logger.Trace("Reusing existing session: {0}", session.Id);
                     return session;
                 }
                 if (session is SingleChatSession single2 &&
                     single2.Participant1 == participant2 && single2.Participant2 == participant1)
                 {
-                    _logger.Trace("Reusing existing session: {SessionId}", session.Id);
+                    _logger.Trace("Reusing existing session: {0}", session.Id);
                     return session;
                 }
             }
 
             SingleChatSession newSession = new(participant1, participant2, _storage);
             _sessions[newSession.Id] = newSession;
-            _logger.Info("Created new single chat session: {SessionId}, participants={P1},{P2}", newSession.Id, participant1, participant2);
+            _logger.Info("Created new single chat session: {0}, participants={1},{2}", newSession.Id, participant1, participant2);
             return newSession;
         }
     }
@@ -139,7 +139,7 @@ public class ChatSystem
         {
             GroupChatSession newSession = new(groupId, members, _storage);
             _sessions[groupId] = newSession;
-            _logger.Info("Created group chat session: {GroupId}, members={Count}", groupId, members.Count);
+            _logger.Info("Created group chat session: {0}, members={1}", groupId, members.Count);
             return newSession;
         }
     }
@@ -190,7 +190,7 @@ public class ChatSystem
             }
         }
 
-        _logger.Debug("Found {Count} pending messages for being {BeingId}", result.Count, beingId);
+        _logger.Debug("Found {0} pending messages for being {1}", result.Count, beingId);
         return result;
     }
 
@@ -207,7 +207,7 @@ public class ChatSystem
                 session.MarkMessageAsRead(messageId, readerId);
             }
         }
-        _logger.Trace("Message {MessageId} marked as read by {ReaderId}", messageId, readerId);
+        _logger.Trace("Message {0} marked as read by {1}", messageId, readerId);
     }
 
     /// <summary>

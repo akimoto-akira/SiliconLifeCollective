@@ -88,7 +88,7 @@ public class PermissionManager
         _defaultCallback = callback;
         _askHandler = askHandler;
         _frequencyCache = new UserFrequencyCache(cacheExpiration ?? TimeSpan.FromHours(1));
-        _logger.Info("PermissionManager created for being {BeingName} ({BeingId})", owner.Name, owner.Id);
+        _logger.Info("PermissionManager created for being {0} ({1})", owner.Name, owner.Id);
     }
 
     /// <summary>
@@ -99,7 +99,7 @@ public class PermissionManager
     public void SetCustomCallback(IPermissionCallback customCallback)
     {
         _callback = customCallback ?? throw new ArgumentNullException(nameof(customCallback));
-        _logger.Info("Custom permission callback set for being {BeingId}", OwnerId);
+        _logger.Info("Custom permission callback set for being {0}", OwnerId);
     }
 
     /// <summary>
@@ -108,7 +108,7 @@ public class PermissionManager
     public void ResetCallback()
     {
         _callback = _defaultCallback;
-        _logger.Info("Permission callback reset to default for being {BeingId}", OwnerId);
+        _logger.Info("Permission callback reset to default for being {0}", OwnerId);
     }
 
     /// <summary>

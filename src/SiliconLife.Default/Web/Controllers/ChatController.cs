@@ -15,6 +15,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using SiliconLife.Collective;
+using SiliconLife.Default.IM;
 using SiliconLife.Default.Web.Models;
 using SiliconLife.Default.Web.Views;
 
@@ -46,6 +47,10 @@ public class ChatController : Controller
         {
             Index();
         }
+        else if (_currentPath == "/api/chat/stream")
+        {
+            HandleSSE();
+        }
         else if (_currentPath == "/api/chat/conversations")
         {
             GetConversations();
@@ -73,16 +78,93 @@ public class ChatController : Controller
     {
         var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
         var view = new ChatView();
+        var beings = _beingManager.GetAllBeings();
+        var beingDict = beings.ToDictionary(b => b.Id);
+        var userNickname = Config.Instance?.Data?.UserNickname ?? "User";
+        var loc = LocalizationManager.Instance.GetLocalization(Config.Instance?.Data?.Language ?? Language.ZhCN);
+
+        var sessions = new List<ChatSessionItem>();
+        Guid? currentSessionId = null;
+        string currentBeingName = "";
+
+        foreach (var session in _chatSystem.GetSessionsForUser(_userId, beings.Select(b => b.Id)))
+        {
+            var messages = session.GetMessages(0, 1);
+            var lastMsg = messages.LastOrDefault();
+
+            string displayName;
+            if (session.Type == SessionType.SingleChat)
+            {
+                var otherId = session.Members.FirstOrDefault(id => id != _userId);
+                if (otherId != Guid.Empty && beingDict.TryGetValue(otherId, out var being))
+                {
+                    displayName = loc.GetSingleChatDisplayName(being.Name);
+                    if (currentSessionId == null)
+                    {
+                        currentSessionId = session.Id;
+                        currentBeingName = being.Name;
+                    }
+                }
+                else if (otherId != Guid.Empty)
+                {
+                    displayName = userNickname;
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                var memberNames = session.Members
+                    .Select(id => id == _userId ? userNickname : beingDict.GetValueOrDefault(id)?.Name ?? id.ToString("N").Substring(0, 8))
+                    .ToArray();
+                displayName = string.Join(", ", memberNames);
+            }
+
+            sessions.Add(new ChatSessionItem
+            {
+                Id = session.Id,
+                Name = displayName,
+                LastMessage = lastMsg?.Content ?? "",
+                LastMessageAt = lastMsg?.Timestamp ?? DateTime.MinValue
+            });
+        }
 
         var vm = new ChatViewModel
         {
             Skin = skin,
             ActiveMenu = "chat",
             UserId = _userId,
+            Sessions = sessions,
+            CurrentBeingId = currentSessionId,
+            CurrentBeingName = currentBeingName
         };
 
         var html = view.Render(vm);
         RenderHtml(html);
+    }
+
+    private void HandleSSE()
+    {
+        var channelIdStr = Request.QueryString["channelId"];
+        Guid? channelId = null;
+
+        if (!string.IsNullOrEmpty(channelIdStr) && Guid.TryParse(channelIdStr, out var parsedChannelId))
+        {
+            channelId = parsedChannelId;
+        }
+
+        var router = ServiceLocator.Instance.GetService<Router>();
+        if (router != null)
+        {
+            _ = router.HandleSSE(Context, _userId, channelId);
+        }
+        else
+        {
+            Response.StatusCode = 500;
+            Response.Close();
+        }
     }
 
     private void GetConversations()
@@ -93,8 +175,6 @@ public class ChatController : Controller
             var beings = _beingManager.GetAllBeings();
             var beingDict = beings.ToDictionary(b => b.Id);
             var userNickname = Config.Instance?.Data?.UserNickname ?? "User";
-
-            Console.WriteLine($"[ChatController] GetConversations: {beings.Count} beings, userId={_userId}");
 
             foreach (var session in _chatSystem.GetSessionsForUser(_userId, _beingManager.GetAllBeings().Select(b => b.Id)))
             {
@@ -107,7 +187,6 @@ public class ChatController : Controller
                 if (session.Type == SessionType.SingleChat)
                 {
                     type = "single";
-                    // Find the other participant and set partner name for session display
                     var otherId = session.Members.FirstOrDefault(id => id != _userId);
                     if (otherId != Guid.Empty && beingDict.TryGetValue(otherId, out var being))
                     {
@@ -142,12 +221,10 @@ public class ChatController : Controller
                 });
             }
 
-            Console.WriteLine($"[ChatController] GetConversations: returning {conversations.Count} conversations");
             RenderJson(conversations);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[ChatController] GetConversations ERROR: {ex}");
             RenderJson(new { error = ex.Message });
         }
     }
@@ -202,15 +279,28 @@ public class ChatController : Controller
             var result = messages.Select(m =>
             {
                 var senderBeing = m.SenderId != _userId && beingDict.TryGetValue(m.SenderId, out var b) ? b : null;
+                string roleStr;
+                if (m.Role != null)
+                {
+                    roleStr = m.Role.Value.ToString();
+                }
+                else if (m.SenderId == _userId)
+                {
+                    roleStr = "User";
+                }
+                else
+                {
+                    roleStr = "Assistant";
+                }
                 return new
                 {
-                    isUser = m.SenderId == _userId,
-                    senderName = senderBeing?.Name ?? "",
-                    text = m.Content,
+                    id = m.Id.ToString(),
+                    senderId = m.SenderId.ToString(),
+                    content = m.Content,
                     thinking = m.Thinking,
-                    toolCalls = string.IsNullOrEmpty(m.ToolCallsJson) ? null
-                        : System.Text.Json.JsonSerializer.Deserialize<List<ToolCallInfo>>(m.ToolCallsJson),
-                    time = m.Timestamp.ToString("HH:mm")
+                    role = roleStr,
+                    senderName = senderBeing?.Name ?? "",
+                    timestamp = m.Timestamp
                 };
             });
 
@@ -218,7 +308,6 @@ public class ChatController : Controller
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[ChatController] GetHistory ERROR: {ex}");
             RenderJson(new { messages = Array.Empty<object>(), error = ex.Message });
         }
     }
@@ -228,67 +317,32 @@ public class ChatController : Controller
         try
         {
             var body = GetJsonBody<SendRequest>();
-            if (body == null || !Guid.TryParse(body.SessionId, out var sessionId) || string.IsNullOrEmpty(body.Message))
+            if (body == null || !Guid.TryParse(body.ChannelId, out var channelId) || string.IsNullOrEmpty(body.Content))
             {
                 RenderJson(new { success = false, error = "Invalid request" });
                 return;
             }
 
-            var session = _chatSystem.GetSession(sessionId);
-            if (session == null)
+            var imProvider = ServiceLocator.Instance.GetService<IIMProvider>();
+            if (imProvider is not WebUIProvider webUIProvider)
             {
-                RenderJson(new { success = false, error = "Session not found" });
+                RenderJson(new { success = false, error = "Provider not available" });
                 return;
             }
 
-            // Build message: receiver is the first other member in the session
-            var receiverId = session.Members.FirstOrDefault(id => id != _userId);
-            if (receiverId == Guid.Empty)
-            {
-                RenderJson(new { success = false, error = "No receiver in session" });
-                return;
-            }
+            webUIProvider.HandleChatMessage(_userId, channelId, body.Content);
 
-            _chatSystem.AddMessage(_userId, receiverId, body.Message);
-
-            // Retrieve pending AI replies from beings in this session
-            var reply = session.Members
-                .Where(id => id != _userId)
-                .SelectMany(beingId => _chatSystem.GetPendingMessages(beingId))
-                .FirstOrDefault();
-
-            RenderJson(new
-            {
-                success = true,
-                reply = reply != null ? new
-                {
-                    isUser = false,
-                    senderName = _beingManager.GetBeing(reply.SenderId)?.Name ?? "",
-                    text = reply.Content,
-                    thinking = reply.Thinking,
-                    toolCalls = string.IsNullOrEmpty(reply.ToolCallsJson) ? null
-                        : System.Text.Json.JsonSerializer.Deserialize<List<ToolCallInfo>>(reply.ToolCallsJson),
-                    time = reply.Timestamp.ToString("HH:mm")
-                } : null
-            });
+            RenderJson(new { success = true });
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[ChatController] SendMessage ERROR: {ex}");
             RenderJson(new { success = false, error = ex.Message });
         }
     }
 
     private class SendRequest
     {
-        public string? SessionId { get; set; }
-        public string? Message { get; set; }
-    }
-
-    private class ToolCallInfo
-    {
-        public string Name { get; set; } = "";
-        public string? Target { get; set; }
-        public bool Success { get; set; }
+        public string? ChannelId { get; set; }
+        public string? Content { get; set; }
     }
 }

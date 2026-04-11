@@ -100,13 +100,13 @@ public class UserFrequencyCache
                     resource.StartsWith(entry.ResourcePrefix, StringComparison.OrdinalIgnoreCase))
                 {
                     _cache[i] = new CachedPermission(permissionType, resource, result, DateTime.UtcNow + _expiration);
-                    _logger.Debug("Frequency cache recorded: type={Type}, resource={Resource}, result={Result}", permissionType, resource, result);
+                    _logger.Debug("Frequency cache recorded: type={0}, resource={1}, result={2}", permissionType, resource, result);
                     return;
                 }
             }
 
             _cache.Add(new CachedPermission(permissionType, resource, result, DateTime.UtcNow + _expiration));
-            _logger.Debug("Frequency cache recorded: type={Type}, resource={Resource}, result={Result}", permissionType, resource, result);
+            _logger.Debug("Frequency cache recorded: type={0}, resource={1}, result={2}", permissionType, resource, result);
             CleanExpired();
         }
     }
@@ -129,12 +129,12 @@ public class UserFrequencyCache
                 if (entry.PermissionType == permissionType &&
                     resource.StartsWith(entry.ResourcePrefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    _logger.Trace("Frequency cache hit: type={Type}, resource={Resource}, result={Result}", permissionType, resource, entry.Result);
+                    _logger.Trace("Frequency cache hit: type={0}, resource={1}, result={2}", permissionType, resource, entry.Result);
                     return entry.Result;
                 }
             }
         }
-        _logger.Trace("Frequency cache miss: type={Type}, resource={Resource}", permissionType, resource);
+        _logger.Trace("Frequency cache miss: type={0}, resource={1}", permissionType, resource);
         return null;
     }
 
@@ -186,7 +186,7 @@ public class UserFrequencyCache
         int removed = _cache.RemoveAll(e => e.IsExpired);
         if (removed > 0)
         {
-            _logger.Debug("Frequency cache cleanup: removed {Count} expired entries", removed);
+            _logger.Debug("Frequency cache cleanup: removed {0} expired entries", removed);
         }
     }
 }

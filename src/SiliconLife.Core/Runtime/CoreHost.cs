@@ -93,6 +93,11 @@ public class CoreHost
             ServiceLocator.Instance.Register<DynamicBeingLoader>(_builder.DynamicBeingLoader);
             _logger.Debug("Registered service: {0}", nameof(DynamicBeingLoader));
         }
+        if (_builder.IMProvider != null)
+        {
+            ServiceLocator.Instance.Register(_builder.IMProvider);
+            _logger.Debug("Registered service: {0}", _builder.IMProvider.GetType().Name);
+        }
 
         MainLoop.SetConfig(_builder.Config!);
         MainLoop.Start();

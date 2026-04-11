@@ -41,7 +41,7 @@ public class IMManager
         _isRunning = false;
 
         _imProvider.MessageReceived += OnMessageReceived;
-        _logger.Info("IMManager initialized with provider {ProviderName}", imProvider.GetType().Name);
+        _logger.Info("IMManager initialized with provider {0}", imProvider.GetType().Name);
     }
 
     /// <summary>
@@ -51,14 +51,14 @@ public class IMManager
     private void OnMessageReceived(object? sender, IMMessageEventArgs e)
     {
         ChatMessage msg = e.Message;
-        _logger.Info("IM message received: sender={SenderId}, channel={ChannelId}", msg.SenderId, msg.ChannelId);
+        _logger.Info("IM message received: sender={0}, channel={1}", msg.SenderId, msg.ChannelId);
         if (msg.ChannelId == Guid.Empty)
         {
             List<SiliconBeingBase> beings = _beingManager.GetAllBeings();
             if (beings.Count > 0)
             {
                 msg.ChannelId = beings[0].Id;
-                _logger.Debug("Routing message to default being: {BeingId}", beings[0].Id);
+                _logger.Debug("Routing message to default being: {0}", beings[0].Id);
                 _chatSystem.AddMessage(msg.SenderId, msg.ChannelId, msg.Content);
             }
         }
@@ -76,7 +76,7 @@ public class IMManager
     /// <param name="content">The message content.</param>
     public async Task SendMessageAsync(Guid senderId, Guid channelId, string content, string? thinking = null, string? senderName = null)
     {
-        _logger.Debug("Sending IM message: sender={SenderId}, channel={ChannelId}", senderId, channelId);
+        _logger.Debug("Sending IM message: sender={0}, channel={1}", senderId, channelId);
         await _imProvider.SendMessageAsync(senderId, channelId, content, thinking, senderName);
     }
 
@@ -89,7 +89,7 @@ public class IMManager
     /// <param name="chunk">The stream chunk to send.</param>
     public async Task SendStreamChunkAsync(Guid senderId, Guid channelId, StreamChunk chunk)
     {
-        _logger.Trace("Sending stream chunk: sender={SenderId}, channel={ChannelId}", senderId, channelId);
+        _logger.Trace("Sending stream chunk: sender={0}, channel={1}", senderId, channelId);
         await _imProvider.SendStreamChunkAsync(senderId, channelId, chunk);
     }
 

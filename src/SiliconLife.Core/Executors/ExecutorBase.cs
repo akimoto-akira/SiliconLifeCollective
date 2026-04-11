@@ -64,7 +64,7 @@ public abstract class ExecutorBase : IDisposable
     public ExecutorResult Execute(ExecutorRequest request, TimeSpan? timeout = null)
     {
         TimeSpan actualTimeout = timeout ?? DefaultTimeout;
-        _logger.Debug("Executing request: {Request}", request);
+        _logger.Debug("Executing request: {0}", request);
 
         try
         {
@@ -74,13 +74,13 @@ public abstract class ExecutorBase : IDisposable
                 _logger.Debug("Execution completed successfully");
                 return task.Result;
             }
-            _logger.Warn("Execution timed out after {Timeout}ms", actualTimeout.TotalMilliseconds);
+            _logger.Warn("Execution timed out after {0}ms", actualTimeout.TotalMilliseconds);
             return ExecutorResult.Failed("Operation timed out");
         }
         catch (AggregateException ex)
         {
             Exception? inner = ex.InnerException;
-            _logger.Error("Execution failed: {Exception}", ex);
+            _logger.Error("Execution failed: {0}", ex);
             return ExecutorResult.Failed(inner?.Message ?? ex.Message);
         }
     }
@@ -98,7 +98,7 @@ public abstract class ExecutorBase : IDisposable
             return false;
         }
         bool result = _requestQueue.TryAdd(request);
-        _logger.Debug("Request enqueued, queue size={Size}", _requestQueue.Count);
+        _logger.Debug("Request enqueued, queue size={0}", _requestQueue.Count);
         return result;
     }
 
