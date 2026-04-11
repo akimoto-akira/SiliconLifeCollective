@@ -158,6 +158,55 @@ Code is stored AES-256 encrypted on disk. The encryption key is derived from the
 
 ---
 
+## Web UI Architecture
+
+### Skin System
+
+The Web UI features a **pluggable skin system** that allows complete UI customization without changing application logic:
+
+- **ISkin Interface** — Defines the contract for all skins, including:
+  - Core rendering methods (`RenderHtml`, `RenderError`)
+  - UI component library (buttons, inputs, cards, tables, etc.)
+  - Theme CSS generation
+  - Preview information for skin selector
+
+- **Built-in Skins** — 4 production-ready skins:
+  - **Admin** — Professional, data-focused interface for system administration
+  - **Chat** — Conversational, message-centric design for AI interactions
+  - **Creative** — Artistic, visually rich layout for creative workflows
+  - **Dev** — Developer-focused, code-centric interface with syntax highlighting
+
+- **Skin Discovery** — Automatic discovery and registration via reflection (`SkinManager.DiscoverSkins()`)
+
+### Controller System
+
+The Web UI follows a **MVC-like pattern** with 14 controllers handling different aspects:
+
+| Controller | Purpose |
+|------------|---------|
+| Being | Silicon Being management and status |
+| Chat | Real-time chat interface with SSE |
+| CodeBrowser | Code viewing and editing |
+| Config | System configuration |
+| Dashboard | System overview and metrics |
+| Executor | Executor status and management |
+| Init | First-run initialization wizard |
+| Knowledge | Knowledge graph visualization (placeholder) |
+| Log | System log viewer |
+| Memory | Long-term memory browser |
+| Permission | Permission management |
+| PermissionRequest | Permission request queue |
+| Project | Project management (placeholder) |
+| Task | Task system interface |
+
+### Real-time Updates
+
+- **SSE (Server-Sent Events)** — Push-based updates for chat messages, being status, and system events
+- **No WebSocket Required** — Simpler architecture using SSE for most real-time needs
+- **Automatic Reconnection** — Client-side reconnection logic for resilient connections
+
+---
+
 ## Data Directory Structure
 
 ```

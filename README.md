@@ -17,9 +17,13 @@ A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Bei
 - **Executor-Permission Security** — All disk, network, and command-line operations pass through executors with permission verification
   - 5-level permission chain: IsCurator -> UserFrequencyCache -> GlobalACL -> IPermissionCallback -> IPermissionAskHandler
   - Audit logging for all permission decisions
-- **Zero Dependencies** — Core library has zero NuGet packages; built entirely on .NET 9 SDK APIs
+- **Minimal Dependencies** — Core library only depends on Microsoft.CodeAnalysis.CSharp for Roslyn dynamic compilation
 - **Zero Database Dependency** — File-based storage (JSON) with time-indexed queries via `ITimeStorage`
 - **Localization** — Built-in Chinese and English support
+- **Web UI** — Built-in HTTP server with WebSocket/SSE support, multiple skins, and comprehensive dashboard
+  - **Skin System** — 4 built-in skins (Admin, Chat, Creative, Dev) with complete UI component library
+  - **14 Controllers** — Being, Chat, CodeBrowser, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task
+  - **Real-time Updates** — SSE (Server-Sent Events) for live data streaming
 
 ## Tech Stack
 
@@ -29,7 +33,8 @@ A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Bei
 | Language | C# |
 | AI Integration | Ollama (native HTTP API) |
 | Storage | File system (JSON + time-indexed directories) |
-| External Dependencies | None (zero NuGet packages in Core) |
+| Web Server | HttpListener (built-in .NET) |
+| Dynamic Compilation | Roslyn (Microsoft.CodeAnalysis.CSharp) |
 | License | Apache-2.0 |
 
 ## Project Structure
@@ -39,30 +44,43 @@ SiliconLifeCollective.sln
 ├── src/
 │   ├── SiliconLife.Core/                  # Core library (interfaces, abstractions)
 │   │   ├── ServiceLocator.cs             # Global service locator: Register/Get, ChatSystem, IMManager, AuditLogger, GlobalACL
-│   │   ├── Runtime/                       # MainLoop, TickObject (threaded scheduling, watchdog, circuit breaker)
-│   │   ├── SiliconBeing/                  # SiliconBeingBase, ISiliconBeingFactory, SiliconBeingManager, SoulFileManager
-│   │   ├── AI/                            # IAIClient, ContextManager ("brain"), Message, AIRequest/AIResponse
-│   │   ├── Chat/                          # ChatSystem, ISession, SingleChatSession, GroupChatSession, ChatMessage
-│   │   ├── Executors/                     # ExecutorBase, DiskExecutor, NetworkExecutor, CommandLineExecutor
-│   │   ├── Tools/                         # ITool, ToolManager (reflection scanning), ToolCall/ToolResult
-│   │   ├── Security/                      # PermissionManager, GlobalACL, UserFrequencyCache, AuditLogger
+│   │   ├── Runtime/                       # MainLoop, TickObject, CoreHost, CoreHostBuilder, PerformanceMonitor
+│   │   ├── SiliconBeing/                  # SiliconBeingBase, ISiliconBeingFactory, SiliconBeingManager, SoulFileManager, TaskSystem, TimerSystem
+│   │   ├── AI/                            # IAIClient, IAIClientFactory, ContextManager ("brain"), Message, AIRequest/AIResponse
+│   │   ├── Chat/                          # ChatSystem, IChatService, SimpleChatService, ISession, SingleChatSession, GroupChatSession, ChatMessage
+│   │   ├── Executors/                     # ExecutorBase, DiskExecutor, NetworkExecutor, CommandLineExecutor, ExecutorRequest, ExecutorResult
+│   │   ├── Tools/                         # ITool, ToolManager (reflection scanning), ToolCall/ToolResult, ToolDefinition, SiliconManagerOnlyAttribute
+│   │   ├── Security/                      # PermissionManager, GlobalACL, UserFrequencyCache, AuditLogger, PermissionResult, PermissionType
 │   │   ├── IM/                            # IIMProvider, IMManager (message routing)
 │   │   ├── Storage/                       # IStorage, ITimeStorage (key-value + time-indexed)
-│   │   ├── Config/                        # ConfigDataBase, Config (singleton + JSON)
+│   │   ├── Config/                        # ConfigDataBase, Config (singleton + JSON), ConfigDataBaseConverter, GuidConverter
 │   │   ├── Localization/                  # LocalizationBase, LocalizationManager, Language enum
+│   │   ├── Logging/                       # ILogger, ILoggerProvider, LogEntry, LogLevel, LogManager
+│   │   ├── Compilation/                   # DynamicBeingLoader, DynamicCompilationExecutor, SecurityScanner, CodeEncryption
 │   │   └── Time/                          # IncompleteDate (time range queries)
 │   │
 │   └── SiliconLife.Default/               # Default implementations + entry point
 │       ├── Program.cs                     # Application entry (wiring all components)
-│       ├── AI/                            # OllamaClient (native Ollama HTTP API)
+│       ├── AI/                            # OllamaClient, OllamaClientFactory (native Ollama HTTP API)
 │       ├── SiliconBeing/                  # DefaultSiliconBeing, DefaultSiliconBeingFactory
 │       ├── Executors/                     # Default executor implementations
-│       ├── IM/                            # ConsoleIMProvider (console I/O as IM channel)
-│       ├── Tools/                         # Built-in tools: Calendar, Chat, Disk, Network, System
+│       ├── IM/                            # WebUIProvider (Web UI as IM channel)
+│       ├── Tools/                         # Built-in tools: Calendar, Chat, Curator, Disk, DynamicCompile, Memory, Network, System, Task, Timer
 │       ├── Config/                        # DefaultConfigData
-│       ├── Localization/                  # ZhCN, EnUS
+│       ├── Localization/                  # ZhCN, EnUS, DefaultLocalizationBase
+│       ├── Logging/                       # ConsoleLoggerProvider, FileSystemLoggerProvider
 │       ├── Storage/                       # FileSystemStorage, FileSystemTimeStorage
-│       └── Security/                      # DefaultPermissionCallback, IMPermissionAskHandler
+│       ├── Security/                      # DefaultPermissionCallback, IMPermissionAskHandler
+│       └── Web/                           # Web UI implementation
+│           ├── Controllers/               # 14 controllers: Being, Chat, CodeBrowser, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task
+│           ├── Models/                    # ViewModels for all controllers
+│           ├── Views/                     # HTML views
+│           ├── Skins/                     # 4 skins: Admin (professional), Chat (conversational), Creative (artistic), Dev (developer-focused)
+│           ├── ISkin.cs                   # Skin interface with UI component library
+│           ├── WebHost.cs                 # HTTP server
+│           ├── Router.cs                  # Request routing
+│           ├── SSEHandler.cs              # Server-Sent Events
+│           └── WebSecurity.cs             # Web security utilities
 │
 ├── docs/
 │   ├── en-US/                             # English documentation
@@ -107,6 +125,8 @@ dotnet build
 dotnet run --project src/SiliconLife.Default
 ```
 
+The application will start a web server and automatically open the Web UI in your browser.
+
 ### Publish (single file)
 
 ```bash
@@ -124,7 +144,7 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] Phase 7: Dynamic compilation + self-evolution (Roslyn)
 - [x] Phase 8: Long-term memory + Task + Timer
 - [x] Phase 9: CoreHost + multi-agent collaboration
-- [x] Phase 10: Web UI (HTTP + WebSocket)
+- [x] Phase 10: Web UI (HTTP + WebSocket + SSE)
 - [ ] Phase 11: External IM (Feishu / WhatsApp / Telegram)
 - [ ] Phase 12: Knowledge graph, plugins, and extras
 

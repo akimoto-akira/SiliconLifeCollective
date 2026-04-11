@@ -58,7 +58,7 @@ public abstract class ViewBase
         var bodyChildren = new List<object>
         {
             H.Div(
-                RenderHeader(),
+                RenderHeader(localization),
                 H.Div(
                     RenderSidebar(activeMenu, localization),
                     H.MainElement(bodyContent).Class("shell-content")
@@ -77,10 +77,10 @@ public abstract class ViewBase
         return H.DocType() + "\n" + html.Build();
     }
 
-    private static H RenderHeader()
+    private static H RenderHeader(DefaultLocalizationBase localization)
     {
         return H.Header(
-            H.Div("🜲 硅基生命群").Class("shell-brand"),
+            H.Div($"🜲 {localization.BrandName}").Class("shell-brand"),
             H.Div(
                 H.A("⚙").Class("shell-header-link").Href("/config")
             ).Class("shell-header-actions")

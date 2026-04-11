@@ -243,4 +243,55 @@ public class ChatSystem
                 .ToList();
         }
     }
+
+    /// <summary>
+    /// Get message count metrics for the specified time range.
+    /// Returns message counts grouped by minute for the last N minutes.
+    /// </summary>
+    /// <param name="minutes">Number of minutes to look back</param>
+    /// <returns>Dictionary mapping timestamp (HH:mm) to message count</returns>
+    public Dictionary<string, int> GetMessageMetrics(int minutes = 20)
+    {
+        DateTime cutoff = DateTime.Now.AddMinutes(-minutes);
+        Dictionary<string, int> metrics = [];
+
+        lock (_lock)
+        {
+            foreach (ISession session in _sessions.Values)
+            {
+                List<ChatMessage> messages = session.GetMessages(0, int.MaxValue);
+                foreach (ChatMessage message in messages)
+                {
+                    if (message.Timestamp >= cutoff)
+                    {
+                        string key = message.Timestamp.ToString("HH:mm");
+                        if (!metrics.ContainsKey(key))
+                        {
+                            metrics[key] = 0;
+                        }
+                        metrics[key]++;
+                    }
+                }
+            }
+        }
+
+        _logger.Debug("Message metrics collected: {0} time slots", metrics.Count);
+        return metrics;
+    }
+
+    /// <summary>
+    /// Get total message count across all sessions.
+    /// </summary>
+    public int GetTotalMessageCount()
+    {
+        int count = 0;
+        lock (_lock)
+        {
+            foreach (ISession session in _sessions.Values)
+            {
+                count += session.GetMessages(0, int.MaxValue).Count;
+            }
+        }
+        return count;
+    }
 }

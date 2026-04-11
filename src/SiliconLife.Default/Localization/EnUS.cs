@@ -36,6 +36,11 @@ public class EnUS : DefaultLocalizationBase
     public override string WelcomeMessage => "Welcome to Silicon Life Collective!";
 
     /// <summary>
+    /// Gets the brand name
+    /// </summary>
+    public override string BrandName => "Silicon Life Collective";
+
+    /// <summary>
     /// Gets the input prompt
     /// </summary>
     public override string InputPrompt => "> ";
@@ -210,4 +215,21 @@ public class EnUS : DefaultLocalizationBase
     // ===== Chat Localization =====
 
     public override string SingleChatNameFormat => "Chat with {0}";
+    public override string ChatConversationsHeader => "Conversations";
+    public override string ChatNoConversationSelected => "Select a conversation to start chatting";
+    public override string ChatMessageInputPlaceholder => "Type a message...";
+    public override string ChatSendButton => "Send";
+    public override string ChatUserDisplayName => "Me";
+    public override string ChatDefaultBeingName => "AI";
+    public override string ChatThinkingSummary => "💭 Think";
+    public override string GetChatToolCallsSummary(int count) => $"🔧 Tool Calls ({count})";
+
+    // ===== Dashboard Localization =====
+
+    public override string DashboardPageHeader => "Dashboard";
+    public override string DashboardStatTotalBeings => "Total Beings";
+    public override string DashboardStatActiveBeings => "Active Beings";
+    public override string DashboardStatUptime => "Uptime";
+    public override string DashboardStatMemory => "Memory Usage";
+    public override string DashboardChartMessageFrequency => "Message Frequency";
 }

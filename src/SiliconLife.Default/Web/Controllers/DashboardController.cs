@@ -72,10 +72,21 @@ public class DashboardController : Controller
 
     private void GetMetrics()
     {
+        Dictionary<string, int> rawMetrics = _chatSystem.GetMessageMetrics(20);
+        List<string> timestamps = [];
+        List<int> messageCounts = [];
+
+        for (int i = 19; i >= 0; i--)
+        {
+            string timeKey = DateTime.Now.AddMinutes(-i).ToString("HH:mm");
+            timestamps.Add(timeKey);
+            messageCounts.Add(rawMetrics.TryGetValue(timeKey, out int count) ? count : 0);
+        }
+
         RenderJson(new
         {
-            timestamps = Enumerable.Range(0, 20).Select(i => DateTime.Now.AddMinutes(-19 + i).ToString("HH:mm")).ToList(),
-            messageCounts = Enumerable.Range(0, 20).Select(_ => Random.Shared.Next(0, 100)).ToList()
+            timestamps = timestamps,
+            messageCounts = messageCounts
         });
     }
 }

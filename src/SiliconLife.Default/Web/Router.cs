@@ -38,6 +38,8 @@ public class Router
     public void RegisterControllers()
     {
         RegisterController(() => new DashboardController(), "/dashboard");
+        RegisterController(() => new DashboardController(), "/api/dashboard/stats");
+        RegisterController(() => new DashboardController(), "/api/dashboard/metrics");
         RegisterController(() => new ChatController(), "/chat");
         RegisterController(() => new ChatController(), "/api/chat/stream");
         RegisterController(() => new ChatController(), "/api/chat/conversations");

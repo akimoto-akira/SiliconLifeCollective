@@ -36,6 +36,11 @@ public class ZhCN : DefaultLocalizationBase
     public override string WelcomeMessage => "欢迎使用硅基生命群！";
 
     /// <summary>
+    /// Gets the brand name
+    /// </summary>
+    public override string BrandName => "硅基生命群";
+
+    /// <summary>
     /// Gets the input prompt
     /// </summary>
     public override string InputPrompt => "> ";
@@ -210,4 +215,21 @@ public class ZhCN : DefaultLocalizationBase
     // ===== Chat Localization =====
 
     public override string SingleChatNameFormat => "与{0}聊天";
+    public override string ChatConversationsHeader => "会话";
+    public override string ChatNoConversationSelected => "选择会话开始聊天";
+    public override string ChatMessageInputPlaceholder => "输入消息...";
+    public override string ChatSendButton => "发送";
+    public override string ChatUserDisplayName => "我";
+    public override string ChatDefaultBeingName => "AI";
+    public override string ChatThinkingSummary => "💭 Think";
+    public override string GetChatToolCallsSummary(int count) => $"🔧 工具调用 ({count}项)";
+
+    // ===== Dashboard Localization =====
+
+    public override string DashboardPageHeader => "仪表盘";
+    public override string DashboardStatTotalBeings => "硅基人数量";
+    public override string DashboardStatActiveBeings => "活跃硅基人";
+    public override string DashboardStatUptime => "运行时间";
+    public override string DashboardStatMemory => "内存占用";
+    public override string DashboardChartMessageFrequency => "消息频率";
 }

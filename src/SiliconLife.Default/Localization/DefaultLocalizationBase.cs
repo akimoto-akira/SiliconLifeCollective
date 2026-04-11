@@ -27,6 +27,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string WelcomeMessage { get; }
 
     /// <summary>
+    /// Gets the brand name displayed in the header
+    /// </summary>
+    public abstract string BrandName { get; }
+
+    /// <summary>
     /// Gets the prompt displayed when waiting for user input
     /// </summary>
     public abstract string InputPrompt { get; }
@@ -363,4 +368,80 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the page title for permission page
     /// </summary>
     public abstract string PageTitlePermission { get; }
+
+    // ===== Dashboard Localization =====
+
+    /// <summary>
+    /// Gets the dashboard page header text
+    /// </summary>
+    public abstract string DashboardPageHeader { get; }
+
+    /// <summary>
+    /// Gets the label for total beings count statistic
+    /// </summary>
+    public abstract string DashboardStatTotalBeings { get; }
+
+    /// <summary>
+    /// Gets the label for active beings count statistic
+    /// </summary>
+    public abstract string DashboardStatActiveBeings { get; }
+
+    /// <summary>
+    /// Gets the label for uptime statistic
+    /// </summary>
+    public abstract string DashboardStatUptime { get; }
+
+    /// <summary>
+    /// Gets the label for memory usage statistic
+    /// </summary>
+    public abstract string DashboardStatMemory { get; }
+
+    /// <summary>
+    /// Gets the label for message frequency chart
+    /// </summary>
+    public abstract string DashboardChartMessageFrequency { get; }
+
+    // ===== Chat Page Localization =====
+
+    /// <summary>
+    /// Gets the header text for the conversations sidebar
+    /// </summary>
+    public abstract string ChatConversationsHeader { get; }
+
+    /// <summary>
+    /// Gets the placeholder text when no conversation is selected
+    /// </summary>
+    public abstract string ChatNoConversationSelected { get; }
+
+    /// <summary>
+    /// Gets the placeholder text for the message input
+    /// </summary>
+    public abstract string ChatMessageInputPlaceholder { get; }
+
+    /// <summary>
+    /// Gets the text for the send button
+    /// </summary>
+    public abstract string ChatSendButton { get; }
+
+    /// <summary>
+    /// Gets the display name for the user in chat messages
+    /// </summary>
+    public abstract string ChatUserDisplayName { get; }
+
+    /// <summary>
+    /// Gets the default display name for AI beings
+    /// </summary>
+    public abstract string ChatDefaultBeingName { get; }
+
+    /// <summary>
+    /// Gets the summary text for thinking section
+    /// </summary>
+    public abstract string ChatThinkingSummary { get; }
+
+    /// <summary>
+    /// Gets the summary text for tool calls section
+    /// </summary>
+    /// <param name="count">The number of tool calls</param>
+    /// <returns>The formatted summary text</returns>
+    public abstract string GetChatToolCallsSummary(int count);
 }

@@ -42,29 +42,29 @@ public class ChatView : ViewBase
         var msgItems = new List<object>();
         foreach (var msg in vm.Messages)
         {
-            msgItems.Add(RenderMessage(msg));
+            msgItems.Add(RenderMessage(msg, vm.Localization));
         }
 
         return H.Div(
             H.Div(
-                H.Div("会话").Class("chat-conversations-header"),
+                H.Div(vm.Localization.ChatConversationsHeader).Class("chat-conversations-header"),
                 H.Div(sessionItems.ToArray()).Id("beings-list").Class("chat-conversations-list")
             ).Class("chat-conversations"),
             H.Div(
                 H.Div(
-                    H.Span(string.IsNullOrEmpty(vm.CurrentBeingName) ? "选择会话开始聊天" : vm.CurrentBeingName)
+                    H.Span(string.IsNullOrEmpty(vm.CurrentBeingName) ? vm.Localization.ChatNoConversationSelected : vm.CurrentBeingName)
                         .Class("chat-header-name")
                 ).Id("chat-header").Class("chat-header"),
                 H.Div(msgItems.ToArray()).Id("chat-messages").Class("chat-messages"),
                 H.Div(
-                    H.Textarea().Id("message-input").Placeholder("输入消息..."),
-                    H.Div(H.Button("发送").OnClick("sendMessage()")).Class("send-button")
+                    H.Textarea().Id("message-input").Placeholder(vm.Localization.ChatMessageInputPlaceholder),
+                    H.Div(H.Button(vm.Localization.ChatSendButton).OnClick("sendMessage()")).Class("send-button")
                 ).Class("chat-input-area")
             ).Class("chat-main")
         ).Class("chat-layout");
     }
 
-    private static H RenderMessage(ChatMessage msg)
+    private static H RenderMessage(ChatMessage msg, DefaultLocalizationBase localization)
     {
         if (msg.IsUser)
         {
@@ -74,11 +74,11 @@ public class ChatView : ViewBase
             var content = H.Div(bubble).Class("msg-user-content");
             if (!string.IsNullOrEmpty(msg.Time))
                 content.Add(H.Div(msg.Time).Class("msg-time"));
-            var avatar = H.Div(H.Div("U").Class("msg-avatar-icon"), H.Div("我").Class("msg-avatar-name")).Class("msg-user-avatar");
+            var avatar = H.Div(H.Div("U").Class("msg-avatar-icon"), H.Div(localization.ChatUserDisplayName).Class("msg-avatar-name")).Class("msg-user-avatar");
             return H.Div(content, avatar).Class("msg-user");
         }
 
-        var beingDisplayName = !string.IsNullOrEmpty(msg.SenderName) ? msg.SenderName : "AI";
+        var beingDisplayName = !string.IsNullOrEmpty(msg.SenderName) ? msg.SenderName : localization.ChatDefaultBeingName;
         var avatar2 = H.Div(H.Div(beingDisplayName.Substring(0, 1)).Class("msg-avatar-icon"), H.Div(beingDisplayName).Class("msg-avatar-name")).Class("msg-being-avatar");
 
         var children = new List<object>();
@@ -90,7 +90,7 @@ public class ChatView : ViewBase
 
         var thinkContent = msg.Thinking ?? "";
         bodyChildren.Add(H.Details(
-            H.Summary("💭 Think"),
+            H.Summary(localization.ChatThinkingSummary),
             H.Div(thinkContent).Class("msg-thinking-content")
         ).Class("msg-collapsible"));
 
@@ -112,7 +112,7 @@ public class ChatView : ViewBase
                 ).Class("msg-tool-item"));
             }
             bodyChildren.Add(H.Details(
-                H.Summary($"🔧 工具调用 ({tools.Count}项)"),
+                H.Summary(localization.GetChatToolCallsSummary(tools.Count)),
                 H.Div(toolItems.ToArray()).Class("msg-tools-list")
             ).Class("msg-collapsible"));
         }
