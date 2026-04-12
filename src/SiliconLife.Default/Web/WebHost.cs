@@ -171,14 +171,6 @@ public class WebHostBuilder
         return this;
     }
 
-    public WebHostBuilder UseStaticFiles(string path)
-    {
-        if (_router == null)
-            _router = new Router();
-        _router.SetStaticFilesPath(path);
-        return this;
-    }
-
     public WebHost Build()
     {
         if (_router == null)

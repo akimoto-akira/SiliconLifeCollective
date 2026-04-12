@@ -66,6 +66,13 @@ public class JsNumber : JsSyntax
     public override string Build() => Value();
 }
 
+public class JsArrayLiteral : JsSyntax
+{
+    private readonly List<Func<JsSyntax>> _elements = new();
+    public JsArrayLiteral Add(Func<JsSyntax> element) { _elements.Add(element); return this; }
+    public override string Build() => _elements.Count == 0 ? "[]" : $"[{string.Join(", ", _elements.Select(e => e().Build()))}]";
+}
+
 public class JsBool : JsSyntax
 {
     public Func<bool> Value { get; }
@@ -281,11 +288,11 @@ public class JsSwitch : JsSyntax
         foreach (var (value, body) in Cases())
         {
             if (value == null)
-                sb.Append($" default: {{ {string.Join(" ", body.Select(b => b.Build()))} }}");
+                sb.Append($"\n  default: {{\n    {string.Join("\n    ", body.Select(b => b.Build()))}\n  }}");
             else
-                sb.Append($" case {value.Build()}: {{ {string.Join(" ", body.Select(b => b.Build()))} }}");
+                sb.Append($"\n  case {value.Build()}: {{\n    {string.Join("\n    ", body.Select(b => b.Build()))}\n  }}");
         }
-        sb.Append(" }");
+        sb.Append("\n}");
         return sb.ToString();
     }
 }
@@ -390,6 +397,11 @@ public class JsRegex : JsSyntax
     public override string Build() => string.IsNullOrEmpty(Flags()) ? $"/{Pattern()}/" : $"/{Pattern()}/{Flags()}";
 }
 
+public class JsBreak : JsSyntax
+{
+    public override string Build() => "break;";
+}
+
 public static class Js
 {
     public static JsIdent Id(Func<string> name) => new(name);
@@ -397,8 +409,11 @@ public static class Js
     public static JsNumber Num(Func<string> value) => new(value);
     public static JsBool Bool(Func<bool> value) => new(value);
     public static JsNull Null() => new();
+    public static JsBreak Break() => new();
+    public static JsSwitch Switch(Func<JsSyntax> expression, Func<List<(JsSyntax? Value, List<JsSyntax> Body)>> cases) => new(expression, cases);
     public static JsNew New(Func<JsSyntax> constructor, params Func<JsSyntax>[] args) => new(constructor, args);
     public static JsObj Obj() => new();
+    public static JsArrayLiteral Array() => new();
     public static JsBlock Block() => new();
     public static JsConst Const(Func<string> name, Func<JsSyntax> value) => new(name, value);
     public static JsLet Let(Func<string> name, Func<JsSyntax> value) => new(name, value);

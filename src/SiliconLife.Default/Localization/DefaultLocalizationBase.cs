@@ -590,4 +590,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <param name="platform">The platform identifier</param>
     /// <returns>The localized display name</returns>
     public abstract string GetSocialMediaName(string platform);
+
+    /// <summary>
+    /// Gets the localized display name for a log level
+    /// </summary>
+    /// <param name="logLevel">The log level</param>
+    /// <returns>The localized display name</returns>
+    public abstract override string GetLogLevelName(LogLevel logLevel);
 }

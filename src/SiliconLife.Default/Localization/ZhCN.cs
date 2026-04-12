@@ -279,4 +279,19 @@ public class ZhCN : DefaultLocalizationBase
         "Kuaishou" => "快手",
         _ => platform
     };
+
+    /// <summary>
+    /// Gets the localized display name for a log level
+    /// </summary>
+    public override string GetLogLevelName(LogLevel logLevel) => logLevel switch
+    {
+        LogLevel.Trace => "跟踪",
+        LogLevel.Debug => "调试",
+        LogLevel.Information => "信息",
+        LogLevel.Warning => "警告",
+        LogLevel.Error => "错误",
+        LogLevel.Critical => "严重",
+        LogLevel.None => "无",
+        _ => logLevel.ToString()
+    };
 }

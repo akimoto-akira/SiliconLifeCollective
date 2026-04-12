@@ -23,17 +23,10 @@ public class Router
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<Router>();
     private readonly Dictionary<string, Func<Controller>> _controllers = new();
-    private readonly Dictionary<string, string> _mimeTypes = new();
-    private string _staticFilesPath = string.Empty;
     private SSEHandler? _sharedSSEHandler;
     private bool _isInitialized = false;
     private Action<string>? _onFirstInit;
     private const string InitPath = "/init";
-
-    public Router()
-    {
-        InitializeMimeTypes();
-    }
 
     public void RegisterControllers()
     {
@@ -53,6 +46,7 @@ public class Router
         RegisterController(() => new PermissionController(), "/permissions");
         RegisterController(() => new LogController(), "/logs");
         RegisterController(() => new ConfigController(), "/config");
+        RegisterController(() => new ConfigController(), "/config/save", "POST");
         RegisterController(() => new MemoryController(), "/memory");
         RegisterController(() => new KnowledgeController(), "/knowledge");
         RegisterController(() => new ProjectController(), "/project");
@@ -82,32 +76,6 @@ public class Router
     {
         var extension = Path.GetExtension(path);
         return !string.IsNullOrEmpty(extension) && StaticExtensions.Contains(extension);
-    }
-
-    private void InitializeMimeTypes()
-    {
-        _mimeTypes[".html"] = "text/html; charset=utf-8";
-        _mimeTypes[".htm"] = "text/html; charset=utf-8";
-        _mimeTypes[".css"] = "text/css; charset=utf-8";
-        _mimeTypes[".js"] = "application/javascript; charset=utf-8";
-        _mimeTypes[".json"] = "application/json; charset=utf-8";
-        _mimeTypes[".xml"] = "application/xml; charset=utf-8";
-        _mimeTypes[".txt"] = "text/plain; charset=utf-8";
-        _mimeTypes[".png"] = "image/png";
-        _mimeTypes[".jpg"] = "image/jpeg";
-        _mimeTypes[".jpeg"] = "image/jpeg";
-        _mimeTypes[".gif"] = "image/gif";
-        _mimeTypes[".ico"] = "image/x-icon";
-        _mimeTypes[".svg"] = "image/svg+xml";
-        _mimeTypes[".woff"] = "application/font-woff";
-        _mimeTypes[".woff2"] = "application/font-woff2";
-        _mimeTypes[".ttf"] = "application/font-ttf";
-        _mimeTypes[".eot"] = "application/vnd.ms-fontobject";
-    }
-
-    public void SetStaticFilesPath(string path)
-    {
-        _staticFilesPath = path;
     }
 
     public void SetInitialized(bool initialized)
@@ -195,10 +163,6 @@ public class Router
                 controller.SetContext(context, parameters);
                 controller.Handle();
             }
-            else if (!string.IsNullOrEmpty(_staticFilesPath))
-            {
-                await ServeStaticFile(context, path);
-            }
             else
             {
                 await Send404(response);
@@ -258,54 +222,10 @@ public class Router
         return true;
     }
 
-    private async Task ServeStaticFile(HttpListenerContext context, string path)
-    {
-        var request = context.Request;
-        var response = context.Response;
-
-        var filePath = Path.GetFullPath(Path.Combine(_staticFilesPath, path.TrimStart('/')));
-
-        if (!filePath.StartsWith(Path.GetFullPath(_staticFilesPath), StringComparison.OrdinalIgnoreCase))
-        {
-            await Send403(response);
-            return;
-        }
-
-        if (!File.Exists(filePath))
-        {
-            await Send404(response);
-            return;
-        }
-
-        _logger.Trace($"Serving static file: {path}");
-
-        var extension = Path.GetExtension(filePath).ToLowerInvariant();
-        var contentType = _mimeTypes.GetValueOrDefault(extension, "application/octet-stream");
-
-        var content = await File.ReadAllBytesAsync(filePath);
-
-        response.ContentType = contentType;
-        response.ContentLength64 = content.Length;
-        response.StatusCode = 200;
-
-        await response.OutputStream.WriteAsync(content);
-        response.Close();
-    }
-
     private async Task Send404(HttpListenerResponse response)
     {
         byte[] buffer = Encoding.UTF8.GetBytes("404 Not Found");
         response.StatusCode = 404;
-        response.ContentType = "text/plain; charset=utf-8";
-        response.ContentLength64 = buffer.Length;
-        await response.OutputStream.WriteAsync(buffer);
-        response.Close();
-    }
-
-    private async Task Send403(HttpListenerResponse response)
-    {
-        byte[] buffer = Encoding.UTF8.GetBytes("403 Forbidden");
-        response.StatusCode = 403;
         response.ContentType = "text/plain; charset=utf-8";
         response.ContentLength64 = buffer.Length;
         await response.OutputStream.WriteAsync(buffer);

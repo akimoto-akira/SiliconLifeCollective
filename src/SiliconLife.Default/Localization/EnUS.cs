@@ -279,4 +279,19 @@ public class EnUS : DefaultLocalizationBase
         "Kuaishou" => "Kuaishou",
         _ => platform
     };
+
+    /// <summary>
+    /// Gets the localized display name for a log level
+    /// </summary>
+    public override string GetLogLevelName(LogLevel logLevel) => logLevel switch
+    {
+        LogLevel.Trace => "Trace",
+        LogLevel.Debug => "Debug",
+        LogLevel.Information => "Information",
+        LogLevel.Warning => "Warning",
+        LogLevel.Error => "Error",
+        LogLevel.Critical => "Critical",
+        LogLevel.None => "None",
+        _ => logLevel.ToString()
+    };
 }

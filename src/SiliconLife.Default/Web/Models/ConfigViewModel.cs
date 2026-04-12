@@ -15,12 +15,35 @@ namespace SiliconLife.Default.Web.Models;
 
 public class ConfigViewModel : ViewModelBase
 {
-    public Dictionary<string, ConfigSection> Sections { get; set; } = new();
-    public string? EditedSection { get; set; }
+    public List<ConfigGroup> Groups { get; set; } = new();
+
+    public List<AIClientInfo> AvailableAIClients { get; set; } = new();
 }
 
-public class ConfigSection
+public class ConfigGroup
 {
     public string Name { get; set; } = string.Empty;
-    public Dictionary<string, string> Values { get; set; } = new();
+    public List<ConfigItem> Items { get; set; } = new();
+}
+
+public class ConfigItem
+{
+    public string PropertyName { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
+    public string? Value { get; set; }
+    public string? Description { get; set; }
+    public int Order { get; set; }
+    public string PropertyType { get; set; } = "string";
+    public List<string>? EnumValues { get; set; }
+    public List<string>? EnumDisplayNames { get; set; }
+
+    public string? DependsOn { get; set; }
+    public string? DependsOnValue { get; set; }
+}
+
+public class AIClientInfo
+{
+    public string TypeName { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
+    public string? Description { get; set; }
 }

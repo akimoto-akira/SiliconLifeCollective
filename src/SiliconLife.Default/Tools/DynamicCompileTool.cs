@@ -249,7 +249,7 @@ public class DynamicCompileTool : ITool
 
     private static string GetBeingDirectory(Guid beingId)
     {
-        string dataDirectory = Config.Instance?.Data?.DataDirectory
+        string dataDirectory = Config.Instance?.Data?.DataDirectory?.FullName
             ?? Path.Combine(Environment.CurrentDirectory, "data");
         return Path.Combine(dataDirectory, "SiliconManager", beingId.ToString());
     }

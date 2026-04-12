@@ -150,7 +150,7 @@ public class InitController : Controller
         form.Add(H.Create("div",
             H.Create("label", _localization.InitDataDirectoryLabel).Attr("for", "dataDirectory"),
             H.Create("div",
-                H.Input().Attr("type", "text").Attr("name", "dataDirectory").Attr("placeholder", _localization.InitDataDirectoryPlaceholder).Attr("value", _configData.DataDirectory).Attr("id", "dataDirInput"),
+                H.Input().Attr("type", "text").Attr("name", "dataDirectory").Attr("placeholder", _localization.InitDataDirectoryPlaceholder).Attr("value", _configData.DataDirectory.FullName).Attr("id", "dataDirInput"),
                 H.Create("button", _localization.InitDataDirectoryBrowse).Attr("type", "button")
                     .Class("dir-browse-btn").Attr("onclick", "openDirBrowser()")
             ).Class("dir-input-row"),
@@ -298,7 +298,7 @@ public class InitController : Controller
         }
 
         _configData.UserNickname = nickname;
-        _configData.DataDirectory = dataDir;
+        _configData.DataDirectory = new DirectoryInfo(dataDir);
 
         var curatorName = form.GetValueOrDefault("curatorName", "").Trim();
         if (string.IsNullOrEmpty(curatorName))
@@ -429,10 +429,24 @@ public class InitController : Controller
             .Call(() => "replace", () => Js.Regex(() => ">", () => "g"), () => Js.Str(() => "&gt;"));
         browseDirBody.Add(() => Js.Const(() => "h", () => Js.Arrow(() => new List<string> { "s" }, () => escapeHtml)));
 
-        browseDirBody
-            .Add(() => Js.Const(() => "html", () => Js.Str(() => "<div class=\"dir-header\"><span class=\"dir-current\">")))
-            .Add(() => Js.Id(() => "html").Call(() => "concat", () => Js.Id(() => "h").Invoke(() => Js.Id(() => "data").Prop(() => "currentPath"))).Stmt())
-            .Add(() => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "</span></div><div class=\"dir-list\">")).Stmt());
+        var forEachBlock = Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "<div class=\"dir-item\" onclick=\"browseDir('")).Call(() => "concat", () => Js.Id(() => "d").Prop(() => "path")).Call(() => "concat", () => Js.Str(() => "')\">"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Id(() => "h").Invoke(() => Js.Id(() => "d").Prop(() => "name"))).Call(() => "concat", () => Js.Str(() => "</div>"))));
+
+        var innerBlock = Js.Block()
+            .Add(() => Js.Let(() => "html", () => Js.Str(() => "<div class=\"dir-header\"><span class=\"dir-current\">")))
+            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Id(() => "h").Invoke(() => Js.Id(() => "data").Prop(() => "currentPath")))))
+            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "</span></div><div class=\"dir-list\">"))))
+            .Add(() => Js.Id(() => "data").Prop(() => "directories").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "d" }, () => forEachBlock)))
+            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "</div>"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "db").Prop(() => "innerHTML"), () => Js.Id(() => "html")));
+
+        var dataArrow = Js.Arrow(() => new List<string> { "data" }, () => innerBlock);
+        var responseBlock = Js.Block()
+            .Add(() => Js.Id(() => "response").Call(() => "json").Call(() => "then", () => dataArrow));
+        var fetchThenArrow = Js.Arrow(() => new List<string> { "response" }, () => responseBlock);
+
+        browseDirBody.Add(() => Js.Id(() => "fetch").Invoke(() => Js.Id(() => "url")).Call(() => "then", () => fetchThenArrow));
         js.Add(() => Js.Func(() => "browseDir", () => new List<string> { "path" }, () => browseDirBody));
 
         var switchLangBody = Js.Block()

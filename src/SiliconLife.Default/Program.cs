@@ -57,15 +57,15 @@ public class Program
         IAIClient aiClient = aiClientFactory.CreateClient(configData.OllamaEndpoint, configData.DefaultModel);
         _logger.Info("Initialized: AIClient");
 
-        IStorage storage = new FileSystemStorage(configData.DataDirectory);
+        IStorage storage = new FileSystemStorage(configData.DataDirectory.FullName);
         ITimeStorage timeStorage = new FileSystemTimeStorage(
-            Path.Combine(configData.DataDirectory, "chat"));
+            Path.Combine(configData.DataDirectory.FullName, "chat"));
 
         ChatSystem chatSystem = new ChatSystem(timeStorage);
         _logger.Info("Initialized: ChatSystem");
 
         ITimeStorage auditStorage = new FileSystemTimeStorage(
-            Path.Combine(configData.DataDirectory, "audit"));
+            Path.Combine(configData.DataDirectory.FullName, "audit"));
         AuditLogger auditLogger = new AuditLogger(auditStorage);
         _logger.Info("Initialized: AuditLogger");
 
@@ -77,7 +77,7 @@ public class Program
         IIMProvider imProvider = new WebUIProvider(router);
         imProvider.ExitRequested += (s, e) => RequestExit();
 
-        DefaultPermissionCallback permissionCallback = new DefaultPermissionCallback(configData.DataDirectory);
+        DefaultPermissionCallback permissionCallback = new DefaultPermissionCallback(configData.DataDirectory.FullName);
         IMPermissionAskHandler askHandler = new IMPermissionAskHandler(imProvider);
 
         IMManager imManager = new IMManager(imProvider, chatSystem, MainLoop.BeingManager);
@@ -87,7 +87,7 @@ public class Program
             aiClient,
             storage,
             timeStorage,
-            configData.DataDirectory,
+            configData.DataDirectory.FullName,
             permissionCallback,
             askHandler);
 
@@ -178,11 +178,6 @@ public class Program
 
         router.RegisterControllers();
 
-        if (!string.IsNullOrEmpty(configData.StaticFilesPath) && Directory.Exists(configData.StaticFilesPath))
-        {
-            router.SetStaticFilesPath(configData.StaticFilesPath);
-        }
-
         _webHost = new WebHost(configData.WebPort, router, configData.AllowIntranet);
 
         try
@@ -223,7 +218,7 @@ public class Program
     /// </summary>
     private static void RegisterAndConfigureCurator(SiliconBeingBase curator, DefaultConfigData configData, DynamicBeingLoader dynamicBeingLoader)
     {
-        string beingDirectory = Path.Combine(configData.DataDirectory, "SiliconManager", curator.Id.ToString());
+        string beingDirectory = Path.Combine(configData.DataDirectory.FullName, "SiliconManager", curator.Id.ToString());
 
         if (DynamicBeingLoader.HasCustomPermissionCallback(beingDirectory))
         {

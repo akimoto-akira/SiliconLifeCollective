@@ -58,4 +58,11 @@ public abstract class LocalizationBase
     /// <returns>The formatted session name</returns>
     public string GetSingleChatDisplayName(string partnerName) =>
         string.Format(SingleChatNameFormat, partnerName);
+
+    /// <summary>
+    /// Gets the localized display name for a log level.
+    /// </summary>
+    /// <param name="logLevel">The log level</param>
+    /// <returns>The localized display name</returns>
+    public abstract string GetLogLevelName(LogLevel logLevel);
 }
