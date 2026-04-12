@@ -280,6 +280,105 @@ public class ZhCN : DefaultLocalizationBase
         _ => platform
     };
 
+    // ===== Config Page Localization =====
+
+    public override string ConfigPageHeader => "系统配置";
+    public override string ConfigPropertyNameLabel => "属性名";
+    public override string ConfigPropertyValueLabel => "属性值";
+    public override string ConfigActionLabel => "操作";
+    public override string ConfigEditButton => "编辑";
+    public override string ConfigEditModalTitle => "编辑配置项";
+    public override string ConfigEditPropertyLabel => "属性名：";
+    public override string ConfigEditValueLabel => "属性值：";
+    public override string ConfigBrowseButton => "浏览";
+    public override string ConfigTimeSettingsLabel => "时间设定：";
+    public override string ConfigDaysLabel => "天：";
+    public override string ConfigHoursLabel => "时：";
+    public override string ConfigMinutesLabel => "分：";
+    public override string ConfigSecondsLabel => "秒：";
+    public override string ConfigSaveButton => "保存";
+    public override string ConfigCancelButton => "取消";
+    public override string ConfigNullValue => "空";
+
+    public override string ConfigEditPrefix => "编辑：";
+    public override string ConfigDefaultGroupName => "其他";
+    public override string ConfigErrorInvalidRequest => "无效的请求参数";
+    public override string ConfigErrorInstanceNotFound => "配置实例不存在";
+    public override string ConfigErrorPropertyNotFound => "属性 {0} 不存在或不可写";
+    public override string ConfigErrorConvertInt => "无法将 '{0}' 转换为整数";
+    public override string ConfigErrorConvertLong => "无法将 '{0}' 转换为长整数";
+    public override string ConfigErrorConvertDouble => "无法将 '{0}' 转换为浮点数";
+    public override string ConfigErrorConvertBool => "无法将 '{0}' 转换为布尔值";
+    public override string ConfigErrorConvertGuid => "无法将 '{0}' 转换为 GUID";
+    public override string ConfigErrorConvertTimeSpan => "无法将 '{0}' 转换为时间间隔";
+    public override string ConfigErrorConvertDateTime => "无法将 '{0}' 转换为日期时间";
+    public override string ConfigErrorConvertEnum => "无法将 '{0}' 转换为 {1}";
+    public override string ConfigErrorUnsupportedType => "不支持的属性类型: {0}";
+    public override string ConfigErrorSaveFailed => "保存失败: {0}";
+
+    public override string LogsPageHeader => "日志查询";
+    public override string LogsTotalCount => "共 {0} 条日志";
+    public override string LogsStartTime => "开始时间";
+    public override string LogsEndTime => "结束时间";
+    public override string LogsLevelAll => "全部级别";
+    public override string LogsFilterButton => "查询";
+    public override string LogsEmptyState => "暂无日志记录";
+    public override string LogsExceptionLabel => "异常详情：";
+    public override string LogsPrevPage => "上一页";
+    public override string LogsNextPage => "下一页";
+
+    private static readonly Dictionary<string, string> ConfigGroupNames = new()
+    {
+        ["Basic"] = "基础配置",
+        ["Runtime"] = "运行时配置",
+        ["AI"] = "AI 配置",
+        ["Web"] = "Web 配置",
+        ["User"] = "用户配置"
+    };
+
+    private static readonly Dictionary<string, string> ConfigDisplayNames = new()
+    {
+        ["DataDirectory"] = "数据目录",
+        ["Language"] = "语言设置",
+        ["TickTimeout"] = "Tick 超时",
+        ["MaxTimeoutCount"] = "最大超时次数",
+        ["WatchdogTimeout"] = "看门狗超时",
+        ["MinLogLevel"] = "最小日志级别",
+        ["AIClientType"] = "AI 客户端类型",
+        ["OllamaEndpoint"] = "Ollama 端点",
+        ["DefaultModel"] = "默认模型",
+        ["WebPort"] = "Web 端口",
+        ["AllowIntranetAccess"] = "允许内网访问",
+        ["WebSkin"] = "Web 皮肤",
+        ["UserNickname"] = "用户昵称"
+    };
+
+    private static readonly Dictionary<string, string> ConfigDescriptions = new()
+    {
+        ["DataDirectory"] = "存储所有应用数据的数据目录路径",
+        ["Language"] = "应用程序的语言设置",
+        ["TickTimeout"] = "每次 tick 执行的超时时长",
+        ["MaxTimeoutCount"] = "熔断器触发前的最大连续超时次数",
+        ["WatchdogTimeout"] = "用于检测主循环卡死的看门狗超时时长",
+        ["MinLogLevel"] = "全局最小日志级别",
+        ["AIClientType"] = "要使用的 AI 客户端类型",
+        ["OllamaEndpoint"] = "Ollama API 端点 URL",
+        ["DefaultModel"] = "默认使用的 AI 模型",
+        ["WebPort"] = "Web 服务器端口",
+        ["AllowIntranetAccess"] = "允许内网访问（需要管理员权限）",
+        ["WebSkin"] = "Web 皮肤名称",
+        ["UserNickname"] = "人类用户的昵称"
+    };
+
+    public override string GetConfigGroupName(string groupKey) =>
+        ConfigGroupNames.GetValueOrDefault(groupKey, groupKey);
+
+    public override string GetConfigDisplayName(string displayNameKey) =>
+        ConfigDisplayNames.GetValueOrDefault(displayNameKey, displayNameKey);
+
+    public override string? GetConfigDescription(string descriptionKey) =>
+        ConfigDescriptions.GetValueOrDefault(descriptionKey);
+
     /// <summary>
     /// Gets the localized display name for a log level
     /// </summary>

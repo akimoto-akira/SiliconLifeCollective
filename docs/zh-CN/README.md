@@ -44,16 +44,16 @@ SiliconLifeCollective.sln
 ├── src/
 │   ├── SiliconLife.Core/                  # 核心库（接口、抽象类）
 │   │   ├── ServiceLocator.cs             # 全局服务定位器：Register/Get、ChatSystem、IMManager、AuditLogger、GlobalACL
-│   │       ├── Runtime/                       # MainLoop、TickObject、CoreHost、CoreHostBuilder、PerformanceMonitor、TestTickObject
+│   │   ├── Runtime/                       # MainLoop、TickObject、CoreHost、CoreHostBuilder、PerformanceMonitor
 │   │   ├── SiliconBeing/                  # SiliconBeingBase、ISiliconBeingFactory、SiliconBeingManager、SoulFileManager、TaskSystem、TimerSystem、SiliconCurator、Memory
 │   │   ├── AI/                            # IAIClient、IAIClientFactory、ContextManager（"大脑"）、Message、AIRequest/AIResponse
 │   │   ├── Chat/                          # ChatSystem、IChatService、SimpleChatService、ISession、SingleChatSession、GroupChatSession、ChatMessage
 │   │   ├── Executors/                     # ExecutorBase、DiskExecutor、NetworkExecutor、CommandLineExecutor、ExecutorRequest、ExecutorResult
 │   │   ├── Tools/                         # ITool、ToolManager（反射扫描）、ToolCall/ToolResult、ToolDefinition、SiliconManagerOnlyAttribute
-│   │   ├── Security/                      # PermissionManager、GlobalACL、UserFrequencyCache、AuditLogger、PermissionResult、PermissionType
+│   │   ├── Security/                      # PermissionManager、GlobalACL、UserFrequencyCache、AuditLogger、PermissionResult、PermissionType、IPermissionCallback、IPermissionAskHandler
 │   │   ├── IM/                            # IIMProvider、IMManager（消息路由）
 │   │   ├── Storage/                       # IStorage、ITimeStorage（键值存储 + 时间索引存储）
-│   │   ├── Config/                        # ConfigDataBase、Config（单例 + JSON）、ConfigDataBaseConverter、GuidConverter
+│   │   ├── Config/                        # ConfigDataBase、Config（单例 + JSON）、ConfigDataBaseConverter、GuidConverter、AIClientConfigAttribute、ConfigGroupAttribute、ConfigIgnoreAttribute、DirectoryInfoConverter
 │   │   ├── Localization/                  # LocalizationBase、LocalizationManager、Language 枚举
 │   │   ├── Logging/                       # ILogger、ILoggerProvider、LogEntry、LogLevel、LogManager
 │   │   ├── Compilation/                   # DynamicBeingLoader、DynamicCompilationExecutor、SecurityScanner、CodeEncryption
@@ -71,10 +71,11 @@ SiliconLifeCollective.sln
 │       ├── Logging/                       # ConsoleLoggerProvider、FileSystemLoggerProvider
 │       ├── Storage/                       # FileSystemStorage、FileSystemTimeStorage
 │       ├── Security/                      # DefaultPermissionCallback、IMPermissionAskHandler
+│       ├── Runtime/                       # TestTickObject
 │       └── Web/                           # Web UI 实现
 │           ├── Controllers/               # 15 个控制器：About、Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task
-│           ├── Models/                    # 所有控制器的 ViewModel（AboutViewModel、BeingViewModel 等）
-│           ├── Views/                     # HTML 视图（ViewBase、AboutView、BeingView、ChatView 等）
+│           ├── Models/                    # 所有控制器的 ViewModel（AboutViewModel、BeingViewModel、ChatViewModel、CodeBrowserViewModel、ConfigViewModel、DashboardViewModel、ExecutorViewModel、KnowledgeViewModel、LogViewModel、MemoryViewModel、PermissionViewModel、PermissionRequestViewModel、ProjectViewModel、TaskViewModel、ViewModelBase）
+│           ├── Views/                     # HTML 视图（ViewBase、AboutView、BeingView、ChatView、CodeBrowserView、ConfigView、DashboardView、ExecutorView、KnowledgeView、LogView、MemoryView、PermissionView、ProjectView、TaskView）
 │           ├── Skins/                     # 4 种皮肤：Admin（专业）、Chat（对话）、Creative（创意）、Dev（开发者）
 │           ├── ISkin.cs                   # 皮肤接口，包含 UI 组件库
 │           ├── Controller.cs              # 控制器基类

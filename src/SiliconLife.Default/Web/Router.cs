@@ -45,6 +45,7 @@ public class Router
         RegisterController(() => new TaskController(), "/tasks");
         RegisterController(() => new PermissionController(), "/permissions");
         RegisterController(() => new LogController(), "/logs");
+        RegisterController(() => new LogController(), "/api/logs/list");
         RegisterController(() => new ConfigController(), "/config");
         RegisterController(() => new ConfigController(), "/config/save", "POST");
         RegisterController(() => new MemoryController(), "/memory");

@@ -591,6 +591,241 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <returns>The localized display name</returns>
     public abstract string GetSocialMediaName(string platform);
 
+    // ===== Config Page Localization =====
+
+    /// <summary>
+    /// Gets the config page header text
+    /// </summary>
+    public abstract string ConfigPageHeader { get; }
+
+    /// <summary>
+    /// Gets the label for property name column header
+    /// </summary>
+    public abstract string ConfigPropertyNameLabel { get; }
+
+    /// <summary>
+    /// Gets the label for property value column header
+    /// </summary>
+    public abstract string ConfigPropertyValueLabel { get; }
+
+    /// <summary>
+    /// Gets the label for action column header
+    /// </summary>
+    public abstract string ConfigActionLabel { get; }
+
+    /// <summary>
+    /// Gets the text for the edit button
+    /// </summary>
+    public abstract string ConfigEditButton { get; }
+
+    /// <summary>
+    /// Gets the title for the edit modal
+    /// </summary>
+    public abstract string ConfigEditModalTitle { get; }
+
+    /// <summary>
+    /// Gets the label for property name in edit form
+    /// </summary>
+    public abstract string ConfigEditPropertyLabel { get; }
+
+    /// <summary>
+    /// Gets the label for property value in edit form
+    /// </summary>
+    public abstract string ConfigEditValueLabel { get; }
+
+    /// <summary>
+    /// Gets the text for the browse button
+    /// </summary>
+    public abstract string ConfigBrowseButton { get; }
+
+    /// <summary>
+    /// Gets the label for time settings section
+    /// </summary>
+    public abstract string ConfigTimeSettingsLabel { get; }
+
+    /// <summary>
+    /// Gets the label for days input
+    /// </summary>
+    public abstract string ConfigDaysLabel { get; }
+
+    /// <summary>
+    /// Gets the label for hours input
+    /// </summary>
+    public abstract string ConfigHoursLabel { get; }
+
+    /// <summary>
+    /// Gets the label for minutes input
+    /// </summary>
+    public abstract string ConfigMinutesLabel { get; }
+
+    /// <summary>
+    /// Gets the label for seconds input
+    /// </summary>
+    public abstract string ConfigSecondsLabel { get; }
+
+    /// <summary>
+    /// Gets the text for the save button
+    /// </summary>
+    public abstract string ConfigSaveButton { get; }
+
+    /// <summary>
+    /// Gets the text for the cancel button
+    /// </summary>
+    public abstract string ConfigCancelButton { get; }
+
+    /// <summary>
+    /// Gets the display text for null values
+    /// </summary>
+    public abstract string ConfigNullValue { get; }
+
+    /// <summary>
+    /// Gets the prefix text for edit modal title
+    /// </summary>
+    public abstract string ConfigEditPrefix { get; }
+
+    /// <summary>
+    /// Gets the default group name for ungrouped config items
+    /// </summary>
+    public abstract string ConfigDefaultGroupName { get; }
+
+    /// <summary>
+    /// Gets the error message for invalid request parameters
+    /// </summary>
+    public abstract string ConfigErrorInvalidRequest { get; }
+
+    /// <summary>
+    /// Gets the error message when config instance does not exist
+    /// </summary>
+    public abstract string ConfigErrorInstanceNotFound { get; }
+
+    /// <summary>
+    /// Gets the error message when property does not exist or is not writable
+    /// </summary>
+    public abstract string ConfigErrorPropertyNotFound { get; }
+
+    /// <summary>
+    /// Gets the error message for integer conversion failure
+    /// </summary>
+    public abstract string ConfigErrorConvertInt { get; }
+
+    /// <summary>
+    /// Gets the error message for long integer conversion failure
+    /// </summary>
+    public abstract string ConfigErrorConvertLong { get; }
+
+    /// <summary>
+    /// Gets the error message for double conversion failure
+    /// </summary>
+    public abstract string ConfigErrorConvertDouble { get; }
+
+    /// <summary>
+    /// Gets the error message for boolean conversion failure
+    /// </summary>
+    public abstract string ConfigErrorConvertBool { get; }
+
+    /// <summary>
+    /// Gets the error message for GUID conversion failure
+    /// </summary>
+    public abstract string ConfigErrorConvertGuid { get; }
+
+    /// <summary>
+    /// Gets the error message for TimeSpan conversion failure
+    /// </summary>
+    public abstract string ConfigErrorConvertTimeSpan { get; }
+
+    /// <summary>
+    /// Gets the error message for DateTime conversion failure
+    /// </summary>
+    public abstract string ConfigErrorConvertDateTime { get; }
+
+    /// <summary>
+    /// Gets the error message for enum conversion failure
+    /// </summary>
+    public abstract string ConfigErrorConvertEnum { get; }
+
+    /// <summary>
+    /// Gets the error message for unsupported property type
+    /// </summary>
+    public abstract string ConfigErrorUnsupportedType { get; }
+
+    /// <summary>
+    /// Gets the error message for save failure
+    /// </summary>
+    public abstract string ConfigErrorSaveFailed { get; }
+
+    // ===== Logs Page Localization =====
+
+    /// <summary>
+    /// Gets the logs page header text
+    /// </summary>
+    public abstract string LogsPageHeader { get; }
+
+    /// <summary>
+    /// Gets the label for total logs count
+    /// </summary>
+    public abstract string LogsTotalCount { get; }
+
+    /// <summary>
+    /// Gets the label for start time filter
+    /// </summary>
+    public abstract string LogsStartTime { get; }
+
+    /// <summary>
+    /// Gets the label for end time filter
+    /// </summary>
+    public abstract string LogsEndTime { get; }
+
+    /// <summary>
+    /// Gets the text for "All Levels" option in filter
+    /// </summary>
+    public abstract string LogsLevelAll { get; }
+
+    /// <summary>
+    /// Gets the text for the filter button
+    /// </summary>
+    public abstract string LogsFilterButton { get; }
+
+    /// <summary>
+    /// Gets the empty state text when no logs exist
+    /// </summary>
+    public abstract string LogsEmptyState { get; }
+
+    /// <summary>
+    /// Gets the label for exception details
+    /// </summary>
+    public abstract string LogsExceptionLabel { get; }
+
+    /// <summary>
+    /// Gets the text for previous page button
+    /// </summary>
+    public abstract string LogsPrevPage { get; }
+
+    /// <summary>
+    /// Gets the text for next page button
+    /// </summary>
+    public abstract string LogsNextPage { get; }
+
+    /// <summary>
+    /// Gets the localized display name for a configuration group
+    /// </summary>
+    /// <param name="groupKey">The group localization key</param>
+    /// <returns>The localized display name, or the key itself if not found</returns>
+    public abstract string GetConfigGroupName(string groupKey);
+
+    /// <summary>
+    /// Gets the localized display name for a configuration property
+    /// </summary>
+    /// <param name="displayNameKey">The display name localization key</param>
+    /// <returns>The localized display name, or the key itself if not found</returns>
+    public abstract string GetConfigDisplayName(string displayNameKey);
+
+    /// <summary>
+    /// Gets the localized description for a configuration property
+    /// </summary>
+    /// <param name="descriptionKey">The description localization key</param>
+    /// <returns>The localized description, or null if not found</returns>
+    public abstract string? GetConfigDescription(string descriptionKey);
+
     /// <summary>
     /// Gets the localized display name for a log level
     /// </summary>

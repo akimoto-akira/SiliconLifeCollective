@@ -27,7 +27,8 @@ public class LogItem
 {
     public DateTime Timestamp { get; set; }
     public string Level { get; set; } = "info";
-    public string Source { get; set; } = string.Empty;
+    public string Category { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;
     public string? Details { get; set; }
+    public string? Exception => Details;
 }

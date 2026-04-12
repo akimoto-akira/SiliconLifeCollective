@@ -20,9 +20,9 @@ namespace SiliconLife.Collective;
 public class ConfigGroupAttribute : Attribute
 {
     /// <summary>
-    /// Gets the group name for the configuration property
+    /// Gets the localization key for the group name
     /// </summary>
-    public string GroupName { get; }
+    public string GroupKey { get; }
 
     /// <summary>
     /// Gets or sets the display order within the group (default: 0)
@@ -30,21 +30,21 @@ public class ConfigGroupAttribute : Attribute
     public int Order { get; set; } = 0;
 
     /// <summary>
-    /// Gets or sets the description of this configuration property
+    /// Gets or sets the localization key for the description
     /// </summary>
-    public string? Description { get; set; }
+    public string? DescriptionKey { get; set; }
 
     /// <summary>
-    /// Gets or sets the display name for this property (if different from property name)
+    /// Gets or sets the localization key for the display name
     /// </summary>
-    public string? DisplayName { get; set; }
+    public string? DisplayNameKey { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the ConfigGroupAttribute class
     /// </summary>
-    /// <param name="groupName">The name of the configuration group</param>
-    public ConfigGroupAttribute(string groupName)
+    /// <param name="groupKey">The localization key for the configuration group name</param>
+    public ConfigGroupAttribute(string groupKey)
     {
-        GroupName = groupName ?? throw new ArgumentNullException(nameof(groupName));
+        GroupKey = groupKey ?? throw new ArgumentNullException(nameof(groupKey));
     }
 }

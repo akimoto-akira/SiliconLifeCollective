@@ -19,10 +19,12 @@ namespace SiliconLife.Default.Web;
 public class ConfigController : Controller
 {
     private readonly SkinManager _skinManager;
+    private readonly DefaultLocalizationBase _loc;
 
     public ConfigController()
     {
         _skinManager = ServiceLocator.Instance.GetService<SkinManager>()!;
+        _loc = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(((DefaultConfigData)Config.Instance!.Data).Language);
     }
 
     public override void Handle()
@@ -65,21 +67,21 @@ public class ConfigController : Controller
             
             if (data == null || string.IsNullOrEmpty(data.key))
             {
-                RenderJson(new { success = false, message = "无效的请求参数" });
+                RenderJson(new { success = false, message = _loc.ConfigErrorInvalidRequest });
                 return;
             }
 
             var config = Config.Instance?.Data as DefaultConfigData;
             if (config == null)
             {
-                RenderJson(new { success = false, message = "配置实例不存在" });
+                RenderJson(new { success = false, message = _loc.ConfigErrorInstanceNotFound });
                 return;
             }
 
             var prop = typeof(DefaultConfigData).GetProperty(data.key);
             if (prop == null || !prop.CanWrite)
             {
-                RenderJson(new { success = false, message = $"属性 {data.key} 不存在或不可写" });
+                RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorPropertyNotFound, data.key) });
                 return;
             }
 
@@ -100,7 +102,7 @@ public class ConfigController : Controller
                     value = intVal;
                 else
                 {
-                    RenderJson(new { success = false, message = $"无法将 '{data.value}' 转换为整数" });
+                    RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorConvertInt, data.value) });
                     return;
                 }
             }
@@ -110,7 +112,7 @@ public class ConfigController : Controller
                     value = longVal;
                 else
                 {
-                    RenderJson(new { success = false, message = $"无法将 '{data.value}' 转换为长整数" });
+                    RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorConvertLong, data.value) });
                     return;
                 }
             }
@@ -120,7 +122,7 @@ public class ConfigController : Controller
                     value = doubleVal;
                 else
                 {
-                    RenderJson(new { success = false, message = $"无法将 '{data.value}' 转换为浮点数" });
+                    RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorConvertDouble, data.value) });
                     return;
                 }
             }
@@ -130,7 +132,7 @@ public class ConfigController : Controller
                     value = boolVal;
                 else
                 {
-                    RenderJson(new { success = false, message = $"无法将 '{data.value}' 转换为布尔值" });
+                    RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorConvertBool, data.value) });
                     return;
                 }
             }
@@ -140,7 +142,7 @@ public class ConfigController : Controller
                     value = guidVal;
                 else
                 {
-                    RenderJson(new { success = false, message = $"无法将 '{data.value}' 转换为 GUID" });
+                    RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorConvertGuid, data.value) });
                     return;
                 }
             }
@@ -150,7 +152,7 @@ public class ConfigController : Controller
                     value = timeSpanVal;
                 else
                 {
-                    RenderJson(new { success = false, message = $"无法将 '{data.value}' 转换为时间间隔" });
+                    RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorConvertTimeSpan, data.value) });
                     return;
                 }
             }
@@ -160,7 +162,7 @@ public class ConfigController : Controller
                     value = dateTimeVal;
                 else
                 {
-                    RenderJson(new { success = false, message = $"无法将 '{data.value}' 转换为日期时间" });
+                    RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorConvertDateTime, data.value) });
                     return;
                 }
             }
@@ -174,13 +176,13 @@ public class ConfigController : Controller
                     value = enumVal;
                 else
                 {
-                    RenderJson(new { success = false, message = $"无法将 '{data.value}' 转换为 {propType.Name}" });
+                    RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorConvertEnum, data.value, propType.Name) });
                     return;
                 }
             }
             else
             {
-                RenderJson(new { success = false, message = $"不支持的属性类型: {propType.Name}" });
+                RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorUnsupportedType, propType.Name) });
                 return;
             }
 
@@ -191,7 +193,7 @@ public class ConfigController : Controller
         }
         catch (Exception ex)
         {
-            RenderJson(new { success = false, message = $"保存失败: {ex.Message}" });
+            RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorSaveFailed, ex.Message) });
         }
     }
 
@@ -220,9 +222,14 @@ public class ConfigController : Controller
                 continue;
 
             var attr = prop.GetCustomAttributes(typeof(ConfigGroupAttribute), true).FirstOrDefault() as ConfigGroupAttribute;
-            var groupName = attr?.GroupName ?? "其他";
-            var displayName = attr?.DisplayName ?? prop.Name;
-            var description = attr?.Description;
+            var groupKey = attr?.GroupKey ?? "Other";
+            var groupName = _loc.GetConfigGroupName(groupKey);
+            var displayName = attr?.DisplayNameKey != null 
+                ? _loc.GetConfigDisplayName(attr.DisplayNameKey) 
+                : _loc.GetConfigDisplayName(prop.Name);
+            var description = attr?.DescriptionKey != null 
+                ? _loc.GetConfigDescription(attr.DescriptionKey) 
+                : null;
             var order = attr?.Order ?? 0;
 
             var value = prop.GetValue(config);

@@ -280,6 +280,105 @@ public class EnUS : DefaultLocalizationBase
         _ => platform
     };
 
+    // ===== Config Page Localization =====
+
+    public override string ConfigPageHeader => "System Configuration";
+    public override string ConfigPropertyNameLabel => "Property Name";
+    public override string ConfigPropertyValueLabel => "Property Value";
+    public override string ConfigActionLabel => "Action";
+    public override string ConfigEditButton => "Edit";
+    public override string ConfigEditModalTitle => "Edit Configuration";
+    public override string ConfigEditPropertyLabel => "Property Name: ";
+    public override string ConfigEditValueLabel => "Property Value: ";
+    public override string ConfigBrowseButton => "Browse";
+    public override string ConfigTimeSettingsLabel => "Time Settings: ";
+    public override string ConfigDaysLabel => "Days: ";
+    public override string ConfigHoursLabel => "Hours: ";
+    public override string ConfigMinutesLabel => "Minutes: ";
+    public override string ConfigSecondsLabel => "Seconds: ";
+    public override string ConfigSaveButton => "Save";
+    public override string ConfigCancelButton => "Cancel";
+    public override string ConfigNullValue => "null";
+
+    public override string ConfigEditPrefix => "Edit: ";
+    public override string ConfigDefaultGroupName => "Other";
+    public override string ConfigErrorInvalidRequest => "Invalid request parameters";
+    public override string ConfigErrorInstanceNotFound => "Configuration instance not found";
+    public override string ConfigErrorPropertyNotFound => "Property {0} does not exist or is not writable";
+    public override string ConfigErrorConvertInt => "Cannot convert '{0}' to integer";
+    public override string ConfigErrorConvertLong => "Cannot convert '{0}' to long integer";
+    public override string ConfigErrorConvertDouble => "Cannot convert '{0}' to floating point number";
+    public override string ConfigErrorConvertBool => "Cannot convert '{0}' to boolean";
+    public override string ConfigErrorConvertGuid => "Cannot convert '{0}' to GUID";
+    public override string ConfigErrorConvertTimeSpan => "Cannot convert '{0}' to time span";
+    public override string ConfigErrorConvertDateTime => "Cannot convert '{0}' to date time";
+    public override string ConfigErrorConvertEnum => "Cannot convert '{0}' to {1}";
+    public override string ConfigErrorUnsupportedType => "Unsupported property type: {0}";
+    public override string ConfigErrorSaveFailed => "Save failed: {0}";
+
+    public override string LogsPageHeader => "Log Query";
+    public override string LogsTotalCount => "{0} logs total";
+    public override string LogsStartTime => "Start Time";
+    public override string LogsEndTime => "End Time";
+    public override string LogsLevelAll => "All Levels";
+    public override string LogsFilterButton => "Filter";
+    public override string LogsEmptyState => "No log entries found";
+    public override string LogsExceptionLabel => "Exception: ";
+    public override string LogsPrevPage => "Previous";
+    public override string LogsNextPage => "Next";
+
+    private static readonly Dictionary<string, string> ConfigGroupNames = new()
+    {
+        ["Basic"] = "Basic Settings",
+        ["Runtime"] = "Runtime Settings",
+        ["AI"] = "AI Settings",
+        ["Web"] = "Web Settings",
+        ["User"] = "User Settings"
+    };
+
+    private static readonly Dictionary<string, string> ConfigDisplayNames = new()
+    {
+        ["DataDirectory"] = "Data Directory",
+        ["Language"] = "Language",
+        ["TickTimeout"] = "Tick Timeout",
+        ["MaxTimeoutCount"] = "Max Timeout Count",
+        ["WatchdogTimeout"] = "Watchdog Timeout",
+        ["MinLogLevel"] = "Min Log Level",
+        ["AIClientType"] = "AI Client Type",
+        ["OllamaEndpoint"] = "Ollama Endpoint",
+        ["DefaultModel"] = "Default Model",
+        ["WebPort"] = "Web Port",
+        ["AllowIntranetAccess"] = "Allow Intranet Access",
+        ["WebSkin"] = "Web Skin",
+        ["UserNickname"] = "User Nickname"
+    };
+
+    private static readonly Dictionary<string, string> ConfigDescriptions = new()
+    {
+        ["DataDirectory"] = "Data directory path for storing all application data",
+        ["Language"] = "Language setting for the application",
+        ["TickTimeout"] = "Timeout duration for each tick execution",
+        ["MaxTimeoutCount"] = "Maximum consecutive timeouts before circuit breaker triggers",
+        ["WatchdogTimeout"] = "Watchdog timeout duration for detecting hung main loop",
+        ["MinLogLevel"] = "Global minimum log level",
+        ["AIClientType"] = "AI client type to use",
+        ["OllamaEndpoint"] = "Ollama API endpoint URL",
+        ["DefaultModel"] = "Default AI model to use",
+        ["WebPort"] = "Web server port",
+        ["AllowIntranetAccess"] = "Allow intranet access (requires admin)",
+        ["WebSkin"] = "Web skin name",
+        ["UserNickname"] = "Nickname of the human user"
+    };
+
+    public override string GetConfigGroupName(string groupKey) =>
+        ConfigGroupNames.GetValueOrDefault(groupKey, groupKey);
+
+    public override string GetConfigDisplayName(string displayNameKey) =>
+        ConfigDisplayNames.GetValueOrDefault(displayNameKey, displayNameKey);
+
+    public override string? GetConfigDescription(string descriptionKey) =>
+        ConfigDescriptions.GetValueOrDefault(descriptionKey);
+
     /// <summary>
     /// Gets the localized display name for a log level
     /// </summary>

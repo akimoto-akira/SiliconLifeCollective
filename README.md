@@ -44,16 +44,16 @@ SiliconLifeCollective.sln
 ├── src/
 │   ├── SiliconLife.Core/                  # Core library (interfaces, abstractions)
 │   │   ├── ServiceLocator.cs             # Global service locator: Register/Get, ChatSystem, IMManager, AuditLogger, GlobalACL
-│   │       ├── Runtime/                       # MainLoop, TickObject, CoreHost, CoreHostBuilder, PerformanceMonitor, TestTickObject
+│   │   ├── Runtime/                       # MainLoop, TickObject, CoreHost, CoreHostBuilder, PerformanceMonitor
 │   │   ├── SiliconBeing/                  # SiliconBeingBase, ISiliconBeingFactory, SiliconBeingManager, SoulFileManager, TaskSystem, TimerSystem, SiliconCurator, Memory
 │   │   ├── AI/                            # IAIClient, IAIClientFactory, ContextManager ("brain"), Message, AIRequest/AIResponse
 │   │   ├── Chat/                          # ChatSystem, IChatService, SimpleChatService, ISession, SingleChatSession, GroupChatSession, ChatMessage
 │   │   ├── Executors/                     # ExecutorBase, DiskExecutor, NetworkExecutor, CommandLineExecutor, ExecutorRequest, ExecutorResult
 │   │   ├── Tools/                         # ITool, ToolManager (reflection scanning), ToolCall/ToolResult, ToolDefinition, SiliconManagerOnlyAttribute
-│   │   ├── Security/                      # PermissionManager, GlobalACL, UserFrequencyCache, AuditLogger, PermissionResult, PermissionType
+│   │   ├── Security/                      # PermissionManager, GlobalACL, UserFrequencyCache, AuditLogger, PermissionResult, PermissionType, IPermissionCallback, IPermissionAskHandler
 │   │   ├── IM/                            # IIMProvider, IMManager (message routing)
 │   │   ├── Storage/                       # IStorage, ITimeStorage (key-value + time-indexed)
-│   │   ├── Config/                        # ConfigDataBase, Config (singleton + JSON), ConfigDataBaseConverter, GuidConverter
+│   │   ├── Config/                        # ConfigDataBase, Config (singleton + JSON), ConfigDataBaseConverter, GuidConverter, AIClientConfigAttribute, ConfigGroupAttribute, ConfigIgnoreAttribute, DirectoryInfoConverter
 │   │   ├── Localization/                  # LocalizationBase, LocalizationManager, Language enum
 │   │   ├── Logging/                       # ILogger, ILoggerProvider, LogEntry, LogLevel, LogManager
 │   │   ├── Compilation/                   # DynamicBeingLoader, DynamicCompilationExecutor, SecurityScanner, CodeEncryption
@@ -71,10 +71,11 @@ SiliconLifeCollective.sln
 │       ├── Logging/                       # ConsoleLoggerProvider, FileSystemLoggerProvider
 │       ├── Storage/                       # FileSystemStorage, FileSystemTimeStorage
 │       ├── Security/                      # DefaultPermissionCallback, IMPermissionAskHandler
+│       ├── Runtime/                       # TestTickObject
 │       └── Web/                           # Web UI implementation
 │           ├── Controllers/               # 15 controllers: About, Being, Chat, CodeBrowser, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task
-│           ├── Models/                    # ViewModels for all controllers (AboutViewModel, BeingViewModel, etc.)
-│           ├── Views/                     # HTML views (ViewBase, AboutView, BeingView, ChatView, etc.)
+│           ├── Models/                    # ViewModels for all controllers (AboutViewModel, BeingViewModel, ChatViewModel, CodeBrowserViewModel, ConfigViewModel, DashboardViewModel, ExecutorViewModel, KnowledgeViewModel, LogViewModel, MemoryViewModel, PermissionViewModel, PermissionRequestViewModel, ProjectViewModel, TaskViewModel, ViewModelBase)
+│           ├── Views/                     # HTML views (ViewBase, AboutView, BeingView, ChatView, CodeBrowserView, ConfigView, DashboardView, ExecutorView, KnowledgeView, LogView, MemoryView, PermissionView, ProjectView, TaskView)
 │           ├── Skins/                     # 4 skins: Admin (professional), Chat (conversational), Creative (artistic), Dev (developer-focused)
 │           ├── ISkin.cs                   # Skin interface with UI component library
 │           ├── Controller.cs              # Base controller class

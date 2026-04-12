@@ -27,7 +27,7 @@ public abstract class ConfigDataBase
     /// <summary>
     /// Gets or sets the data directory for storing all application data
     /// </summary>
-    [ConfigGroup("基础配置", Order = 2, DisplayName = "数据目录", Description = "Data directory path for storing all application data")]
+    [ConfigGroup("Basic", Order = 2, DisplayNameKey = "DataDirectory", DescriptionKey = "DataDirectory")]
     public abstract DirectoryInfo DataDirectory { get; set; }
 
     /// <summary>
@@ -39,19 +39,19 @@ public abstract class ConfigDataBase
     /// <summary>
     /// Gets or sets the language setting for the application
     /// </summary>
-    [ConfigGroup("基础配置", Order = 4, DisplayName = "语言设置", Description = "Language setting for the application")]
+    [ConfigGroup("Basic", Order = 4, DisplayNameKey = "Language", DescriptionKey = "Language")]
     public abstract Language Language { get; set; }
 
     /// <summary>
     /// Gets or sets the timeout duration for each tick execution
     /// </summary>
-    [ConfigGroup("运行时配置", Order = 1, DisplayName = "Tick 超时", Description = "Timeout duration for each tick execution")]
+    [ConfigGroup("Runtime", Order = 1, DisplayNameKey = "TickTimeout", DescriptionKey = "TickTimeout")]
     public abstract TimeSpan TickTimeout { get; set; }
 
     /// <summary>
     /// Gets or sets the maximum number of consecutive timeouts allowed before circuit breaker triggers
     /// </summary>
-    [ConfigGroup("运行时配置", Order = 2, DisplayName = "最大超时次数", Description = "Maximum consecutive timeouts before circuit breaker triggers")]
+    [ConfigGroup("Runtime", Order = 2, DisplayNameKey = "MaxTimeoutCount", DescriptionKey = "MaxTimeoutCount")]
     public abstract int MaxTimeoutCount { get; set; }
 
     /// <summary>
@@ -59,14 +59,14 @@ public abstract class ConfigDataBase
     /// If the main loop thread does not update heartbeat within this duration,
     /// the watchdog will consider it hung and attempt to restart it.
     /// </summary>
-    [ConfigGroup("运行时配置", Order = 3, DisplayName = "看门狗超时", Description = "Watchdog timeout duration for detecting hung main loop")]
+    [ConfigGroup("Runtime", Order = 3, DisplayNameKey = "WatchdogTimeout", DescriptionKey = "WatchdogTimeout")]
     public abstract TimeSpan WatchdogTimeout { get; set; }
 
     /// <summary>
     /// Gets or sets the global minimum log level.
     /// Log entries below this level will not be recorded.
     /// </summary>
-    [ConfigGroup("运行时配置", Order = 4, DisplayName = "最小日志级别", Description = "Global minimum log level")]
+    [ConfigGroup("Runtime", Order = 4, DisplayNameKey = "MinLogLevel", DescriptionKey = "MinLogLevel")]
     public abstract LogLevel MinimumLogLevel { get; set; }
 
     /// <summary>
@@ -78,7 +78,7 @@ public abstract class ConfigDataBase
     /// <summary>
     /// Gets or sets the nickname of the human user
     /// </summary>
-    [ConfigGroup("用户配置", Order = 2, DisplayName = "用户昵称", Description = "Nickname of the human user")]
+    [ConfigGroup("User", Order = 2, DisplayNameKey = "UserNickname", DescriptionKey = "UserNickname")]
     public abstract string UserNickname { get; set; }
 
     /// <summary>

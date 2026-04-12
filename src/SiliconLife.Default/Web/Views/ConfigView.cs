@@ -20,11 +20,12 @@ public class ConfigView : ViewBase
         var vm = model as ConfigViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.PageTitleConfig, "config", vm.Localization, body, GetScripts(), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleConfig, "config", vm.Localization, body, GetScripts(vm.Localization), GetStyles());
     }
 
     private static H RenderBody(ConfigViewModel vm)
     {
+        var loc = vm.Localization;
         var groupCards = new List<H>();
 
         foreach (var group in vm.Groups)
@@ -40,7 +41,7 @@ public class ConfigView : ViewBase
                     ? $"[{string.Join(",", item.EnumDisplayNames.Select(v => $"\"{v}\""))}]" 
                     : "";
                 
-                var editBtn = H.Button("编辑").Class("btn btn-sm btn-edit")
+                var editBtn = H.Button(loc.ConfigEditButton).Class("btn btn-sm btn-edit")
                     .Data("key", item.PropertyName)
                     .Data("display", item.DisplayName)
                     .Data("type", item.PropertyType);
@@ -57,7 +58,7 @@ public class ConfigView : ViewBase
 
                 var tr = H.Tr(
                     H.Td(item.DisplayName),
-                    H.Td(item.Value ?? "null").Class("config-value").Data("key", item.PropertyName),
+                    H.Td(item.Value ?? loc.ConfigNullValue).Class("config-value").Data("key", item.PropertyName),
                     H.Td(editBtn)
                 );
 
@@ -75,9 +76,9 @@ public class ConfigView : ViewBase
                 H.Table(
                     H.Thead(
                         H.Tr(
-                            H.Th("属性名"),
-                            H.Th("属性值"),
-                            H.Th("操作")
+                            H.Th(loc.ConfigPropertyNameLabel),
+                            H.Th(loc.ConfigPropertyValueLabel),
+                            H.Th(loc.ConfigActionLabel)
                         )
                     ),
                     H.Tbody(rows.ToArray())
@@ -87,61 +88,61 @@ public class ConfigView : ViewBase
 
         return H.Div(
             H.Div(
-                H.H1("系统配置")
+                H.H1(loc.ConfigPageHeader)
             ).Class("page-header"),
             H.Div(groupCards.ToArray()),
             H.Div(
                 H.Div(
                     H.Div(
-                        H.H3("编辑配置项").Id("editModalTitle"),
+                        H.H3(loc.ConfigEditModalTitle).Id("editModalTitle"),
                         H.Div(
-                            H.Label("属性名：").Attr("for", "editKey"),
+                            H.Label(loc.ConfigEditPropertyLabel).Attr("for", "editKey"),
                             H.Input().Attr("type", "text").Id("editKey").Attr("readonly", "readonly")
                         ).Class("form-group"),
                         H.Div(
-                            H.Label("属性值：").Attr("for", "editValue"),
+                            H.Label(loc.ConfigEditValueLabel).Attr("for", "editValue"),
                             H.Input().Attr("type", "text").Id("editValue")
                         ).Class("form-group").Id("inputString"),
                         H.Div(
-                            H.Label("属性值：").Attr("for", "editValueNumber"),
+                            H.Label(loc.ConfigEditValueLabel).Attr("for", "editValueNumber"),
                             H.Input().Attr("type", "number").Id("editValueNumber").Attr("step", "any")
                         ).Class("form-group").Id("inputNumber").Style("display:none"),
                         H.Div(
-                            H.Label("属性值：").Attr("for", "editValueBool"),
+                            H.Label(loc.ConfigEditValueLabel).Attr("for", "editValueBool"),
                             H.Input().Attr("type", "checkbox").Id("editValueBool")
                         ).Class("form-group").Id("inputBool").Style("display:none"),
                         H.Div(
-                            H.Label("属性值：").Attr("for", "editValueDirectory"),
+                            H.Label(loc.ConfigEditValueLabel).Attr("for", "editValueDirectory"),
                             H.Div(
                                 H.Input().Attr("type", "text").Id("editValueDirectory").Attr("readonly", "readonly"),
-                                H.Button("浏览").Class("btn btn-sm").Id("btnBrowseDir")
+                                H.Button(loc.ConfigBrowseButton).Class("btn btn-sm").Id("btnBrowseDir")
                             ).Class("input-with-btn"),
                             H.Div().Id("dirBrowser").Class("dir-browser").Style("display:none")
                         ).Class("form-group").Id("inputDirectory").Style("display:none"),
                         H.Div(
-                            H.Label("属性值：").Attr("for", "editValueDatetime"),
+                            H.Label(loc.ConfigEditValueLabel).Attr("for", "editValueDatetime"),
                             H.Input().Attr("type", "datetime-local").Id("editValueDatetime")
                         ).Class("form-group").Id("inputDatetime").Style("display:none"),
                         H.Div(
-                            H.Label("时间设定："),
+                            H.Label(loc.ConfigTimeSettingsLabel),
                             H.Div(
-                                H.Label("天：").Attr("for", "editValueTimespanDays"),
+                                H.Label(loc.ConfigDaysLabel).Attr("for", "editValueTimespanDays"),
                                 H.Input().Attr("type", "number").Id("editValueTimespanDays").Attr("min", "0").Attr("step", "1").Class("timespan-input"),
-                                H.Label("时：").Attr("for", "editValueTimespanHours"),
+                                H.Label(loc.ConfigHoursLabel).Attr("for", "editValueTimespanHours"),
                                 H.Input().Attr("type", "number").Id("editValueTimespanHours").Attr("min", "0").Attr("max", "23").Attr("step", "1").Class("timespan-input"),
-                                H.Label("分：").Attr("for", "editValueTimespanMinutes"),
+                                H.Label(loc.ConfigMinutesLabel).Attr("for", "editValueTimespanMinutes"),
                                 H.Input().Attr("type", "number").Id("editValueTimespanMinutes").Attr("min", "0").Attr("max", "59").Attr("step", "1").Class("timespan-input"),
-                                H.Label("秒：").Attr("for", "editValueTimespanSeconds"),
+                                H.Label(loc.ConfigSecondsLabel).Attr("for", "editValueTimespanSeconds"),
                                 H.Input().Attr("type", "number").Id("editValueTimespanSeconds").Attr("min", "0").Attr("max", "59").Attr("step", "1").Class("timespan-input")
                             ).Class("timespan-inputs")
                         ).Class("form-group").Id("inputTimespan").Style("display:none"),
                         H.Div(
-                            H.Label("属性值：").Attr("for", "editValueEnum"),
+                            H.Label(loc.ConfigEditValueLabel).Attr("for", "editValueEnum"),
                             H.Select().Id("editValueEnum")
                         ).Class("form-group").Id("inputEnum").Style("display:none"),
                         H.Div(
-                            H.Button("保存").Class("btn btn-primary").Id("btnSave"),
-                            H.Button("取消").Class("btn btn-secondary").Id("btnCancel")
+                            H.Button(loc.ConfigSaveButton).Class("btn btn-primary").Id("btnSave"),
+                            H.Button(loc.ConfigCancelButton).Class("btn btn-secondary").Id("btnCancel")
                         ).Class("form-actions")
                     ).Class("modal-content")
                 ).Class("modal-dialog")
@@ -329,7 +330,7 @@ public class ConfigView : ViewBase
             .EndSelector();
     }
 
-    private static JsSyntax GetScripts()
+    private static JsSyntax GetScripts(DefaultLocalizationBase loc)
     {
         var js = Js.Block();
 
@@ -391,7 +392,7 @@ public class ConfigView : ViewBase
         var openModalBlock = Js.Block()
             .Add(() => Js.Id(() => "hideAllInputs").Invoke().Stmt())
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editKey")).Prop(() => "value").Assign(() => Js.Id(() => "key")))
-            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editModalTitle")).Prop(() => "textContent").Assign(() => Js.Str(() => "编辑：").Op(() => "+", () => Js.Id(() => "display"))))
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editModalTitle")).Prop(() => "textContent").Assign(() => Js.Str(() => loc.ConfigEditPrefix).Op(() => "+", () => Js.Id(() => "display"))))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editModal")).Prop(() => "classList").Call(() => "add", () => Js.Str(() => "show")));
         
         var typeSwitchBlock = Js.Block()
