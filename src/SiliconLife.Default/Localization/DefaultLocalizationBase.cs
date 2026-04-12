@@ -340,6 +340,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string PageTitleTasks { get; }
 
     /// <summary>
+    /// Gets the page title for timers page
+    /// </summary>
+    public abstract string PageTitleTimers { get; }
+
+    /// <summary>
     /// Gets the page title for memory page
     /// </summary>
     public abstract string PageTitleMemory { get; }
@@ -469,6 +474,16 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string BeingsDetailSoulContentLabel { get; }
 
     /// <summary>
+    /// Gets the timers label in detail view
+    /// </summary>
+    public abstract string BeingsDetailTimersLabel { get; }
+
+    /// <summary>
+    /// Gets the tasks label in detail view
+    /// </summary>
+    public abstract string BeingsDetailTasksLabel { get; }
+
+    /// <summary>
     /// Gets the "Yes" text for boolean values
     /// </summary>
     public abstract string BeingsYes { get; }
@@ -482,6 +497,63 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the "Not set" placeholder text
     /// </summary>
     public abstract string BeingsNotSet { get; }
+
+    // ===== Timers Page Localization =====
+
+    /// <summary>
+    /// Gets the timers page header text
+    /// </summary>
+    public abstract string TimersPageHeader { get; }
+
+    /// <summary>
+    /// Gets the label for total timers count
+    /// </summary>
+    public abstract string TimersTotalCount { get; }
+
+    /// <summary>
+    /// Gets the empty state text when no timers exist
+    /// </summary>
+    public abstract string TimersEmptyState { get; }
+
+    /// <summary>
+    /// Gets the active status text
+    /// </summary>
+    public abstract string TimersStatusActive { get; }
+
+    /// <summary>
+    /// Gets the paused status text
+    /// </summary>
+    public abstract string TimersStatusPaused { get; }
+
+    /// <summary>
+    /// Gets the triggered status text
+    /// </summary>
+    public abstract string TimersStatusTriggered { get; }
+
+    /// <summary>
+    /// Gets the cancelled status text
+    /// </summary>
+    public abstract string TimersStatusCancelled { get; }
+
+    /// <summary>
+    /// Gets the recurring timer type text
+    /// </summary>
+    public abstract string TimersTypeRecurring { get; }
+
+    /// <summary>
+    /// Gets the trigger time label
+    /// </summary>
+    public abstract string TimersTriggerTimeLabel { get; }
+
+    /// <summary>
+    /// Gets the interval label
+    /// </summary>
+    public abstract string TimersIntervalLabel { get; }
+
+    /// <summary>
+    /// Gets the triggered count label
+    /// </summary>
+    public abstract string TimersTriggeredCountLabel { get; }
 
     // ===== Chat Page Localization =====
 

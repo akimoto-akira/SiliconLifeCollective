@@ -90,7 +90,9 @@ public class BeingController : Controller
             isIdle = being.IsIdle,
             isCustomCompiled = being.IsCustomCompiled,
             customTypeName = being.CustomTypeName ?? "",
-            soulContent = being.SoulContent ?? ""
+            soulContent = being.SoulContent ?? "",
+            timerCount = being.TimerSystem?.Count ?? 0,
+            taskCount = being.TaskSystem?.Count ?? 0
         });
     }
 }

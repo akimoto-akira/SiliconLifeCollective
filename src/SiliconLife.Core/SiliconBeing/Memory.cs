@@ -11,8 +11,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
-
 namespace SiliconLife.Collective;
 
 /// <summary>
@@ -127,12 +125,8 @@ public sealed class Memory
     {
         try
         {
-            var entries = _timeStorage.Query(_storageKey, new IncompleteDate(DateTime.Now.Year));
-            _memories = entries
-                .Select(e => JsonSerializer.Deserialize<MemoryEntry>(System.Text.Encoding.UTF8.GetString(e.Data)))
-                .Where(e => e != null)
-                .Cast<MemoryEntry>()
-                .ToList();
+            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, new IncompleteDate(DateTime.Now.Year));
+            _memories = entries.Select(e => e.Data).ToList();
             _logger.Debug("Loading memories from storage, found {0} entries", _memories.Count);
         }
         catch (Exception ex)
@@ -144,9 +138,7 @@ public sealed class Memory
 
     private void Save(MemoryEntry entry)
     {
-        string json = JsonSerializer.Serialize(entry);
-        byte[] data = System.Text.Encoding.UTF8.GetBytes(json);
-        _timeStorage.Write(_storageKey, entry.Timestamp, data);
+        _timeStorage.Write(_storageKey, entry.Timestamp, entry);
     }
 
     /// <summary>
@@ -223,47 +215,43 @@ public sealed class Memory
         var hour = now.Hour;
         for (int h = hour; h >= 0 && results.Count < count * 10; h--)
         {
-            var entries = _timeStorage.Query(_storageKey, new IncompleteDate(now.Year, now.Month, now.Day, h));
+            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, new IncompleteDate(now.Year, now.Month, now.Day, h));
             foreach (var e in entries.OrderByDescending(e => e.Timestamp).Take(count))
             {
-                var entry = JsonSerializer.Deserialize<MemoryEntry>(System.Text.Encoding.UTF8.GetString(e.Data));
-                if (entry != null && seenIds.Add(entry.Id))
-                    results.Add(entry);
+                if (seenIds.Add(e.Data.Id))
+                    results.Add(e.Data);
             }
         }
 
         var day = now.Day;
         for (int d = day - 1; d > 0 && results.Count < count * 10; d--)
         {
-            var entries = _timeStorage.Query(_storageKey, new IncompleteDate(now.Year, now.Month, d));
+            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, new IncompleteDate(now.Year, now.Month, d));
             foreach (var e in entries.OrderByDescending(e => e.Timestamp).Take(count))
             {
-                var entry = JsonSerializer.Deserialize<MemoryEntry>(System.Text.Encoding.UTF8.GetString(e.Data));
-                if (entry != null && seenIds.Add(entry.Id))
-                    results.Add(entry);
+                if (seenIds.Add(e.Data.Id))
+                    results.Add(e.Data);
             }
         }
 
         var month = now.Month;
         for (int m = month - 1; m > 0 && results.Count < count * 10; m--)
         {
-            var entries = _timeStorage.Query(_storageKey, new IncompleteDate(now.Year, m));
+            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, new IncompleteDate(now.Year, m));
             foreach (var e in entries.OrderByDescending(e => e.Timestamp).Take(count))
             {
-                var entry = JsonSerializer.Deserialize<MemoryEntry>(System.Text.Encoding.UTF8.GetString(e.Data));
-                if (entry != null && seenIds.Add(entry.Id))
-                    results.Add(entry);
+                if (seenIds.Add(e.Data.Id))
+                    results.Add(e.Data);
             }
         }
 
         for (int y = now.Year - 1; results.Count < count * 10; y--)
         {
-            var entries = _timeStorage.Query(_storageKey, new IncompleteDate(y));
+            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, new IncompleteDate(y));
             foreach (var e in entries.OrderByDescending(e => e.Timestamp).Take(count))
             {
-                var entry = JsonSerializer.Deserialize<MemoryEntry>(System.Text.Encoding.UTF8.GetString(e.Data));
-                if (entry != null && seenIds.Add(entry.Id))
-                    results.Add(entry);
+                if (seenIds.Add(e.Data.Id))
+                    results.Add(e.Data);
             }
             if (y <= 0) break;
         }
@@ -306,14 +294,14 @@ public sealed class Memory
     /// Finds the time level that needs compression based on the number of entries.
     /// </summary>
     /// <returns>A tuple containing the level and entries to compress, or null if no compression is needed.</returns>
-    public (IncompleteDate Level, List<TimeEntry> Entries)? FindLevelToCompress()
+    public (IncompleteDate Level, List<TimeEntry<MemoryEntry>> Entries)? FindLevelToCompress()
     {
         var now = DateTime.Now;
 
         var second = new IncompleteDate(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
         if (!HasSummary(second))
         {
-            var entries = _timeStorage.Query(_storageKey, second);
+            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, second);
             if (entries.Count > 0)
                 return (second, entries);
         }
@@ -321,7 +309,7 @@ public sealed class Memory
         var minute = new IncompleteDate(now.Year, now.Month, now.Day, now.Hour, now.Minute);
         if (!HasSummary(minute))
         {
-            var entries = _timeStorage.Query(_storageKey, minute);
+            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, minute);
             if (entries.Count > 0)
                 return (minute, entries);
         }
@@ -329,7 +317,7 @@ public sealed class Memory
         var hour = new IncompleteDate(now.Year, now.Month, now.Day, now.Hour);
         if (!HasSummary(hour))
         {
-            var entries = _timeStorage.Query(_storageKey, hour);
+            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, hour);
             if (entries.Count > 0)
                 return (hour, entries);
         }
@@ -337,7 +325,7 @@ public sealed class Memory
         var day = new IncompleteDate(now.Year, now.Month, now.Day);
         if (!HasSummary(day))
         {
-            var entries = _timeStorage.Query(_storageKey, day);
+            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, day);
             if (entries.Count > 0)
                 return (day, entries);
         }
@@ -345,7 +333,7 @@ public sealed class Memory
         var month = new IncompleteDate(now.Year, now.Month);
         if (!HasSummary(month))
         {
-            var entries = _timeStorage.Query(_storageKey, month);
+            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, month);
             if (entries.Count > 0)
                 return (month, entries);
         }
@@ -353,7 +341,7 @@ public sealed class Memory
         var year = new IncompleteDate(now.Year);
         if (!HasSummary(year))
         {
-            var entries = _timeStorage.Query(_storageKey, year);
+            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, year);
             if (entries.Count > 0)
                 return (year, entries);
         }
@@ -363,7 +351,7 @@ public sealed class Memory
             var pastYear = new IncompleteDate(y);
             if (!HasSummary(pastYear))
             {
-                var entries = _timeStorage.Query(_storageKey, pastYear);
+                var entries = _timeStorage.Query<MemoryEntry>(_storageKey, pastYear);
                 if (entries.Count > 0)
                     return (pastYear, entries);
             }
@@ -404,11 +392,11 @@ public sealed class Memory
     /// </summary>
     /// <param name="count">The maximum number of entries to retrieve.</param>
     /// <returns>A list of time entries available for compression.</returns>
-    public List<TimeEntry> GetEntriesForCompression(int count = 10)
+    public List<TimeEntry<MemoryEntry>> GetEntriesForCompression(int count = 10)
     {
         var compressData = FindLevelToCompress();
         if (!compressData.HasValue)
-            return new List<TimeEntry>();
+            return new List<TimeEntry<MemoryEntry>>();
 
         return compressData.Value.Entries.Take(count).ToList();
     }

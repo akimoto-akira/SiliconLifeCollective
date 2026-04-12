@@ -279,19 +279,7 @@ public class ChatController : Controller
             var result = messages.Select(m =>
             {
                 var senderBeing = m.SenderId != _userId && beingDict.TryGetValue(m.SenderId, out var b) ? b : null;
-                string roleStr;
-                if (m.Role != null)
-                {
-                    roleStr = m.Role.Value.ToString();
-                }
-                else if (m.SenderId == _userId)
-                {
-                    roleStr = "User";
-                }
-                else
-                {
-                    roleStr = "Assistant";
-                }
+                string roleStr = m.Role.ToString();
                 return new
                 {
                     id = m.Id.ToString(),

@@ -67,11 +67,10 @@ public class ChatMessage
     public List<Guid> ReadBy { get; set; } = [];
 
     /// <summary>
-    /// Optional explicit message role for AI conversation context.
-    /// When null, role is inferred from SenderId (User or Assistant).
-    /// Used to persist Tool-related messages that cannot be inferred from sender alone.
+    /// Message role for AI conversation context.
+    /// Defaults to User. Used to persist Tool-related messages that cannot be inferred from sender alone.
     /// </summary>
-    public MessageRole? Role { get; set; }
+    public MessageRole Role { get; set; } = MessageRole.User;
 
     /// <summary>
     /// Tool call ID for tool result messages, matching the originating ToolCall.

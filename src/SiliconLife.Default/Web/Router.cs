@@ -42,6 +42,8 @@ public class Router
         RegisterController(() => new BeingController(), "/beings");
         RegisterController(() => new BeingController(), "/api/beings/list");
         RegisterController(() => new BeingController(), "/api/beings/detail");
+        RegisterController(() => new TimerController(), "/timers");
+        RegisterController(() => new TimerController(), "/api/timers/list");
         RegisterController(() => new TaskController(), "/tasks");
         RegisterController(() => new PermissionController(), "/permissions");
         RegisterController(() => new LogController(), "/logs");

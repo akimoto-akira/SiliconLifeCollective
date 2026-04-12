@@ -339,12 +339,8 @@ public sealed class TimerSystem
     {
         try
         {
-            byte[]? data = _storage.Read(_storageKey);
-            if (data == null || data.Length == 0)
-                return;
-
-            string json = System.Text.Encoding.UTF8.GetString(data);
-            _timers = JsonSerializer.Deserialize<List<TimerItem>>(json) ?? new List<TimerItem>();
+            List<TimerItem>? timers = _storage.Read<List<TimerItem>>(_storageKey);
+            _timers = timers ?? new List<TimerItem>();
 
             foreach (var timer in _timers.Where(t => t.Status == TimerStatus.Triggered))
             {
@@ -369,9 +365,7 @@ public sealed class TimerSystem
     {
         try
         {
-            string json = JsonSerializer.Serialize(_timers);
-            byte[] data = System.Text.Encoding.UTF8.GetBytes(json);
-            _storage.Write(_storageKey, data);
+            _storage.Write(_storageKey, _timers);
         }
         catch (Exception ex)
         {

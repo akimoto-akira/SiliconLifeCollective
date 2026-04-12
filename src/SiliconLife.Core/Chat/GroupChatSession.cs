@@ -11,14 +11,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
-
 namespace SiliconLife.Collective;
 
 /// <summary>
 /// Group chat session — persists messages via <see cref="ITimeStorage"/>.
 /// </summary>
-public class GroupChatSession : ISession
+public class GroupChatSession : SessionBase
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<GroupChatSession>();
     private readonly ITimeStorage _storage;
@@ -26,27 +24,25 @@ public class GroupChatSession : ISession
     private readonly object _lock = new();
 
     /// <inheritdoc/>
-    public Guid Id { get; }
+    public override SessionType Type => SessionType.GroupChat;
 
     /// <inheritdoc/>
-    public SessionType Type => SessionType.GroupChat;
+    public override string Name { get; set; }
 
     /// <inheritdoc/>
-    public string Name { get; set; }
-
-    /// <inheritdoc/>
-    public List<Guid> Members { get; private set; }
+    public override List<Guid> Members { get; protected set; }
 
     /// <summary>
     /// Initialize group chat session.
     /// </summary>
-    /// <param name="groupId">Group GUID</param>
     /// <param name="members">Member list</param>
     /// <param name="storage">Time-indexed storage for message persistence</param>
-    public GroupChatSession(Guid groupId, List<Guid> members, ITimeStorage storage)
+    /// <param name="name">Group display name (optional)</param>
+    public GroupChatSession(List<Guid> members, ITimeStorage storage, string name = "")
+        : base(members)
     {
-        Id = groupId;
         Members = new(members);
+        Name = name;
         _storage = storage;
         _storageKey = $"sessions/group/{Id}";
     }
@@ -77,18 +73,17 @@ public class GroupChatSession : ISession
     }
 
     /// <inheritdoc/>
-    public void AddMessage(ChatMessage message)
+    public override void AddMessage(ChatMessage message)
     {
         lock (_lock)
         {
-            byte[] data = JsonSerializer.SerializeToUtf8Bytes(message);
-            _storage.Write(_storageKey, message.Timestamp, data);
+            _storage.Write(_storageKey, message.Timestamp, message);
             _logger.Debug("Session {0}: message added from {1}", Id, message.SenderId);
         }
     }
 
     /// <inheritdoc/>
-    public List<ChatMessage> GetMessages(int offset = 0, int limit = 50)
+    public override List<ChatMessage> GetMessages(int offset = 0, int limit = 50)
     {
         lock (_lock)
         {
@@ -98,12 +93,11 @@ public class GroupChatSession : ISession
             while (allMessages.Count < offset + limit && year >= 1)
             {
                 IncompleteDate range = new(year);
-                List<TimeEntry> entries = _storage.Query(_storageKey, range);
-                foreach (TimeEntry entry in entries)
+                List<TimeEntry<ChatMessage>> entries = _storage.Query<ChatMessage>(_storageKey, range);
+                foreach (TimeEntry<ChatMessage> entry in entries)
                 {
-                    ChatMessage? msg = JsonSerializer.Deserialize<ChatMessage>(entry.Data);
-                    if (msg != null)
-                        allMessages.Add(msg);
+                    if (entry.Data != null)
+                        allMessages.Add(entry.Data);
                 }
                 year--;
             }
@@ -115,7 +109,7 @@ public class GroupChatSession : ISession
     }
 
     /// <inheritdoc/>
-    public List<ChatMessage> GetPendingMessages(Guid participantId)
+    public override List<ChatMessage> GetPendingMessages(Guid participantId)
     {
         lock (_lock)
         {
@@ -125,15 +119,14 @@ public class GroupChatSession : ISession
             while (year >= 1)
             {
                 IncompleteDate range = new(year);
-                List<TimeEntry> entries = _storage.Query(_storageKey, range);
+                List<TimeEntry<ChatMessage>> entries = _storage.Query<ChatMessage>(_storageKey, range);
                 bool foundAny = false;
 
-                foreach (TimeEntry entry in entries)
+                foreach (TimeEntry<ChatMessage> entry in entries)
                 {
-                    ChatMessage? msg = JsonSerializer.Deserialize<ChatMessage>(entry.Data);
-                    if (msg != null && msg.SenderId != participantId && !msg.ReadBy.Contains(participantId))
+                    if (entry.Data != null && entry.Data.SenderId != participantId && !entry.Data.ReadBy.Contains(participantId))
                     {
-                        pending.Add(msg);
+                        pending.Add(entry.Data);
                         foundAny = true;
                     }
                 }
@@ -150,7 +143,7 @@ public class GroupChatSession : ISession
     }
 
     /// <inheritdoc/>
-    public void MarkMessageAsRead(Guid messageId, Guid readerId)
+    public override void MarkMessageAsRead(Guid messageId, Guid readerId)
     {
         lock (_lock)
         {
@@ -159,16 +152,14 @@ public class GroupChatSession : ISession
             while (year >= 1)
             {
                 IncompleteDate range = new(year);
-                List<TimeEntry> entries = _storage.Query(_storageKey, range);
+                List<TimeEntry<ChatMessage>> entries = _storage.Query<ChatMessage>(_storageKey, range);
 
-                foreach (TimeEntry entry in entries)
+                foreach (TimeEntry<ChatMessage> entry in entries)
                 {
-                    ChatMessage? msg = JsonSerializer.Deserialize<ChatMessage>(entry.Data);
-                    if (msg != null && msg.Id == messageId && !msg.ReadBy.Contains(readerId))
+                    if (entry.Data != null && entry.Data.Id == messageId && !entry.Data.ReadBy.Contains(readerId))
                     {
-                        msg.ReadBy.Add(readerId);
-                        byte[] data = JsonSerializer.SerializeToUtf8Bytes(msg);
-                        _storage.Write(_storageKey, entry.Timestamp, data);
+                        entry.Data.ReadBy.Add(readerId);
+                        _storage.Write(_storageKey, entry.Timestamp, entry.Data);
                         _logger.Trace("Session {0}: message {1} read by {2}", Id, messageId, readerId);
                         return;
                     }
@@ -180,7 +171,7 @@ public class GroupChatSession : ISession
     }
 
     /// <inheritdoc/>
-    public void MarkMessagesAsRead(IEnumerable<Guid> messageIds, Guid readerId)
+    public override void MarkMessagesAsRead(IEnumerable<Guid> messageIds, Guid readerId)
     {
         lock (_lock)
         {
@@ -190,17 +181,15 @@ public class GroupChatSession : ISession
             while (year >= 1 && ids.Count > 0)
             {
                 IncompleteDate range = new(year);
-                List<TimeEntry> entries = _storage.Query(_storageKey, range);
+                List<TimeEntry<ChatMessage>> entries = _storage.Query<ChatMessage>(_storageKey, range);
 
-                foreach (TimeEntry entry in entries)
+                foreach (TimeEntry<ChatMessage> entry in entries)
                 {
-                    ChatMessage? msg = JsonSerializer.Deserialize<ChatMessage>(entry.Data);
-                    if (msg != null && ids.Contains(msg.Id) && !msg.ReadBy.Contains(readerId))
+                    if (entry.Data != null && ids.Contains(entry.Data.Id) && !entry.Data.ReadBy.Contains(readerId))
                     {
-                        msg.ReadBy.Add(readerId);
-                        byte[] data = JsonSerializer.SerializeToUtf8Bytes(msg);
-                        _storage.Write(_storageKey, entry.Timestamp, data);
-                        ids.Remove(msg.Id);
+                        entry.Data.ReadBy.Add(readerId);
+                        _storage.Write(_storageKey, entry.Timestamp, entry.Data);
+                        ids.Remove(entry.Data.Id);
                     }
                 }
 

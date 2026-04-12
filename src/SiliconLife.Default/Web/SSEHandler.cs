@@ -184,19 +184,7 @@ public class SSEHandler : IDisposable
     {
         var historyData = messages.Select(m =>
         {
-            string roleStr;
-            if (m.Role != null)
-            {
-                roleStr = m.Role.Value.ToString();
-            }
-            else if (m.SenderId == requestUserId)
-            {
-                roleStr = "User";
-            }
-            else
-            {
-                roleStr = "Assistant";
-            }
+            string roleStr = m.Role.ToString();
             return new
             {
                 id = m.Id.ToString(),

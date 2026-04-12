@@ -205,6 +205,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string PageTitleDashboard => "仪表盘 - 硅基生命群";
     public override string PageTitleBeings => "硅基人管理 - 硅基生命群";
     public override string PageTitleTasks => "任务管理 - 硅基生命群";
+    public override string PageTitleTimers => "定时器管理 - 硅基生命群";
     public override string PageTitleMemory => "记忆浏览 - 硅基生命群";
     public override string PageTitleKnowledge => "知识图谱 - 硅基生命群";
     public override string PageTitleProjects => "项目空间管理 - 硅基生命群";
@@ -248,11 +249,27 @@ public class ZhCN : DefaultLocalizationBase
     public override string BeingsDetailStatusLabel => "状态：";
     public override string BeingsDetailCustomCompileLabel => "自定义编译：";
     public override string BeingsDetailSoulContentLabel => "灵魂内容：";
+    public override string BeingsDetailTimersLabel => "定时器：";
+    public override string BeingsDetailTasksLabel => "任务：";
     public override string BeingsYes => "是";
     public override string BeingsNo => "否";
     public override string BeingsNotSet => "未设置";
 
-    // ===== About Page Localization =====
+    // ===== Timers Page Localization =====
+
+    public override string TimersPageHeader => "定时器管理";
+    public override string TimersTotalCount => "共 {0} 个定时器";
+    public override string TimersEmptyState => "暂无定时器";
+    public override string TimersStatusActive => "运行中";
+    public override string TimersStatusPaused => "已暂停";
+    public override string TimersStatusTriggered => "已触发";
+    public override string TimersStatusCancelled => "已取消";
+    public override string TimersTypeRecurring => "循环";
+    public override string TimersTriggerTimeLabel => "触发时间：";
+    public override string TimersIntervalLabel => "间隔：";
+    public override string TimersTriggeredCountLabel => "已触发：";
+
+    // ===== Chat Page Localization =====
 
     public override string AboutPageHeader => "关于";
     public override string AboutAppName => "硅基生命群";

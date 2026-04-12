@@ -265,12 +265,8 @@ public sealed class TaskSystem
     {
         try
         {
-            byte[]? data = _storage.Read(_storageKey);
-            if (data == null || data.Length == 0)
-                return;
-
-            string json = System.Text.Encoding.UTF8.GetString(data);
-            _tasks = JsonSerializer.Deserialize<List<TaskItem>>(json) ?? new List<TaskItem>();
+            List<TaskItem>? tasks = _storage.Read<List<TaskItem>>(_storageKey);
+            _tasks = tasks ?? new List<TaskItem>();
         }
         catch (Exception ex)
         {
@@ -286,9 +282,7 @@ public sealed class TaskSystem
     {
         try
         {
-            string json = JsonSerializer.Serialize(_tasks);
-            byte[] data = System.Text.Encoding.UTF8.GetBytes(json);
-            _storage.Write(_storageKey, data);
+            _storage.Write(_storageKey, _tasks);
         }
         catch (Exception ex)
         {

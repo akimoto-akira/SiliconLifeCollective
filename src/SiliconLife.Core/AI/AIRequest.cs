@@ -24,9 +24,10 @@ public class AIRequest
     public string Model { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the list of messages in the conversation
+    /// Gets or sets the list of chat messages in the conversation.
+    /// IAIClient implementations are responsible for converting ChatMessage to their specific API format.
     /// </summary>
-    public List<Message> Messages { get; set; } = new List<Message>();
+    public List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
 
     /// <summary>
     /// Gets or sets the list of tools available for the AI to call.
@@ -47,6 +48,10 @@ public class AIRequest
     /// </summary>
     public void AddMessage(MessageRole role, string content)
     {
-        Messages.Add(new Message(role, content));
+        Messages.Add(new ChatMessage
+        {
+            Role = role,
+            Content = content,
+        });
     }
 }

@@ -11,7 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using SiliconLife.Collective;
+using SiliconLife.Default.Storage;
 
 namespace SiliconLife.Default;
 
@@ -22,6 +25,13 @@ namespace SiliconLife.Default;
 public class FileSystemStorage : IStorage
 {
     private readonly string _baseDirectory;
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+        Converters = { new FlexibleEnumConverter() }
+    };
 
     /// <summary>
     /// Initializes a new instance of the FileSystemStorage class
@@ -30,7 +40,7 @@ public class FileSystemStorage : IStorage
     public FileSystemStorage(string baseDirectory)
     {
         _baseDirectory = baseDirectory;
-        
+
         if (!Directory.Exists(_baseDirectory))
         {
             Directory.CreateDirectory(_baseDirectory);
@@ -38,28 +48,31 @@ public class FileSystemStorage : IStorage
     }
 
     /// <summary>
-    /// Reads data from storage by key
+    /// Reads data from storage by key and deserializes to type T
     /// </summary>
+    /// <typeparam name="T">The type to deserialize to</typeparam>
     /// <param name="key">The key to read</param>
-    /// <returns>The data bytes, or null if not found</returns>
-    public byte[]? Read(string key)
+    /// <returns>The deserialized data, or default if not found</returns>
+    public T? Read<T>(string key)
     {
         string filePath = GetFilePath(key);
-        
+
         if (!File.Exists(filePath))
         {
-            return null;
+            return default;
         }
 
-        return File.ReadAllBytes(filePath);
+        string json = File.ReadAllText(filePath);
+        return JsonSerializer.Deserialize<T>(json, _jsonOptions);
     }
 
     /// <summary>
-    /// Writes data to storage by key
+    /// Writes data to storage by key with automatic JSON serialization
     /// </summary>
+    /// <typeparam name="T">The type of data to serialize</typeparam>
     /// <param name="key">The key to write</param>
-    /// <param name="data">The data bytes to write</param>
-    public void Write(string key, byte[] data)
+    /// <param name="data">The data to write</param>
+    public void Write<T>(string key, T data)
     {
         string filePath = GetFilePath(key);
         string? directory = Path.GetDirectoryName(filePath);
@@ -69,7 +82,8 @@ public class FileSystemStorage : IStorage
             Directory.CreateDirectory(directory);
         }
 
-        File.WriteAllBytes(filePath, data);
+        string json = JsonSerializer.Serialize(data, _jsonOptions);
+        File.WriteAllText(filePath, json);
     }
 
     /// <summary>

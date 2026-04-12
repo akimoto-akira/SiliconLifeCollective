@@ -14,23 +14,25 @@
 namespace SiliconLife.Collective;
 
 /// <summary>
-/// Storage interface for key-value data persistence
+/// Storage interface for key-value data persistence with automatic JSON serialization.
 /// </summary>
 public interface IStorage
 {
     /// <summary>
-    /// Reads data from storage by key
+    /// Reads data from storage by key and deserializes to type T.
     /// </summary>
+    /// <typeparam name="T">The type to deserialize to</typeparam>
     /// <param name="key">The key to read</param>
-    /// <returns>The data bytes, or null if not found</returns>
-    byte[]? Read(string key);
+    /// <returns>The deserialized object, or default if not found</returns>
+    T? Read<T>(string key);
 
     /// <summary>
-    /// Writes data to storage by key
+    /// Writes data to storage by key with automatic JSON serialization.
     /// </summary>
+    /// <typeparam name="T">The type of the data to serialize</typeparam>
     /// <param name="key">The key to write</param>
-    /// <param name="data">The data bytes to write</param>
-    void Write(string key, byte[] data);
+    /// <param name="data">The data object to write</param>
+    void Write<T>(string key, T data);
 
     /// <summary>
     /// Checks if a key exists in storage

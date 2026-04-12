@@ -150,6 +150,16 @@ public class BeingView : ViewBase
                 .Property("overflow-y", "auto")
                 .Property("white-space", "pre-wrap")
             .EndSelector()
+            .Selector(".detail-link")
+                .Property("color", "var(--accent-primary)")
+                .Property("text-decoration", "none")
+                .Property("font-weight", "bold")
+                .Property("transition", "color 0.2s")
+            .EndSelector()
+            .Selector(".detail-link:hover")
+                .Property("color", "var(--accent-secondary, var(--accent-primary))")
+                .Property("text-decoration", "underline")
+            .EndSelector()
             .Selector(".empty-state")
                 .Property("text-align", "center")
                 .Property("padding", "40px")
@@ -243,6 +253,18 @@ public class BeingView : ViewBase
             () => Js.Str(() => "<div class='soul-content'>").Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "soulContent")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>")),
             () => Js.Str(() => $"<span style='color: var(--text-secondary)'>{loc.BeingsNotSet}</span>"));
 
+        var timerLink = Js.Str(() => "<a class='detail-link' href='/timers?beingId=")
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "id"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "'>"))
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "timerCount"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a>"));
+
+        var taskLink = Js.Str(() => "<a class='detail-link' href='/tasks?beingId=")
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "id"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "'>"))
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "taskCount"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a>"));
+
         return Js.Str(() => "<h2>")
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "name"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</h2><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailIdLabel}</span><span class=\"detail-value\">"))
@@ -251,7 +273,11 @@ public class BeingView : ViewBase
             .Op(() => "+", () => (JsSyntax)statusValue)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailCustomCompileLabel}</span><span class=\"detail-value\">"))
             .Op(() => "+", () => (JsSyntax)compiledValue)
-            .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</span></div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailSoulContentLabel}</span></div><div class=\"detail-row\">"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</span></div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailTimersLabel}</span>"))
+            .Op(() => "+", () => (JsSyntax)timerLink)
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailTasksLabel}</span>"))
+            .Op(() => "+", () => (JsSyntax)taskLink)
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailSoulContentLabel}</span></div><div class=\"detail-row\">"))
             .Op(() => "+", () => (JsSyntax)soulHtml)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"));
     }

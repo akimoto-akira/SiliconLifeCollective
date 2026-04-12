@@ -174,9 +174,9 @@ public class DefaultSiliconBeing : SiliconBeingBase
     /// Builds the list of chat sessions:
     /// single chat sessions with the project user ID + all other silicon beings (excluding self).
     /// </summary>
-    private List<ISession> BuildSessionList()
+    private List<SessionBase> BuildSessionList()
     {
-        var sessions = new List<ISession>();
+        var sessions = new List<SessionBase>();
         ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
         if (chatSystem == null)
         {
@@ -186,7 +186,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
         Guid userId = Config.Instance.Data.UserGuid;
         if (userId != Guid.Empty)
         {
-            ISession session = chatSystem.GetOrCreateSession(Id, userId);
+            SessionBase session = chatSystem.GetOrCreateSession(Id, userId);
             sessions.Add(session);
         }
 
@@ -197,7 +197,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
             {
                 if (other.Id != Id)
                 {
-                    ISession session = chatSystem.GetOrCreateSession(Id, other.Id);
+                    SessionBase session = chatSystem.GetOrCreateSession(Id, other.Id);
                     sessions.Add(session);
                 }
             }
@@ -209,7 +209,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
     /// <summary>
     /// Executes a brain function with logging and continuation tracking.
     /// </summary>
-    private void ExecuteBrain(string sceneName, ISession? session, Func<ContextManager, AIResponse> thinkFunc)
+    private void ExecuteBrain(string sceneName, SessionBase? session, Func<ContextManager, AIResponse> thinkFunc)
     {
         _logger.Info("Being {0}: executing brain scene {1}", Name, sceneName);
 

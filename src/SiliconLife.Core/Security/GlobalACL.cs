@@ -40,6 +40,14 @@ public sealed class AclRule
     }
 }
 
+internal sealed class AclRuleData
+{
+    public PermissionType PermissionType { get; set; }
+    public string ResourcePrefix { get; set; } = string.Empty;
+    public PermissionResult Result { get; set; }
+    public string? Description { get; set; }
+}
+
 /// <summary>
 /// Global Access Control List — prefix-matching rule table shared across all silicon beings.
 /// Persists to IStorage. Supports user management (add/remove rules).
@@ -51,7 +59,6 @@ public class GlobalACL
     private readonly List<AclRule> _rules = new();
     private readonly IStorage? _storage;
     private readonly object _lock = new();
-    private const string StorageKeyPrefix = "acl/";
     private const string RulesKey = "acl/rules";
 
     /// <summary>
@@ -156,16 +163,15 @@ public class GlobalACL
 
         try
         {
-            var ruleData = _rules.Select(r => new Dictionary<string, string>
+            var ruleData = _rules.Select(r => new AclRuleData
             {
-                ["type"] = r.PermissionType.ToString(),
-                ["prefix"] = r.ResourcePrefix,
-                ["result"] = r.Result.ToString(),
-                ["desc"] = r.Description ?? ""
+                PermissionType = r.PermissionType,
+                ResourcePrefix = r.ResourcePrefix,
+                Result = r.Result,
+                Description = r.Description
             }).ToList();
 
-            string json = System.Text.Json.JsonSerializer.Serialize(ruleData);
-            _storage.Write(RulesKey, System.Text.Encoding.UTF8.GetBytes(json));
+            _storage.Write(RulesKey, ruleData);
         }
         catch (Exception ex)
         {
@@ -179,30 +185,12 @@ public class GlobalACL
 
         try
         {
-            byte[]? data = _storage.Read(RulesKey);
-            if (data == null) return;
-
-            string json = System.Text.Encoding.UTF8.GetString(data);
-            var ruleData = System.Text.Json.JsonSerializer.Deserialize<List<Dictionary<string, string>>>(json);
+            List<AclRuleData>? ruleData = _storage.Read<List<AclRuleData>>(RulesKey);
             if (ruleData == null) return;
 
             foreach (var item in ruleData)
             {
-                if (!item.TryGetValue("type", out string? typeStr) ||
-                    !item.TryGetValue("prefix", out string? prefix) ||
-                    !item.TryGetValue("result", out string? resultStr))
-                {
-                    continue;
-                }
-
-                if (!Enum.TryParse<PermissionType>(typeStr, true, out PermissionType permType))
-                    continue;
-
-                if (!Enum.TryParse<PermissionResult>(resultStr, true, out PermissionResult result))
-                    continue;
-
-                string? desc = item.TryGetValue("desc", out string? d) ? d : null;
-                _rules.Add(new AclRule(permType, prefix, result, desc));
+                _rules.Add(new AclRule(item.PermissionType, item.ResourcePrefix, item.Result, item.Description));
             }
         }
         catch (Exception ex)

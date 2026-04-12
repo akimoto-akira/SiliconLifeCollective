@@ -11,15 +11,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Security.Cryptography;
-using System.Text.Json;
-
 namespace SiliconLife.Collective;
 
 /// <summary>
 /// Single chat session — persists messages via <see cref="ITimeStorage"/>.
 /// </summary>
-public class SingleChatSession : ISession
+public class SingleChatSession : SessionBase
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<SingleChatSession>();
     private readonly ITimeStorage _storage;
@@ -27,13 +24,10 @@ public class SingleChatSession : ISession
     private readonly object _lock = new();
 
     /// <inheritdoc/>
-    public Guid Id { get; }
+    public override SessionType Type => SessionType.SingleChat;
 
     /// <inheritdoc/>
-    public SessionType Type => SessionType.SingleChat;
-
-    /// <inheritdoc/>
-    public string Name { get; } = "";
+    public override string Name { get; set; } = "";
 
     /// <summary>Participant 1 GUID</summary>
     public Guid Participant1 { get; }
@@ -42,45 +36,36 @@ public class SingleChatSession : ISession
     public Guid Participant2 { get; }
 
     /// <inheritdoc/>
-    public List<Guid> Members { get; }
+    public override List<Guid> Members { get; protected set; }
 
     /// <summary>
     /// Initialize single chat session.
     /// </summary>
     public SingleChatSession(Guid participant1, Guid participant2, ITimeStorage storage)
+        : base(new[] { participant1, participant2 })
     {
         Participant1 = participant1;
         Participant2 = participant2;
         Members = [participant1, participant2];
         _storage = storage;
-
-        // Deterministic Id from sorted participant GUIDs via MD5
-        string sorted = string.Compare(participant1.ToString(), participant2.ToString(), StringComparison.Ordinal) <= 0
-            ? $"{participant1}{participant2}"
-            : $"{participant2}{participant1}";
-        byte[] hash = MD5.HashData(System.Text.Encoding.UTF8.GetBytes(sorted));
-        Id = new Guid(hash);
-
         _storageKey = $"sessions/single/{Id}";
     }
 
     /// <inheritdoc/>
-    public void AddMessage(ChatMessage message)
+    public override void AddMessage(ChatMessage message)
     {
         lock (_lock)
         {
-            byte[] data = JsonSerializer.SerializeToUtf8Bytes(message);
-            _storage.Write(_storageKey, message.Timestamp, data);
+            _storage.Write(_storageKey, message.Timestamp, message);
             _logger.Debug("Session {0}: message added from {1}", Id, message.SenderId);
         }
     }
 
     /// <inheritdoc/>
-    public List<ChatMessage> GetMessages(int offset = 0, int limit = 50)
+    public override List<ChatMessage> GetMessages(int offset = 0, int limit = 50)
     {
         lock (_lock)
         {
-            // Early exit: if no data exists for this session key, skip the year loop
             if (!_storage.Exists(_storageKey))
                 return [];
 
@@ -90,12 +75,11 @@ public class SingleChatSession : ISession
             while (allMessages.Count < offset + limit && year >= 1)
             {
                 IncompleteDate range = new(year);
-                List<TimeEntry> entries = _storage.Query(_storageKey, range);
-                foreach (TimeEntry entry in entries)
+                List<TimeEntry<ChatMessage>> entries = _storage.Query<ChatMessage>(_storageKey, range);
+                foreach (TimeEntry<ChatMessage> entry in entries)
                 {
-                    ChatMessage? msg = JsonSerializer.Deserialize<ChatMessage>(entry.Data);
-                    if (msg != null)
-                        allMessages.Add(msg);
+                    if (entry.Data != null)
+                        allMessages.Add(entry.Data);
                 }
                 year--;
             }
@@ -107,7 +91,7 @@ public class SingleChatSession : ISession
     }
 
     /// <inheritdoc/>
-    public List<ChatMessage> GetPendingMessages(Guid participantId)
+    public override List<ChatMessage> GetPendingMessages(Guid participantId)
     {
         lock (_lock)
         {
@@ -117,15 +101,14 @@ public class SingleChatSession : ISession
             while (year >= 1)
             {
                 IncompleteDate range = new(year);
-                List<TimeEntry> entries = _storage.Query(_storageKey, range);
+                List<TimeEntry<ChatMessage>> entries = _storage.Query<ChatMessage>(_storageKey, range);
                 bool foundAny = false;
 
-                foreach (TimeEntry entry in entries)
+                foreach (TimeEntry<ChatMessage> entry in entries)
                 {
-                    ChatMessage? msg = JsonSerializer.Deserialize<ChatMessage>(entry.Data);
-                    if (msg != null && msg.SenderId != participantId && !msg.ReadBy.Contains(participantId))
+                    if (entry.Data != null && entry.Data.SenderId != participantId && !entry.Data.ReadBy.Contains(participantId))
                     {
-                        pending.Add(msg);
+                        pending.Add(entry.Data);
                         foundAny = true;
                     }
                 }
@@ -142,7 +125,7 @@ public class SingleChatSession : ISession
     }
 
     /// <inheritdoc/>
-    public void MarkMessageAsRead(Guid messageId, Guid readerId)
+    public override void MarkMessageAsRead(Guid messageId, Guid readerId)
     {
         lock (_lock)
         {
@@ -151,16 +134,14 @@ public class SingleChatSession : ISession
             while (year >= 1)
             {
                 IncompleteDate range = new(year);
-                List<TimeEntry> entries = _storage.Query(_storageKey, range);
+                List<TimeEntry<ChatMessage>> entries = _storage.Query<ChatMessage>(_storageKey, range);
 
-                foreach (TimeEntry entry in entries)
+                foreach (TimeEntry<ChatMessage> entry in entries)
                 {
-                    ChatMessage? msg = JsonSerializer.Deserialize<ChatMessage>(entry.Data);
-                    if (msg != null && msg.Id == messageId && !msg.ReadBy.Contains(readerId))
+                    if (entry.Data != null && entry.Data.Id == messageId && !entry.Data.ReadBy.Contains(readerId))
                     {
-                        msg.ReadBy.Add(readerId);
-                        byte[] data = JsonSerializer.SerializeToUtf8Bytes(msg);
-                        _storage.Write(_storageKey, entry.Timestamp, data);
+                        entry.Data.ReadBy.Add(readerId);
+                        _storage.Write(_storageKey, entry.Timestamp, entry.Data);
                         _logger.Trace("Session {0}: message {1} read by {2}", Id, messageId, readerId);
                         return;
                     }
@@ -172,7 +153,7 @@ public class SingleChatSession : ISession
     }
 
     /// <inheritdoc/>
-    public void MarkMessagesAsRead(IEnumerable<Guid> messageIds, Guid readerId)
+    public override void MarkMessagesAsRead(IEnumerable<Guid> messageIds, Guid readerId)
     {
         lock (_lock)
         {
@@ -182,17 +163,15 @@ public class SingleChatSession : ISession
             while (year >= 1 && ids.Count > 0)
             {
                 IncompleteDate range = new(year);
-                List<TimeEntry> entries = _storage.Query(_storageKey, range);
+                List<TimeEntry<ChatMessage>> entries = _storage.Query<ChatMessage>(_storageKey, range);
 
-                foreach (TimeEntry entry in entries)
+                foreach (TimeEntry<ChatMessage> entry in entries)
                 {
-                    ChatMessage? msg = JsonSerializer.Deserialize<ChatMessage>(entry.Data);
-                    if (msg != null && ids.Contains(msg.Id) && !msg.ReadBy.Contains(readerId))
+                    if (entry.Data != null && ids.Contains(entry.Data.Id) && !entry.Data.ReadBy.Contains(readerId))
                     {
-                        msg.ReadBy.Add(readerId);
-                        byte[] data = JsonSerializer.SerializeToUtf8Bytes(msg);
-                        _storage.Write(_storageKey, entry.Timestamp, data);
-                        ids.Remove(msg.Id);
+                        entry.Data.ReadBy.Add(readerId);
+                        _storage.Write(_storageKey, entry.Timestamp, entry.Data);
+                        ids.Remove(entry.Data.Id);
                     }
                 }
 

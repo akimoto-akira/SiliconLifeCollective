@@ -47,6 +47,15 @@ public sealed class AuditEntry
     }
 }
 
+internal sealed class AuditEntryData
+{
+    public Guid CallerId { get; set; }
+    public PermissionType PermissionType { get; set; }
+    public string Resource { get; set; } = string.Empty;
+    public PermissionResult Result { get; set; }
+    public string Reason { get; set; } = string.Empty;
+}
+
 /// <summary>
 /// Audit logger for permission decisions.
 /// Persists all permission checks to ITimeStorage for time-indexed querying.
@@ -89,16 +98,16 @@ public class AuditLogger
         {
             try
             {
-                string json = System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, string>
+                var data = new AuditEntryData
                 {
-                    ["caller"] = callerId.ToString(),
-                    ["type"] = permissionType.ToString(),
-                    ["resource"] = resource,
-                    ["result"] = result.ToString(),
-                    ["reason"] = reason
-                });
+                    CallerId = callerId,
+                    PermissionType = permissionType,
+                    Resource = resource,
+                    Result = result,
+                    Reason = reason
+                };
 
-                _timeStorage.Write(AuditKey, entry.Timestamp, System.Text.Encoding.UTF8.GetBytes(json));
+                _timeStorage.Write(AuditKey, entry.Timestamp, data);
                 _logger.Debug("Audit logged: {0} | {1} | {2} | {3}", result, permissionType, resource, reason);
             }
             catch (Exception ex)
@@ -125,30 +134,21 @@ public class AuditLogger
 
         try
         {
-            List<TimeEntry> entries = _timeStorage.Query(AuditKey, range);
+            List<TimeEntry<AuditEntryData>> entries = _timeStorage.Query<AuditEntryData>(AuditKey, range);
             var results = new List<AuditEntry>();
 
-            foreach (TimeEntry entry in entries)
+            foreach (TimeEntry<AuditEntryData> entry in entries)
             {
-                try
-                {
-                    string json = System.Text.Encoding.UTF8.GetString(entry.Data);
-                    var data = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(json);
-                    if (data == null) continue;
+                if (entry.Data == null) continue;
 
-                    results.Add(new AuditEntry(
-                        entry.Timestamp,
-                        Guid.Parse(data.GetValueOrDefault("caller", Guid.Empty.ToString())),
-                        Enum.Parse<PermissionType>(data.GetValueOrDefault("type", "FileAccess")),
-                        data.GetValueOrDefault("resource", ""),
-                        Enum.Parse<PermissionResult>(data.GetValueOrDefault("result", "Denied")),
-                        data.GetValueOrDefault("reason", "")
-                    ));
-                }
-                catch
-                {
-                    // Skip malformed entries
-                }
+                results.Add(new AuditEntry(
+                    entry.Timestamp,
+                    entry.Data.CallerId,
+                    entry.Data.PermissionType,
+                    entry.Data.Resource,
+                    entry.Data.Result,
+                    entry.Data.Reason
+                ));
             }
 
             return results;

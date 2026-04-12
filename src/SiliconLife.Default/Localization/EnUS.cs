@@ -205,6 +205,7 @@ public class EnUS : DefaultLocalizationBase
     public override string PageTitleDashboard => "Dashboard - Silicon Life Collective";
     public override string PageTitleBeings => "Beings - Silicon Life Collective";
     public override string PageTitleTasks => "Tasks - Silicon Life Collective";
+    public override string PageTitleTimers => "Timers - Silicon Life Collective";
     public override string PageTitleMemory => "Memory - Silicon Life Collective";
     public override string PageTitleKnowledge => "Knowledge - Silicon Life Collective";
     public override string PageTitleProjects => "Projects - Silicon Life Collective";
@@ -248,11 +249,27 @@ public class EnUS : DefaultLocalizationBase
     public override string BeingsDetailStatusLabel => "Status: ";
     public override string BeingsDetailCustomCompileLabel => "Custom Compilation: ";
     public override string BeingsDetailSoulContentLabel => "Soul Content: ";
+    public override string BeingsDetailTimersLabel => "Timers: ";
+    public override string BeingsDetailTasksLabel => "Tasks: ";
     public override string BeingsYes => "Yes";
     public override string BeingsNo => "No";
     public override string BeingsNotSet => "Not set";
 
-    // ===== About Page Localization =====
+    // ===== Timers Page Localization =====
+
+    public override string TimersPageHeader => "Timer Management";
+    public override string TimersTotalCount => "Total {0} timers";
+    public override string TimersEmptyState => "No timers";
+    public override string TimersStatusActive => "Active";
+    public override string TimersStatusPaused => "Paused";
+    public override string TimersStatusTriggered => "Triggered";
+    public override string TimersStatusCancelled => "Cancelled";
+    public override string TimersTypeRecurring => "Recurring";
+    public override string TimersTriggerTimeLabel => "Trigger Time: ";
+    public override string TimersIntervalLabel => "Interval: ";
+    public override string TimersTriggeredCountLabel => "Triggered: ";
+
+    // ===== Chat Page Localization =====
 
     public override string AboutPageHeader => "About";
     public override string AboutAppName => "Silicon Life Collective";

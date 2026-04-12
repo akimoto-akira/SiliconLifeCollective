@@ -31,9 +31,9 @@ public class ContextManager
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<ContextManager>();
     private readonly IAIClient _aiClient;
     private readonly SiliconBeingBase _being;
-    private readonly ISession? _session;
+    private readonly SessionBase? _session;
 
-    private readonly List<Message> _messages;
+    private readonly List<ChatMessage> _messages;
     private readonly HashSet<Guid> _contextMessageIds;
     private bool _needsContinuation;
     private bool _hasNewPendingMessages;
@@ -49,7 +49,7 @@ public class ContextManager
     /// Gets the session this context manager is associated with.
     /// May be null for non-chat scenarios (timer, task, memory compression).
     /// </summary>
-    public ISession? Session => _session;
+    public SessionBase? Session => _session;
 
     /// <summary>
     /// Initializes a new instance of the ContextManager class.
@@ -59,12 +59,12 @@ public class ContextManager
     /// <param name="being">The silicon being that owns this context</param>
     /// <param name="session">The chat session (single or group), or null for non-chat scenarios</param>
     /// <exception cref="ArgumentNullException">Thrown when being or its AIClient is null</exception>
-    public ContextManager(SiliconBeingBase being, ISession? session)
+    public ContextManager(SiliconBeingBase being, SessionBase? session)
     {
         _being = being ?? throw new ArgumentNullException(nameof(being));
         _aiClient = being.AIClient ?? throw new ArgumentNullException(nameof(being.AIClient));
         _session = session;
-        _messages = new List<Message>();
+        _messages = new List<ChatMessage>();
         _contextMessageIds = new HashSet<Guid>();
 
         if (_being.Id != Guid.Empty && _session != null)
@@ -120,7 +120,7 @@ public class ContextManager
     /// <param name="being">The silicon being to check</param>
     /// <param name="session">The chat session</param>
     /// <returns>True if the last history message is a Tool result</returns>
-    public static bool NeedsContinuation(SiliconBeingBase being, ISession session)
+    public static bool NeedsContinuation(SiliconBeingBase being, SessionBase session)
     {
         List<ChatMessage> history = session.GetMessages();
         if (history.Count == 0)
@@ -129,7 +129,7 @@ public class ContextManager
         }
 
         ChatMessage last = history[^1];
-        return last.Role == MessageRole.Tool;
+        return (last.Role == MessageRole.Tool) || (string.IsNullOrEmpty(last.Content) && !string.IsNullOrEmpty(last.Thinking));
     }
 
     /// <summary>
@@ -172,52 +172,7 @@ public class ContextManager
 
     private void AddMessageToContext(ChatMessage msg)
     {
-        if (msg.Role.HasValue)
-        {
-            AddMessageToContextByRole(msg);
-        }
-        else
-        {
-            // Legacy behavior: infer role from SenderId
-            bool isUserMessage = _session != null
-                ? msg.SenderId != _being.Id && _session.Members.Contains(msg.SenderId)
-                : msg.SenderId != _being.Id;
-
-            if (isUserMessage)
-            {
-                _messages.Add(new Message(MessageRole.User, msg.Content));
-            }
-            else if (msg.SenderId == _being.Id)
-            {
-                _messages.Add(new Message(MessageRole.Assistant, msg.Content));
-            }
-        }
-    }
-
-    private void AddMessageToContextByRole(ChatMessage msg)
-    {
-        MessageRole role = msg.Role!.Value;
-
-        if (role == MessageRole.Assistant && !string.IsNullOrEmpty(msg.ToolCallsJson))
-        {
-            List<ToolCall>? toolCalls = null;
-            try
-            {
-                toolCalls = JsonSerializer.Deserialize<List<ToolCall>>(msg.ToolCallsJson);
-            }
-            catch { /* ignore deserialization errors */ }
-
-            _messages.Add(Message.AssistantWithToolCalls(
-                msg.Content, toolCalls ?? [], msg.Thinking));
-        }
-        else if (role == MessageRole.Tool)
-        {
-            _messages.Add(Message.ToolResultMessage(msg.ToolCallId ?? "", msg.Content));
-        }
-        else
-        {
-            _messages.Add(new Message(role, msg.Content) { Thinking = msg.Thinking });
-        }
+        _messages.Add(msg);
     }
 
     /// <summary>
@@ -225,14 +180,19 @@ public class ContextManager
     /// </summary>
     private void AddAssistantMessage(string content, string? thinking = null)
     {
-        _messages.Add(new Message(MessageRole.Assistant, content));
+        ChatMessage chatMsg = new(_being.Id, _session?.Id ?? Guid.Empty, content)
+        {
+            Role = MessageRole.Assistant,
+            Thinking = thinking,
+        };
+        _messages.Add(chatMsg);
 
         if (_session != null)
         {
             ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
             if (chatSystem != null && _being.Id != Guid.Empty)
             {
-                chatSystem.AddMessage(_being.Id, _session.Id, content, thinking);
+                chatSystem.AddMessage(chatMsg);
             }
         }
     }
@@ -240,13 +200,34 @@ public class ContextManager
     /// <summary>
     /// Builds an AIRequest from the current context
     /// </summary>
-    private AIRequest BuildRequest()
+    /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
+    private AIRequest BuildRequest(string? scenarioContext = null)
     {
         AIRequest request = new AIRequest(_aiClient.DefaultModel);
 
         if (!string.IsNullOrEmpty(_being.SoulContent))
         {
-            request.Messages.Add(new Message(MessageRole.System, _being.SoulContent));
+            request.Messages.Add(new ChatMessage
+            {
+                Role = MessageRole.System,
+                Content = _being.SoulContent,
+            });
+        }
+
+        Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+        request.Messages.Add(new ChatMessage
+        {
+            Role = MessageRole.System,
+            Content = $"Your name: {_being.Name}\nCurrent time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\nSystem language: {language}",
+        });
+
+        if (!string.IsNullOrEmpty(scenarioContext))
+        {
+            request.Messages.Add(new ChatMessage
+            {
+                Role = MessageRole.System,
+                Content = scenarioContext,
+            });
         }
 
         request.Messages.AddRange(_messages);
@@ -266,11 +247,11 @@ public class ContextManager
     /// Executes tool calls and returns tool result messages.
     /// Each tool result is added to the context messages.
     /// </summary>
-    private List<Message> ExecuteToolCalls(List<ToolCall> toolCalls)
+    private List<ChatMessage> ExecuteToolCalls(List<ToolCall> toolCalls)
     {
         _logger.Info("Executing {0} tool calls for being {1}", toolCalls.Count, _being.Name);
 
-        List<Message> toolResultMessages = new List<Message>();
+        List<ChatMessage> toolResultMessages = new List<ChatMessage>();
         ToolManager? toolManager = _being.ToolManager;
 
         foreach (ToolCall toolCall in toolCalls)
@@ -292,9 +273,12 @@ public class ContextManager
                 ? Guid.NewGuid().ToString()
                 : toolCall.Id;
 
-            Message toolMsg = Message.ToolResultMessage(toolCallId, resultContent);
+            ChatMessage toolMsg = new(_being.Id, _session?.Id ?? Guid.Empty, resultContent)
+            {
+                Role = MessageRole.Tool,
+                ToolCallId = toolCallId,
+            };
             toolResultMessages.Add(toolMsg);
-            _messages.Add(toolMsg);
         }
 
         return toolResultMessages;
@@ -331,23 +315,36 @@ public class ContextManager
     /// If AI returns tool_calls, executes them and persists intermediate messages to chat history.
     /// The next tick will load history and the AI will see the full context to continue.
     /// </summary>
+    /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
     /// <returns>The AI response (may contain tool_calls or plain text)</returns>
-    public AIResponse GetResponse()
+    public AIResponse GetResponse(string? scenarioContext = null)
     {
         _logger.Info("Getting AI response for being {0}", _being.Name);
 
-        AIRequest request = BuildRequest();
+        AIRequest request = BuildRequest(scenarioContext);
         AIResponse response = _aiClient.Chat(request);
+
+        if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
+        {
+            _logger.Debug("AI returned text response, length={0}", response.Content.Length);
+            AddAssistantMessage(response.Content, response.Thinking);
+        }
 
         if (response.Success && response.HasToolCalls)
         {
             _logger.Debug("AI returned tool calls, persisting intermediate round");
-            PersistToolCallRound(response);
-        }
-        else if (response.Success && !string.IsNullOrEmpty(response.Content))
-        {
-            _logger.Debug("AI returned text response, length={0}", response.Content.Length);
-            AddAssistantMessage(response.Content, response.Thinking);
+            List<ChatMessage>? toolMessages = PersistToolCallRound(response);
+            if (toolMessages != null && _session != null)
+            {
+                ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
+                if (chatSystem != null && _being.Id != Guid.Empty)
+                {
+                    foreach (ChatMessage msg in toolMessages)
+                    {
+                        chatSystem.AddMessage(msg);
+                    }
+                }
+            }
         }
 
         return response;
@@ -356,21 +353,34 @@ public class ContextManager
     /// <summary>
     /// Sends the current context to AI and gets the response asynchronously.
     /// </summary>
+    /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
     /// <returns>The AI response (may contain tool_calls or plain text)</returns>
-    public async Task<AIResponse> GetResponseAsync()
+    public async Task<AIResponse> GetResponseAsync(string? scenarioContext = null)
     {
-        AIRequest request = BuildRequest();
+        AIRequest request = BuildRequest(scenarioContext);
         AIResponse response = await _aiClient.ChatAsync(request);
+
+        if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
+        {
+            _logger.Debug("AI returned text response (async), length={0}", response.Content.Length);
+            AddAssistantMessage(response.Content, response.Thinking);
+        }
 
         if (response.Success && response.HasToolCalls)
         {
             _logger.Debug("AI returned tool calls (async), persisting intermediate round");
-            PersistToolCallRound(response);
-        }
-        else if (response.Success && !string.IsNullOrEmpty(response.Content))
-        {
-            _logger.Debug("AI returned text response (async), length={0}", response.Content.Length);
-            AddAssistantMessage(response.Content, response.Thinking);
+            List<ChatMessage>? toolMessages = PersistToolCallRound(response);
+            if (toolMessages != null && _session != null)
+            {
+                ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
+                if (chatSystem != null && _being.Id != Guid.Empty)
+                {
+                    foreach (ChatMessage msg in toolMessages)
+                    {
+                        chatSystem.AddMessage(msg);
+                    }
+                }
+            }
         }
 
         return response;
@@ -381,18 +391,19 @@ public class ContextManager
     /// Streams incremental tokens to the IM layer for real-time frontend display.
     /// Falls back to non-streaming if the AI client does not support streaming.
     /// </summary>
+    /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
     /// <param name="cancellationToken">Cancellation token to abort the stream</param>
     /// <returns>The final AI response (assembled from all stream chunks)</returns>
-    public async Task<AIResponse> GetResponseStreamAsync(CancellationToken cancellationToken = default)
+    public async Task<AIResponse> GetResponseStreamAsync(string? scenarioContext = null, CancellationToken cancellationToken = default)
     {
         bool? streamingMode = _aiClient.StreamingMode;
         if (streamingMode == false)
         {
             _logger.Warn("Falling back to non-streaming mode");
-            return await GetResponseAsync();
+            return await GetResponseAsync(scenarioContext);
         }
 
-        AIRequest request = BuildRequest();
+        AIRequest request = BuildRequest(scenarioContext);
         StringBuilder contentBuilder = new();
         StringBuilder thinkingBuilder = new();
         List<ToolCall>? toolCalls = null;
@@ -448,7 +459,7 @@ public class ContextManager
                 return AIResponse.Failed("AI client requires streaming but ChatStreamAsync is not implemented");
             }
             _logger.Warn("Streaming not implemented, falling back to non-streaming mode");
-            return await GetResponseAsync();
+            return await GetResponseAsync(scenarioContext);
         }
 
         if (!streamSucceeded)
@@ -458,7 +469,7 @@ public class ContextManager
                 return AIResponse.Failed("AI client requires streaming but stream ended without final chunk");
             }
             _logger.Warn("Stream ended without final chunk, falling back to non-streaming mode");
-            return await GetResponseAsync();
+            return await GetResponseAsync(scenarioContext);
         }
 
         StreamChunk endChunk = StreamChunk.End(streamId);
@@ -479,13 +490,25 @@ public class ContextManager
             Success = true
         };
 
-        if (response.Success && response.HasToolCalls)
-        {
-            PersistToolCallRound(response);
-        }
-        else if (response.Success && !string.IsNullOrEmpty(response.Content))
+        if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
         {
             AddAssistantMessage(response.Content, response.Thinking);
+        }
+
+        if (response.Success && response.HasToolCalls)
+        {
+            List<ChatMessage>? toolMessages = PersistToolCallRound(response);
+            if (toolMessages != null && _session != null)
+            {
+                ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
+                if (chatSystem != null && _being.Id != Guid.Empty)
+                {
+                    foreach (ChatMessage msg in toolMessages)
+                    {
+                        chatSystem.AddMessage(msg);
+                    }
+                }
+            }
         }
 
         return response;
@@ -500,7 +523,8 @@ public class ContextManager
     {
         _logger.Info("ThinkOnChat: being={0}, session={1}", _being.Name, _session?.Id.ToString() ?? "null");
 
-        AIResponse response = GetResponse();
+        string? scenarioContext = BuildSingleChatScenarioContext();
+        AIResponse response = GetResponse(scenarioContext);
 
         if (response.Success && response.HasToolCalls)
         {
@@ -515,6 +539,45 @@ public class ContextManager
     }
 
     /// <summary>
+    /// Builds scenario context for single chat.
+    /// Includes information about the conversation partner (human or silicon being).
+    /// </summary>
+    private string? BuildSingleChatScenarioContext()
+    {
+        if (_session == null)
+        {
+            return null;
+        }
+
+        Guid otherId = _session.Members.FirstOrDefault(id => id != _being.Id);
+        if (otherId == Guid.Empty)
+        {
+            return null;
+        }
+
+        SiliconBeingManager? beingManager = ServiceLocator.Instance.BeingManager;
+        SiliconBeingBase? otherBeing = beingManager?.GetBeing(otherId);
+
+        StringBuilder sb = new();
+        sb.AppendLine("Scene: Single chat");
+
+        if (otherBeing != null)
+        {
+            sb.AppendLine($"Partner type: Silicon being");
+            sb.AppendLine($"Partner name: {otherBeing.Name}");
+            sb.AppendLine($"Partner ID: {otherBeing.Id}");
+        }
+        else
+        {
+            sb.AppendLine($"Partner type: Human user");
+            sb.AppendLine($"Partner name: {Config.Instance.Data.UserNickname}");
+            sb.AppendLine($"Partner ID: {otherId}");
+        }
+
+        return sb.ToString();
+    }
+
+    /// <summary>
     /// Scene: 1-on-1 chat with streaming support.
     /// Uses streaming when the AI client supports it, falling back to non-streaming otherwise.
     /// </summary>
@@ -524,7 +587,8 @@ public class ContextManager
     {
         _logger.Info("ThinkOnChatStream: being={0}, session={1}", _being.Name, _session?.Id.ToString() ?? "null");
 
-        AIResponse response = await GetResponseStreamAsync(cancellationToken);
+        string? scenarioContext = BuildSingleChatScenarioContext();
+        AIResponse response = await GetResponseStreamAsync(scenarioContext, cancellationToken);
 
         if (response.Success && response.HasToolCalls)
         {
@@ -543,7 +607,8 @@ public class ContextManager
     {
         _logger.Info("ThinkOnGroupChat: being={0}", _being.Name);
 
-        AIResponse response = GetResponse();
+        string? scenarioContext = null;
+        AIResponse response = GetResponse(scenarioContext);
 
         if (response.Success && response.HasToolCalls)
         {
@@ -567,7 +632,8 @@ public class ContextManager
     {
         _logger.Info("ThinkOnGroupChatStream: being={0}", _being.Name);
 
-        AIResponse response = await GetResponseStreamAsync(cancellationToken);
+        string? scenarioContext = null;
+        AIResponse response = await GetResponseStreamAsync(scenarioContext, cancellationToken);
 
         if (response.Success && response.HasToolCalls)
         {
@@ -586,7 +652,8 @@ public class ContextManager
     {
         _logger.Info("ThinkOnTask: being={0}", _being.Name);
 
-        AIResponse response = GetResponse();
+        string? scenarioContext = null;
+        AIResponse response = GetResponse(scenarioContext);
         return response;
     }
 
@@ -599,7 +666,8 @@ public class ContextManager
     {
         _logger.Info("ThinkOnTimer: being={0}", _being.Name);
 
-        AIResponse response = GetResponse();
+        string? scenarioContext = null;
+        AIResponse response = GetResponse(scenarioContext);
         return response;
     }
 
@@ -632,9 +700,8 @@ public class ContextManager
         }
 
         var memoryEntries = entries
-            .Select(e => JsonSerializer.Deserialize<MemoryEntry>(System.Text.Encoding.UTF8.GetString(e.Data)))
+            .Select(e => e.Data)
             .Where(e => e != null)
-            .Cast<MemoryEntry>()
             .ToList();
 
         string levelDesc = GetLevelDescription(level);
@@ -726,77 +793,19 @@ public class ContextManager
     /// Executes tool calls from an AI response and persists all intermediate messages
     /// (assistant with tool_calls + tool results) to chat history, then yields the time slice.
     /// </summary>
-    private void PersistToolCallRound(AIResponse response)
+    private List<ChatMessage>? PersistToolCallRound(AIResponse response)
     {
         // Add assistant message with tool calls to in-memory context
-        _messages.Add(Message.AssistantWithToolCalls(response.Content, response.ToolCalls!, response.Thinking));
+        ChatMessage assistantMsg = new(_being.Id, _session?.Id ?? Guid.Empty, response.Content)
+        {
+            Role = MessageRole.Assistant,
+            Thinking = response.Thinking,
+            ToolCallsJson = JsonSerializer.Serialize(response.ToolCalls!),
+        };
+        _messages.Add(assistantMsg);
 
         // Execute all tool calls (adds tool result messages to _messages)
-        ExecuteToolCalls(response.ToolCalls!);
-
-        // Persist the entire round (assistant + tool results) to ChatSystem
-        PersistToolRoundToChatSystem();
-    }
-
-    /// <summary>
-    /// Persists the last assistant+tool_calls message and all subsequent tool result messages to ChatSystem
-    /// </summary>
-    private void PersistToolRoundToChatSystem()
-    {
-        if (_session == null)
-        {
-            return;
-        }
-
-        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
-        if (chatSystem == null || _being.Id == Guid.Empty)
-        {
-            return;
-        }
-
-        // Find the last assistant message with tool calls
-        int lastAssistantIndex = -1;
-        for (int i = _messages.Count - 1; i >= 0; i--)
-        {
-            if (_messages[i].Role == MessageRole.Assistant && _messages[i].ToolCalls != null)
-            {
-                lastAssistantIndex = i;
-                break;
-            }
-        }
-
-        if (lastAssistantIndex < 0)
-        {
-            return;
-        }
-
-        // Persist all messages from the assistant message onwards
-        for (int i = lastAssistantIndex; i < _messages.Count; i++)
-        {
-            Message msg = _messages[i];
-            if (msg.Role == MessageRole.Assistant)
-            {
-                ChatMessage chatMsg = new(_being.Id, _session.Id, msg.Content)
-                {
-                    Role = MessageRole.Assistant,
-                    Thinking = msg.Thinking,
-                };
-                if (msg.ToolCalls != null && msg.ToolCalls.Count > 0)
-                {
-                    chatMsg.ToolCallsJson = JsonSerializer.Serialize(msg.ToolCalls);
-                }
-                chatSystem.AddMessage(chatMsg);
-            }
-            else if (msg.Role == MessageRole.Tool)
-            {
-                ChatMessage chatMsg = new(_being.Id, _session.Id, msg.Content)
-                {
-                    Role = MessageRole.Tool,
-                    ToolCallId = msg.ToolCallId,
-                };
-                chatSystem.AddMessage(chatMsg);
-            }
-        }
+        return ExecuteToolCalls(response.ToolCalls!);
     }
 
     /// <summary>

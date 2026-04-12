@@ -108,7 +108,7 @@ public class WebUIProvider : IIMProvider
         }
 
         _logger.Info($"SendHistoryToClientAsync: looking for session with channelId={client.ChannelId.Value}");
-        ISession? session = chatSystem.GetSessionByChannelId(client.ChannelId.Value);
+        SessionBase? session = chatSystem.GetSessionByChannelId(client.ChannelId.Value);
         if (session == null)
         {
             _logger.Debug("SendHistoryToClientAsync: GetSessionByChannelId returned null, trying GetSession");

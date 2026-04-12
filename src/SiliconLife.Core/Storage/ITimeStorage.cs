@@ -17,28 +17,29 @@ namespace SiliconLife.Collective;
 /// Time-indexed storage interface extending <see cref="IStorage"/>.
 /// Each entry is associated with a <see cref="DateTime"/> timestamp,
 /// and can be queried by <see cref="IncompleteDate"/> ranges.
+/// Provides automatic JSON serialization/deserialization.
 /// </summary>
 public interface ITimeStorage : IStorage
 {
     /// <summary>
-    /// Writes data indexed by a composite key and timestamp.
+    /// Writes data indexed by a composite key and timestamp with automatic JSON serialization.
     /// </summary>
-    void Write(string key, DateTime timestamp, byte[] data);
+    void Write<T>(string key, DateTime timestamp, T data);
 
     /// <summary>
-    /// Writes data indexed by a composite key and IncompleteDate timestamp.
+    /// Writes data indexed by a composite key and IncompleteDate timestamp with automatic JSON serialization.
     /// </summary>
-    void Write(string key, IncompleteDate timestamp, byte[] data);
+    void Write<T>(string key, IncompleteDate timestamp, T data);
 
     /// <summary>
-    /// Reads data by exact key and timestamp.
+    /// Reads data by exact key and timestamp and deserializes to type T.
     /// </summary>
-    byte[]? Read(string key, DateTime timestamp);
+    T? Read<T>(string key, DateTime timestamp);
 
     /// <summary>
-    /// Reads data by exact key and IncompleteDate timestamp.
+    /// Reads data by exact key and IncompleteDate timestamp and deserializes to type T.
     /// </summary>
-    byte[]? Read(string key, IncompleteDate timestamp);
+    T? Read<T>(string key, IncompleteDate timestamp);
 
     /// <summary>
     /// Checks if an entry exists for the exact key and timestamp.
@@ -66,14 +67,14 @@ public interface ITimeStorage : IStorage
     /// <param name="key">The logical key prefix to match.</param>
     /// <param name="range">The time range to match (unspecified components are wildcards).</param>
     /// <returns>All matching entries, ordered by timestamp ascending.</returns>
-    List<TimeEntry> Query(string key, IncompleteDate range);
+    List<TimeEntry<T>> Query<T>(string key, IncompleteDate range);
 
     /// <summary>
     /// Queries all entries matching the time range across all keys.
     /// </summary>
     /// <param name="range">The time range to match.</param>
     /// <returns>All matching entries, ordered by timestamp ascending.</returns>
-    List<TimeEntry> Query(IncompleteDate range);
+    List<TimeEntry<T>> Query<T>(IncompleteDate range);
 
     /// <summary>
     /// Returns the number of entries matching the given key and time range.
@@ -95,7 +96,7 @@ public interface ITimeStorage : IStorage
 /// <summary>
 /// A single entry returned by time-indexed queries.
 /// </summary>
-public sealed class TimeEntry
+public sealed class TimeEntry<T>
 {
     /// <summary>The logical key.</summary>
     public string Key { get; }
@@ -103,10 +104,10 @@ public sealed class TimeEntry
     /// <summary>The timestamp associated with this entry.</summary>
     public DateTime Timestamp { get; }
 
-    /// <summary>The payload data.</summary>
-    public byte[] Data { get; }
+    /// <summary>The deserialized payload data.</summary>
+    public T Data { get; }
 
-    public TimeEntry(string key, DateTime timestamp, byte[] data)
+    public TimeEntry(string key, DateTime timestamp, T data)
     {
         Key = key;
         Timestamp = timestamp;

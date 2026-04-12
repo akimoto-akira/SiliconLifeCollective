@@ -12,7 +12,9 @@
 // limitations under the License.
 
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using SiliconLife.Collective;
+using SiliconLife.Default.Storage;
 
 namespace SiliconLife.Default;
 
@@ -20,10 +22,17 @@ namespace SiliconLife.Default;
 /// File system implementation of <see cref="ITimeStorage"/>.
 /// Time-indexed entries are stored as individual files organized by
 /// <c>{key}/{yyyy}/{MM}/{dd}/{HH}/{mm}/{ss}.json</c>.
+/// Provides automatic JSON serialization/deserialization.
 /// </summary>
 public class FileSystemTimeStorage : ITimeStorage
 {
     private readonly string _baseDirectory;
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        WriteIndented = true,
+        PropertyNamingPolicy = null,
+        Converters = { new FlexibleEnumConverter() }
+    };
 
     public FileSystemTimeStorage(string baseDirectory)
     {
@@ -36,12 +45,12 @@ public class FileSystemTimeStorage : ITimeStorage
 
     // ── IStorage ────────────────────────────────────
 
-    public byte[]? Read(string key)
+    public T? Read<T>(string key)
     {
         string dir = GetKeyDirectory(key);
-        if (!Directory.Exists(dir)) return null;
+        if (!Directory.Exists(dir)) return default;
 
-        byte[]? latest = null;
+        T? latest = default;
         DateTime latestTime = DateTime.MinValue;
 
         foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
@@ -55,24 +64,26 @@ public class FileSystemTimeStorage : ITimeStorage
             if (fileTime > latestTime)
             {
                 latestTime = fileTime;
-                latest = File.ReadAllBytes(file);
+                string json = File.ReadAllText(file);
+                latest = JsonSerializer.Deserialize<T>(json, _jsonOptions);
             }
         }
 
         return latest;
     }
 
-    public void Write(string key, byte[] data)
+    public void Write<T>(string key, T data)
     {
         string filePath = Path.Combine(GetKeyDirectory(key), "latest.json");
         string? dir = Path.GetDirectoryName(filePath);
         if (dir != null) Directory.CreateDirectory(dir);
-        File.WriteAllBytes(filePath, data);
+        string json = JsonSerializer.Serialize(data, _jsonOptions);
+        File.WriteAllText(filePath, json);
     }
 
     public bool Exists(string key)
     {
-        return Read(key) != null;
+        return Directory.Exists(GetKeyDirectory(key));
     }
 
     public void Delete(string key)
@@ -86,34 +97,36 @@ public class FileSystemTimeStorage : ITimeStorage
 
     // ── ITimeStorage ────────────────────────────────
 
-    public void Write(string key, DateTime timestamp, byte[] data)
+    public void Write<T>(string key, DateTime timestamp, T data)
     {
         string filePath = GetTimeFilePath(key, timestamp);
         string? dir = Path.GetDirectoryName(filePath);
         if (dir != null) Directory.CreateDirectory(dir);
-        File.WriteAllBytes(filePath, data);
+        string json = JsonSerializer.Serialize(data, _jsonOptions);
+        File.WriteAllText(filePath, json);
     }
 
-    public void Write(string key, IncompleteDate timestamp, byte[] data)
+    public void Write<T>(string key, IncompleteDate timestamp, T data)
     {
         string filePath = GetTimeFilePath(key, timestamp);
         string? dir = Path.GetDirectoryName(filePath);
         if (dir != null) Directory.CreateDirectory(dir);
-        
+
         foreach (var f in Directory.GetFiles(dir, "*.json"))
         {
             File.Delete(f);
         }
-        
-        File.WriteAllBytes(filePath.Replace("*.json", "0.json"), data);
+
+        string json = JsonSerializer.Serialize(data, _jsonOptions);
+        File.WriteAllText(filePath.Replace("*.json", "0.json"), json);
     }
 
-    public byte[]? Read(string key, DateTime timestamp)
+    public T? Read<T>(string key, DateTime timestamp)
     {
         string dir = GetKeyDirectory(key);
-        if (!Directory.Exists(dir)) return null;
+        if (!Directory.Exists(dir)) return default;
 
-        byte[]? best = null;
+        T? best = default;
         long bestDiff = long.MaxValue;
 
         foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
@@ -124,7 +137,8 @@ public class FileSystemTimeStorage : ITimeStorage
                 if (diff < bestDiff)
                 {
                     bestDiff = diff;
-                    best = File.ReadAllBytes(file);
+                    string json = File.ReadAllText(file);
+                    best = JsonSerializer.Deserialize<T>(json, _jsonOptions);
                 }
             }
         }
@@ -132,30 +146,31 @@ public class FileSystemTimeStorage : ITimeStorage
         return best;
     }
 
-    public byte[]? Read(string key, IncompleteDate timestamp)
+    public T? Read<T>(string key, IncompleteDate timestamp)
     {
         string dir = GetKeyDirectory(key);
         string patternPath = GetTimeFilePath(key, timestamp);
         string? dirPattern = Path.GetDirectoryName(patternPath);
-        
+
         if (dirPattern == null || !Directory.Exists(dirPattern))
-            return null;
+            return default;
 
         var files = Directory.GetFiles(dirPattern, "*.json");
         if (files.Length == 0)
-            return null;
+            return default;
 
-        return File.ReadAllBytes(files[0]);
+        string json = File.ReadAllText(files[0]);
+        return JsonSerializer.Deserialize<T>(json, _jsonOptions);
     }
 
     public bool Exists(string key, DateTime timestamp)
     {
-        return Read(key, timestamp) != null;
+        return Read<object>(key, timestamp) != null;
     }
 
     public bool Exists(string key, IncompleteDate timestamp)
     {
-        return Read(key, timestamp) != null;
+        return Read<object>(key, timestamp) != null;
     }
 
     public void Delete(string key, DateTime timestamp)
@@ -172,7 +187,7 @@ public class FileSystemTimeStorage : ITimeStorage
         string dir = GetKeyDirectory(key);
         string patternPath = GetTimeFilePath(key, timestamp);
         string? dirPattern = Path.GetDirectoryName(patternPath);
-        
+
         if (dirPattern == null || !Directory.Exists(dirPattern))
             return;
 
@@ -182,9 +197,9 @@ public class FileSystemTimeStorage : ITimeStorage
         }
     }
 
-    public List<TimeEntry> Query(string key, IncompleteDate range)
+    public List<TimeEntry<T>> Query<T>(string key, IncompleteDate range)
     {
-        List<TimeEntry> result = [];
+        List<TimeEntry<T>> result = [];
         string dir = GetKeyDirectory(key);
         if (!Directory.Exists(dir)) return result;
 
@@ -192,7 +207,12 @@ public class FileSystemTimeStorage : ITimeStorage
         {
             if (TryParseTimestampFromFile(file, out DateTime fileTime) && range.Matches(fileTime))
             {
-                result.Add(new(key, fileTime, File.ReadAllBytes(file)));
+                string json = File.ReadAllText(file);
+                T? data = JsonSerializer.Deserialize<T>(json, _jsonOptions);
+                if (data != null)
+                {
+                    result.Add(new(key, fileTime, data));
+                }
             }
         }
 
@@ -200,9 +220,9 @@ public class FileSystemTimeStorage : ITimeStorage
         return result;
     }
 
-    public List<TimeEntry> Query(IncompleteDate range)
+    public List<TimeEntry<T>> Query<T>(IncompleteDate range)
     {
-        List<TimeEntry> result = [];
+        List<TimeEntry<T>> result = [];
 
         if (!Directory.Exists(_baseDirectory)) return result;
 
@@ -213,7 +233,12 @@ public class FileSystemTimeStorage : ITimeStorage
             {
                 if (TryParseTimestampFromFile(file, out DateTime fileTime) && range.Matches(fileTime))
                 {
-                    result.Add(new(key, fileTime, File.ReadAllBytes(file)));
+                    string json = File.ReadAllText(file);
+                    T? data = JsonSerializer.Deserialize<T>(json, _jsonOptions);
+                    if (data != null)
+                    {
+                        result.Add(new(key, fileTime, data));
+                    }
                 }
             }
         }
@@ -224,12 +249,12 @@ public class FileSystemTimeStorage : ITimeStorage
 
     public int Count(string key, IncompleteDate range)
     {
-        return Query(key, range).Count;
+        return Query<object>(key, range).Count;
     }
 
     public int Count(IncompleteDate range)
     {
-        return Query(range).Count;
+        return Query<object>(range).Count;
     }
 
     public int DeleteRange(string key, IncompleteDate range)

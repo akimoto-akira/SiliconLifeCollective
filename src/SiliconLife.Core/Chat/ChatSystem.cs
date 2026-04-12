@@ -2,16 +2,14 @@
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using System.Security.Cryptography;
 
 namespace SiliconLife.Collective;
 
@@ -24,7 +22,7 @@ public class ChatSystem
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<ChatSystem>();
     private readonly ITimeStorage _storage;
     private readonly object _lock = new();
-    private Dictionary<Guid, ISession> _sessions = new();
+    private Dictionary<Guid, SessionBase> _sessions = new();
 
     public ChatSystem(ITimeStorage storage)
     {
@@ -33,28 +31,12 @@ public class ChatSystem
     }
 
     /// <summary>
-    /// Computes a deterministic channel ID for a single chat session between two participants.
-    /// The ID is derived from sorted participant GUIDs via MD5 hash.
-    /// </summary>
-    /// <param name="participant1">First participant's ID</param>
-    /// <param name="participant2">Second participant's ID</param>
-    /// <returns>The deterministic channel ID for this conversation</returns>
-    public static Guid ComputeSingleChatChannelId(Guid participant1, Guid participant2)
-    {
-        string sorted = string.Compare(participant1.ToString(), participant2.ToString(), StringComparison.Ordinal) <= 0
-            ? $"{participant1}{participant2}"
-            : $"{participant2}{participant1}";
-        byte[] hash = MD5.HashData(System.Text.Encoding.UTF8.GetBytes(sorted));
-        return new Guid(hash);
-    }
-
-    /// <summary>
     /// Add a message to the session for the given channel.
     /// Creates the session if it does not exist yet.
     /// </summary>
     public void AddMessage(Guid senderId, Guid channelId, string content, string? thinking = null)
     {
-        ISession? session = GetSessionByChannelId(channelId);
+        SessionBase? session = GetSessionByChannelId(channelId);
         ChatMessage message = new(senderId, channelId, content) { Thinking = thinking };
         session?.AddMessage(message);
         _logger.Debug("Message added: sender={0}, channel={1}, length={2}", senderId, channelId, content.Length);
@@ -67,7 +49,7 @@ public class ChatSystem
     /// </summary>
     public void AddMessage(ChatMessage message)
     {
-        ISession session = GetOrCreateSession(message.SenderId, message.ChannelId);
+        SessionBase session = GetOrCreateSession(message.SenderId, message.ChannelId);
         session.AddMessage(message);
     }
 
@@ -77,7 +59,7 @@ public class ChatSystem
     /// </summary>
     public List<ChatMessage> GetMessages(Guid userId, Guid beingId, int limit = 50)
     {
-        ISession session = GetOrCreateSession(userId, beingId);
+        SessionBase session = GetOrCreateSession(userId, beingId);
         _logger.Debug("Retrieving messages: user={0}, being={1}, limit={2}", userId, beingId, limit);
         return session.GetMessages(0, limit);
     }
@@ -86,12 +68,11 @@ public class ChatSystem
     /// Get or create a single chat session for the two participants.
     /// Searches existing sessions for a matching pair in either order.
     /// </summary>
-    public ISession GetOrCreateSession(Guid participant1, Guid participant2)
+    public SessionBase GetOrCreateSession(Guid participant1, Guid participant2)
     {
         lock (_lock)
         {
-            // Search for an existing session matching both participant orderings
-            foreach (ISession session in _sessions.Values)
+            foreach (SessionBase session in _sessions.Values)
             {
                 if (session is SingleChatSession single &&
                     single.Participant1 == participant1 && single.Participant2 == participant2)
@@ -120,7 +101,7 @@ public class ChatSystem
     /// For group chat, the channel ID is the group ID.
     /// If the session does not exist, returns null.
     /// </summary>
-    public ISession? GetSessionByChannelId(Guid channelId)
+    public SessionBase? GetSessionByChannelId(Guid channelId)
     {
         lock (_lock)
         {
@@ -131,15 +112,13 @@ public class ChatSystem
     /// <summary>
     /// Create a new group chat session with the specified members.
     /// </summary>
-    public ISession CreateGroupSession(List<Guid> members)
+    public SessionBase CreateGroupSession(List<Guid> members, string name = "")
     {
-        Guid groupId = Guid.NewGuid();
-
         lock (_lock)
         {
-            GroupChatSession newSession = new(groupId, members, _storage);
-            _sessions[groupId] = newSession;
-            _logger.Info("Created group chat session: {0}, members={1}", groupId, members.Count);
+            GroupChatSession newSession = new(members, _storage, name);
+            _sessions[newSession.Id] = newSession;
+            _logger.Info("Created group chat session: {0}, members={1}", newSession.Id, members.Count);
             return newSession;
         }
     }
@@ -148,7 +127,7 @@ public class ChatSystem
     /// Get any session (single or group) by its unique ID.
     /// Returns null if not found.
     /// </summary>
-    public ISession? GetSession(Guid sessionId)
+    public SessionBase? GetSession(Guid sessionId)
     {
         lock (_lock)
         {
@@ -160,11 +139,11 @@ public class ChatSystem
     /// Retrieve a group chat session by its group ID.
     /// Returns null if not found or if the session is not a group session.
     /// </summary>
-    public ISession? GetGroupSession(Guid groupId)
+    public SessionBase? GetGroupSession(Guid groupId)
     {
         lock (_lock)
         {
-            if (_sessions.TryGetValue(groupId, out ISession? session))
+            if (_sessions.TryGetValue(groupId, out SessionBase? session))
             {
                 if (session.Type == SessionType.GroupChat)
                 {
@@ -184,7 +163,7 @@ public class ChatSystem
 
         lock (_lock)
         {
-            foreach (ISession session in _sessions.Values)
+            foreach (SessionBase session in _sessions.Values)
             {
                 result.AddRange(session.GetPendingMessages(beingId));
             }
@@ -202,7 +181,7 @@ public class ChatSystem
     {
         lock (_lock)
         {
-            foreach (ISession session in _sessions.Values)
+            foreach (SessionBase session in _sessions.Values)
             {
                 session.MarkMessageAsRead(messageId, readerId);
             }
@@ -217,7 +196,7 @@ public class ChatSystem
     {
         lock (_lock)
         {
-            foreach (ISession session in _sessions.Values)
+            foreach (SessionBase session in _sessions.Values)
             {
                 session.MarkMessagesAsRead(messageIds, readerId);
             }
@@ -228,9 +207,8 @@ public class ChatSystem
     /// Get all sessions that involve the specified user.
     /// Ensures sessions exist for all known user-being pairs by creating them if needed.
     /// </summary>
-    public List<ISession> GetSessionsForUser(Guid userId, IEnumerable<Guid> beingIds)
+    public List<SessionBase> GetSessionsForUser(Guid userId, IEnumerable<Guid> beingIds)
     {
-        // Ensure sessions exist for all known user-being pairs
         foreach (Guid beingId in beingIds)
         {
             GetOrCreateSession(userId, beingId);
@@ -257,7 +235,7 @@ public class ChatSystem
 
         lock (_lock)
         {
-            foreach (ISession session in _sessions.Values)
+            foreach (SessionBase session in _sessions.Values)
             {
                 List<ChatMessage> messages = session.GetMessages(0, int.MaxValue);
                 foreach (ChatMessage message in messages)
@@ -287,7 +265,7 @@ public class ChatSystem
         int count = 0;
         lock (_lock)
         {
-            foreach (ISession session in _sessions.Values)
+            foreach (SessionBase session in _sessions.Values)
             {
                 count += session.GetMessages(0, int.MaxValue).Count;
             }

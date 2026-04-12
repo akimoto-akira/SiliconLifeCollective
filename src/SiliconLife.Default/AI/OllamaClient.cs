@@ -242,37 +242,47 @@ public class OllamaClient : IAIClient
     }
 
     /// <summary>
-    /// Maps core Message list to Ollama message list, preserving tool_calls and tool role
+    /// Maps core ChatMessage list to Ollama message list, preserving tool_calls and tool role
     /// </summary>
-    private static List<OllamaMessage> MapMessages(List<Message> messages)
+    private static List<OllamaMessage> MapMessages(List<ChatMessage> messages)
     {
         List<OllamaMessage> result = new();
 
-        foreach (Message msg in messages)
+        foreach (ChatMessage msg in messages)
         {
+            MessageRole role = msg.Role;
+
             OllamaMessage ollamaMsg = new OllamaMessage
             {
-                Role = MapRole(msg.Role),
+                Role = MapRole(role),
                 Content = msg.Content,
                 Thinking = msg.Thinking
             };
 
             // Preserve tool_calls in assistant messages
-            if (msg.ToolCalls != null && msg.ToolCalls.Count > 0)
+            if (!string.IsNullOrEmpty(msg.ToolCallsJson))
             {
-                ollamaMsg.ToolCalls = msg.ToolCalls.Select(tc => new OllamaToolCall
+                try
                 {
-                    Id = tc.Id,
-                    Function = new OllamaToolCallFunction
+                    List<ToolCall>? toolCalls = JsonSerializer.Deserialize<List<ToolCall>>(msg.ToolCallsJson);
+                    if (toolCalls != null && toolCalls.Count > 0)
                     {
-                        Name = tc.Name,
-                        Arguments = tc.Arguments
+                        ollamaMsg.ToolCalls = toolCalls.Select(tc => new OllamaToolCall
+                        {
+                            Id = tc.Id,
+                            Function = new OllamaToolCallFunction
+                            {
+                                Name = tc.Name,
+                                Arguments = tc.Arguments
+                            }
+                        }).ToList();
                     }
-                }).ToList();
+                }
+                catch { /* ignore deserialization errors */ }
             }
 
             // Set tool_call_id for tool result messages
-            if (msg.Role == MessageRole.Tool && !string.IsNullOrEmpty(msg.ToolCallId))
+            if (role == MessageRole.Tool && !string.IsNullOrEmpty(msg.ToolCallId))
             {
                 ollamaMsg.ToolCallId = msg.ToolCallId;
             }
