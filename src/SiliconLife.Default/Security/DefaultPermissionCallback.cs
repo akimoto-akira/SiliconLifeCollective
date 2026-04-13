@@ -864,6 +864,39 @@ public class DefaultPermissionCallback : IPermissionCallback
             return PermissionResult.Allowed;
         }
 
+        // 允许：公用用户文件夹 / Allow: public/common user folders
+        // Windows: C:\Users\Public\Desktop, Documents, Downloads, Music, Pictures, Videos
+        // macOS: /Users/Shared
+        // Linux: no standard public folders, skip
+        if (OperatingSystem.IsWindows())
+        {
+            string publicDesktopPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory).ToLowerInvariant();
+            string publicDocumentsPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments).ToLowerInvariant();
+            string publicMusicPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic).ToLowerInvariant();
+            string publicPicturesPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonPictures).ToLowerInvariant();
+            string publicVideosPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonVideos).ToLowerInvariant();
+            string publicRootPath = Path.GetDirectoryName(publicDesktopPath)!.ToLowerInvariant();
+            string publicDownloadsPath = Path.Combine(publicRootPath, "Downloads").ToLowerInvariant();
+
+            if (filePathLower.StartsWith(publicDesktopPath)
+                || filePathLower.StartsWith(publicDocumentsPath)
+                || filePathLower.StartsWith(publicMusicPath)
+                || filePathLower.StartsWith(publicPicturesPath)
+                || filePathLower.StartsWith(publicVideosPath)
+                || filePathLower.StartsWith(publicDownloadsPath))
+            {
+                return PermissionResult.Allowed;
+            }
+        }
+        else if (OperatingSystem.IsMacOS())
+        {
+            string sharedPath = "/users/shared";
+            if (filePathLower.StartsWith(sharedPath))
+            {
+                return PermissionResult.Allowed;
+            }
+        }
+
         if (OperatingSystem.IsWindows())
         {
             // Windows 禁止：系统关键目录（不一定在C盘）

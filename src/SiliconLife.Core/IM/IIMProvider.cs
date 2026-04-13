@@ -43,6 +43,20 @@ public interface IIMProvider
     /// <param name="denyCode">6-digit random code for denying the operation</param>
     /// <returns>The user's decision result</returns>
     Task<AskPermissionResult> AskPermissionAsync(PermissionType permissionType, string resource, string allowCode, string denyCode);
+
+    /// <summary>
+    /// Sends a tool update event to the channel.
+    /// Used for real-time notification when AI calls tools or tools return results.
+    /// </summary>
+    /// <param name="senderId">The sender ID</param>
+    /// <param name="channelId">The channel ID</param>
+    /// <param name="role">Message role (Assistant for tool call, Tool for tool result)</param>
+    /// <param name="content">The message content</param>
+    /// <param name="toolCallsJson">Serialized tool calls JSON (for Assistant role with tool calls)</param>
+    /// <param name="toolCallId">Tool call ID (for Tool role result messages)</param>
+    /// <param name="thinking">Optional thinking content</param>
+    /// <param name="senderName">Optional sender name</param>
+    Task SendToolUpdateAsync(Guid senderId, Guid channelId, string role, string content, string? toolCallsJson = null, string? toolCallId = null, string? thinking = null, string? senderName = null);
 }
 
 /// <summary>

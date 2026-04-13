@@ -49,6 +49,22 @@ public class PermissionController : Controller
 
     private void GetList()
     {
-        RenderJson(new List<object>());
+        GlobalACL? acl = ServiceLocator.Instance.GlobalAcl;
+        if (acl == null)
+        {
+            RenderJson(new List<object>());
+            return;
+        }
+
+        List<AclRule> rules = acl.GetAllRules();
+        var result = rules.Select(r => new
+        {
+            permissionType = r.PermissionType.ToString(),
+            resourcePrefix = r.ResourcePrefix,
+            result = r.Result.ToString(),
+            description = r.Description ?? ""
+        }).ToList();
+
+        RenderJson(result);
     }
 }

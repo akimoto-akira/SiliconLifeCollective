@@ -324,27 +324,15 @@ public class ContextManager
         AIRequest request = BuildRequest(scenarioContext);
         AIResponse response = _aiClient.Chat(request);
 
-        if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
-        {
-            _logger.Debug("AI returned text response, length={0}", response.Content.Length);
-            AddAssistantMessage(response.Content, response.Thinking);
-        }
-
         if (response.Success && response.HasToolCalls)
         {
             _logger.Debug("AI returned tool calls, persisting intermediate round");
-            List<ChatMessage>? toolMessages = PersistToolCallRound(response);
-            if (toolMessages != null && _session != null)
-            {
-                ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
-                if (chatSystem != null && _being.Id != Guid.Empty)
-                {
-                    foreach (ChatMessage msg in toolMessages)
-                    {
-                        chatSystem.AddMessage(msg);
-                    }
-                }
-            }
+            PersistAndDeliverToolCallRound(response);
+        }
+        else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
+        {
+            _logger.Debug("AI returned text response, length={0}", response.Content.Length);
+            AddAssistantMessage(response.Content, response.Thinking);
         }
 
         return response;
@@ -360,27 +348,15 @@ public class ContextManager
         AIRequest request = BuildRequest(scenarioContext);
         AIResponse response = await _aiClient.ChatAsync(request);
 
-        if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
-        {
-            _logger.Debug("AI returned text response (async), length={0}", response.Content.Length);
-            AddAssistantMessage(response.Content, response.Thinking);
-        }
-
         if (response.Success && response.HasToolCalls)
         {
             _logger.Debug("AI returned tool calls (async), persisting intermediate round");
-            List<ChatMessage>? toolMessages = PersistToolCallRound(response);
-            if (toolMessages != null && _session != null)
-            {
-                ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
-                if (chatSystem != null && _being.Id != Guid.Empty)
-                {
-                    foreach (ChatMessage msg in toolMessages)
-                    {
-                        chatSystem.AddMessage(msg);
-                    }
-                }
-            }
+            PersistAndDeliverToolCallRound(response);
+        }
+        else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
+        {
+            _logger.Debug("AI returned text response (async), length={0}", response.Content.Length);
+            AddAssistantMessage(response.Content, response.Thinking);
         }
 
         return response;
@@ -490,25 +466,13 @@ public class ContextManager
             Success = true
         };
 
-        if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
-        {
-            AddAssistantMessage(response.Content, response.Thinking);
-        }
-
         if (response.Success && response.HasToolCalls)
         {
-            List<ChatMessage>? toolMessages = PersistToolCallRound(response);
-            if (toolMessages != null && _session != null)
-            {
-                ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
-                if (chatSystem != null && _being.Id != Guid.Empty)
-                {
-                    foreach (ChatMessage msg in toolMessages)
-                    {
-                        chatSystem.AddMessage(msg);
-                    }
-                }
-            }
+            PersistAndDeliverToolCallRound(response);
+        }
+        else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
+        {
+            AddAssistantMessage(response.Content, response.Thinking);
         }
 
         return response;
@@ -795,7 +759,6 @@ public class ContextManager
     /// </summary>
     private List<ChatMessage>? PersistToolCallRound(AIResponse response)
     {
-        // Add assistant message with tool calls to in-memory context
         ChatMessage assistantMsg = new(_being.Id, _session?.Id ?? Guid.Empty, response.Content)
         {
             Role = MessageRole.Assistant,
@@ -804,8 +767,66 @@ public class ContextManager
         };
         _messages.Add(assistantMsg);
 
-        // Execute all tool calls (adds tool result messages to _messages)
         return ExecuteToolCalls(response.ToolCalls!);
+    }
+
+    /// <summary>
+    /// Persists the tool call round (assistant + tool results) to storage
+    /// and delivers SSE events for real-time frontend display.
+    /// </summary>
+    private void PersistAndDeliverToolCallRound(AIResponse response)
+    {
+        ChatMessage assistantMsg = new(_being.Id, _session?.Id ?? Guid.Empty, response.Content)
+        {
+            Role = MessageRole.Assistant,
+            Thinking = response.Thinking,
+            ToolCallsJson = JsonSerializer.Serialize(response.ToolCalls!),
+        };
+        _messages.Add(assistantMsg);
+
+        List<ChatMessage> toolResultMessages = ExecuteToolCalls(response.ToolCalls!);
+
+        if (_session != null)
+        {
+            ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
+            if (chatSystem != null && _being.Id != Guid.Empty)
+            {
+                chatSystem.AddMessage(assistantMsg);
+
+                foreach (ChatMessage msg in toolResultMessages)
+                {
+                    chatSystem.AddMessage(msg);
+                }
+            }
+        }
+
+        DeliverToolUpdate(assistantMsg);
+        foreach (ChatMessage msg in toolResultMessages)
+        {
+            DeliverToolUpdate(msg);
+        }
+    }
+
+    /// <summary>
+    /// Delivers a tool-related message to the IM layer for real-time frontend display.
+    /// Handles both assistant messages with tool_calls and tool result messages.
+    /// </summary>
+    private void DeliverToolUpdate(ChatMessage msg)
+    {
+        IMManager? imManager = ServiceLocator.Instance.IMManager;
+        if (imManager != null && _session != null)
+        {
+            string roleStr = msg.Role.ToString();
+            _ = imManager.SendToolUpdateAsync(
+                msg.SenderId,
+                _session.Id,
+                roleStr,
+                msg.Content,
+                msg.ToolCallsJson,
+                msg.ToolCallId,
+                msg.Thinking,
+                _being.Name);
+        }
     }
 
     /// <summary>

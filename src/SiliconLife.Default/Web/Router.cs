@@ -55,7 +55,9 @@ public class Router
         RegisterController(() => new ProjectController(), "/project");
         RegisterController(() => new ExecutorController(), "/executor");
         RegisterController(() => new CodeBrowserController(), "/code");
-        RegisterController(() => new PermissionRequestController(), "/permission-request");
+        RegisterController(() => new PermissionRequestController(), "/permission/request");
+        RegisterController(() => new PermissionRequestController(), "/permission/check");
+        RegisterController(() => new PermissionRequestController(), "/permission/respond");
         RegisterController(() => new AboutController(), "/about");
         RegisterController(() => new InitController(), "/init", "GET");
         RegisterController(() => new InitController(), "/init", "POST");

@@ -18,11 +18,11 @@ namespace SiliconLife.Collective;
 /// Each being holds its own PermissionManager instance.
 ///
 /// Query priority:
-/// 1. IsCurator check — curators have highest privileges (always allowed)
-/// 2. UserFrequencyCache — high-frequency user decisions (memory-only)
-/// 3. GlobalACL — prefix-matching rule table (persistent)
-/// 4. IPermissionCallback — domain-specific callback rules
-/// 5. IPermissionAskHandler — ask user (fallback)
+/// 1. UserFrequencyCache — high-frequency user decisions (memory-only)
+/// 2. IPermissionCallback — domain-specific callback rules
+/// 3. If callback returns AskUser (or no callback):
+///    - Curator → IPermissionAskHandler (IM inquiry)
+///    - Non-curator → GlobalACL → default deny
 /// </summary>
 public class PermissionManager
 {
@@ -113,7 +113,12 @@ public class PermissionManager
 
     /// <summary>
     /// Checks whether a permission request is allowed.
-    /// Follows the priority chain: Curator → FrequencyCache → GlobalACL → Callback → AskUser.
+    /// Follows the priority chain:
+    /// 1. UserFrequencyCache — high-frequency user decisions (memory-only)
+    /// 2. IPermissionCallback — domain-specific callback rules
+    /// 3. If callback returns AskUser (or no callback):
+    ///    - Curator → IPermissionAskHandler (IM inquiry)
+    ///    - Non-curator → GlobalACL → default deny
     /// </summary>
     /// <param name="callerId">The GUID of the silicon being making the request</param>
     /// <param name="permissionType">The type of permission being checked</param>
@@ -121,14 +126,7 @@ public class PermissionManager
     /// <returns>True if the operation is allowed, false otherwise</returns>
     public bool CheckPermission(Guid callerId, PermissionType permissionType, string resource)
     {
-        // Priority 1: Curators always have full access
-        if (IsCurator)
-        {
-            AuditLog(callerId, permissionType, resource, PermissionResult.Allowed, "Curator privilege");
-            return true;
-        }
-
-        // Priority 2: Check frequency cache (high-frequency user decisions)
+        // Priority 1: Check frequency cache (high-frequency user decisions)
         PermissionResult? cachedResult = _frequencyCache.Query(permissionType, resource);
         if (cachedResult.HasValue)
         {
@@ -136,15 +134,7 @@ public class PermissionManager
             return cachedResult.Value == PermissionResult.Allowed;
         }
 
-        // Priority 3: Check Global ACL
-        PermissionResult? aclResult = _globalAcl.Query(permissionType, resource);
-        if (aclResult.HasValue)
-        {
-            AuditLog(callerId, permissionType, resource, aclResult.Value, "Global ACL");
-            return aclResult.Value == PermissionResult.Allowed;
-        }
-
-        // Priority 4: Callback
+        // Priority 2: Callback
         if (_callback != null)
         {
             PermissionResult callbackResult = _callback.Evaluate(callerId, permissionType, resource);
@@ -155,21 +145,35 @@ public class PermissionManager
             }
         }
 
-        // Priority 5: Ask user
-        if (_askHandler != null)
+        // Priority 3: Branch based on curator status when callback returns AskUser or no callback
+        if (IsCurator)
         {
-            AskPermissionResult userDecision = _askHandler.AskUser(callerId, permissionType, resource);
+            // Curator: ask user via IM
+            if (_askHandler != null)
+            {
+                AskPermissionResult userDecision = _askHandler.AskUser(callerId, permissionType, resource);
 
-            // Record the user's decision in frequency cache (if user opted in)
-            PermissionResult userResult = userDecision.Allowed ? PermissionResult.Allowed : PermissionResult.Denied;
-            _frequencyCache.Record(permissionType, resource, userResult, userDecision.AddToCache);
+                PermissionResult userResult = userDecision.Allowed ? PermissionResult.Allowed : PermissionResult.Denied;
+                _frequencyCache.Record(permissionType, resource, userResult, userDecision.AddToCache);
 
-            AuditLog(callerId, permissionType, resource, userResult, "User decision");
-            return userDecision.Allowed;
+                AuditLog(callerId, permissionType, resource, userResult, "User decision (curator)");
+                return userDecision.Allowed;
+            }
+
+            AuditLog(callerId, permissionType, resource, PermissionResult.Denied, "No ask handler for curator, default deny");
+            return false;
         }
 
-        // No handler available — deny by default
-        AuditLog(callerId, permissionType, resource, PermissionResult.Denied, "No handler, default deny");
+        // Non-curator: check Global ACL
+        PermissionResult? aclResult = _globalAcl.Query(permissionType, resource);
+        if (aclResult.HasValue)
+        {
+            AuditLog(callerId, permissionType, resource, aclResult.Value, "Global ACL");
+            return aclResult.Value == PermissionResult.Allowed;
+        }
+
+        // No matching rule — deny by default
+        AuditLog(callerId, permissionType, resource, PermissionResult.Denied, "No matching rule, default deny");
         return false;
     }
 

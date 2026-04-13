@@ -11,6 +11,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Reflection.Metadata;
+using System.Threading.Channels;
+
 namespace SiliconLife.Collective;
 
 /// <summary>
@@ -49,8 +52,9 @@ public class ChatSystem
     /// </summary>
     public void AddMessage(ChatMessage message)
     {
-        SessionBase session = GetOrCreateSession(message.SenderId, message.ChannelId);
-        session.AddMessage(message);
+        SessionBase? session = GetSessionByChannelId(message.ChannelId);
+        session?.AddMessage(message);
+        _logger.Debug("Message added: sender={0}, channel={1}, length={2}", message.SenderId, message.ChannelId, message.Content.Length);
     }
 
     /// <summary>

@@ -94,6 +94,24 @@ public class IMManager
     }
 
     /// <summary>
+    /// Sends a tool update event through the IM provider.
+    /// Used for real-time notification when AI calls tools or tools return results.
+    /// </summary>
+    /// <param name="senderId">The ID of the message sender.</param>
+    /// <param name="channelId">The channel ID.</param>
+    /// <param name="role">Message role (Assistant for tool call, Tool for tool result).</param>
+    /// <param name="content">The message content.</param>
+    /// <param name="toolCallsJson">Serialized tool calls JSON (for Assistant role with tool calls).</param>
+    /// <param name="toolCallId">Tool call ID (for Tool role result messages).</param>
+    /// <param name="thinking">Optional thinking content.</param>
+    /// <param name="senderName">Optional sender name.</param>
+    public async Task SendToolUpdateAsync(Guid senderId, Guid channelId, string role, string content, string? toolCallsJson = null, string? toolCallId = null, string? thinking = null, string? senderName = null)
+    {
+        _logger.Debug("Sending tool update: sender={0}, channel={1}, role={2}", senderId, channelId, role);
+        await _imProvider.SendToolUpdateAsync(senderId, channelId, role, content, toolCallsJson, toolCallId, thinking, senderName);
+    }
+
+    /// <summary>
     /// Starts the IM manager and activates the underlying IM provider.
     /// </summary>
     public async Task StartAsync()

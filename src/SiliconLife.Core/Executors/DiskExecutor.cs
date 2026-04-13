@@ -281,7 +281,7 @@ public static class DiskExecutor
     private static bool CheckPermission(ExecutorRequest request)
     {
         PermissionManager? pm = ServiceLocator.Instance.GetPermissionManager(request.CallerId);
-        if (pm == null) return true; // No manager = no restriction (bootstrap)
+        if (pm == null) return false; // No manager = no restriction (bootstrap)
         return pm.CheckPermission(request.CallerId, PermissionType.FileAccess, request.ResourcePath);
     }
 }

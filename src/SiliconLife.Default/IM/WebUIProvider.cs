@@ -240,9 +240,15 @@ public class WebUIProvider : IIMProvider
 
     public async Task<AskPermissionResult> AskPermissionAsync(PermissionType permissionType, string resource, string allowCode, string denyCode)
     {
+        Guid userId = Config.Instance.Data.UserGuid;
+
         var message = new
         {
             type = "permission_ask",
+            permissionType = permissionType.ToString(),
+            resource,
+            allowCode,
+            denyCode,
             content = $"Permission required: {permissionType}\nResource: {resource}\nAllow code: {allowCode}\nDeny code: {denyCode}",
             timestamp = DateTime.UtcNow
         };
@@ -250,7 +256,6 @@ public class WebUIProvider : IIMProvider
         await _sseHandler.SendToAllAsync("permission", message);
 
         var tcs = new TaskCompletionSource<AskPermissionResult>();
-        var userId = Guid.Empty;
         _pendingPermissionRequests[userId] = tcs;
 
         try
@@ -276,5 +281,25 @@ public class WebUIProvider : IIMProvider
             client.ChannelId = channelId;
             await SendHistoryToClientAsync(client);
         }
+    }
+
+    public async Task SendToolUpdateAsync(Guid senderId, Guid channelId, string role, string content, string? toolCallsJson = null, string? toolCallId = null, string? thinking = null, string? senderName = null)
+    {
+        var message = new
+        {
+            type = "tool",
+            senderId = senderId.ToString(),
+            senderName,
+            channelId = channelId.ToString(),
+            content,
+            role,
+            toolCallsJson,
+            toolCallId,
+            thinking,
+            timestamp = DateTime.UtcNow
+        };
+
+        await _sseHandler.SendToChannelAsync(channelId, "tool", message);
+        _logger.Debug($"Tool update sent to channel {channelId}, role={role}");
     }
 }

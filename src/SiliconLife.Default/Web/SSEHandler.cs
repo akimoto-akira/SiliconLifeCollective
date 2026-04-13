@@ -192,7 +192,9 @@ public class SSEHandler : IDisposable
                 content = m.Content,
                 thinking = m.Thinking,
                 role = roleStr,
-                timestamp = m.Timestamp
+                timestamp = m.Timestamp,
+                toolCallsJson = m.ToolCallsJson,
+                toolCallId = m.ToolCallId
             };
         }).ToList();
 

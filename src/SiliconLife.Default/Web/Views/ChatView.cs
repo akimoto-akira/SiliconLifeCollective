@@ -60,7 +60,32 @@ public class ChatView : ViewBase
                     H.Textarea().Id("message-input").Placeholder(vm.Localization.ChatMessageInputPlaceholder),
                     H.Div(H.Button(vm.Localization.ChatSendButton).OnClick("sendMessage()")).Class("send-button")
                 ).Class("chat-input-area")
-            ).Class("chat-main")
+            ).Class("chat-main"),
+            H.Div(
+                H.Div(
+                    H.Div(
+                        H.H1("权限请求").Class("permission-dialog-title"),
+                        H.Div(
+                            H.Div(
+                                H.Span("权限类型:").Class("permission-label"),
+                                H.Span("").Id("permission-type").Class("permission-value")
+                            ).Class("permission-detail-row"),
+                            H.Div(
+                                H.Span("请求资源:").Class("permission-label"),
+                                H.Span("").Id("permission-resource").Class("permission-value")
+                            ).Class("permission-detail-row"),
+                            H.Div(
+                                H.Span("详细信息:").Class("permission-label"),
+                                H.Div("").Id("permission-content").Class("permission-content-text")
+                            ).Class("permission-detail-row")
+                        ).Class("permission-details"),
+                        H.Div(
+                            H.Button("允许").Class("btn-permission-allow").OnClick("respondPermission(true)"),
+                            H.Button("拒绝").Class("btn-permission-deny").OnClick("respondPermission(false)")
+                        ).Class("permission-buttons")
+                    ).Class("permission-dialog")
+                ).Id("permission-overlay").Class("permission-overlay")
+            ).Class("permission-overlay-wrapper")
         ).Class("chat-layout");
     }
 
@@ -375,6 +400,47 @@ public class ChatView : ViewBase
                 .Property("color", "var(--accent-error)")
             .EndSelector()
 
+            .Comment("Tool Call Message")
+            .Selector(".msg-tool")
+                .Property("margin", "8px 0")
+            .EndSelector()
+            .Selector(".msg-tool .msg-collapsible")
+                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.03))")
+                .Property("border", "1px solid var(--border)")
+            .EndSelector()
+            .Selector(".msg-tool-content")
+                .Property("padding", "0 12px 10px")
+                .Property("border-top", "1px solid var(--border)")
+                .Property("padding-top", "8px")
+            .EndSelector()
+            .Selector(".msg-tool-section")
+                .Property("margin-top", "8px")
+            .EndSelector()
+            .Selector(".msg-tool-section:first-child")
+                .Property("margin-top", "0")
+            .EndSelector()
+            .Selector(".msg-tool-label")
+                .Property("font-size", "12px")
+                .Property("font-weight", "600")
+                .Property("color", "var(--text-secondary)")
+                .Property("margin-bottom", "4px")
+            .EndSelector()
+            .Selector(".msg-tool-code")
+                .Property("margin", "0")
+                .Property("padding", "8px 10px")
+                .Property("background", "var(--bg-primary)")
+                .Property("border", "1px solid var(--border)")
+                .Property("border-radius", "6px")
+                .Property("font-size", "12px")
+                .Property("font-family", "monospace")
+                .Property("color", "var(--text-primary)")
+                .Property("white-space", "pre-wrap")
+                .Property("word-break", "break-word")
+                .Property("overflow-x", "auto")
+                .Property("max-height", "300px")
+                .Property("overflow-y", "auto")
+            .EndSelector()
+
             .Comment("Message Time")
             .Selector(".msg-time")
                 .Property("font-size", "11px")
@@ -437,7 +503,112 @@ public class ChatView : ViewBase
                 .Selector(".chat-conversations")
                     .Property("display", "none")
                 .EndSelector()
-            .EndMedia();
+            .EndMedia()
+
+            .Comment("Permission Overlay")
+            .Selector(".permission-overlay-wrapper")
+                .Property("position", "fixed")
+                .Property("top", "0")
+                .Property("left", "0")
+                .Property("width", "100%")
+                .Property("height", "100%")
+                .Property("pointer-events", "none")
+                .Property("z-index", "1000")
+            .EndSelector()
+            .Selector(".permission-overlay")
+                .Property("display", "none")
+                .Property("position", "fixed")
+                .Property("top", "0")
+                .Property("left", "0")
+                .Property("width", "100%")
+                .Property("height", "100%")
+                .Property("background", "rgba(0,0,0,0.5)")
+                .Property("align-items", "center")
+                .Property("justify-content", "center")
+                .Property("pointer-events", "auto")
+                .Property("z-index", "1001")
+            .EndSelector()
+            .Selector(".permission-dialog")
+                .Property("background", "var(--bg-card)")
+                .Property("border", "1px solid var(--border)")
+                .Property("border-radius", "12px")
+                .Property("padding", "24px")
+                .Property("min-width", "360px")
+                .Property("max-width", "500px")
+                .Property("box-shadow", "0 8px 32px rgba(0,0,0,0.3)")
+            .EndSelector()
+            .Selector(".permission-dialog-title")
+                .Property("font-size", "18px")
+                .Property("font-weight", "600")
+                .Property("color", "var(--text-primary)")
+                .Property("margin-bottom", "16px")
+            .EndSelector()
+            .Selector(".permission-details")
+                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.03))")
+                .Property("border-radius", "8px")
+                .Property("padding", "12px 16px")
+                .Property("margin-bottom", "20px")
+            .EndSelector()
+            .Selector(".permission-detail-row")
+                .Property("display", "flex")
+                .Property("justify-content", "space-between")
+                .Property("padding", "8px 0")
+                .Property("border-bottom", "1px solid var(--border)")
+            .EndSelector()
+            .Selector(".permission-detail-row:last-child")
+                .Property("border-bottom", "none")
+                .Property("flex-direction", "column")
+            .EndSelector()
+            .Selector(".permission-label")
+                .Property("font-size", "13px")
+                .Property("font-weight", "600")
+                .Property("color", "var(--text-secondary)")
+                .Property("flex-shrink", "0")
+                .Property("margin-right", "12px")
+            .EndSelector()
+            .Selector(".permission-value")
+                .Property("font-size", "13px")
+                .Property("color", "var(--text-primary)")
+                .Property("word-break", "break-all")
+            .EndSelector()
+            .Selector(".permission-content-text")
+                .Property("font-size", "12px")
+                .Property("color", "var(--text-secondary)")
+                .Property("white-space", "pre-wrap")
+                .Property("word-break", "break-word")
+                .Property("margin-top", "4px")
+            .EndSelector()
+            .Selector(".permission-buttons")
+                .Property("display", "flex")
+                .Property("gap", "12px")
+                .Property("justify-content", "flex-end")
+            .EndSelector()
+            .Selector(".btn-permission-allow")
+                .Property("padding", "8px 24px")
+                .Property("background", "var(--accent-success, #4CAF50)")
+                .Property("color", "#fff")
+                .Property("border", "none")
+                .Property("border-radius", "6px")
+                .Property("cursor", "pointer")
+                .Property("font-size", "14px")
+                .Property("font-weight", "500")
+            .EndSelector()
+            .Selector(".btn-permission-allow:hover")
+                .Property("opacity", "0.85")
+            .EndSelector()
+            .Selector(".btn-permission-deny")
+                .Property("padding", "8px 24px")
+                .Property("background", "var(--accent-error, #f44336)")
+                .Property("color", "#fff")
+                .Property("border", "none")
+                .Property("border-radius", "6px")
+                .Property("cursor", "pointer")
+                .Property("font-size", "14px")
+                .Property("font-weight", "500")
+            .EndSelector()
+            .Selector(".btn-permission-deny:hover")
+                .Property("opacity", "0.85")
+            .EndSelector();
     }
 
     private static JsSyntax GetScripts(ChatViewModel vm)
@@ -452,7 +623,8 @@ public class ChatView : ViewBase
             .Add(() => Js.Let(() => "eventSource", () => Js.Null()))
             .Add(() => Js.Let(() => "currentStreamId", () => Js.Null()))
             .Add(() => Js.Let(() => "streamingMessage", () => Js.Null()))
-            .Add(() => Js.Let(() => "messageCache", () => Js.New(() => Js.Id(() => "Array"))));
+            .Add(() => Js.Let(() => "messageCache", () => Js.New(() => Js.Id(() => "Array"))))
+            .Add(() => Js.Let(() => "toolCallMap", () => Js.New(() => Js.Id(() => "Map"))));
 
         var autoResizeBody = Js.Block()
             .Add(() => Js.Assign(() => Js.Id(() => "textarea").Prop(() => "style").Prop(() => "height"), () => Js.Str(() => "auto")))
@@ -470,6 +642,14 @@ public class ChatView : ViewBase
         var streamingHandlerBody = Js.Block()
             .Add(() => Js.Const(() => "data", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "event").Prop(() => "data"))))
             .Add(() => Js.Id(() => "handleStreaming").Invoke(() => Js.Id(() => "data")).Stmt());
+
+        var toolHandlerBody = Js.Block()
+            .Add(() => Js.Const(() => "data", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "event").Prop(() => "data"))))
+            .Add(() => Js.Id(() => "handleTool").Invoke(() => Js.Id(() => "data")).Stmt());
+
+        var permissionHandlerBody = Js.Block()
+            .Add(() => Js.Const(() => "data", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "event").Prop(() => "data"))))
+            .Add(() => Js.Id(() => "handlePermission").Invoke(() => Js.Id(() => "data")).Stmt());
 
         var connectSSEBody = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
@@ -500,7 +680,9 @@ public class ChatView : ViewBase
             )))
             .Add(() => Js.Id(() => "eventSource").Call(() => "addEventListener", () => Js.Str(() => "history"), () => Js.Arrow(() => new List<string> { "event" }, () => historyHandlerBody)).Stmt())
             .Add(() => Js.Id(() => "eventSource").Call(() => "addEventListener", () => Js.Str(() => "message"), () => Js.Arrow(() => new List<string> { "event" }, () => messageHandlerBody)).Stmt())
-            .Add(() => Js.Id(() => "eventSource").Call(() => "addEventListener", () => Js.Str(() => "streaming"), () => Js.Arrow(() => new List<string> { "event" }, () => streamingHandlerBody)).Stmt());
+            .Add(() => Js.Id(() => "eventSource").Call(() => "addEventListener", () => Js.Str(() => "streaming"), () => Js.Arrow(() => new List<string> { "event" }, () => streamingHandlerBody)).Stmt())
+            .Add(() => Js.Id(() => "eventSource").Call(() => "addEventListener", () => Js.Str(() => "tool"), () => Js.Arrow(() => new List<string> { "event" }, () => toolHandlerBody)).Stmt())
+            .Add(() => Js.Id(() => "eventSource").Call(() => "addEventListener", () => Js.Str(() => "permission"), () => Js.Arrow(() => new List<string> { "event" }, () => permissionHandlerBody)).Stmt());
         js.Add(() => Js.Func(() => "connectSSE", () => new List<string>(), () => connectSSEBody));
 
         var handleHistoryBody = Js.Block()
@@ -531,6 +713,70 @@ public class ChatView : ViewBase
                 .Prop(() => "thinking", () => Js.Id(() => "data").Prop(() => "thinking"))
                 .Prop(() => "senderName", () => Js.Id(() => "data").Prop(() => "senderName"))).Stmt());
         js.Add(() => Js.Func(() => "handleMessage", () => new List<string> { "data" }, () => handleMessageBody));
+
+        var handleToolBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "data").Prop(() => "channelId").Op(() => "!==", () => Js.Id(() => "currentSessionId")), new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
+            }))
+            .Add(() => Js.Id(() => "messageCache").Call(() => "push", () => Js.Obj()
+                .Prop(() => "role", () => Js.Id(() => "data").Prop(() => "role"))
+                .Prop(() => "content", () => Js.Id(() => "data").Prop(() => "content"))
+                .Prop(() => "thinking", () => Js.Id(() => "data").Prop(() => "thinking"))
+                .Prop(() => "senderName", () => Js.Id(() => "data").Prop(() => "senderName"))
+                .Prop(() => "toolCallsJson", () => Js.Id(() => "data").Prop(() => "toolCallsJson"))
+                .Prop(() => "toolCallId", () => Js.Id(() => "data").Prop(() => "toolCallId"))).Stmt())
+            .Add(() => Js.Id(() => "buildToolCallMap").Invoke().Stmt())
+            .Add(() => Js.Id(() => "appendMessage").Invoke(() => Js.Obj()
+                .Prop(() => "isUser", () => Js.Bool(() => false))
+                .Prop(() => "text", () => Js.Id(() => "data").Prop(() => "content"))
+                .Prop(() => "thinking", () => Js.Id(() => "data").Prop(() => "thinking"))
+                .Prop(() => "senderName", () => Js.Id(() => "data").Prop(() => "senderName"))
+                .Prop(() => "role", () => Js.Id(() => "data").Prop(() => "role"))
+                .Prop(() => "toolCallsJson", () => Js.Id(() => "data").Prop(() => "toolCallsJson"))
+                .Prop(() => "toolCallId", () => Js.Id(() => "data").Prop(() => "toolCallId"))).Stmt());
+        js.Add(() => Js.Func(() => "handleTool", () => new List<string> { "data" }, () => handleToolBody));
+
+        var handlePermissionBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "data").Prop(() => "type").Op(() => "!==", () => Js.Str(() => "permission_ask")), new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
+            }))
+            .Add(() => Js.Id(() => "showPermissionDialog").Invoke(() => Js.Id(() => "data")).Stmt());
+        js.Add(() => Js.Func(() => "handlePermission", () => new List<string> { "data" }, () => handlePermissionBody));
+
+        var showPermissionDialogBody = Js.Block()
+            .Add(() => Js.Const(() => "overlay", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permission-overlay"))))
+            .Add(() => Js.Const(() => "typeEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permission-type"))))
+            .Add(() => Js.Const(() => "resourceEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permission-resource"))))
+            .Add(() => Js.Const(() => "contentEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permission-content"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "overlay").Not(), new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
+            }))
+            .Add(() => Js.Assign(() => Js.Id(() => "typeEl").Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "permissionType")))
+            .Add(() => Js.Assign(() => Js.Id(() => "resourceEl").Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "resource")))
+            .Add(() => Js.Assign(() => Js.Id(() => "contentEl").Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "content")))
+            .Add(() => Js.Assign(() => Js.Id(() => "overlay").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "flex")));
+        js.Add(() => Js.Func(() => "showPermissionDialog", () => new List<string> { "data" }, () => showPermissionDialogBody));
+
+        var respondPermissionBody = Js.Block()
+            .Add(() => Js.Const(() => "overlay", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permission-overlay"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "overlay").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "none")))
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/permission/respond").Op(() => "+", () => (JsSyntax)Js.Str(() => "?userId=")).Op(() => "+", () => (JsSyntax)Js.Str(() => userId)).Op(() => "+", () => (JsSyntax)Js.Str(() => "&allowed=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "allowed")), () => Js.Obj()
+                .Prop(() => "method", () => Js.Str(() => "GET"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "result" }, () => Js.Block()
+                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                {
+                    { (Js.Id(() => "result").Prop(() => "success"), new List<JsSyntax>
+                        {
+                            Js.Id(() => "appendMessage").Invoke(() => Js.Obj()
+                                .Prop(() => "isUser", () => Js.Bool(() => true))
+                                .Prop(() => "text", () => Js.Ternary(() => Js.Id(() => "allowed"), () => Js.Str(() => "[Permission Allowed]"), () => Js.Str(() => "[Permission Denied]")))).Stmt()
+                        }
+                    )}
+                }))
+            )).Call(() => "catch", () => Js.Arrow(() => new List<string> { "err" }, () => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Permission respond error:"), () => Js.Id(() => "err")))).Stmt());
+        js.Add(() => Js.Func(() => "respondPermission", () => new List<string> { "allowed" }, () => respondPermissionBody));
 
         var handleStreamingBody = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
@@ -609,16 +855,37 @@ public class ChatView : ViewBase
             }));
         js.Add(() => Js.Func(() => "handleStreaming", () => new List<string> { "data" }, () => handleStreamingBody));
 
+        var buildToolCallMapBody = Js.Block()
+            .Add(() => Js.Id(() => "toolCallMap").Call(() => "clear").Stmt())
+            .Add(() => Js.Id(() => "messageCache").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "m" }, () => Js.Block()
+                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                {
+                    { (Js.Id(() => "m").Prop(() => "toolCallsJson"), new List<JsSyntax>
+                        {
+                            Js.Const(() => "toolCalls", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "m").Prop(() => "toolCallsJson"))),
+                            Js.Id(() => "toolCalls").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "tc" }, () => Js.Block()
+                                .Add(() => Js.Id(() => "toolCallMap").Call(() => "set", () => Js.Id(() => "tc").Prop(() => "Id"), () => Js.Id(() => "tc"))).Stmt()
+                            )).Stmt()
+                        }
+                    )}
+                }))
+            )));
+        js.Add(() => Js.Func(() => "buildToolCallMap", () => new List<string>(), () => buildToolCallMapBody));
+
         var renderMessagesBody = Js.Block()
             .Add(() => Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "renderMessages called, cache length:"), () => Js.Id(() => "messageCache").Prop(() => "length")).Stmt())
             .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))))
             .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Str(() => "")))
+            .Add(() => Js.Id(() => "buildToolCallMap").Invoke().Stmt())
             .Add(() => Js.Id(() => "messageCache").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "m" }, () => Js.Block()
                 .Add(() => Js.Id(() => "appendMessage").Invoke(() => Js.Obj()
                     .Prop(() => "isUser", () => Js.Id(() => "m").Prop(() => "role").Op(() => "===", () => Js.Str(() => "User")))
                     .Prop(() => "text", () => Js.Id(() => "m").Prop(() => "content"))
                     .Prop(() => "thinking", () => Js.Id(() => "m").Prop(() => "thinking"))
-                    .Prop(() => "senderName", () => Js.Id(() => "m").Prop(() => "senderName"))).Stmt())
+                    .Prop(() => "senderName", () => Js.Id(() => "m").Prop(() => "senderName"))
+                    .Prop(() => "role", () => Js.Id(() => "m").Prop(() => "role"))
+                    .Prop(() => "toolCallsJson", () => Js.Id(() => "m").Prop(() => "toolCallsJson"))
+                    .Prop(() => "toolCallId", () => Js.Id(() => "m").Prop(() => "toolCallId"))).Stmt())
             )))
             .Add(() => Js.Id(() => "container").Call(() => "scrollTo", () => Js.Obj().Prop(() => "top", () => Js.Id(() => "container").Prop(() => "scrollHeight")).Prop(() => "behavior", () => Js.Str(() => "smooth"))).Stmt());
         js.Add(() => Js.Func(() => "renderMessages", () => new List<string>(), () => renderMessagesBody));
@@ -719,10 +986,17 @@ public class ChatView : ViewBase
         js.Add(() => Js.Func(() => "loadConversations", () => new List<string>(), () => loadConversationsBody));
 
         var msgIsUserCond = Js.Id(() => "msg").Prop(() => "isUser");
+        var msgIsToolCond = Js.Id(() => "msg").Prop(() => "role").Op(() => "===", () => Js.Str(() => "Tool"));
+        var toolCallRequestExpr = Js.Ternary(() => Js.Id(() => "toolCallMap").Call(() => "has", () => Js.Id(() => "msg").Prop(() => "toolCallId")), () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "toolCallMap").Call(() => "get", () => Js.Id(() => "msg").Prop(() => "toolCallId")), () => Js.Null(), () => Js.Num(() => "2")), () => Js.Str(() => "{}"));
         var userMsgBody = new List<JsSyntax>
         {
             Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "msg-user")),
             Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-user-content\"><div class=\"msg-user-bubble\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div><div class=\"msg-user-avatar\"><div class=\"msg-avatar-icon\">U</div><div class=\"msg-avatar-name\">我</div></div>")))
+        };
+        var toolMsgBody = new List<JsSyntax>
+        {
+            Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "msg-tool")),
+            Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<details class=\"msg-collapsible\"><summary>🔧 Tool Call</summary><div class=\"msg-tool-content\"><div class=\"msg-tool-section\"><div class=\"msg-tool-label\">Request:</div><pre class=\"msg-tool-code\">").Op(() => "+", () => (JsSyntax)toolCallRequestExpr).Op(() => "+", () => (JsSyntax)Js.Str(() => "</pre></div><div class=\"msg-tool-section\"><div class=\"msg-tool-label\">Response:</div><pre class=\"msg-tool-code\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</pre></div></div></details>"))),
         };
         var beingMsgBody = new List<JsSyntax>
         {
@@ -736,6 +1010,7 @@ public class ChatView : ViewBase
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 { (msgIsUserCond, userMsgBody) },
+                { (msgIsToolCond, toolMsgBody) },
                 { (null, beingMsgBody) }
             }))
             .Add(() => Js.Id(() => "messages").Call(() => "appendChild", () => Js.Id(() => "div")).Stmt())

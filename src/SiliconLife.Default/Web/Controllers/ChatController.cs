@@ -288,7 +288,9 @@ public class ChatController : Controller
                     thinking = m.Thinking,
                     role = roleStr,
                     senderName = senderBeing?.Name ?? "",
-                    timestamp = m.Timestamp
+                    timestamp = m.Timestamp,
+                    toolCallsJson = m.ToolCallsJson,
+                    toolCallId = m.ToolCallId
                 };
             });
 
