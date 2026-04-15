@@ -28,6 +28,14 @@ public class CalendarTool : ITool
         "Actions: 'now' (current date/time), 'day_of_week' (current day of week), " +
         "'format' (format a date), 'add_days' (add days to a date), 'diff' (difference between dates).";
 
+    public string GetDisplayName(Language language)
+    {
+        if (LocalizationManager.Instance.TryGetLocalization(language, out var loc) &&
+            loc is DefaultLocalizationBase defaultLoc)
+            return defaultLoc.GetToolDisplayName(Name);
+        return Name;
+    }
+
     public Dictionary<string, object> GetParameterSchema()
     {
         return new Dictionary<string, object>

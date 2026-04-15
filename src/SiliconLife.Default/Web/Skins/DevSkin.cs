@@ -333,6 +333,7 @@ public class DevSkin : ISkin
             .WithVariable("bg-primary", "#0d1117")
             .WithVariable("bg-secondary", "#161b22")
             .WithVariable("bg-tertiary", "#21262d")
+            .WithVariable("bg-card", "#161b22")
             .WithVariable("border", "#30363d")
             .WithVariable("border-color", "#30363d")
             .WithVariable("text-primary", "#c9d1d9")

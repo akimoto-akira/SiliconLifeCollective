@@ -904,4 +904,13 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <param name="logLevel">The log level</param>
     /// <returns>The localized display name</returns>
     public abstract override string GetLogLevelName(LogLevel logLevel);
+
+    // ===== Tool Display Name Localization =====
+
+    /// <summary>
+    /// Gets the localized display name for a tool by its name identifier
+    /// </summary>
+    /// <param name="toolName">The tool's Name property value</param>
+    /// <returns>The localized display name, or the tool name itself if not found</returns>
+    public abstract string GetToolDisplayName(string toolName);
 }

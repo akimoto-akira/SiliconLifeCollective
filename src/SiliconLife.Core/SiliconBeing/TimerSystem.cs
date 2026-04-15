@@ -300,12 +300,28 @@ public sealed class TimerCallbackInfo
 public sealed class TimerSystem
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<TimerSystem>();
+    private readonly SiliconBeingBase _owner;
     private readonly IStorage _storage;
     private readonly string _storageKey;
     private readonly object _lock = new();
 
     private List<TimerItem> _timers = new();
     private readonly List<Action<TimerCallbackInfo>> _callbacks = new();
+
+    /// <summary>
+    /// Gets the owner being's GUID (computed in real-time from the owner)
+    /// </summary>
+    public Guid OwnerId => _owner.Id;
+
+    /// <summary>
+    /// Gets the name of the owner being (computed in real-time from the owner)
+    /// </summary>
+    public string OwnerName => _owner.Name;
+
+    /// <summary>
+    /// Gets whether the owner is a curator (computed in real-time from the owner)
+    /// </summary>
+    public bool IsCurator => _owner.IsCurator;
 
     /// <summary>
     /// Gets the total number of timers.
@@ -323,14 +339,20 @@ public sealed class TimerSystem
     public event Action<TimerCallbackInfo>? OnTimerTriggered;
 
     /// <summary>
-    /// Initializes a new instance of the TimerSystem class with the specified storage.
+    /// Initializes a new instance of the TimerSystem class with the specified owner and storage.
+    /// Each being holds its own TimerSystem instance; the owner reference enables real-time
+    /// identity queries (OwnerId, OwnerName, IsCurator) without duplicating state.
     /// </summary>
+    /// <param name="owner">The silicon being that owns this TimerSystem</param>
     /// <param name="storage">The storage to use for persisting timers.</param>
-    /// <exception cref="ArgumentNullException">Thrown when storage is null.</exception>
-    public TimerSystem(IStorage storage)
+    /// <exception cref="ArgumentNullException">Thrown when owner or storage is null.</exception>
+    public TimerSystem(SiliconBeingBase owner, IStorage storage)
     {
+        _owner = owner ?? throw new ArgumentNullException(nameof(owner));
         _storage = storage ?? throw new ArgumentNullException(nameof(storage));
         _storageKey = "timers";
+
+        _logger.Info("TimerSystem created for being {0} ({1})", owner.Name, owner.Id);
 
         Load();
     }

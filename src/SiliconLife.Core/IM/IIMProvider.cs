@@ -21,7 +21,7 @@ public interface IIMProvider
 
     Task StartAsync();
     Task StopAsync();
-    Task SendMessageAsync(Guid senderId, Guid channelId, string content, string? thinking = null, string? senderName = null);
+    Task SendMessageAsync(Guid senderId, Guid channelId, string content, string? thinking = null, string? senderName = null, int? promptTokens = null, int? completionTokens = null, int? totalTokens = null);
 
     /// <summary>
     /// Sends a streaming chunk to the channel.
@@ -119,6 +119,13 @@ public class StreamChunk
     public int? Sequence { get; init; }
 
     /// <summary>
+    /// Optional token usage for the final chunk (only set on IsFinal=true chunks).
+    /// </summary>
+    public int? PromptTokens { get; init; }
+    public int? CompletionTokens { get; init; }
+    public int? TotalTokens { get; init; }
+
+    /// <summary>
     /// Creates a start chunk to begin a new stream.
     /// </summary>
     public static StreamChunk Start(Guid streamId, string content = "", string? thinking = null)
@@ -151,7 +158,7 @@ public class StreamChunk
     /// <summary>
     /// Creates a final chunk to end the stream.
     /// </summary>
-    public static StreamChunk End(Guid streamId, string content = "", int? sequence = null, string? thinking = null)
+    public static StreamChunk End(Guid streamId, string content = "", int? sequence = null, string? thinking = null, int? promptTokens = null, int? completionTokens = null, int? totalTokens = null)
     {
         return new StreamChunk
         {
@@ -159,7 +166,10 @@ public class StreamChunk
             Content = content,
             IsFinal = true,
             Thinking = thinking,
-            Sequence = sequence
+            Sequence = sequence,
+            PromptTokens = promptTokens,
+            CompletionTokens = completionTokens,
+            TotalTokens = totalTokens,
         };
     }
 }

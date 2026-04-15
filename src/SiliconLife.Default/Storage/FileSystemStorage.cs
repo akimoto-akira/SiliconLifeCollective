@@ -12,31 +12,30 @@
 // limitations under the License.
 
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using SiliconLife.Collective;
 using SiliconLife.Default.Storage;
 
 namespace SiliconLife.Default;
 
 /// <summary>
-/// File system storage implementation
-/// Maps keys to file paths and stores values as JSON-serialized bytes
+/// File system storage implementation.
+/// Each key maps to a single file; the value is stored as a single-line JSON record.
 /// </summary>
 public class FileSystemStorage : IStorage
 {
     private readonly string _baseDirectory;
-    private readonly JsonSerializerOptions _jsonOptions = new()
+    private static readonly JsonSerializerOptions _jsonOptions = new()
     {
-        WriteIndented = true,
+        WriteIndented = false,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
         Converters = { new FlexibleEnumConverter() }
     };
 
     /// <summary>
-    /// Initializes a new instance of the FileSystemStorage class
+    /// Initializes a new instance of the <see cref="FileSystemStorage"/> class.
     /// </summary>
-    /// <param name="baseDirectory">The base directory for storage</param>
+    /// <param name="baseDirectory">The base directory for storage.</param>
     public FileSystemStorage(string baseDirectory)
     {
         _baseDirectory = baseDirectory;
@@ -48,77 +47,73 @@ public class FileSystemStorage : IStorage
     }
 
     /// <summary>
-    /// Reads data from storage by key and deserializes to type T
+    /// Reads data from storage by key and deserializes to type <typeparamref name="T"/>.
+    /// The file is expected to contain a single-line JSON record.
     /// </summary>
-    /// <typeparam name="T">The type to deserialize to</typeparam>
-    /// <param name="key">The key to read</param>
-    /// <returns>The deserialized data, or default if not found</returns>
     public T? Read<T>(string key)
     {
         string filePath = GetFilePath(key);
 
         if (!File.Exists(filePath))
-        {
             return default;
+
+        // Read only the first non-empty line
+        foreach (string line in File.ReadLines(filePath))
+        {
+            if (!string.IsNullOrWhiteSpace(line))
+                return JsonSerializer.Deserialize<T>(line, _jsonOptions);
         }
 
-        string json = File.ReadAllText(filePath);
-        return JsonSerializer.Deserialize<T>(json, _jsonOptions);
+        return default;
     }
 
     /// <summary>
-    /// Writes data to storage by key with automatic JSON serialization
+    /// Writes data to storage by key as a single-line JSON record,
+    /// overwriting any existing content.
     /// </summary>
-    /// <typeparam name="T">The type of data to serialize</typeparam>
-    /// <param name="key">The key to write</param>
-    /// <param name="data">The data to write</param>
     public void Write<T>(string key, T data)
     {
         string filePath = GetFilePath(key);
         string? directory = Path.GetDirectoryName(filePath);
 
         if (directory != null && !Directory.Exists(directory))
-        {
             Directory.CreateDirectory(directory);
-        }
 
-        string json = JsonSerializer.Serialize(data, _jsonOptions);
-        File.WriteAllText(filePath, json);
+        string line = JsonSerializer.Serialize(data, _jsonOptions);
+        File.WriteAllText(filePath, line + Environment.NewLine);
     }
 
     /// <summary>
-    /// Checks if a key exists in storage
+    /// Checks if a key exists in storage.
     /// </summary>
-    /// <param name="key">The key to check</param>
-    /// <returns>True if the key exists, false otherwise</returns>
     public bool Exists(string key)
     {
-        string filePath = GetFilePath(key);
-        return File.Exists(filePath);
+        return File.Exists(GetFilePath(key));
     }
 
     /// <summary>
-    /// Deletes data from storage by key
+    /// Deletes data from storage by key.
     /// </summary>
-    /// <param name="key">The key to delete</param>
     public void Delete(string key)
     {
         string filePath = GetFilePath(key);
 
         if (File.Exists(filePath))
-        {
             File.Delete(filePath);
-        }
     }
 
     /// <summary>
-    /// Converts a storage key to a file path
+    /// Converts a storage key to a file path.
+    /// Path traversal sequences are stripped; keys without an extension get <c>.json</c>.
     /// </summary>
-    /// <param name="key">The storage key</param>
-    /// <returns>The file path</returns>
     private string GetFilePath(string key)
     {
-        string safeKey = key.Replace("..", string.Empty).Replace("/", Path.DirectorySeparatorChar.ToString());
+        string safeKey = key.Replace("..", string.Empty)
+                            .Replace("/", Path.DirectorySeparatorChar.ToString());
+
+        if (string.IsNullOrEmpty(Path.GetExtension(safeKey)))
+            safeKey += ".json";
+
         return Path.Combine(_baseDirectory, safeKey);
     }
 }

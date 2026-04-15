@@ -29,6 +29,15 @@ public class MemoryTool : ITool
         "Manage memory/notes for the silicon being. " +
         "Actions: 'add' (add a new memory), 'recent' (get recent memories), 'stats' (get memory statistics).";
 
+    /// <inheritdoc/>
+    public string GetDisplayName(Language language)
+    {
+        if (LocalizationManager.Instance.TryGetLocalization(language, out var loc) &&
+            loc is DefaultLocalizationBase defaultLoc)
+            return defaultLoc.GetToolDisplayName(Name);
+        return Name;
+    }
+
     public Dictionary<string, object> GetParameterSchema()
     {
         return new Dictionary<string, object>

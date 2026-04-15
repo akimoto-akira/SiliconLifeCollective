@@ -32,6 +32,15 @@ public class TaskTool : ITool
         "'delete' (delete task), 'update_priority' (change priority), " +
         "'add_dependency' (add task dependency), 'stats' (get task statistics).";
 
+    /// <inheritdoc/>
+    public string GetDisplayName(Language language)
+    {
+        if (LocalizationManager.Instance.TryGetLocalization(language, out var loc) &&
+            loc is DefaultLocalizationBase defaultLoc)
+            return defaultLoc.GetToolDisplayName(Name);
+        return Name;
+    }
+
     public Dictionary<string, object> GetParameterSchema()
     {
         return new Dictionary<string, object>

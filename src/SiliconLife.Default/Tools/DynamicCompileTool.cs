@@ -30,6 +30,14 @@ public class DynamicCompileTool : ITool
         "'preview_saved' (view your saved code), " +
         "'clear_saved' (delete saved code).";
 
+    public string GetDisplayName(Language language)
+    {
+        if (LocalizationManager.Instance.TryGetLocalization(language, out var loc) &&
+            loc is DefaultLocalizationBase defaultLoc)
+            return defaultLoc.GetToolDisplayName(Name);
+        return Name;
+    }
+
     public Dictionary<string, object> GetParameterSchema()
     {
         return new Dictionary<string, object>

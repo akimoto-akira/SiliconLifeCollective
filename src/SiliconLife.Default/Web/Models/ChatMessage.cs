@@ -47,4 +47,13 @@ public class ChatMessage
 
     /// <summary>Timestamp string (e.g. "14:30")</summary>
     public string? Time { get; init; }
+
+    /// <summary>Prompt (input) token count. Only set for AI-generated messages.</summary>
+    public int? PromptTokens { get; init; }
+
+    /// <summary>Completion (output) token count. Only set for AI-generated messages.</summary>
+    public int? CompletionTokens { get; init; }
+
+    /// <summary>Total token count. Only set for AI-generated messages.</summary>
+    public int? TotalTokens { get; init; }
 }

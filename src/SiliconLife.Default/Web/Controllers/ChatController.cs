@@ -141,6 +141,20 @@ public class ChatController : Controller
             CurrentBeingName = currentBeingName
         };
 
+        // Build tool display name map for the frontend lookup table
+        var language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+        foreach (var being in beings)
+        {
+            if (being.ToolManager == null) continue;
+            foreach (var toolName in being.ToolManager.GetToolNames())
+            {
+                if (vm.ToolDisplayNames.ContainsKey(toolName)) continue;
+                var tool = being.ToolManager.GetTool(toolName);
+                if (tool != null)
+                    vm.ToolDisplayNames[toolName] = tool.GetDisplayName(language);
+            }
+        }
+
         var html = view.Render(vm);
         RenderHtml(html);
     }

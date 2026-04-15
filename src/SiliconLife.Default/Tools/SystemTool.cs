@@ -29,6 +29,14 @@ public class SystemTool : ITool
         "'get_env' (specific environment variable), 'get_env_all' (all environment variables), " +
         "'system_info' (OS and runtime information).";
 
+    public string GetDisplayName(Language language)
+    {
+        if (LocalizationManager.Instance.TryGetLocalization(language, out var loc) &&
+            loc is DefaultLocalizationBase defaultLoc)
+            return defaultLoc.GetToolDisplayName(Name);
+        return Name;
+    }
+
     public Dictionary<string, object> GetParameterSchema()
     {
         return new Dictionary<string, object>

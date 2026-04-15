@@ -30,6 +30,13 @@ public interface ITool
     string Description { get; }
 
     /// <summary>
+    /// Gets the localized display name of this tool
+    /// </summary>
+    /// <param name="language">The language to use for the display name</param>
+    /// <returns>The localized display name</returns>
+    string GetDisplayName(Language language);
+
+    /// <summary>
     /// Gets the JSON Schema describing the parameters for this tool.
     /// The schema must have "type": "object" at the top level.
     /// </summary>

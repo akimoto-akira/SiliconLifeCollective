@@ -164,7 +164,7 @@ public class WebUIProvider : IIMProvider
         return Task.CompletedTask;
     }
 
-    public async Task SendMessageAsync(Guid senderId, Guid channelId, string content, string? thinking = null, string? senderName = null)
+    public async Task SendMessageAsync(Guid senderId, Guid channelId, string content, string? thinking = null, string? senderName = null, int? promptTokens = null, int? completionTokens = null, int? totalTokens = null)
     {
         var message = new
         {
@@ -174,6 +174,9 @@ public class WebUIProvider : IIMProvider
             channelId = channelId.ToString(),
             content,
             thinking,
+            promptTokens,
+            completionTokens,
+            totalTokens,
             timestamp = DateTime.Now
         };
 
@@ -231,6 +234,9 @@ public class WebUIProvider : IIMProvider
             thinking = accumulatedThinking,
             streamId = chunk.StreamId.ToString(),
             isFinal = chunk.IsFinal,
+            promptTokens = chunk.IsFinal ? chunk.PromptTokens : null,
+            completionTokens = chunk.IsFinal ? chunk.CompletionTokens : null,
+            totalTokens = chunk.IsFinal ? chunk.TotalTokens : null,
             timestamp = DateTime.UtcNow
         };
 

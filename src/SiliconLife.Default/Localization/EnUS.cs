@@ -410,4 +410,23 @@ public class EnUS : DefaultLocalizationBase
         LogLevel.None => "None",
         _ => logLevel.ToString()
     };
+
+    // ===== Tool Display Name Localization =====
+
+    private static readonly Dictionary<string, string> ToolDisplayNames = new()
+    {
+        ["calendar"] = "Calendar",
+        ["chat"] = "Chat",
+        ["silicon_manager"] = "Silicon Manager",
+        ["disk"] = "Disk",
+        ["dynamic_compile"] = "Dynamic Compile",
+        ["network"] = "Network",
+        ["memory"] = "Memory",
+        ["task"] = "Task",
+        ["system"] = "System",
+        ["timer"] = "Timer"
+    };
+
+    public override string GetToolDisplayName(string toolName) =>
+        ToolDisplayNames.GetValueOrDefault(toolName, toolName);
 }

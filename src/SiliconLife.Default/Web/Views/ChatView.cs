@@ -120,7 +120,7 @@ public class ChatView : ViewBase
         ).Class("msg-collapsible"));
 
         if (!string.IsNullOrEmpty(msg.Text))
-            bodyChildren.Add(H.Div(msg.Text).Class("msg-being-text"));
+            bodyChildren.Add(H.Div().Class("msg-being-text markdown-body").Data("md-raw", msg.Text));
 
         var tools = msg.ToolCalls?.ToList();
         if (tools != null && tools.Count > 0)
@@ -143,6 +143,13 @@ public class ChatView : ViewBase
         }
 
         children.Add(H.Div(bodyChildren.ToArray()).Class("msg-being-body"));
+
+        {
+            var prompt = msg.PromptTokens ?? 0;
+            var completion = msg.CompletionTokens ?? 0;
+            var total = msg.TotalTokens ?? 0;
+            children.Add(H.Div($"Token: ↑{prompt} ↓{completion} Σ{total}").Class("msg-token-stats"));
+        }
 
         if (!string.IsNullOrEmpty(msg.Time))
             children.Add(H.Div(msg.Time).Class("msg-time"));
@@ -342,14 +349,98 @@ public class ChatView : ViewBase
                 .Property("font-size", "14px")
                 .Property("line-height", "1.7")
                 .Property("color", "var(--text-primary)")
-                .Property("white-space", "pre-wrap")
                 .Property("word-break", "break-word")
+            .EndSelector()
+
+            .Comment("Markdown body styles for chat messages")
+            .Selector(".markdown-body h1")
+                .Property("font-size", "1.6em")
+                .Property("margin", "0.5em 0")
+                .Property("border-bottom", "1px solid var(--border)")
+                .Property("padding-bottom", "0.3em")
+            .EndSelector()
+            .Selector(".markdown-body h2")
+                .Property("font-size", "1.4em")
+                .Property("margin", "0.5em 0")
+                .Property("border-bottom", "1px solid var(--border)")
+                .Property("padding-bottom", "0.3em")
+            .EndSelector()
+            .Selector(".markdown-body h3")
+                .Property("font-size", "1.2em")
+                .Property("margin", "0.5em 0")
+            .EndSelector()
+            .Selector(".markdown-body h4, .markdown-body h5, .markdown-body h6")
+                .Property("margin", "0.5em 0")
+            .EndSelector()
+            .Selector(".markdown-body p")
+                .Property("margin", "0.6em 0")
+            .EndSelector()
+            .Selector(".markdown-body code")
+                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.1))")
+                .Property("padding", "2px 6px")
+                .Property("border-radius", "3px")
+                .Property("font-size", "0.9em")
+                .Property("font-family", "'JetBrains Mono', 'Fira Code', 'Consolas', monospace")
+            .EndSelector()
+            .Selector(".markdown-body pre")
+                .Property("background", "var(--bg-secondary, rgba(0,0,0,0.3))")
+                .Property("padding", "12px")
+                .Property("border-radius", "6px")
+                .Property("overflow-x", "auto")
+                .Property("margin", "0.8em 0")
+            .EndSelector()
+            .Selector(".markdown-body pre code")
+                .Property("background", "none")
+                .Property("padding", "0")
+            .EndSelector()
+            .Selector(".markdown-body blockquote")
+                .Property("border-left", "4px solid var(--accent-primary)")
+                .Property("margin", "0.8em 0")
+                .Property("padding", "0.5em 1em")
+                .Property("color", "var(--text-secondary)")
+                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.03))")
+                .Property("border-radius", "0 4px 4px 0")
+            .EndSelector()
+            .Selector(".markdown-body ul, .markdown-body ol")
+                .Property("padding-left", "2em")
+                .Property("margin", "0.4em 0")
+            .EndSelector()
+            .Selector(".markdown-body table")
+                .Property("border-collapse", "collapse")
+                .Property("width", "100%")
+                .Property("margin", "0.8em 0")
+            .EndSelector()
+            .Selector(".markdown-body th, .markdown-body td")
+                .Property("border", "1px solid var(--border)")
+                .Property("padding", "6px 10px")
+                .Property("text-align", "left")
+            .EndSelector()
+            .Selector(".markdown-body th")
+                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.05))")
+                .Property("font-weight", "600")
+            .EndSelector()
+            .Selector(".markdown-body img")
+                .Property("max-width", "100%")
+                .Property("border-radius", "6px")
+            .EndSelector()
+            .Selector(".markdown-body a")
+                .Property("color", "var(--accent-primary)")
+                .Property("text-decoration", "none")
+            .EndSelector()
+            .Selector(".markdown-body a:hover")
+                .Property("text-decoration", "underline")
+            .EndSelector()
+            .Selector(".markdown-body hr")
+                .Property("border", "none")
+                .Property("border-top", "1px solid var(--border)")
+                .Property("margin", "1em 0")
             .EndSelector()
 
             .Comment("Collapsible sections")
             .Selector(".msg-collapsible")
                 .Property("margin-top", "8px")
                 .Property("border", "1px solid var(--border)")
+                .Property("border-left", "3px solid var(--accent-primary)")
                 .Property("border-radius", "8px")
                 .Property("font-size", "13px")
             .EndSelector()
@@ -359,6 +450,26 @@ public class ChatView : ViewBase
                 .Property("color", "var(--text-secondary)")
                 .Property("font-weight", "500")
                 .Property("user-select", "none")
+                .Property("display", "flex")
+                .Property("justify-content", "space-between")
+                .Property("align-items", "center")
+                .Property("list-style", "none")
+            .EndSelector()
+            .Selector(".msg-collapsible summary::-webkit-details-marker")
+                .Property("display", "none")
+            .EndSelector()
+            .Selector(".msg-collapsible summary::marker")
+                .Property("display", "none")
+            .EndSelector()
+            .Selector(".msg-collapsible summary::after")
+                .Property("content", "\"▼\"")
+                .Property("font-size", "10px")
+                .Property("transition", "transform 0.2s")
+                .Property("flex-shrink", "0")
+                .Property("margin-left", "8px")
+            .EndSelector()
+            .Selector(".msg-collapsible[open] summary::after")
+                .Property("transform", "rotate(180deg)")
             .EndSelector()
             .Selector(".msg-collapsible summary:hover")
                 .Property("color", "var(--text-primary)")
@@ -407,6 +518,8 @@ public class ChatView : ViewBase
             .Selector(".msg-tool .msg-collapsible")
                 .Property("background", "var(--bg-secondary, rgba(255,255,255,0.03))")
                 .Property("border", "1px solid var(--border)")
+                .Property("border-left", "3px solid var(--accent-warning, #f59e0b)")
+                .Property("border-radius", "8px")
             .EndSelector()
             .Selector(".msg-tool-content")
                 .Property("padding", "0 12px 10px")
@@ -447,6 +560,19 @@ public class ChatView : ViewBase
                 .Property("color", "var(--text-secondary)")
                 .Property("margin-top", "6px")
                 .Property("text-align", "right")
+            .EndSelector()
+
+            .Comment("Token Stats")
+            .Selector(".msg-token-stats")
+                .Property("font-size", "11px")
+                .Property("color", "var(--text-secondary)")
+                .Property("opacity", "0.6")
+                .Property("margin-top", "6px")
+                .Property("margin-right", "4px")
+                .Property("margin-bottom", "2px")
+                .Property("text-align", "right")
+                .Property("font-family", "'JetBrains Mono', 'Fira Code', 'Consolas', monospace")
+                .Property("letter-spacing", "0.02em")
             .EndSelector()
 
             .Comment("Input Area")
@@ -522,20 +648,21 @@ public class ChatView : ViewBase
                 .Property("left", "0")
                 .Property("width", "100%")
                 .Property("height", "100%")
-                .Property("background", "rgba(0,0,0,0.5)")
+                .Property("background", "rgba(0,0,0,0.55)")
                 .Property("align-items", "center")
                 .Property("justify-content", "center")
                 .Property("pointer-events", "auto")
                 .Property("z-index", "1001")
             .EndSelector()
             .Selector(".permission-dialog")
-                .Property("background", "var(--bg-card)")
+                // bg-card → bg-secondary → bg-white fallback，确保任何皮肤下弹窗都不透明
+                .Property("background", "var(--bg-card, var(--bg-secondary, var(--bg-white, #ffffff)))")
                 .Property("border", "1px solid var(--border)")
                 .Property("border-radius", "12px")
                 .Property("padding", "24px")
                 .Property("min-width", "360px")
                 .Property("max-width", "500px")
-                .Property("box-shadow", "0 8px 32px rgba(0,0,0,0.3)")
+                .Property("box-shadow", "0 8px 32px rgba(0,0,0,0.35)")
             .EndSelector()
             .Selector(".permission-dialog-title")
                 .Property("font-size", "18px")
@@ -544,7 +671,8 @@ public class ChatView : ViewBase
                 .Property("margin-bottom", "16px")
             .EndSelector()
             .Selector(".permission-details")
-                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.03))")
+                // bg-tertiary → bg-secondary fallback，浅色皮肤下给一个可见的区分背景
+                .Property("background", "var(--bg-tertiary, var(--bg-secondary, rgba(0,0,0,0.04)))")
                 .Property("border-radius", "8px")
                 .Property("padding", "12px 16px")
                 .Property("margin-bottom", "20px")
@@ -585,6 +713,7 @@ public class ChatView : ViewBase
             .EndSelector()
             .Selector(".btn-permission-allow")
                 .Property("padding", "8px 24px")
+                // accent-success 在所有皮肤中均有定义，fallback 到通用绿色
                 .Property("background", "var(--accent-success, #4CAF50)")
                 .Property("color", "#fff")
                 .Property("border", "none")
@@ -592,19 +721,22 @@ public class ChatView : ViewBase
                 .Property("cursor", "pointer")
                 .Property("font-size", "14px")
                 .Property("font-weight", "500")
+                .Property("transition", "opacity 0.2s")
             .EndSelector()
             .Selector(".btn-permission-allow:hover")
                 .Property("opacity", "0.85")
             .EndSelector()
             .Selector(".btn-permission-deny")
                 .Property("padding", "8px 24px")
-                .Property("background", "var(--accent-error, #f44336)")
+                // accent-error → accent-danger fallback（AdminSkin 用 accent-danger 而非 accent-error）
+                .Property("background", "var(--accent-error, var(--accent-danger, #f44336))")
                 .Property("color", "#fff")
                 .Property("border", "none")
                 .Property("border-radius", "6px")
                 .Property("cursor", "pointer")
                 .Property("font-size", "14px")
                 .Property("font-weight", "500")
+                .Property("transition", "opacity 0.2s")
             .EndSelector()
             .Selector(".btn-permission-deny:hover")
                 .Property("opacity", "0.85")
@@ -617,6 +749,11 @@ public class ChatView : ViewBase
         var userId = vm.UserId.ToString();
         var beingName = vm.CurrentBeingName ?? "AI";
 
+        // Serialize the tool display name map as a JS object literal
+        var toolDisplayNamesLiteral = "{" + string.Join(",",
+            vm.ToolDisplayNames.Select(kv =>
+                $"\"{kv.Key}\":\"{kv.Value}\"")) + "}";
+
         var js = Js.Block()
             .Add(() => Js.Let(() => "currentSessionId", () => currentSessionId.Length > 0 ? Js.Str(() => currentSessionId) : Js.Null()))
             .Add(() => Js.Let(() => "beingName", () => Js.Str(() => beingName)))
@@ -624,12 +761,43 @@ public class ChatView : ViewBase
             .Add(() => Js.Let(() => "currentStreamId", () => Js.Null()))
             .Add(() => Js.Let(() => "streamingMessage", () => Js.Null()))
             .Add(() => Js.Let(() => "messageCache", () => Js.New(() => Js.Id(() => "Array"))))
-            .Add(() => Js.Let(() => "toolCallMap", () => Js.New(() => Js.Id(() => "Map"))));
+            .Add(() => Js.Let(() => "toolCallMap", () => Js.New(() => Js.Id(() => "Map"))))
+            .Add(() => Js.Const(() => "toolDisplayNames", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Str(() => toolDisplayNamesLiteral))));
 
         var autoResizeBody = Js.Block()
             .Add(() => Js.Assign(() => Js.Id(() => "textarea").Prop(() => "style").Prop(() => "height"), () => Js.Str(() => "auto")))
             .Add(() => Js.Assign(() => Js.Id(() => "textarea").Prop(() => "style").Prop(() => "height"), () => Js.Id(() => "Math").Call(() => "min", () => Js.Id(() => "textarea").Prop(() => "scrollHeight"), () => Js.Num(() => "120")).Op(() => "+", () => (JsSyntax)Js.Str(() => "px"))));
         js.Add(() => Js.Func(() => "autoResize", () => new List<string> { "textarea" }, () => autoResizeBody));
+
+        var renderMdElementBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRaw").Op(() => "&&", () => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRendered").Not()), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "el").Prop(() => "innerHTML"), () => Js.Ternary(
+                            () => Js.Id(() => "typeof").Invoke(() => Js.Id(() => "marked")).Op(() => "!==", () => Js.Str(() => "undefined")),
+                            () => Js.Id(() => "marked").Call(() => "parse", () => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRaw")),
+                            () => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRaw"))),
+                        Js.Assign(() => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRendered"), () => Js.Str(() => "1"))
+                    }
+                )}
+            }));
+
+        var renderMarkdownBodyBody = Js.Block()
+            .Add(() => Js.Const(() => "elements", () => Js.Id(() => "root").Call(() => "querySelectorAll", () => Js.Str(() => ".markdown-body[data-md-raw]"))))
+            .Add(() => Js.Id(() => "elements").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "el" }, () => renderMdElementBody)).Stmt());
+        js.Add(() => Js.Func(() => "renderMarkdownBody", () => new List<string> { "root" }, () => renderMarkdownBodyBody));
+
+        js.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+        {
+            (Js.Id(() => "typeof").Invoke(() => Js.Id(() => "marked")).Op(() => "===", () => Js.Str(() => "undefined")), new List<JsSyntax>
+            {
+                Js.Let(() => "mdScript", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "script"))),
+                Js.Assign(() => Js.Id(() => "mdScript").Prop(() => "src"), () => Js.Str(() => "https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js")),
+                Js.Assign(() => Js.Id(() => "mdScript").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "renderMarkdownBody").Invoke(() => Js.Id(() => "document")))),
+                Js.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => Js.Id(() => "mdScript")).Stmt()
+            })
+        }));
 
         var historyHandlerBody = Js.Block()
             .Add(() => Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "history event received"), () => Js.Id(() => "event").Prop(() => "data")).Stmt())
@@ -711,7 +879,10 @@ public class ChatView : ViewBase
                 .Prop(() => "isUser", () => Js.Id(() => "isCurrentUser"))
                 .Prop(() => "text", () => Js.Id(() => "data").Prop(() => "content"))
                 .Prop(() => "thinking", () => Js.Id(() => "data").Prop(() => "thinking"))
-                .Prop(() => "senderName", () => Js.Id(() => "data").Prop(() => "senderName"))).Stmt());
+                .Prop(() => "senderName", () => Js.Id(() => "data").Prop(() => "senderName"))
+                .Prop(() => "promptTokens", () => Js.Id(() => "data").Prop(() => "promptTokens"))
+                .Prop(() => "completionTokens", () => Js.Id(() => "data").Prop(() => "completionTokens"))
+                .Prop(() => "totalTokens", () => Js.Id(() => "data").Prop(() => "totalTokens"))).Stmt());
         js.Add(() => Js.Func(() => "handleMessage", () => new List<string> { "data" }, () => handleMessageBody));
 
         var handleToolBody = Js.Block()
@@ -789,33 +960,26 @@ public class ChatView : ViewBase
             .Add(() => Js.Const(() => "isFinal", () => Js.Id(() => "data").Prop(() => "isFinal")))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
-                { (Js.Id(() => "streamContent").Not().Op(() => "&&", () => (JsSyntax)Js.Id(() => "streamThinking").Not()).Op(() => "&&", () => (JsSyntax)Js.Id(() => "isFinal")), new List<JsSyntax>
+                { (Js.Id(() => "isFinal"), new List<JsSyntax>
                     {
                         Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                         {
-                            { (Js.Id(() => "currentStreamId"), new List<JsSyntax>
+                            { (Js.Id(() => "streamingMessage").Prop(() => "elementId"), new List<JsSyntax>
                                 {
+                                    Js.Const(() => "removeEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Id(() => "streamingMessage").Prop(() => "elementId"))),
                                     Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                                     {
-                                        { (Js.Id(() => "streamingMessage").Prop(() => "elementId"), new List<JsSyntax>
+                                        { (Js.Id(() => "removeEl"), new List<JsSyntax>
                                             {
-                                                Js.Const(() => "removeEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Id(() => "streamingMessage").Prop(() => "elementId"))),
-                                                Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
-                                                {
-                                                    { (Js.Id(() => "removeEl"), new List<JsSyntax>
-                                                        {
-                                                            Js.Id(() => "removeEl").Call(() => "remove").Stmt()
-                                                        }
-                                                    )}
-                                                })
+                                                Js.Id(() => "removeEl").Call(() => "remove").Stmt()
                                             }
                                         )}
-                                    }),
-                                    Js.Assign(() => Js.Id(() => "currentStreamId"), () => Js.Null()),
-                                    Js.Assign(() => Js.Id(() => "streamingMessage"), () => Js.Null())
+                                    })
                                 }
                             )}
                         }),
+                        Js.Assign(() => Js.Id(() => "currentStreamId"), () => Js.Null()),
+                        Js.Assign(() => Js.Id(() => "streamingMessage"), () => Js.Null()),
                         Js.Return(() => Js.Id(() => "undefined"))
                     }
                 )}
@@ -840,7 +1004,9 @@ public class ChatView : ViewBase
                 { (Js.Id(() => "streamEl"), new List<JsSyntax>
                     {
                         Js.Assign(() => Js.Id(() => "streamingMessage").Prop(() => "text"), () => Js.Id(() => "streamContent")),
-                        Js.Assign(() => Js.Id(() => "streamEl").Call(() => "querySelector", () => Js.Str(() => ".msg-being-text")).Prop(() => "textContent"), () => Js.Id(() => "streamContent")),
+                        Js.Assign(() => Js.Id(() => "streamEl").Call(() => "querySelector", () => Js.Str(() => ".msg-being-text")).Prop(() => "dataset").Prop(() => "mdRaw"), () => Js.Id(() => "streamContent")),
+                        Js.Assign(() => Js.Id(() => "streamEl").Call(() => "querySelector", () => Js.Str(() => ".msg-being-text")).Prop(() => "dataset").Prop(() => "mdRendered"), () => Js.Str(() => "")),
+                        Js.Id(() => "renderMarkdownBody").Invoke(() => Js.Id(() => "streamEl")).Stmt(),
                         Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                         {
                             { (Js.Id(() => "streamThinking"), new List<JsSyntax>
@@ -885,7 +1051,10 @@ public class ChatView : ViewBase
                     .Prop(() => "senderName", () => Js.Id(() => "m").Prop(() => "senderName"))
                     .Prop(() => "role", () => Js.Id(() => "m").Prop(() => "role"))
                     .Prop(() => "toolCallsJson", () => Js.Id(() => "m").Prop(() => "toolCallsJson"))
-                    .Prop(() => "toolCallId", () => Js.Id(() => "m").Prop(() => "toolCallId"))).Stmt())
+                    .Prop(() => "toolCallId", () => Js.Id(() => "m").Prop(() => "toolCallId"))
+                    .Prop(() => "promptTokens", () => Js.Id(() => "m").Prop(() => "promptTokens"))
+                    .Prop(() => "completionTokens", () => Js.Id(() => "m").Prop(() => "completionTokens"))
+                    .Prop(() => "totalTokens", () => Js.Id(() => "m").Prop(() => "totalTokens"))).Stmt())
             )))
             .Add(() => Js.Id(() => "container").Call(() => "scrollTo", () => Js.Obj().Prop(() => "top", () => Js.Id(() => "container").Prop(() => "scrollHeight")).Prop(() => "behavior", () => Js.Str(() => "smooth"))).Stmt());
         js.Add(() => Js.Func(() => "renderMessages", () => new List<string>(), () => renderMessagesBody));
@@ -988,21 +1157,71 @@ public class ChatView : ViewBase
         var msgIsUserCond = Js.Id(() => "msg").Prop(() => "isUser");
         var msgIsToolCond = Js.Id(() => "msg").Prop(() => "role").Op(() => "===", () => Js.Str(() => "Tool"));
         var toolCallRequestExpr = Js.Ternary(() => Js.Id(() => "toolCallMap").Call(() => "has", () => Js.Id(() => "msg").Prop(() => "toolCallId")), () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "toolCallMap").Call(() => "get", () => Js.Id(() => "msg").Prop(() => "toolCallId")), () => Js.Null(), () => Js.Num(() => "2")), () => Js.Str(() => "{}"));
+
+        // Helper: build token stats HTML string from msg
+        var getTokenStatsBody = Js.Block()
+            .Add(() => Js.Const(() => "p", () => Js.Id(() => "msg").Prop(() => "promptTokens").Op(() => "??", () => Js.Num(() => "0"))))
+            .Add(() => Js.Const(() => "c", () => Js.Id(() => "msg").Prop(() => "completionTokens").Op(() => "??", () => Js.Num(() => "0"))))
+            .Add(() => Js.Const(() => "t", () => Js.Id(() => "msg").Prop(() => "totalTokens").Op(() => "??", () => Js.Num(() => "0"))))
+            .Add(() => Js.Return(() => Js.Str(() => "<div class=\"msg-token-stats\">Token: \u2191").Op(() => "+", () => (JsSyntax)Js.Id(() => "p")).Op(() => "+", () => (JsSyntax)Js.Str(() => " \u2193")).Op(() => "+", () => (JsSyntax)Js.Id(() => "c")).Op(() => "+", () => (JsSyntax)Js.Str(() => " \u03a3")).Op(() => "+", () => (JsSyntax)Js.Id(() => "t")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"))));
+        js.Add(() => Js.Func(() => "getTokenStats", () => new List<string> { "msg" }, () => getTokenStatsBody));
+        var decodeUnicodeBody = Js.Block()
+            .Add(() => Js.Return(() => Js.Id(() => "str").Call(() => "replace",
+                () => Js.New(() => Js.Id(() => "RegExp"), () => Js.Str(() => "\\\\u([0-9a-fA-F]{4})"), () => Js.Str(() => "g")),
+                () => Js.Arrow(() => new List<string> { "_", "code" },
+                    () => Js.Id(() => "String").Call(() => "fromCharCode",
+                        () => Js.Id(() => "parseInt").Invoke(() => Js.Id(() => "code"), () => Js.Num(() => "16")))))));
+        js.Add(() => Js.Func(() => "decodeUnicode", () => new List<string> { "str" }, () => decodeUnicodeBody));
+
+        // Helper: resolve localized tool display name from msg
+        var getToolSummaryBody = Js.Block()
+            .Add(() => Js.Const(() => "defaultLabel", () => Js.Str(() => "🔧 Tool Call")))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "msg").Prop(() => "toolCallsJson"), new List<JsSyntax>
+                    {
+                        Js.Const(() => "tcs", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "msg").Prop(() => "toolCallsJson"))),
+                        Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                        {
+                            { (Js.Id(() => "tcs").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0")), new List<JsSyntax>
+                                {
+                                    Js.Const(() => "n", () => Js.Id(() => "tcs").Index(() => Js.Num(() => "0")).Prop(() => "Name")),
+                                    Js.Return(() => Js.Str(() => "🔧 ").Op(() => "+", () => (JsSyntax)Js.Id(() => "toolDisplayNames").Index(() => Js.Id(() => "n")).Op(() => "||", () => (JsSyntax)Js.Id(() => "n"))))
+                                }
+                            )}
+                        })
+                    }
+                )}
+            }))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "msg").Prop(() => "toolCallId").Op(() => "&&", () => Js.Id(() => "toolCallMap").Call(() => "has", () => Js.Id(() => "msg").Prop(() => "toolCallId"))), new List<JsSyntax>
+                    {
+                        Js.Const(() => "tc", () => Js.Id(() => "toolCallMap").Call(() => "get", () => Js.Id(() => "msg").Prop(() => "toolCallId"))),
+                        Js.Const(() => "n", () => Js.Id(() => "tc").Prop(() => "Name")),
+                        Js.Return(() => Js.Str(() => "🔧 ").Op(() => "+", () => (JsSyntax)Js.Id(() => "toolDisplayNames").Index(() => Js.Id(() => "n")).Op(() => "||", () => (JsSyntax)Js.Id(() => "n"))))
+                    }
+                )}
+            }))
+            .Add(() => Js.Return(() => Js.Id(() => "defaultLabel")));
+        js.Add(() => Js.Func(() => "getToolSummary", () => new List<string> { "msg" }, () => getToolSummaryBody));
+
         var userMsgBody = new List<JsSyntax>
         {
             Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "msg-user")),
             Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-user-content\"><div class=\"msg-user-bubble\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div><div class=\"msg-user-avatar\"><div class=\"msg-avatar-icon\">U</div><div class=\"msg-avatar-name\">我</div></div>")))
         };
+        var toolCallRequestDecoded = Js.Id(() => "decodeUnicode").Invoke(() => toolCallRequestExpr);
         var toolMsgBody = new List<JsSyntax>
         {
             Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "msg-tool")),
-            Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<details class=\"msg-collapsible\"><summary>🔧 Tool Call</summary><div class=\"msg-tool-content\"><div class=\"msg-tool-section\"><div class=\"msg-tool-label\">Request:</div><pre class=\"msg-tool-code\">").Op(() => "+", () => (JsSyntax)toolCallRequestExpr).Op(() => "+", () => (JsSyntax)Js.Str(() => "</pre></div><div class=\"msg-tool-section\"><div class=\"msg-tool-label\">Response:</div><pre class=\"msg-tool-code\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</pre></div></div></details>"))),
+            Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<details class=\"msg-collapsible\"><summary>").Op(() => "+", () => (JsSyntax)Js.Id(() => "getToolSummary").Invoke(() => Js.Id(() => "msg"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "</summary><div class=\"msg-tool-content\"><div class=\"msg-tool-section\"><div class=\"msg-tool-label\">Request:</div><pre class=\"msg-tool-code\">")).Op(() => "+", () => (JsSyntax)toolCallRequestDecoded).Op(() => "+", () => (JsSyntax)Js.Str(() => "</pre></div><div class=\"msg-tool-section\"><div class=\"msg-tool-label\">Response:</div><pre class=\"msg-tool-code\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "msg").Prop(() => "text"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "</pre></div></div></details>"))),
         };
         var beingMsgBody = new List<JsSyntax>
         {
             Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "msg-being")),
             Js.Assign(() => Js.Id(() => "div").Prop(() => "id"), () => Js.Id(() => "msg").Prop(() => "elementId").Op(() => "||", () => (JsSyntax)Js.Str(() => ""))),
-            Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-being-avatar\"><div class=\"msg-avatar-icon\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "senderName").Op(() => "||", () => (JsSyntax)Js.Id(() => "beingName")).Paren().Call(() => "charAt", () => Js.Num(() => "0"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><div class=\"msg-avatar-name\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "senderName").Op(() => "||", () => (JsSyntax)Js.Id(() => "beingName")).Paren()).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div><div class=\"msg-being-content\"><div class=\"msg-being-card\"><div class=\"msg-being-body\"><details class=\"msg-collapsible\"><summary>💭 Think</summary><div class=\"msg-thinking-content\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "thinking").Op(() => "||", () => (JsSyntax)Js.Str(() => "")).Paren()).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></details><div class=\"msg-being-text\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div></div></div>")))
+            Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-being-avatar\"><div class=\"msg-avatar-icon\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "senderName").Op(() => "||", () => (JsSyntax)Js.Id(() => "beingName")).Paren().Call(() => "charAt", () => Js.Num(() => "0"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><div class=\"msg-avatar-name\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "senderName").Op(() => "||", () => (JsSyntax)Js.Id(() => "beingName")).Paren()).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div><div class=\"msg-being-content\"><div class=\"msg-being-card\"><div class=\"msg-being-body\"><details class=\"msg-collapsible\"><summary>" + vm.Localization.ChatThinkingSummary + "</summary><div class=\"msg-thinking-content\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "thinking").Op(() => "||", () => (JsSyntax)Js.Str(() => "")).Paren()).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></details><div class=\"msg-being-text markdown-body\" data-md-raw=\"")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "text").Call(() => "replace", () => Js.Str(() => "&"), () => Js.Str(() => "&amp;")).Call(() => "replace", () => Js.Str(() => "\""), () => Js.Str(() => "&quot;")).Call(() => "replace", () => Js.Str(() => "<"), () => Js.Str(() => "&lt;")).Call(() => "replace", () => Js.Str(() => ">"), () => Js.Str(() => "&gt;"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "\"></div></div>")).Op(() => "+", () => (JsSyntax)Js.Id(() => "getTokenStats").Invoke(() => Js.Id(() => "msg"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div>")))
         };
         var appendMessageBody = Js.Block()
             .Add(() => Js.Const(() => "messages", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))))
@@ -1014,11 +1233,13 @@ public class ChatView : ViewBase
                 { (null, beingMsgBody) }
             }))
             .Add(() => Js.Id(() => "messages").Call(() => "appendChild", () => Js.Id(() => "div")).Stmt())
+            .Add(() => Js.Id(() => "renderMarkdownBody").Invoke(() => Js.Id(() => "div")).Stmt())
             .Add(() => Js.Id(() => "messages").Call(() => "scrollTo", () => Js.Obj().Prop(() => "top", () => Js.Id(() => "messages").Prop(() => "scrollHeight")).Prop(() => "behavior", () => Js.Str(() => "smooth"))).Stmt());
         js.Add(() => Js.Func(() => "appendMessage", () => new List<string> { "msg" }, () => appendMessageBody));
 
         js.Add(() => Js.Id(() => "initInput").Invoke().Stmt());
         js.Add(() => Js.Id(() => "initSessionList").Invoke().Stmt());
+        js.Add(() => Js.Id(() => "renderMarkdownBody").Invoke(() => Js.Id(() => "document")).Stmt());
         js.Add(() => Js.Id(() => "connectSSE").Invoke().Stmt());
         js.Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages")).Call(() => "scrollTo", () => Js.Obj().Prop(() => "top", () => Js.Num(() => "999999")).Prop(() => "behavior", () => Js.Str(() => "auto"))).Stmt());
 

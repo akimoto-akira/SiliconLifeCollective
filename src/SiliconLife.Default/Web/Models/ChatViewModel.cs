@@ -20,6 +20,13 @@ public class ChatViewModel : ViewModelBase
     public Guid UserId { get; set; }
     public Guid? CurrentBeingId { get; set; }
     public string CurrentBeingName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Maps tool Name (e.g. "calendar") to its localized display name (e.g. "日历").
+    /// Populated at render time by ChatController; used by ChatView to inject a
+    /// client-side lookup table so the frontend never needs to call the server again.
+    /// </summary>
+    public Dictionary<string, string> ToolDisplayNames { get; set; } = new();
 }
 
 public class ChatSessionItem

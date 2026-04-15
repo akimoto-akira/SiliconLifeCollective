@@ -28,6 +28,14 @@ public class ChatTool : ITool
         "Send a message to another silicon being or to the user. " +
         "Use this to communicate with other silicon beings in the collective.";
 
+    public string GetDisplayName(Language language)
+    {
+        if (LocalizationManager.Instance.TryGetLocalization(language, out var loc) &&
+            loc is DefaultLocalizationBase defaultLoc)
+            return defaultLoc.GetToolDisplayName(Name);
+        return Name;
+    }
+
     public Dictionary<string, object> GetParameterSchema()
     {
         return new Dictionary<string, object>

@@ -32,6 +32,15 @@ public class TimerTool : ITool
         "'resume' (resume timer), 'cancel' (cancel timer), 'delete' (delete timer), " +
         "'stats' (get timer statistics), 'tick' (check for triggered timers).";
 
+    /// <inheritdoc/>
+    public string GetDisplayName(Language language)
+    {
+        if (LocalizationManager.Instance.TryGetLocalization(language, out var loc) &&
+            loc is DefaultLocalizationBase defaultLoc)
+            return defaultLoc.GetToolDisplayName(Name);
+        return Name;
+    }
+
     public Dictionary<string, object> GetParameterSchema()
     {
         return new Dictionary<string, object>

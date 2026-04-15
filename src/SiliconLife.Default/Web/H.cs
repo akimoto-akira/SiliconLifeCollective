@@ -28,6 +28,12 @@ public class H
     public static H Create(string tagName, params object[] children)
     {
         var el = new H(tagName);
+        AddChildren(el, children);
+        return el;
+    }
+
+    private static void AddChildren(H el, System.Collections.IEnumerable children)
+    {
         foreach (var child in children)
         {
             if (child is null) continue;
@@ -36,8 +42,9 @@ public class H
             else if (child is JsSyntax js) el._children.Add(js);
             else if (child is CssBuilder css) el._children.Add(css);
             else if (child is RawHtml raw) el._children.Add(raw);
+            else if (child is object[] arr) AddChildren(el, arr);
+            else if (child is System.Collections.IEnumerable nested) AddChildren(el, nested);
         }
-        return el;
     }
 
     public static H Create(string tagName, string text)

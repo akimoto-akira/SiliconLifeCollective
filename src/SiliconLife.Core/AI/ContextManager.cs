@@ -178,12 +178,15 @@ public class ContextManager
     /// <summary>
     /// Adds an assistant message to the context and persists it
     /// </summary>
-    private void AddAssistantMessage(string content, string? thinking = null)
+    private void AddAssistantMessage(string? content, string? thinking = null, int? promptTokens = null, int? completionTokens = null, int? totalTokens = null)
     {
-        ChatMessage chatMsg = new(_being.Id, _session?.Id ?? Guid.Empty, content)
+        ChatMessage chatMsg = new(_being.Id, _session?.Id ?? Guid.Empty, content ?? string.Empty)
         {
             Role = MessageRole.Assistant,
             Thinking = thinking,
+            PromptTokens = promptTokens,
+            CompletionTokens = completionTokens,
+            TotalTokens = totalTokens,
         };
         _messages.Add(chatMsg);
 
@@ -329,10 +332,10 @@ public class ContextManager
             _logger.Debug("AI returned tool calls, persisting intermediate round");
             PersistAndDeliverToolCallRound(response);
         }
-        else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
+        else if (response.Success)
         {
-            _logger.Debug("AI returned text response, length={0}", response.Content.Length);
-            AddAssistantMessage(response.Content, response.Thinking);
+            _logger.Debug("AI returned text response, length={0}", response.Content?.Length ?? 0);
+            AddAssistantMessage(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
         }
 
         return response;
@@ -353,10 +356,10 @@ public class ContextManager
             _logger.Debug("AI returned tool calls (async), persisting intermediate round");
             PersistAndDeliverToolCallRound(response);
         }
-        else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
+        else if (response.Success)
         {
-            _logger.Debug("AI returned text response (async), length={0}", response.Content.Length);
-            AddAssistantMessage(response.Content, response.Thinking);
+            _logger.Debug("AI returned text response (async), length={0}", response.Content?.Length ?? 0);
+            AddAssistantMessage(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
         }
 
         return response;
@@ -448,7 +451,7 @@ public class ContextManager
             return await GetResponseAsync(scenarioContext);
         }
 
-        StreamChunk endChunk = StreamChunk.End(streamId);
+        StreamChunk endChunk = StreamChunk.End(streamId, promptTokens: promptTokens, completionTokens: completionTokens, totalTokens: totalTokens);
         DeliverStreamChunk(endChunk);
 
         string fullContent = contentBuilder.ToString();
@@ -470,9 +473,9 @@ public class ContextManager
         {
             PersistAndDeliverToolCallRound(response);
         }
-        else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
+        else if (response.Success)
         {
-            AddAssistantMessage(response.Content, response.Thinking);
+            AddAssistantMessage(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
         }
 
         return response;
@@ -494,9 +497,9 @@ public class ContextManager
         {
             // Tool calls executed, results persisted — yield time slice
         }
-        else if (response.Success && !string.IsNullOrEmpty(response.Content))
+        else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
         {
-            DeliverOutput(response.Content, response.Thinking);
+            DeliverOutput(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
         }
 
         return response;
@@ -558,6 +561,10 @@ public class ContextManager
         {
             // Tool calls executed, results persisted — yield time slice
         }
+        else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
+        {
+            DeliverOutput(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
+        }
 
         return response;
     }
@@ -578,9 +585,9 @@ public class ContextManager
         {
             // Tool calls executed, results persisted — yield time slice
         }
-        else if (response.Success && !string.IsNullOrEmpty(response.Content))
+        else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
         {
-            DeliverOutput(response.Content, response.Thinking);
+            DeliverOutput(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
         }
 
         return response;
@@ -602,6 +609,10 @@ public class ContextManager
         if (response.Success && response.HasToolCalls)
         {
             // Tool calls executed, results persisted — yield time slice
+        }
+        else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
+        {
+            DeliverOutput(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
         }
 
         return response;
@@ -723,14 +734,14 @@ public class ContextManager
     /// <summary>
     /// Delivers the AI's response to the user via IM or console.
     /// </summary>
-    private void DeliverOutput(string content, string? thinking = null)
+    private void DeliverOutput(string content, string? thinking = null, int? promptTokens = null, int? completionTokens = null, int? totalTokens = null)
     {
         _logger.Debug("Delivering output for being {0}, length={1}", _being.Name, content.Length);
 
         IMManager? imManager = ServiceLocator.Instance.IMManager;
         if (imManager != null && _session != null)
         {
-            _ = imManager.SendMessageAsync(_being.Id, _session.Id, content, thinking, _being.Name);
+            _ = imManager.SendMessageAsync(_being.Id, _session.Id, content, thinking, _being.Name, promptTokens, completionTokens, totalTokens);
         }
         else
         {
@@ -764,6 +775,9 @@ public class ContextManager
             Role = MessageRole.Assistant,
             Thinking = response.Thinking,
             ToolCallsJson = JsonSerializer.Serialize(response.ToolCalls!),
+            PromptTokens = response.PromptTokens,
+            CompletionTokens = response.CompletionTokens,
+            TotalTokens = response.TotalTokens,
         };
         _messages.Add(assistantMsg);
 
@@ -781,6 +795,9 @@ public class ContextManager
             Role = MessageRole.Assistant,
             Thinking = response.Thinking,
             ToolCallsJson = JsonSerializer.Serialize(response.ToolCalls!),
+            PromptTokens = response.PromptTokens,
+            CompletionTokens = response.CompletionTokens,
+            TotalTokens = response.TotalTokens,
         };
         _messages.Add(assistantMsg);
 

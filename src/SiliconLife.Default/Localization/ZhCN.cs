@@ -225,7 +225,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string ChatSendButton => "发送";
     public override string ChatUserDisplayName => "我";
     public override string ChatDefaultBeingName => "AI";
-    public override string ChatThinkingSummary => "💭 Think";
+    public override string ChatThinkingSummary => "💭 思考过程（点击展开）";
     public override string GetChatToolCallsSummary(int count) => $"🔧 工具调用 ({count}项)";
 
     // ===== Dashboard Localization =====
@@ -410,4 +410,23 @@ public class ZhCN : DefaultLocalizationBase
         LogLevel.None => "无",
         _ => logLevel.ToString()
     };
+
+    // ===== Tool Display Name Localization =====
+
+    private static readonly Dictionary<string, string> ToolDisplayNames = new()
+    {
+        ["calendar"] = "日历",
+        ["chat"] = "聊天",
+        ["silicon_manager"] = "硅基管理员",
+        ["disk"] = "磁盘",
+        ["dynamic_compile"] = "动态编译",
+        ["network"] = "网络",
+        ["memory"] = "记忆",
+        ["task"] = "任务",
+        ["system"] = "系统",
+        ["timer"] = "定时器"
+    };
+
+    public override string GetToolDisplayName(string toolName) =>
+        ToolDisplayNames.GetValueOrDefault(toolName, toolName);
 }

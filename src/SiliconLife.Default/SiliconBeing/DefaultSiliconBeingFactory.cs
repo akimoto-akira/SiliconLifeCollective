@@ -168,10 +168,13 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         ITimeStorage beingTimeStorage = new FileSystemTimeStorage(beingTimeStorageDir);
         being.TimeStorage = beingTimeStorage;
 
+        // Create per-being storage for TaskSystem and TimerSystem (data stored in SiliconManager\{GUID})
+        IStorage beingStorage = new FileSystemStorage(beingDirectory);
+
         // Create Memory, TaskSystem, TimerSystem for this being
         being.Memory = new Memory(beingTimeStorage);
-        being.TaskSystem = new TaskSystem(_storage);
-        being.TimerSystem = new TimerSystem(_storage);
+        being.TaskSystem = new TaskSystem(being, beingStorage);
+        being.TimerSystem = new TimerSystem(being, beingStorage);
 
         return being;
     }

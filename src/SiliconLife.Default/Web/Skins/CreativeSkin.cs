@@ -351,6 +351,7 @@ public class CreativeSkin : ISkin
             .WithVariable("accent-secondary", "#c9956c")
             .WithVariable("accent-warm", "#e8c9a0")
             .WithVariable("accent-success", "#8fbc8f")
+            .WithVariable("accent-error", "#c0392b")
             .Selector(".btn")
             .Property("padding", "12px 24px")
             .Property("border-radius", "12px")

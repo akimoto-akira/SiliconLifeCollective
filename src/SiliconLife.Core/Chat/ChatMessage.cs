@@ -88,6 +88,21 @@ public class ChatMessage
     public string? Thinking { get; set; }
 
     /// <summary>
+    /// Number of tokens in the prompt (input). Only set for AI-generated assistant messages.
+    /// </summary>
+    public int? PromptTokens { get; set; }
+
+    /// <summary>
+    /// Number of tokens in the completion (output). Only set for AI-generated assistant messages.
+    /// </summary>
+    public int? CompletionTokens { get; set; }
+
+    /// <summary>
+    /// Total number of tokens used (input + output). Only set for AI-generated assistant messages.
+    /// </summary>
+    public int? TotalTokens { get; set; }
+
+    /// <summary>
     /// Initializes a new instance of the ChatMessage class.
     /// </summary>
     public ChatMessage()

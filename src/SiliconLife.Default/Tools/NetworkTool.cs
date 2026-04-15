@@ -28,6 +28,14 @@ public class NetworkTool : ITool
         "Make HTTP requests to URLs. Supports GET and POST methods. " +
         "Returns the response body. Use for fetching web content, APIs, etc.";
 
+    public string GetDisplayName(Language language)
+    {
+        if (LocalizationManager.Instance.TryGetLocalization(language, out var loc) &&
+            loc is DefaultLocalizationBase defaultLoc)
+            return defaultLoc.GetToolDisplayName(Name);
+        return Name;
+    }
+
     public Dictionary<string, object> GetParameterSchema()
     {
         return new Dictionary<string, object>

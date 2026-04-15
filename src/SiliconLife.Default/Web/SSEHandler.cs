@@ -194,7 +194,10 @@ public class SSEHandler : IDisposable
                 role = roleStr,
                 timestamp = m.Timestamp,
                 toolCallsJson = m.ToolCallsJson,
-                toolCallId = m.ToolCallId
+                toolCallId = m.ToolCallId,
+                promptTokens = m.PromptTokens,
+                completionTokens = m.CompletionTokens,
+                totalTokens = m.TotalTokens
             };
         }).ToList();
 

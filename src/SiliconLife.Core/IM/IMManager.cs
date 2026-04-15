@@ -74,10 +74,10 @@ public class IMManager
     /// <param name="senderId">The ID of the message sender.</param>
     /// <param name="channelId">The channel ID.</param>
     /// <param name="content">The message content.</param>
-    public async Task SendMessageAsync(Guid senderId, Guid channelId, string content, string? thinking = null, string? senderName = null)
+    public async Task SendMessageAsync(Guid senderId, Guid channelId, string content, string? thinking = null, string? senderName = null, int? promptTokens = null, int? completionTokens = null, int? totalTokens = null)
     {
         _logger.Debug("Sending IM message: sender={0}, channel={1}", senderId, channelId);
-        await _imProvider.SendMessageAsync(senderId, channelId, content, thinking, senderName);
+        await _imProvider.SendMessageAsync(senderId, channelId, content, thinking, senderName, promptTokens, completionTokens, totalTokens);
     }
 
     /// <summary>
