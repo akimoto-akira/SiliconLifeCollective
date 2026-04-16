@@ -91,6 +91,19 @@ public class PermissionRequestController : Controller
                                 H.Button("允许").Class("btn-allow").OnClick("respond(true)"),
                                 H.Button("拒绝").Class("btn-deny").OnClick("respond(false)")
                             ).Class("permission-buttons"),
+                            H.Div(
+                                H.Input().Attr("type", "checkbox").Id("cache-checkbox").Class("cache-checkbox"),
+                                H.Label("记住此决定").Attr("for", "cache-checkbox").Class("cache-label")
+                            ).Class("cache-row"),
+                            H.Div(
+                                H.Label("缓存时长").Attr("for", "cache-duration").Class("duration-label"),
+                                H.Select(
+                                    H.Option("1 小时").Attr("value", "1"),
+                                    H.Option("24 小时").Attr("value", "24"),
+                                    H.Option("7 天").Attr("value", "168"),
+                                    H.Option("30 天").Attr("value", "720")
+                                ).Id("cache-duration").Class("duration-select")
+                            ).Class("duration-row"),
                             H.Div("等待响应...").Class("auto-close")
                         )
                     ).Class("permission-box")
@@ -117,6 +130,8 @@ public class PermissionRequestController : Controller
     {
         var userIdStr = Request.QueryString["userId"];
         var allowedStr = Request.QueryString["allowed"];
+        var addToCacheStr = Request.QueryString["addToCache"];
+        var cacheDurationStr = Request.QueryString["cacheDuration"];
 
         if (!Guid.TryParse(userIdStr, out var userId) || !bool.TryParse(allowedStr, out var allowed))
         {
@@ -125,10 +140,22 @@ public class PermissionRequestController : Controller
             return;
         }
 
+        bool addToCache = false;
+        if (!string.IsNullOrEmpty(addToCacheStr))
+        {
+            bool.TryParse(addToCacheStr, out addToCache);
+        }
+
+        TimeSpan? cacheDuration = null;
+        if (addToCache && !string.IsNullOrEmpty(cacheDurationStr) && double.TryParse(cacheDurationStr, out double hours))
+        {
+            cacheDuration = TimeSpan.FromHours(hours);
+        }
+
         var tcs = _getPermissionTcs(userId);
         if (tcs != null)
         {
-            tcs.SetResult(new AskPermissionResult { Allowed = allowed });
+            tcs.SetResult(new AskPermissionResult { Allowed = allowed, AddToCache = addToCache, CacheDuration = cacheDuration });
         }
 
         RenderJson(new { success = true });
@@ -154,6 +181,12 @@ public class PermissionRequestController : Controller
             .btn-allow:hover { background: #45a049; transform: translateY(-2px); }
             .btn-deny { background: #f44336; color: white; }
             .btn-deny:hover { background: #da190b; transform: translateY(-2px); }
+            .cache-row { display: flex; align-items: center; gap: 6px; justify-content: center; margin-bottom: 20px; }
+            .cache-checkbox { cursor: pointer; accent-color: #4CAF50; width: 16px; height: 16px; }
+            .cache-label { font-size: 14px; color: #666; cursor: pointer; user-select: none; }
+            .duration-row { display: none; align-items: center; gap: 8px; justify-content: center; margin-bottom: 20px; }
+            .duration-label { font-size: 14px; color: #666; }
+            .duration-select { font-size: 14px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; }
             .auto-close { font-size: 12px; color: #999; }
         ";
     }
@@ -161,8 +194,14 @@ public class PermissionRequestController : Controller
     private string GetScripts(string userId)
     {
         return $@"
+            document.getElementById('cache-checkbox').addEventListener('change', function() {{
+                document.getElementById('duration-row').style.display = this.checked ? 'flex' : 'none';
+            }});
+
             function respond(allowed) {{
-                fetch('/permission/respond?userId={userId}&allowed=' + allowed)
+                var addToCache = document.getElementById('cache-checkbox').checked;
+                var cacheDuration = document.getElementById('cache-duration').value;
+                fetch('/permission/respond?userId={userId}&allowed=' + allowed + '&addToCache=' + addToCache + '&cacheDuration=' + cacheDuration)
                     .then(r => r.json())
                     .then(data => {{
                         if (data.success) {{

@@ -140,13 +140,15 @@ public class WebUIProvider : IIMProvider
         MessageReceived?.Invoke(this, new IMMessageEventArgs(chatMessage));
     }
 
-    public void HandlePermissionResponse(Guid userId, bool allowed)
+    public void HandlePermissionResponse(Guid userId, bool allowed, bool addToCache = false, TimeSpan? cacheDuration = null)
     {
         if (_pendingPermissionRequests.TryGetValue(userId, out TaskCompletionSource<AskPermissionResult>? tcs))
         {
             AskPermissionResult result = new AskPermissionResult
             {
-                Allowed = allowed
+                Allowed = allowed,
+                AddToCache = addToCache,
+                CacheDuration = cacheDuration
             };
             tcs.SetResult(result);
             _pendingPermissionRequests.Remove(userId);
@@ -289,7 +291,7 @@ public class WebUIProvider : IIMProvider
         }
     }
 
-    public async Task SendToolUpdateAsync(Guid senderId, Guid channelId, string role, string content, string? toolCallsJson = null, string? toolCallId = null, string? thinking = null, string? senderName = null)
+    public async Task SendToolUpdateAsync(Guid senderId, Guid channelId, string role, string content, string? toolCallsJson = null, string? toolCallId = null, string? thinking = null, string? senderName = null, int? promptTokens = null, int? completionTokens = null, int? totalTokens = null)
     {
         var message = new
         {
@@ -302,6 +304,9 @@ public class WebUIProvider : IIMProvider
             toolCallsJson,
             toolCallId,
             thinking,
+            promptTokens,
+            completionTokens,
+            totalTokens,
             timestamp = DateTime.UtcNow
         };
 

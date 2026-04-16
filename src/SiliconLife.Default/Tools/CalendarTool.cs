@@ -17,16 +17,21 @@ namespace SiliconLife.Default;
 
 /// <summary>
 /// Calendar and date calculation tool.
-/// Pure logic with no external dependencies — used to verify the tool system pipeline.
+/// Supports multiple calendar systems derived from <see cref="CalendarBase"/>.
+/// The desired calendar is selected via the optional <c>calendar</c> parameter (defaults to "gregorian").
 /// </summary>
 public class CalendarTool : ITool
 {
     public string Name => "calendar";
 
     public string Description =>
-        "Get current date/time information, day of week, and perform date calculations. " +
-        "Actions: 'now' (current date/time), 'day_of_week' (current day of week), " +
-        "'format' (format a date), 'add_days' (add days to a date), 'diff' (difference between dates).";
+        "Get current date/time information and perform date calculations using various calendar systems. " +
+        "Actions: 'now' (current date/time), 'format' (format/localize a date), " +
+        "'add_days' (add/subtract days), 'diff' (difference between two dates), " +
+        "'get_components' (list component definitions of a calendar), " +
+        "'get_now_components' (get current date/time broken down into calendar components), " +
+        "'convert' (convert a date from one calendar system to another, requires calendar, calendar2, and date), " +
+        "'list_calendars' (list all supported calendar systems).";
 
     public string GetDisplayName(Language language)
     {
@@ -38,6 +43,8 @@ public class CalendarTool : ITool
 
     public Dictionary<string, object> GetParameterSchema()
     {
+        var calendarIds = BuildCalendarRegistry().Keys.ToArray<object>();
+
         return new Dictionary<string, object>
         {
             ["type"] = "object",
@@ -46,23 +53,35 @@ public class CalendarTool : ITool
                 ["action"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "The action to perform: now, day_of_week, add_days, diff, format",
-                    ["enum"] = new[] { "now", "day_of_week", "add_days", "diff", "format" }
+                    ["description"] = "The action to perform.",
+                    ["enum"] = new[] { "now", "format", "add_days", "diff", "list_calendars", "get_components", "get_now_components", "convert" }
+                },
+                ["calendar"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["description"] = "Calendar system to use (default: gregorian). For 'convert', this is the source calendar.",
+                    ["enum"] = calendarIds
+                },
+                ["calendar2"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["description"] = "Target calendar system for 'convert'.",
+                    ["enum"] = calendarIds
                 },
                 ["date"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "A date string (format: yyyy-MM-dd or yyyy-MM-dd HH:mm:ss), used with day_of_week, add_days, diff, format"
-                },
-                ["days"] = new Dictionary<string, object>
-                {
-                    ["type"] = "integer",
-                    ["description"] = "Number of days to add (positive or negative), used with add_days"
+                    ["description"] = "Date string in ISO format (yyyy-MM-dd or yyyy-MM-dd HH:mm:ss). Used with format, add_days, diff, convert."
                 },
                 ["date2"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "Second date for diff calculation (format: yyyy-MM-dd)"
+                    ["description"] = "Second date for diff (yyyy-MM-dd or yyyy-MM-dd HH:mm:ss)."
+                },
+                ["days"] = new Dictionary<string, object>
+                {
+                    ["type"] = "integer",
+                    ["description"] = "Number of days to add (positive) or subtract (negative). Used with add_days."
                 }
             },
             ["required"] = new[] { "action" }
@@ -72,22 +91,36 @@ public class CalendarTool : ITool
     public ToolResult Execute(Guid callerId, Dictionary<string, object> parameters)
     {
         if (!parameters.TryGetValue("action", out object? actionObj))
-        {
-            return ToolResult.Failed("Missing 'action' parameter");
-        }
+            return ToolResult.Failed("Missing 'action' parameter.");
 
-        string action = actionObj?.ToString() ?? "";
+        string action = actionObj?.ToString()?.ToLowerInvariant() ?? "";
 
         try
         {
-            return action.ToLowerInvariant() switch
+            if (action == "list_calendars")
+                return ExecuteListCalendars();
+
+            var registry = BuildCalendarRegistry();
+
+            if (action == "convert")
+                return ExecuteConvert(registry, parameters);
+
+            string calendarId = parameters.TryGetValue("calendar", out var calObj)
+                ? calObj?.ToString() ?? "gregorian"
+                : "gregorian";
+
+            if (!registry.TryGetValue(calendarId, out CalendarBase? calendar))
+                return ToolResult.Failed($"Unknown calendar '{calendarId}'. Use list_calendars to see available options.");
+
+            return action switch
             {
-                "now" => ExecuteNow(),
-                "day_of_week" => ExecuteDayOfWeek(parameters),
-                "add_days" => ExecuteAddDays(parameters),
-                "diff" => ExecuteDiff(parameters),
-                "format" => ExecuteFormat(parameters),
-                _ => ToolResult.Failed($"Unknown action: {action}")
+                "now"               => ExecuteNow(calendar),
+                "format"            => ExecuteFormat(calendar, parameters),
+                "add_days"          => ExecuteAddDays(calendar, parameters),
+                "diff"              => ExecuteDiff(calendar, parameters),
+                "get_components"    => ExecuteGetComponents(calendar),
+                "get_now_components"=> ExecuteGetNowComponents(calendar),
+                _                   => ToolResult.Failed($"Unknown action: {action}")
             };
         }
         catch (Exception ex)
@@ -96,83 +129,234 @@ public class CalendarTool : ITool
         }
     }
 
-    private ToolResult ExecuteNow()
+    // ── registry ─────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Builds the calendar registry for the current application language.
+    /// Register additional <see cref="CalendarBase"/> subclasses here as they are implemented.
+    /// </summary>
+    private static Dictionary<string, CalendarBase> BuildCalendarRegistry()
+    {
+        DefaultLocalizationBase loc = GetLocalization();
+        var registry = new Dictionary<string, CalendarBase>(StringComparer.OrdinalIgnoreCase);
+
+        // ── registered calendars ──────────────────────────────────────────────
+        Register(registry, new GregorianCalendar(loc));
+        Register(registry, new BuddhistCalendar(loc));
+        Register(registry, new JucheCalendar(loc));
+        Register(registry, new RepublicOfChinaCalendar(loc));
+        Register(registry, new ChulaSakaratCalendar(loc));
+        Register(registry, new JulianCalendar(loc));
+        Register(registry, new KhmerCalendar(loc));
+        Register(registry, new ZoroastrianCalendar(loc));
+        Register(registry, new FrenchRepublicanCalendar(loc));
+        Register(registry, new CopticCalendar(loc));
+        Register(registry, new EthiopianCalendar(loc));
+        Register(registry, new IslamicCalendar(loc));
+        Register(registry, new HebrewCalendar(loc));
+        Register(registry, new PersianCalendar(loc));
+        Register(registry, new IndianCalendar(loc));
+        Register(registry, new SakaCalendar(loc));
+        Register(registry, new VikramSamvatCalendar(loc));
+        Register(registry, new JavaneseCalendar(loc));
+        Register(registry, new MongolianCalendar(loc));
+        Register(registry, new TibetanCalendar(loc));
+        Register(registry, new MayanCalendar(loc));
+        Register(registry, new CherokeeCalendar(loc));
+        Register(registry, new InuitCalendar(loc));
+        Register(registry, new RomanCalendar(loc));
+        Register(registry, new ChineseLunarCalendar(loc));
+        Register(registry, new VietnameseCalendar(loc));
+        Register(registry, new JapaneseCalendar(loc));
+        Register(registry, new SexagenaryCalendar(loc));
+        Register(registry, new YiCalendar(loc));
+        Register(registry, new DaiCalendar(loc));
+        Register(registry, new DehongDaiCalendar(loc));
+        // ─────────────────────────────────────────────────────────────────────
+
+        return registry;
+    }
+
+    private static void Register(Dictionary<string, CalendarBase> registry, CalendarBase calendar)
+        => registry[calendar.CalendarId] = calendar;
+
+    // ── actions ───────────────────────────────────────────────────────────────
+
+    private static ToolResult ExecuteListCalendars()
+    {
+        var registry = BuildCalendarRegistry();
+        var lines = registry.Values.Select(c =>
+        {
+            var components = string.Join(", ", c.GetComponents().Select(kv => $"{kv.Key}({kv.Value})"));
+            return $"  {c.CalendarId,-20} {c.CalendarName}\n    Components: {components}";
+        });
+        return ToolResult.Successful("Supported calendars:\n" + string.Join("\n", lines));
+    }
+
+    private static ToolResult ExecuteNow(CalendarBase calendar)
     {
         DateTime now = DateTime.Now;
-        string result = $"Current date and time: {now:yyyy-MM-dd HH:mm:ss}\n" +
+        var components = calendar.FromDateTime(now);
+
+        string result =
+            $"Calendar: {calendar.CalendarName}\n" +
+            $"Current date/time: {calendar.Localize(components)}\n" +
+            $"ISO format: {calendar.Format(components)}\n" +
             $"Day of week: {now:dddd}\n" +
             $"Unix timestamp: {new DateTimeOffset(now).ToUnixTimeSeconds()}\n" +
-            $"UTC: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}";
+            $"UTC: {calendar.Format(calendar.FromDateTime(DateTime.UtcNow))}";
         return ToolResult.Successful(result);
     }
 
-    private ToolResult ExecuteDayOfWeek(Dictionary<string, object> parameters)
+    private static ToolResult ExecuteFormat(CalendarBase calendar, Dictionary<string, object> parameters)
     {
-        DateTime date = GetDateParameter(parameters, "date") ?? DateTime.Now;
-        return ToolResult.Successful($"{date:yyyy-MM-dd} is {date:dddd} (day {(int)date.DayOfWeek + 1} of the week)");
+        DateTime date = GetDateParameter(parameters, "date", calendar) ?? DateTime.Now;
+        var components = calendar.FromDateTime(date);
+        return ToolResult.Successful(
+            $"Calendar: {calendar.CalendarName}\n" +
+            $"Localized: {calendar.Localize(components)}\n" +
+            $"ISO: {calendar.Format(components)}");
     }
 
-    private ToolResult ExecuteAddDays(Dictionary<string, object> parameters)
+    private static ToolResult ExecuteAddDays(CalendarBase calendar, Dictionary<string, object> parameters)
     {
-        DateTime date = GetDateParameter(parameters, "date") ?? DateTime.Now;
+        DateTime date = GetDateParameter(parameters, "date", calendar) ?? DateTime.Now;
 
         if (!parameters.TryGetValue("days", out object? daysObj) || daysObj == null)
-        {
-            return ToolResult.Failed("Missing 'days' parameter for add_days");
-        }
-
+            return ToolResult.Failed("Missing 'days' parameter for add_days.");
         if (!int.TryParse(daysObj.ToString(), out int days))
-        {
-            return ToolResult.Failed("'days' must be an integer");
-        }
+            return ToolResult.Failed("'days' must be an integer.");
 
         DateTime result = date.AddDays(days);
-        return ToolResult.Successful($"Adding {days} days to {date:yyyy-MM-dd} = {result:yyyy-MM-dd} ({result:dddd})");
+        string op = days >= 0 ? $"+ {days}" : $"- {Math.Abs(days)}";
+        return ToolResult.Successful(
+            $"Calendar: {calendar.CalendarName}\n" +
+            $"{calendar.Localize(calendar.FromDateTime(date))} {op} days = " +
+            $"{calendar.Localize(calendar.FromDateTime(result))} ({result:dddd})");
     }
 
-    private ToolResult ExecuteDiff(Dictionary<string, object> parameters)
+    private static ToolResult ExecuteDiff(CalendarBase calendar, Dictionary<string, object> parameters)
     {
-        DateTime? date1 = GetDateParameter(parameters, "date");
-        DateTime? date2 = GetDateParameter(parameters, "date2");
+        DateTime? date1 = GetDateParameter(parameters, "date", calendar);
+        DateTime? date2 = GetDateParameter(parameters, "date2", calendar);
 
         if (date1 == null || date2 == null)
-        {
-            return ToolResult.Failed("Both 'date' and 'date2' are required for diff");
-        }
+            return ToolResult.Failed("Both 'date' and 'date2' are required for diff.");
 
         TimeSpan diff = date2.Value - date1.Value;
-        string sign = diff.TotalDays < 0 ? "-" : "";
-        int absDays = Math.Abs((int)diff.TotalDays);
+        int totalDays = (int)diff.TotalDays;
+        string sign = totalDays < 0 ? "-" : "";
 
         return ToolResult.Successful(
-            $"Difference between {date1.Value:yyyy-MM-dd} and {date2.Value:yyyy-MM-dd}: {sign}{absDays} days");
+            $"Calendar: {calendar.CalendarName}\n" +
+            $"From: {calendar.Localize(calendar.FromDateTime(date1.Value))}\n" +
+            $"To:   {calendar.Localize(calendar.FromDateTime(date2.Value))}\n" +
+            $"Difference: {sign}{Math.Abs(totalDays)} days");
     }
 
-    private ToolResult ExecuteFormat(Dictionary<string, object> parameters)
+    private static ToolResult ExecuteGetComponents(CalendarBase calendar)
     {
-        DateTime date = GetDateParameter(parameters, "date") ?? DateTime.Now;
-        return ToolResult.Successful($"Formatted: {date:yyyy-MM-dd dddd HH:mm:ss}");
+        var components = calendar.GetComponents();
+        var lines = components.Select(kv => $"  {kv.Key,-20} {kv.Value}");
+        return ToolResult.Successful(
+            $"Calendar: {calendar.CalendarName}\n" +
+            $"Components:\n{string.Join("\n", lines)}");
     }
 
-    private static DateTime? GetDateParameter(Dictionary<string, object> parameters, string key)
+    private static ToolResult ExecuteGetNowComponents(CalendarBase calendar)
+    {
+        DateTime now = DateTime.Now;
+        var components = calendar.FromDateTime(now);
+        var componentDefs = calendar.GetComponents();
+        var lines = components.Select(kv =>
+        {
+            string displayName = componentDefs.TryGetValue(kv.Key, out var name) ? name : kv.Key;
+            string localized = calendar.TryGetComponentValueLocalization(kv.Key, kv.Value, out var loc) && loc != null
+                ? $" ({loc})"
+                : "";
+            return $"  {displayName}: {kv.Value}{localized}";
+        });
+        return ToolResult.Successful(
+            $"Calendar: {calendar.CalendarName}\n" +
+            $"Current date/time components ({now:yyyy-MM-dd HH:mm:ss}):\n{string.Join("\n", lines)}");
+    }
+
+    private static ToolResult ExecuteConvert(Dictionary<string, CalendarBase> registry,
+        Dictionary<string, object> parameters)
+    {
+        string srcId = parameters.TryGetValue("calendar", out var srcObj)
+            ? srcObj?.ToString() ?? "gregorian" : "gregorian";
+        string dstId = parameters.TryGetValue("calendar2", out var dstObj)
+            ? dstObj?.ToString() ?? "" : "";
+
+        if (string.IsNullOrEmpty(dstId))
+            return ToolResult.Failed("Missing 'calendar2' parameter for convert.");
+        if (!registry.TryGetValue(srcId, out CalendarBase? src))
+            return ToolResult.Failed($"Unknown source calendar '{srcId}'.");
+        if (!registry.TryGetValue(dstId, out CalendarBase? dst))
+            return ToolResult.Failed($"Unknown target calendar '{dstId}'.");
+
+        DateTime? date = GetDateParameter(parameters, "date", src);
+        if (date == null)
+            return ToolResult.Failed("Missing or unparseable 'date' parameter for convert.");
+
+        var srcComponents = src.FromDateTime(date.Value);
+        var dstComponents = dst.FromDateTime(date.Value);
+
+        return ToolResult.Successful(
+            $"Source  [{src.CalendarName}]: {src.Localize(srcComponents)} ({src.Format(srcComponents)})\n" +
+            $"Target  [{dst.CalendarName}]: {dst.Localize(dstComponents)} ({dst.Format(dstComponents)})");
+    }
+
+    // ── helpers ───────────────────────────────────────────────────────────────
+
+    private static DefaultLocalizationBase GetLocalization()
+    {
+        Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+        if (LocalizationManager.Instance.TryGetLocalization(language, out var loc) &&
+            loc is DefaultLocalizationBase defaultLoc)
+            return defaultLoc;
+
+        return LocalizationManager.Instance.GetLocalization(Language.ZhCN) as DefaultLocalizationBase
+               ?? throw new InvalidOperationException("No DefaultLocalizationBase registered.");
+    }
+
+    /// <summary>
+    /// Resolves a date string to a <see cref="DateTime"/>.
+    /// First tries <see cref="CalendarBase.Parse"/> (native calendar format),
+    /// then falls back to ISO / common formats via <see cref="DateTime.TryParse"/>.
+    /// </summary>
+    private static DateTime? GetDateParameter(Dictionary<string, object> parameters, string key,
+        CalendarBase? calendar = null)
     {
         if (!parameters.TryGetValue(key, out object? dateObj) || dateObj == null)
-        {
             return null;
-        }
 
         string dateStr = dateObj.ToString()!;
-        if (DateTime.TryParse(dateStr, out DateTime date))
+
+        // 1. Try the calendar's own Parse (native format, e.g. "正月初一" for lunar)
+        if (calendar != null)
         {
-            return date;
+            try
+            {
+                var components = calendar.Parse(dateStr);
+                // Parse succeeded — but CalendarBase.Parse returns components, not DateTime.
+                // We need the calendar to convert back; use Format → DateTime.Parse as bridge.
+                string iso = calendar.Format(components);
+                if (DateTime.TryParse(iso, out DateTime fromCalendar))
+                    return fromCalendar;
+            }
+            catch { /* fall through */ }
         }
 
-        // Try common formats
-        string[] formats = { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd", "yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss" };
-        if (DateTime.TryParseExact(dateStr, formats, null, System.Globalization.DateTimeStyles.None, out date))
-        {
+        // 2. Standard ISO / common formats
+        if (DateTime.TryParse(dateStr, out DateTime date))
             return date;
-        }
+
+        string[] formats = { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd", "yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss" };
+        if (DateTime.TryParseExact(dateStr, formats, null,
+                System.Globalization.DateTimeStyles.None, out date))
+            return date;
 
         return null;
     }

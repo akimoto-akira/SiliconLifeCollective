@@ -292,14 +292,52 @@ public class FileSystemTimeStorage : ITimeStorage
     // ── File I/O helpers ─────────────────────────────────────────────────────
 
     /// <summary>
-    /// Serializes <paramref name="data"/> as a single-line JSON string and appends it
-    /// to <paramref name="filePath"/>. Multiple records in the same file (e.g. same
-    /// second) are each stored on their own line.
+    /// Serializes <paramref name="data"/> as a single-line JSON string and writes it
+    /// to <paramref name="filePath"/>. If the file already contains a line whose
+    /// <c>Id</c> field matches the one on <paramref name="data"/>, that line is
+    /// replaced in-place; otherwise the new line is appended at the end.
     /// </summary>
     private static void WriteSingleLine<T>(string filePath, T data)
     {
-        string line = JsonSerializer.Serialize(data, _jsonOptions);
-        File.AppendAllText(filePath, line + Environment.NewLine);
+        string newLine = JsonSerializer.Serialize(data, _jsonOptions);
+
+        // Try to extract the Id value via reflection so we can do upsert logic.
+        object? newId = typeof(T).GetProperty("Id")?.GetValue(data);
+
+        if (newId != null && File.Exists(filePath))
+        {
+            string[] existingLines = File.ReadAllLines(filePath);
+            bool replaced = false;
+
+            for (int i = 0; i < existingLines.Length; i++)
+            {
+                string existing = existingLines[i];
+                if (string.IsNullOrWhiteSpace(existing)) continue;
+
+                try
+                {
+                    using JsonDocument doc = JsonDocument.Parse(existing);
+                    if (doc.RootElement.TryGetProperty("Id", out JsonElement idEl) &&
+                        idEl.ToString() == newId.ToString())
+                    {
+                        existingLines[i] = newLine;
+                        replaced = true;
+                        break;
+                    }
+                }
+                catch (JsonException) { /* malformed line – skip */ }
+            }
+
+            if (replaced)
+            {
+                File.WriteAllLines(filePath, existingLines);
+                return;
+            }
+        }
+
+        // No matching Id found (or no Id property) – append as a new line.
+        EnsureDirectory(filePath);
+        File.AppendAllText(filePath, newLine + Environment.NewLine);
     }
 
     /// <summary>

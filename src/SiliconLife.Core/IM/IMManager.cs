@@ -105,10 +105,13 @@ public class IMManager
     /// <param name="toolCallId">Tool call ID (for Tool role result messages).</param>
     /// <param name="thinking">Optional thinking content.</param>
     /// <param name="senderName">Optional sender name.</param>
-    public async Task SendToolUpdateAsync(Guid senderId, Guid channelId, string role, string content, string? toolCallsJson = null, string? toolCallId = null, string? thinking = null, string? senderName = null)
+    /// <param name="promptTokens">Number of tokens in the prompt.</param>
+    /// <param name="completionTokens">Number of tokens in the completion.</param>
+    /// <param name="totalTokens">Total number of tokens.</param>
+    public async Task SendToolUpdateAsync(Guid senderId, Guid channelId, string role, string content, string? toolCallsJson = null, string? toolCallId = null, string? thinking = null, string? senderName = null, int? promptTokens = null, int? completionTokens = null, int? totalTokens = null)
     {
         _logger.Debug("Sending tool update: sender={0}, channel={1}, role={2}", senderId, channelId, role);
-        await _imProvider.SendToolUpdateAsync(senderId, channelId, role, content, toolCallsJson, toolCallId, thinking, senderName);
+        await _imProvider.SendToolUpdateAsync(senderId, channelId, role, content, toolCallsJson, toolCallId, thinking, senderName, promptTokens, completionTokens, totalTokens);
     }
 
     /// <summary>

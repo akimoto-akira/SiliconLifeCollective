@@ -56,7 +56,10 @@ public interface IIMProvider
     /// <param name="toolCallId">Tool call ID (for Tool role result messages)</param>
     /// <param name="thinking">Optional thinking content</param>
     /// <param name="senderName">Optional sender name</param>
-    Task SendToolUpdateAsync(Guid senderId, Guid channelId, string role, string content, string? toolCallsJson = null, string? toolCallId = null, string? thinking = null, string? senderName = null);
+    /// <param name="promptTokens">Number of tokens in the prompt</param>
+    /// <param name="completionTokens">Number of tokens in the completion</param>
+    /// <param name="totalTokens">Total number of tokens</param>
+    Task SendToolUpdateAsync(Guid senderId, Guid channelId, string role, string content, string? toolCallsJson = null, string? toolCallId = null, string? thinking = null, string? senderName = null, int? promptTokens = null, int? completionTokens = null, int? totalTokens = null);
 }
 
 /// <summary>
@@ -73,6 +76,13 @@ public class AskPermissionResult
     /// Only meaningful when the user actively selects this option.
     /// </summary>
     public bool AddToCache { get; init; }
+
+    /// <summary>
+    /// Custom cache duration specified by the user.
+    /// When null, the cache default expiration is used.
+    /// Only meaningful when AddToCache is true.
+    /// </summary>
+    public TimeSpan? CacheDuration { get; init; }
 }
 
 public class IMMessageEventArgs : EventArgs

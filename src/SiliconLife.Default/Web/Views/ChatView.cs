@@ -64,25 +64,38 @@ public class ChatView : ViewBase
             H.Div(
                 H.Div(
                     H.Div(
-                        H.H1("权限请求").Class("permission-dialog-title"),
+                        H.H1(vm.Localization.PermissionDialogTitle).Class("permission-dialog-title"),
                         H.Div(
                             H.Div(
-                                H.Span("权限类型:").Class("permission-label"),
+                                H.Span(vm.Localization.PermissionTypeLabel).Class("permission-label"),
                                 H.Span("").Id("permission-type").Class("permission-value")
                             ).Class("permission-detail-row"),
                             H.Div(
-                                H.Span("请求资源:").Class("permission-label"),
+                                H.Span(vm.Localization.PermissionResourceLabel).Class("permission-label"),
                                 H.Span("").Id("permission-resource").Class("permission-value")
                             ).Class("permission-detail-row"),
                             H.Div(
-                                H.Span("详细信息:").Class("permission-label"),
+                                H.Span(vm.Localization.PermissionDetailLabel).Class("permission-label"),
                                 H.Div("").Id("permission-content").Class("permission-content-text")
                             ).Class("permission-detail-row")
                         ).Class("permission-details"),
                         H.Div(
-                            H.Button("允许").Class("btn-permission-allow").OnClick("respondPermission(true)"),
-                            H.Button("拒绝").Class("btn-permission-deny").OnClick("respondPermission(false)")
-                        ).Class("permission-buttons")
+                            H.Button(vm.Localization.PermissionAllowButton).Class("btn-permission-allow").OnClick("respondPermission(true)"),
+                            H.Button(vm.Localization.PermissionDenyButton).Class("btn-permission-deny").OnClick("respondPermission(false)")
+                        ).Class("permission-buttons"),
+                        H.Div(
+                            H.Input().Attr("type", "checkbox").Id("permission-cache-checkbox").Class("permission-cache-checkbox"),
+                            H.Label(vm.Localization.PermissionCacheLabel).Attr("for", "permission-cache-checkbox").Class("permission-cache-label")
+                        ).Class("permission-cache-row"),
+                        H.Div(
+                            H.Label(vm.Localization.PermissionCacheDurationLabel).Attr("for", "permission-cache-duration").Class("permission-duration-label"),
+                            H.Select(
+                                H.Option(vm.Localization.PermissionCacheDuration1Hour).Attr("value", "1"),
+                                H.Option(vm.Localization.PermissionCacheDuration24Hours).Attr("value", "24"),
+                                H.Option(vm.Localization.PermissionCacheDuration7Days).Attr("value", "168"),
+                                H.Option(vm.Localization.PermissionCacheDuration30Days).Attr("value", "720")
+                            ).Id("permission-cache-duration").Class("permission-duration-select")
+                        ).Id("permission-duration-row").Class("permission-duration-row")
                     ).Class("permission-dialog")
                 ).Id("permission-overlay").Class("permission-overlay")
             ).Class("permission-overlay-wrapper")
@@ -740,6 +753,45 @@ public class ChatView : ViewBase
             .EndSelector()
             .Selector(".btn-permission-deny:hover")
                 .Property("opacity", "0.85")
+            .EndSelector()
+            .Selector(".permission-cache-row")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("gap", "6px")
+                .Property("margin-top", "12px")
+                .Property("justify-content", "flex-end")
+            .EndSelector()
+            .Selector(".permission-cache-checkbox")
+                .Property("cursor", "pointer")
+                .Property("accent-color", "var(--accent-success, #4CAF50)")
+                .Property("width", "16px")
+                .Property("height", "16px")
+            .EndSelector()
+            .Selector(".permission-cache-label")
+                .Property("font-size", "13px")
+                .Property("color", "var(--text-secondary)")
+                .Property("cursor", "pointer")
+                .Property("user-select", "none")
+            .EndSelector()
+            .Selector(".permission-duration-row")
+                .Property("display", "none")
+                .Property("align-items", "center")
+                .Property("gap", "8px")
+                .Property("margin-top", "8px")
+                .Property("justify-content", "flex-end")
+            .EndSelector()
+            .Selector(".permission-duration-label")
+                .Property("font-size", "13px")
+                .Property("color", "var(--text-secondary)")
+            .EndSelector()
+            .Selector(".permission-duration-select")
+                .Property("font-size", "13px")
+                .Property("padding", "4px 8px")
+                .Property("border", "1px solid var(--border)")
+                .Property("border-radius", "4px")
+                .Property("background", "var(--bg-card, var(--bg-secondary, #fff))")
+                .Property("color", "var(--text-primary)")
+                .Property("cursor", "pointer")
             .EndSelector();
     }
 
@@ -760,6 +812,7 @@ public class ChatView : ViewBase
             .Add(() => Js.Let(() => "eventSource", () => Js.Null()))
             .Add(() => Js.Let(() => "currentStreamId", () => Js.Null()))
             .Add(() => Js.Let(() => "streamingMessage", () => Js.Null()))
+            .Add(() => Js.Let(() => "lastStreamElementId", () => Js.Null()))
             .Add(() => Js.Let(() => "messageCache", () => Js.New(() => Js.Id(() => "Array"))))
             .Add(() => Js.Let(() => "toolCallMap", () => Js.New(() => Js.Id(() => "Map"))))
             .Add(() => Js.Const(() => "toolDisplayNames", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Str(() => toolDisplayNamesLiteral))));
@@ -875,6 +928,36 @@ public class ChatView : ViewBase
                 { (Js.Id(() => "data").Prop(() => "channelId").Op(() => "!==", () => Js.Id(() => "currentSessionId")), new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
             }))
             .Add(() => Js.Const(() => "isCurrentUser", () => Js.Id(() => "data").Prop(() => "senderId").Op(() => "===", () => (JsSyntax)Js.Str(() => userId))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "isCurrentUser").Not().Op(() => "&&", () => Js.Id(() => "lastStreamElementId")), new List<JsSyntax>
+                    {
+                        Js.Const(() => "streamEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Id(() => "lastStreamElementId"))),
+                        Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                        {
+                            { (Js.Id(() => "streamEl"), new List<JsSyntax>
+                                {
+                                    Js.Const(() => "tokenEl", () => Js.Id(() => "streamEl").Call(() => "querySelector", () => Js.Str(() => ".msg-token-stats"))),
+                                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                                    {
+                                        { (Js.Id(() => "tokenEl"), new List<JsSyntax>
+                                            {
+                                                Js.Assign(() => Js.Id(() => "tokenEl").Prop(() => "outerHTML"), () => Js.Id(() => "getTokenStats").Invoke(() => Js.Obj()
+                                                    .Prop(() => "promptTokens", () => Js.Id(() => "data").Prop(() => "promptTokens"))
+                                                    .Prop(() => "completionTokens", () => Js.Id(() => "data").Prop(() => "completionTokens"))
+                                                    .Prop(() => "totalTokens", () => Js.Id(() => "data").Prop(() => "totalTokens"))))
+                                            }
+                                        )}
+                                    }),
+                                    Js.Assign(() => Js.Id(() => "lastStreamElementId"), () => Js.Null()),
+                                    Js.Return(() => Js.Id(() => "undefined"))
+                                }
+                            )}
+                        }),
+                        Js.Assign(() => Js.Id(() => "lastStreamElementId"), () => Js.Null())
+                    }
+                )}
+            }))
             .Add(() => Js.Id(() => "appendMessage").Invoke(() => Js.Obj()
                 .Prop(() => "isUser", () => Js.Id(() => "isCurrentUser"))
                 .Prop(() => "text", () => Js.Id(() => "data").Prop(() => "content"))
@@ -890,13 +973,33 @@ public class ChatView : ViewBase
             {
                 { (Js.Id(() => "data").Prop(() => "channelId").Op(() => "!==", () => Js.Id(() => "currentSessionId")), new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
             }))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "lastStreamElementId"), new List<JsSyntax>
+                    {
+                        Js.Const(() => "streamEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Id(() => "lastStreamElementId"))),
+                        Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                        {
+                            { (Js.Id(() => "streamEl"), new List<JsSyntax>
+                                {
+                                    Js.Id(() => "streamEl").Call(() => "remove").Stmt()
+                                }
+                            )}
+                        }),
+                        Js.Assign(() => Js.Id(() => "lastStreamElementId"), () => Js.Null())
+                    }
+                )}
+            }))
             .Add(() => Js.Id(() => "messageCache").Call(() => "push", () => Js.Obj()
                 .Prop(() => "role", () => Js.Id(() => "data").Prop(() => "role"))
                 .Prop(() => "content", () => Js.Id(() => "data").Prop(() => "content"))
                 .Prop(() => "thinking", () => Js.Id(() => "data").Prop(() => "thinking"))
                 .Prop(() => "senderName", () => Js.Id(() => "data").Prop(() => "senderName"))
                 .Prop(() => "toolCallsJson", () => Js.Id(() => "data").Prop(() => "toolCallsJson"))
-                .Prop(() => "toolCallId", () => Js.Id(() => "data").Prop(() => "toolCallId"))).Stmt())
+                .Prop(() => "toolCallId", () => Js.Id(() => "data").Prop(() => "toolCallId"))
+                .Prop(() => "promptTokens", () => Js.Id(() => "data").Prop(() => "promptTokens"))
+                .Prop(() => "completionTokens", () => Js.Id(() => "data").Prop(() => "completionTokens"))
+                .Prop(() => "totalTokens", () => Js.Id(() => "data").Prop(() => "totalTokens"))).Stmt())
             .Add(() => Js.Id(() => "buildToolCallMap").Invoke().Stmt())
             .Add(() => Js.Id(() => "appendMessage").Invoke(() => Js.Obj()
                 .Prop(() => "isUser", () => Js.Bool(() => false))
@@ -905,7 +1008,10 @@ public class ChatView : ViewBase
                 .Prop(() => "senderName", () => Js.Id(() => "data").Prop(() => "senderName"))
                 .Prop(() => "role", () => Js.Id(() => "data").Prop(() => "role"))
                 .Prop(() => "toolCallsJson", () => Js.Id(() => "data").Prop(() => "toolCallsJson"))
-                .Prop(() => "toolCallId", () => Js.Id(() => "data").Prop(() => "toolCallId"))).Stmt());
+                .Prop(() => "toolCallId", () => Js.Id(() => "data").Prop(() => "toolCallId"))
+                .Prop(() => "promptTokens", () => Js.Id(() => "data").Prop(() => "promptTokens"))
+                .Prop(() => "completionTokens", () => Js.Id(() => "data").Prop(() => "completionTokens"))
+                .Prop(() => "totalTokens", () => Js.Id(() => "data").Prop(() => "totalTokens"))).Stmt());
         js.Add(() => Js.Func(() => "handleTool", () => new List<string> { "data" }, () => handleToolBody));
 
         var handlePermissionBody = Js.Block()
@@ -927,26 +1033,36 @@ public class ChatView : ViewBase
             }))
             .Add(() => Js.Assign(() => Js.Id(() => "typeEl").Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "permissionType")))
             .Add(() => Js.Assign(() => Js.Id(() => "resourceEl").Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "resource")))
-            .Add(() => Js.Assign(() => Js.Id(() => "contentEl").Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "content")))
+            .Add(() => Js.Assign(() => Js.Id(() => "contentEl").Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "content").Call(() => "replace", () => Js.Regex(() => "^Allow code:.*$", () => "gm"), () => Js.Str(() => "")).Call(() => "replace", () => Js.Regex(() => "^Deny code:.*$", () => "gm"), () => Js.Str(() => "")).Call(() => "trim")))
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permission-cache-checkbox")).Prop(() => "checked"), () => Js.Bool(() => false)))
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permission-cache-duration")).Prop(() => "selectedIndex"), () => Js.Num(() => "0")))
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permission-duration-row")).Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "none")));
+
+        var cacheCheckboxChangeBody = Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permission-duration-row")).Prop(() => "style").Prop(() => "display"), () => Js.Ternary(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permission-cache-checkbox")).Prop(() => "checked"), () => Js.Str(() => "flex"), () => Js.Str(() => "none"))));
+
+        showPermissionDialogBody
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permission-cache-checkbox")).Call(() => "addEventListener", () => Js.Str(() => "change"), () => Js.Arrow(() => new List<string>(), () => cacheCheckboxChangeBody)).Stmt())
             .Add(() => Js.Assign(() => Js.Id(() => "overlay").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "flex")));
         js.Add(() => Js.Func(() => "showPermissionDialog", () => new List<string> { "data" }, () => showPermissionDialogBody));
 
         var respondPermissionBody = Js.Block()
             .Add(() => Js.Const(() => "overlay", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permission-overlay"))))
+            .Add(() => Js.Const(() => "cacheCheckbox", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permission-cache-checkbox"))))
+            .Add(() => Js.Const(() => "addToCache", () => Js.Id(() => "cacheCheckbox").Prop(() => "checked")))
+            .Add(() => Js.Const(() => "cacheDuration", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permission-cache-duration")).Prop(() => "value")))
             .Add(() => Js.Assign(() => Js.Id(() => "overlay").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "none")))
-            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/permission/respond").Op(() => "+", () => (JsSyntax)Js.Str(() => "?userId=")).Op(() => "+", () => (JsSyntax)Js.Str(() => userId)).Op(() => "+", () => (JsSyntax)Js.Str(() => "&allowed=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "allowed")), () => Js.Obj()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/permission/respond").Op(() => "+", () => (JsSyntax)Js.Str(() => "?userId=")).Op(() => "+", () => (JsSyntax)Js.Str(() => userId)).Op(() => "+", () => (JsSyntax)Js.Str(() => "&allowed=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "allowed")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&addToCache=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "addToCache")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&cacheDuration=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "cacheDuration")), () => Js.Obj()
                 .Prop(() => "method", () => Js.Str(() => "GET"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "result" }, () => Js.Block()
                 .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                 {
-                    { (Js.Id(() => "result").Prop(() => "success"), new List<JsSyntax>
+                    { (Js.Id(() => "result").Prop(() => "success").Not(), new List<JsSyntax>
                         {
-                            Js.Id(() => "appendMessage").Invoke(() => Js.Obj()
-                                .Prop(() => "isUser", () => Js.Bool(() => true))
-                                .Prop(() => "text", () => Js.Ternary(() => Js.Id(() => "allowed"), () => Js.Str(() => "[Permission Allowed]"), () => Js.Str(() => "[Permission Denied]")))).Stmt()
+                            Js.Id(() => "console").Call(() => "error", () => Js.Str(() => vm.Localization.PermissionRespondFailed)).Stmt()
                         }
                     )}
                 }))
-            )).Call(() => "catch", () => Js.Arrow(() => new List<string> { "err" }, () => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Permission respond error:"), () => Js.Id(() => "err")))).Stmt());
+            )).Call(() => "catch", () => Js.Arrow(() => new List<string> { "err" }, () => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => vm.Localization.PermissionRespondError), () => Js.Id(() => "err")))).Stmt());
         js.Add(() => Js.Func(() => "respondPermission", () => new List<string> { "allowed" }, () => respondPermissionBody));
 
         var handleStreamingBody = Js.Block()
@@ -964,20 +1080,32 @@ public class ChatView : ViewBase
                     {
                         Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                         {
-                            { (Js.Id(() => "streamingMessage").Prop(() => "elementId"), new List<JsSyntax>
+                            { (Js.Id(() => "streamingMessage"), new List<JsSyntax>
                                 {
-                                    Js.Const(() => "removeEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Id(() => "streamingMessage").Prop(() => "elementId"))),
+                                    Js.Assign(() => Js.Id(() => "streamingMessage").Prop(() => "promptTokens"), () => Js.Id(() => "data").Prop(() => "promptTokens")),
+                                    Js.Assign(() => Js.Id(() => "streamingMessage").Prop(() => "completionTokens"), () => Js.Id(() => "data").Prop(() => "completionTokens")),
+                                    Js.Assign(() => Js.Id(() => "streamingMessage").Prop(() => "totalTokens"), () => Js.Id(() => "data").Prop(() => "totalTokens")),
+                                    Js.Const(() => "finalEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Id(() => "streamingMessage").Prop(() => "elementId"))),
                                     Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                                     {
-                                        { (Js.Id(() => "removeEl"), new List<JsSyntax>
+                                        { (Js.Id(() => "finalEl"), new List<JsSyntax>
                                             {
-                                                Js.Id(() => "removeEl").Call(() => "remove").Stmt()
+                                                Js.Const(() => "tokenEl", () => Js.Id(() => "finalEl").Call(() => "querySelector", () => Js.Str(() => ".msg-token-stats"))),
+                                                Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                                                {
+                                                    { (Js.Id(() => "tokenEl"), new List<JsSyntax>
+                                                        {
+                                                            Js.Assign(() => Js.Id(() => "tokenEl").Prop(() => "innerHTML"), () => Js.Id(() => "getTokenStats").Invoke(() => Js.Id(() => "streamingMessage")).Prop(() => "innerHTML"))
+                                                        }
+                                                    )}
+                                                })
                                             }
                                         )}
                                     })
                                 }
                             )}
                         }),
+                        Js.Assign(() => Js.Id(() => "lastStreamElementId"), () => Js.Id(() => "streamingMessage").Prop(() => "elementId").Op(() => "||", () => (JsSyntax)Js.Null())),
                         Js.Assign(() => Js.Id(() => "currentStreamId"), () => Js.Null()),
                         Js.Assign(() => Js.Id(() => "streamingMessage"), () => Js.Null()),
                         Js.Return(() => Js.Id(() => "undefined"))
@@ -993,6 +1121,9 @@ public class ChatView : ViewBase
                             .Prop(() => "isUser", () => Js.Bool(() => false))
                             .Prop(() => "text", () => Js.Str(() => ""))
                             .Prop(() => "thinking", () => Js.Str(() => ""))
+                            .Prop(() => "promptTokens", () => Js.Null())
+                            .Prop(() => "completionTokens", () => Js.Null())
+                            .Prop(() => "totalTokens", () => Js.Null())
                             .Prop(() => "elementId", () => Js.Str(() => "stream-").Op(() => "+", () => (JsSyntax)Js.Id(() => "streamId")))),
                         Js.Id(() => "appendMessage").Invoke(() => Js.Id(() => "streamingMessage")).Stmt()
                     }

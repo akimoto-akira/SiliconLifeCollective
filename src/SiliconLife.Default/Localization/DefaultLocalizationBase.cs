@@ -122,11 +122,81 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string AddToCachePrompt { get; }
 
     /// <summary>
+    /// Gets the label for the permission cache checkbox in the web UI
+    /// </summary>
+    public abstract string PermissionCacheLabel { get; }
+
+    /// <summary>
+    /// Gets the label for the cache duration selector in the permission dialog
+    /// </summary>
+    public abstract string PermissionCacheDurationLabel { get; }
+
+    /// <summary>
+    /// Gets the option text for 1-hour cache duration
+    /// </summary>
+    public abstract string PermissionCacheDuration1Hour { get; }
+
+    /// <summary>
+    /// Gets the option text for 24-hour cache duration
+    /// </summary>
+    public abstract string PermissionCacheDuration24Hours { get; }
+
+    /// <summary>
+    /// Gets the option text for 7-day cache duration
+    /// </summary>
+    public abstract string PermissionCacheDuration7Days { get; }
+
+    /// <summary>
+    /// Gets the option text for 30-day cache duration
+    /// </summary>
+    public abstract string PermissionCacheDuration30Days { get; }
+
+    /// <summary>
     /// Gets the localized display name for a permission type
     /// </summary>
     /// <param name="permissionType">The permission type</param>
     /// <returns>The localized display name</returns>
     public abstract string GetPermissionTypeName(PermissionType permissionType);
+
+    /// <summary>
+    /// Gets the title text for the permission dialog in the web UI
+    /// </summary>
+    public abstract string PermissionDialogTitle { get; }
+
+    /// <summary>
+    /// Gets the label for the permission type field in the permission dialog
+    /// </summary>
+    public abstract string PermissionTypeLabel { get; }
+
+    /// <summary>
+    /// Gets the label for the requested resource field in the permission dialog
+    /// </summary>
+    public abstract string PermissionResourceLabel { get; }
+
+    /// <summary>
+    /// Gets the label for the detail information field in the permission dialog
+    /// </summary>
+    public abstract string PermissionDetailLabel { get; }
+
+    /// <summary>
+    /// Gets the text for the allow button in the permission dialog
+    /// </summary>
+    public abstract string PermissionAllowButton { get; }
+
+    /// <summary>
+    /// Gets the text for the deny button in the permission dialog
+    /// </summary>
+    public abstract string PermissionDenyButton { get; }
+
+    /// <summary>
+    /// Gets the console error message when permission respond fails
+    /// </summary>
+    public abstract string PermissionRespondFailed { get; }
+
+    /// <summary>
+    /// Gets the console error prefix when permission respond throws an error
+    /// </summary>
+    public abstract string PermissionRespondError { get; }
 
     // ===== Init Page Localization =====
 
@@ -276,6 +346,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the label for the beings menu item
     /// </summary>
     public abstract string NavMenuBeings { get; }
+
+    /// <summary>
+    /// Gets the label for the audit menu item
+    /// </summary>
+    public abstract string NavMenuAudit { get; }
 
     /// <summary>
     /// Gets the label for the tasks menu item
@@ -472,6 +547,26 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the soul content label in detail view
     /// </summary>
     public abstract string BeingsDetailSoulContentLabel { get; }
+
+    /// <summary>
+    /// Gets the memory label in detail view
+    /// </summary>
+    public abstract string BeingsDetailMemoryLabel { get; }
+
+    /// <summary>
+    /// Gets the memory view link text in detail view
+    /// </summary>
+    public abstract string BeingsDetailMemoryViewLink { get; }
+
+    /// <summary>
+    /// Gets the permission label in detail view
+    /// </summary>
+    public abstract string BeingsDetailPermissionLabel { get; }
+
+    /// <summary>
+    /// Gets the permission edit link text in detail view
+    /// </summary>
+    public abstract string BeingsDetailPermissionEditLink { get; }
 
     /// <summary>
     /// Gets the timers label in detail view
@@ -913,4 +1008,779 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <param name="toolName">The tool's Name property value</param>
     /// <returns>The localized display name, or the tool name itself if not found</returns>
     public abstract string GetToolDisplayName(string toolName);
+
+    // ===== Curator Soul =====
+
+    /// <summary>
+    /// Gets the default soul content for the Silicon Curator (硅基主理人).
+    /// Subclasses may override to provide a localized version.
+    /// </summary>
+    public abstract string DefaultCuratorSoul { get; }
+
+    // ===== Gregorian Calendar Localization =====
+
+    /// <summary>
+    /// Gets the display name of the Gregorian calendar system.
+    /// </summary>
+    public abstract string CalendarGregorianName { get; }
+
+    /// <summary>
+    /// Gets the localized label for the year component.
+    /// </summary>
+    public abstract string CalendarComponentYear { get; }
+
+    /// <summary>
+    /// Gets the localized label for the month component.
+    /// </summary>
+    public abstract string CalendarComponentMonth { get; }
+
+    /// <summary>
+    /// Gets the localized label for the day component.
+    /// </summary>
+    public abstract string CalendarComponentDay { get; }
+
+    /// <summary>
+    /// Gets the localized label for the hour component.
+    /// </summary>
+    public abstract string CalendarComponentHour { get; }
+
+    /// <summary>
+    /// Gets the localized label for the minute component.
+    /// </summary>
+    public abstract string CalendarComponentMinute { get; }
+
+    /// <summary>
+    /// Gets the localized label for the second component.
+    /// </summary>
+    public abstract string CalendarComponentSecond { get; }
+
+    /// <summary>
+    /// Gets the localized label for the weekday component.
+    /// </summary>
+    public abstract string CalendarComponentWeekday { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–12).
+    /// </summary>
+    /// <param name="month">Month number, 1 = January … 12 = December.</param>
+    /// <returns>The localized month name, or <see langword="null"/> if not found.</returns>
+    public abstract string? GetGregorianMonthName(int month);
+
+    /// <summary>Returns a localized string for the given year value (e.g. "2026" or "2026年").</summary>
+    public abstract string FormatGregorianYear(int year);
+
+    /// <summary>Returns a localized string for the given day value (e.g. "16" or "16日").</summary>
+    public abstract string FormatGregorianDay(int day);
+
+    /// <summary>Returns a localized string for the given hour value (e.g. "08" or "8时").</summary>
+    public abstract string FormatGregorianHour(int hour);
+
+    /// <summary>Returns a localized string for the given minute value (e.g. "30" or "30分").</summary>
+    public abstract string FormatGregorianMinute(int minute);
+
+    /// <summary>Returns a localized string for the given second value (e.g. "00" or "0秒").</summary>
+    public abstract string FormatGregorianSecond(int second);
+
+    /// <summary>Returns a localized weekday name for the given <see cref="System.DayOfWeek"/> value (0 = Sunday … 6 = Saturday).</summary>
+    /// <returns>The localized weekday name, or <see langword="null"/> if not found.</returns>
+    public abstract string? GetGregorianWeekdayName(int dayOfWeek);
+
+    /// <summary>
+    /// Formats a full Gregorian date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeGregorianDateTime(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Buddhist Calendar Localization =====
+
+    /// <summary>
+    /// Gets the display name of the Buddhist Era calendar system.
+    /// </summary>
+    public abstract string CalendarBuddhistName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–12) in the Buddhist calendar.
+    /// </summary>
+    /// <param name="month">Month number, 1 = January … 12 = December.</param>
+    /// <returns>The localized month name, or <see langword="null"/> if not found.</returns>
+    public abstract string? GetBuddhistMonthName(int month);
+
+    /// <summary>Returns a localized string for the given Buddhist Era year value (e.g. "2569" or "佛元2569年").</summary>
+    public abstract string FormatBuddhistYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Buddhist calendar (e.g. "16" or "16日").</summary>
+    public abstract string FormatBuddhistDay(int day);
+
+    /// <summary>
+    /// Formats a full Buddhist Era date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeBuddhistDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Cherokee Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Cherokee traditional calendar system.
+    /// </summary>
+    public abstract string CalendarCherokeeName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–13) in the Cherokee calendar.
+    /// </summary>
+    /// <param name="month">Month number, 1–13.</param>
+    /// <returns>The localized month name, or <see langword="null"/> if not found.</returns>
+    public abstract string? GetCherokeeMonthName(int month);
+
+    /// <summary>Returns a localized string for the given Cherokee year value.</summary>
+    public abstract string FormatCherokeeYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Cherokee calendar.</summary>
+    public abstract string FormatCherokeeDay(int day);
+
+    /// <summary>
+    /// Formats a full Cherokee date into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeCherokeeDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Juche Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Juche calendar system.
+    /// </summary>
+    public abstract string CalendarJucheName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–12) in the Juche calendar.
+    /// </summary>
+    public abstract string? GetJucheMonthName(int month);
+
+    /// <summary>Returns a localized string for the given Juche year value.</summary>
+    public abstract string FormatJucheYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Juche calendar.</summary>
+    public abstract string FormatJucheDay(int day);
+
+    /// <summary>
+    /// Formats a full Juche date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeJucheDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Republic of China Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Republic of China (Minguo) calendar system.
+    /// </summary>
+    public abstract string CalendarRocName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–12) in the ROC calendar.
+    /// </summary>
+    public abstract string? GetRocMonthName(int month);
+
+    /// <summary>Returns a localized string for the given ROC year value.</summary>
+    public abstract string FormatRocYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the ROC calendar.</summary>
+    public abstract string FormatRocDay(int day);
+
+    /// <summary>
+    /// Formats a full ROC date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeRocDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Chula Sakarat Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Chula Sakarat (CS) calendar system.
+    /// </summary>
+    public abstract string CalendarChulaSakaratName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–12) in the Chula Sakarat calendar.
+    /// </summary>
+    public abstract string? GetChulaSakaratMonthName(int month);
+
+    /// <summary>Returns a localized string for the given Chula Sakarat year value.</summary>
+    public abstract string FormatChulaSakaratYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Chula Sakarat calendar.</summary>
+    public abstract string FormatChulaSakaratDay(int day);
+
+    /// <summary>
+    /// Formats a full Chula Sakarat date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeChulaSakaratDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Julian Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Julian calendar system.
+    /// </summary>
+    public abstract string CalendarJulianName { get; }
+
+    /// <summary>Returns a localized string for the given Julian year value.</summary>
+    public abstract string FormatJulianYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Julian calendar.</summary>
+    public abstract string FormatJulianDay(int day);
+
+    /// <summary>
+    /// Formats a full Julian date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeJulianDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Khmer Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Khmer calendar system.
+    /// </summary>
+    public abstract string CalendarKhmerName { get; }
+
+    /// <summary>Returns a localized string for the given Khmer year value.</summary>
+    public abstract string FormatKhmerYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Khmer calendar.</summary>
+    public abstract string FormatKhmerDay(int day);
+
+    /// <summary>
+    /// Formats a full Khmer date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeKhmerDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Zoroastrian Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Zoroastrian (Yazdegerd) calendar system.
+    /// </summary>
+    public abstract string CalendarZoroastrianName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–13) in the Zoroastrian calendar.
+    /// </summary>
+    public abstract string? GetZoroastrianMonthName(int month);
+
+    /// <summary>Returns a localized string for the given Zoroastrian year value.</summary>
+    public abstract string FormatZoroastrianYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Zoroastrian calendar.</summary>
+    public abstract string FormatZoroastrianDay(int day);
+
+    /// <summary>
+    /// Formats a full Zoroastrian date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeZoroastrianDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== French Republican Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the French Republican calendar system.
+    /// </summary>
+    public abstract string CalendarFrenchRepublicanName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–13) in the French Republican calendar.
+    /// </summary>
+    public abstract string? GetFrenchRepublicanMonthName(int month);
+
+    /// <summary>Returns a localized string for the given French Republican year value.</summary>
+    public abstract string FormatFrenchRepublicanYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the French Republican calendar.</summary>
+    public abstract string FormatFrenchRepublicanDay(int day);
+
+    /// <summary>
+    /// Formats a full French Republican date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeFrenchRepublicanDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Coptic Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Coptic calendar system.
+    /// </summary>
+    public abstract string CalendarCopticName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–13) in the Coptic calendar.
+    /// </summary>
+    public abstract string? GetCopticMonthName(int month);
+
+    /// <summary>Returns a localized string for the given Coptic year value.</summary>
+    public abstract string FormatCopticYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Coptic calendar.</summary>
+    public abstract string FormatCopticDay(int day);
+
+    /// <summary>
+    /// Formats a full Coptic date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeCopticDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Ethiopian Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Ethiopian calendar system.
+    /// </summary>
+    public abstract string CalendarEthiopianName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–13) in the Ethiopian calendar.
+    /// </summary>
+    public abstract string? GetEthiopianMonthName(int month);
+
+    /// <summary>Returns a localized string for the given Ethiopian year value.</summary>
+    public abstract string FormatEthiopianYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Ethiopian calendar.</summary>
+    public abstract string FormatEthiopianDay(int day);
+
+    /// <summary>
+    /// Formats a full Ethiopian date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeEthiopianDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Islamic Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Islamic (Hijri) calendar system.
+    /// </summary>
+    public abstract string CalendarIslamicName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–12) in the Islamic calendar.
+    /// </summary>
+    public abstract string? GetIslamicMonthName(int month);
+
+    /// <summary>Returns a localized string for the given Islamic year value.</summary>
+    public abstract string FormatIslamicYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Islamic calendar.</summary>
+    public abstract string FormatIslamicDay(int day);
+
+    /// <summary>
+    /// Formats a full Islamic date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeIslamicDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Hebrew Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Hebrew calendar system.
+    /// </summary>
+    public abstract string CalendarHebrewName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–13) in the Hebrew calendar.
+    /// </summary>
+    public abstract string? GetHebrewMonthName(int month);
+
+    /// <summary>Returns a localized string for the given Hebrew year value.</summary>
+    public abstract string FormatHebrewYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Hebrew calendar.</summary>
+    public abstract string FormatHebrewDay(int day);
+
+    /// <summary>
+    /// Formats a full Hebrew date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeHebrewDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Persian Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Persian (Solar Hijri) calendar system.
+    /// </summary>
+    public abstract string CalendarPersianName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–12) in the Persian calendar.
+    /// </summary>
+    public abstract string? GetPersianMonthName(int month);
+
+    /// <summary>Returns a localized string for the given Persian year value.</summary>
+    public abstract string FormatPersianYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Persian calendar.</summary>
+    public abstract string FormatPersianDay(int day);
+
+    /// <summary>
+    /// Formats a full Persian date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizePersianDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Indian National Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Indian National (Saka) calendar system.
+    /// </summary>
+    public abstract string CalendarIndianName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–12) in the Indian calendar.
+    /// </summary>
+    public abstract string? GetIndianMonthName(int month);
+
+    /// <summary>Returns a localized string for the given Indian year value.</summary>
+    public abstract string FormatIndianYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Indian calendar.</summary>
+    public abstract string FormatIndianDay(int day);
+
+    /// <summary>
+    /// Formats a full Indian date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeIndianDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Saka Era Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Saka Era calendar system.
+    /// </summary>
+    public abstract string CalendarSakaName { get; }
+
+    /// <summary>Returns a localized string for the given Saka year value.</summary>
+    public abstract string FormatSakaYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Saka calendar.</summary>
+    public abstract string FormatSakaDay(int day);
+
+    /// <summary>
+    /// Formats a full Saka date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeSakaDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Vikram Samvat Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Vikram Samvat calendar system.
+    /// </summary>
+    public abstract string CalendarVikramSamvatName { get; }
+
+    /// <summary>Returns a localized string for the given Vikram Samvat year value.</summary>
+    public abstract string FormatVikramSamvatYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Vikram Samvat calendar.</summary>
+    public abstract string FormatVikramSamvatDay(int day);
+
+    /// <summary>
+    /// Formats a full Vikram Samvat date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeVikramSamvatDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Mongolian Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Mongolian calendar system.
+    /// </summary>
+    public abstract string CalendarMongolianName { get; }
+
+    /// <summary>Returns a localized string for the given Mongolian year value.</summary>
+    public abstract string FormatMongolianYear(int year);
+
+    /// <summary>Returns a localized string for the given month value in the Mongolian calendar.</summary>
+    public abstract string FormatMongolianMonth(int month);
+
+    /// <summary>Returns a localized string for the given day value in the Mongolian calendar.</summary>
+    public abstract string FormatMongolianDay(int day);
+
+    /// <summary>
+    /// Formats a full Mongolian date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeMongolianDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Javanese Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Javanese calendar system.
+    /// </summary>
+    public abstract string CalendarJavaneseName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–12) in the Javanese calendar.
+    /// </summary>
+    public abstract string? GetJavaneseMonthName(int month);
+
+    /// <summary>Returns a localized string for the given Javanese year value.</summary>
+    public abstract string FormatJavaneseYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Javanese calendar.</summary>
+    public abstract string FormatJavaneseDay(int day);
+
+    /// <summary>
+    /// Formats a full Javanese date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeJavaneseDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Tibetan Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Tibetan calendar system.
+    /// </summary>
+    public abstract string CalendarTibetanName { get; }
+
+    /// <summary>Returns a localized string for the given Tibetan year value.</summary>
+    public abstract string FormatTibetanYear(int year);
+
+    /// <summary>Returns a localized string for the given month value in the Tibetan calendar.</summary>
+    public abstract string FormatTibetanMonth(int month);
+
+    /// <summary>Returns a localized string for the given day value in the Tibetan calendar.</summary>
+    public abstract string FormatTibetanDay(int day);
+
+    /// <summary>
+    /// Formats a full Tibetan date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeTibetanDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Mayan Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Mayan Long Count calendar system.
+    /// </summary>
+    public abstract string CalendarMayanName { get; }
+
+    /// <summary>Gets the localized label for the Baktun component.</summary>
+    public abstract string CalendarMayanBaktun { get; }
+
+    /// <summary>Gets the localized label for the Katun component.</summary>
+    public abstract string CalendarMayanKatun { get; }
+
+    /// <summary>Gets the localized label for the Tun component.</summary>
+    public abstract string CalendarMayanTun { get; }
+
+    /// <summary>Gets the localized label for the Uinal component.</summary>
+    public abstract string CalendarMayanUinal { get; }
+
+    /// <summary>Gets the localized label for the Kin component.</summary>
+    public abstract string CalendarMayanKin { get; }
+
+    /// <summary>
+    /// Formats a full Mayan date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeMayanDate(int baktun, int katun, int tun, int uinal, int kin, int hour, int minute, int second);
+
+    // ===== Inuit Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Inuit traditional calendar system.
+    /// </summary>
+    public abstract string CalendarInuitName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–13) in the Inuit calendar.
+    /// </summary>
+    public abstract string? GetInuitMonthName(int month);
+
+    /// <summary>Returns a localized string for the given Inuit year value.</summary>
+    public abstract string FormatInuitYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Inuit calendar.</summary>
+    public abstract string FormatInuitDay(int day);
+
+    /// <summary>
+    /// Formats a full Inuit date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeInuitDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Roman Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Roman calendar system.
+    /// </summary>
+    public abstract string CalendarRomanName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–12) in the Roman calendar.
+    /// </summary>
+    public abstract string? GetRomanMonthName(int month);
+
+    /// <summary>Returns a localized string for the given Roman year value (Julian year, displayed as AUC).</summary>
+    public abstract string FormatRomanYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Roman calendar.</summary>
+    public abstract string FormatRomanDay(int day);
+
+    /// <summary>
+    /// Formats a full Roman date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeRomanDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Chinese Lunar Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Chinese Lunar calendar system.
+    /// </summary>
+    public abstract string CalendarChineseLunarName { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–12) in the Chinese Lunar calendar.
+    /// </summary>
+    public abstract string? GetChineseLunarMonthName(int month);
+
+    /// <summary>
+    /// Gets the localized day name for the given day number (1–30) in the Chinese Lunar calendar.
+    /// </summary>
+    public abstract string? GetChineseLunarDayName(int day);
+
+    /// <summary>Gets the localized leap month prefix (e.g. "闰" / "閏").</summary>
+    public abstract string ChineseLunarLeapPrefix { get; }
+
+    /// <summary>Gets the localized label for the leap month indicator component.</summary>
+    public abstract string CalendarComponentIsLeap { get; }
+
+    /// <summary>Returns a localized string for the given Chinese Lunar year value.</summary>
+    public abstract string FormatChineseLunarYear(int year);
+
+    /// <summary>
+    /// Formats a full Chinese Lunar date-time into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeChineseLunarDate(int year, int month, int day, bool isLeap, int hour, int minute, int second);
+
+    // ===== Vietnamese Calendar =====
+
+    /// <summary>Gets the display name of the Vietnamese Lunar calendar system.</summary>
+    public abstract string CalendarVietnameseName { get; }
+
+    /// <summary>Gets the localized month name for the given month number (1–12) in the Vietnamese calendar.</summary>
+    public abstract string? GetVietnameseMonthName(int month);
+
+    /// <summary>Gets the localized zodiac name for the given zodiac index (0–11).</summary>
+    public abstract string? GetVietnameseZodiacName(int index);
+
+    /// <summary>Gets the localized leap month prefix.</summary>
+    public abstract string VietnameseLeapPrefix { get; }
+
+    /// <summary>Gets the localized label for the zodiac component.</summary>
+    public abstract string CalendarComponentZodiac { get; }
+
+    /// <summary>Returns a localized string for the given Vietnamese year value.</summary>
+    public abstract string FormatVietnameseYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Vietnamese calendar.</summary>
+    public abstract string FormatVietnameseDay(int day);
+
+    /// <summary>Formats a full Vietnamese date-time into a localized human-readable string.</summary>
+    public abstract string LocalizeVietnameseDate(int year, int month, int day, bool isLeap, int zodiac, int hour, int minute, int second);
+
+    // ===== Japanese Calendar =====
+
+    /// <summary>Gets the display name of the Japanese era (Nengo) calendar system.</summary>
+    public abstract string CalendarJapaneseName { get; }
+
+    /// <summary>Gets the localized era name for the given era index.</summary>
+    public abstract string? GetJapaneseEraName(int eraIndex);
+
+    /// <summary>Gets the localized label for the era component.</summary>
+    public abstract string CalendarComponentEra { get; }
+
+    /// <summary>Returns a localized string for the given Japanese year-within-era value.</summary>
+    public abstract string FormatJapaneseYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Japanese calendar.</summary>
+    public abstract string FormatJapaneseDay(int day);
+
+    /// <summary>Formats a full Japanese date-time into a localized human-readable string.</summary>
+    public abstract string LocalizeJapaneseDate(int eraIndex, int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Yi Calendar (彝历) =====
+
+    /// <summary>Gets the display name of the Yi ethnic solar calendar system.</summary>
+    public abstract string CalendarYiName { get; }
+
+    /// <summary>Gets the localized label for the Yi season component (五季).</summary>
+    public abstract string CalendarComponentYiSeason { get; }
+
+    /// <summary>Gets the localized label for the Yi xun (旬) component.</summary>
+    public abstract string CalendarComponentYiXun { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given internal month number.
+    /// 0 = New Year (大年), 1–10 = regular months, 11 = Mid-Year (小年).
+    /// </summary>
+    public abstract string? GetYiMonthName(int month);
+
+    /// <summary>Gets the localized season name for the given season index (0–4: 木火土金水).</summary>
+    public abstract string? GetYiSeasonName(int seasonIndex);
+
+    /// <summary>Gets the localized xun name for the given xun index (0=上旬, 1=中旬, 2=下旬).</summary>
+    public abstract string? GetYiXunName(int xunIndex);
+
+    /// <summary>Gets the localized day-animal name for the given animal index (0–11).</summary>
+    public abstract string? GetYiDayAnimalName(int animalIndex);
+
+    /// <summary>Returns a localized string for the given Yi year value.</summary>
+    public abstract string FormatYiYear(int year);
+
+    /// <summary>Returns a localized string for the given day value in the Yi calendar (1–36).</summary>
+    public abstract string FormatYiDay(int day);
+
+    /// <summary>Formats a full Yi date-time into a localized human-readable string.</summary>
+    public abstract string LocalizeYiDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Sexagenary Calendar =====
+
+    /// <summary>Gets the display name of the Chinese Sexagenary Cycle calendar system.</summary>
+    public abstract string CalendarSexagenaryName { get; }
+
+    /// <summary>Gets the localized label for the year stem component.</summary>
+    public abstract string CalendarComponentYearStem { get; }
+
+    /// <summary>Gets the localized label for the year branch component.</summary>
+    public abstract string CalendarComponentYearBranch { get; }
+
+    /// <summary>Gets the localized label for the month stem component.</summary>
+    public abstract string CalendarComponentMonthStem { get; }
+
+    /// <summary>Gets the localized label for the month branch component.</summary>
+    public abstract string CalendarComponentMonthBranch { get; }
+
+    /// <summary>Gets the localized label for the day stem component.</summary>
+    public abstract string CalendarComponentDayStem { get; }
+
+    /// <summary>Gets the localized label for the day branch component.</summary>
+    public abstract string CalendarComponentDayBranch { get; }
+
+    /// <summary>Gets the localized stem name for the given index (0–9).</summary>
+    public abstract string? GetSexagenaryStemName(int index);
+
+    /// <summary>Gets the localized branch name for the given index (0–11).</summary>
+    public abstract string? GetSexagenaryBranchName(int index);
+
+    /// <summary>Gets the localized zodiac name for the given branch index (0–11).</summary>
+    public abstract string? GetSexagenaryZodiacName(int index);
+
+    /// <summary>Formats a full Sexagenary date-time into a localized human-readable string.</summary>
+    public abstract string LocalizeSexagenaryDate(int yearStem, int yearBranch, int monthStem, int monthBranch, int dayStem, int dayBranch, int hour, int minute, int second);
+
+    // ── Dai Calendar (Xishuangbanna / 西双版纳小傣历) ─────────────────────────
+
+    /// <summary>Gets the display name of the Xishuangbanna Dai calendar system.</summary>
+    public abstract string CalendarDaiName { get; }
+
+    /// <summary>Gets the localized month name for the Dai calendar (1–12, or 13 for leap month 9).</summary>
+    public abstract string? GetDaiMonthName(int month);
+
+    /// <summary>Formats a Dai calendar year as a localized string.</summary>
+    public abstract string FormatDaiYear(int year);
+
+    /// <summary>Formats a Dai calendar day as a localized string.</summary>
+    public abstract string FormatDaiDay(int day);
+
+    /// <summary>Formats a full Dai calendar date-time into a localized human-readable string.</summary>
+    public abstract string LocalizeDaiDate(int year, int month, int day, bool isLeap, int hour, int minute, int second);
+
+    // ── Dehong Dai Calendar (德宏大傣历) ──────────────────────────────────────
+
+    /// <summary>Gets the display name of the Dehong Dai calendar system.</summary>
+    public abstract string CalendarDehongDaiName { get; }
+
+    /// <summary>Gets the localized month name for the Dehong Dai calendar (1–12, or 13 for leap month 9).</summary>
+    public abstract string? GetDehongDaiMonthName(int month);
+
+    /// <summary>Formats a Dehong Dai calendar year as a localized string.</summary>
+    public abstract string FormatDehongDaiYear(int year);
+
+    /// <summary>Formats a Dehong Dai calendar day as a localized string.</summary>
+    public abstract string FormatDehongDaiDay(int day);
+
+    /// <summary>Formats a full Dehong Dai calendar date-time into a localized human-readable string.</summary>
+    public abstract string LocalizeDehongDaiDate(int year, int month, int day, bool isLeap, int hour, int minute, int second);
 }

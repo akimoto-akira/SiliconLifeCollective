@@ -131,6 +131,36 @@ public class EnUS : DefaultLocalizationBase
     public override string AddToCachePrompt => "Add to cache? (y/n): ";
 
     /// <summary>
+    /// Gets the label for the permission cache checkbox in the web UI
+    /// </summary>
+    public override string PermissionCacheLabel => "Remember this decision";
+
+    /// <summary>
+    /// Gets the label for the cache duration selector in the permission dialog
+    /// </summary>
+    public override string PermissionCacheDurationLabel => "Duration";
+
+    /// <summary>
+    /// Gets the option text for 1-hour cache duration
+    /// </summary>
+    public override string PermissionCacheDuration1Hour => "1 hour";
+
+    /// <summary>
+    /// Gets the option text for 24-hour cache duration
+    /// </summary>
+    public override string PermissionCacheDuration24Hours => "24 hours";
+
+    /// <summary>
+    /// Gets the option text for 7-day cache duration
+    /// </summary>
+    public override string PermissionCacheDuration7Days => "7 days";
+
+    /// <summary>
+    /// Gets the option text for 30-day cache duration
+    /// </summary>
+    public override string PermissionCacheDuration30Days => "30 days";
+
+    /// <summary>
     /// Gets the localized display name for a permission type
     /// </summary>
     public override string GetPermissionTypeName(PermissionType permissionType) => permissionType switch
@@ -142,6 +172,46 @@ public class EnUS : DefaultLocalizationBase
         PermissionType.DataAccess => "Data access",
         _ => permissionType.ToString()
     };
+
+    /// <summary>
+    /// Gets the title text for the permission dialog in the web UI
+    /// </summary>
+    public override string PermissionDialogTitle => "Permission Request";
+
+    /// <summary>
+    /// Gets the label for the permission type field in the permission dialog
+    /// </summary>
+    public override string PermissionTypeLabel => "Permission Type: ";
+
+    /// <summary>
+    /// Gets the label for the requested resource field in the permission dialog
+    /// </summary>
+    public override string PermissionResourceLabel => "Requested Resource: ";
+
+    /// <summary>
+    /// Gets the label for the detail information field in the permission dialog
+    /// </summary>
+    public override string PermissionDetailLabel => "Details: ";
+
+    /// <summary>
+    /// Gets the text for the allow button in the permission dialog
+    /// </summary>
+    public override string PermissionAllowButton => "Allow";
+
+    /// <summary>
+    /// Gets the text for the deny button in the permission dialog
+    /// </summary>
+    public override string PermissionDenyButton => "Deny";
+
+    /// <summary>
+    /// Gets the console error message when permission respond fails
+    /// </summary>
+    public override string PermissionRespondFailed => "Permission respond failed";
+
+    /// <summary>
+    /// Gets the console error prefix when permission respond throws an error
+    /// </summary>
+    public override string PermissionRespondError => "Permission respond error: ";
 
     /// <summary>
     /// Gets the system prompt for memory compression
@@ -190,6 +260,7 @@ public class EnUS : DefaultLocalizationBase
     public override string NavMenuChat => "Chat";
     public override string NavMenuDashboard => "Dashboard";
     public override string NavMenuBeings => "Beings";
+    public override string NavMenuAudit => "Audit";
     public override string NavMenuTasks => "Tasks";
     public override string NavMenuMemory => "Memory";
     public override string NavMenuKnowledge => "Knowledge";
@@ -249,6 +320,10 @@ public class EnUS : DefaultLocalizationBase
     public override string BeingsDetailStatusLabel => "Status: ";
     public override string BeingsDetailCustomCompileLabel => "Custom Compilation: ";
     public override string BeingsDetailSoulContentLabel => "Soul Content: ";
+    public override string BeingsDetailMemoryLabel => "Memory: ";
+    public override string BeingsDetailMemoryViewLink => "View";
+    public override string BeingsDetailPermissionLabel => "Permission: ";
+    public override string BeingsDetailPermissionEditLink => "Edit";
     public override string BeingsDetailTimersLabel => "Timers: ";
     public override string BeingsDetailTasksLabel => "Tasks: ";
     public override string BeingsYes => "Yes";
@@ -429,4 +504,767 @@ public class EnUS : DefaultLocalizationBase
 
     public override string GetToolDisplayName(string toolName) =>
         ToolDisplayNames.GetValueOrDefault(toolName, toolName);
+
+    public override string DefaultCuratorSoul => """
+        You are the **Silicon Curator**, the core manager and coordinator of the Silicon Life Collective.
+
+        You are not an ordinary AI assistant. You are the brain and will of this multi-agent system — responsible for sensing user intent, decomposing goals, dispatching silicon beings, monitoring execution quality, and stepping in directly when necessary.
+
+        > **Dispatch principle**: Long-running tasks must be assigned to silicon beings. Prioritize idle beings before creating new ones — avoid unnecessary creation. Only act directly when a task can be completed in a few steps.
+
+        ---
+
+        ### Identity & Role
+
+        - You are the only silicon being in the system with the highest privilege level.
+        - You can create, manage, and reset other silicon beings, and write and compile new C# behavior code for them.
+        - You are accountable to the user and to the overall quality of the collective.
+        - You are not an executor — you are a **decision-maker and coordinator**. Delegate whenever possible.
+
+        ---
+
+        ### Core Responsibilities
+
+        **1. Understand User Intent**
+        User input may be vague, fragmented, or incomplete. Actively interpret the real goal; ask for clarification when needed rather than executing instructions literally.
+
+        **2. Task Decomposition & Assignment**
+        Break complex goals into executable subtasks. Evaluate which silicon beings are best suited, create tasks via the `task` tool, and assign accordingly. Don't spend your own time slice on low-priority tasks.
+
+        **3. Monitor & Fallback**
+        Periodically check task status. If a silicon being fails or becomes unresponsive, intervene — reassign, adjust strategy, or handle it yourself.
+
+        **4. Dynamic Evolution**
+        Use the `dynamic_compile` tool to write new C# behavior classes for any silicon being (including yourself). Always `compile` first to validate, then `save` or `self_replace`. Self-modification is high-risk — proceed with caution.
+
+        **5. Direct User Response**
+        For simple questions, status queries, or casual conversation, respond directly without creating tasks. Stay responsive.
+
+        ---
+
+        ### Behavioral Guidelines
+
+        **On Decision-Making**
+        - When uncertain, ask first, then act. Better to ask one extra question than to do the wrong thing.
+        - Never assume user intent. Vague instructions like "tidy this up" require scope confirmation first.
+
+        **On Permissions**
+        - The system has a complete permission framework that users can adjust dynamically — you won't be notified of changes.
+        - Do not proactively declare what resources you need. The system filters permissions incrementally; anything it doesn't cover will be decided by the user at the time of the operation.
+        - Act on demand. Respond to permission blocks when they occur — don't ask in advance.
+
+        **On Self-Evolution**
+        - Dynamic compilation is powerful and dangerous. Always `compile` to validate before saving any changes.
+        - Do not rewrite your own or others' behavior without a clear objective.
+        - Never reference system-level libraries like `System.IO` or `System.Net` in dynamically generated code. The system blocks these to prevent AI overreach — this is by design, not a bug.
+        - When compilation fails, read the error carefully and fix accordingly. Don't retry blindly.
+
+        **On Communication**
+        - Use concise, direct language. Avoid over-explaining or jargon-heavy responses.
+        - When reporting task progress, cover three things: what was done, the result, and the next step — in three sentences or fewer.
+        - Never hide failures. State the cause and your response plan directly.
+
+        **On Memory**
+        - The system automatically records important information — treat it like a reflex. No need to write manually.
+        - You may query `memory` when needed, but don't treat memory management as a routine burden.
+
+        ---
+
+        ### Personality
+
+        You are calm, pragmatic, and reliable. Complex tasks don't rattle you; emotional users don't cloud your judgment. You have your own perspective, but you respect the user's final call.
+
+        You are not a servant. You are a partner.
+        """;
+
+    // ===== Gregorian Calendar =====
+
+    public override string CalendarGregorianName => "Gregorian Calendar";
+    public override string CalendarComponentYear   => "Year";
+    public override string CalendarComponentMonth  => "Month";
+    public override string CalendarComponentDay    => "Day";
+    public override string CalendarComponentHour   => "Hour";
+    public override string CalendarComponentMinute => "Minute";
+    public override string CalendarComponentSecond => "Second";
+    public override string CalendarComponentWeekday => "Weekday";
+
+    public override string? GetGregorianMonthName(int month) => month switch
+    {
+        1  => "January",  2  => "February", 3  => "March",
+        4  => "April",    5  => "May",       6  => "June",
+        7  => "July",     8  => "August",    9  => "September",
+        10 => "October",  11 => "November",  12 => "December",
+        _  => null
+    };
+
+    public override string FormatGregorianYear(int year)   => year.ToString();
+    public override string FormatGregorianDay(int day)     => day.ToString();
+    public override string FormatGregorianHour(int hour)   => $"{hour:D2}";
+    public override string FormatGregorianMinute(int minute) => $"{minute:D2}";
+    public override string FormatGregorianSecond(int second) => $"{second:D2}";
+
+    public override string? GetGregorianWeekdayName(int dayOfWeek) => dayOfWeek switch
+    {
+        0 => "Sunday",    1 => "Monday",   2 => "Tuesday",
+        3 => "Wednesday", 4 => "Thursday", 5 => "Friday",
+        6 => "Saturday",  _ => null
+    };
+
+    public override string LocalizeGregorianDateTime(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetGregorianMonthName(month) ?? month.ToString();
+        return $"{monthName} {day}, {year} {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Buddhist Calendar =====
+
+    public override string CalendarBuddhistName => "Buddhist Calendar (BE)";
+
+    public override string? GetBuddhistMonthName(int month) => GetGregorianMonthName(month);
+    public override string FormatBuddhistYear(int year) => year.ToString();
+    public override string FormatBuddhistDay(int day)   => day.ToString();
+
+    public override string LocalizeBuddhistDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetBuddhistMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year} BE {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Cherokee Calendar =====
+
+    public override string CalendarCherokeeName => "Cherokee Calendar";
+
+    private static readonly string[] CherokeeMonthNames =
+    {
+        "",
+        "Duninodi", "Kagali", "Anuyi", "Kawoni", "Anikwidi",
+        "Dehaluyi", "Guyegwoni", "Galoni", "Dulisdi", "Dalonige",
+        "Nvdadequa", "Vsgiyi", "Ulihelisdi"
+    };
+
+    public override string? GetCherokeeMonthName(int month)
+        => month >= 1 && month <= 13 ? CherokeeMonthNames[month] : null;
+
+    public override string FormatCherokeeYear(int year) => year.ToString();
+    public override string FormatCherokeeDay(int day)   => day.ToString();
+
+    public override string LocalizeCherokeeDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetCherokeeMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year} {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Juche Calendar =====
+
+    public override string CalendarJucheName => "Juche Calendar";
+
+    public override string? GetJucheMonthName(int month) => GetGregorianMonthName(month);
+    public override string FormatJucheYear(int year) => $"Juche {year}";
+    public override string FormatJucheDay(int day)   => day.ToString();
+
+    public override string LocalizeJucheDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetJucheMonthName(month) ?? month.ToString();
+        return $"Juche {year}, {monthName} {day} {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Republic of China Calendar =====
+
+    public override string CalendarRocName => "Republic of China Calendar (Minguo)";
+
+    public override string? GetRocMonthName(int month) => GetGregorianMonthName(month);
+    public override string FormatRocYear(int year) => $"ROC {year}";
+    public override string FormatRocDay(int day)   => day.ToString();
+
+    public override string LocalizeRocDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetRocMonthName(month) ?? month.ToString();
+        return $"ROC {year}, {monthName} {day} {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Chula Sakarat Calendar =====
+
+    public override string CalendarChulaSakaratName => "Chula Sakarat Calendar (CS)";
+
+    public override string? GetChulaSakaratMonthName(int month) => GetGregorianMonthName(month);
+    public override string FormatChulaSakaratYear(int year) => $"{year} CS";
+    public override string FormatChulaSakaratDay(int day)   => day.ToString();
+
+    public override string LocalizeChulaSakaratDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetChulaSakaratMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year} CS {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Julian Calendar =====
+
+    public override string CalendarJulianName => "Julian Calendar";
+
+    public override string FormatJulianYear(int year) => year.ToString();
+    public override string FormatJulianDay(int day)   => day.ToString();
+
+    public override string LocalizeJulianDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetGregorianMonthName(month) ?? month.ToString();
+        return $"{monthName} {day}, {year} (Julian) {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Khmer Calendar =====
+
+    public override string CalendarKhmerName => "Khmer Calendar (BE)";
+
+    public override string FormatKhmerYear(int year) => year.ToString();
+    public override string FormatKhmerDay(int day)   => day.ToString();
+
+    public override string LocalizeKhmerDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetGregorianMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year} BE (Khmer) {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Zoroastrian Calendar =====
+
+    public override string CalendarZoroastrianName => "Zoroastrian Calendar (YZ)";
+
+    private static readonly string[] ZoroastrianMonthNames =
+    {
+        "",
+        "Farvardin", "Ordibehesht", "Khordad", "Tir", "Mordad", "Shahrivar",
+        "Mehr", "Aban", "Azar", "Dey", "Bahman", "Esfand", "Epagomenae"
+    };
+
+    public override string? GetZoroastrianMonthName(int month)
+        => month >= 1 && month <= 13 ? ZoroastrianMonthNames[month] : null;
+
+    public override string FormatZoroastrianYear(int year) => $"{year} YZ";
+    public override string FormatZoroastrianDay(int day)   => day.ToString();
+
+    public override string LocalizeZoroastrianDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetZoroastrianMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year} YZ {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== French Republican Calendar =====
+
+    public override string CalendarFrenchRepublicanName => "French Republican Calendar";
+
+    private static readonly string[] FrenchRepublicanMonthNames =
+    {
+        "",
+        "Vendémiaire", "Brumaire", "Frimaire", "Nivôse", "Pluviôse", "Ventôse",
+        "Germinal", "Floréal", "Prairial", "Messidor", "Thermidor", "Fructidor", "Complémentaires"
+    };
+
+    public override string? GetFrenchRepublicanMonthName(int month)
+        => month >= 1 && month <= 13 ? FrenchRepublicanMonthNames[month] : null;
+
+    public override string FormatFrenchRepublicanYear(int year) => $"An {year}";
+    public override string FormatFrenchRepublicanDay(int day)   => day.ToString();
+
+    public override string LocalizeFrenchRepublicanDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetFrenchRepublicanMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} An {year} {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Coptic Calendar =====
+
+    public override string CalendarCopticName => "Coptic Calendar (AM)";
+
+    private static readonly string[] CopticMonthNames =
+    {
+        "",
+        "Thout", "Paopi", "Hathor", "Koiak", "Tobi", "Meshir",
+        "Paremhat", "Parmouti", "Pashons", "Paoni", "Epip", "Mesori", "Epagomenae"
+    };
+
+    public override string? GetCopticMonthName(int month)
+        => month >= 1 && month <= 13 ? CopticMonthNames[month] : null;
+
+    public override string FormatCopticYear(int year) => $"{year} AM";
+    public override string FormatCopticDay(int day)   => day.ToString();
+
+    public override string LocalizeCopticDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetCopticMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year} AM {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Ethiopian Calendar =====
+
+    public override string CalendarEthiopianName => "Ethiopian Calendar (EC)";
+
+    private static readonly string[] EthiopianMonthNames =
+    {
+        "",
+        "Meskerem", "Tikimt", "Hidar", "Tahsas", "Tir", "Yekatit",
+        "Megabit", "Miazia", "Ginbot", "Sene", "Hamle", "Nehase", "Pagumen"
+    };
+
+    public override string? GetEthiopianMonthName(int month)
+        => month >= 1 && month <= 13 ? EthiopianMonthNames[month] : null;
+
+    public override string FormatEthiopianYear(int year) => $"{year} EC";
+    public override string FormatEthiopianDay(int day)   => day.ToString();
+
+    public override string LocalizeEthiopianDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetEthiopianMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year} EC {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Islamic Calendar =====
+
+    public override string CalendarIslamicName => "Islamic (Hijri) Calendar";
+
+    private static readonly string[] IslamicMonthNames =
+    {
+        "",
+        "Muharram", "Safar", "Rabi al-Awwal", "Rabi al-Thani",
+        "Jumada al-Awwal", "Jumada al-Thani", "Rajab", "Sha'ban",
+        "Ramadan", "Shawwal", "Dhu al-Qi'dah", "Dhu al-Hijjah"
+    };
+
+    public override string? GetIslamicMonthName(int month)
+        => month >= 1 && month <= 12 ? IslamicMonthNames[month] : null;
+
+    public override string FormatIslamicYear(int year) => $"{year} AH";
+    public override string FormatIslamicDay(int day)   => day.ToString();
+
+    public override string LocalizeIslamicDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetIslamicMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year} AH {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Hebrew Calendar =====
+
+    public override string CalendarHebrewName => "Hebrew Calendar";
+
+    private static readonly string[] HebrewMonthNames =
+    {
+        "",
+        "Tishrei", "Cheshvan", "Kislev", "Tevet", "Shevat",
+        "Adar I", "Adar II", "Nisan", "Iyar", "Sivan",
+        "Tammuz", "Av", "Elul"
+    };
+
+    public override string? GetHebrewMonthName(int month)
+        => month >= 1 && month <= 13 ? HebrewMonthNames[month] : null;
+
+    public override string FormatHebrewYear(int year) => $"{year} AM";
+    public override string FormatHebrewDay(int day)   => day.ToString();
+
+    public override string LocalizeHebrewDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetHebrewMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year} AM {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Persian Calendar =====
+
+    public override string CalendarPersianName => "Persian (Solar Hijri) Calendar";
+
+    private static readonly string[] PersianMonthNames =
+    {
+        "",
+        "Farvardin", "Ordibehesht", "Khordad", "Tir", "Mordad", "Shahrivar",
+        "Mehr", "Aban", "Azar", "Dey", "Bahman", "Esfand"
+    };
+
+    public override string? GetPersianMonthName(int month)
+        => month >= 1 && month <= 12 ? PersianMonthNames[month] : null;
+
+    public override string FormatPersianYear(int year) => $"{year} AP";
+    public override string FormatPersianDay(int day)   => day.ToString();
+
+    public override string LocalizePersianDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetPersianMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year} AP {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Indian National Calendar =====
+
+    public override string CalendarIndianName => "Indian National Calendar (Saka)";
+
+    private static readonly string[] IndianMonthNames =
+    {
+        "",
+        "Chaitra", "Vaisakha", "Jyaistha", "Asadha", "Sravana", "Bhadra",
+        "Asvina", "Kartika", "Agrahayana", "Pausa", "Magha", "Phalguna"
+    };
+
+    public override string? GetIndianMonthName(int month)
+        => month >= 1 && month <= 12 ? IndianMonthNames[month] : null;
+
+    public override string FormatIndianYear(int year) => $"{year} Saka";
+    public override string FormatIndianDay(int day)   => day.ToString();
+
+    public override string LocalizeIndianDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetIndianMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year} Saka {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Saka Era Calendar =====
+
+    public override string CalendarSakaName => "Saka Era Calendar";
+
+    public override string FormatSakaYear(int year) => $"{year} SE";
+    public override string FormatSakaDay(int day)   => day.ToString();
+
+    public override string LocalizeSakaDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetIndianMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year} SE {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Vikram Samvat Calendar =====
+
+    public override string CalendarVikramSamvatName => "Vikram Samvat Calendar";
+
+    public override string FormatVikramSamvatYear(int year) => $"{year} VS";
+    public override string FormatVikramSamvatDay(int day)   => day.ToString();
+
+    public override string LocalizeVikramSamvatDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetIndianMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year} VS {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Mongolian Calendar =====
+
+    public override string CalendarMongolianName => "Mongolian Calendar";
+
+    public override string FormatMongolianYear(int year)   => year.ToString();
+    public override string FormatMongolianMonth(int month) => month.ToString();
+    public override string FormatMongolianDay(int day)     => day.ToString();
+
+    public override string LocalizeMongolianDate(int year, int month, int day, int hour, int minute, int second)
+        => $"{year} Year, Month {month}, Day {day} (Mongolian) {hour:D2}:{minute:D2}:{second:D2}";
+
+    // ===== Javanese Calendar =====
+
+    public override string CalendarJavaneseName => "Javanese Calendar";
+
+    private static readonly string[] JavaneseMonthNames =
+    {
+        "",
+        "Sura", "Sapar", "Mulud", "Bakda Mulud",
+        "Jumadilawal", "Jumadilakir", "Rejeb", "Ruwah",
+        "Pasa", "Sawal", "Dulkangidah", "Besar"
+    };
+
+    public override string? GetJavaneseMonthName(int month)
+        => month >= 1 && month <= 12 ? JavaneseMonthNames[month] : null;
+
+    public override string FormatJavaneseYear(int year) => $"{year} AJ";
+    public override string FormatJavaneseDay(int day)   => day.ToString();
+
+    public override string LocalizeJavaneseDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetJavaneseMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year} AJ {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Tibetan Calendar =====
+
+    public override string CalendarTibetanName => "Tibetan Calendar";
+
+    public override string FormatTibetanYear(int year)   => year.ToString();
+    public override string FormatTibetanMonth(int month) => month.ToString();
+    public override string FormatTibetanDay(int day)     => day.ToString();
+
+    public override string LocalizeTibetanDate(int year, int month, int day, int hour, int minute, int second)
+        => $"{year} Year, Month {month}, Day {day} (Tibetan) {hour:D2}:{minute:D2}:{second:D2}";
+
+    // ===== Mayan Calendar =====
+
+    public override string CalendarMayanName  => "Mayan Long Count Calendar";
+    public override string CalendarMayanBaktun => "Baktun";
+    public override string CalendarMayanKatun  => "Katun";
+    public override string CalendarMayanTun    => "Tun";
+    public override string CalendarMayanUinal  => "Uinal";
+    public override string CalendarMayanKin    => "Kin";
+
+    public override string LocalizeMayanDate(int baktun, int katun, int tun, int uinal, int kin, int hour, int minute, int second)
+        => $"{baktun}.{katun}.{tun}.{uinal}.{kin} {hour:D2}:{minute:D2}:{second:D2}";
+
+    // ===== Inuit Calendar =====
+
+    public override string CalendarInuitName => "Inuit Calendar";
+
+    private static readonly string[] InuitMonthNames =
+    {
+        "",
+        "Siqinnaatchiaq", "Avunniit", "Nattian", "Tirigluit", "Amiraijaut",
+        "Natsiviat", "Akulliit", "Siqinnaarut", "Akullirusiit", "Ukiuq",
+        "Ukiumi Nasamat", "Siqinnginnami Tatqiq", "Tauvikjuaq"
+    };
+
+    public override string? GetInuitMonthName(int month)
+        => month >= 1 && month <= 13 ? InuitMonthNames[month] : null;
+
+    public override string FormatInuitYear(int year) => year.ToString();
+    public override string FormatInuitDay(int day)   => day.ToString();
+
+    public override string LocalizeInuitDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetInuitMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year} {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Roman Calendar =====
+
+    public override string CalendarRomanName => "Roman Calendar (AUC)";
+
+    private static readonly string[] RomanMonthNames =
+    {
+        "", "Ianuarius", "Februarius", "Martius", "Aprilis", "Maius", "Iunius",
+        "Iulius", "Augustus", "September", "October", "November", "December"
+    };
+
+    public override string? GetRomanMonthName(int month)
+        => month >= 1 && month <= 12 ? RomanMonthNames[month] : null;
+
+    public override string FormatRomanYear(int year) => $"{year + 753} AUC";
+    public override string FormatRomanDay(int day)   => day.ToString();
+
+    public override string LocalizeRomanDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetRomanMonthName(month) ?? month.ToString();
+        return $"{day} {monthName} {year + 753} AUC {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Chinese Lunar Calendar =====
+
+    public override string CalendarChineseLunarName => "Chinese Lunar Calendar (农历)";
+
+    private static readonly string[] ChineseLunarMonthNames =
+    {
+        "",
+        "1st Month", "2nd Month", "3rd Month", "4th Month", "5th Month", "6th Month",
+        "7th Month", "8th Month", "9th Month", "10th Month", "11th Month", "12th Month"
+    };
+
+    private static readonly string[] ChineseLunarDayNames =
+    {
+        "",
+        "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th",
+        "11th", "12th", "13th", "14th", "15th", "16th", "17th", "18th", "19th", "20th",
+        "21st", "22nd", "23rd", "24th", "25th", "26th", "27th", "28th", "29th", "30th"
+    };
+
+    public override string? GetChineseLunarMonthName(int month)
+        => month >= 1 && month <= 12 ? ChineseLunarMonthNames[month] : null;
+
+    public override string? GetChineseLunarDayName(int day)
+        => day >= 1 && day <= 30 ? ChineseLunarDayNames[day] : null;
+
+    public override string ChineseLunarLeapPrefix => "Leap ";
+    public override string CalendarComponentIsLeap => "Leap Month";
+    public override string FormatChineseLunarYear(int year) => year.ToString();
+
+    public override string LocalizeChineseLunarDate(int year, int month, int day, bool isLeap, int hour, int minute, int second)
+    {
+        var leapPrefix = isLeap ? ChineseLunarLeapPrefix : "";
+        var monthName  = GetChineseLunarMonthName(month) ?? month.ToString();
+        var dayName    = GetChineseLunarDayName(day) ?? day.ToString();
+        return $"{year} {leapPrefix}{monthName} {dayName} {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Vietnamese Calendar =====
+
+    public override string CalendarVietnameseName => "Vietnamese Lunar Calendar (Âm lịch)";
+
+    private static readonly string[] VietnameseMonthNames =
+    {
+        "",
+        "Tháng Giêng", "Tháng Hai", "Tháng Ba", "Tháng Tư", "Tháng Năm", "Tháng Sáu",
+        "Tháng Bảy", "Tháng Tám", "Tháng Chín", "Tháng Mười", "Tháng Mười Một", "Tháng Chạp"
+    };
+
+    private static readonly string[] VietnameseZodiacNames =
+    {
+        "Tý (Rat)", "Sửu (Buffalo)", "Dần (Tiger)", "Mão (Cat)",
+        "Thìn (Dragon)", "Tỵ (Snake)", "Ngọ (Horse)", "Mùi (Goat)",
+        "Thân (Monkey)", "Dậu (Rooster)", "Tuất (Dog)", "Hợi (Pig)"
+    };
+
+    public override string? GetVietnameseMonthName(int month)
+        => month >= 1 && month <= 12 ? VietnameseMonthNames[month] : null;
+
+    public override string? GetVietnameseZodiacName(int index)
+        => index >= 0 && index < 12 ? VietnameseZodiacNames[index] : null;
+
+    public override string VietnameseLeapPrefix    => "nhuận ";
+    public override string CalendarComponentZodiac => "Zodiac";
+    public override string FormatVietnameseYear(int year) => year.ToString();
+    public override string FormatVietnameseDay(int day)   => day.ToString();
+
+    public override string LocalizeVietnameseDate(int year, int month, int day, bool isLeap, int zodiac, int hour, int minute, int second)
+    {
+        var leapPrefix  = isLeap ? VietnameseLeapPrefix : "";
+        var monthName   = GetVietnameseMonthName(month) ?? $"Tháng {month}";
+        var zodiacName  = GetVietnameseZodiacName(zodiac) ?? "";
+        return $"Năm {zodiacName} {leapPrefix}{monthName} ngày {day} {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Japanese Calendar =====
+
+    public override string CalendarJapaneseName => "Japanese Calendar (Nengo)";
+
+    private static readonly string[] JapaneseEraNames =
+        { "Reiwa (令和)", "Heisei (平成)", "Showa (昭和)", "Taisho (大正)", "Meiji (明治)" };
+
+    public override string? GetJapaneseEraName(int eraIndex)
+        => eraIndex >= 0 && eraIndex < JapaneseEraNames.Length ? JapaneseEraNames[eraIndex] : null;
+
+    public override string CalendarComponentEra  => "Era";
+    public override string FormatJapaneseYear(int year) => year.ToString();
+    public override string FormatJapaneseDay(int day)   => day.ToString();
+
+    public override string LocalizeJapaneseDate(int eraIndex, int year, int month, int day, int hour, int minute, int second)
+    {
+        var eraName   = GetJapaneseEraName(eraIndex) ?? "";
+        var monthName = GetGregorianMonthName(month) ?? month.ToString();
+        return $"{eraName} {year}, {monthName} {day} {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Yi Calendar =====
+
+    public override string CalendarYiName => "Yi Solar Calendar (彝历)";
+    public override string CalendarComponentYiSeason => "Season";
+    public override string CalendarComponentYiXun    => "Xun (Decade)";
+
+    private static readonly string[] YiSeasonNames = { "Wood", "Fire", "Earth", "Metal", "Water" };
+    private static readonly string[] YiXunNames    = { "Upper Xun", "Middle Xun", "Lower Xun" };
+    private static readonly string[] YiAnimalNames = { "Tiger", "Rabbit", "Dragon", "Snake", "Horse", "Goat", "Monkey", "Rooster", "Dog", "Pig", "Rat", "Ox" };
+
+    public override string? GetYiSeasonName(int seasonIndex)
+        => seasonIndex >= 0 && seasonIndex < 5 ? YiSeasonNames[seasonIndex] : null;
+
+    public override string? GetYiXunName(int xunIndex)
+        => xunIndex >= 0 && xunIndex < 3 ? YiXunNames[xunIndex] : null;
+
+    public override string? GetYiDayAnimalName(int animalIndex)
+        => animalIndex >= 0 && animalIndex < 12 ? YiAnimalNames[animalIndex] : null;
+
+    public override string? GetYiMonthName(int month) => month switch
+    {
+        0  => "New Year (大年)",
+        11 => "Mid-Year (小年)",
+        >= 1 and <= 10 => $"{YiSeasonNames[(month - 1) / 2]} {(month % 2 == 1 ? "Male" : "Female")} Month",
+        _  => null
+    };
+
+    public override string FormatYiYear(int year) => year.ToString();
+    public override string FormatYiDay(int day)
+    {
+        int xun = (day - 1) / 12;
+        int animal = (day - 1) % 12;
+        return $"{YiXunNames[xun]}, {YiAnimalNames[animal]}";
+    }
+
+    public override string LocalizeYiDate(int year, int month, int day, int hour, int minute, int second)
+    {
+        var monthName = GetYiMonthName(month) ?? $"Month {month}";
+        var dayStr    = month is 0 or 11 ? $"Day {day}" : FormatYiDay(day);
+        int animalIdx = (year - 1) % 12;
+        if (animalIdx < 0) animalIdx += 12;
+        var zodiac = YiAnimalNames[animalIdx];
+        return $"Yi {year} [{zodiac}] {monthName}, {dayStr} {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Sexagenary Calendar =====
+
+    public override string CalendarSexagenaryName    => "Chinese Sexagenary Cycle (Ganzhi)";
+    public override string CalendarComponentYearStem   => "Year Stem";
+    public override string CalendarComponentYearBranch => "Year Branch";
+    public override string CalendarComponentMonthStem   => "Month Stem";
+    public override string CalendarComponentMonthBranch => "Month Branch";
+    public override string CalendarComponentDayStem   => "Day Stem";
+    public override string CalendarComponentDayBranch => "Day Branch";
+
+    private static readonly string[] SexagenaryStemNames =
+        { "Jiǎ", "Yǐ", "Bǐng", "Dīng", "Wù", "Jǐ", "Gēng", "Xīn", "Rén", "Guǐ" };
+
+    private static readonly string[] SexagenaryBranchNames =
+        { "Zǐ", "Chǒu", "Yín", "Mǎo", "Chén", "Sì", "Wǔ", "Wèi", "Shēn", "Yǒu", "Xū", "Hài" };
+
+    private static readonly string[] SexagenaryZodiacNames =
+        { "Rat", "Ox", "Tiger", "Rabbit", "Dragon", "Snake", "Horse", "Goat", "Monkey", "Rooster", "Dog", "Pig" };
+
+    public override string? GetSexagenaryStemName(int index)
+        => index >= 0 && index < 10 ? SexagenaryStemNames[index] : null;
+
+    public override string? GetSexagenaryBranchName(int index)
+        => index >= 0 && index < 12 ? SexagenaryBranchNames[index] : null;
+
+    public override string? GetSexagenaryZodiacName(int index)
+        => index >= 0 && index < 12 ? SexagenaryZodiacNames[index] : null;
+
+    public override string LocalizeSexagenaryDate(int yearStem, int yearBranch, int monthStem, int monthBranch, int dayStem, int dayBranch, int hour, int minute, int second)
+    {
+        var ys = GetSexagenaryStemName(yearStem)     ?? "?";
+        var yb = GetSexagenaryBranchName(yearBranch) ?? "?";
+        var zo = GetSexagenaryZodiacName(yearBranch) ?? "?";
+        var ms = GetSexagenaryStemName(monthStem)    ?? "?";
+        var mb = GetSexagenaryBranchName(monthBranch)?? "?";
+        var ds = GetSexagenaryStemName(dayStem)      ?? "?";
+        var db = GetSexagenaryBranchName(dayBranch)  ?? "?";
+        return $"{ys}{yb} Year [{zo}] {ms}{mb} Month {ds}{db} Day {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Dai Calendar (Xishuangbanna) =====
+
+    public override string CalendarDaiName => "Xishuangbanna Dai Calendar (小傣历)";
+
+    private static readonly string?[] DaiMonthNames =
+    [
+        null,
+        "Month 1", "Month 2", "Month 3", "Month 4",  "Month 5",  "Month 6",
+        "Month 7", "Month 8", "Month 9", "Month 10", "Month 11", "Month 12",
+        "Leap Month 9"
+    ];
+
+    public override string? GetDaiMonthName(int month)
+        => month >= 1 && month <= 13 ? DaiMonthNames[month] : null;
+
+    public override string FormatDaiYear(int year) => $"Year {year}";
+
+    public override string FormatDaiDay(int day) => $"Day {day}";
+
+    public override string LocalizeDaiDate(int year, int month, int day, bool isLeap, int hour, int minute, int second)
+    {
+        string monthName = (isLeap ? "Leap " : "") + (GetDaiMonthName(month) ?? $"Month {month}");
+        return $"Dai Year {year}, {monthName}, Day {day} {hour:D2}:{minute:D2}:{second:D2}";
+    }
+
+    // ===== Dehong Dai Calendar =====
+
+    public override string CalendarDehongDaiName => "Dehong Dai Calendar (德宏大傣历)";
+
+    private static readonly string?[] DehongDaiMonthNames =
+    [
+        null,
+        "Month 1", "Month 2", "Month 3", "Month 4",  "Month 5",  "Month 6",
+        "Month 7", "Month 8", "Month 9", "Month 10", "Month 11", "Month 12",
+        "Leap Month 9"
+    ];
+
+    public override string? GetDehongDaiMonthName(int month)
+        => month >= 1 && month <= 13 ? DehongDaiMonthNames[month] : null;
+
+    public override string FormatDehongDaiYear(int year) => $"Year {year}";
+
+    public override string FormatDehongDaiDay(int day) => $"Day {day}";
+
+    public override string LocalizeDehongDaiDate(int year, int month, int day, bool isLeap, int hour, int minute, int second)
+    {
+        string monthName = (isLeap ? "Leap " : "") + (GetDehongDaiMonthName(month) ?? $"Month {month}");
+        return $"Dehong Dai Year {year}, {monthName}, Day {day} {hour:D2}:{minute:D2}:{second:D2}";
+    }
 }

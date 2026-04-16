@@ -265,6 +265,14 @@ public class BeingView : ViewBase
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "taskCount"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a>"));
 
+        var memoryLink = Js.Str(() => "<a class='detail-link' href='#'>")
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.BeingsDetailMemoryViewLink))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a>"));
+
+        var permissionLink = Js.Str(() => "<a class='detail-link' href='#'>")
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.BeingsDetailPermissionEditLink))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a>"));
+
         return Js.Str(() => "<h2>")
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "name"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</h2><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailIdLabel}</span><span class=\"detail-value\">"))
@@ -277,6 +285,10 @@ public class BeingView : ViewBase
             .Op(() => "+", () => (JsSyntax)timerLink)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailTasksLabel}</span>"))
             .Op(() => "+", () => (JsSyntax)taskLink)
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailMemoryLabel}</span>"))
+            .Op(() => "+", () => (JsSyntax)memoryLink)
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailPermissionLabel}</span>"))
+            .Op(() => "+", () => (JsSyntax)permissionLink)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailSoulContentLabel}</span></div><div class=\"detail-row\">"))
             .Op(() => "+", () => (JsSyntax)soulHtml)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"));

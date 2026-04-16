@@ -248,8 +248,29 @@ public class OllamaClient : IAIClient
     {
         List<OllamaMessage> result = new();
 
+        List<string> systemContents = new();
         foreach (ChatMessage msg in messages)
         {
+            if (msg.Role == MessageRole.System)
+            {
+                systemContents.Add(msg.Content);
+            }
+        }
+
+        if (systemContents.Count > 0)
+        {
+            result.Add(new OllamaMessage
+            {
+                Role = "system",
+                Content = string.Join("\n", systemContents)
+            });
+        }
+
+        foreach (ChatMessage msg in messages)
+        {
+            if (msg.Role == MessageRole.System)
+                continue;
+
             MessageRole role = msg.Role;
 
             OllamaMessage ollamaMsg = new OllamaMessage
@@ -259,7 +280,6 @@ public class OllamaClient : IAIClient
                 Thinking = msg.Thinking
             };
 
-            // Preserve tool_calls in assistant messages
             if (!string.IsNullOrEmpty(msg.ToolCallsJson))
             {
                 try
@@ -281,7 +301,6 @@ public class OllamaClient : IAIClient
                 catch { /* ignore deserialization errors */ }
             }
 
-            // Set tool_call_id for tool result messages
             if (role == MessageRole.Tool && !string.IsNullOrEmpty(msg.ToolCallId))
             {
                 ollamaMsg.ToolCallId = msg.ToolCallId;

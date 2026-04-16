@@ -154,7 +154,7 @@ public class PermissionManager
                 AskPermissionResult userDecision = _askHandler.AskUser(callerId, permissionType, resource);
 
                 PermissionResult userResult = userDecision.Allowed ? PermissionResult.Allowed : PermissionResult.Denied;
-                _frequencyCache.Record(permissionType, resource, userResult, userDecision.AddToCache);
+                _frequencyCache.Record(permissionType, resource, userResult, userDecision.AddToCache, userDecision.CacheDuration);
 
                 AuditLog(callerId, permissionType, resource, userResult, "User decision (curator)");
                 return userDecision.Allowed;

@@ -51,6 +51,12 @@ public class ServiceLocator
     /// <summary>Gets the registered <see cref="DynamicBeingLoader"/>, or <c>null</c>.</summary>
     public DynamicBeingLoader? DynamicBeingLoader => Get<DynamicBeingLoader>();
 
+    /// <summary>Gets the registered <see cref="ITokenUsageAudit"/>, or <c>null</c>.</summary>
+    public ITokenUsageAudit? TokenUsageAudit => Get<ITokenUsageAudit>();
+
+    /// <summary>Gets the registered <see cref="TokenUsageAuditManager"/>, or <c>null</c>.</summary>
+    public TokenUsageAuditManager? TokenUsageAuditManager => Get<TokenUsageAuditManager>();
+
     /// <summary>Gets the registered <typeparamref name="T"/> service, or <c>null</c>.</summary>
     public T? GetService<T>() where T : class => Get<T>();
 

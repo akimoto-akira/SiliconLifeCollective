@@ -221,7 +221,7 @@ public class ContextManager
         request.Messages.Add(new ChatMessage
         {
             Role = MessageRole.System,
-            Content = $"Your name: {_being.Name}\nCurrent time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\nSystem language: {language}",
+            Content = $"Your name: {_being.Name}\nYour GUID: {_being.Id}\nCurrent time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\nSystem language: {language}",
         });
 
         if (!string.IsNullOrEmpty(scenarioContext))
@@ -842,7 +842,10 @@ public class ContextManager
                 msg.ToolCallsJson,
                 msg.ToolCallId,
                 msg.Thinking,
-                _being.Name);
+                _being.Name,
+                msg.PromptTokens,
+                msg.CompletionTokens,
+                msg.TotalTokens);
         }
     }
 

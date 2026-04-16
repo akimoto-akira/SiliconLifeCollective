@@ -26,5 +26,10 @@ public enum Language
     /// <summary>
     /// English (United States)
     /// </summary>
-    EnUS
+    EnUS,
+
+    /// <summary>
+    /// Chinese (Traditional, Hong Kong)
+    /// </summary>
+    ZhHK
 }

@@ -87,9 +87,12 @@ public class UserFrequencyCache
     /// <param name="resource">The resource path (prefix-stored)</param>
     /// <param name="result">The user's decision</param>
     /// <param name="addToCache">If false, the decision is NOT cached (user did not opt in)</param>
-    public void Record(PermissionType permissionType, string resource, PermissionResult result, bool addToCache = true)
+    /// <param name="customExpiration">Custom expiration for this entry; when null, the cache default is used</param>
+    public void Record(PermissionType permissionType, string resource, PermissionResult result, bool addToCache = true, TimeSpan? customExpiration = null)
     {
         if (!addToCache) return;
+
+        TimeSpan expiration = customExpiration ?? _expiration;
 
         lock (_lock)
         {
@@ -99,13 +102,13 @@ public class UserFrequencyCache
                 if (entry.PermissionType == permissionType &&
                     resource.StartsWith(entry.ResourcePrefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    _cache[i] = new CachedPermission(permissionType, resource, result, DateTime.UtcNow + _expiration);
+                    _cache[i] = new CachedPermission(permissionType, resource, result, DateTime.UtcNow + expiration);
                     _logger.Debug("Frequency cache recorded: type={0}, resource={1}, result={2}", permissionType, resource, result);
                     return;
                 }
             }
 
-            _cache.Add(new CachedPermission(permissionType, resource, result, DateTime.UtcNow + _expiration));
+            _cache.Add(new CachedPermission(permissionType, resource, result, DateTime.UtcNow + expiration));
             _logger.Debug("Frequency cache recorded: type={0}, resource={1}, result={2}", permissionType, resource, result);
             CleanExpired();
         }
