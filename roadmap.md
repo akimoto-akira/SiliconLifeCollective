@@ -1,6 +1,6 @@
 # Roadmap
 
-[中文](../zh-CN/roadmap.md)
+[中文](docs/zh-CN/roadmap.md) | [繁體中文](docs/zh-HK/roadmap.md)
 
 ## Guiding Principle
 

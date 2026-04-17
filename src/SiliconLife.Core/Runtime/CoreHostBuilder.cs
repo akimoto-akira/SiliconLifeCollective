@@ -55,6 +55,9 @@ public class CoreHostBuilder
     /// <summary>Gets the dynamic being loader attached to this builder.</summary>
     public DynamicBeingLoader? DynamicBeingLoader { get; private set; }
 
+    /// <summary>Gets the token usage audit manager attached to this builder.</summary>
+    public TokenUsageAuditManager? TokenUsageAuditManager { get; private set; }
+
     /// <summary>Sets the configuration data.</summary>
     public CoreHostBuilder SetConfig(ConfigDataBase config)
     {
@@ -143,6 +146,14 @@ public class CoreHostBuilder
         return this;
     }
 
+    /// <summary>Sets the token usage audit manager.</summary>
+    public CoreHostBuilder SetTokenUsageAuditManager(TokenUsageAuditManager manager)
+    {
+        TokenUsageAuditManager = manager;
+        _logger.Debug("Set TokenUsageAuditManager");
+        return this;
+    }
+
     /// <summary>
     /// Builds and returns a new <see cref="CoreHost"/> using the configured components.
     /// </summary>
@@ -160,6 +171,7 @@ public class CoreHostBuilder
         if (IMManager != null) componentCount++;
         if (BeingFactory != null) componentCount++;
         if (DynamicBeingLoader != null) componentCount++;
+        if (TokenUsageAuditManager != null) componentCount++;
 
         _logger.Info("Building CoreHost with {0} components", componentCount);
         return new CoreHost(this);

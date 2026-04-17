@@ -1,6 +1,6 @@
 # Architecture
 
-[中文](../zh-CN/architecture.md)
+[中文](docs/zh-CN/architecture.md) | [繁體中文](docs/zh-HK/architecture.md)
 
 ## Core Concepts
 
@@ -28,24 +28,26 @@ A Markdown file (`soul.md`) stored in each Silicon Being's data directory. It se
 
 ### MainLoop + TickObject
 
-The system runs a **tick-driven main loop** on a background thread:
+The system runs a **tick-driven main loop** on a dedicated background thread:
 
 ```
-MainLoop (infinite loop)
+MainLoop (dedicated thread, watchdog + circuit breaker)
   └── TickObject A (Priority=0, Interval=100ms)
   └── TickObject B (Priority=1, Interval=500ms)
-  └── SiliconBeingManager (Priority=0, Interval=100ms)
-        └── Silicon Being 1 → Tick → ExecuteOneRound
-        └── Silicon Being 2 → Tick → ExecuteOneRound
-        └── Silicon Being 3 → Tick → ExecuteOneRound
+  └── SiliconBeingManager (ticked directly by MainLoop)
+        └── SiliconBeingRunner → Silicon Being 1 → Tick → ExecuteOneRound
+        └── SiliconBeingRunner → Silicon Being 2 → Tick → ExecuteOneRound
+        └── SiliconBeingRunner → Silicon Being 3 → Tick → ExecuteOneRound
         └── ...
 ```
 
 Key design decisions:
 
-- **Silicon Beings do NOT inherit TickObject.** They have their own `Tick()` method, but it is invoked by the SiliconBeingManager, not registered directly to the MainLoop.
-- **SiliconBeingManager inherits TickObject** and acts as the single proxy for all beings.
+- **Silicon Beings do NOT inherit TickObject.** They have their own `Tick()` method, invoked by `SiliconBeingManager` via a `SiliconBeingRunner`, not registered directly to the MainLoop.
+- **SiliconBeingManager** is ticked directly by MainLoop and acts as the single proxy for all beings.
+- **SiliconBeingRunner** wraps each being's `Tick()` on a temporary thread with timeout and per-being circuit breaker (3 consecutive timeouts → 1-minute cooldown).
 - Each being's execution is limited to **one round** of AI request + ToolCalls per tick, ensuring no being can monopolize the main loop.
+- **PerformanceMonitor** tracks tick execution times for observability.
 
 ### Curator Priority Response
 
@@ -109,6 +111,26 @@ This ensures responsive user interaction without disrupting in-progress tasks.
 
 ---
 
+## ServiceLocator
+
+`ServiceLocator` is a thread-safe singleton registry that provides access to all core services:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `ChatSystem` | `ChatSystem` | Central chat session manager |
+| `IMManager` | `IMManager` | Instant messaging provider router |
+| `AuditLogger` | `AuditLogger` | Permission audit trail |
+| `GlobalAcl` | `GlobalACL` | Global access control list |
+| `BeingFactory` | `ISiliconBeingFactory` | Factory for creating beings |
+| `BeingManager` | `SiliconBeingManager` | Active being lifecycle manager |
+| `DynamicBeingLoader` | `DynamicBeingLoader` | Dynamic compilation loader |
+| `TokenUsageAudit` | `ITokenUsageAudit` | Token usage tracking |
+| `TokenUsageAuditManager` | `TokenUsageAuditManager` | Token usage reporting |
+
+It also maintains a per-being `PermissionManager` registry, keyed by being GUID.
+
+---
+
 ## Key Design Decisions
 
 ### Storage as Instance Class (not static)
@@ -149,16 +171,29 @@ Silicon Beings can rewrite their own C# classes at runtime:
 
 1. AI generates new class code (must inherit `SiliconBeingBase`).
 2. **Compile-time reference control** (primary defense): the compiler is only given an allowed assembly list — `System.IO`, `System.Reflection`, etc. are excluded, so dangerous code is impossible at the type level.
-3. **Runtime static analysis** (secondary defense): even after successful compilation, code is scanned for dangerous patterns.
+3. **Runtime static analysis** (secondary defense): `SecurityScanner` scans the code for dangerous patterns even after successful compilation.
 4. Roslyn compiles the code in memory.
-5. On success: replace the current instance, persist encrypted code to disk.
+5. On success: `SiliconBeingManager.ReplaceBeing()` swaps the current instance, state is migrated, and encrypted code is persisted to disk.
 6. On failure: discard new code, keep the existing implementation.
+
+Custom `IPermissionCallback` implementations can also be compiled and injected via `ReplacePermissionCallback()`, allowing beings to customize their own permission logic.
 
 Code is stored AES-256 encrypted on disk. The encryption key is derived from the being's GUID (uppercase) via PBKDF2.
 
 ---
 
-## Web UI Architecture
+## Token Usage Audit
+
+The `TokenUsageAuditManager` tracks AI token consumption across all beings:
+
+- `TokenUsageRecord` — per-request record (being ID, model, prompt tokens, completion tokens, timestamp)
+- `TokenUsageSummary` — aggregated statistics
+- `TokenUsageQuery` — query parameters for filtering records
+- Persisted via `ITimeStorage` for time-series queries
+
+---
+
+### Web UI Architecture
 
 ### Skin System
 
@@ -166,9 +201,9 @@ The Web UI features a **pluggable skin system** that allows complete UI customiz
 
 - **ISkin Interface** — Defines the contract for all skins, including:
   - Core rendering methods (`RenderHtml`, `RenderError`)
-  - UI component library (buttons, inputs, cards, tables, etc.)
-  - Theme CSS generation
-  - Preview information for skin selector
+  - 20+ UI component methods (buttons, inputs, cards, tables, badges, bubbles, progress, tabs, etc.)
+  - Theme CSS generation via `CssBuilder`
+  - `SkinPreviewInfo` — color palette and icon for the init page skin selector
 
 - **Built-in Skins** — 4 production-ready skins:
   - **Admin** — Professional, data-focused interface for system administration
@@ -176,11 +211,19 @@ The Web UI features a **pluggable skin system** that allows complete UI customiz
   - **Creative** — Artistic, visually rich layout for creative workflows
   - **Dev** — Developer-focused, code-centric interface with syntax highlighting
 
-- **Skin Discovery** — Automatic discovery and registration via reflection (`SkinManager.DiscoverSkins()`)
+- **Skin Discovery** — `SkinManager` auto-discovers and registers all `ISkin` implementations via reflection
+
+### HTML / CSS / JS Builders
+
+The Web UI avoids template files entirely, generating all markup in C#:
+
+- **`H`** — Fluent HTML builder DSL for constructing HTML trees in code
+- **`CssBuilder`** — CSS builder with selector and media query support
+- **`JsBuilder` (`JsSyntax`)** — JavaScript builder for inline scripts
 
 ### Controller System
 
-The Web UI follows a **MVC-like pattern** with 15 controllers handling different aspects:
+The Web UI follows a **MVC-like pattern** with 16 controllers handling different aspects:
 
 | Controller | Purpose |
 |------------|---------|
@@ -199,12 +242,17 @@ The Web UI follows a **MVC-like pattern** with 15 controllers handling different
 | PermissionRequest | Permission request queue |
 | Project | Project management (placeholder) |
 | Task | Task system interface |
+| Timer | Timer system management |
 
 ### Real-time Updates
 
-- **SSE (Server-Sent Events)** — Push-based updates for chat messages, being status, and system events
+- **SSE (Server-Sent Events)** — Push-based updates for chat messages, being status, and system events via `SSEHandler`
 - **No WebSocket Required** — Simpler architecture using SSE for most real-time needs
 - **Automatic Reconnection** — Client-side reconnection logic for resilient connections
+
+### Localization
+
+Three locales are built in: `ZhCN` (Simplified Chinese), `ZhHK` (Traditional Chinese), and `EnUS` (English). The active locale is selected via `DefaultConfigData.Language` and resolved through `LocalizationManager`.
 
 ---
 

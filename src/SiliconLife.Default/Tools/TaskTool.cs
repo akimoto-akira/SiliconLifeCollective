@@ -142,6 +142,18 @@ public class TaskTool : ITool
         return manager.GetBeing(callerId);
     }
 
+    private static void RecordMemoryForBeing(SiliconBeingBase being, Func<DefaultLocalizationBase, string> format)
+    {
+        if (being.Memory == null) return;
+        Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+        if (LocalizationManager.Instance.TryGetLocalization(language, out LocalizationBase? loc) &&
+            loc is DefaultLocalizationBase defaultLoc)
+        {
+            try { being.Memory.Add(format(defaultLoc)); }
+            catch { /* non-critical */ }
+        }
+    }
+
     private ToolResult ExecuteCreate(SiliconBeingBase being, Dictionary<string, object> parameters)
     {
         if (!parameters.TryGetValue("title", out object? titleObj) || string.IsNullOrWhiteSpace(titleObj?.ToString()))
@@ -236,7 +248,9 @@ public class TaskTool : ITool
             return ToolResult.Failed("Missing or invalid 'task_id' parameter");
         }
 
+        string taskTitle = being.TaskSystem!.Get(taskId)?.Title ?? taskId.ToString();
         being.TaskSystem!.Complete(taskId);
+        RecordMemoryForBeing(being, loc => loc.FormatMemoryEventTaskCompleted(taskTitle));
         return ToolResult.Successful($"Task {taskId} marked as completed.");
     }
 
@@ -247,8 +261,10 @@ public class TaskTool : ITool
             return ToolResult.Failed("Missing or invalid 'task_id' parameter");
         }
 
+        string taskTitle = being.TaskSystem!.Get(taskId)?.Title ?? taskId.ToString();
         string error = parameters.TryGetValue("error", out object? errorObj) ? errorObj?.ToString() ?? "Unknown error" : "Unknown error";
         being.TaskSystem!.Fail(taskId, error);
+        RecordMemoryForBeing(being, loc => loc.FormatMemoryEventTaskFailed(taskTitle));
         return ToolResult.Successful($"Task {taskId} marked as failed: {error}");
     }
 

@@ -136,6 +136,7 @@ public class ZhHK : DefaultLocalizationBase
     public override string PageTitleKnowledge => "知識圖譜 - 矽基生命群";
     public override string PageTitleProjects => "專案空間管理 - 矽基生命群";
     public override string PageTitleLogs => "日誌查詢 - 矽基生命群";
+    public override string PageTitleAudit => "Token 審計 - 矽基生命群";
     public override string PageTitleConfig => "系統設定 - 矽基生命群";
     public override string PageTitleExecutor => "執行器監控 - 矽基生命群";
     public override string PageTitleCodeBrowser => "程式碼瀏覽 - 矽基生命群";
@@ -275,6 +276,35 @@ public class ZhHK : DefaultLocalizationBase
     public override string LogsExceptionLabel => "例外詳情：";
     public override string LogsPrevPage => "上一頁";
     public override string LogsNextPage => "下一頁";
+
+    public override string AuditPageHeader => "Token 用量審計";
+    public override string AuditTotalTokens => "總 Token 數";
+    public override string AuditTotalRequests => "總請求數";
+    public override string AuditSuccessCount => "成功";
+    public override string AuditFailureCount => "失敗";
+    public override string AuditPromptTokens => "輸入 Token";
+    public override string AuditCompletionTokens => "輸出 Token";
+    public override string AuditStartTime => "開始時間";
+    public override string AuditEndTime => "結束時間";
+    public override string AuditFilterButton => "查詢";
+    public override string AuditEmptyState => "暫無審計記錄";
+    public override string AuditAIClientType => "AI 客戶端";
+    public override string AuditAllClientTypes => "全部類型";
+    public override string AuditGroupByClient => "按客戶端分組";
+    public override string AuditGroupByBeing => "按矽基人分組";
+    public override string AuditPrevPage => "上一頁";
+    public override string AuditNextPage => "下一頁";
+    public override string AuditBeing => "矽基人";
+    public override string AuditAllBeings => "全部矽基人";
+    public override string AuditTimeToday => "今日";
+    public override string AuditTimeWeek => "本週";
+    public override string AuditTimeMonth => "本月";
+    public override string AuditTimeYear => "本年";
+    public override string AuditExport => "匯出";
+    public override string AuditTrendTitle => "Token 用量趨勢";
+    public override string AuditTrendPrompt => "輸入 Token";
+    public override string AuditTrendCompletion => "輸出 Token";
+    public override string AuditTrendTotal => "總 Token";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {
@@ -1119,4 +1149,56 @@ public class ZhHK : DefaultLocalizationBase
         string monthName = (isLeap ? "閏" : "") + (GetDehongDaiMonthName(month) ?? $"{month}月");
         return $"傣曆{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
+
+    // ===== Memory Event Localization =====
+
+    public override string FormatMemoryEventSingleChat(string partnerName, string content)
+        => $"[單聊] 與「{partnerName}」對話，回覆：{content}";
+
+    public override string FormatMemoryEventGroupChat(string sessionId, string content)
+        => $"[群聊] 在工作階段 {sessionId} 中發言：{content}";
+
+    public override string FormatMemoryEventToolCall(string toolNames)
+        => $"[工具調用] 執行工具：{toolNames}";
+
+    public override string FormatMemoryEventTask(string content)
+        => $"[任務] 執行任務，結果：{content}";
+
+    public override string FormatMemoryEventTimer(string content)
+        => $"[定時] 定時觸發，回應：{content}";
+
+    public override string FormatMemoryEventBeingCreated(string name, string id)
+        => $"[管理] 建立了新矽基人「{name}」（{id}）";
+
+    public override string FormatMemoryEventBeingReset(string id)
+        => $"[管理] 將矽基人 {id} 重置為預設實作";
+
+    public override string FormatMemoryEventTaskCompleted(string taskTitle)
+        => $"[任務完成] {taskTitle}";
+
+    public override string FormatMemoryEventTaskFailed(string taskTitle)
+        => $"[任務失敗] {taskTitle}";
+
+    public override string FormatMemoryEventStartup()
+        => "系統啟動，我上線了";
+
+    public override string FormatMemoryEventRuntimeError(string message)
+        => $"[執行時錯誤] {message}";
+
+    // ===== MemoryTool Response Localization =====
+
+    public override string MemoryToolNotAvailable => "記憶系統不可用";
+    public override string MemoryToolMissingAction => "缺少 'action' 參數";
+    public override string MemoryToolMissingContent => "缺少 'content' 參數";
+    public override string MemoryToolNoMemories => "暫無記憶";
+    public override string MemoryToolRecentHeader(int count) => $"最近 {count} 條記憶：";
+    public override string MemoryToolStatsHeader => "記憶統計：";
+    public override string MemoryToolStatsTotal => "- 總數";
+    public override string MemoryToolStatsOldest => "- 最早";
+    public override string MemoryToolStatsNewest => "- 最新";
+    public override string MemoryToolStatsNA => "無";
+    public override string MemoryToolQueryNoResults => "該時間範圍內無記憶";
+    public override string MemoryToolQueryHeader(int count, string rangeDesc) => $"{rangeDesc} 共 {count} 條記憶：";
+    public override string MemoryToolInvalidYear => "'year' 參數無效";
+    public override string MemoryToolUnknownAction(string action) => $"未知操作：{action}";
 }

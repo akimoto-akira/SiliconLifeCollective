@@ -76,6 +76,12 @@ public abstract class ConfigDataBase
     public Guid UserGuid { get; } = new Guid("00000000-0000-0000-0000-000000000001");
 
     /// <summary>
+    /// Gets the reserved GUID representing the global broadcast channel
+    /// </summary>
+    [ConfigIgnore("系统保留 GUID，固定值不可修改")]
+    public Guid BroadcastChannelGuid { get; } = new Guid("00000000-0000-0000-0000-000000000002");
+
+    /// <summary>
     /// Gets or sets the nickname of the human user
     /// </summary>
     [ConfigGroup("User", Order = 2, DisplayNameKey = "UserNickname", DescriptionKey = "UserNickname")]

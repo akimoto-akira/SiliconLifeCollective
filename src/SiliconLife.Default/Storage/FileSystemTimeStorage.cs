@@ -120,15 +120,6 @@ public class FileSystemTimeStorage : ITimeStorage
         DateTime resolved = ResolveTimestamp(timestamp);
         string filePath = GetTimeFilePath(key, resolved);
         EnsureDirectory(filePath);
-
-        // Clear sibling files in the same directory before writing
-        string? dir = Path.GetDirectoryName(filePath);
-        if (dir != null && Directory.Exists(dir))
-        {
-            foreach (string f in Directory.GetFiles(dir, "*.json"))
-                File.Delete(f);
-        }
-
         WriteSingleLine(filePath, data);
     }
 
@@ -210,7 +201,7 @@ public class FileSystemTimeStorage : ITimeStorage
     /// Returns all records for <paramref name="key"/> that fall within
     /// <paramref name="range"/>, sorted by timestamp ascending.
     /// </summary>
-    public List<TimeEntry<T>> Query<T>(string key, IncompleteDate range)
+    public List<TimeEntry<T>> Query<T>(string key, IncompleteDate? range)
     {
         var result = new List<TimeEntry<T>>();
         string dir = GetKeyDirectory(key);
@@ -219,7 +210,7 @@ public class FileSystemTimeStorage : ITimeStorage
         foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
         {
             if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
-            if (!range.Matches(fileTime)) continue;
+            if (range.HasValue && !range.Value.Matches(fileTime)) continue;
 
             foreach (T data in ReadAllLines<T>(file))
                 result.Add(new TimeEntry<T>(key, fileTime, data));
@@ -231,9 +222,9 @@ public class FileSystemTimeStorage : ITimeStorage
 
     /// <summary>
     /// Returns all records across every key that fall within <paramref name="range"/>,
-    /// sorted by timestamp ascending.
+    /// sorted by timestamp ascending. If <paramref name="range"/> is null, returns all records.
     /// </summary>
-    public List<TimeEntry<T>> Query<T>(IncompleteDate range)
+    public List<TimeEntry<T>> Query<T>(IncompleteDate? range)
     {
         var result = new List<TimeEntry<T>>();
         if (!Directory.Exists(_baseDirectory)) return result;
@@ -245,7 +236,7 @@ public class FileSystemTimeStorage : ITimeStorage
             foreach (string file in Directory.GetFiles(keyDir, "*.json", SearchOption.AllDirectories))
             {
                 if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
-                if (!range.Matches(fileTime)) continue;
+                if (range.HasValue && !range.Value.Matches(fileTime)) continue;
 
                 foreach (T data in ReadAllLines<T>(file))
                     result.Add(new TimeEntry<T>(key, fileTime, data));

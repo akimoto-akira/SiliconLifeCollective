@@ -11,7 +11,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json;
 using SiliconLife.Collective;
 
 namespace SiliconLife.Default;
@@ -27,7 +26,11 @@ public class MemoryTool : ITool
     /// <inheritdoc/>
     public string Description =>
         "Manage memory/notes for the silicon being. " +
-        "Actions: 'add' (add a new memory), 'recent' (get recent memories), 'stats' (get memory statistics).";
+        "Actions: " +
+        "'add' (add a new memory entry); " +
+        "'recent' (get recent memories, optional max_results); " +
+        "'query' (query memories by time range: requires 'year', optional 'month', 'day', 'hour', 'minute', 'second', optional 'max_results'); " +
+        "'stats' (get memory statistics).";
 
     /// <inheritdoc/>
     public string GetDisplayName(Language language)
@@ -48,18 +51,48 @@ public class MemoryTool : ITool
                 ["action"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "The action to perform: add, recent, stats",
-                    ["enum"] = new[] { "add", "recent", "stats" }
+                    ["description"] = "The action to perform: add, recent, query, stats",
+                    ["enum"] = new[] { "add", "recent", "query", "stats" }
                 },
                 ["content"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "The memory content to add (used with action=add)"
+                    ["description"] = "Memory content to add (required for action=add)"
                 },
                 ["max_results"] = new Dictionary<string, object>
                 {
                     ["type"] = "integer",
-                    ["description"] = "Maximum number of results (used with action=recent)"
+                    ["description"] = "Maximum number of results to return (used with recent and query)"
+                },
+                ["year"] = new Dictionary<string, object>
+                {
+                    ["type"] = "integer",
+                    ["description"] = "Year to query (optional for action=query; omit to query all entries)"
+                },
+                ["month"] = new Dictionary<string, object>
+                {
+                    ["type"] = "integer",
+                    ["description"] = "Month to query, 1–12 (optional, used with action=query)"
+                },
+                ["day"] = new Dictionary<string, object>
+                {
+                    ["type"] = "integer",
+                    ["description"] = "Day to query, 1–31 (optional, used with action=query)"
+                },
+                ["hour"] = new Dictionary<string, object>
+                {
+                    ["type"] = "integer",
+                    ["description"] = "Hour to query, 0–23 (optional, used with action=query)"
+                },
+                ["minute"] = new Dictionary<string, object>
+                {
+                    ["type"] = "integer",
+                    ["description"] = "Minute to query, 0–59 (optional, used with action=query)"
+                },
+                ["second"] = new Dictionary<string, object>
+                {
+                    ["type"] = "integer",
+                    ["description"] = "Second to query, 0–59 (optional, used with action=query)"
                 }
             },
             ["required"] = new[] { "action" }
@@ -68,93 +101,136 @@ public class MemoryTool : ITool
 
     public ToolResult Execute(Guid callerId, Dictionary<string, object> parameters)
     {
-        var being = GetSiliconBeing(callerId);
+        SiliconBeingBase? being = GetSiliconBeing(callerId);
+        DefaultLocalizationBase loc = GetLocalization();
+
         if (being?.Memory == null)
-        {
-            return ToolResult.Failed("Memory system not available");
-        }
+            return ToolResult.Failed(loc.MemoryToolNotAvailable);
 
         if (!parameters.TryGetValue("action", out object? actionObj))
-        {
-            return ToolResult.Failed("Missing 'action' parameter");
-        }
+            return ToolResult.Failed(loc.MemoryToolMissingAction);
 
-        string action = actionObj?.ToString() ?? "";
+        string action = actionObj?.ToString()?.ToLowerInvariant() ?? "";
 
         try
         {
-            return action.ToLowerInvariant() switch
+            return action switch
             {
-                "add" => ExecuteAdd(being, parameters),
-                "recent" => ExecuteRecent(being, parameters),
-                "stats" => ExecuteStats(being, parameters),
-                _ => ToolResult.Failed($"Unknown action: {action}")
+                "add"    => ExecuteAdd(being, parameters, loc),
+                "recent" => ExecuteRecent(being, parameters, loc),
+                "query"  => ExecuteQuery(being, parameters, loc),
+                "stats"  => ExecuteStats(being, loc),
+                _        => ToolResult.Failed(loc.MemoryToolUnknownAction(action))
             };
         }
         catch (Exception ex)
         {
-            return ToolResult.Failed($"Memory operation failed: {ex.Message}");
+            return ToolResult.Failed($"{loc.ErrorMessage}: {ex.Message}");
         }
     }
 
-    private SiliconBeingBase? GetSiliconBeing(Guid callerId)
-    {
-        var manager = ServiceLocator.Instance.BeingManager;
-        if (manager == null)
-            return null;
-
-        return manager.GetBeing(callerId);
-    }
-
-    private ToolResult ExecuteAdd(SiliconBeingBase being, Dictionary<string, object> parameters)
+    private static ToolResult ExecuteAdd(SiliconBeingBase being, Dictionary<string, object> parameters, DefaultLocalizationBase loc)
     {
         if (!parameters.TryGetValue("content", out object? contentObj) || string.IsNullOrWhiteSpace(contentObj?.ToString()))
-        {
-            return ToolResult.Failed("Missing 'content' parameter");
-        }
+            return ToolResult.Failed(loc.MemoryToolMissingContent);
 
-        string content = contentObj!.ToString()!;
-        var entry = being.Memory!.Add(content);
-
+        var entry = being.Memory!.Add(contentObj!.ToString()!);
         return ToolResult.Successful($"Memory added (ID: {entry.Id})");
     }
 
-    private ToolResult ExecuteRecent(SiliconBeingBase being, Dictionary<string, object> parameters)
+    private static ToolResult ExecuteRecent(SiliconBeingBase being, Dictionary<string, object> parameters, DefaultLocalizationBase loc)
     {
         int count = 10;
         if (parameters.TryGetValue("max_results", out object? countObj) && int.TryParse(countObj?.ToString(), out int c))
-        {
             count = c;
-        }
 
-        var memories = being.Memory!.GetRecent(count);
+        List<MemoryEntry> memories = being.Memory!.GetRecent(count);
 
         if (memories.Count == 0)
-        {
-            return ToolResult.Successful("No memories yet.");
-        }
+            return ToolResult.Successful(loc.MemoryToolNoMemories);
 
-        var lines = new List<string> { $"Recent {memories.Count} memories:" };
-        foreach (var memory in memories)
-        {
-            lines.Add($"- [{memory.Timestamp:yyyy-MM-dd HH:mm}] {memory.Content.Substring(0, Math.Min(50, memory.Content.Length))}");
-        }
+        var lines = new List<string> { loc.MemoryToolRecentHeader(memories.Count) };
+        foreach (MemoryEntry memory in memories)
+            lines.Add($"- [{memory.Timestamp}] {memory.Content}");
 
         return ToolResult.Successful(string.Join("\n", lines));
     }
 
-    private ToolResult ExecuteStats(SiliconBeingBase being, Dictionary<string, object> parameters)
+    private static ToolResult ExecuteQuery(SiliconBeingBase being, Dictionary<string, object> parameters, DefaultLocalizationBase loc)
     {
-        var stats = being.Memory!.GetStatistics();
+        int? year   = TryGetInt(parameters, "year");
+        int? month  = TryGetInt(parameters, "month");
+        int? day    = TryGetInt(parameters, "day");
+        int? hour   = TryGetInt(parameters, "hour");
+        int? minute = TryGetInt(parameters, "minute");
+        int? second = TryGetInt(parameters, "second");
+
+        int maxResults = 0;
+        if (parameters.TryGetValue("max_results", out object? mrObj) && int.TryParse(mrObj?.ToString(), out int mr))
+            maxResults = mr;
+
+        List<MemoryEntry> memories;
+        string rangeDesc;
+
+        if (year == null)
+        {
+            memories = being.Memory!.QueryAll(maxResults);
+            rangeDesc = "*";
+        }
+        else
+        {
+            IncompleteDate range;
+            try
+            {
+                range = new IncompleteDate(year.Value, month, day, hour, minute, second);
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                return ToolResult.Failed($"{loc.MemoryToolInvalidYear}: {ex.ParamName}");
+            }
+
+            memories = being.Memory!.Query(range, maxResults);
+            rangeDesc = range.ToString();
+        }
+
+        if (memories.Count == 0)
+            return ToolResult.Successful(loc.MemoryToolQueryNoResults);
+
+        var lines = new List<string> { loc.MemoryToolQueryHeader(memories.Count, rangeDesc) };
+        foreach (MemoryEntry memory in memories)
+            lines.Add($"- [{memory.Timestamp}] {memory.Content}");
+
+        return ToolResult.Successful(string.Join("\n", lines));
+    }
+
+    private static ToolResult ExecuteStats(SiliconBeingBase being, DefaultLocalizationBase loc)
+    {
+        MemoryStatistics stats = being.Memory!.GetStatistics();
 
         var lines = new List<string>
         {
-            "Memory Statistics:",
-            $"- Total: {stats.TotalEntries}",
-            $"- Oldest: {(stats.OldestEntry?.ToString() ?? "N/A")}",
-            $"- Newest: {(stats.NewestEntry?.ToString() ?? "N/A")}"
+            loc.MemoryToolStatsHeader,
+            $"{loc.MemoryToolStatsTotal}: {stats.TotalEntries}",
+            $"{loc.MemoryToolStatsOldest}: {stats.OldestEntry?.ToString() ?? loc.MemoryToolStatsNA}",
+            $"{loc.MemoryToolStatsNewest}: {stats.NewestEntry?.ToString() ?? loc.MemoryToolStatsNA}"
         };
 
         return ToolResult.Successful(string.Join("\n", lines));
     }
+
+    private static SiliconBeingBase? GetSiliconBeing(Guid callerId)
+        => ServiceLocator.Instance.BeingManager?.GetBeing(callerId);
+
+    private static DefaultLocalizationBase GetLocalization()
+    {
+        Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+        if (LocalizationManager.Instance.TryGetLocalization(language, out LocalizationBase? loc) &&
+            loc is DefaultLocalizationBase defaultLoc)
+            return defaultLoc;
+        // fallback — should never happen in practice
+        return new ZhCN();
+    }
+
+    private static int? TryGetInt(Dictionary<string, object> parameters, string key)
+        => parameters.TryGetValue(key, out object? v) && int.TryParse(v?.ToString(), out int n) ? n : null;
 }

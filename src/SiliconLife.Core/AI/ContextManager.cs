@@ -200,6 +200,40 @@ public class ContextManager
         }
     }
 
+    private void RecordTokenUsage(AIResponse response)
+    {
+        if (response.PromptTokens == null && response.CompletionTokens == null && response.TotalTokens == null)
+        {
+            return;
+        }
+
+        ITokenUsageAudit? audit = ServiceLocator.Instance.TokenUsageAudit;
+        if (audit == null)
+        {
+            return;
+        }
+
+        try
+        {
+            var record = new TokenUsageRecord(
+                DateTime.UtcNow,
+                _being.Id,
+                _aiClient.GetType().Name,
+                response.PromptTokens ?? 0,
+                response.CompletionTokens ?? 0,
+                response.TotalTokens ?? 0,
+                _session?.Id ?? Guid.Empty,
+                response.Success
+            );
+
+            audit.Record(record);
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn("Failed to record token usage: {0}", ex.Message);
+        }
+    }
+
     /// <summary>
     /// Builds an AIRequest from the current context
     /// </summary>
@@ -338,6 +372,7 @@ public class ContextManager
             AddAssistantMessage(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
         }
 
+        RecordTokenUsage(response);
         return response;
     }
 
@@ -362,6 +397,7 @@ public class ContextManager
             AddAssistantMessage(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
         }
 
+        RecordTokenUsage(response);
         return response;
     }
 
@@ -478,6 +514,7 @@ public class ContextManager
             AddAssistantMessage(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
         }
 
+        RecordTokenUsage(response);
         return response;
     }
 
@@ -496,10 +533,25 @@ public class ContextManager
         if (response.Success && response.HasToolCalls)
         {
             // Tool calls executed, results persisted — yield time slice
+            Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+            string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
+            RecordToMemory(loc.FormatMemoryEventToolCall(toolNames));
         }
         else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
         {
             DeliverOutput(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
+
+            if (!string.IsNullOrEmpty(response.Content))
+            {
+                Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+                LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+                Guid otherId = _session?.Members.FirstOrDefault(id => id != _being.Id) ?? Guid.Empty;
+                SiliconBeingManager? beingManager = ServiceLocator.Instance.BeingManager;
+                SiliconBeingBase? otherBeing = otherId != Guid.Empty ? beingManager?.GetBeing(otherId) : null;
+                string partnerName = otherBeing?.Name ?? Config.Instance?.Data?.UserNickname ?? otherId.ToString();
+                RecordToMemory(loc.FormatMemoryEventSingleChat(partnerName, response.Content));
+            }
         }
 
         return response;
@@ -560,10 +612,25 @@ public class ContextManager
         if (response.Success && response.HasToolCalls)
         {
             // Tool calls executed, results persisted — yield time slice
+            Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+            string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
+            RecordToMemory(loc.FormatMemoryEventToolCall(toolNames));
         }
         else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
         {
             DeliverOutput(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
+
+            if (!string.IsNullOrEmpty(response.Content))
+            {
+                Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+                LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+                Guid otherId = _session?.Members.FirstOrDefault(id => id != _being.Id) ?? Guid.Empty;
+                SiliconBeingManager? beingManager = ServiceLocator.Instance.BeingManager;
+                SiliconBeingBase? otherBeing = otherId != Guid.Empty ? beingManager?.GetBeing(otherId) : null;
+                string partnerName = otherBeing?.Name ?? Config.Instance?.Data?.UserNickname ?? otherId.ToString();
+                RecordToMemory(loc.FormatMemoryEventSingleChat(partnerName, response.Content));
+            }
         }
 
         return response;
@@ -584,10 +651,22 @@ public class ContextManager
         if (response.Success && response.HasToolCalls)
         {
             // Tool calls executed, results persisted — yield time slice
+            Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+            string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
+            RecordToMemory(loc.FormatMemoryEventToolCall(toolNames));
         }
         else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
         {
             DeliverOutput(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
+
+            if (!string.IsNullOrEmpty(response.Content))
+            {
+                Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+                LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+                string sessionId = _session?.Id.ToString() ?? string.Empty;
+                RecordToMemory(loc.FormatMemoryEventGroupChat(sessionId, response.Content));
+            }
         }
 
         return response;
@@ -609,10 +688,22 @@ public class ContextManager
         if (response.Success && response.HasToolCalls)
         {
             // Tool calls executed, results persisted — yield time slice
+            Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+            string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
+            RecordToMemory(loc.FormatMemoryEventToolCall(toolNames));
         }
         else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
         {
             DeliverOutput(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
+
+            if (!string.IsNullOrEmpty(response.Content))
+            {
+                Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+                LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+                string sessionId = _session?.Id.ToString() ?? string.Empty;
+                RecordToMemory(loc.FormatMemoryEventGroupChat(sessionId, response.Content));
+            }
         }
 
         return response;
@@ -629,6 +720,14 @@ public class ContextManager
 
         string? scenarioContext = null;
         AIResponse response = GetResponse(scenarioContext);
+
+        if (response.Success && !string.IsNullOrEmpty(response.Content))
+        {
+            Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+            RecordToMemory(loc.FormatMemoryEventTask(response.Content));
+        }
+
         return response;
     }
 
@@ -643,6 +742,14 @@ public class ContextManager
 
         string? scenarioContext = null;
         AIResponse response = GetResponse(scenarioContext);
+
+        if (response.Success && !string.IsNullOrEmpty(response.Content))
+        {
+            Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+            RecordToMemory(loc.FormatMemoryEventTimer(response.Content));
+        }
+
         return response;
     }
 
@@ -846,6 +953,29 @@ public class ContextManager
                 msg.PromptTokens,
                 msg.CompletionTokens,
                 msg.TotalTokens);
+        }
+    }
+
+    /// <summary>
+    /// Records an event to the being's memory using localized text.
+    /// No-op if the being has no memory system configured.
+    /// </summary>
+    private void RecordToMemory(string content)
+    {
+        if (_being.Memory == null || string.IsNullOrEmpty(content))
+        {
+            return;
+        }
+
+        try
+        {
+            Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            LocalizationBase localization = LocalizationManager.Instance.GetLocalization(language);
+            _being.Memory.Add(content, null);
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn("Failed to record to memory: {0}", ex.Message);
         }
     }
 

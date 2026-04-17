@@ -65,4 +65,38 @@ public abstract class LocalizationBase
     /// <param name="logLevel">The log level</param>
     /// <returns>The localized display name</returns>
     public abstract string GetLogLevelName(LogLevel logLevel);
+
+    // ===== Memory Event Localization =====
+
+    /// <summary>
+    /// Formats a memory record for a single-chat AI response event.
+    /// </summary>
+    /// <param name="partnerName">Display name of the conversation partner</param>
+    /// <param name="content">The AI response content (may be truncated)</param>
+    public abstract string FormatMemoryEventSingleChat(string partnerName, string content);
+
+    /// <summary>
+    /// Formats a memory record for a group-chat AI response event.
+    /// </summary>
+    /// <param name="sessionId">The group session identifier</param>
+    /// <param name="content">The AI response content (may be truncated)</param>
+    public abstract string FormatMemoryEventGroupChat(string sessionId, string content);
+
+    /// <summary>
+    /// Formats a memory record for a tool-call round.
+    /// </summary>
+    /// <param name="toolNames">Comma-separated list of tool names that were called</param>
+    public abstract string FormatMemoryEventToolCall(string toolNames);
+
+    /// <summary>
+    /// Formats a memory record for a task execution event.
+    /// </summary>
+    /// <param name="content">The AI response content for the task</param>
+    public abstract string FormatMemoryEventTask(string content);
+
+    /// <summary>
+    /// Formats a memory record for a timer-triggered event.
+    /// </summary>
+    /// <param name="content">The AI response content triggered by the timer</param>
+    public abstract string FormatMemoryEventTimer(string content);
 }

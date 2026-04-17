@@ -281,6 +281,7 @@ public class EnUS : DefaultLocalizationBase
     public override string PageTitleKnowledge => "Knowledge - Silicon Life Collective";
     public override string PageTitleProjects => "Projects - Silicon Life Collective";
     public override string PageTitleLogs => "Logs - Silicon Life Collective";
+    public override string PageTitleAudit => "Token Audit - Silicon Life Collective";
     public override string PageTitleConfig => "Config - Silicon Life Collective";
     public override string PageTitleExecutor => "Executor - Silicon Life Collective";
     public override string PageTitleCodeBrowser => "Code Browser - Silicon Life Collective";
@@ -418,6 +419,35 @@ public class EnUS : DefaultLocalizationBase
     public override string LogsExceptionLabel => "Exception: ";
     public override string LogsPrevPage => "Previous";
     public override string LogsNextPage => "Next";
+
+    public override string AuditPageHeader => "Token Usage Audit";
+    public override string AuditTotalTokens => "Total Tokens";
+    public override string AuditTotalRequests => "Total Requests";
+    public override string AuditSuccessCount => "Success";
+    public override string AuditFailureCount => "Failure";
+    public override string AuditPromptTokens => "Prompt Tokens";
+    public override string AuditCompletionTokens => "Completion Tokens";
+    public override string AuditStartTime => "Start Time";
+    public override string AuditEndTime => "End Time";
+    public override string AuditFilterButton => "Filter";
+    public override string AuditEmptyState => "No audit records found";
+    public override string AuditAIClientType => "AI Client";
+    public override string AuditAllClientTypes => "All Types";
+    public override string AuditGroupByClient => "Group by Client";
+    public override string AuditGroupByBeing => "Group by Being";
+    public override string AuditPrevPage => "Previous";
+    public override string AuditNextPage => "Next";
+    public override string AuditBeing => "Being";
+    public override string AuditAllBeings => "All Beings";
+    public override string AuditTimeToday => "Today";
+    public override string AuditTimeWeek => "This Week";
+    public override string AuditTimeMonth => "This Month";
+    public override string AuditTimeYear => "This Year";
+    public override string AuditExport => "Export";
+    public override string AuditTrendTitle => "Token Usage Trend";
+    public override string AuditTrendPrompt => "Prompt Tokens";
+    public override string AuditTrendCompletion => "Completion Tokens";
+    public override string AuditTrendTotal => "Total Tokens";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {
@@ -1267,4 +1297,56 @@ public class EnUS : DefaultLocalizationBase
         string monthName = (isLeap ? "Leap " : "") + (GetDehongDaiMonthName(month) ?? $"Month {month}");
         return $"Dehong Dai Year {year}, {monthName}, Day {day} {hour:D2}:{minute:D2}:{second:D2}";
     }
+
+    // ===== Memory Event Localization =====
+
+    public override string FormatMemoryEventSingleChat(string partnerName, string content)
+        => $"[Chat] Replied to \"{partnerName}\": {content}";
+
+    public override string FormatMemoryEventGroupChat(string sessionId, string content)
+        => $"[Group] Spoke in session {sessionId}: {content}";
+
+    public override string FormatMemoryEventToolCall(string toolNames)
+        => $"[Tool] Called tools: {toolNames}";
+
+    public override string FormatMemoryEventTask(string content)
+        => $"[Task] Executed task, result: {content}";
+
+    public override string FormatMemoryEventTimer(string content)
+        => $"[Timer] Timer triggered, responded: {content}";
+
+    public override string FormatMemoryEventBeingCreated(string name, string id)
+        => $"[Management] Created new silicon being \"{name}\" ({id})";
+
+    public override string FormatMemoryEventBeingReset(string id)
+        => $"[Management] Reset being {id} to default implementation";
+
+    public override string FormatMemoryEventTaskCompleted(string taskTitle)
+        => $"[Task Completed] {taskTitle}";
+
+    public override string FormatMemoryEventTaskFailed(string taskTitle)
+        => $"[Task Failed] {taskTitle}";
+
+    public override string FormatMemoryEventStartup()
+        => "System started, I am online";
+
+    public override string FormatMemoryEventRuntimeError(string message)
+        => $"[Runtime Error] {message}";
+
+    // ===== MemoryTool Response Localization =====
+
+    public override string MemoryToolNotAvailable => "Memory system not available";
+    public override string MemoryToolMissingAction => "Missing 'action' parameter";
+    public override string MemoryToolMissingContent => "Missing 'content' parameter";
+    public override string MemoryToolNoMemories => "No memories yet";
+    public override string MemoryToolRecentHeader(int count) => $"Recent {count} memories:";
+    public override string MemoryToolStatsHeader => "Memory statistics:";
+    public override string MemoryToolStatsTotal => "- Total";
+    public override string MemoryToolStatsOldest => "- Oldest";
+    public override string MemoryToolStatsNewest => "- Newest";
+    public override string MemoryToolStatsNA => "N/A";
+    public override string MemoryToolQueryNoResults => "No memories found in this time range";
+    public override string MemoryToolQueryHeader(int count, string rangeDesc) => $"{rangeDesc}: {count} memories found:";
+    public override string MemoryToolInvalidYear => "Invalid 'year' parameter";
+    public override string MemoryToolUnknownAction(string action) => $"Unknown action: {action}";
 }

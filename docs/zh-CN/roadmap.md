@@ -1,6 +1,6 @@
 # 开发路线
 
-[English](../en-US/roadmap.md)
+[English](../../roadmap.md) | [繁體中文](../zh-HK/roadmap.md)
 
 ## 指导原则
 

@@ -69,6 +69,11 @@ public class Program
         AuditLogger auditLogger = new AuditLogger(auditStorage);
         _logger.Info("Initialized: AuditLogger");
 
+        ITimeStorage tokenUsageStorage = new FileSystemTimeStorage(
+            Path.Combine(configData.DataDirectory.FullName, "token-usage"));
+        TokenUsageAuditManager tokenUsageAuditManager = new TokenUsageAuditManager(tokenUsageStorage);
+        _logger.Info("Initialized: TokenUsageAuditManager");
+
         GlobalACL globalAcl = new GlobalACL(storage);
         _logger.Info("Initialized: GlobalACL");
 
@@ -104,7 +109,8 @@ public class Program
             .SetIMProvider(imProvider)
             .SetIMManager(imManager)
             .SetBeingFactory(beingFactory)
-            .SetDynamicBeingLoader(dynamicBeingLoader);
+            .SetDynamicBeingLoader(dynamicBeingLoader)
+            .SetTokenUsageAuditManager(tokenUsageAuditManager);
 
         _host = builder.Build();
 

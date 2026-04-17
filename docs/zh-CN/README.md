@@ -6,23 +6,24 @@
 
 基于 .NET 9 的多智能体协作平台，AI 智能体（硅基人）可通过 Roslyn 动态编译实现自我进化。
 
-[English](../../README.md)
+[English](../../README.md) | [繁體中文](../zh-HK/README.md)
 
 ## 特性
 
 - **多智能体编排** — 由硅基主理人统一管理，基于 Tick 驱动的时间分片公平调度（MainLoop + TickObject + 看门狗 + 熔断器）
 - **灵魂文件驱动** — 每个硅基人由核心提示词文件（`soul.md`）驱动，定义其个性与行为模式
 - **身体-大脑架构** — 身体（SiliconBeing）保持存活并检测触发场景；大脑（ContextManager）加载历史、调用 AI、执行工具并持久化响应
-- **工具调用循环** — AI 返回 tool_calls -> 执行工具 -> 反馈结果 -> AI 继续 -> 直到返回纯文本
+- **工具调用循环** — AI 返回 tool_calls → 执行工具 → 反馈结果 → AI 继续 → 直到返回纯文本
 - **执行器-权限安全体系** — 所有磁盘、网络、命令行操作均通过执行器进行权限验证
-  - 5 级权限查询链：IsCurator -> UserFrequencyCache -> GlobalACL -> IPermissionCallback -> IPermissionAskHandler
+  - 5 级权限查询链：IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
   - 所有权限决策均有审计日志
+- **Token 用量审计** — 内置 Token 用量追踪与报告（`ITokenUsageAudit` / `TokenUsageAuditManager`）
 - **最小化依赖** — 核心库仅依赖 Microsoft.CodeAnalysis.CSharp 用于 Roslyn 动态编译
 - **零数据库依赖** — 基于文件系统存储（JSON），支持通过 `ITimeStorage` 进行时间索引查询
-- **国际化** — 内置中文和英文支持
-- **Web 界面** — 内置 HTTP 服务器，支持 WebSocket/SSE，多种皮肤，完整的仪表盘
+- **国际化** — 内置简体中文、繁体中文和英文支持
+- **Web 界面** — 内置 HTTP 服务器，支持 SSE，多种皮肤，完整的仪表盘
   - **皮肤系统** — 4 种内置皮肤（Admin、Chat、Creative、Dev），提供完整的 UI 组件库
-  - **15 个控制器** — About、Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task
+  - **16 个控制器** — About、Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer
   - **实时更新** — 通过 SSE（Server-Sent Events）实现实时数据流
 
 ## 技术栈
@@ -34,7 +35,7 @@
 | AI 接入 | Ollama（原生 HTTP API） |
 | 数据存储 | 文件系统（JSON + 时间索引目录结构） |
 | Web 服务器 | HttpListener（.NET 内置） |
-| 动态编译 | Roslyn（Microsoft.CodeAnalysis.CSharp） |
+| 动态编译 | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
 | 开源许可证 | Apache-2.0 |
 
 ## 项目结构
@@ -43,14 +44,15 @@
 SiliconLifeCollective.sln
 ├── src/
 │   ├── SiliconLife.Core/                  # 核心库（接口、抽象类）
-│   │   ├── ServiceLocator.cs             # 全局服务定位器：Register/Get、ChatSystem、IMManager、AuditLogger、GlobalACL
+│   │   ├── ServiceLocator.cs             # 全局服务定位器：Register/Get、ChatSystem、IMManager、AuditLogger、GlobalACL、BeingFactory、BeingManager、DynamicBeingLoader、TokenUsageAudit
 │   │   ├── Runtime/                       # MainLoop、TickObject、CoreHost、CoreHostBuilder、PerformanceMonitor
-│   │   ├── SiliconBeing/                  # SiliconBeingBase、ISiliconBeingFactory、SiliconBeingManager、SoulFileManager、TaskSystem、TimerSystem、SiliconCurator、Memory
+│   │   ├── SiliconBeing/                  # SiliconBeingBase、SiliconBeingManager、SiliconCurator、ISiliconBeingFactory、SoulFileManager、Memory、TaskSystem、TimerSystem
 │   │   ├── AI/                            # IAIClient、IAIClientFactory、ContextManager（"大脑"）、Message、AIRequest/AIResponse
-│   │   ├── Chat/                          # ChatSystem、IChatService、SimpleChatService、ISession、SingleChatSession、GroupChatSession、ChatMessage
+│   │   ├── Audit/                         # ITokenUsageAudit、TokenUsageAuditManager、TokenUsageRecord、TokenUsageSummary、TokenUsageQuery
+│   │   ├── Chat/                          # ChatSystem、IChatService、SimpleChatService、SessionBase、SingleChatSession、GroupChatSession、ChatMessage
 │   │   ├── Executors/                     # ExecutorBase、DiskExecutor、NetworkExecutor、CommandLineExecutor、ExecutorRequest、ExecutorResult
 │   │   ├── Tools/                         # ITool、ToolManager（反射扫描）、ToolCall/ToolResult、ToolDefinition、SiliconManagerOnlyAttribute
-│   │   ├── Security/                      # PermissionManager、GlobalACL、UserFrequencyCache、AuditLogger、PermissionResult、PermissionType、IPermissionCallback、IPermissionAskHandler
+│   │   ├── Security/                      # PermissionManager、GlobalACL、AuditLogger、UserFrequencyCache、PermissionResult、PermissionType、IPermissionCallback、IPermissionAskHandler
 │   │   ├── IM/                            # IIMProvider、IMManager（消息路由）
 │   │   ├── Storage/                       # IStorage、ITimeStorage（键值存储 + 时间索引存储）
 │   │   ├── Config/                        # ConfigDataBase、Config（单例 + JSON）、ConfigDataBaseConverter、GuidConverter、AIClientConfigAttribute、ConfigGroupAttribute、ConfigIgnoreAttribute、DirectoryInfoConverter
@@ -63,32 +65,32 @@ SiliconLifeCollective.sln
 │       ├── Program.cs                     # 应用程序入口（组装所有组件）
 │       ├── AI/                            # OllamaClient、OllamaClientFactory（原生 Ollama HTTP API）
 │       ├── SiliconBeing/                  # DefaultSiliconBeing、DefaultSiliconBeingFactory
+│       ├── Calendar/                      # 日历工具
 │       ├── Executors/                     # 默认执行器实现
-│       ├── IM/                            # WebUIProvider（Web UI 作为 IM 通道）
+│       ├── IM/                            # WebUIProvider（Web UI 作为 IM 通道）、IMPermissionAskHandler
 │       ├── Tools/                         # 内置工具：日历、聊天、主理人、磁盘、动态编译、记忆、网络、系统、任务、定时器
 │       ├── Config/                        # DefaultConfigData
-│       ├── Localization/                  # ZhCN、EnUS、DefaultLocalizationBase
+│       ├── Localization/                  # ZhCN、ZhHK、EnUS、DefaultLocalizationBase
 │       ├── Logging/                       # ConsoleLoggerProvider、FileSystemLoggerProvider
 │       ├── Storage/                       # FileSystemStorage、FileSystemTimeStorage
-│       ├── Security/                      # DefaultPermissionCallback、IMPermissionAskHandler
+│       ├── Security/                      # DefaultPermissionCallback
 │       ├── Runtime/                       # TestTickObject
 │       └── Web/                           # Web UI 实现
-│           ├── Controllers/               # 15 个控制器：About、Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task
-│           ├── Models/                    # 所有控制器的 ViewModel（AboutViewModel、BeingViewModel、ChatViewModel、CodeBrowserViewModel、ConfigViewModel、DashboardViewModel、ExecutorViewModel、KnowledgeViewModel、LogViewModel、MemoryViewModel、PermissionViewModel、PermissionRequestViewModel、ProjectViewModel、TaskViewModel、ViewModelBase）
-│           ├── Views/                     # HTML 视图（ViewBase、AboutView、BeingView、ChatView、CodeBrowserView、ConfigView、DashboardView、ExecutorView、KnowledgeView、LogView、MemoryView、PermissionView、ProjectView、TaskView）
+│           ├── Controllers/               # 16 个控制器：About、Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer
+│           ├── Models/                    # ViewModel：AboutViewModel、BeingViewModel、ChatViewModel、CodeBrowserViewModel、ConfigViewModel、DashboardViewModel、ExecutorViewModel、KnowledgeViewModel、LogViewModel、MemoryViewModel、PermissionViewModel、PermissionRequestViewModel、ProjectViewModel、TaskViewModel、TimerViewModel、ViewModelBase
+│           ├── Views/                     # HTML 视图：ViewBase、AboutView、BeingView、ChatView、CodeBrowserView、CodeEditorView、ConfigView、DashboardView、ExecutorView、KnowledgeView、LogView、MarkdownEditorView、MemoryView、PermissionView、ProjectView、TaskView、TimerView
 │           ├── Skins/                     # 4 种皮肤：Admin（专业）、Chat（对话）、Creative（创意）、Dev（开发者）
-│           ├── ISkin.cs                   # 皮肤接口，包含 UI 组件库
+│           ├── ISkin.cs                   # 皮肤接口 + SkinPreviewInfo + SkinManager（自动发现）
 │           ├── Controller.cs              # 控制器基类
-│           ├── WebHost.cs                 # HTTP 服务器
-│           ├── Router.cs                  # 请求路由
+│           ├── WebHost.cs                 # HTTP 服务器（HttpListener）
+│           ├── Router.cs                  # 请求路由（模式匹配）
 │           ├── SSEHandler.cs              # 服务器推送事件
 │           ├── WebSecurity.cs             # Web 安全工具
-│           ├── H.cs                       # HTML 辅助工具
+│           ├── H.cs                       # 流式 HTML 构建器 DSL
 │           ├── CssBuilder.cs              # CSS 构建工具
 │           └── JsBuilder.cs               # JavaScript 构建工具
 │
 ├── docs/
-│   ├── en-US/                             # 英文文档
 │   └── zh-CN/                             # 中文文档
 ```
 
@@ -98,16 +100,16 @@ SiliconLifeCollective.sln
 MainLoop（专用线程，看门狗 + 熔断器）
   └── TickObject（按优先级排序）
        └── SiliconBeingManager
-            └── SiliconBeingRunner（临时线程执行，带超时和熔断）
+            └── SiliconBeingRunner（每次 Tick 独立临时线程，带超时和熔断）
                  └── DefaultSiliconBeing.Tick()
                       └── ContextManager.ThinkOnChat()
-                           └── IAIClient.Chat() -> 工具调用循环 -> 持久化到 ChatSystem
+                           └── IAIClient.Chat() → 工具调用循环 → 持久化到 ChatSystem
 ```
 
 所有 AI 发起的 I/O 操作均经过安全链：
 
 ```
-工具调用 -> 执行器 -> 权限管理器 -> [IsCurator -> 频率缓存 -> 全局ACL -> 回调 -> 询问用户]
+工具调用 → 执行器 → 权限管理器 → [IsCurator → 频率缓存 → 全局ACL → 回调 → 询问用户]
 ```
 
 ## 快速开始
@@ -149,7 +151,7 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] 第七阶段：动态编译 + 自我进化（Roslyn）
 - [x] 第八阶段：长期记忆 + 任务 + 定时器
 - [x] 第九阶段：CoreHost + 多硅基人协作
-- [x] 第十阶段：Web 界面（HTTP + WebSocket + SSE）
+- [x] 第十阶段：Web 界面（HTTP + SSE，16 个控制器，4 种皮肤）
 - [ ] 第十一阶段：外接 IM（飞书 / WhatsApp / Telegram）
 - [ ] 第十二阶段：知识图谱、插件及其他
 
@@ -165,4 +167,4 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 
 ## 作者
 
-天源垦骥 (Hoshino Kennji) — [B站](https://space.bilibili.com/617827040) | [YouTube](https://www.youtube.com/@hoshinokenji)
+天源垦骥 (Hoshino Kennji) — [B站](https://space.bilibili.com/617827040) | [YouTube](https://www.youtube.com/@hoshinokennji)

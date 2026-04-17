@@ -1,6 +1,6 @@
 # 架构设计
 
-[English](../en-US/architecture.md)
+[English](../../architecture.md) | [繁體中文](../zh-HK/architecture.md)
 
 ## 核心概念
 
@@ -28,24 +28,26 @@
 
 ### MainLoop + TickObject
 
-系统在后台线程运行**Tick 驱动的主循环**：
+系统在专用后台线程运行**Tick 驱动的主循环**：
 
 ```
-MainLoop（无限循环）
+MainLoop（专用线程，看门狗 + 熔断器）
   └── TickObject A（Priority=0, Interval=100ms）
   └── TickObject B（Priority=1, Interval=500ms）
-  └── SiliconBeingManager（Priority=0, Interval=100ms）
-        └── 硅基人 1 → Tick → ExecuteOneRound
-        └── 硅基人 2 → Tick → ExecuteOneRound
-        └── 硅基人 3 → Tick → ExecuteOneRound
+  └── SiliconBeingManager（由 MainLoop 直接驱动）
+        └── SiliconBeingRunner → 硅基人 1 → Tick → ExecuteOneRound
+        └── SiliconBeingRunner → 硅基人 2 → Tick → ExecuteOneRound
+        └── SiliconBeingRunner → 硅基人 3 → Tick → ExecuteOneRound
         └── ...
 ```
 
 关键设计决策：
 
-- **硅基人不继承 TickObject**，拥有独立的 `Tick()` 方法，但由 SiliconBeingManager 统一调用，不直接注册到 MainLoop。
-- **SiliconBeingManager 继承 TickObject**，作为所有硅基人的唯一调度代理。
+- **硅基人不继承 TickObject**，拥有独立的 `Tick()` 方法，由 `SiliconBeingManager` 通过 `SiliconBeingRunner` 调用，不直接注册到 MainLoop。
+- **SiliconBeingManager** 由 MainLoop 直接驱动，作为所有硅基人的唯一调度代理。
+- **SiliconBeingRunner** 将每个硅基人的 `Tick()` 包装在独立临时线程中执行，带超时控制和每硅基人独立熔断器（连续 3 次超时 → 冷却 1 分钟）。
 - 每个硅基人每次 Tick 只执行**一轮** AI 请求 + ToolCall，确保没有硅基人能独占主循环。
+- **PerformanceMonitor** 追踪每次 Tick 的执行耗时，用于可观测性。
 
 ### 主理人优先响应
 
@@ -109,6 +111,26 @@ MainLoop（无限循环）
 
 ---
 
+## ServiceLocator
+
+`ServiceLocator` 是线程安全的单例服务注册表，提供对所有核心服务的访问：
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `ChatSystem` | `ChatSystem` | 中央聊天会话管理器 |
+| `IMManager` | `IMManager` | 即时通讯通道路由器 |
+| `AuditLogger` | `AuditLogger` | 权限审计日志 |
+| `GlobalAcl` | `GlobalACL` | 全局访问控制列表 |
+| `BeingFactory` | `ISiliconBeingFactory` | 硅基人创建工厂 |
+| `BeingManager` | `SiliconBeingManager` | 硅基人生命周期管理器 |
+| `DynamicBeingLoader` | `DynamicBeingLoader` | 动态编译加载器 |
+| `TokenUsageAudit` | `ITokenUsageAudit` | Token 用量追踪 |
+| `TokenUsageAuditManager` | `TokenUsageAuditManager` | Token 用量报告 |
+
+同时维护以硅基人 GUID 为键的每硅基人 `PermissionManager` 注册表。
+
+---
+
 ## 关键设计决策
 
 ### Storage 设计为实例类（非静态）
@@ -149,12 +171,25 @@ MainLoop（无限循环）
 
 1. AI 生成新的类代码（必须继承 `SiliconBeingBase`）。
 2. **编译时引用控制**（主要防线）：编译器只获得允许的程序集列表——`System.IO`、`System.Reflection` 等被排除，危险操作在类型层面就不可能存在。
-3. **运行时静态分析**（辅助防线）：即使编译成功，仍对代码进行静态模式扫描。
+3. **运行时静态分析**（辅助防线）：`SecurityScanner` 即使在编译成功后仍对代码进行危险模式扫描。
 4. Roslyn 在内存中编译代码。
-5. 编译成功：替换当前实例，将加密代码持久化到磁盘。
+5. 编译成功：`SiliconBeingManager.ReplaceBeing()` 替换当前实例，迁移状态，将加密代码持久化到磁盘。
 6. 编译失败：丢弃新代码，保持现有实现。
 
+自定义 `IPermissionCallback` 实现也可通过 `ReplacePermissionCallback()` 编译并注入，允许硅基人自定义自身的权限逻辑。
+
 代码以 AES-256 加密形式存储在磁盘上。加密密钥通过 PBKDF2 从硅基人 GUID（全大写）派生。
+
+---
+
+## Token 用量审计
+
+`TokenUsageAuditManager` 追踪所有硅基人的 AI Token 消耗：
+
+- `TokenUsageRecord` — 单次请求记录（硅基人 ID、模型、提示词 Token 数、补全 Token 数、时间戳）
+- `TokenUsageSummary` — 聚合统计
+- `TokenUsageQuery` — 查询过滤参数
+- 通过 `ITimeStorage` 持久化，支持时间序列查询
 
 ---
 
@@ -166,9 +201,9 @@ Web UI 采用**可插拔皮肤系统**，允许在不改变应用逻辑的情况
 
 - **ISkin 接口** — 定义所有皮肤的契约，包括：
   - 核心渲染方法（`RenderHtml`、`RenderError`）
-  - UI 组件库（按钮、输入框、卡片、表格等）
-  - 主题 CSS 生成
-  - 皮肤选择器的预览信息
+  - 20+ UI 组件方法（按钮、输入框、卡片、表格、徽章、气泡、进度条、标签页等）
+  - 通过 `CssBuilder` 生成主题 CSS
+  - `SkinPreviewInfo` — 初始化页面皮肤选择器的颜色预览信息
 
 - **内置皮肤** — 4 种生产就绪的皮肤：
   - **Admin** — 专业、数据导向的界面，用于系统管理
@@ -176,11 +211,19 @@ Web UI 采用**可插拔皮肤系统**，允许在不改变应用逻辑的情况
   - **Creative** — 艺术化、视觉丰富的布局，用于创意工作流
   - **Dev** — 开发者导向、代码中心的界面，支持语法高亮
 
-- **皮肤发现** — 通过反射自动发现和注册（`SkinManager.DiscoverSkins()`）
+- **皮肤发现** — `SkinManager` 通过反射自动发现并注册所有 `ISkin` 实现
+
+### HTML / CSS / JS 构建器
+
+Web UI 完全在 C# 中生成标记，不依赖任何模板文件：
+
+- **`H`** — 流式 HTML 构建器 DSL，用于在代码中构建 HTML 树
+- **`CssBuilder`** — 支持选择器和媒体查询的 CSS 构建器
+- **`JsBuilder`（`JsSyntax`）** — 用于内联脚本的 JavaScript 构建器
 
 ### 控制器系统
 
-Web UI 遵循 **MVC 模式**，有 15 个控制器处理不同方面：
+Web UI 遵循 **MVC 模式**，有 16 个控制器处理不同方面：
 
 | 控制器 | 用途 |
 |--------|------|
@@ -199,12 +242,17 @@ Web UI 遵循 **MVC 模式**，有 15 个控制器处理不同方面：
 | PermissionRequest | 权限请求队列 |
 | Project | 项目管理（占位符） |
 | Task | 任务系统界面 |
+| Timer | 定时器系统管理 |
 
 ### 实时更新
 
-- **SSE（Server-Sent Events）** — 推送式更新，用于聊天消息、硅基人状态和系统事件
+- **SSE（Server-Sent Events）** — 通过 `SSEHandler` 推送聊天消息、硅基人状态和系统事件
 - **无需 WebSocket** — 使用 SSE 满足大部分实时需求，架构更简单
 - **自动重连** — 客户端重连逻辑，确保连接弹性
+
+### 国际化
+
+内置三种语言：`ZhCN`（简体中文）、`ZhHK`（繁体中文）和 `EnUS`（英文）。通过 `DefaultConfigData.Language` 配置，由 `LocalizationManager` 解析。
 
 ---
 

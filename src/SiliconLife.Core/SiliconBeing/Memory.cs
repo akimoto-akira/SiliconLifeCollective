@@ -100,12 +100,10 @@ public sealed class Memory
     private readonly ITimeStorage _timeStorage;
     private readonly string _storageKey;
 
-    private List<MemoryEntry> _memories = new();
-
     /// <summary>
     /// Gets the total number of memory entries.
     /// </summary>
-    public int Count => _memories.Count;
+    public int Count => _timeStorage.Query<MemoryEntry>(_storageKey, null).Count;
 
     /// <summary>
     /// Initializes a new instance of the Memory class with the specified time storage.
@@ -116,24 +114,7 @@ public sealed class Memory
     {
         _timeStorage = timeStorage ?? throw new ArgumentNullException(nameof(timeStorage));
         _storageKey = "memory";
-
-        Load();
         _logger.Info("Memory system initialized with {0}", _storageKey);
-    }
-
-    private void Load()
-    {
-        try
-        {
-            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, new IncompleteDate(DateTime.Now.Year));
-            _memories = entries.Select(e => e.Data).ToList();
-            _logger.Debug("Loading memories from storage, found {0} entries", _memories.Count);
-        }
-        catch (Exception ex)
-        {
-            _logger.Warn("Failed to load memories, starting with empty collection", ex);
-            _memories = new List<MemoryEntry>();
-        }
     }
 
     private void Save(MemoryEntry entry)
@@ -163,7 +144,6 @@ public sealed class Memory
             }
         }
 
-        _memories.Add(entry);
         Save(entry);
 
         _logger.Debug("Memory added: {0}..., id={1}", content.Length > 30 ? content[..30] : content, entry.Id);
@@ -193,7 +173,6 @@ public sealed class Memory
             }
         }
 
-        _memories.Add(entry);
         Save(entry);
 
         _logger.Debug("Memory added: {0}..., id={1}", content.Length > 30 ? content[..30] : content, entry.Id);
@@ -202,61 +181,56 @@ public sealed class Memory
     }
 
     /// <summary>
-    /// Gets the most recent memory entries, searching from the current time backwards.
+    /// Gets the most recent memory entries by progressively widening the time range:
+    /// today �?this month �?this year �?all entries.
     /// </summary>
-    /// <param name="count">The maximum number of entries to retrieve per time period.</param>
-    /// <returns>A list of recent memory entries.</returns>
+    /// <param name="count">The maximum number of entries to return.</param>
+    /// <returns>A list of recent memory entries ordered by timestamp descending.</returns>
     public List<MemoryEntry> GetRecent(int count = 2)
     {
         var now = DateTime.Now;
-        var results = new List<MemoryEntry>();
-        var seenIds = new HashSet<Guid>();
 
-        var hour = now.Hour;
-        for (int h = hour; h >= 0 && results.Count < count * 10; h--)
-        {
-            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, new IncompleteDate(now.Year, now.Month, now.Day, h));
-            foreach (var e in entries.OrderByDescending(e => e.Timestamp).Take(count))
-            {
-                if (seenIds.Add(e.Data.Id))
-                    results.Add(e.Data);
-            }
-        }
+        // today
+        var results = Query(new IncompleteDate(now.Year, now.Month, now.Day), count);
+        if (results.Count >= count) return results;
 
-        var day = now.Day;
-        for (int d = day - 1; d > 0 && results.Count < count * 10; d--)
-        {
-            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, new IncompleteDate(now.Year, now.Month, d));
-            foreach (var e in entries.OrderByDescending(e => e.Timestamp).Take(count))
-            {
-                if (seenIds.Add(e.Data.Id))
-                    results.Add(e.Data);
-            }
-        }
+        // this month
+        results = Query(new IncompleteDate(now.Year, now.Month), count);
+        if (results.Count >= count) return results;
 
-        var month = now.Month;
-        for (int m = month - 1; m > 0 && results.Count < count * 10; m--)
-        {
-            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, new IncompleteDate(now.Year, m));
-            foreach (var e in entries.OrderByDescending(e => e.Timestamp).Take(count))
-            {
-                if (seenIds.Add(e.Data.Id))
-                    results.Add(e.Data);
-            }
-        }
+        // this year
+        results = Query(new IncompleteDate(now.Year), count);
+        if (results.Count >= count) return results;
 
-        for (int y = now.Year - 1; results.Count < count * 10; y--)
-        {
-            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, new IncompleteDate(y));
-            foreach (var e in entries.OrderByDescending(e => e.Timestamp).Take(count))
-            {
-                if (seenIds.Add(e.Data.Id))
-                    results.Add(e.Data);
-            }
-            if (y <= 0) break;
-        }
+        // all
+        return QueryAll(count);
+    }
 
-        return results.Take(count).ToList();
+    /// <summary>
+    /// Queries memory entries within a specific time range.
+    /// </summary>
+    /// <param name="range">The time range to query (unspecified components are wildcards). Null means all entries.</param>
+    /// <param name="count">Maximum number of entries to return. 0 means no limit.</param>
+    /// <returns>A list of matching memory entries ordered by timestamp descending.</returns>
+    public List<MemoryEntry> Query(IncompleteDate? range, int count = 0)
+    {
+        var entries = _timeStorage.Query<MemoryEntry>(_storageKey, range)
+            .OrderByDescending(e => e.Timestamp)
+            .Select(e => e.Data);
+
+        return (count > 0 ? entries.Take(count) : entries).ToList();
+    }
+
+    /// <summary>
+    /// Returns all memory entries ordered by timestamp descending.
+    /// </summary>
+    /// <param name="count">Maximum number of entries to return. 0 means no limit.</param>
+    public List<MemoryEntry> QueryAll(int count = 0)
+    {
+        var entries = _timeStorage.Query<MemoryEntry>(_storageKey, null)
+            .OrderByDescending(e => e.Timestamp)
+            .Select(e => e.Data);
+        return (count > 0 ? entries.Take(count) : entries).ToList();
     }
 
     /// <summary>
@@ -265,14 +239,15 @@ public sealed class Memory
     /// <returns>A MemoryStatistics object with memory system statistics.</returns>
     public MemoryStatistics GetStatistics()
     {
-        var oldest = _memories.MinBy(m => m.Timestamp);
-        var newest = _memories.MaxBy(m => m.Timestamp);
+        var all = _timeStorage.Query<MemoryEntry>(_storageKey, null);
+        var oldest = all.MinBy(e => e.Timestamp);
+        var newest = all.MaxBy(e => e.Timestamp);
 
         return new MemoryStatistics
         {
-            TotalEntries = _memories.Count,
-            OldestEntry = oldest?.Timestamp,
-            NewestEntry = newest?.Timestamp
+            TotalEntries = all.Count,
+            OldestEntry = oldest != null ? new IncompleteDate(oldest.Timestamp.Year, oldest.Timestamp.Month, oldest.Timestamp.Day, oldest.Timestamp.Hour, oldest.Timestamp.Minute, oldest.Timestamp.Second) : null,
+            NewestEntry = newest != null ? new IncompleteDate(newest.Timestamp.Year, newest.Timestamp.Month, newest.Timestamp.Day, newest.Timestamp.Hour, newest.Timestamp.Minute, newest.Timestamp.Second) : null,
         };
     }
 
@@ -285,7 +260,7 @@ public sealed class Memory
         var compressLevel = FindLevelToCompress();
         if (compressLevel.HasValue)
         {
-            _logger.Debug("Memory compression check: {0} entries, compression needed", _memories.Count);
+            _logger.Debug("Memory compression check: compression needed");
         }
         return compressLevel.HasValue;
     }
@@ -407,7 +382,13 @@ public sealed class Memory
     /// <param name="entryIds">The list of entry IDs to remove.</param>
     public void RemoveEntries(List<Guid> entryIds)
     {
-        _memories.RemoveAll(m => entryIds.Contains(m.Id));
+        foreach (Guid id in entryIds)
+        {
+            var entry = _timeStorage.Query<MemoryEntry>(_storageKey, null)
+                .FirstOrDefault(e => e.Data.Id == id);
+            if (entry != null)
+                _timeStorage.Delete(_storageKey, entry.Timestamp);
+        }
     }
 
     /// <summary>

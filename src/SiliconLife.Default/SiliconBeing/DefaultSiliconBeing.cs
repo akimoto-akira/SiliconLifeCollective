@@ -84,6 +84,14 @@ public class DefaultSiliconBeing : SiliconBeingBase
             {
                 Name = name;
                 _logger.Debug("Being {0}: state loaded from {1}", Name, stateFilePath);
+
+                Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+                if (LocalizationManager.Instance.TryGetLocalization(language, out LocalizationBase? loc) &&
+                    loc is DefaultLocalizationBase defaultLoc)
+                {
+                    Memory?.Add(defaultLoc.FormatMemoryEventStartup());
+                }
+
                 return true;
             }
         }
@@ -161,6 +169,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
             Language language = Config.Instance.Data.Language;
             DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(language);
 
+            Memory?.Add(localization.FormatMemoryEventRuntimeError(ex.Message));
             Console.WriteLine($"{Name}: {localization.UnexpectedErrorMessage} {ex.Message}");
             Console.WriteLine();
         }

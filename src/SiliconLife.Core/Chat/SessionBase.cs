@@ -24,7 +24,9 @@ public enum SessionType
     /// <summary>Single chat</summary>
     SingleChat,
     /// <summary>Group chat</summary>
-    GroupChat
+    GroupChat,
+    /// <summary>Broadcast channel — open to all silicon beings</summary>
+    Broadcast
 }
 
 /// <summary>

@@ -24,7 +24,7 @@ namespace SiliconLife.Collective;
 /// <example>
 /// <c>new IncompleteDate(2026, month: 4)</c> represents any moment in April 2026.
 /// </example>
-public readonly struct IncompleteDate : IEquatable<IncompleteDate>
+public readonly struct IncompleteDate : IEquatable<IncompleteDate>, IComparable<IncompleteDate>
 {
     /// <summary>Year (required).</summary>
     public int Year { get; }
@@ -131,6 +131,27 @@ public readonly struct IncompleteDate : IEquatable<IncompleteDate>
     public static bool operator ==(IncompleteDate left, IncompleteDate right) => left.Equals(right);
 
     public static bool operator !=(IncompleteDate left, IncompleteDate right) => !left.Equals(right);
+
+    // ── Comparison ────────────────────────────────────
+
+    /// <summary>
+    /// Compares two incomplete dates component by component from coarsest to finest.
+    /// Unspecified (null) components are treated as their minimum value (year: n/a, month/day: 1, time: 0).
+    /// </summary>
+    public int CompareTo(IncompleteDate other)
+    {
+        int c = Year.CompareTo(other.Year);                              if (c != 0) return c;
+        c = (Month  ?? 1).CompareTo(other.Month  ?? 1);                 if (c != 0) return c;
+        c = (Day    ?? 1).CompareTo(other.Day    ?? 1);                 if (c != 0) return c;
+        c = (Hour   ?? 0).CompareTo(other.Hour   ?? 0);                 if (c != 0) return c;
+        c = (Minute ?? 0).CompareTo(other.Minute ?? 0);                 if (c != 0) return c;
+        return (Second ?? 0).CompareTo(other.Second ?? 0);
+    }
+
+    public static bool operator < (IncompleteDate l, IncompleteDate r) => l.CompareTo(r) <  0;
+    public static bool operator > (IncompleteDate l, IncompleteDate r) => l.CompareTo(r) >  0;
+    public static bool operator <=(IncompleteDate l, IncompleteDate r) => l.CompareTo(r) <= 0;
+    public static bool operator >=(IncompleteDate l, IncompleteDate r) => l.CompareTo(r) >= 0;
 
     /// <summary>Human-readable representation showing only the specified components.</summary>
     public override string ToString()

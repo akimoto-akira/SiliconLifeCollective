@@ -28,6 +28,7 @@ public class CuratorTool : ITool
 
     public string Description =>
         "Manage silicon beings. Actions: 'list_beings' (list all beings with status), " +
+        "'create_being' (create a new silicon being; requires 'name' and 'soul' parameters), " +
         "'get_code' (view a being's custom source code), " +
         "'reset' (revert to default implementation).";
 
@@ -50,12 +51,22 @@ public class CuratorTool : ITool
                 {
                     ["type"] = "string",
                     ["description"] = "The management action to perform",
-                    ["enum"] = new[] { "list_beings", "get_code", "reset" }
+                    ["enum"] = new[] { "list_beings", "create_being", "get_code", "reset" }
                 },
                 ["being_id"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
                     ["description"] = "The GUID of the target silicon being (required for most actions)"
+                },
+                ["name"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["description"] = "The name for the new silicon being (required for 'create_being')"
+                },
+                ["soul"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["description"] = "The soul content (system prompt) for the new silicon being (required for 'create_being')"
                 }
             },
             ["required"] = new[] { "action" }
@@ -77,6 +88,24 @@ public class CuratorTool : ITool
             return ExecuteListBeings(callerId);
         }
 
+        // create_being requires name and soul, not being_id
+        if (action == "create_being")
+        {
+            if (!parameters.TryGetValue("name", out object? nameObj) ||
+                string.IsNullOrWhiteSpace(nameObj?.ToString()))
+            {
+                return ToolResult.Failed("Missing 'name' parameter");
+            }
+
+            if (!parameters.TryGetValue("soul", out object? soulObj) ||
+                string.IsNullOrWhiteSpace(soulObj?.ToString()))
+            {
+                return ToolResult.Failed("Missing 'soul' parameter");
+            }
+
+            return ExecuteCreateBeing(callerId, nameObj.ToString()!.Trim(), soulObj.ToString()!);
+        }
+
         // All other actions require being_id
         if (!parameters.TryGetValue("being_id", out object? beingIdObj) ||
             string.IsNullOrWhiteSpace(beingIdObj?.ToString()))
@@ -92,13 +121,48 @@ public class CuratorTool : ITool
         return action switch
         {
             "get_code" => ExecuteGetCode(beingId),
-            "reset" => ExecuteReset(beingId),
+            "reset" => ExecuteReset(callerId, beingId),
             _ => ToolResult.Failed($"Unknown action: {action}")
         };
     }
 
-    private ToolResult ExecuteListBeings(Guid callerId)
+    private ToolResult ExecuteCreateBeing(Guid callerId, string name, string soulContent)
     {
+        ISiliconBeingFactory? factory = ServiceLocator.Instance.BeingFactory;
+        if (factory == null)
+        {
+            return ToolResult.Failed("ISiliconBeingFactory is not available.");
+        }
+
+        SiliconBeingManager? beingManager = MainLoop.BeingManager;
+        if (beingManager == null)
+        {
+            return ToolResult.Failed("SiliconBeingManager is not available.");
+        }
+
+        Guid newId = Guid.NewGuid();
+
+        // Write the soul file before CreateBeing so the factory picks it up during initialization
+        string beingDirectory = GetBeingDirectory(newId);
+        if (!Directory.Exists(beingDirectory))
+        {
+            Directory.CreateDirectory(beingDirectory);
+        }
+
+        if (!SoulFileManager.SaveSoul(beingDirectory, soulContent))
+        {
+            return ToolResult.Failed($"Failed to save soul file for being {newId:N}.");
+        }
+
+        SiliconBeingBase newBeing = factory.CreateBeing(newId, name);
+        beingManager.RegisterBeing(newBeing);
+
+        RecordMemoryForCaller(callerId, loc => loc.FormatMemoryEventBeingCreated(name, newId.ToString("N")));
+
+        return ToolResult.Successful($"Silicon being created successfully.\nID:   {newId:N}\nName: {name}");
+    }
+
+    private ToolResult ExecuteListBeings(Guid callerId)    {
         SiliconBeingManager? beingManager = MainLoop.BeingManager;
         if (beingManager == null)
         {
@@ -150,7 +214,7 @@ public class CuratorTool : ITool
         return ToolResult.Successful($"Custom code for being {beingId:N}:\n\n{sourceCode}");
     }
 
-    private ToolResult ExecuteReset(Guid beingId)
+    private ToolResult ExecuteReset(Guid callerId, Guid beingId)
     {
         string beingDirectory = GetBeingDirectory(beingId);
         DynamicBeingLoader.DeleteCustomCode(beingDirectory);
@@ -160,6 +224,8 @@ public class CuratorTool : ITool
         {
             beingManager.ReplaceWithDefault(beingId);
         }
+
+        RecordMemoryForCaller(callerId, loc => loc.FormatMemoryEventBeingReset(beingId.ToString("N")));
 
         return ToolResult.Successful($"Being {beingId:N} has been reset to the default implementation.");
     }
@@ -172,5 +238,22 @@ public class CuratorTool : ITool
         string dataDirectory = Config.Instance?.Data?.DataDirectory?.FullName
             ?? Path.Combine(Environment.CurrentDirectory, "data");
         return Path.Combine(dataDirectory, "SiliconManager", beingId.ToString());
+    }
+
+    /// <summary>
+    /// Records a localized memory event to the calling being's memory.
+    /// </summary>
+    private static void RecordMemoryForCaller(Guid callerId, Func<DefaultLocalizationBase, string> format)
+    {
+        SiliconBeingBase? being = ServiceLocator.Instance.BeingManager?.GetBeing(callerId);
+        if (being?.Memory == null) return;
+
+        Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+        if (LocalizationManager.Instance.TryGetLocalization(language, out LocalizationBase? loc) &&
+            loc is DefaultLocalizationBase defaultLoc)
+        {
+            try { being.Memory.Add(format(defaultLoc)); }
+            catch { /* non-critical */ }
+        }
     }
 }

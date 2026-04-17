@@ -440,6 +440,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string PageTitleLogs { get; }
 
     /// <summary>
+    /// Gets the page title for audit page
+    /// </summary>
+    public abstract string PageTitleAudit { get; }
+
+    /// <summary>
     /// Gets the page title for config page
     /// </summary>
     public abstract string PageTitleConfig { get; }
@@ -971,6 +976,148 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the text for next page button
     /// </summary>
     public abstract string LogsNextPage { get; }
+
+    // ===== Audit Page Localization =====
+
+    /// <summary>
+    /// Gets the audit page header text
+    /// </summary>
+    public abstract string AuditPageHeader { get; }
+
+    /// <summary>
+    /// Gets the label for total token count
+    /// </summary>
+    public abstract string AuditTotalTokens { get; }
+
+    /// <summary>
+    /// Gets the label for total requests
+    /// </summary>
+    public abstract string AuditTotalRequests { get; }
+
+    /// <summary>
+    /// Gets the label for success count
+    /// </summary>
+    public abstract string AuditSuccessCount { get; }
+
+    /// <summary>
+    /// Gets the label for failure count
+    /// </summary>
+    public abstract string AuditFailureCount { get; }
+
+    /// <summary>
+    /// Gets the label for prompt tokens
+    /// </summary>
+    public abstract string AuditPromptTokens { get; }
+
+    /// <summary>
+    /// Gets the label for completion tokens
+    /// </summary>
+    public abstract string AuditCompletionTokens { get; }
+
+    /// <summary>
+    /// Gets the label for start time filter
+    /// </summary>
+    public abstract string AuditStartTime { get; }
+
+    /// <summary>
+    /// Gets the label for end time filter
+    /// </summary>
+    public abstract string AuditEndTime { get; }
+
+    /// <summary>
+    /// Gets the text for the filter button
+    /// </summary>
+    public abstract string AuditFilterButton { get; }
+
+    /// <summary>
+    /// Gets the empty state text when no audit records exist
+    /// </summary>
+    public abstract string AuditEmptyState { get; }
+
+    /// <summary>
+    /// Gets the label for AI client type filter
+    /// </summary>
+    public abstract string AuditAIClientType { get; }
+
+    /// <summary>
+    /// Gets the text for "All Types" option in AI client type filter
+    /// </summary>
+    public abstract string AuditAllClientTypes { get; }
+
+    /// <summary>
+    /// Gets the label for grouping by AI client type
+    /// </summary>
+    public abstract string AuditGroupByClient { get; }
+
+    /// <summary>
+    /// Gets the label for grouping by being
+    /// </summary>
+    public abstract string AuditGroupByBeing { get; }
+
+    /// <summary>
+    /// Gets the text for previous page button
+    /// </summary>
+    public abstract string AuditPrevPage { get; }
+
+    /// <summary>
+    /// Gets the text for next page button
+    /// </summary>
+    public abstract string AuditNextPage { get; }
+
+    /// <summary>
+    /// Gets the label for silicon being filter
+    /// </summary>
+    public abstract string AuditBeing { get; }
+
+    /// <summary>
+    /// Gets the text for "All Beings" option in being filter
+    /// </summary>
+    public abstract string AuditAllBeings { get; }
+
+    /// <summary>
+    /// Gets the text for "Today" time range button
+    /// </summary>
+    public abstract string AuditTimeToday { get; }
+
+    /// <summary>
+    /// Gets the text for "This Week" time range button
+    /// </summary>
+    public abstract string AuditTimeWeek { get; }
+
+    /// <summary>
+    /// Gets the text for "This Month" time range button
+    /// </summary>
+    public abstract string AuditTimeMonth { get; }
+
+    /// <summary>
+    /// Gets the text for "This Year" time range button
+    /// </summary>
+    public abstract string AuditTimeYear { get; }
+
+    /// <summary>
+    /// Gets the text for the export button
+    /// </summary>
+    public abstract string AuditExport { get; }
+
+    /// <summary>
+    /// Gets the title for the token usage trend chart
+    /// </summary>
+    public abstract string AuditTrendTitle { get; }
+
+    /// <summary>
+    /// Gets the legend label for prompt tokens in trend chart
+    /// </summary>
+    public abstract string AuditTrendPrompt { get; }
+
+    /// <summary>
+    /// Gets the legend label for completion tokens in trend chart
+    /// </summary>
+    public abstract string AuditTrendCompletion { get; }
+
+    /// <summary>
+    /// Gets the legend label for total tokens in trend chart
+    /// </summary>
+    public abstract string AuditTrendTotal { get; }
 
     /// <summary>
     /// Gets the localized display name for a configuration group
@@ -1783,4 +1930,67 @@ public abstract class DefaultLocalizationBase : LocalizationBase
 
     /// <summary>Formats a full Dehong Dai calendar date-time into a localized human-readable string.</summary>
     public abstract string LocalizeDehongDaiDate(int year, int month, int day, bool isLeap, int hour, int minute, int second);
+
+    // ===== Memory Event Localization =====
+
+    public abstract override string FormatMemoryEventSingleChat(string partnerName, string content);
+    public abstract override string FormatMemoryEventGroupChat(string sessionId, string content);
+    public abstract override string FormatMemoryEventToolCall(string toolNames);
+    public abstract override string FormatMemoryEventTask(string content);
+    public abstract override string FormatMemoryEventTimer(string content);
+
+    // ===== Default-Layer Memory Event Localization =====
+
+    /// <summary>
+    /// Formats a memory record when the curator creates a new silicon being.
+    /// </summary>
+    /// <param name="name">The name of the newly created being</param>
+    /// <param name="id">The GUID of the newly created being</param>
+    public abstract string FormatMemoryEventBeingCreated(string name, string id);
+
+    /// <summary>
+    /// Formats a memory record when a silicon being is reset to its default implementation.
+    /// </summary>
+    /// <param name="id">The GUID of the being that was reset</param>
+    public abstract string FormatMemoryEventBeingReset(string id);
+
+    /// <summary>
+    /// Formats a memory record when a task reaches a terminal state (completed).
+    /// </summary>
+    /// <param name="taskTitle">The title of the completed task</param>
+    public abstract string FormatMemoryEventTaskCompleted(string taskTitle);
+
+    /// <summary>
+    /// Formats a memory record when a task reaches a terminal state (failed).
+    /// </summary>
+    /// <param name="taskTitle">The title of the failed task</param>
+    public abstract string FormatMemoryEventTaskFailed(string taskTitle);
+
+    /// <summary>
+    /// Formats a memory record when the being comes online (loaded by the manager).
+    /// </summary>
+    public abstract string FormatMemoryEventStartup();
+
+    /// <summary>
+    /// Formats a memory record when an unexpected runtime error occurs during a tick.
+    /// </summary>
+    /// <param name="message">The exception message</param>
+    public abstract string FormatMemoryEventRuntimeError(string message);
+
+    // ===== MemoryTool Response Localization =====
+
+    public abstract string MemoryToolNotAvailable { get; }
+    public abstract string MemoryToolMissingAction { get; }
+    public abstract string MemoryToolMissingContent { get; }
+    public abstract string MemoryToolNoMemories { get; }
+    public abstract string MemoryToolRecentHeader(int count);
+    public abstract string MemoryToolStatsHeader { get; }
+    public abstract string MemoryToolStatsTotal { get; }
+    public abstract string MemoryToolStatsOldest { get; }
+    public abstract string MemoryToolStatsNewest { get; }
+    public abstract string MemoryToolStatsNA { get; }
+    public abstract string MemoryToolQueryNoResults { get; }
+    public abstract string MemoryToolQueryHeader(int count, string rangeDesc);
+    public abstract string MemoryToolInvalidYear { get; }
+    public abstract string MemoryToolUnknownAction(string action);
 }

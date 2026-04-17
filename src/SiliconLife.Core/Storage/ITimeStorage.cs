@@ -65,16 +65,17 @@ public interface ITimeStorage : IStorage
     /// Queries entries matching the given key prefix and time range.
     /// </summary>
     /// <param name="key">The logical key prefix to match.</param>
-    /// <param name="range">The time range to match (unspecified components are wildcards).</param>
+    /// <param name="range">The time range to match (unspecified components are wildcards). Null means all entries.</param>
     /// <returns>All matching entries, ordered by timestamp ascending.</returns>
-    List<TimeEntry<T>> Query<T>(string key, IncompleteDate range);
+    List<TimeEntry<T>> Query<T>(string key, IncompleteDate? range);
 
     /// <summary>
     /// Queries all entries matching the time range across all keys.
     /// </summary>
-    /// <param name="range">The time range to match.</param>
+    /// <param name="range">The time range to match (null means all entries without filtering).</param>
     /// <returns>All matching entries, ordered by timestamp ascending.</returns>
-    List<TimeEntry<T>> Query<T>(IncompleteDate range);
+    List<TimeEntry<T>> Query<T>(IncompleteDate? range);
+
 
     /// <summary>
     /// Returns the number of entries matching the given key and time range.

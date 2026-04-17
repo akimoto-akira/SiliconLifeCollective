@@ -48,6 +48,9 @@ public class Router
         RegisterController(() => new PermissionController(), "/permissions");
         RegisterController(() => new LogController(), "/logs");
         RegisterController(() => new LogController(), "/api/logs/list");
+        RegisterController(() => new AuditController(), "/audit");
+        RegisterController(() => new AuditController(), "/api/audit/list");
+        RegisterController(() => new AuditController(), "/api/audit/summary");
         RegisterController(() => new ConfigController(), "/config");
         RegisterController(() => new ConfigController(), "/config/save", "POST");
         RegisterController(() => new MemoryController(), "/memory");

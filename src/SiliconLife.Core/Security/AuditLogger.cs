@@ -123,9 +123,9 @@ public class AuditLogger
     /// <summary>
     /// Queries audit entries within a time range
     /// </summary>
-    /// <param name="range">The time range to query</param>
+    /// <param name="range">The time range to query (null means all entries without filtering).</param>
     /// <returns>List of matching audit entries</returns>
-    public List<AuditEntry> Query(IncompleteDate range)
+    public List<AuditEntry> Query(IncompleteDate? range)
     {
         if (_timeStorage == null)
         {

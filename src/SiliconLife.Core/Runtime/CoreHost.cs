@@ -98,6 +98,12 @@ public class CoreHost
             ServiceLocator.Instance.Register(_builder.IMProvider);
             _logger.Debug("Registered service: {0}", _builder.IMProvider.GetType().Name);
         }
+        if (_builder.TokenUsageAuditManager != null)
+        {
+            ServiceLocator.Instance.Register<ITokenUsageAudit>(_builder.TokenUsageAuditManager);
+            ServiceLocator.Instance.Register<TokenUsageAuditManager>(_builder.TokenUsageAuditManager);
+            _logger.Debug("Registered service: {0}", nameof(TokenUsageAuditManager));
+        }
 
         MainLoop.SetConfig(_builder.Config!);
         MainLoop.Start();

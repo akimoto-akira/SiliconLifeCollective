@@ -281,6 +281,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string PageTitleKnowledge => "知识图谱 - 硅基生命群";
     public override string PageTitleProjects => "项目空间管理 - 硅基生命群";
     public override string PageTitleLogs => "日志查询 - 硅基生命群";
+    public override string PageTitleAudit => "Token 审计 - 硅基生命群";
     public override string PageTitleConfig => "系统配置 - 硅基生命群";
     public override string PageTitleExecutor => "执行器监控 - 硅基生命群";
     public override string PageTitleCodeBrowser => "代码浏览 - 硅基生命群";
@@ -418,6 +419,35 @@ public class ZhCN : DefaultLocalizationBase
     public override string LogsExceptionLabel => "异常详情：";
     public override string LogsPrevPage => "上一页";
     public override string LogsNextPage => "下一页";
+
+    public override string AuditPageHeader => "Token 用量审计";
+    public override string AuditTotalTokens => "总 Token 数";
+    public override string AuditTotalRequests => "总请求数";
+    public override string AuditSuccessCount => "成功";
+    public override string AuditFailureCount => "失败";
+    public override string AuditPromptTokens => "输入 Token";
+    public override string AuditCompletionTokens => "输出 Token";
+    public override string AuditStartTime => "开始时间";
+    public override string AuditEndTime => "结束时间";
+    public override string AuditFilterButton => "查询";
+    public override string AuditEmptyState => "暂无审计记录";
+    public override string AuditAIClientType => "AI 客户端";
+    public override string AuditAllClientTypes => "全部类型";
+    public override string AuditGroupByClient => "按客户端分组";
+    public override string AuditGroupByBeing => "按硅基人分组";
+    public override string AuditPrevPage => "上一页";
+    public override string AuditNextPage => "下一页";
+    public override string AuditBeing => "硅基人";
+    public override string AuditAllBeings => "全部硅基人";
+    public override string AuditTimeToday => "今日";
+    public override string AuditTimeWeek => "本周";
+    public override string AuditTimeMonth => "本月";
+    public override string AuditTimeYear => "本年";
+    public override string AuditExport => "导出";
+    public override string AuditTrendTitle => "Token 用量趋势";
+    public override string AuditTrendPrompt => "输入 Token";
+    public override string AuditTrendCompletion => "输出 Token";
+    public override string AuditTrendTotal => "总 Token";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {
@@ -1265,4 +1295,56 @@ public class ZhCN : DefaultLocalizationBase
         string monthName = (isLeap ? "闰" : "") + (GetDehongDaiMonthName(month) ?? $"{month}月");
         return $"傣历{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
+
+    // ===== Memory Event Localization =====
+
+    public override string FormatMemoryEventSingleChat(string partnerName, string content)
+        => $"[单聊] 与\"{partnerName}\"对话，回复：{content}";
+
+    public override string FormatMemoryEventGroupChat(string sessionId, string content)
+        => $"[群聊] 在会话 {sessionId} 中发言：{content}";
+
+    public override string FormatMemoryEventToolCall(string toolNames)
+        => $"[工具调用] 执行工具：{toolNames}";
+
+    public override string FormatMemoryEventTask(string content)
+        => $"[任务] 执行任务，结果：{content}";
+
+    public override string FormatMemoryEventTimer(string content)
+        => $"[定时] 定时触发，响应：{content}";
+
+    public override string FormatMemoryEventBeingCreated(string name, string id)
+        => $"[管理] 创建了新硅基人\"{name}\"（{id}）";
+
+    public override string FormatMemoryEventBeingReset(string id)
+        => $"[管理] 将硅基人 {id} 重置为默认实现";
+
+    public override string FormatMemoryEventTaskCompleted(string taskTitle)
+        => $"[任务完成] {taskTitle}";
+
+    public override string FormatMemoryEventTaskFailed(string taskTitle)
+        => $"[任务失败] {taskTitle}";
+
+    public override string FormatMemoryEventStartup()
+        => "系统启动，我上线了";
+
+    public override string FormatMemoryEventRuntimeError(string message)
+        => $"[运行时错误] {message}";
+
+    // ===== MemoryTool Response Localization =====
+
+    public override string MemoryToolNotAvailable => "记忆系统不可用";
+    public override string MemoryToolMissingAction => "缺少 'action' 参数";
+    public override string MemoryToolMissingContent => "缺少 'content' 参数";
+    public override string MemoryToolNoMemories => "暂无记忆";
+    public override string MemoryToolRecentHeader(int count) => $"最近 {count} 条记忆：";
+    public override string MemoryToolStatsHeader => "记忆统计：";
+    public override string MemoryToolStatsTotal => "- 总数";
+    public override string MemoryToolStatsOldest => "- 最早";
+    public override string MemoryToolStatsNewest => "- 最新";
+    public override string MemoryToolStatsNA => "无";
+    public override string MemoryToolQueryNoResults => "该时间范围内无记忆";
+    public override string MemoryToolQueryHeader(int count, string rangeDesc) => $"{rangeDesc} 共 {count} 条记忆：";
+    public override string MemoryToolInvalidYear => "'year' 参数无效";
+    public override string MemoryToolUnknownAction(string action) => $"未知操作：{action}";
 }

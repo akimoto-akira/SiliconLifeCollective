@@ -164,7 +164,7 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         }
 
         // Create TimeStorage for this being (separate directory per being)
-        string beingTimeStorageDir = Path.Combine(_dataDirectory, "SiliconManager", id.ToString(), "memory");
+        string beingTimeStorageDir = Path.Combine(_dataDirectory, "SiliconManager", id.ToString());
         ITimeStorage beingTimeStorage = new FileSystemTimeStorage(beingTimeStorageDir);
         being.TimeStorage = beingTimeStorage;
 

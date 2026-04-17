@@ -26,7 +26,8 @@ public class DiskTool : ITool
 
     public string Description =>
         "Perform file and directory operations. Actions: read_file, write_file, " +
-        "list_directory, delete_file, create_directory, exists, get_file_info, count_lines, read_lines, clear_file, replace_lines, replace_text, replace_text_all (not recommended for code editing).";
+        "list_directory, delete_file, create_directory, exists, get_file_info, count_lines, read_lines, clear_file, replace_lines, replace_text, replace_text_all (not recommended for code editing), " +
+        "list_drives (all drives with type and capacity information).";
 
     public string GetDisplayName(Language language)
     {
@@ -47,7 +48,7 @@ public class DiskTool : ITool
                 {
                     ["type"] = "string",
                     ["description"] = "The action to perform",
-                    ["enum"] = new[] { "read_file", "write_file", "list_directory", "delete_file", "create_directory", "exists", "get_file_info", "count_lines", "read_lines", "clear_file", "replace_lines", "replace_text", "replace_text_all" }
+                    ["enum"] = new[] { "read_file", "write_file", "list_directory", "delete_file", "create_directory", "exists", "get_file_info", "count_lines", "read_lines", "clear_file", "replace_lines", "replace_text", "replace_text_all", "list_drives" }
                 },
                 ["path"] = new Dictionary<string, object>
                 {
@@ -91,12 +92,17 @@ public class DiskTool : ITool
             return ToolResult.Failed("Missing 'action' parameter");
         }
 
+        string action = actionObj?.ToString() ?? "";
+
+        // list_drives does not require a path
+        if (action == "list_drives")
+            return ExecuteListDrives();
+
         if (!parameters.TryGetValue("path", out object? pathObj) || string.IsNullOrWhiteSpace(pathObj?.ToString()))
         {
             return ToolResult.Failed("Missing 'path' parameter");
         }
 
-        string action = actionObj?.ToString() ?? "";
         string path = pathObj.ToString()!;
 
         var requestParams = new Dictionary<string, object>();
@@ -284,5 +290,45 @@ public class DiskTool : ITool
         }
 
         return ToolResult.Failed(result.Error ?? $"Disk operation '{action}' failed");
+    }
+
+    private static ToolResult ExecuteListDrives()
+    {
+        DriveInfo[] drives = DriveInfo.GetDrives();
+        var lines = new List<string>();
+
+        foreach (DriveInfo drive in drives)
+        {
+            string driveType = drive.DriveType switch
+            {
+                DriveType.Fixed       => "Fixed",
+                DriveType.Removable   => "Removable (USB/SD)",
+                DriveType.Network     => "Network",
+                DriveType.CDRom       => "CD/DVD",
+                DriveType.Ram         => "RAM Disk",
+                DriveType.NoRootDirectory => "No Root",
+                _                     => "Unknown"
+            };
+
+            if (!drive.IsReady)
+            {
+                lines.Add($"{drive.Name}  [{driveType}]  (not ready)");
+                continue;
+            }
+
+            double totalGb = drive.TotalSize / 1024.0 / 1024.0 / 1024.0;
+            double freeGb  = drive.TotalFreeSpace / 1024.0 / 1024.0 / 1024.0;
+            double usedGb  = totalGb - freeGb;
+            double usedPct = totalGb > 0 ? usedGb / totalGb * 100.0 : 0;
+
+            string label = string.IsNullOrWhiteSpace(drive.VolumeLabel) ? "(no label)" : drive.VolumeLabel;
+            lines.Add(
+                $"{drive.Name}  [{driveType}]  {label}  " +
+                $"Used: {usedGb:F1} GB / {totalGb:F1} GB ({usedPct:F1}%)  " +
+                $"Free: {freeGb:F1} GB  " +
+                $"Format: {drive.DriveFormat}");
+        }
+
+        return ToolResult.Successful($"Drives ({drives.Length}):\n" + string.Join("\n", lines));
     }
 }

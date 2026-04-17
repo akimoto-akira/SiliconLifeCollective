@@ -11,9 +11,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Reflection.Metadata;
-using System.Threading.Channels;
-
 namespace SiliconLife.Collective;
 
 /// <summary>
@@ -26,6 +23,7 @@ public class ChatSystem
     private readonly ITimeStorage _storage;
     private readonly object _lock = new();
     private Dictionary<Guid, SessionBase> _sessions = new();
+    private readonly Dictionary<Guid, BroadcastChannel> _broadcastChannels = new();
 
     public ChatSystem(ITimeStorage storage)
     {
@@ -275,5 +273,71 @@ public class ChatSystem
             }
         }
         return count;
+    }
+
+    // ── Broadcast ─────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Get or create a broadcast channel with a fixed, well-known ID.
+    /// Suitable for system-wide announcements across the silicon collective.
+    /// </summary>
+    /// <param name="channelId">Fixed channel GUID (use a project-level constant)</param>
+    /// <param name="name">Human-readable channel name</param>
+    public BroadcastChannel GetOrCreateBroadcastChannel(Guid channelId, string name = "")
+    {
+        lock (_lock)
+        {
+            if (_broadcastChannels.TryGetValue(channelId, out BroadcastChannel? existing))
+                return existing;
+
+            BroadcastChannel channel = new(channelId, _storage, name);
+            _broadcastChannels[channelId] = channel;
+            _logger.Info("BroadcastChannel created: {0} ({1})", channelId, name);
+            return channel;
+        }
+    }
+
+    /// <summary>
+    /// Broadcast a message to a channel. All subscribers will see it as pending
+    /// until they read it.
+    /// </summary>
+    /// <param name="senderId">The sender (system or a silicon being)</param>
+    /// <param name="channelId">Target broadcast channel ID</param>
+    /// <param name="content">Message content</param>
+    public void Broadcast(Guid senderId, Guid channelId, string content)
+    {
+        lock (_lock)
+        {
+            if (!_broadcastChannels.TryGetValue(channelId, out BroadcastChannel? channel))
+            {
+                _logger.Warn("Broadcast failed: channel {0} not found", channelId);
+                return;
+            }
+
+            ChatMessage message = new(senderId, channelId, content)
+            {
+                Type = MessageType.SystemNotification
+            };
+            channel.AddMessage(message);
+            _logger.Info("Broadcast sent to channel {0} by {1}", channelId, senderId);
+        }
+    }
+
+    /// <summary>
+    /// Collect pending broadcast messages for a given being across all channels
+    /// they are subscribed to.
+    /// </summary>
+    public List<ChatMessage> GetPendingBroadcasts(Guid beingId)
+    {
+        List<ChatMessage> result = [];
+        lock (_lock)
+        {
+            foreach (BroadcastChannel channel in _broadcastChannels.Values)
+            {
+                result.AddRange(channel.GetPendingMessages(beingId));
+            }
+        }
+        _logger.Debug("{0} pending broadcast(s) for {1}", result.Count, beingId);
+        return result;
     }
 }
