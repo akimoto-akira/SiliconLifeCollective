@@ -222,6 +222,10 @@ public class Program
         LocalizationManager.Instance.Register<ZhCN>(Language.ZhCN);
         LocalizationManager.Instance.Register<EnUS>(Language.EnUS);
         LocalizationManager.Instance.Register<ZhHK>(Language.ZhHK);
+        LocalizationManager.Instance.Register<ZhSG>(Language.ZhSG);
+        LocalizationManager.Instance.Register<ZhMO>(Language.ZhMO);
+        LocalizationManager.Instance.Register<ZhTW>(Language.ZhTW);
+        LocalizationManager.Instance.Register<ZhMY>(Language.ZhMY);
     }
 
     public static void RequestExit()

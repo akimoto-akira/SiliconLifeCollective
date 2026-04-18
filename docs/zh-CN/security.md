@@ -290,3 +290,15 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 ```
 
 日志持久化到存储，可通过 Web 界面（日志控制器）查看。
+
+---
+
+## Token 用量审计
+
+`TokenUsageAuditManager` 提供与安全相关的 AI Token 消耗追踪：
+
+- **单次请求记录** — 每次 AI 调用记录硅基人 ID、模型、提示词 Token 数、补全 Token 数和时间戳。
+- **异常检测** — 异常的 Token 消耗模式可能表明提示注入或资源滥用。
+- **仅主理人可访问** — `TokenAuditTool`（标记为 `[SiliconManagerOnly]`）允许主理人查询和汇总 Token 用量。
+- **Web 仪表盘** — `AuditController` 提供基于浏览器的仪表盘，含趋势图表和数据导出。
+- **持久化存储** — 记录通过 `ITimeStorage` 存储，支持时间序列查询和长期分析。

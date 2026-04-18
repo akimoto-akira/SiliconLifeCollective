@@ -63,15 +63,16 @@ public class AuditView : ViewBase
                 ).Class("filter-group")
             ).Class("filter-bar"),
             H.Div(
-                H.Button(vm.Localization.AuditTimeToday).OnClick("setTimeRange('today')").Class("time-btn active").Id("btn-today"),
+                H.Button(vm.Localization.AuditTimeToday).OnClick("setTimeRange('today')").Class("time-btn").Id("btn-today"),
                 H.Button(vm.Localization.AuditTimeWeek).OnClick("setTimeRange('week')").Class("time-btn").Id("btn-week"),
-                H.Button(vm.Localization.AuditTimeMonth).OnClick("setTimeRange('month')").Class("time-btn").Id("btn-month"),
+                H.Button(vm.Localization.AuditTimeMonth).OnClick("setTimeRange('month')").Class("time-btn active").Id("btn-month"),
                 H.Button(vm.Localization.AuditTimeYear).OnClick("setTimeRange('year')").Class("time-btn").Id("btn-year")
             ).Class("time-range-bar"),
             H.Div(
                 H.H3(vm.Localization.AuditTrendTitle),
                 H.Div(
-                    H.Svg().Id("trend-chart").Attr("viewBox", "0 0 800 300").Attr("preserveAspectRatio", "xMidYMid meet")
+                    H.Svg().Id("trend-chart").Attr("viewBox", "0 0 800 300").Attr("preserveAspectRatio", "none"),
+                    H.Div().Id("chart-tooltip").Class("chart-tooltip")
                 ).Class("chart-container"),
                 H.Div(
                     H.Span("").Class("legend-color prompt-color"),
@@ -184,10 +185,61 @@ public class AuditView : ViewBase
             .EndSelector()
             .Selector(".chart-container")
                 .Property("width", "100%")
+                .Property("position", "relative")
             .EndSelector()
             .Selector(".chart-container svg")
                 .Property("width", "100%")
                 .Property("height", "300px")
+                .Property("cursor", "crosshair")
+            .EndSelector()
+            .Selector(".chart-tooltip")
+                .Property("position", "absolute")
+                .Property("display", "none")
+                .Property("background", "var(--bg-card)")
+                .Property("border", "1px solid var(--border)")
+                .Property("border-radius", "8px")
+                .Property("padding", "10px 14px")
+                .Property("box-shadow", "0 4px 12px rgba(0,0,0,0.15)")
+                .Property("pointer-events", "none")
+                .Property("z-index", "1000")
+                .Property("font-size", "12px")
+                .Property("line-height", "1.6")
+                .Property("backdrop-filter", "blur(8px)")
+                .Property("min-width", "180px")
+            .EndSelector()
+            .Selector(".chart-tooltip .tooltip-date")
+                .Property("font-weight", "bold")
+                .Property("color", "var(--text-primary)")
+                .Property("margin-bottom", "6px")
+                .Property("border-bottom", "1px solid var(--border)")
+                .Property("padding-bottom", "4px")
+            .EndSelector()
+            .Selector(".chart-tooltip .tooltip-row")
+                .Property("display", "flex")
+                .Property("justify-content", "space-between")
+                .Property("gap", "16px")
+            .EndSelector()
+            .Selector(".chart-tooltip .tooltip-label")
+                .Property("color", "var(--text-secondary)")
+            .EndSelector()
+            .Selector(".chart-tooltip .tooltip-value")
+                .Property("font-weight", "600")
+                .Property("color", "var(--text-primary)")
+            .EndSelector()
+            .Selector(".chart-tooltip .tooltip-value.prompt-color")
+                .Property("color", "#4a90d9")
+            .EndSelector()
+            .Selector(".chart-tooltip .tooltip-value.completion-color")
+                .Property("color", "#e8725c")
+            .EndSelector()
+            .Selector(".chart-tooltip .tooltip-value.total-color")
+                .Property("color", "#50c878")
+            .EndSelector()
+            .Selector(".chart-indicator")
+                .Property("stroke", "var(--text-secondary)")
+                .Property("stroke-width", "1")
+                .Property("stroke-dasharray", "4,4")
+                .Property("opacity", "0.5")
             .EndSelector()
             .Selector(".chart-legend")
                 .Property("display", "flex")
@@ -230,11 +282,23 @@ public class AuditView : ViewBase
 
         var buildParamsExpr = Js.Str(() => "?timeRange=").Op(() => "+", () => (JsSyntax)Js.Id(() => "currentTimeRange")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&clientType=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "clientType")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&beingId=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "beingId"));
 
-        var reduceArrow = Js.Arrow(() => new List<string> { "a", "b" }, () => (JsSyntax)Js.Id(() => "Math").Call(() => "max", () => Js.Id(() => "a"), () => Js.Id(() => "b").Prop(() => "totalTokens")));
+        var reduceArrow = Js.Arrow(() => new List<string> { "acc", "point" }, () => (JsSyntax)Js.Id(() => "Math").Call(() => "max", () => Js.Id(() => "acc"), () => Js.Id(() => "point").Prop(() => "totalTokens")));
 
         var drawTrendBody = Js.Block()
+            .Add(() => Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "Trend data received:"), () => Js.Id(() => "data")).Stmt())
+            .Add(() => Js.Assign(() => Js.Id(() => "beingNames"), () => Js.Id(() => "data").Prop(() => "beings").Op(() => "||", () => Js.Id(() => "{}"))))
             .Add(() => Js.Const(() => "svg", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "trend-chart"))))
             .Add(() => Js.Assign(() => Js.Id(() => "svg").Prop(() => "innerHTML"), () => Js.Str(() => "")))
+            .Add(() => {
+                var line = Js.Id(() => "document").Call(() => "createElementNS", () => Js.Str(() => "http://www.w3.org/2000/svg"), () => Js.Str(() => "line"));
+                return Js.Block()
+                    .Add(() => line.Call(() => "setAttribute", () => Js.Str(() => "id"), () => Js.Str(() => "chart-indicator")).Stmt())
+                    .Add(() => line.Call(() => "setAttribute", () => Js.Str(() => "class"), () => Js.Str(() => "chart-indicator")).Stmt())
+                    .Add(() => line.Call(() => "setAttribute", () => Js.Str(() => "y1"), () => Js.Num(() => "30")).Stmt())
+                    .Add(() => line.Call(() => "setAttribute", () => Js.Str(() => "y2"), () => Js.Num(() => "270")).Stmt())
+                    .Add(() => line.Call(() => "setAttribute", () => Js.Str(() => "style"), () => Js.Str(() => "display: none;")).Stmt())
+                    .Add(() => Js.Id(() => "svg").Call(() => "appendChild", () => line));
+            })
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 (Js.Id(() => "data").Prop(() => "points").Prop(() => "length").Op(() => "===", () => Js.Num(() => "0")), new List<JsSyntax>
@@ -252,13 +316,41 @@ public class AuditView : ViewBase
             .Add(() => Js.Func(() => "yPos", () => new List<string> { "val" }, () => Js.Block()
                 .Add(() => Js.Return(() => Js.Id(() => "padY").Op(() => "+", () => Js.Id(() => "chartH").Op(() => "-", () => Js.Id(() => "val").Op(() => "/", () => Js.Id(() => "maxVal")).Op(() => "*", () => Js.Id(() => "chartH"))))))))
             .Add(() => Js.Func(() => "drawLine", () => new List<string> { "key", "color" }, () => Js.Block()
-                .Add(() => Js.Const(() => "coords", () => Js.Id(() => "points").Call(() => "map", () => Js.Arrow(() => new List<string> { "p", "i" }, () => (JsSyntax)Js.Str(() => "").Op(() => "+", () => (JsSyntax)Js.Id(() => "padX").Op(() => "+", () => Js.Id(() => "i").Op(() => "*", () => Js.Id(() => "stepX")))).Op(() => "+", () => (JsSyntax)Js.Str(() => ",")).Op(() => "+", () => (JsSyntax)Js.Id(() => "yPos").Invoke(() => new JsIndex(() => (JsSyntax)Js.Id(() => "p"), () => (JsSyntax)Js.Id(() => "key"))))))))
-                .Add(() => Js.Const(() => "polyline", () => Js.Id(() => "document").Call(() => "createElementNS", () => Js.Str(() => "http://www.w3.org/2000/svg"), () => Js.Str(() => "polyline"))))
-                .Add(() => Js.Id(() => "polyline").Call(() => "setAttribute", () => Js.Str(() => "points"), () => Js.Id(() => "coords").Call(() => "join", () => Js.Str(() => " "))).Stmt())
-                .Add(() => Js.Id(() => "polyline").Call(() => "setAttribute", () => Js.Str(() => "fill"), () => Js.Str(() => "none")).Stmt())
-                .Add(() => Js.Id(() => "polyline").Call(() => "setAttribute", () => Js.Str(() => "stroke"), () => Js.Id(() => "color")).Stmt())
-                .Add(() => Js.Id(() => "polyline").Call(() => "setAttribute", () => Js.Str(() => "stroke-width"), () => Js.Str(() => "2")).Stmt())
-                .Add(() => Js.Id(() => "svg").Call(() => "appendChild", () => Js.Id(() => "polyline")).Stmt())))
+                .Add(() => {
+                    var xExpr = (JsSyntax)Js.Id(() => "padX").Op(() => "+", () => Js.Id(() => "i").Op(() => "*", () => Js.Id(() => "stepX"))).Paren();
+                    var coordExpr = xExpr.Op(() => "+", () => (JsSyntax)Js.Str(() => ",")).Op(() => "+", () => (JsSyntax)Js.Id(() => "yPos").Invoke(() => Js.Id(() => "p").Index(() => Js.Id(() => "key"))));
+                    return Js.Const(() => "coords", () => Js.Id(() => "points").Call(() => "map", () => Js.Arrow(() => new List<string> { "p", "i" }, () => (JsSyntax)coordExpr)));
+                })
+                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                {
+                    (Js.Id(() => "coords").Prop(() => "length").Op(() => "===", () => Js.Num(() => "1")), new List<JsSyntax>
+                    {
+                        Js.Block()
+                            .Add(() => Js.Const(() => "xyParts", () => Js.Id(() => "coords").Index(() => Js.Num(() => "0")).Call(() => "split", () => Js.Str(() => ","))))
+                            .Add(() => Js.Const(() => "circle", () => Js.Id(() => "document").Call(() => "createElementNS", () => Js.Str(() => "http://www.w3.org/2000/svg"), () => Js.Str(() => "circle"))))
+                            .Add(() => Js.Id(() => "circle").Call(() => "setAttribute", () => Js.Str(() => "cx"), () => Js.Id(() => "xyParts").Index(() => Js.Num(() => "0"))).Stmt())
+                            .Add(() => Js.Id(() => "circle").Call(() => "setAttribute", () => Js.Str(() => "cy"), () => Js.Id(() => "xyParts").Index(() => Js.Num(() => "1"))).Stmt())
+                            .Add(() => Js.Id(() => "circle").Call(() => "setAttribute", () => Js.Str(() => "r"), () => Js.Str(() => "4")).Stmt())
+                            .Add(() => Js.Id(() => "circle").Call(() => "setAttribute", () => Js.Str(() => "fill"), () => Js.Id(() => "color")).Stmt())
+                            .Add(() => Js.Id(() => "svg").Call(() => "appendChild", () => Js.Id(() => "circle")).Stmt())
+                            .Stmt()
+                    })
+                }))
+                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                {
+                    (Js.Id(() => "coords").Prop(() => "length").Op(() => "!==", () => Js.Num(() => "1")), new List<JsSyntax>
+                    {
+                        Js.Block()
+                            .Add(() => Js.Const(() => "polyline", () => Js.Id(() => "document").Call(() => "createElementNS", () => Js.Str(() => "http://www.w3.org/2000/svg"), () => Js.Str(() => "polyline"))))
+                            .Add(() => Js.Id(() => "polyline").Call(() => "setAttribute", () => Js.Str(() => "points"), () => Js.Id(() => "coords").Call(() => "join", () => Js.Str(() => " "))).Stmt())
+                            .Add(() => Js.Id(() => "polyline").Call(() => "setAttribute", () => Js.Str(() => "fill"), () => Js.Str(() => "none")).Stmt())
+                            .Add(() => Js.Id(() => "polyline").Call(() => "setAttribute", () => Js.Str(() => "stroke"), () => Js.Id(() => "color")).Stmt())
+                            .Add(() => Js.Id(() => "polyline").Call(() => "setAttribute", () => Js.Str(() => "stroke-width"), () => Js.Str(() => "2")).Stmt())
+                            .Add(() => Js.Id(() => "svg").Call(() => "appendChild", () => Js.Id(() => "polyline")).Stmt())
+                            .Stmt()
+                    })
+                }))
+                .Stmt()))
             .Add(() => Js.Id(() => "drawLine").Invoke(() => Js.Str(() => "promptTokens"), () => Js.Str(() => "#4a90d9")).Stmt())
             .Add(() => Js.Id(() => "drawLine").Invoke(() => Js.Str(() => "completionTokens"), () => Js.Str(() => "#e8725c")).Stmt())
             .Add(() => Js.Id(() => "drawLine").Invoke(() => Js.Str(() => "totalTokens"), () => Js.Str(() => "#50c878")).Stmt())
@@ -272,6 +364,54 @@ public class AuditView : ViewBase
                 .Add(() => Js.Id(() => "label").Call(() => "setAttribute", () => Js.Str(() => "text-anchor"), () => Js.Str(() => "middle")).Stmt())
                 .Add(() => Js.Assign(() => Js.Id(() => "label").Prop(() => "textContent"), () => Js.Id(() => "p").Prop(() => "date").Call(() => "substring", () => Js.Num(() => "5"))))
                 .Add(() => Js.Id(() => "svg").Call(() => "appendChild", () => Js.Id(() => "label")).Stmt())
+            )).Stmt())
+            .Add(() => Js.Id(() => "svg").Call(() => "addEventListener", () => Js.Str(() => "mousemove"), () => Js.Arrow(() => new List<string> { "e" }, () => (JsSyntax)Js.Block()
+                .Add(() => Js.Const(() => "rect", () => Js.Id(() => "svg").Call(() => "getBoundingClientRect")))
+                .Add(() => Js.Const(() => "containerRect", () => Js.Id(() => "svg").Prop(() => "parentElement").Call(() => "getBoundingClientRect")))
+                .Add(() => Js.Const(() => "mouseX", () => Js.Id(() => "e").Prop(() => "clientX").Op(() => "-", () => Js.Id(() => "rect").Prop(() => "left"))))
+                .Add(() => Js.Const(() => "svgWidth", () => Js.Id(() => "rect").Prop(() => "width")))
+                .Add(() => Js.Const(() => "ratio", () => Js.Id(() => "svgWidth").Op(() => "/", () => Js.Num(() => "800"))))
+                .Add(() => Js.Const(() => "svgX", () => Js.Id(() => "mouseX").Op(() => "/", () => Js.Id(() => "ratio"))))
+                .Add(() => Js.Const(() => "rawIndex", () => Js.Id(() => "svgX").Op(() => "-", () => Js.Id(() => "padX")).Paren().Op(() => "/", () => Js.Id(() => "stepX"))))
+                .Add(() => Js.Const(() => "index", () => Js.Id(() => "Math").Call(() => "max", () => Js.Num(() => "0"), () => Js.Id(() => "Math").Call(() => "min", () => Js.Id(() => "points").Prop(() => "length").Op(() => "-", () => Js.Num(() => "1")), () => Js.Id(() => "Math").Call(() => "round", () => Js.Id(() => "rawIndex"))))))
+                .Add(() => {
+                    return Js.Block()
+                        .Add(() => Js.Const(() => "point", () => Js.Id(() => "points").Index(() => Js.Id(() => "index"))))
+                        .Add(() => Js.Const(() => "tooltip", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chart-tooltip"))))
+                        .Add(() => Js.Const(() => "indicator", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chart-indicator"))))
+                        .Add(() => Js.Const(() => "pointX", () => Js.Id(() => "padX").Op(() => "+", () => Js.Id(() => "index").Op(() => "*", () => Js.Id(() => "stepX")))))
+                        .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                        {
+                            (Js.Id(() => "indicator").Op(() => "!==", () => Js.Null()), new List<JsSyntax>
+                            {
+                                Js.Id(() => "indicator").Call(() => "setAttribute", () => Js.Str(() => "x1"), () => Js.Id(() => "pointX")).Stmt(),
+                                Js.Id(() => "indicator").Call(() => "setAttribute", () => Js.Str(() => "x2"), () => Js.Id(() => "pointX")).Stmt(),
+                                Js.Id(() => "indicator").Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "block"))
+                            })
+                        }).Stmt())
+                        .Add(() => Js.Id(() => "tooltip").Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "block")))
+                        .Add(() => Js.Id(() => "tooltip").Prop(() => "style").Prop(() => "left").Assign(() => Js.Id(() => "mouseX").Op(() => "+", () => Js.Num(() => "15")).Paren().Op(() => "+", () => (JsSyntax)Js.Str(() => "px"))))
+                        .Add(() => Js.Id(() => "tooltip").Prop(() => "style").Prop(() => "top").Assign(() => Js.Id(() => "e").Prop(() => "clientY").Op(() => "-", () => Js.Id(() => "containerRect").Prop(() => "top")).Op(() => "+", () => Js.Num(() => "15")).Paren().Op(() => "+", () => (JsSyntax)Js.Str(() => "px"))))
+                        .Add(() => {
+                            var tooltipHtml = (JsSyntax)Js.Str(() => "<div class='tooltip-date'>").Op(() => "+", () => (JsSyntax)Js.Id(() => "point").Prop(() => "date"))
+                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"))
+                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "<div class='tooltip-row'><span class='tooltip-label'>" + loc.AuditTooltipPrompt + ":</span><span class='tooltip-value prompt-color'>"))
+                                .Op(() => "+", () => (JsSyntax)Js.Id(() => "point").Prop(() => "promptTokens").Call(() => "toLocaleString"))
+                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "</span></div>"))
+                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "<div class='tooltip-row'><span class='tooltip-label'>" + loc.AuditTooltipCompletion + ":</span><span class='tooltip-value completion-color'>"))
+                                .Op(() => "+", () => (JsSyntax)Js.Id(() => "point").Prop(() => "completionTokens").Call(() => "toLocaleString"))
+                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "</span></div>"))
+                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "<div class='tooltip-row'><span class='tooltip-label'>" + loc.AuditTooltipTotal + ":</span><span class='tooltip-value total-color'>"))
+                                .Op(() => "+", () => (JsSyntax)Js.Id(() => "point").Prop(() => "totalTokens").Call(() => "toLocaleString"))
+                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "</span></div>"));
+                            return Js.Assign(() => Js.Id(() => "tooltip").Prop(() => "innerHTML"), () => tooltipHtml);
+                        });
+                })
+            )).Stmt())
+            // Mouse leave event - hide tooltip
+            .Add(() => Js.Id(() => "svg").Call(() => "addEventListener", () => Js.Str(() => "mouseleave"), () => Js.Arrow(() => new List<string>(), () => (JsSyntax)Js.Block()
+                .Add(() => Js.Const(() => "tooltip", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chart-tooltip"))))
+                .Add(() => Js.Id(() => "tooltip").Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
             )).Stmt());
 
         var loadAuditBody = Js.Block()
@@ -306,7 +446,7 @@ public class AuditView : ViewBase
             .Add(() => Js.Id(() => "beings").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "b" }, () => (JsSyntax)Js.Block()
                 .Add(() => Js.Const(() => "opt", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "option"))))
                 .Add(() => Js.Assign(() => Js.Id(() => "opt").Prop(() => "value"), () => Js.Id(() => "b").Prop(() => "key")))
-                .Add(() => Js.Assign(() => Js.Id(() => "opt").Prop(() => "textContent"), () => Js.Id(() => "b").Prop(() => "key")))
+                .Add(() => Js.Assign(() => Js.Id(() => "opt").Prop(() => "textContent"), () => Js.Id(() => "b").Prop(() => "name")))
                 .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                 {
                     (Js.Id(() => "b").Prop(() => "key").Op(() => "===", () => Js.Id(() => "currentValue")), new List<JsSyntax>
@@ -333,6 +473,7 @@ public class AuditView : ViewBase
 
         return Js.Block()
             .Add(() => Js.Let(() => "currentTimeRange", () => Js.Str(() => "month")))
+            .Add(() => Js.Let(() => "beingNames", () => Js.Id(() => "{}")))
             .Add(() => Js.Func(() => "loadAudit", () => new List<string>(), () => loadAuditBody))
             .Add(() => Js.Func(() => "updateClientFilter", () => new List<string> { "clients" }, () => updateClientFilterBody))
             .Add(() => Js.Func(() => "updateBeingFilter", () => new List<string> { "beings" }, () => updateBeingFilterBody))

@@ -26,7 +26,7 @@ public enum TimerType
     Once,
 
     /// <summary>
-    /// The timer triggers repeatedly at specified intervals.
+    /// The timer triggers repeatedly based on calendar conditions.
     /// </summary>
     Recurring
 }
@@ -56,6 +56,45 @@ public enum TimerStatus
     /// </summary>
     Cancelled
 }
+
+/// <summary>
+/// Resolves calendar-specific component conditions to the next DateTime
+/// that satisfies those conditions, starting from the given anchor time.
+/// </summary>
+/// <param name="anchor">The time after which to find the next occurrence</param>
+/// <param name="calendarId">The calendar system identifier (e.g., "chinese_lunar", "gregorian")</param>
+/// <param name="componentConditions">
+/// Calendar component conditions keyed by component ID.
+/// Both date-level components (e.g., "month", "day", "isLeap", "era") and
+/// time-level components ("hour", "minute", "second") are allowed.
+/// The resolver separates them internally: date components for day-by-day matching,
+/// time components for constructing the final DateTime.
+/// Example: { "month": 1, "day": 1, "hour": 8 } means "1st day of 1st month at 08:00".
+/// </param>
+/// <returns>The next DateTime that matches the conditions, or null if unresolvable</returns>
+public delegate DateTime? CalendarNextOccurrenceResolver(
+    DateTime anchor,
+    string calendarId,
+    Dictionary<string, int> componentConditions);
+
+/// <summary>
+/// Determines whether a timer should be considered pending (ready to trigger).
+/// Used by HasPendingTimers and GetPendingTimers to decide which timers qualify.
+/// </summary>
+/// <param name="timer">The timer item to evaluate</param>
+/// <returns>True if the timer is pending; otherwise, false</returns>
+public delegate bool TimerPendingChecker(TimerItem timer);
+
+/// <summary>
+/// Converts a DateTime to a calendar-specific component representation.
+/// Used to enrich TimerCallbackInfo with calendar context.
+/// </summary>
+/// <param name="dateTime">The DateTime to convert</param>
+/// <param name="calendarId">The calendar system identifier</param>
+/// <returns>Component values keyed by component ID, or null if the calendar is unavailable</returns>
+public delegate Dictionary<string, int>? CalendarDateTimeConverter(
+    DateTime dateTime,
+    string calendarId);
 
 /// <summary>
 /// Represents a single timer item.
@@ -93,19 +132,26 @@ public sealed class TimerItem
     public DateTime TriggerTime { get; set; }
 
     /// <summary>
-    /// Gets or sets the interval for recurring timers.
+    /// Gets or sets the calendar system identifier for this timer.
+    /// Required. Examples: "gregorian", "chinese_lunar", "islamic", "sexagenary", "interval".
     /// </summary>
-    public TimeSpan? Interval { get; set; }
+    public string CalendarId { get; set; } = "gregorian";
+
+    /// <summary>
+    /// Gets or sets the calendar component conditions that define when this timer triggers.
+    /// Keyed by component ID (e.g., "month", "day", "hour") with required values.
+    /// Both date-level components ("month", "day", "isLeap", "era", etc.) and
+    /// time-level components ("hour", "minute", "second") are allowed.
+    /// The resolver separates them internally: date components for day-by-day matching,
+    /// time components for constructing the final DateTime.
+    /// Example: { "month": 1, "day": 15, "hour": 8 } = "15th of the 1st month at 08:00".
+    /// </summary>
+    public Dictionary<string, int> CalendarConditions { get; set; } = new();
 
     /// <summary>
     /// Gets or sets the number of times the timer has been triggered.
     /// </summary>
     public int TimesTriggered { get; set; }
-
-    /// <summary>
-    /// Gets or sets the maximum number of triggers for recurring timers.
-    /// </summary>
-    public int? MaxTriggers { get; set; }
 
     /// <summary>
     /// Gets or sets the timestamp when the timer was created.
@@ -114,6 +160,7 @@ public sealed class TimerItem
 
     /// <summary>
     /// Gets or sets the timestamp when the timer was last triggered.
+    /// Persisted to storage. Used to prevent duplicate triggers within the same cycle.
     /// </summary>
     public DateTime? LastTriggeredAt { get; set; }
 
@@ -132,32 +179,30 @@ public sealed class TimerItem
     }
 
     /// <summary>
-    /// Initializes a new instance of the TimerItem class with the specified name and trigger time.
-    /// </summary>
-    /// <param name="name">The name of the timer.</param>
-    /// <param name="triggerTime">The time when the timer should trigger.</param>
-    /// <param name="type">The type of the timer.</param>
-    public TimerItem(string name, DateTime triggerTime, TimerType type = TimerType.Once) : this()
-    {
-        Name = name;
-        TriggerTime = triggerTime;
-        Type = type;
-    }
-
-    /// <summary>
     /// Determines whether the timer should trigger now.
+    /// Three conditions must all be satisfied:
+    /// 1. Status is Active
+    /// 2. Current time has reached or passed TriggerTime
+    /// 3. The current cycle has not already been triggered (LastTriggeredAt &lt; TriggerTime)
     /// </summary>
-    /// <returns>True if the timer is active and its trigger time has passed; otherwise, false.</returns>
     public bool ShouldTrigger()
     {
         if (Status != TimerStatus.Active)
             return false;
 
-        return DateTime.Now >= TriggerTime;
+        if (DateTime.Now < TriggerTime)
+            return false;
+
+        if (LastTriggeredAt.HasValue && LastTriggeredAt.Value >= TriggerTime)
+            return false;
+
+        return true;
     }
 
     /// <summary>
     /// Triggers the timer and updates its state.
+    /// Does NOT advance TriggerTime for recurring timers —
+    /// that is handled by TimerSystem.Tick() via the calendar resolver.
     /// </summary>
     public void Trigger()
     {
@@ -167,14 +212,6 @@ public sealed class TimerItem
         if (Type == TimerType.Once)
         {
             Status = TimerStatus.Triggered;
-        }
-        else if (MaxTriggers.HasValue && TimesTriggered >= MaxTriggers.Value)
-        {
-            Status = TimerStatus.Triggered;
-        }
-        else if (Interval.HasValue)
-        {
-            TriggerTime = TriggerTime.Add(Interval.Value);
         }
     }
 
@@ -227,7 +264,7 @@ public sealed class TimerItem
         if (Status != TimerStatus.Active)
             return null;
 
-        var diff = TriggerTime - DateTime.Now;
+        TimeSpan diff = TriggerTime - DateTime.Now;
         return diff > TimeSpan.Zero ? diff : TimeSpan.Zero;
     }
 }
@@ -266,6 +303,11 @@ public sealed class TimerStatistics
     /// Gets or sets the next trigger time across all active timers.
     /// </summary>
     public DateTime? NextTrigger { get; set; }
+
+    /// <summary>
+    /// Gets or sets the count of timers grouped by calendar ID.
+    /// </summary>
+    public Dictionary<string, int> ByCalendar { get; set; } = new();
 }
 
 /// <summary>
@@ -284,18 +326,26 @@ public sealed class TimerCallbackInfo
     public string TimerName { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the calendar system identifier of the triggered timer.
+    /// </summary>
+    public string CalendarId { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the number of times the timer has been triggered.
     /// </summary>
     public int TimesTriggered { get; set; }
 
     /// <summary>
     /// Gets or sets the metadata associated with the timer.
+    /// Calendar component context is stored under "calendar.{componentId}" keys.
     /// </summary>
     public Dictionary<string, string> Metadata { get; set; } = new();
 }
 
 /// <summary>
-/// System for managing timers with one-shot and recurring functionality.
+/// System for managing timers with calendar-based scheduling.
+/// All timers use calendar component matching for scheduling,
+/// including Gregorian timers (calendarId="gregorian") and interval timers (calendarId="interval").
 /// </summary>
 public sealed class TimerSystem
 {
@@ -304,6 +354,10 @@ public sealed class TimerSystem
     private readonly IStorage _storage;
     private readonly string _storageKey;
     private readonly object _lock = new();
+
+    private readonly CalendarNextOccurrenceResolver _calendarResolver;
+    private readonly CalendarDateTimeConverter _calendarConverter;
+    private readonly TimerPendingChecker _pendingChecker;
 
     private List<TimerItem> _timers = new();
     private readonly List<Action<TimerCallbackInfo>> _callbacks = new();
@@ -339,17 +393,28 @@ public sealed class TimerSystem
     public event Action<TimerCallbackInfo>? OnTimerTriggered;
 
     /// <summary>
-    /// Initializes a new instance of the TimerSystem class with the specified owner and storage.
+    /// Initializes a new instance of the TimerSystem class with calendar-based scheduling support.
     /// Each being holds its own TimerSystem instance; the owner reference enables real-time
     /// identity queries (OwnerId, OwnerName, IsCurator) without duplicating state.
     /// </summary>
     /// <param name="owner">The silicon being that owns this TimerSystem</param>
     /// <param name="storage">The storage to use for persisting timers.</param>
-    /// <exception cref="ArgumentNullException">Thrown when owner or storage is null.</exception>
-    public TimerSystem(SiliconBeingBase owner, IStorage storage)
+    /// <param name="calendarResolver">Resolves calendar conditions to next occurrence DateTime</param>
+    /// <param name="calendarConverter">Converts DateTime to calendar component representation</param>
+    /// <param name="pendingChecker">Determines whether a timer is pending (ready to trigger)</param>
+    /// <exception cref="ArgumentNullException">Thrown when any parameter is null.</exception>
+    public TimerSystem(
+        SiliconBeingBase owner,
+        IStorage storage,
+        CalendarNextOccurrenceResolver calendarResolver,
+        CalendarDateTimeConverter calendarConverter,
+        TimerPendingChecker pendingChecker)
     {
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
         _storage = storage ?? throw new ArgumentNullException(nameof(storage));
+        _calendarResolver = calendarResolver ?? throw new ArgumentNullException(nameof(calendarResolver));
+        _calendarConverter = calendarConverter ?? throw new ArgumentNullException(nameof(calendarConverter));
+        _pendingChecker = pendingChecker ?? throw new ArgumentNullException(nameof(pendingChecker));
         _storageKey = "timers";
 
         _logger.Info("TimerSystem created for being {0} ({1})", owner.Name, owner.Id);
@@ -364,10 +429,9 @@ public sealed class TimerSystem
             List<TimerItem>? timers = _storage.Read<List<TimerItem>>(_storageKey);
             _timers = timers ?? new List<TimerItem>();
 
-            foreach (var timer in _timers.Where(t => t.Status == TimerStatus.Triggered))
+            foreach (TimerItem timer in _timers.Where(t => t.Status == TimerStatus.Triggered))
             {
-                if (timer.Type == TimerType.Recurring && !timer.MaxTriggers.HasValue ||
-                    timer.TimesTriggered < timer.MaxTriggers)
+                if (timer.Type == TimerType.Recurring)
                 {
                     timer.Status = TimerStatus.Active;
                 }
@@ -396,56 +460,81 @@ public sealed class TimerSystem
     }
 
     /// <summary>
-    /// Creates a one-shot timer that triggers once at the specified time.
+    /// Creates a one-shot timer that triggers once when the specified calendar conditions are met.
     /// </summary>
     /// <param name="name">The name of the timer.</param>
-    /// <param name="triggerTime">The time when the timer should trigger.</param>
+    /// <param name="calendarId">The calendar system identifier.</param>
+    /// <param name="componentConditions">
+    /// Calendar component conditions (e.g., { "month": 1, "day": 1, "hour": 8 } for "1st of 1st month at 08:00").
+    /// </param>
     /// <param name="metadata">Optional metadata for the timer.</param>
-    /// <returns>The created timer item.</returns>
-    public TimerItem CreateOneShot(string name, DateTime triggerTime, Dictionary<string, string>? metadata = null)
+    /// <returns>The created timer item, or null if the resolver cannot compute the first trigger time.</returns>
+    public TimerItem? CreateOneShot(string name, string calendarId, Dictionary<string, int> componentConditions, Dictionary<string, string>? metadata = null)
     {
         lock (_lock)
         {
-            var timer = new TimerItem(name, triggerTime, TimerType.Once)
+            DateTime? triggerTime = _calendarResolver(DateTime.Now, calendarId, componentConditions);
+            if (!triggerTime.HasValue)
             {
+                _logger.Warn("Cannot create one-shot timer: resolver returned null for calendar={0}", calendarId);
+                return null;
+            }
+
+            TimerItem timer = new TimerItem()
+            {
+                Name = name,
+                TriggerTime = triggerTime.Value,
+                Type = TimerType.Once,
+                CalendarId = calendarId,
+                CalendarConditions = componentConditions,
                 Metadata = metadata ?? new Dictionary<string, string>()
             };
 
             _timers.Add(timer);
             Save();
 
-            _logger.Info("Timer added: {0} ({1}), type={2}, triggerAt={3}", name, timer.Id, TimerType.Once, triggerTime);
+            _logger.Info("Timer added: {0} ({1}), type={2}, calendar={3}, triggerAt={4}", name, timer.Id, TimerType.Once, calendarId, triggerTime.Value);
 
             return timer;
         }
     }
 
     /// <summary>
-    /// Creates a recurring timer that triggers at the specified interval.
+    /// Creates a recurring timer that triggers when the specified calendar components match the conditions.
+    /// After each trigger, the next occurrence is computed via the calendar resolver.
     /// </summary>
     /// <param name="name">The name of the timer.</param>
-    /// <param name="interval">The interval between triggers.</param>
-    /// <param name="startTime">The optional start time (defaults to now + interval).</param>
-    /// <param name="maxTriggers">Optional maximum number of triggers.</param>
+    /// <param name="calendarId">The calendar system identifier.</param>
+    /// <param name="componentConditions">
+    /// Calendar component conditions (e.g., { "month": 1, "day": 1, "hour": 8 } for "1st of 1st month at 08:00").
+    /// </param>
     /// <param name="metadata">Optional metadata for the timer.</param>
-    /// <returns>The created timer item.</returns>
-    public TimerItem CreateRecurring(string name, TimeSpan interval, DateTime? startTime = null, int? maxTriggers = null, Dictionary<string, string>? metadata = null)
+    /// <returns>The created timer item, or null if the resolver cannot compute the first trigger time.</returns>
+    public TimerItem? CreateRecurring(string name, string calendarId, Dictionary<string, int> componentConditions, Dictionary<string, string>? metadata = null)
     {
         lock (_lock)
         {
-            var triggerTime = startTime ?? DateTime.Now.Add(interval);
-
-            var timer = new TimerItem(name, triggerTime, TimerType.Recurring)
+            DateTime? triggerTime = _calendarResolver(DateTime.Now, calendarId, componentConditions);
+            if (!triggerTime.HasValue)
             {
-                Interval = interval,
-                MaxTriggers = maxTriggers,
+                _logger.Warn("Cannot create recurring timer: resolver returned null for calendar={0}", calendarId);
+                return null;
+            }
+
+            TimerItem timer = new TimerItem()
+            {
+                Name = name,
+                TriggerTime = triggerTime.Value,
+                Type = TimerType.Recurring,
+                CalendarId = calendarId,
+                CalendarConditions = componentConditions,
                 Metadata = metadata ?? new Dictionary<string, string>()
             };
 
             _timers.Add(timer);
             Save();
 
-            _logger.Info("Timer added: {0} ({1}), type={2}, triggerAt={3}", name, timer.Id, TimerType.Recurring, triggerTime);
+            _logger.Info("Timer added: {0} ({1}), type={2}, calendar={3}, triggerAt={4}", name, timer.Id, TimerType.Recurring, calendarId, triggerTime.Value);
 
             return timer;
         }
@@ -503,7 +592,7 @@ public sealed class TimerSystem
     {
         lock (_lock)
         {
-            int pendingCount = _timers.Count(t => t.Status == TimerStatus.Active && t.ShouldTrigger());
+            int pendingCount = _timers.Count(t => _pendingChecker(t));
             _logger.Debug("Checking pending timers: {0} pending", pendingCount);
             return pendingCount > 0;
         }
@@ -518,7 +607,7 @@ public sealed class TimerSystem
         lock (_lock)
         {
             return _timers
-                .Where(t => t.ShouldTrigger())
+                .Where(t => _pendingChecker(t))
                 .OrderBy(t => t.TriggerTime)
                 .ToList();
         }
@@ -532,7 +621,7 @@ public sealed class TimerSystem
     {
         lock (_lock)
         {
-            var timer = _timers.FirstOrDefault(t => t.Id == timerId);
+            TimerItem? timer = _timers.FirstOrDefault(t => t.Id == timerId);
             if (timer != null)
             {
                 timer.Pause();
@@ -544,19 +633,36 @@ public sealed class TimerSystem
 
     /// <summary>
     /// Resumes a paused timer by its ID.
+    /// If the timer's TriggerTime has passed while paused,
+    /// the calendar resolver is used to compute the next valid occurrence.
     /// </summary>
     /// <param name="timerId">The ID of the timer to resume.</param>
     public void Resume(Guid timerId)
     {
         lock (_lock)
         {
-            var timer = _timers.FirstOrDefault(t => t.Id == timerId);
-            if (timer != null)
+            TimerItem? timer = _timers.FirstOrDefault(t => t.Id == timerId);
+            if (timer == null || timer.Status != TimerStatus.Paused)
+                return;
+
+            timer.Status = TimerStatus.Active;
+
+            if (timer.TriggerTime < DateTime.Now && timer.Type == TimerType.Recurring)
             {
-                timer.Resume();
-                Save();
-                _logger.Debug("Timer resumed: {0} ({1})", timer.Name, timer.Id);
+                DateTime? nextTime = _calendarResolver(DateTime.Now, timer.CalendarId, timer.CalendarConditions);
+                if (nextTime.HasValue)
+                {
+                    timer.TriggerTime = nextTime.Value;
+                }
+                else
+                {
+                    timer.Status = TimerStatus.Cancelled;
+                    _logger.Warn("Timer cancelled on resume: resolver returned null for {0}", timer.Name);
+                }
             }
+
+            Save();
+            _logger.Debug("Timer resumed: {0} ({1})", timer.Name, timer.Id);
         }
     }
 
@@ -568,7 +674,7 @@ public sealed class TimerSystem
     {
         lock (_lock)
         {
-            var timer = _timers.FirstOrDefault(t => t.Id == timerId);
+            TimerItem? timer = _timers.FirstOrDefault(t => t.Id == timerId);
             if (timer != null)
             {
                 timer.Cancel();
@@ -585,7 +691,7 @@ public sealed class TimerSystem
     {
         lock (_lock)
         {
-            var timer = _timers.FirstOrDefault(t => t.Id == timerId);
+            TimerItem? timer = _timers.FirstOrDefault(t => t.Id == timerId);
             if (timer != null)
             {
                 timer.Reset();
@@ -604,7 +710,7 @@ public sealed class TimerSystem
     {
         lock (_lock)
         {
-            var timer = _timers.FirstOrDefault(t => t.Id == timerId);
+            TimerItem? timer = _timers.FirstOrDefault(t => t.Id == timerId);
             if (timer != null && (timer.Status == TimerStatus.Active || timer.Status == TimerStatus.Paused))
             {
                 timer.TriggerTime = newTime;
@@ -625,7 +731,7 @@ public sealed class TimerSystem
     {
         lock (_lock)
         {
-            var timer = _timers.FirstOrDefault(t => t.Id == timerId);
+            TimerItem? timer = _timers.FirstOrDefault(t => t.Id == timerId);
             if (timer != null)
             {
                 _timers.Remove(timer);
@@ -660,33 +766,45 @@ public sealed class TimerSystem
 
     /// <summary>
     /// Processes all timers that should trigger and returns triggered timer information.
+    /// For recurring timers, advances TriggerTime via the calendar resolver after triggering.
     /// </summary>
-    /// <returns>A list of triggered timer callback info.</returns>
+    /// <returns>A list of triggered timer items.</returns>
     public List<TimerItem> Tick()
     {
         lock (_lock)
         {
-            var triggered = new List<TimerItem>();
+            List<TimerItem> triggered = new List<TimerItem>();
 
-            foreach (var timer in _timers.Where(t => t.ShouldTrigger()).ToList())
+            foreach (TimerItem timer in _timers.Where(t => _pendingChecker(t)).ToList())
             {
                 timer.Trigger();
                 triggered.Add(timer);
 
                 _logger.Info("Timer triggered: {0} ({1}), timesTriggered={2}", timer.Name, timer.Id, timer.TimesTriggered);
 
-                if (timer.Type == TimerType.Once || (timer.MaxTriggers.HasValue && timer.TimesTriggered >= timer.MaxTriggers.Value))
+                if (timer.Type == TimerType.Once)
                 {
                     _logger.Debug("One-shot timer completed: {0} ({1})", timer.Name, timer.Id);
                 }
 
-                var info = new TimerCallbackInfo
+                TimerCallbackInfo info = new TimerCallbackInfo
                 {
                     TimerId = timer.Id,
                     TimerName = timer.Name,
+                    CalendarId = timer.CalendarId,
                     TimesTriggered = timer.TimesTriggered,
                     Metadata = timer.Metadata
                 };
+
+                Dictionary<string, int>? calendarComponents = _calendarConverter(DateTime.Now, timer.CalendarId);
+                if (calendarComponents != null)
+                {
+                    info.Metadata["calendarId"] = timer.CalendarId;
+                    foreach (KeyValuePair<string, int> kv in calendarComponents)
+                    {
+                        info.Metadata[$"calendar.{kv.Key}"] = kv.Value.ToString();
+                    }
+                }
 
                 try
                 {
@@ -694,6 +812,24 @@ public sealed class TimerSystem
                 }
                 catch
                 {
+                }
+            }
+
+            foreach (TimerItem timer in triggered)
+            {
+                if (timer.Type == TimerType.Recurring && timer.Status == TimerStatus.Active)
+                {
+                    DateTime? nextTime = _calendarResolver(timer.TriggerTime, timer.CalendarId, timer.CalendarConditions);
+                    if (nextTime.HasValue)
+                    {
+                        timer.TriggerTime = nextTime.Value;
+                        _logger.Debug("Timer advanced: {0} next trigger at {1}", timer.Name, nextTime.Value);
+                    }
+                    else
+                    {
+                        timer.Status = TimerStatus.Cancelled;
+                        _logger.Warn("Timer cancelled: resolver returned null for {0}", timer.Name);
+                    }
                 }
             }
 
@@ -714,7 +850,7 @@ public sealed class TimerSystem
     {
         lock (_lock)
         {
-            var active = _timers.Where(t => t.Status == TimerStatus.Active).ToList();
+            List<TimerItem> active = _timers.Where(t => t.Status == TimerStatus.Active).ToList();
 
             return new TimerStatistics
             {
@@ -723,7 +859,10 @@ public sealed class TimerSystem
                 Paused = _timers.Count(t => t.Status == TimerStatus.Paused),
                 Triggered = _timers.Count(t => t.Status == TimerStatus.Triggered),
                 Cancelled = _timers.Count(t => t.Status == TimerStatus.Cancelled),
-                NextTrigger = active.MinBy(t => t.TriggerTime)?.TriggerTime
+                NextTrigger = active.MinBy(t => t.TriggerTime)?.TriggerTime,
+                ByCalendar = _timers
+                    .GroupBy(t => t.CalendarId)
+                    .ToDictionary(g => g.Key, g => g.Count())
             };
         }
     }

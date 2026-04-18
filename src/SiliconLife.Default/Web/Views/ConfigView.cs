@@ -586,7 +586,7 @@ public class ConfigView : ViewBase
                 },
                 { (null, new List<JsSyntax>
                     {
-                        Js.Id(() => "alert").Invoke(() => Js.Str(() => "保存失败：").Op(() => "+", () => Js.Id(() => "data").Prop(() => "message"))).Stmt()
+                        Js.Id(() => "alert").Invoke(() => Js.Str(() => loc.ConfigSaveFailed).Op(() => "+", () => Js.Id(() => "data").Prop(() => "message"))).Stmt()
                     })
                 }
             }));

@@ -186,7 +186,7 @@ public class MemoryTool : ITool
             }
             catch (ArgumentOutOfRangeException ex)
             {
-                return ToolResult.Failed($"{loc.MemoryToolInvalidYear}: {ex.ParamName}");
+                return ToolResult.Failed($"{loc.ErrorMessage}: Invalid parameter '{ex.ParamName}' - {ex.Message}");
             }
 
             memories = being.Memory!.Query(range, maxResults);

@@ -27,7 +27,7 @@ public class CodeBrowserView : ViewBase
     {
         return H.Div(
             H.Div(
-                H.H1("代码浏览")
+                H.H1(vm.Localization.CodeBrowserPageHeader)
             ).Class("page-header"),
             H.Div(
                 H.Div().Id("types-list").Class("types-list"),

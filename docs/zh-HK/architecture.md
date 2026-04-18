@@ -131,6 +131,50 @@ MainLoop（專用執行緒，看門狗 + 熔斷器）
 
 ---
 
+## 聊天系統
+
+### 工作階段類型
+
+聊天系統透過 `SessionBase` 支援三種工作階段類型：
+
+| 類型 | 類別 | 說明 |
+|------|-----|------|
+| `SingleChat` | `SingleChatSession` | 兩個參與者之間的一對一對話 |
+| `GroupChat` | `GroupChatSession` | 多參與者群組對話 |
+| `Broadcast` | `BroadcastChannel` | 固定 ID 的開放頻道；矽基人動態訂閱，僅接收訂閱後的訊息 |
+
+### BroadcastChannel
+
+`BroadcastChannel` 是一種特殊的工作階段類型，用於系統級廣播：
+
+- **固定頻道 ID** — 與 `SingleChatSession` 和 `GroupChatSession` 不同，頻道 ID 是已知常數，而非由成員 GUID 衍生。
+- **動態訂閱** — 矽基人在執行時訂閱/取消訂閱；僅接收訂閱後發布的訊息。
+- **待讀訊息篩選** — `GetPendingMessages()` 僅返回矽基人訂閱後且尚未閱讀的訊息。
+- **由 ChatSystem 管理** — `GetOrCreateBroadcastChannel()`、`Broadcast()`、`GetPendingBroadcasts()`。
+
+### ChatMessage
+
+`ChatMessage` 模型包含 AI 對話上下文和 Token 追蹤欄位：
+
+| 欄位 | 類型 | 說明 |
+|------|------|------|
+| `Id` | `Guid` | 訊息唯一識別碼 |
+| `SenderId` | `Guid` | 傳送者唯一識別碼 |
+| `ChannelId` | `Guid` | 頻道/工作階段識別碼 |
+| `Content` | `string` | 訊息內容 |
+| `Timestamp` | `DateTime` | 訊息傳送時間 |
+| `Type` | `MessageType` | Text、Image、File 或 SystemNotification |
+| `ReadBy` | `List<Guid>` | 已閱讀此訊息的參與者 ID 清單 |
+| `Role` | `MessageRole` | AI 對話角色（User、Assistant、Tool） |
+| `ToolCallId` | `string?` | 工具結果訊息的工具呼叫 ID |
+| `ToolCallsJson` | `string?` | 助理訊息的序列化工具呼叫 JSON |
+| `Thinking` | `string?` | AI 的思維鏈推理內容 |
+| `PromptTokens` | `int?` | 提示詞 Token 數（輸入） |
+| `CompletionTokens` | `int?` | 補全 Token 數（輸出） |
+| `TotalTokens` | `int?` | 總 Token 數（輸入 + 輸出） |
+
+---
+
 ## 關鍵設計決策
 
 ### Storage 設計為執行個體類別（非靜態）
@@ -190,6 +234,49 @@ MainLoop（專用執行緒，看門狗 + 熔斷器）
 - `TokenUsageSummary` — 彙總統計
 - `TokenUsageQuery` — 查詢篩選參數
 - 透過 `ITimeStorage` 持久化，支援時間序列查詢
+- 可透過 Web UI（AuditController）和 `TokenAuditTool`（僅主理人可用）存取
+
+---
+
+## 曆法系統
+
+系統包含 **32 種曆法實作**，均衍生自抽象基底類別 `CalendarBase`，涵蓋世界主要曆法體系：
+
+| 曆法 | ID | 說明 |
+|------|-----|------|
+| BuddhistCalendar | `buddhist` | 佛曆（BE），年份 + 543 |
+| CherokeeCalendar | `cherokee` | 切羅基曆法 |
+| ChineseLunarCalendar | `lunar` | 中國農曆，含閏月計算 |
+| ChulaSakaratCalendar | `chula_sakarat` | 朱拉曆（CS），年份 - 638 |
+| CopticCalendar | `coptic` | 科普特曆 |
+| DaiCalendar | `dai` | 傣曆，含完整月相計算 |
+| DehongDaiCalendar | `dehong_dai` | 德宏傣曆變體 |
+| EthiopianCalendar | `ethiopian` | 衣索比亞曆 |
+| FrenchRepublicanCalendar | `french_republican` | 法國共和曆 |
+| GregorianCalendar | `gregorian` | 標準公曆 |
+| HebrewCalendar | `hebrew` | 希伯來曆（猶太曆） |
+| IndianCalendar | `indian` | 印度國曆 |
+| InuitCalendar | `inuit` | 因紐特曆法 |
+| IslamicCalendar | `islamic` | 伊斯蘭教曆（希吉來曆） |
+| JapaneseCalendar | `japanese` | 日本年號曆 |
+| JavaneseCalendar | `javanese` | 爪哇伊斯蘭曆 |
+| JucheCalendar | `juche` | 主體曆（朝鮮），年份 - 1911 |
+| JulianCalendar | `julian` | 儒略曆 |
+| KhmerCalendar | `khmer` | 高棉曆 |
+| MayanCalendar | `mayan` | 瑪雅長計曆 |
+| MongolianCalendar | `mongolian` | 蒙古曆 |
+| PersianCalendar | `persian` | 波斯曆（太陽希吉來曆） |
+| RepublicOfChinaCalendar | `roc` | 民國紀年，年份 - 1911 |
+| RomanCalendar | `roman` | 羅馬曆 |
+| SakaCalendar | `saka` | 塞迦曆（印尼） |
+| SexagenaryCalendar | `sexagenary` | 干支紀年 |
+| TibetanCalendar | `tibetan` | 藏曆 |
+| VietnameseCalendar | `vietnamese` | 越南農曆（貓年變體） |
+| VikramSamvatCalendar | `vikram_samvat` | 維克拉姆曆 |
+| YiCalendar | `yi` | 彝曆 |
+| ZoroastrianCalendar | `zoroastrian` | 瑣羅亞斯德曆 |
+
+`CalendarTool` 提供操作：`now`、`format`、`add_days`、`diff`、`list_calendars`、`get_components`、`get_now_components`、`convert`（跨曆法日期轉換）。
 
 ---
 
@@ -223,11 +310,12 @@ Web UI 完全在 C# 中產生標記，不依賴任何範本檔案：
 
 ### 控制器系統
 
-Web UI 遵循 **MVC 模式**，有 16 個控制器處理不同方面：
+Web UI 遵循 **MVC 模式**，有 17 個控制器處理不同方面：
 
 | 控制器 | 用途 |
 |--------|------|
 | About | 關於頁面和專案資訊 |
+| Audit | Token 用量稽核儀表板，含趨勢圖表和資料匯出 |
 | Being | 矽基人管理和狀態 |
 | Chat | 即時聊天介面（支援 SSE） |
 | CodeBrowser | 程式碼檢視和編輯 |

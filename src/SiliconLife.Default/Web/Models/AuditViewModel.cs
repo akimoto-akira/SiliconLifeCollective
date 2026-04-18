@@ -18,6 +18,7 @@ public class AuditViewModel : ViewModelBase
 public class AuditSummaryItem
 {
     public string Key { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
     public int RequestCount { get; set; }
     public long TotalPromptTokens { get; set; }
     public long TotalCompletionTokens { get; set; }

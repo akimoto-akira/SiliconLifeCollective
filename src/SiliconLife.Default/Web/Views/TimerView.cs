@@ -115,6 +115,15 @@ public class TimerView : ViewBase
                 .Property("color", "var(--accent-primary)")
                 .Property("margin-left", "8px")
             .EndSelector()
+            .Selector(".calendar-badge")
+                .Property("display", "inline-block")
+                .Property("padding", "2px 8px")
+                .Property("border-radius", "4px")
+                .Property("font-size", "11px")
+                .Property("background", "rgba(255,152,0,0.15)")
+                .Property("color", "#ff9800")
+                .Property("margin-left", "8px")
+            .EndSelector()
             .Selector(".empty-state")
                 .Property("text-align", "center")
                 .Property("padding", "40px")
@@ -126,10 +135,10 @@ public class TimerView : ViewBase
     {
         var forEachBody = Js.Block()
             .Add(() => Js.Const(() => "card", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
-            .Add(() => Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "t").Prop(() => "status").Op(() => "===", () => Js.Str(() => "active")), () => Js.Str(() => "active"), 
+            .Add(() => Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "t").Prop(() => "status").Op(() => "===", () => Js.Str(() => "active")), () => Js.Str(() => "active"),
                 () => Js.Ternary(() => Js.Id(() => "t").Prop(() => "status").Op(() => "===", () => Js.Str(() => "paused")), () => Js.Str(() => "paused"),
                 () => Js.Ternary(() => Js.Id(() => "t").Prop(() => "status").Op(() => "===", () => Js.Str(() => "triggered")), () => Js.Str(() => "triggered"), () => Js.Str(() => "cancelled"))))))
-            .Add(() => Js.Const(() => "statusText", () => Js.Ternary(() => Js.Id(() => "t").Prop(() => "status").Op(() => "===", () => Js.Str(() => "active")), () => Js.Str(() => loc.TimersStatusActive), 
+            .Add(() => Js.Const(() => "statusText", () => Js.Ternary(() => Js.Id(() => "t").Prop(() => "status").Op(() => "===", () => Js.Str(() => "active")), () => Js.Str(() => loc.TimersStatusActive),
                 () => Js.Ternary(() => Js.Id(() => "t").Prop(() => "status").Op(() => "===", () => Js.Str(() => "paused")), () => Js.Str(() => loc.TimersStatusPaused),
                 () => Js.Ternary(() => Js.Id(() => "t").Prop(() => "status").Op(() => "===", () => Js.Str(() => "triggered")), () => Js.Str(() => loc.TimersStatusTriggered), () => Js.Str(() => loc.TimersStatusCancelled))))))
             .Add(() => Js.Assign(() => Js.Id(() => "card").Prop(() => "className"), () => Js.Str(() => "timer-card")))
@@ -169,14 +178,19 @@ public class TimerView : ViewBase
             () => Js.Str(() => "<span class='timer-type-badge'>").Op(() => "+", () => (JsSyntax)Js.Str(() => loc.TimersTypeRecurring)).Op(() => "+", () => (JsSyntax)Js.Str(() => "</span>")),
             () => Js.Str(() => ""));
 
-        var intervalInfo = Js.Ternary(
-            () => Js.Id(() => "t").Prop(() => "interval"),
-            () => Js.Str(() => $"<div class='timer-info'><span class='timer-info-label'>{loc.TimersIntervalLabel}</span>").Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "interval")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>")),
+        var calendarBadge = Js.Str(() => "<span class='calendar-badge'>")
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "calendarId"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</span>"));
+
+        var calendarInfo = Js.Ternary(
+            () => Js.Id(() => "t").Prop(() => "calendarDescription"),
+            () => Js.Str(() => $"<div class='timer-info'><span class='timer-info-label'>{loc.TimersCalendarLabel}</span>").Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "calendarDescription")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>")),
             () => Js.Str(() => ""));
 
         return Js.Str(() => "<div class='timer-header'><div class='timer-name'>")
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "name"))
             .Op(() => "+", () => (JsSyntax)typeBadge)
+            .Op(() => "+", () => (JsSyntax)calendarBadge)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><span class='timer-status "))
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "statusClass"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "'>"))
@@ -184,7 +198,7 @@ public class TimerView : ViewBase
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</span></div><div class='timer-info'><span class='timer-info-label'>{loc.TimersTriggerTimeLabel}</span>"))
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "triggerTimeFormatted"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"))
-            .Op(() => "+", () => (JsSyntax)intervalInfo)
+            .Op(() => "+", () => (JsSyntax)calendarInfo)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"<div class='timer-info'><span class='timer-info-label'>{loc.TimersTriggeredCountLabel}</span>"))
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "timesTriggered"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"));

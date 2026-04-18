@@ -136,7 +136,7 @@ Every phase ends with a **runnable, observable** system. No phase produces "a pi
 | 7.4 | Being lifecycle enhancement | Load: decrypt → scan → compile → instantiate. Runtime: compile in memory → atomic replace → persist encrypted |
 | 7.5 | SiliconCurator | Curator abstract base class. IsCurator=true. Highest privileges |
 | 7.6 | DefaultCurator | Default curator implementation with built-in soul file and management tools |
-| 7.7 | CuratorTool | `[SiliconManagerOnly]` tools: list_beings, recompile, get_code, update_soul, scan_code |
+| 7.7 | CuratorTool | `[SiliconManagerOnly]` tools: list_beings, create_being, get_code, reset |
 | 7.8 | Permission callback override | Beings can compile custom permission callbacks |
 | 7.9 | SiliconBeingManager enhancement | Replace method (runtime instance swap). MigrateState (transfer state between old and new instances) |
 
@@ -164,7 +164,7 @@ Every phase ends with a **runnable, observable** system. No phase produces "a pi
 
 ---
 
-## Phase 9: Framework Complete ✅ Completed
+## ~~Phase 9: Framework Complete~~ ✅ Completed
 
 **Goal**: Unified entry point, multi-being collaboration.
 
@@ -192,14 +192,37 @@ Every phase ends with a **runnable, observable** system. No phase produces "a pi
 | 10.1 | Router | HTTP request router. Sequence-param routes and static file serving |
 | 10.2 | Controller base | Request/response context. HTML and JSON response support |
 | 10.3–10.5 | HtmlBuilder / CssBuilder / JsBuilder | C# server-side builders. Zero frontend framework dependency |
-| 10.6 | WebSocket | Real-time message push. Shared port with HTTP. JSON message format |
-| 10.7 | WebUIProvider | WebSocket-based real-time IM channel. Replaces console as primary interface |
+| 10.6 | SSE (Server-Sent Events) | Push-based real-time updates for chat, being status, and system events. Simpler than WebSocket, with automatic client-side reconnection |
+| 10.7 | WebUIProvider | SSE-based real-time IM channel. Replaces console as primary interface |
 | 10.8 | Web security | IP blacklist/whitelist. `[WebCode]` attribute. Dynamic updates |
-| 10.9–10.16 | Web controllers | Chat, Dashboard, Being, Task, Permission, Executor, Log, Config pages |
+| 10.9–10.17 | Web controllers | Chat, Dashboard, Being, Task, Permission, PermissionRequest, Executor, Log, Config, Memory, Timer, Init, About, CodeBrowser, Knowledge, Project, Audit |
 
 **Deliverable**: Full web UI accessible from browser.
 
 **Verification**: Open browser → chat with beings → view dashboard → manage permissions → all functional.
+
+---
+
+## ~~Phase 10.5: Incremental Enhancements~~ ✅ Done
+
+**Goal**: Enhance existing systems with new capabilities discovered during development.
+
+| # | Module | Description |
+|---|--------|-------------|
+| 10.5.1 | BroadcastChannel | New session type for system-wide announcements. Fixed channel ID, dynamic subscription, pending message filtering |
+| 10.5.2 | ChatMessage enhancement | ToolCallId, ToolCallsJson, Thinking fields for AI context; PromptTokens, CompletionTokens, TotalTokens for token tracking; SystemNotification message type |
+| 10.5.3 | TokenUsageAuditManager | Per-request token consumption tracking across all beings. Aggregated statistics, time-series queries, persistent storage |
+| 10.5.4 | TokenAuditTool | `[SiliconManagerOnly]` tool for Curator to query and summarize token usage |
+| 10.5.5 | ConfigTool | `[SiliconManagerOnly]` tool for Curator to read and modify system configuration |
+| 10.5.6 | AuditController | Web dashboard for token usage audit with trend charts and data export |
+| 10.5.7 | Calendar system expansion | 32 calendar implementations covering world calendar systems (Buddhist, Chinese Lunar, Islamic, Hebrew, Japanese, Persian, Mayan, etc.) |
+| 10.5.8 | DiskTool enhancement | New actions: count_lines, read_lines, clear_file, replace_lines, replace_text, replace_text_all, list_drives |
+| 10.5.9 | SystemTool enhancement | New actions: find_process (with wildcard support), resource_usage |
+| 10.5.10 | CalendarTool enhancement | New actions: diff, list_calendars, get_components, get_now_components, convert (cross-calendar conversion) |
+
+**Deliverable**: Enhanced tooling, observability, and calendar coverage.
+
+**Verification**: Curator queries token usage via TokenAuditTool → Audit dashboard shows trends → CalendarTool converts dates across 32 calendar systems.
 
 ---
 
@@ -227,4 +250,3 @@ Every phase ends with a **runnable, observable** system. No phase produces "a pi
 | 12.1 | Knowledge Network | Shared knowledge graph using triple structure |
 | 12.2 | Plugin system | External plugin loading with security checks |
 | 12.3 | Skills ecosystem | Reusable skill marketplace |
-| 12.4 | Calendar system | Multi-calendar support (Gregorian, Chinese, Islamic, etc.) |

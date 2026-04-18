@@ -28,9 +28,10 @@ public class TimerItemModel
     public string Type { get; set; } = "once";
     public string Status { get; set; } = "active";
     public DateTime TriggerTime { get; set; }
-    public string Interval { get; set; } = string.Empty;
+    public string CalendarId { get; set; } = "gregorian";
+    public string CalendarDescription { get; set; } = string.Empty;
+    public Dictionary<string, int> CalendarConditions { get; set; } = new();
     public int TimesTriggered { get; set; }
-    public int? MaxTriggers { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? LastTriggeredAt { get; set; }
 }

@@ -17,7 +17,7 @@ using SiliconLife.Collective;
 namespace SiliconLife.Default;
 
 /// <summary>
-/// Tool for managing silicon being timers and alarms.
+/// Tool for managing silicon being timers and alarms with calendar-based scheduling.
 /// </summary>
 public class TimerTool : ITool
 {
@@ -26,7 +26,7 @@ public class TimerTool : ITool
 
     /// <inheritdoc/>
     public string Description =>
-        "Manage timers and alarms for the silicon being. " +
+        "Manage timers and alarms for the silicon being using calendar-based scheduling. " +
         "Actions: 'create_once' (one-time alarm), 'create_recurring' (recurring timer), " +
         "'list' (list timers), 'get' (get timer details), 'pause' (pause timer), " +
         "'resume' (resume timer), 'cancel' (cancel timer), 'delete' (delete timer), " +
@@ -43,6 +43,8 @@ public class TimerTool : ITool
 
     public Dictionary<string, object> GetParameterSchema()
     {
+        string[] calendarIds = GetAvailableCalendarIds();
+
         return new Dictionary<string, object>
         {
             ["type"] = "object",
@@ -59,20 +61,28 @@ public class TimerTool : ITool
                     ["type"] = "string",
                     ["description"] = "Timer name (used with create_once, create_recurring)"
                 },
-                ["trigger_time"] = new Dictionary<string, object>
+                ["calendar_id"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "Trigger time (format: yyyy-MM-dd HH:mm:ss or HH:mm:ss for today, used with create_once)"
+                    ["description"] = "Calendar system identifier. Use 'gregorian' for standard dates, 'chinese_lunar' for Chinese lunar calendar, 'interval' for fixed time intervals, etc.",
+                    ["enum"] = calendarIds
                 },
-                ["interval_seconds"] = new Dictionary<string, object>
+                ["calendar_conditions"] = new Dictionary<string, object>
                 {
-                    ["type"] = "integer",
-                    ["description"] = "Interval in seconds (used with create_recurring)"
+                    ["type"] = "object",
+                    ["description"] = "Calendar component conditions (key=componentId, value=integer). " +
+                        "For gregorian: {\"hour\":8}=daily at 8am, {\"day\":1}=1st of month, {\"month\":1,\"day\":1}=Jan 1st, {\"weekday\":1,\"hour\":9}=every Mon 9am. " +
+                        "For chinese_lunar: {\"month\":1,\"day\":1}=Spring Festival, {\"day\":1,\"hour\":8}=every 1st of lunar month at 8am. " +
+                        "For interval: {\"days\":2}=every 2 days, {\"hours\":1}=hourly, {\"minutes\":30}=every 30min.",
+                    ["additionalProperties"] = new Dictionary<string, object>
+                    {
+                        ["type"] = "integer"
+                    }
                 },
-                ["max_triggers"] = new Dictionary<string, object>
+                ["description"] = new Dictionary<string, object>
                 {
-                    ["type"] = "integer",
-                    ["description"] = "Maximum number of triggers (optional, used with create_recurring)"
+                    ["type"] = "string",
+                    ["description"] = "Timer description (optional, used with create_once, create_recurring)"
                 },
                 ["timer_id"] = new Dictionary<string, object>
                 {
@@ -84,11 +94,6 @@ public class TimerTool : ITool
                     ["type"] = "string",
                     ["description"] = "Filter by status: active, paused, triggered, cancelled, all (used with action=list)",
                     ["enum"] = new[] { "active", "paused", "triggered", "cancelled", "all" }
-                },
-                ["description"] = new Dictionary<string, object>
-                {
-                    ["type"] = "string",
-                    ["description"] = "Timer description (optional, used with create_once, create_recurring)"
                 }
             },
             ["required"] = new[] { "action" }
@@ -97,7 +102,7 @@ public class TimerTool : ITool
 
     public ToolResult Execute(Guid callerId, Dictionary<string, object> parameters)
     {
-        var being = GetSiliconBeing(callerId);
+        SiliconBeingBase? being = GetSiliconBeing(callerId);
         if (being?.TimerSystem == null)
         {
             return ToolResult.Failed("Timer system not available");
@@ -135,105 +140,81 @@ public class TimerTool : ITool
 
     private SiliconBeingBase? GetSiliconBeing(Guid callerId)
     {
-        var manager = ServiceLocator.Instance.BeingManager;
+        SiliconBeingManager? manager = ServiceLocator.Instance.BeingManager;
         if (manager == null)
             return null;
 
         return manager.GetBeing(callerId);
     }
 
-    private DateTime ParseTime(string timeStr)
-    {
-        if (DateTime.TryParse(timeStr, out DateTime result))
-        {
-            return result;
-        }
-
-        if (TimeSpan.TryParse(timeStr, out TimeSpan ts))
-        {
-            return DateTime.Today.Add(ts);
-        }
-
-        throw new ArgumentException($"Invalid time format: {timeStr}");
-    }
-
     private ToolResult ExecuteCreateOnce(SiliconBeingBase being, Dictionary<string, object> parameters)
     {
         if (!parameters.TryGetValue("name", out object? nameObj) || string.IsNullOrWhiteSpace(nameObj?.ToString()))
-        {
             return ToolResult.Failed("Missing 'name' parameter");
-        }
 
-        if (!parameters.TryGetValue("trigger_time", out object? timeObj) || string.IsNullOrWhiteSpace(timeObj?.ToString()))
-        {
-            return ToolResult.Failed("Missing 'trigger_time' parameter");
-        }
+        if (!parameters.TryGetValue("calendar_id", out object? calObj) || string.IsNullOrWhiteSpace(calObj?.ToString()))
+            return ToolResult.Failed("Missing 'calendar_id' parameter");
+
+        Dictionary<string, int>? conditions = ParseCalendarConditions(parameters);
+        if (conditions == null || conditions.Count == 0)
+            return ToolResult.Failed("Missing or invalid 'calendar_conditions' parameter");
 
         string name = nameObj!.ToString()!;
-        DateTime triggerTime = ParseTime(timeObj!.ToString()!);
+        string calendarId = calObj!.ToString()!;
 
-        var timer = being.TimerSystem!.CreateOneShot(name, triggerTime);
+        TimerItem? timer = being.TimerSystem!.CreateOneShot(name, calendarId, conditions);
+        if (timer == null)
+            return ToolResult.Failed($"Cannot create timer: resolver returned null for calendar={calendarId}");
 
-        return ToolResult.Successful($"One-time timer created (ID: {timer.Id}, Trigger: {timer.TriggerTime:yyyy-MM-dd HH:mm:ss})");
+        string desc = GetHumanReadableDescription(calendarId, conditions);
+        return ToolResult.Successful(
+            $"One-shot timer created (ID: {timer.Id}, Calendar: {calendarId}, Condition: {desc}, " +
+            $"Trigger: {timer.TriggerTime:yyyy-MM-dd HH:mm:ss})");
     }
 
     private ToolResult ExecuteCreateRecurring(SiliconBeingBase being, Dictionary<string, object> parameters)
     {
         if (!parameters.TryGetValue("name", out object? nameObj) || string.IsNullOrWhiteSpace(nameObj?.ToString()))
-        {
             return ToolResult.Failed("Missing 'name' parameter");
-        }
 
-        if (!parameters.TryGetValue("interval_seconds", out object? intervalObj) || !int.TryParse(intervalObj?.ToString(), out int intervalSeconds))
-        {
-            return ToolResult.Failed("Missing or invalid 'interval_seconds' parameter");
-        }
+        if (!parameters.TryGetValue("calendar_id", out object? calObj) || string.IsNullOrWhiteSpace(calObj?.ToString()))
+            return ToolResult.Failed("Missing 'calendar_id' parameter");
+
+        Dictionary<string, int>? conditions = ParseCalendarConditions(parameters);
+        if (conditions == null || conditions.Count == 0)
+            return ToolResult.Failed("Missing or invalid 'calendar_conditions' parameter");
 
         string name = nameObj!.ToString()!;
-        TimeSpan interval = TimeSpan.FromSeconds(intervalSeconds);
+        string calendarId = calObj!.ToString()!;
 
-        int? maxTriggers = null;
-        if (parameters.TryGetValue("max_triggers", out object? maxObj) && int.TryParse(maxObj?.ToString(), out int max))
-        {
-            maxTriggers = max;
-        }
+        TimerItem? timer = being.TimerSystem!.CreateRecurring(name, calendarId, conditions);
+        if (timer == null)
+            return ToolResult.Failed($"Cannot create timer: resolver returned null for calendar={calendarId}");
 
-        var timer = being.TimerSystem!.CreateRecurring(name, interval, null, maxTriggers);
-
-        string info = $"Recurring timer created (ID: {timer.Id}, Interval: {interval}, ";
-        info += timer.MaxTriggers.HasValue ? $"Max: {timer.MaxTriggers})" : "Infinite)";
-
-        return ToolResult.Successful(info);
+        string desc = GetHumanReadableDescription(calendarId, conditions);
+        return ToolResult.Successful(
+            $"Recurring timer created (ID: {timer.Id}, Calendar: {calendarId}, Condition: {desc}, " +
+            $"Next trigger: {timer.TriggerTime:yyyy-MM-dd HH:mm:ss})");
     }
 
     private ToolResult ExecuteList(SiliconBeingBase being, Dictionary<string, object> parameters)
     {
-        TimerStatus? status = null;
-        if (parameters.TryGetValue("status", out object? statusObj) && !string.IsNullOrWhiteSpace(statusObj?.ToString()))
-        {
-            status = statusObj!.ToString()!.ToLowerInvariant() switch
-            {
-                "active" => TimerStatus.Active,
-                "paused" => TimerStatus.Paused,
-                "triggered" => TimerStatus.Triggered,
-                "cancelled" => TimerStatus.Cancelled,
-                _ => null
-            };
-        }
+        TimerStatus? status = ParseStatusFilter(parameters);
 
-        var timers = being.TimerSystem!.GetAll(status);
+        List<TimerItem> timers = being.TimerSystem!.GetAll(status);
 
         if (timers.Count == 0)
         {
             return ToolResult.Successful("No timers found.");
         }
 
-        var lines = new List<string> { $"Found {timers.Count} timers:" };
-        foreach (var timer in timers.Take(20))
+        List<string> lines = new List<string> { $"Found {timers.Count} timers:" };
+        foreach (TimerItem timer in timers.Take(20))
         {
-            var timeUntil = timer.GetTimeUntilNextTrigger();
+            TimeSpan? timeUntil = timer.GetTimeUntilNextTrigger();
             string triggerInfo = timeUntil.HasValue ? $"Next: {timeUntil.Value:hh\\:mm\\:ss}" : "N/A";
-            lines.Add($"- [{timer.Status}] {timer.Name} ({timer.Type}, {triggerInfo}, ID: {timer.Id})");
+            string desc = GetHumanReadableDescription(timer.CalendarId, timer.CalendarConditions);
+            lines.Add($"- [{timer.Status}] {timer.Name} ({timer.CalendarId}, {desc}, {triggerInfo}, ID: {timer.Id})");
         }
 
         return ToolResult.Successful(string.Join("\n", lines));
@@ -246,35 +227,34 @@ public class TimerTool : ITool
             return ToolResult.Failed("Missing or invalid 'timer_id' parameter");
         }
 
-        var timer = being.TimerSystem!.Get(timerId);
+        TimerItem? timer = being.TimerSystem!.Get(timerId);
         if (timer == null)
         {
             return ToolResult.Failed($"Timer not found: {timerId}");
         }
 
-        var lines = new List<string>
+        string desc = GetHumanReadableDescription(timer.CalendarId, timer.CalendarConditions);
+        List<string> lines = new List<string>
         {
             $"Timer: {timer.Name}",
             $"ID: {timer.Id}",
             $"Type: {timer.Type}",
             $"Status: {timer.Status}",
+            $"Calendar: {timer.CalendarId}",
+            $"Condition: {desc}",
             $"Trigger Time: {timer.TriggerTime:yyyy-MM-dd HH:mm:ss}",
             $"Times Triggered: {timer.TimesTriggered}",
             $"Created: {timer.CreatedAt:yyyy-MM-dd HH:mm:ss}"
         };
 
-        if (timer.Interval.HasValue)
-            lines.Add($"Interval: {timer.Interval.Value.TotalSeconds} seconds");
-        if (timer.MaxTriggers.HasValue)
-            lines.Add($"Max Triggers: {timer.MaxTriggers}");
         if (timer.LastTriggeredAt.HasValue)
             lines.Add($"Last Triggered: {timer.LastTriggeredAt:yyyy-MM-dd HH:mm:ss}");
         if (timer.Description != null)
             lines.Add($"Description: {timer.Description}");
 
-        var timeUntil = timer.GetTimeUntilNextTrigger();
+        TimeSpan? timeUntil = timer.GetTimeUntilNextTrigger();
         if (timeUntil.HasValue && timer.Status == TimerStatus.Active)
-            lines.Add($"Time Until Next: {timeUntil.Value:hh\\:mm\\:ss}");
+            lines.Add($"Time Until Next: {timeUntil.Value:dd\\:hh\\:mm\\:ss}");
 
         return ToolResult.Successful(string.Join("\n", lines));
     }
@@ -332,9 +312,9 @@ public class TimerTool : ITool
 
     private ToolResult ExecuteStats(SiliconBeingBase being, Dictionary<string, object> parameters)
     {
-        var stats = being.TimerSystem!.GetStatistics();
+        TimerStatistics stats = being.TimerSystem!.GetStatistics();
 
-        var lines = new List<string>
+        List<string> lines = new List<string>
         {
             "Timer Statistics:",
             $"- Total: {stats.Total}",
@@ -345,24 +325,114 @@ public class TimerTool : ITool
             $"- Next Trigger: {(stats.NextTrigger?.ToString("yyyy-MM-dd HH:mm:ss") ?? "N/A")}"
         };
 
+        if (stats.ByCalendar.Count > 0)
+        {
+            lines.Add("- By Calendar:");
+            foreach (KeyValuePair<string, int> kv in stats.ByCalendar)
+            {
+                lines.Add($"  - {kv.Key}: {kv.Value}");
+            }
+        }
+
         return ToolResult.Successful(string.Join("\n", lines));
     }
 
     private ToolResult ExecuteTick(SiliconBeingBase being)
     {
-        var triggered = being.TimerSystem!.Tick();
+        List<TimerItem> triggered = being.TimerSystem!.Tick();
 
         if (triggered.Count == 0)
         {
             return ToolResult.Successful("No timers triggered.");
         }
 
-        var lines = new List<string> { $"{triggered.Count} timer(s) triggered:" };
-        foreach (var timer in triggered)
+        List<string> lines = new List<string> { $"{triggered.Count} timer(s) triggered:" };
+        foreach (TimerItem timer in triggered)
         {
             lines.Add($"- {timer.Name} (ID: {timer.Id}, Times: {timer.TimesTriggered})");
         }
 
         return ToolResult.Successful(string.Join("\n", lines));
+    }
+
+    private static Dictionary<string, int>? ParseCalendarConditions(Dictionary<string, object> parameters)
+    {
+        if (!parameters.TryGetValue("calendar_conditions", out object? condObj) || condObj == null)
+            return null;
+
+        Dictionary<string, int> result = new Dictionary<string, int>();
+
+        if (condObj is Dictionary<string, object> dict)
+        {
+            foreach (KeyValuePair<string, object> kv in dict)
+            {
+                if (int.TryParse(kv.Value?.ToString(), out int value))
+                    result[kv.Key] = value;
+            }
+        }
+        else if (condObj is JsonElement jsonElement && jsonElement.ValueKind == JsonValueKind.Object)
+        {
+            foreach (JsonProperty property in jsonElement.EnumerateObject())
+            {
+                if (property.Value.ValueKind == JsonValueKind.Number && property.Value.TryGetInt32(out int value))
+                    result[property.Name] = value;
+                else if (int.TryParse(property.Value.ToString(), out int parsedValue))
+                    result[property.Name] = parsedValue;
+            }
+        }
+
+        return result.Count > 0 ? result : null;
+    }
+
+    private static TimerStatus? ParseStatusFilter(Dictionary<string, object> parameters)
+    {
+        if (!parameters.TryGetValue("status", out object? statusObj) || string.IsNullOrWhiteSpace(statusObj?.ToString()))
+            return null;
+
+        return statusObj!.ToString()!.ToLowerInvariant() switch
+        {
+            "active" => TimerStatus.Active,
+            "paused" => TimerStatus.Paused,
+            "triggered" => TimerStatus.Triggered,
+            "cancelled" => TimerStatus.Cancelled,
+            "all" => null,
+            _ => null
+        };
+    }
+
+    private static string GetHumanReadableDescription(string calendarId, Dictionary<string, int> conditions)
+    {
+        if (calendarId == "interval")
+        {
+            List<string> parts = new List<string>();
+            if (conditions.TryGetValue("days", out int d) && d > 0) parts.Add($"every {d} day(s)");
+            if (conditions.TryGetValue("hours", out int h) && h > 0) parts.Add($"every {h} hour(s)");
+            if (conditions.TryGetValue("minutes", out int m) && m > 0) parts.Add($"every {m} min(s)");
+            if (conditions.TryGetValue("seconds", out int s) && s > 0) parts.Add($"every {s} sec(s)");
+            return parts.Count > 0 ? string.Join(", ", parts) : "interval";
+        }
+
+        Dictionary<string, CalendarBase> registry = CalendarTool.BuildCalendarRegistry();
+        if (registry.TryGetValue(calendarId, out CalendarBase? calendar))
+        {
+            try
+            {
+                return calendar.Localize(conditions);
+            }
+            catch
+            {
+            }
+        }
+
+        return string.Join(", ", conditions.Select(kv => $"{kv.Key}={kv.Value}"));
+    }
+
+    private static string[] GetAvailableCalendarIds()
+    {
+        Dictionary<string, CalendarBase> registry = CalendarTool.BuildCalendarRegistry();
+        List<string> ids = registry.Keys.ToList();
+        ids.Add("interval");
+        ids.Sort(StringComparer.OrdinalIgnoreCase);
+        return ids.ToArray();
     }
 }

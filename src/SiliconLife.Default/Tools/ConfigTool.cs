@@ -30,7 +30,8 @@ public class ConfigTool : ITool
         "Read the Silicon Life system configuration (curator only). " +
         "Actions: 'get_all' (all configuration fields), " +
         "'get_group' (fields in a specific group), " +
-        "'get_field' (a single field by name).";
+        "'get_field' (a single field by name), " +
+        "'get_enum_values' (all possible values for an enum field).";
 
     public string GetDisplayName(Language language)
     {
@@ -62,6 +63,11 @@ public class ConfigTool : ITool
                 {
                     ["type"] = "string",
                     ["description"] = "Config field name (for get_field action)"
+                },
+                ["enum_field"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["description"] = "Enum field name to get available values (for get_enum_values action)"
                 }
             },
             ["required"] = new[] { "action" }
@@ -81,10 +87,11 @@ public class ConfigTool : ITool
 
         return action.ToLowerInvariant() switch
         {
-            "get_all"   => ExecuteGetAll(data),
-            "get_group" => ExecuteGetGroup(data, parameters),
-            "get_field" => ExecuteGetField(data, parameters),
-            _           => ToolResult.Failed($"Unknown action: {action}")
+            "get_all"       => ExecuteGetAll(data),
+            "get_group"     => ExecuteGetGroup(data, parameters),
+            "get_field"     => ExecuteGetField(data, parameters),
+            "get_enum_values" => ExecuteGetEnumValues(data, parameters),
+            _               => ToolResult.Failed($"Unknown action: {action}")
         };
     }
 
@@ -147,6 +154,49 @@ public class ConfigTool : ITool
         string desc = prop.GetCustomAttribute<ConfigGroupAttribute>()?.DescriptionKey ?? "";
         var sb = new StringBuilder();
         AppendField(sb, prop.Name, value, desc);
+
+        return ToolResult.Successful(sb.ToString().TrimEnd());
+    }
+
+    private static ToolResult ExecuteGetEnumValues(ConfigDataBase data, Dictionary<string, object> parameters)
+    {
+        if (!parameters.TryGetValue("enum_field", out object? fieldObj) || string.IsNullOrWhiteSpace(fieldObj?.ToString()))
+            return ToolResult.Failed("Missing 'enum_field' parameter for get_enum_values");
+
+        string fieldName = fieldObj.ToString()!;
+        PropertyInfo? prop = data.GetType().GetProperty(fieldName,
+            BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+
+        if (prop == null)
+            return ToolResult.Failed($"Field '{fieldName}' not found");
+
+        // Respect [ConfigIgnore]
+        if (prop.GetCustomAttribute<ConfigIgnoreAttribute>() != null)
+            return ToolResult.Failed($"Field '{fieldName}' is marked as internal and cannot be read");
+
+        Type propType = prop.PropertyType;
+        
+        // Handle nullable types
+        if (propType.IsGenericType && propType.GetGenericTypeDefinition() == typeof(Nullable<>))
+        {
+            propType = Nullable.GetUnderlyingType(propType)!;
+        }
+
+        if (!propType.IsEnum)
+            return ToolResult.Failed($"Field '{fieldName}' is not an enum type (it is {propType.Name})");
+
+        var sb = new StringBuilder();
+        sb.AppendLine($"Enum field: {prop.Name} (Type: {propType.Name})");
+        sb.AppendLine($"Current value: {prop.GetValue(data)}");
+        sb.AppendLine();
+        sb.AppendLine("Available values:");
+
+        foreach (object value in Enum.GetValues(propType))
+        {
+            string enumName = value.ToString()!;
+            int intValue = Convert.ToInt32(value);
+            sb.AppendLine($"  {enumName} = {intValue}");
+        }
 
         return ToolResult.Successful(sb.ToString().TrimEnd());
     }

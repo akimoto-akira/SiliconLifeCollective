@@ -64,7 +64,10 @@ public class PermissionRequestController : Controller
             return;
         }
 
-        var html = H.PageElement("权限请求 - Silicon Life Collective",
+        // 获取本地化服务
+        var loc = ServiceLocator.Instance.Get<DefaultLocalizationBase>()!;
+
+        var html = H.PageElement($"{loc.PermissionRequestHeader} - Silicon Life Collective",
             new object[]
             {
                 H.Style(GetStyles()),
@@ -74,37 +77,37 @@ public class PermissionRequestController : Controller
             {
                 H.Div(
                     H.Div(
-                        H.H1("权限请求"),
-                        H.P("一个硅基人请求您的授权："),
+                        H.H1(loc.PermissionRequestHeader),
+                        H.P(loc.PermissionRequestDescription),
                         H.Div(
                             H.Div(
                                 H.Div(
-                                    H.Span("权限类型:").Class("label"),
+                                    H.Span(loc.PermissionRequestTypeLabel).Class("label"),
                                     H.Span(permissionType).Class("value")
                                 ).Class("detail-row"),
                                 H.Div(
-                                    H.Span("请求资源:").Class("label"),
+                                    H.Span(loc.PermissionRequestResourceLabel).Class("label"),
                                     H.Span(resource).Class("value")
                                 ).Class("detail-row")
                             ).Class("permission-details"),
                             H.Div(
-                                H.Button("允许").Class("btn-allow").OnClick("respond(true)"),
-                                H.Button("拒绝").Class("btn-deny").OnClick("respond(false)")
+                                H.Button(loc.PermissionRequestAllowButton).Class("btn-allow").OnClick("respond(true)"),
+                                H.Button(loc.PermissionRequestDenyButton).Class("btn-deny").OnClick("respond(false)")
                             ).Class("permission-buttons"),
                             H.Div(
                                 H.Input().Attr("type", "checkbox").Id("cache-checkbox").Class("cache-checkbox"),
-                                H.Label("记住此决定").Attr("for", "cache-checkbox").Class("cache-label")
+                                H.Label(loc.PermissionRequestCacheLabel).Attr("for", "cache-checkbox").Class("cache-label")
                             ).Class("cache-row"),
                             H.Div(
-                                H.Label("缓存时长").Attr("for", "cache-duration").Class("duration-label"),
+                                H.Label(loc.PermissionRequestDurationLabel).Attr("for", "cache-duration").Class("duration-label"),
                                 H.Select(
-                                    H.Option("1 小时").Attr("value", "1"),
-                                    H.Option("24 小时").Attr("value", "24"),
-                                    H.Option("7 天").Attr("value", "168"),
-                                    H.Option("30 天").Attr("value", "720")
+                                    H.Option(loc.PermissionCacheDuration1Hour).Attr("value", "1"),
+                                    H.Option(loc.PermissionCacheDuration24Hours).Attr("value", "24"),
+                                    H.Option(loc.PermissionCacheDuration7Days).Attr("value", "168"),
+                                    H.Option(loc.PermissionCacheDuration30Days).Attr("value", "720")
                                 ).Id("cache-duration").Class("duration-select")
                             ).Class("duration-row"),
-                            H.Div("等待响应...").Class("auto-close")
+                            H.Div(loc.PermissionRequestWaitingMessage).Class("auto-close")
                         )
                     ).Class("permission-box")
                 ).Class("permission-container"),

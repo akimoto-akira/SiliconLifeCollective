@@ -102,6 +102,46 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string PermissionRequestHeader { get; }
 
     /// <summary>
+    /// Gets the description text for permission request page
+    /// </summary>
+    public abstract string PermissionRequestDescription { get; }
+
+    /// <summary>
+    /// Gets the label for permission type in request page
+    /// </summary>
+    public abstract string PermissionRequestTypeLabel { get; }
+
+    /// <summary>
+    /// Gets the label for requested resource in request page
+    /// </summary>
+    public abstract string PermissionRequestResourceLabel { get; }
+
+    /// <summary>
+    /// Gets the text for allow button in request page
+    /// </summary>
+    public abstract string PermissionRequestAllowButton { get; }
+
+    /// <summary>
+    /// Gets the text for deny button in request page
+    /// </summary>
+    public abstract string PermissionRequestDenyButton { get; }
+
+    /// <summary>
+    /// Gets the label for cache checkbox in request page
+    /// </summary>
+    public abstract string PermissionRequestCacheLabel { get; }
+
+    /// <summary>
+    /// Gets the label for cache duration selector in request page
+    /// </summary>
+    public abstract string PermissionRequestDurationLabel { get; }
+
+    /// <summary>
+    /// Gets the waiting message text in request page
+    /// </summary>
+    public abstract string PermissionRequestWaitingMessage { get; }
+
+    /// <summary>
     /// Gets the label for the allow code in permission prompts
     /// </summary>
     public abstract string AllowCodeLabel { get; }
@@ -651,6 +691,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string TimersIntervalLabel { get; }
 
     /// <summary>
+    /// Gets the calendar description label
+    /// </summary>
+    public abstract string TimersCalendarLabel { get; }
+
+    /// <summary>
     /// Gets the triggered count label
     /// </summary>
     public abstract string TimersTriggeredCountLabel { get; }
@@ -681,6 +726,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the display name for the user in chat messages
     /// </summary>
     public abstract string ChatUserDisplayName { get; }
+
+    /// <summary>
+    /// Gets the avatar name for the user in chat UI
+    /// </summary>
+    public abstract string ChatUserAvatarName { get; }
 
     /// <summary>
     /// Gets the default display name for AI beings
@@ -762,6 +812,135 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <param name="platform">The platform identifier</param>
     /// <returns>The localized display name</returns>
     public abstract string GetSocialMediaName(string platform);
+
+    // ===== Memory Page Localization =====
+
+    /// <summary>
+    /// Gets the memory page header text
+    /// </summary>
+    public abstract string MemoryPageHeader { get; }
+
+    /// <summary>
+    /// Gets the empty state text when no memory records exist
+    /// </summary>
+    public abstract string MemoryEmptyState { get; }
+
+    /// <summary>
+    /// Gets the placeholder text for memory search input
+    /// </summary>
+    public abstract string MemorySearchPlaceholder { get; }
+
+    /// <summary>
+    /// Gets the search button text
+    /// </summary>
+    public abstract string MemorySearchButton { get; }
+
+    /// <summary>
+    /// Gets the filter mode text for showing all memories
+    /// </summary>
+    public abstract string MemoryFilterAll { get; }
+
+    /// <summary>
+    /// Gets the filter mode text for showing summaries only
+    /// </summary>
+    public abstract string MemoryFilterSummaryOnly { get; }
+
+    /// <summary>
+    /// Gets the filter mode text for showing original memories only
+    /// </summary>
+    public abstract string MemoryFilterOriginalOnly { get; }
+
+    /// <summary>
+    /// Gets the statistics label for total memories
+    /// </summary>
+    public abstract string MemoryStatTotal { get; }
+
+    /// <summary>
+    /// Gets the statistics label for oldest memory
+    /// </summary>
+    public abstract string MemoryStatOldest { get; }
+
+    /// <summary>
+    /// Gets the statistics label for newest memory
+    /// </summary>
+    public abstract string MemoryStatNewest { get; }
+
+    /// <summary>
+    /// Gets the badge text for summary memories
+    /// </summary>
+    public abstract string MemoryIsSummaryBadge { get; }
+
+    /// <summary>
+    /// Gets the pagination previous button text
+    /// </summary>
+    public abstract string MemoryPaginationPrev { get; }
+
+    /// <summary>
+    /// Gets the pagination next button text
+    /// </summary>
+    public abstract string MemoryPaginationNext { get; }
+
+    // ===== Projects Page Localization =====
+
+    /// <summary>
+    /// Gets the projects page header text
+    /// </summary>
+    public abstract string ProjectsPageHeader { get; }
+
+    /// <summary>
+    /// Gets the empty state text when no projects exist
+    /// </summary>
+    public abstract string ProjectsEmptyState { get; }
+
+    // ===== Tasks Page Localization =====
+
+    /// <summary>
+    /// Gets the tasks page header text
+    /// </summary>
+    public abstract string TasksPageHeader { get; }
+
+    /// <summary>
+    /// Gets the empty state text when no tasks exist
+    /// </summary>
+    public abstract string TasksEmptyState { get; }
+
+    // ===== Code Browser Page Localization =====
+
+    /// <summary>
+    /// Gets the code browser page header text
+    /// </summary>
+    public abstract string CodeBrowserPageHeader { get; }
+
+    // ===== Executor Page Localization =====
+
+    /// <summary>
+    /// Gets the executor page header text
+    /// </summary>
+    public abstract string ExecutorPageHeader { get; }
+
+    // ===== Permission Page Localization =====
+
+    /// <summary>
+    /// Gets the permission page header text
+    /// </summary>
+    public abstract string PermissionPageHeader { get; }
+
+    /// <summary>
+    /// Gets the empty state text when no permission rules exist
+    /// </summary>
+    public abstract string PermissionEmptyState { get; }
+
+    // ===== Knowledge Page Localization =====
+
+    /// <summary>
+    /// Gets the knowledge page header text
+    /// </summary>
+    public abstract string KnowledgePageHeader { get; }
+
+    /// <summary>
+    /// Gets the loading state text for knowledge graph
+    /// </summary>
+    public abstract string KnowledgeLoadingState { get; }
 
     // ===== Config Page Localization =====
 
@@ -924,6 +1103,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the error message for save failure
     /// </summary>
     public abstract string ConfigErrorSaveFailed { get; }
+
+    /// <summary>
+    /// Gets the error message prefix for save failure in alert dialog
+    /// </summary>
+    public abstract string ConfigSaveFailed { get; }
 
     // ===== Logs Page Localization =====
 
@@ -1118,6 +1302,26 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the legend label for total tokens in trend chart
     /// </summary>
     public abstract string AuditTrendTotal { get; }
+
+    /// <summary>
+    /// Gets the tooltip label for date in chart hover
+    /// </summary>
+    public abstract string AuditTooltipDate { get; }
+
+    /// <summary>
+    /// Gets the tooltip label for prompt tokens in chart hover
+    /// </summary>
+    public abstract string AuditTooltipPrompt { get; }
+
+    /// <summary>
+    /// Gets the tooltip label for completion tokens in chart hover
+    /// </summary>
+    public abstract string AuditTooltipCompletion { get; }
+
+    /// <summary>
+    /// Gets the tooltip label for total tokens in chart hover
+    /// </summary>
+    public abstract string AuditTooltipTotal { get; }
 
     /// <summary>
     /// Gets the localized display name for a configuration group

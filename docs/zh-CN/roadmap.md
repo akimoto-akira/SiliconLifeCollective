@@ -136,7 +136,7 @@
 | 7.4 | 硅基人生命周期增强 | 加载：解密 → 扫描 → 编译 → 实例化。运行时：内存编译 → 原子替换 → 持久化加密代码 |
 | 7.5 | SiliconCurator | 主理人抽象基类。IsCurator=true。最高权限 |
 | 7.6 | DefaultCurator | 默认主理人实现。内置灵魂文件和管理工具集 |
-| 7.7 | CuratorTool | `[SiliconManagerOnly]` 工具：list_beings、recompile、get_code、update_soul、scan_code |
+| 7.7 | CuratorTool | `[SiliconManagerOnly]` 工具：list_beings、create_being、get_code、reset |
 | 7.8 | 权限回调动态覆盖 | 硅基人可编译自定义权限回调代码 |
 | 7.9 | SiliconBeingManager 增强 | Replace 方法（运行时替换实例）。MigrateState（状态迁移） |
 
@@ -164,7 +164,7 @@
 
 ---
 
-## 第九阶段：框架完备 ✅ 已完成
+## ~~第九阶段：框架完备~~ ✅ 已完成
 
 **目标**：统一入口，多硅基人协作。
 
@@ -192,14 +192,37 @@
 | 10.1 | Router | HTTP 请求路由器。序号参数型路由和静态文件服务 |
 | 10.2 | Controller 抽象类 | 请求/响应上下文。HTML 和 JSON 响应支持 |
 | 10.3–10.5 | HtmlBuilder / CssBuilder / JsBuilder | C# 服务端构建器。零前端框架依赖 |
-| 10.6 | WebSocket | 实时消息推送。与 HTTP 共用端口。JSON 消息格式 |
-| 10.7 | WebUIProvider | 基于 WebSocket 的实时 IM 通道。替代控制台 |
+| 10.6 | SSE（Server-Sent Events） | 基于推送的实时更新，用于聊天、硅基人状态和系统事件。比 WebSocket 更简单，支持客户端自动重连 |
+| 10.7 | WebUIProvider | 基于 SSE 的实时 IM 通道。替代控制台作为主要界面 |
 | 10.8 | Web 安全 | IP 黑白名单。`[WebCode]` 特性。动态更新 |
-| 10.9–10.16 | Web 控制器 | 聊天、仪表盘、硅基人管理、任务、权限、执行器、日志、配置页面 |
+| 10.9–10.17 | Web 控制器 | Chat、Dashboard、Being、Task、Permission、PermissionRequest、Executor、Log、Config、Memory、Timer、Init、About、CodeBrowser、Knowledge、Project、Audit |
 
 **阶段产出**：完整的 Web 界面，可通过浏览器访问。
 
 **验证方式**：打开浏览器 → 与硅基人聊天 → 查看仪表盘 → 管理权限 → 全部功能正常。
+
+---
+
+## ~~第十点五阶段：增量增强~~ ✅ 已完成
+
+**目标**：在已有系统基础上增加开发过程中发现的新能力。
+
+| # | 模块 | 说明 |
+|---|------|------|
+| 10.5.1 | BroadcastChannel | 新会话类型，用于系统级广播。固定频道 ID，动态订阅，待读消息过滤 |
+| 10.5.2 | ChatMessage 增强 | ToolCallId、ToolCallsJson、Thinking 字段用于 AI 上下文；PromptTokens、CompletionTokens、TotalTokens 用于 Token 追踪；SystemNotification 消息类型 |
+| 10.5.3 | TokenUsageAuditManager | 跨硅基人的单次请求 Token 消耗追踪。聚合统计、时间序列查询、持久化存储 |
+| 10.5.4 | TokenAuditTool | `[SiliconManagerOnly]` 工具，主理人可查询和汇总 Token 用量 |
+| 10.5.5 | ConfigTool | `[SiliconManagerOnly]` 工具，主理人可读取和修改系统配置 |
+| 10.5.6 | AuditController | Token 用量审计 Web 仪表盘，含趋势图表和数据导出 |
+| 10.5.7 | 历法系统扩展 | 32 种历法实现，覆盖世界主要历法体系（佛历、中国农历、伊斯兰历、希伯来历、日本年号历、波斯历、玛雅历等） |
+| 10.5.8 | DiskTool 增强 | 新增操作：count_lines、read_lines、clear_file、replace_lines、replace_text、replace_text_all、list_drives |
+| 10.5.9 | SystemTool 增强 | 新增操作：find_process（支持通配符）、resource_usage |
+| 10.5.10 | CalendarTool 增强 | 新增操作：diff、list_calendars、get_components、get_now_components、convert（跨历法转换） |
+
+**阶段产出**：增强的工具集、可观测性和历法覆盖。
+
+**验证方式**：主理人通过 TokenAuditTool 查询 Token 用量 → 审计仪表盘显示趋势 → CalendarTool 跨 32 种历法转换日期。
 
 ---
 
@@ -227,4 +250,3 @@
 | 12.1 | 知识网络 | 共享知识图谱，三元组结构 |
 | 12.2 | 插件系统 | 外部插件加载，安全检查 |
 | 12.3 | 技能生态系统 | 可复用的功能模块市场 |
-| 12.4 | 历法系统 | 多历法支持（公历、农历、伊斯兰历等） |

@@ -46,6 +46,14 @@ public class ZhHK : DefaultLocalizationBase
     public override string PermissionDeniedMessage => "權限被拒絕";
     public override string PermissionAskPrompt => "是否允許？(y/n): ";
     public override string PermissionRequestHeader => "[權限請求]";
+    public override string PermissionRequestDescription => "一個矽基人請求您的授權：";
+    public override string PermissionRequestTypeLabel => "權限類型:";
+    public override string PermissionRequestResourceLabel => "請求資源:";
+    public override string PermissionRequestAllowButton => "允許";
+    public override string PermissionRequestDenyButton => "拒絕";
+    public override string PermissionRequestCacheLabel => "記住此決定";
+    public override string PermissionRequestDurationLabel => "緩存時長";
+    public override string PermissionRequestWaitingMessage => "等待響應...";
     public override string AllowCodeLabel => "允許碼";
     public override string DenyCodeLabel => "拒絕碼";
     public override string PermissionReplyInstruction => "輸入驗證碼確認，或輸入其他內容拒絕";
@@ -143,6 +151,50 @@ public class ZhHK : DefaultLocalizationBase
     public override string PageTitlePermission => "權限管理 - 矽基生命群";
     public override string PageTitleAbout => "關於 - 矽基生命群";
 
+    // ===== Memory Page Localization =====
+
+    public override string MemoryPageHeader => "記憶瀏覽";
+    public override string MemoryEmptyState => "暫無記憶數據";
+    public override string MemorySearchPlaceholder => "搜尋記憶...";
+    public override string MemorySearchButton => "搜尋";
+    public override string MemoryFilterAll => "全部";
+    public override string MemoryFilterSummaryOnly => "僅總結";
+    public override string MemoryFilterOriginalOnly => "僅原始";
+    public override string MemoryStatTotal => "記憶總數";
+    public override string MemoryStatOldest => "最早記憶";
+    public override string MemoryStatNewest => "最新記憶";
+    public override string MemoryIsSummaryBadge => "壓縮總結";
+    public override string MemoryPaginationPrev => "上一頁";
+    public override string MemoryPaginationNext => "下一頁";
+
+    // ===== Projects Page Localization =====
+
+    public override string ProjectsPageHeader => "項目空間管理";
+    public override string ProjectsEmptyState => "暫無項目";
+
+    // ===== Tasks Page Localization =====
+
+    public override string TasksPageHeader => "任務管理";
+    public override string TasksEmptyState => "暫無任務";
+
+    // ===== Code Browser Page Localization =====
+
+    public override string CodeBrowserPageHeader => "代碼瀏覽";
+
+    // ===== Executor Page Localization =====
+
+    public override string ExecutorPageHeader => "執行器監控";
+
+    // ===== Permission Page Localization =====
+
+    public override string PermissionPageHeader => "權限管理";
+    public override string PermissionEmptyState => "暫無權限規則";
+
+    // ===== Knowledge Page Localization =====
+
+    public override string KnowledgePageHeader => "知識圖譜可視化";
+    public override string KnowledgeLoadingState => "知識圖譜數據加載中...";
+
     // ===== Chat =====
 
     public override string SingleChatNameFormat => "與{0}聊天";
@@ -151,6 +203,7 @@ public class ZhHK : DefaultLocalizationBase
     public override string ChatMessageInputPlaceholder => "輸入訊息...";
     public override string ChatSendButton => "傳送";
     public override string ChatUserDisplayName => "我";
+    public override string ChatUserAvatarName => "我";
     public override string ChatDefaultBeingName => "AI";
     public override string ChatThinkingSummary => "💭 思考過程（點擊展開）";
     public override string GetChatToolCallsSummary(int count) => $"🔧 工具呼叫 ({count}項)";
@@ -198,6 +251,7 @@ public class ZhHK : DefaultLocalizationBase
     public override string TimersTypeRecurring => "循環";
     public override string TimersTriggerTimeLabel => "觸發時間：";
     public override string TimersIntervalLabel => "間隔：";
+    public override string TimersCalendarLabel => "曆法條件：";
     public override string TimersTriggeredCountLabel => "已觸發：";
 
     // ===== About =====
@@ -263,6 +317,7 @@ public class ZhHK : DefaultLocalizationBase
     public override string ConfigErrorConvertEnum => "無法將 '{0}' 轉換為 {1}";
     public override string ConfigErrorUnsupportedType => "不支援的屬性類型: {0}";
     public override string ConfigErrorSaveFailed => "儲存失敗: {0}";
+    public override string ConfigSaveFailed => "儲存失敗：";
 
     // ===== Logs =====
 
@@ -305,6 +360,10 @@ public class ZhHK : DefaultLocalizationBase
     public override string AuditTrendPrompt => "輸入 Token";
     public override string AuditTrendCompletion => "輸出 Token";
     public override string AuditTrendTotal => "總 Token";
+    public override string AuditTooltipDate => "日期";
+    public override string AuditTooltipPrompt => "輸入 Token";
+    public override string AuditTooltipCompletion => "輸出 Token";
+    public override string AuditTooltipTotal => "總 Token";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {

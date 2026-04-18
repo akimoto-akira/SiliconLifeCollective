@@ -19,15 +19,15 @@ public class ExecutorView : ViewBase
     {
         var vm = model as ViewModelBase;
         if (vm == null) return string.Empty;
-        var body = RenderBody();
+        var body = RenderBody(vm);
         return RenderPage(vm.Skin, vm.Localization.PageTitleExecutor, "beings", vm.Localization, body, GetScripts(), GetStyles());
     }
 
-    private static H RenderBody()
+    private static H RenderBody(ViewModelBase vm)
     {
         return H.Div(
             H.Div(
-                H.H1("执行器监控")
+                H.H1(vm.Localization.ExecutorPageHeader)
             ).Class("page-header"),
             H.Div().Id("executors-grid").Class("executors-grid")
         ).Class("page-content");

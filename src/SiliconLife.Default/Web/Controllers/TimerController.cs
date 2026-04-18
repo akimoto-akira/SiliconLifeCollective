@@ -10,6 +10,7 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
+using SiliconLife.Default.Web.Models;
 
 namespace SiliconLife.Default.Web;
 
@@ -82,7 +83,58 @@ public class TimerController : Controller
 
     private static List<object> GetTimersFromSystem(TimerSystem timerSystem)
     {
+        var timers = timerSystem.GetAll();
         var result = new List<object>();
+
+        foreach (var timer in timers)
+        {
+            string calendarDesc = GetCalendarDescription(timer.CalendarId, timer.CalendarConditions);
+
+            result.Add(new
+            {
+                id = timer.Id.ToString(),
+                name = timer.Name,
+                description = timer.Description ?? "",
+                type = timer.Type.ToString().ToLowerInvariant(),
+                status = timer.Status.ToString().ToLowerInvariant(),
+                triggerTime = timer.TriggerTime,
+                triggerTimeFormatted = timer.TriggerTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                calendarId = timer.CalendarId,
+                calendarDescription = calendarDesc,
+                calendarConditions = timer.CalendarConditions,
+                timesTriggered = timer.TimesTriggered,
+                createdAt = timer.CreatedAt,
+                lastTriggeredAt = timer.LastTriggeredAt
+            });
+        }
+
         return result;
+    }
+
+    private static string GetCalendarDescription(string calendarId, Dictionary<string, int> conditions)
+    {
+        if (calendarId == "interval")
+        {
+            List<string> parts = new();
+            if (conditions.TryGetValue("days", out int d) && d > 0) parts.Add($"{d}d");
+            if (conditions.TryGetValue("hours", out int h) && h > 0) parts.Add($"{h}h");
+            if (conditions.TryGetValue("minutes", out int m) && m > 0) parts.Add($"{m}m");
+            if (conditions.TryGetValue("seconds", out int s) && s > 0) parts.Add($"{s}s");
+            return parts.Count > 0 ? $"every " + string.Join(" ", parts) : "interval";
+        }
+
+        Dictionary<string, CalendarBase> registry = CalendarTool.BuildCalendarRegistry();
+        if (registry.TryGetValue(calendarId, out CalendarBase? calendar))
+        {
+            try
+            {
+                return calendar.Localize(conditions);
+            }
+            catch
+            {
+            }
+        }
+
+        return string.Join(", ", conditions.Select(kv => $"{kv.Key}={kv.Value}"));
     }
 }

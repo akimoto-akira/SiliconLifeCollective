@@ -20,14 +20,14 @@ public class PermissionView : ViewBase
         var vm = model as PermissionViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.PageTitlePermission, "beings", vm.Localization, body, GetScripts(), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.PageTitlePermission, "beings", vm.Localization, body, GetScripts(vm.Localization), GetStyles());
     }
 
     private static H RenderBody(PermissionViewModel vm)
     {
         return H.Div(
             H.Div(
-                H.H1("权限管理")
+                H.H1(vm.Localization.PermissionPageHeader)
             ).Class("page-header"),
             H.Div(
                 H.Div().Id("permissions-list").Class("permissions-list")
@@ -35,7 +35,7 @@ public class PermissionView : ViewBase
         ).Class("page-content");
     }
 
-    private static JsSyntax GetScripts()
+    private static JsSyntax GetScripts(DefaultLocalizationBase loc)
     {
         var forEachBody = Js.Block()
             .Add(() => Js.Const(() => "row", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
@@ -51,7 +51,7 @@ public class PermissionView : ViewBase
             {
                 { (Js.Id(() => "data").Prop(() => "length").Op(() => "===", () => Js.Num(() => "0")), new List<JsSyntax>
                     {
-                        Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => "<p>暂无权限规则</p>"))
+                        Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => $"<p>{loc.PermissionEmptyState}</p>"))
                     }
                 )}
             }))

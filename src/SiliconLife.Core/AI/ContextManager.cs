@@ -713,12 +713,13 @@ public class ContextManager
     /// Scene: task execution.
     /// Loads task context, calls AI, writes back task result.
     /// </summary>
+    /// <param name="task">The task item to execute</param>
     /// <returns>The AI response</returns>
-    public AIResponse ThinkOnTask()
+    public AIResponse ThinkOnTask(TaskItem task)
     {
-        _logger.Info("ThinkOnTask: being={0}", _being.Name);
+        _logger.Info("ThinkOnTask: being={0}, task={1} ({2})", _being.Name, task.Title, task.Id);
 
-        string? scenarioContext = null;
+        string? scenarioContext = BuildTaskScenarioContext(task);
         AIResponse response = GetResponse(scenarioContext);
 
         if (response.Success && !string.IsNullOrEmpty(response.Content))
@@ -735,12 +736,13 @@ public class ContextManager
     /// Scene: scheduled timer.
     /// Loads timer context, calls AI, may not deliver output.
     /// </summary>
+    /// <param name="timer">The timer item that triggered</param>
     /// <returns>The AI response</returns>
-    public AIResponse ThinkOnTimer()
+    public AIResponse ThinkOnTimer(TimerItem timer)
     {
-        _logger.Info("ThinkOnTimer: being={0}", _being.Name);
+        _logger.Info("ThinkOnTimer: being={0}, timer={1} ({2})", _being.Name, timer.Name, timer.Id);
 
-        string? scenarioContext = null;
+        string? scenarioContext = BuildTimerScenarioContext(timer);
         AIResponse response = GetResponse(scenarioContext);
 
         if (response.Success && !string.IsNullOrEmpty(response.Content))
@@ -751,6 +753,54 @@ public class ContextManager
         }
 
         return response;
+    }
+
+    private static string BuildTaskScenarioContext(TaskItem task)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine("Scene: Task execution");
+        sb.AppendLine($"Task ID: {task.Id}");
+        sb.AppendLine($"Task title: {task.Title}");
+        if (!string.IsNullOrEmpty(task.Description))
+            sb.AppendLine($"Task description: {task.Description}");
+        sb.AppendLine($"Task priority: {task.Priority}");
+        sb.AppendLine($"Task status: {task.Status}");
+        sb.AppendLine($"Task created at: {task.CreatedAt:yyyy-MM-dd HH:mm:ss}");
+        if (task.StartedAt.HasValue)
+            sb.AppendLine($"Task started at: {task.StartedAt.Value:yyyy-MM-dd HH:mm:ss}");
+        if (task.Dependencies.Count > 0)
+            sb.AppendLine($"Task dependencies: {string.Join(", ", task.Dependencies)}");
+        if (task.Metadata.Count > 0)
+        {
+            sb.AppendLine("Task metadata:");
+            foreach (KeyValuePair<string, string> kv in task.Metadata)
+                sb.AppendLine($"  {kv.Key}: {kv.Value}");
+        }
+        return sb.ToString();
+    }
+
+    private static string BuildTimerScenarioContext(TimerItem timer)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine("Scene: Scheduled timer triggered");
+        sb.AppendLine($"Timer ID: {timer.Id}");
+        sb.AppendLine($"Timer name: {timer.Name}");
+        if (!string.IsNullOrEmpty(timer.Description))
+            sb.AppendLine($"Timer description: {timer.Description}");
+        sb.AppendLine($"Timer type: {timer.Type}");
+        sb.AppendLine($"Timer calendar: {timer.CalendarId}");
+        sb.AppendLine($"Timer conditions: {string.Join(", ", timer.CalendarConditions.Select(kv => $"{kv.Key}={kv.Value}"))}");
+        sb.AppendLine($"Timer trigger time: {timer.TriggerTime:yyyy-MM-dd HH:mm:ss}");
+        sb.AppendLine($"Times triggered: {timer.TimesTriggered}");
+        if (timer.LastTriggeredAt.HasValue)
+            sb.AppendLine($"Last triggered at: {timer.LastTriggeredAt.Value:yyyy-MM-dd HH:mm:ss}");
+        if (timer.Metadata.Count > 0)
+        {
+            sb.AppendLine("Timer metadata:");
+            foreach (KeyValuePair<string, string> kv in timer.Metadata)
+                sb.AppendLine($"  {kv.Key}: {kv.Value}");
+        }
+        return sb.ToString();
     }
 
     /// <summary>
@@ -799,8 +849,7 @@ public class ContextManager
 
         if (response.Success && !string.IsNullOrEmpty(response.Content))
         {
-            _being.Memory.Add($"[{level} Compression] {response.Content}", null);
-            _being.Memory.RemoveEntriesByTimestamp(level);
+            _being.Memory.AddSummary(level, $"[{level} Compression] {response.Content}");
         }
 
         return response;

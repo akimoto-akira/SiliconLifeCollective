@@ -11,6 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json;
+
 namespace SiliconLife.Collective;
 
 /// <summary>
@@ -76,11 +78,11 @@ public static class NetworkExecutor
                 httpRequest.Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
             }
 
-            if (request.Parameters.TryGetValue("headers", out object? headersObj) && headersObj is Dictionary<string, object> headers)
+            if (request.Parameters.TryGetValue("headers", out object? headersObj) && headersObj != null)
             {
-                foreach (KeyValuePair<string, object> header in headers)
+                foreach (KeyValuePair<string, string> header in EnumerateStringKeyValuePairs(headersObj))
                 {
-                    httpRequest.Headers.TryAddWithoutValidation(header.Key, header.Value?.ToString());
+                    httpRequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
                 }
             }
 
@@ -123,5 +125,19 @@ public static class NetworkExecutor
         PermissionManager? pm = ServiceLocator.Instance.GetPermissionManager(request.CallerId);
         if (pm == null) return true;
         return pm.CheckPermission(request.CallerId, PermissionType.NetworkAccess, request.ResourcePath);
+    }
+
+    private static IEnumerable<KeyValuePair<string, string>> EnumerateStringKeyValuePairs(object obj)
+    {
+        if (obj is Dictionary<string, object> dict)
+        {
+            foreach (KeyValuePair<string, object> kv in dict)
+                yield return new KeyValuePair<string, string>(kv.Key, kv.Value?.ToString() ?? "");
+        }
+        else if (obj is JsonElement jsonElement && jsonElement.ValueKind == JsonValueKind.Object)
+        {
+            foreach (JsonProperty property in jsonElement.EnumerateObject())
+                yield return new KeyValuePair<string, string>(property.Name, property.Value.ToString());
+        }
     }
 }

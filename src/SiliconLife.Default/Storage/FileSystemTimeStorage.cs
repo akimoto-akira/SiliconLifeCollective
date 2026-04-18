@@ -477,4 +477,83 @@ public class FileSystemTimeStorage : ITimeStorage
                 Directory.Delete(dir);
         }
     }
+
+    // ── Search Implementation ────────────────────────────────────────────────
+
+    /// <summary>
+    /// Searches entries by keyword across all time levels for the given key.
+    /// </summary>
+    public List<TimeEntry<T>> Search<T>(string key, string keyword, int maxCount = 0)
+    {
+        if (string.IsNullOrWhiteSpace(keyword))
+            return new List<TimeEntry<T>>();
+
+        string dir = GetKeyDirectory(key);
+        if (!Directory.Exists(dir))
+            return new List<TimeEntry<T>>();
+
+        var results = new List<TimeEntry<T>>();
+        var keywordLower = keyword.ToLowerInvariant();
+
+        foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
+        {
+            if (!TryParseTimestampFromFile(file, out DateTime fileTime))
+                continue;
+
+            try
+            {
+                var entry = ReadSingleLine<T>(file);
+                if (entry == null)
+                    continue;
+
+                // Search in Content and Keywords fields using reflection
+                bool found = false;
+                var entryType = typeof(T);
+
+                // Check Content property
+                var contentProp = entryType.GetProperty("Content");
+                if (contentProp != null)
+                {
+                    var content = contentProp.GetValue(entry) as string;
+                    if (!string.IsNullOrEmpty(content) && content.ToLowerInvariant().Contains(keywordLower))
+                        found = true;
+                }
+
+                // Check Keywords property
+                if (!found)
+                {
+                    var keywordsProp = entryType.GetProperty("Keywords");
+                    if (keywordsProp != null)
+                    {
+                        var keywords = keywordsProp.GetValue(entry) as System.Collections.IEnumerable;
+                        if (keywords != null)
+                        {
+                            foreach (var kw in keywords)
+                            {
+                                var kwStr = kw?.ToString();
+                                if (!string.IsNullOrEmpty(kwStr) && kwStr.ToLowerInvariant().Contains(keywordLower))
+                                {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (found)
+                {
+                    results.Add(new TimeEntry<T>(key, fileTime, entry));
+                }
+            }
+            catch
+            {
+                // Skip files that cannot be read or deserialized
+            }
+        }
+
+        // Order by timestamp descending and apply limit
+        var ordered = results.OrderByDescending(e => e.Timestamp);
+        return (maxCount > 0 ? ordered.Take(maxCount) : ordered).ToList();
+    }
 }

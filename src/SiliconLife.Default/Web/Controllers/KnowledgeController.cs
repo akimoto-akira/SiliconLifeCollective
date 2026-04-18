@@ -49,9 +49,10 @@ public class KnowledgeController : Controller
 
     private void GetGraph()
     {
+        var loc = ServiceLocator.Instance.Get<DefaultLocalizationBase>()!;
         RenderJson(new
         {
-            nodes = new[] { new { id = "1", label = "中心" } },
+            nodes = new[] { new { id = "1", label = loc.KnowledgePageHeader } },
             edges = new[] { new { from = "1", to = "1" } }
         });
     }

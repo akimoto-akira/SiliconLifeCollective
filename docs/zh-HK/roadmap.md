@@ -136,7 +136,7 @@
 | 7.4 | 矽基人生命週期增強 | 載入：解密 → 掃描 → 編譯 → 執行個體化。執行時：記憶體編譯 → 原子替換 → 持久化加密程式碼 |
 | 7.5 | SiliconCurator | 主理人抽象基底類別。IsCurator=true。最高權限 |
 | 7.6 | DefaultCurator | 預設主理人實作。內建靈魂檔案和管理工具集 |
-| 7.7 | CuratorTool | `[SiliconManagerOnly]` 工具：list_beings、recompile、get_code、update_soul、scan_code |
+| 7.7 | CuratorTool | `[SiliconManagerOnly]` 工具：list_beings、create_being、get_code、reset |
 | 7.8 | 權限回呼動態覆寫 | 矽基人可編譯自訂權限回呼程式碼 |
 | 7.9 | SiliconBeingManager 增強 | Replace 方法（執行時替換執行個體）。MigrateState（狀態遷移） |
 
@@ -192,14 +192,37 @@
 | 10.1 | Router | HTTP 請求路由器。序號參數型路由和靜態檔案服務 |
 | 10.2 | Controller 抽象類別 | 請求/響應上下文。HTML 和 JSON 響應支援 |
 | 10.3–10.5 | HtmlBuilder / CssBuilder / JsBuilder | C# 伺服器端建構器。零前端框架依賴 |
-| 10.6 | WebSocket | 即時訊息推送。與 HTTP 共用連接埠。JSON 訊息格式 |
-| 10.7 | WebUIProvider | 基於 WebSocket 的即時 IM 通道。替代主控台 |
+| 10.6 | SSE（Server-Sent Events） | 基於推送的即時更新，用於聊天、矽基人狀態和系統事件。比 WebSocket 更簡單，支援用戶端自動重新連線 |
+| 10.7 | WebUIProvider | 基於 SSE 的即時 IM 通道。替代主控台作為主要介面 |
 | 10.8 | Web 安全 | IP 黑白名單。`[WebCode]` 屬性。動態更新 |
-| 10.9–10.16 | Web 控制器 | 聊天、儀表板、矽基人管理、任務、權限、執行器、日誌、設定頁面 |
+| 10.9–10.17 | Web 控制器 | Chat、Dashboard、Being、Task、Permission、PermissionRequest、Executor、Log、Config、Memory、Timer、Init、About、CodeBrowser、Knowledge、Project、Audit |
 
 **階段產出**：完整的 Web 介面，可透過瀏覽器存取。
 
 **驗證方式**：開啟瀏覽器 → 與矽基人聊天 → 查看儀表板 → 管理權限 → 全部功能正常。
+
+---
+
+## ~~第十點五階段：增量增強~~ ✅ 已完成
+
+**目標**：在已有系統基礎上增加開發過程中發現的新能力。
+
+| # | 模組 | 說明 |
+|---|------|------|
+| 10.5.1 | BroadcastChannel | 新工作階段類型，用於系統級廣播。固定頻道 ID，動態訂閱，待讀訊息篩選 |
+| 10.5.2 | ChatMessage 增強 | ToolCallId、ToolCallsJson、Thinking 欄位用於 AI 上下文；PromptTokens、CompletionTokens、TotalTokens 用於 Token 追蹤；SystemNotification 訊息類型 |
+| 10.5.3 | TokenUsageAuditManager | 跨矽基人的單次請求 Token 消耗追蹤。彙總統計、時間序列查詢、持久化儲存 |
+| 10.5.4 | TokenAuditTool | `[SiliconManagerOnly]` 工具，主理人可查詢和彙總 Token 用量 |
+| 10.5.5 | ConfigTool | `[SiliconManagerOnly]` 工具，主理人可讀取和修改系統設定 |
+| 10.5.6 | AuditController | Token 用量稽核 Web 儀表板，含趨勢圖表和資料匯出 |
+| 10.5.7 | 曆法系統擴展 | 32 種曆法實作，涵蓋世界主要曆法體系（佛曆、中國農曆、伊斯蘭曆、希伯來曆、日本年號曆、波斯曆、瑪雅曆等） |
+| 10.5.8 | DiskTool 增強 | 新增操作：count_lines、read_lines、clear_file、replace_lines、replace_text、replace_text_all、list_drives |
+| 10.5.9 | SystemTool 增強 | 新增操作：find_process（支援萬用字元）、resource_usage |
+| 10.5.10 | CalendarTool 增強 | 新增操作：diff、list_calendars、get_components、get_now_components、convert（跨曆法轉換） |
+
+**階段產出**：增強的工具集、可觀測性和曆法涵蓋範圍。
+
+**驗證方式**：主理人透過 TokenAuditTool 查詢 Token 用量 → 稽核儀表板顯示趨勢 → CalendarTool 跨 32 種曆法轉換日期。
 
 ---
 
@@ -227,4 +250,3 @@
 | 12.1 | 知識網路 | 共用知識圖譜，三元組結構 |
 | 12.2 | 外掛程式系統 | 外部外掛程式載入，安全檢查 |
 | 12.3 | 技能生態系統 | 可重複使用的功能模組市場 |
-| 12.4 | 曆法系統 | 多曆法支援（公曆、農曆、伊斯蘭曆等） |

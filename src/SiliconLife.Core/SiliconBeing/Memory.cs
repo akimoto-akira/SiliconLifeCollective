@@ -39,6 +39,22 @@ public sealed class MemoryEntry
     public List<Guid> RelatedBeings { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets whether this entry is a compression summary rather than
+    /// an original memory record.
+    /// </summary>
+    public bool IsSummary { get; set; }
+
+    /// <summary>
+    /// Gets or sets the type/category of this memory entry (e.g., "chat", "tool_call", "task", "timer").
+    /// </summary>
+    public string? Type { get; set; }
+
+    /// <summary>
+    /// Gets or sets the list of keywords associated with this memory entry for search and retrieval.
+    /// </summary>
+    public List<string> Keywords { get; set; } = new();
+
+    /// <summary>
     /// Initializes a new instance of the MemoryEntry class with the current timestamp.
     /// </summary>
     public MemoryEntry()
@@ -103,7 +119,20 @@ public sealed class Memory
     /// <summary>
     /// Gets the total number of memory entries.
     /// </summary>
-    public int Count => _timeStorage.Query<MemoryEntry>(_storageKey, null).Count;
+    public int Count
+    {
+        get
+        {
+            try
+            {
+                return _timeStorage.Query<MemoryEntry>(_storageKey, null).Count;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+    }
 
     /// <summary>
     /// Initializes a new instance of the Memory class with the specified time storage.
@@ -181,12 +210,36 @@ public sealed class Memory
     }
 
     /// <summary>
+    /// Adds a compression summary entry at the resolved timestamp of the given
+    /// <paramref name="level"/>. Summary entries are marked with
+    /// <see cref="MemoryEntry.IsSummary"/> = <c>true</c> so that
+    /// <see cref="HasSummary"/> can detect them without deleting original records.
+    /// </summary>
+    /// <param name="level">The time level this summary covers.</param>
+    /// <param name="content">The compressed summary text.</param>
+    /// <returns>The created summary entry.</returns>
+    public MemoryEntry AddSummary(IncompleteDate level, string content)
+    {
+        var entry = new MemoryEntry(content)
+        {
+            Timestamp = level,
+            IsSummary = true
+        };
+
+        Save(entry);
+
+        _logger.Debug("Memory summary added: {0}..., level={1}", content.Length > 30 ? content[..30] : content, level);
+
+        return entry;
+    }
+
+    /// <summary>
     /// Gets the most recent memory entries by progressively widening the time range:
     /// today �?this month �?this year �?all entries.
     /// </summary>
     /// <param name="count">The maximum number of entries to return.</param>
     /// <returns>A list of recent memory entries ordered by timestamp descending.</returns>
-    public List<MemoryEntry> GetRecent(int count = 2)
+    public List<MemoryEntry> GetRecent(int count = 10)
     {
         var now = DateTime.Now;
 
@@ -337,29 +390,8 @@ public sealed class Memory
 
     private bool HasSummary(IncompleteDate level)
     {
-        if (level.Second.HasValue)
-            return _timeStorage.Exists(_storageKey, level);
-        if (level.Minute.HasValue)
-        {
-            var secondLevel = new IncompleteDate(level.Year, level.Month, level.Day, level.Hour, level.Minute);
-            return _timeStorage.Exists(_storageKey, secondLevel);
-        }
-        if (level.Hour.HasValue)
-        {
-            var minuteLevel = new IncompleteDate(level.Year, level.Month, level.Day, level.Hour);
-            return _timeStorage.Exists(_storageKey, minuteLevel);
-        }
-        if (level.Day.HasValue)
-        {
-            var hourLevel = new IncompleteDate(level.Year, level.Month, level.Day);
-            return _timeStorage.Exists(_storageKey, hourLevel);
-        }
-        if (level.Month.HasValue)
-        {
-            var dayLevel = new IncompleteDate(level.Year, level.Month);
-            return _timeStorage.Exists(_storageKey, dayLevel);
-        }
-        return _timeStorage.Exists(_storageKey, level);
+        return _timeStorage.Query<MemoryEntry>(_storageKey, level)
+            .Any(e => e.Data.IsSummary);
     }
 
     /// <summary>
@@ -377,26 +409,45 @@ public sealed class Memory
     }
 
     /// <summary>
-    /// Removes memory entries by their IDs.
+    /// Searches memory entries by keyword in content and keywords list.
     /// </summary>
-    /// <param name="entryIds">The list of entry IDs to remove.</param>
-    public void RemoveEntries(List<Guid> entryIds)
+    /// <param name="keyword">The keyword to search for.</param>
+    /// <param name="count">Maximum number of entries to return. 0 means no limit.</param>
+    /// <returns>A list of matching memory entries ordered by timestamp descending.</returns>
+    public List<MemoryEntry> Search(string keyword, int count = 0)
     {
-        foreach (Guid id in entryIds)
-        {
-            var entry = _timeStorage.Query<MemoryEntry>(_storageKey, null)
-                .FirstOrDefault(e => e.Data.Id == id);
-            if (entry != null)
-                _timeStorage.Delete(_storageKey, entry.Timestamp);
-        }
+        if (string.IsNullOrWhiteSpace(keyword))
+            return new List<MemoryEntry>();
+
+        var allEntries = _timeStorage.Query<MemoryEntry>(_storageKey, null);
+        var keywordLower = keyword.ToLowerInvariant();
+
+        var results = allEntries
+            .Where(e => e.Data.Content.ToLowerInvariant().Contains(keywordLower) ||
+                        e.Data.Keywords.Any(k => k.ToLowerInvariant().Contains(keywordLower)))
+            .OrderByDescending(e => e.Timestamp)
+            .Select(e => e.Data);
+
+        return (count > 0 ? results.Take(count) : results).ToList();
     }
 
     /// <summary>
-    /// Removes memory entries within the specified timestamp range.
+    /// Queries memory entries by type/category.
     /// </summary>
-    /// <param name="range">The timestamp range to delete entries from.</param>
-    public void RemoveEntriesByTimestamp(IncompleteDate range)
+    /// <param name="type">The memory type to filter by.</param>
+    /// <param name="count">Maximum number of entries to return. 0 means no limit.</param>
+    /// <returns>A list of matching memory entries ordered by timestamp descending.</returns>
+    public List<MemoryEntry> GetByType(string type, int count = 0)
     {
-        _timeStorage.DeleteRange(_storageKey, range);
+        if (string.IsNullOrWhiteSpace(type))
+            return QueryAll(count);
+
+        var allEntries = _timeStorage.Query<MemoryEntry>(_storageKey, null);
+        var results = allEntries
+            .Where(e => e.Data.Type == type)
+            .OrderByDescending(e => e.Timestamp)
+            .Select(e => e.Data);
+
+        return (count > 0 ? results.Take(count) : results).ToList();
     }
 }

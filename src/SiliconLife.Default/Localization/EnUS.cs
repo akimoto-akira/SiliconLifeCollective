@@ -109,6 +109,14 @@ public class EnUS : DefaultLocalizationBase
     /// Gets the header displayed for permission requests
     /// </summary>
     public override string PermissionRequestHeader => "[PERMISSION]";
+    public override string PermissionRequestDescription => "A silicon being is requesting your authorization:";
+    public override string PermissionRequestTypeLabel => "Permission Type:";
+    public override string PermissionRequestResourceLabel => "Requested Resource:";
+    public override string PermissionRequestAllowButton => "Allow";
+    public override string PermissionRequestDenyButton => "Deny";
+    public override string PermissionRequestCacheLabel => "Remember this decision";
+    public override string PermissionRequestDurationLabel => "Cache Duration";
+    public override string PermissionRequestWaitingMessage => "Waiting for response...";
 
     /// <summary>
     /// Gets the label for the allow code in permission prompts
@@ -288,6 +296,50 @@ public class EnUS : DefaultLocalizationBase
     public override string PageTitlePermission => "Permission - Silicon Life Collective";
     public override string PageTitleAbout => "About - Silicon Life Collective";
 
+    // ===== Memory Page Localization =====
+
+    public override string MemoryPageHeader => "Memory Browser";
+    public override string MemoryEmptyState => "No memory records";
+    public override string MemorySearchPlaceholder => "Search memories...";
+    public override string MemorySearchButton => "Search";
+    public override string MemoryFilterAll => "All";
+    public override string MemoryFilterSummaryOnly => "Summaries Only";
+    public override string MemoryFilterOriginalOnly => "Original Only";
+    public override string MemoryStatTotal => "Total Memories";
+    public override string MemoryStatOldest => "Oldest Memory";
+    public override string MemoryStatNewest => "Newest Memory";
+    public override string MemoryIsSummaryBadge => "Summary";
+    public override string MemoryPaginationPrev => "Previous";
+    public override string MemoryPaginationNext => "Next";
+
+    // ===== Projects Page Localization =====
+
+    public override string ProjectsPageHeader => "Project Space";
+    public override string ProjectsEmptyState => "No projects";
+
+    // ===== Tasks Page Localization =====
+
+    public override string TasksPageHeader => "Task Management";
+    public override string TasksEmptyState => "No tasks";
+
+    // ===== Code Browser Page Localization =====
+
+    public override string CodeBrowserPageHeader => "Code Browser";
+
+    // ===== Executor Page Localization =====
+
+    public override string ExecutorPageHeader => "Executor Monitor";
+
+    // ===== Permission Page Localization =====
+
+    public override string PermissionPageHeader => "Permission Management";
+    public override string PermissionEmptyState => "No permission rules";
+
+    // ===== Knowledge Page Localization =====
+
+    public override string KnowledgePageHeader => "Knowledge Graph";
+    public override string KnowledgeLoadingState => "Loading knowledge graph...";
+
     // ===== Chat Localization =====
 
     public override string SingleChatNameFormat => "Chat with {0}";
@@ -296,6 +348,7 @@ public class EnUS : DefaultLocalizationBase
     public override string ChatMessageInputPlaceholder => "Type a message...";
     public override string ChatSendButton => "Send";
     public override string ChatUserDisplayName => "Me";
+    public override string ChatUserAvatarName => "Me";
     public override string ChatDefaultBeingName => "AI";
     public override string ChatThinkingSummary => "💭 Think";
     public override string GetChatToolCallsSummary(int count) => $"🔧 Tool Calls ({count})";
@@ -343,6 +396,7 @@ public class EnUS : DefaultLocalizationBase
     public override string TimersTypeRecurring => "Recurring";
     public override string TimersTriggerTimeLabel => "Trigger Time: ";
     public override string TimersIntervalLabel => "Interval: ";
+    public override string TimersCalendarLabel => "Calendar: ";
     public override string TimersTriggeredCountLabel => "Triggered: ";
 
     // ===== Chat Page Localization =====
@@ -408,6 +462,7 @@ public class EnUS : DefaultLocalizationBase
     public override string ConfigErrorConvertEnum => "Cannot convert '{0}' to {1}";
     public override string ConfigErrorUnsupportedType => "Unsupported property type: {0}";
     public override string ConfigErrorSaveFailed => "Save failed: {0}";
+    public override string ConfigSaveFailed => "Save failed: ";
 
     public override string LogsPageHeader => "Log Query";
     public override string LogsTotalCount => "{0} logs total";
@@ -448,6 +503,10 @@ public class EnUS : DefaultLocalizationBase
     public override string AuditTrendPrompt => "Prompt Tokens";
     public override string AuditTrendCompletion => "Completion Tokens";
     public override string AuditTrendTotal => "Total Tokens";
+    public override string AuditTooltipDate => "Date";
+    public override string AuditTooltipPrompt => "Prompt Tokens";
+    public override string AuditTooltipCompletion => "Completion Tokens";
+    public override string AuditTooltipTotal => "Total Tokens";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {

@@ -18,12 +18,13 @@ A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Bei
   - 5-level permission chain: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
   - Audit logging for all permission decisions
 - **Token Usage Audit** — Built-in token usage tracking and reporting via `ITokenUsageAudit` / `TokenUsageAuditManager`
+- **32 Calendar Systems** — Multi-calendar support including Gregorian, Chinese Lunar, Islamic, Hebrew, Japanese, Persian, Mayan, and more
 - **Minimal Dependencies** — Core library only depends on Microsoft.CodeAnalysis.CSharp for Roslyn dynamic compilation
 - **Zero Database Dependency** — File-based storage (JSON) with time-indexed queries via `ITimeStorage`
 - **Localization** — Built-in Chinese (Simplified & Traditional) and English support
 - **Web UI** — Built-in HTTP server with SSE support, multiple skins, and comprehensive dashboard
   - **Skin System** — 4 built-in skins (Admin, Chat, Creative, Dev) with complete UI component library
-  - **16 Controllers** — About, Being, Chat, CodeBrowser, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer
+  - **17 Controllers** — About, Audit, Being, Chat, CodeBrowser, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer
   - **Real-time Updates** — SSE (Server-Sent Events) for live data streaming
 
 ## Tech Stack
@@ -49,7 +50,7 @@ SiliconLifeCollective.sln
 │   │   ├── SiliconBeing/                  # SiliconBeingBase, SiliconBeingManager, SiliconCurator, ISiliconBeingFactory, SoulFileManager, Memory, TaskSystem, TimerSystem
 │   │   ├── AI/                            # IAIClient, IAIClientFactory, ContextManager ("brain"), Message, AIRequest/AIResponse
 │   │   ├── Audit/                         # ITokenUsageAudit, TokenUsageAuditManager, TokenUsageRecord, TokenUsageSummary, TokenUsageQuery
-│   │   ├── Chat/                          # ChatSystem, IChatService, SimpleChatService, SessionBase, SingleChatSession, GroupChatSession, ChatMessage
+│   │   ├── Chat/                          # ChatSystem, IChatService, SimpleChatService, SessionBase, SingleChatSession, GroupChatSession, BroadcastChannel, ChatMessage
 │   │   ├── Executors/                     # ExecutorBase, DiskExecutor, NetworkExecutor, CommandLineExecutor, ExecutorRequest, ExecutorResult
 │   │   ├── Tools/                         # ITool, ToolManager (reflection scanning), ToolCall/ToolResult, ToolDefinition, SiliconManagerOnlyAttribute
 │   │   ├── Security/                      # PermissionManager, GlobalACL, AuditLogger, UserFrequencyCache, PermissionResult, PermissionType, IPermissionCallback, IPermissionAskHandler
@@ -65,10 +66,10 @@ SiliconLifeCollective.sln
 │       ├── Program.cs                     # Application entry (wiring all components)
 │       ├── AI/                            # OllamaClient, OllamaClientFactory (native Ollama HTTP API)
 │       ├── SiliconBeing/                  # DefaultSiliconBeing, DefaultSiliconBeingFactory
-│       ├── Calendar/                      # Calendar utilities
+│       ├── Calendar/                      # 32 calendar implementations: Buddhist, Cherokee, ChineseLunar, ChulaSakarat, Coptic, Dai, DehongDai, Ethiopian, FrenchRepublican, Gregorian, Hebrew, Indian, Inuit, Islamic, Japanese, Javanese, Juche, Julian, Khmer, Mayan, Mongolian, Persian, RepublicOfChina, Roman, Saka, Sexagenary, Tibetan, Vietnamese, VikramSamvat, Yi, Zoroastrian
 │       ├── Executors/                     # Default executor implementations
 │       ├── IM/                            # WebUIProvider (Web UI as IM channel), IMPermissionAskHandler
-│       ├── Tools/                         # Built-in tools: Calendar, Chat, Curator, Disk, DynamicCompile, Memory, Network, System, Task, Timer
+│       ├── Tools/                         # Built-in tools: Calendar, Chat, Config, Curator, Disk, DynamicCompile, Memory, Network, System, Task, Timer, TokenAudit
 │       ├── Config/                        # DefaultConfigData
 │       ├── Localization/                  # ZhCN, ZhHK, EnUS, DefaultLocalizationBase
 │       ├── Logging/                       # ConsoleLoggerProvider, FileSystemLoggerProvider
@@ -76,9 +77,9 @@ SiliconLifeCollective.sln
 │       ├── Security/                      # DefaultPermissionCallback
 │       ├── Runtime/                       # TestTickObject
 │       └── Web/                           # Web UI implementation
-│           ├── Controllers/               # 16 controllers: About, Being, Chat, CodeBrowser, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer
-│           ├── Models/                    # ViewModels: AboutViewModel, BeingViewModel, ChatViewModel, CodeBrowserViewModel, ConfigViewModel, DashboardViewModel, ExecutorViewModel, KnowledgeViewModel, LogViewModel, MemoryViewModel, PermissionViewModel, PermissionRequestViewModel, ProjectViewModel, TaskViewModel, TimerViewModel, ViewModelBase
-│           ├── Views/                     # HTML views: ViewBase, AboutView, BeingView, ChatView, CodeBrowserView, CodeEditorView, ConfigView, DashboardView, ExecutorView, KnowledgeView, LogView, MarkdownEditorView, MemoryView, PermissionView, ProjectView, TaskView, TimerView
+│           ├── Controllers/               # 17 controllers: About, Audit, Being, Chat, CodeBrowser, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer
+│           ├── Models/                    # ViewModels: AboutViewModel, AuditViewModel, BeingViewModel, ChatMessage, ChatViewModel, CodeBrowserViewModel, ConfigViewModel, DashboardViewModel, ExecutorViewModel, KnowledgeViewModel, LogViewModel, MemoryViewModel, PermissionViewModel, PermissionRequestViewModel, ProjectViewModel, TaskViewModel, TimerViewModel, ViewModelBase
+│           ├── Views/                     # HTML views: ViewBase, AboutView, AuditView, BeingView, ChatView, CodeBrowserView, CodeEditorView, ConfigView, DashboardView, ExecutorView, KnowledgeView, LogView, MarkdownEditorView, MemoryView, PermissionView, ProjectView, TaskView, TimerView
 │           ├── Skins/                     # 4 skins: Admin (professional), Chat (conversational), Creative (artistic), Dev (developer-focused)
 │           ├── ISkin.cs                   # Skin interface + SkinPreviewInfo + SkinManager (auto-discovery)
 │           ├── Controller.cs              # Base controller class
@@ -151,7 +152,8 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] Phase 7: Dynamic compilation + self-evolution (Roslyn)
 - [x] Phase 8: Long-term memory + Task + Timer
 - [x] Phase 9: CoreHost + multi-agent collaboration
-- [x] Phase 10: Web UI (HTTP + SSE, 16 controllers, 4 skins)
+- [x] Phase 10: Web UI (HTTP + SSE, 17 controllers, 4 skins)
+- [x] Phase 10.5: Incremental enhancements (BroadcastChannel, TokenAudit, 32 calendars, tool enhancements)
 - [ ] Phase 11: External IM (Feishu / WhatsApp / Telegram)
 - [ ] Phase 12: Knowledge graph, plugins, and extras
 

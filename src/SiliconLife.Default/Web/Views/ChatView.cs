@@ -1340,7 +1340,7 @@ public class ChatView : ViewBase
         var userMsgBody = new List<JsSyntax>
         {
             Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "msg-user")),
-            Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-user-content\"><div class=\"msg-user-bubble\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div><div class=\"msg-user-avatar\"><div class=\"msg-avatar-icon\">U</div><div class=\"msg-avatar-name\">我</div></div>")))
+            Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-user-content\"><div class=\"msg-user-bubble\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "text")).Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div></div><div class=\"msg-user-avatar\"><div class=\"msg-avatar-icon\">U</div><div class=\"msg-avatar-name\">{vm.Localization.ChatUserAvatarName}</div></div>")))
         };
         var toolCallRequestDecoded = Js.Id(() => "decodeUnicode").Invoke(() => toolCallRequestExpr);
         var toolMsgBody = new List<JsSyntax>

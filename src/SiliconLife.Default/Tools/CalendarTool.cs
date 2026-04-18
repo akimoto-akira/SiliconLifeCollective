@@ -135,7 +135,7 @@ public class CalendarTool : ITool
     /// Builds the calendar registry for the current application language.
     /// Register additional <see cref="CalendarBase"/> subclasses here as they are implemented.
     /// </summary>
-    private static Dictionary<string, CalendarBase> BuildCalendarRegistry()
+    public static Dictionary<string, CalendarBase> BuildCalendarRegistry()
     {
         DefaultLocalizationBase loc = GetLocalization();
         var registry = new Dictionary<string, CalendarBase>(StringComparer.OrdinalIgnoreCase);

@@ -52,17 +52,17 @@ public readonly struct IncompleteDate : IEquatable<IncompleteDate>, IComparable<
     public IncompleteDate(int year, int? month = null, int? day = null,
                           int? hour = null, int? minute = null, int? second = null)
     {
-        if (year is < 1 or > 9999)
+        if (year < 1 || year > 9999)
             throw new ArgumentOutOfRangeException(nameof(year));
-        if (month is < 1 or > 12)
+        if (month.HasValue && (month.Value < 1 || month.Value > 12))
             throw new ArgumentOutOfRangeException(nameof(month));
-        if (day is < 1 or > 31)
+        if (day.HasValue && (day.Value < 1 || day.Value > 31))
             throw new ArgumentOutOfRangeException(nameof(day));
-        if (hour is < 0 or > 23)
+        if (hour.HasValue && (hour.Value < 0 || hour.Value > 23))
             throw new ArgumentOutOfRangeException(nameof(hour));
-        if (minute is < 0 or > 59)
+        if (minute.HasValue && (minute.Value < 0 || minute.Value > 59))
             throw new ArgumentOutOfRangeException(nameof(minute));
-        if (second is < 0 or > 59)
+        if (second.HasValue && (second.Value < 0 || second.Value > 59))
             throw new ArgumentOutOfRangeException(nameof(second));
 
         Year = year;

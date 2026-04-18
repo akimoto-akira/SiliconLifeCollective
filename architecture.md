@@ -131,6 +131,50 @@ It also maintains a per-being `PermissionManager` registry, keyed by being GUID.
 
 ---
 
+## Chat System
+
+### Session Types
+
+The chat system supports three session types via `SessionBase`:
+
+| Type | Class | Description |
+|------|-------|-------------|
+| `SingleChat` | `SingleChatSession` | 1-on-1 conversation between two participants |
+| `GroupChat` | `GroupChatSession` | Multi-participant group conversation |
+| `Broadcast` | `BroadcastChannel` | Open channel with fixed ID; beings subscribe dynamically and only receive messages after subscription time |
+
+### BroadcastChannel
+
+`BroadcastChannel` is a special session type for system-wide announcements:
+
+- **Fixed channel ID** — Unlike `SingleChatSession` and `GroupChatSession`, the channel ID is a well-known constant, not derived from member GUIDs.
+- **Dynamic subscription** — Beings subscribe/unsubscribe at runtime; they only receive messages posted after their subscription time.
+- **Pending message filtering** — `GetPendingMessages()` returns only messages posted after the being's subscription time that they haven't read yet.
+- **Managed by ChatSystem** — `GetOrCreateBroadcastChannel()`, `Broadcast()`, `GetPendingBroadcasts()`.
+
+### ChatMessage
+
+The `ChatMessage` model includes fields for AI conversation context and token tracking:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `Id` | `Guid` | Unique message identifier |
+| `SenderId` | `Guid` | Sender's unique identifier |
+| `ChannelId` | `Guid` | Channel/conversation identifier |
+| `Content` | `string` | Message content |
+| `Timestamp` | `DateTime` | When the message was sent |
+| `Type` | `MessageType` | Text, Image, File, or SystemNotification |
+| `ReadBy` | `List<Guid>` | IDs of participants who have read this message |
+| `Role` | `MessageRole` | AI conversation role (User, Assistant, Tool) |
+| `ToolCallId` | `string?` | Tool call ID for tool result messages |
+| `ToolCallsJson` | `string?` | Serialized tool calls JSON for assistant messages |
+| `Thinking` | `string?` | Chain-of-thought reasoning from the AI |
+| `PromptTokens` | `int?` | Number of tokens in the prompt (input) |
+| `CompletionTokens` | `int?` | Number of tokens in the completion (output) |
+| `TotalTokens` | `int?` | Total tokens used (input + output) |
+
+---
+
 ## Key Design Decisions
 
 ### Storage as Instance Class (not static)
@@ -190,10 +234,53 @@ The `TokenUsageAuditManager` tracks AI token consumption across all beings:
 - `TokenUsageSummary` — aggregated statistics
 - `TokenUsageQuery` — query parameters for filtering records
 - Persisted via `ITimeStorage` for time-series queries
+- Accessible via Web UI (AuditController) and `TokenAuditTool` (curator-only)
 
 ---
 
-### Web UI Architecture
+## Calendar System
+
+The system includes **32 calendar implementations** derived from the abstract `CalendarBase` class, covering major world calendar systems:
+
+| Calendar | ID | Description |
+|----------|-----|-------------|
+| BuddhistCalendar | `buddhist` | Buddhist Era (BE), year + 543 |
+| CherokeeCalendar | `cherokee` | Cherokee calendar system |
+| ChineseLunarCalendar | `lunar` | Chinese lunar calendar with leap months |
+| ChulaSakaratCalendar | `chula_sakarat` | Chula Sakarat (CS), year - 638 |
+| CopticCalendar | `coptic` | Coptic calendar |
+| DaiCalendar | `dai` | Dai calendar with full lunar computation |
+| DehongDaiCalendar | `dehong_dai` | Dehong Dai calendar variant |
+| EthiopianCalendar | `ethiopian` | Ethiopian calendar |
+| FrenchRepublicanCalendar | `french_republican` | French Republican calendar |
+| GregorianCalendar | `gregorian` | Standard Gregorian calendar |
+| HebrewCalendar | `hebrew` | Hebrew (Jewish) calendar |
+| IndianCalendar | `indian` | Indian national calendar |
+| InuitCalendar | `inuit` | Inuit calendar system |
+| IslamicCalendar | `islamic` | Islamic Hijri calendar |
+| JapaneseCalendar | `japanese` | Japanese era (Nengo) calendar |
+| JavaneseCalendar | `javanese` | Javanese Islamic calendar |
+| JucheCalendar | `juche` | Juche calendar (DPRK), year - 1911 |
+| JulianCalendar | `julian` | Julian calendar |
+| KhmerCalendar | `khmer` | Khmer calendar |
+| MayanCalendar | `mayan` | Mayan Long Count calendar |
+| MongolianCalendar | `mongolian` | Mongolian calendar |
+| PersianCalendar | `persian` | Persian (Solar Hijri) calendar |
+| RepublicOfChinaCalendar | `roc` | Republic of China (Minguo) calendar, year - 1911 |
+| RomanCalendar | `roman` | Roman calendar |
+| SakaCalendar | `saka` | Saka calendar (Indonesian) |
+| SexagenaryCalendar | `sexagenary` | Chinese Sexagenary Cycle (干支 Ganzhi) |
+| TibetanCalendar | `tibetan` | Tibetan calendar |
+| VietnameseCalendar | `vietnamese` | Vietnamese lunar calendar (Cat zodiac variant) |
+| VikramSamvatCalendar | `vikram_samvat` | Vikram Samvat calendar |
+| YiCalendar | `yi` | Yi calendar system |
+| ZoroastrianCalendar | `zoroastrian` | Zoroastrian calendar |
+
+The `CalendarTool` provides actions: `now`, `format`, `add_days`, `diff`, `list_calendars`, `get_components`, `get_now_components`, `convert` (cross-calendar date conversion).
+
+---
+
+## Web UI Architecture
 
 ### Skin System
 
@@ -223,11 +310,12 @@ The Web UI avoids template files entirely, generating all markup in C#:
 
 ### Controller System
 
-The Web UI follows a **MVC-like pattern** with 16 controllers handling different aspects:
+The Web UI follows a **MVC-like pattern** with 17 controllers handling different aspects:
 
 | Controller | Purpose |
 |------------|---------|
 | About | About page and project information |
+| Audit | Token usage audit dashboard with trend charts and export |
 | Being | Silicon Being management and status |
 | Chat | Real-time chat interface with SSE |
 | CodeBrowser | Code viewing and editing |

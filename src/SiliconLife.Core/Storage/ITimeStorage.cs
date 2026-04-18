@@ -92,6 +92,16 @@ public interface ITimeStorage : IStorage
     /// </summary>
     /// <returns>The number of entries deleted.</returns>
     int DeleteRange(string key, IncompleteDate range);
+
+    /// <summary>
+    /// Searches entries by keyword across all time levels for the given key.
+    /// Searches in both content and keywords fields of the stored data.
+    /// </summary>
+    /// <param name="key">The logical key prefix to match.</param>
+    /// <param name="keyword">The keyword to search for (case-insensitive).</param>
+    /// <param name="maxCount">Maximum number of entries to return. 0 means no limit.</param>
+    /// <returns>All matching entries ordered by timestamp descending.</returns>
+    List<TimeEntry<T>> Search<T>(string key, string keyword, int maxCount = 0);
 }
 
 /// <summary>

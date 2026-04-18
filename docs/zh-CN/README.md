@@ -18,12 +18,13 @@
   - 5 级权限查询链：IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
   - 所有权限决策均有审计日志
 - **Token 用量审计** — 内置 Token 用量追踪与报告（`ITokenUsageAudit` / `TokenUsageAuditManager`）
+- **32 种历法体系** — 多历法支持，包括公历、中国农历、伊斯兰历、希伯来历、日本年号历、波斯历、玛雅历等
 - **最小化依赖** — 核心库仅依赖 Microsoft.CodeAnalysis.CSharp 用于 Roslyn 动态编译
 - **零数据库依赖** — 基于文件系统存储（JSON），支持通过 `ITimeStorage` 进行时间索引查询
 - **国际化** — 内置简体中文、繁体中文和英文支持
 - **Web 界面** — 内置 HTTP 服务器，支持 SSE，多种皮肤，完整的仪表盘
   - **皮肤系统** — 4 种内置皮肤（Admin、Chat、Creative、Dev），提供完整的 UI 组件库
-  - **16 个控制器** — About、Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer
+  - **17 个控制器** — About、Audit、Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer
   - **实时更新** — 通过 SSE（Server-Sent Events）实现实时数据流
 
 ## 技术栈
@@ -49,7 +50,7 @@ SiliconLifeCollective.sln
 │   │   ├── SiliconBeing/                  # SiliconBeingBase、SiliconBeingManager、SiliconCurator、ISiliconBeingFactory、SoulFileManager、Memory、TaskSystem、TimerSystem
 │   │   ├── AI/                            # IAIClient、IAIClientFactory、ContextManager（"大脑"）、Message、AIRequest/AIResponse
 │   │   ├── Audit/                         # ITokenUsageAudit、TokenUsageAuditManager、TokenUsageRecord、TokenUsageSummary、TokenUsageQuery
-│   │   ├── Chat/                          # ChatSystem、IChatService、SimpleChatService、SessionBase、SingleChatSession、GroupChatSession、ChatMessage
+│   │   ├── Chat/                          # ChatSystem、IChatService、SimpleChatService、SessionBase、SingleChatSession、GroupChatSession、BroadcastChannel、ChatMessage
 │   │   ├── Executors/                     # ExecutorBase、DiskExecutor、NetworkExecutor、CommandLineExecutor、ExecutorRequest、ExecutorResult
 │   │   ├── Tools/                         # ITool、ToolManager（反射扫描）、ToolCall/ToolResult、ToolDefinition、SiliconManagerOnlyAttribute
 │   │   ├── Security/                      # PermissionManager、GlobalACL、AuditLogger、UserFrequencyCache、PermissionResult、PermissionType、IPermissionCallback、IPermissionAskHandler
@@ -65,10 +66,10 @@ SiliconLifeCollective.sln
 │       ├── Program.cs                     # 应用程序入口（组装所有组件）
 │       ├── AI/                            # OllamaClient、OllamaClientFactory（原生 Ollama HTTP API）
 │       ├── SiliconBeing/                  # DefaultSiliconBeing、DefaultSiliconBeingFactory
-│       ├── Calendar/                      # 日历工具
+│       ├── Calendar/                      # 32 种历法实现：Buddhist、Cherokee、ChineseLunar、ChulaSakarat、Coptic、Dai、DehongDai、Ethiopian、FrenchRepublican、Gregorian、Hebrew、Indian、Inuit、Islamic、Japanese、Javanese、Juche、Julian、Khmer、Mayan、Mongolian、Persian、RepublicOfChina、Roman、Saka、Sexagenary、Tibetan、Vietnamese、VikramSamvat、Yi、Zoroastrian
 │       ├── Executors/                     # 默认执行器实现
 │       ├── IM/                            # WebUIProvider（Web UI 作为 IM 通道）、IMPermissionAskHandler
-│       ├── Tools/                         # 内置工具：日历、聊天、主理人、磁盘、动态编译、记忆、网络、系统、任务、定时器
+│       ├── Tools/                         # 内置工具：日历、聊天、配置、主理人、磁盘、动态编译、记忆、网络、系统、任务、定时器、Token审计
 │       ├── Config/                        # DefaultConfigData
 │       ├── Localization/                  # ZhCN、ZhHK、EnUS、DefaultLocalizationBase
 │       ├── Logging/                       # ConsoleLoggerProvider、FileSystemLoggerProvider
@@ -76,9 +77,9 @@ SiliconLifeCollective.sln
 │       ├── Security/                      # DefaultPermissionCallback
 │       ├── Runtime/                       # TestTickObject
 │       └── Web/                           # Web UI 实现
-│           ├── Controllers/               # 16 个控制器：About、Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer
-│           ├── Models/                    # ViewModel：AboutViewModel、BeingViewModel、ChatViewModel、CodeBrowserViewModel、ConfigViewModel、DashboardViewModel、ExecutorViewModel、KnowledgeViewModel、LogViewModel、MemoryViewModel、PermissionViewModel、PermissionRequestViewModel、ProjectViewModel、TaskViewModel、TimerViewModel、ViewModelBase
-│           ├── Views/                     # HTML 视图：ViewBase、AboutView、BeingView、ChatView、CodeBrowserView、CodeEditorView、ConfigView、DashboardView、ExecutorView、KnowledgeView、LogView、MarkdownEditorView、MemoryView、PermissionView、ProjectView、TaskView、TimerView
+│           ├── Controllers/               # 17 个控制器：About、Audit、Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer
+│           ├── Models/                    # ViewModel：AboutViewModel、AuditViewModel、BeingViewModel、ChatMessage、ChatViewModel、CodeBrowserViewModel、ConfigViewModel、DashboardViewModel、ExecutorViewModel、KnowledgeViewModel、LogViewModel、MemoryViewModel、PermissionViewModel、PermissionRequestViewModel、ProjectViewModel、TaskViewModel、TimerViewModel、ViewModelBase
+│           ├── Views/                     # HTML 视图：ViewBase、AboutView、AuditView、BeingView、ChatView、CodeBrowserView、CodeEditorView、ConfigView、DashboardView、ExecutorView、KnowledgeView、LogView、MarkdownEditorView、MemoryView、PermissionView、ProjectView、TaskView、TimerView
 │           ├── Skins/                     # 4 种皮肤：Admin（专业）、Chat（对话）、Creative（创意）、Dev（开发者）
 │           ├── ISkin.cs                   # 皮肤接口 + SkinPreviewInfo + SkinManager（自动发现）
 │           ├── Controller.cs              # 控制器基类
@@ -151,7 +152,8 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] 第七阶段：动态编译 + 自我进化（Roslyn）
 - [x] 第八阶段：长期记忆 + 任务 + 定时器
 - [x] 第九阶段：CoreHost + 多硅基人协作
-- [x] 第十阶段：Web 界面（HTTP + SSE，16 个控制器，4 种皮肤）
+- [x] 第十阶段：Web 界面（HTTP + SSE，17 个控制器，4 种皮肤）
+- [x] 第十点五阶段：增量增强（BroadcastChannel、Token审计、32 种历法、工具增强）
 - [ ] 第十一阶段：外接 IM（飞书 / WhatsApp / Telegram）
 - [ ] 第十二阶段：知识图谱、插件及其他
 

@@ -31,5 +31,25 @@ public enum Language
     /// <summary>
     /// Chinese (Traditional, Hong Kong)
     /// </summary>
-    ZhHK
+    ZhHK,
+
+    /// <summary>
+    /// Chinese (Simplified, Singapore)
+    /// </summary>
+    ZhSG,
+
+    /// <summary>
+    /// Chinese (Traditional, Macau)
+    /// </summary>
+    ZhMO,
+
+    /// <summary>
+    /// Chinese (Traditional, Taiwan)
+    /// </summary>
+    ZhTW,
+
+    /// <summary>
+    /// Chinese (Simplified, Malaysia)
+    /// </summary>
+    ZhMY
 }

@@ -20,14 +20,14 @@ public class ProjectView : ViewBase
         var vm = model as ProjectViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.PageTitleProjects, "projects", vm.Localization, body, GetScripts());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleProjects, "projects", vm.Localization, body, GetScripts(vm.Localization));
     }
 
     private static H RenderBody(ProjectViewModel vm)
     {
         return H.Div(
             H.Div(
-                H.H1("项目空间管理")
+                H.H1(vm.Localization.ProjectsPageHeader)
             ).Class("page-header"),
             H.Div(
                 H.Div().Id("projects-list").Class("projects-list")
@@ -35,11 +35,11 @@ public class ProjectView : ViewBase
         ).Class("page-content");
     }
 
-    private static JsSyntax GetScripts()
+    private static JsSyntax GetScripts(DefaultLocalizationBase loc)
     {
         var thenBody = Js.Block()
             .Add(() => Js.Const(() => "list", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "projects-list"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => "<p>暂无项目</p>")));
+            .Add(() => Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => $"<p>{loc.ProjectsEmptyState}</p>")));
 
         var loadProjectsBody = Js.Block()
             .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/projects/list")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());

@@ -19,12 +19,14 @@ public class AuditController : Controller
 {
     private readonly SkinManager _skinManager;
     private readonly ITokenUsageAudit? _audit;
+    private readonly SiliconBeingManager? _beingManager;
 
     public AuditController()
     {
         var locator = ServiceLocator.Instance;
         _skinManager = locator.GetService<SkinManager>()!;
         _audit = locator.TokenUsageAudit;
+        _beingManager = locator.BeingManager;
     }
 
     public override void Handle()
@@ -73,7 +75,20 @@ public class AuditController : Controller
 
         var clientTypeFilter = GetQueryValue("clientType", "");
         var beingIdFilter = GetQueryValue("beingId", "");
-        var range = BuildRangeFromParams();
+        var timeRange = GetQueryValue("timeRange", "month");
+        var now = DateTime.UtcNow;
+
+        // 对于week，需要特殊处理范围
+        IncompleteDate range;
+        if (timeRange == "week")
+        {
+            // 查询整个月的数据，然后由前端过滤
+            range = new IncompleteDate(now.Year, now.Month);
+        }
+        else
+        {
+            range = BuildRangeFromParams();
+        }
 
         var query = new TokenUsageQuery
         {
@@ -86,18 +101,72 @@ public class AuditController : Controller
 
         TokenUsageSummary summary = _audit.QuerySummary(query);
 
+        // 对于week，需要过滤只统计本周的数据
+        if (timeRange == "week")
+        {
+            var weekStart = now.Date.AddDays(-(int)now.DayOfWeek);
+            var weekEnd = weekStart.AddDays(7);
+            
+            // 重新查询记录并过滤
+            var recordsQuery = new TokenUsageQuery
+            {
+                Range = range,
+                AIClientType = string.IsNullOrEmpty(clientTypeFilter) ? null : clientTypeFilter,
+                BeingId = string.IsNullOrEmpty(beingIdFilter) ? null : Guid.TryParse(beingIdFilter, out var beingId) ? beingId : (Guid?)null,
+                GroupByAIClientType = false,
+                GroupByBeingId = false
+            };
+            
+            var records = _audit.QueryRecords(recordsQuery);
+            var filteredRecords = records.Where(r => r.Timestamp >= weekStart && r.Timestamp < weekEnd).ToList();
+            
+            summary = new TokenUsageSummary
+            {
+                RequestCount = filteredRecords.Count,
+                SuccessCount = filteredRecords.Count(r => r.Success),
+                FailureCount = filteredRecords.Count(r => !r.Success),
+                TotalPromptTokens = filteredRecords.Sum(r => r.PromptTokens),
+                TotalCompletionTokens = filteredRecords.Sum(r => r.CompletionTokens),
+                TotalTokens = filteredRecords.Sum(r => r.TotalTokens),
+                ByAIClientType = filteredRecords.GroupBy(r => r.AIClientType ?? "Unknown")
+                    .ToDictionary(g => g.Key, g => new TokenUsageSummary
+                    {
+                        RequestCount = g.Count(),
+                        TotalPromptTokens = g.Sum(r => r.PromptTokens),
+                        TotalCompletionTokens = g.Sum(r => r.CompletionTokens),
+                        TotalTokens = g.Sum(r => r.TotalTokens)
+                    }),
+                ByBeingId = filteredRecords.GroupBy(r => r.BeingId)
+                    .ToDictionary(g => g.Key, g => new TokenUsageSummary
+                    {
+                        RequestCount = g.Count(),
+                        TotalPromptTokens = g.Sum(r => r.PromptTokens),
+                        TotalCompletionTokens = g.Sum(r => r.CompletionTokens),
+                        TotalTokens = g.Sum(r => r.TotalTokens)
+                    })
+            };
+        }
+
         var byClient = summary.ByAIClientType.Select(kvp => new AuditSummaryItem
         {
             Key = kvp.Key,
+            Name = kvp.Key,
             RequestCount = kvp.Value.RequestCount,
             TotalPromptTokens = kvp.Value.TotalPromptTokens,
             TotalCompletionTokens = kvp.Value.TotalCompletionTokens,
             TotalTokens = kvp.Value.TotalTokens
         }).ToList();
 
+        Dictionary<string, string> beingNameMap = _beingManager != null
+            ? summary.ByBeingId.Keys
+                .Select(id => new { Guid = id, Being = _beingManager.GetBeing(id) })
+                .ToDictionary(x => x.Guid.ToString(), x => x.Being?.Name ?? x.Guid.ToString())
+            : summary.ByBeingId.Keys.ToDictionary(id => id.ToString(), id => id.ToString());
+
         var byBeing = summary.ByBeingId.Select(kvp => new AuditSummaryItem
         {
             Key = kvp.Key.ToString(),
+            Name = beingNameMap.TryGetValue(kvp.Key.ToString(), out string? name) ? name : kvp.Key.ToString(),
             RequestCount = kvp.Value.RequestCount,
             TotalPromptTokens = kvp.Value.TotalPromptTokens,
             TotalCompletionTokens = kvp.Value.TotalCompletionTokens,
@@ -111,7 +180,8 @@ public class AuditController : Controller
             totalCompletionTokens = summary.TotalCompletionTokens,
             totalTokens = summary.TotalTokens,
             byClient,
-            byBeing
+            byBeing,
+            beings = beingNameMap
         });
     }
 
@@ -119,13 +189,25 @@ public class AuditController : Controller
     {
         if (_audit == null)
         {
-            RenderJson(new { points = new List<object>() });
+            RenderJson(new { points = new List<object>(), beings = new Dictionary<string, string>() });
             return;
         }
 
         var clientTypeFilter = GetQueryValue("clientType", "");
         var beingIdFilter = GetQueryValue("beingId", "");
-        var range = BuildRangeFromParams();
+        var timeRange = GetQueryValue("timeRange", "month");
+        var now = DateTime.UtcNow;
+
+        // For week, query the whole month and filter in GroupBy methods
+        IncompleteDate range;
+        if (timeRange == "week")
+        {
+            range = new IncompleteDate(now.Year, now.Month);
+        }
+        else
+        {
+            range = BuildRangeFromParams();
+        }
 
         var query = new TokenUsageQuery
         {
@@ -138,19 +220,171 @@ public class AuditController : Controller
 
         List<TokenUsageRecord> records = _audit.QueryRecords(query);
 
-        var grouped = records
-            .GroupBy(r => r.Timestamp.ToString("yyyy-MM-dd"))
-            .OrderBy(g => g.Key)
-            .Select(g => new
-            {
-                date = g.Key,
-                promptTokens = g.Sum(r => r.PromptTokens),
-                completionTokens = g.Sum(r => r.CompletionTokens),
-                totalTokens = g.Sum(r => r.TotalTokens)
-            })
-            .ToList();
+        var grouped = timeRange switch
+        {
+            "today" => GroupByHour(records, now),
+            "week" => GroupByHourForWeek(records, now),
+            "month" => GroupByDay(records, now),
+            "year" => GroupByMonth(records, now),
+            _ => GroupByDay(records, now)
+        };
 
-        RenderJson(new { points = grouped });
+        Dictionary<string, string> beings = BuildBeingNameMap(records);
+
+        RenderJson(new { points = grouped, beings });
+    }
+
+    private List<object> GroupByHourForWeek(List<TokenUsageRecord> records, DateTime now)
+    {
+        // 计算本周的起始日期（周日）
+        var weekStart = now.Date.AddDays(-(int)now.DayOfWeek);
+        var weekEnd = weekStart.AddDays(7); // 不包含第8天
+
+        // 创建7天×24小时的字典
+        var hourDict = new Dictionary<string, (long promptTokens, long completionTokens, long totalTokens)>();
+        for (var day = 0; day < 7; day++)
+        {
+            var currentDate = weekStart.AddDays(day);
+            for (int hour = 0; hour < 24; hour++)
+            {
+                var hourStart = currentDate.AddHours(hour);
+                var hourKey = hourStart.ToString("yyyy-MM-dd HH:00");
+                hourDict[hourKey] = (0L, 0L, 0L);
+            }
+        }
+
+        // 填充实际数据（只统计本周的数据）
+        foreach (var record in records)
+        {
+            var recordDate = record.Timestamp.Date;
+            if (recordDate >= weekStart && recordDate < weekEnd)
+            {
+                var hourKey = record.Timestamp.ToString("yyyy-MM-dd HH:00");
+                if (hourDict.ContainsKey(hourKey))
+                {
+                    var existing = hourDict[hourKey];
+                    hourDict[hourKey] = (
+                        existing.promptTokens + record.PromptTokens,
+                        existing.completionTokens + record.CompletionTokens,
+                        existing.totalTokens + record.TotalTokens
+                    );
+                }
+            }
+        }
+
+        // 转换为结果列表
+        var result = hourDict.Select(kv => new
+        {
+            date = kv.Key,
+            promptTokens = kv.Value.promptTokens,
+            completionTokens = kv.Value.completionTokens,
+            totalTokens = kv.Value.totalTokens
+        }).OrderBy(x => x.date).Cast<object>().ToList();
+
+        return result;
+    }
+
+    private List<object> GroupByHour(List<TokenUsageRecord> records, DateTime now)
+    {
+        var today = now.Date;
+        var hourlyData = new List<object>();
+
+        for (int hour = 0; hour < 24; hour++)
+        {
+            var hourStart = today.AddHours(hour);
+            var hourEnd = hourStart.AddHours(1);
+            
+            var hourRecords = records.Where(r => r.Timestamp >= hourStart && r.Timestamp < hourEnd).ToList();
+            
+            hourlyData.Add(new
+            {
+                date = hourStart.ToString("yyyy-MM-dd HH:00"),
+                promptTokens = hourRecords.Sum(r => r.PromptTokens),
+                completionTokens = hourRecords.Sum(r => r.CompletionTokens),
+                totalTokens = hourRecords.Sum(r => r.TotalTokens)
+            });
+        }
+
+        return hourlyData;
+    }
+
+    private List<object> GroupByDay(List<TokenUsageRecord> records, DateTime now)
+    {
+        // 获取时间范围的起始和结束日期
+        var range = BuildRangeFromParams();
+        var (startDate, endDate) = range.GetRange();
+        endDate = endDate.Date; // 只取日期部分
+
+        // 创建所有日期的字典
+        var dateDict = new Dictionary<string, (long promptTokens, long completionTokens, long totalTokens)>();
+        for (var date = startDate.Date; date <= endDate; date = date.AddDays(1))
+        {
+            var dateKey = date.ToString("yyyy-MM-dd");
+            dateDict[dateKey] = (0L, 0L, 0L);
+        }
+
+        // 填充实际数据
+        foreach (var record in records)
+        {
+            var dateKey = record.Timestamp.ToString("yyyy-MM-dd");
+            if (dateDict.ContainsKey(dateKey))
+            {
+                var existing = dateDict[dateKey];
+                dateDict[dateKey] = (
+                    existing.promptTokens + record.PromptTokens,
+                    existing.completionTokens + record.CompletionTokens,
+                    existing.totalTokens + record.TotalTokens
+                );
+            }
+        }
+
+        // 转换为结果列表
+        var result = dateDict.Select(kv => new
+        {
+            date = kv.Key,
+            promptTokens = kv.Value.promptTokens,
+            completionTokens = kv.Value.completionTokens,
+            totalTokens = kv.Value.totalTokens
+        }).OrderBy(x => x.date).Cast<object>().ToList();
+
+        return result;
+    }
+
+    private List<object> GroupByMonth(List<TokenUsageRecord> records, DateTime now)
+    {
+        // 创建当年12个月的字典
+        var monthDict = new Dictionary<string, (long promptTokens, long completionTokens, long totalTokens)>();
+        for (int month = 1; month <= 12; month++)
+        {
+            var monthKey = $"{now.Year}-{month:00}";
+            monthDict[monthKey] = (0L, 0L, 0L);
+        }
+
+        // 填充实际数据
+        foreach (var record in records)
+        {
+            var monthKey = record.Timestamp.ToString("yyyy-MM");
+            if (monthDict.ContainsKey(monthKey))
+            {
+                var existing = monthDict[monthKey];
+                monthDict[monthKey] = (
+                    existing.promptTokens + record.PromptTokens,
+                    existing.completionTokens + record.CompletionTokens,
+                    existing.totalTokens + record.TotalTokens
+                );
+            }
+        }
+
+        // 转换为结果列表
+        var result = monthDict.Select(kv => new
+        {
+            date = kv.Key,
+            promptTokens = kv.Value.promptTokens,
+            completionTokens = kv.Value.completionTokens,
+            totalTokens = kv.Value.totalTokens
+        }).OrderBy(x => x.date).Cast<object>().ToList();
+
+        return result;
     }
 
     private void Export()
@@ -200,16 +434,38 @@ public class AuditController : Controller
         return timeRange switch
         {
             "today" => new IncompleteDate(now.Year, now.Month, now.Day),
-            "week" => BuildWeekRange(now),
+            "week" => new IncompleteDate(now.Year, now.Month, now.AddDays(-(int)now.DayOfWeek).Day),
             "month" => new IncompleteDate(now.Year, now.Month),
             "year" => new IncompleteDate(now.Year),
             _ => new IncompleteDate(now.Year, now.Month)
         };
     }
 
-    private static IncompleteDate BuildWeekRange(DateTime now)
+    private Dictionary<string, string> BuildBeingNameMap(List<TokenUsageRecord> records)
     {
-        var weekStart = now.Date.AddDays(-(int)now.DayOfWeek);
-        return new IncompleteDate(weekStart.Year, weekStart.Month, weekStart.Day);
+        Dictionary<string, string> nameMap = new Dictionary<string, string>();
+
+        if (_beingManager == null)
+        {
+            foreach (TokenUsageRecord record in records)
+            {
+                string guidStr = record.BeingId.ToString();
+                if (!nameMap.ContainsKey(guidStr))
+                    nameMap[guidStr] = guidStr;
+            }
+            return nameMap;
+        }
+
+        foreach (TokenUsageRecord record in records)
+        {
+            string guidStr = record.BeingId.ToString();
+            if (nameMap.ContainsKey(guidStr))
+                continue;
+
+            SiliconBeingBase? being = _beingManager.GetBeing(record.BeingId);
+            nameMap[guidStr] = being?.Name ?? guidStr;
+        }
+
+        return nameMap;
     }
 }

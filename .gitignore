@@ -69,3 +69,5 @@ YLog/
 .lingma/
 .codebuddy/
 YDoc/
+.qoderignore
+.qoder/

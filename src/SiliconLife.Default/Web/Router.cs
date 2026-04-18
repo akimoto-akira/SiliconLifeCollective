@@ -51,9 +51,17 @@ public class Router
         RegisterController(() => new AuditController(), "/audit");
         RegisterController(() => new AuditController(), "/api/audit/list");
         RegisterController(() => new AuditController(), "/api/audit/summary");
+        RegisterController(() => new AuditController(), "/api/audit/trend");
+        RegisterController(() => new AuditController(), "/api/audit/export");
         RegisterController(() => new ConfigController(), "/config");
         RegisterController(() => new ConfigController(), "/config/save", "POST");
         RegisterController(() => new MemoryController(), "/memory");
+        RegisterController(() => new MemoryController(), "/api/memory/list");
+        RegisterController(() => new MemoryController(), "/api/memory/detail/{id}");
+        RegisterController(() => new MemoryController(), "/api/memory/stats");
+        RegisterController(() => new MemoryController(), "/api/memory/search");
+        RegisterController(() => new MemoryController(), "/api/memory/beings");
+        RegisterController(() => new MemoryController(), "/api/memory/trace/{id}");
         RegisterController(() => new KnowledgeController(), "/knowledge");
         RegisterController(() => new ProjectController(), "/project");
         RegisterController(() => new ExecutorController(), "/executor");

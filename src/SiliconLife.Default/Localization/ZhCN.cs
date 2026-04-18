@@ -109,6 +109,14 @@ public class ZhCN : DefaultLocalizationBase
     /// Gets the header displayed for permission requests
     /// </summary>
     public override string PermissionRequestHeader => "[权限请求]";
+    public override string PermissionRequestDescription => "一个硅基人请求您的授权：";
+    public override string PermissionRequestTypeLabel => "权限类型:";
+    public override string PermissionRequestResourceLabel => "请求资源:";
+    public override string PermissionRequestAllowButton => "允许";
+    public override string PermissionRequestDenyButton => "拒绝";
+    public override string PermissionRequestCacheLabel => "记住此决定";
+    public override string PermissionRequestDurationLabel => "缓存时长";
+    public override string PermissionRequestWaitingMessage => "等待响应...";
 
     /// <summary>
     /// Gets the label for the allow code in permission prompts
@@ -288,6 +296,50 @@ public class ZhCN : DefaultLocalizationBase
     public override string PageTitlePermission => "权限管理 - 硅基生命群";
     public override string PageTitleAbout => "关于 - 硅基生命群";
 
+    // ===== Memory Page Localization =====
+
+    public override string MemoryPageHeader => "记忆浏览";
+    public override string MemoryEmptyState => "暂无记忆数据";
+    public override string MemorySearchPlaceholder => "搜索记忆...";
+    public override string MemorySearchButton => "搜索";
+    public override string MemoryFilterAll => "全部";
+    public override string MemoryFilterSummaryOnly => "仅总结";
+    public override string MemoryFilterOriginalOnly => "仅原始";
+    public override string MemoryStatTotal => "记忆总数";
+    public override string MemoryStatOldest => "最早记忆";
+    public override string MemoryStatNewest => "最新记忆";
+    public override string MemoryIsSummaryBadge => "压缩总结";
+    public override string MemoryPaginationPrev => "上一页";
+    public override string MemoryPaginationNext => "下一页";
+
+    // ===== Projects Page Localization =====
+
+    public override string ProjectsPageHeader => "项目空间管理";
+    public override string ProjectsEmptyState => "暂无项目";
+
+    // ===== Tasks Page Localization =====
+
+    public override string TasksPageHeader => "任务管理";
+    public override string TasksEmptyState => "暂无任务";
+
+    // ===== Code Browser Page Localization =====
+
+    public override string CodeBrowserPageHeader => "代码浏览";
+
+    // ===== Executor Page Localization =====
+
+    public override string ExecutorPageHeader => "执行器监控";
+
+    // ===== Permission Page Localization =====
+
+    public override string PermissionPageHeader => "权限管理";
+    public override string PermissionEmptyState => "暂无权限规则";
+
+    // ===== Knowledge Page Localization =====
+
+    public override string KnowledgePageHeader => "知识图谱可视化";
+    public override string KnowledgeLoadingState => "知识图谱数据加载中...";
+
     // ===== Chat Localization =====
 
     public override string SingleChatNameFormat => "与{0}聊天";
@@ -296,6 +348,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string ChatMessageInputPlaceholder => "输入消息...";
     public override string ChatSendButton => "发送";
     public override string ChatUserDisplayName => "我";
+    public override string ChatUserAvatarName => "我";
     public override string ChatDefaultBeingName => "AI";
     public override string ChatThinkingSummary => "💭 思考过程（点击展开）";
     public override string GetChatToolCallsSummary(int count) => $"🔧 工具调用 ({count}项)";
@@ -343,6 +396,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string TimersTypeRecurring => "循环";
     public override string TimersTriggerTimeLabel => "触发时间：";
     public override string TimersIntervalLabel => "间隔：";
+    public override string TimersCalendarLabel => "历法条件：";
     public override string TimersTriggeredCountLabel => "已触发：";
 
     // ===== Chat Page Localization =====
@@ -408,6 +462,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string ConfigErrorConvertEnum => "无法将 '{0}' 转换为 {1}";
     public override string ConfigErrorUnsupportedType => "不支持的属性类型: {0}";
     public override string ConfigErrorSaveFailed => "保存失败: {0}";
+    public override string ConfigSaveFailed => "保存失败：";
 
     public override string LogsPageHeader => "日志查询";
     public override string LogsTotalCount => "共 {0} 条日志";
@@ -448,6 +503,10 @@ public class ZhCN : DefaultLocalizationBase
     public override string AuditTrendPrompt => "输入 Token";
     public override string AuditTrendCompletion => "输出 Token";
     public override string AuditTrendTotal => "总 Token";
+    public override string AuditTooltipDate => "日期";
+    public override string AuditTooltipPrompt => "输入 Token";
+    public override string AuditTooltipCompletion => "输出 Token";
+    public override string AuditTooltipTotal => "总 Token";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {

@@ -20,14 +20,14 @@ public class TaskView : ViewBase
         var vm = model as TaskViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.PageTitleTasks, "tasks", vm.Localization, body, GetScripts());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleTasks, "tasks", vm.Localization, body, GetScripts(vm.Localization));
     }
 
     private static H RenderBody(TaskViewModel vm)
     {
         return H.Div(
             H.Div(
-                H.H1("任务管理")
+                H.H1(vm.Localization.TasksPageHeader)
             ).Class("page-header"),
             H.Div(
                 H.Div().Id("tasks-list").Class("tasks-list")
@@ -35,11 +35,11 @@ public class TaskView : ViewBase
         ).Class("page-content");
     }
 
-    private static JsSyntax GetScripts()
+    private static JsSyntax GetScripts(DefaultLocalizationBase loc)
     {
         var thenBody = Js.Block()
             .Add(() => Js.Const(() => "list", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "tasks-list"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => "<p>暂无任务</p>")));
+            .Add(() => Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => $"<p>{loc.TasksEmptyState}</p>")));
 
         var loadTasksBody = Js.Block()
             .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/tasks/list")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());

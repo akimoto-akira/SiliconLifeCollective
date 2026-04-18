@@ -174,7 +174,12 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         // Create Memory, TaskSystem, TimerSystem for this being
         being.Memory = new Memory(beingTimeStorage);
         being.TaskSystem = new TaskSystem(being, beingStorage);
-        being.TimerSystem = new TimerSystem(being, beingStorage);
+
+        Func<Dictionary<string, CalendarBase>> registryFactory = CalendarTool.BuildCalendarRegistry;
+        CalendarNextOccurrenceResolver resolver = CalendarTimerResolvers.CreateResolver(registryFactory);
+        CalendarDateTimeConverter converter = CalendarTimerResolvers.CreateConverter(registryFactory);
+        TimerPendingChecker pendingChecker = CalendarTimerResolvers.CreatePendingChecker();
+        being.TimerSystem = new TimerSystem(being, beingStorage, resolver, converter, pendingChecker);
 
         return being;
     }

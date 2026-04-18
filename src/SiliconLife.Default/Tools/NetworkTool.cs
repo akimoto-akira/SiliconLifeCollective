@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json;
 using SiliconLife.Collective;
 
 namespace SiliconLife.Default;
@@ -96,9 +97,9 @@ public class NetworkTool : ITool
             requestParams["body"] = bodyObj.ToString()!;
         }
 
-        if (parameters.TryGetValue("headers", out object? headersObj) && headersObj is Dictionary<string, object> headers)
+        if (parameters.TryGetValue("headers", out object? headersObj) && headersObj != null)
         {
-            requestParams["headers"] = headers;
+            requestParams["headers"] = FlattenToStringDictionary(headersObj);
         }
 
         ExecutorRequest request = new(callerId, url, method, requestParams);
@@ -116,5 +117,23 @@ public class NetworkTool : ITool
         }
 
         return ToolResult.Failed(result.Error ?? "Network request failed");
+    }
+
+    private static Dictionary<string, object> FlattenToStringDictionary(object obj)
+    {
+        Dictionary<string, object> result = new Dictionary<string, object>();
+
+        if (obj is Dictionary<string, object> dict)
+        {
+            foreach (KeyValuePair<string, object> kv in dict)
+                result[kv.Key] = kv.Value?.ToString() ?? "";
+        }
+        else if (obj is JsonElement jsonElement && jsonElement.ValueKind == JsonValueKind.Object)
+        {
+            foreach (JsonProperty property in jsonElement.EnumerateObject())
+                result[property.Name] = property.Value.ToString();
+        }
+
+        return result;
     }
 }

@@ -20,14 +20,14 @@ public class KnowledgeView : ViewBase
         var vm = model as KnowledgeViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.PageTitleKnowledge, "knowledge", vm.Localization, body, GetScripts(), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleKnowledge, "knowledge", vm.Localization, body, GetScripts(vm.Localization), GetStyles());
     }
 
     private static H RenderBody(KnowledgeViewModel vm)
     {
         return H.Div(
             H.Div(
-                H.H1("知识图谱可视化")
+                H.H1(vm.Localization.KnowledgePageHeader)
             ).Class("page-header"),
             H.Div().Id("graph-container").Class("graph-container")
         ).Class("page-content");
@@ -45,11 +45,11 @@ public class KnowledgeView : ViewBase
             .EndSelector();
     }
 
-    private static JsSyntax GetScripts()
+    private static JsSyntax GetScripts(DefaultLocalizationBase loc)
     {
         var thenBody = Js.Block()
             .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "graph-container"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Str(() => "<p>知识图谱数据加载中...</p>")));
+            .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Str(() => $"<p>{loc.KnowledgeLoadingState}</p>")));
 
         var loadGraphBody = Js.Block()
             .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/knowledge/graph")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());

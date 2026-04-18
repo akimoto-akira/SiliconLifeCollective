@@ -143,20 +143,30 @@ public class DefaultSiliconBeing : SiliconBeingBase
 
             if (TimerSystem != null && TimerSystem.HasPendingTimers())
             {
-                _logger.Info("Being {0}: timer triggered", Name);
-                ExecuteBrain("ThinkOnTimer", null, _ => new ContextManager(this, null).ThinkOnTimer());
+                List<TimerItem> triggeredTimers = TimerSystem.Tick();
+                foreach (TimerItem timer in triggeredTimers)
+                {
+                    _logger.Info("Being {0}: timer triggered - {1} ({2})", Name, timer.Name, timer.Id);
+                    ExecuteBrain("ThinkOnTimer", null, _ => new ContextManager(this, null).ThinkOnTimer(timer));
+                }
                 return;
             }
 
             if (TaskSystem != null && TaskSystem.HasPendingTasks())
             {
-                _logger.Info("Being {0}: pending task detected", Name);
-                ExecuteBrain("ThinkOnTask", null, _ => new ContextManager(this, null).ThinkOnTask());
-                return;
+                List<TaskItem> runnable = TaskSystem.GetRunnableTasks();
+                if (runnable.Count > 0)
+                {
+                    TaskItem task = runnable[0];
+                    _logger.Info("Being {0}: pending task detected - {1} ({2})", Name, task.Title, task.Id);
+                    ExecuteBrain("ThinkOnTask", null, _ => new ContextManager(this, null).ThinkOnTask(task));
+                    return;
+                }
             }
 
             if (Memory != null && Memory.ShouldCompress())
             {
+                return;
                 _logger.Debug("Being {0}: memory compression needed", Name);
                 ExecuteBrain("ThinkOnMemoryCompress", null, _ => new ContextManager(this, null).ThinkOnMemoryCompress());
                 return;
@@ -170,8 +180,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
             DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(language);
 
             Memory?.Add(localization.FormatMemoryEventRuntimeError(ex.Message));
-            Console.WriteLine($"{Name}: {localization.UnexpectedErrorMessage} {ex.Message}");
-            Console.WriteLine();
+            _logger.Info("{0}: {1} {2}", Name, localization.UnexpectedErrorMessage, ex.Message);
         }
         finally
         {
@@ -225,7 +234,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
         Language language = Config.Instance.Data.Language;
         DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(language);
 
-        Console.WriteLine($"{Name}: {localization.ThinkingMessage}");
+        _logger.Info("{0}: {1}", Name, localization.ThinkingMessage);
 
         ContextManager brain = new ContextManager(this, session);
 
@@ -241,13 +250,12 @@ public class DefaultSiliconBeing : SiliconBeingBase
 
         if (response.Success && response.HasToolCalls)
         {
-            Console.WriteLine($"{Name}: {localization.ToolCallMessage}");
+            _logger.Info("{0}: {1}", Name, localization.ToolCallMessage);
         }
         else if (!response.Success)
         {
             _logger.Error("Being {0}: brain scene {1} failed: {2}", Name, sceneName, response.ErrorMessage ?? "unknown");
-            Console.WriteLine($"{Name}: {localization.ErrorMessage} {response.ErrorMessage}");
-            Console.WriteLine();
+            _logger.Info("{0}: {1} {2}", Name, localization.ErrorMessage, response.ErrorMessage);
         }
         else
         {
