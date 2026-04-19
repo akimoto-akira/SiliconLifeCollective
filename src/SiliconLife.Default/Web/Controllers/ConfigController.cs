@@ -35,6 +35,8 @@ public class ConfigController : Controller
             Index();
         else if (path == "/config/save")
             Save();
+        else if (path == "/config/aioptions")
+            GetAIConfigOptions();
         else
         {
             Response.StatusCode = 404;
@@ -75,6 +77,13 @@ public class ConfigController : Controller
             if (config == null)
             {
                 RenderJson(new { success = false, message = _loc.ConfigErrorInstanceNotFound });
+                return;
+            }
+
+            // Handle AI config items (keys starting with "AIConfig_")
+            if (data.key.StartsWith("AIConfig_"))
+            {
+                SaveAIConfigItem(config, data.key, data.value);
                 return;
             }
 
@@ -193,6 +202,26 @@ public class ConfigController : Controller
                         RenderJson(new { success = false, message = _loc.ConfigErrorInvalidRequest });
                         return;
                     }
+                    
+                    // Filter AIConfig dictionary to only keep keys supported by the target AI client
+                    if (data.key == "AIConfig" && value is Dictionary<string, object> aiDict)
+                    {
+                        var clientType = config.AIClientType;
+                        var factory = CreateAIClientFactory(clientType);
+                        if (factory != null)
+                        {
+                            var supportedKeys = factory.GetConfigKeysMetadata(config.Language);
+                            var filteredDict = new Dictionary<string, object>();
+                            foreach (var kvp in aiDict)
+                            {
+                                if (supportedKeys.ContainsKey(kvp.Key))
+                                {
+                                    filteredDict[kvp.Key] = kvp.Value;
+                                }
+                            }
+                            value = filteredDict;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -209,6 +238,32 @@ public class ConfigController : Controller
             prop.SetValue(config, value);
             Config.Instance?.SaveConfig();
             
+            RenderJson(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorSaveFailed, ex.Message) });
+        }
+    }
+
+    private void SaveAIConfigItem(DefaultConfigData config, string key, string? value)
+    {
+        try
+        {
+            // Extract the actual config key (remove "AIConfig_" prefix)
+            var configKey = key.Substring(9); // "AIConfig_".Length = 9
+            
+            // Update the AIConfig dictionary
+            if (string.IsNullOrEmpty(value))
+            {
+                config.AIConfig.Remove(configKey);
+            }
+            else
+            {
+                config.AIConfig[configKey] = value;
+            }
+            
+            Config.Instance?.SaveConfig();
             RenderJson(new { success = true });
         }
         catch (Exception ex)
@@ -339,7 +394,12 @@ public class ConfigController : Controller
             {
                 var clients = DiscoverAIClients();
                 enumValues = clients.Select(c => c.TypeName).ToList();
-                enumDisplayNames = clients.Select(c => c.DisplayName).ToList();
+                enumDisplayNames = clients.Select(c => _loc.GetConfigDisplayName(c.TypeName)).ToList();
+                // Normalize displayValue: config may store "DashScopeClientFactory" but enum uses "DashScopeClient"
+                if (displayValue != null && displayValue.EndsWith("Factory"))
+                {
+                    displayValue = displayValue.Substring(0, displayValue.Length - 7);
+                }
             }
 
             string? dependsOn = null;
@@ -371,12 +431,99 @@ public class ConfigController : Controller
             });
         }
 
+        // AIConfig is rendered as a dictionary editor, not expanded into individual items
+        // The dictionary editor will intelligently render dropdowns for keys like "region", "model", etc.
+        // by calling IAIClientFactory.GetConfigKeyOptions()
+
         foreach (var group in groups.Values)
         {
             group.Items = group.Items.OrderBy(i => i.Order).ToList();
         }
 
         return groups.Values.ToList();
+    }
+
+    private void AddAIConfigItems(Dictionary<string, ConfigGroup> groups, DefaultConfigData config)
+    {
+        var aiGroupName = _loc.GetConfigGroupName("AI");
+        if (!groups.ContainsKey(aiGroupName))
+        {
+            groups[aiGroupName] = new ConfigGroup { Name = aiGroupName };
+        }
+
+        var currentClientType = config.AIClientType;
+        var factory = CreateAIClientFactory(currentClientType);
+        if (factory == null)
+            return;
+
+        // Get metadata and options for current AI client
+        var metadata = factory.GetConfigKeysMetadata(config.Language);
+        var currentConfig = config.AIConfig.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        int order = 100; // Start after existing AI items
+        foreach (var kvp in metadata)
+        {
+            var configKey = kvp.Key;
+            var displayName = kvp.Value;
+            
+            // Get current value from AIConfig
+            var currentValue = config.AIConfig.TryGetValue(configKey, out var val) 
+                ? val?.ToString() ?? "" 
+                : "";
+
+            // Get options if available
+            var options = factory.GetConfigKeyOptions(configKey, currentConfig, config.Language);
+            
+            List<string>? enumValues = null;
+            List<string>? enumDisplayNames = null;
+            string propertyType = "string";
+            
+            if (options != null && options.Count > 0)
+            {
+                enumValues = options.Keys.ToList();
+                enumDisplayNames = options.Values.ToList();
+                propertyType = "enum";
+            }
+
+            groups[aiGroupName].Items.Add(new ConfigItem
+            {
+                PropertyName = $"AIConfig_{configKey}",
+                DisplayName = displayName,
+                Value = currentValue,
+                Description = null,
+                Order = order++,
+                PropertyType = propertyType,
+                EnumValues = enumValues,
+                EnumDisplayNames = enumDisplayNames,
+                DependsOn = "AIClientType",
+                DependsOnValue = currentClientType,
+                IsAIConfigItem = true,
+                AIConfigKey = configKey,
+                AIClientType = currentClientType
+            });
+        }
+    }
+
+    private IAIClientFactory? CreateAIClientFactory(string clientType)
+    {
+        // Try to find the factory - handle both "OllamaClient" and "OllamaClientFactory" formats
+        string factoryTypeName = clientType.EndsWith("Factory") ? clientType : clientType + "Factory";
+        
+        var factoryType = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(a => a.GetTypes())
+            .FirstOrDefault(t => t.Name == factoryTypeName && typeof(IAIClientFactory).IsAssignableFrom(t));
+
+        if (factoryType == null)
+            return null;
+
+        try
+        {
+            return (IAIClientFactory)Activator.CreateInstance(factoryType)!;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private static string GetSimpleTypeName(Type type)
@@ -428,5 +575,51 @@ public class ConfigController : Controller
         }
 
         return clients;
+    }
+
+    private void GetAIConfigOptions()
+    {
+        try
+        {
+            var config = Config.Instance?.Data as DefaultConfigData;
+            if (config == null)
+            {
+                RenderJson(new { success = false, message = "Config not found" });
+                return;
+            }
+
+            // Parse query parameters
+            var query = Request.Url?.Query ?? "";
+            var queryParams = System.Web.HttpUtility.ParseQueryString(query);
+            var configKey = queryParams["key"] ?? "";
+            var clientType = queryParams["clientType"] ?? config.AIClientType;
+
+            var factory = CreateAIClientFactory(clientType);
+            if (factory == null)
+            {
+                RenderJson(new { success = false, message = "Factory not found" });
+                return;
+            }
+
+            var currentConfig = config.AIConfig.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            var options = factory.GetConfigKeyOptions(configKey, currentConfig, config.Language);
+
+            if (options == null)
+            {
+                RenderJson(new { success = true, hasOptions = false });
+            }
+            else
+            {
+                RenderJson(new { 
+                    success = true, 
+                    hasOptions = true, 
+                    options = options 
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            RenderJson(new { success = false, message = ex.Message });
+        }
     }
 }

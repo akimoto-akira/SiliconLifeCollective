@@ -4,7 +4,7 @@
 
 基于 .NET 9 的多智能体协作平台，AI 智能体（硅基人）可通过 Roslyn 动态编译实现自我进化。
 
-[English](../../README.md) | [繁體中文](../zh-HK/README.md)
+[English](../../README.md) | [繁體中文](../zh-HK/README.md) | [日本語](../ja-JP/README.md)
 
 ## 特性
 
@@ -16,6 +16,9 @@
   - 5 级权限查询链：IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
   - 所有权限决策均有审计日志
 - **Token 用量审计** — 内置 Token 用量追踪与报告（`ITokenUsageAudit` / `TokenUsageAuditManager`）
+- **多 AI 后端支持** — 支持 Ollama（本地）和阿里云百炼（云端）
+  - **Ollama** — 本地模型托管，原生 HTTP API
+  - **DashScope（百炼）** — 云端 AI 服务，OpenAI 兼容 API，多地域部署，13+ 模型支持（千问、DeepSeek、GLM、Kimi、Llama）
 - **32 种历法体系** — 多历法支持，包括公历、中国农历、伊斯兰历、希伯来历、日本年号历、波斯历、玛雅历等
 - **最小化依赖** — 核心库仅依赖 Microsoft.CodeAnalysis.CSharp 用于 Roslyn 动态编译
 - **零数据库依赖** — 基于文件系统存储（JSON），支持通过 `ITimeStorage` 进行时间索引查询
@@ -33,7 +36,7 @@
 |------|------|
 | 运行时 | .NET 9 |
 | 开发语言 | C# |
-| AI 接入 | Ollama（原生 HTTP API） |
+| AI 接入 | Ollama（本地）、阿里云 DashScope（云端） |
 | 数据存储 | 文件系统（JSON + 时间索引目录结构） |
 | Web 服务器 | HttpListener（.NET 内置） |
 | 动态编译 | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
@@ -64,7 +67,7 @@ SiliconLifeCollective.sln
 │   │
 │   └── SiliconLife.Default/               # 默认实现 + 程序入口
 │       ├── Program.cs                     # 应用程序入口（组装所有组件）
-│       ├── AI/                            # OllamaClient、OllamaClientFactory（原生 Ollama HTTP API）
+│       ├── AI/                            # OllamaClient、OllamaClientFactory（原生 Ollama HTTP API）；DashScopeClient、DashScopeClientFactory（阿里云百炼）
 │       ├── SiliconBeing/                  # DefaultSiliconBeing、DefaultSiliconBeingFactory
 │       ├── Calendar/                      # 32 种历法实现：Buddhist、Cherokee、ChineseLunar、ChulaSakarat、Coptic、Dai、DehongDai、Ethiopian、FrenchRepublican、Gregorian、Hebrew、Indian、Inuit、Islamic、Japanese、Javanese、Juche、Julian、Khmer、Mayan、Mongolian、Persian、RepublicOfChina、Roman、Saka、Sexagenary、Tibetan、Vietnamese、VikramSamvat、Yi、Zoroastrian
 │       ├── Executors/                     # 默认执行器实现

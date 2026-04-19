@@ -12,6 +12,8 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SiliconLife.Default;
 
@@ -69,4 +71,89 @@ public class OllamaClientFactory : IAIClientFactory
             ["maxTokens"] = localization.GetConfigDisplayName("MaxTokens")
         };
     }
+    
+    /// <summary>
+    /// Gets the optional values for a specific configuration key.
+    /// </summary>
+    /// <param name="configKey">The configuration key to get options for</param>
+    /// <param name="currentConfig">Current configuration dictionary for context-dependent options</param>
+    /// <param name="language">The language to use for localized display text</param>
+    /// <returns>
+    /// A dictionary mapping programming values to localized display text, or null if the config key should use a text input.
+    /// </returns>
+    public Dictionary<string, string>? GetConfigKeyOptions(string configKey, Dictionary<string, object> currentConfig, Language language)
+    {
+        // Only "model" has predefined options, others use text input
+        if (configKey == "model")
+        {
+            // Try to fetch available models from Ollama API
+            string endpoint = currentConfig.TryGetValue("endpoint", out var ep) 
+                ? ep.ToString() ?? "http://localhost:11434"
+                : "http://localhost:11434";
+            
+            try
+            {
+                var models = FetchAvailableModels(endpoint);
+                if (models != null && models.Count > 0)
+                {
+                    return models;
+                }
+            }
+            catch
+            {
+                // If fetching fails, return null to use text input
+                // Ollama returns 404 for models not loaded locally, so fallback list is meaningless
+            }
+        }
+        
+        // All other config keys use text input
+        return null;
+    }
+    
+    /// <summary>
+    /// Fetches available models from Ollama API
+    /// </summary>
+    private static Dictionary<string, string>? FetchAvailableModels(string endpoint)
+    {
+        try
+        {
+            using var httpClient = new HttpClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(3);
+            
+            var response = httpClient.GetAsync($"{endpoint.TrimEnd('/')}/api/tags").Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+            
+            var json = response.Content.ReadAsStringAsync().Result;
+            var doc = JsonDocument.Parse(json);
+            
+            if (!doc.RootElement.TryGetProperty("models", out var modelsElement))
+            {
+                return null;
+            }
+            
+            var models = new Dictionary<string, string>();
+            foreach (var model in modelsElement.EnumerateArray())
+            {
+                if (model.TryGetProperty("name", out var nameElement))
+                {
+                    var modelName = nameElement.GetString();
+                    if (!string.IsNullOrEmpty(modelName))
+                    {
+                        // Use model name as both value and display text
+                        models[modelName] = modelName;
+                    }
+                }
+            }
+            
+            return models.Count > 0 ? models : null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+    
 }

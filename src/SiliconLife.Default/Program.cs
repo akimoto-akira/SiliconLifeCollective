@@ -233,6 +233,9 @@ public class Program
         LocalizationManager.Instance.Register<EnIE>(Language.EnIE);
         LocalizationManager.Instance.Register<EnNZ>(Language.EnNZ);
         LocalizationManager.Instance.Register<EnMY>(Language.EnMY);
+        
+        // Japanese
+        LocalizationManager.Instance.Register<JaJP>(Language.JaJP);
     }
 
     public static void RequestExit()

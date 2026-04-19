@@ -207,13 +207,13 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         {
             // Has independent config, use being's config
             configToUse = being.AIClientConfig;
-            clientType = being.AIClientType ?? Config.Instance?.Data?.AIClientType ?? "OllamaClient";
+            clientType = ResolveClientType(being.AIClientType);
         }
         else
         {
             // No independent config, use global config
             configToUse = _globalAIConfig;
-            clientType = Config.Instance?.Data?.AIClientType ?? "OllamaClient";
+            clientType = ResolveClientType(null);
         }
         
         if (configToUse == null || configToUse.Count == 0)
@@ -231,14 +231,32 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     }
     
     /// <summary>
+    /// Resolves AI client type, treating empty strings as null.
+    /// Priority: provided type → global config type → default "OllamaClient".
+    /// </summary>
+    private static string ResolveClientType(string? beingType)
+    {
+        if (!string.IsNullOrEmpty(beingType))
+            return beingType;
+        var globalType = Config.Instance?.Data?.AIClientType;
+        if (!string.IsNullOrEmpty(globalType))
+            return globalType;
+        return "OllamaClient";
+    }
+    
+    /// <summary>
     /// Creates an AI client factory based on client type
     /// </summary>
     private IAIClientFactory CreateFactoryByType(string clientType)
     {
+        // Normalize: strip "Factory" suffix if present (config may store "DashScopeClientFactory")
+        if (clientType.EndsWith("Factory"))
+            clientType = clientType.Substring(0, clientType.Length - 7);
+        
         return clientType switch
         {
             "OllamaClient" => new OllamaClientFactory(),
-            // Future: can extend to support other client types
+            "DashScopeClient" => new DashScopeClientFactory(),
             _ => throw new NotSupportedException($"AI client type '{clientType}' is not supported")
         };
     }

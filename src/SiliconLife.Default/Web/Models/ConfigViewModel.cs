@@ -39,6 +39,21 @@ public class ConfigItem
 
     public string? DependsOn { get; set; }
     public string? DependsOnValue { get; set; }
+    
+    /// <summary>
+    /// Indicates this is an AI config item (stored in AIConfig dictionary, not a direct property)
+    /// </summary>
+    public bool IsAIConfigItem { get; set; }
+    
+    /// <summary>
+    /// For AI config items: the config key within AIConfig dictionary
+    /// </summary>
+    public string? AIConfigKey { get; set; }
+    
+    /// <summary>
+    /// For AI config items: the AI client type this config belongs to
+    /// </summary>
+    public string? AIClientType { get; set; }
 }
 
 public class AIClientInfo

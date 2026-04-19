@@ -1,6 +1,6 @@
 # Roadmap
 
-[中文](docs/zh-CN/roadmap.md) | [繁體中文](docs/zh-HK/roadmap.md)
+[中文](docs/zh-CN/roadmap.md) | [繁體中文](docs/zh-HK/roadmap.md) | [日本語](docs/ja-JP/roadmap.md)
 
 ## Guiding Principle
 
@@ -219,10 +219,14 @@ Every phase ends with a **runnable, observable** system. No phase produces "a pi
 | 10.5.8 | DiskTool enhancement | New actions: count_lines, read_lines, clear_file, replace_lines, replace_text, replace_text_all, list_drives |
 | 10.5.9 | SystemTool enhancement | New actions: find_process (with wildcard support), resource_usage |
 | 10.5.10 | CalendarTool enhancement | New actions: diff, list_calendars, get_components, get_now_components, convert (cross-calendar conversion) |
+| 10.5.11 | DashScopeClient | Alibaba Cloud Bailian AI client with OpenAI-compatible API. Streaming, tool calling, reasoning content support |
+| 10.5.12 | DashScopeClientFactory | Factory for DashScope client creation. Dynamic model discovery via API. Multi-region support (Beijing, Virginia, Singapore, Hongkong, Frankfurt) |
+| 10.5.13 | AI client config system | Per-being AI client configuration. Dynamic config key options (models, regions). Localized display names |
+| 10.5.14 | Localization expansion | Chinese, Traditional Chinese, English, and Japanese localization for DashScope config options, model names, and region names |
 
-**Deliverable**: Enhanced tooling, observability, and calendar coverage.
+**Deliverable**: Enhanced tooling, observability, calendar coverage, and multi-AI-backend support.
 
-**Verification**: Curator queries token usage via TokenAuditTool → Audit dashboard shows trends → CalendarTool converts dates across 32 calendar systems.
+**Verification**: Curator queries token usage via TokenAuditTool → Audit dashboard shows trends → CalendarTool converts dates across 32 calendar systems → Switch AI backend to DashScope → Chat with Qwen model via cloud API.
 
 ---
 

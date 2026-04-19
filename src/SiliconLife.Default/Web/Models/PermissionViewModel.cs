@@ -39,6 +39,11 @@ public class PermissionViewModel : ViewModelBase
         return sb.ToString();
     }
 
+    private string GetCallbackClassName()
+    {
+        return $"PermissionCallback_{BeingId:N}";
+    }
+
     private static string Comment(DefaultLocalizationBase? loc, string key)
         => loc?.GetPermissionRuleComment(key) ?? key;
 
@@ -59,7 +64,7 @@ public class PermissionViewModel : ViewModelBase
             sb.AppendLine("/// </summary>");
         }
 
-        sb.AppendLine("public class DefaultPermissionCallback : IPermissionCallback");
+        sb.AppendLine($"public class {GetCallbackClassName()} : IPermissionCallback");
         sb.AppendLine("{");
         sb.AppendLine("    private readonly string _appDataDirectory;");
         sb.AppendLine();
@@ -76,7 +81,7 @@ public class PermissionViewModel : ViewModelBase
             sb.AppendLine($"    /// <param name=\"appDataDirectory\">{loc.PermissionCallbackConstructorParam}</param>");
         }
 
-        sb.AppendLine("    public DefaultPermissionCallback(string appDataDirectory)");
+        sb.AppendLine($"    public {GetCallbackClassName()}(string appDataDirectory)");
         sb.AppendLine("    {");
         sb.AppendLine("        _appDataDirectory = appDataDirectory?.ToLowerInvariant() ?? string.Empty;");
         sb.AppendLine("    }");

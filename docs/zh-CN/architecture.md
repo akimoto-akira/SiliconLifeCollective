@@ -1,6 +1,6 @@
 # 架构设计
 
-[English](../../architecture.md) | [繁體中文](../zh-HK/architecture.md)
+[English](../../architecture.md) | [繁體中文](../zh-HK/architecture.md) | [日本語](../ja-JP/architecture.md)
 
 ## 核心概念
 
@@ -172,6 +172,50 @@ MainLoop（专用线程，看门狗 + 熔断器）
 | `PromptTokens` | `int?` | 提示词 Token 数（输入） |
 | `CompletionTokens` | `int?` | 补全 Token 数（输出） |
 | `TotalTokens` | `int?` | 总 Token 数（输入 + 输出） |
+
+---
+
+## AI 客户端系统
+
+系统通过 `IAIClient` 接口支持多种 AI 后端：
+
+### OllamaClient
+
+- **类型**：本地 AI 服务
+- **协议**：原生 Ollama HTTP API（`/api/chat`、`/api/generate`）
+- **特性**：流式输出、工具调用、本地模型托管
+- **配置项**：`endpoint`、`model`、`temperature`、`maxTokens`
+
+### DashScopeClient（阿里云百炼）
+
+- **类型**：云端 AI 服务
+- **协议**：OpenAI 兼容 API（`/compatible-mode/v1/chat/completions`）
+- **认证方式**：Bearer Token（API 密钥）
+- **特性**：流式输出、工具调用、思维链推理内容（Reasoning Content）、多地域部署
+- **支持的地域**：
+  - `beijing` — 华北2（北京）
+  - `virginia` — 美国（弗吉尼亚）
+  - `singapore` — 新加坡
+  - `hongkong` — 中国香港
+  - `frankfurt` — 德国（法兰克福）
+- **支持的模型**（通过 API 动态发现，带回退列表）：
+  - **千问系列**：qwen3-max、qwen3.6-plus、qwen3.6-flash、qwen-max、qwen-plus、qwen-turbo、qwen3-coder-plus
+  - **推理模型**：qwq-plus
+  - **第三方模型**：deepseek-v3.2、deepseek-r1、glm-5.1、kimi-k2.5、llama-4-maverick
+- **配置项**：`apiKey`、`region`、`model`
+- **模型发现**：运行时从 DashScope API 获取可用模型列表；网络失败时回退到预设列表
+
+### 客户端工厂模式
+
+每种 AI 客户端类型都有对应的工厂实现 `IAIClientFactory`：
+
+- `OllamaClientFactory` — 创建 OllamaClient 实例
+- `DashScopeClientFactory` — 创建 DashScopeClient 实例
+
+工厂提供：
+- `CreateClient(Dictionary<string, object> config)` — 从配置字典创建客户端实例
+- `GetConfigKeyOptions(string key, ...)` — 返回配置键的动态选项（如可用模型、地域列表）
+- `GetDisplayName()` — 客户端类型的本地化显示名称
 
 ---
 

@@ -96,5 +96,10 @@ public enum Language
     /// <summary>
     /// Chinese (Simplified, Malaysia)
     /// </summary>
-    ZhMY
+    ZhMY,
+
+    /// <summary>
+    /// Japanese (Japan)
+    /// </summary>
+    JaJP
 }

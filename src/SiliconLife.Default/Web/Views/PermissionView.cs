@@ -48,81 +48,22 @@ public class PermissionView : ViewBase
 
     private static JsSyntax GetScripts(DefaultLocalizationBase loc, Guid beingId)
     {
-        var editorInitBody = Js.Block()
-            .Add(() => Js.Id(() => $"codeEditorInit_permissionCallbackEditor").Invoke().Stmt());
-    
-        return Js.Block()
-            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Block()
-                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
-                {
-                    (Js.Id(() => "typeof").Invoke(() => Js.Id(() => "require")).Op(() => "!==", () => Js.Str(() => "undefined")), new List<JsSyntax>
-                    {
-                        Js.Id(() => "editorInitBody").Invoke().Stmt()
-                    }),
-                    (null, new List<JsSyntax>
-                    {
-                        Js.Let(() => "loaderScript", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "script"))),
-                        Js.Assign(() => Js.Id(() => "loaderScript").Prop(() => "src"), () => Js.Str(() => "https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js")),
-                        Js.Assign(() => Js.Id(() => "loaderScript").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "editorInitBody").Invoke())),
-                        Js.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => Js.Id(() => "loaderScript")).Stmt()
-                    })
-                }))
-            )));
+        // 使用 CodeEditorView 生成的脚本
+        return CodeEditorView.GetWidgetScripts(
+            "permissionCallbackEditor",
+            "csharp",
+            "vs-dark",
+            readOnly: false,
+            minimap: true,
+            lineNumbers: true,
+            wordWrap: true,
+            saveEndpoint: $"/api/permissions/save?beingId={beingId}"
+        );
     }
 
     private static CssBuilder GetStyles()
     {
-        return CssBuilder.Create()
-            .Selector(".code-editor-widget")
-                .Property("display", "flex")
-                .Property("flex-direction", "column")
-                .Property("border", "1px solid var(--border)")
-                .Property("border-radius", "8px")
-                .Property("overflow", "hidden")
-                .Property("background", "var(--bg-card)")
-            .EndSelector()
-            .Selector(".code-editor-toolbar")
-                .Property("display", "flex")
-                .Property("align-items", "center")
-                .Property("gap", "10px")
-                .Property("padding", "8px 14px")
-                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.05))")
-                .Property("border-bottom", "1px solid var(--border)")
-                .Property("font-size", "13px")
-            .EndSelector()
-            .Selector(".code-editor-filename")
-                .Property("color", "var(--text-primary)")
-                .Property("font-weight", "500")
-                .Property("flex", "1")
-                .Property("overflow", "hidden")
-                .Property("text-overflow", "ellipsis")
-                .Property("white-space", "nowrap")
-            .EndSelector()
-            .Selector(".code-editor-lang-badge")
-                .Property("background", "var(--accent-primary)")
-                .Property("color", "#fff")
-                .Property("padding", "2px 8px")
-                .Property("border-radius", "4px")
-                .Property("font-size", "11px")
-                .Property("font-weight", "600")
-                .Property("letter-spacing", "0.5px")
-            .EndSelector()
-            .Selector(".code-editor-btn-save")
-                .Property("background", "none")
-                .Property("border", "none")
-                .Property("cursor", "pointer")
-                .Property("font-size", "18px")
-                .Property("padding", "2px 6px")
-                .Property("border-radius", "4px")
-                .Property("transition", "background 0.2s")
-            .EndSelector()
-            .Selector(".code-editor-btn-save:hover")
-                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.1))")
-            .EndSelector()
-            .Selector(".code-editor-container")
-                .Property("flex", "1")
-                .Property("min-height", "500px")
-                .Property("width", "100%")
-            .EndSelector();
+        // 使用 CodeEditorView 提供的样式
+        return CodeEditorView.GetWidgetStyles();
     }
 }

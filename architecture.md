@@ -1,6 +1,6 @@
 # Architecture
 
-[中文](docs/zh-CN/architecture.md) | [繁體中文](docs/zh-HK/architecture.md)
+[中文](docs/zh-CN/architecture.md) | [繁體中文](docs/zh-HK/architecture.md) | [日本語](docs/ja-JP/architecture.md)
 
 ## Core Concepts
 
@@ -172,6 +172,50 @@ The `ChatMessage` model includes fields for AI conversation context and token tr
 | `PromptTokens` | `int?` | Number of tokens in the prompt (input) |
 | `CompletionTokens` | `int?` | Number of tokens in the completion (output) |
 | `TotalTokens` | `int?` | Total tokens used (input + output) |
+
+---
+
+## AI Client System
+
+The system supports multiple AI backends through the `IAIClient` interface:
+
+### OllamaClient
+
+- **Type**: Local AI service
+- **Protocol**: Native Ollama HTTP API (`/api/chat`, `/api/generate`)
+- **Features**: Streaming, tool calling, local model hosting
+- **Configuration**: `endpoint`, `model`, `temperature`, `maxTokens`
+
+### DashScopeClient (Alibaba Cloud Bailian)
+
+- **Type**: Cloud AI service
+- **Protocol**: OpenAI-compatible API (`/compatible-mode/v1/chat/completions`)
+- **Authentication**: Bearer token (API key)
+- **Features**: Streaming, tool calling, reasoning content (Chain-of-Thought), multi-region deployment
+- **Supported Regions**:
+  - `beijing` — 华北2（北京）
+  - `virginia` — 美国（弗吉尼亚）
+  - `singapore` — 新加坡
+  - `hongkong` — 中国香港
+  - `frankfurt` — 德国（法兰克福）
+- **Supported Models** (dynamic discovery via API, with fallback list):
+  - **Qwen Series**: qwen3-max, qwen3.6-plus, qwen3.6-flash, qwen-max, qwen-plus, qwen-turbo, qwen3-coder-plus
+  - **Reasoning**: qwq-plus
+  - **Third-party**: deepseek-v3.2, deepseek-r1, glm-5.1, kimi-k2.5, llama-4-maverick
+- **Configuration**: `apiKey`, `region`, `model`
+- **Model Discovery**: Fetches available models from DashScope API at runtime; falls back to curated list on network failure
+
+### Client Factory Pattern
+
+Each AI client type has a corresponding factory implementing `IAIClientFactory`:
+
+- `OllamaClientFactory` — Creates OllamaClient instances
+- `DashScopeClientFactory` — Creates DashScopeClient instances
+
+Factories provide:
+- `CreateClient(Dictionary<string, object> config)` — Instantiates client from configuration
+- `GetConfigKeyOptions(string key, ...)` — Returns dynamic options for configuration keys (e.g., available models, regions)
+- `GetDisplayName()` — Localized display name for the client type
 
 ---
 

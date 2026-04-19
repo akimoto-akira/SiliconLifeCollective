@@ -49,6 +49,18 @@ public abstract class SiliconBeingBase
     protected Dictionary<string, object>? BackupAIClientConfig { get; set; }
 
     /// <summary>
+    /// Gets or sets the backup of the effective AI client type (for change detection).
+    /// Tracks the last known client type to detect global AIClientType changes.
+    /// </summary>
+    protected string? BackupEffectiveAIClientType { get; set; }
+
+    /// <summary>
+    /// Gets or sets the backup of the global AI config (for change detection).
+    /// Used when the being has no independent config and relies on global config.
+    /// </summary>
+    protected Dictionary<string, object>? BackupGlobalAIConfig { get; set; }
+
+    /// <summary>
     /// Gets or sets whether this being is currently using a fallback AI client
     /// </summary>
     public bool IsUsingFallbackClient { get; set; }

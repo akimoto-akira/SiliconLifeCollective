@@ -357,7 +357,7 @@ public class ConfigView : ViewBase
                 .Property("align-items", "center")
                 .Property("margin-bottom", "8px")
             .EndSelector()
-            .Selector(".dict-row input")
+            .Selector(".dict-row input, .dict-row select")
                 .Property("flex", "1")
                 .Property("padding", "6px 10px")
                 .Property("border", "1px solid var(--border-color)")
@@ -405,6 +405,7 @@ public class ConfigView : ViewBase
         var js = Js.Block();
 
         js.Add(() => Js.Let(() => "currentType", () => Js.Str(() => "string")));
+                js.Add(() => Js.Let(() => "isAIConfigDict", () => Js.Id(() => "false")));
 
         var hideAllInputsBlock = Js.Block()
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputString")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
@@ -447,6 +448,38 @@ public class ConfigView : ViewBase
             .Add(() => Js.Id(() => "keyInput").Prop(() => "placeholder").Assign(() => Js.Str(() => loc.ConfigDictKeyLabel)))
             .Add(() => Js.Id(() => "keyInput").Prop(() => "value").Assign(() => Js.Id(() => "key")));
         
+        // Define fetch then-body for AIConfig dropdown
+        var fetchThenBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "d").Prop(() => "success").Op(() => "&&", () => Js.Id(() => "d").Prop(() => "hasOptions")), new List<JsSyntax>
+                    {
+                        Js.Const(() => "sel", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "select"))).Stmt(),
+                        Js.Id(() => "Object").Prop(() => "keys").Invoke(() => Js.Id(() => "d").Prop(() => "options")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "k" }, () => Js.Block()
+                            .Add(() => Js.Const(() => "o", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "option"))))
+                            .Add(() => Js.Id(() => "o").Prop(() => "value").Assign(() => Js.Id(() => "k")))
+                            .Add(() => Js.Id(() => "o").Prop(() => "textContent").Assign(() => Js.Id(() => "d").Prop(() => "options").Index(() => Js.Id(() => "k"))))
+                            .Add(() => Js.Id(() => "o").Prop(() => "selected").Assign(() => Js.Id(() => "k").Op(() => "===", () => Js.Id(() => "valueInput").Prop(() => "value"))))
+                            .Add(() => Js.Id(() => "sel").Call(() => "appendChild", () => Js.Id(() => "o"))))
+                        ).Stmt(),
+                        Js.Id(() => "valueInput").Call(() => "replaceWith", () => Js.Id(() => "sel")).Stmt()
+                    }
+                )}
+            }));
+        
+        var blurHandlerBody = Js.Block()
+            .Add(() => Js.Const(() => "ck", () => Js.Id(() => "keyInput").Prop(() => "value")))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "isAIConfigDict").Op(() => "&&", () => Js.Id(() => "ck")), new List<JsSyntax>
+                    {
+                        Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/config/aioptions?key=").Op(() => "+", () => Js.Id(() => "encodeURIComponent").Invoke(() => Js.Id(() => "ck")))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "d" }, () => (JsSyntax)fetchThenBody)).Stmt()
+                    }
+                )}
+            }));
+        
+        addDictRowBlock.Add(() => Js.Id(() => "keyInput").Call(() => "addEventListener", () => Js.Str(() => "blur"), () => Js.Arrow(() => new List<string> { }, () => (JsSyntax)blurHandlerBody)));
+        
         addDictRowBlock.Add(() => Js.Const(() => "valueInput", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "input"))))
             .Add(() => Js.Id(() => "valueInput").Prop(() => "type").Assign(() => Js.Str(() => "text")))
             .Add(() => Js.Id(() => "valueInput").Prop(() => "placeholder").Assign(() => Js.Str(() => loc.ConfigDictValueLabel)))
@@ -462,6 +495,16 @@ public class ConfigView : ViewBase
             .Add(() => Js.Id(() => "row").Call(() => "appendChild", () => Js.Id(() => "deleteBtn")))
             .Add(() => Js.Id(() => "container").Call(() => "appendChild", () => Js.Id(() => "row")));
         
+        // Immediately fetch and render dropdown for existing AIConfig keys
+        addDictRowBlock.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+        {
+            { (Js.Id(() => "isAIConfigDict").Op(() => "&&", () => Js.Id(() => "key")), new List<JsSyntax>
+                {
+                    Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/config/aioptions?key=").Op(() => "+", () => Js.Id(() => "encodeURIComponent").Invoke(() => Js.Id(() => "key")))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "d" }, () => (JsSyntax)fetchThenBody)).Stmt()
+                }
+            )}
+        }));
+        
         js.Add(() => Js.Func(() => "addDictRow", () => new List<string> { "key", "value" }, () => addDictRowBlock));
 
         var getDictJsonBlock = Js.Block()
@@ -470,7 +513,7 @@ public class ConfigView : ViewBase
             .Add(() => Js.Const(() => "dict", () => Js.Obj()));
         
         var processRowBlock = Js.Block()
-            .Add(() => Js.Const(() => "inputs", () => Js.Id(() => "row").Call(() => "querySelectorAll", () => Js.Str(() => "input"))))
+            .Add(() => Js.Const(() => "inputs", () => Js.Id(() => "row").Call(() => "querySelectorAll", () => Js.Str(() => "input, select"))))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 { (Js.Id(() => "inputs").Prop(() => "length").Op(() => ">=", () => Js.Num(() => "2")), new List<JsSyntax>
@@ -604,21 +647,22 @@ public class ConfigView : ViewBase
                 },
                 { (Js.Str(() => "enum"), new List<JsSyntax>
                     {
-                        Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputEnum")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "block")),
-                        Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValueEnum")).Prop(() => "innerHTML").Assign(() => Js.Str(() => "")),
+                        Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputEnum")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "block")).Stmt(),
+                        Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValueEnum")).Prop(() => "innerHTML").Assign(() => Js.Str(() => "")).Stmt(),
                         Js.Id(() => "enumValues").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "v", "i" }, () => Js.Block()
                             .Add(() => Js.Const(() => "opt", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "option"))))
                             .Add(() => Js.Id(() => "opt").Prop(() => "value").Assign(() => Js.Id(() => "v")))
                             .Add(() => Js.Id(() => "opt").Prop(() => "textContent").Assign(() => Js.Id(() => "enumDisplayNames").Index(() => Js.Id(() => "i"))))
                             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValueEnum")).Call(() => "appendChild", () => Js.Id(() => "opt")))
-                        )),
-                        Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValueEnum")).Prop(() => "value").Assign(() => Js.Id(() => "value")),
+                        )).Stmt(),
+                        Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValueEnum")).Prop(() => "value").Assign(() => Js.Id(() => "value")).Stmt(),
                         Js.Break()
                     })
                 },
                 { (Js.Str(() => "dictionary"), new List<JsSyntax>
                     {
                         Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputDictionary")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "block")),
+                        Js.Assign(() => Js.Id(() => "isAIConfigDict"), () => Js.Id(() => "key").Op(() => "===", () => Js.Str(() => "AIConfig"))),
                         Js.Id(() => "initDictEditor").Invoke(() => Js.Id(() => "value")),
                         Js.Break()
                     })

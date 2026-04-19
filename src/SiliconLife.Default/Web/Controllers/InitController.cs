@@ -566,8 +566,31 @@ public class InitController : Controller
                 var configObj = Js.Obj();
                 foreach (var kvp in metadata)
                 {
-                    // kvp.Value 已经是工厂返回的已本地化文本
-                    configObj.Prop(() => kvp.Key, () => Js.Str(() => kvp.Value));
+                    // 获取当前配置值（从_configData.AIConfig）
+                    var currentConfig = new Dictionary<string, object>();
+                    foreach (var cfg in _configData.AIConfig)
+                    {
+                        currentConfig[cfg.Key] = cfg.Value;
+                    }
+                    
+                    // 调用 GetConfigKeyOptions 获取选项
+                    var options = factory.GetConfigKeyOptions(kvp.Key, currentConfig, currentLanguage);
+                    
+                    // 构建字段元数据对象：包含 label 和可选的 options
+                    var fieldObj = Js.Obj()
+                        .Prop(() => "label", () => Js.Str(() => kvp.Value));
+                    
+                    if (options != null && options.Count > 0)
+                    {
+                        var optionsObj = Js.Obj();
+                        foreach (var opt in options)
+                        {
+                            optionsObj.Prop(() => opt.Key, () => Js.Str(() => opt.Value));
+                        }
+                        fieldObj.Prop(() => "options", () => optionsObj);
+                    }
+                    
+                    configObj.Prop(() => kvp.Key, () => fieldObj);
                 }
                 aiConfigData.Prop(() => factoryType.Name, () => configObj);
             }
@@ -596,24 +619,56 @@ public class InitController : Controller
             .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "aiConfigFields"))))
             .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Str(() => "")));
         
-        // forEach循环体
+        // forEach循环体 - 根据是否有options决定渲染select还是input
         var forEachBody = Js.Block()
-            .Add(() => Js.Const(() => "label", () => Js.Id(() => "metadata").Index(() => Js.Id(() => "key"))))
+            .Add(() => Js.Const(() => "fieldMeta", () => Js.Id(() => "metadata").Index(() => Js.Id(() => "key"))))
+            .Add(() => Js.Const(() => "label", () => Js.Id(() => "fieldMeta").Prop(() => "label")))
             .Add(() => Js.Const(() => "value", () => Js.Id(() => "currentValues").Index(() => Js.Id(() => "key")).Op(() => "||", () => (JsSyntax)Js.Str(() => ""))))
             .Add(() => Js.Const(() => "div", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
             .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "ai-config-field")))
             .Add(() => Js.Const(() => "labelEl", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "label"))))
             .Add(() => Js.Assign(() => Js.Id(() => "labelEl").Prop(() => "htmlFor"), () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key"))))
             .Add(() => Js.Assign(() => Js.Id(() => "labelEl").Prop(() => "textContent"), () => Js.Id(() => "label")))
+            .Add(() => Js.Id(() => "div").Call(() => "appendChild", () => Js.Id(() => "labelEl")));
+        
+        // 如果有options，渲染select下拉框；否则渲染input文本框
+        var optionForEachBody = Js.Block()
+            .Add(() => Js.Const(() => "option", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "option"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "option").Prop(() => "value"), () => Js.Id(() => "optKey")))
+            .Add(() => Js.Assign(() => Js.Id(() => "option").Prop(() => "textContent"), () => Js.Id(() => "fieldMeta").Prop(() => "options").Index(() => Js.Id(() => "optKey"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "optKey").Op(() => "===", () => (JsSyntax)Js.Id(() => "value")), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "option").Prop(() => "selected"), () => Js.Bool(() => true))
+                    })
+                }
+            }))
+            .Add(() => Js.Id(() => "select").Call(() => "appendChild", () => Js.Id(() => "option")));
+        
+        var selectRenderingBody = Js.Block()
+            .Add(() => Js.Const(() => "select", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "select"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "select").Prop(() => "name"), () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "select").Prop(() => "id"), () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key"))))
+            .Add(() => Js.Id(() => "Object").Call(() => "keys", () => Js.Id(() => "fieldMeta").Prop(() => "options")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "optKey" }, () => optionForEachBody)).Stmt())
+            .Add(() => Js.Id(() => "div").Call(() => "appendChild", () => Js.Id(() => "select")));
+        
+        var inputRenderingBody = Js.Block()
             .Add(() => Js.Const(() => "input", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "input"))))
             .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "type"), () => Js.Str(() => "text")))
             .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "name"), () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key"))))
             .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "id"), () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key"))))
             .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "placeholder"), () => Js.Id(() => "label")))
             .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "value"), () => Js.Id(() => "value")))
-            .Add(() => Js.Id(() => "div").Call(() => "appendChild", () => Js.Id(() => "labelEl")))
-            .Add(() => Js.Id(() => "div").Call(() => "appendChild", () => Js.Id(() => "input")))
-            .Add(() => Js.Id(() => "container").Call(() => "appendChild", () => Js.Id(() => "div")));
+            .Add(() => Js.Id(() => "div").Call(() => "appendChild", () => Js.Id(() => "input")));
+        
+        forEachBody.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+        {
+            { (Js.Id(() => "fieldMeta").Prop(() => "options"), new List<JsSyntax> { selectRenderingBody }) },
+            { (null, new List<JsSyntax> { inputRenderingBody }) }
+        }));
+        
+        forEachBody.Add(() => Js.Id(() => "container").Call(() => "appendChild", () => Js.Id(() => "div")));
         
         onClientTypeChangeBody.Add(() => Js.Id(() => "Object").Call(() => "keys", () => Js.Id(() => "metadata")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "key" }, () => forEachBody)));
         
@@ -1018,6 +1073,25 @@ public class InitController : Controller
             .EndSelector()
             .Selector(".ai-config-field input:focus")
                 .Property("border-color", "#3b82f6")
+            .EndSelector()
+            .Selector(".ai-config-field select")
+                .Property("width", "100%")
+                .Property("padding", "10px 14px")
+                .Property("border", "1px solid rgba(148, 163, 184, 0.2)")
+                .Property("border-radius", "8px")
+                .Property("background", "rgba(15, 23, 42, 0.6)")
+                .Property("color", "#f1f5f9")
+                .Property("font-size", "14px")
+                .Property("outline", "none")
+                .Property("transition", "border-color 0.2s")
+                .Property("cursor", "pointer")
+            .EndSelector()
+            .Selector(".ai-config-field select:focus")
+                .Property("border-color", "#3b82f6")
+            .EndSelector()
+            .Selector(".ai-config-field select option")
+                .Property("background", "#1e293b")
+                .Property("color", "#f1f5f9")
             .EndSelector()
             .Build();
     }

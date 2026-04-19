@@ -17,7 +17,22 @@ public class CodeEditorView : ViewBase
 {
     public override string Render(object model)
     {
+        // CodeEditorView 是组件视图，不直接渲染完整页面
+        // 应使用 RenderWidget 方法获取组件 HTML
         return string.Empty;
+    }
+
+    /// <summary>
+    /// 渲染代码编辑器组件（HTML + Scripts）
+    /// </summary>
+    public static (H Html, JsSyntax Scripts) RenderEditor(string editorId, string code, string language = "csharp",
+        string filePath = "", bool readOnly = false, string theme = "vs-dark",
+        bool minimap = true, bool lineNumbers = true, bool wordWrap = true,
+        string saveEndpoint = "")
+    {
+        var html = RenderWidget(editorId, code, language, filePath, readOnly, theme, minimap, lineNumbers, wordWrap, saveEndpoint);
+        var scripts = GetWidgetScripts(editorId, language, theme, readOnly, minimap, lineNumbers, wordWrap, saveEndpoint);
+        return (html, scripts);
     }
 
     public static H RenderWidget(string editorId, string code, string language = "csharp",
@@ -25,7 +40,8 @@ public class CodeEditorView : ViewBase
         bool minimap = true, bool lineNumbers = true, bool wordWrap = true,
         string saveEndpoint = "")
     {
-        var escapedCode = EscapeCodeForJs(code);
+        // 不要预先转义！H.Value() 内部的 EscapeAttr 会自动处理 HTML 属性转义
+        // 如果预先转义，会导致双重转义：< → &lt; → &amp;lt;
         var editorContainerId = editorId + "-container";
 
         var toolbarChildren = new List<object>();
@@ -42,7 +58,7 @@ public class CodeEditorView : ViewBase
         return H.Div(
             H.Div(toolbarChildren.ToArray()).Class("code-editor-toolbar"),
             H.Div().Id(editorContainerId).Class("code-editor-container"),
-            H.Input().Id(editorId + "-code-hidden").Attr("type", "hidden").Value(escapedCode),
+            H.Input().Id(editorId + "-code-hidden").Attr("type", "hidden").Value(code),
             H.Input().Id(editorId + "-dirty-flag").Attr("type", "hidden").Value("0")
         ).Class("code-editor-widget").Id(editorId);
     }
@@ -112,23 +128,55 @@ public class CodeEditorView : ViewBase
         string hiddenId = editorId + "-code-hidden";
         string dirtyId = editorId + "-dirty-flag";
 
-        JsObj editorOptions = Js.Obj()
-            .Prop(() => "value", () => Js.Id(() => "initialCode"))
-            .Prop(() => "language", () => Js.Str(() => language))
-            .Prop(() => "theme", () => Js.Str(() => theme))
-            .Prop(() => "readOnly", () => Js.Bool(() => readOnly))
-            .Prop(() => "minimap", () => Js.Obj().Prop(() => "enabled", () => Js.Bool(() => minimap)))
-            .Prop(() => "lineNumbers", () => Js.Str(() => lineNumbers ? "on" : "off"))
-            .Prop(() => "wordWrap", () => Js.Str(() => wordWrap ? "on" : "off"))
-            .Prop(() => "automaticLayout", () => Js.Bool(() => true))
-            .Prop(() => "scrollBeyondLastLine", () => Js.Bool(() => false))
-            .Prop(() => "fontSize", () => Js.Num(() => "14"))
-            .Prop(() => "tabSize", () => Js.Num(() => "4"))
-            .Prop(() => "renderWhitespace", () => Js.Str(() => "selection"))
-            .Prop(() => "bracketPairColorization", () => Js.Obj().Prop(() => "enabled", () => Js.Bool(() => true)));
+        // Monaco Editor 的语言映射
+        var monacoLanguageMap = new Dictionary<string, string>
+        {
+            { "csharp", "csharp" },
+            { "cs", "csharp" },
+            { "javascript", "javascript" },
+            { "js", "javascript" },
+            { "typescript", "typescript" },
+            { "ts", "typescript" },
+            { "python", "python" },
+            { "py", "python" },
+            { "html", "html" },
+            { "css", "css" },
+            { "json", "json" },
+            { "xml", "xml" },
+            { "sql", "sql" },
+            { "markdown", "markdown" },
+            { "md", "markdown" },
+            { "java", "java" },
+            { "cpp", "cpp" },
+            { "c", "c" },
+            { "go", "go" },
+            { "rust", "rust" },
+            { "php", "php" },
+            { "ruby", "ruby" },
+            { "yaml", "yaml" },
+            { "yml", "yaml" }
+        };
+
+        var monacoLanguage = monacoLanguageMap.ContainsKey(language.ToLower()) 
+            ? monacoLanguageMap[language.ToLower()] 
+            : "plaintext";
 
         JsBlock requireCallbackBody = Js.Block()
-            .Add(() => Js.Let(() => "editor", () => Js.Id(() => "monaco").Prop(() => "editor").Call(() => "create", () => Js.Id(() => "containerEl"), () => editorOptions)))
+            // 使用 monaco.editor.createModel 创建带语言支持的模型
+            .Add(() => Js.Let(() => "model", () => Js.Id(() => "monaco").Prop(() => "editor").Call(() => "createModel", () => Js.Id(() => "initialCode"), () => Js.Str(() => monacoLanguage))))
+            .Add(() => Js.Let(() => "editor", () => Js.Id(() => "monaco").Prop(() => "editor").Call(() => "create", () => Js.Id(() => "containerEl"), () => Js.Obj()
+                .Prop(() => "model", () => Js.Id(() => "model"))
+                .Prop(() => "theme", () => Js.Str(() => theme))
+                .Prop(() => "readOnly", () => Js.Bool(() => readOnly))
+                .Prop(() => "minimap", () => Js.Obj().Prop(() => "enabled", () => Js.Bool(() => minimap)))
+                .Prop(() => "lineNumbers", () => Js.Str(() => lineNumbers ? "on" : "off"))
+                .Prop(() => "wordWrap", () => Js.Str(() => wordWrap ? "on" : "off"))
+                .Prop(() => "automaticLayout", () => Js.Bool(() => true))
+                .Prop(() => "scrollBeyondLastLine", () => Js.Bool(() => false))
+                .Prop(() => "fontSize", () => Js.Num(() => "14"))
+                .Prop(() => "tabSize", () => Js.Num(() => "4"))
+                .Prop(() => "renderWhitespace", () => Js.Str(() => "selection"))
+                .Prop(() => "bracketPairColorization", () => Js.Obj().Prop(() => "enabled", () => Js.Bool(() => true))))))
             .Add(() => Js.Id(() => "editor").Call(() => "onDidChangeModelContent", () => Js.Arrow(() => new List<string>(), () => Js.Block()
                 .Add(() => Js.Assign(() => Js.Id(() => "dirtyFlag").Prop(() => "value"), () => Js.Str(() => "1"))))).Stmt())
             .Add(() => Js.Assign(() => Js.Id(() => "window").Index(() => Js.Str(() => editorId)), () => Js.Id(() => "editor")));
@@ -203,13 +251,27 @@ public class CodeEditorView : ViewBase
             }));
     }
 
+    private static string EscapeForHtmlAttribute(string code)
+    {
+        // HTML 属性需要 HTML 实体编码
+        // 浏览器会自动解码，JavaScript 读取 value 时会得到原始字符串（包括真正的换行符）
+        return code
+            .Replace("&", "&amp;")
+            .Replace("<", "&lt;")
+            .Replace(">", "&gt;")
+            .Replace("\"", "&quot;")
+            .Replace("'", "&#39;");
+    }
+
     private static string EscapeCodeForJs(string code)
     {
+        // 必须按照正确的顺序转义：先转义反斜杠，再转义其他字符
+        // 否则会导致双重转义（例如 \n 变成 \\n 再变成 \\\\n）
         return code
-            .Replace("\\", "\\\\")
-            .Replace("\"", "\\\"")
-            .Replace("\n", "\\n")
-            .Replace("\r", "\\r")
-            .Replace("\t", "\\t");
+            .Replace("\\", "\\\\")  // 第一步：转义反斜杠
+            .Replace("\"", "\\\"")  // 第二步：转义双引号
+            .Replace("\n", "\\n")   // 第三步：转义换行符
+            .Replace("\r", "\\r")   // 第四步：转义回车符
+            .Replace("\t", "\\t");  // 第五步：转义制表符
     }
 }

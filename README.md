@@ -4,7 +4,7 @@
 
 A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Beings** self-evolve through Roslyn dynamic compilation.
 
-[中文文档](docs/zh-CN/README.md) | [繁體中文](docs/zh-HK/README.md)
+[中文文档](docs/zh-CN/README.md) | [繁體中文](docs/zh-HK/README.md) | [日本語](docs/ja-JP/README.md)
 
 ## Features
 
@@ -16,6 +16,9 @@ A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Bei
   - 5-level permission chain: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
   - Audit logging for all permission decisions
 - **Token Usage Audit** — Built-in token usage tracking and reporting via `ITokenUsageAudit` / `TokenUsageAuditManager`
+- **Multiple AI Backends** — Support for Ollama (local) and Alibaba Cloud DashScope (cloud)
+  - **Ollama** — Local model hosting with native HTTP API
+  - **DashScope (百炼)** — Cloud AI service with OpenAI-compatible API, multi-region deployment, and 13+ models (Qwen, DeepSeek, GLM, Kimi, Llama)
 - **32 Calendar Systems** — Multi-calendar support including Gregorian, Chinese Lunar, Islamic, Hebrew, Japanese, Persian, Mayan, and more
 - **Minimal Dependencies** — Core library only depends on Microsoft.CodeAnalysis.CSharp for Roslyn dynamic compilation
 - **Zero Database Dependency** — File-based storage (JSON) with time-indexed queries via `ITimeStorage`
@@ -33,7 +36,7 @@ A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Bei
 |-----------|-----------|
 | Runtime | .NET 9 |
 | Language | C# |
-| AI Integration | Ollama (native HTTP API) |
+| AI Integration | Ollama (local), Alibaba Cloud DashScope (cloud) |
 | Storage | File system (JSON + time-indexed directories) |
 | Web Server | HttpListener (built-in .NET) |
 | Dynamic Compilation | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -64,7 +67,7 @@ SiliconLifeCollective.sln
 │   │
 │   └── SiliconLife.Default/               # Default implementations + entry point
 │       ├── Program.cs                     # Application entry (wiring all components)
-│       ├── AI/                            # OllamaClient, OllamaClientFactory (native Ollama HTTP API)
+│       ├── AI/                            # OllamaClient, OllamaClientFactory (native Ollama HTTP API); DashScopeClient, DashScopeClientFactory (Alibaba Cloud Bailian)
 │       ├── SiliconBeing/                  # DefaultSiliconBeing, DefaultSiliconBeingFactory
 │       ├── Calendar/                      # 32 calendar implementations: Buddhist, Cherokee, ChineseLunar, ChulaSakarat, Coptic, Dai, DehongDai, Ethiopian, FrenchRepublican, Gregorian, Hebrew, Indian, Inuit, Islamic, Japanese, Javanese, Juche, Julian, Khmer, Mayan, Mongolian, Persian, RepublicOfChina, Roman, Saka, Sexagenary, Tibetan, Vietnamese, VikramSamvat, Yi, Zoroastrian
 │       ├── Executors/                     # Default executor implementations
@@ -118,7 +121,9 @@ Tool Call -> Executor -> PermissionManager -> [IsCurator -> FrequencyCache -> Gl
 ### Prerequisites
 
 - .NET 9 SDK
-- [Ollama](https://ollama.com) running locally with a model pulled (e.g., `ollama pull llama3`)
+- AI backend (choose one):
+  - **Ollama**: [Ollama](https://ollama.com) running locally with a model pulled (e.g., `ollama pull llama3`)
+  - **Alibaba Cloud DashScope**: Valid API key from [Bailian Console](https://bailian.console.aliyun.com/)
 
 ### Build
 

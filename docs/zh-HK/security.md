@@ -1,6 +1,6 @@
 # 安全設計
 
-[English](../../security.md) | [简体中文](../zh-CN/security.md)
+[English](../../security.md) | [简体中文](../zh-CN/security.md) | [日本語](../ja-JP/security.md)
 
 ## 概述
 

@@ -76,13 +76,21 @@ public class PermissionController : Controller
         var dataDirectory = Config.Instance?.Data?.DataDirectory?.FullName 
             ?? Path.Combine(Environment.CurrentDirectory, "data");
         string beingDirectory = Path.Combine(dataDirectory, "SiliconManager", beingId.ToString());
-        
+                
         var dynamicLoader = ServiceLocator.Instance.GetService<DynamicBeingLoader>();
         string callbackCode = dynamicLoader?.GetPermissionCallbackSourceCode(beingId, beingDirectory) ?? "";
-
+        
         var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
+                
+        // 如果没有自定义代码,使用默认模板
+        var vm = new Models.PermissionViewModel { Skin = skin, BeingId = beingId };
+        if (string.IsNullOrWhiteSpace(callbackCode))
+        {
+            callbackCode = vm.GenerateDefaultTemplateCode();
+        }
+                
+        vm.CurrentCallbackCode = callbackCode;
         var view = new Views.PermissionView();
-        var vm = new Models.PermissionViewModel { Skin = skin, BeingId = beingId, CurrentCallbackCode = callbackCode };
         var html = view.Render(vm);
         RenderHtml(html);
     }

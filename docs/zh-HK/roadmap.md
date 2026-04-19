@@ -1,6 +1,6 @@
 # 開發路線
 
-[English](../../roadmap.md) | [简体中文](../zh-CN/roadmap.md)
+[English](../../roadmap.md) | [简体中文](../zh-CN/roadmap.md) | [日本語](../ja-JP/roadmap.md)
 
 ## 指導原則
 
@@ -219,10 +219,14 @@
 | 10.5.8 | DiskTool 增強 | 新增操作：count_lines、read_lines、clear_file、replace_lines、replace_text、replace_text_all、list_drives |
 | 10.5.9 | SystemTool 增強 | 新增操作：find_process（支援萬用字元）、resource_usage |
 | 10.5.10 | CalendarTool 增強 | 新增操作：diff、list_calendars、get_components、get_now_components、convert（跨曆法轉換） |
+| 10.5.11 | DashScopeClient | 阿里雲百煉 AI 用戶端，OpenAI 相容 API。支援串流輸出、工具呼叫、思維鏈推理內容 |
+| 10.5.12 | DashScopeClientFactory | DashScope 用戶端工廠。透過 API 動態發現模型。多地域支援（北京、維吉尼亞、新加坡、香港、法蘭克福） |
+| 10.5.13 | AI 用戶端配置系統 | 矽基人級別的 AI 用戶端配置。動態配置鍵選項（模型、地域）。本地化顯示名稱 |
+| 10.5.14 | 本地化擴展 | 中文、繁體中文、英文、日文的 DashScope 配置選項、模型名稱、地域名稱本地化 |
 
-**階段產出**：增強的工具集、可觀測性和曆法涵蓋範圍。
+**階段產出**：增強的工具集、可觀測性、曆法涵蓋範圍和多 AI 後端支援。
 
-**驗證方式**：主理人透過 TokenAuditTool 查詢 Token 用量 → 稽核儀表板顯示趨勢 → CalendarTool 跨 32 種曆法轉換日期。
+**驗證方式**：主理人透過 TokenAuditTool 查詢 Token 用量 → 稽核儀表板顯示趨勢 → CalendarTool 跨 32 種曆法轉換日期 → 切換 AI 後端為 DashScope → 透過雲端 API 與千問模型對話。
 
 ---
 

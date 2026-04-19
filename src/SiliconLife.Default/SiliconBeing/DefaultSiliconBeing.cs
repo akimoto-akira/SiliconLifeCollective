@@ -339,8 +339,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
         if (AIClient == null)
         {
             RebuildAIClientFromConfig();
-            // Update backup config
-            BackupAIClientConfig = AIClientConfig?.ToDictionary(k => k.Key, v => v.Value);
+            UpdateConfigBackups();
             return AIClient != null; // Return true if initialization succeeded
         }
         
@@ -349,6 +348,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
         {
             this.IsUsingFallbackClient = false;
             RebuildAIClientFromConfig();
+            UpdateConfigBackups();
             return true;
         }
         
@@ -360,11 +360,20 @@ public class DefaultSiliconBeing : SiliconBeingBase
         
         // Config changed, rebuild client
         RebuildAIClientFromConfig();
-        
-        // Update backup config
-        BackupAIClientConfig = AIClientConfig?.ToDictionary(k => k.Key, v => v.Value);
+        UpdateConfigBackups();
         
         return true;
+    }
+    
+    /// <summary>
+    /// Updates all config backups to current values for future change detection
+    /// </summary>
+    private void UpdateConfigBackups()
+    {
+        BackupAIClientConfig = AIClientConfig?.ToDictionary(k => k.Key, v => v.Value);
+        BackupEffectiveAIClientType = ResolveEffectiveAIClientType(AIClientType);
+        var globalConfig = Config.Instance?.Data?.AIConfig;
+        BackupGlobalAIConfig = globalConfig?.ToDictionary(k => k.Key, v => v.Value);
     }
     
     /// <summary>
@@ -372,29 +381,41 @@ public class DefaultSiliconBeing : SiliconBeingBase
     /// </summary>
     private bool IsAIClientConfigChanged()
     {
-        // If both are null, no change
-        if (AIClientConfig == null && BackupAIClientConfig == null)
-            return false;
-        
-        // If one is null and the other is not, changed
-        if (AIClientConfig == null || BackupAIClientConfig == null)
+        // Check if the effective AI client type has changed
+        string currentEffectiveType = ResolveEffectiveAIClientType(AIClientType);
+        if (currentEffectiveType != BackupEffectiveAIClientType)
             return true;
         
-        // Compare dictionary size
-        if (AIClientConfig.Count != BackupAIClientConfig.Count)
-            return true;
-        
-        // Compare each key-value pair
-        foreach (var kvp in AIClientConfig)
+        // Check being-level config changes
+        if (AIClientConfig != null && AIClientConfig.Count > 0)
         {
-            if (!BackupAIClientConfig.TryGetValue(kvp.Key, out var backupValue))
-                return true;
-            
-            if (!object.Equals(kvp.Value, backupValue))
-                return true;
+            // Being has independent config, compare with backup
+            return !AreDictionariesEqual(AIClientConfig, BackupAIClientConfig);
         }
         
-        return false;
+        // Being uses global config, check if global config has changed
+        var globalConfig = Config.Instance?.Data?.AIConfig;
+        return !AreDictionariesEqual(globalConfig, BackupGlobalAIConfig);
+    }
+    
+    /// <summary>
+    /// Deep compares two dictionaries for equality
+    /// </summary>
+    private static bool AreDictionariesEqual(Dictionary<string, object>? a, Dictionary<string, object>? b)
+    {
+        if (a == null && b == null) return true;
+        if (a == null || b == null) return false;
+        if (a.Count != b.Count) return false;
+        
+        foreach (var kvp in a)
+        {
+            if (!b.TryGetValue(kvp.Key, out var bValue))
+                return false;
+            if (!object.Equals(kvp.Value, bValue))
+                return false;
+        }
+        
+        return true;
     }
     
     /// <summary>
@@ -449,13 +470,39 @@ public class DefaultSiliconBeing : SiliconBeingBase
     /// </summary>
     private IAIClientFactory GetAIClientFactory()
     {
-        string clientType = AIClientType ?? Config.Instance?.Data?.AIClientType ?? "OllamaClient";
+        string clientType = NormalizeClientType(
+            ResolveEffectiveAIClientType());
         
         return clientType switch
         {
             "OllamaClient" => new OllamaClientFactory(),
-            // Future: can extend to support other client types
+            "DashScopeClient" => new DashScopeClientFactory(),
             _ => new OllamaClientFactory()
         };
+    }
+    
+    /// <summary>
+    /// Resolves the effective AI client type, falling through empty strings and nulls.
+    /// Priority: being's own type → global config type → default "OllamaClient".
+    /// </summary>
+    private static string ResolveEffectiveAIClientType(string? beingType = null)
+    {
+        if (!string.IsNullOrEmpty(beingType))
+            return beingType;
+        var globalType = Config.Instance?.Data?.AIClientType;
+        if (!string.IsNullOrEmpty(globalType))
+            return globalType;
+        return "OllamaClient";
+    }
+    
+    /// <summary>
+    /// Normalizes client type string by stripping "Factory" suffix if present.
+    /// Config may store "DashScopeClientFactory" but factory switch expects "DashScopeClient".
+    /// </summary>
+    private static string NormalizeClientType(string clientType)
+    {
+        if (clientType.EndsWith("Factory"))
+            return clientType.Substring(0, clientType.Length - 7);
+        return clientType;
     }
 }

@@ -1,6 +1,6 @@
 # 开发路线
 
-[English](../../roadmap.md) | [繁體中文](../zh-HK/roadmap.md)
+[English](../../roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [日本語](../ja-JP/roadmap.md)
 
 ## 指导原则
 
@@ -219,10 +219,14 @@
 | 10.5.8 | DiskTool 增强 | 新增操作：count_lines、read_lines、clear_file、replace_lines、replace_text、replace_text_all、list_drives |
 | 10.5.9 | SystemTool 增强 | 新增操作：find_process（支持通配符）、resource_usage |
 | 10.5.10 | CalendarTool 增强 | 新增操作：diff、list_calendars、get_components、get_now_components、convert（跨历法转换） |
+| 10.5.11 | DashScopeClient | 阿里云百炼 AI 客户端，OpenAI 兼容 API。支持流式输出、工具调用、思维链推理内容 |
+| 10.5.12 | DashScopeClientFactory | DashScope 客户端工厂。通过 API 动态发现模型。多地域支持（北京、弗吉尼亚、新加坡、香港、法兰克福） |
+| 10.5.13 | AI 客户端配置系统 | 硅基人级别的 AI 客户端配置。动态配置键选项（模型、地域）。本地化显示名称 |
+| 10.5.14 | 本地化扩展 | 中文、繁体中文、英文、日文的 DashScope 配置选项、模型名称、地域名称本地化 |
 
-**阶段产出**：增强的工具集、可观测性和历法覆盖。
+**阶段产出**：增强的工具集、可观测性、历法覆盖和多 AI 后端支持。
 
-**验证方式**：主理人通过 TokenAuditTool 查询 Token 用量 → 审计仪表盘显示趋势 → CalendarTool 跨 32 种历法转换日期。
+**验证方式**：主理人通过 TokenAuditTool 查询 Token 用量 → 审计仪表盘显示趋势 → CalendarTool 跨 32 种历法转换日期 → 切换 AI 后端为 DashScope → 通过云端 API 与千问模型对话。
 
 ---
 
