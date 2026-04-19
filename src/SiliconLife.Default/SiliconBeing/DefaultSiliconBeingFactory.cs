@@ -21,7 +21,7 @@ namespace SiliconLife.Default;
 /// </summary>
 public class DefaultSiliconBeingFactory : ISiliconBeingFactory
 {
-    private readonly IAIClient _aiClient;
+    private readonly Dictionary<string, object> _globalAIConfig;
     private readonly IStorage _storage;
     private readonly ITimeStorage _timeStorage;
     private readonly string _dataDirectory;
@@ -31,15 +31,15 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     /// <summary>
     /// Initializes a new instance of the DefaultSiliconBeingFactory class
     /// </summary>
-    /// <param name="aiClient">The AI client to use for created beings</param>
+    /// <param name="globalAIConfig">The global AI configuration for beings without independent config</param>
     /// <param name="storage">The storage instance to use</param>
     /// <param name="dataDirectory">The base data directory</param>
     public DefaultSiliconBeingFactory(
-        IAIClient aiClient,
+        Dictionary<string, object> globalAIConfig,
         IStorage storage,
         ITimeStorage timeStorage,
         string dataDirectory)
-        : this(aiClient, storage, timeStorage, dataDirectory, null, null)
+        : this(globalAIConfig, storage, timeStorage, dataDirectory, null, null)
     {
     }
 
@@ -47,14 +47,14 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     /// Initializes a new instance with permission components
     /// </summary>
     public DefaultSiliconBeingFactory(
-        IAIClient aiClient,
+        Dictionary<string, object> globalAIConfig,
         IStorage storage,
         ITimeStorage timeStorage,
         string dataDirectory,
         IPermissionCallback? permissionCallback,
         IPermissionAskHandler? askHandler)
     {
-        _aiClient = aiClient;
+        _globalAIConfig = globalAIConfig;
         _storage = storage;
         _timeStorage = timeStorage;
         _dataDirectory = dataDirectory;
@@ -127,13 +127,23 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
 
         DefaultSiliconBeing being = new(id, name);
         being.BeingDirectory = beingDirectory;
-        being.AIClient = _aiClient;
         being.SoulContent = soulContent;
 
-        // Load or save state — the being manages its own data
+        // Load or save state — the being manages its own data (includes AI config)
         if (!being.LoadState() && !string.IsNullOrEmpty(name))
         {
             being.SaveState();
+        }
+        
+        // Create AI client for this being based on its configuration
+        try
+        {
+            being.AIClient = CreateAIClientForBeing(being);
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't block being creation; will retry on next tick
+            Console.WriteLine($"[WARN] Being {name}: failed to create AI client, will retry on next tick. Error: {ex.Message}");
         }
 
         // Create and configure ToolManager for this being
@@ -182,5 +192,54 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         being.TimerSystem = new TimerSystem(being, beingStorage, resolver, converter, pendingChecker);
 
         return being;
+    }
+    
+    /// <summary>
+    /// Creates an AI client for a being based on its configuration
+    /// </summary>
+    private IAIClient CreateAIClientForBeing(DefaultSiliconBeing being)
+    {
+        // Determine which config to use
+        Dictionary<string, object> configToUse;
+        string clientType;
+        
+        if (being.AIClientConfig != null && being.AIClientConfig.Count > 0)
+        {
+            // Has independent config, use being's config
+            configToUse = being.AIClientConfig;
+            clientType = being.AIClientType ?? Config.Instance?.Data?.AIClientType ?? "OllamaClient";
+        }
+        else
+        {
+            // No independent config, use global config
+            configToUse = _globalAIConfig;
+            clientType = Config.Instance?.Data?.AIClientType ?? "OllamaClient";
+        }
+        
+        if (configToUse == null || configToUse.Count == 0)
+        {
+            throw new InvalidOperationException($"Being {being.Name}: no AI config available");
+        }
+        
+        // Create factory based on client type
+        IAIClientFactory factory = CreateFactoryByType(clientType);
+        
+        // Create client using factory
+        IAIClient client = factory.CreateClient(configToUse);
+        
+        return client;
+    }
+    
+    /// <summary>
+    /// Creates an AI client factory based on client type
+    /// </summary>
+    private IAIClientFactory CreateFactoryByType(string clientType)
+    {
+        return clientType switch
+        {
+            "OllamaClient" => new OllamaClientFactory(),
+            // Future: can extend to support other client types
+            _ => throw new NotSupportedException($"AI client type '{clientType}' is not supported")
+        };
     }
 }

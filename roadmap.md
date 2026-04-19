@@ -226,27 +226,27 @@ Every phase ends with a **runnable, observable** system. No phase produces "a pi
 
 ---
 
-## Phase 11: External IM
+## Phase 11: External IM Integration
 
-**Goal**: Connect to external messaging platforms.
+**Goal**: Connect to external messaging platforms for broader user accessibility.
 
 | # | Module | Description |
 |---|--------|-------------|
-| 11.1 | FeishuProvider | Feishu (Lark) bot integration |
+| 11.1 | FeishuProvider | Feishu (Lark) bot integration with card support |
 | 11.2 | WhatsAppProvider | WhatsApp Business API integration |
-| 11.3 | TelegramProvider | Telegram Bot API integration |
-| 11.4 | IMManager enhancement | Multi-provider routing, unified message format |
+| 11.3 | TelegramProvider | Telegram Bot API integration with inline keyboards |
+| 11.4 | IMManager enhancement | Multi-provider routing, unified message format, permission ask handling across platforms |
 
 **Deliverable**: Users can interact with Silicon Beings via external IM platforms.
 
 ---
 
-## Phase 12: Extras
+## Phase 12: Advanced Features
 
-**Goal**: Optional advanced features.
+**Goal**: Optional advanced features for enhanced capabilities.
 
 | # | Module | Description |
 |---|--------|-------------|
-| 12.1 | Knowledge Network | Shared knowledge graph using triple structure |
-| 12.2 | Plugin system | External plugin loading with security checks |
-| 12.3 | Skills ecosystem | Reusable skill marketplace |
+| 12.1 | Knowledge Network | Shared knowledge graph using triple structure (subject-predicate-object) |
+| 12.2 | Plugin system | External plugin loading with security checks and sandboxing |
+| 12.3 | Skills ecosystem | Reusable skill marketplace for being capabilities |

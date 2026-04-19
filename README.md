@@ -1,8 +1,6 @@
 # Silicon Life Collective
 
-**⚠️ WARNING: Dynamic compilation has not been thoroughly tested, but it does work. Templates must be added in the code for it to function properly.**
-
-**⚠️ WARNING: Web UI is in rapid adjustment period, page functionality may not work properly.**
+**⚠️ WARNING: Dynamic compilation works but requires code templates to function properly. Thorough testing is ongoing.**
 
 A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Beings** self-evolve through Roslyn dynamic compilation.
 
@@ -23,9 +21,11 @@ A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Bei
 - **Zero Database Dependency** — File-based storage (JSON) with time-indexed queries via `ITimeStorage`
 - **Localization** — Built-in Chinese (Simplified & Traditional) and English support
 - **Web UI** — Built-in HTTP server with SSE support, multiple skins, and comprehensive dashboard
-  - **Skin System** — 4 built-in skins (Admin, Chat, Creative, Dev) with complete UI component library
+  - **Skin System** — 4 built-in skins (Admin, Chat, Creative, Dev) with pluggable ISkin interface and auto-discovery
   - **17 Controllers** — About, Audit, Being, Chat, CodeBrowser, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer
-  - **Real-time Updates** — SSE (Server-Sent Events) for live data streaming
+  - **Real-time Updates** — SSE (Server-Sent Events) for chat messages, being status, and system events
+  - **HTML/CSS/JS Builders** — Server-side markup generation via `H`, `CssBuilder`, and `JsBuilder` (zero frontend framework dependency)
+  - **Localization** — Three built-in locales (zh-CN, zh-HK, en-US) with LocalizationManager resolution
 
 ## Tech Stack
 
@@ -154,8 +154,8 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] Phase 9: CoreHost + multi-agent collaboration
 - [x] Phase 10: Web UI (HTTP + SSE, 17 controllers, 4 skins)
 - [x] Phase 10.5: Incremental enhancements (BroadcastChannel, TokenAudit, 32 calendars, tool enhancements)
-- [ ] Phase 11: External IM (Feishu / WhatsApp / Telegram)
-- [ ] Phase 12: Knowledge graph, plugins, and extras
+- [ ] Phase 11: External IM integration (Feishu / WhatsApp / Telegram)
+- [ ] Phase 12: Knowledge graph, plugin system, and skills ecosystem
 
 ## Documentation
 

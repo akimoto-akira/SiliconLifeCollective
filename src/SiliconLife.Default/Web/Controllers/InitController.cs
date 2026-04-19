@@ -86,8 +86,11 @@ public class InitController : Controller
         ).Class("form-group"));
 
         form.Add(H.Create("div",
-            H.Create("label", _localization.InitEndpointLabel).Attr("for", "ollamaEndpoint")
+            H.Create("label", _localization.InitAIClientTypeLabel).Attr("for", "aiClientType"),
+            H.Create("select", GetAIClientTypeOptions()).Attr("name", "aiClientType").Attr("id", "aiClientTypeSelect").Attr("onchange", "onClientTypeChange(this.value)")
         ).Class("form-group"));
+
+        form.Add(H.Create("div", H.Create("div").Attr("id", "aiConfigFields")).Attr("id", "aiConfigContainer").Class("form-group"));
 
         BuildDataDirectoryFormGroup(form);
 
@@ -213,6 +216,66 @@ public class InitController : Controller
         ).Class("form-group"));
     }
 
+    private object[] GetAIClientTypeOptions()
+    {
+        // 通过反射自动发现所有实现了IAIClientFactory的类型
+        var factoryTypes = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes())
+            .Where(type => typeof(IAIClientFactory).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+            .ToList();
+
+        var options = new List<object>();
+        foreach (var type in factoryTypes)
+        {
+            try
+            {
+                // 创建工厂实例获取元数据
+                var factory = (IAIClientFactory)Activator.CreateInstance(type)!;
+                var typeName = type.Name.Replace("Factory", ""); // OllamaClientFactory -> OllamaClient
+                
+                // 直接使用当前_localization获取本地化显示名称
+                var displayName = _localization.GetConfigDisplayName(typeName) ?? typeName;
+                
+                options.Add(H.Create("option", displayName).Attr("value", type.Name));
+            }
+            catch
+            {
+                // 跳过无法实例化的类型
+            }
+        }
+
+        // 设置当前选中项
+        var currentType = _configData.AIClientType ?? (options.FirstOrDefault() as System.Xml.Linq.XElement)?.Attribute("value")?.Value;
+        if (!string.IsNullOrEmpty(currentType))
+        {
+            foreach (var opt in options.OfType<System.Xml.Linq.XElement>())
+            {
+                if (opt.Attribute("value")?.Value == currentType)
+                {
+                    opt.SetAttributeValue("selected", "selected");
+                    break;
+                }
+            }
+        }
+
+        return options.ToArray();
+    }
+
+    private IAIClientFactory CreateFactoryByType(string clientType)
+    {
+        // 通过反射动态创建工厂实例
+        var factoryType = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes())
+            .FirstOrDefault(type => type.Name == clientType && typeof(IAIClientFactory).IsAssignableFrom(type));
+
+        if (factoryType == null)
+        {
+            throw new NotSupportedException($"AI client factory type '{clientType}' not found");
+        }
+
+        return (IAIClientFactory)Activator.CreateInstance(factoryType)!;
+    }
+
     private void HandleBrowse()
     {
         var dir = GetQueryValue("dir");
@@ -307,10 +370,17 @@ public class InitController : Controller
             return;
         }
 
-        var endpoint = form.GetValueOrDefault("ollamaEndpoint", "").Trim();
-        if (!string.IsNullOrEmpty(endpoint))
+        var aiClientType = form.GetValueOrDefault("aiClientType", "OllamaClient").Trim();
+        _configData.AIClientType = string.IsNullOrEmpty(aiClientType) ? "OllamaClient" : aiClientType;
+
+        // 动态保存AI配置字段（以ai_开头的字段）
+        foreach (var kvp in form)
         {
-            _configData.OllamaEndpoint = endpoint;
+            if (kvp.Key.StartsWith("ai_") && kvp.Value.Length > 0)
+            {
+                var configKey = kvp.Key.Substring(3); // 去掉"ai_"前缀
+                _configData.AIConfig[configKey] = kvp.Value.Trim();
+            }
         }
 
         var skin = form.GetValueOrDefault("webSkin", "").Trim();
@@ -471,6 +541,92 @@ public class InitController : Controller
             .Add(() => Js.Const(() => "selectedLang", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "languageSelect")).Prop(() => "value")))
             .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "location").Prop(() => "href"), () => Js.Str(() => "/init?lang=").Op(() => "+", () => (JsSyntax)Js.Id(() => "selectedLang"))));
         js.Add(() => Js.Func(() => "applyLanguage", () => new List<string>(), () => applyLangBody));
+
+        // AI客户端类型切换逻辑 - 动态发现所有工厂
+        var aiConfigData = Js.Obj();
+        
+        // 获取当前语言（从_localization.LanguageCode反推，需去掉短横线）
+        var currentLanguage = Enum.TryParse<Language>(_localization.LanguageCode.Replace("-", ""), ignoreCase: true, out var lang) 
+            ? lang 
+            : _configData.Language; // 如果解析失败，使用配置文件中的语言
+        
+        // 通过反射获取所有工厂类型并生成元数据
+        var allFactoryTypes = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes())
+            .Where(type => typeof(IAIClientFactory).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+            .ToList();
+        
+        foreach (var factoryType in allFactoryTypes)
+        {
+            try
+            {
+                var factory = (IAIClientFactory)Activator.CreateInstance(factoryType)!;
+                // 传递当前语言给工厂
+                var metadata = factory.GetConfigKeysMetadata(currentLanguage);
+                var configObj = Js.Obj();
+                foreach (var kvp in metadata)
+                {
+                    // kvp.Value 已经是工厂返回的已本地化文本
+                    configObj.Prop(() => kvp.Key, () => Js.Str(() => kvp.Value));
+                }
+                aiConfigData.Prop(() => factoryType.Name, () => configObj);
+            }
+            catch
+            {
+                // 跳过无法实例化的工厂
+            }
+        }
+        
+        js.Add(() => Js.Const(() => "aiConfigMetadata", () => aiConfigData));
+
+        // getCurrentAIConfigValues 函数
+        var getCurrentValuesBody = Js.Block()
+            .Add(() => Js.Const(() => "values", () => Js.Obj()))
+            .Add(() => Js.Const(() => "inputs", () => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => "#aiConfigFields input"))))
+            .Add(() => Js.Id(() => "inputs").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "input" }, () => Js.Block()
+                .Add(() => Js.Assign(() => Js.Id(() => "values").Index(() => Js.Id(() => "input").Prop(() => "name").Call(() => "substring", () => Js.Str(() => "3"))), () => Js.Id(() => "input").Prop(() => "value")))
+            )))
+            .Add(() => Js.Return(() => Js.Id(() => "values")));
+        js.Add(() => Js.Func(() => "getCurrentAIConfigValues", () => new List<string>(), () => getCurrentValuesBody));
+
+        // onClientTypeChange 函数
+        var onClientTypeChangeBody = Js.Block()
+            .Add(() => Js.Const(() => "currentValues", () => Js.Id(() => "getCurrentAIConfigValues").Invoke()))
+            .Add(() => Js.Const(() => "metadata", () => Js.Id(() => "aiConfigMetadata").Index(() => Js.Id(() => "clientType"))))
+            .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "aiConfigFields"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Str(() => "")));
+        
+        // forEach循环体
+        var forEachBody = Js.Block()
+            .Add(() => Js.Const(() => "label", () => Js.Id(() => "metadata").Index(() => Js.Id(() => "key"))))
+            .Add(() => Js.Const(() => "value", () => Js.Id(() => "currentValues").Index(() => Js.Id(() => "key")).Op(() => "||", () => (JsSyntax)Js.Str(() => ""))))
+            .Add(() => Js.Const(() => "div", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "ai-config-field")))
+            .Add(() => Js.Const(() => "labelEl", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "label"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "labelEl").Prop(() => "htmlFor"), () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "labelEl").Prop(() => "textContent"), () => Js.Id(() => "label")))
+            .Add(() => Js.Const(() => "input", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "input"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "type"), () => Js.Str(() => "text")))
+            .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "name"), () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "id"), () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "placeholder"), () => Js.Id(() => "label")))
+            .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "value"), () => Js.Id(() => "value")))
+            .Add(() => Js.Id(() => "div").Call(() => "appendChild", () => Js.Id(() => "labelEl")))
+            .Add(() => Js.Id(() => "div").Call(() => "appendChild", () => Js.Id(() => "input")))
+            .Add(() => Js.Id(() => "container").Call(() => "appendChild", () => Js.Id(() => "div")));
+        
+        onClientTypeChangeBody.Add(() => Js.Id(() => "Object").Call(() => "keys", () => Js.Id(() => "metadata")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "key" }, () => forEachBody)));
+        
+        js.Add(() => Js.Func(() => "onClientTypeChange", () => new List<string> { "clientType" }, () => onClientTypeChangeBody));
+
+        // 页面加载时初始化
+        var initBody = Js.Block()
+            .Add(() => Js.Const(() => "initialType", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "aiClientTypeSelect")).Prop(() => "value")))
+            .Add(() => Js.Id(() => "onClientTypeChange").Invoke(() => Js.Id(() => "initialType")).Stmt());
+        js.Add(() => Js.Id(() => "window").Prop(() => "addEventListener").Invoke(
+            () => Js.Str(() => "load"),
+            () => Js.Arrow(() => new List<string>(), () => initBody)
+        ));
 
         return js;
     }
@@ -838,6 +994,30 @@ public class InitController : Controller
             .EndSelector()
             .Selector(".lang-switch-btn:hover")
                 .Property("background", "rgba(51, 65, 85, 0.9)")
+            .EndSelector()
+            .Selector(".ai-config-field")
+                .Property("margin-bottom", "12px")
+            .EndSelector()
+            .Selector(".ai-config-field label")
+                .Property("display", "block")
+                .Property("font-size", "13px")
+                .Property("font-weight", "500")
+                .Property("color", "#cbd5e1")
+                .Property("margin-bottom", "4px")
+            .EndSelector()
+            .Selector(".ai-config-field input")
+                .Property("width", "100%")
+                .Property("padding", "10px 14px")
+                .Property("border", "1px solid rgba(148, 163, 184, 0.2)")
+                .Property("border-radius", "8px")
+                .Property("background", "rgba(15, 23, 42, 0.6)")
+                .Property("color", "#f1f5f9")
+                .Property("font-size", "14px")
+                .Property("outline", "none")
+                .Property("transition", "border-color 0.2s")
+            .EndSelector()
+            .Selector(".ai-config-field input:focus")
+                .Property("border-color", "#3b82f6")
             .EndSelector()
             .Build();
     }

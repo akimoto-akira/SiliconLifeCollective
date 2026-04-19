@@ -34,9 +34,43 @@ public abstract class SiliconBeingBase
     public IAIClient? AIClient { get; set; }
 
     /// <summary>
-    /// Gets or sets the soul content (system prompt) for this silicon being
+    /// Gets or sets the AI client type identifier (e.g., "OllamaClient", "OpenAIClient")
     /// </summary>
-    public string? SoulContent { get; set; }
+    public string? AIClientType { get; set; }
+
+    /// <summary>
+    /// Gets or sets the AI client configuration dictionary (free-form)
+    /// </summary>
+    public Dictionary<string, object>? AIClientConfig { get; set; }
+
+    /// <summary>
+    /// Gets or sets the backup AI client configuration dictionary (for change detection)
+    /// </summary>
+    protected Dictionary<string, object>? BackupAIClientConfig { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether this being is currently using a fallback AI client
+    /// </summary>
+    public bool IsUsingFallbackClient { get; set; }
+
+    /// <summary>
+    /// Gets or sets the soul content (system prompt) for this silicon being.
+    /// Automatically syncs with the soul file on disk when modified.
+    /// </summary>
+    public string? SoulContent
+    {
+        get => _soulContent;
+        set
+        {
+            _soulContent = value;
+            // Auto-save to disk when soul content is modified
+            if (!string.IsNullOrEmpty(BeingDirectory))
+            {
+                SoulFileManager.SaveSoul(BeingDirectory, value ?? string.Empty);
+            }
+        }
+    }
+    private string? _soulContent;
 
     /// <summary>
     /// Gets or sets the tool manager for this silicon being.
@@ -73,6 +107,12 @@ public abstract class SiliconBeingBase
     /// Each being holds its own TimerSystem instance.
     /// </summary>
     public TimerSystem? TimerSystem { get; set; }
+
+    /// <summary>
+    /// Gets or sets the data directory path for this silicon being.
+    /// Used for persisting soul file, state, memory, etc.
+    /// </summary>
+    public string? BeingDirectory { get; set; }
 
     /// <summary>
     /// Gets whether this silicon being is a curator (highest privilege level).

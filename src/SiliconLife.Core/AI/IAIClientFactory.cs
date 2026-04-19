@@ -19,10 +19,22 @@ namespace SiliconLife.Collective;
 public interface IAIClientFactory
 {
     /// <summary>
-    /// Creates an AI client instance based on the provided configuration
+    /// Creates an AI client instance based on the provided configuration dictionary
     /// </summary>
-    /// <param name="endpoint">The AI service endpoint URL</param>
-    /// <param name="defaultModel">The default model name</param>
+    /// <param name="config">Configuration dictionary with keys like "endpoint", "model", etc.</param>
     /// <returns>An AI client instance</returns>
-    IAIClient CreateClient(string endpoint, string defaultModel);
+    IAIClient CreateClient(Dictionary<string, object> config);
+    
+    /// <summary>
+    /// Gets the configuration keys metadata for this AI client type.
+    /// Used by Web UI to dynamically generate configuration form fields.
+    /// </summary>
+    /// <param name="language">The language to use for localized display labels</param>
+    /// <returns>Dictionary mapping config key to display label</returns>
+    /// <example>
+    /// Returns: { "endpoint" => "Ollama Endpoint", "model" => "Default Model" }
+    /// Config keys must not contain "." character.
+    /// Display labels are already localized based on the provided language.
+    /// </example>
+    Dictionary<string, string> GetConfigKeysMetadata(Language language);
 }

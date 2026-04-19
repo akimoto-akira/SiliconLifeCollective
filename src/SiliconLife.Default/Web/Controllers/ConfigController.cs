@@ -180,6 +180,26 @@ public class ConfigController : Controller
                     return;
                 }
             }
+            else if (propType.IsGenericType && propType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            {
+                // Handle Dictionary type - value should be JSON string
+                try
+                {
+                    var dictType = typeof(Dictionary<string, object>);
+                    value = System.Text.Json.JsonSerializer.Deserialize(data.value, dictType);
+                    
+                    if (value == null)
+                    {
+                        RenderJson(new { success = false, message = _loc.ConfigErrorInvalidRequest });
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorSaveFailed, $"JSON parse error: {ex.Message}") });
+                    return;
+                }
+            }
             else
             {
                 RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorUnsupportedType, propType.Name) });
@@ -238,6 +258,7 @@ public class ConfigController : Controller
                 Guid guid => guid.ToString(),
                 TimeSpan ts => ts.ToString(),
                 DateTime dt => dt.ToString("O"),
+                System.Collections.IDictionary dict => System.Text.Json.JsonSerializer.Serialize(dict),
                 null => null,
                 _ => value.ToString()
             };
@@ -370,6 +391,13 @@ public class ConfigController : Controller
         if (type == typeof(DateTime)) return "datetime";
         if (type == typeof(System.IO.DirectoryInfo)) return "directory";
         if (type.IsEnum) return "enum";
+        
+        // Check for Dictionary type (any generic parameters)
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+        {
+            return "dictionary";
+        }
+        
         return type.Name.ToLower();
     }
 

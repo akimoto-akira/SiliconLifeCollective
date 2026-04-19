@@ -310,7 +310,11 @@ public class CalendarTool : ITool
 
     // ── helpers ───────────────────────────────────────────────────────────────
 
-    private static DefaultLocalizationBase GetLocalization()
+    /// <summary>
+    /// Gets the current localization provider for calendar systems.
+    /// </summary>
+    /// <returns>The DefaultLocalizationBase instance for the current language.</returns>
+    public static DefaultLocalizationBase GetLocalization()
     {
         Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
         if (LocalizationManager.Instance.TryGetLocalization(language, out var loc) &&

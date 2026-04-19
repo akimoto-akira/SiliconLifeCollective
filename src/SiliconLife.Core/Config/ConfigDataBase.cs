@@ -88,6 +88,19 @@ public abstract class ConfigDataBase
     public abstract string UserNickname { get; set; }
 
     /// <summary>
+    /// Gets or sets the AI client type to use (e.g., "OllamaClient", "OpenAIClient")
+    /// </summary>
+    [ConfigGroup("AI", Order = 0, DisplayNameKey = "AIClientType", DescriptionKey = "AIClientType")]
+    public abstract string AIClientType { get; set; }
+
+    /// <summary>
+    /// Gets or sets the global AI client configuration dictionary.
+    /// Used when silicon beings don't have their own AI config.
+    /// </summary>
+    [ConfigGroup("AI", Order = 1, DisplayNameKey = "AIConfig", DescriptionKey = "AIConfigDescription")]
+    public abstract Dictionary<string, object> AIConfig { get; set; }
+
+    /// <summary>
     /// Gets the configuration file path
     /// </summary>
     /// <returns>The full path to the configuration file</returns>

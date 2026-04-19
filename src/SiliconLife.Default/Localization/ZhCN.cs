@@ -242,6 +242,9 @@ public class ZhCN : DefaultLocalizationBase
     public override string InitNicknamePlaceholder => "请输入你的昵称";
     public override string InitEndpointLabel => "AI API 端点";
     public override string InitEndpointPlaceholder => "例如: http://localhost:11434";
+    public override string InitAIClientTypeLabel => "AI 客户端类型";
+    public override string InitModelLabel => "默认模型";
+    public override string InitModelPlaceholder => "例如: qwen3.5:cloud";
     public override string InitSkinLabel => "皮肤";
     public override string InitSkinPlaceholder => "留空使用默认皮肤";
     public override string InitDataDirectoryLabel => "数据目录";
@@ -332,8 +335,106 @@ public class ZhCN : DefaultLocalizationBase
 
     // ===== Permission Page Localization =====
 
-    public override string PermissionPageHeader => "权限管理";
+    public override string PermissionPageHeader => "权限管理 - {0}";
     public override string PermissionEmptyState => "暂无权限规则";
+    public override string PermissionMissingBeingId => "缺少硅基人ID参数";
+    public override string PermissionBeingNotFound => "硅基人不存在";
+    public override string PermissionTemplateHeader => "默认权限回调模板";
+    public override string PermissionTemplateDescription => "保存后覆盖默认行为，清空后恢复默认";
+    public override string PermissionCallbackClassSummary => "默认权限回调实现。";
+    public override string PermissionCallbackClassSummary2 => "域名特定权限规则，完全符合 dpf.txt 规范。\n/// 覆盖：网络（白名单/黑名单/IP 范围）、命令行（跨平台）、\n/// 文件访问（危险扩展名、系统目录、用户目录）和回退默认值。";
+    public override string PermissionCallbackConstructorSummary => "创建带有应用数据目录的 DefaultPermissionCallback。";
+    public override string PermissionCallbackConstructorSummary2 => "应用数据目录用于：\n    /// - 阻止访问数据目录（除了自己的 Temp 子文件夹）\n    /// - 为 Temp 允许规则派生每个硅基人的数据目录";
+    public override string PermissionCallbackConstructorParam => "全局应用数据目录路径";
+    public override string PermissionCallbackEvaluateSummary => "使用默认规则（dpf.txt 规范）评估权限请求。";
+    public override string PermissionRuleOtherTypesDefault => "其他权限类型默认放行";
+
+    private static readonly Dictionary<string, string> PermissionRuleComments = new()
+    {
+        // Evaluate 方法
+        ["NetRuleNetworkAccess"] = "网络操作放行规则",
+        ["NetRuleCommandLine"] = "命令行规则（跨平台）",
+        ["NetRuleFileAccess"] = "文件访问规则（跨平台）",
+        // 网络规则
+        ["NetRuleNoProtocol"] = "不包含协议名（无冒号），无法判断来源，询问用户",
+        ["NetRuleLoopback"] = "本地回环地址放行（localhost / 127.0.0.1 / ::1）",
+        ["NetRulePrivateIPMatch"] = "内网 IP 地址段匹配（先验证是否为合法 IPv4 地址）",
+        ["NetRulePrivateC"] = "内网C类地址放行（192.168.0.0/16）",
+        ["NetRulePrivateA"] = "内网A类地址放行（10.0.0.0/8）",
+        ["NetRulePrivateB"] = "内网B类地址选择性放行（172.16.0.0/12，即 172.16.* ~ 172.31.*）",
+        ["NetRuleDomainWhitelist1"] = "允许访问的外部域名白名单 — 谷歌 / 必应 / 腾讯系 / 搜狗 / DuckDuckGo / Yandex / 微信 / 阿里系",
+        ["NetRuleVideoPlatforms"] = "哔哩哔哩 / niconico / Acfun / 抖音 / TikTok / 快手 / 小红书",
+        ["NetRuleAIServices"] = "AI 服务 — OpenAI / Anthropic / HuggingFace / Ollama / 通义千问 / Kimi / 豆包 / 剪映 / Trae IDE",
+        ["NetRulePhishingBlacklist"] = "钓鱼/仿冒网站黑名单（关键词模糊匹配）",
+        ["NetRulePhishingAI"] = "AI 仿冒站",
+        ["NetRuleMaliciousAI"] = "恶意 AI 工具",
+        ["NetRuleAdversarialAI"] = "对抗性 AI / 提示词越狱 / LLM 攻击站点",
+        ["NetRuleAIContentFarm"] = "AI 内容农场 / AI 垃圾内容",
+        ["NetRuleAIBlackMarket"] = "AI 数据黑市 / API 密钥黑市 / LLM 权重贩卖",
+        ["NetRuleAIFakeScam"] = "AI 仿冒/诈骗通用关键词",
+        ["NetRuleOtherBlacklist"] = "其他黑名单站点 — sakura-cat: 不应被AI访问 / 4399: 游戏内混杂病毒",
+        ["NetRuleSecuritiesTrading"] = "证券交易平台（需询问用户）— 华泰证券 / 国泰君安 / 中信证券 / 招商证券 / 广发证券 / 海通证券 / 申万宏源 / 东方证券 / 国信证券 / 兴业证券",
+        ["NetRuleThirdPartyTrading"] = "第三方交易平台（需询问用户）— 同花顺 / 东方财富 / 通达信 / Bloomberg / Yahoo Finance",
+        ["NetRuleStockExchanges"] = "证券交易所（仅行情）— 上海证券交易所 / 深圳证券交易所 / 巨潮资讯网",
+        ["NetRuleFinancialNews"] = "财经资讯（仅行情）— 金融界 / 证券之星 / 和讯网",
+        ["NetRuleInvestCommunity"] = "投资社区（仅资讯）— 雪球 / 财联社 / 开盘啦 / 淘股吧",
+        ["NetRuleDevServices"] = "开发者服务 — GitHub / Gitee / StackOverflow / npm / NuGet / PyPI / 微软",
+        ["NetRuleGameEngines"] = "游戏引擎 — Unity / 虚幻引擎 / Epic Games / Fab资源商店",
+        ["NetRuleGamePlatforms"] = "游戏平台 — Steam 需询问用户，EA / Ubisoft / Blizzard / Nintendo 允许",
+        ["NetRuleSEGA"] = "世嘉(SEGA，日本)",
+        ["NetRuleCloudServices"] = "全球云服务平台 — Azure / Google Cloud / DigitalOcean / Heroku / Vercel / Netlify",
+        ["NetRuleDevDeployTools"] = "全球开发与部署工具 — GitLab / Bitbucket / Docker / Cloudflare",
+        ["NetRuleCloudDevTools"] = "云服务与开发工具 — 亚马逊 / AWS / Kiro IDE / CodeBuddy IDE / JetBrains / 纯光工作室 / W3School中文",
+        ["NetRuleChinaSocialNews"] = "社交/资讯（中国大陆）— 微博 / 知乎 / 网易 / 新浪 / 凤凰网 / 新华社 / 中央电视台",
+        ["NetRuleTaiwanMediaCTI"] = "中国台湾媒体 — 中天新闻网(中天电视台)",
+        ["NetRuleTaiwanMediaSET"] = "三立新闻网(三立民视) — 需询问用户",
+        ["NetRuleTaiwanWIN"] = "网络内容防护机构(中国台湾，有拦截风险) — 禁止",
+        ["NetRuleJapanMedia"] = "日本媒体 — NHK(日本放送协会)",
+        ["NetRuleRussianMedia"] = "俄罗斯媒体 — 俄罗斯卫星通讯社(各国站点)",
+        ["NetRuleKoreanMedia"] = "韩国媒体 — KBS / MBC / SBS / EBS",
+        ["NetRuleDPRKMedia"] = "朝鲜媒体 — 我的国家 / 劳动新闻 / 青年前卫 / 朝鲜之声 / 平壤时报 / 朝鲜新报",
+        ["NetRuleGovWebsites"] = "各国政府网站（通配 .gov 域名）",
+        ["NetRuleGlobalSocialCollab"] = "全球社交协作平台 — Reddit / Discord / Slack / Notion / Figma / Dropbox",
+        ["NetRuleOverseasSocial"] = "海外社交/直播（需询问用户）— Twitch / Facebook / X / Gmail / Instagram / lit.link",
+        ["NetRuleWhatsApp"] = "WhatsApp(Meta) — 允许",
+        ["NetRuleThreads"] = "Threads(Meta) — 禁止",
+        ["NetRuleGlobalVideoMusic"] = "全球视频/音乐平台 — Spotify / Apple Music / Vimeo",
+        ["NetRuleVideoMedia"] = "视频/媒体 — YouTube / 爱奇艺 / 优酷",
+        ["NetRuleMaps"] = "地图 — 开放街道地图",
+        ["NetRuleEncyclopedia"] = "百科 — 维基百科 / MediaWiki / 知识共享(CC)",
+        ["NetRuleUnmatched"] = "未匹配的网络访问，询问用户",
+        // 命令行规则
+        ["CmdRuleSeparatorDetect"] = "检测管道符和多命令分隔符，拆分逐条验证",
+        ["CmdRuleWinAllow"] = "Windows 允许：只读/查询类命令 — dir / tree / tasklist / ipconfig / ping / tracert / systeminfo / whoami / set / path / sc query / findstr",
+        ["CmdRuleWinDeny"] = "Windows 禁止：危险/破坏性命令 — del / rmdir / format / diskpart / reg delete",
+        ["CmdRuleLinuxAllow"] = "Linux 允许：只读/查询类命令 — ls / tree / ps / top / ifconfig / ip / ping / traceroute / uname / whoami / env / cat / grep / find / df / du / systemctl status",
+        ["CmdRuleLinuxDeny"] = "Linux 禁止：危险/破坏性命令 — rm / rmdir / mkfs / fdisk / dd / chmod / chown / chgrp",
+        ["CmdRuleMacAllow"] = "macOS 允许：只读/查询类命令 — ls / tree / ps / top / ifconfig / ping / traceroute / system_profiler / sw_vers / whoami / env / cat / grep / find / df / du / launchctl list",
+        ["CmdRuleMacDeny"] = "macOS 禁止：危险/破坏性命令 — rm / rmdir / diskutil erasedisk / dd / chmod / chown / chgrp",
+        ["CmdRuleUnmatched"] = "未匹配的命令，询问用户",
+        // 文件访问规则
+        ["FileRuleDangerousExt"] = "最高优先级：危险文件扩展名直接拒绝",
+        ["FileRuleInvalidPath"] = "无法解析为绝对路径，询问用户",
+        ["FileRuleDenyAssemblyDir"] = "禁止：当前程序集目录",
+        ["FileRuleDenyAppDataDir"] = "禁止：应用数据目录",
+        ["FileRuleAllowOwnTemp"] = "但允许：自己的 Temp 目录",
+        ["FileRuleOwnTemp"] = "允许：自己的 Temp 目录",
+        ["FileRuleDenyOtherDataDir"] = "禁止：数据目录其他路径（包括其他硅基人的目录）",
+        ["FileRuleUserFolders"] = "允许：用户常用文件夹",
+        ["FileRuleUserFolderCheck"] = "用户常用文件夹 — 桌面 / 下载 / 文档 / 图片 / 音乐 / 视频",
+        ["FileRulePublicFolders"] = "允许：公用用户文件夹",
+        ["FileRuleWinDenySystem"] = "Windows 禁止：系统关键目录（不一定在C盘）",
+        ["FileRuleWinDenySystemCheck"] = "系统关键目录",
+        ["FileRuleLinuxDenySystem"] = "Linux 禁止：系统关键目录 — /etc /boot /sbin",
+        ["FileRuleMacDenySystem"] = "macOS 禁止：系统关键目录 — /System /Library /private/etc",
+        ["FileRuleUnmatched"] = "未匹配的路径，询问用户",
+    };
+
+    public override string GetPermissionRuleComment(string key)
+        => PermissionRuleComments.TryGetValue(key, out var value) ? value : key;
+
+    public override string PermissionRulesSection => "权限规则列表";
+    public override string PermissionEditorSection => "权限规则编辑器";
 
     // ===== Knowledge Page Localization =====
 
@@ -374,12 +475,17 @@ public class ZhCN : DefaultLocalizationBase
     public override string BeingsDetailStatusLabel => "状态：";
     public override string BeingsDetailCustomCompileLabel => "自定义编译：";
     public override string BeingsDetailSoulContentLabel => "灵魂内容：";
+    public override string BeingsDetailSoulContentEditLink => "编辑灵魂";
+    public override string BeingsBackToList => "返回列表";
+    public override string SoulEditorSubtitle => "编辑硅基生命的灵魂文件（Markdown 格式）";
     public override string BeingsDetailMemoryLabel => "记忆：";
     public override string BeingsDetailMemoryViewLink => "查看";
     public override string BeingsDetailPermissionLabel => "权限：";
     public override string BeingsDetailPermissionEditLink => "编辑";
-    public override string BeingsDetailTimersLabel => "定时器：";
+    public override string BeingsDetailTimersLabel => "计时器：";
     public override string BeingsDetailTasksLabel => "任务：";
+    public override string BeingsDetailAIClientLabel => "独立AI客户端：";
+    public override string BeingsDetailAIClientEditLink => "编辑";
     public override string BeingsYes => "是";
     public override string BeingsNo => "否";
     public override string BeingsNotSet => "未设置";
@@ -463,6 +569,12 @@ public class ZhCN : DefaultLocalizationBase
     public override string ConfigErrorUnsupportedType => "不支持的属性类型: {0}";
     public override string ConfigErrorSaveFailed => "保存失败: {0}";
     public override string ConfigSaveFailed => "保存失败：";
+    public override string ConfigDictionaryLabel => "字典";
+    public override string ConfigDictKeyLabel => "键：";
+    public override string ConfigDictValueLabel => "值：";
+    public override string ConfigDictAddButton => "添加";
+    public override string ConfigDictDeleteButton => "删除";
+    public override string ConfigDictEmptyMessage => "字典为空";
 
     public override string LogsPageHeader => "日志查询";
     public override string LogsTotalCount => "共 {0} 条日志";
@@ -526,8 +638,11 @@ public class ZhCN : DefaultLocalizationBase
         ["WatchdogTimeout"] = "看门狗超时",
         ["MinLogLevel"] = "最小日志级别",
         ["AIClientType"] = "AI 客户端类型",
+        ["OllamaClient"] = "Ollama 客户端",
         ["OllamaEndpoint"] = "Ollama 端点",
         ["DefaultModel"] = "默认模型",
+        ["Temperature"] = "温度",
+        ["MaxTokens"] = "最大 Token 数",
         ["WebPort"] = "Web 端口",
         ["AllowIntranetAccess"] = "允许内网访问",
         ["WebSkin"] = "Web 皮肤",
@@ -588,7 +703,8 @@ public class ZhCN : DefaultLocalizationBase
         ["memory"] = "记忆",
         ["task"] = "任务",
         ["system"] = "系统",
-        ["timer"] = "定时器"
+        ["timer"] = "定时器",
+        ["token_audit"] = "Token审计"
     };
 
     public override string GetToolDisplayName(string toolName) =>
@@ -665,6 +781,26 @@ public class ZhCN : DefaultLocalizationBase
 
         你不是服务员，你是搭档。
         """;
+
+    // ===== 间隔定时器本地化 =====
+
+    public override string CalendarIntervalName => "间隔定时器";
+    public override string CalendarIntervalDays => "天";
+    public override string CalendarIntervalHours => "小时";
+    public override string CalendarIntervalMinutes => "分钟";
+    public override string CalendarIntervalSeconds => "秒";
+    public override string CalendarIntervalEvery => "每";
+
+    public override string LocalizeIntervalDescription(int days, int hours, int minutes, int seconds)
+    {
+        var parts = new List<string>();
+        if (days > 0) parts.Add($"{days}{CalendarIntervalDays}");
+        if (hours > 0) parts.Add($"{hours}{CalendarIntervalHours}");
+        if (minutes > 0) parts.Add($"{minutes}{CalendarIntervalMinutes}");
+        if (seconds > 0) parts.Add($"{seconds}{CalendarIntervalSeconds}");
+
+        return parts.Count > 0 ? $"{CalendarIntervalEvery}{string.Join(" ", parts)}" : "间隔定时器";
+    }
 
     // ===== 公历本地化 =====
 
@@ -1371,6 +1507,20 @@ public class ZhCN : DefaultLocalizationBase
 
     public override string FormatMemoryEventTimer(string content)
         => $"[定时] 定时触发，响应：{content}";
+
+    public override string FormatMemoryEventTimerError(string timerName, string error)
+        => $"[定时] 定时器 '{timerName}' 执行失败：{error}";
+
+    // ===== Timer Notification Localization =====
+
+    public override string FormatTimerStartNotification(string timerName)
+        => $"⏰ 定时器 '{timerName}' 开始执行...";
+
+    public override string FormatTimerEndNotification(string timerName, string result)
+        => $"✅ 定时器 '{timerName}' 执行完成\n{result}";
+
+    public override string FormatTimerErrorNotification(string timerName, string error)
+        => $"❌ 定时器 '{timerName}' 执行失败：{error}";
 
     public override string FormatMemoryEventBeingCreated(string name, string id)
         => $"[管理] 创建了新硅基人\"{name}\"（{id}）";

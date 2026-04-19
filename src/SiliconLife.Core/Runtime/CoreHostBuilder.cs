@@ -25,9 +25,6 @@ public class CoreHostBuilder
     /// <summary>Gets the configuration data attached to this builder.</summary>
     public ConfigDataBase? Config { get; private set; }
 
-    /// <summary>Gets the AI client attached to this builder.</summary>
-    public IAIClient? AIClient { get; private set; }
-
     /// <summary>Gets the general-purpose storage attached to this builder.</summary>
     public IStorage? Storage { get; private set; }
 
@@ -63,14 +60,6 @@ public class CoreHostBuilder
     {
         Config = config;
         _logger.Debug("Set Config");
-        return this;
-    }
-
-    /// <summary>Sets the AI client used for LLM interactions.</summary>
-    public CoreHostBuilder SetAIClient(IAIClient client)
-    {
-        AIClient = client;
-        _logger.Debug("Set AIClient: {0}", client?.GetType().Name ?? "null");
         return this;
     }
 
@@ -161,7 +150,6 @@ public class CoreHostBuilder
     {
         int componentCount = 0;
         if (Config != null) componentCount++;
-        if (AIClient != null) componentCount++;
         if (Storage != null) componentCount++;
         if (TimeStorage != null) componentCount++;
         if (ChatSystem != null) componentCount++;

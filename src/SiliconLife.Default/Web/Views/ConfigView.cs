@@ -141,6 +141,13 @@ public class ConfigView : ViewBase
                             H.Select().Id("editValueEnum")
                         ).Class("form-group").Id("inputEnum").Style("display:none"),
                         H.Div(
+                            H.Label(loc.ConfigDictionaryLabel),
+                            H.Div().Id("dictEditorContainer").Class("dict-editor"),
+                            H.Div(
+                                H.Button(loc.ConfigDictAddButton).Class("btn btn-add").Id("btnAddDictRow")
+                            ).Class("dict-actions")
+                        ).Class("form-group").Id("inputDictionary").Style("display:none"),
+                        H.Div(
                             H.Button(loc.ConfigSaveButton).Class("btn btn-primary").Id("btnSave"),
                             H.Button(loc.ConfigCancelButton).Class("btn btn-secondary").Id("btnCancel")
                         ).Class("form-actions")
@@ -327,6 +334,69 @@ public class ConfigView : ViewBase
             .EndSelector()
             .Selector(".dir-icon")
                 .Property("font-size", "14px")
+            .EndSelector()
+            .Selector(".dict-editor")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "4px")
+                .Property("padding", "12px")
+                .Property("background", "var(--bg-primary)")
+            .EndSelector()
+            .Selector(".dict-editor::-webkit-scrollbar")
+                .Property("width", "6px")
+            .EndSelector()
+            .Selector(".dict-editor::-webkit-scrollbar-track")
+                .Property("background", "transparent")
+            .EndSelector()
+            .Selector(".dict-editor::-webkit-scrollbar-thumb")
+                .Property("background", "var(--border-color)")
+                .Property("border-radius", "3px")
+            .EndSelector()
+            .Selector(".dict-row")
+                .Property("display", "flex")
+                .Property("gap", "8px")
+                .Property("align-items", "center")
+                .Property("margin-bottom", "8px")
+            .EndSelector()
+            .Selector(".dict-row input")
+                .Property("flex", "1")
+                .Property("padding", "6px 10px")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "4px")
+                .Property("background", "var(--bg-tertiary)")
+                .Property("color", "var(--text-primary)")
+            .EndSelector()
+            .Selector(".dict-row .btn-delete")
+                .Property("padding", "6px 12px")
+                .Property("background", "#dc3545")
+                .Property("color", "#fff")
+                .Property("border", "none")
+                .Property("border-radius", "4px")
+                .Property("cursor", "pointer")
+            .EndSelector()
+            .Selector(".dict-row .btn-delete:hover")
+                .Property("background", "#c82333")
+            .EndSelector()
+            .Selector(".dict-empty")
+                .Property("text-align", "center")
+                .Property("color", "var(--text-secondary)")
+                .Property("padding", "20px")
+                .Property("font-style", "italic")
+            .EndSelector()
+            .Selector(".dict-actions")
+                .Property("margin-top", "8px")
+                .Property("display", "flex")
+                .Property("justify-content", "flex-end")
+            .EndSelector()
+            .Selector(".dict-actions .btn-add")
+                .Property("padding", "6px 16px")
+                .Property("background", "var(--accent-color)")
+                .Property("color", "#fff")
+                .Property("border", "none")
+                .Property("border-radius", "4px")
+                .Property("cursor", "pointer")
+            .EndSelector()
+            .Selector(".dict-actions .btn-add:hover")
+                .Property("opacity", "0.9")
             .EndSelector();
     }
 
@@ -343,8 +413,86 @@ public class ConfigView : ViewBase
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputDirectory")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputDatetime")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputTimespan")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
-            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputEnum")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")));
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputEnum")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputDictionary")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")));
         js.Add(() => Js.Func(() => "hideAllInputs", () => new List<string> { }, () => hideAllInputsBlock));
+
+        // Dictionary editor functions
+        var initDictEditorBlock = Js.Block()
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dictEditorContainer")).Prop(() => "innerHTML").Assign(() => Js.Str(() => "")))
+            .Add(() => Js.Let(() => "dict", () => Js.Ternary(() => Js.Id(() => "jsonStr"), () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "jsonStr")), () => Js.Obj())));
+        
+        var initDictForEachBlock = Js.Block()
+            .Add(() => Js.Id(() => "addDictRow").Invoke(() => Js.Id(() => "k"), () => Js.Id(() => "dict").Index(() => Js.Id(() => "k"))));
+        
+        initDictEditorBlock.Add(() => Js.Id(() => "Object").Prop(() => "keys").Invoke(() => Js.Id(() => "dict")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "k" }, () => initDictForEachBlock)));
+        initDictEditorBlock.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+        {
+            { (Js.Id(() => "Object").Prop(() => "keys").Invoke(() => Js.Id(() => "dict")).Prop(() => "length").Op(() => "===", () => Js.Num(() => "0")), new List<JsSyntax>
+                {
+                    Js.Id(() => "addDictRow").Invoke(() => Js.Str(() => ""), () => Js.Str(() => ""))
+                })
+            }
+        }));
+        
+        js.Add(() => Js.Func(() => "initDictEditor", () => new List<string> { "jsonStr" }, () => initDictEditorBlock));
+
+        var addDictRowBlock = Js.Block()
+            .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dictEditorContainer"))))
+            .Add(() => Js.Const(() => "row", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))));
+        
+        addDictRowBlock.Add(() => Js.Id(() => "row").Prop(() => "className").Assign(() => Js.Str(() => "dict-row")));
+        addDictRowBlock.Add(() => Js.Const(() => "keyInput", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "input"))))
+            .Add(() => Js.Id(() => "keyInput").Prop(() => "type").Assign(() => Js.Str(() => "text")))
+            .Add(() => Js.Id(() => "keyInput").Prop(() => "placeholder").Assign(() => Js.Str(() => loc.ConfigDictKeyLabel)))
+            .Add(() => Js.Id(() => "keyInput").Prop(() => "value").Assign(() => Js.Id(() => "key")));
+        
+        addDictRowBlock.Add(() => Js.Const(() => "valueInput", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "input"))))
+            .Add(() => Js.Id(() => "valueInput").Prop(() => "type").Assign(() => Js.Str(() => "text")))
+            .Add(() => Js.Id(() => "valueInput").Prop(() => "placeholder").Assign(() => Js.Str(() => loc.ConfigDictValueLabel)))
+            .Add(() => Js.Id(() => "valueInput").Prop(() => "value").Assign(() => Js.Id(() => "value")));
+        
+        addDictRowBlock.Add(() => Js.Const(() => "deleteBtn", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "button"))))
+            .Add(() => Js.Id(() => "deleteBtn").Prop(() => "textContent").Assign(() => Js.Str(() => loc.ConfigDictDeleteButton)))
+            .Add(() => Js.Id(() => "deleteBtn").Prop(() => "className").Assign(() => Js.Str(() => "btn-delete")))
+            .Add(() => Js.Id(() => "deleteBtn").Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "row").Prop(() => "remove").Invoke().Stmt())));
+        
+        addDictRowBlock.Add(() => Js.Id(() => "row").Call(() => "appendChild", () => Js.Id(() => "keyInput")))
+            .Add(() => Js.Id(() => "row").Call(() => "appendChild", () => Js.Id(() => "valueInput")))
+            .Add(() => Js.Id(() => "row").Call(() => "appendChild", () => Js.Id(() => "deleteBtn")))
+            .Add(() => Js.Id(() => "container").Call(() => "appendChild", () => Js.Id(() => "row")));
+        
+        js.Add(() => Js.Func(() => "addDictRow", () => new List<string> { "key", "value" }, () => addDictRowBlock));
+
+        var getDictJsonBlock = Js.Block()
+            .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dictEditorContainer"))))
+            .Add(() => Js.Const(() => "rows", () => Js.Id(() => "container").Call(() => "querySelectorAll", () => Js.Str(() => ".dict-row"))))
+            .Add(() => Js.Const(() => "dict", () => Js.Obj()));
+        
+        var processRowBlock = Js.Block()
+            .Add(() => Js.Const(() => "inputs", () => Js.Id(() => "row").Call(() => "querySelectorAll", () => Js.Str(() => "input"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "inputs").Prop(() => "length").Op(() => ">=", () => Js.Num(() => "2")), new List<JsSyntax>
+                    {
+                        Js.Const(() => "k", () => Js.Id(() => "inputs").Index(() => Js.Num(() => "0")).Prop(() => "value")),
+                        Js.Const(() => "v", () => Js.Id(() => "inputs").Index(() => Js.Num(() => "1")).Prop(() => "value")),
+                        Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                        {
+                            { (Js.Id(() => "k"), new List<JsSyntax>
+                                {
+                                    Js.Id(() => "dict").Index(() => Js.Id(() => "k")).Assign(() => Js.Id(() => "v"))
+                                })
+                            }
+                        })
+                    })
+                }
+            }));
+        
+        getDictJsonBlock.Add(() => Js.Id(() => "rows").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "row" }, () => processRowBlock)));
+        getDictJsonBlock.Add(() => Js.Return(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "dict"))));
+        
+        js.Add(() => Js.Func(() => "getDictJson", () => new List<string> { }, () => getDictJsonBlock));
 
         var parseTimespanBlock = Js.Block()
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValueTimespanDays")).Prop(() => "value").Assign(() => Js.Str(() => "0")))
@@ -468,6 +616,13 @@ public class ConfigView : ViewBase
                         Js.Break()
                     })
                 },
+                { (Js.Str(() => "dictionary"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputDictionary")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "block")),
+                        Js.Id(() => "initDictEditor").Invoke(() => Js.Id(() => "value")),
+                        Js.Break()
+                    })
+                },
                 { (Js.Str(() => "guid"), new List<JsSyntax>
                     {
                         Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputString")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "block")),
@@ -551,6 +706,12 @@ public class ConfigView : ViewBase
                         Js.Break()
                     })
                 },
+                { (Js.Str(() => "dictionary"), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "value"), () => Js.Id(() => "getDictJson").Invoke()),
+                        Js.Break()
+                    })
+                },
                 { (Js.Str(() => "guid"), new List<JsSyntax>
                     {
                         Js.Assign(() => Js.Id(() => "value"), () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValue")).Prop(() => "value").Call(() => "trim")),
@@ -622,7 +783,8 @@ public class ConfigView : ViewBase
         initBlock
             .Add(() => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => ".btn-edit")).Call(() => "forEach", () => forEachArrow))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnSave")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "saveConfig").Invoke().Stmt())))
-            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnCancel")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "closeModal").Invoke().Stmt())));
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnCancel")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "closeModal").Invoke().Stmt())))
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnAddDictRow")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "addDictRow").Invoke(() => Js.Str(() => ""), () => Js.Str(() => "")).Stmt())));
         
         var modalClickBlock = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>

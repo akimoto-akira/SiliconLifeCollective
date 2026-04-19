@@ -242,6 +242,9 @@ public class EnUS : DefaultLocalizationBase
     public override string InitNicknamePlaceholder => "Enter your nickname";
     public override string InitEndpointLabel => "AI API Endpoint";
     public override string InitEndpointPlaceholder => "e.g. http://localhost:11434";
+    public override string InitAIClientTypeLabel => "AI Client Type";
+    public override string InitModelLabel => "Default Model";
+    public override string InitModelPlaceholder => "e.g. qwen3.5:cloud";
     public override string InitSkinLabel => "Skin";
     public override string InitSkinPlaceholder => "Leave empty for default skin";
     public override string InitDataDirectoryLabel => "Data Directory";
@@ -332,8 +335,106 @@ public class EnUS : DefaultLocalizationBase
 
     // ===== Permission Page Localization =====
 
-    public override string PermissionPageHeader => "Permission Management";
+    public override string PermissionPageHeader => "Permission Management - {0}";
     public override string PermissionEmptyState => "No permission rules";
+    public override string PermissionMissingBeingId => "Missing being ID parameter";
+    public override string PermissionBeingNotFound => "Silicon being not found";
+    public override string PermissionTemplateHeader => "Default Permission Callback Template";
+    public override string PermissionTemplateDescription => "Save to override default behavior, clear to restore default";
+    public override string PermissionCallbackClassSummary => "Default permission callback implementation.";
+    public override string PermissionCallbackClassSummary2 => "Domain-specific permission rules fully aligned with dpf.txt specification.\n/// Covers: network (whitelist/blacklist/IP ranges), command line (cross-platform),\n/// file access (dangerous extensions, system dirs, user dirs), and fallback defaults.";
+    public override string PermissionCallbackConstructorSummary => "Creates a DefaultPermissionCallback with the application data directory.";
+    public override string PermissionCallbackConstructorSummary2 => "The app data directory is used for:\n    /// - Blocking access to the data directory (except own Temp subfolder)\n    /// - Deriving per-being data directories for Temp allow rule";
+    public override string PermissionCallbackConstructorParam => "The global application data directory path";
+    public override string PermissionCallbackEvaluateSummary => "Evaluates a permission request using default rules (dpf.txt specification).";
+    public override string PermissionRuleOtherTypesDefault => "Other permission types default to allowed";
+
+    private static readonly Dictionary<string, string> PermissionRuleComments = new()
+    {
+        // Evaluate method
+        ["NetRuleNetworkAccess"] = "Network access allow rules",
+        ["NetRuleCommandLine"] = "Command line rules (cross-platform)",
+        ["NetRuleFileAccess"] = "File access rules (cross-platform)",
+        // Network rules
+        ["NetRuleNoProtocol"] = "No protocol scheme (no colon), cannot determine origin, ask user",
+        ["NetRuleLoopback"] = "Allow loopback addresses (localhost / 127.0.0.1 / ::1)",
+        ["NetRulePrivateIPMatch"] = "Private IP address range matching (validate IPv4 format first)",
+        ["NetRulePrivateC"] = "Allow private class C (192.168.0.0/16)",
+        ["NetRulePrivateA"] = "Allow private class A (10.0.0.0/8)",
+        ["NetRulePrivateB"] = "Ask user for private class B (172.16.0.0/12, i.e. 172.16.* ~ 172.31.*)",
+        ["NetRuleDomainWhitelist1"] = "Allowed external domain whitelist — Google / Bing / Tencent / Sogou / DuckDuckGo / Yandex / WeChat / Alibaba",
+        ["NetRuleVideoPlatforms"] = "Bilibili / niconico / Acfun / Douyin / TikTok / Kuaishou / Xiaohongshu",
+        ["NetRuleAIServices"] = "AI Services — OpenAI / Anthropic / HuggingFace / Ollama / Qianwen / Kimi / Doubao / CapCut / JianYing / Trae IDE",
+        ["NetRulePhishingBlacklist"] = "Phishing & fake sites blacklist (fuzzy keyword match)",
+        ["NetRulePhishingAI"] = "AI phishing sites",
+        ["NetRuleMaliciousAI"] = "Malicious AI tools",
+        ["NetRuleAdversarialAI"] = "Adversarial AI / prompt jailbreak / LLM hacking sites",
+        ["NetRuleAIContentFarm"] = "AI content farm & slop",
+        ["NetRuleAIBlackMarket"] = "AI data black market / API key market / LLM weight seller",
+        ["NetRuleAIFakeScam"] = "AI fake & scam generic keywords",
+        ["NetRuleOtherBlacklist"] = "Other blacklisted sites — sakura-cat: should not be accessed by AI / 4399: games with embedded malware",
+        ["NetRuleSecuritiesTrading"] = "Securities trading platforms (ask user) — HTSC / GTJA / CITICS / CMS / GF / HTSEC / SW / DF / Guosen / Xingye",
+        ["NetRuleThirdPartyTrading"] = "Third-party trading platforms (ask user) — Tonghuashun / Eastmoney / TDX / Bloomberg / Yahoo Finance",
+        ["NetRuleStockExchanges"] = "Stock exchanges (quotes only) — SSE / SZSE / CNInfo",
+        ["NetRuleFinancialNews"] = "Financial news (quotes only) — JRJ / StockStar / Hexun",
+        ["NetRuleInvestCommunity"] = "Investment community (news only) — Xueqiu / CLS / KaiPanLa / TaoGuBa",
+        ["NetRuleDevServices"] = "Developer services — GitHub / Gitee / StackOverflow / npm / NuGet / PyPI / Microsoft",
+        ["NetRuleGameEngines"] = "Game engines — Unity / Unreal Engine / Epic Games / Fab",
+        ["NetRuleGamePlatforms"] = "Game platforms — Steam ask user, EA / Ubisoft / Blizzard / Nintendo allowed",
+        ["NetRuleSEGA"] = "SEGA (Japan)",
+        ["NetRuleCloudServices"] = "Global cloud services — Azure / Google Cloud / DigitalOcean / Heroku / Vercel / Netlify",
+        ["NetRuleDevDeployTools"] = "Global dev & deployment tools — GitLab / Bitbucket / Docker / Cloudflare",
+        ["NetRuleCloudDevTools"] = "Cloud services & dev tools — Amazon / AWS / Kiro IDE / CodeBuddy IDE / JetBrains / Purelight / W3School",
+        ["NetRuleChinaSocialNews"] = "Social & news (mainland China) — Weibo / Zhihu / 163 / Sina / iFeng / Xinhua / CCTV",
+        ["NetRuleTaiwanMediaCTI"] = "Taiwan media — CTI News (CTI TV)",
+        ["NetRuleTaiwanMediaSET"] = "SET News (SET TV) — ask user",
+        ["NetRuleTaiwanWIN"] = "WIN (Taiwan, risk of being blocked) — deny",
+        ["NetRuleJapanMedia"] = "Japanese media — NHK (Japan Broadcasting Corporation)",
+        ["NetRuleRussianMedia"] = "Russian media — Sputnik News (all regions)",
+        ["NetRuleKoreanMedia"] = "Korean media — KBS / MBC / SBS / EBS",
+        ["NetRuleDPRKMedia"] = "DPRK media — Naenara / Rodong / Youth / VOK / Pyongyang Times / Choson Sinbo",
+        ["NetRuleGovWebsites"] = "Government websites (wildcard .gov domains)",
+        ["NetRuleGlobalSocialCollab"] = "Global social & collaboration platforms — Reddit / Discord / Slack / Notion / Figma / Dropbox",
+        ["NetRuleOverseasSocial"] = "Overseas social & streaming (ask user) — Twitch / Facebook / X / Gmail / Instagram / lit.link",
+        ["NetRuleWhatsApp"] = "WhatsApp(Meta) — Allow",
+        ["NetRuleThreads"] = "Threads(Meta) — Deny",
+        ["NetRuleGlobalVideoMusic"] = "Global video & music platforms — Spotify / Apple Music / Vimeo",
+        ["NetRuleVideoMedia"] = "Video & media — YouTube / iQIYI / Youku",
+        ["NetRuleMaps"] = "Maps — OpenStreetMap (OSM)",
+        ["NetRuleEncyclopedia"] = "Encyclopedia — Wikipedia / MediaWiki / Creative Commons",
+        ["NetRuleUnmatched"] = "Unmatched network access, ask user",
+        // Command line rules
+        ["CmdRuleSeparatorDetect"] = "Detect pipe and multi-command separators, split and verify each",
+        ["CmdRuleWinAllow"] = "Windows allow: read-only / query commands — dir / tree / tasklist / ipconfig / ping / tracert / systeminfo / whoami / set / path / sc query / findstr",
+        ["CmdRuleWinDeny"] = "Windows deny: dangerous / destructive commands — del / rmdir / format / diskpart / reg delete",
+        ["CmdRuleLinuxAllow"] = "Linux allow: read-only / query commands — ls / tree / ps / top / ifconfig / ip / ping / traceroute / uname / whoami / env / cat / grep / find / df / du / systemctl status",
+        ["CmdRuleLinuxDeny"] = "Linux deny: dangerous / destructive commands — rm / rmdir / mkfs / fdisk / dd / chmod / chown / chgrp",
+        ["CmdRuleMacAllow"] = "macOS allow: read-only / query commands — ls / tree / ps / top / ifconfig / ping / traceroute / system_profiler / sw_vers / whoami / env / cat / grep / find / df / du / launchctl list",
+        ["CmdRuleMacDeny"] = "macOS deny: dangerous / destructive commands — rm / rmdir / diskutil erasedisk / dd / chmod / chown / chgrp",
+        ["CmdRuleUnmatched"] = "Unmatched commands, ask user",
+        // File access rules
+        ["FileRuleDangerousExt"] = "Highest priority: deny dangerous file extensions regardless of directory permissions",
+        ["FileRuleInvalidPath"] = "Cannot resolve to absolute path, ask user",
+        ["FileRuleDenyAssemblyDir"] = "Deny: current assembly directory",
+        ["FileRuleDenyAppDataDir"] = "Deny: application data directory (from constructor)",
+        ["FileRuleAllowOwnTemp"] = "But allow: own Temp directory",
+        ["FileRuleOwnTemp"] = "Allow: own Temp directory",
+        ["FileRuleDenyOtherDataDir"] = "Deny: other paths in data directory (including other silicon life's directories)",
+        ["FileRuleUserFolders"] = "Allow: common user folders",
+        ["FileRuleUserFolderCheck"] = "Common user folders — Desktop / Downloads / Documents / Pictures / Music / Videos",
+        ["FileRulePublicFolders"] = "Allow: public/common user folders",
+        ["FileRuleWinDenySystem"] = "Windows deny: critical system directories (not necessarily on C drive)",
+        ["FileRuleWinDenySystemCheck"] = "Critical system directories",
+        ["FileRuleLinuxDenySystem"] = "Linux deny: critical system directories — /etc /boot /sbin",
+        ["FileRuleMacDenySystem"] = "macOS deny: critical system directories — /System /Library /private/etc",
+        ["FileRuleUnmatched"] = "Unmatched paths, ask user",
+    };
+
+    public override string GetPermissionRuleComment(string key)
+        => PermissionRuleComments.TryGetValue(key, out var value) ? value : key;
+
+    public override string PermissionRulesSection => "Permission Rules";
+    public override string PermissionEditorSection => "Permission Rule Editor";
 
     // ===== Knowledge Page Localization =====
 
@@ -374,12 +475,17 @@ public class EnUS : DefaultLocalizationBase
     public override string BeingsDetailStatusLabel => "Status: ";
     public override string BeingsDetailCustomCompileLabel => "Custom Compilation: ";
     public override string BeingsDetailSoulContentLabel => "Soul Content: ";
+    public override string BeingsDetailSoulContentEditLink => "Edit Soul";
+    public override string BeingsBackToList => "Back to List";
+    public override string SoulEditorSubtitle => "Edit the silicon being's soul file (Markdown format)";
     public override string BeingsDetailMemoryLabel => "Memory: ";
     public override string BeingsDetailMemoryViewLink => "View";
     public override string BeingsDetailPermissionLabel => "Permission: ";
     public override string BeingsDetailPermissionEditLink => "Edit";
     public override string BeingsDetailTimersLabel => "Timers: ";
     public override string BeingsDetailTasksLabel => "Tasks: ";
+    public override string BeingsDetailAIClientLabel => "Independent AI Client: ";
+    public override string BeingsDetailAIClientEditLink => "Edit";
     public override string BeingsYes => "Yes";
     public override string BeingsNo => "No";
     public override string BeingsNotSet => "Not set";
@@ -463,6 +569,12 @@ public class EnUS : DefaultLocalizationBase
     public override string ConfigErrorUnsupportedType => "Unsupported property type: {0}";
     public override string ConfigErrorSaveFailed => "Save failed: {0}";
     public override string ConfigSaveFailed => "Save failed: ";
+    public override string ConfigDictionaryLabel => "Dictionary";
+    public override string ConfigDictKeyLabel => "Key: ";
+    public override string ConfigDictValueLabel => "Value: ";
+    public override string ConfigDictAddButton => "Add";
+    public override string ConfigDictDeleteButton => "Delete";
+    public override string ConfigDictEmptyMessage => "Dictionary is empty";
 
     public override string LogsPageHeader => "Log Query";
     public override string LogsTotalCount => "{0} logs total";
@@ -526,8 +638,11 @@ public class EnUS : DefaultLocalizationBase
         ["WatchdogTimeout"] = "Watchdog Timeout",
         ["MinLogLevel"] = "Min Log Level",
         ["AIClientType"] = "AI Client Type",
+        ["OllamaClient"] = "Ollama Client",
         ["OllamaEndpoint"] = "Ollama Endpoint",
         ["DefaultModel"] = "Default Model",
+        ["Temperature"] = "Temperature",
+        ["MaxTokens"] = "Max Tokens",
         ["WebPort"] = "Web Port",
         ["AllowIntranetAccess"] = "Allow Intranet Access",
         ["WebSkin"] = "Web Skin",
@@ -588,7 +703,8 @@ public class EnUS : DefaultLocalizationBase
         ["memory"] = "Memory",
         ["task"] = "Task",
         ["system"] = "System",
-        ["timer"] = "Timer"
+        ["timer"] = "Timer",
+        ["token_audit"] = "Token Audit"
     };
 
     public override string GetToolDisplayName(string toolName) =>
@@ -665,6 +781,26 @@ public class EnUS : DefaultLocalizationBase
 
         You are not a servant. You are a partner.
         """;
+
+    // ===== Interval Calendar =====
+
+    public override string CalendarIntervalName => "Interval Timer";
+    public override string CalendarIntervalDays => "d";
+    public override string CalendarIntervalHours => "h";
+    public override string CalendarIntervalMinutes => "m";
+    public override string CalendarIntervalSeconds => "s";
+    public override string CalendarIntervalEvery => "Every";
+
+    public override string LocalizeIntervalDescription(int days, int hours, int minutes, int seconds)
+    {
+        var parts = new List<string>();
+        if (days > 0) parts.Add($"{days}{CalendarIntervalDays}");
+        if (hours > 0) parts.Add($"{hours}{CalendarIntervalHours}");
+        if (minutes > 0) parts.Add($"{minutes}{CalendarIntervalMinutes}");
+        if (seconds > 0) parts.Add($"{seconds}{CalendarIntervalSeconds}");
+
+        return parts.Count > 0 ? $"{CalendarIntervalEvery} {string.Join(" ", parts)}" : "Interval Timer";
+    }
 
     // ===== Gregorian Calendar =====
 
@@ -1373,6 +1509,20 @@ public class EnUS : DefaultLocalizationBase
 
     public override string FormatMemoryEventTimer(string content)
         => $"[Timer] Timer triggered, responded: {content}";
+
+    public override string FormatMemoryEventTimerError(string timerName, string error)
+        => $"[Timer] Timer '{timerName}' execution failed: {error}";
+
+    // ===== Timer Notification Localization =====
+
+    public override string FormatTimerStartNotification(string timerName)
+        => $"⏰ Timer '{timerName}' started executing...";
+
+    public override string FormatTimerEndNotification(string timerName, string result)
+        => $"✅ Timer '{timerName}' completed\n{result}";
+
+    public override string FormatTimerErrorNotification(string timerName, string error)
+        => $"❌ Timer '{timerName}' failed: {error}";
 
     public override string FormatMemoryEventBeingCreated(string name, string id)
         => $"[Management] Created new silicon being \"{name}\" ({id})";

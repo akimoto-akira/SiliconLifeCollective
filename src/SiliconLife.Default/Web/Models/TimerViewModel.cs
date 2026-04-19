@@ -29,6 +29,7 @@ public class TimerItemModel
     public string Status { get; set; } = "active";
     public DateTime TriggerTime { get; set; }
     public string CalendarId { get; set; } = "gregorian";
+    public string CalendarName { get; set; } = string.Empty;
     public string CalendarDescription { get; set; } = string.Empty;
     public Dictionary<string, int> CalendarConditions { get; set; } = new();
     public int TimesTriggered { get; set; }

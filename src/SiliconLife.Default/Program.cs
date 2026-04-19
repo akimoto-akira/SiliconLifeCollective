@@ -46,16 +46,13 @@ public class Program
 
         DefaultConfigData configData = (DefaultConfigData)config.Data;
         LogManager.Instance.AddProvider(new FileSystemLoggerProvider(configData));
-        _logger.Info("Configuration loaded: endpoint={0}, model={1}", configData.OllamaEndpoint, configData.DefaultModel);
+        _logger.Info("Configuration loaded: endpoint={0}, model={1}", 
+            configData.AIConfig["endpoint"], configData.AIConfig["model"]);
 
         DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(configData.Language);
 
         Console.WriteLine(localization.WelcomeMessage);
         Console.WriteLine();
-
-        IAIClientFactory aiClientFactory = new OllamaClientFactory();
-        IAIClient aiClient = aiClientFactory.CreateClient(configData.OllamaEndpoint, configData.DefaultModel);
-        _logger.Info("Initialized: AIClient");
 
         IStorage storage = new FileSystemStorage(configData.DataDirectory.FullName);
         ITimeStorage timeStorage = new FileSystemTimeStorage(
@@ -89,7 +86,7 @@ public class Program
         _logger.Info("Initialized: IMManager");
 
         DefaultSiliconBeingFactory beingFactory = new DefaultSiliconBeingFactory(
-            aiClient,
+            configData.AIConfig,
             storage,
             timeStorage,
             configData.DataDirectory.FullName,
@@ -100,7 +97,6 @@ public class Program
 
         CoreHostBuilder builder = new CoreHostBuilder()
             .SetConfig(configData)
-            .SetAIClient(aiClient)
             .SetStorage(storage)
             .SetTimeStorage(timeStorage)
             .SetChatSystem(chatSystem)
@@ -226,6 +222,17 @@ public class Program
         LocalizationManager.Instance.Register<ZhMO>(Language.ZhMO);
         LocalizationManager.Instance.Register<ZhTW>(Language.ZhTW);
         LocalizationManager.Instance.Register<ZhMY>(Language.ZhMY);
+        
+        // English variants
+        LocalizationManager.Instance.Register<EnGB>(Language.EnGB);
+        LocalizationManager.Instance.Register<EnCA>(Language.EnCA);
+        LocalizationManager.Instance.Register<EnAU>(Language.EnAU);
+        LocalizationManager.Instance.Register<EnIN>(Language.EnIN);
+        LocalizationManager.Instance.Register<EnSG>(Language.EnSG);
+        LocalizationManager.Instance.Register<EnZA>(Language.EnZA);
+        LocalizationManager.Instance.Register<EnIE>(Language.EnIE);
+        LocalizationManager.Instance.Register<EnNZ>(Language.EnNZ);
+        LocalizationManager.Instance.Register<EnMY>(Language.EnMY);
     }
 
     public static void RequestExit()

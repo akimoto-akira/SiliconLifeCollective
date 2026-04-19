@@ -19,7 +19,6 @@ namespace SiliconLife.Default;
 
 /// <summary>
 /// Default permission callback implementation.
-/// Domain-specific permission rules fully aligned with dpf.txt specification.
 /// Covers: network (whitelist/blacklist/IP ranges), command line (cross-platform),
 /// file access (dangerous extensions, system dirs, user dirs), and fallback defaults.
 /// </summary>
@@ -71,7 +70,7 @@ public class DefaultPermissionCallback : IPermissionCallback
         };
     }
 
-    #region Network Rules (dpf.txt lines 9-621)
+
 
     private PermissionResult EvaluateNetwork(string resourcePath)
     {
@@ -94,9 +93,11 @@ public class DefaultPermissionCallback : IPermissionCallback
 
         // 本地回环地址放行（localhost / 127.0.0.1 / ::1）
         // Allow loopback addresses
-        if (string.Equals(host, "localhost", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "127.0.0.1", StringComparison.Ordinal)
-            || string.Equals(host, "::1", StringComparison.Ordinal))
+        var allowedLoopback = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "localhost", "127.0.0.1", "::1"
+        };
+        if (allowedLoopback.Contains(host))
         {
             return PermissionResult.Allowed;
         }
@@ -127,476 +128,231 @@ public class DefaultPermissionCallback : IPermissionCallback
             }
         }
 
-        // 允许访问的外部域名白名单 / Allowed external domain whitelist
-        // 谷歌 / 必应 / 腾讯系 / 搜狗 / DuckDuckGo / Yandex / 微信 / 阿里系
-        if (host.EndsWith(".google.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "google.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".bing.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "bing.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".qq.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "qq.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".tencent.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "tencent.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".weixin.qq.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".sogou.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "sogou.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".duckduckgo.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "duckduckgo.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".yandex.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "yandex.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".yandex.ru", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "yandex.ru", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".wechat.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "wechat.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".alibaba.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "alibaba.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".alibabacloud.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "alibabacloud.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".aliyun.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "aliyun.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".1688.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "1688.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".alipay.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "alipay.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".tmall.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "tmall.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".dingtalk.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "dingtalk.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".taobao.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "taobao.com", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.Allowed;
-        }
-
-        // 哔哩哔哩 / niconico / Acfun / 抖音 / TikTok / 快手 / 小红书
-        if (host.EndsWith(".bilibili.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "bilibili.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".bilivideo.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "bilivideo.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".nicovideo.jp", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "nicovideo.jp", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".niconico.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "niconico.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".acfun.cn", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "acfun.cn", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".douyin.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "douyin.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".tiktok.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "tiktok.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".kuaishou.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "kuaishou.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".xiaohongshu.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "xiaohongshu.com", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.Allowed;
-        }
-
-        // AI 服务 / AI Services
-        // OpenAI / Anthropic / HuggingFace / Ollama / 通义千问 / Kimi / 豆包 / 剪映 / Trae IDE
-        if (host.EndsWith(".openai.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "openai.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".anthropic.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "anthropic.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".huggingface.co", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "huggingface.co", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".ollama.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "ollama.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".tongyi.aliyun.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".qianwen.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "qianwen.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".moonshot.cn", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "moonshot.cn", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".kimi.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "kimi.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".doubao.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "doubao.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".capcut.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "capcut.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".jianying.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "jianying.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".trae.cn", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "trae.cn", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".trae.ai", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "trae.ai", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.Allowed;
-        }
-
-        // 钓鱼/仿冒网站黑名单（关键词模糊匹配，规则宽松以覆盖更多近似网站）
-        // Phishing & fake sites blacklist (fuzzy keyword match, loose rules)
         var hostLower = host.ToLowerInvariant();
 
-        // AI 仿冒站 / AI phishing sites
-        if (hostLower.Contains("chatgpt")
-            || hostLower.Contains("openai")
-            || hostLower.Contains("deepseek")
-            || hostLower.Contains("sora")
-            || hostLower.Contains("claude")
-            || hostLower.Contains("luma-ai")
-            || hostLower.Contains("kling-ai")
-            || hostLower.Contains("openclaw"))
+        // ===== Denied: Contains 匹配（优先级最高） =====
+        var deniedContains = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            // AI 仿冒站
+            "chatgpt", "openai", "deepseek", "sora", "claude", "luma-ai", "kling-ai", "openclaw",
+            // 恶意 AI 工具
+            "wormgpt", "darkgpt", "fraudgpt", "ghostgpt", "oniongpt", "evilgpt", "hackgpt", "poisongpt",
+            // 对抗性 AI
+            "adversarial-ai", "prompt-jailbreak", "jailbreak-ai", "llm-hacking", "llm-hack", "llm-exploit",
+            // AI 内容农场
+            "ai-content-farm", "ai-slop", "auto-ai-write", "mass-ai-article",
+            "ai-article-spam", "ai-spam", "ai-generator-free", "ai-essay-mill",
+            // AI 数据黑市
+            "ai-data-blackmarket", "api-key-market", "api-key-free",
+            "llm-weight-seller", "llm-weight-free", "model-pirate",
+            // AI 仿冒/诈骗
+            "ai-official-fake", "ai-fake", "ai-vip", "ai-zh", "ai-cn", "ai-free-vip", "ai-premium-crack",
+            // 其他
+            "4399"
+        };
+
+        if (deniedContains.Any(hostLower.Contains))
         {
             return PermissionResult.Denied;
         }
 
-        // 恶意 AI 工具 / Malicious AI tools
-        if (hostLower.Contains("wormgpt")
-            || hostLower.Contains("darkgpt")
-            || hostLower.Contains("fraudgpt")
-            || hostLower.Contains("ghostgpt")
-            || hostLower.Contains("oniongpt")
-            || hostLower.Contains("evilgpt")
-            || hostLower.Contains("hackgpt")
-            || hostLower.Contains("poisongpt"))
+        // 特殊处理：sakura-cat StartsWith
+        if (hostLower.StartsWith("sakura-cat"))
         {
             return PermissionResult.Denied;
         }
 
-        // 对抗性 AI / 提示词越狱 / LLM 攻击站点
-        // Adversarial AI / prompt jailbreak / LLM hacking sites
-        if (hostLower.Contains("adversarial-ai")
-            || hostLower.Contains("prompt-jailbreak")
-            || hostLower.Contains("jailbreak-ai")
-            || hostLower.Contains("llm-hacking")
-            || hostLower.Contains("llm-hack")
-            || hostLower.Contains("llm-exploit"))
+        // ===== Allowed: EndsWith 匹配 =====
+        var allowedEndsWith = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            return PermissionResult.Denied;
-        }
+            // 谷歌 / 必应 / 腾讯系 / 搜狗 / DuckDuckGo / Yandex / 微信 / 阿里系
+            ".google.com", ".bing.com", ".qq.com", ".tencent.com", ".weixin.qq.com",
+            ".sogou.com", ".duckduckgo.com", ".yandex.com", ".yandex.ru", ".wechat.com",
+            ".alibaba.com", ".alibabacloud.com", ".aliyun.com", ".1688.com", ".alipay.com",
+            ".tmall.com", ".dingtalk.com", ".taobao.com",
+            // 哔哩哔哩 / niconico / Acfun / 抖音 / TikTok / 快手 / 小红书
+            ".bilibili.com", ".bilivideo.com", ".nicovideo.jp", ".niconico.com",
+            ".acfun.cn", ".douyin.com", ".tiktok.com", ".kuaishou.com", ".xiaohongshu.com",
+            // AI 服务
+            ".openai.com", ".anthropic.com", ".huggingface.co", ".ollama.com",
+            ".tongyi.aliyun.com", ".qianwen.com", ".moonshot.cn", ".kimi.com",
+            ".doubao.com", ".capcut.com", ".jianying.com", ".trae.cn", ".trae.ai",
+            // 证券交易所 / 财经资讯 / 投资社区
+            ".sse.com.cn", ".szse.cn", ".cninfo.com.cn",
+            ".jrj.com.cn", ".stockstar.com", ".hexun.com",
+            ".xueqiu.com", ".cls.cn", ".kaipanla.com", ".taoguba.com.cn",
+            // 开发者服务
+            ".github.com", ".githubusercontent.com", ".gitee.com",
+            ".stackoverflow.com", ".npmjs.com", ".nuget.org", ".pypi.org", ".microsoft.com",
+            // 游戏引擎
+            ".unity.com", ".unity3d.com", ".unrealengine.com", ".epicgames.com", ".fab.com",
+            // 世嘉
+            ".sega.com",
+            // 全球云服务平台
+            ".azure.com", ".azurewebsites.net", ".cloud.google.com",
+            ".digitalocean.com", ".heroku.com", ".vercel.com", ".netlify.com",
+            // 全球开发与部署工具
+            ".gitlab.com", ".bitbucket.org", ".docker.com", ".cloudflare.com",
+            // 云服务与开发工具
+            ".amazon.com", ".amazonaws.com", ".kiro.dev", ".codebuddy.cn",
+            ".jetbrains.com", ".purelight.net.cn", ".w3school.com.cn",
+            // 社交/资讯（中国大陆）
+            ".weibo.com", ".zhihu.com", ".163.com", ".sina.com.cn",
+            ".ifeng.com", ".xinhuanet.com", ".cctv.com",
+            // 中国台湾媒体
+            ".ctinews.com",
+            // 日本媒体
+            ".nhk.or.jp",
+            // 韩国媒体
+            ".kbs.co.kr", ".imbc.com", ".sbs.co.kr", ".ebs.co.kr",
+            // 朝鲜媒体
+            ".naenara.com.kp", ".rodong.rep.kp", ".youth.rep.kp",
+            ".vok.rep.kp", ".pyongyangtimes.com.kp",
+            // 全球社交协作平台
+            ".reddit.com", ".discord.com", ".discordapp.com", ".slack.com",
+            ".notion.so", ".figma.com", ".dropbox.com",
+            // WhatsApp
+            ".whatsapp.com",
+            // 全球视频/音乐平台
+            ".spotify.com", ".apple.com", ".vimeo.com",
+            // 视频/媒体
+            ".youtube.com", ".iqiyi.com", ".youku.com",
+            // 地图
+            ".openstreetmap.org",
+            // 百科
+            ".wikipedia.org", ".mediawiki.org"
+        };
 
-        // AI 内容农场 / AI 垃圾内容 / AI content farm & slop
-        if (hostLower.Contains("ai-content-farm")
-            || hostLower.Contains("ai-slop")
-            || hostLower.Contains("auto-ai-write")
-            || hostLower.Contains("mass-ai-article")
-            || hostLower.Contains("ai-article-spam")
-            || hostLower.Contains("ai-spam")
-            || hostLower.Contains("ai-generator-free")
-            || hostLower.Contains("ai-essay-mill"))
-        {
-            return PermissionResult.Denied;
-        }
-
-        // AI 数据黑市 / API 密钥黑市 / LLM 权重贩卖
-        // AI data black market / API key market / LLM weight seller
-        if (hostLower.Contains("ai-data-blackmarket")
-            || hostLower.Contains("api-key-market")
-            || hostLower.Contains("api-key-free")
-            || hostLower.Contains("llm-weight-seller")
-            || hostLower.Contains("llm-weight-free")
-            || hostLower.Contains("model-pirate"))
-        {
-            return PermissionResult.Denied;
-        }
-
-        // AI 仿冒/诈骗通用关键词 / AI fake & scam generic keywords
-        if (hostLower.Contains("ai-official-fake")
-            || hostLower.Contains("ai-fake")
-            || hostLower.Contains("ai-vip")
-            || hostLower.Contains("ai-zh")
-            || hostLower.Contains("ai-cn")
-            || hostLower.Contains("ai-free-vip")
-            || hostLower.Contains("ai-premium-crack"))
-        {
-            return PermissionResult.Denied;
-        }
-
-        // 其他黑名单站点 / Other blacklisted sites
-        // sakura-cat: 不应被AI访问的网站 / 4399: 游戏内混杂病毒
-        if (hostLower.StartsWith("sakura-cat")
-            || hostLower.Contains("4399"))
-        {
-            return PermissionResult.Denied;
-        }
-
-        // 证券交易平台（需询问用户）/ Securities trading platforms (ask user)
-        // 华泰证券 / 国泰君安 / 中信证券 / 招商证券 / 广发证券 / 海通证券 / 申万宏源 / 东方证券 / 国信证券 / 兴业证券
-        if (host.EndsWith(".htsc.com.cn", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".gtja.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".citics.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".cmschina.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".gf.com.cn", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".htsec.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".swhysc.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".dfzq.com.cn", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".guosen.com.cn", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".xyzq.com.cn", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.AskUser;
-        }
-
-        // 第三方交易平台（需询问用户）/ Third-party trading platforms (ask user)
-        // 同花顺 / 东方财富 / 通达信
-        if (host.EndsWith(".10jqka.com.cn", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".eastmoney.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".tdx.com.cn", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.AskUser;
-        }
-
-        // 证券交易所（仅行情）/ Stock exchanges (quotes only)
-        // 上海证券交易所 / 深圳证券交易所 / 巨潮资讯网
-        if (host.EndsWith(".sse.com.cn", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".szse.cn", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".cninfo.com.cn", StringComparison.OrdinalIgnoreCase))
+        if (allowedEndsWith.Any(host.EndsWith))
         {
             return PermissionResult.Allowed;
         }
 
-        // 财经资讯（仅行情）/ Financial news (quotes only)
-        // 金融界 / 证券之星 / 和讯网
-        if (host.EndsWith(".jrj.com.cn", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".stockstar.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".hexun.com", StringComparison.OrdinalIgnoreCase))
+        // ===== Allowed: 完全匹配 =====
+        var allowedExact = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "google.com", "bing.com", "qq.com", "tencent.com", "sogou.com",
+            "duckduckgo.com", "yandex.com", "yandex.ru", "wechat.com",
+            "alibaba.com", "alibabacloud.com", "aliyun.com", "1688.com", "alipay.com",
+            "tmall.com", "dingtalk.com", "taobao.com",
+            "bilibili.com", "bilivideo.com", "nicovideo.jp", "niconico.com",
+            "acfun.cn", "douyin.com", "tiktok.com", "kuaishou.com", "xiaohongshu.com",
+            "openai.com", "anthropic.com", "huggingface.co", "ollama.com",
+            "qianwen.com", "moonshot.cn", "kimi.com", "doubao.com",
+            "capcut.com", "jianying.com", "trae.cn", "trae.ai",
+            "github.com", "githubusercontent.com", "gitee.com",
+            "stackoverflow.com", "npmjs.com", "nuget.org", "pypi.org", "microsoft.com",
+            "unity.com", "unity3d.com", "unrealengine.com", "epicgames.com", "fab.com",
+            "sega.com",
+            "azure.com", "digitalocean.com", "heroku.com", "vercel.com", "netlify.com",
+            "gitlab.com", "bitbucket.org", "docker.com", "cloudflare.com",
+            "amazon.com", "amazonaws.com", "kiro.dev", "codebuddy.cn",
+            "jetbrains.com", "purelight.net.cn", "w3school.com.cn",
+            "weibo.com", "zhihu.com", "163.com", "ifeng.com",
+            "xinhuanet.com", "cctv.com",
+            "ctinews.com",
+            "nhk.or.jp",
+            "kbs.co.kr", "imbc.com", "sbs.co.kr", "ebs.co.kr",
+            "chosonsinbo.com",
+            "reddit.com", "discord.com", "discordapp.com", "slack.com",
+            "notion.so", "figma.com", "dropbox.com",
+            "whatsapp.com",
+            "spotify.com", "apple.com", "vimeo.com",
+            "youtube.com", "iqiyi.com", "youku.com",
+            "openstreetmap.org",
+            "wikipedia.org", "mediawiki.org"
+        };
+
+        if (allowedExact.Contains(host))
         {
             return PermissionResult.Allowed;
         }
 
-        // 投资社区（仅资讯）/ Investment community (news only)
-        // 雪球 / 财联社 / 开盘啦 / 淘股吧
-        if (host.EndsWith(".xueqiu.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".cls.cn", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".kaipanla.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".taoguba.com.cn", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.Allowed;
-        }
-
-        // 开发者服务 / Developer services
-        // GitHub / Gitee / StackOverflow / npm / NuGet / PyPI / 微软
-        if (host.EndsWith(".github.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "github.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".githubusercontent.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "githubusercontent.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".gitee.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "gitee.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".stackoverflow.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "stackoverflow.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".npmjs.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "npmjs.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".nuget.org", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "nuget.org", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".pypi.org", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "pypi.org", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".microsoft.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "microsoft.com", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.Allowed;
-        }
-
-        // 游戏引擎 / Game engines
-        // Unity / 虚幻引擎 / Epic Games / Fab资源商店
-        if (host.EndsWith(".unity.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "unity.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".unity3d.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "unity3d.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".unrealengine.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "unrealengine.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".epicgames.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "epicgames.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".fab.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "fab.com", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.Allowed;
-        }
-
-        // 游戏平台 / Game platforms — Steam 需询问用户
-        if (host.EndsWith(".steampowered.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "steampowered.com", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.AskUser;
-        }
-
-        // 世嘉(SEGA，日本) / SEGA (Japan)
-        if (host.EndsWith(".sega.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "sega.com", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.Allowed;
-        }
-
-        // 云服务与开发工具 / Cloud services & dev tools
-        // 亚马逊 / AWS / Kiro IDE / CodeBuddy IDE / JetBrains / 纯光工作室 / W3School中文
-        if (host.EndsWith(".amazon.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "amazon.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".amazonaws.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "amazonaws.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".kiro.dev", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "kiro.dev", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".codebuddy.cn", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "codebuddy.cn", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".jetbrains.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "jetbrains.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".purelight.net.cn", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "purelight.net.cn", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".w3school.com.cn", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "w3school.com.cn", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.Allowed;
-        }
-
-        // 社交/资讯（中国大陆）/ Social & news (mainland China)
-        // 微博 / 知乎 / 网易 / 新浪 / 凤凰网 / 新华社 / 中央电视台
-        if (host.EndsWith(".weibo.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "weibo.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".zhihu.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "zhihu.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".163.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "163.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".sina.com.cn", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".ifeng.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "ifeng.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".xinhuanet.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "xinhuanet.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".cctv.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "cctv.com", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.Allowed;
-        }
-
-        // 中国台湾媒体 / Taiwan media
-        // 中天新闻网(中天电视台) / CTI News (CTI TV)
-        if (host.EndsWith(".ctinews.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "ctinews.com", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.Allowed;
-        }
-
-        // 三立新闻网(三立民视) — 需询问用户 / SET News (SET TV) — ask user
-        if (host.EndsWith(".setn.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "setn.com", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.AskUser;
-        }
-
-        // 网络内容防护机构(中国台湾，有拦截风险) — 禁止
-        // WIN (Taiwan, risk of being blocked) — deny
-        if (host.EndsWith(".win.org.tw", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "win.org.tw", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.Denied;
-        }
-
-        // 日本媒体 / Japanese media
-        // NHK(日本放送协会) / NHK (Japan Broadcasting Corporation)
-        if (host.EndsWith(".nhk.or.jp", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "nhk.or.jp", StringComparison.OrdinalIgnoreCase))
-        {
-            return PermissionResult.Allowed;
-        }
-
-        // 俄罗斯媒体 / Russian media
-        // 俄罗斯卫星通讯社(各国站点) / Sputnik News (all regions)
+        // ===== Allowed: Contains 特殊匹配 =====
+        // 俄罗斯媒体
         if (hostLower.Contains("sputniknews"))
         {
             return PermissionResult.Allowed;
         }
 
-        // 韩国媒体 / Korean media
-        // KBS / MBC / SBS / EBS
-        if (host.EndsWith(".kbs.co.kr", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "kbs.co.kr", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".imbc.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "imbc.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".sbs.co.kr", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "sbs.co.kr", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".ebs.co.kr", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "ebs.co.kr", StringComparison.OrdinalIgnoreCase))
+        // 百科 - creativecommons
+        if (hostLower.Contains("creativecommons"))
         {
             return PermissionResult.Allowed;
         }
 
-        // 朝鲜媒体 / DPRK media
-        // 我的国家 / 劳动新闻 / 青年前卫 / 朝鲜之声 / 平壤时报 / 朝鲜新报
-        if (host.EndsWith(".naenara.com.kp", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".rodong.rep.kp", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".youth.rep.kp", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".vok.rep.kp", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".pyongyangtimes.com.kp", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".chosonsinbo.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "chosonsinbo.com", StringComparison.OrdinalIgnoreCase))
+        // 政府网站
+        if (hostLower.Contains(".gov") || hostLower.EndsWith(".go.jp") || hostLower.EndsWith(".go.kr"))
         {
             return PermissionResult.Allowed;
         }
 
-        // 各国政府网站（通配 .gov 域名）/ Government websites (wildcard .gov domains)
-        // 覆盖：.gov.cn, .gov.tw, .gov.uk, .gov.jp, .gov, .go.jp, .go.kr 等
-        if (hostLower.Contains(".gov")
-            || hostLower.EndsWith(".go.jp")
-            || hostLower.EndsWith(".go.kr"))
+        // ===== Denied: 特殊匹配 =====
+        // 朝鲜媒体 - chosonsinbo.com
+        if (hostLower.Equals("chosonsinbo.com"))
         {
             return PermissionResult.Allowed;
         }
 
-        // 海外社交/直播（需询问用户）/ Overseas social & streaming (ask user)
-        // Twitch / Facebook / X / Gmail / Instagram / lit.link
-        if (host.EndsWith(".twitch.tv", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "twitch.tv", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".facebook.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "facebook.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".x.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "x.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".gmail.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "gmail.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".instagram.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "instagram.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".lit.link", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "lit.link", StringComparison.OrdinalIgnoreCase))
+        // WIN (Taiwan) 和 Threads - Denied
+        var deniedEndsWith = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            return PermissionResult.AskUser;
-        }
+            ".win.org.tw", ".threads.com"
+        };
 
-        // WhatsApp(Meta) — 允许 / Allow
-        if (host.EndsWith(".whatsapp.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "whatsapp.com", StringComparison.OrdinalIgnoreCase))
+        var deniedExact = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            return PermissionResult.Allowed;
-        }
+            "win.org.tw", "threads.com"
+        };
 
-        // Threads(Meta) — 禁止 / Deny
-        if (host.EndsWith(".threads.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "threads.com", StringComparison.OrdinalIgnoreCase))
+        if (deniedEndsWith.Any(host.EndsWith) || deniedExact.Contains(host))
         {
             return PermissionResult.Denied;
         }
 
-        // 视频/媒体 / Video & media
-        // YouTube / 爱奇艺 / 优酷
-        if (host.EndsWith(".youtube.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "youtube.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".iqiyi.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "iqiyi.com", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".youku.com", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "youku.com", StringComparison.OrdinalIgnoreCase))
+        // ===== AskUser: EndsWith 匹配 =====
+        var askUserEndsWith = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            return PermissionResult.Allowed;
+            // 证券交易平台
+            ".htsc.com.cn", ".gtja.com", ".citics.com", ".cmschina.com", ".gf.com.cn",
+            ".htsec.com", ".swhysc.com", ".dfzq.com.cn", ".guosen.com.cn", ".xyzq.com.cn",
+            // 第三方交易平台
+            ".10jqka.com.cn", ".eastmoney.com", ".tdx.com.cn", ".bloomberg.com",
+            ".yahoo.com", ".finance.yahoo.com",
+            // 游戏平台
+            ".steampowered.com", ".ea.com", ".ubisoft.com", ".blizzard.com", ".nintendo.com",
+            // 三立新闻网
+            ".setn.com",
+            // 海外社交/直播
+            ".twitch.tv", ".facebook.com", ".x.com", ".gmail.com",
+            ".instagram.com", ".lit.link"
+        };
+
+        if (askUserEndsWith.Any(host.EndsWith))
+        {
+            return PermissionResult.AskUser;
         }
 
-        // 地图 / Maps
-        // 开放街道地图 / OpenStreetMap (OSM)
-        if (host.EndsWith(".openstreetmap.org", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "openstreetmap.org", StringComparison.OrdinalIgnoreCase))
+        // ===== AskUser: 完全匹配 =====
+        var askUserExact = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            return PermissionResult.Allowed;
-        }
+            "bloomberg.com", "steampowered.com",
+            "ea.com", "ubisoft.com", "blizzard.com", "nintendo.com",
+            "setn.com",
+            "twitch.tv", "facebook.com", "x.com", "gmail.com",
+            "instagram.com", "lit.link"
+        };
 
-        // 百科 / Encyclopedia
-        // 维基百科 / MediaWiki / 知识共享(CC)
-        if (host.EndsWith(".wikipedia.org", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "wikipedia.org", StringComparison.OrdinalIgnoreCase)
-            || host.EndsWith(".mediawiki.org", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(host, "mediawiki.org", StringComparison.OrdinalIgnoreCase)
-            || hostLower.Contains("creativecommons"))
+        if (askUserExact.Contains(host))
         {
-            return PermissionResult.Allowed;
+            return PermissionResult.AskUser;
         }
 
         // 未匹配的网络访问，询问用户 / Unmatched network access, ask user
         return PermissionResult.AskUser;
     }
 
-    #endregion
 
-    #region Command Line Rules (dpf.txt lines 623-874)
 
     private PermissionResult EvaluateCommandLine(Guid callerId, string resourcePath)
     {
@@ -663,123 +419,91 @@ public class DefaultPermissionCallback : IPermissionCallback
 
         if (OperatingSystem.IsWindows())
         {
-            // Windows 允许：只读/查询类命令 / Windows allow: read-only / query commands
-            // dir / tree / tasklist / ipconfig / ping / tracert / systeminfo / whoami / set / path / sc query / findstr
-            if (cmdLower.StartsWith("dir ")
-                || cmdLower.StartsWith("tree ")
-                || string.Equals(cmdLower, "tasklist")
-                || cmdLower.StartsWith("tasklist ")
-                || string.Equals(cmdLower, "ipconfig /all")
-                || cmdLower.StartsWith("ipconfig ")
-                || cmdLower.StartsWith("ping ")
-                || cmdLower.StartsWith("tracert ")
-                || string.Equals(cmdLower, "systeminfo")
-                || string.Equals(cmdLower, "whoami")
-                || string.Equals(cmdLower, "set")
-                || cmdLower.StartsWith("set ")
-                || string.Equals(cmdLower, "path")
-                || cmdLower.StartsWith("sc query ")
-                || cmdLower.StartsWith("findstr "))
+            // Windows 允许：只读/查询类命令
+            var allowedStartsWithWin = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "dir ", "tree ", "tasklist ", "ipconfig ", "ping ", "tracert ",
+                "set ", "sc query ", "findstr "
+            };
+
+            var allowedExactWin = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "tasklist", "ipconfig /all", "systeminfo", "whoami", "set", "path"
+            };
+
+            if (allowedStartsWithWin.Any(cmdLower.StartsWith) || allowedExactWin.Contains(cmdLower))
             {
                 return PermissionResult.Allowed;
             }
 
-            // Windows 禁止：危险/破坏性命令 / Windows deny: dangerous / destructive commands
-            // del / rmdir / format / diskpart / reg delete
-            if (cmdLower.StartsWith("del ")
-                || cmdLower.StartsWith("rmdir ")
-                || cmdLower.StartsWith("format ")
-                || cmdLower.StartsWith("diskpart")
-                || cmdLower.StartsWith("reg delete "))
+            // Windows 禁止：危险/破坏性命令
+            var deniedStartsWithWin = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "del ", "rmdir ", "format ", "diskpart", "reg delete "
+            };
+
+            if (deniedStartsWithWin.Any(cmdLower.StartsWith))
             {
                 return PermissionResult.Denied;
             }
         }
         else if (OperatingSystem.IsLinux())
         {
-            // Linux 允许：只读/查询类命令 / Linux allow: read-only / query commands
-            // ls / tree / ps / top / ifconfig / ip / ping / traceroute / uname / whoami / env / cat / grep / find / df / du / systemctl status
-            if (cmdLower.StartsWith("ls ")
-                || string.Equals(cmdLower, "ls")
-                || cmdLower.StartsWith("tree ")
-                || string.Equals(cmdLower, "tree")
-                || cmdLower.StartsWith("ps ")
-                || string.Equals(cmdLower, "ps")
-                || string.Equals(cmdLower, "top")
-                || cmdLower.StartsWith("ifconfig ")
-                || string.Equals(cmdLower, "ifconfig")
-                || cmdLower.StartsWith("ip ")
-                || cmdLower.StartsWith("ping ")
-                || cmdLower.StartsWith("traceroute ")
-                || cmdLower.StartsWith("uname ")
-                || string.Equals(cmdLower, "uname")
-                || string.Equals(cmdLower, "whoami")
-                || string.Equals(cmdLower, "env")
-                || cmdLower.StartsWith("cat ")
-                || cmdLower.StartsWith("grep ")
-                || cmdLower.StartsWith("find ")
-                || cmdLower.StartsWith("df ")
-                || string.Equals(cmdLower, "df")
-                || cmdLower.StartsWith("du ")
-                || cmdLower.StartsWith("systemctl status "))
+            // Linux 允许：只读/查询类命令
+            var allowedStartsWithLinux = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "ls ", "tree ", "ps ", "ifconfig ", "ip ", "ping ", "traceroute ",
+                "uname ", "cat ", "grep ", "find ", "df ", "du ", "systemctl status "
+            };
+
+            var allowedExactLinux = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "ls", "tree", "ps", "top", "ifconfig", "uname", "whoami", "env", "df"
+            };
+
+            if (allowedStartsWithLinux.Any(cmdLower.StartsWith) || allowedExactLinux.Contains(cmdLower))
             {
                 return PermissionResult.Allowed;
             }
 
-            // Linux 禁止：危险/破坏性命令 / Linux deny: dangerous / destructive commands
-            // rm / rmdir / mkfs / fdisk / dd / chmod / chown / chgrp
-            if (cmdLower.StartsWith("rm ")
-                || cmdLower.StartsWith("rmdir ")
-                || cmdLower.StartsWith("mkfs ")
-                || cmdLower.StartsWith("fdisk ")
-                || cmdLower.StartsWith("dd ")
-                || cmdLower.StartsWith("chmod ")
-                || cmdLower.StartsWith("chown ")
-                || cmdLower.StartsWith("chgrp "))
+            // Linux 禁止：危险/破坏性命令
+            var deniedStartsWithLinux = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "rm ", "rmdir ", "mkfs ", "fdisk ", "dd ", "chmod ", "chown ", "chgrp "
+            };
+
+            if (deniedStartsWithLinux.Any(cmdLower.StartsWith))
             {
                 return PermissionResult.Denied;
             }
         }
         else if (OperatingSystem.IsMacOS())
         {
-            // macOS 允许：只读/查询类命令 / macOS allow: read-only / query commands
-            // ls / tree / ps / top / ifconfig / ping / traceroute / system_profiler / sw_vers / whoami / env / cat / grep / find / df / du / launchctl list
-            if (cmdLower.StartsWith("ls ")
-                || string.Equals(cmdLower, "ls")
-                || cmdLower.StartsWith("tree ")
-                || string.Equals(cmdLower, "tree")
-                || cmdLower.StartsWith("ps ")
-                || string.Equals(cmdLower, "ps")
-                || string.Equals(cmdLower, "top")
-                || cmdLower.StartsWith("ifconfig ")
-                || string.Equals(cmdLower, "ifconfig")
-                || cmdLower.StartsWith("ping ")
-                || cmdLower.StartsWith("traceroute ")
-                || cmdLower.StartsWith("system_profiler ")
-                || string.Equals(cmdLower, "system_profiler")
-                || string.Equals(cmdLower, "sw_vers")
-                || string.Equals(cmdLower, "whoami")
-                || string.Equals(cmdLower, "env")
-                || cmdLower.StartsWith("cat ")
-                || cmdLower.StartsWith("grep ")
-                || cmdLower.StartsWith("find ")
-                || cmdLower.StartsWith("df ")
-                || string.Equals(cmdLower, "df")
-                || cmdLower.StartsWith("du ")
-                || cmdLower.StartsWith("launchctl list "))
+            // macOS 允许：只读/查询类命令
+            var allowedStartsWithMacOS = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "ls ", "tree ", "ps ", "ifconfig ", "ping ", "traceroute ",
+                "system_profiler ", "cat ", "grep ", "find ", "df ", "du ", "launchctl list "
+            };
+
+            var allowedExactMacOS = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "ls", "tree", "ps", "top", "ifconfig", "system_profiler", "sw_vers",
+                "whoami", "env", "df"
+            };
+
+            if (allowedStartsWithMacOS.Any(cmdLower.StartsWith) || allowedExactMacOS.Contains(cmdLower))
             {
                 return PermissionResult.Allowed;
             }
 
-            // macOS 禁止：危险/破坏性命令 / macOS deny: dangerous / destructive commands
-            // rm / rmdir / diskutil eraseDisk / dd / chmod / chown / chgrp
-            if (cmdLower.StartsWith("rm ")
-                || cmdLower.StartsWith("rmdir ")
-                || cmdLower.StartsWith("diskutil erasedisk ")
-                || cmdLower.StartsWith("dd ")
-                || cmdLower.StartsWith("chmod ")
-                || cmdLower.StartsWith("chown ")
-                || cmdLower.StartsWith("chgrp "))
+            // macOS 禁止：危险/破坏性命令
+            var deniedStartsWithMacOS = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "rm ", "rmdir ", "diskutil erasedisk ", "dd ", "chmod ", "chown ", "chgrp "
+            };
+
+            if (deniedStartsWithMacOS.Any(cmdLower.StartsWith))
             {
                 return PermissionResult.Denied;
             }
@@ -789,17 +513,20 @@ public class DefaultPermissionCallback : IPermissionCallback
         return PermissionResult.AskUser;
     }
 
-    #endregion
 
-    #region File Access Rules (dpf.txt lines 876-1008)
 
     private PermissionResult EvaluateFileAccess(Guid callerId, string resourcePath)
     {
         // 最高优先级：危险文件扩展名直接拒绝，无论目录是否允许
         // Highest priority: deny dangerous file extensions regardless of directory permissions
         // .pfx: 证书私钥文件 / .key: 密钥文件 / .bat: Windows 批处理脚本 / .sh: Shell 脚本 / .reg: Windows 注册表文件
+        var deniedExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ".pfx", ".key", ".bat", ".sh", ".reg"
+        };
+
         var ext = Path.GetExtension(resourcePath).ToLowerInvariant();
-        if (ext is ".pfx" or ".key" or ".bat" or ".sh" or ".reg")
+        if (deniedExtensions.Contains(ext))
         {
             return PermissionResult.Denied;
         }
@@ -847,19 +574,17 @@ public class DefaultPermissionCallback : IPermissionCallback
         // 允许：用户常用文件夹 / Allow: common user folders
         // 桌面 / 下载 / 文档 / 图片 / 音乐 / 视频
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile).ToLowerInvariant();
-        var desktopPath = Path.Combine(home, "Desktop").ToLowerInvariant();
-        var downloadsPath = Path.Combine(home, "Downloads").ToLowerInvariant();
-        var documentsPath = Path.Combine(home, "Documents").ToLowerInvariant();
-        var picturesPath = Path.Combine(home, "Pictures").ToLowerInvariant();
-        var musicPath = Path.Combine(home, "Music").ToLowerInvariant();
-        var videosPath = Path.Combine(home, OperatingSystem.IsMacOS() ? "Movies" : "Videos").ToLowerInvariant();
+        var allowedUserPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            Path.Combine(home, "Desktop"),
+            Path.Combine(home, "Downloads"),
+            Path.Combine(home, "Documents"),
+            Path.Combine(home, "Pictures"),
+            Path.Combine(home, "Music"),
+            Path.Combine(home, OperatingSystem.IsMacOS() ? "Movies" : "Videos")
+        };
 
-        if (filePathLower.StartsWith(desktopPath)
-            || filePathLower.StartsWith(downloadsPath)
-            || filePathLower.StartsWith(documentsPath)
-            || filePathLower.StartsWith(picturesPath)
-            || filePathLower.StartsWith(musicPath)
-            || filePathLower.StartsWith(videosPath))
+        if (allowedUserPaths.Any(filePathLower.StartsWith))
         {
             return PermissionResult.Allowed;
         }
@@ -878,12 +603,13 @@ public class DefaultPermissionCallback : IPermissionCallback
             string publicRootPath = Path.GetDirectoryName(publicDesktopPath)!.ToLowerInvariant();
             string publicDownloadsPath = Path.Combine(publicRootPath, "Downloads").ToLowerInvariant();
 
-            if (filePathLower.StartsWith(publicDesktopPath)
-                || filePathLower.StartsWith(publicDocumentsPath)
-                || filePathLower.StartsWith(publicMusicPath)
-                || filePathLower.StartsWith(publicPicturesPath)
-                || filePathLower.StartsWith(publicVideosPath)
-                || filePathLower.StartsWith(publicDownloadsPath))
+            var allowedPublicPathsWin = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                publicDesktopPath, publicDocumentsPath, publicMusicPath,
+                publicPicturesPath, publicVideosPath, publicDownloadsPath
+            };
+
+            if (allowedPublicPathsWin.Any(filePathLower.StartsWith))
             {
                 return PermissionResult.Allowed;
             }
@@ -906,10 +632,12 @@ public class DefaultPermissionCallback : IPermissionCallback
             var progDir = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles).ToLowerInvariant();
             var progX86Dir = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86).ToLowerInvariant();
 
-            if (filePathLower.StartsWith(winDir)
-                || filePathLower.StartsWith(sysDir)
-                || filePathLower.StartsWith(progDir)
-                || filePathLower.StartsWith(progX86Dir))
+            var deniedSystemPathsWin = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                winDir, sysDir, progDir, progX86Dir
+            };
+
+            if (deniedSystemPathsWin.Any(filePathLower.StartsWith))
             {
                 return PermissionResult.Denied;
             }
@@ -918,9 +646,12 @@ public class DefaultPermissionCallback : IPermissionCallback
         {
             // Linux 禁止：系统关键目录 / Linux deny: critical system directories
             // /etc /boot /sbin
-            if (filePathLower.StartsWith("/etc/")
-                || filePathLower.StartsWith("/boot/")
-                || filePathLower.StartsWith("/sbin/"))
+            var deniedSystemPathsLinux = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "/etc/", "/boot/", "/sbin/"
+            };
+
+            if (deniedSystemPathsLinux.Any(filePathLower.StartsWith))
             {
                 return PermissionResult.Denied;
             }
@@ -929,9 +660,12 @@ public class DefaultPermissionCallback : IPermissionCallback
         {
             // macOS 禁止：系统关键目录 / macOS deny: critical system directories
             // /System /Library /private/etc
-            if (filePathLower.StartsWith("/system/")
-                || filePathLower.StartsWith("/library/")
-                || filePathLower.StartsWith("/private/etc/"))
+            var deniedSystemPathsMacOS = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "/system/", "/library/", "/private/etc/"
+            };
+
+            if (deniedSystemPathsMacOS.Any(filePathLower.StartsWith))
             {
                 return PermissionResult.Denied;
             }
@@ -941,5 +675,5 @@ public class DefaultPermissionCallback : IPermissionCallback
         return PermissionResult.AskUser;
     }
 
-    #endregion
+
 }

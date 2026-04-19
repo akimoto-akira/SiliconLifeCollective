@@ -20,102 +20,109 @@ public class PermissionView : ViewBase
         var vm = model as PermissionViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.PageTitlePermission, "beings", vm.Localization, body, GetScripts(vm.Localization), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.PageTitlePermission, "permissions", vm.Localization, body, GetScripts(vm.Localization, vm.BeingId), GetStyles());
     }
 
     private static H RenderBody(PermissionViewModel vm)
     {
         return H.Div(
             H.Div(
-                H.H1(vm.Localization.PermissionPageHeader)
+                H.H1(string.Format(vm.Localization.PermissionPageHeader, vm.BeingId.ToString()))
             ).Class("page-header"),
             H.Div(
-                H.Div().Id("permissions-list").Class("permissions-list")
+                CodeEditorView.RenderWidget(
+                    "permissionCallbackEditor",
+                    vm.CurrentCallbackCode ?? "",
+                    "csharp",
+                    $"Permission Callback - Being {vm.BeingId}",
+                    readOnly: false,
+                    theme: "vs-dark",
+                    minimap: true,
+                    lineNumbers: true,
+                    wordWrap: true,
+                    saveEndpoint: $"/api/permissions/save?beingId={vm.BeingId}"
+                )
             ).Class("card")
         ).Class("page-content");
     }
 
-    private static JsSyntax GetScripts(DefaultLocalizationBase loc)
+    private static JsSyntax GetScripts(DefaultLocalizationBase loc, Guid beingId)
     {
-        var forEachBody = Js.Block()
-            .Add(() => Js.Const(() => "row", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "row").Prop(() => "className"), () => Js.Str(() => "permission-rule")))
-            .Add(() => Js.Const(() => "resultClass", () => Js.Ternary(() => Js.Id(() => "r").Prop(() => "result").Op(() => "===", () => Js.Str(() => "Allowed")), () => Js.Str(() => "result-allowed"), () => Js.Ternary(() => Js.Id(() => "r").Prop(() => "result").Op(() => "===", () => Js.Str(() => "Denied")), () => Js.Str(() => "result-denied"), () => Js.Str(() => "result-ask")))))
-            .Add(() => Js.Assign(() => Js.Id(() => "row").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"rule-type\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "r").Prop(() => "permissionType")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><div class=\"rule-prefix\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "r").Prop(() => "resourcePrefix")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><div class=\"rule-result ")).Op(() => "+", () => (JsSyntax)Js.Id(() => "resultClass")).Op(() => "+", () => (JsSyntax)Js.Str(() => "\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "r").Prop(() => "result")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><div class=\"rule-desc\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "r").Prop(() => "description")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"))))
-            .Add(() => Js.Id(() => "list").Call(() => "appendChild", () => Js.Id(() => "row")).Stmt());
-
-        var thenBody = Js.Block()
-            .Add(() => Js.Const(() => "list", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permissions-list"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => "")))
-            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
-            {
-                { (Js.Id(() => "data").Prop(() => "length").Op(() => "===", () => Js.Num(() => "0")), new List<JsSyntax>
-                    {
-                        Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => $"<p>{loc.PermissionEmptyState}</p>"))
-                    }
-                )}
-            }))
-            .Add(() => Js.Id(() => "data").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "r" }, () => forEachBody)).Stmt());
-
-        var loadPermissionsBody = Js.Block()
-            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/permissions/list")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
-
+        var editorInitBody = Js.Block()
+            .Add(() => Js.Id(() => $"codeEditorInit_permissionCallbackEditor").Invoke().Stmt());
+    
         return Js.Block()
-            .Add(() => Js.Func(() => "loadPermissions", () => new List<string>(), () => loadPermissionsBody))
-            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "loadPermissions").Invoke())));
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Block()
+                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                {
+                    (Js.Id(() => "typeof").Invoke(() => Js.Id(() => "require")).Op(() => "!==", () => Js.Str(() => "undefined")), new List<JsSyntax>
+                    {
+                        Js.Id(() => "editorInitBody").Invoke().Stmt()
+                    }),
+                    (null, new List<JsSyntax>
+                    {
+                        Js.Let(() => "loaderScript", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "script"))),
+                        Js.Assign(() => Js.Id(() => "loaderScript").Prop(() => "src"), () => Js.Str(() => "https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js")),
+                        Js.Assign(() => Js.Id(() => "loaderScript").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "editorInitBody").Invoke())),
+                        Js.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => Js.Id(() => "loaderScript")).Stmt()
+                    })
+                }))
+            )));
     }
 
     private static CssBuilder GetStyles()
     {
         return CssBuilder.Create()
-            .Selector(".permissions-list")
+            .Selector(".code-editor-widget")
                 .Property("display", "flex")
                 .Property("flex-direction", "column")
-                .Property("gap", "8px")
-            .EndSelector()
-            .Selector(".permission-rule")
-                .Property("display", "grid")
-                .Property("grid-template-columns", "140px 1fr 100px 1fr")
-                .Property("gap", "12px")
-                .Property("padding", "12px 16px")
-                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.03))")
                 .Property("border", "1px solid var(--border)")
                 .Property("border-radius", "8px")
-                .Property("font-size", "13px")
+                .Property("overflow", "hidden")
+                .Property("background", "var(--bg-card)")
+            .EndSelector()
+            .Selector(".code-editor-toolbar")
+                .Property("display", "flex")
                 .Property("align-items", "center")
+                .Property("gap", "10px")
+                .Property("padding", "8px 14px")
+                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.05))")
+                .Property("border-bottom", "1px solid var(--border)")
+                .Property("font-size", "13px")
             .EndSelector()
-            .Selector(".rule-type")
-                .Property("font-weight", "600")
+            .Selector(".code-editor-filename")
                 .Property("color", "var(--text-primary)")
+                .Property("font-weight", "500")
+                .Property("flex", "1")
+                .Property("overflow", "hidden")
+                .Property("text-overflow", "ellipsis")
+                .Property("white-space", "nowrap")
             .EndSelector()
-            .Selector(".rule-prefix")
-                .Property("color", "var(--text-secondary)")
-                .Property("word-break", "break-all")
-                .Property("font-family", "monospace")
-                .Property("font-size", "12px")
-            .EndSelector()
-            .Selector(".rule-result")
-                .Property("font-weight", "600")
-                .Property("text-align", "center")
+            .Selector(".code-editor-lang-badge")
+                .Property("background", "var(--accent-primary)")
+                .Property("color", "#fff")
                 .Property("padding", "2px 8px")
                 .Property("border-radius", "4px")
-                .Property("font-size", "12px")
+                .Property("font-size", "11px")
+                .Property("font-weight", "600")
+                .Property("letter-spacing", "0.5px")
             .EndSelector()
-            .Selector(".result-allowed")
-                .Property("color", "var(--accent-success, #4CAF50)")
-                .Property("background", "rgba(76,175,80,0.1)")
+            .Selector(".code-editor-btn-save")
+                .Property("background", "none")
+                .Property("border", "none")
+                .Property("cursor", "pointer")
+                .Property("font-size", "18px")
+                .Property("padding", "2px 6px")
+                .Property("border-radius", "4px")
+                .Property("transition", "background 0.2s")
             .EndSelector()
-            .Selector(".result-denied")
-                .Property("color", "var(--accent-error, #f44336)")
-                .Property("background", "rgba(244,67,54,0.1)")
+            .Selector(".code-editor-btn-save:hover")
+                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.1))")
             .EndSelector()
-            .Selector(".result-ask")
-                .Property("color", "var(--accent-warning, #FF9800)")
-                .Property("background", "rgba(255,152,0,0.1)")
-            .EndSelector()
-            .Selector(".rule-desc")
-                .Property("color", "var(--text-secondary)")
-                .Property("font-size", "12px")
+            .Selector(".code-editor-container")
+                .Property("flex", "1")
+                .Property("min-height", "500px")
+                .Property("width", "100%")
             .EndSelector();
     }
 }

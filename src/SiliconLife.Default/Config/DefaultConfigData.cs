@@ -70,21 +70,20 @@ public class DefaultConfigData : ConfigDataBase
     /// Gets or sets the AI client type to use
     /// </summary>
     [ConfigGroup("AI", Order = 0, DisplayNameKey = "AIClientType", DescriptionKey = "AIClientType")]
-    public string AIClientType { get; set; } = "OllamaClient";
+    public override string AIClientType { get; set; } = "OllamaClient";
 
     /// <summary>
-    /// Gets or sets the Ollama API endpoint URL
+    /// Gets or sets the global AI client configuration dictionary.
+    /// Used when silicon beings don't have their own AI config.
     /// </summary>
-    [AIClientConfig("OllamaClient", Order = 1)]
-    [ConfigGroup("AI", Order = 1, DisplayNameKey = "OllamaEndpoint", DescriptionKey = "OllamaEndpoint")]
-    public string OllamaEndpoint { get; set; } = "http://localhost:11434";
-
-    /// <summary>
-    /// Gets or sets the default AI model to use
-    /// </summary>
-    [AIClientConfig("OllamaClient", Order = 2)]
-    [ConfigGroup("AI", Order = 2, DisplayNameKey = "DefaultModel", DescriptionKey = "DefaultModel")]
-    public string DefaultModel { get; set; } = "qwen3.5:cloud";
+    [ConfigGroup("AI", Order = 1, DisplayNameKey = "AIConfig", DescriptionKey = "AIConfigDescription")]
+    public override Dictionary<string, object> AIConfig { get; set; } = new Dictionary<string, object>
+    {
+        ["endpoint"] = "http://localhost:11434",
+        ["model"] = "qwen3.5:cloud",
+        ["temperature"] = 0.7,
+        ["maxTokens"] = 4096
+    };
 
     /// <summary>
     /// Gets or sets the web server port
@@ -160,8 +159,7 @@ public class DefaultConfigData : ConfigDataBase
                     WatchdogTimeout = loadedData.WatchdogTimeout;
                     MinimumLogLevel = loadedData.MinimumLogLevel;
                     AIClientType = loadedData.AIClientType;
-                    OllamaEndpoint = loadedData.OllamaEndpoint;
-                    DefaultModel = loadedData.DefaultModel;
+                    AIConfig = loadedData.AIConfig ?? new Dictionary<string, object>();
                     WebPort = loadedData.WebPort;
                     AllowIntranet = loadedData.AllowIntranet;
                     WebSkin = loadedData.WebSkin;

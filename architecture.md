@@ -319,7 +319,7 @@ The Web UI follows a **MVC-like pattern** with 17 controllers handling different
 | Being | Silicon Being management and status |
 | Chat | Real-time chat interface with SSE |
 | CodeBrowser | Code viewing and editing |
-| Config | System configuration |
+| Config | System configuration management |
 | Dashboard | System overview and metrics |
 | Executor | Executor status and management |
 | Init | First-run initialization wizard |

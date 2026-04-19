@@ -17,8 +17,9 @@ namespace SiliconLife.Collective;
 
 /// <summary>
 /// Manages loading, compiling, and persisting dynamically compiled silicon beings.
-/// Handles the full lifecycle: read code.enc → decrypt → security scan → compile → instantiate.
+/// Handles the full lifecycle: read code.enc → decrypt → compile → instantiate.
 /// Falls back to a default type if anything fails.
+/// Uses CompilationCore directly for compilation without security scanning.
 /// </summary>
 public class DynamicBeingLoader
 {
@@ -26,7 +27,7 @@ public class DynamicBeingLoader
     private const string CodeFileName = "code.enc";
     private const string PermissionCodeFileName = "permission.enc";
 
-    private readonly DynamicCompilationExecutor _executor;
+    private readonly CompilationCore _compilationCore;
 
     /// <summary>
     /// Creates a new DynamicBeingLoader.
@@ -34,7 +35,10 @@ public class DynamicBeingLoader
     /// <param name="hostAssemblyPath">Optional path to the host assembly for compilation references</param>
     public DynamicBeingLoader(string? hostAssemblyPath = null)
     {
-        _executor = new DynamicCompilationExecutor(hostAssemblyPath);
+        // Initialize compilation core with SiliconBeingBase and IPermissionCallback assemblies
+        _compilationCore = new CompilationCore(
+            typeof(SiliconBeingBase).Assembly,
+            typeof(IPermissionCallback).Assembly);
     }
 
     /// <summary>
@@ -75,7 +79,22 @@ public class DynamicBeingLoader
                 "Code may be corrupted or the GUID may have changed.");
         }
 
-        CompilationResult result = _executor.Compile<SiliconBeingBase>(sourceCode);
+        // Compile using CompilationCore directly (no security scan)
+        CompilationResult result = _compilationCore.Compile(
+            sourceCode,
+            assembly =>
+            {
+                // Find any type inheriting SiliconBeingBase
+                foreach (Type type in assembly.GetTypes())
+                {
+                    if (!type.IsAbstract && typeof(SiliconBeingBase).IsAssignableFrom(type))
+                    {
+                        return type;
+                    }
+                }
+                return null;
+            });
+
         if (!result.Success)
         {
             string errorList = result.Errors.Count > 0
@@ -131,6 +150,7 @@ public class DynamicBeingLoader
     /// <summary>
     /// Compiles source code for a being and creates an instance.
     /// Does NOT persist — used for preview/verification.
+    /// Uses CompilationCore directly (no security scan).
     /// </summary>
     /// <param name="sourceCode">The C# source code</param>
     /// <param name="beingId">The being's GUID</param>
@@ -138,7 +158,22 @@ public class DynamicBeingLoader
     public CompilationResult CompileBeing(string sourceCode, Guid beingId)
     {
         _logger.Info("Preview compilation for being {0}", beingId);
-        return _executor.Compile<SiliconBeingBase>(sourceCode);
+        
+        // Compile using CompilationCore directly (no security scan)
+        return _compilationCore.Compile(
+            sourceCode,
+            assembly =>
+            {
+                // Find any type inheriting SiliconBeingBase
+                foreach (Type type in assembly.GetTypes())
+                {
+                    if (!type.IsAbstract && typeof(SiliconBeingBase).IsAssignableFrom(type))
+                    {
+                        return type;
+                    }
+                }
+                return null;
+            });
     }
 
     /// <summary>
@@ -176,7 +211,22 @@ public class DynamicBeingLoader
             return new CompilationResult(false, null, ["Failed to decrypt permission callback code."]);
         }
 
-        CompilationResult result = _executor.CompilePermissionCallback(sourceCode);
+        // Compile using CompilationCore directly (no security scan)
+        CompilationResult result = _compilationCore.Compile(
+            sourceCode,
+            assembly =>
+            {
+                // Find IPermissionCallback implementation
+                foreach (Type type in assembly.GetTypes())
+                {
+                    if (!type.IsAbstract && typeof(IPermissionCallback).IsAssignableFrom(type))
+                    {
+                        return type;
+                    }
+                }
+                return null;
+            });
+
         if (result.Success)
         {
             _logger.Info("Permission callback loaded for being {0}, type={1}", beingId, result.CompiledType?.Name);
@@ -186,6 +236,41 @@ public class DynamicBeingLoader
             _logger.Error("Failed to load permission callback for being {0}", beingId);
         }
         return result;
+    }
+
+    /// <summary>
+    /// Reads and decrypts the permission callback source code without compiling.
+    /// Used by Web UI to display the current code for editing.
+    /// </summary>
+    /// <param name="beingId">The silicon being's GUID</param>
+    /// <param name="beingDirectory">The silicon being's data directory</param>
+    /// <returns>The decrypted source code, or empty string if not found or failed</returns>
+    public string GetPermissionCallbackSourceCode(Guid beingId, string beingDirectory)
+    {
+        try
+        {
+            string permPath = Path.Combine(beingDirectory, PermissionCodeFileName);
+            if (!File.Exists(permPath))
+            {
+                _logger.Debug("No permission callback file found for being {0}", beingId);
+                return string.Empty;
+            }
+
+            byte[] encryptedCode = File.ReadAllBytes(permPath);
+
+            if (!CodeEncryption.TryDecryptToString(encryptedCode, beingId, out string? sourceCode) || sourceCode == null)
+            {
+                _logger.Warn("Failed to decrypt permission callback for being {0}", beingId);
+                return string.Empty;
+            }
+
+            return sourceCode;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error("Error reading permission callback source for being {0}: {1}", beingId, ex.Message);
+            return string.Empty;
+        }
     }
 
     /// <summary>

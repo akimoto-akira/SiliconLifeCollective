@@ -271,6 +271,21 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string InitEndpointPlaceholder { get; }
 
     /// <summary>
+    /// Gets the label for the AI client type field
+    /// </summary>
+    public abstract string InitAIClientTypeLabel { get; }
+
+    /// <summary>
+    /// Gets the label for the default model field
+    /// </summary>
+    public abstract string InitModelLabel { get; }
+
+    /// <summary>
+    /// Gets the placeholder for the default model input
+    /// </summary>
+    public abstract string InitModelPlaceholder { get; }
+
+    /// <summary>
     /// Gets the label for the skin field
     /// </summary>
     public abstract string InitSkinLabel { get; }
@@ -594,6 +609,21 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string BeingsDetailSoulContentLabel { get; }
 
     /// <summary>
+    /// Gets the soul content edit link text in detail view
+    /// </summary>
+    public abstract string BeingsDetailSoulContentEditLink { get; }
+
+    /// <summary>
+    /// Gets the back to list link text
+    /// </summary>
+    public abstract string BeingsBackToList { get; }
+
+    /// <summary>
+    /// Gets the soul editor page subtitle
+    /// </summary>
+    public abstract string SoulEditorSubtitle { get; }
+
+    /// <summary>
     /// Gets the memory label in detail view
     /// </summary>
     public abstract string BeingsDetailMemoryLabel { get; }
@@ -622,6 +652,16 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the tasks label in detail view
     /// </summary>
     public abstract string BeingsDetailTasksLabel { get; }
+
+    /// <summary>
+    /// Gets the independent AI client label in detail view
+    /// </summary>
+    public abstract string BeingsDetailAIClientLabel { get; }
+
+    /// <summary>
+    /// Gets the AI client edit link text
+    /// </summary>
+    public abstract string BeingsDetailAIClientEditLink { get; }
 
     /// <summary>
     /// Gets the "Yes" text for boolean values
@@ -930,6 +970,77 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// </summary>
     public abstract string PermissionEmptyState { get; }
 
+    /// <summary>
+    /// Gets the error message when being ID is missing
+    /// </summary>
+    public abstract string PermissionMissingBeingId { get; }
+
+    /// <summary>
+    /// Gets the error message when being is not found
+    /// </summary>
+    public abstract string PermissionBeingNotFound { get; }
+
+    /// <summary>
+    /// Gets the default permission template header title
+    /// </summary>
+    public abstract string PermissionTemplateHeader { get; }
+
+    /// <summary>
+    /// Gets the default permission template description
+    /// </summary>
+    public abstract string PermissionTemplateDescription { get; }
+
+    /// <summary>
+    /// Gets the XML doc: class summary for DefaultPermissionCallback
+    /// </summary>
+    public abstract string PermissionCallbackClassSummary { get; }
+
+    /// <summary>
+    /// Gets the XML doc: class summary line 2 for DefaultPermissionCallback
+    /// </summary>
+    public abstract string PermissionCallbackClassSummary2 { get; }
+
+    /// <summary>
+    /// Gets the XML doc: constructor summary for DefaultPermissionCallback
+    /// </summary>
+    public abstract string PermissionCallbackConstructorSummary { get; }
+
+    /// <summary>
+    /// Gets the XML doc: constructor summary line 2 for DefaultPermissionCallback
+    /// </summary>
+    public abstract string PermissionCallbackConstructorSummary2 { get; }
+
+    /// <summary>
+    /// Gets the XML doc: constructor param description for appDataDirectory
+    /// </summary>
+    public abstract string PermissionCallbackConstructorParam { get; }
+
+    /// <summary>
+    /// Gets the XML doc: Evaluate method summary for DefaultPermissionCallback
+    /// </summary>
+    public abstract string PermissionCallbackEvaluateSummary { get; }
+
+    /// <summary>
+    /// Gets the fallback comment for "other permission types default to allowed"
+    /// </summary>
+    public abstract string PermissionRuleOtherTypesDefault { get; }
+
+    /// <summary>
+    /// Gets the localized comment for a permission rule by key.
+    /// Returns the key itself if not found (used as fallback bilingual comment).
+    /// </summary>
+    public virtual string GetPermissionRuleComment(string key) => key;
+
+    /// <summary>
+    /// Gets the section title for permission rules list
+    /// </summary>
+    public abstract string PermissionRulesSection { get; }
+
+    /// <summary>
+    /// Gets the section title for permission editor
+    /// </summary>
+    public abstract string PermissionEditorSection { get; }
+
     // ===== Knowledge Page Localization =====
 
     /// <summary>
@@ -1108,6 +1219,36 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the error message prefix for save failure in alert dialog
     /// </summary>
     public abstract string ConfigSaveFailed { get; }
+
+    /// <summary>
+    /// Gets the label for dictionary type
+    /// </summary>
+    public abstract string ConfigDictionaryLabel { get; }
+
+    /// <summary>
+    /// Gets the label for dictionary key input
+    /// </summary>
+    public abstract string ConfigDictKeyLabel { get; }
+
+    /// <summary>
+    /// Gets the label for dictionary value input
+    /// </summary>
+    public abstract string ConfigDictValueLabel { get; }
+
+    /// <summary>
+    /// Gets the text for add button in dictionary editor
+    /// </summary>
+    public abstract string ConfigDictAddButton { get; }
+
+    /// <summary>
+    /// Gets the text for delete button in dictionary editor
+    /// </summary>
+    public abstract string ConfigDictDeleteButton { get; }
+
+    /// <summary>
+    /// Gets the message when dictionary is empty
+    /// </summary>
+    public abstract string ConfigDictEmptyMessage { get; }
 
     // ===== Logs Page Localization =====
 
@@ -1367,6 +1508,44 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Subclasses may override to provide a localized version.
     /// </summary>
     public abstract string DefaultCuratorSoul { get; }
+
+    // ===== Interval Calendar Localization =====
+
+    /// <summary>
+    /// Gets the display name of the Interval (time span) calendar system.
+    /// This is a virtual calendar used for recurring timers based on time intervals.
+    /// </summary>
+    public abstract string CalendarIntervalName { get; }
+
+    /// <summary>
+    /// Gets the localized label for the days component in interval.
+    /// </summary>
+    public abstract string CalendarIntervalDays { get; }
+
+    /// <summary>
+    /// Gets the localized label for the hours component in interval.
+    /// </summary>
+    public abstract string CalendarIntervalHours { get; }
+
+    /// <summary>
+    /// Gets the localized label for the minutes component in interval.
+    /// </summary>
+    public abstract string CalendarIntervalMinutes { get; }
+
+    /// <summary>
+    /// Gets the localized label for the seconds component in interval.
+    /// </summary>
+    public abstract string CalendarIntervalSeconds { get; }
+
+    /// <summary>
+    /// Gets the localized label for "every" in interval description.
+    /// </summary>
+    public abstract string CalendarIntervalEvery { get; }
+
+    /// <summary>
+    /// Formats a full interval description into a localized human-readable string.
+    /// </summary>
+    public abstract string LocalizeIntervalDescription(int days, int hours, int minutes, int seconds);
 
     // ===== Gregorian Calendar Localization =====
 
@@ -2142,6 +2321,29 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract override string FormatMemoryEventToolCall(string toolNames);
     public abstract override string FormatMemoryEventTask(string content);
     public abstract override string FormatMemoryEventTimer(string content);
+    public abstract override string FormatMemoryEventTimerError(string timerName, string error);
+
+    // ===== Timer Notification Localization =====
+
+    /// <summary>
+    /// Formats a notification message when a timer starts execution.
+    /// </summary>
+    /// <param name="timerName">The name of the timer</param>
+    public abstract override string FormatTimerStartNotification(string timerName);
+
+    /// <summary>
+    /// Formats a notification message when a timer completes execution.
+    /// </summary>
+    /// <param name="timerName">The name of the timer</param>
+    /// <param name="result">The execution result summary</param>
+    public abstract override string FormatTimerEndNotification(string timerName, string result);
+
+    /// <summary>
+    /// Formats a notification message when a timer execution fails.
+    /// </summary>
+    /// <param name="timerName">The name of the timer</param>
+    /// <param name="error">The error message</param>
+    public abstract override string FormatTimerErrorNotification(string timerName, string error);
 
     // ===== Default-Layer Memory Event Localization =====
 

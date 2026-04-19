@@ -24,9 +24,15 @@ public class MarkdownEditorView : ViewBase
         bool readOnly = false, string initialMode = "edit",
         string saveEndpoint = "")
     {
+        // Sanitize editorId to ensure it's a valid JavaScript identifier
+        // Replace hyphens and other invalid characters with underscores
+        var safeEditorId = new string(editorId.Select(c => char.IsLetterOrDigit(c) || c == '_' ? c : '_').ToArray());
+        if (char.IsDigit(safeEditorId[0]))
+            safeEditorId = "_" + safeEditorId;  // Identifiers can't start with digits
+        
         var escapedMarkdown = EscapeCodeForJs(markdown);
-        var textareaId = editorId + "-textarea";
-        var previewId = editorId + "-preview";
+        var textareaId = safeEditorId + "-textarea";
+        var previewId = safeEditorId + "-preview";
 
         var toolbarChildren = new List<object>();
         if (!string.IsNullOrEmpty(filePath))
@@ -35,14 +41,14 @@ public class MarkdownEditorView : ViewBase
         }
 
         toolbarChildren.Add(H.Div(
-            H.Button("✏️").Class("md-editor-mode-btn md-editor-mode-edit").OnClick($"mdEditorSetMode_{editorId}('edit')"),
-            H.Button("👁").Class("md-editor-mode-btn md-editor-mode-preview").OnClick($"mdEditorSetMode_{editorId}('preview')"),
-            H.Button("📋").Class("md-editor-mode-btn md-editor-mode-split").OnClick($"mdEditorSetMode_{editorId}('split')")
+            H.Button("✏️").Class("md-editor-mode-btn md-editor-mode-edit").OnClick($"mdEditorSetMode_{safeEditorId}('edit')"),
+            H.Button("👁").Class("md-editor-mode-btn md-editor-mode-preview").OnClick($"mdEditorSetMode_{safeEditorId}('preview')"),
+            H.Button("📋").Class("md-editor-mode-btn md-editor-mode-split").OnClick($"mdEditorSetMode_{safeEditorId}('split')")
         ).Class("md-editor-mode-group"));
 
         if (!readOnly)
         {
-            toolbarChildren.Add(H.Button("💾").Class("md-editor-btn-save").OnClick($"mdEditorSave_{editorId}()"));
+            toolbarChildren.Add(H.Button("💾").Class("md-editor-btn-save").OnClick($"mdEditorSave_{safeEditorId}()"));
         }
 
         return H.Div(
@@ -53,10 +59,9 @@ public class MarkdownEditorView : ViewBase
                 ).Class("md-editor-edit-pane"),
                 H.Div().Id(previewId).Class("md-editor-preview-pane")
             ).Class("md-editor-body"),
-            H.Input().Id(editorId + "-md-hidden").Attr("type", "hidden").Value(escapedMarkdown),
-            H.Input().Id(editorId + "-dirty-flag").Attr("type", "hidden").Value("0"),
-            H.Input().Id(editorId + "-mode-hidden").Attr("type", "hidden").Value(initialMode)
-        ).Class("md-editor-widget").Id(editorId);
+            H.Input().Id(safeEditorId + "-dirty-flag").Attr("type", "hidden").Value("0"),
+            H.Input().Id(safeEditorId + "-mode-hidden").Attr("type", "hidden").Value(initialMode)
+        ).Class("md-editor-widget").Id(safeEditorId);
     }
 
     public static CssBuilder GetWidgetStyles()
@@ -148,6 +153,25 @@ public class MarkdownEditorView : ViewBase
                 .Property("color", "var(--text-primary)")
                 .Property("tab-size", "4")
             .EndSelector()
+            .Selector(".md-editor-edit-pane .CodeMirror")
+                .Property("height", "100%")
+                .Property("font-size", "14px")
+                .Property("font-family", "'JetBrains Mono', 'Fira Code', 'Consolas', monospace")
+                .Property("line-height", "1.6")
+                .Property("tab-size", "4")
+                .Property("background", "var(--bg-card)")
+                .Property("color", "var(--text-primary)")
+            .EndSelector()
+            .Selector(".md-editor-edit-pane .CodeMirror-gutters")
+                .Property("background", "var(--bg-secondary, rgba(255,255,255,0.05))")
+                .Property("border-right", "1px solid var(--border)")
+            .EndSelector()
+            .Selector(".md-editor-edit-pane .CodeMirror-linenumber")
+                .Property("color", "var(--text-secondary)")
+            .EndSelector()
+            .Selector(".md-editor-edit-pane .CodeMirror-cursor")
+                .Property("border-left-color", "var(--text-primary)")
+            .EndSelector()
             .Selector(".md-editor-preview-pane")
                 .Property("flex", "1")
                 .Property("overflow-y", "auto")
@@ -195,6 +219,20 @@ public class MarkdownEditorView : ViewBase
             .Selector(".md-editor-preview-pane pre code")
                 .Property("background", "none")
                 .Property("padding", "0")
+            .EndSelector()
+            .Selector(".md-editor-preview-pane pre.hljs")
+                .Property("background", "var(--bg-secondary, rgba(0,0,0,0.3))")
+                .Property("padding", "16px")
+                .Property("border-radius", "6px")
+                .Property("overflow-x", "auto")
+                .Property("margin", "1em 0")
+                .Property("tab-size", "4")
+            .EndSelector()
+            .Selector(".md-editor-preview-pane .hljs")
+                .Property("display", "block")
+                .Property("overflow-x", "auto")
+                .Property("padding", "0")
+                .Property("background", "transparent")
             .EndSelector()
             .Selector(".md-editor-preview-pane blockquote")
                 .Property("border-left", "4px solid var(--accent-primary)")
@@ -261,19 +299,22 @@ public class MarkdownEditorView : ViewBase
             .EndSelector();
     }
 
-    public static JsSyntax GetWidgetScripts(string editorId, bool readOnly = false,
+    public static JsSyntax GetWidgetScripts(string editorId, string initialContent = "", bool readOnly = false,
         string saveEndpoint = "")
     {
-        string textareaId = editorId + "-textarea";
-        string previewId = editorId + "-preview";
-        string hiddenId = editorId + "-md-hidden";
-        string dirtyId = editorId + "-dirty-flag";
-        string modeId = editorId + "-mode-hidden";
-        string widgetId = editorId;
+        // Sanitize editorId to match RenderWidget
+        var safeEditorId = new string(editorId.Select(c => char.IsLetterOrDigit(c) || c == '_' ? c : '_').ToArray());
+        if (char.IsDigit(safeEditorId[0]))
+            safeEditorId = "_" + safeEditorId;
+        
+        string textareaId = safeEditorId + "-textarea";
+        string previewId = safeEditorId + "-preview";
+        string dirtyId = safeEditorId + "-dirty-flag";
+        string modeId = safeEditorId + "-mode-hidden";
+        string widgetId = safeEditorId;
 
         JsBlock initBody = Js.Block()
             .Add(() => Js.Let(() => "textarea", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => textareaId))))
-            .Add(() => Js.Let(() => "hiddenInput", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => hiddenId))))
             .Add(() => Js.Let(() => "dirtyFlag", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => dirtyId))))
             .Add(() => Js.Let(() => "modeInput", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => modeId))))
             .Add(() => Js.Let(() => "widget", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => widgetId))))
@@ -284,20 +325,33 @@ public class MarkdownEditorView : ViewBase
                     Js.Return(() => Js.Str(() => ""))
                 })
             }))
-            .Add(() => Js.Assign(() => Js.Id(() => "textarea").Prop(() => "value"), () => Js.Id(() => "hiddenInput").Prop(() => "value")))
-            .Add(() => Js.Id(() => "textarea").Call(() => "addEventListener", () => Js.Str(() => "input"), () => Js.Arrow(() => new List<string>(), () => Js.Block()
-                .Add(() => Js.Assign(() => Js.Id(() => "dirtyFlag").Prop(() => "value"), () => Js.Str(() => "1")))))
-            .Stmt())
-            .Add(() => Js.Assign(() => Js.Id(() => "window").Index(() => Js.Str(() => editorId)), () => Js.Obj()
+            // Set initial content to textarea before creating CodeMirror
+            .Add(() => Js.Assign(() => Js.Id(() => "textarea").Prop(() => "value"), () => Js.Str(() => initialContent)))
+            // Initialize CodeMirror editor
+            .Add(() => Js.Let(() => "editor", () => Js.Id(() => "window").Prop(() => "CodeMirror").Call(() => "fromTextArea", () => Js.Id(() => "textarea"), () => Js.Obj()
+                .Prop(() => "mode", () => Js.Str(() => "text/x-markdown"))
+                .Prop(() => "lineNumbers", () => Js.Bool(() => true))
+                .Prop(() => "lineWrapping", () => Js.Bool(() => true))
+                .Prop(() => "tabSize", () => Js.Num(() => "4"))
+                .Prop(() => "indentWithTabs", () => Js.Bool(() => true))
+                .Prop(() => "theme", () => Js.Str(() => "default")))))
+            .Add(() => Js.Id(() => "editor").Call(() => "on", () => Js.Str(() => "change"), () => Js.Arrow(() => new List<string> { "instance" }, () => Js.Block()
+                .Add(() => Js.Assign(() => Js.Id(() => "dirtyFlag").Prop(() => "value"), () => Js.Str(() => "1")))
+                .Add(() => Js.Id(() => "instance").Call(() => "save").Stmt())
+                .Add(() => Js.Assign(() => Js.Id(() => "textarea").Prop(() => "value"), () => Js.Id(() => "instance").Call(() => "getValue")).Stmt()))))
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Index(() => Js.Str(() => safeEditorId)), () => Js.Obj()
+                .Prop(() => "editor", () => Js.Id(() => "editor"))
                 .Prop(() => "textarea", () => Js.Id(() => "textarea"))
                 .Prop(() => "dirtyFlag", () => Js.Id(() => "dirtyFlag"))
                 .Prop(() => "modeInput", () => Js.Id(() => "modeInput"))
                 .Prop(() => "widget", () => Js.Id(() => "widget"))))
-            .Add(() => Js.Id(() => $"mdEditorSetMode_{editorId}").Invoke(() => Js.Id(() => "modeInput").Prop(() => "value")).Stmt())
-            .Add(() => Js.Id(() => $"mdEditorRender_{editorId}").Invoke().Stmt());
+            // Refresh CodeMirror to ensure proper rendering
+            .Add(() => Js.Id(() => "editor").Call(() => "refresh").Stmt())
+            .Add(() => Js.Id(() => $"mdEditorSetMode_{safeEditorId}").Invoke(() => Js.Id(() => "modeInput").Prop(() => "value")).Stmt())
+            .Add(() => Js.Id(() => $"mdEditorRender_{safeEditorId}").Invoke().Stmt());
 
         JsBlock renderBody = Js.Block()
-            .Add(() => Js.Let(() => "state", () => Js.Id(() => "window").Index(() => Js.Str(() => editorId))))
+            .Add(() => Js.Let(() => "state", () => Js.Id(() => "window").Index(() => Js.Str(() => safeEditorId))))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 (Js.Id(() => "state").Not(), new List<JsSyntax>
@@ -313,21 +367,53 @@ public class MarkdownEditorView : ViewBase
                     Js.Return(() => Js.Str(() => ""))
                 })
             }))
-            .Add(() => Js.Let(() => "md", () => Js.Id(() => "state").Prop(() => "textarea").Prop(() => "value")))
+            // Get markdown content from CodeMirror editor
+            .Add(() => Js.Let(() => "md", () => Js.Id(() => "state").Prop(() => "editor").Call(() => "getValue")))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 (Js.Id(() => "typeof").Invoke(() => Js.Id(() => "marked")).Op(() => "!==", () => Js.Str(() => "undefined")), new List<JsSyntax>
                 {
-                    Js.Assign(() => Js.Id(() => "previewEl").Prop(() => "innerHTML"), () => Js.Id(() => "marked").Call(() => "parse", () => Js.Id(() => "md")))
+                    // Configure marked to use highlight.js for code highlighting (only if hljs is available)
+                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "typeof").Invoke(() => Js.Id(() => "hljs")).Op(() => "!==", () => Js.Str(() => "undefined")), new List<JsSyntax>
+                        {
+                            // Configure marked with highlight function
+                            Js.Assign(
+                                () => Js.Id(() => "window").Prop(() => "markedHighlight"),
+                                () => Js.Arrow(() => new List<string> { "code", "lang" }, () => Js.Block()
+                                    .Add(() => Js.Let(() => "result", () => Js.Ternary(
+                                        () => Js.Id(() => "lang").Op(() => "&&", () => Js.Id(() => "hljs").Call(() => "getLanguage", () => Js.Id(() => "lang"))),
+                                        () => Js.Id(() => "hljs").Call(() => "highlight", () => Js.Id(() => "code"), () => Js.Obj().Prop(() => "language", () => Js.Id(() => "lang"))).Prop(() => "value"),
+                                        () => Js.Id(() => "hljs").Call(() => "highlightAuto", () => Js.Id(() => "code")).Prop(() => "value")
+                                    )))
+                                    .Add(() => Js.Return(() => Js.Id(() => "result")))))
+                            .Stmt(),
+                            Js.Id(() => "marked").Call(() => "setOptions", () => Js.Obj()
+                                .Prop(() => "highlight", () => Js.Id(() => "window").Prop(() => "markedHighlight")))
+                            .Stmt()
+                        })
+                    }),
+                    // Render markdown to HTML
+                    Js.Assign(() => Js.Id(() => "previewEl").Prop(() => "innerHTML"), () => Js.Id(() => "marked").Call(() => "parse", () => Js.Id(() => "md"))).Stmt(),
+                    // Apply highlight.js to all code blocks if hljs is available
+                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "typeof").Invoke(() => Js.Id(() => "hljs")).Op(() => "!==", () => Js.Str(() => "undefined")), new List<JsSyntax>
+                        {
+                            Js.Id(() => "hljs").Call(() => "highlightAll").Stmt()
+                        })
+                    })
                 }),
                 (null, new List<JsSyntax>
                 {
-                    Js.Assign(() => Js.Id(() => "previewEl").Prop(() => "innerHTML"), () => Js.Str(() => "<p>Markdown preview requires marked.js</p>"))
+                    // Fallback: just show the markdown as-is if marked is not loaded
+                    Js.Assign(() => Js.Id(() => "previewEl").Prop(() => "innerHTML"), () => Js.Id(() => "md")).Stmt()
                 })
             }));
 
         JsBlock setModeBody = Js.Block()
-            .Add(() => Js.Let(() => "state", () => Js.Id(() => "window").Index(() => Js.Str(() => editorId))))
+            .Add(() => Js.Let(() => "state", () => Js.Id(() => "window").Index(() => Js.Str(() => safeEditorId))))
             .Add(() => Js.Let(() => "widget", () => Js.Id(() => "state").Op(() => "&&", () => Js.Id(() => "state").Prop(() => "widget")).Op(() => "||", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => widgetId)))))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
@@ -363,12 +449,12 @@ public class MarkdownEditorView : ViewBase
             {
                 (Js.Id(() => "mode").Op(() => "===", () => Js.Str(() => "preview")).Op(() => "||", () => Js.Id(() => "mode").Op(() => "===", () => Js.Str(() => "split"))), new List<JsSyntax>
                 {
-                    Js.Id(() => $"mdEditorRender_{editorId}").Invoke().Stmt()
+                    Js.Id(() => $"mdEditorRender_{safeEditorId}").Invoke().Stmt()
                 })
             }));
 
         JsBlock saveBody = Js.Block()
-            .Add(() => Js.Let(() => "state", () => Js.Id(() => "window").Index(() => Js.Str(() => editorId))))
+            .Add(() => Js.Let(() => "state", () => Js.Id(() => "window").Index(() => Js.Str(() => safeEditorId))))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 (Js.Id(() => "state").Not(), new List<JsSyntax>
@@ -376,8 +462,8 @@ public class MarkdownEditorView : ViewBase
                     Js.Return(() => Js.Str(() => ""))
                 })
             }))
-            .Add(() => Js.Let(() => "md", () => Js.Id(() => "state").Prop(() => "textarea").Prop(() => "value")))
-            .Add(() => Js.Let(() => "dirtyFlag", () => Js.Id(() => "dirtyFlag")));
+            .Add(() => Js.Let(() => "md", () => Js.Id(() => "state").Prop(() => "editor").Call(() => "getValue")))
+            .Add(() => Js.Let(() => "dirtyFlag", () => Js.Id(() => "state").Prop(() => "dirtyFlag")));
 
         if (!string.IsNullOrEmpty(saveEndpoint))
         {
@@ -387,10 +473,29 @@ public class MarkdownEditorView : ViewBase
                     () => Js.Obj()
                         .Prop(() => "method", () => Js.Str(() => "POST"))
                         .Prop(() => "headers", () => Js.Obj().Prop(() => "Content-Type", () => Js.Str(() => "application/json")))
-                        .Prop(() => "body", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj().Prop(() => "markdown", () => Js.Id(() => "md"))))
-                ).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json")))
+                        .Prop(() => "body", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj().Prop(() => "markdown", () => Js.Id(() => "md")))))
+                .Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Block()
+                    .Add(() => Js.Return(() => Js.Id(() => "r").Call(() => "json")))))
                 .Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => Js.Block()
-                    .Add(() => Js.Assign(() => Js.Id(() => "dirtyFlag").Prop(() => "value"), () => Js.Str(() => "0"))))).Stmt());
+                    .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "data").Prop(() => "success"), new List<JsSyntax>
+                        {
+                            // Success: clear dirty flag
+                            Js.Assign(() => Js.Id(() => "dirtyFlag").Prop(() => "value"), () => Js.Str(() => "0")).Stmt(),
+                            Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "Save successful")).Stmt()
+                        }),
+                        (null, new List<JsSyntax>
+                        {
+                            // Error: show error message
+                            Js.Id(() => "console").Call(() => "error", () => Js.Id(() => "data").Prop(() => "error").Op(() => "||", () => Js.Str(() => "Save failed"))).Stmt(),
+                            Js.Id(() => "alert").Call(() => "invoke", () => Js.Id(() => "data").Prop(() => "error").Op(() => "||", () => Js.Str(() => "Save failed"))).Stmt()
+                        })
+                    }))))
+                .Call(() => "catch", () => Js.Arrow(() => new List<string> { "err" }, () => Js.Block()
+                    .Add(() => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Save error:"), () => Js.Id(() => "err")))
+                    .Add(() => Js.Id(() => "alert").Call(() => "invoke", () => Js.Op(() => Js.Str(() => "Save failed: "), () => "+", () => Js.Id(() => "err"))))))
+                .Stmt());
         }
         else
         {
@@ -399,22 +504,62 @@ public class MarkdownEditorView : ViewBase
         }
 
         return Js.Block()
-            .Add(() => Js.Func(() => $"mdEditorInit_{editorId}", () => new List<string>(), () => initBody))
-            .Add(() => Js.Func(() => $"mdEditorRender_{editorId}", () => new List<string>(), () => renderBody))
-            .Add(() => Js.Func(() => $"mdEditorSetMode_{editorId}", () => new List<string> { "mode" }, () => setModeBody))
-            .Add(() => Js.Func(() => $"mdEditorSave_{editorId}", () => new List<string>(), () => saveBody))
+            .Add(() => Js.Func(() => $"mdEditorInit_{safeEditorId}", () => new List<string>(), () => initBody))
+            .Add(() => Js.Func(() => $"mdEditorRender_{safeEditorId}", () => new List<string>(), () => renderBody))
+            .Add(() => Js.Func(() => $"mdEditorSetMode_{safeEditorId}", () => new List<string> { "mode" }, () => setModeBody))
+            .Add(() => Js.Func(() => $"mdEditorSave_{safeEditorId}", () => new List<string>(), () => saveBody))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
-                (Js.Id(() => "typeof").Invoke(() => Js.Id(() => "marked")).Op(() => "!==", () => Js.Str(() => "undefined")), new List<JsSyntax>
+                (Js.Id(() => "typeof").Invoke(() => Js.Id(() => "CodeMirror")).Op(() => "!==", () => Js.Str(() => "undefined")), new List<JsSyntax>
                 {
-                    Js.Id(() => $"mdEditorInit_{editorId}").Invoke().Stmt()
+                    // CodeMirror is loaded, check if marked is also loaded
+                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "typeof").Invoke(() => Js.Id(() => "marked")).Op(() => "!==", () => Js.Str(() => "undefined")), new List<JsSyntax>
+                        {
+                            Js.Id(() => $"mdEditorInit_{safeEditorId}").Invoke().Stmt()
+                        }),
+                        (null, new List<JsSyntax>
+                        {
+                            // Load marked.js and highlight.js
+                            Js.Let(() => "scriptMarked", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "script"))),
+                            Js.Assign(() => Js.Id(() => "scriptMarked").Prop(() => "src"), () => Js.Str(() => "https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js")),
+                            Js.Assign(() => Js.Id(() => "scriptMarked").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Block()
+                                .Add(() => Js.Let(() => "scriptHljs", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "script"))))
+                                .Add(() => Js.Assign(() => Js.Id(() => "scriptHljs").Prop(() => "src"), () => Js.Str(() => "https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js")))
+                                .Add(() => Js.Assign(() => Js.Id(() => "scriptHljs").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => $"mdEditorInit_{safeEditorId}").Invoke())))
+                                .Add(() => Js.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => Js.Id(() => "scriptHljs")).Stmt()))),
+                            Js.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => Js.Id(() => "scriptMarked")).Stmt()
+                        })
+                    })
                 }),
                 (null, new List<JsSyntax>
                 {
-                    Js.Let(() => "script", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "script"))),
-                    Js.Assign(() => Js.Id(() => "script").Prop(() => "src"), () => Js.Str(() => "https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js")),
-                    Js.Assign(() => Js.Id(() => "script").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => $"mdEditorInit_{editorId}").Invoke())),
-                    Js.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => Js.Id(() => "script")).Stmt()
+                    // Load CodeMirror first, then other libraries
+                    // Load CodeMirror CSS
+                    Js.Let(() => "linkCss", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "link"))),
+                    Js.Assign(() => Js.Id(() => "linkCss").Prop(() => "rel"), () => Js.Str(() => "stylesheet")),
+                    Js.Assign(() => Js.Id(() => "linkCss").Prop(() => "href"), () => Js.Str(() => "https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css")),
+                    Js.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => Js.Id(() => "linkCss")).Stmt(),
+                    
+                    // Load CodeMirror JS
+                    Js.Let(() => "scriptCodeMirror", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "script"))),
+                    Js.Assign(() => Js.Id(() => "scriptCodeMirror").Prop(() => "src"), () => Js.Str(() => "https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js")),
+                    Js.Assign(() => Js.Id(() => "scriptCodeMirror").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Block()
+                        // Load Markdown mode
+                        .Add(() => Js.Let(() => "scriptMdMode", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "script"))))
+                        .Add(() => Js.Assign(() => Js.Id(() => "scriptMdMode").Prop(() => "src"), () => Js.Str(() => "https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/markdown/markdown.min.js")))
+                        // Load marked.js
+                        .Add(() => Js.Let(() => "scriptMarked", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "script"))))
+                        .Add(() => Js.Assign(() => Js.Id(() => "scriptMarked").Prop(() => "src"), () => Js.Str(() => "https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js")))
+                        .Add(() => Js.Assign(() => Js.Id(() => "scriptMarked").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Block()
+                            .Add(() => Js.Let(() => "scriptHljs", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "script"))))
+                            .Add(() => Js.Assign(() => Js.Id(() => "scriptHljs").Prop(() => "src"), () => Js.Str(() => "https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js")))
+                            .Add(() => Js.Assign(() => Js.Id(() => "scriptHljs").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => $"mdEditorInit_{safeEditorId}").Invoke())))
+                            .Add(() => Js.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => Js.Id(() => "scriptHljs")).Stmt()))))
+                        .Add(() => Js.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => Js.Id(() => "scriptMarked")).Stmt())
+                        .Add(() => Js.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => Js.Id(() => "scriptMdMode")).Stmt()))),
+                    Js.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => Js.Id(() => "scriptCodeMirror")).Stmt()
                 })
             }));
     }

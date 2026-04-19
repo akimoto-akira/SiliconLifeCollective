@@ -29,7 +29,7 @@ namespace SiliconLife.Collective;
 public class ContextManager
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<ContextManager>();
-    private readonly IAIClient _aiClient;
+    private IAIClient _aiClient;
     private readonly SiliconBeingBase _being;
     private readonly SessionBase? _session;
 
@@ -378,27 +378,39 @@ public class ContextManager
 
     /// <summary>
     /// Sends the current context to AI and gets the response asynchronously.
+    /// Implements fallback strategy: if connection fails, temporarily uses global config.
     /// </summary>
     /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
     /// <returns>The AI response (may contain tool_calls or plain text)</returns>
     public async Task<AIResponse> GetResponseAsync(string? scenarioContext = null)
     {
         AIRequest request = BuildRequest(scenarioContext);
-        AIResponse response = await _aiClient.ChatAsync(request);
-
-        if (response.Success && response.HasToolCalls)
+        
+        try
         {
-            _logger.Debug("AI returned tool calls (async), persisting intermediate round");
-            PersistAndDeliverToolCallRound(response);
-        }
-        else if (response.Success)
-        {
-            _logger.Debug("AI returned text response (async), length={0}", response.Content?.Length ?? 0);
-            AddAssistantMessage(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
-        }
+            AIResponse response = await _aiClient.ChatAsync(request);
+            
+            if (response.Success && response.HasToolCalls)
+            {
+                _logger.Debug("AI returned tool calls (async), persisting intermediate round");
+                PersistAndDeliverToolCallRound(response);
+            }
+            else if (response.Success)
+            {
+                _logger.Debug("AI returned text response (async), length={0}", response.Content?.Length ?? 0);
+                AddAssistantMessage(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
+            }
 
-        RecordTokenUsage(response);
-        return response;
+            RecordTokenUsage(response);
+            return response;
+        }
+        catch (HttpRequestException ex) when (IsConnectionError(ex))
+        {
+            // Connection error: try fallback with global config
+            _logger.Warn("Being {0}: AI client connection error, attempting fallback to global config", _being.Name, ex);
+            
+            return await ExecuteWithFallbackClientAsync(request);
+        }
     }
 
     /// <summary>
@@ -734,7 +746,9 @@ public class ContextManager
 
     /// <summary>
     /// Scene: scheduled timer.
-    /// Loads timer context, calls AI, may not deliver output.
+    /// Loads timer context, calls AI, delivers start/end notifications via IM.
+    /// Supports both streaming and non-streaming modes with automatic fallback.
+    /// Executes tool calls in a loop until AI returns pure text response.
     /// </summary>
     /// <param name="timer">The timer item that triggered</param>
     /// <returns>The AI response</returns>
@@ -742,17 +756,94 @@ public class ContextManager
     {
         _logger.Info("ThinkOnTimer: being={0}, timer={1} ({2})", _being.Name, timer.Name, timer.Id);
 
-        string? scenarioContext = BuildTimerScenarioContext(timer);
-        AIResponse response = GetResponse(scenarioContext);
-
-        if (response.Success && !string.IsNullOrEmpty(response.Content))
+        try
         {
+            // 1. Send start notification
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
-            RecordToMemory(loc.FormatMemoryEventTimer(response.Content));
-        }
+            string startMessage = loc.FormatTimerStartNotification(timer.Name);
+            DeliverTimerOutput(startMessage);
 
-        return response;
+            // 2. Build enhanced scenario context with execution guidance
+            string? scenarioContext = BuildTimerScenarioContext(timer);
+
+            // 3. Add a User message to explicitly trigger the timer action
+            // This ensures AI models have a clear user prompt to respond to
+            _messages.Add(new ChatMessage
+            {
+                Role = MessageRole.User,
+                Content = $"Timer '{timer.Name}' has been triggered. Please execute the scheduled task and provide a summary of what you did.",
+            });
+
+            // 4. Execute tool call loop until AI returns pure text response
+            AIResponse response = new AIResponse(); // Initialize to avoid compiler error
+            int maxIterations = 20; // Prevent infinite loops
+            int iteration = 0;
+            
+            do
+            {
+                iteration++;
+                if (iteration > maxIterations)
+                {
+                    _logger.Warn("ThinkOnTimer: Max iterations ({0}) reached, stopping tool call loop", maxIterations);
+                    break;
+                }
+
+                // Get AI response with streaming fallback
+                bool? streamingMode = _aiClient.StreamingMode;
+                if (streamingMode == true)
+                {
+                    response = GetResponseStreamAsync(scenarioContext).GetAwaiter().GetResult();
+                }
+                else
+                {
+                    response = GetResponse(scenarioContext);
+                }
+
+                if (!response.Success)
+                {
+                    // AI call failed, exit loop
+                    break;
+                }
+
+            } while (response.HasToolCalls);
+
+            // 5. Send end notification with result
+            if (response.Success && !string.IsNullOrEmpty(response.Content))
+            {
+                string endMessage = loc.FormatTimerEndNotification(timer.Name, response.Content);
+                DeliverTimerOutput(endMessage);
+                RecordToMemory(loc.FormatMemoryEventTimer(response.Content));
+            }
+            else if (response.Success)
+            {
+                // Success but no content (e.g., only tool calls and hit max iterations)
+                string endMessage = loc.FormatTimerEndNotification(timer.Name, "Timer executed successfully (tool calls completed)");
+                DeliverTimerOutput(endMessage);
+            }
+            else
+            {
+                // AI call failed
+                string errorMessage = loc.FormatTimerErrorNotification(timer.Name, response.ErrorMessage ?? "Unknown error");
+                DeliverTimerOutput(errorMessage);
+                RecordToMemory(loc.FormatMemoryEventTimerError(timer.Name, response.ErrorMessage ?? "Unknown error"));
+            }
+
+            return response;
+        }
+        catch (Exception ex)
+        {
+            // Catch any unexpected exceptions and notify user
+            _logger.Error("ThinkOnTimer exception: being={0}, timer={1}, error={2}", _being.Name, timer.Name, ex.Message);
+            
+            Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+            string errorMessage = loc.FormatTimerErrorNotification(timer.Name, ex.Message);
+            DeliverTimerOutput(errorMessage);
+            RecordToMemory(loc.FormatMemoryEventTimerError(timer.Name, ex.Message));
+
+            return AIResponse.Failed(ex.Message);
+        }
     }
 
     private static string BuildTaskScenarioContext(TaskItem task)
@@ -800,6 +891,17 @@ public class ContextManager
             foreach (KeyValuePair<string, string> kv in timer.Metadata)
                 sb.AppendLine($"  {kv.Key}: {kv.Value}");
         }
+
+        // Add execution guidance for efficient AI behavior
+        sb.AppendLine();
+        sb.AppendLine("IMPORTANT INSTRUCTIONS:");
+        sb.AppendLine("- This is an automated timer execution. You must complete ALL required operations efficiently.");
+        sb.AppendLine("- You can call multiple tools in sequence to accomplish the timer's purpose.");
+        sb.AppendLine("- After completing all operations, return a FINAL SUMMARY as plain text (no tool calls) describing what was done.");
+        sb.AppendLine("- The final summary will be delivered to the user as the timer execution result.");
+        sb.AppendLine("- Be concise and focused. Avoid unnecessary operations or lengthy explanations.");
+        sb.AppendLine("- If you encounter errors, report them clearly in your final response.");
+
         return sb.ToString();
     }
 
@@ -907,6 +1009,27 @@ public class ContextManager
     }
 
     /// <summary>
+    /// Delivers output for timer execution (no session required).
+    /// Always sends via IM manager or falls back to console.
+    /// </summary>
+    private void DeliverTimerOutput(string content, string? thinking = null)
+    {
+        _logger.Debug("Delivering timer output for being {0}, length={1}", _being.Name, content.Length);
+
+        IMManager? imManager = ServiceLocator.Instance.IMManager;
+        if (imManager != null)
+        {
+            // For timer, we don't have a session, so we send to a default session or use broadcast
+            // Since timer is automated, we'll use console output as fallback
+            _ = imManager.SendMessageAsync(_being.Id, Guid.Empty, content, thinking, _being.Name);
+        }
+        
+        // Always log to console for timer notifications
+        Console.WriteLine($"[TIMER] {_being.Name}: {content}");
+        Console.WriteLine();
+    }
+
+    /// <summary>
     /// Delivers a streaming chunk to the IM layer for real-time frontend display.
     /// The chunk is accumulated in the WebUIProvider's streaming buffer,
     /// which the frontend polls via WebSocket.
@@ -978,6 +1101,7 @@ public class ContextManager
         {
             DeliverToolUpdate(msg);
         }
+        _messages.AddRange(toolResultMessages);
     }
 
     /// <summary>
@@ -1040,4 +1164,32 @@ public class ContextManager
     /// Gets the number of messages in the context
     /// </summary>
     public int MessageCount => _messages.Count;
+    
+    /// <summary>
+    /// Executes AI request with fallback client when connection fails.
+    /// Sets the IsUsingFallbackClient flag so that DefaultSiliconBeing can handle it on next tick.
+    /// </summary>
+    private async Task<AIResponse> ExecuteWithFallbackClientAsync(AIRequest request)
+    {
+        // Mark being as using fallback client
+        // The actual fallback client creation will be handled by DefaultSiliconBeing on next tick
+        _being.IsUsingFallbackClient = true;
+        
+        _logger.Error("Being {0}: AI client connection failed. Will attempt recovery on next tick.", _being.Name);
+        
+        // Return error response - the being will handle recovery on next tick
+        return AIResponse.Failed("AI client connection failed, will retry on next tick");
+    }
+    
+    /// <summary>
+    /// Determines if an exception is a connection error (vs timeout or other errors)
+    /// </summary>
+    private bool IsConnectionError(HttpRequestException ex)
+    {
+        // Connection refused, name resolution failure, etc.
+        return ex.InnerException is System.Net.Sockets.SocketException 
+               || ex.Message.Contains("Connection refused", StringComparison.OrdinalIgnoreCase)
+               || ex.Message.Contains("Name or service not known", StringComparison.OrdinalIgnoreCase)
+               || ex.Message.Contains("No connection could be made", StringComparison.OrdinalIgnoreCase);
+    }
 }

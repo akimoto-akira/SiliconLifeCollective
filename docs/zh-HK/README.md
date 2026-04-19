@@ -1,8 +1,6 @@
 # 矽基生命群
 
-**⚠️ 警告：動態編譯尚未經過深度測試，但確實可以運作。必須在程式碼中增加範本才能正常工作**
-
-**⚠️ 警告：Web 頁面正處於快速調整期，當前頁面功能可能無法正常響應**
+**⚠️ 警告：動態編譯功能已可用，但需要程式碼範本才能正常工作。深度測試正在進行中。**
 
 基於 .NET 9 的多智能體協作平台，AI 智能體（矽基人）可透過 Roslyn 動態編譯實現自我進化。
 
@@ -23,9 +21,11 @@
 - **零資料庫依賴** — 基於檔案系統儲存（JSON），支援透過 `ITimeStorage` 進行時間索引查詢
 - **國際化** — 內建簡體中文、繁體中文和英文支援
 - **Web 介面** — 內建 HTTP 伺服器，支援 SSE，多種佈景主題，完整的儀表板
-  - **佈景主題系統** — 4 種內建佈景主題（Admin、Chat、Creative、Dev），提供完整的 UI 元件庫
+  - **佈景主題系統** — 4 種內建佈景主題（Admin、Chat、Creative、Dev），可插拔 ISkin 介面，自動發現註冊
   - **17 個控制器** — About、Audit、Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer
-  - **即時更新** — 透過 SSE（Server-Sent Events）實現即時資料串流
+  - **即時更新** — 透過 SSE（Server-Sent Events）實現聊天訊息、矽基人狀態和系統事件的即時推送
+  - **HTML/CSS/JS 建構器** — 伺服器端標記語言產生，透過 `H`、`CssBuilder` 和 `JsBuilder` 實現（零前端框架依賴）
+  - **本地化** — 三種內建語言環境（zh-CN、zh-HK、en-US），透過 LocalizationManager 解析
 
 ## 技術棧
 

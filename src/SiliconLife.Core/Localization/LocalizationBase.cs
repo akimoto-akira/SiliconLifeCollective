@@ -99,4 +99,33 @@ public abstract class LocalizationBase
     /// </summary>
     /// <param name="content">The AI response content triggered by the timer</param>
     public abstract string FormatMemoryEventTimer(string content);
+
+    /// <summary>
+    /// Formats a memory record for a timer error event.
+    /// </summary>
+    /// <param name="timerName">The name of the timer that failed</param>
+    /// <param name="error">The error message</param>
+    public abstract string FormatMemoryEventTimerError(string timerName, string error);
+
+    // ===== Timer Notification Localization =====
+
+    /// <summary>
+    /// Formats a notification message when a timer starts execution.
+    /// </summary>
+    /// <param name="timerName">The name of the timer</param>
+    public abstract string FormatTimerStartNotification(string timerName);
+
+    /// <summary>
+    /// Formats a notification message when a timer completes execution.
+    /// </summary>
+    /// <param name="timerName">The name of the timer</param>
+    /// <param name="result">The execution result summary</param>
+    public abstract string FormatTimerEndNotification(string timerName, string result);
+
+    /// <summary>
+    /// Formats a notification message when a timer execution fails.
+    /// </summary>
+    /// <param name="timerName">The name of the timer</param>
+    /// <param name="error">The error message</param>
+    public abstract string FormatTimerErrorNotification(string timerName, string error);
 }

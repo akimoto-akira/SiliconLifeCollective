@@ -12,6 +12,7 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
+using System.Text.Json;
 
 namespace SiliconLife.Default;
 
@@ -24,11 +25,6 @@ public class DefaultSiliconBeing : SiliconBeingBase
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<DefaultSiliconBeing>();
     private volatile bool _isProcessing;
-
-    /// <summary>
-    /// Gets the data directory path for this silicon being
-    /// </summary>
-    public string? BeingDirectory { get; set; }
 
     /// <summary>
     /// Gets whether this silicon being is idle (no pending tasks and not thinking).
@@ -47,17 +43,27 @@ public class DefaultSiliconBeing : SiliconBeingBase
     }
 
     /// <summary>
-    /// Saves this being's state (name) to state.json in its directory.
-    /// Called by the factory on first creation.
+    /// Saves this being's state (name, AI config) to state.json in its directory.
+    /// Called by the factory on first creation and when config changes.
     /// </summary>
     public void SaveState()
     {
         if (BeingDirectory == null) return;
         try
         {
-            var state = new Dictionary<string, string> { ["name"] = Name };
-            string json = System.Text.Json.JsonSerializer.Serialize(state, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            var state = new Dictionary<string, object>
+            {
+                ["name"] = Name,
+                ["aiClientType"] = AIClientType ?? "",
+                ["aiConfig"] = AIClientConfig ?? new Dictionary<string, object>()
+            };
+            
+            string json = JsonSerializer.Serialize(state, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(Path.Combine(BeingDirectory, "state.json"), json);
+            
+            // Update backup config
+            BackupAIClientConfig = AIClientConfig?.ToDictionary(k => k.Key, v => v.Value);
+            
             _logger.Debug("Being {0}: state saved to {1}", Name, Path.Combine(BeingDirectory, "state.json"));
         }
         catch (Exception ex)
@@ -67,7 +73,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
     }
 
     /// <summary>
-    /// Loads this being's name from state.json in its directory.
+    /// Loads this being's name and AI config from state.json in its directory.
     /// Returns true if state was loaded successfully.
     /// </summary>
     public bool LoadState()
@@ -79,10 +85,38 @@ public class DefaultSiliconBeing : SiliconBeingBase
             if (!File.Exists(stateFilePath)) return false;
 
             string json = File.ReadAllText(stateFilePath);
-            var state = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(json);
-            if (state != null && state.TryGetValue("name", out string? name))
+            var state = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+            
+            if (state != null)
             {
-                Name = name;
+                // Load name
+                if (state.TryGetValue("name", out var nameObj))
+                {
+                    Name = nameObj?.ToString() ?? "";
+                }
+                
+                // Load aiClientType
+                if (state.TryGetValue("aiClientType", out var typeObj))
+                {
+                    AIClientType = typeObj?.ToString();
+                }
+                
+                // Load aiConfig
+                if (state.TryGetValue("aiConfig", out var configObj))
+                {
+                    if (configObj is JsonElement configElement)
+                    {
+                        AIClientConfig = DeserializeDictionary(configElement);
+                    }
+                    else if (configObj is Dictionary<string, object> dict)
+                    {
+                        AIClientConfig = dict;
+                    }
+                }
+                
+                // Initialize backup config
+                BackupAIClientConfig = AIClientConfig?.ToDictionary(k => k.Key, v => v.Value);
+                
                 _logger.Debug("Being {0}: state loaded from {1}", Name, stateFilePath);
 
                 Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
@@ -101,15 +135,46 @@ public class DefaultSiliconBeing : SiliconBeingBase
         }
         return false;
     }
+    
+    /// <summary>
+    /// Deserializes a JsonElement to Dictionary<string, object>
+    /// </summary>
+    private Dictionary<string, object> DeserializeDictionary(JsonElement element)
+    {
+        var dict = new Dictionary<string, object>();
+        if (element.ValueKind == System.Text.Json.JsonValueKind.Object)
+        {
+            foreach (var property in element.EnumerateObject())
+            {
+                dict[property.Name] = property.Value.ValueKind switch
+                {
+                    System.Text.Json.JsonValueKind.String => property.Value.GetString() ?? "",
+                    System.Text.Json.JsonValueKind.Number => property.Value.GetDouble(),
+                    System.Text.Json.JsonValueKind.True => true,
+                    System.Text.Json.JsonValueKind.False => false,
+                    _ => property.Value.GetRawText()
+                };
+            }
+        }
+        return dict;
+    }
 
     /// <summary>
     /// Called by SiliconBeingManager on each tick.
     /// Detects the trigger scene and calls the corresponding brain method.
-    /// Priority: Continuation > Chat > Timer > Task > MemoryCompression
+    /// Priority: AI Config Change > Continuation > Chat > Timer > Task > MemoryCompression
     /// </summary>
     /// <param name="deltaTime">Time elapsed since the last tick</param>
     public override void Tick(TimeSpan deltaTime)
     {
+        // 1. Check if AI config has changed
+        if (CheckAndRebuildAIClient())
+        {
+            // Config changed and client rebuilt, skip this tick
+            return;
+        }
+        
+        // 2. Original tick logic
         if (_isProcessing || AIClient == null)
         {
             return;
@@ -261,5 +326,136 @@ public class DefaultSiliconBeing : SiliconBeingBase
         {
             _logger.Debug("Being {0}: brain scene {1} completed", Name, sceneName);
         }
+    }
+    
+    /// <summary>
+    /// Checks if AI config has changed and rebuilds the client if necessary.
+    /// Also initializes the client if it's null.
+    /// Returns true if client was initialized or rebuilt.
+    /// </summary>
+    private bool CheckAndRebuildAIClient()
+    {
+        // If client is null, always initialize it
+        if (AIClient == null)
+        {
+            RebuildAIClientFromConfig();
+            // Update backup config
+            BackupAIClientConfig = AIClientConfig?.ToDictionary(k => k.Key, v => v.Value);
+            return AIClient != null; // Return true if initialization succeeded
+        }
+        
+        // If using fallback client, restore original config client
+        if (this.IsUsingFallbackClient)
+        {
+            this.IsUsingFallbackClient = false;
+            RebuildAIClientFromConfig();
+            return true;
+        }
+        
+        // Deep compare current config with backup config
+        if (!IsAIClientConfigChanged())
+        {
+            return false;
+        }
+        
+        // Config changed, rebuild client
+        RebuildAIClientFromConfig();
+        
+        // Update backup config
+        BackupAIClientConfig = AIClientConfig?.ToDictionary(k => k.Key, v => v.Value);
+        
+        return true;
+    }
+    
+    /// <summary>
+    /// Deep compares AI config to detect changes
+    /// </summary>
+    private bool IsAIClientConfigChanged()
+    {
+        // If both are null, no change
+        if (AIClientConfig == null && BackupAIClientConfig == null)
+            return false;
+        
+        // If one is null and the other is not, changed
+        if (AIClientConfig == null || BackupAIClientConfig == null)
+            return true;
+        
+        // Compare dictionary size
+        if (AIClientConfig.Count != BackupAIClientConfig.Count)
+            return true;
+        
+        // Compare each key-value pair
+        foreach (var kvp in AIClientConfig)
+        {
+            if (!BackupAIClientConfig.TryGetValue(kvp.Key, out var backupValue))
+                return true;
+            
+            if (!object.Equals(kvp.Value, backupValue))
+                return true;
+        }
+        
+        return false;
+    }
+    
+    /// <summary>
+    /// Rebuilds AI client from current configuration
+    /// </summary>
+    private void RebuildAIClientFromConfig()
+    {
+        try
+        {
+            IAIClientFactory factory = GetAIClientFactory();
+            
+            IAIClient newClient;
+            if (AIClientConfig != null && AIClientConfig.Count > 0)
+            {
+                // Has independent config, create dedicated client
+                newClient = factory.CreateClient(AIClientConfig);
+                _logger.Info("Being {0}: rebuilding AI client with independent config", Name);
+            }
+            else
+            {
+                // No independent config, use global config to create client
+                var globalConfig = Config.Instance?.Data?.AIConfig;
+                if (globalConfig != null && globalConfig.Count > 0)
+                {
+                    newClient = factory.CreateClient(globalConfig);
+                    _logger.Info("Being {0}: rebuilding AI client with global config", Name);
+                }
+                else
+                {
+                    _logger.Error("Being {0}: no AI config available", Name);
+                    return;
+                }
+            }
+            
+            // Dispose old client
+            if (AIClient != null && AIClient is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+            
+            AIClient = newClient;
+            _logger.Info("Being {0}: AI client rebuilt successfully", Name);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error("Being {0}: failed to rebuild AI client", Name, ex);
+        }
+    }
+    
+    /// <summary>
+    /// Gets the AI client factory based on AIClientType
+    /// </summary>
+    private IAIClientFactory GetAIClientFactory()
+    {
+        string clientType = AIClientType ?? Config.Instance?.Data?.AIClientType ?? "OllamaClient";
+        
+        return clientType switch
+        {
+            "OllamaClient" => new OllamaClientFactory(),
+            // Future: can extend to support other client types
+            _ => new OllamaClientFactory()
+        };
     }
 }

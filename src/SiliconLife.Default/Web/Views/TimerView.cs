@@ -179,7 +179,7 @@ public class TimerView : ViewBase
             () => Js.Str(() => ""));
 
         var calendarBadge = Js.Str(() => "<span class='calendar-badge'>")
-            .Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "calendarId"))
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "calendarName"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</span>"));
 
         var calendarInfo = Js.Ternary(

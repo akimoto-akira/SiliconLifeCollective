@@ -40,8 +40,10 @@ public class Router
         RegisterController(() => new ChatController(), "/api/chat/history");
         RegisterController(() => new ChatController(), "/api/chat/send", "POST");
         RegisterController(() => new BeingController(), "/beings");
+        RegisterController(() => new BeingController(), "/beings/soul");
         RegisterController(() => new BeingController(), "/api/beings/list");
         RegisterController(() => new BeingController(), "/api/beings/detail");
+        RegisterController(() => new BeingController(), "/api/beings/soul/save", "POST");
         RegisterController(() => new TimerController(), "/timers");
         RegisterController(() => new TimerController(), "/api/timers/list");
         RegisterController(() => new TaskController(), "/tasks");

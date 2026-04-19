@@ -248,9 +248,22 @@ public class BeingView : ViewBase
             () => Js.Str(() => $"{loc.BeingsYes} (").Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "customTypeName")).Op(() => "+", () => (JsSyntax)Js.Str(() => ")")),
             () => Js.Str(() => loc.BeingsNo));
 
-        var soulHtml = Js.Str(() => "<a class='detail-link' href='#'>")
-            .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.BeingsDetailPermissionEditLink))
+        var soulHtml = Js.Str(() => "<a class='detail-link' href='/beings/soul?beingId=")
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "id"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "'>"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.BeingsDetailSoulContentEditLink))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a>"));
+
+        var aiClientValue = Js.Ternary(
+            () => Js.Id(() => "data").Prop(() => "aiClientConfig"),
+            () => Js.Str(() => "<a class='detail-link' href='#'>")
+                .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.BeingsDetailAIClientEditLink))
+                .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a> "))
+                .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "aiClientConfig")),
+            () => Js.Str(() => "<a class='detail-link' href='#'>")
+                .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.BeingsDetailAIClientEditLink))
+                .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a> "))
+                .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.BeingsNotSet)));
 
         var timerLink = Js.Str(() => "<a class='detail-link' href='/timers?beingId=")
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "id"))
@@ -270,7 +283,9 @@ public class BeingView : ViewBase
             .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.BeingsDetailMemoryViewLink))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a>"));
 
-        var permissionLink = Js.Str(() => "<a class='detail-link' href='#'>")
+        var permissionLink = Js.Str(() => "<a class='detail-link' href='/permissions?beingId=")
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "id"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "'>"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.BeingsDetailPermissionEditLink))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a>"));
 
@@ -280,7 +295,7 @@ public class BeingView : ViewBase
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "id"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</span></div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailStatusLabel}</span>"))
             .Op(() => "+", () => (JsSyntax)statusValue)
-            .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailCustomCompileLabel}</span><span class=\"detail-value\">"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</span></div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailCustomCompileLabel}</span><span class=\"detail-value\">"))
             .Op(() => "+", () => (JsSyntax)compiledValue)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</span></div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailTimersLabel}</span>"))
             .Op(() => "+", () => (JsSyntax)timerLink)
@@ -290,7 +305,9 @@ public class BeingView : ViewBase
             .Op(() => "+", () => (JsSyntax)memoryLink)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailPermissionLabel}</span>"))
             .Op(() => "+", () => (JsSyntax)permissionLink)
-            .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailSoulContentLabel}</span>"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailAIClientLabel}</span><span class=\"detail-value\">"))
+            .Op(() => "+", () => (JsSyntax)aiClientValue)
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</span></div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailSoulContentLabel}</span>"))
             .Op(() => "+", () => (JsSyntax)soulHtml)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"));
     }

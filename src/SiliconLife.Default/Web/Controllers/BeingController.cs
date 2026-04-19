@@ -36,6 +36,10 @@ public class BeingController : Controller
             GetList();
         else if (path == "/api/beings/detail")
             GetDetail();
+        else if (path.StartsWith("/beings/soul"))
+            SoulEditor();
+        else if (path == "/api/beings/soul/save")
+            SaveSoul();
         else
         {
             Response.StatusCode = 404;
@@ -92,7 +96,89 @@ public class BeingController : Controller
             customTypeName = being.CustomTypeName ?? "",
             soulContent = being.SoulContent ?? "",
             timerCount = being.TimerSystem?.Count ?? 0,
-            taskCount = being.TaskSystem?.Count ?? 0
+            taskCount = being.TaskSystem?.Count ?? 0,
+            aiClientType = being.AIClientType ?? "",
+            aiClientConfig = (being.AIClientConfig != null && being.AIClientConfig.Count > 0) 
+                ? System.Text.Json.JsonSerializer.Serialize(being.AIClientConfig) 
+                : null
         });
+    }
+
+    private void SoulEditor()
+    {
+        var idStr = Request.QueryString["beingId"];
+        if (string.IsNullOrEmpty(idStr) || !Guid.TryParse(idStr, out var id))
+        {
+            Response.StatusCode = 400;
+            RenderHtml("<h1>Invalid Being ID</h1>");
+            return;
+        }
+
+        var being = _beingManager.GetBeing(id);
+        if (being == null)
+        {
+            Response.StatusCode = 404;
+            RenderHtml("<h1>Being Not Found</h1>");
+            return;
+        }
+
+        var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
+        var view = new Views.SoulEditorView();
+        var vm = new Models.SoulEditorViewModel
+        {
+            Skin = skin,
+            ActiveMenu = "beings",
+            BeingId = being.Id,
+            BeingName = being.Name,
+            SoulContent = being.SoulContent ?? ""
+        };
+        var html = view.Render(vm);
+        RenderHtml(html);
+    }
+
+    private void SaveSoul()
+    {
+        var idStr = Request.QueryString["beingId"];
+        if (string.IsNullOrEmpty(idStr) || !Guid.TryParse(idStr, out var id))
+        {
+            RenderJson(new { success = false, error = "Invalid Being ID" });
+            return;
+        }
+
+        var being = _beingManager.GetBeing(id);
+        if (being == null)
+        {
+            RenderJson(new { success = false, error = "Being Not Found" });
+            return;
+        }
+
+        try
+        {
+            var body = new System.IO.StreamReader(Request.InputStream).ReadToEnd();
+            var options = new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true  // 忽略属性名大小写
+            };
+            var requestData = System.Text.Json.JsonSerializer.Deserialize<SaveSoulRequest>(body, options);
+            
+            if (requestData == null)
+            {
+                RenderJson(new { success = false, error = "Invalid request data" });
+                return;
+            }
+
+            being.SoulContent = requestData.Markdown ?? "";
+            
+            RenderJson(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            RenderJson(new { success = false, error = ex.Message });
+        }
+    }
+
+    private class SaveSoulRequest
+    {
+        public string Markdown { get; set; } = string.Empty;
     }
 }

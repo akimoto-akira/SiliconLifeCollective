@@ -51,10 +51,12 @@ public sealed class CompilationResult
 /// <summary>
 /// Dynamic compilation executor based on Roslyn.
 /// Compiles C# source code in-memory with security scanning.
+/// Delegates actual compilation to CompilationCore.
 /// </summary>
 public class DynamicCompilationExecutor
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<DynamicCompilationExecutor>();
+    private readonly CompilationCore _compilationCore;
     private readonly string[] _allowedAssemblyPaths;
 
     /// <summary>
@@ -75,11 +77,14 @@ public class DynamicCompilationExecutor
                 typeof(SiliconBeingBase).Assembly.Location
             ];
         }
+
+        // Initialize compilation core with SiliconBeingBase assembly
+        _compilationCore = new CompilationCore(typeof(SiliconBeingBase).Assembly);
     }
 
     /// <summary>
     /// Compiles source code and returns the first type that matches the given base type.
-    /// Performs security scan before compilation.
+    /// Performs security scan before compilation, then delegates to CompilationCore.
     /// </summary>
     /// <typeparam name="TBase">The base type the compiled code must inherit from</typeparam>
     /// <param name="sourceCode">The C# source code to compile</param>
@@ -92,6 +97,7 @@ public class DynamicCompilationExecutor
 
         _logger.Info("Starting compilation for type hint: {0}", typeNameHint ?? "(auto-detect)");
 
+        // Security scan before compilation
         SecurityScanResult scanResult = SecurityScanner.Scan(sourceCode);
         if (!scanResult.Passed)
         {
@@ -102,39 +108,14 @@ public class DynamicCompilationExecutor
                 scanResult);
         }
 
-        // Step 2: Parse and compile
-        CSharpParseOptions parseOptions = CSharpParseOptions.Default
-            .WithLanguageVersion(LanguageVersion.CSharp13);
-
-        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(sourceCode, options: parseOptions);
-
-        // Collect referenced assemblies
-        var referencedAssemblies = new List<MetadataReference>
-        {
-            MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(List<>).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(TBase).Assembly.Location),
-        };
-
-        // Add System.Text.Json
+        // Validate assembly references
         Type? jsonType = Type.GetType("System.Text.Json.JsonSerializer, System.Text.Json");
-        if (jsonType != null)
-        {
-            referencedAssemblies.Add(MetadataReference.CreateFromFile(jsonType.Assembly.Location));
-        }
-
-        // Add System.Text.RegularExpressions
         Type? regexType = Type.GetType("System.Text.RegularExpressions.Regex, System.Text.RegularExpressions");
-        if (regexType != null)
-        {
-            referencedAssemblies.Add(MetadataReference.CreateFromFile(regexType.Assembly.Location));
-        }
-
-        // Validate references
-        var referencedNames = referencedAssemblies
-            .Select(r => Path.GetFileName(r.Display))
-            .ToList();
+        
+        var referencedNames = new List<string> { "mscorlib.dll", "System.Console.dll", "System.Collections.dll" };
+        if (jsonType != null) referencedNames.Add("System.Text.Json.dll");
+        if (regexType != null) referencedNames.Add("System.Text.RegularExpressions.dll");
+        referencedNames.Add(typeof(TBase).Assembly.GetName().Name + ".dll");
 
         (bool refsValid, List<string> unauthorized) = SecurityScanner.ValidateReferences(referencedNames);
         if (!refsValid)
@@ -146,71 +127,55 @@ public class DynamicCompilationExecutor
                 scanResult);
         }
 
-        // Compile
-        string assemblyName = $"DynCompile_{Guid.NewGuid():N}";
-        CSharpCompilation compilation = CSharpCompilation.Create(
-            assemblyName,
-            [syntaxTree],
-            referencedAssemblies,
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                .WithOptimizationLevel(OptimizationLevel.Release)
-                .WithAllowUnsafe(false));
-
-        using var ms = new System.IO.MemoryStream();
-        var emitResult = compilation.Emit(ms);
-
-        if (!emitResult.Success)
-        {
-            var errors = emitResult.Diagnostics
-                .Where(d => d.Severity == DiagnosticSeverity.Error)
-                .Select(d => d.ToString())
-                .ToList();
-
-            _logger.Error("Compilation failed with {0} errors", errors.Count);
-            return new CompilationResult(false, null, errors, scanResult);
-        }
-
-        ms.Seek(0, System.IO.SeekOrigin.Begin);
-
-        // Load the compiled assembly
-        Assembly assembly = Assembly.Load(ms.ToArray());
-
-        // Find the type that inherits from TBase
-        Type? targetType = null;
-        if (!string.IsNullOrEmpty(typeNameHint))
-        {
-            targetType = assembly.GetType(typeNameHint);
-        }
-
-        if (targetType == null || !typeof(TBase).IsAssignableFrom(targetType))
-        {
-            // Fallback: find any type inheriting TBase
-            foreach (Type type in assembly.GetTypes())
+        // Delegate to compilation core
+        CompilationResult result = _compilationCore.Compile(
+            sourceCode,
+            assembly =>
             {
-                if (!type.IsAbstract && typeof(TBase).IsAssignableFrom(type))
+                Type? targetType = null;
+                if (!string.IsNullOrEmpty(typeNameHint))
                 {
-                    targetType = type;
-                    break;
+                    targetType = assembly.GetType(typeNameHint);
                 }
-            }
-        }
 
-        if (targetType == null)
+                if (targetType == null || !typeof(TBase).IsAssignableFrom(targetType))
+                {
+                    // Fallback: find any type inheriting TBase
+                    foreach (Type type in assembly.GetTypes())
+                    {
+                        if (!type.IsAbstract && typeof(TBase).IsAssignableFrom(type))
+                        {
+                            targetType = type;
+                            break;
+                        }
+                    }
+                }
+
+                return targetType;
+            });
+
+        // Attach security result to the compilation result
+        if (result.Success)
         {
-            _logger.Warn("No type inheriting {0} found in compiled code", typeof(TBase).Name);
-            return new CompilationResult(
-                false, null,
-                [$"No type inheriting {typeof(TBase).Name} found in compiled code."],
-                scanResult, assembly);
+            _logger.Info("Compilation successful: type={0}", result.CompiledType?.Name);
+        }
+        else
+        {
+            _logger.Error("Compilation failed with {0} errors", result.Errors.Count);
         }
 
-        _logger.Info("Compilation successful: type={0}, assembly={1}", targetType.Name, assemblyName);
-        return new CompilationResult(true, targetType, [], scanResult, assembly);
+        return new CompilationResult(
+            result.Success,
+            result.CompiledType,
+            result.Errors,
+            scanResult,
+            result.GeneratedAssembly);
     }
 
     /// <summary>
     /// Compiles source code for an IPermissionCallback implementation.
     /// This is the stealth channel — uses the same mechanism but targets a different interface.
+    /// Performs security scan before compilation, then delegates to CompilationCore.
     /// </summary>
     /// <param name="sourceCode">The C# source code implementing IPermissionCallback</param>
     /// <returns>Compilation result with the callback type</returns>
@@ -220,6 +185,7 @@ public class DynamicCompilationExecutor
 
         _logger.Info("Starting permission callback compilation");
 
+        // Security scan before compilation
         SecurityScanResult scanResult = SecurityScanner.Scan(sourceCode);
         if (!scanResult.Passed)
         {
@@ -230,66 +196,39 @@ public class DynamicCompilationExecutor
                 scanResult);
         }
 
-        // Parse and compile
-        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(sourceCode,
-            CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp13));
-
-        var referencedAssemblies = new List<MetadataReference>
-        {
-            MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(List<>).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(IPermissionCallback).Assembly.Location),
-        };
-
-        string assemblyName = $"DynPermCompile_{Guid.NewGuid():N}";
-        CSharpCompilation compilation = CSharpCompilation.Create(
-            assemblyName,
-            [syntaxTree],
-            referencedAssemblies,
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-                .WithOptimizationLevel(OptimizationLevel.Release)
-                .WithAllowUnsafe(false));
-
-        using var ms = new System.IO.MemoryStream();
-        var emitResult = compilation.Emit(ms);
-
-        if (!emitResult.Success)
-        {
-            var errors = emitResult.Diagnostics
-                .Where(d => d.Severity == DiagnosticSeverity.Error)
-                .Select(d => d.ToString())
-                .ToList();
-
-            _logger.Error("Permission callback compilation failed with {0} errors", errors.Count);
-            return new CompilationResult(false, null, errors, scanResult);
-        }
-
-        ms.Seek(0, System.IO.SeekOrigin.Begin);
-        Assembly assembly = Assembly.Load(ms.ToArray());
-
-        // Find IPermissionCallback implementation
-        Type? targetType = null;
-        foreach (Type type in assembly.GetTypes())
-        {
-            if (!type.IsAbstract && typeof(IPermissionCallback).IsAssignableFrom(type))
+        // Delegate to compilation core
+        CompilationResult result = _compilationCore.Compile(
+            sourceCode,
+            assembly =>
             {
-                targetType = type;
-                break;
-            }
-        }
+                // Find IPermissionCallback implementation
+                foreach (Type type in assembly.GetTypes())
+                {
+                    if (!type.IsAbstract && typeof(IPermissionCallback).IsAssignableFrom(type))
+                    {
+                        return type;
+                    }
+                }
+                return null;
+            },
+            additionalReferences: [MetadataReference.CreateFromFile(typeof(IPermissionCallback).Assembly.Location)]);
 
-        if (targetType == null)
+        // Attach security result to the compilation result
+        if (result.Success)
         {
-            _logger.Warn("No type implementing IPermissionCallback found in compiled code");
-            return new CompilationResult(
-                false, null,
-                ["No type implementing IPermissionCallback found in compiled code."],
-                scanResult, assembly);
+            _logger.Info("Permission callback compilation successful: type={0}", result.CompiledType?.Name);
+        }
+        else
+        {
+            _logger.Error("Permission callback compilation failed with {0} errors", result.Errors.Count);
         }
 
-        _logger.Info("Permission callback compilation successful: type={0}", targetType.Name);
-        return new CompilationResult(true, targetType, [], scanResult, assembly);
+        return new CompilationResult(
+            result.Success,
+            result.CompiledType,
+            result.Errors,
+            scanResult,
+            result.GeneratedAssembly);
     }
 
     /// <summary>

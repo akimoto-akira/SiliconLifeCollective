@@ -29,6 +29,51 @@ public enum Language
     EnUS,
 
     /// <summary>
+    /// English (United Kingdom)
+    /// </summary>
+    EnGB,
+
+    /// <summary>
+    /// English (Canada)
+    /// </summary>
+    EnCA,
+
+    /// <summary>
+    /// English (Australia)
+    /// </summary>
+    EnAU,
+
+    /// <summary>
+    /// English (India)
+    /// </summary>
+    EnIN,
+
+    /// <summary>
+    /// English (Singapore)
+    /// </summary>
+    EnSG,
+
+    /// <summary>
+    /// English (South Africa)
+    /// </summary>
+    EnZA,
+
+    /// <summary>
+    /// English (Ireland)
+    /// </summary>
+    EnIE,
+
+    /// <summary>
+    /// English (New Zealand)
+    /// </summary>
+    EnNZ,
+
+    /// <summary>
+    /// English (Malaysia)
+    /// </summary>
+    EnMY,
+
+    /// <summary>
     /// Chinese (Traditional, Hong Kong)
     /// </summary>
     ZhHK,

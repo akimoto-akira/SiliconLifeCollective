@@ -85,10 +85,12 @@ public class TimerController : Controller
     {
         var timers = timerSystem.GetAll();
         var result = new List<object>();
+        var registry = CalendarTool.BuildCalendarRegistry();
 
         foreach (var timer in timers)
         {
-            string calendarDesc = GetCalendarDescription(timer.CalendarId, timer.CalendarConditions);
+            string calendarDesc = GetCalendarDescription(timer.CalendarId, timer.CalendarConditions, registry);
+            string calendarName = GetCalendarName(timer.CalendarId, registry);
 
             result.Add(new
             {
@@ -100,6 +102,7 @@ public class TimerController : Controller
                 triggerTime = timer.TriggerTime,
                 triggerTimeFormatted = timer.TriggerTime.ToString("yyyy-MM-dd HH:mm:ss"),
                 calendarId = timer.CalendarId,
+                calendarName = calendarName,
                 calendarDescription = calendarDesc,
                 calendarConditions = timer.CalendarConditions,
                 timesTriggered = timer.TimesTriggered,
@@ -111,19 +114,19 @@ public class TimerController : Controller
         return result;
     }
 
-    private static string GetCalendarDescription(string calendarId, Dictionary<string, int> conditions)
+    private static string GetCalendarDescription(string calendarId, Dictionary<string, int> conditions, Dictionary<string, CalendarBase> registry)
     {
         if (calendarId == "interval")
         {
-            List<string> parts = new();
-            if (conditions.TryGetValue("days", out int d) && d > 0) parts.Add($"{d}d");
-            if (conditions.TryGetValue("hours", out int h) && h > 0) parts.Add($"{h}h");
-            if (conditions.TryGetValue("minutes", out int m) && m > 0) parts.Add($"{m}m");
-            if (conditions.TryGetValue("seconds", out int s) && s > 0) parts.Add($"{s}s");
-            return parts.Count > 0 ? $"every " + string.Join(" ", parts) : "interval";
+            int days = conditions.TryGetValue("days", out int d) ? d : 0;
+            int hours = conditions.TryGetValue("hours", out int h) ? h : 0;
+            int minutes = conditions.TryGetValue("minutes", out int m) ? m : 0;
+            int seconds = conditions.TryGetValue("seconds", out int s) ? s : 0;
+
+            var loc = CalendarTool.GetLocalization();
+            return loc.LocalizeIntervalDescription(days, hours, minutes, seconds);
         }
 
-        Dictionary<string, CalendarBase> registry = CalendarTool.BuildCalendarRegistry();
         if (registry.TryGetValue(calendarId, out CalendarBase? calendar))
         {
             try
@@ -136,5 +139,21 @@ public class TimerController : Controller
         }
 
         return string.Join(", ", conditions.Select(kv => $"{kv.Key}={kv.Value}"));
+    }
+
+    private static string GetCalendarName(string calendarId, Dictionary<string, CalendarBase> registry)
+    {
+        if (calendarId == "interval")
+        {
+            var loc = CalendarTool.GetLocalization();
+            return loc.CalendarIntervalName;
+        }
+
+        if (registry.TryGetValue(calendarId, out CalendarBase? calendar))
+        {
+            return calendar.CalendarName;
+        }
+
+        return calendarId;
     }
 }

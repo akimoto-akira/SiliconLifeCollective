@@ -21,13 +21,52 @@ namespace SiliconLife.Default;
 public class OllamaClientFactory : IAIClientFactory
 {
     /// <summary>
-    /// Creates an Ollama client instance based on the provided configuration
+    /// Creates an Ollama client instance based on the provided configuration dictionary
     /// </summary>
-    /// <param name="endpoint">The Ollama service endpoint URL</param>
-    /// <param name="defaultModel">The default model name</param>
+    /// <param name="config">Configuration dictionary with keys like "endpoint", "model", etc.</param>
     /// <returns>An Ollama client instance</returns>
-    public IAIClient CreateClient(string endpoint, string defaultModel)
+    public IAIClient CreateClient(Dictionary<string, object> config)
     {
-        return new OllamaClient(endpoint, defaultModel);
+        // Extract required fields
+        string endpoint = config.TryGetValue("endpoint", out var ep) 
+            ? ep.ToString() ?? "http://localhost:11434"
+            : "http://localhost:11434";
+        
+        string model = config.TryGetValue("model", out var m) 
+            ? m.ToString() ?? "llama3.2"
+            : "llama3.2";
+        
+        return new OllamaClient(endpoint, model);
+    }
+    
+    /// <summary>
+    /// Gets the configuration keys metadata for Ollama client
+    /// </summary>
+    /// <param name="language">The language to use for localized display labels</param>
+    public Dictionary<string, string> GetConfigKeysMetadata(Language language)
+    {
+        // 获取指定语言的本地化实例
+        var localization = LocalizationManager.Instance.GetLocalization(language) as DefaultLocalizationBase;
+        
+        if (localization == null)
+        {
+            // 如果无法获取本地化，返回英文默认值
+            return new Dictionary<string, string>
+            {
+                ["endpoint"] = "Ollama Endpoint",
+                ["model"] = "Default Model",
+                ["temperature"] = "Temperature",
+                ["maxTokens"] = "Max Tokens"
+            };
+        }
+        
+        // 返回已本地化的文本
+        return new Dictionary<string, string>
+        {
+            ["endpoint"] = localization.GetConfigDisplayName("OllamaEndpoint"),
+            ["model"] = localization.GetConfigDisplayName("DefaultModel"),
+            ["temperature"] = localization.GetConfigDisplayName("Temperature"),
+            ["maxTokens"] = localization.GetConfigDisplayName("MaxTokens")
+        };
     }
 }

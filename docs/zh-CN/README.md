@@ -1,8 +1,6 @@
 # 硅基生命群
 
-**⚠️ 警告：动态编译没有经过深度测试，但确实生效了。必须在代码中增加模板才可以正常工作**
-
-**⚠️ 警告：Web 页面正在快速调整期，当前页面功能无法保持正常响应**
+**⚠️ 警告：动态编译功能已可用，但需要代码模板才能正常工作。深度测试正在进行中。**
 
 基于 .NET 9 的多智能体协作平台，AI 智能体（硅基人）可通过 Roslyn 动态编译实现自我进化。
 
@@ -23,9 +21,11 @@
 - **零数据库依赖** — 基于文件系统存储（JSON），支持通过 `ITimeStorage` 进行时间索引查询
 - **国际化** — 内置简体中文、繁体中文和英文支持
 - **Web 界面** — 内置 HTTP 服务器，支持 SSE，多种皮肤，完整的仪表盘
-  - **皮肤系统** — 4 种内置皮肤（Admin、Chat、Creative、Dev），提供完整的 UI 组件库
+  - **皮肤系统** — 4 种内置皮肤（Admin、Chat、Creative、Dev），可插拔 ISkin 接口，自动发现注册
   - **17 个控制器** — About、Audit、Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer
-  - **实时更新** — 通过 SSE（Server-Sent Events）实现实时数据流
+  - **实时更新** — 通过 SSE（Server-Sent Events）实现聊天消息、硅基人状态和系统事件的实时推送
+  - **HTML/CSS/JS 构建器** — 服务端标记语言生成，通过 `H`、`CssBuilder` 和 `JsBuilder` 实现（零前端框架依赖）
+  - **本地化** — 三种内置语言环境（zh-CN、zh-HK、en-US），通过 LocalizationManager 解析
 
 ## 技术栈
 

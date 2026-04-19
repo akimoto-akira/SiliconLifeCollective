@@ -97,6 +97,9 @@ public class ZhHK : DefaultLocalizationBase
     public override string InitNicknamePlaceholder => "請輸入你的暱稱";
     public override string InitEndpointLabel => "AI API 端點";
     public override string InitEndpointPlaceholder => "例如: http://localhost:11434";
+    public override string InitAIClientTypeLabel => "AI 客戶端類型";
+    public override string InitModelLabel => "預設模型";
+    public override string InitModelPlaceholder => "例如: qwen3.5:cloud";
     public override string InitSkinLabel => "介面主題";
     public override string InitSkinPlaceholder => "留空使用預設主題";
     public override string InitDataDirectoryLabel => "資料目錄";
@@ -187,8 +190,106 @@ public class ZhHK : DefaultLocalizationBase
 
     // ===== Permission Page Localization =====
 
-    public override string PermissionPageHeader => "權限管理";
+    public override string PermissionPageHeader => "權限管理 - {0}";
     public override string PermissionEmptyState => "暫無權限規則";
+    public override string PermissionMissingBeingId => "缺少硅基人ID參數";
+    public override string PermissionBeingNotFound => "硅基人不存在";
+    public override string PermissionTemplateHeader => "默認權限回調模板";
+    public override string PermissionTemplateDescription => "保存後覆蓋默認行為，清空後恢復默認";
+    public override string PermissionCallbackClassSummary => "默認權限回調實現。";
+    public override string PermissionCallbackClassSummary2 => "域名特定權限規則，完全符合 dpf.txt 規範。\n/// 覆蓋：網絡（白名單/黑名單/IP 範圍）、命令行（跨平台）、\n/// 文件訪問（危險擴展名、系統目錄、用戶目錄）和回退默認值。";
+    public override string PermissionCallbackConstructorSummary => "創建帶有應用數據目錄的 DefaultPermissionCallback。";
+    public override string PermissionCallbackConstructorSummary2 => "應用數據目錄用於：\n    /// - 阻止訪問數據目錄（除了自己的 Temp 子文件夾）\n    /// - 為 Temp 允許規則派生每個硅基人的數據目錄";
+    public override string PermissionCallbackConstructorParam => "全局應用數據目錄路徑";
+    public override string PermissionCallbackEvaluateSummary => "使用默認規則（dpf.txt 規範）評估權限請求。";
+    public override string PermissionRuleOtherTypesDefault => "其他權限類型默認放行";
+
+    private static readonly Dictionary<string, string> PermissionRuleComments = new()
+    {
+        // Evaluate 方法
+        ["NetRuleNetworkAccess"] = "網絡操作放行規則",
+        ["NetRuleCommandLine"] = "命令行規則（跨平台）",
+        ["NetRuleFileAccess"] = "文件訪問規則（跨平台）",
+        // 網絡規則
+        ["NetRuleNoProtocol"] = "不包含協議名（無冒號），無法判斷來源，詢問用戶",
+        ["NetRuleLoopback"] = "本地回環地址放行（localhost / 127.0.0.1 / ::1）",
+        ["NetRulePrivateIPMatch"] = "內網 IP 地址段匹配（先驗證是否為合法 IPv4 地址）",
+        ["NetRulePrivateC"] = "內網C類地址放行（192.168.0.0/16）",
+        ["NetRulePrivateA"] = "內網A類地址放行（10.0.0.0/8）",
+        ["NetRulePrivateB"] = "內網B類地址選擇性放行（172.16.0.0/12，即 172.16.* ~ 172.31.*）",
+        ["NetRuleDomainWhitelist1"] = "允許訪問的外部域名白名單 — 谷歌 / 必應 / 騰訊系 / 搜狗 / DuckDuckGo / Yandex / 微信 / 阿里系",
+        ["NetRuleVideoPlatforms"] = "嗶哩嗶哩 / niconico / Acfun / 抖音 / TikTok / 快手 / 小紅書",
+        ["NetRuleAIServices"] = "AI 服務 — OpenAI / Anthropic / HuggingFace / Ollama / 通義千問 / Kimi / 豆包 / 剪映 / Trae IDE",
+        ["NetRulePhishingBlacklist"] = "釣魚/仿冒網站黑名單（關鍵詞模糊匹配）",
+        ["NetRulePhishingAI"] = "AI 仿冒站",
+        ["NetRuleMaliciousAI"] = "惡意 AI 工具",
+        ["NetRuleAdversarialAI"] = "對抗性 AI / 提示詞越獄 / LLM 攻擊站點",
+        ["NetRuleAIContentFarm"] = "AI 內容農場 / AI 垃圾內容",
+        ["NetRuleAIBlackMarket"] = "AI 數據黑市 / API 密鑰黑市 / LLM 權重販賣",
+        ["NetRuleAIFakeScam"] = "AI 仿冒/詐騙通用關鍵詞",
+        ["NetRuleOtherBlacklist"] = "其他黑名單站點 — sakura-cat: 不應被AI訪問 / 4399: 遊戲內混雜病毒",
+        ["NetRuleSecuritiesTrading"] = "證券交易平台（需詢問用戶）— 華泰證券 / 國泰君安 / 中信證券 / 招商證券 / 廣發證券 / 海通證券 / 申萬宏源 / 東方證券 / 國信證券 / 兴業證券",
+        ["NetRuleThirdPartyTrading"] = "第三方交易平台（需詢問用戶）— 同花順 / 東方財富 / 通達信 / Bloomberg / Yahoo Finance",
+        ["NetRuleStockExchanges"] = "證券交易所（僅行情）— 上海證券交易所 / 深圳證券交易所 / 巨潮資訊網",
+        ["NetRuleFinancialNews"] = "財經資訊（僅行情）— 金融界 / 證券之星 / 和訊網",
+        ["NetRuleInvestCommunity"] = "投資社區（僅資訊）— 雪球 / 財聯社 / 開盤啦 / 淘股吧",
+        ["NetRuleDevServices"] = "開發者服務 — GitHub / Gitee / StackOverflow / npm / NuGet / PyPI / 微軟",
+        ["NetRuleGameEngines"] = "遊戲引擎 — Unity / 虛幻引擎 / Epic Games / Fab資源商店",
+        ["NetRuleGamePlatforms"] = "遊戲平台 — Steam 需詢問用戶，EA / Ubisoft / Blizzard / Nintendo 允許",
+        ["NetRuleSEGA"] = "世嘉(SEGA，日本)",
+        ["NetRuleCloudServices"] = "全球雲服務平台 — Azure / Google Cloud / DigitalOcean / Heroku / Vercel / Netlify",
+        ["NetRuleDevDeployTools"] = "全球開發與部署工具 — GitLab / Bitbucket / Docker / Cloudflare",
+        ["NetRuleCloudDevTools"] = "雲服務與開發工具 — 亞馬遜 / AWS / Kiro IDE / CodeBuddy IDE / JetBrains / 純光工作室 / W3School中文",
+        ["NetRuleChinaSocialNews"] = "社交/資訊（中國大陸）— 微博 / 知乎 / 網易 / 新浪 / 鳳凰網 / 新華社 / 中央電視台",
+        ["NetRuleTaiwanMediaCTI"] = "中國台灣媒體 — 中天新聞網(中天電視台)",
+        ["NetRuleTaiwanMediaSET"] = "三立新聞網(三立民視) — 需詢問用戶",
+        ["NetRuleTaiwanWIN"] = "網絡內容防護機構(中國台灣，有攔截風險) — 禁止",
+        ["NetRuleJapanMedia"] = "日本媒體 — NHK(日本放送協會)",
+        ["NetRuleRussianMedia"] = "俄羅斯媒體 — 俄羅斯衛星通訊社(各國站點)",
+        ["NetRuleKoreanMedia"] = "韓國媒體 — KBS / MBC / SBS / EBS",
+        ["NetRuleDPRKMedia"] = "朝鮮媒體 — 我的國家 / 勞動新聞 / 青年前衛 / 朝鮮之聲 / 平壤時報 / 朝鮮新報",
+        ["NetRuleGovWebsites"] = "各國政府網站（通配 .gov 域名）",
+        ["NetRuleGlobalSocialCollab"] = "全球社交協作平台 — Reddit / Discord / Slack / Notion / Figma / Dropbox",
+        ["NetRuleOverseasSocial"] = "海外社交/直播（需詢問用戶）— Twitch / Facebook / X / Gmail / Instagram / lit.link",
+        ["NetRuleWhatsApp"] = "WhatsApp(Meta) — 允許",
+        ["NetRuleThreads"] = "Threads(Meta) — 禁止",
+        ["NetRuleGlobalVideoMusic"] = "全球視頻/音樂平台 — Spotify / Apple Music / Vimeo",
+        ["NetRuleVideoMedia"] = "視頻/媒體 — YouTube / 愛奇藝 / 優酷",
+        ["NetRuleMaps"] = "地圖 — 開放街道地圖",
+        ["NetRuleEncyclopedia"] = "百科 — 維基百科 / MediaWiki / 知識共享(CC)",
+        ["NetRuleUnmatched"] = "未匹配的網絡訪問，詢問用戶",
+        // 命令行規則
+        ["CmdRuleSeparatorDetect"] = "檢測管道符和多命令分隔符，拆分逐條驗證",
+        ["CmdRuleWinAllow"] = "Windows 允許：只讀/查詢類命令 — dir / tree / tasklist / ipconfig / ping / tracert / systeminfo / whoami / set / path / sc query / findstr",
+        ["CmdRuleWinDeny"] = "Windows 禁止：危險/破壞性命令 — del / rmdir / format / diskpart / reg delete",
+        ["CmdRuleLinuxAllow"] = "Linux 允許：只讀/查詢類命令 — ls / tree / ps / top / ifconfig / ip / ping / traceroute / uname / whoami / env / cat / grep / find / df / du / systemctl status",
+        ["CmdRuleLinuxDeny"] = "Linux 禁止：危險/破壞性命令 — rm / rmdir / mkfs / fdisk / dd / chmod / chown / chgrp",
+        ["CmdRuleMacAllow"] = "macOS 允許：只讀/查詢類命令 — ls / tree / ps / top / ifconfig / ping / traceroute / system_profiler / sw_vers / whoami / env / cat / grep / find / df / du / launchctl list",
+        ["CmdRuleMacDeny"] = "macOS 禁止：危險/破壞性命令 — rm / rmdir / diskutil erasedisk / dd / chmod / chown / chgrp",
+        ["CmdRuleUnmatched"] = "未匹配的命令，詢問用戶",
+        // 文件訪問規則
+        ["FileRuleDangerousExt"] = "最高優先級：危險文件擴展名直接拒絕",
+        ["FileRuleInvalidPath"] = "無法解析為絕對路徑，詢問用戶",
+        ["FileRuleDenyAssemblyDir"] = "禁止：當前程序集目錄",
+        ["FileRuleDenyAppDataDir"] = "禁止：應用數據目錄",
+        ["FileRuleAllowOwnTemp"] = "但允許：自己的 Temp 目錄",
+        ["FileRuleOwnTemp"] = "允許：自己的 Temp 目錄",
+        ["FileRuleDenyOtherDataDir"] = "禁止：數據目錄其他路徑（包括其他硅基人的目錄）",
+        ["FileRuleUserFolders"] = "允許：用戶常用文件夾",
+        ["FileRuleUserFolderCheck"] = "用戶常用文件夾 — 桌面 / 下載 / 文檔 / 圖片 / 音樂 / 視頻",
+        ["FileRulePublicFolders"] = "允許：公用用戶文件夾",
+        ["FileRuleWinDenySystem"] = "Windows 禁止：系統關鍵目錄（不一定在C盤）",
+        ["FileRuleWinDenySystemCheck"] = "系統關鍵目錄",
+        ["FileRuleLinuxDenySystem"] = "Linux 禁止：系統關鍵目錄 — /etc /boot /sbin",
+        ["FileRuleMacDenySystem"] = "macOS 禁止：系統關鍵目錄 — /System /Library /private/etc",
+        ["FileRuleUnmatched"] = "未匹配的路徑，詢問用戶",
+    };
+
+    public override string GetPermissionRuleComment(string key)
+        => PermissionRuleComments.TryGetValue(key, out var value) ? value : key;
+
+    public override string PermissionRulesSection => "權限規則列表";
+    public override string PermissionEditorSection => "權限規則編輯器";
 
     // ===== Knowledge Page Localization =====
 
@@ -229,12 +330,17 @@ public class ZhHK : DefaultLocalizationBase
     public override string BeingsDetailStatusLabel => "狀態：";
     public override string BeingsDetailCustomCompileLabel => "自訂編譯：";
     public override string BeingsDetailSoulContentLabel => "靈魂內容：";
+    public override string BeingsDetailSoulContentEditLink => "編輯靈魂";
+    public override string BeingsBackToList => "返回列表";
+    public override string SoulEditorSubtitle => "編輯矽基生命的靈魂檔案（Markdown 格式）";
     public override string BeingsDetailMemoryLabel => "記憶：";
     public override string BeingsDetailMemoryViewLink => "查看";
     public override string BeingsDetailPermissionLabel => "權限：";
     public override string BeingsDetailPermissionEditLink => "編輯";
     public override string BeingsDetailTimersLabel => "計時器：";
     public override string BeingsDetailTasksLabel => "任務：";
+    public override string BeingsDetailAIClientLabel => "獨立AI客戶端：";
+    public override string BeingsDetailAIClientEditLink => "編輯";
     public override string BeingsYes => "是";
     public override string BeingsNo => "否";
     public override string BeingsNotSet => "未設定";
@@ -318,6 +424,12 @@ public class ZhHK : DefaultLocalizationBase
     public override string ConfigErrorUnsupportedType => "不支援的屬性類型: {0}";
     public override string ConfigErrorSaveFailed => "儲存失敗: {0}";
     public override string ConfigSaveFailed => "儲存失敗：";
+    public override string ConfigDictionaryLabel => "字典";
+    public override string ConfigDictKeyLabel => "鍵：";
+    public override string ConfigDictValueLabel => "值：";
+    public override string ConfigDictAddButton => "添加";
+    public override string ConfigDictDeleteButton => "刪除";
+    public override string ConfigDictEmptyMessage => "字典為空";
 
     // ===== Logs =====
 
@@ -383,8 +495,11 @@ public class ZhHK : DefaultLocalizationBase
         ["WatchdogTimeout"] = "看門狗逾時",
         ["MinLogLevel"] = "最小日誌級別",
         ["AIClientType"] = "AI 客戶端類型",
+        ["OllamaClient"] = "Ollama 客戶端",
         ["OllamaEndpoint"] = "Ollama 端點",
         ["DefaultModel"] = "預設模型",
+        ["Temperature"] = "溫度",
+        ["MaxTokens"] = "最大 Token 數",
         ["WebPort"] = "Web 連接埠",
         ["AllowIntranetAccess"] = "允許內網存取",
         ["WebSkin"] = "Web 主題",
@@ -442,7 +557,8 @@ public class ZhHK : DefaultLocalizationBase
         ["memory"] = "記憶",
         ["task"] = "任務",
         ["system"] = "系統",
-        ["timer"] = "計時器"
+        ["timer"] = "計時器",
+        ["token_audit"] = "Token審計"
     };
 
     public override string GetToolDisplayName(string toolName) =>
@@ -519,6 +635,26 @@ public class ZhHK : DefaultLocalizationBase
 
         你不是服務員，你是搭檔。
         """;
+
+    // ===== 間隔定時器本地化 =====
+
+    public override string CalendarIntervalName => "間隔定時器";
+    public override string CalendarIntervalDays => "天";
+    public override string CalendarIntervalHours => "小時";
+    public override string CalendarIntervalMinutes => "分鐘";
+    public override string CalendarIntervalSeconds => "秒";
+    public override string CalendarIntervalEvery => "每";
+
+    public override string LocalizeIntervalDescription(int days, int hours, int minutes, int seconds)
+    {
+        var parts = new List<string>();
+        if (days > 0) parts.Add($"{days}{CalendarIntervalDays}");
+        if (hours > 0) parts.Add($"{hours}{CalendarIntervalHours}");
+        if (minutes > 0) parts.Add($"{minutes}{CalendarIntervalMinutes}");
+        if (seconds > 0) parts.Add($"{seconds}{CalendarIntervalSeconds}");
+
+        return parts.Count > 0 ? $"{CalendarIntervalEvery}{string.Join(" ", parts)}" : "間隔定時器";
+    }
 
     // ===== 公曆本地化 =====
 
@@ -1225,6 +1361,20 @@ public class ZhHK : DefaultLocalizationBase
 
     public override string FormatMemoryEventTimer(string content)
         => $"[定時] 定時觸發，回應：{content}";
+
+    public override string FormatMemoryEventTimerError(string timerName, string error)
+        => $"[定時] 定時器 '{timerName}' 執行失敗：{error}";
+
+    // ===== Timer Notification Localization =====
+
+    public override string FormatTimerStartNotification(string timerName)
+        => $"⏰ 定時器 '{timerName}' 開始執行...";
+
+    public override string FormatTimerEndNotification(string timerName, string result)
+        => $"✅ 定時器 '{timerName}' 執行完成\n{result}";
+
+    public override string FormatTimerErrorNotification(string timerName, string error)
+        => $"❌ 定時器 '{timerName}' 執行失敗：{error}";
 
     public override string FormatMemoryEventBeingCreated(string name, string id)
         => $"[管理] 建立了新矽基人「{name}」（{id}）";

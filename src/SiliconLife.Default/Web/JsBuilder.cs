@@ -56,7 +56,26 @@ public class JsString : JsSyntax
 {
     public Func<string> Value { get; }
     public JsString(Func<string> value) => Value = value;
-    public override string Build() => $"\"{Value().Replace("\\", "\\\\").Replace("\"", "\\\"")}\"";
+    public override string Build()
+    {
+        var value = Value();
+        var sb = new StringBuilder();
+        foreach (char c in value)
+        {
+            switch (c)
+            {
+                case '\\': sb.Append("\\\\"); break;
+                case '"': sb.Append("\\\""); break;
+                case '\n': sb.Append("\\n"); break;
+                case '\r': sb.Append("\\r"); break;
+                case '\t': sb.Append("\\t"); break;
+                case '\b': sb.Append("\\b"); break;
+                case '\f': sb.Append("\\f"); break;
+                default: sb.Append(c); break;
+            }
+        }
+        return $"\"{sb}\"";
+    }
 }
 
 public class JsNumber : JsSyntax
