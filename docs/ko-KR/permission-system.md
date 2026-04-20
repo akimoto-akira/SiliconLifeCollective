@@ -1,0 +1,293 @@
+# 권한 시스템
+
+## 개요
+
+권한 시스템은 AI가 시작한 모든 작업이 적절하게 검증되고 감사되도록 보장합니다.
+
+## 5단계 권한 체인
+
+```
+┌─────────────────────────────────────────────┐
+│          권한 검증                           │
+├─────────────────────────────────────────────┤
+│  1단계: IsCurator                           │
+│  ↓ true이면 우회                            │
+│  2단계: UserFrequencyCache                  │
+│  ↓ 속도 제한                                │
+│  3단계: GlobalACL                           │
+│  ↓ 접근 제어 목록                           │
+│  4단계: IPermissionCallback                 │
+│  ↓ 사용자 정의 로직                         │
+│  5단계: IPermissionAskHandler               │
+│  ↓ 사용자에게 질문                          │
+│  결과: 허용 또는 거부                       │
+└─────────────────────────────────────────────┘
+```
+
+## 1단계: IsCurator
+
+관리자/curator는 모든 권한 검사를 우회합니다.
+
+```csharp
+if (user.IsCurator)
+{
+    return PermissionResult.Allowed("Curator access");
+}
+```
+
+## 2단계: UserFrequencyCache
+
+남용을 방지하기 위해 사용자별 속도 제한.
+
+```csharp
+var cache = new UserFrequencyCache();
+if (!cache.CheckLimit(userId, resource))
+{
+    return PermissionResult.Denied("Rate limit exceeded");
+}
+```
+
+## 3단계: GlobalACL
+
+전역 접근 제어 목록은 명시적 규칙을 정의합니다.
+
+### ACL 구조
+
+```json
+{
+  "rules": [
+    {
+      "userId": "user-uuid",
+      "resource": "disk:read",
+      "allowed": true,
+      "expiresAt": "2026-04-21T00:00:00Z"
+    }
+  ]
+}
+```
+
+### 리소스 형식
+
+```
+{type}:{action}
+
+예시:
+- disk:read
+- disk:write
+- network:http
+- compile:execute
+- system:info
+```
+
+## 4단계: IPermissionCallback
+
+동적 권한 로직을 위한 사용자 정의 콜백.
+
+```csharp
+public class DefaultPermissionCallback : IPermissionCallback
+{
+    public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+    {
+        // 여기에 사용자 정의 로직
+        if (IsSafeOperation(request))
+        {
+            return PermissionResult.Allowed("Safe operation");
+        }
+        
+        return PermissionResult.Undecided("Needs user confirmation");
+    }
+}
+```
+
+## 5단계: IPermissionAskHandler
+
+다른 모든 단계가 결정되지 않았을 때 사용자에게 권한을 요청합니다.
+
+```csharp
+public class IMPermissionAskHandler : IPermissionAskHandler
+{
+    public async Task<AskPermissionResult> AskAsync(PermissionRequest request)
+    {
+        // IM을 통해 사용자에게 메시지 전송
+        await SendMessageAsync($"Allow {request.Resource}?");
+        
+        // 사용자 응답 대기
+        var response = await WaitForResponseAsync();
+        
+        return response.Approved 
+            ? AskPermissionResult.Approved()
+            : AskPermissionResult.Denied();
+    }
+}
+```
+
+## 감사 시스템
+
+모든 권한 결정이 기록됩니다:
+
+```json
+{
+  "timestamp": "2026-04-20T10:30:00Z",
+  "userId": "user-uuid",
+  "resource": "disk:write",
+  "allowed": true,
+  "level": "GlobalACL",
+  "reason": "Explicit rule granted"
+}
+```
+
+## 권한 관리
+
+### 권한 부여
+
+**Web UI를 통해**:
+1. **권한 관리**로 이동
+2. **규칙 추가** 클릭
+3. 설정:
+   - 사용자
+   - 리소스
+   - 허용/거부
+   - 기간
+
+**API를 통해**:
+```bash
+curl -X POST http://localhost:8080/api/permissions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "user-uuid",
+    "resource": "disk:write",
+    "allowed": true,
+    "duration": 3600
+  }'
+```
+
+### 권한 취소
+
+```bash
+curl -X DELETE http://localhost:8080/api/permissions/{rule-id}
+```
+
+### 권한 보기
+
+```bash
+curl http://localhost:8080/api/permissions?userId=user-uuid
+```
+
+## 모범 사례
+
+### 1. 최소 권한의 원칙
+
+필요한 최소 권한만 부여:
+
+```json
+{
+  "resource": "disk:read",  // disk:* 아님
+  "allowed": true,
+  "expiresAt": "2026-04-21T00:00:00Z"  // 항상 만료 설정
+}
+```
+
+### 2. 시간 제한 권한 사용
+
+절대적으로 필요한 경우가 아니면 영구 권한을 부여하지 마십시오.
+
+### 3. 권한 로그 모니터링
+
+감사 로그를 정기적으로 검토:
+- 거부된 접근 시도
+- 비정상적인 패턴
+- 권한 승격
+
+### 4. 사용자 정의 콜백 구현
+
+복잡한 로직의 경우 `IPermissionCallback` 사용:
+
+```csharp
+public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+{
+    // 시간 기반 권한
+    if (IsOutsideBusinessHours())
+    {
+        return PermissionResult.Denied("Outside business hours");
+    }
+    
+    // 리소스 기반 권한
+    if (IsSensitiveResource(request.Resource))
+    {
+        return PermissionResult.Undecided("Requires approval");
+    }
+    
+    return PermissionResult.Allowed();
+}
+```
+
+## 일반적인 시나리오
+
+### 시나리오 1: AI가 파일 읽기 원함
+
+```
+AI: "config.json을 읽어야 합니다"
+↓
+권한 체인:
+1. IsCurator? 아님
+2. 속도 제한? 정상
+3. GlobalACL? 규칙 발견: disk:read = 허용
+4. 결과: 허용
+```
+
+### 시나리오 2: AI가 코드 실행 원함
+
+```
+AI: "코드를 컴파일하고 실행하고 싶습니다"
+↓
+권한 체인:
+1. IsCurator? 아님
+2. 속도 제한? 정상
+3. GlobalACL? 규칙 없음
+4. 콜백? 결정되지 않음 반환
+5. 사용자에게 질문? 사용자 승인
+6. 결과: 허용
+```
+
+### 시나리오 3: 속도 제한 초과
+
+```
+AI: "100개의 HTTP 요청을 해야 합니다"
+↓
+권한 체인:
+1. IsCurator? 아님
+2. 속도 제한? 초과
+3. 결과: 거부
+```
+
+## 문제 해결
+
+### 예상치 못한 권한 거부
+
+**확인**:
+1. 사용자의 IsCurator 상태
+2. 속도 제한 설정
+3. GlobalACL 규칙
+4. 콜백 로직
+5. 사용자 응답 타임아웃
+
+### 권한이 만료되지 않음
+
+**확인**:
+- `expiresAt` 필드가 올바르게 설정됨
+- 시간대가 올바름
+- 시계 동기화
+
+### 감사 로그가 기록되지 않음
+
+**확인**:
+- 감사 로거가 등록됨
+- 저장소 백엔드에 접근 가능
+- 충분한 디스크 공간
+
+## 다음 단계
+
+- 📚 [아키텍처 가이드](architecture.md) 읽기
+- 🛠️ [개발 가이드](development-guide.md) 확인
+- 🔒 [보안 문서](security.md) 검토
+- 🚀 [시작 가이드](getting-started.md) 참조

@@ -1,63 +1,63 @@
-# 架構設計
+# 架構
 
-[English](../../architecture.md) | [简体中文](../zh-CN/architecture.md) | [日本語](../ja-JP/architecture.md)
+[English](architecture.md) | [中文](docs/zh-CN/architecture.md) | [繁體中文](docs/zh-HK/architecture.md) | [日本語](docs/ja-JP/architecture.md) | [한국어](docs/ko-KR/architecture.md)
 
 ## 核心概念
 
-### 矽基人
+### 硅基生命体
 
-系統中的每個 AI 智能體都是一個**矽基人**——擁有獨立身份、個性和能力的自主實體。每個矽基人由**靈魂檔案**（Markdown 提示詞）驅動，定義其行為模式。
+系統中的每個 AI 智能体都是一個**硅基生命体** —— 一個具有自身身份、個性和能力的自主实体。每個硅基生命体都由一個**靈魂檔案**（Markdown 提示词）驅動程式，定義其行為模式。
 
-### 矽基主理人
+### 硅基主理人
 
-**矽基主理人**是擁有最高系統權限的特殊矽基人，充當系統管理員：
+**硅基主理人**是一個具有最高系統權限的特殊硅基生命体。它充當系統管理員：
 
-- 建立和管理其他矽基人
-- 分析使用者請求並分解為子任務
-- 將任務分發給合適的矽基人
-- 監控執行品質，處理失敗情況
-- 對使用者訊息享有**優先排程權**（詳見下文）
+- 建立和管理其他硅基生命体
+- 分析使用者要求並将其分解為工作
+- 将工作分發给适當的硅基生命体
+- 監控執行质量並處理失敗
+- 使用**優先排程**回應使用者訊息（見下文）
 
 ### 靈魂檔案
 
-儲存在每個矽基人資料目錄中的 Markdown 檔案（`soul.md`），作為系統提示詞注入每次 AI 請求，定義矽基人的個性、決策模式和行為約束。
+儲存在每個硅基生命体資料目錄中的 Markdown 檔案（`soul.md`）。它作為系統提示词注入到每個 AI 要求中，定義生命体的個性、決策模式和行為約束。
 
 ---
 
-## 排程機制：時間分片公平排程
+## 排程：时隙公平排程
 
-### MainLoop + TickObject
+### 主循环 + 时钟物件
 
-系統在專用背景執行緒執行 **Tick 驅動的主循環**：
+系統在專用後臺线程上執行一個**时钟驅動程式的主循环**：
 
 ```
-MainLoop（專用執行緒，看門狗 + 熔斷器）
-  └── TickObject A（Priority=0, Interval=100ms）
-  └── TickObject B（Priority=1, Interval=500ms）
-  └── SiliconBeingManager（由 MainLoop 直接驅動）
-        └── SiliconBeingRunner → 矽基人 1 → Tick → ExecuteOneRound
-        └── SiliconBeingRunner → 矽基人 2 → Tick → ExecuteOneRound
-        └── SiliconBeingRunner → 矽基人 3 → Tick → ExecuteOneRound
+主循环（專用线程，看門狗 + 熔断器）
+  └── 时钟物件 A（優先級=0，间隔=100ms）
+  └── 时钟物件 B（優先級=1，间隔=500ms）
+  └── 硅基生命体管理器（由主循环直接时钟触發）
+        └── 硅基生命体執行器 → 硅基生命体 1 → 时钟触發 → 執行一轮
+        └── 硅基生命体執行器 → 硅基生命体 2 → 时钟触發 → 執行一轮
+        └── 硅基生命体執行器 → 硅基生命体 3 → 时钟触發 → 執行一轮
         └── ...
 ```
 
-關鍵設計決策：
+關键設計決策：
 
-- **矽基人不繼承 TickObject**，擁有獨立的 `Tick()` 方法，由 `SiliconBeingManager` 透過 `SiliconBeingRunner` 呼叫，不直接註冊到 MainLoop。
-- **SiliconBeingManager** 由 MainLoop 直接驅動，作為所有矽基人的唯一排程代理。
-- **SiliconBeingRunner** 將每個矽基人的 `Tick()` 包裝在獨立臨時執行緒中執行，帶逾時控制和每矽基人獨立熔斷器（連續 3 次逾時 → 冷卻 1 分鐘）。
-- 每個矽基人每次 Tick 只執行**一輪** AI 請求 + ToolCall，確保沒有矽基人能獨佔主循環。
-- **PerformanceMonitor** 追蹤每次 Tick 的執行耗時，用於可觀測性。
+- **硅基生命体不继承时钟物件。** 它們有自己的 `Tick()` 方法，由 `SiliconBeingManager` 通過 `SiliconBeingRunner` 调用，而不是直接註冊到主循环。
+- **硅基生命体管理器**由主循环直接时钟触發，並作為所有生命体的单一代理。
+- **硅基生命体執行器**在臨時綫程上包裝每個生命体的 `Tick()`，具有超時和每個生命体的斷路器（連续 3 次超時 → 1 分钟冷卻）。
+- 每個生命体的執行限制為每次时钟触發**一轮** AI 要求 + 工具调用，确保没有生命体可以垄断主循环。
+- **效能監控器**跟踪时钟執行時間以實現可觀察性。
 
-### 主理人優先響應
+### 主理人優先回應
 
-當使用者向矽基主理人傳送訊息時：
+當使用者向硅基主理人發送訊息时：
 
-1. 當前正在執行的矽基人（如矽基人 A）完成本輪執行——**不中斷**。
-2. 管理器**跳過剩餘佇列**。
-3. 循環**從主理人重新開始**，使其立即獲得執行機會。
+1. 當前生命体（例如生命体 A）完成其當前轮次 —— **不中断**。
+2. 管理器**跳過剩餘隊列**。
+3. 循环**從主理人重新開始**，使其立即執行。
 
-這保證了使用者互動的響應速度，同時不破壞正在執行的任務完整性。
+这确保了回應使用者交互，同时不幹擾進行中的工作。
 
 ---
 
@@ -65,45 +65,45 @@ MainLoop（專用執行緒，看門狗 + 熔斷器）
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                        CoreHost                         │
-│  （統一宿主 — 組裝和管理所有元件）                        │
+│                        核心主機                          │
+│  （统一主機 —— 装配和管理所有元件）                        │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
 │  ┌──────────┐  ┌──────────────┐  ┌──────────────────┐  │
-│  │ MainLoop │  │ ServiceLocator│  │      Config      │  │
+│  │ 主循环    │  │ 服務定位器    │  │      設定         │  │
 │  └────┬─────┘  └──────────────┘  └──────────────────┘  │
 │       │                                                  │
 │  ┌────▼─────────────────────────────────────────────┐   │
-│  │           SiliconBeingManager (TickObject)        │   │
+│  │           硅基生命体管理器（时钟物件）               │   │
 │  │  ┌─────────┐ ┌─────────┐ ┌─────────┐            │   │
-│  │  │ 主理人  │ │矽基人 A │ │矽基人 B │  ...       │   │
+│  │  │主理人    │ │生命体 A  │ │生命体 B  │  ...       │   │
 │  │  └────┬────┘ └────┬────┘ └────┬────┘            │   │
 │  └───────┼───────────┼───────────┼──────────────────┘   │
 │          │           │           │                      │
 │  ┌───────▼───────────▼───────────▼──────────────────┐   │
-│  │              共用服務層                            │   │
+│  │              共享服務                              │   │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────────────┐  │   │
-│  │  │ChatSystem│  │ Storage  │  │  PermissionMgr  │  │   │
+│  │  │聊天系統   │  │ 儲存     │  │  權限管理器       │  │   │
 │  │  └──────────┘ └────┬─────┘ └──────────────────┘  │   │
 │  │                   │                               │   │
 │  │  ┌──────────┐ ┌────▼─────┐ ┌──────────────────┐  │   │
-│  │  │ IAIClient│  │執行器層  │  │   ToolManager   │  │   │
+│  │  │ AI 客戶端 │  │執行器     │  │   工具管理器      │  │   │
 │  │  └──────────┘ └──────────┘ └──────────────────┘  │   │
 │  └──────────────────────────────────────────────────┘   │
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │                    執行器                         │   │
+│  │                  執行器                            │   │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────────────┐  │   │
-│  │  │  磁碟    │  │  網路    │  │    命令列       │  │   │
-│  │  │執行器    │  │執行器    │  │    執行器       │  │   │
+│  │  │  磁碟     │  │ 網路     │  │  命令行          │  │   │
+│  │  │執行器     │  │執行器     │  │  執行器          │  │   │
 │  │  └──────────┘ └──────────┘ └──────────────────┘  │   │
 │  └──────────────────────────────────────────────────┘   │
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │              IM 通道層                            │   │
+│  │              即时通訊提供者                        │   │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────────────┐  │   │
-│  │  │ 主控台   │  │  Web     │  │ 飛書 / ...      │  │   │
-│  │  │通道      │  │通道      │  │ 通道            │  │   │
+│  │  │ 控制臺    │  │  Web     │  │  飛書 / ...      │  │   │
+│  │  │提供者     │  │提供者     │  │  提供者          │  │   │
 │  │  └──────────┘ └──────────┘ └──────────────────┘  │   │
 │  └──────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────┘
@@ -111,280 +111,280 @@ MainLoop（專用執行緒，看門狗 + 熔斷器）
 
 ---
 
-## ServiceLocator
+## 服務定位器
 
-`ServiceLocator` 是執行緒安全的單例服務登錄檔，提供對所有核心服務的存取：
+`ServiceLocator` 是一個线程安全的单例註冊表，提供對所有核心服務的訪問：
 
-| 屬性 | 類型 | 說明 |
-|------|------|------|
-| `ChatSystem` | `ChatSystem` | 中央聊天工作階段管理器 |
-| `IMManager` | `IMManager` | 即時通訊通道路由器 |
-| `AuditLogger` | `AuditLogger` | 權限稽核日誌 |
-| `GlobalAcl` | `GlobalACL` | 全域存取控制清單 |
-| `BeingFactory` | `ISiliconBeingFactory` | 矽基人建立工廠 |
-| `BeingManager` | `SiliconBeingManager` | 矽基人生命週期管理器 |
-| `DynamicBeingLoader` | `DynamicBeingLoader` | 動態編譯載入器 |
-| `TokenUsageAudit` | `ITokenUsageAudit` | Token 用量追蹤 |
-| `TokenUsageAuditManager` | `TokenUsageAuditManager` | Token 用量報告 |
+| 屬性 | 類型 | 描述 |
+|----------|------|-------------|
+| `ChatSystem` | `ChatSystem` | 中央聊天會话管理器 |
+| `IMManager` | `IMManager` | 即时通訊提供者路由器 |
+| `AuditLogger` | `AuditLogger` | 權限稽核跟踪 |
+| `GlobalAcl` | `GlobalACL` | 全局訪問控制列表 |
+| `BeingFactory` | `ISiliconBeingFactory` | 建立生命体的工廠 |
+| `BeingManager` | `SiliconBeingManager` | 活動生命体生命週期管理器 |
+| `DynamicBeingLoader` | `DynamicBeingLoader` | 動态編譯載入器 |
+| `TokenUsageAudit` | `ITokenUsageAudit` | Token 使用跟踪 |
+| `TokenUsageAuditManager` | `TokenUsageAuditManager` | Token 使用報告 |
 
-同時維護以矽基人 GUID 為鍵的每矽基人 `PermissionManager` 登錄檔。
+它還維護每個生命体的 `PermissionManager` 註冊表，以生命体 GUID 為键。
 
 ---
 
 ## 聊天系統
 
-### 工作階段類型
+### 會话類型
 
-聊天系統透過 `SessionBase` 支援三種工作階段類型：
+聊天系統通過 `SessionBase` 支援三种會话類型：
 
-| 類型 | 類別 | 說明 |
-|------|-----|------|
-| `SingleChat` | `SingleChatSession` | 兩個參與者之間的一對一對話 |
-| `GroupChat` | `GroupChatSession` | 多參與者群組對話 |
-| `Broadcast` | `BroadcastChannel` | 固定 ID 的開放頻道；矽基人動態訂閱，僅接收訂閱後的訊息 |
+| 類型 | 類別 | 描述 |
+|------|-------|-------------|
+| `SingleChat` | `SingleChatSession` | 两個参與者之间的一對一對话 |
+| `GroupChat` | `GroupChatSession` | 多参與者群聊 |
+| `Broadcast` | `BroadcastChannel` | 具有固定 ID 的開放频道；生命体動态訂阅，僅在訂阅後接收訊息 |
 
-### BroadcastChannel
+### 廣播频道
 
-`BroadcastChannel` 是一種特殊的工作階段類型，用於系統級廣播：
+`BroadcastChannel` 是一种特殊的會话類型，用於系統范围的公告：
 
-- **固定頻道 ID** — 與 `SingleChatSession` 和 `GroupChatSession` 不同，頻道 ID 是已知常數，而非由成員 GUID 衍生。
-- **動態訂閱** — 矽基人在執行時訂閱/取消訂閱；僅接收訂閱後發布的訊息。
-- **待讀訊息篩選** — `GetPendingMessages()` 僅返回矽基人訂閱後且尚未閱讀的訊息。
-- **由 ChatSystem 管理** — `GetOrCreateBroadcastChannel()`、`Broadcast()`、`GetPendingBroadcasts()`。
+- **固定频道 ID** —— 與 `SingleChatSession` 和 `GroupChatSession` 不同，频道 ID 是眾所周知的常量，而不是從成员 GUID 派生。
+- **動态訂阅** —— 生命体在執行时訂阅/取消訂阅；它們只接收訂阅後發佈的訊息。
+- **待處理訊息過濾** —— `GetPendingMessages()` 僅返回在生命体訂阅時間之後發佈且尚未读取的訊息。
+- **由聊天系統管理** —— `GetOrCreateBroadcastChannel()`、`Broadcast()`、`GetPendingBroadcasts()`。
 
-### ChatMessage
+### 聊天訊息
 
-`ChatMessage` 模型包含 AI 對話上下文和 Token 追蹤欄位：
+`ChatMessage` 模型包含 AI 對话上下文和 token 跟踪的字段：
 
-| 欄位 | 類型 | 說明 |
-|------|------|------|
-| `Id` | `Guid` | 訊息唯一識別碼 |
-| `SenderId` | `Guid` | 傳送者唯一識別碼 |
-| `ChannelId` | `Guid` | 頻道/工作階段識別碼 |
+| 字段 | 類型 | 描述 |
+|-------|------|-------------|
+| `Id` | `Guid` | 唯一訊息标识符 |
+| `SenderId` | `Guid` | 發送者的唯一标识符 |
+| `ChannelId` | `Guid` | 频道/對话标识符 |
 | `Content` | `string` | 訊息內容 |
-| `Timestamp` | `DateTime` | 訊息傳送時間 |
-| `Type` | `MessageType` | Text、Image、File 或 SystemNotification |
-| `ReadBy` | `List<Guid>` | 已閱讀此訊息的參與者 ID 清單 |
-| `Role` | `MessageRole` | AI 對話角色（User、Assistant、Tool） |
-| `ToolCallId` | `string?` | 工具結果訊息的工具呼叫 ID |
-| `ToolCallsJson` | `string?` | 助理訊息的序列化工具呼叫 JSON |
-| `Thinking` | `string?` | AI 的思維鏈推理內容 |
-| `PromptTokens` | `int?` | 提示詞 Token 數（輸入） |
-| `CompletionTokens` | `int?` | 補全 Token 數（輸出） |
-| `TotalTokens` | `int?` | 總 Token 數（輸入 + 輸出） |
+| `Timestamp` | `DateTime` | 訊息發送時間 |
+| `Type` | `MessageType` | 文本、圖片、檔案或系統通知 |
+| `ReadBy` | `List<Guid>` | 已阅读此訊息的参與者 ID |
+| `Role` | `MessageRole` | AI 對话角色（使用者、助手、工具） |
+| `ToolCallId` | `string?` | 工具結果訊息的工具调用 ID |
+| `ToolCallsJson` | `string?` | 助手訊息的序列化工具调用 JSON |
+| `Thinking` | `string?` | AI 的思维链推理 |
+| `PromptTokens` | `int?` | 提示词中的 token 数量（输入） |
+| `CompletionTokens` | `int?` | 补全中的 token 数量（输出） |
+| `TotalTokens` | `int?` | 使用的总 token 数量（输入 + 输出） |
 
 ---
 
-## AI 用戶端系統
+## AI 客戶端系統
 
-系統透過 `IAIClient` 介面支援多種 AI 後端：
+系統通過 `IAIClient` 介面支援多個 AI 後端：
 
 ### OllamaClient
 
 - **類型**：本地 AI 服務
-- **協議**：原生 Ollama HTTP API（`/api/chat`、`/api/generate`）
-- **特性**：串流輸出、工具呼叫、本地模型託管
-- **配置項**：`endpoint`、`model`、`temperature`、`maxTokens`
+- **協定**：原生 Ollama HTTP API（`/api/chat`、`/api/generate`）
+- **功能**：流式傳输、工具调用、本地模型托管
+- **設定**：`endpoint`、`model`、`temperature`、`maxTokens`
 
-### DashScopeClient（阿里雲百煉）
+### DashScopeClient（阿里雲百炼）
 
 - **類型**：雲端 AI 服務
-- **協議**：OpenAI 相容 API（`/compatible-mode/v1/chat/completions`）
-- **認證方式**：Bearer Token（API 金鑰）
-- **特性**：串流輸出、工具呼叫、思維鏈推理內容（Reasoning Content）、多地域部署
-- **支援的地域**：
-  - `beijing` — 華北2（北京）
-  - `virginia` — 美國（維吉尼亞）
-  - `singapore` — 新加坡
-  - `hongkong` — 中國香港
-  - `frankfurt` — 德國（法蘭克福）
-- **支援的模型**（透過 API 動態發現，帶回退清單）：
-  - **千問系列**：qwen3-max、qwen3.6-plus、qwen3.6-flash、qwen-max、qwen-plus、qwen-turbo、qwen3-coder-plus
-  - **推理模型**：qwq-plus
-  - **第三方模型**：deepseek-v3.2、deepseek-r1、glm-5.1、kimi-k2.5、llama-4-maverick
-- **配置項**：`apiKey`、`region`、`model`
-- **模型發現**：執行階段從 DashScope API 取得可用模型清單；網路失敗時回退到預設清單
+- **協定**：相容 OpenAI 的 API（`/compatible-mode/v1/chat/completions`）
+- **認證**：Bearer token（API 金鑰）
+- **功能**：流式傳输、工具调用、推理內容（思维链）、多區域部署
+- **支援的區域**：
+  - `beijing` —— 華北2（北京）
+  - `virginia` —— 美国（弗吉尼亞）
+  - `singapore` —— 新加坡
+  - `hongkong` —— 中国香港
+  - `frankfurt` —— 德国（法蘭克福）
+- **支援的模型**（通過 API 動态發現，带有回退列表）：
+  - **通義千問系列**：qwen3-max、qwen3.6-plus、qwen3.6-flash、qwen-max、qwen-plus、qwen-turbo、qwen3-coder-plus
+  - **推理**：qwq-plus
+  - **第三方**：deepseek-v3.2、deepseek-r1、glm-5.1、kimi-k2.5、llama-4-maverick
+- **設定**：`apiKey`、`region`、`model`
+- **模型發現**：執行时從百炼 API 获取可用模型；網路故障时回退到精选列表
 
-### 用戶端工廠模式
+### 客戶端工廠模式
 
-每種 AI 用戶端類型都有對應的工廠實作 `IAIClientFactory`：
+每种 AI 客戶端類型都有相应的工廠實現 `IAIClientFactory`：
 
-- `OllamaClientFactory` — 建立 OllamaClient 實例
-- `DashScopeClientFactory` — 建立 DashScopeClient 實例
+- `OllamaClientFactory` —— 建立 OllamaClient 实例
+- `DashScopeClientFactory` —— 建立 DashScopeClient 实例
 
 工廠提供：
-- `CreateClient(Dictionary<string, object> config)` — 從配置字典建立用戶端實例
-- `GetConfigKeyOptions(string key, ...)` — 返回配置鍵的動態選項（如可用模型、地域清單）
-- `GetDisplayName()` — 用戶端類型的本地化顯示名稱
+- `CreateClient(Dictionary<string, object> config)` —— 從設定实例化客戶端
+- `GetConfigKeyOptions(string key, ...)` —— 返回設定键的動态選項（例如可用模型、區域）
+- `GetDisplayName()` —— 客戶端類型的在地化顯示名称
 
 ---
 
-## 關鍵設計決策
+## 關键設計決策
 
-### Storage 設計為執行個體類別（非靜態）
+### 儲存作為实例類別（而非静态）
 
-`IStorage` 設計為可注入的執行個體類別，而非靜態工具類別。這確保了：
+`IStorage` 被設計為可注入的实例，而不是静态工具。这确保：
 
-- 直接操作檔案系統——IStorage 是系統自身的持久化通道，**不經過執行器**。
-- **AI 無法控制 IStorage**——執行器管轄的是 AI 透過工具發起的 IO，IStorage 管轄的是框架自身的內部資料讀寫。兩者性質不同。
-- 可透過 Mock 實作進行單元測試。
-- 未來支援不同儲存後端時，無需修改消費者程式碼。
+- 直接檔案系統訪問 —— IStorage 是系統的內部持久化通道，**不**通過執行器路由。
+- **AI 无法控制 IStorage** —— 執行器管理 AI 工具發起的 IO；IStorage 管理架構自身的內部資料读寫。这些是根本不同的追蹤点。
+- 可使用模擬實現進行測試。
+- 未來支援不同的儲存後端，无需修改消费者。
 
 ### 執行器作為安全邊界
 
-執行器是 I/O 操作的**唯一通道**。需要磁碟、網路或命令列存取的工具**必須**透過執行器執行。這一設計強制：
+執行器是 I/O 操作的**唯一**路徑。需要磁碟、網路或命令行訪問的工具**必須**通過執行器。此設計强制執行：
 
-- 每個執行器擁有**獨立的排程執行緒**，透過執行緒鎖定進行權限驗證。
-- 集中的權限檢查——執行器查詢矽基人的**私有權限管理器**。
-- 支援優先順序的請求佇列和逾時控制。
-- 所有外部操作的稽核日誌。
-- 例外隔離——一個執行器的失敗不影響其他執行器。
-- 熔斷機制——連續失敗時暫時熔斷，防止雪崩。
+- 每個執行器拥有**独立的排程线程**，带有用於權限驗證的线程锁定。
+- 集中式權限檢查 —— 執行器查詢生命体的**私有權限管理器**。
+- 支援優先級和超时控制的要求隊列。
+- 所有外部操作的稽核記錄。
+- 例外隔离 —— 一個執行器的失敗不影響其他執行器。
+- 熔断器 —— 連续失敗暂时停止執行器以防止級联失敗。
 
-### ContextManager 為輕量級物件
+### ContextManager 作為轻量級物件
 
-每次 `ExecuteOneRound()` 建立一個新的 `ContextManager` 執行個體：
+每次 `ExecuteOneRound()` 建立一個新的 `ContextManager` 实例：
 
-1. 載入靈魂檔案 + 最近聊天記錄。
-2. 傳送請求到 AI 用戶端。
-3. 循環處理 ToolCall，直到 AI 返回純文字。
-4. 將回覆持久化到 ChatSystem。
-5. 釋放資源。
+1. 載入靈魂檔案 + 最近的聊天歷史。
+2. 将要求發送到 AI 客戶端。
+3. 循环處理工具调用，直到 AI 返回纯文本。
+4. 将回應持久化到聊天系統。
+5. 释放。
 
-這保證了每輪執行相互隔離、無狀態。
+这使每轮保持隔离和无狀態。
 
-### 透過類別重寫實現自我進化
+### 通過類別重寫實現自我進化
 
-矽基人可以在執行時重寫自身的 C# 類別：
+硅基生命体可以在執行时重寫自己的 C# 類別：
 
-1. AI 產生新的類別程式碼（必須繼承 `SiliconBeingBase`）。
-2. **編譯時參考控制**（主要防線）：編譯器只獲得允許的組件清單——`System.IO`、`System.Reflection` 等被排除，危險操作在類型層面就不可能存在。
-3. **執行時靜態分析**（輔助防線）：`SecurityScanner` 即使在編譯成功後仍對程式碼進行危險模式掃描。
+1. AI 生成新類別程式碼（必須继承 `SiliconBeingBase`）。
+2. **編譯时引用控制**（主要防御）：編譯器只获得允許的装配列表 —— `System.IO`、`System.Reflection` 等被排除，因此危險程式碼在類型級别是不可能的。
+3. **執行时静态分析**（次要防御）：`SecurityScanner` 在成功編譯後掃描程式碼中的危險模式。
 4. Roslyn 在記憶體中編譯程式碼。
-5. 編譯成功：`SiliconBeingManager.ReplaceBeing()` 替換當前執行個體，遷移狀態，將加密程式碼持久化到磁碟。
-6. 編譯失敗：捨棄新程式碼，保持現有實作。
+5. 成功时：`SiliconBeingManager.ReplaceBeing()` 交换當前实例，遷移狀態，並将加密程式碼持久化到磁碟。
+6. 失敗时：丟弃新程式碼，保留现有實現。
 
-自訂 `IPermissionCallback` 實作也可透過 `ReplacePermissionCallback()` 編譯並注入，允許矽基人自訂自身的權限邏輯。
+自定義 `IPermissionCallback` 實現也可以通過 `ReplacePermissionCallback()` 編譯和注入，允許生命体自定義自己的權限逻辑。
 
-程式碼以 AES-256 加密形式儲存在磁碟上。加密金鑰透過 PBKDF2 從矽基人 GUID（全大寫）衍生。
-
----
-
-## Token 用量稽核
-
-`TokenUsageAuditManager` 追蹤所有矽基人的 AI Token 消耗：
-
-- `TokenUsageRecord` — 單次請求記錄（矽基人 ID、模型、提示詞 Token 數、補全 Token 數、時間戳記）
-- `TokenUsageSummary` — 彙總統計
-- `TokenUsageQuery` — 查詢篩選參數
-- 透過 `ITimeStorage` 持久化，支援時間序列查詢
-- 可透過 Web UI（AuditController）和 `TokenAuditTool`（僅主理人可用）存取
+程式碼在磁碟上以 AES-256 加密儲存。加密金鑰從生命体的 GUID（大寫）通過 PBKDF2 派生。
 
 ---
 
-## 曆法系統
+## Token 使用稽核
 
-系統包含 **32 種曆法實作**，均衍生自抽象基底類別 `CalendarBase`，涵蓋世界主要曆法體系：
+`TokenUsageAuditManager` 跟踪所有生命体的 AI token 消耗：
 
-| 曆法 | ID | 說明 |
-|------|-----|------|
-| BuddhistCalendar | `buddhist` | 佛曆（BE），年份 + 543 |
-| CherokeeCalendar | `cherokee` | 切羅基曆法 |
-| ChineseLunarCalendar | `lunar` | 中國農曆，含閏月計算 |
-| ChulaSakaratCalendar | `chula_sakarat` | 朱拉曆（CS），年份 - 638 |
-| CopticCalendar | `coptic` | 科普特曆 |
-| DaiCalendar | `dai` | 傣曆，含完整月相計算 |
-| DehongDaiCalendar | `dehong_dai` | 德宏傣曆變體 |
-| EthiopianCalendar | `ethiopian` | 衣索比亞曆 |
-| FrenchRepublicanCalendar | `french_republican` | 法國共和曆 |
-| GregorianCalendar | `gregorian` | 標準公曆 |
-| HebrewCalendar | `hebrew` | 希伯來曆（猶太曆） |
-| IndianCalendar | `indian` | 印度國曆 |
-| InuitCalendar | `inuit` | 因紐特曆法 |
-| IslamicCalendar | `islamic` | 伊斯蘭教曆（希吉來曆） |
-| JapaneseCalendar | `japanese` | 日本年號曆 |
-| JavaneseCalendar | `javanese` | 爪哇伊斯蘭曆 |
-| JucheCalendar | `juche` | 主體曆（朝鮮），年份 - 1911 |
-| JulianCalendar | `julian` | 儒略曆 |
-| KhmerCalendar | `khmer` | 高棉曆 |
-| MayanCalendar | `mayan` | 瑪雅長計曆 |
-| MongolianCalendar | `mongolian` | 蒙古曆 |
-| PersianCalendar | `persian` | 波斯曆（太陽希吉來曆） |
-| RepublicOfChinaCalendar | `roc` | 民國紀年，年份 - 1911 |
-| RomanCalendar | `roman` | 羅馬曆 |
-| SakaCalendar | `saka` | 塞迦曆（印尼） |
-| SexagenaryCalendar | `sexagenary` | 干支紀年 |
-| TibetanCalendar | `tibetan` | 藏曆 |
-| VietnameseCalendar | `vietnamese` | 越南農曆（貓年變體） |
-| VikramSamvatCalendar | `vikram_samvat` | 維克拉姆曆 |
-| YiCalendar | `yi` | 彝曆 |
-| ZoroastrianCalendar | `zoroastrian` | 瑣羅亞斯德曆 |
+- `TokenUsageRecord` —— 每次要求的記录（生命体 ID、模型、提示词 token、补全 token、時間戳）
+- `TokenUsageSummary` —— 聚合統計
+- `TokenUsageQuery` —— 用於過濾記录的查詢參數
+- 通過 `ITimeStorage` 持久化以進行時間序列查詢
+- 可通過 Web UI（AuditController）和 `TokenAuditTool`（僅主理人）訪問
 
-`CalendarTool` 提供操作：`now`、`format`、`add_days`、`diff`、`list_calendars`、`get_components`、`get_now_components`、`convert`（跨曆法日期轉換）。
+---
+
+## 日歷系統
+
+系統包含 **32 种日歷實現**，派生自抽象 `CalendarBase` 類別，涵盖世界主要日歷系統：
+
+| 日歷 | ID | 描述 |
+|----------|-----|-------------|
+| BuddhistCalendar | `buddhist` | 佛歷（BE），年份 + 543 |
+| CherokeeCalendar | `cherokee` | 切罗基日歷系統 |
+| ChineseLunarCalendar | `lunar` | 中国農歷，带闰月 |
+| ChulaSakaratCalendar | `chula_sakarat` | 朱拉萨卡拉特歷（CS），年份 - 638 |
+| CopticCalendar | `coptic` | 科普特歷 |
+| DaiCalendar | `dai` | 傣歷，带完整農歷計算 |
+| DehongDaiCalendar | `dehong_dai` | 德宏傣歷变体 |
+| EthiopianCalendar | `ethiopian` | 埃塞俄比亞歷 |
+| FrenchRepublicanCalendar | `french_republican` | 法国共和歷 |
+| GregorianCalendar | `gregorian` | 標準公歷 |
+| HebrewCalendar | `hebrew` | 希伯來（犹太）歷 |
+| IndianCalendar | `indian` | 印度国歷 |
+| InuitCalendar | `inuit` | 因纽特日歷系統 |
+| IslamicCalendar | `islamic` | 伊斯蘭回歷 |
+| JapaneseCalendar | `japanese` | 日本年號（Nengo）歷 |
+| JavaneseCalendar | `javanese` | 爪哇伊斯蘭歷 |
+| JucheCalendar | `juche` | 主体歷（朝鮮），年份 - 1911 |
+| JulianCalendar | `julian` | 儒略歷 |
+| KhmerCalendar | `khmer` | 高棉歷 |
+| MayanCalendar | `mayan` | 瑪雅長計歷 |
+| MongolianCalendar | `mongolian` | 蒙古歷 |
+| PersianCalendar | `persian` | 波斯（太陽回歷）歷 |
+| RepublicOfChinaCalendar | `roc` | 中華民国（民国）歷，年份 - 1911 |
+| RomanCalendar | `roman` | 罗馬歷 |
+| SakaCalendar | `saka` | 萨卡歷（印度尼西亞） |
+| SexagenaryCalendar | `sexagenary` | 中国幹支歷（Ganzhi） |
+| TibetanCalendar | `tibetan` | 藏歷 |
+| VietnameseCalendar | `vietnamese` | 越南農歷（猫生肖变体） |
+| VikramSamvatCalendar | `vikram_samvat` | 维克拉姆桑巴特歷 |
+| YiCalendar | `yi` | 彝歷系統 |
+| ZoroastrianCalendar | `zoroastrian` | 祆歷 |
+
+`CalendarTool` 提供操作：`now`、`format`、`add_days`、`diff`、`list_calendars`、`get_components`、`get_now_components`、`convert`（跨日歷日期转换）。
 
 ---
 
 ## Web UI 架構
 
-### 佈景主題系統
+### 皮肤系統
 
-Web UI 採用**可插拔佈景主題系統**，允許在不改變應用程式邏輯的情況下完全自訂 UI：
+Web UI 具有**可插拔的皮肤系統**，允許完整的 UI 定制，无需更改應用程式程式逻辑：
 
-- **ISkin 介面** — 定義所有佈景主題的契約，包括：
+- **ISkin 介面** —— 定義所有皮肤的契約，包括：
   - 核心渲染方法（`RenderHtml`、`RenderError`）
-  - 20+ UI 元件方法（按鈕、輸入框、卡片、表格、徽章、氣泡、進度條、索引標籤等）
-  - 透過 `CssBuilder` 產生主題 CSS
-  - `SkinPreviewInfo` — 初始化頁面佈景主題選擇器的色彩預覽資訊
+  - 20+ UI 元件方法（按钮、输入、卡片、表格、徽章、氣泡、進度、標籤等）
+  - 通過 `CssBuilder` 生成主題 CSS
+  - `SkinPreviewInfo` —— 初始化頁面皮肤选择器的调色板和图标
 
-- **內建佈景主題** — 4 種生產就緒的佈景主題：
-  - **Admin** — 專業、資料導向的介面，用於系統管理
-  - **Chat** — 對話式、訊息中心設計，用於 AI 互動
-  - **Creative** — 藝術化、視覺豐富的版面配置，用於創意工作流程
-  - **Dev** — 開發者導向、程式碼中心的介面，支援語法醒目提示
+- **內置皮肤** —— 4 种生產就绪的皮肤：
+  - **Admin** —— 專業、資料聚焦的系統管理界面
+  - **Chat** —— 對话式、以訊息為中心的設計，用於 AI 交互
+  - **Creative** —— 藝術性、视觉豐富的創意工作流程布局
+  - **Dev** —— 以開發者為中心、以程式碼為中心的界面，带语法高亮
 
-- **佈景主題探索** — `SkinManager` 透過反射自動探索並註冊所有 `ISkin` 實作
+- **皮肤發現** —— `SkinManager` 通過反射自動發現和註冊所有 `ISkin` 實現
 
-### HTML / CSS / JS 建構器
+### HTML / CSS / JS 构建器
 
-Web UI 完全在 C# 中產生標記，不依賴任何範本檔案：
+Web UI 完全避免模板檔案，在 C# 中生成所有标記：
 
-- **`H`** — 流式 HTML 建構器 DSL，用於在程式碼中建構 HTML 樹
-- **`CssBuilder`** — 支援選擇器和媒體查詢的 CSS 建構器
-- **`JsBuilder`（`JsSyntax`）** — 用於內嵌指令碼的 JavaScript 建構器
+- **`H`** —— 流式 HTML 构建器 DSL，用於在程式碼中构建 HTML 树
+- **`CssBuilder`** —— CSS 构建器，支援选择器和媒体查詢
+- **`JsBuilder`（`JsSyntax`）** —— JavaScript 构建器，用於內联脚本
 
 ### 控制器系統
 
-Web UI 遵循 **MVC 模式**，有 17 個控制器處理不同方面：
+Web UI 遵循**類別 MVC 模式**，17 個控制器處理不同方面：
 
 | 控制器 | 用途 |
-|--------|------|
-| About | 關於頁面和專案資訊 |
-| Audit | Token 用量稽核儀表板，含趨勢圖表和資料匯出 |
-| Being | 矽基人管理和狀態 |
-| Chat | 即時聊天介面（支援 SSE） |
-| CodeBrowser | 程式碼檢視和編輯 |
-| Config | 系統設定 |
-| Dashboard | 系統概覽和指標 |
+|------------|---------|
+| About | 關於頁面和項目資訊 |
+| Audit | Token 使用稽核儀表板，带趋势图和導出 |
+| Being | 硅基生命体管理和狀態 |
+| Chat | 带 SSE 的实时聊天界面 |
+| CodeBrowser | 程式碼查看和编辑 |
+| Config | 系統設定管理 |
+| Dashboard | 系統概览和指标 |
 | Executor | 執行器狀態和管理 |
-| Init | 首次執行初始化精靈 |
-| Knowledge | 知識圖譜視覺化（預留位置） |
-| Log | 系統日誌檢視器 |
+| Init | 首次執行初始化向導 |
+| Knowledge | 知识图谱可视化（占位符） |
+| Log | 系統記錄查看器 |
 | Memory | 長期記憶瀏覽器 |
 | Permission | 權限管理 |
-| PermissionRequest | 權限請求佇列 |
-| Project | 專案管理（預留位置） |
-| Task | 任務系統介面 |
-| Timer | 計時器系統管理 |
+| PermissionRequest | 權限要求隊列 |
+| Project | 項目管理（占位符） |
+| Task | 工作系統界面 |
+| Timer | 定时器系統管理 |
 
-### 即時更新
+### 实时更新
 
-- **SSE（Server-Sent Events）** — 透過 `SSEHandler` 推送聊天訊息、矽基人狀態和系統事件
-- **無需 WebSocket** — 使用 SSE 滿足大部分即時需求，架構更簡單
-- **自動重新連線** — 用戶端重新連線邏輯，確保連線彈性
+- **SSE（伺服器發送事件）** —— 通過 `SSEHandler` 推送聊天訊息、生命体狀態和系統事件的更新
+- **无需 WebSocket** —— 使用 SSE 满足大多数实时需求的更简单架構
+- **自動重連** —— 客戶端重連逻辑實現弹性連接
 
-### 國際化
+### 在地化
 
-內建三種語言：`ZhCN`（簡體中文）、`ZhHK`（繁體中文）和 `EnUS`（英文）。透過 `DefaultConfigData.Language` 設定，由 `LocalizationManager` 解析。
+內置三种语言环境：`ZhCN`（简体中文）、`ZhHK`（繁体中文）和 `EnUS`（英文）。通過 `DefaultConfigData.Language` 选择活動语言环境，並通過 `LocalizationManager` 解析。
 
 ---
 
@@ -393,13 +393,13 @@ Web UI 遵循 **MVC 模式**，有 17 個控制器處理不同方面：
 ```
 data/
 └── SiliconManager/
-    ├── {主理人-guid}/
-    │   ├── soul.md          # 主理人靈魂檔案
-    │   ├── state.json       # 執行時狀態
-    │   ├── code.enc         # AES 加密的自訂類別程式碼
-    │   └── permission.enc   # AES 加密的自訂權限回呼
+    ├── {curator-guid}/
+    │   ├── soul.md          # 主理人的靈魂檔案
+    │   ├── state.json       # 執行时狀態
+    │   ├── code.enc         # AES 加密的自定義類別程式碼
+    │   └── permission.enc   # AES 加密的自定義權限回调
     │
-    └── {矽基人-guid}/
+    └── {being-guid}/
         ├── soul.md
         ├── state.json
         ├── code.enc

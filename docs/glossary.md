@@ -1,115 +1,129 @@
 # Glossary
 
-| 中简         | 中繁         | 日本語           | English            | File Path                                                                 |
-|--------------|--------------|------------------|--------------------|--------------------------------------------------------------------------|
-| 硅生命集合体 | 矽生命集合體 | シリコンライフコレクティブ | Silicon Life Collective | [README.md](../README.md)                                               |
-| 硅生命核心   | 矽生命核心   | シリコンライフコア | SiliconLife.Core   | [src/SiliconLife.Core/](../src/SiliconLife.Core/)                       |
-| 硅生命默认实现 | 矽生命預設實作 | シリコンライフデフォルト | SiliconLife.Default | [src/SiliconLife.Default/](../src/SiliconLife.Default/)                 |
-| 硅生命管理者 | 矽生命管理者 | シリコンキュレーター | Silicon Curator    | [src/SiliconLife.Core/SiliconBeing/SiliconCurator.cs](../src/SiliconLife.Core/SiliconBeing/SiliconCurator.cs) |
-| 硅生命个体   | 矽生命個體   | シリコンビーイング | Silicon Being      | [src/SiliconLife.Core/SiliconBeing/SiliconBeingBase.cs](../src/SiliconLife.Core/SiliconBeing/SiliconBeingBase.cs) |
-| 灵魂文件     | 靈魂檔案     | ソウルファイル     | Soul File          | [src/SiliconLife.Core/SiliconBeing/SoulFileManager.cs](../src/SiliconLife.Core/SiliconBeing/SoulFileManager.cs) |
-| 上下文管理器 | 內容管理器   | コンテキストマネージャー | Context Manager    | [src/SiliconLife.Core/AI/ContextManager.cs](../src/SiliconLife.Core/AI/ContextManager.cs) |
-| 执行器       | 執行器       | エグゼキューター   | Executor           | [src/SiliconLife.Core/Executors/ExecutorBase.cs](../src/SiliconLife.Core/Executors/ExecutorBase.cs) |
-| 权限管理器   | 權限管理器   | パーミッションマネージャー | Permission Manager | [src/SiliconLife.Core/Security/PermissionManager.cs](../src/SiliconLife.Core/Security/PermissionManager.cs) |
-| 全局访问控制列表 | 全域存取控制清單 | グローバルACL | Global ACL         | [src/SiliconLife.Core/Security/GlobalACL.cs](../src/SiliconLife.Core/Security/GlobalACL.cs) |
-| 令牌使用审计 | 令牌使用審計 | トークン使用監査   | Token Usage Audit  | [src/SiliconLife.Core/Audit/ITokenUsageAudit.cs](../src/SiliconLife.Core/Audit/ITokenUsageAudit.cs) |
-| 聊天系统     | 聊天系統     | チャットシステム   | Chat System        | [src/SiliconLife.Core/Chat/ChatSystem.cs](../src/SiliconLife.Core/Chat/ChatSystem.cs) |
-| 工具管理器   | 工具管理器   | ツールマネージャー | Tool Manager       | [src/SiliconLife.Core/Tools/ToolManager.cs](../src/SiliconLife.Core/Tools/ToolManager.cs) |
-| 动态编译     | 動態編譯     | 動的コンパイル     | Dynamic Compilation | [src/SiliconLife.Core/Compilation/DynamicCompilationExecutor.cs](../src/SiliconLife.Core/Compilation/DynamicCompilationExecutor.cs) |
-| 存储系统     | 儲存系統     | ストレージシステム | Storage System     | [src/SiliconLife.Core/Storage/IStorage.cs](../src/SiliconLife.Core/Storage/IStorage.cs) |
-| 配置系统     | 設定系統     | 設定システム       | Config System      | [src/SiliconLife.Core/Config/Config.cs](../src/SiliconLife.Core/Config/Config.cs) |
-| 本地化系统   | 在地化系統   | ローカリゼーションシステム | Localization System | [src/SiliconLife.Core/Localization/LocalizationManager.cs](../src/SiliconLife.Core/Localization/LocalizationManager.cs) |
-| 日志系统     | 日誌系統     | ロギングシステム   | Logging System     | [src/SiliconLife.Core/Logging/LogManager.cs](../src/SiliconLife.Core/Logging/LogManager.cs) |
-| 主循环       | 主迴圈       | メインループ       | Main Loop          | [src/SiliconLife.Core/Runtime/MainLoop.cs](../src/SiliconLife.Core/Runtime/MainLoop.cs) |
-| 滴答对象     | 滴答物件     | ティックオブジェクト | Tick Object        | [src/SiliconLife.Core/Runtime/TickObject.cs](../src/SiliconLife.Core/Runtime/TickObject.cs) |
-| 看门狗       | 看門狗       | ウォッチドッグ     | Watchdog           | [src/SiliconLife.Core/Runtime/MainLoop.cs](../src/SiliconLife.Core/Runtime/MainLoop.cs) |
-| 断路器       | 斷路器       | サーキットブレーカー | Circuit Breaker    | [src/SiliconLife.Core/Runtime/MainLoop.cs](../src/SiliconLife.Core/Runtime/MainLoop.cs) |
-| 网络执行器   | 網路執行器   | ネットワークエグゼキューター | Network Executor   | [src/SiliconLife.Core/Executors/NetworkExecutor.cs](../src/SiliconLife.Core/Executors/NetworkExecutor.cs) |
-| 磁盘执行器   | 磁碟執行器   | ディスクエグゼキューター | Disk Executor      | [src/SiliconLife.Core/Executors/DiskExecutor.cs](../src/SiliconLife.Core/Executors/DiskExecutor.cs) |
-| 命令行执行器 | 命令列執行器 | コマンドラインエグゼキューター | CommandLine Executor | [src/SiliconLife.Core/Executors/CommandLineExecutor.cs](../src/SiliconLife.Core/Executors/CommandLineExecutor.cs) |
-| 工具调用     | 工具呼叫     | ツールコール       | Tool Call          | [src/SiliconLife.Core/Tools/ToolCall.cs](../src/SiliconLife.Core/Tools/ToolCall.cs) |
-| 工具结果     | 工具結果     | ツール結果         | Tool Result        | [src/SiliconLife.Core/Tools/ToolResult.cs](../src/SiliconLife.Core/Tools/ToolResult.cs) |
-| 权限结果     | 權限結果     | パーミッション結果 | Permission Result  | [src/SiliconLife.Core/Security/PermissionResult.cs](../src/SiliconLife.Core/Security/PermissionResult.cs) |
-| 权限类型     | 權限類型     | パーミッションタイプ | Permission Type    | [src/SiliconLife.Core/Security/PermissionType.cs](../src/SiliconLife.Core/Security/PermissionType.cs) |
-| 令牌使用记录 | 令牌使用記錄 | トークン使用記録   | Token Usage Record | [src/SiliconLife.Core/Audit/TokenUsageRecord.cs](../src/SiliconLife.Core/Audit/TokenUsageRecord.cs) |
-| 令牌使用摘要 | 令牌使用摘要 | トークン使用サマリー | Token Usage Summary | [src/SiliconLife.Core/Audit/TokenUsageSummary.cs](../src/SiliconLife.Core/Audit/TokenUsageSummary.cs) |
-| 令牌使用查询 | 令牌使用查詢 | トークン使用クエリ | Token Usage Query  | [src/SiliconLife.Core/Audit/TokenUsageQuery.cs](../src/SiliconLife.Core/Audit/TokenUsageQuery.cs) |
-| 聊天会话     | 聊天會話     | チャットセッション | Chat Session       | [src/SiliconLife.Core/Chat/SessionBase.cs](../src/SiliconLife.Core/Chat/SessionBase.cs) |
-| 单聊会话     | 單聊會話     | 単一チャットセッション | Single Chat Session | [src/SiliconLife.Core/Chat/SingleChatSession.cs](../src/SiliconLife.Core/Chat/SingleChatSession.cs) |
-| 群聊会话     | 群聊會話     | グループチャットセッション | Group Chat Session | [src/SiliconLife.Core/Chat/GroupChatSession.cs](../src/SiliconLife.Core/Chat/GroupChatSession.cs) |
-| 广播频道     | 廣播頻道     | ブロードキャストチャンネル | Broadcast Channel  | [src/SiliconLife.Core/Chat/BroadcastChannel.cs](../src/SiliconLife.Core/Chat/BroadcastChannel.cs) |
-| 聊天消息     | 聊天訊息     | チャットメッセージ | Chat Message       | [src/SiliconLife.Core/Chat/ChatMessage.cs](../src/SiliconLife.Core/Chat/ChatMessage.cs) |
-| 即时通讯提供者 | 即時通訊提供者 | IMプロバイダー     | IM Provider        | [src/SiliconLife.Core/IM/IIMProvider.cs](../src/SiliconLife.Core/IM/IIMProvider.cs) |
-| 即时通讯管理器 | 即時通訊管理器 | IMマネージャー     | IM Manager         | [src/SiliconLife.Core/IM/IMManager.cs](../src/SiliconLife.Core/IM/IMManager.cs) |
-| 时间存储     | 時間儲存     | 時間ストレージ     | Time Storage       | [src/SiliconLife.Core/Storage/ITimeStorage.cs](../src/SiliconLife.Core/Storage/ITimeStorage.cs) |
-| 配置数据库   | 設定資料庫   | 設定データベース   | Config Database    | [src/SiliconLife.Core/Config/ConfigDataBase.cs](../src/SiliconLife.Core/Config/ConfigDataBase.cs) |
-| 配置转换器   | 設定轉換器   | 設定コンバーター   | Config Converter   | [src/SiliconLife.Core/Config/ConfigDataBaseConverter.cs](../src/SiliconLife.Core/Config/ConfigDataBaseConverter.cs) |
-| 本地化基础   | 在地化基礎   | ローカリゼーションベース | Localization Base  | [src/SiliconLife.Core/Localization/LocalizationBase.cs](../src/SiliconLife.Core/Localization/LocalizationBase.cs) |
-| 本地化管理器 | 在地化管理器 | ローカリゼーションマネージャー | Localization Manager | [src/SiliconLife.Core/Localization/LocalizationManager.cs](../src/SiliconLife.Core/Localization/LocalizationManager.cs) |
-| 日志提供者   | 日誌提供者   | ロガープロバイダー | Logger Provider    | [src/SiliconLife.Core/Logging/ILoggerProvider.cs](../src/SiliconLife.Core/Logging/ILoggerProvider.cs) |
-| 日志条目     | 日誌條目     | ログエントリー     | Log Entry          | [src/SiliconLife.Core/Logging/LogEntry.cs](../src/SiliconLife.Core/Logging/LogEntry.cs) |
-| 日志级别     | 日誌等級     | ログレベル         | Log Level          | [src/SiliconLife.Core/Logging/LogLevel.cs](../src/SiliconLife.Core/Logging/LogLevel.cs) |
-| 日志管理器   | 日誌管理器   | ログマネージャー   | Log Manager        | [src/SiliconLife.Core/Logging/LogManager.cs](../src/SiliconLife.Core/Logging/LogManager.cs) |
-| 动态生命加载器 | 動態生命載入器 | 動的ビーイングローダー | Dynamic Being Loader | [src/SiliconLife.Core/Compilation/DynamicBeingLoader.cs](../src/SiliconLife.Core/Compilation/DynamicBeingLoader.cs) |
-| 动态编译执行器 | 動態編譯執行器 | 動的コンパイルエグゼキューター | Dynamic Compilation Executor | [src/SiliconLife.Core/Compilation/DynamicCompilationExecutor.cs](../src/SiliconLife.Core/Compilation/DynamicCompilationExecutor.cs) |
-| 安全扫描器   | 安全掃描器   | セキュリティスキャナー | Security Scanner   | [src/SiliconLife.Core/Compilation/SecurityScanner.cs](../src/SiliconLife.Core/Compilation/SecurityScanner.cs) |
-| 代码加密     | 程式碼加密   | コード暗号化       | Code Encryption    | [src/SiliconLife.Core/Compilation/CodeEncryption.cs](../src/SiliconLife.Core/Compilation/CodeEncryption.cs) |
-| 不完整日期   | 不完整日期   | 不完全日付         | Incomplete Date    | [src/SiliconLife.Core/Time/IncompleteDate.cs](../src/SiliconLife.Core/Time/IncompleteDate.cs) |
-| 核心主机     | 核心主機     | コアホスト         | Core Host          | [src/SiliconLife.Core/Runtime/CoreHost.cs](../src/SiliconLife.Core/Runtime/CoreHost.cs) |
-| 核心主机构建器 | 核心主機建構器 | コアホストビルダー | Core Host Builder  | [src/SiliconLife.Core/Runtime/CoreHostBuilder.cs](../src/SiliconLife.Core/Runtime/CoreHostBuilder.cs) |
-| 性能监视器   | 效能監視器   | パフォーマンスモニター | Performance Monitor | [src/SiliconLife.Core/Runtime/PerformanceMonitor.cs](../src/SiliconLife.Core/Runtime/PerformanceMonitor.cs) |
-| 测试滴答对象 | 測試滴答物件 | テストティックオブジェクト | Test Tick Object   | [src/SiliconLife.Default/Runtime/TestTickObject.cs](../src/SiliconLife.Default/Runtime/TestTickObject.cs) |
-| Ollama客户端 | Ollama用戶端 | Ollamaクライアント | Ollama Client      | [src/SiliconLife.Default/AI/OllamaClient.cs](../src/SiliconLife.Default/AI/OllamaClient.cs) |
-| Ollama客户端工厂 | Ollama用戶端工廠 | Ollamaクライアントファクトリー | Ollama Client Factory | [src/SiliconLife.Default/AI/OllamaClientFactory.cs](../src/SiliconLife.Default/AI/OllamaClientFactory.cs) |
-| 默认硅生命个体 | 預設矽生命個體 | デフォルトシリコンビーイング | Default Silicon Being | [src/SiliconLife.Default/SiliconBeing/DefaultSiliconBeing.cs](../src/SiliconLife.Default/SiliconBeing/DefaultSiliconBeing.cs) |
-| 默认硅生命工厂 | 預設矽生命工廠 | デフォルトシリコンビーイングファクトリー | Default Silicon Being Factory | [src/SiliconLife.Default/SiliconBeing/DefaultSiliconBeingFactory.cs](../src/SiliconLife.Default/SiliconBeing/DefaultSiliconBeingFactory.cs) |
-| 日历系统     | 日曆系統     | カレンダーシステム | Calendar System    | [src/SiliconLife.Default/Calendar/](../src/SiliconLife.Default/Calendar/) |
-| 网页UI提供者 | 網頁UI提供者 | Web UIプロバイダー | Web UI Provider    | [src/SiliconLife.Default/IM/WebUIProvider.cs](../src/SiliconLife.Default/IM/WebUIProvider.cs) |
-| 内置工具     | 內建工具     | 組み込みツール     | Built-in Tools     | [src/SiliconLife.Default/Tools/](../src/SiliconLife.Default/Tools/) |
-| 默认配置数据 | 預設設定資料 | デフォルト設定データ | Default Config Data | [src/SiliconLife.Default/Config/DefaultConfigData.cs](../src/SiliconLife.Default/Config/DefaultConfigData.cs) |
-| 中文简体本地化 | 中文簡體在地化 | 中国語簡体ローカリゼーション | ZhCN Localization  | [src/SiliconLife.Default/Localization/ZhCN.cs](../src/SiliconLife.Default/Localization/ZhCN.cs) |
-| 中文繁体本地化 | 中文繁體在地化 | 中国語繁体ローカリゼーション | ZhHK Localization  | [src/SiliconLife.Default/Localization/ZhHK.cs](../src/SiliconLife.Default/Localization/ZhHK.cs) |
-| 英文本地化   | 英文在地化   | 英語ローカリゼーション | EnUS Localization  | [src/SiliconLife.Default/Localization/EnUS.cs](../src/SiliconLife.Default/Localization/EnUS.cs) |
-| 默认本地化基础 | 預設在地化基礎 | デフォルトローカリゼーションベース | Default Localization Base | [src/SiliconLife.Default/Localization/DefaultLocalizationBase.cs](../src/SiliconLife.Default/Localization/DefaultLocalizationBase.cs) |
-| 控制台日志提供者 | 主控台日誌提供者 | コンソールロガープロバイダー | Console Logger Provider | [src/SiliconLife.Default/Logging/ConsoleLoggerProvider.cs](../src/SiliconLife.Default/Logging/ConsoleLoggerProvider.cs) |
-| 文件系统日志提供者 | 檔案系統日誌提供者 | ファイルシステムロガープロバイダー | File System Logger Provider | [src/SiliconLife.Default/Logging/FileSystemLoggerProvider.cs](../src/SiliconLife.Default/Logging/FileSystemLoggerProvider.cs) |
-| 文件系统存储 | 檔案系統儲存 | ファイルシステムストレージ | File System Storage | [src/SiliconLife.Default/Storage/FileSystemStorage.cs](../src/SiliconLife.Default/Storage/FileSystemStorage.cs) |
-| 文件系统时间存储 | 檔案系統時間儲存 | ファイルシステム時間ストレージ | File System Time Storage | [src/SiliconLife.Default/Storage/FileSystemTimeStorage.cs](../src/SiliconLife.Default/Storage/FileSystemTimeStorage.cs) |
-| 默认权限回调 | 預設權限回呼 | デフォルトパーミッションコールバック | Default Permission Callback | [src/SiliconLife.Default/Security/DefaultPermissionCallback.cs](../src/SiliconLife.Default/Security/DefaultPermissionCallback.cs) |
-| 网页主机     | 網頁主機     | Webホスト         | Web Host           | [src/SiliconLife.Default/Web/WebHost.cs](../src/SiliconLife.Default/Web/WebHost.cs) |
-| 路由器       | 路由器       | ルーター           | Router             | [src/SiliconLife.Default/Web/Router.cs](../src/SiliconLife.Default/Web/Router.cs) |
-| 服务器发送事件处理器 | 伺服器傳送事件處理器 | SSEハンドラー      | SSE Handler        | [src/SiliconLife.Default/Web/SSEHandler.cs](../src/SiliconLife.Default/Web/SSEHandler.cs) |
-| 网页安全工具 | 網頁安全工具 | Webセキュリティ   | Web Security       | [src/SiliconLife.Default/Web/WebSecurity.cs](../src/SiliconLife.Default/Web/WebSecurity.cs) |
-| HTML构建器   | HTML建構器   | HTMLビルダー       | H Builder          | [src/SiliconLife.Default/Web/H.cs](../src/SiliconLife.Default/Web/H.cs) |
-| CSS构建器    | CSS建構器    | CSSビルダー        | Css Builder        | [src/SiliconLife.Default/Web/CssBuilder.cs](../src/SiliconLife.Default/Web/CssBuilder.cs) |
-| JavaScript构建器 | JavaScript建構器 | JavaScriptビルダー | Js Builder         | [src/SiliconLife.Default/Web/JsBuilder.cs](../src/SiliconLife.Default/Web/JsBuilder.cs) |
-| 控制器       | 控制器       | コントローラー     | Controller         | [src/SiliconLife.Default/Web/Controller.cs](../src/SiliconLife.Default/Web/Controller.cs) |
-| 视图模型基础 | 檢視模型基礎 | ビューモデルベース | View Model Base    | [src/SiliconLife.Default/Web/Models/ViewModelBase.cs](../src/SiliconLife.Default/Web/Models/ViewModelBase.cs) |
-| 视图基础     | 檢視基礎     | ビューベース       | View Base          | [src/SiliconLife.Default/Web/Views/ViewBase.cs](../src/SiliconLife.Default/Web/Views/ViewBase.cs) |
-| 皮肤接口     | 外觀介面     | ISkinインターフェース | ISkin              | [src/SiliconLife.Default/Web/ISkin.cs](../src/SiliconLife.Default/Web/ISkin.cs) |
-| 皮肤管理器   | 外觀管理器   | スキンマネージャー | Skin Manager       | [src/SiliconLife.Default/Web/ISkin.cs](../src/SiliconLife.Default/Web/ISkin.cs) |
-| 皮肤预览信息 | 外觀預覽資訊 | スキンプレビュー情報 | Skin Preview Info  | [src/SiliconLife.Default/Web/ISkin.cs](../src/SiliconLife.Default/Web/ISkin.cs) |
-| 管理皮肤     | 管理外觀     | 管理スキン         | Admin Skin         | [src/SiliconLife.Default/Web/Skins/AdminSkin.cs](../src/SiliconLife.Default/Web/Skins/AdminSkin.cs) |
-| 聊天皮肤     | 聊天外觀     | チャットスキン     | Chat Skin          | [src/SiliconLife.Default/Web/Skins/ChatSkin.cs](../src/SiliconLife.Default/Web/Skins/ChatSkin.cs) |
-| 创意皮肤     | 創意外觀     | クリエイティブスキン | Creative Skin      | [src/SiliconLife.Default/Web/Skins/CreativeSkin.cs](../src/SiliconLife.Default/Web/Skins/CreativeSkin.cs) |
-| 开发者皮肤   | 開發者外觀   | 開発者スキン       | Dev Skin           | [src/SiliconLife.Default/Web/Skins/DevSkin.cs](../src/SiliconLife.Default/Web/Skins/DevSkin.cs) |
-| 身体-大脑架构 | 身體-大腦架構 | ボディ-ブレインアーキテクチャ | Body-Brain Architecture | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 时间分片公平调度 | 時間分片公平調度 | 時間分割公平スケジューリング | Time-Sliced Fair Scheduling | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 单轮执行     | 單輪執行     | 単一ラウンド実行   | Single Round Execution | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 记忆系统     | 記憶系統     | メモリシステム     | Memory System      | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 任务系统     | 任務系統     | タスクシステム     | Task System        | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 定时器系统   | 定時器系統   | タイマーシステム   | Timer System       | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 工作笔记系统 | 工作筆記系統 | ワークノートシステム | Work Note System   | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 项目系统     | 項目系統     | プロジェクトシステム | Project System     | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 知识网络     | 知識網絡     | ナレッジネットワーク | Knowledge Network  | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 上下文容量管理 | 上下文容量管理 | コンテキスト容量管理 | Context Capacity Management | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 已读未读机制 | 已讀未讀機制 | 既読未読メカニズム | Read/Unread Mechanism | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 进化触发与判定 | 進化觸發與判定 | 進化トリガーと判定 | Evolution Trigger & Decision | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 原子替换     | 原子替換     | アトミック置換     | Atomic Replacement | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 默认权限回调 | 預設權限回呼 | デフォルトパーミッションコールバック | Default Permission Callback | [docs/zh-CN/security.md](../docs/zh-CN/security.md) |
-| 用户高频缓存 | 用戶高頻緩存 | ユーザー高頻キャッシュ | User Frequency Cache | [docs/zh-CN/security.md](../docs/zh-CN/security.md) |
-| AskUser 流程 | AskUser 流程 | AskUserプロセス    | AskUser Process    | [docs/zh-CN/security.md](../docs/zh-CN/security.md) |
-| 服务器发送事件 | 伺服器傳送事件 | サーバー送信イベント | Server-Sent Events (SSE) | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 控制器系统   | 控制器系統   | コントローラーシステム | Controller System  | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 残缺日期     | 殘缺日期     | 不完全日付         | Incomplete Date    | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
-| 本地化覆盖范围 | 本地化覆蓋範圍 | ローカリゼーションカバレッジ | Localization Coverage | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
+| 中简         | 中繁         | 日本語           | 한국어             | English            | File Path                                                                 |
+|--------------|--------------|------------------|--------------------|--------------------|--------------------------------------------------------------------------|
+| 硅基生命群 | 矽基生命群 | シリコンライフコレクティブ | 실리콘 라이프 콜렉티브 | Silicon Life Collective | [README.md](../README.md)                                               |
+| 硅基生命核心库   | 矽基生命核心庫   | シリコンライフコアライブラリ | 실리콘 라이프 코어 라이브러리 | SiliconLife.Core   | [src/SiliconLife.Core/](../src/SiliconLife.Core/)                       |
+| 硅基生命默认实现工程 | 矽基生命預設實作工程 | シリコンライフデフォルトプロジェクト | 실리콘 라이프 디폴트 프로젝트 | SiliconLife.Default | [src/SiliconLife.Default/](../src/SiliconLife.Default/)                 |
+| 硅基主理人 | 矽基主理人 | シリコンキュレーター | 실리콘 큐레이터    | Silicon Curator    | [src/SiliconLife.Core/SiliconBeing/SiliconCurator.cs](../src/SiliconLife.Core/SiliconBeing/SiliconCurator.cs) |
+| 硅基生命（对象）   | 矽基生命（物件）   | シリコンビーイング（オブジェクト） | 실리콘 비잉 (오브젝트) | Silicon Being      | [src/SiliconLife.Core/SiliconBeing/SiliconBeingBase.cs](../src/SiliconLife.Core/SiliconBeing/SiliconBeingBase.cs) |
+| 灵魂文件     | 靈魂檔案     | ソウルファイル     | 소울 파일          | Soul File          | [src/SiliconLife.Core/SiliconBeing/SoulFileManager.cs](../src/SiliconLife.Core/SiliconBeing/SoulFileManager.cs) |
+| 上下文管理器 | 內容管理器   | コンテキストマネージャー | 컨텍스트 매니저    | Context Manager    | [src/SiliconLife.Core/AI/ContextManager.cs](../src/SiliconLife.Core/AI/ContextManager.cs) |
+| 执行器       | 執行器       | エグゼキューター   | 이그제큐터         | Executor           | [src/SiliconLife.Core/Executors/ExecutorBase.cs](../src/SiliconLife.Core/Executors/ExecutorBase.cs) |
+| 权限管理器   | 權限管理器   | パーミッションマネージャー | 퍼미션 매니저      | Permission Manager | [src/SiliconLife.Core/Security/PermissionManager.cs](../src/SiliconLife.Core/Security/PermissionManager.cs) |
+| 全局访问控制列表 | 全域存取控制清單 | グローバルACL | 글로벌 ACL         | Global ACL         | [src/SiliconLife.Core/Security/GlobalACL.cs](../src/SiliconLife.Core/Security/GlobalACL.cs) |
+| Token使用审计 | Token使用審計 | トークン使用監査   | 토큰 사용 감사     | Token Usage Audit  | [src/SiliconLife.Core/Audit/ITokenUsageAudit.cs](../src/SiliconLife.Core/Audit/ITokenUsageAudit.cs) |
+| 聊天系统     | 聊天系統     | チャットシステム   | 채팅 시스템        | Chat System        | [src/SiliconLife.Core/Chat/ChatSystem.cs](../src/SiliconLife.Core/Chat/ChatSystem.cs) |
+| 工具管理器   | 工具管理器   | ツールマネージャー | 툴 매니저          | Tool Manager       | [src/SiliconLife.Core/Tools/ToolManager.cs](../src/SiliconLife.Core/Tools/ToolManager.cs) |
+| 动态编译     | 動態編譯     | 動的コンパイル     | 동적 컴파일        | Dynamic Compilation | [src/SiliconLife.Core/Compilation/DynamicCompilationExecutor.cs](../src/SiliconLife.Core/Compilation/DynamicCompilationExecutor.cs) |
+| 存储系统     | 儲存系統     | ストレージシステム | 스토리지 시스템    | Storage System     | [src/SiliconLife.Core/Storage/IStorage.cs](../src/SiliconLife.Core/Storage/IStorage.cs) |
+| 配置系统     | 設定系統     | 設定システム       | 설정 시스템        | Config System      | [src/SiliconLife.Core/Config/Config.cs](../src/SiliconLife.Core/Config/Config.cs) |
+| 本地化系统   | 在地化系統   | ローカリゼーションシステム | 로컬라이제이션 시스템 | Localization System | [src/SiliconLife.Core/Localization/LocalizationManager.cs](../src/SiliconLife.Core/Localization/LocalizationManager.cs) |
+| 日志系统     | 日誌系統     | ロギングシステム   | 로깅 시스템        | Logging System     | [src/SiliconLife.Core/Logging/LogManager.cs](../src/SiliconLife.Core/Logging/LogManager.cs) |
+| 主循环       | 主迴圈       | メインループ       | 메인 루프          | Main Loop          | [src/SiliconLife.Core/Runtime/MainLoop.cs](../src/SiliconLife.Core/Runtime/MainLoop.cs) |
+| Tick对象     | Tick物件     | ティックオブジェクト | 틱 오브젝트        | Tick Object        | [src/SiliconLife.Core/Runtime/TickObject.cs](../src/SiliconLife.Core/Runtime/TickObject.cs) |
+| 看门狗       | 看門狗       | ウォッチドッグ     | 워치독             | Watchdog           | [src/SiliconLife.Core/Runtime/MainLoop.cs](../src/SiliconLife.Core/Runtime/MainLoop.cs) |
+| 断路器       | 斷路器       | サーキットブレーカー | 서킷 브레이커      | Circuit Breaker    | [src/SiliconLife.Core/Runtime/MainLoop.cs](../src/SiliconLife.Core/Runtime/MainLoop.cs) |
+| 网络执行器   | 網路執行器   | ネットワークエグゼキューター | 네트워크 이그제큐터 | Network Executor   | [src/SiliconLife.Core/Executors/NetworkExecutor.cs](../src/SiliconLife.Core/Executors/NetworkExecutor.cs) |
+| 磁盘执行器   | 磁碟執行器   | ディスクエグゼキューター | 디스크 이그제큐터  | Disk Executor      | [src/SiliconLife.Core/Executors/DiskExecutor.cs](../src/SiliconLife.Core/Executors/DiskExecutor.cs) |
+| 命令行执行器 | 命令列執行器 | コマンドラインエグゼキューター | 커맨드라인 이그제큐터 | CommandLine Executor | [src/SiliconLife.Core/Executors/CommandLineExecutor.cs](../src/SiliconLife.Core/Executors/CommandLineExecutor.cs) |
+| 工具调用     | 工具呼叫     | ツールコール       | 툴 콜              | Tool Call          | [src/SiliconLife.Core/Tools/ToolCall.cs](../src/SiliconLife.Core/Tools/ToolCall.cs) |
+| 工具结果     | 工具結果     | ツール結果         | 툴 리절트          | Tool Result        | [src/SiliconLife.Core/Tools/ToolResult.cs](../src/SiliconLife.Core/Tools/ToolResult.cs) |
+| 权限结果     | 權限結果     | パーミッション結果 | 퍼미션 리절트      | Permission Result  | [src/SiliconLife.Core/Security/PermissionResult.cs](../src/SiliconLife.Core/Security/PermissionResult.cs) |
+| 权限类型     | 權限類型     | パーミッションタイプ | 퍼미션 타입        | Permission Type    | [src/SiliconLife.Core/Security/PermissionType.cs](../src/SiliconLife.Core/Security/PermissionType.cs) |
+| Token使用记录 | Token使用記錄 | トークン使用記録   | 토큰 사용 기록     | Token Usage Record | [src/SiliconLife.Core/Audit/TokenUsageRecord.cs](../src/SiliconLife.Core/Audit/TokenUsageRecord.cs) |
+| Token使用摘要 | Token使用摘要 | トークン使用サマリー | 토큰 사용 요약     | Token Usage Summary | [src/SiliconLife.Core/Audit/TokenUsageSummary.cs](../src/SiliconLife.Core/Audit/TokenUsageSummary.cs) |
+| Token使用查询 | Token使用查詢 | トークン使用クエリ | 토큰 사용 쿼리     | Token Usage Query  | [src/SiliconLife.Core/Audit/TokenUsageQuery.cs](../src/SiliconLife.Core/Audit/TokenUsageQuery.cs) |
+| 聊天会话     | 聊天會話     | チャットセッション | 채팅 세션          | Chat Session       | [src/SiliconLife.Core/Chat/SessionBase.cs](../src/SiliconLife.Core/Chat/SessionBase.cs) |
+| 单聊会话     | 單聊會話     | 単一チャットセッション | 단일 채팅 세션     | Single Chat Session | [src/SiliconLife.Core/Chat/SingleChatSession.cs](../src/SiliconLife.Core/Chat/SingleChatSession.cs) |
+| 群聊会话     | 群聊會話     | グループチャットセッション | 그룹 채팅 세션     | Group Chat Session | [src/SiliconLife.Core/Chat/GroupChatSession.cs](../src/SiliconLife.Core/Chat/GroupChatSession.cs) |
+| 广播频道     | 廣播頻道     | ブロードキャストチャンネル | 브로드캐스트 채널  | Broadcast Channel  | [src/SiliconLife.Core/Chat/BroadcastChannel.cs](../src/SiliconLife.Core/Chat/BroadcastChannel.cs) |
+| 聊天消息     | 聊天訊息     | チャットメッセージ | 채팅 메시지        | Chat Message       | [src/SiliconLife.Core/Chat/ChatMessage.cs](../src/SiliconLife.Core/Chat/ChatMessage.cs) |
+| 即时通讯提供者 | 即時通訊提供者 | IMプロバイダー     | IM 프로바이더      | IM Provider        | [src/SiliconLife.Core/IM/IIMProvider.cs](../src/SiliconLife.Core/IM/IIMProvider.cs) |
+| 即时通讯管理器 | 即時通訊管理器 | IMマネージャー     | IM 매니저          | IM Manager         | [src/SiliconLife.Core/IM/IMManager.cs](../src/SiliconLife.Core/IM/IMManager.cs) |
+| 时间存储     | 時間儲存     | 時間ストレージ     | 타임 스토리지      | Time Storage       | [src/SiliconLife.Core/Storage/ITimeStorage.cs](../src/SiliconLife.Core/Storage/ITimeStorage.cs) |
+| 配置数据库   | 設定資料庫   | 設定データベース   | 설정 데이터베이스  | Config Database    | [src/SiliconLife.Core/Config/ConfigDataBase.cs](../src/SiliconLife.Core/Config/ConfigDataBase.cs) |
+| 配置转换器   | 設定轉換器   | 設定コンバーター   | 설정 컨버터        | Config Converter   | [src/SiliconLife.Core/Config/ConfigDataBaseConverter.cs](../src/SiliconLife.Core/Config/ConfigDataBaseConverter.cs) |
+| 本地化基类   | 在地化基底類別 | ローカリゼーションベースクラス | 로컬라이제이션 베이스 클래스 | Localization Base  | [src/SiliconLife.Core/Localization/LocalizationBase.cs](../src/SiliconLife.Core/Localization/LocalizationBase.cs) |
+| 本地化管理器 | 在地化管理器 | ローカリゼーションマネージャー | 로컬라이제이션 매니저 | Localization Manager | [src/SiliconLife.Core/Localization/LocalizationManager.cs](../src/SiliconLife.Core/Localization/LocalizationManager.cs) |
+| 日志提供者   | 日誌提供者   | ロガープロバイダー | 로거 프로바이더    | Logger Provider    | [src/SiliconLife.Core/Logging/ILoggerProvider.cs](../src/SiliconLife.Core/Logging/ILoggerProvider.cs) |
+| 日志条目     | 日誌條目     | ログエントリー     | 로그 엔트리        | Log Entry          | [src/SiliconLife.Core/Logging/LogEntry.cs](../src/SiliconLife.Core/Logging/LogEntry.cs) |
+| 日志级别     | 日誌等級     | ログレベル         | 로그 레벨          | Log Level          | [src/SiliconLife.Core/Logging/LogLevel.cs](../src/SiliconLife.Core/Logging/LogLevel.cs) |
+| 日志管理器   | 日誌管理器   | ログマネージャー   | 로그 매니저        | Log Manager        | [src/SiliconLife.Core/Logging/LogManager.cs](../src/SiliconLife.Core/Logging/LogManager.cs) |
+| 动态生命加载器 | 動態生命載入器 | 動的ビーイングローダー | 동적 비잉 로더     | Dynamic Being Loader | [src/SiliconLife.Core/Compilation/DynamicBeingLoader.cs](../src/SiliconLife.Core/Compilation/DynamicBeingLoader.cs) |
+| 动态编译执行器 | 動態編譯執行器 | 動的コンパイルエグゼキューター | 동적 컴파일 이그제큐터 | Dynamic Compilation Executor | [src/SiliconLife.Core/Compilation/DynamicCompilationExecutor.cs](../src/SiliconLife.Core/Compilation/DynamicCompilationExecutor.cs) |
+| 安全扫描器   | 安全掃描器   | セキュリティスキャナー | 시큐리티 스캐너    | Security Scanner   | [src/SiliconLife.Core/Compilation/SecurityScanner.cs](../src/SiliconLife.Core/Compilation/SecurityScanner.cs) |
+| 代码加密     | 程式碼加密   | コード暗号化       | 코드 암호화        | Code Encryption    | [src/SiliconLife.Core/Compilation/CodeEncryption.cs](../src/SiliconLife.Core/Compilation/CodeEncryption.cs) |
+| 残缺日期     | 殘缺日期     | 不完全日付         | 불완전 날짜        | Incomplete Date    | [src/SiliconLife.Core/Time/IncompleteDate.cs](../src/SiliconLife.Core/Time/IncompleteDate.cs) |
+| 核心主机     | 核心主機     | コアホスト         | 코어 호스트        | Core Host          | [src/SiliconLife.Core/Runtime/CoreHost.cs](../src/SiliconLife.Core/Runtime/CoreHost.cs) |
+| 核心主机构建器 | 核心主機建構器 | コアホストビルダー | 코어 호스트 빌더   | Core Host Builder  | [src/SiliconLife.Core/Runtime/CoreHostBuilder.cs](../src/SiliconLife.Core/Runtime/CoreHostBuilder.cs) |
+| 性能监视器   | 效能監視器   | パフォーマンスモニター | 퍼포먼스 모니터    | Performance Monitor | [src/SiliconLife.Core/Runtime/PerformanceMonitor.cs](../src/SiliconLife.Core/Runtime/PerformanceMonitor.cs) |
+| 测试Tick对象 | 測試Tick物件 | テストティックオブジェクト | 테스트 틱 오브젝트 | Test Tick Object   | [src/SiliconLife.Default/Runtime/TestTickObject.cs](../src/SiliconLife.Default/Runtime/TestTickObject.cs) |
+| Ollama客户端 | Ollama用戶端 | Ollamaクライアント | Ollama 클라이언트  | Ollama Client      | [src/SiliconLife.Default/AI/OllamaClient.cs](../src/SiliconLife.Default/AI/OllamaClient.cs) |
+| Ollama客户端工厂 | Ollama用戶端工廠 | Ollamaクライアントファクトリー | Ollama 클라이언트 팩토리 | Ollama Client Factory | [src/SiliconLife.Default/AI/OllamaClientFactory.cs](../src/SiliconLife.Default/AI/OllamaClientFactory.cs) |
+| 默认硅基生命个体 | 預設矽基生命個體 | デフォルトシリコンビーイング | 디폴트 실리콘 비잉 | Default Silicon Being | [src/SiliconLife.Default/SiliconBeing/DefaultSiliconBeing.cs](../src/SiliconLife.Default/SiliconBeing/DefaultSiliconBeing.cs) |
+| 默认硅基生命工厂 | 預設矽基生命工廠 | デフォルトシリコンビーイングファクトリー | 디폴트 실리콘 비잉 팩토리 | Default Silicon Being Factory | [src/SiliconLife.Default/SiliconBeing/DefaultSiliconBeingFactory.cs](../src/SiliconLife.Default/SiliconBeing/DefaultSiliconBeingFactory.cs) |
+| 日历系统     | 日曆系統     | カレンダーシステム | 캘린더 시스템      | Calendar System    | [src/SiliconLife.Default/Calendar/](../src/SiliconLife.Default/Calendar/) |
+| 网页UI提供者 | 網頁UI提供者 | Web UIプロバイダー | Web UI 프로바이더  | Web UI Provider    | [src/SiliconLife.Default/IM/WebUIProvider.cs](../src/SiliconLife.Default/IM/WebUIProvider.cs) |
+| 内置工具     | 內建工具     | 組み込みツール     | 내장 툴            | Built-in Tools     | [src/SiliconLife.Default/Tools/](../src/SiliconLife.Default/Tools/) |
+| 默认配置数据 | 預設設定資料 | デフォルト設定データ | 디폴트 설정 데이터 | Default Config Data | [src/SiliconLife.Default/Config/DefaultConfigData.cs](../src/SiliconLife.Default/Config/DefaultConfigData.cs) |
+| 中文简体本地化 | 中文簡體在地化 | 中国語簡体ローカリゼーション | 중국어 간체 로컬라이제이션 | ZhCN Localization  | [src/SiliconLife.Default/Localization/ZhCN.cs](../src/SiliconLife.Default/Localization/ZhCN.cs) |
+| 中文繁体本地化 | 中文繁體在地化 | 中国語繁体ローカリゼーション | 중국어 번체 로컬라이제이션 | ZhHK Localization  | [src/SiliconLife.Default/Localization/ZhHK.cs](../src/SiliconLife.Default/Localization/ZhHK.cs) |
+| 英文本地化   | 英文在地化   | 英語ローカリゼーション | 영어 로컬라이제이션 | EnUS Localization  | [src/SiliconLife.Default/Localization/EnUS.cs](../src/SiliconLife.Default/Localization/EnUS.cs) |
+| 默认本地化基类 | 預設在地化基底類別 | デフォルトローカリゼーションベースクラス | 디폴트 로컬라이제이션 베이스 클래스 | Default Localization Base | [src/SiliconLife.Default/Localization/DefaultLocalizationBase.cs](../src/SiliconLife.Default/Localization/DefaultLocalizationBase.cs) |
+| 控制台日志提供者 | 主控台日誌提供者 | コンソールロガープロバイダー | 콘솔 로거 프로바이더 | Console Logger Provider | [src/SiliconLife.Default/Logging/ConsoleLoggerProvider.cs](../src/SiliconLife.Default/Logging/ConsoleLoggerProvider.cs) |
+| 文件系统日志提供者 | 檔案系統日誌提供者 | ファイルシステムロガープロバイダー | 파일 시스템 로거 프로바이더 | File System Logger Provider | [src/SiliconLife.Default/Logging/FileSystemLoggerProvider.cs](../src/SiliconLife.Default/Logging/FileSystemLoggerProvider.cs) |
+| 文件系统存储 | 檔案系統儲存 | ファイルシステムストレージ | 파일 시스템 스토리지 | File System Storage | [src/SiliconLife.Default/Storage/FileSystemStorage.cs](../src/SiliconLife.Default/Storage/FileSystemStorage.cs) |
+| 文件系统时间存储 | 檔案系統時間儲存 | ファイルシステム時間ストレージ | 파일 시스템 타임 스토리지 | File System Time Storage | [src/SiliconLife.Default/Storage/FileSystemTimeStorage.cs](../src/SiliconLife.Default/Storage/FileSystemTimeStorage.cs) |
+| 默认权限回调 | 預設權限回呼 | デフォルトパーミッションコールバック | 디폴트 퍼미션 콜백 | Default Permission Callback | [src/SiliconLife.Default/Security/DefaultPermissionCallback.cs](../src/SiliconLife.Default/Security/DefaultPermissionCallback.cs) |
+| Web主机     | Web主機     | Webホスト         | Web 호스트         | Web Host           | [src/SiliconLife.Default/Web/WebHost.cs](../src/SiliconLife.Default/Web/WebHost.cs) |
+| 路由器       | 路由器       | ルーター           | 라우터             | Router             | [src/SiliconLife.Default/Web/Router.cs](../src/SiliconLife.Default/Web/Router.cs) |
+| 服务器发送事件处理器 | 伺服器傳送事件處理器 | SSEハンドラー      | SSE 핸들러         | SSE Handler        | [src/SiliconLife.Default/Web/SSEHandler.cs](../src/SiliconLife.Default/Web/SSEHandler.cs) |
+| Web安全工具 | Web安全工具 | Webセキュリティ   | Web 시큐리티       | Web Security       | [src/SiliconLife.Default/Web/WebSecurity.cs](../src/SiliconLife.Default/Web/WebSecurity.cs) |
+| HTML构建器   | HTML建構器   | HTMLビルダー       | HTML 빌더          | H Builder          | [src/SiliconLife.Default/Web/H.cs](../src/SiliconLife.Default/Web/H.cs) |
+| CSS构建器    | CSS建構器    | CSSビルダー        | CSS 빌더           | Css Builder        | [src/SiliconLife.Default/Web/CssBuilder.cs](../src/SiliconLife.Default/Web/CssBuilder.cs) |
+| JavaScript构建器 | JavaScript建構器 | JavaScriptビルダー | JavaScript 빌더    | Js Builder         | [src/SiliconLife.Default/Web/JsBuilder.cs](../src/SiliconLife.Default/Web/JsBuilder.cs) |
+| 控制器       | 控制器       | コントローラー     | 컨트롤러           | Controller         | [src/SiliconLife.Default/Web/Controller.cs](../src/SiliconLife.Default/Web/Controller.cs) |
+| 视图模块基类 | 檢視模組基底類別 | ビューモジュールベースクラス | 뷰 모듈 베이스 클래스 | View Model Base    | [src/SiliconLife.Default/Web/Models/ViewModelBase.cs](../src/SiliconLife.Default/Web/Models/ViewModelBase.cs) |
+| 视图基类     | 檢視基底類別     | ビューベースクラス       | 뷰 베이스 클래스          | View Base          | [src/SiliconLife.Default/Web/Views/ViewBase.cs](../src/SiliconLife.Default/Web/Views/ViewBase.cs) |
+| 皮肤接口     | 外觀介面     | ISkinインターフェース | ISkin 인터페이스   | ISkin              | [src/SiliconLife.Default/Web/ISkin.cs](../src/SiliconLife.Default/Web/ISkin.cs) |
+| 皮肤管理器   | 外觀管理器   | スキンマネージャー | 스키ン 매니저      | Skin Manager       | [src/SiliconLife.Default/Web/ISkin.cs](../src/SiliconLife.Default/Web/ISkin.cs) |
+| 皮肤预览信息 | 外觀預覽資訊 | スキンプレビュー情報 | 스키인 프리뷰 정보 | Skin Preview Info  | [src/SiliconLife.Default/Web/ISkin.cs](../src/SiliconLife.Default/Web/ISkin.cs) |
+| 管理员风格皮肤     | 管理員風格外觀     | 管理者用スキン         | 관리자용 스킨        | Admin Skin         | [src/SiliconLife.Default/Web/Skins/AdminSkin.cs](../src/SiliconLife.Default/Web/Skins/AdminSkin.cs) |
+| 聊天风格皮肤     | 聊天風格外觀     | チャット用スキン     | 채팅용 스킨        | Chat Skin          | [src/SiliconLife.Default/Web/Skins/ChatSkin.cs](../src/SiliconLife.Default/Web/Skins/ChatSkin.cs) |
+| 创意者风格皮肤     | 創作者風格外觀     | クリエイター用スキン | 크리에이터용 스킨 | Creative Skin      | [src/SiliconLife.Default/Web/Skins/CreativeSkin.cs](../src/SiliconLife.Default/Web/Skins/CreativeSkin.cs) |
+| 开发者风格皮肤   | 開發者風格外觀   | 開発者用スキン       | 개발자용 스킨      | Dev Skin           | [src/SiliconLife.Default/Web/Skins/DevSkin.cs](../src/SiliconLife.Default/Web/Skins/DevSkin.cs) |
+| 身体-大脑架构 | 身體-大腦架構 | ボディ-ブレインアーキテクチャ | 바디-브레인 아키텍처 | Body-Brain Architecture | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
+| 基于时间分片的公平调度策略 | 基於時間分片的公平調度策略 | 時間分割に基づく公平スケジューリング戦略 | 타임 슬라이스 기반 페어 스케줄링 전략 | Time-Sliced Fair Scheduling Strategy | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
+| 单轮执行     | 單輪執行     | 単一ラウンド実行   | 싱글 라운드 실행   | Single Round Execution | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
+| 记忆系统     | 記憶系統     | メモリシステム     | 메모리 시스템      | Memory System      | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
+| 任务系统     | 任務系統     | タスクシステム     | 태스크 시스템      | Task System        | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
+| 定时器系统   | 定時器系統   | タイマーシステム   | 타이머 시스템      | Timer System       | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
+| 工作笔记系统 | 工作筆記系統 | ワークノートシステム | 워크 노트 시스템   | Work Note System   | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
+| 项目系统     | 項目系統     | プロジェクトシステム | 프로젝트 시스템    | Project System     | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
+| 知识网络     | 知識網絡     | ナレッジネットワーク | 노レッジ 네트워크  | Knowledge Network  | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
+| 上下文容量管理 | 上下文容量管理 | コンテキスト容量管理 | 컨텍스트 용량 관리 | Context Capacity Management | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
+| 已读未读机制 | 已讀未讀機制 | 既読未読メカニズム | 읽음/안읽음 메커니즘 | Read/Unread Mechanism | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
+| 进化触发与判定 | 進化觸發與判定 | 進化トリガーと判定 | 진화 트리거 및 판정 | Evolution Trigger & Decision | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
+| 原子替换     | 原子替換     | アトミック置換     | 아토믹 교체        | Atomic Replacement | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
+| 本地化覆盖范围 | 本地化覆蓋範圍 | ローカリゼーションカバレッジ | 로컬라이제이션 커버리지 | Localization Coverage | [docs/zh-CN/architecture.md](../docs/zh-CN/architecture.md) |
+| 工具接口     | 工具介面     | ツールインターフェース | 툴 인터페이스      | ITool              | [src/SiliconLife.Core/Tools/ITool.cs](../src/SiliconLife.Core/Tools/ITool.cs) |
+| 工具定义     | 工具定義     | ツール定義         | 툴 정의            | Tool Definition    | [src/SiliconLife.Core/Tools/ToolDefinition.cs](../src/SiliconLife.Core/Tools/ToolDefinition.cs) |
+| 硅基生命管理器 | 矽基生命管理器 | シリコンビーイングマネージャー | 실리콘 비잉 매니저 | Silicon Being Manager | [src/SiliconLife.Core/SiliconBeing/SiliconBeingManager.cs](../src/SiliconLife.Core/SiliconBeing/SiliconBeingManager.cs) |
+| 主理人专用标记 | 主理人專用標記 | マネージャー専用属性 | 매니저 전용 어트리뷰트 | SiliconManagerOnly Attribute | [src/SiliconLife.Core/Tools/SiliconManagerOnlyAttribute.cs](../src/SiliconLife.Core/Tools/SiliconManagerOnlyAttribute.cs) |
+| 用户高频缓存 | 使用者高頻快取 | ユーザー高頻度キャッシュ | 사용자 빈도 캐시   | User Frequency Cache | [src/SiliconLife.Core/Security/UserFrequencyCache.cs](../src/SiliconLife.Core/Security/UserFrequencyCache.cs) |
+| 权限回调接口 | 權限回呼介面 | パーミッションコールバックインターフェース | 퍼미션 콜백 인터페이스 | Permission Callback Interface | [src/SiliconLife.Core/Security/IPermissionCallback.cs](../src/SiliconLife.Core/Security/IPermissionCallback.cs) |
+| 权限询问处理器 | 權限詢問處理器 | パーミッション問合せハンドラー | 퍼미션 요청 핸들러 | Permission Ask Handler | [src/SiliconLife.Core/Security/IPermissionAskHandler.cs](../src/SiliconLife.Core/Security/IPermissionAskHandler.cs) |
+| 日历工具     | 日曆工具     | カレンダーツール   | 캘린더 툴          | Calendar Tool      | [src/SiliconLife.Default/Tools/CalendarTool.cs](../src/SiliconLife.Default/Tools/CalendarTool.cs) |
+| 磁盘工具     | 磁碟工具     | ディスクツール     | 디스크 툴          | Disk Tool          | [src/SiliconLife.Default/Tools/DiskTool.cs](../src/SiliconLife.Default/Tools/DiskTool.cs) |
+| 网络工具     | 網路工具     | ネットワークツール | 네트워크 툴        | Network Tool       | [src/SiliconLife.Default/Tools/NetworkTool.cs](../src/SiliconLife.Default/Tools/NetworkTool.cs) |
+| 系统工具     | 系統工具     | システムツール     | 시스템 툴          | System Tool        | [src/SiliconLife.Default/Tools/SystemTool.cs](../src/SiliconLife.Default/Tools/SystemTool.cs) |
+| 配置工具     | 設定工具     | 設定ツール         | 설정 툴            | Config Tool        | [src/SiliconLife.Default/Tools/ConfigTool.cs](../src/SiliconLife.Default/Tools/ConfigTool.cs) |
+| 聊天工具     | 聊天工具     | チャットツール     | 채팅 툴            | Chat Tool          | [src/SiliconLife.Default/Tools/ChatTool.cs](../src/SiliconLife.Default/Tools/ChatTool.cs) |
+| 主理人工具   | 主理人工具   | キュレーターツール | 큐레이터 툴        | Curator Tool       | [src/SiliconLife.Default/Tools/CuratorTool.cs](../src/SiliconLife.Default/Tools/CuratorTool.cs) |
+| 动态编译工具 | 動態編譯工具 | 動的コンパイルツール | 동적 컴파일 툴     | Dynamic Compile Tool | [src/SiliconLife.Default/Tools/DynamicCompileTool.cs](../src/SiliconLife.Default/Tools/DynamicCompileTool.cs) |
+| 定时器工具   | 定時器工具   | タイマーツール     | 타이머 툴          | Timer Tool         | [src/SiliconLife.Default/Tools/TimerTool.cs](../src/SiliconLife.Default/Tools/TimerTool.cs) |
+| 记忆工具     | 記憶工具     | メモリツール       | 메모리 툴          | Memory Tool        | [src/SiliconLife.Default/Tools/MemoryTool.cs](../src/SiliconLife.Default/Tools/MemoryTool.cs) |
+| 任务工具     | 任務工具     | タスクツール       | 태스크 툴          | Task Tool          | [src/SiliconLife.Default/Tools/TaskTool.cs](../src/SiliconLife.Default/Tools/TaskTool.cs) |
+| WebHidden特性 | WebHidden特性 | WebHidden属性     | WebHidden 어트리뷰트 | WebHidden Attribute | [src/SiliconLife.Default/Web/WebSecurity.cs](../src/SiliconLife.Default/Web/WebSecurity.cs) |
+| WebCode特性  | WebCode特性  | WebCode属性       | WebCode 어트리뷰트  | WebCode Attribute  | [src/SiliconLife.Default/Web/WebSecurity.cs](../src/SiliconLife.Default/Web/WebSecurity.cs) |

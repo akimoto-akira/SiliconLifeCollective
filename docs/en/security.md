@@ -1,6 +1,6 @@
 # Security Design
 
-[中文](docs/zh-CN/security.md) | [繁體中文](docs/zh-HK/security.md) | [日本語](docs/ja-JP/security.md)
+[English](security.md) | [中文](docs/zh-CN/security.md) | [繁體中文](docs/zh-HK/security.md) | [日本語](docs/ja-JP/security.md) | [한국어](docs/ko-KR/security.md)
 
 ## Overview
 

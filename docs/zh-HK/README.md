@@ -1,129 +1,135 @@
-# 矽基生命群
+# Silicon Life Collective
 
-**⚠️ 警告：動態編譯功能已可用，但需要程式碼範本才能正常工作。深度測試正在進行中。**
+**⚠️ 警告：動态編譯可以工作，但需要程式碼模板才能正常執行。正在進行全面測試。**
 
-基於 .NET 9 的多智能體協作平台，AI 智能體（矽基人）可透過 Roslyn 動態編譯實現自我進化。
+一個基於 .NET 9 的多智能体協作平台，AI 智能体被称為**硅基生命体**，通過 Roslyn 動态編譯實現自我進化。
 
-[English](../../README.md) | [简体中文](../zh-CN/README.md) | [日本語](../ja-JP/README.md)
+[English](README.md) | [中文文檔](docs/zh-CN/README.md) | [繁體中文](docs/zh-HK/README.md) | [日本語](docs/ja-JP/README.md) | [한국어](docs/ko-KR/README.md)
 
-## 特性
+## 功能特性
 
-- **多智能體編排** — 由矽基主理人統一管理，基於 Tick 驅動的時間分片公平排程（MainLoop + TickObject + 看門狗 + 熔斷器）
-- **靈魂檔案驅動** — 每個矽基人由核心提示詞檔案（`soul.md`）驅動，定義其個性與行為模式
-- **身體-大腦架構** — 身體（SiliconBeing）保持存活並偵測觸發場景；大腦（ContextManager）載入歷史、呼叫 AI、執行工具並持久化響應
-- **工具呼叫循環** — AI 返回 tool_calls → 執行工具 → 回饋結果 → AI 繼續 → 直到返回純文字
-- **執行器-權限安全體系** — 所有磁碟、網路、命令列操作均透過執行器進行權限驗證
-  - 5 級權限查詢鏈：IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
-  - 所有權限決策均有稽核日誌
-- **Token 用量稽核** — 內建 Token 用量追蹤與報告（`ITokenUsageAudit` / `TokenUsageAuditManager`）
-- **多 AI 後端支援** — 支援 Ollama（本地）和阿里雲百煉（雲端）
-  - **Ollama** — 本地模型託管，原生 HTTP API
-  - **DashScope（百煉）** — 雲端 AI 服務，OpenAI 相容 API，多地域部署，13+ 模型支援（千問、DeepSeek、GLM、Kimi、Llama）
-- **32 種曆法體系** — 多曆法支援，包括公曆、中國農曆、伊斯蘭曆、希伯來曆、日本年號曆、波斯曆、瑪雅曆等
-- **最小化依賴** — 核心庫僅依賴 Microsoft.CodeAnalysis.CSharp 用於 Roslyn 動態編譯
-- **零資料庫依賴** — 基於檔案系統儲存（JSON），支援透過 `ITimeStorage` 進行時間索引查詢
-- **國際化** — 內建簡體中文、繁體中文和英文支援
-- **Web 介面** — 內建 HTTP 伺服器，支援 SSE，多種佈景主題，完整的儀表板
-  - **佈景主題系統** — 4 種內建佈景主題（Admin、Chat、Creative、Dev），可插拔 ISkin 介面，自動發現註冊
-  - **17 個控制器** — About、Audit、Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer
-  - **即時更新** — 透過 SSE（Server-Sent Events）實現聊天訊息、矽基人狀態和系統事件的即時推送
-  - **HTML/CSS/JS 建構器** — 伺服器端標記語言產生，透過 `H`、`CssBuilder` 和 `JsBuilder` 實現（零前端框架依賴）
-  - **本地化** — 三種內建語言環境（zh-CN、zh-HK、en-US），透過 LocalizationManager 解析
+- **多智能体编排** — 由*硅基主理人*管理，采用时钟驅動程式的时隙公平排程（主循环 + 时钟物件 + 看門狗 + 斷路器）
+- **靈魂檔案驅動程式** — 每個硅基生命体由核心提示檔案（`soul.md`）驅動程式，定義其個性和行為
+- **身體-大腦架構** — *身體*（SiliconBeing）保持存活狀態並检测触發場景；*大腦*（ContextManager）載入歷史記录、调用 AI、執行工具並持久化回應
+- **工具调用循环** — AI 返回工具调用 → 執行工具 → 将結果回饋给 AI → AI 继续 → 直到返回纯文本回應
+- **執行器-權限安全** — 所有磁碟、網路和命令行操作都通過執行器進行權限驗證
+  - 5級權限链：IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+  - 所有權限決策都有稽核記錄
+- **Token 使用稽核** — 通過 `ITokenUsageAudit` / `TokenUsageAuditManager` 內置 token 使用跟踪和報告
+- **多 AI 後端** — 支援 Ollama（本地）和阿里雲百炼（雲端）
+  - **Ollama** — 本地模型托管，使用原生 HTTP API
+  - **百炼（DashScope）** — 雲端 AI 服務，相容 OpenAI API，多區域部署，支援 13+ 模型（通義千問、DeepSeek、GLM、Kimi、Llama）
+- **32 种日歷系統** — 多日歷支援，包括公歷、農歷、伊斯蘭歷、希伯來歷、日本歷、波斯歷、瑪雅歷等
+- **最小依赖** — 核心程式庫僅依赖 Microsoft.CodeAnalysis.CSharp 用於 Roslyn 動态編譯
+- **零資料庫依赖** — 基於檔案的儲存（JSON），通過 `ITimeStorage` 支援時間索引查詢
+- **在地化** — 全面的多語言支援,包含 18 種語言變體
+  - 中文:zh-CN, zh-HK, zh-SG, zh-MO, zh-TW, zhMY(6 種變體)
+  - 英文:en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY(10 種變體)
+  - 日语：ja-JP
+  - 韩语：ko-KR
+- **Web UI** — 內建 HTTP 伺服器,支援 SSE,多种皮肤和全面的儀表板
+  - **皮肤系統** — 4 种內置皮肤(管理版、聊天版、創作版、開發版),支援可插拔的 ISkin 介面和自動發現
+  - **18 個控制器** — 關於、稽核、生命体、聊天、程式碼瀏覽器、程式碼悬浮提示、設定、儀表板、執行器、初始化、知識、記錄、記憶、權限、權限要求、項目、工作、定时器
+  - **实时更新** — SSE（伺服器發送事件）用於聊天訊息、生命体狀態和系統事件
+  - **HTML/CSS/JS 构建器** — 通過 `H`、`CssBuilder` 和 `JsBuilder` 進行伺服器端标記生成（零前端架構依赖）
+  - **在地化** — 18 种內置语言变体，通過 LocalizationManager 解析
 
-## 技術棧
+## 技術栈
 
 | 元件 | 技術 |
-|------|------|
-| 執行環境 | .NET 9 |
-| 開發語言 | C# |
-| AI 接入 | Ollama（本地）、阿里雲 DashScope（雲端） |
-| 資料儲存 | 檔案系統（JSON + 時間索引目錄結構） |
-| Web 伺服器 | HttpListener（.NET 內建） |
-| 動態編譯 | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
-| 開源授權 | Apache-2.0 |
+|-----------|-----------|
+| 執行时 | .NET 9 |
+| 语言 | C# |
+| AI 集成 | Ollama（本地）、阿里雲百炼（雲端） |
+| 儲存 | 檔案系統（JSON + 時間索引目錄） |
+| Web 伺服器 | HttpListener（.NET 內置） |
+| 動态編譯 | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
+| 授權證 | Apache-2.0 |
 
-## 專案結構
+## 項目結構
 
 ```
 SiliconLifeCollective.sln
 ├── src/
-│   ├── SiliconLife.Core/                  # 核心庫（介面、抽象類別）
-│   │   ├── ServiceLocator.cs             # 全域服務定位器：Register/Get、ChatSystem、IMManager、AuditLogger、GlobalACL、BeingFactory、BeingManager、DynamicBeingLoader、TokenUsageAudit
-│   │   ├── Runtime/                       # MainLoop、TickObject、CoreHost、CoreHostBuilder、PerformanceMonitor
-│   │   ├── SiliconBeing/                  # SiliconBeingBase、SiliconBeingManager、SiliconCurator、ISiliconBeingFactory、SoulFileManager、Memory、TaskSystem、TimerSystem
-│   │   ├── AI/                            # IAIClient、IAIClientFactory、ContextManager（「大腦」）、Message、AIRequest/AIResponse
-│   │   ├── Audit/                         # ITokenUsageAudit、TokenUsageAuditManager、TokenUsageRecord、TokenUsageSummary、TokenUsageQuery
-│   │   ├── Chat/                          # ChatSystem、IChatService、SimpleChatService、SessionBase、SingleChatSession、GroupChatSession、BroadcastChannel、ChatMessage
-│   │   ├── Executors/                     # ExecutorBase、DiskExecutor、NetworkExecutor、CommandLineExecutor、ExecutorRequest、ExecutorResult
-│   │   ├── Tools/                         # ITool、ToolManager（反射掃描）、ToolCall/ToolResult、ToolDefinition、SiliconManagerOnlyAttribute
-│   │   ├── Security/                      # PermissionManager、GlobalACL、AuditLogger、UserFrequencyCache、PermissionResult、PermissionType、IPermissionCallback、IPermissionAskHandler
-│   │   ├── IM/                            # IIMProvider、IMManager（訊息路由）
-│   │   ├── Storage/                       # IStorage、ITimeStorage（鍵值儲存 + 時間索引儲存）
-│   │   ├── Config/                        # ConfigDataBase、Config（單例 + JSON）、ConfigDataBaseConverter、GuidConverter、AIClientConfigAttribute、ConfigGroupAttribute、ConfigIgnoreAttribute、DirectoryInfoConverter
-│   │   ├── Localization/                  # LocalizationBase、LocalizationManager、Language 列舉
-│   │   ├── Logging/                       # ILogger、ILoggerProvider、LogEntry、LogLevel、LogManager
-│   │   ├── Compilation/                   # DynamicBeingLoader、DynamicCompilationExecutor、SecurityScanner、CodeEncryption
-│   │   └── Time/                          # IncompleteDate（時間範圍查詢）
+│   ├── SiliconLife.Core/                  # 核心程式庫（介面、抽象類別）
+│   │   ├── ServiceLocator.cs             # 全局服務定位器：Register/Get, ChatSystem, IMManager, AuditLogger, GlobalACL, BeingFactory, BeingManager, DynamicBeingLoader, TokenUsageAudit
+│   │   ├── Runtime/                       # 主循环、时钟物件、核心主機、核心主機构建器、效能監控器
+│   │   ├── SiliconBeing/                  # 硅基生命体基類別、硅基生命体管理器、硅基主理人、硅基生命体工廠介面、靈魂檔案管理器、記憶、工作系統、定时器系統
+│   │   ├── AI/                            # AI 客戶端介面、AI 客戶端工廠介面、上下文管理器（"大腦"）、訊息、AI 要求/AI 回應
+│   │   ├── Audit/                         # Token 使用稽核介面、Token 使用稽核管理器、Token 使用記录、Token 使用摘要、Token 使用查詢
+│   │   ├── Chat/                          # 聊天系統、聊天服務介面、简单聊天服務、會话基類別、单聊會话、群聊會话、廣播频道、聊天訊息
+│   │   ├── Executors/                     # 執行器基類別、磁碟執行器、網路執行器、命令行執行器、執行器要求、執行器結果
+│   │   ├── Tools/                         # 工具介面、工具管理器（反射掃描）、工具调用/工具結果、工具定義、硅基管理員專用屬性
+│   │   ├── Security/                      # 權限管理器、全局訪問控制列表、稽核記錄器、使用者频率快取、權限結果、權限類型、權限回调介面、權限询問處理器介面
+│   │   ├── IM/                            # 即时通訊提供者介面、即时通訊管理器（訊息路由）
+│   │   ├── Storage/                       # 儲存介面、時間儲存介面（键值對 + 時間索引）
+│   │   ├── Config/                        # 設定資料基類別、設定（单例 + JSON）、設定資料基類別转换器、Guid 转换器、AI 客戶端設定屬性、設定群組屬性、設定忽略屬性、目錄資訊转换器
+│   │   ├── Localization/                  # 在地化基類別、在地化管理器、語言枚舉
+│   │   ├── Logging/                       # 記錄介面、記錄提供者介面、記錄条目、記錄級别、記錄管理器
+│   │   ├── Compilation/                   # 動态生命体載入器、動态編譯執行器、安全掃描器、程式碼加密
+│   │   └── Time/                          # 不完整日期（時間范围查詢）
 │   │
-│   └── SiliconLife.Default/               # 預設實作 + 程式進入點
-│       ├── Program.cs                     # 應用程式進入點（組裝所有元件）
-│       ├── AI/                            # OllamaClient、OllamaClientFactory（原生 Ollama HTTP API）；DashScopeClient、DashScopeClientFactory（阿里雲百煉）
-│       ├── SiliconBeing/                  # DefaultSiliconBeing、DefaultSiliconBeingFactory
-│       ├── Calendar/                      # 32 種曆法實作：Buddhist、Cherokee、ChineseLunar、ChulaSakarat、Coptic、Dai、DehongDai、Ethiopian、FrenchRepublican、Gregorian、Hebrew、Indian、Inuit、Islamic、Japanese、Javanese、Juche、Julian、Khmer、Mayan、Mongolian、Persian、RepublicOfChina、Roman、Saka、Sexagenary、Tibetan、Vietnamese、VikramSamvat、Yi、Zoroastrian
-│       ├── Executors/                     # 預設執行器實作
-│       ├── IM/                            # WebUIProvider（Web UI 作為 IM 通道）、IMPermissionAskHandler
-│       ├── Tools/                         # 內建工具：日曆、聊天、設定、主理人、磁碟、動態編譯、記憶、網路、系統、任務、計時器、Token稽核
-│       ├── Config/                        # DefaultConfigData
-│       ├── Localization/                  # ZhCN、ZhHK、EnUS、DefaultLocalizationBase
-│       ├── Logging/                       # ConsoleLoggerProvider、FileSystemLoggerProvider
-│       ├── Storage/                       # FileSystemStorage、FileSystemTimeStorage
-│       ├── Security/                      # DefaultPermissionCallback
-│       ├── Runtime/                       # TestTickObject
-│       └── Web/                           # Web UI 實作
-│           ├── Controllers/               # 17 個控制器：About、Audit、Being、Chat、CodeBrowser、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer
-│           ├── Models/                    # ViewModel：AboutViewModel、AuditViewModel、BeingViewModel、ChatMessage、ChatViewModel、CodeBrowserViewModel、ConfigViewModel、DashboardViewModel、ExecutorViewModel、KnowledgeViewModel、LogViewModel、MemoryViewModel、PermissionViewModel、PermissionRequestViewModel、ProjectViewModel、TaskViewModel、TimerViewModel、ViewModelBase
-│           ├── Views/                     # HTML 視圖：ViewBase、AboutView、AuditView、BeingView、ChatView、CodeBrowserView、CodeEditorView、ConfigView、DashboardView、ExecutorView、KnowledgeView、LogView、MarkdownEditorView、MemoryView、PermissionView、ProjectView、TaskView、TimerView
-│           ├── Skins/                     # 4 種佈景主題：Admin（專業）、Chat（對話）、Creative（創意）、Dev（開發者）
-│           ├── ISkin.cs                   # 佈景主題介面 + SkinPreviewInfo + SkinManager（自動探索）
-│           ├── Controller.cs              # 控制器基底類別
+│   └── SiliconLife.Default/               # 默認實現 + 入口点
+│       ├── Program.cs                     # 應用程式程式入口（装配所有元件）
+│       ├── AI/                            # Ollama 客戶端、Ollama 客戶端工廠（原生 Ollama HTTP API）；百炼客戶端、百炼客戶端工廠（阿里雲百炼）
+│       ├── SiliconBeing/                  # 默認硅基生命体、默認硅基生命体工廠
+│       ├── Calendar/                      # 32 种日歷實現：佛歷、切罗基歷、農歷、朱拉萨卡拉特歷、科普特歷、傣歷、德宏傣歷、埃塞俄比亞歷、法国共和歷、公歷、希伯來歷、印度歷、因纽特歷、伊斯蘭歷、日本歷、爪哇歷、主体歷、儒略歷、高棉歷、瑪雅歷、蒙古歷、波斯歷、民国歷、罗馬歷、萨卡歷、幹支歷、藏歷、越南歷、维克拉姆桑巴特歷、彝歷、祆歷
+│       ├── Executors/                     # 默認執行器實現
+│       ├── IM/                            # WebUI 提供者（Web UI 作為即时通訊频道）、即时通訊權限询問處理器
+│       ├── Tools/                         # 內置工具：日歷、聊天、設定、主理人、磁碟、動态編譯、記憶、網路、系統、工作、定时器、Token 稽核
+│       ├── Config/                        # 默認設定資料
+│       ├── Localization/                  # 简体中文、繁体中文、美式英语、日语、韩语、默認在地化基類別、其他英语(英式英语、加拿大英语、澳大利亞英语、印度英语、新加坡英语、南非英语、愛爾蘭英语、新西蘭英语、馬來西亞英语)、其他中文(新加坡中文、澳門中文、臺灣中文、馬來西亞中文)
+│       ├── Logging/                       # 控制臺記錄提供者、檔案系統記錄提供者
+│       ├── Storage/                       # 檔案系統儲存、檔案系統時間儲存
+│       ├── Security/                      # 默認權限回调
+│       ├── Runtime/                       # 測試时钟物件
+│       └── Web/                           # Web UI 實現
+│           ├── Controllers/               # 18 個控制器:關於、稽核、生命体、聊天、程式碼瀏覽器、程式碼悬浮提示、設定、儀表板、執行器、初始化、知識、記錄、記憶、權限、權限要求、項目、工作、定时器
+│           ├── Models/                    # 檢視模型：關於檢視模型、稽核檢視模型、生命体檢視模型、聊天訊息、聊天檢視模型、程式碼瀏覽器檢視模型、設定檢視模型、儀表板檢視模型、執行器檢視模型、知識檢視模型、記錄檢視模型、記憶檢視模型、權限檢視模型、權限要求檢視模型、項目檢視模型、工作檢視模型、定时器檢視模型、檢視模型基類別
+│           ├── Views/                     # 19 個 HTML 檢視：檢視基類別、關於檢視、稽核檢視、生命体檢視、聊天檢視、程式碼瀏覽器檢視、程式碼编辑器檢視、設定檢視、儀表板檢視、執行器檢視、知識檢視、記錄檢視、Markdown 编辑器檢視、記憶檢視、權限檢視、項目檢視、靈魂编辑器檢視、工作檢視、定时器檢視
+│           ├── Skins/                     # 4 种皮肤：管理版（專業）、聊天版（對话）、創作版（藝術）、開發版（開發者導向）
+│           ├── ISkin.cs                   # 皮肤介面 + 皮肤預览資訊 + 皮肤管理器（自動發現）
+│           ├── Controller.cs              # 控制器基類別
 │           ├── WebHost.cs                 # HTTP 伺服器（HttpListener）
-│           ├── Router.cs                  # 請求路由（模式比對）
-│           ├── SSEHandler.cs              # 伺服器推送事件
+│           ├── Router.cs                  # 要求路由，支援模式匹配
+│           ├── SSEHandler.cs              # 伺服器發送事件
 │           ├── WebSecurity.cs             # Web 安全工具
-│           ├── H.cs                       # 流式 HTML 建構器 DSL
-│           ├── CssBuilder.cs              # CSS 建構工具
-│           └── JsBuilder.cs               # JavaScript 建構工具
+│           ├── H.cs                       # 流式 HTML 构建器 DSL
+│           ├── CssBuilder.cs              # CSS 构建器工具
+│           └── JsBuilder.cs               # JavaScript 构建器工具
 │
 ├── docs/
-│   └── zh-HK/                             # 繁體中文文件
+│   └── zh-CN/                             # 中文文檔
 ```
 
 ## 架構概覽
 
 ```
-MainLoop（專用執行緒，看門狗 + 熔斷器）
-  └── TickObject（按優先順序排序）
-       └── SiliconBeingManager
-            └── SiliconBeingRunner（每次 Tick 獨立臨時執行緒，帶逾時和熔斷）
-                 └── DefaultSiliconBeing.Tick()
-                      └── ContextManager.ThinkOnChat()
-                           └── IAIClient.Chat() → 工具呼叫循環 → 持久化到 ChatSystem
+主循环(專用线程,看門狗 + 斷路器)
+  └── 时钟物件(按優先級排序)
+       └── 硅基生命体管理器
+            └── 硅基生命体執行器(每次时钟建立臨時线程,超時 + 斷路器)
+                 └── 默認硅基生命体.Tick()
+                      └── 上下文管理器.思考聊天()
+                           └── AI 客戶端.聊天() -> 工具调用循环 -> 持久化到聊天系統
 ```
 
-所有 AI 發起的 I/O 操作均經過安全鏈：
+所有 AI 發起的 I/O 操作都必須通過安全链：
 
 ```
-工具呼叫 → 執行器 → 權限管理器 → [IsCurator → 頻率快取 → 全域ACL → 回呼 → 詢問使用者]
+工具调用 -> 執行器 -> 權限管理器 -> [IsCurator -> 頻率快取 -> 全局訪問控制列表 -> 回調 -> 詢問使用者]
 ```
 
 ## 快速開始
 
-### 環境需求
+### 前置條件
 
 - .NET 9 SDK
-- 本機執行 [Ollama](https://ollama.com) 並拉取模型（如 `ollama pull llama3`）
+- AI 後端(选择其一):
+  - **Ollama**：[Ollama](https://ollama.com) 在本地執行並已拉取模型（例如 `ollama pull llama3`）
+  - **阿里雲百煉**：從[百煉控制臺](https://bailian.console.aliyun.com/)获取有效的 API 金鑰
 
-### 建置
+### 建立
 
 ```bash
 dotnet restore
@@ -136,40 +142,40 @@ dotnet build
 dotnet run --project src/SiliconLife.Default
 ```
 
-應用程式將啟動 Web 伺服器並自動在瀏覽器中開啟 Web UI。
+應用程式程式将啟動 Web 伺服器並自動在瀏覽器中打開 Web UI。
 
-### 發佈（單一檔案）
+### 發佈(单檔案)
 
 ```bash
 dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 ```
 
-## 開發路線
+## 路線圖
 
-- [x] 第一階段：主控台 AI 對話
-- [x] 第二階段：框架骨架（MainLoop + TickObject + 看門狗 + 熔斷器）
-- [x] 第三階段：第一個矽基人（靈魂檔案驅動，身體-大腦架構）
-- [x] 第四階段：持久化記憶（ChatSystem + ITimeStorage）
-- [x] 第五階段：工具系統 + 執行器
-- [x] 第六階段：權限系統（5 級查詢鏈、稽核日誌、全域 ACL）
-- [x] 第七階段：動態編譯 + 自我進化（Roslyn）
-- [x] 第八階段：長期記憶 + 任務 + 計時器
-- [x] 第九階段：CoreHost + 多矽基人協作
-- [x] 第十階段：Web 介面（HTTP + SSE，17 個控制器，4 種佈景主題）
-- [x] 第十點五階段：增量增強（BroadcastChannel、Token稽核、32 種曆法、工具增強）
-- [ ] 第十一階段：外接 IM（飛書 / WhatsApp / Telegram）
-- [ ] 第十二階段：知識圖譜、外掛程式及其他
+- [x] 階段 1:控制臺 AI 聊天
+- [x] 階段 2:架構骨架(主循环 + 时钟物件 + 看門狗 + 斷路器)
+- [x] 階段 3:第一個帶有靈魂檔案的硅基生命体(身體-大腦架構)
+- [x] 階段 4:持久化記憶(聊天系統 + 時間儲存介面)
+- [x] 階段 5:工具系統 + 執行器
+- [x] 階段 6:權限系統(5 級链、稽核記錄器、全局訪問控制列表)
+- [x] 階段 7:動态編譯 + 自我進化(Roslyn)
+- [x] 階段 8:長期記憶 + 工作 + 定时器
+- [x] 階段 9:核心主機 + 多智能体協作
+- [x] 階段 10:Web UI(HTTP + SSE,18 個控制器,4 种皮肤)
+- [x] 階段 10.5:增量增強(廣播频道、Token 稽核、32 种日歷、工具增強、18 語言在地化)
+- [ ] 階段 11：外部即时通訊集成（飛書 / WhatsApp / Telegram）
+- [ ] 階段 12：知识图谱、外掛程式系統和技能生态系統
 
-## 文件
+## 文檔
 
-- [架構設計](architecture.md) — 系統設計、排程機制、元件架構
-- [安全設計](security.md) — 權限模型、執行器、動態編譯安全
-- [開發路線](roadmap.md) — 詳細的 12 階段開發計畫
+- [架構](architecture.md) — 系統設計、排程、元件架構
+- [安全](security.md) — 權限模型、執行器、動态編譯安全
+- [路線圖](roadmap.md) — 詳細的 12 階段開發計畫
 
-## 授權
+## 授權證
 
-本專案基於 Apache License 2.0 開源 — 詳見 [LICENSE](../../LICENSE) 檔案。
+本項目采用 Apache License 2.0 授權證 — 詳見 [LICENSE](LICENSE) 檔案。
 
 ## 作者
 
-天源垦骥 (Hoshino Kennji) — [B站](https://space.bilibili.com/617827040) | [YouTube](https://www.youtube.com/@hoshinokennji)
+Hoshino Kennji — [YouTube](https://www.youtube.com/@hoshinokennji) | [Bilibili](https://space.bilibili.com/617827040)
