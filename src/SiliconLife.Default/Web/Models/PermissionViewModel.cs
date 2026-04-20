@@ -391,7 +391,7 @@ public class PermissionViewModel : ViewModelBase
 
     private void GenerateNetworkDeniedSpecialBlock(StringBuilder sb, DefaultLocalizationBase? loc)
     {
-        sb.AppendLine("        // ===== Denied: Special =====");
+        sb.AppendLine("        // ===== Allowed: Special =====");
         sb.AppendLine($"        // {Comment(loc, "NetRuleDPRKMedia")} - chosonsinbo.com");
         sb.AppendLine("        if (hostLower.Equals(\"chosonsinbo.com\"))");
         sb.AppendLine("        {");

@@ -42,7 +42,7 @@ public class PermissionController : Controller
 
     private void Index()
     {
-        // 强制验证硅基人ID
+        // Force validate silicon being ID
         var beingIdStr = Request.QueryString?["beingId"];
         if (string.IsNullOrEmpty(beingIdStr) || !Guid.TryParse(beingIdStr, out Guid beingId))
         {
@@ -57,7 +57,7 @@ public class PermissionController : Controller
             return;
         }
 
-        // 验证硅基人是否存在
+        // Validate silicon being exists
         var beingManager = ServiceLocator.Instance.BeingManager;
         if (beingManager == null || beingManager.GetBeing(beingId) == null)
         {
@@ -72,7 +72,7 @@ public class PermissionController : Controller
             return;
         }
 
-        // 加载当前权限回调代码
+        // Load current permission callback code
         var dataDirectory = Config.Instance?.Data?.DataDirectory?.FullName 
             ?? Path.Combine(Environment.CurrentDirectory, "data");
         string beingDirectory = Path.Combine(dataDirectory, "SiliconManager", beingId.ToString());
@@ -82,7 +82,7 @@ public class PermissionController : Controller
         
         var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
                 
-        // 如果没有自定义代码,使用默认模板
+        // If no custom code, use default template
         var vm = new Models.PermissionViewModel { Skin = skin, BeingId = beingId };
         if (string.IsNullOrWhiteSpace(callbackCode))
         {
@@ -99,7 +99,7 @@ public class PermissionController : Controller
 
     private void GetList()
     {
-        // 验证硅基人ID
+        // Validate silicon being ID
         var beingIdStr = Request.QueryString?["beingId"];
         if (string.IsNullOrEmpty(beingIdStr) || !Guid.TryParse(beingIdStr, out Guid beingId))
         {
@@ -107,7 +107,7 @@ public class PermissionController : Controller
             return;
         }
 
-        // 获取该硅基人的PermissionManager
+        // Get PermissionManager for this silicon being
         var permManager = ServiceLocator.Instance.GetPermissionManager(beingId);
         if (permManager == null)
         {
@@ -138,7 +138,7 @@ public class PermissionController : Controller
     {
         try
         {
-            // 验证硅基人ID
+            // Validate silicon being ID
             var beingIdStr = Request.QueryString?["beingId"];
             if (string.IsNullOrEmpty(beingIdStr) || !Guid.TryParse(beingIdStr, out Guid beingId))
             {
@@ -146,7 +146,7 @@ public class PermissionController : Controller
                 return;
             }
 
-            // 读取请求体中的代码
+            // Read code from request body
             using var reader = new StreamReader(Request.InputStream);
             string body = reader.ReadToEnd();
             var requestData = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(body);
@@ -159,7 +159,7 @@ public class PermissionController : Controller
 
             string sourceCode = requestData["code"];
 
-            // 使用 DynamicBeingLoader 获取硅基人目录
+            // Use DynamicBeingLoader to get silicon being directory
             var dataDirectory = Config.Instance?.Data?.DataDirectory?.FullName 
                 ?? Path.Combine(Environment.CurrentDirectory, "data");
             string beingDirectory = Path.Combine(dataDirectory, "SiliconManager", beingId.ToString());
@@ -171,7 +171,7 @@ public class PermissionController : Controller
                 return;
             }
 
-            // 如果代码为空，删除自定义权限回调
+            // If code is empty, delete custom permission callback
             if (string.IsNullOrWhiteSpace(sourceCode))
             {
                 DynamicBeingLoader.DeleteCustomPermissionCallback(beingDirectory);
@@ -180,7 +180,7 @@ public class PermissionController : Controller
                 return;
             }
 
-            // 保存并编译权限回调代码
+            // Save and compile permission callback code
             bool saved = dynamicLoader.SavePermissionCallback(beingId, beingDirectory, sourceCode);
             if (!saved)
             {
@@ -188,7 +188,7 @@ public class PermissionController : Controller
                 return;
             }
 
-            // 加载并应用新的权限回调
+            // Load and apply new permission callback
             CompilationResult result = dynamicLoader.LoadPermissionCallback(beingId, beingDirectory);
             if (result.Success && result.CompiledType != null)
             {

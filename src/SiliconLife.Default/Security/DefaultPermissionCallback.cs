@@ -43,25 +43,25 @@ public class DefaultPermissionCallback : IPermissionCallback
     /// </summary>
     public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
     {
-        // 网络操作放行规则 / Network access allow rules
+        // Network access allow rules
         if (permissionType == PermissionType.NetworkAccess && !string.IsNullOrWhiteSpace(resource))
         {
             return EvaluateNetwork(resource);
         }
 
-        // 命令行规则（跨平台）/ Command line rules (cross-platform)
+        // Command line rules (cross-platform)
         if (permissionType == PermissionType.CommandLine && !string.IsNullOrWhiteSpace(resource))
         {
             return EvaluateCommandLine(callerId, resource);
         }
 
-        // 文件访问规则（跨平台）/ File access rules (cross-platform)
+        // File access rules (cross-platform)
         if (permissionType == PermissionType.FileAccess && !string.IsNullOrWhiteSpace(resource))
         {
             return EvaluateFileAccess(callerId, resource);
         }
 
-        // 其他权限类型默认放行 / Other permission types default to allowed
+        // Other permission types default to allowed
         return permissionType switch
         {
             PermissionType.Function => PermissionResult.Allowed,
@@ -74,7 +74,6 @@ public class DefaultPermissionCallback : IPermissionCallback
 
     private PermissionResult EvaluateNetwork(string resourcePath)
     {
-        // 不包含协议名（无冒号），无法判断来源，询问用户
         // No protocol scheme (no colon), cannot determine origin, ask user
         if (!resourcePath.Contains(':'))
         {
@@ -91,7 +90,6 @@ public class DefaultPermissionCallback : IPermissionCallback
             host = resourcePath.Trim().Split(':')[0];
         }
 
-        // 本地回环地址放行（localhost / 127.0.0.1 / ::1）
         // Allow loopback addresses
         var allowedLoopback = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -102,26 +100,25 @@ public class DefaultPermissionCallback : IPermissionCallback
             return PermissionResult.Allowed;
         }
 
-        // 内网 IP 地址段匹配（先验证是否为合法 IPv4 地址）
         // Private IP address range matching (validate IPv4 format first)
         if (IPAddress.TryParse(host, out var ipAddr)
             && ipAddr.AddressFamily == AddressFamily.InterNetwork)
         {
             var bytes = ipAddr.GetAddressBytes();
 
-            // 内网C类地址放行（192.168.0.0/16）
+            // Allow Class C private addresses (192.168.0.0/16)
             if (bytes[0] == 192 && bytes[1] == 168)
             {
                 return PermissionResult.Allowed;
             }
 
-            // 内网A类地址放行（10.0.0.0/8）
+            // Allow Class A private addresses (10.0.0.0/8)
             if (bytes[0] == 10)
             {
                 return PermissionResult.Allowed;
             }
 
-            // 内网B类地址选择性放行（172.16.0.0/12，即 172.16.* ~ 172.31.*）
+            // Allow Class B private addresses selectively (172.16.0.0/12, i.e. 172.16.* ~ 172.31.*)
             if (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31)
             {
                 return PermissionResult.AskUser;
@@ -130,24 +127,24 @@ public class DefaultPermissionCallback : IPermissionCallback
 
         var hostLower = host.ToLowerInvariant();
 
-        // ===== Denied: Contains 匹配（优先级最高） =====
+        // ===== Denied: Contains match (highest priority) =====
         var deniedContains = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            // AI 仿冒站
+            // AI impersonation sites
             "chatgpt", "openai", "deepseek", "sora", "claude", "luma-ai", "kling-ai", "openclaw",
-            // 恶意 AI 工具
+            // Malicious AI tools
             "wormgpt", "darkgpt", "fraudgpt", "ghostgpt", "oniongpt", "evilgpt", "hackgpt", "poisongpt",
-            // 对抗性 AI
+            // Adversarial AI
             "adversarial-ai", "prompt-jailbreak", "jailbreak-ai", "llm-hacking", "llm-hack", "llm-exploit",
-            // AI 内容农场
+            // AI content farms
             "ai-content-farm", "ai-slop", "auto-ai-write", "mass-ai-article",
             "ai-article-spam", "ai-spam", "ai-generator-free", "ai-essay-mill",
-            // AI 数据黑市
+            // AI data black market
             "ai-data-blackmarket", "api-key-market", "api-key-free",
             "llm-weight-seller", "llm-weight-free", "model-pirate",
-            // AI 仿冒/诈骗
+            // AI impersonation/scam
             "ai-official-fake", "ai-fake", "ai-vip", "ai-zh", "ai-cn", "ai-free-vip", "ai-premium-crack",
-            // 其他
+            // Other
             "4399"
         };
 
@@ -156,70 +153,70 @@ public class DefaultPermissionCallback : IPermissionCallback
             return PermissionResult.Denied;
         }
 
-        // 特殊处理：sakura-cat StartsWith
+        // Special handling: sakura-cat StartsWith
         if (hostLower.StartsWith("sakura-cat"))
         {
             return PermissionResult.Denied;
         }
 
-        // ===== Allowed: EndsWith 匹配 =====
+        // ===== Allowed: EndsWith match =====
         var allowedEndsWith = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            // 谷歌 / 必应 / 腾讯系 / 搜狗 / DuckDuckGo / Yandex / 微信 / 阿里系
+            // Google / Bing / Tencent / Sogou / DuckDuckGo / Yandex / WeChat / Alibaba
             ".google.com", ".bing.com", ".qq.com", ".tencent.com", ".weixin.qq.com",
             ".sogou.com", ".duckduckgo.com", ".yandex.com", ".yandex.ru", ".wechat.com",
             ".alibaba.com", ".alibabacloud.com", ".aliyun.com", ".1688.com", ".alipay.com",
             ".tmall.com", ".dingtalk.com", ".taobao.com",
-            // 哔哩哔哩 / niconico / Acfun / 抖音 / TikTok / 快手 / 小红书
+            // Bilibili / niconico / Acfun / Douyin / TikTok / Kuaishou / Xiaohongshu
             ".bilibili.com", ".bilivideo.com", ".nicovideo.jp", ".niconico.com",
             ".acfun.cn", ".douyin.com", ".tiktok.com", ".kuaishou.com", ".xiaohongshu.com",
-            // AI 服务
+            // AI services
             ".openai.com", ".anthropic.com", ".huggingface.co", ".ollama.com",
             ".tongyi.aliyun.com", ".qianwen.com", ".moonshot.cn", ".kimi.com",
             ".doubao.com", ".capcut.com", ".jianying.com", ".trae.cn", ".trae.ai",
-            // 证券交易所 / 财经资讯 / 投资社区
+            // Stock exchanges / financial news / investment communities
             ".sse.com.cn", ".szse.cn", ".cninfo.com.cn",
             ".jrj.com.cn", ".stockstar.com", ".hexun.com",
             ".xueqiu.com", ".cls.cn", ".kaipanla.com", ".taoguba.com.cn",
-            // 开发者服务
+            // Developer services
             ".github.com", ".githubusercontent.com", ".gitee.com",
             ".stackoverflow.com", ".npmjs.com", ".nuget.org", ".pypi.org", ".microsoft.com",
-            // 游戏引擎
+            // Game engines
             ".unity.com", ".unity3d.com", ".unrealengine.com", ".epicgames.com", ".fab.com",
-            // 世嘉
+            // Sega
             ".sega.com",
-            // 全球云服务平台
+            // Global cloud service platforms
             ".azure.com", ".azurewebsites.net", ".cloud.google.com",
             ".digitalocean.com", ".heroku.com", ".vercel.com", ".netlify.com",
-            // 全球开发与部署工具
+            // Global development and deployment tools
             ".gitlab.com", ".bitbucket.org", ".docker.com", ".cloudflare.com",
-            // 云服务与开发工具
+            // Cloud services and development tools
             ".amazon.com", ".amazonaws.com", ".kiro.dev", ".codebuddy.cn",
             ".jetbrains.com", ".purelight.net.cn", ".w3school.com.cn",
-            // 社交/资讯（中国大陆）
+            // Social/news (Mainland China)
             ".weibo.com", ".zhihu.com", ".163.com", ".sina.com.cn",
             ".ifeng.com", ".xinhuanet.com", ".cctv.com",
-            // 中国台湾媒体
+            // Taiwan media
             ".ctinews.com",
-            // 日本媒体
+            // Japanese media
             ".nhk.or.jp",
-            // 韩国媒体
+            // Korean media
             ".kbs.co.kr", ".imbc.com", ".sbs.co.kr", ".ebs.co.kr",
-            // 朝鲜媒体
+            // North Korean media
             ".naenara.com.kp", ".rodong.rep.kp", ".youth.rep.kp",
             ".vok.rep.kp", ".pyongyangtimes.com.kp",
-            // 全球社交协作平台
+            // Global social collaboration platforms
             ".reddit.com", ".discord.com", ".discordapp.com", ".slack.com",
             ".notion.so", ".figma.com", ".dropbox.com",
             // WhatsApp
             ".whatsapp.com",
-            // 全球视频/音乐平台
+            // Global video/music platforms
             ".spotify.com", ".apple.com", ".vimeo.com",
-            // 视频/媒体
+            // Video/media
             ".youtube.com", ".iqiyi.com", ".youku.com",
-            // 地图
+            // Maps
             ".openstreetmap.org",
-            // 百科
+            // Encyclopedia
             ".wikipedia.org", ".mediawiki.org"
         };
 
@@ -228,7 +225,7 @@ public class DefaultPermissionCallback : IPermissionCallback
             return PermissionResult.Allowed;
         }
 
-        // ===== Allowed: 完全匹配 =====
+        // ===== Allowed: Exact match =====
         var allowedExact = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "google.com", "bing.com", "qq.com", "tencent.com", "sogou.com",
@@ -268,33 +265,33 @@ public class DefaultPermissionCallback : IPermissionCallback
             return PermissionResult.Allowed;
         }
 
-        // ===== Allowed: Contains 特殊匹配 =====
-        // 俄罗斯媒体
+        // ===== Allowed: Contains special match =====
+        // Russian media
         if (hostLower.Contains("sputniknews"))
         {
             return PermissionResult.Allowed;
         }
 
-        // 百科 - creativecommons
+        // Encyclopedia - creativecommons
         if (hostLower.Contains("creativecommons"))
         {
             return PermissionResult.Allowed;
         }
 
-        // 政府网站
+        // Government websites
         if (hostLower.Contains(".gov") || hostLower.EndsWith(".go.jp") || hostLower.EndsWith(".go.kr"))
         {
             return PermissionResult.Allowed;
         }
 
-        // ===== Denied: 特殊匹配 =====
-        // 朝鲜媒体 - chosonsinbo.com
+        // ===== Denied: Special match =====
+        // North Korean media - chosonsinbo.com
         if (hostLower.Equals("chosonsinbo.com"))
         {
             return PermissionResult.Allowed;
         }
 
-        // WIN (Taiwan) 和 Threads - Denied
+        // WIN (Taiwan) and Threads - Denied
         var deniedEndsWith = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             ".win.org.tw", ".threads.com"
@@ -310,20 +307,20 @@ public class DefaultPermissionCallback : IPermissionCallback
             return PermissionResult.Denied;
         }
 
-        // ===== AskUser: EndsWith 匹配 =====
+        // ===== AskUser: EndsWith match =====
         var askUserEndsWith = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            // 证券交易平台
+            // Securities trading platforms
             ".htsc.com.cn", ".gtja.com", ".citics.com", ".cmschina.com", ".gf.com.cn",
             ".htsec.com", ".swhysc.com", ".dfzq.com.cn", ".guosen.com.cn", ".xyzq.com.cn",
-            // 第三方交易平台
+            // Third-party trading platforms
             ".10jqka.com.cn", ".eastmoney.com", ".tdx.com.cn", ".bloomberg.com",
             ".yahoo.com", ".finance.yahoo.com",
-            // 游戏平台
+            // Game platforms
             ".steampowered.com", ".ea.com", ".ubisoft.com", ".blizzard.com", ".nintendo.com",
-            // 三立新闻网
+            // Sanli News
             ".setn.com",
-            // 海外社交/直播
+            // Overseas social/live streaming
             ".twitch.tv", ".facebook.com", ".x.com", ".gmail.com",
             ".instagram.com", ".lit.link"
         };
@@ -333,7 +330,7 @@ public class DefaultPermissionCallback : IPermissionCallback
             return PermissionResult.AskUser;
         }
 
-        // ===== AskUser: 完全匹配 =====
+        // ===== AskUser: Exact match =====
         var askUserExact = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "bloomberg.com", "steampowered.com",
@@ -348,7 +345,7 @@ public class DefaultPermissionCallback : IPermissionCallback
             return PermissionResult.AskUser;
         }
 
-        // 未匹配的网络访问，询问用户 / Unmatched network access, ask user
+        // Unmatched network access, ask user
         return PermissionResult.AskUser;
     }
 
@@ -358,9 +355,8 @@ public class DefaultPermissionCallback : IPermissionCallback
     {
         var cmd = resourcePath.Trim();
 
-        // 检测管道符和多命令分隔符，拆分逐条验证
         // Detect pipe and multi-command separators, split and verify each
-        // 通用 / Common: |, ||, &&
+        // Common: |, ||, &&
         // Windows: &
         // Linux/macOS: ;
         string[] separators;
@@ -373,7 +369,7 @@ public class DefaultPermissionCallback : IPermissionCallback
             separators = ["||", "&&", "|", ";"];
         }
 
-        // 检查是否包含任何分隔符 / Check if contains any separator
+        // Check if contains any separator
         bool hasMultipleCommands = false;
         foreach (var sep in separators)
         {
@@ -386,7 +382,7 @@ public class DefaultPermissionCallback : IPermissionCallback
 
         if (hasMultipleCommands)
         {
-            // 拆分为多条命令 / Split into multiple commands
+            // Split into multiple commands
             var parts = cmd.Split(separators, StringSplitOptions.RemoveEmptyEntries);
             var hasAskUser = false;
 
@@ -395,7 +391,6 @@ public class DefaultPermissionCallback : IPermissionCallback
                 var subResult = Evaluate(callerId, PermissionType.CommandLine, part.Trim());
                 if (subResult == PermissionResult.Denied)
                 {
-                    // 有任何一条被禁止，直接禁止整条命令
                     // If any sub-command is denied, deny the entire command
                     return PermissionResult.Denied;
                 }
@@ -405,13 +400,13 @@ public class DefaultPermissionCallback : IPermissionCallback
                 }
             }
 
-            // 没有禁止的，但有需要询问的，询问用户
+            // No denials, but some need asking, ask user
             if (hasAskUser)
             {
                 return PermissionResult.AskUser;
             }
 
-            // 全部允许 / All allowed
+            // All allowed
             return PermissionResult.Allowed;
         }
 
@@ -419,7 +414,7 @@ public class DefaultPermissionCallback : IPermissionCallback
 
         if (OperatingSystem.IsWindows())
         {
-            // Windows 允许：只读/查询类命令
+            // Windows allow: read-only/query commands
             var allowedStartsWithWin = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 "dir ", "tree ", "tasklist ", "ipconfig ", "ping ", "tracert ",
@@ -436,7 +431,7 @@ public class DefaultPermissionCallback : IPermissionCallback
                 return PermissionResult.Allowed;
             }
 
-            // Windows 禁止：危险/破坏性命令
+            // Windows deny: dangerous/destructive commands
             var deniedStartsWithWin = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 "del ", "rmdir ", "format ", "diskpart", "reg delete "
@@ -449,7 +444,7 @@ public class DefaultPermissionCallback : IPermissionCallback
         }
         else if (OperatingSystem.IsLinux())
         {
-            // Linux 允许：只读/查询类命令
+            // Linux allow: read-only/query commands
             var allowedStartsWithLinux = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 "ls ", "tree ", "ps ", "ifconfig ", "ip ", "ping ", "traceroute ",
@@ -466,7 +461,7 @@ public class DefaultPermissionCallback : IPermissionCallback
                 return PermissionResult.Allowed;
             }
 
-            // Linux 禁止：危险/破坏性命令
+            // Linux deny: dangerous/destructive commands
             var deniedStartsWithLinux = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 "rm ", "rmdir ", "mkfs ", "fdisk ", "dd ", "chmod ", "chown ", "chgrp "
@@ -479,7 +474,7 @@ public class DefaultPermissionCallback : IPermissionCallback
         }
         else if (OperatingSystem.IsMacOS())
         {
-            // macOS 允许：只读/查询类命令
+            // macOS allow: read-only/query commands
             var allowedStartsWithMacOS = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 "ls ", "tree ", "ps ", "ifconfig ", "ping ", "traceroute ",
@@ -497,7 +492,7 @@ public class DefaultPermissionCallback : IPermissionCallback
                 return PermissionResult.Allowed;
             }
 
-            // macOS 禁止：危险/破坏性命令
+            // macOS deny: dangerous/destructive commands
             var deniedStartsWithMacOS = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 "rm ", "rmdir ", "diskutil erasedisk ", "dd ", "chmod ", "chown ", "chgrp "
@@ -509,7 +504,7 @@ public class DefaultPermissionCallback : IPermissionCallback
             }
         }
 
-        // 未匹配的命令，询问用户 / Unmatched commands, ask user
+        // Unmatched commands, ask user
         return PermissionResult.AskUser;
     }
 
@@ -517,9 +512,8 @@ public class DefaultPermissionCallback : IPermissionCallback
 
     private PermissionResult EvaluateFileAccess(Guid callerId, string resourcePath)
     {
-        // 最高优先级：危险文件扩展名直接拒绝，无论目录是否允许
         // Highest priority: deny dangerous file extensions regardless of directory permissions
-        // .pfx: 证书私钥文件 / .key: 密钥文件 / .bat: Windows 批处理脚本 / .sh: Shell 脚本 / .reg: Windows 注册表文件
+        // .pfx: certificate private key / .key: key file / .bat: Windows batch script / .sh: Shell script / .reg: Windows registry file
         var deniedExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             ".pfx", ".key", ".bat", ".sh", ".reg"
@@ -538,24 +532,22 @@ public class DefaultPermissionCallback : IPermissionCallback
         }
         catch
         {
-            // 无法解析为绝对路径，询问用户 / Cannot resolve to absolute path, ask user
+            // Cannot resolve to absolute path, ask user
             return PermissionResult.AskUser;
         }
         var filePathLower = filePath.ToLowerInvariant();
 
-        // 禁止：当前程序集目录 / Deny: current assembly directory
+        // Deny: current assembly directory
         var assemblyDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)?.ToLowerInvariant();
         if (!string.IsNullOrEmpty(assemblyDir) && filePathLower.StartsWith(assemblyDir))
         {
             return PermissionResult.Denied;
         }
 
-        // 禁止：应用数据目录（从构造函数获取）
         // Deny: application data directory (from constructor)
-        // 但允许：自己的 Temp 目录 / But allow: own Temp directory
+        // But allow: own Temp directory
         if (!string.IsNullOrEmpty(_appDataDirectory))
         {
-            // 允许：自己的 Temp 目录（dataDirectory/SiliconManager/{callerId}/Temp）
             // Allow: own Temp directory
             var ownTempDir = Path.Combine(_appDataDirectory, "SiliconManager", callerId.ToString(), "Temp").ToLowerInvariant();
             if (filePathLower.StartsWith(ownTempDir))
@@ -563,16 +555,15 @@ public class DefaultPermissionCallback : IPermissionCallback
                 return PermissionResult.Allowed;
             }
 
-            // 禁止：数据目录其他路径（包括其他硅基人的目录）
-            // Deny: other paths in data directory (including other silicon life's directories)
+            // Deny: other paths in data directory (including other silicon beings' directories)
             if (filePathLower.StartsWith(_appDataDirectory))
             {
                 return PermissionResult.Denied;
             }
         }
 
-        // 允许：用户常用文件夹 / Allow: common user folders
-        // 桌面 / 下载 / 文档 / 图片 / 音乐 / 视频
+        // Allow: common user folders
+        // Desktop / Downloads / Documents / Pictures / Music / Videos
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile).ToLowerInvariant();
         var allowedUserPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -589,7 +580,7 @@ public class DefaultPermissionCallback : IPermissionCallback
             return PermissionResult.Allowed;
         }
 
-        // 允许：公用用户文件夹 / Allow: public/common user folders
+        // Allow: public/common user folders
         // Windows: C:\Users\Public\Desktop, Documents, Downloads, Music, Pictures, Videos
         // macOS: /Users/Shared
         // Linux: no standard public folders, skip
@@ -625,7 +616,6 @@ public class DefaultPermissionCallback : IPermissionCallback
 
         if (OperatingSystem.IsWindows())
         {
-            // Windows 禁止：系统关键目录（不一定在C盘）
             // Windows deny: critical system directories (not necessarily on C drive)
             var winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows).ToLowerInvariant();
             var sysDir = Environment.GetFolderPath(Environment.SpecialFolder.System).ToLowerInvariant();
@@ -644,7 +634,7 @@ public class DefaultPermissionCallback : IPermissionCallback
         }
         else if (OperatingSystem.IsLinux())
         {
-            // Linux 禁止：系统关键目录 / Linux deny: critical system directories
+            // Linux deny: critical system directories
             // /etc /boot /sbin
             var deniedSystemPathsLinux = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
@@ -658,7 +648,7 @@ public class DefaultPermissionCallback : IPermissionCallback
         }
         else if (OperatingSystem.IsMacOS())
         {
-            // macOS 禁止：系统关键目录 / macOS deny: critical system directories
+            // macOS deny: critical system directories
             // /System /Library /private/etc
             var deniedSystemPathsMacOS = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
@@ -671,7 +661,7 @@ public class DefaultPermissionCallback : IPermissionCallback
             }
         }
 
-        // 未匹配的路径，询问用户 / Unmatched paths, ask user
+        // Unmatched paths, ask user
         return PermissionResult.AskUser;
     }
 
