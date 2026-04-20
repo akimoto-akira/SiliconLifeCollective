@@ -236,6 +236,9 @@ public class Program
         
         // Japanese
         LocalizationManager.Instance.Register<JaJP>(Language.JaJP);
+        
+        // Korean
+        LocalizationManager.Instance.Register<KoKR>(Language.KoKR);
     }
 
     public static void RequestExit()
