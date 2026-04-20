@@ -376,7 +376,7 @@ dotnet run
 ### リソース
 
 - 📖 [ドキュメント](../) を確認
-- 🐛 [GitHub Issues](https://github.com/your-org/SiliconLifeCollective/issues) で問題を報告
+- 🐛 [GitHub Issues](https://github.com/akimoto-akira/SiliconLifeCollective/issues) で問題を報告
 - 💬 コミュニティディスカッションに参加
 
 ### バグレポート

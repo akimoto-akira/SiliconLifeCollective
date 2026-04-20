@@ -12,7 +12,7 @@
 ### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/your-org/SiliconLifeCollective.git
+git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 ```
 

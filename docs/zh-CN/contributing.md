@@ -17,7 +17,7 @@
 ### 2. 克隆您的 Fork
 
 ```bash
-git clone https://github.com/your-username/SiliconLifeCollective.git
+git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 ```
 
@@ -382,8 +382,8 @@ git push --force-with-lease
 ## 下一步
 
 - 📚 阅读[文档](../)
-- 🐛 查看[开放问题](https://github.com/your-org/SiliconLifeCollective/issues)
-- 💬 开始[讨论](https://github.com/your-org/SiliconLifeCollective/discussions)
+- 🐛 查看[开放问题](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 💬 开始[讨论](https://github.com/akimoto-akira/SiliconLifeCollective/discussions)
 - 🚀 Fork 并开始贡献！
 
 感谢您为 SiliconLifeCollective 做出贡献！🎉

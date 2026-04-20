@@ -17,7 +17,7 @@ GitHub에서 "Fork" 버튼을 클릭하여 자체 복사본을 만듭니다.
 ### 2. 포크 클론
 
 ```bash
-git clone https://github.com/your-username/SiliconLifeCollective.git
+git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 ```
 
@@ -382,8 +382,8 @@ git push --force-with-lease
 ## 다음 단계
 
 - 📚 [문서](../) 읽기
-- 🐛 [열린 이슈](https://github.com/your-org/SiliconLifeCollective/issues) 확인
-- 💬 [토론](https://github.com/your-org/SiliconLifeCollective/discussions) 시작
+- 🐛 [열린 이슈](https://github.com/akimoto-akira/SiliconLifeCollective/issues) 확인
+- 💬 [토론](https://github.com/akimoto-akira/SiliconLifeCollective/discussions) 시작
 - 🚀 포크하고 기여 시작!
 
 SiliconLifeCollective에 기여해 주셔서 감사합니다! 🎉

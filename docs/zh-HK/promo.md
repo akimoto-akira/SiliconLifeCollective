@@ -182,4 +182,4 @@
 
 *由 Hoshino Kennji 和開源社群用心构建*
 
-[GitHub](https://github.com/hoshinokennji/SiliconLifeCollective) | [YouTube](https://www.youtube.com/@hoshinokennji) | [Bilibili](https://space.bilibili.com/617827040)
+[GitHub](https://github.com/akimoto-akira/SiliconLifeCollective) | [碼雲](https://gitee.com/hoshinokennji/SiliconLifeCollective) | [YouTube](https://www.youtube.com/@hoshinokennji) | [嗶哩嗶哩](https://space.bilibili.com/617827040)

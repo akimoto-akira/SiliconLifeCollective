@@ -235,7 +235,7 @@ SiliconLife.Default/
 
 ```bash
 # 克隆倉程式庫
-git clone https://github.com/your-org/SiliconLifeCollective.git
+git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 
 # 復原依赖

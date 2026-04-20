@@ -17,7 +17,7 @@ Click the "Fork" button on GitHub to create your own copy.
 ### 2. Clone Your Fork
 
 ```bash
-git clone https://github.com/your-username/SiliconLifeCollective.git
+git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 ```
 
@@ -382,8 +382,8 @@ By contributing, you agree that your contributions will be licensed under the Ap
 ## Next Steps
 
 - 📚 Read the [Documentation](../)
-- 🐛 Check [Open Issues](https://github.com/your-org/SiliconLifeCollective/issues)
-- 💬 Start a [Discussion](https://github.com/your-org/SiliconLifeCollective/discussions)
+- 🐛 Check [open issues](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 💬 Start a [discussion](https://github.com/akimoto-akira/SiliconLifeCollective/discussions)
 - 🚀 Fork and start contributing!
 
 Thank you for contributing to SiliconLifeCollective! 🎉

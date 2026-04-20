@@ -235,7 +235,7 @@ SiliconLife.Default/
 
 ```bash
 # Clone repository
-git clone https://github.com/your-org/SiliconLifeCollective.git
+git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 
 # Restore dependencies

@@ -56,7 +56,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.5.1] - 2026-04-21
+
 ### Added
+- `0fc1693` - Update program entry and project configuration
+  - Program entry point optimization
+  - Project configuration improvements
+- `2940373` - Enhance web interface with code hover hints and UI improvements
+  - Code editor hover hint feature
+  - Web interface UI optimization
+- `7940d9c` - Add Korean localization support
+  - Korean localization files
+  - Multi-language system enhancements
+- `4ff98ad` - Restructure documentation with multi-language support
+  - Documentation structure reorganization
+  - Multi-language documentation synchronization
+
+### Changed
+- `ea9179a` - Improve permission system implementation
+  - Permission system refactoring
+  - Permission validation logic optimization
+- `646813e` - Improve AI client factory implementation
+  - AI client factory refactoring
+  - Client discovery mechanism optimization
+
+### Fixed
+- `928a96d` - Fix calendar calculation implementations
+  - Calendar calculation logic correction
+  - Improved accuracy for multiple calendar types
 - Full multi-language support - you can now use English, Simplified Chinese, Traditional Chinese, Japanese, and Korean
 - Token usage tracking and querying - keeps track of how much each AI call costs
 - AI client factory - automatically finds and sets up different AI platforms

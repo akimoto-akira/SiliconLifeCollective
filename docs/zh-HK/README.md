@@ -178,4 +178,4 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 
 ## 作者
 
-Hoshino Kennji — [YouTube](https://www.youtube.com/@hoshinokennji) | [Bilibili](https://space.bilibili.com/617827040)
+Hoshino Kennji — [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective) | [碼雲](https://gitee.com/hoshinokennji/SiliconLifeCollective) | [YouTube](https://www.youtube.com/@hoshinokennji) | [嗶哩嗶哩](https://space.bilibili.com/617827040)

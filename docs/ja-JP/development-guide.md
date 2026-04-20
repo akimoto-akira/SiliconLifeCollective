@@ -235,7 +235,7 @@ SiliconLife.Default/
 
 ```bash
 # リポジトリのクローン
-git clone https://github.com/your-org/SiliconLifeCollective.git
+git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 
 # 依存関係の復元

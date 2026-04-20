@@ -235,7 +235,7 @@ SiliconLife.Default/
 
 ```bash
 # 저장소 클론
-git clone https://github.com/your-org/SiliconLifeCollective.git
+git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 
 # 종속성 복원

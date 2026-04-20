@@ -182,4 +182,4 @@ Whether you're curious about AI, need help staying organized, or just want to tr
 
 *Built with care by Hoshino Kennji and the open-source community*
 
-[GitHub](https://github.com/hoshinokennji/SiliconLifeCollective) | [YouTube](https://www.youtube.com/@hoshinokennji) | [Bilibili](https://space.bilibili.com/617827040)
+[GitHub](https://github.com/akimoto-akira/SiliconLifeCollective) | [Gitee](https://gitee.com/hoshinokennji/SiliconLifeCollective) | [YouTube](https://www.youtube.com/@hoshinokennji) | [Bilibili](https://space.bilibili.com/617827040)
