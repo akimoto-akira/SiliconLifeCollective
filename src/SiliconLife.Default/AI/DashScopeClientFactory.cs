@@ -99,9 +99,9 @@ public class DashScopeClientFactory : IAIClientFactory
 
         return new Dictionary<string, string>
         {
-            ["apiKey"] = localization.GetConfigDisplayName("DashScopeApiKey"),
-            ["region"] = localization.GetConfigDisplayName("DashScopeRegion"),
-            ["model"] = localization.GetConfigDisplayName("DashScopeModel")
+            ["apiKey"] = localization.GetConfigDisplayName("DashScopeApiKey", out _),
+            ["region"] = localization.GetConfigDisplayName("DashScopeRegion", out _),
+            ["model"] = localization.GetConfigDisplayName("DashScopeModel", out _)
         };
     }
 
@@ -124,11 +124,11 @@ public class DashScopeClientFactory : IAIClientFactory
         {
             return new Dictionary<string, string>
             {
-                ["beijing"] = localization?.GetConfigDisplayName("DashScopeRegionBeijing") ?? "China North 2 (Beijing)",
-                ["virginia"] = localization?.GetConfigDisplayName("DashScopeRegionVirginia") ?? "US (Virginia)",
-                ["singapore"] = localization?.GetConfigDisplayName("DashScopeRegionSingapore") ?? "Singapore",
-                ["hongkong"] = localization?.GetConfigDisplayName("DashScopeRegionHongkong") ?? "Hong Kong (China)",
-                ["frankfurt"] = localization?.GetConfigDisplayName("DashScopeRegionFrankfurt") ?? "Germany (Frankfurt)"
+                ["beijing"] = localization?.GetConfigDisplayName("DashScopeRegionBeijing", out _) ?? "China North 2 (Beijing)",
+                ["virginia"] = localization?.GetConfigDisplayName("DashScopeRegionVirginia", out _) ?? "US (Virginia)",
+                ["singapore"] = localization?.GetConfigDisplayName("DashScopeRegionSingapore", out _) ?? "Singapore",
+                ["hongkong"] = localization?.GetConfigDisplayName("DashScopeRegionHongkong", out _) ?? "Hong Kong (China)",
+                ["frankfurt"] = localization?.GetConfigDisplayName("DashScopeRegionFrankfurt", out _) ?? "Germany (Frankfurt)"
             };
         }
 
@@ -164,7 +164,7 @@ public class DashScopeClientFactory : IAIClientFactory
 
         foreach (string modelId in FallbackModelIds)
         {
-            string localizedName = localization?.GetConfigDisplayName($"DashScopeModel_{modelId}") ?? modelId;
+            string localizedName = localization?.GetConfigDisplayName($"DashScopeModel_{modelId}", out _) ?? modelId;
             // Format: "Localized Name (modelId)" for quota control visibility
             models[modelId] = $"{localizedName} ({modelId})";
         }
@@ -199,11 +199,12 @@ public class DashScopeClientFactory : IAIClientFactory
             {
                 string id = item.GetProperty("id").GetString() ?? "";
                 
-                // Try to get localized name, fallback to model id
-                string localizedName = localization?.GetConfigDisplayName($"DashScopeModel_{id}") ?? id;
+                // Try to get localized name, fallback to model id directly
+                bool found = false;
+                string localizedName = localization?.GetConfigDisplayName($"DashScopeModel_{id}", out found) ?? id;
                 
-                // Format: "Localized Name (modelId)" for quota control visibility
-                models[id] = $"{localizedName} ({id})";
+                // Use localized name if found, otherwise use id directly
+                models[id] = found ? $"{localizedName} ({id})" : id;
             }
 
             return models.Count > 0 ? models : null;

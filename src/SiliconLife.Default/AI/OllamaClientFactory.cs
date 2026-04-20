@@ -47,12 +47,12 @@ public class OllamaClientFactory : IAIClientFactory
     /// <param name="language">The language to use for localized display labels</param>
     public Dictionary<string, string> GetConfigKeysMetadata(Language language)
     {
-        // 获取指定语言的本地化实例
+        // Get localization instance for the specified language
         var localization = LocalizationManager.Instance.GetLocalization(language) as DefaultLocalizationBase;
         
         if (localization == null)
         {
-            // 如果无法获取本地化，返回英文默认值
+            // Return English default values if localization is unavailable
             return new Dictionary<string, string>
             {
                 ["endpoint"] = "Ollama Endpoint",
@@ -62,13 +62,13 @@ public class OllamaClientFactory : IAIClientFactory
             };
         }
         
-        // 返回已本地化的文本
+        // Return localized text
         return new Dictionary<string, string>
         {
-            ["endpoint"] = localization.GetConfigDisplayName("OllamaEndpoint"),
-            ["model"] = localization.GetConfigDisplayName("DefaultModel"),
-            ["temperature"] = localization.GetConfigDisplayName("Temperature"),
-            ["maxTokens"] = localization.GetConfigDisplayName("MaxTokens")
+            ["endpoint"] = localization.GetConfigDisplayName("OllamaEndpoint", out _),
+            ["model"] = localization.GetConfigDisplayName("DefaultModel", out _),
+            ["temperature"] = localization.GetConfigDisplayName("Temperature", out _),
+            ["maxTokens"] = localization.GetConfigDisplayName("MaxTokens", out _)
         };
     }
     
