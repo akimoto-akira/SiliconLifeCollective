@@ -694,8 +694,12 @@ public class EnUS : DefaultLocalizationBase
     public override string GetConfigGroupName(string groupKey) =>
         ConfigGroupNames.GetValueOrDefault(groupKey, groupKey);
 
-    public override string GetConfigDisplayName(string displayNameKey) =>
-        ConfigDisplayNames.GetValueOrDefault(displayNameKey, displayNameKey);
+    public override string GetConfigDisplayName(string displayNameKey, out bool found)
+    {
+        var result = ConfigDisplayNames.TryGetValue(displayNameKey, out var value);
+        found = result;
+        return result ? value : displayNameKey;
+    }
 
     public override string? GetConfigDescription(string descriptionKey) =>
         ConfigDescriptions.GetValueOrDefault(descriptionKey);
@@ -1583,4 +1587,157 @@ public class EnUS : DefaultLocalizationBase
     public override string MemoryToolQueryHeader(int count, string rangeDesc) => $"{rangeDesc}: {count} memories found:";
     public override string MemoryToolInvalidYear => "Invalid 'year' parameter";
     public override string MemoryToolUnknownAction(string action) => $"Unknown action: {action}";
+
+    // ===== Code Editor Hover Tooltip Localization =====
+
+    public override string GetCodeHoverWordTypeLabel(string wordType) => wordType switch
+    {
+        "variable" => "Variable",
+        "function" => "Function",
+        "class" => "Class",
+        "keyword" => "Keyword",
+        "comment" => "Comment",
+        "namespace" => "Namespace",
+        "parameter" => "Parameter",
+        _ => "Identifier"
+    };
+
+    public override string GetCodeHoverWordTypeDesc(string wordType, string word)
+    {
+        var encodedWord = System.Net.WebUtility.HtmlEncode(word);
+        return wordType switch
+        {
+            "variable" => $"Definition and usage information for variable '{encodedWord}'",
+            "function" => $"Signature and description for function '{encodedWord}'",
+            "class" => $"Structure and description for class '{encodedWord}'",
+            "keyword" => $"Syntax and usage for keyword '{encodedWord}'",
+            "comment" => $"Word '{encodedWord}' in comment",
+            "namespace" => $"Information for namespace '{encodedWord}'",
+            "parameter" => $"Definition and usage of parameter '{encodedWord}'",
+            _ => $"Information for identifier '{encodedWord}'"
+        };
+    }
+
+    public override string GetCodeHoverKeywordDesc(string language, string keyword)
+    {
+        var key = $"{language}:{keyword.ToLower()}";
+        return CSharpKeywords.GetValueOrDefault(key, "");
+    }
+
+    public override string GetTranslation(string key)
+    {
+        return TranslationDictionary.GetValueOrDefault(key, "");
+    }
+
+    private static readonly Dictionary<string, string> CSharpKeywords = new()
+    {
+        { "csharp:if", "Conditional branch statement. Executes a code block when the condition expression is true." },
+        { "csharp:else", "Alternative branch path. Used with if, executes when the condition is false." },
+        { "csharp:for", "Counting loop statement. Contains initialization, condition, and iteration parts." },
+        { "csharp:while", "Conditional loop statement. Repeats a code block while the condition is true." },
+        { "csharp:do", "Post-test loop statement. Executes the code block once, then checks the condition." },
+        { "csharp:switch", "Multi-branch statement. Matches an expression's value against different case branches." },
+        { "csharp:case", "Branch label in a switch statement. Executes the corresponding block when matched." },
+        { "csharp:break", "Exit statement. Immediately terminates the nearest loop or switch statement." },
+        { "csharp:continue", "Continue statement. Skips the rest of the current loop iteration." },
+        { "csharp:return", "Return statement. Exits the current method and optionally returns a value." },
+        { "csharp:goto", "Jump statement. Unconditionally jumps to a specified label." },
+        { "csharp:foreach", "Collection iteration statement. Visits each element in a collection." },
+        { "csharp:class", "Reference type declaration. Defines a structure containing data (fields, properties) and behavior (methods)." },
+        { "csharp:interface", "Interface declaration. Defines a contract that classes or structs must implement." },
+        { "csharp:struct", "Value type declaration. Lightweight data structure allocated on the stack." },
+        { "csharp:enum", "Enumeration type declaration. Defines a set of named integer constants." },
+        { "csharp:namespace", "Namespace declaration. A logical container for organizing code and avoiding naming conflicts." },
+        { "csharp:record", "Record type declaration. A reference type with value semantics, suitable for immutable data." },
+        { "csharp:delegate", "Delegate declaration. A type-safe method reference used for events and callbacks." },
+        { "csharp:public", "Public access modifier. Member is accessible from any code." },
+        { "csharp:private", "Private access modifier. Member is accessible only within the containing type." },
+        { "csharp:protected", "Protected access modifier. Member is accessible within the containing type and derived types." },
+        { "csharp:internal", "Internal access modifier. Member is accessible only within the same assembly." },
+        { "csharp:sealed", "Sealed modifier. Prevents a class from being inherited or a method from being overridden." },
+        { "csharp:int", "32-bit signed integer type (alias for System.Int32)." },
+        { "csharp:string", "String type (alias for System.String). Represents an immutable sequence of Unicode characters." },
+        { "csharp:bool", "Boolean type (alias for System.Boolean). Value is true or false." },
+        { "csharp:float", "32-bit single-precision floating-point type (alias for System.Single)." },
+        { "csharp:double", "64-bit double-precision floating-point type (alias for System.Double)." },
+        { "csharp:decimal", "128-bit high-precision decimal type, suitable for financial calculations." },
+        { "csharp:char", "16-bit Unicode character type (alias for System.Char)." },
+        { "csharp:byte", "8-bit unsigned integer type (alias for System.Byte)." },
+        { "csharp:object", "Base type for all types (alias for System.Object)." },
+        { "csharp:var", "Implicitly typed local variable. The compiler infers the type from the initialization expression." },
+        { "csharp:dynamic", "Dynamic type. Skips compile-time type checking, resolved at runtime." },
+        { "csharp:void", "Returnless type. Indicates a method does not return a value." },
+        { "csharp:static", "Static modifier. Belongs to the type itself rather than a specific instance." },
+        { "csharp:abstract", "Abstract modifier. Indicates an incomplete implementation that must be completed by derived classes." },
+        { "csharp:virtual", "Virtual modifier. Method or property can be overridden in derived classes." },
+        { "csharp:override", "Override modifier. Provides a new implementation of a base class virtual or abstract method." },
+        { "csharp:const", "Constant modifier. An immutable value determined at compile time." },
+        { "csharp:readonly", "Read-only modifier. Can only be assigned in the declaration or constructor." },
+        { "csharp:volatile", "Volatile modifier. Indicates a field may be modified by multiple threads concurrently." },
+        { "csharp:async", "Async modifier. Marks a method as containing asynchronous operations, typically used with await." },
+        { "csharp:await", "Await operator. Suspends method execution until an asynchronous operation completes." },
+        { "csharp:partial", "Partial modifier. Allows a class, struct, or interface to be split across multiple files." },
+        { "csharp:ref", "Reference parameter. Passes a parameter by reference." },
+        { "csharp:out", "Output parameter. Used to return multiple values from a method." },
+        { "csharp:in", "Read-only reference parameter. Passes by reference but does not allow modification." },
+        { "csharp:params", "Params modifier. Allows a variable number of arguments of the same type." },
+        { "csharp:try", "Exception handling block. Contains code that may throw an exception." },
+        { "csharp:catch", "Exception catch block. Handles exceptions thrown in a try block." },
+        { "csharp:finally", "Finally block. Code that executes regardless of whether an exception occurred." },
+        { "csharp:throw", "Throw statement. Manually throws an exception object." },
+        { "csharp:new", "Instance creation operator. Creates an object or calls a constructor." },
+        { "csharp:this", "Current instance reference. Refers to the current class instance." },
+        { "csharp:base", "Base class reference. Refers to members of the direct base class." },
+        { "csharp:using", "Directive or statement. Imports a namespace or ensures IDisposable resources are released." },
+        { "csharp:yield", "Iterator keyword. Returns values one at a time, enabling deferred execution." },
+        { "csharp:lock", "Lock statement. Ensures only one thread executes a code block at a time." },
+        { "csharp:typeof", "Type operator. Gets the System.Type object for a type." },
+        { "csharp:nameof", "Nameof operator. Gets the string name of a variable, type, or member." },
+        { "csharp:is", "Type check operator. Checks if an object is compatible with a specified type." },
+        { "csharp:as", "Type conversion operator. Safely attempts a type conversion, returning null on failure." },
+        { "csharp:null", "Null literal. Represents a null reference for reference or nullable types." },
+        { "csharp:true", "Boolean true value." },
+        { "csharp:false", "Boolean false value." },
+        { "csharp:default", "Default value expression. Gets the default value of a type (null for reference types, 0 for numeric types)." },
+        { "csharp:operator", "Operator declaration. Defines operator behavior on a custom type." },
+        { "csharp:explicit", "Explicit conversion declaration. A conversion operator that requires an explicit cast." },
+        { "csharp:implicit", "Implicit conversion declaration. A conversion operator that can be performed automatically." },
+        { "csharp:unchecked", "Unchecked block. Disables overflow checking for integer arithmetic." },
+        { "csharp:checked", "Checked block. Enables overflow checking for integer arithmetic." },
+        { "csharp:fixed", "Fixed statement. Pins a memory location to prevent garbage collection from moving it." },
+        { "csharp:stackalloc", "Stack allocation operator. Allocates a block of memory on the stack." },
+        { "csharp:extern", "External modifier. Indicates a method is implemented in an external assembly (e.g., a DLL)." },
+        { "csharp:unsafe", "Unsafe code block. Allows use of unsafe features such as pointers." },
+        // Platform core types
+        { "csharp:ipermissioncallback", "Permission callback interface. Used to evaluate various operation permissions for silicon beings (network, command line, file access, etc.)." },
+        { "csharp:permissionresult", "Permission result enum. Represents the result of permission evaluation: Allowed, Denied, AskUser." },
+        { "csharp:permissiontype", "Permission type enum. Defines the kind of permission: NetworkAccess, CommandLine, FileAccess, Function, DataAccess." },
+        // System.Net
+        { "csharp:ipaddress", "IP Address class (System.Net.IPAddress). Represents an Internet Protocol (IP) address." },
+        { "csharp:addressfamily", "Address family enum (System.Net.Sockets.AddressFamily). Specifies the addressing scheme for a network address, such as InterNetwork (IPv4) or InterNetworkV6 (IPv6)." },
+        // System
+        { "csharp:uri", "Uniform Resource Identifier class (System.Uri). Provides an object representation of a URI for accessing web resources." },
+        { "csharp:operatingsystem", "Operating system class (System.OperatingSystem). Provides static methods for checking the current operating system, such as IsWindows(), IsLinux(), IsMacOS()." },
+        { "csharp:environment", "Environment class (System.Environment). Provides information about and means to manipulate the current environment and platform." },
+        // System.IO
+        { "csharp:path", "Path class (System.IO.Path). Performs operations on String instances that contain file or directory path information." },
+        // System.Collections.Generic
+        { "csharp:hashset", "Hash set class (System.Collections.Generic.HashSet<T>). Represents a set of values, providing high-performance set operations." },
+        // System.Text
+        { "csharp:stringbuilder", "String builder class (System.Text.StringBuilder). Represents a mutable string of characters, suitable for scenarios with frequent string modifications." },
+    };
+
+    // Full namespace translation dictionary
+    private static readonly Dictionary<string, string> TranslationDictionary = new(CSharpKeywords)
+    {
+        // Add full namespace keys
+        { "csharp:System.Net.IPAddress", "IP Address class (System.Net.IPAddress). Represents an Internet Protocol (IP) address." },
+        { "csharp:System.Net.Sockets.AddressFamily", "Address family enum (System.Net.Sockets.AddressFamily). Specifies the addressing scheme for a network address, such as InterNetwork (IPv4) or InterNetworkV6 (IPv6)." },
+        { "csharp:System.Uri", "Uniform Resource Identifier class (System.Uri). Provides an object representation of a URI for accessing web resources." },
+        { "csharp:System.OperatingSystem", "Operating system class (System.OperatingSystem). Provides static methods for checking the current operating system, such as IsWindows(), IsLinux(), IsMacOS()." },
+        { "csharp:System.Environment", "Environment class (System.Environment). Provides information about and means to manipulate the current environment and platform." },
+        { "csharp:System.IO.Path", "Path class (System.IO.Path). Performs operations on String instances that contain file or directory path information." },
+        { "csharp:System.Collections.Generic.HashSet", "Hash set class (System.Collections.Generic.HashSet<T>). Represents a set of values, providing high-performance set operations." },
+        { "csharp:System.Text.StringBuilder", "String builder class (System.Text.StringBuilder). Represents a mutable string of characters, suitable for scenarios with frequent string modifications." },
+    };
 }

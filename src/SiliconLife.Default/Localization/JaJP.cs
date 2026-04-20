@@ -694,8 +694,12 @@ public class JaJP : DefaultLocalizationBase
     public override string GetConfigGroupName(string groupKey) =>
         ConfigGroupNames.GetValueOrDefault(groupKey, groupKey);
 
-    public override string GetConfigDisplayName(string displayNameKey) =>
-        ConfigDisplayNames.GetValueOrDefault(displayNameKey, displayNameKey);
+    public override string GetConfigDisplayName(string displayNameKey, out bool found)
+    {
+        var result = ConfigDisplayNames.TryGetValue(displayNameKey, out var value);
+        found = result;
+        return result ? value : displayNameKey;
+    }
 
     public override string? GetConfigDescription(string descriptionKey) =>
         ConfigDescriptions.GetValueOrDefault(descriptionKey);
@@ -1581,4 +1585,157 @@ public class JaJP : DefaultLocalizationBase
     public override string MemoryToolQueryHeader(int count, string rangeDesc) => $"{rangeDesc} 合計 {count} 件のメモリ：";
     public override string MemoryToolInvalidYear => "'year'パラメータが無効";
     public override string MemoryToolUnknownAction(string action) => $"未知の操作：{action}";
+
+    // ===== Code Editor Hover Tooltip Localization =====
+
+    public override string GetCodeHoverWordTypeLabel(string wordType) => wordType switch
+    {
+        "variable" => "変数",
+        "function" => "関数",
+        "class" => "クラス",
+        "keyword" => "キーワード",
+        "comment" => "コメント",
+        "namespace" => "名前空間",
+        "parameter" => "パラメータ",
+        _ => "識別子"
+    };
+
+    public override string GetCodeHoverWordTypeDesc(string wordType, string word)
+    {
+        var encodedWord = System.Net.WebUtility.HtmlEncode(word);
+        return wordType switch
+        {
+            "variable" => $"変数 '{encodedWord}' の定義と使用情報",
+            "function" => $"関数 '{encodedWord}' のシグネチャと説明",
+            "class" => $"クラス '{encodedWord}' の構造と説明",
+            "keyword" => $"キーワード '{encodedWord}' の構文と用途",
+            "comment" => $"コメント内の単語 '{encodedWord}'",
+            "namespace" => $"名前空間 '{encodedWord}' の情報",
+            "parameter" => $"パラメータ '{encodedWord}' の定義と使用情報",
+            _ => $"識別子 '{encodedWord}' の情報"
+        };
+    }
+
+    public override string GetCodeHoverKeywordDesc(string language, string keyword)
+    {
+        var key = $"{language}:{keyword.ToLower()}";
+        return CSharpKeywords.GetValueOrDefault(key, "");
+    }
+
+    public override string GetTranslation(string key)
+    {
+        return TranslationDictionary.GetValueOrDefault(key, "");
+    }
+
+    private static readonly Dictionary<string, string> CSharpKeywords = new()
+    {
+        { "csharp:if", "条件分岐ステートメント。条件式が true の場合にコードブロックを実行します。" },
+        { "csharp:else", "条件分岐の代替パス。if と組み合わせて使用し、条件が false の場合に実行されます。" },
+        { "csharp:for", "カウントループステートメント。初期化、条件判定、反復の3つの部分から成ります。" },
+        { "csharp:while", "条件ループステートメント。条件が true の間、コードブロックを繰り返します。" },
+        { "csharp:do", "後判定ループステートメント。最初にコードブロックを1回実行し、その後条件を判定します。" },
+        { "csharp:switch", "多岐分岐ステートメント。式の値を異なる case ブランチと照合します。" },
+        { "csharp:case", "switch ステートメント内のブランチラベル。一致した値に対応するコードブロックを実行します。" },
+        { "csharp:break", "脱出ステートメント。最も近いループまたは switch ステートメントを直ちに終了します。" },
+        { "csharp:continue", "継続ステートメント。現在のループの残りの部分をスキップし、次の反復に進みます。" },
+        { "csharp:return", "戻り値ステートメント。現在のメソッドを終了し、オプションで値を返します。" },
+        { "csharp:goto", "ジャンプステートメント。指定されたラベルに無条件でジャンプします。" },
+        { "csharp:foreach", "コレクション反復ステートメント。コレクションの各要素を順にアクセスします。" },
+        { "csharp:class", "参照型宣言。データ（フィールド、プロパティ）と動作（メソッド）を含む構造を定義します。" },
+        { "csharp:interface", "インターフェース宣言。クラスまたは構造体が実装しなければならない契約を定義します。" },
+        { "csharp:struct", "値型宣言。スタックに割り当てられる軽量なデータ構造。" },
+        { "csharp:enum", "列挙型宣言。名前付き整数定数のセットを定義します。" },
+        { "csharp:namespace", "名前空間宣言。コードを整理し、名前の衝突を回避するための論理コンテナ。" },
+        { "csharp:record", "レコード型宣言。値セマンティクスを持つ参照型。不変データに適しています。" },
+        { "csharp:delegate", "デリゲート宣言。イベントやコールバックに使用される型安全なメソッド参照。" },
+        { "csharp:public", "パブリックアクセス修飾子。メンバーは任意のコードからアクセス可能です。" },
+        { "csharp:private", "プライベートアクセス修飾子。メンバーは包含型内部でのみアクセス可能です。" },
+        { "csharp:protected", "プロテクテッドアクセス修飾子。メンバーは包含型および派生型でアクセス可能です。" },
+        { "csharp:internal", "インターナルアクセス修飾子。メンバーは同一アセンブリ内でのみアクセス可能です。" },
+        { "csharp:sealed", "シールド修飾子。クラスが継承されるか、メソッドがオーバーライドされるのを防ぎます。" },
+        { "csharp:int", "32ビット符号付き整数型（System.Int32 のエイリアス）。" },
+        { "csharp:string", "文字列型（System.String のエイリアス）。Unicode 文字の_immutable_なシーケンスを表します。" },
+        { "csharp:bool", "ブール型（System.Boolean のエイリアス）。値は true または false。" },
+        { "csharp:float", "32ビット単精度浮動小数点型（System.Single のエイリアス）。" },
+        { "csharp:double", "64ビット倍精度浮動小数点型（System.Double のエイリアス）。" },
+        { "csharp:decimal", "128ビット高精度10進数型。金融計算に適しています。" },
+        { "csharp:char", "16ビット Unicode 文字型（System.Char のエイリアス）。" },
+        { "csharp:byte", "8ビット符号なし整数型（System.Byte のエイリアス）。" },
+        { "csharp:object", "すべての型の基底型（System.Object のエイリアス）。" },
+        { "csharp:var", "暗黙的に型指定されるローカル変数。コンパイラが初期化式から型を推論します。" },
+        { "csharp:dynamic", "動的型。コンパイル時の型チェックをスキップし、実行時に解決されます。" },
+        { "csharp:void", "戻り値なし型。メソッドが値を返さないことを示します。" },
+        { "csharp:static", "静的修飾子。特定のインスタンスではなく型自体に属します。" },
+        { "csharp:abstract", "抽象修飾子。不完全な実装を示し、派生クラスによって完成される必要があります。" },
+        { "csharp:virtual", "仮想修飾子。メソッドまたはプロパティは派生クラスでオーバーライド可能です。" },
+        { "csharp:override", "オーバーライド修飾子。基底クラスの仮想メソッドまたは抽象メソッドの新しい実装を提供します。" },
+        { "csharp:const", "定数修飾子。コンパイル時に決定される不変値。" },
+        { "csharp:readonly", "読み取り専用修飾子。宣言時またはコンストラクタでのみ値を代入できます。" },
+        { "csharp:volatile", "volatile 修飾子。フィールドが複数のスレッドによって同時に変更される可能性を示します。" },
+        { "csharp:async", "非同期修飾子。メソッドが非同期操作を含むことを示し、通常 await と組み合わせて使用します。" },
+        { "csharp:await", "await 演算子。非同期操作が完了するまでメソッドの実行を一時停止します。" },
+        { "csharp:partial", "パーシャル修飾子。クラス、構造体、またはインターフェースを複数のファイルに分割できます。" },
+        { "csharp:ref", "参照パラメータ。パラメータを参照渡しします。" },
+        { "csharp:out", "出力パラメータ。メソッドから複数の値を返すために使用します。" },
+        { "csharp:in", "読み取り専用参照パラメータ。参照渡ししますが、変更は許可されません。" },
+        { "csharp:params", "params 修飾子。同じ型の可変長の引数を渡すことができます。" },
+        { "csharp:try", "例外処理ブロック。例外を投げる可能性のあるコードを含みます。" },
+        { "csharp:catch", "例外キャッチブロック。try ブロックで投げられた例外を処理します。" },
+        { "csharp:finally", "finally ブロック。例外が発生したかどうかにかかわらず実行されるコード。" },
+        { "csharp:throw", "例外送出ステートメント。例外オブジェクトを手動で投げます。" },
+        { "csharp:new", "インスタンス生成演算子。オブジェクトを作成するか、コンストラクタを呼び出します。" },
+        { "csharp:this", "現在のインスタンス参照。現在のクラスインスタンスを参照します。" },
+        { "csharp:base", "基底クラス参照。直接の基底クラスのメンバーを参照します。" },
+        { "csharp:using", "ディレクティブまたはステートメント。名前空間をインポートするか、IDisposable リソースの解放を保証します。" },
+        { "csharp:yield", "イテレータキーワード。値を1つずつ返し、遅延実行を実現します。" },
+        { "csharp:lock", "ロックステートメント。一度に1つのスレッドのみがコードブロックを実行することを保証します。" },
+        { "csharp:typeof", "型演算子。型の System.Type オブジェクトを取得します。" },
+        { "csharp:nameof", "nameof 演算子。変数、型、またはメンバーの文字列名を取得します。" },
+        { "csharp:is", "型チェック演算子。オブジェクトが指定された型と互換性があるかチェックします。" },
+        { "csharp:as", "型変換演算子。安全に型変換を試み、失敗した場合は null を返します。" },
+        { "csharp:null", "null リテラル。参照型または null 許容型の null 参照を表します。" },
+        { "csharp:true", "ブール真値。" },
+        { "csharp:false", "ブール偽値。" },
+        { "csharp:default", "デフォルト値式。型のデフォルト値を取得します（参照型は null、数値型は 0）。" },
+        { "csharp:operator", "演算子宣言。カスタム型上の演算子の動作を定義します。" },
+        { "csharp:explicit", "明示的変換宣言。明示的なキャストが必要な変換演算子。" },
+        { "csharp:implicit", "暗黙的変換宣言。自動的に実行できる変換演算子。" },
+        { "csharp:unchecked", "unchecked ブロック。整数算術のオーバーフロー チェックを無効にします。" },
+        { "csharp:checked", "checked ブロック。整数算術のオーバーフロー チェックを有効にします。" },
+        { "csharp:fixed", "fixed ステートメント。ガベージコレクションによる移動を防ぐためにメモリ位置を固定します。" },
+        { "csharp:stackalloc", "スタック割り当て演算子。スタック上にメモリブロックを割り当てます。" },
+        { "csharp:extern", "外部修飾子。メソッドが外部アセンブリ（DLL など）で実装されていることを示します。" },
+        { "csharp:unsafe", "アンセーフコードブロック。ポインタなどのアンセーフ機能の使用を許可します。" },
+        // プラットフォームコア型
+        { "csharp:ipermissioncallback", "権限コールバックインターフェース。シリコンベースの生命体の各種操作権限（ネットワーク、コマンドライン、ファイルアクセスなど）を評価するために使用されます。" },
+        { "csharp:permissionresult", "権限結果列挙型。権限評価の結果を表します：Allowed（許可）、Denied（拒否）、AskUser（ユーザーに確認）。" },
+        { "csharp:permissiontype", "権限タイプ列挙型。権限の種類を定義します：NetworkAccess（ネットワークアクセス）、CommandLine（コマンドライン実行）、FileAccess（ファイルアクセス）、Function（関数呼び出し）、DataAccess（データアクセス）。" },
+        // System.Net
+        { "csharp:ipaddress", "IP アドレスクラス（System.Net.IPAddress）。Internet Protocol (IP) アドレスを表します。" },
+        { "csharp:addressfamily", "アドレスファミリ列挙型（System.Net.Sockets.AddressFamily）。ネットワークアドレスのアドレッシングスキームを指定します（InterNetwork（IPv4）、InterNetworkV6（IPv6）など）。" },
+        // System
+        { "csharp:uri", "統一リソース識別子クラス（System.Uri）。Web リソースにアクセスするための URI（Uniform Resource Identifier）のオブジェクト表現を提供します。" },
+        { "csharp:operatingsystem", "オペレーティングシステムクラス（System.OperatingSystem）。現在のオペレーティングシステムをチェックするための静的メソッド（IsWindows()、IsLinux()、IsMacOS() など）を提供します。" },
+        { "csharp:environment", "環境クラス（System.Environment）。現在の環境とプラットフォームに関する情報、およびそれらを操作する方法を提供します。" },
+        // System.IO
+        { "csharp:path", "パスクラス（System.IO.Path）。ファイルまたはディレクトリのパス情報を含む String インスタンスに対して操作を実行します。" },
+        // System.Collections.Generic
+        { "csharp:hashset", "ハッシュセットクラス（System.Collections.Generic.HashSet<T>）。値のセットを表し、高性能なセット演算を提供します。" },
+        // System.Text
+        { "csharp:stringbuilder", "文字列ビルダークラス（System.Text.StringBuilder）。変更可能な文字列を表し、文字列の頻繁な変更があるシナリオに適しています。" },
+    };
+
+    // 完全な名前空間変換辞書
+    private static readonly Dictionary<string, string> TranslationDictionary = new(CSharpKeywords)
+    {
+        // 完全な名前空間キーを追加
+        { "csharp:System.Net.IPAddress", "IP アドレスクラス（System.Net.IPAddress）。Internet Protocol (IP) アドレスを表します。" },
+        { "csharp:System.Net.Sockets.AddressFamily", "アドレスファミリ列挙（System.Net.Sockets.AddressFamily）。InterNetwork（IPv4）や InterNetworkV6（IPv6）など、ネットワークアドレスのアドレッシングスキームを指定します。" },
+        { "csharp:System.Uri", "統一リソース識別子クラス（System.Uri）。Web リソースにアクセスするための URI のオブジェクト表現を提供します。" },
+        { "csharp:System.OperatingSystem", "オペレーティングシステムクラス（System.OperatingSystem）。IsWindows()、IsLinux()、IsMacOS() など、現在のオペレーティングシステムを確認する静的メソッドを提供します。" },
+        { "csharp:System.Environment", "環境クラス（System.Environment）。現在の環境とプラットフォームに関する情報と、それらを操作する手段を提供します。" },
+        { "csharp:System.IO.Path", "パスクラス（System.IO.Path）。ファイルまたはディレクトリのパス情報を含む String インスタンスに対して操作を実行します。" },
+        { "csharp:System.Collections.Generic.HashSet", "ハッシュセットクラス（System.Collections.Generic.HashSet<T>）。値のセットを表し、高性能なセット演算を提供します。" },
+        { "csharp:System.Text.StringBuilder", "文字列ビルダークラス（System.Text.StringBuilder）。変更可能な文字列を表し、文字列の頻繁な変更があるシナリオに適しています。" },
+    };
 }

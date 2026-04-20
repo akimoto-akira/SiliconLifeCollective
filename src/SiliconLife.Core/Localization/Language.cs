@@ -101,5 +101,10 @@ public enum Language
     /// <summary>
     /// Japanese (Japan)
     /// </summary>
-    JaJP
+    JaJP,
+
+    /// <summary>
+    /// Korean (South Korea)
+    /// </summary>
+    KoKR
 }

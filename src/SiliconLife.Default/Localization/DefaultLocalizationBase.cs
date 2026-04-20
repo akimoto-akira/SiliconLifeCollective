@@ -1475,8 +1475,9 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the localized display name for a configuration property
     /// </summary>
     /// <param name="displayNameKey">The display name localization key</param>
+    /// <param name="found">Whether the localized value was found</param>
     /// <returns>The localized display name, or the key itself if not found</returns>
-    public abstract string GetConfigDisplayName(string displayNameKey);
+    public abstract string GetConfigDisplayName(string displayNameKey, out bool found);
 
     /// <summary>
     /// Gets the localized description for a configuration property
@@ -2399,4 +2400,36 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string MemoryToolQueryHeader(int count, string rangeDesc);
     public abstract string MemoryToolInvalidYear { get; }
     public abstract string MemoryToolUnknownAction(string action);
+
+    // ===== Code Editor Hover Tooltip Localization =====
+
+    /// <summary>
+    /// Gets the localized label for a word type in code editor hover tooltip.
+    /// </summary>
+    /// <param name="wordType">The type of word (variable, function, class, keyword, identifier)</param>
+    /// <returns>The localized label</returns>
+    public abstract string GetCodeHoverWordTypeLabel(string wordType);
+
+    /// <summary>
+    /// Gets the localized description for a word in code editor hover tooltip.
+    /// </summary>
+    /// <param name="wordType">The type of word (variable, function, class, keyword, identifier)</param>
+    /// <param name="word">The actual word/identifier</param>
+    /// <returns>The localized description</returns>
+    public abstract string GetCodeHoverWordTypeDesc(string wordType, string word);
+
+    /// <summary>
+    /// Gets the localized description for a programming keyword in code editor hover tooltip.
+    /// </summary>
+    /// <param name="language">Programming language identifier (e.g. "csharp", "javascript")</param>
+    /// <param name="keyword">The keyword to describe</param>
+    /// <returns>Localized keyword description, or empty string if not found</returns>
+    public abstract string GetCodeHoverKeywordDesc(string language, string keyword);
+
+    /// <summary>
+    /// Gets a translation by key from the localization dictionary.
+    /// </summary>
+    /// <param name="key">The translation key</param>
+    /// <returns>Localized text, or empty string if not found</returns>
+    public abstract string GetTranslation(string key);
 }

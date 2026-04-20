@@ -551,8 +551,12 @@ public class ZhHK : DefaultLocalizationBase
     public override string GetConfigGroupName(string groupKey) =>
         ConfigGroupNames.GetValueOrDefault(groupKey, groupKey);
 
-    public override string GetConfigDisplayName(string displayNameKey) =>
-        ConfigDisplayNames.GetValueOrDefault(displayNameKey, displayNameKey);
+    public override string GetConfigDisplayName(string displayNameKey, out bool found)
+    {
+        var result = ConfigDisplayNames.TryGetValue(displayNameKey, out var value);
+        found = result;
+        return result ? value : displayNameKey;
+    }
 
     public override string? GetConfigDescription(string descriptionKey) =>
         ConfigDescriptions.GetValueOrDefault(descriptionKey);
@@ -1435,4 +1439,157 @@ public class ZhHK : DefaultLocalizationBase
     public override string MemoryToolQueryHeader(int count, string rangeDesc) => $"{rangeDesc} 共 {count} 條記憶：";
     public override string MemoryToolInvalidYear => "'year' 參數無效";
     public override string MemoryToolUnknownAction(string action) => $"未知操作：{action}";
+
+    // ===== Code Editor Hover Tooltip Localization =====
+
+    public override string GetCodeHoverWordTypeLabel(string wordType) => wordType switch
+    {
+        "variable" => "變數",
+        "function" => "函數",
+        "class" => "類別",
+        "keyword" => "關鍵字",
+        "comment" => "註釋",
+        "namespace" => "命名空間",
+        "parameter" => "參數",
+        _ => "識別符"
+    };
+
+    public override string GetCodeHoverWordTypeDesc(string wordType, string word)
+    {
+        var encodedWord = System.Net.WebUtility.HtmlEncode(word);
+        return wordType switch
+        {
+            "variable" => $"變數 '{encodedWord}' 的定義和使用資訊",
+            "function" => $"函數 '{encodedWord}' 的簽名和說明",
+            "class" => $"類別 '{encodedWord}' 的結構和說明",
+            "keyword" => $"關鍵字 '{encodedWord}' 的語法和用途",
+            "comment" => $"註釋中的單詞 '{encodedWord}'",
+            "namespace" => $"命名空間 '{encodedWord}' 的資訊",
+            "parameter" => $"參數 '{encodedWord}' 的定義和用途",
+            _ => $"識別符 '{encodedWord}' 的資訊"
+        };
+    }
+
+    public override string GetCodeHoverKeywordDesc(string language, string keyword)
+    {
+        var key = $"{language}:{keyword.ToLower()}";
+        return CSharpKeywords.GetValueOrDefault(key, "");
+    }
+
+    public override string GetTranslation(string key)
+    {
+        return TranslationDictionary.GetValueOrDefault(key, "");
+    }
+
+    private static readonly Dictionary<string, string> CSharpKeywords = new()
+    {
+        { "csharp:if", "條件分支語句。當條件表達式為 true 時執行程式碼區塊。" },
+        { "csharp:else", "條件分支的替代路徑。與 if 配合使用，當條件為 false 時執行。" },
+        { "csharp:for", "計數迴圈語句。包含初始化、條件判斷和迭代三個部分。" },
+        { "csharp:while", "條件迴圈語句。條件為 true 時重複執行程式碼區塊。" },
+        { "csharp:do", "後測試迴圈語句。先執行一次程式碼區塊，再判斷條件是否繼續迴圈。" },
+        { "csharp:switch", "多選分支語句。根據表達式的值匹配不同的 case 分支。" },
+        { "csharp:case", "switch 語句中的分支標籤。匹配特定值時執行對應程式碼區塊。" },
+        { "csharp:break", "跳出語句。立即終止最近的迴圈或 switch 語句。" },
+        { "csharp:continue", "繼續語句。跳過當前迴圈的剩餘部分，進入下一次迭代。" },
+        { "csharp:return", "返回語句。退出當前方法並可選地返回一個值。" },
+        { "csharp:goto", "跳轉語句。無條件跳轉到指定的標籤位置。" },
+        { "csharp:foreach", "集合遍歷語句。依次訪問集合中的每個元素。" },
+        { "csharp:class", "參考型別宣告。定義包含資料（欄位、屬性）和行為（方法）的結構。" },
+        { "csharp:interface", "介面宣告。定義類別或結構必須實作的契約。" },
+        { "csharp:struct", "實值型別宣告。輕量級資料結構，配置在堆疊上。" },
+        { "csharp:enum", "列舉型別宣告。定義一組具名的整數常量。" },
+        { "csharp:namespace", "命名空間宣告。組織程式碼的邏輯容器，避免命名衝突。" },
+        { "csharp:record", "記錄型別宣告。具有值語義的參考型別，適合不可變資料。" },
+        { "csharp:delegate", "委託宣告。型別安全的方法參考，用於事件和回呼。" },
+        { "csharp:public", "公共存取修飾詞。成員可被任何程式碼存取。" },
+        { "csharp:private", "私有存取修飾詞。成員只能在包含型別內部存取。" },
+        { "csharp:protected", "受保護存取修飾詞。成員可在包含型別及其衍生型別中存取。" },
+        { "csharp:internal", "內部存取修飾詞。成員只能在同一組件內存取。" },
+        { "csharp:sealed", "密封修飾詞。防止類別被繼承或方法被覆寫。" },
+        { "csharp:int", "32 位元帶符號整數型別（System.Int32 的別名）。" },
+        { "csharp:string", "字串型別（System.String 的別名）。表示 Unicode 字元序列，不可變。" },
+        { "csharp:bool", "布林型別（System.Boolean 的別名）。值為 true 或 false。" },
+        { "csharp:float", "32 位元單精確度浮點數型別（System.Single 的別名）。" },
+        { "csharp:double", "64 位元雙精確度浮點數型別（System.Double 的別名）。" },
+        { "csharp:decimal", "128 位元高精確度十進位數型別，適合金融計算。" },
+        { "csharp:char", "16 位元 Unicode 字元型別（System.Char 的別名）。" },
+        { "csharp:byte", "8 位元無符號整數型別（System.Byte 的別名）。" },
+        { "csharp:object", "所有型別的基底類別（System.Object 的別名）。" },
+        { "csharp:var", "隱含型別區域變數。編譯器從初始化表達式推斷型別。" },
+        { "csharp:dynamic", "動態型別。跳過編譯時型別檢查，在執行時期解析。" },
+        { "csharp:void", "無回傳值型別。表示方法不回傳任何值。" },
+        { "csharp:static", "靜態修飾詞。屬於型別本身而非特定物件實例。" },
+        { "csharp:abstract", "抽象修飾詞。表示不完整的實作，必須由衍生類別完成。" },
+        { "csharp:virtual", "虛擬修飾詞。方法或屬性可在衍生類別中被覆寫。" },
+        { "csharp:override", "覆寫修飾詞。提供對基底類別虛擬方法或抽象方法的新實作。" },
+        { "csharp:const", "常量修飾詞。編譯時確定的不可變值。" },
+        { "csharp:readonly", "唯讀修飾詞。只能在宣告或建構函式中賦值。" },
+        { "csharp:volatile", "易變修飾詞。表示欄位可能被多個執行緒併行修改。" },
+        { "csharp:async", "非同步修飾詞。標記方法包含非同步作業，通常與 await 配合使用。" },
+        { "csharp:await", "等待運算子。暫停方法執行直到非同步作業完成。" },
+        { "csharp:partial", "分部修飾詞。允許類別、結構或介面分布在多個檔案中。" },
+        { "csharp:ref", "參考參數。按參考傳遞參數。" },
+        { "csharp:out", "輸出參數。用於從方法中回傳多個值。" },
+        { "csharp:in", "唯讀參考參數。按參考傳遞但不允許修改。" },
+        { "csharp:params", "可變參數修飾詞。允許傳遞可變數量的同型別參數。" },
+        { "csharp:try", "例外處理區塊。包含可能擲回例外的程式碼。" },
+        { "csharp:catch", "例外擷取區塊。處理 try 區塊中擲回的例外。" },
+        { "csharp:finally", "最終執行區塊。無論是否發生例外都會執行的程式碼。" },
+        { "csharp:throw", "擲回例外語句。手動擲回例外物件。" },
+        { "csharp:new", "建立實例運算子。建立物件或呼叫建構函式。" },
+        { "csharp:this", "當前實例參考。參考當前類別的實例。" },
+        { "csharp:base", "基底類別參考。參考直接基底類別的成員。" },
+        { "csharp:using", "指示詞或語句。匯入命名空間或確保 IDisposable 資源被釋放。" },
+        { "csharp:yield", "迭代器關鍵字。逐個回傳值，實現延遲執行。" },
+        { "csharp:lock", "鎖定語句。確保同一時刻只有一個執行緒執行程式碼區塊。" },
+        { "csharp:typeof", "型別運算子。取得型別的 System.Type 物件。" },
+        { "csharp:nameof", "名稱運算子。取得變數、型別或成員的字串名稱。" },
+        { "csharp:is", "型別檢查運算子。檢查物件是否相容指定型別。" },
+        { "csharp:as", "型別轉換運算子。安全地嘗試型別轉換，失敗時回傳 null。" },
+        { "csharp:null", "空值字面量。表示參考型別或可空型別的空參考。" },
+        { "csharp:true", "布林真值。" },
+        { "csharp:false", "布林假值。" },
+        { "csharp:default", "預設值表達式。取得型別的預設值（參考型別為 null，數值型別為 0）。" },
+        { "csharp:operator", "運算子宣告。定義自訂型別上的運算子行為。" },
+        { "csharp:explicit", "明確轉換宣告。需要強制型別轉換的轉換運算子。" },
+        { "csharp:implicit", "隱含轉換宣告。可自動執行的轉換運算子。" },
+        { "csharp:unchecked", "取消檢查區塊。停用整型算術溢位的檢查。" },
+        { "csharp:checked", "檢查區塊。啟用整型算術溢位的檢查。" },
+        { "csharp:fixed", "固定語句。固定記憶體位置以防止記憶體回收移動。" },
+        { "csharp:stackalloc", "堆疊配置運算子。在堆疊上配置記憶體區塊。" },
+        { "csharp:extern", "外部修飾詞。表示方法在外部組件中實作（如 DLL）。" },
+        { "csharp:unsafe", "不安全程式碼區塊。允許使用指標等不安全特性。" },
+        // 平台核心類型
+        { "csharp:ipermissioncallback", "權限回呼介面。用於評估矽基生命體的各種操作權限（網路、命令列、檔案存取等）。" },
+        { "csharp:permissionresult", "權限結果列舉。表示權限評估的結果：Allowed（允許）、Denied（拒絕）、AskUser（詢問使用者）。" },
+        { "csharp:permissiontype", "權限類型列舉。定義權限的種類：NetworkAccess（網路存取）、CommandLine（命令列執行）、FileAccess（檔案存取）、Function（函式呼叫）、DataAccess（資料存取）。" },
+        // System.Net
+        { "csharp:ipaddress", "IP 位址類別（System.Net.IPAddress）。表示 Internet Protocol (IP) 位址。" },
+        { "csharp:addressfamily", "位址族列舉（System.Net.Sockets.AddressFamily）。指定網路位址的定址方案，如 InterNetwork（IPv4）、InterNetworkV6（IPv6）。" },
+        // System
+        { "csharp:uri", "統一資源識別碼類別（System.Uri）。提供 URI（Uniform Resource Identifier）的物件表示，用於存取 Web 資源。" },
+        { "csharp:operatingsystem", "作業系統類別（System.OperatingSystem）。提供用於檢查目前作業系統的靜態方法，如 IsWindows()、IsLinux()、IsMacOS()。" },
+        { "csharp:environment", "環境類別（System.Environment）。提供有關目前環境和平台的資訊，以及操作它們的方法。" },
+        // System.IO
+        { "csharp:path", "路徑類別（System.IO.Path）。對包含檔案或目錄路徑資訊的 String 執行個體執行操作。" },
+        // System.Collections.Generic
+        { "csharp:hashset", "雜湊集類別（System.Collections.Generic.HashSet<T>）。表示值的集，提供高效能的集運算。" },
+        // System.Text
+        { "csharp:stringbuilder", "字串建構器類別（System.Text.StringBuilder）。表示可變字元字串，適合頻繁修改字串的場景。" },
+    };
+
+    // 完整命名空間翻譯字典
+    private static readonly Dictionary<string, string> TranslationDictionary = new(CSharpKeywords)
+    {
+        // 添加完整命名空間鍵
+        { "csharp:System.Net.IPAddress", "IP 位址類別（System.Net.IPAddress）。表示 Internet Protocol (IP) 位址。" },
+        { "csharp:System.Net.Sockets.AddressFamily", "位址族列舉（System.Net.Sockets.AddressFamily）。指定網路位址的定址方案，如 InterNetwork（IPv4）、InterNetworkV6（IPv6）。" },
+        { "csharp:System.Uri", "統一資源識別碼類別（System.Uri）。提供 URI（Uniform Resource Identifier）的物件表示，用於存取 Web 資源。" },
+        { "csharp:System.OperatingSystem", "作業系統類別（System.OperatingSystem）。提供用於檢查目前作業系統的靜態方法，如 IsWindows()、IsLinux()、IsMacOS()。" },
+        { "csharp:System.Environment", "環境類別（System.Environment）。提供有關目前環境和平台的資訊，以及操作它們的方法。" },
+        { "csharp:System.IO.Path", "路徑類別（System.IO.Path）。對包含檔案或目錄路徑資訊的 String 執行個體執行操作。" },
+        { "csharp:System.Collections.Generic.HashSet", "雜湊集類別（System.Collections.Generic.HashSet<T>）。表示值的集，提供高效能的集運算。" },
+        { "csharp:System.Text.StringBuilder", "字串建構器類別（System.Text.StringBuilder）。表示可變字元字串，適合頻繁修改字串的場景。" },
+    };
 }

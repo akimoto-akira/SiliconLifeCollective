@@ -694,8 +694,12 @@ public class ZhCN : DefaultLocalizationBase
     public override string GetConfigGroupName(string groupKey) =>
         ConfigGroupNames.GetValueOrDefault(groupKey, groupKey);
 
-    public override string GetConfigDisplayName(string displayNameKey) =>
-        ConfigDisplayNames.GetValueOrDefault(displayNameKey, displayNameKey);
+    public override string GetConfigDisplayName(string displayNameKey, out bool found)
+    {
+        var result = ConfigDisplayNames.TryGetValue(displayNameKey, out var value);
+        found = result;
+        return result ? value : displayNameKey;
+    }
 
     public override string? GetConfigDescription(string descriptionKey) =>
         ConfigDescriptions.GetValueOrDefault(descriptionKey);
@@ -1581,4 +1585,164 @@ public class ZhCN : DefaultLocalizationBase
     public override string MemoryToolQueryHeader(int count, string rangeDesc) => $"{rangeDesc} 共 {count} 条记忆：";
     public override string MemoryToolInvalidYear => "'year' 参数无效";
     public override string MemoryToolUnknownAction(string action) => $"未知操作：{action}";
+
+    // ===== Code Editor Hover Tooltip Localization =====
+
+    public override string GetCodeHoverWordTypeLabel(string wordType) => wordType switch
+    {
+        "variable" => "变量",
+        "function" => "函数",
+        "class" => "类",
+        "keyword" => "关键字",
+        "comment" => "注释",
+        "namespace" => "命名空间",
+        "parameter" => "参数",
+        _ => "标识符"
+    };
+
+    public override string GetCodeHoverWordTypeDesc(string wordType, string word)
+    {
+        var encodedWord = System.Net.WebUtility.HtmlEncode(word);
+        return wordType switch
+        {
+            "variable" => $"变量 '{encodedWord}' 的定义和使用信息",
+            "function" => $"函数 '{encodedWord}' 的签名和说明",
+            "class" => $"类 '{encodedWord}' 的结构和说明",
+            "keyword" => $"关键字 '{encodedWord}' 的语法和用途",
+            "comment" => $"注释中的单词 '{encodedWord}'",
+            "namespace" => $"命名空间 '{encodedWord}' 的信息",
+            "parameter" => $"参数 '{encodedWord}' 的定义和用途",
+            _ => $"标识符 '{encodedWord}' 的信息"
+        };
+    }
+
+    public override string GetCodeHoverKeywordDesc(string language, string keyword)
+    {
+        var key = $"{language}:{keyword.ToLower()}";
+        return CSharpKeywords.GetValueOrDefault(key, "");
+    }
+
+    public override string GetTranslation(string key)
+    {
+        return TranslationDictionary.GetValueOrDefault(key, "");
+    }
+
+    private static readonly Dictionary<string, string> CSharpKeywords = new()
+    {
+        // 控制流
+        { "csharp:if", "条件分支语句。当条件表达式为 true 时执行代码块。" },
+        { "csharp:else", "条件分支的替代路径。与 if 配合使用，当条件为 false 时执行。" },
+        { "csharp:for", "计数循环语句。包含初始化、条件判断和迭代三个部分。" },
+        { "csharp:while", "条件循环语句。条件为 true 时重复执行代码块。" },
+        { "csharp:do", "后测试循环语句。先执行一次代码块，再判断条件是否继续循环。" },
+        { "csharp:switch", "多选分支语句。根据表达式的值匹配不同的 case 分支。" },
+        { "csharp:case", "switch 语句中的分支标签。匹配特定值时执行对应代码块。" },
+        { "csharp:break", "跳出语句。立即终止最近的循环或 switch 语句。" },
+        { "csharp:continue", "继续语句。跳过当前循环的剩余部分，进入下一次迭代。" },
+        { "csharp:return", "返回语句。退出当前方法并可选地返回一个值。" },
+        { "csharp:goto", "跳转语句。无条件跳转到指定的标签位置。" },
+        { "csharp:foreach", "集合遍历语句。依次访问集合中的每个元素。" },
+        // 类型声明
+        { "csharp:class", "引用类型声明。定义包含数据（字段、属性）和行为（方法）的结构。" },
+        { "csharp:interface", "接口声明。定义类或结构必须实现的契约。" },
+        { "csharp:struct", "值类型声明。轻量级数据结构，分配在栈上。" },
+        { "csharp:enum", "枚举类型声明。定义一组命名的整数常量。" },
+        { "csharp:namespace", "命名空间声明。组织代码的逻辑容器，避免命名冲突。" },
+        { "csharp:record", "记录类型声明。具有值语义的引用类型，适合不可变数据。" },
+        { "csharp:delegate", "委托声明。类型安全的方法引用，用于事件和回调。" },
+        // 访问修饰符
+        { "csharp:public", "公共访问修饰符。成员可被任何代码访问。" },
+        { "csharp:private", "私有访问修饰符。成员只能在包含类型内部访问。" },
+        { "csharp:protected", "受保护访问修饰符。成员可在包含类型及其派生类型中访问。" },
+        { "csharp:internal", "内部访问修饰符。成员只能在同一程序集内访问。" },
+        { "csharp:sealed", "密封修饰符。防止类被继承或方法被重写。" },
+        // 类型关键字
+        { "csharp:int", "32 位有符号整数类型（System.Int32 的别名）。" },
+        { "csharp:string", "字符串类型（System.String 的别名）。表示 Unicode 字符序列，不可变。" },
+        { "csharp:bool", "布尔类型（System.Boolean 的别名）。值为 true 或 false。" },
+        { "csharp:float", "32 位单精度浮点数类型（System.Single 的别名）。" },
+        { "csharp:double", "64 位双精度浮点数类型（System.Double 的别名）。" },
+        { "csharp:decimal", "128 位高精度十进制数类型，适合金融计算。" },
+        { "csharp:char", "16 位 Unicode 字符类型（System.Char 的别名）。" },
+        { "csharp:byte", "8 位无符号整数类型（System.Byte 的别名）。" },
+        { "csharp:object", "所有类型的基类（System.Object 的别名）。" },
+        { "csharp:var", "隐式类型局部变量。编译器从初始化表达式推断类型。" },
+        { "csharp:dynamic", "动态类型。跳过编译时类型检查，在运行时解析。" },
+        { "csharp:void", "无返回值类型。表示方法不返回任何值。" },
+        // 修饰符
+        { "csharp:static", "静态修饰符。属于类型本身而非特定对象实例。" },
+        { "csharp:abstract", "抽象修饰符。表示不完整的实现，必须由派生类完成。" },
+        { "csharp:virtual", "虚修饰符。方法或属性可在派生类中被重写。" },
+        { "csharp:override", "重写修饰符。提供对基类虚方法或抽象方法的新实现。" },
+        { "csharp:const", "常量修饰符。编译时确定的不可变值。" },
+        { "csharp:readonly", "只读修饰符。只能在声明或构造函数中赋值。" },
+        { "csharp:volatile", "易失修饰符。表示字段可能被多个线程并发修改。" },
+        { "csharp:async", "异步修饰符。标记方法包含异步操作，通常与 await 配合使用。" },
+        { "csharp:await", "等待运算符。暂停方法执行直到异步操作完成。" },
+        { "csharp:partial", "分部修饰符。允许类、结构或接口分布在多个文件中。" },
+        { "csharp:ref", "引用参数。按引用传递参数。" },
+        { "csharp:out", "输出参数。用于从方法中返回多个值。" },
+        { "csharp:in", "只读引用参数。按引用传递但不允许修改。" },
+        { "csharp:params", "可变参数修饰符。允许传递可变数量的同类型参数。" },
+        // 异常处理
+        { "csharp:try", "异常处理块。包含可能抛出异常的代码。" },
+        { "csharp:catch", "异常捕获块。处理 try 块中抛出的异常。" },
+        { "csharp:finally", "最终执行块。无论是否发生异常都会执行的代码。" },
+        { "csharp:throw", "抛出异常语句。手动抛出异常对象。" },
+        // 其他
+        { "csharp:new", "创建实例运算符。创建对象或调用构造函数。" },
+        { "csharp:this", "当前实例引用。引用当前类的实例。" },
+        { "csharp:base", "基类引用。引用直接基类的成员。" },
+        { "csharp:using", "指令或语句。导入命名空间或确保 IDisposable 资源被释放。" },
+        { "csharp:yield", "迭代器关键字。逐个返回值，实现延迟执行。" },
+        { "csharp:lock", "锁语句。确保同一时刻只有一个线程执行代码块。" },
+        { "csharp:typeof", "类型运算符。获取类型的 System.Type 对象。" },
+        { "csharp:nameof", "名称运算符。获取变量、类型或成员的字符串名称。" },
+        { "csharp:is", "类型检查运算符。检查对象是否兼容指定类型。" },
+        { "csharp:as", "类型转换运算符。安全地尝试类型转换，失败时返回 null。" },
+        { "csharp:null", "空值字面量。表示引用类型或可空类型的空引用。" },
+        { "csharp:true", "布尔真值。" },
+        { "csharp:false", "布尔假值。" },
+        { "csharp:default", "默认值表达式。获取类型的默认值（引用类型为 null，数值类型为 0）。" },
+        { "csharp:operator", "运算符声明。定义自定义类型上的运算符行为。" },
+        { "csharp:explicit", "显式转换声明。需要强制类型转换的转换运算符。" },
+        { "csharp:implicit", "隐式转换声明。可自动执行的转换运算符。" },
+        { "csharp:unchecked", "取消检查块。禁用整型算术溢出的检查。" },
+        { "csharp:checked", "检查块。启用整型算术溢出的检查。" },
+        { "csharp:fixed", "固定语句。固定内存位置以防止垃圾回收移动。" },
+        { "csharp:stackalloc", "栈分配运算符。在栈上分配内存块。" },
+        { "csharp:extern", "外部修饰符。表示方法在外部程序集中实现（如 DLL）。" },
+        { "csharp:unsafe", "不安全代码块。允许使用指针等不安全特性。" },
+        // 平台核心类型
+        { "csharp:ipermissioncallback", "权限回调接口。用于评估硅基生命体的各种操作权限（网络、命令行、文件访问等）。" },
+        { "csharp:permissionresult", "权限结果枚举。表示权限评估的结果：Allowed（允许）、Denied（拒绝）、AskUser（询问用户）。" },
+        { "csharp:permissiontype", "权限类型枚举。定义权限的种类：NetworkAccess（网络访问）、CommandLine（命令行执行）、FileAccess（文件访问）、Function（函数调用）、DataAccess（数据访问）。" },
+        // System.Net
+        { "csharp:ipaddress", "IP 地址类（System.Net.IPAddress）。表示 Internet Protocol (IP) 地址。" },
+        { "csharp:addressfamily", "地址族枚举（System.Net.Sockets.AddressFamily）。指定网络地址的寻址方案，如 InterNetwork（IPv4）、InterNetworkV6（IPv6）。" },
+        // System
+        { "csharp:uri", "统一资源标识符类（System.Uri）。提供 URI（Uniform Resource Identifier）的对象表示，用于访问 Web 资源。" },
+        { "csharp:operatingsystem", "操作系统类（System.OperatingSystem）。提供用于检查当前操作系统的静态方法，如 IsWindows()、IsLinux()、IsMacOS()。" },
+        { "csharp:environment", "环境类（System.Environment）。提供有关当前环境和平台的信息，以及操作它们的方法。" },
+        // System.IO
+        { "csharp:path", "路径类（System.IO.Path）。对包含文件或目录路径信息的 String 实例执行操作。" },
+        // System.Collections.Generic
+        { "csharp:hashset", "哈希集类（System.Collections.Generic.HashSet<T>）。表示值的集，提供高性能的集运算。" },
+        // System.Text
+        { "csharp:stringbuilder", "字符串构建器类（System.Text.StringBuilder）。表示可变字符字符串，适合频繁修改字符串的场景。" },
+    };
+
+    // 完整命名空间翻译字典
+    private static readonly Dictionary<string, string> TranslationDictionary = new(CSharpKeywords)
+    {
+        // 添加完整命名空间键
+        { "csharp:System.Net.IPAddress", "IP 地址类（System.Net.IPAddress）。表示 Internet Protocol (IP) 地址。" },
+        { "csharp:System.Net.Sockets.AddressFamily", "地址族枚举（System.Net.Sockets.AddressFamily）。指定网络地址的寻址方案，如 InterNetwork（IPv4）、InterNetworkV6（IPv6）。" },
+        { "csharp:System.Uri", "统一资源标识符类（System.Uri）。提供 URI（Uniform Resource Identifier）的对象表示，用于访问 Web 资源。" },
+        { "csharp:System.OperatingSystem", "操作系统类（System.OperatingSystem）。提供用于检查当前操作系统的静态方法，如 IsWindows()、IsLinux()、IsMacOS()。" },
+        { "csharp:System.Environment", "环境类（System.Environment）。提供有关当前环境和平台的信息，以及操作它们的方法。" },
+        { "csharp:System.IO.Path", "路径类（System.IO.Path）。对包含文件或目录路径信息的 String 实例执行操作。" },
+        { "csharp:System.Collections.Generic.HashSet", "哈希集类（System.Collections.Generic.HashSet<T>）。表示值的集，提供高性能的集运算。" },
+        { "csharp:System.Text.StringBuilder", "字符串构建器类（System.Text.StringBuilder）。表示可变字符字符串，适合频繁修改字符串的场景。" },
+    };
 }
