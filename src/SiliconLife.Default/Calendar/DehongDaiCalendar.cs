@@ -14,7 +14,7 @@
 namespace SiliconLife.Default;
 
 /// <summary>
-/// Implements the Dehong Dai (德宏大傣历) lunisolar calendar.
+/// Implements the Dehong Dai (Da Dai / Major Dai) lunisolar calendar.
 /// <para>
 /// Uses the same astronomical algorithm as <see cref="DaiCalendar"/> (Xishuangbanna),
 /// but with a different epoch: Gregorian year = Dehong Dai year + 579.

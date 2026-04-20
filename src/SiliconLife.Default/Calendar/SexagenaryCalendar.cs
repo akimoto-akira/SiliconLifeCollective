@@ -14,15 +14,15 @@
 namespace SiliconLife.Default;
 
 /// <summary>
-/// Implements the Chinese Sexagenary Cycle (干支 Ganzhi) calendar.
+/// Implements the Chinese Sexagenary Cycle (Ganzhi) calendar.
 /// Components: yearStem, yearBranch, monthStem, monthBranch, dayStem, dayBranch, hour, minute, second.
 /// Based on the Chinese Lunar calendar year for year/month Ganzhi, and JDN for day Ganzhi.
 /// </summary>
 public class SexagenaryCalendar(DefaultLocalizationBase loc) : CalendarBase
 {
-    // Reference: 1984 = 甲子年 (stem=0, branch=0)
+    // Reference: 1984 = Jia-Zi year (stem=0, branch=0)
     private const int RefYear = 1984;
-    // Reference day: JDN 2451545 (2000-01-01) = 戊午 (stem=4, branch=6)
+    // Reference day: JDN 2451545 (2000-01-01) = Wu-Wu (stem=4, branch=6)
     private const int RefDayJdn    = 2451545;
     private const int RefDayStem   = 4;
     private const int RefDayBranch = 6;

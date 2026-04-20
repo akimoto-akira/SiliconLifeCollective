@@ -14,18 +14,18 @@
 namespace SiliconLife.Default;
 
 /// <summary>
-/// Implements the Yi ethnic solar calendar (彝历).
+/// Implements the Yi ethnic solar calendar.
 ///
 /// Year structure (365 / 366 days):
-///   - Month  0 : New Year (大年)  — 3 days, winter solstice
+///   - Month  0 : New Year — 3 days, winter solstice
 ///   - Months 1–5  : first half  — 5 × 36 days (180 days)
-///   - Month 11 : Mid-Year (小年) — 2 days (3 in leap year), summer solstice
+///   - Month 11 : Mid-Year — 2 days (3 in leap year), summer solstice
 ///   - Months 6–10 : second half — 5 × 36 days (180 days)
 ///
-/// Each regular month (1–10) belongs to one of five seasons (木火土金水).
-///   Odd months are male (公月), even months are female (母月).
-/// Each 36-day month is divided into three xun (旬) of 12 days each.
-///   Days within a xun are named by the 12 animals (虎兔龙蛇马羊猴鸡狗猪鼠牛).
+/// Each regular month (1–10) belongs to one of five seasons (Wood, Fire, Earth, Metal, Water).
+///   Odd months are male, even months are female.
+/// Each 36-day month is divided into three xun of 12 days each.
+///   Days within a xun are named by the 12 animals (Tiger, Rabbit, Dragon, Snake, Horse, Goat, Monkey, Rooster, Dog, Pig, Rat, Ox).
 ///
 /// Leap year rule: same as Gregorian (divisible by 4, except centuries unless by 400).
 /// Yi year N starts at the winter solstice of Gregorian year N−1 (approx. Dec 22).

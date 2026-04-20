@@ -14,7 +14,7 @@
 namespace SiliconLife.Default;
 
 /// <summary>
-/// Implements the Xishuangbanna Dai (小傣历) lunisolar calendar.
+/// Implements the Xishuangbanna Dai (Xiao Dai / Minor Dai) lunisolar calendar.
 /// <para>
 /// New Year falls on the first new moon on or after the vernal equinox (around April 13–15 Gregorian).
 /// Epoch: Julian 638-03-21 (JDN 1954168). Leap years contain 13 new moons; the leap month is
