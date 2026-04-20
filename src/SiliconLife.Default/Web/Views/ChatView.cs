@@ -668,7 +668,7 @@ public class ChatView : ViewBase
                 .Property("z-index", "1001")
             .EndSelector()
             .Selector(".permission-dialog")
-                // bg-card → bg-secondary → bg-white fallback，确保任何皮肤下弹窗都不透明
+                // bg-card → bg-secondary → bg-white fallback, ensure dialog is never opaque in any skin
                 .Property("background", "var(--bg-card, var(--bg-secondary, var(--bg-white, #ffffff)))")
                 .Property("border", "1px solid var(--border)")
                 .Property("border-radius", "12px")
@@ -684,7 +684,7 @@ public class ChatView : ViewBase
                 .Property("margin-bottom", "16px")
             .EndSelector()
             .Selector(".permission-details")
-                // bg-tertiary → bg-secondary fallback，浅色皮肤下给一个可见的区分背景
+                // bg-tertiary → bg-secondary fallback, give a visible distinguishing background in light skins
                 .Property("background", "var(--bg-tertiary, var(--bg-secondary, rgba(0,0,0,0.04)))")
                 .Property("border-radius", "8px")
                 .Property("padding", "12px 16px")
@@ -726,7 +726,7 @@ public class ChatView : ViewBase
             .EndSelector()
             .Selector(".btn-permission-allow")
                 .Property("padding", "8px 24px")
-                // accent-success 在所有皮肤中均有定义，fallback 到通用绿色
+                // accent-success is defined in all skins, fallback to generic green
                 .Property("background", "var(--accent-success, #4CAF50)")
                 .Property("color", "#fff")
                 .Property("border", "none")
@@ -741,7 +741,7 @@ public class ChatView : ViewBase
             .EndSelector()
             .Selector(".btn-permission-deny")
                 .Property("padding", "8px 24px")
-                // accent-error → accent-danger fallback（AdminSkin 用 accent-danger 而非 accent-error）
+                // accent-error → accent-danger fallback (AdminSkin uses accent-danger instead of accent-error)
                 .Property("background", "var(--accent-error, var(--accent-danger, #f44336))")
                 .Property("color", "#fff")
                 .Property("border", "none")

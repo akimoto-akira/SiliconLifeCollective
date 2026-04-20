@@ -17,13 +17,13 @@ public class CodeEditorView : ViewBase
 {
     public override string Render(object model)
     {
-        // CodeEditorView 是组件视图，不直接渲染完整页面
-        // 应使用 RenderWidget 方法获取组件 HTML
+        // CodeEditorView is a component view, does not render a complete page directly
+        // Should use RenderWidget method to get component HTML
         return string.Empty;
     }
 
     /// <summary>
-    /// 渲染代码编辑器组件（HTML + Scripts）
+    /// Renders the code editor component (HTML + Scripts)
     /// </summary>
     public static (H Html, JsSyntax Scripts) RenderEditor(string editorId, string code, string language = "csharp",
         string filePath = "", bool readOnly = false, string theme = "vs-dark",
@@ -40,8 +40,8 @@ public class CodeEditorView : ViewBase
         bool minimap = true, bool lineNumbers = true, bool wordWrap = true,
         string saveEndpoint = "")
     {
-        // 不要预先转义！H.Value() 内部的 EscapeAttr 会自动处理 HTML 属性转义
-        // 如果预先转义，会导致双重转义：< → &lt; → &amp;lt;
+        // Do NOT pre-escape! EscapeAttr inside H.Value() will automatically handle HTML attribute escaping
+        // Pre-escaping would cause double escaping: < → &lt; → &amp;lt;
         var editorContainerId = editorId + "-container";
 
         var toolbarChildren = new List<object>();
@@ -116,6 +116,69 @@ public class CodeEditorView : ViewBase
                 .Property("flex", "1")
                 .Property("min-height", "300px")
                 .Property("width", "100%")
+            .EndSelector()
+            .Selector(".code-hover-tip")
+                .Property("font-family", "var(--font-family, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif)")
+                .Property("font-size", "13px")
+                .Property("line-height", "1.4")
+                .Property("max-width", "400px")
+                .Property("background", "var(--bg-tooltip, #2d2d30)")
+                .Property("color", "var(--text-tooltip, #d4d4d4)")
+                .Property("border", "1px solid var(--border-tooltip, #454545)")
+                .Property("border-radius", "4px")
+                .Property("padding", "8px 12px")
+                .Property("box-shadow", "0 2px 8px rgba(0,0,0,0.3)")
+            .EndSelector()
+            .Selector(".code-hover-tip .tip-header")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("gap", "6px")
+                .Property("margin-bottom", "6px")
+                .Property("padding-bottom", "6px")
+                .Property("border-bottom", "1px solid var(--border-tooltip, #454545)")
+            .EndSelector()
+            .Selector(".code-hover-tip .tip-type")
+                .Property("padding", "2px 6px")
+                .Property("border-radius", "3px")
+                .Property("font-size", "11px")
+                .Property("font-weight", "600")
+                .Property("text-transform", "uppercase")
+            .EndSelector()
+            .Selector(".code-hover-tip .tip-type.variable")
+                .Property("background", "var(--accent-variable, #4ec9b0)")
+                .Property("color", "#000")
+            .EndSelector()
+            .Selector(".code-hover-tip .tip-type.function")
+                .Property("background", "var(--accent-function, #dcdcaa)")
+                .Property("color", "#000")
+            .EndSelector()
+            .Selector(".code-hover-tip .tip-type.class")
+                .Property("background", "var(--accent-class, #4ec9b0)")
+                .Property("color", "#000")
+            .EndSelector()
+            .Selector(".code-hover-tip .tip-type.keyword")
+                .Property("background", "var(--accent-keyword, #c586c0)")
+                .Property("color", "#fff")
+            .EndSelector()
+            .Selector(".code-hover-tip .tip-type.identifier")
+                .Property("background", "var(--accent-identifier, #9cdcfe)")
+                .Property("color", "#000")
+            .EndSelector()
+            .Selector(".code-hover-tip .tip-word")
+                .Property("font-weight", "600")
+                .Property("color", "var(--text-primary-tooltip, #ffffff)")
+            .EndSelector()
+            .Selector(".code-hover-tip .tip-content p")
+                .Property("margin", "0 0 6px 0")
+                .Property("color", "var(--text-secondary-tooltip, #cccccc)")
+            .EndSelector()
+            .Selector(".code-hover-tip .tip-meta")
+                .Property("display", "flex")
+                .Property("gap", "12px")
+                .Property("font-size", "11px")
+                .Property("color", "var(--text-meta-tooltip, #888888)")
+                .Property("border-top", "1px solid var(--border-tooltip, #454545)")
+                .Property("padding-top", "4px")
             .EndSelector();
     }
 
@@ -127,8 +190,8 @@ public class CodeEditorView : ViewBase
         string containerId = editorId + "-container";
         string hiddenId = editorId + "-code-hidden";
         string dirtyId = editorId + "-dirty-flag";
-
-        // Monaco Editor 的语言映射
+    
+        // Monaco Editor language mapping
         var monacoLanguageMap = new Dictionary<string, string>
         {
             { "csharp", "csharp" },
@@ -156,13 +219,30 @@ public class CodeEditorView : ViewBase
             { "yaml", "yaml" },
             { "yml", "yaml" }
         };
-
+    
         var monacoLanguage = monacoLanguageMap.ContainsKey(language.ToLower()) 
             ? monacoLanguageMap[language.ToLower()] 
             : "plaintext";
 
+        // Editor cache key name
+        var editorGuidKey = editorId + "_editorGuid";
+        var updateTimerKey = editorId + "_updateTimer";
+
+        // Debounced update code block
+        var updateFetchBody = Js.Block()
+            .Add(() => Js.Let(() => "code", () => Js.Id(() => "editor").Call(() => "getValue")))
+            .Add(() => Js.Id(() => "fetch").Invoke(
+                () => Js.Str(() => "/api/code/update"),
+                () => Js.Obj()
+                    .Prop(() => "method", () => Js.Str(() => "POST"))
+                    .Prop(() => "headers", () => Js.Obj().Prop(() => "Content-Type", () => Js.Str(() => "application/json")))
+                    .Prop(() => "body", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj()
+                        .Prop(() => "editorGuid", () => Js.Id(() => "window").Index(() => Js.Str(() => editorGuidKey)))
+                        .Prop(() => "code", () => Js.Id(() => "code")))))
+            .Stmt());
+    
         JsBlock requireCallbackBody = Js.Block()
-            // 使用 monaco.editor.createModel 创建带语言支持的模型
+            // Use monaco.editor.createModel to create language-supported model
             .Add(() => Js.Let(() => "model", () => Js.Id(() => "monaco").Prop(() => "editor").Call(() => "createModel", () => Js.Id(() => "initialCode"), () => Js.Str(() => monacoLanguage))))
             .Add(() => Js.Let(() => "editor", () => Js.Id(() => "monaco").Prop(() => "editor").Call(() => "create", () => Js.Id(() => "containerEl"), () => Js.Obj()
                 .Prop(() => "model", () => Js.Id(() => "model"))
@@ -176,9 +256,141 @@ public class CodeEditorView : ViewBase
                 .Prop(() => "fontSize", () => Js.Num(() => "14"))
                 .Prop(() => "tabSize", () => Js.Num(() => "4"))
                 .Prop(() => "renderWhitespace", () => Js.Str(() => "selection"))
-                .Prop(() => "bracketPairColorization", () => Js.Obj().Prop(() => "enabled", () => Js.Bool(() => true))))))
+                .Prop(() => "bracketPairColorization", () => Js.Obj().Prop(() => "enabled", () => Js.Bool(() => true)))
+                .Prop(() => "hover", () => Js.Obj()
+                    .Prop(() => "enabled", () => Js.Bool(() => true))
+                    .Prop(() => "delay", () => Js.Num(() => "300"))))))
+            .Add(() =>
+            {
+                // Register editor to backend cache
+                var registerEditor = Js.Block()
+                    .Add(() => Js.Id(() => "fetch").Invoke(
+                        () => Js.Str(() => "/api/code/register"),
+                        () => Js.Obj()
+                            .Prop(() => "method", () => Js.Str(() => "POST"))
+                            .Prop(() => "headers", () => Js.Obj().Prop(() => "Content-Type", () => Js.Str(() => "application/json")))
+                            .Prop(() => "body", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj().Prop(() => "language", () => Js.Str(() => monacoLanguage))))
+                    ).Call(() => "then", () => Js.Arrow(() => new List<string> { "response" },
+                        () => Js.Id(() => "response").Call(() => "json")))
+                    .Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => Js.Block()
+                        // Save editorGuid
+                        .Add(() => Js.Assign(() => Js.Id(() => "window").Index(() => Js.Str(() => editorGuidKey)), () => Js.Id(() => "data").Prop(() => "editorGuid")))
+                        // Immediately upload current code to backend cache
+                        .Add(() => Js.Let(() => "initialCode", () => Js.Id(() => "editor").Call(() => "getValue")))
+                        .Add(() => Js.Id(() => "fetch").Invoke(
+                            () => Js.Str(() => "/api/code/update"),
+                            () => Js.Obj()
+                                .Prop(() => "method", () => Js.Str(() => "POST"))
+                                .Prop(() => "headers", () => Js.Obj().Prop(() => "Content-Type", () => Js.Str(() => "application/json")))
+                                .Prop(() => "body", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj()
+                                    .Prop(() => "editorGuid", () => Js.Id(() => "data").Prop(() => "editorGuid"))
+                                    .Prop(() => "code", () => Js.Id(() => "initialCode"))))))
+                    )).Stmt());
+    
+                // Custom hover provider (using POST request)
+                var hoverContentItem = Js.Obj()
+                    .Prop(() => "value", () => Js.Id(() => "html"))
+                    .Prop(() => "supportHtml", () => Js.Bool(() => true))
+                    .Prop(() => "isTrusted", () => Js.Bool(() => true));
+                    
+                var hoverRange = Js.New(() => Js.Id(() => "monaco").Prop(() => "Range"),
+                    () => Js.Id(() => "position").Prop(() => "lineNumber"),
+                    () => Js.Id(() => "word").Prop(() => "startColumn"),
+                    () => Js.Id(() => "position").Prop(() => "lineNumber"),
+                    () => Js.Id(() => "word").Prop(() => "endColumn"));
+                    
+                var hoverResult = Js.Obj()
+                    .Prop(() => "range", () => hoverRange)
+                    .Prop(() => "contents", () => Js.Array()
+                        .Add(() => hoverContentItem));
+                
+                var fetchHoverBody = Js.Obj()
+                    .Prop(() => "method", () => Js.Str(() => "POST"))
+                    .Prop(() => "headers", () => Js.Obj().Prop(() => "Content-Type", () => Js.Str(() => "application/json")))
+                    .Prop(() => "body", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj()
+                        .Prop(() => "editorGuid", () => Js.Id(() => "window").Index(() => Js.Str(() => editorGuidKey)))
+                        .Prop(() => "word", () => Js.Id(() => "word").Prop(() => "word"))
+                        .Prop(() => "language", () => Js.Str(() => monacoLanguage))
+                        .Prop(() => "line", () => Js.Id(() => "position").Prop(() => "lineNumber"))
+                        .Prop(() => "column", () => Js.Id(() => "position").Prop(() => "column"))));
+
+                var retryFetchHover = Js.Id(() => "fetch").Invoke(
+                    () => Js.Str(() => "/api/code/hover"),
+                    () => fetchHoverBody)
+                    .Call(() => "then", () => Js.Arrow(() => new List<string> { "retryResponse" },
+                        () => Js.Id(() => "retryResponse").Call(() => "text")));
+
+                var updateBodyForRetry = Js.Obj()
+                    .Prop(() => "method", () => Js.Str(() => "POST"))
+                    .Prop(() => "headers", () => Js.Obj().Prop(() => "Content-Type", () => Js.Str(() => "application/json")))
+                    .Prop(() => "body", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj()
+                        .Prop(() => "editorGuid", () => Js.Id(() => "window").Index(() => Js.Str(() => editorGuidKey)))
+                        .Prop(() => "code", () => Js.Id(() => "code"))));
+
+                var fetchHover = Js.Id(() => "fetch").Invoke(
+                    () => Js.Str(() => "/api/code/hover"),
+                    () => fetchHoverBody)
+                    .Call(() => "then", () => Js.Arrow(() => new List<string> { "response" }, () => Js.Block()
+                        .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                        {
+                            (Js.Id(() => "response").Prop(() => "status").Op(() => "===", () => Js.Num(() => "404")), new List<JsSyntax>
+                            {
+                                Js.Let(() => "code", () => Js.Id(() => "editor").Call(() => "getValue")),
+                                Js.Id(() => "fetch").Invoke(
+                                    () => Js.Str(() => "/api/code/update"),
+                                    () => updateBodyForRetry)
+                                    .Call(() => "then", () => Js.Arrow(() => new List<string>(), () => retryFetchHover)).Stmt()
+                            })
+                        }))
+                        .Add(() => Js.Return(() => Js.Id(() => "response").Call(() => "text")))))
+                    .Call(() => "then", () => Js.Arrow(() => new List<string> { "html" }, () => hoverResult));
+                
+                var hoverBody = Js.Block()
+                    .Add(() => Js.Let(() => "word", () => Js.Id(() => "model").Call(() => "getWordAtPosition", () => Js.Id(() => "position"))))
+                    .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "word").Not(), new List<JsSyntax>
+                        {
+                            Js.Return(() => Js.Null())
+                        })
+                    }))
+                    // Check if editorGuid is already registered (async registration may not be complete)
+                    .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "window").Index(() => Js.Str(() => editorGuidKey)).Op(() => "===", () => Js.Str(() => "")), new List<JsSyntax>
+                        {
+                            // editorGuid is empty, return null directly (no Roslyn analysis)
+                            Js.Return(() => Js.Null())
+                        })
+                    }))
+                    .Add(() => Js.Return(() => fetchHover));
+                
+                var hoverProvider = Js.Obj()
+                    .Prop(() => "provideHover", () => Js.Arrow(
+                        () => new List<string> { "model", "position" },
+                        () => hoverBody));
+                
+                return Js.Block()
+                    .Add(() => Js.Assign(() => Js.Id(() => "window").Index(() => Js.Str(() => editorGuidKey)), () => Js.Str(() => "")))
+                    .Add(() => registerEditor.Stmt())
+                    .Add(() => Js.Id(() => "monaco").Prop(() => "languages").Call(() => "registerHoverProvider",
+                        () => Js.Str(() => monacoLanguage),
+                        () => hoverProvider).Stmt());
+            })
             .Add(() => Js.Id(() => "editor").Call(() => "onDidChangeModelContent", () => Js.Arrow(() => new List<string>(), () => Js.Block()
-                .Add(() => Js.Assign(() => Js.Id(() => "dirtyFlag").Prop(() => "value"), () => Js.Str(() => "1"))))).Stmt())
+                .Add(() => Js.Assign(() => Js.Id(() => "dirtyFlag").Prop(() => "value"), () => Js.Str(() => "1")))
+                // Trigger debounced update
+                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                {
+                    (Js.Id(() => "window").Index(() => Js.Str(() => updateTimerKey)).Op(() => "!==", () => Js.Id(() => "undefined")), new List<JsSyntax>
+                    {
+                        Js.Id(() => "clearTimeout").Invoke(() => Js.Id(() => "window").Index(() => Js.Str(() => updateTimerKey))).Stmt()
+                    })
+                }))
+                .Add(() => Js.Assign(() => Js.Id(() => "window").Index(() => Js.Str(() => updateTimerKey)), () => Js.Id(() => "setTimeout").Invoke(
+                    () => Js.Arrow(() => new List<string>(), () => updateFetchBody),
+                    () => Js.Num(() => "1000"))))
+            )).Stmt())
             .Add(() => Js.Assign(() => Js.Id(() => "window").Index(() => Js.Str(() => editorId)), () => Js.Id(() => "editor")));
 
         JsBlock initBody = Js.Block()
@@ -253,8 +465,8 @@ public class CodeEditorView : ViewBase
 
     private static string EscapeForHtmlAttribute(string code)
     {
-        // HTML 属性需要 HTML 实体编码
-        // 浏览器会自动解码，JavaScript 读取 value 时会得到原始字符串（包括真正的换行符）
+        // HTML attributes need HTML entity encoding
+        // Browser will auto-decode, JavaScript reading value will get original string (including real newlines)
         return code
             .Replace("&", "&amp;")
             .Replace("<", "&lt;")
@@ -265,13 +477,13 @@ public class CodeEditorView : ViewBase
 
     private static string EscapeCodeForJs(string code)
     {
-        // 必须按照正确的顺序转义：先转义反斜杠，再转义其他字符
-        // 否则会导致双重转义（例如 \n 变成 \\n 再变成 \\\\n）
+        // Must escape in correct order: first backslash, then other characters
+        // Otherwise will cause double escaping (e.g., \n becomes \\n then becomes \\\\n)
         return code
-            .Replace("\\", "\\\\")  // 第一步：转义反斜杠
-            .Replace("\"", "\\\"")  // 第二步：转义双引号
-            .Replace("\n", "\\n")   // 第三步：转义换行符
-            .Replace("\r", "\\r")   // 第四步：转义回车符
-            .Replace("\t", "\\t");  // 第五步：转义制表符
+            .Replace("\\", "\\\\")  // Step 1: Escape backslash
+            .Replace("\"", "\\\"")  // Step 2: Escape double quote
+            .Replace("\n", "\\n")   // Step 3: Escape newline
+            .Replace("\r", "\\r")   // Step 4: Escape carriage return
+            .Replace("\t", "\\t");  // Step 5: Escape tab
     }
 }

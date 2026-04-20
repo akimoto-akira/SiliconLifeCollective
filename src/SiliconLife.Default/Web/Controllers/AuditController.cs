@@ -78,11 +78,11 @@ public class AuditController : Controller
         var timeRange = GetQueryValue("timeRange", "month");
         var now = DateTime.UtcNow;
 
-        // 对于week，需要特殊处理范围
+        // For week, need special range handling
         IncompleteDate range;
         if (timeRange == "week")
         {
-            // 查询整个月的数据，然后由前端过滤
+            // Query entire month's data, then filter by frontend
             range = new IncompleteDate(now.Year, now.Month);
         }
         else
@@ -101,13 +101,13 @@ public class AuditController : Controller
 
         TokenUsageSummary summary = _audit.QuerySummary(query);
 
-        // 对于week，需要过滤只统计本周的数据
+        // For week, need to filter and only count this week's data
         if (timeRange == "week")
         {
             var weekStart = now.Date.AddDays(-(int)now.DayOfWeek);
             var weekEnd = weekStart.AddDays(7);
             
-            // 重新查询记录并过滤
+            // Re-query records and filter
             var recordsQuery = new TokenUsageQuery
             {
                 Range = range,
@@ -236,11 +236,11 @@ public class AuditController : Controller
 
     private List<object> GroupByHourForWeek(List<TokenUsageRecord> records, DateTime now)
     {
-        // 计算本周的起始日期（周日）
+        // Calculate week start date (Sunday)
         var weekStart = now.Date.AddDays(-(int)now.DayOfWeek);
-        var weekEnd = weekStart.AddDays(7); // 不包含第8天
+        var weekEnd = weekStart.AddDays(7); // Exclude day 8
 
-        // 创建7天×24小时的字典
+        // Create dictionary for 7 days × 24 hours
         var hourDict = new Dictionary<string, (long promptTokens, long completionTokens, long totalTokens)>();
         for (var day = 0; day < 7; day++)
         {
@@ -253,7 +253,7 @@ public class AuditController : Controller
             }
         }
 
-        // 填充实际数据（只统计本周的数据）
+        // Fill actual data (only count this week's data)
         foreach (var record in records)
         {
             var recordDate = record.Timestamp.Date;
@@ -272,7 +272,7 @@ public class AuditController : Controller
             }
         }
 
-        // 转换为结果列表
+        // Convert to result list
         var result = hourDict.Select(kv => new
         {
             date = kv.Key,
@@ -310,12 +310,12 @@ public class AuditController : Controller
 
     private List<object> GroupByDay(List<TokenUsageRecord> records, DateTime now)
     {
-        // 获取时间范围的起始和结束日期
+        // Get time range start and end dates
         var range = BuildRangeFromParams();
         var (startDate, endDate) = range.GetRange();
-        endDate = endDate.Date; // 只取日期部分
+        endDate = endDate.Date; // Only take date part
 
-        // 创建所有日期的字典
+        // Create dictionary for all dates
         var dateDict = new Dictionary<string, (long promptTokens, long completionTokens, long totalTokens)>();
         for (var date = startDate.Date; date <= endDate; date = date.AddDays(1))
         {
@@ -323,7 +323,7 @@ public class AuditController : Controller
             dateDict[dateKey] = (0L, 0L, 0L);
         }
 
-        // 填充实际数据
+        // Fill actual data
         foreach (var record in records)
         {
             var dateKey = record.Timestamp.ToString("yyyy-MM-dd");
@@ -338,7 +338,7 @@ public class AuditController : Controller
             }
         }
 
-        // 转换为结果列表
+        // Convert to result list
         var result = dateDict.Select(kv => new
         {
             date = kv.Key,
@@ -352,7 +352,7 @@ public class AuditController : Controller
 
     private List<object> GroupByMonth(List<TokenUsageRecord> records, DateTime now)
     {
-        // 创建当年12个月的字典
+        // Create dictionary for 12 months of current year
         var monthDict = new Dictionary<string, (long promptTokens, long completionTokens, long totalTokens)>();
         for (int month = 1; month <= 12; month++)
         {
@@ -360,7 +360,7 @@ public class AuditController : Controller
             monthDict[monthKey] = (0L, 0L, 0L);
         }
 
-        // 填充实际数据
+        // Fill actual data
         foreach (var record in records)
         {
             var monthKey = record.Timestamp.ToString("yyyy-MM");
@@ -375,7 +375,7 @@ public class AuditController : Controller
             }
         }
 
-        // 转换为结果列表
+        // Convert to result list
         var result = monthDict.Select(kv => new
         {
             date = kv.Key,

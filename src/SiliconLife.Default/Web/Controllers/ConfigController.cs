@@ -300,8 +300,8 @@ public class ConfigController : Controller
             var groupKey = attr?.GroupKey ?? "Other";
             var groupName = _loc.GetConfigGroupName(groupKey);
             var displayName = attr?.DisplayNameKey != null 
-                ? _loc.GetConfigDisplayName(attr.DisplayNameKey) 
-                : _loc.GetConfigDisplayName(prop.Name);
+                ? _loc.GetConfigDisplayName(attr.DisplayNameKey, out _)
+                : _loc.GetConfigDisplayName(prop.Name, out _);
             var description = attr?.DescriptionKey != null 
                 ? _loc.GetConfigDescription(attr.DescriptionKey) 
                 : null;
@@ -394,7 +394,7 @@ public class ConfigController : Controller
             {
                 var clients = DiscoverAIClients();
                 enumValues = clients.Select(c => c.TypeName).ToList();
-                enumDisplayNames = clients.Select(c => _loc.GetConfigDisplayName(c.TypeName)).ToList();
+                enumDisplayNames = clients.Select(c => _loc.GetConfigDisplayName(c.TypeName, out _)).ToList();
                 // Normalize displayValue: config may store "DashScopeClientFactory" but enum uses "DashScopeClient"
                 if (displayValue != null && displayValue.EndsWith("Factory"))
                 {

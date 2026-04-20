@@ -69,6 +69,11 @@ public class Router
         RegisterController(() => new ProjectController(), "/project");
         RegisterController(() => new ExecutorController(), "/executor");
         RegisterController(() => new CodeBrowserController(), "/code");
+        RegisterController(() => new CodeHoverController(), "/api/code/hover", "GET");
+        RegisterController(() => new CodeHoverController(), "/api/code/hover", "POST");
+        RegisterController(() => new CodeHoverController(), "/api/code/register", "POST");
+        RegisterController(() => new CodeHoverController(), "/api/code/update", "POST");
+        RegisterController(() => new CodeHoverController(), "/api/code/unregister", "POST");
         RegisterController(() => new PermissionRequestController(), "/permission/request");
         RegisterController(() => new PermissionRequestController(), "/permission/check");
         RegisterController(() => new PermissionRequestController(), "/permission/respond");

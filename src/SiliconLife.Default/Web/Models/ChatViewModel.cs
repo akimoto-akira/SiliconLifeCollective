@@ -22,7 +22,7 @@ public class ChatViewModel : ViewModelBase
     public string CurrentBeingName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Maps tool Name (e.g. "calendar") to its localized display name (e.g. "日历").
+    /// Maps tool Name (e.g. "calendar") to its localized display name.
     /// Populated at render time by ChatController; used by ChatView to inject a
     /// client-side lookup table so the frontend never needs to call the server again.
     /// </summary>

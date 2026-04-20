@@ -218,7 +218,7 @@ public class InitController : Controller
 
     private object[] GetAIClientTypeOptions()
     {
-        // 通过反射自动发现所有实现了IAIClientFactory的类型
+        // Auto-discover all types that implement IAIClientFactory via reflection
         var factoryTypes = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(assembly => assembly.GetTypes())
             .Where(type => typeof(IAIClientFactory).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
@@ -229,22 +229,22 @@ public class InitController : Controller
         {
             try
             {
-                // 创建工厂实例获取元数据
+                // Create factory instance to get metadata
                 var factory = (IAIClientFactory)Activator.CreateInstance(type)!;
                 var typeName = type.Name.Replace("Factory", ""); // OllamaClientFactory -> OllamaClient
                 
-                // 直接使用当前_localization获取本地化显示名称
-                var displayName = _localization.GetConfigDisplayName(typeName) ?? typeName;
+                // Use current _localization to get localized display name
+                var displayName = _localization.GetConfigDisplayName(typeName, out _) ?? typeName;
                 
                 options.Add(H.Create("option", displayName).Attr("value", type.Name));
             }
             catch
             {
-                // 跳过无法实例化的类型
+                // Skip types that cannot be instantiated
             }
         }
 
-        // 设置当前选中项
+        // Set current selected item
         var currentType = _configData.AIClientType ?? (options.FirstOrDefault() as System.Xml.Linq.XElement)?.Attribute("value")?.Value;
         if (!string.IsNullOrEmpty(currentType))
         {
@@ -263,7 +263,7 @@ public class InitController : Controller
 
     private IAIClientFactory CreateFactoryByType(string clientType)
     {
-        // 通过反射动态创建工厂实例
+        // Dynamically create factory instance via reflection
         var factoryType = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(assembly => assembly.GetTypes())
             .FirstOrDefault(type => type.Name == clientType && typeof(IAIClientFactory).IsAssignableFrom(type));
@@ -373,12 +373,12 @@ public class InitController : Controller
         var aiClientType = form.GetValueOrDefault("aiClientType", "OllamaClient").Trim();
         _configData.AIClientType = string.IsNullOrEmpty(aiClientType) ? "OllamaClient" : aiClientType;
 
-        // 动态保存AI配置字段（以ai_开头的字段）
+        // Dynamically save AI configuration fields (fields starting with ai_)
         foreach (var kvp in form)
         {
             if (kvp.Key.StartsWith("ai_") && kvp.Value.Length > 0)
             {
-                var configKey = kvp.Key.Substring(3); // 去掉"ai_"前缀
+                var configKey = kvp.Key.Substring(3); // Remove "ai_" prefix
                 _configData.AIConfig[configKey] = kvp.Value.Trim();
             }
         }
@@ -542,15 +542,15 @@ public class InitController : Controller
             .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "location").Prop(() => "href"), () => Js.Str(() => "/init?lang=").Op(() => "+", () => (JsSyntax)Js.Id(() => "selectedLang"))));
         js.Add(() => Js.Func(() => "applyLanguage", () => new List<string>(), () => applyLangBody));
 
-        // AI客户端类型切换逻辑 - 动态发现所有工厂
+        // AI client type switching logic - dynamically discover all factories
         var aiConfigData = Js.Obj();
         
-        // 获取当前语言（从_localization.LanguageCode反推，需去掉短横线）
+        // Get current language (infer from _localization.LanguageCode, need to remove hyphen)
         var currentLanguage = Enum.TryParse<Language>(_localization.LanguageCode.Replace("-", ""), ignoreCase: true, out var lang) 
             ? lang 
-            : _configData.Language; // 如果解析失败，使用配置文件中的语言
+            : _configData.Language; // Fallback to config file language if parsing fails
         
-        // 通过反射获取所有工厂类型并生成元数据
+        // Get all factory types via reflection and generate metadata
         var allFactoryTypes = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(assembly => assembly.GetTypes())
             .Where(type => typeof(IAIClientFactory).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
@@ -561,22 +561,22 @@ public class InitController : Controller
             try
             {
                 var factory = (IAIClientFactory)Activator.CreateInstance(factoryType)!;
-                // 传递当前语言给工厂
+                // Pass current language to factory
                 var metadata = factory.GetConfigKeysMetadata(currentLanguage);
                 var configObj = Js.Obj();
                 foreach (var kvp in metadata)
                 {
-                    // 获取当前配置值（从_configData.AIConfig）
+                    // Get current config value (from _configData.AIConfig)
                     var currentConfig = new Dictionary<string, object>();
                     foreach (var cfg in _configData.AIConfig)
                     {
                         currentConfig[cfg.Key] = cfg.Value;
                     }
                     
-                    // 调用 GetConfigKeyOptions 获取选项
+                    // Call GetConfigKeyOptions to get options
                     var options = factory.GetConfigKeyOptions(kvp.Key, currentConfig, currentLanguage);
                     
-                    // 构建字段元数据对象：包含 label 和可选的 options
+                    // Build field metadata object: contains label and optional options
                     var fieldObj = Js.Obj()
                         .Prop(() => "label", () => Js.Str(() => kvp.Value));
                     
@@ -596,13 +596,13 @@ public class InitController : Controller
             }
             catch
             {
-                // 跳过无法实例化的工厂
+                // Skip factories that cannot be instantiated
             }
         }
         
         js.Add(() => Js.Const(() => "aiConfigMetadata", () => aiConfigData));
 
-        // getCurrentAIConfigValues 函数
+        // getCurrentAIConfigValues function
         var getCurrentValuesBody = Js.Block()
             .Add(() => Js.Const(() => "values", () => Js.Obj()))
             .Add(() => Js.Const(() => "inputs", () => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => "#aiConfigFields input"))))
@@ -612,14 +612,14 @@ public class InitController : Controller
             .Add(() => Js.Return(() => Js.Id(() => "values")));
         js.Add(() => Js.Func(() => "getCurrentAIConfigValues", () => new List<string>(), () => getCurrentValuesBody));
 
-        // onClientTypeChange 函数
+        // onClientTypeChange function
         var onClientTypeChangeBody = Js.Block()
             .Add(() => Js.Const(() => "currentValues", () => Js.Id(() => "getCurrentAIConfigValues").Invoke()))
             .Add(() => Js.Const(() => "metadata", () => Js.Id(() => "aiConfigMetadata").Index(() => Js.Id(() => "clientType"))))
             .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "aiConfigFields"))))
             .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Str(() => "")));
         
-        // forEach循环体 - 根据是否有options决定渲染select还是input
+        // forEach loop body - render select or input based on whether options exist
         var forEachBody = Js.Block()
             .Add(() => Js.Const(() => "fieldMeta", () => Js.Id(() => "metadata").Index(() => Js.Id(() => "key"))))
             .Add(() => Js.Const(() => "label", () => Js.Id(() => "fieldMeta").Prop(() => "label")))
@@ -631,7 +631,7 @@ public class InitController : Controller
             .Add(() => Js.Assign(() => Js.Id(() => "labelEl").Prop(() => "textContent"), () => Js.Id(() => "label")))
             .Add(() => Js.Id(() => "div").Call(() => "appendChild", () => Js.Id(() => "labelEl")));
         
-        // 如果有options，渲染select下拉框；否则渲染input文本框
+        // If has options, render select dropdown; otherwise render input text box
         var optionForEachBody = Js.Block()
             .Add(() => Js.Const(() => "option", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "option"))))
             .Add(() => Js.Assign(() => Js.Id(() => "option").Prop(() => "value"), () => Js.Id(() => "optKey")))
@@ -674,7 +674,7 @@ public class InitController : Controller
         
         js.Add(() => Js.Func(() => "onClientTypeChange", () => new List<string> { "clientType" }, () => onClientTypeChangeBody));
 
-        // 页面加载时初始化
+        // Initialize on page load
         var initBody = Js.Block()
             .Add(() => Js.Const(() => "initialType", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "aiClientTypeSelect")).Prop(() => "value")))
             .Add(() => Js.Id(() => "onClientTypeChange").Invoke(() => Js.Id(() => "initialType")).Stmt());

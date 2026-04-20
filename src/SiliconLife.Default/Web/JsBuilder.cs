@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// JsBuilder 设计规则：
-// 1. 所有 JS 语法元素都继承自 JsSyntax
-// 2. 禁止 ElseIf()/Else() 方法 - 用 Dictionary 参数替代
-// 3. 禁止 Case()/AddBody() 方法 - 用 Dictionary 参数替代
-// 4. Body/Cases 元素必须是 JsSyntax，不能是 string
-// 5. 禁止直接字符串拼接生成代码
-// 6. 所有参数使用回调形式，便于调试追踪
+// JsBuilder Design Rules:
+// 1. All JS syntax elements inherit from JsSyntax
+// 2. No ElseIf()/Else() methods - use Dictionary parameter instead
+// 3. No Case()/AddBody() methods - use Dictionary parameter instead
+// 4. Body/Cases elements must be JsSyntax, not string
+// 5. No direct string concatenation for code generation
+// 6. All parameters use callback form for debugging and tracing
 
 using System.Text;
 
@@ -400,6 +400,9 @@ public class JsArrowFunc : JsSyntax
         var bodyStr = body.Build();
         if (bodyStr.EndsWith(";"))
             bodyStr = bodyStr.Substring(0, bodyStr.Length - 1);
+        // Wrap object literals in parentheses to avoid being parsed as block statements
+        if (body is JsObj)
+            return $"({string.Join(", ", Params())}) => ({bodyStr})";
         return $"({string.Join(", ", Params())}) => {bodyStr}";
     }
 }
