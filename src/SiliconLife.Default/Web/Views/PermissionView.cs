@@ -27,6 +27,7 @@ public class PermissionView : ViewBase
     {
         return H.Div(
             H.Div(
+                H.A("← " + vm.Localization.BeingsBackToList).Href("/beings").Class("permission-back-link"),
                 H.H1(string.Format(vm.Localization.PermissionPageHeader, vm.BeingId.ToString()))
             ).Class("page-header"),
             H.Div(
@@ -65,6 +66,21 @@ public class PermissionView : ViewBase
     {
         // Use styles provided by CodeEditorView + custom adaptive height styles
         return CodeEditorView.GetWidgetStyles()
+            .Selector(".page-header")
+                .Property("margin-bottom", "20px")
+            .EndSelector()
+            .Selector(".permission-back-link")
+                .Property("display", "inline-block")
+                .Property("margin-bottom", "12px")
+                .Property("color", "var(--accent-primary)")
+                .Property("text-decoration", "none")
+                .Property("font-size", "14px")
+                .Property("transition", "color 0.2s")
+            .EndSelector()
+            .Selector(".permission-back-link:hover")
+                .Property("color", "var(--accent-secondary, var(--accent-primary))")
+                .Property("text-decoration", "underline")
+            .EndSelector()
             .Selector(".page-content.flex-column")
                 .Property("display", "flex")
                 .Property("flex-direction", "column")
