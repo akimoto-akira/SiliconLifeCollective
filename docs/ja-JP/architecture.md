@@ -217,6 +217,46 @@ MainLoop（専用スレッド、ウォッチドッグ + サーキットブレー
 - `GetConfigKeyOptions(string key, ...)` — 設定キーの動的オプションを返す（例：利用可能なモデル、リージョン）
 - `GetDisplayName()` — クライアントタイプのローカライズされた表示名
 
+### AIプラットフォームサポートリスト
+
+#### ステータス説明
+- ✅ 実装済み
+- 🚧 開発中
+- 📋 計画中
+- 💡 検討中
+
+*注：開発者のネットワーク環境の影響により、[検討中]の海外クラウドAIサービスの統合にはネットワークプロキシツールの使用が必要になる場合があり、デバッグプロセスが不安定になる可能性があります。*
+
+#### プラットフォームリスト
+
+| プラットフォーム | ステータス | タイプ | 説明 |
+|------|------|------|------|
+| Ollama | ✅ | ローカル | ローカルAIサービス、ローカルモデルデプロイをサポート |
+| DashScope（Alibaba Cloud Bailian） | ✅ | クラウド | Alibaba Cloud Bailian AIサービス、マルチリージョンデプロイをサポート |
+| 百度千帆（文心一言） | 📋 | クラウド | Baidu ERNIE Bot AIサービス |
+| 智譜AI（GLM） | 📋 | クラウド | Zhipu Qingyan AIサービス |
+| 月之暗面（Kimi） | 📋 | クラウド | Moonshot Kimi AIサービス |
+| 火山エンジン.豆包 | 📋 | クラウド | ByteDance Doubao AIサービス |
+| DeepSeek（直接接続） | 📋 | クラウド | Deepseek AIサービス |
+| 零一万物 | 📋 | クラウド | 01.AI AIサービス |
+| 騰訊混元 | 📋 | クラウド | Tencent Hunyuan AIサービス |
+| SiliconFlow | 📋 | クラウド | SiliconFlow AIサービス |
+| MiniMax | 📋 | クラウド | MiniMax AIサービス |
+| OpenAI | 💡 | クラウド | OpenAI APIサービス（GPTシリーズ） |
+| Anthropic | 💡 | クラウド | Anthropic Claude AIサービス |
+| Google DeepMind | 💡 | クラウド | Google Gemini AIサービス |
+| Mistral AI | 💡 | クラウド | Mistral AIサービス |
+| Groq | 💡 | クラウド | Groq高速AI推論サービス |
+| Together AI | 💡 | クラウド | Together AIオープンソースモデルサービス |
+| xAI | 💡 | クラウド | xAI Grokサービス |
+| Cohere | 💡 | クラウド | CohereエンタープライズNLPサービス |
+| Replicate | 💡 | クラウド | Replicateオープンソースモデルホスティングプラットフォーム |
+| Hugging Face | 💡 | クラウド | Hugging FaceオープンソースAIコミュニティとモデルプラットフォーム |
+| Cerebras | 💡 | クラウド | Cerebras AI推論最適化サービス |
+| Databricks | 💡 | クラウド | DatabricksエンタープライズAIプラットフォーム（MosaicML） |
+| Perplexity AI | 💡 | クラウド | Perplexity AI検索Q&Aサービス |
+| NVIDIA NIM | 💡 | クラウド | NVIDIA AI推論マイクロサービス |
+
 ---
 
 ## 主要な設計判断

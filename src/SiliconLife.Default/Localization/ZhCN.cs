@@ -436,6 +436,16 @@ public class ZhCN : DefaultLocalizationBase
     public override string PermissionRulesSection => "权限规则列表";
     public override string PermissionEditorSection => "权限规则编辑器";
 
+    public override string PermissionSaveMissingBeingId => "缺少或无效的硅基人ID";
+    public override string PermissionSaveMissingCode => "请求体中缺少代码";
+    public override string PermissionSaveLoaderNotAvailable => "DynamicBeingLoader 不可用";
+    public override string PermissionSaveRemoveFailed => "删除权限回调失败";
+    public override string PermissionSaveRemoveSuccess => "权限回调已移除";
+    public override string PermissionSaveSecurityScanFailed => "保存权限回调失败（安全扫描未通过）";
+    public override string PermissionSaveCompilationFailed => "编译失败";
+    public override string PermissionSaveSuccess => "权限回调保存并应用成功";
+    public override string PermissionSaveError => "保存权限回调时发生错误";
+
     // ===== Knowledge Page Localization =====
 
     public override string KnowledgePageHeader => "知识图谱可视化";

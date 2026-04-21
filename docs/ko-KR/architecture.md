@@ -217,6 +217,46 @@ MainLoop (전용 스레드, watchdog + circuit breaker)
 - `GetConfigKeyOptions(string key, ...)` — 설정 키에 대한 동적 옵션 반환 (예: 사용 가능한 모델, 리전)
 - `GetDisplayName()` — 클라이언트 타입의 현지화된 표시 이름
 
+### AI 플랫폼 지원 목록
+
+#### 상태 설명
+- ✅ 구현됨
+- 🚧 개발 중
+- 📋 계획 중
+- 💡 고려 중
+
+*참고: 개발자의 네트워크 환경 영향으로 [고려 중] 해외 클라우드 AI 서비스 통합에는 네트워크 프록시 도구가 필요할 수 있으며, 디버깅 프로세스가 불안정할 수 있습니다.*
+
+#### 플랫폼 목록
+
+| 플랫폼 | 상태 | 타입 | 설명 |
+|------|------|------|------|
+| Ollama | ✅ | 로컬 | 로컬 AI 서비스, 로컬 모델 배포 지원 |
+| DashScope (Alibaba Cloud Bailian) | ✅ | 클라우드 | Alibaba Cloud Bailian AI 서비스, 다중 리전 배포 지원 |
+| Baidu Qianfan (ERNIE Bot) | 📋 | 클라우드 | Baidu ERNIE Bot AI 서비스 |
+| Zhipu AI (GLM) | 📋 | 클라우드 | Zhipu Qingyan AI 서비스 |
+| Moonshot AI (Kimi) | 📋 | 클라우드 | Moonshot Kimi AI 서비스 |
+| Doubao (Volcano Engine) | 📋 | 클라우드 | ByteDance Doubao AI 서비스 |
+| DeepSeek (직접 연결) | 📋 | 클라우드 | Deepseek AI 서비스 |
+| 01.AI | 📋 | 클라우드 | 01.AI AI 서비스 |
+| Tencent Hunyuan | 📋 | 클라우드 | Tencent Hunyuan AI 서비스 |
+| SiliconFlow | 📋 | 클라우드 | SiliconFlow AI 서비스 |
+| MiniMax | 📋 | 클라우드 | MiniMax AI 서비스 |
+| OpenAI | 💡 | 클라우드 | OpenAI API 서비스 (GPT 시리즈) |
+| Anthropic | 💡 | 클라우드 | Anthropic Claude AI 서비스 |
+| Google DeepMind | 💡 | 클라우드 | Google Gemini AI 서비스 |
+| Mistral AI | 💡 | 클라우드 | Mistral AI 서비스 |
+| Groq | 💡 | 클라우드 | Groq 고속 AI 추론 서비스 |
+| Together AI | 💡 | 클라우드 | Together AI 오픈소스 모델 서비스 |
+| xAI | 💡 | 클라우드 | xAI Grok 서비스 |
+| Cohere | 💡 | 클라우드 | Cohere 엔터프라이즈 NLP 서비스 |
+| Replicate | 💡 | 클라우드 | Replicate 오픈소스 모델 호스팅 플랫폼 |
+| Hugging Face | 💡 | 클라우드 | Hugging Face 오픈소스 AI 커뮤니티 및 모델 플랫폼 |
+| Cerebras | 💡 | 클라우드 | Cerebras AI 추론 최적화 서비스 |
+| Databricks | 💡 | 클라우드 | Databricks 엔터프라이즈 AI 플랫폼 (MosaicML) |
+| Perplexity AI | 💡 | 클라우드 | Perplexity AI 검색 Q&A 서비스 |
+| NVIDIA NIM | 💡 | 클라우드 | NVIDIA AI 추론 마이크로서비스 |
+
 ---
 
 ## 주요 설계 결정

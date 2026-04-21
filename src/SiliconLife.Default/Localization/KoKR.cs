@@ -436,6 +436,16 @@ public class KoKR : DefaultLocalizationBase
     public override string PermissionRulesSection => "권한 규칙 목록";
     public override string PermissionEditorSection => "권한 규칙 편집기";
 
+    public override string PermissionSaveMissingBeingId => "Being ID가 없거나 유효하지 않습니다";
+    public override string PermissionSaveMissingCode => "요청 본문에 코드가 없습니다";
+    public override string PermissionSaveLoaderNotAvailable => "DynamicBeingLoader를 사용할 수 없습니다";
+    public override string PermissionSaveRemoveFailed => "권한 콜백 삭제에 실패했습니다";
+    public override string PermissionSaveRemoveSuccess => "권한 콜백이 제거되었습니다";
+    public override string PermissionSaveSecurityScanFailed => "권한 콜백 저장에 실패했습니다 (보안 검사 실패)";
+    public override string PermissionSaveCompilationFailed => "컴파일에 실패했습니다";
+    public override string PermissionSaveSuccess => "권한 콜백이 저장되고 적용되었습니다";
+    public override string PermissionSaveError => "권한 콜백 저장 중 오류가 발생했습니다";
+
     // ===== Knowledge Page Localization =====
 
     public override string KnowledgePageHeader => "지식 그래프 시각화";

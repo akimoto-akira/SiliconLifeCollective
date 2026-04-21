@@ -138,11 +138,24 @@ public class PermissionController : Controller
     {
         try
         {
+            // Get localization
+            var loc = LocalizationManager.Instance.GetLocalization(Config.Instance?.Data?.Language ?? Language.ZhCN);
+            string errorMessage = "Save failed";
+            if (loc is DefaultLocalizationBase defaultLoc)
+            {
+                errorMessage = defaultLoc.PermissionSaveError;
+            }
+
             // Validate silicon being ID
             var beingIdStr = Request.QueryString?["beingId"];
             if (string.IsNullOrEmpty(beingIdStr) || !Guid.TryParse(beingIdStr, out Guid beingId))
             {
-                RenderJson(new { success = false, error = "Missing or invalid beingId" });
+                string missingBeingId = "Missing or invalid beingId";
+                if (loc is DefaultLocalizationBase locBase)
+                {
+                    missingBeingId = locBase.PermissionSaveMissingBeingId;
+                }
+                RenderJson(new { success = false, error = missingBeingId });
                 return;
             }
 
@@ -153,7 +166,12 @@ public class PermissionController : Controller
             
             if (requestData == null || !requestData.ContainsKey("code"))
             {
-                RenderJson(new { success = false, error = "Missing code in request body" });
+                string missingCode = "Missing code in request body";
+                if (loc is DefaultLocalizationBase locBase2)
+                {
+                    missingCode = locBase2.PermissionSaveMissingCode;
+                }
+                RenderJson(new { success = false, error = missingCode });
                 return;
             }
 
@@ -167,43 +185,88 @@ public class PermissionController : Controller
             var dynamicLoader = ServiceLocator.Instance.GetService<DynamicBeingLoader>();
             if (dynamicLoader == null)
             {
-                RenderJson(new { success = false, error = "DynamicBeingLoader not available" });
+                string loaderNotAvailable = "DynamicBeingLoader not available";
+                if (loc is DefaultLocalizationBase locBase3)
+                {
+                    loaderNotAvailable = locBase3.PermissionSaveLoaderNotAvailable;
+                }
+                RenderJson(new { success = false, error = loaderNotAvailable });
                 return;
             }
 
             // If code is empty, delete custom permission callback
             if (string.IsNullOrWhiteSpace(sourceCode))
             {
-                DynamicBeingLoader.DeleteCustomPermissionCallback(beingDirectory);
-                MainLoop.BeingManager?.ResetPermissionCallback(beingId);
-                RenderJson(new { success = true, message = "Permission callback removed" });
+                try
+                {
+                    DynamicBeingLoader.DeleteCustomPermissionCallback(beingDirectory);
+                    MainLoop.BeingManager?.ResetPermissionCallback(beingId);
+                    
+                    string removeSuccess = "Permission callback removed";
+                    if (loc is DefaultLocalizationBase locBase4)
+                    {
+                        removeSuccess = locBase4.PermissionSaveRemoveSuccess;
+                    }
+                    RenderJson(new { success = true, message = removeSuccess });
+                }
+                catch
+                {
+                    string removeFailed = "Failed to remove permission callback";
+                    if (loc is DefaultLocalizationBase locBase5)
+                    {
+                        removeFailed = locBase5.PermissionSaveRemoveFailed;
+                    }
+                    RenderJson(new { success = false, error = removeFailed });
+                }
                 return;
             }
 
-            // Save and compile permission callback code
+            // Step 1: Compile first to validate code (without saving)
+            CompilationResult compileResult = dynamicLoader.CompilePermissionCallback(sourceCode);
+            if (!compileResult.Success || compileResult.CompiledType == null)
+            {
+                string compilationFailed = "Compilation failed";
+                if (loc is DefaultLocalizationBase locBase6)
+                {
+                    compilationFailed = locBase6.PermissionSaveCompilationFailed;
+                }
+                string errors = string.Join("\n", compileResult.Errors ?? new List<string>());
+                RenderJson(new { success = false, error = compilationFailed, details = errors });
+                return;
+            }
+
+            // Step 2: Compilation succeeded, now save to disk (includes security scan)
             bool saved = dynamicLoader.SavePermissionCallback(beingId, beingDirectory, sourceCode);
             if (!saved)
             {
-                RenderJson(new { success = false, error = "Failed to save permission callback (security scan failed)" });
+                string securityFailed = "Failed to save permission callback (security scan failed)";
+                if (loc is DefaultLocalizationBase locBase7)
+                {
+                    securityFailed = locBase7.PermissionSaveSecurityScanFailed;
+                }
+                RenderJson(new { success = false, error = securityFailed });
                 return;
             }
 
-            // Load and apply new permission callback
-            CompilationResult result = dynamicLoader.LoadPermissionCallback(beingId, beingDirectory);
-            if (result.Success && result.CompiledType != null)
+            // Step 3: Apply the compiled type to the running being
+            MainLoop.BeingManager?.ReplacePermissionCallback(beingId, compileResult.CompiledType);
+            
+            string saveSuccess = "Permission callback saved and applied successfully";
+            if (loc is DefaultLocalizationBase locBase8)
             {
-                MainLoop.BeingManager?.ReplacePermissionCallback(beingId, result.CompiledType);
-                RenderJson(new { success = true, message = "Permission callback saved and applied successfully" });
+                saveSuccess = locBase8.PermissionSaveSuccess;
             }
-            else
-            {
-                string errors = string.Join("\n", result.Errors ?? new List<string>());
-                RenderJson(new { success = false, error = "Compilation failed", details = errors });
-            }
+            RenderJson(new { success = true, message = saveSuccess });
         }
         catch (Exception ex)
         {
-            RenderJson(new { success = false, error = ex.Message });
+            var loc = LocalizationManager.Instance.GetLocalization(Config.Instance?.Data?.Language ?? Language.ZhCN);
+            string genericError = "An error occurred while saving permission callback";
+            if (loc is DefaultLocalizationBase locBase)
+            {
+                genericError = locBase.PermissionSaveError;
+            }
+            RenderJson(new { success = false, error = genericError, details = ex.Message });
         }
     }
 }

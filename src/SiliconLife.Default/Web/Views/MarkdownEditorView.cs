@@ -487,14 +487,24 @@ public class MarkdownEditorView : ViewBase
                         }),
                         (null, new List<JsSyntax>
                         {
-                            // Error: show error message
-                            Js.Id(() => "console").Call(() => "error", () => Js.Id(() => "data").Prop(() => "error").Op(() => "||", () => Js.Str(() => "Save failed"))).Stmt(),
-                            Js.Id(() => "alert").Call(() => "invoke", () => Js.Id(() => "data").Prop(() => "error").Op(() => "||", () => Js.Str(() => "Save failed"))).Stmt()
+                            // Error: show detailed error message
+                            Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Save failed:"), () => Js.Id(() => "data")).Stmt(),
+                            // Build detailed error message
+                            Js.Let(() => "errorMsg", () => Js.Id(() => "data").Prop(() => "error").Op(() => "||", () => Js.Str(() => "Save failed"))).Stmt(),
+                            Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                            {
+                                (Js.Id(() => "data").Prop(() => "details").Op(() => "!==", () => Js.Id(() => "undefined")).Op(() => "&&", () => Js.Id(() => "data").Prop(() => "details")), new List<JsSyntax>
+                                {
+                                    Js.Assign(() => Js.Id(() => "errorMsg"), () => Js.Op(() => Js.Id(() => "errorMsg"), () => "+", () => Js.Str(() => "\n\n"))).Stmt(),
+                                    Js.Assign(() => Js.Id(() => "errorMsg"), () => Js.Op(() => Js.Id(() => "errorMsg"), () => "+", () => Js.Id(() => "data").Prop(() => "details"))).Stmt()
+                                })
+                            }).Stmt(),
+                            Js.Id(() => "alert").Invoke(() => Js.Id(() => "errorMsg")).Stmt()
                         })
                     }))))
                 .Call(() => "catch", () => Js.Arrow(() => new List<string> { "err" }, () => Js.Block()
                     .Add(() => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Save error:"), () => Js.Id(() => "err")))
-                    .Add(() => Js.Id(() => "alert").Call(() => "invoke", () => Js.Op(() => Js.Str(() => "Save failed: "), () => "+", () => Js.Id(() => "err"))))))
+                    .Add(() => Js.Id(() => "alert").Invoke(() => Js.Op(() => Js.Str(() => "Save failed: "), () => "+", () => Js.Id(() => "err"))))))
                 .Stmt());
         }
         else

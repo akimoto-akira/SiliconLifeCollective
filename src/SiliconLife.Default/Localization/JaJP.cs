@@ -436,6 +436,16 @@ public class JaJP : DefaultLocalizationBase
     public override string PermissionRulesSection => "権限ルールリスト";
     public override string PermissionEditorSection => "権限ルールエディター";
 
+    public override string PermissionSaveMissingBeingId => "Being IDが見つからないか無効です";
+    public override string PermissionSaveMissingCode => "リクエストボディにコードがありません";
+    public override string PermissionSaveLoaderNotAvailable => "DynamicBeingLoaderが利用できません";
+    public override string PermissionSaveRemoveFailed => "権限コールバックの削除に失敗しました";
+    public override string PermissionSaveRemoveSuccess => "権限コールバックが削除されました";
+    public override string PermissionSaveSecurityScanFailed => "権限コールバックの保存に失敗しました（セキュリティスキャンに失敗しました）";
+    public override string PermissionSaveCompilationFailed => "コンパイルに失敗しました";
+    public override string PermissionSaveSuccess => "権限コールバックが保存されて適用されました";
+    public override string PermissionSaveError => "権限コールバックの保存中にエラーが発生しました";
+
     // ===== Knowledge Page Localization =====
 
     public override string KnowledgePageHeader => "ナレッジグラフ可視化";

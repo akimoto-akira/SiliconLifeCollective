@@ -1041,6 +1041,51 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// </summary>
     public abstract string PermissionEditorSection { get; }
 
+    /// <summary>
+    /// Gets the error message when permission save fails due to missing being ID
+    /// </summary>
+    public abstract string PermissionSaveMissingBeingId { get; }
+
+    /// <summary>
+    /// Gets the error message when permission save fails due to missing code
+    /// </summary>
+    public abstract string PermissionSaveMissingCode { get; }
+
+    /// <summary>
+    /// Gets the error message when DynamicBeingLoader is not available
+    /// </summary>
+    public abstract string PermissionSaveLoaderNotAvailable { get; }
+
+    /// <summary>
+    /// Gets the error message when permission callback removal fails
+    /// </summary>
+    public abstract string PermissionSaveRemoveFailed { get; }
+
+    /// <summary>
+    /// Gets the success message when permission callback is removed
+    /// </summary>
+    public abstract string PermissionSaveRemoveSuccess { get; }
+
+    /// <summary>
+    /// Gets the error message when permission save fails due to security scan
+    /// </summary>
+    public abstract string PermissionSaveSecurityScanFailed { get; }
+
+    /// <summary>
+    /// Gets the error message when permission compilation fails
+    /// </summary>
+    public abstract string PermissionSaveCompilationFailed { get; }
+
+    /// <summary>
+    /// Gets the success message when permission callback is saved successfully
+    /// </summary>
+    public abstract string PermissionSaveSuccess { get; }
+
+    /// <summary>
+    /// Gets the generic error message when permission save throws an exception
+    /// </summary>
+    public abstract string PermissionSaveError { get; }
+
     // ===== Knowledge Page Localization =====
 
     /// <summary>

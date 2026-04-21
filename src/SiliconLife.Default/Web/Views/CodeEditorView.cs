@@ -433,10 +433,49 @@ public class CodeEditorView : ViewBase
                     () => Js.Obj()
                         .Prop(() => "method", () => Js.Str(() => "POST"))
                         .Prop(() => "headers", () => Js.Obj().Prop(() => "Content-Type", () => Js.Str(() => "application/json")))
-                        .Prop(() => "body", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj().Prop(() => "code", () => Js.Id(() => "code"))))
-                ).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json")))
+                        .Prop(() => "body", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj().Prop(() => "code", () => Js.Id(() => "code")))))
+                .Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Block()
+                    .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "r").Prop(() => "ok").Not(), new List<JsSyntax>
+                        {
+                            // HTTP error: show error and return
+                            Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Save failed with status:"), () => Js.Id(() => "r").Prop(() => "status")).Stmt(),
+                            Js.Id(() => "alert").Invoke(() => Js.Op(() => Js.Str(() => "Save failed: HTTP "), () => "+", () => Js.Id(() => "r").Prop(() => "status"))).Stmt(),
+                            Js.Return(() => Js.Str(() => ""))
+                        })
+                    }))
+                    .Add(() => Js.Return(() => Js.Id(() => "r").Call(() => "json")))))
                 .Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => Js.Block()
-                    .Add(() => Js.Assign(() => Js.Id(() => "dirtyFlag").Prop(() => "value"), () => Js.Str(() => "0"))))).Stmt());
+                    .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "data").Prop(() => "success"), new List<JsSyntax>
+                        {
+                            // Success: clear dirty flag
+                            Js.Assign(() => Js.Id(() => "dirtyFlag").Prop(() => "value"), () => Js.Str(() => "0")).Stmt(),
+                            Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "Save successful")).Stmt()
+                        }),
+                        (null, new List<JsSyntax>
+                        {
+                            // Error: show detailed error message
+                            Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Save failed:"), () => Js.Id(() => "data")).Stmt(),
+                            // Build detailed error message
+                            Js.Let(() => "errorMsg", () => Js.Id(() => "data").Prop(() => "error").Op(() => "||", () => Js.Str(() => "Save failed"))).Stmt(),
+                            Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                            {
+                                (Js.Id(() => "data").Prop(() => "details").Op(() => "!==", () => Js.Id(() => "undefined")).Op(() => "&&", () => Js.Id(() => "data").Prop(() => "details")), new List<JsSyntax>
+                                {
+                                    Js.Assign(() => Js.Id(() => "errorMsg"), () => Js.Op(() => Js.Id(() => "errorMsg"), () => "+", () => Js.Str(() => "\n\n"))).Stmt(),
+                                    Js.Assign(() => Js.Id(() => "errorMsg"), () => Js.Op(() => Js.Id(() => "errorMsg"), () => "+", () => Js.Id(() => "data").Prop(() => "details"))).Stmt()
+                                })
+                            }).Stmt(),
+                            Js.Id(() => "alert").Invoke(() => Js.Id(() => "errorMsg")).Stmt()
+                        })
+                    }))))
+                .Call(() => "catch", () => Js.Arrow(() => new List<string> { "err" }, () => Js.Block()
+                    .Add(() => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Save error:"), () => Js.Id(() => "err")))
+                    .Add(() => Js.Id(() => "alert").Invoke(() => Js.Op(() => Js.Str(() => "Save failed: "), () => "+", () => Js.Id(() => "err"))))))
+                .Stmt());
         }
         else
         {

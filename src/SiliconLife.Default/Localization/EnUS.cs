@@ -436,6 +436,16 @@ public class EnUS : DefaultLocalizationBase
     public override string PermissionRulesSection => "Permission Rules";
     public override string PermissionEditorSection => "Permission Rule Editor";
 
+    public override string PermissionSaveMissingBeingId => "Missing or invalid being ID";
+    public override string PermissionSaveMissingCode => "Missing code in request body";
+    public override string PermissionSaveLoaderNotAvailable => "DynamicBeingLoader not available";
+    public override string PermissionSaveRemoveFailed => "Failed to remove permission callback";
+    public override string PermissionSaveRemoveSuccess => "Permission callback removed";
+    public override string PermissionSaveSecurityScanFailed => "Failed to save permission callback (security scan failed)";
+    public override string PermissionSaveCompilationFailed => "Compilation failed";
+    public override string PermissionSaveSuccess => "Permission callback saved and applied successfully";
+    public override string PermissionSaveError => "An error occurred while saving permission callback";
+
     // ===== Knowledge Page Localization =====
 
     public override string KnowledgePageHeader => "Knowledge Graph";

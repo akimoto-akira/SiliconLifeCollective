@@ -217,6 +217,46 @@ Factories provide:
 - `GetConfigKeyOptions(string key, ...)` — Returns dynamic options for configuration keys (e.g., available models, regions)
 - `GetDisplayName()` — Localized display name for the client type
 
+### AI Platform Support List
+
+#### Status Indicators
+- ✅ Implemented
+- 🚧 In Development
+- 📋 Planned
+- 💡 Under Consideration
+
+*Note: Due to the developer's network environment, integrating [Under Consideration] overseas cloud AI services may require network proxy tools for access, and the debugging process may be unstable.*
+
+#### Platform List
+
+| Platform | Status | Type | Description |
+|----------|--------|------|-------------|
+| Ollama | ✅ | Local | Local AI service, supports local model deployment |
+| DashScope (Alibaba Cloud Bailian) | ✅ | Cloud | Alibaba Cloud Bailian AI service, supports multi-region deployment |
+| Baidu Qianfan (ERNIE Bot) | 📋 | Cloud | Baidu ERNIE Bot AI service |
+| Zhipu AI (GLM) | 📋 | Cloud | Zhipu Qingyan AI service |
+| Moonshot AI (Kimi) | 📋 | Cloud | Moonshot Kimi AI service |
+| Doubao (Volcano Engine) | 📋 | Cloud | ByteDance Doubao AI service |
+| DeepSeek (Direct Connection) | 📋 | Cloud | Deepseek AI service |
+| 01.AI | 📋 | Cloud | 01.AI AI service |
+| Tencent Hunyuan | 📋 | Cloud | Tencent Hunyuan AI service |
+| SiliconFlow | 📋 | Cloud | SiliconFlow AI service |
+| MiniMax | 📋 | Cloud | MiniMax AI service |
+| OpenAI | 💡 | Cloud | OpenAI API service (GPT series) |
+| Anthropic | 💡 | Cloud | Anthropic Claude AI service |
+| Google DeepMind | 💡 | Cloud | Google Gemini AI service |
+| Mistral AI | 💡 | Cloud | Mistral AI service |
+| Groq | 💡 | Cloud | Groq high-speed AI inference service |
+| Together AI | 💡 | Cloud | Together AI open-source model service |
+| xAI | 💡 | Cloud | xAI Grok service |
+| Cohere | 💡 | Cloud | Cohere enterprise NLP service |
+| Replicate | 💡 | Cloud | Replicate open-source model hosting platform |
+| Hugging Face | 💡 | Cloud | Hugging Face open-source AI community and model platform |
+| Cerebras | 💡 | Cloud | Cerebras AI inference optimization service |
+| Databricks | 💡 | Cloud | Databricks enterprise AI platform (MosaicML) |
+| Perplexity AI | 💡 | Cloud | Perplexity AI search Q&A service |
+| NVIDIA NIM | 💡 | Cloud | NVIDIA AI inference microservice |
+
 ---
 
 ## Key Design Decisions

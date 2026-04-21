@@ -217,6 +217,46 @@
 - `GetConfigKeyOptions(string key, ...)` —— 返回配置键的动态选项（例如可用模型、区域）
 - `GetDisplayName()` —— 客户端类型的本地化显示名称
 
+### AI平台支持清单
+
+#### 状态说明
+- ✅ 已实现
+- 🚧 开发中
+- 📋 计划中
+- 💡 考虑中
+
+*注：受开发者所在网络环境影响，对接[考虑中]的海外云端AI服务可能需要借助网络代理工具进行访问，调试过程可能存在不稳定性。*
+
+#### 平台列表
+
+| 平台 | 状态 | 类型 | 说明 |
+|------|------|------|------|
+| Ollama | ✅ | 本地 | 本地AI服务，支持本地模型部署 |
+| DashScope（阿里云百炼） | ✅ | 云端 | 阿里云百炼AI服务，支持多区域部署 |
+| 百度千帆（文心一言） | 📋 | 云端 | 百度文心一言AI服务 |
+| 智普AI（GLM） | 📋 | 云端 | 智谱清言AI服务 |
+| 月之暗面（Kimi） | 📋 | 云端 | 月之暗面Kimi AI服务 |
+| 火山方舟引擎.豆包 | 📋 | 云端 | 字节跳动豆包AI服务 |
+| DeepSeek（直连） | 📋 | 云端 | 深度求索AI服务 |
+| 零一万物 | 📋 | 云端 | 零一万物AI服务 |
+| 腾讯混元 | 📋 | 云端 | 腾讯混元AI服务 |
+| 硅基流动 | 📋 | 云端 | 硅基流动AI服务 |
+| MiniMax | 📋 | 云端 | MiniMax AI服务 |
+| OpenAI | 💡 | 云端 | OpenAI API服务（GPT系列） |
+| Anthropic | 💡 | 云端 | Anthropic Claude AI服务 |
+| Google DeepMind | 💡 | 云端 | Google Gemini AI服务 |
+| Mistral AI | 💡 | 云端 | Mistral AI服务 |
+| Groq | 💡 | 云端 | Groq高速AI推理服务 |
+| Together AI | 💡 | 云端 | Together AI开源模型服务 |
+| xAI | 💡 | 云端 | xAI Grok服务 |
+| Cohere | 💡 | 云端 | Cohere企业级NLP服务 |
+| Replicate | 💡 | 云端 | Replicate开源模型托管平台 |
+| Hugging Face | 💡 | 云端 | Hugging Face开源AI社区和模型平台 |
+| Cerebras | 💡 | 云端 | Cerebras AI推理优化服务 |
+| Databricks | 💡 | 云端 | Databricks企业AI平台（MosaicML） |
+| Perplexity AI | 💡 | 云端 | Perplexity AI搜索问答服务 |
+| NVIDIA NIM | 💡 | 云端 | NVIDIA AI推理微服务 |
+
 ---
 
 ## 关键设计决策

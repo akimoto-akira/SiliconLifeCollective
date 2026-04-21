@@ -291,6 +291,16 @@ public class ZhHK : DefaultLocalizationBase
     public override string PermissionRulesSection => "權限規則列表";
     public override string PermissionEditorSection => "權限規則編輯器";
 
+    public override string PermissionSaveMissingBeingId => "缺少或無效的硅基人ID";
+    public override string PermissionSaveMissingCode => "請求體中缺少代碼";
+    public override string PermissionSaveLoaderNotAvailable => "DynamicBeingLoader 不可用";
+    public override string PermissionSaveRemoveFailed => "刪除權限回調失敗";
+    public override string PermissionSaveRemoveSuccess => "權限回調已移除";
+    public override string PermissionSaveSecurityScanFailed => "保存權限回調失敗（安全掃描未通過）";
+    public override string PermissionSaveCompilationFailed => "編譯失敗";
+    public override string PermissionSaveSuccess => "權限回調保存並套用成功";
+    public override string PermissionSaveError => "保存權限回調時發生錯誤";
+
     // ===== Knowledge Page Localization =====
 
     public override string KnowledgePageHeader => "知識圖譜可視化";

@@ -239,6 +239,33 @@ public class DynamicBeingLoader
     }
 
     /// <summary>
+    /// Compiles permission callback source code without saving to disk.
+    /// Used for validation before saving.
+    /// </summary>
+    /// <param name="sourceCode">The C# source code implementing IPermissionCallback</param>
+    /// <returns>CompilationResult with CompiledType if successful</returns>
+    public CompilationResult CompilePermissionCallback(string sourceCode)
+    {
+        _logger.Info("Permission callback compilation (preview mode)");
+        
+        // Compile using CompilationCore directly (no security scan)
+        return _compilationCore.Compile(
+            sourceCode,
+            assembly =>
+            {
+                // Find IPermissionCallback implementation
+                foreach (Type type in assembly.GetTypes())
+                {
+                    if (!type.IsAbstract && typeof(IPermissionCallback).IsAssignableFrom(type))
+                    {
+                        return type;
+                    }
+                }
+                return null;
+            });
+    }
+
+    /// <summary>
     /// Reads and decrypts the permission callback source code without compiling.
     /// Used by Web UI to display the current code for editing.
     /// </summary>

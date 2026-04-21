@@ -58,6 +58,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.2] - 2026-04-21
+
+### Added
+- Permission callback pre-compilation validation feature
+  - Compile permission callback code before saving to validate correctness
+  - Prevent invalid code from being saved to disk
+- Detailed error handling for permission save operations
+  - Enhanced error messages with localization support
+  - Separate compilation and security scan steps for better error reporting
+- JsBuilder error handling improvements in CodeEditorView and MarkdownEditorView
+  - Enhanced client-side error display with detailed error messages
+  - Better HTTP error handling and status code reporting
+- Permission controller API route registration
+  - Added `/api/permissions/list` route
+  - Added `/api/permissions/save` POST route
+
+### Changed
+- Permission save workflow refactoring
+  - Separated compilation validation from file saving
+  - Improved security scan integration
+  - Enhanced localization support for all error messages
+- CodeEditorView and MarkdownEditorView save response handling
+  - More detailed success/error feedback
+  - Improved alert messages with error details
+
+### Fixed
+- Missing permission controller API routes
+- Inconsistent error message handling in permission save operations
+
+---
+
 ## [0.5.1] - 2026-04-21
 
 ### Added
