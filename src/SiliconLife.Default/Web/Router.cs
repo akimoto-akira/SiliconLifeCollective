@@ -50,6 +50,7 @@ public class Router
         RegisterController(() => new TimerController(), "/timers");
         RegisterController(() => new TimerController(), "/api/timers/list");
         RegisterController(() => new TaskController(), "/tasks");
+        RegisterController(() => new TaskController(), "/api/tasks/list");
         RegisterController(() => new PermissionController(), "/permissions");
         RegisterController(() => new PermissionController(), "/api/permissions/list");
         RegisterController(() => new PermissionController(), "/api/permissions/save", "POST");
