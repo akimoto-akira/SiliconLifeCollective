@@ -451,9 +451,16 @@ public class CodeEditorView : ViewBase
                     {
                         (Js.Id(() => "data").Prop(() => "success"), new List<JsSyntax>
                         {
-                            // Success: clear dirty flag
+                            // Success: clear dirty flag and show success message
                             Js.Assign(() => Js.Id(() => "dirtyFlag").Prop(() => "value"), () => Js.Str(() => "0")).Stmt(),
-                            Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "Save successful")).Stmt()
+                            Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "Save successful")).Stmt(),
+                            Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                            {
+                                (Js.Id(() => "data").Prop(() => "message"), new List<JsSyntax>
+                                {
+                                    Js.Id(() => "alert").Invoke(() => Js.Id(() => "data").Prop(() => "message")).Stmt()
+                                })
+                            }).Stmt()
                         }),
                         (null, new List<JsSyntax>
                         {
