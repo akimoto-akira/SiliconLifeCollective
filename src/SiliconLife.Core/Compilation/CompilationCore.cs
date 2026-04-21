@@ -40,6 +40,47 @@ public class CompilationCore
             MetadataReference.CreateFromFile(typeof(List<>).Assembly.Location),
         ];
 
+        // Add System.Runtime reference assembly (contains type forwards for Enum, Guid, Uri, IEnumerable<>, etc.)
+        // Note: typeof(Enum).Assembly returns System.Private.CoreLib (implementation), 
+        // but Roslyn needs the reference assembly System.Runtime for compilation
+        try
+        {
+            Assembly runtimeRefAssembly = Assembly.Load("System.Runtime");
+            _baseReferences.Add(MetadataReference.CreateFromFile(runtimeRefAssembly.Location));
+            _logger.Debug("Added System.Runtime reference assembly from: {0}", runtimeRefAssembly.Location);
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn("Failed to add System.Runtime reference: {0}", ex.Message);
+        }
+
+        // Add System.Private.Uri (contains Uri, UriKind implementation)
+        try
+        {
+            Assembly uriAssembly = typeof(Uri).Assembly;
+            if (uriAssembly.GetName().Name != "System.Private.CoreLib")
+            {
+                _baseReferences.Add(MetadataReference.CreateFromFile(uriAssembly.Location));
+                _logger.Debug("Added {0} reference from: {1}", uriAssembly.GetName().Name, uriAssembly.Location);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn("Failed to add Uri assembly reference: {0}", ex.Message);
+        }
+
+        // Add System.Linq (contains LINQ extension methods like .Any())
+        try
+        {
+            Assembly linqAssembly = typeof(System.Linq.Enumerable).Assembly;
+            _baseReferences.Add(MetadataReference.CreateFromFile(linqAssembly.Location));
+            _logger.Debug("Added System.Linq reference from: {0}", linqAssembly.Location);
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn("Failed to add System.Linq reference: {0}", ex.Message);
+        }
+
         // Add System.Text.Json
         Type? jsonType = Type.GetType("System.Text.Json.JsonSerializer, System.Text.Json");
         if (jsonType != null)

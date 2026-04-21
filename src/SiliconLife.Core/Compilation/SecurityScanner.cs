@@ -88,6 +88,7 @@ public static class SecurityScanner
     /// </summary>
     public static readonly HashSet<string> AllowedAssemblyNames = new(StringComparer.OrdinalIgnoreCase)
     {
+        "mscorlib",
         "System.Runtime",
         "System.Private.CoreLib",
         "System.Console",

@@ -42,6 +42,47 @@ public class DynamicBeingLoader
     }
 
     /// <summary>
+    /// Validates that the default assembly references are in the allowed list.
+    /// </summary>
+    /// <param name="beingId">Optional being ID for logging context</param>
+    /// <param name="baseAssembly">The base assembly to validate references for</param>
+    /// <returns>Tuple of (isValid, unauthorizedList)</returns>
+    private (bool IsValid, string UnauthorizedList) ValidateDefaultReferences(Guid? beingId, Assembly baseAssembly)
+    {
+        Type? runtimeType = Type.GetType("System.Runtime.CompilerServices.RuntimeHelpers, System.Runtime");
+        Type? linqType = Type.GetType("System.Linq.Enumerable, System.Linq");
+        Type? jsonType = Type.GetType("System.Text.Json.JsonSerializer, System.Text.Json");
+        Type? regexType = Type.GetType("System.Text.RegularExpressions.Regex, System.Text.RegularExpressions");
+        
+        var referencedNames = new List<string> 
+        { 
+            "mscorlib.dll", 
+            "System.Private.CoreLib.dll",
+            "System.Console.dll", 
+            "System.Collections.dll"
+        };
+        if (runtimeType != null) referencedNames.Add("System.Runtime.dll");
+        if (linqType != null) referencedNames.Add("System.Linq.dll");
+        if (jsonType != null) referencedNames.Add("System.Text.Json.dll");
+        if (regexType != null) referencedNames.Add("System.Text.RegularExpressions.dll");
+        referencedNames.Add(baseAssembly.GetName().Name + ".dll");
+
+        (bool refsValid, List<string> unauthorized) = SecurityScanner.ValidateReferences(referencedNames);
+        
+        string unauthorizedList = string.Join(", ", unauthorized);
+        if (!refsValid && beingId.HasValue)
+        {
+            _logger.Error("Unauthorized assembly references for being {0}: {1}", beingId.Value, unauthorizedList);
+        }
+        else if (!refsValid)
+        {
+            _logger.Error("Unauthorized assembly references: {0}", unauthorizedList);
+        }
+
+        return (refsValid, unauthorizedList);
+    }
+
+    /// <summary>
     /// Checks if a silicon being has custom compiled code in its directory.
     /// </summary>
     /// <param name="beingDirectory">The silicon being's data directory</param>
@@ -77,6 +118,14 @@ public class DynamicBeingLoader
             throw new InvalidOperationException(
                 $"Failed to decrypt custom code for being {beingId}. " +
                 "Code may be corrupted or the GUID may have changed.");
+        }
+
+        // Validate assembly references against allowed list
+        (bool refsValid, string unauthorizedList) = ValidateDefaultReferences(beingId, typeof(SiliconBeingBase).Assembly);
+        if (!refsValid)
+        {
+            throw new InvalidOperationException(
+                $"Unauthorized assembly references for being {beingId}: {unauthorizedList}");
         }
 
         // Compile using CompilationCore directly (no security scan)
@@ -159,6 +208,16 @@ public class DynamicBeingLoader
     {
         _logger.Info("Preview compilation for being {0}", beingId);
         
+        // Validate assembly references against allowed list
+        (bool refsValid2, string unauthorizedList2) = ValidateDefaultReferences(beingId, typeof(SiliconBeingBase).Assembly);
+        if (!refsValid2)
+        {
+            return new CompilationResult(
+                false, 
+                null, 
+                [$"Unauthorized assembly references: {unauthorizedList2}"]);
+        }
+
         // Compile using CompilationCore directly (no security scan)
         return _compilationCore.Compile(
             sourceCode,
@@ -211,6 +270,16 @@ public class DynamicBeingLoader
             return new CompilationResult(false, null, ["Failed to decrypt permission callback code."]);
         }
 
+        // Validate assembly references against allowed list
+        (bool refsValid3, string unauthorizedList3) = ValidateDefaultReferences(beingId, typeof(IPermissionCallback).Assembly);
+        if (!refsValid3)
+        {
+            return new CompilationResult(
+                false, 
+                null, 
+                [$"Unauthorized assembly references: {unauthorizedList3}"]);
+        }
+
         // Compile using CompilationCore directly (no security scan)
         CompilationResult result = _compilationCore.Compile(
             sourceCode,
@@ -248,6 +317,16 @@ public class DynamicBeingLoader
     {
         _logger.Info("Permission callback compilation (preview mode)");
         
+        // Validate assembly references against allowed list
+        (bool refsValid4, string unauthorizedList4) = ValidateDefaultReferences(null, typeof(IPermissionCallback).Assembly);
+        if (!refsValid4)
+        {
+            return new CompilationResult(
+                false, 
+                null, 
+                [$"Unauthorized assembly references: {unauthorizedList4}"]);
+        }
+
         // Compile using CompilationCore directly (no security scan)
         return _compilationCore.Compile(
             sourceCode,

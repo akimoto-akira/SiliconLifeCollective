@@ -49,8 +49,10 @@ public class PermissionViewModel : ViewModelBase
 
     private void GenerateHeader(StringBuilder sb, DefaultLocalizationBase? loc)
     {
-        sb.AppendLine("using System.Net;");
-        sb.AppendLine("using System.Net.Sockets;");
+        sb.AppendLine("using System;");
+        sb.AppendLine("using System.Collections.Generic;");
+        sb.AppendLine("using System.IO;");
+        sb.AppendLine("using System.Linq;");
         sb.AppendLine("using SiliconLife.Collective;");
         sb.AppendLine();
         sb.AppendLine("namespace SiliconLife.Default;");
@@ -179,25 +181,29 @@ public class PermissionViewModel : ViewModelBase
     private void GeneratePrivateIpBlock(StringBuilder sb, DefaultLocalizationBase? loc)
     {
         sb.AppendLine($"        // {Comment(loc, "NetRulePrivateIPMatch")}");
-        sb.AppendLine("        if (IPAddress.TryParse(host, out var ipAddr)");
-        sb.AppendLine("            && ipAddr.AddressFamily == AddressFamily.InterNetwork)");
+        sb.AppendLine("        // Check if host is an IPv4 address and validate private ranges");
+        sb.AppendLine("        var ipParts = host.Split('.');");
+        sb.AppendLine("        if (ipParts.Length == 4");
+        sb.AppendLine("            && byte.TryParse(ipParts[0], out var b0)");
+        sb.AppendLine("            && byte.TryParse(ipParts[1], out var b1)");
+        sb.AppendLine("            && byte.TryParse(ipParts[2], out var b2)");
+        sb.AppendLine("            && byte.TryParse(ipParts[3], out var b3))");
         sb.AppendLine("        {");
-        sb.AppendLine("            var bytes = ipAddr.GetAddressBytes();");
         sb.AppendLine();
         sb.AppendLine($"            // {Comment(loc, "NetRulePrivateC")}");
-        sb.AppendLine("            if (bytes[0] == 192 && bytes[1] == 168)");
+        sb.AppendLine("            if (b0 == 192 && b1 == 168)");
         sb.AppendLine("            {");
         sb.AppendLine("                return PermissionResult.Allowed;");
         sb.AppendLine("            }");
         sb.AppendLine();
         sb.AppendLine($"            // {Comment(loc, "NetRulePrivateA")}");
-        sb.AppendLine("            if (bytes[0] == 10)");
+        sb.AppendLine("            if (b0 == 10)");
         sb.AppendLine("            {");
         sb.AppendLine("                return PermissionResult.Allowed;");
         sb.AppendLine("            }");
         sb.AppendLine();
         sb.AppendLine($"            // {Comment(loc, "NetRulePrivateB")}");
-        sb.AppendLine("            if (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31)");
+        sb.AppendLine("            if (b0 == 172 && b1 >= 16 && b1 <= 31)");
         sb.AppendLine("            {");
         sb.AppendLine("                return PermissionResult.AskUser;");
         sb.AppendLine("            }");
