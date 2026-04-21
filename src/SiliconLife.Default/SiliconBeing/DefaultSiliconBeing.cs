@@ -61,9 +61,6 @@ public class DefaultSiliconBeing : SiliconBeingBase
             string json = JsonSerializer.Serialize(state, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(Path.Combine(BeingDirectory, "state.json"), json);
             
-            // Update backup config
-            BackupAIClientConfig = AIClientConfig?.ToDictionary(k => k.Key, v => v.Value);
-            
             _logger.Debug("Being {0}: state saved to {1}", Name, Path.Combine(BeingDirectory, "state.json"));
         }
         catch (Exception ex)
@@ -471,7 +468,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
     private IAIClientFactory GetAIClientFactory()
     {
         string clientType = NormalizeClientType(
-            ResolveEffectiveAIClientType());
+            ResolveEffectiveAIClientType(AIClientType));
         
         return clientType switch
         {

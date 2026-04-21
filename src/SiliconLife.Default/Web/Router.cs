@@ -41,9 +41,12 @@ public class Router
         RegisterController(() => new ChatController(), "/api/chat/send", "POST");
         RegisterController(() => new BeingController(), "/beings");
         RegisterController(() => new BeingController(), "/beings/soul");
+        RegisterController(() => new BeingController(), "/beings/ai-config");
         RegisterController(() => new BeingController(), "/api/beings/list");
         RegisterController(() => new BeingController(), "/api/beings/detail");
         RegisterController(() => new BeingController(), "/api/beings/soul/save", "POST");
+        RegisterController(() => new BeingController(), "/api/beings/ai-config/save", "POST");
+        RegisterController(() => new BeingController(), "/api/beings/ai-config/models");
         RegisterController(() => new TimerController(), "/timers");
         RegisterController(() => new TimerController(), "/api/timers/list");
         RegisterController(() => new TaskController(), "/tasks");

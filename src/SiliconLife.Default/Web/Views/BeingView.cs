@@ -256,11 +256,15 @@ public class BeingView : ViewBase
 
         var aiClientValue = Js.Ternary(
             () => Js.Id(() => "data").Prop(() => "aiClientConfig"),
-            () => Js.Str(() => "<a class='detail-link' href='#'>")
+            () => Js.Str(() => "<a class='detail-link' href='/beings/ai-config?beingId=")
+                .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "id"))
+                .Op(() => "+", () => (JsSyntax)Js.Str(() => "'>"))
                 .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.BeingsDetailAIClientEditLink))
                 .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a> "))
                 .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "aiClientConfig")),
-            () => Js.Str(() => "<a class='detail-link' href='#'>")
+            () => Js.Str(() => "<a class='detail-link' href='/beings/ai-config?beingId=")
+                .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "id"))
+                .Op(() => "+", () => (JsSyntax)Js.Str(() => "'>"))
                 .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.BeingsDetailAIClientEditLink))
                 .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a> "))
                 .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.BeingsNotSet)));

@@ -56,15 +56,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Independent AI configuration editor for silicon beings
+  - Added BeingAIConfigViewModel view model
+  - Added BeingAIConfigView view component
+  - Support configuring independent AI client type and parameters for each silicon being
+  - Support switching between global and independent configuration
+  - Support dynamic loading of AI model lists (e.g., DashScope)
+  - Added AI configuration related API routes in BeingController
+  - Optimized AI client type resolution logic in DefaultSiliconBeing
+  - Updated AI configuration edit link in BeingView
+
 ---
 
 ## [0.5.2] - 2026-04-21
 
 ### Added
-- Permission callback pre-compilation validation feature
+- `0a826f5` - Add save success alert in code editor
+  - Save operation success notification for code editor
+  - Improved user operation feedback
+- `833ead2` - Add assembly reference validation for dynamic compilation
+  - Dynamic compilation security enhancement
+  - Assembly reference validation mechanism
+- `5879621` - Add permission callback pre-compilation validation and enhanced error handling
+  - Permission callback pre-compilation validation feature
   - Compile permission callback code before saving to validate correctness
   - Prevent invalid code from being saved to disk
-- Detailed error handling for permission save operations
+  - Detailed error handling for permission save operations
   - Enhanced error messages with localization support
   - Separate compilation and security scan steps for better error reporting
 - JsBuilder error handling improvements in CodeEditorView and MarkdownEditorView
@@ -84,6 +102,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved alert messages with error details
 
 ### Fixed
+- `592c7ab` - Fix callback instantiation and registration order
+  - Permission callback system fix
+  - Callback registration order optimization
 - Missing permission controller API routes
 - Inconsistent error message handling in permission save operations
 
