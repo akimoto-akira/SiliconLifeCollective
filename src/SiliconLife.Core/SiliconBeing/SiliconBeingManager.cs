@@ -12,6 +12,7 @@
 // limitations under the License.
 
 using System.Diagnostics;
+using System.Reflection;
 
 namespace SiliconLife.Collective;
 
@@ -429,28 +430,57 @@ public class SiliconBeingManager : TickObject
     {
         if (!typeof(IPermissionCallback).IsAssignableFrom(callbackType))
         {
+            _logger.Warn("ReplacePermissionCallback: type {0} does not implement IPermissionCallback", callbackType.Name);
             return;
         }
 
         lock (_lock)
         {
             SiliconBeingBase? being = _beings.FirstOrDefault(b => b.Id == beingId);
-            if (being?.PermissionManager == null)
+            if (being == null)
             {
+                _logger.Warn("ReplacePermissionCallback: being {0} not found in manager", beingId);
+                return;
+            }
+            if (being.PermissionManager == null)
+            {
+                _logger.Warn("ReplacePermissionCallback: being {0} has no PermissionManager", beingId);
                 return;
             }
 
             try
             {
-                IPermissionCallback? callback = (IPermissionCallback?)Activator.CreateInstance(callbackType);
+                // Get the app data directory from config
+                string appDataDirectory = Config.Instance?.Data?.DataDirectory?.FullName ?? string.Empty;
+                
+                // Find the constructor that takes a single string parameter
+                ConstructorInfo? ctor = callbackType.GetConstructor(new[] { typeof(string) });
+                if (ctor == null)
+                {
+                    _logger.Warn("ReplacePermissionCallback: no constructor(string) found on type {0}", callbackType.Name);
+                    return;
+                }
+                
+                // Invoke constructor directly with appDataDirectory
+                IPermissionCallback? callback = (IPermissionCallback?)ctor.Invoke(new object[] { appDataDirectory });
+                    
                 if (callback != null)
                 {
                     being.PermissionManager.SetCustomCallback(callback);
+                    _logger.Info("Custom permission callback applied for being {0}, type={1}", beingId, callbackType.Name);
+                }
+                else
+                {
+                    _logger.Warn("ReplacePermissionCallback: constructor returned null for being {0}", beingId);
                 }
             }
-            catch
+            catch (TargetInvocationException tie) when (tie.InnerException != null)
             {
-                // Failed to instantiate callback — silently ignore (stealth channel)
+                _logger.Warn("Failed to instantiate permission callback for being {0}: constructor threw {1}", beingId, tie.InnerException.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn("Failed to instantiate permission callback for being {0}: {1}", beingId, ex.Message);
             }
         }
     }

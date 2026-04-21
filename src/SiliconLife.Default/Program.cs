@@ -253,6 +253,10 @@ public class Program
     {
         string beingDirectory = Path.Combine(configData.DataDirectory.FullName, "SiliconManager", curator.Id.ToString());
 
+        // Register being FIRST before applying custom callbacks
+        MainLoop.BeingManager.RegisterBeing(curator);
+        _logger.Info("Registered curator: {0} ({1})", curator.Name, curator.Id);
+
         if (DynamicBeingLoader.HasCustomPermissionCallback(beingDirectory))
         {
             try
@@ -269,9 +273,6 @@ public class Program
                 _logger.Warn("Failed to load custom permission callback for curator {0}", ex, curator.Id);
             }
         }
-
-        MainLoop.BeingManager.RegisterBeing(curator);
-        _logger.Info("Registered curator: {0} ({1})", curator.Name, curator.Id);
 
         if (DynamicBeingLoader.HasCustomCode(beingDirectory))
         {
