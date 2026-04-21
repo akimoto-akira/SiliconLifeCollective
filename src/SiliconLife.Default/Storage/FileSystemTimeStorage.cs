@@ -26,6 +26,7 @@ namespace SiliconLife.Default;
 public class FileSystemTimeStorage : ITimeStorage
 {
     private readonly string _baseDirectory;
+    private readonly ReaderWriterLockSlim _rwLock = new();
 
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -49,24 +50,32 @@ public class FileSystemTimeStorage : ITimeStorage
     /// </summary>
     public T? Read<T>(string key)
     {
-        string dir = GetKeyDirectory(key);
-        if (!Directory.Exists(dir)) return default;
-
-        T? latest = default;
-        DateTime latestTime = DateTime.MinValue;
-
-        foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
+        _rwLock.EnterReadLock();
+        try
         {
-            if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
+            string dir = GetKeyDirectory(key);
+            if (!Directory.Exists(dir)) return default;
 
-            if (fileTime > latestTime)
+            T? latest = default;
+            DateTime latestTime = DateTime.MinValue;
+
+            foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
             {
-                latestTime = fileTime;
-                latest = ReadSingleLine<T>(file);
-            }
-        }
+                if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
 
-        return latest;
+                if (fileTime > latestTime)
+                {
+                    latestTime = fileTime;
+                    latest = ReadSingleLine<T>(file);
+                }
+            }
+
+            return latest;
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
     }
 
     /// <summary>
@@ -82,9 +91,17 @@ public class FileSystemTimeStorage : ITimeStorage
     /// </summary>
     public bool Exists(string key)
     {
-        string dir = GetKeyDirectory(key);
-        return Directory.Exists(dir)
-            && Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories).Length > 0;
+        _rwLock.EnterReadLock();
+        try
+        {
+            string dir = GetKeyDirectory(key);
+            return Directory.Exists(dir)
+                && Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories).Length > 0;
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
     }
 
     /// <summary>
@@ -92,9 +109,17 @@ public class FileSystemTimeStorage : ITimeStorage
     /// </summary>
     public void Delete(string key)
     {
-        string dir = GetKeyDirectory(key);
-        if (Directory.Exists(dir))
-            Directory.Delete(dir, true);
+        _rwLock.EnterWriteLock();
+        try
+        {
+            string dir = GetKeyDirectory(key);
+            if (Directory.Exists(dir))
+                Directory.Delete(dir, true);
+        }
+        finally
+        {
+            _rwLock.ExitWriteLock();
+        }
     }
 
     // ── ITimeStorage ─────────────────────────────────────────────────────────
@@ -105,9 +130,17 @@ public class FileSystemTimeStorage : ITimeStorage
     /// </summary>
     public void Write<T>(string key, DateTime timestamp, T data)
     {
-        string filePath = GetTimeFilePath(key, timestamp);
-        EnsureDirectory(filePath);
-        WriteSingleLine(filePath, data);
+        _rwLock.EnterWriteLock();
+        try
+        {
+            string filePath = GetTimeFilePath(key, timestamp);
+            EnsureDirectory(filePath);
+            WriteSingleLine(filePath, data);
+        }
+        finally
+        {
+            _rwLock.ExitWriteLock();
+        }
     }
 
     /// <summary>
@@ -117,10 +150,18 @@ public class FileSystemTimeStorage : ITimeStorage
     /// </summary>
     public void Write<T>(string key, IncompleteDate timestamp, T data)
     {
-        DateTime resolved = ResolveTimestamp(timestamp);
-        string filePath = GetTimeFilePath(key, resolved);
-        EnsureDirectory(filePath);
-        WriteSingleLine(filePath, data);
+        _rwLock.EnterWriteLock();
+        try
+        {
+            DateTime resolved = ResolveTimestamp(timestamp);
+            string filePath = GetTimeFilePath(key, resolved);
+            EnsureDirectory(filePath);
+            WriteSingleLine(filePath, data);
+        }
+        finally
+        {
+            _rwLock.ExitWriteLock();
+        }
     }
 
     /// <summary>
@@ -128,25 +169,33 @@ public class FileSystemTimeStorage : ITimeStorage
     /// </summary>
     public T? Read<T>(string key, DateTime timestamp)
     {
-        string dir = GetKeyDirectory(key);
-        if (!Directory.Exists(dir)) return default;
-
-        T? best = default;
-        long bestDiff = long.MaxValue;
-
-        foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
+        _rwLock.EnterReadLock();
+        try
         {
-            if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
+            string dir = GetKeyDirectory(key);
+            if (!Directory.Exists(dir)) return default;
 
-            long diff = Math.Abs((fileTime - timestamp).Ticks);
-            if (diff < bestDiff)
+            T? best = default;
+            long bestDiff = long.MaxValue;
+
+            foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
             {
-                bestDiff = diff;
-                best = ReadSingleLine<T>(file);
-            }
-        }
+                if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
 
-        return best;
+                long diff = Math.Abs((fileTime - timestamp).Ticks);
+                if (diff < bestDiff)
+                {
+                    bestDiff = diff;
+                    best = ReadSingleLine<T>(file);
+                }
+            }
+
+            return best;
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
     }
 
     /// <summary>
@@ -154,13 +203,21 @@ public class FileSystemTimeStorage : ITimeStorage
     /// </summary>
     public T? Read<T>(string key, IncompleteDate timestamp)
     {
-        string dir = GetKeyDirectory(key);
-        string? patternDir = Path.GetDirectoryName(GetTimeFilePath(key, timestamp));
+        _rwLock.EnterReadLock();
+        try
+        {
+            string dir = GetKeyDirectory(key);
+            string? patternDir = Path.GetDirectoryName(GetTimeFilePath(key, timestamp));
 
-        if (patternDir == null || !Directory.Exists(patternDir)) return default;
+            if (patternDir == null || !Directory.Exists(patternDir)) return default;
 
-        string[] files = Directory.GetFiles(patternDir, "*.json");
-        return files.Length > 0 ? ReadSingleLine<T>(files[0]) : default;
+            string[] files = Directory.GetFiles(patternDir, "*.json");
+            return files.Length > 0 ? ReadSingleLine<T>(files[0]) : default;
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
     }
 
     public bool Exists(string key, DateTime timestamp)
@@ -174,11 +231,19 @@ public class FileSystemTimeStorage : ITimeStorage
     /// </summary>
     public void Delete(string key, DateTime timestamp)
     {
-        string filePath = GetTimeFilePath(key, timestamp);
-        if (File.Exists(filePath))
-            File.Delete(filePath);
+        _rwLock.EnterWriteLock();
+        try
+        {
+            string filePath = GetTimeFilePath(key, timestamp);
+            if (File.Exists(filePath))
+                File.Delete(filePath);
 
-        CleanEmptyDirs(GetKeyDirectory(key));
+            CleanEmptyDirs(GetKeyDirectory(key));
+        }
+        finally
+        {
+            _rwLock.ExitWriteLock();
+        }
     }
 
     /// <summary>
@@ -186,15 +251,23 @@ public class FileSystemTimeStorage : ITimeStorage
     /// </summary>
     public void Delete(string key, IncompleteDate timestamp)
     {
-        string dir = GetKeyDirectory(key);
-        string? patternDir = Path.GetDirectoryName(GetTimeFilePath(key, timestamp));
+        _rwLock.EnterWriteLock();
+        try
+        {
+            string dir = GetKeyDirectory(key);
+            string? patternDir = Path.GetDirectoryName(GetTimeFilePath(key, timestamp));
 
-        if (patternDir == null || !Directory.Exists(patternDir)) return;
+            if (patternDir == null || !Directory.Exists(patternDir)) return;
 
-        foreach (string f in Directory.GetFiles(patternDir, "*.json"))
-            File.Delete(f);
+            foreach (string f in Directory.GetFiles(patternDir, "*.json"))
+                File.Delete(f);
 
-        CleanEmptyDirs(dir);
+            CleanEmptyDirs(dir);
+        }
+        finally
+        {
+            _rwLock.ExitWriteLock();
+        }
     }
 
     /// <summary>
@@ -203,21 +276,29 @@ public class FileSystemTimeStorage : ITimeStorage
     /// </summary>
     public List<TimeEntry<T>> Query<T>(string key, IncompleteDate? range)
     {
-        var result = new List<TimeEntry<T>>();
-        string dir = GetKeyDirectory(key);
-        if (!Directory.Exists(dir)) return result;
-
-        foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
+        _rwLock.EnterReadLock();
+        try
         {
-            if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
-            if (range.HasValue && !range.Value.Matches(fileTime)) continue;
+            var result = new List<TimeEntry<T>>();
+            string dir = GetKeyDirectory(key);
+            if (!Directory.Exists(dir)) return result;
 
-            foreach (T data in ReadAllLines<T>(file))
-                result.Add(new TimeEntry<T>(key, fileTime, data));
+            foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
+            {
+                if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
+                if (range.HasValue && !range.Value.Matches(fileTime)) continue;
+
+                foreach (T data in ReadAllLines<T>(file))
+                    result.Add(new TimeEntry<T>(key, fileTime, data));
+            }
+
+            result.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
+            return result;
         }
-
-        result.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
-        return result;
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
     }
 
     /// <summary>
@@ -226,25 +307,33 @@ public class FileSystemTimeStorage : ITimeStorage
     /// </summary>
     public List<TimeEntry<T>> Query<T>(IncompleteDate? range)
     {
-        var result = new List<TimeEntry<T>>();
-        if (!Directory.Exists(_baseDirectory)) return result;
-
-        foreach (string keyDir in Directory.GetDirectories(_baseDirectory))
+        _rwLock.EnterReadLock();
+        try
         {
-            string key = Path.GetFileName(keyDir);
+            var result = new List<TimeEntry<T>>();
+            if (!Directory.Exists(_baseDirectory)) return result;
 
-            foreach (string file in Directory.GetFiles(keyDir, "*.json", SearchOption.AllDirectories))
+            foreach (string keyDir in Directory.GetDirectories(_baseDirectory))
             {
-                if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
-                if (range.HasValue && !range.Value.Matches(fileTime)) continue;
+                string key = Path.GetFileName(keyDir);
 
-                foreach (T data in ReadAllLines<T>(file))
-                    result.Add(new TimeEntry<T>(key, fileTime, data));
+                foreach (string file in Directory.GetFiles(keyDir, "*.json", SearchOption.AllDirectories))
+                {
+                    if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
+                    if (range.HasValue && !range.Value.Matches(fileTime)) continue;
+
+                    foreach (T data in ReadAllLines<T>(file))
+                        result.Add(new TimeEntry<T>(key, fileTime, data));
+                }
             }
-        }
 
-        result.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
-        return result;
+            result.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
+            return result;
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
     }
 
     public int Count(string key, IncompleteDate range)
@@ -259,25 +348,33 @@ public class FileSystemTimeStorage : ITimeStorage
     /// </summary>
     public int DeleteRange(string key, IncompleteDate range)
     {
-        string dir = GetKeyDirectory(key);
-        if (!Directory.Exists(dir)) return 0;
-
-        int deleted = 0;
-
-        foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
+        _rwLock.EnterWriteLock();
+        try
         {
-            if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
-            if (!range.Matches(fileTime)) continue;
+            string dir = GetKeyDirectory(key);
+            if (!Directory.Exists(dir)) return 0;
 
-            // Count every record line in the file, then delete the whole file
-            deleted += File.ReadLines(file).Count(l => !string.IsNullOrWhiteSpace(l));
-            File.Delete(file);
+            int deleted = 0;
+
+            foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
+            {
+                if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
+                if (!range.Matches(fileTime)) continue;
+
+                // Count every record line in the file, then delete the whole file
+                deleted += File.ReadLines(file).Count(l => !string.IsNullOrWhiteSpace(l));
+                File.Delete(file);
+            }
+
+            if (deleted > 0)
+                CleanEmptyDirs(dir);
+
+            return deleted;
         }
-
-        if (deleted > 0)
-            CleanEmptyDirs(dir);
-
-        return deleted;
+        finally
+        {
+            _rwLock.ExitWriteLock();
+        }
     }
 
     // ── File I/O helpers ─────────────────────────────────────────────────────
@@ -488,12 +585,15 @@ public class FileSystemTimeStorage : ITimeStorage
         if (string.IsNullOrWhiteSpace(keyword))
             return new List<TimeEntry<T>>();
 
-        string dir = GetKeyDirectory(key);
-        if (!Directory.Exists(dir))
-            return new List<TimeEntry<T>>();
+        _rwLock.EnterReadLock();
+        try
+        {
+            string dir = GetKeyDirectory(key);
+            if (!Directory.Exists(dir))
+                return new List<TimeEntry<T>>();
 
-        var results = new List<TimeEntry<T>>();
-        var keywordLower = keyword.ToLowerInvariant();
+            var results = new List<TimeEntry<T>>();
+            var keywordLower = keyword.ToLowerInvariant();
 
         foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
         {
@@ -555,5 +655,10 @@ public class FileSystemTimeStorage : ITimeStorage
         // Order by timestamp descending and apply limit
         var ordered = results.OrderByDescending(e => e.Timestamp);
         return (maxCount > 0 ? ordered.Take(maxCount) : ordered).ToList();
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
     }
 }

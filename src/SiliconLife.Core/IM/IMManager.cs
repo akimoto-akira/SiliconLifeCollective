@@ -54,18 +54,12 @@ public class IMManager
         _logger.Info("IM message received: sender={0}, channel={1}", msg.SenderId, msg.ChannelId);
         if (msg.ChannelId == Guid.Empty)
         {
-            List<SiliconBeingBase> beings = _beingManager.GetAllBeings();
-            if (beings.Count > 0)
-            {
-                msg.ChannelId = beings[0].Id;
-                _logger.Debug("Routing message to default being: {0}", beings[0].Id);
-                _chatSystem.AddMessage(msg.SenderId, msg.ChannelId, msg.Content);
-            }
+            // Reject messages with empty ChannelId instead of routing to a default being
+            _logger.Warn("Received message with empty ChannelId from sender={0}, rejecting", msg.SenderId);
+            return;
         }
-        else
-        {
-            _chatSystem.AddMessage(msg.SenderId, msg.ChannelId, msg.Content);
-        }
+
+        _chatSystem.AddMessage(msg.SenderId, msg.ChannelId, msg.Content);
     }
 
     /// <summary>

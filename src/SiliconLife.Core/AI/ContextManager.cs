@@ -35,6 +35,7 @@ public class ContextManager
 
     private readonly List<ChatMessage> _messages;
     private readonly HashSet<Guid> _contextMessageIds;
+    private readonly List<Guid> _pendingMarkAsReadIds;
     private bool _needsContinuation;
     private bool _hasNewPendingMessages;
 
@@ -66,6 +67,7 @@ public class ContextManager
         _session = session;
         _messages = new List<ChatMessage>();
         _contextMessageIds = new HashSet<Guid>();
+        _pendingMarkAsReadIds = new List<Guid>();
 
         if (_being.Id != Guid.Empty && _session != null)
         {
@@ -146,7 +148,6 @@ public class ContextManager
         }
 
         List<ChatMessage> unread = chatSystem.GetPendingMessages(_being.Id);
-        List<Guid> messageIdsToMark = new List<Guid>();
         
         foreach (ChatMessage msg in unread)
         {
@@ -156,17 +157,37 @@ public class ContextManager
                 continue;
             }
 
+            // Verify message belongs to the current session
+            if (_session != null && msg.ChannelId != Guid.Empty && msg.ChannelId != _session.Id)
+            {
+                _logger.Debug("Skipping message {0} from different session {1}", msg.Id, msg.ChannelId);
+                continue;
+            }
+
             // Context already loaded by LoadHistoryMessages — just track
             _contextMessageIds.Add(msg.Id);
             _hasNewPendingMessages = true;
-            messageIdsToMark.Add(msg.Id);
+            _pendingMarkAsReadIds.Add(msg.Id);
         }
         
-        // Mark messages as read in the session
-        if (messageIdsToMark.Count > 0 && _session != null)
+        if (_pendingMarkAsReadIds.Count > 0)
         {
-            _session.MarkMessagesAsRead(messageIdsToMark, _being.Id);
-            _logger.Debug("Fetched {0} unread messages for being {1}", messageIdsToMark.Count, _being.Id);
+            _logger.Debug("Fetched {0} unread messages for being {1}", _pendingMarkAsReadIds.Count, _being.Id);
+        }
+    }
+
+    /// <summary>
+    /// Commits pending messages as read after AI processing succeeds.
+    /// Should only be called when AI response is successful, so that
+    /// failed messages remain unread and can be retried on the next tick.
+    /// </summary>
+    public void CommitMessagesAsRead()
+    {
+        if (_pendingMarkAsReadIds.Count > 0 && _session != null)
+        {
+            _session.MarkMessagesAsRead(_pendingMarkAsReadIds, _being.Id);
+            _logger.Debug("Committed {0} messages as read for being {1}", _pendingMarkAsReadIds.Count, _being.Id);
+            _pendingMarkAsReadIds.Clear();
         }
     }
 
@@ -549,10 +570,12 @@ public class ContextManager
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
             RecordToMemory(loc.FormatMemoryEventToolCall(toolNames));
+            CommitMessagesAsRead();
         }
         else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
         {
             DeliverOutput(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
+            CommitMessagesAsRead();
 
             if (!string.IsNullOrEmpty(response.Content))
             {
@@ -564,6 +587,13 @@ public class ContextManager
                 string partnerName = otherBeing?.Name ?? Config.Instance?.Data?.UserNickname ?? otherId.ToString();
                 RecordToMemory(loc.FormatMemoryEventSingleChat(partnerName, response.Content));
             }
+        }
+        else if (!response.Success)
+        {
+            // AI request failed — notify frontend and keep messages unread for retry
+            string errorMsg = response.ErrorMessage ?? "Unknown AI error";
+            DeliverOutput($"[Error] AI request failed: {errorMsg}");
+            _logger.Error("ThinkOnChat failed: being={0}, error={1}", _being.Name, errorMsg);
         }
 
         return response;
@@ -628,10 +658,12 @@ public class ContextManager
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
             RecordToMemory(loc.FormatMemoryEventToolCall(toolNames));
+            CommitMessagesAsRead();
         }
         else if (response.Success && (!string.IsNullOrEmpty(response.Content) || !string.IsNullOrEmpty(response.Thinking)))
         {
             DeliverOutput(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
+            CommitMessagesAsRead();
 
             if (!string.IsNullOrEmpty(response.Content))
             {
@@ -643,6 +675,13 @@ public class ContextManager
                 string partnerName = otherBeing?.Name ?? Config.Instance?.Data?.UserNickname ?? otherId.ToString();
                 RecordToMemory(loc.FormatMemoryEventSingleChat(partnerName, response.Content));
             }
+        }
+        else if (!response.Success)
+        {
+            // AI request failed — notify frontend and keep messages unread for retry
+            string errorMsg = response.ErrorMessage ?? "Unknown AI error";
+            DeliverOutput($"[Error] AI request failed: {errorMsg}");
+            _logger.Error("ThinkOnChatStreamAsync failed: being={0}, error={1}", _being.Name, errorMsg);
         }
 
         return response;
@@ -1010,23 +1049,58 @@ public class ContextManager
 
     /// <summary>
     /// Delivers output for timer execution (no session required).
-    /// Always sends via IM manager or falls back to console.
+    /// Resolves the correct session for routing and persists the message to ChatSystem.
+    /// Curator sends directly to the user; non-curator sends to the curator for relay.
     /// </summary>
     private void DeliverTimerOutput(string content, string? thinking = null)
     {
         _logger.Debug("Delivering timer output for being {0}, length={1}", _being.Name, content.Length);
 
+        // Determine the target: curator → user, non-curator → curator
+        Guid targetId = Guid.Empty;
+        if (_being.IsCurator)
+        {
+            targetId = Config.Instance?.Data?.UserGuid ?? Guid.Empty;
+        }
+        else
+        {
+            Guid curatorGuid = Config.Instance?.Data?.CuratorGuid ?? Guid.Empty;
+            SiliconBeingManager? beingManager = ServiceLocator.Instance.BeingManager;
+            SiliconBeingBase? curator = curatorGuid != Guid.Empty ? beingManager?.GetBeing(curatorGuid) : null;
+            targetId = curator?.Id ?? Guid.Empty;
+        }
+
+        if (targetId == Guid.Empty)
+        {
+            _logger.Warn("DeliverTimerOutput: no valid target for being {0}", _being.Name);
+            return;
+        }
+
+        // Get or create session to obtain the correct session ID for routing
+        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
+        SessionBase? session = chatSystem?.GetOrCreateSession(_being.Id, targetId);
+        if (session == null)
+        {
+            _logger.Warn("DeliverTimerOutput: failed to get session for being {0} → target {1}", _being.Name, targetId);
+            return;
+        }
+
+        // Persist message to ChatSystem
+        ChatMessage chatMsg = new(_being.Id, session.Id, content)
+        {
+            Role = MessageRole.Assistant,
+            Thinking = thinking,
+        };
+        chatSystem!.AddMessage(chatMsg);
+
+        // Push via IM (SSE) using the session ID so SSE clients can receive it
         IMManager? imManager = ServiceLocator.Instance.IMManager;
         if (imManager != null)
         {
-            // For timer, we don't have a session, so we send to a default session or use broadcast
-            // Since timer is automated, we'll use console output as fallback
-            _ = imManager.SendMessageAsync(_being.Id, Guid.Empty, content, thinking, _being.Name);
+            _ = imManager.SendMessageAsync(_being.Id, session.Id, content, thinking, _being.Name);
         }
-        
-        // Always log to console for timer notifications
-        Console.WriteLine($"[TIMER] {_being.Name}: {content}");
-        Console.WriteLine();
+
+        _logger.Info("[TIMER] {0}: {1}", _being.Name, content);
     }
 
     /// <summary>
