@@ -1363,6 +1363,21 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string LogsLevelAll { get; }
 
     /// <summary>
+    /// Gets the label for being filter
+    /// </summary>
+    public abstract string LogsBeingFilter { get; }
+
+    /// <summary>
+    /// Gets the text for "All Beings" option in filter
+    /// </summary>
+    public abstract string LogsAllBeings { get; }
+
+    /// <summary>
+    /// Gets the text for "System Only" option in filter
+    /// </summary>
+    public abstract string LogsSystemOnly { get; }
+
+    /// <summary>
     /// Gets the text for the filter button
     /// </summary>
     public abstract string LogsFilterButton { get; }

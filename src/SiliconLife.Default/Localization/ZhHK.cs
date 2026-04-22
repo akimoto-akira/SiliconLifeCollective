@@ -456,6 +456,9 @@ public class ZhHK : DefaultLocalizationBase
     public override string LogsStartTime => "開始時間";
     public override string LogsEndTime => "結束時間";
     public override string LogsLevelAll => "全部級別";
+    public override string LogsBeingFilter => "矽基人";
+    public override string LogsAllBeings => "不篩選";
+    public override string LogsSystemOnly => "僅系統";
     public override string LogsFilterButton => "查詢";
     public override string LogsEmptyState => "暫無日誌記錄";
     public override string LogsExceptionLabel => "例外詳情：";

@@ -599,6 +599,9 @@ public class EnUS : DefaultLocalizationBase
     public override string LogsStartTime => "Start Time";
     public override string LogsEndTime => "End Time";
     public override string LogsLevelAll => "All Levels";
+    public override string LogsBeingFilter => "Silicon Being";
+    public override string LogsAllBeings => "All Beings";
+    public override string LogsSystemOnly => "System Only";
     public override string LogsFilterButton => "Filter";
     public override string LogsEmptyState => "No log entries found";
     public override string LogsExceptionLabel => "Exception: ";

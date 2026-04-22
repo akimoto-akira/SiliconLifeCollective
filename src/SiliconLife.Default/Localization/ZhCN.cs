@@ -599,6 +599,9 @@ public class ZhCN : DefaultLocalizationBase
     public override string LogsStartTime => "开始时间";
     public override string LogsEndTime => "结束时间";
     public override string LogsLevelAll => "全部级别";
+    public override string LogsBeingFilter => "硅基人";
+    public override string LogsAllBeings => "不筛选";
+    public override string LogsSystemOnly => "仅系统";
     public override string LogsFilterButton => "查询";
     public override string LogsEmptyState => "暂无日志记录";
     public override string LogsExceptionLabel => "异常详情：";

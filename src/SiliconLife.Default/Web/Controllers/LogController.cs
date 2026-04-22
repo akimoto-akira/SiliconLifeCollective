@@ -27,10 +27,12 @@ public class LogController : Controller
     private const int DefaultPageSize = 100;
 
     private readonly SkinManager _skinManager;
+    private readonly SiliconBeingManager _beingManager;
 
     public LogController()
     {
         _skinManager = ServiceLocator.Instance.GetService<SkinManager>()!;
+        _beingManager = ServiceLocator.Instance.BeingManager!;
     }
 
     public override void Handle()
@@ -41,6 +43,10 @@ public class LogController : Controller
             Index();
         else if (path == "/api/logs/list")
             GetList();
+        else if (path == "/api/logs/beings")
+            GetBeings();
+        else if (path == "/api/logs/levels")
+            GetLevels();
         else
         {
             Response.StatusCode = 404;
@@ -60,6 +66,7 @@ public class LogController : Controller
     private void GetList()
     {
         var levelFilter = GetQueryValue("level", "");
+        var beingFilter = GetQueryValue("beingId", "");
         var startDateStr = GetQueryValue("startDate", "");
         var endDateStr = GetQueryValue("endDate", "");
         var page = int.TryParse(GetQueryValue("page", "1"), out int p) ? p : 1;
@@ -87,6 +94,21 @@ public class LogController : Controller
             endTime = end;
         }
 
+        Guid? beingIdFilter = null;
+        bool systemOnly = false;
+        
+        if (!string.IsNullOrEmpty(beingFilter))
+        {
+            if (beingFilter == "system")
+            {
+                systemOnly = true;
+            }
+            else if (Guid.TryParse(beingFilter, out var beingId))
+            {
+                beingIdFilter = beingId;
+            }
+        }
+
         foreach (string file in Directory.GetFiles(logDirectory, "*.json", SearchOption.AllDirectories))
         {
             try
@@ -103,6 +125,18 @@ public class LogController : Controller
                 var data = File.ReadAllBytes(file);
                 var dto = JsonSerializer.Deserialize<LogEntryDto>(System.Text.Encoding.UTF8.GetString(data), JsonOptions);
                 if (dto == null) continue;
+
+                // Apply being filter
+                if (systemOnly && dto.BeingId.HasValue)
+                {
+                    continue;
+                }
+                
+                if (beingIdFilter.HasValue && 
+                    (!dto.BeingId.HasValue || dto.BeingId.Value != beingIdFilter.Value))
+                {
+                    continue;
+                }
 
                 var levelStr = GetLevelString(dto.Level);
 
@@ -204,6 +238,41 @@ public class LogController : Controller
             path = parent;
         }
         return int.TryParse(Path.GetFileName(path), out value);
+    }
+
+    private void GetBeings()
+    {
+        var beings = _beingManager.GetAllBeings();
+        var list = beings.Select(b => new
+        {
+            id = b.Id.ToString(),
+            displayName = $"{b.Name} ({b.Id})"
+        }).ToList();
+
+        RenderJson(list);
+    }
+
+    private void GetLevels()
+    {
+        var config = Config.Instance.Data as DefaultConfigData;
+        var language = config?.Language ?? Language.EnUS;
+        
+        if (!LocalizationManager.Instance.TryGetLocalization(language, out var localization))
+        {
+            RenderJson(new { error = "Localization not found" });
+            return;
+        }
+
+        var levels = new[] 
+        {
+            new { value = "Trace", displayName = localization!.GetLogLevelName(LogLevel.Trace) },
+            new { value = "Debug", displayName = localization.GetLogLevelName(LogLevel.Debug) },
+            new { value = "Info", displayName = localization.GetLogLevelName(LogLevel.Information) },
+            new { value = "Warning", displayName = localization.GetLogLevelName(LogLevel.Warning) },
+            new { value = "Error", displayName = localization.GetLogLevelName(LogLevel.Error) }
+        };
+
+        RenderJson(levels);
     }
 
     private sealed record LogEntryDto(

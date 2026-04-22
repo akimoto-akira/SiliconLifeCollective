@@ -599,6 +599,9 @@ public class KoKR : DefaultLocalizationBase
     public override string LogsStartTime => "시작 시간";
     public override string LogsEndTime => "종료 시간";
     public override string LogsLevelAll => "모든 수준";
+    public override string LogsBeingFilter => "실리콘 생명체";
+    public override string LogsAllBeings => "필터링 안 함";
+    public override string LogsSystemOnly => "시스템만";
     public override string LogsFilterButton => "조회";
     public override string LogsEmptyState => "로그 기록 없음";
     public override string LogsExceptionLabel => "예외 상세:";

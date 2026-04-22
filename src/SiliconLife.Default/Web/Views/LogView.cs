@@ -41,14 +41,19 @@ public class LogView : ViewBase
                     H.Label(vm.Localization.LogsEndTime).Attr("for", "end-date").Class("filter-label"),
                     H.Input().Attr("type", "datetime-local").Id("end-date").Class("filter-datetime")
                 ).Class("filter-group"),
-                H.Select(
-                    H.Option(vm.Localization.LogsLevelAll).Value(""),
-                    H.Option("Trace").Value("Trace"),
-                    H.Option("Debug").Value("Debug"),
-                    H.Option("Info").Value("Info"),
-                    H.Option("Warning").Value("Warning"),
-                    H.Option("Error").Value("Error")
-                ).Id("log-level").Class("filter-select"),
+                H.Div(
+                    H.Label(vm.Localization.LogsLevelAll).Attr("for", "log-level").Class("filter-label"),
+                    H.Select(
+                        H.Option(vm.Localization.LogsLevelAll).Value("")
+                    ).Id("log-level").Class("filter-select")
+                ).Class("filter-group"),
+                H.Div(
+                    H.Label(vm.Localization.LogsBeingFilter).Attr("for", "being-filter").Class("filter-label"),
+                    H.Select(
+                        H.Option(vm.Localization.LogsAllBeings).Value(""),
+                        H.Option(vm.Localization.LogsSystemOnly).Value("system")
+                    ).Id("being-filter").Class("filter-select")
+                ).Class("filter-group"),
                 H.Button(vm.Localization.LogsFilterButton).OnClick("loadLogs()").Class("filter-btn")
             ).Class("filter-bar"),
             H.Div(
@@ -261,9 +266,10 @@ public class LogView : ViewBase
 
         var loadLogsBody = Js.Block()
             .Add(() => Js.Const(() => "level", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "log-level")).Prop(() => "value")))
+            .Add(() => Js.Const(() => "beingId", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "being-filter")).Prop(() => "value")))
             .Add(() => Js.Const(() => "startDate", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "start-date")).Prop(() => "value")))
             .Add(() => Js.Const(() => "endDate", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "end-date")).Prop(() => "value")))
-            .Add(() => Js.Const(() => "params", () => Js.Str(() => "?page=").Op(() => "+", () => (JsSyntax)Js.Id(() => "currentPage")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&level=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "level")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&startDate=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "startDate")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&endDate=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "endDate"))))
+            .Add(() => Js.Const(() => "params", () => Js.Str(() => "?page=").Op(() => "+", () => (JsSyntax)Js.Id(() => "currentPage")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&level=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "level")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&beingId=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "beingId")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&startDate=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "startDate")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&endDate=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "endDate"))))
             .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/logs/list").Op(() => "+", () => (JsSyntax)Js.Id(() => "params"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
 
         var updatePaginationBody = Js.Block()
@@ -308,11 +314,41 @@ public class LogView : ViewBase
             .Add(() => Js.Let(() => "currentPage", () => Js.Num(() => "1")))
             .Add(() => Js.Let(() => "totalPages", () => Js.Num(() => "1")))
             .Add(() => Js.Func(() => "loadLogs", () => new List<string>(), () => loadLogsBody))
+            .Add(() => Js.Func(() => "loadBeings", () => new List<string>(), () => Js.Block()
+                .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/logs/beings"))
+                    .Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json")))
+                    .Call(() => "then", () => Js.Arrow(() => new List<string> { "beings" }, () => Js.Block()
+                        .Add(() => Js.Const(() => "select", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "being-filter"))))
+                        .Add(() => Js.Id(() => "beings").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "being" }, () => Js.Block()
+                            .Add(() => Js.Const(() => "option", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "option"))))
+                            .Add(() => Js.Assign(() => Js.Id(() => "option").Prop(() => "value"), () => Js.Id(() => "being").Prop(() => "id")))
+                            .Add(() => Js.Assign(() => Js.Id(() => "option").Prop(() => "textContent"), () => Js.Id(() => "being").Prop(() => "displayName")))
+                            .Add(() => Js.Id(() => "select").Call(() => "appendChild", () => Js.Id(() => "option")).Stmt())
+                        )).Stmt())
+                    )).Stmt())
+            ))
+            .Add(() => Js.Func(() => "loadLevels", () => new List<string>(), () => Js.Block()
+                .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/logs/levels"))
+                    .Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json")))
+                    .Call(() => "then", () => Js.Arrow(() => new List<string> { "levels" }, () => Js.Block()
+                        .Add(() => Js.Const(() => "select", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "log-level"))))
+                        .Add(() => Js.Id(() => "levels").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "level" }, () => Js.Block()
+                            .Add(() => Js.Const(() => "option", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "option"))))
+                            .Add(() => Js.Assign(() => Js.Id(() => "option").Prop(() => "value"), () => Js.Id(() => "level").Prop(() => "value")))
+                            .Add(() => Js.Assign(() => Js.Id(() => "option").Prop(() => "textContent"), () => Js.Id(() => "level").Prop(() => "displayName")))
+                            .Add(() => Js.Id(() => "select").Call(() => "appendChild", () => Js.Id(() => "option")).Stmt())
+                        )).Stmt())
+                    )).Stmt())
+            ))
             .Add(() => Js.Func(() => "updatePagination", () => new List<string>(), () => updatePaginationBody))
             .Add(() => Js.Func(() => "prevPage", () => new List<string>(), () => prevPageBody))
             .Add(() => Js.Func(() => "nextPage", () => new List<string>(), () => nextPageBody))
             .Add(() => Js.Func(() => "toggleException", () => new List<string> { "item" }, () => toggleExceptionBody))
-            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "loadLogs").Invoke())));
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Block()
+                .Add(() => Js.Id(() => "loadLevels").Invoke().Stmt())
+                .Add(() => Js.Id(() => "loadBeings").Invoke().Stmt())
+                .Add(() => Js.Id(() => "loadLogs").Invoke().Stmt())
+            )));
     }
 
     private static JsSyntax BuildLogItemHtml(DefaultLocalizationBase loc)

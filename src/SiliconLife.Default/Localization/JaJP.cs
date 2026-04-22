@@ -599,6 +599,9 @@ public class JaJP : DefaultLocalizationBase
     public override string LogsStartTime => "開始時間";
     public override string LogsEndTime => "終了時間";
     public override string LogsLevelAll => "すべてのレベル";
+    public override string LogsBeingFilter => "シリコンビーイング";
+    public override string LogsAllBeings => "フィルタリングなし";
+    public override string LogsSystemOnly => "システムのみ";
     public override string LogsFilterButton => "クエリ";
     public override string LogsEmptyState => "ログ記録なし";
     public override string LogsExceptionLabel => "例外詳細：";
