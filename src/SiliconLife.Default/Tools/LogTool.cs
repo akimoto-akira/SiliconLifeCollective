@@ -81,10 +81,15 @@ public class LogTool : ITool
                     ["type"] = "boolean",
                     ["description"] = "Only return successful/failed calls (for query_tool_calls)"
                 },
-                ["session_id"] = new Dictionary<string, object>
+                ["other_id"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "Specific session ID (for query_conversations)"
+                    ["description"] = "The other participant's GUID (user ID or another being ID)"
+                },
+                ["my_id"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["description"] = "Optional: your own being GUID (for querying conversations on behalf of another being)"
                 },
                 ["keyword"] = new Dictionary<string, object>
                 {
@@ -298,8 +303,11 @@ public class LogTool : ITool
             }
         }
 
-        string? sessionId = parameters.TryGetValue("session_id", out object? sessionIdObj) && sessionIdObj != null
-            ? sessionIdObj.ToString()
+        string? otherIdStr = parameters.TryGetValue("other_id", out object? otherIdObj) && otherIdObj != null
+            ? otherIdObj.ToString()
+            : null;
+        string? myIdStr = parameters.TryGetValue("my_id", out object? myIdObj) && myIdObj != null
+            ? myIdObj.ToString()
             : null;
         string? keyword = parameters.TryGetValue("keyword", out object? keywordObj) && keywordObj != null
             ? keywordObj.ToString()
@@ -318,33 +326,53 @@ public class LogTool : ITool
             return ToolResult.Failed("Chat system is not available");
         }
 
-        List<ChatMessage> messages;
+        // Determine the two participants
+        Guid participant1;
+        Guid participant2;
 
-        if (!string.IsNullOrEmpty(sessionId) && Guid.TryParse(sessionId, out var sessionGuid))
+        if (!string.IsNullOrEmpty(myIdStr) && Guid.TryParse(myIdStr, out var myId))
         {
-            // Query specific session
-            var session = chatSystem.GetSession(sessionGuid);
-            if (session == null)
+            // Intrusive query: being is querying on behalf of another being
+            participant1 = myId;
+            
+            if (!string.IsNullOrEmpty(otherIdStr) && Guid.TryParse(otherIdStr, out var otherId))
             {
-                return ToolResult.Failed($"Session '{sessionId}' not found");
+                participant2 = otherId;
             }
-            messages = session.GetMessages(0, maxCount);
+            else
+            {
+                // If other_id not provided, query with user
+                var config = Config.Instance?.Data;
+                if (config == null)
+                {
+                    return ToolResult.Failed("Configuration is not available");
+                }
+                participant2 = config.UserGuid;
+            }
         }
         else
         {
-            // Query conversations between the user and this being
-            // Get the fixed user GUID from config
-            var config = Config.Instance?.Data;
-            if (config == null)
-            {
-                return ToolResult.Failed("Configuration is not available");
-            }
-
-            Guid userGuid = config.UserGuid;
+            // Normal query: being queries its own conversation
+            participant1 = callerId;
             
-            // Use ChatSystem's GetMessages to get conversation between user and being
-            messages = chatSystem.GetMessages(userGuid, callerId, maxCount);
+            if (!string.IsNullOrEmpty(otherIdStr) && Guid.TryParse(otherIdStr, out var otherId))
+            {
+                participant2 = otherId;
+            }
+            else
+            {
+                // If other_id not provided, query with user
+                var config = Config.Instance?.Data;
+                if (config == null)
+                {
+                    return ToolResult.Failed("Configuration is not available");
+                }
+                participant2 = config.UserGuid;
+            }
         }
+
+        // Use ChatSystem's GetMessages to get conversation between two participants
+        List<ChatMessage> messages = chatSystem.GetMessages(participant1, participant2, maxCount);
 
         // Filter by keyword if provided
         if (!string.IsNullOrEmpty(keyword))
@@ -357,14 +385,19 @@ public class LogTool : ITool
 
         if (messages.Count == 0)
         {
-            return ToolResult.Successful($"No conversation history found for being '{callerId}'.");
+            string participant1Name = participant1 == callerId ? "Self" : participant1.ToString("N");
+            string participant2Name = participant2 == Config.Instance?.Data?.UserGuid ? "User" : participant2.ToString("N");
+            return ToolResult.Successful($"No conversation history found between {participant1Name} and {participant2Name}.");
         }
 
-        var result = new StringBuilder($"Conversation history for being '{callerId}' ({messages.Count} records):\n\n");
+        var result = new StringBuilder($"Conversation history ({messages.Count} records):\n");
+        result.AppendLine($"  Between: {participant1:N} and {participant2:N}\n");
         
         foreach (var msg in messages)
         {
-            string senderName = msg.SenderId == callerId ? "Self" : msg.SenderId.ToString("N").Substring(0, 8);
+            string senderName = msg.SenderId == participant1 ? "Participant1" : 
+                               msg.SenderId == Config.Instance?.Data?.UserGuid ? "User" : 
+                               msg.SenderId.ToString("N").Substring(0, 8);
             result.AppendLine($"[{msg.Timestamp:yyyy-MM-dd HH:mm:ss}] {senderName}:");
             
             if (!string.IsNullOrEmpty(msg.Content))
