@@ -182,9 +182,17 @@ public class SSEHandler : IDisposable
 
     public async Task SendHistoryAsync(SSEClient client, List<ChatMessage> messages, Guid requestUserId)
     {
+        var beingManager = ServiceLocator.Instance.BeingManager;
+        var beingDict = beingManager?.GetAllBeings()?.ToDictionary(b => b.Id);
+
         var historyData = messages.Select(m =>
         {
             string roleStr = m.Role.ToString();
+            string senderName = "";
+            if (beingDict != null && m.SenderId != requestUserId && beingDict.TryGetValue(m.SenderId, out var b))
+            {
+                senderName = b.Name ?? "";
+            }
             return new
             {
                 id = m.Id.ToString(),
@@ -192,6 +200,7 @@ public class SSEHandler : IDisposable
                 content = m.Content,
                 thinking = m.Thinking,
                 role = roleStr,
+                senderName,
                 timestamp = m.Timestamp,
                 toolCallsJson = m.ToolCallsJson,
                 toolCallId = m.ToolCallId,
