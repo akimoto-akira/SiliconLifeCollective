@@ -373,35 +373,16 @@ public class MarkdownEditorView : ViewBase
             {
                 (Js.Id(() => "typeof").Invoke(() => Js.Id(() => "marked")).Op(() => "!==", () => Js.Str(() => "undefined")), new List<JsSyntax>
                 {
-                    // Configure marked to use highlight.js for code highlighting (only if hljs is available)
-                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
-                    {
-                        (Js.Id(() => "typeof").Invoke(() => Js.Id(() => "hljs")).Op(() => "!==", () => Js.Str(() => "undefined")), new List<JsSyntax>
-                        {
-                            // Configure marked with highlight function
-                            Js.Assign(
-                                () => Js.Id(() => "window").Prop(() => "markedHighlight"),
-                                () => Js.Arrow(() => new List<string> { "code", "lang" }, () => Js.Block()
-                                    .Add(() => Js.Let(() => "result", () => Js.Ternary(
-                                        () => Js.Id(() => "lang").Op(() => "&&", () => Js.Id(() => "hljs").Call(() => "getLanguage", () => Js.Id(() => "lang"))),
-                                        () => Js.Id(() => "hljs").Call(() => "highlight", () => Js.Id(() => "code"), () => Js.Obj().Prop(() => "language", () => Js.Id(() => "lang"))).Prop(() => "value"),
-                                        () => Js.Id(() => "hljs").Call(() => "highlightAuto", () => Js.Id(() => "code")).Prop(() => "value")
-                                    )))
-                                    .Add(() => Js.Return(() => Js.Id(() => "result")))))
-                            .Stmt(),
-                            Js.Id(() => "marked").Call(() => "setOptions", () => Js.Obj()
-                                .Prop(() => "highlight", () => Js.Id(() => "window").Prop(() => "markedHighlight")))
-                            .Stmt()
-                        })
-                    }),
                     // Render markdown to HTML
                     Js.Assign(() => Js.Id(() => "previewEl").Prop(() => "innerHTML"), () => Js.Id(() => "marked").Call(() => "parse", () => Js.Id(() => "md"))).Stmt(),
-                    // Apply highlight.js to all code blocks if hljs is available
+                    // Apply highlight.js to code blocks in preview pane
                     Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                     {
                         (Js.Id(() => "typeof").Invoke(() => Js.Id(() => "hljs")).Op(() => "!==", () => Js.Str(() => "undefined")), new List<JsSyntax>
                         {
-                            Js.Id(() => "hljs").Call(() => "highlightAll").Stmt()
+                            Js.Id(() => "previewEl").Call(() => "querySelectorAll", () => Js.Str(() => "pre code")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "block" }, () =>
+                                Js.Id(() => "hljs").Call(() => "highlightElement", () => Js.Id(() => "block"))
+                            )).Stmt()
                         })
                     })
                 }),
