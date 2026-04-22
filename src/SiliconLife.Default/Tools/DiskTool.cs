@@ -107,7 +107,7 @@ public class DiskTool : ITool
                     ["description"] = "Case sensitive search (for search actions, default: false)"
                 }
             },
-            ["required"] = new[] { "action", "path" }
+            ["required"] = new[] { "action" }
         };
     }
 
@@ -131,6 +131,7 @@ public class DiskTool : ITool
         if (action == "search_content")
             return ExecuteSearchContent(callerId, parameters);
 
+        // All other actions require path
         if (!parameters.TryGetValue("path", out object? pathObj) || string.IsNullOrWhiteSpace(pathObj?.ToString()))
         {
             return ToolResult.Failed("Missing 'path' parameter");
@@ -403,25 +404,13 @@ public class DiskTool : ITool
 
         try
         {
-            var files = Directory.EnumerateFiles(directory, pattern, SearchOption.AllDirectories);
-            foreach (var file in files)
-            {
-                var fileName = Path.GetFileName(file);
-                if (fileName.Contains(keyword, comparison))
-                {
-                    results.Add($"{file}");
-                    if (results.Count >= maxResults)
-                        break;
-                }
-            }
-        }
-        catch (UnauthorizedAccessException)
-        {
-            // Skip directories we don't have access to
+            SearchFilesRecursive(directory, pattern, keyword, comparison, maxResults, results);
         }
         catch (Exception ex)
         {
-            return ToolResult.Failed($"Error searching files: {ex.Message}");
+            // If top-level directory itself is inaccessible, report error
+            if (results.Count == 0)
+                return ToolResult.Failed($"Error searching files: {ex.Message}");
         }
 
         if (results.Count == 0)
@@ -431,6 +420,49 @@ public class DiskTool : ITool
 
         return ToolResult.Successful($"Found {results.Count} files matching keyword '{keyword}':\n" +
                                    string.Join("\n", results));
+    }
+
+    /// <summary>
+    /// Recursively search files by name, handling UnauthorizedAccessException per directory.
+    /// </summary>
+    private static void SearchFilesRecursive(
+        string directory, string pattern, string keyword,
+        StringComparison comparison, int maxResults, List<string> results)
+    {
+        if (results.Count >= maxResults) return;
+
+        // 1. Search files in current directory first
+        try
+        {
+            foreach (var file in Directory.EnumerateFiles(directory, pattern, SearchOption.TopDirectoryOnly))
+            {
+                var fileName = Path.GetFileName(file);
+                if (fileName.Contains(keyword, comparison))
+                {
+                    results.Add(file);
+                    if (results.Count >= maxResults) return;
+                }
+            }
+        }
+        catch (UnauthorizedAccessException) { }
+        catch (IOException) { }
+
+        // 2. Recurse into subdirectories
+        try
+        {
+            foreach (var subDir in Directory.EnumerateDirectories(directory))
+            {
+                if (results.Count >= maxResults) return;
+                try
+                {
+                    SearchFilesRecursive(subDir, pattern, keyword, comparison, maxResults, results);
+                }
+                catch (UnauthorizedAccessException) { }
+                catch (IOException) { }
+            }
+        }
+        catch (UnauthorizedAccessException) { }
+        catch (IOException) { }
     }
 
     private ToolResult ExecuteSearchContent(Guid callerId, Dictionary<string, object> parameters)
@@ -471,39 +503,12 @@ public class DiskTool : ITool
 
         try
         {
-            var files = Directory.EnumerateFiles(directory, pattern, SearchOption.AllDirectories);
-            foreach (var file in files)
-            {
-                try
-                {
-                    var content = File.ReadAllText(file);
-                    var lines = content.Split('\n');
-                    for (int i = 0; i < lines.Length; i++)
-                    {
-                        if (lines[i].Contains(keyword, comparison))
-                        {
-                            results.Add($"{file}:{i + 1}: {lines[i].Trim()}");
-                            if (results.Count >= maxResults)
-                                break;
-                        }
-                    }
-                }
-                catch
-                {
-                    // Skip files we can't read
-                }
-
-                if (results.Count >= maxResults)
-                    break;
-            }
-        }
-        catch (UnauthorizedAccessException)
-        {
-            // Skip directories we don't have access to
+            SearchContentRecursive(directory, pattern, keyword, comparison, maxResults, results);
         }
         catch (Exception ex)
         {
-            return ToolResult.Failed($"Error searching file contents: {ex.Message}");
+            if (results.Count == 0)
+                return ToolResult.Failed($"Error searching file contents: {ex.Message}");
         }
 
         if (results.Count == 0)
@@ -513,5 +518,57 @@ public class DiskTool : ITool
 
         return ToolResult.Successful($"Found {results.Count} matches for keyword '{keyword}':\n" +
                                    string.Join("\n", results.Take(maxResults)));
+    }
+
+    /// <summary>
+    /// Recursively search file contents, handling UnauthorizedAccessException per directory.
+    /// </summary>
+    private static void SearchContentRecursive(
+        string directory, string pattern, string keyword,
+        StringComparison comparison, int maxResults, List<string> results)
+    {
+        if (results.Count >= maxResults) return;
+
+        // 1. Search file contents in current directory
+        try
+        {
+            foreach (var file in Directory.EnumerateFiles(directory, pattern, SearchOption.TopDirectoryOnly))
+            {
+                if (results.Count >= maxResults) return;
+                try
+                {
+                    var content = File.ReadAllText(file);
+                    var lines = content.Split('\n');
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        if (lines[i].Contains(keyword, comparison))
+                        {
+                            results.Add($"{file}:{i + 1}: {lines[i].Trim()}");
+                            if (results.Count >= maxResults) return;
+                        }
+                    }
+                }
+                catch { /* Skip files we can't read */ }
+            }
+        }
+        catch (UnauthorizedAccessException) { }
+        catch (IOException) { }
+
+        // 2. Recurse into subdirectories
+        try
+        {
+            foreach (var subDir in Directory.EnumerateDirectories(directory))
+            {
+                if (results.Count >= maxResults) return;
+                try
+                {
+                    SearchContentRecursive(subDir, pattern, keyword, comparison, maxResults, results);
+                }
+                catch (UnauthorizedAccessException) { }
+                catch (IOException) { }
+            }
+        }
+        catch (UnauthorizedAccessException) { }
+        catch (IOException) { }
     }
 }
