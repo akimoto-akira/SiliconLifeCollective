@@ -27,7 +27,8 @@ public class DiskTool : ITool
     public string Description =>
         "Perform file and directory operations. Actions: read_file, write_file, " +
         "list_directory, delete_file, create_directory, exists, get_file_info, count_lines, read_lines, clear_file, replace_lines, replace_text, replace_text_all (not recommended for code editing), " +
-        "list_drives (all drives with type and capacity information).";
+        "list_drives (all drives with type and capacity information), " +
+        "search_files (search files by name), search_content (search file contents).";
 
     public string GetDisplayName(Language language)
     {
@@ -48,7 +49,7 @@ public class DiskTool : ITool
                 {
                     ["type"] = "string",
                     ["description"] = "The action to perform",
-                    ["enum"] = new[] { "read_file", "write_file", "list_directory", "delete_file", "create_directory", "exists", "get_file_info", "count_lines", "read_lines", "clear_file", "replace_lines", "replace_text", "replace_text_all", "list_drives" }
+                    ["enum"] = new[] { "read_file", "write_file", "list_directory", "delete_file", "create_directory", "exists", "get_file_info", "count_lines", "read_lines", "clear_file", "replace_lines", "replace_text", "replace_text_all", "list_drives", "search_files", "search_content" }
                 },
                 ["path"] = new Dictionary<string, object>
                 {
@@ -79,6 +80,31 @@ public class DiskTool : ITool
                 {
                     ["type"] = "string",
                     ["description"] = "The text to replace with (for replace_text action)"
+                },
+                ["keyword"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["description"] = "Search keyword (for search_files and search_content actions)"
+                },
+                ["directory"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["description"] = "Directory to search in (for search actions, default: current directory)"
+                },
+                ["pattern"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["description"] = "File pattern (for search actions, default: *.*)"
+                },
+                ["max_results"] = new Dictionary<string, object>
+                {
+                    ["type"] = "integer",
+                    ["description"] = "Maximum number of results (for search actions, default: 50)"
+                },
+                ["case_sensitive"] = new Dictionary<string, object>
+                {
+                    ["type"] = "boolean",
+                    ["description"] = "Case sensitive search (for search actions, default: false)"
                 }
             },
             ["required"] = new[] { "action", "path" }
@@ -97,6 +123,13 @@ public class DiskTool : ITool
         // list_drives does not require a path
         if (action == "list_drives")
             return ExecuteListDrives();
+
+        // search_files and search_content use keyword instead of path
+        if (action == "search_files")
+            return ExecuteSearchFiles(callerId, parameters);
+
+        if (action == "search_content")
+            return ExecuteSearchContent(callerId, parameters);
 
         if (!parameters.TryGetValue("path", out object? pathObj) || string.IsNullOrWhiteSpace(pathObj?.ToString()))
         {
@@ -330,5 +363,155 @@ public class DiskTool : ITool
         }
 
         return ToolResult.Successful($"Drives ({drives.Length}):\n" + string.Join("\n", lines));
+    }
+
+    private ToolResult ExecuteSearchFiles(Guid callerId, Dictionary<string, object> parameters)
+    {
+        if (!parameters.TryGetValue("keyword", out object? keywordObj) || string.IsNullOrWhiteSpace(keywordObj?.ToString()))
+        {
+            return ToolResult.Failed("Missing 'keyword' parameter for search_files action");
+        }
+
+        string keyword = keywordObj.ToString()!;
+        string directory = parameters.TryGetValue("directory", out object? dirObj) && dirObj != null
+            ? dirObj.ToString()!
+            : Directory.GetCurrentDirectory();
+        string pattern = parameters.TryGetValue("pattern", out object? patternObj) && patternObj != null
+            ? patternObj.ToString()!
+            : "*.*";
+        int maxResults = 50;
+        bool caseSensitive = false;
+
+        if (parameters.TryGetValue("max_results", out object? maxResultsObj) && maxResultsObj != null)
+        {
+            if (int.TryParse(maxResultsObj.ToString(), out int parsedMaxResults))
+            {
+                maxResults = parsedMaxResults;
+            }
+        }
+
+        if (parameters.TryGetValue("case_sensitive", out object? caseSensitiveObj) && caseSensitiveObj != null)
+        {
+            if (bool.TryParse(caseSensitiveObj.ToString(), out bool parsedCaseSensitive))
+            {
+                caseSensitive = parsedCaseSensitive;
+            }
+        }
+
+        var results = new List<string>();
+        var comparison = caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+
+        try
+        {
+            var files = Directory.EnumerateFiles(directory, pattern, SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                var fileName = Path.GetFileName(file);
+                if (fileName.Contains(keyword, comparison))
+                {
+                    results.Add($"{file}");
+                    if (results.Count >= maxResults)
+                        break;
+                }
+            }
+        }
+        catch (UnauthorizedAccessException)
+        {
+            // Skip directories we don't have access to
+        }
+        catch (Exception ex)
+        {
+            return ToolResult.Failed($"Error searching files: {ex.Message}");
+        }
+
+        if (results.Count == 0)
+        {
+            return ToolResult.Successful($"No files found matching keyword '{keyword}' in {directory}");
+        }
+
+        return ToolResult.Successful($"Found {results.Count} files matching keyword '{keyword}':\n" +
+                                   string.Join("\n", results));
+    }
+
+    private ToolResult ExecuteSearchContent(Guid callerId, Dictionary<string, object> parameters)
+    {
+        if (!parameters.TryGetValue("keyword", out object? keywordObj) || string.IsNullOrWhiteSpace(keywordObj?.ToString()))
+        {
+            return ToolResult.Failed("Missing 'keyword' parameter for search_content action");
+        }
+
+        string keyword = keywordObj.ToString()!;
+        string directory = parameters.TryGetValue("directory", out object? dirObj) && dirObj != null
+            ? dirObj.ToString()!
+            : Directory.GetCurrentDirectory();
+        string pattern = parameters.TryGetValue("pattern", out object? patternObj) && patternObj != null
+            ? patternObj.ToString()!
+            : "*.*";
+        int maxResults = 50;
+        bool caseSensitive = false;
+
+        if (parameters.TryGetValue("max_results", out object? maxResultsObj) && maxResultsObj != null)
+        {
+            if (int.TryParse(maxResultsObj.ToString(), out int parsedMaxResults))
+            {
+                maxResults = parsedMaxResults;
+            }
+        }
+
+        if (parameters.TryGetValue("case_sensitive", out object? caseSensitiveObj) && caseSensitiveObj != null)
+        {
+            if (bool.TryParse(caseSensitiveObj.ToString(), out bool parsedCaseSensitive))
+            {
+                caseSensitive = parsedCaseSensitive;
+            }
+        }
+
+        var results = new List<string>();
+        var comparison = caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+
+        try
+        {
+            var files = Directory.EnumerateFiles(directory, pattern, SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                try
+                {
+                    var content = File.ReadAllText(file);
+                    var lines = content.Split('\n');
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        if (lines[i].Contains(keyword, comparison))
+                        {
+                            results.Add($"{file}:{i + 1}: {lines[i].Trim()}");
+                            if (results.Count >= maxResults)
+                                break;
+                        }
+                    }
+                }
+                catch
+                {
+                    // Skip files we can't read
+                }
+
+                if (results.Count >= maxResults)
+                    break;
+            }
+        }
+        catch (UnauthorizedAccessException)
+        {
+            // Skip directories we don't have access to
+        }
+        catch (Exception ex)
+        {
+            return ToolResult.Failed($"Error searching file contents: {ex.Message}");
+        }
+
+        if (results.Count == 0)
+        {
+            return ToolResult.Successful($"No file contents found matching keyword '{keyword}' in {directory}");
+        }
+
+        return ToolResult.Successful($"Found {results.Count} matches for keyword '{keyword}':\n" +
+                                   string.Join("\n", results.Take(maxResults)));
     }
 }
