@@ -201,7 +201,7 @@ public sealed class TimerItem
 
     /// <summary>
     /// Triggers the timer and updates its state.
-    /// Does NOT advance TriggerTime for recurring timers â€”
+    /// Does NOT advance TriggerTime for recurring timers â€?
     /// that is handled by TimerSystem.Tick() via the calendar resolver.
     /// </summary>
     public void Trigger()
@@ -417,7 +417,7 @@ public sealed class TimerSystem
         _pendingChecker = pendingChecker ?? throw new ArgumentNullException(nameof(pendingChecker));
         _storageKey = "timers";
 
-        _logger.Info("TimerSystem created for being {0} ({1})", owner.Name, owner.Id);
+        _logger.Info(_owner.Id, "TimerSystem created for being {0} ({1})", owner.Name, owner.Id);
 
         Load();
     }
@@ -439,7 +439,7 @@ public sealed class TimerSystem
         }
         catch (Exception ex)
         {
-            _logger.Warn("Failed to load timers from storage", ex);
+            _logger.Warn(_owner.Id, "Failed to load timers from storage", ex);
             _timers = new List<TimerItem>();
         }
     }
@@ -455,7 +455,7 @@ public sealed class TimerSystem
         }
         catch (Exception ex)
         {
-            _logger.Error("Failed to save timers to storage", ex);
+            _logger.Error(_owner.Id, "Failed to save timers to storage", ex);
         }
     }
 
@@ -476,7 +476,7 @@ public sealed class TimerSystem
             DateTime? triggerTime = _calendarResolver(DateTime.Now, calendarId, componentConditions);
             if (!triggerTime.HasValue)
             {
-                _logger.Warn("Cannot create one-shot timer: resolver returned null for calendar={0}", calendarId);
+                _logger.Warn(_owner.Id, "Cannot create one-shot timer: resolver returned null for calendar={0}", calendarId);
                 return null;
             }
 
@@ -493,7 +493,7 @@ public sealed class TimerSystem
             _timers.Add(timer);
             Save();
 
-            _logger.Info("Timer added: {0} ({1}), type={2}, calendar={3}, triggerAt={4}", name, timer.Id, TimerType.Once, calendarId, triggerTime.Value);
+            _logger.Info(_owner.Id, "Timer added: {0} ({1}), type={2}, calendar={3}, triggerAt={4}", name, timer.Id, TimerType.Once, calendarId, triggerTime.Value);
 
             return timer;
         }
@@ -517,7 +517,7 @@ public sealed class TimerSystem
             DateTime? triggerTime = _calendarResolver(DateTime.Now, calendarId, componentConditions);
             if (!triggerTime.HasValue)
             {
-                _logger.Warn("Cannot create recurring timer: resolver returned null for calendar={0}", calendarId);
+                _logger.Warn(_owner.Id, "Cannot create recurring timer: resolver returned null for calendar={0}", calendarId);
                 return null;
             }
 
@@ -534,7 +534,7 @@ public sealed class TimerSystem
             _timers.Add(timer);
             Save();
 
-            _logger.Info("Timer added: {0} ({1}), type={2}, calendar={3}, triggerAt={4}", name, timer.Id, TimerType.Recurring, calendarId, triggerTime.Value);
+            _logger.Info(_owner.Id, "Timer added: {0} ({1}), type={2}, calendar={3}, triggerAt={4}", name, timer.Id, TimerType.Recurring, calendarId, triggerTime.Value);
 
             return timer;
         }
@@ -593,7 +593,7 @@ public sealed class TimerSystem
         lock (_lock)
         {
             int pendingCount = _timers.Count(t => _pendingChecker(t));
-            _logger.Debug("Checking pending timers: {0} pending", pendingCount);
+            _logger.Debug(_owner.Id, "Checking pending timers: {0} pending", pendingCount);
             return pendingCount > 0;
         }
     }
@@ -626,7 +626,7 @@ public sealed class TimerSystem
             {
                 timer.Pause();
                 Save();
-                _logger.Debug("Timer paused: {0} ({1})", timer.Name, timer.Id);
+                _logger.Debug(_owner.Id, "Timer paused: {0} ({1})", timer.Name, timer.Id);
             }
         }
     }
@@ -657,12 +657,12 @@ public sealed class TimerSystem
                 else
                 {
                     timer.Status = TimerStatus.Cancelled;
-                    _logger.Warn("Timer cancelled on resume: resolver returned null for {0}", timer.Name);
+                    _logger.Warn(_owner.Id, "Timer cancelled on resume: resolver returned null for {0}", timer.Name);
                 }
             }
 
             Save();
-            _logger.Debug("Timer resumed: {0} ({1})", timer.Name, timer.Id);
+            _logger.Debug(_owner.Id, "Timer resumed: {0} ({1})", timer.Name, timer.Id);
         }
     }
 
@@ -780,11 +780,11 @@ public sealed class TimerSystem
                 timer.Trigger();
                 triggered.Add(timer);
 
-                _logger.Info("Timer triggered: {0} ({1}), timesTriggered={2}", timer.Name, timer.Id, timer.TimesTriggered);
+                _logger.Info(_owner.Id, "Timer triggered: {0} ({1}), timesTriggered={2}", timer.Name, timer.Id, timer.TimesTriggered);
 
                 if (timer.Type == TimerType.Once)
                 {
-                    _logger.Debug("One-shot timer completed: {0} ({1})", timer.Name, timer.Id);
+                    _logger.Debug(_owner.Id, "One-shot timer completed: {0} ({1})", timer.Name, timer.Id);
                 }
 
                 TimerCallbackInfo info = new TimerCallbackInfo
@@ -823,12 +823,12 @@ public sealed class TimerSystem
                     if (nextTime.HasValue)
                     {
                         timer.TriggerTime = nextTime.Value;
-                        _logger.Debug("Timer advanced: {0} next trigger at {1}", timer.Name, nextTime.Value);
+                        _logger.Debug(_owner.Id, "Timer advanced: {0} next trigger at {1}", timer.Name, nextTime.Value);
                     }
                     else
                     {
                         timer.Status = TimerStatus.Cancelled;
-                        _logger.Warn("Timer cancelled: resolver returned null for {0}", timer.Name);
+                        _logger.Warn(_owner.Id, "Timer cancelled: resolver returned null for {0}", timer.Name);
                     }
                 }
             }

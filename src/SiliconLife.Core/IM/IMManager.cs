@@ -41,7 +41,7 @@ public class IMManager
         _isRunning = false;
 
         _imProvider.MessageReceived += OnMessageReceived;
-        _logger.Info("IMManager initialized with provider {0}", imProvider.GetType().Name);
+        _logger.Info(null, "IMManager initialized with provider {0}", imProvider.GetType().Name);
     }
 
     /// <summary>
@@ -51,11 +51,11 @@ public class IMManager
     private void OnMessageReceived(object? sender, IMMessageEventArgs e)
     {
         ChatMessage msg = e.Message;
-        _logger.Info("IM message received: sender={0}, channel={1}", msg.SenderId, msg.ChannelId);
+        _logger.Info(null, "IM message received: sender={0}, channel={1}", msg.SenderId, msg.ChannelId);
         if (msg.ChannelId == Guid.Empty)
         {
             // Reject messages with empty ChannelId instead of routing to a default being
-            _logger.Warn("Received message with empty ChannelId from sender={0}, rejecting", msg.SenderId);
+            _logger.Warn(null, "Received message with empty ChannelId from sender={0}, rejecting", msg.SenderId);
             return;
         }
 
@@ -70,7 +70,7 @@ public class IMManager
     /// <param name="content">The message content.</param>
     public async Task SendMessageAsync(Guid senderId, Guid channelId, string content, string? thinking = null, string? senderName = null, int? promptTokens = null, int? completionTokens = null, int? totalTokens = null)
     {
-        _logger.Debug("Sending IM message: sender={0}, channel={1}", senderId, channelId);
+        _logger.Debug(null, "Sending IM message: sender={0}, channel={1}", senderId, channelId);
         await _imProvider.SendMessageAsync(senderId, channelId, content, thinking, senderName, promptTokens, completionTokens, totalTokens);
     }
 
@@ -83,7 +83,7 @@ public class IMManager
     /// <param name="chunk">The stream chunk to send.</param>
     public async Task SendStreamChunkAsync(Guid senderId, Guid channelId, StreamChunk chunk)
     {
-        _logger.Trace("Sending stream chunk: sender={0}, channel={1}", senderId, channelId);
+        _logger.Trace(null, "Sending stream chunk: sender={0}, channel={1}", senderId, channelId);
         await _imProvider.SendStreamChunkAsync(senderId, channelId, chunk);
     }
 
@@ -104,7 +104,7 @@ public class IMManager
     /// <param name="totalTokens">Total number of tokens.</param>
     public async Task SendToolUpdateAsync(Guid senderId, Guid channelId, string role, string content, string? toolCallsJson = null, string? toolCallId = null, string? thinking = null, string? senderName = null, int? promptTokens = null, int? completionTokens = null, int? totalTokens = null)
     {
-        _logger.Debug("Sending tool update: sender={0}, channel={1}, role={2}", senderId, channelId, role);
+        _logger.Debug(null, "Sending tool update: sender={0}, channel={1}, role={2}", senderId, channelId, role);
         await _imProvider.SendToolUpdateAsync(senderId, channelId, role, content, toolCallsJson, toolCallId, thinking, senderName, promptTokens, completionTokens, totalTokens);
     }
 
@@ -115,7 +115,7 @@ public class IMManager
     {
         _isRunning = true;
         await _imProvider.StartAsync();
-        _logger.Info("IM manager started");
+        _logger.Info(null, "IM manager started");
     }
 
     /// <summary>
@@ -125,6 +125,6 @@ public class IMManager
     {
         _isRunning = false;
         await _imProvider.StopAsync();
-        _logger.Info("IM manager stopped");
+        _logger.Info(null, "IM manager stopped");
     }
 }

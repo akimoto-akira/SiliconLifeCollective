@@ -71,7 +71,7 @@ public class ServiceLocator
         {
             _services[typeof(T)] = service;
         }
-        _logger.Debug($"Service registered: {typeof(T).Name}");
+        _logger.Debug(null, $"Service registered: {typeof(T).Name}");
     }
 
     /// <summary>
@@ -86,7 +86,7 @@ public class ServiceLocator
             {
                 return service as T;
             }
-            _logger.Trace($"Service not found: {typeof(T).Name}");
+            _logger.Trace(null, $"Service not found: {typeof(T).Name}");
             return null;
         }
     }
@@ -102,7 +102,7 @@ public class ServiceLocator
         {
             _permissionManagers[beingId] = manager;
         }
-        _logger.Debug($"Permission manager registered for being {beingId}");
+        _logger.Debug(null, $"Permission manager registered for being {beingId}");
     }
 
     /// <summary>
@@ -141,6 +141,6 @@ public class ServiceLocator
             _services.Clear();
             _permissionManagers.Clear();
         }
-        _logger.Info("Service locator cleared");
+        _logger.Info(null, "Service locator cleared");
     }
 }

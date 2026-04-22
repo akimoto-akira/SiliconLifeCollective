@@ -165,6 +165,7 @@ public sealed class ConsoleLoggerProvider : ILoggerProvider
     {
         string levelStr = entry.Level.ToString().ToUpperInvariant().PadLeft(4);
         string timestampStr = entry.Timestamp.ToString("yyyy-MM-dd HH:mm:ss.fff");
-        return $"[{timestampStr}] [{levelStr}] [{entry.Category}] {entry.Message}";
+        string beingStr = entry.BeingId.HasValue ? $" [Being:{entry.BeingId.Value:N}]" : "";
+        return $"[{timestampStr}] [{levelStr}] [{entry.Category}]{beingStr} {entry.Message}";
     }
 }

@@ -56,66 +56,66 @@ public class CoreHost
     /// </summary>
     public async Task StartAsync()
     {
-        _logger.Info("CoreHost starting...");
+        _logger.Info(null, "CoreHost starting...");
 
         if (_builder.ChatSystem != null)
         {
             ServiceLocator.Instance.Register<ChatSystem>(_builder.ChatSystem);
-            _logger.Debug("Registered service: {0}", nameof(ChatSystem));
+            _logger.Debug(null, "Registered service: {0}", nameof(ChatSystem));
         }
         if (_builder.IMManager != null)
         {
             ServiceLocator.Instance.Register<IMManager>(_builder.IMManager);
-            _logger.Debug("Registered service: {0}", nameof(IMManager));
+            _logger.Debug(null, "Registered service: {0}", nameof(IMManager));
         }
         if (MainLoop.BeingManager != null)
         {
             ServiceLocator.Instance.Register<SiliconBeingManager>(MainLoop.BeingManager);
-            _logger.Debug("Registered service: {0}", nameof(SiliconBeingManager));
+            _logger.Debug(null, "Registered service: {0}", nameof(SiliconBeingManager));
         }
         if (_builder.AuditLogger != null)
         {
             ServiceLocator.Instance.Register<AuditLogger>(_builder.AuditLogger);
-            _logger.Debug("Registered service: {0}", nameof(AuditLogger));
+            _logger.Debug(null, "Registered service: {0}", nameof(AuditLogger));
         }
         if (_builder.GlobalAcl != null)
         {
             ServiceLocator.Instance.Register<GlobalACL>(_builder.GlobalAcl);
-            _logger.Debug("Registered service: {0}", nameof(GlobalACL));
+            _logger.Debug(null, "Registered service: {0}", nameof(GlobalACL));
         }
         if (_builder.BeingFactory != null)
         {
             ServiceLocator.Instance.Register<ISiliconBeingFactory>(_builder.BeingFactory);
-            _logger.Debug("Registered service: {0}", nameof(ISiliconBeingFactory));
+            _logger.Debug(null, "Registered service: {0}", nameof(ISiliconBeingFactory));
         }
         if (_builder.DynamicBeingLoader != null)
         {
             ServiceLocator.Instance.Register<DynamicBeingLoader>(_builder.DynamicBeingLoader);
-            _logger.Debug("Registered service: {0}", nameof(DynamicBeingLoader));
+            _logger.Debug(null, "Registered service: {0}", nameof(DynamicBeingLoader));
         }
         if (_builder.IMProvider != null)
         {
             ServiceLocator.Instance.Register(_builder.IMProvider);
-            _logger.Debug("Registered service: {0}", _builder.IMProvider.GetType().Name);
+            _logger.Debug(null, "Registered service: {0}", _builder.IMProvider.GetType().Name);
         }
         if (_builder.TokenUsageAuditManager != null)
         {
             ServiceLocator.Instance.Register<ITokenUsageAudit>(_builder.TokenUsageAuditManager);
             ServiceLocator.Instance.Register<TokenUsageAuditManager>(_builder.TokenUsageAuditManager);
-            _logger.Debug("Registered service: {0}", nameof(TokenUsageAuditManager));
+            _logger.Debug(null, "Registered service: {0}", nameof(TokenUsageAuditManager));
         }
 
         MainLoop.SetConfig(_builder.Config!);
         MainLoop.Start();
-        _logger.Info("MainLoop started");
+        _logger.Info(null, "MainLoop started");
 
         if (_builder.IMManager != null)
         {
             _imManagerTask = _builder.IMManager.StartAsync();
-            _logger.Info("IM manager started");
+            _logger.Info(null, "IM manager started");
         }
 
-        _logger.Info("CoreHost started successfully");
+        _logger.Info(null, "CoreHost started successfully");
         await Task.CompletedTask;
     }
 
@@ -126,21 +126,21 @@ public class CoreHost
     /// </summary>
     public async Task StopAsync()
     {
-        _logger.Info("CoreHost stopping...");
+        _logger.Info(null, "CoreHost stopping...");
 
         _shutdownCts.Cancel();
 
         MainLoop.Stop();
-        _logger.Debug("Stopped: MainLoop");
+        _logger.Debug(null, "Stopped: MainLoop");
 
         if (_imManagerTask != null)
         {
             await _imManagerTask;
-            _logger.Debug("Stopped: IMManager");
+            _logger.Debug(null, "Stopped: IMManager");
         }
 
         ServiceLocator.Instance.Clear();
-        _logger.Debug("Stopped: ServiceLocator");
-        _logger.Info("CoreHost stopped");
+        _logger.Debug(null, "Stopped: ServiceLocator");
+        _logger.Info(null, "CoreHost stopped");
     }
 }

@@ -66,7 +66,7 @@ public static class NetworkExecutor
             ? bodyObj?.ToString()
             : null;
 
-        _logger.Info("Network request: {0} {1}", method, request.ResourcePath);
+        _logger.Info(null, "Network request: {0} {1}", method, request.ResourcePath);
 
         try
         {
@@ -89,7 +89,7 @@ public static class NetworkExecutor
             HttpResponseMessage httpResponse = HttpClient.SendAsync(httpRequest).GetAwaiter().GetResult();
             string responseContent = httpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
-            _logger.Debug("Network response: {0}, size={1}", (int)httpResponse.StatusCode, responseContent.Length);
+            _logger.Debug(null, "Network response: {0}, size={1}", (int)httpResponse.StatusCode, responseContent.Length);
 
             if (httpResponse.IsSuccessStatusCode)
             {
@@ -102,17 +102,17 @@ public static class NetworkExecutor
         }
         catch (HttpRequestException ex)
         {
-            _logger.Error("Network error: {0}, {1}", ex, request.ResourcePath);
+            _logger.Error(null, "Network error: {0}, {1}", ex, request.ResourcePath);
             return ExecutorResult.Failed($"Network error: {ex.Message}");
         }
         catch (TaskCanceledException)
         {
-            _logger.Warn("Network request timed out: {0}", request.ResourcePath);
+            _logger.Warn(null, "Network request timed out: {0}", request.ResourcePath);
             return ExecutorResult.Failed("Request timed out");
         }
         catch (Exception ex)
         {
-            _logger.Error("Network error: {0}, {1}", ex, request.ResourcePath);
+            _logger.Error(null, "Network error: {0}, {1}", ex, request.ResourcePath);
             return ExecutorResult.Failed($"Network error: {ex.Message}");
         }
     }

@@ -47,11 +47,11 @@ public class CompilationCore
         {
             Assembly runtimeRefAssembly = Assembly.Load("System.Runtime");
             _baseReferences.Add(MetadataReference.CreateFromFile(runtimeRefAssembly.Location));
-            _logger.Debug("Added System.Runtime reference assembly from: {0}", runtimeRefAssembly.Location);
+            _logger.Debug(null, "Added System.Runtime reference assembly from: {0}", runtimeRefAssembly.Location);
         }
         catch (Exception ex)
         {
-            _logger.Warn("Failed to add System.Runtime reference: {0}", ex.Message);
+            _logger.Warn(null, "Failed to add System.Runtime reference: {0}", ex.Message);
         }
 
         // Add System.Private.Uri (contains Uri, UriKind implementation)
@@ -61,12 +61,12 @@ public class CompilationCore
             if (uriAssembly.GetName().Name != "System.Private.CoreLib")
             {
                 _baseReferences.Add(MetadataReference.CreateFromFile(uriAssembly.Location));
-                _logger.Debug("Added {0} reference from: {1}", uriAssembly.GetName().Name, uriAssembly.Location);
+                _logger.Debug(null, "Added {0} reference from: {1}", uriAssembly.GetName().Name, uriAssembly.Location);
             }
         }
         catch (Exception ex)
         {
-            _logger.Warn("Failed to add Uri assembly reference: {0}", ex.Message);
+            _logger.Warn(null, "Failed to add Uri assembly reference: {0}", ex.Message);
         }
 
         // Add System.Linq (contains LINQ extension methods like .Any())
@@ -74,11 +74,11 @@ public class CompilationCore
         {
             Assembly linqAssembly = typeof(System.Linq.Enumerable).Assembly;
             _baseReferences.Add(MetadataReference.CreateFromFile(linqAssembly.Location));
-            _logger.Debug("Added System.Linq reference from: {0}", linqAssembly.Location);
+            _logger.Debug(null, "Added System.Linq reference from: {0}", linqAssembly.Location);
         }
         catch (Exception ex)
         {
-            _logger.Warn("Failed to add System.Linq reference: {0}", ex.Message);
+            _logger.Warn(null, "Failed to add System.Linq reference: {0}", ex.Message);
         }
 
         // Add System.Text.Json
@@ -150,7 +150,7 @@ public class CompilationCore
                 .Select(d => d.ToString())
                 .ToList();
 
-            _logger.Debug("Compilation failed with {0} errors", errors.Count);
+            _logger.Debug(null, "Compilation failed with {0} errors", errors.Count);
             return new CompilationResult(false, null, errors);
         }
 
@@ -164,11 +164,11 @@ public class CompilationCore
 
         if (targetType == null)
         {
-            _logger.Warn("No matching type found in compiled code");
+            _logger.Warn(null, "No matching type found in compiled code");
             return new CompilationResult(false, null, ["No matching type found in compiled code."], null, assembly);
         }
 
-        _logger.Debug("Compilation successful: type={0}, assembly={1}", targetType.Name, assemblyName);
+        _logger.Debug(null, "Compilation successful: type={0}, assembly={1}", targetType.Name, assemblyName);
         return new CompilationResult(true, targetType, [], null, assembly);
     }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -35,7 +35,7 @@ public class Program
 
     public static async Task Main(string[] args)
     {
-        _logger.Info("Application starting...");
+        _logger.Info(null, "Application starting...");
 
         RegisterLocalizations();
         ConfigDataBaseConverter.RegisterConfigType("Default", typeof(DefaultConfigData));
@@ -46,7 +46,7 @@ public class Program
 
         DefaultConfigData configData = (DefaultConfigData)config.Data;
         LogManager.Instance.AddProvider(new FileSystemLoggerProvider(configData));
-        _logger.Info("Configuration loaded: endpoint={0}, model={1}", 
+        _logger.Info(null, "Configuration loaded: endpoint={0}, model={1}", 
             configData.AIConfig["endpoint"], configData.AIConfig["model"]);
 
         DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(configData.Language);
@@ -59,20 +59,20 @@ public class Program
             Path.Combine(configData.DataDirectory.FullName, "chat"));
 
         ChatSystem chatSystem = new ChatSystem(timeStorage);
-        _logger.Info("Initialized: ChatSystem");
+        _logger.Info(null, "Initialized: ChatSystem");
 
         ITimeStorage auditStorage = new FileSystemTimeStorage(
             Path.Combine(configData.DataDirectory.FullName, "audit"));
         AuditLogger auditLogger = new AuditLogger(auditStorage);
-        _logger.Info("Initialized: AuditLogger");
+        _logger.Info(null, "Initialized: AuditLogger");
 
         ITimeStorage tokenUsageStorage = new FileSystemTimeStorage(
             Path.Combine(configData.DataDirectory.FullName, "token-usage"));
         TokenUsageAuditManager tokenUsageAuditManager = new TokenUsageAuditManager(tokenUsageStorage);
-        _logger.Info("Initialized: TokenUsageAuditManager");
+        _logger.Info(null, "Initialized: TokenUsageAuditManager");
 
         GlobalACL globalAcl = new GlobalACL(storage);
-        _logger.Info("Initialized: GlobalACL");
+        _logger.Info(null, "Initialized: GlobalACL");
 
         Router router = new Router();
         router.SetInitialized(File.Exists(configData.GetConfigPath()));
@@ -83,7 +83,7 @@ public class Program
         IMPermissionAskHandler askHandler = new IMPermissionAskHandler(imProvider);
 
         IMManager imManager = new IMManager(imProvider, chatSystem, MainLoop.BeingManager);
-        _logger.Info("Initialized: IMManager");
+        _logger.Info(null, "Initialized: IMManager");
 
         DefaultSiliconBeingFactory beingFactory = new DefaultSiliconBeingFactory(
             configData.AIConfig,
@@ -111,13 +111,13 @@ public class Program
         _host = builder.Build();
 
         await _host.StartAsync();
-        _logger.Info("CoreHost started");
+        _logger.Info(null, "CoreHost started");
 
         // Only create curator if it was previously initialized (CuratorGuid is set)
         if (configData.CuratorGuid != Guid.Empty)
         {
             SiliconBeingBase defaultBeing = beingFactory.CreateBeing(configData.CuratorGuid, "");
-            _logger.Info("Curator created: {0} ({1})", defaultBeing.Name, defaultBeing.Id);
+            _logger.Info(null, "Curator created: {0} ({1})", defaultBeing.Name, defaultBeing.Id);
             RegisterAndConfigureCurator(defaultBeing, configData, dynamicBeingLoader);
         }
 
@@ -139,7 +139,7 @@ public class Program
 
     private static async Task ShutdownAsync()
     {
-        _logger.Info("Application shutting down...");
+        _logger.Info(null, "Application shutting down...");
 
         if (_webHost != null)
         {
@@ -153,7 +153,7 @@ public class Program
         }
 
         _shouldExit = true;
-        _logger.Info("Application shutdown complete");
+        _logger.Info(null, "Application shutdown complete");
     }
 
     private static async Task StartWebServerAsync(DefaultConfigData configData, Router router, WebUIProvider webUiProvider, DefaultSiliconBeingFactory beingFactory, DynamicBeingLoader dynamicBeingLoader, DefaultLocalizationBase localization)
@@ -176,7 +176,7 @@ public class Program
             configData.CuratorGuid = curatorGuid;
             SiliconBeingBase curator = beingFactory.CreateBeing(curatorGuid, curatorName);
             configData.SaveConfig();
-            _logger.Info("Curator created: {0} ({1})", curator.Name, curator.Id);
+            _logger.Info(null, "Curator created: {0} ({1})", curator.Name, curator.Id);
 
             // Write default soul file
             string beingDirectory = Path.Combine(configData.DataDirectory.FullName, "SiliconManager", curator.Id.ToString());
@@ -194,7 +194,7 @@ public class Program
         try
         {
             await _webHost.StartAsync();
-            _logger.Info("Web server started on port {0}", configData.WebPort);
+            _logger.Info(null, "Web server started on port {0}", configData.WebPort);
             try
             {
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
@@ -209,7 +209,7 @@ public class Program
         }
         catch (Exception ex)
         {
-            _logger.Error("Failed to start web server: {0}", ex, ex.Message);
+            _logger.Error(null, "Failed to start web server: {0}", ex, ex.Message);
         }
     }
 
@@ -255,7 +255,7 @@ public class Program
 
         // Register being FIRST before applying custom callbacks
         MainLoop.BeingManager.RegisterBeing(curator);
-        _logger.Info("Registered curator: {0} ({1})", curator.Name, curator.Id);
+        _logger.Info(null, "Registered curator: {0} ({1})", curator.Name, curator.Id);
 
         if (DynamicBeingLoader.HasCustomPermissionCallback(beingDirectory))
         {
@@ -265,12 +265,12 @@ public class Program
                 if (permResult.Success && permResult.CompiledType != null)
                 {
                     MainLoop.BeingManager.ReplacePermissionCallback(curator.Id, permResult.CompiledType);
-                    _logger.Info("Loaded custom permission callback for curator {0}", curator.Id);
+                    _logger.Info(null, "Loaded custom permission callback for curator {0}", curator.Id);
                 }
             }
             catch (Exception ex)
             {
-                _logger.Warn("Failed to load custom permission callback for curator {0}", ex, curator.Id);
+                _logger.Warn(null, "Failed to load custom permission callback for curator {0}", ex, curator.Id);
             }
         }
 
@@ -282,12 +282,12 @@ public class Program
                 if (customType != null)
                 {
                     MainLoop.BeingManager.ReplaceBeing(curator.Id, customType);
-                    _logger.Info("Loaded custom code for curator {0}: {1}", curator.Id, customType.Name);
+                    _logger.Info(null, "Loaded custom code for curator {0}: {1}", curator.Id, customType.Name);
                 }
             }
             catch (Exception ex)
             {
-                _logger.Warn("Failed to load custom code for curator {0}", ex, curator.Id);
+                _logger.Warn(null, "Failed to load custom code for curator {0}", ex, curator.Id);
             }
         }
     }

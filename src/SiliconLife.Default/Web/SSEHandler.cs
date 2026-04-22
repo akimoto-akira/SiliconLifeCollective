@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -80,7 +80,7 @@ public class SSEHandler : IDisposable
             _clients.Add(client);
         }
 
-        _logger.Info($"SSE connected: userId={userId}, channelId={channelId}");
+        _logger.Info(null, $"SSE connected: userId={userId}, channelId={channelId}");
         OnConnected?.Invoke(client);
 
         try
@@ -99,7 +99,7 @@ public class SSEHandler : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Error($"SSE error: {ex.Message}");
+            _logger.Error(null, $"SSE error: {ex.Message}");
         }
         finally
         {
@@ -113,7 +113,7 @@ public class SSEHandler : IDisposable
         {
             _clients.Remove(client);
         }
-        _logger.Info($"SSE disconnected: userId={client.UserId}");
+        _logger.Info(null, $"SSE disconnected: userId={client.UserId}");
         OnDisconnected?.Invoke(client);
     }
 

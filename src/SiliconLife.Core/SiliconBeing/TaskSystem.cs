@@ -278,7 +278,7 @@ public sealed class TaskSystem
         _storage = storage ?? throw new ArgumentNullException(nameof(storage));
         _storageKey = "tasks";
 
-        _logger.Info("TaskSystem created for being {0} ({1})", owner.Name, owner.Id);
+        _logger.Info(_owner.Id, "TaskSystem created for being {0} ({1})", owner.Name, owner.Id);
 
         Load();
     }
@@ -292,7 +292,7 @@ public sealed class TaskSystem
         }
         catch (Exception ex)
         {
-            _logger.Warn("Failed to load tasks from storage", ex);
+            _logger.Warn(_owner.Id, "Failed to load tasks from storage", ex);
             _tasks = new List<TaskItem>();
         }
     }
@@ -308,7 +308,7 @@ public sealed class TaskSystem
         }
         catch (Exception ex)
         {
-            _logger.Error("Failed to save tasks to storage", ex);
+            _logger.Error(_owner.Id, "Failed to save tasks to storage", ex);
         }
     }
 
@@ -337,7 +337,7 @@ public sealed class TaskSystem
             _tasks.Add(task);
             Save();
 
-            _logger.Info("Task added: {0} ({1}), priority={2}", title, task.Id, priority);
+            _logger.Info(_owner.Id, "Task added: {0} ({1}), priority={2}", title, task.Id, priority);
 
             return task;
         }
@@ -420,7 +420,7 @@ public sealed class TaskSystem
             {
                 task.Start();
                 Save();
-                _logger.Info("Task started: {0} ({1})", task.Title, task.Id);
+                _logger.Info(_owner.Id, "Task started: {0} ({1})", task.Title, task.Id);
                 return true;
             }
 
@@ -437,7 +437,7 @@ public sealed class TaskSystem
         lock (_lock)
         {
             bool hasPending = _tasks.Any(t => t.CanRun(_tasks));
-            _logger.Debug("Checking pending tasks: {0} pending", _tasks.Count(t => t.Status == TaskStatus.Pending));
+            _logger.Debug(_owner.Id, "Checking pending tasks: {0} pending", _tasks.Count(t => t.Status == TaskStatus.Pending));
             return hasPending;
         }
     }
@@ -455,7 +455,7 @@ public sealed class TaskSystem
             {
                 task.Complete();
                 Save();
-                _logger.Info("Task completed: {0} ({1})", task.Title, task.Id);
+                _logger.Info(_owner.Id, "Task completed: {0} ({1})", task.Title, task.Id);
             }
         }
     }
@@ -474,7 +474,7 @@ public sealed class TaskSystem
             {
                 task.Fail(error);
                 Save();
-                _logger.Warn("Task failed: {0} ({1}), error={2}", task.Title, task.Id, error);
+                _logger.Warn(_owner.Id, "Task failed: {0} ({1}), error={2}", task.Title, task.Id, error);
             }
         }
     }
@@ -492,7 +492,7 @@ public sealed class TaskSystem
             {
                 task.Cancel();
                 Save();
-                _logger.Info("Task cancelled: {0} ({1})", task.Title, task.Id);
+                _logger.Info(_owner.Id, "Task cancelled: {0} ({1})", task.Title, task.Id);
             }
         }
     }

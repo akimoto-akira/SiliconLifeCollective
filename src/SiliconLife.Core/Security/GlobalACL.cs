@@ -49,7 +49,7 @@ internal sealed class AclRuleData
 }
 
 /// <summary>
-/// Global Access Control List â€” prefix-matching rule table shared across all silicon beings.
+/// Global Access Control List â€?prefix-matching rule table shared across all silicon beings.
 /// Persists to IStorage. Supports user management (add/remove rules).
 /// First match wins; no match returns null.
 /// </summary>
@@ -84,7 +84,7 @@ public class GlobalACL
     {
         _storage = storage;
         LoadFromStorage();
-        _logger.Info("GlobalACL initialized with storage, loaded {0} rules", _rules.Count);
+        _logger.Info(null, "GlobalACL initialized with storage, loaded {0} rules", _rules.Count);
     }
 
     /// <summary>
@@ -103,12 +103,12 @@ public class GlobalACL
                 if (rule.PermissionType == permissionType &&
                     resource.StartsWith(rule.ResourcePrefix, StringComparison.OrdinalIgnoreCase))
                 {
-                    _logger.Debug("ACL match: type={0}, prefix={1}, result={2}", permissionType, rule.ResourcePrefix, rule.Result);
+                    _logger.Debug(null, "ACL match: type={0}, prefix={1}, result={2}", permissionType, rule.ResourcePrefix, rule.Result);
                     return rule.Result;
                 }
             }
         }
-        _logger.Trace("ACL no match: type={0}, resource={1}", permissionType, resource);
+        _logger.Trace(null, "ACL no match: type={0}, resource={1}", permissionType, resource);
         return null;
     }
 
@@ -122,7 +122,7 @@ public class GlobalACL
         {
             _rules.Add(rule);
             SaveToStorage();
-            _logger.Info("ACL rule added: type={0}, prefix={1}, result={2}", rule.PermissionType, rule.ResourcePrefix, rule.Result);
+            _logger.Info(null, "ACL rule added: type={0}, prefix={1}, result={2}", rule.PermissionType, rule.ResourcePrefix, rule.Result);
         }
     }
 
@@ -141,7 +141,7 @@ public class GlobalACL
                 r.PermissionType == permissionType &&
                 r.ResourcePrefix.Equals(resourcePrefix, StringComparison.OrdinalIgnoreCase));
             SaveToStorage();
-            _logger.Info("ACL rule removed: type={0}, prefix={1}, count={2}", permissionType, resourcePrefix, removed);
+            _logger.Info(null, "ACL rule removed: type={0}, prefix={1}, count={2}", permissionType, resourcePrefix, removed);
         }
         return removed;
     }
@@ -175,7 +175,7 @@ public class GlobalACL
         }
         catch (Exception ex)
         {
-            _logger.Warn("Failed to persist ACL rules: {0}", ex.Message);
+            _logger.Warn(null, "Failed to persist ACL rules: {0}", ex.Message);
         }
     }
 
@@ -195,7 +195,7 @@ public class GlobalACL
         }
         catch (Exception ex)
         {
-            _logger.Warn("Failed to load ACL rules from storage: {0}", ex.Message);
+            _logger.Warn(null, "Failed to load ACL rules from storage: {0}", ex.Message);
         }
     }
 }

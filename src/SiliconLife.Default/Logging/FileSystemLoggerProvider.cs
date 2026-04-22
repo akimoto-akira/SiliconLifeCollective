@@ -21,7 +21,7 @@ public sealed class FileSystemLoggerProvider : ILoggerProvider
     private const string DefaultKey = "default";
     private const string LogFolderName = "Log";
 
-    private readonly FileSystemTimeStorage _storage;
+    private readonly ITimeStorage _storage;
     private readonly JsonSerializerOptions _jsonOptions;
     private LogLevel _minimumLevel = LogLevel.Trace;
 
@@ -49,6 +49,8 @@ public sealed class FileSystemLoggerProvider : ILoggerProvider
             return;
 
         var dto = new LogEntryDto(
+            Guid.NewGuid(),
+            entry.BeingId,
             entry.Timestamp,
             entry.Level,
             entry.Category,
@@ -56,8 +58,7 @@ public sealed class FileSystemLoggerProvider : ILoggerProvider
             entry.Exception?.ToString()
         );
 
-        byte[] data = JsonSerializer.SerializeToUtf8Bytes(dto, _jsonOptions);
-        _storage.Write(DefaultKey, entry.Timestamp, data);
+        _storage.Write(DefaultKey, entry.Timestamp, dto);
     }
 
     public bool IsEnabled(LogLevel level)
@@ -74,6 +75,8 @@ public sealed class FileSystemLoggerProvider : ILoggerProvider
     }
 
     private sealed record LogEntryDto(
+        Guid Id,
+        Guid? BeingId,
         DateTime Timestamp,
         LogLevel Level,
         string Category,

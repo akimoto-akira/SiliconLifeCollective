@@ -19,6 +19,12 @@ namespace SiliconLife.Collective;
 public sealed class LogEntry
 {
     /// <summary>
+    /// Gets the silicon being ID associated with this log entry, if any.
+    /// Null for system-level logs not associated with any specific being.
+    /// </summary>
+    public Guid? BeingId { get; }
+
+    /// <summary>
     /// Gets the timestamp when the log entry was created.
     /// </summary>
     public DateTime Timestamp { get; }
@@ -46,13 +52,15 @@ public sealed class LogEntry
     /// <summary>
     /// Creates a new log entry.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="timestamp">The timestamp of the log entry.</param>
     /// <param name="level">The log level.</param>
     /// <param name="category">The category name.</param>
     /// <param name="message">The log message.</param>
     /// <param name="exception">The optional exception.</param>
-    public LogEntry(DateTime timestamp, LogLevel level, string category, string message, Exception? exception = null)
+    public LogEntry(Guid? beingId, DateTime timestamp, LogLevel level, string category, string message, Exception? exception = null)
     {
+        BeingId = beingId;
         Timestamp = timestamp;
         Level = level;
         Category = category;
@@ -68,7 +76,8 @@ public sealed class LogEntry
     {
         string levelStr = Level.ToString().ToUpperInvariant().PadLeft(4);
         string timestampStr = Timestamp.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        string beingStr = BeingId.HasValue ? $" [Being:{BeingId.Value:N}]" : "";
         string exceptionStr = Exception != null ? $"\n{Exception}" : "";
-        return $"[{timestampStr}] [{levelStr}] [{Category}] {Message}{exceptionStr}";
+        return $"[{timestampStr}] [{levelStr}] [{Category}]{beingStr} {Message}{exceptionStr}";
     }
 }

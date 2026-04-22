@@ -266,29 +266,29 @@ public sealed class LogManager : IDisposable
             set => _minimumLevel = value;
         }
 
-        public void Log(LogLevel level, string message)
+        public void Log(Guid? beingId, LogLevel level, string message)
         {
             if (!IsEnabled(level))
             {
                 return;
             }
 
-            LogEntry entry = new LogEntry(DateTime.UtcNow, level, _category, message);
+            LogEntry entry = new LogEntry(beingId, DateTime.UtcNow, level, _category, message);
             _manager.DistributeLog(entry);
         }
 
-        public void Log(LogLevel level, string message, Exception exception)
+        public void Log(Guid? beingId, LogLevel level, string message, Exception exception)
         {
             if (!IsEnabled(level))
             {
                 return;
             }
 
-            LogEntry entry = new LogEntry(DateTime.UtcNow, level, _category, message, exception);
+            LogEntry entry = new LogEntry(beingId, DateTime.UtcNow, level, _category, message, exception);
             _manager.DistributeLog(entry);
         }
 
-        public void Log(LogLevel level, string format, params object[] args)
+        public void Log(Guid? beingId, LogLevel level, string format, params object[] args)
         {
             if (!IsEnabled(level))
             {
@@ -296,39 +296,39 @@ public sealed class LogManager : IDisposable
             }
 
             string message = args.Length > 0 ? string.Format(format, args) : format;
-            LogEntry entry = new LogEntry(DateTime.UtcNow, level, _category, message);
+            LogEntry entry = new LogEntry(beingId, DateTime.UtcNow, level, _category, message);
             _manager.DistributeLog(entry);
         }
 
-        public void Trace(string message) => Log(LogLevel.Trace, message);
+        public void Trace(Guid? beingId, string message) => Log(beingId, LogLevel.Trace, message);
 
-        public void Trace(string format, params object[] args) => Log(LogLevel.Trace, format, args);
+        public void Trace(Guid? beingId, string format, params object[] args) => Log(beingId, LogLevel.Trace, format, args);
 
-        public void Debug(string message) => Log(LogLevel.Debug, message);
+        public void Debug(Guid? beingId, string message) => Log(beingId, LogLevel.Debug, message);
 
-        public void Debug(string format, params object[] args) => Log(LogLevel.Debug, format, args);
+        public void Debug(Guid? beingId, string format, params object[] args) => Log(beingId, LogLevel.Debug, format, args);
 
-        public void Info(string message) => Log(LogLevel.Information, message);
+        public void Info(Guid? beingId, string message) => Log(beingId, LogLevel.Information, message);
 
-        public void Info(string format, params object[] args) => Log(LogLevel.Information, format, args);
+        public void Info(Guid? beingId, string format, params object[] args) => Log(beingId, LogLevel.Information, format, args);
 
-        public void Warn(string message) => Log(LogLevel.Warning, message);
+        public void Warn(Guid? beingId, string message) => Log(beingId, LogLevel.Warning, message);
 
-        public void Warn(string message, Exception exception) => Log(LogLevel.Warning, message, exception);
+        public void Warn(Guid? beingId, string message, Exception exception) => Log(beingId, LogLevel.Warning, message, exception);
 
-        public void Warn(string format, params object[] args) => Log(LogLevel.Warning, format, args);
+        public void Warn(Guid? beingId, string format, params object[] args) => Log(beingId, LogLevel.Warning, format, args);
 
-        public void Error(string message) => Log(LogLevel.Error, message);
+        public void Error(Guid? beingId, string message) => Log(beingId, LogLevel.Error, message);
 
-        public void Error(string message, Exception exception) => Log(LogLevel.Error, message, exception);
+        public void Error(Guid? beingId, string message, Exception exception) => Log(beingId, LogLevel.Error, message, exception);
 
-        public void Error(string format, params object[] args) => Log(LogLevel.Error, format, args);
+        public void Error(Guid? beingId, string format, params object[] args) => Log(beingId, LogLevel.Error, format, args);
 
-        public void Critical(string message) => Log(LogLevel.Critical, message);
+        public void Critical(Guid? beingId, string message) => Log(beingId, LogLevel.Critical, message);
 
-        public void Critical(string message, Exception exception) => Log(LogLevel.Critical, message, exception);
+        public void Critical(Guid? beingId, string message, Exception exception) => Log(beingId, LogLevel.Critical, message, exception);
 
-        public void Critical(string format, params object[] args) => Log(LogLevel.Critical, format, args);
+        public void Critical(Guid? beingId, string format, params object[] args) => Log(beingId, LogLevel.Critical, format, args);
 
         public bool IsEnabled(LogLevel level)
         {

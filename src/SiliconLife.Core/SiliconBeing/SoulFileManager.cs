@@ -32,19 +32,19 @@ public static class SoulFileManager
 
         if (!File.Exists(soulFilePath))
         {
-            _logger.Debug("Soul file not found: {0}", soulFilePath);
+            _logger.Debug(null, "Soul file not found: {0}", soulFilePath);
             return null;
         }
 
         try
         {
             string content = File.ReadAllText(soulFilePath);
-            _logger.Info("Soul loaded from {0}, length={1}", soulFilePath, content.Length);
+            _logger.Info(null, "Soul loaded from {0}, length={1}", soulFilePath, content.Length);
             return content;
         }
         catch (Exception ex)
         {
-            _logger.Warn("Failed to load soul from {0}", soulFilePath, ex);
+            _logger.Warn(null, "Failed to load soul from {0}", soulFilePath, ex);
             return null;
         }
     }
@@ -66,12 +66,12 @@ public static class SoulFileManager
 
             string soulFilePath = Path.Combine(beingDirectory, SoulFileName);
             File.WriteAllText(soulFilePath, soulContent);
-            _logger.Info("Soul saved to {0}, length={1}", soulFilePath, soulContent.Length);
+            _logger.Info(null, "Soul saved to {0}, length={1}", soulFilePath, soulContent.Length);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.Error("Failed to save soul to {0}", Path.Combine(beingDirectory, SoulFileName), ex);
+            _logger.Error(null, "Failed to save soul to {0}", Path.Combine(beingDirectory, SoulFileName), ex);
             return false;
         }
     }
@@ -85,7 +85,7 @@ public static class SoulFileManager
     {
         string soulFilePath = Path.Combine(beingDirectory, SoulFileName);
         bool exists = File.Exists(soulFilePath);
-        _logger.Trace("Soul file exists check: {0} = {1}", soulFilePath, exists);
+        _logger.Trace(null, "Soul file exists check: {0} = {1}", soulFilePath, exists);
         return exists;
     }
 }

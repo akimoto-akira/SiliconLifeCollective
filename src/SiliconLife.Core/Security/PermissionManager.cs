@@ -18,11 +18,11 @@ namespace SiliconLife.Collective;
 /// Each being holds its own PermissionManager instance.
 ///
 /// Query priority:
-/// 1. UserFrequencyCache â€” high-frequency user decisions (memory-only)
-/// 2. IPermissionCallback â€” domain-specific callback rules
+/// 1. UserFrequencyCache â€?high-frequency user decisions (memory-only)
+/// 2. IPermissionCallback â€?domain-specific callback rules
 /// 3. If callback returns AskUser (or no callback):
-///    - Curator â†’ IPermissionAskHandler (IM inquiry)
-///    - Non-curator â†’ GlobalACL â†’ default deny
+///    - Curator â†?IPermissionAskHandler (IM inquiry)
+///    - Non-curator â†?GlobalACL â†?default deny
 /// </summary>
 public class PermissionManager
 {
@@ -88,18 +88,18 @@ public class PermissionManager
         _defaultCallback = callback;
         _askHandler = askHandler;
         _frequencyCache = new UserFrequencyCache(cacheExpiration ?? TimeSpan.FromHours(1));
-        _logger.Info("PermissionManager created for being {0} ({1})", owner.Name, owner.Id);
+        _logger.Info(_owner.Id, "PermissionManager created for being {0} ({1})", owner.Name, owner.Id);
     }
 
     /// <summary>
     /// Replaces the permission callback with a custom compiled one.
-    /// Used by the stealth channel (DynamicCompilationExecutor â†’ Curator â†’ this).
+    /// Used by the stealth channel (DynamicCompilationExecutor â†?Curator â†?this).
     /// </summary>
     /// <param name="customCallback">The custom permission callback</param>
     public void SetCustomCallback(IPermissionCallback customCallback)
     {
         _callback = customCallback ?? throw new ArgumentNullException(nameof(customCallback));
-        _logger.Info("Custom permission callback set for being {0}", OwnerId);
+        _logger.Info(_owner.Id, "Custom permission callback set for being {0}", OwnerId);
     }
 
     /// <summary>
@@ -108,17 +108,17 @@ public class PermissionManager
     public void ResetCallback()
     {
         _callback = _defaultCallback;
-        _logger.Info("Permission callback reset to default for being {0}", OwnerId);
+        _logger.Info(_owner.Id, "Permission callback reset to default for being {0}", OwnerId);
     }
 
     /// <summary>
     /// Checks whether a permission request is allowed.
     /// Follows the priority chain:
-    /// 1. UserFrequencyCache â€” high-frequency user decisions (memory-only)
-    /// 2. IPermissionCallback â€” domain-specific callback rules
+    /// 1. UserFrequencyCache â€?high-frequency user decisions (memory-only)
+    /// 2. IPermissionCallback â€?domain-specific callback rules
     /// 3. If callback returns AskUser (or no callback):
-    ///    - Curator â†’ IPermissionAskHandler (IM inquiry)
-    ///    - Non-curator â†’ GlobalACL â†’ default deny
+    ///    - Curator â†?IPermissionAskHandler (IM inquiry)
+    ///    - Non-curator â†?GlobalACL â†?default deny
     /// </summary>
     /// <param name="callerId">The GUID of the silicon being making the request</param>
     /// <param name="permissionType">The type of permission being checked</param>
@@ -172,7 +172,7 @@ public class PermissionManager
             return aclResult.Value == PermissionResult.Allowed;
         }
 
-        // No matching rule â€” deny by default
+        // No matching rule â€?deny by default
         AuditLog(callerId, permissionType, resource, PermissionResult.Denied, "No matching rule, default deny");
         return false;
     }
@@ -220,7 +220,7 @@ public class PermissionManager
             return aclResult.Value;
         }
 
-        // No matching rule â€” deny by default
+        // No matching rule â€?deny by default
         return PermissionResult.Denied;
     }
 

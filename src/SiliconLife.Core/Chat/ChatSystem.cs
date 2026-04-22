@@ -28,7 +28,7 @@ public class ChatSystem
     public ChatSystem(ITimeStorage storage)
     {
         _storage = storage;
-        _logger.Info("ChatSystem initialized");
+        _logger.Info(null, "ChatSystem initialized");
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ public class ChatSystem
         SessionBase? session = GetSessionByChannelId(channelId);
         ChatMessage message = new(senderId, channelId, content) { Thinking = thinking };
         session?.AddMessage(message);
-        _logger.Debug("Message added: sender={0}, channel={1}, length={2}", senderId, channelId, content.Length);
+        _logger.Debug(null, "Message added: sender={0}, channel={1}, length={2}", senderId, channelId, content.Length);
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ public class ChatSystem
     {
         SessionBase? session = GetSessionByChannelId(message.ChannelId);
         session?.AddMessage(message);
-        _logger.Debug("Message added: sender={0}, channel={1}, length={2}", message.SenderId, message.ChannelId, message.Content.Length);
+        _logger.Debug(null, "Message added: sender={0}, channel={1}, length={2}", message.SenderId, message.ChannelId, message.Content.Length);
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public class ChatSystem
     public List<ChatMessage> GetMessages(Guid userId, Guid beingId, int limit = 50)
     {
         SessionBase session = GetOrCreateSession(userId, beingId);
-        _logger.Debug("Retrieving messages: user={0}, being={1}, limit={2}", userId, beingId, limit);
+        _logger.Debug(null, "Retrieving messages: user={0}, being={1}, limit={2}", userId, beingId, limit);
         return session.GetMessages(0, limit);
     }
 
@@ -79,20 +79,20 @@ public class ChatSystem
                 if (session is SingleChatSession single &&
                     single.Participant1 == participant1 && single.Participant2 == participant2)
                 {
-                    _logger.Trace("Reusing existing session: {0}", session.Id);
+                    _logger.Trace(null, "Reusing existing session: {0}", session.Id);
                     return session;
                 }
                 if (session is SingleChatSession single2 &&
                     single2.Participant1 == participant2 && single2.Participant2 == participant1)
                 {
-                    _logger.Trace("Reusing existing session: {0}", session.Id);
+                    _logger.Trace(null, "Reusing existing session: {0}", session.Id);
                     return session;
                 }
             }
 
             SingleChatSession newSession = new(participant1, participant2, _storage);
             _sessions[newSession.Id] = newSession;
-            _logger.Info("Created new single chat session: {0}, participants={1},{2}", newSession.Id, participant1, participant2);
+            _logger.Info(null, "Created new single chat session: {0}, participants={1},{2}", newSession.Id, participant1, participant2);
             return newSession;
         }
     }
@@ -120,7 +120,7 @@ public class ChatSystem
         {
             GroupChatSession newSession = new(members, _storage, name);
             _sessions[newSession.Id] = newSession;
-            _logger.Info("Created group chat session: {0}, members={1}", newSession.Id, members.Count);
+            _logger.Info(null, "Created group chat session: {0}, members={1}", newSession.Id, members.Count);
             return newSession;
         }
     }
@@ -171,7 +171,7 @@ public class ChatSystem
             }
         }
 
-        _logger.Debug("Found {0} pending messages for being {1}", result.Count, beingId);
+        _logger.Debug(null, "Found {0} pending messages for being {1}", result.Count, beingId);
         return result;
     }
 
@@ -188,7 +188,7 @@ public class ChatSystem
                 session.MarkMessageAsRead(messageId, readerId);
             }
         }
-        _logger.Trace("Message {0} marked as read by {1}", messageId, readerId);
+        _logger.Trace(null, "Message {0} marked as read by {1}", messageId, readerId);
     }
 
     /// <summary>
@@ -255,7 +255,7 @@ public class ChatSystem
             }
         }
 
-        _logger.Debug("Message metrics collected: {0} time slots", metrics.Count);
+        _logger.Debug(null, "Message metrics collected: {0} time slots", metrics.Count);
         return metrics;
     }
 
@@ -292,7 +292,7 @@ public class ChatSystem
 
             BroadcastChannel channel = new(channelId, _storage, name);
             _broadcastChannels[channelId] = channel;
-            _logger.Info("BroadcastChannel created: {0} ({1})", channelId, name);
+            _logger.Info(null, "BroadcastChannel created: {0} ({1})", channelId, name);
             return channel;
         }
     }
@@ -310,7 +310,7 @@ public class ChatSystem
         {
             if (!_broadcastChannels.TryGetValue(channelId, out BroadcastChannel? channel))
             {
-                _logger.Warn("Broadcast failed: channel {0} not found", channelId);
+                _logger.Warn(null, "Broadcast failed: channel {0} not found", channelId);
                 return;
             }
 
@@ -319,7 +319,7 @@ public class ChatSystem
                 Type = MessageType.SystemNotification
             };
             channel.AddMessage(message);
-            _logger.Info("Broadcast sent to channel {0} by {1}", channelId, senderId);
+            _logger.Info(null, "Broadcast sent to channel {0} by {1}", channelId, senderId);
         }
     }
 
@@ -337,7 +337,7 @@ public class ChatSystem
                 result.AddRange(channel.GetPendingMessages(beingId));
             }
         }
-        _logger.Debug("{0} pending broadcast(s) for {1}", result.Count, beingId);
+        _logger.Debug(null, "{0} pending broadcast(s) for {1}", result.Count, beingId);
         return result;
     }
 }

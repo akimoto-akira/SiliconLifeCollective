@@ -17,7 +17,7 @@ namespace SiliconLife.Collective;
 
 /// <summary>
 /// Manages loading, compiling, and persisting dynamically compiled silicon beings.
-/// Handles the full lifecycle: read code.enc â†’ decrypt â†’ compile â†’ instantiate.
+/// Handles the full lifecycle: read code.enc â†?decrypt â†?compile â†?instantiate.
 /// Falls back to a default type if anything fails.
 /// Uses CompilationCore directly for compilation without security scanning.
 /// </summary>
@@ -72,11 +72,11 @@ public class DynamicBeingLoader
         string unauthorizedList = string.Join(", ", unauthorized);
         if (!refsValid && beingId.HasValue)
         {
-            _logger.Error("Unauthorized assembly references for being {0}: {1}", beingId.Value, unauthorizedList);
+            _logger.Error(null, "Unauthorized assembly references for being {0}: {1}", beingId.Value, unauthorizedList);
         }
         else if (!refsValid)
         {
-            _logger.Error("Unauthorized assembly references: {0}", unauthorizedList);
+            _logger.Error(null, "Unauthorized assembly references: {0}", unauthorizedList);
         }
 
         return (refsValid, unauthorizedList);
@@ -106,7 +106,7 @@ public class DynamicBeingLoader
         string codePath = Path.Combine(beingDirectory, CodeFileName);
         if (!File.Exists(codePath))
         {
-            _logger.Debug("No custom code found for being {0}", beingId);
+            _logger.Debug(null, "No custom code found for being {0}", beingId);
             return null;
         }
 
@@ -114,7 +114,7 @@ public class DynamicBeingLoader
 
         if (!CodeEncryption.TryDecryptToString(encryptedCode, beingId, out string? sourceCode) || sourceCode == null)
         {
-            _logger.Error("Failed to decrypt custom code for being {0}", beingId);
+            _logger.Error(null, "Failed to decrypt custom code for being {0}", beingId);
             throw new InvalidOperationException(
                 $"Failed to decrypt custom code for being {beingId}. " +
                 "Code may be corrupted or the GUID may have changed.");
@@ -149,12 +149,12 @@ public class DynamicBeingLoader
             string errorList = result.Errors.Count > 0
                 ? string.Join("\n  ", result.Errors)
                 : "Unknown error";
-            _logger.Error("Compilation failed for being {0}: {1}", beingId, errorList);
+            _logger.Error(null, "Compilation failed for being {0}: {1}", beingId, errorList);
             throw new InvalidOperationException(
                 $"Compilation failed for being {beingId}:\n  {errorList}");
         }
 
-        _logger.Info("Custom code loaded for being {0}, type={1}", beingId, result.CompiledType?.Name);
+        _logger.Info(null, "Custom code loaded for being {0}, type={1}", beingId, result.CompiledType?.Name);
         return result.CompiledType;
     }
 
@@ -172,7 +172,7 @@ public class DynamicBeingLoader
         SecurityScanResult scanResult = SecurityScanner.Scan(sourceCode);
         if (!scanResult.Passed)
         {
-            _logger.Warn("Security scan failed, not saving code for being {0}", beingId);
+            _logger.Warn(null, "Security scan failed, not saving code for being {0}", beingId);
             return false;
         }
 
@@ -186,19 +186,19 @@ public class DynamicBeingLoader
             byte[] encrypted = CodeEncryption.Encrypt(sourceCode, beingId);
             string codePath = Path.Combine(beingDirectory, CodeFileName);
             File.WriteAllBytes(codePath, encrypted);
-            _logger.Info("Custom code saved for being {0}", beingId);
+            _logger.Info(null, "Custom code saved for being {0}", beingId);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.Error("Failed to save code for being {0}: {1}", beingId, ex.Message);
+            _logger.Error(null, "Failed to save code for being {0}: {1}", beingId, ex.Message);
             return false;
         }
     }
 
     /// <summary>
     /// Compiles source code for a being and creates an instance.
-    /// Does NOT persist â€” used for preview/verification.
+    /// Does NOT persist â€?used for preview/verification.
     /// Uses CompilationCore directly (no security scan).
     /// </summary>
     /// <param name="sourceCode">The C# source code</param>
@@ -206,7 +206,7 @@ public class DynamicBeingLoader
     /// <returns>CompilationResult with CompiledType and GeneratedAssembly</returns>
     public CompilationResult CompileBeing(string sourceCode, Guid beingId)
     {
-        _logger.Info("Preview compilation for being {0}", beingId);
+        _logger.Info(null, "Preview compilation for being {0}", beingId);
         
         // Validate assembly references against allowed list
         (bool refsValid2, string unauthorizedList2) = ValidateDefaultReferences(beingId, typeof(SiliconBeingBase).Assembly);
@@ -252,13 +252,13 @@ public class DynamicBeingLoader
     /// </summary>
     /// <param name="beingId">The silicon being's GUID</param>
     /// <param name="beingDirectory">The silicon being's data directory</param>
-    /// <returns>CompilationResult â€” check Success and use CompiledType</returns>
+    /// <returns>CompilationResult â€?check Success and use CompiledType</returns>
     public CompilationResult LoadPermissionCallback(Guid beingId, string beingDirectory)
     {
         string permPath = Path.Combine(beingDirectory, PermissionCodeFileName);
         if (!File.Exists(permPath))
         {
-            _logger.Debug("No permission callback file found for being {0}", beingId);
+            _logger.Debug(null, "No permission callback file found for being {0}", beingId);
             return new CompilationResult(false, null, ["No permission callback file found."]);
         }
 
@@ -266,7 +266,7 @@ public class DynamicBeingLoader
 
         if (!CodeEncryption.TryDecryptToString(encryptedCode, beingId, out string? sourceCode) || sourceCode == null)
         {
-            _logger.Error("Failed to decrypt permission callback for being {0}", beingId);
+            _logger.Error(null, "Failed to decrypt permission callback for being {0}", beingId);
             return new CompilationResult(false, null, ["Failed to decrypt permission callback code."]);
         }
 
@@ -298,11 +298,11 @@ public class DynamicBeingLoader
 
         if (result.Success)
         {
-            _logger.Info("Permission callback loaded for being {0}, type={1}", beingId, result.CompiledType?.Name);
+            _logger.Info(null, "Permission callback loaded for being {0}, type={1}", beingId, result.CompiledType?.Name);
         }
         else
         {
-            _logger.Error("Failed to load permission callback for being {0}", beingId);
+            _logger.Error(null, "Failed to load permission callback for being {0}", beingId);
         }
         return result;
     }
@@ -315,7 +315,7 @@ public class DynamicBeingLoader
     /// <returns>CompilationResult with CompiledType if successful</returns>
     public CompilationResult CompilePermissionCallback(string sourceCode)
     {
-        _logger.Info("Permission callback compilation (preview mode)");
+        _logger.Info(null, "Permission callback compilation (preview mode)");
         
         // Validate assembly references against allowed list
         (bool refsValid4, string unauthorizedList4) = ValidateDefaultReferences(null, typeof(IPermissionCallback).Assembly);
@@ -358,7 +358,7 @@ public class DynamicBeingLoader
             string permPath = Path.Combine(beingDirectory, PermissionCodeFileName);
             if (!File.Exists(permPath))
             {
-                _logger.Debug("No permission callback file found for being {0}", beingId);
+                _logger.Debug(null, "No permission callback file found for being {0}", beingId);
                 return string.Empty;
             }
 
@@ -366,7 +366,7 @@ public class DynamicBeingLoader
 
             if (!CodeEncryption.TryDecryptToString(encryptedCode, beingId, out string? sourceCode) || sourceCode == null)
             {
-                _logger.Warn("Failed to decrypt permission callback for being {0}", beingId);
+                _logger.Warn(null, "Failed to decrypt permission callback for being {0}", beingId);
                 return string.Empty;
             }
 
@@ -374,7 +374,7 @@ public class DynamicBeingLoader
         }
         catch (Exception ex)
         {
-            _logger.Error("Error reading permission callback source for being {0}: {1}", beingId, ex.Message);
+            _logger.Error(null, "Error reading permission callback source for being {0}: {1}", beingId, ex.Message);
             return string.Empty;
         }
     }
@@ -393,7 +393,7 @@ public class DynamicBeingLoader
         SecurityScanResult scanResult = SecurityScanner.Scan(sourceCode);
         if (!scanResult.Passed)
         {
-            _logger.Warn("Security scan failed for permission callback, not saving for being {0}", beingId);
+            _logger.Warn(null, "Security scan failed for permission callback, not saving for being {0}", beingId);
             return false;
         }
 
@@ -407,12 +407,12 @@ public class DynamicBeingLoader
             byte[] encrypted = CodeEncryption.Encrypt(sourceCode, beingId);
             string permPath = Path.Combine(beingDirectory, PermissionCodeFileName);
             File.WriteAllBytes(permPath, encrypted);
-            _logger.Info("Permission callback saved for being {0}", beingId);
+            _logger.Info(null, "Permission callback saved for being {0}", beingId);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.Error("Failed to save permission callback for being {0}: {1}", beingId, ex.Message);
+            _logger.Error(null, "Failed to save permission callback for being {0}: {1}", beingId, ex.Message);
             return false;
         }
     }

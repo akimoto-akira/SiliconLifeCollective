@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -61,11 +61,11 @@ public class DefaultSiliconBeing : SiliconBeingBase
             string json = JsonSerializer.Serialize(state, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(Path.Combine(BeingDirectory, "state.json"), json);
             
-            _logger.Debug("Being {0}: state saved to {1}", Name, Path.Combine(BeingDirectory, "state.json"));
+            _logger.Debug(Id, "Being {0}: state saved to {1}", Name, Path.Combine(BeingDirectory, "state.json"));
         }
         catch (Exception ex)
         {
-            _logger.Warn("Being {0}: failed to save state", Name, ex);
+            _logger.Warn(Id, "Being {0}: failed to save state", Name, ex);
         }
     }
 
@@ -114,7 +114,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 // Initialize backup config
                 BackupAIClientConfig = AIClientConfig?.ToDictionary(k => k.Key, v => v.Value);
                 
-                _logger.Debug("Being {0}: state loaded from {1}", Name, stateFilePath);
+                _logger.Debug(Id, "Being {0}: state loaded from {1}", Name, stateFilePath);
 
                 Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
                 if (LocalizationManager.Instance.TryGetLocalization(language, out LocalizationBase? loc) &&
@@ -128,7 +128,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
         }
         catch (Exception ex)
         {
-            _logger.Warn("Being {0}: failed to load state", Name, ex);
+            _logger.Warn(Id, "Being {0}: failed to load state", Name, ex);
         }
         return false;
     }
@@ -186,7 +186,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
             {
                 if (ContextManager.NeedsContinuation(this, session))
                 {
-                    _logger.Info("Being {0}: detected continuation in session {1}", Name, session.Id);
+                    _logger.Info(Id, "Being {0}: detected continuation in session {1}", Name, session.Id);
                     ExecuteBrain("ThinkContinuation", session, brain => brain.ThinkOnChat());
                     return;
                 }
@@ -197,7 +197,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 ContextManager brain = new ContextManager(this, session);
                 if (brain.HasWork)
                 {
-                    _logger.Info("Being {0}: detected pending messages in session {1}", Name, session.Id);
+                    _logger.Info(Id, "Being {0}: detected pending messages in session {1}", Name, session.Id);
                     ExecuteBrain("ThinkOnChat", session, _ => brain.ThinkOnChat());
                     return;
                 }
@@ -208,7 +208,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 List<TimerItem> triggeredTimers = TimerSystem.Tick();
                 foreach (TimerItem timer in triggeredTimers)
                 {
-                    _logger.Info("Being {0}: timer triggered - {1} ({2})", Name, timer.Name, timer.Id);
+                    _logger.Info(Id, "Being {0}: timer triggered - {1} ({2})", Name, timer.Name, timer.Id);
                     ExecuteBrain("ThinkOnTimer", null, _ => new ContextManager(this, null).ThinkOnTimer(timer));
                 }
                 return;
@@ -220,7 +220,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 if (runnable.Count > 0)
                 {
                     TaskItem task = runnable[0];
-                    _logger.Info("Being {0}: pending task detected - {1} ({2})", Name, task.Title, task.Id);
+                    _logger.Info(Id, "Being {0}: pending task detected - {1} ({2})", Name, task.Title, task.Id);
                     ExecuteBrain("ThinkOnTask", null, _ => new ContextManager(this, null).ThinkOnTask(task));
                     return;
                 }
@@ -229,20 +229,20 @@ public class DefaultSiliconBeing : SiliconBeingBase
             if (Memory != null && Memory.ShouldCompress())
             {
                 return;
-                _logger.Debug("Being {0}: memory compression needed", Name);
+                _logger.Debug(Id, "Being {0}: memory compression needed", Name);
                 ExecuteBrain("ThinkOnMemoryCompress", null, _ => new ContextManager(this, null).ThinkOnMemoryCompress());
                 return;
             }
         }
         catch (Exception ex)
         {
-            _logger.Error("Being {0}: unexpected error during tick", Name, ex);
+            _logger.Error(Id, "Being {0}: unexpected error during tick", Name, ex);
 
             Language language = Config.Instance.Data.Language;
             DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(language);
 
             Memory?.Add(localization.FormatMemoryEventRuntimeError(ex.Message));
-            _logger.Info("{0}: {1} {2}", Name, localization.UnexpectedErrorMessage, ex.Message);
+            _logger.Info(Id, "{0}: {1} {2}", Name, localization.UnexpectedErrorMessage, ex.Message);
         }
         finally
         {
@@ -291,12 +291,12 @@ public class DefaultSiliconBeing : SiliconBeingBase
     /// </summary>
     private void ExecuteBrain(string sceneName, SessionBase? session, Func<ContextManager, AIResponse> thinkFunc)
     {
-        _logger.Info("Being {0}: executing brain scene {1}", Name, sceneName);
+        _logger.Info(Id, "Being {0}: executing brain scene {1}", Name, sceneName);
 
         Language language = Config.Instance.Data.Language;
         DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(language);
 
-        _logger.Info("{0}: {1}", Name, localization.ThinkingMessage);
+        _logger.Info(Id, "{0}: {1}", Name, localization.ThinkingMessage);
 
         ContextManager brain = new ContextManager(this, session);
 
@@ -312,16 +312,16 @@ public class DefaultSiliconBeing : SiliconBeingBase
 
         if (response.Success && response.HasToolCalls)
         {
-            _logger.Info("{0}: {1}", Name, localization.ToolCallMessage);
+            _logger.Info(Id, "{0}: {1}", Name, localization.ToolCallMessage);
         }
         else if (!response.Success)
         {
-            _logger.Error("Being {0}: brain scene {1} failed: {2}", Name, sceneName, response.ErrorMessage ?? "unknown");
-            _logger.Info("{0}: {1} {2}", Name, localization.ErrorMessage, response.ErrorMessage);
+            _logger.Error(Id, "Being {0}: brain scene {1} failed: {2}", Name, sceneName, response.ErrorMessage ?? "unknown");
+            _logger.Info(Id, "{0}: {1} {2}", Name, localization.ErrorMessage, response.ErrorMessage);
         }
         else
         {
-            _logger.Debug("Being {0}: brain scene {1} completed", Name, sceneName);
+            _logger.Debug(Id, "Being {0}: brain scene {1} completed", Name, sceneName);
         }
     }
     
@@ -429,7 +429,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
             {
                 // Has independent config, create dedicated client
                 newClient = factory.CreateClient(AIClientConfig);
-                _logger.Info("Being {0}: rebuilding AI client with independent config", Name);
+                _logger.Info(Id, "Being {0}: rebuilding AI client with independent config", Name);
             }
             else
             {
@@ -438,11 +438,11 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 if (globalConfig != null && globalConfig.Count > 0)
                 {
                     newClient = factory.CreateClient(globalConfig);
-                    _logger.Info("Being {0}: rebuilding AI client with global config", Name);
+                    _logger.Info(Id, "Being {0}: rebuilding AI client with global config", Name);
                 }
                 else
                 {
-                    _logger.Error("Being {0}: no AI config available", Name);
+                    _logger.Error(Id, "Being {0}: no AI config available", Name);
                     return;
                 }
             }
@@ -454,11 +454,11 @@ public class DefaultSiliconBeing : SiliconBeingBase
             }
             
             AIClient = newClient;
-            _logger.Info("Being {0}: AI client rebuilt successfully", Name);
+            _logger.Info(Id, "Being {0}: AI client rebuilt successfully", Name);
         }
         catch (Exception ex)
         {
-            _logger.Error("Being {0}: failed to rebuild AI client", Name, ex);
+            _logger.Error(Id, "Being {0}: failed to rebuild AI client", Name, ex);
         }
     }
     

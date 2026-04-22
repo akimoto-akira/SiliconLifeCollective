@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -159,7 +159,7 @@ public class DashScopeClient : IAIClient
         {
             string model = string.IsNullOrEmpty(request.Model) ? DefaultModel : request.Model;
 
-            _logger.Info("DashScope request: model={0}, messages={1}, hasTools={2}",
+            _logger.Info(null, "DashScope request: model={0}, messages={1}, hasTools={2}",
                 model, request.Messages.Count, request.Tools != null && request.Tools.Count > 0);
 
             string requestBody = BuildRequestBody(request, model, stream: false);
@@ -170,31 +170,31 @@ public class DashScopeClient : IAIClient
             if (!response.IsSuccessStatusCode)
             {
                 string errorBody = await response.Content.ReadAsStringAsync();
-                _logger.Error("DashScope HTTP error: {0} {1}", (int)response.StatusCode, errorBody);
+                _logger.Error(null, "DashScope HTTP error: {0} {1}", (int)response.StatusCode, errorBody);
                 return AIResponse.Failed($"HTTP {(int)response.StatusCode}: {errorBody}");
             }
 
             string json = await response.Content.ReadAsStringAsync();
             AIResponse result = ParseChatResponse(json);
 
-            _logger.Info("DashScope response: model={0}, tokens={1}/{2}/{3}, hasToolCalls={4}",
+            _logger.Info(null, "DashScope response: model={0}, tokens={1}/{2}/{3}, hasToolCalls={4}",
                 model, result.PromptTokens, result.CompletionTokens, result.TotalTokens, result.HasToolCalls);
 
             return result;
         }
         catch (HttpRequestException ex)
         {
-            _logger.Error("DashScope connection error: {0}", ex.Message);
+            _logger.Error(null, "DashScope connection error: {0}", ex.Message);
             return AIResponse.Failed($"Connection error: {ex.Message}");
         }
         catch (TaskCanceledException ex)
         {
-            _logger.Warn("DashScope request timeout: {0}", ex.Message);
+            _logger.Warn(null, "DashScope request timeout: {0}", ex.Message);
             return AIResponse.Failed($"Request timeout: {ex.Message}");
         }
         catch (Exception ex)
         {
-            _logger.Error("DashScope request failed: {0}", ex.Message);
+            _logger.Error(null, "DashScope request failed: {0}", ex.Message);
             return AIResponse.Failed($"Unexpected error: {ex.Message}");
         }
     }
@@ -210,7 +210,7 @@ public class DashScopeClient : IAIClient
     {
         string model = string.IsNullOrEmpty(request.Model) ? DefaultModel : request.Model;
 
-        _logger.Info("DashScope stream started: model={0}", model);
+        _logger.Info(null, "DashScope stream started: model={0}", model);
 
         string requestBody = BuildRequestBody(request, model, stream: true);
         StringContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
@@ -224,18 +224,18 @@ public class DashScopeClient : IAIClient
             if (!response.IsSuccessStatusCode)
             {
                 string errorBody = await response.Content.ReadAsStringAsync(cancellationToken);
-                _logger.Error("DashScope stream HTTP error: {0} {1}", (int)response.StatusCode, errorBody);
+                _logger.Error(null, "DashScope stream HTTP error: {0} {1}", (int)response.StatusCode, errorBody);
                 errorResponse = AIResponse.Failed($"HTTP {(int)response.StatusCode}: {errorBody}");
             }
         }
         catch (HttpRequestException ex)
         {
-            _logger.Error("DashScope stream connection error: {0}", ex.Message);
+            _logger.Error(null, "DashScope stream connection error: {0}", ex.Message);
             errorResponse = AIResponse.Failed($"Connection error: {ex.Message}");
         }
         catch (OperationCanceledException)
         {
-            _logger.Debug("DashScope stream cancelled");
+            _logger.Debug(null, "DashScope stream cancelled");
             yield break;
         }
 
@@ -349,7 +349,7 @@ public class DashScopeClient : IAIClient
                 }
                 catch (Exception ex)
                 {
-                    _logger.Warn("DashScope stream: failed to parse tool_calls chunk: {0}", ex.Message);
+                    _logger.Warn(null, "DashScope stream: failed to parse tool_calls chunk: {0}", ex.Message);
                 }
             }
 
@@ -382,7 +382,7 @@ public class DashScopeClient : IAIClient
                     }).ToList();
                 }
 
-                _logger.Info("DashScope stream completed: model={0}, totalTokens={1}",
+                _logger.Info(null, "DashScope stream completed: model={0}, totalTokens={1}",
                     model, chunk.TotalTokens);
             }
 
@@ -635,7 +635,7 @@ public class DashScopeClient : IAIClient
         }
         catch (Exception ex)
         {
-            _logger.Error("DashScope response parse error: {0}", ex.Message);
+            _logger.Error(null, "DashScope response parse error: {0}", ex.Message);
             return AIResponse.Failed($"Failed to parse response: {ex.Message}");
         }
     }

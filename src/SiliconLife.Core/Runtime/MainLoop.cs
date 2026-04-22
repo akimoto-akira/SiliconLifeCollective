@@ -69,7 +69,7 @@ public static class MainLoop
             {
                 _tickObjects.Add(tickObject);
                 _tickObjects.Sort((a, b) => a.Priority.CompareTo(b.Priority));
-                _logger.Debug("Registered tick object: {0}, priority={1}", tickObject.GetType().Name, tickObject.Priority);
+                _logger.Debug(null, "Registered tick object: {0}, priority={1}", tickObject.GetType().Name, tickObject.Priority);
             }
         }
     }
@@ -81,7 +81,7 @@ public static class MainLoop
             _tickObjects.Remove(tickObject);
             _consecutiveTimeoutCounts.Remove(tickObject);
             _circuitBreakerResetTimes.Remove(tickObject);
-            _logger.Debug("Unregistered tick object: {0}", tickObject.GetType().Name);
+            _logger.Debug(null, "Unregistered tick object: {0}", tickObject.GetType().Name);
         }
     }
 
@@ -127,11 +127,11 @@ public static class MainLoop
     {
         if (_isRunning)
         {
-            _logger.Warn("MainLoop already running, ignoring Start()");
+            _logger.Warn(null, "MainLoop already running, ignoring Start()");
             return;
         }
 
-        _logger.Info("MainLoop starting...");
+        _logger.Info(null, "MainLoop starting...");
         _isRunning = true;
         Interlocked.Exchange(ref _lastHeartbeatTicks, DateTime.UtcNow.Ticks);
 
@@ -149,7 +149,7 @@ public static class MainLoop
         };
         _watchdogThread.Start();
 
-        _logger.Info("MainLoop started, thread: {0}", _thread.ManagedThreadId);
+        _logger.Info(null, "MainLoop started, thread: {0}", _thread.ManagedThreadId);
     }
 
     public static void Stop()
@@ -159,19 +159,19 @@ public static class MainLoop
             return;
         }
 
-        _logger.Info("MainLoop stopping...");
+        _logger.Info(null, "MainLoop stopping...");
         _isRunning = false;
         _mainCts.Cancel();
         _watchdogCts.Cancel();
 
         _watchdogThread?.Join(1000);
         _thread?.Join(1000);
-        _logger.Info("MainLoop stopped");
+        _logger.Info(null, "MainLoop stopped");
     }
 
     private static void Run()
     {
-        _logger.Debug("Main loop thread started");
+        _logger.Debug(null, "Main loop thread started");
         Stopwatch stopwatch = Stopwatch.StartNew();
         TimeSpan lastTickTime = TimeSpan.Zero;
 
@@ -207,12 +207,12 @@ public static class MainLoop
 
             if (_thread is null || !_thread.IsAlive)
             {
-                _logger.Critical("Watchdog: Main thread is dead, restarting...");
+                _logger.Critical(null, "Watchdog: Main thread is dead, restarting...");
                 RestartMainThread();
             }
             else if ((DateTime.UtcNow - new DateTime(Interlocked.Read(ref _lastHeartbeatTicks))) > watchdogTimeout)
             {
-                _logger.Critical("Watchdog: Main thread hung (no heartbeat for {0}), restarting...", watchdogTimeout);
+                _logger.Critical(null, "Watchdog: Main thread hung (no heartbeat for {0}), restarting...", watchdogTimeout);
                 try { _thread.Interrupt(); } catch { }
                 if (_thread.Join(TimeSpan.FromSeconds(1)))
                 {
@@ -224,7 +224,7 @@ public static class MainLoop
 
     private static void RestartMainThread()
     {
-        _logger.Warn("Restarting main thread...");
+        _logger.Warn(null, "Restarting main thread...");
         _mainCts.Cancel();
 
         lock (_lock)
@@ -244,7 +244,7 @@ public static class MainLoop
         };
         _lastHeartbeatTicks = DateTime.UtcNow.Ticks;
         _thread.Start();
-        _logger.Info("Main thread restarted successfully");
+        _logger.Info(null, "Main thread restarted successfully");
     }
 
     private static void ExecuteTick(TimeSpan deltaTime)
@@ -273,7 +273,7 @@ public static class MainLoop
                 if (_circuitBreakerResetTimes.TryGetValue(tickObject, out DateTime resetTime)
                     && DateTime.Now < resetTime)
                 {
-                    _logger.Debug("Tick object {0} skipped: circuit breaker tripped", tickObject.GetType().Name);
+                    _logger.Debug(null, "Tick object {0} skipped: circuit breaker tripped", tickObject.GetType().Name);
                     continue;
                 }
 
@@ -295,7 +295,7 @@ public static class MainLoop
                     {
                         _circuitBreakerResetTimes[tickObject] = DateTime.Now + TimeSpan.FromMinutes(1);
                         _consecutiveTimeoutCounts[tickObject] = 0;
-                        _logger.Warn("Circuit breaker tripped for {0}, cooldown until {1}", tickObject.GetType().Name, _circuitBreakerResetTimes[tickObject]);
+                        _logger.Warn(null, "Circuit breaker tripped for {0}, cooldown until {1}", tickObject.GetType().Name, _circuitBreakerResetTimes[tickObject]);
                     }
                 }
             }
@@ -344,7 +344,7 @@ public static class MainLoop
                 return true;
             }
 
-            _logger.Warn("Execution timed out after {0}ms", timeout.TotalMilliseconds);
+            _logger.Warn(null, "Execution timed out after {0}ms", timeout.TotalMilliseconds);
             worker.Interrupt();
             if (!worker.Join(TimeSpan.FromMilliseconds(200)))
             {
@@ -359,7 +359,7 @@ public static class MainLoop
 
                 if (!worker.Join(TimeSpan.FromMilliseconds(500)))
                 {
-                    _logger.Error("Worker thread is out of control, could not be terminated");
+                    _logger.Error(null, "Worker thread is out of control, could not be terminated");
                 }
             }
 

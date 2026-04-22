@@ -75,7 +75,7 @@ public class BroadcastChannel : SessionBase
             {
                 _subscriptions[beingId] = DateTime.UtcNow;
                 Members.Add(beingId);
-                _logger.Info("BroadcastChannel {0}: {1} subscribed at {2:u}", _fixedId, beingId, _subscriptions[beingId]);
+                _logger.Info(null, "BroadcastChannel {0}: {1} subscribed at {2:u}", _fixedId, beingId, _subscriptions[beingId]);
             }
         }
     }
@@ -89,7 +89,7 @@ public class BroadcastChannel : SessionBase
         {
             _subscriptions.Remove(beingId);
             Members.Remove(beingId);
-            _logger.Info("BroadcastChannel {0}: {1} unsubscribed", _fixedId, beingId);
+            _logger.Info(null, "BroadcastChannel {0}: {1} unsubscribed", _fixedId, beingId);
         }
     }
 
@@ -110,7 +110,7 @@ public class BroadcastChannel : SessionBase
         lock (_lock)
         {
             _storage.Write(_storageKey, message.Timestamp, message);
-            _logger.Debug("BroadcastChannel {0}: message from {1}", _fixedId, message.SenderId);
+            _logger.Debug(null, "BroadcastChannel {0}: message from {1}", _fixedId, message.SenderId);
         }
     }
 
@@ -125,7 +125,7 @@ public class BroadcastChannel : SessionBase
     }
 
     /// <summary>
-    /// Get pending messages for a subscriber â€” only messages posted after subscription time
+    /// Get pending messages for a subscriber â€?only messages posted after subscription time
     /// that the subscriber has not yet read.
     /// </summary>
     public override List<ChatMessage> GetPendingMessages(Guid participantId)
@@ -160,7 +160,7 @@ public class BroadcastChannel : SessionBase
                     {
                         entry.Data.ReadBy.Add(readerId);
                         _storage.Write(_storageKey, entry.Timestamp, entry.Data);
-                        _logger.Trace("BroadcastChannel {0}: message {1} read by {2}", _fixedId, messageId, readerId);
+                        _logger.Trace(null, "BroadcastChannel {0}: message {1} read by {2}", _fixedId, messageId, readerId);
                         return;
                     }
                 }

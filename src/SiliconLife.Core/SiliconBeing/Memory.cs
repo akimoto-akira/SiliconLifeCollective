@@ -143,7 +143,7 @@ public sealed class Memory
     {
         _timeStorage = timeStorage ?? throw new ArgumentNullException(nameof(timeStorage));
         _storageKey = "memory";
-        _logger.Info("Memory system initialized with {0}", _storageKey);
+        _logger.Info(null, "Memory system initialized with {0}", _storageKey);
     }
 
     private void Save(MemoryEntry entry)
@@ -175,7 +175,7 @@ public sealed class Memory
 
         Save(entry);
 
-        _logger.Debug("Memory added: {0}..., id={1}", content.Length > 30 ? content[..30] : content, entry.Id);
+        _logger.Debug(null, "Memory added: {0}..., id={1}", content.Length > 30 ? content[..30] : content, entry.Id);
 
         return entry;
     }
@@ -204,7 +204,7 @@ public sealed class Memory
 
         Save(entry);
 
-        _logger.Debug("Memory added: {0}..., id={1}", content.Length > 30 ? content[..30] : content, entry.Id);
+        _logger.Debug(null, "Memory added: {0}..., id={1}", content.Length > 30 ? content[..30] : content, entry.Id);
 
         return entry;
     }
@@ -228,14 +228,14 @@ public sealed class Memory
 
         Save(entry);
 
-        _logger.Debug("Memory summary added: {0}..., level={1}", content.Length > 30 ? content[..30] : content, level);
+        _logger.Debug(null, "Memory summary added: {0}..., level={1}", content.Length > 30 ? content[..30] : content, level);
 
         return entry;
     }
 
     /// <summary>
     /// Gets the most recent memory entries by progressively widening the time range:
-    /// today ï¿½?this month ï¿½?this year ï¿½?all entries.
+    /// today ï¿?this month ï¿?this year ï¿?all entries.
     /// </summary>
     /// <param name="count">The maximum number of entries to return.</param>
     /// <returns>A list of recent memory entries ordered by timestamp descending.</returns>
@@ -313,7 +313,7 @@ public sealed class Memory
         var compressLevel = FindLevelToCompress();
         if (compressLevel.HasValue)
         {
-            _logger.Debug("Memory compression check: compression needed");
+            _logger.Debug(null, "Memory compression check: compression needed");
         }
         return compressLevel.HasValue;
     }

@@ -65,12 +65,12 @@ public static class CommandLineExecutor
         string? detectedSeparator = DetectDangerousSeparator(command);
         if (detectedSeparator != null)
         {
-            _logger.Warn("Command contains dangerous separator '{0}': {1}", detectedSeparator, command);
+            _logger.Warn(null, "Command contains dangerous separator '{0}': {1}", detectedSeparator, command);
             return ExecutorResult.Failed(
                 $"Command contains dangerous separator '{detectedSeparator}'. Multi-command execution is not allowed.");
         }
 
-        _logger.Info("Command: {0}", command);
+        _logger.Info(null, "Command: {0}", command);
 
         try
         {
@@ -109,7 +109,7 @@ public static class CommandLineExecutor
             if (!process.WaitForExit((int)DefaultTimeout.TotalMilliseconds))
             {
                 try { process.Kill(); } catch { }
-                _logger.Warn("Command timed out: {0}", command);
+                _logger.Warn(null, "Command timed out: {0}", command);
                 return ExecutorResult.Failed("Command timed out");
             }
 
@@ -118,16 +118,16 @@ public static class CommandLineExecutor
 
             if (process.ExitCode == 0)
             {
-                _logger.Debug("Command output: {0}", fullOutput.Length > 200 ? fullOutput.Substring(0, 200) + "..." : fullOutput);
+                _logger.Debug(null, "Command output: {0}", fullOutput.Length > 200 ? fullOutput.Substring(0, 200) + "..." : fullOutput);
                 return ExecutorResult.Successful(fullOutput, process.ExitCode);
             }
 
-            _logger.Error("Command failed: exit code={0}", process.ExitCode);
+            _logger.Error(null, "Command failed: exit code={0}", process.ExitCode);
             return ExecutorResult.Failed($"Exit code {process.ExitCode}: {error}", process.ExitCode);
         }
         catch (Exception ex)
         {
-            _logger.Error("Command execution failed: {0}, {1}", ex, command);
+            _logger.Error(null, "Command execution failed: {0}, {1}", ex, command);
             return ExecutorResult.Failed($"Command execution failed: {ex.Message}");
         }
     }

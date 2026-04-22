@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -115,7 +115,7 @@ public class Router
 
     public void NotifyInitialized(string curatorName)
     {
-        _logger.Info("First-time initialization triggered");
+        _logger.Info(null, "First-time initialization triggered");
         _onFirstInit?.Invoke(curatorName);
         SetInitialized(true);
     }
@@ -216,12 +216,12 @@ public class Router
 
             if (TryMatchPattern(pattern, path, parameters))
             {
-                _logger.Debug($"Route matched: {method} {path} -> {pattern}");
+                _logger.Debug(null, $"Route matched: {method} {path} -> {pattern}");
                 return (_controllers[route], parameters);
             }
         }
 
-        _logger.Warn($"No route matched: {method} {path}");
+        _logger.Warn(null, $"No route matched: {method} {path}");
         return (null, new Dictionary<string, string>());
     }
 

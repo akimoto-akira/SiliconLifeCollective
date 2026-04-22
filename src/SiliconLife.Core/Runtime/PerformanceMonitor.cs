@@ -72,10 +72,10 @@ public class PerformanceMonitor
             if (samples.Count > MaxSamples)
             {
                 samples.RemoveAt(0);
-                _logger.Debug("Performance sample overflow for {0}, discarding oldest", name);
+                _logger.Debug(null, "Performance sample overflow for {0}, discarding oldest", name);
             }
 
-            _logger.Trace("Performance recorded: {0} = {1}ms", name, executionTime.TotalMilliseconds);
+            _logger.Trace(null, "Performance recorded: {0} = {1}ms", name, executionTime.TotalMilliseconds);
         }
     }
 

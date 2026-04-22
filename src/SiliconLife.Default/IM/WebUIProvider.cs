@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -74,12 +74,12 @@ public class WebUIProvider : IIMProvider
         _sseHandler.OnConnected += OnSSEConnected;
         _sseHandler.OnDisconnected += OnSSEDisconnected;
         _router.SetSharedSSEHandler(_sseHandler);
-        _logger.Info("WebUIProvider initialized with SSE");
+        _logger.Info(null, "WebUIProvider initialized with SSE");
     }
 
     private void OnSSEConnected(SSEClient client)
     {
-        _logger.Info($"SSE client connected: userId={client.UserId}, channelId={client.ChannelId}");
+        _logger.Info(null, $"SSE client connected: userId={client.UserId}, channelId={client.ChannelId}");
 
         if (client.ChannelId.HasValue)
         {
@@ -89,40 +89,40 @@ public class WebUIProvider : IIMProvider
 
     private void OnSSEDisconnected(SSEClient client)
     {
-        _logger.Info($"SSE client disconnected: userId={client.UserId}");
+        _logger.Info(null, $"SSE client disconnected: userId={client.UserId}");
     }
 
     private async Task SendHistoryToClientAsync(SSEClient client)
     {
         if (!client.ChannelId.HasValue)
         {
-            _logger.Debug("SendHistoryToClientAsync: channelId is null");
+            _logger.Debug(null, "SendHistoryToClientAsync: channelId is null");
             return;
         }
 
         ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
         if (chatSystem == null)
         {
-            _logger.Debug("SendHistoryToClientAsync: chatSystem is null");
+            _logger.Debug(null, "SendHistoryToClientAsync: chatSystem is null");
             return;
         }
 
-        _logger.Info($"SendHistoryToClientAsync: looking for session with channelId={client.ChannelId.Value}");
+        _logger.Info(null, $"SendHistoryToClientAsync: looking for session with channelId={client.ChannelId.Value}");
         SessionBase? session = chatSystem.GetSessionByChannelId(client.ChannelId.Value);
         if (session == null)
         {
-            _logger.Debug("SendHistoryToClientAsync: GetSessionByChannelId returned null, trying GetSession");
+            _logger.Debug(null, "SendHistoryToClientAsync: GetSessionByChannelId returned null, trying GetSession");
             session = chatSystem.GetSession(client.ChannelId.Value);
         }
 
         if (session == null)
         {
-            _logger.Warn($"SendHistoryToClientAsync: session not found for channelId={client.ChannelId.Value}");
+            _logger.Warn(null, $"SendHistoryToClientAsync: session not found for channelId={client.ChannelId.Value}");
             return;
         }
 
         List<ChatMessage> messages = session.GetMessages(0, 500);
-        _logger.Info($"SendHistoryToClientAsync: found {messages.Count} messages for session {session.Id}");
+        _logger.Info(null, $"SendHistoryToClientAsync: found {messages.Count} messages for session {session.Id}");
         await _sseHandler.SendHistoryAsync(client, messages, client.UserId);
     }
 
@@ -183,7 +183,7 @@ public class WebUIProvider : IIMProvider
         };
 
         await _sseHandler.SendToChannelAsync(channelId, "message", message);
-        _logger.Debug($"Message sent to channel {channelId}");
+        _logger.Debug(null, $"Message sent to channel {channelId}");
     }
 
     public async Task SendStreamChunkAsync(Guid senderId, Guid channelId, StreamChunk chunk)
@@ -243,7 +243,7 @@ public class WebUIProvider : IIMProvider
         };
 
         await _sseHandler.SendToChannelAsync(channelId, "streaming", message);
-        _logger.Trace($"Stream chunk sent to channel {channelId}, isFinal={chunk.IsFinal}");
+        _logger.Trace(null, $"Stream chunk sent to channel {channelId}, isFinal={chunk.IsFinal}");
     }
 
     public async Task<AskPermissionResult> AskPermissionAsync(PermissionType permissionType, string resource, string allowCode, string denyCode)
@@ -311,6 +311,6 @@ public class WebUIProvider : IIMProvider
         };
 
         await _sseHandler.SendToChannelAsync(channelId, "tool", message);
-        _logger.Debug($"Tool update sent to channel {channelId}, role={role}");
+        _logger.Debug(null, $"Tool update sent to channel {channelId}, role={role}");
     }
 }

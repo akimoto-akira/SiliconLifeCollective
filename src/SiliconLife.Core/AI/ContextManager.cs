@@ -23,8 +23,8 @@ namespace SiliconLife.Collective;
 /// Acts as the "brain" of a silicon being: perceives input (loads history/pending),
 /// thinks (calls AI), acts (executes tools), speaks (delivers output),
 /// and remembers (persists to ChatSystem).
-/// Supports Tool Call loop: AI returns tool_calls â†’ execute tools â†’
-/// feed results back â†’ AI continues â†’ until plain text response.
+/// Supports Tool Call loop: AI returns tool_calls â†?execute tools â†?
+/// feed results back â†?AI continues â†?until plain text response.
 /// </summary>
 public class ContextManager
 {
@@ -42,7 +42,7 @@ public class ContextManager
     /// <summary>
     /// Gets whether this brain session has work to do.
     /// True if there are pending user messages or an unfinished tool call loop
-    /// (detected from chat history â€” last message is a Tool result).
+    /// (detected from chat history â€?last message is a Tool result).
     /// </summary>
     public bool HasWork => _needsContinuation || _hasNewPendingMessages;
 
@@ -76,7 +76,7 @@ public class ContextManager
             DetectContinuationFromHistory();
         }
 
-        _logger.Info("ContextManager created for being {0}, session={1}", _being.Name, _session?.Id.ToString() ?? "null");
+        _logger.Info(_being.Id, "ContextManager created for being {0}, session={1}", _being.Name, _session?.Id.ToString() ?? "null");
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public class ContextManager
             }
         }
 
-        _logger.Debug("Loaded {0} history messages from session {1}", history.Count, _session.Id);
+        _logger.Debug(_being.Id, "Loaded {0} history messages from session {1}", history.Count, _session.Id);
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public class ContextManager
         if (_messages.Count > 0 && _messages[^1].Role == MessageRole.Tool)
         {
             _needsContinuation = true;
-            _logger.Info("Detected continuation from history for being {0}", _being.Name);
+            _logger.Info(_being.Id, "Detected continuation from history for being {0}", _being.Name);
         }
     }
 
@@ -160,11 +160,11 @@ public class ContextManager
             // Verify message belongs to the current session
             if (_session != null && msg.ChannelId != Guid.Empty && msg.ChannelId != _session.Id)
             {
-                _logger.Debug("Skipping message {0} from different session {1}", msg.Id, msg.ChannelId);
+                _logger.Debug(_being.Id, "Skipping message {0} from different session {1}", msg.Id, msg.ChannelId);
                 continue;
             }
 
-            // Context already loaded by LoadHistoryMessages â€” just track
+            // Context already loaded by LoadHistoryMessages â€?just track
             _contextMessageIds.Add(msg.Id);
             _hasNewPendingMessages = true;
             _pendingMarkAsReadIds.Add(msg.Id);
@@ -172,7 +172,7 @@ public class ContextManager
         
         if (_pendingMarkAsReadIds.Count > 0)
         {
-            _logger.Debug("Fetched {0} unread messages for being {1}", _pendingMarkAsReadIds.Count, _being.Id);
+            _logger.Debug(_being.Id, "Fetched {0} unread messages for being {1}", _pendingMarkAsReadIds.Count, _being.Id);
         }
     }
 
@@ -186,7 +186,7 @@ public class ContextManager
         if (_pendingMarkAsReadIds.Count > 0 && _session != null)
         {
             _session.MarkMessagesAsRead(_pendingMarkAsReadIds, _being.Id);
-            _logger.Debug("Committed {0} messages as read for being {1}", _pendingMarkAsReadIds.Count, _being.Id);
+            _logger.Debug(_being.Id, "Committed {0} messages as read for being {1}", _pendingMarkAsReadIds.Count, _being.Id);
             _pendingMarkAsReadIds.Clear();
         }
     }
@@ -251,7 +251,7 @@ public class ContextManager
         }
         catch (Exception ex)
         {
-            _logger.Warn("Failed to record token usage: {0}", ex.Message);
+            _logger.Warn(_being.Id, "Failed to record token usage: {0}", ex.Message);
         }
     }
 
@@ -296,7 +296,7 @@ public class ContextManager
             request.Tools = toolManager.GetToolDefinitions();
         }
 
-        _logger.Debug("Building AI request: {0} messages, {1} tools", request.Messages.Count, request.Tools?.Count ?? 0);
+        _logger.Debug(_being.Id, "Building AI request: {0} messages, {1} tools", request.Messages.Count, request.Tools?.Count ?? 0);
 
         return request;
     }
@@ -307,7 +307,7 @@ public class ContextManager
     /// </summary>
     private List<ChatMessage> ExecuteToolCalls(List<ToolCall> toolCalls)
     {
-        _logger.Info("Executing {0} tool calls for being {1}", toolCalls.Count, _being.Name);
+        _logger.Info(_being.Id, "Executing {0} tool calls for being {1}", toolCalls.Count, _being.Name);
 
         List<ChatMessage> toolResultMessages = new List<ChatMessage>();
         ToolManager? toolManager = _being.ToolManager;
@@ -324,7 +324,7 @@ public class ContextManager
                 result = ToolResult.Failed($"No tool manager available for tool '{toolCall.Name}'");
             }
 
-            _logger.Info("Tool call: {0}, success={1}", toolCall.Name, result.Success);
+            _logger.Info(_being.Id, "Tool call: {0}, success={1}", toolCall.Name, result.Success);
 
             string resultContent = SerializeToolResult(result);
             string toolCallId = string.IsNullOrEmpty(toolCall.Id)
@@ -377,19 +377,19 @@ public class ContextManager
     /// <returns>The AI response (may contain tool_calls or plain text)</returns>
     public AIResponse GetResponse(string? scenarioContext = null)
     {
-        _logger.Info("Getting AI response for being {0}", _being.Name);
+        _logger.Info(_being.Id, "Getting AI response for being {0}", _being.Name);
 
         AIRequest request = BuildRequest(scenarioContext);
         AIResponse response = _aiClient.Chat(request);
 
         if (response.Success && response.HasToolCalls)
         {
-            _logger.Debug("AI returned tool calls, persisting intermediate round");
+            _logger.Debug(_being.Id, "AI returned tool calls, persisting intermediate round");
             PersistAndDeliverToolCallRound(response);
         }
         else if (response.Success)
         {
-            _logger.Debug("AI returned text response, length={0}", response.Content?.Length ?? 0);
+            _logger.Debug(_being.Id, "AI returned text response, length={0}", response.Content?.Length ?? 0);
             AddAssistantMessage(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
         }
 
@@ -413,12 +413,12 @@ public class ContextManager
             
             if (response.Success && response.HasToolCalls)
             {
-                _logger.Debug("AI returned tool calls (async), persisting intermediate round");
+                _logger.Debug(_being.Id, "AI returned tool calls (async), persisting intermediate round");
                 PersistAndDeliverToolCallRound(response);
             }
             else if (response.Success)
             {
-                _logger.Debug("AI returned text response (async), length={0}", response.Content?.Length ?? 0);
+                _logger.Debug(_being.Id, "AI returned text response (async), length={0}", response.Content?.Length ?? 0);
                 AddAssistantMessage(response.Content, response.Thinking, response.PromptTokens, response.CompletionTokens, response.TotalTokens);
             }
 
@@ -428,7 +428,7 @@ public class ContextManager
         catch (HttpRequestException ex) when (IsConnectionError(ex))
         {
             // Connection error: try fallback with global config
-            _logger.Warn("Being {0}: AI client connection error, attempting fallback to global config", _being.Name, ex);
+            _logger.Warn(_being.Id, "Being {0}: AI client connection error, attempting fallback to global config", _being.Name, ex);
             
             return await ExecuteWithFallbackClientAsync(request);
         }
@@ -447,7 +447,7 @@ public class ContextManager
         bool? streamingMode = _aiClient.StreamingMode;
         if (streamingMode == false)
         {
-            _logger.Warn("Falling back to non-streaming mode");
+            _logger.Warn(_being.Id, "Falling back to non-streaming mode");
             return await GetResponseAsync(scenarioContext);
         }
 
@@ -506,7 +506,7 @@ public class ContextManager
             {
                 return AIResponse.Failed("AI client requires streaming but ChatStreamAsync is not implemented");
             }
-            _logger.Warn("Streaming not implemented, falling back to non-streaming mode");
+            _logger.Warn(_being.Id, "Streaming not implemented, falling back to non-streaming mode");
             return await GetResponseAsync(scenarioContext);
         }
 
@@ -516,7 +516,7 @@ public class ContextManager
             {
                 return AIResponse.Failed("AI client requires streaming but stream ended without final chunk");
             }
-            _logger.Warn("Stream ended without final chunk, falling back to non-streaming mode");
+            _logger.Warn(_being.Id, "Stream ended without final chunk, falling back to non-streaming mode");
             return await GetResponseAsync(scenarioContext);
         }
 
@@ -558,14 +558,14 @@ public class ContextManager
     /// <returns>The AI response</returns>
     public AIResponse ThinkOnChat()
     {
-        _logger.Info("ThinkOnChat: being={0}, session={1}", _being.Name, _session?.Id.ToString() ?? "null");
+        _logger.Info(_being.Id, "ThinkOnChat: being={0}, session={1}", _being.Name, _session?.Id.ToString() ?? "null");
 
         string? scenarioContext = BuildSingleChatScenarioContext();
         AIResponse response = GetResponse(scenarioContext);
 
         if (response.Success && response.HasToolCalls)
         {
-            // Tool calls executed, results persisted â€” yield time slice
+            // Tool calls executed, results persisted â€?yield time slice
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
@@ -590,10 +590,10 @@ public class ContextManager
         }
         else if (!response.Success)
         {
-            // AI request failed â€” notify frontend and keep messages unread for retry
+            // AI request failed â€?notify frontend and keep messages unread for retry
             string errorMsg = response.ErrorMessage ?? "Unknown AI error";
             DeliverOutput($"[Error] AI request failed: {errorMsg}");
-            _logger.Error("ThinkOnChat failed: being={0}, error={1}", _being.Name, errorMsg);
+            _logger.Error(_being.Id, "ThinkOnChat failed: being={0}, error={1}", _being.Name, errorMsg);
         }
 
         return response;
@@ -646,14 +646,14 @@ public class ContextManager
     /// <returns>The AI response</returns>
     public async Task<AIResponse> ThinkOnChatStreamAsync(CancellationToken cancellationToken = default)
     {
-        _logger.Info("ThinkOnChatStream: being={0}, session={1}", _being.Name, _session?.Id.ToString() ?? "null");
+        _logger.Info(_being.Id, "ThinkOnChatStream: being={0}, session={1}", _being.Name, _session?.Id.ToString() ?? "null");
 
         string? scenarioContext = BuildSingleChatScenarioContext();
         AIResponse response = await GetResponseStreamAsync(scenarioContext, cancellationToken);
 
         if (response.Success && response.HasToolCalls)
         {
-            // Tool calls executed, results persisted â€” yield time slice
+            // Tool calls executed, results persisted â€?yield time slice
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
@@ -678,10 +678,10 @@ public class ContextManager
         }
         else if (!response.Success)
         {
-            // AI request failed â€” notify frontend and keep messages unread for retry
+            // AI request failed â€?notify frontend and keep messages unread for retry
             string errorMsg = response.ErrorMessage ?? "Unknown AI error";
             DeliverOutput($"[Error] AI request failed: {errorMsg}");
-            _logger.Error("ThinkOnChatStreamAsync failed: being={0}, error={1}", _being.Name, errorMsg);
+            _logger.Error(_being.Id, "ThinkOnChatStreamAsync failed: being={0}, error={1}", _being.Name, errorMsg);
         }
 
         return response;
@@ -694,14 +694,14 @@ public class ContextManager
     /// <returns>The AI response</returns>
     public AIResponse ThinkOnGroupChat()
     {
-        _logger.Info("ThinkOnGroupChat: being={0}", _being.Name);
+        _logger.Info(_being.Id, "ThinkOnGroupChat: being={0}", _being.Name);
 
         string? scenarioContext = null;
         AIResponse response = GetResponse(scenarioContext);
 
         if (response.Success && response.HasToolCalls)
         {
-            // Tool calls executed, results persisted â€” yield time slice
+            // Tool calls executed, results persisted â€?yield time slice
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
@@ -731,14 +731,14 @@ public class ContextManager
     /// <returns>The AI response</returns>
     public async Task<AIResponse> ThinkOnGroupChatStreamAsync(CancellationToken cancellationToken = default)
     {
-        _logger.Info("ThinkOnGroupChatStream: being={0}", _being.Name);
+        _logger.Info(_being.Id, "ThinkOnGroupChatStream: being={0}", _being.Name);
 
         string? scenarioContext = null;
         AIResponse response = await GetResponseStreamAsync(scenarioContext, cancellationToken);
 
         if (response.Success && response.HasToolCalls)
         {
-            // Tool calls executed, results persisted â€” yield time slice
+            // Tool calls executed, results persisted â€?yield time slice
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
@@ -768,7 +768,7 @@ public class ContextManager
     /// <returns>The AI response</returns>
     public AIResponse ThinkOnTask(TaskItem task)
     {
-        _logger.Info("ThinkOnTask: being={0}, task={1} ({2})", _being.Name, task.Title, task.Id);
+        _logger.Info(_being.Id, "ThinkOnTask: being={0}, task={1} ({2})", _being.Name, task.Title, task.Id);
 
         string? scenarioContext = BuildTaskScenarioContext(task);
         AIResponse response = GetResponse(scenarioContext);
@@ -793,7 +793,7 @@ public class ContextManager
     /// <returns>The AI response</returns>
     public AIResponse ThinkOnTimer(TimerItem timer)
     {
-        _logger.Info("ThinkOnTimer: being={0}, timer={1} ({2})", _being.Name, timer.Name, timer.Id);
+        _logger.Info(_being.Id, "ThinkOnTimer: being={0}, timer={1} ({2})", _being.Name, timer.Name, timer.Id);
 
         try
         {
@@ -824,7 +824,7 @@ public class ContextManager
                 iteration++;
                 if (iteration > maxIterations)
                 {
-                    _logger.Warn("ThinkOnTimer: Max iterations ({0}) reached, stopping tool call loop", maxIterations);
+                    _logger.Warn(_being.Id, "ThinkOnTimer: Max iterations ({0}) reached, stopping tool call loop", maxIterations);
                     break;
                 }
 
@@ -873,7 +873,7 @@ public class ContextManager
         catch (Exception ex)
         {
             // Catch any unexpected exceptions and notify user
-            _logger.Error("ThinkOnTimer exception: being={0}, timer={1}, error={2}", _being.Name, timer.Name, ex.Message);
+            _logger.Error(_being.Id, "ThinkOnTimer exception: being={0}, timer={1}, error={2}", _being.Name, timer.Name, ex.Message);
             
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
@@ -952,7 +952,7 @@ public class ContextManager
     /// <returns>The AI response</returns>
     public AIResponse ThinkOnMemoryCompress()
     {
-        _logger.Info("ThinkOnMemoryCompress: being={0}", _being.Name);
+        _logger.Info(_being.Id, "ThinkOnMemoryCompress: being={0}", _being.Name);
 
         if (_being.Memory == null)
         {
@@ -1033,7 +1033,7 @@ public class ContextManager
     /// </summary>
     private void DeliverOutput(string content, string? thinking = null, int? promptTokens = null, int? completionTokens = null, int? totalTokens = null)
     {
-        _logger.Debug("Delivering output for being {0}, length={1}", _being.Name, content.Length);
+        _logger.Debug(_being.Id, "Delivering output for being {0}, length={1}", _being.Name, content.Length);
 
         IMManager? imManager = ServiceLocator.Instance.IMManager;
         if (imManager != null && _session != null)
@@ -1054,9 +1054,9 @@ public class ContextManager
     /// </summary>
     private void DeliverTimerOutput(string content, string? thinking = null)
     {
-        _logger.Debug("Delivering timer output for being {0}, length={1}", _being.Name, content.Length);
+        _logger.Debug(_being.Id, "Delivering timer output for being {0}, length={1}", _being.Name, content.Length);
 
-        // Determine the target: curator â†’ user, non-curator â†’ curator
+        // Determine the target: curator â†?user, non-curator â†?curator
         Guid targetId = Guid.Empty;
         if (_being.IsCurator)
         {
@@ -1072,7 +1072,7 @@ public class ContextManager
 
         if (targetId == Guid.Empty)
         {
-            _logger.Warn("DeliverTimerOutput: no valid target for being {0}", _being.Name);
+            _logger.Warn(_being.Id, "DeliverTimerOutput: no valid target for being {0}", _being.Name);
             return;
         }
 
@@ -1081,7 +1081,7 @@ public class ContextManager
         SessionBase? session = chatSystem?.GetOrCreateSession(_being.Id, targetId);
         if (session == null)
         {
-            _logger.Warn("DeliverTimerOutput: failed to get session for being {0} â†’ target {1}", _being.Name, targetId);
+            _logger.Warn(_being.Id, "DeliverTimerOutput: failed to get session for being {0} â†?target {1}", _being.Name, targetId);
             return;
         }
 
@@ -1100,7 +1100,7 @@ public class ContextManager
             _ = imManager.SendMessageAsync(_being.Id, session.Id, content, thinking, _being.Name);
         }
 
-        _logger.Info("[TIMER] {0}: {1}", _being.Name, content);
+        _logger.Info(_being.Id, "[TIMER] {0}: {1}", _being.Name, content);
     }
 
     /// <summary>
@@ -1222,7 +1222,7 @@ public class ContextManager
         }
         catch (Exception ex)
         {
-            _logger.Warn("Failed to record to memory: {0}", ex.Message);
+            _logger.Warn(_being.Id, "Failed to record to memory: {0}", ex.Message);
         }
     }
 
@@ -1249,7 +1249,7 @@ public class ContextManager
         // The actual fallback client creation will be handled by DefaultSiliconBeing on next tick
         _being.IsUsingFallbackClient = true;
         
-        _logger.Error("Being {0}: AI client connection failed. Will attempt recovery on next tick.", _being.Name);
+        _logger.Error(_being.Id, "Being {0}: AI client connection failed. Will attempt recovery on next tick.", _being.Name);
         
         // Return error response - the being will handle recovery on next tick
         return AIResponse.Failed("AI client connection failed, will retry on next tick");

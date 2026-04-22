@@ -60,7 +60,7 @@ public class ToolManager
         {
             _tools[tool.Name] = tool;
         }
-        _logger.Debug($"Tool registered: {tool.Name}");
+        _logger.Debug(null, $"Tool registered: {tool.Name}");
     }
 
     /// <summary>
@@ -105,11 +105,11 @@ public class ToolManager
             }
             catch (Exception ex)
             {
-                _logger.Warn($"Failed to instantiate tool '{type.Name}': {ex.Message}");
+                _logger.Warn(null, $"Failed to instantiate tool '{type.Name}': {ex.Message}");
             }
         }
 
-        _logger.Info($"Assembly scan: found {count} tools from {assembly.GetName().Name}");
+        _logger.Info(null, $"Assembly scan: found {count} tools from {assembly.GetName().Name}");
         return count;
     }
 
@@ -142,11 +142,11 @@ public class ToolManager
             }
             catch (Exception ex)
             {
-                _logger.Warn($"Failed to instantiate tool '{type.Name}': {ex.Message}");
+                _logger.Warn(null, $"Failed to instantiate tool '{type.Name}': {ex.Message}");
             }
         }
 
-        _logger.Info($"Assembly scan (all): found {count} tools from {assembly.GetName().Name}");
+        _logger.Info(null, $"Assembly scan (all): found {count} tools from {assembly.GetName().Name}");
         return count;
     }
 
@@ -183,20 +183,20 @@ public class ToolManager
 
         if (tool == null)
         {
-            _logger.Warn($"Tool not found: {name}");
+            _logger.Warn(null, $"Tool not found: {name}");
             return ToolResult.Failed($"Tool '{name}' not found");
         }
 
-        _logger.Info($"Tool execution: {name}, caller={callerId}");
+        _logger.Info(null, $"Tool execution: {name}, caller={callerId}");
         try
         {
             ToolResult result = tool.Execute(callerId, parameters);
-            _logger.Debug($"Tool execution succeeded: {name}");
+            _logger.Debug(null, $"Tool execution succeeded: {name}");
             return result;
         }
         catch (Exception ex)
         {
-            _logger.Error($"Tool execution failed: {name}, error={ex.Message}", ex);
+            _logger.Error(null, $"Tool execution failed: {name}, error={ex.Message}", ex);
             return ToolResult.Failed($"Tool '{name}' execution failed: {ex.Message}");
         }
     }

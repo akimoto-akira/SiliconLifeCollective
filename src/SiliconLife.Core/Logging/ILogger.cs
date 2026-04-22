@@ -32,124 +32,142 @@ public interface ILogger
     /// <summary>
     /// Logs a message with the specified log level.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="level">The log level.</param>
     /// <param name="message">The log message.</param>
-    void Log(LogLevel level, string message);
+    void Log(Guid? beingId, LogLevel level, string message);
 
     /// <summary>
     /// Logs a message with the specified log level and exception.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="level">The log level.</param>
     /// <param name="message">The log message.</param>
     /// <param name="exception">The exception to log.</param>
-    void Log(LogLevel level, string message, Exception exception);
+    void Log(Guid? beingId, LogLevel level, string message, Exception exception);
 
     /// <summary>
     /// Logs a formatted message with the specified log level.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="level">The log level.</param>
     /// <param name="format">The message format string.</param>
     /// <param name="args">The format arguments.</param>
-    void Log(LogLevel level, string format, params object[] args);
+    void Log(Guid? beingId, LogLevel level, string format, params object[] args);
 
     /// <summary>
     /// Logs a trace-level message.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="message">The log message.</param>
-    void Trace(string message);
+    void Trace(Guid? beingId, string message);
 
     /// <summary>
     /// Logs a trace-level formatted message.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="format">The message format string.</param>
     /// <param name="args">The format arguments.</param>
-    void Trace(string format, params object[] args);
+    void Trace(Guid? beingId, string format, params object[] args);
 
     /// <summary>
     /// Logs a debug-level message.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="message">The log message.</param>
-    void Debug(string message);
+    void Debug(Guid? beingId, string message);
 
     /// <summary>
     /// Logs a debug-level formatted message.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="format">The message format string.</param>
     /// <param name="args">The format arguments.</param>
-    void Debug(string format, params object[] args);
+    void Debug(Guid? beingId, string format, params object[] args);
 
     /// <summary>
     /// Logs an information-level message.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="message">The log message.</param>
-    void Info(string message);
+    void Info(Guid? beingId, string message);
 
     /// <summary>
     /// Logs an information-level formatted message.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="format">The message format string.</param>
     /// <param name="args">The format arguments.</param>
-    void Info(string format, params object[] args);
+    void Info(Guid? beingId, string format, params object[] args);
 
     /// <summary>
     /// Logs a warning-level message.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="message">The log message.</param>
-    void Warn(string message);
+    void Warn(Guid? beingId, string message);
 
     /// <summary>
     /// Logs a warning-level message with an exception.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="message">The log message.</param>
     /// <param name="exception">The exception to log.</param>
-    void Warn(string message, Exception exception);
+    void Warn(Guid? beingId, string message, Exception exception);
 
     /// <summary>
     /// Logs a warning-level formatted message.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="format">The message format string.</param>
     /// <param name="args">The format arguments.</param>
-    void Warn(string format, params object[] args);
+    void Warn(Guid? beingId, string format, params object[] args);
 
     /// <summary>
     /// Logs an error-level message.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="message">The log message.</param>
-    void Error(string message);
+    void Error(Guid? beingId, string message);
 
     /// <summary>
     /// Logs an error-level message with an exception.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="message">The log message.</param>
     /// <param name="exception">The exception to log.</param>
-    void Error(string message, Exception exception);
+    void Error(Guid? beingId, string message, Exception exception);
 
     /// <summary>
     /// Logs an error-level formatted message.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="format">The message format string.</param>
     /// <param name="args">The format arguments.</param>
-    void Error(string format, params object[] args);
+    void Error(Guid? beingId, string format, params object[] args);
 
     /// <summary>
     /// Logs a critical-level message.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="message">The log message.</param>
-    void Critical(string message);
+    void Critical(Guid? beingId, string message);
 
     /// <summary>
     /// Logs a critical-level message with an exception.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="message">The log message.</param>
     /// <param name="exception">The exception to log.</param>
-    void Critical(string message, Exception exception);
+    void Critical(Guid? beingId, string message, Exception exception);
 
     /// <summary>
     /// Logs a critical-level formatted message.
     /// </summary>
+    /// <param name="beingId">The silicon being ID, or null for system-level logs.</param>
     /// <param name="format">The message format string.</param>
     /// <param name="args">The format arguments.</param>
-    void Critical(string format, params object[] args);
+    void Critical(Guid? beingId, string format, params object[] args);
 
     /// <summary>
     /// Checks if logging is enabled for the specified log level.

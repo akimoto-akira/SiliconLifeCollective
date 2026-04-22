@@ -50,7 +50,7 @@ public class SiliconBeingRunner
         bool success = false;
         Thread? worker = null;
 
-        _logger.Debug("Executing being tick: {0} ({1})", _being.Name, _being.Id);
+        _logger.Debug(_being.Id, "Executing being tick: {0} ({1})", _being.Name, _being.Id);
 
         try
         {
@@ -66,7 +66,7 @@ public class SiliconBeingRunner
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error("Being tick failed with exception: {0}", _being.Name, ex);
+                    _logger.Error(_being.Id, "Being tick failed with exception: {0}", _being.Name, ex);
                 }
             })
             {
@@ -79,11 +79,11 @@ public class SiliconBeingRunner
             if (worker.Join(timeout))
             {
                 _consecutiveTimeoutCount = 0;
-                _logger.Debug("Being tick completed: {0} in {1}ms", _being.Name, timeout.TotalMilliseconds);
+                _logger.Debug(_being.Id, "Being tick completed: {0} in {1}ms", _being.Name, timeout.TotalMilliseconds);
                 return true;
             }
 
-            _logger.Warn("Being tick timed out: {0} after {1}ms", _being.Name, timeout.TotalMilliseconds);
+            _logger.Warn(_being.Id, "Being tick timed out: {0} after {1}ms", _being.Name, timeout.TotalMilliseconds);
             KillThread(worker, _being.Name);
             HandleTimeout();
             return false;
@@ -100,7 +100,7 @@ public class SiliconBeingRunner
     }
 
     /// <summary>
-    /// Kill a thread aggressively: Interrupt → Abort → verify.
+    /// Kill a thread aggressively: Interrupt �?Abort �?verify.
     /// </summary>
     private static void KillThread(Thread? worker, string beingName)
     {
@@ -122,7 +122,7 @@ public class SiliconBeingRunner
 
             if (!worker.Join(TimeSpan.FromMilliseconds(500)))
             {
-                _logger.Error("Worker thread for being {0} is out of control", beingName);
+                _logger.Error(null, "Worker thread for being {0} is out of control", beingName);
             }
         }
     }
@@ -144,7 +144,7 @@ public class SiliconBeingRunner
             _circuitBreakerTripped = true;
             _circuitBreakerResetTime = DateTime.UtcNow + TimeSpan.FromMinutes(1);
             _consecutiveTimeoutCount = 0;
-            _logger.Warn("Circuit breaker tripped for being {0}, cooldown for 1 minute", _being.Name);
+            _logger.Warn(_being.Id, "Circuit breaker tripped for being {0}, cooldown for 1 minute", _being.Name);
         }
     }
 
@@ -157,7 +157,7 @@ public class SiliconBeingRunner
         {
             _circuitBreakerTripped = false;
             _consecutiveTimeoutCount = 0;
-            _logger.Info("Circuit breaker reset for being {0}", _being.Name);
+            _logger.Info(_being.Id, "Circuit breaker reset for being {0}", _being.Name);
         }
     }
 }
@@ -198,7 +198,7 @@ public class SiliconBeingManager : TickObject
     public void Start()
     {
         _managerRunning = true;
-        _logger.Info("SiliconBeingManager starting...");
+        _logger.Info(null, "SiliconBeingManager starting...");
     }
 
     public void Stop()
@@ -207,7 +207,7 @@ public class SiliconBeingManager : TickObject
 
         lock (_lock)
         {
-            _logger.Info("SiliconBeingManager stopping, clearing {0} beings", _beings.Count);
+            _logger.Info(null, "SiliconBeingManager stopping, clearing {0} beings", _beings.Count);
             _runners.Clear();
             _beings.Clear();
         }
@@ -222,7 +222,7 @@ public class SiliconBeingManager : TickObject
                 _beings.Add(being);
                 _runners[being] = new SiliconBeingRunner(being, MaxTimeoutCount, Config.Instance?.Data!);
                 bool isCurator = Config.Instance?.Data?.CuratorGuid == being.Id;
-                _logger.Info("Registered being: {0} ({1}), isCurator={2}", being.Name, being.Id, isCurator);
+                _logger.Info(being.Id, "Registered being: {0} ({1}), isCurator={2}", being.Name, being.Id, isCurator);
             }
         }
     }
@@ -233,7 +233,7 @@ public class SiliconBeingManager : TickObject
         {
             _runners.Remove(being);
             _beings.Remove(being);
-            _logger.Info("Unregistered being: {0} ({1})", being.Name, being.Id);
+            _logger.Info(being.Id, "Unregistered being: {0} ({1})", being.Name, being.Id);
         }
     }
 
@@ -284,7 +284,7 @@ public class SiliconBeingManager : TickObject
 
             if (runner.IsCircuitBreakerTripped)
             {
-                _logger.Debug("Skipping being {0}: circuit breaker tripped", runner.BeingId);
+                _logger.Debug(null, "Skipping being {0}: circuit breaker tripped", runner.BeingId);
                 continue;
             }
 
@@ -302,7 +302,7 @@ public class SiliconBeingManager : TickObject
         }
     }
 
-    #region Phase 7: Dynamic Compilation — Replace & Migrate
+    #region Phase 7: Dynamic Compilation �?Replace & Migrate
 
     /// <summary>
     /// Replaces a silicon being's implementation with a dynamically compiled type.
@@ -316,7 +316,7 @@ public class SiliconBeingManager : TickObject
     {
         if (!typeof(SiliconBeingBase).IsAssignableFrom(newType))
         {
-            _logger.Error("Cannot replace being {0}: type {1} does not inherit SiliconBeingBase", beingId, newType.Name);
+            _logger.Error(beingId, "Cannot replace being {0}: type {1} does not inherit SiliconBeingBase", beingId, newType.Name);
             return false;
         }
 
@@ -328,7 +328,7 @@ public class SiliconBeingManager : TickObject
                 return false;
             }
 
-            _logger.Info("Replacing being {0} with compiled type {1}", beingId, newType.Name);
+            _logger.Info(beingId, "Replacing being {0} with compiled type {1}", beingId, newType.Name);
 
             SiliconBeingBase? newBeing = null;
             try
@@ -343,14 +343,14 @@ public class SiliconBeingManager : TickObject
                 }
                 catch
                 {
-                    _logger.Error("Failed to create instance of {0} for being {1}", newType.Name, beingId);
+                    _logger.Error(beingId, "Failed to create instance of {0} for being {1}", newType.Name, beingId);
                     return false;
                 }
             }
 
             if (newBeing == null)
             {
-                _logger.Error("Failed to create instance of {0} for being {1}", newType.Name, beingId);
+                _logger.Error(beingId, "Failed to create instance of {0} for being {1}", newType.Name, beingId);
                 return false;
             }
 
@@ -396,7 +396,7 @@ public class SiliconBeingManager : TickObject
                 return;
             }
 
-            _logger.Info("Reverting being {0} to default implementation", beingId);
+            _logger.Info(beingId, "Reverting being {0} to default implementation", beingId);
 
             SiliconBeingBase? newBeing = factory.CreateBeing(oldBeing.Id, oldBeing.Name);
             if (newBeing == null)
@@ -422,7 +422,7 @@ public class SiliconBeingManager : TickObject
     /// <summary>
     /// Replaces the permission callback for a specific being.
     /// Loads the compiled IPermissionCallback and injects it into the being's PermissionManager.
-    /// Stealth channel — this operation is not visible to the AI.
+    /// Stealth channel �?this operation is not visible to the AI.
     /// </summary>
     /// <param name="beingId">The GUID of the being</param>
     /// <param name="callbackType">The compiled Type implementing IPermissionCallback</param>
@@ -430,7 +430,7 @@ public class SiliconBeingManager : TickObject
     {
         if (!typeof(IPermissionCallback).IsAssignableFrom(callbackType))
         {
-            _logger.Warn("ReplacePermissionCallback: type {0} does not implement IPermissionCallback", callbackType.Name);
+            _logger.Warn(beingId, "ReplacePermissionCallback: type {0} does not implement IPermissionCallback", callbackType.Name);
             return;
         }
 
@@ -439,12 +439,12 @@ public class SiliconBeingManager : TickObject
             SiliconBeingBase? being = _beings.FirstOrDefault(b => b.Id == beingId);
             if (being == null)
             {
-                _logger.Warn("ReplacePermissionCallback: being {0} not found in manager", beingId);
+                _logger.Warn(beingId, "ReplacePermissionCallback: being {0} not found in manager", beingId);
                 return;
             }
             if (being.PermissionManager == null)
             {
-                _logger.Warn("ReplacePermissionCallback: being {0} has no PermissionManager", beingId);
+                _logger.Warn(beingId, "ReplacePermissionCallback: being {0} has no PermissionManager", beingId);
                 return;
             }
 
@@ -457,7 +457,7 @@ public class SiliconBeingManager : TickObject
                 ConstructorInfo? ctor = callbackType.GetConstructor(new[] { typeof(string) });
                 if (ctor == null)
                 {
-                    _logger.Warn("ReplacePermissionCallback: no constructor(string) found on type {0}", callbackType.Name);
+                    _logger.Warn(beingId, "ReplacePermissionCallback: no constructor(string) found on type {0}", callbackType.Name);
                     return;
                 }
                 
@@ -467,20 +467,20 @@ public class SiliconBeingManager : TickObject
                 if (callback != null)
                 {
                     being.PermissionManager.SetCustomCallback(callback);
-                    _logger.Info("Custom permission callback applied for being {0}, type={1}", beingId, callbackType.Name);
+                    _logger.Info(beingId, "Custom permission callback applied for being {0}, type={1}", beingId, callbackType.Name);
                 }
                 else
                 {
-                    _logger.Warn("ReplacePermissionCallback: constructor returned null for being {0}", beingId);
+                    _logger.Warn(beingId, "ReplacePermissionCallback: constructor returned null for being {0}", beingId);
                 }
             }
             catch (TargetInvocationException tie) when (tie.InnerException != null)
             {
-                _logger.Warn("Failed to instantiate permission callback for being {0}: constructor threw {1}", beingId, tie.InnerException.Message);
+                _logger.Warn(beingId, "Failed to instantiate permission callback for being {0}: constructor threw {1}", beingId, tie.InnerException.Message);
             }
             catch (Exception ex)
             {
-                _logger.Warn("Failed to instantiate permission callback for being {0}: {1}", beingId, ex.Message);
+                _logger.Warn(beingId, "Failed to instantiate permission callback for being {0}: {1}", beingId, ex.Message);
             }
         }
     }
@@ -511,13 +511,13 @@ public class SiliconBeingManager : TickObject
     /// <param name="newBeing">The new being instance</param>
     private static void MigrateState(SiliconBeingBase oldBeing, SiliconBeingBase newBeing)
     {
-        _logger.Debug("Migrating state from {0} to {1} for being {2}", oldBeing.GetType().Name, newBeing.GetType().Name, oldBeing.Id);
+        _logger.Debug(oldBeing.Id, "Migrating state from {0} to {1} for being {2}", oldBeing.GetType().Name, newBeing.GetType().Name, oldBeing.Id);
 
         newBeing.AIClient = oldBeing.AIClient;
         newBeing.SoulContent = oldBeing.SoulContent;
         newBeing.ToolManager = oldBeing.ToolManager;
 
-        // Migrate PermissionManager — create new one with same owner (newBeing) but keep the old callback
+        // Migrate PermissionManager �?create new one with same owner (newBeing) but keep the old callback
         PermissionManager? oldPm = oldBeing.PermissionManager;
         if (oldPm != null)
         {

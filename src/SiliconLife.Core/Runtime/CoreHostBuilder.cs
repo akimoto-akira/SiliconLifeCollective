@@ -59,7 +59,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetConfig(ConfigDataBase config)
     {
         Config = config;
-        _logger.Debug("Set Config");
+        _logger.Debug(null, "Set Config");
         return this;
     }
 
@@ -67,7 +67,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetStorage(IStorage storage)
     {
         Storage = storage;
-        _logger.Debug("Set Storage: {0}", storage?.GetType().Name ?? "null");
+        _logger.Debug(null, "Set Storage: {0}", storage?.GetType().Name ?? "null");
         return this;
     }
 
@@ -75,7 +75,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetTimeStorage(ITimeStorage timeStorage)
     {
         TimeStorage = timeStorage;
-        _logger.Debug("Set TimeStorage: {0}", timeStorage?.GetType().Name ?? "null");
+        _logger.Debug(null, "Set TimeStorage: {0}", timeStorage?.GetType().Name ?? "null");
         return this;
     }
 
@@ -83,7 +83,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetChatSystem(ChatSystem chatSystem)
     {
         ChatSystem = chatSystem;
-        _logger.Debug("Set ChatSystem");
+        _logger.Debug(null, "Set ChatSystem");
         return this;
     }
 
@@ -91,7 +91,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetAuditLogger(AuditLogger auditLogger)
     {
         AuditLogger = auditLogger;
-        _logger.Debug("Set AuditLogger");
+        _logger.Debug(null, "Set AuditLogger");
         return this;
     }
 
@@ -99,7 +99,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetGlobalACL(GlobalACL globalAcl)
     {
         GlobalAcl = globalAcl;
-        _logger.Debug("Set GlobalACL");
+        _logger.Debug(null, "Set GlobalACL");
         return this;
     }
 
@@ -107,7 +107,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetIMProvider(IIMProvider provider)
     {
         IMProvider = provider;
-        _logger.Debug("Set IMProvider: {0}", provider?.GetType().Name ?? "null");
+        _logger.Debug(null, "Set IMProvider: {0}", provider?.GetType().Name ?? "null");
         return this;
     }
 
@@ -115,7 +115,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetIMManager(IMManager imManager)
     {
         IMManager = imManager;
-        _logger.Debug("Set IMManager");
+        _logger.Debug(null, "Set IMManager");
         return this;
     }
 
@@ -123,7 +123,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetBeingFactory(ISiliconBeingFactory factory)
     {
         BeingFactory = factory;
-        _logger.Debug("Set BeingFactory: {0}", factory?.GetType().Name ?? "null");
+        _logger.Debug(null, "Set BeingFactory: {0}", factory?.GetType().Name ?? "null");
         return this;
     }
 
@@ -131,7 +131,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetDynamicBeingLoader(DynamicBeingLoader loader)
     {
         DynamicBeingLoader = loader;
-        _logger.Debug("Set DynamicBeingLoader");
+        _logger.Debug(null, "Set DynamicBeingLoader");
         return this;
     }
 
@@ -139,7 +139,7 @@ public class CoreHostBuilder
     public CoreHostBuilder SetTokenUsageAuditManager(TokenUsageAuditManager manager)
     {
         TokenUsageAuditManager = manager;
-        _logger.Debug("Set TokenUsageAuditManager");
+        _logger.Debug(null, "Set TokenUsageAuditManager");
         return this;
     }
 
@@ -161,7 +161,7 @@ public class CoreHostBuilder
         if (DynamicBeingLoader != null) componentCount++;
         if (TokenUsageAuditManager != null) componentCount++;
 
-        _logger.Info("Building CoreHost with {0} components", componentCount);
+        _logger.Info(null, "Building CoreHost with {0} components", componentCount);
         return new CoreHost(this);
     }
 }

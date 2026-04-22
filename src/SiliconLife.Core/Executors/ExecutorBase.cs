@@ -64,23 +64,23 @@ public abstract class ExecutorBase : IDisposable
     public ExecutorResult Execute(ExecutorRequest request, TimeSpan? timeout = null)
     {
         TimeSpan actualTimeout = timeout ?? DefaultTimeout;
-        _logger.Debug("Executing request: {0}", request);
+        _logger.Debug(null, "Executing request: {0}", request);
 
         try
         {
             Task<ExecutorResult> task = Task.Run(() => ExecuteCore(request));
             if (task.Wait(actualTimeout))
             {
-                _logger.Debug("Execution completed successfully");
+                _logger.Debug(null, "Execution completed successfully");
                 return task.Result;
             }
-            _logger.Warn("Execution timed out after {0}ms", actualTimeout.TotalMilliseconds);
+            _logger.Warn(null, "Execution timed out after {0}ms", actualTimeout.TotalMilliseconds);
             return ExecutorResult.Failed("Operation timed out");
         }
         catch (AggregateException ex)
         {
             Exception? inner = ex.InnerException;
-            _logger.Error("Execution failed: {0}", ex);
+            _logger.Error(null, "Execution failed: {0}", ex);
             return ExecutorResult.Failed(inner?.Message ?? ex.Message);
         }
     }
@@ -94,11 +94,11 @@ public abstract class ExecutorBase : IDisposable
     {
         if (!_isRunning)
         {
-            _logger.Warn("Cannot enqueue: executor not running");
+            _logger.Warn(null, "Cannot enqueue: executor not running");
             return false;
         }
         bool result = _requestQueue.TryAdd(request);
-        _logger.Debug("Request enqueued, queue size={0}", _requestQueue.Count);
+        _logger.Debug(null, "Request enqueued, queue size={0}", _requestQueue.Count);
         return result;
     }
 
@@ -122,7 +122,7 @@ public abstract class ExecutorBase : IDisposable
             Name = $"Executor-{GetType().Name}"
         };
         _workerThread.Start();
-        _logger.Info("Executor started");
+        _logger.Info(null, "Executor started");
     }
 
     /// <summary>
@@ -130,7 +130,7 @@ public abstract class ExecutorBase : IDisposable
     /// </summary>
     public virtual void Stop()
     {
-        _logger.Info("Executor stopped");
+        _logger.Info(null, "Executor stopped");
         _isRunning = false;
         _requestQueue.CompleteAdding();
         _workerThread?.Join(3000);

@@ -118,7 +118,8 @@ public class LogController : Controller
                     Level = levelStr,
                     Category = dto.Category,
                     Message = dto.Message,
-                    Details = dto.Exception
+                    Details = dto.Exception,
+                    BeingId = dto.BeingId
                 });
             }
             catch
@@ -210,6 +211,7 @@ public class LogController : Controller
         object Level,
         string Category,
         string Message,
-        string? Exception
+        string? Exception,
+        Guid? BeingId = null
     );
 }

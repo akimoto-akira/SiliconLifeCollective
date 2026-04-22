@@ -14,7 +14,7 @@
 namespace SiliconLife.Collective;
 
 /// <summary>
-/// Single chat session â€” persists messages via <see cref="ITimeStorage"/>.
+/// Single chat session â€?persists messages via <see cref="ITimeStorage"/>.
 /// </summary>
 public class SingleChatSession : SessionBase
 {
@@ -57,7 +57,7 @@ public class SingleChatSession : SessionBase
         lock (_lock)
         {
             _storage.Write(_storageKey, message.Timestamp, message);
-            _logger.Debug("Session {0}: message added from {1}", Id, message.SenderId);
+            _logger.Debug(null, "Session {0}: message added from {1}", Id, message.SenderId);
         }
     }
 
@@ -85,7 +85,7 @@ public class SingleChatSession : SessionBase
             }
 
             allMessages.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
-            _logger.Trace("Session {0}: retrieving {1} messages", Id, allMessages.Count);
+            _logger.Trace(null, "Session {0}: retrieving {1} messages", Id, allMessages.Count);
             return allMessages.Skip(offset).Take(limit).ToList();
         }
     }
@@ -119,7 +119,7 @@ public class SingleChatSession : SessionBase
             }
 
             pending.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
-            _logger.Debug("Session {0}: {1} pending messages for {2}", Id, pending.Count, participantId);
+            _logger.Debug(null, "Session {0}: {1} pending messages for {2}", Id, pending.Count, participantId);
             return pending;
         }
     }
@@ -142,7 +142,7 @@ public class SingleChatSession : SessionBase
                     {
                         entry.Data.ReadBy.Add(readerId);
                         _storage.Write(_storageKey, entry.Timestamp, entry.Data);
-                        _logger.Trace("Session {0}: message {1} read by {2}", Id, messageId, readerId);
+                        _logger.Trace(null, "Session {0}: message {1} read by {2}", Id, messageId, readerId);
                         return;
                     }
                 }

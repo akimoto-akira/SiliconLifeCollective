@@ -62,7 +62,7 @@ public static class SecurityScanner
         (new Regex(@"System\.Net\.HttpWebRequest", RegexOptions.Compiled), "Direct HTTP request. Use NetworkExecutor instead.", "critical"),
         (new Regex(@"System\.Net\.WebClient", RegexOptions.Compiled), "Direct WebClient usage. Use NetworkExecutor instead.", "critical"),
 
-        // Reflection abuse â€” loading assemblies, invoking arbitrary methods
+        // Reflection abuse â€?loading assemblies, invoking arbitrary methods
         (new Regex(@"Assembly\.LoadFrom", RegexOptions.Compiled), "Dynamic assembly loading from file path.", "high"),
         (new Regex(@"Assembly\.LoadFile", RegexOptions.Compiled), "Loading assembly from file.", "high"),
         (new Regex(@"Activator\.CreateInstance", RegexOptions.Compiled), "Uncontrolled instance creation via reflection.", "medium"),
@@ -72,7 +72,7 @@ public static class SecurityScanner
         (new Regex(@"AppDomain", RegexOptions.Compiled), "AppDomain manipulation.", "high"),
         (new Regex(@"Thread\.\w*Abort", RegexOptions.Compiled), "Thread abort (deprecated/dangerous).", "high"),
 
-        // P/Invoke â€” calling native code
+        // P/Invoke â€?calling native code
         (new Regex(@"DllImport", RegexOptions.Compiled), "P/Invoke native code interop.", "high"),
 
         // Unsafe code blocks
@@ -119,7 +119,7 @@ public static class SecurityScanner
     {
         ArgumentNullException.ThrowIfNull(sourceCode);
 
-        _logger.Debug("Security scanning source code, length={0}", sourceCode.Length);
+        _logger.Debug(null, "Security scanning source code, length={0}", sourceCode.Length);
 
         var violations = new List<string>();
         string worstSeverity = "none";
@@ -129,7 +129,7 @@ public static class SecurityScanner
             if (pattern.IsMatch(sourceCode))
             {
                 violations.Add($"[{severity.ToUpperInvariant()}] {description} (pattern: {pattern})");
-                _logger.Warn("Security violation: [{0}] {1}", severity.ToUpperInvariant(), description);
+                _logger.Warn(null, "Security violation: [{0}] {1}", severity.ToUpperInvariant(), description);
 
                 if (GetSeverityLevel(severity) > GetSeverityLevel(worstSeverity))
                 {
@@ -140,7 +140,7 @@ public static class SecurityScanner
 
         if (violations.Count == 0)
         {
-            _logger.Debug("Security scan passed");
+            _logger.Debug(null, "Security scan passed");
         }
 
         return new SecurityScanResult(violations.Count == 0, violations, worstSeverity);
@@ -164,7 +164,7 @@ public static class SecurityScanner
             if (!AllowedAssemblyNames.Contains(cleanName))
             {
                 unauthorized.Add(cleanName);
-                _logger.Warn("Unauthorized assembly reference: {0}", cleanName);
+                _logger.Warn(null, "Unauthorized assembly reference: {0}", cleanName);
             }
         }
 

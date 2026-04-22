@@ -44,7 +44,7 @@ public class TokenUsageAuditManager : ITokenUsageAudit
     {
         if (_timeStorage == null)
         {
-            _logger.Warn("TokenUsageAudit: ITimeStorage not available, record not persisted");
+            _logger.Warn(null, "TokenUsageAudit: ITimeStorage not available, record not persisted");
             return;
         }
 
@@ -63,12 +63,12 @@ public class TokenUsageAuditManager : ITokenUsageAudit
             };
 
             _timeStorage.Write(StorageKey, record.Timestamp, data);
-            _logger.Debug("Token usage recorded: {0} | Being={1} | Client={2} | Tokens={3}",
+            _logger.Debug(null, "Token usage recorded: {0} | Being={1} | Client={2} | Tokens={3}",
                 record.Id, record.BeingId, record.AIClientType, record.TotalTokens);
         }
         catch (Exception ex)
         {
-            _logger.Warn("Failed to persist token usage record: {0}", ex.Message);
+            _logger.Warn(null, "Failed to persist token usage record: {0}", ex.Message);
         }
     }
 
@@ -112,7 +112,7 @@ public class TokenUsageAuditManager : ITokenUsageAudit
         }
         catch (Exception ex)
         {
-            _logger.Warn("Failed to query token usage records: {0}", ex.Message);
+            _logger.Warn(null, "Failed to query token usage records: {0}", ex.Message);
             return new List<TokenUsageRecord>();
         }
     }

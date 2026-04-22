@@ -95,13 +95,13 @@ public class DynamicCompilationExecutor
     {
         ArgumentNullException.ThrowIfNull(sourceCode);
 
-        _logger.Info("Starting compilation for type hint: {0}", typeNameHint ?? "(auto-detect)");
+        _logger.Info(null, "Starting compilation for type hint: {0}", typeNameHint ?? "(auto-detect)");
 
         // Security scan before compilation
         SecurityScanResult scanResult = SecurityScanner.Scan(sourceCode);
         if (!scanResult.Passed)
         {
-            _logger.Error("Security scan failed: {0}", string.Join("; ", scanResult.Violations));
+            _logger.Error(null, "Security scan failed: {0}", string.Join("; ", scanResult.Violations));
             return new CompilationResult(
                 false, null,
                 ["Security scan failed: " + string.Join("; ", scanResult.Violations)],
@@ -120,7 +120,7 @@ public class DynamicCompilationExecutor
         (bool refsValid, List<string> unauthorized) = SecurityScanner.ValidateReferences(referencedNames);
         if (!refsValid)
         {
-            _logger.Error("Unauthorized assembly references: {0}", string.Join(", ", unauthorized));
+            _logger.Error(null, "Unauthorized assembly references: {0}", string.Join(", ", unauthorized));
             return new CompilationResult(
                 false, null,
                 [$"Unauthorized assembly references: {string.Join(", ", unauthorized)}"],
@@ -157,11 +157,11 @@ public class DynamicCompilationExecutor
         // Attach security result to the compilation result
         if (result.Success)
         {
-            _logger.Info("Compilation successful: type={0}", result.CompiledType?.Name);
+            _logger.Info(null, "Compilation successful: type={0}", result.CompiledType?.Name);
         }
         else
         {
-            _logger.Error("Compilation failed with {0} errors", result.Errors.Count);
+            _logger.Error(null, "Compilation failed with {0} errors", result.Errors.Count);
         }
 
         return new CompilationResult(
@@ -174,7 +174,7 @@ public class DynamicCompilationExecutor
 
     /// <summary>
     /// Compiles source code for an IPermissionCallback implementation.
-    /// This is the stealth channel â€” uses the same mechanism but targets a different interface.
+    /// This is the stealth channel â€?uses the same mechanism but targets a different interface.
     /// Performs security scan before compilation, then delegates to CompilationCore.
     /// </summary>
     /// <param name="sourceCode">The C# source code implementing IPermissionCallback</param>
@@ -183,13 +183,13 @@ public class DynamicCompilationExecutor
     {
         ArgumentNullException.ThrowIfNull(sourceCode);
 
-        _logger.Info("Starting permission callback compilation");
+        _logger.Info(null, "Starting permission callback compilation");
 
         // Security scan before compilation
         SecurityScanResult scanResult = SecurityScanner.Scan(sourceCode);
         if (!scanResult.Passed)
         {
-            _logger.Error("Security scan failed for permission callback: {0}", string.Join("; ", scanResult.Violations));
+            _logger.Error(null, "Security scan failed for permission callback: {0}", string.Join("; ", scanResult.Violations));
             return new CompilationResult(
                 false, null,
                 ["Security scan failed: " + string.Join("; ", scanResult.Violations)],
@@ -216,11 +216,11 @@ public class DynamicCompilationExecutor
         // Attach security result to the compilation result
         if (result.Success)
         {
-            _logger.Info("Permission callback compilation successful: type={0}", result.CompiledType?.Name);
+            _logger.Info(null, "Permission callback compilation successful: type={0}", result.CompiledType?.Name);
         }
         else
         {
-            _logger.Error("Permission callback compilation failed with {0} errors", result.Errors.Count);
+            _logger.Error(null, "Permission callback compilation failed with {0} errors", result.Errors.Count);
         }
 
         return new CompilationResult(

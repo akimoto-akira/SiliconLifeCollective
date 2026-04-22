@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -179,7 +179,7 @@ public class OllamaClient : IAIClient
         {
             string model = string.IsNullOrEmpty(request.Model) ? DefaultModel : request.Model;
 
-            _logger.Info("AI request: model={0}, messages={1}, hasTools={2}", model, request.Messages.Count, request.Tools != null && request.Tools.Count > 0);
+            _logger.Info(null, "AI request: model={0}, messages={1}, hasTools={2}", model, request.Messages.Count, request.Tools != null && request.Tools.Count > 0);
 
             OllamaRequest ollamaRequest = new OllamaRequest
             {
@@ -209,16 +209,16 @@ public class OllamaClient : IAIClient
             AIResponse? result = await SendAndParseAsync(content);
             if (result != null)
             {
-                _logger.Info("AI response: model={0}, tokens={1}/{2}/{3}, hasToolCalls={4}", model, result.PromptTokens, result.CompletionTokens, result.TotalTokens, result.HasToolCalls);
+                _logger.Info(null, "AI response: model={0}, tokens={1}/{2}/{3}, hasToolCalls={4}", model, result.PromptTokens, result.CompletionTokens, result.TotalTokens, result.HasToolCalls);
                 return result;
             }
 
-            _logger.Warn("Model '{0}' is still loading, retrying in 3s...", model);
+            _logger.Warn(null, "Model '{0}' is still loading, retrying in 3s...", model);
             await Task.Delay(3000);
             result = await SendAndParseAsync(content);
             if (result != null)
             {
-                _logger.Info("AI response (after retry): model={0}, tokens={1}/{2}/{3}, hasToolCalls={4}", model, result.PromptTokens, result.CompletionTokens, result.TotalTokens, result.HasToolCalls);
+                _logger.Info(null, "AI response (after retry): model={0}, tokens={1}/{2}/{3}, hasToolCalls={4}", model, result.PromptTokens, result.CompletionTokens, result.TotalTokens, result.HasToolCalls);
                 return result;
             }
 
@@ -226,17 +226,17 @@ public class OllamaClient : IAIClient
         }
         catch (HttpRequestException ex)
         {
-            _logger.Error("AI connection error: {0}", ex.Message);
+            _logger.Error(null, "AI connection error: {0}", ex.Message);
             return AIResponse.Failed($"Connection error: {ex.Message}");
         }
         catch (TaskCanceledException ex)
         {
-            _logger.Warn("AI request timeout: {0}", ex.Message);
+            _logger.Warn(null, "AI request timeout: {0}", ex.Message);
             return AIResponse.Failed($"Request timeout: {ex.Message}");
         }
         catch (Exception ex)
         {
-            _logger.Error("AI request failed: {0}", ex.Message);
+            _logger.Error(null, "AI request failed: {0}", ex.Message);
             return AIResponse.Failed($"Unexpected error: {ex.Message}");
         }
     }
@@ -321,7 +321,7 @@ public class OllamaClient : IAIClient
     {
         string model = string.IsNullOrEmpty(request.Model) ? DefaultModel : request.Model;
 
-        _logger.Info("AI stream started: model={0}", model);
+        _logger.Info(null, "AI stream started: model={0}", model);
 
         OllamaRequest ollamaRequest = new OllamaRequest
         {
@@ -356,12 +356,12 @@ public class OllamaClient : IAIClient
         }
         catch (HttpRequestException ex)
         {
-            _logger.Error("AI stream connection error: {0}", ex.Message);
+            _logger.Error(null, "AI stream connection error: {0}", ex.Message);
             errorResponse = AIResponse.Failed($"Connection error: {ex.Message}");
         }
         catch (OperationCanceledException)
         {
-            _logger.Debug("AI stream cancelled");
+            _logger.Debug(null, "AI stream cancelled");
             yield break;
         }
 
@@ -441,7 +441,7 @@ public class OllamaClient : IAIClient
 
             if (ollamaResponse.Done)
             {
-                _logger.Info("AI stream completed: model={0}, totalTokens={1}", ollamaResponse.Model, (ollamaResponse.PromptEvalCount ?? 0) + (ollamaResponse.EvalCount ?? 0));
+                _logger.Info(null, "AI stream completed: model={0}, totalTokens={1}", ollamaResponse.Model, (ollamaResponse.PromptEvalCount ?? 0) + (ollamaResponse.EvalCount ?? 0));
 
                 AIResponse finalChunk = new AIResponse
                 {
@@ -607,7 +607,7 @@ public class OllamaClient : IAIClient
 
         try
         {
-            _logger.Debug("AI generate request: model={0}", DefaultModel);
+            _logger.Debug(null, "AI generate request: model={0}", DefaultModel);
             HttpResponseMessage response = await _httpClient.PostAsync($"{Endpoint}/api/generate", content);
 
             if (!response.IsSuccessStatusCode)
@@ -632,7 +632,7 @@ public class OllamaClient : IAIClient
         }
         catch (Exception ex)
         {
-            _logger.Error("AI generate error: {0}", ex.Message);
+            _logger.Error(null, "AI generate error: {0}", ex.Message);
             return new AIResponse
             {
                 Success = false,

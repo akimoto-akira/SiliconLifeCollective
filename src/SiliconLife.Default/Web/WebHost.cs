@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -43,7 +43,7 @@ public class WebHost : IDisposable
         if (_isRunning)
             return;
 
-        _logger.Info($"Web server starting on port {_port}");
+        _logger.Info(null, $"Web server starting on port {_port}");
         _listener = new HttpListener();
         string prefix = _allowIntranet ? $"http://+:{_port}/" : $"http://localhost:{_port}/";
         _listener.Prefixes.Add(prefix);
@@ -54,7 +54,7 @@ public class WebHost : IDisposable
         }
         catch (HttpListenerException ex)
         {
-            _logger.Error($"Failed to start web server on port {_port}: {ex.Message}");
+            _logger.Error(null, $"Failed to start web server on port {_port}: {ex.Message}");
             Console.WriteLine("Try running as administrator or use netsh to reserve the port.");
             throw;
         }
@@ -64,7 +64,7 @@ public class WebHost : IDisposable
 
         _listenerTask = Task.Run(() => ListenAsync(_cts.Token));
         
-        _logger.Info($"Web server started on port {_port}");
+        _logger.Info(null, $"Web server started on port {_port}");
     }
 
     public async Task StopAsync()
@@ -72,7 +72,7 @@ public class WebHost : IDisposable
         if (!_isRunning)
             return;
 
-        _logger.Info("Web server stopping...");
+        _logger.Info(null, "Web server stopping...");
         _cts?.Cancel();
         
         if (_listenerTask != null)
@@ -93,7 +93,7 @@ public class WebHost : IDisposable
         _listener?.Close();
         _isRunning = false;
 
-        _logger.Info("Web server stopped");
+        _logger.Info(null, "Web server stopped");
     }
 
     private async Task ListenAsync(CancellationToken token)
@@ -104,7 +104,7 @@ public class WebHost : IDisposable
             {
                 var context = await _listener.GetContextAsync().WaitAsync(token);
                 
-                _logger.Trace($"Accepted request: {context.Request.HttpMethod} {context.Request.Url?.AbsolutePath}");
+                _logger.Trace(null, $"Accepted request: {context.Request.HttpMethod} {context.Request.Url?.AbsolutePath}");
                 _ = Task.Run(() => HandleRequestAsync(context), token);
             }
             catch (OperationCanceledException)
@@ -117,7 +117,7 @@ public class WebHost : IDisposable
             }
             catch (Exception ex)
             {
-                _logger.Error($"Error accepting request: {ex.Message}");
+                _logger.Error(null, $"Error accepting request: {ex.Message}");
             }
         }
     }
@@ -130,7 +130,7 @@ public class WebHost : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Error($"Error handling request: {ex.Message}");
+            _logger.Error(null, $"Error handling request: {ex.Message}");
             try
             {
                 var response = context.Response;

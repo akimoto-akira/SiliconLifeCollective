@@ -42,7 +42,7 @@ public class Config
     public void Initialize(ConfigDataBase data)
     {
         _data = data;
-        _logger.Info($"Config initialized with data type: {data.GetType().Name}");
+        _logger.Info(null, $"Config initialized with data type: {data.GetType().Name}");
     }
 
     private Config()
@@ -77,11 +77,11 @@ public class Config
         try
         {
             _data.LoadConfig();
-            _logger.Info($"Config loaded from {_data.GetConfigPath()}");
+            _logger.Info(null, $"Config loaded from {_data.GetConfigPath()}");
         }
         catch (Exception)
         {
-            _logger.Error($"Failed to load config from {_data.GetConfigPath()}");
+            _logger.Error(null, $"Failed to load config from {_data.GetConfigPath()}");
             throw;
         }
     }
@@ -94,11 +94,11 @@ public class Config
         try
         {
             _data.SaveConfig();
-            _logger.Info($"Config saved to {_data.GetConfigPath()}");
+            _logger.Info(null, $"Config saved to {_data.GetConfigPath()}");
         }
         catch (Exception)
         {
-            _logger.Error($"Failed to save config to {_data.GetConfigPath()}");
+            _logger.Error(null, $"Failed to save config to {_data.GetConfigPath()}");
             throw;
         }
     }
@@ -109,6 +109,6 @@ public class Config
     public void Reload()
     {
         LoadConfig();
-        _logger.Info($"Config reloaded from {_data.GetConfigPath()}");
+        _logger.Info(null, $"Config reloaded from {_data.GetConfigPath()}");
     }
 }
