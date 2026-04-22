@@ -243,6 +243,61 @@ public sealed class LogManager : IDisposable
     }
 
     /// <summary>
+    /// Reads log entries from the registered providers that support reading.
+    /// Returns an empty list if no providers support reading or if reading is not implemented.
+    /// </summary>
+    /// <param name="startTime">Optional start time filter</param>
+    /// <param name="endTime">Optional end time filter</param>
+    /// <param name="beingId">Optional being ID filter. Null means all beings.</param>
+    /// <param name="systemOnly">If true, only return system-level logs (BeingId is null)</param>
+    /// <param name="levelFilter">Optional log level filter</param>
+    /// <param name="maxCount">Maximum number of entries to return. 0 means no limit.</param>
+    /// <returns>List of log entries matching the filters, ordered by timestamp descending</returns>
+    public List<LogEntry> ReadLogs(
+        DateTime? startTime = null,
+        DateTime? endTime = null,
+        Guid? beingId = null,
+        bool systemOnly = false,
+        LogLevel? levelFilter = null,
+        int maxCount = 0)
+    {
+        List<ILoggerProvider> providersCopy;
+
+        lock (_lock)
+        {
+            providersCopy = new List<ILoggerProvider>(_providers);
+        }
+
+        var allLogs = new List<LogEntry>();
+
+        foreach (var provider in providersCopy)
+        {
+            if (provider is ILogReader logReader)
+            {
+                try
+                {
+                    var logs = logReader.ReadLogs(startTime, endTime, beingId, systemOnly, levelFilter, maxCount);
+                    allLogs.AddRange(logs);
+                }
+                catch
+                {
+                    // Provider read failure should not affect other providers
+                }
+            }
+        }
+
+        // Sort by timestamp descending and apply maxCount
+        allLogs.Sort((a, b) => b.Timestamp.CompareTo(a.Timestamp));
+        
+        if (maxCount > 0 && allLogs.Count > maxCount)
+        {
+            allLogs = allLogs.Take(maxCount).ToList();
+        }
+
+        return allLogs;
+    }
+
+    /// <summary>
     /// Internal logger implementation that delegates to LogManager for distribution.
     /// </summary>
     private sealed class LoggerImpl : ILogger

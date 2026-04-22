@@ -16,7 +16,7 @@ using SiliconLife.Collective;
 
 namespace SiliconLife.Default.Logging;
 
-public sealed class FileSystemLoggerProvider : ILoggerProvider
+public sealed class FileSystemLoggerProvider : ILoggerProvider, ILogReader
 {
     private const string DefaultKey = "default";
     private const string LogFolderName = "Log";
@@ -72,6 +72,63 @@ public sealed class FileSystemLoggerProvider : ILoggerProvider
 
     public void Dispose()
     {
+    }
+
+    public List<LogEntry> ReadLogs(
+        DateTime? startTime = null,
+        DateTime? endTime = null,
+        Guid? beingId = null,
+        bool systemOnly = false,
+        LogLevel? levelFilter = null,
+        int maxCount = 0)
+    {
+        var entries = _storage.Query<LogEntryDto>(DefaultKey, null);
+        var results = new List<LogEntry>();
+
+        foreach (var timeEntry in entries)
+        {
+            var dto = timeEntry.Data;
+
+            // Time range filter - ensure UTC comparison
+            var timestampUtc = DateTime.SpecifyKind(timeEntry.Timestamp, DateTimeKind.Utc);
+            if (startTime.HasValue && timestampUtc < startTime.Value)
+                continue;
+            if (endTime.HasValue && timestampUtc > endTime.Value)
+                continue;
+
+            // Being filter
+            if (systemOnly && dto.BeingId.HasValue)
+                continue;
+            if (beingId.HasValue && (!dto.BeingId.HasValue || dto.BeingId.Value != beingId.Value))
+                continue;
+
+            // Level filter
+            if (levelFilter.HasValue && dto.Level != levelFilter.Value)
+                continue;
+
+            // Convert DTO to LogEntry
+            var logEntry = new LogEntry(
+                dto.BeingId,
+                dto.Timestamp,
+                dto.Level,
+                dto.Category,
+                dto.Message,
+                dto.Exception != null ? new Exception(dto.Exception) : null
+            );
+
+            results.Add(logEntry);
+        }
+
+        // Sort by timestamp descending
+        results.Sort((a, b) => b.Timestamp.CompareTo(a.Timestamp));
+
+        // Apply maxCount
+        if (maxCount > 0 && results.Count > maxCount)
+        {
+            results = results.Take(maxCount).ToList();
+        }
+
+        return results;
     }
 
     private sealed record LogEntryDto(
