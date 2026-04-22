@@ -324,7 +324,15 @@ public class JaJP : DefaultLocalizationBase
 
     public override string TasksPageHeader => "タスク管理";
     public override string TasksEmptyState => "タスクなし";
-
+    public override string TasksStatusPending => "保留中";
+    public override string TasksStatusRunning => "実行中";
+    public override string TasksStatusCompleted => "完了";
+    public override string TasksStatusFailed => "失敗";
+    public override string TasksStatusCancelled => "キャンセル";
+    public override string TasksPriorityLabel => "優先度";
+    public override string TasksAssignedToLabel => "担当者";
+    public override string TasksCreatedAtLabel => "作成日時";
+    
     // ===== Code Browser Page Localization =====
 
     public override string CodeBrowserPageHeader => "コードブラウザ";

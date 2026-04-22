@@ -16,11 +16,14 @@ namespace SiliconLife.Default.Web;
 [WebCode]
 public class TaskController : Controller
 {
+    private readonly SiliconBeingManager _beingManager;
     private readonly SkinManager _skinManager;
 
     public TaskController()
     {
-        _skinManager = ServiceLocator.Instance.GetService<SkinManager>()!;
+        var locator = ServiceLocator.Instance;
+        _beingManager = locator.BeingManager!;
+        _skinManager = locator.GetService<SkinManager>()!;
     }
 
     public override void Handle()
@@ -49,6 +52,55 @@ public class TaskController : Controller
 
     private void GetList()
     {
-        RenderJson(new List<object>());
+        var beingIdStr = Request.QueryString["beingId"];
+        List<object> allTasks = new();
+
+        if (!string.IsNullOrEmpty(beingIdStr) && Guid.TryParse(beingIdStr, out var beingId))
+        {
+            var being = _beingManager.GetBeing(beingId);
+            if (being?.TaskSystem != null)
+            {
+                allTasks.AddRange(GetTasksFromSystem(being.TaskSystem, being.Name));
+            }
+        }
+        else
+        {
+            var beings = _beingManager.GetAllBeings();
+            foreach (var being in beings)
+            {
+                if (being.TaskSystem != null)
+                {
+                    allTasks.AddRange(GetTasksFromSystem(being.TaskSystem, being.Name));
+                }
+            }
+        }
+
+        RenderJson(allTasks);
+    }
+
+    private static List<object> GetTasksFromSystem(TaskSystem taskSystem, string beingName)
+    {
+        var tasks = taskSystem.GetAll();
+        var result = new List<object>();
+
+        foreach (var task in tasks)
+        {
+            result.Add(new
+            {
+                id = task.Id.ToString(),
+                name = task.Title,
+                description = task.Description ?? "",
+                status = task.Status.ToString().ToLowerInvariant(),
+                priority = task.Priority,
+                createdAt = task.CreatedAt,
+                createdAtFormatted = task.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+                startedAt = task.StartedAt,
+                completedAt = task.CompletedAt,
+                assignedTo = beingName,
+                errorMessage = task.ErrorMessage ?? ""
+            });
+        }
+
+        return result;
     }
 }

@@ -324,7 +324,15 @@ public class ZhCN : DefaultLocalizationBase
 
     public override string TasksPageHeader => "任务管理";
     public override string TasksEmptyState => "暂无任务";
-
+    public override string TasksStatusPending => "待处理";
+    public override string TasksStatusRunning => "运行中";
+    public override string TasksStatusCompleted => "已完成";
+    public override string TasksStatusFailed => "已失败";
+    public override string TasksStatusCancelled => "已取消";
+    public override string TasksPriorityLabel => "优先级";
+    public override string TasksAssignedToLabel => "负责人";
+    public override string TasksCreatedAtLabel => "创建时间";
+    
     // ===== Code Browser Page Localization =====
 
     public override string CodeBrowserPageHeader => "代码浏览";

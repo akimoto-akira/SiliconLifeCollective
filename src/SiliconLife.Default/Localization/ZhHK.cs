@@ -179,7 +179,15 @@ public class ZhHK : DefaultLocalizationBase
 
     public override string TasksPageHeader => "任務管理";
     public override string TasksEmptyState => "暫無任務";
-
+    public override string TasksStatusPending => "待處理";
+    public override string TasksStatusRunning => "運行中";
+    public override string TasksStatusCompleted => "已完成";
+    public override string TasksStatusFailed => "已失敗";
+    public override string TasksStatusCancelled => "已取消";
+    public override string TasksPriorityLabel => "優先級";
+    public override string TasksAssignedToLabel => "負責人";
+    public override string TasksCreatedAtLabel => "建立時間";
+    
     // ===== Code Browser Page Localization =====
 
     public override string CodeBrowserPageHeader => "代碼瀏覽";

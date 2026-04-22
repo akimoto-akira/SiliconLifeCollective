@@ -324,7 +324,15 @@ public class EnUS : DefaultLocalizationBase
 
     public override string TasksPageHeader => "Task Management";
     public override string TasksEmptyState => "No tasks";
-
+    public override string TasksStatusPending => "Pending";
+    public override string TasksStatusRunning => "Running";
+    public override string TasksStatusCompleted => "Completed";
+    public override string TasksStatusFailed => "Failed";
+    public override string TasksStatusCancelled => "Cancelled";
+    public override string TasksPriorityLabel => "Priority";
+    public override string TasksAssignedToLabel => "Assigned To";
+    public override string TasksCreatedAtLabel => "Created";
+    
     // ===== Code Browser Page Localization =====
 
     public override string CodeBrowserPageHeader => "Code Browser";

@@ -324,7 +324,15 @@ public class KoKR : DefaultLocalizationBase
 
     public override string TasksPageHeader => "작업 관리";
     public override string TasksEmptyState => "작업 없음";
-
+    public override string TasksStatusPending => "대기 중";
+    public override string TasksStatusRunning => "실행 중";
+    public override string TasksStatusCompleted => "완료";
+    public override string TasksStatusFailed => "실패";
+    public override string TasksStatusCancelled => "취소";
+    public override string TasksPriorityLabel => "우선순위";
+    public override string TasksAssignedToLabel => "담당자";
+    public override string TasksCreatedAtLabel => "생성일";
+    
     // ===== Code Browser Page Localization =====
 
     public override string CodeBrowserPageHeader => "코드 브라우저";

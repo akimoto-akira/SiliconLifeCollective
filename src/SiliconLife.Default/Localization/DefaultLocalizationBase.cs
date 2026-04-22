@@ -944,6 +944,46 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// </summary>
     public abstract string TasksEmptyState { get; }
 
+    /// <summary>
+    /// Gets the status label for pending tasks
+    /// </summary>
+    public abstract string TasksStatusPending { get; }
+
+    /// <summary>
+    /// Gets the status label for running tasks
+    /// </summary>
+    public abstract string TasksStatusRunning { get; }
+
+    /// <summary>
+    /// Gets the status label for completed tasks
+    /// </summary>
+    public abstract string TasksStatusCompleted { get; }
+
+    /// <summary>
+    /// Gets the status label for failed tasks
+    /// </summary>
+    public abstract string TasksStatusFailed { get; }
+
+    /// <summary>
+    /// Gets the status label for cancelled tasks
+    /// </summary>
+    public abstract string TasksStatusCancelled { get; }
+
+    /// <summary>
+    /// Gets the priority label for tasks
+    /// </summary>
+    public abstract string TasksPriorityLabel { get; }
+
+    /// <summary>
+    /// Gets the assigned-to label for tasks
+    /// </summary>
+    public abstract string TasksAssignedToLabel { get; }
+
+    /// <summary>
+    /// Gets the created-at label for tasks
+    /// </summary>
+    public abstract string TasksCreatedAtLabel { get; }
+
     // ===== Code Browser Page Localization =====
 
     /// <summary>
