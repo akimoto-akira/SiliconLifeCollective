@@ -166,7 +166,7 @@ public class BeingController : Controller
             var body = new System.IO.StreamReader(Request.InputStream).ReadToEnd();
             var options = new System.Text.Json.JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true  // 忽略属性名大小写
+                PropertyNameCaseInsensitive = true  // Ignore property name case
             };
             var requestData = System.Text.Json.JsonSerializer.Deserialize<SaveSoulRequest>(body, options);
             

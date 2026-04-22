@@ -57,26 +57,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- `6ba591d` - Add independent AI configuration editor for silicon beings
-  - Added BeingAIConfigViewModel view model
-  - Added BeingAIConfigView view component
-  - Support configuring independent AI client type and parameters for each silicon being
-  - Support switching between global and independent configuration
-  - Support dynamic loading of AI model lists (e.g., DashScope)
-  - Added AI configuration related API routes in BeingController
-  - Optimized AI client type resolution logic in DefaultSiliconBeing
-  - Updated AI configuration edit link in BeingView
-- `634e8ca` - Add back to list link in permission page
-  - Navigation improvement for permission management
-- `188c6f8` - Register task list API route and add empty state display
-  - Task list API route registration
-  - Empty state UI improvement
+- `b574b2b` - Add senderName to history messages for AI identification
+  - Added sender name field to SSE history messages
+  - Support AI message identity identification
+- `601fc14` - Add mark_read action for conversation ending
+  - New read marking feature in chat system
+  - Auto-mark messages as read when conversation ends
+- `0a8d750` - Add common system prompt for proactive silicon being behavior
+  - New common system prompt template in localization system
+  - Support proactive behavior guidance for silicon beings
+- `12da302` - Add silicon being filter to log view
+  - New silicon being filter feature in Web UI
+  - Filter log records by silicon being
+- `70ce7fb` - Implement DatabaseTool for structured database queries
+  - New database query tool
+  - Support structured data operations
+- `be29a09` - Implement LogTool for operation and conversation history queries
+  - New log query tool
+  - Support operation history and conversation history retrieval
+- `4ea7702` - Implement PermissionTool for dynamic permission management
+  - New permission management tool
+  - Support dynamic permission query and management
+- `1384ff4` - Implement ExecuteCodeTool for multi-language code execution
+  - New code execution tool
+  - Support multi-language code compilation and execution
+- `82d1e11` - Implement SearchTool for information retrieval
+  - New information search tool
+  - Support external information retrieval
+- `702b3f3` - Enhance task view with status badges and metadata display
+  - Task view UI improvement
+  - New status badges and metadata display
+- `6ed9a79` - Improve chat message storage and view rendering
+  - Chat message storage mechanism optimization
+  - View rendering performance improvement
 - Add `EvaluatePermission` API to PermissionManager
   - Read-only pre-evaluation of permissions without triggering user prompts
   - Returns three-state result: Allowed, Denied, or AskUser
   - Evaluation chain: FrequencyCache → Callback → CuratorStatus → GlobalACL
 
 ### Changed
+- `7a03a19` - Improve LogTool conversation query flexibility
+  - LogTool conversation query logic optimization
+  - Enhanced query flexibility
+- `2b771f3` - Decouple LogController from file I/O and add log reading API
+  - LogController architecture refactoring
+  - New independent log reading API
+  - Separate file I/O operations
+- `8f6cb1e` - Add beingId parameter to ILogger interface for system/silicon being log separation
+  - ILogger interface extension
+  - Support system log and silicon being log separation
+  - New beingId parameter
+- `4c747ad` - Refactor PermissionTool, ExecuteCodeTool and add EvaluatePermission API
+  - PermissionTool and ExecuteCodeTool refactoring
+  - Integrate EvaluatePermission API
+- `135710d` - Remove SearchTool, move local search to DiskTool
+  - SearchTool removal
+  - Local search functionality integrated into DiskTool
 - `4305769` - Add .gitattributes for line ending management
   - Line ending configuration for cross-platform compatibility
 - Refactor PermissionTool to use real permission evaluation
@@ -91,6 +127,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed PowerShell version detection using `-Command` instead of `--version`
 
 ### Fixed
+- `1c96e99` - Fix search_files and search_content root directory search failure
+  - DiskTool root directory search functionality fix
+  - File and content search logic correction
+- `0675c45` - Optimize markdown code block highlighting in preview pane
+  - Markdown preview code highlighting optimization
+  - Improved code block display
 - `c6b518b` - Fix timer message delivery and chat message storage
   - Timer message delivery mechanism correction
   - Chat message storage optimization

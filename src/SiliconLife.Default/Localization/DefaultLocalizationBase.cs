@@ -1605,7 +1605,7 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     // ===== Curator Soul =====
 
     /// <summary>
-    /// Gets the default soul content for the Silicon Curator (硅基主理人).
+    /// Gets the default soul content for the Silicon Curator.
     /// Subclasses may override to provide a localized version.
     /// </summary>
     public abstract string DefaultCuratorSoul { get; }

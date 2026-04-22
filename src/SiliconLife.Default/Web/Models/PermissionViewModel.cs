@@ -119,7 +119,7 @@ public class PermissionViewModel : ViewModelBase
         sb.AppendLine("            return EvaluateFileAccess(callerId, resource);");
         sb.AppendLine("        }");
         sb.AppendLine();
-        sb.AppendLine($"        // {loc?.PermissionRuleOtherTypesDefault ?? "Other permission types default to allowed / 其他权限类型默认放行"}");
+        sb.AppendLine($"        // {loc?.PermissionRuleOtherTypesDefault ?? "Other permission types default to allowed"}");
         sb.AppendLine("        return permissionType switch");
         sb.AppendLine("        {");
         sb.AppendLine("            PermissionType.Function => PermissionResult.Allowed,");
@@ -655,7 +655,7 @@ public class PermissionViewModel : ViewModelBase
         sb.AppendLine("    {");
 
         sb.AppendLine($"        // {Comment(loc, "FileRuleDangerousExt")}");
-        sb.AppendLine("        // .pfx: 证书私钥文件 / .key: 密钥文件 / .bat: Windows 批处理脚本 / .sh: Shell 脚本 / .reg: Windows 注册表文件");
+        sb.AppendLine("        // .pfx: Certificate private key file / .key: Key file / .bat: Windows batch script / .sh: Shell script / .reg: Windows registry file");
         sb.AppendLine("        var deniedExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)");
         sb.AppendLine("        {");
         sb.AppendLine("            \".pfx\", \".key\", \".bat\", \".sh\", \".reg\"");

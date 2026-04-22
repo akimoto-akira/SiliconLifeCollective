@@ -57,26 +57,62 @@
 ## [미출시]
 
 ### 추가됨
-- `6ba591d` - 실리콘 생명체 독립 AI 설정 편집기 추가
-  - BeingAIConfigViewModel 뷰 모델 추가
-  - BeingAIConfigView 뷰 컴포넌트 추가
-  - 각 실리콘 생명체에 대해 독립적인 AI 클라이언트 유형 및 매개변수 설정 지원
-  - 전역 설정과 독립 설정 간 전환 지원
-  - AI 모델 목록 동적 로드 지원 (예: DashScope)
-  - BeingController 에 AI 설정 관련 API 라우트 추가
-  - DefaultSiliconBeing 의 AI 클라이언트 유형 해결 로직 최적화
-  - BeingView 의 AI 설정 편집 링크 업데이트
-- `634e8ca` - 권한 페이지에 목록으로 돌아가기 링크 추가
-  - 권한 관리의 탐색 개선
-- `188c6f8` - 작업 목록 API 라우트 등록 및 빈 상태 표시 추가
-  - 작업 목록 API 라우트 등록
-  - 빈 상태 UI 개선
+- `b574b2b` - AI 식별을 위해 이력 메시지에 senderName 추가
+  - SSE 이력 메시지에 발송자 이름 필드 추가
+  - AI 메시지 신원 식별 지원
+- `601fc14` - 대화 종료에 mark_read 동작 추가
+  - 채팅 시스템에 읽음 표시 기능 추가
+  - 대화 종료 시 자동으로 메시지를 읽음으로 표시
+- `0a8d750` - 적극적 실리콘 생명체 행동을 위한 공통 시스템 프롬프트 추가
+  - 지역화 시스템에 공통 시스템 프롬프트 템플릿 추가
+  - 실리콘 생명체의 적극적 행동 가이드 지원
+- `12da302` - 로그 뷰에 실리콘 생명체 필터 추가
+  - 웹 UI에 실리콘 생명체 필터 기능 추가
+  - 실리콘 생명체별로 로그 기록 필터링
+- `70ce7fb` - 구조화된 데이터베이스 쿼리를 위한 DatabaseTool 구현
+  - 새 데이터베이스 쿼리 도구
+  - 구조화된 데이터 작업 지원
+- `be29a09` - 작업 및 대화 이력 쿼리를 위한 LogTool 구현
+  - 새 로그 쿼리 도구
+  - 작업 이력 및 대화 이력 검색 지원
+- `4ea7702` - 동적 권한 관리를 위한 PermissionTool 구현
+  - 새 권한 관리 도구
+  - 동적 권한 쿼리 및 관리 지원
+- `1384ff4` - 다국어 코드 실행을 위한 ExecuteCodeTool 구현
+  - 새 코드 실행 도구
+  - 다국어 코드 컴파일 및 실행 지원
+- `82d1e11` - 정보 검색을 위한 SearchTool 구현
+  - 새 정보 검색 도구
+  - 외부 정보 검색 지원
+- `702b3f3` - 상태 배지 및 메타데이터 표시로 작업 뷰 향상
+  - 작업 뷰 UI 개선
+  - 새 상태 배지 및 메타데이터 표시
+- `6ed9a79` - 채팅 메시지 저장 및 뷰 렌더링 개선
+  - 채팅 메시지 저장 메커니즘 최적화
+  - 뷰 렌더링 성능 향상
 - PermissionManager에 `EvaluatePermission` API 추가
   - 사용자 프롬프트 없이 권한의 읽기 전용 사전 평가
   - 3상태 결과 반환: Allowed, Denied 또는 AskUser
   - 평가 체인: FrequencyCache → Callback → CuratorStatus → GlobalACL
 
 ### 변경됨
+- `7a03a19` - LogTool 대화 쿼리 유연성 개선
+  - LogTool 대화 쿼리 로직 최적화
+  - 쿼리 유연성 향상
+- `2b771f3` - LogController를 파일 I/O에서 분리하고 로그 읽기 API 추가
+  - LogController 아키텍처 리팩토링
+  - 새 독립 로그 읽기 API
+  - 파일 I/O 작업 분리
+- `8f6cb1e` - 시스템/실리콘 생명체 로그 분리를 위해 ILogger 인터페이스에 beingId 매개변수 추가
+  - ILogger 인터페이스 확장
+  - 시스템 로그 및 실리콘 생명체 로그 분리 지원
+  - 새 beingId 매개변수
+- `4c747ad` - PermissionTool, ExecuteCodeTool 리팩토링 및 EvaluatePermission API 추가
+  - PermissionTool 및 ExecuteCodeTool 리팩토링
+  - EvaluatePermission API 통합
+- `135710d` - SearchTool 제거, 로컬 검색을 DiskTool로 이동
+  - SearchTool 제거
+  - 로컬 검색 기능이 DiskTool에 통합
 - `4305769` - 줄 끝 관리를 위한 .gitattributes 추가
   - 크로스 플랫폼 호환성을 위한 줄 끝 설정
 - PermissionTool을 실제 권한 평가 사용으로 리팩토링
@@ -91,6 +127,12 @@
   - PowerShell 버전 감지 수정, `--version` 대신 `-Command` 사용
 
 ### 수정됨
+- `1c96e99` - search_files 및 search_content 루트 디렉토리 검색 실패 수정
+  - DiskTool 루트 디렉토리 검색 기능 수정
+  - 파일 및 콘텐츠 검색 로직 수정
+- `0675c45` - 미리보기 창의 markdown 코드 블록 하이라이팅 최적화
+  - Markdown 미리보기 코드 하이라이팅 최적화
+  - 코드 블록 표시 개선
 - `c6b518b` - 타이머 메시지 전달 및 채팅 메시지 저장 수정
   - 타이머 메시지 전달 메커니즘 수정
   - 채팅 메시지 저장 최적화

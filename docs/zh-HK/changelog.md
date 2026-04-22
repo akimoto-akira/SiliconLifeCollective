@@ -57,26 +57,62 @@
 ## [未發佈]
 
 ### 新增
-- `6ba591d` - 爲硅基生命體添加獨立AI配置編輯器
-  - 新增 BeingAIConfigViewModel 視圖模型
-  - 新增 BeingAIConfigView 視圖組件
-  - 支援爲每個硅基生命體配置獨立的AI客戶端類型和參數
-  - 支援全域配置和獨立配置的切換
-  - 支援動態載入AI模型列表（如DashScope）
-  - 在 BeingController 中添加AI配置相關的API路由
-  - 最佳化 DefaultSiliconBeing 的AI客戶端類型解析邏輯
-  - 更新 BeingView 中的AI配置編輯連結
-- `634e8ca` - 在權限頁面添加返回列表連結
-  - 權限管理的導航改進
-- `188c6f8` - 註冊任務列表API路由並添加空狀態顯示
-  - 任務列表API路由註冊
-  - 空狀態UI改進
+- `b574b2b` - 爲歷史訊息添加 senderName 用於 AI 識別
+  - SSE 歷史訊息中添加發送者名稱欄位
+  - 支援 AI 訊息的身份識別
+- `601fc14` - 爲對話結束添加 mark_read 動作
+  - 聊天系統新增已讀標記功能
+  - 對話結束時自動標記訊息爲已讀
+- `0a8d750` - 添加主動硅基生命體行爲的通用系統提示
+  - 本地化系統新增通用系統提示範本
+  - 支援硅基生命體的主動行爲引導
+- `12da302` - 爲日誌視圖添加硅基生命體篩選器
+  - Web 介面新增硅基生命體篩選功能
+  - 可按硅基生命體過濾日誌記錄
+- `70ce7fb` - 實現 DatabaseTool 用於結構化資料庫查詢
+  - 新增資料庫查詢工具
+  - 支援結構化資料操作
+- `be29a09` - 實現 LogTool 用於操作和對話歷史查詢
+  - 新增日誌查詢工具
+  - 支援操作歷史和對話歷史檢索
+- `4ea7702` - 實現 PermissionTool 用於動態權限管理
+  - 新增權限管理工具
+  - 支援動態權限查詢和管理
+- `1384ff4` - 實現 ExecuteCodeTool 用於多語言程式碼執行
+  - 新增程式碼執行工具
+  - 支援多語言程式碼編譯和執行
+- `82d1e11` - 實現 SearchTool 用於資訊檢索
+  - 新增資訊搜尋工具
+  - 支援外部資訊檢索
+- `702b3f3` - 增強任務視圖，添加狀態徽章和元數據展示
+  - 任務視圖 UI 改進
+  - 新增狀態徽章和元數據顯示
+- `6ed9a79` - 改進聊天訊息儲存和視圖渲染
+  - 聊天訊息儲存機制最佳化
+  - 視圖渲染效能提升
 - 爲 PermissionManager 添加 `EvaluatePermission` API
   - 唯讀的權限預評估，不觸發使用者提示
   - 返回三態結果：Allowed、Denied 或 AskUser
   - 評估鏈：FrequencyCache → Callback → CuratorStatus → GlobalACL
 
 ### 變更
+- `7a03a19` - 改進 LogTool 對話查詢靈活性
+  - LogTool 對話查詢邏輯最佳化
+  - 提升查詢靈活性
+- `2b771f3` - 解耦 LogController 與檔案 I/O，添加日誌讀取 API
+  - LogController 架構重構
+  - 新增獨立的日誌讀取 API
+  - 分離檔案 I/O 操作
+- `8f6cb1e` - 爲 ILogger 介面添加 beingId 參數，實現系統/硅基生命體日誌分離
+  - ILogger 介面擴展
+  - 支援系統日誌和硅基生命體日誌分離
+  - 新增 beingId 參數
+- `4c747ad` - 重構 PermissionTool、ExecuteCodeTool，添加 EvaluatePermission API
+  - PermissionTool 和 ExecuteCodeTool 重構
+  - 整合 EvaluatePermission API
+- `135710d` - 移除 SearchTool，將本地搜尋移至 DiskTool
+  - SearchTool 移除
+  - 本地搜尋功能整合到 DiskTool
 - `4305769` - 添加 .gitattributes 用於行尾管理
   - 跨平臺兼容性的行尾配置
 - 重構 PermissionTool 使用真實權限評估
@@ -91,6 +127,12 @@
   - 修復 PowerShell 版本檢測，使用 `-Command` 替代 `--version`
 
 ### 修復
+- `1c96e99` - 修復 search_files 和 search_content 根目錄搜尋失敗
+  - DiskTool 根目錄搜尋功能修復
+  - 檔案和內容搜尋邏輯修正
+- `0675c45` - 最佳化預覽窗格中的 markdown 程式碼區塊高亮
+  - Markdown 預覽程式碼高亮最佳化
+  - 改善程式碼區塊顯示效果
 - `c6b518b` - 修復定時器訊息傳遞和聊天訊息儲存
   - 定時器訊息傳遞機制修正
   - 聊天訊息儲存最佳化

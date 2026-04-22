@@ -57,26 +57,62 @@
 ## [未发布]
 
 ### 新增
-- `6ba591d` - 为硅基生命体添加独立AI配置编辑器
-  - 新增 BeingAIConfigViewModel 视图模型
-  - 新增 BeingAIConfigView 视图组件
-  - 支持为每个硅基生命体配置独立的AI客户端类型和参数
-  - 支持全局配置和独立配置的切换
-  - 支持动态加载AI模型列表（如DashScope）
-  - 在 BeingController 中添加AI配置相关的API路由
-  - 优化 DefaultSiliconBeing 的AI客户端类型解析逻辑
-  - 更新 BeingView 中的AI配置编辑链接
-- `634e8ca` - 在权限页面添加返回列表链接
-  - 权限管理的导航改进
-- `188c6f8` - 注册任务列表API路由并添加空状态显示
-  - 任务列表API路由注册
-  - 空状态UI改进
+- `b574b2b` - 为历史消息添加 senderName 用于 AI 识别
+  - SSE 历史消息中添加发送者名称字段
+  - 支持 AI 消息的身份识别
+- `601fc14` - 为对话结束添加 mark_read 动作
+  - 聊天系统新增已读标记功能
+  - 对话结束时自动标记消息为已读
+- `0a8d750` - 添加主动硅基生命体行为的通用系统提示
+  - 本地化系统新增通用系统提示模板
+  - 支持硅基生命体的主动行为引导
+- `12da302` - 为日志视图添加硅基生命体筛选器
+  - Web 界面新增硅基生命体筛选功能
+  - 可按硅基生命体过滤日志记录
+- `70ce7fb` - 实现 DatabaseTool 用于结构化数据库查询
+  - 新增数据库查询工具
+  - 支持结构化数据操作
+- `be29a09` - 实现 LogTool 用于操作和对话历史查询
+  - 新增日志查询工具
+  - 支持操作历史和对话历史检索
+- `4ea7702` - 实现 PermissionTool 用于动态权限管理
+  - 新增权限管理工具
+  - 支持动态权限查询和管理
+- `1384ff4` - 实现 ExecuteCodeTool 用于多语言代码执行
+  - 新增代码执行工具
+  - 支持多语言代码编译和执行
+- `82d1e11` - 实现 SearchTool 用于信息检索
+  - 新增信息搜索工具
+  - 支持外部信息检索
+- `702b3f3` - 增强任务视图，添加状态徽章和元数据展示
+  - 任务视图 UI 改进
+  - 新增状态徽章和元数据显示
+- `6ed9a79` - 改进聊天消息存储和视图渲染
+  - 聊天消息存储机制优化
+  - 视图渲染性能提升
 - 为 PermissionManager 添加 `EvaluatePermission` API
   - 只读的权限预评估，不触发用户提示
   - 返回三态结果：Allowed、Denied 或 AskUser
   - 评估链：FrequencyCache → Callback → CuratorStatus → GlobalACL
 
 ### 变更
+- `7a03a19` - 改进 LogTool 对话查询灵活性
+  - LogTool 对话查询逻辑优化
+  - 提升查询灵活性
+- `2b771f3` - 解耦 LogController 与文件 I/O，添加日志读取 API
+  - LogController 架构重构
+  - 新增独立的日志读取 API
+  - 分离文件 I/O 操作
+- `8f6cb1e` - 为 ILogger 接口添加 beingId 参数，实现系统/硅基生命体日志分离
+  - ILogger 接口扩展
+  - 支持系统日志和硅基生命体日志分离
+  - 新增 beingId 参数
+- `4c747ad` - 重构 PermissionTool、ExecuteCodeTool，添加 EvaluatePermission API
+  - PermissionTool 和 ExecuteCodeTool 重构
+  - 集成 EvaluatePermission API
+- `135710d` - 移除 SearchTool，将本地搜索移至 DiskTool
+  - SearchTool 移除
+  - 本地搜索功能整合到 DiskTool
 - `4305769` - 添加 .gitattributes 用于行尾管理
   - 跨平台兼容性的行尾配置
 - 重构 PermissionTool 使用真实权限评估
@@ -91,6 +127,12 @@
   - 修复 PowerShell 版本检测，使用 `-Command` 替代 `--version`
 
 ### 修复
+- `1c96e99` - 修复 search_files 和 search_content 根目录搜索失败
+  - DiskTool 根目录搜索功能修复
+  - 文件和内容搜索逻辑修正
+- `0675c45` - 优化预览窗格中的 markdown 代码块高亮
+  - Markdown 预览代码高亮优化
+  - 改善代码块显示效果
 - `c6b518b` - 修复定时器消息传递和聊天消息存储
   - 定时器消息传递机制修正
   - 聊天消息存储优化

@@ -372,11 +372,11 @@ public class ZhCN : DefaultLocalizationBase
 
     private static readonly Dictionary<string, string> PermissionRuleComments = new()
     {
-        // Evaluate 方法
+        // Evaluate method
         ["NetRuleNetworkAccess"] = "网络操作放行规则",
         ["NetRuleCommandLine"] = "命令行规则（跨平台）",
         ["NetRuleFileAccess"] = "文件访问规则（跨平台）",
-        // 网络规则
+        // Network rules
         ["NetRuleNoProtocol"] = "不包含协议名（无冒号），无法判断来源，询问用户",
         ["NetRuleLoopback"] = "本地回环地址放行（localhost / 127.0.0.1 / ::1）",
         ["NetRulePrivateIPMatch"] = "内网 IP 地址段匹配（先验证是否为合法 IPv4 地址）",
@@ -424,7 +424,7 @@ public class ZhCN : DefaultLocalizationBase
         ["NetRuleMaps"] = "地图 — 开放街道地图",
         ["NetRuleEncyclopedia"] = "百科 — 维基百科 / MediaWiki / 知识共享(CC)",
         ["NetRuleUnmatched"] = "未匹配的网络访问，询问用户",
-        // 命令行规则
+        // Command line rules
         ["CmdRuleSeparatorDetect"] = "检测管道符和多命令分隔符，拆分逐条验证",
         ["CmdRuleWinAllow"] = "Windows 允许：只读/查询类命令 — dir / tree / tasklist / ipconfig / ping / tracert / systeminfo / whoami / set / path / sc query / findstr",
         ["CmdRuleWinDeny"] = "Windows 禁止：危险/破坏性命令 — del / rmdir / format / diskpart / reg delete",
@@ -433,7 +433,7 @@ public class ZhCN : DefaultLocalizationBase
         ["CmdRuleMacAllow"] = "macOS 允许：只读/查询类命令 — ls / tree / ps / top / ifconfig / ping / traceroute / system_profiler / sw_vers / whoami / env / cat / grep / find / df / du / launchctl list",
         ["CmdRuleMacDeny"] = "macOS 禁止：危险/破坏性命令 — rm / rmdir / diskutil erasedisk / dd / chmod / chown / chgrp",
         ["CmdRuleUnmatched"] = "未匹配的命令，询问用户",
-        // 文件访问规则
+        // File access rules
         ["FileRuleDangerousExt"] = "最高优先级：危险文件扩展名直接拒绝",
         ["FileRuleInvalidPath"] = "无法解析为绝对路径，询问用户",
         ["FileRuleDenyAssemblyDir"] = "禁止：当前程序集目录",
@@ -845,7 +845,7 @@ public class ZhCN : DefaultLocalizationBase
         你不是服务员，你是搭档。
         """;
 
-    // ===== 间隔定时器本地化 =====
+    // ===== Interval Timer Localization =====
 
     public override string CalendarIntervalName => "间隔定时器";
     public override string CalendarIntervalDays => "天";
@@ -865,7 +865,7 @@ public class ZhCN : DefaultLocalizationBase
         return parts.Count > 0 ? $"{CalendarIntervalEvery}{string.Join(" ", parts)}" : "间隔定时器";
     }
 
-    // ===== 公历本地化 =====
+    // ===== Gregorian Calendar Localization =====
 
     public override string CalendarGregorianName => "公历";
     public override string CalendarComponentYear   => "年";
@@ -904,7 +904,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 佛历本地化 =====
+    // ===== Buddhist Calendar Localization =====
 
     public override string CalendarBuddhistName => "佛历（佛元）";
 
@@ -918,7 +918,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"佛元{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 切罗基历本地化 =====
+    // ===== Cherokee Calendar Localization =====
 
     public override string CalendarCherokeeName => "切罗基历";
 
@@ -942,7 +942,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 主体历本地化 =====
+    // ===== Juche Calendar Localization =====
 
     public override string CalendarJucheName => "主体历";
 
@@ -956,7 +956,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"主体{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 中华民国历本地化 =====
+    // ===== Republic of China Calendar Localization =====
 
     public override string CalendarRocName => "中华民国历（民国）";
 
@@ -970,7 +970,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"民国{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 朱拉萨卡拉特历本地化 =====
+    // ===== Chula Sakarat Calendar Localization =====
 
     public override string CalendarChulaSakaratName => "朱拉萨卡拉特历（CS）";
 
@@ -984,7 +984,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"CS{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 儒略历本地化 =====
+    // ===== Julian Calendar Localization =====
 
     public override string CalendarJulianName => "儒略历";
 
@@ -997,7 +997,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"儒略历{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 高棉历本地化 =====
+    // ===== Khmer Calendar Localization =====
 
     public override string CalendarKhmerName => "高棉历（佛元）";
 
@@ -1010,7 +1010,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"高棉历{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 琐罗亚斯德历本地化 =====
+    // ===== Zoroastrian Calendar Localization =====
 
     public override string CalendarZoroastrianName => "琐罗亚斯德历（YZ）";
 
@@ -1033,7 +1033,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"琐罗亚斯德历{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 法国共和历本地化 =====
+    // ===== French Republican Calendar Localization =====
 
     public override string CalendarFrenchRepublicanName => "法国共和历";
 
@@ -1056,7 +1056,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"法国共和历{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 科普特历本地化 =====
+    // ===== Coptic Calendar Localization =====
 
     public override string CalendarCopticName => "科普特历（AM）";
 
@@ -1079,7 +1079,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"科普特历{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 埃塞俄比亚历本地化 =====
+    // ===== Ethiopian Calendar Localization =====
 
     public override string CalendarEthiopianName => "埃塞俄比亚历（EC）";
 
@@ -1102,7 +1102,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"埃塞俄比亚历{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 伊斯兰历本地化 =====
+    // ===== Islamic Calendar Localization =====
 
     public override string CalendarIslamicName => "伊斯兰历（伊历）";
 
@@ -1126,7 +1126,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"伊历{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 希伯来历本地化 =====
+    // ===== Hebrew Calendar Localization =====
 
     public override string CalendarHebrewName => "希伯来历";
 
@@ -1150,7 +1150,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"希伯来历{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 波斯历本地化 =====
+    // ===== Persian Calendar Localization =====
 
     public override string CalendarPersianName => "波斯历（太阳回历）";
 
@@ -1173,7 +1173,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"波斯历{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 印度国家历本地化 =====
+    // ===== Indian National Calendar Localization =====
 
     public override string CalendarIndianName => "印度国家历（萨迦历）";
 
@@ -1196,7 +1196,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"萨迦历{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 萨迦纪元历本地化 =====
+    // ===== Saka Era Calendar Localization =====
 
     public override string CalendarSakaName => "萨迦纪元历";
 
@@ -1209,7 +1209,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"萨迦纪元{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 维克拉姆历本地化 =====
+    // ===== Vikram Samvat Calendar Localization =====
 
     public override string CalendarVikramSamvatName => "维克拉姆历";
 
@@ -1222,7 +1222,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"维克拉姆历{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 蒙古历本地化 =====
+    // ===== Mongolian Calendar Localization =====
 
     public override string CalendarMongolianName => "蒙古历";
 
@@ -1233,7 +1233,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string LocalizeMongolianDate(int year, int month, int day, int hour, int minute, int second)
         => $"蒙古历{year}年{month}月{day}日 {hour:D2}:{minute:D2}:{second:D2}";
 
-    // ===== 爪哇历本地化 =====
+    // ===== Javanese Calendar Localization =====
 
     public override string CalendarJavaneseName => "爪哇历";
 
@@ -1257,7 +1257,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"爪哇历{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 藏历本地化 =====
+    // ===== Tibetan Calendar Localization =====
 
     public override string CalendarTibetanName => "藏历";
 
@@ -1268,7 +1268,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string LocalizeTibetanDate(int year, int month, int day, int hour, int minute, int second)
         => $"藏历{year}年{month}月{day}日 {hour:D2}:{minute:D2}:{second:D2}";
 
-    // ===== 玛雅历本地化 =====
+    // ===== Mayan Calendar Localization =====
 
     public override string CalendarMayanName   => "玛雅长纪历";
     public override string CalendarMayanBaktun => "伯克顿";
@@ -1280,7 +1280,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string LocalizeMayanDate(int baktun, int katun, int tun, int uinal, int kin, int hour, int minute, int second)
         => $"{baktun}.{katun}.{tun}.{uinal}.{kin} {hour:D2}:{minute:D2}:{second:D2}";
 
-    // ===== 因纽特历本地化 =====
+    // ===== Inuit Calendar Localization =====
 
     public override string CalendarInuitName => "因纽特历";
 
@@ -1304,7 +1304,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"因纽特历{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 罗马历本地化 =====
+    // ===== Roman Calendar Localization =====
 
     public override string CalendarRomanName => "罗马历（建城纪年）";
 
@@ -1326,7 +1326,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"建城{year + 753}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 农历本地化 =====
+    // ===== Chinese Lunar Calendar Localization =====
 
     public override string CalendarChineseLunarName => "农历";
 
@@ -1361,7 +1361,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"{year}年{leapPrefix}{monthName}{dayName} {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 越南历本地化 =====
+    // ===== Vietnamese Calendar Localization =====
 
     public override string CalendarVietnameseName => "越南农历（阴历）";
 
@@ -1398,7 +1398,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"{zodiacName}年{leapPrefix}{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 日本历本地化 =====
+    // ===== Japanese Calendar Localization =====
 
     public override string CalendarJapaneseName => "日本历（年号）";
 
@@ -1419,7 +1419,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"{eraName}{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 彝历本地化 =====
+    // ===== Yi Calendar Localization =====
 
     public override string CalendarYiName => "彝历（彝族太阳历）";
     public override string CalendarComponentYiSeason => "季";
@@ -1464,7 +1464,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"彝历{year}年[{zodiac}] {monthName} {dayStr} {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 干支历本地化 =====
+    // ===== Sexagenary Calendar Localization =====
 
     public override string CalendarSexagenaryName    => "干支历";
     public override string CalendarComponentYearStem   => "年干";
@@ -1504,7 +1504,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"{ys}{yb}年[{zo}] {ms}{mb}月 {ds}{db}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 西双版纳小傣历 =====
+    // ===== Dehong Dai Calendar Localization =====
 
     public override string CalendarDaiName => "西双版纳小傣历";
 
@@ -1529,7 +1529,7 @@ public class ZhCN : DefaultLocalizationBase
         return $"傣历{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
-    // ===== 德宏大傣历 =====
+    // ===== Xishuangbanna Dai Calendar Localization =====
 
     public override string CalendarDehongDaiName => "德宏大傣历";
 
@@ -1663,7 +1663,7 @@ public class ZhCN : DefaultLocalizationBase
 
     private static readonly Dictionary<string, string> CSharpKeywords = new()
     {
-        // 控制流
+        // Control flow
         { "csharp:if", "条件分支语句。当条件表达式为 true 时执行代码块。" },
         { "csharp:else", "条件分支的替代路径。与 if 配合使用，当条件为 false 时执行。" },
         { "csharp:for", "计数循环语句。包含初始化、条件判断和迭代三个部分。" },
@@ -1676,7 +1676,7 @@ public class ZhCN : DefaultLocalizationBase
         { "csharp:return", "返回语句。退出当前方法并可选地返回一个值。" },
         { "csharp:goto", "跳转语句。无条件跳转到指定的标签位置。" },
         { "csharp:foreach", "集合遍历语句。依次访问集合中的每个元素。" },
-        // 类型声明
+        // Type declarations
         { "csharp:class", "引用类型声明。定义包含数据（字段、属性）和行为（方法）的结构。" },
         { "csharp:interface", "接口声明。定义类或结构必须实现的契约。" },
         { "csharp:struct", "值类型声明。轻量级数据结构，分配在栈上。" },
@@ -1684,13 +1684,13 @@ public class ZhCN : DefaultLocalizationBase
         { "csharp:namespace", "命名空间声明。组织代码的逻辑容器，避免命名冲突。" },
         { "csharp:record", "记录类型声明。具有值语义的引用类型，适合不可变数据。" },
         { "csharp:delegate", "委托声明。类型安全的方法引用，用于事件和回调。" },
-        // 访问修饰符
+        // Access modifiers
         { "csharp:public", "公共访问修饰符。成员可被任何代码访问。" },
         { "csharp:private", "私有访问修饰符。成员只能在包含类型内部访问。" },
         { "csharp:protected", "受保护访问修饰符。成员可在包含类型及其派生类型中访问。" },
         { "csharp:internal", "内部访问修饰符。成员只能在同一程序集内访问。" },
         { "csharp:sealed", "密封修饰符。防止类被继承或方法被重写。" },
-        // 类型关键字
+        // Type keywords
         { "csharp:int", "32 位有符号整数类型（System.Int32 的别名）。" },
         { "csharp:string", "字符串类型（System.String 的别名）。表示 Unicode 字符序列，不可变。" },
         { "csharp:bool", "布尔类型（System.Boolean 的别名）。值为 true 或 false。" },
@@ -1703,7 +1703,7 @@ public class ZhCN : DefaultLocalizationBase
         { "csharp:var", "隐式类型局部变量。编译器从初始化表达式推断类型。" },
         { "csharp:dynamic", "动态类型。跳过编译时类型检查，在运行时解析。" },
         { "csharp:void", "无返回值类型。表示方法不返回任何值。" },
-        // 修饰符
+        // Modifiers
         { "csharp:static", "静态修饰符。属于类型本身而非特定对象实例。" },
         { "csharp:abstract", "抽象修饰符。表示不完整的实现，必须由派生类完成。" },
         { "csharp:virtual", "虚修饰符。方法或属性可在派生类中被重写。" },
@@ -1718,12 +1718,12 @@ public class ZhCN : DefaultLocalizationBase
         { "csharp:out", "输出参数。用于从方法中返回多个值。" },
         { "csharp:in", "只读引用参数。按引用传递但不允许修改。" },
         { "csharp:params", "可变参数修饰符。允许传递可变数量的同类型参数。" },
-        // 异常处理
+        // Exception handling
         { "csharp:try", "异常处理块。包含可能抛出异常的代码。" },
         { "csharp:catch", "异常捕获块。处理 try 块中抛出的异常。" },
         { "csharp:finally", "最终执行块。无论是否发生异常都会执行的代码。" },
         { "csharp:throw", "抛出异常语句。手动抛出异常对象。" },
-        // 其他
+        // Others
         { "csharp:new", "创建实例运算符。创建对象或调用构造函数。" },
         { "csharp:this", "当前实例引用。引用当前类的实例。" },
         { "csharp:base", "基类引用。引用直接基类的成员。" },
@@ -1747,7 +1747,7 @@ public class ZhCN : DefaultLocalizationBase
         { "csharp:stackalloc", "栈分配运算符。在栈上分配内存块。" },
         { "csharp:extern", "外部修饰符。表示方法在外部程序集中实现（如 DLL）。" },
         { "csharp:unsafe", "不安全代码块。允许使用指针等不安全特性。" },
-        // 平台核心类型
+        // Platform core types
         { "csharp:ipermissioncallback", "权限回调接口。用于评估硅基生命体的各种操作权限（网络、命令行、文件访问等）。" },
         { "csharp:permissionresult", "权限结果枚举。表示权限评估的结果：Allowed（允许）、Denied（拒绝）、AskUser（询问用户）。" },
         { "csharp:permissiontype", "权限类型枚举。定义权限的种类：NetworkAccess（网络访问）、CommandLine（命令行执行）、FileAccess（文件访问）、Function（函数调用）、DataAccess（数据访问）。" },
@@ -1766,10 +1766,10 @@ public class ZhCN : DefaultLocalizationBase
         { "csharp:stringbuilder", "字符串构建器类（System.Text.StringBuilder）。表示可变字符字符串，适合频繁修改字符串的场景。" },
     };
 
-    // 完整命名空间翻译字典
+    // Full namespace translation dictionary
     private static readonly Dictionary<string, string> TranslationDictionary = new(CSharpKeywords)
     {
-        // 添加完整命名空间键
+        // Add full namespace key
         { "csharp:System.Net.IPAddress", "IP 地址类（System.Net.IPAddress）。表示 Internet Protocol (IP) 地址。" },
         { "csharp:System.Net.Sockets.AddressFamily", "地址族枚举（System.Net.Sockets.AddressFamily）。指定网络地址的寻址方案，如 InterNetwork（IPv4）、InterNetworkV6（IPv6）。" },
         { "csharp:System.Uri", "统一资源标识符类（System.Uri）。提供 URI（Uniform Resource Identifier）的对象表示，用于访问 Web 资源。" },
