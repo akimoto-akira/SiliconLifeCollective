@@ -83,7 +83,28 @@ public class ChatTool : ITool
 
         try
         {
-            chatSystem.AddMessage(callerId, targetId, messageObj.ToString()!);
+            // Get or create the session between caller and target to obtain the correct session ID
+            SessionBase session = chatSystem.GetOrCreateSession(callerId, targetId);
+
+            string content = messageObj.ToString()!;
+            ChatMessage chatMsg = new(callerId, session.Id, content)
+            {
+                Role = MessageRole.Assistant,
+            };
+
+            // Persist message to ChatSystem
+            chatSystem.AddMessage(chatMsg);
+
+            // Push via IMManager for real-time SSE delivery to frontend
+            IMManager? imManager = ServiceLocator.Instance.IMManager;
+            SiliconBeingManager? beingManager = ServiceLocator.Instance.BeingManager;
+            SiliconBeingBase? callerBeing = beingManager?.GetBeing(callerId);
+            string senderName = callerBeing?.Name ?? callerId.ToString();
+            if (imManager != null)
+            {
+                _ = imManager.SendMessageAsync(callerId, session.Id, content, senderName: senderName);
+            }
+
             return ToolResult.Successful($"Message sent to {targetId}");
         }
         catch (Exception ex)

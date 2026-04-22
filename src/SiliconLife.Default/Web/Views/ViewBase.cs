@@ -95,7 +95,7 @@ public abstract class ViewBase
             ("dashboard", "📊", localization.NavMenuDashboard, "/dashboard"),
             ("beings", "🧠", localization.NavMenuBeings, "/beings"),
             ("audit", "🔍", localization.NavMenuAudit, "/audit"),
-            ("knowledge", "�", localization.NavMenuKnowledge, "/knowledge"),
+            ("knowledge", "📚", localization.NavMenuKnowledge, "/knowledge"),
             ("projects", "📁", localization.NavMenuProjects, "/project"),
             ("logs", "📝", localization.NavMenuLogs, "/logs"),
             ("config", "⚙", localization.NavMenuConfig, "/config"),
@@ -206,6 +206,12 @@ public abstract class ViewBase
                 .Property("text-align", "center")
                 .Property("flex-shrink", "0")
             .EndSelector()
+            // 优化3：增强响应式设计 - 添加平板适配断点
+            .Media("(max-width: 1024px)")
+                .Selector(".shell-sidebar")
+                    .Property("width", "180px")
+                .EndSelector()
+            .EndMedia()
             .Media("(max-width: 768px)")
                 .Selector(".shell-sidebar")
                     .Property("width", "60px")
@@ -260,6 +266,7 @@ public abstract class ViewBase
                 .Property("font-size", "16px")
                 .Property("margin-bottom", "12px")
             .EndSelector()
+            // 优化2：减少CSS重复 - 使用统一的按钮基础样式
             .Selector(".btn")
                 .Property("display", "inline-block")
                 .Property("padding", "10px 20px")
@@ -290,6 +297,7 @@ public abstract class ViewBase
                 .Property("margin-bottom", "5px")
                 .Property("font-weight", "500")
             .EndSelector()
+            // 优化2：减少CSS重复 - 合并表单元素的通用样式
             .Selector(".form-group input, .form-group textarea, .form-group select")
                 .Property("width", "100%")
                 .Property("padding", "10px")
@@ -345,6 +353,7 @@ public abstract class ViewBase
                 .Property("align-items", "center")
                 .Property("flex-wrap", "wrap")
             .EndSelector()
+            // 优化2：减少CSS重复 - 复用表单元素样式模式
             .Selector(".filter-bar select, .filter-bar input, .filter-bar button")
                 .Property("padding", "8px 12px")
                 .Property("border", "1px solid var(--border)")

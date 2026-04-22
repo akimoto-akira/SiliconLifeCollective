@@ -127,10 +127,13 @@ public class ChatView : ViewBase
         var bodyChildren = new List<object>();
 
         var thinkContent = msg.Thinking ?? "";
-        bodyChildren.Add(H.Details(
-            H.Summary(localization.ChatThinkingSummary),
-            H.Div(thinkContent).Class("msg-thinking-content")
-        ).Class("msg-collapsible"));
+        if (!string.IsNullOrEmpty(thinkContent))
+        {
+            bodyChildren.Add(H.Details(
+                H.Summary(localization.ChatThinkingSummary),
+                H.Div(thinkContent).Class("msg-thinking-content")
+            ).Class("msg-collapsible"));
+        }
 
         if (!string.IsNullOrEmpty(msg.Text))
             bodyChildren.Add(H.Div().Class("msg-being-text markdown-body").Data("md-raw", msg.Text));
@@ -928,29 +931,20 @@ public class ChatView : ViewBase
                 { (Js.Id(() => "data").Prop(() => "channelId").Op(() => "!==", () => Js.Id(() => "currentSessionId")), new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
             }))
             .Add(() => Js.Const(() => "isCurrentUser", () => Js.Id(() => "data").Prop(() => "senderId").Op(() => "===", () => (JsSyntax)Js.Str(() => userId))))
+            // Clean up any lingering streaming element before appending the new message.
+            // The isFinal handler already updates token stats, so removing the stream element
+            // and appending a fresh message ensures tool-triggered messages (e.g. ChatTool)
+            // are never swallowed by the stale stream element reuse logic.
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
-                { (Js.Id(() => "isCurrentUser").Not().Op(() => "&&", () => Js.Id(() => "lastStreamElementId")), new List<JsSyntax>
+                { (Js.Id(() => "lastStreamElementId"), new List<JsSyntax>
                     {
                         Js.Const(() => "streamEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Id(() => "lastStreamElementId"))),
                         Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                         {
                             { (Js.Id(() => "streamEl"), new List<JsSyntax>
                                 {
-                                    Js.Const(() => "tokenEl", () => Js.Id(() => "streamEl").Call(() => "querySelector", () => Js.Str(() => ".msg-token-stats"))),
-                                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
-                                    {
-                                        { (Js.Id(() => "tokenEl"), new List<JsSyntax>
-                                            {
-                                                Js.Assign(() => Js.Id(() => "tokenEl").Prop(() => "outerHTML"), () => Js.Id(() => "getTokenStats").Invoke(() => Js.Obj()
-                                                    .Prop(() => "promptTokens", () => Js.Id(() => "data").Prop(() => "promptTokens"))
-                                                    .Prop(() => "completionTokens", () => Js.Id(() => "data").Prop(() => "completionTokens"))
-                                                    .Prop(() => "totalTokens", () => Js.Id(() => "data").Prop(() => "totalTokens"))))
-                                            }
-                                        )}
-                                    }),
-                                    Js.Assign(() => Js.Id(() => "lastStreamElementId"), () => Js.Null()),
-                                    Js.Return(() => Js.Id(() => "undefined"))
+                                    Js.Id(() => "streamEl").Call(() => "remove").Stmt()
                                 }
                             )}
                         }),
@@ -1143,6 +1137,15 @@ public class ChatView : ViewBase
                             { (Js.Id(() => "streamThinking"), new List<JsSyntax>
                                 {
                                     Js.Assign(() => Js.Id(() => "streamingMessage").Prop(() => "thinking"), () => Js.Id(() => "streamThinking")),
+                                    // Check if thinking section exists; if not, create it dynamically
+                                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                                    {
+                                        { (Js.Id(() => "streamEl").Call(() => "querySelector", () => Js.Str(() => ".msg-collapsible")).Not(), new List<JsSyntax>
+                                            {
+                                                Js.Id(() => "streamEl").Call(() => "querySelector", () => Js.Str(() => ".msg-being-body")).Call(() => "insertAdjacentHTML", () => Js.Str(() => "afterbegin"), () => Js.Str(() => "<details class=\"msg-collapsible\"><summary>" + vm.Localization.ChatThinkingSummary + "</summary><div class=\"msg-thinking-content\"></div></details>")).Stmt()
+                                            }
+                                        )}
+                                    }),
                                     Js.Assign(() => Js.Id(() => "streamEl").Call(() => "querySelector", () => Js.Str(() => ".msg-thinking-content")).Prop(() => "textContent"), () => Js.Id(() => "streamThinking"))
                                 }
                             )}
@@ -1367,7 +1370,15 @@ public class ChatView : ViewBase
             .Call(() => "replace", () => Js.Regex(() => @"<", () => "g"), () => Js.Str(() => "&lt;"))
             .Call(() => "replace", () => Js.Regex(() => @">", () => "g"), () => Js.Str(() => "&gt;"));
         
-        beingMsgBody.Add(Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-being-avatar\"><div class=\"msg-avatar-icon\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "senderName").Op(() => "||", () => (JsSyntax)Js.Id(() => "beingName")).Paren().Call(() => "charAt", () => Js.Num(() => "0"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><div class=\"msg-avatar-name\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "senderName").Op(() => "||", () => (JsSyntax)Js.Id(() => "beingName")).Paren()).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div><div class=\"msg-being-content\"><div class=\"msg-being-card\"><div class=\"msg-being-body\"><details class=\"msg-collapsible\"><summary>" + vm.Localization.ChatThinkingSummary + "</summary><div class=\"msg-thinking-content\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "thinking").Op(() => "||", () => (JsSyntax)Js.Str(() => "")).Paren()).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></details><div class=\"msg-being-text markdown-body\" data-md-raw=\"")).Op(() => "+", () => (JsSyntax)escapeBeingText).Op(() => "+", () => (JsSyntax)Js.Str(() => "\"></div></div>")).Op(() => "+", () => (JsSyntax)Js.Id(() => "getTokenStats").Invoke(() => Js.Id(() => "msg"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div>"))));
+        // Conditionally build the thinking section only when msg.thinking has content
+        var thinkingSection = Js.Ternary(
+            () => Js.Id(() => "msg").Prop(() => "thinking"),
+            () => Js.Str(() => "<details class=\"msg-collapsible\"><summary>" + vm.Localization.ChatThinkingSummary + "</summary><div class=\"msg-thinking-content\">")
+                .Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "thinking"))
+                .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></details>")),
+            () => Js.Str(() => ""));
+
+        beingMsgBody.Add(Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-being-avatar\"><div class=\"msg-avatar-icon\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "senderName").Op(() => "||", () => (JsSyntax)Js.Id(() => "beingName")).Paren().Call(() => "charAt", () => Js.Num(() => "0"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><div class=\"msg-avatar-name\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "senderName").Op(() => "||", () => (JsSyntax)Js.Id(() => "beingName")).Paren()).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div><div class=\"msg-being-content\"><div class=\"msg-being-card\"><div class=\"msg-being-body\">")).Op(() => "+", () => (JsSyntax)thinkingSection).Op(() => "+", () => (JsSyntax)Js.Str(() => "<div class=\"msg-being-text markdown-body\" data-md-raw=\"")).Op(() => "+", () => (JsSyntax)escapeBeingText).Op(() => "+", () => (JsSyntax)Js.Str(() => "\"></div></div>")).Op(() => "+", () => (JsSyntax)Js.Id(() => "getTokenStats").Invoke(() => Js.Id(() => "msg"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div>"))));
         var appendMessageBody = Js.Block()
             .Add(() => Js.Const(() => "messages", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))))
             .Add(() => Js.Const(() => "div", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))

@@ -57,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Independent AI configuration editor for silicon beings
+- `6ba591d` - Add independent AI configuration editor for silicon beings
   - Added BeingAIConfigViewModel view model
   - Added BeingAIConfigView view component
   - Support configuring independent AI client type and parameters for each silicon being
@@ -66,6 +66,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added AI configuration related API routes in BeingController
   - Optimized AI client type resolution logic in DefaultSiliconBeing
   - Updated AI configuration edit link in BeingView
+- `634e8ca` - Add back to list link in permission page
+  - Navigation improvement for permission management
+- `188c6f8` - Register task list API route and add empty state display
+  - Task list API route registration
+  - Empty state UI improvement
+
+### Changed
+- `4305769` - Add .gitattributes for line ending management
+  - Line ending configuration for cross-platform compatibility
+
+### Fixed
+- `c6b518b` - Fix timer message delivery and chat message storage
+  - Timer message delivery mechanism correction
+  - Chat message storage optimization
 
 ---
 
