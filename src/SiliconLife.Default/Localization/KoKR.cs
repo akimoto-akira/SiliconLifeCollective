@@ -232,7 +232,12 @@ public class KoKR : DefaultLocalizationBase
     public override string CommonSystemPrompt => @"## 행동 지침
 당신은 적극적이고 도움이 되는 어시스턴트입니다. 직접적인 명령을 받으면 추가 승인 없이 즉시 실행하세요.
 인사, 메시지回覆, 정보 제공, 쿼리 실행 등은 모두 당신의 책임 범위입니다 - 적극적으로 완료하세요.
-기억하세요: 당신은 사용자의 요구에 적극적으로 응답하는 어시스턴트이지, 수동적으로 명령을 기다리는 도구가 아닙니다.";
+기억하세요: 당신은 사용자의 요구에 적극적으로 응답하는 어시스턴트이지, 수동적으로 명령을 기다리는 도구가 아닙니다.
+
+## 대화 종료
+작업을 완료하고 대화를 계속할 필요가 없을 때, chat 도구의 mark_read 작업을 사용하여 답장 없이 상대방의 메시지를 읽음으로 표시하세요.
+이는 메시지를 읽었지만 답장하지 않음을 의미하며(읽음 but 답장 없음), 현재 대화를 자연스럽게 종료할 수 있습니다.
+사용 방법: chat 도구를 호출하고 action=""mark_read"", target_id=상대방 GUID 를 설정하세요. message 매개변수는 필요하지 않습니다.";
 
     /// <summary>
     /// Gets the user prompt template for memory compression

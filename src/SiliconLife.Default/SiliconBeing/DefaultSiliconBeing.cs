@@ -197,6 +197,15 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 ContextManager brain = new ContextManager(this, session);
                 if (brain.HasWork)
                 {
+                    // Check if the last AI response was a mark_read action
+                    // If so, skip ThinkOnChat to save tokens (read but no reply)
+                    if (WasJustMarkRead(session))
+                    {
+                        brain.CommitMessagesAsRead();
+                        _logger.Info(Id, "Being {0}: skipped reply after mark_read in session {1}", Name, session.Id);
+                        return;
+                    }
+
                     _logger.Info(Id, "Being {0}: detected pending messages in session {1}", Name, session.Id);
                     ExecuteBrain("ThinkOnChat", session, _ => brain.ThinkOnChat());
                     return;
@@ -501,5 +510,69 @@ public class DefaultSiliconBeing : SiliconBeingBase
         if (clientType.EndsWith("Factory"))
             return clientType.Substring(0, clientType.Length - 7);
         return clientType;
+    }
+
+    /// <summary>
+    /// Checks if the last AI response in the session was a mark_read action.
+    /// This is used to skip ThinkOnChat after AI explicitly marked messages as read (read but no reply).
+    /// </summary>
+    /// <param name="session">The chat session to check</param>
+    /// <returns>True if the last assistant message called mark_read tool</returns>
+    private bool WasJustMarkRead(SessionBase session)
+    {
+        try
+        {
+            // Get last 5 messages from session
+            var messages = session.GetMessages(0, 5);
+            if (messages.Count < 2)
+                return false;
+
+            // Find the last assistant message
+            for (int i = messages.Count - 1; i >= 0; i--)
+            {
+                var msg = messages[i];
+                if (msg.Role == MessageRole.Assistant && !string.IsNullOrEmpty(msg.ToolCallsJson))
+                {
+                    // Parse tool calls JSON
+                    try
+                    {
+                        var toolCalls = JsonSerializer.Deserialize<List<ToolCall>>(msg.ToolCallsJson);
+                        if (toolCalls != null)
+                        {
+                            // Check if any tool call is chat tool with mark_read action
+                            foreach (var toolCall in toolCalls)
+                            {
+                                if (toolCall.Name == "chat" && toolCall.Arguments != null)
+                                {
+                                    if (toolCall.Arguments.TryGetValue("action", out var actionObj))
+                                    {
+                                        string? action = actionObj?.ToString()?.ToLowerInvariant();
+                                        if (action == "mark_read")
+                                        {
+                                            _logger.Debug(Id, "Detected mark_read action in last assistant message for session {0}", session.Id);
+                                            return true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (JsonException ex)
+                    {
+                        _logger.Warn(Id, "Failed to parse ToolCallsJson for session {0}: {1}", session.Id, ex.Message);
+                    }
+
+                    // Found an assistant message with tool calls, but not mark_read
+                    break;
+                }
+            }
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(Id, "WasJustMarkRead check failed for session {0}: {1}", session.Id, ex.Message);
+            return false;
+        }
     }
 }

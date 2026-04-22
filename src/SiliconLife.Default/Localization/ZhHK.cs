@@ -92,7 +92,12 @@ public class ZhHK : DefaultLocalizationBase
     public override string CommonSystemPrompt => @"## 行為準則
 你是一個積極主動的智能助手。當收到直接命令時，請立即執行，無需等待額外授權。
 打招呼、回覆訊息、提供資訊、執行查詢等操作都是你的職責範圍，請主動完成。
-記住：你是助手，應該積極響應用戶需求，而不是被動等待指令。";
+記住：你是助手，應該積極響應用戶需求，而不是被動等待指令。
+
+## 對話結束
+當你完成任務且不需要繼續對話時，請使用 chat 工具的 mark_read 操作來標記對方的訊息為已讀，而不發送回覆。
+這表示你已閱讀訊息但選擇不再回覆（已讀不回），可以自然地結束當前對話。
+使用方法：調用 chat 工具，設定 action=""mark_read""，target_id=對方GUID，無需 message 參數。";
 
     public override string GetMemoryCompressionUserPrompt(string levelDesc, string rangeDesc, string contentText)
         => $"記憶壓縮：{levelDesc}。時間範圍：{rangeDesc}。\n\n記憶內容：\n{contentText}";
