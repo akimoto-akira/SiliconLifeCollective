@@ -136,6 +136,33 @@ All permission decisions are logged:
 }
 ```
 
+## Programmatic Permission Evaluation
+
+### EvaluatePermission API
+
+The `PermissionManager.EvaluatePermission()` method provides read-only pre-evaluation of permissions without triggering user prompts. This is used by the `PermissionTool` to let AI check permission states before attempting operations.
+
+```csharp
+public PermissionResult EvaluatePermission(
+    Guid callerId,
+    PermissionType permissionType,
+    string resource)
+```
+
+**Returns**: Three-state `PermissionResult`:
+- `Allowed` - Operation is permitted
+- `Denied` - Operation is blocked
+- `AskUser` - User confirmation will be needed at execution time
+
+**Evaluation Order**:
+1. **Frequency Cache** - Check cached user decisions
+2. **IPermissionCallback** - Custom callback evaluation
+3. **Curator Status** - If curator, returns `AskUser` (needs confirmation)
+4. **Global ACL** - Check access control rules
+5. **Default** - Deny if no matching rule
+
+> **Note**: Unlike the full permission chain, `EvaluatePermission` does **not** invoke `IPermissionAskHandler`. It only reports what the result *would be* at execution time.
+
 ## Managing Permissions
 
 ### Grant Permission

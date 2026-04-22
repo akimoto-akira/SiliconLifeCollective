@@ -71,10 +71,24 @@
 - `188c6f8` - 작업 목록 API 라우트 등록 및 빈 상태 표시 추가
   - 작업 목록 API 라우트 등록
   - 빈 상태 UI 개선
+- PermissionManager에 `EvaluatePermission` API 추가
+  - 사용자 프롬프트 없이 권한의 읽기 전용 사전 평가
+  - 3상태 결과 반환: Allowed, Denied 또는 AskUser
+  - 평가 체인: FrequencyCache → Callback → CuratorStatus → GlobalACL
 
 ### 변경됨
 - `4305769` - 줄 끝 관리를 위한 .gitattributes 추가
   - 크로스 플랫폼 호환성을 위한 줄 끝 설정
+- PermissionTool을 실제 권한 평가 사용으로 리팩토링
+  - 비기능적인 `grant` 및 `revoke` 액션 제거
+  - `query_permission`이 `EvaluatePermission` API 사용, 매개변수는 `permission_type` 및 `resource`
+  - 3상태 결과 (ALLOWED, DENIED, ASK_USER) 및 상세 컨텍스트 반환
+- ExecuteCodeTool을 컴파일 전용 실행으로 리팩토링
+  - 인터프리터 기반 코드 실행 제거 (Python, Node.js 등)
+  - 패키지 설치 기능 제거
+  - C# 컴파일 및 보안 스캔만으로 단순화
+  - 컴파일 오류 및 보안 위반 보고 개선
+  - PowerShell 버전 감지 수정, `--version` 대신 `-Command` 사용
 
 ### 수정됨
 - `c6b518b` - 타이머 메시지 전달 및 채팅 메시지 저장 수정

@@ -136,6 +136,33 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 }
 ```
 
+## 프로그래마틱 권한 평가
+
+### EvaluatePermission API
+
+`PermissionManager.EvaluatePermission()` 메서드는 사용자 프롬프트를 트리거하지 않고 권한의 읽기 전용 사전 평가를 제공합니다. `PermissionTool`은 이 메서드를 사용하여 AI가 작업을 시도하기 전에 권한 상태를 확인할 수 있습니다.
+
+```csharp
+public PermissionResult EvaluatePermission(
+    Guid callerId,
+    PermissionType permissionType,
+    string resource)
+```
+
+**반환값**: 3상태 `PermissionResult`:
+- `Allowed` - 작업이 허용됨
+- `Denied` - 작업이 차단됨
+- `AskUser` - 실행 시 사용자 확인이 필요
+
+**평가 순서**:
+1. **빈도 캐시** - 캐시된 사용자 결정 확인
+2. **IPermissionCallback** - 사용자 정의 콜백 평가
+3. **Curator 상태** - curator인 경우 `AskUser` 반환 (확인 필요)
+4. **전역 ACL** - 접근 제어 규칙 확인
+5. **기본값** - 일치하는 규칙이 없으면 거부
+
+> **참고**: 완전한 권한 체인과 달리 `EvaluatePermission`은 `IPermissionAskHandler`를 호출하지 **않습니다**. 실행 시 결과가 *어떻게 될지*만 보고합니다.
+
 ## 권한 관리
 
 ### 권한 부여

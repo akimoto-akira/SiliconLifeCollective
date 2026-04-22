@@ -27,8 +27,7 @@ public class PermissionTool : ITool
     public string Name => "permission";
 
     public string Description =>
-        "Manage permissions for silicon beings. Actions: query_permission (check permission status), " +
-        "grant (grant tool access permission), revoke (revoke tool access permission), " +
+        "Manage permissions for silicon beings. Actions: query_permission (check permission status for a specific resource), " +
         "manage_acl (manage global access control list)";
 
     public string GetDisplayName(Language language)
@@ -49,34 +48,29 @@ public class PermissionTool : ITool
                 ["action"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "Action to perform: query_permission, grant, revoke, manage_acl",
-                    ["enum"] = new[] { "query_permission", "grant", "revoke", "manage_acl" }
+                    ["description"] = "Action to perform: query_permission, manage_acl",
+                    ["enum"] = new[] { "query_permission", "manage_acl" }
                 },
                 ["being_id"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
                     ["description"] = "Target silicon being ID (empty string means current being)"
                 },
-                ["tool_name"] = new Dictionary<string, object>
+                ["permission_type"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "Tool name to check/grant/revoke permission for"
+                    ["description"] = "Permission type: network, command, filesystem, function, data (for query_permission action)"
                 },
-                ["reason"] = new Dictionary<string, object>
+                ["resource"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "Reason for permission change (for audit log)"
+                    ["description"] = "Resource to check permission for (URL, file path, command, etc.) (for query_permission action)"
                 },
                 ["acl_action"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
                     ["description"] = "ACL action: add_rule, remove_rule, list_rules (for manage_acl action)",
                     ["enum"] = new[] { "add_rule", "remove_rule", "list_rules" }
-                },
-                ["permission_type"] = new Dictionary<string, object>
-                {
-                    ["type"] = "string",
-                    ["description"] = "Permission type: network, command, filesystem (for ACL rules)"
                 },
                 ["resource_prefix"] = new Dictionary<string, object>
                 {
@@ -111,8 +105,6 @@ public class PermissionTool : ITool
         return action switch
         {
             "query_permission" => ExecuteQueryPermission(callerId, parameters),
-            "grant" => ExecuteGrant(callerId, parameters),
-            "revoke" => ExecuteRevoke(callerId, parameters),
             "manage_acl" => ExecuteManageAcl(callerId, parameters),
             _ => ToolResult.Failed($"Unknown action: {action}")
         };
@@ -124,12 +116,18 @@ public class PermissionTool : ITool
             ? beingIdObj.ToString()!
             : callerId.ToString();
 
-        if (!parameters.TryGetValue("tool_name", out object? toolNameObj) || string.IsNullOrWhiteSpace(toolNameObj?.ToString()))
+        if (!parameters.TryGetValue("permission_type", out object? permTypeObj) || string.IsNullOrWhiteSpace(permTypeObj?.ToString()))
         {
-            return ToolResult.Failed("Missing 'tool_name' parameter for query_permission action");
+            return ToolResult.Failed("Missing 'permission_type' parameter for query_permission action. Valid types: network, command, filesystem, function, data");
         }
 
-        string toolName = toolNameObj.ToString()!;
+        if (!parameters.TryGetValue("resource", out object? resourceObj) || string.IsNullOrWhiteSpace(resourceObj?.ToString()))
+        {
+            return ToolResult.Failed("Missing 'resource' parameter for query_permission action");
+        }
+
+        string permTypeStr = permTypeObj.ToString()!.ToLowerInvariant();
+        string resource = resourceObj.ToString()!;
 
         try
         {
@@ -144,6 +142,17 @@ public class PermissionTool : ITool
                 return ToolResult.Failed($"Invalid being_id format: {beingIdStr}");
             }
 
+            // Parse permission type
+            PermissionType permType = permTypeStr switch
+            {
+                "network" => PermissionType.NetworkAccess,
+                "command" => PermissionType.CommandLine,
+                "filesystem" or "file" => PermissionType.FileAccess,
+                "function" => PermissionType.Function,
+                "data" => PermissionType.DataAccess,
+                _ => throw new ArgumentException($"Unknown permission type: {permTypeStr}. Valid types: network, command, filesystem, function, data")
+            };
+
             // Get the PermissionManager for this being
             var permManager = ServiceLocator.Instance.GetPermissionManager(beingId);
             if (permManager == null)
@@ -151,43 +160,45 @@ public class PermissionTool : ITool
                 return ToolResult.Failed($"Permission manager not found for being: {beingId}");
             }
 
-            // Check if the tool exists
-            var being = ServiceLocator.Instance.BeingManager?.GetBeing(beingId);
-            if (being?.ToolManager == null)
+            // Resolve the actual tested path for filesystem/command resources
+            string resolvedResource = resource;
+            if (permType == PermissionType.FileAccess)
             {
-                return ToolResult.Failed($"Tool manager not found for being: {beingId}");
+                try { resolvedResource = Path.GetFullPath(resource); } catch { /* keep original */ }
             }
 
-            var tool = being.ToolManager.GetTool(toolName);
-            if (tool == null)
-            {
-                return ToolResult.Failed($"Tool '{toolName}' not found for being: {beingId}");
-            }
-
-            // Check permission status
-            // For tool permissions, we need to check if the tool has [SiliconManagerOnly] attribute
-            bool isCuratorOnly = tool.GetType().GetCustomAttributes(typeof(SiliconManagerOnlyAttribute), false).Length > 0;
+            // Evaluate permission using the actual permission system (returns three-state result)
+            PermissionResult result = permManager.EvaluatePermission(beingId, permType, resource);
+            
+            // Get additional context about the decision
             bool isCurator = beingId == (Config.Instance?.Data?.CuratorGuid ?? Guid.Empty);
+            
+            // Check frequency cache for context
+            PermissionResult? cachedResult = permManager.FrequencyCache.Query(permType, resource);
+            string cacheInfo = cachedResult.HasValue ? $"Cached: {cachedResult.Value}" : "Not cached";
 
-            string status;
-            string source;
-
-            if (isCuratorOnly && !isCurator)
+            // Build result message with clear guidance for AI
+            string statusMessage = result switch
             {
-                status = "denied";
-                source = "Tool is curator-only and this being is not the curator";
-            }
-            else
-            {
-                status = "allowed";
-                source = "Tool access granted";
-            }
+                PermissionResult.Allowed => "ALLOWED - You can proceed with this operation",
+                PermissionResult.Denied => "DENIED - This operation is blocked. Do not attempt.",
+                PermissionResult.AskUser => "ASK_USER - This operation requires user confirmation. Please ask the user for permission before proceeding.",
+                _ => "UNKNOWN"
+            };
 
-            return ToolResult.Successful($"Permission query for being '{beingId}' on tool '{toolName}':\n" +
-                                       $"Status: {status}\n" +
-                                       $"Source: {source}\n" +
+            // Include resolved path when it differs from input (helps AI understand path resolution)
+            string resolvedInfo = resolvedResource != resource
+                ? $"Resolved Resource: {resolvedResource}\n"
+                : "";
+
+            return ToolResult.Successful($"Permission evaluation for being '{beingId}':\n" +
+                                       $"Permission Type: {permType}\n" +
+                                       $"Resource: {resource}\n" +
+                                       resolvedInfo +
+                                       $"Result: {result}\n" +
+                                       $"Status: {statusMessage}\n" +
                                        $"Is Curator: {isCurator}\n" +
-                                       $"Is Curator-Only Tool: {isCuratorOnly}");
+                                       $"Frequency Cache: {cacheInfo}");
         }
         catch (Exception ex)
         {
@@ -195,103 +206,7 @@ public class PermissionTool : ITool
         }
     }
 
-    private ToolResult ExecuteGrant(Guid callerId, Dictionary<string, object> parameters)
-    {
-        if (!parameters.TryGetValue("being_id", out object? beingIdObj) || string.IsNullOrWhiteSpace(beingIdObj?.ToString()))
-        {
-            return ToolResult.Failed("Missing 'being_id' parameter for grant action");
-        }
 
-        if (!parameters.TryGetValue("tool_name", out object? toolNameObj) || string.IsNullOrWhiteSpace(toolNameObj?.ToString()))
-        {
-            return ToolResult.Failed("Missing 'tool_name' parameter for grant action");
-        }
-
-        string beingIdStr = beingIdObj.ToString()!;
-        string toolName = toolNameObj.ToString()!;
-        string reason = parameters.TryGetValue("reason", out object? reasonObj) && reasonObj != null
-            ? reasonObj.ToString()!
-            : "Permission granted via PermissionTool";
-
-        try
-        {
-            Guid beingId;
-            if (!Guid.TryParse(beingIdStr, out beingId))
-            {
-                return ToolResult.Failed($"Invalid being_id format: {beingIdStr}");
-            }
-
-            // For tool permissions, we can't directly grant access to specific tools
-            // as the tool access is controlled by the [SiliconManagerOnly] attribute
-            // and the ToolManager scanning process.
-            // However, we can add an ACL rule to allow network/command/filesystem permissions
-            // that might be needed by the tool.
-
-            // Get the PermissionManager for this being
-            var permManager = ServiceLocator.Instance.GetPermissionManager(beingId);
-            if (permManager == null)
-            {
-                return ToolResult.Failed($"Permission manager not found for being: {beingId}");
-            }
-
-            // Since we can't directly modify tool access, we'll record this in the audit log
-            // and provide guidance on how to actually grant access
-            return ToolResult.Successful($"Permission grant request recorded for being '{beingId}' on tool '{toolName}'.\n" +
-                                       $"Reason: {reason}\n" +
-                                       $"Note: Tool access is controlled by the [SiliconManagerOnly] attribute.\n" +
-                                       $"To grant access to curator-only tools, the being must be designated as curator\n" +
-                                       $"or the tool's attribute must be removed. ACL rules can be used for network/command/filesystem permissions.");
-        }
-        catch (Exception ex)
-        {
-            return ToolResult.Failed($"Permission grant failed: {ex.Message}");
-        }
-    }
-
-    private ToolResult ExecuteRevoke(Guid callerId, Dictionary<string, object> parameters)
-    {
-        if (!parameters.TryGetValue("being_id", out object? beingIdObj) || string.IsNullOrWhiteSpace(beingIdObj?.ToString()))
-        {
-            return ToolResult.Failed("Missing 'being_id' parameter for revoke action");
-        }
-
-        if (!parameters.TryGetValue("tool_name", out object? toolNameObj) || string.IsNullOrWhiteSpace(toolNameObj?.ToString()))
-        {
-            return ToolResult.Failed("Missing 'tool_name' parameter for revoke action");
-        }
-
-        string beingIdStr = beingIdObj.ToString()!;
-        string toolName = toolNameObj.ToString()!;
-        string reason = parameters.TryGetValue("reason", out object? reasonObj) && reasonObj != null
-            ? reasonObj.ToString()!
-            : "Permission revoked via PermissionTool";
-
-        try
-        {
-            Guid beingId;
-            if (!Guid.TryParse(beingIdStr, out beingId))
-            {
-                return ToolResult.Failed($"Invalid being_id format: {beingIdStr}");
-            }
-
-            // Get the PermissionManager for this being
-            var permManager = ServiceLocator.Instance.GetPermissionManager(beingId);
-            if (permManager == null)
-            {
-                return ToolResult.Failed($"Permission manager not found for being: {beingId}");
-            }
-
-            // Similar to grant, we record this in the audit log
-            return ToolResult.Successful($"Permission revoke request recorded for being '{beingId}' on tool '{toolName}'.\n" +
-                                       $"Reason: {reason}\n" +
-                                       $"Note: Tool access is controlled by the [SiliconManagerOnly] attribute.\n" +
-                                       $"To revoke access, the being's curator status must be changed or ACL rules updated.");
-        }
-        catch (Exception ex)
-        {
-            return ToolResult.Failed($"Permission revoke failed: {ex.Message}");
-        }
-    }
 
     private ToolResult ExecuteManageAcl(Guid callerId, Dictionary<string, object> parameters)
     {

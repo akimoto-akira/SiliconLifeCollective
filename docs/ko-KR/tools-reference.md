@@ -178,11 +178,64 @@
 }
 ```
 
-### 12. Curator 도구
+### 12. 권한 도구
 
-**이름**: `curator_*`
+**이름**: `permission`
 
-**설명**: 시스템 관리를 위한 관리자 전용 도구.
+**설명**: 실리콘 생명체의 권한을 관리. Curator 전용.
+
+**액션**: `query_permission`, `manage_acl`
+
+**매개변수** (query_permission):
+```json
+{
+  "action": "query_permission",
+  "being_id": "being-uuid",
+  "permission_type": "network",
+  "resource": "https://api.example.com"
+}
+```
+
+**권한 유형**: `network`, `command`, `filesystem`, `function`, `data`
+
+**반환값**: 3상태 결과 (`ALLOWED`, `DENIED`, `ASK_USER`), curator 상태 및 빈도 캐시 정보 포함.
+
+**매개변수** (manage_acl):
+```json
+{
+  "action": "manage_acl",
+  "acl_action": "add_rule",
+  "permission_type": "filesystem",
+  "resource_prefix": "/data/",
+  "acl_result": "allow",
+  "description": "데이터 디렉토리 접근 허용"
+}
+```
+
+**권한**: `IsCurator` 플래그 필요.
+
+### 13. 코드 실행 도구
+
+**이름**: `execute_code`
+
+**설명**: 보안 스캔이 포함된 C# 코드 컴파일 및 실행. Curator 전용.
+
+**액션**: `run_script`
+
+**매개변수**:
+```json
+{
+  "action": "run_script",
+  "code": "return DateTime.Now.ToString();",
+  "timeout": 30
+}
+```
+
+**상세 설명**:
+- 코드는 `ScriptExecutor` 클래스의 `Execute()` 메서드로 래핑됨
+- 컴파일 전 보안 스캔 수행
+- 구성 가능한 타임아웃 지원 (기본값: 30초)
+- 실패 시 컴파일 오류 및 보안 위반 정보 반환
 
 **권한**: `IsCurator` 플래그 필요.
 

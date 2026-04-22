@@ -136,6 +136,33 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 }
 ```
 
+## 程式化權限評估
+
+### EvaluatePermission API
+
+`PermissionManager.EvaluatePermission()` 方法提供唯讀的權限預評估，不會觸發使用者提示。`PermissionTool` 使用此方法讓 AI 在嘗試操作前檢查權限狀態。
+
+```csharp
+public PermissionResult EvaluatePermission(
+    Guid callerId,
+    PermissionType permissionType,
+    string resource)
+```
+
+**返回值**：三態 `PermissionResult`：
+- `Allowed` - 操作被允許
+- `Denied` - 操作被拒絕
+- `AskUser` - 執行時需要使用者確認
+
+**評估順序**：
+1. **頻率快取** - 檢查快取的使用者決策
+2. **IPermissionCallback** - 自定義回調評估
+3. **館長狀態** - 如果是館長，返回 `AskUser`（需要確認）
+4. **全局 ACL** - 檢查訪問控制規則
+5. **預設** - 無匹配規則時拒絕
+
+> **注意**：與完整權限鏈不同，`EvaluatePermission` **不會**調用 `IPermissionAskHandler`。它僅報告執行時的結果*將會是*什麼。
+
 ## 管理權限
 
 ### 授予權限

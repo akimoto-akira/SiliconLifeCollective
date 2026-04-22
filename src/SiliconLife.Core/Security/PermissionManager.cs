@@ -178,6 +178,53 @@ public class PermissionManager
     }
 
     /// <summary>
+    /// Evaluates a permission request and returns the three-state result without triggering user prompts.
+    /// This is a read-only pre-evaluation: it checks caches, callbacks, and ACL rules but does NOT
+    /// invoke IPermissionAskHandler. Use this when you need to know the permission state upfront
+    /// (e.g., to inform the AI whether user confirmation will be needed).
+    /// </summary>
+    /// <param name="callerId">The GUID of the silicon being making the request</param>
+    /// <param name="permissionType">The type of permission being checked</param>
+    /// <param name="resource">The resource path (URL, file path, command, etc.)</param>
+    /// <returns>PermissionResult: Allowed, Denied, or AskUser (AskUser means user confirmation will be needed at execution time)</returns>
+    public PermissionResult EvaluatePermission(Guid callerId, PermissionType permissionType, string resource)
+    {
+        // Priority 1: Check frequency cache (high-frequency user decisions)
+        PermissionResult? cachedResult = _frequencyCache.Query(permissionType, resource);
+        if (cachedResult.HasValue)
+        {
+            return cachedResult.Value;
+        }
+
+        // Priority 2: Callback
+        if (_callback != null)
+        {
+            PermissionResult callbackResult = _callback.Evaluate(callerId, permissionType, resource);
+            if (callbackResult != PermissionResult.AskUser)
+            {
+                return callbackResult;
+            }
+        }
+
+        // Priority 3: Branch based on curator status when callback returns AskUser or no callback
+        if (IsCurator)
+        {
+            // Curator: will need user confirmation at execution time
+            return PermissionResult.AskUser;
+        }
+
+        // Non-curator: check Global ACL
+        PermissionResult? aclResult = _globalAcl.Query(permissionType, resource);
+        if (aclResult.HasValue)
+        {
+            return aclResult.Value;
+        }
+
+        // No matching rule — deny by default
+        return PermissionResult.Denied;
+    }
+
+    /// <summary>
     /// Records an audit log entry for a permission decision.
     /// Override in subclass or extend via event to persist.
     /// </summary>

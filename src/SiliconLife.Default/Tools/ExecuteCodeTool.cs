@@ -11,26 +11,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using SiliconLife.Collective;
 
 namespace SiliconLife.Default;
 
 /// <summary>
-/// Code execution tool for running scripts in multiple languages.
+/// C# code execution tool with security scanning and compilation.
 /// Only available to the Silicon Curator (main administrator).
-/// Supports executing code snippets in various programming languages.
+/// All code is compiled through DynamicCompilationExecutor with security checks.
 /// </summary>
 [SiliconManagerOnly]
 public class ExecuteCodeTool : ITool
 {
+    private readonly DynamicCompilationExecutor _compilationExecutor;
+
+    public ExecuteCodeTool()
+    {
+        _compilationExecutor = new DynamicCompilationExecutor();
+    }
+
     public string Name => "execute_code";
 
     public string Description =>
-        "Execute code scripts in various programming languages. Actions: run_script (execute code), " +
-        "list_languages (list supported languages), install_package (install dependency packages). " +
-        "WARNING: This tool can execute arbitrary code and should only be used by trusted administrators.";
+        "Execute C# code scripts with security scanning and compilation. " +
+        "Actions: run_script (compile and execute C# code). " +
+        "WARNING: This tool compiles and executes C# code with security scanning. " +
+        "Only available to trusted administrators.";
 
     public string GetDisplayName(Language language)
     {
@@ -50,41 +58,21 @@ public class ExecuteCodeTool : ITool
                 ["action"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "Action to perform: run_script, list_languages, install_package",
-                    ["enum"] = new[] { "run_script", "list_languages", "install_package" }
-                },
-                ["language"] = new Dictionary<string, object>
-                {
-                    ["type"] = "string",
-                    ["description"] = "Programming language like 'python', 'javascript', 'bash', 'powershell'"
+                    ["description"] = "Action to perform: run_script",
+                    ["enum"] = new[] { "run_script" }
                 },
                 ["code"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "Code to execute (for run_script action)"
+                    ["description"] = "C# code to compile and execute"
                 },
                 ["timeout"] = new Dictionary<string, object>
                 {
                     ["type"] = "integer",
-                    ["description"] = "Execution timeout in seconds (for run_script action), default 30"
-                },
-                ["stdin"] = new Dictionary<string, object>
-                {
-                    ["type"] = "string",
-                    ["description"] = "Standard input content (for run_script action)"
-                },
-                ["package"] = new Dictionary<string, object>
-                {
-                    ["type"] = "string",
-                    ["description"] = "Package name to install (for install_package action)"
-                },
-                ["version"] = new Dictionary<string, object>
-                {
-                    ["type"] = "string",
-                    ["description"] = "Package version to install (for install_package action)"
+                    ["description"] = "Execution timeout in seconds, default 30"
                 }
             },
-            ["required"] = new[] { "action" }
+            ["required"] = new[] { "action", "code" }
         };
     }
 
@@ -100,28 +88,19 @@ public class ExecuteCodeTool : ITool
         return action switch
         {
             "run_script" => ExecuteRunScript(callerId, parameters),
-            "list_languages" => ExecuteListLanguages(callerId, parameters),
-            "install_package" => ExecuteInstallPackage(callerId, parameters),
             _ => ToolResult.Failed($"Unknown action: {action}")
         };
     }
 
     private ToolResult ExecuteRunScript(Guid callerId, Dictionary<string, object> parameters)
     {
-        if (!parameters.TryGetValue("language", out object? langObj) || string.IsNullOrWhiteSpace(langObj?.ToString()))
-        {
-            return ToolResult.Failed("Missing 'language' parameter for run_script action");
-        }
-
         if (!parameters.TryGetValue("code", out object? codeObj) || string.IsNullOrWhiteSpace(codeObj?.ToString()))
         {
             return ToolResult.Failed("Missing 'code' parameter for run_script action");
         }
 
-        string language = langObj.ToString()!.ToLowerInvariant();
         string code = codeObj.ToString()!;
         int timeout = 30;
-        string? stdin = null;
 
         if (parameters.TryGetValue("timeout", out object? timeoutObj) && timeoutObj != null)
         {
@@ -131,21 +110,9 @@ public class ExecuteCodeTool : ITool
             }
         }
 
-        if (parameters.TryGetValue("stdin", out object? stdinObj) && stdinObj != null)
-        {
-            stdin = stdinObj.ToString();
-        }
-
-        // Get the interpreter path for the specified language
-        string? interpreterPath = GetInterpreterPath(language);
-        if (string.IsNullOrEmpty(interpreterPath))
-        {
-            return ToolResult.Failed($"Language '{language}' is not supported or interpreter not found");
-        }
-
         try
         {
-            return RunCodeWithInterpreter(interpreterPath, language, code, stdin, timeout);
+            return CompileAndExecuteCode(code, timeout);
         }
         catch (Exception ex)
         {
@@ -153,325 +120,98 @@ public class ExecuteCodeTool : ITool
         }
     }
 
-    private ToolResult ExecuteListLanguages(Guid callerId, Dictionary<string, object> parameters)
+    private ToolResult CompileAndExecuteCode(string code, int timeoutSeconds)
     {
-        var supportedLanguages = new Dictionary<string, string>();
+        // Wrap the code in a class that can be compiled
+        string wrappedCode = WrapCodeInClass(code);
 
-        // Check which interpreters are available on the system
-        var interpreters = new Dictionary<string, string[]>
-        {
-            ["python"] = new[] { "python", "python3" },
-            ["javascript"] = new[] { "node", "nodejs" },
-            ["bash"] = new[] { "bash", "sh" },
-            ["powershell"] = new[] { "powershell", "pwsh" },
-            ["ruby"] = new[] { "ruby" },
-            ["perl"] = new[] { "perl" },
-            ["php"] = new[] { "php" },
-            ["java"] = new[] { "java" }
-        };
+        // Compile the code with security scanning
+        CompilationResult compileResult = _compilationExecutor.Compile<object>(wrappedCode, "ScriptExecutor");
 
-        foreach (var kvp in interpreters)
+        if (!compileResult.Success)
         {
-            foreach (var cmd in kvp.Value)
+            var errorMessages = new StringBuilder("Compilation failed:\n");
+            
+            // Add security scan violations if any
+            if (compileResult.SecurityResult != null && !compileResult.SecurityResult.Passed)
             {
-                if (IsCommandAvailable(cmd))
+                errorMessages.AppendLine("Security violations:");
+                foreach (var violation in compileResult.SecurityResult.Violations)
                 {
-                    string version = GetCommandVersion(cmd);
-                    supportedLanguages[kvp.Key] = $"{cmd} ({version})";
-                    break;
+                    errorMessages.AppendLine($"  - {violation}");
                 }
             }
+
+            // Add compilation errors
+            if (compileResult.Errors.Count > 0)
+            {
+                errorMessages.AppendLine("\nCompilation errors:");
+                foreach (var error in compileResult.Errors)
+                {
+                    errorMessages.AppendLine($"  - {error}");
+                }
+            }
+
+            return ToolResult.Failed(errorMessages.ToString().TrimEnd());
         }
 
-        if (supportedLanguages.Count == 0)
-        {
-            return ToolResult.Successful("No supported programming language interpreters found on this system.");
-        }
-
-        var result = new StringBuilder("Supported programming languages:\n");
-        foreach (var kvp in supportedLanguages)
-        {
-            result.AppendLine($"- {kvp.Key}: {kvp.Value}");
-        }
-
-        return ToolResult.Successful(result.ToString().TrimEnd());
-    }
-
-    private ToolResult ExecuteInstallPackage(Guid callerId, Dictionary<string, object> parameters)
-    {
-        if (!parameters.TryGetValue("language", out object? langObj) || string.IsNullOrWhiteSpace(langObj?.ToString()))
-        {
-            return ToolResult.Failed("Missing 'language' parameter for install_package action");
-        }
-
-        if (!parameters.TryGetValue("package", out object? packageObj) || string.IsNullOrWhiteSpace(packageObj?.ToString()))
-        {
-            return ToolResult.Failed("Missing 'package' parameter for install_package action");
-        }
-
-        string language = langObj.ToString()!.ToLowerInvariant();
-        string package = packageObj.ToString()!;
-        string? version = null;
-
-        if (parameters.TryGetValue("version", out object? versionObj) && versionObj != null)
-        {
-            version = versionObj.ToString();
-        }
-
-        // Get package manager command based on language
-        string? packageManagerCmd = GetPackageManagerCommand(language);
-        if (string.IsNullOrEmpty(packageManagerCmd))
-        {
-            return ToolResult.Failed($"Package installation is not supported for language '{language}'");
-        }
-
-        string packageSpec = string.IsNullOrEmpty(version) ? package : $"{package}=={version}";
-        string fullCommand = $"{packageManagerCmd} {packageSpec}";
-
+        // Execute the compiled code
         try
         {
-            return RunCommandWithTimeout(fullCommand, 60); // 60 seconds timeout for package installation
+            object? instance = CompilationCore.CreateInstance(compileResult);
+            if (instance == null)
+            {
+                return ToolResult.Failed("Failed to create instance of compiled code");
+            }
+
+            // Find and execute the Execute method
+            MethodInfo? executeMethod = instance.GetType().GetMethod("Execute");
+            if (executeMethod == null)
+            {
+                return ToolResult.Failed("Compiled code does not have an Execute method");
+            }
+
+            // Execute with timeout
+            using var cancellationTokenSource = new System.Threading.CancellationTokenSource();
+            cancellationTokenSource.CancelAfter(timeoutSeconds * 1000);
+
+            var task = System.Threading.Tasks.Task.Run(() => executeMethod.Invoke(instance, null));
+            
+            if (task.Wait(timeoutSeconds * 1000))
+            {
+                var result = task.Result;
+                string output = result?.ToString() ?? "(no output)";
+                return ToolResult.Successful($"Execution completed successfully:\n{output}");
+            }
+            else
+            {
+                return ToolResult.Failed($"Code execution timed out after {timeoutSeconds} seconds");
+            }
+        }
+        catch (System.Reflection.TargetInvocationException ex)
+        {
+            return ToolResult.Failed($"Runtime error: {ex.InnerException?.Message ?? ex.Message}");
         }
         catch (Exception ex)
         {
-            return ToolResult.Failed($"Package installation failed: {ex.Message}");
+            return ToolResult.Failed($"Execution error: {ex.Message}");
         }
     }
 
-    private ToolResult RunCodeWithInterpreter(string interpreterPath, string language, string code, string? stdin, int timeoutSeconds)
+    private string WrapCodeInClass(string code)
     {
-        // Create a temporary file with the code
-        string tempFile = Path.Combine(Path.GetTempPath(), $"siliconlife_{Guid.NewGuid()}.{GetFileExtension(language)}");
-        File.WriteAllText(tempFile, code);
+        return @"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-        try
-        {
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = interpreterPath,
-                Arguments = $"\"{tempFile}\"",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                RedirectStandardInput = !string.IsNullOrEmpty(stdin),
-                CreateNoWindow = true,
-                WorkingDirectory = Directory.GetCurrentDirectory()
-            };
-
-            // Set UTF-8 encoding for output
-            startInfo.StandardOutputEncoding = Encoding.UTF8;
-            startInfo.StandardErrorEncoding = Encoding.UTF8;
-
-            using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Failed to start process");
-
-            // Write stdin if provided
-            if (!string.IsNullOrEmpty(stdin))
-            {
-                process.StandardInput.Write(stdin);
-                process.StandardInput.Close();
-            }
-
-            // Wait for process to complete with timeout
-            bool exited = process.WaitForExit(timeoutSeconds * 1000);
-            if (!exited)
-            {
-                process.Kill();
-                return ToolResult.Failed($"Code execution timed out after {timeoutSeconds} seconds");
-            }
-
-            string output = process.StandardOutput.ReadToEnd();
-            string error = process.StandardError.ReadToEnd();
-            int exitCode = process.ExitCode;
-
-            var result = new StringBuilder();
-            if (!string.IsNullOrEmpty(output))
-            {
-                result.AppendLine("STDOUT:");
-                result.AppendLine(output.TrimEnd());
-            }
-
-            if (!string.IsNullOrEmpty(error))
-            {
-                result.AppendLine("STDERR:");
-                result.AppendLine(error.TrimEnd());
-            }
-
-            result.AppendLine($"Exit code: {exitCode}");
-
-            if (exitCode != 0 && string.IsNullOrEmpty(error))
-            {
-                result.AppendLine("Execution failed with non-zero exit code");
-            }
-
-            return ToolResult.Successful(result.ToString().TrimEnd());
-        }
-        finally
-        {
-            // Clean up temporary file
-            if (File.Exists(tempFile))
-            {
-                try { File.Delete(tempFile); } catch { }
-            }
-        }
+public class ScriptExecutor
+{
+    public string Execute()
+    {
+" + code + @"
     }
-
-    private ToolResult RunCommandWithTimeout(string command, int timeoutSeconds)
-    {
-        var startInfo = new ProcessStartInfo
-        {
-            FileName = Environment.OSVersion.Platform == PlatformID.Win32NT ? "cmd.exe" : "/bin/bash",
-            Arguments = Environment.OSVersion.Platform == PlatformID.Win32NT ? $"/c \"{command}\"" : $"-c \"{command}\"",
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true,
-            WorkingDirectory = Directory.GetCurrentDirectory()
-        };
-
-        startInfo.StandardOutputEncoding = Encoding.UTF8;
-        startInfo.StandardErrorEncoding = Encoding.UTF8;
-
-        using var process = Process.Start(startInfo) ?? throw new InvalidOperationException("Failed to start process");
-
-        bool exited = process.WaitForExit(timeoutSeconds * 1000);
-        if (!exited)
-        {
-            process.Kill();
-            return ToolResult.Failed($"Command execution timed out after {timeoutSeconds} seconds");
-        }
-
-        string output = process.StandardOutput.ReadToEnd();
-        string error = process.StandardError.ReadToEnd();
-        int exitCode = process.ExitCode;
-
-        var result = new StringBuilder();
-        if (!string.IsNullOrEmpty(output))
-        {
-            result.AppendLine("STDOUT:");
-            result.AppendLine(output.TrimEnd());
-        }
-
-        if (!string.IsNullOrEmpty(error))
-        {
-            result.AppendLine("STDERR:");
-            result.AppendLine(error.TrimEnd());
-        }
-
-        result.AppendLine($"Exit code: {exitCode}");
-
-        return ToolResult.Successful(result.ToString().TrimEnd());
-    }
-
-    private string? GetInterpreterPath(string language)
-    {
-        return language.ToLowerInvariant() switch
-        {
-            "python" => FindCommandPath(new[] { "python", "python3" }),
-            "javascript" or "js" or "node" => FindCommandPath(new[] { "node", "nodejs" }),
-            "bash" => FindCommandPath(new[] { "bash", "sh" }),
-            "powershell" or "ps" or "ps1" => FindCommandPath(new[] { "powershell", "pwsh" }),
-            "ruby" => FindCommandPath(new[] { "ruby" }),
-            "perl" => FindCommandPath(new[] { "perl" }),
-            "php" => FindCommandPath(new[] { "php" }),
-            "java" => FindCommandPath(new[] { "java" }),
-            _ => null
-        };
-    }
-
-    private string? GetPackageManagerCommand(string language)
-    {
-        return language.ToLowerInvariant() switch
-        {
-            "python" => IsCommandAvailable("pip") ? "pip install" : (IsCommandAvailable("pip3") ? "pip3 install" : null),
-            "javascript" or "js" or "node" => IsCommandAvailable("npm") ? "npm install" : (IsCommandAvailable("yarn") ? "yarn add" : null),
-            "ruby" => IsCommandAvailable("gem") ? "gem install" : null,
-            "php" => IsCommandAvailable("composer") ? "composer require" : null,
-            _ => null
-        };
-    }
-
-    private string GetFileExtension(string language)
-    {
-        return language.ToLowerInvariant() switch
-        {
-            "python" => "py",
-            "javascript" or "js" or "node" => "js",
-            "bash" => "sh",
-            "powershell" or "ps" or "ps1" => "ps1",
-            "ruby" => "rb",
-            "perl" => "pl",
-            "php" => "php",
-            "java" => "java",
-            _ => "txt"
-        };
-    }
-
-    private string? FindCommandPath(string[] commands)
-    {
-        foreach (var cmd in commands)
-        {
-            if (IsCommandAvailable(cmd))
-            {
-                return cmd;
-            }
-        }
-        return null;
-    }
-
-    private bool IsCommandAvailable(string command)
-    {
-        try
-        {
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = Environment.OSVersion.Platform == PlatformID.Win32NT ? "where" : "which",
-                Arguments = command,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
-
-            using var process = Process.Start(startInfo);
-            process?.WaitForExit(5000);
-            return process?.ExitCode == 0;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    private string GetCommandVersion(string command)
-    {
-        try
-        {
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = command,
-                Arguments = "--version",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
-
-            using var process = Process.Start(startInfo);
-            if (process != null)
-            {
-                process.WaitForExit(5000);
-                string output = process.StandardOutput.ReadToEnd().Trim();
-                if (string.IsNullOrEmpty(output))
-                {
-                    output = process.StandardError.ReadToEnd().Trim();
-                }
-                return string.IsNullOrEmpty(output) ? "unknown version" : output;
-            }
-        }
-        catch
-        {
-            // Ignore errors
-        }
-        return "unknown version";
+}";
     }
 }

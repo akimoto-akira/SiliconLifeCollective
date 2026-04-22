@@ -71,10 +71,24 @@
 - `188c6f8` - 註冊任務列表API路由並添加空狀態顯示
   - 任務列表API路由註冊
   - 空狀態UI改進
+- 爲 PermissionManager 添加 `EvaluatePermission` API
+  - 唯讀的權限預評估，不觸發使用者提示
+  - 返回三態結果：Allowed、Denied 或 AskUser
+  - 評估鏈：FrequencyCache → Callback → CuratorStatus → GlobalACL
 
 ### 變更
 - `4305769` - 添加 .gitattributes 用於行尾管理
   - 跨平臺兼容性的行尾配置
+- 重構 PermissionTool 使用真實權限評估
+  - 移除無功能的 `grant` 和 `revoke` 動作
+  - `query_permission` 現在使用 `EvaluatePermission` API，參數爲 `permission_type` 和 `resource`
+  - 返回三態結果（ALLOWED、DENIED、ASK_USER）及詳細上下文
+- 重構 ExecuteCodeTool 爲純編譯執行
+  - 移除解釋器程式碼執行（Python、Node.js 等）
+  - 移除套件安裝功能
+  - 簡化爲僅支援 C# 編譯加安全掃描
+  - 改進編譯錯誤和安全違規報告
+  - 修復 PowerShell 版本檢測，使用 `-Command` 替代 `--version`
 
 ### 修復
 - `c6b518b` - 修復定時器訊息傳遞和聊天訊息儲存

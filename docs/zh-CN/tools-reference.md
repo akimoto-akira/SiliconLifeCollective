@@ -178,11 +178,64 @@
 }
 ```
 
-### 12. 主理人工具
+### 12. 权限工具
 
-**名称**：`curator_*`
+**名称**：`permission`
 
-**描述**：仅限管理员使用的系统管理工具。
+**描述**：管理硅基生命体的权限。仅限主理人。
+
+**动作**：`query_permission`、`manage_acl`
+
+**参数**（query_permission）：
+```json
+{
+  "action": "query_permission",
+  "being_id": "being-uuid",
+  "permission_type": "network",
+  "resource": "https://api.example.com"
+}
+```
+
+**权限类型**：`network`、`command`、`filesystem`、`function`、`data`
+
+**返回**：三态结果（`ALLOWED`、`DENIED`、`ASK_USER`），包含主理人状态和频率缓存信息。
+
+**参数**（manage_acl）：
+```json
+{
+  "action": "manage_acl",
+  "acl_action": "add_rule",
+  "permission_type": "filesystem",
+  "resource_prefix": "/data/",
+  "acl_result": "allow",
+  "description": "允许访问数据目录"
+}
+```
+
+**权限**：需要 `IsCurator` 标志。
+
+### 13. 代码执行工具
+
+**名称**：`execute_code`
+
+**描述**：编译并执行带有安全扫描的 C# 代码。仅限主理人。
+
+**动作**：`run_script`
+
+**参数**：
+```json
+{
+  "action": "run_script",
+  "code": "return DateTime.Now.ToString();",
+  "timeout": 30
+}
+```
+
+**详细说明**：
+- 代码被包装在 `ScriptExecutor` 类中的 `Execute()` 方法中
+- 编译前进行安全扫描
+- 支持可配置的超时时间（默认：30 秒）
+- 失败时返回编译错误和安全违规信息
 
 **权限**：需要 `IsCurator` 标志。
 

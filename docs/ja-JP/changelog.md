@@ -71,10 +71,24 @@
 - `188c6f8` - タスクリストAPIルートの登録と空状態の表示追加
   - タスクリストAPIルート登録
   - 空状態UIの改善
+- PermissionManager に `EvaluatePermission` API を追加
+  - ユーザープロンプトをトリガーせずに権限の読み取り専用事前評価
+  - 三状態結果を返却：Allowed、Denied または AskUser
+  - 評価チェーン：FrequencyCache → Callback → CuratorStatus → GlobalACL
 
 ### 変更
 - `4305769` - 行末管理のための .gitattributes を追加
   - クロスプラットフォーム互換性のため行末設定
+- PermissionTool を実際の権限評価を使用するようリファクタリング
+  - 機能しない `grant` と `revoke` アクションを削除
+  - `query_permission` が `EvaluatePermission` API を使用、パラメータは `permission_type` と `resource`
+  - 三状態結果（ALLOWED、DENIED、ASK_USER）と詳細なコンテキストを返却
+- ExecuteCodeTool をコンパイル専用実行にリファクタリング
+  - インタープリターベースのコード実行を削除（Python、Node.js 等）
+  - パッケージインストール機能を削除
+  - C# コンパイルとセキュリティスキャンのみに簡素化
+  - コンパイルエラーとセキュリティ違反報告を改善
+  - PowerShell バージョン検出を修正、`--version` の代わりに `-Command` を使用
 
 ### 修正
 - `c6b518b` - タイマーメッセージ配信とチャットメッセージストアの修正

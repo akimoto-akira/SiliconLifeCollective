@@ -118,6 +118,33 @@ public class ConsolePermissionAskHandler : IPermissionAskHandler
 }
 ```
 
+## プログラマティック権限評価
+
+### EvaluatePermission API
+
+`PermissionManager.EvaluatePermission()` メソッドは、ユーザープロンプトをトリガーせずに権限の読み取り専用事前評価を提供します。`PermissionTool` はこのメソッドを使用して、AI が操作を試みる前に権限状態を確認できます。
+
+```csharp
+public PermissionResult EvaluatePermission(
+    Guid callerId,
+    PermissionType permissionType,
+    string resource)
+```
+
+**戻り値**：三状態 `PermissionResult`：
+- `Allowed` - 操作が許可されている
+- `Denied` - 操作がブロックされている
+- `AskUser` - 実行時にユーザー確認が必要
+
+**評価順序**：
+1. **頻度キャッシュ** - キャッシュされたユーザー決定を確認
+2. **IPermissionCallback** - カスタムコールバック評価
+3. **キュレーターステータス** - キュレーターの場合、`AskUser` を返却（確認が必要）
+4. **グローバル ACL** - アクセス制御ルールを確認
+5. **デフォルト** - 一致するルールがない場合は拒否
+
+> **注意**：完全な権限チェーンとは異なり、`EvaluatePermission` は `IPermissionAskHandler` を呼び出し**ません**。実行時の結果が*どうなるか*を報告するのみです。
+
 ---
 
 ## 権限検証フロー

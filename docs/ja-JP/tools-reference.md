@@ -157,6 +157,75 @@ A: calendar ツールを呼び出して変換
 
 ---
 
+### 8. PermissionTool
+
+権限の管理と確認。
+
+**名前**：`permission`
+
+**説明**：シリコンビーイングの権限を管理。キュレーター専用。
+
+**アクション**：`query_permission`、`manage_acl`
+
+**パラメータ**（query_permission）：
+```json
+{
+  "action": "query_permission",
+  "being_id": "being-uuid",
+  "permission_type": "network",
+  "resource": "https://api.example.com"
+}
+```
+
+**権限タイプ**：`network`、`command`、`filesystem`、`function`、`data`
+
+**戻り値**：三状態結果（`ALLOWED`、`DENIED`、`ASK_USER`）、キュレーターステータスと頻度キャッシュ情報付き。
+
+**パラメータ**（manage_acl）：
+```json
+{
+  "action": "manage_acl",
+  "acl_action": "add_rule",
+  "permission_type": "filesystem",
+  "resource_prefix": "/data/",
+  "acl_result": "allow",
+  "description": "データディレクトリへのアクセスを許可"
+}
+```
+
+**権限**：`IsCurator` フラグが必要。
+
+---
+
+### 9. ExecuteCodeTool
+
+セキュリティスキャン付き C# コードのコンパイルと実行。
+
+**名前**：`execute_code`
+
+**説明**：セキュリティスキャン付きで C# コードをコンパイルして実行。キュレーター専用。
+
+**アクション**：`run_script`
+
+**パラメータ**：
+```json
+{
+  "action": "run_script",
+  "code": "return DateTime.Now.ToString();",
+  "timeout": 30
+}
+```
+
+**詳細**：
+- コードは `ScriptExecutor` クラスの `Execute()` メソッドにラップされる
+- コンパイル前にセキュリティスキャンを実行
+- 設定可能なタイムアウトをサポート（デフォルト：30 秒）
+- 失敗時にコンパイルエラーとセキュリティ違反情報を返却
+
+**権限**：`IsCurator` フラグが必要。
+
+---
+
 ## カスタムツールの作成
 
 ### ステップ 1: ITool を実装

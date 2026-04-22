@@ -178,11 +178,64 @@ The tool system allows AI agents to interact with the external world through a s
 }
 ```
 
-### 12. Curator Tools
+### 12. Permission Tool
 
-**Name**: `curator_*`
+**Name**: `permission`
 
-**Description**: Manager-only tools for system administration.
+**Description**: Manage permissions for silicon beings. Curator-only.
+
+**Actions**: `query_permission`, `manage_acl`
+
+**Parameters** (query_permission):
+```json
+{
+  "action": "query_permission",
+  "being_id": "being-uuid",
+  "permission_type": "network",
+  "resource": "https://api.example.com"
+}
+```
+
+**Permission Types**: `network`, `command`, `filesystem`, `function`, `data`
+
+**Returns**: Three-state result (`ALLOWED`, `DENIED`, `ASK_USER`) with curator status and frequency cache info.
+
+**Parameters** (manage_acl):
+```json
+{
+  "action": "manage_acl",
+  "acl_action": "add_rule",
+  "permission_type": "filesystem",
+  "resource_prefix": "/data/",
+  "acl_result": "allow",
+  "description": "Allow data directory access"
+}
+```
+
+**Permission**: Requires `IsCurator` flag.
+
+### 13. Execute Code Tool
+
+**Name**: `execute_code`
+
+**Description**: Compile and execute C# code with security scanning. Curator-only.
+
+**Actions**: `run_script`
+
+**Parameters**:
+```json
+{
+  "action": "run_script",
+  "code": "return DateTime.Now.ToString();",
+  "timeout": 30
+}
+```
+
+**Details**:
+- Code is wrapped in a `ScriptExecutor` class with an `Execute()` method
+- Security scanning is performed before compilation
+- Supports configurable timeout (default: 30 seconds)
+- Returns compilation errors and security violations on failure
 
 **Permission**: Requires `IsCurator` flag.
 

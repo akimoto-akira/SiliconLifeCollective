@@ -178,11 +178,64 @@
 }
 ```
 
-### 12. 館工具
+### 12. 權限工具
 
-**名称**：`curator_*`
+**名称**：`permission`
 
-**描述**：僅限管理員使用的系統管理工具。
+**描述**：管理矽基生命體的權限。僅限館長。
+
+**動作**：`query_permission`、`manage_acl`
+
+**參數**（query_permission）：
+```json
+{
+  "action": "query_permission",
+  "being_id": "being-uuid",
+  "permission_type": "network",
+  "resource": "https://api.example.com"
+}
+```
+
+**權限類型**：`network`、`command`、`filesystem`、`function`、`data`
+
+**返回**：三態結果（`ALLOWED`、`DENIED`、`ASK_USER`），包含館長狀態和頻率快取資訊。
+
+**參數**（manage_acl）：
+```json
+{
+  "action": "manage_acl",
+  "acl_action": "add_rule",
+  "permission_type": "filesystem",
+  "resource_prefix": "/data/",
+  "acl_result": "allow",
+  "description": "允許訪問數據目錄"
+}
+```
+
+**權限**：需要 `IsCurator` 标志。
+
+### 13. 程式碼執行工具
+
+**名称**：`execute_code`
+
+**描述**：編譯並執行帶有安全掃描的 C# 程式碼。僅限館長。
+
+**動作**：`run_script`
+
+**參數**：
+```json
+{
+  "action": "run_script",
+  "code": "return DateTime.Now.ToString();",
+  "timeout": 30
+}
+```
+
+**詳細說明**：
+- 程式碼被包裝在 `ScriptExecutor` 類中的 `Execute()` 方法中
+- 編譯前進行安全掃描
+- 支援可配置的逾時時間（預設：30 秒）
+- 失敗時返回編譯錯誤和安全違規資訊
 
 **權限**：需要 `IsCurator` 标志。
 

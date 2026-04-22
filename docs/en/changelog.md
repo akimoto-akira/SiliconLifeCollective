@@ -71,10 +71,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `188c6f8` - Register task list API route and add empty state display
   - Task list API route registration
   - Empty state UI improvement
+- Add `EvaluatePermission` API to PermissionManager
+  - Read-only pre-evaluation of permissions without triggering user prompts
+  - Returns three-state result: Allowed, Denied, or AskUser
+  - Evaluation chain: FrequencyCache → Callback → CuratorStatus → GlobalACL
 
 ### Changed
 - `4305769` - Add .gitattributes for line ending management
   - Line ending configuration for cross-platform compatibility
+- Refactor PermissionTool to use real permission evaluation
+  - Removed non-functional `grant` and `revoke` actions
+  - `query_permission` now uses `EvaluatePermission` API with `permission_type` and `resource` parameters
+  - Returns three-state results (ALLOWED, DENIED, ASK_USER) with detailed context
+- Refactor ExecuteCodeTool to compilation-only execution
+  - Removed interpreter-based code execution (Python, Node.js, etc.)
+  - Removed package installation functionality
+  - Simplified to C# compilation with security scanning only
+  - Improved compilation error and security violation reporting
+  - Fixed PowerShell version detection using `-Command` instead of `--version`
 
 ### Fixed
 - `c6b518b` - Fix timer message delivery and chat message storage
