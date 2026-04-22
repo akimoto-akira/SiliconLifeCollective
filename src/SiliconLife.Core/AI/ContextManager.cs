@@ -23,8 +23,8 @@ namespace SiliconLife.Collective;
 /// Acts as the "brain" of a silicon being: perceives input (loads history/pending),
 /// thinks (calls AI), acts (executes tools), speaks (delivers output),
 /// and remembers (persists to ChatSystem).
-/// Supports Tool Call loop: AI returns tool_calls â†?execute tools â†?
-/// feed results back â†?AI continues â†?until plain text response.
+/// Supports Tool Call loop: AI returns tool_calls ï¿½?execute tools ï¿½?
+/// feed results back ï¿½?AI continues ï¿½?until plain text response.
 /// </summary>
 public class ContextManager
 {
@@ -42,7 +42,7 @@ public class ContextManager
     /// <summary>
     /// Gets whether this brain session has work to do.
     /// True if there are pending user messages or an unfinished tool call loop
-    /// (detected from chat history â€?last message is a Tool result).
+    /// (detected from chat history ï¿½?last message is a Tool result).
     /// </summary>
     public bool HasWork => _needsContinuation || _hasNewPendingMessages;
 
@@ -164,7 +164,7 @@ public class ContextManager
                 continue;
             }
 
-            // Context already loaded by LoadHistoryMessages â€?just track
+            // Context already loaded by LoadHistoryMessages ï¿½?just track
             _contextMessageIds.Add(msg.Id);
             _hasNewPendingMessages = true;
             _pendingMarkAsReadIds.Add(msg.Id);
@@ -272,7 +272,15 @@ public class ContextManager
             });
         }
 
+        // æ·»åŠ å…¬å…±æç¤ºè¯ï¼ˆæ‰€æœ‰ç¡…åŸºäººå…±äº«çš„è¡Œä¸ºå‡†åˆ™ï¼‰
         Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+        LocalizationBase loc = LocalizationManager.Instance.GetLocalization(language);
+        request.Messages.Add(new ChatMessage
+        {
+            Role = MessageRole.System,
+            Content = loc.CommonSystemPrompt,
+        });
+
         request.Messages.Add(new ChatMessage
         {
             Role = MessageRole.System,
@@ -565,7 +573,7 @@ public class ContextManager
 
         if (response.Success && response.HasToolCalls)
         {
-            // Tool calls executed, results persisted â€?yield time slice
+            // Tool calls executed, results persisted ï¿½?yield time slice
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
@@ -590,7 +598,7 @@ public class ContextManager
         }
         else if (!response.Success)
         {
-            // AI request failed â€?notify frontend and keep messages unread for retry
+            // AI request failed ï¿½?notify frontend and keep messages unread for retry
             string errorMsg = response.ErrorMessage ?? "Unknown AI error";
             DeliverOutput($"[Error] AI request failed: {errorMsg}");
             _logger.Error(_being.Id, "ThinkOnChat failed: being={0}, error={1}", _being.Name, errorMsg);
@@ -653,7 +661,7 @@ public class ContextManager
 
         if (response.Success && response.HasToolCalls)
         {
-            // Tool calls executed, results persisted â€?yield time slice
+            // Tool calls executed, results persisted ï¿½?yield time slice
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
@@ -678,7 +686,7 @@ public class ContextManager
         }
         else if (!response.Success)
         {
-            // AI request failed â€?notify frontend and keep messages unread for retry
+            // AI request failed ï¿½?notify frontend and keep messages unread for retry
             string errorMsg = response.ErrorMessage ?? "Unknown AI error";
             DeliverOutput($"[Error] AI request failed: {errorMsg}");
             _logger.Error(_being.Id, "ThinkOnChatStreamAsync failed: being={0}, error={1}", _being.Name, errorMsg);
@@ -701,7 +709,7 @@ public class ContextManager
 
         if (response.Success && response.HasToolCalls)
         {
-            // Tool calls executed, results persisted â€?yield time slice
+            // Tool calls executed, results persisted ï¿½?yield time slice
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
@@ -738,7 +746,7 @@ public class ContextManager
 
         if (response.Success && response.HasToolCalls)
         {
-            // Tool calls executed, results persisted â€?yield time slice
+            // Tool calls executed, results persisted ï¿½?yield time slice
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
@@ -1056,7 +1064,7 @@ public class ContextManager
     {
         _logger.Debug(_being.Id, "Delivering timer output for being {0}, length={1}", _being.Name, content.Length);
 
-        // Determine the target: curator â†?user, non-curator â†?curator
+        // Determine the target: curator ï¿½?user, non-curator ï¿½?curator
         Guid targetId = Guid.Empty;
         if (_being.IsCurator)
         {
@@ -1081,7 +1089,7 @@ public class ContextManager
         SessionBase? session = chatSystem?.GetOrCreateSession(_being.Id, targetId);
         if (session == null)
         {
-            _logger.Warn(_being.Id, "DeliverTimerOutput: failed to get session for being {0} â†?target {1}", _being.Name, targetId);
+            _logger.Warn(_being.Id, "DeliverTimerOutput: failed to get session for being {0} ï¿½?target {1}", _being.Name, targetId);
             return;
         }
 

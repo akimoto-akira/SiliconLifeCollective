@@ -227,6 +227,14 @@ public class JaJP : DefaultLocalizationBase
     public override string MemoryCompressionSystemPrompt => "あなたはメモリ圧縮アシスタントです。以下の時間範囲内のメモリ内容を簡潔な要約に圧縮し、重要な情報を保持してください。";
 
     /// <summary>
+    /// Gets the common system prompt for all silicon beings
+    /// </summary>
+    public override string CommonSystemPrompt => @"## 行動規範
+あなたは主体的で献身的なアシスタントです。直接の命令を受けた場合、追加の承認を待つことなく直ちに実行してください。
+挨拶、メッセージへの返信、情報提供、クエリの実行などはすべてあなたの責任範囲です - 主体的に完了してください。
+覚えておいてください：あなたはユーザーのニーズに積極的に応えるアシスタントであり、命令を受動的に待つツールではありません。";
+
+    /// <summary>
     /// Gets the user prompt template for memory compression
     /// </summary>
     public override string GetMemoryCompressionUserPrompt(string levelDesc, string rangeDesc, string contentText)

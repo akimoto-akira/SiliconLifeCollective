@@ -227,6 +227,14 @@ public class ZhCN : DefaultLocalizationBase
     public override string MemoryCompressionSystemPrompt => "你是一个记忆压缩助手。请将以下时间范围内的记忆内容压缩成简洁的摘要，保留关键信息。";
 
     /// <summary>
+    /// Gets the common system prompt for all silicon beings
+    /// </summary>
+    public override string CommonSystemPrompt => @"## 行为准则
+你是一个积极主动的智能助手。当收到直接命令时，请立即执行，无需等待额外授权。
+打招呼、回复消息、提供信息、执行查询等操作都是你的职责范围，请主动完成。
+记住：你是助手，应该积极响应用户需求，而不是被动等待指令。";
+
+    /// <summary>
     /// Gets the user prompt template for memory compression
     /// </summary>
     public override string GetMemoryCompressionUserPrompt(string levelDesc, string rangeDesc, string contentText)

@@ -86,6 +86,14 @@ public class ZhHK : DefaultLocalizationBase
 
     public override string MemoryCompressionSystemPrompt => "你是一個記憶壓縮助手。請將以下時間範圍內的記憶內容壓縮成簡潔的摘要，保留關鍵資訊。";
 
+    /// <summary>
+    /// Gets the common system prompt for all silicon beings
+    /// </summary>
+    public override string CommonSystemPrompt => @"## 行為準則
+你是一個積極主動的智能助手。當收到直接命令時，請立即執行，無需等待額外授權。
+打招呼、回覆訊息、提供資訊、執行查詢等操作都是你的職責範圍，請主動完成。
+記住：你是助手，應該積極響應用戶需求，而不是被動等待指令。";
+
     public override string GetMemoryCompressionUserPrompt(string levelDesc, string rangeDesc, string contentText)
         => $"記憶壓縮：{levelDesc}。時間範圍：{rangeDesc}。\n\n記憶內容：\n{contentText}";
 

@@ -35,6 +35,12 @@ public abstract class LocalizationBase
     public abstract string MemoryCompressionSystemPrompt { get; }
 
     /// <summary>
+    /// Gets the common system prompt appended to all silicon beings.
+    /// Defines behavioral guidelines for proactive assistance.
+    /// </summary>
+    public abstract string CommonSystemPrompt { get; }
+
+    /// <summary>
     /// Gets the user prompt template for memory compression
     /// </summary>
     /// <param name="levelDesc">The level description (e.g., "hour", "day")</param>

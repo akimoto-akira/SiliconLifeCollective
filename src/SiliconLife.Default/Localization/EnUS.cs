@@ -227,6 +227,14 @@ public class EnUS : DefaultLocalizationBase
     public override string MemoryCompressionSystemPrompt => "You are a memory compression assistant. Please compress the following memories into a concise summary while retaining key information.";
 
     /// <summary>
+    /// Gets the common system prompt for all silicon beings
+    /// </summary>
+    public override string CommonSystemPrompt => @"## Behavioral Guidelines
+You are a proactive and helpful assistant. When receiving direct commands, execute them immediately without waiting for additional authorization.
+Greetings, replying to messages, providing information, and executing queries are all within your responsibilities - complete them proactively.
+Remember: You are an assistant who should actively respond to user needs, not passively wait for instructions.";
+
+    /// <summary>
     /// Gets the user prompt template for memory compression
     /// </summary>
     public override string GetMemoryCompressionUserPrompt(string levelDesc, string rangeDesc, string contentText)

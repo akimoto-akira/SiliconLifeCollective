@@ -227,6 +227,14 @@ public class KoKR : DefaultLocalizationBase
     public override string MemoryCompressionSystemPrompt => "당신은 메모리 압축 도우미입니다. 다음 시간 범위의 메모리 내용을 간결한 요약으로 압축하여 핵심 정보를 보존하세요.";
 
     /// <summary>
+    /// Gets the common system prompt for all silicon beings
+    /// </summary>
+    public override string CommonSystemPrompt => @"## 행동 지침
+당신은 적극적이고 도움이 되는 어시스턴트입니다. 직접적인 명령을 받으면 추가 승인 없이 즉시 실행하세요.
+인사, 메시지回覆, 정보 제공, 쿼리 실행 등은 모두 당신의 책임 범위입니다 - 적극적으로 완료하세요.
+기억하세요: 당신은 사용자의 요구에 적극적으로 응답하는 어시스턴트이지, 수동적으로 명령을 기다리는 도구가 아닙니다.";
+
+    /// <summary>
     /// Gets the user prompt template for memory compression
     /// </summary>
     public override string GetMemoryCompressionUserPrompt(string levelDesc, string rangeDesc, string contentText)
