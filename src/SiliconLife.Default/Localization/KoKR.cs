@@ -479,6 +479,9 @@ public class KoKR : DefaultLocalizationBase
     public override string ChatNoConversationSelected => "대화를 선택하여 채팅 시작";
     public override string ChatMessageInputPlaceholder => "메시지를 입력하세요...";
     public override string ChatSendButton => "전송";
+    public override string ChatFileSourceDialogTitle => "파일 선택";
+    public override string ChatFileSourceServerFile => "서버 파일 선택";
+    public override string ChatFileSourceUploadLocal => "로컬 파일 업로드";
     public override string ChatUserDisplayName => "나";
     public override string ChatUserAvatarName => "나";
     public override string ChatDefaultBeingName => "AI";

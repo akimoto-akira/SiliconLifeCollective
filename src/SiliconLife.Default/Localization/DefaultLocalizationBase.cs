@@ -763,6 +763,21 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string ChatSendButton { get; }
 
     /// <summary>
+    /// Gets the title for the file source selection dialog
+    /// </summary>
+    public abstract string ChatFileSourceDialogTitle { get; }
+
+    /// <summary>
+    /// Gets the label for selecting server-side file
+    /// </summary>
+    public abstract string ChatFileSourceServerFile { get; }
+
+    /// <summary>
+    /// Gets the label for uploading a local file
+    /// </summary>
+    public abstract string ChatFileSourceUploadLocal { get; }
+
+    /// <summary>
     /// Gets the display name for the user in chat messages
     /// </summary>
     public abstract string ChatUserDisplayName { get; }

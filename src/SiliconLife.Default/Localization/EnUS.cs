@@ -479,6 +479,9 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string ChatNoConversationSelected => "Select a conversation to start chatting";
     public override string ChatMessageInputPlaceholder => "Type a message...";
     public override string ChatSendButton => "Send";
+    public override string ChatFileSourceDialogTitle => "Select File Source";
+    public override string ChatFileSourceServerFile => "Select Server File";
+    public override string ChatFileSourceUploadLocal => "Upload Local File";
     public override string ChatUserDisplayName => "Me";
     public override string ChatUserAvatarName => "Me";
     public override string ChatDefaultBeingName => "AI";

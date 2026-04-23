@@ -479,6 +479,9 @@ public class JaJP : DefaultLocalizationBase
     public override string ChatNoConversationSelected => "会話を選択してチャットを開始";
     public override string ChatMessageInputPlaceholder => "メッセージを入力...";
     public override string ChatSendButton => "送信";
+    public override string ChatFileSourceDialogTitle => "ファイルの選択";
+    public override string ChatFileSourceServerFile => "サーバーファイルを選択";
+    public override string ChatFileSourceUploadLocal => "ローカルファイルをアップロード";
     public override string ChatUserDisplayName => "自分";
     public override string ChatUserAvatarName => "自分";
     public override string ChatDefaultBeingName => "AI";

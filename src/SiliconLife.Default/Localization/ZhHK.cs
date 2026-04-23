@@ -334,6 +334,9 @@ public class ZhHK : DefaultLocalizationBase
     public override string ChatNoConversationSelected => "選擇對話開始聊天";
     public override string ChatMessageInputPlaceholder => "輸入訊息...";
     public override string ChatSendButton => "傳送";
+    public override string ChatFileSourceDialogTitle => "選擇文件來源";
+    public override string ChatFileSourceServerFile => "選擇伺服器文件";
+    public override string ChatFileSourceUploadLocal => "上載本地文件";
     public override string ChatUserDisplayName => "我";
     public override string ChatUserAvatarName => "我";
     public override string ChatDefaultBeingName => "AI";
