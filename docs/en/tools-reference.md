@@ -239,6 +239,87 @@ The tool system allows AI agents to interact with the external world through a s
 
 **Permission**: Requires `IsCurator` flag.
 
+### 14. Database Tool
+
+**Name**: `database`
+
+**Description**: Structured database query and operations.
+
+**Actions**: `query`, `insert`, `update`, `delete`
+
+**Parameters** (query):
+```json
+{
+  "action": "query",
+  "table": "users",
+  "conditions": {"status": "active"},
+  "limit": 100
+}
+```
+
+**Permission**: Requires appropriate database access permissions.
+
+### 15. Log Tool
+
+**Name**: `log`
+
+**Description**: Operation history and conversation history queries.
+
+**Actions**: `query_logs`, `query_conversations`
+
+**Parameters** (query_logs):
+```json
+{
+  "action": "query_logs",
+  "being_id": "being-uuid",
+  "start_time": "2026-04-20T00:00:00Z",
+  "end_time": "2026-04-23T23:59:59Z",
+  "level": "info"
+}
+```
+
+**Parameters** (query_conversations):
+```json
+{
+  "action": "query_conversations",
+  "being_id": "being-uuid",
+  "session_id": "session-uuid",
+  "limit": 50
+}
+```
+
+**Features**:
+- Support filtering logs by silicon being
+- Support time range queries
+- Support log level filtering
+- Conversation history retrieval
+
+### Disk Tool Enhancements
+
+Disk tool now includes local search functionality (integrated from SearchTool):
+
+**New actions**: `search_files`, `search_content`
+
+**Parameters** (search_files):
+```json
+{
+  "action": "search_files",
+  "path": "/data",
+  "pattern": "*.json",
+  "recursive": true
+}
+```
+
+**Parameters** (search_content):
+```json
+{
+  "action": "search_content",
+  "path": "/data",
+  "query": "search term",
+  "filePattern": "*.md"
+}
+```
+
 ---
 
 ## Tool Call Flow

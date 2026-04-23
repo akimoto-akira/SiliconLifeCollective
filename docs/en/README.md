@@ -4,7 +4,7 @@
 
 A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Beings** self-evolve through Roslyn dynamic compilation.
 
-[English](README.md) | [中文文档](docs/zh-CN/README.md) | [繁體中文](docs/zh-HK/README.md) | [日本語](docs/ja-JP/README.md) | [한국어](docs/ko-KR/README.md)
+[English](README.md) | [中文文档](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Español](../es-ES/README.md)
 
 ## Features
 
@@ -22,17 +22,21 @@ A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Bei
 - **32 Calendar Systems** — Multi-calendar support including Gregorian, Chinese Lunar, Islamic, Hebrew, Japanese, Persian, Mayan, and more
 - **Minimal Dependencies** — Core library only depends on Microsoft.CodeAnalysis.CSharp for Roslyn dynamic compilation
 - **Zero Database Dependency** — File-based storage (JSON) with time-indexed queries via `ITimeStorage`
-- **Localization** — Comprehensive multi-language support with 18 language variants
+- **Localization** — Comprehensive multi-language support with 20 language variants
   - Chinese: zh-CN, zh-HK, zh-SG, zh-MO, zh-TW, zhMY (6 variants)
   - English: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variants)
+  - Spanish: es-ES, es-MX (2 variants)
   - Japanese: ja-JP
   - Korean: ko-KR
 - **Web UI** — Built-in HTTP server with SSE support, multiple skins, and comprehensive dashboard
   - **Skin System** — 4 built-in skins (Admin, Chat, Creative, Dev) with pluggable ISkin interface and auto-discovery
-  - **18 Controllers** — About, Audit, Being, Chat, CodeBrowser, CodeHover, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer
+  - **20+ Controllers** — About, Audit, Being, Chat, ChatHistory, CodeBrowser, CodeHover, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer
   - **Real-time Updates** — SSE (Server-Sent Events) for chat messages, being status, and system events
   - **HTML/CSS/JS Builders** — Server-side markup generation via `H`, `CssBuilder`, and `JsBuilder` (zero frontend framework dependency)
-  - **Localization** — Eighteen built-in language variants with LocalizationManager resolution
+  - **Localization** — Twenty built-in language variants with LocalizationManager resolution
+  - **Chat History View** — Complete Silicon Being chat history browsing with conversation list and message details
+  - **File Upload Support** — File source dialog and file upload functionality
+  - **Loading Indicators** — Loading state indicators for chat pages and auto-select curator session
 
 ## Tech Stack
 
@@ -78,7 +82,7 @@ SiliconLifeCollective.sln
 │       ├── IM/                            # WebUIProvider (Web UI as IM channel), IMPermissionAskHandler
 │       ├── Tools/                         # Built-in tools: Calendar, Chat, Config, Curator, Disk, DynamicCompile, Memory, Network, System, Task, Timer, TokenAudit
 │       ├── Config/                        # DefaultConfigData
-│       ├── Localization/                  # ZhCN, ZhHK, EnUS, JaJP, KoKR, DefaultLocalizationBase, EnOther (EnGB, EnCA, EnAU, EnIN, EnSG, EnZA, EnIE, EnNZ, EnMY), ZhOther (ZhSG, ZhMO, ZhTW, ZhMY)
+│       ├── Localization/                  # ZhCN, ZhHK, EnUS, JaJP, KoKR, EsES, EsMX, DefaultLocalizationBase, EnOther (EnGB, EnCA, EnAU, EnIN, EnSG, EnZA, EnIE, EnNZ, EnMY), ZhOther (ZhSG, ZhMO, ZhTW, ZhMY), EsOther (EsMX)
 │       ├── Logging/                       # ConsoleLoggerProvider, FileSystemLoggerProvider
 │       ├── Storage/                       # FileSystemStorage, FileSystemTimeStorage
 │       ├── Security/                      # DefaultPermissionCallback
@@ -162,7 +166,7 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] Phase 8: Long-term memory + Task + Timer
 - [x] Phase 9: CoreHost + multi-agent collaboration
 - [x] Phase 10: Web UI (HTTP + SSE, 18 controllers, 4 skins)
-- [x] Phase 10.5: Incremental enhancements (BroadcastChannel, TokenAudit, 32 calendars, tool enhancements, 18-language localization)
+- [x] Phase 10.5: Incremental enhancements (BroadcastChannel, TokenAudit, 32 calendars, tool enhancements, 20-language localization)
 - [ ] Phase 11: External IM integration (Feishu / WhatsApp / Telegram)
 - [ ] Phase 12: Knowledge graph, plugin system, and skills ecosystem
 

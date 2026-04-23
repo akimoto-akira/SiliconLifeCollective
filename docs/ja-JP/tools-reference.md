@@ -226,6 +226,89 @@ A: calendar ツールを呼び出して変換
 
 ---
 
+## データベースツール（DatabaseTool）
+
+**名前**: `database`
+
+**説明**: 構造化データベースのクエリと操作。
+
+**アクション**: `query`、`insert`、`update`、`delete`
+
+**パラメータ**（query）:
+```json
+{
+  "action": "query",
+  "table": "users",
+  "conditions": {"status": "active"},
+  "limit": 100
+}
+```
+
+**権限**: 適切なデータベースアクセス権限が必要。
+
+## ログツール（LogTool）
+
+**名前**: `log`
+
+**説明**: 操作履歴と会話履歴のクエリ。
+
+**アクション**: `query_logs`、`query_conversations`
+
+**パラメータ**（query_logs）:
+```json
+{
+  "action": "query_logs",
+  "being_id": "being-uuid",
+  "start_time": "2026-04-20T00:00:00Z",
+  "end_time": "2026-04-23T23:59:59Z",
+  "level": "info"
+}
+```
+
+**パラメータ**（query_conversations）:
+```json
+{
+  "action": "query_conversations",
+  "being_id": "being-uuid",
+  "session_id": "session-uuid",
+  "limit": 50
+}
+```
+
+**機能**:
+- シリコンビーイングによるログのフィルタリングをサポート
+- 時間範囲クエリをサポート
+- ログレベルフィルタリングをサポート
+- 会話履歴の取得
+
+## DiskTool の強化
+
+DiskTool にローカル検索機能が追加されました（SearchTool から統合）:
+
+**新しいアクション**: `search_files`、`search_content`
+
+**パラメータ**（search_files）:
+```json
+{
+  "action": "search_files",
+  "path": "/data",
+  "pattern": "*.json",
+  "recursive": true
+}
+```
+
+**パラメータ**（search_content）:
+```json
+{
+  "action": "search_content",
+  "path": "/data",
+  "query": "検索語",
+  "filePattern": "*.md"
+}
+```
+
+---
+
 ## カスタムツールの作成
 
 ### ステップ 1: ITool を実装

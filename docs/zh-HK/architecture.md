@@ -172,6 +172,49 @@
 | `PromptTokens` | `int?` | 提示词中的 token 数量（输入） |
 | `CompletionTokens` | `int?` | 补全中的 token 数量（输出） |
 | `TotalTokens` | `int?` | 使用的总 token 数量（输入 + 输出） |
+| `SenderName` | `string?` | 發送者名稱（用於 AI 訊息身份識別） |
+
+---
+
+## 聊天訊息佇列
+
+`ChatMessageQueue` 是一個執行緒安全的訊息佇列系統，用於管理聊天訊息的非同步處理：
+
+- **執行緒安全** - 使用鎖機制確保安全的並發訪問
+- **非同步處理** - 支援非同步訊息入隊和出隊
+- **訊息順序** - 保持訊息的時間順序
+- **批次操作** - 支援批次訊息獲取
+
+## 檔案元資料
+
+`FileMetadata` 用於管理上傳檔案的元資料：
+
+- **檔案追蹤** - 記錄檔案名稱、大小、類型等資訊
+- **訪問控制** - 支援檔案訪問權限控制
+- **安全驗證** - 支援上傳檔案的安全驗證
+- **生命週期管理** - 管理從檔案上傳到處理完成的整個生命週期
+
+## 串流取消管理器
+
+`StreamCancellationManager` 負責管理 AI 回應串流的取消：
+
+- **串流取消** - 支援取消正在執行的 AI 回應串流
+- **資源清理** - 清理已取消串流的資源
+- **並發控制** - 控制多個串流的並發
+- **狀態追蹤** - 追蹤和管理串流狀態
+
+## 聊天歷史查看
+
+聊天歷史查看功能支援瀏覽硅基生命体的完整聊天歷史：
+
+- **控制器**：`ChatHistoryController`
+- **ViewModel**：`ChatHistoryViewModel`
+- **API 路由**：
+  - 會话列表：`/api/chat-history/{beingId}/conversations`
+  - 訊息详情：`/api/chat-history/{beingId}/conversation/{conversationId}`
+- **視图**：
+  - `ChatHistoryListView` - 顯示會话列表
+  - `ChatHistoryDetailView` - 顯示訊息详情
 
 ---
 

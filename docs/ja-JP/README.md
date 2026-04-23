@@ -22,17 +22,21 @@ AI エージェントである**シリコンビーイング（Silicon Beings）*
 - **32種類のカレンダーシステム** — グレゴリオ暦、中国旧暦、イスラム暦、ヘブライ暦、日本暦、ペルシャ暦、マヤ暦などを含むマルチカレンダーサポート
 - **最小限の依存関係** — コアライブラリは Roslyn 動的コンパイル用の Microsoft.CodeAnalysis.CSharp のみに依存
 - **ゼロデータベース依存** — `ITimeStorage` による時刻インデックス付きクエリをサポートするファイルベースのストレージ（JSON）
-- **ローカライゼーション** — 18種類の言語バリアントを含む包括的な多言語サポート
+- **ローカライゼーション** — 20種類の言語バリアントを含む包括的な多言語サポート
   - 中国語：zh-CN、zh-HK、zh-SG、zh-MO、zh-TW、zhMY（6種類のバリアント）
   - 英語：en-US、en-GB、en-CA、en-AU、en-IN、en-SG、en-ZA、en-IE、en-NZ、en-MY（10種類のバリアント）
+  - スペイン語：es-ES、es-MX（2種類のバリアント）
   - 日本語：ja-JP
   - 韓国語：ko-KR
 - **Web UI** — SSE サポート、複数のスキン、包括的なダッシュボードを備えた組み込み HTTP サーバー
   - **スキンシステム** — プラグ可能な ISkin インターフェースと自動検出機能を備えた4種類の組み込みスキン（Admin、Chat、Creative、Dev）
-  - **18個のコントローラー** — About、Audit、Being、Chat、CodeBrowser、CodeHover、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer
+  - **20+個のコントローラー** — About、Audit、Being、Chat、ChatHistory、CodeBrowser、CodeHover、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer
   - **リアルタイム更新** — チャットメッセージ、生命体ステータス、システムイベント用の SSE（Server-Sent Events）
   - **HTML/CSS/JS ビルダー** — `H`、`CssBuilder`、`JsBuilder` によるサーバーサイドマークアップ生成（ゼロフロントエンドフレームワーク依存）
-  - **ローカライゼーション** — LocalizationManager による解決を含む18種類の組み込み言語バリアント
+  - **ローカライゼーション** — LocalizationManager による解決を含む20種類の組み込み言語バリアント
+  - **チャット履歴ビュー** — 会話リストとメッセージ詳細をサポートするシリコンビーイングのチャット履歴閲覧機能
+  - **ファイルアップロードサポート** — ファイルソースダイアログとファイルアップロード機能
+  - **ローディングインジケーター** — チャットページのローディング状態インジケーターとキュレーターセッションの自動選択
 
 ## 技術スタック
 
@@ -78,13 +82,13 @@ SiliconLifeCollective.sln
 │       ├── IM/                            # WebUIProvider（Web UI を IM チャネルとして使用）、IMPermissionAskHandler
 │       ├── Tools/                         # 組み込みツール：Calendar、Chat、Config、Curator、Disk、DynamicCompile、Memory、Network、System、Task、Timer、TokenAudit
 │       ├── Config/                        # DefaultConfigData
-│       ├── Localization/                  # ZhCN、ZhHK、EnUS、JaJP、KoKR、DefaultLocalizationBase、EnOther（EnGB、EnCA、EnAU、EnIN、EnSG、EnZA、EnIE、EnNZ、EnMY）、ZhOther（ZhSG、ZhMO、ZhTW、ZhMY）
+│       ├── Localization/                  # ZhCN、ZhHK、EnUS、JaJP、KoKR、EsES、EsMX、DefaultLocalizationBase、EnOther（EnGB、EnCA、EnAU、EnIN、EnSG、EnZA、EnIE、EnNZ、EnMY）、ZhOther（ZhSG、ZhMO、ZhTW、ZhMY）、EsOther（EsMX）
 │       ├── Logging/                       # ConsoleLoggerProvider、FileSystemLoggerProvider
 │       ├── Storage/                       # FileSystemStorage、FileSystemTimeStorage
 │       ├── Security/                      # DefaultPermissionCallback
 │       ├── Runtime/                       # TestTickObject
 │       └── Web/                           # Web UI 実装
-│           ├── Controllers/               # 18個のコントローラー：About、Audit、Being、Chat、CodeBrowser、CodeHover、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer
+│           ├── Controllers/               # 20+個のコントローラー：About、Audit、Being、Chat、ChatHistory、CodeBrowser、CodeHover、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer
 │           ├── Models/                    # ViewModel：AboutViewModel、AuditViewModel、BeingViewModel、ChatMessage、ChatViewModel、CodeBrowserViewModel、ConfigViewModel、DashboardViewModel、ExecutorViewModel、KnowledgeViewModel、LogViewModel、MemoryViewModel、PermissionViewModel、PermissionRequestViewModel、ProjectViewModel、TaskViewModel、TimerViewModel、ViewModelBase
 │           ├── Views/                     # 19個の HTML ビュー：ViewBase、AboutView、AuditView、BeingView、ChatView、CodeBrowserView、CodeEditorView、ConfigView、DashboardView、ExecutorView、KnowledgeView、LogView、MarkdownEditorView、MemoryView、PermissionView、ProjectView、SoulEditorView、TaskView、TimerView
 │           ├── Skins/                     # 4種類のスキン：Admin（プロフェッショナル）、Chat（会話）、Creative（アーティスティック）、Dev（開発者向け）
@@ -162,7 +166,7 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] フェーズ 8：長期メモリ + タスク + タイマー
 - [x] フェーズ 9：CoreHost + マルチエージェントコラボレーション
 - [x] フェーズ 10：Web UI（HTTP + SSE、18個のコントローラー、4種類のスキン）
-- [x] フェーズ 10.5：増分強化（BroadcastChannel、TokenAudit、32種類のカレンダー、ツール強化、18言語のローカライゼーション）
+- [x] フェーズ 10.5：増分強化（BroadcastChannel、TokenAudit、32種類のカレンダー、ツール強化、20言語のローカライゼーション）
 - [ ] フェーズ 11：外部 IM 統合（Feishu / WhatsApp / Telegram）
 - [ ] フェーズ 12：ナレッジグラフ、プラグインシステム、スキルエコシステム
 

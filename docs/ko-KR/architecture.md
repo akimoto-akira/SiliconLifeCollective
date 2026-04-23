@@ -172,6 +172,49 @@ MainLoop (전용 스레드, watchdog + circuit breaker)
 | `PromptTokens` | `int?` | 프롬프트(입력)의 토큰 수 |
 | `CompletionTokens` | `int?` | 완성(출력)의 토큰 수 |
 | `TotalTokens` | `int?` | 사용된 총 토큰 수 (입력 + 출력) |
+| `SenderName` | `string?` | 발신자 이름 (AI 메시지 신원 식별용) |
+
+---
+
+## 채팅 메시지 큐
+
+`ChatMessageQueue`는 채팅 메시지의 비동기 처리를 관리하는 스레드 안전 메시지 큐 시스템입니다:
+
+- **스레드 안전** - 락 메커니즘을 사용하여 안전한 동시 접근 보장
+- **비동기 처리** - 비동기 메시지 인큐 및 디큐 지원
+- **메시지 순서** - 메시지의 시간순서 유지
+- **배치 작업** - 배치 메시지 가져오기 지원
+
+## 파일 메타데이터
+
+`FileMetadata`는 업로드된 파일의 메타데이터를 관리하는 데 사용됩니다:
+
+- **파일 추적** - 파일 이름, 크기, 타입 등의 정보 기록
+- **접근 제어** - 파일 접근 권한 제어 지원
+- **보안 검증** - 업로드된 파일의 보안 검증 지원
+- **수명주기 관리** - 파일 업로드부터 처리 완료까지의 전체 수명주기 관리
+
+## 스트림 취소 관리자
+
+`StreamCancellationManager`는 AI 응답 스트림의 취소 관리를 담당합니다:
+
+- **스트림 취소** - 실행 중인 AI 응답 스트림 취소 지원
+- **리소스 정리** - 취소된 스트림의 리소스 정리
+- **동시성 제어** - 여러 스트림의 동시성 제어
+- **상태 추적** - 스트림 상태 추적 및 관리
+
+## 채팅 히스토리 보기
+
+채팅 히스토리 보기 기능은 실리콘 생명체의 전체 채팅 히스토리 탐색을 지원합니다:
+
+- **컨트롤러**: `ChatHistoryController`
+- **ViewModel**: `ChatHistoryViewModel`
+- **API 라우트**:
+  - 대화 목록: `/api/chat-history/{beingId}/conversations`
+  - 메시지 상세: `/api/chat-history/{beingId}/conversation/{conversationId}`
+- **뷰**:
+  - `ChatHistoryListView` - 대화 목록 표시
+  - `ChatHistoryDetailView` - 메시지 상세 보기
 
 ---
 

@@ -15,18 +15,19 @@ Default URL: `http://localhost:8080`
 1. **Dashboard** - System overview and metrics
 2. **Beings** - Manage silicon beings
 3. **Chat** - Interact with beings
-4. **Tasks** - Task management
-5. **Timers** - Timer configuration
-6. **Configuration** - System settings
-7. **Permissions** - Access control
-8. **Logs** - System logs
-9. **Audit** - Token usage and audit trails
-10. **Memory** - Being memories
-11. **Knowledge** - Knowledge base
-12. **Code Browser** - Code exploration
-13. **Code Editor** - Code editing with hover hints
-14. **Project** - Project management
-15. **Executor** - Executor management
+4. **Chat History** - View silicon being chat history
+5. **Tasks** - Task management
+6. **Timers** - Timer configuration
+7. **Configuration** - System settings
+8. **Permissions** - Access control
+9. **Logs** - System logs
+10. **Audit** - Token usage and audit trails
+11. **Memory** - Being memories
+12. **Knowledge** - Knowledge base
+13. **Code Browser** - Code exploration
+14. **Code Editor** - Code editing with hover hints
+15. **Project** - Project management
+16. **Executor** - Executor management
 
 ---
 
@@ -300,6 +301,88 @@ Hover over any identifier to see:
 - Documentation
 - Definition location
 - References
+
+---
+
+## Chat History View
+
+### Features
+
+- Silicon being chat history browsing
+- Conversation list display
+- Message detail viewing
+- Timeline view
+
+### Using Chat History
+
+1. Navigate to the **Beings** page
+2. Click the **Chat History** link for a silicon being
+3. View the conversation list:
+   - Conversation title
+   - Creation time
+   - Message count
+4. Click a conversation to view details:
+   - Complete message history
+   - Timestamps
+   - Sender information
+   - Tool call records
+
+### Technical Implementation
+
+- **Controller**: `ChatHistoryController`
+- **ViewModel**: `ChatHistoryViewModel`
+- **Views**:
+  - `ChatHistoryListView` - Conversation list
+  - `ChatHistoryDetailView` - Message details
+- **API Routes**:
+  - `/api/chat-history/{beingId}/conversations` - Get conversation list
+  - `/api/chat-history/{beingId}/conversation/{conversationId}` - Get message details
+
+---
+
+## File Upload
+
+### Features
+
+- File source dialog
+- Multi-file upload support
+- File metadata management
+- Upload progress display
+
+### Using File Upload
+
+1. Click the **Upload File** button in the chat interface
+2. The file source dialog opens
+3. Select file source:
+   - Local files
+   - File system path
+4. Select files (multiple selection supported)
+5. Confirm upload
+6. File information will be attached to the message
+
+### Supported File Types
+
+- Text files (.txt, .md, .json, .xml, etc.)
+- Code files (.cs, .js, .py, .java, etc.)
+- Configuration files (.yml, .yaml, .ini, .conf, etc.)
+- Document files (.csv, .log, etc.)
+
+---
+
+## Loading Indicators
+
+### Features
+
+- Loading state display for chat pages
+- Auto-select curator session
+- Data loading progress feedback
+
+### Behavior
+
+- Loading animation displayed when page loads
+- Automatically hidden after data loading completes
+- Curator session auto-selected (if exists)
+- Multi-language loading prompt text
 
 ---
 

@@ -239,6 +239,73 @@
 
 **權限**：需要 `IsCurator` 标志。
 
+### 13. 資料庫工具 (DatabaseTool)
+
+**名称**：`database`
+
+**描述**：結構化資料庫查詢和操作。
+
+**動作**：
+- `query`：查詢資料
+- `insert`：插入資料
+- `update`：更新資料
+- `delete`：刪除資料
+
+**示例**：
+```json
+{
+  "action": "query",
+  "table": "users",
+  "conditions": {"status": "active"},
+  "limit": 100
+}
+```
+
+### 14. 日誌工具 (LogTool)
+
+**名称**：`log`
+
+**描述**：操作歷史和對话歷史查詢。
+
+**動作**：
+- `query_tasks`：查詢操作歷史
+- `query_conversations`：查詢對话歷史
+- `query_logs`：查詢系統日誌
+
+**示例**：
+```json
+{
+  "action": "query_conversations",
+  "beingId": "being-uuid",
+  "limit": 50
+}
+```
+
+### 15. DiskTool 增強
+
+DiskTool 新增了以下功能：
+
+- `search_files`：按檔案名稱搜尋檔案
+- `search_content`：按檔案内容搜尋
+
+**示例** (search_files)：
+```json
+{
+  "action": "search_files",
+  "path": "/data",
+  "pattern": "*.json"
+}
+```
+
+**示例** (search_content)：
+```json
+{
+  "action": "search_content",
+  "path": "/data",
+  "query": "important data"
+}
+```
+
 ---
 
 ## 工具调用流程

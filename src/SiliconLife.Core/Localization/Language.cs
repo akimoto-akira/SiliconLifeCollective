@@ -106,5 +106,15 @@ public enum Language
     /// <summary>
     /// Korean (South Korea)
     /// </summary>
-    KoKR
+    KoKR,
+
+    /// <summary>
+    /// Spanish (Spain)
+    /// </summary>
+    EsES,
+
+    /// <summary>
+    /// Spanish (Mexico)
+    /// </summary>
+    EsMX
 }

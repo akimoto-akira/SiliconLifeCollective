@@ -4,7 +4,7 @@
 
 一個基於 .NET 9 的多智能体協作平台，AI 智能体被称為**硅基生命体**，通過 Roslyn 動态編譯實現自我進化。
 
-[English](README.md) | [中文文檔](docs/zh-CN/README.md) | [繁體中文](docs/zh-HK/README.md) | [日本語](docs/ja-JP/README.md) | [한국어](docs/ko-KR/README.md)
+[English](../en/README.md) | [简体中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Español](../es-ES/README.md)
 
 ## 功能特性
 
@@ -22,17 +22,21 @@
 - **32 种日歷系統** — 多日歷支援，包括公歷、農歷、伊斯蘭歷、希伯來歷、日本歷、波斯歷、瑪雅歷等
 - **最小依赖** — 核心程式庫僅依赖 Microsoft.CodeAnalysis.CSharp 用於 Roslyn 動态編譯
 - **零資料庫依赖** — 基於檔案的儲存（JSON），通過 `ITimeStorage` 支援時間索引查詢
-- **在地化** — 全面的多語言支援,包含 18 種語言變體
+- **在地化** — 全面的多語言支援,包含 20 種語言變體
   - 中文:zh-CN, zh-HK, zh-SG, zh-MO, zh-TW, zhMY(6 種變體)
   - 英文:en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY(10 種變體)
+  - 西班牙語：es-ES, es-MX（2 種變體）
   - 日语：ja-JP
   - 韩语：ko-KR
 - **Web UI** — 內建 HTTP 伺服器,支援 SSE,多种皮肤和全面的儀表板
   - **皮肤系統** — 4 种內置皮肤(管理版、聊天版、創作版、開發版),支援可插拔的 ISkin 介面和自動發現
-  - **18 個控制器** — 關於、稽核、生命体、聊天、程式碼瀏覽器、程式碼悬浮提示、設定、儀表板、執行器、初始化、知識、記錄、記憶、權限、權限要求、項目、工作、定时器
+  - **20+ 個控制器** — 關於、稽核、生命体、聊天、聊天歷史、程式碼瀏覽器...
+  - **聊天歷史查看** — 完整的硅基生命体聊天歷史瀏覽功能
+  - **檔案上傳支援** — 檔案來源對話框和檔案上傳功能
+  - **載入指示器** — 聊天頁面的載入狀態指示器
   - **实时更新** — SSE（伺服器發送事件）用於聊天訊息、生命体狀態和系統事件
   - **HTML/CSS/JS 构建器** — 通過 `H`、`CssBuilder` 和 `JsBuilder` 進行伺服器端标記生成（零前端架構依赖）
-  - **在地化** — 18 种內置语言变体，通過 LocalizationManager 解析
+  - **在地化** — 20 种內置语言变体，通過 LocalizationManager 解析
 
 ## 技術栈
 

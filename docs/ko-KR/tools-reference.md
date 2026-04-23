@@ -239,6 +239,73 @@
 
 **권한**: `IsCurator` 플래그 필요.
 
+### 13. 데이터베이스 도구 (DatabaseTool)
+
+**이름**: `database`
+
+**설명**: 구조화된 데이터베이스 쿼리 및 작업.
+
+**액션**:
+- `query`: 데이터 쿼리
+- `insert`: 데이터 삽입
+- `update`: 데이터 업데이트
+- `delete`: 데이터 삭제
+
+**예시**:
+```json
+{
+  "action": "query",
+  "table": "users",
+  "conditions": {"status": "active"},
+  "limit": 100
+}
+```
+
+### 14. 로그 도구 (LogTool)
+
+**이름**: `log`
+
+**설명**: 작업 이력 및 대화 이력 쿼리.
+
+**액션**:
+- `query_tasks`: 작업 이력 쿼리
+- `query_conversations`: 대화 이력 쿼리
+- `query_logs`: 시스템 로그 쿼리
+
+**예시**:
+```json
+{
+  "action": "query_conversations",
+  "beingId": "being-uuid",
+  "limit": 50
+}
+```
+
+### 15. DiskTool 강화
+
+DiskTool에 다음 기능이 추가되었습니다:
+
+- `search_files`: 파일 이름으로 파일 검색
+- `search_content`: 파일 내용으로 검색
+
+**예시** (search_files):
+```json
+{
+  "action": "search_files",
+  "path": "/data",
+  "pattern": "*.json"
+}
+```
+
+**예시** (search_content):
+```json
+{
+  "action": "search_content",
+  "path": "/data",
+  "query": "important data"
+}
+```
+
 ---
 
 ## 도구 호출 흐름

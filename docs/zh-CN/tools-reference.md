@@ -239,6 +239,87 @@
 
 **权限**：需要 `IsCurator` 标志。
 
+### 14. 数据库工具
+
+**名称**：`database`
+
+**描述**：结构化数据库查询和操作。
+
+**动作**：`query`、`insert`、`update`、`delete`
+
+**参数**（query）：
+```json
+{
+  "action": "query",
+  "table": "users",
+  "conditions": {"status": "active"},
+  "limit": 100
+}
+```
+
+**权限**：需要相应的数据库访问权限。
+
+### 15. 日志工具
+
+**名称**：`log`
+
+**描述**：操作历史和对话历史查询。
+
+**动作**：`query_logs`、`query_conversations`
+
+**参数**（query_logs）：
+```json
+{
+  "action": "query_logs",
+  "being_id": "being-uuid",
+  "start_time": "2026-04-20T00:00:00Z",
+  "end_time": "2026-04-23T23:59:59Z",
+  "level": "info"
+}
+```
+
+**参数**（query_conversations）：
+```json
+{
+  "action": "query_conversations",
+  "being_id": "being-uuid",
+  "session_id": "session-uuid",
+  "limit": 50
+}
+```
+
+**特性**：
+- 支持按硅基生命体过滤日志
+- 支持时间范围查询
+- 支持日志级别过滤
+- 对话历史检索
+
+### 磁盘工具增强
+
+磁盘工具现在包含本地搜索功能（从 SearchTool 整合）：
+
+**新增动作**：`search_files`、`search_content`
+
+**参数**（search_files）：
+```json
+{
+  "action": "search_files",
+  "path": "/data",
+  "pattern": "*.json",
+  "recursive": true
+}
+```
+
+**参数**（search_content）：
+```json
+{
+  "action": "search_content",
+  "path": "/data",
+  "query": "search term",
+  "filePattern": "*.md"
+}
+```
+
 ---
 
 ## 工具调用流程

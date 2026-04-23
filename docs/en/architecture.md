@@ -172,6 +172,41 @@ The `ChatMessage` model includes fields for AI conversation context and token tr
 | `PromptTokens` | `int?` | Number of tokens in the prompt (input) |
 | `CompletionTokens` | `int?` | Number of tokens in the completion (output) |
 | `TotalTokens` | `int?` | Total tokens used (input + output) |
+| `FileMetadata` | `FileMetadata?` | Attached file metadata (if message contains files) |
+
+### Chat Message Queue
+
+`ChatMessageQueue` is a thread-safe message queue system for managing asynchronous processing of chat messages:
+
+- **Thread-safe** - Uses lock mechanism to ensure safe concurrent access
+- **Asynchronous processing** - Supports async message enqueue and dequeue
+- **Message ordering** - Maintains chronological order of messages
+- **Batch operations** - Supports batch message retrieval
+
+### File Metadata
+
+`FileMetadata` is used to manage file information attached to chat messages:
+
+- **File information** - File name, size, type, path
+- **Upload time** - Timestamp of file upload
+- **Uploader** - ID of user or silicon being who uploaded the file
+
+### Stream Cancellation Manager
+
+`StreamCancellationManager` provides cancellation mechanism for AI streaming responses:
+
+- **Stream control** - Supports cancelling ongoing AI streaming responses
+- **Resource cleanup** - Properly cleans up related resources on cancellation
+- **Concurrency safe** - Supports managing multiple streams simultaneously
+
+### Chat History View
+
+The new chat history view feature allows users to browse historical conversations of silicon beings:
+
+- **Conversation list** - Displays all historical conversations
+- **Message details** - View complete message history
+- **Timeline view** - Shows messages in chronological order
+- **API support** - Provides RESTful API to retrieve conversation and message data
 
 ---
 
