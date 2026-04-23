@@ -383,6 +383,12 @@ public class OllamaClient : IAIClient
             string? line = await reader.ReadLineAsync(cancellationToken);
             if (string.IsNullOrEmpty(line))
                 continue;
+            
+            if (cancellationToken.IsCancellationRequested)
+            {
+                _logger.Debug(null, "Ollama stream: cancellation detected after ReadLineAsync, breaking");
+                break;
+            }
 
             OllamaResponse? ollamaResponse;
             try

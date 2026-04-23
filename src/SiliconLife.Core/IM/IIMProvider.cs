@@ -60,6 +60,20 @@ public interface IIMProvider
     /// <param name="completionTokens">Number of tokens in the completion</param>
     /// <param name="totalTokens">Total number of tokens</param>
     Task SendToolUpdateAsync(Guid senderId, Guid channelId, string role, string content, string? toolCallsJson = null, string? toolCallId = null, string? thinking = null, string? senderName = null, int? promptTokens = null, int? completionTokens = null, int? totalTokens = null);
+
+    /// <summary>
+    /// Sends a stream-stopped event to the frontend when the user cancels AI thinking.
+    /// </summary>
+    /// <param name="channelId">The channel ID where the stream was stopped.</param>
+    Task SendStreamStoppedAsync(Guid channelId);
+
+    /// <summary>
+    /// Sends a queue status event to the frontend indicating message queue position.
+    /// </summary>
+    /// <param name="channelId">The channel ID.</param>
+    /// <param name="position">The position in the queue (0 means currently being processed).</param>
+    /// <param name="totalCount">The total number of messages in the queue.</param>
+    Task SendQueueStatusAsync(Guid channelId, int position, int totalCount = 0);
 }
 
 /// <summary>

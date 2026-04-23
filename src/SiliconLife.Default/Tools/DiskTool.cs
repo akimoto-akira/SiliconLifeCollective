@@ -105,6 +105,11 @@ public class DiskTool : ITool
                 {
                     ["type"] = "boolean",
                     ["description"] = "Case sensitive search (for search actions, default: false)"
+                },
+                ["encoding"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["description"] = "File encoding for read operations (e.g., 'utf-8', 'gb2312', 'shift_jis'). If not specified, auto-detects from file content, falls back to UTF-8."
                 }
             },
             ["required"] = new[] { "action" }
@@ -145,9 +150,16 @@ public class DiskTool : ITool
             requestParams["content"] = contentObj.ToString()!;
         }
 
+        // Pass encoding parameter to read operations
+        if (parameters.TryGetValue("encoding", out object? encodingObj) && encodingObj != null)
+        {
+            requestParams["encoding"] = encodingObj.ToString()!;
+        }
+
         if (action == "count_lines")
         {
-            ExecutorRequest readRequest = new(callerId, path, "read_file", requestParams);
+            var readParams = new Dictionary<string, object>(requestParams);
+            ExecutorRequest readRequest = new(callerId, path, "read_file", readParams);
             ExecutorResult readResult = DiskExecutor.Execute(readRequest);
             if (!readResult.Success)
                 return ToolResult.Failed(readResult.Error ?? "Failed to read file for line count");
@@ -166,7 +178,8 @@ public class DiskTool : ITool
                 !int.TryParse(lineCountObj?.ToString(), out int lineCount) || lineCount < 1)
                 return ToolResult.Failed("Missing or invalid 'line_count' parameter (must be a positive integer)");
 
-            ExecutorRequest readRequest = new(callerId, path, "read_file", requestParams);
+            var readParams = new Dictionary<string, object>(requestParams);
+            ExecutorRequest readRequest = new(callerId, path, "read_file", readParams);
             ExecutorResult readResult = DiskExecutor.Execute(readRequest);
             if (!readResult.Success)
                 return ToolResult.Failed(readResult.Error ?? "Failed to read file");
@@ -192,7 +205,8 @@ public class DiskTool : ITool
             string oldTextAll = oldTextAllObj.ToString()!;
             string newTextAll = newTextAllObj.ToString()!;
 
-            ExecutorRequest readRequest = new(callerId, path, "read_file", new Dictionary<string, object>());
+            var readParamsAll = new Dictionary<string, object>(requestParams);
+            ExecutorRequest readRequest = new(callerId, path, "read_file", readParamsAll);
             ExecutorResult readResult = DiskExecutor.Execute(readRequest);
             if (!readResult.Success)
                 return ToolResult.Failed(readResult.Error ?? "Failed to read file");
@@ -229,7 +243,8 @@ public class DiskTool : ITool
             string oldText = oldTextObj.ToString()!;
             string newText = newTextObj.ToString()!;
 
-            ExecutorRequest readRequest = new(callerId, path, "read_file", new Dictionary<string, object>());
+            var readParams = new Dictionary<string, object>(requestParams);
+            ExecutorRequest readRequest = new(callerId, path, "read_file", readParams);
             ExecutorResult readResult = DiskExecutor.Execute(readRequest);
             if (!readResult.Success)
                 return ToolResult.Failed(readResult.Error ?? "Failed to read file");
@@ -266,7 +281,8 @@ public class DiskTool : ITool
             if (!parameters.TryGetValue("content", out object? replaceContentObj) || replaceContentObj == null)
                 return ToolResult.Failed("Missing 'content' parameter");
 
-            ExecutorRequest readRequest = new(callerId, path, "read_file", new Dictionary<string, object>());
+            var readParams = new Dictionary<string, object>(requestParams);
+            ExecutorRequest readRequest = new(callerId, path, "read_file", readParams);
             ExecutorResult readResult = DiskExecutor.Execute(readRequest);
             if (!readResult.Success)
                 return ToolResult.Failed(readResult.Error ?? "Failed to read file");

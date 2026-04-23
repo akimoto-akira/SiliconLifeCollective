@@ -313,4 +313,71 @@ public class WebUIProvider : IIMProvider
         await _sseHandler.SendToChannelAsync(channelId, "tool", message);
         _logger.Debug(null, $"Tool update sent to channel {channelId}, role={role}");
     }
+
+    /// <summary>
+    /// Sends a stream-stopped event to the frontend when the user cancels AI thinking.
+    /// </summary>
+    /// <param name="channelId">The channel ID where the stream was stopped.</param>
+    public async Task SendStreamStoppedAsync(Guid channelId)
+    {
+        var message = new
+        {
+            type = "stopped",
+            channelId = channelId.ToString(),
+            reason = "user_cancelled",
+            timestamp = DateTime.UtcNow
+        };
+
+        await _sseHandler.SendToChannelAsync(channelId, "stopped", message);
+        _logger.Info(null, $"Stream stopped event sent to channel {channelId}");
+    }
+
+    /// <summary>
+    /// Handles a file message by pushing it to the frontend via SSE.
+    /// </summary>
+    /// <param name="message">The file message to deliver.</param>
+    public async Task HandleFileMessage(ChatMessage message)
+    {
+        var fileMessage = new
+        {
+            type = "file",
+            messageId = message.Id.ToString(),
+            senderId = message.SenderId.ToString(),
+            channelId = message.ChannelId.ToString(),
+            content = message.Content,
+            fileMetadata = message.FileMetadata != null ? new
+            {
+                filePath = message.FileMetadata.FilePath,
+                fileName = message.FileMetadata.FileName,
+                fileSize = message.FileMetadata.FileSize,
+                mimeType = message.FileMetadata.MimeType,
+                isLocalPath = message.FileMetadata.IsLocalPath
+            } : null,
+            timestamp = message.Timestamp
+        };
+
+        await _sseHandler.SendToChannelAsync(message.ChannelId, "file", fileMessage);
+        _logger.Debug(null, $"File message sent to channel {message.ChannelId}");
+    }
+
+    /// <summary>
+    /// Sends a queue status event to the frontend indicating message queue position.
+    /// </summary>
+    /// <param name="channelId">The channel ID.</param>
+    /// <param name="position">The position in the queue (0 means currently being processed).</param>
+    /// <param name="totalCount">The total number of messages in the queue.</param>
+    public async Task SendQueueStatusAsync(Guid channelId, int position, int totalCount = 0)
+    {
+        var message = new
+        {
+            type = "queue_status",
+            channelId = channelId.ToString(),
+            position,
+            total = totalCount,
+            timestamp = DateTime.UtcNow
+        };
+
+        await _sseHandler.SendToChannelAsync(channelId, "queue_status", message);
+        _logger.Debug(null, $"Queue status sent to channel {channelId}, position={position}");
+    }
 }

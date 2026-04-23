@@ -13,6 +13,8 @@
 
 namespace SiliconLife.Collective;
 
+using System.Text;
+
 /// <summary>
 /// Static executor for file system operations.
 /// Provides a safe wrapper for disk IO initiated by AI tools.
@@ -66,7 +68,7 @@ public static class DiskExecutor
 
         return request.Type switch
         {
-            "read_file" => ExecuteReadFile(path),
+            "read_file" => ExecuteReadFile(path, request.Parameters),
             "write_file" => ExecuteWriteFile(path, request.Parameters),
             "append_file" => ExecuteAppendFile(path, request.Parameters),
             "delete_file" => ExecuteDeleteFile(path),
@@ -78,7 +80,7 @@ public static class DiskExecutor
         };
     }
 
-    private static ExecutorResult ExecuteReadFile(string path)
+    private static ExecutorResult ExecuteReadFile(string path, Dictionary<string, object> parameters = null)
     {
         try
         {
@@ -87,8 +89,9 @@ public static class DiskExecutor
                 return ExecutorResult.Failed($"File not found: {path}");
             }
 
-            string content = File.ReadAllText(path);
-            _logger.Info(null, "Disk read: {0}, size={1}", path, content.Length);
+            Encoding encoding = DetectEncoding(path, parameters);
+            string content = File.ReadAllText(path, encoding);
+            _logger.Info(null, "Disk read: {0}, size={1}, encoding={2}", path, content.Length, encoding.WebName);
             return ExecutorResult.Successful(content);
         }
         catch (Exception ex)
@@ -96,6 +99,127 @@ public static class DiskExecutor
             _logger.Error(null, "Disk read failed: {0}, {1}", ex, path);
             return ExecutorResult.Failed($"Failed to read file: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Detects file encoding from parameters or file content.
+    /// Priority: explicit encoding parameter > BOM detection > UTF-8 default.
+    /// </summary>
+    private static Encoding DetectEncoding(string path, Dictionary<string, object> parameters)
+    {
+        // 1. Check explicit encoding parameter
+        if (parameters != null && parameters.TryGetValue("encoding", out object? encodingObj))
+        {
+            string encodingName = encodingObj?.ToString()?.Trim() ?? "";
+            if (!string.IsNullOrEmpty(encodingName))
+            {
+                try
+                {
+                    return Encoding.GetEncoding(encodingName);
+                }
+                catch
+                {
+                    // Fall through to auto-detection
+                }
+            }
+        }
+
+        // 2. Auto-detect from file content (BOM and byte patterns)
+        return DetectEncodingFromContent(path);
+    }
+
+    /// <summary>
+    /// Detects encoding by reading file bytes and checking for BOM or byte patterns.
+    /// Falls back to UTF-8 (no BOM) if detection fails.
+    /// </summary>
+    private static Encoding DetectEncodingFromContent(string path)
+    {
+        try
+        {
+            byte[] bytes = File.ReadAllBytes(path);
+            if (bytes.Length == 0)
+            {
+                return Encoding.UTF8; // Empty file, default to UTF-8
+            }
+
+            // Check BOM (Byte Order Mark)
+            if (bytes.Length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
+            {
+                return new UTF8Encoding(true); // UTF-8 with BOM
+            }
+
+            if (bytes.Length >= 2 && bytes[0] == 0xFF && bytes[1] == 0xFE)
+            {
+                return Encoding.Unicode; // UTF-16 LE (UTF-8 little-endian)
+            }
+
+            if (bytes.Length >= 2 && bytes[0] == 0xFE && bytes[1] == 0xFF)
+            {
+                return Encoding.BigEndianUnicode; // UTF-16 BE
+            }
+
+            if (bytes.Length >= 4 && bytes[0] == 0x00 && bytes[1] == 0x00 && bytes[2] == 0xFE && bytes[3] == 0xFF)
+            {
+                return Encoding.UTF32; // UTF-32 BE
+            }
+
+            // Try to detect GB2312/GBK by byte pattern (common in Chinese Windows)
+            // Heuristic: if high byte ratio is significant and valid GBK ranges
+            if (MightBeGBK(bytes))
+            {
+                try
+                {
+                    Encoding gb2312 = Encoding.GetEncoding("GB2312");
+                    // Verify by attempting to decode
+                    gb2312.GetString(bytes);
+                    return gb2312;
+                }
+                catch
+                {
+                    // GB2312 not available, fall through
+                }
+            }
+
+            // Default: UTF-8 without BOM
+            return new UTF8Encoding(false);
+        }
+        catch
+        {
+            return Encoding.UTF8; // Fallback
+        }
+    }
+
+    /// <summary>
+    /// Heuristic check if bytes might be GBK/GB2312 encoded.
+    /// Looks for byte pairs in valid GBK character ranges.
+    /// </summary>
+    private static bool MightBeGBK(byte[] bytes)
+    {
+        int highByteCount = 0;
+        int validGBKPairs = 0;
+        int sampleSize = Math.Min(bytes.Length, 1024); // Check first 1KB
+
+        for (int i = 0; i < sampleSize; i++)
+        {
+            if (bytes[i] > 0x7F)
+            {
+                highByteCount++;
+                // Check if this could be a valid GBK lead byte (0x81-0xFE)
+                if (bytes[i] >= 0x81 && bytes[i] <= 0xFE && i + 1 < sampleSize)
+                {
+                    byte trailByte = bytes[i + 1];
+                    // GBK trail byte range: 0x40-0x7E or 0x80-0xFE
+                    if ((trailByte >= 0x40 && trailByte <= 0x7E) || (trailByte >= 0x80 && trailByte <= 0xFE))
+                    {
+                        validGBKPairs++;
+                        i++; // Skip trail byte
+                    }
+                }
+            }
+        }
+
+        // If >20% high bytes and >50% of them form valid GBK pairs, likely GBK
+        return highByteCount > sampleSize * 0.2 && validGBKPairs > highByteCount * 0.5;
     }
 
     private static ExecutorResult ExecuteWriteFile(string path, Dictionary<string, object> parameters)

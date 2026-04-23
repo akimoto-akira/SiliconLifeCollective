@@ -188,6 +188,9 @@ public class ContextManager
             _session.MarkMessagesAsRead(_pendingMarkAsReadIds, _being.Id);
             _logger.Debug(_being.Id, "Committed {0} messages as read for being {1}", _pendingMarkAsReadIds.Count, _being.Id);
             _pendingMarkAsReadIds.Clear();
+            
+            // Reset the flag since messages are now marked as read
+            _hasNewPendingMessages = false;
         }
     }
 
@@ -473,8 +476,19 @@ public class ContextManager
 
         try
         {
+            // Send initial streaming event to show stop button on frontend
+            StreamChunk initialChunk = StreamChunk.Start(streamId);
+            DeliverStreamChunk(initialChunk);
+
             await foreach (AIResponse chunk in _aiClient.ChatStreamAsync(request, cancellationToken))
             {
+                // Check if cancellation was requested during iteration
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    _logger.Debug(_being.Id, "Stream cancelled during iteration, throwing OperationCanceledException");
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+                
                 if (!chunk.Success)
                 {
                     return chunk;
@@ -517,6 +531,10 @@ public class ContextManager
             _logger.Warn(_being.Id, "Streaming not implemented, falling back to non-streaming mode");
             return await GetResponseAsync(scenarioContext);
         }
+
+        // If the token was cancelled (OllamaClient may have swallowed OperationCanceledException
+        // via yield break), surface it here to prevent falling through to non-streaming fallback.
+        cancellationToken.ThrowIfCancellationRequested();
 
         if (!streamSucceeded)
         {
@@ -656,8 +674,58 @@ public class ContextManager
     {
         _logger.Info(_being.Id, "ThinkOnChatStream: being={0}, session={1}", _being.Name, _session?.Id.ToString() ?? "null");
 
+        // Resolve the effective cancellation token: if a channelId is available,
+        // try to obtain a managed token from StreamCancellationManager so that
+        // external stop requests can cancel this stream.
+        CancellationToken effectiveToken = cancellationToken;
+        Guid channelId = _session?.Id ?? Guid.Empty;
+        StreamCancellationManager? cancellationManager = null;
+        
+        _logger.Info(_being.Id, "ThinkOnChatStreamAsync: channelId={0}, cancellationToken={1}", channelId, cancellationToken == CancellationToken.None ? "None" : "Provided");
+        
+        if (channelId != Guid.Empty && cancellationToken == CancellationToken.None)
+        {
+            cancellationManager = ServiceLocator.Instance.GetService<StreamCancellationManager>();
+            if (cancellationManager != null)
+            {
+                effectiveToken = cancellationManager.CreateToken(channelId);
+                _logger.Info(_being.Id, "ThinkOnChatStreamAsync: Created cancellation token for channel {0}", channelId);
+            }
+            else
+            {
+                _logger.Warn(_being.Id, "ThinkOnChatStreamAsync: StreamCancellationManager not available for channel {0}", channelId);
+            }
+        }
+
         string? scenarioContext = BuildSingleChatScenarioContext();
-        AIResponse response = await GetResponseStreamAsync(scenarioContext, cancellationToken);
+        AIResponse response;
+        try
+        {
+            response = await GetResponseStreamAsync(scenarioContext, effectiveToken);
+        }
+        catch (OperationCanceledException) when (effectiveToken.IsCancellationRequested)
+        {
+            _logger.Info(_being.Id, "ThinkOnChatStreamAsync cancelled for channel {0}, stream abandoned", channelId);
+            cancellationManager?.CompleteStream(channelId);
+            
+            // Mark messages as read so next Tick won't retry this message
+            // User explicitly cancelled, meaning they don't want a response
+            CommitMessagesAsRead();
+            
+            return AIResponse.Failed("思考已被用户中止");
+        }
+        finally
+        {
+            cancellationManager?.CompleteStream(channelId);
+
+            // Notify the IMManager message queue that processing is complete,
+            // so it can dispatch the next queued message for this channel.
+            IMManager? imManager = ServiceLocator.Instance.IMManager;
+            if (imManager != null && channelId != Guid.Empty)
+            {
+                imManager.NotifyMessageProcessed(channelId);
+            }
+        }
 
         if (response.Success && response.HasToolCalls)
         {

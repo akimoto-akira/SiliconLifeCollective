@@ -74,6 +74,9 @@ public class Program
         GlobalACL globalAcl = new GlobalACL(storage);
         _logger.Info(null, "Initialized: GlobalACL");
 
+        StreamCancellationManager streamCancellationManager = new StreamCancellationManager();
+        _logger.Info(null, "Initialized: StreamCancellationManager");
+
         Router router = new Router();
         router.SetInitialized(File.Exists(configData.GetConfigPath()));
         IIMProvider imProvider = new WebUIProvider(router);
@@ -106,7 +109,8 @@ public class Program
             .SetIMManager(imManager)
             .SetBeingFactory(beingFactory)
             .SetDynamicBeingLoader(dynamicBeingLoader)
-            .SetTokenUsageAuditManager(tokenUsageAuditManager);
+            .SetTokenUsageAuditManager(tokenUsageAuditManager)
+            .SetStreamCancellationManager(streamCancellationManager);
 
         _host = builder.Build();
 

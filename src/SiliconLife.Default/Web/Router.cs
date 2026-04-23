@@ -39,6 +39,8 @@ public class Router
         RegisterController(() => new ChatController(), "/api/chat/messages");
         RegisterController(() => new ChatController(), "/api/chat/history");
         RegisterController(() => new ChatController(), "/api/chat/send", "POST");
+        RegisterController(() => new ChatController(), "/api/chat/stop", "POST");
+        RegisterController(() => new ChatController(), "/api/chat/upload", "POST");
         RegisterController(() => new BeingController(), "/beings");
         RegisterController(() => new BeingController(), "/beings/soul");
         RegisterController(() => new BeingController(), "/beings/ai-config");

@@ -104,6 +104,11 @@ public class CoreHost
             ServiceLocator.Instance.Register<TokenUsageAuditManager>(_builder.TokenUsageAuditManager);
             _logger.Debug(null, "Registered service: {0}", nameof(TokenUsageAuditManager));
         }
+        if (_builder.StreamCancellationManager != null)
+        {
+            ServiceLocator.Instance.Register<StreamCancellationManager>(_builder.StreamCancellationManager);
+            _logger.Debug(null, "Registered service: {0}", nameof(StreamCancellationManager));
+        }
 
         MainLoop.SetConfig(_builder.Config!);
         MainLoop.Start();

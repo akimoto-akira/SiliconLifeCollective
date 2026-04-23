@@ -25,6 +25,7 @@ public class IMManager
     private readonly ChatSystem _chatSystem;
     private readonly SiliconBeingManager _beingManager;
     private bool _isRunning;
+    private readonly ChatMessageQueue _messageQueue = new();
 
     /// <summary>
     /// Initializes a new <see cref="IMManager"/> and subscribes to the
@@ -47,6 +48,7 @@ public class IMManager
     /// <summary>
     /// Handles an incoming IM message. If the receiver ID is empty, the message
     /// is routed to the first available <see cref="SiliconBeingBase"/>.
+    /// Messages are queued per channel to prevent concurrent AI processing.
     /// </summary>
     private void OnMessageReceived(object? sender, IMMessageEventArgs e)
     {
@@ -59,7 +61,62 @@ public class IMManager
             return;
         }
 
-        _chatSystem.AddMessage(msg.SenderId, msg.ChannelId, msg.Content);
+        // Enqueue the message and try to process it
+        int position = _messageQueue.Enqueue(msg.ChannelId, msg);
+
+        // Notify frontend about queue status
+        NotifyQueueStatus(msg.ChannelId, position);
+
+        // Try to dequeue and process the next message
+        ProcessNextMessage(msg.ChannelId);
+    }
+
+    /// <summary>
+    /// Attempts to dequeue and process the next message in the channel's queue.
+    /// Only proceeds if the channel is not currently processing another message.
+    /// </summary>
+    private void ProcessNextMessage(Guid channelId)
+    {
+        if (_messageQueue.TryDequeue(channelId, out var queuedMsg))
+        {
+            // Dequeued successfully — add to ChatSystem which triggers AI thinking
+            _chatSystem.AddMessage(queuedMsg.Message.SenderId, queuedMsg.Message.ChannelId, queuedMsg.Message.Content);
+        }
+    }
+
+    /// <summary>
+    /// Notifies the frontend about the current queue status for a channel.
+    /// Pushes a <c>queue_status</c> SSE event via the IM provider.
+    /// </summary>
+    private void NotifyQueueStatus(Guid channelId, int position)
+    {
+        try
+        {
+            int total = _messageQueue.GetQueueLength(channelId);
+            _ = _imProvider.SendQueueStatusAsync(channelId, position, total);
+        }
+        catch (Exception ex)
+        {
+            _logger.Debug(null, "Failed to notify queue status for channel {0}: {1}", channelId, ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Called by ContextManager when AI finishes processing a message.
+    /// Marks the channel as available and processes the next queued message.
+    /// </summary>
+    /// <param name="channelId">The channel ID that has finished processing.</param>
+    public void NotifyMessageProcessed(Guid channelId)
+    {
+        _logger.Debug(null, "Message processed for channel {0}", channelId);
+        _messageQueue.MarkComplete(channelId);
+
+        // Process the next message in queue, if any
+        ProcessNextMessage(channelId);
+
+        // Notify frontend that queue position changed
+        int position = _messageQueue.GetQueuePosition(channelId);
+        NotifyQueueStatus(channelId, position);
     }
 
     /// <summary>
