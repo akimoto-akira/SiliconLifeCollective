@@ -35,7 +35,11 @@ public class ChatHistoryListView : ViewBase
                 H.H1($"{vm.BeingName} - {vm.Localization.ChatHistoryPageHeader}"),
                 H.P(vm.Localization.ChatHistoryConversationList).Class("page-subtitle")
             ).Class("page-header"),
-            H.Div().Id("conversation-list").Class("conversation-list")
+            H.Div().Id("conversation-list").Class("conversation-list"),
+            H.Div(
+                H.Div("").Class("loading-spinner"),
+                H.Div(vm.Localization.ChatLoading).Class("loading-text")
+            ).Id("loading-indicator").Class("loading-indicator")
         ).Class("page-content");
     }
 
@@ -111,7 +115,34 @@ public class ChatHistoryListView : ViewBase
                 .Property("padding", "40px")
                 .Property("color", "var(--text-secondary)")
                 .Property("font-size", "14px")
-            .EndSelector();
+            .EndSelector()
+            .Selector(".loading-indicator")
+                .Property("display", "none")
+                .Property("flex-direction", "column")
+                .Property("align-items", "center")
+                .Property("justify-content", "center")
+                .Property("padding", "40px 20px")
+                .Property("color", "var(--text-secondary)")
+                .Property("gap", "16px")
+            .EndSelector()
+            .Selector(".loading-indicator.active")
+                .Property("display", "flex")
+            .EndSelector()
+            .Selector(".loading-spinner")
+                .Property("width", "40px")
+                .Property("height", "40px")
+                .Property("border", "3px solid var(--border)")
+                .Property("border-top-color", "var(--accent-primary)")
+                .Property("border-radius", "50%")
+                .Property("animation", "spin 1s linear infinite")
+            .EndSelector()
+            .Selector(".loading-text")
+                .Property("font-size", "14px")
+                .Property("color", "var(--text-secondary)")
+            .EndSelector()
+            .Keyframes("spin", kf => kf
+                .At("0%", p => p.Property("transform", "rotate(0deg)"))
+                .At("100%", p => p.Property("transform", "rotate(360deg)")));
     }
 
     private static JsSyntax GetScripts(ChatHistoryListViewModel vm)
@@ -134,11 +165,29 @@ public class ChatHistoryListView : ViewBase
     
         var thenBody = Js.Block()
             .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "conversation-list"))))
+            .Add(() => Js.Const(() => "indicator", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "loading-indicator"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "indicator"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "indicator").Prop(() => "classList").Call(() => "remove", () => Js.Str(() => "active")).Stmt()
+                    }
+                )}
+            }))
             .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"),
                 () => Js.Id(() => "data").Prop(() => "conversations").Call(() => "map", () => Js.Arrow(() => new List<string> { "c" },
                     () => cardHtml))));
     
         var onloadBody = Js.Block()
+            .Add(() => Js.Const(() => "indicator", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "loading-indicator"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "indicator"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "indicator").Prop(() => "classList").Call(() => "add", () => Js.Str(() => "active")).Stmt()
+                    }
+                )}
+            }))
             .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => $"/api/chat-history/conversations?beingId={vm.BeingId}")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
     
         return Js.Block()

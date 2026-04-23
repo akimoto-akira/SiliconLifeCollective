@@ -56,6 +56,10 @@ public class ChatView : ViewBase
                         .Class("chat-header-name")
                 ).Id("chat-header").Class("chat-header"),
                 H.Div(msgItems.ToArray()).Id("chat-messages").Class("chat-messages"),
+                H.Div(
+                    H.Div("").Class("loading-spinner"),
+                    H.Div(vm.Localization.ChatLoading).Class("loading-text")
+                ).Id("loading-indicator").Class("loading-indicator"),
                 H.Div("").Id("queue-indicator").Class("queue-indicator").Style("display:none"),
                 H.Div(
                     H.Textarea().Id("message-input").Placeholder(vm.Localization.ChatMessageInputPlaceholder),
@@ -313,6 +317,36 @@ public class ChatView : ViewBase
                 .Property("display", "flex")
                 .Property("flex-direction", "column")
                 .Property("gap", "16px")
+                .Property("position", "relative")
+            .EndSelector()
+
+            .Comment("Loading indicator")
+            .Selector(".loading-indicator")
+                .Property("display", "none")
+                .Property("flex-direction", "column")
+                .Property("align-items", "center")
+                .Property("justify-content", "center")
+                .Property("padding", "40px 20px")
+                .Property("color", "var(--text-secondary)")
+                .Property("gap", "16px")
+            .EndSelector()
+            .Selector(".loading-indicator.active")
+                .Property("display", "flex")
+            .EndSelector()
+            .Selector(".loading-spinner")
+                .Property("width", "40px")
+                .Property("height", "40px")
+                .Property("border", "3px solid var(--border-color)")
+                .Property("border-top-color", "var(--accent-color)")
+                .Property("border-radius", "50%")
+                .Property("animation", "spin 1s linear infinite")
+            .EndSelector()
+            .Keyframes("spin", kf => kf
+                .At("0%", p => p.Property("transform", "rotate(0deg)"))
+                .At("100%", p => p.Property("transform", "rotate(360deg)")))
+            .Selector(".loading-text")
+                .Property("font-size", "14px")
+                .Property("font-weight", "500")
             .EndSelector()
 
             .Comment("User Message")
@@ -1143,8 +1177,33 @@ public class ChatView : ViewBase
                     }
                 )}
             }))
-            .Add(() => Js.Id(() => "renderMessages").Invoke().Stmt());
+            .Add(() => Js.Id(() => "renderMessages").Invoke().Stmt())
+            .Add(() => Js.Id(() => "hideLoading").Invoke().Stmt());
         js.Add(() => Js.Func(() => "handleHistory", () => new List<string> { "data" }, () => handleHistoryBody));
+
+        var showLoadingBody = Js.Block()
+            .Add(() => Js.Const(() => "indicator", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "loading-indicator"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "indicator"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "indicator").Prop(() => "classList").Call(() => "add", () => Js.Str(() => "active")).Stmt()
+                    }
+                )}
+            }));
+        js.Add(() => Js.Func(() => "showLoading", () => new List<string>(), () => showLoadingBody));
+
+        var hideLoadingBody = Js.Block()
+            .Add(() => Js.Const(() => "indicator", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "loading-indicator"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "indicator"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "indicator").Prop(() => "classList").Call(() => "remove", () => Js.Str(() => "active")).Stmt()
+                    }
+                )}
+            }));
+        js.Add(() => Js.Func(() => "hideLoading", () => new List<string>(), () => hideLoadingBody));
 
         var handleMessageBody = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
@@ -1450,6 +1509,7 @@ public class ChatView : ViewBase
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages")).Call(() => "setAttribute", () => Js.Str(() => "data-session-id"), () => Js.Id(() => "sessionId")).Stmt())
             .Add(() => Js.Assign(() => Js.Id(() => "messageCache"), () => Js.New(() => Js.Id(() => "Array"))))
             .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages")).Prop(() => "innerHTML"), () => Js.Str(() => "")))
+            .Add(() => Js.Id(() => "showLoading").Invoke().Stmt())
             .Add(() => Js.Id(() => "connectSSE").Invoke().Stmt());
         js.Add(() => Js.Func(() => "selectSession", () => new List<string> { "sessionId", "name" }, () => selectSessionBody));
 
@@ -1617,7 +1677,19 @@ public class ChatView : ViewBase
         js.Add(() => Js.Id(() => "initInput").Invoke().Stmt());
         js.Add(() => Js.Id(() => "initSessionList").Invoke().Stmt());
         js.Add(() => Js.Id(() => "renderMarkdownBody").Invoke(() => Js.Id(() => "document")).Stmt());
-        js.Add(() => Js.Id(() => "connectSSE").Invoke().Stmt());
+        js.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+        {
+            { (Js.Id(() => "currentSessionId"), new List<JsSyntax>
+                {
+                    Js.Id(() => "selectSession").Invoke(() => Js.Id(() => "currentSessionId"), () => Js.Id(() => "beingName")).Stmt()
+                }
+            )},
+            { (null, new List<JsSyntax>
+                {
+                    Js.Id(() => "connectSSE").Invoke().Stmt()
+                }
+            )}
+        }));
         js.Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages")).Call(() => "scrollTo", () => Js.Obj().Prop(() => "top", () => Js.Num(() => "999999")).Prop(() => "behavior", () => Js.Str(() => "auto"))).Stmt());
 
         // --- New feature: isThinking state ---

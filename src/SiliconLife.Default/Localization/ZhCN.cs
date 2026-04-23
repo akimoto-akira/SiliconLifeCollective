@@ -478,6 +478,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string ChatConversationsHeader => "会话";
     public override string ChatNoConversationSelected => "选择会话开始聊天";
     public override string ChatMessageInputPlaceholder => "输入消息...";
+    public override string ChatLoading => "正在加载...";
     public override string ChatSendButton => "发送";
     public override string ChatFileSourceDialogTitle => "选择文件来源";
     public override string ChatFileSourceServerFile => "选择服务器文件";

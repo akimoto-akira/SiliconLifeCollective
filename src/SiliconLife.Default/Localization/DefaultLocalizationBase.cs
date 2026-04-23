@@ -808,6 +808,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string ChatMessageInputPlaceholder { get; }
 
     /// <summary>
+    /// Gets the loading text displayed while chat history is being loaded
+    /// </summary>
+    public abstract string ChatLoading { get; }
+
+    /// <summary>
     /// Gets the text for the send button
     /// </summary>
     public abstract string ChatSendButton { get; }

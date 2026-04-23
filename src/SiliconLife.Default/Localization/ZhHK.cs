@@ -333,6 +333,7 @@ public class ZhHK : DefaultLocalizationBase
     public override string ChatConversationsHeader => "對話";
     public override string ChatNoConversationSelected => "選擇對話開始聊天";
     public override string ChatMessageInputPlaceholder => "輸入訊息...";
+    public override string ChatLoading => "正在載入...";
     public override string ChatSendButton => "傳送";
     public override string ChatFileSourceDialogTitle => "選擇文件來源";
     public override string ChatFileSourceServerFile => "選擇伺服器文件";

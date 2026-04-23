@@ -96,6 +96,8 @@ public class ChatController : Controller
         var sessions = new List<ChatSessionItem>();
         Guid? currentSessionId = null;
         string currentBeingName = "";
+        Guid? curatorSessionId = null;
+        string curatorBeingName = "";
 
         foreach (var session in _chatSystem.GetSessionsForUser(_userId, beings.Select(b => b.Id)))
         {
@@ -109,10 +111,17 @@ public class ChatController : Controller
                 if (otherId != Guid.Empty && beingDict.TryGetValue(otherId, out var being))
                 {
                     displayName = loc.GetSingleChatDisplayName(being.Name);
+                    // Track curator session separately to prioritize it
+                    if (being.IsCurator)
+                    {
+                        curatorSessionId = session.Id;
+                        curatorBeingName = displayName;
+                    }
+                    // Fall back to first session if no curator session found yet
                     if (currentSessionId == null)
                     {
                         currentSessionId = session.Id;
-                        currentBeingName = being.Name;
+                        currentBeingName = displayName;
                     }
                 }
                 else if (otherId != Guid.Empty)
@@ -139,6 +148,13 @@ public class ChatController : Controller
                 LastMessage = lastMsg?.Content ?? "",
                 LastMessageAt = lastMsg?.Timestamp ?? DateTime.MinValue
             });
+        }
+
+        // Prioritize curator session over the first found session
+        if (curatorSessionId.HasValue)
+        {
+            currentSessionId = curatorSessionId;
+            currentBeingName = curatorBeingName;
         }
 
         var vm = new ChatViewModel
