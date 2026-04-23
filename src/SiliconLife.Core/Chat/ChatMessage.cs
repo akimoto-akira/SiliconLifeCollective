@@ -103,6 +103,11 @@ public class ChatMessage
     public int? TotalTokens { get; set; }
 
     /// <summary>
+    /// File metadata (only used when <see cref="Type"/> is <see cref="MessageType.File"/>).
+    /// </summary>
+    public FileMetadata? FileMetadata { get; set; }
+
+    /// <summary>
     /// Initializes a new instance of the ChatMessage class.
     /// </summary>
     public ChatMessage()
