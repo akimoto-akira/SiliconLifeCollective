@@ -520,6 +520,16 @@ public class KoKR : DefaultLocalizationBase
     public override string BeingsDetailTasksLabel => "작업:";
     public override string BeingsDetailAIClientLabel => "독립 AI 클라이언트:";
     public override string BeingsDetailAIClientEditLink => "편집";
+    public override string BeingsDetailChatHistoryLabel => "채팅 기록:";
+    public override string BeingsDetailChatHistoryLink => "채팅 기록 보기";
+    public override string ChatHistoryPageTitle => "채팅 기록";
+    public override string ChatHistoryPageHeader => "대화 목록";
+    public override string ChatHistoryConversationList => "대화 목록";
+    public override string ChatHistoryBackToList => "대화 목록으로 돌아가기";
+    public override string ChatHistoryNoConversations => "대화 기록이 없습니다";
+    public override string ChatDetailPageTitle => "채팅 상세";
+    public override string ChatDetailPageHeader => "대화 상세";
+    public override string ChatDetailNoMessages => "메시지가 없습니다";
     public override string BeingsYes => "예";
     public override string BeingsNo => "아니오";
     public override string BeingsNotSet => "미설정";

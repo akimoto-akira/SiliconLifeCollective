@@ -375,6 +375,16 @@ public class ZhHK : DefaultLocalizationBase
     public override string BeingsDetailTasksLabel => "任務：";
     public override string BeingsDetailAIClientLabel => "獨立AI客戶端：";
     public override string BeingsDetailAIClientEditLink => "編輯";
+    public override string BeingsDetailChatHistoryLabel => "聊天記錄：";
+    public override string BeingsDetailChatHistoryLink => "查看聊天記錄";
+    public override string ChatHistoryPageTitle => "聊天歷史";
+    public override string ChatHistoryPageHeader => "會話列表";
+    public override string ChatHistoryConversationList => "會話列表";
+    public override string ChatHistoryBackToList => "返回會話列表";
+    public override string ChatHistoryNoConversations => "暫無會話記錄";
+    public override string ChatDetailPageTitle => "聊天詳情";
+    public override string ChatDetailPageHeader => "會話詳情";
+    public override string ChatDetailNoMessages => "暫無消息";
     public override string BeingsYes => "是";
     public override string BeingsNo => "否";
     public override string BeingsNotSet => "未設定";

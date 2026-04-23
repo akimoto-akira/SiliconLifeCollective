@@ -664,6 +664,56 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string BeingsDetailAIClientEditLink { get; }
 
     /// <summary>
+    /// Gets the chat history link text in detail view
+    /// </summary>
+    public abstract string BeingsDetailChatHistoryLink { get; }
+
+    /// <summary>
+    /// Gets the chat history label in detail view
+    /// </summary>
+    public abstract string BeingsDetailChatHistoryLabel { get; }
+
+    /// <summary>
+    /// Gets the chat history page title
+    /// </summary>
+    public abstract string ChatHistoryPageTitle { get; }
+
+    /// <summary>
+    /// Gets the chat history page header
+    /// </summary>
+    public abstract string ChatHistoryPageHeader { get; }
+
+    /// <summary>
+    /// Gets the conversation list label
+    /// </summary>
+    public abstract string ChatHistoryConversationList { get; }
+
+    /// <summary>
+    /// Gets the back to conversation list link text
+    /// </summary>
+    public abstract string ChatHistoryBackToList { get; }
+
+    /// <summary>
+    /// Gets the no conversations message
+    /// </summary>
+    public abstract string ChatHistoryNoConversations { get; }
+
+    /// <summary>
+    /// Gets the chat detail page title
+    /// </summary>
+    public abstract string ChatDetailPageTitle { get; }
+
+    /// <summary>
+    /// Gets the chat detail page header
+    /// </summary>
+    public abstract string ChatDetailPageHeader { get; }
+
+    /// <summary>
+    /// Gets the no messages message
+    /// </summary>
+    public abstract string ChatDetailNoMessages { get; }
+
+    /// <summary>
     /// Gets the "Yes" text for boolean values
     /// </summary>
     public abstract string BeingsYes { get; }

@@ -520,6 +520,16 @@ public class JaJP : DefaultLocalizationBase
     public override string BeingsDetailTasksLabel => "タスク：";
     public override string BeingsDetailAIClientLabel => "独立AIクライアント：";
     public override string BeingsDetailAIClientEditLink => "編集";
+    public override string BeingsDetailChatHistoryLabel => "チャット履歴：";
+    public override string BeingsDetailChatHistoryLink => "チャット履歴を表示";
+    public override string ChatHistoryPageTitle => "チャット履歴";
+    public override string ChatHistoryPageHeader => "会話リスト";
+    public override string ChatHistoryConversationList => "会話リスト";
+    public override string ChatHistoryBackToList => "会話リストに戻る";
+    public override string ChatHistoryNoConversations => "会話記録はありません";
+    public override string ChatDetailPageTitle => "チャット詳細";
+    public override string ChatDetailPageHeader => "会話詳細";
+    public override string ChatDetailNoMessages => "メッセージはありません";
     public override string BeingsYes => "はい";
     public override string BeingsNo => "いいえ";
     public override string BeingsNotSet => "未設定";

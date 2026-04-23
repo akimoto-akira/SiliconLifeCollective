@@ -520,6 +520,16 @@ public class ZhCN : DefaultLocalizationBase
     public override string BeingsDetailTasksLabel => "任务：";
     public override string BeingsDetailAIClientLabel => "独立AI客户端：";
     public override string BeingsDetailAIClientEditLink => "编辑";
+    public override string BeingsDetailChatHistoryLabel => "聊天记录：";
+    public override string BeingsDetailChatHistoryLink => "查看聊天记录";
+    public override string ChatHistoryPageTitle => "聊天历史";
+    public override string ChatHistoryPageHeader => "会话列表";
+    public override string ChatHistoryConversationList => "会话列表";
+    public override string ChatHistoryBackToList => "返回会话列表";
+    public override string ChatHistoryNoConversations => "暂无会话记录";
+    public override string ChatDetailPageTitle => "聊天详情";
+    public override string ChatDetailPageHeader => "会话详情";
+    public override string ChatDetailNoMessages => "暂无消息";
     public override string BeingsYes => "是";
     public override string BeingsNo => "否";
     public override string BeingsNotSet => "未设置";

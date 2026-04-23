@@ -520,6 +520,16 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string BeingsDetailTasksLabel => "Tasks: ";
     public override string BeingsDetailAIClientLabel => "Independent AI Client: ";
     public override string BeingsDetailAIClientEditLink => "Edit";
+    public override string BeingsDetailChatHistoryLabel => "Chat History: ";
+    public override string BeingsDetailChatHistoryLink => "View Chat History";
+    public override string ChatHistoryPageTitle => "Chat History";
+    public override string ChatHistoryPageHeader => "Conversation List";
+    public override string ChatHistoryConversationList => "Conversation List";
+    public override string ChatHistoryBackToList => "Back to Conversation List";
+    public override string ChatHistoryNoConversations => "No conversations found";
+    public override string ChatDetailPageTitle => "Chat Detail";
+    public override string ChatDetailPageHeader => "Conversation Detail";
+    public override string ChatDetailNoMessages => "No messages";
     public override string BeingsYes => "Yes";
     public override string BeingsNo => "No";
     public override string BeingsNotSet => "Not set";

@@ -49,6 +49,10 @@ public class Router
         RegisterController(() => new BeingController(), "/api/beings/soul/save", "POST");
         RegisterController(() => new BeingController(), "/api/beings/ai-config/save", "POST");
         RegisterController(() => new BeingController(), "/api/beings/ai-config/models");
+        RegisterController(() => new ChatHistoryController(), "/chat-history");
+        RegisterController(() => new ChatHistoryController(), "/chat-history-detail");
+        RegisterController(() => new ChatHistoryController(), "/api/chat-history/conversations");
+        RegisterController(() => new ChatHistoryController(), "/api/chat-history/messages");
         RegisterController(() => new TimerController(), "/timers");
         RegisterController(() => new TimerController(), "/api/timers/list");
         RegisterController(() => new TaskController(), "/tasks");
