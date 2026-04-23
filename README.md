@@ -22,7 +22,9 @@ Choose your preferred language:
 ## Repository
 
 - [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective)
-- [Gitee (China Mirror)](https://gitee.com/hoshinokennji/SiliconLifeCollective)
+  - Detailed English documentation has been uploaded to the GitHub Wiki.
+- [码云（中国镜像）](https://gitee.com/hoshinokennji/SiliconLifeCollective)
+  - 中文版详细文档已经上传至码云 Wiki。
 
 ## License
 
