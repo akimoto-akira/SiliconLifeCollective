@@ -56,11 +56,58 @@ public class ChatView : ViewBase
                         .Class("chat-header-name")
                 ).Id("chat-header").Class("chat-header"),
                 H.Div(msgItems.ToArray()).Id("chat-messages").Class("chat-messages"),
+                H.Div("").Id("queue-indicator").Class("queue-indicator").Style("display:none"),
                 H.Div(
                     H.Textarea().Id("message-input").Placeholder(vm.Localization.ChatMessageInputPlaceholder),
-                    H.Div(H.Button(vm.Localization.ChatSendButton).OnClick("sendMessage()")).Class("send-button")
-                ).Class("chat-input-area")
+                    H.Div(H.Button(vm.Localization.ChatSendButton).OnClick("sendMessage()")).Class("send-button"),
+                    H.Button("\u23F9").Id("stop-button").OnClick("stopThinking()").Class("stop-button").Style("display:none"),
+                    H.Button("\uD83D\uDCC1").Id("file-button").OnClick("showFileSourceDialog()").Class("file-button"),
+                    H.Input().Id("file-input").Attr("type", "file").Attr("multiple", "multiple").Attr("webkitdirectory", "webkitdirectory").Style("display:none").OnChange("handleFileSelected()")
+                ).Class("chat-input-area"),
+                H.Div(
+                    H.Div(
+                        H.Div(
+                            H.H4("\uD83D\uDCC1 " + "\u4E0A\u4F20\u6587\u6863").Class("panel-header-title"),
+                            H.Button("\u2715").OnClick("toggleFilePanel()").Class("panel-close-button")
+                        ).Class("panel-header"),
+                        H.Div(
+                            H.Label("\u8F93\u5165\u672C\u5730\u6587\u4EF6\u8DEF\u5F84\uFF1A"),
+                            H.Input().Id("file-path-input").Placeholder("C:\\Users\\xxx\\document.pdf").Class("file-path-input"),
+                            H.Div("AI\u5C06\u76F4\u63A5\u8BFB\u53D6\u6B64\u8DEF\u5F84\u7684\u6587\u4EF6").Class("file-hint")
+                        ).Class("panel-body"),
+                        H.Div(
+                            H.Button("\u786E\u8BA4\u4E0A\u4F20").OnClick("uploadFile()").Class("btn-primary"),
+                            H.Button("\u53D6\u6D88").OnClick("toggleFilePanel()").Class("btn-secondary")
+                        ).Class("panel-actions")
+                    ).Class("file-upload-panel")
+                ).Id("file-panel").Class("file-panel").Style("display:none")
             ).Class("chat-main"),
+            // File source dialog: moved outside chat-main to avoid overflow clipping
+            H.Div(
+                H.Div(
+                    H.Div(
+                        H.H4(vm.Localization.ChatFileSourceDialogTitle).Class("file-source-title"),
+                        H.Button("\u00D7").Attr("onclick", "event.stopPropagation(); hideFileSourceDialog()").Class("file-source-close")
+                    ).Class("file-source-header"),
+                    H.Div(
+                        H.Div(
+                            H.Div("\uD83D\uDCE1").Class("file-source-icon"),
+                            H.Div(
+                                H.Div(vm.Localization.ChatFileSourceServerFile).Class("file-source-label"),
+                                H.Div("\u4ECE\u670D\u52A1\u5668\u9009\u62E9\u5DF2\u6709\u6587\u4EF6").Class("file-source-desc")
+                            ).Class("file-source-content")
+                        ).Id("server-file-btn").OnClick("selectServerFile()").Class("file-source-card"),
+                        H.Div(
+                            H.Div("\uD83D\uDCC2").Class("file-source-icon"),
+                            H.Div(
+                                H.Div(vm.Localization.ChatFileSourceUploadLocal).Class("file-source-label"),
+                                H.Div("\u4ECE\u672C\u5730\u4E0A\u4F20\u65B0\u6587\u4EF6").Class("file-source-desc")
+                            ).Class("file-source-content")
+                        ).Id("local-file-btn").OnClick("uploadLocalFile()").Class("file-source-card")
+                    ).Class("file-source-cards")
+                ).Class("file-source-box")
+                    .Attr("onclick", "event.stopPropagation()")
+            ).Id("file-source-dialog").Class("file-source-dialog"),
             H.Div(
                 H.Div(
                     H.Div(
@@ -634,6 +681,180 @@ public class ChatView : ViewBase
             .Selector(".send-button button:hover")
                 .Property("opacity", "0.85")
             .EndSelector()
+            .Selector(".stop-button")
+                .Property("padding", "10px 16px")
+                .Property("background", "var(--accent-danger, #ef4444)")
+                .Property("color", "#fff")
+                .Property("border", "none")
+                .Property("border-radius", "8px")
+                .Property("cursor", "pointer")
+                .Property("font-size", "16px")
+                .Property("font-weight", "500")
+                .Property("white-space", "nowrap")
+                .Property("transition", "opacity 0.2s, transform 0.1s")
+                .Property("min-width", "44px")
+                .Property("min-height", "40px")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("justify-content", "center")
+            .EndSelector()
+            .Selector(".stop-button:hover")
+                .Property("opacity", "0.85")
+                .Property("transform", "scale(1.05)")
+            .EndSelector()
+            .Selector(".file-button")
+                .Property("padding", "10px 16px")
+                .Property("background", "var(--accent-secondary, #6366f1)")
+                .Property("color", "#fff")
+                .Property("border", "none")
+                .Property("border-radius", "8px")
+                .Property("cursor", "pointer")
+                .Property("font-size", "16px")
+                .Property("font-weight", "500")
+                .Property("white-space", "nowrap")
+                .Property("transition", "opacity 0.2s, transform 0.1s")
+                .Property("min-width", "44px")
+                .Property("min-height", "40px")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("justify-content", "center")
+            .EndSelector()
+            .Selector(".file-button:hover")
+                .Property("opacity", "0.85")
+                .Property("transform", "scale(1.05)")
+            .EndSelector()
+
+            .Comment("File Source Dialog")
+            .Selector(".file-source-dialog")
+                .Property("display", "none")
+                .Property("position", "fixed")
+                .Property("inset", "0")
+                .Property("z-index", "1000")
+                .Property("align-items", "center")
+                .Property("justify-content", "center")
+                .Property("background", "rgba(0,0,0,0.5)")
+                .Property("backdrop-filter", "blur(8px)")
+            .EndSelector()
+            .Selector(".file-source-dialog-active")
+                .Property("display", "flex")
+            .EndSelector()
+            .Selector(".file-source-box")
+                .Property("background", "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)")
+                .Property("border-radius", "20px")
+                .Property("padding", "28px")
+                .Property("min-width", "360px")
+                .Property("max-width", "440px")
+                .Property("box-shadow", "0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1) inset")
+                .Property("animation", "dialogSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1)")
+            .EndSelector()
+            .Selector(".file-source-header")
+                .Property("display", "flex")
+                .Property("justify-content", "space-between")
+                .Property("align-items", "center")
+                .Property("margin-bottom", "24px")
+                .Property("padding-bottom", "16px")
+                .Property("border-bottom", "1px solid #e5e7eb")
+            .EndSelector()
+            .Selector(".file-source-title")
+                .Property("margin", "0")
+                .Property("font-size", "20px")
+                .Property("font-weight", "600")
+                .Property("color", "#1f2937")
+                .Property("letter-spacing", "-0.01em")
+            .EndSelector()
+            .Selector(".file-source-close")
+                .Property("width", "32px")
+                .Property("height", "32px")
+                .Property("border", "none")
+                .Property("background", "transparent")
+                .Property("color", "#9ca3af")
+                .Property("font-size", "24px")
+                .Property("font-weight", "300")
+                .Property("line-height", "1")
+                .Property("cursor", "pointer")
+                .Property("border-radius", "8px")
+                .Property("transition", "all 0.15s")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("justify-content", "center")
+            .EndSelector()
+            .Selector(".file-source-close:hover")
+                .Property("background", "#f3f4f6")
+                .Property("color", "#374151")
+            .EndSelector()
+            .Selector(".file-source-cards")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+                .Property("gap", "12px")
+            .EndSelector()
+            .Selector(".file-source-card")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("gap", "16px")
+                .Property("padding", "18px 20px")
+                .Property("border", "2px solid #e5e7eb")
+                .Property("border-radius", "14px")
+                .Property("background", "#ffffff")
+                .Property("cursor", "pointer")
+                .Property("transition", "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)")
+                .Property("position", "relative")
+                .Property("overflow", "hidden")
+            .EndSelector()
+            .Selector(".file-source-card::before")
+                .Property("content", "''")
+                .Property("position", "absolute")
+                .Property("inset", "0")
+                .Property("background", "linear-gradient(135deg, rgba(59,130,246,0.05) 0%, rgba(147,51,234,0.05) 100%)")
+                .Property("opacity", "0")
+                .Property("transition", "opacity 0.2s")
+            .EndSelector()
+            .Selector(".file-source-card:hover")
+                .Property("border-color", "#3b82f6")
+                .Property("box-shadow", "0 4px 12px rgba(59,130,246,0.15), 0 0 0 3px rgba(59,130,246,0.1)")
+                .Property("transform", "translateY(-2px)")
+            .EndSelector()
+            .Selector(".file-source-card:hover::before")
+                .Property("opacity", "1")
+            .EndSelector()
+            .Selector(".file-source-card:active")
+                .Property("transform", "translateY(0)")
+            .EndSelector()
+            .Selector(".file-source-icon")
+                .Property("width", "48px")
+                .Property("height", "48px")
+                .Property("border-radius", "12px")
+                .Property("background", "linear-gradient(135deg, #eff6ff 0%, #f3e8ff 100%)")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("justify-content", "center")
+                .Property("font-size", "22px")
+                .Property("flex-shrink", "0")
+                .Property("transition", "all 0.2s")
+            .EndSelector()
+            .Selector(".file-source-card:hover .file-source-icon")
+                .Property("background", "linear-gradient(135deg, #3b82f6 0%, #9333ea 100%)")
+                .Property("transform", "scale(1.05)")
+            .EndSelector()
+            .Selector(".file-source-content")
+                .Property("flex", "1")
+                .Property("min-width", "0")
+            .EndSelector()
+            .Selector(".file-source-label")
+                .Property("font-size", "16px")
+                .Property("font-weight", "600")
+                .Property("color", "#1f2937")
+                .Property("margin-bottom", "4px")
+            .EndSelector()
+            .Selector(".file-source-desc")
+                .Property("font-size", "13px")
+                .Property("color", "#6b7280")
+                .Property("line-height", "1.4")
+            .EndSelector()
+
+            .Comment("File Source Dialog Animation")
+            .Keyframes("dialogSlideIn", kb => kb
+                .At("from", pb => pb.Property("opacity", "0").Property("transform", "translateY(-20px) scale(0.95)"))
+                .At("to", pb => pb.Property("opacity", "1").Property("transform", "translateY(0) scale(1)")))
 
             .Comment("Responsive")
             .Media("(max-width: 768px)")
@@ -1398,6 +1619,366 @@ public class ChatView : ViewBase
         js.Add(() => Js.Id(() => "renderMarkdownBody").Invoke(() => Js.Id(() => "document")).Stmt());
         js.Add(() => Js.Id(() => "connectSSE").Invoke().Stmt());
         js.Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages")).Call(() => "scrollTo", () => Js.Obj().Prop(() => "top", () => Js.Num(() => "999999")).Prop(() => "behavior", () => Js.Str(() => "auto"))).Stmt());
+
+        // --- New feature: isThinking state ---
+        js.Add(() => Js.Let(() => "isThinking", () => Js.Bool(() => false)));
+
+        // --- Stop Thinking ---
+        var stopThinkingBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "currentSessionId").Not(), new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
+            }))
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/chat/stop"), () => Js.Obj()
+                .Prop(() => "method", () => Js.Str(() => "POST"))
+                .Prop(() => "headers", () => Js.Obj().Prop(() => "Content-Type", () => Js.Str(() => "application/json")))
+                .Prop(() => "body", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj()
+                    .Prop(() => "channelId", () => Js.Id(() => "currentSessionId"))))
+            ).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json")))
+            .Call(() => "then", () => Js.Arrow(() => new List<string> { "result" }, () => Js.Block()
+                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                {
+                    { (Js.Id(() => "result").Prop(() => "success"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "Stop request sent")).Stmt(),
+                        Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "stop-button")).Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "none"))
+                    })}
+                }))
+            )).Call(() => "catch", () => Js.Arrow(() => new List<string> { "err" }, () => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Stop error:"), () => Js.Id(() => "err")))).Stmt());
+        js.Add(() => Js.Func(() => "stopThinking", () => new List<string>(), () => stopThinkingBody));
+
+        // --- Show / Hide Stop Button ---
+        var showStopButtonBody = Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "stop-button")).Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "inline-block")))
+            .Add(() => Js.Assign(() => Js.Id(() => "isThinking"), () => Js.Bool(() => true)));
+        js.Add(() => Js.Func(() => "showStopButton", () => new List<string>(), () => showStopButtonBody));
+
+        var hideStopButtonBody = Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "stop-button")).Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "none")))
+            .Add(() => Js.Assign(() => Js.Id(() => "isThinking"), () => Js.Bool(() => false)));
+        js.Add(() => Js.Func(() => "hideStopButton", () => new List<string>(), () => hideStopButtonBody));
+
+        // --- File Source Dialog: show/hide ---
+        var showFileSourceDialogBody = Js.Block()
+            .Add(() => Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "showFileSourceDialog called")).Stmt())
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "file-source-dialog")).Prop(() => "classList").Call(() => "add", () => Js.Str(() => "file-source-dialog-active")).Stmt());
+        js.Add(() => Js.Func(() => "showFileSourceDialog", () => new List<string>(), () => showFileSourceDialogBody));
+
+        var hideFileSourceDialogBody = Js.Block()
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "file-source-dialog")).Prop(() => "classList").Call(() => "remove", () => Js.Str(() => "file-source-dialog-active")).Stmt());
+        js.Add(() => Js.Func(() => "hideFileSourceDialog", () => new List<string>(), () => hideFileSourceDialogBody));
+
+        // --- File Source Actions (placeholders) ---
+        var selectServerFileBody = Js.Block()
+            .Add(() => Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "selectServerFile clicked")).Stmt())
+            .Add(() => Js.Id(() => "hideFileSourceDialog").Invoke().Stmt());
+        js.Add(() => Js.Func(() => "selectServerFile", () => new List<string>(), () => selectServerFileBody));
+
+        var uploadLocalFileBody = Js.Block()
+            .Add(() => Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "uploadLocalFile clicked")).Stmt())
+            .Add(() => Js.Id(() => "hideFileSourceDialog").Invoke().Stmt());
+        js.Add(() => Js.Func(() => "uploadLocalFile", () => new List<string>(), () => uploadLocalFileBody));
+
+        // --- File Upload: triggerFileSelect ---
+        // Always show system file picker; uploadSingleFile decides how to transmit
+        var triggerFileSelectBody = Js.Block()
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "file-input")).Call(() => "click").Stmt());
+        js.Add(() => Js.Func(() => "triggerFileSelect", () => new List<string>(), () => triggerFileSelectBody));
+
+        // --- File Upload: uploadFileByPath(filePath) ---
+        // Local path reference: sends JSON {channelId, filePath, isLocalPath:true}
+        var uploadFileByPathBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/chat/upload"), () => Js.Obj()
+                .Prop(() => "method", () => Js.Str(() => "POST"))
+                .Prop(() => "headers", () => Js.Obj().Prop(() => "Content-Type", () => Js.Str(() => "application/json")))
+                .Prop(() => "body", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj()
+                    .Prop(() => "channelId", () => Js.Id(() => "currentSessionId"))
+                    .Prop(() => "filePath", () => Js.Id(() => "filePath"))
+                    .Prop(() => "isLocalPath", () => Js.Bool(() => true)))))
+            .Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json")))
+            .Call(() => "then", () => Js.Arrow(() => new List<string> { "result" }, () => Js.Block()
+                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                {
+                    { (Js.Id(() => "result").Prop(() => "success"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "appendFileMessage").Invoke(() => Js.Id(() => "result")).Stmt()
+                    })},
+                    { (null, new List<JsSyntax>
+                    {
+                        Js.Id(() => "alert").Invoke(() => Js.Str(() => "Upload failed: ").Op(() => "+", () => (JsSyntax)Js.Id(() => "result").Prop(() => "error"))).Stmt()
+                    })}
+                }))))
+            .Call(() => "catch", () => Js.Arrow(() => new List<string> { "err" }, () => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Upload error:"), () => Js.Id(() => "err")))).Stmt());
+        js.Add(() => Js.Func(() => "uploadFileByPath", () => new List<string> { "filePath" }, () => uploadFileByPathBody));
+
+        // --- File Upload: uploadFileByData(file) ---
+        // Remote upload: sends file content via FormData with channelId as query param
+        var uploadFileByDataBody = Js.Block()
+            .Add(() => Js.Const(() => "formData", () => Js.Id(() => "FormData").Invoke()))
+            .Add(() => Js.Id(() => "formData").Call(() => "append", () => Js.Str(() => "file"), () => Js.Id(() => "file")).Stmt())
+            .Add(() => Js.Id(() => "fetch").Invoke(
+                () => Js.Str(() => "/api/chat/upload?channelId=").Op(() => "+", () => (JsSyntax)Js.Id(() => "currentSessionId")),
+                () => Js.Obj()
+                    .Prop(() => "method", () => Js.Str(() => "POST"))
+                    .Prop(() => "body", () => Js.Id(() => "formData")))
+            .Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json")))
+            .Call(() => "then", () => Js.Arrow(() => new List<string> { "result" }, () => Js.Block()
+                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                {
+                    { (Js.Id(() => "result").Prop(() => "success"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "appendFileMessage").Invoke(() => Js.Id(() => "result")).Stmt()
+                    })},
+                    { (null, new List<JsSyntax>
+                    {
+                        Js.Id(() => "alert").Invoke(() => Js.Str(() => "Upload failed: ").Op(() => "+", () => (JsSyntax)Js.Id(() => "result").Prop(() => "error"))).Stmt()
+                    })}
+                }))))
+            .Call(() => "catch", () => Js.Arrow(() => new List<string> { "err" }, () => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Upload error:"), () => Js.Id(() => "err")))).Stmt());
+        js.Add(() => Js.Func(() => "uploadFileByData", () => new List<string> { "file" }, () => uploadFileByDataBody));
+
+        // --- File Upload: uploadSingleFile(file) ---
+        // Routes to uploadFileByPath (local+path available) or uploadFileByData (otherwise)
+        var isLocalCondition =
+            Js.Id(() => "window").Prop(() => "location").Prop(() => "hostname").Op(() => "===", () => Js.Str(() => "127.0.0.1"))
+            .Op(() => "||", () => Js.Id(() => "window").Prop(() => "location").Prop(() => "hostname").Op(() => "===", () => Js.Str(() => "localhost")))
+            .Op(() => "||", () => Js.Id(() => "window").Prop(() => "location").Prop(() => "hostname").Op(() => "===", () => Js.Str(() => "::1")));
+        var uploadSingleFileBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                {
+                    (isLocalCondition.Paren().Op(() => "&&", () => Js.Id(() => "file").Prop(() => "path")),
+                    new List<JsSyntax>
+                    {
+                        Js.Id(() => "uploadFileByPath").Invoke(() => Js.Id(() => "file").Prop(() => "path")).Stmt()
+                    })
+                },
+                {
+                    (null, new List<JsSyntax>
+                    {
+                        Js.Id(() => "uploadFileByData").Invoke(() => Js.Id(() => "file")).Stmt()
+                    })
+                }
+            }));
+        js.Add(() => Js.Func(() => "uploadSingleFile", () => new List<string> { "file" }, () => uploadSingleFileBody));
+
+        // --- File Upload: handleFileSelected ---
+        var handleFileSelectedBody = Js.Block()
+            .Add(() => Js.Const(() => "fileInput", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "file-input"))))
+            .Add(() => Js.Const(() => "files", () => Js.Id(() => "fileInput").Prop(() => "files")))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "files").Prop(() => "length").Op(() => "===", () => Js.Num(() => "0")), new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
+            }))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "currentSessionId").Not(), new List<JsSyntax> { Js.Id(() => "alert").Invoke(() => Js.Str(() => "No active session")).Stmt(), Js.Return(() => Js.Id(() => "undefined")) }) }
+            }))
+            .Add(() => Js.Id(() => "Array").Call(() => "from", () => Js.Id(() => "files")).Call(() => "forEach", () => Js.Id(() => "uploadSingleFile")).Stmt())
+            .Add(() => Js.Assign(() => Js.Id(() => "fileInput").Prop(() => "value"), () => Js.Str(() => "")));
+        js.Add(() => Js.Func(() => "handleFileSelected", () => new List<string>(), () => handleFileSelectedBody));
+
+        // --- File Upload: toggleFilePanel ---
+        var toggleFilePanelBody = Js.Block()
+            .Add(() => Js.Const(() => "panel", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "file-panel"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "panel").Prop(() => "style").Prop(() => "display"), () => Js.Ternary(
+                () => Js.Id(() => "panel").Prop(() => "style").Prop(() => "display").Op(() => "===", () => Js.Str(() => "none")),
+                () => Js.Str(() => "block"),
+                () => Js.Str(() => "none"))));
+        js.Add(() => Js.Func(() => "toggleFilePanel", () => new List<string>(), () => toggleFilePanelBody));
+
+        // --- File Upload: uploadFile ---
+        var uploadFileBody = Js.Block()
+            .Add(() => Js.Const(() => "filePath", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "file-path-input")).Prop(() => "value").Call(() => "trim")))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "filePath").Not(), new List<JsSyntax> { Js.Id(() => "alert").Invoke(() => Js.Str(() => "Please enter a file path")).Stmt(), Js.Return(() => Js.Id(() => "undefined")) }) }
+            }))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "currentSessionId").Not(), new List<JsSyntax> { Js.Id(() => "alert").Invoke(() => Js.Str(() => "No active session")).Stmt(), Js.Return(() => Js.Id(() => "undefined")) }) }
+            }))
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/chat/upload"), () => Js.Obj()
+                .Prop(() => "method", () => Js.Str(() => "POST"))
+                .Prop(() => "headers", () => Js.Obj().Prop(() => "Content-Type", () => Js.Str(() => "application/json")))
+                .Prop(() => "body", () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Obj()
+                    .Prop(() => "channelId", () => Js.Id(() => "currentSessionId"))
+                    .Prop(() => "filePath", () => Js.Id(() => "filePath"))
+                    .Prop(() => "isLocalPath", () => Js.Bool(() => true))))
+            ).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json")))
+            .Call(() => "then", () => Js.Arrow(() => new List<string> { "result" }, () => Js.Block()
+                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                {
+                    { (Js.Id(() => "result").Prop(() => "success"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "toggleFilePanel").Invoke().Stmt(),
+                        Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "file-path-input")).Prop(() => "value"), () => Js.Str(() => "")),
+                        Js.Id(() => "appendFileMessage").Invoke(() => Js.Id(() => "result")).Stmt()
+                    })},
+                    { (null, new List<JsSyntax>
+                    {
+                        Js.Id(() => "alert").Invoke(() => Js.Str(() => "Upload failed: ").Op(() => "+", () => (JsSyntax)Js.Id(() => "result").Prop(() => "error"))).Stmt()
+                    })}
+                }))
+            )).Call(() => "catch", () => Js.Arrow(() => new List<string> { "err" }, () => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Upload error:"), () => Js.Id(() => "err")))).Stmt());
+        js.Add(() => Js.Func(() => "uploadFile", () => new List<string>(), () => uploadFileBody));
+
+        // --- File Upload: appendFileMessage ---
+        var fileCardHtml = Js.Str(() => "<div class=\"file-card\"><div class=\"file-icon\">📄</div><div class=\"file-info\"><div class=\"file-name\">")
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "escapeHtml").Invoke(() => Js.Id(() => "fileData").Prop(() => "fileName").Op(() => "||", () => Js.Str(() => ""))).Paren())
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><div class=\"file-size\">"))
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "fileSize"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => " · "))
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "pathLabel"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div><button class=\"file-action\" onclick=\"askAIToReadFile('"))
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "escapeHtml").Invoke(() => Js.Id(() => "fileData").Prop(() => "fileName").Op(() => "||", () => Js.Str(() => ""))).Paren())
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "')\">🤖 Ask AI</button></div>"));
+        var appendFileMessageBody = Js.Block()
+            .Add(() => Js.Const(() => "messages", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))))
+            .Add(() => Js.Const(() => "div", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "message message-file")))
+            .Add(() => Js.Const(() => "fileSize", () => Js.Id(() => "formatFileSize").Invoke(() => Js.Id(() => "fileData").Prop(() => "fileSize").Op(() => "||", () => Js.Num(() => "0")))))
+            .Add(() => Js.Const(() => "pathLabel", () => Js.Ternary(() => Js.Id(() => "fileData").Prop(() => "isLocalPath"), () => Js.Str(() => "Local"), () => Js.Str(() => "Server"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => fileCardHtml))
+            .Add(() => Js.Id(() => "messages").Call(() => "appendChild", () => Js.Id(() => "div")).Stmt())
+            .Add(() => Js.Id(() => "messages").Call(() => "scrollTo", () => Js.Obj().Prop(() => "top", () => Js.Id(() => "messages").Prop(() => "scrollHeight")).Prop(() => "behavior", () => Js.Str(() => "smooth"))).Stmt());
+        js.Add(() => Js.Func(() => "appendFileMessage", () => new List<string> { "fileData" }, () => appendFileMessageBody));
+
+        // --- File Upload: askAIToReadFile ---
+        var askAIToReadFileBody = Js.Block()
+            .Add(() => Js.Const(() => "input", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "message-input"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "value"), () => Js.Str(() => "Please read and analyze this file: ").Op(() => "+", () => (JsSyntax)Js.Id(() => "fileName"))))
+            .Add(() => Js.Id(() => "input").Call(() => "focus").Stmt());
+        js.Add(() => Js.Func(() => "askAIToReadFile", () => new List<string> { "fileName" }, () => askAIToReadFileBody));
+
+        // --- formatFileSize ---
+        var formatFileSizeBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "bytes").Op(() => "<", () => Js.Num(() => "1024")), new List<JsSyntax> { Js.Return(() => Js.Id(() => "bytes").Op(() => "+", () => (JsSyntax)Js.Str(() => " B"))) }) },
+                { (Js.Id(() => "bytes").Op(() => "<", () => Js.Num(() => "1048576")), new List<JsSyntax> { Js.Return(() => Js.Id(() => "bytes").Op(() => "/", () => (JsSyntax)Js.Num(() => "1024")).Paren().Call(() => "toFixed", () => Js.Num(() => "1")).Op(() => "+", () => (JsSyntax)Js.Str(() => " KB"))) }) }
+            }))
+            .Add(() => Js.Return(() => Js.Id(() => "bytes").Op(() => "/", () => (JsSyntax)Js.Num(() => "1048576")).Paren().Call(() => "toFixed", () => Js.Num(() => "1")).Op(() => "+", () => (JsSyntax)Js.Str(() => " MB"))));
+        js.Add(() => Js.Func(() => "formatFileSize", () => new List<string> { "bytes" }, () => formatFileSizeBody));
+
+        // --- escapeHtml ---
+        var escapeHtmlBody = Js.Block()
+            .Add(() => Js.Const(() => "div", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "textContent"), () => Js.Id(() => "text")))
+            .Add(() => Js.Return(() => Js.Id(() => "div").Prop(() => "innerHTML")));
+        js.Add(() => Js.Func(() => "escapeHtml", () => new List<string> { "text" }, () => escapeHtmlBody));
+
+        // --- Queue Status ---
+        var showQueueIndicatorBody = Js.Block()
+            .Add(() => Js.Const(() => "indicator", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "queue-indicator"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "indicator"), new List<JsSyntax>
+                {
+                    Js.Assign(() => Js.Id(() => "indicator").Prop(() => "textContent"), () => Js.Ternary(
+                        () => Js.Id(() => "position").Op(() => ">", () => Js.Num(() => "0")),
+                        () => Js.Str(() => "Message queued (position ").Op(() => "+", () => (JsSyntax)Js.Id(() => "position")).Op(() => "+", () => (JsSyntax)Js.Str(() => ")")),
+                        () => Js.Str(() => "Processing..."))),
+                    Js.Assign(() => Js.Id(() => "indicator").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "block"))
+                })}
+            }));
+        js.Add(() => Js.Func(() => "showQueueIndicator", () => new List<string> { "position" }, () => showQueueIndicatorBody));
+
+        var hideQueueIndicatorBody = Js.Block()
+            .Add(() => Js.Const(() => "indicator", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "queue-indicator"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "indicator"), new List<JsSyntax>
+                {
+                    Js.Assign(() => Js.Id(() => "indicator").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "none"))
+                })}
+            }));
+        js.Add(() => Js.Func(() => "hideQueueIndicator", () => new List<string>(), () => hideQueueIndicatorBody));
+
+        // --- SSE Event Listeners: override connectSSE ---
+        js.Add(() => Js.Const(() => "_origConnectSSE", () => Js.Id(() => "connectSSE")));
+
+        // Stopped event handler
+        var stoppedHandlerBody = Js.Block()
+            .Add(() => Js.Id(() => "hideStopButton").Invoke().Stmt())
+            .Add(() => Js.Const(() => "data", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "event").Prop(() => "data"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "data").Prop(() => "channelId").Op(() => "===", () => Js.Id(() => "currentSessionId")), new List<JsSyntax>
+                {
+                    Js.Const(() => "messages", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))),
+                    Js.Const(() => "div", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))),
+                    Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "message message-system")),
+                    Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"system-msg\">AI thinking stopped</div>")),
+                    Js.Id(() => "messages").Call(() => "appendChild", () => Js.Id(() => "div")).Stmt(),
+                    Js.Id(() => "messages").Call(() => "scrollTo", () => Js.Obj().Prop(() => "top", () => Js.Id(() => "messages").Prop(() => "scrollHeight")).Prop(() => "behavior", () => Js.Str(() => "smooth"))).Stmt()
+                })}
+            }));
+
+        // Queue status event handler
+        var queueStatusHandlerBody = Js.Block()
+            .Add(() => Js.Const(() => "data", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "event").Prop(() => "data"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "data").Prop(() => "channelId").Op(() => "===", () => Js.Id(() => "currentSessionId")), new List<JsSyntax>
+                {
+                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        { (Js.Id(() => "data").Prop(() => "position").Op(() => ">", () => Js.Num(() => "0")), new List<JsSyntax> { Js.Id(() => "showQueueIndicator").Invoke(() => Js.Id(() => "data").Prop(() => "position")).Stmt() }) },
+                        { (null, new List<JsSyntax> { Js.Id(() => "hideQueueIndicator").Invoke().Stmt() }) }
+                    })
+                })}
+            }));
+
+        // File event handler
+        var fileEventHandlerBody = Js.Block()
+            .Add(() => Js.Const(() => "data", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "event").Prop(() => "data"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "data").Prop(() => "channelId").Op(() => "===", () => Js.Id(() => "currentSessionId")).Op(() => "&&", () => (JsSyntax)Js.Id(() => "data").Prop(() => "fileMetadata")), new List<JsSyntax>
+                {
+                    Js.Id(() => "appendFileMessage").Invoke(() => Js.Obj()
+                        .Prop(() => "fileName", () => Js.Id(() => "data").Prop(() => "fileMetadata").Prop(() => "fileName"))
+                        .Prop(() => "fileSize", () => Js.Id(() => "data").Prop(() => "fileMetadata").Prop(() => "fileSize"))
+                        .Prop(() => "isLocalPath", () => Js.Id(() => "data").Prop(() => "fileMetadata").Prop(() => "isLocalPath"))).Stmt()
+                })}
+            }));
+
+        // Streaming event handler (show/hide stop button)
+        var streamingEventHandlerBody = Js.Block()
+            .Add(() => Js.Const(() => "data", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "event").Prop(() => "data"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "data").Prop(() => "channelId").Op(() => "===", () => Js.Id(() => "currentSessionId")), new List<JsSyntax>
+                {
+                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        { (Js.Id(() => "data").Prop(() => "isFinal").Not(), new List<JsSyntax> { Js.Id(() => "showStopButton").Invoke().Stmt() }) },
+                        { (null, new List<JsSyntax> { Js.Id(() => "hideStopButton").Invoke().Stmt(), Js.Id(() => "hideQueueIndicator").Invoke().Stmt() }) }
+                    })
+                })}
+            }));
+
+        // Message event handler (hide stop button on complete)
+        var messageEventHandlerBody = Js.Block()
+            .Add(() => Js.Id(() => "hideStopButton").Invoke().Stmt())
+            .Add(() => Js.Id(() => "hideQueueIndicator").Invoke().Stmt());
+
+        // Override connectSSE: call original, then attach new event listeners
+        var connectSSEOverrideBody = Js.Block()
+            .Add(() => Js.Id(() => "_origConnectSSE").Invoke().Stmt())
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "eventSource"), new List<JsSyntax>
+                {
+                    Js.Id(() => "eventSource").Call(() => "addEventListener", () => Js.Str(() => "stopped"), () => Js.Arrow(() => new List<string> { "event" }, () => stoppedHandlerBody)).Stmt(),
+                    Js.Id(() => "eventSource").Call(() => "addEventListener", () => Js.Str(() => "queue_status"), () => Js.Arrow(() => new List<string> { "event" }, () => queueStatusHandlerBody)).Stmt(),
+                    Js.Id(() => "eventSource").Call(() => "addEventListener", () => Js.Str(() => "file"), () => Js.Arrow(() => new List<string> { "event" }, () => fileEventHandlerBody)).Stmt(),
+                    Js.Id(() => "eventSource").Call(() => "addEventListener", () => Js.Str(() => "streaming"), () => Js.Arrow(() => new List<string> { "event" }, () => streamingEventHandlerBody)).Stmt(),
+                    Js.Id(() => "eventSource").Call(() => "addEventListener", () => Js.Str(() => "message"), () => Js.Arrow(() => new List<string> { "event" }, () => messageEventHandlerBody)).Stmt()
+                })}
+            }));
+        js.Add(() => Js.Assign(() => Js.Id(() => "connectSSE"), () => Js.Arrow(() => new List<string>(), () => connectSSEOverrideBody)));
 
         return js;
     }

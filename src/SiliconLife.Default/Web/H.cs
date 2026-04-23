@@ -127,6 +127,7 @@ public class H
         return this;
     }
     public H OnClick(string handler) => Attr("onclick", handler);
+    public H OnChange(string handler) => Attr("onchange", handler);
     public H Placeholder(string text) => Attr("placeholder", text);
     public H Data(string name, string value) => Attr($"data-{name}", value);
     public H Value(string value) => Attr("value", value);

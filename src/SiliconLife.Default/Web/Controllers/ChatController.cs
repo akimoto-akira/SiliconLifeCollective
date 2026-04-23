@@ -18,12 +18,14 @@ using SiliconLife.Collective;
 using SiliconLife.Default.IM;
 using SiliconLife.Default.Web.Models;
 using SiliconLife.Default.Web.Views;
+using System.IO;
 
 namespace SiliconLife.Default.Web;
 
 [WebCode]
 public class ChatController : Controller
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<ChatController>();
     private readonly SiliconBeingManager _beingManager;
     private readonly ChatSystem _chatSystem;
     private readonly SkinManager _skinManager;
@@ -66,6 +68,14 @@ public class ChatController : Controller
         else if (_currentPath == "/api/chat/send")
         {
             SendMessage();
+        }
+        else if (_currentPath == "/api/chat/stop")
+        {
+            StopThinking();
+        }
+        else if (_currentPath == "/api/chat/upload")
+        {
+            UploadFile();
         }
         else
         {
@@ -348,5 +358,511 @@ public class ChatController : Controller
     {
         public string? ChannelId { get; set; }
         public string? Content { get; set; }
+    }
+
+    /// <summary>
+    /// Stops the AI thinking process for the specified channel.
+    /// </summary>
+    private void StopThinking()
+    {
+        try
+        {
+            var body = GetJsonBody<StopRequest>();
+            if (body == null || !Guid.TryParse(body.ChannelId, out var channelId))
+            {
+                _logger.Warn(null, "StopThinking: Invalid request, body={0}", body?.ChannelId ?? "null");
+                RenderJson(new { success = false, error = "Invalid request" });
+                return;
+            }
+
+            _logger.Info(null, "StopThinking: Attempting to cancel stream for channel {0}", channelId);
+            
+            var cancellationManager = ServiceLocator.Instance.GetService<StreamCancellationManager>();
+            if (cancellationManager == null)
+            {
+                _logger.Error(null, "StopThinking: StreamCancellationManager not available");
+                RenderJson(new { success = false, error = "Cancellation manager not available" });
+                return;
+            }
+            
+            _logger.Info(null, "StopThinking: HasActiveStream({0})={1}", channelId, cancellationManager.HasActiveStream(channelId));
+            
+            bool cancelled = cancellationManager.CancelStream(channelId);
+            
+            _logger.Info(null, "StopThinking: CancelStream({0}) returned {1}", channelId, cancelled);
+
+            if (cancelled)
+            {
+                // Notify frontend via SSE that the stream was stopped
+                var imProvider = ServiceLocator.Instance.GetService<IIMProvider>();
+                if (imProvider is WebUIProvider webUIProvider)
+                {
+                    _ = webUIProvider.SendStreamStoppedAsync(channelId);
+                    _logger.Info(null, "StopThinking: StreamStopped event sent for channel {0}", channelId);
+                }
+            }
+
+            RenderJson(new { success = cancelled });
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(null, "StopThinking: Exception occurred: {0}", ex.Message);
+            RenderJson(new { success = false, error = ex.Message });
+        }
+    }
+
+    private class StopRequest
+    {
+        public string? ChannelId { get; set; }
+    }
+
+    /// <summary>
+    /// <summary>
+    /// Handles file upload. Supports two modes:
+    /// 1. JSON body with local file path (isLocalPath=true)
+    /// 2. Multipart/form-data with actual file upload
+    /// </summary>
+    private void UploadFile()
+    {
+        try
+        {
+            var contentType = Request.ContentType ?? "";
+            
+            // Check if it's a multipart/form-data request (file upload)
+            if (contentType.StartsWith("multipart/form-data", StringComparison.OrdinalIgnoreCase))
+            {
+                UploadFileFromMultipart();
+                return;
+            }
+            
+            // Otherwise, treat as JSON (local path reference)
+            var body = GetJsonBody<UploadFileRequest>();
+            if (body == null || string.IsNullOrEmpty(body.FilePath))
+            {
+                RenderJson(new { success = false, error = "Invalid file path" });
+                return;
+            }
+
+            if (!Guid.TryParse(body.ChannelId, out var channelId))
+            {
+                RenderJson(new { success = false, error = "Invalid channelId" });
+                return;
+            }
+
+            // Resolve full path
+            string fullPath = Path.GetFullPath(body.FilePath);
+
+            // Security check: prevent path traversal
+            if (!IsPathAllowed(fullPath))
+            {
+                RenderJson(new { success = false, error = "Path not allowed for security reasons" });
+                return;
+            }
+
+            // Check file exists
+            if (!File.Exists(fullPath))
+            {
+                RenderJson(new { success = false, error = "File not found" });
+                return;
+            }
+
+            // Get file info
+            var fileInfo = new FileInfo(fullPath);
+
+            // Validate file size (100MB limit)
+            const long maxFileSize = 100 * 1024 * 1024;
+            if (fileInfo.Length > maxFileSize)
+            {
+                RenderJson(new { success = false, error = "File too large (max 100MB)" });
+                return;
+            }
+
+            // Create file message
+            var fileMessage = new SiliconLife.Collective.ChatMessage
+            {
+                Id = Guid.NewGuid(),
+                SenderId = _userId,
+                ChannelId = channelId,
+                Content = fullPath,
+                Timestamp = DateTime.Now,
+                Type = MessageType.File,
+                FileMetadata = new FileMetadata
+                {
+                    FilePath = fullPath,
+                    FileName = fileInfo.Name,
+                    FileSize = fileInfo.Length,
+                    MimeType = GetMimeType(fileInfo.Extension),
+                    IsLocalPath = body.IsLocalPath
+                }
+            };
+
+            // Add to chat system
+            _chatSystem.AddMessage(fileMessage);
+
+            // Push file message via SSE
+            var imProvider = ServiceLocator.Instance.GetService<IIMProvider>();
+            if (imProvider is WebUIProvider webUIProvider)
+            {
+                _ = webUIProvider.HandleFileMessage(fileMessage);
+            }
+
+            // Trigger AI thinking via IM event
+            var webUIProv = imProvider as WebUIProvider;
+            if (webUIProv != null)
+            {
+                // Create a text notification message for the AI to process the file
+                var notifyMessage = new SiliconLife.Collective.ChatMessage
+                {
+                    Id = Guid.NewGuid(),
+                    SenderId = _userId,
+                    ChannelId = channelId,
+                    Content = $"[文件上传] {fileInfo.Name} ({FormatFileSize(fileInfo.Length)}), 路径: {fullPath}",
+                    Timestamp = DateTime.Now,
+                    Type = MessageType.Text
+                };
+                webUIProv.HandleChatMessage(_userId, channelId, notifyMessage.Content);
+            }
+
+            RenderJson(new
+            {
+                success = true,
+                messageId = fileMessage.Id.ToString(),
+                fileName = fileInfo.Name,
+                fileSize = fileInfo.Length,
+                isLocalPath = body.IsLocalPath
+            });
+        }
+        catch (Exception ex)
+        {
+            RenderJson(new { success = false, error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Security check: verifies that the path does not access sensitive system directories.
+    /// </summary>
+    private static bool IsPathAllowed(string fullPath)
+    {
+        var forbiddenPaths = new[]
+        {
+            "C:\\Windows",
+            "C:\\Program Files",
+            "C:\\Program Files (x86)",
+        };
+
+        foreach (var forbidden in forbiddenPaths)
+        {
+            if (fullPath.StartsWith(forbidden, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Resolves MIME type from file extension.
+    /// </summary>
+    private static string GetMimeType(string extension)
+    {
+        var mimeTypes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { ".pdf", "application/pdf" },
+            { ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+            { ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+            { ".txt", "text/plain" },
+            { ".md", "text/markdown" },
+            { ".json", "application/json" },
+            { ".csv", "text/csv" },
+            { ".xml", "application/xml" },
+            { ".png", "image/png" },
+            { ".jpg", "image/jpeg" },
+            { ".jpeg", "image/jpeg" },
+            { ".gif", "image/gif" },
+            { ".log", "text/plain" },
+        };
+
+        return mimeTypes.TryGetValue(extension, out var mime) ? mime : "application/octet-stream";
+    }
+
+    /// <summary>
+    /// Formats a file size in human-readable format.
+    /// </summary>
+    private static string FormatFileSize(long bytes)
+    {
+        if (bytes < 1024) return bytes + " B";
+        if (bytes < 1024 * 1024) return (bytes / 1024.0).ToString("F1") + " KB";
+        return (bytes / (1024.0 * 1024.0)).ToString("F1") + " MB";
+    }
+
+    /// <summary>
+    /// Handles multipart/form-data file upload.
+    /// </summary>
+    private void UploadFileFromMultipart()
+    {
+        try
+        {
+            // Parse channelId from query string or form data
+            string? channelIdStr = Request.QueryString["channelId"];
+            if (string.IsNullOrEmpty(channelIdStr) || !Guid.TryParse(channelIdStr, out var channelId))
+            {
+                RenderJson(new { success = false, error = "Invalid or missing channelId" });
+                return;
+            }
+
+            // Read the multipart body
+            var boundary = GetMultipartBoundary();
+            if (string.IsNullOrEmpty(boundary))
+            {
+                RenderJson(new { success = false, error = "Invalid multipart request" });
+                return;
+            }
+
+            // Parse multipart form data
+            var parts = ParseMultipartFormData(boundary);
+            if (!parts.TryGetValue("file", out var fileData) || fileData == null)
+            {
+                RenderJson(new { success = false, error = "No file uploaded" });
+                return;
+            }
+
+            // Validate file size (100MB limit)
+            const long maxFileSize = 100 * 1024 * 1024;
+            if (fileData.Data.Length > maxFileSize)
+            {
+                RenderJson(new { success = false, error = "File too large (max 100MB)" });
+                return;
+            }
+
+            // Save file to temporary directory
+            var tempDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "uploads");
+            if (!Directory.Exists(tempDir))
+            {
+                Directory.CreateDirectory(tempDir);
+            }
+
+            var fileName = SanitizeFileName(fileData.FileName ?? "uploaded_file");
+            var tempFilePath = Path.Combine(tempDir, $"{Guid.NewGuid()}_{fileName}");
+            File.WriteAllBytes(tempFilePath, fileData.Data);
+
+            // Create file message
+            var fileMessage = new SiliconLife.Collective.ChatMessage
+            {
+                Id = Guid.NewGuid(),
+                SenderId = _userId,
+                ChannelId = channelId,
+                Content = $"[Uploaded File] {fileName}",
+                Timestamp = DateTime.Now,
+                Type = MessageType.File,
+                FileMetadata = new FileMetadata
+                {
+                    FilePath = tempFilePath,
+                    FileName = fileName,
+                    FileSize = fileData.Data.Length,
+                    MimeType = fileData.ContentType ?? GetMimeType(Path.GetExtension(fileName)),
+                    IsLocalPath = true
+                }
+            };
+
+            // Add to chat system
+            _chatSystem.AddMessage(fileMessage);
+
+            // Push file message via SSE
+            var imProvider = ServiceLocator.Instance.GetService<IIMProvider>();
+            if (imProvider is WebUIProvider webUIProvider)
+            {
+                _ = webUIProvider.HandleFileMessage(fileMessage);
+            }
+
+            // Trigger AI thinking via IM event
+            var webUIProv = imProvider as WebUIProvider;
+            if (webUIProv != null)
+            {
+                // Create a text notification message for the AI to process the file
+                var notifyMessage = new SiliconLife.Collective.ChatMessage
+                {
+                    Id = Guid.NewGuid(),
+                    SenderId = _userId,
+                    ChannelId = channelId,
+                    Content = $"[文件已上传] {fileName} ({FormatFileSize(fileData.Data.Length)})",
+                    Timestamp = DateTime.Now,
+                    Type = MessageType.Text
+                };
+                webUIProv.HandleChatMessage(_userId, channelId, notifyMessage.Content);
+            }
+
+            RenderJson(new { success = true, fileName = fileName, fileSize = fileData.Data.Length });
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(null, "UploadFileFromMultipart failed: {0}", ex.Message);
+            RenderJson(new { success = false, error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Extracts multipart boundary from Content-Type header.
+    /// </summary>
+    private string? GetMultipartBoundary()
+    {
+        var contentType = Request.ContentType ?? "";
+        var boundaryIndex = contentType.IndexOf("boundary=");
+        if (boundaryIndex < 0)
+            return null;
+        
+        return contentType.Substring(boundaryIndex + 9).Trim('"');
+    }
+
+    /// <summary>
+    /// Simple multipart form data parser.
+    /// </summary>
+    private Dictionary<string, MultipartPart> ParseMultipartFormData(string boundary)
+    {
+        var result = new Dictionary<string, MultipartPart>();
+        
+        using var memoryStream = new MemoryStream();
+        Request.InputStream.CopyTo(memoryStream);
+        var rawData = memoryStream.ToArray();
+        
+        var boundaryBytes = Encoding.UTF8.GetBytes($"--{boundary}");
+        var endBoundaryBytes = Encoding.UTF8.GetBytes($"--{boundary}--");
+        
+        int position = 0;
+        
+        while (position < rawData.Length)
+        {
+            // Find next boundary
+            int boundaryStart = FindBytes(rawData, boundaryBytes, position);
+            if (boundaryStart < 0)
+                break;
+            
+            position = boundaryStart + boundaryBytes.Length;
+            
+            // Skip CRLF
+            if (position + 2 <= rawData.Length && rawData[position] == 13 && rawData[position + 1] == 10)
+                position += 2;
+            
+            // Read headers
+            int headerEnd = FindBytes(rawData, new byte[] { 13, 10, 13, 10 }, position);
+            if (headerEnd < 0)
+                break;
+            
+            var headers = Encoding.UTF8.GetString(rawData, position, headerEnd - position);
+            position = headerEnd + 4;
+            
+            // Find content
+            int nextBoundary = FindBytes(rawData, boundaryBytes, position);
+            if (nextBoundary < 0)
+                break;
+            
+            // Remove trailing CRLF
+            int contentEnd = nextBoundary;
+            if (contentEnd >= 2 && rawData[contentEnd - 2] == 13 && rawData[contentEnd - 1] == 10)
+                contentEnd -= 2;
+            
+            var contentLength = contentEnd - position;
+            var content = new byte[contentLength];
+            Array.Copy(rawData, position, content, 0, contentLength);
+            
+            // Parse headers to get field name and filename
+            var part = ParseMultipartHeaders(headers, content);
+            if (part != null && !string.IsNullOrEmpty(part.Name))
+            {
+                result[part.Name] = part;
+            }
+            
+            position = nextBoundary;
+        }
+        
+        return result;
+    }
+
+    private MultipartPart? ParseMultipartHeaders(string headers, byte[] content)
+    {
+        var part = new MultipartPart { Data = content };
+        
+        // Parse Content-Disposition
+        var dispIndex = headers.IndexOf("Content-Disposition:", StringComparison.OrdinalIgnoreCase);
+        if (dispIndex >= 0)
+        {
+            var dispLine = headers.Substring(dispIndex);
+            var nameStart = dispLine.IndexOf("name=\"");
+            if (nameStart >= 0)
+            {
+                nameStart += 6;
+                var nameEnd = dispLine.IndexOf("\"", nameStart);
+                if (nameEnd > nameStart)
+                {
+                    part.Name = dispLine.Substring(nameStart, nameEnd - nameStart);
+                }
+            }
+            
+            var filenameStart = dispLine.IndexOf("filename=\"");
+            if (filenameStart >= 0)
+            {
+                filenameStart += 10;
+                var filenameEnd = dispLine.IndexOf("\"", filenameStart);
+                if (filenameEnd > filenameStart)
+                {
+                    part.FileName = dispLine.Substring(filenameStart, filenameEnd - filenameStart);
+                }
+            }
+        }
+        
+        // Parse Content-Type
+        var typeIndex = headers.IndexOf("Content-Type:", StringComparison.OrdinalIgnoreCase);
+        if (typeIndex >= 0)
+        {
+            var typeLine = headers.Substring(typeIndex);
+            var endLine = typeLine.IndexOf("\r\n");
+            if (endLine < 0) endLine = typeLine.Length;
+            
+            part.ContentType = typeLine.Substring(13, endLine - 13).Trim();
+        }
+        
+        return part;
+    }
+
+    private int FindBytes(byte[] source, byte[] pattern, int startIndex)
+    {
+        if (pattern.Length == 0 || startIndex + pattern.Length > source.Length)
+            return -1;
+        
+        for (int i = startIndex; i <= source.Length - pattern.Length; i++)
+        {
+            bool found = true;
+            for (int j = 0; j < pattern.Length; j++)
+            {
+                if (source[i + j] != pattern[j])
+                {
+                    found = false;
+                    break;
+                }
+            }
+            if (found)
+                return i;
+        }
+        return -1;
+    }
+
+    private string SanitizeFileName(string fileName)
+    {
+        return Path.GetInvalidFileNameChars().Aggregate(fileName, (current, c) => current.Replace(c.ToString(), "_"));
+    }
+
+    private class MultipartPart
+    {
+        public string? Name { get; set; }
+        public string? FileName { get; set; }
+        public string? ContentType { get; set; }
+        public byte[] Data { get; set; } = Array.Empty<byte>();
+    }
+
+    private class UploadFileRequest
+    {
+        public string? ChannelId { get; set; }
+        public string? FilePath { get; set; }
+        public bool IsLocalPath { get; set; } = true;
     }
 }
