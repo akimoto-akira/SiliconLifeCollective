@@ -212,15 +212,21 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 }
             }
 
-            if (TimerSystem != null && TimerSystem.HasPendingTimers())
+            // Timer processing: step-by-step execution
+            if (TimerSystem != null && HasTimerWork())
             {
-                List<TimerItem> triggeredTimers = TimerSystem.Tick();
-                foreach (TimerItem timer in triggeredTimers)
+                List<TimerItem> timersToProcess = GetTimersToProcess();
+
+                if (timersToProcess.Count > 0)
                 {
-                    _logger.Info(Id, "Being {0}: timer triggered - {1} ({2})", Name, timer.Name, timer.Id);
-                    ExecuteBrain("ThinkOnTimer", null, _ => new ContextManager(this, null).ThinkOnTimer(timer));
+                    TimerItem timer = timersToProcess[0]; // Process one timer per tick
+                    _logger.Info(Id, "Being {0}: processing timer {1} (state={2}, step={3})",
+                        Name, timer.Name, timer.ExecutionState, timer.CurrentStep);
+
+                    // Execute step-by-step logic (using new ContextManager constructor for timer)
+                    ExecuteBrain("ThinkOnTimerStep", null, _ => new ContextManager(this, timer).ThinkOnTimerStep(timer));
+                    return;
                 }
-                return;
             }
 
             if (TaskSystem != null && TaskSystem.HasPendingTasks())
@@ -230,7 +236,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 {
                     TaskItem task = runnable[0];
                     _logger.Info(Id, "Being {0}: pending task detected - {1} ({2})", Name, task.Title, task.Id);
-                    ExecuteBrain("ThinkOnTask", null, _ => new ContextManager(this, null).ThinkOnTask(task));
+                    ExecuteBrain("ThinkOnTask", null, _ => new ContextManager(this, (SessionBase?)null).ThinkOnTask(task));
                     return;
                 }
             }
@@ -238,7 +244,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
             if (Memory != null && Memory.ShouldCompress(out var compressData))
             {
                 _logger.Debug(Id, "Being {0}: memory compression needed at level {1}", Name, compressData.Value.Level);
-                ExecuteBrain("ThinkOnMemoryCompress", null, _ => new ContextManager(this, null).ThinkOnMemoryCompress(compressData));
+                ExecuteBrain("ThinkOnMemoryCompress", null, _ => new ContextManager(this, (SessionBase?)null).ThinkOnMemoryCompress(compressData));
                 return;
             }
         }
@@ -573,5 +579,56 @@ public class DefaultSiliconBeing : SiliconBeingBase
             _logger.Warn(Id, "WasJustMarkRead check failed for session {0}: {1}", session.Id, ex.Message);
             return false;
         }
+    }
+
+    /// <summary>
+    /// Checks if there is any timer work to do (new triggers or ongoing executions)
+    /// </summary>
+    private bool HasTimerWork()
+    {
+        if (TimerSystem == null) return false;
+
+        // Check if there are executing timers (not yet completed)
+        List<TimerItem> allTimers = TimerSystem.GetAll();
+        bool hasExecuting = allTimers.Any(t =>
+            t.ExecutionState == TimerExecutionState.Started ||
+            t.ExecutionState == TimerExecutionState.Executing);
+
+        return hasExecuting || TimerSystem.HasPendingTimers();
+    }
+
+    /// <summary>
+    /// Gets timers that need processing (new triggers + ongoing executions)
+    /// </summary>
+    private List<TimerItem> GetTimersToProcess()
+    {
+        List<TimerItem> result = new();
+
+        if (TimerSystem == null) return result;
+
+        // 1. Newly triggered timers
+        List<TimerItem> triggered = TimerSystem.Tick();
+        foreach (var timer in triggered)
+        {
+            timer.ExecutionState = TimerExecutionState.Idle;
+            result.Add(timer);
+        }
+
+        // 2. Ongoing timers (not completed from last tick)
+        List<TimerItem> allTimers = TimerSystem.GetAll();
+        foreach (var timer in allTimers)
+        {
+            if (timer.ExecutionState == TimerExecutionState.Started ||
+                timer.ExecutionState == TimerExecutionState.Executing)
+            {
+                // Avoid duplicates (already in triggered list)
+                if (!result.Any(t => t.Id == timer.Id))
+                {
+                    result.Add(timer);
+                }
+            }
+        }
+
+        return result;
     }
 }

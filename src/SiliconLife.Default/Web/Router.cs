@@ -55,6 +55,10 @@ public class Router
         RegisterController(() => new ChatHistoryController(), "/api/chat-history/messages");
         RegisterController(() => new TimerController(), "/timers");
         RegisterController(() => new TimerController(), "/api/timers/list");
+        RegisterController(() => new TimerController(), "/timer-executions/{timerId}");
+        RegisterController(() => new TimerController(), "/api/timer-executions/list");
+        RegisterController(() => new TimerController(), "/timer-execution/{executionId}");
+        RegisterController(() => new TimerController(), "/api/timer-execution/messages");
         RegisterController(() => new TaskController(), "/tasks");
         RegisterController(() => new TaskController(), "/api/tasks/list");
         RegisterController(() => new PermissionController(), "/permissions");

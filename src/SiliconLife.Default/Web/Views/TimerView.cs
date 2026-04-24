@@ -128,6 +128,16 @@ public class TimerView : ViewBase
                 .Property("text-align", "center")
                 .Property("padding", "40px")
                 .Property("color", "var(--text-secondary)")
+            .EndSelector()
+            .Selector(".view-history-link")
+                .Property("color", "var(--accent-primary)")
+                .Property("text-decoration", "none")
+                .Property("font-weight", "bold")
+                .Property("transition", "color 0.2s")
+            .EndSelector()
+            .Selector(".view-history-link:hover")
+                .Property("color", "var(--accent-secondary, var(--accent-primary))")
+                .Property("text-decoration", "underline")
             .EndSelector();
     }
 
@@ -187,6 +197,12 @@ public class TimerView : ViewBase
             () => Js.Str(() => $"<div class='timer-info'><span class='timer-info-label'>{loc.TimersCalendarLabel}</span>").Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "calendarDescription")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>")),
             () => Js.Str(() => ""));
 
+        var viewHistoryLink = Js.Str(() => "<div class='timer-info'><a href='/timer-executions/")
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "id"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "' class='view-history-link'>"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.TimerViewExecutionHistory))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a></div>"));
+
         return Js.Str(() => "<div class='timer-header'><div class='timer-name'>")
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "name"))
             .Op(() => "+", () => (JsSyntax)typeBadge)
@@ -201,6 +217,7 @@ public class TimerView : ViewBase
             .Op(() => "+", () => (JsSyntax)calendarInfo)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"<div class='timer-info'><span class='timer-info-label'>{loc.TimersTriggeredCountLabel}</span>"))
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "timesTriggered"))
-            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"));
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"))
+            .Op(() => "+", () => (JsSyntax)viewHistoryLink);
     }
 }
