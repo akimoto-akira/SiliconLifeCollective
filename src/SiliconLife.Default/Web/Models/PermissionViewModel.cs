@@ -355,6 +355,7 @@ public class PermissionViewModel : ViewModelBase
         sb.AppendLine("            \"nhk.or.jp\",");
         sb.AppendLine("            \"kbs.co.kr\", \"imbc.com\", \"sbs.co.kr\", \"ebs.co.kr\",");
         sb.AppendLine("            \"chosonsinbo.com\",");
+        sb.AppendLine("            \"wttr.in\",");
         sb.AppendLine("            \"reddit.com\", \"discord.com\", \"discordapp.com\", \"slack.com\",");
         sb.AppendLine("            \"notion.so\", \"figma.com\", \"dropbox.com\",");
         sb.AppendLine("            \"whatsapp.com\",");
@@ -377,6 +378,12 @@ public class PermissionViewModel : ViewModelBase
         sb.AppendLine("        // ===== Allowed: Contains =====");
         sb.AppendLine($"        // {Comment(loc, "NetRuleRussianMedia")}");
         sb.AppendLine("        if (hostLower.Contains(\"sputniknews\"))");
+        sb.AppendLine("        {");
+        sb.AppendLine("            return PermissionResult.Allowed;");
+        sb.AppendLine("        }");
+        sb.AppendLine();
+        sb.AppendLine("        // Weather information source");
+        sb.AppendLine("        if (hostLower.Equals(\"wttr.in\") || hostLower.EndsWith(\".wttr.in\"))");
         sb.AppendLine("        {");
         sb.AppendLine("            return PermissionResult.Allowed;");
         sb.AppendLine("        }");

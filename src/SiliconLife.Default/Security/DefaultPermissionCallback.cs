@@ -251,6 +251,7 @@ public class DefaultPermissionCallback : IPermissionCallback
             "nhk.or.jp",
             "kbs.co.kr", "imbc.com", "sbs.co.kr", "ebs.co.kr",
             "chosonsinbo.com",
+            "wttr.in",
             "reddit.com", "discord.com", "discordapp.com", "slack.com",
             "notion.so", "figma.com", "dropbox.com",
             "whatsapp.com",
@@ -268,6 +269,12 @@ public class DefaultPermissionCallback : IPermissionCallback
         // ===== Allowed: Contains special match =====
         // Russian media
         if (hostLower.Contains("sputniknews"))
+        {
+            return PermissionResult.Allowed;
+        }
+
+        // Weather information source
+        if (hostLower.Equals("wttr.in") || hostLower.EndsWith(".wttr.in"))
         {
             return PermissionResult.Allowed;
         }

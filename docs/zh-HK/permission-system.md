@@ -83,6 +83,29 @@ if (!cache.CheckLimit(userId, resource))
 
 用於動态權限逻辑的自定義回调。
 
+### DefaultPermissionCallback 默認實現
+
+`DefaultPermissionCallback` 提供了全面的默認權限規則，包括：
+
+#### 網絡訪問規則
+- **環回地址**：允許 localhost, 127.0.0.1, ::1
+- **私有 IP 地址**：
+  - 192.168.x.x (Class C) - 允許
+  - 10.x.x.x (Class A) - 允許
+  - 172.16-31.x.x (Class B) - 詢問用戶
+- **域名白名單**：
+  - 搜索引擎：Google, Bing, DuckDuckGo, Yandex, Sogou 等
+  - AI 服務：OpenAI, Anthropic, HuggingFace, Ollama 等
+  - 開發者服務：GitHub, StackOverflow, npm, NuGet 等
+  - 社交媒體：微博、知乎、Reddit、Discord 等
+  - 視頻平台：YouTube, Bilibili, 抖音、TikTok 等
+  - **天氣資訊**：wttr.in
+  - 政府網站：.gov, .go.jp, .go.kr
+- **域名黑名單**：
+  - AI 冒充網站：chatgpt, openai, deepseek 等仿冒域名
+  - 惡意 AI 工具：wormgpt, darkgpt, fraudgpt 等
+  - AI 內容農場和黑色市場相關域名
+
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {

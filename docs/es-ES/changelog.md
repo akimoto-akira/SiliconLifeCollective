@@ -53,7 +53,51 @@ y este proyecto sigue [Versionado Semántico](https://semver.org/spec/v2.0.0.htm
 
 ---
 
-## [No Publicado]
+## [No publicado]
+
+### 2026-04-24
+
+#### Historial de ejecución del temporizador
+- `fa3f06f` - Añadir función de historial de ejecución del temporizador con vista de detalles
+  - Nueva función de visualización del historial de ejecución del temporizador
+  - Página de detalles del historial de ejecución implementada
+  - Soporte para ver registros detallados de cada ejecución del temporizador
+- `d824835` - Añadir claves de localización del historial de ejecución del temporizador para todos los idiomas
+  - Soporte de localización completo para el historial de ejecución del temporizador (6 idiomas)
+  - Incluye localización para estado de ejecución, hora, resultados y otra información
+
+#### Optimización del historial de chat
+- `057b09d` - Optimizar la visualización de detalles del historial de chat con renderizado mejorado de llamadas a herramientas
+  - Optimización de la visualización de llamadas a herramientas en la página de detalles del historial de chat
+  - Mejora en la visualización formateada de los parámetros de llamada a herramientas
+  - Mejora en la legibilidad de los mensajes históricos
+- `0df599c` - Corregir que los resultados de herramientas se rendericen como mensajes de chat separados
+  - Los resultados de ejecución de herramientas ahora están correctamente asociados con los mensajes originales
+  - Evitar que los resultados de herramientas se muestren como respuestas de IA separadas
+  - Mejorar la coherencia de los mensajes de chat
+
+#### Correcciones de la interfaz web
+- `d9d72e9` - Corregir problema de prioridad CSS en el modal de detalles de notas de trabajo
+  - Corrección de estilo del modal de notas de trabajo
+  - Ajuste de prioridad CSS para asegurar que los estilos se apliquen correctamente
+  - Mejora en los efectos visuales del modal
+
+#### Mejoras de funcionalidad principal
+- `1e7c7b2` - Mejorar la compresión de memoria y el seguimiento de ejecución de herramientas
+  - Optimización del algoritmo de compresión de memoria
+  - Mejora del mecanismo de seguimiento de ejecución de herramientas
+  - Mejora en la eficiencia de gestión de memoria de los seres de silicio
+
+#### Mejora de localización
+- `c13cb17` - Registrar variantes del idioma español
+  - Soporte de localización para español (España)
+  - Expansión del sistema de múltiples idiomas
+- `9c44f34` - Añadir soporte de localización multilingüe para el Calendario Histórico Chino
+  - Localización completa para el Calendario Histórico Chino
+  - Soporte multilingüe para nombres de eras históricas, tablas de dinastías y otra información
+- `192fc6e` - Añadir localizaciones de nombres de herramientas faltantes para 5 herramientas
+  - Complementar la visualización de nombres de herramientas localizados
+  - Mejorar la experiencia multilingüe de la interfaz de herramientas
 
 ### 2026-04-23
 

@@ -41,6 +41,29 @@ Verificar la Lista de Control de Acceso Global:
 
 Callback personalizable que los usuarios pueden implementar para lógica de permisos personalizada:
 
+#### Implementación predeterminada de DefaultPermissionCallback
+
+`DefaultPermissionCallback` proporciona reglas de permisos predeterminadas integrales, que incluyen:
+
+##### Reglas de acceso a la red
+- **Direcciones de bucle invertido**: Permitir localhost, 127.0.0.1, ::1
+- **Direcciones IP privadas**:
+  - 192.168.x.x (Clase C) - Permitido
+  - 10.x.x.x (Clase A) - Permitido
+  - 172.16-31.x.x (Clase B) - Preguntar al usuario
+- **Lista blanca de dominios**:
+  - Motores de búsqueda: Google, Bing, DuckDuckGo, Yandex, Sogou, etc.
+  - Servicios de IA: OpenAI, Anthropic, HuggingFace, Ollama, etc.
+  - Servicios para desarrolladores: GitHub, StackOverflow, npm, NuGet, etc.
+  - Redes sociales: Weibo, Zhihu, Reddit, Discord, etc.
+  - Plataformas de video: YouTube, Bilibili, Douyin, TikTok, etc.
+  - **Información meteorológica**: wttr.in
+  - Sitios web gubernamentales: .gov, .go.jp, .go.kr
+- **Lista negra de dominios**:
+  - Sitios de suplantación de IA: chatgpt, openai, deepseek, etc. (dominios falsos)
+  - Herramientas de IA maliciosas: wormgpt, darkgpt, fraudgpt, etc.
+  - Dominios relacionados con granjas de contenido de IA y mercado negro
+
 ```csharp
 public interface IPermissionCallback
 {

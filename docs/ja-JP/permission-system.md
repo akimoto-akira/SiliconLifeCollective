@@ -83,6 +83,29 @@ if (!cache.CheckLimit(userId, resource))
 
 動的権限ロジックのためのカスタムコールバック。
 
+### DefaultPermissionCallback デフォルト実装
+
+`DefaultPermissionCallback` は包括的なデフォルト権限ルールを提供します。含まれる内容：
+
+#### ネットワークアクセスルール
+- **ループバックアドレス**：localhost, 127.0.0.1, ::1 を許可
+- **プライベート IP アドレス**：
+  - 192.168.x.x (Class C) - 許可
+  - 10.x.x.x (Class A) - 許可
+  - 172.16-31.x.x (Class B) - ユーザーに確認
+- **ドメインホワイトリスト**：
+  - 検索エンジン：Google, Bing, DuckDuckGo, Yandex, Sogou など
+  - AI サービス：OpenAI, Anthropic, HuggingFace, Ollama など
+  - 開発者サービス：GitHub, StackOverflow, npm, NuGet など
+  - ソーシャルメディア：Weibo、Zhihu、Reddit、Discord など
+  - 動画プラットフォーム：YouTube, Bilibili、抖音（Douyin）、TikTok など
+  - **天気情報**：wttr.in
+  - 政府ウェブサイト：.gov, .go.jp, .go.kr
+- **ドメインブラックリスト**：
+  - AI なりすましサイト：chatgpt, openai, deepseek など（偽ドメイン）
+  - 悪意のある AI ツール：wormgpt, darkgpt, fraudgpt など
+  - AI コンテンツファームおよびブラックマーケット関連ドメイン
+
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {

@@ -55,6 +55,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 2026-04-24
+
+#### Timer Execution History
+- `fa3f06f` - Add timer execution history feature with detail view
+  - New timer execution history view feature
+  - Implemented execution history detail page
+  - Support viewing detailed records of each timer execution
+- `d824835` - Add timer execution history localization keys for all languages
+  - Full language localization support for timer execution history (6 languages)
+  - Includes localization for execution status, time, results, and other information
+
+#### Chat History Optimization
+- `057b09d` - Optimize chat history detail display with improved tool call rendering
+  - Tool call display optimization in chat history detail page
+  - Improved formatting display of tool call parameters
+  - Enhanced readability of historical messages
+- `0df599c` - Fix tool results being rendered as separate chat messages
+  - Tool execution results now correctly associated with original messages
+  - Prevent tool results from displaying as separate AI replies
+  - Improve chat message coherence
+
+#### Web Interface Fixes
+- `d9d72e9` - Fix work note detail modal CSS priority issue
+  - Work note modal style fix
+  - CSS priority adjustment to ensure styles apply correctly
+  - Improved modal visual effects
+
+#### Core Functionality Improvements
+- `1e7c7b2` - Improve memory compression and tool execution tracking
+  - Memory compression algorithm optimization
+  - Tool execution tracking mechanism enhancement
+  - Improved silicon being memory management efficiency
+
+#### Localization Enhancement
+- `c13cb17` - Register Spanish language variants
+  - Spanish (Spain) localization support
+  - Multi-language system expansion
+- `9c44f34` - Add Chinese Historical Calendar multi-language localization support
+  - Full language localization for Chinese Historical Calendar
+  - Multi-language support for historical era names, dynasty tables, and other information
+- `192fc6e` - Add missing tool name localizations for 5 tools
+  - Supplement tool localization name display
+  - Improve tool interface multi-language experience
+
 ### 2026-04-23
 
 #### Chat History & Loading Indicators

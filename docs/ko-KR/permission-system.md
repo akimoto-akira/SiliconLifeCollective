@@ -83,6 +83,29 @@ if (!cache.CheckLimit(userId, resource))
 
 동적 권한 로직을 위한 사용자 정의 콜백.
 
+### DefaultPermissionCallback 기본 구현
+
+`DefaultPermissionCallback`은 포괄적인 기본 권한 규칙을 제공합니다. 포함 내용:
+
+#### 네트워크 액세스 규칙
+- **루프백 주소**: localhost, 127.0.0.1, ::1 허용
+- **개인 IP 주소**:
+  - 192.168.x.x (Class C) - 허용
+  - 10.x.x.x (Class A) - 허용
+  - 172.16-31.x.x (Class B) - 사용자에게 확인
+- **도메인 화이트리스트**:
+  - 검색 엔진: Google, Bing, DuckDuckGo, Yandex, Sogou 등
+  - AI 서비스: OpenAI, Anthropic, HuggingFace, Ollama 등
+  - 개발자 서비스: GitHub, StackOverflow, npm, NuGet 등
+  - 소셜 미디어: Weibo, Zhihu, Reddit, Discord 등
+  - 비디오 플랫폼: YouTube, Bilibili, Douyin(틱톡), TikTok 등
+  - **날씨 정보**: wttr.in
+  - 정부 웹사이트: .gov, .go.jp, .go.kr
+- **도메인 블랙리스트**:
+  - AI 사칭 사이트: chatgpt, openai, deepseek 등 (가짜 도메인)
+  - 악의적인 AI 도구: wormgpt, darkgpt, fraudgpt 등
+  - AI 콘텐츠 팜 및 블랙마켓 관련 도메인
+
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {

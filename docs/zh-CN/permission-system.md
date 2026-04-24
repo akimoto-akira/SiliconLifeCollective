@@ -83,6 +83,29 @@ if (!cache.CheckLimit(userId, resource))
 
 用于动态权限逻辑的自定义回调。
 
+### DefaultPermissionCallback 默认实现
+
+`DefaultPermissionCallback` 提供了全面的默认权限规则，包括：
+
+#### 网络访问规则
+- **环回地址**：允许 localhost, 127.0.0.1, ::1
+- **私有 IP 地址**：
+  - 192.168.x.x (Class C) - 允许
+  - 10.x.x.x (Class A) - 允许
+  - 172.16-31.x.x (Class B) - 询问用户
+- **域名白名单**：
+  - 搜索引擎：Google, Bing, DuckDuckGo, Yandex, Sogou 等
+  - AI 服务：OpenAI, Anthropic, HuggingFace, Ollama 等
+  - 开发者服务：GitHub, StackOverflow, npm, NuGet 等
+  - 社交媒体：微博、知乎、Reddit、Discord 等
+  - 视频平台：YouTube, Bilibili, 抖音、TikTok 等
+  - **天气信息**：wttr.in
+  - 政府网站：.gov, .go.jp, .go.kr
+- **域名黑名单**：
+  - AI 冒充网站：chatgpt, openai, deepseek 等仿冒域名
+  - 恶意 AI 工具：wormgpt, darkgpt, fraudgpt 等
+  - AI 内容农场和黑色市场相关域名
+
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {

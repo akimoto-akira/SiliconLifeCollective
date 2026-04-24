@@ -83,6 +83,29 @@ Examples:
 
 Custom callback for dynamic permission logic.
 
+### DefaultPermissionCallback Default Implementation
+
+`DefaultPermissionCallback` provides comprehensive default permission rules, including:
+
+#### Network Access Rules
+- **Loopback addresses**: Allow localhost, 127.0.0.1, ::1
+- **Private IP addresses**:
+  - 192.168.x.x (Class C) - Allowed
+  - 10.x.x.x (Class A) - Allowed
+  - 172.16-31.x.x (Class B) - Ask User
+- **Domain whitelist**:
+  - Search engines: Google, Bing, DuckDuckGo, Yandex, Sogou, etc.
+  - AI services: OpenAI, Anthropic, HuggingFace, Ollama, etc.
+  - Developer services: GitHub, StackOverflow, npm, NuGet, etc.
+  - Social media: Weibo, Zhihu, Reddit, Discord, etc.
+  - Video platforms: YouTube, Bilibili, Douyin, TikTok, etc.
+  - **Weather information**: wttr.in
+  - Government websites: .gov, .go.jp, .go.kr
+- **Domain blacklist**:
+  - AI impersonation sites: chatgpt, openai, deepseek, etc. (fake domains)
+  - Malicious AI tools: wormgpt, darkgpt, fraudgpt, etc.
+  - AI content farm and black market related domains
+
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {
