@@ -396,6 +396,14 @@ public class ZhHK : DefaultLocalizationBase
     public override string TimersPageHeader => "計時器管理";
     public override string TimersTotalCount => "共 {0} 個計時器";
     public override string TimersEmptyState => "暫無計時器";
+    public override string TimerViewExecutionHistory => "📝 查看執行記錄";
+    public override string TimerExecutionHistoryTitle => "計時器執行歷史";
+    public override string TimerExecutionHistoryHeader => "執行記錄";
+    public override string TimerExecutionBackToTimers => "← 返回計時器列表";
+    public override string TimerExecutionTimerName => "計時器：{0}";
+    public override string TimerExecutionDetailTitle => "執行詳情";
+    public override string TimerExecutionDetailHeader => "執行訊息記錄";
+    public override string TimerExecutionNoRecords => "暫無執行記錄";
     public override string TimersStatusActive => "執行中";
     public override string TimersStatusPaused => "已暫停";
     public override string TimersStatusTriggered => "已觸發";

@@ -541,6 +541,14 @@ public class JaJP : DefaultLocalizationBase
     public override string TimersPageHeader => "タイマー管理";
     public override string TimersTotalCount => "合計 {0} 個のタイマー";
     public override string TimersEmptyState => "タイマーなし";
+    public override string TimerViewExecutionHistory => "📝 実行履歴を表示";
+    public override string TimerExecutionHistoryTitle => "タイマー実行履歴";
+    public override string TimerExecutionHistoryHeader => "実行記録";
+    public override string TimerExecutionBackToTimers => "← タイマー一覧に戻る";
+    public override string TimerExecutionTimerName => "タイマー：{0}";
+    public override string TimerExecutionDetailTitle => "実行詳細";
+    public override string TimerExecutionDetailHeader => "実行メッセージログ";
+    public override string TimerExecutionNoRecords => "実行記録がありません";
     public override string TimersStatusActive => "実行中";
     public override string TimersStatusPaused => "一時停止";
     public override string TimersStatusTriggered => "トリガー済み";

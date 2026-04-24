@@ -541,6 +541,14 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string TimersPageHeader => "Gestión de temporizadores";
     public override string TimersTotalCount => "Total {0} temporizadores";
     public override string TimersEmptyState => "Sin temporizadores";
+    public override string TimerViewExecutionHistory => "📝 Ver historial de ejecución";
+    public override string TimerExecutionHistoryTitle => "Historial de ejecución del temporizador";
+    public override string TimerExecutionHistoryHeader => "Registros de ejecución";
+    public override string TimerExecutionBackToTimers => "← Volver a temporizadores";
+    public override string TimerExecutionTimerName => "Temporizador: {0}";
+    public override string TimerExecutionDetailTitle => "Detalle de ejecución";
+    public override string TimerExecutionDetailHeader => "Registro de Mensajes de Ejecución";
+    public override string TimerExecutionNoRecords => "No se encontraron registros de ejecución";
     public override string TimersStatusActive => "Activo";
     public override string TimersStatusPaused => "Pausado";
     public override string TimersStatusTriggered => "Activado";

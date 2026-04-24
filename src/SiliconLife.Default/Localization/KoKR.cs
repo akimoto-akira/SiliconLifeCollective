@@ -541,6 +541,14 @@ public class KoKR : DefaultLocalizationBase
     public override string TimersPageHeader => "타이머 관리";
     public override string TimersTotalCount => "총 {0}개의 타이머";
     public override string TimersEmptyState => "타이머 없음";
+    public override string TimerViewExecutionHistory => "📝 실행 기록 보기";
+    public override string TimerExecutionHistoryTitle => "타이머 실행 기록";
+    public override string TimerExecutionHistoryHeader => "실행 기록";
+    public override string TimerExecutionBackToTimers => "← 타이머 목록으로 돌아가기";
+    public override string TimerExecutionTimerName => "타이머: {0}";
+    public override string TimerExecutionDetailTitle => "실행 세부정보";
+    public override string TimerExecutionDetailHeader => "실행 메시지 기록";
+    public override string TimerExecutionNoRecords => "실행 기록이 없습니다";
     public override string TimersStatusActive => "실행 중";
     public override string TimersStatusPaused => "일시 정지";
     public override string TimersStatusTriggered => "트리거됨";

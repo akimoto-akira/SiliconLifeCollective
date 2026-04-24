@@ -541,6 +541,14 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string TimersPageHeader => "Timer Management";
     public override string TimersTotalCount => "Total {0} timers";
     public override string TimersEmptyState => "No timers";
+    public override string TimerViewExecutionHistory => "📝 View Execution History";
+    public override string TimerExecutionHistoryTitle => "Timer Execution History";
+    public override string TimerExecutionHistoryHeader => "Execution Records";
+    public override string TimerExecutionBackToTimers => "← Back to Timers";
+    public override string TimerExecutionTimerName => "Timer: {0}";
+    public override string TimerExecutionDetailTitle => "Execution Detail";
+    public override string TimerExecutionDetailHeader => "Execution Message Log";
+    public override string TimerExecutionNoRecords => "No execution records found";
     public override string TimersStatusActive => "Active";
     public override string TimersStatusPaused => "Paused";
     public override string TimersStatusTriggered => "Triggered";

@@ -541,6 +541,14 @@ public class ZhCN : DefaultLocalizationBase
     public override string TimersPageHeader => "定时器管理";
     public override string TimersTotalCount => "共 {0} 个定时器";
     public override string TimersEmptyState => "暂无定时器";
+    public override string TimerViewExecutionHistory => "📝 查看执行记录";
+    public override string TimerExecutionHistoryTitle => "定时器执行历史";
+    public override string TimerExecutionHistoryHeader => "执行记录";
+    public override string TimerExecutionBackToTimers => "← 返回定时器列表";
+    public override string TimerExecutionTimerName => "定时器：{0}";
+    public override string TimerExecutionDetailTitle => "执行详情";
+    public override string TimerExecutionDetailHeader => "执行消息记录";
+    public override string TimerExecutionNoRecords => "暂无执行记录";
     public override string TimersStatusActive => "运行中";
     public override string TimersStatusPaused => "已暂停";
     public override string TimersStatusTriggered => "已触发";

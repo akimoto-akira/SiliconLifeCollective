@@ -747,6 +747,46 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string TimersEmptyState { get; }
 
     /// <summary>
+    /// Gets the view execution history link text
+    /// </summary>
+    public abstract string TimerViewExecutionHistory { get; }
+
+    /// <summary>
+    /// Gets the timer execution history page title
+    /// </summary>
+    public abstract string TimerExecutionHistoryTitle { get; }
+
+    /// <summary>
+    /// Gets the timer execution history page header
+    /// </summary>
+    public abstract string TimerExecutionHistoryHeader { get; }
+
+    /// <summary>
+    /// Gets the back to timers link text
+    /// </summary>
+    public abstract string TimerExecutionBackToTimers { get; }
+
+    /// <summary>
+    /// Gets the timer name label for execution history
+    /// </summary>
+    public abstract string TimerExecutionTimerName { get; }
+
+    /// <summary>
+    /// Gets the timer execution detail page title
+    /// </summary>
+    public abstract string TimerExecutionDetailTitle { get; }
+
+    /// <summary>
+    /// Gets the timer execution detail page header
+    /// </summary>
+    public abstract string TimerExecutionDetailHeader { get; }
+
+    /// <summary>
+    /// Timer execution history empty state message
+    /// </summary>
+    public abstract string TimerExecutionNoRecords { get; }
+
+    /// <summary>
     /// Gets the active status text
     /// </summary>
     public abstract string TimersStatusActive { get; }
