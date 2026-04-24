@@ -191,6 +191,10 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         TimerPendingChecker pendingChecker = CalendarTimerResolvers.CreatePendingChecker();
         being.TimerSystem = new TimerSystem(being, beingStorage, resolver, converter, pendingChecker);
 
+        // Create WorkNoteSystem for this being (stores in beingDirectory/work_notes.json)
+        IWorkNoteStorage workNoteStorage = new FileSystemWorkNoteStorage(beingDirectory);
+        being.WorkNoteSystem = new WorkNoteSystem(workNoteStorage, id);
+
         return being;
     }
     

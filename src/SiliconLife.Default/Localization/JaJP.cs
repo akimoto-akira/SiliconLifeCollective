@@ -303,6 +303,7 @@ public class JaJP : DefaultLocalizationBase
     public override string PageTitleTasks => "タスク管理 - シリコンライフコレクティブ";
     public override string PageTitleTimers => "タイマー管理 - シリコンライフコレクティブ";
     public override string PageTitleMemory => "メモリブラウザ - シリコンライフコレクティブ";
+    public override string PageTitleWorkNotes => "作業ノート - シリコンライフコレクティブ";
     public override string PageTitleKnowledge => "ナレッジグラフ - シリコンライフコレクティブ";
     public override string PageTitleProjects => "プロジェクトスペース管理 - シリコンライフコレクティブ";
     public override string PageTitleLogs => "ログクエリ - シリコンライフコレクティブ";
@@ -316,6 +317,12 @@ public class JaJP : DefaultLocalizationBase
     // ===== Memory Page Localization =====
 
     public override string MemoryPageHeader => "メモリブラウザ";
+    public override string WorkNotesPageHeader => "作業ノート";
+    public override string WorkNotesTotalPages => "合計 {0} ページ";
+    public override string WorkNotesEmptyState => "作業ノートはありません";
+    public override string WorkNotesSearchPlaceholder => "ノートを検索...";
+    public override string WorkNotesSearchButton => "検索";
+    public override string WorkNotesNoSearchResults => "一致するノートが見つかりません";
     public override string MemoryEmptyState => "メモリデータなし";
     public override string MemorySearchPlaceholder => "メモリを検索...";
     public override string MemorySearchButton => "検索";
@@ -523,7 +530,12 @@ public class JaJP : DefaultLocalizationBase
     public override string BeingsDetailAIClientLabel => "独立AIクライアント：";
     public override string BeingsDetailAIClientEditLink => "編集";
     public override string BeingsDetailChatHistoryLabel => "チャット履歴：";
+    public override string BeingsDetailWorkNoteLabel => "作業ノート：";
     public override string BeingsDetailChatHistoryLink => "チャット履歴を表示";
+    public override string BeingsDetailWorkNoteLink => "作業ノートを表示";
+    public override string WorkNotePageTitle => "作業ノート";
+    public override string WorkNotePageHeader => "作業ノートリスト";
+    public override string WorkNotePageDescription => "硅基人の作業ノートの管理と表示";
     public override string ChatHistoryPageTitle => "チャット履歴";
     public override string ChatHistoryPageHeader => "会話リスト";
     public override string ChatHistoryConversationList => "会話リスト";
@@ -795,7 +807,8 @@ public class JaJP : DefaultLocalizationBase
         ["task"] = "タスク",
         ["system"] = "システム",
         ["timer"] = "タイマー",
-        ["token_audit"] = "Token監査"
+        ["token_audit"] = "Token監査",
+        ["work_note"] = "作業ノート"
     };
 
     public override string GetToolDisplayName(string toolName) =>

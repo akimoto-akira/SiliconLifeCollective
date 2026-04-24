@@ -83,6 +83,14 @@ public class Router
         RegisterController(() => new MemoryController(), "/api/memory/search");
         RegisterController(() => new MemoryController(), "/api/memory/beings");
         RegisterController(() => new MemoryController(), "/api/memory/trace/{id}");
+        RegisterController(() => new WorkNoteController(), "/work-notes");
+        RegisterController(() => new WorkNoteController(), "/api/work-notes/list");
+        RegisterController(() => new WorkNoteController(), "/api/work-notes/read");
+        RegisterController(() => new WorkNoteController(), "/api/work-notes/directory");
+        RegisterController(() => new WorkNoteController(), "/api/work-notes/search");
+        RegisterController(() => new WorkNoteController(), "/api/work-notes/create", "POST");
+        RegisterController(() => new WorkNoteController(), "/api/work-notes/update", "POST");
+        RegisterController(() => new WorkNoteController(), "/api/work-notes/delete", "POST");
         RegisterController(() => new KnowledgeController(), "/knowledge");
         RegisterController(() => new ProjectController(), "/project");
         RegisterController(() => new ExecutorController(), "/executor");

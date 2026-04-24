@@ -481,6 +481,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string PageTitleMemory { get; }
 
     /// <summary>
+    /// Gets the page title for work notes page
+    /// </summary>
+    public abstract string PageTitleWorkNotes { get; }
+
+    /// <summary>
     /// Gets the page title for knowledge page
     /// </summary>
     public abstract string PageTitleKnowledge { get; }
@@ -668,6 +673,61 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the chat history link text in detail view
     /// </summary>
     public abstract string BeingsDetailChatHistoryLink { get; }
+
+    /// <summary>
+    /// Gets the work note label in detail view
+    /// </summary>
+    public abstract string BeingsDetailWorkNoteLabel { get; }
+
+    /// <summary>
+    /// Gets the work note link text in detail view
+    /// </summary>
+    public abstract string BeingsDetailWorkNoteLink { get; }
+
+    /// <summary>
+    /// Gets the work note page title
+    /// </summary>
+    public abstract string WorkNotePageTitle { get; }
+
+    /// <summary>
+    /// Gets the work note page header
+    /// </summary>
+    public abstract string WorkNotePageHeader { get; }
+
+    /// <summary>
+    /// Gets the work note page description
+    /// </summary>
+    public abstract string WorkNotePageDescription { get; }
+
+    /// <summary>
+    /// Gets the work notes page header
+    /// </summary>
+    public abstract string WorkNotesPageHeader { get; }
+
+    /// <summary>
+    /// Gets the work notes total pages text
+    /// </summary>
+    public abstract string WorkNotesTotalPages { get; }
+
+    /// <summary>
+    /// Gets the work notes search placeholder
+    /// </summary>
+    public abstract string WorkNotesSearchPlaceholder { get; }
+
+    /// <summary>
+    /// Gets the work notes search button text
+    /// </summary>
+    public abstract string WorkNotesSearchButton { get; }
+
+    /// <summary>
+    /// Gets the work notes empty state text
+    /// </summary>
+    public abstract string WorkNotesEmptyState { get; }
+
+    /// <summary>
+    /// Gets the work notes no search results text
+    /// </summary>
+    public abstract string WorkNotesNoSearchResults { get; }
 
     /// <summary>
     /// Gets the chat history label in detail view

@@ -303,6 +303,7 @@ public class KoKR : DefaultLocalizationBase
     public override string PageTitleTasks => "작업 관리 - 실리콘 라이프 콜렉티브";
     public override string PageTitleTimers => "타이머 관리 - 실리콘 라이프 콜렉티브";
     public override string PageTitleMemory => "메모리 브라우저 - 실리콘 라이프 콜렉티브";
+    public override string PageTitleWorkNotes => "작업 노트 - 실리콘 라이프 콜렉티브";
     public override string PageTitleKnowledge => "지식 그래프 - 실리콘 라이프 콜렉티브";
     public override string PageTitleProjects => "프로젝트 공간 관리 - 실리콘 라이프 콜렉티브";
     public override string PageTitleLogs => "로그 조회 - 실리콘 라이프 콜렉티브";
@@ -316,6 +317,12 @@ public class KoKR : DefaultLocalizationBase
     // ===== Memory Page Localization =====
 
     public override string MemoryPageHeader => "메모리 브라우저";
+    public override string WorkNotesPageHeader => "작업 노트";
+    public override string WorkNotesTotalPages => "총 {0} 페이지";
+    public override string WorkNotesEmptyState => "작업 노트가 없습니다";
+    public override string WorkNotesSearchPlaceholder => "노트 검색...";
+    public override string WorkNotesSearchButton => "검색";
+    public override string WorkNotesNoSearchResults => "일치하는 노트를 찾을 수 없습니다";
     public override string MemoryEmptyState => "메모리 데이터 없음";
     public override string MemorySearchPlaceholder => "메모리 검색...";
     public override string MemorySearchButton => "검색";
@@ -523,7 +530,12 @@ public class KoKR : DefaultLocalizationBase
     public override string BeingsDetailAIClientLabel => "독립 AI 클라이언트:";
     public override string BeingsDetailAIClientEditLink => "편집";
     public override string BeingsDetailChatHistoryLabel => "채팅 기록:";
+    public override string BeingsDetailWorkNoteLabel => "작업 노트:";
     public override string BeingsDetailChatHistoryLink => "채팅 기록 보기";
+    public override string BeingsDetailWorkNoteLink => "작업 노트 보기";
+    public override string WorkNotePageTitle => "작업 노트";
+    public override string WorkNotePageHeader => "작업 노트 목록";
+    public override string WorkNotePageDescription => "硅基人의 작업 노트 관리 및 보기";
     public override string ChatHistoryPageTitle => "채팅 기록";
     public override string ChatHistoryPageHeader => "대화 목록";
     public override string ChatHistoryConversationList => "대화 목록";
@@ -795,7 +807,8 @@ public class KoKR : DefaultLocalizationBase
         ["task"] = "작업",
         ["system"] = "시스템",
         ["timer"] = "타이머",
-        ["token_audit"] = "Token 감사"
+        ["token_audit"] = "Token 감사",
+        ["work_note"] = "작업 노트"
     };
 
     public override string GetToolDisplayName(string toolName) =>

@@ -121,6 +121,12 @@ public abstract class SiliconBeingBase
     public TimerSystem? TimerSystem { get; set; }
 
     /// <summary>
+    /// Gets or sets the work note system for this silicon being.
+    /// Used for managing personal work notes (private by default).
+    /// </summary>
+    public WorkNoteSystem? WorkNoteSystem { get; set; }
+
+    /// <summary>
     /// Gets or sets the data directory path for this silicon being.
     /// Used for persisting soul file, state, memory, etc.
     /// </summary>

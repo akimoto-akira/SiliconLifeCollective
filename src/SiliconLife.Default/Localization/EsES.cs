@@ -303,6 +303,7 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string PageTitleTasks => "Tareas - Silicon Life Collective";
     public override string PageTitleTimers => "Temporizadores - Silicon Life Collective";
     public override string PageTitleMemory => "Memoria - Silicon Life Collective";
+    public override string PageTitleWorkNotes => "Notas de Trabajo - Silicon Life Collective";
     public override string PageTitleKnowledge => "Conocimiento - Silicon Life Collective";
     public override string PageTitleProjects => "Proyectos - Silicon Life Collective";
     public override string PageTitleLogs => "Registros - Silicon Life Collective";
@@ -316,6 +317,12 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     // ===== Memory Page Localization =====
 
     public override string MemoryPageHeader => "Navegador de memoria";
+    public override string WorkNotesPageHeader => "Notas de Trabajo";
+    public override string WorkNotesTotalPages => "{0} páginas en total";
+    public override string WorkNotesEmptyState => "No hay notas de trabajo";
+    public override string WorkNotesSearchPlaceholder => "Buscar notas...";
+    public override string WorkNotesSearchButton => "Buscar";
+    public override string WorkNotesNoSearchResults => "No se encontraron notas coincidentes";
     public override string MemoryEmptyState => "Sin registros de memoria";
     public override string MemorySearchPlaceholder => "Buscar memorias...";
     public override string MemorySearchButton => "Buscar";
@@ -523,7 +530,12 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string BeingsDetailAIClientLabel => "Cliente de IA independiente: ";
     public override string BeingsDetailAIClientEditLink => "Editar";
     public override string BeingsDetailChatHistoryLabel => "Historial de chat: ";
+    public override string BeingsDetailWorkNoteLabel => "Notas de trabajo: ";
     public override string BeingsDetailChatHistoryLink => "Ver historial de chat";
+    public override string BeingsDetailWorkNoteLink => "Ver notas de trabajo";
+    public override string WorkNotePageTitle => "Notas de Trabajo";
+    public override string WorkNotePageHeader => "Lista de Notas de Trabajo";
+    public override string WorkNotePageDescription => "Gestionar y ver las notas de trabajo del ser de silicio";
     public override string ChatHistoryPageTitle => "Historial de chat";
     public override string ChatHistoryPageHeader => "Lista de conversaciones";
     public override string ChatHistoryConversationList => "Lista de conversaciones";
@@ -795,7 +807,8 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         ["task"] = "Tarea",
         ["system"] = "Sistema",
         ["timer"] = "Temporizador",
-        ["token_audit"] = "Auditoría de tokens"
+        ["token_audit"] = "Auditoría de tokens",
+        ["work_note"] = "Nota de Trabajo"
     };
 
     public override string GetToolDisplayName(string toolName) =>

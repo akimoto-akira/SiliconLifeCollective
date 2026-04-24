@@ -299,6 +299,12 @@ public class BeingView : ViewBase
             .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.BeingsDetailChatHistoryLink))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a>"));
 
+        var workNoteLink = Js.Str(() => "<a class='detail-link' href='/work-notes?beingId=")
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "id"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "'>"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.BeingsDetailWorkNoteLink))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a>"));
+
         return Js.Str(() => "<h2>")
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "name"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</h2><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailIdLabel}</span><span class=\"detail-value\">"))
@@ -317,6 +323,8 @@ public class BeingView : ViewBase
             .Op(() => "+", () => (JsSyntax)permissionLink)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailChatHistoryLabel}</span>"))
             .Op(() => "+", () => (JsSyntax)chatHistoryLink)
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailWorkNoteLabel}</span>"))
+            .Op(() => "+", () => (JsSyntax)workNoteLink)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailAIClientLabel}</span><span class=\"detail-value\">"))
             .Op(() => "+", () => (JsSyntax)aiClientValue)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</span></div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailSoulContentLabel}</span>"))

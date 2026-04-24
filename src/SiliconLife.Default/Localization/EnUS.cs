@@ -303,6 +303,7 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string PageTitleTasks => "Tasks - Silicon Life Collective";
     public override string PageTitleTimers => "Timers - Silicon Life Collective";
     public override string PageTitleMemory => "Memory - Silicon Life Collective";
+    public override string PageTitleWorkNotes => "Work Notes - Silicon Life Collective";
     public override string PageTitleKnowledge => "Knowledge - Silicon Life Collective";
     public override string PageTitleProjects => "Projects - Silicon Life Collective";
     public override string PageTitleLogs => "Logs - Silicon Life Collective";
@@ -316,6 +317,12 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     // ===== Memory Page Localization =====
 
     public override string MemoryPageHeader => "Memory Browser";
+    public override string WorkNotesPageHeader => "Work Notes";
+    public override string WorkNotesTotalPages => "{0} pages total";
+    public override string WorkNotesEmptyState => "No work notes available";
+    public override string WorkNotesSearchPlaceholder => "Search notes...";
+    public override string WorkNotesSearchButton => "Search";
+    public override string WorkNotesNoSearchResults => "No matching notes found";
     public override string MemoryEmptyState => "No memory records";
     public override string MemorySearchPlaceholder => "Search memories...";
     public override string MemorySearchButton => "Search";
@@ -523,7 +530,12 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string BeingsDetailAIClientLabel => "Independent AI Client: ";
     public override string BeingsDetailAIClientEditLink => "Edit";
     public override string BeingsDetailChatHistoryLabel => "Chat History: ";
+    public override string BeingsDetailWorkNoteLabel => "Work Notes: ";
     public override string BeingsDetailChatHistoryLink => "View Chat History";
+    public override string BeingsDetailWorkNoteLink => "View Work Notes";
+    public override string WorkNotePageTitle => "Work Notes";
+    public override string WorkNotePageHeader => "Work Note List";
+    public override string WorkNotePageDescription => "Manage and view silicon being work notes";
     public override string ChatHistoryPageTitle => "Chat History";
     public override string ChatHistoryPageHeader => "Conversation List";
     public override string ChatHistoryConversationList => "Conversation List";
@@ -795,7 +807,8 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
         ["task"] = "Task",
         ["system"] = "System",
         ["timer"] = "Timer",
-        ["token_audit"] = "Token Audit"
+        ["token_audit"] = "Token Audit",
+        ["work_note"] = "Work Note"
     };
 
     public override string GetToolDisplayName(string toolName) =>

@@ -303,6 +303,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string PageTitleTasks => "任务管理 - 硅基生命群";
     public override string PageTitleTimers => "定时器管理 - 硅基生命群";
     public override string PageTitleMemory => "记忆浏览 - 硅基生命群";
+    public override string PageTitleWorkNotes => "工作笔记 - 硅基生命群";
     public override string PageTitleKnowledge => "知识图谱 - 硅基生命群";
     public override string PageTitleProjects => "项目空间管理 - 硅基生命群";
     public override string PageTitleLogs => "日志查询 - 硅基生命群";
@@ -316,6 +317,12 @@ public class ZhCN : DefaultLocalizationBase
     // ===== Memory Page Localization =====
 
     public override string MemoryPageHeader => "记忆浏览";
+    public override string WorkNotesPageHeader => "工作笔记";
+    public override string WorkNotesTotalPages => "共 {0} 页";
+    public override string WorkNotesEmptyState => "暂无工作笔记";
+    public override string WorkNotesSearchPlaceholder => "搜索笔记...";
+    public override string WorkNotesSearchButton => "搜索";
+    public override string WorkNotesNoSearchResults => "未找到匹配的笔记";
     public override string MemoryEmptyState => "暂无记忆数据";
     public override string MemorySearchPlaceholder => "搜索记忆...";
     public override string MemorySearchButton => "搜索";
@@ -523,7 +530,12 @@ public class ZhCN : DefaultLocalizationBase
     public override string BeingsDetailAIClientLabel => "独立AI客户端：";
     public override string BeingsDetailAIClientEditLink => "编辑";
     public override string BeingsDetailChatHistoryLabel => "聊天记录：";
+    public override string BeingsDetailWorkNoteLabel => "工作笔记：";
     public override string BeingsDetailChatHistoryLink => "查看聊天记录";
+    public override string BeingsDetailWorkNoteLink => "查看工作笔记";
+    public override string WorkNotePageTitle => "工作笔记";
+    public override string WorkNotePageHeader => "工作笔记列表";
+    public override string WorkNotePageDescription => "管理和查看硅基人的工作笔记";
     public override string ChatHistoryPageTitle => "聊天历史";
     public override string ChatHistoryPageHeader => "会话列表";
     public override string ChatHistoryConversationList => "会话列表";
@@ -795,7 +807,8 @@ public class ZhCN : DefaultLocalizationBase
         ["task"] = "任务",
         ["system"] = "系统",
         ["timer"] = "定时器",
-        ["token_audit"] = "Token审计"
+        ["token_audit"] = "Token审计",
+        ["work_note"] = "工作笔记"
     };
 
     public override string GetToolDisplayName(string toolName) =>
