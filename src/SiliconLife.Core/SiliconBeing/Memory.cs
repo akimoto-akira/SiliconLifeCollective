@@ -235,7 +235,7 @@ public sealed class Memory
 
     /// <summary>
     /// Gets the most recent memory entries by progressively widening the time range:
-    /// today ï¿?this month ï¿?this year ï¿?all entries.
+    /// today ï¿½?this month ï¿½?this year ï¿½?all entries.
     /// </summary>
     /// <param name="count">The maximum number of entries to return.</param>
     /// <returns>A list of recent memory entries ordered by timestamp descending.</returns>
@@ -305,87 +305,267 @@ public sealed class Memory
     }
 
     /// <summary>
-    /// Determines whether the memory system should be compressed based on entry count.
+    /// Determines whether the memory system should be compressed and returns the compression level information.
     /// </summary>
+    /// <param name="compressData">The compression level and entries to compress, or null if no compression is needed.</param>
     /// <returns>True if compression is needed; otherwise, false.</returns>
-    public bool ShouldCompress()
+    public bool ShouldCompress(out (IncompleteDate Level, List<TimeEntry<MemoryEntry>> Entries)? compressData)
     {
-        var compressLevel = FindLevelToCompress();
-        if (compressLevel.HasValue)
+        compressData = FindLevelToCompress();
+        if (compressData.HasValue)
         {
-            _logger.Debug(null, "Memory compression check: compression needed");
+            _logger.Debug(null, "Memory compression check: compression needed at level {0}", compressData.Value.Level);
         }
-        return compressLevel.HasValue;
+        return compressData.HasValue;
     }
 
     /// <summary>
     /// Finds the time level that needs compression based on the number of entries.
+    /// Starts from the earliest memory time and works forward with hierarchical checking.
+    /// Returns the most precise uncompressed level with its child summaries or original entries.
     /// </summary>
     /// <returns>A tuple containing the level and entries to compress, or null if no compression is needed.</returns>
     public (IncompleteDate Level, List<TimeEntry<MemoryEntry>> Entries)? FindLevelToCompress()
     {
+        // Step 1: Get the earliest memory timestamp
+        var allEntries = _timeStorage.Query<MemoryEntry>(_storageKey, null);
+        if (allEntries.Count == 0)
+        {
+            return null;
+        }
+
+        // Query returns entries sorted by timestamp ascending, so the first one is the earliest
+        var earliestTimestamp = allEntries[0].Timestamp;
         var now = DateTime.Now;
+        var earliestYear = earliestTimestamp.Year;
+        var earliestMonth = earliestTimestamp.Month;
+        var earliestDay = earliestTimestamp.Day;
+        var earliestHour = earliestTimestamp.Hour;
+        var earliestMinute = earliestTimestamp.Minute;
 
-        var second = new IncompleteDate(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
-        if (!HasSummary(second))
+        // Step 2: Hierarchical check from earliest year downward (year â†’ month â†’ day â†’ hour â†’ minute)
+        // Only compress completed time periods (e.g., don't compress current year/month/day/hour)
+        
+        // Check year level (only past years, not current year)
+        for (int year = earliestYear; year < now.Year; year++)
         {
-            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, second);
-            if (entries.Count > 0)
-                return (second, entries);
-        }
-
-        var minute = new IncompleteDate(now.Year, now.Month, now.Day, now.Hour, now.Minute);
-        if (!HasSummary(minute))
-        {
-            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, minute);
-            if (entries.Count > 0)
-                return (minute, entries);
-        }
-
-        var hour = new IncompleteDate(now.Year, now.Month, now.Day, now.Hour);
-        if (!HasSummary(hour))
-        {
-            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, hour);
-            if (entries.Count > 0)
-                return (hour, entries);
-        }
-
-        var day = new IncompleteDate(now.Year, now.Month, now.Day);
-        if (!HasSummary(day))
-        {
-            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, day);
-            if (entries.Count > 0)
-                return (day, entries);
-        }
-
-        var month = new IncompleteDate(now.Year, now.Month);
-        if (!HasSummary(month))
-        {
-            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, month);
-            if (entries.Count > 0)
-                return (month, entries);
-        }
-
-        var year = new IncompleteDate(now.Year);
-        if (!HasSummary(year))
-        {
-            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, year);
-            if (entries.Count > 0)
-                return (year, entries);
-        }
-
-        for (int y = now.Year - 1; y >= now.Year - 3; y--)
-        {
-            var pastYear = new IncompleteDate(y);
-            if (!HasSummary(pastYear))
+            var yearLevel = new IncompleteDate(year);
+            
+            if (HasSummary(yearLevel))
             {
-                var entries = _timeStorage.Query<MemoryEntry>(_storageKey, pastYear);
-                if (entries.Count > 0)
-                    return (pastYear, entries);
+                // This year is already compressed, skip
+                continue;
+            }
+
+            // This year is not compressed, check all months (1-12)
+            bool allMonthsCompressed = true;
+            
+            for (int month = 1; month <= 12; month++)
+            {
+                var monthLevel = new IncompleteDate(year, month);
+                
+                if (!HasSummary(monthLevel))
+                {
+                    // This month is not compressed, check all days
+                    int daysInMonth = DateTime.DaysInMonth(year, month);
+                    bool allDaysCompressed = true;
+                    
+                    for (int day = 1; day <= daysInMonth; day++)
+                    {
+                        var dayLevel = new IncompleteDate(year, month, day);
+                        
+                        if (!HasSummary(dayLevel))
+                        {
+                            // This day is not compressed, check all hours (0-23)
+                            bool allHoursCompressed = true;
+                            
+                            for (int hour = 0; hour <= 23; hour++)
+                            {
+                                var hourLevel = new IncompleteDate(year, month, day, hour);
+                                
+                                if (!HasSummary(hourLevel))
+                                {
+                                    // This hour is not compressed, check all minutes (0-59)
+                                    bool allMinutesCompressed = true;
+                                    
+                                    for (int minute = 0; minute <= 59; minute++)
+                                    {
+                                        var minuteLevel = new IncompleteDate(year, month, day, hour, minute);
+                                        
+                                        if (!HasSummary(minuteLevel))
+                                        {
+                                            // Found the most precise uncompressed level: minute
+                                            var entries = _timeStorage.Query<MemoryEntry>(_storageKey, minuteLevel);
+                                            if (entries.Count > 0)
+                                            {
+                                                return (minuteLevel, entries);
+                                            }
+                                            // This minute has no memories, continue to next minute
+                                            allMinutesCompressed = false;
+                                            break;
+                                        }
+                                    }
+                                    
+                                    // If all minutes in this hour are compressed, return all minute-level summaries for this hour
+                                    if (allMinutesCompressed)
+                                    {
+                                        var hourEntries = GetSummaryEntries(year, month, day, hour, null);
+                                        if (hourEntries.Count > 0)
+                                        {
+                                            return (hourLevel, hourEntries);
+                                        }
+                                    }
+                                    
+                                    // This hour is not compressed, return all memories in this hour (original or child summaries)
+                                    var hourMemoryEntries = _timeStorage.Query<MemoryEntry>(_storageKey, hourLevel);
+                                    if (hourMemoryEntries.Count > 0)
+                                    {
+                                        return (hourLevel, hourMemoryEntries);
+                                    }
+                                    
+                                    allHoursCompressed = false;
+                                    break;
+                                }
+                            }
+                            
+                            // If all hours in this day are compressed, return all hour-level summaries for this day
+                            if (allHoursCompressed)
+                            {
+                                var dayEntries = GetSummaryEntries(year, month, day, null, null);
+                                if (dayEntries.Count > 0)
+                                {
+                                    return (dayLevel, dayEntries);
+                                }
+                            }
+                            
+                            // This day is not compressed, return all memories in this day (original or child summaries)
+                            var dayMemoryEntries = _timeStorage.Query<MemoryEntry>(_storageKey, dayLevel);
+                            if (dayMemoryEntries.Count > 0)
+                            {
+                                return (dayLevel, dayMemoryEntries);
+                            }
+                            
+                            allDaysCompressed = false;
+                            break;
+                        }
+                    }
+                    
+                    // If all days in this month are compressed, return all day-level summaries for this month
+                    if (allDaysCompressed)
+                    {
+                        var monthEntries = GetSummaryEntries(year, month, null, null, null);
+                        if (monthEntries.Count > 0)
+                        {
+                            return (monthLevel, monthEntries);
+                        }
+                    }
+                    
+                    // This month is not compressed, return all memories in this month (original or child summaries)
+                    var monthMemoryEntries = _timeStorage.Query<MemoryEntry>(_storageKey, monthLevel);
+                    if (monthMemoryEntries.Count > 0)
+                    {
+                        return (monthLevel, monthMemoryEntries);
+                    }
+                    
+                    allMonthsCompressed = false;
+                    break;
+                }
+            }
+            
+            // If all months in this year are compressed, return all month-level summaries for this year
+            if (allMonthsCompressed)
+            {
+                var yearEntries = GetSummaryEntries(year, null, null, null, null);
+                if (yearEntries.Count > 0)
+                {
+                    return (yearLevel, yearEntries);
+                }
+            }
+            
+            // This year is not compressed, return all memories in this year (original or child summaries)
+            var yearMemoryEntries = _timeStorage.Query<MemoryEntry>(_storageKey, yearLevel);
+            if (yearMemoryEntries.Count > 0)
+            {
+                return (yearLevel, yearMemoryEntries);
             }
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Gets compression summary entries for a specific time level.
+    /// </summary>
+    private List<TimeEntry<MemoryEntry>> GetSummaryEntries(int year, int? month, int? day, int? hour, int? minute)
+    {
+        var summaries = new List<TimeEntry<MemoryEntry>>();
+        
+        if (month.HasValue)
+        {
+            // Query all day-level summaries under this month (when called from month level)
+            if (day.HasValue)
+            {
+                // Query all hour-level summaries under this day (when called from day level)
+                if (hour.HasValue)
+                {
+                    // Query all minute-level summaries under this hour (when called from hour level)
+                    if (minute.HasValue)
+                    {
+                        // Should not reach here since minute is the finest granularity
+                        return summaries;
+                    }
+                    
+                    // Query all minute-level summaries for this hour
+                    for (int m = 0; m <= 59; m++)
+                    {
+                        var minuteLevel = new IncompleteDate(year, month.Value, day.Value, hour.Value, m);
+                        var minuteSummaries = _timeStorage.Query<MemoryEntry>(_storageKey, minuteLevel)
+                            .Where(e => e.Data.IsSummary)
+                            .ToList();
+                        summaries.AddRange(minuteSummaries);
+                    }
+                }
+                else
+                {
+                    // Query all hour-level summaries for this day
+                    for (int h = 0; h <= 23; h++)
+                    {
+                        var hourLevel = new IncompleteDate(year, month.Value, day.Value, h);
+                        var hourSummaries = _timeStorage.Query<MemoryEntry>(_storageKey, hourLevel)
+                            .Where(e => e.Data.IsSummary)
+                            .ToList();
+                        summaries.AddRange(hourSummaries);
+                    }
+                }
+            }
+            else
+            {
+                // Query all day-level summaries for this month
+                int daysInMonth = DateTime.DaysInMonth(year, month.Value);
+                for (int d = 1; d <= daysInMonth; d++)
+                {
+                    var dayLevel = new IncompleteDate(year, month.Value, d);
+                    var daySummaries = _timeStorage.Query<MemoryEntry>(_storageKey, dayLevel)
+                        .Where(e => e.Data.IsSummary)
+                        .ToList();
+                    summaries.AddRange(daySummaries);
+                }
+            }
+        }
+        else
+        {
+            // Query all month-level summaries for this year
+            for (int m = 1; m <= 12; m++)
+            {
+                var monthLevel = new IncompleteDate(year, m);
+                var monthSummaries = _timeStorage.Query<MemoryEntry>(_storageKey, monthLevel)
+                    .Where(e => e.Data.IsSummary)
+                    .ToList();
+                summaries.AddRange(monthSummaries);
+            }
+        }
+        
+        return summaries;
     }
 
     private bool HasSummary(IncompleteDate level)

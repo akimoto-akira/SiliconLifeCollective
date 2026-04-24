@@ -235,11 +235,10 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 }
             }
 
-            if (Memory != null && Memory.ShouldCompress())
+            if (Memory != null && Memory.ShouldCompress(out var compressData))
             {
-                return;
-                _logger.Debug(Id, "Being {0}: memory compression needed", Name);
-                ExecuteBrain("ThinkOnMemoryCompress", null, _ => new ContextManager(this, null).ThinkOnMemoryCompress());
+                _logger.Debug(Id, "Being {0}: memory compression needed at level {1}", Name, compressData.Value.Level);
+                ExecuteBrain("ThinkOnMemoryCompress", null, _ => new ContextManager(this, null).ThinkOnMemoryCompress(compressData));
                 return;
             }
         }

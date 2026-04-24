@@ -170,11 +170,13 @@ public class ToolManager
     /// Executes a tool by name with the given parameters
     /// </summary>
     /// <param name="name">The tool name</param>
-    /// <param name="callerId">The GUID of the silicon being invoking this tool</param>
     /// <param name="parameters">The parameters for the tool</param>
+    /// <param name="being">The silicon being instance (callerId will be obtained from being.Id)</param>
     /// <returns>The tool execution result</returns>
-    public ToolResult ExecuteTool(string name, Guid callerId, Dictionary<string, object> parameters)
+    public ToolResult ExecuteTool(string name, Dictionary<string, object>? parameters = null, SiliconBeingBase? being = null)
     {
+        Guid callerId = being?.Id ?? Guid.Empty;
+        
         ITool? tool;
         lock (_lock)
         {
@@ -190,13 +192,21 @@ public class ToolManager
         _logger.Info(null, $"Tool execution: {name}, caller={callerId}");
         try
         {
-            ToolResult result = tool.Execute(callerId, parameters);
+            ToolResult result = tool.Execute(callerId, parameters ?? new Dictionary<string, object>());
+            
+            // Record tool execution to memory
+            RecordToolExecutionToMemory(being, name, result);
+            
             _logger.Debug(null, $"Tool execution succeeded: {name}");
             return result;
         }
         catch (Exception ex)
         {
             _logger.Error(null, $"Tool execution failed: {name}, error={ex.Message}", ex);
+            
+            // Record tool execution failure to memory
+            RecordToolExecutionErrorToMemory(being, name, ex.Message);
+            
             return ToolResult.Failed($"Tool '{name}' execution failed: {ex.Message}");
         }
     }
@@ -237,6 +247,59 @@ public class ToolManager
         lock (_lock)
         {
             return _tools.Keys.ToList();
+        }
+    }
+
+    /// <summary>
+    /// Records tool execution to the being's memory.
+    /// </summary>
+    private void RecordToolExecutionToMemory(SiliconBeingBase? being, string toolName, ToolResult result)
+    {
+        if (being?.Memory == null)
+        {
+            return;
+        }
+
+        try
+        {
+            string status = result.Success ? "成功" : "失败";
+            string content = $"[工具执行] {toolName} - {status}";
+            
+            // Add brief result info if successful
+            if (result.Success && !string.IsNullOrEmpty(result.Message))
+            {
+                string preview = result.Message.Length > 100 
+                    ? result.Message.Substring(0, 100) 
+                    : result.Message;
+                content += $": {preview}";
+            }
+            
+            being.Memory.Add(content, null);
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(being.Id, $"Failed to record tool execution to memory: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Records tool execution error to the being's memory.
+    /// </summary>
+    private void RecordToolExecutionErrorToMemory(SiliconBeingBase? being, string toolName, string errorMessage)
+    {
+        if (being?.Memory == null)
+        {
+            return;
+        }
+
+        try
+        {
+            string content = $"[工具错误] {toolName} 执行失败: {errorMessage}";
+            being.Memory.Add(content, null);
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(being.Id, $"Failed to record tool error to memory: {ex.Message}");
         }
     }
 }

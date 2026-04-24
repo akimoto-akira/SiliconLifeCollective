@@ -23,8 +23,8 @@ namespace SiliconLife.Collective;
 /// Acts as the "brain" of a silicon being: perceives input (loads history/pending),
 /// thinks (calls AI), acts (executes tools), speaks (delivers output),
 /// and remembers (persists to ChatSystem).
-/// Supports Tool Call loop: AI returns tool_calls �?execute tools �?
-/// feed results back �?AI continues �?until plain text response.
+/// Supports Tool Call loop: AI returns tool_calls → execute tools →
+/// feed results back → AI continues → until plain text response.
 /// </summary>
 public class ContextManager
 {
@@ -42,7 +42,7 @@ public class ContextManager
     /// <summary>
     /// Gets whether this brain session has work to do.
     /// True if there are pending user messages or an unfinished tool call loop
-    /// (detected from chat history �?last message is a Tool result).
+    /// (detected from chat history → last message is a Tool result).
     /// </summary>
     public bool HasWork => _needsContinuation || _hasNewPendingMessages;
 
@@ -164,7 +164,7 @@ public class ContextManager
                 continue;
             }
 
-            // Context already loaded by LoadHistoryMessages �?just track
+            // Context already loaded by LoadHistoryMessages → just track
             _contextMessageIds.Add(msg.Id);
             _hasNewPendingMessages = true;
             _pendingMarkAsReadIds.Add(msg.Id);
@@ -307,7 +307,7 @@ public class ContextManager
             request.Tools = toolManager.GetToolDefinitions();
         }
 
-        _logger.Debug(_being.Id, "Building AI request: {0} messages, {1} tools", request.Messages.Count, request.Tools?.Count ?? 0);
+        _logger.Debug(_being.Id, "Building AI request: {0} messages, {0} tools", request.Messages.Count, request.Tools?.Count ?? 0);
 
         return request;
     }
@@ -328,7 +328,7 @@ public class ContextManager
             ToolResult result;
             if (toolManager != null)
             {
-                result = toolManager.ExecuteTool(toolCall.Name, _being.Id, toolCall.Arguments);
+                result = toolManager.ExecuteTool(toolCall.Name, toolCall.Arguments, being: _being);
             }
             else
             {
@@ -591,7 +591,7 @@ public class ContextManager
 
         if (response.Success && response.HasToolCalls)
         {
-            // Tool calls executed, results persisted �?yield time slice
+            // Tool calls executed, results persisted → yield time slice
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
@@ -611,12 +611,15 @@ public class ContextManager
                 SiliconBeingManager? beingManager = ServiceLocator.Instance.BeingManager;
                 SiliconBeingBase? otherBeing = otherId != Guid.Empty ? beingManager?.GetBeing(otherId) : null;
                 string partnerName = otherBeing?.Name ?? Config.Instance?.Data?.UserNickname ?? otherId.ToString();
-                RecordToMemory(loc.FormatMemoryEventSingleChat(partnerName, response.Content));
+                
+                // 如果对方是硅基人，关联到记忆；如果是人类用户，不关联
+                List<Guid>? relatedBeings = otherBeing != null ? new List<Guid> { otherId } : null;
+                RecordToMemory(loc.FormatMemoryEventSingleChat(partnerName, response.Content), relatedBeings);
             }
         }
         else if (!response.Success)
         {
-            // AI request failed �?notify frontend and keep messages unread for retry
+            // AI request failed → notify frontend and keep messages unread for retry
             string errorMsg = response.ErrorMessage ?? "Unknown AI error";
             DeliverOutput($"[Error] AI request failed: {errorMsg}");
             _logger.Error(_being.Id, "ThinkOnChat failed: being={0}, error={1}", _being.Name, errorMsg);
@@ -729,7 +732,7 @@ public class ContextManager
 
         if (response.Success && response.HasToolCalls)
         {
-            // Tool calls executed, results persisted �?yield time slice
+            // Tool calls executed, results persisted → yield time slice
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
@@ -749,12 +752,15 @@ public class ContextManager
                 SiliconBeingManager? beingManager = ServiceLocator.Instance.BeingManager;
                 SiliconBeingBase? otherBeing = otherId != Guid.Empty ? beingManager?.GetBeing(otherId) : null;
                 string partnerName = otherBeing?.Name ?? Config.Instance?.Data?.UserNickname ?? otherId.ToString();
-                RecordToMemory(loc.FormatMemoryEventSingleChat(partnerName, response.Content));
+                
+                // 如果对方是硅基人，关联到记忆；如果是人类用户，不关联
+                List<Guid>? relatedBeings = otherBeing != null ? new List<Guid> { otherId } : null;
+                RecordToMemory(loc.FormatMemoryEventSingleChat(partnerName, response.Content), relatedBeings);
             }
         }
         else if (!response.Success)
         {
-            // AI request failed �?notify frontend and keep messages unread for retry
+            // AI request failed → notify frontend and keep messages unread for retry
             string errorMsg = response.ErrorMessage ?? "Unknown AI error";
             DeliverOutput($"[Error] AI request failed: {errorMsg}");
             _logger.Error(_being.Id, "ThinkOnChatStreamAsync failed: being={0}, error={1}", _being.Name, errorMsg);
@@ -777,7 +783,7 @@ public class ContextManager
 
         if (response.Success && response.HasToolCalls)
         {
-            // Tool calls executed, results persisted �?yield time slice
+            // Tool calls executed, results persisted → yield time slice
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
@@ -814,7 +820,7 @@ public class ContextManager
 
         if (response.Success && response.HasToolCalls)
         {
-            // Tool calls executed, results persisted �?yield time slice
+            // Tool calls executed, results persisted → yield time slice
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
@@ -1022,11 +1028,12 @@ public class ContextManager
 
     /// <summary>
     /// Scene: memory compression.
-    /// Compresses old memories level by level: second -> minute -> hour -> day -> month -> year.
+    /// Compresses memories using hierarchical aggregation: minute summaries -> hour -> day -> month -> year.
     /// Uses Generate API (non-chat) for pure text compression.
     /// </summary>
+    /// <param name="compressData">The compression level and entries to compress. If null, will be determined automatically.</param>
     /// <returns>The AI response</returns>
-    public AIResponse ThinkOnMemoryCompress()
+    public AIResponse ThinkOnMemoryCompress((IncompleteDate Level, List<TimeEntry<MemoryEntry>> Entries)? compressData = null)
     {
         _logger.Info(_being.Id, "ThinkOnMemoryCompress: being={0}", _being.Name);
 
@@ -1035,13 +1042,14 @@ public class ContextManager
             return new AIResponse { Success = false, ErrorMessage = "Memory not initialized" };
         }
 
-        var compressData = _being.Memory.FindLevelToCompress();
-        if (!compressData.HasValue)
+        // Use provided compressData or find level to compress automatically
+        var compressDataValue = compressData ?? _being.Memory.FindLevelToCompress();
+        if (!compressDataValue.HasValue)
         {
             return new AIResponse { Success = true, Content = "No level to compress" };
         }
 
-        var (level, entries) = compressData.Value;
+        var (level, entries) = compressDataValue.Value;
 
         if (entries.Count == 0)
         {
@@ -1132,7 +1140,7 @@ public class ContextManager
     {
         _logger.Debug(_being.Id, "Delivering timer output for being {0}, length={1}", _being.Name, content.Length);
 
-        // Determine the target: curator �?user, non-curator �?curator
+        // Determine the target: curator → user, non-curator → curator
         Guid targetId = Guid.Empty;
         if (_being.IsCurator)
         {
@@ -1157,7 +1165,7 @@ public class ContextManager
         SessionBase? session = chatSystem?.GetOrCreateSession(_being.Id, targetId);
         if (session == null)
         {
-            _logger.Warn(_being.Id, "DeliverTimerOutput: failed to get session for being {0} �?target {1}", _being.Name, targetId);
+            _logger.Warn(_being.Id, "DeliverTimerOutput: failed to get session for being {0} → target {1}", _being.Name, targetId);
             return;
         }
 
@@ -1283,7 +1291,9 @@ public class ContextManager
     /// Records an event to the being's memory using localized text.
     /// No-op if the being has no memory system configured.
     /// </summary>
-    private void RecordToMemory(string content)
+    /// <param name="content">The memory content</param>
+    /// <param name="relatedBeings">List of related being IDs (e.g., conversation partner)</param>
+    private void RecordToMemory(string content, List<Guid>? relatedBeings = null)
     {
         if (_being.Memory == null || string.IsNullOrEmpty(content))
         {
@@ -1294,7 +1304,7 @@ public class ContextManager
         {
             Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase localization = LocalizationManager.Instance.GetLocalization(language);
-            _being.Memory.Add(content, null);
+            _being.Memory.Add(content, relatedBeings);
         }
         catch (Exception ex)
         {
