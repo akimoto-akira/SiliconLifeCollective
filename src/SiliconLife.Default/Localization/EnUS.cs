@@ -12,6 +12,7 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
+using SiliconLife.Default.ChineseHistorical;
 
 namespace SiliconLife.Default;
 
@@ -988,6 +989,16 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
         var monthName = GetRocMonthName(month) ?? month.ToString();
         return $"ROC {year}, {monthName} {day} {hour:D2}:{minute:D2}:{second:D2}";
     }
+
+    // ===== Chinese Historical Calendar =====
+
+    public override string CalendarChineseHistoricalName => "Chinese Historical Calendar";
+    public override string CalendarComponentDynasty => "Dynasty";
+    public override string? GetChineseHistoricalMonthName(int month) => GetGregorianMonthName(month);
+    public override string FormatChineseHistoricalDay(int day) => day.ToString();
+    
+    private readonly ChineseHistoricalEnUS _chineseHistorical = new();
+    public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
 
     // ===== Chula Sakarat Calendar =====
 

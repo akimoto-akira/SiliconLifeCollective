@@ -12,6 +12,7 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
+using SiliconLife.Default.ChineseHistorical;
 
 namespace SiliconLife.Default;
 
@@ -988,6 +989,16 @@ public class JaJP : DefaultLocalizationBase
         var monthName = GetRocMonthName(month) ?? $"{month}月";
         return $"民国{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
+
+    // ===== Chinese Historical Calendar Localization =====
+
+    public override string CalendarChineseHistoricalName => "中国歴史紀年暦";
+    public override string CalendarComponentDynasty => "朝代";
+    public override string? GetChineseHistoricalMonthName(int month) => GetGregorianMonthName(month);
+    public override string FormatChineseHistoricalDay(int day) => $"{day}日";
+    
+    private readonly ChineseHistoricalJaJP _chineseHistorical = new();
+    public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
 
     // ===== チュラサッカラート暦ローカライゼーション =====
 

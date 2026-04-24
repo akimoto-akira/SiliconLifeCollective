@@ -12,6 +12,7 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
+using SiliconLife.Default.ChineseHistorical;
 
 namespace SiliconLife.Default;
 
@@ -989,6 +990,16 @@ public class ZhCN : DefaultLocalizationBase
         return $"民国{year}年{monthName}{day}日 {hour:D2}:{minute:D2}:{second:D2}";
     }
 
+    // ===== Chinese Historical Calendar Localization =====
+
+    public override string CalendarChineseHistoricalName => "中国历史纪年历";
+    public override string CalendarComponentDynasty => "朝代";
+    public override string? GetChineseHistoricalMonthName(int month) => GetGregorianMonthName(month);
+    public override string FormatChineseHistoricalDay(int day) => $"{day}日";
+    
+    private readonly ChineseHistoricalZhCN _chineseHistorical = new();
+    public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
+    
     // ===== Chula Sakarat Calendar Localization =====
 
     public override string CalendarChulaSakaratName => "朱拉萨卡拉特历（CS）";

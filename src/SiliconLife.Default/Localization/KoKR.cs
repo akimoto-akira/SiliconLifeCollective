@@ -12,6 +12,7 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
+using SiliconLife.Default.ChineseHistorical;
 
 namespace SiliconLife.Default;
 
@@ -986,8 +987,18 @@ public class KoKR : DefaultLocalizationBase
     public override string LocalizeRocDate(int year, int month, int day, int hour, int minute, int second)
     {
         var monthName = GetRocMonthName(month) ?? $"{month}월";
-        return $"민국{year}년 {monthName} {day}일 {hour:D2}:{minute:D2}:{second:D2}";
+        return $"민국 {year}년 {monthName} {day}일 {hour:D2}:{minute:D2}:{second:D2}";
     }
+    
+    // ===== Chinese Historical Calendar Localization =====
+    
+    public override string CalendarChineseHistoricalName => "중국 역사 기년력";
+    public override string CalendarComponentDynasty => "왕조";
+    public override string? GetChineseHistoricalMonthName(int month) => GetGregorianMonthName(month);
+    public override string FormatChineseHistoricalDay(int day) => $"{day}일";
+    
+    private readonly ChineseHistoricalKoKR _chineseHistorical = new();
+    public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
 
     // ===== 츌라사카랏력 로컬라이제이션 =====
 

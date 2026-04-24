@@ -12,6 +12,7 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
+using SiliconLife.Default.ChineseHistorical;
 
 namespace SiliconLife.Default;
 
@@ -1886,6 +1887,35 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Formats a full ROC date-time into a localized human-readable string.
     /// </summary>
     public abstract string LocalizeRocDate(int year, int month, int day, int hour, int minute, int second);
+
+    // ===== Chinese Historical Calendar =====
+
+    /// <summary>
+    /// Gets the display name of the Chinese Historical Calendar system.
+    /// </summary>
+    public abstract string CalendarChineseHistoricalName { get; }
+
+    /// <summary>
+    /// Gets the localized component name for Dynasty.
+    /// </summary>
+    public abstract string CalendarComponentDynasty { get; }
+
+    /// <summary>
+    /// Gets the localized month name for the given month number (1–12) in the Chinese Historical calendar.
+    /// </summary>
+    public abstract string? GetChineseHistoricalMonthName(int month);
+
+    /// <summary>Returns a localized string for the given day value in the Chinese Historical calendar.</summary>
+    public abstract string FormatChineseHistoricalDay(int day);
+
+    /// <summary>
+    /// Gets the Chinese historical localization provider for dynasty and era name translations.
+    /// </summary>
+    /// <returns>
+    /// An instance of ChineseHistoricalLocalizationBase implementation that provides
+    /// localized names for all 28 dynasties and 356 era names.
+    /// </returns>
+    public abstract ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization();
 
     // ===== Chula Sakarat Calendar =====
 
