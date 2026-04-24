@@ -48,6 +48,11 @@ public class ChatHistoryDetailView : ViewBase
 
     private static CssBuilder GetStyles()
     {
+        return GetStylesInternal();
+    }
+
+    internal static CssBuilder GetStylesInternal()
+    {
         return CssBuilder.Create()
             .Selector(".back-nav")
                 .Property("margin-bottom", "16px")
@@ -334,9 +339,14 @@ public class ChatHistoryDetailView : ViewBase
 
     private static JsSyntax GetScripts(ChatHistoryDetailViewModel vm)
     {
+        return GetScriptsStatic(vm.ToolDisplayNames, $"/api/chat-history/messages?sessionId={vm.SessionId}", vm.Localization.ChatDetailNoMessages);
+    }
+
+    internal static JsSyntax GetScriptsStatic(Dictionary<string, string> toolDisplayNames, string apiUrl, string emptyMessage = "No messages found")
+    {
         // Serialize the tool display name map as a JS object literal
         var toolDisplayNamesLiteral = "{" + string.Join(",",
-            vm.ToolDisplayNames.Select(kv =>
+            toolDisplayNames.Select(kv =>
                 $"\"{kv.Key}\":\"{kv.Value}\"")) + "}";
         
         // Global tool display names dictionary
@@ -362,7 +372,7 @@ public class ChatHistoryDetailView : ViewBase
                 )));
         var decodeUnicodeFunc = Js.Func(() => "decodeUnicode", () => new List<string> { "str" }, () => decodeUnicodeBody);
         
-        // getToolSummary function
+        // getToolSummary function - supports multiple tool calls
         var getToolSummaryBody = Js.Block()
             .Add(() => Js.Let(() => "defaultLabel", () => Js.Str(() => "🔧 Tool Call")))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
@@ -374,19 +384,34 @@ public class ChatHistoryDetailView : ViewBase
                     {
                         (Js.Id(() => "tcs").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0")), new List<JsSyntax>
                         {
-                            Js.Let(() => "n", () => Js.Id(() => "tcs").Index(() => Js.Num(() => "0")).Prop(() => "Name")),
-                            Js.Return(() => Js.Str(() => "🔧 ").Op(() => "+",
-                                () => Js.Id(() => "toolDisplayNames")
-                                    .Index(() => Js.Id(() => "n"))
-                                    .Op(() => "||", () => Js.Id(() => "n"))))
+                            Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                            {
+                                (Js.Id(() => "tcs").Prop(() => "length").Op(() => "===", () => Js.Num(() => "1")), new List<JsSyntax>
+                                {
+                                    Js.Let(() => "n", () => Js.Id(() => "tcs").Index(() => Js.Num(() => "0")).Prop(() => "Name")),
+                                    Js.Return(() => Js.Str(() => "🔧 ").Op(() => "+",
+                                        () => Js.Id(() => "toolDisplayNames")
+                                            .Index(() => Js.Id(() => "n"))
+                                            .Op(() => "||", () => Js.Id(() => "n"))))
+                                }),
+                                (null, new List<JsSyntax>
+                                {
+                                    // Multiple tool calls: show all names
+                                    Js.Let(() => "names", () => Js.Id(() => "tcs").Call(() => "map",
+                                        () => Js.Arrow(() => new List<string> { "tc" }, () => Js.Id(() => "toolDisplayNames")
+                                            .Index(() => Js.Id(() => "tc").Prop(() => "Name"))
+                                            .Op(() => "||", () => Js.Id(() => "tc").Prop(() => "Name"))))),
+                                    Js.Return(() => Js.Str(() => "🔧 ").Op(() => "+", () => Js.Id(() => "names").Call(() => "join", () => Js.Str(() => ", "))))
+                                })
+                            })
                         })
                     })
                 })
             }))
             .Add(() => Js.Return(() => Js.Id(() => "defaultLabel")));
         var getToolSummaryFunc = Js.Func(() => "getToolSummary", () => new List<string> { "msg" }, () => getToolSummaryBody);
-        
-        // renderToolMessage function
+
+        // renderToolMessage function - supports multiple tool calls with individual request/response pairs
         var renderToolMessageBody = Js.Block()
             .Add(() => Js.Let(() => "html", () => Js.Str(() => "<div class='message-item tool-message'>")))
             .Add(() =>
@@ -412,43 +437,68 @@ public class ChatHistoryDetailView : ViewBase
                 );
             })
             .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Op(() => "+", () => Js.Str(() => "<div class='message-tool-content'>"))))
-            // Request section
-            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Op(() => "+", () => Js.Str(() => "<div class='msg-tool-section'><div class='msg-tool-label'>Request:</div>"))))
-            .Add(() => Js.Let(() => "requestJson", () => Js.Ternary(
+            // Parse tool calls array
+            .Add(() => Js.Let(() => "tcs", () => Js.Ternary(
                 () => Js.Id(() => "msg").Prop(() => "toolCallsJson"),
                 () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "msg").Prop(() => "toolCallsJson")),
-                () => Js.Obj()
-            )))
-            .Add(() =>
-            {
-                var stringifyCall = Js.Id(() => "decodeUnicode").Invoke(
-                    () => Js.Id(() => "JSON")
-                        .Call(() => "stringify",
-                            () => Js.Id(() => "requestJson"),
-                            () => Js.Null(),
-                            () => Js.Num(() => "2")
-                        )
-                );
-                return Js.Assign(
-                    () => Js.Id(() => "html"),
-                    () => Js.Id(() => "html")
-                        .Op(() => "+", () => Js.Str(() => "<pre class='msg-tool-code'>"))
-                        .Op(() => "+", () => stringifyCall)
-                        .Op(() => "+", () => Js.Str(() => "</pre>"))
-                );
-            })
-            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Op(() => "+", () => Js.Str(() => "</div>"))))
-            // Response section
+                () => Js.New(() => Js.Id(() => "Array")))))
+            // Build result map for quick lookup
+            .Add(() => Js.Let(() => "resultMap", () => Js.Obj()))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
-                (Js.Id(() => "msg").Prop(() => "toolResult"), new List<JsSyntax>
+                (Js.Id(() => "msg").Prop(() => "toolResults").Op(() => "&&", () => Js.Id(() => "msg").Prop(() => "toolResults").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0"))), new List<JsSyntax>
                 {
-                    Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
-                        .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-section'><div class='msg-tool-label'>Response:</div><pre class='msg-tool-code'>"))).Stmt(),
-                    Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
-                        .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "msg").Prop(() => "toolResult")))).Stmt(),
-                    Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
-                        .Op(() => "+", () => Js.Str(() => "</pre></div>"))).Stmt()
+                    Js.Id(() => "msg").Prop(() => "toolResults").Call(() => "forEach",
+                        () => Js.Arrow(() => new List<string> { "r" }, () => Js.Block()
+                            .Add(() => Js.Assign(() => Js.Id(() => "resultMap").Index(() => Js.Id(() => "r").Prop(() => "toolCallId")), () => Js.Id(() => "r"))))).Stmt()
+                })
+            }))
+            // Render each tool call with its matching result
+            .Add(() => Js.Id(() => "tcs").Call(() => "forEach",
+                () => Js.Arrow(() => new List<string> { "tc" }, () => Js.Block()
+                    .Add(() => Js.Let(() => "dn", () => Js.Id(() => "toolDisplayNames").Index(() => Js.Id(() => "tc").Prop(() => "Name")).Op(() => "||", () => Js.Id(() => "tc").Prop(() => "Name"))))
+                    // Section header with tool display name
+                    .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
+                        .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-section'>"))
+                        .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-label'>🔧 "))
+                        .Op(() => "+", () => Js.Id(() => "dn"))
+                        .Op(() => "+", () => Js.Str(() => "</div>"))))
+                    // Individual request
+                    .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
+                        .Op(() => "+", () => Js.Str(() => "<pre class='msg-tool-code'>"))
+                        .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "tc"), () => Js.Null(), () => Js.Num(() => "2"))))
+                        .Op(() => "+", () => Js.Str(() => "</pre>"))))
+                    // Matching result
+                    .Add(() => Js.Let(() => "res", () => Js.Id(() => "resultMap").Index(() => Js.Id(() => "tc").Prop(() => "Id"))))
+                    .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "res").Op(() => "&&", () => Js.Id(() => "res").Prop(() => "content")), new List<JsSyntax>
+                        {
+                            Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
+                                .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-label'>Response:</div><pre class='msg-tool-code'>"))
+                                .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "res").Prop(() => "content")))
+                                .Op(() => "+", () => Js.Str(() => "</pre>"))).Stmt()
+                        })
+                    }))
+                    .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Op(() => "+", () => Js.Str(() => "</div>"))))
+                )).Stmt())
+            // Fallback: if no toolCalls parsed but there's a toolResult (backward compat with old single-result format)
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "tcs").Prop(() => "length").Op(() => "===", () => Js.Num(() => "0")), new List<JsSyntax>
+                {
+                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "msg").Prop(() => "toolResult"), new List<JsSyntax>
+                        {
+                            Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
+                                .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-section'><div class='msg-tool-label'>Response:</div><pre class='msg-tool-code'>"))).Stmt(),
+                            Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
+                                .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "msg").Prop(() => "toolResult")))).Stmt(),
+                            Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
+                                .Op(() => "+", () => Js.Str(() => "</pre></div>"))).Stmt()
+                        })
+                    })
                 })
             }))
             .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Op(() => "+", () => Js.Str(() => "</div></details></div>"))))
@@ -571,7 +621,7 @@ public class ChatHistoryDetailView : ViewBase
                 )}
             }))
             .Add(() => Js.Id(() => "fetch")
-                .Invoke(() => Js.Str(() => $"/api/chat-history/messages?sessionId={vm.SessionId}"))
+                .Invoke(() => Js.Str(() => apiUrl))
                 .Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json")))
                 .Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => Js.Block()
                     .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "message-list"))))
@@ -580,7 +630,7 @@ public class ChatHistoryDetailView : ViewBase
                     {
                         (Js.Id(() => "data").Prop(() => "messages").Not().Op(() => "||", () => Js.Id(() => "data").Prop(() => "messages").Prop(() => "length").Op(() => "===", () => Js.Num(() => "0"))), new List<JsSyntax>
                         {
-                            Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Str(() => $"<div class='empty-state'>{vm.Localization.ChatDetailNoMessages}</div>")),
+                            Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Str(() => $"<div class='empty-state'>{emptyMessage}</div>")),
                             Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                             {
                                 { (Js.Id(() => "loadingIndicator"), new List<JsSyntax>

@@ -40,6 +40,11 @@ public class ContextManager
     private bool _hasNewPendingMessages;
 
     /// <summary>
+    /// Timer execution context (for timer scenarios, null for chat scenarios)
+    /// </summary>
+    private TimerExecution? _timerExecution;
+
+    /// <summary>
     /// Gets whether this brain session has work to do.
     /// True if there are pending user messages or an unfinished tool call loop
     /// (detected from chat history → last message is a Tool result).
@@ -77,6 +82,31 @@ public class ContextManager
         }
 
         _logger.Info(_being.Id, "ContextManager created for being {0}, session={1}", _being.Name, _session?.Id.ToString() ?? "null");
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the ContextManager class for timer execution.
+    /// Creates or loads timer execution context from JSON file.
+    /// </summary>
+    /// <param name="being">The silicon being that owns this context</param>
+    /// <param name="timer">The timer item for execution</param>
+    /// <exception cref="ArgumentNullException">Thrown when being or its AIClient is null</exception>
+    public ContextManager(SiliconBeingBase being, TimerItem timer)
+    {
+        _being = being ?? throw new ArgumentNullException(nameof(being));
+        _aiClient = being.AIClient ?? throw new ArgumentNullException(nameof(being.AIClient));
+        _session = null;
+        _messages = new List<ChatMessage>();
+        _contextMessageIds = new HashSet<Guid>();
+        _pendingMarkAsReadIds = new List<Guid>();
+
+        // Initialize timer execution context
+        if (!string.IsNullOrEmpty(being.BeingDirectory))
+        {
+            InitializeTimerExecution(timer);
+        }
+
+        _logger.Info(_being.Id, "ContextManager created for being {0}, timer={1}", _being.Name, timer.Name);
     }
 
     /// <summary>
@@ -214,7 +244,14 @@ public class ContextManager
         };
         _messages.Add(chatMsg);
 
-        if (_session != null)
+        // If timer execution scenario, save to TimerExecution
+        if (_timerExecution != null)
+        {
+            _timerExecution.Messages.Add(chatMsg);
+            _timerExecution.Save();
+        }
+        // Original chat session logic
+        else if (_session != null)
         {
             ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
             if (chatSystem != null && _being.Id != Guid.Empty)
@@ -967,6 +1004,235 @@ public class ContextManager
         }
     }
 
+    /// <summary>
+    /// Initialize timer execution context (create new or load existing)
+    /// </summary>
+    /// <param name="timer">The timer item</param>
+    private void InitializeTimerExecution(TimerItem timer)
+    {
+        if (string.IsNullOrEmpty(_being.BeingDirectory)) return;
+
+        string execDir = Path.Combine(_being.BeingDirectory, "timers", timer.Id.ToString());
+
+        // If new execution (Idle state), create new file
+        if (timer.ExecutionState == TimerExecutionState.Idle)
+        {
+            _timerExecution = new TimerExecution
+            {
+                TimerId = timer.Id,
+                TimerName = timer.Name,
+                TriggeredAt = DateTime.Now
+            };
+            // Use ExecutionId as filename for direct lookup
+            string execFile = Path.Combine(execDir, $"{_timerExecution.ExecutionId}.json");
+            _timerExecution.FilePath = execFile;
+
+            _timerExecution.Save(); // Create file
+            timer.CurrentExecutionFile = execFile;
+            _logger.Debug(_being.Id, "Created new timer execution file: {0}", execFile);
+        }
+        else if (!string.IsNullOrEmpty(timer.CurrentExecutionFile))
+        {
+            // Load existing execution context
+            _timerExecution = TimerExecution.Load(timer.CurrentExecutionFile);
+
+            if (_timerExecution != null)
+            {
+                // Load historical messages from execution context
+                _messages.AddRange(_timerExecution.Messages);
+                _logger.Debug(_being.Id, "Loaded {0} messages from timer execution {1}",
+                    _timerExecution.Messages.Count, _timerExecution.ExecutionId);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Step-by-step timer execution. Each Tick executes only one step.
+    /// Maintains context continuity via TimerExecution JSON file.
+    /// </summary>
+    /// <param name="timer">The timer item to process</param>
+    /// <returns>The AI response</returns>
+    public AIResponse ThinkOnTimerStep(TimerItem timer)
+    {
+        _logger.Info(_being.Id, "ThinkOnTimerStep: being={0}, timer={1}, state={2}, step={3}",
+            _being.Name, timer.Name, timer.ExecutionState, timer.CurrentStep);
+
+        try
+        {
+            Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+
+            switch (timer.ExecutionState)
+            {
+                case TimerExecutionState.Idle:
+                    return ExecuteTimerStep_Start(timer, loc);
+
+                case TimerExecutionState.Started:
+                case TimerExecutionState.Executing:
+                    return ExecuteTimerStep_Continue(timer, loc);
+
+                case TimerExecutionState.Completed:
+                case TimerExecutionState.Failed:
+                    _logger.Warn(_being.Id, "Timer {0} already in terminal state {1}",
+                        timer.Name, timer.ExecutionState);
+                    return AIResponse.Failed("Timer already completed");
+
+                default:
+                    return AIResponse.Failed("Unknown timer state");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(_being.Id, "ThinkOnTimerStep exception: being={0}, timer={1}, error={2}",
+                _being.Name, timer.Name, ex.Message);
+
+            Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+            string errorMessage = loc.FormatTimerErrorNotification(timer.Name, ex.Message);
+            DeliverTimerOutput(errorMessage);
+            RecordToMemory(loc.FormatMemoryEventTimerError(timer.Name, ex.Message));
+
+            timer.ExecutionState = TimerExecutionState.Failed;
+            _being.TimerSystem?.Save();
+
+            return AIResponse.Failed(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Step 1: Idle → Started (Start notification + first AI call)
+    /// </summary>
+    private AIResponse ExecuteTimerStep_Start(TimerItem timer, LocalizationBase loc)
+    {
+        _logger.Info(_being.Id, "Timer step 1: Start notification for {0}", timer.Name);
+
+        // 1. Send start notification
+        string startMessage = loc.FormatTimerStartNotification(timer.Name);
+        DeliverTimerOutput(startMessage);
+
+        // 2. Build scenario context
+        string scenarioContext = BuildTimerScenarioContext(timer);
+
+        // 3. Add User message to trigger AI
+        _messages.Add(new ChatMessage
+        {
+            Role = MessageRole.User,
+            Content = $"Timer '{timer.Name}' has been triggered. Please execute the scheduled task.",
+        });
+
+        // 4. Call AI (first time)
+        AIResponse response = GetResponse(scenarioContext);
+
+        // 5. Update state
+        timer.CurrentStep = 1;
+
+        if (!response.Success)
+        {
+            timer.ExecutionState = TimerExecutionState.Failed;
+            string errorMsg = loc.FormatTimerErrorNotification(timer.Name, response.ErrorMessage ?? "AI call failed");
+            DeliverTimerOutput(errorMsg);
+            RecordToMemory(loc.FormatMemoryEventTimerError(timer.Name, response.ErrorMessage ?? "AI call failed"));
+        }
+        else if (response.HasToolCalls)
+        {
+            timer.ExecutionState = TimerExecutionState.Executing;
+        }
+        else if (!string.IsNullOrEmpty(response.Content))
+        {
+            timer.ExecutionState = TimerExecutionState.Completed;
+            string endMessage = loc.FormatTimerEndNotification(timer.Name, response.Content);
+            DeliverTimerOutput(endMessage);
+            RecordToMemory(loc.FormatMemoryEventTimer(response.Content));
+
+            // Mark execution as completed
+            if (_timerExecution != null)
+            {
+                _timerExecution.CompletedAt = DateTime.Now;
+                _timerExecution.State = TimerExecutionState.Completed;
+                _timerExecution.Save();
+            }
+        }
+
+        _being.TimerSystem?.Save();
+        return response;
+    }
+
+    /// <summary>
+    /// Step 2+: Executing → Executing/Completed (Continue tool loop)
+    /// </summary>
+    private AIResponse ExecuteTimerStep_Continue(TimerItem timer, LocalizationBase loc)
+    {
+        timer.CurrentStep++;
+
+        // 1. Check step limit
+        if (timer.CurrentStep > timer.MaxSteps)
+        {
+            _logger.Warn(_being.Id, "Timer {0}: Max steps ({1}) reached", timer.Name, timer.MaxSteps);
+            timer.ExecutionState = TimerExecutionState.Completed;
+            string endMessage = loc.FormatTimerEndNotification(timer.Name, "Timer executed (max steps reached)");
+            DeliverTimerOutput(endMessage);
+
+            if (_timerExecution != null)
+            {
+                _timerExecution.CompletedAt = DateTime.Now;
+                _timerExecution.State = TimerExecutionState.Completed;
+                _timerExecution.Save();
+            }
+
+            _being.TimerSystem?.Save();
+            return AIResponse.Failed("Max steps reached");
+        }
+
+        _logger.Info(_being.Id, "Timer step {0}: Continue execution for {1}", timer.CurrentStep, timer.Name);
+
+        // 2. Continue tool loop
+        string scenarioContext = BuildTimerScenarioContext(timer);
+        AIResponse response = GetResponse(scenarioContext);
+
+        // 3. Decide next step based on AI response
+        if (!response.Success)
+        {
+            timer.ExecutionState = TimerExecutionState.Failed;
+            string errorMsg = loc.FormatTimerErrorNotification(timer.Name, response.ErrorMessage ?? "AI call failed");
+            DeliverTimerOutput(errorMsg);
+            RecordToMemory(loc.FormatMemoryEventTimerError(timer.Name, response.ErrorMessage ?? "AI call failed"));
+
+            if (_timerExecution != null)
+            {
+                _timerExecution.CompletedAt = DateTime.Now;
+                _timerExecution.State = TimerExecutionState.Failed;
+                _timerExecution.Save();
+            }
+        }
+        else if (!response.HasToolCalls && !string.IsNullOrEmpty(response.Content))
+        {
+            // AI returned final text, complete
+            timer.ExecutionState = TimerExecutionState.Completed;
+            string endMessage = loc.FormatTimerEndNotification(timer.Name, response.Content);
+            DeliverTimerOutput(endMessage);
+            RecordToMemory(loc.FormatMemoryEventTimer(response.Content));
+
+            if (_timerExecution != null)
+            {
+                _timerExecution.CompletedAt = DateTime.Now;
+                _timerExecution.State = TimerExecutionState.Completed;
+                _timerExecution.Save();
+            }
+        }
+        else if (response.HasToolCalls)
+        {
+            // Still has tool calls, continue on next tick
+            _logger.Info(_being.Id, "Timer {0}: Tool calls returned, will continue on next tick", timer.Name);
+            
+            // Record tool calls to memory for execution tracking
+            string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
+            RecordToMemory(loc.FormatMemoryEventToolCall(toolNames));
+        }
+
+        _being.TimerSystem?.Save();
+        return response;
+    }
+
     private static string BuildTaskScenarioContext(TaskItem task)
     {
         StringBuilder sb = new();
@@ -1240,7 +1506,15 @@ public class ContextManager
 
         List<ChatMessage> toolResultMessages = ExecuteToolCalls(response.ToolCalls!);
 
-        if (_session != null)
+        // If timer execution scenario, save to TimerExecution
+        if (_timerExecution != null)
+        {
+            _timerExecution.Messages.Add(assistantMsg);
+            _timerExecution.Messages.AddRange(toolResultMessages);
+            _timerExecution.Save();
+        }
+        // Original chat session logic
+        else if (_session != null)
         {
             ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
             if (chatSystem != null && _being.Id != Guid.Empty)

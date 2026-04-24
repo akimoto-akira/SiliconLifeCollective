@@ -205,6 +205,8 @@ public class ChatHistoryController : Controller
             var messages = session.GetMessages(0, int.MaxValue);
 
             // Pair tool calls with their results
+            // One Assistant message may contain multiple tool calls; each tool result
+            // is a separate Tool message matched by ToolCallId.
             var toolCallMap = new Dictionary<string, int>(); // toolCallId -> index in result list
             var result = new List<dynamic>();
 
@@ -219,22 +221,15 @@ public class ChatHistoryController : Controller
                     // This is a tool result, find matching tool call
                     if (toolCallMap.TryGetValue(m.ToolCallId, out var toolCallIndex))
                     {
-                        // Merge tool call with result by creating a new object
+                        // Append result to the tool call's results list
                         var original = result[toolCallIndex];
-                        result[toolCallIndex] = new
+                        var existingResults = (List<dynamic>)original.toolResults;
+                        existingResults.Add(new
                         {
-                            id = original.id,
-                            senderId = original.senderId,
-                            content = original.content,
-                            thinking = original.thinking,
-                            role = original.role,
-                            senderName = original.senderName,
-                            timestamp = original.timestamp,
-                            toolCallsJson = original.toolCallsJson,
-                            toolCallId = original.toolCallId,
-                            toolResult = m.Content,
-                            toolResultTimestamp = m.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")
-                        };
+                            toolCallId = m.ToolCallId,
+                            content = m.Content,
+                            timestamp = m.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")
+                        });
                     }
                     else
                     {
@@ -250,8 +245,7 @@ public class ChatHistoryController : Controller
                             timestamp = m.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"),
                             toolCallsJson = (string?)null,
                             toolCallId = m.ToolCallId,
-                            toolResult = (string?)null,
-                            toolResultTimestamp = (string?)null
+                            toolResults = new List<dynamic>()
                         });
                     }
                 }
@@ -269,26 +263,30 @@ public class ChatHistoryController : Controller
                         timestamp = m.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"),
                         toolCallsJson = m.ToolCallsJson,
                         toolCallId = (string?)null,
-                        toolResult = (string?)null,
-                        toolResultTimestamp = (string?)null
+                        toolResults = new List<dynamic>()
                     } as dynamic;
 
-                    // Extract the first tool call ID from toolCallsJson for matching
-                    var toolCallKey = m.Id.ToString(); // fallback to message ID
+                    // Extract ALL tool call IDs from toolCallsJson for matching
                     try
                     {
                         var toolCalls = System.Text.Json.JsonSerializer.Deserialize<List<Dictionary<string, object>>>(m.ToolCallsJson);
-                        if (toolCalls != null && toolCalls.Count > 0 && toolCalls[0].ContainsKey("Id"))
+                        if (toolCalls != null)
                         {
-                            toolCallKey = toolCalls[0]["Id"]?.ToString() ?? m.Id.ToString();
+                            foreach (var tc in toolCalls)
+                            {
+                                if (tc.ContainsKey("Id") && tc["Id"] != null)
+                                {
+                                    toolCallMap[tc["Id"].ToString()!] = result.Count;
+                                }
+                            }
                         }
                     }
                     catch
                     {
                         // If parsing fails, use message ID as fallback
+                        toolCallMap[m.Id.ToString()] = result.Count;
                     }
 
-                    toolCallMap[toolCallKey] = result.Count;
                     result.Add(toolCallData);
                 }
                 else
@@ -305,8 +303,7 @@ public class ChatHistoryController : Controller
                         timestamp = m.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"),
                         toolCallsJson = (string?)null,
                         toolCallId = (string?)null,
-                        toolResult = (string?)null,
-                        toolResultTimestamp = (string?)null
+                        toolResults = new List<dynamic>()
                     });
                 }
             }
