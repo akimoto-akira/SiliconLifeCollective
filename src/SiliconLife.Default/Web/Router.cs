@@ -82,7 +82,9 @@ public class Router
         RegisterController(() => new MemoryController(), "/api/memory/stats");
         RegisterController(() => new MemoryController(), "/api/memory/search");
         RegisterController(() => new MemoryController(), "/api/memory/beings");
+        RegisterController(() => new MemoryController(), "/api/memory/timeline-html");
         RegisterController(() => new MemoryController(), "/api/memory/trace/{id}");
+        RegisterController(() => new BeingController(), "/api/beings");
         RegisterController(() => new WorkNoteController(), "/work-notes");
         RegisterController(() => new WorkNoteController(), "/api/work-notes/list");
         RegisterController(() => new WorkNoteController(), "/api/work-notes/read");

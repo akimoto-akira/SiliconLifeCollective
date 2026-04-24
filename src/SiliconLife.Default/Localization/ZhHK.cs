@@ -190,6 +190,25 @@ public class ZhHK : DefaultLocalizationBase
     public override string MemoryIsSummaryBadge => "壓縮總結";
     public override string MemoryPaginationPrev => "上一頁";
     public override string MemoryPaginationNext => "下一頁";
+    public override string MemoryFilterTypeLabel => "類型";
+    public override string MemoryFilterDateFrom => "開始日期";
+    public override string MemoryFilterDateTo => "結束日期";
+    public override string MemoryFilterApply => "應用";
+    public override string MemoryFilterReset => "重置";
+    public override string MemoryTypeChat => "對話";
+    public override string MemoryTypeToolCall => "工具調用";
+    public override string MemoryTypeTask => "任務";
+    public override string MemoryTypeTimer => "定時器";
+    public override string MemoryDetailTitle => "記憶詳情";
+    public override string MemoryDetailClose => "關閉";
+    public override string MemoryDetailId => "ID";
+    public override string MemoryDetailContent => "內容";
+    public override string MemoryDetailCreatedAt => "創建時間";
+    public override string MemoryDetailRelatedBeings => "關聯智能體";
+    public override string MemoryDetailKeywords => "關鍵詞";
+    public override string MemoryStatTypeDistribution => "類型分布";
+    public override string MemoryStatKeywordFrequency => "關鍵詞頻率";
+    public override string MemoryCardViewDetail => "查看詳情";
 
     // ===== Projects Page Localization =====
 

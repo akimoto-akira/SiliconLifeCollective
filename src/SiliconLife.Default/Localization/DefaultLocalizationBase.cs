@@ -1091,6 +1091,101 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// </summary>
     public abstract string MemoryPaginationNext { get; }
 
+    /// <summary>
+    /// Gets the filter type label text
+    /// </summary>
+    public abstract string MemoryFilterTypeLabel { get; }
+
+    /// <summary>
+    /// Gets the filter date from label
+    /// </summary>
+    public abstract string MemoryFilterDateFrom { get; }
+
+    /// <summary>
+    /// Gets the filter date to label
+    /// </summary>
+    public abstract string MemoryFilterDateTo { get; }
+
+    /// <summary>
+    /// Gets the filter apply button text
+    /// </summary>
+    public abstract string MemoryFilterApply { get; }
+
+    /// <summary>
+    /// Gets the filter reset button text
+    /// </summary>
+    public abstract string MemoryFilterReset { get; }
+
+    /// <summary>
+    /// Gets the memory type chat label
+    /// </summary>
+    public abstract string MemoryTypeChat { get; }
+
+    /// <summary>
+    /// Gets the memory type tool call label
+    /// </summary>
+    public abstract string MemoryTypeToolCall { get; }
+
+    /// <summary>
+    /// Gets the memory type task label
+    /// </summary>
+    public abstract string MemoryTypeTask { get; }
+
+    /// <summary>
+    /// Gets the memory type timer label
+    /// </summary>
+    public abstract string MemoryTypeTimer { get; }
+
+    /// <summary>
+    /// Gets the memory detail panel title
+    /// </summary>
+    public abstract string MemoryDetailTitle { get; }
+
+    /// <summary>
+    /// Gets the memory detail close button text
+    /// </summary>
+    public abstract string MemoryDetailClose { get; }
+
+    /// <summary>
+    /// Gets the memory detail ID label
+    /// </summary>
+    public abstract string MemoryDetailId { get; }
+
+    /// <summary>
+    /// Gets the memory detail content label
+    /// </summary>
+    public abstract string MemoryDetailContent { get; }
+
+    /// <summary>
+    /// Gets the memory detail created at label
+    /// </summary>
+    public abstract string MemoryDetailCreatedAt { get; }
+
+    /// <summary>
+    /// Gets the memory detail related beings label
+    /// </summary>
+    public abstract string MemoryDetailRelatedBeings { get; }
+
+    /// <summary>
+    /// Gets the memory detail keywords label
+    /// </summary>
+    public abstract string MemoryDetailKeywords { get; }
+
+    /// <summary>
+    /// Gets the type distribution statistics label
+    /// </summary>
+    public abstract string MemoryStatTypeDistribution { get; }
+
+    /// <summary>
+    /// Gets the keyword frequency statistics label
+    /// </summary>
+    public abstract string MemoryStatKeywordFrequency { get; }
+
+    /// <summary>
+    /// Gets the view detail button text on memory card
+    /// </summary>
+    public abstract string MemoryCardViewDetail { get; }
+
     // ===== Projects Page Localization =====
 
     /// <summary>

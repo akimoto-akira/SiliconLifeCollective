@@ -335,6 +335,25 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string MemoryIsSummaryBadge => "Resumen";
     public override string MemoryPaginationPrev => "Anterior";
     public override string MemoryPaginationNext => "Siguiente";
+    public override string MemoryFilterTypeLabel => "Tipo";
+    public override string MemoryFilterDateFrom => "Desde";
+    public override string MemoryFilterDateTo => "Hasta";
+    public override string MemoryFilterApply => "Aplicar";
+    public override string MemoryFilterReset => "Restablecer";
+    public override string MemoryTypeChat => "Chat";
+    public override string MemoryTypeToolCall => "Llamada de herramienta";
+    public override string MemoryTypeTask => "Tarea";
+    public override string MemoryTypeTimer => "Temporizador";
+    public override string MemoryDetailTitle => "Detalle de memoria";
+    public override string MemoryDetailClose => "Cerrar";
+    public override string MemoryDetailId => "ID";
+    public override string MemoryDetailContent => "Contenido";
+    public override string MemoryDetailCreatedAt => "Creado el";
+    public override string MemoryDetailRelatedBeings => "Seres relacionados";
+    public override string MemoryDetailKeywords => "Palabras clave";
+    public override string MemoryStatTypeDistribution => "Distribución por tipo";
+    public override string MemoryStatKeywordFrequency => "Frecuencia de palabras clave";
+    public override string MemoryCardViewDetail => "Ver detalle";
 
     // ===== Projects Page Localization =====
 

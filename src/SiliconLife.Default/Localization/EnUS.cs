@@ -335,6 +335,25 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string MemoryIsSummaryBadge => "Summary";
     public override string MemoryPaginationPrev => "Previous";
     public override string MemoryPaginationNext => "Next";
+    public override string MemoryFilterTypeLabel => "Type";
+    public override string MemoryFilterDateFrom => "From";
+    public override string MemoryFilterDateTo => "To";
+    public override string MemoryFilterApply => "Apply";
+    public override string MemoryFilterReset => "Reset";
+    public override string MemoryTypeChat => "Chat";
+    public override string MemoryTypeToolCall => "Tool Call";
+    public override string MemoryTypeTask => "Task";
+    public override string MemoryTypeTimer => "Timer";
+    public override string MemoryDetailTitle => "Memory Detail";
+    public override string MemoryDetailClose => "Close";
+    public override string MemoryDetailId => "ID";
+    public override string MemoryDetailContent => "Content";
+    public override string MemoryDetailCreatedAt => "Created At";
+    public override string MemoryDetailRelatedBeings => "Related Beings";
+    public override string MemoryDetailKeywords => "Keywords";
+    public override string MemoryStatTypeDistribution => "Type Distribution";
+    public override string MemoryStatKeywordFrequency => "Keyword Frequency";
+    public override string MemoryCardViewDetail => "View Detail";
 
     // ===== Projects Page Localization =====
 

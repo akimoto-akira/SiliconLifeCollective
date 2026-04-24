@@ -35,7 +35,7 @@ public class BeingController : Controller
 
         if (path == "/beings" || path == "/beings/index")
             Index();
-        else if (path == "/api/beings/list")
+        else if (path == "/api/beings" || path == "/api/beings/list")
             GetList();
         else if (path == "/api/beings/detail")
             GetDetail();

@@ -32,7 +32,7 @@ public class FileSystemTimeStorage : ITimeStorage
     {
         WriteIndented = false,
         PropertyNamingPolicy = null,
-        Converters = { new FlexibleEnumConverter() }
+        Converters = { new FlexibleEnumConverter(), new IncompleteDateJsonConverter() }
     };
 
     public FileSystemTimeStorage(string baseDirectory)

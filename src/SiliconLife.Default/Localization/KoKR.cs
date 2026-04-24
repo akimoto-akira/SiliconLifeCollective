@@ -335,6 +335,25 @@ public class KoKR : DefaultLocalizationBase
     public override string MemoryIsSummaryBadge => "압축 요약";
     public override string MemoryPaginationPrev => "이전";
     public override string MemoryPaginationNext => "다음";
+    public override string MemoryFilterTypeLabel => "유형";
+    public override string MemoryFilterDateFrom => "시작일";
+    public override string MemoryFilterDateTo => "종료일";
+    public override string MemoryFilterApply => "적용";
+    public override string MemoryFilterReset => "초기화";
+    public override string MemoryTypeChat => "대화";
+    public override string MemoryTypeToolCall => "도구 호출";
+    public override string MemoryTypeTask => "작업";
+    public override string MemoryTypeTimer => "타이머";
+    public override string MemoryDetailTitle => "기억 상세";
+    public override string MemoryDetailClose => "닫기";
+    public override string MemoryDetailId => "ID";
+    public override string MemoryDetailContent => "내용";
+    public override string MemoryDetailCreatedAt => "생성 시간";
+    public override string MemoryDetailRelatedBeings => "관련 존재";
+    public override string MemoryDetailKeywords => "키워드";
+    public override string MemoryStatTypeDistribution => "유형 분포";
+    public override string MemoryStatKeywordFrequency => "키워드 빈도";
+    public override string MemoryCardViewDetail => "상세 보기";
 
     // ===== Projects Page Localization =====
 

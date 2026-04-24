@@ -335,6 +335,25 @@ public class ZhCN : DefaultLocalizationBase
     public override string MemoryIsSummaryBadge => "压缩总结";
     public override string MemoryPaginationPrev => "上一页";
     public override string MemoryPaginationNext => "下一页";
+    public override string MemoryFilterTypeLabel => "类型";
+    public override string MemoryFilterDateFrom => "开始日期";
+    public override string MemoryFilterDateTo => "结束日期";
+    public override string MemoryFilterApply => "应用";
+    public override string MemoryFilterReset => "重置";
+    public override string MemoryTypeChat => "对话";
+    public override string MemoryTypeToolCall => "工具调用";
+    public override string MemoryTypeTask => "任务";
+    public override string MemoryTypeTimer => "定时器";
+    public override string MemoryDetailTitle => "记忆详情";
+    public override string MemoryDetailClose => "关闭";
+    public override string MemoryDetailId => "ID";
+    public override string MemoryDetailContent => "内容";
+    public override string MemoryDetailCreatedAt => "创建时间";
+    public override string MemoryDetailRelatedBeings => "关联智能体";
+    public override string MemoryDetailKeywords => "关键词";
+    public override string MemoryStatTypeDistribution => "类型分布";
+    public override string MemoryStatKeywordFrequency => "关键词频率";
+    public override string MemoryCardViewDetail => "查看详情";
 
     // ===== Projects Page Localization =====
 

@@ -335,6 +335,25 @@ public class JaJP : DefaultLocalizationBase
     public override string MemoryIsSummaryBadge => "圧縮要約";
     public override string MemoryPaginationPrev => "前へ";
     public override string MemoryPaginationNext => "次へ";
+    public override string MemoryFilterTypeLabel => "タイプ";
+    public override string MemoryFilterDateFrom => "開始日";
+    public override string MemoryFilterDateTo => "終了日";
+    public override string MemoryFilterApply => "適用";
+    public override string MemoryFilterReset => "リセット";
+    public override string MemoryTypeChat => "チャット";
+    public override string MemoryTypeToolCall => "ツール呼び出し";
+    public override string MemoryTypeTask => "タスク";
+    public override string MemoryTypeTimer => "タイマー";
+    public override string MemoryDetailTitle => "記憶詳細";
+    public override string MemoryDetailClose => "閉じる";
+    public override string MemoryDetailId => "ID";
+    public override string MemoryDetailContent => "内容";
+    public override string MemoryDetailCreatedAt => "作成日時";
+    public override string MemoryDetailRelatedBeings => "関連エンティティ";
+    public override string MemoryDetailKeywords => "キーワード";
+    public override string MemoryStatTypeDistribution => "タイプ分布";
+    public override string MemoryStatKeywordFrequency => "キーワード頻度";
+    public override string MemoryCardViewDetail => "詳細を見る";
 
     // ===== Projects Page Localization =====
 
