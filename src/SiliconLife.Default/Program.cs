@@ -243,6 +243,10 @@ public class Program
         
         // Korean
         LocalizationManager.Instance.Register<KoKR>(Language.KoKR);
+        
+        // Spanish
+        LocalizationManager.Instance.Register<EsES>(Language.EsES);
+        LocalizationManager.Instance.Register<EsMX>(Language.EsMX);
     }
 
     public static void RequestExit()
