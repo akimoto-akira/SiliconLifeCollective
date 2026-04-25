@@ -256,6 +256,9 @@ public class Program
         // Spanish
         LocalizationManager.Instance.Register<EsES>(Language.EsES);
         LocalizationManager.Instance.Register<EsMX>(Language.EsMX);
+        
+        // Czech
+        LocalizationManager.Instance.Register<CsCZ>(Language.CsCZ);
     }
 
     public static void RequestExit()

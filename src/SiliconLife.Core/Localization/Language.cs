@@ -116,5 +116,10 @@ public enum Language
     /// <summary>
     /// Spanish (Mexico)
     /// </summary>
-    EsMX
+    EsMX,
+
+    /// <summary>
+    /// Czech (Czech Republic)
+    /// </summary>
+    CsCZ
 }
