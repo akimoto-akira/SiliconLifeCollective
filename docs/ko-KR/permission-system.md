@@ -1,5 +1,7 @@
 # 권한 시스템
 
+[English](permission-system.md) | [简体中文](docs/zh-CN/permission-system.md) | [繁體中文](docs/zh-HK/permission-system.md) | [Español](docs/es-ES/permission-system.md) | [日本語](docs/ja-JP/permission-system.md) | [한국어](docs/ko-KR/permission-system.md) | [Čeština](docs/cs-CZ/permission-system.md)
+
 ## 개요
 
 권한 시스템은 AI가 시작한 모든 작업이 적절하게 검증되고 감사되도록 보장합니다.

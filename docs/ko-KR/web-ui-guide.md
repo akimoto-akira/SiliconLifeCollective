@@ -1,5 +1,7 @@
 # Web UI 가이드
 
+[English](web-ui-guide.md) | [简体中文](docs/zh-CN/web-ui-guide.md) | [繁體中文](docs/zh-HK/web-ui-guide.md) | [Español](docs/es-ES/web-ui-guide.md) | [日本語](docs/ja-JP/web-ui-guide.md) | [한국어](docs/ko-KR/web-ui-guide.md) | [Čeština](docs/cs-CZ/web-ui-guide.md)
+
 ## 개요
 
 Web UI는 silicon being 관리, 시스템 상태 모니터링, AI 에이전트 상호작용을 위한 포괄적인 인터페이스를 제공합니다.

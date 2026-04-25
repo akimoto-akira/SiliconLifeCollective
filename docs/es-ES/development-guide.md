@@ -1,6 +1,6 @@
 # Guía de Desarrollo
 
-[English](../en/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Español](../es-ES/development-guide.md)
+[English](development-guide.md) | [简体中文](docs/zh-CN/development-guide.md) | [繁體中文](docs/zh-HK/development-guide.md) | [Español](docs/es-ES/development-guide.md) | [日本語](docs/ja-JP/development-guide.md) | [한국어](docs/ko-KR/development-guide.md) | [Čeština](docs/cs-CZ/development-guide.md)
 
 ## Configuración del Entorno
 

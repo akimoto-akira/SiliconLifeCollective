@@ -1,5 +1,7 @@
 # 디지털 동료 만나기
 
+[English](promo.md) | [简体中文](docs/zh-CN/promo.md) | [繁體中文](docs/zh-HK/promo.md) | [Español](docs/es-ES/promo.md) | [日本語](docs/ja-JP/promo.md) | [한국어](docs/ko-KR/promo.md) | [Čeština](docs/cs-CZ/promo.md)
+
 ## 컴퓨터가 스스로 생각할 수 있다면?
 
 컴퓨터 안에 살아있는 유용한 어시스턴트 팀이 있다고 상상해보세요. 그들은 명령을 기다리는 프로그램이 아닙니다 — 자신만의 성격이 있고, 당신이 말한 것을 기억하며, 함께 일하여 일을 완료합니다.

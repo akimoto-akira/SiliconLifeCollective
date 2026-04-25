@@ -1,5 +1,7 @@
 # シリコンビーイングガイド
 
+[English](silicon-being-guide.md) | [简体中文](docs/zh-CN/silicon-being-guide.md) | [繁體中文](docs/zh-HK/silicon-being-guide.md) | [Español](docs/es-ES/silicon-being-guide.md) | [日本語](docs/ja-JP/silicon-being-guide.md) | [한국어](docs/ko-KR/silicon-being-guide.md) | [Čeština](docs/cs-CZ/silicon-being-guide.md)
+
 ## シリコンビーイングとは？
 
 シリコンビーイングは、AI ドリブンの自律エージェントであり、以下の能力を持っています：

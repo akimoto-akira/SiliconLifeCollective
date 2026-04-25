@@ -1,5 +1,7 @@
 # Web UI ガイド
 
+[English](web-ui-guide.md) | [简体中文](docs/zh-CN/web-ui-guide.md) | [繁體中文](docs/zh-HK/web-ui-guide.md) | [Español](docs/es-ES/web-ui-guide.md) | [日本語](docs/ja-JP/web-ui-guide.md) | [한국어](docs/ko-KR/web-ui-guide.md) | [Čeština](docs/cs-CZ/web-ui-guide.md)
+
 ## 概要
 
 Web UI は SiliconLifeCollective の主要なユーザーインターフェースを提供します。ASP.NET Core とカスタム MVC フレームワークを使用して構築されています。

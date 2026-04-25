@@ -1,5 +1,7 @@
 # Registro de Cambios
 
+[English](changelog.md) | [简体中文](docs/zh-CN/changelog.md) | [繁體中文](docs/zh-HK/changelog.md) | [Español](docs/es-ES/changelog.md) | [日本語](docs/ja-JP/changelog.md) | [한국어](docs/ko-KR/changelog.md) | [Čeština](docs/cs-CZ/changelog.md)
+
 Todos los cambios notables de este proyecto se documentarán en este archivo.
 
 El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),

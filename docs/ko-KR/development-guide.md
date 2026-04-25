@@ -1,5 +1,7 @@
 # 개발 가이드
 
+[English](development-guide.md) | [简体中文](docs/zh-CN/development-guide.md) | [繁體中文](docs/zh-HK/development-guide.md) | [Español](docs/es-ES/development-guide.md) | [日本語](docs/ja-JP/development-guide.md) | [한국어](docs/ko-KR/development-guide.md) | [Čeština](docs/cs-CZ/development-guide.md)
+
 ## 아키텍처 개요
 
 SiliconLifeCollective는 핵심 인터페이스와 기본 구현 간 엄격한 분리를 갖춘 **Body-Brain 아키텍처**를 따릅니다.

@@ -1,5 +1,7 @@
 # Hoja de Ruta
 
+[English](roadmap.md) | [简体中文](docs/zh-CN/roadmap.md) | [繁體中文](docs/zh-HK/roadmap.md) | [Español](docs/es-ES/roadmap.md) | [日本語](docs/ja-JP/roadmap.md) | [한국어](docs/ko-KR/roadmap.md) | [Čeština](docs/cs-CZ/roadmap.md)
+
 [English](../en/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Español](../es-ES/roadmap.md)
 
 ## Principio Rector

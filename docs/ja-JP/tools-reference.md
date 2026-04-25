@@ -1,5 +1,7 @@
 # ツールリファレンス
 
+[English](tools-reference.md) | [简体中文](docs/zh-CN/tools-reference.md) | [繁體中文](docs/zh-HK/tools-reference.md) | [Español](docs/es-ES/tools-reference.md) | [日本語](docs/ja-JP/tools-reference.md) | [한국어](docs/ko-KR/tools-reference.md) | [Čeština](docs/cs-CZ/tools-reference.md)
+
 ## 概要
 
 ツールは AI がシステムと対話できるようにする関数です。各ツールは `ITool` インターフェースを実装し、リフレクションを介して自動的に検出されます。

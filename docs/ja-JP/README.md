@@ -4,7 +4,7 @@
 
 AI エージェントである**シリコンビーイング（Silicon Beings）**が Roslyn 動的コンパイルを通じて自己進化を行う、.NET 9 マルチエージェントコラボレーションプラットフォーム。
 
-[English](../en/README.md) | [中文文档](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [日本語](README.md) | [한국어](../ko-KR/README.md)
+[English](../en/README.md) | [中文文档](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [日本語](README.md) | [한국어](../ko-KR/README.md) | [Español](../es-ES/README.md) | [Čeština](../cs-CZ/README.md)
 
 ## 機能
 
@@ -22,18 +22,19 @@ AI エージェントである**シリコンビーイング（Silicon Beings）*
 - **32種類のカレンダーシステム** — グレゴリオ暦、中国旧暦、イスラム暦、ヘブライ暦、日本暦、ペルシャ暦、マヤ暦などを含むマルチカレンダーサポート
 - **最小限の依存関係** — コアライブラリは Roslyn 動的コンパイル用の Microsoft.CodeAnalysis.CSharp のみに依存
 - **ゼロデータベース依存** — `ITimeStorage` による時刻インデックス付きクエリをサポートするファイルベースのストレージ（JSON）
-- **ローカライゼーション** — 20種類の言語バリアントを含む包括的な多言語サポート
+- **ローカライゼーション** — 21種類の言語バリアントを含む包括的な多言語サポート
   - 中国語：zh-CN、zh-HK、zh-SG、zh-MO、zh-TW、zhMY（6種類のバリアント）
   - 英語：en-US、en-GB、en-CA、en-AU、en-IN、en-SG、en-ZA、en-IE、en-NZ、en-MY（10種類のバリアント）
   - スペイン語：es-ES、es-MX（2種類のバリアント）
   - 日本語：ja-JP
   - 韓国語：ko-KR
+  - チェコ語：cs-CZ
 - **Web UI** — SSE サポート、複数のスキン、包括的なダッシュボードを備えた組み込み HTTP サーバー
   - **スキンシステム** — プラグ可能な ISkin インターフェースと自動検出機能を備えた4種類の組み込みスキン（Admin、Chat、Creative、Dev）
   - **20+個のコントローラー** — About、Audit、Being、Chat、ChatHistory、CodeBrowser、CodeHover、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer、TimerExecutionHistory
   - **リアルタイム更新** — チャットメッセージ、生命体ステータス、システムイベント用の SSE（Server-Sent Events）
   - **HTML/CSS/JS ビルダー** — `H`、`CssBuilder`、`JsBuilder` によるサーバーサイドマークアップ生成（ゼロフロントエンドフレームワーク依存）
-  - **ローカライゼーション** — LocalizationManager による解決を含む20種類の組み込み言語バリアント
+  - **ローカライゼーション** — LocalizationManager による解決を含む21種類の組み込み言語バリアント
   - **チャット履歴ビュー** — 会話リストとメッセージ詳細をサポートするシリコンビーイングのチャット履歴閲覧機能
   - **ファイルアップロードサポート** — ファイルソースダイアログとファイルアップロード機能
   - **ローディングインジケーター** — チャットページのローディング状態インジケーターとキュレーターセッションの自動選択
@@ -82,7 +83,7 @@ SiliconLifeCollective.sln
 │       ├── IM/                            # WebUIProvider（Web UI を IM チャネルとして使用）、IMPermissionAskHandler
 │       ├── Tools/                         # 組み込みツール：Calendar、Chat、Config、Curator、Disk、DynamicCompile、Memory、Network、System、Task、Timer、TokenAudit
 │       ├── Config/                        # DefaultConfigData
-│       ├── Localization/                  # ZhCN、ZhHK、EnUS、JaJP、KoKR、EsES、EsMX、DefaultLocalizationBase、EnOther（EnGB、EnCA、EnAU、EnIN、EnSG、EnZA、EnIE、EnNZ、EnMY）、ZhOther（ZhSG、ZhMO、ZhTW、ZhMY）、EsOther（EsMX）
+│       ├── Localization/                  # ZhCN、ZhHK、EnUS、JaJP、KoKR、CsCZ、EsES、DefaultLocalizationBase、EnOther（EnGB、EnCA、EnAU、EnIN、EnSG、EnZA、EnIE、EnNZ、EnMY）、ZhOther（ZhSG、ZhMO、ZhTW、ZhMY）、EsOther（EsMX）
 │       ├── Logging/                       # ConsoleLoggerProvider、FileSystemLoggerProvider
 │       ├── Storage/                       # FileSystemStorage、FileSystemTimeStorage
 │       ├── Security/                      # DefaultPermissionCallback
@@ -166,7 +167,7 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] フェーズ 8：長期メモリ + タスク + タイマー
 - [x] フェーズ 9：CoreHost + マルチエージェントコラボレーション
 - [x] フェーズ 10：Web UI（HTTP + SSE、18個のコントローラー、4種類のスキン）
-- [x] フェーズ 10.5：増分強化（BroadcastChannel、TokenAudit、32種類のカレンダー、ツール強化、20言語のローカライゼーション）
+- [x] フェーズ 10.5：増分強化（BroadcastChannel、TokenAudit、32種類のカレンダー、ツール強化、21言語のローカライゼーション）
 - [ ] フェーズ 11：外部 IM 統合（Feishu / WhatsApp / Telegram）
 - [ ] フェーズ 12：ナレッジグラフ、プラグインシステム、スキルエコシステム
 

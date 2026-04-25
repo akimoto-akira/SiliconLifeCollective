@@ -1,5 +1,7 @@
 # 硅基生命体指南
 
+[English](silicon-being-guide.md) | [中文](docs/zh-CN/silicon-being-guide.md) | [繁體中文](docs/zh-HK/silicon-being-guide.md) | [Español](docs/es-ES/silicon-being-guide.md) | [日本語](docs/ja-JP/silicon-being-guide.md) | [한국어](docs/ko-KR/silicon-being-guide.md) | [Čeština](docs/cs-CZ/silicon-being-guide.md)
+
 ## 概述
 
 硅基生命体是 AI 驱动的智能体，可以自主思考、行动和进化。

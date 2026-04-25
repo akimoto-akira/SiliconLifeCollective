@@ -1,5 +1,7 @@
 # Sistema de Permisos
 
+[English](permission-system.md) | [简体中文](docs/zh-CN/permission-system.md) | [繁體中文](docs/zh-HK/permission-system.md) | [Español](docs/es-ES/permission-system.md) | [日本語](docs/ja-JP/permission-system.md) | [한국어](docs/ko-KR/permission-system.md) | [Čeština](docs/cs-CZ/permission-system.md)
+
 ## Resumen
 
 El sistema de permisos de Silicon Life Collective proporciona control granular sobre las operaciones que los Seres de Silicio pueden realizar. Todas las operaciones de I/O iniciadas por IA deben pasar por una cadena de verificación de permisos de 5 niveles.

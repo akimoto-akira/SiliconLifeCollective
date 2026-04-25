@@ -12,6 +12,7 @@ Choose your preferred language:
 - **[日本語](docs/ja-JP/README.md)**
 - **[한국어](docs/ko-KR/README.md)**
 - **[Español](docs/es-ES/README.md)**
+- **[Čeština](docs/cs-CZ/README.md)**
 
 ## Quick Links
 

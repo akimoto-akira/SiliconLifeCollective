@@ -1,5 +1,7 @@
 # Meet Your Digital Companions
 
+[English](promo.md) | [简体中文](docs/zh-CN/promo.md) | [繁體中文](docs/zh-HK/promo.md) | [Español](docs/es-ES/promo.md) | [日本語](docs/ja-JP/promo.md) | [한국어](docs/ko-KR/promo.md) | [Čeština](docs/cs-CZ/promo.md)
+
 ## What If Your Computer Could Think For Itself?
 
 Imagine having a team of helpful assistants living inside your computer. They're not just programs that wait for your commands — they have their own personalities, remember what you've told them, and can work together to get things done.

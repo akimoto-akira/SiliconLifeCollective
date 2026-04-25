@@ -1,5 +1,7 @@
 # Web UI 指南
 
+[English](web-ui-guide.md) | [简体中文](docs/zh-CN/web-ui-guide.md) | [繁體中文](docs/zh-HK/web-ui-guide.md) | [Español](docs/es-ES/web-ui-guide.md) | [日本語](docs/ja-JP/web-ui-guide.md) | [한국어](docs/ko-KR/web-ui-guide.md) | [Čeština](docs/cs-CZ/web-ui-guide.md)
+
 ## 概述
 
 Web UI 提供了一個全面的界面，用於管理硅基生命体、監控系統狀態和與 AI 智能体交互。

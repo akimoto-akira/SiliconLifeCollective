@@ -1,5 +1,7 @@
 # 캘린더 시스템
 
+[English](calendar-system.md) | [简体中文](docs/zh-CN/calendar-system.md) | [繁體中文](docs/zh-HK/calendar-system.md) | [Español](docs/es-ES/calendar-system.md) | [日本語](docs/ja-JP/calendar-system.md) | [한국어](docs/ko-KR/calendar-system.md) | [Čeština](docs/cs-CZ/calendar-system.md)
+
 ## 개요
 
 SiliconLifeCollective는 날짜 변환 및 역사적 정확성을 위해 32개의 다른 캘린더 시스템을 지원합니다.

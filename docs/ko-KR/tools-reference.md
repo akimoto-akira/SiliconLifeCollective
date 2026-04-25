@@ -1,5 +1,7 @@
 # 도구 레퍼런스
 
+[English](tools-reference.md) | [简体中文](docs/zh-CN/tools-reference.md) | [繁體中文](docs/zh-HK/tools-reference.md) | [Español](docs/es-ES/tools-reference.md) | [日本語](docs/ja-JP/tools-reference.md) | [한국어](docs/ko-KR/tools-reference.md) | [Čeština](docs/cs-CZ/tools-reference.md)
+
 ## 개요
 
 도구 시스템은 AI 에이전트가 표준화된 인터페이스를 통해 외부 세계와 상호작용할 수 있게 합니다.

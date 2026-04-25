@@ -1,5 +1,7 @@
 # 開発ガイド
 
+[English](development-guide.md) | [简体中文](docs/zh-CN/development-guide.md) | [繁體中文](docs/zh-HK/development-guide.md) | [Español](docs/es-ES/development-guide.md) | [日本語](docs/ja-JP/development-guide.md) | [한국어](docs/ko-KR/development-guide.md) | [Čeština](docs/cs-CZ/development-guide.md)
+
 ## アーキテクチャ概要
 
 SiliconLifeCollective は、コアインターフェースとデフォルト実装の厳格な分離を伴う**ボディ-ブレインアーキテクチャ**に従います。

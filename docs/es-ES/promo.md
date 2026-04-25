@@ -1,5 +1,7 @@
 # Promoción
 
+[English](promo.md) | [简体中文](docs/zh-CN/promo.md) | [繁體中文](docs/zh-HK/promo.md) | [Español](docs/es-ES/promo.md) | [日本語](docs/ja-JP/promo.md) | [한국어](docs/ko-KR/promo.md) | [Čeština](docs/cs-CZ/promo.md)
+
 ## Silicon Life Collective
 
 **Una plataforma de colaboración multiagente donde los agentes de IA se autoevolucionan**

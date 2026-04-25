@@ -1,5 +1,7 @@
 # 貢献ガイド
 
+[English](contributing.md) | [简体中文](docs/zh-CN/contributing.md) | [繁體中文](docs/zh-HK/contributing.md) | [Español](docs/es-ES/contributing.md) | [日本語](docs/ja-JP/contributing.md) | [한국어](docs/ko-KR/contributing.md) | [Čeština](docs/cs-CZ/contributing.md)
+
 ## はじめに
 
 SiliconLifeCollective への貢献に興味を持っていただきありがとうございます！このガイドは、プロジェクトへの貢献方法を説明します。

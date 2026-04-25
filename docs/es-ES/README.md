@@ -4,7 +4,7 @@
 
 Una plataforma de colaboración multiagente en .NET 9 donde los agentes de IA llamados **Seres de Silicio** se autoevolucionan mediante compilación dinámica Roslyn.
 
-[English](../en/README.md) | [中文文档](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Español](../es-ES/README.md)
+[English](../en/README.md) | [中文文档](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Español](../es-ES/README.md) | [Čeština](../cs-CZ/README.md)
 
 ## Características
 
@@ -22,18 +22,19 @@ Una plataforma de colaboración multiagente en .NET 9 donde los agentes de IA ll
 - **32 Sistemas de Calendario** — Soporte multicalendario incluyendo Gregoriano, Lunar Chino, Islámico, Hebreo, Japonés, Persa, Maya y más
 - **Dependencias Mínimas** — La biblioteca principal solo depende de Microsoft.CodeAnalysis.CSharp para compilación dinámica Roslyn
 - **Cero Dependencia de Base de Datos** — Almacenamiento basado en archivos (JSON) con consultas indexadas por tiempo mediante `ITimeStorage`
-- **Localización** — Soporte multilingüe integral con 20 variantes de idioma
+- **Localización** — Soporte multilingüe integral con 21 variantes de idioma
   - Chino: zh-CN, zh-HK, zh-SG, zh-MO, zh-TW, zhMY (6 variantes)
   - Inglés: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variantes)
   - Japonés: ja-JP
   - Coreano: ko-KR
   - Español: es-ES, es-MX (2 variantes)
+  - Checo: cs-CZ
 - **Interfaz Web** — Servidor HTTP integrado con soporte SSE, múltiples pieles y panel integral
   - **Sistema de Pieles** — 4 pieles integradas (Admin, Chat, Creative, Dev) con interfaz ISkin enchufable y autodescubrimiento
   - **20+ Controladores** — About, Audit, Being, Chat, ChatHistory, CodeBrowser, CodeHover, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer, TimerExecutionHistory
   - **Actualizaciones en Tiempo Real** — SSE (Server-Sent Events) para mensajes de chat, estado de seres y eventos del sistema
   - **Constructores HTML/CSS/JS** — Generación de marcado del lado del servidor mediante `H`, `CssBuilder` y `JsBuilder` (cero dependencia de framework frontend)
-  - **Localización** — Veinte variantes de idioma integradas con resolución de LocalizationManager
+  - **Localización** — Veintiún variantes de idioma integradas con resolución de LocalizationManager
   - **Vista de Historial de Chat** — Navegación completa del historial de chat de Seres de Silicio con lista de conversaciones y detalles de mensajes
   - **Soporte de Carga de Archivos** — Diálogo de origen de archivos y funcionalidad de carga de archivos
   - **Indicadores de Carga** — Indicadores de estado de carga para páginas de chat y selección automática de sesión del curador
@@ -82,7 +83,7 @@ SiliconLifeCollective.sln
 │       ├── IM/                            # WebUIProvider (Interfaz web como canal IM), IMPermissionAskHandler
 │       ├── Tools/                         # Herramientas integradas: Calendar, Chat, Config, Curator, Disk, DynamicCompile, Memory, Network, System, Task, Timer, TokenAudit
 │       ├── Config/                        # DefaultConfigData
-│       ├── Localization/                  # ZhCN, ZhHK, EnUS, JaJP, KoKR, EsES, EsMX, DefaultLocalizationBase, EnOther (EnGB, EnCA, EnAU, EnIN, EnSG, EnZA, EnIE, EnNZ, EnMY), ZhOther (ZhSG, ZhMO, ZhTW, ZhMY), EsOther (EsMX)
+│       ├── Localization/                  # ZhCN, ZhHK, EnUS, JaJP, KoKR, CsCZ, EsES, DefaultLocalizationBase, EnOther (EnGB, EnCA, EnAU, EnIN, EnSG, EnZA, EnIE, EnNZ, EnMY), ZhOther (ZhSG, ZhMO, ZhTW, ZhMY), EsOther (EsMX)
 │       ├── Logging/                       # ConsoleLoggerProvider, FileSystemLoggerProvider
 │       ├── Storage/                       # FileSystemStorage, FileSystemTimeStorage
 │       ├── Security/                      # DefaultPermissionCallback
@@ -166,7 +167,7 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 - [x] Fase 8: Memoria a largo plazo + Tareas + Temporizador
 - [x] Fase 9: CoreHost + colaboración multiagente
 - [x] Fase 10: Interfaz web (HTTP + SSE, 18 controladores, 4 pieles)
-- [x] Fase 10.5: Mejoras incrementales (BroadcastChannel, TokenAudit, 32 calendarios, mejoras de herramientas, localización en 20 idiomas)
+- [x] Fase 10.5: Mejoras incrementales (BroadcastChannel, TokenAudit, 32 calendarios, mejoras de herramientas, localización en 21 idiomas)
 - [ ] Fase 11: Integración con IM externos (Feishu / WhatsApp / Telegram)
 - [ ] Fase 12: Gráfico de conocimiento, sistema de plugins y ecosistema de habilidades
 

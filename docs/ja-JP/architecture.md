@@ -1,6 +1,6 @@
 # アーキテクチャ
 
-[English](../en/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [日本語](architecture.md) | [한국어](../ko-KR/architecture.md)
+[English](architecture.md) | [简体中文](docs/zh-CN/architecture.md) | [繁體中文](docs/zh-HK/architecture.md) | [Español](docs/es-ES/architecture.md) | [日本語](docs/ja-JP/architecture.md) | [한국어](docs/ko-KR/architecture.md) | [Čeština](docs/cs-CZ/architecture.md)
 
 ## 核心概念
 

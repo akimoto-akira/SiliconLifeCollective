@@ -1,5 +1,7 @@
 # 故障排除指南
 
+[English](troubleshooting.md) | [中文](docs/zh-CN/troubleshooting.md) | [繁體中文](docs/zh-HK/troubleshooting.md) | [Español](docs/es-ES/troubleshooting.md) | [日本語](docs/ja-JP/troubleshooting.md) | [한국어](docs/ko-KR/troubleshooting.md) | [Čeština](docs/cs-CZ/troubleshooting.md)
+
 ## 常见问题
 
 ### 构建和编译

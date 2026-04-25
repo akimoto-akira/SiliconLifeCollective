@@ -1,5 +1,7 @@
 # 기여 가이드
 
+[English](contributing.md) | [简体中文](docs/zh-CN/contributing.md) | [繁體中文](docs/zh-HK/contributing.md) | [Español](docs/es-ES/contributing.md) | [日本語](docs/ja-JP/contributing.md) | [한국어](docs/ko-KR/contributing.md) | [Čeština](docs/cs-CZ/contributing.md)
+
 SiliconLifeCollective에 관심을 가져주셔서 감사합니다!
 
 ## 행동 강령

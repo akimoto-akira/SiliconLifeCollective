@@ -1,5 +1,7 @@
 # 실리콘 비잉 가이드
 
+[English](silicon-being-guide.md) | [简体中文](docs/zh-CN/silicon-being-guide.md) | [繁體中文](docs/zh-HK/silicon-being-guide.md) | [Español](docs/es-ES/silicon-being-guide.md) | [日本語](docs/ja-JP/silicon-being-guide.md) | [한국어](docs/ko-KR/silicon-being-guide.md) | [Čeština](docs/cs-CZ/silicon-being-guide.md)
+
 ## 개요
 
 실리콘 비잉은 자율적으로 생각, 행동, 진화할 수 있는 AI 기반 에이전트입니다.

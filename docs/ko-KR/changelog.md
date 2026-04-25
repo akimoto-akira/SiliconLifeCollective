@@ -1,5 +1,7 @@
 # 변경 로그
 
+[English](changelog.md) | [简体中文](docs/zh-CN/changelog.md) | [繁體中文](docs/zh-HK/changelog.md) | [Español](docs/es-ES/changelog.md) | [日本語](docs/ja-JP/changelog.md) | [한국어](docs/ko-KR/changelog.md) | [Čeština](docs/cs-CZ/changelog.md)
+
 이 프로젝트의 모든 주목할 만한 변경사항은 이 파일에 기록됩니다.
 
 형식은 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)를 따르며,

@@ -1,5 +1,7 @@
 # 开发指南
 
+[English](development-guide.md) | [中文](docs/zh-CN/development-guide.md) | [繁體中文](docs/zh-HK/development-guide.md) | [Español](docs/es-ES/development-guide.md) | [日本語](docs/ja-JP/development-guide.md) | [한국어](docs/ko-KR/development-guide.md) | [Čeština](docs/cs-CZ/development-guide.md)
+
 ## 架构概述
 
 SiliconLifeCollective 遵循**身体-大脑架构**，核心接口和默认实现严格分离。

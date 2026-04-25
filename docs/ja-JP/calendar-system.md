@@ -1,5 +1,7 @@
 # カレンダーシステム
 
+[English](calendar-system.md) | [简体中文](docs/zh-CN/calendar-system.md) | [繁體中文](docs/zh-HK/calendar-system.md) | [Español](docs/es-ES/calendar-system.md) | [日本語](docs/ja-JP/calendar-system.md) | [한국어](docs/ko-KR/calendar-system.md) | [Čeština](docs/cs-CZ/calendar-system.md)
+
 ## 概要
 
 SiliconLifeCollective は日付変換と歴史的精度のために 32 種類のカレンダーシステムをサポートしています。

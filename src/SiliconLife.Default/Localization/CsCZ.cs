@@ -4,7 +4,7 @@
 using SiliconLife.Collective;
 using SiliconLife.Default.ChineseHistorical;
 
-namespace SiliconLife.Default.Localization;
+namespace SiliconLife.Default;
 
 /// <summary>
 /// Czech (Czech Republic) localization
@@ -381,7 +381,11 @@ public class CsCZ : DefaultLocalizationBase
     // ===== Memory Filter =====
     public override string MemoryFilterTypeLabel => "Typ";
     public override string MemoryFilterSummaryOnly => "Pouze souhrny";
+    public override string MemoryFilterAll => "Vše";
+    public override string MemoryFilterApply => "Použít";
     public override string MemoryFilterReset => "Resetovat";
+    public override string MemoryTypeToolCall => "Volání nástroje";
+    public override string MemoryIsSummaryBadge => "Souhrn";
 
     // ===== Memory Pagination =====
     public override string MemoryPaginationNext => "Další";
@@ -408,6 +412,7 @@ public class CsCZ : DefaultLocalizationBase
 
     // ===== Config Edit =====
     public override string ConfigEditValueLabel => "Hodnota";
+    public override string ConfigEditModalTitle => "Upravit vlastnost";
     public override string ConfigDictKeyLabel => "Klíč";
 
     // ===== Logs =====
@@ -435,7 +440,6 @@ public class CsCZ : DefaultLocalizationBase
 
     // ===== Calendar Format Methods =====
     public override string FormatGregorianYear(int year) => year.ToString();
-    public override string FormatGregorianMonth(int month) => month.ToString();
     public override string FormatGregorianDay(int day) => day.ToString();
     public override string FormatGregorianHour(int hour) => hour.ToString();
     public override string FormatGregorianMinute(int minute) => minute.ToString();
@@ -485,17 +489,19 @@ public class CsCZ : DefaultLocalizationBase
     public override string FormatChulaSakaratDay(int day) => day.ToString();
     public override string FormatKhmerYear(int year) => year.ToString();
     public override string FormatKhmerDay(int day) => day.ToString();
-    public override string FormatThaiYear(int year) => year.ToString();
+    public override string FormatVietnameseYear(int year) => year.ToString();
+    public override string FormatVietnameseDay(int day) => day.ToString();
+    public override string FormatChineseHistoricalDay(int day) => day.ToString();
+    public override string FormatIslamicDay(int day) => day.ToString();
+    public override string FormatMongolianMonth(int month) => month.ToString();
+    public override string FormatTibetanMonth(int month) => month.ToString();
+    public override string FormatJapaneseDay(int day) => day.ToString();
+    public override string FormatRomanYear(int year) => year.ToString();
+    public override string FormatRomanDay(int day) => day.ToString();
     public override string FormatDaiYear(int year) => year.ToString();
     public override string FormatDaiDay(int day) => day.ToString();
     public override string FormatDehongDaiYear(int year) => year.ToString();
     public override string FormatDehongDaiDay(int day) => day.ToString();
-    public override string FormatRomanYear(int year) => year.ToString();
-    public override string FormatRomanDay(int day) => day.ToString();
-    public override string FormatVietnameseYear(int year) => year.ToString();
-    public override string FormatVietnameseDay(int day) => day.ToString();
-    public override string FormatChineseHistoricalYear(int year) => year.ToString();
-    public override string FormatChineseHistoricalDay(int day) => day.ToString();
 
     // ===== Memory Event Formatting =====
     public override string FormatMemoryEventStartup() => "Systém spuštěn";
@@ -533,8 +539,8 @@ public class CsCZ : DefaultLocalizationBase
     public override string GetToolDisplayName(string toolName) => toolName;
 
     // ===== Chinese Historical Calendar =====
-    // TODO: Implement Chinese Historical localization
-    public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => throw new NotImplementedException();
+    private readonly ChineseHistoricalCsCZ _chineseHistorical = new();
+    public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
 
     // ===== Sexagenary Cycle =====
     private static readonly string[] SexagenaryStemNames =
@@ -549,7 +555,6 @@ public class CsCZ : DefaultLocalizationBase
     // TODO: Add correct Localize methods based on compilation errors
 
     // ===== Calendar Format Methods =====
-    public override string FormatChineseLunarYear(int year) => year.ToString();
 
 
     // ===== Gregorian Calendar Names =====
@@ -641,17 +646,9 @@ public class CsCZ : DefaultLocalizationBase
     private static readonly string[] MongolianMonthNames =
         { "První", "Druhý", "Třetí", "Čtvrtý", "Pátý", "Šestý", "Sedmý", "Osmý", "Devátý", "Desátý", "Jedenáctý", "Dvanáctý" };
 
-    public override string? GetMongolianMonthName(int month) => month >= 1 && month <= 12 ? MongolianMonthNames[month - 1] : null;
-
-    public override string GetMongolianMonthName(int month) => month >= 1 && month <= 12 ? $"Měsíc {month}" : null;
-
     // ===== Tibetan Calendar Names =====
     private static readonly string[] TibetanMonthNames =
         { "První", "Druhý", "Třetí", "Čtvrtý", "Pátý", "Šestý", "Sedmý", "Osmý", "Devátý", "Desátý", "Jedenáctý", "Dvanáctý" };
-
-    public override string? GetTibetanMonthName(int month) => month >= 1 && month <= 12 ? TibetanMonthNames[month - 1] : null;
-
-    public override string GetTibetanMonthName(int month) => month >= 1 && month <= 12 ? $"Měsíc {month}" : null;
 
     // ===== Cherokee Calendar Names =====
     private static readonly string[] CherokeeMonthNames =
@@ -681,17 +678,9 @@ public class CsCZ : DefaultLocalizationBase
     private static readonly string[] VikramSamvatMonthNames =
         { "Čaitra", "Vaisákha", "Džjaištha", "Ášádha", "Šrávana", "Bhádrapada", "Ášvina", "Kártika", "Márgaširša", "Pauša", "Mágha", "Phálguna" };
 
-    public override string? GetVikramSamvatMonthName(int month) => month >= 1 && month <= 12 ? VikramSamvatMonthNames[month - 1] : null;
-
-    public override string GetVikramSamvatMonthName(int month) => month >= 1 && month <= 12 ? VikramSamvatMonthNames[month - 1] : null;
-
     // ===== Saka Calendar Names =====
     private static readonly string[] SakaMonthNames =
         { "Čaitra", "Vaisákha", "Džjaištha", "Ášádha", "Šrávana", "Bhádrapada", "Ášvina", "Kártika", "Márgaširša", "Pauša", "Mágha", "Phálguna" };
-
-    public override string? GetSakaMonthName(int month) => month >= 1 && month <= 12 ? SakaMonthNames[month - 1] : null;
-
-    public override string GetSakaMonthName(int month) => month >= 1 && month <= 12 ? SakaMonthNames[month - 1] : null;
 
     // ===== Zoroastrian Calendar Names =====
     private static readonly string[] ZoroastrianMonthNames =
@@ -757,11 +746,6 @@ public class CsCZ : DefaultLocalizationBase
     public override string ChineseLunarLeapPrefix => "Přestupný";
     public override string VietnameseLeapPrefix => "Přestupný";
 
-    public override string MemoryFilterAll => "Vše";
-    public override string MemoryFilterApply => "Použít";
-    public override string MemoryFilterReset => "Resetovat";
-    public override string MemoryTypeToolCall => "Volání nástroje";
-    public override string MemoryIsSummaryBadge => "Souhrn";
     public override string MemoryDetailId => "ID";
     public override string MemoryDetailTitle => "Název";
     public override string MemoryDetailContent => "Obsah";
@@ -769,16 +753,12 @@ public class CsCZ : DefaultLocalizationBase
     public override string MemoryDetailKeywords => "Klíčová slova";
     public override string MemoryDetailRelatedBeings => "Související bytí";
     public override string MemoryStatTypeDistribution => "Rozdělení typů";
-    public override string MemoryStatKeywordFrequency => "Frekvence klíčových slov";
     public override string MemoryToolStatsHeader => "Statistiky";
     public override string MemoryToolStatsTotal => "Celkem";
-    public override string MemoryToolStatsOldest => "Nejstarší";
 
     public override string ConfigBrowseButton => "Procházet";
     public override string ConfigEditButton => "Upravit";
     public override string ConfigEditPropertyLabel => "Vlastnost";
-    public override string ConfigEditValueLabel => "Hodnota";
-    public override string ConfigEditModalTitle => "Upravit vlastnost";
     public override string ConfigDictAddButton => "Přidat";
     public override string ConfigDictDeleteButton => "Smazat";
     public override string ConfigDictEmptyMessage => "Žádné položky";
@@ -816,7 +796,7 @@ public class CsCZ : DefaultLocalizationBase
     // ===== Localize Date Methods =====
     public override string LocalizeGregorianDateTime(int year, int month, int day, int hour, int minute, int second) => $"{year}-{month:00}-{day:00} {hour:00}:{minute:00}:{second:00}";
     public override string LocalizeChineseLunarDate(int year, int month, int day, bool isLeap, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
-    public override string LocalizeJapaneseDate(int year, int month, int day, int era, int eraYear, int hour, int minute, int second) => $"{eraYear} {era}";
+    public override string LocalizeJapaneseDate(int year, int month, int day, int era, int eraYear, int hour, int minute) => $"{eraYear} {era}";
     public override string LocalizeVietnameseDate(int year, int month, int day, bool isLeap, int hour, int minute, int second, int zodiac) => $"{year}-{month:00}-{day:00}";
     public override string LocalizeIslamicDate(int year, int month, int day, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
     public override string LocalizeHebrewDate(int year, int month, int day, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
@@ -833,7 +813,7 @@ public class CsCZ : DefaultLocalizationBase
     public override string LocalizeMongolianDate(int year, int month, int day, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
     public override string LocalizeTibetanDate(int year, int month, int day, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
     public override string LocalizeCherokeeDate(int year, int month, int day, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
-    public override string LocalizeYiDate(int year, int month, int day, int season, int xun, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
+    public override string LocalizeYiDate(int year, int month, int day, int season, int hour, int minute) => $"{year}-{month:00}-{day:00}";
     public override string LocalizeInuitDate(int year, int month, int day, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
     public override string LocalizeVikramSamvatDate(int year, int month, int day, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
     public override string LocalizeSakaDate(int year, int month, int day, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
@@ -841,11 +821,10 @@ public class CsCZ : DefaultLocalizationBase
     public override string LocalizeFrenchRepublicanDate(int year, int month, int day, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
     public override string LocalizeChulaSakaratDate(int year, int month, int day, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
     public override string LocalizeKhmerDate(int year, int month, int day, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
-    public override string LocalizeThaiDate(int year, int month, int day, int era, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
     public override string LocalizeDaiDate(int year, int month, int day, bool isLeap, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
     public override string LocalizeDehongDaiDate(int year, int month, int day, bool isLeap, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
     public override string LocalizeRomanDate(int year, int month, int day, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
-    public override string LocalizeSexagenaryDate(int year, int month, int day, int yearStem, int yearBranch, int monthStem, int monthBranch, int dayStem, int dayBranch, int hour, int minute, int second) => $"{year}-{month:00}-{day:00}";
+    public override string LocalizeSexagenaryDate(int year, int month, int day, int yearStem, int yearBranch, int monthStem, int monthBranch, int hour, int minute) => $"{year}-{month:00}-{day:00}";
 
     public override string? GetVietnameseMonthName(int month) => month >= 1 && month <= 12 ? $"Měsíc {month}" : null;
     public override string? GetChineseHistoricalMonthName(int month) => month >= 1 && month <= 12 ? $"Měsíc {month}" : null;
@@ -879,11 +858,6 @@ public class CsCZ : DefaultLocalizationBase
     public override string GetTranslation(string key) => key;
 
 
-    public override string CalendarIntervalEvery => "Každých";
-    public override string CalendarIntervalDays => "d";
-    public override string CalendarIntervalHours => "h";
-    public override string CalendarIntervalMinutes => "m";
-    public override string CalendarIntervalSeconds => "s";
 
     public override string LocalizeIntervalDescription(int days, int hours, int minutes, int seconds)
     {
@@ -894,6 +868,13 @@ public class CsCZ : DefaultLocalizationBase
         if (seconds > 0) parts.Add($"{seconds}{CalendarIntervalSeconds}");
         return string.Join(", ", parts);
     }
+
+
+    public override string CalendarComponentIsLeap => "Přestupný";
+    public override string MemoryToolNoMemories => "Žádné paměti";
+    public override string MemoryToolMissingContent => "Chybějící obsah";
+    public override string MemoryToolStatsNewest => "Nejnovější";
+    public override string MemoryToolRecentHeader(int count) => $"Posledních {count} pamětí";
 
     // ===== Code Browser =====
     public override string CodeBrowserPageHeader => "Prohlížeč kódu";

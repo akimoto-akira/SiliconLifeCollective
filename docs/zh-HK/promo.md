@@ -1,5 +1,7 @@
 # 認识您的数字伴侣
 
+[English](promo.md) | [简体中文](docs/zh-CN/promo.md) | [繁體中文](docs/zh-HK/promo.md) | [Español](docs/es-ES/promo.md) | [日本語](docs/ja-JP/promo.md) | [한국어](docs/ko-KR/promo.md) | [Čeština](docs/cs-CZ/promo.md)
+
 ## 如果您的計算機能自己思考會怎样？
 
 想象一下，有一群組樂於助人的助手住在您的計算機里。它們不僅僅是等待您命令的程式 —— 它們有自己的個性，記得您告诉過它們的事情，並且可以協同工作完成工作。

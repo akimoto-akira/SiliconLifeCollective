@@ -1,5 +1,7 @@
 # Guía de Seres de Silicio
 
+[English](silicon-being-guide.md) | [简体中文](docs/zh-CN/silicon-being-guide.md) | [繁體中文](docs/zh-HK/silicon-being-guide.md) | [Español](docs/es-ES/silicon-being-guide.md) | [日本語](docs/ja-JP/silicon-being-guide.md) | [한국어](docs/ko-KR/silicon-being-guide.md) | [Čeština](docs/cs-CZ/silicon-being-guide.md)
+
 ## ¿Qué es un Ser de Silicio?
 
 Un **Ser de Silicio** es un agente de IA autónomo dentro del sistema Silicon Life Collective. Cada ser tiene:

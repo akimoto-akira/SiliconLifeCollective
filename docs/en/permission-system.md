@@ -1,5 +1,7 @@
 # Permission System
 
+[English](permission-system.md) | [简体中文](docs/zh-CN/permission-system.md) | [繁體中文](docs/zh-HK/permission-system.md) | [Español](docs/es-ES/permission-system.md) | [日本語](docs/ja-JP/permission-system.md) | [한국어](docs/ko-KR/permission-system.md) | [Čeština](docs/cs-CZ/permission-system.md)
+
 ## Overview
 
 The permission system ensures all AI-initiated operations are properly validated and audited.

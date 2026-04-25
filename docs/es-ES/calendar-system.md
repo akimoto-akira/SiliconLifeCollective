@@ -1,5 +1,7 @@
 # Sistema de Calendario
 
+[English](calendar-system.md) | [简体中文](docs/zh-CN/calendar-system.md) | [繁體中文](docs/zh-HK/calendar-system.md) | [Español](docs/es-ES/calendar-system.md) | [日本語](docs/ja-JP/calendar-system.md) | [한국어](docs/ko-KR/calendar-system.md) | [Čeština](docs/cs-CZ/calendar-system.md)
+
 ## Resumen
 
 Silicon Life Collective soporta **32 sistemas de calendario** diferentes, proporcionando conversión y consulta de fechas multi-calendario.

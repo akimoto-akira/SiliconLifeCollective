@@ -1,5 +1,7 @@
 # 시작 가이드
 
+[English](getting-started.md) | [简体中文](docs/zh-CN/getting-started.md) | [繁體中文](docs/zh-HK/getting-started.md) | [Español](docs/es-ES/getting-started.md) | [日本語](docs/ja-JP/getting-started.md) | [한국어](docs/ko-KR/getting-started.md) | [Čeština](docs/cs-CZ/getting-started.md)
+
 ## 필수 조건
 
 - **.NET 9 SDK** - [다운로드](https://dotnet.microsoft.com/download/dotnet/9.0)

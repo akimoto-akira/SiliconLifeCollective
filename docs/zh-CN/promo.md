@@ -1,5 +1,7 @@
 # 认识您的数字伴侣
 
+[English](promo.md) | [中文](docs/zh-CN/promo.md) | [繁體中文](docs/zh-HK/promo.md) | [Español](docs/es-ES/promo.md) | [日本語](docs/ja-JP/promo.md) | [한국어](docs/ko-KR/promo.md) | [Čeština](docs/cs-CZ/promo.md)
+
 ## 如果您的计算机能自己思考会怎样？
 
 想象一下，有一组乐于助人的助手住在您的计算机里。它们不仅仅是等待您命令的程序 —— 它们有自己的个性，记得您告诉过它们的事情，并且可以协同工作完成任务。
