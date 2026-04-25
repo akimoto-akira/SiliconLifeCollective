@@ -13,6 +13,30 @@ tento projekt dodržuje [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Nevydáno]
 
+### 2026-04-25
+
+#### Správa Pracovního Prostoru Projektu
+- `785c551` - Implementace správy pracovního prostoru projektu s pracovními poznámkami a systémem úkolů
+  - Nový systém správy pracovního prostoru projektu
+  - Funkce pracovních poznámek pro sledování průběhu projektu
+  - Integrace systému správy úkolů
+  - Zlepšené možnosti organizace a sledování projektu
+
+#### Česká Lokalizace
+- `b4bbf39` - Přidání kompletní české (cs-CZ) lokalizace a aktualizace všech jazykových dokumentací
+  - Kompletní podpora českého jazyka
+  - Aktualizace všech jazykových dokumentací včetně češtiny
+  - Plná lokalizace prvků uživatelského rozhraní a zpráv
+- `faf078f` - Oprava chyb kompilace české lokalizace
+  - Vyřešení problémů s kompilací v souborech české lokalizace
+  - Zajištění správné integrace českého jazykového balíčku
+
+#### Rozšíření Systému Znalostí
+- `20adaac` - Přidání KnowledgeTool s plnou podporou lokalizace
+  - Nový nástroj KnowledgeTool pro správu znalostí
+  - Plná vícejazyčná lokalizační podpora
+  - Rozšířené možnosti sítě znalostí
+
 ### 2026-04-24
 
 #### Vylepšení Správy Paměti

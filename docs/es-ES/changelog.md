@@ -57,6 +57,30 @@ y este proyecto sigue [Versionado Semántico](https://semver.org/spec/v2.0.0.htm
 
 ## [No publicado]
 
+### 2026-04-25
+
+#### Gestión de Espacio de Trabajo del Proyecto
+- `785c551` - Implementar gestión de espacio de trabajo del proyecto con notas de trabajo y sistemas de tareas
+  - Nuevo sistema de gestión de espacio de trabajo del proyecto
+  - Funcionalidad de notas de trabajo para rastrear el progreso del proyecto
+  - Integración del sistema de gestión de tareas
+  - Capacidades mejoradas de organización y rastreo de proyectos
+
+#### Localización en Checo
+- `b4bbf39` - Agregar localización completa en checo (cs-CZ) y actualizar documentación en todos los idiomas
+  - Soporte completo del idioma checo
+  - Documentación actualizada en todos los idiomas para incluir checo
+  - Localización completa de elementos de interfaz de usuario y mensajes
+- `faf078f` - Corregir errores de compilación de localización en checo
+  - Problemas de compilación resueltos en archivos de localización checa
+  - Asegurado que el paquete de idioma checo se integre correctamente
+
+#### Mejora del Sistema de Conocimiento
+- `20adaac` - Agregar KnowledgeTool con soporte completo de localización
+  - Nueva herramienta KnowledgeTool para gestión de conocimiento
+  - Soporte completo de localización multiidioma
+  - Capacidades mejoradas de red de conocimiento
+
 ### 2026-04-24
 
 #### Mejora de Gestión de Memoria
