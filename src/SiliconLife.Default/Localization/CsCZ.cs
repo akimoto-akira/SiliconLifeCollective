@@ -562,7 +562,35 @@ public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
     public override string GetConfigDescription(string key) => string.Empty;
 
     // ===== Tool Display Name =====
-    public override string GetToolDisplayName(string toolName) => toolName;
+    private static readonly Dictionary<string, string> ToolDisplayNames = new()
+    {
+        ["calendar"] = "Kalendář",
+        ["chat"] = "Chat",
+        ["config"] = "Konfigurace",
+        ["silicon_manager"] = "Správce křemíku",
+        ["database"] = "Databáze",
+        ["disk"] = "Disk",
+        ["dynamic_compile"] = "Dynamická kompilace",
+        ["execute_code"] = "Spustit kód",
+        ["help"] = "Nápověda",
+        ["knowledge"] = "Znalosti",
+        ["log"] = "Protokol",
+        ["network"] = "Síť",
+        ["memory"] = "Paměť",
+        ["permission"] = "Oprávnění",
+        ["task"] = "Úkol",
+        ["system"] = "Systém",
+        ["timer"] = "Časovač",
+        ["token_audit"] = "Audit tokenů",
+        ["work_note"] = "Pracovní poznámka",
+        ["project"] = "Projekt",
+        ["project_task"] = "Projektový úkol",
+        ["project_work_note"] = "Projektová pracovní poznámka",
+        ["webview_browser"] = "Prohlížeč WebView"
+    };
+
+    public override string GetToolDisplayName(string toolName) =>
+        ToolDisplayNames.GetValueOrDefault(toolName, toolName);
 
     // ===== Chinese Historical Calendar =====
     private readonly ChineseHistoricalCsCZ _chineseHistorical = new();

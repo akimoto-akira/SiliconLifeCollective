@@ -845,6 +845,7 @@ public class ZhCN : DefaultLocalizationBase
         ["disk"] = "磁盘",
         ["dynamic_compile"] = "动态编译",
         ["execute_code"] = "执行代码",
+        ["help"] = "帮助",
         ["knowledge"] = "知识",
         ["log"] = "日志",
         ["network"] = "网络",
@@ -857,7 +858,8 @@ public class ZhCN : DefaultLocalizationBase
         ["work_note"] = "工作笔记",
         ["project"] = "项目",
         ["project_task"] = "项目任务",
-        ["project_work_note"] = "项目工作笔记"
+        ["project_work_note"] = "项目工作笔记",
+        ["webview_browser"] = "WebView浏览器"
     };
 
     public override string GetToolDisplayName(string toolName) =>

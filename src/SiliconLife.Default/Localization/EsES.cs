@@ -845,6 +845,7 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         ["disk"] = "Disco",
         ["dynamic_compile"] = "Compilación dinámica",
         ["execute_code"] = "Ejecutar código",
+        ["help"] = "Ayuda",
         ["knowledge"] = "Conocimiento",
         ["log"] = "Registro",
         ["network"] = "Red",
@@ -857,7 +858,8 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         ["work_note"] = "Nota de Trabajo",
         ["project"] = "Proyecto",
         ["project_task"] = "Tarea de proyecto",
-        ["project_work_note"] = "Nota de trabajo de proyecto"
+        ["project_work_note"] = "Nota de trabajo de proyecto",
+        ["webview_browser"] = "Navegador WebView"
     };
 
     public override string GetToolDisplayName(string toolName) =>

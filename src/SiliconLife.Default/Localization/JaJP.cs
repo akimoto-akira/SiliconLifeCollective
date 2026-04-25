@@ -845,6 +845,7 @@ public class JaJP : DefaultLocalizationBase
         ["disk"] = "ディスク",
         ["dynamic_compile"] = "動的コンパイル",
         ["execute_code"] = "コード実行",
+        ["help"] = "ヘルプ",
         ["knowledge"] = "ナレッジ",
         ["log"] = "ログ",
         ["network"] = "ネットワーク",
@@ -857,7 +858,8 @@ public class JaJP : DefaultLocalizationBase
         ["work_note"] = "作業ノート",
         ["project"] = "プロジェクト",
         ["project_task"] = "プロジェクトタスク",
-        ["project_work_note"] = "プロジェクト作業ノート"
+        ["project_work_note"] = "プロジェクト作業ノート",
+        ["webview_browser"] = "WebViewブラウザ"
     };
 
     public override string GetToolDisplayName(string toolName) =>

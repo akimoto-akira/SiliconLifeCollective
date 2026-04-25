@@ -699,6 +699,7 @@ public class ZhHK : DefaultLocalizationBase
         ["disk"] = "磁碟",
         ["dynamic_compile"] = "動態編譯",
         ["execute_code"] = "執行程式碼",
+        ["help"] = "幫助",
         ["knowledge"] = "知識",
         ["log"] = "日誌",
         ["network"] = "網絡",
@@ -711,7 +712,8 @@ public class ZhHK : DefaultLocalizationBase
         ["work_note"] = "工作筆記",
         ["project"] = "項目",
         ["project_task"] = "項目任務",
-        ["project_work_note"] = "項目工作筆記"
+        ["project_work_note"] = "項目工作筆記",
+        ["webview_browser"] = "WebView瀏覽器"
     };
 
     public override string GetToolDisplayName(string toolName) =>

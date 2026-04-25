@@ -845,6 +845,7 @@ public class KoKR : DefaultLocalizationBase
         ["disk"] = "디스크",
         ["dynamic_compile"] = "동적 컴파일",
         ["execute_code"] = "코드 실행",
+        ["help"] = "도움말",
         ["knowledge"] = "지식",
         ["log"] = "로그",
         ["network"] = "네트워크",
@@ -857,7 +858,8 @@ public class KoKR : DefaultLocalizationBase
         ["work_note"] = "작업 노트",
         ["project"] = "프로젝트",
         ["project_task"] = "프로젝트 작업",
-        ["project_work_note"] = "프로젝트 작업 노트"
+        ["project_work_note"] = "프로젝트 작업 노트",
+        ["webview_browser"] = "WebView 브라우저"
     };
 
     public override string GetToolDisplayName(string toolName) =>
