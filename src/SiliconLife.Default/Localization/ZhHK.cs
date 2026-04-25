@@ -1726,4 +1726,13 @@ public class ZhHK : DefaultLocalizationBase
         { "csharp:System.Collections.Generic.HashSet", "雜湊集類別（System.Collections.Generic.HashSet<T>）。表示值的集，提供高效能的集運算。" },
         { "csharp:System.Text.StringBuilder", "字串建構器類別（System.Text.StringBuilder）。表示可變字元字串，適合頻繁修改字串的場景。" },
     };
+
+    // ===== Help Module UI Labels =====
+
+    public override string Help_Title => "幫助文檔";
+    public override string Help_Search => "搜索幫助";
+    public override string Help_DocList => "文檔列表";
+    public override string Help_NoResults => "未找到相關文檔";
+    public override string Help_Previous => "上一篇";
+    public override string Help_Next => "下一篇";
 }

@@ -1872,4 +1872,13 @@ public class KoKR : DefaultLocalizationBase
         { "csharp:System.Collections.Generic.HashSet", "해시 집합 클래스(System.Collections.Generic.HashSet<T>). 값 집합을 나타내며 고성능 집합 연산을 제공합니다." },
         { "csharp:System.Text.StringBuilder", "문자열 빌더 클래스(System.Text.StringBuilder). 변경 가능한 문자열을 나타내며 문자열을 자주 수정하는 시나리오에 적합합니다." },
     };
+
+    // ===== Help Module UI Labels =====
+
+    public override string Help_Title => "헬프 문서";
+    public override string Help_Search => "헬프 검색";
+    public override string Help_DocList => "문서 목록";
+    public override string Help_NoResults => "문서를 찾을 수 없습니다";
+    public override string Help_Previous => "이전";
+    public override string Help_Next => "다음";
 }

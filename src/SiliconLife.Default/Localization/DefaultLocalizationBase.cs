@@ -2907,4 +2907,24 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <param name="key">The translation key</param>
     /// <returns>Localized text, or empty string if not found</returns>
     public abstract string GetTranslation(string key);
+
+    // ===== Help Module UI Labels =====
+
+    /// <summary>帮助文档 (Help Documentation)</summary>
+    public abstract string Help_Title { get; }
+
+    /// <summary>搜索帮助 (Search Help)</summary>
+    public abstract string Help_Search { get; }
+
+    /// <summary>文档列表 (Document List)</summary>
+    public abstract string Help_DocList { get; }
+
+    /// <summary>无搜索结果 (No Results Found)</summary>
+    public abstract string Help_NoResults { get; }
+
+    /// <summary>上一篇 (Previous)</summary>
+    public abstract string Help_Previous { get; }
+
+    /// <summary>下一篇 (Next)</summary>
+    public abstract string Help_Next { get; }
 }

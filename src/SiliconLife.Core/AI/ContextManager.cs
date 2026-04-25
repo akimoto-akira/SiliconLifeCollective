@@ -312,7 +312,7 @@ public class ContextManager
             });
         }
 
-        // 添加公共提示词（所有硅基人共享的行为准则）
+        // Add common prompt (behavior guidelines shared by all silicon beings)
         Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
         LocalizationBase loc = LocalizationManager.Instance.GetLocalization(language);
         request.Messages.Add(new ChatMessage
@@ -649,7 +649,7 @@ public class ContextManager
                 SiliconBeingBase? otherBeing = otherId != Guid.Empty ? beingManager?.GetBeing(otherId) : null;
                 string partnerName = otherBeing?.Name ?? Config.Instance?.Data?.UserNickname ?? otherId.ToString();
                 
-                // 如果对方是硅基人，关联到记忆；如果是人类用户，不关联
+                // If the other party is a silicon being, associate with memory; if human user, don't associate
                 List<Guid>? relatedBeings = otherBeing != null ? new List<Guid> { otherId } : null;
                 RecordToMemory(loc.FormatMemoryEventSingleChat(partnerName, response.Content), relatedBeings);
             }
@@ -790,7 +790,7 @@ public class ContextManager
                 SiliconBeingBase? otherBeing = otherId != Guid.Empty ? beingManager?.GetBeing(otherId) : null;
                 string partnerName = otherBeing?.Name ?? Config.Instance?.Data?.UserNickname ?? otherId.ToString();
                 
-                // 如果对方是硅基人，关联到记忆；如果是人类用户，不关联
+                // If the other party is a silicon being, associate with memory; if human user, don't associate
                 List<Guid>? relatedBeings = otherBeing != null ? new List<Guid> { otherId } : null;
                 RecordToMemory(loc.FormatMemoryEventSingleChat(partnerName, response.Content), relatedBeings);
             }

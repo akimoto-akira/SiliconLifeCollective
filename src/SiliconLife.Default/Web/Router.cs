@@ -132,6 +132,10 @@ public class Router
         RegisterController(() => new PermissionRequestController(), "/permission/check");
         RegisterController(() => new PermissionRequestController(), "/permission/respond");
         RegisterController(() => new AboutController(), "/about");
+        RegisterController(() => new HelpController(), "/help");
+        RegisterController(() => new HelpController(), "/help/index");
+        RegisterController(() => new HelpController(), "/help/{topic}");
+        RegisterController(() => new HelpController(), "/api/help/search");
         RegisterController(() => new InitController(), "/init", "GET");
         RegisterController(() => new InitController(), "/init", "POST");
         RegisterController(() => new InitController(), "/init/browse", "GET");
@@ -206,7 +210,10 @@ public class Router
 
         try
         {
-            if (!_isInitialized && path != InitPath && !path.StartsWith(InitPath + "/") && method != "POST")
+            // Help pages are accessible even before initialization
+            bool isHelpPage = path == "/help" || path.StartsWith("/help/") || path.StartsWith("/api/help");
+            
+            if (!_isInitialized && !isHelpPage && path != InitPath && !path.StartsWith(InitPath + "/") && method != "POST")
             {
                 if (!IsStaticFileRequest(path))
                 {

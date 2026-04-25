@@ -1879,4 +1879,13 @@ public class ZhCN : DefaultLocalizationBase
         { "csharp:System.Collections.Generic.HashSet", "哈希集类（System.Collections.Generic.HashSet<T>）。表示值的集，提供高性能的集运算。" },
         { "csharp:System.Text.StringBuilder", "字符串构建器类（System.Text.StringBuilder）。表示可变字符字符串，适合频繁修改字符串的场景。" },
     };
+
+    // ===== Help Module UI Labels =====
+
+    public override string Help_Title => "帮助文档";
+    public override string Help_Search => "搜索帮助";
+    public override string Help_DocList => "文档列表";
+    public override string Help_NoResults => "未找到相关文档";
+    public override string Help_Previous => "上一篇";
+    public override string Help_Next => "下一篇";
 }

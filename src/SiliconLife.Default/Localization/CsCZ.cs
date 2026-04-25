@@ -905,4 +905,13 @@ public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
     // ===== Code Browser =====
     public override string CodeBrowserPageHeader => "Prohlížeč kódu";
     public override string GetCodeHoverWordTypeDesc(string wordType, string word) => $"{wordType}: {word}";
+
+    // ===== Help Module UI Labels =====
+
+    public override string Help_Title => "Nápověda";
+    public override string Help_Search => "Hledat nápovědu";
+    public override string Help_DocList => "Seznam dokumentů";
+    public override string Help_NoResults => "Nebyly nalezeny žádné dokumenty";
+    public override string Help_Previous => "Předchozí";
+    public override string Help_Next => "Další";
 }

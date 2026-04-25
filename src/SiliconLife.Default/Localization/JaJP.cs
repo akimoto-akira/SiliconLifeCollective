@@ -425,11 +425,11 @@ public class JaJP : DefaultLocalizationBase
 
     private static readonly Dictionary<string, string> PermissionRuleComments = new()
     {
-        // Evaluate メソッド
+        // Evaluate method
         ["NetRuleNetworkAccess"] = "ネットワーク操作許可ルール",
         ["NetRuleCommandLine"] = "コマンドラインルール（クロスプラットフォーム）",
         ["NetRuleFileAccess"] = "ファイルアクセスルール（クロスプラットフォーム）",
-        // ネットワークルール
+        // Network rules
         ["NetRuleNoProtocol"] = "プロトコル名（コロン）が含まれていないため、送信元を判断できず、ユーザーに確認",
         ["NetRuleLoopback"] = "ローカルループバックアドレスを許可（localhost / 127.0.0.1 / ::1）",
         ["NetRulePrivateIPMatch"] = "プライベートIPアドレスセグメントのマッチング（まず有効なIPv4アドレスか検証）",
@@ -477,7 +477,7 @@ public class JaJP : DefaultLocalizationBase
         ["NetRuleMaps"] = "地図 — OpenStreetMap",
         ["NetRuleEncyclopedia"] = "百科事典 — Wikipedia / MediaWiki / クリエイティブ・コモンズ(CC)",
         ["NetRuleUnmatched"] = "一致しないネットワークアクセス、ユーザーに確認",
-        // コマンドラインルール
+        // Command line rules
         ["CmdRuleSeparatorDetect"] = "パイプ文字と複数コマンドセパレーターを検出し、分割して逐次検証",
         ["CmdRuleWinAllow"] = "Windows許可：読み取り/クエリコマンド — dir / tree / tasklist / ipconfig / ping / tracert / systeminfo / whoami / set / path / sc query / findstr",
         ["CmdRuleWinDeny"] = "Windows禁止：危険/破壊的コマンド — del / rmdir / format / diskpart / reg delete",
@@ -486,7 +486,7 @@ public class JaJP : DefaultLocalizationBase
         ["CmdRuleMacAllow"] = "macOS許可：読み取り/クエリコマンド — ls / tree / ps / top / ifconfig / ping / traceroute / system_profiler / sw_vers / whoami / env / cat / grep / find / df / du / launchctl list",
         ["CmdRuleMacDeny"] = "macOS禁止：危険/破壊的コマンド — rm / rmdir / diskutil erasedisk / dd / chmod / chown / chgrp",
         ["CmdRuleUnmatched"] = "一致しないコマンド、ユーザーに確認",
-        // ファイルアクセスルール
+        // File access rules
         ["FileRuleDangerousExt"] = "最優先：危険なファイル拡張子は即時拒否",
         ["FileRuleInvalidPath"] = "絶対パスに解決できないため、ユーザーに確認",
         ["FileRuleDenyAssemblyDir"] = "禁止：現在のアセンブリディレクトリ",
@@ -1840,7 +1840,7 @@ public class JaJP : DefaultLocalizationBase
         { "csharp:stackalloc", "スタック割り当て演算子。スタック上にメモリブロックを割り当てます。" },
         { "csharp:extern", "外部修飾子。メソッドが外部アセンブリ（DLL など）で実装されていることを示します。" },
         { "csharp:unsafe", "アンセーフコードブロック。ポインタなどのアンセーフ機能の使用を許可します。" },
-        // プラットフォームコア型
+        // Platform core types
         { "csharp:ipermissioncallback", "権限コールバックインターフェース。シリコンベースの生命体の各種操作権限（ネットワーク、コマンドライン、ファイルアクセスなど）を評価するために使用されます。" },
         { "csharp:permissionresult", "権限結果列挙型。権限評価の結果を表します：Allowed（許可）、Denied（拒否）、AskUser（ユーザーに確認）。" },
         { "csharp:permissiontype", "権限タイプ列挙型。権限の種類を定義します：NetworkAccess（ネットワークアクセス）、CommandLine（コマンドライン実行）、FileAccess（ファイルアクセス）、Function（関数呼び出し）、DataAccess（データアクセス）。" },
@@ -1859,10 +1859,10 @@ public class JaJP : DefaultLocalizationBase
         { "csharp:stringbuilder", "文字列ビルダークラス（System.Text.StringBuilder）。変更可能な文字列を表し、文字列の頻繁な変更があるシナリオに適しています。" },
     };
 
-    // 完全な名前空間変換辞書
+    // Full namespace conversion dictionary
     private static readonly Dictionary<string, string> TranslationDictionary = new(CSharpKeywords)
     {
-        // 完全な名前空間キーを追加
+        // Add full namespace keys
         { "csharp:System.Net.IPAddress", "IP アドレスクラス（System.Net.IPAddress）。Internet Protocol (IP) アドレスを表します。" },
         { "csharp:System.Net.Sockets.AddressFamily", "アドレスファミリ列挙（System.Net.Sockets.AddressFamily）。InterNetwork（IPv4）や InterNetworkV6（IPv6）など、ネットワークアドレスのアドレッシングスキームを指定します。" },
         { "csharp:System.Uri", "統一リソース識別子クラス（System.Uri）。Web リソースにアクセスするための URI のオブジェクト表現を提供します。" },
@@ -1872,4 +1872,13 @@ public class JaJP : DefaultLocalizationBase
         { "csharp:System.Collections.Generic.HashSet", "ハッシュセットクラス（System.Collections.Generic.HashSet<T>）。値のセットを表し、高性能なセット演算を提供します。" },
         { "csharp:System.Text.StringBuilder", "文字列ビルダークラス（System.Text.StringBuilder）。変更可能な文字列を表し、文字列の頻繁な変更があるシナリオに適しています。" },
     };
+
+    // ===== Help Module UI Labels =====
+
+    public override string Help_Title => "ヘルプドキュメント";
+    public override string Help_Search => "ヘルプを検索";
+    public override string Help_DocList => "ドキュメント一覧";
+    public override string Help_NoResults => "ドキュメントが見つかりません";
+    public override string Help_Previous => "前へ";
+    public override string Help_Next => "次へ";
 }

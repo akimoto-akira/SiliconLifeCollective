@@ -1874,4 +1874,13 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
         { "csharp:System.Collections.Generic.HashSet", "Hash set class (System.Collections.Generic.HashSet<T>). Represents a set of values, providing high-performance set operations." },
         { "csharp:System.Text.StringBuilder", "String builder class (System.Text.StringBuilder). Represents a mutable string of characters, suitable for scenarios with frequent string modifications." },
     };
+
+    // ===== Help Module UI Labels =====
+
+    public override string Help_Title => "Help Documentation";
+    public override string Help_Search => "Search Help";
+    public override string Help_DocList => "Document List";
+    public override string Help_NoResults => "No documents found";
+    public override string Help_Previous => "Previous";
+    public override string Help_Next => "Next";
 }

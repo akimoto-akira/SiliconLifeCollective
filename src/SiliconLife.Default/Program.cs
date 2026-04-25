@@ -80,7 +80,7 @@ public class Program
         TokenUsageAuditManager tokenUsageAuditManager = new TokenUsageAuditManager(tokenUsageStorage);
         _logger.Info(null, "Initialized: TokenUsageAuditManager");
 
-        // 初始化知识网络系统
+        // Initialize knowledge network system
         string knowledgeStoragePath = Path.Combine(configData.DataDirectory.FullName, "knowledge");
         KnowledgeNetwork knowledgeNetwork = new KnowledgeNetwork();
         knowledgeNetwork.Initialize(knowledgeStoragePath);

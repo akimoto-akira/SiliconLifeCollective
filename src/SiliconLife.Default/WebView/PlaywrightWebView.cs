@@ -18,8 +18,8 @@ using System.Text.Json;
 namespace SiliconLife.Default;
 
 /// <summary>
-/// Playwright跨平台WebView统一实现 / Playwright cross-platform WebView unified implementation
-/// 所有平台使用同一套代码 / All platforms use the same code
+/// Playwright cross-platform WebView unified implementation.
+/// All platforms use the same code.
 /// </summary>
 public class PlaywrightWebView : IWebViewCore
 {
@@ -319,13 +319,12 @@ public class PlaywrightWebView : IWebViewCore
             _logger.Info(_being.Id, "WebView: Initializing browser");
             
             // Auto-install browsers on first run if needed
-            // 首次运行时自动安装浏览器
             await InstallBrowsersIfNeeded();
             
             var playwright = await Playwright.CreateAsync();
             _browser = await playwright.Chromium.LaunchAsync(new()
             {
-                Headless = true, // 无头模式,用户不可见
+                Headless = true, // Headless mode, not visible to user
                 Args = new[] { 
                     "--disable-gpu",
                     "--no-sandbox",
@@ -339,7 +338,6 @@ public class PlaywrightWebView : IWebViewCore
             };
             
             // Only load storage state if file exists
-            // 只有在文件存在时才加载会话状态
             var statePath = GetSessionStoragePath();
             if (!string.IsNullOrEmpty(statePath) && File.Exists(statePath))
             {
@@ -362,14 +360,12 @@ public class PlaywrightWebView : IWebViewCore
     
     /// <summary>
     /// Auto-install Playwright browsers on first run
-    /// 首次运行时自动安装 Playwright 浏览器
     /// </summary>
     private static async Task InstallBrowsersIfNeeded()
     {
         try
         {
             // Check if browsers are already installed
-            // 检查浏览器是否已安装
             var playwrightPath = Environment.GetEnvironmentVariable("PLAYWRIGHT_BROWSERS_PATH");
             if (string.IsNullOrEmpty(playwrightPath))
             {
@@ -383,7 +379,6 @@ public class PlaywrightWebView : IWebViewCore
                 _logger.Info(null, "WebView: First run detected, installing browsers...");
                 
                 // Use the official Playwright installation script
-                // 使用官方的 Playwright 安装脚本
                 var assemblyDir = AppDomain.CurrentDomain.BaseDirectory;
                 var installScript = Path.Combine(assemblyDir, "playwright.ps1");
                 
@@ -442,7 +437,6 @@ public class PlaywrightWebView : IWebViewCore
         try
         {
             // Use the being's directory directly
-            // 直接使用硅基人的目录
             if (string.IsNullOrEmpty(_being.BeingDirectory))
             {
                 _logger.Warn(_being.Id, "WebView: Being directory is not set");
@@ -450,7 +444,6 @@ public class PlaywrightWebView : IWebViewCore
             }
             
             // Store browser state in the being's directory
-            // 将浏览器状态存储在硅基人目录中
             return Path.Combine(_being.BeingDirectory, "browser_state.json");
         }
         catch (Exception ex)

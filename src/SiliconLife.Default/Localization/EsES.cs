@@ -1874,4 +1874,13 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         { "csharp:System.Collections.Generic.HashSet", "Clase de hash set (System.Collections.Generic.HashSet<T>). Representa un conjunto de valores, proporcionando operaciones de conjunto de alto rendimiento." },
         { "csharp:System.Text.StringBuilder", "Clase de constructor de cadenas (System.Text.StringBuilder). Representa una cadena mutable de caracteres, adecuada para escenarios con modificaciones frecuentes de cadenas." },
     };
+
+    // ===== Help Module UI Labels =====
+
+    public override string Help_Title => "Documentación de Ayuda";
+    public override string Help_Search => "Buscar Ayuda";
+    public override string Help_DocList => "Lista de Documentos";
+    public override string Help_NoResults => "No se encontraron documentos";
+    public override string Help_Previous => "Anterior";
+    public override string Help_Next => "Siguiente";
 }
