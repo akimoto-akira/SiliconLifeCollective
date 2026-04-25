@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using SiliconLife.Core.Knowledge;
+using SiliconLife.Collective;
 using System.Text.Json;
 
 namespace SiliconLife.Default.Knowledge;

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
-using SiliconLife.Core.Knowledge;
 using System.Text.Json;
 
 namespace SiliconLife.Default.Knowledge;

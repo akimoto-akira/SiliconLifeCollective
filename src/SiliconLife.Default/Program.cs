@@ -12,7 +12,6 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
-using SiliconLife.Core.Knowledge;
 using SiliconLife.Default;
 using SiliconLife.Default.IM;
 using SiliconLife.Default.Knowledge;

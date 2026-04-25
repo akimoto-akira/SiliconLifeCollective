@@ -10,7 +10,6 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
-using SiliconLife.Core.Knowledge;
 
 namespace SiliconLife.Default.Web;
 

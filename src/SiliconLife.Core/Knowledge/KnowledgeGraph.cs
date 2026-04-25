@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SiliconLife.Core.Knowledge;
+namespace SiliconLife.Collective;
 
 /// <summary>
 /// Knowledge graph - uses adjacency list structure to store knowledge network
