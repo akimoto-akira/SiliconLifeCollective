@@ -30,7 +30,7 @@ A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Bei
   - Korean: ko-KR
 - **Web UI** — Built-in HTTP server with SSE support, multiple skins, and comprehensive dashboard
   - **Skin System** — 4 built-in skins (Admin, Chat, Creative, Dev) with pluggable ISkin interface and auto-discovery
-  - **20+ Controllers** — About, Audit, Being, Chat, ChatHistory, CodeBrowser, CodeHover, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer
+  - **20+ Controllers** — About, Audit, Being, Chat, ChatHistory, CodeBrowser, CodeHover, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer, TimerExecutionHistory
   - **Real-time Updates** — SSE (Server-Sent Events) for chat messages, being status, and system events
   - **HTML/CSS/JS Builders** — Server-side markup generation via `H`, `CssBuilder`, and `JsBuilder` (zero frontend framework dependency)
   - **Localization** — Twenty built-in language variants with LocalizationManager resolution

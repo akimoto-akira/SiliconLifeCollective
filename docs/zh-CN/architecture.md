@@ -444,7 +444,7 @@ Web UI 遵循**类 MVC 模式**，17 个控制器处理不同方面：
 | Init | 首次运行初始化向导 |
 | Knowledge | 知识图谱可视化（占位符） |
 | Log | 系统日志查看器 |
-| Memory | 长期记忆浏览器 |
+| Memory | 长期记忆浏览器，支持高级过滤、统计和详情视图 |
 | Permission | 权限管理 |
 | PermissionRequest | 权限请求队列 |
 | Project | 项目管理（占位符） |

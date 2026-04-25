@@ -819,6 +819,7 @@ public class KoKR : DefaultLocalizationBase
         ["disk"] = "디스크",
         ["dynamic_compile"] = "동적 컴파일",
         ["execute_code"] = "코드 실행",
+        ["knowledge"] = "지식",
         ["log"] = "로그",
         ["network"] = "네트워크",
         ["memory"] = "메모리",

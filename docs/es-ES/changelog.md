@@ -57,6 +57,20 @@ y este proyecto sigue [Versionado Semántico](https://semver.org/spec/v2.0.0.htm
 
 ### 2026-04-24
 
+#### Mejora de Gestión de Memoria
+- `c7b2ecc` - Mejorar la gestión de memoria con filtrado avanzado, estadísticas y vista de detalles
+  - Nueva función de filtrado avanzado de memoria con filtrado multidimensional por tipo, rango de tiempo, etiquetas, etc.
+  - Función de estadísticas de memoria implementada que muestra el recuento de memorias, distribución de tipos y otras estadísticas
+  - Página de vista de detalles de memoria agregada para ver información completa de memorias individuales
+  - Interfaz de gestión de memoria optimizada para mejorar la experiencia del usuario y la eficiencia operativa
+  - Soporte de localización multiidioma (6 idiomas)
+
+#### Extensión del Sistema de Permisos
+- `4489ad6` - Agregar servicio meteorológico wttr.in a la lista blanca de red
+  - Permitir que los Seres de Silicio accedan a la API meteorológica wttr.in para obtener información del clima
+  - Documentación del sistema de permisos actualizada explicando la configuración de permisos del servicio meteorológico
+  - Sincronización completa de documentación multiidioma (6 idiomas)
+
 #### Historial de ejecución del temporizador
 - `fa3f06f` - Añadir función de historial de ejecución del temporizador con vista de detalles
   - Nueva función de visualización del historial de ejecución del temporizador

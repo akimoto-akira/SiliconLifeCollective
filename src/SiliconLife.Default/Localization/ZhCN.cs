@@ -819,6 +819,7 @@ public class ZhCN : DefaultLocalizationBase
         ["disk"] = "磁盘",
         ["dynamic_compile"] = "动态编译",
         ["execute_code"] = "执行代码",
+        ["knowledge"] = "知识",
         ["log"] = "日志",
         ["network"] = "网络",
         ["memory"] = "记忆",

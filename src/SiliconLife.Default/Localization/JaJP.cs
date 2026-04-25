@@ -819,6 +819,7 @@ public class JaJP : DefaultLocalizationBase
         ["disk"] = "ディスク",
         ["dynamic_compile"] = "動的コンパイル",
         ["execute_code"] = "コード実行",
+        ["knowledge"] = "ナレッジ",
         ["log"] = "ログ",
         ["network"] = "ネットワーク",
         ["memory"] = "メモリ",

@@ -30,7 +30,7 @@ AI エージェントである**シリコンビーイング（Silicon Beings）*
   - 韓国語：ko-KR
 - **Web UI** — SSE サポート、複数のスキン、包括的なダッシュボードを備えた組み込み HTTP サーバー
   - **スキンシステム** — プラグ可能な ISkin インターフェースと自動検出機能を備えた4種類の組み込みスキン（Admin、Chat、Creative、Dev）
-  - **20+個のコントローラー** — About、Audit、Being、Chat、ChatHistory、CodeBrowser、CodeHover、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer
+  - **20+個のコントローラー** — About、Audit、Being、Chat、ChatHistory、CodeBrowser、CodeHover、Config、Dashboard、Executor、Init、Knowledge、Log、Memory、Permission、PermissionRequest、Project、Task、Timer、TimerExecutionHistory
   - **リアルタイム更新** — チャットメッセージ、生命体ステータス、システムイベント用の SSE（Server-Sent Events）
   - **HTML/CSS/JS ビルダー** — `H`、`CssBuilder`、`JsBuilder` によるサーバーサイドマークアップ生成（ゼロフロントエンドフレームワーク依存）
   - **ローカライゼーション** — LocalizationManager による解決を含む20種類の組み込み言語バリアント

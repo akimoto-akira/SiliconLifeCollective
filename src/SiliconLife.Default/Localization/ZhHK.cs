@@ -673,6 +673,7 @@ public class ZhHK : DefaultLocalizationBase
         ["disk"] = "磁碟",
         ["dynamic_compile"] = "動態編譯",
         ["execute_code"] = "執行程式碼",
+        ["knowledge"] = "知識",
         ["log"] = "日誌",
         ["network"] = "網絡",
         ["memory"] = "記憶",

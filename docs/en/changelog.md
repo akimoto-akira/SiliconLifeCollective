@@ -57,7 +57,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-04-24
 
-#### Timer Execution History
+#### Memory Management Enhancement
+- `c7b2ecc` - Enhance memory management with advanced filtering, statistics, and detail view
+  - New advanced memory filtering feature with multi-dimensional filtering by type, time range, tags, etc.
+  - Implemented memory statistics feature showing memory count, type distribution, and other statistics
+  - Added memory detail view page for viewing complete information of individual memories
+  - Optimized memory management interface for improved user experience and operational efficiency
+  - Multi-language localization support (6 languages)
+
+#### Permission System Extension
+- `4489ad6` - Add wttr.in weather service to network whitelist
+  - Allow silicon beings to access wttr.in weather API for weather information
+  - Updated permission system documentation explaining weather service permission configuration
+  - Complete multi-language documentation synchronization (6 languages)
 - `fa3f06f` - Add timer execution history feature with detail view
   - New timer execution history view feature
   - Implemented execution history detail page

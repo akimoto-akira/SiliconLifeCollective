@@ -424,6 +424,52 @@ public class JsBreak : JsSyntax
     public override string Build() => "break;";
 }
 
+public class JsFor : JsSyntax
+{
+    public Func<JsSyntax> Init { get; }
+    public Func<JsSyntax> Condition { get; }
+    public Func<JsSyntax> Increment { get; }
+    public Func<JsSyntax> Body { get; }
+
+    public JsFor(Func<JsSyntax> init, Func<JsSyntax> condition, Func<JsSyntax> increment, Func<JsSyntax> body)
+    {
+        Init = init;
+        Condition = condition;
+        Increment = increment;
+        Body = body;
+    }
+
+    public override string Build()
+    {
+        var init = StripTrailingSemicolon(Init().Build());
+        var condition = StripTrailingSemicolon(Condition().Build());
+        var increment = StripTrailingSemicolon(Increment().Build());
+        return $"for ({init}; {condition}; {increment}) {{ {Body().Build()} }}";
+    }
+
+    private static string StripTrailingSemicolon(string s) => s.EndsWith(";") ? s.Substring(0, s.Length - 1) : s;
+}
+
+public class JsWhile : JsSyntax
+{
+    public Func<JsSyntax> Condition { get; }
+    public Func<JsSyntax> Body { get; }
+
+    public JsWhile(Func<JsSyntax> condition, Func<JsSyntax> body)
+    {
+        Condition = condition;
+        Body = body;
+    }
+
+    public override string Build()
+    {
+        var condition = StripTrailingSemicolon(Condition().Build());
+        return $"while ({condition}) {{ {Body().Build()} }}";
+    }
+
+    private static string StripTrailingSemicolon(string s) => s.EndsWith(";") ? s.Substring(0, s.Length - 1) : s;
+}
+
 public static class Js
 {
     public static JsIdent Id(Func<string> name) => new(name);
@@ -458,6 +504,8 @@ public static class Js
     public static JsFuncDecl Func(Func<string> name, Func<List<string>> @params, Func<JsSyntax> body) => new(name, @params, body);
     public static JsArrowFunc Arrow(Func<List<string>> @params, Func<JsSyntax> body) => new(@params, body);
     public static JsRegex Regex(Func<string> pattern, Func<string> flags) => new(pattern, flags);
+    public static JsFor For(Func<JsSyntax> init, Func<JsSyntax> condition, Func<JsSyntax> increment, Func<JsSyntax> body) => new(init, condition, increment, body);
+    public static JsWhile While(Func<JsSyntax> condition, Func<JsSyntax> body) => new(condition, body);
 }
 
 public static class JsSyntaxExtensions

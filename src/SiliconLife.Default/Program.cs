@@ -12,8 +12,10 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
+using SiliconLife.Core.Knowledge;
 using SiliconLife.Default;
 using SiliconLife.Default.IM;
+using SiliconLife.Default.Knowledge;
 using SiliconLife.Default.Logging;
 using SiliconLife.Default.Web;
 using System.Text;
@@ -70,6 +72,13 @@ public class Program
             Path.Combine(configData.DataDirectory.FullName, "token-usage"));
         TokenUsageAuditManager tokenUsageAuditManager = new TokenUsageAuditManager(tokenUsageStorage);
         _logger.Info(null, "Initialized: TokenUsageAuditManager");
+
+        // 初始化知识网络系统
+        string knowledgeStoragePath = Path.Combine(configData.DataDirectory.FullName, "knowledge");
+        KnowledgeNetwork knowledgeNetwork = new KnowledgeNetwork();
+        knowledgeNetwork.Initialize(knowledgeStoragePath);
+        ServiceLocator.Instance.Register<IKnowledgeNetwork>(knowledgeNetwork);
+        _logger.Info(null, "Initialized: KnowledgeNetwork at {0}", knowledgeStoragePath);
 
         GlobalACL globalAcl = new GlobalACL(storage);
         _logger.Info(null, "Initialized: GlobalACL");

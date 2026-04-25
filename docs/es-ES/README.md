@@ -30,7 +30,7 @@ Una plataforma de colaboración multiagente en .NET 9 donde los agentes de IA ll
   - Español: es-ES, es-MX (2 variantes)
 - **Interfaz Web** — Servidor HTTP integrado con soporte SSE, múltiples pieles y panel integral
   - **Sistema de Pieles** — 4 pieles integradas (Admin, Chat, Creative, Dev) con interfaz ISkin enchufable y autodescubrimiento
-  - **20+ Controladores** — About, Audit, Being, Chat, ChatHistory, CodeBrowser, CodeHover, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer
+  - **20+ Controladores** — About, Audit, Being, Chat, ChatHistory, CodeBrowser, CodeHover, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer, TimerExecutionHistory
   - **Actualizaciones en Tiempo Real** — SSE (Server-Sent Events) para mensajes de chat, estado de seres y eventos del sistema
   - **Constructores HTML/CSS/JS** — Generación de marcado del lado del servidor mediante `H`, `CssBuilder` y `JsBuilder` (cero dependencia de framework frontend)
   - **Localización** — Veinte variantes de idioma integradas con resolución de LocalizationManager

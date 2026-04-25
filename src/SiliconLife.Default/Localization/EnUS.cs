@@ -819,6 +819,7 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
         ["disk"] = "Disk",
         ["dynamic_compile"] = "Dynamic Compile",
         ["execute_code"] = "Execute Code",
+        ["knowledge"] = "Knowledge",
         ["log"] = "Log",
         ["network"] = "Network",
         ["memory"] = "Memory",

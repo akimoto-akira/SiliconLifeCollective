@@ -444,7 +444,7 @@ The Web UI follows a **MVC-like pattern** with 17 controllers handling different
 | Init | First-run initialization wizard |
 | Knowledge | Knowledge graph visualization (placeholder) |
 | Log | System log viewer |
-| Memory | Long-term memory browser |
+| Memory | Long-term memory browser with advanced filtering, statistics, and detail view |
 | Permission | Permission management |
 | PermissionRequest | Permission request queue |
 | Project | Project management (placeholder) |

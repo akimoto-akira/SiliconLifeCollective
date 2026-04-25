@@ -10,6 +10,7 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
+using SiliconLife.Core.Knowledge;
 
 namespace SiliconLife.Default.Web;
 
@@ -49,11 +50,29 @@ public class KnowledgeController : Controller
 
     private void GetGraph()
     {
-        var loc = ServiceLocator.Instance.Get<DefaultLocalizationBase>()!;
-        RenderJson(new
+        var knowledgeNetwork = ServiceLocator.Instance.Get<IKnowledgeNetwork>();
+
+        if (knowledgeNetwork == null)
         {
-            nodes = new[] { new { id = "1", label = loc.KnowledgePageHeader } },
-            edges = new[] { new { from = "1", to = "1" } }
-        });
+            RenderJson(new { nodes = new List<object>(), edges = new List<object>() });
+            return;
+        }
+
+        var entries = knowledgeNetwork.QueryKnowledge();
+        var nodeSet = new HashSet<string>();
+        var edges = new List<object>();
+
+        foreach (var entry in entries)
+        {
+            var subject = entry.Triple.Subject;
+            var obj = entry.Triple.Object;
+            nodeSet.Add(subject);
+            nodeSet.Add(obj);
+            edges.Add(new { from = subject, to = obj, label = entry.Triple.Predicate });
+        }
+
+        var nodes = nodeSet.Select(n => new { id = n, label = n }).ToList<object>();
+
+        RenderJson(new { nodes, edges });
     }
 }

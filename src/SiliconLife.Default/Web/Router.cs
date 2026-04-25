@@ -94,6 +94,7 @@ public class Router
         RegisterController(() => new WorkNoteController(), "/api/work-notes/update", "POST");
         RegisterController(() => new WorkNoteController(), "/api/work-notes/delete", "POST");
         RegisterController(() => new KnowledgeController(), "/knowledge");
+        RegisterController(() => new KnowledgeController(), "/api/knowledge/graph");
         RegisterController(() => new ProjectController(), "/project");
         RegisterController(() => new ExecutorController(), "/executor");
         RegisterController(() => new CodeBrowserController(), "/code");

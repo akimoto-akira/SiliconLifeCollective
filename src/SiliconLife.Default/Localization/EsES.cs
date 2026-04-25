@@ -819,6 +819,7 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         ["disk"] = "Disco",
         ["dynamic_compile"] = "Compilación dinámica",
         ["execute_code"] = "Ejecutar código",
+        ["knowledge"] = "Conocimiento",
         ["log"] = "Registro",
         ["network"] = "Red",
         ["memory"] = "Memoria",
