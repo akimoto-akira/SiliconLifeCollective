@@ -384,3 +384,133 @@ GitHub Issues: [github.com/akimoto-akira/SiliconLifeCollective/issues](https://g
 
 - YouTube: [@hoshinokennji](https://www.youtube.com/@hoshinokennji)
 - Bilibili: [617827040](https://space.bilibili.com/617827040)
+
+---
+
+## Problemas de Notas de Trabajo
+
+### Problema: No Se Pueden Crear Notas de Trabajo
+
+**Síntomas**:
+```
+Failed to create work note
+```
+
+**Solución**:
+1. Verificar que el ser existe y está en ejecución
+2. Validar que la ruta de almacenamiento tiene permisos de escritura
+3. Comprobar que el contenido no está vacío (contenido obligatorio)
+4. Revisar logs para información detallada del error
+
+### Problema: Búsqueda de Notas Sin Resultados
+
+**Síntomas**:
+- La búsqueda por palabra clave devuelve resultados vacíos
+- Pero se sabe que hay notas relacionadas
+
+**Solución**:
+1. Comprobar que la ortografía de la palabra clave es correcta
+2. Intentar con una palabra clave más general
+3. Validar que la nota contiene esa palabra clave (distingue mayúsculas/minúsculas)
+4. Aumentar el valor del parámetro `max_results`
+
+### Problema: Generación de Directorio de Notas Lenta
+
+**Síntomas**:
+- Tiempo de respuesta largo al generar directorio
+- El ser tiene muchas notas (>1000 páginas)
+
+**Solución**:
+1. Esto es normal, necesita recorrer todas las notas
+2. Considerar archivar notas antiguas periódicamente
+3. Usar función de búsqueda en lugar de navegación por directorio
+4. Optimización planificada: añadir mecanismo de caché de directorio
+
+---
+
+## Problemas de Red de Conocimiento
+
+### Problema: Consulta de Conocimiento Devuelve Vacío
+
+**Síntomas**:
+```
+No knowledge triples found
+```
+
+**Solución**:
+1. Validar ortografía de sujeto y predicado
+2. Comprobar que el conocimiento ha sido añadido a la red
+3. Usar función de búsqueda para coincidencia difusa:
+```json
+{
+  "action": "search",
+  "query": "palabra clave"
+}
+```
+
+### Problema: Falla Búsqueda de Ruta de Conocimiento
+
+**Síntomas**:
+```
+No path found between concepts
+```
+
+**Solución**:
+1. Validar que ambos conceptos existen en la red de conocimiento
+2. Comprobar si existe ruta asociativa (puede que no haya relación directa o indirecta)
+3. Intentar añadir más conocimiento para establecer conexión
+4. Reducir límite de longitud de ruta (si está configurado)
+
+### Problema: Falla Validación de Conocimiento
+
+**Síntomas**:
+```
+Knowledge validation failed
+```
+
+**Solución**:
+1. Comprobar que el formato del triple es correcto (sujeto, predicado, objeto obligatorios)
+2. Validar que la confianza está en rango 0.0-1.0
+3. Comprobar si hay triples duplicados
+4. Revisar detalles del error de validación para entender problema específico
+
+### Problema: Estadísticas de Red de Conocimiento Inexactas
+
+**Síntomas**:
+- Números estadísticos no coinciden con lo esperado
+- Estadísticas no se actualizan después de añadir conocimiento
+
+**Solución**:
+1. Las estadísticas pueden tardar unos segundos en actualizarse (caché)
+2. Comprobar si la operación de eliminación se ejecutó exitosamente
+3. Reiniciar aplicación para forzar actualización de estadísticas
+4. Reconsultar información estadística a través de API
+
+---
+
+## Problemas de Gestión de Proyectos
+
+### Problema: No Se Puede Crear Proyecto
+
+**Síntomas**:
+```
+Failed to create project
+```
+
+**Solución**:
+1. Comprobar que el nombre del proyecto no está vacío (obligatorio)
+2. Validar que el nombre del proyecto no está duplicado
+3. Comprobar que la ruta de almacenamiento tiene permisos de escritura
+4. Revisar logs para información detallada del error
+
+### Problema: Pérdida de Datos del Proyecto
+
+**Síntomas**:
+- No se puede cargar información del proyecto
+- Archivo del proyecto corrupto
+
+**Solución**:
+1. Comprobar que el directorio de almacenamiento del proyecto existe
+2. Restaurar datos del proyecto desde backup
+3. Validar que el formato del archivo JSON es correcto
+4. Reparar manualmente archivo del proyecto dañado

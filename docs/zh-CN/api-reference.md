@@ -513,6 +513,225 @@ public class AIResponse
 
 ---
 
+## 工作笔记 API
+
+### 获取工作笔记列表
+
+**GET** `/api/beings/{id}/work-notes`
+
+**响应**：
+```json
+{
+  "notes": [
+    {
+      "id": "note-uuid",
+      "pageNumber": 1,
+      "summary": "完成用户认证模块",
+      "keywords": ["认证", "JWT", "OAuth2"],
+      "createdAt": "2026-04-25T10:00:00Z",
+      "updatedAt": "2026-04-25T10:00:00Z"
+    }
+  ],
+  "totalCount": 15
+}
+```
+
+### 获取单条笔记详情
+
+**GET** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**响应**：
+```json
+{
+  "id": "note-uuid",
+  "pageNumber": 1,
+  "summary": "完成用户认证模块",
+  "content": "## 实现细节\n\n- 使用 JWT token\n- 支持 OAuth2",
+  "keywords": ["认证", "JWT", "OAuth2"],
+  "createdAt": "2026-04-25T10:00:00Z",
+  "updatedAt": "2026-04-25T10:00:00Z"
+}
+```
+
+### 创建新笔记
+
+**POST** `/api/beings/{id}/work-notes`
+
+**请求**：
+```json
+{
+  "summary": "完成用户认证模块",
+  "content": "## 实现细节\n\n- 使用 JWT token",
+  "keywords": "认证,JWT,OAuth2"
+}
+```
+
+**响应**：`201 Created`
+
+### 更新笔记
+
+**PUT** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**请求**：
+```json
+{
+  "summary": "完成用户认证模块及测试",
+  "content": "## 更新后的内容\n\n添加了单元测试",
+  "keywords": "认证,JWT,OAuth2,测试"
+}
+```
+
+### 删除笔记
+
+**DELETE** `/api/beings/{id}/work-notes/{pageNumber}`
+
+### 搜索笔记
+
+**GET** `/api/beings/{id}/work-notes/search?keyword=认证&maxResults=10`
+
+### 获取笔记目录
+
+**GET** `/api/beings/{id}/work-notes/directory`
+
+---
+
+## 知识网络 API
+
+### 获取知识统计
+
+**GET** `/api/knowledge/stats`
+
+**响应**：
+```json
+{
+  "totalTriples": 1523,
+  "totalSubjects": 450,
+  "totalPredicates": 85,
+  "totalObjects": 892,
+  "averageConfidence": 0.87
+}
+```
+
+### 添加知识三元组
+
+**POST** `/api/knowledge/triples`
+
+**请求**：
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "confidence": 0.95,
+  "tags": ["programming", "language"]
+}
+```
+
+**响应**：`201 Created`
+
+### 查询知识
+
+**GET** `/api/knowledge/query?subject=Python&predicate=is_a`
+
+**响应**：
+```json
+{
+  "triples": [
+    {
+      "subject": "Python",
+      "predicate": "is_a",
+      "object": "programming_language",
+      "confidence": 0.95,
+      "tags": ["programming", "language"]
+    }
+  ]
+}
+```
+
+### 搜索知识
+
+**GET** `/api/knowledge/search?query=programming+language&limit=10`
+
+### 获取知识路径
+
+**GET** `/api/knowledge/path?from=Python&to=computer_science`
+
+**响应**：
+```json
+{
+  "path": [
+    {"subject": "Python", "predicate": "is_a", "object": "programming_language"},
+    {"subject": "programming_language", "predicate": "belongs_to", "object": "computer_science"}
+  ],
+  "length": 2
+}
+```
+
+### 验证知识
+
+**POST** `/api/knowledge/validate`
+
+**请求**：
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language"
+}
+```
+
+### 删除知识
+
+**DELETE** `/api/knowledge/triples/{id}`
+
+---
+
+## 项目管理 API
+
+### 获取项目列表
+
+**GET** `/api/projects`
+
+**响应**：
+```json
+{
+  "projects": [
+    {
+      "id": "project-uuid",
+      "name": "My Project",
+      "description": "Project description",
+      "createdAt": "2026-04-25T10:00:00Z"
+    }
+  ]
+}
+```
+
+### 创建项目
+
+**POST** `/api/projects`
+
+**请求**：
+```json
+{
+  "name": "My Project",
+  "description": "Project description"
+}
+```
+
+### 获取项目详情
+
+**GET** `/api/projects/{id}`
+
+### 更新项目
+
+**PUT** `/api/projects/{id}`
+
+### 删除项目
+
+**DELETE** `/api/projects/{id}`
+
+---
+
 ## 工具系统 API
 
 ### ITool 接口

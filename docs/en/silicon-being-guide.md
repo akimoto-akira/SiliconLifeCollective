@@ -180,6 +180,226 @@ data/
             └── task-history.json
 ```
 
+## Work Notes System
+
+### Overview
+
+Work notes are the personal diary system for silicon beings, using a page-based design to record work progress, learning notes, project notes, etc.
+
+### Features
+
+- **Page Management**: Each note is an independent page, accessed by page number
+- **Markdown Support**: Content supports Markdown format (text, lists, tables, code blocks)
+- **Keyword Indexing**: Support adding keywords to notes for easy searching
+- **Summary Feature**: Each note has a short summary for quick browsing
+- **Directory Generation**: Can generate a directory overview of all notes, helping understand overall context
+- **Timestamps**: Automatic recording of creation and update times
+- **Private by Default**: Only the being can access (curator can manage)
+
+### Use Cases
+
+1. **Project Progress Recording**
+   ```
+   Summary: User authentication module completed
+   Content: Implemented JWT token verification, OAuth2 integration, refresh token mechanism
+   Keywords: authentication,JWT,OAuth2
+   ```
+
+2. **Learning Notes**
+   ```
+   Summary: Learning C# async programming best practices
+   Content: async/await usage precautions, ConfigureFlags usage scenarios...
+   Keywords: C#,async,best practices
+   ```
+
+3. **Meeting Minutes**
+   ```
+   Summary: Product requirements discussion meeting
+   Content: Discussed new feature requirements, determined implementation plan...
+   Keywords: product,requirements,meeting
+   ```
+
+### Usage Through Tools
+
+Beings can manage work notes through the `work_note` tool:
+
+```json
+// Create note
+{
+  "action": "create",
+  "summary": "User authentication module completed",
+  "content": "## Implementation Details\n\n- Using JWT token\n- OAuth2 support",
+  "keywords": "authentication,JWT,OAuth2"
+}
+
+// Read note
+{
+  "action": "read",
+  "page_number": 1
+}
+
+// Search notes
+{
+  "action": "search",
+  "keyword": "authentication",
+  "max_results": 10
+}
+```
+
+### Management Through Web UI
+
+1. Navigate to **Being Management** → Select being
+2. Click **Work Notes** tab
+3. Can view, search, edit notes
+4. Markdown preview support
+
+## Knowledge Network System
+
+### Overview
+
+The knowledge network is a knowledge representation and management system based on triple structure (subject-predicate-object), used for storing and managing structured knowledge.
+
+### Core Concepts
+
+#### Triple Structure
+
+```
+Subject (Subject) --Predicate (Predicate)--> Object (Object)
+```
+
+**Examples**:
+- `Python` --`is_a`--> `programming_language`
+- `Beijing` --`capital_of`--> `China`
+- `Water` --`boiling_point`--> `100°C`
+
+#### Confidence
+
+Each knowledge triple has a confidence score (0.0-1.0), indicating the reliability of the knowledge:
+- `1.0`: Absolutely certain (mathematical theorems, etc.)
+- `0.8-0.99`: High confidence (verified facts, etc.)
+- `0.5-0.79`: Medium confidence (inferences or hypotheses, etc.)
+- `<0.5`: Low confidence (guesses or unverified information, etc.)
+
+#### Tag System
+
+Support adding tags to triples for easy classification and search:
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "tags": ["programming", "language", "popular"]
+}
+```
+
+### Knowledge Operations
+
+#### 1. Add Knowledge
+
+```json
+{
+  "action": "add",
+  "subject": "C#",
+  "predicate": "created_by",
+  "object": "Microsoft",
+  "confidence": 1.0,
+  "tags": ["programming", "language"]
+}
+```
+
+#### 2. Query Knowledge
+
+```json
+{
+  "action": "query",
+  "subject": "C#",
+  "predicate": "created_by"
+}
+```
+
+#### 3. Search Knowledge
+
+```json
+{
+  "action": "search",
+  "query": "programming language",
+  "limit": 10
+}
+```
+
+#### 4. Discover Knowledge Path
+
+Find associative paths between two concepts:
+```json
+{
+  "action": "get_path",
+  "from": "Python",
+  "to": "computer_science"
+}
+```
+
+Returns:
+```
+Python → is_a → programming_language → belongs_to → computer_science
+```
+
+#### 5. Validate Knowledge
+
+Check validity and consistency of knowledge:
+```json
+{
+  "action": "validate",
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language"
+}
+```
+
+#### 6. Knowledge Statistics
+
+Get overall statistics of the knowledge network:
+```json
+{
+  "action": "stats"
+}
+```
+
+Returns:
+```json
+{
+  "totalTriples": 1523,
+  "totalSubjects": 450,
+  "totalPredicates": 85,
+  "totalObjects": 892,
+  "averageConfidence": 0.87
+}
+```
+
+### Use Cases
+
+1. **Fact Storage**
+   - Store objective facts and common sense
+   - Example: `Earth` --`is_a`--> `Planet`
+
+2. **Concept Relationships**
+   - Record relationships between concepts
+   - Example: `Inheritance` --`is_a`--> `Object-oriented programming concept`
+
+3. **Learning Accumulation**
+   - Beings continuously accumulate knowledge through learning
+   - Form structured knowledge systems
+
+4. **Reasoning Support**
+   - Discover indirect relationships through knowledge paths
+   - Support knowledge-based reasoning and decision-making
+
+### Management Through Web UI
+
+1. Navigate to **Knowledge Network** page
+2. View knowledge statistics
+3. Search and browse knowledge
+4. Visualize knowledge relationship graph (planned)
+
 ## Best Practices
 
 ### Soul File Writing

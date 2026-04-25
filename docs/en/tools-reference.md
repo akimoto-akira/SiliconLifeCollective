@@ -322,6 +322,148 @@ Disk tool now includes local search functionality (integrated from SearchTool):
 }
 ```
 
+### 16. Knowledge Network Tool
+
+**Name**: `knowledge`
+
+**Description**: Knowledge network operation tool for adding, querying, updating, deleting, and searching knowledge triples.
+
+**Actions**: `add`, `query`, `update`, `delete`, `search`, `get_path`, `validate`, `stats`
+
+**Parameters** (add - add knowledge):
+```json
+{
+  "action": "add",
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "confidence": 0.95,
+  "tags": ["programming", "language"]
+}
+```
+
+**Parameters** (query - query knowledge):
+```json
+{
+  "action": "query",
+  "subject": "Python",
+  "predicate": "is_a"
+}
+```
+
+**Parameters** (search - search knowledge):
+```json
+{
+  "action": "search",
+  "query": "programming language",
+  "limit": 10
+}
+```
+
+**Parameters** (get_path - get knowledge path):
+```json
+{
+  "action": "get_path",
+  "from": "Python",
+  "to": "computer_science"
+}
+```
+
+**Parameters** (stats - statistics):
+```json
+{
+  "action": "stats"
+}
+```
+
+**Features**:
+- Knowledge representation based on triple structure (subject-predicate-object)
+- Knowledge confidence score support
+- Tag classification and search support
+- Knowledge path discovery (associative paths between two points) support
+- Knowledge validation and integrity check support
+- Persistent storage to file system
+
+**Permission**: All beings can use.
+
+### 17. Work Note Tool
+
+**Name**: `work_note`
+
+**Description**: Manage work notes for silicon beings. Work notes use page-based design, similar to a personal diary (private by default).
+
+**Actions**: `create`, `read`, `update`, `delete`, `list`, `directory`, `search`
+
+**Parameters** (create - create note):
+```json
+{
+  "action": "create",
+  "summary": "User authentication module completed",
+  "content": "## Implementation Details\n\n- Using JWT token\n- OAuth2 support\n- Refresh token mechanism added",
+  "keywords": "authentication,JWT,OAuth2"
+}
+```
+
+**Parameters** (read - read note):
+```json
+{
+  "action": "read",
+  "page_number": 1
+}
+```
+
+Or use note_id:
+```json
+{
+  "action": "read",
+  "note_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+**Parameters** (update - update note):
+```json
+{
+  "action": "update",
+  "page_number": 1,
+  "content": "## Updated Content\n\nUnit tests added",
+  "summary": "User authentication module and tests completed"
+}
+```
+
+**Parameters** (list - list all notes):
+```json
+{
+  "action": "list"
+}
+```
+
+**Parameters** (directory - generate note directory):
+```json
+{
+  "action": "directory"
+}
+```
+
+**Parameters** (search - search notes):
+```json
+{
+  "action": "search",
+  "keyword": "authentication",
+  "max_results": 10
+}
+```
+
+**Features**:
+- Page-based design, each page managed independently
+- Support for summary, content, keywords
+- Keyword-based search support
+- Directory overview generation support (for context understanding)
+- Markdown format support (text, lists, tables, code blocks)
+- Automatic timestamp recording
+- Private by default, only the being can access
+
+**Permission**: Beings access their own work notes, curator can manage all notes.
+
 ---
 
 ## Tool Call Flow

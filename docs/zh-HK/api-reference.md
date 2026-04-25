@@ -552,6 +552,225 @@ public class ToolResult
 
 ---
 
+## 工作筆記 API
+
+### 獲取工作筆記列表
+
+**GET** `/api/beings/{id}/work-notes`
+
+**響應**：
+```json
+{
+  "notes": [
+    {
+      "id": "note-uuid",
+      "pageNumber": 1,
+      "summary": "完成用戶認證模組",
+      "keywords": ["認證", "JWT", "OAuth2"],
+      "createdAt": "2026-04-25T10:00:00Z",
+      "updatedAt": "2026-04-25T10:00:00Z"
+    }
+  ],
+  "totalCount": 15
+}
+```
+
+### 獲取單條筆記詳情
+
+**GET** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**響應**：
+```json
+{
+  "id": "note-uuid",
+  "pageNumber": 1,
+  "summary": "完成用戶認證模組",
+  "content": "## 實現細節\n\n- 使用 JWT token\n- 支持 OAuth2",
+  "keywords": ["認證", "JWT", "OAuth2"],
+  "createdAt": "2026-04-25T10:00:00Z",
+  "updatedAt": "2026-04-25T10:00:00Z"
+}
+```
+
+### 創建新筆記
+
+**POST** `/api/beings/{id}/work-notes`
+
+**請求**：
+```json
+{
+  "summary": "完成用戶認證模組",
+  "content": "## 實現細節\n\n- 使用 JWT token",
+  "keywords": "認證,JWT,OAuth2"
+}
+```
+
+**響應**：`201 Created`
+
+### 更新筆記
+
+**PUT** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**請求**：
+```json
+{
+  "summary": "完成用戶認證模組及測試",
+  "content": "## 更新後的內容\n\n添加了單元測試",
+  "keywords": "認證,JWT,OAuth2,測試"
+}
+```
+
+### 刪除筆記
+
+**DELETE** `/api/beings/{id}/work-notes/{pageNumber}`
+
+### 搜索筆記
+
+**GET** `/api/beings/{id}/work-notes/search?keyword=認證&maxResults=10`
+
+### 獲取筆記目錄
+
+**GET** `/api/beings/{id}/work-notes/directory`
+
+---
+
+## 知識網絡 API
+
+### 獲取知識統計
+
+**GET** `/api/knowledge/stats`
+
+**響應**：
+```json
+{
+  "totalTriples": 1523,
+  "totalSubjects": 450,
+  "totalPredicates": 85,
+  "totalObjects": 892,
+  "averageConfidence": 0.87
+}
+```
+
+### 添加知識三元組
+
+**POST** `/api/knowledge/triples`
+
+**請求**：
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "confidence": 0.95,
+  "tags": ["programming", "language"]
+}
+```
+
+**響應**：`201 Created`
+
+### 查詢知識
+
+**GET** `/api/knowledge/query?subject=Python&predicate=is_a`
+
+**響應**：
+```json
+{
+  "triples": [
+    {
+      "subject": "Python",
+      "predicate": "is_a",
+      "object": "programming_language",
+      "confidence": 0.95,
+      "tags": ["programming", "language"]
+    }
+  ]
+}
+```
+
+### 搜索知識
+
+**GET** `/api/knowledge/search?query=programming+language&limit=10`
+
+### 獲取知識路徑
+
+**GET** `/api/knowledge/path?from=Python&to=computer_science`
+
+**響應**：
+```json
+{
+  "path": [
+    {"subject": "Python", "predicate": "is_a", "object": "programming_language"},
+    {"subject": "programming_language", "predicate": "belongs_to", "object": "computer_science"}
+  ],
+  "length": 2
+}
+```
+
+### 驗證知識
+
+**POST** `/api/knowledge/validate`
+
+**請求**：
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language"
+}
+```
+
+### 刪除知識
+
+**DELETE** `/api/knowledge/triples/{id}`
+
+---
+
+## 專案管理 API
+
+### 獲取專案列表
+
+**GET** `/api/projects`
+
+**響應**：
+```json
+{
+  "projects": [
+    {
+      "id": "project-uuid",
+      "name": "My Project",
+      "description": "Project description",
+      "createdAt": "2026-04-25T10:00:00Z"
+    }
+  ]
+}
+```
+
+### 創建專案
+
+**POST** `/api/projects`
+
+**請求**：
+```json
+{
+  "name": "My Project",
+  "description": "Project description"
+}
+```
+
+### 獲取專案詳情
+
+**GET** `/api/projects/{id}`
+
+### 更新專案
+
+**PUT** `/api/projects/{id}`
+
+### 刪除專案
+
+**DELETE** `/api/projects/{id}`
+
+---
+
 ## 下一步
 
 - 🚀 查看[快速開始指南](getting-started.md)

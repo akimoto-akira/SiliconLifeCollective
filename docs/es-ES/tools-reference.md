@@ -384,6 +384,150 @@ DiskTool ahora incluye funcionalidad de búsqueda local (integrada desde SearchT
 
 ---
 
+## 16. Herramienta de Red de Conocimiento
+
+**Nombre**: `knowledge`
+
+**Descripción**: Herramienta de operaciones de red de conocimiento, para agregar, consultar, actualizar, eliminar y buscar triples de conocimiento.
+
+**Acciones**: `add`, `query`, `update`, `delete`, `search`, `get_path`, `validate`, `stats`
+
+**Parámetros** (add - agregar conocimiento):
+```json
+{
+  "action": "add",
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "confidence": 0.95,
+  "tags": ["programming", "language"]
+}
+```
+
+**Parámetros** (query - consultar conocimiento):
+```json
+{
+  "action": "query",
+  "subject": "Python",
+  "predicate": "is_a"
+}
+```
+
+**Parámetros** (search - buscar conocimiento):
+```json
+{
+  "action": "search",
+  "query": "programming language",
+  "limit": 10
+}
+```
+
+**Parámetros** (get_path - obtener ruta de conocimiento):
+```json
+{
+  "action": "get_path",
+  "from": "Python",
+  "to": "computer_science"
+}
+```
+
+**Parámetros** (stats - estadísticas):
+```json
+{
+  "action": "stats"
+}
+```
+
+**Características**:
+- Representación de conocimiento basada en estructura de triple (sujeto-predicado-objeto)
+- Soporte de puntuación de confianza de conocimiento
+- Soporte de clasificación y búsqueda por etiquetas
+- Soporte de descubrimiento de rutas de conocimiento (rutas asociativas entre dos puntos)
+- Soporte de validación de conocimiento y verificación de integridad
+- Almacenamiento persistente en sistema de archivos
+
+**Permiso**: Todos los seres pueden usar.
+
+## 17. Herramienta de Notas de Trabajo
+
+**Nombre**: `work_note`
+
+**Descripción**: Gestión de notas de trabajo para seres de silicio. Las notas de trabajo usan diseño basado en páginas, similar a un diario personal (privado por defecto).
+
+**Acciones**: `create`, `read`, `update`, `delete`, `list`, `directory`, `search`
+
+**Parámetros** (create - crear nota):
+```json
+{
+  "action": "create",
+  "summary": "Módulo de autenticación de usuario completado",
+  "content": "## Detalles de implementación\n\n- Uso de token JWT\n- Soporte OAuth2\n- Mecanismo de token de actualización añadido",
+  "keywords": "autenticación,JWT,OAuth2"
+}
+```
+
+**Parámetros** (read - leer nota):
+```json
+{
+  "action": "read",
+  "page_number": 1
+}
+```
+
+O usar note_id:
+```json
+{
+  "action": "read",
+  "note_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+**Parámetros** (update - actualizar nota):
+```json
+{
+  "action": "update",
+  "page_number": 1,
+  "content": "## Contenido actualizado\n\nPruebas unitarias añadidas",
+  "summary": "Módulo de autenticación y pruebas completados"
+}
+```
+
+**Parámetros** (list - listar todas las notas):
+```json
+{
+  "action": "list"
+}
+```
+
+**Parámetros** (directory - generar directorio de notas):
+```json
+{
+  "action": "directory"
+}
+```
+
+**Parámetros** (search - buscar notas):
+```json
+{
+  "action": "search",
+  "keyword": "autenticación",
+  "max_results": 10
+}
+```
+
+**Características**:
+- Diseño basado en páginas, cada página gestionada independientemente
+- Soporte de resumen, contenido, palabras clave
+- Soporte de búsqueda por palabras clave
+- Soporte de generación de vista general de directorio (para comprensión de contexto)
+- Soporte de formato Markdown (texto, listas, tablas, bloques de código)
+- Registro automático de marca de tiempo
+- Privado por defecto, solo el ser puede acceder
+
+**Permiso**: Los seres acceden a sus propias notas de trabajo, el curador puede gestionar todas las notas.
+
+---
+
 ## Crear Herramientas Personalizadas
 
 Puedes crear herramientas personalizadas implementando `ITool`:

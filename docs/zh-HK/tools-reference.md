@@ -308,6 +308,148 @@ DiskTool 新增了以下功能：
 }
 ```
 
+### 16. 知識網絡工具
+
+**名稱**：`knowledge`
+
+**描述**：知識網絡操作工具，用於添加、查詢、更新、刪除和搜索知識三元組。
+
+**動作**：`add`、`query`、`update`、`delete`、`search`、`get_path`、`validate`、`stats`
+
+**參數**（add - 添加知識）：
+```json
+{
+  "action": "add",
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "confidence": 0.95,
+  "tags": ["programming", "language"]
+}
+```
+
+**參數**（query - 查詢知識）：
+```json
+{
+  "action": "query",
+  "subject": "Python",
+  "predicate": "is_a"
+}
+```
+
+**參數**（search - 搜索知識）：
+```json
+{
+  "action": "search",
+  "query": "programming language",
+  "limit": 10
+}
+```
+
+**參數**（get_path - 獲取知識路徑）：
+```json
+{
+  "action": "get_path",
+  "from": "Python",
+  "to": "computer_science"
+}
+```
+
+**參數**（stats - 統計資訊）：
+```json
+{
+  "action": "stats"
+}
+```
+
+**特性**：
+- 基於三元組結構（主語-謂語-賓語）的知識表示
+- 支持知識置信度評分
+- 支持標籤分類和搜索
+- 支持知識路徑發現（兩點間的關聯路徑）
+- 支持知識驗證和完整性檢查
+- 持久化儲存到檔案系統
+
+**權限**：所有生命體均可使用。
+
+### 17. 工作筆記工具
+
+**名稱**：`work_note`
+
+**描述**：管理硅基生命體的工作筆記。工作筆記採用頁式設計，類似個人日記（默認私有）。
+
+**動作**：`create`、`read`、`update`、`delete`、`list`、`directory`、`search`
+
+**參數**（create - 創建筆記）：
+```json
+{
+  "action": "create",
+  "summary": "完成用戶認證模組",
+  "content": "## 實現細節\n\n- 使用 JWT token\n- 支持 OAuth2\n- 添加了刷新 token 機制",
+  "keywords": "認證,JWT,OAuth2"
+}
+```
+
+**參數**（read - 讀取筆記）：
+```json
+{
+  "action": "read",
+  "page_number": 1
+}
+```
+
+或使用 note_id：
+```json
+{
+  "action": "read",
+  "note_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+**參數**（update - 更新筆記）：
+```json
+{
+  "action": "update",
+  "page_number": 1,
+  "content": "## 更新後的內容\n\n添加了單元測試",
+  "summary": "完成用戶認證模組及測試"
+}
+```
+
+**參數**（list - 列出所有筆記）：
+```json
+{
+  "action": "list"
+}
+```
+
+**參數**（directory - 生成筆記目錄）：
+```json
+{
+  "action": "directory"
+}
+```
+
+**參數**（search - 搜索筆記）：
+```json
+{
+  "action": "search",
+  "keyword": "認證",
+  "max_results": 10
+}
+```
+
+**特性**：
+- 頁式設計，每頁獨立管理
+- 支持摘要、內容、關鍵詞
+- 支持按關鍵詞搜索
+- 支持生成目錄概覽（用於上下文理解）
+- 內容支持 Markdown 格式（文本、列表、表格、程式碼區塊）
+- 自動時間戳記錄
+- 默認私有，僅生命體自身可訪問
+
+**權限**：生命體訪問自己的工作筆記，主理人可管理所有筆記。
+
 ---
 
 ## 工具调用流程

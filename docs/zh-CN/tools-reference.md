@@ -296,6 +296,148 @@
 - 支持日志级别过滤
 - 对话历史检索
 
+### 16. 知识网络工具
+
+**名称**：`knowledge`
+
+**描述**：知识网络操作工具，用于添加、查询、更新、删除和搜索知识三元组。
+
+**动作**：`add`、`query`、`update`、`delete`、`search`、`get_path`、`validate`、`stats`
+
+**参数**（add - 添加知识）：
+```json
+{
+  "action": "add",
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "confidence": 0.95,
+  "tags": ["programming", "language"]
+}
+```
+
+**参数**（query - 查询知识）：
+```json
+{
+  "action": "query",
+  "subject": "Python",
+  "predicate": "is_a"
+}
+```
+
+**参数**（search - 搜索知识）：
+```json
+{
+  "action": "search",
+  "query": "programming language",
+  "limit": 10
+}
+```
+
+**参数**（get_path - 获取知识路径）：
+```json
+{
+  "action": "get_path",
+  "from": "Python",
+  "to": "computer_science"
+}
+```
+
+**参数**（stats - 统计信息）：
+```json
+{
+  "action": "stats"
+}
+```
+
+**特性**：
+- 基于三元组结构（主语-谓语-宾语）的知识表示
+- 支持知识置信度评分
+- 支持标签分类和搜索
+- 支持知识路径发现（两点间的关联路径）
+- 支持知识验证和完整性检查
+- 持久化存储到文件系统
+
+**权限**：所有生命体均可使用。
+
+### 17. 工作笔记工具
+
+**名称**：`work_note`
+
+**描述**：管理硅基生命体的工作笔记。工作笔记采用页式设计，类似个人日记（默认私有）。
+
+**动作**：`create`、`read`、`update`、`delete`、`list`、`directory`、`search`
+
+**参数**（create - 创建笔记）：
+```json
+{
+  "action": "create",
+  "summary": "完成用户认证模块",
+  "content": "## 实现细节\n\n- 使用 JWT token\n- 支持 OAuth2\n- 添加了刷新 token 机制",
+  "keywords": "认证,JWT,OAuth2"
+}
+```
+
+**参数**（read - 读取笔记）：
+```json
+{
+  "action": "read",
+  "page_number": 1
+}
+```
+
+或使用 note_id：
+```json
+{
+  "action": "read",
+  "note_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+**参数**（update - 更新笔记）：
+```json
+{
+  "action": "update",
+  "page_number": 1,
+  "content": "## 更新后的内容\n\n添加了单元测试",
+  "summary": "完成用户认证模块及测试"
+}
+```
+
+**参数**（list - 列出所有笔记）：
+```json
+{
+  "action": "list"
+}
+```
+
+**参数**（directory - 生成笔记目录）：
+```json
+{
+  "action": "directory"
+}
+```
+
+**参数**（search - 搜索笔记）：
+```json
+{
+  "action": "search",
+  "keyword": "认证",
+  "max_results": 10
+}
+```
+
+**特性**：
+- 页式设计，每页独立管理
+- 支持摘要、内容、关键词
+- 支持按关键词搜索
+- 支持生成目录概览（用于上下文理解）
+- 内容支持 Markdown 格式（文本、列表、表格、代码块）
+- 自动时间戳记录
+- 默认私有，仅生命体自身可访问
+
+**权限**：生命体访问自己的工作笔记，主理人可管理所有笔记。
+
 ### 磁盘工具增强
 
 磁盘工具现在包含本地搜索功能（从 SearchTool 整合）：

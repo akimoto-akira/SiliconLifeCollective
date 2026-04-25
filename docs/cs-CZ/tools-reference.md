@@ -162,6 +162,148 @@ Označuje nástroje přístupné pouze Kurátorovi:
 public class AdminTool : ITool { ... }
 ```
 
+### 16. Nástroj Síťe Znalostí
+
+**Název**: `knowledge`
+
+**Popis**: Nástroj pro operace se sítí znalostí, pro přidávání, dotazování, aktualizaci, mazání a vyhledávání trojic znalostí.
+
+**Akce**: `add`, `query`, `update`, `delete`, `search`, `get_path`, `validate`, `stats`
+
+**Parametry** (add - přidat znalost):
+```json
+{
+  "action": "add",
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "confidence": 0.95,
+  "tags": ["programming", "language"]
+}
+```
+
+**Parametry** (query - dotaz na znalost):
+```json
+{
+  "action": "query",
+  "subject": "Python",
+  "predicate": "is_a"
+}
+```
+
+**Parametry** (search - vyhledat znalost):
+```json
+{
+  "action": "search",
+  "query": "programming language",
+  "limit": 10
+}
+```
+
+**Parametry** (get_path - získat cestu znalostí):
+```json
+{
+  "action": "get_path",
+  "from": "Python",
+  "to": "computer_science"
+}
+```
+
+**Parametry** (stats - statistiky):
+```json
+{
+  "action": "stats"
+}
+```
+
+**Funkce**:
+- Reprezentace znalostí založená na struktuře trojice (subjekt-predikát-objekt)
+- Podpora skóre důvěryhodnosti znalostí
+- Podpora klasifikace a vyhledávání podle štítků
+- Podpora objevování cest znalostí (asociativní cesty mezi dvěma body)
+- Podpora validace znalostí a kontroly integrity
+- Trvalé úložiště do souborového systému
+
+**Oprávnění**: Všechny bytosti mohou používat.
+
+### 17. Nástroj Pracovních Poznámek
+
+**Název**: `work_note`
+
+**Popis**: Správa pracovních poznámek pro křemíkové bytosti. Pracovní poznámky používají stránkový design, podobný osobnímu deníku (ve výchozím nastavení soukromé).
+
+**Akce**: `create`, `read`, `update`, `delete`, `list`, `directory`, `search`
+
+**Parametry** (create - vytvořit poznámku):
+```json
+{
+  "action": "create",
+  "summary": "Modul ověřování uživatele dokončen",
+  "content": "## Detaily implementace\n\n- Použití JWT tokenu\n- Podpora OAuth2\n- Přidán mechanismus obnovovacího tokenu",
+  "keywords": "authentication,JWT,OAuth2"
+}
+```
+
+**Parametry** (read - číst poznámku):
+```json
+{
+  "action": "read",
+  "page_number": 1
+}
+```
+
+Nebo použít note_id:
+```json
+{
+  "action": "read",
+  "note_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+**Parametry** (update - aktualizovat poznámku):
+```json
+{
+  "action": "update",
+  "page_number": 1,
+  "content": "## Aktualizovaný obsah\n\nPřidány unit testy",
+  "summary": "Modul ověřování uživatele a testy dokončeny"
+}
+```
+
+**Parametry** (list - seznam všech poznámek):
+```json
+{
+  "action": "list"
+}
+```
+
+**Parametry** (directory - generovat adresář poznámek):
+```json
+{
+  "action": "directory"
+}
+```
+
+**Parametry** (search - vyhledat poznámky):
+```json
+{
+  "action": "search",
+  "keyword": "authentication",
+  "max_results": 10
+}
+```
+
+**Funkce**:
+- Stránkový design, každá stránka spravována samostatně
+- Podpora shrnutí, obsahu, klíčových slov
+- Podpora vyhledávání podle klíčových slov
+- Podpora generování přehledu adresáře (pro porozumění kontextu)
+- Podpora formátu Markdown (text, seznamy, tabulky, bloky kódu)
+- Automatické zaznamenávání časových razítek
+- Ve výchozím nastavení soukromé, přístup pouze pro bytost
+
+**Oprávnění**: Bytosti přistupují ke svým vlastním pracovním poznámkám, kurátor může spravovat všechny poznámky.
+
 ## Návratové Hodnoty
 
 ### ToolResult

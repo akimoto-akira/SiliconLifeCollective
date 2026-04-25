@@ -308,6 +308,148 @@ DiskTool에 다음 기능이 추가되었습니다:
 }
 ```
 
+### 16. 지식 네트워크 도구
+
+**이름**: `knowledge`
+
+**설명**: 지식 네트워크 작업 도구, 지식 삼중항 추가, 조회, 업데이트, 삭제 및 검색용.
+
+**동작**: `add`, `query`, `update`, `delete`, `search`, `get_path`, `validate`, `stats`
+
+**매개변수** (add - 지식 추가):
+```json
+{
+  "action": "add",
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "confidence": 0.95,
+  "tags": ["programming", "language"]
+}
+```
+
+**매개변수** (query - 지식 조회):
+```json
+{
+  "action": "query",
+  "subject": "Python",
+  "predicate": "is_a"
+}
+```
+
+**매개변수** (search - 지식 검색):
+```json
+{
+  "action": "search",
+  "query": "programming language",
+  "limit": 10
+}
+```
+
+**매개변수** (get_path - 지식 경로 가져오기):
+```json
+{
+  "action": "get_path",
+  "from": "Python",
+  "to": "computer_science"
+}
+```
+
+**매개변수** (stats - 통계 정보):
+```json
+{
+  "action": "stats"
+}
+```
+
+**특징**:
+- 삼중항 구조(주어-서술어-목적어) 기반 지식 표현
+- 지식 신뢰도 점수 지원
+- 태그 분류 및 검색 지원
+- 지식 경로 발견(두 지점 간 연관 경로) 지원
+- 지식 유효성 검사 및 무결성 검사 지원
+- 파일 시스템에 영구 저장
+
+**권한**: 모든 생명체 사용 가능.
+
+### 17. 작업 노트 도구
+
+**이름**: `work_note`
+
+**설명**: 실리콘 생명체의 작업 노트 관리. 작업 노트는 페이지 기반 설계로, 개인 일기와 유사(기본적으로 비공개).
+
+**동작**: `create`, `read`, `update`, `delete`, `list`, `directory`, `search`
+
+**매개변수** (create - 노트 생성):
+```json
+{
+  "action": "create",
+  "summary": "사용자 인증 모듈 완료",
+  "content": "## 구현 세부사항\n\n- JWT token 사용\n- OAuth2 지원\n- refresh token 메커니즘 추가",
+  "keywords": "인증,JWT,OAuth2"
+}
+```
+
+**매개변수** (read - 노트 읽기):
+```json
+{
+  "action": "read",
+  "page_number": 1
+}
+```
+
+또는 note_id 사용:
+```json
+{
+  "action": "read",
+  "note_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+**매개변수** (update - 노트 업데이트):
+```json
+{
+  "action": "update",
+  "page_number": 1,
+  "content": "## 업데이트된 내용\n\n단위 테스트 추가",
+  "summary": "사용자 인증 모듈 및 테스트 완료"
+}
+```
+
+**매개변수** (list - 모든 노트 나열):
+```json
+{
+  "action": "list"
+}
+```
+
+**매개변수** (directory - 노트 디렉토리 생성):
+```json
+{
+  "action": "directory"
+}
+```
+
+**매개변수** (search - 노트 검색):
+```json
+{
+  "action": "search",
+  "keyword": "인증",
+  "max_results": 10
+}
+```
+
+**특징**:
+- 페이지 기반 설계, 각 페이지 독립 관리
+- 요약, 내용, 키워드 지원
+- 키워드별 검색 지원
+- 디렉토리 개요 생성 지원(컨텍스트 이해용)
+- Markdown 형식 지원(텍스트, 목록, 표, 코드 블록)
+- 자동 타임스탬프 기록
+- 기본적으로 비공개, 생명체 자신만 접근 가능
+
+**권한**: 생명체는 자신의 작업 노트에 접근, 큐레이터는 모든 노트 관리 가능.
+
 ---
 
 ## 도구 호출 흐름

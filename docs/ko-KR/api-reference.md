@@ -552,6 +552,225 @@ public class ToolResult
 
 ---
 
+## 작업 노트 API
+
+### 작업 노트 목록 가져오기
+
+**GET** `/api/beings/{id}/work-notes`
+
+**응답**:
+```json
+{
+  "notes": [
+    {
+      "id": "note-uuid",
+      "pageNumber": 1,
+      "summary": "사용자 인증 모듈 완료",
+      "keywords": ["인증", "JWT", "OAuth2"],
+      "createdAt": "2026-04-25T10:00:00Z",
+      "updatedAt": "2026-04-25T10:00:00Z"
+    }
+  ],
+  "totalCount": 15
+}
+```
+
+### 단일 노트 상세 정보 가져오기
+
+**GET** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**응답**:
+```json
+{
+  "id": "note-uuid",
+  "pageNumber": 1,
+  "summary": "사용자 인증 모듈 완료",
+  "content": "## 구현 세부사항\n\n- JWT token 사용\n- OAuth2 지원",
+  "keywords": ["인증", "JWT", "OAuth2"],
+  "createdAt": "2026-04-25T10:00:00Z",
+  "updatedAt": "2026-04-25T10:00:00Z"
+}
+```
+
+### 새 노트 생성
+
+**POST** `/api/beings/{id}/work-notes`
+
+**요청**:
+```json
+{
+  "summary": "사용자 인증 모듈 완료",
+  "content": "## 구현 세부사항\n\n- JWT token 사용",
+  "keywords": "인증,JWT,OAuth2"
+}
+```
+
+**응답**: `201 Created`
+
+### 노트 업데이트
+
+**PUT** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**요청**:
+```json
+{
+  "summary": "사용자 인증 모듈 및 테스트 완료",
+  "content": "## 업데이트된 내용\n\n단위 테스트 추가",
+  "keywords": "인증,JWT,OAuth2,테스트"
+}
+```
+
+### 노트 삭제
+
+**DELETE** `/api/beings/{id}/work-notes/{pageNumber}`
+
+### 노트 검색
+
+**GET** `/api/beings/{id}/work-notes/search?keyword=인증&maxResults=10`
+
+### 노트 디렉토리 가져오기
+
+**GET** `/api/beings/{id}/work-notes/directory`
+
+---
+
+## 지식 네트워크 API
+
+### 지식 통계 가져오기
+
+**GET** `/api/knowledge/stats`
+
+**응답**:
+```json
+{
+  "totalTriples": 1523,
+  "totalSubjects": 450,
+  "totalPredicates": 85,
+  "totalObjects": 892,
+  "averageConfidence": 0.87
+}
+```
+
+### 지식 삼중항 추가
+
+**POST** `/api/knowledge/triples`
+
+**요청**:
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "confidence": 0.95,
+  "tags": ["programming", "language"]
+}
+```
+
+**응답**: `201 Created`
+
+### 지식 조회
+
+**GET** `/api/knowledge/query?subject=Python&predicate=is_a`
+
+**응답**:
+```json
+{
+  "triples": [
+    {
+      "subject": "Python",
+      "predicate": "is_a",
+      "object": "programming_language",
+      "confidence": 0.95,
+      "tags": ["programming", "language"]
+    }
+  ]
+}
+```
+
+### 지식 검색
+
+**GET** `/api/knowledge/search?query=programming+language&limit=10`
+
+### 지식 경로 가져오기
+
+**GET** `/api/knowledge/path?from=Python&to=computer_science`
+
+**응답**:
+```json
+{
+  "path": [
+    {"subject": "Python", "predicate": "is_a", "object": "programming_language"},
+    {"subject": "programming_language", "predicate": "belongs_to", "object": "computer_science"}
+  ],
+  "length": 2
+}
+```
+
+### 지식 유효성 검사
+
+**POST** `/api/knowledge/validate`
+
+**요청**:
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language"
+}
+```
+
+### 지식 삭제
+
+**DELETE** `/api/knowledge/triples/{id}`
+
+---
+
+## 프로젝트 관리 API
+
+### 프로젝트 목록 가져오기
+
+**GET** `/api/projects`
+
+**응답**:
+```json
+{
+  "projects": [
+    {
+      "id": "project-uuid",
+      "name": "My Project",
+      "description": "Project description",
+      "createdAt": "2026-04-25T10:00:00Z"
+    }
+  ]
+}
+```
+
+### 프로젝트 생성
+
+**POST** `/api/projects`
+
+**요청**:
+```json
+{
+  "name": "My Project",
+  "description": "Project description"
+}
+```
+
+### 프로젝트 상세 정보 가져오기
+
+**GET** `/api/projects/{id}`
+
+### 프로젝트 업데이트
+
+**PUT** `/api/projects/{id}`
+
+### 프로젝트 삭제
+
+**DELETE** `/api/projects/{id}`
+
+---
+
 ## 다음 단계
 
 - 🚀 [시작 가이드](getting-started.md) 확인

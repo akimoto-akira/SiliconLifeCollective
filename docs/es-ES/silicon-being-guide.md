@@ -333,3 +333,223 @@ var result = dynamicCompileTool.Execute("Execute", new {
 1. Limpiar memoria antigua
 2. Aumentar límites si es necesario
 3. Optimizar uso de memoria
+
+## Sistema de Notas de Trabajo
+
+### Descripción General
+
+Las notas de trabajo son el sistema de diario personal de los seres de silicio, con diseño basado en páginas, utilizado para registrar el progreso del trabajo, notas de aprendizaje, notas de proyectos, etc.
+
+### Características
+
+- **Gestión por páginas**: Cada nota es una página independiente, accesible por número de página
+- **Soporte de Markdown**: El contenido soporta formato Markdown (texto, listas, tablas, bloques de código)
+- **Indexación por palabras clave**: Soporte para añadir palabras clave a las notas, facilitando la búsqueda
+- **Función de resumen**: Cada nota tiene un resumen corto, navegación rápida
+- **Generación de directorio**: Puede generar una vista general del directorio de todas las notas, ayudando a comprender el contexto general
+- **Marca de tiempo**: Registro automático de tiempo de creación y actualización
+- **Privado por defecto**: Solo el ser puede acceder (el curador puede gestionar)
+
+### Casos de Uso
+
+1. **Registro de Progreso del Proyecto**
+   ```
+   Resumen: Módulo de autenticación de usuario completado
+   Contenido: Implementada verificación de token JWT, integración OAuth2, mecanismo de token de actualización
+   Palabras clave: autenticación,JWT,OAuth2
+   ```
+
+2. **Notas de Aprendizaje**
+   ```
+   Resumen: Aprendizaje de mejores prácticas de programación asíncrona en C#
+   Contenido: Precauciones de uso de async/await, escenarios de uso de ConfigureFlags...
+   Palabras clave: C#,asíncrono,mejores prácticas
+   ```
+
+3. **Actas de Reunión**
+   ```
+   Resumen: Reunión de discusión de requisitos del producto
+   Contenido: Discutidos requisitos de nuevas funciones, determinado plan de implementación...
+   Palabras clave: producto,requisitos,reunión
+   ```
+
+### Uso a Través de Herramientas
+
+Los seres pueden gestionar notas de trabajo a través de la herramienta `work_note`:
+
+```json
+// Crear nota
+{
+  "action": "create",
+  "summary": "Módulo de autenticación completado",
+  "content": "## Detalles de implementación\n\n- Uso de token JWT\n- Soporte OAuth2",
+  "keywords": "autenticación,JWT,OAuth2"
+}
+
+// Leer nota
+{
+  "action": "read",
+  "page_number": 1
+}
+
+// Buscar notas
+{
+  "action": "search",
+  "keyword": "autenticación",
+  "max_results": 10
+}
+```
+
+### Gestión a Través de Web UI
+
+1. Navegar a **Gestión de Seres** → Seleccionar ser
+2. Hacer clic en la pestaña **Notas de Trabajo**
+3. Puede ver, buscar, editar notas
+4. Soporte de vista previa de Markdown
+
+## Sistema de Red de Conocimiento
+
+### Descripción General
+
+La red de conocimiento es un sistema de representación y gestión de conocimiento basado en estructura de triple (sujeto-predicado-objeto), utilizado para almacenar y gestionar conocimiento estructurado.
+
+### Conceptos Clave
+
+#### Estructura de Triple
+
+```
+Sujeto (Subject) --Predicado (Predicate)--> Objeto (Object)
+```
+
+**Ejemplos**:
+- `Python` --`is_a`--> `programming_language`
+- `Beijing` --`capital_of`--> `China`
+- `Agua` --`boiling_point`--> `100°C`
+
+#### Confianza
+
+Cada triple de conocimiento tiene una puntuación de confianza (0.0-1.0), indicando el grado de fiabilidad del conocimiento:
+- `1.0`: Absolutamente cierto (teoremas matemáticos, etc.)
+- `0.8-0.99`: Alta confianza (hechos verificados, etc.)
+- `0.5-0.79`: Confianza media (inferencias o hipótesis, etc.)
+- `<0.5`: Baja confianza (conjeturas o información no verificada, etc.)
+
+#### Sistema de Etiquetas
+
+Soporte para añadir etiquetas a triples, facilitando clasificación y búsqueda:
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "tags": ["programming", "language", "popular"]
+}
+```
+
+### Operaciones de Conocimiento
+
+#### 1. Agregar Conocimiento
+
+```json
+{
+  "action": "add",
+  "subject": "C#",
+  "predicate": "created_by",
+  "object": "Microsoft",
+  "confidence": 1.0,
+  "tags": ["programming", "language"]
+}
+```
+
+#### 2. Consultar Conocimiento
+
+```json
+{
+  "action": "query",
+  "subject": "C#",
+  "predicate": "created_by"
+}
+```
+
+#### 3. Buscar Conocimiento
+
+```json
+{
+  "action": "search",
+  "query": "programming language",
+  "limit": 10
+}
+```
+
+#### 4. Descubrir Ruta de Conocimiento
+
+Encontrar rutas asociativas entre dos conceptos:
+```json
+{
+  "action": "get_path",
+  "from": "Python",
+  "to": "computer_science"
+}
+```
+
+Devuelve:
+```
+Python → is_a → programming_language → belongs_to → computer_science
+```
+
+#### 5. Validar Conocimiento
+
+Verificar validez y consistencia del conocimiento:
+```json
+{
+  "action": "validate",
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language"
+}
+```
+
+#### 6. Estadísticas de Conocimiento
+
+Obtener información estadística general de la red de conocimiento:
+```json
+{
+  "action": "stats"
+}
+```
+
+Devuelve:
+```json
+{
+  "totalTriples": 1523,
+  "totalSubjects": 450,
+  "totalPredicates": 85,
+  "totalObjects": 892,
+  "averageConfidence": 0.87
+}
+```
+
+### Casos de Uso
+
+1. **Almacenamiento de Hechos**
+   - Almacenar hechos objetivos y sentido común
+   - Ejemplo: `Tierra` --`is_a`--> `Planeta`
+
+2. **Relaciones de Conceptos**
+   - Registrar relaciones entre conceptos
+   - Ejemplo: `Herencia` --`is_a`--> `Concepto de programación orientada a objetos`
+
+3. **Acumulación de Aprendizaje**
+   - Los seres acumulan conocimiento continuamente a través del aprendizaje
+   - Formar un sistema de conocimiento estructurado
+
+4. **Soporte de Inferencia**
+   - Descubrir relaciones indirectas a través de rutas de conocimiento
+   - Soporte para inferencia y decisiones basadas en conocimiento
+
+### Gestión a Través de Web UI
+
+1. Navegar a la página **Red de Conocimiento**
+2. Ver información estadística de conocimiento
+3. Buscar y navegar conocimiento
+4. Visualización de relaciones de conocimiento (planificado)

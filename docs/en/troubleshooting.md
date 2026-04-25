@@ -291,6 +291,136 @@ Tool execution failed: ...
 
 ---
 
+### Work Notes Issues
+
+#### Issue: Cannot Create Work Notes
+
+**Symptoms**:
+```
+Failed to create work note
+```
+
+**Solution**:
+1. Check if being exists and is running
+2. Verify storage path has write permissions
+3. Check if content is empty (content required)
+4. Check logs for detailed error information
+
+#### Issue: Note Search Returns No Results
+
+**Symptoms**:
+- Search keyword returns empty results
+- But certain related notes exist
+
+**Solution**:
+1. Check if keyword spelling is correct
+2. Try a more general keyword
+3. Verify note contains that keyword (case-sensitive)
+4. Increase `max_results` parameter value
+
+#### Issue: Note Directory Generation is Slow
+
+**Symptoms**:
+- Long response time when generating directory
+- Being has many notes (>1000 pages)
+
+**Solution**:
+1. This is normal, needs to iterate through all notes
+2. Consider archiving old notes periodically
+3. Use search function instead of directory browsing
+4. Planned optimization: add directory caching mechanism
+
+---
+
+### Knowledge Network Issues
+
+#### Issue: Knowledge Query Returns Empty Results
+
+**Symptoms**:
+```
+No knowledge triples found
+```
+
+**Solution**:
+1. Verify subject and predicate spelling
+2. Check if knowledge has been added to network
+3. Use search function for fuzzy matching:
+```json
+{
+  "action": "search",
+  "query": "keyword"
+}
+```
+
+#### Issue: Knowledge Path Finding Fails
+
+**Symptoms**:
+```
+No path found between concepts
+```
+
+**Solution**:
+1. Verify both concepts exist in knowledge network
+2. Check if associative path exists (may have no direct or indirect relationship)
+3. Try adding more knowledge to establish connection
+4. Lower path length limit (if configured)
+
+#### Issue: Knowledge Validation Fails
+
+**Symptoms**:
+```
+Knowledge validation failed
+```
+
+**Solution**:
+1. Check if triple format is correct (subject, predicate, object required)
+2. Verify confidence is within 0.0-1.0 range
+3. Check for duplicate triples
+4. Review validation error details to understand specific problem
+
+#### Issue: Knowledge Network Statistics Inaccurate
+
+**Symptoms**:
+- Statistics numbers don't match expectations
+- Statistics not updated after adding knowledge
+
+**Solution**:
+1. Statistics may take a few seconds to update (cache)
+2. Check if delete operation executed successfully
+3. Restart application to force statistics refresh
+4. Re-query statistics information through API
+
+---
+
+### Project Management Issues
+
+#### Issue: Cannot Create Project
+
+**Symptoms**:
+```
+Failed to create project
+```
+
+**Solution**:
+1. Check if project name is empty (required)
+2. Verify project name is not duplicated
+3. Check storage path has write permissions
+4. Check logs for detailed error information
+
+#### Issue: Project Data Loss
+
+**Symptoms**:
+- Cannot load project information
+- Project file corrupted
+
+**Solution**:
+1. Check if project storage directory exists
+2. Restore project data from backup
+3. Verify JSON file format is correct
+4. Manually repair corrupted project file
+
+---
+
 ## Debugging
 
 ### Enable Verbose Logging

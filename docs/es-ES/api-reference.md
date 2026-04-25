@@ -492,3 +492,222 @@ await fetch('http://localhost:8080/api/beings', {
     body: JSON.stringify({ name: 'MiSer', soul: '# Alma' })
 });
 ```
+
+---
+
+## API de Notas de Trabajo
+
+### Obtener Lista de Notas de Trabajo
+
+**GET** `/api/beings/{id}/work-notes`
+
+**Respuesta**:
+```json
+{
+  "notes": [
+    {
+      "id": "note-uuid",
+      "pageNumber": 1,
+      "summary": "Módulo de autenticación completado",
+      "keywords": ["autenticación", "JWT", "OAuth2"],
+      "createdAt": "2026-04-25T10:00:00Z",
+      "updatedAt": "2026-04-25T10:00:00Z"
+    }
+  ],
+  "totalCount": 15
+}
+```
+
+### Obtener Detalles de Una Nota
+
+**GET** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**Respuesta**:
+```json
+{
+  "id": "note-uuid",
+  "pageNumber": 1,
+  "summary": "Módulo de autenticación completado",
+  "content": "## Detalles de implementación\n\n- Uso de token JWT\n- Soporte OAuth2",
+  "keywords": ["autenticación", "JWT", "OAuth2"],
+  "createdAt": "2026-04-25T10:00:00Z",
+  "updatedAt": "2026-04-25T10:00:00Z"
+}
+```
+
+### Crear Nueva Nota
+
+**POST** `/api/beings/{id}/work-notes`
+
+**Solicitud**:
+```json
+{
+  "summary": "Módulo de autenticación completado",
+  "content": "## Detalles de implementación\n\n- Uso de token JWT",
+  "keywords": "autenticación,JWT,OAuth2"
+}
+```
+
+**Respuesta**: `201 Created`
+
+### Actualizar Nota
+
+**PUT** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**Solicitud**:
+```json
+{
+  "summary": "Módulo de autenticación y pruebas completados",
+  "content": "## Contenido actualizado\n\nPruebas unitarias añadidas",
+  "keywords": "autenticación,JWT,OAuth2,pruebas"
+}
+```
+
+### Eliminar Nota
+
+**DELETE** `/api/beings/{id}/work-notes/{pageNumber}`
+
+### Buscar Notas
+
+**GET** `/api/beings/{id}/work-notes/search?keyword=autenticación&maxResults=10`
+
+### Obtener Directorio de Notas
+
+**GET** `/api/beings/{id}/work-notes/directory`
+
+---
+
+## API de Red de Conocimiento
+
+### Obtener Estadísticas de Conocimiento
+
+**GET** `/api/knowledge/stats`
+
+**Respuesta**:
+```json
+{
+  "totalTriples": 1523,
+  "totalSubjects": 450,
+  "totalPredicates": 85,
+  "totalObjects": 892,
+  "averageConfidence": 0.87
+}
+```
+
+### Agregar Triple de Conocimiento
+
+**POST** `/api/knowledge/triples`
+
+**Solicitud**:
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "confidence": 0.95,
+  "tags": ["programming", "language"]
+}
+```
+
+**Respuesta**: `201 Created`
+
+### Consultar Conocimiento
+
+**GET** `/api/knowledge/query?subject=Python&predicate=is_a`
+
+**Respuesta**:
+```json
+{
+  "triples": [
+    {
+      "subject": "Python",
+      "predicate": "is_a",
+      "object": "programming_language",
+      "confidence": 0.95,
+      "tags": ["programming", "language"]
+    }
+  ]
+}
+```
+
+### Buscar Conocimiento
+
+**GET** `/api/knowledge/search?query=programming+language&limit=10`
+
+### Obtener Ruta de Conocimiento
+
+**GET** `/api/knowledge/path?from=Python&to=computer_science`
+
+**Respuesta**:
+```json
+{
+  "path": [
+    {"subject": "Python", "predicate": "is_a", "object": "programming_language"},
+    {"subject": "programming_language", "predicate": "belongs_to", "object": "computer_science"}
+  ],
+  "length": 2
+}
+```
+
+### Validar Conocimiento
+
+**POST** `/api/knowledge/validate`
+
+**Solicitud**:
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language"
+}
+```
+
+### Eliminar Conocimiento
+
+**DELETE** `/api/knowledge/triples/{id}`
+
+---
+
+## API de Gestión de Proyectos
+
+### Obtener Lista de Proyectos
+
+**GET** `/api/projects`
+
+**Respuesta**:
+```json
+{
+  "projects": [
+    {
+      "id": "project-uuid",
+      "name": "My Project",
+      "description": "Project description",
+      "createdAt": "2026-04-25T10:00:00Z"
+    }
+  ]
+}
+```
+
+### Crear Proyecto
+
+**POST** `/api/projects`
+
+**Solicitud**:
+```json
+{
+  "name": "My Project",
+  "description": "Project description"
+}
+```
+
+### Obtener Detalles del Proyecto
+
+**GET** `/api/projects/{id}`
+
+### Actualizar Proyecto
+
+**PUT** `/api/projects/{id}`
+
+### Eliminar Proyecto
+
+**DELETE** `/api/projects/{id}`

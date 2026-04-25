@@ -180,6 +180,226 @@ data/
             └── task-history.json
 ```
 
+## 工作笔记系统
+
+### 概述
+
+工作笔记是硅基生命体的个人日记系统，采用页式设计，用于记录工作进展、学习心得、项目笔记等。
+
+### 特性
+
+- **页式管理**：每条笔记独立成页，按页码访问
+- **Markdown 支持**：内容支持 Markdown 格式（文本、列表、表格、代码块）
+- **关键词索引**：支持为笔记添加关键词，便于搜索
+- **摘要功能**：每条笔记有简短摘要，快速浏览
+- **目录生成**：可生成所有笔记的目录概览，帮助理解整体上下文
+- **时间戳**：自动记录创建和更新时间
+- **默认私有**：仅生命体自身可访问（主理人可管理）
+
+### 使用场景
+
+1. **项目进展记录**
+   ```
+   摘要：完成用户认证模块
+   内容：实现了 JWT token 验证、OAuth2 集成、刷新 token 机制
+   关键词：认证,JWT,OAuth2
+   ```
+
+2. **学习笔记**
+   ```
+   摘要：学习 C# 异步编程最佳实践
+   内容：async/await 使用注意事项、ConfigureAwait 的使用场景...
+   关键词：C#,异步,最佳实践
+   ```
+
+3. **会议纪要**
+   ```
+   摘要：产品需求讨论会
+   内容：讨论了新功能需求，确定了实现方案...
+   关键词：产品,需求,会议
+   ```
+
+### 通过工具使用
+
+生命体可以通过 `work_note` 工具管理工作笔记：
+
+```json
+// 创建笔记
+{
+  "action": "create",
+  "summary": "完成用户认证模块",
+  "content": "## 实现细节\n\n- 使用 JWT token\n- 支持 OAuth2",
+  "keywords": "认证,JWT,OAuth2"
+}
+
+// 读取笔记
+{
+  "action": "read",
+  "page_number": 1
+}
+
+// 搜索笔记
+{
+  "action": "search",
+  "keyword": "认证",
+  "max_results": 10
+}
+```
+
+### 通过 Web UI 管理
+
+1. 导航到**生命体管理** → 选择生命体
+2. 点击**工作笔记**标签页
+3. 可以查看、搜索、编辑笔记
+4. 支持 Markdown 预览
+
+## 知识网络系统
+
+### 概述
+
+知识网络是基于三元组结构（主语-谓语-宾语）的知识表示和管理系统，用于存储和管理结构化的知识。
+
+### 核心概念
+
+#### 三元组结构
+
+```
+主语 (Subject) --谓语 (Predicate)--> 宾语 (Object)
+```
+
+**示例**：
+- `Python` --`is_a`--> `programming_language`
+- `北京` --`capital_of`--> `中国`
+- `水` --`boiling_point`--> `100°C`
+
+#### 置信度
+
+每个知识三元组都有置信度评分（0.0-1.0），表示知识的可信程度：
+- `1.0`：绝对确定（如数学定理）
+- `0.8-0.99`：高度可信（如经过验证的事实）
+- `0.5-0.79`：中等可信（如推断或假设）
+- `<0.5`：低可信（如猜测或未验证信息）
+
+#### 标签系统
+
+支持为三元组添加标签，便于分类和搜索：
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "tags": ["programming", "language", "popular"]
+}
+```
+
+### 知识操作
+
+#### 1. 添加知识
+
+```json
+{
+  "action": "add",
+  "subject": "C#",
+  "predicate": "created_by",
+  "object": "Microsoft",
+  "confidence": 1.0,
+  "tags": ["programming", "language"]
+}
+```
+
+#### 2. 查询知识
+
+```json
+{
+  "action": "query",
+  "subject": "C#",
+  "predicate": "created_by"
+}
+```
+
+#### 3. 搜索知识
+
+```json
+{
+  "action": "search",
+  "query": "programming language",
+  "limit": 10
+}
+```
+
+#### 4. 发现知识路径
+
+找出两个概念之间的关联路径：
+```json
+{
+  "action": "get_path",
+  "from": "Python",
+  "to": "computer_science"
+}
+```
+
+返回：
+```
+Python → is_a → programming_language → belongs_to → computer_science
+```
+
+#### 5. 知识验证
+
+检查知识的有效性和一致性：
+```json
+{
+  "action": "validate",
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language"
+}
+```
+
+#### 6. 知识统计
+
+获取知识网络的整体统计信息：
+```json
+{
+  "action": "stats"
+}
+```
+
+返回：
+```json
+{
+  "totalTriples": 1523,
+  "totalSubjects": 450,
+  "totalPredicates": 85,
+  "totalObjects": 892,
+  "averageConfidence": 0.87
+}
+```
+
+### 使用场景
+
+1. **事实存储**
+   - 存储客观事实和常识
+   - 示例：`地球` --`is_a`--> `行星`
+
+2. **概念关系**
+   - 记录概念之间的关系
+   - 示例：`继承` --`is_a`--> `面向对象编程概念`
+
+3. **学习积累**
+   - 生命体通过学习不断积累知识
+   - 形成结构化的知识体系
+
+4. **推理支持**
+   - 通过知识路径发现间接关系
+   - 支持基于知识的推理和决策
+
+### 通过 Web UI 管理
+
+1. 导航到**知识网络**页面
+2. 查看知识统计信息
+3. 搜索和浏览知识
+4. 可视化知识关系图（计划中）
+
 ## 最佳实践
 
 ### 灵魂文件编写

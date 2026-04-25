@@ -309,6 +309,148 @@ DiskTool にローカル検索機能が追加されました（SearchTool から
 }
 ```
 
+### 16. ナレッジネットワークツール
+
+**名前**: `knowledge`
+
+**説明**: ナレッジネットワーク操作ツール、ナレッジトリプルの追加、照会、更新、削除、検索用。
+
+**アクション**: `add`、`query`、`update`、`delete`、`search`、`get_path`、`validate`、`stats`
+
+**パラメータ**（add - ナレッジ追加）:
+```json
+{
+  "action": "add",
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "confidence": 0.95,
+  "tags": ["programming", "language"]
+}
+```
+
+**パラメータ**（query - ナレッジ照会）:
+```json
+{
+  "action": "query",
+  "subject": "Python",
+  "predicate": "is_a"
+}
+```
+
+**パラメータ**（search - ナレッジ検索）:
+```json
+{
+  "action": "search",
+  "query": "programming language",
+  "limit": 10
+}
+```
+
+**パラメータ**（get_path - ナレッジパス取得）:
+```json
+{
+  "action": "get_path",
+  "from": "Python",
+  "to": "computer_science"
+}
+```
+
+**パラメータ**（stats - 統計情報）:
+```json
+{
+  "action": "stats"
+}
+```
+
+**特徴**:
+- トリプル構造（主語-述語-目的語）ベースのナレッジ表現
+- ナレッジ信頼度スコア対応
+- タグ分類および検索対応
+- ナレッジパス発見（2点間の関連パス）対応
+- ナレッジ検証および整合性チェック対応
+- ファイルシステムに永続保存
+
+**権限**: すべての生命体が使用可能。
+
+### 17. 作業ノートツール
+
+**名前**: `work_note`
+
+**説明**: シリコン生命体の作業ノート管理。作業ノートはページベース設計で、個人日記に類似（デフォルトで非公開）。
+
+**アクション**: `create`、`read`、`update`、`delete`、`list`、`directory`、`search`
+
+**パラメータ**（create - ノート作成）:
+```json
+{
+  "action": "create",
+  "summary": "ユーザー認証モジュール完了",
+  "content": "## 実装詳細\n\n- JWT token使用\n- OAuth2対応\n- refresh tokenメカニズム追加",
+  "keywords": "認証,JWT,OAuth2"
+}
+```
+
+**パラメータ**（read - ノート読み取り）:
+```json
+{
+  "action": "read",
+  "page_number": 1
+}
+```
+
+またはnote_idを使用:
+```json
+{
+  "action": "read",
+  "note_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+**パラメータ**（update - ノート更新）:
+```json
+{
+  "action": "update",
+  "page_number": 1,
+  "content": "## 更新後の内容\n\nユニットテスト追加",
+  "summary": "ユーザー認証モジュールおよびテスト完了"
+}
+```
+
+**パラメータ**（list - 全ノート一覧）:
+```json
+{
+  "action": "list"
+}
+```
+
+**パラメータ**（directory - ノート目次生成）:
+```json
+{
+  "action": "directory"
+}
+```
+
+**パラメータ**（search - ノート検索）:
+```json
+{
+  "action": "search",
+  "keyword": "認証",
+  "max_results": 10
+}
+```
+
+**特徴**:
+- ページベース設計、各ページ独立管理
+- 要約、内容、キーワード対応
+- キーワード別検索対応
+- 目次概要生成対応（コンテキスト理解用）
+- Markdown形式対応（テキスト、リスト、表、コードブロック）
+- 自動タイムスタンプ記録
+- デフォルトで非公開、生命体自身のみアクセス可能
+
+**権限**: 生命体は自分の作業ノートにアクセス、キュレーターは全ノート管理可能。
+
 ---
 
 ## カスタムツールの作成

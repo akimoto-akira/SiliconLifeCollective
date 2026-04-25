@@ -180,6 +180,226 @@ data/
             └── task-history.json
 ```
 
+## 工作筆記系統
+
+### 概述
+
+工作筆記是硅基生命體的個人日記系統，採用頁式設計，用於記錄工作進展、學習心得、專案筆記等。
+
+### 特性
+
+- **頁式管理**：每條筆記獨立成頁，按頁碼訪問
+- **Markdown 支持**：內容支持 Markdown 格式（文本、列表、表格、程式碼區塊）
+- **關鍵詞索引**：支持為筆記添加關鍵詞，便於搜索
+- **摘要功能**：每條筆記有簡短摘要，快速瀏覽
+- **目錄生成**：可生成所有筆記的目錄概覽，幫助理解整體上下文
+- **時間戳**：自動記錄創建和更新時間
+- **默認私有**：僅生命體自身可訪問（主理人可管理）
+
+### 使用場景
+
+1. **專案進展記錄**
+   ```
+   摘要：完成用戶認證模組
+   內容：實現了 JWT token 驗證、OAuth2 整合、刷新 token 機制
+   關鍵詞：認證,JWT,OAuth2
+   ```
+
+2. **學習筆記**
+   ```
+   摘要：學習 C# 異步程式設計最佳實踐
+   內容：async/await 使用注意事項、ConfigureAwait 的使用場景...
+   關鍵詞：C#,異步,最佳實踐
+   ```
+
+3. **會議紀要**
+   ```
+   摘要：產品需求討論會
+   內容：討論了新功能需求，確定了實現方案...
+   關鍵詞：產品,需求,會議
+   ```
+
+### 通過工具使用
+
+生命體可以通過 `work_note` 工具管理工作筆記：
+
+```json
+// 創建筆記
+{
+  "action": "create",
+  "summary": "完成用戶認證模組",
+  "content": "## 實現細節\n\n- 使用 JWT token\n- 支持 OAuth2",
+  "keywords": "認證,JWT,OAuth2"
+}
+
+// 讀取筆記
+{
+  "action": "read",
+  "page_number": 1
+}
+
+// 搜索筆記
+{
+  "action": "search",
+  "keyword": "認證",
+  "max_results": 10
+}
+```
+
+### 通過 Web UI 管理
+
+1. 導航到**生命體管理** → 選擇生命體
+2. 點擊**工作筆記**標籤頁
+3. 可以查看、搜索、編輯筆記
+4. 支持 Markdown 預覽
+
+## 知識網絡系統
+
+### 概述
+
+知識網絡是基於三元組結構（主語-謂語-賓語）的知識表示和管理系統，用於儲存和管理結構化的知識。
+
+### 核心概念
+
+#### 三元組結構
+
+```
+主語 (Subject) --謂語 (Predicate)--> 賓語 (Object)
+```
+
+**示例**：
+- `Python` --`is_a`--> `programming_language`
+- `北京` --`capital_of`--> `中國`
+- `水` --`boiling_point`--> `100°C`
+
+#### 置信度
+
+每個知識三元組都有置信度評分（0.0-1.0），表示知識的可信程度：
+- `1.0`：絕對確定（如數學定理）
+- `0.8-0.99`：高度可信（如經過驗證的事實）
+- `0.5-0.79`：中等可信（如推斷或假設）
+- `<0.5`：低可信（如猜測或未驗證資訊）
+
+#### 標籤系統
+
+支持為三元組添加標籤，便於分類和搜索：
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "tags": ["programming", "language", "popular"]
+}
+```
+
+### 知識操作
+
+#### 1. 添加知識
+
+```json
+{
+  "action": "add",
+  "subject": "C#",
+  "predicate": "created_by",
+  "object": "Microsoft",
+  "confidence": 1.0,
+  "tags": ["programming", "language"]
+}
+```
+
+#### 2. 查詢知識
+
+```json
+{
+  "action": "query",
+  "subject": "C#",
+  "predicate": "created_by"
+}
+```
+
+#### 3. 搜索知識
+
+```json
+{
+  "action": "search",
+  "query": "programming language",
+  "limit": 10
+}
+```
+
+#### 4. 發現知識路徑
+
+找出兩個概念之間的關聯路徑：
+```json
+{
+  "action": "get_path",
+  "from": "Python",
+  "to": "computer_science"
+}
+```
+
+返回：
+```
+Python → is_a → programming_language → belongs_to → computer_science
+```
+
+#### 5. 知識驗證
+
+檢查知識的有效性和一致性：
+```json
+{
+  "action": "validate",
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language"
+}
+```
+
+#### 6. 知識統計
+
+獲取知識網絡的整體統計資訊：
+```json
+{
+  "action": "stats"
+}
+```
+
+返回：
+```json
+{
+  "totalTriples": 1523,
+  "totalSubjects": 450,
+  "totalPredicates": 85,
+  "totalObjects": 892,
+  "averageConfidence": 0.87
+}
+```
+
+### 使用場景
+
+1. **事實儲存**
+   - 儲存客觀事實和常識
+   - 示例：`地球` --`is_a`--> `行星`
+
+2. **概念關係**
+   - 記錄概念之間的關係
+   - 示例：`繼承` --`is_a`--> `面向物件程式設計概念`
+
+3. **學習積累**
+   - 生命體通過學習不斷積累知識
+   - 形成結構化的知識體系
+
+4. **推理支持**
+   - 通過知識路徑發現間接關係
+   - 支持基於知識的推理和決策
+
+### 通過 Web UI 管理
+
+1. 導航到**知識網絡**頁面
+2. 查看知識統計資訊
+3. 搜索和瀏覽知識
+4. 視覺化知識關係圖（計劃中）
+
 ## 最佳实践
 
 ### 靈魂檔案编寫

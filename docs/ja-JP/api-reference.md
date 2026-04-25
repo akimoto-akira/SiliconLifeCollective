@@ -552,6 +552,225 @@ public class ToolResult
 
 ---
 
+## 作業ノート API
+
+### 作業ノートリスト取得
+
+**GET** `/api/beings/{id}/work-notes`
+
+**レスポンス**:
+```json
+{
+  "notes": [
+    {
+      "id": "note-uuid",
+      "pageNumber": 1,
+      "summary": "ユーザー認証モジュール完了",
+      "keywords": ["認証", "JWT", "OAuth2"],
+      "createdAt": "2026-04-25T10:00:00Z",
+      "updatedAt": "2026-04-25T10:00:00Z"
+    }
+  ],
+  "totalCount": 15
+}
+```
+
+### 単一ノート詳細取得
+
+**GET** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**レスポンス**:
+```json
+{
+  "id": "note-uuid",
+  "pageNumber": 1,
+  "summary": "ユーザー認証モジュール完了",
+  "content": "## 実装詳細\n\n- JWT token使用\n- OAuth2対応",
+  "keywords": ["認証", "JWT", "OAuth2"],
+  "createdAt": "2026-04-25T10:00:00Z",
+  "updatedAt": "2026-04-25T10:00:00Z"
+}
+```
+
+### 新規ノート作成
+
+**POST** `/api/beings/{id}/work-notes`
+
+**リクエスト**:
+```json
+{
+  "summary": "ユーザー認証モジュール完了",
+  "content": "## 実装詳細\n\n- JWT token使用",
+  "keywords": "認証,JWT,OAuth2"
+}
+```
+
+**レスポンス**: `201 Created`
+
+### ノート更新
+
+**PUT** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**リクエスト**:
+```json
+{
+  "summary": "ユーザー認証モジュールおよびテスト完了",
+  "content": "## 更新後の内容\n\nユニットテスト追加",
+  "keywords": "認証,JWT,OAuth2,テスト"
+}
+```
+
+### ノート削除
+
+**DELETE** `/api/beings/{id}/work-notes/{pageNumber}`
+
+### ノート検索
+
+**GET** `/api/beings/{id}/work-notes/search?keyword=認証&maxResults=10`
+
+### ノート目次取得
+
+**GET** `/api/beings/{id}/work-notes/directory`
+
+---
+
+## ナレッジネットワーク API
+
+### ナレッジ統計取得
+
+**GET** `/api/knowledge/stats`
+
+**レスポンス**:
+```json
+{
+  "totalTriples": 1523,
+  "totalSubjects": 450,
+  "totalPredicates": 85,
+  "totalObjects": 892,
+  "averageConfidence": 0.87
+}
+```
+
+### ナレッジトリプル追加
+
+**POST** `/api/knowledge/triples`
+
+**リクエスト**:
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "confidence": 0.95,
+  "tags": ["programming", "language"]
+}
+```
+
+**レスポンス**: `201 Created`
+
+### ナレッジ照会
+
+**GET** `/api/knowledge/query?subject=Python&predicate=is_a`
+
+**レスポンス**:
+```json
+{
+  "triples": [
+    {
+      "subject": "Python",
+      "predicate": "is_a",
+      "object": "programming_language",
+      "confidence": 0.95,
+      "tags": ["programming", "language"]
+    }
+  ]
+}
+```
+
+### ナレッジ検索
+
+**GET** `/api/knowledge/search?query=programming+language&limit=10`
+
+### ナレッジパス取得
+
+**GET** `/api/knowledge/path?from=Python&to=computer_science`
+
+**レスポンス**:
+```json
+{
+  "path": [
+    {"subject": "Python", "predicate": "is_a", "object": "programming_language"},
+    {"subject": "programming_language", "predicate": "belongs_to", "object": "computer_science"}
+  ],
+  "length": 2
+}
+```
+
+### ナレッジ検証
+
+**POST** `/api/knowledge/validate`
+
+**リクエスト**:
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language"
+}
+```
+
+### ナレッジ削除
+
+**DELETE** `/api/knowledge/triples/{id}`
+
+---
+
+## プロジェクト管理 API
+
+### プロジェクトリスト取得
+
+**GET** `/api/projects`
+
+**レスポンス**:
+```json
+{
+  "projects": [
+    {
+      "id": "project-uuid",
+      "name": "My Project",
+      "description": "Project description",
+      "createdAt": "2026-04-25T10:00:00Z"
+    }
+  ]
+}
+```
+
+### プロジェクト作成
+
+**POST** `/api/projects`
+
+**リクエスト**:
+```json
+{
+  "name": "My Project",
+  "description": "Project description"
+}
+```
+
+### プロジェクト詳細取得
+
+**GET** `/api/projects/{id}`
+
+### プロジェクト更新
+
+**PUT** `/api/projects/{id}`
+
+### プロジェクト削除
+
+**DELETE** `/api/projects/{id}`
+
+---
+
 ## 次のステップ
 
 - 🚀 [はじめにガイド](getting-started.md)を確認

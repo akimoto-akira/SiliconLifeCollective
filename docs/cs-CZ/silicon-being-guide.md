@@ -178,3 +178,223 @@ Systémová oznámení pro všechny přihlášené bytosti.
 - [Bezpečnost](security.md)
 - [API Reference](api-reference.md)
 - [Vývojový Průvodce](development-guide.md)
+
+## Systém Pracovních Poznámek
+
+### Přehled
+
+Pracovní poznámky jsou osobní deníkový systém pro křemíkové bytosti, používající stránkový design k zaznamenávání pracovního postupu, poznámek k učení, projektových poznámek atd.
+
+### Funkce
+
+- **Správa stránek**: Každá poznámka je nezávislá stránka, přístupná podle čísla stránky
+- **Podpora Markdown**: Obsah podporuje formát Markdown (text, seznamy, tabulky, bloky kódu)
+- **Indexace klíčových slov**: Podpora přidávání klíčových slov k poznámkám pro snadné vyhledávání
+- **Funkce shrnutí**: Každá poznámka má krátké shrnutí pro rychlé procházení
+- **Generování adresáře**: Může generovat přehled adresáře všech poznámek, pomáhá pochopit celkový kontext
+- **Časová razítka**: Automatické zaznamenávání časů vytvoření a aktualizace
+- **Ve výchozím nastavení soukromé**: Přístup pouze pro bytost (kurátor může spravovat)
+
+### Případy Použití
+
+1. **Záznam Postupu Projektu**
+   ```
+   Shrnutí: Modul ověřování uživatele dokončen
+   Obsah: Implementováno ověřování JWT tokenu, integrace OAuth2, mechanismus obnovovacího tokenu
+   Klíčová slova: authentication,JWT,OAuth2
+   ```
+
+2. **Poznámky k Učení**
+   ```
+   Shrnutí: Učení osvědčených postupů C# async programování
+   Obsah: Upozornění k použití async/await, scénáře použití ConfigureFlags...
+   Klíčová slova: C#,async,best practices
+   ```
+
+3. **Zápisy ze Schůzek**
+   ```
+   Shrnutí: Schůzka o požadavcích na produkt
+   Obsah: Diskutovány požadavky na nové funkce, určen plán implementace...
+   Klíčová slova: product,requirements,meeting
+   ```
+
+### Použití Prostřednictvím Nástrojů
+
+Bytosti mohou spravovat pracovní poznámky pomocí nástroje `work_note`:
+
+```json
+// Vytvořit poznámku
+{
+  "action": "create",
+  "summary": "Modul ověřování uživatele dokončen",
+  "content": "## Detaily implementace\n\n- Použití JWT tokenu\n- Podpora OAuth2",
+  "keywords": "authentication,JWT,OAuth2"
+}
+
+// Číst poznámku
+{
+  "action": "read",
+  "page_number": 1
+}
+
+// Vyhledat poznámky
+{
+  "action": "search",
+  "keyword": "authentication",
+  "max_results": 10
+}
+```
+
+### Správa Prostřednictvím Web UI
+
+1. Přejděte na **Správa Bytostí** → Vyberte bytost
+2. Klikněte na záložku **Pracovní Poznámky**
+3. Lze zobrazit, vyhledávat, upravovat poznámky
+4. Podpora náhledu Markdown
+
+## Systém Sítě Znalostí
+
+### Přehled
+
+Síť znalostí je systém reprezentace a správy znalostí založený na struktuře trojice (subjekt-predikát-objekt), používaný k ukládání a správě strukturovaných znalostí.
+
+### Základní Koncepty
+
+#### Struktura Trojice
+
+```
+Subjekt (Subject) --Predikát (Predicate)--> Objekt (Object)
+```
+
+**Příklady**:
+- `Python` --`is_a`--> `programming_language`
+- `Peking` --`capital_of`--> `China`
+- `Voda` --`boiling_point`--> `100°C`
+
+#### Důvěryhodnost
+
+Každá trojice znalostí má skóre důvěryhodnosti (0.0-1.0), udávající spolehlivost znalosti:
+- `1.0`: Absolutně jisté (matematické věty atd.)
+- `0.8-0.99`: Vysoká důvěryhodnost (ověřená fakta atd.)
+- `0.5-0.79`: Střední důvěryhodnost (odvození nebo hypotézy atd.)
+- `<0.5`: Nízká důvěryhodnost (domněnky nebo neověřené informace atd.)
+
+#### Systém Štítků
+
+Podpora přidávání štítků k trojicím pro snadnou klasifikaci a vyhledávání:
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "tags": ["programming", "language", "popular"]
+}
+```
+
+### Operace se Znalostmi
+
+#### 1. Přidat Znalost
+
+```json
+{
+  "action": "add",
+  "subject": "C#",
+  "predicate": "created_by",
+  "object": "Microsoft",
+  "confidence": 1.0,
+  "tags": ["programming", "language"]
+}
+```
+
+#### 2. Dotaz na Znalost
+
+```json
+{
+  "action": "query",
+  "subject": "C#",
+  "predicate": "created_by"
+}
+```
+
+#### 3. Vyhledat Znalost
+
+```json
+{
+  "action": "search",
+  "query": "programming language",
+  "limit": 10
+}
+```
+
+#### 4. Objevit Cestu Znalostí
+
+Najít asociativní cesty mezi dvěma koncepty:
+```json
+{
+  "action": "get_path",
+  "from": "Python",
+  "to": "computer_science"
+}
+```
+
+Vrátí:
+```
+Python → is_a → programming_language → belongs_to → computer_science
+```
+
+#### 5. Validovat Znalost
+
+Kontrola platnosti a konzistence znalosti:
+```json
+{
+  "action": "validate",
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language"
+}
+```
+
+#### 6. Statistiky Znalostí
+
+Získat celkové statistiky sítě znalostí:
+```json
+{
+  "action": "stats"
+}
+```
+
+Vrátí:
+```json
+{
+  "totalTriples": 1523,
+  "totalSubjects": 450,
+  "totalPredicates": 85,
+  "totalObjects": 892,
+  "averageConfidence": 0.87
+}
+```
+
+### Případy Použití
+
+1. **Ukládání Faktů**
+   - Ukládání objektivních faktů a common sense
+   - Příklad: `Země` --`is_a`--> `Planeta`
+
+2. **Vztahy Konceptů**
+   - Zaznamenávání vztahů mezi koncepty
+   - Příklad: `Dědičnost` --`is_a`--> `Koncept objektově orientovaného programování`
+
+3. **Akumulace Učení**
+   - Bytosti neustále akumulují znalosti prostřednictvím učení
+   - Vytváření strukturovaných systémů znalostí
+
+4. **Podpora Odvozování**
+   - Objevování nepřímých vztahů prostřednictvím cest znalostí
+   - Podpora odvozování a rozhodování založeného na znalostech
+
+### Správa Prostřednictvím Web UI
+
+1. Přejděte na stránku **Síť Znalostí**
+2. Zobrazit statistiky znalostí
+3. Vyhledávat a procházet znalosti
+4. Vizualizace grafu vztahů znalostí (plánováno)

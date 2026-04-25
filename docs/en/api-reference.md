@@ -552,6 +552,225 @@ public class ToolResult
 
 ---
 
+## Work Notes API
+
+### Get Work Notes List
+
+**GET** `/api/beings/{id}/work-notes`
+
+**Response**:
+```json
+{
+  "notes": [
+    {
+      "id": "note-uuid",
+      "pageNumber": 1,
+      "summary": "User authentication module completed",
+      "keywords": ["authentication", "JWT", "OAuth2"],
+      "createdAt": "2026-04-25T10:00:00Z",
+      "updatedAt": "2026-04-25T10:00:00Z"
+    }
+  ],
+  "totalCount": 15
+}
+```
+
+### Get Single Note Details
+
+**GET** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**Response**:
+```json
+{
+  "id": "note-uuid",
+  "pageNumber": 1,
+  "summary": "User authentication module completed",
+  "content": "## Implementation Details\n\n- Using JWT token\n- OAuth2 support",
+  "keywords": ["authentication", "JWT", "OAuth2"],
+  "createdAt": "2026-04-25T10:00:00Z",
+  "updatedAt": "2026-04-25T10:00:00Z"
+}
+```
+
+### Create New Note
+
+**POST** `/api/beings/{id}/work-notes`
+
+**Request**:
+```json
+{
+  "summary": "User authentication module completed",
+  "content": "## Implementation Details\n\n- Using JWT token",
+  "keywords": "authentication,JWT,OAuth2"
+}
+```
+
+**Response**: `201 Created`
+
+### Update Note
+
+**PUT** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**Request**:
+```json
+{
+  "summary": "User authentication module and tests completed",
+  "content": "## Updated Content\n\nUnit tests added",
+  "keywords": "authentication,JWT,OAuth2,tests"
+}
+```
+
+### Delete Note
+
+**DELETE** `/api/beings/{id}/work-notes/{pageNumber}`
+
+### Search Notes
+
+**GET** `/api/beings/{id}/work-notes/search?keyword=authentication&maxResults=10`
+
+### Get Note Directory
+
+**GET** `/api/beings/{id}/work-notes/directory`
+
+---
+
+## Knowledge Network API
+
+### Get Knowledge Statistics
+
+**GET** `/api/knowledge/stats`
+
+**Response**:
+```json
+{
+  "totalTriples": 1523,
+  "totalSubjects": 450,
+  "totalPredicates": 85,
+  "totalObjects": 892,
+  "averageConfidence": 0.87
+}
+```
+
+### Add Knowledge Triple
+
+**POST** `/api/knowledge/triples`
+
+**Request**:
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "confidence": 0.95,
+  "tags": ["programming", "language"]
+}
+```
+
+**Response**: `201 Created`
+
+### Query Knowledge
+
+**GET** `/api/knowledge/query?subject=Python&predicate=is_a`
+
+**Response**:
+```json
+{
+  "triples": [
+    {
+      "subject": "Python",
+      "predicate": "is_a",
+      "object": "programming_language",
+      "confidence": 0.95,
+      "tags": ["programming", "language"]
+    }
+  ]
+}
+```
+
+### Search Knowledge
+
+**GET** `/api/knowledge/search?query=programming+language&limit=10`
+
+### Get Knowledge Path
+
+**GET** `/api/knowledge/path?from=Python&to=computer_science`
+
+**Response**:
+```json
+{
+  "path": [
+    {"subject": "Python", "predicate": "is_a", "object": "programming_language"},
+    {"subject": "programming_language", "predicate": "belongs_to", "object": "computer_science"}
+  ],
+  "length": 2
+}
+```
+
+### Validate Knowledge
+
+**POST** `/api/knowledge/validate`
+
+**Request**:
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language"
+}
+```
+
+### Delete Knowledge
+
+**DELETE** `/api/knowledge/triples/{id}`
+
+---
+
+## Project Management API
+
+### Get Projects List
+
+**GET** `/api/projects`
+
+**Response**:
+```json
+{
+  "projects": [
+    {
+      "id": "project-uuid",
+      "name": "My Project",
+      "description": "Project description",
+      "createdAt": "2026-04-25T10:00:00Z"
+    }
+  ]
+}
+```
+
+### Create Project
+
+**POST** `/api/projects`
+
+**Request**:
+```json
+{
+  "name": "My Project",
+  "description": "Project description"
+}
+```
+
+### Get Project Details
+
+**GET** `/api/projects/{id}`
+
+### Update Project
+
+**PUT** `/api/projects/{id}`
+
+### Delete Project
+
+**DELETE** `/api/projects/{id}`
+
+---
+
 ## Next Steps
 
 - 🚀 Check the [Getting Started Guide](getting-started.md)

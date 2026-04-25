@@ -247,6 +247,136 @@ dotnet --version
 ollama --version
 ```
 
+### Problémy s Pracovními Poznámками
+
+#### Problém: Nelze Vytvořit Pracovní Poznámku
+
+**Příznaky**:
+```
+Failed to create work note
+```
+
+**Řešení**:
+1. Zkontrolujte, zda bytost existuje a je spuštěna
+2. Ověřte, že cesta úložiště má oprávnění k zápisu
+3. Zkontrolujte, zda obsah není prázdný (obsah je vyžadován)
+4. Zkontrolujte logy pro podrobné informace o chybě
+
+#### Problém: Vyhledávání Poznámek Nevrací Výsledky
+
+**Příznaky**:
+- Vyhledávání klíčového slova vrací prázdné výsledky
+- Ale jistě existují související poznámky
+
+**Řešení**:
+1. Zkontrolujte správnost pravopisu klíčového slova
+2. Zkuste obecnější klíčové slovo
+3. Ověřte, že poznámka obsahuje toto klíčové slovo (rozlišuje velká/malá písmena)
+4. Zvyšte hodnotu parametru `max_results`
+
+#### Problém: Generování Adresáře Poznámek Je Pomalé
+
+**Příznaky**:
+- Dlouhá doba odezvy při generování adresáře
+- Bytost má mnoho poznámek (>1000 stránek)
+
+**Řešení**:
+1. Toto je normální, potřebuje iterovat všechny poznámky
+2. Zvažte pravidelné archivování starých poznámek
+3. Použijte funkci vyhledávání místo procházení adresáře
+4. Plánovaná optimalizace: přidat mechanismus ukládání adresáře do mezipaměti
+
+---
+
+### Problémy se Sítí Znalostí
+
+#### Problém: Dotaz na Znalost Vrací Prázdné Výsledky
+
+**Příznaky**:
+```
+No knowledge triples found
+```
+
+**Řešení**:
+1. Ověřte pravopis subjektu a predikátu
+2. Zkontrolujte, zda byla znalost přidána do sítě
+3. Použijte funkci vyhledávání pro fuzzy matching:
+```json
+{
+  "action": "search",
+  "query": "klíčové slovo"
+}
+```
+
+#### Problém: Hledání Cesty Znalostí Selhává
+
+**Příznaky**:
+```
+No path found between concepts
+```
+
+**Řešení**:
+1. Ověřte, že oba koncepty existují v síti znalostí
+2. Zkontrolujte, zda existuje asociativní cesta (může neexistovat přímý nebo nepřímý vztah)
+3. Zkuste přidat více znalostí pro navázání spojení
+4. Snižte limit délky cesty (pokud je nakonfigurován)
+
+#### Problém: Validace Znalostí Selhává
+
+**Příznaky**:
+```
+Knowledge validation failed
+```
+
+**Řešení**:
+1. Zkontrolujte, zda je formát trojice správný (subjekt, predikát, objekt jsou vyžadovány)
+2. Ověřte, že důvěryhodnost je v rozsahu 0.0-1.0
+3. Zkontrolujte duplicity trojic
+4. Zkontrolujte podrobnosti chyby validace pro pochopení konkrétního problému
+
+#### Problém: Statistiky Sítě Znalostí Jsou Nepřesné
+
+**Příznaky**:
+- Čísla statistik neodpovídají očekávání
+- Statistiky se neaktualizují po přidání znalosti
+
+**Řešení**:
+1. Statistiky mohou trvat několik sekund k aktualizaci (mezipaměť)
+2. Zkontrolujte, zda byla operace smazání úspěšně provedena
+3. Restartujte aplikaci pro vynucení obnovení statistik
+4. Znovu dotazujte informace o statistikách prostřednictvím API
+
+---
+
+### Problémy se Správou Projektů
+
+#### Problém: Nelze Vytvořit Projekt
+
+**Příznaky**:
+```
+Failed to create project
+```
+
+**Řešení**:
+1. Zkontrolujte, zda název projektu není prázdný (vyžadováno)
+2. Ověřte, že název projektu není duplicitní
+3. Zkontrolujte, že cesta úložiště má oprávnění k zápisu
+4. Zkontrolujte logy pro podrobné informace o chybě
+
+#### Problém: Ztráta Dat Projektu
+
+**Příznaky**:
+- Nelze načíst informace o projektu
+- Soubor projektu je poškozen
+
+**Řešení**:
+1. Zkontrolujte, zda existuje adresář úložiště projektu
+2. Obnovte data projektu ze zálohy
+3. Ověřte, že formát JSON souboru je správný
+4. Ručně opravte poškozený soubor projektu
+
+---
+
 ### Contact
 
 - **GitHub Issues**: https://github.com/akimoto-akira/SiliconLifeCollective/issues

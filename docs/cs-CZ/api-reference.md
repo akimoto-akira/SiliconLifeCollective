@@ -227,3 +227,222 @@ if (permission == PermissionResult.Allowed)
     // Provést operaci
 }
 ```
+
+---
+
+## API Pracovních Poznámek
+
+### Získat Seznam Pracovních Poznámek
+
+**GET** `/api/beings/{id}/work-notes`
+
+**Odpověď**:
+```json
+{
+  "notes": [
+    {
+      "id": "note-uuid",
+      "pageNumber": 1,
+      "summary": "Modul ověřování uživatele dokončen",
+      "keywords": ["authentication", "JWT", "OAuth2"],
+      "createdAt": "2026-04-25T10:00:00Z",
+      "updatedAt": "2026-04-25T10:00:00Z"
+    }
+  ],
+  "totalCount": 15
+}
+```
+
+### Získat Detaily Jedné Poznámky
+
+**GET** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**Odpověď**:
+```json
+{
+  "id": "note-uuid",
+  "pageNumber": 1,
+  "summary": "Modul ověřování uživatele dokončen",
+  "content": "## Detaily implementace\n\n- Použití JWT tokenu\n- Podpora OAuth2",
+  "keywords": ["authentication", "JWT", "OAuth2"],
+  "createdAt": "2026-04-25T10:00:00Z",
+  "updatedAt": "2026-04-25T10:00:00Z"
+}
+```
+
+### Vytvořit Novou Poznámku
+
+**POST** `/api/beings/{id}/work-notes`
+
+**Požadavek**:
+```json
+{
+  "summary": "Modul ověřování uživatele dokončen",
+  "content": "## Detaily implementace\n\n- Použití JWT tokenu",
+  "keywords": "authentication,JWT,OAuth2"
+}
+```
+
+**Odpověď**: `201 Created`
+
+### Aktualizovat Poznámku
+
+**PUT** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**Požadavek**:
+```json
+{
+  "summary": "Modul ověřování uživatele a testy dokončeny",
+  "content": "## Aktualizovaný obsah\n\nPřidány unit testy",
+  "keywords": "authentication,JWT,OAuth2,tests"
+}
+```
+
+### Smazat Poznámku
+
+**DELETE** `/api/beings/{id}/work-notes/{pageNumber}`
+
+### Vyhledat Poznámky
+
+**GET** `/api/beings/{id}/work-notes/search?keyword=authentication&maxResults=10`
+
+### Získat Adresář Poznámek
+
+**GET** `/api/beings/{id}/work-notes/directory`
+
+---
+
+## API Sítě Znalostí
+
+### Získat Statistiky Znalostí
+
+**GET** `/api/knowledge/stats`
+
+**Odpověď**:
+```json
+{
+  "totalTriples": 1523,
+  "totalSubjects": 450,
+  "totalPredicates": 85,
+  "totalObjects": 892,
+  "averageConfidence": 0.87
+}
+```
+
+### Přidat Trojici Znalostí
+
+**POST** `/api/knowledge/triples`
+
+**Požadavek**:
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "confidence": 0.95,
+  "tags": ["programming", "language"]
+}
+```
+
+**Odpověď**: `201 Created`
+
+### Dotaz na Znalost
+
+**GET** `/api/knowledge/query?subject=Python&predicate=is_a`
+
+**Odpověď**:
+```json
+{
+  "triples": [
+    {
+      "subject": "Python",
+      "predicate": "is_a",
+      "object": "programming_language",
+      "confidence": 0.95,
+      "tags": ["programming", "language"]
+    }
+  ]
+}
+```
+
+### Vyhledat Znalost
+
+**GET** `/api/knowledge/search?query=programming+language&limit=10`
+
+### Získat Cestu Znalostí
+
+**GET** `/api/knowledge/path?from=Python&to=computer_science`
+
+**Odpověď**:
+```json
+{
+  "path": [
+    {"subject": "Python", "predicate": "is_a", "object": "programming_language"},
+    {"subject": "programming_language", "predicate": "belongs_to", "object": "computer_science"}
+  ],
+  "length": 2
+}
+```
+
+### Validovat Znalost
+
+**POST** `/api/knowledge/validate`
+
+**Požadavek**:
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language"
+}
+```
+
+### Smazat Znalost
+
+**DELETE** `/api/knowledge/triples/{id}`
+
+---
+
+## API Správy Projektů
+
+### Získat Seznam Projektů
+
+**GET** `/api/projects`
+
+**Odpověď**:
+```json
+{
+  "projects": [
+    {
+      "id": "project-uuid",
+      "name": "My Project",
+      "description": "Project description",
+      "createdAt": "2026-04-25T10:00:00Z"
+    }
+  ]
+}
+```
+
+### Vytvořit Projekt
+
+**POST** `/api/projects`
+
+**Požadavek**:
+```json
+{
+  "name": "My Project",
+  "description": "Project description"
+}
+```
+
+### Získat Detaily Projektu
+
+**GET** `/api/projects/{id}`
+
+### Aktualizovat Projekt
+
+**PUT** `/api/projects/{id}`
+
+### Smazat Projekt
+
+**DELETE** `/api/projects/{id}`
