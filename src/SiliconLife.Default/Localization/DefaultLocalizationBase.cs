@@ -1198,6 +1198,56 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// </summary>
     public abstract string ProjectsEmptyState { get; }
 
+    /// <summary>
+    /// Gets the active projects count label
+    /// </summary>
+    public abstract string ProjectsActiveLabel { get; }
+
+    /// <summary>
+    /// Gets the archived projects count label
+    /// </summary>
+    public abstract string ProjectsArchivedLabel { get; }
+
+    /// <summary>
+    /// Gets the active project status label
+    /// </summary>
+    public abstract string ProjectStatusActiveLabel { get; }
+
+    /// <summary>
+    /// Gets the archived project status label
+    /// </summary>
+    public abstract string ProjectStatusArchivedLabel { get; }
+
+    /// <summary>
+    /// Gets the destroyed project status label
+    /// </summary>
+    public abstract string ProjectStatusDestroyedLabel { get; }
+
+    /// <summary>
+    /// Gets the project tasks link label
+    /// </summary>
+    public abstract string ProjectTasksLinkLabel { get; }
+
+    /// <summary>
+    /// Gets the project work notes link label
+    /// </summary>
+    public abstract string ProjectWorkNotesLinkLabel { get; }
+
+    /// <summary>
+    /// Gets the project work notes page header text
+    /// </summary>
+    public abstract string ProjectWorkNotesPageHeader { get; }
+
+    /// <summary>
+    /// Gets the empty state text when no project work notes exist
+    /// </summary>
+    public abstract string ProjectWorkNotesEmptyState { get; }
+
+    /// <summary>
+    /// Gets the total pages label for project work notes
+    /// </summary>
+    public abstract string ProjectWorkNotesTotalPages { get; }
+
     // ===== Tasks Page Localization =====
 
     /// <summary>
@@ -1249,6 +1299,36 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the created-at label for tasks
     /// </summary>
     public abstract string TasksCreatedAtLabel { get; }
+
+    /// <summary>
+    /// Gets the project tasks page header text
+    /// </summary>
+    public abstract string ProjectTasksPageHeader { get; }
+
+    /// <summary>
+    /// Gets the empty state text when no project tasks exist
+    /// </summary>
+    public abstract string ProjectTasksEmptyState { get; }
+
+    /// <summary>
+    /// Gets the assignees label for project tasks
+    /// </summary>
+    public abstract string ProjectTasksAssigneesLabel { get; }
+
+    /// <summary>
+    /// Gets the created-by label for project tasks
+    /// </summary>
+    public abstract string ProjectTasksCreatedByLabel { get; }
+
+    /// <summary>
+    /// Gets the back-to-projects link text for project tasks page
+    /// </summary>
+    public abstract string ProjectTasksBackToProjects { get; }
+
+    /// <summary>
+    /// Gets the no-assignees label for project tasks
+    /// </summary>
+    public abstract string ProjectTasksNoAssigneesLabel { get; }
 
     // ===== Code Browser Page Localization =====
 

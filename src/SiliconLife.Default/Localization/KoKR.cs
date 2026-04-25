@@ -359,6 +359,21 @@ public class KoKR : DefaultLocalizationBase
 
     public override string ProjectsPageHeader => "프로젝트 공간 관리";
     public override string ProjectsEmptyState => "프로젝트 없음";
+    public override string ProjectsActiveLabel => "활성";
+    public override string ProjectsArchivedLabel => "보관";
+    
+    public override string ProjectStatusActiveLabel => "활성";
+    
+    public override string ProjectStatusArchivedLabel => "보관";
+    
+    public override string ProjectStatusDestroyedLabel => "삭제됨";
+    
+    public override string ProjectTasksLinkLabel => "작업";
+    
+    public override string ProjectWorkNotesLinkLabel => "작업 노트";
+    public override string ProjectWorkNotesPageHeader => "프로젝트 작업 노트";
+    public override string ProjectWorkNotesEmptyState => "이 프로젝트에 작업 노트가 없습니다";
+    public override string ProjectWorkNotesTotalPages => "총 페이지 수: {0}";
 
     // ===== Tasks Page Localization =====
 
@@ -372,6 +387,17 @@ public class KoKR : DefaultLocalizationBase
     public override string TasksPriorityLabel => "우선순위";
     public override string TasksAssignedToLabel => "담당자";
     public override string TasksCreatedAtLabel => "생성일";
+    
+    public override string ProjectTasksPageHeader => "프로젝트 작업";
+    
+    public override string ProjectTasksEmptyState => "프로젝트 작업 없음";
+    
+    public override string ProjectTasksAssigneesLabel => "담당자";
+    
+    public override string ProjectTasksCreatedByLabel => "생성자";
+    
+    public override string ProjectTasksBackToProjects => "← 프로젝트 목록으로 돌아가기";
+    public override string ProjectTasksNoAssigneesLabel => "없음";
     
     // ===== Code Browser Page Localization =====
 
@@ -828,7 +854,10 @@ public class KoKR : DefaultLocalizationBase
         ["system"] = "시스템",
         ["timer"] = "타이머",
         ["token_audit"] = "Token 감사",
-        ["work_note"] = "작업 노트"
+        ["work_note"] = "작업 노트",
+        ["project"] = "프로젝트",
+        ["project_task"] = "프로젝트 작업",
+        ["project_work_note"] = "프로젝트 작업 노트"
     };
 
     public override string GetToolDisplayName(string toolName) =>

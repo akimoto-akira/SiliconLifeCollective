@@ -13,19 +13,9 @@
 
 namespace SiliconLife.Default.Web.Models;
 
-public class WorkNoteViewModel : ViewModelBase
+public class ProjectTaskViewModel : ViewModelBase
 {
-    public Guid BeingId { get; set; }
-    public string BeingName { get; set; } = string.Empty;
-    public int TotalPages { get; set; }
-
-    /// <summary>
-    /// If set, displays work notes for a project instead of a silicon being.
-    /// </summary>
-    public Guid? ProjectId { get; set; }
-
-    /// <summary>
-    /// Project name when viewing project work notes.
-    /// </summary>
+    public Guid ProjectId { get; set; }
     public string ProjectName { get; set; } = string.Empty;
+    public int TotalTasks { get; set; }
 }

@@ -359,6 +359,21 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
 
     public override string ProjectsPageHeader => "Project Space";
     public override string ProjectsEmptyState => "No projects";
+    public override string ProjectsActiveLabel => "Active";
+    public override string ProjectsArchivedLabel => "Archived";
+    
+    public override string ProjectStatusActiveLabel => "Active";
+    
+    public override string ProjectStatusArchivedLabel => "Archived";
+    
+    public override string ProjectStatusDestroyedLabel => "Destroyed";
+    
+    public override string ProjectTasksLinkLabel => "Tasks";
+    
+    public override string ProjectWorkNotesLinkLabel => "Work Notes";
+    public override string ProjectWorkNotesPageHeader => "Project Work Notes";
+    public override string ProjectWorkNotesEmptyState => "No work notes for this project";
+    public override string ProjectWorkNotesTotalPages => "Total Pages: {0}";
 
     // ===== Tasks Page Localization =====
 
@@ -372,6 +387,17 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string TasksPriorityLabel => "Priority";
     public override string TasksAssignedToLabel => "Assigned To";
     public override string TasksCreatedAtLabel => "Created";
+    
+    public override string ProjectTasksPageHeader => "Project Tasks";
+    
+    public override string ProjectTasksEmptyState => "No project tasks";
+    
+    public override string ProjectTasksAssigneesLabel => "Assignees";
+    
+    public override string ProjectTasksCreatedByLabel => "Created By";
+    
+    public override string ProjectTasksBackToProjects => "← Back to Projects";
+    public override string ProjectTasksNoAssigneesLabel => "None";
     
     // ===== Code Browser Page Localization =====
 
@@ -828,7 +854,10 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
         ["system"] = "System",
         ["timer"] = "Timer",
         ["token_audit"] = "Token Audit",
-        ["work_note"] = "Work Note"
+        ["work_note"] = "Work Note",
+        ["project"] = "Project",
+        ["project_task"] = "Project Task",
+        ["project_work_note"] = "Project Work Note"
     };
 
     public override string GetToolDisplayName(string toolName) =>

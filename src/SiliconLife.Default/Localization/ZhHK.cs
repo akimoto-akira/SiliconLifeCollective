@@ -214,6 +214,21 @@ public class ZhHK : DefaultLocalizationBase
 
     public override string ProjectsPageHeader => "項目空間管理";
     public override string ProjectsEmptyState => "暫無項目";
+    public override string ProjectsActiveLabel => "活躍";
+    public override string ProjectsArchivedLabel => "已歸檔";
+    
+    public override string ProjectStatusActiveLabel => "活躍";
+    
+    public override string ProjectStatusArchivedLabel => "已歸檔";
+    
+    public override string ProjectStatusDestroyedLabel => "已銷毀";
+    
+    public override string ProjectTasksLinkLabel => "任務";
+    
+    public override string ProjectWorkNotesLinkLabel => "工作筆記";
+    public override string ProjectWorkNotesPageHeader => "項目工作筆記";
+    public override string ProjectWorkNotesEmptyState => "該項目暫無工作筆記";
+    public override string ProjectWorkNotesTotalPages => "總頁數：{0}";
 
     // ===== Tasks Page Localization =====
 
@@ -227,6 +242,17 @@ public class ZhHK : DefaultLocalizationBase
     public override string TasksPriorityLabel => "優先級";
     public override string TasksAssignedToLabel => "負責人";
     public override string TasksCreatedAtLabel => "建立時間";
+    
+    public override string ProjectTasksPageHeader => "項目任務";
+    
+    public override string ProjectTasksEmptyState => "暫無項目任務";
+    
+    public override string ProjectTasksAssigneesLabel => "負責人";
+    
+    public override string ProjectTasksCreatedByLabel => "建立者";
+    
+    public override string ProjectTasksBackToProjects => "← 返回項目列表";
+    public override string ProjectTasksNoAssigneesLabel => "無";
     
     // ===== Code Browser Page Localization =====
 
@@ -682,7 +708,10 @@ public class ZhHK : DefaultLocalizationBase
         ["system"] = "系統",
         ["timer"] = "計時器",
         ["token_audit"] = "Token審計",
-        ["work_note"] = "工作筆記"
+        ["work_note"] = "工作筆記",
+        ["project"] = "項目",
+        ["project_task"] = "項目任務",
+        ["project_work_note"] = "項目工作筆記"
     };
 
     public override string GetToolDisplayName(string toolName) =>

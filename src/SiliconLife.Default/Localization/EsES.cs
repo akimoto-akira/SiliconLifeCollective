@@ -359,6 +359,21 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
 
     public override string ProjectsPageHeader => "Espacio de proyectos";
     public override string ProjectsEmptyState => "Sin proyectos";
+    public override string ProjectsActiveLabel => "Activos";
+    public override string ProjectsArchivedLabel => "Archivados";
+    
+    public override string ProjectStatusActiveLabel => "Activo";
+    
+    public override string ProjectStatusArchivedLabel => "Archivado";
+    
+    public override string ProjectStatusDestroyedLabel => "Destruido";
+    
+    public override string ProjectTasksLinkLabel => "Tareas";
+    
+    public override string ProjectWorkNotesLinkLabel => "Notas de trabajo";
+    public override string ProjectWorkNotesPageHeader => "Notas de trabajo del proyecto";
+    public override string ProjectWorkNotesEmptyState => "No hay notas de trabajo para este proyecto";
+    public override string ProjectWorkNotesTotalPages => "Páginas totales: {0}";
 
     // ===== Tasks Page Localization =====
 
@@ -372,6 +387,17 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string TasksPriorityLabel => "Prioridad";
     public override string TasksAssignedToLabel => "Asignado a";
     public override string TasksCreatedAtLabel => "Creado";
+    
+    public override string ProjectTasksPageHeader => "Tareas del proyecto";
+    
+    public override string ProjectTasksEmptyState => "No hay tareas del proyecto";
+    
+    public override string ProjectTasksAssigneesLabel => "Asignados";
+    
+    public override string ProjectTasksCreatedByLabel => "Creado por";
+    
+    public override string ProjectTasksBackToProjects => "← Volver a proyectos";
+    public override string ProjectTasksNoAssigneesLabel => "Ninguno";
     
     // ===== Code Browser Page Localization =====
 
@@ -828,7 +854,10 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         ["system"] = "Sistema",
         ["timer"] = "Temporizador",
         ["token_audit"] = "Auditoría de tokens",
-        ["work_note"] = "Nota de Trabajo"
+        ["work_note"] = "Nota de Trabajo",
+        ["project"] = "Proyecto",
+        ["project_task"] = "Tarea de proyecto",
+        ["project_work_note"] = "Nota de trabajo de proyecto"
     };
 
     public override string GetToolDisplayName(string toolName) =>

@@ -48,8 +48,10 @@ public class Program
 
         DefaultConfigData configData = (DefaultConfigData)config.Data;
         LogManager.Instance.AddProvider(new FileSystemLoggerProvider(configData));
-        _logger.Info(null, "Configuration loaded: endpoint={0}, model={1}", 
-            configData.AIConfig["endpoint"], configData.AIConfig["model"]);
+        configData.AIConfig.TryGetValue("endpoint", out var endpointValue);
+        configData.AIConfig.TryGetValue("model", out var modelValue);
+        _logger.Info(null, "Configuration loaded: endpoint={0}, model={1}",
+            endpointValue?.ToString() ?? "N/A", modelValue?.ToString() ?? "N/A");
 
         DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(configData.Language);
 
@@ -59,6 +61,11 @@ public class Program
         IStorage storage = new FileSystemStorage(configData.DataDirectory.FullName);
         ITimeStorage timeStorage = new FileSystemTimeStorage(
             Path.Combine(configData.DataDirectory.FullName, "chat"));
+
+        // Initialize project manager
+        IProjectManager projectManager = new ProjectManager(storage, configData.DataDirectory.FullName);
+        ServiceLocator.Instance.Register<IProjectManager>(projectManager);
+        _logger.Info(null, "Initialized: ProjectManager");
 
         ChatSystem chatSystem = new ChatSystem(timeStorage);
         _logger.Info(null, "Initialized: ChatSystem");

@@ -65,8 +65,9 @@ public sealed class WorkNoteSystem
     /// <param name="content">The content of the note page</param>
     /// <param name="keywords">Optional comma-separated keywords for search</param>
     /// <param name="visibility">Optional visibility setting (defaults based on owner type)</param>
+    /// <param name="authorGuid">The GUID of the creator (mandatory for project notes)</param>
     /// <returns>The created note entry</returns>
-    public WorkNoteEntry CreateNote(string summary, string content, string keywords = "", WorkNoteVisibility? visibility = null)
+    public WorkNoteEntry CreateNote(string summary, string content, string keywords = "", WorkNoteVisibility? visibility = null, Guid authorGuid = default)
     {
         if (string.IsNullOrWhiteSpace(summary))
         {
@@ -84,7 +85,9 @@ public sealed class WorkNoteSystem
             Content = content,
             Keywords = keywords,
             OwnerType = _ownerType,
-            OwnerId = _beingId.ToString()
+            OwnerId = _beingId.ToString(),
+            AuthorGuid = authorGuid,
+            ModifiedByGuid = authorGuid
         };
 
         if (visibility.HasValue)
@@ -130,8 +133,9 @@ public sealed class WorkNoteSystem
     /// <param name="content">New content (or null to keep existing)</param>
     /// <param name="summary">New summary (or null to keep existing)</param>
     /// <param name="keywords">New keywords (or null to keep existing)</param>
+    /// <param name="modifiedByGuid">The GUID of the modifier (mandatory for project notes)</param>
     /// <returns>The updated note entry</returns>
-    public WorkNoteEntry UpdateNote(int pageNumber, string? content = null, string? summary = null, string? keywords = null)
+    public WorkNoteEntry UpdateNote(int pageNumber, string? content = null, string? summary = null, string? keywords = null, Guid modifiedByGuid = default)
     {
         WorkNoteEntry? note = ReadNote(pageNumber);
         if (note == null)
@@ -153,6 +157,8 @@ public sealed class WorkNoteSystem
         {
             note.Keywords = keywords;
         }
+
+        note.ModifiedByGuid = modifiedByGuid;
 
         WorkNoteEntry updated = _storage.UpdateNote(note);
         _logger.Info(_beingId, "Updated work note page {0} (version {1})", updated.PageNumber, updated.Version);

@@ -359,6 +359,21 @@ public class JaJP : DefaultLocalizationBase
 
     public override string ProjectsPageHeader => "プロジェクトスペース管理";
     public override string ProjectsEmptyState => "プロジェクトなし";
+    public override string ProjectsActiveLabel => "アクティブ";
+    public override string ProjectsArchivedLabel => "アーカイブ";
+    
+    public override string ProjectStatusActiveLabel => "アクティブ";
+    
+    public override string ProjectStatusArchivedLabel => "アーカイブ";
+    
+    public override string ProjectStatusDestroyedLabel => "破棄済み";
+    
+    public override string ProjectTasksLinkLabel => "タスク";
+    
+    public override string ProjectWorkNotesLinkLabel => "ワークノート";
+    public override string ProjectWorkNotesPageHeader => "プロジェクト作業ノート";
+    public override string ProjectWorkNotesEmptyState => "このプロジェクトには作業ノートがありません";
+    public override string ProjectWorkNotesTotalPages => "総ページ数：{0}";
 
     // ===== Tasks Page Localization =====
 
@@ -372,6 +387,17 @@ public class JaJP : DefaultLocalizationBase
     public override string TasksPriorityLabel => "優先度";
     public override string TasksAssignedToLabel => "担当者";
     public override string TasksCreatedAtLabel => "作成日時";
+    
+    public override string ProjectTasksPageHeader => "プロジェクトタスク";
+    
+    public override string ProjectTasksEmptyState => "プロジェクトタスクがありません";
+    
+    public override string ProjectTasksAssigneesLabel => "担当者";
+    
+    public override string ProjectTasksCreatedByLabel => "作成者";
+    
+    public override string ProjectTasksBackToProjects => "← プロジェクト一覧に戻る";
+    public override string ProjectTasksNoAssigneesLabel => "なし";
     
     // ===== Code Browser Page Localization =====
 
@@ -828,7 +854,10 @@ public class JaJP : DefaultLocalizationBase
         ["system"] = "システム",
         ["timer"] = "タイマー",
         ["token_audit"] = "Token監査",
-        ["work_note"] = "作業ノート"
+        ["work_note"] = "作業ノート",
+        ["project"] = "プロジェクト",
+        ["project_task"] = "プロジェクトタスク",
+        ["project_work_note"] = "プロジェクト作業ノート"
     };
 
     public override string GetToolDisplayName(string toolName) =>

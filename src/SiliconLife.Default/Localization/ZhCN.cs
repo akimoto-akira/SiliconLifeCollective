@@ -359,6 +359,21 @@ public class ZhCN : DefaultLocalizationBase
 
     public override string ProjectsPageHeader => "项目空间管理";
     public override string ProjectsEmptyState => "暂无项目";
+    public override string ProjectsActiveLabel => "活跃";
+    public override string ProjectsArchivedLabel => "已归档";
+    
+    public override string ProjectStatusActiveLabel => "活跃";
+    
+    public override string ProjectStatusArchivedLabel => "已归档";
+    
+    public override string ProjectStatusDestroyedLabel => "已销毁";
+    
+    public override string ProjectTasksLinkLabel => "任务";
+    
+    public override string ProjectWorkNotesLinkLabel => "工作笔记";
+    public override string ProjectWorkNotesPageHeader => "项目工作笔记";
+    public override string ProjectWorkNotesEmptyState => "该项目暂无工作笔记";
+    public override string ProjectWorkNotesTotalPages => "总页数：{0}";
 
     // ===== Tasks Page Localization =====
 
@@ -372,6 +387,17 @@ public class ZhCN : DefaultLocalizationBase
     public override string TasksPriorityLabel => "优先级";
     public override string TasksAssignedToLabel => "负责人";
     public override string TasksCreatedAtLabel => "创建时间";
+    
+    public override string ProjectTasksPageHeader => "项目任务";
+    
+    public override string ProjectTasksEmptyState => "暂无项目任务";
+    
+    public override string ProjectTasksAssigneesLabel => "负责人";
+    
+    public override string ProjectTasksCreatedByLabel => "创建者";
+    
+    public override string ProjectTasksBackToProjects => "← 返回项目列表";
+    public override string ProjectTasksNoAssigneesLabel => "无";
     
     // ===== Code Browser Page Localization =====
 
@@ -828,7 +854,10 @@ public class ZhCN : DefaultLocalizationBase
         ["system"] = "系统",
         ["timer"] = "定时器",
         ["token_audit"] = "Token审计",
-        ["work_note"] = "工作笔记"
+        ["work_note"] = "工作笔记",
+        ["project"] = "项目",
+        ["project_task"] = "项目任务",
+        ["project_work_note"] = "项目工作笔记"
     };
 
     public override string GetToolDisplayName(string toolName) =>

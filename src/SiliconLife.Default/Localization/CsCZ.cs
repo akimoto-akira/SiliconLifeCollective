@@ -260,6 +260,17 @@ public class CsCZ : DefaultLocalizationBase
     public override string TasksStatusFailed => "Selhalo";
     public override string TasksAssignedToLabel => "Přiřazeno";
     public override string TasksCreatedAtLabel => "Vytvořeno";
+    
+    public override string ProjectTasksPageHeader => "Úkoly projektu";
+    
+    public override string ProjectTasksEmptyState => "Žádné úkoly projektu";
+    
+    public override string ProjectTasksAssigneesLabel => "Přiřazení";
+    
+    public override string ProjectTasksCreatedByLabel => "Vytvořil";
+    
+    public override string ProjectTasksBackToProjects => "← Zpět na projekty";
+    public override string ProjectTasksNoAssigneesLabel => "Žádný";
 
     // ===== Logs Page =====
     public override string LogsPageHeader => "Logy";
@@ -428,6 +439,21 @@ public class CsCZ : DefaultLocalizationBase
 
     // ===== Projects =====
     public override string ProjectsPageHeader => "Projekty";
+public override string ProjectsActiveLabel => "Aktivní";
+public override string ProjectsArchivedLabel => "Archivované";
+
+public override string ProjectStatusActiveLabel => "Aktivní";
+
+public override string ProjectStatusArchivedLabel => "Archivováno";
+
+public override string ProjectStatusDestroyedLabel => "Zničeno";
+
+public override string ProjectTasksLinkLabel => "Úkoly";
+
+public override string ProjectWorkNotesLinkLabel => "Pracovní poznámky";
+public override string ProjectWorkNotesPageHeader => "Pracovní poznámky projektu";
+public override string ProjectWorkNotesEmptyState => "Žádné pracovní poznámky pro tento projekt";
+public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
 
     // ===== Executor =====
     public override string ExecutorPageHeader => "Executor";

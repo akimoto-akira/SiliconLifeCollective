@@ -22,16 +22,19 @@ public class WorkNoteView : ViewBase
         var vm = model as WorkNoteViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.PageTitleWorkNotes, "work-notes", vm.Localization, body, GetScripts(vm.Localization, vm.BeingId), GetStyles());
+        string pageTitle = vm.ProjectId.HasValue ? vm.Localization.ProjectWorkNotesPageHeader : vm.Localization.PageTitleWorkNotes;
+        return RenderPage(vm.Skin, pageTitle, "work-notes", vm.Localization, body, GetScripts(vm.Localization, vm.BeingId, vm.ProjectId), GetStyles());
     }
 
     private static H RenderBody(WorkNoteViewModel vm)
     {
+        string headerText = vm.ProjectId.HasValue ? vm.Localization.ProjectWorkNotesPageHeader : vm.Localization.WorkNotesPageHeader;
+        string totalLabel = vm.ProjectId.HasValue ? vm.Localization.ProjectWorkNotesTotalPages : vm.Localization.WorkNotesTotalPages;
         return H.Div(
             H.Div(
-                H.H1(vm.Localization.WorkNotesPageHeader),
+                H.H1(headerText),
                 H.Div(
-                    H.Span(string.Format(vm.Localization.WorkNotesTotalPages, "")).Id("total-pages").Class("stat-value")
+                    H.Span(string.Format(totalLabel, "")).Id("total-pages").Class("stat-value")
                 ).Class("page-stat")
             ).Class("page-header"),
             H.Div().Id("notes-grid").Class("notes-grid"),
@@ -156,8 +159,15 @@ public class WorkNoteView : ViewBase
             .EndSelector();
     }
 
-    private static JsSyntax GetScripts(DefaultLocalizationBase loc, Guid beingId)
+    private static JsSyntax GetScripts(DefaultLocalizationBase loc, Guid beingId, Guid? projectId = null)
     {
+        string listUrl = projectId.HasValue
+            ? $"/api/projects/{projectId}/work-notes/list"
+            : "/api/work-notes/list?beingId=" + beingId;
+        string readUrlPrefix = projectId.HasValue
+            ? $"/api/projects/{projectId}/work-notes/read?pageNumber="
+            : "/api/work-notes/read?beingId=" + beingId + "&pageNumber=";
+
         var cardBlock = Js.Block()
             .Add(() => Js.Const(() => "card", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
             .Add(() => Js.Assign(() => Js.Id(() => "card").Prop(() => "className"), () => Js.Str(() => "note-card")))
@@ -167,7 +177,7 @@ public class WorkNoteView : ViewBase
             .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Op(() => "+", () => Js.Str(() => "<div class='note-meta'>Updated: ").Op(() => "+", () => Js.Id(() => "note").Prop(() => "updatedAt")).Op(() => "+", () => Js.Str(() => "</div>")))))
             .Add(() => Js.Assign(() => Js.Id(() => "card").Prop(() => "innerHTML"), () => Js.Id(() => "html")))
             .Add(() => Js.Id(() => "grid").Call(() => "appendChild", () => Js.Id(() => "card")).Stmt());
-
+    
         var loadNotesThenBody = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
@@ -193,7 +203,7 @@ public class WorkNoteView : ViewBase
                     Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "notes-grid")).Prop(() => "innerHTML"), () => Js.Str(() => "<div class='empty-state'>Failed to load notes: </div>").Op(() => "+", () => Js.Id(() => "result").Prop(() => "error").Op(() => "||", () => Js.Str(() => "Unknown error")))).Stmt()
                 })
             }));
-
+    
         // Markdown rendering - render content area with marked library
         var renderMarkdownBodyBody = Js.Block()
             .Add(() => Js.Const(() => "elements", () => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => ".markdown-body[data-md-raw]"))))
@@ -209,7 +219,7 @@ public class WorkNoteView : ViewBase
                         Js.Assign(() => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRendered"), () => Js.Str(() => "1"))
                     })
                 })))).Stmt());
-        
+    
         // Marked.js lazy loading and render Markdown body
         var markedLoadCheck = Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
         {
@@ -221,11 +231,11 @@ public class WorkNoteView : ViewBase
                 Js.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => Js.Id(() => "mdScript")).Stmt()
             })
         });
-        
+    
         // Build close button click handler
         var closeBtnHandler = Js.Arrow(() => new List<string>(), () => (JsSyntax)Js.Block()
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "note-detail")).Prop(() => "classList").Call(() => "remove", () => Js.Str(() => "active")).Stmt()));
-        
+    
         var loadNoteDetailThenBody = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
@@ -268,15 +278,15 @@ public class WorkNoteView : ViewBase
                     Js.Id(() => "renderNoteDetailMarkdown").Invoke().Stmt()
                 })
             }));
-        
+    
         return Js.Block()
             .Add(() => Js.Const(() => "beingId", () => Js.Str(() => beingId.ToString())))
             .Add(() => Js.Func(() => "renderNoteDetailMarkdown", () => new List<string>(), () => renderMarkdownBodyBody))
             .Add(() => markedLoadCheck)
             .Add(() => Js.Func(() => "loadNotes", () => new List<string>(), () => Js.Block()
-                .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/work-notes/list?beingId=").Op(() => "+", () => Js.Id(() => "beingId"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => (JsSyntax)Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "result" }, () => (JsSyntax)loadNotesThenBody)).Stmt())))
+                .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => listUrl)).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => (JsSyntax)Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "result" }, () => (JsSyntax)loadNotesThenBody)).Stmt())))
             .Add(() => Js.Func(() => "loadNoteDetail", () => new List<string> { "pageNumber" }, () => Js.Block()
-                .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/work-notes/read?beingId=").Op(() => "+", () => Js.Id(() => "beingId")).Op(() => "+", () => Js.Str(() => "&pageNumber=")).Op(() => "+", () => Js.Id(() => "pageNumber")))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => (JsSyntax)Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "result" }, () => (JsSyntax)loadNoteDetailThenBody)).Stmt()))
+                .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => readUrlPrefix).Op(() => "+", () => Js.Id(() => "pageNumber"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => (JsSyntax)Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "result" }, () => (JsSyntax)loadNoteDetailThenBody)).Stmt())))
             .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "loadNotes").Invoke())));
     }
 }

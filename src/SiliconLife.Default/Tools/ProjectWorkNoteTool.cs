@@ -16,26 +16,26 @@ using SiliconLife.Collective;
 namespace SiliconLife.Default;
 
 /// <summary>
-/// Tool for managing work notes for silicon beings.
+/// Tool for managing work notes within project spaces.
 /// Supports creating, reading, updating, deleting, listing, searching, and generating directories.
 /// </summary>
-public class WorkNoteTool : ITool
+public class ProjectWorkNoteTool : ITool
 {
     /// <inheritdoc/>
-    public string Name => "work_note";
+    public string Name => "project_work_note";
 
     /// <inheritdoc/>
     public string Description =>
-        "Manage work notes for the silicon being. " +
-        "Work notes are page-based, like a personal diary (private by default). " +
+        "Manage work notes within project spaces. " +
+        "Work notes are page-based, like a project diary. " +
         "Actions: " +
-        "'create' (create a new note page: requires 'summary' and 'content', optional 'keywords'); " +
-        "'read' (read a specific note page: requires 'page_number' or 'note_id'); " +
-        "'update' (update an existing note page: requires 'page_number' and 'content', optional 'summary' and 'keywords'); " +
-        "'delete' (delete a note page: requires 'page_number' or 'note_id'); " +
-        "'list' (list all note pages with summaries); " +
+        "'create' (create a new note page: requires 'project_id', 'summary' and 'content', optional 'keywords'); " +
+        "'read' (read a specific note page: requires 'project_id' and 'page_number' or 'note_id'); " +
+        "'update' (update an existing note page: requires 'project_id', 'page_number' and 'content', optional 'summary' and 'keywords'); " +
+        "'delete' (delete a note page: requires 'project_id' and 'page_number' or 'note_id'); " +
+        "'list' (list all note pages with summaries for a project); " +
         "'directory' (generate a directory/overview of all notes for context); " +
-        "'search' (search notes by keyword: requires 'keyword', optional 'max_results').";
+        "'search' (search notes by keyword: requires 'project_id' and 'keyword', optional 'max_results').";
 
     /// <inheritdoc/>
     public string GetDisplayName(Language language)
@@ -59,6 +59,11 @@ public class WorkNoteTool : ITool
                     ["type"] = "string",
                     ["description"] = "The action to perform: create, read, update, delete, list, directory, search",
                     ["enum"] = new[] { "create", "read", "update", "delete", "list", "directory", "search" }
+                },
+                ["project_id"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["description"] = "Project ID (GUID, required for all actions)"
                 },
                 ["page_number"] = new Dictionary<string, object>
                 {
@@ -96,7 +101,7 @@ public class WorkNoteTool : ITool
                     ["description"] = "Maximum number of results to return (used with search)"
                 }
             },
-            ["required"] = new[] { "action" }
+            ["required"] = new[] { "action", "project_id" }
         };
     }
 
@@ -116,37 +121,42 @@ public class WorkNoteTool : ITool
                 return ToolResult.Failed("Missing required parameter: action");
             }
 
-            // Get the silicon being
-            SiliconBeingBase? being = ServiceLocator.Instance.BeingManager?.GetBeing(callerId);
-            if (being == null)
+            var projectManager = ServiceLocator.Instance.GetService<IProjectManager>();
+            if (projectManager == null)
             {
-                return ToolResult.Failed($"Silicon being not found: {callerId}");
+                return ToolResult.Failed("Project manager is not initialized");
             }
 
-            if (being.WorkNoteSystem == null)
+            if (!parameters.TryGetValue("project_id", out var projectIdObj) || !Guid.TryParse(projectIdObj?.ToString(), out Guid projectId))
             {
-                return ToolResult.Failed("Work note system is not initialized for this silicon being");
+                return ToolResult.Failed("Missing or invalid required parameter: project_id");
             }
 
-            return action.ToLowerInvariant() switch
+            var workNoteSystem = projectManager.GetWorkNoteSystem(projectId);
+            if (workNoteSystem == null)
             {
-                "create" => ExecuteCreate(being, parameters, callerId),
-                "read" => ExecuteRead(being, parameters),
-                "update" => ExecuteUpdate(being, parameters, callerId),
-                "delete" => ExecuteDelete(being, parameters),
-                "list" => ExecuteList(being),
-                "directory" => ExecuteDirectory(being),
-                "search" => ExecuteSearch(being, parameters),
+                return ToolResult.Failed($"Project work note system not found for project: {projectId}");
+            }
+
+            return action switch
+            {
+                "create" => ExecuteCreate(workNoteSystem, parameters, callerId),
+                "read" => ExecuteRead(workNoteSystem, parameters),
+                "update" => ExecuteUpdate(workNoteSystem, parameters, callerId),
+                "delete" => ExecuteDelete(workNoteSystem, parameters),
+                "list" => ExecuteList(workNoteSystem),
+                "directory" => ExecuteDirectory(workNoteSystem),
+                "search" => ExecuteSearch(workNoteSystem, parameters),
                 _ => ToolResult.Failed($"Unknown action: {action}")
             };
         }
         catch (Exception ex)
         {
-            return ToolResult.Failed($"Work note tool execution failed: {ex.Message}");
+            return ToolResult.Failed($"Project work note tool execution failed: {ex.Message}");
         }
     }
 
-    private ToolResult ExecuteCreate(SiliconBeingBase being, Dictionary<string, object> parameters, Guid callerId)
+    private static ToolResult ExecuteCreate(WorkNoteSystem workNoteSystem, Dictionary<string, object> parameters, Guid callerId)
     {
         if (!parameters.TryGetValue("summary", out var summaryObj))
         {
@@ -174,37 +184,35 @@ public class WorkNoteTool : ITool
             ? (kwObj?.ToString() ?? "")
             : string.Empty;
 
-        WorkNoteEntry created = being.WorkNoteSystem.CreateNote(summary, content, keywords, authorGuid: callerId);
+        WorkNoteEntry created = workNoteSystem.CreateNote(summary, content, keywords, authorGuid: callerId);
 
         return ToolResult.Successful(
-            $"Work note page created successfully.\n" +
+            $"Project work note page created successfully.\n" +
             $"Page Number: {created.PageNumber}\n" +
             $"Note ID: {created.Id}\n" +
             $"Summary: {created.Summary}",
             created);
     }
 
-    private ToolResult ExecuteRead(SiliconBeingBase being, Dictionary<string, object> parameters)
+    private static ToolResult ExecuteRead(WorkNoteSystem workNoteSystem, Dictionary<string, object> parameters)
     {
         WorkNoteEntry? note = null;
 
-        // Try to read by note_id first
         if (parameters.TryGetValue("note_id", out var noteIdObj))
         {
             string noteIdStr = noteIdObj?.ToString() ?? "";
             if (Guid.TryParse(noteIdStr, out Guid noteId))
             {
-                note = being.WorkNoteSystem.ReadNote(noteId);
+                note = workNoteSystem.ReadNote(noteId);
             }
             else
             {
                 return ToolResult.Failed("Invalid note_id format (must be a GUID)");
             }
         }
-        // Try to read by page_number
         else if (parameters.TryGetValue("page_number", out var pageNumObj) && int.TryParse(pageNumObj?.ToString(), out int pageNum))
         {
-            note = being.WorkNoteSystem.ReadNote(pageNum);
+            note = workNoteSystem.ReadNote(pageNum);
         }
         else
         {
@@ -227,44 +235,41 @@ public class WorkNoteTool : ITool
             note);
     }
 
-    private ToolResult ExecuteUpdate(SiliconBeingBase being, Dictionary<string, object> parameters, Guid callerId)
+    private static ToolResult ExecuteUpdate(WorkNoteSystem workNoteSystem, Dictionary<string, object> parameters, Guid callerId)
     {
         if (!parameters.TryGetValue("page_number", out var pageNumObj) || !int.TryParse(pageNumObj?.ToString(), out int pageNum))
         {
             return ToolResult.Failed("Missing required parameter: page_number (for update action)");
         }
 
-        // Update fields if provided
         string? content = parameters.TryGetValue("content", out var contentObj) ? contentObj?.ToString() : null;
         string? summary = parameters.TryGetValue("summary", out var summaryObj) ? summaryObj?.ToString() : null;
         string? keywords = parameters.TryGetValue("keywords", out var kwObj) ? kwObj?.ToString() : null;
 
-        WorkNoteEntry updated = being.WorkNoteSystem.UpdateNote(pageNum, content, summary, keywords, modifiedByGuid: callerId);
+        WorkNoteEntry updated = workNoteSystem.UpdateNote(pageNum, content, summary, keywords, modifiedByGuid: callerId);
 
         return ToolResult.Successful(
-            $"Work note page updated successfully.\n" +
+            $"Project work note page updated successfully.\n" +
             $"Page Number: {updated.PageNumber}\n" +
             $"Version: {updated.Version}\n" +
             $"Updated: {updated.UpdatedAt:yyyy-MM-dd HH:mm:ss}",
             updated);
     }
 
-    private ToolResult ExecuteDelete(SiliconBeingBase being, Dictionary<string, object> parameters)
+    private static ToolResult ExecuteDelete(WorkNoteSystem workNoteSystem, Dictionary<string, object> parameters)
     {
         int? pageNum = null;
 
-        // Try to get page_number directly
         if (parameters.TryGetValue("page_number", out var pageNumObj) && int.TryParse(pageNumObj?.ToString(), out int p))
         {
             pageNum = p;
         }
-        // Try to get note_id and find corresponding page
         else if (parameters.TryGetValue("note_id", out var noteIdObj))
         {
             string noteIdStr = noteIdObj?.ToString() ?? "";
             if (Guid.TryParse(noteIdStr, out Guid noteId))
             {
-                WorkNoteEntry? note = being.WorkNoteSystem.ReadNote(noteId);
+                WorkNoteEntry? note = workNoteSystem.ReadNote(noteId);
                 if (note != null)
                 {
                     pageNum = note.PageNumber;
@@ -284,25 +289,25 @@ public class WorkNoteTool : ITool
             return ToolResult.Failed("Missing required parameter: page_number or note_id (for delete action)");
         }
 
-        bool deleted = being.WorkNoteSystem.DeleteNote(pageNum.Value);
+        bool deleted = workNoteSystem.DeleteNote(pageNum.Value);
         if (!deleted)
         {
             return ToolResult.Failed("Failed to delete note page");
         }
 
-        return ToolResult.Successful($"Work note page deleted successfully.");
+        return ToolResult.Successful("Project work note page deleted successfully.");
     }
 
-    private ToolResult ExecuteList(SiliconBeingBase being)
+    private static ToolResult ExecuteList(WorkNoteSystem workNoteSystem)
     {
-        var notes = being.WorkNoteSystem.ListNotes();
+        var notes = workNoteSystem.ListNotes();
         if (notes.Count == 0)
         {
-            return ToolResult.Successful("No work notes found.");
+            return ToolResult.Successful("No project work notes found.");
         }
 
         var sb = new System.Text.StringBuilder();
-        sb.AppendLine($"# Work Notes ({notes.Count} pages)");
+        sb.AppendLine($"# Project Work Notes ({notes.Count} pages)");
         sb.AppendLine();
 
         foreach (var note in notes)
@@ -322,13 +327,13 @@ public class WorkNoteTool : ITool
         return ToolResult.Successful(sb.ToString(), notes);
     }
 
-    private ToolResult ExecuteDirectory(SiliconBeingBase being)
+    private static ToolResult ExecuteDirectory(WorkNoteSystem workNoteSystem)
     {
-        string directory = being.WorkNoteSystem.GenerateDirectory();
+        string directory = workNoteSystem.GenerateDirectory();
         return ToolResult.Successful(directory);
     }
 
-    private ToolResult ExecuteSearch(SiliconBeingBase being, Dictionary<string, object> parameters)
+    private static ToolResult ExecuteSearch(WorkNoteSystem workNoteSystem, Dictionary<string, object> parameters)
     {
         if (!parameters.TryGetValue("keyword", out var keywordObj))
         {
@@ -347,10 +352,10 @@ public class WorkNoteTool : ITool
             maxResults = max;
         }
 
-        var results = being.WorkNoteSystem.SearchNotes(keyword, maxResults);
+        var results = workNoteSystem.SearchNotes(keyword, maxResults);
         if (results.Count == 0)
         {
-            return ToolResult.Successful($"No work notes found matching keyword: '{keyword}'");
+            return ToolResult.Successful($"No project work notes found matching keyword: '{keyword}'");
         }
 
         var sb = new System.Text.StringBuilder();

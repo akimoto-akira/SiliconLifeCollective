@@ -107,6 +107,21 @@ public sealed class TaskItem
     public Dictionary<string, string> Metadata { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets the project ID this task belongs to. Null for private being tasks.
+    /// </summary>
+    public Guid? ProjectId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the list of assignee GUIDs responsible for this task.
+    /// </summary>
+    public List<Guid> AssigneeGuids { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the GUID of the being who created this task.
+    /// </summary>
+    public Guid CreatedByGuid { get; set; }
+
+    /// <summary>
     /// Initializes a new instance of the TaskItem class.
     /// </summary>
     public TaskItem()

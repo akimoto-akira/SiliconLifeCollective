@@ -69,6 +69,18 @@ public sealed class WorkNoteEntry
     public DateTime UpdatedAt { get; set; }
 
     /// <summary>
+    /// Gets or sets the GUID of the creator (silicon being who created this note).
+    /// Mandatory attribution, cannot be null for project notes.
+    /// </summary>
+    public Guid AuthorGuid { get; set; }
+
+    /// <summary>
+    /// Gets or sets the GUID of the last modifier (silicon being who last edited this note).
+    /// Updated on every edit.
+    /// </summary>
+    public Guid ModifiedByGuid { get; set; }
+
+    /// <summary>
     /// Gets or sets the version number (incremented on each edit)
     /// </summary>
     public int Version { get; set; } = 1;

@@ -16,6 +16,9 @@ namespace SiliconLife.Default.Web.Models;
 public class ProjectViewModel : ViewModelBase
 {
     public List<ProjectItem> Projects { get; set; } = new();
+    public int TotalCount => Projects.Count;
+    public int ActiveCount => Projects.Count(p => p.Status == "active");
+    public int ArchivedCount => Projects.Count(p => p.Status == "archived");
 }
 
 public class ProjectItem
@@ -26,4 +29,5 @@ public class ProjectItem
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public string Status { get; set; } = "active";
+    public int BeingCount { get; set; }
 }

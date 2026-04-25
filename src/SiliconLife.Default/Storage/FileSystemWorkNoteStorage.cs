@@ -107,7 +107,10 @@ public class FileSystemWorkNoteStorage : IWorkNoteStorage
     public WorkNoteEntry? ReadNoteByPage(WorkNoteOwnerType ownerType, string ownerId, int pageNumber)
     {
         var data = LoadData();
-        return data.Notes.FirstOrDefault(n => n.PageNumber == pageNumber);
+        return data.Notes.FirstOrDefault(n =>
+            n.OwnerType == ownerType &&
+            n.OwnerId == ownerId &&
+            n.PageNumber == pageNumber);
     }
 
     /// <inheritdoc/>
@@ -123,6 +126,7 @@ public class FileSystemWorkNoteStorage : IWorkNoteStorage
         existing.Content = note.Content;
         existing.Summary = note.Summary;
         existing.Keywords = note.Keywords;
+        existing.ModifiedByGuid = note.ModifiedByGuid;
         existing.Version++;
         existing.UpdatedAt = DateTime.UtcNow;
 
@@ -146,7 +150,10 @@ public class FileSystemWorkNoteStorage : IWorkNoteStorage
     public List<WorkNoteEntry> ListNotes(WorkNoteOwnerType ownerType, string ownerId)
     {
         var data = LoadData();
-        return data.Notes.OrderBy(n => n.PageNumber).ToList();
+        return data.Notes
+            .Where(n => n.OwnerType == ownerType && n.OwnerId == ownerId)
+            .OrderBy(n => n.PageNumber)
+            .ToList();
     }
 
     /// <inheritdoc/>
