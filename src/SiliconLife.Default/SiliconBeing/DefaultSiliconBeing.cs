@@ -25,6 +25,9 @@ public class DefaultSiliconBeing : SiliconBeingBase
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<DefaultSiliconBeing>();
     private volatile bool _isProcessing;
+    
+    // WebView instance (nullable, created on demand)
+    private IWebViewCore? _webView;
 
     /// <summary>
     /// Gets whether this silicon being is idle (no pending tasks and not thinking).
@@ -630,5 +633,32 @@ public class DefaultSiliconBeing : SiliconBeingBase
         }
 
         return result;
+    }
+    
+    /// <summary>
+    /// Get or create WebView instance
+    /// Created on demand, only when silicon being needs browser operations
+    /// </summary>
+    public IWebViewCore GetWebView()
+    {
+        if (_webView == null && !string.IsNullOrEmpty(BeingDirectory))
+        {
+            _webView = new PlaywrightWebView(this);
+        }
+        return _webView!;
+    }
+    
+    /// <summary>
+    /// Close WebView
+    /// Cleans up browser instance and related resources
+    /// </summary>
+    public void CloseWebView()
+    {
+        if (_webView != null)
+        {
+            _webView.Dispose();
+            _webView = null;
+            _logger.Info(Id, "Being {0}: WebView closed", Name);
+        }
     }
 }
