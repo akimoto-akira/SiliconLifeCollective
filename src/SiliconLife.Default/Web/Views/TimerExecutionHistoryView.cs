@@ -22,7 +22,7 @@ public class TimerExecutionHistoryView : ViewBase
         var vm = model as TimerExecutionHistoryViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.TimerExecutionHistoryTitle, "timer-execution-history", vm.Localization, body, GetScripts(vm), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.TimerExecutionHistoryTitle, "timer-execution-history", vm.Localization, body, GetScripts(vm), GetStyles(), "timer");
     }
 
     private static H RenderBody(TimerExecutionHistoryViewModel vm)

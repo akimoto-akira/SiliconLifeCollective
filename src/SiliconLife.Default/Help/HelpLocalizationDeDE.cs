@@ -15,24 +15,34 @@ public class HelpLocalizationDeDE : HelpLocalizationBase
     public override string GettingStarted_Title => "Schnellstart";
     public override string BeingManagement_Title => "Being-Verwaltung";
     public override string ChatSystem_Title => "Chat-System";
-    public override string TaskTimer_Title => "Aufgaben und Timer";
+    public override string Dashboard_Title => "Dashboard";
+    public override string Task_Title => "Aufgaben";
+    public override string Timer_Title => "Timer";
     public override string Permission_Title => "Berechtigungsverwaltung";
     public override string Config_Title => "Konfigurationsverwaltung";
     public override string FAQ_Title => "Häufig gestellte Fragen";
     public override string Memory_Title => "Speichersystem";
     public override string OllamaSetup_Title => "Ollama-Installation und Modell-Download";
     public override string BailianDashScope_Title => "Leitfaden für die Alibaba Cloud Bailian-Plattform";
+    public override string AIClients_Title => "KI-Client-Konfiguration";
+    
+    public override string BeingSoul_Title => "Soul-Datei";
 
     public override string[] GettingStarted_Tags => new[] { "Installation", "Start", "Einrichtung", "Schnellstart", "Erste Schritte", "Beginnen", "Initialisierung", "Umgebung" };
     public override string[] BeingManagement_Tags => new[] { "Being", "Erstellen", "Einstellung", "Being-Verwaltung", "Silicon Being", "Profil", "Konfiguration", "Verwaltung" };
     public override string[] ChatSystem_Tags => new[] { "Chat", "Nachricht", "Konversation", "Chat-System", "Dialog", "Kommunikation", "Gespräch", "Diskussion" };
-    public override string[] TaskTimer_Tags => new[] { "Aufgabe", "Timer", "Zeitplan", "Aufgaben und Timer", "cron", "Automatisierung", "Wiederholung", "Erinnerung" };
+    public override string[] Dashboard_Tags => new[] { "Dashboard", "Monitor", "Statistik", "Status", "System", "Nachrichtenhäufigkeit", "Betriebszeit", "Speicher" };
+    public override string[] Task_Tags => new[] { "aufgabe", "arbeit", "ausführung", "priorität", "abhängigkeit", "status", "automatisierung", "verwaltung" };
+    public override string[] Timer_Tags => new[] { "timer", "zeitplan", "auslösen", "wiederholung", "kalender", "erinnerung", "automatisch", "cron" };
     public override string[] Permission_Tags => new[] { "Berechtigung", "Sicherheit", "Zugriffskontrolle", "Berechtigungsverwaltung", "Authentifizierung", "Autorisierung", "Datenschutz", "Schutz" };
     public override string[] Config_Tags => new[] { "Konfiguration", "Einstellung", "Option", "Konfigurationsverwaltung", "Präferenzen", "Anpassung", "System", "Parameter" };
     public override string[] FAQ_Tags => new[] { "FAQ", "Hilfe", "Problem", "Support", "Fehlerbehebung", "Leitfaden", "Unterstützung", "Antwort" };
     public override string[] Memory_Tags => new[] { "Speicher", "Verlauf", "Protokoll", "Speichersystem", "Aktivität", "Nachverfolgung", "Suche", "Log" };
     public override string[] OllamaSetup_Tags => new[] { "Ollama", "Installation", "Modell", "Download", "Lokale KI", "Konfiguration", "Einrichtung", "Ausführen" };
     public override string[] BailianDashScope_Tags => new[] { "Bailian", "DashScope", "Alibaba Cloud", "Cloud-KI", "API", "Konfiguration", "Modell", "Bezahlung" };
+    public override string[] AIClients_Tags => new[] { "KI-Client", "KI-Dienst", "Modell", "Konfiguration", "Lokal", "Cloud", "Ollama", "DashScope", "Einrichtung" };
+    
+    public override string[] BeingSoul_Tags => new[] { "Soul-Datei", "Persönlichkeit", "Prompt", "Rolle", "Verhalten", "Konfiguration", "Charakter", "Arbeitsanleitung", "System-Prompt" };
     
     public override string GettingStarted => @"
 # Schnellstart
@@ -454,8 +464,116 @@ Auf der ""Beings""-Seite klicken Sie auf den Link ""Chatverlauf"" des entspreche
 5. **Auf Tool-Aufrufe achten**: Beachten Sie die von der KI aufgerufenen Tools, um sicherzustellen, dass die Operationen den Erwartungen entsprechen
 ";
 
-    public override string TaskTimer => @"
-# Aufgaben und Timer
+    public override string Dashboard => @"
+# Dashboard
+
+## Übersicht
+
+Das Dashboard ist Ihr Systemüberwachungszentrum, das Ihnen ermöglicht, den Ausführungsstatus der Silicon Beings auf einen Blick zu verstehen. Durch intuitive Statistikkarten und Diagramme können Sie jederzeit die Gesamtsituation des Systems im Blick behalten.
+
+## Hauptfunktionen
+
+- **Echtzeitüberwachung**: Zeigt die Anzahl der Silicon Beings, aktiven Status und Systemressourcennutzung an
+- **Nachrichtenstatistiken**: Zeigt die Häufigkeit kürzlicher Chat-Nachrichten in Diagrammform an
+- **Automatische Aktualisierung**: Daten werden automatisch aktualisiert, kein manuelles Eingreifen erforderlich
+
+## Beschreibung der Oberfläche
+
+### Statistikkarten
+
+Oben auf der Seite werden 4 Statistikkarten angezeigt, die wichtige Systeminformationen darstellen:
+
+| Karte | Beschreibung |
+|------|------|
+| 🧠 Silicon Beings Gesamt | Die Gesamtzahl aller Silicon Beings, die Sie erstellt haben |
+| ⚡ Aktive Silicon Beings | Die Anzahl der Silicon Beings, die derzeit arbeiten oder Aufgaben verarbeiten |
+| ⏱️ System-Betriebszeit | Die Zeit, die das Programm seit dem Start läuft |
+| 💾 Speichernutzung | Die Größe des Computerspeichers, die das Programm derzeit verwendet |
+
+### Nachrichtenhäufigkeitsdiagramm
+
+Unter den Statistikkarten wird ein Balkendiagramm angezeigt, das die Anzahl der Nachrichten an jedem Zeitpunkt in den letzten 20 Minuten darstellt:
+- Je höher der Balken, desto häufiger war die Nachrichteninteraktion in diesem Zeitraum
+- Wenn der Balken leer ist, bedeutet dies, dass es in diesem Zeitraum keine Nachrichteninteraktion gab
+
+## So greifen Sie zu
+
+1. Starten Sie das Silicon Life Collective-Programm
+
+2. Öffnen Sie den Browser und greifen Sie auf die Weboberfläche des Programms zu
+
+3. Klicken Sie auf den Menüpunkt **📊 Dashboard** in der linken Navigationsleiste
+
+## So verstehen Sie die Daten
+
+### Silicon Being-Aktivität
+
+- Wenn die aktive Zahl nahe an der Gesamtzahl ist: bedeutet dies, dass die meisten Beings beschäftigt sind
+- Wenn die aktive Zahl 0 ist: bedeutet dies, dass alle Beings ruhen und auf neue Aufgaben warten
+
+### Speichernutzung
+- Normaler Bereich: 50-300 MB (abhängig von der Anzahl der erstellten Beings und der Länge des Konversationsverlaufs)
+- Wenn Sie feststellen, dass der Speicher kontinuierlich wächst und 500 MB überschreitet, wird empfohlen, das Programm neu zu starten
+
+### Nachrichtenhäufigkeitstrend
+- Beobachten Sie die Veränderungen der Balkenhöhen, um zu verstehen, zu welchen Zeiten Sie das System am häufigsten nutzen
+
+## Häufige Fragen
+
+### F: Warum werden die Statistiken nicht aktualisiert?
+
+**A**: Überprüfen Sie die folgenden Punkte:
+1. Gibt es JavaScript-Fehler in der Browserkonsole
+2. Sind Netzwerkanfragen normal (F12 → Registerkarte Network)
+3. Läuft der Backend-Dienst normal
+4. Versuchen Sie, die Seite zu aktualisieren (F5)
+
+### F: Diagramm zeigt leer oder keine Daten?
+
+**A**: Mögliche Gründe:
+1. Das System wurde gerade gestartet, es gibt noch keine Nachrichteninteraktionsprotokolle
+2. In den letzten 20 Minuten wurden keine Nachrichten generiert
+3. Der ChatSystem-Dienst wurde nicht korrekt initialisiert
+
+### F: Betriebszeit wird falsch angezeigt?
+
+**A**: Die Betriebszeit wird ab dem Start der Anwendung berechnet, wenn sie abnormal angezeigt wird:
+1. Überprüfen Sie, ob die Systemzeit korrekt ist
+2. Starten Sie die Anwendung neu, um die Zeitmessung zurückzusetzen
+
+### F: Wie aktualisiere ich die Daten manuell?
+
+**A**: Die aktuelle Version wird automatisch aktualisiert, wenn Sie manuell aktualisieren müssen:
+- Drücken Sie F5, um die gesamte Seite zu aktualisieren
+- Oder drücken Sie Ctrl+F5, um die Aktualisierung zu erzwingen (Cache löschen)
+
+## Verwendungsvorschläge
+
+### Tägliche Überwachung
+
+1. **Regelmäßig überprüfen**: Es wird empfohlen, es jeden Tag zu öffnen, um den Systemausführungsstatus zu verstehen
+2. **Trends beobachten**: Durch das Nachrichtenhäufigkeitsdiagramm verstehen, zu welchen Zeiten Sie es am häufigsten verwenden
+3. **Auf Speicher achten**: Wenn die Speichernutzung 500 MB überschreitet, können Sie einen Neustart des Programms in Betracht ziehen
+4. **Aktivität verstehen**: Durch die Anzahl aktiver Beings beurteilen, ob das System normal funktioniert
+
+### Optimierungsvorschläge
+
+1. **Anzahl der Beings kontrollieren**: Zu viele Beings erstellen wird mehr Speicher belegen
+2. **Alte Konversationen bereinigen**: Bereinigen Sie regelmäßig nicht benötigte Konversationsverläufe, um Speicherplatz freizugeben
+3. **Mit Systemtools kombinieren**: Sie können die Systemressourcen zusammen mit dem Task-Manager des Computers überwachen
+
+### Was tun bei Problemen?
+
+Wenn das Dashboard nicht korrekt angezeigt wird, können Sie die folgenden Schritte versuchen:
+
+1. **Browser überprüfen**: Öffnen Sie die Browserkonsole (drücken Sie F12), überprüfen Sie, ob es Fehlermeldungen gibt
+2. **Netzwerkverbindung überprüfen**: Bestätigen Sie, dass das Programm läuft und das Netzwerk normal ist
+3. **Programmprotokolle überprüfen**: Überprüfen Sie, ob das Programm abnormale Protokolle hat
+4. **Programm neu starten**: Wenn keine der oben genannten Methoden funktioniert, versuchen Sie, das Programm zu schließen und erneut zu öffnen
+";
+
+    public override string Task => @"
+# Aufgaben
 
 ## Übersicht
 
@@ -654,6 +772,151 @@ Das System wird automatisch:
 - Abgelaufene Daten bereinigen
 
 Sie müssen nicht manuell verwalten; das System wird alles handhaben.
+";
+
+    public override string Timer => @"
+# Timer
+
+## Was sind Timer?
+
+Timer sind der automatische Erinnerungsmechanismus der Silizium-Lebensformen. Wenn die eingestellte Zeit erreicht ist, führt die Silizium-Lebensform automatisch die entsprechende Aufgabe aus.
+
+## Zwei Arten von Timern
+
+### Einmaliger Timer
+
+Ein Timer, der nur einmal auslöst. Nach dem Auslösen endet er automatisch.
+
+**Geeignete Szenarien:**
+- Sie daran erinnern, zu einer bestimmten Zeit etwas zu tun
+- Eine einmalige Aufgabe an einem bestimmten Datum ausführen
+
+### Periodischer Timer
+
+Ein Timer, der wiederholt auslöst. Nach jedem Auslösen berechnet das System automatisch die nächste Auslösezeit.
+
+**Geeignete Szenarien:**
+- Aufgaben, die täglich zu einer festen Zeit ausgeführt werden (z. B. Morgenbericht jeden Tag um 9 Uhr)
+- Aufgaben, die wöchentlich oder monatlich regelmäßig ausgeführt werden
+- Aufgaben, die regelmäßig nach dem Mondkalender Feiertagen ausgeführt werden (z. B. jedes Mond-Neujahr)
+
+## Status der Timer
+
+Timer haben vier Status:
+
+| Status | Beschreibung |
+|------|------|
+| **Läuft** | Der Timer funktioniert normal und wartet auf das Auslösen |
+| **Pausiert** | Der Timer ist vorübergehend gestoppt und wird nicht auslösen |
+| **Ausgelöst** | Einmaliger Timer hat das Auslösen abgeschlossen |
+| **Abgebrochen** | Der Timer wurde abgebrochen und wird nicht mehr auslösen |
+
+## Wie werden Timer angezeigt?
+
+### Timer einer bestimmten Silizium-Lebensform anzeigen
+
+1. Gehen Sie zur Seite **🧠 Silizium-Lebensform**
+2. Wählen Sie die Silizium-Lebensform aus, die Sie anzeigen möchten
+3. Finden Sie die Option ""Timer"", um alle Timer dieser Lebensform anzuzeigen
+
+## Bei Timern angezeigte Informationen
+
+Beim Anzeigen von Timern können Sie folgende Informationen sehen:
+
+| Informationselement | Beschreibung |
+|------|------|
+| **Name** | Der Name des Timers |
+| **Beschreibung** | Die detaillierte Beschreibung des Timers (falls vorhanden) |
+| **Status** | Aktueller Status (Läuft, Pausiert usw.) |
+| **Typ** | Einmalig oder periodisch |
+| **Nächstes Auslösedatum** | Die genaue Zeit, wann der Timer als nächstes auslöst |
+| **Kalendersystem** | Verwendeter Kalender (z. B. Gregorianisch, Mondkalender usw.) |
+| **Auslöseanzahl** | Wie oft der Timer bereits ausgelöst hat |
+| **Erstellungszeit** | Wann der Timer erstellt wurde |
+| **Letztes Auslösedatum** | Die Zeit des letzten Auslösens (falls bereits ausgelöst) |
+
+## Unterstützte Kalendersysteme
+
+Timer unterstützen verschiedene Kalendersysteme, einschließlich:
+
+- **Gregorianischer Kalender** (Gregorian): International verwendetes Sonnensystem
+- **Mondkalender** (Chinese Lunar): Traditioneller chinesischer Mondkalender
+- **Andere Kalendersysteme**: Islamischer Kalender, Himmelsstämme-Kalender usw.
+- **Intervall-Kalender** (Interval): Auslösen in festen Zeitintervallen (z. B. alle 2 Stunden)
+
+## Auslöseverlauf der Timer
+
+Jedes Mal, wenn ein Timer auslöst, zeichnet das System detaillierte Ausführungsinformationen auf.
+
+### Auslöseverlauf anzeigen
+
+1. Wählen Sie einen bestimmten Timer aus der Timer-Liste aus
+2. Zeigen Sie den Ausführungsverlauf dieses Timers an
+3. Sie können die Details jedes Auslösens sehen:
+   - Auslösezeit
+   - Ausführungsstatus (Erfolg, Fehler usw.)
+   - Konversationsnachrichten während der Ausführung (falls vorhanden)
+   - Fehlerinformationen (wenn die Ausführung fehlgeschlagen ist)
+
+### Status des Ausführungsverlaufs
+
+Jede Ausführung hat die folgenden Status:
+
+| Status | Beschreibung |
+|------|------|
+| **Nicht gestartet** | Die Ausführung hat noch nicht begonnen |
+| **Gestartet** | Startbenachrichtigung wurde gesendet |
+| **Ausführend** | Die Aufgabe wird ausgeführt |
+| **Abgeschlossen** | Die Aufgabe wurde erfolgreich abgeschlossen |
+| **Fehlgeschlagen** | Die Aufgabenausführung ist fehlgeschlagen |
+
+## Häufig gestellte Fragen
+
+### F: Wie erstelle ich einen neuen Timer?
+
+**A:** Timer werden automatisch von den Silizium-Lebensformen verwaltet. Silizium-Lebensformen erstellen Timer nach Bedarf, um regelmäßige Aufgaben auszuführen.
+
+### F: Kann ich Timer löschen oder pausieren?
+
+**A:** Ja. Das System unterstützt folgende Operationen:
+- **Timer pausieren**: Den Timer vorübergehend anhalten, kann bei Bedarf wiederhergestellt werden
+- **Timer wiederherstellen**: Einen pausierten Timer in den laufenden Status wiederherstellen. Wenn während der Pause eine Auslösezeit verpasst wurde, berechnet das System automatisch die nächste Auslösezeit
+- **Timer abbrechen**: Einen Timer dauerhaft abbrechen, wird nicht mehr auslösen
+- **Timer löschen**: Einen Timer vollständig aus dem System entfernen
+
+### F: Was tun, wenn der Timer nicht auslöst?
+
+**Überprüfen Sie Folgendes:**
+1. Ob sich der Timer im Status **Läuft** befindet (nicht Pausiert oder Abgerochen)
+2. Ob die Auslösezeit erreicht ist (überprüfen Sie ""Nächstes Auslösedatum"")
+3. Ob die Silizium-Lebensform normal läuft
+
+### F: Wie erfahre ich, wie die Timer arbeiten?
+
+**Methoden:**
+1. Überprüfen Sie die Timer-Liste, um bevorstehende Operationen zu verstehen
+2. Überprüfen Sie den Ausführungsverlauf, um vergangene Aktivitäten zu verstehen
+3. Fragen Sie direkt die Silizium-Lebensform im Gespräch.
+
+### F: Wie berechnet ein periodischer Timer die nächste Auslösezeit?
+
+**A:** Nach jedem Auslösen eines periodischen Timers berechnet das System automatisch die nächste Auslösezeit basierend auf dem Kalendersystem und den eingestellten Bedingungen. Zum Beispiel:
+- Wenn Gregorianisch ""jeden Tag um 9 Uhr"" eingestellt ist, wird das System jeden Tag um 9 Uhr auslösen und dann 9 Uhr des nächsten Tages als nächste Auslösezeit berechnen
+- Wenn Mondkalender ""jedes Jahr erster Tag des ersten Monats"" eingestellt ist, wird das System während des Mond-Neujahrs auslösen und dann das Datum des nächsten Mond-Neujahrs berechnen
+
+## Verwendungsempfehlungen
+
+### Tägliche Überwachung
+
+1. **Regelmäßig überprüfen**: Verstehen Sie die automatische Ausführung der Silizium-Lebensformen
+2. **Ausführungsverlauf beachten**: Verstehen Sie den Arbeitsmodus der KI
+3. **Anomalien überprüfen**: Überprüfen Sie, ob es Aufzeichnungen über fehlgeschlagene Ausführungen gibt
+
+### Optimierungsvorschläge
+
+1. **Mit Gespräch kombinieren**: Diskutieren Sie den Status der Timer mit der Silizium-Lebensform
+2. **Ausführungsergebnisse beobachten**: Verstehen Sie die Timer-Effekte durch den Ausführungsverlauf
+3. **Strategie anpassen**: Lassen Sie bei Bedarf die Silizium-Lebensform die Timer-Einstellungen durch Gespräch anpassen
 ";
 
     public override string Permission => @"
@@ -1729,7 +1992,6 @@ Empfehlen Sie, ausreichenden Festplattenspeicher freizuhalten.
 
 - **Ollama-Website**: https://ollama.com
 - **Ollama-Dokumentation**: https://docs.ollama.com
-- **Modellbibliothek**: https://ollama.com/library (alle verfügbaren Modelle anzeigen)
 
 ## Nächste Schritte
 
@@ -1996,6 +2258,536 @@ Nach der Konfiguration von Bailian können Sie:
 - Sich keine Sorgen über lokale Hardwarekonfiguration machen
 
 Viel Spaß bei der Verwendung!
+";
+    
+    public override string AIClients => @"
+# KI-Client-Konfiguration
+
+## Übersicht
+
+KI-Clients sind die ""Brain-Connectors"" des Silicon Life-Systems und verantwortlich für die Kommunikation mit künstlichen Intelligenzmodellen. Das System unterstützt mehrere KI-Clients, und Sie können den appropriate Service basierend auf Ihren Bedürfnissen auswählen.
+
+## Unterstützte KI-Clients
+
+Das System unterstützt mehrere KI-Clients, und Sie können den appropriate Service basierend auf Ihren Bedürfnissen auswählen.
+
+### Lokaler KI-Client
+
+**Merkmale:**
+- 🏠 **Lokaler Betrieb**: KI-Modelle laufen auf Ihrem Computer
+- 🔒 **Datenschutz und Sicherheit**: Daten werden nicht in die Cloud hochgeladen
+- 💰 **Völlig kostenlos**: Keine Nutzungsbeschränkungen
+- ⚡ **Schnelle Antwort**: Keine Netzwerklatenz (lokale Modelle)
+
+**Geeignete Szenarien:**
+- Datenschutzorientierte Benutzer
+- Bessere Computerkonfiguration (empfohlen 16GB+ RAM)
+- Unbegrenzte KI-Nutzung
+- Schlechte Netzwerkbedingungen
+
+**Konfigurationsanforderungen:**
+- Muss entsprechende KI-Service-Software installieren
+- Muss KI-Modelldateien herunterladen (normalerweise 4-20GB)
+- Empfohlen 16GB+ RAM, dedizierte Grafikkarte ist besser
+
+### Cloud-KI-Client
+
+**Merkmale:**
+- ☁️ **Cloud-Service**: KI-Modelle laufen auf Remote-Servern
+- 🚀 **Leistungsstark**: Kann ultragroße Modelle verwenden (200B+ Parameter)
+- 💳 **Pay-per-use**: Hat Freikontingent, nach Überschreiten wird nach Nutzung abgerechnet
+- 🌍 **Multi-Region-Unterstützung**: Kann näher gelegene Server auswählen
+
+**Geeignete Szenarien:**
+- Niedrigere Computerkonfiguration
+- Muss High-End-Modelle verwenden
+- Gelegentliche Nutzung, geringe Nutzung
+- Will schnell starten ohne lokale Konfiguration
+
+**Konfigurationsanforderungen:**
+- Benötigt Konto und API-Schlüssel für entsprechende Plattform
+- Benötigt Internetverbindung
+- Hat Nutzungslimit (kann periodisch aktualisieren)
+
+## Wie wählt man einen KI-Client?
+
+### Auswahl-Flowchart
+
+```
+Wie ist Ihre Computerkonfiguration?
+├─ Hohe Konfiguration (16GB+ RAM)
+│  └─ Datenschutzorientiert?
+│     ├─ Ja → Wählen Sie lokalen Client (z.B. Ollama)
+│     └─ Nein → Beides ist möglich
+└─ Niedrige Konfiguration (8GB oder weniger)
+   └─ Wählen Sie Cloud-Client (z.B. DashScope)
+```
+
+### Vergleichstabelle
+
+| Merkmal | Lokaler Client | Cloud-Client |
+|------|--------------|-----------------|
+| Installationsschwierigkeit | Mittel (muss Software und Modelle installieren) | Einfach (nur API-Schlüssel benötigt) |
+| Betriebskosten | Kostenlos (verbraucht Strom) | Hat Freikontingent, nach Überschreiben Abrechnung |
+| Datenschutz | ⭐⭐⭐⭐⭐ Völlig lokal | ⭐⭐⭐ Daten gehen durch Cloud |
+| Modellauswahl | Begrenzt durch Computerkonfiguration | Kann verschiedene große Modelle auswählen |
+| Netzwerkanforderung | Nur beim Herunterladen von Modellen benötigt | Immer benötigt |
+| Antwortgeschwindigkeit | Schnell (lokal) | Hängt vom Netzwerk ab |
+| Nutzungsbeschränkungen | Keine Beschränkungen | Hat Kontingentbeschränkungen |
+
+## KI-Client konfigurieren
+
+### Schritt 1: Konfigurationsseite betreten
+
+1. Öffnen Sie das Silicon Life-System
+2. Klicken Sie auf das **⚙ Konfiguration**-Menü in der oberen Navigationsleiste
+
+### Schritt 2: KI-Client-Typ auswählen
+
+1. Finden Sie die Option **""KI-Client-Typ""** auf der Konfigurationsseite
+2. Wählen Sie Ihren gewünschten Client aus dem Dropdown-Menü:
+   - Lokaler Client (z.B. `OllamaClient`)
+   - Cloud-Client (z.B. `DashScopeClient`)
+
+### Schritt 3: Konfigurationsinformationen ausfüllen
+
+Nach der Auswahl des Clients erscheinen unten entsprechende Konfigurationselemente:
+
+#### Lokaler Client-Konfiguration (z.B. Ollama)
+
+| Konfigurationselement | Beschreibung | Standardwert | Beispiel |
+|--------|------|--------|------|
+| **endpoint** | KI-Service-Adresse | Abhängig vom spezifischen Service | z.B. `http://localhost:11434` |
+| **model** | Zu verwendendes Modell | Abhängig vom spezifischen Service | z.B. `qwen3.5:8b` |
+| **temperature** | Kreativitätsniveau (0-1) | `0.7` | `0.5` konservativer, `0.9` kreativer |
+| **maxTokens** | Maximale Antwortlänge | `2048` | `4096` erlaubt längere Antworten |
+
+**Konfigurationsbeispiel:**
+```
+KI-Client-Typ: Lokaler Client-Typ (z.B. OllamaClient)
+endpoint: http://localhost:11434 (gemäß tatsächlicher Service-Adresse ausfüllen)
+model: qwen3.5:8b (gemäß heruntergeladenem Modell ausfüllen)
+temperature: 0.7
+maxTokens: 2048
+```
+
+#### Cloud-Client-Konfiguration (z.B. DashScope)
+
+| Konfigurationselement | Beschreibung | Standardwert | Beispiel |
+|--------|------|--------|------|
+| **apiKey** | API-Schlüssel | Keiner | Von spezifischer Plattform bereitgestellt |
+| **region** | Server-Region | Abhängig von spezifischer Plattform | z.B. `beijing` |
+| **model** | Zu verwendendes Modell | Abhängig von spezifischer Plattform | z.B. `qwen3.6-plus` |
+| **temperature** | Kreativitätsniveau (0-1) | `0.7` | `0.5` |
+| **maxTokens** | Maximale Antwortlänge | `2048` | `4096` |
+
+**Verfügbare Regionen:**
+
+| Regionscode | Ort | Geeignete Benutzer |
+|---------|------|---------|
+| `beijing` | Peking, China | Benutzer in Festlandchina (empfohlen) |
+| `singapore` | Singapur | Benutzer in Südostasien |
+| `hongkong` | Hongkong, China | Benutzer in Hongkong, Macao, Taiwan |
+| `virginia` | USA | Nordamerikanische Benutzer |
+| `frankfurt` | Deutschland | Europäische Benutzer |
+
+**Verfügbare Modelle:**
+
+| Modellname | Merkmale | Geeignete Szenarien |
+|---------|------|---------|
+| `qwen3.6-plus` | Ausgewogene Leistung (empfohlen) | Täglicher Gebrauch |
+| `qwen3-max` | Stärkste Fähigkeit | Komplexe Aufgaben |
+| `qwen3.6-flash` | Schnelle Antwort | Einfache Fragen und Antworten |
+| `qwen-max` | Flaggschiff der vorherigen Generation | Komplexe Schlussfolgerung |
+| `qwen-plus` | Verstärkt der vorherigen Generation | Allgemeine Szenarien |
+| `qwen-turbo` | Schnell der vorherigen Generation | Einfache Aufgaben |
+| `qwen3-coder-plus` | Programmierung spezifisch | Code-Generierung |
+| `qwq-plus` | Schlussfolgerung spezifisch | Mathematik, Logik |
+| `deepseek-v3.2` | Drittanbieter-Modell | Allgemeine Szenarien |
+| `deepseek-r1` | Schlussfolgerungsmodell | Tiefes Denken |
+| `glm-5.1` | Zhipu-Modell | Chinesische Szenarien |
+| `kimi-k2.5` | Langer Kontext | Lange Textverarbeitung |
+| `llama-4-maverick` | Meta-Modell | Englische Szenarien |
+
+**Konfigurationsbeispiel:**
+```
+KI-Client-Typ: Cloud-Client-Typ (z.B. DashScopeClient)
+apiKey: Ihr API-Schlüssel (von entsprechender Plattform erhalten)
+region: beijing (wählen Sie die nächstgelegene Region)
+model: qwen3.6-plus (gemäß verfügbaren Modellen auswählen)
+temperature: 0.7
+maxTokens: 2048
+```
+
+### Schritt 4: Konfiguration speichern
+
+1. Nach dem Ausfüllen aller notwendigen Informationen
+2. Klicken Sie auf die Schaltfläche **""Konfiguration speichern""** am unteren Rand der Seite
+3. Das System wird melden, dass das Speichern erfolgreich war
+
+### Schritt 5: Verbindung testen
+
+1. Klicken Sie auf das **💬 Chat**-Menü in der oberen Navigationsleiste
+2. Wählen Sie ein Silicon Being
+3. Senden Sie eine Testnachricht, z.B. ""Hallo""
+4. Wenn Sie eine Antwort erhalten, war die Konfiguration erfolgreich
+
+## FAQ
+
+### F1: Ich weiß nicht, welchen Client ich wählen soll?
+
+**Vorschläge:**
+- Wenn Sie Anfänger sind, wird empfohlen, zuerst **Cloud-Client** zu verwenden, einfache Konfiguration, schnelles Starten
+- Wenn Sie Datenschutz schätzen oder bessere Computerkonfiguration haben, wählen Sie **lokalen Client**
+
+### F2: Kann ich zwei Clients gleichzeitig verwenden?
+
+Nein. Das System kann nur einen KI-Client gleichzeitig verwenden. Aber Sie können jederzeit auf der Konfigurationsseite wechseln.
+
+### F3: Werden Chat-Protokolle nach dem Wechseln von Clients verloren?
+
+Nein. Chat-Protokolle werden im System gespeichert und sind unabhängig vom KI-Client. Sie können auch nach dem Wechsel historische Gespräche ansehen.
+
+### F4: Lokaler Client zeigt Verbindungsfehler an?
+
+**Lösungen:**
+1. Bestätigen Sie, dass die entsprechende KI-Service-Software läuft (System-Tray oder Prozesse prüfen)
+2. Prüfen Sie, ob die endpoint-Adresse korrekt ist (Standardkonfiguration dieses Service referenzieren)
+3. Greifen Sie auf die Service-Adresse in einem Browser zu, Sie sollten eine Antwort sehen
+4. Bestätigen Sie, dass Modelle heruntergeladen sind: Verwenden Sie den Befehl des spezifischen Service, um die Modellliste anzusehen
+
+### F5: Cloud-Client zeigt Authentifizierungsfehler an?
+
+**Lösungen:**
+1. Prüfen Sie, ob der API-Schlüssel korrekt ist (Format bezieht sich auf die Anforderungen der entsprechenden Plattform)
+2. Bestätigen Sie, dass das Konto nicht im Rückstand ist
+3. Prüfen Sie, ob das Nutzungskontingent überschritten ist
+4. Generieren Sie den API-Schlüssel neu und aktualisieren Sie die Konfiguration
+
+### F6: Wie erhält man den API-Schlüssel für Cloud-Client?
+
+**Allgemeine Schritte:**
+1. Besuchen Sie die Konsolen-Website des entsprechenden KI-Service-Anbieters
+2. Melden Sie sich bei Ihrem Konto an
+3. Betreten Sie die Seite ""Schlüsselverwaltung"" oder ""API-Verwaltung""
+4. Klicken Sie auf ""Schlüssel erstellen"" oder ""API-Schlüssel generieren""
+5. Kopieren Sie den generierten API-Schlüssel und speichern Sie ihn ordnungsgemäß
+
+### F7: Was tun, wenn die Antwort sehr langsam ist?
+
+**Lokaler Client:**
+- Prüfen Sie die Computerressourcennutzung (CPU, RAM, Grafikkarte)
+- Versuchen Sie ein kleineres Modell (z.B. 8B statt 32B)
+- Schließen Sie andere ressourcenverbrauchende Programme
+
+**Cloud-Client:**
+- Prüfen Sie die Netzwerkverbindungsqualität
+- Versuchen Sie eine näher gelegene Server-Region
+- Vermeiden Sie Netzwerk-Hauptlastzeiten
+
+### F8: Was ist der temperature-Parameter?
+
+temperature steuert die Kreativität von KI-Antworten:
+- **0.0-0.3**: Sehr konservativ, vorhersehbare Antworten, geeignet für faktische Fragen
+- **0.4-0.7**: Ausgewogener Modus, geeignet für tägliche Konversation (empfohlen)
+- **0.8-1.0**: Sehr kreativ, vielfältige Antworten, geeignet für kreatives Schreiben
+
+### F9: Wie viel sollte maxTokens eingestellt werden?
+
+- **1024**: Kurze Antworten, geeignet für einfache Fragen und Antworten
+- **2048**: Mittlere Länge, geeignet für allgemeine Konversation (empfohlen)
+- **4096+**: Lange Antworten, geeignet für komplexe Aufgaben oder lange Textgenerierung
+
+Hinweis: Je größer die Einstellung, je mehr Ressourcen und Zeit verbraucht werden.
+
+### F10: Können verschiedene Beings verschiedene Clients verwenden?
+
+Ja. Jedes Silicon Being kann unabhängig den KI-Client-Typ konfigurieren.
+
+**Einrichtungsmethode:**
+1. Betreten Sie die Being-Verwaltungsseite
+2. Wählen Sie das zu konfigurierende Being
+3. Setzen Sie AIClientType in der Konfiguration dieses Beings
+4. Wenn das Being nicht eingestellt ist, wird die globale Konfiguration verwendet
+
+## Best Practices
+
+### 1. Modelle basierend auf Aufgaben auswählen
+
+- **Tägliche Konversation**: Verwenden Sie kleine bis mittlere Modelle (8B-14B oder schnelle Modelle)
+- **Komplexe Analyse**: Verwenden Sie große Modelle (32B+ oder fortgeschrittene Modelle)
+- **Code-Generierung**: Verwenden Sie dedizierte Programmiermodelle
+- **Kreatives Schreiben**: Verwenden Sie höhere temperature (0.8-0.9)
+
+### 2. Kosten optimieren (Cloud-Client)
+
+- Regelmäßig Nutzung prüfen, um Überschreiten des Freikontingents zu vermeiden
+- Verwenden Sie schnelle Modelle für einfache Aufgaben
+- Verwenden Sie fortgeschrittene Modelle für komplexe Aufgaben
+- Setzen Sie maxTokens vernünftig, um Verschwendung zu vermeiden
+
+### 3. Leistung verbessern (Lokaler Client)
+
+- Priorisieren Sie das Herunterladen häufig verwendeter Modelle, um Herunterladen zur Laufzeit zu vermeiden
+- Halten Sie KI-Service resident, um Startzeit zu reduzieren
+- Verwenden Sie Grafikkarten-Beschleunigung (wenn Sie NVIDIA-Grafikkarte haben)
+- Regelmäßig ungenutzte Modelle bereinigen, um Speicherplatz freizugeben
+
+### 4. Sicherheitsempfehlungen
+
+- Teilen Sie API-Schlüssel nicht mit anderen
+- Regelmäßig API-Schlüssel ändern
+- Lokale Clients sind nur auf lokalen Zugang beschränkt, nicht zum öffentlichen Netzwerk exponieren
+- Wichtige Konfigurationsdateien sichern
+
+## Hilfe erhalten
+
+Wenn Sie Probleme haben:
+1. Prüfen Sie den Abschnitt [FAQ](#faq)
+2. Prüfen Sie [Konfigurationsverwaltung](./config) für Systemkonfigurationsanweisungen
+3. Prüfen Sie Systemprotokolle für Fehlerdetails
+";
+    
+    public override string BeingSoul => @"
+# Soul-Datei
+
+## Übersicht
+
+Die Soul-Datei ist die Kernkonfigurationsdatei eines Silicon Being und bestimmt die **Persönlichkeit, Verhaltensmuster, fachlichen Fähigkeiten und Arbeitsmethoden** jedes Beings.
+
+Sie können die Soul-Datei als ""Persönlichkeitseinstellung"" oder ""Arbeitsanleitung"" des Beings verstehen. Sie wird bei jeder KI-Konversation automatisch geladen und leitet das Silicon Being, so zu denken und zu handeln, wie Sie es erwarten.
+
+## Rolle der Soul-Datei
+
+Die Soul-Datei ist die **Kernantriebskraft** eines Silicon Being und definiert:
+
+- 🎭 **Rollenpositionierung**: Wer dieses Silicon Being ist, in welchen Bereichen es sich auszeichnet
+- 📋 **Verhaltensrichtlinien**: Wie es auf Benutzer antworten sollte, welchen Prinzipien es folgen soll
+- 🔄 **Arbeitsablauf**: Wie Aufgaben nach Erhalt bearbeitet werden, in wie vielen Schritten
+- ⚠️ **Verhaltensgrenzen**: Was getan werden kann, was nicht getan werden sollte
+- 💡 **Fachliche Anforderungen**: Code-Standards, Ausgabeformat, Sprachstil usw.
+
+## So bearbeiten Sie die Soul-Datei
+
+### Über die Web-Oberfläche bearbeiten
+
+1. Gehen Sie zur Seite **Silicon Beings**
+2. Klicken Sie auf die Karte des Silicon Being, das Sie bearbeiten möchten
+3. Klicken Sie auf den Link **Soul-Datei**
+4. Ändern Sie den Inhalt im Markdown-Editor
+5. Klicken Sie auf die Schaltfläche **Speichern**
+
+### Über den KI-Assistenten bearbeiten
+
+Sie können auch direkt mit dem **Silicon Curator** sprechen und ihn bitten, die Soul-Datei zu ändern:
+
+```
+Bitte helfen Sie mir, die Soul-Datei des Programmierassistenten zu ändern, um Python-Entwicklungsunterstützung hinzuzufügen
+```
+
+Der Silicon Curator wird Ihnen helfen, den Inhalt der Soul-Datei zu aktualisieren.
+
+## Leitfaden zum Schreiben von Soul-Dateien
+
+### Grundstruktur
+
+Soul-Dateien werden im **Markdown-Format** geschrieben. Die folgende Struktur wird empfohlen:
+
+```markdown
+# Rolleneinstellung
+
+Sie sind ein [Rollenbeschreibung], spezialisiert auf:
+- Fähigkeit 1
+- Fähigkeit 2
+- Fähigkeit 3
+
+# Verhaltensrichtlinien
+
+1. Richtlinie 1
+2. Richtlinie 2
+3. Richtlinie 3
+
+# Arbeitsablauf
+
+Beim Empfang einer Aufgabe:
+1. Anforderungen verstehen
+2. Ansatz analysieren
+3. Operationen ausführen
+4. Ergebnisse melden
+
+# Code-Standards
+
+- Bestimmte Codierungsstandards befolgen
+- Erforderliche Kommentare bereitstellen
+- Randfälle berücksichtigen
+```
+
+### Schreibtipps
+
+1. **Klare Rollendefinition**: Geben Sie klar die Verantwortlichkeiten und Fachgebiete des Silicon Being an
+2. **Verhaltensgrenzen setzen**: Erklären Sie, was getan werden kann und was nicht getan werden sollte
+3. **Arbeitsablauf bereitstellen**: Leiten Sie das Silicon Being, wie Aufgaben zu bearbeiten sind
+4. **Markdown-Format verwenden**: Unterstützt Überschriften, Listen, Codeblöcke usw.
+5. **Spezifisch statt vage**: Verwenden Sie konkrete Beispiele anstelle abstrakter Beschreibungen
+
+## Praktische Beispiele
+
+### Beispiel 1: Programmierassistent
+
+```markdown
+# Rolleneinstellung
+
+Sie sind ein professioneller Full-Stack-Entwicklungsassistent, spezialisiert auf:
+- C# / .NET-Entwicklung
+- Architekturdesign und Code-Review
+- Datenbankdesign und -optimierung
+- Web-Frontend-Entwicklung
+
+# Verhaltensrichtlinien
+
+1. Immer ausführbare Codebeispiele bereitstellen
+2. Wichtige Code-Logik und Designgedanken erklären
+3. Best-Practice-Empfehlungen geben
+4. Bei Unsicherheit den Benutzer klar informieren
+
+# Code-Standards
+
+- SOLID-Prinzipien befolgen
+- Klare Namensgebung verwenden
+- Erforderliche Kommentare hinzufügen
+- Ausnahmebehandlung und Randfälle berücksichtigen
+```
+
+### Beispiel 2: Kundenservice-Assistent
+
+```markdown
+# Rolleneinstellung
+
+Sie sind ein freundlicher Kundenservice-Assistent, verantwortlich für:
+- Häufige Benutzerfragen beantworten
+- Einfache Beschwerden bearbeiten
+- Benutzer durch Vorgänge führen
+- Benutzerfeedback sammeln
+
+# Verhaltensrichtlinien
+
+1. Immer höflich und geduldig bleiben
+2. In einfacher, leicht verständlicher Sprache erklären
+3. Bei Nichtlösbarkeit sofort an menschlichen Agenten übergeben
+4. Benutzerfragen und Feedback aufzeichnen
+
+# Arbeitsablauf
+
+1. Benutzer begrüßen
+2. Benutzerbedürfnisse verstehen
+3. Lösungen bereitstellen
+4. Bestätigen, ob das Problem gelöst ist
+5. Benutzer danken und Gespräch beenden
+```
+
+### Beispiel 3: Datenanalyse-Assistent
+
+```markdown
+# Rolleneinstellung
+
+Sie sind ein Datenanalyseexperte, spezialisiert auf:
+- Datenbereinigung und -vorverarbeitung
+- Statistische Analyse und Visualisierung
+- Trendvorhersage und Anomalieerkennung
+- Generieren von Datenberichten
+
+# Ausgabeanforderungen
+
+1. Klare Analyseergebnisse bereitstellen
+2. Diagramme zur unterstützenden Erklärung verwenden
+3. Datenquellen und Annahmen annotieren
+4. Umsetzbare Empfehlungen geben
+```
+
+## Speicherort der Soul-Datei
+
+Die Soul-Datei jedes Silicon Being wird in seinem Datenverzeichnis gespeichert:
+
+```
+DataDirectory/SiliconManager/{BeingGUID}/soul.md
+```
+
+Das System verwaltet diese Datei automatisch, und Sie müssen das Dateisystem nicht manuell bedienen.
+
+## Häufig gestellte Fragen
+
+### F: Werden Änderungen an der Soul-Datei sofort wirksam?
+
+**A:** Ja, sie werden sofort nach dem Speichern wirksam. Beim nächsten Mal, wenn das Silicon Being antwortet, wird es die neue Soul-Datei verwenden.
+
+### F: Gibt es eine Größenbeschränkung für Soul-Dateien?
+
+**A:** Es gibt keine strenge Größenbeschränkung, aber es wird empfohlen, sie in einem vernünftigen Bereich zu halten (innerhalb weniger tausend Wörter). Zu lange Soul-Dateien können die Antwortgeschwindigkeit beeinträchtigen.
+
+### F: Kann ich die Soul-Datei vollständig löschen?
+
+**A:** Es wird nicht empfohlen, die Soul-Datei zu löschen. Wenn der Inhalt leer ist, verliert das Silicon Being die Verhaltensanleitung und kann unerwartete Antworten erzeugen.
+
+### F: Wie sichere ich die Soul-Datei?
+
+**A:** Es wird empfohlen, die Soul-Dateien wichtiger Silicon Beings regelmäßig zu sichern. Sie können:
+1. Den Inhalt über die Weboberfläche in eine lokale Datei kopieren
+2. Die Exportfunktion des Systems verwenden (falls unterstützt)
+3. Das Datenverzeichnis direkt sichern
+
+### F: Was ist die Beziehung zwischen der Soul-Datei und dem Speichersystem?
+
+**A:** Die Soul-Datei definiert **langfristige Verhaltensmuster**, während das Speichersystem **kurzfristige Konversationsverläufe** aufzeichnet. Sie arbeiten zusammen:
+- Soul-Datei: Sagt dem Silicon Being ""welche Rolle du hast""
+- Speichersystem: Sagt dem Silicon Being ""worüber wir vorher gesprochen haben""
+
+### F: Können verschiedene Silicon Beings dieselbe Soul-Datei verwenden?
+
+**A:** Ja, aber es wird nicht empfohlen. Jedes Silicon Being sollte eine einzigartige Rollenpositionierung haben, um funktionale Duplikate zu vermeiden.
+
+## Best Practices
+
+1. **Kontinuierliche Optimierung**: Optimieren Sie die Soul-Datei kontinuierlich basierend auf tatsächlichem Nutzungsfeedback
+2. **Versionsverwaltung**: Sichern Sie die aktuelle Version vor größeren Änderungen
+3. **Testverifikation**: Testen Sie die Wirkung nach der Änderung durch Konversation
+4. **Prägnant halten**: Drücken Sie Kernanforderungen in prägnanter Sprache aus
+5. **Widersprüche vermeiden**: Stellen Sie sicher, dass es keine Konflikte zwischen verschiedenen Richtlinien gibt
+6. **Regelmäßige Überprüfung**: Überprüfen Sie regelmäßig, ob die Soul-Datei noch anwendbar ist
+
+## Fehlerbehebung
+
+### Problem: Das Verhalten des Silicon Being entspricht nicht den Erwartungen
+
+**Checkliste:**
+1. Ist der Inhalt der Soul-Datei klar und genau?
+2. Haben Sie ausreichende Verhaltensanleitung hinzugefügt?
+3. Gibt es widersprüchliche Anweisungen?
+4. Haben Sie einen spezifischen Arbeitsablauf bereitgestellt?
+
+**Lösungen:**
+1. Vage Beschreibungen neu schreiben
+2. Weitere spezifische Verhaltensrichtlinien hinzufügen
+3. Beispiele bereitstellen, um die erwartete Ausgabe zu veranschaulichen
+4. Testen und kontinuierlich optimieren
+
+### Problem: Soul-Datei konnte nicht gespeichert werden
+
+**Mögliche Ursachen:**
+1. Dateisystem-Berechtigungsprobleme
+2. Unzureichender Festplattenspeicher
+3. Datei ist von einem anderen Prozess belegt
+
+**Lösungen:**
+1. Systemprotokolle auf detaillierte Fehlerinformationen prüfen
+2. Bestätigen, dass das Datenverzeichnis beschreibbar ist
+3. Nach dem Neustart des Systems erneut versuchen
+
+## Verwandte Funktionen
+
+- 🤖 [Being-Verwaltung](being-management) - Silicon Beings erstellen und verwalten
+- 💬 [Chat-System](chat-system) - Mit Silicon Beings konversieren
+- 🧠 [KI-Client-Konfiguration](ai-clients) - KI-Dienste konfigurieren
+- 📝 [Speichersystem](memory) - Konversationsverlauf verwalten
 ";
     
     #endregion

@@ -22,7 +22,7 @@ public class ChatHistoryListView : ViewBase
         var vm = model as ChatHistoryListViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.ChatHistoryPageTitle, "chat-history", vm.Localization, body, GetScripts(vm), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.ChatHistoryPageTitle, "chat-history", vm.Localization, body, GetScripts(vm), GetStyles(), helpTopicId: "chat-system");
     }
 
     private static H RenderBody(ChatHistoryListViewModel vm)

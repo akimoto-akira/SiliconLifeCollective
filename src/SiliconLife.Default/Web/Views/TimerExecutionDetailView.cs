@@ -25,7 +25,7 @@ public class TimerExecutionDetailView : ViewBase
         var scripts = GetScripts(vm);
         var styles = GetStyles();
         
-        return RenderPage(vm.Skin, vm.Localization.TimerExecutionDetailTitle, "timer-execution-detail", vm.Localization, body, scripts, styles);
+        return RenderPage(vm.Skin, vm.Localization.TimerExecutionDetailTitle, "timer-execution-detail", vm.Localization, body, scripts, styles, "timer");
     }
 
     private static H RenderBody(TimerExecutionDetailViewModel vm)

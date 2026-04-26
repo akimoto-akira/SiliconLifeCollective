@@ -458,6 +458,28 @@ public sealed class TaskSystem
     }
 
     /// <summary>
+    /// Starts a pending task, transitioning it to Running status.
+    /// </summary>
+    /// <param name="taskId">The ID of the task to start.</param>
+    /// <returns>True if the task was started; otherwise, false.</returns>
+    public bool Start(Guid taskId)
+    {
+        lock (_lock)
+        {
+            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
+            if (task != null && task.Status == TaskStatus.Pending)
+            {
+                task.Start();
+                Save();
+                _logger.Info(_owner.Id, "Task started: {0} ({1})", task.Title, task.Id);
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    /// <summary>
     /// Marks a running task as completed.
     /// </summary>
     /// <param name="taskId">The ID of the task to complete.</param>

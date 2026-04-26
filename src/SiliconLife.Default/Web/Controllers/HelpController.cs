@@ -25,6 +25,10 @@ public class HelpController : Controller
     {
         var path = Request.Url?.AbsolutePath ?? "/help";
 
+        // Resolve language and skin from query parameters (override config)
+        ResolveLocalizationFromQuery();
+        ResolveSkinFromQuery();
+
         if (path == "/help" || path == "/help/index")
             Index();
         else if (path.StartsWith("/help/"))
@@ -35,6 +39,34 @@ public class HelpController : Controller
         {
             Response.StatusCode = 404;
             Response.Close();
+        }
+    }
+
+    /// <summary>
+    /// Resolve language from query parameter (?lang=zh-CN)
+    /// </summary>
+    private void ResolveLocalizationFromQuery()
+    {
+        var langParam = GetQueryValue("lang");
+        if (!string.IsNullOrEmpty(langParam) && Enum.TryParse<Language>(langParam, ignoreCase: true, out var lang))
+        {
+            // Temporarily override the language in config
+            var configData = (DefaultConfigData)Config.Instance.Data;
+            configData.Language = lang;
+        }
+    }
+
+    /// <summary>
+    /// Resolve skin from query parameter (?skin=ChatSkin)
+    /// </summary>
+    private void ResolveSkinFromQuery()
+    {
+        var skinParam = GetQueryValue("skin");
+        if (!string.IsNullOrEmpty(skinParam))
+        {
+            // Temporarily override the skin in config
+            var configData = (DefaultConfigData)Config.Instance.Data;
+            configData.WebSkin = skinParam;
         }
     }
 
@@ -72,9 +104,8 @@ public class HelpController : Controller
 
         var helpLocalization = GetHelpLocalization();
 
-        // Get document content by property name
+        // Get document content by property name (return raw markdown, not HTML)
         var content = GetDocumentByProperty(helpLocalization, topic.PropertyName);
-        var htmlContent = SimpleMarkdownToHtml(content);
 
         // Find previous and next topics
         var currentIndex = HelpTopics.AllTopics.IndexOf(topic);
@@ -85,7 +116,7 @@ public class HelpController : Controller
         {
             Topics = HelpTopics.AllTopics,
             CurrentTopic = topic,
-            ContentHtml = htmlContent,
+            ContentHtml = content, // Pass raw markdown, will be rendered by marked.js
             Skin = GetSkin(),
             ActiveMenu = "help",
             PreviousTopic = previousTopic,
@@ -135,133 +166,6 @@ public class HelpController : Controller
     {
         var property = help.GetType().GetProperty(propertyName);
         return property?.GetValue(help) as string ?? string.Empty;
-    }
-
-    /// <summary>
-    /// Simple Markdown to HTML converter
-    /// </summary>
-    private string SimpleMarkdownToHtml(string markdown)
-    {
-        if (string.IsNullOrEmpty(markdown))
-            return string.Empty;
-
-        var lines = markdown.Split('\n');
-        var html = new System.Text.StringBuilder();
-        var inCodeBlock = false;
-        var inList = false;
-
-        foreach (var line in lines)
-        {
-            var trimmedLine = line.Trim();
-
-            // Code blocks
-            if (trimmedLine.StartsWith("```"))
-            {
-                if (inCodeBlock)
-                {
-                    html.AppendLine("</code></pre>");
-                    inCodeBlock = false;
-                }
-                else
-                {
-                    if (inList)
-                    {
-                        html.AppendLine("</ul>");
-                        inList = false;
-                    }
-                    html.AppendLine("<pre><code>");
-                    inCodeBlock = true;
-                }
-                continue;
-            }
-
-            if (inCodeBlock)
-            {
-                html.AppendLine(System.Net.WebUtility.HtmlEncode(line));
-                continue;
-            }
-
-            // Headers
-            if (trimmedLine.StartsWith("# "))
-            {
-                if (inList)
-                {
-                    html.AppendLine("</ul>");
-                    inList = false;
-                }
-                html.AppendLine($"<h1>{trimmedLine.Substring(2)}</h1>");
-            }
-            else if (trimmedLine.StartsWith("## "))
-            {
-                if (inList)
-                {
-                    html.AppendLine("</ul>");
-                    inList = false;
-                }
-                html.AppendLine($"<h2>{trimmedLine.Substring(3)}</h2>");
-            }
-            else if (trimmedLine.StartsWith("### "))
-            {
-                if (inList)
-                {
-                    html.AppendLine("</ul>");
-                    inList = false;
-                }
-                html.AppendLine($"<h3>{trimmedLine.Substring(4)}</h3>");
-            }
-            // Lists
-            else if (trimmedLine.StartsWith("- ") || trimmedLine.StartsWith("* "))
-            {
-                if (!inList)
-                {
-                    html.AppendLine("<ul>");
-                    inList = true;
-                }
-                html.AppendLine($"<li>{trimmedLine.Substring(2)}</li>");
-            }
-            // Numbered lists
-            else if (System.Text.RegularExpressions.Regex.IsMatch(trimmedLine, @"^\d+\.\s"))
-            {
-                if (!inList)
-                {
-                    html.AppendLine("<ol>");
-                    inList = true;
-                }
-                var match = System.Text.RegularExpressions.Regex.Match(trimmedLine, @"^\d+\.\s(.+)");
-                if (match.Success)
-                {
-                    html.AppendLine($"<li>{match.Groups[1].Value}</li>");
-                }
-            }
-            // Empty lines
-            else if (string.IsNullOrEmpty(trimmedLine))
-            {
-                if (inList)
-                {
-                    html.AppendLine("</ul></ol>".Contains("<ul>") ? "</ul>" : "</ol>");
-                    inList = false;
-                }
-                html.AppendLine("<br/>");
-            }
-            // Regular paragraphs
-            else
-            {
-                if (inList)
-                {
-                    html.AppendLine("</ul>");
-                    inList = false;
-                }
-                html.AppendLine($"<p>{trimmedLine}</p>");
-            }
-        }
-
-        // Close any open tags
-        if (inCodeBlock)
-            html.AppendLine("</code></pre>");
-        if (inList)
-            html.AppendLine("</ul>");
-
-        return html.ToString();
     }
 
     /// <summary>

@@ -16,24 +16,34 @@ public class HelpLocalizationEsES : HelpLocalizationBase
     public override string GettingStarted_Title => "Inicio Rápido";
     public override string BeingManagement_Title => "Gestión de Seres de Silicio";
     public override string ChatSystem_Title => "Función de Chat";
-    public override string TaskTimer_Title => "Tareas y Temporizadores";
+    public override string Dashboard_Title => "Panel de Control";
+    public override string Task_Title => "Tareas";
+    public override string Timer_Title => "Temporizadores";
     public override string Permission_Title => "Gestión de Permisos";
     public override string Config_Title => "Gestión de Configuración";
     public override string FAQ_Title => "Preguntas Frecuentes";
     public override string Memory_Title => "Sistema de Memoria";
     public override string OllamaSetup_Title => "Instalación de Ollama y Descarga de Modelos";
     public override string BailianDashScope_Title => "Guía de Uso de la Plataforma Alibaba Cloud Bailian";
+    public override string AIClients_Title => "Configuración de Cliente de IA";
+        
+        public override string BeingSoul_Title => "Archivo de Alma";
 
     public override string[] GettingStarted_Tags => new[] { "instalación", "inicio", "introducción", "inicio rápido", "empezar", "inicialización", "ejecutar", "configurar entorno" };
     public override string[] BeingManagement_Tags => new[] { "ser de silicio", "crear", "configurar", "gestión de seres de silicio", "entidad", "perfil", "ajustes", "gestión" };
     public override string[] ChatSystem_Tags => new[] { "chat", "conversación", "mensaje", "función de chat", "comunicación", "intercambio", "diálogo", "discusión" };
-    public override string[] TaskTimer_Tags => new[] { "tarea", "temporizador", "programación", "tareas y temporizadores", "automatización", "programado", "recordatorio", "período" };
+    public override string[] Dashboard_Tags => new[] { "panel de control", "monitor", "estadísticas", "estado", "sistema", "frecuencia de mensajes", "tiempo de actividad", "memoria" };
+    public override string[] Task_Tags => new[] { "tarea", "trabajo", "ejecución", "prioridad", "dependencia", "estado", "automatización", "gestión" };
+    public override string[] Timer_Tags => new[] { "temporizador", "programación", "disparador", "período", "calendario", "recordatorio", "automático", "programado" };
     public override string[] Permission_Tags => new[] { "permiso", "seguridad", "control de acceso", "gestión de permisos", "autorización", "privacidad", "protección", "autenticación" };
     public override string[] Config_Tags => new[] { "configuración", "ajustes", "opciones", "gestión de configuración", "preferencias", "personalización", "sistema", "parámetros" };
     public override string[] FAQ_Tags => new[] { "preguntas frecuentes", "ayuda", "problemas", "soporte", "solución de problemas", "guía", "asistencia", "respuestas" };
     public override string[] Memory_Tags => new[] { "memoria", "historial", "registro", "sistema de memoria", "actividad", "rastreo", "búsqueda", "registro de eventos" };
     public override string[] OllamaSetup_Tags => new[] { "Ollama", "instalación", "modelo", "descarga", "IA local", "configuración", "ajustes", "ejecución" };
     public override string[] BailianDashScope_Tags => new[] { "Bailian", "DashScope", "Alibaba Cloud", "IA en la nube", "API", "configuración", "modelo", "pago" };
+    public override string[] AIClients_Tags => new[] { "cliente de IA", "servicio de IA", "modelo", "configuración", "local", "nube", "Ollama", "DashScope", "ajustes" };
+    
+    public override string[] BeingSoul_Tags => new[] { "archivo de alma", "personalidad", "prompt", "rol", "comportamiento", "configuración", "carácter", "guía de trabajo", "prompt del sistema" };
     
     public override string GettingStarted => @"
 # Inicio Rápido
@@ -455,8 +465,116 @@ En la página ""Seres de Silicio"", haga clic en el enlace ""Historial de chat""
 5. **Prestar atención a la invocación de herramientas**: Observe las herramientas que invoca la IA para asegurar que las operaciones cumplan con sus expectativas
 ";
 
-    public override string TaskTimer => @"
-# Tareas y Temporizadores
+    public override string Dashboard => @"
+# Panel de Control
+
+## Descripción General
+
+El Panel de Control es su centro de monitoreo del sistema, permitiéndole comprender el estado de ejecución de los seres de silicio de un vistazo. A través de tarjetas de estadísticas intuitivas y gráficos, puede mantenerse al tanto de la situación general del sistema en cualquier momento.
+
+## Funciones Principales
+
+- **Monitoreo en tiempo real**: Muestra la cantidad de seres de silicio, estado activo y uso de recursos del sistema
+- **Estadísticas de mensajes**: Muestra la frecuencia de mensajes de chat recientes en forma de gráfico
+- **Actualización automática**: Los datos se actualizan automáticamente, sin necesidad de operación manual
+
+## Descripción de la Interfaz
+
+### Tarjetas de Estadísticas
+
+En la parte superior de la página se muestran 4 tarjetas de estadísticas, presentando información clave del sistema:
+
+| Tarjeta | Descripción |
+|------|------|
+| 🧠 Total de Seres de Silicio | La cantidad total de todos los seres de silicio que ha creado |
+| ⚡ Seres de Silicio Activos | La cantidad de seres de silicio que están trabajando o procesando tareas actualmente |
+| ⏱️ Tiempo de Actividad del Sistema | El tiempo que ha estado ejecutándose el programa desde que se inició |
+| 💾 Uso de Memoria | El tamaño de memoria de la computadora que está utilizando el programa actualmente |
+
+### Gráfico de Frecuencia de Mensajes
+
+Debajo de las tarjetas de estadísticas se muestra un gráfico de barras, presentando la cantidad de mensajes en cada punto de tiempo en los últimos 20 minutos:
+- Cuanto más alta es la barra, más frecuente es la interacción de mensajes en ese período
+- Si la barra está vacía, significa que no hubo interacción de mensajes en ese período
+
+## Cómo Acceder
+
+1. Inicie el programa Silicon Life Collective
+
+2. Abra el navegador y acceda a la interfaz web del programa
+
+3. Haga clic en el elemento de menú **📊 Panel de Control** en la barra de navegación izquierda
+
+## Cómo Entender los Datos
+
+### Actividad de Seres de Silicio
+
+- Si la cantidad activa está cerca del total: indica que la mayoría de los seres están ocupados trabajando
+- Si la cantidad activa es 0: indica que todos los seres están descansando, esperando nuevas tareas
+
+### Uso de Memoria
+- Rango general: 50-300 MB (depende de la cantidad de seres creados y la longitud del historial de conversaciones)
+- Si nota que la memoria crece continuamente y supera los 500MB, se recomienda reiniciar el programa
+
+### Tendencia de Frecuencia de Mensajes
+- Observe los cambios de altura de las barras para entender en qué momentos usa el sistema con más frecuencia
+
+## Preguntas Frecuentes
+
+### P: ¿Por qué no se actualizan las estadísticas?
+
+**R**: Verifique los siguientes puntos:
+1. Si hay errores de JavaScript en la consola del navegador
+2. Si las solicitudes de red son normales (F12 → pestaña Network)
+3. Si el servicio backend se está ejecutando normalmente
+4. Intente actualizar la página (F5)
+
+### P: ¿El gráfico se muestra vacío o sin datos?
+
+**R**: Posibles razones:
+1. El sistema acaba de iniciarse, aún no hay registros de interacción de mensajes
+2. No se han generado mensajes en los últimos 20 minutos
+3. El servicio ChatSystem no se inicializó correctamente
+
+### P: ¿El tiempo de actividad se muestra incorrectamente?
+
+**R**: El tiempo de actividad se calcula desde que se inicia la aplicación, si se muestra anormalmente:
+1. Verifique si la hora del sistema es correcta
+2. Reinicie la aplicación para reiniciar el cronómetro
+
+### P: ¿Cómo actualizar manualmente los datos?
+
+**R**: La versión actual se actualiza automáticamente, si necesita actualizar manualmente:
+- Presione F5 para actualizar toda la página
+- O presione Ctrl+F5 para forzar la actualización (limpiar caché)
+
+## Sugerencias de Uso
+
+### Monitoreo Diario
+
+1. **Revisar regularmente**: Se recomienda abrirlo todos los días para entender el estado de ejecución del sistema
+2. **Observar tendencias**: A través del gráfico de frecuencia de mensajes, entienda en qué momentos usa el sistema con más frecuencia
+3. **Prestar atención a la memoria**: Si el uso de memoria supera los 500MB, puede considerar reiniciar el programa
+4. **Entender la actividad**: A través de la cantidad de seres activos, juzgue si el sistema está funcionando normalmente
+
+### Sugerencias de Optimización
+
+1. **Controlar la cantidad de seres**: Crear demasiados seres ocupará más memoria
+2. **Limpiar conversaciones antiguas**: Limpie regularmente el historial de conversaciones que no necesita para liberar espacio de almacenamiento
+3. **Combinar con herramientas del sistema**: Puede monitorear los recursos del sistema junto con el administrador de tareas de la computadora
+
+### ¿Qué hacer si encuentra problemas?
+
+Si el Panel de Control no se muestra correctamente, puede intentar los siguientes pasos:
+
+1. **Verificar el navegador**: Abra la consola del navegador (presione F12), verifique si hay mensajes de error
+2. **Verificar la conexión de red**: Confirme que el programa se está ejecutando y la red es normal
+3. **Verificar los registros del programa**: Verifique si el programa tiene registros anormales
+4. **Reiniciar el programa**: Si ninguno de los métodos anteriores funciona, intente cerrar el programa y abrirlo nuevamente
+";
+
+    public override string Task => @"
+# Tareas
 
 ## Descripción General
 
@@ -655,6 +773,151 @@ El sistema automáticamente:
 - Limpia datos expirados
 
 No necesita gestionar manualmente, el sistema se encargará de todo.
+";
+
+    public override string Timer => @"
+# Temporizadores
+
+## ¿Qué son los temporizadores?
+
+Los temporizadores son el mecanismo automático de recordatorio de los seres de silicio. Cuando se alcanza el tiempo establecido, el ser de silicio ejecutará automáticamente la tarea correspondiente.
+
+## Dos tipos de temporizadores
+
+### Temporizador único
+
+Un temporizador que solo se activa una vez. Después de activarse, finaliza automáticamente.
+
+**Escenarios aplicables:**
+- Recordarle que haga algo en un momento específico
+- Ejecutar una tarea única en una fecha específica
+
+### Temporizador periódico
+
+Un temporizador que se activará repetidamente. Después de cada activación, el sistema calculará automáticamente el tiempo de la próxima activación.
+
+**Escenarios aplicables:**
+- Tareas que se ejecutan diariamente a una hora fija (como un informe matutino todos los días a las 9 a. m.)
+- Tareas que se ejecutan regularmente cada semana o mes
+- Tareas que se ejecutan regularmente según las festividades del calendario lunar (como cada Año Nuevo lunar)
+
+## Estados de los temporizadores
+
+Los temporizadores tienen cuatro estados:
+
+| Estado | Descripción |
+|------|------|
+| **En ejecución** | El temporizador funciona normalmente y espera la activación |
+| **Pausado** | El temporizador está detenido temporalmente y no se activará |
+| **Activado** | El temporizador único ha completado la activación |
+| **Cancelado** | El temporizador ha sido cancelado y no se activará más |
+
+## ¿Cómo ver los temporizadores?
+
+### Ver los temporizadores de un ser de silicio específico
+
+1. Vaya a la página **🧠 Ser de Silicio**
+2. Seleccione el ser de silicio que desea ver
+3. Encuentre la opción ""Temporizadores"" para ver todos los temporizadores de ese ser
+
+## Información mostrada en los temporizadores
+
+Al ver los temporizadores, puede ver la siguiente información:
+
+| Elemento de información | Descripción |
+|------|------|
+| **Nombre** | El nombre del temporizador |
+| **Descripción** | La descripción detallada del temporizador (si existe) |
+| **Estado** | Estado actual (En ejecución, Pausado, etc.) |
+| **Tipo** | Único o periódico |
+| **Próxima activación** | La hora específica en que el temporizador se activará la próxima vez |
+| **Sistema de calendario** | Calendario utilizado (como gregoriano, lunar, etc.) |
+| **Número de activaciones** | Cuántas veces se ha activado el temporizador |
+| **Hora de creación** | Cuándo se creó el temporizador |
+| **Última activación** | La hora de la última activación (si ya se ha activado) |
+
+## Sistemas de calendario admitidos
+
+Los temporizadores admiten varios sistemas de calendario, incluyendo:
+
+- **Calendario gregoriano** (Gregorian): Sistema solar de uso internacional
+- **Calendario lunar** (Chinese Lunar): Calendario lunar tradicional chino
+- **Otros sistemas de calendario**: Calendario islámico, calendario de troncos celestiales, etc.
+- **Calendario de intervalo** (Interval): Activación en intervalos de tiempo fijos (como cada 2 horas)
+
+## Historial de activación de los temporizadores
+
+Cada vez que se activa un temporizador, el sistema registra información detallada de ejecución.
+
+### Ver el historial de activación
+
+1. Seleccione un temporizador específico en la lista de temporizadores
+2. Vea el historial de ejecución de ese temporizador
+3. Puede ver los detalles de cada activación:
+   - Hora de activación
+   - Estado de ejecución (éxito, fallo, etc.)
+   - Mensajes de conversación durante la ejecución (si existen)
+   - Información de error (si la ejecución falló)
+
+### Estados del historial de ejecución
+
+Cada ejecución tiene los siguientes estados:
+
+| Estado | Descripción |
+|------|------|
+| **No iniciado** | La ejecución aún no ha comenzado |
+| **Iniciado** | Se ha enviado la notificación de inicio |
+| **En ejecución** | La tarea se está ejecutando |
+| **Completado** | La tarea se ha completado con éxito |
+| **Fallido** | La ejecución de la tarea ha fallado |
+
+## Preguntas frecuentes
+
+### P: ¿Cómo creo un nuevo temporizador?
+
+**R:** Los temporizadores son gestionados automáticamente por los seres de silicio. Los seres de silicio crean temporizadores según sea necesario para ejecutar tareas periódicas.
+
+### P: ¿Puedo eliminar o pausar temporizadores?
+
+**R:** Sí. El sistema admite las siguientes operaciones:
+- **Pausar temporizador**: Detener temporalmente el temporizador, se puede reanudar cuando sea necesario
+- **Reanudar temporizador**: Restaurar un temporizador pausado al estado de ejecución. Si se perdió una hora de activación durante la pausa, el sistema calculará automáticamente la próxima hora de activación
+- **Cancelar temporizador**: Cancelar permanentemente un temporizador, no se activará más
+- **Eliminar temporizador**: Eliminar completamente un temporizador del sistema
+
+### P: ¿Qué hago si el temporizador no se activa?
+
+**Verifique lo siguiente:**
+1. Si el temporizador está en estado **En ejecución** (no Pausado o Cancelado)
+2. Si ha llegado la hora de activación (verifique ""Próxima activación"")
+3. Si el ser de silicio se está ejecutando normalmente
+
+### P: ¿Cómo sé cómo funcionan los temporizadores?
+
+**Métodos:**
+1. Verifique la lista de temporizadores para comprender las próximas operaciones
+2. Verifique el historial de ejecución para comprender las actividades pasadas
+3. Pregunte directamente al ser de silicio en la conversación.
+
+### P: ¿Cómo calcula un temporizador periódico la próxima hora de activación?
+
+**R:** Después de cada activación de un temporizador periódico, el sistema calcula automáticamente la próxima hora de activación según el sistema de calendario y las condiciones establecidas. Por ejemplo:
+- Si se configura Gregoriano ""todos los días a las 9"", el sistema se activará todos los días a las 9 y luego calculará las 9 del día siguiente como la próxima hora de activación
+- Si se configura Lunar ""primer día del primer mes de cada año"", el sistema se activará durante el Año Nuevo lunar y luego calculará la fecha del próximo Año Nuevo lunar
+
+## Recomendaciones de uso
+
+### Monitoreo diario
+
+1. **Verificar regularmente**: Comprender la ejecución automática de los seres de silicio
+2. **Prestar atención al historial de ejecución**: Comprender el modo de trabajo de la IA
+3. **Verificar anomalías**: Verificar si hay registros de ejecución fallida
+
+### Recomendaciones de optimización
+
+1. **Combinar con conversación**: Discutir el estado de los temporizadores con el ser de silicio
+2. **Observar los resultados de ejecución**: Comprender el efecto de los temporizadores a través del historial de ejecución
+3. **Ajustar estrategias**: Si es necesario, haga que el ser de silicio ajuste la configuración de los temporizadores a través de la conversación
 ";
 
     public override string Permission => @"
@@ -1730,7 +1993,6 @@ Se recomienda mantener suficiente espacio en disco.
 
 - **Sitio web oficial de Ollama**: https://ollama.com
 - **Documentación de Ollama**: https://docs.ollama.com
-- **Biblioteca de modelos**: https://ollama.com/library (ver todos los modelos disponibles)
 
 ## Próximos Pasos
 
@@ -1997,6 +2259,536 @@ Después de configurar Bailian, puede:
 - No preocuparse por la configuración de hardware local
 
 ¡Le deseamos un uso agradable!
+";
+    
+    public override string AIClients => @"
+# Configuración de Cliente de IA
+
+## Descripción General
+
+Los clientes de IA son los ""conectores cerebrales"" del sistema Silicon Life, responsables de comunicarse con modelos de inteligencia artificial. El sistema admite múltiples clientes de IA, y puede elegir el servicio apropiado según sus necesidades.
+
+## Clientes de IA Admitidos
+
+El sistema admite múltiples clientes de IA, y puede elegir el servicio apropiado según sus necesidades.
+
+### Cliente de IA Local
+
+**Características:**
+- 🏠 **Ejecución Local**: Los modelos de IA se ejecutan en su computadora
+- 🔒 **Privacidad y Seguridad**: Los datos no se suben a la nube
+- 💰 **Completamente Gratis**: Sin restricciones de uso
+- ⚡ **Respuesta Rápida**: Sin latencia de red (modelos locales)
+
+**Escenarios Adecuados:**
+- Usuarios conscientes de la privacidad
+- Mejor configuración de computadora (recomendado 16GB+ RAM)
+- Uso ilimitado de IA
+- Condiciones de red deficientes
+
+**Requisitos de Configuración:**
+- Necesita instalar software de servicio de IA correspondiente
+- Necesita descargar archivos de modelo de IA (generalmente 4-20GB)
+- Recomendado 16GB+ RAM, tarjeta gráfica dedicada es mejor
+
+### Cliente de IA en la Nube
+
+**Características:**
+- ☁️ **Servicio en la Nube**: Los modelos de IA se ejecutan en servidores remotos
+- 🚀 **Potente**: Puede usar modelos ultra grandes (200B+ parámetros)
+- 💳 **Pago por Uso**: Tiene cuota gratuita, se cobra después de exceder
+- 🌍 **Soporte Multi-Región**: Puede elegir servidores más cercanos
+
+**Escenarios Adecuados:**
+- Configuración de computadora más baja
+- Necesita usar modelos de alta gama
+- Uso ocasional, bajo uso
+- Quiere comenzar rápidamente sin configuración local
+
+**Requisitos de Configuración:**
+- Necesita cuenta y clave API para plataforma correspondiente
+- Necesita conexión a Internet
+- Tiene límites de cuota de uso (puede actualizarse periódicamente)
+
+## ¿Cómo Elegir un Cliente de IA?
+
+### Diagrama de Flujo de Selección
+
+```
+¿Cuál es su configuración de computadora?
+├─ Configuración alta (16GB+ RAM)
+│  └─ ¿Consciente de la privacidad?
+│     ├─ Sí → Elegir cliente local (ej. Ollama)
+│     └─ No → Cualquiera está bien
+└─ Configuración baja (8GB o menos)
+   └─ Elegir cliente en la nube (ej. DashScope)
+```
+
+### Tabla Comparativa
+
+| Característica | Cliente Local | Cliente en la Nube |
+|------|--------------|-----------------|
+| Dificultad de instalación | Media (necesita instalar software y modelos) | Simple (solo necesita clave API) |
+| Costo de ejecución | Gratis (consume electricidad) | Tiene cuota gratuita, se cobra después de exceder |
+| Protección de privacidad | ⭐⭐⭐⭐⭐ Completamente local | ⭐⭐⭐ Los datos pasan por la nube |
+| Selección de modelos | Limitado por configuración de computadora | Puede elegir varios modelos grandes |
+| Requisito de red | Solo necesario al descargar modelos | Siempre necesario |
+| Velocidad de respuesta | Rápida (local) | Depende de la red |
+| Límites de uso | Sin límites | Tiene límites de cuota |
+
+## Configurar Cliente de IA
+
+### Paso 1: Entrar a la Página de Configuración
+
+1. Abra el sistema Silicon Life
+2. Haga clic en el menú **⚙ Configuración** en la barra de navegación superior
+
+### Paso 2: Seleccionar Tipo de Cliente de IA
+
+1. Encuentre la opción **""Tipo de Cliente de IA""** en la página de configuración
+2. Seleccione su cliente deseado del menú desplegable:
+   - Cliente local (ej. `OllamaClient`)
+   - Cliente en la nube (ej. `DashScopeClient`)
+
+### Paso 3: Completar Información de Configuración
+
+Después de seleccionar el cliente, aparecerán elementos de configuración correspondientes abajo:
+
+#### Configuración de Cliente Local (ej. Ollama)
+
+| Elemento de Configuración | Descripción | Valor Predeterminado | Ejemplo |
+|--------|------|--------|------|
+| **endpoint** | Dirección de servicio de IA | Depende del servicio específico | ej. `http://localhost:11434` |
+| **model** | Nombre del modelo a usar | Depende del servicio específico | ej. `qwen3.5:8b` |
+| **temperature** | Nivel de creatividad (0-1) | `0.7` | `0.5` más conservador, `0.9` más creativo |
+| **maxTokens** | Longitud máxima de respuesta | `2048` | `4096` permite respuestas más largas |
+
+**Ejemplo de Configuración:**
+```
+Tipo de Cliente de IA: Tipo de cliente local (ej. OllamaClient)
+endpoint: http://localhost:11434 (completar según dirección de servicio real)
+model: qwen3.5:8b (completar según modelo descargado)
+temperature: 0.7
+maxTokens: 2048
+```
+
+#### Configuración de Cliente en la Nube (ej. DashScope)
+
+| Elemento de Configuración | Descripción | Valor Predeterminado | Ejemplo |
+|--------|------|--------|------|
+| **apiKey** | Clave API | Ninguna | Proporcionada por plataforma específica |
+| **region** | Región de servidor | Depende de plataforma específica | ej. `beijing` |
+| **model** | Modelo a usar | Depende de plataforma específica | ej. `qwen3.6-plus` |
+| **temperature** | Nivel de creatividad (0-1) | `0.7` | `0.5` |
+| **maxTokens** | Longitud máxima de respuesta | `2048` | `4096` |
+
+**Regiones Disponibles:**
+
+| Código de Región | Ubicación | Usuarios Adecuados |
+|---------|------|---------|
+| `beijing` | Pekín, China | Usuarios de China continental (recomendado) |
+| `singapore` | Singapur | Usuarios del sudeste asiático |
+| `hongkong` | Hong Kong, China | Usuarios de Hong Kong, Macao, Taiwán |
+| `virginia` | EE.UU. | Usuarios de América del Norte |
+| `frankfurt` | Alemania | Usuarios europeos |
+
+**Modelos Disponibles:**
+
+| Nombre del Modelo | Características | Escenarios Adecuados |
+|---------|------|---------|
+| `qwen3.6-plus` | Rendimiento equilibrado (recomendado) | Uso diario |
+| `qwen3-max` | Capacidad más fuerte | Tareas complejas |
+| `qwen3.6-flash` | Respuesta rápida | Preguntas y respuestas simples |
+| `qwen-max` | Insignia de generación anterior | Razonamiento complejo |
+| `qwen-plus` | Mejorado de generación anterior | Escenarios generales |
+| `qwen-turbo` | Rápido de generación anterior | Tareas simples |
+| `qwen3-coder-plus` | Específico de programación | Generación de código |
+| `qwq-plus` | Específico de razonamiento | Matemáticas, lógica |
+| `deepseek-v3.2` | Modelo de terceros | Escenarios generales |
+| `deepseek-r1` | Modelo de razonamiento | Pensamiento profundo |
+| `glm-5.1` | Modelo Zhipu | Escenarios en chino |
+| `kimi-k2.5` | Contexto largo | Procesamiento de texto largo |
+| `llama-4-maverick` | Modelo Meta | Escenarios en inglés |
+
+**Ejemplo de Configuración:**
+```
+Tipo de Cliente de IA: Tipo de cliente en la nube (ej. DashScopeClient)
+apiKey: Su clave API (obtenida de plataforma correspondiente)
+region: beijing (elegir la región más cercana)
+model: qwen3.6-plus (elegir según modelos disponibles)
+temperature: 0.7
+maxTokens: 2048
+```
+
+### Paso 4: Guardar Configuración
+
+1. Después de completar toda la información necesaria
+2. Haga clic en el botón **""Guardar Configuración""** en la parte inferior de la página
+3. El sistema notificará que el guardado fue exitoso
+
+### Paso 5: Probar Conexión
+
+1. Haga clic en el menú **💬 Chat** en la barra de navegación superior
+2. Seleccione un ser de silicio
+3. Envíe un mensaje de prueba, como ""Hola""
+4. Si recibe una respuesta, la configuración fue exitosa
+
+## Preguntas Frecuentes
+
+### P1: ¿No sé qué cliente elegir?
+
+**Sugerencias:**
+- Si es principiante, se recomienda usar primero **cliente en la nube**, configuración simple, inicio rápido
+- Si valora la privacidad o tiene mejor configuración de computadora, elija **cliente local**
+
+### P2: ¿Puedo usar dos clientes al mismo tiempo?
+
+No. El sistema solo puede usar un cliente de IA a la vez. Pero puede cambiar en cualquier momento en la página de configuración.
+
+### P3: ¿Se perderán los registros de chat después de cambiar clientes?
+
+No. Los registros de chat se guardan en el sistema y son independientes del cliente de IA. Aún puede ver conversaciones históricas después de cambiar.
+
+### P4: ¿El cliente local muestra error de conexión?
+
+**Soluciones:**
+1. Confirme que el software de servicio de IA correspondiente está ejecutándose (verificar bandeja del sistema o procesos)
+2. Verifique si la dirección endpoint es correcta (referir configuración predeterminada de ese servicio)
+3. Acceda a la dirección de servicio en un navegador, debería ver una respuesta
+4. Confirme que los modelos están descargados: use el comando del servicio específico para ver la lista de modelos
+
+### P5: ¿El cliente en la nube muestra error de autenticación?
+
+**Soluciones:**
+1. Verifique si la clave API es correcta (el formato se refiere a los requisitos de la plataforma correspondiente)
+2. Confirme que la cuenta no está en mora
+3. Verifique si se excedió la cuota de uso
+4. Regenerar la clave API y actualizar la configuración
+
+### P6: ¿Cómo obtener la clave API para cliente en la nube?
+
+**Pasos Generales:**
+1. Visite el sitio web de consola del proveedor de servicio de IA correspondiente
+2. Inicie sesión en su cuenta
+3. Entre a la página ""Gestión de Claves"" o ""Gestión de API""
+4. Haga clic en ""Crear Clave"" o ""Generar Clave API""
+5. Copie la clave API generada y guárdela adecuadamente
+
+### P7: ¿Qué hacer si la respuesta es muy lenta?
+
+**Cliente Local:**
+- Verifique el uso de recursos de la computadora (CPU, RAM, tarjeta gráfica)
+- Intente usar un modelo más pequeño (ej. 8B en lugar de 32B)
+- Cierre otros programas que consumen recursos
+
+**Cliente en la Nube:**
+- Verifique la calidad de conexión de red
+- Intente elegir una región de servidor más cercana
+- Evite horas pico de red
+
+### P8: ¿Qué es el parámetro temperature?
+
+temperature controla la creatividad de las respuestas de IA:
+- **0.0-0.3**: Muy conservador, respuestas predecibles, adecuado para preguntas factuales
+- **0.4-0.7**: Modo equilibrado, adecuado para conversación diaria (recomendado)
+- **0.8-1.0**: Muy creativo, respuestas diversas, adecuado para escritura creativa
+
+### P9: ¿Cuánto debe configurarse maxTokens?
+
+- **1024**: Respuestas cortas, adecuado para preguntas y respuestas simples
+- **2048**: Longitud media, adecuado para conversación general (recomendado)
+- **4096+**: Respuestas largas, adecuado para tareas complejas o generación de texto largo
+
+Nota: Cuanto mayor sea la configuración, más recursos y tiempo consumirá.
+
+### P10: ¿Pueden diferentes seres usar diferentes clientes?
+
+Sí. Cada ser de silicio puede configurar independientemente el tipo de cliente de IA.
+
+**Método de Configuración:**
+1. Entre a la página de gestión de seres
+2. Seleccione el ser a configurar
+3. Configure AIClientType en la configuración de ese ser
+4. Si el ser no está configurado, se usará la configuración global
+
+## Mejores Prácticas
+
+### 1. Elegir Modelos Basados en Tareas
+
+- **Conversación diaria**: Use modelos pequeños a medianos (8B-14B o modelos rápidos)
+- **Análisis complejo**: Use modelos grandes (32B+ o modelos avanzados)
+- **Generación de código**: Use modelos de programación dedicados
+- **Escritura creativa**: Use temperature más alto (0.8-0.9)
+
+### 2. Optimizar Costos (Cliente en la Nube)
+
+- Verifique regularmente el uso para evitar exceder la cuota gratuita
+- Use modelos rápidos para tareas simples
+- Use modelos avanzados para tareas complejas
+- Configure maxTokens razonablemente para evitar desperdicio
+
+### 3. Mejorar Rendimiento (Cliente Local)
+
+- Priorice descargar modelos de uso frecuente para evitar descargar en tiempo de ejecución
+- Mantenga el servicio de IA residente para reducir tiempo de inicio
+- Use aceleración de tarjeta gráfica (si tiene tarjeta gráfica NVIDIA)
+- Limpie regularmente modelos no usados para liberar espacio
+
+### 4. Recomendaciones de Seguridad
+
+- No comparta clave API con otros
+- Cambie regularmente la clave API
+- Los clientes locales están limitados solo a acceso local, no exponer a red pública
+- Respalde archivos de configuración importantes
+
+## Obtener Ayuda
+
+Si encuentra problemas:
+1. Verifique la sección [Preguntas Frecuentes](#preguntas-frecuentes)
+2. Verifique [Gestión de Configuración](./config) para instrucciones de configuración del sistema
+3. Verifique registros del sistema para detalles de error
+";
+    
+    public override string BeingSoul => @"
+# Archivo de Alma
+
+## Descripción General
+
+El Archivo de Alma es el archivo de configuración central de un Ser de Silicio, determinando la **personalidad, patrones de comportamiento, capacidades profesionales y métodos de trabajo** de cada ser.
+
+Puede entender el archivo de alma como la ""configuración de personalidad"" o ""manual de trabajo"" del ser. Se carga automáticamente durante cada conversación de IA, guiando al ser de silicio para pensar y actuar de la manera que usted espera.
+
+## Función del Archivo de Alma
+
+El archivo de alma es la **fuerza impulsora central** de un ser de silicio, definiendo:
+
+- 🎭 **Posicionamiento de Rol**: Quién es este ser de silicio, en qué campos destaca
+- 📋 **Directrices de Comportamiento**: Cómo debería responder a los usuarios, qué principios seguir
+- 🔄 **Flujo de Trabajo**: Cómo manejar tareas después de recibirlas, en cuántos pasos
+- ⚠️ **Límites de Comportamiento**: Qué se puede hacer, qué no se debería hacer
+- 💡 **Requisitos Profesionales**: Estándares de código, formato de salida, estilo de lenguaje, etc.
+
+## Cómo Editar el Archivo de Alma
+
+### Editar a través de la Interfaz Web
+
+1. Vaya a la página **Seres de Silicio**
+2. Haga clic en la tarjeta del ser de silicio que desea editar
+3. Haga clic en el enlace **Archivo de Alma**
+4. Modifique el contenido en el editor Markdown
+5. Haga clic en el botón **Guardar**
+
+### Editar a través del Asistente de IA
+
+También puede conversar directamente con el **Curador de Silicio** y pedirle que le ayude a modificar el archivo de alma:
+
+```
+Por favor, ayúdeme a modificar el archivo de alma del asistente de programación para agregar soporte para desarrollo de Python
+```
+
+El Curador de Silicio le ayudará a actualizar el contenido del archivo de alma.
+
+## Guía de Escritura de Archivos de Alma
+
+### Estructura Básica
+
+Los archivos de alma se escriben en **formato Markdown**. Se recomienda la siguiente estructura:
+
+```markdown
+# Configuración de Rol
+
+Eres un [descripción de rol], especializado en:
+- Habilidad 1
+- Habilidad 2
+- Habilidad 3
+
+# Directrices de Comportamiento
+
+1. Directriz 1
+2. Directriz 2
+3. Directriz 3
+
+# Flujo de Trabajo
+
+Al recibir una tarea:
+1. Entender los requisitos
+2. Analizar el enfoque
+3. Ejecutar operaciones
+4. Reportar resultados
+
+# Estándares de Código
+
+- Seguir ciertos estándares de codificación
+- Proporcionar comentarios necesarios
+- Considerar casos extremos
+```
+
+### Consejos de Escritura
+
+1. **Definición Clara de Rol**: Especifique claramente las responsabilidades y áreas de especialización del ser de silicio
+2. **Establecer Límites de Comportamiento**: Explique qué se puede hacer y qué no se debería hacer
+3. **Proporcionar Flujo de Trabajo**: Guíe al ser de silicio sobre cómo manejar tareas
+4. **Usar Formato Markdown**: Soporta encabezados, listas, bloques de código, etc.
+5. **Ser Específico, No Vago**: Use ejemplos concretos en lugar de descripciones abstractas
+
+## Ejemplos Prácticos
+
+### Ejemplo 1: Asistente de Programación
+
+```markdown
+# Configuración de Rol
+
+Eres un asistente de desarrollo full-stack profesional, especializado en:
+- Desarrollo C# / .NET
+- Diseño de arquitectura y revisión de código
+- Diseño y optimización de bases de datos
+- Desarrollo web frontend
+
+# Directrices de Comportamiento
+
+1. Siempre proporcionar ejemplos de código ejecutables
+2. Explicar la lógica de código clave y el pensamiento de diseño
+3. Proporcionar recomendaciones de mejores prácticas
+4. Cuando no esté seguro, informar claramente al usuario
+
+# Estándares de Código
+
+- Seguir principios SOLID
+- Usar nombres claros
+- Agregar comentarios necesarios
+- Considerar manejo de excepciones y casos extremos
+```
+
+### Ejemplo 2: Asistente de Servicio al Cliente
+
+```markdown
+# Configuración de Rol
+
+Eres un asistente de servicio al cliente amigable, responsable de:
+- Responder preguntas frecuentes de usuarios
+- Manejar quejas simples
+- Guiar a los usuarios a través de operaciones
+- Recopilar comentarios de usuarios
+
+# Directrices de Comportamiento
+
+1. Mantenerse siempre cortés y paciente
+2. Explicar en lenguaje simple y fácil de entender
+3. Transferir a agente humano promptly cuando no pueda resolver
+4. Registrar preguntas y comentarios de usuarios
+
+# Flujo de Trabajo
+
+1. Saludar al usuario
+2. Entender las necesidades del usuario
+3. Proporcionar soluciones
+4. Confirmar si el problema está resuelto
+5. Agradecer al usuario y finalizar la conversación
+```
+
+### Ejemplo 3: Asistente de Análisis de Datos
+
+```markdown
+# Configuración de Rol
+
+Eres un experto en análisis de datos, especializado en:
+- Limpieza y preprocesamiento de datos
+- Análisis estadístico y visualización
+- Predicción de tendencias y detección de anomalías
+- Generar informes de datos
+
+# Requisitos de Salida
+
+1. Proporcionar conclusiones de análisis claras
+2. Usar gráficos para explicación auxiliar
+3. Anotar fuentes de datos y suposiciones
+4. Dar recomendaciones accionables
+```
+
+## Ubicación de Almacenamiento del Archivo de Alma
+
+El archivo de alma de cada ser de silicio se almacena en su directorio de datos:
+
+```
+DataDirectory/SiliconManager/{BeingGUID}/soul.md
+```
+
+El sistema gestiona automáticamente este archivo, y no necesita operar manualmente el sistema de archivos.
+
+## Preguntas Frecuentes
+
+### P: ¿Los cambios en el archivo de alma tendrán efecto inmediatamente?
+
+**R:** Sí, tendrán efecto inmediatamente después de guardar. La próxima vez que el ser de silicio responda, usará el nuevo archivo de alma.
+
+### P: ¿Hay un límite de tamaño para los archivos de alma?
+
+**R:** No hay un límite de tamaño estricto, pero se recomienda mantenerlo dentro de un rango razonable (dentro de unos pocos miles de palabras). Los archivos de alma demasiado largos pueden afectar la velocidad de respuesta.
+
+### P: ¿Puedo eliminar completamente el archivo de alma?
+
+**R:** No se recomienda eliminar el archivo de alma. Si el contenido está vacío, el ser de silicio perderá la guía de comportamiento y puede producir respuestas inesperadas.
+
+### P: ¿Cómo hago una copia de seguridad del archivo de alma?
+
+**R:** Se recomienda hacer copias de seguridad regulares de los archivos de alma de seres de silicio importantes. Puede:
+1. Copiar el contenido a un archivo local a través de la interfaz web
+2. Usar la función de exportación del sistema (si es compatible)
+3. Hacer una copia de seguridad directamente del directorio de datos
+
+### P: ¿Cuál es la relación entre el archivo de alma y el sistema de memoria?
+
+**R:** El archivo de alma define **patrones de comportamiento a largo plazo**, mientras que el sistema de memoria registra **historial de conversaciones a corto plazo**. Trabajan juntos:
+- Archivo de alma: Le dice al ser de silicio ""qué tipo de rol eres""
+- Sistema de memoria: Le dice al ser de silicio ""de qué hablamos antes""
+
+### P: ¿Pueden diferentes seres de silicio usar el mismo archivo de alma?
+
+**R:** Sí, pero no se recomienda. Cada ser de silicio debería tener un posicionamiento de rol único para evitar duplicación funcional.
+
+## Mejores Prácticas
+
+1. **Optimización Continua**: Optimice continuamente el archivo de alma basado en comentarios de uso real
+2. **Gestión de Versiones**: Haga una copia de seguridad de la versión actual antes de modificaciones importantes
+3. **Verificación de Pruebas**: Pruebe el efecto a través de la conversación después de la modificación
+4. **Mantenerlo Conciso**: Exprese requisitos centrales en lenguaje conciso
+5. **Evitar Contradicciones**: Asegúrese de que no haya conflictos entre varias directrices
+6. **Revisión Regular**: Verifique regularmente si el archivo de alma sigue siendo aplicable
+
+## Solución de Problemas
+
+### Problema: El comportamiento del ser de silicio no cumple con las expectativas
+
+**Lista de Verificación:**
+1. ¿Es el contenido del archivo de alma claro y preciso?
+2. ¿Ha agregado suficientes directrices de comportamiento?
+3. ¿Hay instrucciones contradictorias?
+4. ¿Ha proporcionado un flujo de trabajo específico?
+
+**Soluciones:**
+1. Reescribir descripciones vagas
+2. Agregar más directrices de comportamiento específicas
+3. Proporcionar ejemplos para ilustrar la salida esperada
+4. Probar y optimizar continuamente
+
+### Problema: Error al guardar el archivo de alma
+
+**Causas Posibles:**
+1. Problemas de permisos del sistema de archivos
+2. Espacio en disco insuficiente
+3. El archivo está ocupado por otro proceso
+
+**Soluciones:**
+1. Verificar registros del sistema para información detallada de errores
+2. Confirmar que el directorio de datos es escribible
+3. Reintentar después de reiniciar el sistema
+
+## Funciones Relacionadas
+
+- 🤖 [Gestión de Seres](being-management) - Crear y gestionar seres de silicio
+- 💬 [Sistema de Chat](chat-system) - Conversar con seres de silicio
+- 🧠 [Configuración de Cliente de IA](ai-clients) - Configurar servicios de IA
+- 📝 [Sistema de Memoria](memory) - Gestionar historial de conversaciones
 ";
     
     #endregion

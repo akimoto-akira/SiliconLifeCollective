@@ -36,10 +36,26 @@ public static class HelpTopics
         },
         new()
         {
-            Id = "task-timer",
-            PropertyName = nameof(HelpLocalizationBase.TaskTimer),
-            TitlePropertyName = nameof(HelpLocalizationBase.TaskTimer_Title),
-            TagsPropertyName = nameof(HelpLocalizationBase.TaskTimer_Tags),
+            Id = "dashboard",
+            PropertyName = nameof(HelpLocalizationBase.Dashboard),
+            TitlePropertyName = nameof(HelpLocalizationBase.Dashboard_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.Dashboard_Tags),
+            Icon = "📊"
+        },
+        new()
+        {
+            Id = "task",
+            PropertyName = nameof(HelpLocalizationBase.Task),
+            TitlePropertyName = nameof(HelpLocalizationBase.Task_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.Task_Tags),
+            Icon = "📋"
+        },
+        new()
+        {
+            Id = "timer",
+            PropertyName = nameof(HelpLocalizationBase.Timer),
+            TitlePropertyName = nameof(HelpLocalizationBase.Timer_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.Timer_Tags),
             Icon = "⏰"
         },
         new()
@@ -65,6 +81,46 @@ public static class HelpTopics
             TitlePropertyName = nameof(HelpLocalizationBase.FAQ_Title),
             TagsPropertyName = nameof(HelpLocalizationBase.FAQ_Tags),
             Icon = "❓"
+        },
+        new()
+        {
+            Id = "memory",
+            PropertyName = nameof(HelpLocalizationBase.Memory),
+            TitlePropertyName = nameof(HelpLocalizationBase.Memory_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.Memory_Tags),
+            Icon = "🧠"
+        },
+        new()
+        {
+            Id = "ollama-setup",
+            PropertyName = nameof(HelpLocalizationBase.OllamaSetup),
+            TitlePropertyName = nameof(HelpLocalizationBase.OllamaSetup_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.OllamaSetup_Tags),
+            Icon = "📦"
+        },
+        new()
+        {
+            Id = "bailian-dashscope",
+            PropertyName = nameof(HelpLocalizationBase.BailianDashScope),
+            TitlePropertyName = nameof(HelpLocalizationBase.BailianDashScope_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.BailianDashScope_Tags),
+            Icon = "☁️"
+        },
+        new()
+        {
+            Id = "ai-clients",
+            PropertyName = nameof(HelpLocalizationBase.AIClients),
+            TitlePropertyName = nameof(HelpLocalizationBase.AIClients_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.AIClients_Tags),
+            Icon = "🧠"
+        },
+        new()
+        {
+            Id = "being-soul",
+            PropertyName = nameof(HelpLocalizationBase.BeingSoul),
+            TitlePropertyName = nameof(HelpLocalizationBase.BeingSoul_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.BeingSoul_Tags),
+            Icon = "✨"
         }
     };
 

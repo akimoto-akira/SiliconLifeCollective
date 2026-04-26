@@ -24,7 +24,7 @@ public class ChatView : ViewBase
 
         var body = RenderChatBody(vm);
         return RenderPage(vm.Skin, vm.Localization.PageTitleChat, vm.ActiveMenu, vm.Localization, body,
-            GetScripts(vm), GetStyles());
+            GetScripts(vm), GetStyles(), helpTopicId: "chat-system");
     }
 
     private static H RenderChatBody(ChatViewModel vm)

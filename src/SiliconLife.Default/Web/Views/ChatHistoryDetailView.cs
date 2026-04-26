@@ -25,7 +25,7 @@ public class ChatHistoryDetailView : ViewBase
         var scripts = GetScripts(vm);
         var styles = GetStyles();
         
-        return RenderPage(vm.Skin, vm.Localization.ChatDetailPageTitle, "chat-detail", vm.Localization, body, scripts, styles);
+        return RenderPage(vm.Skin, vm.Localization.ChatDetailPageTitle, "chat-detail", vm.Localization, body, scripts, styles, helpTopicId: "chat-system");
     }
 
     private static H RenderBody(ChatHistoryDetailViewModel vm)

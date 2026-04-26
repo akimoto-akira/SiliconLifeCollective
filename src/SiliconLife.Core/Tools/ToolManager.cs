@@ -12,6 +12,7 @@
 // limitations under the License.
 
 using System.Reflection;
+using System.Text.Json;
 
 namespace SiliconLife.Collective;
 
@@ -192,7 +193,8 @@ public class ToolManager
         _logger.Info(null, $"Tool execution: {name}, caller={callerId}");
         try
         {
-            ToolResult result = tool.Execute(callerId, parameters ?? new Dictionary<string, object>());
+            var convertedParams = ConvertParameters(parameters ?? new Dictionary<string, object>());
+            ToolResult result = tool.Execute(callerId, convertedParams);
             
             // Record tool execution to memory
             RecordToolExecutionToMemory(being, name, result);
@@ -248,6 +250,60 @@ public class ToolManager
         {
             return _tools.Keys.ToList();
         }
+    }
+
+    /// <summary>
+    /// Converts all JsonElement values in the parameters dictionary to native .NET types.
+    /// System.Text.Json deserializes Dictionary&lt;string, object&gt; with JsonElement values,
+    /// but tools expect native types (string, int, bool, etc.).
+    /// </summary>
+    private static Dictionary<string, object> ConvertParameters(Dictionary<string, object> parameters)
+    {
+        var result = new Dictionary<string, object>();
+        foreach (var kvp in parameters)
+        {
+            var converted = ConvertJsonValue(kvp.Value);
+            if (converted != null)
+                result[kvp.Key] = converted;
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Recursively converts a JsonElement to its native .NET type.
+    /// </summary>
+    private static object? ConvertJsonValue(object? value)
+    {
+        if (value is JsonElement element)
+        {
+            return element.ValueKind switch
+            {
+                JsonValueKind.String => element.GetString(),
+                JsonValueKind.Number => TryGetNumber(element),
+                JsonValueKind.True => true,
+                JsonValueKind.False => false,
+                JsonValueKind.Null => null,
+                JsonValueKind.Array => element.EnumerateArray().Select(e => ConvertJsonValue(e)).ToList(),
+                JsonValueKind.Object => element.EnumerateObject()
+                    .Where(p => ConvertJsonValue(p.Value) != null)
+                    .ToDictionary(p => p.Name, p => ConvertJsonValue(p.Value)!),
+                _ => value
+            };
+        }
+        return value;
+    }
+
+    /// <summary>
+    /// Tries to convert a numeric JsonElement to the most appropriate .NET numeric type.
+    /// Priority: int → long → double
+    /// </summary>
+    private static object TryGetNumber(JsonElement element)
+    {
+        if (element.TryGetInt32(out int intVal))
+            return intVal;
+        if (element.TryGetInt64(out long longVal))
+            return longVal;
+        return element.GetDouble();
     }
 
     /// <summary>

@@ -25,7 +25,7 @@ public class BeingAIConfigView : ViewBase
         if (vm == null) return string.Empty;
 
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, $"{vm.BeingName} - AI Config", "beings", vm.Localization, body, GetScripts(vm), GetStyles());
+        return RenderPage(vm.Skin, $"{vm.BeingName} - AI Config", "beings", vm.Localization, body, GetScripts(vm), GetStyles(), helpTopicId: "ai-clients");
     }
 
     private static H RenderBody(BeingAIConfigViewModel vm)

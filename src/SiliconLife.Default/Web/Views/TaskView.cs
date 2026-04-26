@@ -20,7 +20,7 @@ public class TaskView : ViewBase
         var vm = model as TaskViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.PageTitleTasks, "tasks", vm.Localization, body, GetScripts(vm.Localization), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleTasks, "tasks", vm.Localization, body, GetScripts(vm.Localization), GetStyles(), "task");
     }
 
     private static H RenderBody(TaskViewModel vm)

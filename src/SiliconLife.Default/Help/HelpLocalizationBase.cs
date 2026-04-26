@@ -20,8 +20,14 @@ public abstract class HelpLocalizationBase
     /// <summary>Chat System</summary>
     public abstract string ChatSystem { get; }
     
-    /// <summary>Tasks and Timers</summary>
-    public abstract string TaskTimer { get; }
+    /// <summary>Dashboard</summary>
+    public abstract string Dashboard { get; }
+    
+    /// <summary>Tasks</summary>
+    public abstract string Task { get; }
+    
+    /// <summary>Timers</summary>
+    public abstract string Timer { get; }
     
     /// <summary>Permission Management</summary>
     public abstract string Permission { get; }
@@ -41,6 +47,12 @@ public abstract class HelpLocalizationBase
     /// <summary>Bailian DashScope</summary>
     public abstract string BailianDashScope { get; }
     
+    /// <summary>AI Clients</summary>
+    public abstract string AIClients { get; }
+    
+    /// <summary>Being Soul</summary>
+    public abstract string BeingSoul { get; }
+    
     #endregion
 
     #region Help Document Titles (Display Titles)
@@ -54,8 +66,14 @@ public abstract class HelpLocalizationBase
     /// <summary>Chat System Title</summary>
     public abstract string ChatSystem_Title { get; }
     
-    /// <summary>Tasks and Timers Title</summary>
-    public abstract string TaskTimer_Title { get; }
+    /// <summary>Dashboard Title</summary>
+    public abstract string Dashboard_Title { get; }
+    
+    /// <summary>Tasks Title</summary>
+    public abstract string Task_Title { get; }
+    
+    /// <summary>Timers Title</summary>
+    public abstract string Timer_Title { get; }
     
     /// <summary>Permission Management Title</summary>
     public abstract string Permission_Title { get; }
@@ -75,6 +93,12 @@ public abstract class HelpLocalizationBase
     /// <summary>Bailian DashScope Title</summary>
     public abstract string BailianDashScope_Title { get; }
     
+    /// <summary>AI Clients Title</summary>
+    public abstract string AIClients_Title { get; }
+    
+    /// <summary>Being Soul Title</summary>
+    public abstract string BeingSoul_Title { get; }
+    
     #endregion
 
     #region Help Document Tags (Search Tags)
@@ -88,8 +112,14 @@ public abstract class HelpLocalizationBase
     /// <summary>Chat System Tags</summary>
     public abstract string[] ChatSystem_Tags { get; }
     
-    /// <summary>Tasks and Timers Tags</summary>
-    public abstract string[] TaskTimer_Tags { get; }
+    /// <summary>Dashboard Tags</summary>
+    public abstract string[] Dashboard_Tags { get; }
+    
+    /// <summary>Tasks Tags</summary>
+    public abstract string[] Task_Tags { get; }
+    
+    /// <summary>Timers Tags</summary>
+    public abstract string[] Timer_Tags { get; }
     
     /// <summary>Permission Management Tags</summary>
     public abstract string[] Permission_Tags { get; }
@@ -108,6 +138,12 @@ public abstract class HelpLocalizationBase
     
     /// <summary>Bailian DashScope Tags</summary>
     public abstract string[] BailianDashScope_Tags { get; }
+    
+    /// <summary>AI Clients Tags</summary>
+    public abstract string[] AIClients_Tags { get; }
+    
+    /// <summary>Being Soul Tags</summary>
+    public abstract string[] BeingSoul_Tags { get; }
     
     #endregion
 }

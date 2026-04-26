@@ -29,7 +29,7 @@ public class MemoryView : ViewBase
             .Add(() => Js.Let(() => "currentBeingId", () => Js.Null()))
             .Add(() => beingNameScript)
             .Add(() => scripts);
-        return RenderPage(vm.Skin, vm.Localization.PageTitleMemory, "memory", vm.Localization, body, combinedScripts);
+        return RenderPage(vm.Skin, vm.Localization.PageTitleMemory, "memory", vm.Localization, body, combinedScripts, helpTopicId: "memory");
     }
 
     private static H RenderBody(MemoryViewModel vm)

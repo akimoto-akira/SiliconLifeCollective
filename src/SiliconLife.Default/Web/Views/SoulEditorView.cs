@@ -26,7 +26,7 @@ public class SoulEditorView : ViewBase
         var scripts = GetScripts(vm);
         var styles = GetStyles();
         
-        return RenderPage(vm.Skin, vm.Localization.PageTitleBeings, "beings", vm.Localization, body, scripts, styles);
+        return RenderPage(vm.Skin, vm.Localization.PageTitleBeings, "beings", vm.Localization, body, scripts, styles, helpTopicId: "being-soul");
     }
 
     private static H RenderBody(SoulEditorViewModel vm)

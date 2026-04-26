@@ -517,6 +517,15 @@ public class SiliconBeingManager : TickObject
         newBeing.SoulContent = oldBeing.SoulContent;
         newBeing.ToolManager = oldBeing.ToolManager;
 
+        // Migrate systems — only if new being doesn't already have them
+        // (ReplaceWithDefault creates fresh instances via factory; ReplaceBeing does not)
+        newBeing.TaskSystem ??= oldBeing.TaskSystem;
+        newBeing.TimerSystem ??= oldBeing.TimerSystem;
+        newBeing.Memory ??= oldBeing.Memory;
+        newBeing.WorkNoteSystem ??= oldBeing.WorkNoteSystem;
+        newBeing.TimeStorage ??= oldBeing.TimeStorage;
+        newBeing.BeingDirectory ??= oldBeing.BeingDirectory;
+
         // Migrate PermissionManager �?create new one with same owner (newBeing) but keep the old callback
         PermissionManager? oldPm = oldBeing.PermissionManager;
         if (oldPm != null)

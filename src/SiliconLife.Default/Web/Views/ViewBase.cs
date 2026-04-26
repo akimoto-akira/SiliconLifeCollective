@@ -33,7 +33,7 @@ public abstract class ViewBase
     }
 
     protected string RenderPage(ISkin skin, string title, string activeMenu, DefaultLocalizationBase localization, H bodyContent,
-        JsSyntax? inlineScripts = null, CssBuilder? inlineStyles = null)
+        JsSyntax? inlineScripts = null, CssBuilder? inlineStyles = null, string? helpTopicId = null)
     {
         var themeCss = skin.GetThemeCss().Build();
         var baseCss = skin.GetStyles().Build();
@@ -58,7 +58,7 @@ public abstract class ViewBase
         var bodyChildren = new List<object>
         {
             H.Div(
-                RenderHeader(localization),
+                RenderHeader(localization, helpTopicId),
                 H.Div(
                     RenderSidebar(activeMenu, localization),
                     H.MainElement(bodyContent).Class("shell-content")
@@ -77,12 +77,16 @@ public abstract class ViewBase
         return H.DocType() + "\n" + html.Build();
     }
 
-    private static H RenderHeader(DefaultLocalizationBase localization)
+    private static H RenderHeader(DefaultLocalizationBase localization, string? helpTopicId = null)
     {
+        var helpHref = string.IsNullOrEmpty(helpTopicId) 
+            ? "/help" 
+            : $"/help/{helpTopicId}";
+        
         return H.Header(
             H.Div($"🜲 {localization.BrandName}").Class("shell-brand"),
             H.Div(
-                H.A("⚙").Class("shell-header-link").Href("/config")
+                H.A("❓").Class("shell-header-link").Href(helpHref).Attr("title", localization.NavMenuHelp)
             ).Class("shell-header-actions")
         ).Class("shell-header");
     }

@@ -186,6 +186,7 @@ public class TaskTool : ITool
                 "completed" => Collective.TaskStatus.Completed,
                 "failed" => Collective.TaskStatus.Failed,
                 "cancelled" => Collective.TaskStatus.Cancelled,
+                "all" => null,
                 _ => null
             };
         }
@@ -248,10 +249,30 @@ public class TaskTool : ITool
             return ToolResult.Failed("Missing or invalid 'task_id' parameter");
         }
 
-        string taskTitle = being.TaskSystem!.Get(taskId)?.Title ?? taskId.ToString();
+        var task = being.TaskSystem!.Get(taskId);
+        if (task == null)
+        {
+            return ToolResult.Failed($"Task not found: {taskId}");
+        }
+
+        // Terminal states cannot be changed
+        if (task.Status == Collective.TaskStatus.Completed ||
+            task.Status == Collective.TaskStatus.Failed ||
+            task.Status == Collective.TaskStatus.Cancelled)
+        {
+            return ToolResult.Failed($"Task '{task.Title}' is already {task.Status} and cannot be completed");
+        }
+
+        // Auto-start pending tasks before completing
+        if (task.Status == Collective.TaskStatus.Pending)
+        {
+            being.TaskSystem!.Start(taskId);
+        }
+
+        string taskTitle = task.Title;
         being.TaskSystem!.Complete(taskId);
         RecordMemoryForBeing(being, loc => loc.FormatMemoryEventTaskCompleted(taskTitle));
-        return ToolResult.Successful($"Task {taskId} marked as completed.");
+        return ToolResult.Successful($"Task '{taskTitle}' marked as completed.");
     }
 
     private ToolResult ExecuteFail(SiliconBeingBase being, Dictionary<string, object> parameters)
@@ -261,11 +282,31 @@ public class TaskTool : ITool
             return ToolResult.Failed("Missing or invalid 'task_id' parameter");
         }
 
-        string taskTitle = being.TaskSystem!.Get(taskId)?.Title ?? taskId.ToString();
+        var task = being.TaskSystem!.Get(taskId);
+        if (task == null)
+        {
+            return ToolResult.Failed($"Task not found: {taskId}");
+        }
+
+        // Terminal states cannot be changed
+        if (task.Status == Collective.TaskStatus.Completed ||
+            task.Status == Collective.TaskStatus.Failed ||
+            task.Status == Collective.TaskStatus.Cancelled)
+        {
+            return ToolResult.Failed($"Task '{task.Title}' is already {task.Status} and cannot be failed");
+        }
+
+        // Auto-start pending tasks before failing
+        if (task.Status == Collective.TaskStatus.Pending)
+        {
+            being.TaskSystem!.Start(taskId);
+        }
+
+        string taskTitle = task.Title;
         string error = parameters.TryGetValue("error", out object? errorObj) ? errorObj?.ToString() ?? "Unknown error" : "Unknown error";
         being.TaskSystem!.Fail(taskId, error);
         RecordMemoryForBeing(being, loc => loc.FormatMemoryEventTaskFailed(taskTitle));
-        return ToolResult.Successful($"Task {taskId} marked as failed: {error}");
+        return ToolResult.Successful($"Task '{taskTitle}' marked as failed: {error}");
     }
 
     private ToolResult ExecuteCancel(SiliconBeingBase being, Dictionary<string, object> parameters)
@@ -275,8 +316,19 @@ public class TaskTool : ITool
             return ToolResult.Failed("Missing or invalid 'task_id' parameter");
         }
 
+        var task = being.TaskSystem!.Get(taskId);
+        if (task == null)
+        {
+            return ToolResult.Failed($"Task not found: {taskId}");
+        }
+
+        if (task.Status != Collective.TaskStatus.Pending)
+        {
+            return ToolResult.Failed($"Task '{task.Title}' is {task.Status}, only pending tasks can be cancelled");
+        }
+
         being.TaskSystem!.Cancel(taskId);
-        return ToolResult.Successful($"Task {taskId} cancelled.");
+        return ToolResult.Successful($"Task '{task.Title}' cancelled.");
     }
 
     private ToolResult ExecuteDelete(SiliconBeingBase being, Dictionary<string, object> parameters)

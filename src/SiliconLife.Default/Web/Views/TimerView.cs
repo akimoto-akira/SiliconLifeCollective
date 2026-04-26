@@ -20,7 +20,7 @@ public class TimerView : ViewBase
         var vm = model as TimerViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.PageTitleTimers, "timers", vm.Localization, body, GetScripts(vm.Localization), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleTimers, "timers", vm.Localization, body, GetScripts(vm.Localization), GetStyles(), "timer");
     }
 
     private static H RenderBody(TimerViewModel vm)
