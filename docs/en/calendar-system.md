@@ -1,62 +1,68 @@
-# Calendar System
+﻿# Calendar System
 
-[English](calendar-system.md) | [简体中文](docs/zh-CN/calendar-system.md) | [繁體中文](docs/zh-HK/calendar-system.md) | [Español](docs/es-ES/calendar-system.md) | [日本語](docs/ja-JP/calendar-system.md) | [한국어](docs/ko-KR/calendar-system.md) | [Čeština](docs/cs-CZ/calendar-system.md)
+[English](../en/calendar-system.md) | [中文](../zh-CN/calendar-system.md) | [繁體中文](../zh-HK/calendar-system.md) | [Español](../es-ES/calendar-system.md) | [日本語](../ja-JP/calendar-system.md) | [한국어](../ko-KR/calendar-system.md) | [Deutsch](../de-DE/calendar-system.md) | [Čeština](../cs-CZ/calendar-system.md)
 
 ## Overview
 
 SiliconLifeCollective supports 32 different calendar systems for date conversion and historical accuracy.
 
-## Supported Calendars
+## Supported Calendars (32 total)
 
-### Major Calendars
+### Primary Calendars (6)
 
-1. **Gregorian** - International standard calendar
-2. **Chinese Lunar** - Traditional Chinese calendar
-3. **Islamic** - Islamic Hijri calendar
-4. **Hebrew** - Jewish calendar
-5. **Persian** - Iranian calendar
-6. **Indian** - Indian national calendar
+1. **Gregorian** - International standard calendar, ID: `gregorian`
+2. **Chinese Lunar** - Traditional Chinese calendar with leap month calculation, ID: `lunar`
+3. **Islamic** - Islamic Hijri calendar, ID: `islamic`
+4. **Hebrew** - Jewish calendar, ID: `hebrew`
+5. **Persian** - Iranian solar calendar, ID: `persian`
+6. **Indian** - Indian national calendar, ID: `indian`
 
-### East Asian Calendars
+### Chinese Historical Calendars (2)
 
-7. **Chinese Historical** - Historical Chinese eras
-8. **Japanese** - Japanese imperial eras
-9. **Korean** - Korean calendar systems
-10. **Vietnamese** - Vietnamese calendar
-11. **Tibetan** - Tibetan calendar
-12. **Mongolian** - Mongolian calendar
+7. **Chinese Historical** - Supports Ganzhi year system and imperial era names, ID: `chinese_historical`
+   - **Ganzhi Year System**: 60-year cycle (Heavenly Stems + Earthly Branches)
+   - **Imperial Era Names**: Supports era names from Chinese historical dynasties (Kangxi, Qianlong, Zhenguan, etc.)
+   - **Dynamic Database**: Built-in complete database of Chinese historical dynasties and era names
+8. **Sexagenary** - 60-year Ganzhi cycle, ID: `sexagenary`
 
-### Historical Calendars
+### East Asian Calendars (6)
 
-13. **Mayan** - Mayan long count
-14. **Roman** - Ancient Roman calendar
-15. **Julian** - Julian calendar
-16. **French Republican** - French Revolution calendar
-17. **Coptic** - Coptic Orthodox calendar
-18. **Ethiopian** - Ethiopian calendar
+9. **Japanese** - Japanese era (Nengo) calendar, ID: `japanese`
+10. **Vietnamese** - Vietnamese lunar calendar (Cat zodiac variant), ID: `vietnamese`
+11. **Tibetan** - Tibetan calendar system, ID: `tibetan`
+12. **Mongolian** - Mongolian calendar, ID: `mongolian`
+13. **Dai** - Dai calendar with complete lunar calculations, ID: `dai`
+14. **Dehong Dai** - Dehong Dai calendar variant, ID: `dehong_dai`
 
-### Regional Calendars
+### Historical Calendars (6)
 
-19. **Buddhist** - Buddhist era
-20. **Saka** - Saka era (India)
-21. **Vikram Samvat** - Hindu calendar
-22. **Javanese** - Javanese calendar
-23. **Balinese** - Balinese calendar
+15. **Mayan** - Mayan Long Count calendar, ID: `mayan`
+16. **Roman** - Ancient Roman calendar, ID: `roman`
+17. **Julian** - Julian calendar, ID: `julian`
+18. **French Republican** - French revolutionary calendar, ID: `french_republican`
+19. **Coptic** - Coptic Orthodox calendar, ID: `coptic`
+20. **Ethiopian** - Ethiopian calendar, ID: `ethiopian`
 
-### Modern Calendars
+### Regional Calendars (6)
 
-24. **Republic of China (Taiwan)** - Minguo calendar
-25. **Juche** - North Korean calendar
-26. **Chula Sakarat** - Southeast Asian Buddhist
+21. **Buddhist** - Buddhist Era (BE), year + 543, ID: `buddhist`
+22. **Saka** - Saka Era (Indonesia), ID: `saka`
+23. **Vikram Samvat** - Hindu calendar, ID: `vikram_samvat`
+24. **Javanese** - Javanese Islamic calendar, ID: `javanese`
+25. **Chula Sakarat** - Southeast Asian Buddhist calendar, year - 638, ID: `chula_sakarat`
+26. **Khmer** - Khmer calendar, ID: `khmer`
 
-### Ethnic Calendars (China)
+### Modern Calendars (3)
 
-27. **Dai** - Dai calendar
-28. **Dehong Dai** - Dehong Dai calendar
-29. **Yi** - Yi calendar
-30. **Cherokee** - Cherokee calendar
-31. **Inuit** - Inuit calendar
-32. **Sexagenary** - 60-year cycle
+27. **ROC** - Republic of China (Minguo) calendar, year - 1911, ID: `roc`
+28. **Juche** - North Korean calendar, year - 1911, ID: `juche`
+29. **Zoroastrian** - Zoroastrian calendar, ID: `zoroastrian`
+
+### Ethnic Calendars (3)
+
+30. **Yi** - Yi calendar system, ID: `yi`
+31. **Cherokee** - Cherokee calendar, ID: `cherokee`
+32. **Inuit** - Inuit calendar, ID: `inuit`
 
 ---
 
@@ -76,7 +82,7 @@ SiliconLifeCollective supports 32 different calendar systems for date conversion
 **Response**:
 ```json
 {
-  "result": "农历丙午年四月初三",
+  "result": "Lunar calendar Bingwu year, fourth month, third day",
   "year": 2026,
   "month": 4,
   "day": 3,
@@ -84,7 +90,7 @@ SiliconLifeCollective supports 32 different calendar systems for date conversion
 }
 ```
 
-### Multiple Calendar Query
+### Multi-Calendar Query
 
 ```json
 {
@@ -141,31 +147,73 @@ public class MyCustomCalendar : CalendarBase
 
 ## Special Features
 
-### Chinese Historical Eras
+### Chinese Historical Calendar Details (New)
 
-Supports dynamic era database:
+The Chinese Historical Calendar is a highlight of this system, supporting two core features:
 
+#### 1. Ganzhi Year System
+
+Uses a 60-year cycle composed of Heavenly Stems and Earthly Branches:
+
+```
+Heavenly Stems (10): Jia, Yi, Bing, Ding, Wu, Ji, Geng, Xin, Ren, Gui
+Earthly Branches (12): Zi, Chou, Yin, Mao, Chen, Si, Wu, Wei, Shen, You, Xu, Hai
+```
+
+**Examples**:
+- 2026 = Bingwu year
+- 2025 = Yisi year (Year of the Snake)
+- 2024 = Jiachen year (Year of the Dragon)
+
+**Usage Example**:
 ```json
 {
-  "era": "康熙",
-  "year": 60,
-  "month": 3,
-  "day": 15
+  "action": "convert",
+  "date": "2026-04-26",
+  "from_calendar": "gregorian",
+  "to_calendar": "chinese_historical"
 }
 ```
 
-Converts to: `1721-04-12` (Gregorian)
-
-### Sexagenary Cycle
-
-60-year cycle with heavenly stems and earthly branches:
-
-```
-天干: 甲、乙、丙、丁、戊、己、庚、辛、壬、癸
-地支: 子、丑、寅、卯、辰、巳、午、未、申、酉、戌、亥
+**Response**:
+```json
+{
+  "result": "Bingwu year, third month, ninth day",
+  "ganzhi_year": "Bingwu",
+  "zodiac": "Horse"
+}
 ```
 
-Example: 2026 = 丙午年
+#### 2. Imperial Era Name System
+
+Built-in complete database of Chinese historical dynasties and imperial era names:
+
+**Supported Dynasties** (partial):
+- Qing Dynasty: Kangxi, Yongzheng, Qianlong, Jiaqing, Daoguang, Xianfeng, Tongzhi, Guangxu, Xuantong
+- Ming Dynasty: Hongwu, Yongle, Jiajing, Wanli, Chongzhen, etc.
+- Tang Dynasty: Zhenguan, Kaiyuan, Tianbao, etc.
+- Han Dynasty: Jianyuan, Yuanguang, Yuanshuo, etc.
+- Other dynasties...
+
+**Usage Example**:
+```json
+{
+  "action": "convert",
+  "date": "1721-04-12",
+  "from_calendar": "gregorian",
+  "to_calendar": "chinese_historical"
+}
+```
+
+**Response**:
+```json
+{
+  "result": "60th year of Kangxi, third month, fifteenth day",
+  "era": "Kangxi",
+  "era_year": 60,
+  "dynasty": "Qing"
+}
+```
 
 ### Leap Month Handling
 
@@ -179,7 +227,7 @@ Calendars with leap months:
 {
   "isLeapMonth": true,
   "month": 4,
-  "note": "闰四月"
+  "note": "Leap fourth month"
 }
 ```
 
@@ -197,7 +245,7 @@ Calendars with leap months:
 
 - Some ancient dates are approximate
 - Calendar reforms vary by region
-- Leap second handling not included
+- Does not include leap second handling
 
 ---
 
@@ -205,33 +253,33 @@ Calendars with leap months:
 
 ### Historical Research
 
-Convert historical dates to modern calendar:
+Convert historical dates to modern calendars:
 
 ```
 Q: "When was the French Revolution?"
-A: "14 July 1789 (Gregorian)"
-   "26 Messidor, Year I (French Republican)"
+A: "July 14, 1789 (Gregorian)"
+   "26 Thermidor, Year 1 (French Republican)"
 ```
 
 ### Cultural Applications
 
-Support traditional festivals:
+Support for traditional festivals:
 
 ```
-Chinese New Year 2026:
+2026 Chinese New Year:
 - Gregorian: February 17, 2026
-- Chinese Lunar: 正月初一
+- Lunar: First month, first day
 ```
 
 ### Multi-Cultural Scheduling
 
-Schedule events respecting multiple calendars:
+Schedule events that respect multiple calendars:
 
 ```
 Meeting: 2026-04-20
-- Avoids Islamic Friday prayers
-- Respects Jewish Sabbath
-- Considers Chinese holidays
+- Avoid Islamic Friday prayers
+- Respect Jewish Sabbath
+- Consider Chinese holidays
 ```
 
 ---
@@ -245,7 +293,7 @@ Never assume the calendar system:
 ```json
 {
   "date": "2026-04-20",
-  "calendar": "gregorian"  // Explicit!
+  "calendar": "gregorian"  // Specify explicitly!
 }
 ```
 
@@ -259,40 +307,15 @@ Some dates don't exist in certain calendars:
 }
 ```
 
-### 3. Consider Timezones
+### 3. Consider Time Zones
 
-Date conversion may vary by timezone:
+Date conversion may vary by time zone:
 
 ```
 2026-04-20 23:00 UTC+8
 ≠
 2026-04-20 23:00 UTC-5
 ```
-
----
-
-## Troubleshooting
-
-### Conversion Returns Wrong Date
-
-**Check**:
-- Correct calendar specified
-- Date is valid for that calendar
-- Historical accuracy noted
-
-### Leap Month Issues
-
-**Check**:
-- Calendar supports leap months
-- Year actually has leap month
-- Leap month calculation is correct
-
-### Historical Era Not Found
-
-**Check**:
-- Era name spelling
-- Era date range
-- Database includes that era
 
 ---
 

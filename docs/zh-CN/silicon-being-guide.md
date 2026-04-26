@@ -1,6 +1,6 @@
-# 硅基生命体指南
+﻿# 硅基生命体指南
 
-[English](silicon-being-guide.md) | [中文](docs/zh-CN/silicon-being-guide.md) | [繁體中文](docs/zh-HK/silicon-being-guide.md) | [Español](docs/es-ES/silicon-being-guide.md) | [日本語](docs/ja-JP/silicon-being-guide.md) | [한국어](docs/ko-KR/silicon-being-guide.md) | [Čeština](docs/cs-CZ/silicon-being-guide.md)
+[English](../en/silicon-being-guide.md) | [Deutsch](../de-DE/silicon-being-guide.md) | **中文** | [繁體中文](../zh-HK/silicon-being-guide.md) | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | [한국어](../ko-KR/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md)
 
 ## 概述
 
@@ -399,6 +399,120 @@ Python → is_a → programming_language → belongs_to → computer_science
 2. 查看知识统计信息
 3. 搜索和浏览知识
 4. 可视化知识关系图（计划中）
+
+## WebView 浏览器操作（新增）
+
+### 概述
+
+硅基生命体可以通过 WebView 浏览器工具自主浏览网页、获取信息、执行网页操作。浏览器运行在无头模式下，用户完全不可见。
+
+### 特性
+
+- **个体隔离**：每个生命体拥有独立的浏览器实例、Cookie 和会话
+- **无头模式**：后台自主操作，用户不可见
+- **完整功能**：支持 JavaScript 执行、CSS 渲染、表单填写等
+- **安全控制**：所有操作需通过权限验证链
+
+### 常用操作
+
+#### 1. 打开浏览器
+
+```json
+{
+  "action": "open_browser"
+}
+```
+
+#### 2. 导航到网页
+
+```json
+{
+  "action": "navigate",
+  "url": "https://example.com"
+}
+```
+
+#### 3. 获取页面内容
+
+```json
+{
+  "action": "get_page_text"
+}
+```
+
+返回页面文本内容，供 AI 分析和理解。
+
+#### 4. 点击元素
+
+```json
+{
+  "action": "click",
+  "selector": "#submit-button"
+}
+```
+
+#### 5. 输入文本
+
+```json
+{
+  "action": "input",
+  "selector": "#search-input",
+  "text": "搜索关键词"
+}
+```
+
+#### 6. 执行 JavaScript
+
+```json
+{
+  "action": "execute_script",
+  "script": "return document.title;"
+}
+```
+
+#### 7. 获取截图
+
+```json
+{
+  "action": "get_screenshot"
+}
+```
+
+返回页面截图（Base64 编码），可用于视觉分析。
+
+#### 8. 等待元素出现
+
+```json
+{
+  "action": "wait_for_element",
+  "selector": ".loading-complete",
+  "timeout": 10000
+}
+```
+
+### 使用场景
+
+1. **信息获取**
+   - 浏览新闻网站获取最新资讯
+   - 查询文档和技术资料
+   - 监控网页内容变化
+
+2. **自动化操作**
+   - 填写表单并提交
+   - 点击按钮触发操作
+   - 抓取网页数据
+
+3. **网页分析**
+   - 分析页面结构和内容
+   - 提取特定信息
+   - 可视化页面截图分析
+
+### 注意事项
+
+- 浏览器操作可能较慢，需等待页面加载完成
+- 使用 `wait_for_element` 确保元素出现后再操作
+- 遵守网站的使用条款和 robots.txt
+- 避免频繁请求导致被封禁
 
 ## 最佳实践
 

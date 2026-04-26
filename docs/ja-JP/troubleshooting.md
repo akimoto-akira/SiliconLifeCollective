@@ -1,542 +1,349 @@
-# トラブルシューティングガイド
+﻿# トラブルシューティングガイド
 
-[English](troubleshooting.md) | [简体中文](docs/zh-CN/troubleshooting.md) | [繁體中文](docs/zh-HK/troubleshooting.md) | [Español](docs/es-ES/troubleshooting.md) | [日本語](docs/ja-JP/troubleshooting.md) | [한국어](docs/ko-KR/troubleshooting.md) | [Čeština](docs/cs-CZ/troubleshooting.md)
+[English](../en/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | **日本語** | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md)
 
-## よくある問題と解決策
+## 一般的な問題
 
----
+### ビルドとコンパイル
 
-## インストール問題
+#### 問題：依存関係の欠落でビルド失敗
 
-### .NET SDK が見つからない
-
-**エラー**：`dotnet: command not found`
-
-**解決策**：
-1. [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) をダウンロード
-2. インストーラーを実行
-3. ターミナルを再起動
-4. 確認：`dotnet --version`
-
-### ビルドエラー
-
-**エラー**：`error NU1101: Unable to find package`
+**症状**：
+```
+error CS0246: The type or namespace name 'Microsoft.CodeAnalysis' could not be found
+```
 
 **解決策**：
 ```bash
-# NuGet キャッシュをクリア
-dotnet nuget locals all --clear
-
-# 依存関係を復元
 dotnet restore
-
-# 再構築
 dotnet build
+```
+
+#### 問題：.NET SDK が見つからない
+
+**症状**：
+```
+The .NET SDK could not be found
+```
+
+**解決策**：
+1. .NET 9 SDK をインストール：https://dotnet.microsoft.com/download/dotnet/9.0
+2. インストールを検証：
+```bash
+dotnet --version
 ```
 
 ---
 
-## AI 接続問題
+### AI 接続問題
 
-### Ollama に接続できない
+#### 問題：Ollama 接続拒否
 
-**エラー**：`Failed to connect to http://localhost:11434`
+**症状**：
+```
+Failed to connect to Ollama at http://localhost:11434
+```
 
 **解決策**：
 ```bash
 # Ollama が実行中か確認
 ollama list
 
-# 実行中でない場合は起動
+# Ollama を起動
 ollama serve
 
-# ファイアウォール設定を確認
-# ポート 11434 がブロックされていないことを確認
+# 接続をテスト
+curl http://localhost:11434/api/tags
 ```
 
-### モデルが見つからない
+#### 問題：モデルが見つからない
 
-**エラー**：`model "qwen2.5:7b" not found`
+**症状**：
+```
+model "qwen2.5:7b" not found
+```
 
 **解決策**：
 ```bash
-# モデルをダウンロード
+# 必要なモデルをプル
 ollama pull qwen2.5:7b
 
-# インストール済みモデルを確認
+# 利用可能なモデルをリスト
 ollama list
 ```
 
-### DashScope 認証失敗
+#### 問題：DashScope 404 エラー
 
-**エラー**：`Invalid API key`
+**症状**：
+```
+HTTP 404: Model not found
+```
 
 **解決策**：
 1. API キーが正しいことを確認
-2. [DashScope コンソール](https://bailian.console.aliyun.com/) でキーを再生成
-3. 設定でキーを更新：
-
-```json
-{
-  "AIClients": {
-    "DashScope": {
-      "ApiKey": "your-new-api-key"
-    }
-  }
-}
-```
+2. モデル名が DashScope カタログと一致するか確認
+3. リージョンエンドポイントが正しいことを確認
+4. アカウントがモデルにアクセスできるか確認
 
 ---
 
-## ポート問題
+### 実行時問題
 
-### ポート 8080 が既に使用中
+#### 問題：ポートが既に使用されている
 
-**エラー**：`HttpListenerException: Address already in use`
+**症状**：
+```
+HttpListenerException: Address already in use
+```
 
 **解決策**：
 
 **Windows**：
 ```bash
-# ポートを使用しているプロセスを検索
 netstat -ano | findstr :8080
-
-# プロセスをkill
 taskkill /PID <PID> /F
 ```
 
 **Linux/Mac**：
 ```bash
-# ポートを使用しているプロセスを検索
-lsof -ti:8080
-
-# プロセスをkill
-kill -9 <PID>
+lsof -ti:8080 | xargs kill -9
 ```
 
-**またはポートを変更**：
+**または設定でポートを変更**。
 
-`DefaultConfigData.cs` で：
-```csharp
-WebHostPort = 8081  // 別のポート
-```
+#### 問題：生命体が起動しない
 
----
-
-## 権限問題
-
-### 権限拒否エラー
-
-**エラー**：`Permission denied: disk:write`
+**症状**：
+- 生命体状態が「Error」を表示
+- ログに初期化失敗が表示
 
 **解決策**：
-1. Web UI で権限管理に移動
-2. ユーザーに適切な権限を付与
-3. または ACL ルールを更新：
-
-```json
-{
-  "userId": "user-uuid",
-  "resource": "disk:write",
-  "allowed": true,
-  "expiresAt": "2026-04-21T00:00:00Z"
-}
-```
-
-### IsCurator が機能しない
-
-**確認**：
-1. ユーザーが正しく設定されている
-2. `IsCurator` プロパティが true に設定されている
-3. 権限チェーンの最初のチェックである
-
----
-
-## ストレージ問題
-
-### データが保存されない
-
-**確認**：
-1. ストレージパスが存在する
-2. ディレクトリに書き込み権限がある
-3. ディスク容量が十分にある
-
-**解決策**：
+1. ソウルファイルが存在し、有効か確認
+2. AI クライアントが設定されていることを確認
+3. ログで具体的なエラーを確認：
 ```bash
-# ディレクトリを作成
-mkdir -p ./data/beings
-
-# 権限を設定（Linux/Mac）
-chmod 755 ./data
-
-# Windows で権限を確認
-# フォルダのプロパティ → セキュリティタブ
+tail -f logs/*.log
 ```
 
-### メモリ使用量が高すぎる
+#### 問題：メモリ不足
+
+**症状**：
+```
+OutOfMemoryException
+```
 
 **解決策**：
-1. メモリ制限を設定：
-
-```csharp
-var cache = new MemoryCache(new MemoryCacheOptions
-{
-    SizeLimit = 1024  // 1GB
-});
+1. ヒープサイズを増加：
+```bash
+dotnet run --server.gcHeapCount 4
 ```
 
 2. 古いデータをクリーンアップ：
+```bash
+# 古いログをアーカイブ
+mv logs/ logs-archive/
+mkdir logs
+
+# 古いメモリをクリーンアップ
+# Web UI 経由：メモリ管理 > クリーンアップ
+```
+
+---
+
+### 権限問題
+
+#### 問題：予期しない権限拒否
+
+**解決策**：
+1. ユーザーの IsCurator 状態を確認
+2. レートリミット設定を確認
+3. GlobalACL ルールを確認
+4. コールバックロジックを確認
+5. ユーザー応答タイムアウトを確認
+
+#### 問題：権限が期限切れにならない
+
+**解決策**：
+- `expiresAt` フィールドが正しく設定されていることを確認
+- タイムゾーンが正確であることを確認
+- クロックが同期していることを確認
+
+---
+
+### Web UI 問題
+
+#### 問題：Web UI にアクセスできない
+
+**解決策**：
+1. サーバーが実行中であることを確認
+2. ポート 8080 がブロックされていないことを確認
+3. ファイアウォール設定を確認
+4. ブラウザのコンソールでエラーを確認
+
+#### 問題：SSE が機能しない
+
+**解決策**：
+1. ブラウザが SSE をサポートしていることを確認
+2. プロキシが SSE をバッファリングしていないことを確認
+3. ネットワークの安定性を確認
+4. ブラウザの開発者ツールで接続を確認
+
+---
+
+### カレンダー問題
+
+#### 問題：日付変換が正しくない
+
+**解決策**：
+1. カレンダー ID が正しいことを確認
+2. 日付形式が正しいことを確認（YYYY-MM-DD）
+3. 閏月処理を確認
+4. カレンダーの既知の制限を確認
+
+---
+
+### ツール問題
+
+#### 問題：ツールが実行されない
+
+**解決策**：
+1. ツール名が正しいことを確認
+2. パラメータが正しい形式であることを確認
+3. 権限が適切に付与されていることを確認
+4. 実行器が実行中であることを確認
+
+#### 問題：ツールがタイムアウト
+
+**解決策**：
+1. 実行器のタイムアウト設定を増加
+2. ネットワーク接続を確認
+3. リソースの利用可能性を確認
+4. サーキットブレーカー状態を確認
+
+---
+
+## ログの表示
+
+### ログファイルの場所
+
+```
+logs/
+├── application.log
+├── error.log
+└── being-{id}.log
+```
+
+### リアルタイムログモニタリング
 
 ```bash
-# 古いログを削除
-rm -rf ./data/logs/*
+# すべてのログをフォロー
+tail -f logs/*.log
 
-# 古いチャット履歴を削除
-rm -rf ./data/chats/2025-*
+# エラーログのみ
+tail -f logs/error.log
+
+# 特定の生命体
+tail -f logs/being-{id}.log
 ```
+
+### Web UI でのログ表示
+
+1. **ログ**ページに移動
+2. レベルでフィルタ（情報/警告/エラー）
+3. キーワードで検索
+4. 時間範囲を選択
 
 ---
 
-## チャット問題
+## デバッグ
 
-### AI が応答しない
+### デバッグモードの有効化
 
-**確認**：
-1. AI サービスが実行中
-2. タイムアウトが発生していない
-3. リクエストが正しい形式
+```bash
+# デバッグビルド
+dotnet build --configuration Debug
 
-**タイムアウトを増加**：
-```csharp
-var request = new AIRequest
-{
-    MaxTokens = 4000,  // 増加
-    Timeout = TimeSpan.FromMinutes(5)  // タイムアウトを延長
-};
+# デバッグで実行
+dotnet run --configuration Debug
 ```
 
-### ストリーミングが切断される
+### Visual Studio でのデバッグ
 
-**解決策**：
-1. SSE 接続が安定していることを確認
-2. プロキシ設定を確認
-3. ブラウザのコンソールでエラーを確認
+1. プロジェクトを開く
+2. ブレークポイントを設定
+3. F5 でデバッグ開始
+4. 変数を検査
+5. コールスタックを確認
+
+### VS Code でのデバッグ
+
+1. デバッグ拡張をインストール
+2. `launch.json` を設定
+3. F5 でデバッグ開始
+4. デバッグコンソールを使用
 
 ---
 
-## パフォーマンス問題
-
-### 応答が遅い
-
-**解決策**：
-1. より高速な AI モデルを使用
-2. キャッシュを有効化
-3. 不要なツールを無効化
-
-**キャッシュの有効化**：
-```csharp
-ServiceLocator.Instance.Register<ICache>(new MemoryCache());
-```
+## パフォーマンス
 
 ### CPU 使用率が高い
 
-**確認**：
-1. 無限ループがない
-2. MainLoop が適切に実行されている
-3. 実行中の生命体が多すぎない
-
-**生命体の数を制限**：
-```csharp
-// 同時に実行される生命体の最大数
-MaxConcurrentBeings = 5;
-```
-
----
-
-## ツール問題
-
-### ツールが見つからない
-
-**確認**：
-1. ツールが `Tools/` ディレクトリにある
-2. `ITool` インターフェースを実装
-3. クラスが public である
-4. コンパイルエラーがない
-
-**ツールをデバッグ**：
-```csharp
-public class DebugTool : ITool
-{
-    public string Name => "debug";
-    
-    public async Task<ToolResult> ExecuteAsync(ToolCall call)
-    {
-        Console.WriteLine($"ツール呼び出し：{call.Name}");
-        Console.WriteLine($"パラメータ：{call.Parameters}");
-        
-        return ToolResult.Success("デバッグ出力を確認");
-    }
-}
-```
-
-### ツール実行が失敗
-
-**確認**：
-1. パラメータが正しい
-2. 権限が十分
-3. 依存関係がインストールされている
-
----
-
-## カレンダー問題
-
-### 日付変換が正しくない
-
-**確認**：
-1. 正しいカレンダーが指定されている
-2. 日付がそのカレンダーで有効
-3. 閏月が正しく処理されている
-
-**カレンダーをデバッグ**：
-```csharp
-var calendar = new ChineseLunarCalendar();
-var result = calendar.ConvertFromGregorian(new GregorianDate(2026, 4, 20));
-Console.WriteLine($"結果：{result}");
-```
-
----
-
-## ログの確認
-
-### ログの場所
-
-```
-./data/logs/
-├── system.log      # システムログ
-├── ai.log          # AI 相互作用
-├── permission.log  # 権限決定
-└── error.log       # エラーのみ
-```
-
-### ログレベルを設定
-
-```csharp
-LoggingManager.SetLogLevel(LogLevel.Debug);  // 詳細
-LoggingManager.SetLogLevel(LogLevel.Info);   // 標準
-LoggingManager.SetLogLevel(LogLevel.Error);  // エラーのみ
-```
-
-### ログを分析
-
+**解決策**：
+1. プロファイラーを実行：
 ```bash
-# エラーを検索
-grep "ERROR" ./data/logs/system.log
-
-# 特定のコンポーネントを検索
-grep "OllamaClient" ./data/logs/ai.log
-
-# タイムスタンプでフィルター
-grep "2026-04-20" ./data/logs/system.log
+dotnet trace collect --process-id <PID>
 ```
+
+2. ホットパスを特定
+3. アルゴリズムを最適化
+4. キャッシュを使用
+
+### メモリ使用率が高い
+
+**解決策**：
+1. メモリダンプを分析：
+```bash
+dotnet-dump collect --process-id <PID>
+```
+
+2. メモリリークを特定
+3. 大きなオブジェクトを破棄
+4. GC 設定を調整
 
 ---
 
-## システムをリセット
+## 一般的なエラーコード
 
-### 全面的なリセット
-
-**警告**：これによりすべてのデータが削除されます！
-
-```bash
-# データディレクトリを削除
-rm -rf ./data
-
-# ビルドキャッシュをクリア
-dotnet clean
-
-# 再構築
-dotnet build
-
-# 再起動
-dotnet run
-```
-
-### 設定のみをリセット
-
-```bash
-# 設定ファイルを削除
-rm ./data/config.json
-
-# デフォルト設定で再起動
-dotnet run
-```
+| エラーコード | 説明 | 解決策 |
+|----------|------|------|
+| 400 | 不正なリクエスト | リクエストパラメータを確認 |
+| 401 | 認証失敗 | 認証情報を確認 |
+| 403 | 権限なし | 権限を確認 |
+| 404 | 見つからない | URL/パスを確認 |
+| 500 | サーバーエラー | ログを確認 |
+| 503 | サービス利用不可 | サーバー状態を確認 |
 
 ---
 
-## サポートが必要な場合
+## サポートの取得
 
-### リソース
+### ドキュメント
 
-- 📖 [ドキュメント](../) を確認
+- 📚 [完全なドキュメント](docs/)
+- 🛠️ [開発ガイド](development-guide.md)
+- 📖 [API リファレンス](api-reference.md)
+
+### コミュニティ
+
 - 🐛 [GitHub Issues](https://github.com/akimoto-akira/SiliconLifeCollective/issues) で問題を報告
-- 💬 コミュニティディスカッションに参加
-
-### バグレポート
-
-バグを報告する際は以下を含めてください：
-
-1. **環境**：
-   - OS: Windows/Linux/Mac
-   - .NET バージョン: `dotnet --version`
-   - AI バックエンド: Ollama/DashScope
-
-2. **エラーメッセージ**：
-   - 完全なエラー出力
-   - ログファイルの関連部分
-
-3. **再現手順**：
-   - 問題を再現する手順
-   - 期待される動作
-   - 実際の動作
-
-4. **設定**：
-   - 関連する設定ファイル（API キーは削除）
-
----
-
-## 作業ノート問題
-
-### 問題: 作業ノート作成不可
-
-**症状**:
-```
-Failed to create work note
-```
-
-**解決策**:
-1. 生命体が存在し実行中か確認
-2. 保存パスに書き込み権限があるか検証
-3. 内容が空でないか確認（内容必須）
-4. ログで詳細エラー情報確認
-
-### 問題: ノート検索結果なし
-
-**症状**:
-- 検索キーワードが空の結果を返す
-- しかし関連ノートがあることが確実
-
-**解決策**:
-1. キーワードの綴りが正しいか確認
-2. より一般的なキーワードを試す
-3. ノートに当該キーワードが含まれているか検証（大文字小文字区別）
-4. `max_results` パラメータ値増加
-
-### 問題: ノート目次生成が遅い
-
-**症状**:
-- 目次生成時に応答時間長い
-- 生命体に多くのノートがある（>1000ページ）
-
-**解決策**:
-1. これは正常な現象、全ノートを巡回する必要がある
-2. 古いノートの定期的なアーカイブを検討
-3. 目次探索代わりに検索機能使用
-4. 計画された最適化: 目次キャッシュメカニズム追加
-
----
-
-## ナレッジネットワーク問題
-
-### 問題: ナレッジ照会が空の結果を返す
-
-**症状**:
-```
-No knowledge triples found
-```
-
-**解決策**:
-1. 主語と述語の綴りを検証
-2. ナレッジがネットワークに追加されたか確認
-3. 検索機能でファジーマッチング使用:
-```json
-{
-  "action": "search",
-  "query": "キーワード"
-}
-```
-
-### 問題: ナレッジパス発見失敗
-
-**症状**:
-```
-No path found between concepts
-```
-
-**解決策**:
-1. 2つの概念がナレッジネットワークに存在するか検証
-2. 関連パスがあるか確認（直接的または間接的な関係がない可能性）
-3. 接続構築のためにより多くのナレッジ追加を試す
-4. パス長さ制限を下げる（設定されている場合）
-
-### 問題: ナレッジ検証失敗
-
-**症状**:
-```
-Knowledge validation failed
-```
-
-**解決策**:
-1. トリプル形式が正しいか確認（主語、述語、目的語必須）
-2. 信頼度が0.0-1.0範囲内にあるか検証
-3. 重複したトリプルがないか確認
-4. 検証エラー詳細情報確認して具体的問題把握
-
-### 問題: ナレッジネットワーク統計情報が不正確
-
-**症状**:
-- 統計数字が予想と異なる
-- ナレッジ追加後統計が更新されない
-
-**解決策**:
-1. 統計情報には数秒かかる可能性あり（キャッシュ）
-2. 削除操作が成功裏に実行されたか確認
-3. アプリケーション再起動して統計強制更新
-4. APIを通じて統計情報再照会
-
----
-
-## プロジェクト管理問題
-
-### 問題: プロジェクト作成不可
-
-**症状**:
-```
-Failed to create project
-```
-
-**解決策**:
-1. プロジェクト名が空でないか確認（必須）
-2. プロジェクト名が重複していないか検証
-3. 保存パスに書き込み権限があるか確認
-4. ログで詳細エラー情報確認
-
-### 問題: プロジェクトデータ損失
-
-**症状**:
-- プロジェクト情報ロード不可
-- プロジェクトファイル破損
-
-**解決策**:
-1. プロジェクト保存ディレクトリが存在するか確認
-2. バックアップからプロジェクトデータ復元
-3. JSONファイル形式が正しいか検証
-4. 破損したプロジェクトファイル手動修复
+- 💬 ディスカッションに参加
+- 📧 開発者に連絡
 
 ---
 
 ## 次のステップ
 
 - 📚 [アーキテクチャガイド](architecture.md)を読む
-- 🛠️ [開発ガイド](development-guide.md)を確認
-- 🚀 [はじめにガイド](getting-started.md)で開始
-- 📖 他のドキュメントを探索
+- 🛠️ [開発ガイド](development-guide.md)をチェック
+- 📖 [API リファレンス](api-reference.md)を探る
+- 🚀 [クイックスタートガイド](getting-started.md)で始める

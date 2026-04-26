@@ -1,62 +1,68 @@
-# 日历系统
+﻿# 日历系统
 
-[English](calendar-system.md) | [中文](docs/zh-CN/calendar-system.md) | [繁體中文](docs/zh-HK/calendar-system.md) | [Español](docs/es-ES/calendar-system.md) | [日本語](docs/ja-JP/calendar-system.md) | [한국어](docs/ko-KR/calendar-system.md) | [Čeština](docs/cs-CZ/calendar-system.md)
+[English](../en/calendar-system.md) | [Deutsch](../de-DE/calendar-system.md) | **中文** | [繁體中文](../zh-HK/calendar-system.md) | [Español](../es-ES/calendar-system.md) | [日本語](../ja-JP/calendar-system.md) | [한국어](../ko-KR/calendar-system.md) | [Čeština](../cs-CZ/calendar-system.md)
 
 ## 概述
 
 SiliconLifeCollective 支持 32 种不同的日历系统，用于日期转换和历史准确性。
 
-## 支持的日历
+## 支持的日历（32 种）
 
-### 主要日历
+### 主要日历（6 种）
 
-1. **公历** - 国际标准日历
-2. **农历** - 中国传统日历
-3. **伊斯兰历** - 伊斯兰回历
-4. **希伯来历** - 犹太日历
-5. **波斯历** - 伊朗日历
-6. **印度历** - 印度国历
+1. **公历 (Gregorian)** - 国际标准日历，ID: `gregorian`
+2. **农历 (Chinese Lunar)** - 中国传统日历，带闰月计算，ID: `lunar`
+3. **伊斯兰历 (Islamic)** - 伊斯兰回历，ID: `islamic`
+4. **希伯来历 (Hebrew)** - 犹太日历，ID: `hebrew`
+5. **波斯历 (Persian)** - 伊朗太阳历，ID: `persian`
+6. **印度历 (Indian)** - 印度国历，ID: `indian`
 
-### 东亚日历
+### 中国历史历法（2 种）
 
-7. **中国历史历** - 中国历史朝代
-8. **日本历** - 日本 imperial 朝代
-9. **韩国历** - 韩国日历系统
-10. **越南历** - 越南日历
-11. **藏历** - 藏历
-12. **蒙古历** - 蒙古历
+7. **中国历史历法 (Chinese Historical)** - 支持干支纪年和帝王年号，ID: `chinese_historical`
+   - **干支纪年**：60 年周期（天干 + 地支）
+   - **帝王年号**：支持中国历史各朝代年号（康熙、乾隆、贞观等）
+   - **动态数据库**：内置完整的中国历史朝代和年号数据库
+8. **干支历 (Sexagenary)** - 60 年干支周期，ID: `sexagenary`
 
-### 历史日历
+### 东亚日历（6 种）
 
-13. **玛雅历** - 玛雅长计历
-14. **罗马历** - 古罗马日历
-15. **儒略历** - 儒略历
-16. **法国共和历** - 法国革命日历
-17. **科普特历** - 科普特正教日历
-18. **埃塞俄比亚历** - 埃塞俄比亚历
+9. **日本历 (Japanese)** - 日本年号（Nengo）历，ID: `japanese`
+10. **越南历 (Vietnamese)** - 越南农历（猫生肖变体），ID: `vietnamese`
+11. **藏历 (Tibetan)** - 藏历系统，ID: `tibetan`
+12. **蒙古历 (Mongolian)** - 蒙古历，ID: `mongolian`
+13. **傣历 (Dai)** - 傣历，带完整农历计算，ID: `dai`
+14. **德宏傣历 (Dehong Dai)** - 德宏傣历变体，ID: `dehong_dai`
 
-### 区域日历
+### 历史日历（6 种）
 
-19. **佛历** - 佛历纪元
-20. **萨卡历** - 萨卡纪元（印度）
-21. **维克拉姆桑巴特历** - 印度教日历
-22. **爪哇历** - 爪哇日历
-23. **巴厘历** - 巴厘日历
+15. **玛雅历 (Mayan)** - 玛雅长计历，ID: `mayan`
+16. **罗马历 (Roman)** - 古罗马日历，ID: `roman`
+17. **儒略历 (Julian)** - 儒略历，ID: `julian`
+18. **法国共和历 (French Republican)** - 法国革命日历，ID: `french_republican`
+19. **科普特历 (Coptic)** - 科普特正教日历，ID: `coptic`
+20. **埃塞俄比亚历 (Ethiopian)** - 埃塞俄比亚历，ID: `ethiopian`
 
-### 现代日历
+### 区域日历（6 种）
 
-24. **中华民国（台湾）历** - 民国历
-25. **主体历** - 朝鲜日历
-26. **朱拉萨卡拉特历** - 东南亚佛历
+21. **佛历 (Buddhist)** - 佛历纪元（BE），年份 + 543，ID: `buddhist`
+22. **萨卡历 (Saka)** - 萨卡纪元（印度尼西亚），ID: `saka`
+23. **维克拉姆桑巴特历 (Vikram Samvat)** - 印度教日历，ID: `vikram_samvat`
+24. **爪哇历 (Javanese)** - 爪哇伊斯兰历，ID: `javanese`
+25. **朱拉萨卡拉特历 (Chula Sakarat)** - 东南亚佛历，年份 - 638，ID: `chula_sakarat`
+26. **高棉历 (Khmer)** - 高棉历，ID: `khmer`
 
-### 民族日历（中国）
+### 现代日历（3 种）
 
-27. **傣历** - 傣历
-28. **德宏傣历** - 德宏傣历
-29. **彝历** - 彝历
-30. **切罗基历** - 切罗基历
-31. **因纽特历** - 因纽特历
-32. **干支历** - 60 年周期
+27. **中华民国历 (ROC)** - 民国历，年份 - 1911，ID: `roc`
+28. **主体历 (Juche)** - 朝鲜日历，年份 - 1911，ID: `juche`
+29. **祆历 (Zoroastrian)** - 祆教历，ID: `zoroastrian`
+
+### 民族日历（3 种）
+
+30. **彝历 (Yi)** - 彝历系统，ID: `yi`
+31. **切罗基历 (Cherokee)** - 切罗基历，ID: `cherokee`
+32. **因纽特历 (Inuit)** - 因纽特历，ID: `inuit`
 
 ---
 
@@ -141,31 +147,73 @@ public class MyCustomCalendar : CalendarBase
 
 ## 特殊功能
 
-### 中国历史朝代
+### 中国历史历法详解（新增）
 
-支持动态朝代数据库：
+中国历史历法是本系统的一大亮点，支持两种核心功能：
 
+#### 1. 干支纪年系统
+
+采用 60 年周期，由天干和地支组合而成：
+
+```
+天干（10）：甲、乙、丙、丁、戊、己、庚、辛、壬、癸
+地支（12）：子、丑、寅、卯、辰、巳、午、未、申、酉、戌、亥
+```
+
+**示例**：
+- 2026 年 = 丙午年
+- 2025 年 = 乙巳年（蛇年）
+- 2024 年 = 甲辰年（龙年）
+
+**使用示例**：
 ```json
 {
-  "era": "康熙",
-  "year": 60,
-  "month": 3,
-  "day": 15
+  "action": "convert",
+  "date": "2026-04-26",
+  "from_calendar": "gregorian",
+  "to_calendar": "chinese_historical"
 }
 ```
 
-转换为：`1721-04-12`（公历）
-
-### 干支周期
-
-60 年周期，带天干地支：
-
-```
-天干：甲、乙、丙、丁、戊、己、庚、辛、壬、癸
-地支：子、丑、寅、卯、辰、巳、午、未、申、酉、戌、亥
+**响应**：
+```json
+{
+  "result": "丙午年 三月 初九",
+  "ganzhi_year": "丙午",
+  "zodiac": "马"
+}
 ```
 
-示例：2026 = 丙午年
+#### 2. 帝王年号系统
+
+内置完整的中国历史朝代和帝王年号数据库：
+
+**支持的朝代**（部分）：
+- 清朝：康熙、雍正、乾隆、嘉庆、道光、咸丰、同治、光绪、宣统
+- 明朝：洪武、永乐、嘉靖、万历、崇祯等
+- 唐朝：贞观、开元、天宝等
+- 汉朝：建元、元光、元朔等
+- 其他朝代...
+
+**使用示例**：
+```json
+{
+  "action": "convert",
+  "date": "1721-04-12",
+  "from_calendar": "gregorian",
+  "to_calendar": "chinese_historical"
+}
+```
+
+**响应**：
+```json
+{
+  "result": "康熙六十年 三月 十五日",
+  "era": "康熙",
+  "era_year": 60,
+  "dynasty": "清"
+}
+```
 
 ### 闰月处理
 
@@ -268,31 +316,6 @@ public class MyCustomCalendar : CalendarBase
 ≠
 2026-04-20 23:00 UTC-5
 ```
-
----
-
-## 故障排除
-
-### 转换返回错误日期
-
-**检查**：
-- 指定的日历正确
-- 日期对该日历有效
-- 注意到历史准确性
-
-### 闰月问题
-
-**检查**：
-- 日历支持闰月
-- 年份确实有闰月
-- 闰月计算正确
-
-### 未找到历史朝代
-
-**检查**：
-- 朝代名称拼写
-- 朝代日期范围
-- 数据库包含该朝代
 
 ---
 

@@ -43,6 +43,13 @@ public static class HelpLocalizationFactory
         Language.EsES => new HelpLocalizationEsES(),
         Language.EsMX => new HelpLocalizationEsMX(),
         Language.CsCZ => new HelpLocalizationCsCZ(),
+        
+        // German variants
+        Language.DeDE => new HelpLocalizationDeDE(),
+        Language.DeAT => new HelpLocalizationDeAT(),
+        Language.DeCH => new HelpLocalizationDeCH(),
+        Language.DeLU => new HelpLocalizationDeLU(),
+        Language.DeLI => new HelpLocalizationDeLI(),
         _ => new HelpLocalizationEnUS() // Default to English
     };
 }

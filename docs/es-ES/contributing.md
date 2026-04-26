@@ -1,273 +1,220 @@
-# Contribuir
+﻿# Guía de Contribución
 
-[English](contributing.md) | [简体中文](docs/zh-CN/contributing.md) | [繁體中文](docs/zh-HK/contributing.md) | [Español](docs/es-ES/contributing.md) | [日本語](docs/ja-JP/contributing.md) | [한국어](docs/ko-KR/contributing.md) | [Čeština](docs/cs-CZ/contributing.md)
+[English](../en/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | **Español** | [Deutsch](../de-DE/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md)
 
 ## ¡Bienvenido!
 
-Gracias por tu interés en contribuir a Silicon Life Collective. Todas las contribuciones son bienvenidas.
-
----
+¡Gracias por tu interés en contribuir a Silicon Life Collective! Aceptamos todas las formas de contribución.
 
 ## Cómo Contribuir
 
-### 1. Reportar Bugs
+### Reportar Bugs
 
-Usar GitHub Issues para reportar bugs:
+1. Verificar que el bug no haya sido reportado
+2. Crear un issue en [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+3. Incluir:
+   - Descripción clara del problema
+   - Pasos para reproducir
+   - Comportamiento esperado
+   - Capturas de pantalla si es aplicable
 
-- Descripción clara del problema
-- Pasos para reproducir
-- Comportamiento esperado vs actual
-- Logs si es posible
+### Sugerir Mejoras
 
-### 2. Sugerir Mejoras
+1. Crear un issue con etiqueta "enhancement"
+2. Describir la mejora propuesta
+3. Explicar por qué sería útil
+4. Proporcionar ejemplos si es posible
 
-Abrir un Issue con etiqueta "enhancement":
+### Contribuir con Código
 
-- Descripción de la mejora
-- Casos de uso
-- Beneficios
+#### Flujo de Trabajo de Desarrollo
 
-### 3. Enviar Código
+1. **Hacer fork del repositorio**
 
-#### Fork y Clonar
+2. **Crear rama de característica**:
+   ```bash
+   git checkout -b feature/nombre-de-caracteristica
+   ```
 
-```bash
-git clone https://github.com/tu-usuario/SiliconLifeCollective.git
-cd SiliconLifeCollective
-```
+3. **Implementar cambios**
+   - Seguir convenciones de código del proyecto
+   - Añadir pruebas para nueva funcionalidad
+   - Actualizar documentación si es necesario
 
-#### Crear Rama
+4. **Confirmar cambios**:
+   ```bash
+   git add .
+   git commit -m "feat: descripción clara del cambio"
+   ```
 
-```bash
-git checkout -b feature/mi-caracteristica
-```
+5. **Push a la rama**:
+   ```bash
+   git push origin feature/nombre-de-caracteristica
+   ```
 
-#### Hacer Cambios
+6. **Enviar Pull Request**
 
-Seguir convenciones de código del proyecto.
-
-#### Commits Atómicos
-
-```bash
-git add archivos-modificados
-git commit -m "feat(modulo): descripción del cambio"
-```
-
-#### Push y Pull Request
-
-```bash
-git push origin feature/mi-caracteristica
-```
-
-Abrir Pull Request en GitHub.
-
----
-
-## Convenciones de Commits
+### Convenciones de Commit
 
 Seguir [Conventional Commits](https://www.conventionalcommits.org/):
 
-### Tipos
-
-- `feat`: Nueva funcionalidad
-- `fix`: Corrección de bug
-- `docs`: Documentación
-- `style`: Formato de código
-- `refactor`: Refactorización
-- `test`: Pruebas
-- `chore`: Mantenimiento
-
-### Ejemplos
-
-```bash
-feat(localization): add Spanish localization support
-fix(permission): fix null pointer in permission callback
-docs: update architecture documentation
-refactor(web): refactor controller structure
+```
+<tipo>(<alcance>): <descripción>
 ```
 
-### Reglas
+**Tipos**:
+- `feat`: Nueva característica
+- `fix`: Corrección de bug
+- `docs`: Cambios de documentación
+- `style`: Formato de código
+- `refactor`: Refactorización
+- `test`: Añadir o modificar pruebas
+- `chore`: Tareas de mantenimiento
 
-- **Idioma**: Usar inglés
-- **Formato**: Verbo en imperativo
-- **Longitud**: Máximo 50 caracteres
-- **Scope**: Módulo afectado (opcional)
+**Ejemplos**:
+```bash
+feat(localization): añadir soporte para español
+fix(permission): corregir validación de permisos nulos
+docs: actualizar documentación de arquitectura
+```
 
----
-
-## Estándares de Código
+## Estilo de Código
 
 ### C#
 
-- Seguir convenciones de Microsoft
-- Usar .NET 9 características
-- Nullable reference types habilitados
-- Documentación XML para APIs públicas
-
-### Nombrado
-
-```csharp
-// Clases: PascalCase
-public class MyTool { }
-
-// Métodos: PascalCase
-public void ExecuteMethod() { }
-
-// Variables: camelCase
-string myVariable;
-
-// Constantes: UPPER_SNAKE_CASE
-const int MAX_VALUE = 100;
-
-// Interfaces: Prefijo I
-interface ITool { }
-```
-
-### Estructura de Archivos
-
-- Un archivo por clase
-- Namespace completo
-- Orden: using, namespace, clase
-
-### Comentarios
+- Seguir convenciones de .NET
+- Usar PascalCase para clases y métodos
+- Usar camelCase para parámetros y variables locales
+- Incluir comentarios XML para APIs públicas
 
 ```csharp
 /// <summary>
-/// Descripción del método
+/// Descripción del método.
 /// </summary>
-/// <param name="param">Parámetro</param>
-/// <returns>Valor de retorno</returns>
-public string MyMethod(string param)
+/// <param name="param">Descripción del parámetro</param>
+/// <returns>Descripción del valor de retorno</returns>
+public async Task<string> MiMetodoAsync(string param)
 {
     // Implementación
 }
 ```
 
----
+### Markdown
 
-## Agregar Localización
+- Usar encabezados consistentes
+- Incluir ejemplos de código cuando sea apropiado
+- Mantener listas formateadas correctamente
 
-### 1. Crear Clase
+### Documentación
 
-```csharp
-// src/SiliconLife.Default/Localization/LangXX.cs
-public class LangXX : DefaultLocalizationBase
-{
-    public override string LanguageCode => "lang-XX";
-    public override string LanguageName => "Language Name";
-    
-    // Implementar todos los miembros
-}
+- Mantener documentación actualizada con cambios de código
+- Proporcionar ejemplos claros
+- Traducir a múltiples idiomas si es posible
+
+## Pruebas
+
+### Ejecutar Pruebas
+
+```bash
+dotnet test
 ```
 
-### 2. Agregar al Enum
+### Escribir Pruebas
 
-```csharp
-// src/SiliconLife.Core/Localization/Language.cs
-public enum Language
-{
-    // ...
-    LangXX
-}
+- Crear pruebas unitarias para nueva funcionalidad
+- Incluir pruebas de integración para flujos complejos
+- Asegurar que todas las pruebas pasen antes de enviar PR
+
+### Cobertura de Pruebas
+
+Objetivo: >80% de cobertura de código
+
+```bash
+dotnet test /p:CollectCoverage=true
 ```
 
-### 3. Traducir Documentos
+## Documentación
 
-Crear directorio en `docs/lang-XX/` con todos los documentos traducidos.
+### Actualizar Documentación
 
----
+Cuando añadas nuevas características:
 
-## Agregar Herramienta
+1. Actualizar guía relevante en `docs/`
+2. Actualizar README si es necesario
+3. Añadir ejemplos de uso
+4. Actualizar referencias de API
 
-### 1. Implementar ITool
+### Traducciones
 
-```csharp
-public class MyTool : ITool
-{
-    public string Name => "MiHerramienta";
-    public string Description => "Descripción";
-    
-    public ToolResult Execute(string method, object parameters)
-    {
-        // Lógica
-    }
-}
-```
+Ayuda a traducir documentación a múltiples idiomas:
 
-### 2. Pruebas
+- `docs/en/` - Inglés
+- `docs/zh-CN/` - Chino simplificado
+- `docs/es-ES/` - Español
+- `docs/ja-JP/` - Japonés
+- `docs/ko-KR/` - Coreano
+- Y más...
 
-```csharp
-[Fact]
-public void TestMyTool()
-{
-    var tool = new MyTool();
-    var result = tool.Execute("Test", new { });
-    Assert.True(result.Success);
-}
-```
+## Revisión de Código
 
----
+### Criterios de Revisión
 
-## Agregar Calendario
+- Código sigue convenciones de estilo
+- Todas las pruebas pasan
+- Documentación actualizada
+- Sin regresiones de rendimiento
+- Sin problemas de seguridad
 
-### 1. Implementar ICalendar
+### Proceso de Revisión
 
-```csharp
-public class MyCalendar : ICalendar
-{
-    public string Name => "MiCalendario";
-    
-    public DateTime ToGregorian(int year, int month, int day) { }
-    public (int, int, int) FromGregorian(DateTime date) { }
-}
-```
-
----
-
-## Agregar Piel Web
-
-### 1. Implementar ISkin
-
-```csharp
-public class MySkin : ISkin
-{
-    public string Name => "MiPiel";
-    public string Description => "Descripción";
-    
-    public string BuildPage(ViewModelBase model) { }
-    public string GetCss() { }
-}
-```
-
----
-
-## Proceso de Review
-
-1. **CI/CD**: Verificar que build pasa
-2. **Code Review**: Mantenedores revisan código
-3. **Pruebas**: Verificar funcionalidad
-4. **Merge**: Integrar cambios
-
----
+1. Mantenedor revisa PR
+2. Solicita cambios si es necesario
+3. Contribuidor actualiza PR
+4. Mantenedor aprueba y fusiona
 
 ## Licencia
 
-Al contribuir, aceptas que tu contribución está bajo la Licencia Apache 2.0.
-
----
+Al contribuir, aceptas que tus contribuciones estén bajo la licencia Apache 2.0.
 
 ## Código de Conducta
 
-- Ser respetuoso
-- Ser constructivo
-- Seguir guías del proyecto
-- Ayudar a otros
+- Ser respetuoso con otros contribuidores
+- Aceptar retroalimentación constructiva
+- Enfocarse en lo que es mejor para la comunidad
+- Mostrar empatía hacia otros miembros de la comunidad
+
+## Reconocimiento
+
+Los contribuidores serán reconocidos en:
+
+- Archivo CONTRIBUTORS.md
+- Notas de lanzamiento
+- Página de agradecimientos en Web UI
+
+## Preguntas Frecuentes
+
+### ¿Necesito permiso para contribuir?
+
+¡No! Simplemente envía un PR y lo revisaremos.
+
+### ¿Puedo contribuir sin ser experto en C#?
+
+¡Sí! Aceptamos contribuciones de documentación, traducciones, reportes de bugs, etc.
+
+### ¿Cuánto tiempo toma revisar un PR?
+
+Generalmente dentro de 1-2 semanas, dependiendo de la complejidad.
+
+### ¿Puedo trabajar en múltiples PRs?
+
+¡Por supuesto! Solo asegúrate de usar ramas separadas.
+
+## Contactar
+
+- 🐛 [Reportar problema](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 💬 [Discusiones de GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/discussions)
+- 📧 Email del maintainer
 
 ---
 
-## Recursos
-
-- [Documentación](../es-ES/README.md)
-- [Guía de Desarrollo](development-guide.md)
-- [Arquitectura](architecture.md)
-- [Issues](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+¡Gracias por contribuir a Silicon Life Collective!

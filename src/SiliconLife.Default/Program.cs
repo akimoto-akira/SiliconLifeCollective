@@ -265,6 +265,13 @@ public class Program
         
         // Czech
         LocalizationManager.Instance.Register<CsCZ>(Language.CsCZ);
+        
+        // German
+        LocalizationManager.Instance.Register<DeDE>(Language.DeDE);
+        LocalizationManager.Instance.Register<DeAT>(Language.DeAT);
+        LocalizationManager.Instance.Register<DeCH>(Language.DeCH);
+        LocalizationManager.Instance.Register<DeLU>(Language.DeLU);
+        LocalizationManager.Instance.Register<DeLI>(Language.DeLI);
     }
 
     public static void RequestExit()

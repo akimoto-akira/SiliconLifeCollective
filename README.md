@@ -13,6 +13,7 @@ Choose your preferred language:
 - **[한국어](docs/ko-KR/README.md)**
 - **[Español](docs/es-ES/README.md)**
 - **[Čeština](docs/cs-CZ/README.md)**
+- **[Deutsch](docs/de-DE/README.md)**
 
 ## Quick Links
 

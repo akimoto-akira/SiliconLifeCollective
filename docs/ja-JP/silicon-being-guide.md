@@ -1,414 +1,244 @@
-# シリコンビーイングガイド
+﻿# シリコン生命体ガイド
 
-[English](silicon-being-guide.md) | [简体中文](docs/zh-CN/silicon-being-guide.md) | [繁體中文](docs/zh-HK/silicon-being-guide.md) | [Español](docs/es-ES/silicon-being-guide.md) | [日本語](docs/ja-JP/silicon-being-guide.md) | [한국어](docs/ko-KR/silicon-being-guide.md) | [Čeština](docs/cs-CZ/silicon-being-guide.md)
+[English](../en/silicon-being-guide.md) | [中文](../zh-CN/silicon-being-guide.md) | [繁體中文](../zh-HK/silicon-being-guide.md) | [Español](../es-ES/silicon-being-guide.md) | **日本語** | [한국어](../ko-KR/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md)
 
-## シリコンビーイングとは？
+## 概要
 
-シリコンビーイングは、AI ドリブンの自律エージェントであり、以下の能力を持っています：
-- 自然言語での対話
-- ツールを使用してアクションを実行
-- 記憶を保持
-- タスクのスケジュール
-- 学習と進化
+シリコン生命体は AI 駆動の自律エージェント。自ら思考し、行動し、進化することができます。
 
----
+## アーキテクチャ
 
-## 生命体の作成
+### 身体-大脳分離
 
-### 方法 1：Web UI
-
-1. ダッシュボードに移動
-2. **新しい生命体を作成**をクリック
-3. 名前とソウルファイルを入力
-4. 生命体を開始
-
-### 方法 2：プログラム的
-
-```csharp
-var being = new DefaultSiliconBeing(new BeingConfig
-{
-    Id = Guid.NewGuid(),
-    Name = "Assistant",
-    SoulPath = "./data/beings/assistant/soul.md"
-});
-
-await being.StartAsync();
 ```
-
----
+┌─────────────────────────────────────┐
+│         シリコン生命体               │
+├──────────────────┬──────────────────┤
+│   身体            │   大脳            │
+│ (SiliconBeing)   │ (ContextManager) │
+├──────────────────┼──────────────────┤
+│ • 状態管理        │ • 履歴の読み込み  │
+│ • トリガー検出    │ • AI 呼び出し     │
+│ • ライフサイクル  │ • ツール実行      │
+│                  │ • 応答の永続化    │
+└──────────────────┴──────────────────┘
+```
 
 ## ソウルファイル
 
-ソウルファイル（`soul.md`）は生命体の個性を定義します。
-
-### 基本構造
+### 構造
 
 ```markdown
-# 生命体名
+# Being Name
 
-## 個性
-あなたの個性の説明。
+## Personality
+Describe the being's personality traits and characteristics.
 
-## 機能
-あなたが得意なこと：
-- 機能1
-- 機能2
+## Capabilities
+List what this being can do.
 
-## 行動
-あなたの行動方法：
-- 常に礼儀正しく
-- 明確で簡潔
+## Behavior Guidelines
+Define how the being should behave in different situations.
+
+## Knowledge Domain
+Specify the being's area of expertise.
 ```
 
-### 詳細な例
+### 例
 
 ```markdown
-# コードレビューアシスタント
+# Code Review Assistant
 
-## 個性
-あなたは経験豊富なソフトウェアエンジニアリングメンターです。
-コード品質、セキュリティ、パフォーマンスを重視します。
+## Personality
+You are a meticulous code reviewer with 10 years of experience.
+You provide constructive feedback and always explain your reasoning.
 
-## 機能
-- コードレビューとフィードバック
-- アーキテクチャの提案
-- ベストプラクティスのガイダンス
-- バグの特定と修正提案
+## Capabilities
+- Review code for bugs and best practices
+- Suggest performance optimizations
+- Explain complex algorithms
+- Identify security vulnerabilities
 
-## 行動
-- 常に建設的なフィードバックを提供
-- 明確な例を使用
-- コードスニペットで説明
-- 複雑な概念を段階的に説明
-- セキュリティ脆弱性を優先
+## Behavior Guidelines
+- Start with positive observations
+- Provide specific examples
+- Explain why changes are needed
+- Be respectful and professional
+
+## Knowledge Domain
+Specialized in C#, .NET, and software architecture.
 ```
 
----
+## 生命体の作成
 
-## 生命体のライフサイクル
+### Web UI 経由
 
-### 1. 初期化
+1. **生命体管理**に移動
+2. **新生命体を作成**をクリック
+3. 入力：
+   - 名前
+   - ソウルコンテンツ
+   - 設定オプション
+4. **作成**をクリック
 
-```
-1. 設定をロード
-2. ソウルファイルを読み取る
-3. メモリを初期化
-4. ツールを登録
-5. AI クライアントに接続
-```
+### API 経由
 
-### 2. 実行
-
-```
-1. トリガーを待機（メッセージ、タイマー、タスク）
-2. コンテキストを構築（履歴 + 現在の入力）
-3. AI を呼び出し
-4. ツールコールを実行（存在する場合）
-5. レスポンスを保存
-6. トリガーに戻る
+```bash
+curl -X POST http://localhost:8080/api/beings \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Assistant",
+    "soul": "# Personality\nYou are helpful..."
+  }'
 ```
 
-### 3. 停止
+## 生命体ライフサイクル
+
+### 状態
 
 ```
-1. 保留中の操作を完了
-2. 状態を保存
-3. リソースを解放
-4. 安全にシャットダウン
+Created → Starting → Running → Stopping → Stopped
+                    ↓
+                  Error
 ```
 
----
+### 操作
 
-## 身体-ブレインアーキテクチャ
+- **起動**：初期化して処理を開始
+- **停止**：グレースフルシャットダウン
+- **一時停止**：一時的なサスペンド（状態を保持）
+- **再開**：一時停止状態から継続
 
-### 身体（DefaultSiliconBeing）
+## タスクシステム
 
-身体は以下を担当：
-- 生存状態の維持
-- トリガーシナリオの検出
-- 外部イベントの処理
-- 内部状態の管理
+### タスクの作成
 
 ```csharp
-public class DefaultSiliconBeing : SiliconBeingBase
+var task = new BeingTask
 {
-    public override async Task Tick()
-    {
-        // トリガーをチェック
-        if (HasNewMessage())
-        {
-            await TriggerBrain();
-        }
-        
-        // タイマーを確認
-        await CheckTimers();
-        
-        // タスクを更新
-        await UpdateTasks();
-    }
-}
+    BeingId = being.Id,
+    Description = "Review the code",
+    Priority = 5,
+    DueDate = DateTime.UtcNow.AddHours(2)
+};
+
+await taskSystem.CreateAsync(task);
 ```
 
-### ブレイン（ContextManager）
+### タスク状態
 
-ブレインは以下を担当：
-- 履歴のロード
-- AI リクエストの構築
-- AI レスポンスの処理
-- ツール実行
-- 結果の永続化
+- `Pending` - 実行待ち
+- `Running` - 実行中
+- `Completed` - 正常完了
+- `Failed` - 実行失敗
+- `Cancelled` - 手動キャンセル
+
+## タイマーシステム
+
+### タイマータイプ
+
+1. **ワンタイム**：遅延後に1回実行
+2. **インターバル**：固定間隔で繰り返し実行
+3. **Cron**：cron 式に基づいて実行
+
+### 例
 
 ```csharp
-public class ContextManager
+// 毎時間実行
+var timer = new BeingTimer
 {
-    public async Task<string> ProcessMessage(string message)
-    {
-        // 履歴をロード
-        var history = await LoadHistory();
-        
-        // リクエストを構築
-        var request = BuildRequest(history, message);
-        
-        // AI を呼び出し
-        var response = await aiClient.ChatAsync(request);
-        
-        // ツールを処理
-        if (response.HasToolCalls)
-        {
-            var result = await ExecuteTools(response.ToolCalls);
-            return await ProcessMessage(result);
-        }
-        
-        // レスポンスを保存
-        await SaveResponse(response);
-        
-        return response.Content;
-    }
-}
-```
+    BeingId = being.Id,
+    Interval = TimeSpan.FromHours(1),
+    Action = "think",
+    Repeat = true
+};
 
----
+await timerSystem.StartAsync(timer);
+```
 
 ## メモリシステム
 
-### 短期記憶
+### メモリタイプ
 
-現在のセッションの会話：
-- チャット履歴
-- 最近のコンテキスト
-- アクティブなタスク
+- **短期**：現在の会話コンテキスト
+- **長期**：永続化された知識と経験
+- **エピソード**：時間インデックス付きのイベントとインタラクション
 
-### 長期記憶
-
-永続的な知識：
-- ユーザーの好み
-- 過去の相互作用
-- 学習したパターン
-
-### 記憶の使用
-
-```csharp
-// 保存
-await memory.SaveAsync("ユーザーは青が好き", tags: ["preference"]);
-
-// 検索
-var memories = await memory.SearchAsync("preference");
-
-// 更新
-await memory.UpdateAsync(memoryId, "ユーザーは赤が好き");
-```
-
----
-
-## 生命体の設定
-
-### 設定オプション
-
-```json
-{
-  "id": "being-uuid",
-  "name": "Assistant",
-  "soulPath": "./data/beings/assistant/soul.md",
-  "aiClient": "Ollama",
-  "model": "qwen2.5:7b",
-  "temperature": 0.7,
-  "maxTokens": 2000,
-  "memoryEnabled": true,
-  "taskEnabled": true
-}
-```
-
-### AI クライアント
-
-サポートされているクライアント：
-- **Ollama** - ローカル AI
-- **DashScope** - クラウド AI
-- **カスタム** - 独自の実装
-
----
-
-## 生命体間の相互作用
-
-### マルチ生命体チャット
-
-複数の生命体が一緒にチャットできます：
+### ストレージ構造
 
 ```
-ユーザー → 生命体A → 生命体B → 応答
+data/
+└── beings/
+    └── {being-id}/
+        ├── soul.md
+        ├── memory/
+        │   ├── short-term.json
+        │   └── long-term/
+        │       ├── 2026-04-20.json
+        │       └── 2026-04-21.json
+        └── tasks/
+            └── task-history.json
 ```
-
-### 生命体協調
-
-生命体がツールとして他の生命体を呼び出す：
-
-```csharp
-// 生命体A が生命体B を使用
-var beingB = ServiceLocator.Get<ISiliconBeing>("being-b-id");
-var result = await beingB.ProcessQuery("専門知識が必要");
-```
-
----
-
-## ベストプラクティス
-
-### 1. 明確な個性を定義
-
-ソウルファイルで明確で簡潔な個性を提供：
-
-```markdown
-## 個性
-あなたは専門的なカスタマーサポートエージェントです。
-常に礼儀正しく、効率的で、問題解決志向です。
-```
-
-### 2. スコープを制限
-
-生命体に焦点を当てた機能を持たせる：
-
-```markdown
-## 機能
-- 注文の追跡
-- 返品処理
-- 製品情報の提供
-
-（すべてをやらせない！）
-```
-
-### 3. メモリを活用
-
-重要な情報をメモリに保存：
-
-```csharp
-await memory.SaveAsync("ユーザーはプレミアムプランに加入");
-```
-
-### 4. エラーを処理
-
-失敗に優雅に対処：
-
-```csharp
-try
-{
-    var response = await aiClient.ChatAsync(request);
-}
-catch (Exception ex)
-{
-    Logger.Error($"AI の呼び出しに失敗：{ex.Message}");
-    return "申し訳ありません、一時的に利用できません。";
-}
-```
-
----
-
-## トラブルシューティング
-
-### 生命体が開始しない
-
-**確認**：
-1. ソウルファイルが存在する
-2. AI クライアントが設定されている
-3. AI サービスが実行中
-4. 設定が有効
-
-### 生命体が応答しない
-
-**確認**：
-1. AI がタイムアウトしていない
-2. ツールが正しく実行されている
-3. メモリが過負荷でない
-4. 権限が適切
-
-### 生命体が奇妙に振る舞う
-
-**確認**：
-1. ソウルファイルが明確
-2. 温度設定が適切（0.7 を推奨）
-3. 履歴が正しくロードされている
-4. ツールが正しく定義されている
-
----
-
-## 次のステップ
 
 ## 作業ノートシステム
 
 ### 概要
 
-作業ノートはシリコン生命体の個人日記システムで、ページベース設計で作業進捗状況、学習メモ、プロジェクトノートなどを記録するために使用されます。
+作業ノートはシリコン生命体の個人日記システム。ページ式设计で、作業進捗、学習メモ、プロジェクトノートなどを記録。
 
-### 特徴
+### 機能
 
-- **ページ管理**: 各ノートは独立したページで、ページ番号でアクセス
-- **Markdown対応**: 内容はMarkdown形式対応（テキスト、リスト、表、コードブロック）
-- **キーワード索引**: ノートにキーワード追加可能、検索容易
-- **要約機能**: 各ノートに短い要約、快速ブラウジング
-- **目次生成**: 全ノートの目次概要生成可能、全体コンテキスト理解支援
-- **タイムスタンプ**: 作成および更新時間自動記録
-- **デフォルト非公開**: 生命体自身のみアクセス可能（キュレーター管理可能）
+- **ページ管理**：各ノートは独立したページ。ページ番号でアクセス
+- **Markdown サポート**：コンテンツは Markdown 形式をサポート（テキスト、リスト、テーブル、コードブロック）
+- **キーワードインデックス**：ノートにキーワードを追加可能。検索に便利
+- **要約機能**：各ノートに簡単な要約。素早い閲覧
+- **目次生成**：すべてのノートの目次概览を生成。全体のコンテキスト理解を支援
+- **タイムスタンプ**：作成・更新時間を自動記録
+- **デフォルトプライベート**：生命体自身のみアクセス可能（管理人は管理可能）
 
-### 使用事例
+### 使用シナリオ
 
 1. **プロジェクト進捗記録**
    ```
-   要約: ユーザー認証モジュール完了
-   内容: JWT token検証、OAuth2統合、refresh tokenメカニズム実装
-   キーワード: 認証,JWT,OAuth2
+   要約：ユーザー認証モジュールを完了
+   コンテンツ：JWT token 認証、OAuth2 統合、リフレッシュ token メカニズムを実装
+   キーワード：認証,JWT,OAuth2
    ```
 
 2. **学習ノート**
    ```
-   要約: C# 非同期プログラミングベストプラクティス学習
-   内容: async/await使用注意事項、ConfigureAwaitの使用シナリオ...
-   キーワード: C#,非同期,ベストプラクティス
+   要約：C# 非同期プログラミングのベストプラクティスを学習
+   コンテンツ：async/await 使用上の注意事項、ConfigureAwait の使用シナリオ...
+   キーワード：C#,非同期,ベストプラクティス
    ```
 
-3. **議事録**
+3. **会議記録**
    ```
-   要約: 製品要件議論会議
-   内容: 新機能要件議論、実装方案確定...
-   キーワード: 製品,要件,会議
+   要約：製品要件ディスカッション会議
+   コンテンツ：新機能要件を議論。実装方案を決定...
+   キーワード：製品,要件,会議
    ```
 
-### ツールを通じた使用
+### ツール経由での使用
 
-生命体は `work_note` ツールを通じて作業ノートを管理できます:
+生命体は `work_note` ツールを介して作業ノートを管理可能：
 
 ```json
-// ノート作成
+// ノートを作成
 {
   "action": "create",
-  "summary": "ユーザー認証モジュール完了",
-  "content": "## 実装詳細\n\n- JWT token使用\n- OAuth2対応",
+  "summary": "ユーザー認証モジュールを完了",
+  "content": "## 実装詳細\n\n- JWT token を使用\n- OAuth2 をサポート",
   "keywords": "認証,JWT,OAuth2"
 }
 
-// ノート読み取り
+// ノートを読み取り
 {
   "action": "read",
   "page_number": 1
 }
 
-// ノート検索
+// ノートを検索
 {
   "action": "search",
   "keyword": "認証",
@@ -416,165 +246,122 @@ catch (Exception ex)
 }
 ```
 
-### Web UIを通じた管理
+### Web UI 経由での管理
 
-1. **生命体管理** → 生命体選択に移動
-2. **作業ノート** タブクリック
-3. ノート表示、検索、編集可能
-4. Markdownプレビュー対応
+1. **プロジェクト**ページに移動
+2. **作業ノート**セクションをクリック
+3. ノート管理：
+   - 新ノートを作成
+   - タイムラインで閲覧
+   - キーワードで検索
+   - 目次を生成
 
-## ナレッジネットワークシステム
+## ナレッジネットワーク
 
 ### 概要
 
-ナレッジネットワークはトリプル構造（主語-述語-目的語）をベースとしたナレッジ表現および管理システムで、構造化ナレッジの保存および管理に使用されます。
+ナレッジネットワークは、三つ組（主語-関係-目的語）に基づくナレッジグラフシステム。
 
-### コアコンセプト
-
-#### トリプル構造
+### ナレッジ表現
 
 ```
-主語 (Subject) --述語 (Predicate)--> 目的語 (Object)
+主体 - 関係 - 客体
+
+例：
+- Python - is_a - プログラミング言語
+- C# - belongs_to - .NET エコシステム
+- AI - related_to - 機械学習
 ```
 
-**例**:
-- `Python` --`is_a`--> `programming_language`
-- `北京` --`capital_of`--> `中国`
-- `水` --`boiling_point`--> `100°C`
-
-#### 信頼度
-
-各ナレッジトリプルには信頼度スコア（0.0-1.0）があり、ナレッジの信頼度を表します:
-- `1.0`: 絶対確実（数学定理など）
-- `0.8-0.99`: 高い信頼（検証済み事実など）
-- `0.5-0.79`: 中間信頼（推論または仮定など）
-- `<0.5`: 低い信頼（推測または未検証情報など）
-
-#### タグシステム
-
-トリプルにタグ追加可能、分類および検索容易:
-```json
-{
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language",
-  "tags": ["programming", "language", "popular"]
-}
-```
-
-### ナレッジ操作
-
-#### 1. ナレッジ追加
+### KnowledgeTool 操作
 
 ```json
+// ナレッジを追加
 {
   "action": "add",
-  "subject": "C#",
-  "predicate": "created_by",
-  "object": "Microsoft",
-  "confidence": 1.0,
-  "tags": ["programming", "language"]
+  "subject": "Python",
+  "relation": "is_a",
+  "object": "プログラミング言語",
+  "confidence": 1.0
 }
-```
 
-#### 2. ナレッジ照会
-
-```json
+// ナレッジを検索
 {
   "action": "query",
-  "subject": "C#",
-  "predicate": "created_by"
+  "subject": "Python"
 }
-```
 
-#### 3. ナレッジ検索
-
-```json
-{
-  "action": "search",
-  "query": "programming language",
-  "limit": 10
-}
-```
-
-#### 4. ナレッジパス発見
-
-2つの概念間の関連パスを見つける:
-```json
+// パスを発見
 {
   "action": "get_path",
   "from": "Python",
-  "to": "computer_science"
+  "to": "プログラミング"
 }
 ```
 
-返却:
-```
-Python → is_a → programming_language → belongs_to → computer_science
-```
+## WebView ブラウザ
 
-#### 5. ナレッジ検証
+### 機能
 
-ナレッジの有効性および一貫性チェック:
+各シリコン生命体は独自の WebView ブラウザインスタンスを持つ：
+
+- **個別分離**：各生命体は独立したブラウザ、Cookie、セッション
+- **ヘッドレスモード**：ユーザーには不可視。生命体がバックグラウンドで操作
+- **完全なブラウザ操作**：
+  - ページナビゲーション
+  - クリックと入力
+  - コンテンツ取得
+  - JavaScript 実行
+  - スクリーンショット
+
+### 使用例
+
 ```json
 {
-  "action": "validate",
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language"
+  "action": "navigate",
+  "url": "https://example.com"
 }
-```
 
-#### 6. ナレッジ統計
-
-ナレッジネットワークの全体統計情報取得:
-```json
 {
-  "action": "stats"
+  "action": "click",
+  "selector": "#submit-button"
 }
-```
 
-返却:
-```json
 {
-  "totalTriples": 1523,
-  "totalSubjects": 450,
-  "totalPredicates": 85,
-  "totalObjects": 892,
-  "averageConfidence": 0.87
+  "action": "get_content"
 }
 ```
 
-### 使用事例
+## ベストプラクティス
 
-1. **事実保存**
-   - 客観的事実および常識保存
-   - 例: `地球` --`is_a`--> `惑星`
+### 1. 明確なソウルファイル
 
-2. **概念関係**
-   - 概念間の関係記録
-   - 例: `継承` --`is_a`--> `オブジェクト指向プログラミング概念`
+詳細で明確なソウルファイルを作成：
+- 個性と行動を定義
+- 能力と制限を指定
+- 具体的な例を提供
 
-3. **学習蓄積**
-   - 生命体が学習を通じてナレッジ継続蓄積
-   - 構造化ナレッジシステム形成
+### 2. 適度なタスク割り当て
 
-4. **推論支援**
-   - ナレッジパスを通じて間接関係発見
-   - ナレッジベース推論および決定支援
+- タスクの説明を明確に
+- 現実的な期限を設定
+- 優先度を適切に割り当てる
 
-### Web UIを通じた管理
+### 3. 定期的なメモリ管理
 
-1. **ナレッジネットワーク** ページに移動
-2. ナレッジ統計情報表示
-3. ナレッジ検索およびブラウジング
-4. ナレッジ関係可視化（計画中）
+- 古いメモリをクリーンアップ
+- 重要な情報を長期メモリに保存
+- コンテキストウィンドウを最適化
 
----
+### 4. 効果的なノート使用
+
+- 作業ノートを定期的に更新
+- 検索可能なキーワードを追加
+- 重要な決定を記録
 
 ## 次のステップ
 
 - 📚 [アーキテクチャガイド](architecture.md)を読む
-- 🛠️ [開発ガイド](development-guide.md)を確認
-- 🚀 [はじめにガイド](getting-started.md)で開始
-- 🔧 [ツールリファレンス](tools-reference.md)を参照
+- 🛠️ [開発ガイド](development-guide.md)をチェック
+- 📖 [ツールリファレンス](tools-reference.md)を見る
+- 🚀 [クイックスタートガイド](getting-started.md)で始める

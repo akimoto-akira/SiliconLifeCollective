@@ -1,57 +1,57 @@
-# 権限システム
+﻿# 権限システム
 
-[English](permission-system.md) | [简体中文](docs/zh-CN/permission-system.md) | [繁體中文](docs/zh-HK/permission-system.md) | [Español](docs/es-ES/permission-system.md) | [日本語](docs/ja-JP/permission-system.md) | [한국어](docs/ko-KR/permission-system.md) | [Čeština](docs/cs-CZ/permission-system.md)
+[English](../en/permission-system.md) | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | [Español](../es-ES/permission-system.md) | **日本語** | [한국어](../ko-KR/permission-system.md) | [Čeština](../cs-CZ/permission-system.md)
 
 ## 概要
 
-権限システムは、AI が開始したすべての操作が適切に検証および監査されることを保証します。
+権限システムは、AI が開始するすべての操作が適切に検証および監査されることを保証します。
 
-## 5レベル権限チェーン
+## 5段階権限チェーン
 
 ```
 ┌─────────────────────────────────────────────┐
 │          権限検証                            │
 ├─────────────────────────────────────────────┤
-│  レベル1: IsCurator                         │
-│  ↓ true の場合はバイパス                     │
-│  レベル2: UserFrequencyCache                │
-│  ↓ レート制限                                │
-│  レベル3: GlobalACL                         │
-│  ↓ アクセス制御リスト                        │
-│  レベル4: IPermissionCallback               │
-│  ↓ カスタムロジック                          │
-│  レベル5: IPermissionAskHandler             │
-│  ↓ ユーザーに確認                            │
-│  結果: 許可 または 拒否                      │
+│  レベル 1：IsCurator                         │
+│  ↓ 真の場合はバイパス                         │
+│  レベル 2：UserFrequencyCache                │
+│  ↓ レートリミット                             │
+│  レベル 3：GlobalACL                         │
+│  ↓ アクセスコントロールリスト                 │
+│  レベル 4：IPermissionCallback               │
+│  ↓ カスタムロジック                           │
+│  レベル 5：IPermissionAskHandler             │
+│  ↓ ユーザーに確認                             │
+│  結果：許可または拒否                         │
 └─────────────────────────────────────────────┘
 ```
 
-## レベル 1: IsCurator
+## レベル 1：IsCurator
 
-マネージャー/キュレーターはすべての権限チェックをバイパスします。
+管理者/管理人はすべての権限チェックをバイパス。
 
 ```csharp
 if (user.IsCurator)
 {
-    return PermissionResult.Allowed("キュレーターアクセス");
+    return PermissionResult.Allowed("Curator access");
 }
 ```
 
-## レベル 2: UserFrequencyCache
+## レベル 2：UserFrequencyCache
 
-ユーザーごとのレート制限で悪用を防止します。
+ユーザーごとのレートリミットで不正使用を防止。
 
 ```csharp
 var cache = new UserFrequencyCache();
 if (!cache.CheckLimit(userId, resource))
 {
-    return PermissionResult.Denied("レート制限超過");
+    return PermissionResult.Denied("Rate limit exceeded");
 }
 ```
 
-## レベル 3: GlobalACL
+## レベル 3：GlobalACL
 
-グローバルアクセス制御リストが明示的なルールを定義します。
+グローバルアクセスコントロールリストが明確なルールを定義。
 
 ### ACL 構造
 
@@ -81,73 +81,91 @@ if (!cache.CheckLimit(userId, resource))
 - system:info
 ```
 
-## レベル 4: IPermissionCallback
+## レベル 4：IPermissionCallback
 
-動的権限ロジックのためのカスタムコールバック。
+動的権限ロジック用のカスタムコールバック。
 
 ### DefaultPermissionCallback デフォルト実装
 
-`DefaultPermissionCallback` は包括的なデフォルト権限ルールを提供します。含まれる内容：
+`DefaultPermissionCallback` は包括的なデフォルト権限ルールを提供：
 
 #### ネットワークアクセスルール
 - **ループバックアドレス**：localhost, 127.0.0.1, ::1 を許可
 - **プライベート IP アドレス**：
-  - 192.168.x.x (Class C) - 許可
-  - 10.x.x.x (Class A) - 許可
-  - 172.16-31.x.x (Class B) - ユーザーに確認
+  - 192.168.x.x（クラス C）- 許可
+  - 10.x.x.x（クラス A）- 許可
+  - 172.16-31.x.x（クラス B）- ユーザーに確認
 - **ドメインホワイトリスト**：
   - 検索エンジン：Google, Bing, DuckDuckGo, Yandex, Sogou など
   - AI サービス：OpenAI, Anthropic, HuggingFace, Ollama など
   - 開発者サービス：GitHub, StackOverflow, npm, NuGet など
-  - ソーシャルメディア：Weibo、Zhihu、Reddit、Discord など
-  - 動画プラットフォーム：YouTube, Bilibili、抖音（Douyin）、TikTok など
+  - ソーシャルメディア：微博、知乎、Reddit、Discord など
+  - 動画プラットフォーム：YouTube, Bilibili, 抖音、TikTok など
   - **天気情報**：wttr.in
-  - 政府ウェブサイト：.gov, .go.jp, .go.kr
+  - 政府サイト：.gov, .go.jp, .go.kr
 - **ドメインブラックリスト**：
-  - AI なりすましサイト：chatgpt, openai, deepseek など（偽ドメイン）
+  - AI 偽装サイト：chatgpt, openai, deepseek などのフィッシングドメイン
   - 悪意のある AI ツール：wormgpt, darkgpt, fraudgpt など
-  - AI コンテンツファームおよびブラックマーケット関連ドメイン
+  - AI コンテンツファームとブラックマーケット関連ドメイン
 
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {
     public async Task<PermissionResult> CheckAsync(PermissionRequest request)
     {
-        // ここにカスタムロジック
+        // カスタムロジック
         if (IsSafeOperation(request))
         {
-            return PermissionResult.Allowed("安全な操作");
+            return PermissionResult.Allowed("Safe operation");
         }
         
-        return PermissionResult.Undecided("ユーザー確認が必要");
+        return PermissionResult.Undecided("Needs user confirmation");
     }
 }
 ```
 
-## レベル 5: IPermissionAskHandler
+## レベル 5：IPermissionAskHandler
 
-不明なリクエストはユーザーに直接確認します。
+他のすべてのレベルが未決定の場合、ユーザーに権限を確認。
 
 ```csharp
-public class ConsolePermissionAskHandler : IPermissionAskHandler
+public class IMPermissionAskHandler : IPermissionAskHandler
 {
-    public async Task<PermissionResult> AskAsync(PermissionRequest request)
+    public async Task<AskPermissionResult> AskAsync(PermissionRequest request)
     {
-        Console.WriteLine($"操作を許可しますか？{request.Resource}");
-        var answer = Console.ReadLine();
+        // IM を介してユーザーにメッセージを送信
+        await SendMessageAsync($"Allow {request.Resource}?");
         
-        return answer.ToLower() == "yes" 
-            ? PermissionResult.Allowed("ユーザーが許可")
-            : PermissionResult.Denied("ユーザーが拒否");
+        // ユーザーの応答を待機
+        var response = await WaitForResponseAsync();
+        
+        return response.Approved 
+            ? AskPermissionResult.Approved()
+            : AskPermissionResult.Denied();
     }
 }
 ```
 
-## プログラマティック権限評価
+## 監査システム
+
+すべての権限決定が記録されます：
+
+```json
+{
+  "timestamp": "2026-04-20T10:30:00Z",
+  "userId": "user-uuid",
+  "resource": "disk:write",
+  "allowed": true,
+  "level": "GlobalACL",
+  "reason": "Explicit rule granted"
+}
+```
+
+## プログラムによる権限評価
 
 ### EvaluatePermission API
 
-`PermissionManager.EvaluatePermission()` メソッドは、ユーザープロンプトをトリガーせずに権限の読み取り専用事前評価を提供します。`PermissionTool` はこのメソッドを使用して、AI が操作を試みる前に権限状態を確認できます。
+`PermissionManager.EvaluatePermission()` メソッドは、ユーザープロンプトをトリガーしない読み取り専用の権限事前評価を提供します。`PermissionTool` はこのメソッドを使用して、AI が操作を試みる前に権限状態を確認します。
 
 ```csharp
 public PermissionResult EvaluatePermission(
@@ -157,151 +175,171 @@ public PermissionResult EvaluatePermission(
 ```
 
 **戻り値**：三状態 `PermissionResult`：
-- `Allowed` - 操作が許可されている
-- `Denied` - 操作がブロックされている
+- `Allowed` - 操作が許可される
+- `Denied` - 操作が拒否される
 - `AskUser` - 実行時にユーザー確認が必要
 
 **評価順序**：
-1. **頻度キャッシュ** - キャッシュされたユーザー決定を確認
+1. **周波数キャッシュ** - キャッシュされたユーザー決定を確認
 2. **IPermissionCallback** - カスタムコールバック評価
-3. **キュレーターステータス** - キュレーターの場合、`AskUser` を返却（確認が必要）
-4. **グローバル ACL** - アクセス制御ルールを確認
-5. **デフォルト** - 一致するルールがない場合は拒否
+3. **管理人状態** - 管理人の場合、`AskUser` を返す（確認が必要）
+4. **グローバル ACL** - アクセスコントロールルールを確認
+5. **デフォルト** - ルールが一致しない場合、拒否
 
-> **注意**：完全な権限チェーンとは異なり、`EvaluatePermission` は `IPermissionAskHandler` を呼び出し**ません**。実行時の結果が*どうなるか*を報告するのみです。
+> **注意**：完全な権限チェーンとは異なり、`EvaluatePermission` は `IPermissionAskHandler` を呼び出し**ません**。実行時の結果が*どうなるか*のみを報告します。
 
----
+## 権限の管理
 
-## 権限検証フロー
+### 権限の付与
 
-### 典型的なリクエスト
+**Web UI 経由**：
+1. **権限管理**に移動
+2. **ルールを追加**をクリック
+3. 設定：
+   - ユーザー
+   - リソース
+   - 許可/拒否
+   - 期間
 
-```
-1. AI が「file.txt を削除」ツールを呼び出す
-   ↓
-2. 実行リクエストを作成
-   ↓
-3. 権限チェーンを通過：
-   - IsCurator? いいえ
-   - レート制限？通過
-   - GlobalACL？ルールなし
-   - コールバック？未決定
-   - ユーザーに確認？「はい」
-   ↓
-4. 許可 → ファイルを削除
-```
-
-### 拒否シナリオ
-
-```
-1. AI が「システムをシャットダウン」しようとする
-   ↓
-2. IsCurator? いいえ
-   ↓
-3. GlobalACL？拒否ルールあり
-   ↓
-4. 拒否：「管理者権限が必要」
+**API 経由**：
+```bash
+curl -X POST http://localhost:8080/api/permissions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "user-uuid",
+    "resource": "disk:write",
+    "allowed": true,
+    "duration": 3600
+  }'
 ```
 
----
+### 権限の取消
 
-## 権限リソースタイプ
+```bash
+curl -X DELETE http://localhost:8080/api/permissions/{rule-id}
+```
 
-### ディスク操作
+### 権限の表示
 
-- `disk:read` - ファイルを読み取る
-- `disk:write` - ファイルに書き込む
-- `disk:delete` - ファイルを削除
-- `disk:execute` - プログラムを実行
-
-### ネットワーク操作
-
-- `network:http` - HTTP リクエスト
-- `network:tcp` - TCP 接続
-- `network:udp` - UDP データグラム
-
-### コンパイル＆実行
-
-- `compile:execute` - コードをコンパイルして実行
-- `compile:safe` - 安全なコードのみ
-
-### システム操作
-
-- `system:info` - システム情報を取得
-- `system:config` - 設定を変更
-- `system:restart` - サービスを再起動
-
----
+```bash
+curl http://localhost:8080/api/permissions?userId=user-uuid
+```
 
 ## ベストプラクティス
 
 ### 1. 最小権限の原則
 
-必要最小限の権限のみを付与：
+必要な最小限の権限のみを付与：
 
 ```json
 {
-  "userId": "user-123",
-  "resource": "disk:read",  // 書き込みではない！
-  "allowed": true
-}
-```
-
-### 2. 時間制限付き権限
-
-永続的な権限を避ける：
-
-```json
-{
-  "userId": "user-123",
-  "resource": "disk:write",
+  "resource": "disk:read",  // disk:* ではない
   "allowed": true,
-  "expiresAt": "2026-04-20T12:00:00Z"  // 1時間後
+  "expiresAt": "2026-04-21T00:00:00Z"  // 常に有効期限を設定
 }
 ```
 
-### 3. 操作を監査
+### 2. 時間制限付き権限を使用
 
-すべての権限決定をログに記録：
+絶対に必要でない限り、永久権限を付与しないでください。
+
+### 3. 権限ログをモニタリング
+
+定期的に監査ログを確認：
+- 拒否されたアクセストライ
+- 異常なパターン
+- 権限昇格
+
+### 4. カスタムコールバックを実装
+
+複雑なロジックには `IPermissionCallback` を使用：
 
 ```csharp
-Logger.Info($"権限 {request.Resource} ユーザー {userId}: {(allowed ? "許可" : "拒否")}");
+public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+{
+    // 時間ベースの権限
+    if (IsOutsideBusinessHours())
+    {
+        return PermissionResult.Denied("Outside business hours");
+    }
+    
+    // リソースベースの権限
+    if (IsSensitiveResource(request.Resource))
+    {
+        return PermissionResult.Undecided("Requires approval");
+    }
+    
+    return PermissionResult.Allowed();
+}
 ```
 
----
+## 一般的なシナリオ
+
+### シナリオ 1：AI がファイルを読み取りたい
+
+```
+AI：「config.json を読み取る必要があります」
+↓
+権限チェーン：
+1. IsCurator？いいえ
+2. レートリミット？正常
+3. GlobalACL？ルール発見：disk:read = 許可
+4. 結果：許可
+```
+
+### シナリオ 2：AI がコードを実行したい
+
+```
+AI：「コードをコンパイルして実行したい」
+↓
+権限チェーン：
+1. IsCurator？いいえ
+2. レートリミット？正常
+3. GlobalACL？ルールなし
+4. コールバック？未決定を返す
+5. ユーザーに確認？ユーザー承認
+6. 結果：許可
+```
+
+### シナリオ 3：レートリミット超過
+
+```
+AI：「100回の HTTP リクエストが必要です」
+↓
+権限チェーン：
+1. IsCurator？いいえ
+2. レートリミット？超過
+3. 結果：拒否
+```
 
 ## トラブルシューティング
 
-### 「権限拒否」エラー
+### 予期しない権限拒否
 
 **確認**：
-1. ユーザーが IsCurator であるか
-2. GlobalACL に許可ルールがあるか
-3. 権限が期限切れでないか
-4. レート制限に達していないか
+1. ユーザーの IsCurator 状態
+2. レートリミット設定
+3. GlobalACL ルール
+4. コールバックロジック
+5. ユーザー応答タイムアウト
 
-### レート制限が早すぎる
-
-**調整**：
-```csharp
-var cache = new UserFrequencyCache(
-    maxRequests: 100,      // 上限を増加
-    windowMinutes: 60      // 時間枠を延長
-);
-```
-
-### カスタムコールバックが機能しない
+### 権限が期限切れにならない
 
 **確認**：
-1. コールバックが正しく登録されている
-2. チェーンから Undecided を返している
-3. 例外をスローしていない
+- `expiresAt` フィールドが正しく設定
+- タイムゾーンが正確
+- クロックが同期
 
----
+### 監査ログが記録されない
+
+**確認**：
+- 監査ロガーが登録済み
+- ストレージバックエンドがアクセス可能
+- ディスク容量が十分
 
 ## 次のステップ
 
-- 🔒 [セキュリティドキュメント](security.md)を確認
 - 📚 [アーキテクチャガイド](architecture.md)を読む
-- 🛠️ [開発ガイド](development-guide.md)を確認
-- 🚀 [はじめにガイド](getting-started.md)で開始
+- 🛠️ [開発ガイド](development-guide.md)をチェック
+- 🔒 [セキュリティドキュメント](security.md)を確認
+- 🚀 [クイックスタートガイド](getting-started.md)を見る

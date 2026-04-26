@@ -1,34 +1,141 @@
-# Guía de Interfaz Web
+﻿# Guía de Web UI
 
-[English](web-ui-guide.md) | [简体中文](docs/zh-CN/web-ui-guide.md) | [繁體中文](docs/zh-HK/web-ui-guide.md) | [Español](docs/es-ES/web-ui-guide.md) | [日本語](docs/ja-JP/web-ui-guide.md) | [한국어](docs/ko-KR/web-ui-guide.md) | [Čeština](docs/cs-CZ/web-ui-guide.md)
+[English](../en/web-ui-guide.md) | [中文](../zh-CN/web-ui-guide.md) | [繁體中文](../zh-HK/web-ui-guide.md) | **Español** | [Deutsch](../de-DE/web-ui-guide.md) | [日本語](../ja-JP/web-ui-guide.md) | [한국어](../ko-KR/web-ui-guide.md) | [Čeština](../cs-CZ/web-ui-guide.md)
 
 ## Resumen
 
-La interfaz web de Silicon Life Collective proporciona una interfaz completa para gestionar y interactuar con Seres de Silicio.
-
----
-
-## Arquitectura
-
-```
-WebHost (HttpListener)
-  ↓
-Router (coincidencia de patrones)
-  ↓
-Controladores (18)
-  ↓
-Vistas (constructores HTML)
-  ↓
-Respuesta HTTP
-```
-
----
+La Web UI proporciona una interfaz completa para gestionar Seres Silicona, monitorear el estado del sistema e interactuar con agentes de IA. El sistema utiliza una arquitectura de renderizado puro del lado del servidor, sin dependencias de frameworks frontend, generando HTML, CSS y JavaScript a través de los constructores `H`, `CssBuilder` y `JsBuilder`.
 
 ## Acceso
 
-- **URL**: `http://localhost:8080`
-- **Puerto**: Configurable en `config.json`
-- **Protocolo**: HTTP + SSE (Server-Sent Events)
+URL predeterminada: `http://localhost:8080`
+
+## Navegación
+
+### Secciones Principales
+
+1. **Panel de Control** - Resumen del sistema y métricas
+2. **Seres** - Gestionar Seres Silicona
+3. **Chat** - Interactuar con seres (soporte para subida de archivos, SSE en tiempo real)
+4. **Historial de Chat** - Ver historial de chat de Seres Silicona (lista de sesiones, detalles de mensajes)
+5. **Tareas** - Gestión de tareas (tareas personales)
+6. **Temporizadores** - Configuración de temporizadores (crear, pausar, historial de ejecución)
+7. **Configuración** - Ajustes del sistema (clientes IA, localización)
+8. **Permisos** - Control de acceso (gestión de ACL, consulta de permisos)
+9. **Registros** - Registros del sistema (filtrar por nivel, consulta por rango de tiempo)
+10. **Auditoría** - Uso de tokens y seguimiento de auditoría
+11. **Memoria** - Memoria de seres (vista de línea de tiempo, filtrado avanzado)
+12. **Conocimiento** - Base de conocimiento (gestión de tripletas, descubrimiento de rutas)
+13. **Explorador de Código** - Exploración de código (árbol de archivos, resaltado de sintaxis)
+14. **Editor de Código** - Edición de código con indicaciones flotantes (Monaco Editor)
+15. **Proyecto** - Gestión de proyectos (espacio de trabajo, tareas, notas de trabajo)
+16. **Ejecutores** - Gestión de ejecutores (disco, red, línea de comandos)
+17. **Ayuda** - Sistema de documentos de ayuda (soporte multilingüe, búsqueda por tema)
+18. **Acerca de** - Información del sistema y versión
+
+---
+
+## Panel de Control
+
+### Funcionalidades
+
+- Métricas de rendimiento del sistema (CPU, memoria, tiempo de ejecución)
+- Resumen de estado de seres
+- Estadísticas de uso de IA
+- Acciones rápidas
+
+### Actualizaciones en Tiempo Real
+
+Usar SSE (Eventos Enviados por el Servidor) para obtener datos en tiempo real:
+
+```javascript
+const dashboard = new EventSource('/api/dashboard/events');
+dashboard.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    updateMetrics(data);
+};
+```
+
+---
+
+## Gestión de Seres
+
+### Lista de Seres
+
+Muestra todos los seres, incluyendo:
+- Nombre e ID
+- Estado actual (ejecutándose/detenido/error)
+- Enlace al archivo de alma
+- Acciones rápidas (iniciar/detener/configurar)
+
+### Detalles del Ser
+
+- Configuración completa
+- Editor de archivo de alma
+- Historial de tareas
+- Visor de memoria
+- Métricas de rendimiento
+
+### Crear Ser
+
+1. Hacer clic en **Crear Nuevo Ser**
+2. Completar:
+   - Nombre
+   - Contenido del alma (editor Markdown)
+   - Configuración inicial
+3. Hacer clic en **Crear**
+
+---
+
+## Interfaz de Chat
+
+### Funcionalidades
+
+- Flujo de mensajes en tiempo real
+- Historial de mensajes
+- Soporte para múltiples sesiones
+- Visualización de invocación de herramientas
+
+### Usar el Chat
+
+1. Seleccionar un ser
+2. Escribir un mensaje
+3. Ver respuestas en streaming
+4. Ver ejecución de herramientas en tiempo real
+
+### Visualización de Invocación de Herramientas
+
+Cuando la IA invoca una herramienta:
+```
+🔧 Herramienta: calendar
+📥 Entrada: {"date": "2026-04-20"}
+📤 Salida: "农历四月初三"
+```
+
+---
+
+## Configuración
+
+### Clientes de IA
+
+Configurar backends de IA:
+- Ollama (local)
+- Bailian (nube)
+- Clientes personalizados
+
+### Ajustes de Almacenamiento
+
+- Ruta base
+- Indexación por tiempo
+- Estrategia de limpieza
+
+### Localización
+
+Cambiar entre 21 variantes de idioma:
+- Chino (6 variantes): Simplificado, Tradicional, Singapur, Macao, Taiwán, Malasia
+- Inglés (10 variantes): EE.UU., Reino Unido, Canadá, Australia, India, Singapur, Sudáfrica, Irlanda, Nueva Zelanda, Malasia
+- Español (2 variantes): España, México
+- Japonés, Coreano, Checo
 
 ---
 
@@ -36,373 +143,291 @@ Respuesta HTTP
 
 ### Pieles Disponibles
 
-1. **Admin**: Interfaz profesional de gestión
-2. **Chat**: Interfaz conversacional
-3. **Creative**: Interfaz artística
-4. **Dev**: Interfaz para desarrolladores
+1. **Admin** - Interfaz profesional de gestión
+2. **Chat** - Diseño centrado en conversaciones
+3. **Creative** - Estilo creativo y artístico
+4. **Dev** - Layout orientado a desarrolladores
 
 ### Cambiar Piel
 
-1. Ir a Configuración
-2. Seleccionar piel
-3. Guardar cambios
+1. Hacer clic en **Configuración** (icono de engranaje)
+2. Seleccionar **Piel**
+3. Elegir la piel deseada
+4. La interfaz se actualiza inmediatamente
+
+### Piel Personalizada
+
+Crear piel personalizada implementando `ISkin`:
+
+```csharp
+public class MySkin : ISkin
+{
+    public string Name => "MySkin";
+    
+    public string GetCss()
+    {
+        return ":root { --primary: #color; }";
+    }
+}
+```
 
 ---
 
-## Controladores
+## Gestión de Permisos
 
-### About (`/about`)
+### Ver Permisos
 
-Información sobre el sistema:
-- Versión
-- Autor
-- Licencia
-- Estadísticas
+- Listar todas las reglas de permisos
+- Filtrar por usuario o recurso
+- Ver fechas de expiración
 
-### Audit (`/audit`)
+### Añadir Regla de Permiso
 
-Registros de auditoría:
-- Decisiones de permisos
-- Uso de tokens
-- Ejecución de herramientas
+1. Hacer clic en **Añadir Regla**
+2. Configurar:
+   - Usuario
+   - Recurso (ej. `disk:read`)
+   - Permitir/Denegar
+   - Duración
+3. Guardar
 
-### Being (`/beings`)
+### Seguimiento de Auditoría
 
-Gestión de Seres de Silicio:
-- Lista de seres
-- Crear/eliminar seres
-- Iniciar/detener
-- Editar archivo de alma
-
-### Chat (`/chat`)
-
-Interfaz de chat:
-- Seleccionar ser
-- Enviar mensajes
-- Ver historial
-- Actualizaciones en tiempo real (SSE)
-
-### CodeBrowser (`/code`)
-
-Navegador de código:
-- Explorar estructura
-- Ver archivos
-- Buscar código
-
-### CodeHover (`/api/code/hover`)
-
-Información de código al pasar el cursor:
-- Tooltips de código
-- Documentación inline
-
-### Config (`/config`)
-
-Configuración del sistema:
-- Editar configuración
-- Backend de IA
-- Localización
-- Piel
-
-### Dashboard (`/`)
-
-Panel principal:
-- Estados de seres
-- Métricas de rendimiento
-- Uso de recursos
-- Actividad reciente
-
-### Executor (`/executors`)
-
-Estado de ejecutores:
-- DiskExecutor
-- NetworkExecutor
-- CommandLineExecutor
-- DynamicCompilationExecutor
-
-### Init (`/init`)
-
-Inicialización del sistema:
-- Primer arranque
-- Configuración inicial
-
-### Knowledge (`/knowledge`)
-
-Base de conocimiento:
-- Documentos
-- Referencias
-- Guías
-
-### Log (`/logs`)
-
-Registros del sistema:
-- Logs en tiempo real
-- Filtrar por nivel
-- Buscar
-
-### Memory (`/memory`)
-
-Gestión de memoria:
-- Ver memoria
-- Buscar
-- Limpiar
-
-### Permission (`/permissions`)
-
-Gestión de permisos:
-- Ver permisos
-- Configurar ACL
-- Cachés
-
-### PermissionRequest (`/permission-requests`)
-
-Solicitudes de permiso pendientes:
-- Ver solicitudes
-- Aprobar/rechazar
-- Recordar decisión
-
-### Project (`/project`)
-
-Información del proyecto:
-- Estructura
-- Documentación
-- Recursos
-
-### Task (`/tasks`)
-
-Gestión de tareas:
-- Lista de tareas
-- Crear/actualizar
-- Completar
-
-### Timer (`/timers`)
-
-Gestión de temporizadores:
-- Temporizadores activos
-- Crear/cancelar
-- Historial
+Ver todas las decisiones de permisos:
+- Marca de tiempo
+- Usuario
+- Recurso
+- Decisión
 
 ---
 
-## Actualizaciones en Tiempo Real
+## Sistema de Registros
 
-### SSE (Server-Sent Events)
+### Funcionalidades
 
-La interfaz usa SSE para actualizaciones en tiempo real:
+- Ver registros del sistema en tiempo real
+- Filtrar por nivel (Info, Warning, Error)
+- Filtrar por Ser Silicona
+- Consulta por rango de tiempo
+
+### Niveles de Registro
+
+- **Info** - Información general
+- **Warning** - Advertencias
+- **Error** - Errores
+- **Debug** - Información de depuración
+
+---
+
+## Sistema de Memoria
+
+### Vista de Línea de Tiempo
+
+Visualizar memoria a largo plazo en vista cronológica:
+- Eventos y interacciones indexados por tiempo
+- Navegación por fecha
+- Filtrado avanzado
+
+### Filtrado
+
+- Por fecha
+- Por tipo de evento
+- Por palabras clave
+- Por ser
+
+---
+
+## Base de Conocimiento
+
+### Gestión de Tripletas
+
+Crear y gestionar conocimiento usando estructura de tripla:
+- **Sujeto**: El concepto principal
+- **Relación**: La conexión entre conceptos
+- **Objeto**: El concepto relacionado
+
+### Descubrimiento de Rutas
+
+Encontrar conexiones entre conceptos:
+- Visualización gráfica
+- Ruta más corta
+- Puntuación de confianza
+
+### Búsqueda
+
+- Búsqueda de texto completo
+- Coincidencia de palabras clave
+- Filtrado por etiquetas
+
+---
+
+## Explorador de Código
+
+### Árbol de Archivos
+
+Navegar la estructura de archivos del proyecto:
+- Expandir/colapsar directorios
+- Iconos de tipo de archivo
+- Búsqueda de archivos
+
+### Resaltado de Sintaxis
+
+Soporte para múltiples lenguajes:
+- C#
+- JavaScript
+- Python
+- Markdown
+- Y más...
+
+---
+
+## Editor de Código
+
+### Monaco Editor
+
+Editor de código profesional con:
+- Resaltado de sintaxis
+- Autocompletado
+- Indicaciones flotantes
+- Plegado de código
+- Búsqueda y reemplazo
+
+### Indicaciones Flotantes
+
+Al pasar el cursor sobre código:
+- Ver documentación
+- Ver definiciones de tipos
+- Ver referencias
+
+---
+
+## Gestión de Proyectos
+
+### Espacio de Trabajo
+
+Organizar proyectos:
+- Crear proyectos
+- Configurar directorios
+- Gestionar miembros
+
+### Sistema de Tareas
+
+Gestionar tareas del proyecto:
+- Crear tareas
+- Asignar prioridades
+- Seguimiento de progreso
+
+### Notas de Trabajo
+
+Sistema de notas personales para seres:
+- Crear notas en formato Markdown
+- Añadir palabras clave
+- Generar índice
+- Búsqueda de notas
+
+---
+
+## Sistema de Temporizadores
+
+### Tipos de Temporizadores
+
+1. **Una vez**: Ejecutar una vez después de un retraso
+2. **Intervalo**: Ejecutar repetidamente a intervalos fijos
+3. **Cron**: Ejecutar basado en expresión cron
+
+### Gestión
+
+- Crear temporizadores
+- Pausar/reanudar
+- Ver historial de ejecución
+- Eliminar temporizadores
+
+---
+
+## Sistema de Ayuda
+
+### Documentos Multilingües
+
+Acceder a documentos de ayuda en múltiples idiomas:
+- Selección de idioma
+- Búsqueda por tema
+- Navegación por categorías
+
+### Temas de Ayuda
+
+- Introducción
+- Arquitectura
+- Guía de desarrollo
+- Referencia de herramientas
+- Solución de problemas
+- Y más...
+
+---
+
+## Mejores Prácticas
+
+### 1. Usar SSE para Actualizaciones en Tiempo Real
+
+Para características en tiempo real, usar eventos SSE en lugar de sondeo:
 
 ```javascript
-const eventSource = new EventSource('/sse');
-
-eventSource.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    // Actualizar UI
+const source = new EventSource('/api/events');
+source.onmessage = (event) => {
+    // Manejar actualización
 };
 ```
 
-### Eventos
+### 2. Gestionar Reconexión
 
-- `chat_message`: Nuevo mensaje de chat
-- `being_status`: Cambio de estado de ser
-- `permission_request`: Nueva solicitud de permiso
-- `log_entry`: Nueva entrada de log
+Implementar lógica de reconexión para conexiones SSE:
 
----
-
-## Constructores HTML
-
-### H (HTML Builder)
-
-DSL fluente para construir HTML:
-
-```csharp
-H.Html(
-    H.Head(
-        H.Title("Mi Página"),
-        H.Style("body { margin: 0; }")
-    ),
-    H.Body(
-        H.Div(
-            H.Class("container"),
-            H.H1("Título"),
-            H.P("Párrafo")
-        )
-    )
-)
+```javascript
+source.onerror = () => {
+    setTimeout(() => {
+        source.close();
+        // Reconectar
+    }, 5000);
+};
 ```
 
-### CssBuilder
+### 3. Usar Pieles Apropiadas
 
-Constructor de CSS:
-
-```csharp
-var css = new CssBuilder()
-    .Add("body", new { margin = "0", padding = "0" })
-    .Add(".container", new { "max-width" = "1200px" })
-    .Build();
-```
-
-### JsBuilder
-
-Constructor de JavaScript:
-
-```csharp
-var js = new JsBuilder()
-    .Function("init", new string[0], @"
-        console.log('Inicializado');
-    ")
-    .Build();
-```
+Elegir piel basada en tarea:
+- **Admin** para gestión del sistema
+- **Chat** para interacción con IA
+- **Creative** para trabajo creativo
+- **Dev** para desarrollo de código
 
 ---
 
-## Personalización
+## Solución de Problemas
 
-### Agregar Nueva Página
+### No Se Puede Acceder a Web UI
 
-1. Crear controlador
-2. Crear vista
-3. Registrar ruta
+**Verificar**:
+1. La aplicación se está ejecutando
+2. El puerto 8080 no está en uso
+3. El firewall permite el puerto 8080
 
-### Modificar Piel
+### SSE No Funciona
 
-1. Editar archivo de piel
-2. Modificar CSS
-3. Actualizar constructores
+**Verificar**:
+1. El navegador soporta SSE
+2. La conexión no está bloqueada
+3. Los registros del servidor muestran conexiones SSE
 
----
+### Piel No Se Carga Correctamente
 
-## API REST
-
-### Obtener Seres
-
-```bash
-GET /api/beings
-```
-
-### Crear Ser
-
-```bash
-POST /api/beings
-Content-Type: application/json
-
-{
-  "name": "Nuevo Ser",
-  "soul": "# Personalidad..."
-}
-```
-
-### Enviar Mensaje
-
-```bash
-POST /api/chat/{channelId}/message
-Content-Type: application/json
-
-{
-  "content": "Hola"
-}
-```
+**Verificar**:
+1. La piel está registrada en `SkinManager`
+2. No hay errores de CSS
+3. El navegador cacheó CSS antiguo (limpiar caché)
 
 ---
 
-## Vista de Historial de Chat
+## Próximos Pasos
 
-### Funcionalidades
-
-- Navegación del historial de chat de Seres de Silicio
-- Visualización de lista de conversaciones
-- Vista de detalles de mensajes
-- Vista de línea de tiempo
-
-### Uso del Historial de Chat
-
-1. Navegue a la página **Seres**
-2. Haga clic en el enlace **Historial de Chat** de un Ser de Silicio
-3. Vea la lista de conversaciones:
-   - Título de conversación
-   - Hora de creación
-   - Cantidad de mensajes
-4. Haga clic en una conversación para ver detalles:
-   - Historial completo de mensajes
-   - Marcas de tiempo
-   - Información del remitente
-   - Registros de llamadas a herramientas
-
-### Implementación Técnica
-
-- **Controlador**: `ChatHistoryController`
-- **ViewModel**: `ChatHistoryViewModel`
-- **Vistas**:
-  - `ChatHistoryListView` - Lista de conversaciones
-  - `ChatHistoryDetailView` - Detalles de mensajes
-- **Rutas API**:
-  - `/api/chat-history/{beingId}/conversations` - Obtener lista de conversaciones
-  - `/api/chat-history/{beingId}/conversation/{conversationId}` - Obtener detalles de mensajes
-
----
-
-## Carga de Archivos
-
-### Funcionalidades
-
-- Diálogo de origen de archivos
-- Soporte de carga de múltiples archivos
-- Gestión de metadatos de archivos
-- Visualización de progreso de carga
-
-### Uso de Carga de Archivos
-
-1. Haga clic en el botón **Cargar Archivo** en la interfaz de chat
-2. Se abre el diálogo de origen de archivos
-3. Seleccione origen de archivos:
-   - Archivos locales
-   - Ruta del sistema de archivos
-4. Seleccione archivos (selección múltiple soportada)
-5. Confirme la carga
-6. La información del archivo se adjuntará al mensaje
-
-### Tipos de Archivos Soportados
-
-- Archivos de texto (.txt, .md, .json, .xml, etc.)
-- Archivos de código (.cs, .js, .py, .java, etc.)
-- Archivos de configuración (.yml, .yaml, .ini, .conf, etc.)
-- Archivos de documento (.csv, .log, etc.)
-
----
-
-## Indicadores de Carga
-
-### Funcionalidades
-
-- Visualización de estado de carga para páginas de chat
-- Selección automática de sesión del curador
-- Retroalimentación de progreso de carga de datos
-
-### Comportamiento
-
-- Animación de carga mostrada cuando la página se carga
-- Ocultado automáticamente después de que la carga de datos se completa
-- Sesión del curador seleccionada automáticamente (si existe)
-- Texto de aviso de carga multiidioma
-
----
-
-## Seguridad
-
-### Autenticación
-
-- Sesiones basadas en cookies
-- CSRF protection
-- Input validation
-
-### Autorización
-
-- Permisos por operación
-- Role-based access
-- Audit logging
-
----
-
-## Recursos Adicionales
-
-- [Arquitectura](architecture.md)
-- [Referencia de API](api-reference.md)
-- [Guía de Desarrollo](development-guide.md)
+- 📚 Leer la [Guía de Arquitectura](architecture.md)
+- 🛠️ Consultar la [Guía de Desarrollo](development-guide.md)
+- 🔧 Ver la [Referencia de Herramientas](tools-reference.md)
+- 🚀 Comenzar con la [Guía de Inicio Rápido](getting-started.md)

@@ -1,6 +1,6 @@
-# 路线图
+﻿# 路线图
 
-[English](roadmap.md) | [中文](docs/zh-CN/roadmap.md) | [繁體中文](docs/zh-HK/roadmap.md) | [Español](docs/es-ES/roadmap.md) | [日本語](docs/ja-JP/roadmap.md) | [한국어](docs/ko-KR/roadmap.md) | [Čeština](docs/cs-CZ/roadmap.md)
+[English](../en/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | **中文** | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
 
 ## 指导原则
 
@@ -227,6 +227,33 @@
 **交付物**：增强的工具、可观察性、日历覆盖范围和多 AI 后端支持。
 
 **验证**：主理人通过 TokenAuditTool 查询 token 使用 → 审计仪表板显示趋势 → CalendarTool 在 32 种日历系统之间转换日期 → 将 AI 后端切换到百炼 → 通过云端 API 与通义千问模型聊天。
+
+---
+
+## ~~阶段 10.6：完善与优化~~ ✅ 已完成
+
+**目标**：完善系统功能，添加新特性，优化用户体验。
+
+| # | 模块 | 描述 |
+|---|--------|-------------|
+| 10.6.1 | WebViewBrowserTool | 基于 Playwright 的跨平台浏览器自动化工具，支持无头模式、个体隔离、完整 JS/CSS 支持 |
+| 10.6.2 | HelpTool | 帮助文档系统工具，支持多语言文档查询和展示 |
+| 10.6.3 | ProjectWorkNoteTool | 项目工作笔记工具，支持项目维度的工作记录和管理 |
+| 10.6.4 | ProjectTaskTool | 项目任务管理工具，支持任务分配、进度跟踪 |
+| 10.6.5 | KnowledgeTool | 知识网络工具，支持三元组知识的增删改查和路径发现 |
+| 10.6.6 | ChatHistoryController | 聊天历史查看控制器，支持会话列表和消息详情 |
+| 10.6.7 | CodeHoverController | 代码悬浮提示控制器，支持语法高亮和代码提示 |
+| 10.6.8 | WorkNoteController | 工作笔记管理控制器，支持搜索和目录生成 |
+| 10.6.9 | TimerExecutionHistory | 定时器执行历史功能，记录和查看定时器触发历史 |
+| 10.6.10 | 本地化扩展 | 添加捷克语 (cs-CZ) 本地化支持，总计 21 种语言变体 |
+| 10.6.11 | Web UI 优化 | 文件上传支持、加载指示器、工具调用渲染优化、工作笔记模态框修复 |
+| 10.6.12 | 记忆管理增强 | 高级过滤、统计信息、详情视图、压缩算法优化 |
+| 10.6.13 | 日志系统重构 | 系统/硅基生命体日志分离、日志读取 API、硅基生命体筛选器 |
+| 10.6.14 | 权限系统增强 | 权限回调预编译验证、程序集引用验证、wttr.in 天气服务白名单 |
+
+**交付物**：完整的 WebView 浏览器自动化、帮助文档系统、项目工作区、知识网络、聊天历史查看等增强功能。
+
+**验证**：硅基生命体可以通过 WebViewBrowserTool 操作浏览器 → 通过 HelpTool 获取帮助文档 → 管理项目工作笔记和任务 → 查询知识网络 → 查看聊天历史。
 
 ---
 

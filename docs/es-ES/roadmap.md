@@ -1,230 +1,233 @@
-# Hoja de Ruta
+﻿# Hoja de Ruta
 
-[English](roadmap.md) | [简体中文](docs/zh-CN/roadmap.md) | [繁體中文](docs/zh-HK/roadmap.md) | [Español](docs/es-ES/roadmap.md) | [日本語](docs/ja-JP/roadmap.md) | [한국어](docs/ko-KR/roadmap.md) | [Čeština](docs/cs-CZ/roadmap.md)
+[English](../en/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | **Español** | [Deutsch](../de-DE/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
 
-[English](../en/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Español](../es-ES/roadmap.md)
+## Principios Rectores
 
-## Principio Rector
-
-Cada fase termina con un sistema **ejecutable y observable**. Ninguna fase produce "un montón de infraestructura sin nada que mostrar."
+Cada fase termina con un sistema **funcional y observable**. Ninguna fase produce "un montón de infraestructura sin nada que mostrar".
 
 ---
 
 ## ~~Fase 1: Puede Chatear~~ ✅ Completado
 
-**Objetivo**: Entrada de consola → Llamada a IA → Salida de consola. Unidad mínima verificable.
+**Objetivo**: Entrada de consola → Llamada de IA → Salida de consola. Unidad mínima verificable.
 
 | # | Módulo | Descripción |
 |---|--------|-------------|
-| 1.1 | Estructura de solución y proyectos | Crear `SiliconLifeCollective.sln` con `src/SiliconLife.Core/` (biblioteca principal) y `src/SiliconLife.Default/` (implementación predeterminada + punto de entrada) |
-| 1.2 | Config (mínimo) | Singleton + deserialización JSON. Leer `config.json`. Generar predeterminados automáticamente si falta |
-| 1.3 | Localización (mínimo) | Clase abstracta `LocalizationBase`, implementación `ZhCN`. Agregar `Language` a la configuración |
-| 1.4 | OllamaClient (mínimo) | Interfaz `IAIClient`, llamada HTTP a Ollama local `/api/chat`. Sin streaming, sin ToolCall aún |
-| 1.5 | E/S de consola | `while(true) + Console.ReadLine()`, leer entrada → llamar a IA → imprimir respuesta |
-| 1.6 | Encabezados de copyright | Agregar encabezados Apache 2.0 a todos los archivos fuente C# |
+| 1.1 | Estructura de solución y proyectos | Crear `SiliconLifeCollective.sln`, con `src/SiliconLife.Core/` (biblioteca central) y `src/SiliconLife.Default/` (implementación predeterminada + punto de entrada) |
+| 1.2 | Configuración (mínima) | Singleton + deserialización JSON. Leer `config.json`. Generar automáticamente valores predeterminados si falta |
+| 1.3 | Localización (mínima) | Clase abstracta `LocalizationBase`, implementación `ZhCN`. Añadir `Language` en configuración |
+| 1.4 | OllamaClient (mínimo) | Interfaz `IAIClient`, llamada HTTP a Ollama local `/api/chat`. Sin streaming, sin invocación de herramientas |
+| 1.5 | E/S de consola | `while(true) + Console.ReadLine()`, leer entrada → llamar IA → imprimir respuesta |
+| 1.6 | Encabezado de copyright | Añadir encabezado Apache 2.0 a todos los archivos fuente C# |
 
-**Entregable**: Un programa de chat de consola que habla con un modelo Ollama local.
+**Entregable**: Programa de chat de consola con modelo Ollama local.
 
-**Verificación**: Ejecutar el programa, escribir "hola", ver una respuesta de IA.
+**Verificación**: Ejecutar programa, escribir "hello", ver respuesta de IA.
 
 ---
 
 ## ~~Fase 2: Tiene Esqueleto~~ ✅ Completado
 
-**Objetivo**: Reemplazar el "bucle desnudo" con una estructura de framework. Comportamiento sin cambios.
+**Objetivo**: Reemplazar "bucle desnudo" con estructura de framework. Comportamiento sin cambios.
 
 | # | Módulo | Descripción |
 |---|--------|-------------|
-| 2.1 | Almacenamiento (mínimo) | Interfaz `IStorage` (Read/Write/Exists/Delete, clave-valor). Implementación `FileSystemStorage`. Clase de instancia (no estática). Acceso directo al sistema de archivos — **la IA no puede controlar IStorage** |
-| 2.2 | MainLoop + TickObject | Bucle infinito con intervalos de tick precisos (`Stopwatch` + `Thread.Sleep`). Programación por prioridad |
+| 2.1 | Almacenamiento (mínimo) | Interfaz `IStorage` (Read/Write/Exists/Delete, pares clave-valor). Implementación `FileSystemStorage`. Clase de instancia (no estática). Acceso directo al sistema de archivos — **IA no puede controlar IStorage** | [Deutsch](../de-DE/roadmap.md) |
+| 2.2 | Bucle principal + objetos de reloj | Bucle infinito, intervalos de reloj precisos (`Stopwatch` + `Thread.Sleep`). Programación por prioridad |
 | 2.3 | Estandarización de IAIClient | Interfaz `IAIClientFactory`. OllamaClient refactorizado para implementar interfaz estándar |
-| 2.4 | Migración de consola | Migrar `while(true)` a TickObject impulsado por MainLoop. Comportamiento idéntico a Fase 1 |
+| 2.4 | Migración de consola | Migrar `while(true)` a objeto de reloj impulsado por bucle principal. Mismo comportamiento que Fase 1 |
 
-**Entregable**: MainLoop ejecutando ticks, chat de consola aún funciona.
+**Entregable**: Bucle principal ejecutando reloj, chat de consola todavía funciona.
 
-**Verificación**: Registrar un TickObject de prueba que imprima conteo de ticks cada segundo; chat de consola aún funciona.
+**Verificación**: Registrar objeto de reloj de prueba, imprimir conteo de reloj cada segundo; chat de consola todavía funciona.
 
 ---
 
-## ~~Fase 3: Tiene un Alma~~ ✅ Completado
+## ~~Fase 3: Tiene Alma~~ ✅ Completado
 
-**Objetivo**: El primer Ser de Silicio está vivo dentro del framework.
+**Objetivo**: Primer Ser Silicona vivo en el framework.
 
 | # | Módulo | Descripción |
 |---|--------|-------------|
 | 3.1 | SiliconBeingBase | Clase base abstracta con Id, Name, ToolManager, AIClient, ChatService, Storage, PermissionService. `Tick()` y `ExecuteOneRound()` abstractos |
 | 3.2 | Carga de archivo de alma | `SoulFileManager`: leer `soul.md` desde directorio de datos del ser |
-| 3.3 | ContextManager (mínimo) | Concatenar archivo de alma + mensajes recientes → llamar a IA → obtener respuesta. Sin ToolCall, sin persistencia aún |
+| 3.3 | ContextManager (mínimo) | Conectar archivo de alma + mensajes recientes → llamar IA → obtener respuesta. Sin invocación de herramientas, sin persistencia |
 | 3.4 | ISiliconBeingFactory | Interfaz de fábrica para crear instancias de seres |
-| 3.5 | SiliconBeingManager (mínimo) | Hereda TickObject (Prioridad=0). Itera todos los seres, llama sus Tick en secuencia |
+| 3.5 | SiliconBeingManager (mínimo) | Hereda objeto de reloj (prioridad=0). Iterar todos los seres, llamar sus Tick secuencialmente |
 | 3.6 | DefaultSiliconBeing | Implementación de comportamiento estándar. Verificar mensajes no leídos → crear ContextManager → ExecuteOneRound → salida |
-| 3.7 | Estructura de directorios de seres | `DataDirectory/SiliconManager/{GUID}/` con `soul.md` y `state.json` |
+| 3.7 | Estructura de directorio de seres | `DataDirectory/SiliconManager/{GUID}/`, con `soul.md` y `state.json` |
 
-**Entregable**: Ser de Silicio impulsado por MainLoop, recibiendo entrada de consola, cargando archivo de alma, llamando a IA.
+**Entregable**: Ser Silicona impulsado por bucle principal, recibe entrada de consola, carga archivo de alma, llama IA.
 
-**Verificación**: Entrada de consola → Tick de MainLoop → Ser procesa (con comportamiento guiado por archivo de alma) → respuesta de IA. El estilo de respuesta debería diferir de la Fase 1.
+**Verificación**: Entrada de consola → activación de reloj de bucle principal → procesamiento de ser (con comportamiento guiado por archivo de alma) → respuesta de IA. Estilo de respuesta debe ser diferente de Fase 1.
 
 ---
 
 ## ~~Fase 4: Tiene Memoria~~ ✅ Completado
 
-**Objetivo**: Las conversaciones persisten entre reinicios.
+**Objetivo**: Conversaciones persisten después de reinicio.
 
 | # | Módulo | Descripción |
 |---|--------|-------------|
 | 4.1 | ChatSystem | Concepto de canal (dos GUID = un canal). Modelo de mensaje con persistencia. Sin chat grupal aún |
-| 4.2 | IIMProvider + IMManager | Interfaz `IIMProvider`. `ConsoleProvider` como canal IM formal. `IMManager` enruta mensajes |
-| 4.3 | ContextManager mejorado | Extraer historial de ChatSystem. Persistir respuestas de IA. Soporte para continuación ToolCall de múltiples rondas |
-| 4.4 | Modelo IMessage | Modelo de mensaje unificado compartido por ChatSystem e IMManager |
+| 4.2 | IIMProvider + IMManager | Interfaz `IIMProvider`. `ConsoleProvider` como canal de mensajería instantánea formal. `IMManager` enruta mensajes |
+| 4.3 | ContextManager mejorado | Extraer historial de sistema de chat. Persistir respuestas de IA. Soporte para continuación de invocación de herramientas de múltiples rondas |
+| 4.4 | Modelo IMessage | Modelo de mensaje unificado compartido por sistema de chat y gestor de mensajería instantánea |
 
-**Entregable**: Un sistema de chat con memoria persistente.
+**Entregable**: Sistema de chat con memoria persistente.
 
-**Verificación**: Chatear unas vueltas → salir → reiniciar → preguntar "¿de qué hablamos?" → el ser puede responder.
+**Verificación**: Chatear varias rondas → salir → reiniciar → preguntar "¿de qué hablamos?" → el ser puede responder.
 
 ---
 
 ## ~~Fase 5: Puede Actuar (Sistema de Herramientas)~~ ✅ Completado
 
-**Objetivo**: Los Seres de Silicio pueden ejecutar operaciones, no solo hablar.
+**Objetivo**: Seres Silicona pueden ejecutar acciones, no solo chatear.
 
 | # | Módulo | Descripción |
 |---|--------|-------------|
 | 5.1 | ITool + ToolResult | Interfaz `ITool` con Name, Description, Execute. `ToolResult` con Success, Message, Data |
-| 5.2 | ToolManager | Instancia por ser. Descubrimiento de herramientas basado en reflexión. Soporte para atributo `[SiliconManagerOnly]` |
-| 5.3 | IAIClient: Soporte ToolCall | Analizar tool_calls de IA. Bucle: ejecutar herramienta → enviar resultado de vuelta → IA continúa → hasta texto plano |
+| 5.2 | ToolManager | Instancia por ser. Descubrimiento de herramientas basado en reflexión. Soporte de atributo `[SiliconManagerOnly]` |
+| 5.3 | IAIClient: Soporte de invocación de herramientas | Analizar tool_calls de IA. Bucle: ejecutar herramienta → enviar resultado de vuelta → IA continúa → hasta texto puro |
 | 5.4 | Clase base de ejecutor | Clase base abstracta con hilo de programación independiente, cola de solicitudes, control de timeout |
 | 5.5 | NetworkExecutor | Solicitudes HTTP a través de ejecutor. Timeout, cola |
 | 5.6 | CommandLineExecutor | Ejecución de shell a través de ejecutor. Detección de separador multiplataforma |
-| 5.7 | DiskExecutor | Operaciones de archivos a través de ejecutor. Sin verificación de permisos aún (Fase 6) |
+| 5.7 | DiskExecutor | Operaciones de archivo a través de ejecutor. Sin verificación de permisos aún (Fase 6) |
 | 5.8–5.12 | Herramientas integradas | CalendarTool, SystemTool, NetworkTool, ChatTool, DiskTool |
 
-**Entregable**: Los Seres de Silicio pueden llamar herramientas para realizar operaciones.
+**Entregable**: Seres Silicona pueden invocar herramientas para ejecutar acciones.
 
 ---
 
-## ~~Fase 6: Sistema de Permisos~~ ✅ Completado
+## ~~Fase 6: Seguridad (Sistema de Permisos)~~ ✅ Completado
 
-**Objetivo**: Control granular sobre qué pueden hacer los seres.
+**Objetivo**: Todas las operaciones de E/S pasan por verificación de permisos.
 
 | # | Módulo | Descripción |
 |---|--------|-------------|
-| 6.1 | PermissionManager | Gestor de permisos privado por ser |
-| 6.2 | 5 niveles de permisos | IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler |
-| 6.3 | AuditLogger | Registro de todas las decisiones de permisos |
-| 6.4 | GlobalACL | Lista de control de acceso global |
-| 6.5 | UserFrequencyCache | Caché de frecuencia de usuario para prevenir abuso |
-| 6.6 | Integración con ejecutores | Todos los ejecutores verifican permisos antes de ejecutar |
+| 6.1 | PermissionManager | Gestor de permisos privado por ser. Cadena de 5 niveles |
+| 6.2 | GlobalACL | Lista de control de acceso global. Persistida al almacenamiento |
+| 6.3 | UserFrequencyCache | Caché de frecuencia de usuario (solo memoria) para reducir prompts repetitivos |
+| 6.4 | IPermissionCallback | Interfaz de callback para lógica de permisos personalizada |
+| 6.5 | IPermissionAskHandler | Interfaz para preguntar al usuario por permisos |
+| 6.6 | AuditLogger | Registro de auditoría para todas las decisiones de permisos |
+| 6.7 | Integración de ejecutor | Ejecutores consultan PermissionManager antes de ejecutar |
 
-**Entregable**: Sistema de permisos de 5 niveles con auditoría completa.
-
-**Verificación**: El ser intenta ejecutar una operación restringida → se solicita permiso al usuario → el usuario aprueba/rechaza → se registra la decisión.
+**Entregable**: Sistema de permisos de 5 niveles con registro de auditoría.
 
 ---
 
-## ~~Fase 7: Compilación Dinámica + Autoevolución~~ ✅ Completado
+## ~~Fase 7: Auto-Evolución (Compilación Dinámica)~~ ✅ Completado
 
-**Objetivo**: Los Seres de Silicio pueden autoevolucionarse mediante generación de código.
+**Objetivo**: Seres pueden reescribir su propio código.
 
 | # | Módulo | Descripción |
 |---|--------|-------------|
-| 7.1 | DynamicCompilationExecutor | Compilación Roslyn de código C# generado por IA |
-| 7.2 | SecurityScanner | Escaneo de seguridad antes de compilar |
-| 7.3 | DynamicBeingLoader | Carga dinámica de assemblies compilados |
-| 7.4 | CodeEncryption | Encriptación de código compilado sensible |
-| 7.5 | Integración con herramientas | Herramienta DynamicCompile para seres |
+| 7.1 | DynamicBeingLoader | Cargador de compilación dinámica usando Roslyn |
+| 7.2 | SecurityScanner | Análisis estático de código para operaciones peligrosas |
+| 7.3 | Control de referencias en compilación | Compilador solo obtiene lista permitida de ensamblados |
+| 7.4 | Almacenamiento cifrado | Código cifrado con AES-256 en disco |
+| 7.5 | Reemplazo atómico | Compilar en memoria → crear instancia → migrar estado → intercambiar → persistir |
+| 7.6 | ReplacePermissionCallback | Permitir a seres compilar e inyectar callbacks de permisos personalizados |
 
-**Entregable**: Seres capaces de generar, compilar y ejecutar código dinámicamente.
-
-**Verificación**: El ser genera código → pasa escaneo de seguridad → se compila → se ejecuta → resultados retornados.
+**Entregable**: Seres pueden auto-evolucionarse reescribiendo código.
 
 ---
 
-## ~~Fase 8: Memoria a Largo Plazo + Tareas + Temporizadores~~ ✅ Completado
+## ~~Fase 8: Memoria a Largo Plazo y Tareas~~ ✅ Completado
 
-**Objetivo**: Capacidades avanzadas de memoria y planificación.
+**Objetivo**: Seres pueden recordar y planificar.
 
 | # | Módulo | Descripción |
 |---|--------|-------------|
-| 8.1 | ITimeStorage | Almacenamiento indexado por tiempo para consultas de rango temporal |
-| 8.2 | FileSystemTimeStorage | Implementación basada en archivos con estructura de directorios temporal |
-| 8.3 | TaskSystem | Sistema de tareas para seres (crear, actualizar, completar) |
-| 8.4 | TimerSystem | Sistema de temporizadores para acciones futuras |
-| 8.5 | Integración con ChatSystem | Persistencia de mensajes indexada por tiempo |
+| 8.1 | Sistema de memoria a largo plazo | Persistir y consultar experiencias pasadas |
+| 8.2 | Sistema de tareas | Crear, gestionar y completar tareas |
+| 8.3 | Sistema de temporizadores | Temporizadores de una vez, intervalo y cron |
+| 8.4 | Sistema de notas de trabajo | Notas personales para seres con Markdown y palabras clave |
 
-**Entregable**: Memoria persistente con capacidades de tareas y temporizadores.
+**Entregable**: Seres pueden recordar pasado y planificar futuro.
 
 ---
 
-## ~~Fase 9: CoreHost + Colaboración Multiagente~~ ✅ Completado
+## ~~Fase 9: Host Central~~ ✅ Completado
 
-**Objetivo**: Múltiples seres trabajando juntos.
+**Objetivo**: Unificar todos los componentes en host central.
 
 | # | Módulo | Descripción |
 |---|--------|-------------|
-| 9.1 | CoreHost | Host principal que gestiona todos los componentes |
-| 9.2 | CoreHostBuilder | Builder para configurar CoreHost |
-| 9.3 | BroadcastChannel | Canales de difusión para comunicación entre seres |
-| 9.4 | SiliconCurator | Ser especial con privilegios máximos para gestión |
-| 9.5 | TokenUsageAudit | Auditoría de uso de tokens de IA |
+| 9.1 | CoreHost | Host unificado que ensambla todos los componentes |
+| 9.2 | ServiceLocator | Registro y recuperación global de servicios |
+| 9.3 | Gestión multiagente | Múltiples seres coexisten y colaboran |
+| 9.4 | Programación prioritaria del curador | Curador responde inmediatamente a mensajes de usuario |
 
-**Entregable**: Sistema multiagente completo con curador.
+**Entregable**: Sistema multiagente completamente funcional.
 
 ---
 
-## ~~Fase 10: Interfaz Web~~ ✅ Completado
+## ~~Fase 10: Web UI~~ ✅ Completado
 
-**Objetivo**: Interfaz web completa con funcionalidad total.
+**Objetivo**: Interfaz web moderna para gestión e interacción.
 
 | # | Módulo | Descripción |
 |---|--------|-------------|
-| 10.1 | WebHost | Servidor HTTP usando HttpListener |
-| 10.2 | Router | Enrutamiento de solicitudes con coincidencia de patrones |
-| 10.3 | Controllers | 18 controladores para diferentes funcionalidades |
-| 10.4 | Views | 19 vistas HTML con constructores fluentes |
-| 10.5 | Skins | 4 pieles intercambiables (Admin, Chat, Creative, Dev) |
-| 10.6 | SSE | Server-Sent Events para actualizaciones en tiempo real |
-| 10.7 | H, CssBuilder, JsBuilder | Constructores de marcado del lado del servidor |
+| 10.1 | Servidor HTTP | HttpListener integrado, enrutamiento básico |
+| 10.2 | SSE | Eventos enviados por servidor para actualizaciones en tiempo real |
+| 10.3 | 20+ controladores | Being, Chat, Config, Permission, Log, Audit, etc. |
+| 10.4 | Sistema de pieles | 4 pieles: Admin, Chat, Creative, Dev |
+| 10.5 | Constructores HTML/CSS/JS | `H`, `CssBuilder`, `JsBuilder` para generación de marcado |
 
-**Entregable**: Interfaz web completa con múltiples pieles y actualizaciones en tiempo real.
+**Entregable**: Web UI completa con gestión de seres, chat y configuración.
 
 ---
 
 ## ~~Fase 10.5: Mejoras Incrementales~~ ✅ Completado
 
-**Objetivo**: Pulir y expandir capacidades existentes.
-
-- 32 sistemas de calendario
-- Localización en 20 idiomas
-- Mejoras de herramientas existentes
-- Optimizaciones de rendimiento
-- Documentación completa
+| # | Módulo | Descripción |
+|---|--------|-------------|
+| 10.5.1 | Canales de broadcast | Anuncios a nivel del sistema |
+| 10.5.2 | Auditoría de tokens | Seguimiento de uso de tokens de IA |
+| 10.5.3 | 32 calendarios | Implementación completa de todos los sistemas de calendario |
+| 10.5.4 | Mejoras de herramientas | Herramientas adicionales y mejoras |
+| 10.5.5 | Localización en 21 idiomas | Soporte multilingüe integral |
 
 ---
 
-## Fase 11: Integración con IM Externos 🔜
+## ~~Fase 10.6: Perfeccionamiento~~ ✅ Completado
 
-**Objetivo**: Conectar con plataformas de mensajería populares.
+| # | Módulo | Descripción |
+|---|--------|-------------|
+| 10.6.1 | WebView | Automatización de navegador basada en Playwright |
+| 10.6.2 | Sistema de ayuda | Documentos de ayuda multilingües |
+| 10.6.3 | Proyectos | Espacios de trabajo de proyectos con notas de trabajo |
+| 10.6.4 | Red de conocimiento | Sistema de gráfico de conocimiento basado en tripletas |
 
-- [ ] Integración con Feishu/Lark
+---
+
+## Fase 11: Integración de Mensajería Instantánea Externa 🚧 Planificado
+
+**Objetivo**: Conectar con plataformas de mensajería instantánea populares.
+
+- [ ] Soporte para Feishu
 - [ ] Integración con WhatsApp
-- [ ] Integración con Telegram
-- [ ] Adaptador de IM genérico para plataformas personalizadas
+- [ ] Conector de Telegram
+- [ ] Gestión de múltiples plataformas
 
 ---
 
-## Fase 12: Gráfico de Conocimiento + Ecosistema de Plugins 🔜
+## Fase 12: Sistema de Plugins y Ecosistema de Habilidades 🚧 Planificado
 
-**Objetivo**: Capacidades avanzadas de conocimiento y extensibilidad.
+**Objetivo**: Permitir extensiones de terceros.
 
-- [ ] Sistema de gráfico de conocimiento
 - [ ] Sistema de plugins
-- [ ] Ecosistema de habilidades (skills)
-- [ ] Mercado de plugins/habilidades
+- [ ] Marketplace de habilidades
+- [ ] API de extensión
+- [ ] Documentación para desarrolladores de plugins
 
 ---
 
-## Estado Actual
+## Próximos Pasos
 
-✅ Fases 1-10.5: Completadas y funcionando
-🔜 Fase 11: Planificada
-🔜 Fase 12: Planificada
+- 📚 Leer la [Guía de Arquitectura](architecture.md)
+- 🛠️ Consultar la [Guía de Desarrollo](development-guide.md)
+- 🚀 Comenzar con la [Guía de Inicio Rápido](getting-started.md)

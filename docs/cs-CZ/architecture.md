@@ -1,81 +1,81 @@
-# Architektura
+﻿# Architektura
 
-[English](../en/architecture.md) | [中文文档](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md)
+[English](../en/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Deutsch](../de-DE/architecture.md) | **Čeština**
 
-## Základní koncepty
+## Core Koncepty
 
-### Křemíková Bytost
+### Silikonová Bytost
 
-Každý AI agent v systému je **Křemíková Bytost** — autonomní entita s vlastní identitou, osobností a schopnostmi. Každá křemíková bytost je řízena **souborem duše** (Markdown výzva), který definuje její vzorce chování.
+Každý AI agent v systému je **silikonová bytost** — autonomní entita s vlastní identitou, osobností a schopnostmi. Každá silikonová bytost je řízena **souborem duše** (Markdown prompt), který definuje její vzorce chování.
 
-### Křemíkový Kurátor
+### Silikonový Kurátor
 
-**Křemíkový Kurátor** je speciální křemíková bytost s nejvyšším systémovým oprávněním. Funguje jako správce systému:
+**Silikonový kurátor** je speciální silikonová bytost s nejvyšším systémovým oprávněním. Působí jako správce systému:
 
-- Vytváří a spravuje ostatní křemíkové bytosti
+- Vytváří a spravuje další silikonové bytosti
 - Analyzuje požadavky uživatelů a rozkládá je na úkoly
-- Přiděluje úkoly odpovídajícím křemíkovým bytostem
-- Monitoruje kvalitu provádění a zpracovává selhání
-- Odpovídá na zprávy uživatelů pomocí **prioritního scheduling** (viz níže)
+- Přiděluje úkoly odpovídajícím silikonovým bytostem
+- Monitoruje kvalitu provádění a řeší selhání
+- Odpovídá na zprávy uživatelů pomocí **prioritního rozvrhování** (viz níže)
 
 ### Soubor Duše
 
-Soubor Markdown (`soul.md`) uložený v datovém adresáři každé křemíkové bytosti. Funguje jako systémová výzva vložená do každého požadavku AI a definuje osobnost, rozhodovací vzorce a behaviorální omezení bytosti.
+Markdown soubor (`soul.md`) uložený v datovém adresáři každé silikonové bytosti. Je vstřikován jako systémový prompt do každého AI požadavku a definuje osobnost bytosti, vzorce rozhodování a behaviorální omezení.
 
 ---
 
-## Scheduling: Time-Slice Fair Scheduling
+## Plánování: Spravedlivé Plánování Časových Slotů
 
-### Hlavní smyčka + Objekty Clock
+### Hlavní Smyčka + Objekt Hodin
 
-Systém běží na **hlavní smyčce řízené clock** na vyhrazeném background threadu:
+Systém běží na **hlavní smyčce řízené hodinami** na vyhrazeném vláknu na pozadí:
 
 ```
-Hlavní smyčka (vyhrazený thread, watchdog + jistič)
-  └── Objekt Clock A (priorita=0, interval=100ms)
-  └── Objekt Clock B (priorita=1, interval=500ms)
-  └── SiliconBeingManager (spouštěn clock přímo z hlavní smyčky)
-        └── SiliconBeingRunner → Bytost 1 → tick clock → provede jedno kolo
-        └── SiliconBeingRunner → Bytost 2 → tick clock → provede jedno kolo
-        └── SiliconBeingRunner → Bytost 3 → tick clock → provede jedno kolo
+Hlavní smyčka (vyhrazené vlákno, watchdog + jistič)
+  └── Objekt hodin A (priorita=0, interval=100ms)
+  └── Objekt hodin B (priorita=1, interval=500ms)
+  └── Správce silikonových bytostí (spouštěn přímo hlavní smyčkou)
+        └── Běžeč bytosti → Bytost 1 → Spuštění hodin → Proveď jedno kolo
+        └── Běžeč bytosti → Bytost 2 → Spuštění hodin → Proveď jedno kolo
+        └── Běžeč bytosti → Bytost 3 → Spuštění hodin → Proveď jedno kolo
         └── ...
 ```
 
-Klíčová designová rozhodnutí:
+Klíčová rozhodnutí o designu:
 
-- **Křemíkové bytosti nedědí objekty Clock.** Mají vlastní metodu `Tick()`, kterou volá `SiliconBeingManager` prostřednictvím `SiliconBeingRunner`, místo aby byly přímo registrovány do hlavní smyčky.
-- **SiliconBeingManager** je spouštěn clock přímo z hlavní smyčky a funguje jako jediný proxy pro všechny bytosti.
-- **SiliconBeingRunner** obaluje `Tick()` každé bytosti na dočasném threadu s timeoutem a jističem pro každou bytost (3 po sobě jdoucí timeouty → 1 minuta cooldown).
-- Provádění každé bytosti je omezeno na **jedno kolo** požadavku AI + volání nástrojů na každý tick clocku, což zajišťuje, že žádná bytost nemůže monopolizovat hlavní smyčku.
-- **Performance Monitor** sleduje dobu provádění clocku pro pozorovatelnost.
+- **Silikonové bytosti nedědí objekt hodin.** Mají vlastní metodu `Tick()`, která je volána `SiliconBeingManagerem` prostřednictvím `SiliconBeingRunneru`, místo aby byly přímo registrovány do hlavní smyčky.
+- **Správce silikonových bytostí** je spouštěn přímo hlavní smyčkou a působí jako jediný agent pro všechny bytosti.
+- **Běžeč silikonových bytostí** obaluje `Tick()` každé bytosti na dočasném vlákně s časovým limitem a jističem pro každou bytost (3 po sobě jdoucí časové limity → 1minutové ochlazení).
+- Provádění každé bytosti je omezeno na **jedno kolo** AI požadavku + volání nástrojů na spuštění hodin, což zajišťuje, že žádná bytost nemůže monopolizovat hlavní smyčku.
+- **Monitor výkonu** sleduje dobu provádění hodin pro pozorovatelnost.
 
-### Prioritní odpověď Kurátora
+### Prioritní Odpověď Kurátora
 
-Když uživatel pošle zprávu Křemíkovému Kurátorovi:
+Když uživatel odešle zprávu silikonovému kurátorovi:
 
 1. Aktuální bytost (např. Bytost A) dokončí své aktuální kolo — **bez přerušení**.
-2. Manager **přeskočí zbývající frontu**.
-3. Smyčka **začne znovu od Kurátora**, což mu umožní okamžité provedení.
+2. Správce **přeskočí zbývající frontu**.
+3. Smyčka **začne znovu od kurátora**, což mu umožní okamžité provedení.
 
-To zajišťuje reakci na interakce uživatele, aniž by docházelo k narušení probíhajících úkolů.
+To zajišťuje reakci na interakci uživatele, aniž by narušovalo probíhající úkoly.
 
 ---
 
-## Architektura komponent
+## Architektura Komponent
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                        CoreHost                          │
-│  (Unifikovaný hostitel — sestavení a správa všech komponent)│
+│                        Core Host                         │
+│  (Unifikovaný host — montáž a správa všech komponent)   │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
 │  ┌──────────┐  ┌──────────────┐  ┌──────────────────┐  │
-│  │ Hlavní    │  │ Service       │  │      Config       │  │
-│  │ smyčka    │  │ Locator       │  │                  │  │
+│  │ Hlavní    │  │ Service      │  │    Konfigurace    │  │
+│  │ smyčka    │  │ Locator      │  │                  │  │
 │  └────┬─────┘  └──────────────┘  └──────────────────┘  │
 │       │                                                  │
 │  ┌────▼─────────────────────────────────────────────┐   │
-│  │        SiliconBeingManager (objekt Clock)         │   │
+│  │     Správce silikonových bytostí (objekt hodin)    │   │
 │  │  ┌─────────┐ ┌─────────┐ ┌─────────┐            │   │
 │  │  │Kurátor   │ │Bytost A │ │Bytost B │  ...       │   │
 │  │  └────┬────┘ └────┬────┘ └────┬────┘            │   │
@@ -84,29 +84,29 @@ To zajišťuje reakci na interakce uživatele, aniž by docházelo k narušení 
 │  ┌───────▼───────────▼───────────▼──────────────────┐   │
 │  │              Sdílené služby                        │   │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────────────┐  │   │
-│  │  │Chat       │  │ Storage  │  │ Permission        │  │   │
-│  │  │System     │  │          │  │ Manager           │  │   │
+│  │  │ Chat     │  │ Úložiště │  │ Správce         │  │   │
+│  │  │ systém   │  │          │  │ oprávnění       │  │   │
 │  │  └──────────┘ └────┬─────┘ └──────────────────┘  │   │
 │  │                   │                               │   │
 │  │  ┌──────────┐ ┌────▼─────┐ ┌──────────────────┐  │   │
-│  │  │ AI       │  │Executory │  │ Tool              │  │   │
-│  │  │ Klient   │  │          │  │ Manager           │  │   │
+│  │  │ AI       │  │Exekutor  │  │ Správce         │  │   │
+│  │  │ klient   │  │          │  │ nástrojů        │  │   │
 │  │  └──────────┘ └──────────┘ └──────────────────┘  │   │
 │  └──────────────────────────────────────────────────┘   │
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │                  Executory                         │   │
+│  │                  Exekutory                         │   │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────────────┐  │   │
-│  │  │ Disk     │  │ Síť      │  │ Příkazový        │  │   │
-│  │  │ Executor │  │ Executor │  │ Executor          │  │   │
+│  │  │  Disk    │  │ Síť      │  │ Příkazový       │  │   │
+│  │  │ exekutor │  │ exekutor │  │ exekutor        │  │   │
 │  │  └──────────┘ └──────────┘ └──────────────────┘  │   │
 │  └──────────────────────────────────────────────────┘   │
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │              IM Provideři                          │   │
+│  │              IM Provideři                         │   │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────────────┐  │   │
-│  │  │ Console  │  │  Web     │  │  Feishu / ...     │  │   │
-│  │  │ Provider │  │ Provider │  │  Provider          │  │   │
+│  │  │ Konzole  │  │  Web     │  │  Feishu / ...    │  │   │
+│  │  │ provider │  │ provider │  │  provider        │  │   │
 │  │  └──────────┘ └──────────┘ └──────────────────┘  │   │
 │  └──────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────┘
@@ -116,370 +116,291 @@ To zajišťuje reakci na interakce uživatele, aniž by docházelo k narušení 
 
 ## Service Locator
 
-`ServiceLocator` je threadsafe singleton registr poskytující přístup ke všem core službám:
+`ServiceLocator` je thread-safe singleton registr poskytující přístup ke všem core službám:
 
 | Vlastnost | Typ | Popis |
 |----------|------|-------------|
-| `ChatSystem` | `ChatSystem` | Centrální manažer chatových relací |
+| `ChatSystem` | `ChatSystem` | Centrální správce chatovacích relací |
 | `IMManager` | `IMManager` | Router IM providerů |
 | `AuditLogger` | `AuditLogger` | Auditní stopa oprávnění |
 | `GlobalAcl` | `GlobalACL` | Globální seznam řízení přístupu |
-| `BeingFactory` | `ISiliconBeingFactory` | Továrna pro vytváření bytostí |
-| `BeingManager` | `SiliconBeingManager` | Manažer životního cyklu aktivních bytostí |
-| `DynamicBeingLoader` | `DynamicBeingLoader` | Loader dynamické kompilace |
-| `TokenUsageAudit` | `ITokenUsageAudit` | Sledování použití tokenů |
-| `TokenUsageAuditManager` | `TokenUsageAuditManager` | Reportování použití tokenů |
+| `BeingFactory` | `ISiliconBeingFactory` | Factory pro vytváření bytostí |
+| `BeingManager` | `SiliconBeingManager` | Správce životního cyklu aktivních bytostí |
+| `DynamicBeingLoader` | `DynamicBeingLoader` | Načítač dynamické kompilace |
+| `TokenUsageAudit` | `ITokenUsageAudit` | Sledování využití tokenů |
+| `TokenUsageAuditManager` | `TokenUsageAuditManager` | Vykazování využití tokenů |
 
 Také udržuje registr `PermissionManager` pro každou bytost, klíčovaný podle GUID bytosti.
 
 ---
 
-## Chatový Systém
+## Chatovací Systém
 
-### Typy relací
+### Typy Relací
 
-Chatový systém podporuje tři typy relací prostřednictvím `SessionBase`:
+Chatovací systém podporuje tři typy relací prostřednictvím `SessionBase`:
 
 | Typ | Třída | Popis |
 |------|-------|-------------|
-| `SingleChat` | `SingleChatSession` | Konverzace jeden-na-jednoho mezi dvěma účastníky |
+| `SingleChat` | `SingleChatSession` | Jedna konverzace mezi dvěma účastníky |
 | `GroupChat` | `GroupChatSession` | Skupinový chat s více účastníky |
-| `Broadcast` | `BroadcastChannel` | Otevřený kanál s pevným ID; bytosti se dynamicky přihlašují a přijímají zprávy pouze po přihlášení |
+| `Broadcast` | `BroadcastChannel` | Otevřený kanál s pevným ID; bytosti se dynamicky přihlašují, přijímají zprávy pouze po přihlášení |
 
-### Broadcast Channel
+### Vysílací Kanál
 
 `BroadcastChannel` je speciální typ relace pro systémová oznámení:
 
-- **Pevné ID kanálu** — Na rozdíl od `SingleChatSession` a `GroupChatSession` je ID kanálu veřejně známá konstanta, nikoli odvozená od GUID členů.
-- **Dynamické přihlašování** — Bytosti se přihlašují/odhlašují za běhu; přijímají pouze zprávy publikované po jejich přihlášení.
+- **Pevné ID kanálu** — Na rozdíl od `SingleChatSession` a `GroupChatSession`, ID kanálu je známá konstanta, ne odvozená z GUID členů.
+- **Dynamické přihlášení** — Bytosti se přihlašují/odhlašují za běhu; přijímají pouze zprávy publikované po jejich přihlášení.
 - **Filtrování čekajících zpráv** — `GetPendingMessages()` vrací pouze zprávy publikované po čase přihlášení bytosti, které ještě nebyly přečteny.
-- **Spravováno Chat Systemem** — `GetOrCreateBroadcastChannel()`, `Broadcast()`, `GetPendingBroadcasts()`.
+- **Spravováno chatovacím systémem** — `GetOrCreateBroadcastChannel()`, `Broadcast()`, `GetPendingBroadcasts()`.
 
-### Chatové zprávy
+### Chatovací Zpráva
 
-Model `ChatMessage` obsahuje pole pro kontext konverzace AI a sledování tokenů:
+Model `ChatMessage` obsahuje pole pro kontext AI konverzace a sledování tokenů:
 
 | Pole | Typ | Popis |
 |-------|------|-------------|
-| `Id` | `Guid` | Jedinečný identifikátor zprávy |
-| `SenderId` | `Guid` | Jedinečný identifikátor odesílatele |
+| `Id` | `Guid` | Unikátní identifikátor zprávy |
+| `SenderId` | `Guid` | Unikátní identifikátor odesílatele |
 | `ChannelId` | `Guid` | Identifikátor kanálu/konverzace |
 | `Content` | `string` | Obsah zprávy |
 | `Timestamp` | `DateTime` | Čas odeslání zprávy |
 | `Type` | `MessageType` | Text, obrázek, soubor nebo systémové oznámení |
 | `ReadBy` | `List<Guid>` | ID účastníků, kteří si tuto zprávu přečetli |
-| `Role` | `MessageRole` | Role konverzace AI (uživatel, asistent, nástroj) |
+| `Role` | `MessageRole` | Role AI konverzace (uživatel, asistent, nástroj) |
 | `ToolCallId` | `string?` | ID volání nástroje pro zprávy výsledků nástroje |
-| `ToolCallsJson` | `string?` | Serializovaný JSON volání nástroje pro zprávy asistenta |
-| `Thinking` | `string?` | Řetězec myšlení AI |
+| `ToolCallsJson` | `string?` | Serializovaný JSON volání nástrojů pro zprávy asistenta |
+| `Thinking` | `string?` | Řetězec myšlenek AI reasoningu |
 | `PromptTokens` | `int?` | Počet tokenů v promptu (vstup) |
 | `CompletionTokens` | `int?` | Počet tokenů v completion (výstup) |
 | `TotalTokens` | `int?` | Celkový počet použitých tokenů (vstup + výstup) |
 | `FileMetadata` | `FileMetadata?` | Připojená metadata souboru (pokud zpráva obsahuje soubor) |
 
-### Fronta chatových zpráv
+### Fronta Chatovacích Zpráv
 
-`ChatMessageQueue` je threadsafe systém fronty zpráv pro správu asynchronního zpracování chatových zpráv:
+`ChatMessageQueue` je thread-safe systém fronty zpráv pro správu asynchronního zpracování chatovacích zpráv:
 
-- **Threadsafe** — Zajišťuje bezpečný přístup při souběžném přístupu pomocí zamykacího mechanismu
+- **Thread-safe** — Používá zamykací mechanismus pro bezpečný souběžný přístup
 - **Asynchronní zpracování** — Podporuje asynchronní enqueue a dequeue zpráv
 - **Řazení zpráv** — Zachovává časové pořadí zpráv
 - **Dávkové operace** — Podporuje dávkové načítání zpráv
 
-### Metadata souboru
+### Metadata Souboru
 
-`FileMetadata` slouží ke správě informací o souborech připojených k chatovým zprávám:
+`FileMetadata` slouží ke správě informací o souborech připojených k chatovacím zprávám:
 
 - **Informace o souboru** — Název souboru, velikost, typ, cesta
 - **Čas nahrání** — Časové razítko nahrání souboru
-- **Nahrávající** — ID uživatele nebo křemíkové bytosti, která soubor nahrála
+- **Nahrávající** — ID uživatele nebo silikonové bytosti, která soubor nahrála
 
-### Manažer zrušení streamu
+### Správce Zrušení Streamu
 
-`StreamCancellationManager` poskytuje mechanismus zrušení pro streamované odpovědi AI:
+`StreamCancellationManager` poskytuje mechanismus zrušení pro AI streamované odpovědi:
 
-- **Řízení streamu** — Podporuje zrušení probíhajících streamovaných odpovědí AI
-- **Čištění zdrojů** — Správně čistí související zdroje při zrušení
-- **Concurrenční bezpečí** — Podporuje správu více streamů současně
-
-### Zobrazení historie chatu
-
-Nově přidaná funkce zobrazení historie chatu umožňuje uživatelům procházet historické konverzace křemíkových bytostí:
-
-- **Seznam relací** — Zobrazuje všechny historické relace
-- **Detaily zpráv** — Zobrazuje úplnou historii zpráv
-- **Zobrazení časové osy** — Zobrazuje zprávy v chronologickém pořadí
-- **Podpora API** — Poskytuje RESTful API pro získávání dat relací a zpráv
+- **Ovládání streamu** — Podporuje zrušení probíhajících AI streamovaných odpovědí
+- **Čištění zdrojů** — Správně čistí přidružené zdroje při zrušení
+- **Souběžně bezpečný** — Podporuje správu více streamů současně
 
 ---
 
-## Systém AI Klientů
+## AI Klientský Systém
 
-Systém podporuje více AI backendů prostřednictvím rozhraní `IAIClient`:
+### IAIClient Rozhraní
 
-### OllamaClient
+```csharp
+public interface IAIClient
+{
+    string Name { get; }
+    Task<AIResponse> ChatAsync(AIRequest request);
+    IAsyncEnumerable<string> StreamChatAsync(AIRequest request);
+}
+```
 
-- **Typ**: Lokální AI služba
-- **Protokol**: Nativní Ollama HTTP API (`/api/chat`, `/api/generate`)
-- **Funkce**: Streaming, volání nástrojů, lokální hostování modelů
-- **Konfigurace**: `endpoint`, `model`, `temperature`, `maxTokens`
+### Implementace Klientů
 
-### DashScopeClient (Alibaba Cloud Bailian)
+- **OllamaClient** — Lokální AI přes Ollama API
+- **DashScopeClient** — Cloudová AI přes Alibaba Cloud Bailian API
 
-- **Typ**: Cloudová AI služba
-- **Protokol**: API kompatibilní s OpenAI (`/compatible-mode/v1/chat/completions`)
-- **Autentizace**: Bearer token (API klíč)
-- **Funkce**: Streaming, volání nástrojů, reasoning content (řetězec myšlení), více oblastí nasazení
-- **Podporované oblasti**:
-  - `beijing` — Severní Čína 2 (Peking)
-  - `virginia` — USA (Virginie)
-  - `singapore` — Singapur
-  - `hongkong` — Hongkong, Čína
-  - `frankfurt` — Německo (Frankfurt)
-- **Podporované modely** (dynamicky zjišťovány prostřednictvím API s fallback seznamem):
-  - **Řada Tongyi Qianwen**: qwen3-max, qwen3.6-plus, qwen3.6-flash, qwen-max, qwen-plus, qwen-turbo, qwen3-coder-plus
-  - **Reasoning**: qwq-plus
-  - **Třetí strany**: deepseek-v3.2, deepseek-r1, glm-5.1, kimi-k2.5, llama-4-maverick
-- **Konfigurace**: `apiKey`, `region`, `model`
-- **Zjišťování modelů**: Runtime získávání dostupných modelů z Bailian API; fallback na kurátovaný seznam při selhání sítě
+### Factory Pattern
 
-### Factory vzor klientů
+Každý AI klient má odpovídající factory:
 
-Každý typ AI klienta má odpovídající factory implementaci `IAIClientFactory`:
+```csharp
+public interface IAIClientFactory
+{
+    IAIClient CreateClient(AIClientConfig config);
+}
+```
 
-- `OllamaClientFactory` — Vytváří instance OllamaClient
-- `DashScopeClientFactory` — Vytváří instance DashScopeClient
-
-Factory poskytují:
-- `CreateClient(Dictionary<string, object> config)` — Vytvoří klienta z konfigurace
-- `GetConfigKeyOptions(string key, ...)` — Vrací dynamické možnosti pro klíče konfigurace (např. dostupné modely, oblasti)
-- `GetDisplayName()` — Lokalizovaný zobrazovaný název typu klienta
-
-### Přehled podpory AI platforem
-
-#### Vysvětlení stavu
-- ✅ Implementováno
-- 🚧 Ve vývoji
-- 📋 Plánováno
-- 💡 Zvažováno
-
-*Poznámka: Kvůli síťovému prostředí vývojáře může přístup k [Zvažováno] cloudovým AI službám v zahraničí vyžadovat použití proxy nástrojů a proces ladění může být nestabilní.*
-
-#### Seznam platforem
-
-| Platforma | Stav | Typ | Popis |
-|------|------|------|------|
-| Ollama | ✅ | Lokální | Lokální AI služba, podpora lokálního nasazení modelů |
-| DashScope (Alibaba Cloud Bailian) | ✅ | Cloud | AI služba Alibaba Cloud Bailian, podpora více oblastí nasazení |
-| Baidu Qianfan (ERNIE Bot) | 📋 | Cloud | AI služba Baidu ERNIE Bot |
-| Zhipu AI (GLM) | 📋 | Cloud | AI služba Zhipu Qingyan |
-| Moonshot AI (Kimi) | 📋 | Cloud | AI služba Moonshot Kimi |
-| Volcano Ark Engine.Doubao | 📋 | Cloud | AI služba ByteDance Doubao |
-| DeepSeek (přímé připojení) | 📋 | Cloud | AI služba DeepSeek |
-| 01.AI | 📋 | Cloud | AI služba 01.AI |
-| Tencent Hunyuan | 📋 | Cloud | AI služba Tencent Hunyuan |
-| SiliconFlow | 📋 | Cloud | AI služba SiliconFlow |
-| MiniMax | 📋 | Cloud | AI služba MiniMax |
-| OpenAI | 💡 | Cloud | API služba OpenAI (řada GPT) |
-| Anthropic | 💡 | Cloud | AI služba Anthropic Claude |
-| Google DeepMind | 💡 | Cloud | AI služba Google Gemini |
-| Mistral AI | 💡 | Cloud | AI služba Mistral |
-| Groq | 💡 | Cloud | Služba rychlého AI inference Groq |
-| Together AI | 💡 | Cloud | Služba open-source modelů Together AI |
-| xAI | 💡 | Cloud | Služba xAI Grok |
-| Cohere | 💡 | Cloud | Podniková NLP služba Cohere |
-| Replicate | 💡 | Cloud | Platforma pro hostování open-source modelů Replicate |
-| Hugging Face | 💡 | Cloud | Open-source AI komunita a platforma modelů Hugging Face |
-| Cerebras | 💡 | Cloud | Služba optimalizovaná pro AI inference Cerebras |
-| Databricks | 💡 | Cloud | Podniková AI platforma Databricks (MosaicML) |
-| Perplexity AI | 💡 | Cloud | Služba vyhledávání a odpovědí Perplexity AI |
-| NVIDIA NIM | 💡 | Cloud | Microslužba AI inference NVIDIA |
+Factory jsou automaticky objevovány a registrovány prostřednictvím reflexe.
 
 ---
 
-## Klíčová designová rozhodnutí
+## Systém Nástrojů
 
-### Storage jako instance třídy (ne statická)
+### Objevování Nástrojů
 
-`IStorage` je navrženo jako injectovatelná instance, nikoli statický nástroj. To zajišťuje:
+Nástroje jsou automaticky objevovány prostřednictvím reflexe:
 
-- Přímý přístup k souborovému systému — IStorage je interní persistenční kanál systému, **ne** routovaný přes Executory.
-- **AI nemůže ovládat IStorage** — Executory spravují IO iniciované nástroji AI; IStorage spravuje interní čtení/zápis dat frameworku. Jde o zásadně odlišné concerns.
-- Testovatelnost s mock implementacemi.
-- Podpora různých storage backendů v budoucnosti bez úpravy spotřebitelů.
+1. Skenování všech sestav pro třídy implementující `ITool`
+2. Vytvoření instance a registrace do `ToolManager` každé bytosti
+3. Podpora atributu `[SiliconManagerOnly]` pro nástroje pouze pro kurátora
 
-### Executory jako bezpečnostní hranice
+### Vykonávání Nástrojů
 
-Executory jsou **jedinou** cestou pro I/O operace. Nástroje vyžadující přístup k disku, síti nebo příkazovému řádku **musí** procházet přes Executory. Tento design vynucuje:
-
-- **Samostatný dispatch thread** pro každý executor s thread lockem pro ověřování oprávnění.
-- Centralizované kontroly oprávnění — Executory dotazují **soukromý Permission Manager** bytosti.
-- Fronta požadavků s podporou priority a timeout kontroly.
-- Audit log všech externích operací.
-- Izolace výjimek — selhání jednoho executoru neovlivní ostatní executory.
-- Jistič — Dočasné pozastavení executoru po连续的 selháních k prevenci kaskádových selhání.
-
-### ContextManager jako lehký objekt
-
-Každé `ExecuteOneRound()` vytváří novou instanci `ContextManager`:
-
-1. Načte soubor duše + nedávnou historii chatu.
-2. Odešle požadavek na AI klienta.
-3. Smyčka zpracování volání nástrojů, dokud AI nevrátí čistý text.
-4. Persistuje odpověď do chatového systému.
-5. Dispose.
-
-To udržuje každé kolo izolované a bezstavové.
-
-### Sebe-evoluce prostřednictvím override třídy
-
-Křemíkové bytosti mohou přepsat svou vlastní C# třídu za běhu:
-
-1. AI generuje kód nové třídy (musí dědit `SiliconBeingBase`).
-2. **Kontrola referencí při kompilaci** (primární obrana): Kompilátor získá pouze povolený seznam assembly — `System.IO`, `System.Reflection` atd. jsou vyloučeny, takže nebezpečný kód je nemožný na úrovni typů.
-3. **Statická analýza za běhu** (sekundární obrana): `SecurityScanner` skenuje kód pro nebezpečné vzory po úspěšné kompilaci.
-4. Roslyn zkompiluje kód v paměti.
-5. Při úspěchu: `SiliconBeingManager.ReplaceBeing()` vymění aktuální instanci, migruje stav a persistuje zašifrovaný kód na disk.
-6. Při selhání: Zahodí nový kód, zachová existující implementaci.
-
-Vlastní implementace `IPermissionCallback` mohou být také kompilovány a injektovány prostřednictvím `ReplacePermissionCallback()`, což umožňuje bytostem přizpůsobit si vlastní logiku oprávnění.
-
-Kód je uložen na disku šifrovaný pomocí AES-256. Šifrovací klíč je odvozen z GUID bytosti (velká písmena) prostřednictvím PBKDF2.
+```
+AI vrací tool_calls
+  ↓
+ToolManager najde a ověří použití nástroje
+  ↓
+Správce oprávnění zkontroluje řetězec oprávnění
+  ↓
+Exekutor provede operaci přístupu ke zdroji
+  ↓
+AI přijme výsledek nástroje, pokračuje v myšlení
+```
 
 ---
 
-## Audit použití Tokenů
+## 32 Kalendářových Systémů
 
-`TokenUsageAuditManager` sleduje spotřebu AI tokenů pro všechny bytosti:
+Platforma podporuje 32 kalendářových systémů:
 
-- `TokenUsageRecord` — Záznam pro každý požadavek (ID bytosti, model, prompt tokeny, completion tokeny, časové razítko)
-- `TokenUsageSummary` — Agregované statistiky
-- `TokenUsageQuery` — Parametry dotazu pro filtrování záznamů
-- Persistováno prostřednictvím `ITimeStorage` pro časové řady dotazů
-- Přístupné prostřednictvím Web UI (AuditController) a `TokenAuditTool` (pouze pro Kurátora)
+### Hlavní Kalendáře (6)
+- Gregoriánský, Čínský lunární, Islámský, Hebrejský, Perský, Indický
 
----
+### Čínské Historické (2)
+- Čínský historický (cyklický letopočet + éry panovníků), Sexagenární
 
-## Kalendářový Systém
+### Východoasijské (6)
+- Japonský, Vietnamský, Tibetský, Mongolský, Dai, Dehong Dai
 
-Systém obsahuje **32 kalendářních implementací** odvozených od abstraktní třídy `CalendarBase`, pokrývajících hlavní světové kalendářní systémy:
+### Historické (6)
+- Mayský, Římský, Juliánský, Francouzský republikánský, Koptský, Etiopský
 
-| Kalendář | ID | Popis |
-|----------|-----|-------------|
-| BuddhistCalendar | `buddhist` | Buddhistský kalendář (BE), rok + 543 |
-| CherokeeCalendar | `cherokee` | Kalendářní systém Cherokee |
-| ChineseLunarCalendar | `lunar` | Čínský lunární kalendář s přestupnými měsíci |
-| ChulaSakaratCalendar | `chula_sakarat` | Chula Sakarat (CS), rok - 638 |
-| CopticCalendar | `coptic` | Koptský kalendář |
-| DaiCalendar | `dai` | Dai kalendář s kompletním lunárním výpočtem |
-| DehongDaiCalendar | `dehong_dai` | Varianta Dehong Dai kalendáře |
-| EthiopianCalendar | `ethiopian` | Etiopský kalendář |
-| FrenchRepublicanCalendar | `french_republican` | Francouzský republikánský kalendář |
-| GregorianCalendar | `gregorian` | Standardní gregoriánský kalendář |
-| HebrewCalendar | `hebrew` | Hebrejský (židovský) kalendář |
-| IndianCalendar | `indian` | Indický národní kalendář |
-| InuitCalendar | `inuit` | Kalendářní systém Inuit |
-| IslamicCalendar | `islamic` | Islámský Hijri kalendář |
-| JapaneseCalendar | `japanese` | Japonský kalendář éry (Nengo) |
-| JavaneseCalendar | `javanese` | Jávský islámský kalendář |
-| JucheCalendar | `juche` | Kalendář Juche (Severní Korea), rok - 1911 |
-| JulianCalendar | `julian` | Juliánský kalendář |
-| KhmerCalendar | `khmer` | Khmerský kalendář |
-| MayanCalendar | `mayan` | Mayský dlouhý kalendář |
-| MongolianCalendar | `mongolian` | Mongolský kalendář |
-| PersianCalendar | `persian` | Perský (Solar Hijri) kalendář |
-| RepublicOfChinaCalendar | `roc` | Kalendář Čínské republiky (Minguo), rok - 1911 |
-| RomanCalendar | `roman` | Římský kalendář |
-| SakaCalendar | `saka` | Saka kalendář (Indonésie) |
-| SexagenaryCalendar | `sexagenary` | Čínský kalendář Ganzhi |
-| TibetanCalendar | `tibetan` | Tibetský kalendář |
-| VietnameseCalendar | `vietnamese` | Vietnamský lunární kalendář (varianta kočky) |
-| VikramSamvatCalendar | `vikram_samvat` | Kalendář Vikram Samvat |
-| YiCalendar | `yi` | Kalendářní systém Yi |
-| ZoroastrianCalendar | `zoroastrian` | Zoroastriánský kalendář |
+### Regionální (6)
+- Buddhistický, Saka, Vikram Samvat, Jávský, Chula Sakarat, Khmerský
 
-`CalendarTool` poskytuje operace: `now`, `format`, `add_days`, `diff`, `list_calendars`, `get_components`, `get_now_components`, `convert` (konverze data mezi kalendáři).
+### Moderní (3)
+- ROC, Čučche, Zoroastriánský
+
+### Etnické (3)
+- Yi, Čerokézský, Inuitský
 
 ---
 
-## Architektura Web UI
+## Web UI Architektura
+
+### Server-Side Rendering
+
+Web UI používá čistý server-side rendering, žádná závislost na frontendovém frameworku:
+
+- **HtmlBuilder** — Generuje HTML z C#
+- **CssBuilder** — Generuje CSS styly
+- **JsBuilder** — Generuje JavaScript
+
+### SSE (Server-Sent Events)
+
+Real-time aktualizace přes Server-Sent Events:
+
+- Streamování chatovacích odpovědí
+- Aktualizace stavu bytostí
+- Systémová oznámení
+- Automatické opětovné připojení klienta
 
 ### Systém Skinů
 
-Web UI má **rozšiřitelný systém skinů**, který umožňuje kompletní přizpůsobení UI bez změny aplikační logiky:
+Skinů jsou automaticky objevovány prostřednictvím reflexe:
 
-- **Rozhraní ISkin** — Definuje kontrakty pro všechny skiny, včetně:
-  - Core renderovací metody (`RenderHtml`, `RenderError`)
-  - 20+ metod UI komponent (tlačítka, vstupy, karty, tabulky, odznaky, bubliny, progress, tagy atd.)
-  - Generování témat CSS prostřednictvím `CssBuilder`
-  - `SkinPreviewInfo` — Paleta barev a ikony pro výběr skinu na inicializační stránce
-
-- **Vestavěné skiny** — 4 produkčně připravené skiny:
-  - **Admin** — Profesionální, datově orientované rozhraní pro správu systému
-  - **Chat** — Konverzační, message-centric design pro AI interakce
-  - **Creative** — Umělecké, vizuálně bohaté rozložení pro kreativní workflow
-  - **Dev** — Developer-centric, code-centric rozhraní se zvýrazněním syntaxe
-
-- **Objevování skinů** — `SkinManager` automaticky objevuje a registruje všechny implementace `ISkin` prostřednictvím reflexe
-
-### HTML / CSS / JS Buildery
-
-Web UI se zcela vyhýbá souborům šablon a generuje veškeré značky v C#:
-
-- **`H`** — Streamovaný HTML Builder DSL pro sestavování HTML stromů v kódu
-- **`CssBuilder`** — CSS Builder s podporou selektorů a media queries
-- **`JsBuilder` (`JsSyntax`)** — JavaScript Builder pro inline skripty
-
-### Systém Kontrolerů
-
-Web UI následuje **MVC-like vzor** s 17 kontrolery obsluhujícími různé aspekty:
-
-| Kontroler | Účel |
-|------------|---------|
-| About | O stránce a informace o projektu |
-| Audit | Dashboard auditu použití tokenů s grafy trendů a exportem |
-| Being | Správa a stav křemíkových bytostí |
-| Chat | Rozhraní chatu v reálném čase se SSE |
-| CodeBrowser | Prohlížení a úprava kódu |
-| Config | Správa systémové konfigurace |
-| Dashboard | Přehled systému a metriky |
-| Executor | Stav a správa executorů |
-| Init | Průvodce inicializací pro první spuštění |
-| Knowledge | Vizualizace knowledge graph (placeholder) |
-| Log | Prohlížeč systémových logů |
-| Memory | Prohlížeč dlouhodobé paměti s pokročilým filtrováním, statistikami a zobrazením detailů |
-| Permission | Správa oprávnění |
-| PermissionRequest | Fronta požadavků na oprávnění |
-| Project | Správa projektů (placeholder) |
-| Task | Rozhraní systému úkolů |
-| Timer | Správa systému časovačů |
-
-### Aktualizace v reálném čase
-
-- **SSE (Server-Sent Events)** — Push aktualizace pro chatové zprávy, stav bytostí a systémové události prostřednictvím `SSEHandler`
-- **Žádné WebSocket** — Jednodušší architektura pomocí SSE pro většinu potřeb v reálném čase
-- **Automatické opětovné připojení** — Logika opětovného připojení klienta pro odolné připojení
-
-### Lokalizace
-
-Vestavěny tři locale: `ZhCN` (zjednodušená čínština), `ZhHK` (tradiční čínština) a `EnUS` (angličtina). Aktivní locale se vybírá prostřednictvím `DefaultConfigData.Language` a parsuje se prostřednictvím `LocalizationManager`.
+- **Admin** — Profesionální správcovské rozhraní
+- **Chat** — Design zaměřený na konverzaci
+- **Creative** — Kreativní a umělecký styl
+- **Dev** — Rozložení orientované na vývojáře
 
 ---
 
-## Struktura datového adresáře
+## Bezpečnostní Architektura
+
+### Vrstvená Obrana
 
 ```
-data/
-└── SiliconManager/
-    ├── {curator-guid}/
-    │   ├── soul.md          # Soubor duše Kurátora
-    │   ├── state.json       # Stav za běhu
-    │   ├── code.enc         # Šifrovaný kód vlastní třídy AES
-    │   └── permission.enc   # Šifrovaný vlastní callback oprávnění AES
-    │
-    └── {being-guid}/
-        ├── soul.md
-        ├── state.json
-        ├── code.enc
-        └── permission.enc
+Volání nástroje → Exekutor → Správce oprávnění → Vysoké zamítnutí → Vysoké povolení → Callback → Dotaz uživatele
 ```
+
+### Exekutory jako Bezpečnostní Hranice
+
+- Všechny I/O operace musí procházet přes exekutory
+- Každý exekutor má nezávislé plánovací vlákno
+- Kontrola oprávnění před provedením
+- Zpracování časového limitu a izolace výjimek
+
+### Dynamická Kompilační Bezpečnost
+
+- AES-256 šifrování zkompilovaného kódu
+- Statické skenování nebezpečných vzorů kódu
+- Kontrola referencí při kompilaci (vyloučení nebezpečných sestav)
+- Izolace paměti pro kompilovaný kód
+
+---
+
+## Datové Úložiště
+
+### IStorage Rozhraní
+
+```csharp
+public interface IStorage
+{
+    Task<string> ReadAsync(string key);
+    Task WriteAsync(string key, string value);
+    Task<bool> ExistsAsync(string key);
+    Task DeleteAsync(string key);
+}
+```
+
+### ITimeStorage Rozhraní
+
+```csharp
+public interface ITimeStorage
+{
+    Task<IEnumerable<string>> ReadByTimeAsync(DateTime start, DateTime end);
+    Task<IEnumerable<string>> ReadByTimeAsync(DateTime start, DateTime end, string prefix);
+}
+```
+
+### Implementace
+
+- **FileSystemStorage** — Výchozí implementace založená na souborovém systému
+- Struktura klíč-hodnota
+- Časově indexované dotazy
+- Přístup k přímému souborovému systému — **AI nemůže ovládat IStorage**
+
+---
+
+## Lokalizační Systém
+
+### Podporované Jazyky (21 variant)
+
+- **Čínština (6)**: Zjednodušená, Tradiční, Singapurská, Macajská, Tchajwanská, Malajsijská
+- **Angličtina (10)**: Americká, Britská, Kanadská, Australská, Indická, Singapurská, Jihhoafrická, Irská, Novozélandská, Malajsijská
+- **Španělština (2)**: Španělská, Mexická
+- **Japonština, Korejština, Čeština**
+
+### Implementace
+
+```csharp
+public abstract class LocalizationBase
+{
+    public abstract string LanguageCode { get; }
+    public abstract string GetTranslation(string key);
+}
+```
+
+---
+
+## Další Kroky
+
+- 🚀 Podívejte se na [Průvodce Rychlým Startem](getting-started.md)
+- 🛠️ Přečtěte si [Vývojářskou Příručku](development-guide.md)
+- 📚 Prozkoumejte [Referenci API](api-reference.md)
+- 🔒 Pochopte [Bezpečnostní Návrh](security.md)

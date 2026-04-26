@@ -1,6 +1,6 @@
-# 認识您的数字伴侣
+﻿# 認识您的数字伴侣
 
-[English](promo.md) | [简体中文](docs/zh-CN/promo.md) | [繁體中文](docs/zh-HK/promo.md) | [Español](docs/es-ES/promo.md) | [日本語](docs/ja-JP/promo.md) | [한국어](docs/ko-KR/promo.md) | [Čeština](docs/cs-CZ/promo.md)
+[English](../en/promo.md) | [中文](../zh-CN/promo.md) | **繁體中文** | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Čeština](../cs-CZ/promo.md)
 
 ## 如果您的計算機能自己思考會怎样？
 

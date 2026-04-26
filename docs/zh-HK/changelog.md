@@ -1,6 +1,6 @@
-# 變更日誌
+﻿# 變更日誌
 
-[English](changelog.md) | [简体中文](docs/zh-CN/changelog.md) | [繁體中文](docs/zh-HK/changelog.md) | [Español](docs/es-ES/changelog.md) | [日本語](docs/ja-JP/changelog.md) | [한국어](docs/ko-KR/changelog.md) | [Čeština](docs/cs-CZ/changelog.md)
+[English](../en/changelog.md) | [中文](../zh-CN/changelog.md) | **繁體中文** | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md)
 
 本專案的所有重要變更都將記錄在此檔案中。
 

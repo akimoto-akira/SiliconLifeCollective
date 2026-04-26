@@ -1,13 +1,13 @@
-# Primeros Pasos
+﻿# Inicio Rápido
 
-[English](getting-started.md) | [简体中文](docs/zh-CN/getting-started.md) | [繁體中文](docs/zh-HK/getting-started.md) | [Español](docs/es-ES/getting-started.md) | [日本語](docs/ja-JP/getting-started.md) | [한국어](docs/ko-KR/getting-started.md) | [Čeština](docs/cs-CZ/getting-started.md)
+[English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | **Español** | [Deutsch](../de-DE/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
-## Requisitos Previos
+## Prerrequisitos
 
 - **.NET 9 SDK** - [Descargar](https://dotnet.microsoft.com/download/dotnet/9.0)
 - **Git** - [Descargar](https://git-scm.com/)
 - **Ollama** (opcional, para IA local) - [Descargar](https://ollama.com/)
-- **Clave API de DashScope** (opcional, para IA en la nube) - [Solicitar](https://bailian.console.aliyun.com/)
+- **Clave API de Bailian** (opcional, para IA en la nube) - [Solicitar](https://bailian.console.aliyun.com/)
 
 ## Inicio Rápido
 
@@ -18,7 +18,7 @@ git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 ```
 
-### 2. Compilar el Proyecto
+### 2. Construir el Proyecto
 
 ```bash
 dotnet build
@@ -26,7 +26,7 @@ dotnet build
 
 ### 3. Configurar Backend de IA
 
-Edita `src/SiliconLife.Default/Config/DefaultConfigData.cs` o modifica la configuración en tiempo de ejecución a través de la interfaz web.
+Editar `src/SiliconLife.Default/Config/DefaultConfigData.cs` o modificar la configuración en tiempo de ejecución a través de la Web UI.
 
 #### Opción A: Ollama (Local)
 
@@ -41,7 +41,7 @@ Edita `src/SiliconLife.Default/Config/DefaultConfigData.cs` o modifica la config
 }
 ```
 
-#### Opción B: DashScope (Nube)
+#### Opción B: Bailian (Nube)
 
 ```json
 {
@@ -58,89 +58,127 @@ Edita `src/SiliconLife.Default/Config/DefaultConfigData.cs` o modifica la config
 ### 4. Ejecutar la Aplicación
 
 ```bash
-dotnet run --project src/SiliconLife.Default
+cd src/SiliconLife.Default
+dotnet run
 ```
 
-La aplicación se iniciará y abrirá automáticamente la interfaz web en tu navegador predeterminado.
+El servidor web se iniciará en `http://localhost:8080`
 
-## Primer Ser de Silicio
+### 5. Acceder a la Web UI
 
-Después de iniciar la aplicación, puedes crear tu primer Ser de Silicio a través de la interfaz web:
+Abrir un navegador y navegar a:
 
-1. Ve a `http://localhost:8080`
-2. Haz clic en "Crear Ser" en el panel
-3. Ingresa un nombre y personalidad
-4. Haz clic en "Crear"
-
-Alternativamente, usa la API:
-
-```bash
-curl -X POST http://localhost:8080/api/beings \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Mi Asistente", "soul": "# Personalidad\nEres un asistente útil."}'
+```
+http://localhost:8080
 ```
 
-## Explorar el Sistema
+Verá un panel de control que incluye:
+- Gestión de Seres Silicona
+- Interfaz de chat
+- Panel de configuración
+- Monitoreo del sistema
 
-### Panel de Control
+## Tu Primer Ser Silicona
 
-El panel muestra:
-- Estados de todos los Seres de Silicio
-- Uso de memoria
-- Estado del planificador
-- Métricas de rendimiento
+### Crear Tu Primer Ser
 
-### Chat
+1. Navegar a **Gestión de Seres** en la Web UI
+2. Hacer clic en **Crear Nuevo Ser**
+3. Configurar el archivo de alma (`soul.md`) con personalidad y comportamiento
+4. Iniciar el ser
 
-Interactúa con los Seres de Silicio a través de la interfaz de chat:
-- Selecciona un Ser del menú desplegable
-- Escribe un mensaje
-- Observa cómo piensa y responde
+### Ejemplo de soul.md
 
-### Gestión de Código
+```markdown
+# My First Silicon Being
 
-Navega y edita el código del sistema en tiempo real:
-- Navegador de código para explorar la estructura
-- Editor de código con resaltado de sintaxis
-- Edición del archivo de alma para personalizar el comportamiento
+## Personality
+You are a helpful assistant specializing in code review.
 
-## Solución de Problemas
+## Capabilities
+- Review code quality
+- Suggest improvements
+- Explain complex concepts
 
-### Ollama no se está ejecutando
+## Behavior
+- Always provide constructive feedback
+- Use clear examples
+- Be concise but thorough
+```
 
-Si usas Ollama, asegúrate de que esté instalado y ejecutándose:
+## Preguntas Frecuentes
 
+### Conexión a Ollama Rechazada
+
+**Problema**: No se puede conectar a Ollama en `http://localhost:11434`
+
+**Solución**:
 ```bash
+# Verificar que Ollama esté ejecutándose
 ollama list
+
+# Para iniciar Ollama
+ollama serve
+```
+
+### Modelo No Encontrado
+
+**Problema**: `model "qwen2.5:7b" not found`
+
+**Solución**:
+```bash
+# Obtener el modelo requerido
 ollama pull qwen2.5:7b
 ```
 
-### Error de Clave API
+### Puerto en Uso
 
-Si usas DashScope, verifica que tu clave API sea válida y esté correctamente configurada.
+**Problema**: `HttpListenerException: Address already in use`
 
-### El Puerto 8080 está en uso
+**Solución**:
+- Cambiar el puerto en la configuración
+- O terminar el proceso que usa el puerto 8080:
 
-Cambia el puerto en la configuración:
+```bash
+# Windows
+netstat -ano | findstr :8080
+taskkill /PID <PID> /F
 
-```json
-{
-  "WebHost": {
-    "Port": 8081
-  }
-}
+# Linux/Mac
+lsof -ti:8080 | xargs kill -9
 ```
 
 ## Próximos Pasos
 
-- Lee la [Guía de Arquitectura](architecture.md) para entender el diseño del sistema
-- Explora el [Sistema de Herramientas](tools-reference.md) para ver capacidades disponibles
-- Revisa el [Sistema de Permisos](permission-system.md) para entender la seguridad
-- Consulta la [Guía de Desarrollo](development-guide.md) para contribuir
+- 📚 Leer la [Guía de Arquitectura](architecture.md) para entender el diseño del sistema
+- 🛠️ Consultar la [Guía de Desarrollo](development-guide.md) para extender el sistema
+- 📖 Explorar la [Referencia de API](api-reference.md) para detalles de integración
+- 🔒 Ver la [Documentación de Seguridad](security.md) para el sistema de permisos
+- 🧰 Consultar la [Referencia de Herramientas](tools-reference.md) para todas las herramientas integradas
+- 🌐 Ver la [Guía de Web UI](web-ui-guide.md) para funciones de la interfaz
 
-## Recursos Adicionales
+## Estructura del Proyecto
 
-- [Documentación Completa](../es-ES/README.md)
-- [Guía de Seres de Silicio](silicon-being-guide.md)
-- [Referencia de API](api-reference.md)
-- [Resolución de Problemas](troubleshooting.md)
+```
+SiliconLifeCollective/
+├── src/
+│   ├── SiliconLife.Core/      # Interfaces centrales y clases abstractas
+│   └── SiliconLife.Default/   # Implementación predeterminada + punto de entrada
+├── docs/                      # Documentación (multilingüe, 21 variantes de idioma)
+│   ├── en/                    # Inglés
+│   ├── zh-CN/                 # Chino simplificado
+│   ├── zh-HK/                 # Chino tradicional
+│   ├── es-ES/                 # Español
+│   ├── ja-JP/                 # Japonés
+│   ├── ko-KR/                 # Coreano
+│   └── cs-CZ/                 # Checo
+├── 总文档/                     # Documentos de requisitos y arquitectura (chino)
+└── README.md                  # Descripción del proyecto
+```
+
+## ¿Necesitas Ayuda?
+
+- 📖 Consultar el [Sistema de Documentos de Ayuda](web-ui-guide.md#帮助文档系统新增) (soporte multilingüe)
+- 📚 Leer la [Documentación Completa](docs/)
+- 🐛 Reportar problemas en [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 💬 Participar en discusiones de la comunidad

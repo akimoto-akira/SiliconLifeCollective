@@ -1,26 +1,26 @@
-# Development Guide
+﻿# Development Guide
 
-[English](development-guide.md) | [简体中文](docs/zh-CN/development-guide.md) | [繁體中文](docs/zh-HK/development-guide.md) | [Español](docs/es-ES/development-guide.md) | [日本語](docs/ja-JP/development-guide.md) | [한국어](docs/ko-KR/development-guide.md) | [Čeština](docs/cs-CZ/development-guide.md)
+[English](../en/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Deutsch](../de-DE/development-guide.md) | [Čeština](../cs-CZ/development-guide.md)
 
 ## Architecture Overview
 
-SiliconLifeCollective follows a **Body-Brain Architecture** with strict separation between core interfaces and default implementations.
+SiliconLifeCollective follows a **body-brain architecture** with strict separation between core interfaces and default implementations.
 
 ### Project Structure
 
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/      # Interfaces, abstractions, common infrastructure
-│   └── SiliconLife.Default/   # Concrete implementations, entry point
+│   ├── SiliconLife.Core/      # Interfaces, abstract classes, common infrastructure
+│   └── SiliconLife.Default/   # Concrete implementations, entry points
 └── docs/                      # Multi-language documentation
 ```
 
-**Dependency Direction**: `SiliconLife.Default` → `SiliconLife.Core` (one-way)
+**Dependency direction**: `SiliconLife.Default` → `SiliconLife.Core` (one-way)
 
 ## Core Concepts
 
-### 1. Silicon Being (硅基生命体)
+### 1. Silicon Beings
 
 Each AI agent consists of:
 - **Body** (`DefaultSiliconBeing`): Maintains alive state, detects trigger scenarios
@@ -42,7 +42,7 @@ public interface ITool
 
 ### 3. Permission System
 
-5-level permission validation chain:
+5-level permission verification chain:
 ```
 IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
 ```
@@ -60,7 +60,7 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ## Extending the System
 
-### Add a New Tool
+### Adding a New Tool
 
 1. Create a new class in `src/SiliconLife.Default/Tools/`:
 
@@ -88,7 +88,7 @@ public class MyCustomTool : ITool
 }
 ```
 
-2. Tools are automatically discovered via reflection - no manual registration needed!
+2. Tools are auto-discovered via reflection - no manual registration needed!
 
 3. (Optional) Mark as manager-only:
 ```csharp
@@ -96,7 +96,7 @@ public class MyCustomTool : ITool
 public class AdminTool : ITool { ... }
 ```
 
-### Add a New AI Client
+### Adding a New AI Client
 
 1. Implement `IAIClient` in `src/SiliconLife.Default/AI/`:
 
@@ -141,9 +141,9 @@ public class MyAIClientFactory : IAIClientFactory
 }
 ```
 
-3. Factories are automatically discovered and registered.
+3. Factory is auto-discovered and registered.
 
-### Add a New Storage Backend
+### Adding a New Storage Backend
 
 1. Implement `IStorage` and `ITimeStorage` in `src/SiliconLife.Default/Storage/`:
 
@@ -167,7 +167,7 @@ public class DatabaseStorage : IStorage, ITimeStorage
 }
 ```
 
-### Add a New Skin
+### Adding a New Skin
 
 1. Implement `ISkin` in `src/SiliconLife.Default/Web/Skins/`:
 
@@ -190,7 +190,7 @@ public class MyCustomSkin : ISkin
 }
 ```
 
-2. Skins are automatically discovered by the `SkinManager`.
+2. Skin is auto-discovered by `SkinManager`.
 
 ## Code Style Guidelines
 
@@ -212,7 +212,7 @@ SiliconLife.Default/
 ├── Executors/             # Executor implementations
 ├── IM/                    # IM provider implementations
 ├── Localization/          # Localization implementations
-├── Logging/               # Logger provider implementations
+├── Logging/               # Log provider implementations
 ├── Runtime/               # Runtime components
 ├── Security/              # Security implementations
 ├── SiliconBeing/          # Default silicon being implementation
@@ -228,12 +228,12 @@ SiliconLife.Default/
 ### Documentation
 
 - All public APIs must have XML documentation comments
-- Use Apache 2.0 license header in all source files
+- All source files use Apache 2.0 license header
 - Leverage .NET 9 features (implicit usings, nullable reference types)
 
 ## Development Workflow
 
-### 1. Set Up Development Environment
+### 1. Setup Development Environment
 
 ```bash
 # Clone repository
@@ -264,7 +264,7 @@ dotnet test tests/SiliconLife.Core.Tests
 dotnet run --project src/SiliconLife.Default --configuration Debug
 ```
 
-### 4. Code Formatting
+### 4. Format Code
 
 ```bash
 # Format code
@@ -273,7 +273,7 @@ dotnet format
 
 ## Building Custom Features
 
-### Example: Add a Custom Calendar
+### Example: Adding a Custom Calendar
 
 ```csharp
 public class MyCustomCalendar : CalendarBase
@@ -294,7 +294,7 @@ public class MyCustomCalendar : CalendarBase
 }
 ```
 
-### Example: Add a Custom Executor
+### Example: Adding a Custom Executor
 
 ```csharp
 public class CustomExecutor : ExecutorBase
@@ -303,7 +303,7 @@ public class CustomExecutor : ExecutorBase
     
     public override async Task<ExecutorResult> ExecuteAsync(ExecutorRequest request)
     {
-        // Validate permissions first
+        // Verify permissions first
         var permission = await CheckPermissionAsync(request);
         if (!permission.Allowed)
         {
@@ -352,31 +352,31 @@ public class MyToolTests
 
 ### Integration Tests
 
-Test the complete flow:
-1. AI returns tool call
+Test complete flows:
+1. AI returns tool calls
 2. Tool executes
-3. Result feeds back to AI
+3. Results fed back to AI
 4. AI returns final response
 
 ## Performance Considerations
 
 ### Storage System
 
-- The storage system prioritizes **functionality over performance**
-- File-based JSON storage is used by default
+- Storage system prioritizes **functionality over performance**
+- Default uses file-based JSON storage
 - Time-indexed queries use directory structure
 
-### MainLoop Scheduler
+### Main Loop Scheduler
 
-- Tick-based time-slicing for fair scheduling
-- Watchdog timer for detecting stuck operations
-- Circuit breaker for preventing cascade failures
+- Clock-based time-slice fair scheduling
+- Watchdog timers for detecting stuck operations
+- Circuit breakers for preventing cascade failures
 
 ## Best Practices
 
 ### 1. Always Validate Permissions
 
-Any AI-initiated operation must go through the permission chain:
+Any AI-initiated operation must go through permission chain:
 
 ```csharp
 var permission = await permissionManager.CheckAsync(request);
@@ -418,10 +418,10 @@ catch (Exception ex)
 }
 ```
 
-## Contribution Guidelines
+## Contributing Guidelines
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes using conventional commits
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
@@ -442,4 +442,4 @@ docs: update development guide
 - 📚 Read the [Architecture Guide](architecture.md)
 - 📖 Explore the [API Reference](api-reference.md)
 - 🔒 Review the [Security Documentation](security.md)
-- 🚀 Check the [Getting Started Guide](getting-started.md)
+- 🚀 See the [Quick Start Guide](getting-started.md)

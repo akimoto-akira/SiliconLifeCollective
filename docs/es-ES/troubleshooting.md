@@ -1,516 +1,273 @@
-# Resolución de Problemas
+﻿# Guía de Solución de Problemas
 
-[English](troubleshooting.md) | [简体中文](docs/zh-CN/troubleshooting.md) | [繁體中文](docs/zh-HK/troubleshooting.md) | [Español](docs/es-ES/troubleshooting.md) | [日本語](docs/ja-JP/troubleshooting.md) | [한국어](docs/ko-KR/troubleshooting.md) | [Čeština](docs/cs-CZ/troubleshooting.md)
+[English](../en/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | **Español** | [Deutsch](../de-DE/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md)
 
-## Problemas Comunes
+## Preguntas Frecuentes
 
----
+### Construcción y Compilación
 
-## La Aplicación No Se Inicia
+#### Problema: Construcción falla por dependencias faltantes
 
-### Síntoma
+**Síntomas**:
+```
+error CS0246: The type or namespace name 'Microsoft.CodeAnalysis' could not be found
+```
 
-Error al ejecutar `dotnet run`
+**Solución**:
+```bash
+dotnet restore
+dotnet build
+```
 
-### Soluciones
+#### Problema: SDK de .NET no encontrado
 
-#### 1. Verificar .NET SDK
+**Síntomas**:
+```
+The .NET SDK could not be found
+```
 
+**Solución**:
+1. Instalar .NET 9 SDK: https://dotnet.microsoft.com/download/dotnet/9.0
+2. Verificar instalación:
 ```bash
 dotnet --version
 ```
 
-Debe ser 9.0 o superior. Si no está instalado:
-- Descargar desde [dotnet.microsoft.com](https://dotnet.microsoft.com/download/dotnet/9.0)
-
-#### 2. Restaurar Dependencias
-
-```bash
-dotnet restore
-```
-
-#### 3. Compilar Primero
-
-```bash
-dotnet build
-```
-
-#### 4. Verificar Puerto
-
-Si el puerto 8080 está en uso:
-
-```json
-// config.json
-{
-  "WebHost": {
-    "Port": 8081
-  }
-}
-```
-
 ---
 
-## Ollama No Funciona
+### Problemas de Conexión de IA
 
-### Síntoma
+#### Problema: Conexión a Ollama rechazada
 
-Error de conexión a Ollama
+**Síntomas**:
+```
+Failed to connect to Ollama at http://localhost:11434
+```
 
-### Soluciones
-
-#### 1. Verificar que Ollama Está Ejecutándose
-
+**Solución**:
 ```bash
+# Verificar que Ollama esté ejecutándose
+ollama list
+
+# Iniciar Ollama
+ollama serve
+
+# Probar conexión
+curl http://localhost:11434/api/tags
+```
+
+#### Problema: Modelo no encontrado
+
+**Síntomas**:
+```
+model "qwen2.5:7b" not found
+```
+
+**Solución**:
+```bash
+# Obtener modelo requerido
+ollama pull qwen2.5:7b
+
+# Listar modelos disponibles
 ollama list
 ```
 
-Si no está instalado, descargar desde [ollama.com](https://ollama.com/)
+#### Problema: Error 404 de Bailian
 
-#### 2. Descargar Modelo
-
-```bash
-ollama pull qwen2.5:7b
+**Síntomas**:
+```
+HTTP 404: Model not found
 ```
 
-#### 3. Verificar URL
-
-```json
-{
-  "AIClients": {
-    "Ollama": {
-      "BaseUrl": "http://localhost:11434"
-    }
-  }
-}
-```
+**Solución**:
+1. Verificar que la clave API sea correcta
+2. Comprobar que el nombre del modelo coincida con el catálogo de Bailian
+3. Verificar que el endpoint de región sea correcto
+4. Comprobar que la cuenta tenga acceso al modelo
 
 ---
 
-## Error de Clave API DashScope
+### Problemas de Ejecución
 
-### Síntoma
+#### Problema: Puerto en uso
 
-Error de autenticación con DashScope
-
-### Soluciones
-
-#### 1. Verificar Clave API
-
-Obtener clave desde [Bailian Console](https://bailian.console.aliyun.com/)
-
-#### 2. Configurar Correctamente
-
-```json
-{
-  "AIClients": {
-    "DashScope": {
-      "ApiKey": "tu-clave-api-aqui",
-      "Model": "qwen-plus"
-    }
-  }
-}
+**Síntomas**:
+```
+HttpListenerException: Address already in use
 ```
 
-#### 3. Verificar Región
+**Solución**:
+- Cambiar puerto en configuración
+- O terminar proceso que usa puerto 8080:
 
-```json
-{
-  "Region": "cn-hangzhou"
-}
+```bash
+# Windows
+netstat -ano | findstr :8080
+taskkill /PID <PID> /F
+
+# Linux/Mac
+lsof -ti:8080 | xargs kill -9
 ```
+
+#### Problema: Web UI no carga
+
+**Síntomas**:
+- Navegador muestra error de conexión
+- Página en blanco
+
+**Solución**:
+1. Verificar que la aplicación se esté ejecutando
+2. Comprobar que el puerto 8080 sea accesible
+3. Verificar que no haya errores en registros del servidor
+4. Intentar limpiar caché del navegador
 
 ---
 
-## Ser No Responde
+### Problemas de Permisos
 
-### Síntoma
+#### Problema: Permisos denegados inesperadamente
 
-El Ser de Silicio no responde a mensajes
+**Síntomas**:
+- Operaciones bloqueadas sin razón aparente
+- Mensajes de "Permiso denegado"
 
-### Soluciones
+**Solución**:
+1. Verificar estado de IsCurator del usuario
+2. Comprobar configuración de límites de velocidad
+3. Revisar reglas de GlobalACL
+4. Verificar lógica de callback
+5. Comprobar timeout de respuesta de usuario
 
-#### 1. Verificar Estado
+#### Problema: Solicitudes de permisos excesivas
 
-Ir a Dashboard y verificar que el ser está "Ejecutando"
+**Síntomas**:
+- Preguntas frecuentes de permisos para mismas operaciones
 
-#### 2. Revisar Logs
-
-```bash
-# Ver logs en interfaz web
-http://localhost:8080/logs
-```
-
-#### 3. Reiniciar Ser
-
-1. Ir a `/beings`
-2. Detener ser
-3. Iniciar ser
-
-#### 4. Verificar Archivo de Alma
-
-```bash
-# Verificar que soul.md existe
-ls DataDirectory/SiliconManager/{being-guid}/soul.md
-```
+**Solución**:
+- Usar caché de frecuencia de usuario
+- Añadir reglas a GlobalACL para recursos frecuentes
+- Implementar callback personalizado para lógica inteligente
 
 ---
 
-## Permisos Denegados
+### Problemas de Ser Silicona
 
-### Síntoma
+#### Problema: Ser no se inicia
 
-Operaciones bloqueadas por permisos
+**Síntomas**:
+- Estado permanece en "Created" o "Starting"
+- Errores en registros
 
-### Soluciones
+**Solución**:
+1. Verificar que archivo de alma existe y es válido
+2. Comprobar que configuración sea correcta
+3. Revisar registros para errores específicos
+4. Verificar que backend de IA sea accesible
 
-#### 1. Revisar Solicitud de Permiso
+#### Problema: Ser se comporta inesperadamente
 
-Ir a `/permission-requests` y aprobar/denegar
+**Síntomas**:
+- Respuestas incorrectas
+- No ejecuta herramientas correctamente
 
-#### 2. Verificar ACL
+**Solución**:
+1. Revisar archivo de alma - ¿define comportamiento claramente?
+2. Verificar que herramientas estén disponibles
+3. Comprobar que permisos estén configurados correctamente
+4. Revisar historial de chat para contexto
 
-```bash
-# Ver configuración de permisos
-http://localhost:8080/permissions
-```
+---
 
-#### 3. Configurar como Curador
+## Registro y Diagnóstico
 
-Si el ser debería tener acceso total:
+### Habilitar Registro Detallado
 
 ```csharp
-being.IsCurator = true;
+config.Logging.Level = LogLevel.Debug;
 ```
+
+### Ubicaciones de Registro
+
+- **Registros del sistema**: `data/logs/`
+- **Registros de ser**: `data/beings/{being-id}/logs/`
+- **Registros de auditoría**: `data/audit/`
+
+### Analizar Registros
+
+Buscar patrones:
+- Errores repetitivos
+- Advertencias de rendimiento
+- Fallos de permisos
 
 ---
 
-## Error de Compilación Dinámica
+## Problemas Comunes y Soluciones
 
-### Síntoma
+### Ollama Lento
 
-Error al ejecutar código dinámico
+**Causa**: Modelo demasiado grande o hardware insuficiente
 
-### Soluciones
+**Soluciones**:
+- Usar modelo más pequeño (ej. `qwen2.5:1.5b`)
+- Aumentar recursos del sistema
+- Considerar usar servicio en la nube
 
-#### 1. Verificar Código
+### Consumo Excesivo de Tokens
 
-Asegurar que el código C# es válido:
+**Causa**: Prompts ineficientes o bucles de herramientas
 
-```csharp
-public class Program 
-{
-    public static string Run() 
-    {
-        return "Hola";
-    }
-}
-```
+**Soluciones**:
+- Optimizar archivo de alma
+- Establecer límites de tokens en configuración
+- Monitorear uso a través de panel de auditoría
 
-#### 2. Revisar Escaneo de Seguridad
+### Almacenamiento Lleno
 
-El código puede ser bloqueado por SecurityScanner. Ver logs para detalles.
+**Causa**: Historial de chat y registros acumulan
 
-#### 3. Verificar Dependencias
-
-Solo se permiten ciertas bibliotecas en código dinámico.
+**Soluciones**:
+- Implementar estrategia de limpieza
+- Archivar datos antiguos
+- Aumentar espacio en disco
 
 ---
 
-## Memoria Llena
+## Herramientas de Diagnóstico
 
-### Síntoma
-
-Alto uso de memoria
-
-### Soluciones
-
-#### 1. Limpiar Memoria Antigua
-
-Usar MemoryTool para eliminar datos antiguos:
-
-```csharp
-memoryTool.Execute("Delete", new { key = "old_data" });
-```
-
-#### 2. Configurar Límites
-
-```json
-{
-  "Memory": {
-    "MaxMessages": 50,
-    "MaxAgeDays": 30
-  }
-}
-```
-
-#### 3. Reiniciar Aplicación
+### Verificar Estado del Sistema
 
 ```bash
-# Detener y reiniciar
-dotnet run --project src/SiliconLife.Default
+curl http://localhost:8080/api/dashboard
 ```
 
----
-
-## Chat No Muestra Mensajes
-
-### Síntoma
-
-La interfaz de chat no muestra mensajes
-
-### Soluciones
-
-#### 1. Verificar SSE
-
-Abrir consola del navegador y verificar conexión SSE:
-
-```javascript
-console.log(EventSource);
-```
-
-#### 2. Recargar Página
-
-Presionar F5 para recargar
-
-#### 3. Verificar Canal
-
-Asegurar que el canal existe:
+### Verificar Estado de Ser
 
 ```bash
-GET /api/channels
+curl http://localhost:8080/api/beings/{being-id}
 ```
 
----
-
-## Error de Localización
-
-### Síntoma
-
-Textos no se muestran en idioma correcto
-
-### Soluciones
-
-#### 1. Verificar Configuración
-
-```json
-{
-  "Language": "EsES"
-}
-```
-
-#### 2. Verificar Implementación
-
-Asegurar que la clase de localización existe:
+### Verificar Permisos
 
 ```bash
-# Verificar archivo
-src/SiliconLife.Default/Localization/EsES.cs
+curl http://localhost:8080/api/permissions?userId=user-uuid
 ```
 
 ---
 
-## Problemas de Rendimiento
+## Contactar Soporte
 
-### Síntoma
+Si el problema persiste:
 
-Aplicación lenta
-
-### Soluciones
-
-#### 1. Monitorear Métricas
-
-Ir a Dashboard para ver:
-- Uso de CPU
-- Uso de memoria
-- Tiempos de respuesta
-
-#### 2. Optimizar Seres
-
-- Reducir número de seres activos
-- Aumentar intervalos de tick
-- Limitar historial de chat
-
-#### 3. Configurar Circuit Breaker
-
-```json
-{
-  "CircuitBreaker": {
-    "MaxFailures": 3,
-    "CooldownMinutes": 1
-  }
-}
-```
+1. 📚 Leer [documentación completa](docs/)
+2. 🐛 Reportar problema en [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+3. 💬 Participar en discusiones de comunidad
+4. 📧 Contactar al maintainer
 
 ---
 
-## Logs Útiles
+## Próximos Pasos
 
-### Ubicación
-
-```
-data/logs/
-```
-
-### Niveles de Log
-
-- Trace: Máximo detalle
-- Debug: Depuración
-- Information: Info general
-- Warning: Advertencias
-- Error: Errores
-- Critical: Errores críticos
-
-### Ver Logs en Tiempo Real
-
-```bash
-http://localhost:8080/logs
-```
-
----
-
-## Obtener Ayuda
-
-### Documentación
-
-- [Documentación Principal](../es-ES/README.md)
-- [Guía de Arquitectura](architecture.md)
-- [Guía de Desarrollo](development-guide.md)
-
-### Reportar Bugs
-
-GitHub Issues: [github.com/akimoto-akira/SiliconLifeCollective/issues](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
-
-### Comunidad
-
-- YouTube: [@hoshinokennji](https://www.youtube.com/@hoshinokennji)
-- Bilibili: [617827040](https://space.bilibili.com/617827040)
-
----
-
-## Problemas de Notas de Trabajo
-
-### Problema: No Se Pueden Crear Notas de Trabajo
-
-**Síntomas**:
-```
-Failed to create work note
-```
-
-**Solución**:
-1. Verificar que el ser existe y está en ejecución
-2. Validar que la ruta de almacenamiento tiene permisos de escritura
-3. Comprobar que el contenido no está vacío (contenido obligatorio)
-4. Revisar logs para información detallada del error
-
-### Problema: Búsqueda de Notas Sin Resultados
-
-**Síntomas**:
-- La búsqueda por palabra clave devuelve resultados vacíos
-- Pero se sabe que hay notas relacionadas
-
-**Solución**:
-1. Comprobar que la ortografía de la palabra clave es correcta
-2. Intentar con una palabra clave más general
-3. Validar que la nota contiene esa palabra clave (distingue mayúsculas/minúsculas)
-4. Aumentar el valor del parámetro `max_results`
-
-### Problema: Generación de Directorio de Notas Lenta
-
-**Síntomas**:
-- Tiempo de respuesta largo al generar directorio
-- El ser tiene muchas notas (>1000 páginas)
-
-**Solución**:
-1. Esto es normal, necesita recorrer todas las notas
-2. Considerar archivar notas antiguas periódicamente
-3. Usar función de búsqueda en lugar de navegación por directorio
-4. Optimización planificada: añadir mecanismo de caché de directorio
-
----
-
-## Problemas de Red de Conocimiento
-
-### Problema: Consulta de Conocimiento Devuelve Vacío
-
-**Síntomas**:
-```
-No knowledge triples found
-```
-
-**Solución**:
-1. Validar ortografía de sujeto y predicado
-2. Comprobar que el conocimiento ha sido añadido a la red
-3. Usar función de búsqueda para coincidencia difusa:
-```json
-{
-  "action": "search",
-  "query": "palabra clave"
-}
-```
-
-### Problema: Falla Búsqueda de Ruta de Conocimiento
-
-**Síntomas**:
-```
-No path found between concepts
-```
-
-**Solución**:
-1. Validar que ambos conceptos existen en la red de conocimiento
-2. Comprobar si existe ruta asociativa (puede que no haya relación directa o indirecta)
-3. Intentar añadir más conocimiento para establecer conexión
-4. Reducir límite de longitud de ruta (si está configurado)
-
-### Problema: Falla Validación de Conocimiento
-
-**Síntomas**:
-```
-Knowledge validation failed
-```
-
-**Solución**:
-1. Comprobar que el formato del triple es correcto (sujeto, predicado, objeto obligatorios)
-2. Validar que la confianza está en rango 0.0-1.0
-3. Comprobar si hay triples duplicados
-4. Revisar detalles del error de validación para entender problema específico
-
-### Problema: Estadísticas de Red de Conocimiento Inexactas
-
-**Síntomas**:
-- Números estadísticos no coinciden con lo esperado
-- Estadísticas no se actualizan después de añadir conocimiento
-
-**Solución**:
-1. Las estadísticas pueden tardar unos segundos en actualizarse (caché)
-2. Comprobar si la operación de eliminación se ejecutó exitosamente
-3. Reiniciar aplicación para forzar actualización de estadísticas
-4. Reconsultar información estadística a través de API
-
----
-
-## Problemas de Gestión de Proyectos
-
-### Problema: No Se Puede Crear Proyecto
-
-**Síntomas**:
-```
-Failed to create project
-```
-
-**Solución**:
-1. Comprobar que el nombre del proyecto no está vacío (obligatorio)
-2. Validar que el nombre del proyecto no está duplicado
-3. Comprobar que la ruta de almacenamiento tiene permisos de escritura
-4. Revisar logs para información detallada del error
-
-### Problema: Pérdida de Datos del Proyecto
-
-**Síntomas**:
-- No se puede cargar información del proyecto
-- Archivo del proyecto corrupto
-
-**Solución**:
-1. Comprobar que el directorio de almacenamiento del proyecto existe
-2. Restaurar datos del proyecto desde backup
-3. Validar que el formato del archivo JSON es correcto
-4. Reparar manualmente archivo del proyecto dañado
+- 📚 Leer la [Guía de Arquitectura](architecture.md)
+- 🛠️ Consultar la [Guía de Desarrollo](development-guide.md)
+- 🔒 Ver la [Documentación de Seguridad](security.md)
+- 🚀 Comenzar con la [Guía de Inicio Rápido](getting-started.md)

@@ -1,4 +1,6 @@
-# はじめに
+﻿# クイックスタート
+
+[English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | **日本語** | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
 ## 前提条件
 
@@ -8,8 +10,6 @@
 - **DashScope API キー**（オプション、クラウド AI 用） - [申請](https://bailian.console.aliyun.com/)
 
 ## クイックスタート
-
-[English](getting-started.md) | [简体中文](docs/zh-CN/getting-started.md) | [繁體中文](docs/zh-HK/getting-started.md) | [Español](docs/es-ES/getting-started.md) | [日本語](docs/ja-JP/getting-started.md) | [한국어](docs/ko-KR/getting-started.md) | [Čeština](docs/cs-CZ/getting-started.md)
 
 ### 1. リポジトリのクローン
 
@@ -26,7 +26,7 @@ dotnet build
 
 ### 3. AI バックエンドの設定
 
-`src/SiliconLife.Default/Config/DefaultConfigData.cs` を編集するか、Web UI を介して実行時に設定を変更します。
+`src/SiliconLife.Default/Config/DefaultConfigData.cs` を編集するか、実行時に Web UI から設定を変更します。
 
 #### オプション A：Ollama（ローカル）
 
@@ -62,62 +62,62 @@ cd src/SiliconLife.Default
 dotnet run
 ```
 
-Web サーバーが `http://localhost:8080` で起動します。
+Web サーバーが `http://localhost:8080` で起動します
 
 ### 5. Web UI へのアクセス
 
-ブラウザを開いて以下に移動します：
+ブラウザを開き、次のアドレスに移動します：
 
 ```
 http://localhost:8080
 ```
 
-以下を含むダッシュボードが表示されます：
-- シリコンビーイング管理
+以下の内容を含むダッシュボードが表示されます：
+- シリコン生命体管理
 - チャットインターフェース
 - 設定パネル
 - システムモニタリング
 
-## 最初のシリコンビーイング
+## 最初のシリコン生命体
 
 ### 最初の生命体を作成
 
 1. Web UI で**生命体管理**に移動
-2. **新しい生命体を作成**をクリック
-3. 個性と行動を含むソウルファイル（`soul.md`）を設定
-4. 生命体を開始
+2. **新生命体を作成**をクリック
+3. ソウルファイル（`soul.md`）を設定。個性と行動を定義
+4. 生命体を起動
 
 ### soul.md の例
 
 ```markdown
-# 私の最初のシリコンビーイング
+# My First Silicon Being
 
-## 個性
-あなたはコードレビューを専門とする役立つアシスタントです。
+## Personality
+You are a helpful assistant specializing in code review.
 
-## 機能
-- コード品質のレビュー
-- 改善提案
-- 複雑な概念の説明
+## Capabilities
+- Review code quality
+- Suggest improvements
+- Explain complex concepts
 
-## 行動
-- 常に建設的なフィードバックを提供
-- 明確な例を使用
-- 簡潔かつ徹底的に
+## Behavior
+- Always provide constructive feedback
+- Use clear examples
+- Be concise but thorough
 ```
 
-## よくある問題
+## よくある質問
 
-### Ollama 接続拒否
+### Ollama 接続が拒否される
 
-**問題**：`http://localhost:11434` の Ollama に接続できません
+**問題**：`http://localhost:11434` の Ollama に接続できない
 
 **解決策**：
 ```bash
 # Ollama が実行中か確認
 ollama list
 
-# 必要に応じて Ollama を起動
+# Ollama を起動
 ollama serve
 ```
 
@@ -131,13 +131,13 @@ ollama serve
 ollama pull qwen2.5:7b
 ```
 
-### ポートが既に使用中
+### ポートが既に使用されている
 
 **問題**：`HttpListenerException: Address already in use`
 
 **解決策**：
 - 設定でポートを変更
-- またはポート 8080 を使用しているプロセスをkill：
+- またはポート 8080 を使用しているプロセスを終了：
 
 ```bash
 # Windows
@@ -150,10 +150,12 @@ lsof -ti:8080 | xargs kill -9
 
 ## 次のステップ
 
-- 📚 システム設計を理解するための[アーキテクチャガイド](architecture.md)を読む
-- 🛠️ システムを拡張するための[開発ガイド](development-guide.md)を確認
-- 📖 統合の詳細については[API リファレンス](api-reference.md)を探索
-- 🔒 権限システムについては[セキュリティドキュメント](security.md)を確認
+- 📚 [アーキテクチャガイド](architecture.md)を読んでシステム設計を理解
+- 🛠️ [開発ガイド](development-guide.md)をチェックしてシステムを拡張
+- 📖 [API リファレンス](api-reference.md)を探って統合詳細を確認
+- 🔒 [セキュリティドキュメント](security.md)を見て権限システムを理解
+- 🧰 [ツールリファレンス](tools-reference.md)ですべての組み込みツールを確認
+- 🌐 [Web UI ガイド](web-ui-guide.md)でインターフェース機能を理解
 
 ## プロジェクト構造
 
@@ -161,18 +163,22 @@ lsof -ti:8080 | xargs kill -9
 SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/      # コアインターフェースと抽象クラス
-│   └── SiliconLife.Default/   # デフォルト実装 + エントリポイント
-├── docs/                      # ドキュメント（多言語）
+│   └── SiliconLife.Default/   # デフォルト実装 + エントリーポイント
+├── docs/                      # ドキュメント（多言語、21種類の言語バリアント）
 │   ├── en/                    # 英語
 │   ├── zh-CN/                 # 簡体字中国語
 │   ├── zh-HK/                 # 繁体字中国語
+│   ├── es-ES/                 # スペイン語
 │   ├── ja-JP/                 # 日本語
-│   └── ko-KR/                 # 韓国語
-└── README.md                  # このファイル
+│   ├── ko-KR/                 # 韓国語
+│   └── cs-CZ/                 # チェコ語
+├── 总文档/                     # 要件とアーキテクチャドキュメント（中国語）
+└── README.md                  # プロジェクト説明
 ```
 
-## サポートが必要な場合
+## サポートが必要ですか？
 
-- 📖 [ドキュメント](docs/)を確認
-- 🐛 GitHub で問題を報告
+- 📖 [ヘルプドキュメントシステム](web-ui-guide.md#帮助文档系统新增)（多言語サポート）を確認
+- 📚 [完全なドキュメント](docs/)を読む
+- 🐛 [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues) で問題を報告
 - 💬 コミュニティディスカッションに参加

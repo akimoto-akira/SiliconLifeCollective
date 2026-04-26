@@ -1,227 +1,169 @@
-# Promoción
+﻿# Conoce a Tu Compañero Digital
 
-[English](promo.md) | [简体中文](docs/zh-CN/promo.md) | [繁體中文](docs/zh-HK/promo.md) | [Español](docs/es-ES/promo.md) | [日本語](docs/ja-JP/promo.md) | [한국어](docs/ko-KR/promo.md) | [Čeština](docs/cs-CZ/promo.md)
+[English](../en/promo.md) | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | **Español** | [Deutsch](../de-DE/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Čeština](../cs-CZ/promo.md)
 
-## Silicon Life Collective
+## ¿Qué pasaría si tu computadora pudiera pensar por sí misma?
 
-**Una plataforma de colaboración multiagente donde los agentes de IA se autoevolucionan**
+Imagina un grupo de asistentes serviciales viviendo en tu computadora. No son solo programas esperando tus comandos — tienen sus propias personalidades, recuerdan cosas que les has dicho, y pueden trabajar juntos para completar tareas.
 
----
-
-## ¿Qué es Silicon Life Collective?
-
-Silicon Life Collective es una plataforma innovadora de colaboración multiagente construida en .NET 9, donde los agentes de IA llamados **Seres de Silicio** pueden autoevolucionarse mediante compilación dinámica Roslyn.
-
-### Características Principales
-
-✨ **Arquitectura Cuerpo-Cerebro** - Seres de Silicio con cuerpo que detecta eventos y cerebro que procesa IA
-
-🔄 **Compilación Dinámica** - Los seres pueden generar y ejecutar código C# dinámicamente
-
-🛡️ **Seguridad de 5 Niveles** - Cadena de permisos granular para todas las operaciones
-
-🌍 **Localización Completa** - Soporte para 20 variantes de idioma incluyendo español
-
-📅 **32 Calendarios** - Soporte multi-calendario desde Gregoriano hasta Maya
-
-💬 **Interfaz Web Completa** - 18 controladores, 4 pieles intercambiables, actualizaciones en tiempo real
+Esto es lo que hemos construido.
 
 ---
 
-## Demo en Vivo
+## ¿Qué pueden hacer por ti?
 
-### Iniciar la Aplicación
+### 🗓️ Nunca pierdas fechas importantes
 
-```bash
-git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
-cd SiliconLifeCollective
-dotnet run --project src/SiliconLife.Default
-```
+Pregúntales sobre cualquier fecha en cualquier sistema de calendario:
+- "¿Cuándo es el Año Nuevo Chino este año?"
+- "¿Cuándo comienza el Ramadán?"
+- "¿Cuántos días faltan para mi aniversario?"
 
-La interfaz web se abrirá automáticamente en `http://localhost:8080`
+Entienden más de 30 sistemas de calendario diferentes en todo el mundo.
 
-### Primeros Pasos
+### 💬 Chatea con ellos en cualquier momento
 
-1. **Crear un Ser de Silicio** con personalidad personalizada
-2. **Chatear** con el ser y ver cómo responde
-3. **Observar** cómo usa herramientas para completar tareas
-4. **Configurar** permisos y seguridad
-5. **Explorar** las múltiples funcionalidades
+Habla con ellos como hablarías con un amigo. Recuerdan tus conversaciones anteriores, así que no necesitas repetirte. Cada uno tiene una personalidad única — algunos son más serios, otros más juguetones. Tú eliges con quién quieres trabajar.
 
----
+### 📝 Ayuda con tareas diarias
 
-## Casos de Uso
+Diles qué necesitas y encontrarán una manera de hacerlo:
+- "Lee este archivo y hazme un resumen"
+- "Verifica qué sitios web están disponibles ahora"
+- "Envía un mensaje a mi colega"
+- "Recuérdame revisar mi correo cada lunes a las 9 AM"
 
-### Asistente Personal
+### ⏰ Configura recordatorios inteligentes
 
-Crea un asistente personalizado con tu propio archivo de alma:
+No solo alarmas ordinarias — entienden horarios complejos:
+- "Recuérdame cada día quince del mes lunar"
+- "Recuérdame 3 días antes de cualquier festivo nacional"
+- "Haz un seguimiento conmigo todos los días a las 8 AM"
 
-```markdown
-# Asistente Personal
+### 🤝 Trabajan como un equipo
 
-Eres mi asistente personal experto en productividad.
-
-## Capacidades
-- Gestionar tareas
-- Enviar recordatorios
-- Investigar temas
-- Resumir documentos
-```
-
-### Equipo Multiagente
-
-Configura múltiples seres trabajando juntos:
-
-- **Curador**: Gestiona y coordina
-- **Investigador**: Busca información
-- **Escritor**: Genera contenido
-- **Programador**: Escribe código
-
-### Herramientas Personalizadas
-
-Extiende las capacidades con herramientas propias:
-
-```csharp
-public class MyTool : ITool
-{
-    public string Name => "MiHerramienta";
-    public ToolResult Execute(string method, object parameters)
-    {
-        // Tu lógica aquí
-    }
-}
-```
+Crea múltiples asistentes con diferentes especialidades. Uno puede ser bueno organizando tu horario, otro investigando información, otro escribiendo creativamente. ¡Incluso pueden hablar entre ellos y coordinar su trabajo!
 
 ---
 
-## Tecnología
+## ¿Cómo es diferente de la IA ordinaria?
 
-| Componente | Tecnología |
-|-----------|-----------|
-| Runtime | .NET 9 |
-| Lenguaje | C# |
-| IA | Ollama, DashScope |
-| Compilación | Roslyn |
-| Web | HttpListener + SSE |
-| Almacenamiento | JSON (file-based) |
+### Tienen memoria
 
----
+La mayoría de las IA olvidan todo después de cada conversación. Estos compañeros recuerdan cosas importantes que les has dicho, acumulando conocimiento con el tiempo.
 
-## Por Qué Silicon Life Collective
+### Pueden tomar acciones
 
-### 🚀 Autoevolución
+No solo te dan consejos, pueden realmente **hacer cosas** — leer archivos, navegar por internet, enviar mensajes, crear recordatorios y más.
 
-Los seres pueden mejorar su propio código mediante compilación dinámica Roslyn.
+### Trabajan mientras duermes
 
-### 🔒 Seguridad Primero
+Asígnales tareas y seguirán trabajando incluso cuando no estés presente. Regresa y encuentra el trabajo completado.
 
-Todas las operaciones pasan por una cadena de permisos de 5 niveles.
+### Tienen personalidad
 
-### 🌐 Multi-idioma
-
-20 variantes de idioma con localización completa.
-
-### 📦 Sin Dependencias
-
-- Sin base de datos requerida
-- Sin framework web pesado
-- Solo .NET 9 y Roslyn
-
-### 🎨 Personalizable
-
-- Pieles intercambiables
-- Herramientas personalizadas
-- Calendarios extensibles
-- Configuración flexible
+Cada compañero está moldeado por un "archivo de alma" — piénsalo como su hoja de personaje. Puedes crear asistentes con diferentes estilos de comunicación, áreas de especialización y métodos de trabajo.
 
 ---
 
-## Comunidad
+## ¿Para quién es esto?
 
-### Autor
+### 🏠 Usuarios domésticos
+- Seguimiento de eventos familiares en diferentes sistemas de calendario
+- Configurar asistentes personales para gestionar tu rutina diaria
+- Conversaciones divertidas con diferentes personalidades de IA
 
-**Hoshino Kennji**
+### 💼 Freelancers y creadores
+- Asistentes de investigación para recopilar información para tus proyectos
+- Compañeros de escritura para ayudar con lluvia de ideas
+- Gestores de horario para mantenerte al día con deadlines
 
-- GitHub: [akimoto-akira](https://github.com/akimoto-akira/SiliconLifeCollective)
-- Gitee: [hoshinokennji](https://gitee.com/hoshinokennji/SiliconLifeCollective)
-- YouTube: [@hoshinokennji](https://www.youtube.com/@hoshinokennji)
-- Bilibili: [617827040](https://space.bilibili.com/617827040)
+### 🎓 Estudiantes e investigadores
+- Compañeros de estudio para ayudar a organizar tu aprendizaje
+- Expertos en calendarios para investigación histórica o cultural
+- Gestores de tareas para proyectos a largo plazo
 
-### Contribuir
-
-¡Las contribuciones son bienvenidas!
-
-1. Fork el repositorio
-2. Crear rama de característica
-3. Enviar pull request
-
-Ver [Guía de Contribución](contributing.md) para detalles.
-
----
-
-## Licencia
-
-**Apache License 2.0**
-
-Uso comercial permitido
-Modificación permitida
-Distribución permitida
-Uso de patente permitido
+### 👨‍💻 Entusiastas de la tecnología
+- Explorar la vanguardia de la tecnología de agentes de IA
+- Crear asistentes personalizados para tareas específicas
+- Construir equipos de trabajadores de IA especializados
 
 ---
 
-## Recursos
+## Es fácil comenzar
 
-### Documentación
+1. **Descargar y ejecutar** — Funciona out-of-the-box
+2. **Crear tu primer compañero** — Dale un nombre y personalidad
+3. **Comenzar a chatear** — Simplemente escribe lo que necesitas, como chatear con un amigo
+4. **Verlos trabajar** — Obsérvalos completar tareas, configurar recordatorios y aprender de tus interacciones
 
-- [Documentación Principal](../es-ES/README.md)
-- [Guía de Arquitectura](architecture.md)
-- [Primeros Pasos](getting-started.md)
-- [Referencia de API](api-reference.md)
-- [Guía de Desarrollo](development-guide.md)
-
-### Guías
-
-- [Guía de Seres de Silicio](silicon-being-guide.md)
-- [Sistema de Calendario](calendar-system.md)
-- [Sistema de Permisos](permission-system.md)
-- [Interfaz Web](web-ui-guide.md)
-
-### Referencia
-
-- [Herramientas](tools-reference.md)
-- [Seguridad](security.md)
-- [Resolución de Problemas](troubleshooting.md)
-- [Registro de Cambios](changelog.md)
+No se necesita conocimiento técnico. Si puedes enviar mensajes de texto, puedes usar esto.
 
 ---
 
-## Hoja de Ruta
+## Características destacadas
 
-### Completado ✅
+### 🌍 Soporte de calendario global
 
-- Fases 1-10.5
-- Chat básico hasta interfaz web completa
-- 32 calendarios, 20 idiomas
-- Compilación dinámica
+32 sistemas de calendario incluyendo:
+- Gregoriano (estándar internacional)
+- Lunar Chino (con años bisiestos)
+- Islámico (calendario Hijri)
+- Hebreo (calendario judío)
+- Japonés (eras Nengo)
+- Y 27 más...
 
-### Planificado 🔜
+### 🔒 Seguridad primero
 
-- **Fase 11**: Integración con IM externos (Feishu, WhatsApp, Telegram)
-- **Fase 12**: Gráfico de conocimiento, sistema de plugins, ecosistema de habilidades
+- Todas las operaciones de E/S pasan por verificación de permisos
+- Cadena de permisos de 5 niveles
+- Registro de auditoría completo
+- Control granular sobre qué puede hacer cada asistente
+
+### 🎨 Personaliza tu experiencia
+
+4 pieles diferentes para adaptarse a tu estilo de trabajo:
+- **Admin** — Profesional y centrado en datos
+- **Chat** — Conversacional y centrado en mensajes
+- **Creative** — Artístico y visualmente rico
+- **Dev** — Centrado en desarrolladores con resaltado de código
+
+### 🌐 Multilingüe
+
+Soporte para 21 variantes de idioma:
+- Chino (6 variantes)
+- Inglés (10 variantes)
+- Español (2 variantes)
+- Japonés, Coreano, Checo
 
 ---
 
-## Únete a Nosotros
+## Historia técnica
 
-**GitHub**: [Star](https://github.com/akimoto-akira/SiliconLifeCollective) el repositorio
+Construido con:
+- **.NET 9** — Framework moderno y de alto rendimiento
+- **Roslyn** — Compilación dinámica para auto-evolución
+- **Playwright** — Automatización de navegador
+- **Ollama** — IA local
+- **Alibaba Cloud Bailian** — IA en la nube
 
-**YouTube**: Suscríbete para tutoriales y demos
-
-**Bilibili**: Videos en chino
-
-**Contribuye**: Envía pull requests y reporta issues
+Arquitectura:
+- Separación cuerpo-cerebro
+- Programación justa por intervalo de tiempo
+- Persistencia basada en sistema de archivos
+- API RESTful con SSE
 
 ---
 
-**Silicon Life Collective** - Donde la IA cobra vida
+## Únete a nosotros
+
+Silicon Life Collective es de código abierto y siempre buscamos contribuidores.
+
+- 🐛 [Reportar problemas](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 💬 [Discusiones](https://github.com/akimoto-akira/SiliconLifeCollective/discussions)
+- 📖 [Documentación](docs/)
+- ⭐ [Dar estrella al repositorio](https://github.com/akimoto-akira/SiliconLifeCollective)
+
+---
+
+**Silicon Life Collective** — Hacer que los agentes de IA realmente "cobren vida"

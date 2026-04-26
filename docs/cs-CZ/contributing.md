@@ -1,22 +1,22 @@
-# Přispívání
+﻿# Přispívání
 
-[English](../en/contributing.md) | [中文文档](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md)
+[English](../en/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Deutsch](../de-DE/contributing.md) | **Čeština**
 
-Děkujeme za váš zájem přispět do SiliconLifeCollective!
+Děkujeme vám za zájem přispět do SiliconLifeCollective!
 
-## Code of Conduct
+## Kodex Chování
 
-Tento projekt následuje Apache 2.0 licenci. Ve všech interakcích buďte respektující a profesionální.
+Tento projekt následuje licenci Apache 2.0. Ve všech interakcích buďte respektující a profesionální.
 
 ---
 
 ## Rychlý Start
 
-### 1. Forkněte Repozitář
+### 1. Fork Repozitáře
 
-Klikněte na tlačítko "Fork" na GitHubu pro vytvoření vaší vlastní kopie.
+Klikněte na tlačítko "Fork" na GitHubu pro vytvoření vlastní kopie.
 
-### 2. Klonujte Váš Fork
+### 2. Naklonujte Váš Fork
 
 ```bash
 git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
@@ -39,10 +39,10 @@ dotnet build
 dotnet test
 ```
 
-### 4. Vytvořte Feature Branch
+### 4. Vytvořte Větev Funkce
 
 ```bash
-git checkout -b feature/nazev-vasi-funkce
+git checkout -b feature/vase-nazev-funkce
 ```
 
 ---
@@ -51,18 +51,18 @@ git checkout -b feature/nazev-vasi-funkce
 
 ### Styl Kódu
 
-- Následujte C# konvence kódování
-- Používejte PascalCase pro názvy tříd
-- Používejte camelCase pro parametry metod
-- Používejte `_camelCase` pro privátní pole
+- Dodržujte konvence kódování C#
+- Názvy tříd používejte PascalCase
+- Parametry metod používejte camelCase
+- Soukromá pole používejte `_camelCase`
 - Všechna veřejná API musí mít XML dokumentaci
 
-### Commit Zprávy
+### Zprávy o Commitu
 
 Následujte formát **Conventional Commits**:
 
 ```
-<type>(<scope>): <description>
+<typ>(<rozsah>): <popis>
 ```
 
 **Typy**:
@@ -70,31 +70,31 @@ Následujte formát **Conventional Commits**:
 - `fix`: Oprava chyby
 - `docs`: Změny dokumentace
 - `style`: Formátování kódu
-- `refactor`: Refaktoring kódu
+- `refactor`: Refaktorizace kódu
 - `test`: Změny testů
-- `chore`: Změny build/nástrojů
+- `chore`: Změny sestavení/nástrojů
 
 **Příklady**:
 ```bash
-feat(localization): přidání podpory korejského jazyka
-fix(permission): oprava null pointer v callbacku
-docs: aktualizace průvodce přispíváním
-refactor(web): zjednodušení struktury controllerů
+feat(localization): add Korean language support
+fix(permission): fix null pointer in callback
+docs: update contributing guide
+refactor(web): simplify controller structure
 ```
 
 ### Provádění Změn
 
 1. **Pište kód**
-   - Následujte existující patterny
+   - Dodržujte existující vzory
    - Přidejte testy pro nové funkce
    - Aktualizujte dokumentaci
 
-2. **Testujte vaše změny**
+2. **Otestujte své změny**
    ```bash
    # Spusťte všechny testy
    dotnet test
    
-   # Build v release módu
+   # Sestavte v režimu Release
    dotnet build --configuration Release
    ```
 
@@ -103,35 +103,35 @@ refactor(web): zjednodušení struktury controllerů
    dotnet format
    ```
 
-4. **Commitněte změny**
+4. **Commitujte změny**
    ```bash
    git add .
-   git commit -m "feat(scope): popis"
+   git commit -m "feat(rozsah): popis"
    ```
 
 5. **Pushněte na váš Fork**
    ```bash
-   git push origin feature/nazev-vasi-funkce
+   git push origin feature/vase-nazev-funkce
    ```
 
 6. **Vytvořte Pull Request**
-   - Přejděte na originální repozitář
+   - Přejděte na původní repozitář
    - Klikněte na "Compare & pull request"
-   - Vyplňte PR šablonu
+   - Vyplňte šablonu PR
    - Odešlete
 
 ---
 
-## Pull Request Průvodce
+## Průvodce Pull Requesty
 
-### PR Název
+### Název PR
 
-Použijte stejný formát jako commit zprávy:
+Použijte stejný formát jako zprávy commitu:
 ```
-feat(localization): přidání podpory korejského jazyka
+feat(localization): add Korean language support
 ```
 
-### PR Popis
+### Popis PR
 
 Zahrňte:
 
@@ -140,7 +140,7 @@ Zahrňte:
 3. **Jak** - Jak jste to implementovali?
 4. **Testování** - Jak jste to testovali?
 
-### Příklad PR Popisu
+### Příklad Popisu PR
 
 ```markdown
 ## Co
@@ -150,242 +150,266 @@ Přidání korejské lokalizace pro všechny UI komponenty a dokumentaci.
 Rozšíření přístupnosti projektu pro korejské uživatele.
 
 ## Jak
-- Vytvoření KoKR.cs lokalizačního souboru
-- Přidání 500+ překladových klíčů
-- Aktualizace všech pohledů pro použití lokalizace
-- Vytvoření korejské dokumentace v docs/ko-KR/
+- Vytvořil KoKR lokalizační soubory
+- Aktualizoval všechny UI řetězce
+- Přeložil dokumentaci
+- Přidal testy
 
 ## Testování
-- Ověření, že všechny UI elementy správně zobrazují korejštinu
-- Testování funkce přepínání jazyka
-- Revize překladů s rodilým mluvčím
+- Ručně ověřeno v Web UI
+- Spuštěny všechny existující testy
+- Otestováno přepínání jazyků
 ```
 
 ---
 
-## Typy Příspěvků
+## Směrnice pro Kód
 
-### 1. Opravy Chyb
+### Struktura Projektu
 
-**Workflow**:
-1. Zkontrolujte existující issues
-2. Vytvořte issue pokud neexistuje
-3. Opravte chybu
-4. Přidejte testovací případy
-5. Odešlete PR
+```
+src/
+├── SiliconLife.Core/      # Rozhraní a abstrakce
+│   ├── AI/                # AI klientská rozhraní
+│   ├── Chat/              # Systém chatu
+│   ├── Config/            # Konfigurační modely
+│   ├── Tools/             # Rozhraní nástrojů
+│   └── ...
+└── SiliconLife.Default/   # Konkrétní implementace
+    ├── AI/                # AI klienti
+    ├── Tools/             # Implementace nástrojů
+    ├── Web/               # Web UI
+    └── ...
+```
 
-**Požadavky**:
-- Jasný popis chyby
-- Kroky pro reprodukci
-- Testy proti regresi
+### Přidávání Nových Funkcí
 
-### 2. Nové Funkce
+1. **Rozhraní nejprve v Core**
+   ```csharp
+   // SiliconLife.Core/INovaFunkce.cs
+   public interface INovaFunkce
+   {
+       Task<string> ProveďAsync(string vstup);
+   }
+   ```
 
-**Workflow**:
-1. Diskutujte o funkci v Issues/Discussions
-2. Získejte schválení od maintainerů
-3. Implementujte funkci
-4. Přidejte komplexní testy
-5. Aktualizujte dokumentaci
-6. Odešlete PR
+2. **Implementace v Default**
+   ```csharp
+   // SiliconLife.Default/NovaFunkce.cs
+   public class NovaFunkce : INovaFunkce
+   {
+       public async Task<string> ProveďAsync(string vstup)
+       {
+           // Implementace
+       }
+   }
+   ```
 
-**Požadavky**:
-- Schválený návrh funkce
-- Kompletní pokrytí testy
-- Aktualizovaná dokumentace
-- Zpětně kompatibilní
+3. **Přidejte testy**
+   ```csharp
+   [Fact]
+   public async Task ProveďAsync_VraciOcekavanyVysledek()
+   {
+       // Test
+   }
+   ```
 
-### 3. Dokumentace
-
-**Workflow**:
-1. Identifikujte mezery v dokumentaci
-2. Napište/aktualizujte dokumentaci
-3. Odešlete PR
-
-**Požadavky**:
-- Jasné a stručné
-- Zahrnující příklady
-- Vícejazyčné pokud je to vhodné
-
-### 4. Refaktoring Kódu
-
-**Workflow**:
-1. Navrhněte refaktoring v Issue
-2. Získejte schválení
-3. Refaktorujte kód
-4. Ujistěte se, že všechny testy procházejí
-5. Odešlete PR
-
-**Požadavky**:
-- Žádné funkční změny
-- Všechny testy procházejí
-- Zlepšení kvality kódu
-- Jasné vysvětlení
+4. **Aktualizujte dokumentaci**
 
 ---
 
-## Testovací Průvodce
+## Přidávání Nových Nástrojů
 
-### Unit Testy
+1. Vytvořte nový soubor v `src/SiliconLife.Default/Tools/`:
 
 ```csharp
-[TestMethod]
-public void MyFeature_ShouldWork_AsExpected()
+public class MujVlastniNastroj : ITool
 {
-    // Arrange
-    var service = new MyService();
+    public string Name => "muj_nastroj";
+    public string Description => "Popis toho, co tento nástroj dělá";
     
-    // Act
-    var result = service.DoSomething();
-    
-    // Assert
-    Assert.IsTrue(result.Success);
+    public async Task<ToolResult> ExecuteAsync(ToolCall call)
+    {
+        // Logika nástroje
+        return new ToolResult { Success = true, Output = "výsledek" };
+    }
 }
 ```
 
-### Integrační Testy
+2. Nástroj je automaticky objeven prostřednictvím reflexe.
 
-Testujte kompletní workflow:
-- AI interakce
-- Provádění nástrojů
-- Ověřování oprávnění
-- Operace úložiště
-
-### Manuální Testy
-
-Pro UI změny:
-- Testujte ve více prohlížečích
-- Ověřte responzivní design
-- Zkontrolujte přístupnost
-
----
-
-## Průvodce Dokumentací
-
-### Komentáře Kódu
-
-- XML komentáře pro všechna veřejná API
-- Inline komentáře pro komplexní logiku
-- Angličtina pro komentáře kódu
-
-### Dokumentační Soubory
-
-- Umístěte do `docs/{language}/`
-- Aktualizujte všechny jazykové verze
-- Následujte existující strukturu
-
-### Vícejazyčná Dokumentace
-
-Při přidávání dokumentace:
-1. Nejprve vytvořte anglickou verzi
-2. Přeložte do ostatních jazyků
-3. Udržujte obsah synchronizovaný
-
----
-
-## Review Proces
-
-### Co Maintaineři Kontrolují
-
-1. **Kvalita Kódu**
-   - Následuje konvence
-   - Čitelný a čistý
-   - Dobře zdokumentovaný
-
-2. **Testy**
-   - Dobře pokryté
-   - Všechny testy procházejí
-   - Coverage hraničních případů
-
-3. **Dokumentace**
-   - Aktualizovaná
-   - Jasně vysvětlená
-   - Vícejazyčná
-
-4. **Kompatibilita**
-   - Zpětně kompatibilní
-   - Žádné breaking changes (pokud nejsou oznámeny)
-   - Následuje semantic versioning
-
-### Review Timeline
-
-- Počáteční review: 1-3 dny
-- Implementace feedbacku: dle potřeby
-- Merge: po schválení
-
----
-
-## FAQ
-
-### PR Zamítnuto
-
-**Důvody**:
-- Následování průvodců
-- Nedostatečné testy
-- Neoznámené breaking changes
-- Špatná kvalita kódu
-
-**Řešení**:
-- Adresujte feedback
-- Aktualizujte PR
-- Odešlete znovu
-
-### Merge Konflikty
-
-**Řešení**:
-```bash
-# Aktualizujte vaši branch
-git fetch origin
-git rebase origin/master
-
-# Vyřešte konflikty
-# Upravte konfliktní soubory
-git add .
-git rebase --continue
-
-# Force push
-git push --force-with-lease
+3. (Volitelné) Označte jako pouze pro kurátora:
+```csharp
+[SiliconManagerOnly]
+public class AdminNastroj : ITool { ... }
 ```
 
 ---
 
-## Získání Pomoci
+## Přidávání Nových Jazyků
 
-### Zdroje
+1. Vytvořte nový adresář v `docs/`:
+```bash
+mkdir docs/fr-FR
+```
 
-- **Dokumentace**: [docs/](../)
-- **Issues**: GitHub Issues
-- **Diskuse**: GitHub Discussions
-- **Code of Conduct**: CODE_OF_CONDUCT.md
+2. Zkopírujte existující dokumenty:
+```bash
+cp docs/en/* docs/fr-FR/
+```
 
-### Kontakt
+3. Přeložte všechny dokumenty
 
-- Vytvořte Issue pro chyby
-- Spusťte Discussion pro otázky
-- Označte maintainery pro urgentní záležitosti
+4. Aktualizujte odkazy na dokumenty v každém souboru
+
+5. Přidejte lokalizaci Web UI:
+```csharp
+// SiliconLife.Default/Localization/FrFR.cs
+public class FrFR : LocalizationBase
+{
+    // Implementace
+}
+```
 
 ---
 
-## Poděkování
+## Přidávání Nových Skinů
 
-Přispěvatelé budou uznáni na:
-- Sekci přispěvatelů v README.md
-- Release notes
-- Projektové dokumentaci
+1. Vytvořte nový soubor v `src/SiliconLife.Default/Web/Skins/`:
+
+```csharp
+public class MujSkin : ISkin
+{
+    public string Name => "MujSkin";
+    public string Description => "Popis skinu";
+    
+    public string GetCss()
+    {
+        return @"
+            :root {
+                --primary-color: #barva;
+            }
+        ";
+    }
+}
+```
+
+2. Skin je automaticky objeven Správcem skinů.
+
+---
+
+## Testování
+
+### Spouštění Testů
+
+```bash
+# Všechny testy
+dotnet test
+
+# Konkrétní testovací projekt
+dotnet test tests/SiliconLife.Core.Tests/
+
+# S detailním výstupem
+dotnet test --logger "console;verbosity=detailed"
+```
+
+### Psaní Testů
+
+```csharp
+public class MujNastrojTests
+{
+    [Fact]
+    public async Task ExecuteAsync_PlatnyVstup_VraciSuccess()
+    {
+        // Arrange
+        var tool = new MujNastroj();
+        var call = new ToolCall { Parameters = new Dictionary<string, object>() };
+        
+        // Act
+        var result = await tool.ExecuteAsync(call);
+        
+        // Assert
+        Assert.True(result.Success);
+    }
+}
+```
+
+---
+
+## Dokumentace
+
+### Aktualizace Dokumentace
+
+Při přidávání nových funkcí:
+
+1. **Aktualizujte relevantní .md soubory** v `docs/`
+2. **Přidejte příklady** použití
+3. **Dokumentujte API** změny
+4. **Aktualizujte všechny jazykové verze** (nebo označte k překladu)
+
+### Styl Dokumentace
+
+- Používejte Markdown formátování
+- Zahrňte příklady kódu
+- Popište parametry a návratové hodnoty
+- Uveďte případy použití
+
+---
+
+## Proces Revize
+
+### Co Hledáme
+
+- **Funkčnost**: Kód dělá to, co má?
+- **Kvalita**: Dodržuje standardy kódování?
+- **Testy**: Jsou zahrnuty testy?
+- **Dokumentace**: Je aktualizována dokumentace?
+- **Výkon**: Žádné zbytečné režie?
+- **Bezpečnost**: Žádné bezpečnostní problémy?
+
+### Čas Revize
+
+- Většina PR je revizována do 48 hodin
+- Složité změny mohou trvat déle
+- Buďte trpěliví a respektujte čas recenzentů
+
+---
+
+## Časté Otázky
+
+### Mohu přispět bez znalosti C#?
+
+Ano! Můžete pomoci s:
+- Překlady dokumentace
+- Testování a hlášení chyb
+- Návrhy funkcí
+- Vylepšení dokumentace
+
+### Jak dlouho trvá schválení PR?
+
+Obvykle 1-3 dny pro jednoduché změny, déle pro komplexní funkce.
+
+### Mohu přispět k existující funkci?
+
+Ano! Otevřete issue pro diskusi o navrhovaných změnách.
+
+### Jak nahlásit chybu?
+
+1. Vyhledejte existující issues
+2. Pokud nenalezeno, vytvořte nové issue
+3. Zahrňte kroky k reprodukci
+4. Připojte relevantní logy
 
 ---
 
 ## Licence
 
-Přispíváním souhlasíte, že váš příspěvek bude licencován pod Apache 2.0 licencí.
+Přispíváním souhlasíte s tím, že vaše příspěvky budou licencovány pod Apache 2.0.
 
 ---
 
-## Další Kroky
+## Poděkování
 
-- 📚 Přečtěte si [Dokumentaci](../)
-- 🐛 Podívejte se na [Otevřené Issues](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
-- 💬 Spusťte [Diskusi](https://github.com/akimoto-akira/SiliconLifeCollective/discussions)
-- 🚀 Forkněte a začněte přispívat!
+Děkujeme všem přispěvatelům, kteří pomáhají zlepšovat SiliconLifeCollective!
 
-Děkujeme za váš příspěvek do SiliconLifeCollective! 🎉
+**Začněte přispívat ještě dnes!** 🚀

@@ -1,445 +1,401 @@
-# 開發指南
+﻿# 開發指南
 
-[English](development-guide.md) | [简体中文](docs/zh-CN/development-guide.md) | [繁體中文](docs/zh-HK/development-guide.md) | [Español](docs/es-ES/development-guide.md) | [日本語](docs/ja-JP/development-guide.md) | [한국어](docs/ko-KR/development-guide.md) | [Čeština](docs/cs-CZ/development-guide.md)
+[English](../en/development-guide.md) | [中文](../zh-CN/development-guide.md) | **繁體中文** | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/development-guide.md)
 
 ## 架構概述
 
-SiliconLifeCollective 遵循**身体-大脑架構**，核心介面和默認實現嚴格分离。
-
-### 項目結構
+Silicon Life Collective 採用分層架構設計：
 
 ```
-SiliconLifeCollective/
-├── src/
-│   ├── SiliconLife.Core/      # 介面、抽象類別、通用基础設施
-│   └── SiliconLife.Default/   # 具体實現、入口点
-└── docs/                      # 多语言文檔
+┌─────────────────────────────────────────┐
+│   SiliconLife.Default (實現 + 入口點)    │
+├─────────────────────────────────────────┤
+│   SiliconLife.Core (介面 + 抽象類別)     │
+└─────────────────────────────────────────┘
 ```
 
-**依赖方向**：`SiliconLife.Default` → `SiliconLife.Core`（单向）
+### 專案結構
 
-## 核心概念
+- **SiliconLife.Core** - 核心介面、抽象類別和通用基礎設施
+- **SiliconLife.Default** - 具體實現、業務邏輯和應用程式入口點
 
-### 1. 硅基生命体（硅基生命体）
+依賴方向：Default → Core（單向依賴）
 
-每個 AI 智能体由以下部分群組成：
-- **身体**（`DefaultSiliconBeing`）：维持存活狀態，检测触發場景
-- **大脑**（`ContextManager`）：載入歷史、调用 AI、執行工具、持久化回應
-
-### 2. 工具系統
-
-工具通過反射自動發現和註冊：
-
-```csharp
-// 所有工具實現 ITool 介面
-public interface ITool
-{
-    string Name { get; }
-    string Description { get; }
-    Task<ToolResult> ExecuteAsync(ToolCall call);
-}
-```
-
-### 3. 權限系統
-
-5 級權限驗證链：
-```
-IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
-```
-
-### 4. 服務定位器
-
-全局服務註冊和检索：
-```csharp
-// 註冊
-ServiceLocator.Instance.Register<IAIClient>(ollamaClient);
-
-// 获取
-var client = ServiceLocator.Instance.Get<IAIClient>();
-```
+---
 
 ## 擴充系統
 
-### 添加新工具
+### 建立自訂工具
 
-1. 在 `src/SiliconLife.Default/Tools/` 中建立新類別：
+工具是矽基生命體與外部世界互動的主要方式。
+
+#### 步驟 1: 實現 ITool 介面
 
 ```csharp
 public class MyCustomTool : ITool
 {
-    public string Name => "my_custom_tool";
-    public string Description => "Description of what this tool does";
+    public string Name => "my_tool";
+    
+    public string Description => "工具描述";
+    
+    public ToolDefinition Definition => new ToolDefinition
+    {
+        Name = Name,
+        Description = Description,
+        Parameters = new Dictionary<string, object>
+        {
+            ["param1"] = new { type = "string", description = "參數說明" }
+        }
+    };
     
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
-        // 解析參數
-        var param1 = call.Parameters["param1"]?.ToString();
-        
-        // 執行逻辑
-        var result = await DoSomething(param1);
-        
-        // 返回結果
-        return new ToolResult 
-        { 
-            Success = true, 
-            Output = result 
-        };
-    }
-}
-```
-
-2. 工具通過反射自動發現 - 无需手動註冊！
-
-3. （可选）标記為僅管理員可用：
-```csharp
-[SiliconManagerOnly]
-public class AdminTool : ITool { ... }
-```
-
-### 添加新 AI 客戶端
-
-1. 在 `src/SiliconLife.Default/AI/` 中實現 `IAIClient`：
-
-```csharp
-public class MyAIClient : IAIClient
-{
-    public string Name => "my_ai";
-    
-    public async Task<AIResponse> ChatAsync(AIRequest request)
-    {
-        // 调用您的 AI API
-        var response = await CallMyAPI(request);
-        
-        return new AIResponse
+        try
         {
-            Content = response.Message,
-            ToolCalls = response.ToolCalls,
-            Usage = response.Usage
-        };
-    }
-    
-    public async IAsyncEnumerable<string> StreamChatAsync(AIRequest request)
-    {
-        // 實現流式傳输
-        await foreach (var chunk in StreamFromAPI(request))
+            var param1 = call.Parameters["param1"]?.ToString();
+            var result = await DoWork(param1);
+            
+            return new ToolResult
+            {
+                Success = true,
+                Output = result
+            };
+        }
+        catch (Exception ex)
         {
-            yield return chunk;
+            return new ToolResult
+            {
+                Success = false,
+                Error = ex.Message
+            };
         }
     }
 }
 ```
 
-2. 建立工廠：
+#### 步驟 2: 添加到專案
+
+將工具檔案放置在 `src/SiliconLife.Default/Tools/` 目錄中。`ToolManager` 會在啟動時通過反射自動發現並註冊。
+
+#### 步驟 3: （可選）標記為主理人專用
 
 ```csharp
-public class MyAIClientFactory : IAIClientFactory
+[SiliconManagerOnly]
+public class AdminOnlyTool : ITool
 {
-    public IAIClient CreateClient(AIClientConfig config)
-    {
-        return new MyAIClient(config);
-    }
+    // 僅矽基主理人可存取
 }
 ```
 
-3. 工廠自動發現並註冊。
+### 建立自訂執行器
 
-### 添加新儲存後端
+執行器管理 I/O 操作並強制執行權限檢查。
 
-1. 在 `src/SiliconLife.Default/Storage/` 中實現 `IStorage` 和 `ITimeStorage`：
-
-```csharp
-public class DatabaseStorage : IStorage, ITimeStorage
-{
-    public async Task<string> ReadAsync(string key)
-    {
-        // 從您的資料庫读取
-    }
-    
-    public async Task WriteAsync(string key, string value)
-    {
-        // 寫入您的資料庫
-    }
-    
-    public async Task<IEnumerable<string>> ReadByTimeAsync(DateTime start, DateTime end)
-    {
-        // 時間索引查詢
-    }
-}
-```
-
-### 添加新皮肤
-
-1. 在 `src/SiliconLife.Default/Web/Skins/` 中實現 `ISkin`：
+#### 步驟 1: 繼承 ExecutorBase
 
 ```csharp
-public class MyCustomSkin : ISkin
+public class MyCustomExecutor : ExecutorBase
 {
-    public string Name => "MySkin";
-    public string Description => "A custom skin description";
-    
-    public string GetCss()
+    public MyCustomExecutor(PermissionManager permissionManager) 
+        : base(permissionManager)
     {
-        return @"
-            :root {
-                --primary-color: #your-color;
-                --bg-color: #your-bg;
-            }
-            /* Your custom styles */
-        ";
-    }
-}
-```
-
-2. 皮肤由 `SkinManager` 自動發現。
-
-## 程式碼風格指南
-
-### 命名約定
-
-- **類別**：PascalCase，带功能前缀（例如 `DefaultSiliconBeing`）
-- **介面**：以 `I` 開頭（例如 `IAIClient`、`ITool`）
-- **實現**：以介面名结尾（例如 `OllamaClient` 實現 `IAIClient`）
-- **工具**：以 `Tool` 结尾（例如 `CalendarTool`、`ChatTool`）
-- **檢視模型**：以 `ViewModel` 结尾（例如 `BeingViewModel`）
-
-### 程式碼組織
-
-```
-SiliconLife.Default/
-├── AI/                    # AI 客戶端實現
-├── Calendar/              # 日歷實現
-├── Config/                # 默認設定資料
-├── Executors/             # 執行器實現
-├── IM/                    # 即时通訊提供者實現
-├── Localization/          # 在地化實現
-├── Logging/               # 記錄提供者實現
-├── Runtime/               # 執行时元件
-├── Security/              # 安全實現
-├── SiliconBeing/          # 默認硅基生命体實現
-├── Storage/               # 儲存實現
-├── Tools/                 # 內置工具
-└── Web/                   # Web UI 實現
-    ├── Controllers/       # 路由控制器
-    ├── Models/            # 檢視模型
-    ├── Views/             # HTML 檢視
-    └── Skins/             # 皮肤主題
-```
-
-### 文檔
-
-- 所有公共 API 必須有 XML 文檔註解
-- 所有源檔案使用 Apache 2.0 授權證頭
-- 利用 .NET 9 特性（隐式 using、可空引用類型）
-
-## 開發工作流程
-
-### 1. 設定開發环境
-
-```bash
-# 克隆倉程式庫
-git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
-cd SiliconLifeCollective
-
-# 復原依赖
-dotnet restore
-
-# 构建
-dotnet build
-```
-
-### 2. 執行測試
-
-```bash
-# 執行所有測試
-dotnet test
-
-# 執行特定測試項目
-dotnet test tests/SiliconLife.Core.Tests
-```
-
-### 3. 偵錯
-
-```bash
-# 以偵錯输出執行
-dotnet run --project src/SiliconLife.Default --configuration Debug
-```
-
-### 4. 程式碼格式化
-
-```bash
-# 格式化程式碼
-dotnet format
-```
-
-## 构建自定義功能
-
-### 示例：添加自定義日歷
-
-```csharp
-public class MyCustomCalendar : CalendarBase
-{
-    public override string Name => "MyCalendar";
-    
-    public override CalendarDate ConvertFromGregorian(GregorianDate date)
-    {
-        // 您的转换逻辑
-        return new CalendarDate(year, month, day);
     }
     
-    public override GregorianDate ConvertToGregorian(CalendarDate date)
+    public async Task<ExecutorResult> ExecuteMyOperation(ExecutorRequest request)
     {
-        // 反向转换
-        return new GregorianDate(year, month, day);
-    }
-}
-```
-
-### 示例：添加自定義執行器
-
-```csharp
-public class CustomExecutor : ExecutorBase
-{
-    public override string Name => "custom";
-    
-    public override async Task<ExecutorResult> ExecuteAsync(ExecutorRequest request)
-    {
-        // 首先驗證權限
-        var permission = await CheckPermissionAsync(request);
+        // 1. 建立權限請求
+        var permRequest = new PermissionRequest
+        {
+            PermissionType = PermissionType.CustomOperation,
+            Resource = request.Resource,
+            BeingId = request.BeingId
+        };
+        
+        // 2. 檢查權限
+        var permission = await CheckPermissionAsync(permRequest);
         if (!permission.Allowed)
         {
             return ExecutorResult.Denied(permission.Reason);
         }
         
-        // 執行操作
+        // 3. 執行操作
         var result = await PerformOperation(request);
-        
         return ExecutorResult.Success(result);
     }
 }
 ```
 
-## 測試指南
+#### 步驟 2: 註冊執行器
 
-### 单元測試
+在 `Program.cs` 中註冊您的執行器：
 
 ```csharp
-[TestClass]
-public class MyToolTests
+var myExecutor = new MyCustomExecutor(permissionManager);
+ServiceLocator.Instance.Register<MyCustomExecutor>(myExecutor);
+```
+
+### 建立自訂 AI 客戶端
+
+#### 步驟 1: 實現 IAIClient
+
+```csharp
+public class MyAIClient : IAIClient
 {
-    [TestMethod]
-    public async Task ExecuteAsync_ValidInput_ReturnsSuccess()
+    public async Task<AIResponse> ChatAsync(AIRequest request)
     {
-        // 安排
-        var tool = new MyCustomTool();
-        var call = new ToolCall 
-        { 
-            Name = "my_custom_tool",
-            Parameters = new Dictionary<string, object> 
-            { 
-                ["param1"] = "test" 
-            }
+        // 實現您的 AI 客戶端邏輯
+        var response = await CallMyAI(request);
+        
+        return new AIResponse
+        {
+            Content = response.Text,
+            ToolCalls = response.ToolCalls,
+            PromptTokens = response.Usage.Prompt,
+            CompletionTokens = response.Usage.Completion
         };
-        
-        // 執行
-        var result = await tool.ExecuteAsync(call);
-        
-        // 断言
-        Assert.IsTrue(result.Success);
-        Assert.IsNotNull(result.Output);
     }
 }
 ```
 
-### 集成測試
-
-測試完整流程：
-1. AI 返回工具调用
-2. 工具執行
-3. 結果回饋给 AI
-4. AI 返回最终回應
-
-## 效能考虑
-
-### 儲存系統
-
-- 儲存系統優先考虑**功能而非效能**
-- 默認使用基於檔案的 JSON 儲存
-- 時間索引查詢使用目錄結構
-
-### 主循环排程器
-
-- 基於时钟的时切片公平排程
-- 看門狗定时器用於检测卡死操作
-- 熔断器用於防止級联失敗
-
-## 最佳实践
-
-### 1. 始终驗證權限
-
-任何 AI 發起的操作必須通過權限链：
+#### 步驟 2: 建立客戶端工廠
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+public class MyAIClientFactory : IAIClientFactory
 {
-    return Result.Denied(permission.Reason);
+    public IAIClient CreateClient(Dictionary<string, object> config)
+    {
+        var apiKey = config["apiKey"]?.ToString();
+        var model = config["model"]?.ToString();
+        
+        return new MyAIClient(apiKey, model);
+    }
+    
+    public string GetDisplayName() => "我的 AI 服務";
 }
 ```
 
-### 2. 使用服務定位器
+#### 步驟 3: 註冊工廠
 
-全局註冊和检索服務：
+在配置中添加您的 AI 客戶端類型，系統會自動發現並使用。
 
-```csharp
-// 初始化期间
-ServiceLocator.Instance.Register<ICustomService>(myService);
+---
 
-// 需要时
-var service = ServiceLocator.Instance.Get<ICustomService>();
-```
+## 擴充日曆系統
 
-### 3. 遵循身体-大脑分离
+### 建立新日曆
 
-- 身体處理狀態和触發
-- 大脑處理 AI 交互和工具執行
-
-### 4. 實現适當的錯誤處理
+#### 步驟 1: 繼承 CalendarBase
 
 ```csharp
-try
+public class MyCustomCalendar : CalendarBase
 {
-    var result = await operation();
-    return Result.Success(result);
+    public override string Name => "My Custom Calendar";
+    public override string Id => "my_custom";
+    
+    public override CalendarDate ConvertFromGregorian(DateTime gregorianDate)
+    {
+        // 實現從公曆的轉換邏輯
+        return new CalendarDate
+        {
+            Year = CalculateYear(gregorianDate),
+            Month = CalculateMonth(gregorianDate),
+            Day = CalculateDay(gregorianDate)
+        };
+    }
+    
+    public override DateTime ConvertToGregorian(CalendarDate date)
+    {
+        // 實現轉換為公曆的邏輯
+        return CalculateGregorianDate(date);
+    }
 }
-catch (Exception ex)
+```
+
+#### 步驟 2: 自動註冊
+
+日曆系統通過反射自動發現所有繼承自 `CalendarBase` 的類別，無需手動註冊。
+
+---
+
+## 建立自訂皮膚
+
+### 步驟 1: 實現 ISkin 介面
+
+```csharp
+public class MyCustomSkin : ISkin
 {
-    Logger.Error($"Operation failed: {ex.Message}");
-    return Result.Failure(ex.Message);
+    public string Name => "My Custom Skin";
+    public string Id => "my_custom";
+    
+    public string RenderHtml(Controller controller, string viewName, object model)
+    {
+        // 使用 H 建構器生成 HTML
+        return H.Html(
+            H.Head(
+                H.Link("stylesheet", "/skins/my-custom.css")
+            ),
+            H.Body(
+                RenderContent(controller, viewName, model)
+            )
+        ).ToString();
+    }
+    
+    public string GenerateCss()
+    {
+        var css = new CssBuilder();
+        css.Add("body", b => b
+            .Set("background-color", "#f0f0f0")
+            .Set("color", "#333")
+        );
+        return css.ToString();
+    }
 }
 ```
 
-## 貢献指南
+### 步驟 2: 自動發現
 
-1. Fork 倉程式庫
-2. 建立功能分支（`git checkout -b feature/amazing-feature`）
-3. 使用約定式提交提交您的更改
-4. 推送到分支（`git push origin feature/amazing-feature`）
-5. 打開拉取要求
+`SkinManager` 會通過反射自動發現並註冊所有 `ISkin` 實現。
 
-### 提交訊息格式
+---
 
+## 本地化開發
+
+### 添加新語言
+
+#### 步驟 1: 建立本地化類別
+
+```csharp
+public class MyLanguageLocalization : DefaultLocalizationBase
+{
+    public override Language Language => Language.MyCustom;
+    
+    public override string GetString(LocalizationKey key)
+    {
+        return key switch
+        {
+            LocalizationKey.Hello => "Hello in My Language",
+            LocalizationKey.Goodbye => "Goodbye in My Language",
+            // ... 其他字串
+            _ => base.GetString(key)
+        };
+    }
+}
 ```
-<type>(<scope>): <description>
 
-示例：
-feat(tool): add custom calendar tool
-fix(permission): fix null pointer in callback
-docs: update development guide
+#### 步驟 2: 添加到 Language 列舉
+
+在 `Language.cs` 中添加新的語言列舉值。
+
+---
+
+## 測試指南
+
+### 單元測試
+
+```csharp
+[Test]
+public async Task MyTool_ExecuteAsync_ReturnsSuccess()
+{
+    // Arrange
+    var tool = new MyCustomTool();
+    var call = new ToolCall
+    {
+        Parameters = new Dictionary<string, object>
+        {
+            ["param1"] = "test"
+        }
+    };
+    
+    // Act
+    var result = await tool.ExecuteAsync(call);
+    
+    // Assert
+    Assert.IsTrue(result.Success);
+    Assert.IsNotNull(result.Output);
+}
 ```
 
-## 下一步
+### 整合測試
 
-- 📚 阅读[架構指南](architecture.md)
-- 📖 探索[API 参考](api-reference.md)
-- 🔒 查看[安全文檔](security.md)
-- 🚀 查看[快速開始指南](getting-started.md)
+測試完整的工具調用循環：
+
+```csharp
+[Test]
+public async Task FullToolCycle_WithPermission_Checks()
+{
+    // 1. 建立測試生命體
+    var being = CreateTestBeing();
+    
+    // 2. 設置權限
+    SetupPermissions(being);
+    
+    // 3. 執行工具
+    var result = await ExecuteTool(being, "my_tool", parameters);
+    
+    // 4. 驗證結果
+    Assert.IsTrue(result.Success);
+    VerifyAuditLog(being);
+}
+```
+
+---
+
+## 效能最佳化
+
+### 1. 快取策略
+
+- 使用 `UserFrequencyCache` 快取頻繁的權限決策
+- 快取日曆轉換結果
+- 避免重複載入靈魂文件
+
+### 2. 非同步操作
+
+- 所有 I/O 操作使用 `async/await`
+- 避免阻塞主循環
+- 使用 `CancellationToken` 支援取消
+
+### 3. 記憶體管理
+
+- 及時釋放不再使用的物件
+- 避免大型物件長期存活
+- 使用物件池重用頻繁建立的物件
+
+---
+
+## 除錯技巧
+
+### 啟用詳細日誌
+
+```csharp
+LogManager.SetLogLevel(LogLevel.Debug);
+```
+
+### 檢查權限審計
+
+```csharp
+var auditLogs = ServiceLocator.Instance.AuditLogger.GetLogs(beingId);
+foreach (var log in auditLogs)
+{
+    Console.WriteLine($"[{log.Timestamp}] {log.PermissionType}: {log.Result}");
+}
+```
+
+### 監控效能
+
+```csharp
+var monitor = ServiceLocator.Instance.PerformanceMonitor;
+var stats = monitor.GetStats();
+Console.WriteLine($"Average Tick Time: {stats.AverageTickTime}ms");
+```
+
+---
+
+## 貢獻指南
+
+1. Fork 儲存庫
+2. 建立功能分支
+3. 編寫測試
+4. 確保所有測試通過
+5. 提交 Pull Request
+
+詳細資訊請參閱 [貢獻指南](contributing.md)。

@@ -1,6 +1,6 @@
-# Permission System
+﻿# Permission System
 
-[English](permission-system.md) | [简体中文](docs/zh-CN/permission-system.md) | [繁體中文](docs/zh-HK/permission-system.md) | [Español](docs/es-ES/permission-system.md) | [日本語](docs/ja-JP/permission-system.md) | [한국어](docs/ko-KR/permission-system.md) | [Čeština](docs/cs-CZ/permission-system.md)
+[English](../en/permission-system.md) | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | [Español](../es-ES/permission-system.md) | [日本語](../ja-JP/permission-system.md) | [한국어](../ko-KR/permission-system.md) | [Deutsch](../de-DE/permission-system.md) | [Čeština](../cs-CZ/permission-system.md)
 
 ## Overview
 
@@ -10,25 +10,25 @@ The permission system ensures all AI-initiated operations are properly validated
 
 ```
 ┌─────────────────────────────────────────────┐
-│          Permission Validation              │
+│          Permission Verification             │
 ├─────────────────────────────────────────────┤
-│  Level 1: IsCurator                         │
-│  ↓ Bypass if true                           │
-│  Level 2: UserFrequencyCache                │
-│  ↓ Rate limiting                            │
-│  Level 3: GlobalACL                         │
-│  ↓ Access control list                      │
-│  Level 4: IPermissionCallback               │
-│  ↓ Custom logic                             │
-│  Level 5: IPermissionAskHandler             │
-│  ↓ Ask user                                 │
-│  Result: Allowed or Denied                  │
+│  Level 1: IsCurator                          │
+│  ↓ Bypasses if true                          │
+│  Level 2: UserFrequencyCache                 │
+│  ↓ Rate limiting                             │
+│  Level 3: GlobalACL                          │
+│  ↓ Access control list                       │
+│  Level 4: IPermissionCallback                │
+│  ↓ Custom logic                              │
+│  Level 5: IPermissionAskHandler              │
+│  ↓ Ask user                                  │
+│  Result: Allowed or Denied                   │
 └─────────────────────────────────────────────┘
 ```
 
 ## Level 1: IsCurator
 
-Manager/curator bypasses all permission checks.
+Administrator/Curator bypasses all permission checks.
 
 ```csharp
 if (user.IsCurator)
@@ -39,7 +39,7 @@ if (user.IsCurator)
 
 ## Level 2: UserFrequencyCache
 
-Rate limiting per user to prevent abuse.
+Per-user rate limiting to prevent abuse.
 
 ```csharp
 var cache = new UserFrequencyCache();
@@ -83,7 +83,7 @@ Examples:
 
 ## Level 4: IPermissionCallback
 
-Custom callback for dynamic permission logic.
+Custom callbacks for dynamic permission logic.
 
 ### DefaultPermissionCallback Default Implementation
 
@@ -94,7 +94,7 @@ Custom callback for dynamic permission logic.
 - **Private IP addresses**:
   - 192.168.x.x (Class C) - Allowed
   - 10.x.x.x (Class A) - Allowed
-  - 172.16-31.x.x (Class B) - Ask User
+  - 172.16-31.x.x (Class B) - AskUser
 - **Domain whitelist**:
   - Search engines: Google, Bing, DuckDuckGo, Yandex, Sogou, etc.
   - AI services: OpenAI, Anthropic, HuggingFace, Ollama, etc.
@@ -104,16 +104,16 @@ Custom callback for dynamic permission logic.
   - **Weather information**: wttr.in
   - Government websites: .gov, .go.jp, .go.kr
 - **Domain blacklist**:
-  - AI impersonation sites: chatgpt, openai, deepseek, etc. (fake domains)
+  - AI impersonation websites: chatgpt, openai, deepseek, etc. spoofed domains
   - Malicious AI tools: wormgpt, darkgpt, fraudgpt, etc.
-  - AI content farm and black market related domains
+  - AI content farms and black market related domains
 
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {
     public async Task<PermissionResult> CheckAsync(PermissionRequest request)
     {
-        // Custom logic here
+        // Custom logic
         if (IsSafeOperation(request))
         {
             return PermissionResult.Allowed("Safe operation");
@@ -126,7 +126,7 @@ public class DefaultPermissionCallback : IPermissionCallback
 
 ## Level 5: IPermissionAskHandler
 
-Ask the user for permission when all other levels are undecided.
+Ask user for permission when all other levels are undecided.
 
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
@@ -165,7 +165,7 @@ All permission decisions are logged:
 
 ### EvaluatePermission API
 
-The `PermissionManager.EvaluatePermission()` method provides read-only pre-evaluation of permissions without triggering user prompts. This is used by the `PermissionTool` to let AI check permission states before attempting operations.
+The `PermissionManager.EvaluatePermission()` method provides read-only permission pre-evaluation without triggering user prompts. `PermissionTool` uses this method to let AI check permission status before attempting operations.
 
 ```csharp
 public PermissionResult EvaluatePermission(
@@ -174,23 +174,23 @@ public PermissionResult EvaluatePermission(
     string resource)
 ```
 
-**Returns**: Three-state `PermissionResult`:
-- `Allowed` - Operation is permitted
-- `Denied` - Operation is blocked
-- `AskUser` - User confirmation will be needed at execution time
+**Return value**: Three-state `PermissionResult`:
+- `Allowed` - Operation is allowed
+- `Denied` - Operation is denied
+- `AskUser` - User confirmation required on execution
 
-**Evaluation Order**:
+**Evaluation order**:
 1. **Frequency Cache** - Check cached user decisions
 2. **IPermissionCallback** - Custom callback evaluation
 3. **Curator Status** - If curator, returns `AskUser` (needs confirmation)
 4. **Global ACL** - Check access control rules
-5. **Default** - Deny if no matching rule
+5. **Default** - Deny when no rules match
 
-> **Note**: Unlike the full permission chain, `EvaluatePermission` does **not** invoke `IPermissionAskHandler`. It only reports what the result *would be* at execution time.
+> **Note**: Unlike the full permission chain, `EvaluatePermission` does **not** call `IPermissionAskHandler`. It only reports what the result *would be* on execution.
 
 ## Managing Permissions
 
-### Grant Permission
+### Grant Permissions
 
 **Via Web UI**:
 1. Navigate to **Permission Management**
@@ -198,7 +198,7 @@ public PermissionResult EvaluatePermission(
 3. Configure:
    - User
    - Resource
-   - Allowed/Denied
+   - Allow/Deny
    - Duration
 
 **Via API**:
@@ -213,7 +213,7 @@ curl -X POST http://localhost:8080/api/permissions \
   }'
 ```
 
-### Revoke Permission
+### Revoke Permissions
 
 ```bash
 curl -X DELETE http://localhost:8080/api/permissions/{rule-id}
@@ -229,13 +229,13 @@ curl http://localhost:8080/api/permissions?userId=user-uuid
 
 ### 1. Principle of Least Privilege
 
-Grant only the minimum permissions needed:
+Grant only the minimum permissions required:
 
 ```json
 {
   "resource": "disk:read",  // Not disk:*
   "allowed": true,
-  "expiresAt": "2026-04-21T00:00:00Z"  // Always set expiry
+  "expiresAt": "2026-04-21T00:00:00Z"  // Always set expiration
 }
 ```
 
@@ -245,10 +245,10 @@ Never grant permanent permissions unless absolutely necessary.
 
 ### 3. Monitor Permission Logs
 
-Regularly review the audit logs for:
+Regularly review audit logs for:
 - Denied access attempts
 - Unusual patterns
-- Permission escalations
+- Permission escalation
 
 ### 4. Implement Custom Callbacks
 
@@ -275,12 +275,12 @@ public async Task<PermissionResult> CheckAsync(PermissionRequest request)
 
 ## Common Scenarios
 
-### Scenario 1: AI Wants to Read File
+### Scenario 1: AI Wants to Read a File
 
 ```
 AI: "I need to read config.json"
 ↓
-Permission Chain:
+Permission chain:
 1. IsCurator? No
 2. Rate limit? OK
 3. GlobalACL? Found rule: disk:read = Allowed
@@ -292,12 +292,12 @@ Permission Chain:
 ```
 AI: "I want to compile and run code"
 ↓
-Permission Chain:
+Permission chain:
 1. IsCurator? No
 2. Rate limit? OK
 3. GlobalACL? No rule found
 4. Callback? Returns Undecided
-5. Ask User? User approves
+5. AskUser? User approves
 6. Result: Allowed
 ```
 
@@ -306,15 +306,15 @@ Permission Chain:
 ```
 AI: "I need to make 100 HTTP requests"
 ↓
-Permission Chain:
+Permission chain:
 1. IsCurator? No
-2. Rate limit? EXCEEDED
+2. Rate limit? Already exceeded
 3. Result: Denied
 ```
 
 ## Troubleshooting
 
-### Permission Denied Unexpectedly
+### Unexpected Permission Denial
 
 **Check**:
 1. User's IsCurator status
@@ -323,10 +323,10 @@ Permission Chain:
 4. Callback logic
 5. User response timeout
 
-### Permission Not Expiring
+### Permissions Not Expiring
 
 **Check**:
-- `expiresAt` field is set correctly
+- `expiresAt` field set correctly
 - Timezone is correct
 - Clock synchronization
 
@@ -334,7 +334,7 @@ Permission Chain:
 
 **Check**:
 - Audit logger is registered
-- Storage backend is accessible
+- Storage backend accessible
 - Sufficient disk space
 
 ## Next Steps
@@ -342,4 +342,4 @@ Permission Chain:
 - 📚 Read the [Architecture Guide](architecture.md)
 - 🛠️ Check the [Development Guide](development-guide.md)
 - 🔒 Review the [Security Documentation](security.md)
-- 🚀 See the [Getting Started Guide](getting-started.md)
+- 🚀 See the [Quick Start Guide](getting-started.md)

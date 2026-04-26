@@ -1,549 +1,345 @@
-# Referencia de Herramientas
+﻿# Referencia de Herramientas
 
-[English](tools-reference.md) | [简体中文](docs/zh-CN/tools-reference.md) | [繁體中文](docs/zh-HK/tools-reference.md) | [Español](docs/es-ES/tools-reference.md) | [日本語](docs/ja-JP/tools-reference.md) | [한국어](docs/ko-KR/tools-reference.md) | [Čeština](docs/cs-CZ/tools-reference.md)
+Este documento detalla todas las herramientas integradas de la plataforma Silicon Life Collective.
 
-## Herramientas Integradas
+[English](../en/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | **Español** | [Deutsch](../de-DE/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md)
 
-Silicon Life Collective incluye varias herramientas integradas que los Seres de Silicio pueden usar.
+## Resumen
+
+El sistema de herramientas permite a los Seres Silicona interactuar con el mundo exterior a través de una interfaz estandarizada. Cada herramienta implementa la interfaz `ITool` y es descubierta y registrada automáticamente por `ToolManager` a través de reflexión.
+
+### Categorías de Herramientas
+
+- **Herramientas de administración del sistema** — Configuración, permisos, compilación dinámica
+- **Herramientas de comunicación** — Chat, solicitudes de red
+- **Herramientas de almacenamiento de datos** — Operaciones de disco, base de datos, memoria, notas de trabajo
+- **Herramientas de gestión del tiempo** — Calendario, temporizadores, tareas
+- **Herramientas de desarrollo** — Ejecución de código, consulta de registros
+- **Herramientas de utilidad** — Información del sistema, auditoría de tokens, documentos de ayuda, red de conocimiento
+- **Herramientas de navegador** — Automatización de navegador WebView
 
 ---
 
-## CalendarTool
+## Lista de Herramientas Integradas
 
-**Descripción**: Consulta y conversión entre 32 sistemas de calendario.
+### 1. Herramienta de Calendario (CalendarTool)
 
-### Métodos
+**Nombre de herramienta**: `calendar`
 
-- `ConvertDate(DateTime date, string targetCalendar)`: Convertir fecha a otro calendario
-- `GetCurrentDate(string calendar)`: Obtener fecha actual en calendario específico
-- `GetSupportedCalendars()`: Listar calendarios soportados
+**Descripción**: Soporte para conversión y cálculo de fechas en 32 sistemas de calendario.
 
-### Ejemplo
+**Operaciones soportadas**:
+- `now` — Obtener tiempo actual
+- `format` — Formatear fecha
+- `add_days` — Sumar/restar días a fecha
+- `diff` — Calcular diferencia entre fechas
+- `list_calendars` — Listar todos los calendarios soportados
+- `get_components` — Obtener componentes de fecha
+- `get_now_components` — Obtener componentes de tiempo actual
+- `convert` — Convertir entre sistemas de calendario
 
-```csharp
-var tool = new CalendarTool();
-var result = tool.Execute("ConvertDate", new { 
-    date = DateTime.Now, 
-    targetCalendar = "ChineseLunar" 
-});
+**Sistemas de calendario soportados** (32):
+- Gregoriano (Gregorian)
+- Lunar Chino (Chinese Lunar)
+- Histórico Chino (Chinese Historical) — ciclo Ganzhi, años de reinado imperial
+- Islámico (Islamic)
+- Hebreo (Hebrew)
+- Japonés (Japanese)
+- Persa (Persian)
+- Maya (Mayan)
+- Budista (Buddhist)
+- Tibetano (Tibetan)
+- Y 24 calendarios más...
+
+**Ejemplo de uso**:
+```json
+{
+  "action": "convert",
+  "date": "2026-04-26",
+  "from_calendar": "gregorian",
+  "to_calendar": "chinese_lunar"
+}
 ```
 
-### Calendarios Soportados
-
-Gregorian, ChineseLunar, Islamic, Hebrew, Japanese, Persian, Mayan, Buddhist, Indian, y 23 más.
-
 ---
 
-## ChatTool
+### 2. Herramienta de Chat (ChatTool)
 
-**Descripción**: Enviar y recibir mensajes a través del sistema de chat.
+**Nombre de herramienta**: `chat`
 
-### Métodos
+**Descripción**: Gestionar sesiones de chat y envío de mensajes.
 
-- `SendMessage(string channelId, string message)`: Enviar mensaje
-- `GetMessages(string channelId, int count)`: Obtener mensajes recientes
-- `CreateChannel(string name)`: Crear nuevo canal
+**Operaciones soportadas**:
+- `send_message` — Enviar mensaje
+- `get_messages` — Obtener mensajes históricos
+- `create_group` — Crear chat grupal
+- `add_member` — Añadir miembro al grupo
+- `remove_member` — Remover miembro del grupo
+- `get_chat_info` — Obtener información de chat
+- `terminate_chat` — Terminar chat (leer sin responder)
 
-### Ejemplo
-
-```csharp
-var tool = new ChatTool();
-var result = tool.Execute("SendMessage", new {
-    channelId = "channel-guid",
-    message = "Hola desde herramienta"
-});
+**Ejemplo de uso**:
+```json
+{
+  "action": "send_message",
+  "target_id": "being-uuid-or-user-0",
+  "message": "你好，让我们协作吧！"
+}
 ```
 
 ---
 
-## ConfigTool
+### 3. Herramienta de Configuración (ConfigTool)
+
+**Nombre de herramienta**: `config`
 
 **Descripción**: Leer y modificar configuración del sistema.
 
-### Métodos
-
-- `GetValue(string key)`: Obtener valor de configuración
-- `SetValue(string key, object value)`: Establecer valor
-- `GetAll()`: Obtener toda la configuración
-
-### Ejemplo
-
-```csharp
-var tool = new ConfigTool();
-var aiConfig = tool.Execute("GetValue", new { key = "AIClients:Ollama:Model" });
-```
+**Operaciones soportadas**:
+- `read` — Leer elemento de configuración
+- `write` — Escribir elemento de configuración
+- `list` — Listar todos los elementos de configuración
+- `reset` — Restablecer configuración a valores predeterminados
 
 ---
 
-## CuratorTool
+### 4. Herramienta de Disco (DiskTool)
 
-**Descripción**: Herramienta exclusiva del Curador para gestionar seres.
+**Nombre de herramienta**: `disk`
 
-### Métodos
+**Descripción**: Operaciones de archivo y directorio.
 
-- `CreateBeing(string name, string soul)`: Crear nuevo ser
-- `DeleteBeing(string beingId)`: Eliminar ser
-- `ListBeings()`: Listar todos los seres
-- `StartBeing(string beingId)`: Iniciar ser
-- `StopBeing(string beingId)`: Detener ser
-
-### Ejemplo
-
-```csharp
-var tool = new CuratorTool();
-var result = tool.Execute("CreateBeing", new {
-    name = "Asistente",
-    soul = "# Personalidad\nEres útil..."
-});
-```
-
-**Nota**: Esta herramienta tiene el atributo `[SiliconManagerOnly]`.
+**Operaciones soportadas**:
+- `read` — Leer archivo
+- `write` — Escribir archivo
+- `list` — Listar directorio
+- `delete` — Eliminar archivo/directorio
+- `exists` — Verificar existencia
+- `create_directory` — Crear directorio
 
 ---
 
-## DiskTool
+### 5. Herramienta de Red (NetworkTool)
 
-**Descripción**: Operaciones de archivos y directorios.
+**Nombre de herramienta**: `network`
 
-### Métodos
+**Descripción**: Solicitudes HTTP y operaciones de red.
 
-- `ReadFile(string path)`: Leer archivo
-- `WriteFile(string path, string content)`: Escribir archivo
-- `ListDirectory(string path)`: Listar directorio
-- `CreateDirectory(string path)`: Crear directorio
-- `DeleteFile(string path)`: Eliminar archivo
-
-### Ejemplo
-
-```csharp
-var tool = new DiskTool();
-var content = tool.Execute("ReadFile", new { path = "/data/file.txt" });
-```
-
-**Nota**: Requiere permiso `FileAccess`.
+**Operaciones soportadas**:
+- `get` — Solicitud HTTP GET
+- `post` — Solicitud HTTP POST
+- `download` — Descargar archivo
+- `upload` — Subir archivo
 
 ---
 
-## DynamicCompileTool
+### 6. Herramienta de Memoria (MemoryTool)
 
-**Descripción**: Compilar y ejecutar código C# dinámicamente.
+**Nombre de herramienta**: `memory`
 
-### Métodos
+**Descripción**: Gestionar memoria a largo plazo del ser.
 
-- `Compile(string code)`: Compilar código
-- `Execute(string code, string[] args)`: Compilar y ejecutar
-- `ScanSecurity(string code)`: Escanear código por seguridad
-
-### Ejemplo
-
-```csharp
-var tool = new DynamicCompileTool();
-var result = tool.Execute("Execute", new {
-    code = "public class Program { public static string Run() => \"Hola\"; }",
-    args = new string[0]
-});
-```
-
-**Nota**: El código pasa por SecurityScanner antes de compilar.
+**Operaciones soportadas**:
+- `save` — Guardar memoria
+- `load` — Cargar memoria
+- `search` — Buscar memoria
+- `delete` — Eliminar memoria
+- `list` — Listar memorias
 
 ---
 
-## MemoryTool
+### 7. Herramienta de Tareas (TaskTool)
 
-**Descripción**: Gestionar memoria a largo plazo de los seres.
+**Nombre de herramienta**: `task`
 
-### Métodos
+**Descripción**: Gestionar sistema de tareas.
 
-- `Save(string key, string value)`: Guardar en memoria
-- `Load(string key)`: Cargar de memoria
-- `Delete(string key)`: Eliminar de memoria
-- `Search(string query)`: Buscar en memoria
-
-### Ejemplo
-
-```csharp
-var tool = new MemoryTool();
-tool.Execute("Save", new {
-    key = "user_preference",
-    value = "prefiere respuestas cortas"
-});
-```
+**Operaciones soportadas**:
+- `create` — Crear tarea
+- `update` — Actualizar tarea
+- `delete` — Eliminar tarea
+- `list` — Listar tareas
+- `complete` — Marcar tarea como completada
 
 ---
 
-## NetworkTool
+### 8. Herramienta de Temporizador (TimerTool)
 
-**Descripción**: Realizar solicitudes HTTP.
+**Nombre de herramienta**: `timer`
 
-### Métodos
+**Descripción**: Gestionar sistema de temporizadores.
 
-- `Get(string url)`: Solicitud GET
-- `Post(string url, string body)`: Solicitud POST
-- `Put(string url, string body)`: Solicitud PUT
-- `Delete(string url)`: Solicitud DELETE
-
-### Ejemplo
-
-```csharp
-var tool = new NetworkTool();
-var response = tool.Execute("Get", new { url = "https://api.example.com/data" });
-```
-
-**Nota**: Requiere permiso `NetworkAccess`.
+**Operaciones soportadas**:
+- `create` — Crear temporizador
+- `start` — Iniciar temporizador
+- `pause` — Pausar temporizador
+- `resume` — Reanudar temporizador
+- `cancel` — Cancelar temporizador
+- `list` — Listar temporizadores
 
 ---
 
-## SystemTool
+### 9. Herramienta de Notas de Trabajo (WorkNoteTool)
 
-**Descripción**: Información del sistema y operaciones.
+**Nombre de herramienta**: `worknote`
 
-### Métodos
+**Descripción**: Gestionar sistema de notas de trabajo.
 
-- `GetSystemInfo()`: Información del sistema
-- `GetMemoryUsage()`: Uso de memoria
-- `GetCpuUsage()`: Uso de CPU
-- `GetUptime()`: Tiempo de actividad
-
-### Ejemplo
-
-```csharp
-var tool = new SystemTool();
-var info = tool.Execute("GetSystemInfo", new { });
-```
+**Operaciones soportadas**:
+- `create` — Crear nota
+- `read` — Leer nota
+- `update` — Actualizar nota
+- `delete` — Eliminar nota
+- `search` — Buscar notas
+- `index` — Generar índice de notas
 
 ---
 
-## TaskTool
+### 10. Herramienta de Conocimiento (KnowledgeTool)
 
-**Descripción**: Gestionar tareas de los seres.
+**Nombre de herramienta**: `knowledge`
 
-### Métodos
+**Descripción**: Gestionar red de conocimiento basada en tripletas.
 
-- `CreateTask(string title, string description)`: Crear tarea
-- `UpdateTask(string taskId, string status)`: Actualizar tarea
-- `CompleteTask(string taskId)`: Completar tarea
-- `ListTasks(string status)`: Listar tareas
-
-### Ejemplo
-
-```csharp
-var tool = new TaskTool();
-var task = tool.Execute("CreateTask", new {
-    title = "Investigar tema",
-    description = "Buscar información sobre..."
-});
-```
+**Operaciones soportadas**:
+- `add` — Añadir tripleta de conocimiento
+- `query` — Consultar conocimiento
+- `update` — Actualizar conocimiento
+- `delete` — Eliminar conocimiento
+- `search` — Buscar conocimiento
+- `get_path` — Obtener ruta entre conceptos
+- `validate` — Validar conocimiento
+- `stats` — Estadísticas de red de conocimiento
 
 ---
 
-## TimerTool
+### 11. Herramienta de Auditoría de Tokens (TokenAuditTool)
 
-**Descripción**: Configurar temporizadores.
+**Nombre de herramienta**: `token_audit`
 
-### Métodos
+**Descripción**: Consultar uso de tokens de IA. **[Solo Curador]**
 
-- `SetTimer(string name, TimeSpan delay, string action)`: Configurar temporizador
-- `CancelTimer(string name)`: Cancelar temporizador
-- `ListTimers()`: Listar temporizadores activos
-
-### Ejemplo
-
-```csharp
-var tool = new TimerTool();
-tool.Execute("SetTimer", new {
-    name = "recordatorio",
-    delay = TimeSpan.FromMinutes(30),
-    action = "Enviar mensaje de recordatorio"
-});
-```
+**Operaciones soportadas**:
+- `query` — Consultar uso de tokens
+- `summary` — Obtener resumen de uso
+- `export` — Exportar datos de auditoría
 
 ---
 
-## TokenAuditTool
+### 12. Herramienta de Permiso (PermissionTool)
 
-**Descripción**: Consultar uso de tokens de IA.
+**Nombre de herramienta**: `permission`
 
-### Métodos
+**Descripción**: Gestionar sistema de permisos. **[Solo Curador]**
 
-- `GetUsage(string beingId, DateTime start, DateTime end)`: Uso de tokens
-- `GetSummary(string beingId)`: Resumen de uso
-- `GetAllUsage()`: Uso de todos los seres
-
-### Ejemplo
-
-```csharp
-var tool = new TokenAuditTool();
-var usage = tool.Execute("GetUsage", new {
-    beingId = "being-guid",
-    start = DateTime.Today,
-    end = DateTime.Now
-});
-```
+**Operaciones soportadas**:
+- `evaluate` — Evaluar permiso (sin activar prompt)
+- `add_rule` — Añadir regla de permiso
+- `remove_rule` — Eliminar regla de permiso
+- `list_rules` — Listar reglas de permiso
 
 ---
 
-## DatabaseTool
+### 13. Herramienta de Compilación Dinámica (DynamicCompilationTool)
 
-**Descripción**: Consulta y operaciones de base de datos estructurada.
+**Nombre de herramienta**: `dynamic_compilation`
 
-### Acciones
+**Descripción**: Compilar y reemplazar código del ser en tiempo de ejecución. **[Solo Curador]**
 
-- `query`: Consultar datos
-- `insert`: Insertar datos
-- `update`: Actualizar datos
-- `delete`: Eliminar datos
-
-### Ejemplo
-
-```json
-{
-  "action": "query",
-  "table": "users",
-  "conditions": {"status": "active"},
-  "limit": 100
-}
-```
-
-### Permiso
-
-Requiere permisos de acceso a base de datos apropiados.
+**Operaciones soportadas**:
+- `compile` — Compilar código
+- `replace` — Reemplazar clase del ser
+- `validate` — Validar código
 
 ---
 
-## LogTool
+### 14. Herramienta de Registro (LogTool)
 
-**Descripción**: Consultas de historial de operaciones y conversaciones.
+**Nombre de herramienta**: `log`
 
-### Acciones
+**Descripción**: Consultar registros del sistema.
 
-- `query_logs`: Consultar registros de operaciones
-- `query_conversations`: Consultar historial de conversaciones
-
-### Ejemplo (query_logs)
-
-```json
-{
-  "action": "query_logs",
-  "being_id": "being-uuid",
-  "start_time": "2026-04-20T00:00:00Z",
-  "end_time": "2026-04-23T23:59:59Z",
-  "level": "info"
-}
-```
-
-### Ejemplo (query_conversations)
-
-```json
-{
-  "action": "query_conversations",
-  "being_id": "being-uuid",
-  "session_id": "session-uuid",
-  "limit": 50
-}
-```
-
-### Funcionalidades
-
-- Soporte para filtrar registros por Ser de Silicio
-- Soporte para consultas de rango de tiempo
-- Soporte para filtrado por nivel de registro
-- Recuperación de historial de conversaciones
+**Operaciones soportadas**:
+- `query` — Consultar registros
+- `filter` — Filtrar registros por nivel/fecha
 
 ---
 
-## Mejoras de DiskTool
+### 15. Herramienta de Información del Sistema (SystemTool)
 
-DiskTool ahora incluye funcionalidad de búsqueda local (integrada desde SearchTool):
+**Nombre de herramienta**: `system`
 
-### Nuevas Acciones
+**Descripción**: Obtener información del sistema.
 
-- `search_files`: Buscar archivos
-- `search_content`: Buscar contenido
-
-### Ejemplo (search_files)
-
-```json
-{
-  "action": "search_files",
-  "path": "/data",
-  "pattern": "*.json",
-  "recursive": true
-}
-```
-
-### Ejemplo (search_content)
-
-```json
-{
-  "action": "search_content",
-  "path": "/data",
-  "query": "término de búsqueda",
-  "filePattern": "*.md"
-}
-```
+**Operaciones soportadas**:
+- `info` — Información del sistema
+- `stats` — Estadísticas de rendimiento
 
 ---
 
-## 16. Herramienta de Red de Conocimiento
+### 16. Herramienta de Ayuda (HelpTool)
 
-**Nombre**: `knowledge`
+**Nombre de herramienta**: `help`
 
-**Descripción**: Herramienta de operaciones de red de conocimiento, para agregar, consultar, actualizar, eliminar y buscar triples de conocimiento.
+**Descripción**: Acceder a documentos de ayuda.
 
-**Acciones**: `add`, `query`, `update`, `delete`, `search`, `get_path`, `validate`, `stats`
-
-**Parámetros** (add - agregar conocimiento):
-```json
-{
-  "action": "add",
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language",
-  "confidence": 0.95,
-  "tags": ["programming", "language"]
-}
-```
-
-**Parámetros** (query - consultar conocimiento):
-```json
-{
-  "action": "query",
-  "subject": "Python",
-  "predicate": "is_a"
-}
-```
-
-**Parámetros** (search - buscar conocimiento):
-```json
-{
-  "action": "search",
-  "query": "programming language",
-  "limit": 10
-}
-```
-
-**Parámetros** (get_path - obtener ruta de conocimiento):
-```json
-{
-  "action": "get_path",
-  "from": "Python",
-  "to": "computer_science"
-}
-```
-
-**Parámetros** (stats - estadísticas):
-```json
-{
-  "action": "stats"
-}
-```
-
-**Características**:
-- Representación de conocimiento basada en estructura de triple (sujeto-predicado-objeto)
-- Soporte de puntuación de confianza de conocimiento
-- Soporte de clasificación y búsqueda por etiquetas
-- Soporte de descubrimiento de rutas de conocimiento (rutas asociativas entre dos puntos)
-- Soporte de validación de conocimiento y verificación de integridad
-- Almacenamiento persistente en sistema de archivos
-
-**Permiso**: Todos los seres pueden usar.
-
-## 17. Herramienta de Notas de Trabajo
-
-**Nombre**: `work_note`
-
-**Descripción**: Gestión de notas de trabajo para seres de silicio. Las notas de trabajo usan diseño basado en páginas, similar a un diario personal (privado por defecto).
-
-**Acciones**: `create`, `read`, `update`, `delete`, `list`, `directory`, `search`
-
-**Parámetros** (create - crear nota):
-```json
-{
-  "action": "create",
-  "summary": "Módulo de autenticación de usuario completado",
-  "content": "## Detalles de implementación\n\n- Uso de token JWT\n- Soporte OAuth2\n- Mecanismo de token de actualización añadido",
-  "keywords": "autenticación,JWT,OAuth2"
-}
-```
-
-**Parámetros** (read - leer nota):
-```json
-{
-  "action": "read",
-  "page_number": 1
-}
-```
-
-O usar note_id:
-```json
-{
-  "action": "read",
-  "note_id": "550e8400-e29b-41d4-a716-446655440000"
-}
-```
-
-**Parámetros** (update - actualizar nota):
-```json
-{
-  "action": "update",
-  "page_number": 1,
-  "content": "## Contenido actualizado\n\nPruebas unitarias añadidas",
-  "summary": "Módulo de autenticación y pruebas completados"
-}
-```
-
-**Parámetros** (list - listar todas las notas):
-```json
-{
-  "action": "list"
-}
-```
-
-**Parámetros** (directory - generar directorio de notas):
-```json
-{
-  "action": "directory"
-}
-```
-
-**Parámetros** (search - buscar notas):
-```json
-{
-  "action": "search",
-  "keyword": "autenticación",
-  "max_results": 10
-}
-```
-
-**Características**:
-- Diseño basado en páginas, cada página gestionada independientemente
-- Soporte de resumen, contenido, palabras clave
-- Soporte de búsqueda por palabras clave
-- Soporte de generación de vista general de directorio (para comprensión de contexto)
-- Soporte de formato Markdown (texto, listas, tablas, bloques de código)
-- Registro automático de marca de tiempo
-- Privado por defecto, solo el ser puede acceder
-
-**Permiso**: Los seres acceden a sus propias notas de trabajo, el curador puede gestionar todas las notas.
+**Operaciones soportadas**:
+- `search` — Buscar documentos de ayuda
+- `list` — Listar temas de ayuda
+- `get` — Obtener documento específico
 
 ---
 
-## Crear Herramientas Personalizadas
+### 17. Herramienta de Navegador WebView (WebViewBrowserTool)
 
-Puedes crear herramientas personalizadas implementando `ITool`:
+**Nombre de herramienta**: `webview_browser`
 
-```csharp
-public class MyCustomTool : ITool
-{
-    public string Name => "MiHerramienta";
-    public string Description => "Mi herramienta personalizada";
-    
-    public ToolResult Execute(string method, object parameters)
-    {
-        // Lógica de la herramienta
-        return new ToolResult { Success = true, Message = "Éxito" };
-    }
-}
-```
+**Descripción**: Automatización de navegador basada en Playwright.
 
-La herramienta se registrará automáticamente mediante reflexión.
+**Operaciones soportadas**:
+- `navigate` — Navegar a URL
+- `click` — Hacer clic en elemento
+- `input` — Entrada de texto
+- `get_content` — Obtener contenido de página
+- `execute_js` — Ejecutar JavaScript
+- `screenshot` — Tomar captura de pantalla
+- `wait_for` — Esperar elemento
+
+---
+
+### 18-23. Otras Herramientas
+
+- **Herramienta de Proyecto (ProjectTool)**: Gestionar proyectos y espacios de trabajo
+- **Herramienta de Ejecutor (ExecutorTool)**: Gestionar ejecutores (solo curador)
+- **Herramienta de Localización (LocalizationTool)**: Gestionar localización
+- **Herramienta de Chat History (ChatHistoryTool)**: Consultar historial de chat
+- **Herramienta de Broadcast (BroadcastTool)**: Gestionar canales de broadcast
+- **Herramienta de Código (CodeTool)**: Ejecutar y analizar código
+
+---
+
+## Mejores Prácticas
+
+### 1. Verificar Permisos Antes de Ejecutar
+
+Usar `PermissionTool.EvaluatePermission()` para verificar estado de permisos antes de intentar operaciones.
+
+### 2. Manejar Errores Gracefully
+
+Siempre verificar `ToolResult.Success` y manejar fallos apropiadamente.
+
+### 3. Usar Herramientas Apropiadas
+
+Elegir la herramienta correcta para el trabajo:
+- Operaciones de archivo → `DiskTool`
+- Solicitudes HTTP → `NetworkTool`
+- Gestión de tiempo → `CalendarTool`, `TimerTool`
+
+---
+
+## Próximos Pasos
+
+- 📚 Leer la [Guía de Arquitectura](architecture.md)
+- 🛠️ Consultar la [Guía de Desarrollo](development-guide.md)
+- 🌐 Ver la [Guía de Web UI](web-ui-guide.md)
+- 🚀 Comenzar con la [Guía de Inicio Rápido](getting-started.md)

@@ -1,6 +1,6 @@
-# Getting Started
+﻿# Quick Start
 
-[English](getting-started.md) | [简体中文](docs/zh-CN/getting-started.md) | [繁體中文](docs/zh-HK/getting-started.md) | [Español](docs/es-ES/getting-started.md) | [日本語](docs/ja-JP/getting-started.md) | [한국어](docs/ko-KR/getting-started.md) | [Čeština](docs/cs-CZ/getting-started.md)
+[English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ dotnet build
 
 ### 3. Configure AI Backend
 
-Edit `src/SiliconLife.Default/Config/DefaultConfigData.cs` or modify the configuration at runtime through the Web UI.
+Edit `src/SiliconLife.Default/Config/DefaultConfigData.cs` or modify configuration at runtime through the Web UI.
 
 #### Option A: Ollama (Local)
 
@@ -72,13 +72,13 @@ Open your browser and navigate to:
 http://localhost:8080
 ```
 
-You'll see the dashboard with:
-- Silicon Being management
-- Chat interface
-- Configuration panel
-- System monitoring
+You will see a dashboard with:
+- Silicon Being Management
+- Chat Interface
+- Configuration Panel
+- System Monitoring
 
-## First Silicon Being
+## Your First Silicon Being
 
 ### Create Your First Being
 
@@ -150,10 +150,12 @@ lsof -ti:8080 | xargs kill -9
 
 ## Next Steps
 
-- 📚 Read the [Architecture Guide](architecture.md) to understand the system design
+- 📚 Read the [Architecture Guide](architecture.md) to understand system design
 - 🛠️ Check the [Development Guide](development-guide.md) to extend the system
 - 📖 Explore the [API Reference](api-reference.md) for integration details
-- 🔒 Review the [Security Documentation](security.md) for permission system
+- 🔒 Review the [Security Documentation](security.md) for the permission system
+- 🧰 See the [Tools Reference](tools-reference.md) for all built-in tools
+- 🌐 Check the [Web UI Guide](web-ui-guide.md) for interface features
 
 ## Project Structure
 
@@ -161,18 +163,22 @@ lsof -ti:8080 | xargs kill -9
 SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/      # Core interfaces and abstractions
-│   └── SiliconLife.Default/   # Default implementations + entry point
-├── docs/                      # Documentation (multi-language)
+│   └── SiliconLife.Default/   # Default implementation + entry point
+├── docs/                      # Documentation (multi-language, 21 language variants)
 │   ├── en/                    # English
 │   ├── zh-CN/                 # Simplified Chinese
 │   ├── zh-HK/                 # Traditional Chinese
+│   ├── es-ES/                 # Spanish
 │   ├── ja-JP/                 # Japanese
-│   └── ko-KR/                 # Korean
-└── README.md                  # This file
+│   ├── ko-KR/                 # Korean
+│   └── cs-CZ/                 # Czech
+├── 总文档/                     # Requirements and architecture docs (Chinese)
+└── README.md                  # Project readme
 ```
 
 ## Need Help?
 
-- 📖 Check the [Documentation](docs/)
-- 🐛 Report issues on GitHub
-- 💬 Join the community discussions
+- 📖 Check the [Help Documentation System](web-ui-guide.md#help-documentation-system-new) (multi-language support)
+- 📚 Read the [Full Documentation](docs/)
+- 🐛 Report issues on [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 💬 Join community discussions

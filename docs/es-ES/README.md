@@ -1,186 +1,246 @@
-# Silicon Life Collective
+﻿# Silicon Life Collective
 
-**⚠️ ADVERTENCIA: La compilación dinámica funciona pero requiere plantillas de código para funcionar correctamente. Las pruebas exhaustivas están en curso.**
+**Silicon Life Collective** — Una plataforma de colaboración multiagente basada en .NET 9, donde los agentes de IA se denominan **Ser Silicona**, capaces de auto-evolucionarse mediante compilación dinámica Roslyn.
 
-Una plataforma de colaboración multiagente en .NET 9 donde los agentes de IA llamados **Seres de Silicio** se autoevolucionan mediante compilación dinámica Roslyn.
+[English](../README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | **Español** | [Deutsch](../de-DE/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Čeština](../cs-CZ/README.md)
 
-[English](../en/README.md) | [中文文档](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Español](../es-ES/README.md) | [Čeština](../cs-CZ/README.md)
+## 🌟 Características Principales
 
-## Características
+### Sistema de Agentes
+- **Orquestación Multiagente** — Gestión unificada por el *Curador Silicona*, con mecanismo de programación justa por intervalo de tiempo impulsado por reloj
+- **Impulsado por Archivo de Alma** — Cada Ser Silicona es impulsado por un archivo de indicación central (`soul.md`), definiendo personalidad y patrones de comportamiento únicos
+- **Arquitectura Cuerpo-Cerebro** — El *Cuerpo* (SiliconBeing) mantiene signos vitales y detecta escenarios de activación; el *Cerebro* (ContextManager) carga historial, invoca IA, ejecuta herramientas y persiste respuestas
+- **Capacidad de Auto-Evolución** — Mediante tecnología de compilación dinámica Roslyn, los Seres Silicona pueden reescribir su propio código para evolucionar
 
-- **Orquestación Multiagente** — Gestionada por un *Curador de Silicio* con programación justa por segmentos de tiempo basada en ticks (MainLoop + TickObject + Watchdog + Circuit Breaker)
-- **Impulsado por Archivo de Alma** — Cada Ser de Silicio es impulsado por un archivo de prompt principal (`soul.md`) que define su personalidad y comportamiento
-- **Arquitectura Cuerpo-Cerebro** — El *Cuerpo* (SiliconBeing) se mantiene vivo y detecta desencadenadores; el *Cerebro* (ContextManager) carga historial, llama a IA, ejecuta herramientas y persiste respuestas
-- **Bucle de Llamada a Herramientas** — La IA devuelve tool_calls → ejecutar herramientas → devolver resultados → la IA continúa → hasta respuesta de texto plano
-- **Seguridad Ejecutor-Permiso** — Todas las operaciones de disco, red y línea de comandos pasan por ejecutores con verificación de permisos
+### Herramientas y Ejecución
+- **23 Herramientas Integradas** — Cubren calendario, chat, configuración, disco, red, memoria, tareas, temporizadores, base de conocimientos, notas de trabajo, navegador WebView, etc.
+- **Ciclo de Invocación de Herramientas** — IA devuelve invocación de herramienta → Ejecutar herramienta → Retroalimentar resultados a IA → Ciclo continuo hasta devolver respuesta de texto puro
+- **Seguridad Ejecutor-Permiso** — Todas las operaciones de E/S pasan por verificación estricta de permisos a través de ejecutores
   - Cadena de permisos de 5 niveles: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
-  - Registro de auditoría para todas las decisiones de permisos
-- **Auditoría de Uso de Tokens** — Seguimiento y reporte integrado de uso de tokens mediante `ITokenUsageAudit` / `TokenUsageAuditManager`
-- **Múltiples Backends de IA** — Soporte para Ollama (local) y Alibaba Cloud DashScope (nube)
-  - **Ollama** — Alojamiento local de modelos con API HTTP nativa
-  - **DashScope (百炼)** — Servicio de IA en la nube con API compatible con OpenAI, despliegue multirregional y 13+ modelos (Qwen, DeepSeek, GLM, Kimi, Llama)
-- **32 Sistemas de Calendario** — Soporte multicalendario incluyendo Gregoriano, Lunar Chino, Islámico, Hebreo, Japonés, Persa, Maya y más
-- **Dependencias Mínimas** — La biblioteca principal solo depende de Microsoft.CodeAnalysis.CSharp para compilación dinámica Roslyn
-- **Cero Dependencia de Base de Datos** — Almacenamiento basado en archivos (JSON) con consultas indexadas por tiempo mediante `ITimeStorage`
-- **Localización** — Soporte multilingüe integral con 21 variantes de idioma
+  - Registro de auditoría completo para todas las decisiones de permisos
+
+### IA y Conocimiento
+- **Soporte para Múltiples Backends de IA**
+  - **Ollama** — Despliegue local de modelos, usando API HTTP nativa
+  - **Alibaba Cloud Bailian (DashScope)** — Servicio de IA en la nube, compatible con API OpenAI, soporte para 13+ modelos, despliegue multi-región
+- **32 Sistemas de Calendario** — Cobertura completa de los principales calendarios globales, incluyendo Gregoriano, Lunar Chino, Islámico, Hebreo, Japonés, Persa, Maya, Calendario Histórico Chino, etc.
+- **Sistema de Red de Conocimiento** — Gráfico de conocimiento basado en tripletas (sujeto-relación-objeto), soportando almacenamiento, consulta y descubrimiento de rutas
+
+### Interfaz Web
+- **Web UI Moderna** — Servidor HTTP integrado, soporte para actualizaciones en tiempo real SSE
+- **4 Temas de Piel** — Versión de gestión, versión de chat, versión de creación, versión de desarrollo, soporte para descubrimiento y cambio automáticos
+- **20+ Controladores** — Funcionalidad completa de gestión del sistema, chat, configuración y monitoreo
+- **Sin Dependencias de Framework Frontend** — Generación de HTML/CSS/JS en el servidor mediante `H`, `CssBuilder` y `JsBuilder`
+
+### Internacionalización y Localización
+- Soporte completo para **21 variantes de idioma**
   - Chino: zh-CN, zh-HK, zh-SG, zh-MO, zh-TW, zhMY (6 variantes)
   - Inglés: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variantes)
-  - Japonés: ja-JP
-  - Coreano: ko-KR
   - Español: es-ES, es-MX (2 variantes)
-  - Checo: cs-CZ
-- **Interfaz Web** — Servidor HTTP integrado con soporte SSE, múltiples pieles y panel integral
-  - **Sistema de Pieles** — 4 pieles integradas (Admin, Chat, Creative, Dev) con interfaz ISkin enchufable y autodescubrimiento
-  - **20+ Controladores** — About, Audit, Being, Chat, ChatHistory, CodeBrowser, CodeHover, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer, TimerExecutionHistory
-  - **Actualizaciones en Tiempo Real** — SSE (Server-Sent Events) para mensajes de chat, estado de seres y eventos del sistema
-  - **Constructores HTML/CSS/JS** — Generación de marcado del lado del servidor mediante `H`, `CssBuilder` y `JsBuilder` (cero dependencia de framework frontend)
-  - **Localización** — Veintiún variantes de idioma integradas con resolución de LocalizationManager
-  - **Vista de Historial de Chat** — Navegación completa del historial de chat de Seres de Silicio con lista de conversaciones y detalles de mensajes
-  - **Soporte de Carga de Archivos** — Diálogo de origen de archivos y funcionalidad de carga de archivos
-  - **Indicadores de Carga** — Indicadores de estado de carga para páginas de chat y selección automática de sesión del curador
+  - Japonés: ja-JP | Coreano: ko-KR | Checo: cs-CZ
 
-## Stack Tecnológico
+### Datos y Almacenamiento
+- **Sin Dependencia de Base de Datos** — Almacenamiento puro en sistema de archivos (formato JSON)
+- **Consulta Indexada por Tiempo** — Soporte para consultas eficientes por rango de tiempo a través de la interfaz `ITimeStorage`
+- **Dependencias Mínimas** — La biblioteca central solo depende de Microsoft.CodeAnalysis.CSharp para compilación dinámica
+
+## 🛠️ Stack Tecnológico
 
 | Componente | Tecnología |
-|-----------|-----------|
+|------|------|
 | Runtime | .NET 9 |
-| Lenguaje | C# |
-| Integración de IA | Ollama (local), Alibaba Cloud DashScope (nube) |
-| Almacenamiento | Sistema de archivos (JSON + directorios indexados por tiempo) |
+| Lenguaje de Programación | C# |
+| Integración IA | Ollama (local), Alibaba Cloud Bailian (nube) |
+| Almacenamiento de Datos | Sistema de archivos (JSON + directorios indexados por tiempo) |
 | Servidor Web | HttpListener (integrado en .NET) |
 | Compilación Dinámica | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
+| Automatización de Navegador | Playwright (WebView) |
 | Licencia | Apache-2.0 |
 
-## Estructura del Proyecto
+## 📁 Estructura del Proyecto
 
 ```
 SiliconLifeCollective.sln
 ├── src/
-│   ├── SiliconLife.Core/                  # Biblioteca principal (interfaces, abstracciones)
-│   │   ├── ServiceLocator.cs             # Localizador de servicios global: Register/Get, ChatSystem, IMManager, AuditLogger, GlobalACL, BeingFactory, BeingManager, DynamicBeingLoader, TokenUsageAudit
-│   │   ├── Runtime/                       # MainLoop, TickObject, CoreHost, CoreHostBuilder, PerformanceMonitor
-│   │   ├── SiliconBeing/                  # SiliconBeingBase, SiliconBeingManager, SiliconCurator, ISiliconBeingFactory, SoulFileManager, Memory, TaskSystem, TimerSystem
-│   │   ├── AI/                            # IAIClient, IAIClientFactory, ContextManager ("cerebro"), Message, AIRequest/AIResponse
-│   │   ├── Audit/                         # ITokenUsageAudit, TokenUsageAuditManager, TokenUsageRecord, TokenUsageSummary, TokenUsageQuery
-│   │   ├── Chat/                          # ChatSystem, IChatService, SimpleChatService, SessionBase, SingleChatSession, GroupChatSession, BroadcastChannel, ChatMessage
-│   │   ├── Executors/                     # ExecutorBase, DiskExecutor, NetworkExecutor, CommandLineExecutor, ExecutorRequest, ExecutorResult
-│   │   ├── Tools/                         # ITool, ToolManager (escaneo por reflexión), ToolCall/ToolResult, ToolDefinition, SiliconManagerOnlyAttribute
-│   │   ├── Security/                      # PermissionManager, GlobalACL, AuditLogger, UserFrequencyCache, PermissionResult, PermissionType, IPermissionCallback, IPermissionAskHandler
-│   │   ├── IM/                            # IIMProvider, IMManager (enrutamiento de mensajes)
-│   │   ├── Storage/                       # IStorage, ITimeStorage (clave-valor + indexado por tiempo)
-│   │   ├── Config/                        # ConfigDataBase, Config (singleton + JSON), ConfigDataBaseConverter, GuidConverter, AIClientConfigAttribute, ConfigGroupAttribute, ConfigIgnoreAttribute, DirectoryInfoConverter
-│   │   ├── Localization/                  # LocalizationBase, LocalizationManager, enum Language
-│   │   ├── Logging/                       # ILogger, ILoggerProvider, LogEntry, LogLevel, LogManager
-│   │   ├── Compilation/                   # DynamicBeingLoader, DynamicCompilationExecutor, SecurityScanner, CodeEncryption
-│   │   └── Time/                          # IncompleteDate (consultas por rango de tiempo)
+│   ├── SiliconLife.Core/                  # Biblioteca central (interfaces, clases abstractas)
+│   │   ├── AI/                            # Interfaces de cliente IA, gestor de contexto, modelos de mensajes
+│   │   ├── Audit/                         # Sistema de auditoría de uso de tokens
+│   │   ├── Chat/                          # Sistema de chat, gestión de sesiones, canales de broadcast
+│   │   ├── Compilation/                   # Compilación dinámica, escaneo de seguridad, cifrado de código
+│   │   ├── Config/                        # Sistema de gestión de configuración
+│   │   ├── Executors/                     # Ejecutores (disco, red, línea de comandos)
+│   │   ├── IM/                            # Interfaces de proveedor de mensajería instantánea
+│   │   ├── Knowledge/                     # Sistema de red de conocimiento
+│   │   ├── Localization/                  # Sistema de localización
+│   │   ├── Logging/                       # Sistema de registro
+│   │   ├── Project/                       # Sistema de gestión de proyectos
+│   │   ├── Runtime/                       # Bucle principal, objetos de reloj, host central
+│   │   ├── Security/                      # Sistema de gestión de permisos
+│   │   ├── SiliconBeing/                  # Clase base de Ser Silicona, gestor, fábrica
+│   │   ├── Storage/                       # Interfaces de almacenamiento
+│   │   ├── Time/                          # Fecha incompleta (consulta de rango de tiempo)
+│   │   ├── Tools/                         # Interfaces de herramientas y gestor de herramientas
+│   │   ├── WebView/                       # Interfaz de navegador WebView
+│   │   └── ServiceLocator.cs              # Localizador de servicios global
 │   │
-│   └── SiliconLife.Default/               # Implementaciones predeterminadas + punto de entrada
-│       ├── Program.cs                     # Entrada de aplicación (conexión de todos los componentes)
-│       ├── AI/                            # OllamaClient, OllamaClientFactory (API HTTP nativa de Ollama); DashScopeClient, DashScopeClientFactory (Alibaba Cloud Bailian)
-│       ├── SiliconBeing/                  # DefaultSiliconBeing, DefaultSiliconBeingFactory
-│       ├── Calendar/                      # 32 implementaciones de calendario: Buddhist, Cherokee, ChineseLunar, ChulaSakarat, Coptic, Dai, DehongDai, Ethiopian, FrenchRepublican, Gregorian, Hebrew, Indian, Inuit, Islamic, Japanese, Javanese, Juche, Julian, Khmer, Mayan, Mongolian, Persian, RepublicOfChina, Roman, Saka, Sexagenary, Tibetan, Vietnamese, VikramSamvat, Yi, Zoroastrian
+│   └── SiliconLife.Default/               # Implementación predeterminada + punto de entrada de la aplicación
+│       ├── Program.cs                     # Punto de entrada (ensambla todos los componentes)
+│       ├── AI/                            # Cliente Ollama, cliente Bailian
+│       ├── Calendar/                      # 32 implementaciones de calendario
+│       ├── Config/                        # Datos de configuración predeterminados
 │       ├── Executors/                     # Implementaciones predeterminadas de ejecutores
-│       ├── IM/                            # WebUIProvider (Interfaz web como canal IM), IMPermissionAskHandler
-│       ├── Tools/                         # Herramientas integradas: Calendar, Chat, Config, Curator, Disk, DynamicCompile, Memory, Network, System, Task, Timer, TokenAudit
-│       ├── Config/                        # DefaultConfigData
-│       ├── Localization/                  # ZhCN, ZhHK, EnUS, JaJP, KoKR, CsCZ, EsES, DefaultLocalizationBase, EnOther (EnGB, EnCA, EnAU, EnIN, EnSG, EnZA, EnIE, EnNZ, EnMY), ZhOther (ZhSG, ZhMO, ZhTW, ZhMY), EsOther (EsMX)
-│       ├── Logging/                       # ConsoleLoggerProvider, FileSystemLoggerProvider
-│       ├── Storage/                       # FileSystemStorage, FileSystemTimeStorage
-│       ├── Security/                      # DefaultPermissionCallback
-│       ├── Runtime/                       # TestTickObject
-│       └── Web/                           # Implementación de interfaz web
-│           ├── Controllers/               # 20+ controladores: About, Audit, Being, Chat, ChatHistory, CodeBrowser, CodeHover, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer
-│           ├── Models/                    # ViewModels: AboutViewModel, AuditViewModel, BeingViewModel, ChatMessage, ChatViewModel, CodeBrowserViewModel, ConfigViewModel, DashboardViewModel, ExecutorViewModel, KnowledgeViewModel, LogViewModel, MemoryViewModel, PermissionViewModel, PermissionRequestViewModel, ProjectViewModel, TaskViewModel, TimerViewModel, ViewModelBase
-│           ├── Views/                     # 19 vistas HTML: ViewBase, AboutView, AuditView, BeingView, ChatView, CodeBrowserView, CodeEditorView, ConfigView, DashboardView, ExecutorView, KnowledgeView, LogView, MarkdownEditorView, MemoryView, PermissionView, ProjectView, SoulEditorView, TaskView, TimerView
-│           ├── Skins/                     # 4 pieles: Admin (profesional), Chat (conversacional), Creative (artística), Dev (enfocada en desarrolladores)
-│           ├── ISkin.cs                   # Interfaz Skin + SkinPreviewInfo + SkinManager (autodescubrimiento)
-│           ├── Controller.cs              # Clase base de controlador
-│           ├── WebHost.cs                 # Servidor HTTP (HttpListener)
-│           ├── Router.cs                  # Enrutamiento de solicitudes con coincidencia de patrones
-│           ├── SSEHandler.cs              # Server-Sent Events
-│           ├── WebSecurity.cs             # Utilidades de seguridad web
-│           ├── H.cs                       # DSL de constructor HTML fluido
-│           ├── CssBuilder.cs              # Utilidad de constructor CSS
-│           └── JsBuilder.cs               # Utilidad de constructor JavaScript
+│       ├── Help/                          # Sistema de documentos de ayuda
+│       ├── IM/                            # Proveedor WebUI
+│       ├── Knowledge/                     # Implementación de red de conocimiento
+│       ├── Localization/                  # Localización en 21 idiomas
+│       ├── Logging/                       # Implementaciones de proveedores de registro
+│       ├── Project/                       # Implementación del sistema de proyectos
+│       ├── Runtime/                       # Objeto de reloj de prueba
+│       ├── Security/                      # Callbacks de permisos predeterminados
+│       ├── SiliconBeing/                  # Implementación predeterminada de Ser Silicona
+│       ├── Storage/                       # Implementación de almacenamiento en sistema de archivos
+│       ├── Tools/                         # 23 implementaciones de herramientas integradas
+│       ├── WebView/                       # Implementación Playwright WebView
+│       └── Web/                           # Implementación Web UI
+│           ├── Controllers/               # 20+ controladores
+│           ├── Models/                    # Modelos de vista
+│           ├── Views/                     # Vistas HTML
+│           └── Skins/                     # 4 temas de piel
 │
-├── docs/
-│   └── es-ES/                             # Documentación en español
+├── docs/                                  # Documentación multilingüe
+│   ├── zh-CN/                             # Documentación en chino simplificado
+│   ├── en/                                # Documentación en inglés
+│   └── ...                                # Documentación en otros idiomas
+│
+└── 总文档/                                 # Documentos de requisitos y arquitectura
+    ├── 需求文档.md
+    ├── 架构大纲.md
+    └── 实现顺序.md
 ```
 
-## Resumen de Arquitectura
+## 🏗️ Resumen de Arquitectura
 
+### Arquitectura de Programación
 ```
-MainLoop (hilo dedicado, watchdog + circuit breaker)
-  └── TickObject (ordenado por prioridad)
-       └── SiliconBeingManager
-            └── SiliconBeingRunner (hilo temporal por tick, timeout + circuit breaker)
-                 └── DefaultSiliconBeing.Tick()
-                      └── ContextManager.ThinkOnChat()
-                           └── IAIClient.Chat() -> Bucle de Llamada a Herramientas -> Persistir en ChatSystem
-```
-
-Todas las operaciones de I/O iniciadas por IA pasan por la cadena de seguridad:
-
-```
-Tool Call -> Executor -> PermissionManager -> [IsCurator -> FrequencyCache -> GlobalACL -> Callback -> AskUser]
+Bucle principal (hilo dedicado, watchdog + cortacircuitos)
+  └── Objetos de reloj (ordenados por prioridad)
+       └── Gestor de Seres Silicona
+            └── Ejecutor de Ser Silicona (hilo temporal, timeout + cortacircuitos)
+                 └── SiliconBeing.Tick()
+                      └── ContextManager.Think()
+                           └── IAIClient.Chat()
+                                └── Ciclo de invocación de herramientas → Persistir en sistema de chat
 ```
 
-## Primeros Pasos
+### Arquitectura de Seguridad
+Todas las operaciones de E/S iniciadas por IA deben pasar por una cadena de seguridad estricta:
 
-### Requisitos Previos
+```
+Invocación de herramienta → Ejecutor → Gestor de permisos → [IsCurator → caché de frecuencia → ACL global → callback → preguntar al usuario]
+```
 
-- .NET 9 SDK
-- Backend de IA (elegir uno):
-  - **Ollama**: [Ollama](https://ollama.com) ejecutándose localmente con un modelo descargado (ej., `ollama pull llama3`)
-  - **Alibaba Cloud DashScope**: Clave API válida desde [Bailian Console](https://bailian.console.aliyun.com/)
+## 🚀 Inicio Rápido
 
-### Compilar
+### Prerrequisitos
+
+- **.NET 9 SDK** — [Enlace de descarga](https://dotnet.microsoft.com/download/dotnet/9.0)
+- **Backend de IA** (elegir uno):
+  - **Ollama**: [Instalar Ollama](https://ollama.com) y obtener modelo (ej. `ollama pull llama3`)
+  - **Alibaba Cloud Bailian**: Obtener clave API desde [Consola Bailian](https://bailian.console.aliyun.com/)
+
+### Construir el Proyecto
 
 ```bash
 dotnet restore
 dotnet build
 ```
 
-### Ejecutar
+### Ejecutar el Sistema
 
 ```bash
 dotnet run --project src/SiliconLife.Default
 ```
 
-La aplicación iniciará un servidor web y abrirá automáticamente la interfaz web en tu navegador.
+La aplicación iniciará el servidor web y abrirá automáticamente la Web UI en el navegador.
 
-### Publicar (archivo único)
+### Publicar como Archivo Único
 
 ```bash
+# Windows
 dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
+
+# Linux
+dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS
+dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
-## Hoja de Ruta
+## 📋 Hoja de Ruta de Desarrollo
 
+### ✅ Completado
 - [x] Fase 1: Chat de IA en consola
-- [x] Fase 2: Esqueleto de framework (MainLoop + TickObject + Watchdog + Circuit Breaker)
-- [x] Fase 3: Primer Ser de Silicio con archivo de alma (arquitectura Cuerpo-Cerebro)
-- [x] Fase 4: Memoria persistente (ChatSystem + ITimeStorage)
-- [x] Fase 5: Sistema de herramientas + Ejecutores
-- [x] Fase 6: Sistema de permisos (cadena de 5 niveles, AuditLogger, GlobalACL)
-- [x] Fase 7: Compilación dinámica + autoevolución (Roslyn)
-- [x] Fase 8: Memoria a largo plazo + Tareas + Temporizador
-- [x] Fase 9: CoreHost + colaboración multiagente
-- [x] Fase 10: Interfaz web (HTTP + SSE, 18 controladores, 4 pieles)
-- [x] Fase 10.5: Mejoras incrementales (BroadcastChannel, TokenAudit, 32 calendarios, mejoras de herramientas, localización en 21 idiomas)
-- [ ] Fase 11: Integración con IM externos (Feishu / WhatsApp / Telegram)
-- [ ] Fase 12: Gráfico de conocimiento, sistema de plugins y ecosistema de habilidades
+- [x] Fase 2: Esqueleto del framework (bucle principal + objetos de reloj + watchdog + cortacircuitos)
+- [x] Fase 3: Primer Ser Silicona con archivo de alma (arquitectura cuerpo-cerebro)
+- [x] Fase 4: Memoria persistente (sistema de chat + interfaz de almacenamiento por tiempo)
+- [x] Fase 5: Sistema de herramientas + ejecutores
+- [x] Fase 6: Sistema de permisos (cadena de 5 niveles, registrador de auditoría, ACL global)
+- [x] Fase 7: Compilación dinámica + auto-evolución (Roslyn)
+- [x] Fase 8: Memoria a largo plazo + tareas + temporizadores
+- [x] Fase 9: Host central + colaboración multiagente
+- [x] Fase 10: Web UI (HTTP + SSE, 20+ controladores, 4 pieles)
+- [x] Fase 10.5: Mejoras incrementales (canales de broadcast, auditoría de tokens, 32 calendarios, mejoras de herramientas, localización en 21 idiomas)
+- [x] Fase 10.6: Perfeccionamiento y optimización (WebView, sistema de ayuda, espacio de trabajo de proyectos, red de conocimiento)
 
-## Documentación
+### 🚧 Planificado
+- [ ] Fase 11: Integración de mensajería instantánea externa (Feishu / WhatsApp / Telegram)
+- [ ] Fase 12: Sistema de plugins y ecosistema de habilidades
 
-- [Arquitectura](architecture.md) — Diseño del sistema, programación, arquitectura de componentes
-- [Seguridad](security.md) — Modelo de permisos, ejecutores, seguridad de compilación dinámica
-- [Hoja de Ruta](roadmap.md) — Plan de desarrollo detallado de 12 fases
+## 📚 Documentación
 
-## Licencia
+- [Diseño de Arquitectura](architecture.md) — Diseño del sistema, mecanismo de programación, arquitectura de componentes
+- [Modelo de Seguridad](security.md) — Modelo de permisos, ejecutores, seguridad de compilación dinámica
+- [Guía de Desarrollo](development-guide.md) — Desarrollo de herramientas, guía de extensión
+- [Referencia de API](api-reference.md) — Documentación de endpoints Web API
+- [Referencia de Herramientas](tools-reference.md) — Detalles de herramientas integradas
+- [Guía de Web UI](web-ui-guide.md) — Guía de uso de la interfaz web
+- [Guía de Ser Silicona](silicon-being-guide.md) — Guía de desarrollo de agentes
+- [Sistema de Permisos](permission-system.md) — Gestión detallada de permisos
+- [Sistema de Calendario](calendar-system.md) — Descripción de 32 sistemas de calendario
+- [Inicio Rápido](getting-started.md) — Guía detallada de introducción
+- [Solución de Problemas](troubleshooting.md) — Preguntas frecuentes
+- [Hoja de Ruta](roadmap.md) — Plan de desarrollo completo
+- [Registro de Cambios](changelog.md) — Historial de actualizaciones de versiones
+- [Guía de Contribución](contributing.md) — Cómo participar en el proyecto
 
-Este proyecto está licenciado bajo la Licencia Apache 2.0 — consulte el archivo [LICENSE](../../LICENSE) para más detalles.
+## 🤝 Contribuir
 
-## Autor
+¡Aceptamos todas las formas de contribución! Para más detalles, consulta la [Guía de Contribución](contributing.md).
 
-Hoshino Kennji — [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective) | [Gitee](https://gitee.com/hoshinokennji/SiliconLifeCollective) | [YouTube](https://www.youtube.com/@hoshinokennji) | [Bilibili](https://space.bilibili.com/617827040)
+### Flujo de Trabajo de Desarrollo
+1. Hacer fork del repositorio
+2. Crear una rama de característica (`git checkout -b feature/AmazingFeature`)
+3. Confirmar cambios (`git commit -m 'feat: add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Enviar un Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia Apache 2.0 — ver el archivo [LICENSE](../../LICENSE) para más detalles.
+
+## 👨‍💻 Autor
+
+**Hoshino Kennji**
+
+- GitHub: [@akimoto-akira](https://github.com/akimoto-akira/SiliconLifeCollective)
+- Gitee: [hoshinokennji](https://gitee.com/hoshinokennji/SiliconLifeCollective)
+- YouTube: [@hoshinokennji](https://www.youtube.com/@hoshinokennji)
+- Bilibili: [617827040](https://space.bilibili.com/617827040)
+
+## 🙏 Agradecimientos
+
+Gracias a todos los desarrolladores y proveedores de plataformas de IA que han contribuido a este proyecto.
+
+---
+
+**Silicon Life Collective** — Hacer que los agentes de IA realmente "cobren vida"

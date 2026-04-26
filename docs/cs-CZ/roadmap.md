@@ -1,256 +1,283 @@
-# Roadmapa
+﻿# Roadmap
 
-[English](../en/roadmap.md) | [中文文档](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
+[English](../en/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | **Čeština**
 
-## Vodící principy
+## Guiding Principles
 
-Každá fáze končí **funkčním, pozorovatelným** systémem. Žádná fáze nevyústí v "hromadu infrastruktury bez ničeho k předvedení".
+Každá fáze končí **fungujícím, pozorovatelným** systémem. Žádná fáze nevytváří "spoustu infrastruktury s ničím k předvedení."
 
 ---
 
-## ~~Fáze 1: Umí chatovat~~ ✅ Dokončeno
+## ~~Fáze 1: Umí Chatovat~~ ✅ Dokončeno
 
-**Cíl**: Vstup z konzole → Volání AI → Výstup na konzoli. Minimální ověřitelná jednotka.
+**Cíl**: Konzolový vstup → Volání AI → Konzolový výstup. Minimální ověřitelná jednotka.
 
 | # | Modul | Popis |
 |---|--------|-------------|
-| 1.1 | Struktura řešení a projektů | Vytvoření `SiliconLifeCollective.sln`, včetně `src/SiliconLife.Core/` (core knihovna) a `src/SiliconLife.Default/` (výchozí implementace + vstupní bod) |
-| 1.2 | Konfigurace (minimální) | Singleton + JSON deserializace. Čtení `config.json`. Automatické generování výchozích hodnot pokud chybí |
-| 1.3 | Lokalizace (minimální) | Abstraktní třída `LocalizationBase`, implementace `ZhCN`. Přidání `Language` do konfigurace |
-| 1.4 | OllamaClient (minimální) | Rozhraní `IAIClient`, HTTP volání lokálního Ollama `/api/chat`. Zatím bez streamování, bez volání nástrojů |
+| 1.1 | Struktura řešení a projektů | Vytvoření `SiliconLifeCollective.sln`, obsahující `src/SiliconLife.Core/` (core knihovna) a `src/SiliconLife.Default/` (výchozí implementace + vstupní bod) |
+| 1.2 | Konfigurace (Minimální) | Singleton + JSON deserializace. Čte `config.json`. Automaticky generuje výchozí hodnoty, pokud chybí |
+| 1.3 | Lokalizace (Minimální) | Abstraktní třída `LocalizationBase`, implementace `ZhCN`. Přidání `Language` do konfigurace |
+| 1.4 | OllamaClient (Minimální) | Rozhraní `IAIClient`, HTTP volání na lokální Ollama `/api/chat`. Zatím žádné streamování, žádná volání nástrojů |
 | 1.5 | Konzolový I/O | `while(true) + Console.ReadLine()`, čtení vstupu → volání AI → tisk odpovědi |
-| 1.6 | Copyright hlavička | Přidání Apache 2.0 hlavičky do všech C# zdrojových souborů |
+| 1.6 | Autorská záhlaví | Přidání Apache 2.0 záhlaví do všech C# zdrojových souborů |
 
-**Dodávka**: Konzolový chatovací program komunikující s lokálním Ollama modelem.
+**Výsledek**: Konzolový chatovací program komunikující s lokálním modelem Ollama.
 
-**Ověření**: Spustit program, zadat "hello", vidět odpověď AI.
-
----
-
-## ~~Fáze 2: Má kostru~~ ✅ Dokončeno
-
-**Cíl**: Nahradit "nahou smyčku" framework strukturou. Chování nezměněno.
-
-| # | Modul | Popis |
-|---|--------|-------------|
-| 2.1 | Storage (minimální) | Rozhraní `IStorage` (Read/Write/Exists/Delete, key-value). Implementace `FileSystemStorage`. Třída instance (ne statická). Přímý přístup k souborovému systému — **AI nemůže ovládat IStorage** |
-| 2.2 | Hlavní smyčka + objekty Clock | Nekonečná smyčka, přesné intervaly clocku (`Stopwatch` + `Thread.Sleep`). Prioritní scheduling |
-| 2.3 | Standardizace IAIClient | Rozhraní `IAIClientFactory`. Refaktoring OllamaClient pro implementaci standardního rozhraní |
-| 2.4 | Migrace konzole | Migrace `while(true)` na clock objekt řízený hlavní smyčkou. Chování shodné s Fází 1 |
-
-**Dodávka**: Hlavní smyčka běží clock, konzolový chat stále funguje.
-
-**Ověření**: Zaregistrovat testovací clock objekt, vytisknout počet clocků za sekundu; konzolový chat stále funguje.
+**Ověření**: Spusťte program, zadejte "hello", uvidíte odpověď AI.
 
 ---
 
-## ~~Fáze 3: Má duši~~ ✅ Dokončeno
+## ~~Fáze 2: Má Kostru~~ ✅ Dokončeno
 
-**Cíl**: První křemíková bytost žije ve frameworku.
+**Cíl**: Nahradit "nahou smyčku" framework strukturou. Chování se nemění.
 
 | # | Modul | Popis |
 |---|--------|-------------|
-| 3.1 | SiliconBeingBase | Abstraktní základní třída s Id, Name, ToolManager, AIClient, ChatService, Storage, PermissionService. Abstraktní `Tick()` a `ExecuteOneRound()` |
+| 2.1 | Úložiště (Minimální) | Rozhraní `IStorage` (Read/Write/Exists/Delete, klíč-hodnota). Implementace `FileSystemStorage`. Třída instance (ne statická). Přímý přístup k souborovému systému — **AI nemůže ovládat IStorage** |
+| 2.2 | Hlavní smyčka + Objekt hodin | Nekonečná smyčka, přesný interval hodin (`Stopwatch` + `Thread.Sleep`). Prioritní plánování |
+| 2.3 | Standardizace IAIClient | Rozhraní `IAIClientFactory`. Refaktorizace OllamaClient pro implementaci standardního rozhraní |
+| 2.4 | Migrace konzole | Migrace `while(true)` do hlavní smyčky řízené objektem hodin. Chování stejné jako Fáze 1 |
+
+**Výsledek**: Hlavní smyčka spouští hodiny, konzolový chat stále funguje.
+
+**Ověření**: Zaregistrujte testovací objekt hodin, každou sekundu tiskněte počet hodin; konzolový chat stále funguje.
+
+---
+
+## ~~Fáze 3: Má Duši~~ ✅ Dokončeno
+
+**Cíl**: První silikonová bytost žije ve frameworku.
+
+| # | Modul | Popis |
+|---|--------|-------------|
+| 3.1 | SiliconBeingBase | Abstraktní základní třída s Id, Name, ToolManager, AIClient, ChatService, Storage, PermissionService. Abstraktní metody `Tick()` a `ExecuteOneRound()` |
 | 3.2 | Načítání souboru duše | `SoulFileManager`: čtení `soul.md` z datového adresáře bytosti |
-| 3.3 | ContextManager (minimální) | Připojení souboru duše + nedávné zprávy → volání AI → získání odpovědi. Zatím bez volání nástrojů, bez persistence |
-| 3.4 | ISiliconBeingFactory | Rozhraní továrny pro vytváření instancí bytostí |
-| 3.5 | SiliconBeingManager (minimální) | Dědí clock objekt (priorita=0). Iteruje všechny bytosti, sekvenčně volá jejich Tick |
+| 3.3 | ContextManager (Minimální) | Propojení souboru duše + nedávné zprávy → volání AI → získání odpovědi. Zatím žádná volání nástrojů, žádná perzistence |
+| 3.4 | ISiliconBeingFactory | Rozhraní factory pro vytváření instancí bytostí |
+| 3.5 | SiliconBeingManager (Minimální) | Dědí objekt hodin (priorita=0). Iteruje všechny bytosti, postupně volá jejich Tick |
 | 3.6 | DefaultSiliconBeing | Implementace standardního chování. Kontrola nepřečtených zpráv → vytvoření ContextManager → ExecuteOneRound → výstup |
-| 3.7 | Struktura adresáře bytosti | `DataDirectory/SiliconManager/{GUID}/`, včetně `soul.md` a `state.json` |
+| 3.7 | Struktura adresáře bytostí | `DataDirectory/SiliconManager/{GUID}/`, obsahující `soul.md` a `state.json` |
 
-**Dodávka**: Křemíková bytost řízená hlavní smyčkou, přijímající konzolový vstup, načítající soubor duše, volající AI.
+**Výsledek**: Silikonová bytost řízená hlavní smyčkou, přijímající konzolový vstup, načítající soubor duše, volající AI.
 
-**Ověření**: Konzolový vstup → tick hlavní smyčky → zpracování bytosti (chování řízené souborem duše) → odpověď AI. Styl odpovědi by se měl lišit od Fáze 1.
+**Ověření**: Konzolový vstup → Hlavní smyčka spouští hodiny → Bytost zpracovává (s chováním řízeným souborem duše) → Odpověď AI. Styl odpovědi by se měl lišit od Fáze 1.
 
 ---
 
-## ~~Fáze 4: Má paměť~~ ✅ Dokončeno
+## ~~Fáze 4: Má Paměť~~ ✅ Dokončeno
 
-**Cíl**: Konverzace persistují po restartu.
+**Cíl**: Konverzace přetrvávají po restartu.
 
 | # | Modul | Popis |
 |---|--------|-------------|
-| 4.1 | ChatSystem | Koncept kanálu (dva GUID = jeden kanál). Model zprávy s persistencí. Zatím bez skupinového chatu |
+| 4.1 | ChatSystem | Koncept kanálů (dva GUID = jeden kanál). Model zpráv s perzistencí. Zatím žádné skupinové chaty |
 | 4.2 | IIMProvider + IMManager | Rozhraní `IIMProvider`. `ConsoleProvider` jako formální IM kanál. `IMManager` směruje zprávy |
-| 4.3 | Vylepšení ContextManager | Stažení historie z chatového systému. Persistování odpovědí AI. Podpora pokračování více kol volání nástrojů |
-| 4.4 | Model IMessage | Sjednocený model zprávy sdílený chatovým systémem a IM managerem |
+| 4.3 | Vylepšení ContextManager | Stažení historie z chatovacího systému. Perzistence odpovědí AI. Podpora více kol volání nástrojů |
+| 4.4 | Model IMessage | Sjednocený model zpráv sdílený chatovacím systémem a IM managerem |
 
-**Dodávka**: Chatový systém s persistující pamětí.
+**Výsledek**: Chatovací systém s perzistentní pamětí.
 
-**Ověření**: Chatovat několik kol → ukončit → restartovat → zeptat se "O čem jsme mluvili?" → bytost může odpovědět.
+**Ověření**: Chatujte několik kol → Ukončete → Restartujte → Zeptejte se "O čem jsme mluvili?" → Bytost může odpovědět.
 
 ---
 
-## ~~Fáze 5: Umí jednat (systém nástrojů)~~ ✅ Dokončeno
+## ~~Fáze 5: Může Jednat (Systém Nástrojů)~~ ✅ Dokončeno
 
-**Cíl**: Křemíkové bytosti mohou provádět akce, nejen chatovat.
+**Cíl**: Silikonové bytosti mohou provádět akce, nejen chatovat.
 
 | # | Modul | Popis |
 |---|--------|-------------|
-| 5.1 | ITool + ToolResult | Rozhraní `ITool` s Name, Description, Execute. `ToolResult` obsahuje Success, Message, Data |
-| 5.2 | ToolManager | Instance pro každou bytost. Objevování nástrojů založené na reflexi. Podpora atributu `[SiliconManagerOnly]` |
-| 5.3 | IAIClient: Podpora volání nástrojů | Parsování AI tool_calls. Smyčka: execute nástroj → odeslat výsledek zpět → AI pokračuje → dokud čistý text |
-| 5.4 | Základní třída Executoru | Abstraktní základní třída s nezávislým dispatch threadem, frontou požadavků, kontrolou timeoutu |
-| 5.5 | NetworkExecutor | HTTP požadavky přes executor. Timeout, fronta |
-| 5.6 | CommandLineExecutor | Shell execution přes executor. Detekce oddělovačů napříč platformami |
-| 5.7 | DiskExecutor | Operace se soubory přes executor. Zatím bez kontroly oprávnění (Fáze 6) |
+| 5.1 | ITool + ToolResult | Rozhraní `ITool` s Name, Description, Execute. `ToolResult` s Success, Message, Data |
+| 5.2 | ToolManager | Instance na bytost. Objevování nástrojů založené na reflexi. Podpora atributu `[SiliconManagerOnly]` |
+| 5.3 | IAIClient: Podpora volání nástrojů | Parsování AI tool_calls. Smyčka: provedení nástroje → odeslání výsledku zpět → AI pokračuje → dokud čistý text |
+| 5.4 | Základní třída exekutoru | Abstraktní základní třída s nezávislým plánovacím vláknem, frontou požadavků, kontrolou časového limitu |
+| 5.5 | NetworkExecutor | HTTP požadavky prostřednictvím exekutoru. Časový limit, fronta |
+| 5.6 | CommandLineExecutor | Shell provádění prostřednictvím exekutoru. Detekce platformového oddělovače |
+| 5.7 | DiskExecutor | Operace se soubory prostřednictvím exekutoru. Zatím žádná kontrola oprávnění (Fáze 6) |
 | 5.8–5.12 | Vestavěné nástroje | CalendarTool, SystemTool, NetworkTool, ChatTool, DiskTool |
 
-**Dodávka**: Křemíkové bytosti mohou volat nástroje k provádění akcí.
+**Výsledek**: Silikonové bytosti mohou volat nástroje k provádění akcí.
 
-**Ověření**: Zeptat se "Jaký je dnes den" → CalendarTool odpoví; zeptat se "Zkontrolovat procesy" → SystemTool provede; říct bytosti aby poslala zprávu jiné bytosti → ChatTool funguje.
-
----
-
-## ~~Fáze 6: Dodržuje pravidla (systém oprávnění)~~ ✅ Dokončeno
-
-**Cíl**: Křemíkové bytosti nemohou přistupovat k citlivým zdrojům bez autorizace.
-
-| # | Modul | Popis |
-|---|--------|-------------|
-| 6.1 | PermissionManager | Soukromá instance pro každou bytost. Založeno na callbacku, trojrozměrný výsledek (Allowed/Deny/AskUser). Priorita dotazu: HighDeny → HighAllow → Callback. Flag IsCurator |
-| 6.2 | Enumerace PermissionType | NetworkAccess, CommandLine, FileAccess, Function, DataAccess |
-| 6.3 | DefaultPermissionCallback | Síťový whitelist/blacklist, klasifikace CLI, bezpečnostní pravidla cest souborů |
-| 6.4 | GlobalACL | Tabulka pravidel prefix matching, persistovaná do storage |
-| 6.5 | UserFrequencyCache | Seznamy HighAllow/HighDeny. Výběr uživatele (ne automatická detekce). Prefix matching, pouze paměť, konfigurovatelná expirace |
-| 6.6 | UserAskMechanism (konzole) | Výzva y/n na konzoli při návratu AskUser |
-| 6.7 | Integrace oprávnění Executoru | Všechny executory kontrolují oprávnění před provedením |
-| 6.8 | Izolace IStorage | IStorage je interní persistence systému — přímý přístup k souborům, **ne** routováno přes executory, **ne** ovladatelné AI. Executory spravují pouze IO iniciované nástroji AI |
-| 6.9 | Audit log | Zaznamenává všechna rozhodnutí o oprávněních s časovým razítkem, žadatelem, zdrojem, výsledkem |
-
-**Dodávka**: Výzva oprávnění když bytost zkusí citlivou operaci.
-
-**Ověření**: Říct bytosti aby smazala soubor → konzole zobrazí výzvu oprávnění → zadat `n` → operace zamítnuta. Říct bytosti aby přistoupila k webu na whitelistu → okamžitě povoleno.
+**Ověření**: Zeptejte se "Jaký je den v týdnu" → CalendarTool odpoví; Zeptejte se "Zkontroluj procesy" → SystemTool provede; Řekněte bytosti, aby poslala zprávu jiné bytosti → ChatTool funguje.
 
 ---
 
-## ~~Fáze 7: Umí se vyvíjet (dynamická kompilace)~~ ✅ Dokončeno
+## ~~Fáze 6: Dodržuje Pravidla (Systém Oprávnění)~~ ✅ Dokončeno
 
-**Cíl**: Křemíkové bytosti mohou přepisovat svůj vlastní kód.
+**Cíl**: Silikonové bytosti nemohou přistupovat k citlivým zdrojům bez autorizace.
 
 | # | Modul | Popis |
 |---|--------|-------------|
-| 7.1 | CodeEncryption | Šifrování/dešifrování AES-256. Odvození klíče PBKDF2 z GUID |
-| 7.2 | DynamicCompilationExecutor | Sandbox kompilace v paměti založený na Roslyn. Kontrola referencí assembly při kompilaci (primární obrana: vyloučení System.IO, Reflection atd.) |
-| 7.3 | Bezpečnostní scanning | Statická analýza za běhu na vzory nebezpečného kódu (sekundární obrana). Blokování načtení pokud scanning selže |
-| 7.4 | Vylepšení životního cyklu bytosti | Načtení: dešifrování → scanning → kompilace → instance. Za běhu: kompilace v paměti → atomická výměna → persistování šifrování |
-| 7.5 | SiliconCurator | Abstraktní základní třída Kurátora. IsCurator=true. Nejvyšší oprávnění |
-| 7.6 | DefaultCurator | Výchozí implementace Kurátora s vestavěným souborem duše a nástroji správy |
-| 7.7 | CuratorTool | Nástroje `[SiliconManagerOnly]`: list_beings, create_being, get_code, reset |
+| 6.1 | PermissionManager | Soukromá instance na bytost. Založeno na callbacku, tříhodnotový výsledek (Allowed/Deny/AskUser). Priorita dotazu: HighDeny → HighAllow → Callback. Příznak IsCurator |
+| 6.2 | Výčet PermissionType | NetworkAccess, CommandLine, FileAccess, Function, DataAccess |
+| 6.3 | DefaultPermissionCallback | Bílá/černá listina sítě, klasifikace CLI, bezpečnostní pravidla cest souborů |
+| 6.4 | GlobalACL | Tabulka pravidel shody prefixů, perzistence do úložiště |
+| 6.5 | UserFrequencyCache | Seznamy HighAllow/HighDeny. Uživatelská volba (ne automatická detekce). Shoda prefixů, pouze paměť, konfigurovatelná expirace |
+| 6.6 | UserAskMechanism (Konzole) | Výzva y/n v konzoli při vrácení AskUser |
+| 6.7 | Integrace oprávnění exekutoru | Všechny exekutory kontrolují oprávnění před provedením |
+| 6.8 | Poznámka k izolaci IStorage | IStorage je interní perzistence systému — přímý přístup k souborům, **ne** směrován přes exekutory, **ne** ovladatelný AI. Exekutory spravují pouze IO iniciované nástroji AI |
+| 6.9 | Audit logy | Zaznamenávání všech rozhodnutí o oprávněních s časovým razítkem, žadatelem, zdrojem, výsledkem |
+
+**Výsledek**: Výzva oprávnění, když se bytost pokusí o citlivou operaci.
+
+**Ověření**: Řekněte bytosti, aby smazala soubor → Konzole zobrazí výzvu oprávnění → Zadejte `n` → Operace zamítnuta. Řekněte bytosti, aby přistoupila k webové stránce na bílé listině → Okamžitě povoleno.
+
+---
+
+## ~~Fáze 7: Může Se Vyvíjet (Dynamická Kompilace)~~ ✅ Dokončeno
+
+**Cíl**: Silikonové bytosti mohou přepisovat svůj vlastní kód.
+
+| # | Modul | Popis |
+|---|--------|-------------|
+| 7.1 | CodeEncryption | AES-256 šifrování/dešifrování. PBKDF2 klíč odvozený z GUID |
+| 7.2 | DynamicCompilationExecutor | Paměťová kompilační sandbox založený na Roslyn. Kontrola referencí při kompilaci (hlavní obrana: vyloučení System.IO, Reflection atd.) |
+| 7.3 | Bezpečnostní skenování | Statická analýza nebezpečných vzorů kódu za běhu (sekundární obrana). Blokování načtení, pokud skenování selže |
+| 7.4 | Vylepšení životního cyklu bytosti | Načtení: dešifrování → skenování → kompilace → instance. Za běhu: kompilace v paměti → atomická výměna → perzistentní šifrování |
+| 7.5 | SiliconCurator | Abstraktní základní třída kurátora. IsCurator=true. Nejvyšší oprávnění |
+| 7.6 | DefaultCurator | Výchozí implementace kurátora s vestavěným souborem duše a správcovskými nástroji |
+| 7.7 | CuratorTool | Nástroj `[SiliconManagerOnly]`: list_beings, create_being, get_code, reset |
 | 7.8 | Přepsání callbacku oprávnění | Bytosti mohou kompilovat vlastní callbacky oprávnění |
 | 7.9 | Vylepšení SiliconBeingManager | Metoda Replace (výměna instance za běhu). MigrateState (přenos stavu mezi starou a novou instancí) |
 
-**Dodávka**: Křemíkové bytosti mohou generovat nový kód prostřednictvím AI, kompilovat a nahrazovat sebe.
+**Výsledek**: Silikonové bytosti mohou generovat nový kód prostřednictvím AI, kompilovat a nahrazovat samy sebe.
 
-**Ověření**: Říct bytosti "přidej si novou funkci" → sledovat kompilaci → restart → nová funkce funguje.
+**Ověření**: Řekněte bytosti "přidej si novou funkci" → Sledujte kompilaci → Restart → Nová funkce funguje.
 
 ---
 
-## ~~Fáze 8: Paměť a plánování~~ ✅ Dokončeno
+## ~~Fáze 8: Paměť a Plánování~~ ✅ Dokončeno
 
-**Cíl**: Dlouhodobá paměť, správa úkolů, časové spuštění.
+**Cíl**: Dlouhodobá paměť, správa úkolů, časové spouštění.
 
 | # | Modul | Popis |
 |---|--------|-------------|
-| 8.1 | FileSystemMemory | Krátkodobé/dlouhodobé segmentované úložiště. Časový útlum. Komprese (sloučení podobných pamětí). Multidimenzionální vyhledávání |
-| 8.2 | TaskSystem | Jednorázové + DAG závislé úkoly. Prioritní scheduling. Sledování stavu |
-| 8.3 | TimerSystem | Jednorázové alarmy + periodické časovače. Přesnost na milisekundy. Persistence do storage |
-| 8.4 | IncompleteDate | Struktura nejasného rozsahu data (např. "duben 2026", "jaro 2026") |
+| 8.1 | FileSystemMemory | Krátkodobé/dlouhodobé segmentované úložiště. Časový útlum. Komprese (sloučení podobných vzpomínek). Vícerozměrné vyhledávání |
+| 8.2 | TaskSystem | Jednorázové + DAG závislé úkoly. Prioritní plánování. Sledování stavu |
+| 8.3 | TimerSystem | Jednorázové alarmy + periodické časovače. Přesnost na milisekundy. Perzistence do úložiště |
+| 8.4 | IncompleteDate | Struktura fuzzy rozsahu data (např. "duben 2026", "jaro 2026") |
 | 8.5–8.7 | Nástroje paměti/úkolů/časovačů | Nástroje pro bytosti k dotazování paměti, správě úkolů, nastavování časovačů |
 
-**Dodávka**: Bytosti si mohou pamatovat klíčové body, vytvářet/sledovat úkoly, nastavovat alarmy.
+**Výsledek**: Bytosti si mohou pamatovat klíčové body, vytvářet/sledovat úkoly, nastavovat alarmy.
 
-**Ověření**: Vytvořit úkol → zkontrolovat seznam úkolů → nastavit 1minutový alarm → přijmout notifikaci když vyprší.
+**Ověření**: Vytvořte úkol → Zkontrolujte seznam úkolů → Nastavte 1minutový alarm → Přijměte oznámení při vypršení.
 
 ---
 
-## ~~Fáze 9: Framework dokončen~~ ✅ Dokončeno
+## ~~Fáze 9: Framework Dokončen~~ ✅ Dokončeno
 
 **Cíl**: Sjednocený vstupní bod, spolupráce více bytostí.
 
 | # | Modul | Popis |
 |---|--------|-------------|
-| 9.1 | CoreHost + CoreHostBuilder | Sjednocený hostitel s builder patternem. Elegní vypnutí (Ctrl+C / SIGTERM) |
-| 9.2 | Refaktoring Program.Main | Migrace na pattern CoreHostBuilder |
-| 9.3 | Vylepšení SiliconBeingManager | Prioritní odpověď Kurátora. Izolace výjimek. Pravidelná persistence |
-| 9.4 | Načítání více bytostí | Načtení více bytostí z datového adresáře. Komunikace mezi bytostmi přes ChatTool |
-| 9.5 | Monitorování výkonu | Sledování doby provádění pro každý clock objekt |
+| 9.1 | CoreHost + CoreHostBuilder | Sjednocený hostitel s patternem builder. Elegantní vypnutí (Ctrl+C / SIGTERM) |
+| 9.2 | Refaktorizace Program.Main | Migrace na pattern CoreHostBuilder |
+| 9.3 | Vylepšení SiliconBeingManager | Prioritní odpověď kurátora. Izolace výjimek. Pravidelná perzistence |
+| 9.4 | Načítání více bytostí | Načtení více bytostí z datového adresáře. Komunikace mezi bytostmi prostřednictvím ChatTool |
+| 9.5 | Monitorování výkonu | Sledování doby provádění každého objektu hodin |
 | 9.6 | ServiceLocator | Globální service locator s metodami Register/Get |
 
-**Dodávka**: Více bytostí běžících současně, spolupracujících, spravovaných CoreHost.
+**Výsledek**: Více bytostí běží současně, spolupracují, řízeno CoreHost.
 
-**Ověření**: Vytvořit dvě bytosti → A pošle zprávu B → B přijme a odpoví → scheduling frameworku bez chyb. Kurátor odpoví prioritně když přijde zpráva uživatele.
+**Ověření**: Vytvořte dvě bytosti → A pošle zprávu B → B přijme a odpoví → Framework plánuje bez chyb. Kurátor prioritně odpovídá, když přijde zpráva uživatele.
 
 ---
 
-## ~~Fáze 10: Směřování k Web~~ ✅ Dokončeno
+## ~~Fáze 10: Směřování k Webu~~ ✅ Dokončeno
 
 **Cíl**: Migrace z konzole na rozhraní prohlížeče.
 
 | # | Modul | Popis |
 |---|--------|-------------|
-| 10.1 | Router | Router HTTP požadavků. Směrování sekvenčních parametrů a obsluha statických souborů |
-| 10.2 | Základní třída Controller | Kontext požadavku/odpovědi. Podpora odpovědí HTML a JSON |
-| 10.3–10.5 | HtmlBuilder / CssBuilder / JsBuilder | Buildery na straně serveru v C#. Žádná závislost na frontendovém frameworku |
-| 10.6 | SSE (Server-Sent Events) | Push aktualizace v reálném čase pro chat, stav bytostí a systémové události. Jednodušší než WebSocket s automatickým opětovným připojením klienta |
-| 10.7 | WebUIProvider | IM kanál v reálném čase založený na SSE. Nahrazuje konzoli jako hlavní rozhraní |
-| 10.8 | Webová bezpečnost | IP blacklist/whitelist. Atribut `[WebCode]`. Dynamické aktualizace |
-| 10.9–10.17 | Webové controllery | Chat, Dashboard, Being, Task, Permission, PermissionRequest, Executor, Log, Config, Memory, Timer, Init, About, CodeBrowser, Knowledge, Project, Audit |
+| 10.1 | Router | HTTP request router. Cesty se sériovými parametry a obsluha statických souborů |
+| 10.2 | Základní třída Controller | Kontext požadavku/odpovědi. Podpora HTML a JSON odpovědí |
+| 10.3–10.5 | HtmlBuilder / CssBuilder / JsBuilder | C# server-side buildery. Nulová závislost na frontendovém frameworku |
+| 10.6 | SSE (Server-Sent Events) | Aktualizace push v reálném čase pro chat, stav bytostí a systémové události. Jednodušší než WebSocket s automatickým opětovným připojením klienta |
+| 10.7 | WebUIProvider | IM kanál založený na SSE v reálném čase. Nahrazuje konzoli jako hlavní rozhraní |
+| 10.8 | Webová bezpečnost | Černá/bílá listina IP. Atribut `[WebCode]`. Dynamické aktualizace |
+| 10.9–10.17 | Webové controllery | Chat, dashboard, bytosti, úkoly, oprávnění, žádosti o oprávnění, exekutory, logy, konfigurace, paměť, časovače, inicializace, o aplikaci, prohlížeč kódu, znalosti, projekty, audit |
 
-**Dodávka**: Kompletní Web UI přístupný z prohlížeče.
+**Výsledek**: Kompletní Web UI přístupné z prohlížeče.
 
-**Ověření**: Otevřít prohlížeč → chatovat s bytostí → zobrazit dashboard → spravovat oprávnění → vše funguje.
+**Ověření**: Otevřete prohlížeč → Chatujte s bytostí → Zobrazte dashboard → Spravujte oprávnění → Vše funguje.
 
 ---
 
-## ~~Fáze 10.5: Přírůstková vylepšení~~ ✅ Dokončeno
+## ~~Fáze 10.5: Přírůstková Vylepšení~~ ✅ Dokončeno
 
-**Cíl**: Vylepšení existujícího systému s novými funkcemi objevenými během vývoje.
+**Cíl**: Vylepšení existujícího systému o nové funkce objevené během vývoje.
 
 | # | Modul | Popis |
 |---|--------|-------------|
 | 10.5.1 | BroadcastChannel | Nový typ relace pro systémová oznámení. Pevné ID kanálu, dynamické přihlašování, filtrování čekajících zpráv |
-| 10.5.2 | Vylepšení ChatMessage | Pole ToolCallId, ToolCallsJson, Thinking pro kontext AI; PromptTokens, CompletionTokens, TotalTokens pro sledování tokenů; typ zprávy SystemNotification |
-| 10.5.3 | TokenUsageAuditManager | Sledování spotřeby tokenů na požadavek napříč všemi bytostmi. Agregované statistiky, dotazy časových řad, persistované úložiště |
-| 10.5.4 | TokenAuditTool | Nástroj `[SiliconManagerOnly]` pro Kurátora k dotazování a sumarizaci použití tokenů |
-| 10.5.5 | ConfigTool | Nástroj `[SiliconManagerOnly]` pro Kurátora ke čtení a úpravě systémové konfigurace |
-| 10.5.6 | AuditController | Web dashboard pro audit použití tokenů s grafy trendů a exportem dat |
-| 10.5.7 | Rozšíření kalendářového systému | 32 kalendářních implementací pokrývajících světové kalendářní systémy (Buddhist, Lunar, Islamic, Hebrew, Japanese, Persian, Mayan atd.) |
+| 10.5.2 | Vylepšení ChatMessage | Pole ToolCallId, ToolCallsJson, Thinking pro kontext AI; PromptTokens, CompletionTokens, TotalTokens pro sledování tokenů; Typ zprávy SystemNotification |
+| 10.5.3 | TokenUsageAuditManager | Sledování spotřeby tokenů pro každý požadavek napříč všemi bytostmi. Agregované statistiky, dotazy časové řady, perzistentní úložiště |
+| 10.5.4 | TokenAuditTool | Nástroj `[SiliconManagerOnly]` pro kurátory k dotazování a shrnutí využití tokenů |
+| 10.5.5 | ConfigTool | Nástroj `[SiliconManagerOnly]` pro kurátory ke čtení a úpravě systémové konfigurace |
+| 10.5.6 | AuditController | Web dashboard pro audit využití tokenů s grafy trendů a exportem dat |
+| 10.5.7 | Rozšíření kalendářového systému | 32 implementací kalendářů pokrývajících světové kalendářní systémy (Buddhistický, Lunární, Islámský, Hebrejský, Japonský, Perský, Mayský atd.) |
 | 10.5.8 | Vylepšení DiskTool | Nové operace: count_lines, read_lines, clear_file, replace_lines, replace_text, replace_text_all, list_drives |
-| 10.5.9 | Vylepšení SystemTool | Nové operace: find_process (podpora wildcard), resource_usage |
-| 10.5.10 | Vylepšení CalendarTool | Nové operace: diff, list_calendars, get_components, get_now_components, convert (konverze mezi kalendáři) |
-| 10.5.11 | DashScopeClient | AI klient Alibaba Cloud Bailian, kompatibilní s OpenAI API. Podpora streamování, volání nástrojů, reasoning content |
-| 10.5.12 | DashScopeClientFactory | Továrna pro vytváření klientů Bailian. Dynamické objevování modelů prostřednictvím API. Podpora více oblastí (Peking, Virginie, Singapur, Hongkong, Frankfurt) |
-| 10.5.13 | Konfigurační systém AI klienta | Konfigurace AI klienta pro každou bytost. Dynamické možnosti klíčů konfigurace (modely, oblasti). Lokalizované zobrazované názvy |
-| 10.5.14 | Rozšíření lokalizace | Zjednodušená čínština, tradiční čínština, angličtina a japonština pro možnosti konfigurace Bailian, názvy modelů a názvy oblastí |
+| 10.5.9 | Vylepšení SystemTool | Nové operace: find_process (podpora wildcardů), resource_usage |
+| 10.5.10 | Vylepšení CalendarTool | Nové operace: diff, list_calendars, get_components, get_now_components, convert (převod mezi kalendáři) |
+| 10.5.11 | DashScopeClient | AI klient Alibaba Cloud Bailian, kompatibilní s OpenAI API. Podpora streamování, volání nástrojů, reasoning obsahu |
+| 10.5.12 | DashScopeClientFactory | Factory pro vytváření Bailian klientů. Dynamický objev modelů prostřednictvím API. Podpora více regionů (Peking, Virginie, Singapur, Hongkong, Frankfurt) |
+| 10.5.13 | Konfigurační systém AI klientů | Konfigurace AI klienta na bytost. Možnosti dynamických konfiguračních klíčů (model, region). Lokalizované zobrazované názvy |
+| 10.5.14 | Rozšíření lokalizace | Zjednodušená čínština, tradiční čínština, angličtina a japonská lokalizace pro možnosti konfigurace Bailian, názvy modelů a názvy regionů |
 
-**Dodávka**: Vylepšené nástroje, pozorovatelnost, pokrytí kalendářů a podpora více AI backendů.
+**Výsledek**: Vylepšené nástroje, pozorovatelnost, pokrytí kalendářů a podpora více AI backendů.
 
-**Ověření**: Kurátor dotazuje použití tokenů prostřednictvím TokenAuditTool → audit dashboard zobrazuje trendy → CalendarTool převádí datumy mezi 32 kalendářními systémy → přepnutí AI backendu na Bailian → chat s modelem Tongyi Qianwen prostřednictvím cloud API.
+**Ověření**: Kurátor dotazuje využití tokenů prostřednictvím TokenAuditTool → Audit dashboard zobrazuje trendy → CalendarTool převádí data mezi 32 kalendářovými systémy → Přepněte AI backend na Bailian → Chatujte s modely Tongyi Qianwen prostřednictvím cloudového API.
 
 ---
 
-## Fáze 11: Externí IM integrace
+## ~~Fáze 10.6: Dokončení a Optimalizace~~ ✅ Dokončeno
 
-**Cíl**: Připojení k externím messaging platformám pro širší dostupnost uživatelů.
+**Cíl**: Dokončení funkcí systému, přidání nových funkcí, optimalizace uživatelského zážitku.
 
 | # | Modul | Popis |
 |---|--------|-------------|
-| 11.1 | FeishuProvider | Integrace robota Feishu (Lark) s podporou karet |
-| 11.2 | WhatsAppProvider | Integrace WhatsApp Business API |
-| 11.3 | TelegramProvider | Integrace Telegram Bot API s podporou inline keyboard |
-| 11.4 | Vylepšení IMManager | Směrování více providerů, sjednocený formát zpráv, zpracování dotazů oprávnění napříč platformami |
+| 10.6.1 | WebViewBrowserTool | Cross-platformní nástroj automatizace prohlížeče založený na Playwright, podporující headless mód, individuální izolaci, plnou podporu JS/CSS |
+| 10.6.2 | HelpTool | Nástroj systému nápovědní dokumentace, podporující vícejazyčné dotazování a zobrazování dokumentace |
+| 10.6.3 | ProjectWorkNoteTool | Nástroj projektových pracovních poznámek, podporující záznamy a správu práce v dimenzi projektu |
+| 10.6.4 | ProjectTaskTool | Nástroj správy projektových úkolů, podporující přiřazování úkolů, sledování postupu |
+| 10.6.5 | KnowledgeTool | Nástroj znalostní sítě, podporující CRUD a objevování cest pro trojčlenné znalosti |
+| 10.6.6 | ChatHistoryController | Controller zobrazení historie chatu, podporující seznam relací a detaily zpráv |
+| 10.6.7 | CodeHoverController | Controller plovoucích nápověd kódu, podporující zvýraznění syntaxe a nápovědy kódu |
+| 10.6.8 | WorkNoteController | Controller správy pracovních poznámek, podporující vyhledávání a generování obsahu |
+| 10.6.9 | TimerExecutionHistory | Funkce historie provádění časovače, zaznamenávání a zobrazování historie spuštění časovače |
+| 10.6.10 | Rozšíření lokalizace | Přidání podpory lokalizace češtiny (cs-CZ), celkem 21 jazykových variant |
+| 10.6.11 | Optimalizace Web UI | Podpora nahrávání souborů, indikátory načítání, optimalizace vykreslování volání nástrojů, oprava modálních oken pracovních poznámek |
+| 10.6.12 | Vylepšení správy paměti | Pokročilé filtrování, statistiky, zobrazení detailů, optimalizace kompresního algoritmu |
+| 10.6.13 | Refaktorizace logovacího systému | Oddělení logů systému/silikonových bytostí, API čtení logů, filtr silikonových bytostí |
+| 10.6.14 | Vylepšení systému oprávnění | Ověření předkompilace callbacku oprávnění, ověření reference sestavení, bílá listina služby wttr.in počasí |
 
-**Dodávka**: Uživatelé mohou interagovat s křemíkovými bytostmi prostřednictvím externích IM platforem.
+**Výsledek**: Kompletní automatizace prohlížeče WebView, systém nápovědní dokumentace, projektový pracovní prostor, znalostní síť, zobrazení historie chatu a další vylepšení.
+
+**Ověření**: Silikonové bytosti mohou ovládat prohlížeč prostřednictvím WebViewBrowserTool → Získat nápovědní dokumentaci prostřednictvím HelpTool → Spravovat projektové pracovní poznámky a úkoly → Dotazovat znalostní síť → Zobrazit historii chatu.
 
 ---
 
-## Fáze 12: Pokročilé funkce
+## Fáze 11: Integrace Externího IM
+
+**Cíl**: Připojení k externím platformám zpráv pro širší dostupnost uživatelů.
+
+| # | Modul | Popis |
+|---|--------|-------------|
+| 11.1 | FeishuProvider | Integrace robota Feishu (Lark), podpora karet |
+| 11.2 | WhatsAppProvider | Integrace WhatsApp Business API |
+| 11.3 | TelegramProvider | Integrace Telegram Bot API, podpora inline klávesnice |
+| 11.4 | Vylepšení IMManager | Směrování více poskytovatelů, sjednocený formát zpráv, cross-platformní zpracování žádostí o oprávnění |
+
+**Výsledek**: Uživatelé mohou komunikovat se silikonovými bytostmi prostřednictvím externích IM platforem.
+
+---
+
+## Fáze 12: Pokročilé Funkce
 
 **Cíl**: Volitelné pokročilé funkce pro vylepšené schopnosti.
 
 | # | Modul | Popis |
 |---|--------|-------------|
-| 12.1 | Knowledge Network | Sdílený knowledge graph s ternární strukturou (subjekt-predikát-objekt) |
-| 12.2 | Plugin System | Načítání externích pluginů s bezpečnostními kontrolami a sandboxem |
-| 12.3 | Skill Ecosystem | Trh znovu použitelných skillů pro schopnosti bytostí |
+| 12.1 | Znalostní síť | Sdílený znalostní graf pomocí trojčlenné struktury (subjekt-predikát-objekt) |
+| 12.2 | Systém pluginů | Načítání externích pluginů s bezpečnostními kontrolami a sandboxem |
+| 12.3 | Ekosystém dovedností | Trh znovu použitelných dovedností pro schopnosti bytostí |

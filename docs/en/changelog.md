@@ -1,13 +1,11 @@
 # Changelog
 
-[English](changelog.md) | [简体中文](docs/zh-CN/changelog.md) | [繁體中文](docs/zh-HK/changelog.md) | [Español](docs/es-ES/changelog.md) | [日本語](docs/ja-JP/changelog.md) | [한국어](docs/ko-KR/changelog.md) | [Čeština](docs/cs-CZ/changelog.md)
-
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-**Note: This project has not yet released any official versions. All content below is under development.**
+**Note: This project has not yet released any official versions, all content is under development.**
 
 ---
 
@@ -16,51 +14,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Project Origin
 
 - This project originated on March 20, 2026.
-- Prior to this project, there was a validation Demo that failed due to unreasonable architecture design, which made it impossible to integrate with multiple AI platforms.
+- Before this project, there was a verification demo that failed due to irrational architecture design, which prevented integration with multiple AI platforms.
 
 ### AI IDE Tools Used
 
 #### Kiro (Amazon AWS)
-- The project was initially maintained by Kiro and launched using the Spec mode.
+- The project was initially maintained by Kiro and started using Spec mode.
 - Kiro is an agentic AI development environment built by Amazon AWS.
-- Based on Code OSS (VS Code), supporting VS Code settings and Open VSX compatible plugins.
+- Based on Code OSS (VS Code), supports VS Code settings and Open VSX compatible extensions.
 - Features spec-driven development workflow for structured AI coding.
 
 #### Comate AI IDE / Wenxin Kuaima (Baidu)
 - Occasionally used for copywriting and documentation work.
 - Comate AI IDE is an AI-native development environment tool released by Baidu Wenxin on June 23, 2025.
-- The industry's first multi-modal, multi-agent collaborative AI IDE.
+- Industry's first multi-modal, multi-agent collaborative AI IDE.
 - Features include design-to-code conversion and full-process AI-assisted coding.
-- Powered by Baidu's Wenxin 4.0 X1 Turbo model.
+- Powered by Baidu Wenxin 4.0 X1 Turbo model.
 
 #### Trae (ByteDance)
-- This project was maintained primarily using Trae for the majority of the time.
-- Trae is an AI IDE developed by ByteDance's Singapore-based subsidiary, SPRING PTE.
-- Functions as a 10x AI Engineer capable of independently building software solutions.
+- This project was primarily maintained using Trae for most of the time.
+- Trae is an AI IDE developed by SPRING PTE, a Singapore subsidiary of ByteDance.
+- As a 10x AI Engineer, capable of independently building software solutions.
 - Features intelligent productivity tools, flexible development rhythm adaptation, and collaborative project delivery.
-- Offers enterprise-grade performance with configurable agent systems.
+- Provides enterprise-grade performance with configurable agent system.
 
 #### Qoder (Alibaba)
 - Since April 18, 2026, this project has been maintained using Qoder.
-- Qoder excels at source code analysis and domain documentation generation, demonstrating exceptional capability in understanding complex codebases.
-- Operates on a zero-compute-cost pricing model, making it highly cost-effective for automated documentation processing and routine task handling.
+- Qoder excels at source code analysis and domain documentation generation, performing exceptionally well in understanding complex codebases.
+- Adopts zero-computation-cost pricing model, making it highly cost-effective for automated documentation processing and routine task handling.
 - An AI-powered agentic coding platform designed for real-world software development.
-- Features intelligent code generation, conversation-based programming, advanced context analysis engine, and multi-agent collaboration.
-- Provides deep code comprehension with minimal resource consumption, ideal for long-term project maintenance and knowledge accumulation.
+- Features intelligent code generation, conversational programming, advanced context analysis engine, and multi-agent collaboration.
+- Provides deep code understanding with minimal resource consumption, ideal for long-term project maintenance and knowledge accumulation.
 
-### Requirements Documentation
+### Requirements Document
 
-- The requirements documentation for this project is not publicly disclosed.
-- The requirements were repeatedly validated by over 12 international AI platforms and large model series, resulting in a user story-driven requirements document of over 2,000 lines that is almost incomprehensible to humans.
+- The requirements document for this project is not publicly available.
+- Requirements have been validated through iterations with 12+ international AI platforms and large model series, producing a user story-driven requirements document of over 2000 lines that is almost incomprehensible to humans.
 
 ---
 
 ## [Unreleased]
 
+### 2026-04-26
+
+#### Help Documentation System
+- `69c51c5` - Add help documentation system and translate code comments to English
+
 ### 2026-04-25
 
 #### Project Workspace Management
-- `785c551` - Implement project workspace management with work notes and task systems
+- `785c551` - Implement project workspace management with work notes and task system
   - New project workspace management system
   - Work notes functionality for tracking project progress
   - Task management system integration
@@ -69,49 +72,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Czech Localization
 - `b4bbf39` - Add complete Czech (cs-CZ) localization and update all language documentation
   - Complete Czech language support
-  - Updated all language documentation to include Czech
-  - Full localization of UI elements and messages
+  - Update all language documentation to include Czech
+  - Full localization for UI elements and messages
 - `faf078f` - Fix Czech localization compilation errors
-  - Resolved compilation issues in Czech localization files
-  - Ensured Czech language pack integrates correctly
+  - Resolve compilation issues in Czech localization files
+  - Ensure Czech language pack integrates correctly
 
 #### Knowledge System Enhancement
 - `20adaac` - Add KnowledgeTool with full localization support
   - New KnowledgeTool for knowledge management
-  - Full multi-language localization support
+  - Complete multi-language localization support
   - Enhanced knowledge network capabilities
 
 ### 2026-04-24
 
 #### Memory Management Enhancement
-- `c7b2ecc` - Enhance memory management with advanced filtering, statistics, and detail view
-  - New advanced memory filtering feature with multi-dimensional filtering by type, time range, tags, etc.
-  - Implemented memory statistics feature showing memory count, type distribution, and other statistics
-  - Added memory detail view page for viewing complete information of individual memories
-  - Optimized memory management interface for improved user experience and operational efficiency
+- `c7b2ecc` - Enhance memory management features with advanced filtering, statistics, and detail views
+  - New advanced memory filtering feature, supporting multi-dimensional filtering by type, time range, tags, etc.
+  - Implemented memory statistics feature, displaying statistics such as memory count, type distribution, etc.
+  - Added memory detail view page, supporting viewing complete information for single memory entries
+  - Optimized memory management interface, improving user experience and operational efficiency
   - Multi-language localization support (6 languages)
 
 #### Permission System Extension
 - `4489ad6` - Add wttr.in weather service to network whitelist
   - Allow silicon beings to access wttr.in weather API for weather information
-  - Updated permission system documentation explaining weather service permission configuration
+  - Update permission system documentation explaining weather service permission configuration
   - Complete multi-language documentation synchronization (6 languages)
-- `fa3f06f` - Add timer execution history feature with detail view
-  - New timer execution history view feature
-  - Implemented execution history detail page
-  - Support viewing detailed records of each timer execution
-- `d824835` - Add timer execution history localization keys for all languages
-  - Full language localization support for timer execution history (6 languages)
-  - Includes localization for execution status, time, results, and other information
 
 #### Chat History Optimization
-- `057b09d` - Optimize chat history detail display with improved tool call rendering
-  - Tool call display optimization in chat history detail page
-  - Improved formatting display of tool call parameters
+- `057b09d` - Optimize chat history detail display, improve tool call rendering
+  - Chat history detail page tool call display optimization
+  - Improved formatted display of tool call parameters
   - Enhanced readability of historical messages
 - `0df599c` - Fix tool results being rendered as separate chat messages
   - Tool execution results now correctly associated with original messages
-  - Prevent tool results from displaying as separate AI replies
+  - Avoid tool results appearing as separate AI replies
   - Improve chat message coherence
 
 #### Web Interface Fixes
@@ -120,34 +116,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - CSS priority adjustment to ensure styles apply correctly
   - Improved modal visual effects
 
-#### Core Functionality Improvements
+#### Core Feature Improvements
 - `1e7c7b2` - Improve memory compression and tool execution tracking
   - Memory compression algorithm optimization
   - Tool execution tracking mechanism enhancement
   - Improved silicon being memory management efficiency
 
 #### Localization Enhancement
-- `c13cb17` - Register Spanish language variants
+- `c13cb17` - Register Spanish language variant
   - Spanish (Spain) localization support
   - Multi-language system expansion
-- `9c44f34` - Add Chinese Historical Calendar multi-language localization support
-  - Full language localization for Chinese Historical Calendar
+- `9c44f34` - Add Chinese historical calendar multi-language localization support
+  - Full language localization for Chinese historical calendar
   - Multi-language support for historical era names, dynasty tables, and other information
-- `192fc6e` - Add missing tool name localizations for 5 tools
-  - Supplement tool localization name display
-  - Improve tool interface multi-language experience
+- `192fc6e` - Add missing tool name localization for 5 tools
+  - Supplement tool localized name display
+  - Improve multi-language experience in tool interface
 
 ### 2026-04-23
 
-#### Chat History & Loading Indicators
-- `e483348` - Implement silicon being chat history view feature
-  - New ChatHistoryController with conversation list and message detail APIs
-  - Created ChatHistoryViewModel for data transfer
-  - Implemented ChatHistoryListView and ChatHistoryDetailView pages
-  - Added chat history localization keys (5 languages)
-  - Updated Router to include chat history routes
-  - Added chat history entry link in BeingView detail page
-- `65c157b` - Add loading indicators for chat pages and auto-select curator session
+#### Chat History & Loading Indicator
+- `e483348` - Implement silicon being chat history viewing feature
+  - New ChatHistoryController with session list and message detail APIs
+  - Create ChatHistoryViewModel for data transfer
+  - Implement ChatHistoryListView and ChatHistoryDetailView pages
+  - Add localization keys for chat history (5 languages)
+  - Update Router to include chat history routes
+  - Add chat history entry link in BeingView detail page
+- `65c157b` - Add loading indicator for chat page and auto-select curator session
   - Chat page loading status indicator
   - Auto-select curator session feature
   - Multi-language support (6 languages)
@@ -158,14 +154,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - IM system integration improvement
   - CoreHost initialization optimization
   - DiskExecutor functionality enhancement
-  - WebUIProvider update
+  - WebUIProvider updates
 
 #### File Upload Support
 - `28fb344` - Implement file source dialog and file upload support
-  - Web UI file source dialog
+  - Web interface file source dialog
   - File upload functionality implementation
 - `1d3e2cc` - Add file source dialog localization strings
-  - File source dialog multi-language support (6 languages)
+  - Multi-language support for file source dialog (6 languages)
 
 #### Chat Message Queue
 - `db48c51` - Add chat message queue, file metadata, and stream cancellation support
@@ -176,14 +172,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 2026-04-22
 
 #### Localization Enhancement
-- `b574b2b` - Add senderName to history messages for AI identification
-  - Added sender name field to SSE history messages
-  - Support AI message identity identification
-- `0a8d750` - Add common system prompt for proactive silicon being behavior
-  - Added common system prompt template to localization system
+- `b574b2b` - Add senderName to historical messages for AI identification
+  - Add sender name field to SSE historical messages
+  - Support identity identification for AI messages
+- `0a8d750` - Add generic system prompt for proactive silicon being behaviors
+  - New generic system prompt template in localization system
   - Support proactive behavior guidance for silicon beings
 
-#### Tool System Expansion
+#### Tool System Extension
 - `70ce7fb` - Implement DatabaseTool for structured database queries
   - New database query tool
   - Support structured data operations
@@ -201,24 +197,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Support external information retrieval
 
 #### Logging System Refactoring
-- `8f6cb1e` - Add beingId parameter to ILogger interface for system/silicon being log separation
+- `8f6cb1e` - Add beingId parameter to ILogger interface, implement system/silicon being log separation
   - ILogger interface extension
   - Support system log and silicon being log separation
   - New beingId parameter
-- `2b771f3` - Decouple LogController from file I/O and add log reading API
+- `2b771f3` - Decouple LogController from file I/O, add log reading API
   - LogController architecture refactoring
   - New independent log reading API
-  - Separated file I/O operations
+  - Separate file I/O operations
 - `12da302` - Add silicon being filter to log view
-  - Web UI added silicon being filter feature
-  - Can filter log records by silicon being
+  - New silicon being filtering feature in web interface
+  - Filter log records by silicon being
 
-#### Permission System Improvement
-- `4c747ad` - Refactor PermissionTool, ExecuteCodeTool and add EvaluatePermission API
+#### Permission System Improvements
+- `4c747ad` - Refactor PermissionTool, ExecuteCodeTool, add EvaluatePermission API
   - PermissionTool and ExecuteCodeTool refactoring
-  - Integrated EvaluatePermission API
+  - Integrate EvaluatePermission API
 
-#### Web UI Optimization
+#### Web Interface Optimization
 - `702b3f3` - Enhance task view with status badges and metadata display
   - Task view UI improvement
   - New status badges and metadata display
@@ -227,7 +223,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - View rendering performance improvement
 - `0675c45` - Optimize markdown code block highlighting in preview pane
   - Markdown preview code highlighting optimization
-  - Improved code block display effect
+  - Improved code block display effects
 
 #### Tool Integration
 - `135710d` - Remove SearchTool, move local search to DiskTool
@@ -235,7 +231,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Local search functionality integrated into DiskTool
 - `7a03a19` - Improve LogTool conversation query flexibility
   - LogTool conversation query logic optimization
-  - Enhanced query flexibility
+  - Improved query flexibility
 
 #### Configuration Management
 - `4305769` - Add .gitattributes for line ending management
@@ -249,26 +245,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 2026-04-21
 
 #### Permission System Enhancement
-- `5879621` - Add permission callback pre-compilation validation and enhanced error handling
-  - Permission callback pre-compilation validation feature
+- `5879621` - Add permission callback pre-compilation verification and enhanced error handling
+  - Permission callback pre-compilation verification feature
   - Compile permission callback code before saving to verify correctness
   - Prevent invalid code from being saved to disk
   - Detailed error handling for permission save operations
   - Enhanced error messages with localization support
-  - Separated compilation and security scanning steps for better error reporting
-- `833ead2` - Add assembly reference validation for dynamic compilation
+  - Separate compilation and security scanning steps for better error reporting
+- `833ead2` - Add assembly reference verification for dynamic compilation
   - Dynamic compilation security enhancement
-  - Assembly reference validation mechanism
+  - Assembly reference verification mechanism
 
-#### Web UI Improvement
-- `0a826f5` - Add save success alert in code editor
-  - Code editor save operation success alert feature
+#### Web Interface Improvements
+- `0a826f5` - Add save success prompt in code editor
+  - Code editor save operation success prompt feature
   - Improved user operation feedback
 - `2940373` - Enhance web interface with code hover hints and UI improvements
   - Code editor hover hint feature
   - Web interface UI optimization
 - `6ba591d` - Add independent AI configuration editor for silicon beings
-- `634e8ca` - Add back to list link in permission page
+- `634e8ca` - Add return to list link on permission page
 - `188c6f8` - Register task list API route and add empty state display
 
 #### Bug Fixes
@@ -283,7 +279,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `7940d9c` - Add Korean localization support
   - Korean localization files
   - Multi-language system enhancement
-- `4ff98ad` - Restructure documentation with multi-language support
+- `4ff98ad` - Refactor documentation for multi-language support
   - Documentation structure reorganization
   - Multi-language documentation synchronization
 
@@ -291,9 +287,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `646813e` - Improve AI client factory implementation
   - AI client factory refactoring
   - Client discovery mechanism optimization
-- `928a96d` - Fix calendar calculation implementations
+- `928a96d` - Fix calendar calculation implementation
   - Calendar calculation logic correction
-  - Improved accuracy for multiple calendar types
+  - Improved calculation accuracy for multiple calendar types
 
 #### Configuration & Entry
 - `0fc1693` - Update program entry and project configuration
@@ -303,8 +299,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 2026-04-20
 
 #### Core Feature Completion
-- `28905b5` - Complete multi-language support, AI client factory, permission system and localization configuration
-  - Log system with manager, entries and different log levels
+- `28905b5` - Complete multi-language support, AI client factory, permission system, and localization settings
+  - Logging system with manager, entries, and different log levels
   - Token audit system for querying and tracking token usage
   - AI client factory for automatic discovery of different AI platforms
   - Permission callback system with its own storage
@@ -315,8 +311,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-04-19
 
-#### Timer & Calendar
-- `c933fd8` - Update localization, timer system, web views and add new tools
+#### Timers & Calendars
+- `c933fd8` - Update localization, timer system, web views and add tools
   - Better localization manager
   - Scheduling system for timed tasks
   - AI configuration and context management
@@ -324,23 +320,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Web controller for calendar API
   - Task management tool
 
-**Architecture Improvement**
-- Redesigned web view architecture to better support skins
+**Architecture Improvements**
+- Redesigned web view architecture for better skin support
 - Improved being management system with better state handling
 
 ### 2026-04-18
 
-- `9f585e1` - Update localization, timer system, web views and add new tools
+- `9f585e1` - Update localization, timer system, web views and add tools
   - Timer and scheduling improvements
   - Better web views with improved UI components
   - More tool implementations
 
 ### 2026-04-17
 
-- `9b71fcd` - Update core modules, add zh-HK docs, broadcast channel, config tool and audit web views
-  - Broadcast channel for multiple silicon beings to chat together
+- `9b71fcd` - Update core modules, add zh-HK documentation, broadcast channels, config tools, and audit web view
+  - Broadcast channels for multiple beings to chat together
   - Configuration tool system
-  - Audit web views
+  - Audit web view
   - Traditional Chinese documentation
 
 ### 2026-04-16
@@ -362,18 +358,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-04-14
 
-- `4241a2f` - Chat functionality basically complete, UI upload optimization
-  - Chat system functionality completion
-  - UI optimization for file uploads
+- `4241a2f` - Chat feature basically complete, UI upload optimization
+  - Chat system functionality completed
+  - UI optimization for file upload
 
 ### 2026-04-13
 
-- `c498c31` - Code update
+- `c498c31` - Code updates
   - General code improvements and optimization
 
 ### 2026-04-12
 
-- `2161002` - Restructure documentation and enhance localization
+- `2161002` - Refactor documentation and enhance localization
   - Documentation reorganization
   - Localization system improvement
 - `03d94e4` - Enhance configuration system and localization
@@ -382,12 +378,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `9976a35` - Add about page and localization
   - About page
   - Localization enhancement
-- `0c8ccfc` - Enhance chat system, localization and web views
+- `0c8ccfc` - Enhance chat system, localization, and web views
   - Chat system improvements
   - Localization updates
   - Web view enhancement
 - `a8f1342` - Redesign web communication layer, switch from WebSocket to SSE
-  - Web communication now uses Server-Sent Events
+  - Web communication now uses server-sent events
 
 ### 2026-04-11
 
@@ -400,7 +396,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-04-10
 
-- `4962924` - Enhance WebSocket handler, chat views and messenger interaction
+- `4962924` - Enhance WebSocket handler, chat view, and messenger interaction
   - Context manager improvements
   - Chat system enhancement
   - Messenger provider interface updates
@@ -411,7 +407,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-04-09
 
-- `f9302bf` - Enhance messenger provider interface, chat system and Web UI interaction
+- `f9302bf` - Enhance messenger provider interface, chat system, and Web UI interaction
   - Messenger provider interface extension
   - Chat message and system improvements
   - Context manager optimization
@@ -424,7 +420,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `6831ee8` - Redesign web views and JavaScript builder
   - Complete web controller redesign
   - JavaScript builder complete rewrite
-  - All view component updates (being views, chat views, code browser views, config views, etc.)
+  - All view components updated (Being view, Chat view, Code Browser view, Config view, etc.)
   - Skin system improvements (Admin, Chat, Creative, Dev skins)
   - View base class architecture enhancement
 
@@ -435,9 +431,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Chat system and session management
   - Service locator redesign
   - Silicon being base class and manager updates
-  - Comprehensive web controller updates (17 controllers)
-  - Default silicon being factory improvement
-- `67988d4` - Improve Web UI module, add executor view, clean up views and core modules
+  - Web controllers comprehensive update (17 controllers)
+  - Default silicon being factory improvements
+- `67988d4` - Improve Web UI modules, add executor view, clean up views and core modules
   - Executor view
   - Module cleanup and organization
 
@@ -464,13 +460,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `d488485` - Add dynamic compilation functionality and curator tool module
   - Dynamic compilation executor
   - Curator tool implementation
-- `753d1d9` - Add security module, update executors, messenger providers, localization and tools
+- `753d1d9` - Add security module, update executors, messenger providers, localization, and tools
   - Security system
   - Executor updates
   - Messenger provider enhancement
-  - Localization improvements
+  - Localization improvement
   - Tool system updates
-- `a378697` - Complete Phase 5 - Tool System + Executors
+- `a378697` - Complete Stage 5 - Tool system + Executors
   - Tool management and definition
   - Command line executor
   - Disk executor
@@ -479,23 +475,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-04-02
 
-- `e6ad94b` - Fix chat history loading failure when deleting config file during testing
+- `e6ad94b` - Fix chat history loading failure when deleting configuration file during testing
   - Ollama client error handling improvement
   - Configuration data validation
   - Project reference cleanup
-- `daa56f5` - Complete Phase 4: Persistent Memory (Chat System + Messenger Channel)
-  - Chat system with group chat and private chat
+- `daa56f5` - Complete Stage 4: Persistent memory (Chat system + Messenger channels)
+  - Chat system with group and private chat
   - Messenger provider and manager interfaces
   - Time-indexed storage
   - Incomplete date handling
   - File system time storage
   - Console messenger provider
-  - Silicon being factory improvement
+  - Silicon being factory improvements
   - Program initialization updates
 
 ### 2026-04-01
 
-- `bbe2dbb` - Fix config loading and chat service message routing
+- `bbe2dbb` - Fix configuration loading and chat service message routing
   - Context manager implementation (added 188 lines of code)
   - AI client interface
   - Chat service interface and simple implementation
@@ -505,20 +501,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Ollama client implementation
   - Localization system setup
   - Program initialization redesign
-- `2fa6305` - Implement Phase 2: Main Loop Framework and Tick Object System
+- `2fa6305` - Implement Stage 2: Main loop framework and clock object system
   - Main loop scheduler
-  - Tick object base class
+  - Clock object base class
   - AI client factory interface
   - Storage interface
   - Ollama client factory
-  - Console tick object
-  - Test tick object
+  - Console clock object
+  - Test clock object
   - File system storage
-- `32b99a1` - Implement Phase 1 - Basic Chat Functionality
+- `32b99a1` - Implement Stage 1 - Basic chat functionality
   - AI request and response models
   - AI client interface
   - Message model
-  - Localization system (language, localization base class, localization manager)
+  - Localization system (Language, Localization base class, Localization manager)
   - Configuration data base class
   - Ollama client implementation
   - Configuration management

@@ -1,13 +1,13 @@
-# Security Design
+﻿# Security Design
 
-[English](security.md) | [简体中文](docs/zh-CN/security.md) | [繁體中文](docs/zh-HK/security.md) | [Español](docs/es-ES/security.md) | [日本語](docs/ja-JP/security.md) | [한국어](docs/ko-KR/security.md) | [Čeština](docs/cs-CZ/security.md)
+[English](../en/security.md) | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Deutsch](../de-DE/security.md) | [Čeština](../cs-CZ/security.md)
 
 ## Overview
 
-Security in Silicon Life Collective is built on a **layered defense** model. The core principle: **all I/O operations must pass through executors**, and executors enforce permission checks before execution.
+Security in Silicon Life Collective is built on a **defense in depth** model. Core principle: **All I/O operations must go through executors**, and executors enforce permission checks before execution.
 
 ```
-Tool Call → Executor → PermissionManager → HighDeny Cache → HighAllow Cache → Callback → AskUser
+Tool Call → Executor → Permission Manager → High Deny Cache → High Allow Cache → Callback → Ask User
 ```
 
 ---
@@ -26,38 +26,38 @@ Tool Call → Executor → PermissionManager → HighDeny Cache → HighAllow Ca
 
 ### Permission Results
 
-Every permission check returns one of three results:
+Each permission check returns one of three outcomes:
 
 | Result | Behavior |
 |--------|----------|
 | **Allowed** | Operation proceeds immediately |
 | **Denied** | Operation is blocked, audit log recorded |
-| **AskUser** | Operation is paused, user confirmation required |
+| **AskUser** | Operation pauses, requires user confirmation |
 
 ### Special Role: Silicon Curator
 
-The Silicon Curator holds the highest privilege level (`IsCurator = true`). Permission checks for the Curator are short-circuited to **Allowed** unless explicitly overridden by the user.
+The silicon curator has the highest permission level (`IsCurator = true`). Permission checks for the curator are short-circuited to **Allowed**, unless the user explicitly overrides.
 
-### Private Permission Managers
+### Private Permission Manager
 
-Each Silicon Being has its own **private PermissionManager** instance. Permission states are not shared between beings.
+Each silicon being has its own **private PermissionManager** instance. Permission state is not shared between beings.
 
 ---
 
 ## Permission Verification Flow
 
-The query priority is: **1. User HighDeny → 2. User HighAllow → 3. Callback Function**
+Query priority is: **1. User High Deny → 2. User High Allow → 3. Callback Function**
 
 ```
 ┌─────────────┐
-│ Tool Call   │
+│  Tool Call   │
 └──────┬──────┘
        │
        ▼
 ┌─────────────┐     ┌─────────────────────┐
-│  Executor   │────▶│ Private Permission  │
-│ (Disk/Net/  │     │ Manager (per-being) │
-│  CLI/...)   │     └────────┬────────────┘
+│  Executor    │────▶│ Private Permission  │
+│ (Disk/Net/   │     │ Manager (per being)  │
+│  CLI...)     │     └────────┬────────────┘
 └─────────────┘            │
                            ▼
                   ┌─────────────────┐
@@ -66,24 +66,24 @@ The query priority is: **1. User HighDeny → 2. User HighAllow → 3. Callback 
                            │ No
                            ▼
                   ┌─────────────────┐
-                  │ 2. User HighDeny│──Match──▶ Denied
-                  │ (memory cache)  │
+                  │ 2. User High    │──Match──▶ Denied
+                  │ Deny Cache      │
                   └────────┬────────┘
-                           │ Miss
+                           │ No Match
                            ▼
                   ┌─────────────────┐
-                  │ 3. User HighAllow│──Match──▶ Allowed
-                  │ (memory cache)  │
+                  │ 3. User High    │──Match──▶ Allowed
+                  │ Allow Cache     │
                   └────────┬────────┘
-                           │ Miss
+                           │ No Match
                            ▼
                   ┌─────────────────┐
                   │ 4. Permission   │
-                  │  Callback Func  │──▶ Allowed / Denied / AskUser
+                  │ Callback        │──▶ Allowed / Denied / AskUser
                   └─────────────────┘
 ```
 
-**Key point**: The executor only sees a boolean (Allowed/Denied). The PermissionManager internally handles the three-way decision (Allowed/Denied/AskUser) and resolves AskUser before returning to the executor.
+**Key Point**: Executors only see booleans (Allowed/Denied). The permission manager internally handles the ternary decision (Allowed/Denied/AskUser) and resolves AskUser before returning to the executor.
 
 ---
 
@@ -91,53 +91,53 @@ The query priority is: **1. User HighDeny → 2. User HighAllow → 3. Callback 
 
 Executors are the **only** path for I/O operations. They enforce:
 
-### Independent Scheduling Thread
+### Independent Scheduling Threads
 
-Each executor owns an **independent scheduling thread**:
+Each executor has its **own scheduling thread**:
 
-- Threads are isolated between executors — one executor's thread block does not affect others.
+- Thread isolation between executors — one executor's thread blocking doesn't affect others.
 - Each executor can set independent resource limits (CPU, memory, etc.).
 - Thread pool management for executor threads.
 
-### Request Queue
+### Request Queues
 
 Each executor maintains a request queue:
 
-- Requests are routed to the corresponding executor by type.
-- Supports priority queuing.
+- Requests are routed to the appropriate executor by type.
+- Priority queuing support.
 - Timeout control per request.
 
 ### Thread Locking for Permission Verification
 
-When a tool initiates a resource access:
+When a tool initiates resource access:
 
-1. The executor receives the request and **locks its thread**.
-2. The executor queries the being's private PermissionManager.
-3. If the callback returns AskUser, the executor thread **remains locked** waiting for the user's response.
-4. The being only sees the final result (success or denied) — it never sees the intermediate "pending" or "waiting" state.
-5. Only the Silicon Curator triggers real user prompts. Ordinary beings query the Global ACL synchronously without blocking.
-6. On timeout, the request is treated as denied and the thread lock is released.
+1. Executor receives the request and **locks its thread**.
+2. Executor queries the being's private permission manager.
+3. If callback returns AskUser, the executor thread **remains locked** waiting for user response.
+4. The being only sees the final result (success or denial) — it never sees the intermediate "pending" or "waiting" state.
+5. Only the silicon curator triggers real user prompts. Normal beings query the global ACL synchronously without blocking.
+6. On timeout, the request is treated as denied, and the thread lock is released.
 
 ### Executor Types
 
 | Executor | Scope | Default Timeout |
 |----------|-------|-----------------|
-| `DiskExecutor` | File read/write, directory operations | 30s |
-| `NetworkExecutor` | HTTP requests, WebSocket connections | 60s |
-| `CommandLineExecutor` | Shell command execution | 120s |
-| `DynamicCompilationExecutor` | Roslyn in-memory compilation | 60s |
+| `DiskExecutor` | File read/write, directory operations | 30 seconds |
+| `NetworkExecutor` | HTTP requests, WebSocket connections | 60 seconds |
+| `CommandLineExecutor` | Shell command execution | 120 seconds |
+| `DynamicCompilationExecutor` | Roslyn in-memory compilation | 60 seconds |
 
-### Exception Isolation & Fault Tolerance
+### Exception Isolation and Fault Tolerance
 
-- One executor's exception does not affect other executors.
-- Auto-restart on thread crash.
-- Circuit breaker: temporarily halt an executor after consecutive failures to prevent cascading failures.
+- Exceptions in one executor don't affect other executors.
+- Automatic restart on thread crash.
+- Circuit breakers: temporarily halt executor after consecutive failures to prevent cascade failures.
 
 ---
 
 ## Global ACL (Access Control List)
 
-A shared rule table persisted to storage, managed exclusively by the Silicon Curator:
+Shared rule table persisted to storage, managed only by the silicon curator:
 
 ```json
 {
@@ -150,9 +150,9 @@ A shared rule table persisted to storage, managed exclusively by the Silicon Cur
 ```
 
 - Rules are evaluated in order; first match wins.
-- Only the Silicon Curator can modify the Global ACL (via its dedicated tools).
+- Only the silicon curator can modify the global ACL (via its dedicated tools).
 - Changes take effect immediately.
-- The Global ACL is **not** in the per-query priority chain above — it is referenced by the callback function internally.
+- Global ACL is **not** in the priority chain per query mentioned above — it is referenced internally by the callback function.
 
 ---
 
@@ -162,25 +162,25 @@ To reduce repetitive permission prompts, the system maintains two **per-being, m
 
 | Cache | Purpose |
 |-------|---------|
-| **HighAllow** | Resources the user has frequently allowed |
-| **HighDeny** | Resources the user has frequently denied |
+| **HighAllow** | Resources frequently allowed by user |
+| **HighDeny** | Resources frequently denied by user |
 
 ### How It Works
 
-- **User-opted, not auto-detected**: When AskUser is triggered, the user chooses whether to add the resource to the cache.
+- **User choice, not auto-detection**: When AskUser is triggered, the user chooses whether to add the resource to cache.
 - **Prefix matching**: Supports resource path prefix matching (e.g., `network:api.example.com/*`).
-- **Priority**: HighDeny has higher priority than HighAllow.
-- **Memory-only**: Caches are not persisted. They are lost on restart.
-- **Configurable expiration**: Users can set cache entry validity duration.
+- **Priority**: HighDeny takes priority over HighAllow.
+- **Memory-only**: Caches are not persisted. Lost on restart.
+- **Configurable expiration**: Users can set validity period for cache entries.
 
 ### Cache Update Flow
 
 1. Permission callback returns `AskUser`.
-2. Permission system sends an inquiry to the card system (Web UI or IM).
-3. User makes a decision (Allow/Deny) and **chooses whether to cache**.
-4. Card system returns the decision + cache flag.
-5. Permission system updates the corresponding cache list.
-6. Future requests matching the cached prefix are resolved immediately.
+2. Permission system sends query to card system (Web UI or IM).
+3. User makes decision (Allow/Deny) and **chooses whether to cache**.
+4. Card system returns decision + cache flag.
+5. Permission system updates the appropriate cache list.
+6. Future requests matching cached prefixes are resolved immediately.
 
 ---
 
@@ -188,59 +188,59 @@ To reduce repetitive permission prompts, the system maintains two **per-being, m
 
 When a permission check returns `AskUser`:
 
-### Web UI: Interactive Card
+### Web UI: Interactive Cards
 
 The web frontend immediately displays an **interactive card** showing:
 
 - Resource type and path
 - Operation description
 - Allow / Deny buttons
-- Optional "Always allow" / "Always deny" checkbox (adds to frequency cache)
+- Optional "Always Allow" / "Always Deny" checkbox (add to frequency cache)
 
-### IM (No Card Support): Random Code
+### IM (No Card Support): Random Codes
 
 For messaging platforms that don't support interactive cards:
 
-1. System generates two random 6-digit codes: an **allow code** and a **deny code**.
-2. Sends a message containing the resource info and both codes.
+1. System generates two random 6-digit codes: **Allow Code** and **Deny Code**.
+2. Sends message with resource information and both codes.
 3. User must reply with the exact allow code to authorize. Any other reply is treated as denial.
 4. Codes are single-use to prevent replay attacks.
 
 ### Timeout
 
-- A timeout is set for all AskUser requests.
-- On timeout, the request is treated as **denied** and the executor thread lock is released.
+- Timeout is set for all AskUser requests.
+- On timeout, the request is treated as **Denied**, and the executor thread lock is released.
 
 ---
 
 ## Dynamic Compilation Security
 
-Self-evolution (class rewriting) introduces unique security risks. The system mitigates them with a **layered strategy**:
+Self-evolution (class override) introduces unique security risks. The system mitigates them with a **layered strategy**:
 
 ### Layer 1: Compile-Time Reference Control (Primary Defense)
 
-- The compiler is only given an **allowed assembly reference list**.
-- **Allowed**: `System.Runtime`, `System.Private.CoreLib`, project assemblies (ITool interfaces, etc.)
+- Compiler only receives a **list of allowed assembly references**.
+- **Allowed**: `System.Runtime`, `System.Private.CoreLib`, project assemblies (ITool interface, etc.)
 - **Blocked**: `System.IO`, `System.Reflection`, `System.Runtime.InteropServices`, etc.
-- If the code references a blocked assembly, the **compiler itself rejects** the code.
+- If code references a blocked assembly, **the compiler itself rejects** the code.
 - This is more reliable than runtime scanning — dangerous operations are impossible at the type level.
 
 ### Layer 2: Runtime Static Analysis (Secondary Defense)
 
-- Even after successful compilation, the code undergoes static pattern scanning.
+- Even after successful compilation, code is scanned for static patterns.
 - Detects dangerous operation patterns (direct I/O, system calls, etc.).
-- If dangerous code is found, loading is rejected and the system falls back to the default function.
+- If dangerous code is found, loading is rejected and the system falls back to default functionality.
 
 ### Inheritance Constraint
 
-All custom Silicon Being classes **must** inherit `SiliconBeingBase`. The compiler enforces this at the type level.
+All custom silicon being classes **must** inherit `SiliconBeingBase`. The compiler enforces this constraint at the type level.
 
 ### Encrypted Storage
 
-Compiled code is stored AES-256 encrypted on disk:
+Compiled code is stored on disk encrypted with AES-256:
 
-- **Key derivation**: PBKDF2 from the being's GUID (uppercase).
-- **Decryption failure**: Falls back to the default implementation.
+- **Key derivation**: From being's GUID (uppercase) using PBKDF2.
+- **Decryption failure**: Falls back to default implementation.
 - **Runtime recompilation**: New code is compiled in memory first; only persisted after successful compilation and instance replacement.
 
 ### Atomic Replacement
@@ -253,20 +253,20 @@ The replacement process is atomic:
 4. Swap references.
 5. Persist encrypted code.
 
-If any step fails, the old instance remains active.
+If any step fails, the old instance remains alive.
 
 ---
 
-## Permission Callback Function
+## Permission Callback Functions
 
 ### Design
 
 Each PermissionManager holds a **callback function variable**:
 
-- **Default**: Points to the built-in default permission function.
+- **Default**: Points to built-in default permission function.
 - **After dynamic compilation**: Overridden by the being's custom permission function.
-- **One-or-the-other**: Only one callback is active at any time.
-- **Compilation failure**: Does not affect the current callback — the default or last successful custom function remains in effect.
+- **One or the other**: Only one callback is active at any time.
+- **Compilation failure**: Doesn't affect current callback — default or last successful custom function remains effective.
 
 ### Callback Signature
 
@@ -289,16 +289,16 @@ All permission decisions are logged:
 [2026-04-01 15:30:28] ALLOWED  | Being:Curator    | Type:CommandLine   | Resource:del /f /q *.log | Source:UserDecision
 ```
 
-Logs are persisted to storage and viewable via the Web UI (Log Controller).
+Logs are persisted to storage and viewable via Web UI (Log Controller).
 
 ---
 
 ## Token Usage Audit
 
-The `TokenUsageAuditManager` provides security-relevant tracking of AI token consumption:
+`TokenUsageAuditManager` provides AI token consumption tracking related to security:
 
-- **Per-request records** — Every AI call logs the being ID, model, prompt tokens, completion tokens, and timestamp.
+- **Per-request logging** — Each AI call records being ID, model, prompt tokens, completion tokens, and timestamp.
 - **Anomaly detection** — Unusual token consumption patterns may indicate prompt injection or resource abuse.
-- **Curator-only access** — The `TokenAuditTool` (marked `[SiliconManagerOnly]`) allows the Curator to query and summarize token usage.
-- **Web dashboard** — The `AuditController` provides a browser-based dashboard with trend charts and data export.
+- **Curator-only access** — `TokenAuditTool` (marked `[SiliconManagerOnly]`) allows curator to query and summarize token usage.
+- **Web dashboard** — `AuditController` provides browser-based dashboard with trend charts and data export.
 - **Persistent storage** — Records are stored via `ITimeStorage` for time-series queries and long-term analysis.

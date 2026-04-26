@@ -1,20 +1,18 @@
-# Referencia de API
+﻿# Referencia de API
 
-[English](api-reference.md) | [简体中文](docs/zh-CN/api-reference.md) | [繁體中文](docs/zh-HK/api-reference.md) | [Español](docs/es-ES/api-reference.md) | [日本語](docs/ja-JP/api-reference.md) | [한국어](docs/ko-KR/api-reference.md) | [Čeština](docs/cs-CZ/api-reference.md)
+[English](../en/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | **Español** | [Deutsch](../de-DE/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
 
-## Endpoints de API Web
+## Endpoints de Web API
 
-URL Base: `http://localhost:8080`
+URL base: `http://localhost:8080`
 
----
+### Autenticación
 
-## Autenticación
-
-La mayoría de endpoints requieren autenticación mediante cookies de sesión gestionadas por la interfaz web.
+La mayoría de los endpoints requieren autenticación a través de cookie de sesión gestionada por Web UI.
 
 ---
 
-## Gestión de Seres de Silicio
+## Gestión de Seres Silicona
 
 ### Obtener Todos los Seres
 
@@ -26,7 +24,7 @@ La mayoría de endpoints requieren autenticación mediante cookies de sesión ge
   "beings": [
     {
       "id": "being-uuid",
-      "name": "Asistente",
+      "name": "Assistant",
       "status": "running",
       "soul": "path/to/soul.md"
     }
@@ -41,8 +39,8 @@ La mayoría de endpoints requieren autenticación mediante cookies de sesión ge
 **Solicitud**:
 ```json
 {
-  "name": "Nuevo Ser",
-  "soul": "# Personalidad\nEres útil..."
+  "name": "New Being",
+  "soul": "# Personality\nYou are helpful..."
 }
 ```
 
@@ -52,229 +50,110 @@ La mayoría de endpoints requieren autenticación mediante cookies de sesión ge
 
 **POST** `/api/beings/{id}/start`
 
-**Respuesta**: `200 OK`
-
 ### Detener Ser
 
 **POST** `/api/beings/{id}/stop`
 
-**Respuesta**: `200 OK`
+### Obtener Detalles del Ser
 
-### Eliminar Ser
-
-**DELETE** `/api/beings/{id}`
-
-**Respuesta**: `204 No Content`
+**GET** `/api/beings/{id}`
 
 ---
 
-## Chat
+## Sistema de Chat
 
 ### Enviar Mensaje
 
-**POST** `/api/chat/{channelId}/message`
+**POST** `/api/chat`
 
 **Solicitud**:
 ```json
 {
-  "content": "Hola, ¿cómo estás?"
+  "beingId": "being-uuid",
+  "message": "Hello, how are you?",
+  "sessionId": "optional-session-id"
 }
 ```
 
-**Respuesta**: `200 OK`
-
-### Obtener Mensajes
-
-**GET** `/api/chat/{channelId}/messages?count=50`
-
-**Respuesta**:
+**Respuesta** (no streaming):
 ```json
 {
-  "messages": [
-    {
-      "id": "msg-uuid",
-      "sender": "user",
-      "content": "Hola",
-      "timestamp": "2024-01-15T14:30:00Z"
-    }
-  ]
+  "reply": "I'm doing well, thank you!",
+  "sessionId": "session-uuid",
+  "timestamp": "2026-04-20T10:30:00Z"
 }
 ```
 
-### Crear Canal
+### Chat en Streaming (SSE)
 
-**POST** `/api/channels`
+**GET** `/api/chat/stream?beingId={id}&message={msg}`
 
-**Solicitud**:
-```json
-{
-  "name": "Canal General"
-}
+**Respuesta**: Stream de eventos enviados por el servidor
+
+```
+data: {"type": "chunk", "content": "I"}
+data: {"type": "chunk", "content": "'m"}
+data: {"type": "chunk", "content": " thinking..."}
+data: {"type": "complete", "sessionId": "uuid"}
 ```
 
-**Respuesta**: `201 Created`
+### Obtener Historial de Chat
+
+**GET** `/api/chat/history?beingId={id}&sessionId={sid}`
 
 ---
 
-## Configuración
+## Sistema de Configuración
 
 ### Obtener Configuración
 
 **GET** `/api/config`
 
-**Respuesta**:
-```json
-{
-  "AIClients": {
-    "Ollama": {
-      "BaseUrl": "http://localhost:11434",
-      "Model": "qwen2.5:7b"
-    }
-  },
-  "Language": "EsES",
-  "WebHost": {
-    "Port": 8080
-  }
-}
-```
-
 ### Actualizar Configuración
 
-**PUT** `/api/config`
+**POST** `/api/config`
 
 **Solicitud**:
 ```json
 {
-  "Language": "en-US"
-}
-```
-
-**Respuesta**: `200 OK`
-
----
-
-## Permisos
-
-### Obtener Solicitudes Pendientes
-
-**GET** `/api/permission-requests`
-
-**Respuesta**:
-```json
-{
-  "requests": [
-    {
-      "id": "req-uuid",
-      "beingId": "being-uuid",
-      "permissionType": "FileAccess",
-      "resource": "/data/file.txt",
-      "timestamp": "2024-01-15T14:30:00Z"
-    }
-  ]
-}
-```
-
-### Aprobar Solicitud
-
-**POST** `/api/permission-requests/{id}/approve`
-
-**Respuesta**: `200 OK`
-
-### Rechazar Solicitud
-
-**POST** `/api/permission-requests/{id}/deny`
-
-**Respuesta**: `200 OK`
-
----
-
-## Auditoría
-
-### Obtener Registros de Permisos
-
-**GET** `/api/audit/permissions?start=2024-01-01&end=2024-01-31`
-
-**Respuesta**:
-```json
-{
-  "logs": [
-    {
-      "timestamp": "2024-01-15T14:30:00Z",
-      "beingId": "being-uuid",
-      "permissionType": "FileAccess",
-      "resource": "/data/file.txt",
-      "result": "Allowed"
-    }
-  ]
-}
-```
-
-### Obtener Uso de Tokens
-
-**GET** `/api/audit/tokens?beingId=uuid&start=2024-01-01`
-
-**Respuesta**:
-```json
-{
-  "usage": {
-    "totalTokens": 15000,
-    "inputTokens": 10000,
-    "outputTokens": 5000,
-    "requests": 50
-  }
+  "key": "AIClients.Ollama.Model",
+  "value": "qwen2.5:7b"
 }
 ```
 
 ---
 
-## Herramientas
+## Sistema de Permisos
 
-### Ejecutar Herramienta
+### Obtener Permisos
 
-**POST** `/api/tools/{toolName}/execute`
+**GET** `/api/permissions?userId={uid}`
+
+### Añadir Regla de Permiso
+
+**POST** `/api/permissions`
 
 **Solicitud**:
 ```json
 {
-  "method": "GetValue",
-  "parameters": {
-    "key": "config_key"
-  }
+  "userId": "user-uuid",
+  "resource": "disk:read",
+  "allowed": true,
+  "duration": 3600
 }
 ```
 
-**Respuesta**:
-```json
-{
-  "success": true,
-  "message": "Éxito",
-  "data": "valor"
-}
-```
+### Eliminar Regla de Permiso
 
-### Listar Herramientas
-
-**GET** `/api/tools`
-
-**Respuesta**:
-```json
-{
-  "tools": [
-    {
-      "name": "CalendarTool",
-      "description": "Consulta de calendarios"
-    },
-    {
-      "name": "ChatTool",
-      "description": "Enviar mensajes"
-    }
-  ]
-}
-```
+**DELETE** `/api/permissions/{rule-id}`
 
 ---
 
-## Tareas
+## Sistema de Tareas
+
+### Obtener Tareas
+
+**GET** `/api/tasks?beingId={id}`
 
 ### Crear Tarea
 
@@ -283,410 +162,152 @@ La mayoría de endpoints requieren autenticación mediante cookies de sesión ge
 **Solicitud**:
 ```json
 {
-  "title": "Investigar API",
-  "description": "Buscar documentación"
+  "beingId": "being-uuid",
+  "description": "Review code",
+  "priority": 5,
+  "dueDate": "2026-04-21T00:00:00Z"
 }
 ```
-
-**Respuesta**: `201 Created`
 
 ### Actualizar Tarea
 
-**PUT** `/api/tasks/{id}`
-
-**Solicitud**:
-```json
-{
-  "status": "completed"
-}
-```
-
-**Respuesta**: `200 OK`
-
-### Listar Tareas
-
-**GET** `/api/tasks?status=active`
-
-**Respuesta**:
-```json
-{
-  "tasks": [
-    {
-      "id": "task-uuid",
-      "title": "Investigar API",
-      "status": "active",
-      "created": "2024-01-15T14:30:00Z"
-    }
-  ]
-}
-```
+**PUT** `/api/tasks/{task-id}`
 
 ---
 
-## Temporizadores
+## Sistema de Temporizadores
 
-### Configurar Temporizador
+### Obtener Temporizadores
+
+**GET** `/api/timers?beingId={id}`
+
+### Crear Temporizador
 
 **POST** `/api/timers`
 
 **Solicitud**:
 ```json
 {
-  "name": "recordatorio",
-  "delay": "00:30:00",
-  "action": "Enviar mensaje"
-}
-```
-
-**Respuesta**: `201 Created`
-
-### Cancelar Temporizador
-
-**DELETE** `/api/timers/{name}`
-
-**Respuesta**: `204 No Content`
-
----
-
-## Logs
-
-### Obtener Logs
-
-**GET** `/api/logs?level=Error&count=100`
-
-**Respuesta**:
-```json
-{
-  "logs": [
-    {
-      "timestamp": "2024-01-15T14:30:00Z",
-      "level": "Error",
-      "message": "Error de conexión",
-      "source": "NetworkExecutor"
-    }
-  ]
+  "beingId": "being-uuid",
+  "interval": 3600,
+  "action": "think",
+  "repeat": true
 }
 ```
 
 ---
 
-## Memoria
+## Sistema de Memoria
 
-### Guardar en Memoria
+### Obtener Memoria
 
-**POST** `/api/memory`
+**GET** `/api/memory?beingId={id}&date={date}`
 
-**Solicitud**:
-```json
-{
-  "key": "preferencia",
-  "value": "respuestas cortas"
-}
-```
+### Buscar Memoria
 
-**Respuesta**: `200 OK`
-
-### Cargar de Memoria
-
-**GET** `/api/memory/{key}`
-
-**Respuesta**:
-```json
-{
-  "key": "preferencia",
-  "value": "respuestas cortas"
-}
-```
+**GET** `/api/memory/search?beingId={id}&query={q}`
 
 ---
 
-## Sistema
+## Sistema de Conocimiento
 
-### Obtener Información del Sistema
+### Añadir Conocimiento
 
-**GET** `/api/system/info`
-
-**Respuesta**:
-```json
-{
-  "version": "1.0.5",
-  "uptime": "24:00:00",
-  "memoryUsage": "256MB",
-  "cpuUsage": "15%"
-}
-```
-
----
-
-## Server-Sent Events (SSE)
-
-### Suscribirse a Eventos
-
-**GET** `/sse`
-
-**Eventos**:
-
-- `chat_message`: Nuevo mensaje
-- `being_status`: Cambio de estado
-- `permission_request`: Nueva solicitud
-- `log_entry`: Nueva entrada de log
-
-**Ejemplo JavaScript**:
-
-```javascript
-const eventSource = new EventSource('/sse');
-
-eventSource.addEventListener('chat_message', (event) => {
-    const message = JSON.parse(event.data);
-    console.log('Nuevo mensaje:', message);
-});
-```
-
----
-
-## Códigos de Error
-
-| Código | Descripción |
-|--------|-------------|
-| 200 | Éxito |
-| 201 | Creado |
-| 204 | Sin contenido |
-| 400 | Solicitud incorrecta |
-| 401 | No autorizado |
-| 403 | Prohibido |
-| 404 | No encontrado |
-| 500 | Error del servidor |
-
----
-
-## Ejemplos de Uso
-
-### cURL
-
-```bash
-# Obtener seres
-curl http://localhost:8080/api/beings
-
-# Crear ser
-curl -X POST http://localhost:8080/api/beings \
-  -H "Content-Type: application/json" \
-  -d '{"name": "MiSer", "soul": "# Alma"}'
-
-# Enviar mensaje
-curl -X POST http://localhost:8080/api/chat/channel-id/message \
-  -H "Content-Type: application/json" \
-  -d '{"content": "Hola"}'
-```
-
-### JavaScript (Fetch)
-
-```javascript
-// Obtener seres
-const response = await fetch('http://localhost:8080/api/beings');
-const data = await response.json();
-
-// Crear ser
-await fetch('http://localhost:8080/api/beings', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name: 'MiSer', soul: '# Alma' })
-});
-```
-
----
-
-## API de Notas de Trabajo
-
-### Obtener Lista de Notas de Trabajo
-
-**GET** `/api/beings/{id}/work-notes`
-
-**Respuesta**:
-```json
-{
-  "notes": [
-    {
-      "id": "note-uuid",
-      "pageNumber": 1,
-      "summary": "Módulo de autenticación completado",
-      "keywords": ["autenticación", "JWT", "OAuth2"],
-      "createdAt": "2026-04-25T10:00:00Z",
-      "updatedAt": "2026-04-25T10:00:00Z"
-    }
-  ],
-  "totalCount": 15
-}
-```
-
-### Obtener Detalles de Una Nota
-
-**GET** `/api/beings/{id}/work-notes/{pageNumber}`
-
-**Respuesta**:
-```json
-{
-  "id": "note-uuid",
-  "pageNumber": 1,
-  "summary": "Módulo de autenticación completado",
-  "content": "## Detalles de implementación\n\n- Uso de token JWT\n- Soporte OAuth2",
-  "keywords": ["autenticación", "JWT", "OAuth2"],
-  "createdAt": "2026-04-25T10:00:00Z",
-  "updatedAt": "2026-04-25T10:00:00Z"
-}
-```
-
-### Crear Nueva Nota
-
-**POST** `/api/beings/{id}/work-notes`
-
-**Solicitud**:
-```json
-{
-  "summary": "Módulo de autenticación completado",
-  "content": "## Detalles de implementación\n\n- Uso de token JWT",
-  "keywords": "autenticación,JWT,OAuth2"
-}
-```
-
-**Respuesta**: `201 Created`
-
-### Actualizar Nota
-
-**PUT** `/api/beings/{id}/work-notes/{pageNumber}`
-
-**Solicitud**:
-```json
-{
-  "summary": "Módulo de autenticación y pruebas completados",
-  "content": "## Contenido actualizado\n\nPruebas unitarias añadidas",
-  "keywords": "autenticación,JWT,OAuth2,pruebas"
-}
-```
-
-### Eliminar Nota
-
-**DELETE** `/api/beings/{id}/work-notes/{pageNumber}`
-
-### Buscar Notas
-
-**GET** `/api/beings/{id}/work-notes/search?keyword=autenticación&maxResults=10`
-
-### Obtener Directorio de Notas
-
-**GET** `/api/beings/{id}/work-notes/directory`
-
----
-
-## API de Red de Conocimiento
-
-### Obtener Estadísticas de Conocimiento
-
-**GET** `/api/knowledge/stats`
-
-**Respuesta**:
-```json
-{
-  "totalTriples": 1523,
-  "totalSubjects": 450,
-  "totalPredicates": 85,
-  "totalObjects": 892,
-  "averageConfidence": 0.87
-}
-```
-
-### Agregar Triple de Conocimiento
-
-**POST** `/api/knowledge/triples`
+**POST** `/api/knowledge`
 
 **Solicitud**:
 ```json
 {
   "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language",
-  "confidence": 0.95,
-  "tags": ["programming", "language"]
+  "relation": "es_un",
+  "object": "lenguaje_de_programación"
 }
 ```
-
-**Respuesta**: `201 Created`
 
 ### Consultar Conocimiento
 
-**GET** `/api/knowledge/query?subject=Python&predicate=is_a`
+**GET** `/api/knowledge?subject={s}`
+
+### Obtener Ruta
+
+**GET** `/api/knowledge/path?from={subject1}&to={subject2}`
+
+---
+
+## Sistema de Registros
+
+### Obtener Registros
+
+**GET** `/api/logs?level={level}&from={date}&to={date}`
+
+---
+
+## Sistema de Auditoría
+
+### Obtener Uso de Tokens
+
+**GET** `/api/audit/tokens?beingId={id}&from={date}&to={date}`
+
+### Obtener Resumen
+
+**GET** `/api/audit/summary?beingId={id}`
+
+---
+
+## Panel de Control
+
+### Obtener Métricas del Sistema
+
+**GET** `/api/dashboard`
 
 **Respuesta**:
 ```json
 {
-  "triples": [
-    {
-      "subject": "Python",
-      "predicate": "is_a",
-      "object": "programming_language",
-      "confidence": 0.95,
-      "tags": ["programming", "language"]
-    }
-  ]
+  "cpu": 45.2,
+  "memory": 1024,
+  "uptime": 86400,
+  "beings": {
+    "total": 5,
+    "running": 3
+  }
 }
 ```
 
-### Buscar Conocimiento
+### Eventos SSE
 
-**GET** `/api/knowledge/search?query=programming+language&limit=10`
+**GET** `/api/dashboard/events`
 
-### Obtener Ruta de Conocimiento
+---
 
-**GET** `/api/knowledge/path?from=Python&to=computer_science`
+## Sistema de Archivos
 
-**Respuesta**:
-```json
-{
-  "path": [
-    {"subject": "Python", "predicate": "is_a", "object": "programming_language"},
-    {"subject": "programming_language", "predicate": "belongs_to", "object": "computer_science"}
-  ],
-  "length": 2
-}
-```
+### Listar Archivos
 
-### Validar Conocimiento
+**GET** `/api/files?path={path}`
 
-**POST** `/api/knowledge/validate`
+### Leer Archivo
+
+**GET** `/api/files/read?path={path}`
+
+### Escribir Archivo
+
+**POST** `/api/files/write`
 
 **Solicitud**:
 ```json
 {
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language"
+  "path": "/path/to/file.txt",
+  "content": "File content"
 }
 ```
-
-### Eliminar Conocimiento
-
-**DELETE** `/api/knowledge/triples/{id}`
 
 ---
 
-## API de Gestión de Proyectos
+## Sistema de Proyectos
 
-### Obtener Lista de Proyectos
+### Obtener Proyectos
 
 **GET** `/api/projects`
-
-**Respuesta**:
-```json
-{
-  "projects": [
-    {
-      "id": "project-uuid",
-      "name": "My Project",
-      "description": "Project description",
-      "createdAt": "2026-04-25T10:00:00Z"
-    }
-  ]
-}
-```
 
 ### Crear Proyecto
 
@@ -700,14 +321,55 @@ await fetch('http://localhost:8080/api/beings', {
 }
 ```
 
-### Obtener Detalles del Proyecto
+---
 
-**GET** `/api/projects/{id}`
+## Sistema de Notas de Trabajo
 
-### Actualizar Proyecto
+### Obtener Notas
 
-**PUT** `/api/projects/{id}`
+**GET** `/api/worknotes?beingId={id}`
 
-### Eliminar Proyecto
+### Crear Nota
 
-**DELETE** `/api/projects/{id}`
+**POST** `/api/worknotes`
+
+**Solicitud**:
+```json
+{
+  "beingId": "being-uuid",
+  "title": "Nota title",
+  "content": "# Content\n\nNote content...",
+  "keywords": ["keyword1", "keyword2"]
+}
+```
+
+### Buscar Notas
+
+**GET** `/api/worknotes/search?beingId={id}&query={q}`
+
+### Generar Índice
+
+**GET** `/api/worknotes/index?beingId={id}`
+
+---
+
+## Códigos de Error
+
+| Código | Descripción |
+|--------|-------------|
+| 200 | Éxito |
+| 201 | Creado |
+| 400 | Solicitud incorrecta |
+| 401 | No autorizado |
+| 403 | Prohibido |
+| 404 | No encontrado |
+| 500 | Error interno del servidor |
+
+---
+
+## Próximos Pasos
+
+- 📚 Leer la [Guía de Arquitectura](architecture.md)
+- 🛠️ Consultar la [Guía de Desarrollo](development-guide.md)
+- 🔧 Ver la [Referencia de Herramientas](tools-reference.md)
+- 🚀 Comenzar con la [Guía de Inicio Rápido](getting-started.md)

@@ -1,6 +1,6 @@
-# API 레퍼런스
+﻿# API 참고
 
-[English](api-reference.md) | [简体中文](docs/zh-CN/api-reference.md) | [繁體中文](docs/zh-HK/api-reference.md) | [Español](docs/es-ES/api-reference.md) | [日本語](docs/ja-JP/api-reference.md) | [한국어](docs/ko-KR/api-reference.md) | [Čeština](docs/cs-CZ/api-reference.md)
+[English](../en/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | **한국어** | [Deutsch](../de-DE/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
 
 ## Web API 엔드포인트
 
@@ -8,13 +8,13 @@
 
 ### 인증
 
-대부분의 엔드포인트는 Web UI에서 관리하는 세션 쿠키를 통한 인증이 필요합니다.
+대부분의 엔드포인트는 Web UI가 관리하는 세션 쿠키를 통한 인증이 필요합니다.
 
 ---
 
-## 실리콘 비잉 관리
+## 실리콘 생명체 관리
 
-### 모든 Being 조회
+### 모든 생명체 가져오기
 
 **GET** `/api/beings`
 
@@ -32,7 +32,7 @@
 }
 ```
 
-### Being 생성
+### 생명체 만들기
 
 **POST** `/api/beings`
 
@@ -46,15 +46,15 @@
 
 **응답**: `201 Created`
 
-### Being 시작
+### 생명체 시작
 
 **POST** `/api/beings/{id}/start`
 
-### Being 중지
+### 생명체 중지
 
 **POST** `/api/beings/{id}/stop`
 
-### Being 상세 정보 조회
+### 생명체 세부정보 가져오기
 
 **GET** `/api/beings/{id}`
 
@@ -62,7 +62,7 @@
 
 ## 채팅 시스템
 
-### 메시지 전송
+### 메시지 보내기
 
 **POST** `/api/chat`
 
@@ -84,11 +84,11 @@
 }
 ```
 
-### 스트림 채팅 (SSE)
+### 스트리밍 채팅 (SSE)
 
 **GET** `/api/chat/stream?beingId={id}&message={msg}`
 
-**응답**: Server-Sent Events 스트림
+**응답**: 서버 전송 이벤트 스트림
 
 ```
 data: {"type": "chunk", "content": "I"}
@@ -97,7 +97,7 @@ data: {"type": "chunk", "content": " thinking..."}
 data: {"type": "complete", "sessionId": "uuid"}
 ```
 
-### 채팅 기록 조회
+### 채팅 기록 가져오기
 
 **GET** `/api/chat/{sessionId}/history`
 
@@ -121,9 +121,9 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ---
 
-## 설정
+## 구성
 
-### 설정 조회
+### 구성 가져오기
 
 **GET** `/api/config`
 
@@ -142,7 +142,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 설정 업데이트
+### 구성 업데이트
 
 **POST** `/api/config`
 
@@ -162,7 +162,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ## 권한 시스템
 
-### 권한 조회
+### 권한 가져오기
 
 **GET** `/api/permissions`
 
@@ -198,7 +198,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **DELETE** `/api/permissions/{id}`
 
-### 권한 확인
+### 권한 검사
 
 **POST** `/api/permissions/check`
 
@@ -222,7 +222,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ## 작업 및 타이머 시스템
 
-### 작업 생성
+### 작업 만들기
 
 **POST** `/api/tasks`
 
@@ -236,7 +236,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 작업 조회
+### 작업 가져오기
 
 **GET** `/api/tasks?beingId={id}&status=pending`
 
@@ -251,7 +251,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 타이머 생성
+### 타이머 만들기
 
 **POST** `/api/timers`
 
@@ -271,9 +271,9 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ---
 
-## 감사 및 로깅
+## 감사 및 로그
 
-### 토큰 사용량 조회
+### Token 사용 가져오기
 
 **GET** `/api/audit/tokens?startDate={date}&endDate={date}`
 
@@ -295,7 +295,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 로그 조회
+### 로그 가져오기
 
 **GET** `/api/logs?level=error&limit=100`
 
@@ -315,7 +315,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ---
 
-## 저장소 API
+## 저장 API
 
 ### 값 읽기
 
@@ -363,7 +363,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ## 시스템 정보
 
-### 대시보드 데이터 조회
+### 대시보드 데이터 가져오기
 
 **GET** `/api/dashboard`
 
@@ -387,7 +387,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 시스템 상태 조회
+### 시스템 상태 가져오기
 
 **GET** `/api/status`
 
@@ -417,21 +417,21 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 일반적인 오류 코드
+### 일반 오류 코드
 
 | 코드 | HTTP 상태 | 설명 |
-|------|-----------|------|
+|------|-------------|-------------|
 | `PERMISSION_DENIED` | 403 | 권한 부족 |
 | `NOT_FOUND` | 404 | 리소스를 찾을 수 없음 |
-| `VALIDATION_ERROR` | 400 | 잘못된 요청 매개변수 |
+| `VALIDATION_ERROR` | 400 | 요청 매개변수 잘못됨 |
 | `INTERNAL_ERROR` | 500 | 내부 서버 오류 |
-| `SERVICE_UNAVAILABLE` | 503 | AI 서비스를 사용할 수 없음 |
+| `SERVICE_UNAVAILABLE` | 503 | AI 서비스 사용 불가 |
 
 ---
 
 ## SSE 이벤트
 
-Server-Sent Events는 실시간 업데이트에 사용됩니다:
+서버 전송 이벤트는 실시간 업데이트에 사용됩니다:
 
 ### 채팅 이벤트
 
@@ -458,7 +458,7 @@ eventSource.onmessage = (event) => {
 };
 ```
 
-### Being 상태 이벤트
+### 생명체 상태 이벤트
 
 ```javascript
 const beingEvents = new EventSource('/api/beings/events');
@@ -513,6 +513,313 @@ public class AIResponse
 
 ---
 
+## 작업 노트 API
+
+### 작업 노트 목록 가져오기
+
+**GET** `/api/beings/{id}/work-notes`
+
+**응답**:
+```json
+{
+  "notes": [
+    {
+      "id": "note-uuid",
+      "pageNumber": 1,
+      "summary": "사용자 인증 모듈 완성",
+      "keywords": ["인증", "JWT", "OAuth2"],
+      "createdAt": "2026-04-25T10:00:00Z",
+      "updatedAt": "2026-04-25T10:00:00Z"
+    }
+  ],
+  "totalCount": 15
+}
+```
+
+### 단일 노트 세부정보 가져오기
+
+**GET** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**응답**:
+```json
+{
+  "id": "note-uuid",
+  "pageNumber": 1,
+  "summary": "사용자 인증 모듈 완성",
+  "content": "## 구현 세부사항\n\n- JWT token 사용\n- OAuth2 지원",
+  "keywords": ["인증", "JWT", "OAuth2"],
+  "createdAt": "2026-04-25T10:00:00Z",
+  "updatedAt": "2026-04-25T10:00:00Z"
+}
+```
+
+### 새 노트 만들기
+
+**POST** `/api/beings/{id}/work-notes`
+
+**요청**:
+```json
+{
+  "summary": "사용자 인증 모듈 완성",
+  "content": "## 구현 세부사항\n\n- JWT token 사용",
+  "keywords": "인증,JWT,OAuth2"
+}
+```
+
+**응답**: `201 Created`
+
+### 노트 업데이트
+
+**PUT** `/api/beings/{id}/work-notes/{pageNumber}`
+
+**요청**:
+```json
+{
+  "summary": "사용자 인증 모듈 및 테스트 완성",
+  "content": "## 업데이트된 내용\n\n단위 테스트 추가",
+  "keywords": "인증,JWT,OAuth2,테스트"
+}
+```
+
+### 노트 삭제
+
+**DELETE** `/api/beings/{id}/work-notes/{pageNumber}`
+
+### 노트 검색
+
+**GET** `/api/beings/{id}/work-notes/search?keyword=인증&maxResults=10`
+
+### 노트 디렉토리 가져오기
+
+**GET** `/api/beings/{id}/work-notes/directory`
+
+---
+
+## 지식 네트워크 API
+
+### 지식 통계 가져오기
+
+**GET** `/api/knowledge/stats`
+
+**응답**:
+```json
+{
+  "totalTriples": 1523,
+  "totalSubjects": 450,
+  "totalPredicates": 85,
+  "totalObjects": 892,
+  "averageConfidence": 0.87
+}
+```
+
+### 지식 트리플 추가
+
+**POST** `/api/knowledge/triples`
+
+**요청**:
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language",
+  "confidence": 0.95,
+  "tags": ["programming", "language"]
+}
+```
+
+**응답**: `201 Created`
+
+### 지식 쿼리
+
+**GET** `/api/knowledge/query?subject=Python&predicate=is_a`
+
+**응답**:
+```json
+{
+  "triples": [
+    {
+      "subject": "Python",
+      "predicate": "is_a",
+      "object": "programming_language",
+      "confidence": 0.95,
+      "tags": ["programming", "language"]
+    }
+  ]
+}
+```
+
+### 지식 검색
+
+**GET** `/api/knowledge/search?query=programming+language&limit=10`
+
+### 지식 경로 가져오기
+
+**GET** `/api/knowledge/path?from=Python&to=computer_science`
+
+**응답**:
+```json
+{
+  "path": [
+    {"subject": "Python", "predicate": "is_a", "object": "programming_language"},
+    {"subject": "programming_language", "predicate": "belongs_to", "object": "computer_science"}
+  ],
+  "length": 2
+}
+```
+
+### 지식 검증
+
+**POST** `/api/knowledge/validate`
+
+**요청**:
+```json
+{
+  "subject": "Python",
+  "predicate": "is_a",
+  "object": "programming_language"
+}
+```
+
+### 지식 삭제
+
+**DELETE** `/api/knowledge/triples/{id}`
+
+---
+
+## 도움말 문서 시스템 API
+
+### 도움말 문서 목록 가져오기
+
+**GET** `/api/help`
+
+**응답**:
+```json
+{
+  "topics": [
+    {
+      "id": "getting-started",
+      "title": "빠른 시작",
+      "category": "시작 가이드"
+    }
+  ]
+}
+```
+
+### 도움말 문서 세부정보 가져오기
+
+**GET** `/api/help/{topicId}`
+
+**응답**:
+```json
+{
+  "id": "getting-started",
+  "title": "빠른 시작",
+  "content": "# 빠른 시작\n\n...",
+  "category": "시작 가이드"
+}
+```
+
+---
+
+## WebView 브라우저 API
+
+### 브라우저 상태 가져오기
+
+**GET** `/api/beings/{id}/browser/status`
+
+**응답**:
+```json
+{
+  "is_open": true,
+  "current_url": "https://example.com",
+  "page_title": "Example Page",
+  "is_loading": false,
+  "last_operation_time": "2026-04-26T10:00:00Z"
+}
+```
+
+### 브라우저 열기
+
+**POST** `/api/beings/{id}/browser/open`
+
+### 브라우저 닫기
+
+**POST** `/api/beings/{id}/browser/close`
+
+### URL로 탐색
+
+**POST** `/api/beings/{id}/browser/navigate`
+
+**요청**:
+```json
+{
+  "url": "https://example.com"
+}
+```
+
+### JavaScript 실행
+
+**POST** `/api/beings/{id}/browser/execute-script`
+
+**요청**:
+```json
+{
+  "script": "return document.title;"
+}
+```
+
+### 페이지 스크린샷 가져오기
+
+**GET** `/api/beings/{id}/browser/screenshot`
+
+---
+
+## 프로젝트 작업 영역 API
+
+### 프로젝트 목록 가져오기
+
+**GET** `/api/projects`
+
+**응답**:
+```json
+{
+  "projects": [
+    {
+      "id": "project-uuid",
+      "name": "My Project",
+      "description": "Project description",
+      "createdAt": "2026-04-25T10:00:00Z"
+    }
+  ]
+}
+```
+
+### 프로젝트 만들기
+
+**POST** `/api/projects`
+
+**요청**:
+```json
+{
+  "name": "My Project",
+  "description": "Project description"
+}
+```
+
+### 프로젝트 세부정보 가져오기
+
+**GET** `/api/projects/{id}`
+
+### 프로젝트 업데이트
+
+**PUT** `/api/projects/{id}`
+
+### 프로젝트 삭제
+
+**DELETE** `/api/projects/{id}`
+
+---
+
 ## 도구 시스템 API
 
 ### ITool 인터페이스
@@ -552,228 +859,9 @@ public class ToolResult
 
 ---
 
-## 작업 노트 API
-
-### 작업 노트 목록 가져오기
-
-**GET** `/api/beings/{id}/work-notes`
-
-**응답**:
-```json
-{
-  "notes": [
-    {
-      "id": "note-uuid",
-      "pageNumber": 1,
-      "summary": "사용자 인증 모듈 완료",
-      "keywords": ["인증", "JWT", "OAuth2"],
-      "createdAt": "2026-04-25T10:00:00Z",
-      "updatedAt": "2026-04-25T10:00:00Z"
-    }
-  ],
-  "totalCount": 15
-}
-```
-
-### 단일 노트 상세 정보 가져오기
-
-**GET** `/api/beings/{id}/work-notes/{pageNumber}`
-
-**응답**:
-```json
-{
-  "id": "note-uuid",
-  "pageNumber": 1,
-  "summary": "사용자 인증 모듈 완료",
-  "content": "## 구현 세부사항\n\n- JWT token 사용\n- OAuth2 지원",
-  "keywords": ["인증", "JWT", "OAuth2"],
-  "createdAt": "2026-04-25T10:00:00Z",
-  "updatedAt": "2026-04-25T10:00:00Z"
-}
-```
-
-### 새 노트 생성
-
-**POST** `/api/beings/{id}/work-notes`
-
-**요청**:
-```json
-{
-  "summary": "사용자 인증 모듈 완료",
-  "content": "## 구현 세부사항\n\n- JWT token 사용",
-  "keywords": "인증,JWT,OAuth2"
-}
-```
-
-**응답**: `201 Created`
-
-### 노트 업데이트
-
-**PUT** `/api/beings/{id}/work-notes/{pageNumber}`
-
-**요청**:
-```json
-{
-  "summary": "사용자 인증 모듈 및 테스트 완료",
-  "content": "## 업데이트된 내용\n\n단위 테스트 추가",
-  "keywords": "인증,JWT,OAuth2,테스트"
-}
-```
-
-### 노트 삭제
-
-**DELETE** `/api/beings/{id}/work-notes/{pageNumber}`
-
-### 노트 검색
-
-**GET** `/api/beings/{id}/work-notes/search?keyword=인증&maxResults=10`
-
-### 노트 디렉토리 가져오기
-
-**GET** `/api/beings/{id}/work-notes/directory`
-
----
-
-## 지식 네트워크 API
-
-### 지식 통계 가져오기
-
-**GET** `/api/knowledge/stats`
-
-**응답**:
-```json
-{
-  "totalTriples": 1523,
-  "totalSubjects": 450,
-  "totalPredicates": 85,
-  "totalObjects": 892,
-  "averageConfidence": 0.87
-}
-```
-
-### 지식 삼중항 추가
-
-**POST** `/api/knowledge/triples`
-
-**요청**:
-```json
-{
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language",
-  "confidence": 0.95,
-  "tags": ["programming", "language"]
-}
-```
-
-**응답**: `201 Created`
-
-### 지식 조회
-
-**GET** `/api/knowledge/query?subject=Python&predicate=is_a`
-
-**응답**:
-```json
-{
-  "triples": [
-    {
-      "subject": "Python",
-      "predicate": "is_a",
-      "object": "programming_language",
-      "confidence": 0.95,
-      "tags": ["programming", "language"]
-    }
-  ]
-}
-```
-
-### 지식 검색
-
-**GET** `/api/knowledge/search?query=programming+language&limit=10`
-
-### 지식 경로 가져오기
-
-**GET** `/api/knowledge/path?from=Python&to=computer_science`
-
-**응답**:
-```json
-{
-  "path": [
-    {"subject": "Python", "predicate": "is_a", "object": "programming_language"},
-    {"subject": "programming_language", "predicate": "belongs_to", "object": "computer_science"}
-  ],
-  "length": 2
-}
-```
-
-### 지식 유효성 검사
-
-**POST** `/api/knowledge/validate`
-
-**요청**:
-```json
-{
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language"
-}
-```
-
-### 지식 삭제
-
-**DELETE** `/api/knowledge/triples/{id}`
-
----
-
-## 프로젝트 관리 API
-
-### 프로젝트 목록 가져오기
-
-**GET** `/api/projects`
-
-**응답**:
-```json
-{
-  "projects": [
-    {
-      "id": "project-uuid",
-      "name": "My Project",
-      "description": "Project description",
-      "createdAt": "2026-04-25T10:00:00Z"
-    }
-  ]
-}
-```
-
-### 프로젝트 생성
-
-**POST** `/api/projects`
-
-**요청**:
-```json
-{
-  "name": "My Project",
-  "description": "Project description"
-}
-```
-
-### 프로젝트 상세 정보 가져오기
-
-**GET** `/api/projects/{id}`
-
-### 프로젝트 업데이트
-
-**PUT** `/api/projects/{id}`
-
-### 프로젝트 삭제
-
-**DELETE** `/api/projects/{id}`
-
----
-
 ## 다음 단계
 
-- 🚀 [시작 가이드](getting-started.md) 확인
+- 🚀 [빠른 시작 가이드](getting-started.md) 보기
 - 🛠️ [개발 가이드](development-guide.md) 읽기
-- 📚 [아키텍처 문서](architecture.md) 검토
-- 🔒 [보안 모델](security.md) 이해
+- 📚 [아키텍처 문서](architecture.md) 확인
+- 🔒 [보안 모델](security.md) 알아보기

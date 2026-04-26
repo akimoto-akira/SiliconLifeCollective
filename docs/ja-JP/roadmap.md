@@ -1,6 +1,6 @@
-# ロードマップ
+﻿# ロードマップ
 
-[English](roadmap.md) | [简体中文](docs/zh-CN/roadmap.md) | [繁體中文](docs/zh-HK/roadmap.md) | [Español](docs/es-ES/roadmap.md) | [日本語](docs/ja-JP/roadmap.md) | [한국어](docs/ko-KR/roadmap.md) | [Čeština](docs/cs-CZ/roadmap.md)
+[English](roadmap.md) | [简体中文](docs/zh-CN/roadmap.md) | [繁體中文](docs/zh-HK/roadmap.md) | [Español](docs/es-ES/roadmap.md) | [日本語](docs/ja-JP/roadmap.md) | [한국어](docs/ko-KR/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | [Čeština](docs/cs-CZ/roadmap.md)
 
 ## ガイディングプリンシプル
 
@@ -33,7 +33,7 @@
 
 | # | モジュール | 説明 |
 |---|--------|-------------|
-| 2.1 | ストレージ（最小限） | `IStorage` インターフェース（Read/Write/Exists/Delete、キーバリュー）。`FileSystemStorage` 実装。インスタンスクラス（静的ではない）。直接ファイルシステムアクセス — **AI は IStorage を制御できません** |
+| 2.1 | ストレージ（最小限） | `IStorage` インターフェース（Read/Write/Exists/Delete、キーバリュー）。`FileSystemStorage` 実装。インスタンスクラス（静的ではない）。直接ファイルシステムアクセス — **AI は IStorage を制御できません** | [Deutsch](../de-DE/roadmap.md) |
 | 2.2 | MainLoop + TickObject | 正確なティック間隔付きの無限ループ（`Stopwatch` + `Thread.Sleep`）。優先度スケジューリング |
 | 2.3 | IAIClient 標準化 | `IAIClientFactory` インターフェース。OllamaClient が標準インターフェースを実装するようにリファクタリング |
 | 2.4 | コンソール移行 | `while(true)` を MainLoop 駆動の TickObject に移行。フェーズ 1 と同一の動作 |

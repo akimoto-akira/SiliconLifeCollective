@@ -1,32 +1,32 @@
-# Vývojový Průvodce
+﻿# Vývojový Průvodce
 
-[English](../en/development-guide.md) | [中文文档](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/development-guide.md)
+[English](../en/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Deutsch](../de-DE/development-guide.md) | **Čeština**
 
-## Přehled Architektury
+## Přehled architektury
 
-SiliconLifeCollective následuje **architekturu Tělo-Mozek** s přísným oddělením core rozhraní a výchozích implementací.
+SiliconLifeCollective následuje **architekturu tělo-mozek** s přísným oddělením základních rozhraní a výchozích implementací.
 
-### Struktura Projektu
+### Struktura projektu
 
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/      # Rozhraní, abstraktní třídy, sdílená infrastruktura
-│   └── SiliconLife.Default/   # Konkrétní implementace, vstupní bod
+│   ├── SiliconLife.Core/      # Rozhraní, abstraktní třídy, obecná infrastruktura
+│   └── SiliconLife.Default/   # Konkrétní implementace, vstupní body
 └── docs/                      # Vícejazyčná dokumentace
 ```
 
 **Směr závislosti**: `SiliconLife.Default` → `SiliconLife.Core` (jednosměrný)
 
-## Core Koncepty
+## Základní koncepty
 
-### 1. Křemíková Bytost
+### 1. Silikonová bytost (Silikonová bytost)
 
 Každý AI agent se skládá z:
-- **Tělo** (`DefaultSiliconBeing`): Udržuje stav naživu, detekuje spouštěcí scénáře
+- **Tělo** (`DefaultSiliconBeing`): Udržuje stav存活, detekuje spouštěcí scénáře
 - **Mozek** (`ContextManager`): Načítá historii, volá AI, provádí nástroje, persistuje odpovědi
 
-### 2. Systém Nástrojů
+### 2. Systém nástrojů
 
 Nástroje jsou automaticky objevovány a registrovány prostřednictvím reflexe:
 
@@ -40,7 +40,7 @@ public interface ITool
 }
 ```
 
-### 3. Systém Oprávnění
+### 3. Systém oprávnění
 
 5-úrovňový řetězec ověřování oprávnění:
 ```
@@ -49,18 +49,18 @@ IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPerm
 
 ### 4. Service Locator
 
-Globální registrace a získávání služeb:
+Globální registrace a načítání služeb:
 ```csharp
 // Registrace
 ServiceLocator.Instance.Register<IAIClient>(ollamaClient);
 
-// Získání
+// Načtení
 var client = ServiceLocator.Instance.Get<IAIClient>();
 ```
 
-## Rozšíření Systému
+## Rozšíření systému
 
-### Přidání Nového Nástroje
+### Přidání nového nástroje
 
 1. Vytvořte novou třídu v `src/SiliconLife.Default/Tools/`:
 
@@ -72,13 +72,13 @@ public class MyCustomTool : ITool
     
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
-        // Parsování parametrů
+        // Analyzujte parametry
         var param1 = call.Parameters["param1"]?.ToString();
         
-        // Provedení logiky
+        // Proveďte logiku
         var result = await DoSomething(param1);
         
-        // Návrat výsledku
+        // Vrátíte výsledek
         return new ToolResult 
         { 
             Success = true, 
@@ -88,7 +88,7 @@ public class MyCustomTool : ITool
 }
 ```
 
-2. Nástroj je automaticky objeven prostřednictvím reflexe - žádná manuální registrace!
+2. Nástroje jsou automaticky objevovány reflexí - žádná manuální registrace není potřeba!
 
 3. (Volitelné) Označte jako pouze pro správce:
 ```csharp
@@ -96,7 +96,7 @@ public class MyCustomTool : ITool
 public class AdminTool : ITool { ... }
 ```
 
-### Přidání Nového AI Klienta
+### Přidání nového AI klienta
 
 1. Implementujte `IAIClient` v `src/SiliconLife.Default/AI/`:
 
@@ -107,7 +107,7 @@ public class MyAIClient : IAIClient
     
     public async Task<AIResponse> ChatAsync(AIRequest request)
     {
-        // Zavolejte vaše AI API
+        // Zavolejte své AI API
         var response = await CallMyAPI(request);
         
         return new AIResponse
@@ -120,7 +120,7 @@ public class MyAIClient : IAIClient
     
     public async IAsyncEnumerable<string> StreamChatAsync(AIRequest request)
     {
-        // Implementace streamování
+        // Implementujte streamování
         await foreach (var chunk in StreamFromAPI(request))
         {
             yield return chunk;
@@ -129,7 +129,7 @@ public class MyAIClient : IAIClient
 }
 ```
 
-2. Vytvořte factory:
+2. Vytvořte továrnu:
 
 ```csharp
 public class MyAIClientFactory : IAIClientFactory
@@ -141,9 +141,9 @@ public class MyAIClientFactory : IAIClientFactory
 }
 ```
 
-3. Factory je automaticky objevena a registrována.
+3. Továrnou je automaticky objevována a registrována.
 
-### Přidání Nového Storage Backend
+### Přidání nového backendu úložiště
 
 1. Implementujte `IStorage` a `ITimeStorage` v `src/SiliconLife.Default/Storage/`:
 
@@ -167,7 +167,7 @@ public class DatabaseStorage : IStorage, ITimeStorage
 }
 ```
 
-### Přidání Nového Skinu
+### Přidání nového skinu
 
 1. Implementujte `ISkin` v `src/SiliconLife.Default/Web/Skins/`:
 
@@ -175,52 +175,52 @@ public class DatabaseStorage : IStorage, ITimeStorage
 public class MyCustomSkin : ISkin
 {
     public string Name => "MySkin";
-    public string Description => "Popis custom skinu";
+    public string Description => "Popis vlastního skinu";
     
     public string GetCss()
     {
         return @"
             :root {
-                --primary-color: #vas-barva;
-                --bg-color: #vas-bg;
+                --primary-color: #vaše-barva;
+                --bg-color: #vaše-pozadí;
             }
-            /* Vaše custom styly */
+            /* Vaše vlastní styly */
         ";
     }
 }
 ```
 
-2. Skin je automaticky objeven `SkinManager`.
+2. Skiny jsou automaticky objevovány `SkinManager`.
 
-## Průvodce Stylem Kódu
+## Pravidla stylu kódu
 
-### Konvence Pojmenování
+### Konvence pojmenování
 
 - **Třídy**: PascalCase s funkčním prefixem (např. `DefaultSiliconBeing`)
-- **Rozhraní**: Začíná `I` (např. `IAIClient`, `ITool`)
+- **Rozhraní**: Začínají `I` (např. `IAIClient`, `ITool`)
 - **Implementace**: Končí názvem rozhraní (např. `OllamaClient` implementuje `IAIClient`)
 - **Nástroje**: Končí `Tool` (např. `CalendarTool`, `ChatTool`)
-- **ViewModely**: Končí `ViewModel` (např. `BeingViewModel`)
+- **View modely**: Končí `ViewModel` (např. `BeingViewModel`)
 
-### Organizace Kódu
+### Organizace kódu
 
 ```
 SiliconLife.Default/
 ├── AI/                    # Implementace AI klientů
 ├── Calendar/              # Implementace kalendářů
 ├── Config/                # Výchozí konfigurační data
-├── Executors/             # Implementace executorů
-├── IM/                    # Implementace IM providerů
+├── Executors/             # Implementace exekutorů
+├── IM/                    # Implementace poskytovatelů IM
 ├── Localization/          # Implementace lokalizace
-├── Logging/               # Implementace logging providerů
-├── Runtime/               # Runtime komponenty
-├── Security/              # Implementace bezpečnosti
-├── SiliconBeing/          # Výchozí implementace křemíkových bytostí
+├── Logging/               # Implementace poskytovatelů logů
+├── Runtime/               # Komponenty runtime
+├── Security/              # Implementace zabezpečení
+├── SiliconBeing/          # Výchozí implementace silikonových bytostí
 ├── Storage/               # Implementace úložiště
 ├── Tools/                 # Vestavěné nástroje
 └── Web/                   # Implementace Web UI
-    ├── Controllers/       # Routovací controllery
-    ├── Models/            # ViewModely
+    ├── Controllers/       # Řadiče routování
+    ├── Models/            # View modely
     ├── Views/             # HTML pohledy
     └── Skins/             # Témata skinů
 ```
@@ -228,12 +228,12 @@ SiliconLife.Default/
 ### Dokumentace
 
 - Všechna veřejná API musí mít XML dokumentační komentáře
-- Všechny zdrojové soubory používají Apache 2.0 licenci v hlavičce
-- Využívejte .NET 9 funkce (implicitní using, nullable reference typy)
+- Všechny zdrojové soubory používají záhlaví licence Apache 2.0
+- Využijte funkce .NET 9 (implicitní using, nullable reference typy)
 
-## Vývojový Workflow
+## Vývojový pracovní postup
 
-### 1. Nastavení Vývojového Prostředí
+### 1. Nastavení vývojového prostředí
 
 ```bash
 # Klonování repozitáře
@@ -243,11 +243,11 @@ cd SiliconLifeCollective
 # Obnovení závislostí
 dotnet restore
 
-# Build
+# Sestavení
 dotnet build
 ```
 
-### 2. Spuštění Testů
+### 2. Spuštění testů
 
 ```bash
 # Spuštění všech testů
@@ -257,23 +257,23 @@ dotnet test
 dotnet test tests/SiliconLife.Core.Tests
 ```
 
-### 3. Debugging
+### 3. Ladění
 
 ```bash
-# Spuštění v debug output
+# Spuštění s výstupem ladění
 dotnet run --project src/SiliconLife.Default --configuration Debug
 ```
 
-### 4. Formátování Kódu
+### 4. Formátování kódu
 
 ```bash
 # Formátování kódu
 dotnet format
 ```
 
-## Build Custom Funkcí
+## Vytváření vlastních funkcí
 
-### Příklad: Přidání Custom Kalendáře
+### Příklad: Přidání vlastního kalendáře
 
 ```csharp
 public class MyCustomCalendar : CalendarBase
@@ -282,7 +282,7 @@ public class MyCustomCalendar : CalendarBase
     
     public override CalendarDate ConvertFromGregorian(GregorianDate date)
     {
-        // Vaše převodní logika
+        // Vaše logika převodu
         return new CalendarDate(year, month, day);
     }
     
@@ -294,7 +294,7 @@ public class MyCustomCalendar : CalendarBase
 }
 ```
 
-### Příklad: Přidání Custom Executoru
+### Příklad: Přidání vlastního exekutoru
 
 ```csharp
 public class CustomExecutor : ExecutorBase
@@ -318,9 +318,9 @@ public class CustomExecutor : ExecutorBase
 }
 ```
 
-## Testovací Průvodce
+## Testovací pravidla
 
-### Unit Testy
+### Unit testy
 
 ```csharp
 [TestClass]
@@ -329,7 +329,7 @@ public class MyToolTests
     [TestMethod]
     public async Task ExecuteAsync_ValidInput_ReturnsSuccess()
     {
-        // Arrange
+        // Uspořádání
         var tool = new MyCustomTool();
         var call = new ToolCall 
         { 
@@ -340,43 +340,43 @@ public class MyToolTests
             }
         };
         
-        // Act
+        // Akce
         var result = await tool.ExecuteAsync(call);
         
-        // Assert
+        // Kontrola
         Assert.IsTrue(result.Success);
         Assert.IsNotNull(result.Output);
     }
 }
 ```
 
-### Integrační Testy
+### Integrační testy
 
-Testujte kompletní workflow:
+Testování kompletního toku:
 1. AI vrací volání nástroje
 2. Provedení nástroje
-3. Výsledek vrácen AI
+3. Výsledek je vrácen AI
 4. AI vrací finální odpověď
 
-## Výkonové Úvahy
+## Úvahy o výkonu
 
-### Storage Systém
+### Systém úložiště
 
-- Storage systém upřednostňuje **funkcionalitu před výkonem**
-- Výchozí použití JSON úložiště založeného na souborech
+- Systém úložiště upřednostňuje **funkčnost před výkonem**
+- Výchozí používá JSON úložiště založené na souborech
 - Dotazy s časovým indexem používají strukturu adresářů
 
-### Hlavní Smyčka Scheduler
+### Hlavní smyčkový scheduler
 
-- Clock-driven time-slice fair scheduling
-- Watchdog timer pro detekci zaseknutých operací
-- Jistič pro prevenci kaskádových selhání
+- Fair scheduling založený na časových řezech hodin
+- Watchdog timer pro detekci zamrznutých operací
+- Circuit breaker pro prevenci kaskádových selhání
 
-## Best Practices
+## Nejlepší postupy
 
-### 1. Vždy Ověřujte Oprávnění
+### 1. Vždy ověřujte oprávnění
 
-Jakákoliv AI iniciovaná operace musí procházet řetězcem oprávnění:
+Jakákoli operace iniciovaná AI musí projít řetězcem oprávnění:
 
 ```csharp
 var permission = await permissionManager.CheckAsync(request);
@@ -388,7 +388,7 @@ if (!permission.Allowed)
 
 ### 2. Používejte Service Locator
 
-Globální registrace a získávání služeb:
+Globální registrace a načítání služeb:
 
 ```csharp
 // Během inicializace
@@ -398,12 +398,12 @@ ServiceLocator.Instance.Register<ICustomService>(myService);
 var service = ServiceLocator.Instance.Get<ICustomService>();
 ```
 
-### 3. Následujte Oddělení Tělo-Mozek
+### 3. Následujte oddělení tělo-mozek
 
-- Tělo zpracovává stav a spouštění
+- Tělo zpracovává stav a spouštěče
 - Mozek zpracovává AI interakce a provádění nástrojů
 
-### 4. Implementujte Správné Zpracování Chyb
+### 4. Implementujte správné zpracování chyb
 
 ```csharp
 try
@@ -418,28 +418,28 @@ catch (Exception ex)
 }
 ```
 
-## Přispívání
+## Pravidla příspěvků
 
 1. Forkněte repozitář
-2. Vytvořte feature branch (`git checkout -b feature/amazing-feature`)
-3. Commitněte vaše změny s conventional commits
-4. Pushněte na branch (`git push origin feature/amazing-feature`)
+2. Vytvořte větev funkce (`git checkout -b feature/amazing-feature`)
+3. Commitněte své změny s konvenčními commity
+4. Pushněte do větve (`git push origin feature/amazing-feature`)
 5. Otevřete Pull Request
 
-### Formát Commit Zpráv
+### Formát zpráv commitu
 
 ```
 <type>(<scope>): <description>
 
 Příklady:
-feat(tool): přidání custom kalendářového nástroje
-fix(permission): oprava null pointer v callbacku
-docs: aktualizace vývojového průvodce
+feat(tool): add custom calendar tool
+fix(permission): fix null pointer in callback
+docs: update development guide
 ```
 
-## Další Kroky
+## Další kroky
 
-- 📚 Přečtěte si [Průvodce Architektury](architecture.md)
+- 📚 Přečtěte si [Průvodce architekturou](architecture.md)
 - 📖 Prozkoumejte [API Reference](api-reference.md)
-- 🔒 Podívejte se na [Dokumentaci Bezpečnosti](security.md)
-- 🚀 Podívejte se na [Rychlý Start](getting-started.md)
+- 🔒 Podívejte se na [Bezpečnostní dokumentaci](security.md)
+- 🚀 Podívejte se na [Průvodce rychlým startem](getting-started.md)

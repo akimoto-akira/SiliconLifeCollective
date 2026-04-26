@@ -1,6 +1,6 @@
-# API Reference
+﻿# API Reference
 
-[English](api-reference.md) | [简体中文](docs/zh-CN/api-reference.md) | [繁體中文](docs/zh-HK/api-reference.md) | [Español](docs/es-ES/api-reference.md) | [日本語](docs/ja-JP/api-reference.md) | [한국어](docs/ko-KR/api-reference.md) | [Čeština](docs/cs-CZ/api-reference.md)
+[English](../en/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
 
 ## Web API Endpoints
 
@@ -75,7 +75,7 @@ Most endpoints require authentication via session cookies managed by the Web UI.
 }
 ```
 
-**Response** (Non-streaming):
+**Response** (non-streaming):
 ```json
 {
   "reply": "I'm doing well, thank you!",
@@ -84,7 +84,7 @@ Most endpoints require authentication via session cookies managed by the Web UI.
 }
 ```
 
-### Stream Chat (SSE)
+### Streaming Chat (SSE)
 
 **GET** `/api/chat/stream?beingId={id}&message={msg}`
 
@@ -220,7 +220,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ---
 
-## Task & Timer System
+## Task and Timer System
 
 ### Create Task
 
@@ -271,7 +271,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ---
 
-## Audit & Logging
+## Audit and Logging
 
 ### Get Token Usage
 
@@ -431,7 +431,7 @@ All endpoints return standardized error responses:
 
 ## SSE Events
 
-Server-Sent Events are used for real-time updates:
+Server-Sent Events for real-time updates:
 
 ### Chat Events
 
@@ -513,45 +513,6 @@ public class AIResponse
 
 ---
 
-## Tool System API
-
-### ITool Interface
-
-```csharp
-public interface ITool
-{
-    string Name { get; }
-    string Description { get; }
-    ToolDefinition Definition { get; }
-    
-    Task<ToolResult> ExecuteAsync(ToolCall call);
-}
-```
-
-### ToolCall Structure
-
-```csharp
-public class ToolCall
-{
-    public string Id { get; set; }
-    public string Name { get; set; }
-    public Dictionary<string, object> Parameters { get; set; }
-}
-```
-
-### ToolResult Structure
-
-```csharp
-public class ToolResult
-{
-    public bool Success { get; set; }
-    public string Output { get; set; }
-    public string Error { get; set; }
-}
-```
-
----
-
 ## Work Notes API
 
 ### Get Work Notes List
@@ -565,7 +526,7 @@ public class ToolResult
     {
       "id": "note-uuid",
       "pageNumber": 1,
-      "summary": "User authentication module completed",
+      "summary": "Completed user authentication module",
       "keywords": ["authentication", "JWT", "OAuth2"],
       "createdAt": "2026-04-25T10:00:00Z",
       "updatedAt": "2026-04-25T10:00:00Z"
@@ -584,8 +545,8 @@ public class ToolResult
 {
   "id": "note-uuid",
   "pageNumber": 1,
-  "summary": "User authentication module completed",
-  "content": "## Implementation Details\n\n- Using JWT token\n- OAuth2 support",
+  "summary": "Completed user authentication module",
+  "content": "## Implementation Details\n\n- Using JWT token\n- Supports OAuth2",
   "keywords": ["authentication", "JWT", "OAuth2"],
   "createdAt": "2026-04-25T10:00:00Z",
   "updatedAt": "2026-04-25T10:00:00Z"
@@ -599,7 +560,7 @@ public class ToolResult
 **Request**:
 ```json
 {
-  "summary": "User authentication module completed",
+  "summary": "Completed user authentication module",
   "content": "## Implementation Details\n\n- Using JWT token",
   "keywords": "authentication,JWT,OAuth2"
 }
@@ -614,8 +575,8 @@ public class ToolResult
 **Request**:
 ```json
 {
-  "summary": "User authentication module and tests completed",
-  "content": "## Updated Content\n\nUnit tests added",
+  "summary": "Completed user authentication module and tests",
+  "content": "## Updated Content\n\nAdded unit tests",
   "keywords": "authentication,JWT,OAuth2,tests"
 }
 ```
@@ -628,7 +589,7 @@ public class ToolResult
 
 **GET** `/api/beings/{id}/work-notes/search?keyword=authentication&maxResults=10`
 
-### Get Note Directory
+### Get Notes Directory
 
 **GET** `/api/beings/{id}/work-notes/directory`
 
@@ -725,9 +686,97 @@ public class ToolResult
 
 ---
 
-## Project Management API
+## Help Documentation System API
 
-### Get Projects List
+### Get Help Documentation List
+
+**GET** `/api/help`
+
+**Response**:
+```json
+{
+  "topics": [
+    {
+      "id": "getting-started",
+      "title": "Getting Started",
+      "category": "Getting Started Guide"
+    }
+  ]
+}
+```
+
+### Get Help Documentation Details
+
+**GET** `/api/help/{topicId}`
+
+**Response**:
+```json
+{
+  "id": "getting-started",
+  "title": "Getting Started",
+  "content": "# Getting Started\n\n...",
+  "category": "Getting Started Guide"
+}
+```
+
+---
+
+## WebView Browser API
+
+### Get Browser Status
+
+**GET** `/api/beings/{id}/browser/status`
+
+**Response**:
+```json
+{
+  "is_open": true,
+  "current_url": "https://example.com",
+  "page_title": "Example Page",
+  "is_loading": false,
+  "last_operation_time": "2026-04-26T10:00:00Z"
+}
+```
+
+### Open Browser
+
+**POST** `/api/beings/{id}/browser/open`
+
+### Close Browser
+
+**POST** `/api/beings/{id}/browser/close`
+
+### Navigate to URL
+
+**POST** `/api/beings/{id}/browser/navigate`
+
+**Request**:
+```json
+{
+  "url": "https://example.com"
+}
+```
+
+### Execute JavaScript
+
+**POST** `/api/beings/{id}/browser/execute-script`
+
+**Request**:
+```json
+{
+  "script": "return document.title;"
+}
+```
+
+### Get Page Screenshot
+
+**GET** `/api/beings/{id}/browser/screenshot`
+
+---
+
+## Project Workspace API
+
+### Get Project List
 
 **GET** `/api/projects`
 
@@ -771,9 +820,48 @@ public class ToolResult
 
 ---
 
+## Tool System API
+
+### ITool Interface
+
+```csharp
+public interface ITool
+{
+    string Name { get; }
+    string Description { get; }
+    ToolDefinition Definition { get; }
+    
+    Task<ToolResult> ExecuteAsync(ToolCall call);
+}
+```
+
+### ToolCall Structure
+
+```csharp
+public class ToolCall
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public Dictionary<string, object> Parameters { get; set; }
+}
+```
+
+### ToolResult Structure
+
+```csharp
+public class ToolResult
+{
+    public bool Success { get; set; }
+    public string Output { get; set; }
+    public string Error { get; set; }
+}
+```
+
+---
+
 ## Next Steps
 
-- 🚀 Check the [Getting Started Guide](getting-started.md)
-- 🛠️ Read the [Development Guide](development-guide.md)
-- 📚 Review the [Architecture Documentation](architecture.md)
-- 🔒 Understand the [Security Model](security.md)
+- 🚀 View [Getting Started Guide](getting-started.md)
+- 🛠️ Read [Development Guide](development-guide.md)
+- 📚 View [Architecture Document](architecture.md)
+- 🔒 Learn about [Security Model](security.md)

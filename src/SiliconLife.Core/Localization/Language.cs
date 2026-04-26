@@ -121,5 +121,30 @@ public enum Language
     /// <summary>
     /// Czech (Czech Republic)
     /// </summary>
-    CsCZ
+    CsCZ,
+
+    /// <summary>
+    /// German (Germany)
+    /// </summary>
+    DeDE,
+
+    /// <summary>
+    /// German (Austria)
+    /// </summary>
+    DeAT,
+
+    /// <summary>
+    /// German (Switzerland)
+    /// </summary>
+    DeCH,
+
+    /// <summary>
+    /// German (Luxembourg)
+    /// </summary>
+    DeLU,
+
+    /// <summary>
+    /// German (Liechtenstein)
+    /// </summary>
+    DeLI
 }

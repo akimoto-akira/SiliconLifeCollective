@@ -1,203 +1,327 @@
-# Kalendářový Systém
+﻿# Systém Kalendářů
 
-[English](../en/calendar-system.md) | [中文文档](../zh-CN/calendar-system.md) | [繁體中文](../zh-HK/calendar-system.md) | [Español](../es-ES/calendar-system.md) | [日本語](../ja-JP/calendar-system.md) | [한국어](../ko-KR/calendar-system.md) | [Čeština](../cs-CZ/calendar-system.md)
+[English](../en/calendar-system.md) | [中文](../zh-CN/calendar-system.md) | [繁體中文](../zh-HK/calendar-system.md) | [Español](../es-ES/calendar-system.md) | [日本語](../ja-JP/calendar-system.md) | [한국어](../ko-KR/calendar-system.md) | [Deutsch](../de-DE/calendar-system.md) | **Čeština**
 
 ## Přehled
 
-Systém obsahuje **32 kalendářních implementací**, pokrývajících hlavní světové kalendářní systémy. Všechny kalendáře dědí od abstraktní třídy `CalendarBase`.
+SiliconLifeCollective podporuje 32 různých kalendářových systémů pro převod data a historickou přesnost.
 
-## Podporované Kalendáře
+## Podporované Kalendáře (32 typů)
 
-| Kalendář | ID | Typ | Popis |
-|----------|-----|------|-------|
-| BuddhistCalendar | `buddhist` | Solární | Buddhistský kalendář (BE), rok + 543 |
-| CherokeeCalendar | `cherokee` | Lunisolární | Kalendářní systém Cherokee |
-| ChineseLunarCalendar | `lunar` | Lunární | Čínský lunární kalendář s přestupnými měsíci |
-| ChulaSakaratCalendar | `chula_sakarat` | Solární | Chula Sakarat (CS), rok - 638 |
-| CopticCalendar | `coptic` | Solární | Koptský kalendář |
-| DaiCalendar | `dai` | Lunisolární | Dai kalendář |
-| DehongDaiCalendar | `dehong_dai` | Lunisolární | Varianta Dehong Dai |
-| EthiopianCalendar | `ethiopian` | Solární | Etiopský kalendář |
-| FrenchRepublicanCalendar | `french_republican` | Solární | Francouzský republikánský kalendář |
-| GregorianCalendar | `gregorian` | Solární | Standardní gregoriánský kalendář |
-| HebrewCalendar | `hebrew` | Lunisolární | Hebrejský (židovský) kalendář |
-| IndianCalendar | `indian` | Solární | Indický národní kalendář |
-| InuitCalendar | `inuit` | Solární | Kalendářní systém Inuit |
-| IslamicCalendar | `islamic` | Lunární | Islámský Hijri kalendář |
-| JapaneseCalendar | `japanese` | Solární | Japonský kalendář éry (Nengo) |
-| JavaneseCalendar | `javanese` | Lunární | Jávský islámský kalendář |
-| JucheCalendar | `juche` | Solární | Kalendář Juche (Severní Korea) |
-| JulianCalendar | `julian` | Solární | Juliánský kalendář |
-| KhmerCalendar | `khmer` | Lunisolární | Khmerský kalendář |
-| MayanCalendar | `mayan` | Dlouhý | Mayský dlouhý kalendář |
-| MongolianCalendar | `mongolian` | Lunisolární | Mongolský kalendář |
-| PersianCalendar | `persian` | Solární | Perský (Solar Hijri) kalendář |
-| RepublicOfChinaCalendar | `roc` | Solární | Kalendář Čínské republiky (Minguo) |
-| RomanCalendar | `roman` | Lunární | Římský kalendář |
-| SakaCalendar | `saka` | Solární | Saka kalendář (Indonésie) |
-| SexagenaryCalendar | `sexagenary` | Cyklický | Čínský kalendář Ganzhi (60letý cyklus) |
-| TibetanCalendar | `tibetan` | Lunisolární | Tibetský kalendář |
-| VietnameseCalendar | `vietnamese` | Lunární | Vietnamský lunární kalendář |
-| VikramSamvatCalendar | `vikram_samvat` | Lunisolární | Kalendář Vikram Samvat |
-| YiCalendar | `yi` | Solární | Kalendářní systém Yi |
-| ZoroastrianCalendar | `zoroastrian` | Solární | Zoroastriánský kalendář |
+### Hlavní Kalendáře (6 typů)
 
-## CalendarTool Operace
+1. **Gregoriánský (Gregorian)** - Mezinárodní standardní kalendář, ID: `gregorian`
+2. **Čínský Lunární (Chinese Lunar)** - Tradiční čínský kalendář s výpočtem přestupných měsíců, ID: `lunar`
+3. **Islámský (Islamic)** - Islámský lunární kalendář, ID: `islamic`
+4. **Hebrejský (Hebrew)** - Židovský kalendář, ID: `hebrew`
+5. **Perský (Persian)** - Íránský solární kalendář, ID: `persian`
+6. **Indický (Indian)** - Indický národní kalendář, ID: `indian`
 
-### now
+### Čínské Historické Kalendáře (2 typy)
 
-Získá aktuální datum v zadaném kalendáři.
+7. **Čínský Historický (Chinese Historical)** - Podpora cyklického letopočtu a éry panovníků, ID: `chinese_historical`
+   - **Cyklický Letopočet**: 60letý cyklus (Nebeské kmeny + Zemské větve)
+   - **Éry Panovníků**: Podpora éry všech čínských historických dynastií (Kangxi, Qianlong, Zhenguan atd.)
+   - **Dynamická Databáze**: Vestavěná kompletní databáze čínských historických dynastií a éry
+8. **Sexagenární (Sexagenary)** - 60letý cyklus Nebeských kmenů a Zemských větví, ID: `sexagenary`
 
-**Parametry**:
-- `calendar`: ID kalendáře (např. "gregorian", "lunar")
+### Východoasijské Kalendáře (6 typů)
 
-**Návrat**:
-```json
-{
-  "calendar": "gregorian",
-  "year": 2026,
-  "month": 4,
-  "day": 25,
-  "formatted": "2026-04-25"
-}
-```
+9. **Japonský (Japanese)** - Japonský kalendář s érami (Nengo), ID: `japanese`
+10. **Vietnamský (Vietnamese)** - Vietnamský lunární kalendář (varianta s kočkou), ID: `vietnamese`
+11. **Tibetský (Tibetan)** - Tibetský kalendářový systém, ID: `tibetan`
+12. **Mongolský (Mongolian)** - Mongolský kalendář, ID: `mongolian`
+13. **Dai (Dai)** - Dai kalendář s kompletním lunárním výpočtem, ID: `dai`
+14. **Dehong Dai (Dehong Dai)** - Varianta Dehong Dai kalendáře, ID: `dehong_dai`
 
-### format
+### Historické Kalendáře (6 typů)
 
-Formátuje datum do čitelného řetězce.
+15. **Mayský (Mayan)** - Mayský dlouhý kalendář, ID: `mayan`
+16. **Římský (Roman)** - Starořímský kalendář, ID: `roman`
+17. **Juliánský (Julian)** - Juliánský kalendář, ID: `julian`
+18. **Francouzský Republikánský (French Republican)** - Kalendář francouzské revoluce, ID: `french_republican`
+19. **Koptský (Coptic)** - Koptský pravoslavný kalendář, ID: `coptic`
+20. **Etiopský (Ethiopian)** - Etiopský kalendář, ID: `ethiopian`
 
-**Parametry**:
-- `calendar`: ID kalendáře
-- `year`: Rok
-- `month`: Měsíc
-- `day`: Den
-- `format`: Formátovací řetězec (volitelné)
+### Regionální Kalendáře (6 typů)
 
-### add_days
+21. **Buddhistický (Buddhist)** - Buddhistický letopočet (BE), rok + 543, ID: `buddhist`
+22. **Saka (Saka)** - Letopočet Saka (Indonésie), ID: `saka`
+23. **Vikram Samvat (Vikram Samvat)** - Hindský kalendář, ID: `vikram_samvat`
+24. **Jávský (Javanese)** - Jávský islámský kalendář, ID: `javanese`
+25. **Chula Sakarat (Chula Sakarat)** - Jihovýchodoasijský buddhistický kalendář, rok - 638, ID: `chula_sakarat`
+26. **Khmerský (Khmer)** - Khmerský kalendář, ID: `khmer`
 
-Přidá dny k datu.
+### Moderní Kalendáře (3 typy)
 
-**Parametry**:
-- `calendar`: ID kalendáře
-- `year`: Rok
-- `month`: Měsíc
-- `day`: Den
-- `days`: Počet dnů k přidání (může být záporný)
+27. **ROC (ROC)** - Kalendář Republiky Čína, rok - 1911, ID: `roc`
+28. **Čučche (Juche)** - Severokorejský kalendář, rok - 1911, ID: `juche`
+29. **Zoroastriánský (Zoroastrian)** - Zoroastriánský kalendář, ID: `zoroastrian`
 
-### diff
+### Etnické Kalendáře (3 typy)
 
-Vypočítá rozdíl mezi dvěma daty.
+30. **Yi (Yi)** - Kalendářový systém Yi, ID: `yi`
+31. **Čerokézský (Cherokee)** - Čerokézský kalendář, ID: `cherokee`
+32. **Inuitský (Inuit)** - Inuitský kalendář, ID: `inuit`
 
-**Parametry**:
-- `calendar`: ID kalendáře
-- `year1`, `month1`, `day1`: První datum
-- `year2`, `month2`, `day2`: Druhé datum
+---
 
-**Návrat**: Počet dnů mezi daty
+## Používání Kalendářového Nástroje
 
-### list_calendars
-
-Vypíše všechny dostupné kalendáře.
-
-**Návrat**: Seznam ID a názvů kalendářů
-
-### get_components
-
-Získá komponenty data (rok, měsíc, den, den v týdnu, atd.).
-
-**Parametry**:
-- `calendar`: ID kalendáře
-- `year`, `month`, `day`: Datum
-
-### get_now_components
-
-Získá komponenty aktuálního data.
-
-**Parametry**:
-- `calendar`: ID kalendáře
-
-### convert
-
-Převede datum mezi kalendáři.
-
-**Parametry**:
-- `from_calendar`: Zdrojový kalendář
-- `to_calendar`: Cílový kalendář
-- `year`, `month`, `day`: Datum k převodu
-
-**Návrat**:
-```json
-{
-  "from": {
-    "calendar": "gregorian",
-    "year": 2026,
-    "month": 4,
-    "day": 25
-  },
-  "to": {
-    "calendar": "lunar",
-    "year": 2026,
-    "month": 3,
-    "day": 8
-  }
-}
-```
-
-## Použití
-
-### Příklad: Získání aktuálního data
-
-```json
-{
-  "action": "now",
-  "calendar": "gregorian"
-}
-```
-
-### Příklad: Převod data
+### Základní Převod
 
 ```json
 {
   "action": "convert",
-  "from_calendar": "gregorian",
-  "to_calendar": "lunar",
-  "year": 2026,
-  "month": 4,
-  "day": 25
+  "date": "2026-04-20",
+  "fromCalendar": "gregorian",
+  "toCalendar": "chinese_lunar"
 }
 ```
 
-### Příklad: Rozdíl mezi daty
+**Odpověď**:
+```json
+{
+  "result": "Lunární duben třetí den roku Bing-Wu",
+  "year": 2026,
+  "month": 4,
+  "day": 3,
+  "leapMonth": false
+}
+```
+
+### Dotaz na Více Kalendářů
 
 ```json
 {
-  "action": "diff",
-  "calendar": "gregorian",
-  "year1": 2026,
-  "month1": 4,
-  "day1": 25,
-  "year2": 2026,
-  "month2": 12,
-  "day2": 25
+  "action": "query_all",
+  "date": "2026-04-20"
 }
 ```
 
-## Rozšíření
+**Odpověď**: Vrátí datum ve všech 32 kalendářových systémech.
 
-Pro přidání nového kalendáře:
+---
 
-1. Vytvořte novou třídu dědící `CalendarBase`
-2. Implementujte abstraktní metody:
-   - `ConvertFromGregorian(GregorianDate date)`
-   - `ConvertToGregorian(CalendarDate date)`
-   - `GetDaysInMonth(int year, int month)`
-   - `IsLeapYear(int year)`
-3. Umístěte třídu do `src/SiliconLife.Default/Calendar/`
-4. CalendarTool automaticky objeví nový kalendář
+## Kalendářové API
 
-## Poznámky
+### Rozhraní CalendarBase
 
-- Všechny kalendáře podporují převod z/na gregoriánský kalendář
-- Některé kalendáře mají specifické éry nebo cykly
-- Přestupné roky se liší podle kalendáře
-- Historické kalendáře mohou mít omezený rozsah platnosti
+```csharp
+public abstract class CalendarBase
+{
+    public abstract string Name { get; }
+    
+    public abstract CalendarDate ConvertFromGregorian(GregorianDate date);
+    
+    public abstract GregorianDate ConvertToGregorian(CalendarDate date);
+    
+    public virtual bool IsLeapYear(int year) => false;
+    
+    public virtual int GetDaysInMonth(int year, int month) => 30;
+}
+```
+
+### Příklad: Vlastní Kalendář
+
+```csharp
+public class MyCustomCalendar : CalendarBase
+{
+    public override string Name => "MyCalendar";
+    
+    public override CalendarDate ConvertFromGregorian(GregorianDate date)
+    {
+        // Logika převodu
+        return new CalendarDate(year, month, day);
+    }
+    
+    public override GregorianDate ConvertToGregorian(CalendarDate date)
+    {
+        // Reverzní převod
+        return new GregorianDate(year, month, day);
+    }
+}
+```
+
+---
+
+## Speciální Funkce
+
+### Detail Čínského Historického Kalendáře (Nové)
+
+Čínský historický kalendář je jednou z hlavních funkcí tohoto systému, podporující dvě klíčové funkce:
+
+#### 1. Systém Cyklického Letopočtu
+
+Používá 60letý cyklus kombinace Nebeských kmenů a Zemských větví:
+
+```
+Nebeské kmeny (10): Jia, Yi, Bing, Ding, Wu, Ji, Geng, Xin, Ren, Gui
+Zemské větve (12): Zi, Chou, Yin, Mao, Chen, Si, Wu, Wei, Shen, You, Xu, Hai
+```
+
+**Příklad**:
+- Rok 2026 = Bing-Wu rok
+- Rok 2025 = Yi-Si rok (rok Hada)
+- Rok 2024 = Jia-Chen rok (rok Draka)
+
+**Příklad použití**:
+```json
+{
+  "action": "convert",
+  "date": "2026-04-26",
+  "from_calendar": "gregorian",
+  "to_calendar": "chinese_historical"
+}
+```
+
+**Odpověď**:
+```json
+{
+  "result": "Devátý den třetího měsíce roku Bing-Wu",
+  "ganzhi_year": "Bing-Wu",
+  "zodiac": "Kůň"
+}
+```
+
+#### 2. Systém Éry Panovníků
+
+Vestavěná kompletní databáze čínských historických dynastií a éry panovníků:
+
+**Podporované dynastie** (částečný seznam):
+- Dynastie Qing: Kangxi, Yongzheng, Qianlong, Jiaqing, Daoguang, Xianfeng, Tongzhi, Guangxu, Xuantong
+- Dynastie Ming: Hongwu, Yongle, Jiajing, Wanli, Chongzhen atd.
+- Dynastie Tang: Zhenguan, Kaiyuan, Tianbao atd.
+- Dynastie Han: Jianyuan, Yuanguang, Yuanshuo atd.
+- Další dynastie...
+
+**Příklad použití**:
+```json
+{
+  "action": "convert",
+  "date": "1721-04-12",
+  "from_calendar": "gregorian",
+  "to_calendar": "chinese_historical"
+}
+```
+
+**Odpověď**:
+```json
+{
+  "result": "Patnáctý den třetího měsíce šedesátého roku éry Kangxi",
+  "era": "Kangxi",
+  "era_year": 60,
+  "dynasty": "Qing"
+}
+```
+
+### Zpracování Přestupných Měsíců
+
+Kalendáře s přestupnými měsíci:
+- Čínský lunární
+- Hebrejský
+- Buddhistický
+- Vietnamský
+
+```json
+{
+  "isLeapMonth": true,
+  "month": 4,
+  "note": "Přestupný čtvrtý měsíc"
+}
+```
+
+---
+
+## Přesnost Kalendáře
+
+### Astronomické Výpočty
+
+- Založeno na skutečných astronomických datech
+- Podpora historických dat
+- Zpracování kalendářových reforem
+
+### Známé Limity
+
+- Některá starověká data jsou přibližná
+- Kalendářové reformy se liší podle regionu
+- Nezahrnuje zpracování přestupných sekund
+
+---
+
+## Případy Použití
+
+### Historický Výzkum
+
+Převod historických dat na moderní kalendář:
+
+```
+Otázka: "Kdy byla francouzská revoluce?"
+Odpověď: "14. července 1789 (gregoriánský)"
+         "26. Thermidor roku I (francouzský republikánský)"
+```
+
+### Kulturní Aplikace
+
+Podpora tradičních festivalů:
+
+```
+Čínský Nový rok 2026:
+- Gregoriánský: 17. února 2026
+- Lunární: První den prvního měsíce
+```
+
+### Multikulturní Plánování
+
+Plánování událostí s respektem k více kalendářům:
+
+```
+Schůzka: 2026-04-20
+- Vyhnout se islámské páteční modlitbě
+- Respektovat židovský šábes
+- Zohlednit čínské svátky
+```
+
+---
+
+## Nejlepší Praktiky
+
+### 1. Vždy Specifikujte Kalendář
+
+Nikdy nepředpokládejte kalendářový systém:
+
+```json
+{
+  "date": "2026-04-20",
+  "calendar": "gregorian"  // Explicitně specifikujte!
+}
+```
+
+### 2. Zpracovávejte Neplatná Data
+
+Některá data v některých kalendářích neexistují:
+
+```json
+{
+  "error": "Neplatné datum: 30. únor neexistuje"
+}
+```
+
+### 3. Zvažte Časová Pásma
+
+Převod data se může lišit podle časového pásma:
+
+```
+2026-04-20 23:00 UTC+8
+≠
+2026-04-20 23:00 UTC-5
+```
+
+---
+
+## Další Kroky
+
+- 📚 Přečtěte si [Průvodce Architektury](architecture.md)
+- 🛠️ Podívejte se na [Vývojářskou Příručku](development-guide.md)
+- 🔧 Podívejte se na [Referenci Nástrojů](tools-reference.md)
+- 🚀 Začněte s [Průvodcem Rychlým Startem](getting-started.md)

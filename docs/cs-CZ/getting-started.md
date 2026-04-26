@@ -1,34 +1,34 @@
-# Rychlý start
+﻿# Rychlý Start
 
-[English](../en/getting-started.md) | [中文文档](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
+[English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | **Čeština**
 
-## Požadavky
+## Předpoklady
 
 - **.NET 9 SDK** - [Stáhnout](https://dotnet.microsoft.com/download/dotnet/9.0)
 - **Git** - [Stáhnout](https://git-scm.com/)
 - **Ollama** (volitelné, pro lokální AI) - [Stáhnout](https://ollama.com/)
-- **Bailian API klíč** (volitelné, pro cloudovou AI) - [Získat](https://bailian.console.aliyun.com/)
+- **Bailian API klíč** (volitelné, pro cloudovou AI) - [Žádat](https://bailian.console.aliyun.com/)
 
-## Rychlý start
+## Rychlý Start
 
-### 1. Klonování repozitáře
+### 1. Klonovat Repozitář
 
 ```bash
 git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 ```
 
-### 2. Sestavení projektu
+### 2. Sestavit Projekt
 
 ```bash
 dotnet build
 ```
 
-### 3. Konfigurace AI backendu
+### 3. Konfigurovat AI Backend
 
 Upravte `src/SiliconLife.Default/Config/DefaultConfigData.cs` nebo změňte konfiguraci za běhu prostřednictvím Web UI.
 
-#### Možnost A: Ollama (lokální)
+#### Možnost A: Ollama (Lokální)
 
 ```json
 {
@@ -41,7 +41,7 @@ Upravte `src/SiliconLife.Default/Config/DefaultConfigData.cs` nebo změňte konf
 }
 ```
 
-#### Možnost B: Bailian (cloud)
+#### Možnost B: Bailian (Cloudový)
 
 ```json
 {
@@ -55,36 +55,36 @@ Upravte `src/SiliconLife.Default/Config/DefaultConfigData.cs` nebo změňte konf
 }
 ```
 
-### 4. Spuštění aplikace
+### 4. Spustit Aplikaci
 
 ```bash
 cd src/SiliconLife.Default
 dotnet run
 ```
 
-Webový server se spustí na adrese `http://localhost:8080`
+Webový server se spustí na `http://localhost:8080`
 
 ### 5. Přístup k Web UI
 
-Otevřete prohlížeč a přejděte na:
+Otevřete prohlížeč a navigujte na:
 
 ```
 http://localhost:8080
 ```
 
-Uvidíte dashboard s:
-- Správou křemíkových bytostí
-- Rozhraním chatu
-- Panelem konfigurace
-- Monitorováním systému
+Uvidíte dashboard obsahující:
+- Správu silikonových bytostí
+- Rozhraní chatu
+- Konfigurační panel
+- Monitorování systému
 
-## Vaše první křemíková bytost
+## Vaše První Silikonová Bytost
 
-### Vytvoření vaší první bytosti
+### Vytvoření Vaší První Bytosti
 
-1. Přejděte na **Správa bytostí** ve Web UI
-2. Klikněte na **Vytvořit novou bytost**
-3. Nakonfigurujte soubor duše (`soul.md`) s osobností a chováním
+1. Navigujte na **Správa Bytostí** ve Web UI
+2. Klikněte na **Vytvořit Novou Bytost**
+3. Konfigurujte soubor duše (`soul.md`) s osobností a chováním
 4. Spusťte bytost
 
 ### Příklad soul.md
@@ -106,9 +106,9 @@ You are a helpful assistant specializing in code review.
 - Be concise but thorough
 ```
 
-## Často kladené otázky
+## Časté Otázky
 
-### Ollama Connection Refused
+### Ollama Odmítnutí Připojení
 
 **Problém**: Nelze se připojit k Ollama na `http://localhost:11434`
 
@@ -121,7 +121,7 @@ ollama list
 ollama serve
 ```
 
-### Model Not Found
+### Model Nenalezen
 
 **Problém**: `model "qwen2.5:7b" not found`
 
@@ -131,7 +131,7 @@ ollama serve
 ollama pull qwen2.5:7b
 ```
 
-### Port Already in Use
+### Port Již Používán
 
 **Problém**: `HttpListenerException: Address already in use`
 
@@ -148,32 +148,37 @@ taskkill /PID <PID> /F
 lsof -ti:8080 | xargs kill -9
 ```
 
-## Další kroky
+## Další Kroky
 
-- 📚 Přečtěte si [Průvodce architekturou](architecture.md) pro pochopení návrhu systému
-- 🛠️ Prozkoumejte [Vývojový průvodce](development-guide.md) pro rozšíření systému
-- 📖 Prozkoumejte [API Reference](api-reference.md) pro detaily integrace
-- 🔒 Podívejte se na [Dokumentaci bezpečnosti](security.md) pro systém oprávnění
+- 📚 Přečtěte si [Průvodce Architektury](architecture.md) pro pochopení designu systému
+- 🛠️ Podívejte se na [Vývojářskou Příručku](development-guide.md) pro rozšíření systému
+- 📖 Prozkoumejte [Referenci API](api-reference.md) pro detaily integrace
+- 🔒 Podívejte se na [Bezpečnostní Dokumentaci](security.md) pro systém oprávnění
+- 🧰 Podívejte se na [Referenci Nástrojů](tools-reference.md) pro všechny vestavěné nástroje
+- 🌐 Podívejte se na [Průvodce Web UI](web-ui-guide.md) pro funkce rozhraní
 
-## Struktura projektu
+## Struktura Projektu
 
 ```
 SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/      # Core rozhraní a abstraktní třídy
 │   └── SiliconLife.Default/   # Výchozí implementace + vstupní bod
-├── docs/                      # Dokumentace (vícejazyčná)
+├── docs/                      # Dokumentace (vícejazyčná, 21 jazykových variant)
 │   ├── en/                    # Angličtina
 │   ├── zh-CN/                 # Zjednodušená čínština
 │   ├── zh-HK/                 # Tradiční čínština
+│   ├── es-ES/                 # Španělština
 │   ├── ja-JP/                 # Japonština
 │   ├── ko-KR/                 # Korejština
 │   └── cs-CZ/                 # Čeština
-└── README.md                  # Tento soubor
+├── 总文档/                     # Požadavky a dokumenty architektury (čínština)
+└── README.md                  # Popis projektu
 ```
 
-## Potřebujete pomoc?
+## Potřebujete Pomoc?
 
-- 📖 Podívejte se na [Dokumentaci](docs/)
-- 🐛 Nahlaste problémy na GitHubu
-- 💬 Připojte se ke komunitní diskusi
+- 📖 Podívejte se na [Systém Nápovědní Dokumentace](web-ui-guide.md) (vícejazyčná podpora)
+- 📚 Přečtěte si [Kompletní Dokumentaci](docs/)
+- 🐛 Nahlaste problémy na [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 💬 Zapojte se do komunitní diskuse

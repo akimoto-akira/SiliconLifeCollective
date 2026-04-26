@@ -1,54 +1,108 @@
-# Tools Reference
+﻿# Tools Reference
 
-[English](tools-reference.md) | [简体中文](docs/zh-CN/tools-reference.md) | [繁體中文](docs/zh-HK/tools-reference.md) | [Español](docs/es-ES/tools-reference.md) | [日本語](docs/ja-JP/tools-reference.md) | [한국어](docs/ko-KR/tools-reference.md) | [Čeština](docs/cs-CZ/tools-reference.md)
+This document provides detailed information about all built-in tools in the Silicon Life Collective platform.
+
+[English](../en/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md)
 
 ## Overview
 
-The tool system allows AI agents to interact with the external world through a standardized interface.
+The tool system allows silicon beings to interact with the external world through a standardized interface. Each tool implements the `ITool` interface and is automatically discovered and registered by the `ToolManager` through reflection.
 
-## Built-in Tools
+### Tool Categories
 
-### 1. Calendar Tool
+- **System Management Tools** — Configuration, permissions, dynamic compilation
+- **Communication Tools** — Chat, network requests
+- **Data Storage Tools** — Disk operations, databases, memory, work notes
+- **Time Management Tools** — Calendar, timers, tasks
+- **Development Tools** — Code execution, log queries
+- **Utility Tools** — System information, token audit, help documentation, knowledge network
+- **Browser Tools** — WebView browser automation
 
-**Name**: `calendar`
+---
 
-**Description**: Convert dates between different calendar systems.
+## Built-in Tools List
 
-**Parameters**:
+### 1. Calendar Tool (CalendarTool)
+
+**Tool Name**: `calendar`
+
+**Description**: Supports date conversion and calculations across 32 calendar systems.
+
+**Supported Operations**:
+- `now` — Get current time
+- `format` — Format date
+- `add_days` — Add/subtract days
+- `diff` — Calculate date difference
+- `list_calendars` — List all supported calendars
+- `get_components` — Get date components
+- `get_now_components` — Get current time components
+- `convert` — Convert between calendar systems
+
+**Supported Calendar Systems** (32 types):
+- Gregorian Calendar
+- Chinese Lunar Calendar
+- Chinese Historical Calendar — Sexagenary cycle, imperial era names
+- Islamic Calendar
+- Hebrew Calendar
+- Japanese Calendar
+- Persian Calendar
+- Mayan Calendar
+- Buddhist Calendar
+- Tibetan Calendar
+- And 24 other calendar systems...
+
+**Usage Example**:
 ```json
 {
-  "date": "2026-04-20",
-  "fromCalendar": "gregorian",
-  "toCalendar": "chinese_lunar"
+  "action": "convert",
+  "date": "2026-04-26",
+  "from_calendar": "gregorian",
+  "to_calendar": "chinese_lunar"
 }
 ```
 
-**Supported Calendars** (32 systems):
-- Gregorian, Chinese Lunar, Islamic, Hebrew
-- Japanese, Persian, Mayan, Tibetan
-- And 24 more...
+---
 
-### 2. Chat Tool
+### 2. Chat Tool (ChatTool)
 
-**Name**: `chat`
+**Tool Name**: `chat`
 
-**Description**: Send messages to other beings or users.
+**Description**: Manages chat sessions and message sending.
 
-**Parameters**:
+**Supported Operations**:
+- `send_message` — Send message
+- `get_messages` — Get message history
+- `create_group` — Create group chat
+- `add_member` — Add group member
+- `remove_member` — Remove group member
+- `get_chat_info` — Get chat information
+- `terminate_chat` — Terminate chat (read without reply)
+
+**Usage Example**:
 ```json
 {
-  "targetId": "being-uuid",
-  "message": "Hello, let's collaborate"
+  "action": "send_message",
+  "target_id": "being-uuid-or-user-0",
+  "message": "Hello, let's collaborate!"
 }
 ```
 
-### 3. Configuration Tool
+---
 
-**Name**: `config`
+### 3. Config Tool (ConfigTool)
 
-**Description**: Read and modify system configuration.
+**Tool Name**: `config`
 
-**Parameters**:
+**Description**: Reads and modifies system configuration.
+
+**Supported Operations**:
+- `read` — Read configuration item
+- `write` — Write configuration item
+- `list` — List all configurations
+- `get_ai_config` — Get AI client configuration
+- `set_ai_config` — Set AI client configuration
+
+**Usage Example**:
 ```json
 {
   "action": "read",
@@ -56,200 +110,49 @@ The tool system allows AI agents to interact with the external world through a s
 }
 ```
 
-### 4. Disk Tool
+---
 
-**Name**: `disk`
+### 4. Curator Tool (CuratorTool) 🔒
 
-**Description**: File system operations (read, write, list).
+**Tool Name**: `curator`
 
-**Parameters**:
+**Permission Requirement**: Silicon Curator only
+
+**Description**: System management tool exclusive to Silicon Curators.
+
+**Supported Operations**:
+- `create_being` — Create new silicon being
+- `list_beings` — List all silicon beings
+- `get_being_info` — Get being information
+- `assign_task` — Assign task
+- `manage_permissions` — Manage permissions
+
+**Usage Example**:
 ```json
 {
-  "action": "read",
-  "path": "/data/file.txt"
+  "action": "create_being",
+  "name": "Assistant",
+  "soul_file": "assistant_soul.md"
 }
 ```
 
-**Permission Required**: `disk:read`, `disk:write`
+---
 
-### 5. Dynamic Compile Tool
+### 5. Database Tool (DatabaseTool)
 
-**Name**: `compile`
+**Tool Name**: `database`
 
-**Description**: Compile and execute C# code dynamically.
+**Description**: Structured database queries and operations.
 
-**Parameters**:
-```json
-{
-  "code": "public class Test { ... }",
-  "references": ["System.Linq"]
-}
-```
+**Supported Operations**:
+- `query` — Query data
+- `insert` — Insert data
+- `update` — Update data
+- `delete` — Delete data
+- `create_table` — Create table
+- `list_tables` — List all tables
 
-**Security**: Code is scanned before execution.
-
-### 6. Memory Tool
-
-**Name**: `memory`
-
-**Description**: Store and retrieve being memories.
-
-**Parameters**:
-```json
-{
-  "action": "read",
-  "key": "important_fact",
-  "timeRange": {
-    "start": "2026-04-01",
-    "end": "2026-04-20"
-  }
-}
-```
-
-### 7. Network Tool
-
-**Name**: `network`
-
-**Description**: Make HTTP requests.
-
-**Parameters**:
-```json
-{
-  "method": "GET",
-  "url": "https://api.example.com/data",
-  "headers": {}
-}
-```
-
-**Permission Required**: `network:http`
-
-### 8. System Tool
-
-**Name**: `system`
-
-**Description**: Get system information.
-
-**Parameters**:
-```json
-{
-  "action": "info"
-}
-```
-
-### 9. Task Tool
-
-**Name**: `task`
-
-**Description**: Manage being tasks.
-
-**Parameters**:
-```json
-{
-  "action": "create",
-  "description": "Review code",
-  "priority": 5
-}
-```
-
-### 10. Timer Tool
-
-**Name**: `timer`
-
-**Description**: Create and manage timers.
-
-**Parameters**:
-```json
-{
-  "action": "create",
-  "interval": 3600,
-  "repeat": true
-}
-```
-
-### 11. Token Audit Tool
-
-**Name**: `token_audit`
-
-**Description**: Query token usage statistics.
-
-**Parameters**:
-```json
-{
-  "startDate": "2026-04-01",
-  "endDate": "2026-04-20"
-}
-```
-
-### 12. Permission Tool
-
-**Name**: `permission`
-
-**Description**: Manage permissions for silicon beings. Curator-only.
-
-**Actions**: `query_permission`, `manage_acl`
-
-**Parameters** (query_permission):
-```json
-{
-  "action": "query_permission",
-  "being_id": "being-uuid",
-  "permission_type": "network",
-  "resource": "https://api.example.com"
-}
-```
-
-**Permission Types**: `network`, `command`, `filesystem`, `function`, `data`
-
-**Returns**: Three-state result (`ALLOWED`, `DENIED`, `ASK_USER`) with curator status and frequency cache info.
-
-**Parameters** (manage_acl):
-```json
-{
-  "action": "manage_acl",
-  "acl_action": "add_rule",
-  "permission_type": "filesystem",
-  "resource_prefix": "/data/",
-  "acl_result": "allow",
-  "description": "Allow data directory access"
-}
-```
-
-**Permission**: Requires `IsCurator` flag.
-
-### 13. Execute Code Tool
-
-**Name**: `execute_code`
-
-**Description**: Compile and execute C# code with security scanning. Curator-only.
-
-**Actions**: `run_script`
-
-**Parameters**:
-```json
-{
-  "action": "run_script",
-  "code": "return DateTime.Now.ToString();",
-  "timeout": 30
-}
-```
-
-**Details**:
-- Code is wrapped in a `ScriptExecutor` class with an `Execute()` method
-- Security scanning is performed before compilation
-- Supports configurable timeout (default: 30 seconds)
-- Returns compilation errors and security violations on failure
-
-**Permission**: Requires `IsCurator` flag.
-
-### 14. Database Tool
-
-**Name**: `database`
-
-**Description**: Structured database query and operations.
-
-**Actions**: `query`, `insert`, `update`, `delete`
-
-**Parameters** (query):
+**Usage Example**:
 ```json
 {
   "action": "query",
@@ -259,214 +162,478 @@ The tool system allows AI agents to interact with the external world through a s
 }
 ```
 
-**Permission**: Requires appropriate database access permissions.
+---
 
-### 15. Log Tool
+### 6. Disk Tool (DiskTool)
 
-**Name**: `log`
+**Tool Name**: `disk`
 
-**Description**: Operation history and conversation history queries.
+**Description**: File system operations and local search.
 
-**Actions**: `query_logs`, `query_conversations`
+**Supported Operations**:
+- `read` — Read file
+- `write` — Write file
+- `list` — List directory
+- `delete` — Delete file
+- `create_directory` — Create directory
+- `search_files` — Search files
+- `search_content` — Search file content
+- `count_lines` — Count lines
+- `read_lines` — Read specified lines
+- `replace_text` — Replace text
 
-**Parameters** (query_logs):
+**Permission Requirements**: `disk:read`, `disk:write`
+
+**Usage Example**:
 ```json
 {
-  "action": "query_logs",
-  "being_id": "being-uuid",
-  "start_time": "2026-04-20T00:00:00Z",
-  "end_time": "2026-04-23T23:59:59Z",
-  "level": "info"
+  "action": "read",
+  "path": "/data/file.txt"
 }
 ```
 
-**Parameters** (query_conversations):
+---
+
+### 7. Dynamic Compile Tool (DynamicCompileTool) 🔒
+
+**Tool Name**: `compile`
+
+**Description**: Dynamically compiles C# code (for silicon being self-evolution).
+
+**Supported Operations**:
+- `compile_class` — Compile class
+- `compile_callback` — Compile permission callback function
+- `validate_code` — Validate code security
+
+**Security Mechanisms**:
+- Compile-time reference control (excludes dangerous assemblies)
+- Runtime static code scanning
+- AES-256 encrypted storage
+
+**Usage Example**:
 ```json
 {
-  "action": "query_conversations",
-  "being_id": "being-uuid",
-  "session_id": "session-uuid",
-  "limit": 50
+  "action": "compile_class",
+  "code": "public class MyBeing : SiliconBeingBase { ... }"
 }
 ```
 
-**Features**:
-- Support filtering logs by silicon being
-- Support time range queries
-- Support log level filtering
-- Conversation history retrieval
+---
 
-### Disk Tool Enhancements
+### 8. Execute Code Tool (ExecuteCodeTool) 🔒
 
-Disk tool now includes local search functionality (integrated from SearchTool):
+**Tool Name**: `execute_code`
 
-**New actions**: `search_files`, `search_content`
+**Permission Requirement**: Silicon Curator only
 
-**Parameters** (search_files):
+**Description**: Compiles and executes C# code snippets.
+
+**Supported Operations**:
+- `run_script` — Execute code script
+
+**Usage Example**:
 ```json
 {
-  "action": "search_files",
-  "path": "/data",
-  "pattern": "*.json",
-  "recursive": true
+  "action": "run_script",
+  "code": "return DateTime.Now.ToString();",
+  "timeout": 30
 }
 ```
 
-**Parameters** (search_content):
+---
+
+### 9. Help Tool (HelpTool)
+
+**Tool Name**: `help`
+
+**Description**: Retrieves system help documentation and usage guides.
+
+**Supported Operations**:
+- `get_topics` — Get help topic list
+- `get_topic` — Get specific topic details
+- `search` — Search help documentation
+
+**Usage Example**:
 ```json
 {
-  "action": "search_content",
-  "path": "/data",
-  "query": "search term",
-  "filePattern": "*.md"
+  "action": "get_topics"
 }
 ```
 
-### 16. Knowledge Network Tool
+---
 
-**Name**: `knowledge`
+### 10. Knowledge Network Tool (KnowledgeTool)
 
-**Description**: Knowledge network operation tool for adding, querying, updating, deleting, and searching knowledge triples.
+**Tool Name**: `knowledge`
 
-**Actions**: `add`, `query`, `update`, `delete`, `search`, `get_path`, `validate`, `stats`
+**Description**: Knowledge graph operations (based on triples: subject-predicate-object).
 
-**Parameters** (add - add knowledge):
+**Supported Operations**:
+- `add` — Add knowledge triple
+- `query` — Query knowledge
+- `update` — Update knowledge
+- `delete` — Delete knowledge
+- `search` — Search knowledge
+- `get_path` — Get knowledge path
+- `validate` — Validate knowledge
+- `stats` — Get statistics
+
+**Usage Example**:
 ```json
 {
   "action": "add",
   "subject": "Python",
   "predicate": "is_a",
   "object": "programming_language",
-  "confidence": 0.95,
-  "tags": ["programming", "language"]
+  "confidence": 0.95
 }
 ```
 
-**Parameters** (query - query knowledge):
+---
+
+### 11. Log Tool (LogTool)
+
+**Tool Name**: `log`
+
+**Description**: Queries operation history and conversation history.
+
+**Supported Operations**:
+- `query_logs` — Query system logs
+- `query_conversations` — Query conversation history
+- `get_stats` — Get log statistics
+
+**Usage Example**:
 ```json
 {
-  "action": "query",
-  "subject": "Python",
-  "predicate": "is_a"
+  "action": "query_logs",
+  "being_id": "being-uuid",
+  "start_time": "2026-04-20T00:00:00Z",
+  "end_time": "2026-04-26T23:59:59Z",
+  "level": "info"
 }
 ```
 
-**Parameters** (search - search knowledge):
+---
+
+### 12. Memory Tool (MemoryTool)
+
+**Tool Name**: `memory`
+
+**Description**: Manages long-term and short-term memory for silicon beings.
+
+**Supported Operations**:
+- `read` — Read memory
+- `write` — Write memory
+- `search` — Search memory
+- `delete` — Delete memory
+- `list` — List memory
+- `get_stats` — Get memory statistics
+- `compress` — Compress memory
+
+**Usage Example**:
 ```json
 {
-  "action": "search",
-  "query": "programming language",
-  "limit": 10
+  "action": "read",
+  "key": "important_fact",
+  "time_range": {
+    "start": "2026-04-01",
+    "end": "2026-04-26"
+  }
 }
 ```
 
-**Parameters** (get_path - get knowledge path):
+---
+
+### 13. Network Tool (NetworkTool)
+
+**Tool Name**: `network`
+
+**Description**: Initiates HTTP/HTTPS requests.
+
+**Supported Operations**:
+- `get` — GET request
+- `post` — POST request
+- `put` — PUT request
+- `delete` — DELETE request
+- `download` — Download file
+- `upload` — Upload file
+
+**Permission Requirements**: `network:http`
+
+**Usage Example**:
 ```json
 {
-  "action": "get_path",
-  "from": "Python",
-  "to": "computer_science"
+  "action": "get",
+  "url": "https://api.example.com/data"
 }
 ```
 
-**Parameters** (stats - statistics):
+---
+
+### 14. Permission Tool (PermissionTool) 🔒
+
+**Tool Name**: `permission`
+
+**Permission Requirement**: Silicon Curator only
+
+**Description**: Manages permissions and access control lists.
+
+**Supported Operations**:
+- `query_permission` — Query permissions
+- `manage_acl` — Manage global ACL
+- `get_callback` — Get permission callback function
+- `set_callback` — Set permission callback function
+
+**Usage Example**:
 ```json
 {
-  "action": "stats"
+  "action": "manage_acl",
+  "acl_action": "add_rule",
+  "permission_type": "filesystem",
+  "resource_prefix": "/data/",
+  "acl_result": "allow"
 }
 ```
 
-**Features**:
-- Knowledge representation based on triple structure (subject-predicate-object)
-- Knowledge confidence score support
-- Tag classification and search support
-- Knowledge path discovery (associative paths between two points) support
-- Knowledge validation and integrity check support
-- Persistent storage to file system
+---
 
-**Permission**: All beings can use.
+### 15. Project Tool (ProjectTool)
 
-### 17. Work Note Tool
+**Tool Name**: `project`
 
-**Name**: `work_note`
+**Description**: Manages project workspaces.
 
-**Description**: Manage work notes for silicon beings. Work notes use page-based design, similar to a personal diary (private by default).
+**Supported Operations**:
+- `create` — Create project
+- `list` — List projects
+- `get_info` — Get project information
+- `update` — Update project
+- `archive` — Archive project
 
-**Actions**: `create`, `read`, `update`, `delete`, `list`, `directory`, `search`
-
-**Parameters** (create - create note):
+**Usage Example**:
 ```json
 {
   "action": "create",
-  "summary": "User authentication module completed",
-  "content": "## Implementation Details\n\n- Using JWT token\n- OAuth2 support\n- Refresh token mechanism added",
+  "name": "My Project",
+  "description": "Project description"
+}
+```
+
+---
+
+### 16. Project Task Tool (ProjectTaskTool)
+
+**Tool Name**: `project_task`
+
+**Description**: Manages project tasks.
+
+**Supported Operations**:
+- `create` — Create task
+- `list` — List tasks
+- `update` — Update task
+- `complete` — Complete task
+- `get_stats` — Get task statistics
+
+**Usage Example**:
+```json
+{
+  "action": "create",
+  "project_id": "project-uuid",
+  "description": "Task description",
+  "priority": 5
+}
+```
+
+---
+
+### 17. Project Work Note Tool (ProjectWorkNoteTool)
+
+**Tool Name**: `project_work_note`
+
+**Description**: Manages project work notes (public, similar to a work notebook).
+
+**Supported Operations**:
+- `create` — Create note
+- `read` — Read note
+- `update` — Update note
+- `delete` — Delete note
+- `list` — List notes
+- `search` — Search notes
+- `directory` — Generate directory
+
+**Usage Example**:
+```json
+{
+  "action": "create",
+  "project_id": "project-uuid",
+  "summary": "Completed user authentication module",
+  "content": "## Implementation Details\n\n- Using JWT token",
+  "keywords": "authentication,JWT"
+}
+```
+
+---
+
+### 18. System Tool (SystemTool)
+
+**Tool Name**: `system`
+
+**Description**: Retrieves system information and resource usage.
+
+**Supported Operations**:
+- `info` — Get system information
+- `resource_usage` — Get resource usage
+- `find_process` — Find process
+- `list_beings` — List silicon beings
+
+**Usage Example**:
+```json
+{
+  "action": "info"
+}
+```
+
+---
+
+### 19. Task Tool (TaskTool)
+
+**Tool Name**: `task`
+
+**Description**: Manages silicon being personal tasks.
+
+**Supported Operations**:
+- `create` — Create task
+- `list` — List tasks
+- `update` — Update task
+- `complete` — Complete task
+- `delete` — Delete task
+- `get_dependencies` — Get dependencies
+
+**Usage Example**:
+```json
+{
+  "action": "create",
+  "description": "Review code",
+  "priority": 5
+}
+```
+
+---
+
+### 20. Timer Tool (TimerTool)
+
+**Tool Name**: `timer`
+
+**Description**: Creates and manages timers.
+
+**Supported Operations**:
+- `create` — Create timer
+- `list` — List timers
+- `delete` — Delete timer
+- `pause` — Pause timer
+- `resume` — Resume timer
+- `get_execution_history` — Get execution history
+
+**Usage Example**:
+```json
+{
+  "action": "create",
+  "interval": 3600,
+  "repeat": true,
+  "message": "Hourly reminder"
+}
+```
+
+---
+
+### 21. Token Audit Tool (TokenAuditTool) 🔒
+
+**Tool Name**: `token_audit`
+
+**Permission Requirement**: Silicon Curator only
+
+**Description**: Queries and aggregates AI token usage.
+
+**Supported Operations**:
+- `get_usage` — Get token usage statistics
+- `get_by_being` — Get usage by being
+- `get_by_model` — Get usage by model
+- `get_trend` — Get usage trend
+- `export` — Export data
+
+**Usage Example**:
+```json
+{
+  "action": "get_usage",
+  "start_date": "2026-04-01",
+  "end_date": "2026-04-26"
+}
+```
+
+---
+
+### 22. WebView Browser Tool (WebViewBrowserTool)
+
+**Tool Name**: `webview`
+
+**Description**: Browser automation based on Playwright.
+
+**Supported Operations**:
+- `open_browser` — Open browser
+- `close_browser` — Close browser
+- `navigate` — Navigate to URL
+- `click` — Click element
+- `input` — Input text
+- `get_page_text` — Get page text
+- `get_screenshot` — Get screenshot
+- `execute_script` — Execute JavaScript
+- `wait_for_element` — Wait for element
+- `get_browser_status` — Get browser status
+
+**Features**:
+- Independent instance per silicon being
+- Completely isolated cookies and sessions
+- Fully invisible to users (headless mode)
+- Full JavaScript and CSS support
+
+**Usage Example**:
+```json
+{
+  "action": "navigate",
+  "url": "https://example.com"
+}
+```
+
+---
+
+### 23. Work Note Tool (WorkNoteTool)
+
+**Tool Name**: `work_note`
+
+**Description**: Manages silicon being personal work notes (private, similar to a diary).
+
+**Supported Operations**:
+- `create` — Create note
+- `read` — Read note
+- `update` — Update note
+- `delete` — Delete note
+- `list` — List notes
+- `search` — Search notes
+- `directory` — Generate directory
+
+**Usage Example**:
+```json
+{
+  "action": "create",
+  "summary": "Completed user authentication module",
+  "content": "## Implementation Details\n\n- Using JWT token\n- Supports OAuth2",
   "keywords": "authentication,JWT,OAuth2"
 }
 ```
 
-**Parameters** (read - read note):
-```json
-{
-  "action": "read",
-  "page_number": 1
-}
-```
-
-Or use note_id:
-```json
-{
-  "action": "read",
-  "note_id": "550e8400-e29b-41d4-a716-446655440000"
-}
-```
-
-**Parameters** (update - update note):
-```json
-{
-  "action": "update",
-  "page_number": 1,
-  "content": "## Updated Content\n\nUnit tests added",
-  "summary": "User authentication module and tests completed"
-}
-```
-
-**Parameters** (list - list all notes):
-```json
-{
-  "action": "list"
-}
-```
-
-**Parameters** (directory - generate note directory):
-```json
-{
-  "action": "directory"
-}
-```
-
-**Parameters** (search - search notes):
-```json
-{
-  "action": "search",
-  "keyword": "authentication",
-  "max_results": 10
-}
-```
-
-**Features**:
-- Page-based design, each page managed independently
-- Support for summary, content, keywords
-- Keyword-based search support
-- Directory overview generation support (for context understanding)
-- Markdown format support (text, lists, tables, code blocks)
-- Automatic timestamp recording
-- Private by default, only the being can access
-
-**Permission**: Beings access their own work notes, curator can manage all notes.
-
 ---
 
-## Tool Call Flow
+## Tool Invocation Flow
 
 ```
 ┌──────────┐
@@ -474,7 +641,7 @@ Or use note_id:
 └────┬─────┘
      ↓
 ┌──────────────┐
-│ ToolManager  │ Finds and validates tool
+│ ToolManager  │ Finds and validates tool usage
 └────┬─────────┘
      ↓
 ┌──────────────┐
@@ -483,34 +650,34 @@ Or use note_id:
 └────┬─────────┘
      ↓
 ┌──────────────┐
-│  Executor    │ Executes the operation
+│  Executor    │ Executes resource access operations
 └────┬─────────┘
      ↓
 ┌──────────┐
-│   AI     │ Receives tool result
+│   AI     │ Receives tool results, continues thinking
 └──────────┘
 ```
 
 ## Permission Validation
 
-All tools go through the 5-level permission chain:
+All tool executions go through a 5-level permission chain:
 
-1. **IsCurator**: Manager bypasses all checks
-2. **UserFrequencyCache**: Rate limiting per user
-3. **GlobalACL**: Access control list
-4. **IPermissionCallback**: Custom callback logic
-5. **IPermissionAskHandler**: Ask user for permission
+1. **IsCurator** — Silicon Curator bypasses all checks
+2. **UserFrequencyCache** — User high-frequency allow/deny cache
+3. **GlobalACL** — Global Access Control List
+4. **IPermissionCallback** — Custom permission callback function
+5. **IPermissionAskHandler** — Ask user
 
 ## Creating Custom Tools
 
-### Step 1: Implement ITool
+### Step 1: Implement ITool Interface
 
 ```csharp
 public class MyCustomTool : ITool
 {
     public string Name => "my_tool";
     
-    public string Description => "Does something useful";
+    public string Description => "Tool description";
     
     public ToolDefinition Definition => new ToolDefinition
     {
@@ -518,7 +685,7 @@ public class MyCustomTool : ITool
         Description = Description,
         Parameters = new Dictionary<string, object>
         {
-            ["param1"] = new { type = "string", description = "Description" }
+            ["param1"] = new { type = "string", description = "Parameter description" }
         }
     };
     
@@ -549,17 +716,15 @@ public class MyCustomTool : ITool
 
 ### Step 2: Add to Project
 
-Place the tool in `src/SiliconLife.Default/Tools/`.
+Place the tool file in the `src/SiliconLife.Default/Tools/` directory. The `ToolManager` will automatically discover and register it through reflection at startup.
 
-The `ToolManager` will automatically discover it via reflection.
-
-### Step 3: (Optional) Mark as Manager-Only
+### Step 3: (Optional) Mark as Curator Only
 
 ```csharp
 [SiliconManagerOnly]
-public class AdminTool : ITool
+public class AdminOnlyTool : ITool
 {
-    // Only accessible by curator
+    // Only accessible by Silicon Curator
 }
 ```
 
@@ -579,18 +744,18 @@ if (!call.Parameters.ContainsKey("required_param"))
 ```csharp
 try
 {
-    // Operation
+    // Perform operation
 }
 catch (Exception ex)
 {
-    Logger.Error($"Tool {Name} failed: {ex.Message}");
+    Logger.Error($"Tool {Name} execution failed: {ex.Message}");
     return ToolResult.Failure(ex.Message);
 }
 ```
 
-### 3. Respect Permissions
+### 3. Respect the Permission System
 
-Never bypass the permission system. Always use:
+Never bypass permission checks. Always access resources through the executor:
 
 ```csharp
 var permission = await permissionManager.CheckAsync(request);
@@ -600,75 +765,50 @@ if (!permission.Allowed)
 }
 ```
 
-### 4. Provide Clear Descriptions
+### 4. Provide Clear Tool Descriptions
 
-Help the AI understand when and how to use your tool:
+Help the AI understand when and how to use the tool:
 
 ```csharp
 public string Description => 
-    "Use this tool to convert dates between calendar systems. " +
-    "Requires 'date', 'fromCalendar', and 'toCalendar' parameters.";
-```
-
-## Testing Tools
-
-### Unit Test Example
-
-```csharp
-[TestMethod]
-public async Task CalendarTool_ConvertDate_ReturnsCorrectResult()
-{
-    var tool = new CalendarTool();
-    var call = new ToolCall
-    {
-        Name = "calendar",
-        Parameters = new Dictionary<string, object>
-        {
-            ["date"] = "2026-04-20",
-            ["fromCalendar"] = "gregorian",
-            ["toCalendar"] = "chinese_lunar"
-        }
-    };
-    
-    var result = await tool.ExecuteAsync(call);
-    
-    Assert.IsTrue(result.Success);
-    Assert.IsNotNull(result.Output);
-}
+    "Used to convert dates between different calendar systems. " +
+    "Requires 'date', 'from_calendar', and 'to_calendar' parameters.";
 ```
 
 ## Troubleshooting
 
 ### Tool Not Found
 
-**Problem**: AI tries to call a tool that doesn't exist.
+**Problem**: AI attempts to call a non-existent tool.
 
-**Solution**: 
-- Check tool name matches exactly
-- Verify tool is in the Tools directory
-- Rebuild the project
+**Solution**:
+- Check if the tool name matches exactly
+- Verify the tool file is in the `Tools/` directory
+- Rebuild the project (`dotnet build`)
 
 ### Permission Denied
 
-**Problem**: Tool execution fails with permission error.
+**Problem**: Tool execution fails with a permission error.
 
 **Solution**:
-- Check permission logs
-- Verify user has required permissions
-- Review GlobalACL settings
+- Check the permission audit log
+- Verify the silicon being has the required permission
+- Review global ACL settings
+- If it's a curator, check if the `[SiliconManagerOnly]` attribute is used
 
-### Tool Returns Error
+### Tool Execution Returns Error
 
-**Problem**: Tool executes but returns failure.
+**Problem**: Tool executes but returns a failure result.
 
 **Solution**:
-- Check tool logs for detailed error
-- Verify input parameters
-- Test tool independently
+- Check the error message returned by the tool
+- Verify input parameters are correctly formatted
+- Review system logs for detailed error information
+- Test tool functionality independently
 
 ## Next Steps
 
-- 📚 Read the [Architecture Guide](architecture.md)
-- 🛠️ Check the [Development Guide](development-guide.md)
-- 🔒 Review the [Permission System](permission-system.md)
-- 🚀 See the [Getting Started Guide](getting-started.md)
+- 📚 Read [Architecture Guide](architecture.md)
+- 🛠️ View [Development Guide](development-guide.md)
+- 🔒 Learn about [Permission System](permission-system.md)
+- 🚀 View [Getting Started Guide](getting-started.md)

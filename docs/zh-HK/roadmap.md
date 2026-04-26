@@ -1,8 +1,6 @@
-# 路線圖
+﻿# 路線圖
 
-[English](roadmap.md) | [简体中文](docs/zh-CN/roadmap.md) | [繁體中文](docs/zh-HK/roadmap.md) | [Español](docs/es-ES/roadmap.md) | [日本語](docs/ja-JP/roadmap.md) | [한국어](docs/ko-KR/roadmap.md) | [Čeština](docs/cs-CZ/roadmap.md)
-
-[English](roadmap.md) | [中文](docs/zh-CN/roadmap.md) | [繁體中文](docs/zh-HK/roadmap.md) | [日本語](docs/ja-JP/roadmap.md) | [한국어](docs/ko-KR/roadmap.md)
+[English](../en/roadmap.md) | [中文](../zh-CN/roadmap.md) | **繁體中文** | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
 
 ## 指導原則
 
@@ -35,7 +33,7 @@
 
 | # | 模組 | 描述 |
 |---|--------|-------------|
-| 2.1 | 儲存（最小化） | `IStorage` 介面（Read/Write/Exists/Delete，键值對）。`FileSystemStorage` 實現。实例類別（非静态）。直接檔案系統訪問 —— **AI 无法控制 IStorage** |
+| 2.1 | 儲存（最小化） | `IStorage` 介面（Read/Write/Exists/Delete，键值對）。`FileSystemStorage` 實現。实例類別（非静态）。直接檔案系統訪問 —— **AI 无法控制 IStorage** | [Deutsch](../de-DE/roadmap.md) |
 | 2.2 | 主循环 + 时钟物件 | 无限循环，精确时钟间隔（`Stopwatch` + `Thread.Sleep`）。優先級排程 |
 | 2.3 | IAIClient 標準化 | `IAIClientFactory` 介面。OllamaClient 重构以實現標準介面 |
 | 2.4 | 控制臺遷移 | 将 `while(true)` 遷移到主循环驅動程式的时钟物件。行為與階段 1 相同 |

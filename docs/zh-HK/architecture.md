@@ -1,4 +1,4 @@
-# 架構
+﻿# 架構
 
 [English](../en/architecture.md) | [中文](../zh-CN/architecture.md) | **繁體中文** | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md)
 

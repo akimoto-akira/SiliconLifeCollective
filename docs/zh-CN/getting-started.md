@@ -1,6 +1,6 @@
-# 快速开始
+﻿# 快速开始
 
-[English](getting-started.md) | [中文](docs/zh-CN/getting-started.md) | [繁體中文](docs/zh-HK/getting-started.md) | [Español](docs/es-ES/getting-started.md) | [日本語](docs/ja-JP/getting-started.md) | [한국어](docs/ko-KR/getting-started.md) | [Čeština](docs/cs-CZ/getting-started.md)
+[English](../en/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | **中文** | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
 ## 前置条件
 
@@ -154,6 +154,8 @@ lsof -ti:8080 | xargs kill -9
 - 🛠️ 查看[开发指南](development-guide.md)扩展系统
 - 📖 探索[API 参考](api-reference.md)了解集成详情
 - 🔒 查看[安全文档](security.md)了解权限系统
+- 🧰 查看[工具参考](tools-reference.md)了解所有内置工具
+- 🌐 查看[Web UI 指南](web-ui-guide.md)了解界面功能
 
 ## 项目结构
 
@@ -162,17 +164,21 @@ SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/      # 核心接口和抽象类
 │   └── SiliconLife.Default/   # 默认实现 + 入口点
-├── docs/                      # 文档（多语言）
+├── docs/                      # 文档（多语言，21 种语言变体）
 │   ├── en/                    # 英语
 │   ├── zh-CN/                 # 简体中文
 │   ├── zh-HK/                 # 繁体中文
+│   ├── es-ES/                 # 西班牙语
 │   ├── ja-JP/                 # 日语
-│   └── ko-KR/                 # 韩语
-└── README.md                  # 本文件
+│   ├── ko-KR/                 # 韩语
+│   └── cs-CZ/                 # 捷克语
+├── 总文档/                     # 需求和架构文档（中文）
+└── README.md                  # 项目说明
 ```
 
 ## 需要帮助？
 
-- 📖 查看[文档](docs/)
-- 🐛 在 GitHub 上报告问题
-- 💬 加入社区讨论
+- 📖 查看[帮助文档系统](web-ui-guide.md#帮助文档系统新增)（多语言支持）
+- 📚 阅读[完整文档](docs/)
+- 🐛 在 [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues) 上报告问题
+- 💬 参与社区讨论

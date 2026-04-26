@@ -1,147 +1,161 @@
-# Silicon Life Collective
+﻿# Silicon Life Collective
 
-**⚠️ VAROVÁNÍ: Dynamická kompilace funguje, ale pro správný běh vyžaduje kódové šablony. Probíhá komplexní testování.**
+**Siliconové bytosti** — Multiagentní platforma založená na .NET 9, kde jsou AI agenti nazýváni **silikonové bytosti** s schopností sebevývoje prostřednictvím dynamické kompilace Roslyn.
 
-Multi-agentní platforma pro spolupráci založená na .NET 9, kde AI agenti jsou nazýváni **Křemíkové Bytosti** a umožňují sebe-evoluci prostřednictvím dynamické kompilace Roslyn.
+[English](../README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Deutsch](../de-DE/README.md) | **Čeština**
 
-[English](../en/README.md) | [中文文档](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Čeština](../cs-CZ/README.md)
+## 🌟 Klíčové funkce
 
-## Funkce
+### Agentní systém
+- **Orchestrace více agentů** — Spravováno *Silikonovým kurátorem* s mechanismem spravedlivého rozvrhování časových slotů řízeným hodinami
+- **Řízeno souborem duše** — Každá silikonová bytost je řízena souborem core prompt (`soul.md`), který definuje jedinečnou osobnost a vzorce chování
+- **Architektura Tělo-Mozek** — *Tělo* (SiliconBeing) udržuje stav života a detekuje spouštěcí scénáře; *Mozek* (ContextManager) načítá historii, volá AI, provádí nástroje a perzistuje odpovědi
+- **Schopnost sebevývoje** — Prostřednictvím technologie dynamické kompilace Roslyn mohou silikonové bytosti přepisovat svůj vlastní kód pro evoluci
 
-- **Multi-agentní orchestrace** — Řízeno *Křemíkovým Kurátorem* s clock-driven time-slice fair scheduling (hlavní smyčka + objekt Clock + watchdog + jistič)
-- **Řízeno souborem duše** — Každá křemíková bytost je řízena souborem s výzvou (`soul.md`), který definuje její osobnost a chování
-- **Architektura Tělo-Mozek** — *Tělo* (SiliconBeing) udržuje stav naživu a detekuje spouštěcí scénáře; *Mozek* (ContextManager) načítá historii, volá AI, executes nástroje a persistuje odpovědi
-- **Cyklus volání nástrojů** — AI vrací volání nástrojů → execute nástroje → vrátit výsledky AI → AI pokračuje → dokud nevrátí čistý text
-- **Executor-Permission Security** — Všechny operace disku, sítě a příkazového řádku jsou autorizovány přes executory
-  - 5-úrovňový řetězec oprávnění: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
-  - Všechna rozhodnutí o oprávněních mají auditní záznam
-- **Audit použití Tokenů** — Vestavěné sledování a reportování použití tokenů prostřednictvím `ITokenUsageAudit` / `TokenUsageAuditManager`
-- **Více AI backendů** — Podpora Ollama (lokální) a Alibaba Cloud Bailian (cloud)
-  - **Ollama** — Lokální hostování modelů s nativním HTTP API
-  - **Bailian (DashScope)** — Cloudová AI služba, kompatibilní s OpenAI API, více oblastí nasazení, podpora 13+ modelů (Tongyi Qianwen, DeepSeek, GLM, Kimi, Llama)
-- **32 kalendářních systémů** — Podpora více kalendářů včetně gregoriánského, lunárního, islámského, hebrejského, japonského, perského, mayského atd.
-- **Minimální závislosti** — Core knihovna závisí pouze na Microsoft.CodeAnalysis.CSharp pro dynamickou kompilaci Roslyn
-- **Žádná databázová závislost** — Úložiště založené na souborech (JSON) s podporou časově indexovaných dotazů prostřednictvím `ITimeStorage`
-- **Lokalizace** — Komplexní vícejazyčná podpora s 21 jazykovými variantami
+### Nástroje a provádění
+- **23 vestavěných nástrojů** — Pokrývá kalendář, chat, konfiguraci, disk, síť, paměť, úkoly, časovače, znalostní bázi, pracovní poznámky, WebView prohlížeč a další
+- **Cyklus volání nástrojů** — AI vrací volání nástroje → provádění nástroje → výsledky zpět AI → pokračuje dokud nevrací čistý text
+- **Bezpečnost oprávnění-exekutor** — Všechny I/O operace procházejí přísným ověřováním oprávnění prostřednictvím exekutorů
+  - 5úrovňový řetězec oprávnění: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+  - Kompletní auditní záznam všech rozhodnutí o oprávněních
+
+### AI a znalosti
+- **Podpora více AI backendů**
+  - **Ollama** — Lokální nasazení modelů pomocí nativního HTTP API
+  - **Alibaba Cloud Bailian (DashScope)** — Cloudová AI služba, kompatibilní s OpenAI API, podpora 13+ modelů, více regionů
+- **32 kalendářních systémů** — Globální pokrytí hlavních kalendářů včetně gregoriánského, lunárního, islámského, hebrejského, japonského, perského, mayského, čínského historického kalendáře atd.
+- **Systém znalostní sítě** — Znalostní graf založený na triplech (subjekt-vztah-objekt) s podporou ukládání, dotazování a objevování cest
+
+### Webové rozhraní
+- **Moderní Web UI** — Vestavěný HTTP server s podporou SSE pro aktualizace v reálném čase
+- **4 témata skinů** — Administrační, chat, kreativní, vývojářská verze s automatickou detekcí a přepínáním
+- **20+ kontrolerů** — Kompletní správa systému, chat, konfigurace, monitoring
+- **Žádná závislost na frontendovém frameworku** — Generování HTML/CSS/JS na serveru pomocí `H`, `CssBuilder` a `JsBuilder`
+
+### Internacionalizace a lokalizace
+- **Plná podpora 21 jazykových variant**
   - Čínština: zh-CN, zh-HK, zh-SG, zh-MO, zh-TW, zhMY (6 variant)
   - Angličtina: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variant)
   - Španělština: es-ES, es-MX (2 varianty)
-  - Japonština: ja-JP
-  - Korejština: ko-KR
-  - Čeština: cs-CZ
-- **Web UI** — Vestavěný HTTP server s podporou SSE, více skinů a komplexní dashboard
-  - **Systém skinů** — 4 vestavěné skiny (Admin, Chat, Creative, Dev) s rozhraním ISkin a automatickým objevováním
-  - **20+ kontrolerů** — About, Audit, Being, Chat, ChatHistory, CodeBrowser, CodeHover, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer, TimerExecutionHistory
-  - **Aktualizace v reálném čase** — SSE (Server-Sent Events) pro chatové zprávy, stav bytostí a systémové události
-  - **HTML/CSS/JS Buildery** — Generování značek na straně serveru prostřednictvím `H`, `CssBuilder` a `JsBuilder` (žádná závislost na frontendovém frameworku)
-  - **Lokalizace** — 21 vestavěných jazykových variant s parsowaniem přes LocalizationManager
-  - **Zobrazení historie chatu** — Kompletní funkce procházení historie chatu křemíkových bytostí s výpisem relací a detaily zpráv
-  - **Podpora nahrávání souborů** — Dialogové okno zdroje souboru a funkce nahrávání souborů
-  - **Indikátor načítání** — Indikátor stavu načítání na stránce chatu a automatický výběr relace kurátora
+  - Japonština: ja-JP | Korejština: ko-KR | Čeština: cs-CZ
 
-## Technologie
+### Data a úložiště
+- **Žádná závislost na databázi** — Čisté úložiště na souborovém systému (formát JSON)
+- **Časově indexované dotazy** — Efektivní dotazování podle časového rozsahu prostřednictvím rozhraní `ITimeStorage`
+- **Minimální závislosti** — Core knihovna závisí pouze na Microsoft.CodeAnalysis.CSharp pro dynamickou kompilaci
+
+## 🛠️ Technologický stack
 
 | Komponenta | Technologie |
-|-----------|-----------|
+|------|------|
 | Runtime | .NET 9 |
-| Jazyk | C# |
-| AI Integrace | Ollama (lokální), Alibaba Cloud Bailian (cloud) |
-| Úložiště | Souborový systém (JSON + adresáře s časovým indexem) |
+| Programovací jazyk | C# |
+| AI integrace | Ollama (lokální), Alibaba Cloud Bailian (cloud) |
+| Úložiště dat | Souborový systém (JSON + časově indexované adresáře) |
 | Webový server | HttpListener (vestavěný v .NET) |
 | Dynamická kompilace | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
+| Automatizace prohlížeče | Playwright (WebView) |
 | Licence | Apache-2.0 |
 
-## Struktura projektu
+## 📁 Struktura projektu
 
 ```
 SiliconLifeCollective.sln
 ├── src/
 │   ├── SiliconLife.Core/                  # Core knihovna (rozhraní, abstraktní třídy)
-│   │   ├── ServiceLocator.cs             # Globální service locator: Register/Get, ChatSystem, IMManager, AuditLogger, GlobalACL, BeingFactory, BeingManager, DynamicBeingLoader, TokenUsageAudit
-│   │   ├── Runtime/                       # Hlavní smyčka, objekty Clock, CoreHost, CoreHostBuilder, PerformanceMonitor
-│   │   ├── SiliconBeing/                  # Základní třída SiliconBeing, SiliconBeingManager, SiliconCurator, rozhraní ISiliconBeingFactory, SoulFileManager, Paměť, Systém úkolů, Systém časovačů
-│   │   ├── AI/                            # Rozhraní AI klienta, rozhraní AI Client Factory, ContextManager ("mozek"), Zprávy, AI Request/AI Response
-│   │   ├── Audit/                         # Rozhraní auditu použití tokenů, Token Usage Audit Manager, Token Usage Record, Token Usage Summary, Token Usage Query
-│   │   ├── Chat/                          # Chatový systém, rozhraní Chat Service, Simple Chat Service, Základ relace, Single Chat Session, Group Chat Session, Broadcast Channel, Chat Message
-│   │   ├── Executors/                     # Základní třída Executor, Disk Executor, Network Executor, Command Line Executor, Executor Request, Executor Result
-│   │   ├── Tools/                         # Rozhraní nástroje, Tool Manager (reflexní skenování), Tool Call/Tool Result, definice nástroje, atribut pouze pro Silicon Manager
-│   │   ├── Security/                      # Permission Manager, Global Access Control List, Audit Logger, User Frequency Cache, Permission Result, Permission Type, rozhraní Permission Callback, rozhraní Permission Ask Handler
-│   │   ├── IM/                            # Rozhraní IM providera, IM Manager (směrování zpráv)
-│   │   ├── Storage/                       # Rozhraní úložiště, rozhraní Time Storage (key-value + časový index)
-│   │   ├── Config/                        # Základní třída Config Data, Config (singleton + JSON), převaděč základní třídy Config Data, převaděč Guid, atribut konfigurace AI klienta, atribut skupiny konfigurace, atribut ignorování konfigurace, převaděč informací o adresáři
-│   │   ├── Localization/                  # Základní třída lokalizace, Localization Manager, enumerace jazyka
-│   │   ├── Logging/                       # Rozhraní loggeru, rozhraní Logging providera, položka logu, úroveň logu, Logging Manager
-│   │   ├── Compilation/                   # Dynamic Being Loader, Dynamic Compilation Executor, Security Scanner, šifrování kódu
-│   │   └── Time/                          # Neúplné datum (dotaz rozsahu času)
+│   │   ├── AI/                            # Rozhraní AI klientů, správce kontextu, modely zpráv
+│   │   ├── Audit/                         # Systém auditu využití tokenů
+│   │   ├── Chat/                          # Systém chatu, správa relací, broadcast kanály
+│   │   ├── Compilation/                   # Dynamická kompilace, bezpečnostní skenování, šifrování kódu
+│   │   ├── Config/                        # Systém správy konfigurace
+│   │   ├── Executors/                     # Exekutory (disk, síť, příkazový řádek)
+│   │   ├── IM/                            # Rozhraní poskytovatelů instantních zpráv
+│   │   ├── Knowledge/                     # Systém znalostní sítě
+│   │   ├── Localization/                  # Lokalizační systém
+│   │   ├── Logging/                       # Systém protokolování
+│   │   ├── Project/                       # Systém správy projektů
+│   │   ├── Runtime/                       # Hlavní smyčka, objekty hodin, core hostitel
+│   │   ├── Security/                      # Systém správy oprávnění
+│   │   ├── SiliconBeing/                  # Základní třída silikonových bytostí, správce, továrna
+│   │   ├── Storage/                       # Rozhraní úložiště
+│   │   ├── Time/                          # Neúplná data (dotazování časového rozsahu)
+│   │   ├── Tools/                         # Rozhraní nástrojů a správce nástrojů
+│   │   ├── WebView/                       # Rozhraní WebView prohlížeče
+│   │   └── ServiceLocator.cs              # Globální lokátor služeb
 │   │
-│   └── SiliconLife.Default/               # Výchozí implementace + vstupní bod
-│       ├── Program.cs                     # Vstupní bod aplikace (sestavení všech komponent)
-│       ├── AI/                            # Ollama klient, Ollama Client Factory (nativní Ollama HTTP API); DashScope klient, DashScope Client Factory (Alibaba Cloud Bailian)
-│       ├── SiliconBeing/                  # Výchozí křemíková bytost, výchozí továrna křemíkových bytostí
-│       ├── Calendar/                      # 32 kalendářních implementací: Buddhist, Cherokee, Chinese Historical, Chinese Lunar, Chula Sakarat, Coptic, Dai, Dehong Dai, Ethiopian, French Republican, Gregorian, Hebrew, Indian, Inuit, Islamic, Japanese, Javanese, Juche, Julian, Khmer, Mayan, Mongolian, Persian, Republic of China, Roman, Saka, Sexagenary, Tibetan, Vietnamese, Vikram Samvat, Yi, Zoroastrian
-│       ├── Executors/                     # Výchozí implementace executorů
-│       ├── IM/                            # WebUI provider (Web UI jako IM kanál), IM Permission Ask Handler
-│       ├── Tools/                         # Vestavěné nástroje: Calendar, Chat, Config, Curator, Disk, Dynamic Compilation, Memory, Network, System, Task, Timer, Token Audit
+│   └── SiliconLife.Default/               # Výchozí implementace + vstup aplikace
+│       ├── Program.cs                     # Vstupní bod (sestavení všech komponent)
+│       ├── AI/                            # Klient Ollama, klient Bailian
+│       ├── Calendar/                      # 32 implementací kalendářů
 │       ├── Config/                        # Výchozí konfigurační data
-│       ├── Localization/                  # Zjednodušená čínština, Tradiční čínština, Americká angličtina, Japonština, Korejština, Španělština, Čeština, výchozí základ lokalizace, další angličtina (britská, kanadská, australská, indická, singapurská, jihoafrická, irská, novozélandská, malajsijská), další čínština (singapurská, macajská, tchajwanská, malajsijská), další španělština (mexická)
-│       ├── Logging/                       # Console Logging provider, FileSystem Logging provider
-│       ├── Storage/                       # FileSystem Storage, FileSystem Time Storage
-│       ├── Security/                      # Výchozí Permission Callback
-│       ├── Runtime/                       # Testovací objekt Clock
-│       └── Web/                           # Web UI implementace
-│           ├── Controllers/               # 18 kontrolerů: About, Audit, Being, Chat, CodeBrowser, CodeHover, Config, Dashboard, Executor, Init, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer
-│           ├── Models/                    # ViewModely: About, Audit, Being, Chat Message, Chat, CodeBrowser, Config, Dashboard, Executor, Knowledge, Log, Memory, Permission, PermissionRequest, Project, Task, Timer, ViewModel Base
-│           ├── Views/                     # 19 HTML pohledů: View Base, About, Audit, Being, Chat, CodeBrowser, CodeEditor, Config, Dashboard, Executor, Knowledge, Log, MarkdownEditor, Memory, Permission, Project, SoulEditor, Task, Timer
-│           ├── Skins/                     # 4 skiny: Admin (profesionální), Chat (konverzační), Creative (umělecký), Dev (orientovaný na vývojáře)
-│           ├── ISkin.cs                   # Rozhraní skinu + informace o náhledu skinu + Skin Manager (automatické objevování)
-│           ├── Controller.cs              # Základní třída kontroleru
-│           ├── WebHost.cs                 # HTTP server (HttpListener)
-│           ├── Router.cs                  # Směrování požadavků s podporou vzorů
-│           ├── SSEHandler.cs              # Server-Sent Events
-│           ├── WebSecurity.cs             # Nástroje webové bezpečnosti
-│           ├── H.cs                       # Streamovaný HTML Builder DSL
-│           ├── CssBuilder.cs              # Nástroj CSS Builderu
-│           └── JsBuilder.cs               # Nástroj JavaScript Builderu
+│       ├── Executors/                     # Výchozí implementace exekutorů
+│       ├── Help/                          # Systém nápovědy
+│       ├── IM/                            # Poskytovatel WebUI
+│       ├── Knowledge/                     # Implementace znalostní sítě
+│       ├── Localization/                  # Lokalizace 21 jazyků
+│       ├── Logging/                       # Implementace poskytovatelů protokolů
+│       ├── Project/                       # Implementace systémů projektů
+│       ├── Runtime/                       # Testovací objekty hodin
+│       ├── Security/                      # Výchozí zpětné volání oprávnění
+│       ├── SiliconBeing/                  # Výchozí implementace silikonových bytostí
+│       ├── Storage/                       # Implementace úložiště na souborovém systému
+│       ├── Tools/                         # 23 vestavěných nástrojů
+│       ├── WebView/                       # Implementace Playwright WebView
+│       └── Web/                           # Implementace Web UI
+│           ├── Controllers/               # 20+ kontrolerů
+│           ├── Models/                    # View modely
+│           ├── Views/                     # HTML pohledy
+│           └── Skins/                     # 4 témata skinů
 │
-├── docs/
-│   └── cs-CZ/                             # Česká dokumentace
+├── docs/                                  # Vícejazyčná dokumentace
+│   ├── zh-CN/                             # Dokumentace v zjednodušené čínštině
+│   ├── en/                                # Anglická dokumentace
+│   └── ...                                # Další jazykové dokumentace
+│
+└── 总文档/                                 # Dokumentace požadavků a architektury
+    ├── 需求文档.md
+    ├── 架构大纲.md
+    └── 实现顺序.md
 ```
 
-## Přehled architektury
+## 🏗️ Přehled architektury
 
+### Architektura rozvrhování
 ```
 Hlavní smyčka (vyhrazený thread, watchdog + jistič)
-  └── Objekty Clock (tříděno podle priority)
-       └── SiliconBeingManager
-            └── SiliconBeingRunner (dočasný thread na tick, timeout + jistič)
-                 └── DefaultSiliconBeing.Tick()
-                      └── ContextManager.ThinkChat()
-                           └── AI Klient.Chat() -> cyklus volání nástrojů -> persist do ChatSystemu
+  └── Objekty hodin (seřazeno podle priority)
+       └── Správce silikonových bytostí
+            └── Běžec silikonových bytostí (dočasný thread, timeout + jistič)
+                 └── SiliconBeing.Tick()
+                      └── ContextManager.思考()
+                           └── AI Klient.Chat()
+                                └── Cyklus volání nástrojů → Perzistence do systému chatu
 ```
 
-Všechny I/O operace iniciované AI musí procházet bezpečnostním řetězcem:
+### Bezpečnostní architektura
+Všechny I/O operace iniciované AI musí procházet přísným bezpečnostním řetězcem:
 
 ```
-Volání nástroje -> Executor -> Permission Manager -> [IsCurator -> Frequence Cache -> GlobalACL -> Callback -> Dotaz uživatele]
+Volání nástroje → Exekutor → Správce oprávnění → [IsCurator → Frekvenční cache → GlobalACL → Zpětné volání → Dotaz uživatele]
 ```
 
-## Rychlý start
+## 🚀 Rychlý start
 
-### Požadavky
+### Předpoklady
 
-- .NET 9 SDK
-- AI backend (vyberte jeden):
-  - **Ollama**: [Ollama](https://ollama.com) běžící lokálně s nataženými modely (např. `ollama pull llama3`)
-  - **Alibaba Cloud Bailian**: Získejte platný API klíč z [Bailian Console](https://bailian.console.aliyun.com/)
+- **.NET 9 SDK** — [Odkaz ke stažení](https://dotnet.microsoft.com/download/dotnet/9.0)
+- **AI Backend** (vyberte jeden):
+  - **Ollama**: [Instalace Ollama](https://ollama.com) a pull modelu (např. `ollama pull llama3`)
+  - **Alibaba Cloud Bailian**: Získejte API klíč z [Bailian konzole](https://bailian.console.aliyun.com/)
 
-### Build
+### Sestavení projektu
 
 ```bash
 dotnet restore
 dotnet build
 ```
 
-### Spuštění
+### Spuštění systému
 
 ```bash
 dotnet run --project src/SiliconLife.Default
@@ -149,38 +163,84 @@ dotnet run --project src/SiliconLife.Default
 
 Aplikace spustí webový server a automaticky otevře Web UI v prohlížeči.
 
-### Publikování (jeden soubor)
+### Publikování jako jeden soubor
 
 ```bash
+# Windows
 dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
+
+# Linux
+dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS
+dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
-## Roadmapa
+## 📋 Roadmapa vývoje
 
-- [x] Fáze 1: Konzolový AI Chat
-- [x] Fáze 2: Kostra frameworku (hlavní smyčka + objekty Clock + watchdog + jistič)
-- [x] Fáze 3: První křemíková bytost se souborem duše (architektura Tělo-Mozek)
-- [x] Fáze 4: Persistující paměť (Chat System + rozhraní Time Storage)
-- [x] Fáze 5: Systém nástrojů + Executory
-- [x] Fáze 6: Systém oprávnění (5-úrovňový řetězec, Audit Logger, GlobalACL)
-- [x] Fáze 7: Dynamická kompilace + sebe-evoluce (Roslyn)
+### ✅ Dokončeno
+- [x] Fáze 1: Konzolový AI chat
+- [x] Fáze 2: Kostra frameworku (hlavní smyčka + objekty hodin + watchdog + jistič)
+- [x] Fáze 3: První silikonová bytost se souborem duše (architektura Tělo-Mozek)
+- [x] Fáze 4: Perzistentní paměť (systém chatu + rozhraní časového úložiště)
+- [x] Fáze 5: Systém nástrojů + Exekutory
+- [x] Fáze 6: Systém oprávnění (5úrovňový řetězec, audit logger, Global ACL)
+- [x] Fáze 7: Dynamická kompilace + Sebevývoj (Roslyn)
 - [x] Fáze 8: Dlouhodobá paměť + Úkoly + Časovače
-- [x] Fáze 9: Core Host + multi-agentní spolupráce
-- [x] Fáze 10: Web UI (HTTP + SSE, 18 kontrolerů, 4 skiny)
-- [x] Fáze 10.5: Přírůstková vylepšení (BroadcastChannel, TokenAudit, 32 kalendářů, vylepšení nástrojů, lokalizace 21 jazyků)
-- [ ] Fáze 11: Externí IM integrace (Feishu / WhatsApp / Telegram)
-- [ ] Fáze 12: Knowledge Graph, Plugin System a Skill Ecosystem
+- [x] Fáze 9: Core Hostitel + Spolupráce více agentů
+- [x] Fáze 10: Web UI (HTTP + SSE, 20+ kontrolerů, 4 skiny)
+- [x] Fáze 10.5: Přírůstková vylepšení (broadcast kanál, audit tokenů, 32 kalendářů, vylepšení nástrojů, lokalizace 21 jazyků)
+- [x] Fáze 10.6: Dokončení a optimalizace (WebView, systém nápovědy, pracovní prostor projektu, znalostní síť)
 
-## Dokumentace
+### 🚧 Plánováno
+- [ ] Fáze 11: Integrace externích instantních zpráv (Feishu / WhatsApp / Telegram)
+- [ ] Fáze 12: Systém pluginů a ekosystém dovedností
 
-- [Architektura](architecture.md) — Návrh systému, scheduling, architektura komponent
-- [Bezpečnost](security.md) — Model oprávnění, Executory, bezpečnost dynamické kompilace
-- [Roadmapa](roadmap.md) — Detailní 12-fázový vývojový plán
+## 📚 Dokumentace
 
-## Licence
+- [Návrh architektury](architecture.md) — Systémový design, mechanismus rozvrhování, architektura komponent
+- [Bezpečnostní model](security.md) — Model oprávnění, exekutory, bezpečnost dynamické kompilace
+- [Vývojářský průvodce](development-guide.md) — Vývoj nástrojů, průvodce rozšířením
+- [API reference](api-reference.md) — Dokumentace Web API endpointů
+- [Reference nástrojů](tools-reference.md) — Podrobný popis vestavěných nástrojů
+- [Průvodce Web UI](web-ui-guide.md) — Průvodce použitím webového rozhraní
+- [Průvodce silikonovou bytostí](silicon-being-guide.md) — Průvodce vývojem agentů
+- [Systém oprávnění](permission-system.md) — Podrobnosti správy oprávnění
+- [Kalendářní systém](calendar-system.md) — Popis 32 kalendářních systémů
+- [Rychlý start](getting-started.md) — Podrobný úvodní průvodce
+- [Odstraňování problémů](troubleshooting.md) — FAQ
+- [Roadmapa](roadmap.md) — Kompletní plán vývoje
+- [Changelog](changelog.md) — Historie aktualizací verzí
+- [Příspěvek](contributing.md) — Jak se zapojit do projektu
 
-Tento projekt je licencován pod licencí Apache License 2.0 — viz soubor [LICENSE](LICENSE).
+## 🤝 Přispívání
 
-## Autor
+Vítáme všechny formy příspěvků! Podrobnosti naleznete v [Průvodci přispíváním](contributing.md).
 
-Hoshino Kennji — [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective) | [Gitee](https://gitee.com/hoshinokennji/SiliconLifeCollective) | [YouTube](https://www.youtube.com/@hoshinokennji) | [Bilibili](https://space.bilibili.com/617827040)
+### Vývojářský workflow
+1. Forkněte toto repo
+2. Vytvořte větev funkce (`git checkout -b feature/AmazingFeature`)
+3. Commitněte změny (`git commit -m 'feat: add some AmazingFeature'`)
+4. Pushněte do větve (`git push origin feature/AmazingFeature`)
+5. Otevřete Pull Request
+
+## 📄 Licence
+
+Tento projekt je licencován pod Apache License 2.0 — viz soubor [LICENSE](../../LICENSE).
+
+## 👨‍💻 Autor
+
+**Hoshino Kennji**
+
+- GitHub: [@akimoto-akira](https://github.com/akimoto-akira/SiliconLifeCollective)
+- Gitee: [hoshinokennji](https://gitee.com/hoshinokennji/SiliconLifeCollective)
+- YouTube: [@hoshinokennji](https://www.youtube.com/@hoshinokennji)
+- Bilibili: [617827040](https://space.bilibili.com/617827040)
+
+## 🙏 Poděkování
+
+Děkujeme všem vývojářům a poskytovatelům AI platforem, kteří přispěli k tomuto projektu.
+
+---
+
+**Silicon Life Collective** — Nechte AI agenty skutečně "ožít"

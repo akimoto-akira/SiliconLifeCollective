@@ -1,12 +1,12 @@
-# Troubleshooting Guide
+﻿# Troubleshooting Guide
 
-[English](troubleshooting.md) | [简体中文](docs/zh-CN/troubleshooting.md) | [繁體中文](docs/zh-HK/troubleshooting.md) | [Español](docs/es-ES/troubleshooting.md) | [日本語](docs/ja-JP/troubleshooting.md) | [한국어](docs/ko-KR/troubleshooting.md) | [Čeština](docs/cs-CZ/troubleshooting.md)
+[English](../en/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md)
 
 ## Common Issues
 
-### Build & Compilation
+### Build and Compilation
 
-#### Issue: Build Fails with Missing Dependencies
+#### Issue: Build fails with missing dependencies
 
 **Symptoms**:
 ```
@@ -19,7 +19,7 @@ dotnet restore
 dotnet build
 ```
 
-#### Issue: .NET SDK Not Found
+#### Issue: .NET SDK not found
 
 **Symptoms**:
 ```
@@ -37,7 +37,7 @@ dotnet --version
 
 ### AI Connection Issues
 
-#### Issue: Ollama Connection Refused
+#### Issue: Ollama connection refused
 
 **Symptoms**:
 ```
@@ -56,7 +56,7 @@ ollama serve
 curl http://localhost:11434/api/tags
 ```
 
-#### Issue: Model Not Found
+#### Issue: Model not found
 
 **Symptoms**:
 ```
@@ -72,7 +72,7 @@ ollama pull qwen2.5:7b
 ollama list
 ```
 
-#### Issue: DashScope 404 Error
+#### Issue: DashScope 404 error
 
 **Symptoms**:
 ```
@@ -83,13 +83,13 @@ HTTP 404: Model not found
 1. Verify API key is correct
 2. Check model name matches DashScope catalog
 3. Verify region endpoint is correct
-4. Check account has access to that model
+4. Check account has access to the model
 
 ---
 
 ### Runtime Issues
 
-#### Issue: Port Already in Use
+#### Issue: Port already in use
 
 **Symptoms**:
 ```
@@ -109,9 +109,9 @@ taskkill /PID <PID> /F
 lsof -ti:8080 | xargs kill -9
 ```
 
-**Or change port** in configuration.
+**Or change the port in configuration**.
 
-#### Issue: Being Won't Start
+#### Issue: Being won't start
 
 **Symptoms**:
 - Being status shows "Error"
@@ -125,7 +125,7 @@ lsof -ti:8080 | xargs kill -9
 tail -f logs/*.log
 ```
 
-#### Issue: Out of Memory
+#### Issue: Out of memory
 
 **Symptoms**:
 ```
@@ -152,7 +152,7 @@ mkdir logs
 
 ### Permission Issues
 
-#### Issue: Permission Denied
+#### Issue: Permission denied
 
 **Symptoms**:
 ```
@@ -178,21 +178,21 @@ curl -X POST http://localhost:8080/api/permissions \
 
 3. Or use Web UI: Permission Management
 
-#### Issue: Permission Not Expiring
+#### Issue: Permissions not expiring
 
 **Symptoms**:
-- Permission persists beyond expiry time
+- Permissions remain active after expiration time
 
 **Solution**:
 1. Check system clock synchronization
-2. Verify `expiresAt` field is set correctly
+2. Verify `expiresAt` field set correctly
 3. Clear permission cache
 
 ---
 
 ### Web UI Issues
 
-#### Issue: Can't Access Web UI
+#### Issue: Cannot access Web UI
 
 **Symptoms**:
 - Browser shows "Connection refused"
@@ -203,11 +203,11 @@ curl -X POST http://localhost:8080/api/permissions \
 3. Check firewall settings
 4. Check logs for startup errors
 
-#### Issue: SSE Not Working
+#### Issue: SSE not working
 
 **Symptoms**:
 - Real-time updates not appearing
-- Chat doesn't stream
+- Chat not streaming
 
 **Solution**:
 1. Check browser supports SSE
@@ -215,11 +215,11 @@ curl -X POST http://localhost:8080/api/permissions \
 3. Check network stability
 4. Try different browser
 
-#### Issue: UI Looks Broken
+#### Issue: UI looks broken
 
 **Symptoms**:
-- Styling is incorrect
-- Layout is broken
+- Styles incorrect
+- Layout broken
 
 **Solution**:
 1. Clear browser cache
@@ -231,7 +231,7 @@ curl -X POST http://localhost:8080/api/permissions \
 
 ### Storage Issues
 
-#### Issue: Can't Read/Write Data
+#### Issue: Cannot read/write data
 
 **Symptoms**:
 ```
@@ -242,13 +242,13 @@ IOException: Access denied
 1. Check file permissions
 2. Verify storage path exists
 3. Check disk space
-4. Run with appropriate privileges
+4. Run with appropriate permissions
 
-#### Issue: Data Corruption
+#### Issue: Data corruption
 
 **Symptoms**:
 - JSON parse errors
-- Missing data
+- Data loss
 
 **Solution**:
 1. Restore from backup
@@ -257,13 +257,13 @@ IOException: Access denied
 # Via Web UI: System > Storage Check
 ```
 
-3. Fix corrupted files manually
+3. Manually fix corrupted files
 
 ---
 
 ### Tool Execution Issues
 
-#### Issue: Tool Not Found
+#### Issue: Tool not found
 
 **Symptoms**:
 ```
@@ -272,11 +272,11 @@ Tool "xyz" not found
 
 **Solution**:
 1. Verify tool name is correct
-2. Check tool is in Tools directory
-3. Rebuild project
-4. Check tool is properly implemented
+2. Check tool exists in Tools directory
+3. Rebuild the project
+4. Check tool implements correctly
 
-#### Issue: Tool Returns Error
+#### Issue: Tool returns error
 
 **Symptoms**:
 ```
@@ -293,7 +293,7 @@ Tool execution failed: ...
 
 ### Work Notes Issues
 
-#### Issue: Cannot Create Work Notes
+#### Issue: Cannot create work note
 
 **Symptoms**:
 ```
@@ -301,40 +301,40 @@ Failed to create work note
 ```
 
 **Solution**:
-1. Check if being exists and is running
+1. Check being exists and is running
 2. Verify storage path has write permissions
-3. Check if content is empty (content required)
-4. Check logs for detailed error information
+3. Check content is not empty (content required)
+4. View logs for detailed error
 
-#### Issue: Note Search Returns No Results
+#### Issue: Note search returns no results
 
 **Symptoms**:
 - Search keyword returns empty results
-- But certain related notes exist
+- But certain relevant notes exist
 
 **Solution**:
-1. Check if keyword spelling is correct
-2. Try a more general keyword
-3. Verify note contains that keyword (case-sensitive)
+1. Check keyword spelling is correct
+2. Try using more general keywords
+3. Verify note contains the keyword (case-sensitive)
 4. Increase `max_results` parameter value
 
-#### Issue: Note Directory Generation is Slow
+#### Issue: Note directory generation is slow
 
 **Symptoms**:
 - Long response time when generating directory
-- Being has many notes (>1000 pages)
+- Being has large number of notes (>1000 pages)
 
 **Solution**:
 1. This is normal, needs to iterate through all notes
-2. Consider archiving old notes periodically
+2. Consider archiving old notes regularly
 3. Use search function instead of directory browsing
-4. Planned optimization: add directory caching mechanism
+4. Planned optimization: Add directory caching mechanism
 
 ---
 
 ### Knowledge Network Issues
 
-#### Issue: Knowledge Query Returns Empty Results
+#### Issue: Knowledge query returns empty results
 
 **Symptoms**:
 ```
@@ -352,7 +352,7 @@ No knowledge triples found
 }
 ```
 
-#### Issue: Knowledge Path Finding Fails
+#### Issue: Knowledge path finding fails
 
 **Symptoms**:
 ```
@@ -361,11 +361,11 @@ No path found between concepts
 
 **Solution**:
 1. Verify both concepts exist in knowledge network
-2. Check if associative path exists (may have no direct or indirect relationship)
-3. Try adding more knowledge to establish connection
-4. Lower path length limit (if configured)
+2. Check if association path exists (may have no direct or indirect relationship)
+3. Try adding more knowledge to establish connections
+4. Reduce path length limit (if set)
 
-#### Issue: Knowledge Validation Fails
+#### Issue: Knowledge validation fails
 
 **Symptoms**:
 ```
@@ -373,28 +373,28 @@ Knowledge validation failed
 ```
 
 **Solution**:
-1. Check if triple format is correct (subject, predicate, object required)
-2. Verify confidence is within 0.0-1.0 range
+1. Check triple format is correct (subject, predicate, object required)
+2. Verify confidence is in 0.0-1.0 range
 3. Check for duplicate triples
-4. Review validation error details to understand specific problem
+4. View validation error details for specific issues
 
-#### Issue: Knowledge Network Statistics Inaccurate
+#### Issue: Knowledge network statistics inaccurate
 
 **Symptoms**:
-- Statistics numbers don't match expectations
+- Statistics don't match expectations
 - Statistics not updated after adding knowledge
 
 **Solution**:
-1. Statistics may take a few seconds to update (cache)
-2. Check if delete operation executed successfully
+1. Statistics may take a few seconds to update (caching)
+2. Check if delete operation didn't execute successfully
 3. Restart application to force statistics refresh
-4. Re-query statistics information through API
+4. Re-query statistics via API
 
 ---
 
 ### Project Management Issues
 
-#### Issue: Cannot Create Project
+#### Issue: Cannot create project
 
 **Symptoms**:
 ```
@@ -402,22 +402,22 @@ Failed to create project
 ```
 
 **Solution**:
-1. Check if project name is empty (required)
-2. Verify project name is not duplicated
+1. Check project name is not empty (required)
+2. Verify project name is not duplicate
 3. Check storage path has write permissions
-4. Check logs for detailed error information
+4. View logs for detailed error
 
-#### Issue: Project Data Loss
+#### Issue: Project data lost
 
 **Symptoms**:
-- Cannot load project information
-- Project file corrupted
+- Project information cannot load
+- Project files corrupted
 
 **Solution**:
 1. Check if project storage directory exists
 2. Restore project data from backup
 3. Verify JSON file format is correct
-4. Manually repair corrupted project file
+4. Manually fix corrupted project files
 
 ---
 
@@ -436,7 +436,7 @@ Edit configuration:
 
 ### Check Logs
 
-Logs are stored in:
+Logs are stored at:
 ```
 logs/
 ├── system.log
@@ -450,7 +450,7 @@ View in real-time:
 tail -f logs/*.log
 ```
 
-### Use Debugger
+### Using Debugger
 
 ```bash
 # Run with debugger
@@ -464,7 +464,7 @@ dotnet run --project src/SiliconLife.Default --configuration Debug
 
 ## Performance Issues
 
-### Slow Response Times
+### Slow Response Time
 
 **Optimize**:
 1. Reduce AI model complexity
@@ -475,7 +475,7 @@ dotnet run --project src/SiliconLife.Default --configuration Debug
 ### High CPU Usage
 
 **Check**:
-- Running too many beings
+- Too many beings running
 - Infinite loops in tools
 - Frequent timer executions
 
@@ -500,9 +500,9 @@ dotnet run --project src/SiliconLife.Default --configuration Debug
 
 ## Getting Help
 
-### Check Documentation
+### View Documentation
 
-- [Getting Started Guide](getting-started.md)
+- [Quick Start Guide](getting-started.md)
 - [Development Guide](development-guide.md)
 - [API Reference](api-reference.md)
 - [Architecture Guide](architecture.md)
@@ -555,14 +555,14 @@ dotnet run --project src/SiliconLife.Default
 1. **Regular Backups**
    - Backup data directory
    - Backup configuration
-   - Test restore procedure
+   - Test recovery process
 
 2. **Monitor Resources**
-   - Watch CPU/Memory usage
+   - Watch CPU/memory usage
    - Monitor disk space
    - Check network connectivity
 
-3. **Keep Updated**
+3. **Stay Updated**
    - Update .NET SDK
    - Update dependencies
    - Apply security patches
@@ -578,5 +578,5 @@ dotnet run --project src/SiliconLife.Default
 
 - 📚 Read the [Architecture Guide](architecture.md)
 - 🛠️ Check the [Development Guide](development-guide.md)
-- 🚀 See the [Getting Started Guide](getting-started.md)
+- 🚀 See the [Quick Start Guide](getting-started.md)
 - 🔒 Review the [Security Documentation](security.md)

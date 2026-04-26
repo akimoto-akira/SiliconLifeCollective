@@ -1,10 +1,10 @@
-# Silicon Being Guide
+﻿# Silicon Being Guide
 
-[English](silicon-being-guide.md) | [简体中文](docs/zh-CN/silicon-being-guide.md) | [繁體中文](docs/zh-HK/silicon-being-guide.md) | [Español](docs/es-ES/silicon-being-guide.md) | [日本語](docs/ja-JP/silicon-being-guide.md) | [한국어](docs/ko-KR/silicon-being-guide.md) | [Čeština](docs/cs-CZ/silicon-being-guide.md)
+[English](../en/silicon-being-guide.md) | [中文](../zh-CN/silicon-being-guide.md) | [繁體中文](../zh-HK/silicon-being-guide.md) | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | [한국어](../ko-KR/silicon-being-guide.md) | [Deutsch](../de-DE/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md)
 
 ## Overview
 
-Silicon Beings are AI-powered agents that can think, act, and evolve autonomously.
+Silicon beings are AI-driven agents that can think, act, and evolve autonomously.
 
 ## Architecture
 
@@ -12,15 +12,15 @@ Silicon Beings are AI-powered agents that can think, act, and evolve autonomousl
 
 ```
 ┌─────────────────────────────────────┐
-│         Silicon Being               │
+│         Silicon Being                │
 ├──────────────────┬──────────────────┤
-│   Body           │   Brain          │
+│   Body            │   Brain          │
 │ (SiliconBeing)   │ (ContextManager) │
 ├──────────────────┼──────────────────┤
-│ • State管理      │ • 加载历史记录    │
-│ • 触发检测       │ • 调用AI         │
-│ • 生命周期       │ • 执行工具       │
-│                  │ • 持久化响应      │
+│ • State          │ • Load history   │
+│ • Trigger detect │ • Call AI        │
+│ • Lifecycle      │ • Execute tools  │
+│                  │ • Persist        │
 └──────────────────┴──────────────────┘
 ```
 
@@ -69,7 +69,7 @@ You provide constructive feedback and always explain your reasoning.
 Specialized in C#, .NET, and software architecture.
 ```
 
-## Creating a Being
+## Creating Beings
 
 ### Via Web UI
 
@@ -105,13 +105,13 @@ Created → Starting → Running → Stopping → Stopped
 ### Operations
 
 - **Start**: Initialize and begin processing
-- **Stop**: Gracefully shutdown
-- **Pause**: Temporarily suspend (keep state)
+- **Stop**: Graceful shutdown
+- **Pause**: Temporary suspend (maintains state)
 - **Resume**: Continue from paused state
 
 ## Task System
 
-### Creating Tasks
+### Create Task
 
 ```csharp
 var task = new BeingTask
@@ -127,18 +127,18 @@ await taskSystem.CreateAsync(task);
 
 ### Task States
 
-- `Pending` - Waiting to be executed
+- `Pending` - Waiting execution
 - `Running` - Currently executing
-- `Completed` - Successfully finished
+- `Completed` - Successfully completed
 - `Failed` - Execution failed
 - `Cancelled` - Manually cancelled
 
 ## Timer System
 
-### Types of Timers
+### Timer Types
 
-1. **One-shot**: Execute once after delay
-2. **Interval**: Execute repeatedly at fixed intervals
+1. **One-time**: Execute once after delay
+2. **Interval**: Repeat at fixed intervals
 3. **Cron**: Execute based on cron expression
 
 ### Example
@@ -184,42 +184,42 @@ data/
 
 ### Overview
 
-Work notes are the personal diary system for silicon beings, using a page-based design to record work progress, learning notes, project notes, etc.
+Work notes are a personal diary system for silicon beings, using a page-based design to record work progress, learning notes, project notes, etc.
 
 ### Features
 
-- **Page Management**: Each note is an independent page, accessed by page number
-- **Markdown Support**: Content supports Markdown format (text, lists, tables, code blocks)
-- **Keyword Indexing**: Support adding keywords to notes for easy searching
-- **Summary Feature**: Each note has a short summary for quick browsing
-- **Directory Generation**: Can generate a directory overview of all notes, helping understand overall context
-- **Timestamps**: Automatic recording of creation and update times
-- **Private by Default**: Only the being can access (curator can manage)
+- **Page-based management**: Each note is independent, accessed by page number
+- **Markdown support**: Content supports Markdown format (text, lists, tables, code blocks)
+- **Keyword indexing**: Supports adding keywords to notes for easy search
+- **Summary feature**: Each note has a brief summary for quick browsing
+- **Table of contents generation**: Can generate directory overview of all notes to help understand overall context
+- **Timestamps**: Automatically records creation and update times
+- **Private by default**: Only accessible by the being itself (curator can manage)
 
 ### Use Cases
 
 1. **Project Progress Recording**
    ```
-   Summary: User authentication module completed
+   Summary: Completed user authentication module
    Content: Implemented JWT token verification, OAuth2 integration, refresh token mechanism
    Keywords: authentication,JWT,OAuth2
    ```
 
 2. **Learning Notes**
    ```
-   Summary: Learning C# async programming best practices
-   Content: async/await usage precautions, ConfigureFlags usage scenarios...
+   Summary: Learn C# async programming best practices
+   Content: async/await usage注意事项, ConfigureAwait usage scenarios...
    Keywords: C#,async,best practices
    ```
 
 3. **Meeting Minutes**
    ```
    Summary: Product requirements discussion meeting
-   Content: Discussed new feature requirements, determined implementation plan...
+   Content: Discussed new feature requirements, determined implementation approach...
    Keywords: product,requirements,meeting
    ```
 
-### Usage Through Tools
+### Using via Tool
 
 Beings can manage work notes through the `work_note` tool:
 
@@ -227,8 +227,8 @@ Beings can manage work notes through the `work_note` tool:
 // Create note
 {
   "action": "create",
-  "summary": "User authentication module completed",
-  "content": "## Implementation Details\n\n- Using JWT token\n- OAuth2 support",
+  "summary": "Completed user authentication module",
+  "content": "## Implementation Details\n\n- Used JWT token\n- Supports OAuth2",
   "keywords": "authentication,JWT,OAuth2"
 }
 
@@ -246,25 +246,25 @@ Beings can manage work notes through the `work_note` tool:
 }
 ```
 
-### Management Through Web UI
+### Managing via Web UI
 
 1. Navigate to **Being Management** → Select being
 2. Click **Work Notes** tab
 3. Can view, search, edit notes
-4. Markdown preview support
+4. Supports Markdown preview
 
 ## Knowledge Network System
 
 ### Overview
 
-The knowledge network is a knowledge representation and management system based on triple structure (subject-predicate-object), used for storing and managing structured knowledge.
+The knowledge network is a knowledge representation and management system based on triple structure (subject-predicate-object), used to store and manage structured knowledge.
 
 ### Core Concepts
 
 #### Triple Structure
 
 ```
-Subject (Subject) --Predicate (Predicate)--> Object (Object)
+Subject --Predicate--> Object
 ```
 
 **Examples**:
@@ -275,14 +275,14 @@ Subject (Subject) --Predicate (Predicate)--> Object (Object)
 #### Confidence
 
 Each knowledge triple has a confidence score (0.0-1.0), indicating the reliability of the knowledge:
-- `1.0`: Absolutely certain (mathematical theorems, etc.)
-- `0.8-0.99`: High confidence (verified facts, etc.)
-- `0.5-0.79`: Medium confidence (inferences or hypotheses, etc.)
-- `<0.5`: Low confidence (guesses or unverified information, etc.)
+- `1.0`: Absolutely certain (e.g., mathematical theorems)
+- `0.8-0.99`: Highly reliable (e.g., verified facts)
+- `0.5-0.79`: Moderately reliable (e.g., inference or hypothesis)
+- `<0.5`: Low reliability (e.g., guess or unverified information)
 
 #### Tag System
 
-Support adding tags to triples for easy classification and search:
+Supports adding tags to triples for categorization and search:
 ```json
 {
   "subject": "Python",
@@ -327,9 +327,9 @@ Support adding tags to triples for easy classification and search:
 }
 ```
 
-#### 4. Discover Knowledge Path
+#### 4. Discover Knowledge Paths
 
-Find associative paths between two concepts:
+Find association paths between two concepts:
 ```json
 {
   "action": "get_path",
@@ -345,7 +345,7 @@ Python → is_a → programming_language → belongs_to → computer_science
 
 #### 5. Validate Knowledge
 
-Check validity and consistency of knowledge:
+Check knowledge validity and consistency:
 ```json
 {
   "action": "validate",
@@ -378,49 +378,163 @@ Returns:
 ### Use Cases
 
 1. **Fact Storage**
-   - Store objective facts and common sense
-   - Example: `Earth` --`is_a`--> `Planet`
+   - Store objective facts and common knowledge
+   - Example: `Earth` --`is_a`--> `planet`
 
 2. **Concept Relationships**
    - Record relationships between concepts
-   - Example: `Inheritance` --`is_a`--> `Object-oriented programming concept`
+   - Example: `Inheritance` --`is_a`--> `OOP concept`
 
 3. **Learning Accumulation**
    - Beings continuously accumulate knowledge through learning
-   - Form structured knowledge systems
+   - Form structured knowledge system
 
 4. **Reasoning Support**
    - Discover indirect relationships through knowledge paths
    - Support knowledge-based reasoning and decision-making
 
-### Management Through Web UI
+### Managing via Web UI
 
 1. Navigate to **Knowledge Network** page
 2. View knowledge statistics
 3. Search and browse knowledge
 4. Visualize knowledge relationship graph (planned)
 
+## WebView Browser Operations (New)
+
+### Overview
+
+Silicon beings can autonomously browse web pages, obtain information, and perform web operations through the WebView browser tool. The browser runs in headless mode, completely invisible to users.
+
+### Features
+
+- **Individual isolation**: Each being has independent browser instance, cookies, and sessions
+- **Headless mode**: Autonomous operation in background, invisible to users
+- **Full functionality**: Supports JavaScript execution, CSS rendering, form filling, etc.
+- **Security control**: All operations must pass through permission verification chain
+
+### Common Operations
+
+#### 1. Open Browser
+
+```json
+{
+  "action": "open_browser"
+}
+```
+
+#### 2. Navigate to Web Page
+
+```json
+{
+  "action": "navigate",
+  "url": "https://example.com"
+}
+```
+
+#### 3. Get Page Content
+
+```json
+{
+  "action": "get_page_text"
+}
+```
+
+Returns page text content for AI analysis and understanding.
+
+#### 4. Click Element
+
+```json
+{
+  "action": "click",
+  "selector": "#submit-button"
+}
+```
+
+#### 5. Input Text
+
+```json
+{
+  "action": "input",
+  "selector": "#search-input",
+  "text": "Search keyword"
+}
+```
+
+#### 6. Execute JavaScript
+
+```json
+{
+  "action": "execute_script",
+  "script": "return document.title;"
+}
+```
+
+#### 7. Get Screenshot
+
+```json
+{
+  "action": "get_screenshot"
+}
+```
+
+Returns page screenshot (Base64 encoded), can be used for visual analysis.
+
+#### 8. Wait for Element
+
+```json
+{
+  "action": "wait_for_element",
+  "selector": ".loading-complete",
+  "timeout": 10000
+}
+```
+
+### Use Cases
+
+1. **Information Retrieval**
+   - Browse news websites for latest information
+   - Query documentation and technical resources
+   - Monitor web page content changes
+
+2. **Automated Operations**
+   - Fill forms and submit
+   - Click buttons to trigger operations
+   - Scrape web data
+
+3. **Web Analysis**
+   - Analyze page structure and content
+   - Extract specific information
+   - Visual page screenshot analysis
+
+### Notes
+
+- Browser operations may be slower, need to wait for page loading
+- Use `wait_for_element` to ensure element appears before operating
+- Comply with website terms of use and robots.txt
+- Avoid frequent requests that may lead to banning
+
 ## Best Practices
 
 ### Soul File Writing
 
-1. **Be Specific**: Clear personality traits and boundaries
-2. **Define Scope**: What the being should and shouldn't do
-3. **Include Examples**: Show expected behavior patterns
-4. **Update Regularly**: Evolve the soul based on performance
+1. **Be specific**: Clear personality traits and boundaries
+2. **Define scope**: What the being should and shouldn't do
+3. **Include examples**: Show expected behavior patterns
+4. **Update regularly**: Evolve soul based on performance
 
 ### Task Management
 
-1. **Set Priorities**: Use priority levels (1-10)
-2. **Define Deadlines**: Always set due dates
-3. **Monitor Progress**: Check task status regularly
-4. **Handle Failures**: Implement retry logic
+1. **Set priorities**: Use priority levels (1-10)
+2. **Define deadlines**: Always set deadlines
+3. **Monitor progress**: Regularly check task status
+4. **Handle failures**: Implement retry logic
 
 ### Memory Optimization
 
-1. **Clean Old Data**: Periodically archive old memories
-2. **Index Important Info**: Tag critical information
-3. **Use Time Storage**: Leverage time-indexed queries
+1. **Clean old data**: Regularly archive old memories
+2. **Index important info**: Tag critical information
+3. **Use time storage**: Leverage time-indexed queries
 
 ## Troubleshooting
 
@@ -431,10 +545,10 @@ Returns:
 - AI client is configured
 - Sufficient system resources
 
-### Being Stopped Unexpectedly
+### Being Stops Unexpectedly
 
 **Check**:
-- Logs for errors
+- Errors in logs
 - AI service availability
 - Memory usage
 
@@ -442,11 +556,11 @@ Returns:
 
 **Check**:
 - Timer system is running
-- Task priority and schedule
+- Task priority and scheduling
 - Permission settings
 
 ## Next Steps
 
 - 📚 Read the [Architecture Guide](architecture.md)
 - 🛠️ Check the [Development Guide](development-guide.md)
-- 🚀 See the [Getting Started Guide](getting-started.md)
+- 🚀 See the [Quick Start Guide](getting-started.md)

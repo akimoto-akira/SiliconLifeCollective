@@ -1,6 +1,6 @@
-# 架构
+﻿# 架构
 
-[English](architecture.md) | [中文](docs/zh-CN/architecture.md) | [繁體中文](docs/zh-HK/architecture.md) | [Español](docs/es-ES/architecture.md) | [日本語](docs/ja-JP/architecture.md) | [한국어](docs/ko-KR/architecture.md) | [Čeština](docs/cs-CZ/architecture.md)
+[English](../en/architecture.md) | [Deutsch](../de-DE/architecture.md) | **中文** | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md)
 
 ## 核心概念
 
@@ -357,7 +357,7 @@
 
 ---
 
-## 日历系统
+### 日历系统
 
 系统包含 **32 种日历实现**，派生自抽象 `CalendarBase` 类，涵盖世界主要日历系统：
 
@@ -366,6 +366,7 @@
 | BuddhistCalendar | `buddhist` | 佛历（BE），年份 + 543 |
 | CherokeeCalendar | `cherokee` | 切罗基日历系统 |
 | ChineseLunarCalendar | `lunar` | 中国农历，带闰月 |
+| ChineseHistoricalCalendar | `chinese_historical` | 中国历史历法，支持干支纪年和帝王年号 |
 | ChulaSakaratCalendar | `chula_sakarat` | 朱拉萨卡拉特历（CS），年份 - 638 |
 | CopticCalendar | `coptic` | 科普特历 |
 | DaiCalendar | `dai` | 傣历，带完整农历计算 |
@@ -429,7 +430,7 @@ Web UI 完全避免模板文件，在 C# 中生成所有标记：
 
 ### 控制器系统
 
-Web UI 遵循**类 MVC 模式**，17 个控制器处理不同方面：
+Web UI 遵循**类 MVC 模式**，20+ 个控制器处理不同方面：
 
 | 控制器 | 用途 |
 |------------|---------|
@@ -437,19 +438,23 @@ Web UI 遵循**类 MVC 模式**，17 个控制器处理不同方面：
 | Audit | Token 使用审计仪表板，带趋势图和导出 |
 | Being | 硅基生命体管理和状态 |
 | Chat | 带 SSE 的实时聊天界面 |
+| ChatHistory | 聊天历史查看，支持会话列表和消息详情 |
 | CodeBrowser | 代码查看和编辑 |
+| CodeHover | 代码悬浮提示，支持语法高亮 |
 | Config | 系统配置管理 |
 | Dashboard | 系统概览和指标 |
 | Executor | 执行器状态和管理 |
+| Help | 帮助文档系统，多语言支持 |
 | Init | 首次运行初始化向导 |
-| Knowledge | 知识图谱可视化（占位符） |
-| Log | 系统日志查看器 |
+| Knowledge | 知识图谱可视化和查询 |
+| Log | 系统日志查看器，支持硅基生命体筛选 |
 | Memory | 长期记忆浏览器，支持高级过滤、统计和详情视图 |
 | Permission | 权限管理 |
 | PermissionRequest | 权限请求队列 |
-| Project | 项目管理（占位符） |
+| Project | 项目管理，包含工作笔记和任务系统 |
 | Task | 任务系统界面 |
-| Timer | 定时器系统管理 |
+| Timer | 定时器系统管理，包含执行历史 |
+| WorkNote | 工作笔记管理，支持搜索和目录生成 |
 
 ### 实时更新
 
@@ -459,7 +464,42 @@ Web UI 遵循**类 MVC 模式**，17 个控制器处理不同方面：
 
 ### 本地化
 
-内置三种语言环境：`ZhCN`（简体中文）、`ZhHK`（繁体中文）和 `EnUS`（英文）。通过 `DefaultConfigData.Language` 选择活动语言环境，并通过 `LocalizationManager` 解析。
+系统支持 **21 种语言变体**的全面本地化：
+- **中文（6 种）**：zh-CN（简体）、zh-HK（繁体）、zh-SG（新加坡）、zh-MO（澳门）、zh-TW（台湾）、zhMY（马来西亚）
+- **英文（10 种）**：en-US、en-GB、en-CA、en-AU、en-IN、en-SG、en-ZA、en-IE、en-NZ、en-MY
+- **西班牙语（2 种）**：es-ES、es-MX
+- **其他（3 种）**：ja-JP（日语）、ko-KR（韩语）、cs-CZ（捷克语）
+
+通过 `DefaultConfigData.Language` 选择活动语言环境，并通过 `LocalizationManager` 解析。
+
+---
+
+### WebView 浏览器自动化系统（新增）
+
+系统集成了基于 **Playwright** 的 WebView 浏览器自动化功能：
+
+- **个体隔离**：每个硅基生命体拥有独立的浏览器实例、Cookie 和会话存储，完全隔离互不干扰。
+- **无头模式**：浏览器运行在用户完全不可见的无头模式下，硅基生命体后台自主操作。
+- **WebViewBrowserTool**：提供完整的浏览器操作能力，包括：
+  - 页面导航、点击、输入文本、获取页面内容
+  - 执行 JavaScript、获取截图、等待元素出现
+  - 浏览器状态管理和资源清理
+- **安全控制**：所有浏览器操作均需通过权限验证链，防止恶意网页访问。
+
+### 知识网络系统（新增）
+
+系统内置基于**三元组结构**的知识图谱系统：
+
+- **知识表示**：采用“主体-关系-客体”三元组结构（例如：Python-is_a-programming_language）
+- **KnowledgeTool**：提供知识的全生命周期管理：
+  - `add`/`query`/`update`/`delete` - 基础 CRUD 操作
+  - `search` - 全文搜索和关键词匹配
+  - `get_path` - 发现两个概念间的关联路径
+  - `validate` - 知识完整性检查
+  - `stats` - 知识网络统计分析
+- **持久化存储**：知识三元组持久化到文件系统，支持时间索引查询。
+- **置信度评分**：每个知识条目带有置信度评分（0-1），支持知识的模糊匹配和排序。
+- **标签分类**：支持为知识添加标签，便于分类和检索。
 
 ---
 

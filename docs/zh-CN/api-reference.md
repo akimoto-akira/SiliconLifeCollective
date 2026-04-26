@@ -1,6 +1,6 @@
-# API 参考
+﻿# API 参考
 
-[English](api-reference.md) | [中文](docs/zh-CN/api-reference.md) | [繁體中文](docs/zh-HK/api-reference.md) | [Español](docs/es-ES/api-reference.md) | [日本語](docs/ja-JP/api-reference.md) | [한국어](docs/ko-KR/api-reference.md) | [Čeština](docs/cs-CZ/api-reference.md)
+[English](../en/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | **中文** | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
 
 ## Web API 端点
 
@@ -686,7 +686,95 @@ public class AIResponse
 
 ---
 
-## 项目管理 API
+## 帮助文档系统 API
+
+### 获取帮助文档列表
+
+**GET** `/api/help`
+
+**响应**：
+```json
+{
+  "topics": [
+    {
+      "id": "getting-started",
+      "title": "快速开始",
+      "category": "入门指南"
+    }
+  ]
+}
+```
+
+### 获取帮助文档详情
+
+**GET** `/api/help/{topicId}`
+
+**响应**：
+```json
+{
+  "id": "getting-started",
+  "title": "快速开始",
+  "content": "# 快速开始\n\n...",
+  "category": "入门指南"
+}
+```
+
+---
+
+## WebView 浏览器 API
+
+### 获取浏览器状态
+
+**GET** `/api/beings/{id}/browser/status`
+
+**响应**：
+```json
+{
+  "is_open": true,
+  "current_url": "https://example.com",
+  "page_title": "Example Page",
+  "is_loading": false,
+  "last_operation_time": "2026-04-26T10:00:00Z"
+}
+```
+
+### 打开浏览器
+
+**POST** `/api/beings/{id}/browser/open`
+
+### 关闭浏览器
+
+**POST** `/api/beings/{id}/browser/close`
+
+### 导航到 URL
+
+**POST** `/api/beings/{id}/browser/navigate`
+
+**请求**：
+```json
+{
+  "url": "https://example.com"
+}
+```
+
+### 执行 JavaScript
+
+**POST** `/api/beings/{id}/browser/execute-script`
+
+**请求**：
+```json
+{
+  "script": "return document.title;"
+}
+```
+
+### 获取页面截图
+
+**GET** `/api/beings/{id}/browser/screenshot`
+
+---
+
+## 项目工作区 API
 
 ### 获取项目列表
 
