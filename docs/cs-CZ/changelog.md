@@ -59,8 +59,11 @@ tento projekt dodržuje [Semantické verzování](https://semver.org/spec/v2.0.0
 
 ### 2026-04-26
 
-#### Systém nápovědy dokumentace
-- `69c51c5` - Přidán systém nápovědy dokumentace a přeloženy komentáře kódu do angličtiny
+#### Vylepšení systému nápovědy dokumentace
+- Přidání dokumentů Paměťový systém, Instalace Ollama a Průvodce platformou Alibaba Cloud Bailian (3 nové dokumenty)
+- Kompletní překlad všech 10 dokumentů nápovědy do 9 jazyků (zh-CN, zh-HK, en-US, de-DE, cs-CZ, es-ES, ja-JP, ko-KR)
+- Zjednodušení renderovací logiky HelpView
+- Celkem: přibližně 14 000 řádků dokumentace ve všech jazycích
 
 ### 2026-04-25
 

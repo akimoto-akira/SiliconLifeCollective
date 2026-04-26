@@ -59,8 +59,11 @@ dieses Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### 2026-04-26
 
-#### Hilfedokumentationssystem
-- `69c51c5` - Hilfedokumentationssystem hinzufügen und Code-Kommentare ins Englische übersetzen
+#### Verbesserung des Hilfedokumentationssystems
+- Hinzufügen von Speichersystem, Ollama-Installation und Alibaba Cloud Bailian-Plattformanleitung (3 neue Dokumente)
+- Vollständige Übersetzung aller 10 Hilfedokumente in 9 Sprachen (zh-CN, zh-HK, en-US, de-DE, cs-CZ, es-ES, ja-JP, ko-KR)
+- Vereinfachung der HelpView-Renderlogik
+- Gesamt: ca. 14.000 Zeilen Dokumentation in allen Sprachen
 
 ### 2026-04-25
 

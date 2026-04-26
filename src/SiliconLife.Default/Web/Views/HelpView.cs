@@ -97,12 +97,8 @@ public class HelpView : ViewBase
         if (vm.CurrentTopic == null)
             return H.P("Topic not found");
 
-        var navigation = RenderNavigation(vm);
-
         return H.Div(
-            navigation,
-            H.Div(vm.ContentHtml).Class("markdown-content"),
-            navigation
+            H.Div().Add(RawHtml.From(vm.ContentHtml)).Class("markdown-content")
         );
     }
 

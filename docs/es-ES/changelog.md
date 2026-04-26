@@ -59,8 +59,11 @@ y este proyecto sigue [Versionado Semántico](https://semver.org/spec/v2.0.0.htm
 
 ### 2026-04-26
 
-#### Sistema de Documentos de Ayuda
-- `69c51c5` - Añadir sistema de documentos de ayuda y traducir comentarios de código al inglés
+#### Mejora del Sistema de Documentos de Ayuda
+- Añadir documentos de Sistema de Memoria, Configuración de Ollama y Guía de la Plataforma Alibaba Cloud Bailian (3 nuevos documentos)
+- Completar la traducción de 10 documentos de ayuda a 9 idiomas (zh-CN, zh-HK, en-US, de-DE, cs-CZ, es-ES, ja-JP, ko-KR)
+- Simplificar la lógica de renderizado de HelpView
+- Total: aproximadamente 14,000 líneas de documentación en todos los idiomas
 
 ### 2026-04-25
 

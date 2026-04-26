@@ -32,6 +32,15 @@ public abstract class HelpLocalizationBase
     /// <summary>FAQ</summary>
     public abstract string FAQ { get; }
     
+    /// <summary>Memory System</summary>
+    public abstract string Memory { get; }
+    
+    /// <summary>Ollama Setup</summary>
+    public abstract string OllamaSetup { get; }
+    
+    /// <summary>Bailian DashScope</summary>
+    public abstract string BailianDashScope { get; }
+    
     #endregion
 
     #region Help Document Titles (Display Titles)
@@ -57,6 +66,15 @@ public abstract class HelpLocalizationBase
     /// <summary>FAQ Title</summary>
     public abstract string FAQ_Title { get; }
     
+    /// <summary>Memory System Title</summary>
+    public abstract string Memory_Title { get; }
+    
+    /// <summary>Ollama Setup Title</summary>
+    public abstract string OllamaSetup_Title { get; }
+    
+    /// <summary>Bailian DashScope Title</summary>
+    public abstract string BailianDashScope_Title { get; }
+    
     #endregion
 
     #region Help Document Tags (Search Tags)
@@ -81,6 +99,15 @@ public abstract class HelpLocalizationBase
     
     /// <summary>FAQ Tags</summary>
     public abstract string[] FAQ_Tags { get; }
+    
+    /// <summary>Memory System Tags</summary>
+    public abstract string[] Memory_Tags { get; }
+    
+    /// <summary>Ollama Setup Tags</summary>
+    public abstract string[] OllamaSetup_Tags { get; }
+    
+    /// <summary>Bailian DashScope Tags</summary>
+    public abstract string[] BailianDashScope_Tags { get; }
     
     #endregion
 }

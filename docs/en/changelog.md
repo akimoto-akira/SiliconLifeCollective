@@ -57,8 +57,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-04-26
 
-#### Help Documentation System
-- `69c51c5` - Add help documentation system and translate code comments to English
+#### Help Documentation System Enhancement
+- Add Memory System, Ollama Setup, and Bailian DashScope help documents (3 new documents)
+- Complete translation of all 10 help documents to 9 languages (zh-CN, zh-HK, en-US, de-DE, cs-CZ, es-ES, ja-JP, ko-KR)
+- Simplify HelpView rendering logic
+- Total: ~14,000 lines of documentation across all languages
 
 ### 2026-04-25
 
