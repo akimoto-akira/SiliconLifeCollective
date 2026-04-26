@@ -1,24 +1,24 @@
 # 快速開始
 
-[English](getting-started.md) | [简体中文](docs/zh-CN/getting-started.md) | [繁體中文](docs/zh-HK/getting-started.md) | [Español](docs/es-ES/getting-started.md) | [日本語](docs/ja-JP/getting-started.md) | [한국어](docs/ko-KR/getting-started.md) | [Čeština](docs/cs-CZ/getting-started.md)
+[English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | **繁體中文** | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
 ## 前置條件
 
-- **.NET 9 SDK** - [下载](https://dotnet.microsoft.com/download/dotnet/9.0)
-- **Git** - [下载](https://git-scm.com/)
-- **Ollama**（可选，用於本地 AI） - [下载](https://ollama.com/)
-- **百炼 API 金鑰**（可选，用於雲端 AI） - [申请](https://bailian.console.aliyun.com/)
+- **.NET 9 SDK** - [下載](https://dotnet.microsoft.com/download/dotnet/9.0)
+- **Git** - [下載](https://git-scm.com/)
+- **Ollama**（可選，用於本地 AI） - [下載](https://ollama.com/)
+- **百煉 API 金鑰**（可選，用於雲端 AI） - [申請](https://bailian.console.aliyun.com/)
 
 ## 快速開始
 
-### 1. 克隆倉程式庫
+### 1. 複製儲存庫
 
 ```bash
 git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 ```
 
-### 2. 构建項目
+### 2. 建構專案
 
 ```bash
 dotnet build
@@ -26,7 +26,7 @@ dotnet build
 
 ### 3. 設定 AI 後端
 
-编辑 `src/SiliconLife.Default/Config/DefaultConfigData.cs` 或通過 Web UI 在執行时修改設定。
+編輯 `src/SiliconLife.Default/Config/DefaultConfigData.cs` 或通過 Web UI 在執行時修改設定。
 
 #### 選項 A：Ollama（本地）
 
@@ -41,7 +41,7 @@ dotnet build
 }
 ```
 
-#### 選項 B：百炼（雲端）
+#### 選項 B：百煉（雲端）
 
 ```json
 {
@@ -55,39 +55,39 @@ dotnet build
 }
 ```
 
-### 4. 執行應用程式程式
+### 4. 執行應用程式
 
 ```bash
 cd src/SiliconLife.Default
 dotnet run
 ```
 
-Web 伺服器将在 `http://localhost:8080` 啟動
+Web 伺服器將在 `http://localhost:8080` 啟動
 
-### 5. 訪問 Web UI
+### 5. 存取 Web UI
 
-打開瀏覽器並導航到：
+開啟瀏覽器並導航到：
 
 ```
 http://localhost:8080
 ```
 
-您将看到包含以下內容的儀表板：
-- 硅基生命体管理
-- 聊天界面
+您將看到包含以下內容的儀表板：
+- 矽基生命體管理
+- 聊天介面
 - 設定面板
 - 系統監控
 
-## 第一個硅基生命体
+## 第一個矽基生命體
 
-### 建立您的第一個生命体
+### 建立您的第一個生命體
 
-1. 在 Web UI 中導航到**生命体管理**
-2. 点擊**建立新生命体**
-3. 設定灵魂檔案（`soul.md`），包含個性和行為
-4. 啟動生命体
+1. 在 Web UI 中導航到**生命體管理**
+2. 點擊**建立新生命體**
+3. 設定靈魂文件（`soul.md`），包含個性和行為
+4. 啟動生命體
 
-### soul.md 示例
+### soul.md 範例
 
 ```markdown
 # My First Silicon Being
@@ -108,9 +108,9 @@ You are a helpful assistant specializing in code review.
 
 ## 常見問題
 
-### Ollama 連接被拒絕
+### Ollama 連線被拒絕
 
-**問題**：无法連接到 `http://localhost:11434` 的 Ollama
+**問題**：無法連線到 `http://localhost:11434` 的 Ollama
 
 **解決方案**：
 ```bash
@@ -121,7 +121,7 @@ ollama list
 ollama serve
 ```
 
-### 未找到模型
+### 找不到模型
 
 **問題**：`model "qwen2.5:7b" not found`
 
@@ -131,13 +131,13 @@ ollama serve
 ollama pull qwen2.5:7b
 ```
 
-### 端口已被占用
+### 連接埠已被佔用
 
 **問題**：`HttpListenerException: Address already in use`
 
 **解決方案**：
-- 在設定中更改端口
-- 或终止使用端口 8080 的進程：
+- 在設定中更改連接埠
+- 或終止使用連接埠 8080 的行程：
 
 ```bash
 # Windows
@@ -150,29 +150,35 @@ lsof -ti:8080 | xargs kill -9
 
 ## 下一步
 
-- 📚 阅读[架構指南](architecture.md)了解系統設計
-- 🛠️ 查看[開發指南](development-guide.md)擴充系統
-- 📖 探索[API 参考](api-reference.md)了解集成详情
-- 🔒 查看[安全文檔](security.md)了解權限系統
+- 📚 閱讀[架構指南](architecture.md)了解系統設計
+- 🛠️ 查看[開發指南](development-guide.md)擴展系統
+- 📖 探索[API 參考](api-reference.md)了解整合詳情
+- 🔒 查看[安全文件](security.md)了解權限系統
+- 🧰 查看[工具參考](tools-reference.md)了解所有內建工具
+- 🌐 查看[Web UI 指南](web-ui-guide.md)了解介面功能
 
-## 項目結構
+## 專案結構
 
 ```
 SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/      # 核心介面和抽象類別
-│   └── SiliconLife.Default/   # 默認實現 + 入口点
-├── docs/                      # 文檔（多语言）
-│   ├── en/                    # 英语
-│   ├── zh-CN/                 # 简体中文
-│   ├── zh-HK/                 # 繁体中文
-│   ├── ja-JP/                 # 日语
-│   └── ko-KR/                 # 韩语
-└── README.md                  # 本檔案
+│   └── SiliconLife.Default/   # 預設實現 + 入口點
+├── docs/                      # 文件（多語言，21 種語言變體）
+│   ├── en/                    # 英語
+│   ├── zh-CN/                 # 簡體中文
+│   ├── zh-HK/                 # 繁體中文
+│   ├── es-ES/                 # 西班牙語
+│   ├── ja-JP/                 # 日語
+│   ├── ko-KR/                 # 韓語
+│   └── cs-CZ/                 # 捷克語
+├── 總文件/                     # 需求和架構文件（中文）
+└── README.md                  # 專案說明
 ```
 
-## 需要幫助？
+## 需要協助？
 
-- 📖 查看[文檔](docs/)
-- 🐛 在 GitHub 上報告問題
-- 💬 加入社群討論
+- 📖 查看[說明文件系統](web-ui-guide.md#幫助文檔系統新增)（多語言支援）
+- 📚 閱讀[完整文件](docs/)
+- 🐛 在 [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues) 上回報問題
+- 💬 參與社群討論
