@@ -20,7 +20,7 @@ public class ProjectView : ViewBase
         var vm = model as ProjectViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.PageTitleProjects, "projects", vm.Localization, body, GetScripts(vm.Localization), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleProjects, "projects", vm.Localization, body, GetScripts(vm.Localization), GetStyles(), "projects");
     }
 
     private static H RenderBody(ProjectViewModel vm)

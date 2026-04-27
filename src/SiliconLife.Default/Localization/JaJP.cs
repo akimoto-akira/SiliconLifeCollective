@@ -272,6 +272,8 @@ public class JaJP : DefaultLocalizationBase
     public override string InitSkinPreviewSecondaryBtn => "二次ボタン";
     public override string InitSubmitButton => "初期化完了";
     public override string InitFooterHint => "設定完了後、いつでも設定ページで変更可能";
+        public override string InitHelpLink => "📖 ヘルプドキュメントを表示";
+        public override string InitAIClientHelpPrefix => "📖 ヘルプを見る：";
     public override string InitNicknameRequiredError => "ユーザーニックネームを入力してください";
     public override string InitDataDirectoryRequiredError => "データディレクトリを選択してください";
     public override string InitCuratorNameLabel => "シリコンライフ名";

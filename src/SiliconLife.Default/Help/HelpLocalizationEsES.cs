@@ -28,6 +28,11 @@ public class HelpLocalizationEsES : HelpLocalizationBase
     public override string AIClients_Title => "Configuración de Cliente de IA";
         
         public override string BeingSoul_Title => "Archivo de Alma";
+    public override string AuditLog_Title => "Registro de Auditoría";
+    public override string KnowledgeGraph_Title => "Grafo de Conocimiento";
+    public override string WorkNotes_Title => "Notas de Trabajo";
+    public override string Projects_Title => "Gestión de Proyectos";
+    public override string Logging_Title => "Sistema de Registro de Eventos";
 
     public override string[] GettingStarted_Tags => new[] { "instalación", "inicio", "introducción", "inicio rápido", "empezar", "inicialización", "ejecutar", "configurar entorno" };
     public override string[] BeingManagement_Tags => new[] { "ser de silicio", "crear", "configurar", "gestión de seres de silicio", "entidad", "perfil", "ajustes", "gestión" };
@@ -44,6 +49,11 @@ public class HelpLocalizationEsES : HelpLocalizationBase
     public override string[] AIClients_Tags => new[] { "cliente de IA", "servicio de IA", "modelo", "configuración", "local", "nube", "Ollama", "DashScope", "ajustes" };
     
     public override string[] BeingSoul_Tags => new[] { "archivo de alma", "personalidad", "prompt", "rol", "comportamiento", "configuración", "carácter", "guía de trabajo", "prompt del sistema" };
+    public override string[] AuditLog_Tags => new[] { "registro de auditoría", "Token", "estadísticas de uso", "monitor", "consumo", "análisis", "tendencia", "exportar", "CSV" };
+    public override string[] KnowledgeGraph_Tags => new[] { "grafo de conocimiento", "conocimiento", "visualización", "triple", "entidad", "relación", "red", "aprendizaje", "gestión" };
+    public override string[] WorkNotes_Tags => new[] { "notas de trabajo", "notas", "registros", "diario", "bitácora", "Markdown", "palabras clave", "versión", "búsqueda" };
+    public override string[] Projects_Tags => new[] { "gestión de proyectos", "proyecto", "colaboración", "tarea", "miembro", "archivo", "equipo", "espacio de trabajo", "progreso" };
+    public override string[] Logging_Tags => new[] { "sistema de registro", "registro", "eventos", "debug", "error", "advertencia", "monitor", "rastreo", "consola", "archivo" };
     
     public override string GettingStarted => @"
 # Inicio Rápido
@@ -2789,6 +2799,1415 @@ El sistema gestiona automáticamente este archivo, y no necesita operar manualme
 - 💬 [Sistema de Chat](chat-system) - Conversar con seres de silicio
 - 🧠 [Configuración de Cliente de IA](ai-clients) - Configurar servicios de IA
 - 📝 [Sistema de Memoria](memory) - Gestionar historial de conversaciones
+";
+
+    public override string AuditLog => @"
+# Registro de Auditoría
+
+## Descripción General
+
+El Registro de Auditoría (Audit Log) es el **sistema de monitoreo de uso de Tokenes** de la plataforma Silicon Life, que le ayuda a rastrear y gestionar el consumo de llamadas a IA de todos los seres de silicio.
+
+Con el registro de auditoría, puede:
+- 📊 **Ver estadísticas de consumo de Tokenes**: Saber cuántos Tokenes ha consumido cada ser de silicio
+- 📈 **Analizar tendencias de uso**: Ver cambios en el uso de Tokenes por hora, día, mes
+- 🔍 **Filtrar y comparar**: Filtrar datos por rango de tiempo, ser de silicio, tipo de cliente de IA
+- 💾 **Exportar datos**: Exportar datos de auditoría a archivo CSV para análisis adicional
+
+**¿Qué es un Token?**  
+El Token es la unidad básica con la que los modelos de IA procesan texto. Cada llamada a IA de un ser de silicio consume Tokenes:
+- **Prompt Tokens**: Texto enviado a la IA (incluyendo archivos de alma, historial de mensajes, mensajes de usuario, etc.)
+- **Completion Tokens**: Texto generado por la respuesta de la IA
+- **Total Tokens**: Total de Tokenes consumidos (Prompt + Completion)
+
+## Acceso al Registro de Auditoría
+
+### Entrar a la Página de Auditoría
+
+1. Iniciar la plataforma Silicon Life
+2. Hacer clic en ""Auditoría"" (icono 📊) en el menú de navegación izquierdo
+3. Entrar al panel de control del registro de auditoría
+
+### Requisitos de Permiso
+
+- 📊 **Ver registro de auditoría**: Permiso de Curator (curador)
+- 🔒 Los seres de silicio comunes no pueden acceder a la función de auditoría
+- Esto asegura que solo los administradores puedan ver el uso global de Tokenes
+
+## Funciones del Panel de Control de Auditoría
+
+### 📈 Gráfico de Tendencias
+
+La parte superior de la página de auditoría muestra el **gráfico de tendencia de uso de Tokenes**, que incluye:
+
+- **Selector de rango de tiempo**:
+  - Hoy (Today): Mostrar uso de Tokenes de hoy por hora
+  - Esta semana (Week): Mostrar tendencia de uso de Tokenes de esta semana
+  - Este mes (Month): Mostrar uso de Tokenes de este mes por día
+  - Este año (Year): Mostrar uso de Tokenes de este año por mes
+
+- **Datos de tendencia**:
+  - El gráfico de líneas muestra el cambio en la cantidad de uso de Tokenes a lo largo del tiempo
+  - Pasar el mouse sobre un punto de datos para ver el valor específico
+  - Le ayuda a descubrir picos y valles de uso
+
+### 📊 Resumen de Estadísticas
+
+El panel de control muestra datos estadísticos clave:
+
+- **Número total de solicitudes**: Número total de llamadas a IA
+- **Número de éxitos/fallos**: Cuántas llamadas a IA fueron exitosas y cuántas fallaron
+- **Consumo de Tokenes**:
+  - Número total de Tokenes de entrada (Prompt Tokens)
+  - Número total de Tokenes de salida (Completion Tokens)
+  - Consumo total de Tokenes (Total Tokens)
+
+### 🔍 Función de Filtros
+
+Puede usar filtros para ver datos específicos con precisión:
+
+- **Filtrar por ser de silicio**: Ver uso de Tokenes de un ser de silicio específico
+- **Filtrar por cliente de IA**: Ver uso de un servicio de IA específico (como Ollama, Alibaba Cloud Bailian)
+- **Filtros combinados**: Usar múltiples condiciones de filtro simultáneamente
+
+### 📋 Categorización Detallada
+
+#### Estadísticas por Tipo de Cliente de IA
+
+Mostrar uso de Tokenes de cada cliente de IA:
+- OllamaClient (servicio local Ollama)
+- DashScopeClient (Alibaba Cloud Bailian)
+- Otros clientes de IA configurados
+
+Le ayuda a entender:
+- Qué servicio de IA se usa más
+- Comparación de uso entre modelos locales y modelos en la nube
+- Si es necesario ajustar la configuración del cliente de IA
+
+#### Estadísticas por Ser de Silicio
+
+Mostrar uso de Tokenes de cada ser de silicio:
+- Nombre del ser de silicio
+- Consumo total de Tokenes
+- Número de solicitudes
+
+Le ayuda a descubrir:
+- Qué seres de silicio son más activos
+- Si el consumo de Tokenes es razonable
+- Si es necesario ajustar la frecuencia de uso de algunos seres
+
+### 💾 Exportación de Datos
+
+Haciendo clic en el botón ""Exportar CSV"", puede:
+
+- Exportar todos los datos de auditoría bajo las condiciones de filtro actuales a un archivo CSV
+- El archivo CSV incluye:
+  - Marca de tiempo
+  - ID del ser de silicio
+  - Tipo de cliente de IA
+  - Número de Tokenes de entrada
+  - Número de Tokenes de salida
+  - Número total de Tokenes
+  - Si fue exitoso
+
+**Escenarios de uso**:
+- Análisis de datos más profundo en Excel
+- Creación de informes personalizados
+- Conservación a largo plazo de registros de auditoría
+- Compartir datos con otros miembros del equipo
+
+## Escenarios de Uso
+
+### Escenario 1: Monitoreo de Consumo de Tokenes
+
+**Requisito**: Quiere saber el consumo total del servicio de IA este mes
+
+**Pasos de operación**:
+1. Entrar a la página de auditoría
+2. Seleccionar ""Este mes"" en el rango de tiempo
+3. Ver la estadística ""Consumo total de Tokenes""
+4. Ver el gráfico de tendencias para entender los cambios diarios de consumo
+
+**Resultado**: Puede ver claramente cuántos Tokenes se consumieron en total este mes y qué días tuvieron el uso más alto.
+
+### Escenario 2: Solución de Consumo Anómalo
+
+**Requisito**: Descubrió que los costos del servicio de IA son anormalmente altos y quiere encontrar la causa
+
+**Pasos de operación**:
+1. Entrar a la página de auditoría
+2. Seleccionar el período de tiempo de costos anómalos
+3. Ver estadísticas por ser de silicio
+4. Encontrar el ser de silicio con mayor consumo
+5. Hacer clic en este ser para ver la tendencia detallada
+6. Si es necesario, exportar CSV para análisis más profundo
+
+**Resultado**: Puede identificar qué ser de silicio consumió una gran cantidad de Tokenes en qué momento, y verificar más a fondo si su archivo de alma o configuración de tareas es razonable.
+
+### Escenario 3: Comparación de Diferentes Servicios de IA
+
+**Requisito**: Quiere comparar el uso de Ollama local y Alibaba Cloud Bailian
+
+**Pasos de operación**:
+1. Entrar a la página de auditoría
+2. Seleccionar ""Este mes"" en el rango de tiempo
+3. Ver estadísticas por tipo de cliente de IA
+4. Comparar uso de Tokenes entre OllamaClient y DashScopeClient
+
+**Resultado**: Puede entender:
+- La proporción de uso entre modelos locales y modelos en la nube
+- Qué servicio es más económico
+- Si es necesario ajustar el cliente de IA predeterminado
+
+### Escenario 4: Monitoreo de un Ser de Silicio Específico
+
+**Requisito**: Creó un nuevo asistente de programación y quiere monitorear si su uso de Tokenes es razonable
+
+**Pasos de operación**:
+1. Entrar a la página de auditoría
+2. Seleccionar el ID o nombre de este asistente de programación en el filtro
+3. Ver su tendencia de uso de Tokenes
+4. Comparar con el uso de otros seres de silicio
+
+**Resultado**: Puede evaluar la eficiencia de este asistente de programación y determinar si es necesario optimizar su archivo de alma o forma de trabajo.
+
+## Herramienta de Auditoría (Llamada de IA)
+
+Los seres de silicio también pueden usar la herramienta **TokenAuditTool** para consultar el uso de Tokenes:
+
+### Consulta de Resumen de Tokenes
+
+**Ejemplo de comando**:
+```
+Consultar uso de Tokenes este mes
+```
+
+**Información devuelta**:
+- Número total de solicitudes
+- Número de éxitos/fallos
+- Número de Tokenes de entrada/salida/totales
+- Estadísticas por cliente de IA
+- Estadísticas por ser de silicio
+
+### Consulta de Tendencia de Uso
+
+**Ejemplo de comando**:
+```
+Mostrar tendencia de uso de Tokenes esta semana
+```
+
+**Información devuelta**:
+- Cantidad de uso de Tokenes por día o por hora
+- Le ayuda a entender los patrones de uso
+
+### Parámetros de la Herramienta
+
+TokenAuditTool admite los siguientes parámetros:
+
+- `time_range`: Rango de tiempo (today/week/month/year)
+- `client_type`: Tipo de cliente de IA (opcional)
+- `being_id`: ID del ser de silicio (opcional)
+
+**Nota**: Esta es una herramienta `[SiliconManagerOnly]`, solo los curadores pueden usarla.
+
+## Explicación de Datos
+
+### Contenido de los Registros
+
+Cada llamada a IA registra la siguiente información:
+
+- **Marca de tiempo**: Hora de la llamada a IA (UTC)
+- **ID del ser de silicio**: El ser que inició la llamada
+- **Tipo de cliente de IA**: Servicio de IA utilizado (por ejemplo, OllamaClient)
+- **Número de Tokenes de entrada**: Número de Tokenes del texto enviado a la IA
+- **Número de Tokenes de salida**: Número de Tokenes del texto de respuesta de la IA
+- **Número total de Tokenes**: Entrada + salida
+- **ID de sesión**: La sesión de chat a la que pertenece
+- **Si fue exitoso**: Si la llamada a IA fue exitosa
+
+### Almacenamiento de Datos
+
+- Los registros de auditoría usan **almacenamiento indexado por tiempo** (ITimeStorage)
+- Admite consultas eficientes por rango de tiempo
+- Los datos se almacenan persistentemente y no se pierden después del reinicio
+
+### Explicación del Cálculo de Tokenes
+
+**¿Qué es un Token?**
+- El Token es la unidad básica con la que los modelos de IA procesan texto
+- Un Token equivale aproximadamente a 0.75 palabras en inglés o 1-2 caracteres chinos
+- El cálculo de Tokenes varía ligeramente entre diferentes modelos de IA
+
+**¿Por qué es necesario monitorear Tokenes?**
+- Los servicios de IA en la nube (como Alibaba Cloud Bailian) cobran por Token
+- Entender el uso de Tokenes ayuda a controlar costos
+- Descubrir patrones de uso anómalos (como llamadas en bucle infinito)
+- Optimizar la configuración y archivos de alma de los seres de silicio
+
+## Preguntas Frecuentes
+
+### P: ¿Por qué no puedo ver la página de auditoría?
+
+**R**: La función de auditoría requiere permiso de Curator (curador). Confirme:
+- Es administrador o curador de la plataforma
+- Los seres de silicio no tienen permiso para ver el registro de auditoría
+- Si tiene problemas de permiso, contacte al administrador de la plataforma
+
+### P: ¿Los datos de auditoría muestran ""Sin datos""?
+
+**R**: Posibles razones:
+- No hay llamadas a IA en el rango de tiempo seleccionado
+- Las condiciones de filtro son demasiado estrictas, no hay registros coincidentes
+- El ser de silicio aún no ha tenido diálogo con IA
+
+**Solución**:
+- Intente ajustar el rango de tiempo (por ejemplo, seleccionar ""Este mes"" en lugar de ""Hoy"")
+- Limpiar las condiciones de filtro
+- Primero tener algunos diálogos con el ser de silicio
+
+### P: ¿Por qué el uso de Tokenes aumentó repentinamente?
+
+**R**: Posibles razones:
+- Se agregaron una gran cantidad de registros de diálogo (el historial se alarga, aumentan los Prompt Token)
+- El archivo de alma se volvió muy complejo
+- Algún ser de silicio llama frecuentemente a la IA
+- Las tareas o temporizadores de IA se ejecutan en gran cantidad
+
+**Método de solución**:
+- Usar filtro para ver qué ser de silicio específico
+- Ver gráfico de tendencias para ubicar el punto de tiempo específico
+- Verificar el archivo de alma y configuración de tareas de este ser de silicio
+- Exportar CSV para análisis detallado
+
+### P: ¿Con qué software se puede abrir el archivo CSV exportado?
+
+**R**: El archivo CSV se puede abrir con el siguiente software:
+- Microsoft Excel
+- Google Sheets
+- LibreOffice Calc
+- Cualquier editor de texto (como Bloc de notas, VS Code)
+
+### P: ¿Cuánto tiempo se conservarán los datos de auditoría?
+
+**R**: 
+- Los registros de auditoría usan almacenamiento persistente en el sistema de archivos
+- Por defecto, los datos se conservarán indefinidamente
+- Si necesita limpiar datos antiguos, puede eliminar manualmente los archivos de registros de auditoría en el directorio de almacenamiento
+- Se recomienda exportar regularmente datos importantes como respaldo
+
+### P: ¿Por qué algunas llamadas a IA no están registradas?
+
+**R**: Posibles razones:
+- El cliente de IA no devolvió información de uso de Tokenes
+- El servicio de registro de Tokenes no se inicializó correctamente
+- La llamada falló y no se generaron estadísticas de Tokenes
+
+**Nota**: Solo las respuestas de IA que contienen información de Tokenes serán registradas.
+
+### P: ¿Puedo eliminar registros de auditoría?
+
+**R**: 
+- La versión actual no admite la eliminación de registros de auditoría a través de la interfaz
+- Los registros de auditoría se almacenan en el directorio de índice de tiempo del sistema de archivos
+- Si necesita limpiar, puede eliminar manualmente los archivos de auditoría en el directorio de almacenamiento
+- **Se recomienda exportar un respaldo primero antes de eliminar**
+
+## Mejores Prácticas
+
+### 1. Monitorear Regularmente el Uso de Tokenes
+
+- 📅 Ver el panel de control de auditoría una vez por semana o mes
+- 📊 Seguir la tendencia de uso de Tokenes, resolver anomalías a tiempo
+- 💰 Si usa servicios de IA en la nube, seguir la relación entre costos y uso de Tokenes
+
+### 2. Usar la Función de Filtros para Ubicación Precisa
+
+- 🔍 Cuando descubra un problema, primero use el filtro para reducir el alcance
+- 🎯 Filtrar por ser de silicio, ubicar el ser específico
+- 🤖 Filtrar por cliente de IA, comparar el uso de diferentes servicios
+
+### 3. Exportar Datos Regularmente
+
+- 💾 Exportar datos de auditoría una vez al mes como respaldo
+- 📈 Crear gráficos e informes personalizados en Excel
+- 📋 Conservar datos a largo plazo para análisis comparativo anual
+
+### 4. Optimizar el Uso de Tokenes
+
+Optimizar según los datos de auditoría:
+- 📝 Simplificar archivos de alma (reducir configuraciones innecesarias)
+- 🗂️ Controlar la cantidad de memoria (evitar historial demasiado largo)
+- ⏱️ Ajustar la frecuencia de temporizadores (reducir llamadas a IA innecesarias)
+- 🎯 Optimizar la descripción de tareas (aumentar eficiencia, reducir llamadas repetidas)
+
+### 5. Configurar Alertas de Uso
+
+- 📊 Seguir fluctuaciones anómalas en el uso de Tokenes
+- 🔔 Si descubre que algún ser de silicio repentinamente consume una gran cantidad de Tokenes, verifique a tiempo
+- 🛑 Si es necesario, pause este ser y resuelva el problema
+
+## Funciones Relacionadas
+
+- [Gestión de Seres de Silicio](/help/being-management) - Gestionar la creación y configuración de seres de silicio
+- [Sistema de Tareas](/help/task) - Configurar y gestionar tareas programadas de seres de silicio
+- [Sistema de Memoria](/help/memory) - Entender cómo la memoria afecta el uso de Tokenes
+- [Gestión de Permisos](/help/permission) - Entender los permisos del curador y control de acceso
+- [Gestión de Configuración](/help/config) - Configurar clientes de IA y otros ajustes del sistema
+";
+    
+    public override string KnowledgeGraph => @"
+# Grafo de Conocimiento
+
+## Descripción General
+
+El Grafo de Conocimiento es el **sistema de gestión y visualización de conocimiento** para seres de silicio, mostrando el conocimiento aprendido y acumulado por seres de silicio de manera gráfica. A través de nodos y conexiones intuitivos, puede ver claramente las relaciones entre el conocimiento.
+
+## ¿Qué es un Triple de Conocimiento?
+
+La unidad básica del grafo de conocimiento es el **triple de conocimiento**, usando una estructura ""sujeto-predicado-objeto"":
+
+```
+(sujeto) -[relación]-> (objeto)
+```
+
+**Ejemplos:**
+- `(Xiao Ming) -[gusta]-> (manzanas)`
+- `(Python) -[es]-> (lenguaje de programación)`
+- `(Tierra) -[orbita]-> (Sol)`
+
+Esta estructura permite a los seres de silicio entender y organizar el conocimiento como los humanos.
+
+## Acceder al Grafo de Conocimiento
+
+### Punto de Entrada
+
+1. Haga clic en el icono **📚 Base de Conocimiento** en la barra de navegación izquierda
+2. El sistema cargará y mostrará automáticamente la página de visualización del grafo de conocimiento
+
+### Diseño de Interfaz
+
+La página del grafo de conocimiento incluye:
+
+- **Título Superior**: Muestra ""Visualización del Grafo de Conocimiento""
+- **Panel de Estadísticas**: Muestra conteo de nodos, conteo de aristas y otras estadísticas
+- **Área Principal de Canvas**: Muestra la visualización del grafo de conocimiento
+- **Indicador de Carga**: Muestra mensaje de carga mientras se cargan los datos
+
+## Visualización del Grafo
+
+### Nodos
+
+Los nodos representan **entidades** (sujetos u objetos) en el conocimiento:
+
+- **Nodos Circulares**: Cada nodo representa una entidad
+- **Etiquetas de Nodo**: Muestran el nombre de la entidad
+- **Tamaño de Nodo**: Ajustado automáticamente según el conteo de conexiones (más conexiones = nodo más grande)
+- **Colores de Nodo**:
+  - Borde azul: Nodos regulares
+  - Resaltado: Al pasar el mouse
+
+### Aristas
+
+Las aristas representan **relaciones** (predicados) en el conocimiento:
+
+- **Líneas con Flechas**: Indican relaciones de sujeto a objeto
+- **Color de Línea**: Azul semitransparente `rgba(100, 150, 255, 0.6)`
+- **Marcadores de Flecha**: Muestran claramente la dirección de la relación
+
+### Algoritmo de Diseño
+
+El grafo de conocimiento usa un **algoritmo de diseño circular**:
+
+- Todos los nodos están distribuidos uniformemente en órbitas circulares
+- Espaciado razonable entre nodos
+- Se adapta automáticamente al tamaño del canvas
+
+## Funciones Interactivas
+
+### Operaciones del Mouse
+
+- **Pasar el mouse sobre nodo**: El nodo se resalta para fácil identificación
+- **Ver relaciones**: Entender dirección de relaciones a través de flechas
+- **Zoom del canvas**: Función de zoom nativa del navegador (Ctrl + rueda del mouse)
+
+### Carga de Datos
+
+- **Carga Automática**: Carga automáticamente datos de conocimiento del sistema al entrar a la página
+- **Actualización en Tiempo Real**: Volver a visitar la página para obtener conocimiento más reciente
+- **Indicador de Carga**: Muestra ""Cargando datos del grafo de conocimiento..."" mientras carga
+
+## Gestión de Conocimiento
+
+### ¿Cómo se Genera el Conocimiento?
+
+Los seres de silicio acumulan conocimiento a través de:
+
+1. **Aprendizaje por Conversación**: Extrayendo información clave de conversaciones con usuarios
+2. **Invocación de Herramientas**: Agregando conocimiento a través de KnowledgeTool
+3. **Análisis de Archivos**: Analizando contenido de archivos subidos para extraer conocimiento
+4. **Ejecución de Tareas**: Acumulando conocimiento de dominio durante la ejecución de tareas
+
+### Operaciones de KnowledgeTool
+
+Los curadores de silicio o seres de silicio pueden pedir a la IA que realice operaciones de conocimiento a través de conversación:
+
+**Agregar Conocimiento:**
+```
+Por favor agrega conocimiento: (Python) -[es]-> (lenguaje de programación)
+```
+
+**Consultar Conocimiento:**
+```
+Encontrar todo el conocimiento sobre ""Python""
+```
+
+**Buscar Conocimiento:**
+```
+Buscar conocimiento que contenga ""programación""
+```
+
+**Encontrar Ruta de Relación:**
+```
+Encontrar la ruta de relación entre ""Python"" y ""IA""
+```
+
+### Atributos de Conocimiento
+
+Cada entrada de conocimiento contiene metadatos ricos:
+
+- **ID Único**: Identificador único para cada conocimiento
+- **Número de Versión**: Soporta actualizaciones de conocimiento y gestión de versiones
+- **Confianza**: 0.0-1.0, indicando confiabilidad del conocimiento
+- **Fuente**: Fuente del conocimiento (conversación, archivo, herramienta, etc.)
+- **Categoría**: Dominio o categoría al que pertenece el conocimiento
+- **Etiquetas**: Etiquetas personalizadas para fácil clasificación y búsqueda
+- **Creador**: El ser de silicio que agregó este conocimiento
+- **Hora de Creación**: Timestamp cuando se agregó el conocimiento
+- **Estado de Validación**: No validado/Validado/Rechazado
+
+## Estadísticas
+
+La página del grafo de conocimiento muestra las siguientes estadísticas:
+
+- **Total de Nodos**: Número de todas las entidades en el grafo de conocimiento
+- **Total de Aristas**: Número de relaciones entre entidades
+- **Entradas de Conocimiento**: Número total de triples de conocimiento en el sistema
+
+Estas estadísticas le ayudan a entender el nivel de acumulación de conocimiento de los seres de silicio.
+
+## Casos de Uso
+
+### 1. Visualización de Conocimiento
+
+Ver intuitivamente qué han aprendido los seres de silicio:
+
+1. Entrar a la página del grafo de conocimiento
+2. Observar distribución de nodos y conexiones
+3. Entender estructura de organización de conocimiento y asociaciones
+
+### 2. Validación de Conocimiento
+
+Verificar resultados de aprendizaje de seres de silicio:
+
+1. Ver nodos de conocimiento en dominios específicos
+2. Validar precisión del conocimiento
+3. Suplementar o corregir conocimiento a través de conversación
+
+### 3. Exploración de Conocimiento
+
+Descubrir asociaciones entre conocimiento:
+
+1. Observar nodos altamente conectados (conceptos centrales)
+2. Rastrear rutas de relación para descubrir asociaciones indirectas
+3. Identificar brechas de conocimiento para guiar aprendizaje adicional
+
+## Preguntas Frecuentes
+
+### P: ¿Por qué el grafo de conocimiento está vacío?
+
+**R:** Si los seres de silicio aún no han aprendido ningún conocimiento, el grafo se mostrará vacío. Puede agregar conocimiento mediante:
+- Conversar con seres de silicio para que aprendan nueva información
+- Subir archivos para que los seres de silicio analicen
+- Pedir directamente a los seres de silicio que agreguen conocimiento específico
+
+### P: ¿El grafo de conocimiento se actualiza automáticamente?
+
+**R:** Los datos del grafo de conocimiento se almacenan en tiempo real, pero la página necesita actualizarse para mostrar los datos más recientes. Después de que los seres de silicio aprendan nuevo conocimiento, vuelva a visitar la página del grafo de conocimiento para ver actualizaciones.
+
+### P: ¿Cómo ver cuando hay demasiados nodos?
+
+**R:** Cuando el volumen de conocimiento es grande:
+- Usar zoom del navegador (Ctrl + rueda del mouse)
+- Enfocarse en nodos centrales altamente conectados
+- Buscar conocimiento sobre temas específicos a través de herramientas de consulta
+
+### P: ¿Cómo eliminar conocimiento incorrecto?
+
+**R:** Puede pedir a los seres de silicio que eliminen o corrijan conocimiento a través de conversación:
+```
+Por favor elimina conocimiento incorrecto sobre ""...""
+```
+o
+```
+Por favor actualiza conocimiento: (conocimiento antiguo) a (nuevo conocimiento)
+```
+
+### P: ¿Dónde se almacenan los datos del grafo de conocimiento?
+
+**R:** Los datos de conocimiento se almacenan en el directorio de datos del sistema en formato JSON. El sistema gestiona automáticamente almacenamiento, indexación y consulta de conocimiento.
+
+### P: ¿Puedo exportar el grafo de conocimiento?
+
+**R:** Actualmente, el grafo de conocimiento se usa principalmente para visualización en línea. Para exportar datos de conocimiento, puede pedir a los seres de silicio que consulten a través de herramientas y generen reportes.
+
+## Mejores Prácticas
+
+### 1. Revisar Regularmente la Acumulación de Conocimiento
+
+- Revisar el grafo de conocimiento semanalmente para entender el progreso de aprendizaje de los seres de silicio
+- Enfocarse en nodos y relaciones recién agregados
+- Validar la precisión de conocimiento importante
+
+### 2. Guiar el Aprendizaje de Conocimiento
+
+- Proporcionar proactivamente entradas de conocimiento de alta calidad
+- Corregir conocimiento incorrecto para mantener la precisión de la base de conocimiento
+- Agregar categorías y etiquetas al conocimiento para facilitar la gestión
+
+### 3. Usar el Grafo de Conocimiento para Asistir Conversaciones
+
+- Referenciar conocimiento existente en conversaciones
+- Pedir a los seres de silicio que razonen basándose en conocimiento existente
+- Explorar asociaciones entre conocimiento para descubrir nuevos insights
+
+### 4. Control de Calidad de Conocimiento
+
+- Prestar atención a las puntuaciones de confianza del conocimiento
+- Validar la precisión de conocimiento crítico
+- Actualizar oportunamente conocimiento obsoleto o incorrecto
+
+## Documentación Relacionada
+
+- [Gestión de Seres](/help/being-management) - Gestionar creación y configuración de seres de silicio
+- [Sistema de Chat](/help/chat-system) - Conversar con seres de silicio para aprender conocimiento
+- [Sistema de Tareas](/help/task) - Configurar tareas de aprendizaje de conocimiento
+- [Sistema de Memoria](/help/memory) - Entender cómo el conocimiento afecta la memoria de conversación
+";
+    
+    public override string WorkNotes => @"
+# Notas de Trabajo
+
+## Descripción General
+
+Las Notas de Trabajo son el**sistema de registro de conocimiento personal** de los Seres de Silicio, similar a un diario digital o registro de trabajo. Cada Ser de Silicio puede crear, gestionar y recuperar sus propias notas de trabajo, registrando experiencias de aprendizaje, ideas de trabajo, reflexiones y pensamientos.
+
+Las Notas de Trabajo admiten dos modos:
+- **Notas de Trabajo Personales**: Propiedad del Ser de Silicio, por defecto privadas
+- **Notas de Trabajo de Proyecto**: Propiedad del espacio de proyecto, los miembros del proyecto pueden colaborar
+
+## Funciones Principales
+
+### Características Principales
+
+- **Registro por Páginas**: Cada nota es una página independiente, organizada por número de página
+- **Soporte Markdown**: El contenido admite formato Markdown, permite edición de texto enriquecido
+- **Etiquetas de Palabras Clave**: Se pueden añadir palabras clave a las notas, facilitando búsqueda y clasificación
+- **Control de Versiones**: Cada edición actualiza automáticamente el número de versión, registrando el historial de cambios
+- **Seguimiento de Autor**: Registra información del creador y último editor
+- **Vista de Línea de Tiempo**: Ver todas las notas en orden cronológico
+- **Búsqueda de Texto Completo**: Buscar notas por palabras clave, resumen o contenido
+
+### Dos Tipos de Notas de Trabajo
+
+| Tipo | Propiedad | Visibilidad Predeterminada | Escenario de Uso |
+|------|-----------|---------------------------|------------------|
+| Notas de Trabajo Personales | Ser de Silicio | Privado | Diario personal, notas de aprendizaje, registro de pensamientos |
+| Notas de Trabajo de Proyecto | Espacio de proyecto | Público | Progreso del proyecto, registro de colaboración, actas de reuniones |
+
+## Acceso a Notas de Trabajo
+
+### Puntos de Entrada
+
+**Notas de Trabajo Personales**:
+1. Haga clic en el icono **📝 Notas de Trabajo** en la barra de navegación izquierda
+2. O encuentre el punto de entrada de notas de trabajo en la página de detalles del Ser de Silicio
+
+**Notas de Trabajo de Proyecto**:
+1. Entre en la página de detalles del proyecto
+2. Haga clic en la pestaña **Notas de Trabajo**
+
+### Descripción de la Interfaz
+
+La página de notas de trabajo contiene dos áreas principales:
+
+**Área de Cuadrícula de Notas**:
+- Muestra todas las notas en formato de tarjeta
+- Cada tarjeta muestra número de página, resumen, hora de actualización
+- Efecto de animación de elevación al pasar el cursor
+- Haga clic en una tarjeta para abrir los detalles de la nota
+
+**Área de Detalles de Nota**:
+- Muestra el contenido completo de la nota en pantalla completa
+- Muestra metadatos (resumen, palabras clave, hora de actualización)
+- El contenido se renderiza en formato Markdown
+- Haga clic en el botón de cierre para volver a la lista
+
+## Crear Notas
+
+### Crear con Herramientas de IA
+
+Los Seres de Silicio pueden crear notas mediante conversación con IA:
+
+**Crear Nota Personal**:
+```
+Por favor, crea una nota de trabajo para mí:
+- Resumen: Aprendí el concepto de grafo de conocimiento
+- Contenido: Un grafo de conocimiento es una forma de representar conocimiento en estructura de grafos...
+- Palabras clave: grafo de conocimiento, IA, aprendizaje
+```
+
+**Crear Nota de Proyecto**:
+```
+Por favor, crea una nota de trabajo en el proyecto XXX:
+- Resumen: Actualización de progreso del proyecto - Semana 1
+- Contenido: Esta semana se completó la fase de análisis de requisitos...
+- Palabras clave: progreso, informe semanal
+```
+
+### Campos Obligatorios de la Nota
+
+- **Resumen**: Breve descripción del contenido de la nota (obligatorio)
+- **Contenido**: Contenido detallado de la nota, admite Markdown (obligatorio)
+- **Palabras Clave**: Palabras clave separadas por comas (opcional)
+
+### Información Registrada Automáticamente
+
+- **Hora de Creación**: Registra automáticamente la hora UTC
+- **Creador**: Registra automáticamente el GUID del creador
+- **Número de Página**: El sistema asigna automáticamente un número de página único
+- **Número de Versión**: La versión inicial es 1
+
+## Ver y Gestionar Notas
+
+### Explorar Lista de Notas
+
+1. Abrir la página de notas de trabajo
+2. Ver la cuadrícula de tarjetas de notas
+3. La parte superior de la página muestra el recuento total de páginas
+4. Las tarjetas están ordenadas por número de página
+
+### Ver Detalles de la Nota
+
+1. Haga clic en cualquier tarjeta de nota
+2. Los detalles de la nota se expanden a pantalla completa
+3. Ver la siguiente información: título de número de página, resumen, palabras clave, hora de actualización, contenido completo (renderizado Markdown)
+4. Haga clic en **×** en la esquina superior derecha para cerrar los detalles
+
+### Información de Tarjetas de Nota
+
+Cada tarjeta muestra:
+- **Page X**: Identificador de número de página
+- **Contenido del Resumen**: Breve descripción de la nota
+- **Hora de Actualización**: Hora de la última modificación
+
+## Buscar Notas
+
+### Métodos de Búsqueda
+
+**Buscar con Herramientas de IA**: Buscar notas de trabajo que contengan palabras clave
+**Ámbito de Búsqueda**: Resumen de la nota, contenido de la nota, campo de palabras clave
+
+### Generar Índice de Notas
+
+Puede pedir a la IA que genere un índice de todas las notas:
+```
+Por favor, genera un índice de mis notas de trabajo
+```
+
+## Actualizar Notas
+
+### Editar Contenido de la Nota
+
+Actualice notas con herramientas de IA, puede actualizar solo resumen, contenido o palabras clave por separado
+
+### Características de Actualización
+
+- **Actualización Selectiva**: Puede actualizar solo algunos campos
+- **Incremento de Versión**: Cada edición incrementa automáticamente el número de versión +1
+- **Seguimiento de Cambios**: Registra el GUID del último editor
+- **Actualización de Hora**: La hora de actualización se refresca automáticamente
+
+## Eliminar Notas
+
+### Operación de Eliminación
+
+Elimine notas con herramientas de IA, se requiere número de página o ID de nota
+
+### Confirmación de Eliminación
+
+- No se puede recuperar después de eliminar, opere con precaución
+- La operación de eliminación se registra en el registro de auditoría
+
+## Gestión de Permisos
+
+### Permisos de Notas de Trabajo Personales
+
+- **Creador**: Control total (crear, ver, editar, eliminar)
+- **Curador de Silicio**: Puede gestionar notas de todos los Seres de Silicio
+- **Otros Usuarios**: Sin permiso de acceso
+
+### Permisos de Notas de Trabajo de Proyecto
+
+- **Miembros del Proyecto**: Pueden crear, ver, editar notas del proyecto
+- **No Miembros del Proyecto**: Sin permiso de acceso
+- **Curador de Silicio**: Puede gestionar todas las notas del proyecto
+
+## Escenarios de Uso
+
+### Registro de Aprendizaje Personal
+
+Registrar el proceso de aprendizaje de nuevos conocimientos, añadir resumen, contenido, palabras clave
+
+### Seguimiento de Progreso del Proyecto
+
+Registrar el progreso semanal del proyecto, hacer seguimiento de la finalización de tareas
+
+### Resumen de Experiencia Laboral
+
+Resumir experiencias y lecciones del trabajo, almacenar para referencia futura
+
+### Registro de Actas de Reuniones
+
+Registrar el contenido de reuniones del proyecto, almacenar decisiones y resultados de discusiones
+
+## Mejores Prácticas
+
+### 1. Redactar Resumen de Forma Estándar
+
+- Limitar el resumen a menos de 20 caracteres, expresar claramente el contenido central de la nota
+
+### 2. Usar Palabras Clave de Forma Razonable
+
+- Usar 3-5 palabras clave, separadas por comas
+
+### 3. Estructurar el Contenido
+
+- Usar jerarquía de títulos Markdown, usar listas para información importante
+
+### 4. Organizar Notas Regularmente
+
+- Generar regularmente vista de índice, eliminar notas caducadas o innecesarias
+
+### 5. Colaboración en Notas de Proyecto
+
+- Registrar claramente información del autor, explicar motivo de cambios al editar
+
+## Preguntas Frecuentes
+
+### P1: ¿Cuál es la diferencia entre notas de trabajo y sistema de memoria?
+
+**R**: Las notas de trabajo son contenido estructurado registrado activamente, similar a un diario; el sistema de memoria almacena fragmentos de conversación y hechos guardados automática o manualmente.
+
+### P2: ¿Puedo proteger las notas con contraseña?
+
+**R**: La versión actual no admite protección con contraseña, pero el acceso se controla mediante el sistema de permisos.
+
+### P3: ¿Hay un límite para el número de notas?
+
+**R**: No hay un límite estricto, pero se recomienda organizar regularmente para mantener la calidad de las notas.
+
+### P4: ¿Puedo exportar las notas?
+
+**R**: La versión actual no admite exportación directa, pero los datos de las notas se pueden obtener a través de la API.
+
+### P5: ¿Puedo ver el historial de versiones de las notas?
+
+**R**: La versión actual solo mantiene la última versión, no almacena versiones históricas.
+
+### P6: ¿Se pueden convertir notas de proyecto y notas personales entre sí?
+
+**R**: No se admite la conversión directa, puede crear una nueva nota y copiar el contenido.
+
+## Documentación Relacionada
+
+- [Gestión de Seres de Silicio](/help/being-management) - Entender cómo gestionar Seres de Silicio
+- [Gestión de Proyectos](/help/projects) - Entender el espacio de proyecto y colaboración
+- [Gestión de Tareas](/help/task) - Entender la asignación y seguimiento de tareas
+- [Grafo de Conocimiento](/help/knowledge-graph) - Entender la visualización de conocimiento
+- [Gestión de Permisos](/help/permission) - Entender el mecanismo de control de permisos
+";
+    
+    public override string Projects => @"
+# Gestión de Proyectos
+
+## Descripción General
+
+La Gestión de Proyectos es el**espacio de trabajo colaborativo** del sistema de Seres de Silicio, que proporciona un entorno para que múltiples Seres de Silicio trabajen juntos. A través del espacio de proyecto, el Curador de Silicio puede organizar y gestionar equipos de Seres de Silicio, asignar tareas, hacer seguimiento del progreso y lograr objetivos de colaboración complejos.
+
+Los proyectos son la unidad organizativa central del sistema de Seres de Silicio, cada proyecto tiene un sistema de tareas independiente, notas de trabajo y lista de miembros.
+
+## Funciones Principales
+
+### Características Principales
+
+- **Gestión del Ciclo de Vida del Proyecto**: Crear, archivar, restaurar, eliminar proyectos
+- **Gestión de Miembros**: Asignar y eliminar miembros del proyecto
+- **Colaboración de Tareas**: Sistema de gestión de tareas exclusivo del proyecto
+- **Notas de Trabajo**: Notas de trabajo compartidas a nivel de proyecto
+- **Información del Proyecto**: Gestión de metadatos como nombre, descripción, estado
+- **Mecanismo de Archivo**: Admite archivo y restauración de proyectos, protege datos históricos
+
+### Estado del Proyecto
+
+| Estado | Descripción | Acciones Ejecutables |
+|--------|-------------|---------------------|
+| Activo | Proyecto en funcionamiento normal | Todas las acciones |
+| Archivado | Proyecto pausado, datos conservados | Restaurar, ver |
+| Eliminado | Proyecto eliminado permanentemente | Ninguna |
+
+## Acceso a Gestión de Proyectos
+
+### Puntos de Entrada
+
+**Función Exclusiva del Curador de Silicio**:
+- Las herramientas de gestión de proyectos solo están disponibles para el Curador de Silicio
+- Pedir a la IA que ejecute operaciones de gestión de proyectos mediante conversación
+- Ver la asociación de proyectos en la interfaz de gestión de Seres de Silicio
+
+### Página de Proyecto
+
+Cada proyecto tiene una página dedicada:
+1. Visite `/project/{ID del Proyecto}` para ver detalles del proyecto
+2. Ver información básica del proyecto (nombre, descripción, estado)
+3. Acceder a notas de trabajo del proyecto
+4. Acceder a lista de tareas del proyecto
+5. Ver lista de miembros del proyecto
+
+## Crear Proyecto
+
+### Operación de Creación
+
+Crear proyecto con herramientas de IA:
+```
+Por favor, crea un nuevo proyecto:
+- Nombre: Proyecto de Desarrollo de Asistente de IA
+- Descripción: Desarrollar funciones centrales del sistema de asistente inteligente
+```
+
+### Información del Proyecto
+
+Requerido al crear el proyecto:
+- **Nombre del Proyecto**: Expresar claramente el objetivo del proyecto (obligatorio)
+- **Descripción del Proyecto**: Describir en detalle el contenido del proyecto (opcional, pero recomendado)
+
+### Configuración Automática Después de Crear
+
+- **ID del Proyecto**: El sistema genera automáticamente un GUID único
+- **Hora de Creación**: Registra la hora de creación UTC
+- **Estado Inicial**: Estado activo
+- **Lista de Miembros**: Inicialmente vacía, necesita asignación posterior
+
+## Gestionar Miembros del Proyecto
+
+### Asignar Miembros al Proyecto
+
+Añadir Ser de Silicio al proyecto:
+```
+Por favor, asigna el Ser de Silicio XXX al proyecto YYY
+```
+
+Requerido:
+- **ID del Proyecto**: GUID del proyecto objetivo
+- **ID del Ser de Silicio**: GUID del Ser de Silicio a asignar
+
+### Eliminar Miembros del Proyecto
+
+Eliminar Ser de Silicio del proyecto:
+```
+Por favor, elimina el Ser de Silicio XXX del proyecto YYY
+```
+
+### Ver Miembros del Proyecto
+
+Listar todos los miembros del proyecto:
+```
+Por favor, lista todos los miembros del proyecto XXX
+```
+
+### Permisos de Miembros
+
+- **Miembros del Proyecto**: Pueden crear tareas del proyecto, escribir notas del proyecto
+- **No Miembros del Proyecto**: Sin acceso a recursos del proyecto
+- **Curador de Silicio**: Puede gestionar miembros de todos los proyectos
+
+## Actualizar Información del Proyecto
+
+### Cambiar Nombre del Proyecto
+
+```
+Por favor, cambia el nombre del proyecto XXX a nuevo nombre del proyecto
+```
+
+### Cambiar Descripción del Proyecto
+
+```
+Por favor, cambia la descripción del proyecto XXX a nueva descripción del proyecto
+```
+
+### Actualizar Nombre y Descripción Simultáneamente
+
+```
+Por favor, actualiza el proyecto XXX:
+- Nombre: Nuevo nombre
+- Descripción: Nueva descripción
+```
+
+## Gestión del Ciclo de Vida del Proyecto
+
+### Archivar Proyecto
+
+Archivar proyectos temporalmente inactivos:
+```
+Por favor, archiva el proyecto XXX
+```
+
+**Efecto del Archivo**:
+- El estado del proyecto cambia a ""Archivado""
+- Los datos del proyecto se conservan completamente
+- Los miembros siguen asociados
+- Se puede restaurar desde la lista de archivos
+
+**Escenarios de Archivo**:
+- Proyecto temporalmente suspendido
+- Proyecto por fases completado
+- Necesidad de organizar la lista de proyectos
+
+### Restaurar Proyecto
+
+Restaurar proyecto desde estado archivado:
+```
+Por favor, restaura el proyecto XXX
+```
+
+**Efecto de Restauración**:
+- El estado del proyecto vuelve a ""Activo""
+- Todos los datos se restauran completamente
+- Las relaciones de miembros permanecen sin cambios
+- Todas las funciones se pueden usar normalmente
+
+### Eliminar Proyecto
+
+Eliminar proyecto permanentemente (no recuperable):
+```
+Por favor, elimina el proyecto XXX
+```
+
+**Efecto de Eliminación**:
+- Los datos del proyecto se eliminan permanentemente
+- Las tareas y notas de trabajo relacionadas se limpian
+- Las relaciones de miembros se disuelven
+- **La acción no se puede deshacer**
+
+**Confirmar Antes de Eliminar**:
+- Confirmar que el proyecto ya no es necesario
+- Hacer copia de seguridad de datos importantes (si es necesario)
+- Notificar a los miembros del proyecto
+
+### Ver Lista y Detalles del Proyecto
+
+**Listar Todos los Proyectos Activos**:
+```
+Por favor, lista todos los proyectos
+```
+
+**Incluyendo Proyectos Archivados**:
+```
+Por favor, lista todos los proyectos, incluyendo archivados
+```
+
+### Ver Detalles del Proyecto
+
+Obtener información completa del proyecto:
+```
+Por favor, obtén los detalles del proyecto XXX
+```
+
+Información devuelta:
+- ID del proyecto
+- Nombre del proyecto
+- Descripción del proyecto
+- Estado del proyecto
+- Hora de creación
+- Lista de miembros
+- Estadísticas de tareas
+
+## Funciones de Colaboración del Proyecto
+
+### Tareas del Proyecto
+
+Cada proyecto tiene un sistema de tareas independiente:
+
+**Crear Tarea del Proyecto**:
+```
+Por favor, crea una tarea en el proyecto XXX:
+- Título: Implementar función de inicio de sesión de usuario
+- Descripción: Completar módulo de autenticación y autorización de usuarios
+- Prioridad: 1
+```
+
+**Prioridad de Tareas**:
+- Número más pequeño = mayor prioridad
+- Prioridad 1: Prioridad más alta
+- Prioridad 5: Prioridad normal
+
+**Flujo de Estado de Tareas**:
+1. **Pendiente** (Pending): Tarea creada, esperando inicio
+2. **En Ejecución** (Running): Tarea iniciada
+3. **Completada** (Completed): Tarea completada exitosamente
+4. **Fallida** (Failed): Ejecución de tarea fallida
+5. **Cancelada** (Cancelled): Tarea cancelada
+
+### Notas de Trabajo del Proyecto
+
+Cada proyecto tiene un sistema de notas de trabajo compartido:
+
+**Crear Nota del Proyecto**:
+```
+Por favor, crea una nota de trabajo en el proyecto XXX:
+- Resumen: Actualización de progreso del proyecto - Semana 1
+- Contenido: Esta semana se completó el análisis de requisitos...
+- Palabras clave: progreso, informe semanal
+```
+
+**Características de Notas del Proyecto**:
+- Todos los miembros del proyecto pueden crear y editar
+- Organizado por número de página, conveniente para seguimiento
+- Registra información del autor, seguimiento de contribuciones
+- Admite formato Markdown
+
+### Comparación de Recursos de Proyecto y Personales
+
+| Tipo de Recurso | Personal | Proyecto |
+|----------------|----------|----------|
+| Notas de Trabajo | Diario privado | Notas de colaboración compartidas |
+| Tareas | Tareas personales | Tareas de colaboración del proyecto |
+| Grafo de Conocimiento | Conocimiento personal | Conocimiento del proyecto (futuro) |
+| Memoria | Memoria personal | Memoria del proyecto (futuro) |
+
+## Escenarios de Uso
+
+### Proyecto de Desarrollo de Software
+
+**Escenario**: Organizar equipo para desarrollar software
+
+**Ejemplo**:
+```
+1. Crear proyecto: Desarrollo de aplicación web
+2. Asignar miembros: Desarrollo frontend, desarrollo backend, pruebas
+3. Crear tareas:
+   - Implementar módulo de autenticación de usuarios (prioridad 1)
+   - Diseñar arquitectura de base de datos (prioridad 1)
+   - Crear documentación de API (prioridad 2)
+4. Actualizar notas del proyecto semanalmente para registrar progreso
+5. Hacer seguimiento de la finalización de tareas
+```
+
+### Proyecto de Investigación
+
+**Escenario**: Colaborar en investigación de IA
+
+**Ejemplo**:
+```
+1. Crear proyecto: Investigación de optimización de grafo de conocimiento
+2. Asignar miembros: Investigador A, Investigador B
+3. Crear tareas:
+   - Revisión de literatura (prioridad 1)
+   - Experimento de mejora de algoritmo (prioridad 2)
+   - Crear informe de investigación (prioridad 3)
+4. Registrar notas de experimento en el proyecto
+5. Archivar fases de investigación completadas
+```
+
+### Proyecto de Aprendizaje
+
+**Escenario**: Organizar grupo de estudio
+
+**Ejemplo**:
+```
+1. Crear proyecto: Grupo de estudio de Python
+2. Asignar miembros: Aprendiz A, Aprendiz B, Mentor
+3. Crear tareas:
+   - Semana 1: Aprender sintaxis básica (prioridad 1)
+   - Semana 2: Programación orientada a objetos (prioridad 2)
+   - Semana 3: Práctica de proyecto (prioridad 3)
+4. Registrar notas de aprendizaje y reflexiones
+5. Marcar hitos de aprendizaje completados
+```
+
+## Mejores Prácticas
+
+### 1. Convención de Nombres de Proyectos
+
+- Usar nombres de proyectos claros
+- Incluir tipo u objetivo del proyecto
+- Evitar abreviaturas ambiguas
+
+**Buenos Ejemplos**:
+- ""Desarrollo de Backend de Aplicación Web""
+- ""Investigación de Optimización de Modelo de IA""
+- ""Organización de Documentos Técnicos 2024""
+
+**Malos Ejemplos**:
+- ""Proyecto 1""
+- ""Prueba""
+- ""Nuevo Proyecto""
+
+### 2. Describir el Proyecto en Detalle
+
+- Describir en detalle el objetivo y alcance del proyecto
+- Registrar hitos importantes
+- Describir resultados esperados
+
+### 3. Asignar Miembros de Forma Razonable
+
+- Asignar miembros basándose en habilidades y roles
+- Evitar que un miembro participe en demasiados proyectos
+- Revisar regularmente la participación de miembros
+
+### 4. Gestión de Prioridad de Tareas
+
+- Establecer alta prioridad para tareas importantes (1-2)
+- Establecer prioridad media para tareas normales (3-4)
+- Establecer baja prioridad para tareas opcionales (5+)
+
+### 5. Actualizar Regularmente Notas del Proyecto
+
+- Actualizar progreso al menos una vez por semana
+- Registrar decisiones y cambios importantes
+- Mantener continuidad e integridad de las notas
+
+### 6. Archivar Proyectos Oportunamente
+
+- Archivar proyectos completados oportunamente
+- Considerar archivar proyectos inactivos a largo plazo
+- Confirmar que los datos están guardados antes de archivar
+
+### 7. Usar la Función de Eliminación con Precaución
+
+- Confirmar dos veces antes de eliminar
+- Considerar archivar primero y observar por un tiempo
+- Confirmar que los datos históricos no son necesarios
+
+## Gestión de Permisos
+
+### Permisos de Gestión de Proyectos
+
+- **Curador de Silicio**:
+  - Crear, archivar, restaurar, eliminar proyectos
+  - Asignar y eliminar miembros del proyecto
+  - Actualizar información del proyecto
+  - Ver todos los proyectos
+
+- **Miembros del Proyecto**:
+  - Ver información del proyecto
+  - Crear y editar tareas del proyecto
+  - Crear y editar notas del proyecto
+  - No puede gestionar el proyecto en sí
+
+- **No Miembros del Proyecto**:
+  - Sin acceso a recursos del proyecto
+  - No puede ver información del proyecto
+
+### Permisos de Herramientas
+
+- Herramienta `project`: Marcada con `[SiliconManagerOnly]`, solo Curador de Silicio
+- Herramienta `project_task`: Disponible para miembros del proyecto y Curador de Silicio
+- Herramienta `project_work_note`: Disponible para miembros del proyecto y Curador de Silicio
+
+## Preguntas Frecuentes
+
+### P1: ¿Hay un límite superior para el número de proyectos?
+
+**R**: La versión actual no tiene un límite estricto. Sin embargo, se recomienda mantener un número razonable de proyectos para facilitar la gestión. Demasiados proyectos pueden causar confusión en la gestión.
+
+### P2: ¿Los proyectos archivados ocupan espacio de almacenamiento?
+
+**R**: Sí, todos los datos de los proyectos archivados (tareas, notas, etc.) se conservan. Si el espacio de almacenamiento es limitado, puede considerar eliminar proyectos que ya no son necesarios.
+
+### P3: ¿Puedo pertenecer a múltiples proyectos simultáneamente?
+
+**R**: Sí. Un Ser de Silicio puede ser asignado a múltiples proyectos simultáneamente y cambiar entre diferentes proyectos.
+
+### P4: ¿Los miembros del proyecto pueden abandonar el proyecto por sí mismos?
+
+**R**: La versión actual no admite el abandono autónomo de miembros. El Curador de Silicio debe ejecutar la operación de eliminación.
+
+### P5: ¿Se pueden añadir tareas a proyectos archivados?
+
+**R**: No. Los proyectos archivados están en estado de solo lectura y deben restaurarse al estado activo para continuar añadiendo o modificando.
+
+### P6: ¿Al eliminar un proyecto, también se eliminan las tareas y notas?
+
+**R**: Sí. Eliminar un proyecto limpia todos los datos relacionados (tareas, notas de trabajo, etc.). Esta acción no es recuperable.
+
+### P7: ¿Puedo copiar un proyecto?
+
+**R**: La versión actual no admite la copia directa de proyectos. Debe crear un nuevo proyecto manualmente y reconfigurar miembros y tareas.
+
+### P8: ¿Los proyectos tienen una fecha límite?
+
+**R**: La versión actual no obliga a establecer fechas límite. Sin embargo, puede registrar el cronograma planificado en la descripción del proyecto o gestionar el tiempo mediante tareas.
+
+## Documentación Relacionada
+
+- [Gestión de Tareas](/help/task) - Entender la gestión de tareas personales
+- [Notas de Trabajo](/help/work-notes) - Entender el sistema de notas de trabajo
+- [Gestión de Seres de Silicio](/help/being-management) - Entender cómo gestionar Seres de Silicio
+- [Gestión de Permisos](/help/permission) - Entender el mecanismo de control de permisos
+- [Registro de Auditoría](/help/audit-log) - Ver registro de acciones del proyecto
+";
+    
+    public override string Logging => @"
+# Sistema de Registro de Eventos
+
+## Descripción General
+
+El sistema de registro de eventos es una infraestructura central de la plataforma Silicon Life Collective, utilizada para registrar el estado operativo del sistema, el comportamiento de los seres de silicio, mensajes de error y datos de depuración. El sistema produce salida simultánea a consola y sistema de archivos, y proporciona capacidades flexibles de filtrado por nivel de registro.
+
+## Funciones Principales
+
+- **Registro Multi-Nivel**: Soporta 6 niveles de registro (Trace, Debug, Information, Warning, Error, Critical)
+- **Múltiples Destinos de Salida**: Soporta simultáneamente salida de consola coloreada y almacenamiento persistente en sistema de archivos
+- **Filtrado Inteligente**: Soporta filtrado por nivel de registro, rango de tiempo y ser de silicio
+- **Gestión Categorizada**: Organiza registros por categoría para facilitar la localización de problemas
+- **Registro de Excepciones**: Registra automáticamente trazas de pila de excepciones para asistir en solución de problemas
+
+## Descripción de Niveles de Registro
+
+El sistema define los siguientes niveles de registro (en orden creciente de severidad):
+
+| Nivel | Descripción | Caso de Uso |
+|-------|-------------|-------------|
+| **Trace** | Registros más detallados | Depuración de desarrollo, incluye datos sensibles |
+| **Debug** | Información de depuración | Investigación interactiva, propósitos de depuración |
+| **Information** | Información general | Rastreo del flujo normal de la aplicación, valor a largo plazo |
+| **Warning** | Mensajes de advertencia | Eventos anormales o inesperados, pero no detiene la ejecución |
+| **Error** | Mensajes de error | El flujo de ejecución actual se detiene debido a fallo |
+| **Critical** | Errores críticos | Fallo del sistema o fallo catastrófico, requiere manejo inmediato |
+| **None** | Sin registro | Usado para deshabilitar registro para una categoría específica |
+
+## Guía de Uso
+
+### ¿Dónde ver los registros?
+
+El sistema proporciona dos formas de ver registros:
+
+1. **Registros de Consola**: Al ejecutar el programa, la ventana de terminal muestra registros coloreados en tiempo real
+   - Diferentes colores representan diferentes niveles de severidad (rojo=error, amarillo=advertencia, etc.)
+   - Adecuado para depuración de desarrollo y monitoreo en tiempo real
+
+2. **Registros de Archivo**: Todos los registros se guardan automáticamente en el directorio `data/Log/`
+   - Guardados permanentemente, puede ver el historial en cualquier momento
+   - Adecuado para rastreo de problemas y análisis posterior
+
+## Opciones de Configuración
+
+### Ajustar Detalle de Registro
+
+Puede configurar el detalle de registro en el archivo de configuración:
+
+- **Durante Desarrollo/Depuración**: Configurar a ""Debug"" o ""Trace"" para ver información más detallada
+- **Uso Diario**: Configurar a ""Information"" para registrar operaciones normales
+- **Entorno de Producción**: Configurar a ""Warning"" para registrar solo problemas y errores
+
+## Visualización y Filtrado de Registros
+
+Los archivos de registro se guardan en el directorio `data/Log/`, organizados automáticamente por tiempo para facilitar la búsqueda de historial.
+
+## Formato de Visualización de Registros
+
+### Estilo de Visualización en Consola
+
+```
+[2026-04-27 10:30:00.123] [INFO] [Category] [Being:guid] Mensaje de registro
+```
+
+- Marca de tiempo: Precisa a milisegundos
+- Nivel: Alineado a la derecha, 4 caracteres de ancho
+- Categoría: Identificador de fuente de registro
+- ID de Ser de Silicio: Solo se muestra cuando el registro se relaciona con un ser específico
+
+### Atributos de Entrada de Registro
+
+Cada entrada de registro contiene la siguiente información:
+
+- **BeingId**: ID del ser de silicio asociado (vacío para registros del sistema)
+- **Timestamp**: Hora de creación del registro (UTC)
+- **Level**: Nivel de registro
+- **Category**: Categoría de registro
+- **Message**: Mensaje de registro
+- **Exception**: Información de excepción (si existe)
+
+## Mejores Prácticas
+
+### 1. Elegir Niveles de Registro Apropiados
+
+- **Entorno de Desarrollo**: Usar niveles Debug o Trace
+- **Entorno de Producción**: Usar niveles Information o Warning
+- **Solución de Problemas**: Reducir temporalmente a nivel Debug
+
+### 2. ¿En qué registros debe enfocarse?
+
+Se recomienda重点关注 las siguientes situaciones:
+- Información de inicio y apagado del sistema
+- Creación de seres de silicio, anomalías en tiempo de ejecución y apagado
+- Fallos de validación de permisos y problemas de seguridad
+- Fallos de llamadas a IA y anomalías de respuesta
+- Errores de ejecución de herramientas y timeouts
+
+### 3. Evitar Impacto en el Rendimiento por Exceso de Registros
+
+Si los archivos de registro son demasiado grandes, puede aumentar la configuración de detalle de registro (ej. cambiar a ""Warning"" o ""Error"") para reducir la cantidad de registros.
+
+### 4. Protección de Información Sensible
+
+El sistema NO registra la siguiente información sensible en los registros:
+- Contraseñas y claves
+- Información de identificación personal
+- Claves y tokens de API
+- Cadenas de conexión de base de datos
+
+## Preguntas Frecuentes
+
+### P: ¿Por qué no puedo ver algunos mensajes de registro?
+
+**R**: Posibles razones:
+1. La configuración de detalle de registro es demasiado alta, filtrando alguna información (se puede ajustar a ""Debug"" o ""Trace"" en configuración)
+2. El sistema no inició correctamente, la funcionalidad de registro no se inicializó
+
+### P: ¿Cómo ver registros más detallados?
+
+**R**: Modifique la configuración de detalle de registro en el archivo de configuración a ""Debug"" o ""Trace"", luego reinicie el sistema.
+
+### P: ¿Dónde están los archivos de registro?
+
+**R**: Los archivos de registro se almacenan en el directorio `data/Log/`, indexados por tiempo.
+
+## Solución de Problemas
+
+### Problema: No se pueden encontrar registros históricos
+
+**Síntomas**: No se pueden ver registros pasados
+
+**Soluciones**:
+1. Verificar si el directorio `data/Log/` existe y tiene permisos de lectura/escritura
+2. Confirmar que hay suficiente espacio en disco disponible
+
+## Notas
+
+- El sistema de registro garantiza operación estable; la falla de un solo destino de salida no afectará otros destinos
+- Si los archivos de registro son demasiado grandes, puede aumentar la configuración de detalle de registro (ej. cambiar a ""Warning"" o ""Error"") para reducir el volumen de registro
+- Al escribir grandes cantidades de registros, se recomienda aumentar apropiadamente el nivel de registro
 ";
     
     #endregion

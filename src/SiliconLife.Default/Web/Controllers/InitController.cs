@@ -13,6 +13,7 @@
 
 using System.Text;
 using SiliconLife.Collective;
+using SiliconLife.Default.Help;
 
 namespace SiliconLife.Default.Web;
 
@@ -90,6 +91,9 @@ public class InitController : Controller
             H.Create("select", GetAIClientTypeOptions()).Attr("name", "aiClientType").Attr("id", "aiClientTypeSelect").Attr("onchange", "onClientTypeChange(this.value)")
         ).Class("form-group"));
 
+        // AI client help link container (dynamically updated)
+        form.Add(H.Create("div", H.Create("div").Attr("id", "aiClientHelpLink")).Attr("id", "aiClientHelpContainer").Class("form-group"));
+
         form.Add(H.Create("div", H.Create("div").Attr("id", "aiConfigFields")).Attr("id", "aiConfigContainer").Class("form-group"));
 
         BuildDataDirectoryFormGroup(form);
@@ -117,7 +121,10 @@ public class InitController : Controller
                             !string.IsNullOrEmpty(error) ? new object[] { H.Create("div", H.Create("p", error ?? "")).Class("form-error") } : Array.Empty<object>(),
                             H.Create("form", form.ToArray()).Attr("action", "/init").Attr("method", "post").Class("init-form")
                                 .Attr("onsubmit", "return validateInitForm()"),
-                            H.Create("div", H.Create("p", _localization.InitFooterHint)).Class("init-footer")
+                            H.Create("div", 
+                                H.Create("p", _localization.InitFooterHint),
+                                H.Create("a", _localization.InitHelpLink).Attr("href", "/help").Class("init-help-link")
+                            ).Class("init-footer")
                         ).Class("init-card")
                     ).Class("init-container")
                 )
@@ -259,6 +266,38 @@ public class InitController : Controller
         }
 
         return options.ToArray();
+    }
+
+    private Dictionary<string, string> GetAIClientHelpTopicMapping()
+    {
+        // Auto-discover all factory types and their help topic IDs
+        var factoryTypes = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(assembly => assembly.GetTypes())
+            .Where(type => typeof(IAIClientFactory).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+            .ToList();
+
+        var helpMapping = new Dictionary<string, string>();
+        foreach (var type in factoryTypes)
+        {
+            try
+            {
+                var factory = Activator.CreateInstance(type);
+                if (factory is IAIClientFactoryHelp helpProvider)
+                {
+                    var helpTopicId = helpProvider.GetHelpTopicId();
+                    if (!string.IsNullOrEmpty(helpTopicId))
+                    {
+                        helpMapping[type.Name] = helpTopicId;
+                    }
+                }
+            }
+            catch
+            {
+                // Skip factories that cannot be instantiated
+            }
+        }
+
+        return helpMapping;
     }
 
     private IAIClientFactory CreateFactoryByType(string clientType)
@@ -407,6 +446,26 @@ public class InitController : Controller
 
         var js = Js.Block()
             .Add(() => Js.Const(() => "skinData", () => Js.Obj()));
+
+        // Get help localization for current language
+        var helpLocalization = HelpLocalizationFactory.Create(_configData.Language);
+        
+        // Get AI client help topic mapping
+        var helpTopicMapping = GetAIClientHelpTopicMapping();
+        
+        // Build help titles mapping from HelpTopics
+        var helpTitlesData = Js.Obj();
+        foreach (var kvp in helpTopicMapping)
+        {
+            var topicId = kvp.Value;
+            var topic = HelpTopics.GetById(topicId);
+            if (topic != null && helpLocalization != null)
+            {
+                var titleProperty = helpLocalization.GetType().GetProperty(topic.TitlePropertyName);
+                var title = titleProperty?.GetValue(helpLocalization) as string ?? topicId;
+                helpTitlesData.Prop(() => kvp.Key, () => Js.Str(() => title));
+            }
+        }
 
         foreach (var (skinCode, skin) in skins)
         {
@@ -601,6 +660,24 @@ public class InitController : Controller
         }
         
         js.Add(() => Js.Const(() => "aiConfigMetadata", () => aiConfigData));
+        
+        // Add AI help titles mapping
+        js.Add(() => Js.Const(() => "aiHelpTitles", () => helpTitlesData));
+        
+        // Add AI help topics mapping (factory type -> help topic ID)
+        var helpTopicsData = Js.Obj();
+        foreach (var kvp in helpTopicMapping)
+        {
+            helpTopicsData.Prop(() => kvp.Key, () => Js.Str(() => kvp.Value));
+        }
+        js.Add(() => Js.Const(() => "aiClientHelpTopics", () => helpTopicsData));
+        
+        // Add help prefix text
+        js.Add(() => Js.Const(() => "aiHelpPrefix", () => Js.Str(() => _localization.InitAIClientHelpPrefix)));
+        
+        // Add current language for help links
+        var currentLangCode = _localization.LanguageCode.Replace("-", ""); // Remove hyphen for consistency
+        js.Add(() => Js.Const(() => "initCurrentLang", () => Js.Str(() => currentLangCode)));
 
         // getCurrentAIConfigValues function
         var getCurrentValuesBody = Js.Block()
@@ -672,12 +749,46 @@ public class InitController : Controller
         
         onClientTypeChangeBody.Add(() => Js.Id(() => "Object").Call(() => "keys", () => Js.Id(() => "metadata")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "key" }, () => forEachBody)));
         
+        // Call updateAIclientHelp to update the help link
+        onClientTypeChangeBody.Add(() => Js.Id(() => "updateAIclientHelp").Invoke(() => Js.Id(() => "clientType")).Stmt());
+        
         js.Add(() => Js.Func(() => "onClientTypeChange", () => new List<string> { "clientType" }, () => onClientTypeChangeBody));
+
+        // updateAIclientHelp function - updates help link based on selected AI client type
+        var updateHelpBody = Js.Block()
+            .Add(() => Js.Const(() => "helpContainer", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "aiClientHelpLink"))))
+            .Add(() => Js.Const(() => "helpTopic", () => Js.Id(() => "aiClientHelpTopics").Index(() => Js.Id(() => "clientType"))))
+            .Add(() => Js.Const(() => "helpTitle", () => Js.Id(() => "aiHelpTitles").Index(() => Js.Id(() => "clientType"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "helpTopic").Op(() => "&&", () => (JsSyntax)Js.Id(() => "helpTitle")), new List<JsSyntax>
+                    {
+                        // Has help documentation, show link with language parameter from backend
+                        Js.Assign(() => Js.Id(() => "helpContainer").Prop(() => "innerHTML"), 
+                            () => Js.Str(() => "<a href='/help/")
+                                .Op(() => "+", () => (JsSyntax)Js.Id(() => "helpTopic"))
+                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "?lang="))
+                                .Op(() => "+", () => (JsSyntax)Js.Id(() => "initCurrentLang"))
+                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "' class='ai-help-link'>"))
+                                .Op(() => "+", () => (JsSyntax)Js.Id(() => "aiHelpPrefix"))
+                                .Op(() => "+", () => (JsSyntax)Js.Id(() => "helpTitle"))
+                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a>")))
+                    })
+                },
+                { (null, new List<JsSyntax>
+                    {
+                        // No help documentation, clear container
+                        Js.Assign(() => Js.Id(() => "helpContainer").Prop(() => "innerHTML"), () => Js.Str(() => ""))
+                    })
+                }
+            }));
+        js.Add(() => Js.Func(() => "updateAIclientHelp", () => new List<string> { "clientType" }, () => updateHelpBody));
 
         // Initialize on page load
         var initBody = Js.Block()
             .Add(() => Js.Const(() => "initialType", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "aiClientTypeSelect")).Prop(() => "value")))
-            .Add(() => Js.Id(() => "onClientTypeChange").Invoke(() => Js.Id(() => "initialType")).Stmt());
+            .Add(() => Js.Id(() => "onClientTypeChange").Invoke(() => Js.Id(() => "initialType")).Stmt())
+            .Add(() => Js.Id(() => "updateAIclientHelp").Invoke(() => Js.Id(() => "initialType")).Stmt());
         js.Add(() => Js.Id(() => "window").Prop(() => "addEventListener").Invoke(
             () => Js.Str(() => "load"),
             () => Js.Arrow(() => new List<string>(), () => initBody)
@@ -1011,6 +1122,18 @@ public class InitController : Controller
                 .Property("font-size", "12px")
                 .Property("color", "#64748b")
             .EndSelector()
+            .Selector(".init-help-link")
+                .Property("display", "inline-block")
+                .Property("margin-top", "12px")
+                .Property("font-size", "13px")
+                .Property("color", "#3b82f6")
+                .Property("text-decoration", "none")
+                .Property("transition", "color 0.2s")
+            .EndSelector()
+            .Selector(".init-help-link:hover")
+                .Property("color", "#2563eb")
+                .Property("text-decoration", "underline")
+            .EndSelector()
             .Selector(".lang-selector-row")
                 .Property("display", "flex")
                 .Property("gap", "8px")
@@ -1092,6 +1215,22 @@ public class InitController : Controller
             .Selector(".ai-config-field select option")
                 .Property("background", "#1e293b")
                 .Property("color", "#f1f5f9")
+            .EndSelector()
+            .Selector("#aiClientHelpContainer")
+                .Property("margin-top", "-12px")
+                .Property("margin-bottom", "8px")
+            .EndSelector()
+            .Selector("#aiClientHelpLink")
+                .Property("font-size", "13px")
+            .EndSelector()
+            .Selector(".ai-help-link")
+                .Property("color", "#3b82f6")
+                .Property("text-decoration", "none")
+                .Property("transition", "color 0.2s")
+            .EndSelector()
+            .Selector(".ai-help-link:hover")
+                .Property("color", "#2563eb")
+                .Property("text-decoration", "underline")
             .EndSelector()
             .Build();
     }

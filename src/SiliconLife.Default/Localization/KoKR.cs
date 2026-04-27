@@ -272,6 +272,8 @@ public class KoKR : DefaultLocalizationBase
     public override string InitSkinPreviewSecondaryBtn => "보조 버튼";
     public override string InitSubmitButton => "초기화 완료";
     public override string InitFooterHint => "설정 완료 후 언제든지 설정 페이지에서 변경 가능";
+        public override string InitHelpLink => "📖 도움말 문서 보기";
+        public override string InitAIClientHelpPrefix => "📖 도움말 보기: ";
     public override string InitNicknameRequiredError => "사용자 닉네임을 입력하세요";
     public override string InitDataDirectoryRequiredError => "데이터 디렉토리를 선택하세요";
     public override string InitCuratorNameLabel => "실리콘 라이프 이름";

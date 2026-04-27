@@ -246,6 +246,8 @@ public class DeDE : DefaultLocalizationBase
     public override string InitSkinPreviewSecondaryBtn => "Sekundäre Taste";
     public override string InitSubmitButton => "Initialisierung abschließen";
     public override string InitFooterHint => "Konfiguration kann jederzeit in den Einstellungen geändert werden";
+        public override string InitHelpLink => "📖 Hilfedokumentation anzeigen";
+        public override string InitAIClientHelpPrefix => "📖 Hilfe anzeigen: ";
     public override string InitNicknameRequiredError => "Bitte geben Sie einen Benutzernamen ein";
     public override string InitDataDirectoryRequiredError => "Bitte wählen Sie ein Datenverzeichnis";
     public override string InitCuratorNameLabel => "Silicon Being Name";

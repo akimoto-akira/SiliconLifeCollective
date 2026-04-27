@@ -20,7 +20,7 @@ public class ConfigView : ViewBase
         var vm = model as ConfigViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.PageTitleConfig, "config", vm.Localization, body, GetScripts(vm.Localization), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleConfig, "config", vm.Localization, body, GetScripts(vm.Localization), GetStyles(), helpTopicId: "config");
     }
 
     private static H RenderBody(ConfigViewModel vm)

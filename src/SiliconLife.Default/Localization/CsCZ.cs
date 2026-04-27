@@ -85,6 +85,8 @@ public class CsCZ : DefaultLocalizationBase
     public override string InitSkinPreviewSecondaryBtn => "Vedlejší tlačítko";
     public override string InitSubmitButton => "Odeslat";
     public override string InitFooterHint => "Tato nastavení můžete později upravit v konfiguraci";
+        public override string InitHelpLink => "📖 Zobrazit dokumentaci nápovědy";
+        public override string InitAIClientHelpPrefix => "📖 Zobrazit nápovědu: ";
     public override string InitNicknameRequiredError => "Přezdívka je vyžadována";
     public override string InitDataDirectoryRequiredError => "Adresář dat je vyžadován";
     public override string InitCuratorNameLabel => "Jméno kurátora";

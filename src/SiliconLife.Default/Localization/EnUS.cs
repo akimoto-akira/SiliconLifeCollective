@@ -272,6 +272,8 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string InitSkinPreviewSecondaryBtn => "Secondary";
     public override string InitSubmitButton => "Complete Setup";
     public override string InitFooterHint => "You can modify settings at any time on the settings page";
+        public override string InitHelpLink => "📖 View Help Documentation";
+        public override string InitAIClientHelpPrefix => "📖 View help: ";
     public override string InitNicknameRequiredError => "Please enter a nickname";
     public override string InitDataDirectoryRequiredError => "Please select a data directory";
     public override string InitCuratorNameLabel => "Silicon Being Name";

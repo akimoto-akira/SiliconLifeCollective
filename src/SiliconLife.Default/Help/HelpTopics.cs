@@ -121,6 +121,46 @@ public static class HelpTopics
             TitlePropertyName = nameof(HelpLocalizationBase.BeingSoul_Title),
             TagsPropertyName = nameof(HelpLocalizationBase.BeingSoul_Tags),
             Icon = "✨"
+        },
+        new()
+        {
+            Id = "audit-log",
+            PropertyName = nameof(HelpLocalizationBase.AuditLog),
+            TitlePropertyName = nameof(HelpLocalizationBase.AuditLog_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.AuditLog_Tags),
+            Icon = "📈"
+        },
+        new()
+        {
+            Id = "knowledge-graph",
+            PropertyName = nameof(HelpLocalizationBase.KnowledgeGraph),
+            TitlePropertyName = nameof(HelpLocalizationBase.KnowledgeGraph_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.KnowledgeGraph_Tags),
+            Icon = "📚"
+        },
+        new()
+        {
+            Id = "work-notes",
+            PropertyName = nameof(HelpLocalizationBase.WorkNotes),
+            TitlePropertyName = nameof(HelpLocalizationBase.WorkNotes_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.WorkNotes_Tags),
+            Icon = "📝"
+        },
+        new()
+        {
+            Id = "projects",
+            PropertyName = nameof(HelpLocalizationBase.Projects),
+            TitlePropertyName = nameof(HelpLocalizationBase.Projects_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.Projects_Tags),
+            Icon = "📁"
+        },
+        new()
+        {
+            Id = "logging",
+            PropertyName = nameof(HelpLocalizationBase.Logging),
+            TitlePropertyName = nameof(HelpLocalizationBase.Logging_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.Logging_Tags),
+            Icon = "📝"
         }
     };
 

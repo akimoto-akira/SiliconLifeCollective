@@ -20,7 +20,7 @@ namespace SiliconLife.Default;
 /// <summary>
 /// Factory for creating Ollama client instances
 /// </summary>
-public class OllamaClientFactory : IAIClientFactory
+public class OllamaClientFactory : IAIClientFactory, IAIClientFactoryHelp
 {
     /// <summary>
     /// Creates an Ollama client instance based on the provided configuration dictionary
@@ -155,5 +155,10 @@ public class OllamaClientFactory : IAIClientFactory
             return null;
         }
     }
+    
+    /// <summary>
+    /// Gets the help documentation topic ID for Ollama client factory
+    /// </summary>
+    public string? GetHelpTopicId() => "ollama-setup";
     
 }

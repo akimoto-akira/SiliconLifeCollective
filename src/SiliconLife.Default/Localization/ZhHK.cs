@@ -127,6 +127,8 @@ public class ZhHK : DefaultLocalizationBase
     public override string InitSkinPreviewSecondaryBtn => "次要按鈕";
     public override string InitSubmitButton => "完成初始化";
     public override string InitFooterHint => "設定完成後可隨時在設定頁面修改";
+        public override string InitHelpLink => "📖 查看幫助文檔";
+        public override string InitAIClientHelpPrefix => "📖 查看幫助：";
     public override string InitNicknameRequiredError => "請輸入用戶暱稱";
     public override string InitDataDirectoryRequiredError => "請選擇資料目錄";
     public override string InitCuratorNameLabel => "矽基人名稱";

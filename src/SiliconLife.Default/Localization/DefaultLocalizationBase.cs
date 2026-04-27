@@ -352,6 +352,16 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string InitFooterHint { get; }
 
     /// <summary>
+    /// Gets the help link text shown at the bottom of init page
+    /// </summary>
+    public abstract string InitHelpLink { get; }
+
+    /// <summary>
+    /// Gets the prefix text for AI client help link (e.g., "View help: ")
+    /// </summary>
+    public abstract string InitAIClientHelpPrefix { get; }
+
+    /// <summary>
     /// Gets the validation error message when nickname is empty
     /// </summary>
     public abstract string InitNicknameRequiredError { get; }

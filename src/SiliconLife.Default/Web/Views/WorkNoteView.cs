@@ -23,7 +23,7 @@ public class WorkNoteView : ViewBase
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
         string pageTitle = vm.ProjectId.HasValue ? vm.Localization.ProjectWorkNotesPageHeader : vm.Localization.PageTitleWorkNotes;
-        return RenderPage(vm.Skin, pageTitle, "work-notes", vm.Localization, body, GetScripts(vm.Localization, vm.BeingId, vm.ProjectId), GetStyles());
+        return RenderPage(vm.Skin, pageTitle, "work-notes", vm.Localization, body, GetScripts(vm.Localization, vm.BeingId, vm.ProjectId), GetStyles(), "work-notes");
     }
 
     private static H RenderBody(WorkNoteViewModel vm)

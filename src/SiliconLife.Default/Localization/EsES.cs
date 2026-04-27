@@ -272,6 +272,8 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string InitSkinPreviewSecondaryBtn => "Secundario";
     public override string InitSubmitButton => "Completar configuración";
     public override string InitFooterHint => "Puede modificar la configuración en cualquier momento en la página de configuración";
+        public override string InitHelpLink => "📖 Ver Documentación de Ayuda";
+        public override string InitAIClientHelpPrefix => "📖 Ver ayuda: ";
     public override string InitNicknameRequiredError => "Por favor ingrese un apodo";
     public override string InitDataDirectoryRequiredError => "Por favor seleccione un directorio de datos";
     public override string InitCuratorNameLabel => "Nombre del ser de silicio";

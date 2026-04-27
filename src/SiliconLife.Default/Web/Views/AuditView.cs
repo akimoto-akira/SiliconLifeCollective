@@ -20,7 +20,7 @@ public class AuditView : ViewBase
         var vm = model as AuditViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.PageTitleAudit, "audit", vm.Localization, body, GetScripts(vm.Localization), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.PageTitleAudit, "audit", vm.Localization, body, GetScripts(vm.Localization), GetStyles(), "audit-log");
     }
 
     private static H RenderBody(AuditViewModel vm)

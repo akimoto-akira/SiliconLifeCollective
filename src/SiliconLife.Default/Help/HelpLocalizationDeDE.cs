@@ -27,6 +27,11 @@ public class HelpLocalizationDeDE : HelpLocalizationBase
     public override string AIClients_Title => "KI-Client-Konfiguration";
     
     public override string BeingSoul_Title => "Soul-Datei";
+    public override string AuditLog_Title => "Prüfprotokoll";
+    public override string KnowledgeGraph_Title => "Wissensgraph";
+    public override string WorkNotes_Title => "Arbeitsnotizen";
+    public override string Projects_Title => "Projektmanagement";
+    public override string Logging_Title => "Protokollierungssystem";
 
     public override string[] GettingStarted_Tags => new[] { "Installation", "Start", "Einrichtung", "Schnellstart", "Erste Schritte", "Beginnen", "Initialisierung", "Umgebung" };
     public override string[] BeingManagement_Tags => new[] { "Being", "Erstellen", "Einstellung", "Being-Verwaltung", "Silicon Being", "Profil", "Konfiguration", "Verwaltung" };
@@ -43,6 +48,11 @@ public class HelpLocalizationDeDE : HelpLocalizationBase
     public override string[] AIClients_Tags => new[] { "KI-Client", "KI-Dienst", "Modell", "Konfiguration", "Lokal", "Cloud", "Ollama", "DashScope", "Einrichtung" };
     
     public override string[] BeingSoul_Tags => new[] { "Soul-Datei", "Persönlichkeit", "Prompt", "Rolle", "Verhalten", "Konfiguration", "Charakter", "Arbeitsanleitung", "System-Prompt" };
+    public override string[] AuditLog_Tags => new[] { "Prüfprotokoll", "Token", "Nutzungsstatistik", "Monitor", "Verbrauch", "Analyse", "Trend", "Export", "CSV" };
+    public override string[] KnowledgeGraph_Tags => new[] { "Wissensgraph", "Wissen", "Visualisierung", "Tripel", "Entität", "Relation", "Netzwerk", "Lernen", "Verwaltung" };
+    public override string[] WorkNotes_Tags => new[] { "Arbeitsnotizen", "Notizen", "Aufzeichnungen", "Tagebuch", "Protokoll", "Markdown", "Schlüsselwörter", "Version", "Suche" };
+    public override string[] Projects_Tags => new[] { "Projektmanagement", "Projekt", "Zusammenarbeit", "Aufgabe", "Mitglied", "Archiv", "Team", "Arbeitsbereich", "Fortschritt" };
+    public override string[] Logging_Tags => new[] { "Protokollierungssystem", "Protokoll", "Aufzeichnungen", "Debug", "Fehler", "Warnung", "Monitor", "Verfolgung", "Konsole", "Datei" };
     
     public override string GettingStarted => @"
 # Schnellstart
@@ -2788,6 +2798,1287 @@ Das System verwaltet diese Datei automatisch, und Sie müssen das Dateisystem ni
 - 💬 [Chat-System](chat-system) - Mit Silicon Beings konversieren
 - 🧠 [KI-Client-Konfiguration](ai-clients) - KI-Dienste konfigurieren
 - 📝 [Speichersystem](memory) - Konversationsverlauf verwalten
+";
+
+    public override string AuditLog => @"
+# Prüfprotokoll
+
+## Übersicht
+
+Das Prüfprotokoll verfolgt und analysiert den Token-Verbrauch aller KI-Aufrufe im System. Damit können Sie:
+- 📊 Token-Verbrauchsmuster visualisieren
+- 💰 Kosten überwachen und vorhersagen
+- 🔍 Anomale Nutzung erkennen
+- 📈 Nutzungstrends analysieren
+
+### Was ist ein Token?
+
+Ein Token ist die grundlegende Einheit, mit der KI-Modelle Text verarbeiten:
+- ca. 1 Token ≈ 0,75 englische Wörter oder 1,5 chinesische/koreanische Zeichen
+- **Eingabe-Token**: Vom Benutzer gesendete Nachrichten (Fragen, Befehle)
+- **Ausgabe-Token**: Von der KI generierte Antworten (Antworten, Ausführungsergebnisse)
+- **Gesamt-Token** = Eingabe-Token + Ausgabe-Token
+Je höher der Token-Verbrauch, desto höher die Rechenkosten.
+
+## Zugriff auf das Prüfprotokoll
+
+### Berechtigungsanforderungen
+- Nur Systemadministratoren können darauf zugreifen (höchste Berechtigungsstufe)
+- Normale Benutzer können es nicht sehen (Sicherheit und Datenschutz)
+
+### Zugriffsmethode
+1. Im Hauptmenü auf ""Systemverwaltung"" klicken (🔧 Symbol)
+2. Im linken Navigationsmenü auf ""Prüfung"" klicken (📊 Symbol)
+3. Das Prüfprotokoll-Dashboard wird automatisch geladen.
+4. Bei fehlenden Berechtigungen wird eine Zugriff-verweigert-Meldung angezeigt.
+5. Die Daten werden automatisch auf dem neuesten Stand gehalten (kein manuelles Aktualisieren erforderlich).
+## Prüfprotokoll-Dashboard-Funktionen
+
+### 1. Nutzungstrend-Diagramm (Liniendiagramm)
+**Position**: Im oberen Hauptbereich des Dashboards angezeigt.
+**Funktion**:
+- Zeigt den täglichen Token-Nutzungstrend innerhalb des ausgewählten Zeitraums.
+- Zwei Datenpunkte angezeigt:
+  - 🔵 **Tägliche Token**: Gesamtzahl der an einem Tag verbrauchten Token.
+  - 🟢 **Tägliche Kosten**: Gesamtkosten an einem Tag (EUR).
+- **Zeitraumauswahl**:
+  - Schnellauswahl-Buttons (""Letzte 7 Tage"", ""Letzte 30 Tage"", ""Dieser Monat"" usw.).
+  - Benutzerdefinierter Datumsbereich (Kalenderauswahl unterstützt).
+- **Daten-Zoom**: Direktes Zoomen im Diagramm zur Anzeige detaillierter Daten.
+- **Daten-Hinweis**: Mauszeiger über Datenpunkte bewegen, um genaue Zahlen anzuzeigen.
+
+### 2. Zusammenfassungs-Statistikkarten (4 Hauptindikatoren)
+
+4 Zusammenfassungskarten oben im Dashboard angezeigt:
+
+- 🔢 **Gesamter Token-Verbrauch**: Gesamtzahl der Token im ausgewählten Zeitraum.
+- 💰 **Gesamtkosten**: Gesamtbetrag im ausgewählten Zeitraum (EUR).
+- 📊 **Tagesdurchschnitt**: Durchschnittlicher täglicher Token-Verbrauch im ausgewählten Zeitraum.
+- 📈 **Maximale tägliche Nutzung**: Höchster täglicher Token-Verbrauch im ausgewählten Zeitraum.
+Diese Indikatoren helfen Ihnen, die Gesamtnutzung und Verbrauchstrends schnell zu erfassen.
+### 3. Nutzungs-Verteilung (Donut-Diagramm)
+**Position**: Unter oder neben den Zusammenfassungskarten angezeigt.
+**Funktion**:
+- Zeigt den Token-Nutzungsanteil jedes KI-Modells.
+- Intuitive Anzeige durch farbliche Unterscheidung der Modelle.
+- Klicken Sie auf den Modellnamen, um nur die Daten dieses Modells anzuzeigen.
+- **Verwendungsbeispiel**:
+  - Ermitteln, welches Modell die meisten Token verbraucht.
+  - Wenn der Anteil teurer Modelle zu hoch ist, auf günstigere Modelle umstellen.
+### 4. Nutzung nach Zeitstunde (Balkendiagramm)
+**Position**: Neben dem Verteilungsdiagramm angezeigt.
+**Funktion**:
+- Zeigt den Token-Verbrauch jeder Stunde innerhalb von 24 Stunden.
+- **Hotspot-Identifizierung**: Spitzenzeiten identifizieren (z.B. 14:00-16:00).
+- **Inaktive Zeiten**: Zeiten identifizieren, in denen das System kaum genutzt wird.
+**Verwendungsbeispiel**:
+- Vermeiden Sie das Planen großer Aufgaben während der Spitzenzeiten und verschieben Sie sie in Leerlaufzeiten.
+- Prüfen Sie, ob die hohe Nutzung während der Spitzenzeiten normal ist oder auf anomale Aufgaben zurückzuführen ist.
+### 5. Erweiterte Filterung und Suche (schnelle Datenexploration)
+**Position**: Oben im Dashboard oder im Filterbereich.
+**Unterstützte Filterbedingungen**:
+- 📅 **Datumsbereich**: Start- und Enddatum auswählen.
+- 🤖 **KI-Modell**: Nur Daten bestimmter Modelle anzeigen (z.B. ""gpt-4"", ""qwen-plus"").
+- 🛠️ **Tool-Name**: Nur Nutzung bestimmter Tools anzeigen (z.B. ""CalendarTool"", ""ChatTool"").
+- 📊 **Token-Bereich**: Nur Daten anzeigen, bei denen die Token-Zahl in einem bestimmten Bereich liegt (z.B. 1000-5000).
+- 🔍 **Schlüsselwort**: Schlüsselwortsuche nach Tool- oder Modellnamen.
+**Verwendungsbeispiel**:
+- ""Wie hoch sind die Kosten für gpt-4?"" → Modellfilter auf ""gpt-4"" setzen.
+- ""Wie hoch ist die Nutzung von CalendarTool?"" → Tool-Filter auf ""CalendarTool"" setzen.
+- ""Welche Aufrufe haben zu hohe Kosten?"" → Token-Bereich hoch einstellen.
+- ""Wie hoch war die Nutzung letzte Woche?"" → Datumsbereich auf letzte Woche setzen.
+### 6. Datenexport (Analysebericht)
+**Position**: Oben rechts im Dashboard.
+**Funktion**:
+- Auf ""CSV exportieren"" klicken.
+- Alle Daten entsprechend den aktuellen Filterbedingungen werden als CSV-Datei exportiert.
+- Kann mit Excel oder anderer Tabellenkalkulationssoftware geöffnet werden.
+**CSV-Datei enthält**:
+- Aufrufzeit (genaue Uhrzeit)
+- KI-Modellname
+- Verwendeter Tool-Name.
+- Token-Zahl (Eingabe/Ausgabe/Gesamt)
+- Kosten (EUR)
+- Aufrufstatus (Erfolg/Fehler)
+**Verwendungsbeispiel**:
+- Monatsberichte erstellen.
+- Daten mit dem Team teilen.
+- Langfristige Trendanalyse und Kostenoptimierung.
+## Verwendungsszenario-Beispiele.
+### Szenario 1: Kostenkontrolle und -optimierung.
+**Problem**: Die monatlichen Kosten des Systems sind zu hoch.
+**Lösung**.
+1. Prüfprotokoll-Dashboard öffnen.
+2. Zeitraum auf ""Dieser Monat"" setzen.
+3. ""Tagesdurchschnitt"" und ""Gesamtkosten"" prüfen.
+4. Teure Modelle im Donut-Diagramm identifizieren.
+5. Erweiterte Filter verwenden, um kostenintensive Aufrufe zu suchen.
+6. Als CSV exportieren und mit dem Team besprechen.
+7. Optimierungsmaßnahmen:
+   - Auf günstigere Modelle umstellen.
+   - Unnötige Aufrufe reduzieren.
+   - Cache-Mechanismen einführen.
+**Ergebnis**: 30% Kosteneinsparung.
+### Szenario 2: Anomale Nutzungserkennung.
+**Problem**: Plötzlicher Anstieg des Token-Verbrauchs.
+**Lösung**.
+1. Prüfprotokoll-Dashboard öffnen.
+2. Zeitraum auf ""Letzte 7 Tage"" setzen.
+3. Anstiegszeiten im Liniendiagramm identifizieren.
+4. Erweiterte Filter verwenden, um Daten für diesen Zeitraum zu suchen.
+5. Tool-Name, Modellname und Token-Zahl prüfen.
+6. Ursache der Anomalie analysieren:
+   - Großaufgabe ausgeführt?
+   - Endlosschleife?
+   - Böswilliger Angriff?
+7. Gegenmaßnahmen ergreifen.
+**Ergebnis**: Anomale Probleme rechtzeitig erkannt und behoben.
+### Szenario 3: Leistungsoptimierung.
+**Problem**: Langsame Systemantwortzeiten.
+**Lösung**.
+1. Prüfprotokoll-Dashboard öffnen.
+2. Zeitraum auf ""Letzte 30 Tage"" setzen.
+3. Spitzenzeiten im Balkendiagramm identifizieren.
+4. Tool-Aufrufe während der Spitzenzeiten prüfen.
+5. Optimierungsmaßnahmen:
+   - Aufgabenplanung während der Spitzenzeiten anpassen.
+   - Kostenintensive Tool-Aufrufe optimieren.
+   - Cache-Mechanismen einführen.
+**Ergebnis**: 40% Verbesserung der Antwortzeiten.
+### Szenario 4: Teamzusammenarbeit und Berichte.
+**Problem**: Monatlicher Nutzungsbericht muss beim Team eingereicht werden.
+**Lösung**.
+1. Prüfprotokoll-Dashboard öffnen.
+2. Zeitraum auf ""Dieser Monat"" setzen.
+3. Daten prüfen und analysieren.
+4. Auf ""CSV exportieren"" klicken.
+5. CSV-Datei in Excel öffnen und Tabellen und Diagramme erstellen.
+6. Bericht erstellen:
+   - Gesamt-Token und Kosten.
+   - Hauptverwendete Tools und Modelle.
+   - Trendanalyse und Optimierungsvorschläge.
+7. Mit dem Team teilen.
+**Ergebnis**: Effiziente Berichtserstellung, datengestützt.
+## Prüfungstool (KI-Aufruf).
+Systemadministratoren können der KI erlauben, Prüfprotokolldaten abzufragen.
+### Verwendungsmethode.
+1. Chat-Interface öffnen.
+2. KI fragen (z.B. ""Wie hoch war der Token-Verbrauch letzte Woche?"").
+3. KI ruft automatisch das Prüfungstool auf.
+4. KI zeigt die zusammengefassten Ergebnisse an.
+### Unterstützte Fragetypen.
+- ""Wie viele Token habe ich in den letzten 7 Tagen verbraucht?""
+- ""Wie hoch sind die Gesamtkosten diesen Monat?""
+- ""Welches Modell habe ich am häufigsten verwendet?""
+- ""Wie oft wurde CalendarTool verwendet?""
+### Vorsichtsmaßnahmen.
+- Administratorberechtigungen erforderlich.
+- Abfrage-Zeitbereichsbeschränkung (z.B. maximal 90 Tage).
+- Zeitüberschreitung bei Abfragen großer Datenmengen möglich.
+## Datenbeschreibung.
+### Datenquelle.
+- Alle Daten stammen aus tatsächlichen KI-Aufrufprotokollen.
+- Automatische Aufzeichnung startet beim Systemstart.
+- Gespeichert in lokalen Dateien, nicht in die Cloud hochgeladen.
+### Datengenauigkeit.
+- Token-Zahl: Tatsächliche vom KI-Modell zurückgegebene Zahl.
+- Kosten: Berechnet als Modellpreis × Token-Zahl.
+- Zeit: Basierend auf der Systemzeit (Kalendereinstellungen können angewendet werden).
+### Datenaufbewahrung.
+- Standardmäßig 365 Tage (1 Jahr) aufbewahrt.
+- Abgelaufene Daten werden automatisch bereinigt.
+- Aufbewahrungsdauer kann in den Einstellungen angepasst werden.
+## Häufig gestellte Fragen (FAQ).
+### F: Warum werden keine Prüfprotokolldaten angezeigt?
+**A:** Mögliche Gründe:
+1. Das System wurde gerade gestartet und es gibt noch keine Aufrufprotokolle.
+2. Der Datenbereich ist zu kurz (wählen Sie einen breiteren Zeitraum).
+3. Filterbedingungen sind zu streng (Filter zurücksetzen).
+4. Noch keine Aufrufprotokolle vorhanden (nach dem Starten eines Chats erneut prüfen).
+### F: Können Prüfprotokolldaten geändert werden?
+**A:** Nein. Prüfprotokolldaten sind ursprüngliche Aufzeichnungen und können nicht geändert werden. (Datenintegrität und Rückverfolgbarkeit gewährleisten).
+### F: Können Daten für einen bestimmten Zeitraum gelöscht werden?
+**A:** Durch Anpassen der Aufbewahrungsdauer in den Einstellungen werden abgelaufene Daten automatisch bereinigt. (Manuelles Löschen nicht unterstützt).
+### F: Die Kosten stimmen nicht mit der tatsächlichen Abrechnung überein?
+**A:** Mögliche Gründe:
+1. Veraltete Preise (aktuelle Preise in den Einstellungen aktualisieren).
+2. Zeitzonenunterschiede (Kalendereinstellungen prüfen).
+3. Einige Aufrufe wurden nicht aufgezeichnet (Systemneustart). (Durch Systemneustart beheben).
+### F: Können Prüfprotokolldaten mit anderen Benutzern geteilt werden?
+**A:** Durch CSV-Export können Sie Daten mit dem Team teilen. (Direkte Kontofreigabe nicht unterstützt, Sicherheitsprobleme).
+### F: Datenexport fehlgeschlagen?
+**A:** Mögliche Gründe:
+1. Unzureichender Festplattenspeicher (Festplattenspeicher freigeben).
+2. Datei von einem anderen Programm belegt (entsprechende Programme schließen).
+3. Berechtigungsproblem (mit Administratorberechtigungen ausführen).
+### F: Wann werden Echtzeitdaten aktualisiert?
+**A:** Wenn die Seite geöffnet ist, wird sie automatisch aktualisiert (alle 5 Sekunden). (Wenn die Seite geschlossen ist, werden die Daten nicht aktualisiert, erneut öffnen).
+## Best Practices.
+1. **Regelmäßige Überprüfung**: Prüfprotokolldaten wöchentlich oder monatlich prüfen.
+2. **Kostenwarnung**: Kostenschwellenwert einstellen, Benachrichtigung bei Überschreitung.
+3. **Optimierungsanpassung**: Modellauswahl und Aufrufstrategie basierend auf Daten optimieren.
+4. **Datenbackup**: Regelmäßig als CSV exportieren und backupen.
+5. **Team-Sharing**: Regelmäßig Daten mit dem Team teilen, Zusammenarbeit optimieren.
+## Verwandte Funktionen.
+- 💰 [Kostenmanagement](cost-management) - KI-Service-Kosten verfolgen und optimieren.
+- 🛠️ [Tool-Verwaltung](tool-management) - Systemtool-Nutzung und -Status.
+- 🧠 [KI-Client-Konfiguration](ai-clients) - KI-Dienste konfigurieren.
+- 📊 [Dashboard](dashboard) - Systemstatus überwachen.
+";
+    
+    public override string KnowledgeGraph => @"
+# Wissensgraph
+
+## Übersicht
+
+Der Wissensgraph ist das **Wissensmanagement- und Visualisierungssystem** für Silicon Beings, das das von Silicon Beings gelernte und angesammelte Wissen auf grafische Weise darstellt. Durch intuitive Knoten und Verbindungen können Sie die Beziehungen zwischen Wissen klar erkennen.
+
+## Was ist ein Wissenstripel?
+
+Die Grundeinheit des Wissensgraphen ist das **Wissenstripel**, das eine ""Subjekt-Prädikat-Objekt""-Struktur verwendet:
+
+```
+(Subjekt) -[Relation]-> (Objekt)
+```
+
+**Beispiele:**
+- `(Xiao Ming) -[mag]-> (Äpfel)`
+- `(Python) -[ist]-> (Programmiersprache)`
+- `(Erde) -[umkreist]-> (Sonne)`
+
+Diese Struktur ermöglicht es Silicon Beings, Wissen wie Menschen zu verstehen und zu organisieren.
+
+## Zugriff auf den Wissensgraphen
+
+### Einstiegspunkt
+
+1. Klicken Sie auf das **📚 Wissensdatenbank**-Symbol in der linken Navigationsleiste
+2. Das System lädt und zeigt automatisch die Wissensgraphen-Visualisierungsseite
+
+### Interface-Layout
+
+Die Wissensgraphen-Seite enthält:
+
+- **Obere Titel**: Zeigt ""Wissensgraph-Visualisierung"" an
+- **Statistik-Panel**: Zeigt Knotenanzahl, Kantenanzahl und andere Statistiken
+- **Haupt-Canvas-Bereich**: Zeigt die Wissensgraphen-Visualisierung
+- **Ladeindikator**: Zeigt Lademeldung während des Datenladens
+
+## Graph-Visualisierung
+
+### Knoten
+
+Knoten repräsentieren **Entitäten** (Subjekte oder Objekte) im Wissen:
+
+- **Kreisförmige Knoten**: Jeder Knoten repräsentiert eine Entität
+- **Knoten-Labels**: Zeigen den Entitätsnamen
+- **Knotengröße**: Automatisch angepasst basierend auf Verbindungsanzahl (mehr Verbindungen = größerer Knoten)
+- **Knotenfarben**:
+  - Blauer Rand: Reguläre Knoten
+  - Hervorgehoben: Beim Hovern mit der Maus
+
+### Kanten
+
+Kanten repräsentieren **Relationen** (Prädikate) im Wissen:
+
+- **Linien mit Pfeilen**: Zeigen Relationen von Subjekt zu Objekt
+- **Linienfarbe**: Halbtransparentes Blau `rgba(100, 150, 255, 0.6)`
+- **Pfeil-Markierungen**: Zeigen klar die Relationsrichtung
+
+### Layout-Algorithmus
+
+Der Wissensgraph verwendet einen **kreisförmigen Layout-Algorithmus**:
+
+- Alle Knoten sind gleichmäßig auf kreisförmigen Bahnen verteilt
+- Angemessener Abstand zwischen Knoten
+- Passt sich automatisch an die Canvas-Größe an
+
+## Interaktive Funktionen
+
+### Mausoperationen
+
+- **Knoten hovern**: Knoten wird hervorgehoben für einfache Identifizierung
+- **Relationen anzeigen**: Relationsrichtung durch Pfeile verstehen
+- **Canvas zoomen**: Browser-native Zoom-Funktion (Strg + Scrollrad)
+
+### Datenladen
+
+- **Automatisches Laden**: Lädt automatisch Wissensdaten vom System beim Seitenaufruf
+- **Echtzeit-Aktualisierung**: Seite erneut besuchen für neuestes Wissen
+- **Ladeindikator**: Zeigt ""Wissensgraph-Daten werden geladen..."" während des Ladens
+
+## Wissensmanagement
+
+### Wie wird Wissen generiert?
+
+Silicon Beings akkumulieren Wissen durch:
+
+1. **Konversationslernen**: Extrahieren von Schlüsselinformationen aus Gesprächen mit Benutzern
+2. **Tool-Aufruf**: Hinzufügen von Wissen durch KnowledgeTool
+3. **Dateianalyse**: Analysieren hochgeladener Dateiinhalte zum Extrahieren von Wissen
+4. **Aufgabenausführung**: Sammeln von Domänenwissen während der Aufgabenausführung
+
+### KnowledgeTool-Operationen
+
+Silicon Curatoren oder Silicon Beings können KI bitten, Wissensoperationen durch Konversation durchzuführen:
+
+**Wissen hinzufügen:**
+```
+Bitte füge Wissen hinzu: (Python) -[ist]-> (Programmiersprache)
+```
+
+**Wissen abfragen:**
+```
+Finde alles Wissen über ""Python""
+```
+
+**Wissen suchen:**
+```
+Suche nach Wissen mit ""Programmierung""
+```
+
+**Relationspfad finden:**
+```
+Finde den Relationspfad zwischen ""Python"" und ""KI""
+```
+
+### Wissensattribute
+
+Jeder Wissenseintrag enthält reiche Metadaten:
+
+- **Eindeutige ID**: Eindeutiger Identifikator für jedes Wissen
+- **Versionsnummer**: Unterstützt Wissensaktualisierungen und Versionsverwaltung
+- **Konfidenz**: 0.0-1.0, zeigt Wissenszuverlässigkeit an
+- **Quelle**: Wissensquelle (Konversation, Datei, Tool usw.)
+- **Kategorie**: Domäne oder Kategorie, zu der das Wissen gehört
+- **Tags**: Benutzerdefinierte Tags für einfache Klassifizierung und Suche
+- **Ersteller**: Das Silicon Being, das dieses Wissen hinzugefügt hat
+- **Erstellungszeit**: Zeitstempel, wann Wissen hinzugefügt wurde
+- **Validierungsstatus**: Unvalidiert/Validiert/Abgelehnt
+
+## Statistiken
+
+Die Wissensgraphen-Seite zeigt folgende Statistiken:
+
+- **Gesamtknoten**: Anzahl aller Entitäten im Wissensgraphen
+- **Gesamtkanten**: Anzahl der Relationen zwischen Entitäten
+- **Wissenseinträge**: Gesamtzahl der Wissenstripel im System
+
+Diese Statistiken helfen Ihnen, das Wissensakkumulationsniveau von Silicon Beings zu verstehen.
+
+## Anwendungsfälle
+
+### 1. Wissensvisualisierung
+
+Intuitiv anzeigen, was Silicon Beings gelernt haben:
+
+1. Wissensgraphen-Seite aufrufen
+2. Knotenverteilung und Verbindungen beobachten
+3. Wissensorganisationsstruktur und -assoziationen verstehen
+
+### 2. Wissensvalidierung
+
+Lernergebnisse von Silicon Beings überprüfen:
+
+1. Wissensknoten in spezifischen Domänen anzeigen
+2. Wissensgenauigkeit validieren
+3. Wissen durch Konversation ergänzen oder korrigieren
+
+### 3. Wissensforschung
+
+Assoziationen zwischen Wissen entdecken:
+
+1. Hoch verbundene Knoten (Kernkonzepte) beobachten
+2. Relationspfade verfolgen, um indirekte Assoziationen zu entdecken
+3. Wissenslücken identifizieren, um weiteres Lernen zu leiten
+
+## Häufig gestellte Fragen
+
+### F: Warum ist der Wissensgraph leer?
+
+**A:** Wenn Silicon Beings noch kein Wissen gelernt haben, wird der Graph leer angezeigt. Sie können Wissen hinzufügen durch:
+- Mit Silicon Beings konversieren, um sie neue Informationen lernen zu lassen
+- Dateien hochladen für Silicon Beings zur Analyse
+- Silicon Beings direkt bitten, spezifisches Wissen hinzuzufügen
+
+### F: Aktualisiert sich der Wissensgraph automatisch?
+
+**A:** Wissensgraphen-Daten werden in Echtzeit gespeichert, aber die Seite muss aktualisiert werden, um die neuesten Daten anzuzeigen. Nachdem Silicon Beings neues Wissen gelernt haben, besuchen Sie die Wissensgraphen-Seite erneut, um Aktualisierungen zu sehen.
+
+### F: Wie anzeigen, wenn es zu viele Knoten gibt?
+
+**A:** Wenn das Wissensvolumen groß ist:
+- Browser-Zoom verwenden (Strg + Scrollrad)
+- Auf hoch verbundene Kernknoten fokussieren
+- Nach Wissen zu spezifischen Themen durch Query-Tools suchen
+
+### F: Wie falsches Wissen löschen?
+
+**A:** Sie können Silicon Beings bitten, Wissen durch Konversation zu löschen oder zu korrigieren:
+```
+Bitte lösche inkorrektes Wissen über ""...""
+```
+oder
+```
+Bitte aktualisiere Wissen: (altes Wissen) zu (neues Wissen)
+```
+
+### F: Wo werden die Wissensgraphen-Daten gespeichert?
+
+**A:** Wissensdaten werden im Datenverzeichnis des Systems im JSON-Format gespeichert. Das System verwaltet automatisch Wissensspeicherung, -indizierung und -abfrage.
+
+### F: Kann ich den Wissensgraphen exportieren?
+
+**A:** Derzeit wird der Wissensgraph hauptsächlich für Online-Visualisierung verwendet. Um Wissensdaten zu exportieren, können Sie Silicon Beings bitten, durch Tools abzufragen und Berichte zu generieren.
+
+## Beste Praktiken
+
+### 1. Wissensakkumulation regelmäßig überprüfen
+
+- Wissensgraphen wöchentlich überprüfen, um Lernfortschritt von Silicon Beings zu verstehen
+- Auf neu hinzugefügte Knoten und Relationen fokussieren
+- Genauigkeit wichtigen Wissens validieren
+
+### 2. Wissenslernen leiten
+
+- Proaktiv hochwertige Wissensinputs bereitstellen
+- Falsches Wissen korrigieren, um Wissensdatenbank-Genauigkeit zu erhalten
+- Kategorien und Tags zu Wissen hinzufügen für einfachere Verwaltung
+
+### 3. Wissensgraphen zur Unterstützung von Konversationen verwenden
+
+- In Konversationen auf bestehendes Wissen referenzieren
+- Silicon Beings bitten, basierend auf bestehendem Wissen zu schlussfolgern
+- Assoziationen zwischen Wissen erforschen, um neue Erkenntnisse zu entdecken
+
+### 4. Wissensqualitätskontrolle
+
+- Auf Wissenskonfidenz-Scores achten
+- Genauigkeit kritischen Wissens validieren
+- Veraltetes oder inkorrektes Wissen zeitnah aktualisieren
+
+## Verwandte Dokumentation
+
+- [Being-Verwaltung](/help/being-management) - Verwaltung der Silicon Being-Erstellung und -Konfiguration
+- [Chat-System](/help/chat-system) - Mit Silicon Beings konversieren, um Wissen zu lernen
+- [Aufgaben-System](/help/task) - Wissenslern-Aufgaben konfigurieren
+- [Speicher-System](/help/memory) - Verstehen, wie Wissen das Konversations-Speicher beeinflusst
+";
+    
+    public override string WorkNotes => @"
+# Arbeitsnotizen
+
+## Übersicht
+
+Arbeitsnotizen sind das**persönliche Wissensaufzeichnungssystem** von Silicon Beings, ähnlich einem digitalen Tagebuch oder Arbeitsprotokoll. Jedes Silicon Being kann eigene Arbeitsnotizen erstellen, verwalten und abrufen, um Lernerfahrungen, Arbeitserkenntnisse, Gedanken und Reflexionen aufzuzeichnen.
+
+Arbeitsnotizen unterstützen zwei Modi:
+- **Persönliche Arbeitsnotizen**: Dem Silicon Being privat gehörend, standardmäßig nicht öffentlich
+- **Projekt-Arbeitsnotizen**: Dem Projektraum gehörend, Projektmitglieder können zusammenarbeiten
+
+## Hauptfunktionen
+
+### Kernmerkmale
+
+- **Seitenbasierte Aufzeichnung**: Jede Notiz ist eine unabhängige Seite, nach Seitennummer geordnet
+- **Markdown-Unterstützung**: Inhalte unterstützen Markdown-Format, Rich-Text-Bearbeitung möglich
+- **Schlagwort-Markierung**: Notizen können mit Schlagworten versehen werden, praktisch für Suche und Klassifizierung
+- **Versionsverwaltung**: Bei Bearbeitung wird automatisch die Versionsnummer aktualisiert, Änderungshistorie wird aufgezeichnet
+- **Autorenverfolgung**: Informationen über Ersteller und letzten Bearbeiter werden aufgezeichnet
+- **Timeline-Ansicht**: Alle Notizen in chronologischer Reihenfolge anzeigen
+- **Volltextsuche**: Notizen nach Schlagworten, Zusammenfassung oder Inhalt durchsuchen
+
+### Zwei Arten von Arbeitsnotizen
+
+| Typ | ownership | Standard-Sichtbarkeit | Anwendungsszenario |
+|------|-----------|----------------------|-------------------|
+| Persönliche Arbeitsnotizen | Silicon Being | Privat | Persönliches Tagebuch, Lernnotizen, Gedankenprotokoll |
+| Projekt-Arbeitsnotizen | Projektraum | Öffentlich | Projektfortschritt, Zusammenarbeitsprotokoll, Besprechungsnotizen |
+
+## Zugriff auf Arbeitsnotizen
+
+### Einstiegspunkte
+
+**Persönliche Arbeitsnotizen**:
+1. Klicken Sie in der linken Navigationsleiste auf das Symbol **📝 Arbeitsnotizen**
+2. Oder finden Sie den Arbeitsnotizen-Einstiegspunkt auf der Silicon Being-Detailseite
+
+**Projekt-Arbeitsnotizen**:
+1. Betreten Sie die Projektdetailseite
+2. Klicken Sie auf den Reiter **Arbeitsnotizen**
+
+### Oberflächenbeschreibung
+
+Die Arbeitsnotizen-Seite enthält zwei Hauptbereiche:
+
+**Notizraster-Bereich**:
+- Zeigt alle Notizen in Kartenform an
+- Jede Karte zeigt Seitennummer, Zusammenfassung, Aktualisierungszeit
+- Beim Hover-Effekt schwebt die Karte nach oben
+- Klicken Sie auf eine Karte, um Notizdetails zu öffnen
+
+**Notizdetail-Bereich**:
+- Zeigt den vollständigen Inhalt der Notiz im Vollbild
+- Zeigt Metadaten (Zusammenfassung, Schlagworte, Aktualisierungszeit)
+- Inhalt wird im Markdown-Format gerendert
+- Klicken Sie auf die Schließen-Schaltfläche, um zur Liste zurückzukehren
+
+## Notiz erstellen
+
+### Erstellen mit AI-Tools
+
+Silicon Beings können Notizen durch Konversation mit AI erstellen:
+
+**Persönliche Notiz erstellen**:
+```
+Bitte erstelle eine Arbeitsnotiz für mich:
+- Zusammenfassung: Konzept des Wissensgraphen gelernt
+- Inhalt: Ein Wissensgraph ist eine Methode, Wissen in Graphstruktur darzustellen...
+- Schlagworte: Wissensgraph, AI, Lernen
+```
+
+**Projekt-Notiz erstellen**:
+```
+Bitte erstelle eine Arbeitsnotiz im Projekt XXX:
+- Zusammenfassung: Projektfortschritt Update - Woche 1
+- Inhalt: Diese Woche wurde die Anforderungsanalysephase abgeschlossen...
+- Schlagworte: Fortschritt, Wochenbericht
+```
+
+### Erforderliche Notizfelder
+
+- **Zusammenfassung**: Kurze Beschreibung des Notizinhalts (erforderlich)
+- **Inhalt**: Detaillierter Inhalt der Notiz, Markdown unterstützt (erforderlich)
+- **Schlagworte**: Durch Kommas getrennte Schlagworte (optional)
+
+### Automatisch aufgezeichnete Informationen
+
+- **Erstellungszeit**: UTC-Zeit wird automatisch aufgezeichnet
+- **Ersteller**: GUID des Erstellers wird automatisch aufgezeichnet
+- **Seitennummer**: System vergibt automatisch eine eindeutige Seitennummer
+- **Versionsnummer**: Anfangsversion ist 1
+
+## Notizen anzeigen und verwalten
+
+### Notizliste durchsuchen
+
+1. Arbeitsnotizen-Seite öffnen
+2. Notizkartenraster anzeigen
+3. Oben auf der Seite wird die Gesamtzahl der Seiten angezeigt
+4. Karten sind nach Seitennummer geordnet
+
+### Notizdetails anzeigen
+
+1. Klicken Sie auf eine beliebige Notizkarte
+2. Notizdetails werden im Vollbild erweitert
+3. Folgende Informationen anzeigen: Seitennummer-Titel, Zusammenfassung, Schlagworte, Aktualisierungszeit, vollständiger Inhalt (Markdown-Rendering)
+4. Klicken Sie auf **×** oben rechts, um Details zu schließen
+
+### Notizkarteninformationen
+
+Jede Karte zeigt:
+- **Page X**: Seitennummern-Identifikator
+- **Zusammenfassung**: Kurze Beschreibung der Notiz
+- **Aktualisierungszeit**: Letzte Bearbeitungszeit
+
+## Notizen durchsuchen
+
+### Suchmethoden
+
+**Suche mit AI-Tools**: Arbeitsnotizen suchen, die Schlagworte enthalten
+**Suchbereich**: Notizzusammenfassung, Notizinhalt, Schlagwort-Feld
+
+### Notizverzeichnis generieren
+
+Sie können AI bitten, ein Verzeichnis aller Notizen zu generieren:
+```
+Bitte generiere ein Verzeichnis meiner Arbeitsnotizen
+```
+
+## Notizen aktualisieren
+
+### Notizinhalt bearbeiten
+
+Aktualisieren Sie Notizen mit AI-Tools, Sie können nur Zusammenfassung, Inhalt oder Schlagworte einzeln aktualisieren
+
+### Aktualisierungsmerkmale
+
+- **Selektives Update**: Nur einige Felder können aktualisiert werden
+- **Versionserhöhung**: Bei jeder Bearbeitung wird die Versionsnummer automatisch +1 erhöht
+- **Änderungsverfolgung**: GUID des letzten Bearbeiters wird aufgezeichnet
+- **Zeitaktualisierung**: Aktualisierungszeit wird automatisch aktualisiert
+
+## Notizen löschen
+
+### Löschvorgang
+
+Löschen Sie Notizen mit AI-Tools, Seitennummer oder Notiz-ID erforderlich
+
+### Löschbestätigung
+
+- Nach dem Löschen nicht wiederherstellbar, bitte vorsichtig handeln
+- Löschvorgang wird im Audit-Log aufgezeichnet
+
+## Berechtigungsverwaltung
+
+### Berechtigungen für persönliche Arbeitsnotizen
+
+- **Ersteller**: Vollständige Kontrolle (Erstellen, Anzeigen, Bearbeiten, Löschen)
+- **Silicon Kurator**: Kann Notizen aller Silicon Beings verwalten
+- **Andere Benutzer**: Keine Zugriffsberechtigung
+
+### Berechtigungen für Projekt-Arbeitsnotizen
+
+- **Projektmitglieder**: Können Projektnotizen erstellen, anzeigen, bearbeiten
+- **Nicht-Projektmitglieder**: Keine Zugriffsberechtigung
+- **Silicon Kurator**: Kann alle Projektnotizen verwalten
+
+## Anwendungsszenarien
+
+### Persönliche Lernaufzeichnung
+
+Aufzeichnen des Prozesses beim Lernen neuen Wissens, Zusammenfassung, Inhalt, Schlagworte hinzufügen
+
+### Projektfortschritt-Verfolgung
+
+Wöchentlichen Projektfortschritt aufzeichnen, Aufgabenerledigung verfolgen
+
+### Arbeitserfahrung-Zusammenfassung
+
+Zusammenfassung von Arbeitserfahrungen und Lehren, für zukünftige Referenz speichern
+
+### Besprechungsprotokoll
+
+Projektbesprechungsinhalte aufzeichnen, Entscheidungen und Diskussionsergebnisse speichern
+
+## Beste Praktiken
+
+### 1. Zusammenfassung standardisiert verfassen
+
+- Zusammenfassung auf unter 20 Zeichen beschränken, Kernaussage der Notiz klar ausdrücken
+
+### 2. Schlagworte vernünftig verwenden
+
+- 3-5 Schlagworte verwenden, durch Kommas getrennt
+
+### 3. Inhalt strukturieren
+
+- Markdown-Überschriftenhierarchie verwenden, wichtige Informationen mit Listen
+
+### 4. Notizen regelmäßig organisieren
+
+- Regelmäßig Verzeichnisübersicht generieren, abgelaufene oder unnötige Notizen löschen
+
+### 5. Projekt-Notizen-Zusammenarbeit
+
+- Autoreninformationen klar aufzeichnen, bei Bearbeitung Änderungsgrund angeben
+
+## Häufig gestellte Fragen
+
+### F1: Was ist der Unterschied zwischen Arbeitsnotizen und Speichersystem?
+
+**A**: Arbeitsnotizen sind aktiv aufgezeichnete strukturierte Inhalte, ähnlich einem Tagebuch; das Speichersystem speichert automatisch oder manuell gespeicherte Gesprächsfragmente und Fakten.
+
+### F2: Kann ich Notizen mit Passwortschutz versehen?
+
+**A**: Die aktuelle Version unterstützt keinen Passwortschutz, aber der Zugriff wird durch das Berechtigungssystem kontrolliert.
+
+### F3: Gibt es eine Begrenzung für die Anzahl der Notizen?
+
+**A**: Es gibt keine harte Begrenzung, aber wir empfehlen, regelmäßig zu organisieren, um die Notizqualität zu erhalten.
+
+### F4: Kann ich Notizen exportieren?
+
+**A**: Die aktuelle Version unterstützt keinen direkten Export, aber Notizdaten können über die API abgerufen werden.
+
+### F5: Kann ich die Versionshistorie von Notizen anzeigen?
+
+**A**: Die aktuelle Version behält nur die neueste Version, historische Versionen werden nicht gespeichert.
+
+### F6: Können Projekt-Notizen und persönliche Notizen ineinander umgewandelt werden?
+
+**A**: Direkte Umwandlung wird nicht unterstützt, Sie können eine neue Notiz erstellen und den Inhalt kopieren.
+
+## Verwandte Dokumentation
+
+- [Silicon Being-Verwaltung](/help/being-management) - Verstehen, wie Silicon Beings verwaltet werden
+- [Projektmanagement](/help/projects) - Verstehen von Projektraum und Zusammenarbeit
+- [Aufgabenverwaltung](/help/task) - Verstehen von Aufgabenzuweisung und -verfolgung
+- [Wissensgraph](/help/knowledge-graph) - Verstehen der Wissensvisualisierung
+- [Berechtigungsverwaltung](/help/permission) - Verstehen des Berechtigungskontrollmechanismus
+";
+    
+    public override string Projects => @"
+# Projektmanagement
+
+## Übersicht
+
+Projektmanagement ist der**Zusammenarbeitsarbeitsraum** des Silicon Being-Systems, der mehreren Silicon Beings eine Umgebung für gemeinsames Arbeiten bietet. Durch Projekträume kann der Silicon Kurator Silicon Being-Teams organisieren und verwalten, Aufgaben zuweisen, Fortschritt verfolgen und komplexe Zusammenarbeitsziele erreichen.
+
+Projekte sind die Kernorganisationseinheit des Silicon Being-Systems, jedes Projekt hat ein unabhängiges Aufgabensystem, Arbeitsnotizen und Mitgliederliste.
+
+## Hauptfunktionen
+
+### Kernmerkmale
+
+- **Projekt-Lebenszyklus-Verwaltung**: Erstellen, Archivieren, Wiederherstellen, Löschen von Projekten
+- **Mitgliederverwaltung**: Zuweisen und Entfernen von Projektmitgliedern
+- **Aufgaben-Zusammenarbeit**: Projektspezifisches Aufgabenverwaltungssystem
+- **Arbeitsnotizen**: Projekt-Level gemeinsame Arbeitsnotizen
+- **Projektinformationen**: Verwaltung von Metadaten wie Name, Beschreibung, Status
+- **Archivierungsmechanismus**: Unterstützt Projektarchivierung und -wiederherstellung, schützt historische Daten
+
+### Projektstatus
+
+| Status | Beschreibung | Ausführbare Aktionen |
+|--------|--------------|---------------------|
+| Aktiv | Normal betriebenes Projekt | Alle Aktionen |
+| Archiviert | Pausiertes Projekt, Daten erhalten | Wiederherstellen, Anzeigen |
+| Gelöscht | Permanent gelöschtes Projekt | Keine |
+
+## Zugriff auf Projektmanagement
+
+### Einstiegspunkte
+
+**Exklusiv für Silicon Kurator**:
+- Projektmanagement-Tools nur für Silicon Kurator verfügbar
+- AI durch Konversation bitten, Projektmanagement-Aktionen auszuführen
+- Projektzuordnung auf der Silicon Being-Verwaltungsoberfläche anzeigen
+
+### Projektseite
+
+Jedes Projekt hat eine eigene Seite:
+1. Besuchen Sie `/project/{ProjektID}`, um Projektdetails anzuzeigen
+2. Projektgrundinformationen anzeigen (Name, Beschreibung, Status)
+3. Auf Projekt-Arbeitsnotizen zugreifen
+4. Auf Projekt-Aufgabenliste zugreifen
+5. Projektmitgliederliste anzeigen
+
+## Projekt erstellen
+
+### Erstellvorgang
+
+Projekt mit AI-Tools erstellen:
+```
+Bitte erstellen Sie ein neues Projekt:
+- Name: AI-Assistent-Entwicklungsprojekt
+- Beschreibung: Entwicklung der Kernfunktionen des intelligenten Assistenzsystems
+```
+
+### Projektinformationen
+
+Bei Projekterstellung erforderlich:
+- **Projektname**: Projektziel klar ausdrücken (erforderlich)
+- **Projektbeschreibung**: Projektinhalt detailliert beschreiben (optional, aber empfohlen)
+
+### Automatische Einstellungen nach Erstellung
+
+- **Projekt-ID**: System generiert automatisch eindeutige GUID
+- **Erstellungszeit**: UTC-Erstellungszeit aufzeichnen
+- **Anfangsstatus**: Aktiver Status
+- **Mitgliederliste**: Anfangs leer, muss später zugewiesen werden
+
+## Projektmitglieder verwalten
+
+### Mitglieder dem Projekt zuweisen
+
+Silicon Being zum Projekt hinzufügen:
+```
+Bitte weisen Sie Silicon Being XXX dem Projekt YYY zu
+```
+
+Erforderlich:
+- **Projekt-ID**: GUID des Zielprojekts
+- **Silicon Being-ID**: GUID des zuzuweisenden Silicon Beings
+
+### Mitglieder aus Projekt entfernen
+
+Silicon Being aus Projekt entfernen:
+```
+Bitte entfernen Sie Silicon Being XXX aus dem Projekt YYY
+```
+
+### Projektmitglieder anzeigen
+
+Alle Mitglieder des Projekts auflisten:
+```
+Bitte listen Sie alle Mitglieder des Projekts XXX auf
+```
+
+### Mitgliederberechtigungen
+
+- **Projektmitglieder**: Können Projektaufgaben erstellen, Projektnotizen schreiben
+- **Nicht-Projektmitglieder**: Kein Zugriff auf Projektressourcen
+- **Silicon Kurator**: Kann Mitglieder aller Projekte verwalten
+
+## Projektinformationen aktualisieren
+
+### Projektname ändern
+
+```
+Bitte ändern Sie den Namen des Projekts XXX in neuen Projektnamen
+```
+
+### Projektbeschreibung ändern
+
+```
+Bitte ändern Sie die Beschreibung des Projekts XXX in neue Projektbeschreibung
+```
+
+### Name und Beschreibung gleichzeitig aktualisieren
+
+```
+Bitte aktualisieren Sie Projekt XXX:
+- Name: Neuer Name
+- Beschreibung: Neue Beschreibung
+```
+
+## Projekt-Lebenszyklus-Verwaltung
+
+### Projekt archivieren
+
+Vorübergehend inaktive Projekte archivieren:
+```
+Bitte archivieren Sie Projekt XXX
+```
+
+**Archivierungseffekt**:
+- Projektstatus ändert sich zu ""Archiviert""
+- Projektdaten vollständig erhalten
+- Mitglieder bleiben zugeordnet
+- Kann aus Archivliste wiederhergestellt werden
+
+**Archivierungsszenarien**:
+- Projekt vorübergehend ausgesetzt
+- Phasenprojekt abgeschlossen
+- Projektliste muss organisiert werden
+
+### Projekt wiederherstellen
+
+Projekt aus Archivstatus wiederherstellen:
+```
+Bitte stellen Sie Projekt XXX wieder her
+```
+
+**Wiederherstellungseffekt**:
+- Projektstatus wechselt zurück zu ""Aktiv""
+- Alle Daten vollständig wiederhergestellt
+- Mitgliederbeziehungen unverändert
+- Alle Funktionen normal nutzbar
+
+### Projekt löschen
+
+Projekt permanent löschen (nicht wiederherstellbar):
+```
+Bitte löschen Sie Projekt XXX
+```
+
+**Löschungseffekt**:
+- Projektdaten permanent gelöscht
+- Zugehörige Aufgaben und Arbeitsnotizen bereinigt
+- Mitgliederbeziehungen aufgehoben
+- **Aktion nicht rückgängig machbar**
+
+**Vor Löschung bestätigen**:
+- Bestätigen, dass Projekt wirklich nicht mehr benötigt wird
+- Wichtige Daten backupen (falls erforderlich)
+- Projektmitglieder benachrichtigen
+
+### Projektliste und Details anzeigen
+
+**Alle aktiven Projekte auflisten**:
+```
+Bitte listen Sie alle Projekte auf
+```
+
+**Einschließlich archivierter Projekte**:
+```
+Bitte listen Sie alle Projekte auf, einschließlich archivierter
+```
+
+### Projektdetails anzeigen
+
+Vollständige Projektinformationen abrufen:
+```
+Bitte holen Sie sich die Details von Projekt XXX
+```
+
+Zurückgegebene Informationen:
+- Projekt-ID
+- Projektname
+- Projektbeschreibung
+- Projektstatus
+- Erstellungszeit
+- Mitgliederliste
+- Aufgabenstatistik
+
+## Projekt-Zusammenarbeitsfunktionen
+
+### Projektaufgaben
+
+Jedes Projekt hat ein unabhängiges Aufgabensystem:
+
+**Projektaufgabe erstellen**:
+```
+Bitte erstellen Sie eine Aufgabe im Projekt XXX:
+- Titel: Benutzer-Login-Funktion implementieren
+- Beschreibung: Benutzer-Authentifizierungs- und Autorisierungsmodul vervollständigen
+- Priorität: 1
+```
+
+**Aufgabenpriorität**:
+- Kleinere Zahl = höhere Priorität
+- Priorität 1: Höchste Priorität
+- Priorität 5: Normale Priorität
+
+**Aufgabenstatus-Fluss**:
+1. **Ausstehend** (Pending): Aufgabe erstellt, wartet auf Start
+2. **Laufend** (Running): Aufgabe gestartet
+3. **Abgeschlossen** (Completed): Aufgabe erfolgreich abgeschlossen
+4. **Fehlgeschlagen** (Failed): Aufgabenausführung fehlgeschlagen
+5. **Storniert** (Cancelled): Aufgabe storniert
+
+### Projekt-Arbeitsnotizen
+
+Jedes Projekt hat ein gemeinsames Arbeitsnotizensystem:
+
+**Projektnotiz erstellen**:
+```
+Bitte erstellen Sie eine Arbeitsnotiz im Projekt XXX:
+- Zusammenfassung: Projektfortschritt Update - Woche 1
+- Inhalt: Diese Woche wurde Anforderungsanalyse abgeschlossen...
+- Schlagworte: Fortschritt, Wochenbericht
+```
+
+**Projektnotiz-Merkmale**:
+- Alle Projektmitglieder können erstellen und bearbeiten
+- Nach Seitennummer organisiert, praktisch für Nachverfolgung
+- Autoreninformationen aufzeichnen, Beitrag nachverfolgen
+- Markdown-Format unterstützt
+
+### Vergleich von Projekt- und persönlichen Ressourcen
+
+| Ressourcentyp | Persönlich | Projekt |
+|--------------|------------|---------|
+| Arbeitsnotizen | Privates Tagebuch | Gemeinsame Zusammenarbeitsnotizen |
+| Aufgaben | Persönliche Aufgaben | Projekt-Zusammenarbeitsaufgaben |
+| Wissensgraph | Persönliches Wissen | Projekt-Wissen (Zukunft) |
+| Speicher | Persönlicher Speicher | Projekt-Speicher (Zukunft) |
+
+## Anwendungsszenarien
+
+### Software-Entwicklungsprojekt
+
+**Szenario**: Team für Software-Entwicklung organisieren
+
+**Beispiel**:
+```
+1. Projekt erstellen: Web-Anwendung-Entwicklung
+2. Mitglieder zuweisen: Frontend-Entwicklung, Backend-Entwicklung, Testing
+3. Aufgaben erstellen:
+   - Benutzer-Authentifizierungsmodul implementieren (Priorität 1)
+   - Datenbank-Architektur entwerfen (Priorität 1)
+   - API-Dokumentation erstellen (Priorität 2)
+4. Wöchentlich Projekt-Notizen aktualisieren, um Fortschritt aufzuzeichnen
+5. Aufgabenerledigung verfolgen
+```
+
+### Forschungsprojekt
+
+**Szenario**: AI-Forschung zusammenarbeiten
+
+**Beispiel**:
+```
+1. Projekt erstellen: Wissensgraph-Optimierungsforschung
+2. Mitglieder zuweisen: Forscher A, Forscher B
+3. Aufgaben erstellen:
+   - Literaturreview (Priorität 1)
+   - Algorithmus-Verbesserungsexperiment (Priorität 2)
+   - Forschungsbericht erstellen (Priorität 3)
+4. Experiment-Notizen im Projekt aufzeichnen
+5. Abgeschlossene Forschungsphasen archivieren
+```
+
+### Lernprojekt
+
+**Szenario**: Lerngruppe organisieren
+
+**Beispiel**:
+```
+1. Projekt erstellen: Python-Lerngruppe
+2. Mitglieder zuweisen: Lernender A, Lernender B, Mentor
+3. Aufgaben erstellen:
+   - Woche 1: Grundlegende Syntax lernen (Priorität 1)
+   - Woche 2: Objektorientierte Programmierung (Priorität 2)
+   - Woche 3: Projekt-Praxis (Priorität 3)
+4. Lernnotizen und Reflexionen aufzeichnen
+5. Abgeschlossene Lern-Meilensteine markieren
+```
+
+## Beste Praktiken
+
+### 1. Projekt-Namenskonvention
+
+- Klaren Projektnamen verwenden
+- Projekttyp oder Ziel enthalten
+- Mehrdeutige Abkürzungen vermeiden
+
+**Gute Beispiele**:
+- ""Web-Anwendung-Backend-Entwicklung""
+- ""AI-Modell-Optimierungsforschung""
+- ""2024-Technologie-Dokument-Organisation""
+
+**Schlechte Beispiele**:
+- ""Projekt 1""
+- ""Test""
+- ""Neues Projekt""
+
+### 2. Projekt detailliert beschreiben
+
+- Projektziel und -umfang detailliert beschreiben
+- Wichtige Meilensteine aufzeichnen
+- Erwartete Ergebnisse beschreiben
+
+### 3. Mitglieder vernünftig zuweisen
+
+- Mitglieder basierend auf Fähigkeiten und Rollen zuweisen
+- Vermeiden, dass ein Mitglied an zu vielen Projekten teilnimmt
+- Regelmäßig Mitgliederbeteiligung überprüfen
+
+### 4. Aufgabenprioritäts-Verwaltung
+
+- Wichtige Aufgaben hohe Priorität setzen (1-2)
+- Normale Aufgaben mittlere Priorität setzen (3-4)
+- Optionale Aufgaben niedrige Priorität setzen (5+)
+
+### 5. Projekt-Notizen regelmäßig aktualisieren
+
+- Mindestens einmal pro Woche Fortschritt aktualisieren
+- Wichtige Entscheidungen und Änderungen aufzeichnen
+- Kontinuität und Vollständigkeit der Notizen erhalten
+
+### 6. Projekte rechtzeitig archivieren
+
+- Abgeschlossene Projekte rechtzeitig archivieren
+- Langfristig inaktive Projekte zur Archivierung in Betracht ziehen
+- Vor Archivierung bestätigen, dass Daten gespeichert sind
+
+### 7. Löschfunktion vorsichtig verwenden
+
+- Vor Löschung doppelt bestätigen
+- Erst archivieren und eine Zeit lang beobachten in Betracht ziehen
+- Bestätigen, dass historische Daten nicht benötigt werden
+
+## Berechtigungsverwaltung
+
+### Projektmanagement-Berechtigungen
+
+- **Silicon Kurator**:
+  - Projekt erstellen, archivieren, wiederherstellen, löschen
+  - Projektmitglieder zuweisen und entfernen
+  - Projektinformationen aktualisieren
+  - Alle Projekte anzeigen
+
+- **Projektmitglieder**:
+  - Projektinformationen anzeigen
+  - Projektaufgaben erstellen und bearbeiten
+  - Projektnotizen erstellen und bearbeiten
+  - Kann Projekt selbst nicht verwalten
+
+- **Nicht-Projektmitglieder**:
+  - Kein Zugriff auf Projektressourcen
+  - Kann Projektinformationen nicht anzeigen
+
+### Tool-Berechtigungen
+
+- `project` Tool: Mit `[SiliconManagerOnly]` markiert, nur Silicon Kurator
+- `project_task` Tool: Verfügbar für Projektmitglieder und Silicon Kurator
+- `project_work_note` Tool: Verfügbar für Projektmitglieder und Silicon Kurator
+
+## Häufig gestellte Fragen
+
+### F1: Gibt es eine Obergrenze für die Anzahl der Projekte?
+
+**A**: Die aktuelle Version hat keine harte Begrenzung. Wir empfehlen jedoch, eine vernünftige Anzahl von Projekten beizubehalten, um die Verwaltung zu erleichtern. Zu viele Projekte können zu Verwaltungskonfusion führen.
+
+### F2: Belegen archivierte Projekte Speicherplatz?
+
+**A**: Ja, alle Daten archivierter Projekte (Aufgaben, Notizen usw.) werden erhalten. Wenn Speicherplatz knapp wird, können Sie die Löschung nicht mehr benötigter Projekte in Betracht ziehen.
+
+### F3: Kann ich gleichzeitig mehreren Projekten angehören?
+
+**A**: Ja. Ein Silicon Being kann gleichzeitig mehreren Projekten zugewiesen werden und zwischen verschiedenen Projekten wechseln.
+
+### F4: Können Projektmitglieder selbst aus dem Projekt austreten?
+
+**A**: Die aktuelle Version unterstützt keinen selbstständigen Austritt von Mitgliedern. Der Silicon Kurator muss die Entfernungsaktion ausführen.
+
+### F5: Können archivierten Projekte Aufgaben hinzugefügt werden?
+
+**A**: Nein. Archivierte Projekte sind im Nur-Lese-Status und müssen in den aktiven Status wiederhergestellt werden, um weiterhin hinzuzufügen oder zu modifizieren.
+
+### F6: Werden beim Löschen eines Projekts auch Aufgaben und Notizen gelöscht?
+
+**A**: Ja. Das Löschen eines Projekts bereinigt alle zugehörigen Daten (Aufgaben, Arbeitsnotizen usw.). Diese Aktion ist nicht wiederherstellbar.
+
+### F7: Kann ich ein Projekt kopieren?
+
+**A**: Die aktuelle Version unterstützt keine direkte Projektkopie. Sie müssen ein neues Projekt manuell erstellen und Mitglieder und Aufgaben neu konfigurieren.
+
+### F8: Haben Projekte einen Endtermin?
+
+**A**: Die aktuelle Version erzwingt keine Endtermine. Sie können jedoch den geplanten Zeitplan in der Projektbeschreibung aufzeichnen oder die Zeit durch Aufgaben verwalten.
+
+## Verwandte Dokumentation
+
+- [Aufgabenverwaltung](/help/task) - Persönliche Aufgabenverwaltung verstehen
+- [Arbeitsnotizen](/help/work-notes) - Arbeitsnotizensystem verstehen
+- [Silicon Being-Verwaltung](/help/being-management) - Verstehen, wie Silicon Beings verwaltet werden
+- [Berechtigungsverwaltung](/help/permission) - Berechtigungskontrollmechanismus verstehen
+- [Audit-Log](/help/audit-log) - Projektaktionsprotokoll anzeigen
+";
+    
+    public override string Logging => @"
+# Protokollierungssystem
+
+## Übersicht
+
+Das Protokollierungssystem ist eine Kerninfrastruktur der Silicon Life Collective Plattform und dient zur Aufzeichnung des Systembetriebsstatus, des Verhaltens von Silicon Beings, Fehlermeldungen und Debug-Daten. Das System gibt gleichzeitig an Konsole und Dateisystem aus und bietet flexible Log-Level-Filterung.
+
+## Hauptfunktionen
+
+- **Multi-Level-Protokollierung**: Unterstützt 6 Log-Level (Trace, Debug, Information, Warning, Error, Critical)
+- **Mehrere Ausgabeziele**: Unterstützt gleichzeitig farbige Konsolenausgabe und Dateisystem-Persistenz
+- **Intelligentes Filtern**: Unterstützt Filterung nach Log-Level, Zeitraum und Silicon Being
+- **Kategorisierte Verwaltung**: Organisiert Logs nach Kategorie zur einfacheren Problemlokalisierung
+- **Ausnahmeaufzeichnung**: Zeichnet automatisch Exception-Stack-Traces zur Fehlerbehebung auf
+
+## Log-Level-Beschreibung
+
+Das System definiert folgende Log-Level (in aufsteigender Schwere):
+
+| Level | Beschreibung | Anwendungsfall |
+|-------|-------------|----------------|
+| **Trace** | Detaillierteste Logs | Entwicklung-Debugging, enthält sensitive Daten |
+| **Debug** | Debug-Informationen | Interaktive Untersuchung, Debugging-Zwecke |
+| **Information** | Allgemeine Informationen | Verfolgung des normalen Anwendungsflusses, langfristiger Wert |
+| **Warning** | Warnmeldungen | Anormale oder unerwartete Ereignisse, stoppt aber die Ausführung nicht |
+| **Error** | Fehlermeldungen | Aktueller Ausführungsfluss aufgrund von Fehler gestoppt |
+| **Critical** | Kritische Fehler | Systemabsturz oder katastrophaler Ausfall, sofortige Behandlung erforderlich |
+| **None** | Keine Protokollierung | Zum Deaktivieren der Protokollierung für eine bestimmte Kategorie |
+
+## Bedienungsanleitung
+
+### Wo kann ich Logs ansehen?
+
+Das System bietet zwei Möglichkeiten zur Log-Anzeige:
+
+1. **Konsolen-Logs**: Beim Ausführen des Programms zeigt das Terminal-Fenster farbige Logs in Echtzeit an
+   - Verschiedene Farben repräsentieren unterschiedliche Schweregrade (rot=Fehler, gelb=Warnung etc.)
+   - Geeignet für Entwicklung-Debugging und Echtzeit-Monitoring
+
+2. **Datei-Logs**: Alle Logs werden automatisch im `data/Log/` Verzeichnis gespeichert
+   - Permanent gespeichert, Verlauf jederzeit einsehbar
+   - Geeignet für Problemverfolgung und Nachanalyse
+
+## Konfigurationsoptionen
+
+### Log-Ausführlichkeit anpassen
+
+Sie können die Log-Ausführlichkeit in der Konfigurationsdatei einstellen:
+
+- **Während Entwicklung/Debugging**: Auf ""Debug"" oder ""Trace"" setzen, um detailliertere Informationen zu sehen
+- **Tägliche Nutzung**: Auf ""Information"" setzen, um normale Operationen aufzuzeichnen
+- **Produktionsumgebung**: Auf ""Warning"" setzen, um nur Probleme und Fehler aufzuzeichnen
+
+## Log-Anzeige und Filterung
+
+Log-Dateien werden im `data/Log/` Verzeichnis gespeichert, automatisch nach Zeit organisiert für einfache Verlaufssuche.
+
+## Log-Anzeigeformat
+
+### Konsolen-Anzeigestil
+
+```
+[2026-04-27 10:30:00.123] [INFO] [Category] [Being:guid] Log-Nachricht
+```
+
+- Zeitstempel: Precise auf Millisekunden
+- Level: Rechtsbündig, 4 Zeichen breit
+- Kategorie: Log-Quellkennung
+- Silicon Being ID: Nur angezeigt, wenn Log sich auf bestimmtes Being bezieht
+
+### Log-Eintragsattribute
+
+Jeder Log-Eintrag enthält folgende Informationen:
+
+- **BeingId**: Zugehörige Silicon Being ID (leer für System-Logs)
+- **Timestamp**: Log-Erstellungszeit (UTC)
+- **Level**: Log-Level
+- **Category**: Log-Kategorie
+- **Message**: Log-Nachricht
+- **Exception**: Exception-Information (falls vorhanden)
+
+## Best Practices
+
+### 1. Angemessene Log-Level wählen
+
+- **Entwicklungsumgebung**: Debug oder Trace Level verwenden
+- **Produktionsumgebung**: Information oder Warning Level verwenden
+- **Fehlerbehebung**: Temporär auf Debug Level senken
+
+### 2. Auf welche Logs sollten Sie achten?
+
+Es wird empfohlen, folgende Situationen zu重点关注:
+- Systemstart- und Shutdown-Informationen
+- Silicon Being-Erstellung, Laufzeitanomalien und Shutdown
+- Berechtigungsvalidierungsfehler und Sicherheitsprobleme
+- KI-Aufruffehler und Antwortanomalien
+- Tool-Ausführungsfehler und Timeouts
+
+### 3. Performance-Beeinträchtigung durch übermäßige Logs vermeiden
+
+Wenn Log-Dateien zu groß werden, können Sie die Log-Ausführlichkeitseinstellung erhöhen (z.B. auf ""Warning"" oder ""Error"" ändern), um die Log-Menge zu reduzieren.
+
+### 4. Schutz sensibler Informationen
+
+Das System zeichnet NICHT folgende sensitive Informationen in Logs auf:
+- Passwörter und Keys
+- Personenbezogene Daten
+- API-Keys und Tokens
+- Datenbank-Verbindungsstrings
+
+## FAQ
+
+### F: Warum kann ich einige Log-Nachrichten nicht sehen?
+
+**A**: Mögliche Gründe:
+1. Log-Ausführlichkeitseinstellung ist zu hoch, filtert einige Informationen heraus (kann in Konfiguration auf ""Debug"" oder ""Trace"" angepasst werden)
+2. System startete nicht korrekt, Logging-Funktionalität nicht initialisiert
+
+### F: Wie kann ich detailliertere Logs ansehen?
+
+**A**: Ändern Sie die Log-Ausführlichkeitseinstellung in der Konfigurationsdatei auf ""Debug"" oder ""Trace"", dann starten Sie das System neu.
+
+### F: Wo befinden sich die Log-Dateien?
+
+**A**: Log-Dateien werden im `data/Log/` Verzeichnis gespeichert, nach Zeit indiziert.
+
+## Fehlerbehebung
+
+### Problem: Historische Log-Aufzeichnungen nicht auffindbar
+
+**Symptome**: Vergangene Logs nicht einsehbar
+
+**Lösungen**:
+1. Prüfen, ob `data/Log/` Verzeichnis existiert und Lese-/Schreibberechtigungen hat
+2. Bestätigen, dass ausreichender Festplattenspeicher verfügbar ist
+
+## Hinweise
+
+- Das Logging-System gewährleistet stabilen Betrieb; Ausfall eines einzelnen Ausgabeziels beeinflusst andere Ziele nicht
+- Wenn Log-Dateien zu groß werden, können Sie die Log-Ausführlichkeitseinstellung erhöhen (z.B. auf ""Warning"" oder ""Error"" ändern), um das Log-Volumen zu reduzieren
+- Bei großen Log-Schreibmengen wird empfohlen, das Log-Level angemessen zu erhöhen
 ";
     
     #endregion

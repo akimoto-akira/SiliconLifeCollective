@@ -53,6 +53,21 @@ public abstract class HelpLocalizationBase
     /// <summary>Being Soul</summary>
     public abstract string BeingSoul { get; }
     
+    /// <summary>Audit Log</summary>
+    public abstract string AuditLog { get; }
+    
+    /// <summary>Knowledge Graph</summary>
+    public abstract string KnowledgeGraph { get; }
+    
+    /// <summary>Work Notes</summary>
+    public abstract string WorkNotes { get; }
+    
+    /// <summary>Projects</summary>
+    public abstract string Projects { get; }
+    
+    /// <summary>Logging System</summary>
+    public abstract string Logging { get; }
+    
     #endregion
 
     #region Help Document Titles (Display Titles)
@@ -99,6 +114,21 @@ public abstract class HelpLocalizationBase
     /// <summary>Being Soul Title</summary>
     public abstract string BeingSoul_Title { get; }
     
+    /// <summary>Audit Log Title</summary>
+    public abstract string AuditLog_Title { get; }
+    
+    /// <summary>Knowledge Graph Title</summary>
+    public abstract string KnowledgeGraph_Title { get; }
+    
+    /// <summary>Work Notes Title</summary>
+    public abstract string WorkNotes_Title { get; }
+    
+    /// <summary>Projects Title</summary>
+    public abstract string Projects_Title { get; }
+    
+    /// <summary>Logging System Title</summary>
+    public abstract string Logging_Title { get; }
+    
     #endregion
 
     #region Help Document Tags (Search Tags)
@@ -144,6 +174,21 @@ public abstract class HelpLocalizationBase
     
     /// <summary>Being Soul Tags</summary>
     public abstract string[] BeingSoul_Tags { get; }
+    
+    /// <summary>Audit Log Tags</summary>
+    public abstract string[] AuditLog_Tags { get; }
+    
+    /// <summary>Knowledge Graph Tags</summary>
+    public abstract string[] KnowledgeGraph_Tags { get; }
+    
+    /// <summary>Work Notes Tags</summary>
+    public abstract string[] WorkNotes_Tags { get; }
+    
+    /// <summary>Projects Tags</summary>
+    public abstract string[] Projects_Tags { get; }
+    
+    /// <summary>Logging System Tags</summary>
+    public abstract string[] Logging_Tags { get; }
     
     #endregion
 }

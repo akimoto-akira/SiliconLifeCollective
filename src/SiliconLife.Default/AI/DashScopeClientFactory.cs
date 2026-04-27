@@ -19,7 +19,7 @@ namespace SiliconLife.Default;
 /// <summary>
 /// Factory for creating DashScope (Alibaba Cloud Bailian) client instances
 /// </summary>
-public class DashScopeClientFactory : IAIClientFactory
+public class DashScopeClientFactory : IAIClientFactory, IAIClientFactoryHelp
 {
     /// <summary>
     /// Region-to-endpoint mapping for DashScope API
@@ -214,4 +214,9 @@ public class DashScopeClientFactory : IAIClientFactory
             return null; // Network error or timeout, fallback to recommended list
         }
     }
+    
+    /// <summary>
+    /// Gets the help documentation topic ID for DashScope client factory
+    /// </summary>
+    public string? GetHelpTopicId() => "bailian-dashscope";
 }

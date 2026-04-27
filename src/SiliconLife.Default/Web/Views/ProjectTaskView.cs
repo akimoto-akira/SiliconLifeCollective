@@ -22,7 +22,7 @@ public class ProjectTaskView : ViewBase
         var vm = model as ProjectTaskViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.ProjectTasksPageHeader, "project-tasks", vm.Localization, body, GetScripts(vm.Localization, vm.ProjectId), GetStyles());
+        return RenderPage(vm.Skin, vm.Localization.ProjectTasksPageHeader, "project-tasks", vm.Localization, body, GetScripts(vm.Localization, vm.ProjectId), GetStyles(), "projects");
     }
 
     private static H RenderBody(ProjectTaskViewModel vm)
