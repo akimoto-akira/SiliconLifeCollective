@@ -11,51 +11,124 @@ namespace SiliconLife.Default.Help;
 /// </summary>
 public class HelpLocalizationEsES : HelpLocalizationBase
 {
-    #region Help Documents
-    
-    public override string GettingStarted_Title => "Inicio Rápido";
-    public override string BeingManagement_Title => "Gestión de Seres de Silicio";
-    public override string ChatSystem_Title => "Función de Chat";
-    public override string Dashboard_Title => "Panel de Control";
-    public override string Task_Title => "Tareas";
-    public override string Timer_Title => "Temporizadores";
-    public override string Permission_Title => "Gestión de Permisos";
-    public override string Config_Title => "Gestión de Configuración";
-    public override string FAQ_Title => "Preguntas Frecuentes";
-    public override string Memory_Title => "Sistema de Memoria";
-    public override string OllamaSetup_Title => "Instalación de Ollama y Descarga de Modelos";
-    public override string BailianDashScope_Title => "Guía de Uso de la Plataforma Alibaba Cloud Bailian";
-    public override string AIClients_Title => "Configuración de Cliente de IA";
-        
-        public override string BeingSoul_Title => "Archivo de Alma";
-    public override string AuditLog_Title => "Registro de Auditoría";
-    public override string KnowledgeGraph_Title => "Grafo de Conocimiento";
-    public override string WorkNotes_Title => "Notas de Trabajo";
-    public override string Projects_Title => "Gestión de Proyectos";
-    public override string Logging_Title => "Sistema de Registro de Eventos";
+  #region Help Documents
 
-    public override string[] GettingStarted_Tags => new[] { "instalación", "inicio", "introducción", "inicio rápido", "empezar", "inicialización", "ejecutar", "configurar entorno" };
-    public override string[] BeingManagement_Tags => new[] { "ser de silicio", "crear", "configurar", "gestión de seres de silicio", "entidad", "perfil", "ajustes", "gestión" };
-    public override string[] ChatSystem_Tags => new[] { "chat", "conversación", "mensaje", "función de chat", "comunicación", "intercambio", "diálogo", "discusión" };
-    public override string[] Dashboard_Tags => new[] { "panel de control", "monitor", "estadísticas", "estado", "sistema", "frecuencia de mensajes", "tiempo de actividad", "memoria" };
-    public override string[] Task_Tags => new[] { "tarea", "trabajo", "ejecución", "prioridad", "dependencia", "estado", "automatización", "gestión" };
-    public override string[] Timer_Tags => new[] { "temporizador", "programación", "disparador", "período", "calendario", "recordatorio", "automático", "programado" };
-    public override string[] Permission_Tags => new[] { "permiso", "seguridad", "control de acceso", "gestión de permisos", "autorización", "privacidad", "protección", "autenticación" };
-    public override string[] Config_Tags => new[] { "configuración", "ajustes", "opciones", "gestión de configuración", "preferencias", "personalización", "sistema", "parámetros" };
-    public override string[] FAQ_Tags => new[] { "preguntas frecuentes", "ayuda", "problemas", "soporte", "solución de problemas", "guía", "asistencia", "respuestas" };
-    public override string[] Memory_Tags => new[] { "memoria", "historial", "registro", "sistema de memoria", "actividad", "rastreo", "búsqueda", "registro de eventos" };
-    public override string[] OllamaSetup_Tags => new[] { "Ollama", "instalación", "modelo", "descarga", "IA local", "configuración", "ajustes", "ejecución" };
-    public override string[] BailianDashScope_Tags => new[] { "Bailian", "DashScope", "Alibaba Cloud", "IA en la nube", "API", "configuración", "modelo", "pago" };
-    public override string[] AIClients_Tags => new[] { "cliente de IA", "servicio de IA", "modelo", "configuración", "local", "nube", "Ollama", "DashScope", "ajustes" };
-    
-    public override string[] BeingSoul_Tags => new[] { "archivo de alma", "personalidad", "prompt", "rol", "comportamiento", "configuración", "carácter", "guía de trabajo", "prompt del sistema" };
-    public override string[] AuditLog_Tags => new[] { "registro de auditoría", "Token", "estadísticas de uso", "monitor", "consumo", "análisis", "tendencia", "exportar", "CSV" };
-    public override string[] KnowledgeGraph_Tags => new[] { "grafo de conocimiento", "conocimiento", "visualización", "triple", "entidad", "relación", "red", "aprendizaje", "gestión" };
-    public override string[] WorkNotes_Tags => new[] { "notas de trabajo", "notas", "registros", "diario", "bitácora", "Markdown", "palabras clave", "versión", "búsqueda" };
-    public override string[] Projects_Tags => new[] { "gestión de proyectos", "proyecto", "colaboración", "tarea", "miembro", "archivo", "equipo", "espacio de trabajo", "progreso" };
-    public override string[] Logging_Tags => new[] { "sistema de registro", "registro", "eventos", "debug", "error", "advertencia", "monitor", "rastreo", "consola", "archivo" };
-    
-    public override string GettingStarted => @"
+  public override string GettingStarted_Title => "Inicio Rápido";
+  public override string BeingManagement_Title => "Gestión de Seres de Silicio";
+  public override string ChatSystem_Title => "Función de Chat";
+  public override string Dashboard_Title => "Panel de Control";
+  public override string Task_Title => "Tareas";
+  public override string Timer_Title => "Temporizadores";
+  public override string Permission_Title => "Gestión de Permisos";
+  public override string Config_Title => "Gestión de Configuración";
+  public override string FAQ_Title => "Preguntas Frecuentes";
+  public override string Memory_Title => "Sistema de Memoria";
+  public override string OllamaSetup_Title => "Instalación de Ollama y Descarga de Modelos";
+  public override string BailianDashScope_Title => "Guía de Uso de la Plataforma Alibaba Cloud Bailian";
+  public override string AIClients_Title => "Configuración de Cliente de IA";
+
+  public override string BeingSoul_Title => "Archivo de Alma";
+  public override string AuditLog_Title => "Registro de Auditoría";
+  public override string KnowledgeGraph_Title => "Grafo de Conocimiento";
+  public override string WorkNotes_Title => "Notas de Trabajo";
+  public override string Projects_Title => "Gestión de Proyectos";
+  public override string Logging_Title => "Sistema de Registro de Eventos";
+
+  public override string[] GettingStarted_Tags => new[]
+  {
+    "instalación", "inicio", "introducción", "inicio rápido", "empezar", "inicialización", "ejecutar",
+    "configurar entorno"
+  };
+
+  public override string[] BeingManagement_Tags => new[]
+  {
+    "ser de silicio", "crear", "configurar", "gestión de seres de silicio", "entidad", "perfil", "ajustes", "gestión"
+  };
+
+  public override string[] ChatSystem_Tags => new[]
+    { "chat", "conversación", "mensaje", "función de chat", "comunicación", "intercambio", "diálogo", "discusión" };
+
+  public override string[] Dashboard_Tags => new[]
+  {
+    "panel de control", "monitor", "estadísticas", "estado", "sistema", "frecuencia de mensajes", "tiempo de actividad",
+    "memoria"
+  };
+
+  public override string[] Task_Tags => new[]
+    { "tarea", "trabajo", "ejecución", "prioridad", "dependencia", "estado", "automatización", "gestión" };
+
+  public override string[] Timer_Tags => new[]
+  {
+    "temporizador", "programación", "disparador", "período", "calendario", "recordatorio", "automático", "programado"
+  };
+
+  public override string[] Permission_Tags => new[]
+  {
+    "permiso", "seguridad", "control de acceso", "gestión de permisos", "autorización", "privacidad", "protección",
+    "autenticación"
+  };
+
+  public override string[] Config_Tags => new[]
+  {
+    "configuración", "ajustes", "opciones", "gestión de configuración", "preferencias", "personalización", "sistema",
+    "parámetros"
+  };
+
+  public override string[] FAQ_Tags => new[]
+  {
+    "preguntas frecuentes", "ayuda", "problemas", "soporte", "solución de problemas", "guía", "asistencia", "respuestas"
+  };
+
+  public override string[] Memory_Tags => new[]
+  {
+    "memoria", "historial", "registro", "sistema de memoria", "actividad", "rastreo", "búsqueda", "registro de eventos"
+  };
+
+  public override string[] OllamaSetup_Tags => new[]
+    { "Ollama", "instalación", "modelo", "descarga", "IA local", "configuración", "ajustes", "ejecución" };
+
+  public override string[] BailianDashScope_Tags => new[]
+    { "Bailian", "DashScope", "Alibaba Cloud", "IA en la nube", "API", "configuración", "modelo", "pago" };
+
+  public override string[] AIClients_Tags => new[]
+    { "cliente de IA", "servicio de IA", "modelo", "configuración", "local", "nube", "Ollama", "DashScope", "ajustes" };
+
+  public override string[] BeingSoul_Tags => new[]
+  {
+    "archivo de alma", "personalidad", "prompt", "rol", "comportamiento", "configuración", "carácter",
+    "guía de trabajo", "prompt del sistema"
+  };
+
+  public override string[] AuditLog_Tags => new[]
+  {
+    "registro de auditoría", "Token", "estadísticas de uso", "monitor", "consumo", "análisis", "tendencia", "exportar",
+    "CSV"
+  };
+
+  public override string[] KnowledgeGraph_Tags => new[]
+  {
+    "grafo de conocimiento", "conocimiento", "visualización", "triple", "entidad", "relación", "red", "aprendizaje",
+    "gestión"
+  };
+
+  public override string[] WorkNotes_Tags => new[]
+  {
+    "notas de trabajo", "notas", "registros", "diario", "bitácora", "Markdown", "palabras clave", "versión", "búsqueda"
+  };
+
+  public override string[] Projects_Tags => new[]
+  {
+    "gestión de proyectos", "proyecto", "colaboración", "tarea", "miembro", "archivo", "equipo", "espacio de trabajo",
+    "progreso"
+  };
+
+  public override string[] Logging_Tags => new[]
+  {
+    "sistema de registro", "registro", "eventos", "debug", "error", "advertencia", "monitor", "rastreo", "consola",
+    "archivo"
+  };
+
+  public override string GettingStarted => @"
 # Inicio Rápido
 
 ## Iniciar el Sistema
@@ -187,7 +260,7 @@ Ahora que ha comprendido las operaciones básicas, puede:
 ¡Le deseamos un uso agradable!
 ";
 
-    public override string BeingManagement => @"
+  public override string BeingManagement => @"
 # Gestión de Seres de Silicio
 
 ## ¿Qué es un Ser de Silicio?
@@ -344,7 +417,7 @@ Haga clic en el enlace ""Cliente de IA"" en la página de detalles del ser de si
 4. Pruebe y optimice continuamente
 ";
 
-    public override string ChatSystem => @"
+  public override string ChatSystem => @"
 # Función de Chat
 
 ## Iniciar Conversación
@@ -475,7 +548,7 @@ En la página ""Seres de Silicio"", haga clic en el enlace ""Historial de chat""
 5. **Prestar atención a la invocación de herramientas**: Observe las herramientas que invoca la IA para asegurar que las operaciones cumplan con sus expectativas
 ";
 
-    public override string Dashboard => @"
+  public override string Dashboard => @"
 # Panel de Control
 
 ## Descripción General
@@ -583,7 +656,7 @@ Si el Panel de Control no se muestra correctamente, puede intentar los siguiente
 4. **Reiniciar el programa**: Si ninguno de los métodos anteriores funciona, intente cerrar el programa y abrirlo nuevamente
 ";
 
-    public override string Task => @"
+  public override string Task => @"
 # Tareas
 
 ## Descripción General
@@ -785,7 +858,7 @@ El sistema automáticamente:
 No necesita gestionar manualmente, el sistema se encargará de todo.
 ";
 
-    public override string Timer => @"
+  public override string Timer => @"
 # Temporizadores
 
 ## ¿Qué son los temporizadores?
@@ -930,7 +1003,7 @@ Cada ejecución tiene los siguientes estados:
 3. **Ajustar estrategias**: Si es necesario, haga que el ser de silicio ajuste la configuración de los temporizadores a través de la conversación
 ";
 
-    public override string Permission => @"
+  public override string Permission => @"
 # Gestión de Permisos
 
 ## ¿Qué es el Sistema de Permisos?
@@ -1091,7 +1164,7 @@ El sistema soporta los siguientes tipos de permisos:
 Cada tipo tiene diferentes niveles de seguridad y métodos de procesamiento.
 ";
 
-    public override string Config => @"
+  public override string Config => @"
 # Gestión de Configuración
 
 ## ¿Qué es la Gestión de Configuración?
@@ -1283,7 +1356,7 @@ El archivo de configuración se encuentra en el archivo `config.json` en el dire
 5. **Seguridad primero**: Asegurar la seguridad de la red antes de abrir el acceso de red interna
 ";
 
-    public override string FAQ => @"
+  public override string FAQ => @"
 # Preguntas Frecuentes
 
 ## Comenzar a Usar
@@ -1512,7 +1585,7 @@ El archivo de configuración se encuentra en el archivo `config.json` en el dire
 **R:** El sistema soporta la extensión de funciones escribiendo código, pero esto requiere ciertos conocimientos de programación. Se recomienda que los usuarios comunes usen las funciones proporcionadas por el sistema.
 ";
 
-    public override string Memory => @"
+  public override string Memory => @"
 # Sistema de Memoria
 
 ## ¿Qué es el Sistema de Memoria?
@@ -1704,7 +1777,7 @@ El sistema automáticamente:
 No necesita gestionar manualmente la memoria, el sistema se encargará de todo.
 ";
 
-    public override string OllamaSetup => @"
+  public override string OllamaSetup => @"
 # Instalación de Ollama y Descarga de Modelos
 
 ## ¿Qué es Ollama?
@@ -2014,7 +2087,7 @@ Después de instalar Ollama y descargar modelos, puede:
 ¡Le deseamos un uso agradable!
 ";
 
-    public override string BailianDashScope => @"
+  public override string BailianDashScope => @"
 # Guía de Uso de la Plataforma Alibaba Cloud Bailian
 
 ## ¿Qué es Alibaba Cloud Bailian?
@@ -2270,8 +2343,8 @@ Después de configurar Bailian, puede:
 
 ¡Le deseamos un uso agradable!
 ";
-    
-    public override string AIClients => @"
+
+  public override string AIClients => @"
 # Configuración de Cliente de IA
 
 ## Descripción General
@@ -2558,8 +2631,8 @@ Si encuentra problemas:
 2. Verifique [Gestión de Configuración](./config) para instrucciones de configuración del sistema
 3. Verifique registros del sistema para detalles de error
 ";
-    
-    public override string BeingSoul => @"
+
+  public override string BeingSoul => @"
 # Archivo de Alma
 
 ## Descripción General
@@ -2801,7 +2874,7 @@ El sistema gestiona automáticamente este archivo, y no necesita operar manualme
 - 📝 [Sistema de Memoria](memory) - Gestionar historial de conversaciones
 ";
 
-    public override string AuditLog => @"
+  public override string AuditLog => @"
 # Registro de Auditoría
 
 ## Descripción General
@@ -3154,8 +3227,8 @@ Optimizar según los datos de auditoría:
 - [Gestión de Permisos](/help/permission) - Entender los permisos del curador y control de acceso
 - [Gestión de Configuración](/help/config) - Configurar clientes de IA y otros ajustes del sistema
 ";
-    
-    public override string KnowledgeGraph => @"
+
+  public override string KnowledgeGraph => @"
 # Grafo de Conocimiento
 
 ## Descripción General
@@ -3393,8 +3466,8 @@ Por favor actualiza conocimiento: (conocimiento antiguo) a (nuevo conocimiento)
 - [Sistema de Tareas](/help/task) - Configurar tareas de aprendizaje de conocimiento
 - [Sistema de Memoria](/help/memory) - Entender cómo el conocimiento afecta la memoria de conversación
 ";
-    
-    public override string WorkNotes => @"
+
+  public override string WorkNotes => @"
 # Notas de Trabajo
 
 ## Descripción General
@@ -3636,8 +3709,8 @@ Registrar el contenido de reuniones del proyecto, almacenar decisiones y resulta
 - [Grafo de Conocimiento](/help/knowledge-graph) - Entender la visualización de conocimiento
 - [Gestión de Permisos](/help/permission) - Entender el mecanismo de control de permisos
 ";
-    
-    public override string Projects => @"
+
+  public override string Projects => @"
 # Gestión de Proyectos
 
 ## Descripción General
@@ -4066,8 +4139,8 @@ Por favor, crea una nota de trabajo en el proyecto XXX:
 - [Gestión de Permisos](/help/permission) - Entender el mecanismo de control de permisos
 - [Registro de Auditoría](/help/audit-log) - Ver registro de acciones del proyecto
 ";
-    
-    public override string Logging => @"
+
+  public override string Logging => @"
 # Sistema de Registro de Eventos
 
 ## Descripción General
@@ -4209,6 +4282,6 @@ El sistema NO registra la siguiente información sensible en los registros:
 - Si los archivos de registro son demasiado grandes, puede aumentar la configuración de detalle de registro (ej. cambiar a ""Warning"" o ""Error"") para reducir el volumen de registro
 - Al escribir grandes cantidades de registros, se recomienda aumentar apropiadamente el nivel de registro
 ";
-    
-    #endregion
+
+  #endregion
 }

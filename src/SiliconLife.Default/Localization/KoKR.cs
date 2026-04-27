@@ -225,7 +225,7 @@ public class KoKR : DefaultLocalizationBase
     /// <summary>
     /// Gets the system prompt for memory compression
     /// </summary>
-    public override string MemoryCompressionSystemPrompt => "당신은 메모리 압축 도우미입니다. 다음 시간 범위의 메모리 내용을 간결한 요약으로 압축하여 핵심 정보를 보존하세요.";
+    public override string MemoryCompressionSystemPrompt => "당신은 메모리 압축 도우미입니다. 다음 시간 범위의 메모리 내용을 간결한 요약으로 압축하여 핵심 정보를 보존하세요. 중요: 압축된 내용만 출력하고, 시간 레이블, 타임스탬프 또는 날짜 주석을 포함하지 마세요. 순수한 압축 텍스트만 제공하세요.";
 
     /// <summary>
     /// Gets the common system prompt for all silicon beings
@@ -1660,8 +1660,8 @@ public class KoKR : DefaultLocalizationBase
 
     // ===== 메모리 이벤트 로컬라이제이션 =====
 
-    public override string FormatMemoryEventSingleChat(string partnerName, string content)
-        => $"[단독채팅] \"{partnerName}\"와의 대화, 답변: {content}";
+    public override string FormatMemoryEventSingleChat(string speakerName, string listenerName, string content)
+        => $"[단독채팅] {speakerName}이(가) {listenerName}에게 말함: {content}";
 
     public override string FormatMemoryEventGroupChat(string sessionId, string content)
         => $"[그룹채팅] 세션 {sessionId}에서 발언: {content}";

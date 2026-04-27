@@ -9,7 +9,7 @@ namespace SiliconLife.Default.Help;
 public class HelpLocalizationEnUS : HelpLocalizationBase
 {
     #region Help Documents
-    
+
     public override string GettingStarted_Title => "Quick Start";
     public override string BeingManagement_Title => "Being Management";
     public override string ChatSystem_Title => "Chat System";
@@ -23,37 +23,83 @@ public class HelpLocalizationEnUS : HelpLocalizationBase
     public override string OllamaSetup_Title => "Ollama Installation and Model Download";
     public override string BailianDashScope_Title => "Alibaba Cloud Bailian Platform User Guide";
     public override string AIClients_Title => "AI Client Configuration";
-        
-        public override string BeingSoul_Title => "Being Soul File";
-    
+
+    public override string BeingSoul_Title => "Being Soul File";
+
     public override string AuditLog_Title => "Audit Log";
-        public override string KnowledgeGraph_Title => "Knowledge Graph";
+    public override string KnowledgeGraph_Title => "Knowledge Graph";
     public override string WorkNotes_Title => "Work Notes";
     public override string Projects_Title => "Project Management";
     public override string Logging_Title => "Logging System";
 
-    public override string[] GettingStarted_Tags => new[] { "install", "start", "setup", "quick start", "getting started", "begin", "launch", "initialize" };
-    public override string[] BeingManagement_Tags => new[] { "being", "create", "config", "being management", "silicon being", "profile", "setup", "manage" };
-    public override string[] ChatSystem_Tags => new[] { "chat", "message", "conversation", "chat system", "dialog", "communicate", "talk", "discussion" };
-    public override string[] Dashboard_Tags => new[] { "dashboard", "monitor", "statistics", "status", "system", "message frequency", "uptime", "memory" };
-    public override string[] Task_Tags => new[] { "task", "work", "execution", "priority", "dependency", "status", "automation", "management" };
-    public override string[] Timer_Tags => new[] { "timer", "schedule", "trigger", "recurring", "calendar", "reminder", "automatic", "cron" };
-    public override string[] Permission_Tags => new[] { "permission", "security", "access control", "permission management", "auth", "authorization", "privacy", "protection" };
-    public override string[] Config_Tags => new[] { "config", "settings", "options", "configuration", "preferences", "customization", "system", "parameters" };
-    public override string[] FAQ_Tags => new[] { "faq", "help", "questions", "frequently asked", "support", "troubleshooting", "guide", "assistance" };
-    public override string[] Memory_Tags => new[] { "memory", "history", "records", "memory system", "activity", "trace", "search", "log" };
-    public override string[] OllamaSetup_Tags => new[] { "Ollama", "install", "model", "download", "local AI", "setup", "configure", "run" };
-    public override string[] BailianDashScope_Tags => new[] { "Bailian", "DashScope", "Alibaba Cloud", "cloud AI", "API", "configuration", "model", "billing" };
-    public override string[] AIClients_Tags => new[] { "AI client", "AI service", "model", "configuration", "local", "cloud", "Ollama", "DashScope", "setup" };
-        
-        public override string[] BeingSoul_Tags => new[] { "soul file", "personality", "prompt", "role", "behavior", "configuration", "character", "work guide", "system prompt" };
-            
-        public override string[] AuditLog_Tags => new[] { "audit log", "Token", "usage statistics", "monitor", "consumption", "analysis", "trend", "export", "CSV" };
-        public override string[] KnowledgeGraph_Tags => new[] { "knowledge graph", "knowledge", "visualization", "triple", "entity", "relation", "network", "learning", "management" };
-        public override string[] WorkNotes_Tags => new[] { "work notes", "notes", "records", "diary", "log", "Markdown", "keywords", "version", "search" };
-        public override string[] Projects_Tags => new[] { "project management", "project", "collaboration", "task", "member", "archive", "team", "workspace", "progress" };
-        public override string[] Logging_Tags => new[] { "logging system", "log", "records", "debug", "error", "warning", "monitor", "trace", "console", "file" };
-    
+    public override string[] GettingStarted_Tags => new[]
+        { "install", "start", "setup", "quick start", "getting started", "begin", "launch", "initialize" };
+
+    public override string[] BeingManagement_Tags => new[]
+        { "being", "create", "config", "being management", "silicon being", "profile", "setup", "manage" };
+
+    public override string[] ChatSystem_Tags => new[]
+        { "chat", "message", "conversation", "chat system", "dialog", "communicate", "talk", "discussion" };
+
+    public override string[] Dashboard_Tags => new[]
+        { "dashboard", "monitor", "statistics", "status", "system", "message frequency", "uptime", "memory" };
+
+    public override string[] Task_Tags => new[]
+        { "task", "work", "execution", "priority", "dependency", "status", "automation", "management" };
+
+    public override string[] Timer_Tags => new[]
+        { "timer", "schedule", "trigger", "recurring", "calendar", "reminder", "automatic", "cron" };
+
+    public override string[] Permission_Tags => new[]
+    {
+        "permission", "security", "access control", "permission management", "auth", "authorization", "privacy",
+        "protection"
+    };
+
+    public override string[] Config_Tags => new[]
+        { "config", "settings", "options", "configuration", "preferences", "customization", "system", "parameters" };
+
+    public override string[] FAQ_Tags => new[]
+        { "faq", "help", "questions", "frequently asked", "support", "troubleshooting", "guide", "assistance" };
+
+    public override string[] Memory_Tags => new[]
+        { "memory", "history", "records", "memory system", "activity", "trace", "search", "log" };
+
+    public override string[] OllamaSetup_Tags => new[]
+        { "Ollama", "install", "model", "download", "local AI", "setup", "configure", "run" };
+
+    public override string[] BailianDashScope_Tags => new[]
+        { "Bailian", "DashScope", "Alibaba Cloud", "cloud AI", "API", "configuration", "model", "billing" };
+
+    public override string[] AIClients_Tags => new[]
+        { "AI client", "AI service", "model", "configuration", "local", "cloud", "Ollama", "DashScope", "setup" };
+
+    public override string[] BeingSoul_Tags => new[]
+    {
+        "soul file", "personality", "prompt", "role", "behavior", "configuration", "character", "work guide",
+        "system prompt"
+    };
+
+    public override string[] AuditLog_Tags => new[]
+        { "audit log", "Token", "usage statistics", "monitor", "consumption", "analysis", "trend", "export", "CSV" };
+
+    public override string[] KnowledgeGraph_Tags => new[]
+    {
+        "knowledge graph", "knowledge", "visualization", "triple", "entity", "relation", "network", "learning",
+        "management"
+    };
+
+    public override string[] WorkNotes_Tags => new[]
+        { "work notes", "notes", "records", "diary", "log", "Markdown", "keywords", "version", "search" };
+
+    public override string[] Projects_Tags => new[]
+    {
+        "project management", "project", "collaboration", "task", "member", "archive", "team", "workspace", "progress"
+    };
+
+    public override string[] Logging_Tags => new[]
+        { "logging system", "log", "records", "debug", "error", "warning", "monitor", "trace", "console", "file" };
+
     public override string GettingStarted => @"
 # Quick Start
 
@@ -2191,7 +2237,7 @@ After configuring Bailian, you can:
 
 Enjoy using the system!
 ";
-    
+
     public override string AIClients => @"
 # AI Client Configuration
 
@@ -2479,7 +2525,7 @@ If you encounter problems:
 2. Check [Configuration Management](./config) for system configuration instructions
 3. Check system logs for error details
 ";
-    
+
     public override string BeingSoul => @"
 # Being Soul File
 
@@ -3075,7 +3121,7 @@ Optimize based on audit data:
 - [Permission Management](/help/permission) - Understand curator permissions and access control
 - [Configuration Management](/help/config) - Configure AI clients and other system settings
 ";
-    
+
     public override string KnowledgeGraph => @"
 # Knowledge Graph
 
@@ -3314,7 +3360,7 @@ Please update knowledge: (old knowledge) to (new knowledge)
 - [Task System](/help/task) - Configure knowledge learning tasks
 - [Memory System](/help/memory) - Understand how knowledge affects conversation memory
 ";
-    
+
     public override string WorkNotes => @"
 # Work Notes
 ## Overview
@@ -3461,7 +3507,7 @@ Delete notes via AI tool, requires page number or note ID
 - [Knowledge Graph](/help/knowledge-graph) - Learn about knowledge visualization
 - [Permission Management](/help/permission) - Learn about permission control mechanisms
 ";
-    
+
     public override string Projects => @"
 # Project Management
 ## Overview
@@ -3537,7 +3583,7 @@ Q7: Can projects be copied? **A**: Current version doesn't support direct projec
 Q8: Do projects have deadlines? **A**: Current version doesn't enforce deadlines, but time can be managed through tasks.
 ## Related Documentation: Task Management, Work Notes, Being Management, Permission Management, Audit Log.
 ";
-    
+
     public override string Logging => @"
 # Logging System
 
@@ -3680,6 +3726,6 @@ The system will NOT record the following sensitive information in logs:
 - If log files become too large, you can increase the log verbosity setting (e.g., change to ""Warning"" or ""Error"") to reduce logging volume
 - When writing large amounts of logs, it's recommended to appropriately increase the log level
 ";
-    
+
     #endregion
 }

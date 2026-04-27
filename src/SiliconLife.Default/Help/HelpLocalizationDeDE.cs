@@ -10,51 +10,109 @@ namespace SiliconLife.Default.Help;
 /// </summary>
 public class HelpLocalizationDeDE : HelpLocalizationBase
 {
-    #region Help Documents
-    
-    public override string GettingStarted_Title => "Schnellstart";
-    public override string BeingManagement_Title => "Being-Verwaltung";
-    public override string ChatSystem_Title => "Chat-System";
-    public override string Dashboard_Title => "Dashboard";
-    public override string Task_Title => "Aufgaben";
-    public override string Timer_Title => "Timer";
-    public override string Permission_Title => "Berechtigungsverwaltung";
-    public override string Config_Title => "Konfigurationsverwaltung";
-    public override string FAQ_Title => "Häufig gestellte Fragen";
-    public override string Memory_Title => "Speichersystem";
-    public override string OllamaSetup_Title => "Ollama-Installation und Modell-Download";
-    public override string BailianDashScope_Title => "Leitfaden für die Alibaba Cloud Bailian-Plattform";
-    public override string AIClients_Title => "KI-Client-Konfiguration";
-    
-    public override string BeingSoul_Title => "Soul-Datei";
-    public override string AuditLog_Title => "Prüfprotokoll";
-    public override string KnowledgeGraph_Title => "Wissensgraph";
-    public override string WorkNotes_Title => "Arbeitsnotizen";
-    public override string Projects_Title => "Projektmanagement";
-    public override string Logging_Title => "Protokollierungssystem";
+  #region Help Documents
 
-    public override string[] GettingStarted_Tags => new[] { "Installation", "Start", "Einrichtung", "Schnellstart", "Erste Schritte", "Beginnen", "Initialisierung", "Umgebung" };
-    public override string[] BeingManagement_Tags => new[] { "Being", "Erstellen", "Einstellung", "Being-Verwaltung", "Silicon Being", "Profil", "Konfiguration", "Verwaltung" };
-    public override string[] ChatSystem_Tags => new[] { "Chat", "Nachricht", "Konversation", "Chat-System", "Dialog", "Kommunikation", "Gespräch", "Diskussion" };
-    public override string[] Dashboard_Tags => new[] { "Dashboard", "Monitor", "Statistik", "Status", "System", "Nachrichtenhäufigkeit", "Betriebszeit", "Speicher" };
-    public override string[] Task_Tags => new[] { "aufgabe", "arbeit", "ausführung", "priorität", "abhängigkeit", "status", "automatisierung", "verwaltung" };
-    public override string[] Timer_Tags => new[] { "timer", "zeitplan", "auslösen", "wiederholung", "kalender", "erinnerung", "automatisch", "cron" };
-    public override string[] Permission_Tags => new[] { "Berechtigung", "Sicherheit", "Zugriffskontrolle", "Berechtigungsverwaltung", "Authentifizierung", "Autorisierung", "Datenschutz", "Schutz" };
-    public override string[] Config_Tags => new[] { "Konfiguration", "Einstellung", "Option", "Konfigurationsverwaltung", "Präferenzen", "Anpassung", "System", "Parameter" };
-    public override string[] FAQ_Tags => new[] { "FAQ", "Hilfe", "Problem", "Support", "Fehlerbehebung", "Leitfaden", "Unterstützung", "Antwort" };
-    public override string[] Memory_Tags => new[] { "Speicher", "Verlauf", "Protokoll", "Speichersystem", "Aktivität", "Nachverfolgung", "Suche", "Log" };
-    public override string[] OllamaSetup_Tags => new[] { "Ollama", "Installation", "Modell", "Download", "Lokale KI", "Konfiguration", "Einrichtung", "Ausführen" };
-    public override string[] BailianDashScope_Tags => new[] { "Bailian", "DashScope", "Alibaba Cloud", "Cloud-KI", "API", "Konfiguration", "Modell", "Bezahlung" };
-    public override string[] AIClients_Tags => new[] { "KI-Client", "KI-Dienst", "Modell", "Konfiguration", "Lokal", "Cloud", "Ollama", "DashScope", "Einrichtung" };
-    
-    public override string[] BeingSoul_Tags => new[] { "Soul-Datei", "Persönlichkeit", "Prompt", "Rolle", "Verhalten", "Konfiguration", "Charakter", "Arbeitsanleitung", "System-Prompt" };
-    public override string[] AuditLog_Tags => new[] { "Prüfprotokoll", "Token", "Nutzungsstatistik", "Monitor", "Verbrauch", "Analyse", "Trend", "Export", "CSV" };
-    public override string[] KnowledgeGraph_Tags => new[] { "Wissensgraph", "Wissen", "Visualisierung", "Tripel", "Entität", "Relation", "Netzwerk", "Lernen", "Verwaltung" };
-    public override string[] WorkNotes_Tags => new[] { "Arbeitsnotizen", "Notizen", "Aufzeichnungen", "Tagebuch", "Protokoll", "Markdown", "Schlüsselwörter", "Version", "Suche" };
-    public override string[] Projects_Tags => new[] { "Projektmanagement", "Projekt", "Zusammenarbeit", "Aufgabe", "Mitglied", "Archiv", "Team", "Arbeitsbereich", "Fortschritt" };
-    public override string[] Logging_Tags => new[] { "Protokollierungssystem", "Protokoll", "Aufzeichnungen", "Debug", "Fehler", "Warnung", "Monitor", "Verfolgung", "Konsole", "Datei" };
-    
-    public override string GettingStarted => @"
+  public override string GettingStarted_Title => "Schnellstart";
+  public override string BeingManagement_Title => "Being-Verwaltung";
+  public override string ChatSystem_Title => "Chat-System";
+  public override string Dashboard_Title => "Dashboard";
+  public override string Task_Title => "Aufgaben";
+  public override string Timer_Title => "Timer";
+  public override string Permission_Title => "Berechtigungsverwaltung";
+  public override string Config_Title => "Konfigurationsverwaltung";
+  public override string FAQ_Title => "Häufig gestellte Fragen";
+  public override string Memory_Title => "Speichersystem";
+  public override string OllamaSetup_Title => "Ollama-Installation und Modell-Download";
+  public override string BailianDashScope_Title => "Leitfaden für die Alibaba Cloud Bailian-Plattform";
+  public override string AIClients_Title => "KI-Client-Konfiguration";
+
+  public override string BeingSoul_Title => "Soul-Datei";
+  public override string AuditLog_Title => "Prüfprotokoll";
+  public override string KnowledgeGraph_Title => "Wissensgraph";
+  public override string WorkNotes_Title => "Arbeitsnotizen";
+  public override string Projects_Title => "Projektmanagement";
+  public override string Logging_Title => "Protokollierungssystem";
+
+  public override string[] GettingStarted_Tags => new[]
+  {
+    "Installation", "Start", "Einrichtung", "Schnellstart", "Erste Schritte", "Beginnen", "Initialisierung", "Umgebung"
+  };
+
+  public override string[] BeingManagement_Tags => new[]
+  {
+    "Being", "Erstellen", "Einstellung", "Being-Verwaltung", "Silicon Being", "Profil", "Konfiguration", "Verwaltung"
+  };
+
+  public override string[] ChatSystem_Tags => new[]
+    { "Chat", "Nachricht", "Konversation", "Chat-System", "Dialog", "Kommunikation", "Gespräch", "Diskussion" };
+
+  public override string[] Dashboard_Tags => new[]
+    { "Dashboard", "Monitor", "Statistik", "Status", "System", "Nachrichtenhäufigkeit", "Betriebszeit", "Speicher" };
+
+  public override string[] Task_Tags => new[]
+    { "aufgabe", "arbeit", "ausführung", "priorität", "abhängigkeit", "status", "automatisierung", "verwaltung" };
+
+  public override string[] Timer_Tags => new[]
+    { "timer", "zeitplan", "auslösen", "wiederholung", "kalender", "erinnerung", "automatisch", "cron" };
+
+  public override string[] Permission_Tags => new[]
+  {
+    "Berechtigung", "Sicherheit", "Zugriffskontrolle", "Berechtigungsverwaltung", "Authentifizierung", "Autorisierung",
+    "Datenschutz", "Schutz"
+  };
+
+  public override string[] Config_Tags => new[]
+  {
+    "Konfiguration", "Einstellung", "Option", "Konfigurationsverwaltung", "Präferenzen", "Anpassung", "System",
+    "Parameter"
+  };
+
+  public override string[] FAQ_Tags => new[]
+    { "FAQ", "Hilfe", "Problem", "Support", "Fehlerbehebung", "Leitfaden", "Unterstützung", "Antwort" };
+
+  public override string[] Memory_Tags => new[]
+    { "Speicher", "Verlauf", "Protokoll", "Speichersystem", "Aktivität", "Nachverfolgung", "Suche", "Log" };
+
+  public override string[] OllamaSetup_Tags => new[]
+    { "Ollama", "Installation", "Modell", "Download", "Lokale KI", "Konfiguration", "Einrichtung", "Ausführen" };
+
+  public override string[] BailianDashScope_Tags => new[]
+    { "Bailian", "DashScope", "Alibaba Cloud", "Cloud-KI", "API", "Konfiguration", "Modell", "Bezahlung" };
+
+  public override string[] AIClients_Tags => new[]
+    { "KI-Client", "KI-Dienst", "Modell", "Konfiguration", "Lokal", "Cloud", "Ollama", "DashScope", "Einrichtung" };
+
+  public override string[] BeingSoul_Tags => new[]
+  {
+    "Soul-Datei", "Persönlichkeit", "Prompt", "Rolle", "Verhalten", "Konfiguration", "Charakter", "Arbeitsanleitung",
+    "System-Prompt"
+  };
+
+  public override string[] AuditLog_Tags => new[]
+    { "Prüfprotokoll", "Token", "Nutzungsstatistik", "Monitor", "Verbrauch", "Analyse", "Trend", "Export", "CSV" };
+
+  public override string[] KnowledgeGraph_Tags => new[]
+    { "Wissensgraph", "Wissen", "Visualisierung", "Tripel", "Entität", "Relation", "Netzwerk", "Lernen", "Verwaltung" };
+
+  public override string[] WorkNotes_Tags => new[]
+  {
+    "Arbeitsnotizen", "Notizen", "Aufzeichnungen", "Tagebuch", "Protokoll", "Markdown", "Schlüsselwörter", "Version",
+    "Suche"
+  };
+
+  public override string[] Projects_Tags => new[]
+  {
+    "Projektmanagement", "Projekt", "Zusammenarbeit", "Aufgabe", "Mitglied", "Archiv", "Team", "Arbeitsbereich",
+    "Fortschritt"
+  };
+
+  public override string[] Logging_Tags => new[]
+  {
+    "Protokollierungssystem", "Protokoll", "Aufzeichnungen", "Debug", "Fehler", "Warnung", "Monitor", "Verfolgung",
+    "Konsole", "Datei"
+  };
+
+  public override string GettingStarted => @"
 # Schnellstart
 
 ## Systemstart
@@ -186,7 +244,7 @@ Jetzt, da Sie die grundlegenden Operationen verstanden haben, können Sie:
 Viel Spaß bei der Verwendung!
 ";
 
-    public override string BeingManagement => @"
+  public override string BeingManagement => @"
 # Being-Verwaltung
 
 ## Was ist ein Silicon Being?
@@ -343,7 +401,7 @@ Klicken Sie auf den Link ""KI-Client"" in der Being-Detailseite, wählen Sie ein
 4. Testen und kontinuierlich optimieren
 ";
 
-    public override string ChatSystem => @"
+  public override string ChatSystem => @"
 # Chat-System
 
 ## Konversation starten
@@ -474,7 +532,7 @@ Auf der ""Beings""-Seite klicken Sie auf den Link ""Chatverlauf"" des entspreche
 5. **Auf Tool-Aufrufe achten**: Beachten Sie die von der KI aufgerufenen Tools, um sicherzustellen, dass die Operationen den Erwartungen entsprechen
 ";
 
-    public override string Dashboard => @"
+  public override string Dashboard => @"
 # Dashboard
 
 ## Übersicht
@@ -582,7 +640,7 @@ Wenn das Dashboard nicht korrekt angezeigt wird, können Sie die folgenden Schri
 4. **Programm neu starten**: Wenn keine der oben genannten Methoden funktioniert, versuchen Sie, das Programm zu schließen und erneut zu öffnen
 ";
 
-    public override string Task => @"
+  public override string Task => @"
 # Aufgaben
 
 ## Übersicht
@@ -784,7 +842,7 @@ Das System wird automatisch:
 Sie müssen nicht manuell verwalten; das System wird alles handhaben.
 ";
 
-    public override string Timer => @"
+  public override string Timer => @"
 # Timer
 
 ## Was sind Timer?
@@ -929,7 +987,7 @@ Jede Ausführung hat die folgenden Status:
 3. **Strategie anpassen**: Lassen Sie bei Bedarf die Silizium-Lebensform die Timer-Einstellungen durch Gespräch anpassen
 ";
 
-    public override string Permission => @"
+  public override string Permission => @"
 # Berechtigungsverwaltung
 
 ## Was ist das Berechtigungssystem?
@@ -1090,7 +1148,7 @@ Das System unterstützt die folgenden Berechtigungstypen:
 Jeder Typ hat unterschiedliche Sicherheitsstufen und Behandlungsmethoden.
 ";
 
-    public override string Config => @"
+  public override string Config => @"
 # Konfigurationsverwaltung
 
 ## Was ist Konfigurationsverwaltung?
@@ -1282,7 +1340,7 @@ Die Konfigurationsdatei ist die `config.json`-Datei im Systemlaufzeitverzeichnis
 5. **Sicherheit zuerst**: Stellen Sie Netzwerksicherheit sicher, bevor LAN-Zugriff aktiviert wird
 ";
 
-    public override string FAQ => @"
+  public override string FAQ => @"
 # Häufig gestellte Fragen
 
 ## Erste Schritte
@@ -1511,7 +1569,7 @@ Die Konfigurationsdatei ist die `config.json`-Datei im Systemlaufzeitverzeichnis
 **A:** Das System unterstützt die Erweiterung von Funktionalität durch Code-Schreiben, aber dies erfordert einige Programmierkenntnisse. Regelmäßigen Benutzern wird empfohlen, die vom System bereitgestellten Funktionen zu verwenden.
 ";
 
-    public override string Memory => @"
+  public override string Memory => @"
 # Speichersystem
 
 ## Was ist das Speichersystem?
@@ -1703,7 +1761,7 @@ Das System wird automatisch:
 Sie müssen Speicher nicht manuell verwalten; das System wird alles handhaben.
 ";
 
-    public override string OllamaSetup => @"
+  public override string OllamaSetup => @"
 # Ollama-Installation und Modell-Download
 
 ## Was ist Ollama?
@@ -2013,7 +2071,7 @@ Nach der Installation von Ollama und dem Download von Modellen können Sie:
 Viel Spaß bei der Verwendung!
 ";
 
-    public override string BailianDashScope => @"
+  public override string BailianDashScope => @"
 # Leitfaden für die Alibaba Cloud Bailian-Plattform
 
 ## Was ist Alibaba Cloud Bailian?
@@ -2269,8 +2327,8 @@ Nach der Konfiguration von Bailian können Sie:
 
 Viel Spaß bei der Verwendung!
 ";
-    
-    public override string AIClients => @"
+
+  public override string AIClients => @"
 # KI-Client-Konfiguration
 
 ## Übersicht
@@ -2557,8 +2615,8 @@ Wenn Sie Probleme haben:
 2. Prüfen Sie [Konfigurationsverwaltung](./config) für Systemkonfigurationsanweisungen
 3. Prüfen Sie Systemprotokolle für Fehlerdetails
 ";
-    
-    public override string BeingSoul => @"
+
+  public override string BeingSoul => @"
 # Soul-Datei
 
 ## Übersicht
@@ -2800,7 +2858,7 @@ Das System verwaltet diese Datei automatisch, und Sie müssen das Dateisystem ni
 - 📝 [Speichersystem](memory) - Konversationsverlauf verwalten
 ";
 
-    public override string AuditLog => @"
+  public override string AuditLog => @"
 # Prüfprotokoll
 
 ## Übersicht
@@ -3025,8 +3083,8 @@ Systemadministratoren können der KI erlauben, Prüfprotokolldaten abzufragen.
 - 🧠 [KI-Client-Konfiguration](ai-clients) - KI-Dienste konfigurieren.
 - 📊 [Dashboard](dashboard) - Systemstatus überwachen.
 ";
-    
-    public override string KnowledgeGraph => @"
+
+  public override string KnowledgeGraph => @"
 # Wissensgraph
 
 ## Übersicht
@@ -3264,8 +3322,8 @@ Bitte aktualisiere Wissen: (altes Wissen) zu (neues Wissen)
 - [Aufgaben-System](/help/task) - Wissenslern-Aufgaben konfigurieren
 - [Speicher-System](/help/memory) - Verstehen, wie Wissen das Konversations-Speicher beeinflusst
 ";
-    
-    public override string WorkNotes => @"
+
+  public override string WorkNotes => @"
 # Arbeitsnotizen
 
 ## Übersicht
@@ -3507,8 +3565,8 @@ Projektbesprechungsinhalte aufzeichnen, Entscheidungen und Diskussionsergebnisse
 - [Wissensgraph](/help/knowledge-graph) - Verstehen der Wissensvisualisierung
 - [Berechtigungsverwaltung](/help/permission) - Verstehen des Berechtigungskontrollmechanismus
 ";
-    
-    public override string Projects => @"
+
+  public override string Projects => @"
 # Projektmanagement
 
 ## Übersicht
@@ -3937,8 +3995,8 @@ Bitte erstellen Sie eine Arbeitsnotiz im Projekt XXX:
 - [Berechtigungsverwaltung](/help/permission) - Berechtigungskontrollmechanismus verstehen
 - [Audit-Log](/help/audit-log) - Projektaktionsprotokoll anzeigen
 ";
-    
-    public override string Logging => @"
+
+  public override string Logging => @"
 # Protokollierungssystem
 
 ## Übersicht
@@ -4080,6 +4138,6 @@ Das System zeichnet NICHT folgende sensitive Informationen in Logs auf:
 - Wenn Log-Dateien zu groß werden, können Sie die Log-Ausführlichkeitseinstellung erhöhen (z.B. auf ""Warning"" oder ""Error"" ändern), um das Log-Volumen zu reduzieren
 - Bei großen Log-Schreibmengen wird empfohlen, das Log-Level angemessen zu erhöhen
 ";
-    
-    #endregion
+
+  #endregion
 }

@@ -531,7 +531,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
         try
         {
             // Get last 5 messages from session
-            var messages = session.GetMessages(0, 5);
+            var messages = session.GetMessages(5);
             if (messages.Count < 2)
                 return false;
 

@@ -121,7 +121,7 @@ public class WebUIProvider : IIMProvider
             return;
         }
 
-        List<ChatMessage> messages = session.GetMessages(0, 500);
+        List<ChatMessage> messages = session.GetMessages(500);
         _logger.Info(null, $"SendHistoryToClientAsync: found {messages.Count} messages for session {session.Id}");
         await _sseHandler.SendHistoryAsync(client, messages, client.UserId);
     }

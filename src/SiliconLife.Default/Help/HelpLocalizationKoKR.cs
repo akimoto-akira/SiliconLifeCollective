@@ -12,7 +12,7 @@ namespace SiliconLife.Default.Help;
 public class HelpLocalizationKoKR : HelpLocalizationBase
 {
     #region Help Documents
-    
+
     public override string GettingStarted_Title => "빠른 시작";
     public override string BeingManagement_Title => "실리콘 생명체 관리";
     public override string ChatSystem_Title => "채팅 기능";
@@ -26,7 +26,7 @@ public class HelpLocalizationKoKR : HelpLocalizationBase
     public override string OllamaSetup_Title => "Ollama 설치 및 모델 다운로드";
     public override string BailianDashScope_Title => "알리클라우드 바이롄 플랫폼 사용 가이드";
     public override string AIClients_Title => "AI 클라이언트 설정";
-        
+
     public override string BeingSoul_Title => "소울 파일";
     public override string AuditLog_Title => "감사 로그";
     public override string KnowledgeGraph_Title => "지식 그래프";
@@ -35,7 +35,10 @@ public class HelpLocalizationKoKR : HelpLocalizationBase
     public override string Logging_Title => "로깅 시스템";
 
     public override string[] GettingStarted_Tags => new[] { "설치", "시작", "입문", "빠른 시작", "시작하기", "초기화", "실행", "환경 구성" };
-    public override string[] BeingManagement_Tags => new[] { "실리콘 생명체", "생성", "구성", "실리콘 생명체 관리", "생명체", "프로필", "설정", "관리" };
+
+    public override string[] BeingManagement_Tags =>
+        new[] { "실리콘 생명체", "생성", "구성", "실리콘 생명체 관리", "생명체", "프로필", "설정", "관리" };
+
     public override string[] ChatSystem_Tags => new[] { "채팅", "대화", "메시지", "채팅 기능", "교류", "통신", "대화", "토론" };
     public override string[] Dashboard_Tags => new[] { "대시보드", "모니터", "통계", "상태", "시스템", "메시지 빈도", "가동 시간", "메모리" };
     public override string[] Task_Tags => new[] { "작업", "업무", "실행", "우선순위", "종속성", "상태", "자동화", "관리" };
@@ -45,16 +48,30 @@ public class HelpLocalizationKoKR : HelpLocalizationBase
     public override string[] FAQ_Tags => new[] { "자주 묻는 질문", "도움말", "문제", "지원", "문제 해결", "가이드", "지원", "답변" };
     public override string[] Memory_Tags => new[] { "기억", "역사", "기록", "기억 시스템", "활동", "추적", "검색", "로그" };
     public override string[] OllamaSetup_Tags => new[] { "Ollama", "설치", "모델", "다운로드", "로컬AI", "구성", "설정", "실행" };
-    public override string[] BailianDashScope_Tags => new[] { "바이롄", "DashScope", "알리클라우드", "클라우드AI", "API", "구성", "모델", "유료" };
-    public override string[] AIClients_Tags => new[] { "AI클라이언트", "AI서비스", "모델", "설정", "로컬", "클라우드", "Ollama", "DashScope", "구성" };
-    
-    public override string[] BeingSoul_Tags => new[] { "소울파일", "성격설정", "프롬프트", "역할", "행동", "설정", "캐릭터", "작업가이드", "시스템프롬프트" };
-    public override string[] AuditLog_Tags => new[] { "감사로그", "Token", "사용통계", "모니터", "소비", "분석", "트렌드", "내보내기", "CSV" };
-    public override string[] KnowledgeGraph_Tags => new[] { "지식 그래프", "지식", "시각화", "트리플", "엔티티", "관계", "네트워크", "학습", "관리" };
-    public override string[] WorkNotes_Tags => new[] { "작업 노트", "노트", "기록", "다이어리", "로그", "Markdown", "키워드", "버전", "검색" };
-    public override string[] Projects_Tags => new[] { "프로젝트 관리", "프로젝트", "협업", "작업", "멤버", "아카이브", "팀", "워크스페이스", "진행" };
+
+    public override string[] BailianDashScope_Tags =>
+        new[] { "바이롄", "DashScope", "알리클라우드", "클라우드AI", "API", "구성", "모델", "유료" };
+
+    public override string[] AIClients_Tags => new[]
+        { "AI클라이언트", "AI서비스", "모델", "설정", "로컬", "클라우드", "Ollama", "DashScope", "구성" };
+
+    public override string[] BeingSoul_Tags =>
+        new[] { "소울파일", "성격설정", "프롬프트", "역할", "행동", "설정", "캐릭터", "작업가이드", "시스템프롬프트" };
+
+    public override string[] AuditLog_Tags =>
+        new[] { "감사로그", "Token", "사용통계", "모니터", "소비", "분석", "트렌드", "내보내기", "CSV" };
+
+    public override string[] KnowledgeGraph_Tags =>
+        new[] { "지식 그래프", "지식", "시각화", "트리플", "엔티티", "관계", "네트워크", "학습", "관리" };
+
+    public override string[] WorkNotes_Tags =>
+        new[] { "작업 노트", "노트", "기록", "다이어리", "로그", "Markdown", "키워드", "버전", "검색" };
+
+    public override string[] Projects_Tags =>
+        new[] { "프로젝트 관리", "프로젝트", "협업", "작업", "멤버", "아카이브", "팀", "워크스페이스", "진행" };
+
     public override string[] Logging_Tags => new[] { "로깅 시스템", "로그", "기록", "디버그", "오류", "경고", "모니터", "추적", "콘솔", "파일" };
-    
+
     public override string GettingStarted => @"
 # 빠른 시작
 
@@ -1846,7 +1863,7 @@ Ollama를 설치하고 모델을 다운로드한 후 다음을 할 수 있습니
 - 로컬 하드웨어 구성을 걱정할 필요가 없습니다.
 즐거운 사용 되세요!
 ";
-    
+
     public override string AIClients => @"
 # AI 클라이언트 설정
 
@@ -2134,7 +2151,7 @@ temperature는 AI 응답의 창의성을 제어합니다:
 2. [설정 관리](./config)에서 시스템 설정 설명 확인
 3. 시스템 로그에서 오류 세부정보 확인
 ";
-    
+
     public override string BeingSoul => @"
 # 소울 파일
 
@@ -2602,7 +2619,7 @@ token 사용량이 많을수록 계산 비용이 증가합니다.
 - 🧠 [AI 클라이언트 설정](ai-clients) - AI 서비스 설정.
 - 📊 [대시보드](dashboard) - 시스템 상태 모니터링.
 ";
-    
+
     public override string KnowledgeGraph => @"
 # 지식 그래프
 
@@ -2841,7 +2858,7 @@ token 사용량이 많을수록 계산 비용이 증가합니다.
 - [작업 시스템](/help/task) - 지식 학습 작업 구성
 - [메모리 시스템](/help/memory) - 지식이 대화 메모리에 미치는 영향 이해
 ";
-    
+
     public override string WorkNotes => @"
 # 작업 노트
 
@@ -3084,7 +3101,7 @@ AI 도구로 노트 삭제, 페이지 번호 또는 노트 ID 필요
 - [지식 그래프](/help/knowledge-graph) - 지식의 시각화 표시 이해
 - [권한 관리](/help/permission) - 권한 제어 메커니즘 이해
 ";
-    
+
     public override string Projects => @"
 # 프로젝트 관리
 
@@ -3514,7 +3531,7 @@ AI 도구로 프로젝트 생성:
 - [권한 관리](/help/permission) - 권한 제어 메커니즘 이해
 - [감사 로그](/help/audit-log) - 프로젝트 작업 기록 보기
 ";
-    
+
     public override string Logging => @"
 # 로깅 시스템
 
@@ -3657,6 +3674,6 @@ AI 도구로 프로젝트 생성:
 - 로그 파일이 너무 큰 경우 로그 상세도 설정을 높여 (예: ""Warning"" 또는 ""Error""로 변경) 기록량을 줄입니다
 - 대량의 로그 쓰기 시 적절히 로그 레벨을 높이는 것을 권장합니다
 ";
-    
+
     #endregion
 }

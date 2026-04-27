@@ -109,23 +109,25 @@ public class BroadcastChannel : SessionBase
     {
         lock (_lock)
         {
-            _storage.Write(_storageKey, message.Timestamp, message);
+            var ts = message.Timestamp;
+            _storage.Write(_storageKey, new IncompleteDate(ts.Year, ts.Month, ts.Day, ts.Hour, ts.Minute, ts.Second), message);
             _logger.Debug(null, "BroadcastChannel {0}: message from {1}", _fixedId, message.SenderId);
         }
     }
 
     /// <inheritdoc/>
-    public override List<ChatMessage> GetMessages(int offset = 0, int limit = 50)
+    public override List<ChatMessage> GetMessages(int limit = 10)
     {
         lock (_lock)
         {
             List<ChatMessage> all = LoadAllMessages();
-            return all.Skip(offset).Take(limit).ToList();
+            // Return the most recent messages
+            return all.Skip(Math.Max(0, all.Count - limit)).Take(limit).ToList();
         }
     }
 
     /// <summary>
-    /// Get pending messages for a subscriber â€?only messages posted after subscription time
+    /// Get pending messages for a subscriber ï¿½?only messages posted after subscription time
     /// that the subscriber has not yet read.
     /// </summary>
     public override List<ChatMessage> GetPendingMessages(Guid participantId)

@@ -23,7 +23,7 @@ public sealed class TokenUsageRecord
     public Guid Id { get; }
 
     /// <summary>Timestamp of the AI request (UTC)</summary>
-    public DateTime Timestamp { get; }
+    public IncompleteDate Timestamp { get; }
 
     /// <summary>GUID of the silicon being that initiated the request</summary>
     public Guid BeingId { get; }
@@ -50,7 +50,7 @@ public sealed class TokenUsageRecord
     public bool Success { get; }
 
     public TokenUsageRecord(
-        DateTime timestamp,
+        IncompleteDate timestamp,
         Guid beingId,
         string aiClientType,
         int promptTokens,

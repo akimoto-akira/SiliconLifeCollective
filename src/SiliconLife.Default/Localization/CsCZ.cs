@@ -464,7 +464,7 @@ public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
     public override string DefaultCuratorSoul => "Jsem silikonové bytí vytvořené pro pomoc lidem.";
 
     // ===== Memory Compression =====
-    public override string MemoryCompressionSystemPrompt => "Jsi expert na kompresi paměti. Shrň následující informace.";
+    public override string MemoryCompressionSystemPrompt => "Jsi expert na kompresi paměti. Shrň následující informace. DŮLEŽITÉ: Vypusť pouze komprimovaný obsah, NEZAHRNUJ žádné časové značky, časové razítka ani poznámky k datům. Poskytni pouze čistý komprimovaný text.";
 
     // ===== Calendar Format Methods =====
     public override string FormatGregorianYear(int year) => year.ToString();
@@ -535,7 +535,7 @@ public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
     public override string FormatMemoryEventStartup() => "Systém spuštěn";
     public override string FormatMemoryEventBeingCreated(string name, string model) => $"Bytí '{name}' vytvořeno (model: {model})";
     public override string FormatMemoryEventBeingReset(string name) => $"Bytí '{name}' resetováno";
-    public override string FormatMemoryEventSingleChat(string being, string message) => $"Jednoduchý chat: {being} - {message}";
+    public override string FormatMemoryEventSingleChat(string speakerName, string listenerName, string content) => $"Jednoduchý chat: {speakerName} řekl {listenerName} - {content}";
     public override string FormatMemoryEventGroupChat(string group, string message) => $"Skupinový chat: {group} - {message}";
     public override string FormatMemoryEventTask(string task) => $"Úkol: {task}";
     public override string FormatMemoryEventTaskCompleted(string task) => $"Úkol dokončen: {task}";

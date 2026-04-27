@@ -58,7 +58,8 @@ public sealed class FileSystemLoggerProvider : ILoggerProvider, ILogReader
             entry.Exception?.ToString()
         );
 
-        _storage.Write(DefaultKey, entry.Timestamp, dto);
+        var ts = entry.Timestamp;
+        _storage.Write(DefaultKey, new IncompleteDate(ts.Year, ts.Month, ts.Day, ts.Hour, ts.Minute, ts.Second), dto);
     }
 
     public bool IsEnabled(LogLevel level)
@@ -90,7 +91,10 @@ public sealed class FileSystemLoggerProvider : ILoggerProvider, ILogReader
             var dto = timeEntry.Data;
 
             // Time range filter - ensure UTC comparison
-            var timestampUtc = DateTime.SpecifyKind(timeEntry.Timestamp, DateTimeKind.Utc);
+            var timestampUtc = DateTime.SpecifyKind(
+                new DateTime(timeEntry.Timestamp.Year, timeEntry.Timestamp.Month ?? 1, timeEntry.Timestamp.Day ?? 1,
+                    timeEntry.Timestamp.Hour ?? 0, timeEntry.Timestamp.Minute ?? 0, timeEntry.Timestamp.Second ?? 0),
+                DateTimeKind.Utc);
             if (startTime.HasValue && timestampUtc < startTime.Value)
                 continue;
             if (endTime.HasValue && timestampUtc > endTime.Value)

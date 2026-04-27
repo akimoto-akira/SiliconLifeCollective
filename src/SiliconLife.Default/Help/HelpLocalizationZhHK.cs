@@ -11,7 +11,7 @@ namespace SiliconLife.Default.Help;
 public class HelpLocalizationZhHK : HelpLocalizationBase
 {
     #region Help Documents
-    
+
     public override string GettingStarted_Title => "快速入門";
     public override string BeingManagement_Title => "硅基人管理";
     public override string ChatSystem_Title => "聊天功能";
@@ -25,11 +25,11 @@ public class HelpLocalizationZhHK : HelpLocalizationBase
     public override string OllamaSetup_Title => "Ollama 安裝與模型下載";
     public override string BailianDashScope_Title => "阿里雲百煉平台使用指南";
     public override string AIClients_Title => "AI 客戶端配置";
-        
-        public override string BeingSoul_Title => "靈魂文件";
-    
+
+    public override string BeingSoul_Title => "靈魂文件";
+
     public override string AuditLog_Title => "審計日誌";
-        public override string KnowledgeGraph_Title => "知識圖譜";
+    public override string KnowledgeGraph_Title => "知識圖譜";
     public override string WorkNotes_Title => "工作筆記";
     public override string Projects_Title => "項目管理";
     public override string Logging_Title => "日誌系統";
@@ -45,17 +45,21 @@ public class HelpLocalizationZhHK : HelpLocalizationBase
     public override string[] FAQ_Tags => new[] { "常見問題", "幫助", "問題", "支援", "故障排除", "指南", "協助", "解答" };
     public override string[] Memory_Tags => new[] { "記憶", "歷史", "記錄", "記憶系統", "活動", "追溯", "搜尋", "日誌" };
     public override string[] OllamaSetup_Tags => new[] { "Ollama", "安裝", "模型", "下載", "本地AI", "配置", "設定", "運行" };
-    public override string[] BailianDashScope_Tags => new[] { "百煉", "DashScope", "阿里雲", "雲端AI", "API", "配置", "模型", "付費" };
-    public override string[] AIClients_Tags => new[] { "AI客戶端", "AI服務", "模型", "配置", "本地", "雲端", "Ollama", "DashScope", "設定" };
-        
-        public override string[] BeingSoul_Tags => new[] { "靈魂文件", "人格設定", "提示詞", "角色", "行為", "配置", "性格", "工作說明書", "系統提示" };
-    
+
+    public override string[] BailianDashScope_Tags =>
+        new[] { "百煉", "DashScope", "阿里雲", "雲端AI", "API", "配置", "模型", "付費" };
+
+    public override string[] AIClients_Tags =>
+        new[] { "AI客戶端", "AI服務", "模型", "配置", "本地", "雲端", "Ollama", "DashScope", "設定" };
+
+    public override string[] BeingSoul_Tags => new[] { "靈魂文件", "人格設定", "提示詞", "角色", "行為", "配置", "性格", "工作說明書", "系統提示" };
+
     public override string[] AuditLog_Tags => new[] { "審計日誌", "Token", "使用統計", "監控", "消耗", "分析", "趨勢", "導出", "CSV" };
     public override string[] KnowledgeGraph_Tags => new[] { "知識圖譜", "知識", "可視化", "三元組", "實體", "關係", "網絡", "學習", "管理" };
     public override string[] WorkNotes_Tags => new[] { "工作筆記", "筆記", "記錄", "日記", "日誌", "Markdown", "關鍵詞", "版本", "搜尋" };
     public override string[] Projects_Tags => new[] { "項目管理", "項目", "協作", "任務", "成員", "歸檔", "團隊", "工作空間", "進度" };
     public override string[] Logging_Tags => new[] { "日誌系統", "日誌", "記錄", "調試", "錯誤", "警告", "監控", "追蹤", "控制台", "文件" };
-    
+
     public override string GettingStarted => @"
 # 快速入門
 
@@ -2192,7 +2196,7 @@ ollama pull qwen3.5
 
 祝您使用愉快！
 ";
-    
+
     public override string AIClients => @"
 # AI 客戶端配置
 
@@ -2480,7 +2484,7 @@ temperature 控制 AI 回覆的創造性：
 2. 查看 [配置管理](./config) 了解系統配置說明
 3. 查看系統日誌獲取錯誤詳情
 ";
-    
+
     public override string BeingSoul => @"
 # 靈魂文件
 
@@ -3076,7 +3080,7 @@ TokenAuditTool 支持以下參數：
 - [權限管理](/help/permission) - 了解硅基主理人權限和訪問控制
 - [配置管理](/help/config) - 配置 AI 客戶端和其他系統設置
 ";
-    
+
     public override string KnowledgeGraph => @"
 # 知識圖譜
 
@@ -3315,7 +3319,7 @@ TokenAuditTool 支持以下參數：
 - [任務系統](/help/task) - 配置知識學習任務
 - [記憶系統](/help/memory) - 了解知識如何影響對話記憶
 ";
-    
+
     public override string WorkNotes => @"
 # 工作筆記
 ## 概述
@@ -3462,7 +3466,7 @@ TokenAuditTool 支持以下參數：
 - [知識圖譜](/help/knowledge-graph) - 了解知識的可視化展示
 - [權限管理](/help/permission) - 了解權限控制機制
 ";
-    
+
     public override string Projects => @"
 # 項目管理
 ## 概述
@@ -3538,7 +3542,7 @@ Q7: 可以複製項目嗎？**A**: 當前版本不支持直接複製項目。
 Q8: 項目有截止日期嗎？**A**: 當前版本不強制設置截止日期，可以通過任務管理時間。
 ## 相關文檔：任務管理、工作筆記、硅基生命體管理、權限管理、審計日誌。
 ";
-    
+
     public override string Logging => @"
 # 日誌系統
 
@@ -3681,6 +3685,6 @@ Q8: 項目有截止日期嗎？**A**: 當前版本不強制設置截止日期，
 - 如果日誌文件過大,可提高日誌詳細程度設置（如改為 ""Warning"" 或 ""Error""）以減少記錄量
 - 大量日誌寫入時建議適當提高日誌級別
 ";
-    
+
     #endregion
 }

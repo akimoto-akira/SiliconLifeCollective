@@ -77,9 +77,10 @@ public abstract class LocalizationBase
     /// <summary>
     /// Formats a memory record for a single-chat AI response event.
     /// </summary>
-    /// <param name="partnerName">Display name of the conversation partner</param>
-    /// <param name="content">The AI response content (may be truncated)</param>
-    public abstract string FormatMemoryEventSingleChat(string partnerName, string content);
+    /// <param name="speakerName">Display name of the speaker</param>
+    /// <param name="listenerName">Display name of the listener</param>
+    /// <param name="content">The message content</param>
+    public abstract string FormatMemoryEventSingleChat(string speakerName, string listenerName, string content);
 
     /// <summary>
     /// Formats a memory record for a group-chat AI response event.

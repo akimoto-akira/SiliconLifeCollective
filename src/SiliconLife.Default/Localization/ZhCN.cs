@@ -225,7 +225,7 @@ public class ZhCN : DefaultLocalizationBase
     /// <summary>
     /// Gets the system prompt for memory compression
     /// </summary>
-    public override string MemoryCompressionSystemPrompt => "你是一个记忆压缩助手。请将以下时间范围内的记忆内容压缩成简洁的摘要，保留关键信息。";
+    public override string MemoryCompressionSystemPrompt => "你是一个记忆压缩助手。请将以下时间范围内的记忆内容压缩成简洁的摘要，保留关键信息。重要：只输出压缩后的内容，不要包含任何时间标注、时间戳或日期注释。只提供纯文本的压缩内容。";
 
     /// <summary>
     /// Gets the common system prompt for all silicon beings
@@ -1660,8 +1660,8 @@ public class ZhCN : DefaultLocalizationBase
 
     // ===== Memory Event Localization =====
 
-    public override string FormatMemoryEventSingleChat(string partnerName, string content)
-        => $"[单聊] 与\"{partnerName}\"对话，回复：{content}";
+    public override string FormatMemoryEventSingleChat(string speakerName, string listenerName, string content)
+        => $"[单聊] {speakerName}对{listenerName}说：{content}";
 
     public override string FormatMemoryEventGroupChat(string sessionId, string content)
         => $"[群聊] 在会话 {sessionId} 中发言：{content}";

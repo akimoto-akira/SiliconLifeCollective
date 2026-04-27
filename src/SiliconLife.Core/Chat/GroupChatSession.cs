@@ -14,7 +14,7 @@
 namespace SiliconLife.Collective;
 
 /// <summary>
-/// Group chat session â€?persists messages via <see cref="ITimeStorage"/>.
+/// Group chat session ï¿½?persists messages via <see cref="ITimeStorage"/>.
 /// </summary>
 public class GroupChatSession : SessionBase
 {
@@ -77,20 +77,22 @@ public class GroupChatSession : SessionBase
     {
         lock (_lock)
         {
-            _storage.Write(_storageKey, message.Timestamp, message);
+            var ts = message.Timestamp;
+            _storage.Write(_storageKey, new IncompleteDate(ts.Year, ts.Month, ts.Day, ts.Hour, ts.Minute, ts.Second), message);
             _logger.Debug(null, "Session {0}: message added from {1}", Id, message.SenderId);
         }
     }
 
     /// <inheritdoc/>
-    public override List<ChatMessage> GetMessages(int offset = 0, int limit = 50)
+    public override List<ChatMessage> GetMessages(int limit = 10)
     {
         lock (_lock)
         {
             List<ChatMessage> allMessages = new();
             int year = DateTime.UtcNow.Year;
 
-            while (allMessages.Count < offset + limit && year >= 1)
+            // Load messages from recent years until we have enough
+            while (allMessages.Count < limit && year >= 1)
             {
                 IncompleteDate range = new(year);
                 List<TimeEntry<ChatMessage>> entries = _storage.Query<ChatMessage>(_storageKey, range);
@@ -103,8 +105,9 @@ public class GroupChatSession : SessionBase
             }
 
             allMessages.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
-            _logger.Trace(null, "Session {0}: retrieving {1} messages", Id, allMessages.Count);
-            return allMessages.Skip(offset).Take(limit).ToList();
+            _logger.Trace(null, "Session {0}: retrieving {1} most recent messages", Id, Math.Min(allMessages.Count, limit));
+            // Return the most recent messages
+            return allMessages.Skip(Math.Max(0, allMessages.Count - limit)).Take(limit).ToList();
         }
     }
 

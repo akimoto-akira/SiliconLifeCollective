@@ -2802,7 +2802,7 @@ public abstract class DefaultLocalizationBase : LocalizationBase
 
     // ===== Memory Event Localization =====
 
-    public abstract override string FormatMemoryEventSingleChat(string partnerName, string content);
+    public abstract override string FormatMemoryEventSingleChat(string speakerName, string listenerName, string content);
     public abstract override string FormatMemoryEventGroupChat(string sessionId, string content);
     public abstract override string FormatMemoryEventToolCall(string toolNames);
     public abstract override string FormatMemoryEventTask(string content);

@@ -17,7 +17,7 @@ public class HelpTool : ITool
 
     public string Description =>
         "Search and retrieve help documentation. Use this tool to look up how to use system features. " +
-        "Actions: 'search' (search by keywords), 'get' (get specific document by ID).";
+        "Actions: 'list' (list all topic IDs), 'search' (search by keywords), 'get' (get specific document by ID).";
 
     public string GetDisplayName(Language language)
     {
@@ -39,8 +39,8 @@ public class HelpTool : ITool
                 ["action"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "Action to perform: 'search' (search by keywords) or 'get' (get specific document by ID)",
-                    ["enum"] = new[] { "search", "get" }
+                    ["description"] = "Action to perform: 'list' (list all topic IDs), 'search' (search by keywords), or 'get' (get specific document by ID)",
+                    ["enum"] = new[] { "list", "search", "get" }
                 },
                 ["query"] = new Dictionary<string, object>
                 {
@@ -48,36 +48,71 @@ public class HelpTool : ITool
                     ["description"] = "Search query or topic ID (e.g., 'getting-started', 'being-management', 'permission')"
                 }
             },
-            ["required"] = new[] { "action", "query" }
+            ["required"] = new[] { "action" }
         };
     }
 
     public ToolResult Execute(Guid callerId, Dictionary<string, object> parameters)
     {
-        var action = parameters.TryGetValue("action", out var actionObj) ? actionObj?.ToString() ?? "get" : "get";
+        var action = parameters.TryGetValue("action", out var actionObj) ? actionObj?.ToString() ?? "list" : "list";
         var query = parameters.TryGetValue("query", out var queryObj) ? queryObj?.ToString() ?? "" : "";
-
-        if (string.IsNullOrWhiteSpace(query))
-        {
-            return ToolResult.Failed("Error: 'query' parameter is required.");
-        }
 
         // Get current language help localization
         var currentLang = ((DefaultConfigData)Config.Instance.Data).Language;
         var helpLocalization = HelpLocalizationFactory.Create(currentLang);
 
-        if (action == "search")
+        if (action == "list")
         {
+            return ToolResult.Successful(ListAllTopics());
+        }
+        else if (action == "search")
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return ToolResult.Failed("Error: 'query' parameter is required for 'search' action.");
+            }
             return ToolResult.Successful(SearchTopics(query));
         }
         else if (action == "get")
         {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return ToolResult.Failed("Error: 'query' parameter is required for 'get' action.");
+            }
             return ToolResult.Successful(GetDocument(query, helpLocalization));
         }
         else
         {
-            return ToolResult.Failed($"Error: Unknown action '{action}'. Use 'search' or 'get'.");
+            return ToolResult.Failed($"Error: Unknown action '{action}'. Use 'list', 'search', or 'get'.");
         }
+    }
+
+    /// <summary>
+    /// List all available help topic IDs
+    /// </summary>
+    private string ListAllTopics()
+    {
+        var currentLang = ((DefaultConfigData)Config.Instance.Data).Language;
+        var helpLocalization = HelpLocalizationFactory.Create(currentLang);
+        
+        var sb = new StringBuilder();
+        sb.AppendLine($"Available help documents ({HelpTopics.AllTopics.Count} total):");
+        sb.AppendLine();
+
+        foreach (var topic in HelpTopics.AllTopics)
+        {
+            var displayName = topic.Id.Replace("-", " ").ToTitleCase();
+            sb.AppendLine($"- **{topic.Id}** {topic.Icon} - {displayName}");
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("Use action='get' with a topic ID to read the full document content.");
+        sb.AppendLine("Example: action='get', query='getting-started'");
+        sb.AppendLine();
+        sb.AppendLine("Use action='search' with keywords to find relevant documents.");
+        sb.AppendLine("Example: action='search', query='permission management'");
+
+        return sb.ToString();
     }
 
     /// <summary>

@@ -1621,8 +1621,8 @@ public class DeDE : DefaultLocalizationBase
 
     // ===== Memory Event Localization =====
 
-    public override string FormatMemoryEventSingleChat(string partnerName, string content)
-        => $"[Einzelchat] Gespräch mit \"{partnerName}\", Antwort: {content}";
+    public override string FormatMemoryEventSingleChat(string speakerName, string listenerName, string content)
+        => $"[Einzelchat] {speakerName} sagte zu {listenerName}: {content}";
 
     public override string FormatMemoryEventGroupChat(string sessionId, string content)
         => $"[Gruppenchat] Nachricht in Sitzung {sessionId}: {content}";
@@ -1857,7 +1857,7 @@ public class DeDE : DefaultLocalizationBase
     /// <summary>
     /// Gets the system prompt for memory compression
     /// </summary>
-    public override string MemoryCompressionSystemPrompt => "Du bist ein Erinnerungskomprimierungsassistent. Bitte komprimiere den folgenden Erinnerungszeitraum zu einer prägnanten Zusammenfassung und behalte die Schlüsselinformationen bei.";
+    public override string MemoryCompressionSystemPrompt => "Du bist ein Erinnerungskomprimierungsassistent. Bitte komprimiere den folgenden Erinnerungszeitraum zu einer prägnanten Zusammenfassung und behalte die Schlüsselinformationen bei. WICHTIG: Gib nur den komprimierten Inhalt aus, füge KEINE Zeitstempel, Zeitmarkierungen oder Datumsanmerkungen hinzu. Stelle nur den reinen komprimierten Text bereit.";
 
     /// <summary>
     /// Gets the common system prompt for all silicon beings

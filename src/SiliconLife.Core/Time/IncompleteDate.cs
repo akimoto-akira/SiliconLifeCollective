@@ -153,6 +153,24 @@ public readonly struct IncompleteDate : IEquatable<IncompleteDate>, IComparable<
     public static bool operator <=(IncompleteDate l, IncompleteDate r) => l.CompareTo(r) <= 0;
     public static bool operator >=(IncompleteDate l, IncompleteDate r) => l.CompareTo(r) >= 0;
 
+    /// <summary>
+    /// Compares IncompleteDate with DateTime. Unspecified components are treated as their minimum values.
+    /// </summary>
+    public int CompareTo(DateTime other)
+    {
+        int c = Year.CompareTo(other.Year);                              if (c != 0) return c;
+        c = (Month  ?? 1).CompareTo(other.Month);                       if (c != 0) return c;
+        c = (Day    ?? 1).CompareTo(other.Day);                         if (c != 0) return c;
+        c = (Hour   ?? 0).CompareTo(other.Hour);                        if (c != 0) return c;
+        c = (Minute ?? 0).CompareTo(other.Minute);                      if (c != 0) return c;
+        return (Second ?? 0).CompareTo(other.Second);
+    }
+
+    public static bool operator < (IncompleteDate l, DateTime r) => l.CompareTo(r) <  0;
+    public static bool operator > (IncompleteDate l, DateTime r) => l.CompareTo(r) >  0;
+    public static bool operator <=(IncompleteDate l, DateTime r) => l.CompareTo(r) <= 0;
+    public static bool operator >=(IncompleteDate l, DateTime r) => l.CompareTo(r) >= 0;
+
     /// <summary>Human-readable representation showing only the specified components.</summary>
     public override string ToString()
     {
@@ -164,5 +182,82 @@ public readonly struct IncompleteDate : IEquatable<IncompleteDate>, IComparable<
             parts.Add($"T{Hour ?? 0:D2}:{Minute ?? 0:D2}:{Second ?? 0:D2}");
 
         return string.Join("-", parts);
+    }
+
+    /// <summary>
+    /// Expands this incomplete date to the next finer level of detail.
+    /// Returns an array of IncompleteDate instances representing all possible values at the next level.
+    /// </summary>
+    /// <param name="expandToSecond">If true, recursively expands all the way down to seconds.</param>
+    /// <returns>An array of expanded IncompleteDate instances.</returns>
+    /// <example>
+    /// <c>new IncompleteDate(2026).Expand()</c> → Returns 12 entries for months 1-12 of 2026
+    /// <c>new IncompleteDate(2026, 4).Expand()</c> → Returns ~30 entries for days 1-30/31 of April 2026
+    /// <c>new IncompleteDate(2026).Expand(expandToSecond: true)</c> → Recursively expands to every second in 2026
+    /// </example>
+    public IncompleteDate[] Expand(bool expandToSecond = false)
+    {
+        // First level expansion
+        var results = new List<IncompleteDate>();
+
+        if (!Month.HasValue)
+        {
+            // Expand year to all months
+            for (int month = 1; month <= 12; month++)
+            {
+                results.Add(new IncompleteDate(Year, month));
+            }
+        }
+        else if (!Day.HasValue)
+        {
+            // Expand month to all days
+            int daysInMonth = DateTime.DaysInMonth(Year, Month.Value);
+            for (int day = 1; day <= daysInMonth; day++)
+            {
+                results.Add(new IncompleteDate(Year, Month.Value, day));
+            }
+        }
+        else if (!Hour.HasValue)
+        {
+            // Expand day to all hours
+            for (int hour = 0; hour < 24; hour++)
+            {
+                results.Add(new IncompleteDate(Year, Month.Value, Day.Value, hour));
+            }
+        }
+        else if (!Minute.HasValue)
+        {
+            // Expand hour to all minutes
+            for (int minute = 0; minute < 60; minute++)
+            {
+                results.Add(new IncompleteDate(Year, Month.Value, Day.Value, Hour.Value, minute));
+            }
+        }
+        else if (!Second.HasValue)
+        {
+            // Expand minute to all seconds
+            for (int second = 0; second < 60; second++)
+            {
+                results.Add(new IncompleteDate(Year, Month.Value, Day.Value, Hour.Value, Minute.Value, second));
+            }
+        }
+        else
+        {
+            // Already at the finest level (all components specified), return just this instance
+            results.Add(this);
+        }
+
+        // If expandToSecond is true and we haven't reached second level, recursively expand
+        if (expandToSecond && results.Count > 0 && !results[0].Second.HasValue)
+        {
+            var fullyExpanded = new List<IncompleteDate>();
+            foreach (var item in results)
+            {
+                fullyExpanded.AddRange(item.Expand(expandToSecond: true));
+            }
+            return fullyExpanded.ToArray();
+        }
+
+        return results.ToArray();
     }
 }

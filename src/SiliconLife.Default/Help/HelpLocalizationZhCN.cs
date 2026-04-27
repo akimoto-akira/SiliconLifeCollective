@@ -9,7 +9,7 @@ namespace SiliconLife.Default.Help;
 public class HelpLocalizationZhCN : HelpLocalizationBase
 {
     #region Help Documents
-    
+
     public override string GettingStarted_Title => "快速入门";
     public override string BeingManagement_Title => "硅基人管理";
     public override string ChatSystem_Title => "聊天功能";
@@ -23,9 +23,9 @@ public class HelpLocalizationZhCN : HelpLocalizationBase
     public override string OllamaSetup_Title => "Ollama 安装与模型下载";
     public override string BailianDashScope_Title => "阿里云百炼平台使用指南";
     public override string AIClients_Title => "AI 客户端配置";
-    
-        public override string BeingSoul_Title => "灵魂文件";
-    
+
+    public override string BeingSoul_Title => "灵魂文件";
+
     public override string AuditLog_Title => "审计日志";
     public override string KnowledgeGraph_Title => "知识图谱";
     public override string WorkNotes_Title => "工作笔记";
@@ -43,17 +43,21 @@ public class HelpLocalizationZhCN : HelpLocalizationBase
     public override string[] FAQ_Tags => new[] { "常见问题", "帮助", "问题", "支持", "故障排除", "指南", "协助", "解答" };
     public override string[] Memory_Tags => new[] { "记忆", "历史", "记录", "记忆系统", "活动", "追溯", "搜索", "日志" };
     public override string[] OllamaSetup_Tags => new[] { "Ollama", "安装", "模型", "下载", "本地AI", "配置", "设置", "运行" };
-    public override string[] BailianDashScope_Tags => new[] { "百炼", "DashScope", "阿里云", "云端AI", "API", "配置", "模型", "付费" };
-    public override string[] AIClients_Tags => new[] { "AI客户端", "AI服务", "模型", "配置", "本地", "云端", "Ollama", "DashScope", "设置" };
-        
-        public override string[] BeingSoul_Tags => new[] { "灵魂文件", "人格设定", "提示词", "角色", "行为", "配置", "性格", "工作说明书", "系统提示" };
-    
+
+    public override string[] BailianDashScope_Tags =>
+        new[] { "百炼", "DashScope", "阿里云", "云端AI", "API", "配置", "模型", "付费" };
+
+    public override string[] AIClients_Tags =>
+        new[] { "AI客户端", "AI服务", "模型", "配置", "本地", "云端", "Ollama", "DashScope", "设置" };
+
+    public override string[] BeingSoul_Tags => new[] { "灵魂文件", "人格设定", "提示词", "角色", "行为", "配置", "性格", "工作说明书", "系统提示" };
+
     public override string[] AuditLog_Tags => new[] { "审计日志", "Token", "使用统计", "监控", "消耗", "分析", "趋势", "导出", "CSV" };
     public override string[] KnowledgeGraph_Tags => new[] { "知识图谱", "知识", "可视化", "三元组", "实体", "关系", "网络", "学习", "管理" };
     public override string[] WorkNotes_Tags => new[] { "工作笔记", "笔记", "记录", "日记", "日志", "Markdown", "关键词", "版本", "搜索" };
     public override string[] Projects_Tags => new[] { "项目管理", "项目", "协作", "任务", "成员", "归档", "团队", "工作空间", "进度" };
     public override string[] Logging_Tags => new[] { "日志系统", "日志", "记录", "调试", "错误", "警告", "监控", "追踪", "控制台", "文件" };
-    
+
     public override string GettingStarted => @"
 # 快速入门
 
@@ -2190,7 +2194,7 @@ ollama pull qwen3.5
 
 祝您使用愉快！
 ";
-    
+
     public override string AIClients => @"
 # AI 客户端配置
 
@@ -2478,7 +2482,7 @@ temperature 控制 AI 回复的创造性：
 2. 查看 [配置管理](./config) 了解系统配置说明
 3. 查看系统日志获取错误详情
 ";
-    
+
     public override string BeingSoul => @"
 # 灵魂文件
 
@@ -3074,7 +3078,7 @@ TokenAuditTool 支持以下参数：
 - [权限管理](/help/permission) - 了解硅基主理人权限和访问控制
 - [配置管理](/help/config) - 配置 AI 客户端和其他系统设置
 ";
-    
+
     public override string KnowledgeGraph => @"
 # 知识图谱
 
@@ -3313,7 +3317,7 @@ TokenAuditTool 支持以下参数：
 - [任务系统](/help/task) - 配置知识学习任务
 - [记忆系统](/help/memory) - 了解知识如何影响对话记忆
 ";
-    
+
     public override string WorkNotes => @"
 # 工作笔记
 ## 概述
@@ -3469,7 +3473,7 @@ TokenAuditTool 支持以下参数：
 - [知识图谱](/help/knowledge-graph) - 了解知识的可视化展示
 - [权限管理](/help/permission) - 了解权限控制机制
 ";
-    
+
     public override string Projects => @"
 # 项目管理
 ## 概述
@@ -3571,7 +3575,7 @@ TokenAuditTool 支持以下参数：
 - [权限管理](/help/permission) - 了解权限控制机制
 - [审计日志](/help/audit-log) - 查看项目操作记录
 ";
-    
+
     public override string Logging => @"
 # 日志系统
 
@@ -3714,6 +3718,6 @@ TokenAuditTool 支持以下参数：
 - 如果日志文件过大,可提高日志详细程度设置（如改为 ""Warning"" 或 ""Error""）以减少记录量
 - 大量日志写入时建议适当提高日志级别
 ";
-    
+
     #endregion
 }

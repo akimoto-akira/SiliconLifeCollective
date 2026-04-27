@@ -101,7 +101,7 @@ public class ChatController : Controller
 
         foreach (var session in _chatSystem.GetSessionsForUser(_userId, beings.Select(b => b.Id)))
         {
-            var messages = session.GetMessages(0, 1);
+            var messages = session.GetMessages(1);
             var lastMsg = messages.LastOrDefault();
 
             string displayName;
@@ -218,7 +218,7 @@ public class ChatController : Controller
 
             foreach (var session in _chatSystem.GetSessionsForUser(_userId, _beingManager.GetAllBeings().Select(b => b.Id)))
             {
-                var messages = session.GetMessages(0, 1);
+                var messages = session.GetMessages(1);
                 var lastMsg = messages.LastOrDefault();
 
                 string displayName;
@@ -314,7 +314,7 @@ public class ChatController : Controller
 
             var beings = _beingManager.GetAllBeings();
             var beingDict = beings.ToDictionary(b => b.Id);
-            var messages = session.GetMessages(0, 50);
+            var messages = session.GetMessages(50);
 
             var result = messages.Select(m =>
             {

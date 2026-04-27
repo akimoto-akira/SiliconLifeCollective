@@ -57,11 +57,11 @@ public class FileSystemTimeStorage : ITimeStorage
             if (!Directory.Exists(dir)) return default;
 
             T? latest = default;
-            DateTime latestTime = DateTime.MinValue;
+            IncompleteDate latestTime = new IncompleteDate(1);
 
             foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
             {
-                if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
+                if (!TryParseTimestampFromFile(dir, file, out IncompleteDate fileTime)) continue;
 
                 if (fileTime > latestTime)
                 {
@@ -83,7 +83,8 @@ public class FileSystemTimeStorage : ITimeStorage
     /// </summary>
     public void Write<T>(string key, T data)
     {
-        Write(key, DateTime.UtcNow, data);
+        var now = DateTime.UtcNow;
+        Write(key, new IncompleteDate(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second), data);
     }
 
     /// <summary>
@@ -96,7 +97,7 @@ public class FileSystemTimeStorage : ITimeStorage
         {
             string dir = GetKeyDirectory(key);
             return Directory.Exists(dir)
-                && Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories).Length > 0;
+                   && Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories).Length > 0;
         }
         finally
         {
@@ -128,21 +129,6 @@ public class FileSystemTimeStorage : ITimeStorage
     /// Writes a record at the given <paramref name="timestamp"/>.
     /// The value is serialized as a single-line JSON string.
     /// </summary>
-    public void Write<T>(string key, DateTime timestamp, T data)
-    {
-        _rwLock.EnterWriteLock();
-        try
-        {
-            string filePath = GetTimeFilePath(key, timestamp);
-            EnsureDirectory(filePath);
-            WriteSingleLine(filePath, data);
-        }
-        finally
-        {
-            _rwLock.ExitWriteLock();
-        }
-    }
-
     /// <summary>
     /// Writes a record at the given <see cref="IncompleteDate"/> timestamp.
     /// The timestamp is resolved to the start of the specified range.
@@ -153,8 +139,7 @@ public class FileSystemTimeStorage : ITimeStorage
         _rwLock.EnterWriteLock();
         try
         {
-            DateTime resolved = ResolveTimestamp(timestamp);
-            string filePath = GetTimeFilePath(key, resolved);
+            string filePath = GetTimeFilePath(key, timestamp);
             EnsureDirectory(filePath);
             WriteSingleLine(filePath, data);
         }
@@ -165,53 +150,28 @@ public class FileSystemTimeStorage : ITimeStorage
     }
 
     /// <summary>
-    /// Returns the record whose timestamp is closest to <paramref name="timestamp"/>.
-    /// </summary>
-    public T? Read<T>(string key, DateTime timestamp)
-    {
-        _rwLock.EnterReadLock();
-        try
-        {
-            string dir = GetKeyDirectory(key);
-            if (!Directory.Exists(dir)) return default;
-
-            T? best = default;
-            long bestDiff = long.MaxValue;
-
-            foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
-            {
-                if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
-
-                long diff = Math.Abs((fileTime - timestamp).Ticks);
-                if (diff < bestDiff)
-                {
-                    bestDiff = diff;
-                    best = ReadSingleLine<T>(file);
-                }
-            }
-
-            return best;
-        }
-        finally
-        {
-            _rwLock.ExitReadLock();
-        }
-    }
-
-    /// <summary>
-    /// Returns the first record whose timestamp matches the given <see cref="IncompleteDate"/>.
+    /// Returns the record whose timestamp matches the given <see cref="IncompleteDate"/>.
+    /// If the IncompleteDate specifies all components down to second, reads that exact file.
+    /// Otherwise, searches recursively in the directory represented by the IncompleteDate and returns the first match.
     /// </summary>
     public T? Read<T>(string key, IncompleteDate timestamp)
     {
         _rwLock.EnterReadLock();
         try
         {
-            string dir = GetKeyDirectory(key);
-            string? patternDir = Path.GetDirectoryName(GetTimeFilePath(key, timestamp));
+            string filePath = GetTimeFilePath(key, timestamp);
 
-            if (patternDir == null || !Directory.Exists(patternDir)) return default;
+            // If all components are specified (down to second), read the exact file
+            if (timestamp.Second.HasValue)
+            {
+                return File.Exists(filePath) ? ReadSingleLine<T>(filePath) : default;
+            }
 
-            string[] files = Directory.GetFiles(patternDir, "*.json");
+            // Otherwise, search recursively in the directory represented by the IncompleteDate
+            string? dirPath = Path.GetDirectoryName(filePath);
+            if (dirPath == null || !Directory.Exists(dirPath)) return default;
+
+            string[] files = Directory.GetFiles(dirPath, "*.json", SearchOption.AllDirectories);
             return files.Length > 0 ? ReadSingleLine<T>(files[0]) : default;
         }
         finally
@@ -220,31 +180,8 @@ public class FileSystemTimeStorage : ITimeStorage
         }
     }
 
-    public bool Exists(string key, DateTime timestamp)
-        => Read<object>(key, timestamp) != null;
-
     public bool Exists(string key, IncompleteDate timestamp)
         => Read<object>(key, timestamp) != null;
-
-    /// <summary>
-    /// Deletes the record at the exact <paramref name="timestamp"/> (second precision).
-    /// </summary>
-    public void Delete(string key, DateTime timestamp)
-    {
-        _rwLock.EnterWriteLock();
-        try
-        {
-            string filePath = GetTimeFilePath(key, timestamp);
-            if (File.Exists(filePath))
-                File.Delete(filePath);
-
-            CleanEmptyDirs(GetKeyDirectory(key));
-        }
-        finally
-        {
-            _rwLock.ExitWriteLock();
-        }
-    }
 
     /// <summary>
     /// Deletes all records whose timestamp matches the given <see cref="IncompleteDate"/>.
@@ -285,8 +222,10 @@ public class FileSystemTimeStorage : ITimeStorage
 
             foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
             {
-                if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
-                if (range.HasValue && !range.Value.Matches(fileTime)) continue;
+                if (!TryParseTimestampFromFile(dir, file, out IncompleteDate fileTime)) continue;
+                if (range.HasValue && !range.Value.Matches(
+                        new DateTime(fileTime.Year, fileTime.Month ?? 1, fileTime.Day ?? 1,
+                            fileTime.Hour ?? 0, fileTime.Minute ?? 0, fileTime.Second ?? 0))) continue;
 
                 foreach (T data in ReadAllLines<T>(file))
                     result.Add(new TimeEntry<T>(key, fileTime, data));
@@ -319,8 +258,10 @@ public class FileSystemTimeStorage : ITimeStorage
 
                 foreach (string file in Directory.GetFiles(keyDir, "*.json", SearchOption.AllDirectories))
                 {
-                    if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
-                    if (range.HasValue && !range.Value.Matches(fileTime)) continue;
+                    if (!TryParseTimestampFromFile(keyDir, file, out IncompleteDate fileTime)) continue;
+                    if (range.HasValue && !range.Value.Matches(
+                            new DateTime(fileTime.Year, fileTime.Month ?? 1, fileTime.Day ?? 1,
+                                fileTime.Hour ?? 0, fileTime.Minute ?? 0, fileTime.Second ?? 0))) continue;
 
                     foreach (T data in ReadAllLines<T>(file))
                         result.Add(new TimeEntry<T>(key, fileTime, data));
@@ -343,6 +284,43 @@ public class FileSystemTimeStorage : ITimeStorage
         => Query<object>(range).Count;
 
     /// <summary>
+    /// Queries all entries at the next finer time level under the given IncompleteDate.
+    /// Uses IncompleteDate.Expand() to get all possible values at the next level.
+    /// </summary>
+    public List<TimeEntry<T>> QueryWithLevel<T>(string key, IncompleteDate level)
+    {
+        _rwLock.EnterReadLock();
+        try
+        {
+            var result = new List<TimeEntry<T>>();
+
+            // Expand to the next finer level
+            var expanded = level.Expand();
+
+            // Read each expanded timestamp
+            foreach (var timestamp in expanded)
+            {
+                string filePath = GetTimeFilePath(key, timestamp);
+
+                if (!File.Exists(filePath)) continue;
+
+                // Parse the actual timestamp from file path for accurate TimeEntry
+                if (!TryParseTimestampFromFile(GetKeyDirectory(key), filePath, out IncompleteDate fileTime)) continue;
+
+                foreach (T data in ReadAllLines<T>(filePath))
+                    result.Add(new TimeEntry<T>(key, fileTime, data));
+            }
+
+            result.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
+            return result;
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
+    }
+
+    /// <summary>
     /// Deletes all records for <paramref name="key"/> that fall within
     /// <paramref name="range"/> and returns the number of deleted records.
     /// </summary>
@@ -358,8 +336,10 @@ public class FileSystemTimeStorage : ITimeStorage
 
             foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
             {
-                if (!TryParseTimestampFromFile(file, out DateTime fileTime)) continue;
-                if (!range.Matches(fileTime)) continue;
+                if (!TryParseTimestampFromFile(dir, file, out IncompleteDate fileTime)) continue;
+                if (!range.Matches(
+                        new DateTime(fileTime.Year, fileTime.Month ?? 1, fileTime.Day ?? 1,
+                            fileTime.Hour ?? 0, fileTime.Minute ?? 0, fileTime.Second ?? 0))) continue;
 
                 // Count every record line in the file, then delete the whole file
                 deleted += File.ReadLines(file).Count(l => !string.IsNullOrWhiteSpace(l));
@@ -413,7 +393,10 @@ public class FileSystemTimeStorage : ITimeStorage
                         break;
                     }
                 }
-                catch (JsonException) { /* malformed line – skip */ }
+                catch (JsonException)
+                {
+                    /* malformed line – skip */
+                }
             }
 
             if (replaced)
@@ -499,12 +482,9 @@ public class FileSystemTimeStorage : ITimeStorage
         if (timestamp.Day.HasValue) parts.Add(timestamp.Day.Value.ToString("D2"));
         if (timestamp.Hour.HasValue) parts.Add(timestamp.Hour.Value.ToString("D2"));
         if (timestamp.Minute.HasValue) parts.Add(timestamp.Minute.Value.ToString("D2"));
-        // Second is the filename component — return the directory only
-        // (callers use GetFiles("*.json") on the returned path's directory)
-        if (timestamp.Second.HasValue)
-            parts.Add($"{timestamp.Second.Value:D2}.json");
+        if (timestamp.Second.HasValue) parts.Add(timestamp.Second.Value.ToString("D2"));
 
-        return Path.Combine(parts.ToArray());
+        return Path.Combine(parts.ToArray()) + ".json";
     }
 
     private static void EnsureDirectory(string filePath)
@@ -515,28 +495,50 @@ public class FileSystemTimeStorage : ITimeStorage
     }
 
     /// <summary>
-    /// Extracts the <see cref="DateTime"/> encoded in a time-stamped file path.
-    /// Expected path format: <c>.../{yyyy}/{MM}/{dd}/{HH}/{mm}/{ss}.json</c>
+    /// Extracts the <see cref="IncompleteDate"/> encoded in a time-stamped file path.
+    /// Expected path format: <c>{_baseDirectory}/{key}/{yyyy}/{MM}/{dd}/{HH}/{mm}/{ss}.json</c>
+    /// The precision of the IncompleteDate is determined by the depth of the path relative to the key directory.
     /// </summary>
-    private static bool TryParseTimestampFromFile(string filePath, out DateTime result)
+    private bool TryParseTimestampFromFile(string keyDir, string filePath, out IncompleteDate result)
     {
         result = default;
-        string fileName = Path.GetFileNameWithoutExtension(filePath);
-        if (!int.TryParse(fileName, out int second) || second is < 0 or > 59)
+        // Get relative path from base directory
+        string? relativePath = Path.GetRelativePath(keyDir, filePath);
+        int a = relativePath.LastIndexOf(".", StringComparison.Ordinal);
+        relativePath = relativePath.Substring(0, a);
+        if (string.IsNullOrEmpty(relativePath)) return false;
+
+        // Split into segments: [key, yyyy, MM, dd, HH, mm, ss.json]
+        string[] segments = relativePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+        // Need at least key + year + second (4 segments minimum)
+        if (segments.Length < 1) return false;
+
+        // segments[0] = key, segments[1] = year, etc.
+        if (!int.TryParse(segments[0], out int year)) return false;
+
+        int? month = null, day = null, hour = null, minute = null, second = null;
+
+        if (segments.Length >= 2 && int.TryParse(segments[1], out int m) && m >= 1 && m <= 12)
+            month = m;
+        if (segments.Length >= 3 && int.TryParse(segments[2], out int d) && d >= 1 && d <= 31)
+            day = d;
+        if (segments.Length >= 4 && int.TryParse(segments[3], out int h) && h >= 0 && h <= 23)
+            hour = h;
+        if (segments.Length >= 5 && int.TryParse(segments[4], out int min) && min >= 0 && min <= 59)
+            minute = min;
+        if (segments.Length >= 6 && int.TryParse(segments[5], out int s) && s >= 0 && s <= 59)
+            second = s;
+
+        try
+        {
+            result = new IncompleteDate(year, month, day, hour, minute, second);
+            return true;
+        }
+        catch
+        {
             return false;
-
-        string? dir = Path.GetDirectoryName(filePath);
-        if (dir == null) return false;
-
-        // Walk up 5 directory levels: mm → HH → dd → MM → yyyy
-        if (!TryIntSegment(dir, 0, out int minute) || minute is < 0 or > 59) return false;
-        if (!TryIntSegment(dir, 1, out int hour)   || hour   is < 0 or > 23) return false;
-        if (!TryIntSegment(dir, 2, out int day)    || day    is < 1 or > 31) return false;
-        if (!TryIntSegment(dir, 3, out int month)  || month  is < 1 or > 12) return false;
-        if (!TryIntSegment(dir, 4, out int year)) return false;
-
-        try { result = new DateTime(year, month, day, hour, minute, second); return true; }
-        catch { return false; }
+        }
     }
 
     /// <summary>
@@ -553,6 +555,7 @@ public class FileSystemTimeStorage : ITimeStorage
             if (parent == null) return false;
             path = parent;
         }
+
         return int.TryParse(Path.GetFileName(path), out value);
     }
 
@@ -562,7 +565,7 @@ public class FileSystemTimeStorage : ITimeStorage
     /// </summary>
     private static DateTime ResolveTimestamp(IncompleteDate d)
         => new(d.Year, d.Month ?? 1, d.Day ?? 1,
-               d.Hour ?? 0, d.Minute ?? 0, d.Second ?? 0);
+            d.Hour ?? 0, d.Minute ?? 0, d.Second ?? 0);
 
     private static void CleanEmptyDirs(string rootDir)
     {
@@ -576,6 +579,34 @@ public class FileSystemTimeStorage : ITimeStorage
     }
 
     // ── Search Implementation ────────────────────────────────────────────────
+
+    /// <summary>
+    /// Checks if any entry at the given IncompleteDate location has a summary flag.
+    /// The IncompleteDate represents a specific file path, not a range.
+    /// </summary>
+    public bool HasSummary<T>(string key, IncompleteDate timestamp, Func<T, bool> summaryPropertySelector)
+    {
+        _rwLock.EnterReadLock();
+        try
+        {
+            string filePath = GetTimeFilePath(key, timestamp);
+
+            if (!File.Exists(filePath)) return false;
+
+            // Read all entries in the file and check if any is a summary
+            foreach (var entry in ReadAllLines<T>(filePath))
+            {
+                if (summaryPropertySelector(entry))
+                    return true;
+            }
+
+            return false;
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
+    }
 
     /// <summary>
     /// Searches entries by keyword across all time levels for the given key.
@@ -595,70 +626,241 @@ public class FileSystemTimeStorage : ITimeStorage
             var results = new List<TimeEntry<T>>();
             var keywordLower = keyword.ToLowerInvariant();
 
-        foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
-        {
-            if (!TryParseTimestampFromFile(file, out DateTime fileTime))
-                continue;
-
-            try
+            foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
             {
-                var entry = ReadSingleLine<T>(file);
-                if (entry == null)
+                if (!TryParseTimestampFromFile(dir, file, out IncompleteDate fileTime))
                     continue;
 
-                // Search in Content and Keywords fields using reflection
-                bool found = false;
-                var entryType = typeof(T);
-
-                // Check Content property
-                var contentProp = entryType.GetProperty("Content");
-                if (contentProp != null)
+                try
                 {
-                    var content = contentProp.GetValue(entry) as string;
-                    if (!string.IsNullOrEmpty(content) && content.ToLowerInvariant().Contains(keywordLower))
-                        found = true;
-                }
+                    var entry = ReadSingleLine<T>(file);
+                    if (entry == null)
+                        continue;
 
-                // Check Keywords property
-                if (!found)
-                {
-                    var keywordsProp = entryType.GetProperty("Keywords");
-                    if (keywordsProp != null)
+                    // Search in Content and Keywords fields using reflection
+                    bool found = false;
+                    var entryType = typeof(T);
+
+                    // Check Content property
+                    var contentProp = entryType.GetProperty("Content");
+                    if (contentProp != null)
                     {
-                        var keywords = keywordsProp.GetValue(entry) as System.Collections.IEnumerable;
-                        if (keywords != null)
+                        var content = contentProp.GetValue(entry) as string;
+                        if (!string.IsNullOrEmpty(content) && content.ToLowerInvariant().Contains(keywordLower))
+                            found = true;
+                    }
+
+                    // Check Keywords property
+                    if (!found)
+                    {
+                        var keywordsProp = entryType.GetProperty("Keywords");
+                        if (keywordsProp != null)
                         {
-                            foreach (var kw in keywords)
+                            var keywords = keywordsProp.GetValue(entry) as System.Collections.IEnumerable;
+                            if (keywords != null)
                             {
-                                var kwStr = kw?.ToString();
-                                if (!string.IsNullOrEmpty(kwStr) && kwStr.ToLowerInvariant().Contains(keywordLower))
+                                foreach (var kw in keywords)
                                 {
-                                    found = true;
-                                    break;
+                                    var kwStr = kw?.ToString();
+                                    if (!string.IsNullOrEmpty(kwStr) && kwStr.ToLowerInvariant().Contains(keywordLower))
+                                    {
+                                        found = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                if (found)
+                    if (found)
+                    {
+                        results.Add(new TimeEntry<T>(key, fileTime, entry));
+                    }
+                }
+                catch
                 {
-                    results.Add(new TimeEntry<T>(key, fileTime, entry));
+                    // Skip files that cannot be read or deserialized
                 }
             }
-            catch
-            {
-                // Skip files that cannot be read or deserialized
-            }
-        }
 
-        // Order by timestamp descending and apply limit
-        var ordered = results.OrderByDescending(e => e.Timestamp);
-        return (maxCount > 0 ? ordered.Take(maxCount) : ordered).ToList();
+            // Order by timestamp descending and apply limit
+            var ordered = results.OrderByDescending(e => e.Timestamp);
+            return (maxCount > 0 ? ordered.Take(maxCount) : ordered).ToList();
         }
         finally
         {
             _rwLock.ExitReadLock();
         }
+    }
+
+    // ── Earliest / Latest Timestamp ──────────────────────────────────────────
+
+    /// <summary>
+    /// Gets the earliest recorded timestamp for the given key by walking the
+    /// deepest timestamp directory chain, picking the smallest numeric segment
+    /// at each level.
+    /// </summary>
+    public IncompleteDate? GetEarliestTimestamp(string key)
+    {
+        _rwLock.EnterReadLock();
+        try
+        {
+            return FindExtremeTimestamp(GetKeyDirectory(key), pickMax: false);
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
+    }
+
+    /// <summary>
+    /// Gets the latest recorded timestamp for the given key by walking the
+    /// deepest timestamp directory chain, picking the largest numeric segment
+    /// at each level.
+    /// </summary>
+    public IncompleteDate? GetLatestTimestamp(string key)
+    {
+        _rwLock.EnterReadLock();
+        try
+        {
+            return FindExtremeTimestamp(GetKeyDirectory(key), pickMax: true);
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
+    }
+
+    /// <summary>
+    /// Gets the earliest recorded timestamp across every key under the base directory.
+    /// </summary>
+    public IncompleteDate? GetEarliestTimestamp()
+    {
+        _rwLock.EnterReadLock();
+        try
+        {
+            return ScanAllKeysForExtremeTimestamp(pickMax: false);
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
+    }
+
+    /// <summary>
+    /// Gets the latest recorded timestamp across every key under the base directory.
+    /// </summary>
+    public IncompleteDate? GetLatestTimestamp()
+    {
+        _rwLock.EnterReadLock();
+        try
+        {
+            return ScanAllKeysForExtremeTimestamp(pickMax: true);
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
+    }
+
+    private IncompleteDate? ScanAllKeysForExtremeTimestamp(bool pickMax)
+    {
+        if (!Directory.Exists(_baseDirectory)) return null;
+
+        IncompleteDate? extreme = null;
+        foreach (string keyDir in Directory.GetDirectories(_baseDirectory))
+        {
+            IncompleteDate? candidate = FindExtremeTimestamp(keyDir, pickMax);
+            if (candidate == null) continue;
+
+            if (extreme == null ||
+                (pickMax && candidate.Value > extreme.Value) ||
+                (!pickMax && candidate.Value < extreme.Value))
+            {
+                extreme = candidate;
+            }
+        }
+
+        return extreme;
+    }
+
+    /// <summary>
+    /// Walks the {yyyy}/{MM}/{dd}/{HH}/{mm}/{ss}.json directory layout under
+    /// <paramref name="keyDir"/>, picking the minimum or maximum numeric child
+    /// at each level. Falls back to the next candidate when a branch is empty,
+    /// so dangling directories do not break the traversal.
+    /// </summary>
+    private static IncompleteDate? FindExtremeTimestamp(string keyDir, bool pickMax)
+    {
+        if (!Directory.Exists(keyDir)) return null;
+
+        // Candidate lists pre-sorted so that "next candidate" on fallback is trivial
+        List<(int value, string dir)> years = EnumerateIntChildren(keyDir, pickMax);
+        foreach (var (year, yearDir) in years)
+        {
+            foreach (var (month, monthDir) in EnumerateIntChildren(yearDir, pickMax))
+            {
+                foreach (var (day, dayDir) in EnumerateIntChildren(monthDir, pickMax))
+                {
+                    foreach (var (hour, hourDir) in EnumerateIntChildren(dayDir, pickMax))
+                    {
+                        foreach (var (minute, minuteDir) in EnumerateIntChildren(hourDir, pickMax))
+                        {
+                            int? second = PickExtremeSecondFile(minuteDir, pickMax);
+                            if (second == null) continue;
+
+                            try
+                            {
+                                return new IncompleteDate(year, month, day, hour, minute, second.Value);
+                            }
+                            catch
+                            {
+                                // Malformed segment combination – skip
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static List<(int value, string dir)> EnumerateIntChildren(string dir, bool pickMax)
+    {
+        if (!Directory.Exists(dir)) return new List<(int, string)>();
+
+        var items = new List<(int value, string dir)>();
+        foreach (string child in Directory.GetDirectories(dir))
+        {
+            if (int.TryParse(Path.GetFileName(child), out int value))
+                items.Add((value, child));
+        }
+
+        items.Sort((a, b) => pickMax
+            ? b.value.CompareTo(a.value)
+            : a.value.CompareTo(b.value));
+        return items;
+    }
+
+    private static int? PickExtremeSecondFile(string dir, bool pickMax)
+    {
+        if (!Directory.Exists(dir)) return null;
+
+        int? extreme = null;
+        foreach (string file in Directory.GetFiles(dir, "*.json"))
+        {
+            if (!int.TryParse(Path.GetFileNameWithoutExtension(file), out int second)) continue;
+            if (second is < 0 or > 59) continue;
+
+            if (extreme == null ||
+                (pickMax && second > extreme.Value) ||
+                (!pickMax && second < extreme.Value))
+            {
+                extreme = second;
+            }
+        }
+
+        return extreme;
     }
 }

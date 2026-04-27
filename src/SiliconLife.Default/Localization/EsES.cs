@@ -225,7 +225,7 @@ public class EsES : DefaultLocalizationBase
     /// <summary>
     /// Gets the system prompt for memory compression
     /// </summary>
-    public override string MemoryCompressionSystemPrompt => "Eres un asistente de compresión de memoria. Por favor, comprime las siguientes memorias en un resumen conciso manteniendo la información clave.";
+    public override string MemoryCompressionSystemPrompt => "Eres un asistente de compresión de memoria. Por favor, comprime las siguientes memorias en un resumen conciso manteniendo la información clave. IMPORTANTE: Solo genera el contenido comprimido, NO incluyas etiquetas de tiempo, marcas de tiempo ni anotaciones de fecha. Proporciona únicamente el texto comprimido puro.";
 
     /// <summary>
     /// Gets the common system prompt for all silicon beings
@@ -1662,8 +1662,8 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
 
     // ===== Memory Event Localization =====
 
-    public override string FormatMemoryEventSingleChat(string partnerName, string content)
-        => $"[Chat] Respondido a \"{partnerName}\": {content}";
+    public override string FormatMemoryEventSingleChat(string speakerName, string listenerName, string content)
+        => $"[Chat] {speakerName} dijo a {listenerName}: {content}";
 
     public override string FormatMemoryEventGroupChat(string sessionId, string content)
         => $"[Grupo] Hablado en sesión {sessionId}: {content}";

@@ -309,7 +309,7 @@ public class TokenAuditTool : ITool
 
         foreach (var record in records)
         {
-            var dateKey = record.Timestamp.ToString("yyyy-MM-dd");
+            var dateKey = $"{record.Timestamp.Year}-{record.Timestamp.Month:D2}-{record.Timestamp.Day:D2}";
             if (dateDict.ContainsKey(dateKey))
             {
                 var existing = dateDict[dateKey];
@@ -341,7 +341,7 @@ public class TokenAuditTool : ITool
 
         foreach (var record in records)
         {
-            var monthKey = record.Timestamp.ToString("yyyy-MM");
+            var monthKey = $"{record.Timestamp.Year}-{record.Timestamp.Month:D2}";
             if (monthDict.ContainsKey(monthKey))
             {
                 var existing = monthDict[monthKey];

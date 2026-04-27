@@ -225,7 +225,7 @@ public class EnUS : DefaultLocalizationBase
     /// <summary>
     /// Gets the system prompt for memory compression
     /// </summary>
-    public override string MemoryCompressionSystemPrompt => "You are a memory compression assistant. Please compress the following memories into a concise summary while retaining key information.";
+    public override string MemoryCompressionSystemPrompt => "You are a memory compression assistant. Please compress the following memories into a concise summary while retaining key information. IMPORTANT: Only output the compressed content itself, do NOT include any time labels, timestamps, or date annotations. Just provide the pure compressed text.";
 
     /// <summary>
     /// Gets the common system prompt for all silicon beings
@@ -1662,8 +1662,8 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
 
     // ===== Memory Event Localization =====
 
-    public override string FormatMemoryEventSingleChat(string partnerName, string content)
-        => $"[Chat] Replied to \"{partnerName}\": {content}";
+    public override string FormatMemoryEventSingleChat(string speakerName, string listenerName, string content)
+        => $"[Chat] {speakerName} said to {listenerName}: {content}";
 
     public override string FormatMemoryEventGroupChat(string sessionId, string content)
         => $"[Group] Spoke in session {sessionId}: {content}";

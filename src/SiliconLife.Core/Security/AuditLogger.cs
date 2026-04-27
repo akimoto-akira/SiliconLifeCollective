@@ -19,7 +19,7 @@ namespace SiliconLife.Collective;
 public sealed class AuditEntry
 {
     /// <summary>The timestamp of the decision</summary>
-    public DateTime Timestamp { get; }
+    public IncompleteDate Timestamp { get; }
 
     /// <summary>The GUID of the silicon being that made the request</summary>
     public Guid CallerId { get; }
@@ -36,7 +36,7 @@ public sealed class AuditEntry
     /// <summary>The reason for the decision</summary>
     public string Reason { get; }
 
-    public AuditEntry(DateTime timestamp, Guid callerId, PermissionType permissionType, string resource, PermissionResult result, string reason)
+    public AuditEntry(IncompleteDate timestamp, Guid callerId, PermissionType permissionType, string resource, PermissionResult result, string reason)
     {
         Timestamp = timestamp;
         CallerId = callerId;
@@ -92,7 +92,8 @@ public class AuditLogger
     /// <param name="reason">The reason for the decision</param>
     public void Log(Guid callerId, PermissionType permissionType, string resource, PermissionResult result, string reason)
     {
-        var entry = new AuditEntry(DateTime.UtcNow, callerId, permissionType, resource, result, reason);
+        var now = DateTime.UtcNow;
+        var entry = new AuditEntry(new IncompleteDate(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second), callerId, permissionType, resource, result, reason);
 
         if (_timeStorage != null)
         {

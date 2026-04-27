@@ -256,10 +256,10 @@ public class AuditController : Controller
         // Fill actual data (only count this week's data)
         foreach (var record in records)
         {
-            var recordDate = record.Timestamp.Date;
+            var recordDate = new DateTime(record.Timestamp.Year, record.Timestamp.Month ?? 1, record.Timestamp.Day ?? 1).Date;
             if (recordDate >= weekStart && recordDate < weekEnd)
             {
-                var hourKey = record.Timestamp.ToString("yyyy-MM-dd HH:00");
+                var hourKey = $"{record.Timestamp.Year}-{record.Timestamp.Month:D2}-{record.Timestamp.Day:D2} {record.Timestamp.Hour:D2}:00";
                 if (hourDict.ContainsKey(hourKey))
                 {
                     var existing = hourDict[hourKey];
@@ -326,7 +326,7 @@ public class AuditController : Controller
         // Fill actual data
         foreach (var record in records)
         {
-            var dateKey = record.Timestamp.ToString("yyyy-MM-dd");
+            var dateKey = $"{record.Timestamp.Year}-{record.Timestamp.Month:D2}-{record.Timestamp.Day:D2}";
             if (dateDict.ContainsKey(dateKey))
             {
                 var existing = dateDict[dateKey];
@@ -363,7 +363,7 @@ public class AuditController : Controller
         // Fill actual data
         foreach (var record in records)
         {
-            var monthKey = record.Timestamp.ToString("yyyy-MM");
+            var monthKey = $"{record.Timestamp.Year}-{record.Timestamp.Month:D2}";
             if (monthDict.ContainsKey(monthKey))
             {
                 var existing = monthDict[monthKey];

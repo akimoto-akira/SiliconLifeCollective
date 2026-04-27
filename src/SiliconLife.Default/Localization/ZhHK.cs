@@ -85,7 +85,7 @@ public class ZhHK : DefaultLocalizationBase
     public override string PermissionRespondFailed => "權限回應失敗";
     public override string PermissionRespondError => "權限回應錯誤：";
 
-    public override string MemoryCompressionSystemPrompt => "你是一個記憶壓縮助手。請將以下時間範圍內的記憶內容壓縮成簡潔的摘要，保留關鍵資訊。";
+    public override string MemoryCompressionSystemPrompt => "你是一個記憶壓縮助手。請將以下時間範圍內的記憶內容壓縮成簡潔的摘要，保留關鍵資訊。重要：只輸出壓縮後的內容，不要包含任何時間標註、時間戳或日期註釋。只提供純文本的壓縮內容。";
 
     /// <summary>
     /// Gets the common system prompt for all silicon beings
@@ -1514,8 +1514,8 @@ public class ZhHK : DefaultLocalizationBase
 
     // ===== Memory Event Localization =====
 
-    public override string FormatMemoryEventSingleChat(string partnerName, string content)
-        => $"[單聊] 與「{partnerName}」對話，回覆：{content}";
+    public override string FormatMemoryEventSingleChat(string speakerName, string listenerName, string content)
+        => $"[單聊] {speakerName}對{listenerName}說：{content}";
 
     public override string FormatMemoryEventGroupChat(string sessionId, string content)
         => $"[群聊] 在工作階段 {sessionId} 中發言：{content}";

@@ -224,7 +224,7 @@ public class HelpTopic
 
         var property = helpLocalization.GetType().GetProperty(TagsPropertyName);
         var tags = property?.GetValue(helpLocalization) as string[];
-        
+
         return tags ?? Array.Empty<string>();
     }
 }

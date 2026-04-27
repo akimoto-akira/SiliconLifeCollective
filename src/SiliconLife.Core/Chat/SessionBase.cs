@@ -77,12 +77,11 @@ public abstract class SessionBase
     public abstract void AddMessage(ChatMessage message);
 
     /// <summary>
-    /// Get message list
+    /// Get recent message list
     /// </summary>
-    /// <param name="offset">Offset</param>
-    /// <param name="limit">Limit</param>
-    /// <returns>Message list (ordered by timestamp ascending)</returns>
-    public abstract List<ChatMessage> GetMessages(int offset = 0, int limit = 50);
+    /// <param name="limit">Maximum number of messages to return (default: 10)</param>
+    /// <returns>Message list (ordered by timestamp ascending, most recent messages)</returns>
+    public abstract List<ChatMessage> GetMessages(int limit = 10);
 
     /// <summary>
     /// Get pending (unread) messages for a specific participant.

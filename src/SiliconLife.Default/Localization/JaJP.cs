@@ -225,7 +225,7 @@ public class JaJP : DefaultLocalizationBase
     /// <summary>
     /// Gets the system prompt for memory compression
     /// </summary>
-    public override string MemoryCompressionSystemPrompt => "あなたはメモリ圧縮アシスタントです。以下の時間範囲内のメモリ内容を簡潔な要約に圧縮し、重要な情報を保持してください。";
+    public override string MemoryCompressionSystemPrompt => "あなたはメモリ圧縮アシスタントです。以下の時間範囲内のメモリ内容を簡潔な要約に圧縮し、重要な情報を保持してください。重要：圧縮された内容のみを出力し、時間ラベル、タイムスタンプ、日付注釈を含めないでください。純粋な圧縮テキストのみを提供してください。";
 
     /// <summary>
     /// Gets the common system prompt for all silicon beings
@@ -1660,8 +1660,8 @@ public class JaJP : DefaultLocalizationBase
 
     // ===== メモリイベントローカライゼーション =====
 
-    public override string FormatMemoryEventSingleChat(string partnerName, string content)
-        => $"[単聊] \"{partnerName}\"との会話、返信：{content}";
+    public override string FormatMemoryEventSingleChat(string speakerName, string listenerName, string content)
+        => $"[単チャット] {speakerName}が{listenerName}に話す：{content}";
 
     public override string FormatMemoryEventGroupChat(string sessionId, string content)
         => $"[群聊] セッション {sessionId} で発言：{content}";

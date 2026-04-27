@@ -194,7 +194,10 @@ public class LogTool : ITool
             .Where(e => e.CallerId == callerId)
             .Where(e =>
             {
-                var tsUtc = DateTime.SpecifyKind(e.Timestamp, DateTimeKind.Utc);
+                var tsUtc = DateTime.SpecifyKind(
+                    new DateTime(e.Timestamp.Year, e.Timestamp.Month ?? 1, e.Timestamp.Day ?? 1,
+                        e.Timestamp.Hour ?? 0, e.Timestamp.Minute ?? 0, e.Timestamp.Second ?? 0),
+                    DateTimeKind.Utc);
                 if (startTime.HasValue && tsUtc < startTime.Value) return false;
                 if (endTime.HasValue && tsUtc > endTime.Value) return false;
                 return true;
@@ -604,7 +607,10 @@ public class LogTool : ITool
             .Where(e => e.CallerId == callerId)
             .Where(e =>
             {
-                var tsUtc = DateTime.SpecifyKind(e.Timestamp, DateTimeKind.Utc);
+                var tsUtc = DateTime.SpecifyKind(
+                    new DateTime(e.Timestamp.Year, e.Timestamp.Month ?? 1, e.Timestamp.Day ?? 1,
+                        e.Timestamp.Hour ?? 0, e.Timestamp.Minute ?? 0, e.Timestamp.Second ?? 0),
+                    DateTimeKind.Utc);
                 if (startTime.HasValue && tsUtc < startTime.Value) return false;
                 if (endTime.HasValue && tsUtc > endTime.Value) return false;
                 return true;

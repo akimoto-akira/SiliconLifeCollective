@@ -101,7 +101,7 @@ public class ChatHistoryController : Controller
 
             var result = sessions.Select(s =>
             {
-                var messages = s.GetMessages(0, 1);
+                var messages = s.GetMessages(1);
                 var lastMsg = messages.LastOrDefault();
                 var otherMembers = s.Members.Where(m => m != beingId).ToList();
 
@@ -118,7 +118,7 @@ public class ChatHistoryController : Controller
                     participants = participants,
                     lastMessage = lastMsg?.Content?.Substring(0, Math.Min(50, lastMsg.Content.Length)) ?? "",
                     lastMessageTime = lastMsg?.Timestamp.ToString("yyyy-MM-dd HH:mm:ss") ?? "",
-                    messageCount = s.GetMessages(0, int.MaxValue).Count
+                    messageCount = s.GetMessages(int.MaxValue).Count
                 };
             }).OrderByDescending(c => c.lastMessageTime).ToList();
 
@@ -202,7 +202,7 @@ public class ChatHistoryController : Controller
 
             var beings = _beingManager.GetAllBeings();
             var beingDict = beings.ToDictionary(b => b.Id);
-            var messages = session.GetMessages(0, int.MaxValue);
+            var messages = session.GetMessages(int.MaxValue);
 
             // Pair tool calls with their results
             // One Assistant message may contain multiple tool calls; each tool result

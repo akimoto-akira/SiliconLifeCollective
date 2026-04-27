@@ -63,7 +63,7 @@ public class ChatSystem
     {
         SessionBase session = GetOrCreateSession(userId, beingId);
         _logger.Debug(null, "Retrieving messages: user={0}, being={1}, limit={2}", userId, beingId, limit);
-        return session.GetMessages(0, limit);
+        return session.GetMessages(limit);
     }
 
     /// <summary>
@@ -239,7 +239,7 @@ public class ChatSystem
         {
             foreach (SessionBase session in _sessions.Values)
             {
-                List<ChatMessage> messages = session.GetMessages(0, int.MaxValue);
+                List<ChatMessage> messages = session.GetMessages(int.MaxValue);
                 foreach (ChatMessage message in messages)
                 {
                     if (message.Timestamp >= cutoff)
@@ -269,7 +269,7 @@ public class ChatSystem
         {
             foreach (SessionBase session in _sessions.Values)
             {
-                count += session.GetMessages(0, int.MaxValue).Count;
+                count += session.GetMessages(int.MaxValue).Count;
             }
         }
         return count;

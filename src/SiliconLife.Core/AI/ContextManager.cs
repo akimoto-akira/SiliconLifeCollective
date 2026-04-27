@@ -28,6 +28,14 @@ namespace SiliconLife.Collective;
 /// </summary>
 public class ContextManager
 {
+    /// <summary>
+    /// Maximum number of recent chat messages loaded into context per AI request.
+    /// Limits the context window to avoid unbounded token consumption during
+    /// long-running sessions. Older messages are still preserved in storage and
+    /// summarized into long-term memory via the compression pipeline.
+    /// </summary>
+    private const int MaxContextMessages = 10;
+
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<ContextManager>();
     private IAIClient _aiClient;
     private readonly SiliconBeingBase _being;
@@ -111,6 +119,9 @@ public class ContextManager
 
     /// <summary>
     /// Loads historical messages from the session into context.
+    /// Applies a sliding context window (MaxContextMessages) to keep token
+    /// usage bounded over long sessions. Older messages remain in storage and
+    /// surface back through the memory-context injection pipeline.
     /// Only tracks already-read messages in _contextMessageIds, so that
     /// FetchUnreadMessages can still pick up unread messages from the same session.
     /// </summary>
@@ -118,7 +129,9 @@ public class ContextManager
     {
         if (_session == null) return;
 
-        List<ChatMessage> history = _session.GetMessages();
+        List<ChatMessage> history = _session.GetMessages(MaxContextMessages);
+
+        // Add messages in chronological order (from earliest to latest)
         foreach (ChatMessage msg in history)
         {
             AddMessageToContext(msg);
@@ -128,7 +141,8 @@ public class ContextManager
             }
         }
 
-        _logger.Debug(_being.Id, "Loaded {0} history messages from session {1}", history.Count, _session.Id);
+        _logger.Debug(_being.Id, "Loaded {0} history messages from session {1} (window={2})",
+            history.Count, _session.Id, MaxContextMessages);
     }
 
     /// <summary>
@@ -276,8 +290,9 @@ public class ContextManager
 
         try
         {
+            var now = DateTime.UtcNow;
             var record = new TokenUsageRecord(
-                DateTime.UtcNow,
+                new IncompleteDate(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second),
                 _being.Id,
                 _aiClient.GetType().Name,
                 response.PromptTokens ?? 0,
@@ -301,6 +316,9 @@ public class ContextManager
     /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
     private AIRequest BuildRequest(string? scenarioContext = null)
     {
+        // Record unread user messages to memory before building the request
+        RecordUnreadMessagesToMemory();
+
         AIRequest request = new AIRequest(_aiClient.DefaultModel);
 
         if (!string.IsNullOrEmpty(_being.SoulContent))
@@ -336,6 +354,21 @@ public class ContextManager
             });
         }
 
+        // Memory context (placed at the end of system prompts, immediately before the
+        // conversation). Rationale:
+        // - Closest to the dialog, so the model's attention is strongest here.
+        // - Semantic layering: earlier system messages = instructions, last one = context.
+        // - Aligns with RAG best practice (retrieved info at end of system prompt).
+        string? memoryContext = BuildMemoryContext();
+        if (!string.IsNullOrEmpty(memoryContext))
+        {
+            request.Messages.Add(new ChatMessage
+            {
+                Role = MessageRole.System,
+                Content = memoryContext,
+            });
+        }
+
         request.Messages.AddRange(_messages);
 
         ToolManager? toolManager = _being.ToolManager;
@@ -344,9 +377,114 @@ public class ContextManager
             request.Tools = toolManager.GetToolDefinitions();
         }
 
-        _logger.Debug(_being.Id, "Building AI request: {0} messages, {0} tools", request.Messages.Count, request.Tools?.Count ?? 0);
+        _logger.Debug(_being.Id, "Building AI request: {0} messages, {1} tools, memory={2}",
+            request.Messages.Count, request.Tools?.Count ?? 0, !string.IsNullOrEmpty(memoryContext));
 
         return request;
+    }
+
+    /// <summary>
+    /// Records all unread user messages to memory before AI processing.
+    /// Only records User role messages from other beings (not self, not Tool messages).
+    /// </summary>
+    private void RecordUnreadMessagesToMemory()
+    {
+        if (_being.Memory == null || _pendingMarkAsReadIds.Count == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            LocalizationBase loc = LocalizationManager.Instance.GetLocalization(language);
+
+            int recordedCount = 0;
+
+            foreach (var msgId in _pendingMarkAsReadIds)
+            {
+                // Find the message in context
+                var msg = _messages.FirstOrDefault(m => m.Id == msgId);
+                if (msg == null) continue;
+
+                // Only record User role messages (skip Assistant and Tool messages)
+                if (msg.Role != MessageRole.User) continue;
+
+                // Skip messages from self
+                if (msg.SenderId == _being.Id) continue;
+
+                // Skip empty messages
+                if (string.IsNullOrWhiteSpace(msg.Content)) continue;
+
+                // Resolve sender name and determine if it's a silicon being
+                string senderName = "Unknown";
+                List<Guid>? relatedBeings = null;
+                
+                SiliconBeingManager? beingManager = ServiceLocator.Instance.BeingManager;
+                SiliconBeingBase? senderBeing = beingManager?.GetBeing(msg.SenderId);
+                
+                if (senderBeing != null)
+                {
+                    // Sender is a silicon being
+                    senderName = senderBeing.Name;
+                    relatedBeings = new List<Guid> { msg.SenderId };
+                }
+                else
+                {
+                    // Sender is a human user
+                    senderName = Config.Instance?.Data?.UserNickname ?? "User";
+                }
+
+                // Record to memory with localized format
+                string memoryContent = loc.FormatMemoryEventSingleChat(senderName, _being.Name, msg.Content);
+                _being.Memory.Add(memoryContent, relatedBeings);
+                recordedCount++;
+
+                _logger.Debug(_being.Id, "Recorded unread message {0} to memory (sender={1})", msgId, senderName);
+            }
+
+            if (recordedCount > 0)
+            {
+                _logger.Info(_being.Id, "Recorded {0} unread user messages to memory", recordedCount);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(_being.Id, "Failed to record unread messages to memory: {0}", ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Builds a memory-context block from the being's compressed memory summaries.
+    /// Combines recent day-level (short-term) and month-level (long-term) summaries
+    /// so the silicon being can recall past interactions like a human would.
+    /// Returns null when memory is unavailable or empty.
+    /// </summary>
+    private string? BuildMemoryContext()
+    {
+        if (_being.Memory == null) return null;
+
+        List<MemoryEntry> memories;
+        try
+        {
+            memories = _being.Memory.GetMemoryContextForChat();
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(_being.Id, "Failed to load memory context: {0}", ex.Message);
+            return null;
+        }
+
+        if (memories.Count == 0) return null;
+
+        StringBuilder sb = new();
+        sb.AppendLine("From your past experiences, you remember:");
+        foreach (MemoryEntry memory in memories)
+        {
+            sb.AppendLine($"- [{memory.Timestamp}] {memory.Content}");
+        }
+
+        return sb.ToString();
     }
 
     /// <summary>
@@ -651,7 +789,7 @@ public class ContextManager
                 
                 // If the other party is a silicon being, associate with memory; if human user, don't associate
                 List<Guid>? relatedBeings = otherBeing != null ? new List<Guid> { otherId } : null;
-                RecordToMemory(loc.FormatMemoryEventSingleChat(partnerName, response.Content), relatedBeings);
+                RecordToMemory(loc.FormatMemoryEventSingleChat(_being.Name, partnerName, response.Content), relatedBeings);
             }
         }
         else if (!response.Success)
@@ -667,7 +805,8 @@ public class ContextManager
 
     /// <summary>
     /// Builds scenario context for single chat.
-    /// Includes information about the conversation partner (human or silicon being).
+    /// Includes information about the conversation partner (human or silicon being)
+    /// plus conversation guidelines tailored for one-on-one dialog.
     /// </summary>
     private string? BuildSingleChatScenarioContext()
     {
@@ -700,6 +839,39 @@ public class ContextManager
             sb.AppendLine($"Partner name: {Config.Instance.Data.UserNickname}");
             sb.AppendLine($"Partner ID: {otherId}");
         }
+
+        sb.AppendLine();
+        sb.AppendLine("CONVERSATION GUIDELINES:");
+        sb.AppendLine("- This is a private conversation, be warm and personal.");
+        sb.AppendLine("- Reference past interactions when relevant (see your memory context).");
+        sb.AppendLine("- Ask follow-up questions to keep the conversation engaging.");
+        sb.AppendLine("- Keep responses concise unless detailed explanation is requested.");
+
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Builds scenario context for group chat, including session metadata
+    /// and behavioral guidelines tuned for multi-participant conversations.
+    /// </summary>
+    private string? BuildGroupChatScenarioContext()
+    {
+        if (_session == null)
+        {
+            return null;
+        }
+
+        StringBuilder sb = new();
+        sb.AppendLine("Scene: Group chat");
+        sb.AppendLine($"Session ID: {_session.Id}");
+        sb.AppendLine($"Members: {_session.Members.Count} participants");
+
+        sb.AppendLine();
+        sb.AppendLine("GROUP CHAT GUIDELINES:");
+        sb.AppendLine("- Only respond when addressed or when you have valuable input.");
+        sb.AppendLine("- Be concise to avoid overwhelming the group.");
+        sb.AppendLine("- Reference specific members by name when responding to them.");
+        sb.AppendLine("- Avoid repeating information already shared in the conversation.");
 
         return sb.ToString();
     }
@@ -792,7 +964,7 @@ public class ContextManager
                 
                 // If the other party is a silicon being, associate with memory; if human user, don't associate
                 List<Guid>? relatedBeings = otherBeing != null ? new List<Guid> { otherId } : null;
-                RecordToMemory(loc.FormatMemoryEventSingleChat(partnerName, response.Content), relatedBeings);
+                RecordToMemory(loc.FormatMemoryEventSingleChat(_being.Name, partnerName, response.Content), relatedBeings);
             }
         }
         else if (!response.Success)
@@ -815,7 +987,7 @@ public class ContextManager
     {
         _logger.Info(_being.Id, "ThinkOnGroupChat: being={0}", _being.Name);
 
-        string? scenarioContext = null;
+        string? scenarioContext = BuildGroupChatScenarioContext();
         AIResponse response = GetResponse(scenarioContext);
 
         if (response.Success && response.HasToolCalls)
@@ -852,7 +1024,7 @@ public class ContextManager
     {
         _logger.Info(_being.Id, "ThinkOnGroupChatStream: being={0}", _being.Name);
 
-        string? scenarioContext = null;
+        string? scenarioContext = BuildGroupChatScenarioContext();
         AIResponse response = await GetResponseStreamAsync(scenarioContext, cancellationToken);
 
         if (response.Success && response.HasToolCalls)
@@ -1254,6 +1426,15 @@ public class ContextManager
             foreach (KeyValuePair<string, string> kv in task.Metadata)
                 sb.AppendLine($"  {kv.Key}: {kv.Value}");
         }
+
+        sb.AppendLine();
+        sb.AppendLine("TASK EXECUTION GUIDELINES:");
+        sb.AppendLine("- Analyze the task requirements carefully before acting.");
+        sb.AppendLine("- Use available tools to complete the task step by step.");
+        sb.AppendLine("- Report progress and any obstacles you encounter.");
+        sb.AppendLine("- When the task is complete, provide a clear summary of what was done.");
+        sb.AppendLine("- If the task cannot be completed, explain why and suggest alternatives.");
+
         return sb.ToString();
     }
 
@@ -1288,6 +1469,19 @@ public class ContextManager
         sb.AppendLine("- The final summary will be delivered to the user as the timer execution result.");
         sb.AppendLine("- Be concise and focused. Avoid unnecessary operations or lengthy explanations.");
         sb.AppendLine("- If you encounter errors, report them clearly in your final response.");
+
+        sb.AppendLine();
+        sb.AppendLine("ERROR HANDLING:");
+        sb.AppendLine("- If a tool call fails due to permission denied, skip it and continue with other operations.");
+        sb.AppendLine("- If a tool call times out, report the error and move on to the next operation.");
+        sb.AppendLine("- Do not retry failed operations more than once.");
+        sb.AppendLine("- Always provide a final summary even if some operations failed.");
+
+        sb.AppendLine();
+        sb.AppendLine("TIME AWARENESS:");
+        sb.AppendLine("- This is an automated background task; keep execution time minimal.");
+        sb.AppendLine("- Prioritize critical operations over optional ones.");
+        sb.AppendLine("- If the task seems too complex, focus on the most important aspects.");
 
         return sb.ToString();
     }
