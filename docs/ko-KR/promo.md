@@ -1,5 +1,7 @@
 ﻿# 당신의 디지털 파트너를 만나보세요
 
+> **버전: v0.1.0-alpha**
+
 [English](../en/promo.md) | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | **한국어** | [Deutsch](../de-DE/promo.md) | [Čeština](../cs-CZ/promo.md)
 
 ## 컴퓨터가 스스로 생각할 수 있다면 어떨까요?

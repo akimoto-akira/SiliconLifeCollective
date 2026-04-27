@@ -1,5 +1,7 @@
 ﻿# ロードマップ
 
+> **バージョン: v0.1.0-alpha**
+
 [English](roadmap.md) | [简体中文](docs/zh-CN/roadmap.md) | [繁體中文](docs/zh-HK/roadmap.md) | [Español](docs/es-ES/roadmap.md) | [日本語](docs/ja-JP/roadmap.md) | [한국어](docs/ko-KR/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | [Čeština](docs/cs-CZ/roadmap.md)
 
 ## ガイディングプリンシプル

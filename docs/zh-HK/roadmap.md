@@ -1,5 +1,7 @@
 ﻿# 路線圖
 
+> **版本：v0.1.0-alpha**
+
 [English](../en/roadmap.md) | [中文](../zh-CN/roadmap.md) | **繁體中文** | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
 
 ## 指導原則

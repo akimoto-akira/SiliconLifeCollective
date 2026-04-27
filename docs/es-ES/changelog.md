@@ -1,13 +1,11 @@
 ﻿# Registro de Cambios
 
-[English](../en/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | **Español** | [Deutsch](../de-DE/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md)
+[English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | **Español** | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md)
 
 Todos los cambios importantes de este proyecto serán documentados en este archivo.
 
 El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 y este proyecto sigue [Versionado Semántico](https://semver.org/spec/v2.0.0.html).
-
-**Nota: Este proyecto aún no ha lanzado ninguna versión oficial, todo el contenido está en desarrollo.**
 
 ---
 
@@ -55,480 +53,394 @@ y este proyecto sigue [Versionado Semántico](https://semver.org/spec/v2.0.0.htm
 
 ---
 
-## [No Publicado]
+## [v0.1.0-alpha] - 2026-04-28
+
+### 2026-04-28
+
+#### Refactorización del Sistema de Almacenamiento
+- `8dd26e3` - Unificó la interfaz ITimeStorage para usar IncompleteDate y agregó API de consulta jerárquica
+  - Eliminó los métodos sobrecargados DateTime de la interfaz ITimeStorage, unificado para usar IncompleteDate
+  - Agregó el método de comparación CompareTo(DateTime) y el método de expansión Expand() a IncompleteDate
+  - Agregó API de consulta jerárquica GetEarliestTimestamp(), GetLatestTimestamp()
+  - Agregó métodos HasSummary() y QueryWithLevel(), soportando consultas por nivel de tiempo
+  - Memory.cs refactorizó el algoritmo de compresión, usando la nueva API de consulta jerárquica para mejorar la eficiencia
+  - FileSystemTimeStorage.cs implementa completamente los nuevos métodos de interfaz
+  - Actualizaciones sincronizadas a todos los llamadores: ChatSystem, ChatSession, BroadcastChannel, AuditLogger, TokenUsageRecord, etc.
+  - Actualizaciones del sistema de herramientas: HelpTool, LogTool, TokenAuditTool adaptados a la nueva interfaz
+  - Actualizaciones del controlador web: AuditController, ChatController, ChatHistoryController adaptados a la nueva interfaz
+  - Total: 41 archivos cambiados (+1820/-903 líneas)
+
+### 2026-04-27
+
+#### Mejora del Sistema de Documentación de Ayuda
+- `9989d79` - Actualizó localización, sistema de ayuda y vistas web
+  - Agregó interfaz de documentación de ayuda de fábrica de cliente IA IAIClientFactoryHelp.cs
+  - Completó traducción a 9 idiomas para todos los documentos de ayuda
+  - HelpTopics.cs agregó 40 definiciones de temas de ayuda
+  - Vistas web actualizadas integralmente: InitController, AuditView, ConfigView, KnowledgeView, LogView, etc.
+  - Mejora del sistema de localización: todas las versiones de idiomas agregaron nuevas claves de localización
+  - Actualizaciones de fábrica de cliente IA: mejoras en DashScopeClientFactory, OllamaClientFactory
+
+#### Nuevo Contenido de Documentación de Ayuda
+- `e7afe94` - Agregó documentación de ayuda de archivos de alma y registro de auditoría
+  - Agregó documentación de ayuda de gestión de archivos de alma
+  - Agregó documentación de ayuda de registro de auditoría
+  - HelpTopics.cs agregó definiciones de temas
+  - HelpView.cs significativamente refactorizado, mejoró la lógica de renderizado de documentos
+  - PermissionView.cs refactorizado, mejoró la interfaz de gestión de permisos
+  - Mejora del módulo central: mejoras en SiliconBeingManager, TaskSystem, ToolManager
+  - TaskTool.cs refactorizado, mejoró la funcionalidad de gestión de tareas
+  - Vistas web actualizadas integralmente: todos los componentes de vista sincronizados
+  - HelpController.cs simplificado, optimizó la lógica del controlador
 
 ### 2026-04-26
 
-#### Mejora del Sistema de Documentos de Ayuda
-- Añadir documentos de Sistema de Memoria, Configuración de Ollama y Guía de la Plataforma Alibaba Cloud Bailian (3 nuevos documentos)
-- Completar la traducción de 10 documentos de ayuda a 9 idiomas (zh-CN, zh-HK, en-US, de-DE, cs-CZ, es-ES, ja-JP, ko-KR)
-- Simplificar la lógica de renderizado de HelpView
-- Total: aproximadamente 14,000 líneas de documentación en todos los idiomas
+#### Sistema de Documentación de Ayuda
+- `07895d7` - Mejoró el sistema de documentación de ayuda, agregó 3 documentos y completó traducción a 9 idiomas
+  - Agregó guía de uso del sistema de memoria, configuración de instalación de Ollama, plataforma Alibaba Cloud Bailian
+  - Completó traducción a 9 idiomas para los 10 documentos de ayuda
+  - Simplificó la lógica de renderizado de HelpView
+
+#### Localización Alemana
+- `0cfd8a1` - Agregó soporte completo de localización alemana (de-DE)
+  - Archivos de localización alemana completos
+  - Agregó soporte alemán para calendario histórico chino
+  - Agregó traducción alemana de documentación de ayuda
+  - Sincronizó completamente todos los documentos en 9 idiomas
+
+#### Sincronización de Documentación
+- `3aada7d` - Sincronizó documentación en chino tradicional (zh-HK) con chino simplificado
+- `2f6abff` - Agregó localización de nombre de visualización de herramientas de ayuda para todos los idiomas
+
+#### Refactorización del Sistema de Conocimiento
+- `60944fe` - Unificó el espacio de nombres a SiliconLife.Collective
+- `69c51c5` - Agregó sistema de documentación de ayuda y tradujo comentarios de código al inglés
 
 ### 2026-04-25
 
-#### Gestión de Espacio de Trabajo de Proyectos
-- `785c551` - Implementar gestión de espacio de trabajo de proyectos con notas de trabajo y sistema de tareas
-  - Nuevo sistema de gestión de espacio de trabajo de proyectos
-  - Función de notas de trabajo para seguimiento de progreso de proyectos
-  - Integración del sistema de gestión de tareas
-  - Mejora de capacidades de organización y seguimiento de proyectos
+#### Automatización de Navegador WebView
+- `41757c3` - Implementó automatización de navegador WebView multiplataforma basada en Playwright
 
-#### Localización en Checo
-- `b4bbf39` - Añadir localización completa en checo (cs-CZ) y actualizar documentos en todos los idiomas
-  - Soporte completo para checo
-  - Actualización de documentos en todos los idiomas para incluir checo
-  - Localización completa de elementos de UI y mensajes
-- `faf078f` - Corregir errores de compilación en localización checa
-  - Resolver problemas de compilación en archivos de localización checa
-  - Asegurar integración correcta del paquete de idioma checo
+#### Actualizaciones de Documentación
+- `0ff797b` - Agregó documentación de KnowledgeTool y WorkNoteTool (7 idiomas)
+- `ad77415` - Actualizó todos los archivos de changelog, agregó historial Git de 2026-04-25
+
+#### Gestión de Espacio de Trabajo del Proyecto
+- `785c551` - Implementó gestión de espacio de trabajo del proyecto con notas de trabajo y sistema de tareas
+  - Agregó sistema de gestión de espacio de trabajo del proyecto
+  - Funcionalidad de notas de trabajo para rastrear el progreso del proyecto
+  - Integración del sistema de gestión de tareas
+
+#### Localización Checa
+- `b4bbf39` - Agregó localización checa completa (cs-CZ) y actualizó toda la documentación de idiomas
+- `faf078f` - Corrigió errores de compilación de localización checa
 
 #### Mejora del Sistema de Conocimiento
-- `20adaac` - Añadir KnowledgeTool y soportar localización completa
-  - Nuevo KnowledgeTool para gestión de conocimiento
-  - Soporte completo de localización multiidioma
-  - Mejora de capacidades de red de conocimiento
+- `20adaac` - Agregó KnowledgeTool con soporte completo de localización
 
 ### 2026-04-24
 
-#### Mejora del Sistema de Gestión de Memoria
-- `c7b2ecc` - Mejorar funciones de gestión de memoria, añadir filtrado avanzado, estadísticas y vista de detalles
-  - Nueva función de filtrado avanzado de memoria, soporta filtrado multidimensional por tipo, rango de tiempo, etiquetas, etc.
-  - Implementación de función de estadísticas de memoria, muestra información estadística como cantidad de memorias, distribución por tipo, etc.
-  - Añadir página de vista de detalles de memoria, soporta ver información completa de una sola memoria
-  - Optimización de interfaz de gestión de memoria, mejora experiencia de usuario y eficiencia operativa
-  - Soporte de localización multiidioma (6 idiomas)
+#### Mejora de Gestión de Memoria
+- `c7b2ecc` - Mejoró la gestión de memoria con filtrado avanzado, estadísticas y vistas detalladas
+  - Agregó filtrado avanzado de memoria
+  - Implementó estadísticas de memoria
+  - Agregó página de vista detallada de memoria
+  - Soporte de localización multi-idioma (6 idiomas)
 
 #### Extensión del Sistema de Permisos
-- `4489ad6` - Añadir servicio meteorológico wttr.in a la lista blanca de red
-  - Permitir que Seres Silicona accedan a API meteorológica wttr.in para obtener información del clima
-  - Actualizar documentos del sistema de permisos, explicar configuración de permisos del servicio meteorológico
-  - Actualización sincronizada de documentos multiidioma completos (6 idiomas)
+- `4489ad6` - Agregó servicio meteorológico wttr.in a la lista blanca de red
+  - Sincronización completa de documentación multi-idioma (6 idiomas)
+
+#### Correcciones de Interfaz Web
+- `d9d72e9` - Corrigió problema de prioridad CSS en modal de detalle de notas de trabajo
 
 #### Optimización del Historial de Chat
-- `057b09d` - Optimizar visualización de detalles del historial de chat, mejorar renderizado de invocación de herramientas
-  - Optimización de visualización de invocación de herramientas en página de detalles del historial de chat
-  - Mejorar visualización formateada de parámetros de invocación de herramientas
-  - Mejorar legibilidad de mensajes históricos
-- `0df599c` - Corregir problema de resultados de herramientas renderizados como mensajes de chat independientes
-  - Los resultados de ejecución de herramientas ahora están correctamente asociados al mensaje original
-  - Evitar que resultados de herramientas se muestren como respuestas de IA separadas
-  - Mejorar coherencia de mensajes de chat
+- `0df599c` - Corrigió resultados de herramientas renderizados como mensajes de chat separados
+- `057b09d` - Optimizó visualización de detalles del historial de chat, mejoró renderizado de llamadas a herramientas
 
-#### Corrección de Interfaz Web
-- `d9d72e9` - Corregir problema de prioridad CSS en modal de detalles de notas de trabajo
-  - Corrección de estilo de modal de notas de trabajo
-  - Ajuste de prioridad CSS para asegurar aplicación correcta de estilos
-  - Mejorar efecto visual del modal
-
-#### Mejora de Funciones Centrales
-- `1e7c7b2` - Mejorar compresión de memoria y seguimiento de ejecución de herramientas
-  - Optimización de algoritmo de compresión de memoria
-  - Mejora de mecanismo de seguimiento de ejecución de herramientas
-  - Mejorar eficiencia de gestión de memoria de Seres Silicona
+#### Historial de Ejecución de Temporizador
+- `fa3f06f` - Agregó función de historial de ejecución de temporizador con vista detallada
+- `d824835` - Agregó claves de localización de historial de ejecución de temporizador (todos los idiomas)
 
 #### Mejora de Localización
-- `c13cb17` - Registrar variante de idioma español
-  - Soporte de localización para español (España)
-  - Expansión del sistema multiidioma
-- `9c44f34` - Añadir soporte de localización multiidioma para calendario histórico chino
-  - Localización completa de idioma para calendario histórico chino
-  - Soporte multiidioma para información de años de reinado histórico, dinastías, etc.
-- `192fc6e` - Añadir localización de nombres de herramientas faltantes para 5 herramientas
-  - Complementar visualización de nombres localizados de herramientas
-  - Mejorar experiencia multiidioma de interfaz de herramientas
+- `c13cb17` - Registró variante de idioma español
+- `9c44f34` - Agregó soporte de localización multi-idioma para calendario histórico chino
+
+#### Mejoras de Funcionalidad Central
+- `1e7c7b2` - Mejoró compresión de memoria y rastreo de ejecución de herramientas
 
 ### 2026-04-23
 
-#### Historial de Chat e Indicador de Carga
-- `e483348` - Implementar función de visualización de historial de chat de Seres Silicona
-  - Nuevo ChatHistoryController, incluye API de lista de sesiones y detalles de mensajes
-  - Crear ChatHistoryViewModel para transferencia de datos
-  - Implementar páginas ChatHistoryListView y ChatHistoryDetailView
-  - Añadir claves de localización para historial de chat (5 idiomas)
-  - Actualizar Router para incluir rutas de historial de chat
-  - Añadir enlace de entrada de historial de chat en página de detalles de BeingView
-- `65c157b` - Añadir indicador de carga para página de chat y seleccionar automáticamente sesión del curador
-  - Indicador de estado de carga en página de chat
-  - Función de selección automática de sesión del curador
-  - Soporte multiidioma (6 idiomas)
+#### Localización de Herramientas
+- `192fc6e` - Agregó localización de nombre de herramienta faltante para 5 herramientas
 
-#### Mejora de Control de Flujo de IA
-- `30a2d4e` - Mejorar cancelación de flujo de IA, integración IM e inicialización de host central
-  - Mejora de mecanismo de cancelación de flujo en ContextManager
-  - Mejora de integración del sistema IM
-  - Optimización de inicialización de CoreHost
-  - Mejora de funcionalidad de DiskExecutor
-  - Actualización de WebUIProvider
+#### Actualizaciones de Documentación
+- `882c08f` - Actualizó todos los archivos de changelog, agregó historial Git completo y eliminó números de versión falsos
 
-#### Soporte de Carga de Archivos
-- `28fb344` - Implementar diálogo de origen de archivo y soporte de carga de archivos
-  - Diálogo de origen de archivo en interfaz web
-  - Implementación de función de carga de archivos
-- `1d3e2cc` - Añadir cadenas de localización para diálogo de origen de archivo
-  - Soporte multiidioma para diálogo de origen de archivo (6 idiomas)
+#### Mejora de Página de Chat
+- `65c157b` - Agregó indicador de carga a página de chat y seleccionó automáticamente sesión de curator
+
+#### Función de Historial de Chat
+- `e483348` - Implementó función de visualización de historial de chat de silicon being
+  - Agregó ChatHistoryController
+  - Creó ChatHistoryViewModel
+  - Implementó páginas ChatHistoryListView y ChatHistoryDetailView
+  - Agregó claves de localización para historial de chat (5 idiomas)
+
+#### Mejora de Control de Flujo IA
+- `30a2d4e` - Mejoró cancelación de flujo IA, integración IM e inicialización de host central
 
 #### Cola de Mensajes de Chat
-- `db48c51` - Añadir cola de mensajes de chat, metadatos de archivo y soporte de cancelación de flujo
-  - Nuevo sistema de cola de mensajes ChatMessageQueue
-  - Nueva gestión de metadatos de archivo FileMetadata
-  - Nuevo gestor de cancelación de flujo StreamCancellationManager
+- `db48c51` - Agregó cola de mensajes de chat, metadatos de archivos y soporte de cancelación de flujo
+
+#### Soporte de Carga de Archivos
+- `28fb344` - Implementó diálogo de origen de archivos y soporte de carga de archivos
+- `1d3e2cc` - Agregó cadenas de localización de diálogo de origen de archivos (6 idiomas)
+
+#### Actualizaciones de Documentación
+- `8111e92` - Agregó enlace Wiki a sección de repositorio en README
 
 ### 2026-04-22
 
+#### Localización de Documentación
+- `66c11eb` - Tradujo comentarios chinos al inglés y actualizó todos los changelogs
+
+#### Mejora de Mensajes SSE
+- `b574b2b` - Agregó senderName a mensajes históricos para identificación IA
+
+#### Funciones de Chat
+- `601fc14` - Agregó acción mark_read para marcado de fin de sesión
+
+#### Optimización del Sistema de Herramientas
+- `7a03a19` - Mejoró flexibilidad de consulta de conversación de LogTool
+
 #### Mejora de Localización
-- `b574b2b` - Añadir senderName para mensajes históricos para identificación de IA
-  - Añadir campo de nombre de remitente en mensajes históricos SSE
-  - Soporte para identificación de identidad de mensajes de IA
-- `0a8d750` - Añadir indicación de sistema genérica para comportamiento proactivo de Seres Silicona
-  - Nueva plantilla de indicación de sistema genérica en sistema de localización
-  - Soporte para guía de comportamiento proactivo de Seres Silicona
+- `0a8d750` - Agregó prompt de sistema común para comportamientos activos de silicon being
 
-#### Expansión del Sistema de Herramientas
-- `70ce7fb` - Implementar DatabaseTool para consultas de base de datos estructurada
-  - Nueva herramienta de consulta de base de datos
-  - Soporte para operaciones de datos estructurados
-- `be29a09` - Implementar LogTool para consulta de historial de operaciones y conversaciones
-  - Nueva herramienta de consulta de registros
-  - Soporte para recuperación de historial de operaciones y conversaciones
-- `4ea7702` - Implementar PermissionTool para gestión dinámica de permisos
-  - Nueva herramienta de gestión de permisos
-  - Soporte para consulta y gestión dinámica de permisos
-- `1384ff4` - Implementar ExecuteCodeTool para ejecución de código multiidioma
-  - Nueva herramienta de ejecución de código
-  - Soporte para compilación y ejecución de código multiidioma
-- `82d1e11` - Implementar SearchTool para recuperación de información
-  - Nueva herramienta de búsqueda de información
-  - Soporte para recuperación de información externa
+#### Refactorización del Sistema de Registro
+- `2b771f3` - Desacopló LogController de E/S de archivos, agregó API de lectura de registro
+- `12da302` - Agregó filtro de silicon being a vista de registro
+- `8f6cb1e` - Agregó parámetro beingId a interfaz ILogger, implementó separación de registros sistema/silicon being
 
-#### Refactorización del Sistema de Registros
-- `8f6cb1e` - Añadir parámetro beingId a interfaz ILogger, implementar separación de registros de sistema/Seres Silicona
-  - Extensión de interfaz ILogger
-  - Soporte para separación de registros de sistema y Seres Silicona
-  - Nuevo parámetro beingId
-- `2b771f3` - Desacoplar LogController de E/S de archivos, añadir API de lectura de registros
-  - Refactorización de arquitectura de LogController
-  - Nueva API independiente de lectura de registros
-  - Separación de operaciones de E/S de archivos
-- `12da302` - Añadir filtro de Seres Silicona para vista de registros
-  - Nueva función de filtro de Seres Silicona en interfaz web
-  - Filtrado de registros por Ser Silicona
+#### Mejoras del Sistema de Permisos
+- `4c747ad` - Refactorizó PermissionTool, ExecuteCodeTool, agregó API EvaluatePermission
 
-#### Mejora del Sistema de Permisos
-- `4c747ad` - Refactorizar PermissionTool, ExecuteCodeTool, añadir API EvaluatePermission
-  - Refactorización de PermissionTool y ExecuteCodeTool
-  - Integración de API EvaluatePermission
-
-#### Optimización de Interfaz Web
-- `702b3f3` - Mejorar vista de tareas, añadir insignias de estado y visualización de metadatos
-  - Mejora de UI de vista de tareas
-  - Nueva visualización de insignias de estado y metadatos
-- `6ed9a79` - Mejorar almacenamiento de mensajes de chat y renderizado de vistas
-  - Optimización de mecanismo de almacenamiento de mensajes de chat
-  - Mejora de rendimiento de renderizado de vistas
-- `0675c45` - Optimizar resaltado de bloques de código markdown en panel de vista previa
-  - Optimización de resaltado de código en vista previa Markdown
-  - Mejorar efecto de visualización de bloques de código
+#### Correcciones de Errores
+- `1c96e99` - Corrigió fallo de búsqueda en directorio raíz de search_files y search_content
 
 #### Integración de Herramientas
-- `135710d` - Eliminar SearchTool, mover búsqueda local a DiskTool
-  - Eliminación de SearchTool
-  - Integración de función de búsqueda local en DiskTool
-- `7a03a19` - Mejorar flexibilidad de consulta de conversaciones de LogTool
-  - Optimización de lógica de consulta de conversaciones de LogTool
-  - Mejorar flexibilidad de consultas
+- `135710d` - Eliminó SearchTool, movió búsqueda local a DiskTool
 
-#### Gestión de Configuración
-- `4305769` - Añadir .gitattributes para gestión de finales de línea
-  - Configuración de finales de línea para compatibilidad multiplataforma
+#### Extensión del Sistema de Herramientas
+- `70ce7fb` - Implementó DatabaseTool para consultas de base de datos estructurada
+- `be29a09` - Implementó LogTool para consultas de historial de operaciones y conversaciones
+- `4ea7702` - Implementó PermissionTool para gestión dinámica de permisos
+- `1384ff4` - Implementó ExecuteCodeTool para ejecución de código multi-idioma
+- `82d1e11` - Implementó SearchTool para recuperación de información
 
-#### Corrección de Bugs
-- `1c96e99` - Corregir fallo de búsqueda en directorio raíz de search_files y search_content
-  - Corrección de función de búsqueda en directorio raíz de DiskTool
-  - Corrección de lógica de búsqueda de archivos y contenido
+#### Optimización de Interfaz Web
+- `0675c45` - Optimizó resaltado de bloques de código markdown en panel de vista previa
+- `702b3f3` - Mejoró vista de tareas con insignias de estado y visualización de metadatos
+- `6ed9a79` - Mejoró almacenamiento de mensajes de chat y renderizado de vistas
 
 ### 2026-04-21
 
+#### Correcciones de Errores
+- `c6b518b` - Corrigió entrega de mensajes de temporizador y almacenamiento de mensajes de chat
+
+#### Gestión de Configuración
+- `4305769` - Agregó .gitattributes para gestión de finales de línea
+
+#### Mejoras de Interfaz Web
+- `188c6f8` - Registró ruta de API de lista de tareas y agregó visualización de estado vacío
+- `634e8ca` - Agregó enlace de retorno a lista de página de permisos
+- `6ba591d` - Agregó editor de configuración IA independiente para silicon beings
+- `0a826f5` - Agregó prompt de éxito de guardado en editor de código
+- `2940373` - Mejoró interfaz web con sugerencias de hover de código y mejoras de UI
+
+#### Correcciones del Sistema de Permisos
+- `592c7ab` - Corrigió instanciación de callback y orden de registro
+
+#### Mejora de Seguridad
+- `833ead2` - Agregó verificación de referencia de ensamblado para compilación dinámica
+
 #### Mejora del Sistema de Permisos
-- `5879621` - Añadir verificación de precompilación de callback de permisos y mejora de manejo de errores
-  - Función de verificación de precompilación de callback de permisos
-  - Compilar código de callback de permisos antes de guardar para verificar corrección
-  - Prevenir que código inválido se guarde en disco
-  - Manejo detallado de errores para operaciones de guardado de permisos
-  - Mensajes de error mejorados, soportan localización
-  - Separación de pasos de compilación y escaneo de seguridad, proporciona mejor informe de errores
-- `833ead2` - Añadir verificación de referencias de ensamblado para compilación dinámica
-  - Mejora de seguridad de compilación dinámica
-  - Mecanismo de verificación de referencias de ensamblado
+- `5879621` - Agregó verificación de pre-compilación de callback de permisos y manejo mejorado de errores
 
-#### Mejora de Interfaz Web
-- `0a826f5` - Añadir indicación de guardado exitoso en editor de código
-  - Función de indicación de éxito para operación de guardado en editor de código
-  - Mejorar retroalimentación de operación de usuario
-- `2940373` - Mejorar interfaz web, añadir indicación flotante de código y mejora de UI
-  - Función de indicación flotante en editor de código
-  - Optimización de UI de interfaz web
-- `6ba591d` - Añadir editor de configuración de IA independiente para Seres Silicona
-- `634e8ca` - Añadir enlace de retorno a lista en página de permisos
-- `188c6f8` - Registrar ruta de API de lista de tareas y añadir visualización de estado vacío
+#### Actualizaciones de Documentación
+- `4dbf659` - Actualizó changelog a v0.5.1, reemplazó URLs de marcador de posición de GitHub, agregó espejo Gitee, localizó nombre de Bilibili por idioma, actualizó correo electrónico
 
-#### Corrección de Bugs
-- `592c7ab` - Corregir orden de instanciación y registro de callbacks
-  - Corrección de sistema de callback de permisos
-  - Optimización de orden de registro de callbacks
-- `c6b518b` - Corregir传递 de mensajes de temporizador y almacenamiento de mensajes de chat
-  - Corrección de mecanismo de传递 de mensajes de temporizador
-  - Optimización de almacenamiento de mensajes de chat
+#### Configuración y Entrada
+- `0fc1693` - Actualizó entrada de programa y configuración de proyecto
 
-#### Localización
-- `7940d9c` - Añadir soporte de localización en coreano
-  - Archivos de localización en coreano
-  - Mejora de sistema multiidioma
-- `4ff98ad` - Refactorizar documentos, soportar multiidioma
-  - Reorganización de estructura de documentos
-  - Sincronización de documentos multiidioma
+#### Refactorización del Sistema de Permisos
+- `ea9179a` - Mejoró implementación del sistema de permisos
+
+#### Correcciones de Errores
+- `928a96d` - Corrigió implementación de cálculo de calendario
 
 #### IA y Calendario
-- `646813e` - Mejorar implementación de fábrica de clientes de IA
-  - Refactorización de fábrica de clientes de IA
-  - Optimización de mecanismo de descubrimiento de clientes
-- `928a96d` - Corregir implementación de cálculo de calendario
-  - Corrección de lógica de cálculo de calendario
-  - Mejora de precisión de cálculo para múltiples tipos de calendario
+- `646813e` - Mejoró implementación de fábrica de cliente IA
 
-#### Configuración y Punto de Entrada
-- `0fc1693` - Actualizar punto de entrada del programa y configuración del proyecto
-  - Optimización de punto de entrada del programa
-  - Mejora de configuración del proyecto
+#### Localización
+- `7940d9c` - Agregó soporte de localización coreana
+- `4ff98ad` - Refactorizó documentación para soporte multi-idioma
 
 ### 2026-04-20
 
-#### Perfeccionamiento de Funciones Centrales
-- `28905b5` - Soporte multiidioma completo, fábrica de clientes de IA, sistema de permisos y configuración de localización
-  - Sistema de registros con gestor, entradas y diferentes niveles de registros
-  - Sistema de auditoría de tokens para consulta y seguimiento de uso de tokens
-  - Fábrica de clientes de IA con descubrimiento automático de diferentes plataformas de IA
-  - Sistema de callback de permisos con almacenamiento propio
+#### Finalización de Funcionalidad Central
+- `28905b5` - Soporte multi-idioma completo, fábrica de cliente IA, sistema de permisos y configuración de localización
+  - Sistema de registro con gerente, entradas y diferentes niveles de registro
+  - Sistema de auditoría de tokens para consultar y rastrear uso de tokens
+  - Fábricas de cliente IA para descubrimiento automático de diferentes plataformas IA
+  - Sistema de callback de permisos con su propio almacenamiento
   - Implementación de registrador de consola
-  - Soporte multiidioma para inglés y chino simplificado
+  - Soporte multi-idioma para inglés y chino simplificado
   - Mensajero WebUI con WebSocket para chat en tiempo real
-  - Ser Silicona predeterminado mejorado con localización
+  - Silicon being por defecto mejorado con localización
 
 ### 2026-04-19
 
-#### Temporizadores y Calendario
-- `c933fd8` - Actualizar localización, sistema de temporizadores, vistas web y añadir herramientas
-  - Mejor gestor de localización
+#### Temporizador y Calendario
+- `c933fd8` - Actualizó localización, sistema de temporizador, vistas web y agregó herramientas
+  - Mejor gerente de localización
   - Sistema de programación para tareas programadas
-  - Configuración de IA y gestión de contexto
-  - Herramienta de calendario con soporte para 32 tipos de calendario
-  - Controlador web para API de calendario
+  - Configuración IA y gestión de contexto
+  - Herramienta de calendario soportando 32 tipos de calendario
+  - Controlador web para APIs de calendario
   - Herramienta de gestión de tareas
 
 **Mejoras de Arquitectura**
-- Rediseñar arquitectura de vistas web para mejor soporte de pieles
-- Mejorar sistema de gestión de seres con mejor manejo de estados
+- Rediseñó arquitectura de vista web para mejor soporte de skins
+- Mejoró sistema de gestión de beings con mejor manejo de estado
 
 ### 2026-04-18
 
-- `9f585e1` - Actualizar localización, sistema de temporizadores, vistas web y añadir herramientas
-  - Mejoras de temporizadores y programación
+- `9f585e1` - Actualizó localización, sistema de temporizador, vistas web y agregó herramientas
+  - Mejoras de temporizador y programación
   - Mejores vistas web con componentes de UI mejorados
   - Más implementaciones de herramientas
 
 ### 2026-04-17
 
-- `9b71fcd` - Actualizar módulos centrales, añadir documentos zh-HK, canales de broadcast, herramienta de configuración y vista web de auditoría
-  - Canales de broadcast para que múltiples Seres Silicona chateen juntos
-  - Sistema de herramienta de configuración
-  - Vista web de auditoría
-  - Documentos en chino tradicional
+- `9b71fcd` - Actualizó módulos centrales, agregó documentación zh-HK, canal de broadcast, herramientas de configuración y vistas web de auditoría
+  - Canal de broadcast para múltiples silicon beings chateando juntos
+  - Sistema de herramientas de configuración
+  - Vistas web de auditoría
+  - Documentación en chino tradicional
 
 ### 2026-04-16
 
-- `5040f05` - Actualizar módulos centrales y predeterminados
-  - Optimización de módulos y corrección de bugs
+- `5040f05` - Actualizó módulos centrales y por defecto
+  - Optimización de módulos y correcciones de errores
   - Actualizaciones y mejoras de implementación
 
 ### 2026-04-15
 
-- `3efab5f` - Actualizar múltiples módulos: AI, Chat, IM, Tools, Web, Localization, Storage
-  - Mejoras de clientes de IA
-  - Mejoras de sistema de chat
-  - Actualizaciones de proveedores de mensajería
-  - Optimización de sistema de herramientas
+- `3efab5f` - Actualizó múltiples módulos: AI, Chat, IM, Tools, Web, Localization, Storage
+  - Mejoras de cliente IA
+  - Mejora del sistema de chat
+  - Actualizaciones de proveedor de mensajero
+  - Optimización del sistema de herramientas
   - Mejoras de infraestructura web
   - Optimización de localización
-  - Actualizaciones de sistema de almacenamiento
+  - Actualizaciones del sistema de almacenamiento
 
 ### 2026-04-14
 
-- `4241a2f` - Funciones de chat básicamente completadas, optimización de carga de UI
-  - Finalización de funciones de sistema de chat
-  - Optimización de UI para carga de archivos
+- `4241a2f` - Funciones de chat básicamente completas, optimización de carga de UI
+  - Funcionalidad del sistema de chat completada
+  - Optimización de UI para cargas de archivos
 
 ### 2026-04-13
 
-- `c498c31` - Actualización de código
-  - Mejoras y optimizaciones generales de código
+- `c498c31` - Actualizaciones de código
+  - Mejoras generales de código y optimización
 
 ### 2026-04-12
 
-- `2161002` - Refactorizar documentos y mejorar localización
-  - Reorganización de documentos
-  - Mejoras de sistema de localización
-- `03d94e4` - Mejorar sistema de configuración y localización
-  - Mejoras de sistema de configuración
-  - Soporte de idiomas adicionales
-- `9976a35` - Añadir página Acerca de y localización
-  - Página Acerca de
-  - Mejora de localización
-- `0c8ccfc` - Mejorar sistema de chat, localización y vistas web
-  - Mejoras de sistema de chat
-  - Actualizaciones de localización
-  - Mejora de vistas web
-- `a8f1342` - Rediseñar capa de comunicación web, cambiar de WebSocket a SSE
-  - Comunicación web ahora usa eventos enviados por servidor
+#### Documentación y Localización
+- `2161002` - Refactorizó documentación y mejoró localización
+- `03d94e4` - Mejoró sistema de configuración y localización
+- `9976a35` - Agregó página acerca de y localización
+
+#### Chat y Vistas Web
+- `0c8ccfc` - Mejoró sistema de chat, localización y vistas web
+- `a8f1342` - Rediseñó capa de comunicación web, cambió de WebSocket a SSE
 
 ### 2026-04-11
 
-- `e8fe259` - Añadir sistema de registros y optimización de código
-  - Infraestructura de registros
-  - Implementación de registradores
-- `f01c519` - Añadir sistema de registros, actualizar interfaces de IA y vistas web
-  - Actualizaciones de interfaces de IA
-  - Mejoras de vistas web
+#### Sistema de Registro
+- `e8fe259` - Agregó sistema de registro y optimización de código
+- `f01c519` - Agregó sistema de registro, actualizó interfaz IA y vistas web
 
 ### 2026-04-10
 
-- `4962924` - Mejorar manejador WebSocket, vista de chat e interacción de mensajería
-  - Mejoras de ContextManager
-  - Mejoras de sistema de chat
-  - Actualizaciones de interfaz de proveedor de mensajería
+- `4962924` - Mejoró manejador WebSocket, vistas de chat e interacción de mensajero
+  - Mejoras de gestor de contexto
+  - Mejora del sistema de chat
+  - Actualizaciones de interfaz de proveedor de mensajero
   - Rediseño de proveedor WebUI
-  - Actualizaciones de constructor JavaScript y router
+  - Actualizaciones de constructor de JavaScript y enrutador
   - Optimización de vista de chat
   - Mejoras de manejador WebSocket
 
 ### 2026-04-09
 
-- `f9302bf` - Mejorar interfaz de proveedor de mensajería, sistema de chat e interacción de Web UI
-  - Extensión de interfaz de proveedor de mensajería
-  - Mejoras de mensajes y sistema de chat
-  - Optimización de ContextManager
-  - Mejora de Ser Silicona predeterminado
-  - Mejoras de vista de chat de Web UI
-  - Actualización de manejador WebSocket
+- `f9302bf` - Mejoró interfaz de proveedor de mensajero, sistema de chat e interacción de UI web
+  - Extensión de interfaz de proveedor de mensajero
+  - Mejoras de mensajes de chat y sistema
+  - Optimización de gestor de contexto
+  - Mejora de silicon being por defecto
+  - Mejoras de vista de chat de UI web
+  - Actualizaciones de manejador WebSocket
 
 ### 2026-04-07
 
-- `6831ee8` - Rediseñar vistas web y constructor JavaScript
+- `6831ee8` - Rediseñó vistas web y constructor de JavaScript
   - Rediseño completo de controladores web
-  - Reescritura completa de constructor JavaScript
-  - Actualización de todos los componentes de vista (vista de seres, vista de chat, vista de explorador de código, vista de configuración, etc.)
-  - Mejoras de sistema de pieles (pieles de administración, chat, creatividad, desarrollo)
-  - Mejora de arquitectura de clase base de vistas
+  - Reescritura completa de constructor de JavaScript
+  - Todos los componentes de vista actualizados
+  - Mejoras del sistema de skins
+  - Actualización de arquitectura de clase base de vista
 
 ### 2026-04-05
 
-- `41e97fb` - Actualizar múltiples módulos centrales y controladores web
-  - Mejoras de ContextManager
+- `41e97fb` - Actualizó múltiples módulos centrales y controladores web
+  - Mejoras de gestor de contexto
   - Sistema de chat y gestión de sesiones
   - Rediseño de localizador de servicios
-  - Actualizaciones de clase base y gestor de Seres Silicona
-  - Actualización completa de controladores web (17 controladores)
-  - Mejora de fábrica de Seres Silicona predeterminados
-- `67988d4` - Mejorar módulos de Web UI, añadir vista de ejecutores, limpiar vistas y módulos centrales
-  - Vista de ejecutores
-  - Limpieza y organización de módulos
+  - Actualizaciones de clase base y gestor de silicon being
+  - Controladores web actualizados integralmente (17 controladores)
+  - Mejoras de fábrica de silicon being por defecto
+- `67988d4` - Mejoró módulo de UI web, agregó vista de ejecutor, limpió vistas y módulos centrales
 
 ### 2026-04-04
 
-- `b58bb1c` - Añadir controlador de inicialización y rediseñar módulos web
+- `b58bb1c` - Agregó controlador de inicialización y rediseñó módulo web
   - Controlador de inicialización
   - Rediseño de módulo de configuración
-  - Actualización de módulo de localización
-  - Mejoras de sistema de pieles
-  - Mejora de router
-- `f03ac0b` - Añadir módulo de Web UI, mejorar funcionalidad de mensajería
-  - Módulo de Web UI
-  - Mejoras de funcionalidad de mensajería
+  - Actualizaciones de módulo de localización
+  - Mejoras del sistema de skins
+  - Mejora de enrutador
+- `f03ac0b` - Agregó módulo de UI web, mejoró funcionalidad de mensajero
 
 ### 2026-04-03
 
-- `192e57b` - Actualizar estructura de proyecto y componentes centrales de runtime
-  - Actualizaciones de sistema de runtime
-  - Mejoras de estructura de proyecto
-- `59faec8` - Actualizaciones de implementación central y predeterminada
-  - Mejoras de módulos centrales
-  - Actualizaciones de implementación predeterminada
-- `d488485` - Añadir función de compilación dinámica y módulo de herramientas del curador
-  - Ejecutor de compilación dinámica
-  - Implementación de herramientas del curador
-- `753d1d9` - Añadir módulo de seguridad, actualizar ejecutores, proveedores de mensajería, localización y herramientas
-  - Sistema de seguridad
-  - Actualizaciones de ejecutores
-  - Mejoras de proveedores de mensajería
-  - Mejoras de localización
-  - Actualizaciones de sistema de herramientas
-- `a378697` - Completar Fase 5 - Sistema de herramientas + Ejecutores
-  - Gestión y definición de herramientas
-  - Ejecutor de línea de comandos
-  - Ejecutor de disco
-  - Ejecutor de red
-  - Implementaciones de herramientas
+- `192e57b` - Actualizó estructura de proyecto y componentes de runtime centrales
+- `59faec8` - Actualizaciones de implementación central y por defecto
+- `d488485` - Agregó funcionalidad de compilación dinámica y módulo de herramientas de curator
+- `753d1d9` - Agregó módulo de seguridad, actualizó ejecutores, proveedores de mensajero, localización y herramientas
+- `a378697` - Completó etapa 5 - sistema de herramientas + ejecutores
 
 ### 2026-04-02
 
-- `e6ad94b` - Corregir fallo de carga de historial de chat al eliminar archivo de configuración durante pruebas
-  - Mejoras de manejo de errores de cliente Ollama
-  - Validación de datos de configuración
-  - Limpieza de referencias de proyecto
-- `daa56f5` - Completar Fase 4: Memoria persistente (sistema de chat + canal de mensajería)
-  - Sistema de chat con chat grupal y privado
-  - Interfaces de proveedor y gestor de mensajería
-  - Almacenamiento indexado por tiempo
-  - Manejo de fechas incompletas
-  - Almacenamiento de tiempo de sistema de archivos
-  - Proveedor de mensajería de consola
-  - Mejora de fábrica de Seres Silicona
-  - Actualización de inicialización de programa
+- `e6ad94b` - Corrigió fallo de carga de historial de chat al eliminar archivos de configuración durante pruebas
+- `daa56f5` - Completó etapa 4: memoria persistente (sistema de chat + canal de mensajero)
 
 ### 2026-04-01
 
-- `bbe2dbb` - Corregir carga de configuración y enrutamiento de mensajes de servicio de chat
-  - Implementación de ContextManager (añadir 188 líneas de código)
-  - Interfaces de cliente de IA
-  - Interfaces e implementación simple de servicio de chat
-  - Sistema de configuración con convertidores
-  - Mejoras de programador de bucle principal
-  - Sistema de gestión de Seres Silicona
-  - Implementación de cliente Ollama
-  - Configuración de sistema de localización
-  - Rediseño de inicialización de programa
-- `2fa6305` - Implementar Fase 2: Framework de bucle principal y sistema de objetos de reloj
-  - Programador de bucle principal
-  - Clase base de objetos de reloj
-  - Interfaz de fábrica de clientes de IA
-  - Interfaces de almacenamiento
-  - Fábrica de cliente Ollama
-  - Objeto de reloj de consola
-  - Objeto de reloj de prueba
-  - Almacenamiento de sistema de archivos
-- `32b99a1` - Implementar Fase 1 - Función básica de chat
-  - Modelos de solicitud y respuesta de IA
-  - Interfaces de cliente de IA
-  - Modelos de mensajes
-  - Sistema de localización (idioma, clase base de localización, gestor de localización)
-  - Clase base de datos de configuración
-  - Implementación de cliente Ollama
-  - Gestión de configuración
-  - Localización multiidioma (inglés, chino simplificado)
-  - Punto de entrada de programa
-- `358e368` - Commit inicial: documentos de proyecto y licencia
-  - README del proyecto (inglés y chino)
-  - Documentos de arquitectura
-  - Documentos de hoja de ruta
-  - Documentos de seguridad
-  - Licencia (Apache 2.0)
-  - Configuración de Git ignore
+- `bbe2dbb` - Corrigió carga de configuración y enrutamiento de mensajes de servicio de chat
+- `2fa6305` - Implementó etapa 2: marco de bucle principal y sistema de objetos de reloj
+- `32b99a1` - Implementó etapa 1 - funcionalidad básica de chat
+- `358e368` - Commit inicial: documentación de proyecto y licencia

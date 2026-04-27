@@ -1,5 +1,7 @@
 ﻿# Development Guide
 
+> **Version: v0.1.0-alpha**
+
 [English](../en/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Deutsch](../de-DE/development-guide.md) | [Čeština](../cs-CZ/development-guide.md)
 
 ## Architecture Overview

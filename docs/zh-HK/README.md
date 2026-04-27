@@ -1,6 +1,6 @@
 ﻿# Silicon Life Collective
 
-**矽基生命群** — 一個基於 .NET 9 的多智能體協作平台，AI 智能體被稱為**矽基生命體**，通過 Roslyn 動態編譯實現自我進化。
+**版本：v0.1.0-alpha** | **矽基生命群** — 一個基於 .NET 9 的多智能體協作平台，AI 智能體被稱為**矽基生命體**，通過 Roslyn 動態編譯實現自我進化。
 
 [English](../README.md) | [中文](../zh-CN/README.md) | **繁體中文** | [Deutsch](../de-DE/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Čeština](../cs-CZ/README.md)
 

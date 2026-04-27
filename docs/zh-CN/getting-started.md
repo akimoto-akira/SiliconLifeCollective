@@ -1,5 +1,7 @@
 ﻿# 快速开始
 
+> **版本：v0.1.0-alpha**
+
 [English](../en/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | **中文** | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
 ## 前置条件

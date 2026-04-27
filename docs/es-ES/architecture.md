@@ -1,5 +1,7 @@
 ﻿# Arquitectura
 
+> **Versión: v0.1.0-alpha**
+
 [English](../en/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | **Español** | [Deutsch](../de-DE/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md)
 
 ## Conceptos Centrales

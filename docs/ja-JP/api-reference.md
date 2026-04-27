@@ -1,5 +1,7 @@
 ﻿# API リファレンス
 
+> **バージョン: v0.1.0-alpha**
+
 [English](api-reference.md) | [简体中文](docs/zh-CN/api-reference.md) | [繁體中文](docs/zh-HK/api-reference.md) | [Español](docs/es-ES/api-reference.md) | [日本語](docs/ja-JP/api-reference.md) | [한국어](docs/ko-KR/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [Čeština](docs/cs-CZ/api-reference.md)
 
 ## Web API エンドポイント

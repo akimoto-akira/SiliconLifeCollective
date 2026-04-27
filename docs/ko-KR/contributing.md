@@ -1,5 +1,7 @@
 ﻿# 기여 가이드
 
+> **버전: v0.1.0-alpha**
+
 [English](../en/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | **한국어** | [Deutsch](../de-DE/contributing.md) | [Čeština](../cs-CZ/contributing.md)
 
 SiliconLifeCollective에 기여해 주셔서 감사합니다!

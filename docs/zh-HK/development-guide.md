@@ -1,5 +1,7 @@
 ﻿# 開發指南
 
+> **版本：v0.1.0-alpha**
+
 [English](../en/development-guide.md) | [中文](../zh-CN/development-guide.md) | **繁體中文** | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/development-guide.md)
 
 ## 架構概述

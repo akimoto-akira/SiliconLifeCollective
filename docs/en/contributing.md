@@ -1,5 +1,7 @@
 # Contributing Guide
 
+> **Version: v0.1.0-alpha**
+
 Thank you for your interest in contributing to SiliconLifeCollective!
 
 ## Code of Conduct

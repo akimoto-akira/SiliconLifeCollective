@@ -1,5 +1,7 @@
 ﻿# 安全設計
 
+> **版本：v0.1.0-alpha**
+
 [English](../en/security.md) | [中文](../zh-CN/security.md) | **繁體中文** | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Čeština](../cs-CZ/security.md)
 
 ## 概述

@@ -1,5 +1,7 @@
 ﻿# API 참고
 
+> **버전: v0.1.0-alpha**
+
 [English](../en/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | **한국어** | [Deutsch](../de-DE/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
 
 ## Web API 엔드포인트

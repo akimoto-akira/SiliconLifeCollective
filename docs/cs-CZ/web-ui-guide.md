@@ -1,5 +1,7 @@
 ﻿# Web UI Průvodce
 
+> **Verze: v0.1.0-alpha**
+
 [English](../en/web-ui-guide.md) | [中文](../zh-CN/web-ui-guide.md) | [繁體中文](../zh-HK/web-ui-guide.md) | [Español](../es-ES/web-ui-guide.md) | [日本語](../ja-JP/web-ui-guide.md) | [한국어](../ko-KR/web-ui-guide.md) | [Deutsch](../de-DE/web-ui-guide.md) | **Čeština**
 
 ## Přehled

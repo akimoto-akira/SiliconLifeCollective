@@ -530,6 +530,10 @@ public class DefaultSiliconBeing : SiliconBeingBase
     {
         try
         {
+            if (session.Members.Contains(Config.Instance.Data.UserGuid))
+            {
+                return false;
+            }
             // Get last 5 messages from session
             var messages = session.GetMessages(5);
             if (messages.Count < 2)

@@ -1,5 +1,7 @@
 ﻿# Diseño de Seguridad
 
+> **Versión: v0.1.0-alpha**
+
 [English](../en/security.md) | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | **Español** | [Deutsch](../de-DE/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Čeština](../cs-CZ/security.md)
 
 ## Resumen

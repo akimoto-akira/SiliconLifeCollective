@@ -1,5 +1,7 @@
 ﻿# Referencia de Herramientas
 
+> **Versión: v0.1.0-alpha**
+
 Este documento detalla todas las herramientas integradas de la plataforma Silicon Life Collective.
 
 [English](../en/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | **Español** | [Deutsch](../de-DE/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md)

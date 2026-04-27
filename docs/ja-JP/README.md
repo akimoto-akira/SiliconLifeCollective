@@ -1,6 +1,6 @@
 ﻿# Silicon Life Collective
 
-**シリコン生命群** — .NET 9 をベースとしたマルチエージェント協力プラットフォーム。AI エージェントは**シリコン生命体**と呼ばれ、Roslyn 動的コンパイル技術による自己進化を実現します。
+**バージョン: v0.1.0-alpha** | **シリコン生命群** — .NET 9 をベースとしたマルチエージェント協力プラットフォーム。AI エージェントは**シリコン生命体**と呼ばれ、Roslyn 動的コンパイル技術による自己進化を実現します。
 
 [English](../README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | **日本語** | [한국어](../ko-KR/README.md) | [Deutsch](../de-DE/README.md) | [Čeština](../cs-CZ/README.md)
 

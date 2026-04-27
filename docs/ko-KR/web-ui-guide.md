@@ -1,5 +1,7 @@
 ﻿# Web UI 가이드
 
+> **버전: v0.1.0-alpha**
+
 [English](../en/web-ui-guide.md) | [中文](../zh-CN/web-ui-guide.md) | [繁體中文](../zh-HK/web-ui-guide.md) | [Español](../es-ES/web-ui-guide.md) | [日本語](../ja-JP/web-ui-guide.md) | **한국어** | [Deutsch](../de-DE/web-ui-guide.md) | [Čeština](../cs-CZ/web-ui-guide.md)
 
 ## 개요

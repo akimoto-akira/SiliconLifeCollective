@@ -1,5 +1,7 @@
 ﻿# Seznamte se se Svými Digitálními Společníky
 
+> **Verze: v0.1.0-alpha**
+
 [English](../en/promo.md) | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Deutsch](../de-DE/promo.md) | **Čeština**
 
 ## Co kdyby váš počítač dokázal přemýšlet sám?

@@ -1,5 +1,7 @@
 ﻿# 권한 시스템
 
+> **버전: v0.1.0-alpha**
+
 [English](../en/permission-system.md) | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | [Español](../es-ES/permission-system.md) | [日本語](../ja-JP/permission-system.md) | **한국어** | [Deutsch](../de-DE/permission-system.md) | [Čeština](../cs-CZ/permission-system.md)
 
 ## 개요

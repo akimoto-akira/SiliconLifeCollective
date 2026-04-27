@@ -1,5 +1,7 @@
 ﻿# クイックスタート
 
+> **バージョン: v0.1.0-alpha**
+
 [English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | **日本語** | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
 ## 前提条件

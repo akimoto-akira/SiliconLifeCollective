@@ -1,5 +1,7 @@
 ﻿# コントリビューションガイド
 
+> **バージョン: v0.1.0-alpha**
+
 [English](../en/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | **日本語** | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md)
 
 SiliconLifeCollective へのコントリビューションに興味をお寄せいただきありがとうございます！

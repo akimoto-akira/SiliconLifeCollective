@@ -1,5 +1,7 @@
 ﻿# Conoce a Tu Compañero Digital
 
+> **Versión: v0.1.0-alpha**
+
 [English](../en/promo.md) | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | **Español** | [Deutsch](../de-DE/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Čeština](../cs-CZ/promo.md)
 
 ## ¿Qué pasaría si tu computadora pudiera pensar por sí misma?

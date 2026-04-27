@@ -1,5 +1,7 @@
 ﻿# 日歷系統
 
+> **版本：v0.1.0-alpha**
+
 [English](../en/calendar-system.md) | [中文](../zh-CN/calendar-system.md) | **繁體中文** | [Español](../es-ES/calendar-system.md) | [日本語](../ja-JP/calendar-system.md) | [한국어](../ko-KR/calendar-system.md) | [Čeština](../cs-CZ/calendar-system.md)
 
 ## 概述
