@@ -34,7 +34,7 @@ public class ContextManager
     /// long-running sessions. Older messages are still preserved in storage and
     /// summarized into long-term memory via the compression pipeline.
     /// </summary>
-    private const int MaxContextMessages = 10;
+    private const int MaxContextMessages = 30;
 
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<ContextManager>();
     private IAIClient _aiClient;

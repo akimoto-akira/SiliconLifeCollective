@@ -158,7 +158,7 @@ public class ChatHistoryController : Controller
         
         // Build tool display names dictionary
         var toolDisplayNames = new Dictionary<string, string>();
-        if (being != null)
+        if (being != null && being.ToolManager != null)
         {
             var language = Config.Instance?.Data?.Language ?? Language.ZhCN;
             foreach (var toolName in being.ToolManager.GetToolNames())

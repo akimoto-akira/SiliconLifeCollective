@@ -230,7 +230,7 @@ public class JsTernary : JsSyntax
 public class JsIndex : JsSyntax
 {
     public Func<JsSyntax> Target { get; }
-    public Func<JsSyntax> Index { get; }
+    public new Func<JsSyntax> Index { get; }
     public JsIndex(Func<JsSyntax> target, Func<JsSyntax> index)
     {
         Target = target;

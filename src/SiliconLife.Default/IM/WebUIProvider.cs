@@ -52,8 +52,10 @@ public class WebUIProvider : IIMProvider
     private readonly object _streamingLock = new();
 
     public event EventHandler<IMMessageEventArgs>? MessageReceived;
+#pragma warning disable CS0067 // 事件为接口要求或为将来扩展预留
     public event EventHandler<StreamChunkEventArgs>? StreamChunkReceived;
     public event EventHandler? ExitRequested;
+#pragma warning restore CS0067
 
     public Func<Guid, TaskCompletionSource<AskPermissionResult>> GetPermissionTcs => (Guid userId) =>
     {
