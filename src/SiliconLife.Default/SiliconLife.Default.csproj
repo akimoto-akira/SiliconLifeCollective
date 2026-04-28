@@ -2,11 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SiliconLife.Core\SiliconLife.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
-    <PackageReference Include="Microsoft.Playwright" Version="1.40.0" />
+    <ProjectReference Include="..\SiliconLife.Common\SiliconLife.Common.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

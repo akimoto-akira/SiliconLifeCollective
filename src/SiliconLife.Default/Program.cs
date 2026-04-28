@@ -18,6 +18,11 @@ using SiliconLife.Default.Knowledge;
 using SiliconLife.Default.Logging;
 using SiliconLife.Default.Web;
 using System.Text;
+using SiliconLife.Common.Security;
+using SiliconLife.Common.SiliconBeing;
+using SiliconLife.Common.WebView;
+
+using SiliconLife.Common.Localization;
 
 namespace SiliconLife.Default;
 
@@ -60,6 +65,13 @@ public class Program
         IStorage storage = new FileSystemStorage(configData.DataDirectory.FullName);
         ITimeStorage timeStorage = new FileSystemTimeStorage(
             Path.Combine(configData.DataDirectory.FullName, "chat"));
+
+        // Register storage factories for SiliconBeing creation
+        ServiceLocator.Instance.Register<Func<string, ITimeStorage>>(dir => new FileSystemTimeStorage(dir));
+        ServiceLocator.Instance.Register<Func<string, IStorage>>(dir => new FileSystemStorage(dir));
+        ServiceLocator.Instance.Register<Func<string, IWorkNoteStorage>>(dir => new FileSystemWorkNoteStorage(dir));
+        ServiceLocator.Instance.Register<Func<SiliconBeingBase, object>>(being => new PlaywrightWebView((DefaultSiliconBeing)being));
+        _logger.Info(null, "Registered: Storage Factories");
 
         // Initialize project manager
         IProjectManager projectManager = new ProjectManager(storage, configData.DataDirectory.FullName);

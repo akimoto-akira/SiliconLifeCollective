@@ -13,6 +13,7 @@
 
 using System.Text.Json;
 using SiliconLife.Collective;
+using SiliconLife.Common.AI;
 using SiliconLife.Default.Web.Models;
 
 namespace SiliconLife.Default.Web.Views;

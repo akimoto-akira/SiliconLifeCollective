@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiliconLife.Core", "src\Sil
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiliconLife.Default", "src\SiliconLife.Default\SiliconLife.Default.csproj", "{FA8AB650-1E85-48E6-8335-1281CE6F7317}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiliconLife.Common", "src\SiliconLife.Common\SiliconLife.Common.csproj", "{C3E4D5F6-A1B2-43C4-85D6-E7F8A9B0C1D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,18 @@ Global
 		{FA8AB650-1E85-48E6-8335-1281CE6F7317}.Release|x64.Build.0 = Release|Any CPU
 		{FA8AB650-1E85-48E6-8335-1281CE6F7317}.Release|x86.ActiveCfg = Release|Any CPU
 		{FA8AB650-1E85-48E6-8335-1281CE6F7317}.Release|x86.Build.0 = Release|Any CPU
+		{C3E4D5F6-A1B2-43C4-85D6-E7F8A9B0C1D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3E4D5F6-A1B2-43C4-85D6-E7F8A9B0C1D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3E4D5F6-A1B2-43C4-85D6-E7F8A9B0C1D2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C3E4D5F6-A1B2-43C4-85D6-E7F8A9B0C1D2}.Debug|x64.Build.0 = Debug|Any CPU
+		{C3E4D5F6-A1B2-43C4-85D6-E7F8A9B0C1D2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C3E4D5F6-A1B2-43C4-85D6-E7F8A9B0C1D2}.Debug|x86.Build.0 = Debug|Any CPU
+		{C3E4D5F6-A1B2-43C4-85D6-E7F8A9B0C1D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3E4D5F6-A1B2-43C4-85D6-E7F8A9B0C1D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3E4D5F6-A1B2-43C4-85D6-E7F8A9B0C1D2}.Release|x64.ActiveCfg = Release|Any CPU
+		{C3E4D5F6-A1B2-43C4-85D6-E7F8A9B0C1D2}.Release|x64.Build.0 = Release|Any CPU
+		{C3E4D5F6-A1B2-43C4-85D6-E7F8A9B0C1D2}.Release|x86.ActiveCfg = Release|Any CPU
+		{C3E4D5F6-A1B2-43C4-85D6-E7F8A9B0C1D2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,5 +64,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{B40D6204-E3F6-45F0-BB05-029FC9F32DD3} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{FA8AB650-1E85-48E6-8335-1281CE6F7317} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{C3E4D5F6-A1B2-43C4-85D6-E7F8A9B0C1D2} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 EndGlobal

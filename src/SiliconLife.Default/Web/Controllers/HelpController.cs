@@ -1,9 +1,11 @@
-// Copyright (c) 2026 Silicon Life Collective
+﻿// Copyright (c) 2026 Silicon Life Collective
 // Licensed under the Apache License, Version 2.0
 
 using SiliconLife.Collective;
 using SiliconLife.Default.Help;
 using SiliconLife.Default.Web.Models;
+
+using SiliconLife.Common.Localization;
 
 namespace SiliconLife.Default.Web;
 

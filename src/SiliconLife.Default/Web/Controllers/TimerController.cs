@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -11,7 +11,7 @@
 
 using SiliconLife.Collective;
 using SiliconLife.Default.Web.Models;
-
+using SiliconLife.Common.Calendar;
 namespace SiliconLife.Default.Web;
 
 [WebCode]
@@ -94,7 +94,7 @@ public class TimerController : Controller
     {
         var timers = timerSystem.GetAll();
         var result = new List<object>();
-        var registry = CalendarTool.BuildCalendarRegistry();
+        var registry = CalendarBase.BuildCalendarRegistry();
 
         foreach (var timer in timers)
         {
@@ -132,7 +132,7 @@ public class TimerController : Controller
             int minutes = conditions.TryGetValue("minutes", out int m) ? m : 0;
             int seconds = conditions.TryGetValue("seconds", out int s) ? s : 0;
 
-            var loc = CalendarTool.GetLocalization();
+            var loc = CalendarBase.GetLocalization();
             return loc.LocalizeIntervalDescription(days, hours, minutes, seconds);
         }
 
@@ -154,7 +154,7 @@ public class TimerController : Controller
     {
         if (calendarId == "interval")
         {
-            var loc = CalendarTool.GetLocalization();
+            var loc = CalendarBase.GetLocalization();
             return loc.CalendarIntervalName;
         }
 

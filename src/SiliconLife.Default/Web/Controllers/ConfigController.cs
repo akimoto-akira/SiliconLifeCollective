@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -11,7 +11,10 @@
 
 using System.ComponentModel;
 using SiliconLife.Collective;
+using SiliconLife.Common.AI;
 using SiliconLife.Default.Web.Models;
+
+using SiliconLife.Common.Localization;
 
 namespace SiliconLife.Default.Web;
 

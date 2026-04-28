@@ -57,6 +57,18 @@ public class ServiceLocator
     /// <summary>Gets the registered <see cref="TokenUsageAuditManager"/>, or <c>null</c>.</summary>
     public TokenUsageAuditManager? TokenUsageAuditManager => Get<TokenUsageAuditManager>();
 
+    /// <summary>Gets the registered factory for creating <see cref="ITimeStorage"/>, or <c>null</c>.</summary>
+    public Func<string, ITimeStorage>? TimeStorageFactory => Get<Func<string, ITimeStorage>>();
+
+    /// <summary>Gets the registered factory for creating <see cref="IStorage"/>, or <c>null</c>.</summary>
+    public Func<string, IStorage>? StorageFactory => Get<Func<string, IStorage>>();
+
+    /// <summary>Gets the registered factory for creating <see cref="IWorkNoteStorage"/>, or <c>null</c>.</summary>
+    public Func<string, IWorkNoteStorage>? WorkNoteStorageFactory => Get<Func<string, IWorkNoteStorage>>();
+
+    /// <summary>Gets the registered factory for creating WebView, or <c>null</c>.</summary>
+    public Func<SiliconBeingBase, object>? WebViewFactory => Get<Func<SiliconBeingBase, object>>();
+
     /// <summary>Gets the registered <typeparamref name="T"/> service, or <c>null</c>.</summary>
     public T? GetService<T>() where T : class => Get<T>();
 

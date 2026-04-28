@@ -4,6 +4,7 @@
 using System.Text;
 using SiliconLife.Collective;
 using SiliconLife.Default.Help;
+using SiliconLife.Common.Localization;
 
 namespace SiliconLife.Default;
 
