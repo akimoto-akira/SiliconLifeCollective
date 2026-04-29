@@ -1586,9 +1586,9 @@ public class ContextManager
         }
         else
         {
-            Console.WriteLine($"{_being.Name}: {content}");
+            _logger.Info(_being.Id, "{0}: {1}", _being.Name, content);
         }
-        Console.WriteLine();
+        _logger.Info(_being.Id, "");
     }
 
     /// <summary>

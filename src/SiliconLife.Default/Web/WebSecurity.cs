@@ -11,6 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using SiliconLife.Collective;
+
 namespace SiliconLife.Default.Web;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field)]
@@ -164,6 +166,7 @@ public class WebSecurity
 
 public class WebCodeBrowser
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<WebCodeBrowser>();
     private readonly Dictionary<string, Type> _registeredTypes = new();
 
     public void RegisterType(Type type)
@@ -189,7 +192,7 @@ public class WebCodeBrowser
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to register assembly types: {ex.Message}");
+            _logger.Error(null, "Failed to register assembly types: {0}", ex.Message);
         }
     }
 

@@ -21,6 +21,7 @@ namespace SiliconLife.Default;
 /// </summary>
 public class DefaultConfigData : ConfigDataBase
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<DefaultConfigData>();
     [ConfigIgnore("系统内部使用，用于多态反序列化")]
     public override string ConfigType { get; set; } = "Default";
 
@@ -168,7 +169,7 @@ public class DefaultConfigData : ConfigDataBase
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Config Load Error: {ex.Message}");
+                _logger.Error(null, "Config Load Error: {0}", ex.Message);
             }
         }
     }

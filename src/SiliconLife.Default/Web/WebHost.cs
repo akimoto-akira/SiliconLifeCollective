@@ -54,8 +54,7 @@ public class WebHost : IDisposable
         }
         catch (HttpListenerException ex)
         {
-            _logger.Error(null, $"Failed to start web server on port {_port}: {ex.Message}");
-            Console.WriteLine("Try running as administrator or use netsh to reserve the port.");
+            _logger.Error(null, "Failed to start web server on port {0}: {1}. Try running as administrator or use netsh to reserve the port.", _port, ex.Message);
             throw;
         }
 

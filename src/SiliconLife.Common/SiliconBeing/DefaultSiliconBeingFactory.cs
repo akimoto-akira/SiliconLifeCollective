@@ -23,6 +23,7 @@ namespace SiliconLife.Common.SiliconBeing;
 /// </summary>
 public class DefaultSiliconBeingFactory : ISiliconBeingFactory
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<DefaultSiliconBeingFactory>();
     private readonly Dictionary<string, object> _globalAIConfig;
     private readonly IStorage _storage;
     private readonly ITimeStorage _timeStorage;
@@ -145,7 +146,7 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         catch (Exception ex)
         {
             // Log error but don't block being creation; will retry on next tick
-            Console.WriteLine($"[WARN] Being {name}: failed to create AI client, will retry on next tick. Error: {ex.Message}");
+            _logger.Warn(Guid.Empty, "Being {0}: failed to create AI client, will retry on next tick. Error: {1}", name, ex.Message);
         }
 
         // Create and configure ToolManager for this being

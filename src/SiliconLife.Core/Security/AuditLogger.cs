@@ -118,7 +118,7 @@ public class AuditLogger
         }
 
         string resultStr = result == PermissionResult.Allowed ? "ALLOW" : result == PermissionResult.Denied ? "DENY" : "ASK";
-        Console.WriteLine($"[AUDIT] {resultStr} | {permissionType} | {resource} | {reason}");
+        _logger.Info(callerId, "[AUDIT] {0} | {1} | {2} | {3}", resultStr, permissionType, resource, reason);
     }
 
     /// <summary>
