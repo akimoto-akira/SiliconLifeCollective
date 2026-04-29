@@ -13,6 +13,7 @@
 
 using SiliconLife.Collective;
 using System.Text.Json;
+using LiteDB;
 
 namespace SiliconLife.Fast;
 
@@ -110,85 +111,78 @@ public class DefaultConfigData : ConfigDataBase
     [ConfigGroup("User", Order = 2, DisplayNameKey = "UserNickname", DescriptionKey = "UserNickname")]
     public override string UserNickname { get; set; } = "User";
 
-    private string GetConfigFilePath()
-    {
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string configPath = Path.Combine(baseDir, "config.json");
-
-        if (File.Exists(configPath))
-        {
-            return configPath;
-        }
-
-        return Path.Combine(Directory.GetCurrentDirectory(), "config.json");
-    }
-
+    /// <summary>
+    /// Returns identifier indicating LiteDB storage
+    /// </summary>
     public override string GetConfigPath()
     {
-        return GetConfigFilePath();
+        return "LiteDB:app_config";
     }
 
+    /// <summary>
+    /// Loads configuration from LiteDB (replaces config.json)
+    /// </summary>
     public override void LoadConfig()
     {
-        string configPath = GetConfigFilePath();
-
-        if (File.Exists(configPath))
+        try
         {
-            try
-            {
-                string json = File.ReadAllText(configPath);
-                DefaultConfigData? loadedData = JsonSerializer.Deserialize<DefaultConfigData>(json, new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    Converters = 
-                    { 
-                        new System.Text.Json.Serialization.JsonStringEnumConverter(),
-                        new GuidConverter(),
-                        new DirectoryInfoConverter(),
-                        new ConfigDataBaseConverter()
-                    }
-                });
-                if (loadedData != null)
-                {
-                    ConfigType = loadedData.ConfigType;
-                    DataDirectory = loadedData.DataDirectory;
-                    CuratorGuid = loadedData.CuratorGuid;
-                    Language = loadedData.Language;
-                    TickTimeout = loadedData.TickTimeout;
-                    MaxTimeoutCount = loadedData.MaxTimeoutCount;
-                    WatchdogTimeout = loadedData.WatchdogTimeout;
-                    MinimumLogLevel = loadedData.MinimumLogLevel;
-                    AIClientType = loadedData.AIClientType;
-                    AIConfig = loadedData.AIConfig ?? new Dictionary<string, object>();
-                    WebPort = loadedData.WebPort;
-                    AllowIntranet = loadedData.AllowIntranet;
-                    WebSkin = loadedData.WebSkin;
-                    UserNickname = loadedData.UserNickname;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(null, "Config Load Error: {0}", ex.Message);
-            }
+            var appConfig = LiteDBManager.GetConfig();
+            
+            // Map AppConfig -> DefaultConfigData
+            ConfigType = appConfig.ConfigType;
+            DataDirectory = new DirectoryInfo(appConfig.DataDirectory);
+            CuratorGuid = appConfig.CuratorGuid;
+            Language = appConfig.Language;
+            TickTimeout = TimeSpan.FromMinutes(appConfig.TickTimeoutMinutes);
+            MaxTimeoutCount = appConfig.MaxTimeoutCount;
+            WatchdogTimeout = TimeSpan.FromMinutes(appConfig.WatchdogTimeoutMinutes);
+            MinimumLogLevel = appConfig.MinimumLogLevel;
+            AIClientType = appConfig.AIClientType;
+            
+            // Deserialize AIConfig from BsonDocument
+            AIConfig = BsonMapper.Global.Deserialize<Dictionary<string, object>>(appConfig.AIConfig) ?? new Dictionary<string, object>();
+            
+            WebPort = appConfig.WebPort;
+            AllowIntranet = appConfig.AllowIntranet;
+            WebSkin = appConfig.WebSkin ?? string.Empty;
+            UserNickname = appConfig.UserNickname;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(null, "Config Load Error from LiteDB: {0}", ex.Message);
         }
     }
 
+    /// <summary>
+    /// Saves configuration to LiteDB (replaces config.json)
+    /// </summary>
     public override void SaveConfig()
     {
-        string json = JsonSerializer.Serialize(this, new JsonSerializerOptions
+        try
         {
-            WriteIndented = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Converters = 
-            { 
-                new System.Text.Json.Serialization.JsonStringEnumConverter(),
-                new GuidConverter(),
-                new DirectoryInfoConverter(),
-                new ConfigDataBaseConverter()
-            }
-        });
-        string configPath = GetConfigFilePath();
-        File.WriteAllText(configPath, json);
+            var appConfig = new AppConfig
+            {
+                ConfigType = ConfigType,
+                DataDirectory = DataDirectory.FullName,
+                CuratorGuid = CuratorGuid,
+                Language = Language,
+                TickTimeoutMinutes = (int)TickTimeout.TotalMinutes,
+                MaxTimeoutCount = MaxTimeoutCount,
+                WatchdogTimeoutMinutes = (int)WatchdogTimeout.TotalMinutes,
+                MinimumLogLevel = MinimumLogLevel,
+                AIClientType = AIClientType,
+                AIConfig = BsonMapper.Global.Serialize(AIConfig).AsDocument,
+                WebPort = WebPort,
+                AllowIntranet = AllowIntranet,
+                WebSkin = string.IsNullOrEmpty(WebSkin) ? null : WebSkin,
+                UserNickname = UserNickname
+            };
+            
+            LiteDBManager.SaveConfig(appConfig);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(null, "Config Save Error to LiteDB: {0}", ex.Message);
+        }
     }
 }
