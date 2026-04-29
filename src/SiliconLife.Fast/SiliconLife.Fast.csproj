@@ -5,23 +5,14 @@
     <ProjectReference Include="..\SiliconLife.Common\SiliconLife.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="alpha.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
-
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>slc.ico</ApplicationIcon>
-    <Authors>Hoshino Kennji</Authors>
-    <PackageIcon>alpha.png</PackageIcon>
-    <AssemblyVersion>v0.1.0-alpha</AssemblyVersion>
-    <FileVersion>v0.1.0-alpha</FileVersion>
+    <Company>Hoshino Kennji</Company>
   </PropertyGroup>
 
 </Project>

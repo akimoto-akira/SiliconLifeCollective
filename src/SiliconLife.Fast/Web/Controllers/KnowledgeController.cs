@@ -1,0 +1,77 @@
+// Copyright (c) 2026 Hoshino Kennji
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//     http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using SiliconLife.Collective;
+
+namespace SiliconLife.Fast.Web;
+
+[WebCode]
+public class KnowledgeController : Controller
+{
+    private readonly SkinManager _skinManager;
+
+    public KnowledgeController()
+    {
+        _skinManager = ServiceLocator.Instance.GetService<SkinManager>()!;
+    }
+
+    public override void Handle()
+    {
+        var path = Request.Url?.AbsolutePath ?? "/knowledge";
+
+        if (path == "/knowledge" || path == "/knowledge/index")
+            Index();
+        else if (path == "/api/knowledge/graph")
+            GetGraph();
+        else
+        {
+            Response.StatusCode = 404;
+            Response.Close();
+        }
+    }
+
+    private void Index()
+    {
+        var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
+        var view = new Views.KnowledgeView();
+        var vm = new Models.KnowledgeViewModel { Skin = skin, ActiveMenu = "knowledge" };
+        var html = view.Render(vm);
+        RenderHtml(html);
+    }
+
+    private void GetGraph()
+    {
+        var knowledgeNetwork = ServiceLocator.Instance.Get<IKnowledgeNetwork>();
+
+        if (knowledgeNetwork == null)
+        {
+            RenderJson(new { nodes = new List<object>(), edges = new List<object>() });
+            return;
+        }
+
+        var entries = knowledgeNetwork.QueryKnowledge();
+        var nodeSet = new HashSet<string>();
+        var edges = new List<object>();
+
+        foreach (var entry in entries)
+        {
+            var subject = entry.Triple.Subject;
+            var obj = entry.Triple.Object;
+            nodeSet.Add(subject);
+            nodeSet.Add(obj);
+            edges.Add(new { from = subject, to = obj, label = entry.Triple.Predicate });
+        }
+
+        var nodes = nodeSet.Select(n => new { id = n, label = n }).ToList<object>();
+
+        RenderJson(new { nodes, edges });
+    }
+}
