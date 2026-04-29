@@ -16,6 +16,7 @@ using SiliconLife.Fast;
 using SiliconLife.Fast.IM;
 using SiliconLife.Fast.Knowledge;
 using SiliconLife.Fast.Logging;
+using SiliconLife.Fast.Tray;
 using SiliconLife.Fast.Web;
 using System.Text;
 using SiliconLife.Common.Security;
@@ -32,6 +33,7 @@ public class Program
     private static bool _shouldExit = false;
     private static CoreHost? _host;
     private static WebHost? _webHost;
+    private static TrayStatusWindow? _trayWindow;
 
     static Program()
     {
@@ -154,6 +156,16 @@ public class Program
 
         await StartWebServerAsync(configData, router, (WebUIProvider)imProvider, beingFactory, dynamicBeingLoader, localization);
 
+        // Initialize tray status window after web server started
+        TrayLocalizationBase trayLocalization = GetTrayLocalization(configData.Language);
+        _trayWindow = new TrayStatusWindow(trayLocalization, configData.WebPort);
+        _trayWindow.ExitRequested += (s, e) => RequestExit();
+        _logger.Info(null, "Initialized: TrayStatusWindow");
+        
+        // Start Windows Forms message loop with ApplicationContext (form stays hidden)
+        var trayContext = new TrayApplicationContext(_trayWindow);
+        Application.Run(trayContext);
+
         Console.CancelKeyPress += async (s, e) =>
         {
             e.Cancel = true;
@@ -172,6 +184,10 @@ public class Program
     {
         _logger.Info(null, "Application shutting down...");
 
+        // Update tray status
+        TrayLocalizationBase shutdownTrayLocalization = GetTrayLocalization(Config.Instance.Data.Language);
+        _trayWindow?.UpdateStatus(shutdownTrayLocalization.ShuttingDown);
+
         if (_webHost != null)
         {
             await _webHost.StopAsync();
@@ -182,6 +198,9 @@ public class Program
         {
             await _host.StopAsync();
         }
+
+        // Dispose tray window
+        _trayWindow?.Dispose();
 
         // Shutdown LiteDB
         LiteDBManager.Shutdown();
@@ -311,6 +330,58 @@ public class Program
     public static void RequestExit()
     {
         _shouldExit = true;
+    }
+
+    /// <summary>
+    /// Gets the appropriate tray localization based on the configured language
+    /// </summary>
+    private static TrayLocalizationBase GetTrayLocalization(Language language)
+    {
+        return language switch
+        {
+            // Chinese variants
+            Language.ZhCN => new TrayZhCN(),
+            Language.ZhHK => new TrayZhHK(),
+            Language.ZhTW => new TrayZhHK(), // Traditional Chinese
+            Language.ZhSG => new TrayZhSG(),
+            Language.ZhMO => new TrayZhHK(),
+            Language.ZhMY => new TrayZhMY(),
+            
+            // English variants
+            Language.EnUS => new TrayEnUS(),
+            Language.EnGB => new TrayEnGB(),
+            Language.EnCA => new TrayEnCA(),
+            Language.EnAU => new TrayEnAU(),
+            Language.EnIN => new TrayEnIN(),
+            Language.EnSG => new TrayEnSG(),
+            Language.EnZA => new TrayEnZA(),
+            Language.EnIE => new TrayEnIE(),
+            Language.EnNZ => new TrayEnNZ(),
+            Language.EnMY => new TrayEnMY(),
+            
+            // Japanese
+            Language.JaJP => new TrayJaJP(),
+            
+            // Korean
+            Language.KoKR => new TrayKoKR(),
+            
+            // Spanish variants
+            Language.EsES => new TrayEsES(),
+            Language.EsMX => new TrayEsMX(),
+            
+            // Czech
+            Language.CsCZ => new TrayCsCZ(),
+            
+            // German variants
+            Language.DeDE => new TrayDeDE(),
+            Language.DeAT => new TrayDeAT(),
+            Language.DeCH => new TrayDeCH(),
+            Language.DeLU => new TrayDeLU(),
+            Language.DeLI => new TrayDeLI(),
+            
+            // Default to English
+            _ => new TrayEnUS()
+        };
     }
 
     /// <summary>

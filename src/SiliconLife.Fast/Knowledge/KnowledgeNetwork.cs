@@ -52,8 +52,8 @@ public class KnowledgeNetwork : IKnowledgeNetwork
 
         ((ILiteCollection<KnowledgeGraphRecord>)_graphCollection).EnsureIndex(x => x.RecordId);
 
-        Load();
         _initialized = true;
+        Load();
     }
 
     /// <summary>
