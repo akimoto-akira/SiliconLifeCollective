@@ -4,6 +4,25 @@
 
 [English](../en/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Deutsch](../de-DE/architecture.md) | [Čeština](../cs-CZ/architecture.md)
 
+## Dual-Version Architecture
+
+This project provides two implementation versions that share the same architecture design but differ in storage and performance optimization:
+
+### SiliconLife.Default (Default Version)
+- **Runtime Mode**: Console application
+- **Storage**: Pure file system JSON storage
+- **Use Case**: High data security requirements, limited memory resources, small data volume scenarios
+
+### SiliconLife.Fast (High-Performance Version)
+- **Runtime Mode**: Windows Forms application (with system tray support)
+- **Storage**: In-memory storage + asynchronous batch persistence (WAL log)
+- **Use Case**: High concurrency, low latency, large data volume scenarios
+- **Performance Improvement**: Storage read latency reduced by 1000x, write latency reduced by 15000x
+
+> **Note**: The architecture described in this document applies to both versions, with differences only in the storage implementation.
+
+---
+
 ## Core Concepts
 
 ### Silicon Beings

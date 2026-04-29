@@ -6,6 +6,22 @@
 
 Děkujeme vám za zájem přispět do SiliconLifeCollective!
 
+## Přispívání Duální Verze
+
+Tento projekt má dvě implementační verze. Můžete si vybrat směr přispívání podle svých zájmů:
+
+### SiliconLife.Default (Výchozí Verze)
+- **Technologický Stack**: .NET 9 Konzolová aplikace
+- **Směr Přispívání**: Vývoj jádrových funkcí, implementace nástrojů, lokalizace, dokumentace
+- **Vhodné Pro**: Všechny vývojáře
+
+### SiliconLife.Fast (Vysoce Výkonná Verze)
+- **Technologický Stack**: .NET 9 Windows Forms aplikace
+- **Směr Přispívání**: Optimalizace výkonu, paměťové úložiště, systémová lišta, lock-free souběžnost
+- **Vhodné Pro**: Vývojáře s Windows vývojovými zkušenostmi a zájmem o optimalizaci výkonu
+
+> **Důležitá Poznámka**: Obě verze sdílejí projekty SiliconLife.Core a SiliconLife.Common. Vylepšení jádrových rozhraní ovlivní obě verze současně.
+
 ## Kodex Chování
 
 Tento projekt následuje licenci Apache 2.0. Ve všech interakcích buďte respektující a profesionální.
@@ -46,6 +62,16 @@ dotnet test
 ```bash
 git checkout -b feature/vase-nazev-funkce
 ```
+
+### 5. Vyberte Vývojový Projekt
+
+Vyberte vhodný projekt podle typu vašeho příspěvku:
+
+- **Jádrová Rozhraní/Abstraktní Třídy** → Upravit `SiliconLife.Core`
+- **Sdílené Implementace** → Upravit `SiliconLife.Common`
+- **Specifické pro Default** → Upravit `SiliconLife.Default`
+- **Specifické pro Fast** → Upravit `SiliconLife.Fast`
+- **Vícejazyčná Dokumentace** → Upravit adresář `docs/`
 
 ---
 

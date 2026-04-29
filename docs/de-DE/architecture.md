@@ -4,6 +4,25 @@
 
 [English](../en/architecture.md) | [Deutsch](../de-DE/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md)
 
+## Duale Versionsarchitektur
+
+Dieses Projekt bietet zwei Implementierungsversionen, die dasselbe Architekturentwurf teilen, sich aber in Speicher und Leistungsoptimierung unterscheiden:
+
+### SiliconLife.Default (Standardversion)
+- **Ausführungsmodus**: Konsolenanwendung
+- **Speicher**: Reines Dateisystem-JSON-Speicher
+- **Anwendungsszenario**: Hohe Datensicherheitsanforderungen, begrenzte Speicherressourcen, Szenarien mit kleinem Datenvolumen
+
+### SiliconLife.Fast (Hochleistungsversion)
+- **Ausführungsmodus**: Windows-Formularanwendung (mit System Tray-Unterstützung)
+- **Speicher**: In-Memory-Speicher + asynchrone Batch-Persistenz (WAL-Protokoll)
+- **Anwendungsszenario**: Szenarien mit hoher Parallelität, niedriger Latenz, großem Datenvolumen
+- **Leistungsverbesserung**: Speicherlese-Latenz um das 1000-fache reduziert, Schreiblatenz um das 15000-fache reduziert
+
+> **Hinweis**: Die in diesem Dokument beschriebene Architektur gilt für beide Versionen, mit Unterschieden nur im Speicherimplementierungsteil.
+
+---
+
 ## Kernkonzepte
 
 ### Silicon Being

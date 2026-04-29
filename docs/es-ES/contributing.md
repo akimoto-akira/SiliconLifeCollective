@@ -8,6 +8,22 @@
 
 ¡Gracias por tu interés en contribuir a Silicon Life Collective! Aceptamos todas las formas de contribución.
 
+## Contribución de Versión Dual
+
+Este proyecto tiene dos versiones de implementación. Puedes elegir tu dirección de contribución según tus intereses:
+
+### SiliconLife.Default (Versión Predeterminada)
+- **Pila Tecnológica**: Aplicación de consola .NET 9
+- **Dirección de Contribución**: Desarrollo de funciones principales, implementación de herramientas, localización, documentación
+- **Adecuado Para**: Todos los desarrolladores
+
+### SiliconLife.Fast (Versión de Alto Rendimiento)
+- **Pila Tecnológica**: Aplicación de formularios Windows .NET 9
+- **Dirección de Contribución**: Optimización de rendimiento, almacenamiento en memoria, bandeja del sistema, concurrencia sin bloqueo
+- **Adecuado Para**: Desarrolladores con experiencia en Windows e interés en optimización de rendimiento
+
+> **Nota Importante**: Ambas versiones comparten los proyectos SiliconLife.Core y SiliconLife.Common. Las mejoras a las interfaces centrales afectarán a ambas versiones simultáneamente.
+
 ## Cómo Contribuir
 
 ### Reportar Bugs
@@ -43,7 +59,16 @@
    - Añadir pruebas para nueva funcionalidad
    - Actualizar documentación si es necesario
 
-4. **Confirmar cambios**:
+4. **Elegir proyecto de desarrollo**
+   
+   Selecciona el proyecto apropiado según tu tipo de contribución:
+   - **Interfaces Centrales/Clases Abstractas** → Modificar `SiliconLife.Core`
+   - **Implementaciones Compartidas** → Modificar `SiliconLife.Common`
+   - **Específico de Default** → Modificar `SiliconLife.Default`
+   - **Específico de Fast** → Modificar `SiliconLife.Fast`
+   - **Documentación Multi-idioma** → Modificar directorio `docs/`
+
+5. **Confirmar cambios**:
    ```bash
    git add .
    git commit -m "feat: descripción clara del cambio"

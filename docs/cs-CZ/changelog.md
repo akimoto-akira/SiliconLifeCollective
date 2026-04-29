@@ -11,6 +11,15 @@ a tento projekt dodržuje [Semantické verzování](https://semver.org/spec/v2.0
 
 ## O tomto záznamu změn
 
+### Duální Verze Projektu
+
+Tento projekt poskytuje dvě implementační verze:
+
+- **SiliconLife.Default**: Výchozí verze, konzolová aplikace, souborové JSON úložiště
+- **SiliconLife.Fast**: Vysoce výkonná verze, Windows Forms aplikace, paměťové úložiště + asynchronní perzistence
+
+Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci úložiště a režimu spuštění.
+
 ### Původ projektu
 
 - Tento projekt vznikl 20. března 2026.

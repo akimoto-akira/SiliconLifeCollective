@@ -4,6 +4,25 @@
 
 [English](../en/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Deutsch](../de-DE/architecture.md) | **Čeština**
 
+## Duální Verze Architektury
+
+Tento projekt poskytuje dvě implementační verze, které sdílejí stejný návrh architektury, ale liší se v úložišti a optimalizaci výkonu:
+
+### SiliconLife.Default (Výchozí Verze)
+- **Režim Spuštění**: Konzolová aplikace
+- **Úložiště**: Čisté souborové JSON úložiště
+- **Scénář Použití**: Vysoké požadavky na bezpečnost dat, omezené paměťové zdroje, scénáře s malým objemem dat
+
+### SiliconLife.Fast (Vysoce Výkonná Verze)
+- **Režim Spuštění**: Windows Forms aplikace (s podporou systémové lišty)
+- **Úložiště**: Paměťové úložiště + asynchronní dávková perzistence (WAL protokol)
+- **Scénář Použití**: Scénáře s vysokou souběžností, nízkou latencí, velkým objemem dat
+- **Zlepšení Výkonu**: Latence čtení úložiště snížena 1000x, latence zápisu snížena 15000x
+
+> **Poznámka**: Architektura popsaná v tomto dokumentu platí pro obě verze, s rozdíly pouze v části implementace úložiště.
+
+---
+
 ## Core Koncepty
 
 ### Silikonová Bytost

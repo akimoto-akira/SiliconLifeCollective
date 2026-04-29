@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## About This Changelog
 
+### Dual Project Versions
+
+This project provides two implementation versions:
+
+- **SiliconLife.Default**: Default version, console application, file system JSON storage
+- **SiliconLife.Fast**: High-performance version, Windows Forms application, in-memory storage + asynchronous persistence
+
+Both versions share the same interfaces and functionality, with differences only in storage implementation and runtime mode.
+
 ### Project Origin
 
 - This project originated on March 20, 2026.

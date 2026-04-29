@@ -4,6 +4,24 @@
 
 [English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | **日本語** | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
+## バージョンの選択
+
+本プロジェクトは2つの実装バージョンを提供します：
+
+### SiliconLife.Default（デフォルトバージョン）
+- **実行モード**：コンソールアプリケーション
+- **ストレージ**：ファイルシステムJSONストレージ
+- **適用シナリオ**：データセキュリティ優先、小データ量、開発デバッグ
+- **プラットフォームサポート**：Windows、Linux、macOS
+
+### SiliconLife.Fast（高性能バージョン）
+- **実行モード**：Windowsフォームアプリケーション（システムトレイ）
+- **ストレージ**：メモリストレージ + 非同期永続化
+- **適用シナリオ**：高同時実行性、低レイテンシ、大データ量
+- **プラットフォームサポート**：Windowsのみ
+
+> **初心者向け推奨**：初めての方は **SiliconLife.Default** から開始し、システムに慣れてから必要に応じてFastバージョンに移行することを推奨します。
+
 ## 前提条件
 
 - **.NET 9 SDK** - [ダウンロード](https://dotnet.microsoft.com/download/dotnet/9.0)
@@ -59,12 +77,23 @@ dotnet build
 
 ### 4. アプリケーションの実行
 
+#### Default バージョンの実行
+
 ```bash
 cd src/SiliconLife.Default
 dotnet run
 ```
 
 Web サーバーが `http://localhost:8080` で起動します
+
+#### Fast バージョンの実行（Windowsのみ）
+
+```bash
+cd src/SiliconLife.Fast
+dotnet run
+```
+
+アプリケーションはフォームモードで起動し、システムトレイに最小化され、Web サーバーも `http://localhost:8080` で起動します
 
 ### 5. Web UI へのアクセス
 

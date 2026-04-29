@@ -4,6 +4,24 @@
 
 [English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | **Čeština**
 
+## Vybrat Verzi
+
+Tento projekt poskytuje dvě implementační verze:
+
+### SiliconLife.Default (Výchozí Verze)
+- **Režim Spuštění**: Konzolová aplikace
+- **Úložiště**: Souborové JSON úložiště
+- **Scénář Použití**: Priorita bezpečnosti dat, malý objem dat, vývojové ladění
+- **Podpora Platformy**: Windows, Linux, macOS
+
+### SiliconLife.Fast (Vysoce Výkonná Verze)
+- **Režim Spuštění**: Windows Forms aplikace (systémová lišta)
+- **Úložiště**: Paměťové úložiště + asynchronní perzistence
+- **Scénář Použití**: Vysoká souběžnost, nízká latence, velký objem dat
+- **Podpora Platformy**: Pouze Windows
+
+> **Doporučení pro Začátečníky**: Noví uživatelé by měli začít s **SiliconLife.Default** a po seznámení se systémem v případě potřeby migrovat na verzi Fast.
+
 ## Předpoklady
 
 - **.NET 9 SDK** - [Stáhnout](https://dotnet.microsoft.com/download/dotnet/9.0)
@@ -59,12 +77,23 @@ Upravte `src/SiliconLife.Default/Config/DefaultConfigData.cs` nebo změňte konf
 
 ### 4. Spustit Aplikaci
 
+#### Spustit Default Verzi
+
 ```bash
 cd src/SiliconLife.Default
 dotnet run
 ```
 
 Webový server se spustí na `http://localhost:8080`
+
+#### Spustit Fast Verzi (Pouze Windows)
+
+```bash
+cd src/SiliconLife.Fast
+dotnet run
+```
+
+Aplikace se spustí v režimu formuláře, minimalizována do systémové lišty, s webovým serverem také na `http://localhost:8080`
 
 ### 5. Přístup k Web UI
 

@@ -11,6 +11,15 @@ y este proyecto sigue [Versionado Semántico](https://semver.org/spec/v2.0.0.htm
 
 ## Acerca de este Registro de Cambios
 
+### Versiones Duales del Proyecto
+
+Este proyecto proporciona dos versiones de implementación:
+
+- **SiliconLife.Default**: Versión predeterminada, aplicación de consola, almacenamiento JSON del sistema de archivos
+- **SiliconLife.Fast**: Versión de alto rendimiento, aplicación de formularios Windows, almacenamiento en memoria + persistencia asíncrona
+
+Ambas versiones comparten las mismas interfaces y funcionalidad, con diferencias solo en la implementación de almacenamiento y modo de ejecución.
+
 ### Origen del Proyecto
 
 - Este proyecto se originó el 20 de marzo de 2026.

@@ -4,6 +4,25 @@
 
 [English](../en/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | **Español** | [Deutsch](../de-DE/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
 
+## Hoja de Ruta de Versión Dual
+
+### SiliconLife.Default (Versión Predeterminada)
+Las fases actuales 1-10.6 están completadas, el sistema se ejecuta de manera estable.
+
+### SiliconLife.Fast (Versión de Alto Rendimiento)
+La portería de arquitectura básica está completada, optimización continua en progreso.
+
+**Plan de Desarrollo de Fast**:
+- ✅ Fase 1: Portería de estructura de proyecto básica y sistema de configuración
+- ✅ Fase 2: Portería de Web UI y controladores
+- ✅ Fase 3: Optimización del sistema de almacenamiento (almacenamiento en memoria + persistencia asíncrona)
+- 🚧 Fase 4: Desarrollo de aplicación de bandeja del sistema y formularios
+- 📋 Fase 5: Optimización de rendimiento (pool de conexiones, pool de objetos, concurrencia sin bloqueo)
+- 📋 Fase 6: Reemplazo del servidor web Kestrel
+- 📋 Fase 7: Serialización binaria MessagePack
+
+---
+
 ## Principios Rectores
 
 Cada fase termina con un sistema **funcional y observable**. Ninguna fase produce "un montón de infraestructura sin nada que mostrar".

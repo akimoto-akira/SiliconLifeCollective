@@ -4,6 +4,22 @@
 
 Thank you for your interest in contributing to SiliconLifeCollective!
 
+## Dual-Version Contribution
+
+This project has two implementation versions. You can choose your contribution direction based on your interests:
+
+### SiliconLife.Default (Default Version)
+- **Tech Stack**: .NET 9 Console Application
+- **Contribution Direction**: Core feature development, tool implementation, localization, documentation
+- **Suitable For**: All developers
+
+### SiliconLife.Fast (High-Performance Version)
+- **Tech Stack**: .NET 9 Windows Forms Application
+- **Contribution Direction**: Performance optimization, in-memory storage, system tray, lock-free concurrency
+- **Suitable For**: Developers with Windows development experience and interest in performance optimization
+
+> **Important Note**: Both versions share the SiliconLife.Core and SiliconLife.Common projects. Improvements to core interfaces will affect both versions simultaneously.
+
 ## Code of Conduct
 
 This project follows the Apache 2.0 License. Be respectful and professional in all interactions.
@@ -44,6 +60,16 @@ dotnet test
 ```bash
 git checkout -b feature/your-feature-name
 ```
+
+### 5. Choose Development Project
+
+Select the appropriate project based on your contribution type:
+
+- **Core Interfaces/Abstract Classes** → Modify `SiliconLife.Core`
+- **Shared Implementations** → Modify `SiliconLife.Common`
+- **Default Version Specific** → Modify `SiliconLife.Default`
+- **Fast Version Specific** → Modify `SiliconLife.Fast`
+- **Multi-language Documentation** → Modify `docs/` directory
 
 ---
 

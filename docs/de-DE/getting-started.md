@@ -4,6 +4,24 @@
 
 [English](../en/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
+## Version Wählen
+
+Dieses Projekt bietet zwei Implementierungsversionen:
+
+### SiliconLife.Default (Standardversion)
+- **Ausführungsmodus**: Konsolenanwendung
+- **Speicher**: Dateisystem-JSON-Speicher
+- **Anwendungsszenario**: Datensicherheitspriorität, kleines Datenvolumen, Entwicklungsdebugging
+- **Plattformunterstützung**: Windows, Linux, macOS
+
+### SiliconLife.Fast (Hochleistungsversion)
+- **Ausführungsmodus**: Windows-Formularanwendung (System Tray)
+- **Speicher**: In-Memory-Speicher + asynchrone Persistenz
+- **Anwendungsszenario**: Hohe Parallelität, niedrige Latenz, großes Datenvolumen
+- **Plattformunterstützung**: Nur Windows
+
+> **Anfängerempfehlung**: Erstbenutzer sollten mit **SiliconLife.Default** beginnen und nach Vertrautheit mit dem System bei Bedarf zur Fast-Version migrieren.
+
 ## Voraussetzungen
 
 - **.NET 9 SDK** - [Download](https://dotnet.microsoft.com/download/dotnet/9.0)
@@ -59,12 +77,23 @@ Bearbeiten Sie `src/SiliconLife.Default/Config/DefaultConfigData.cs` oder änder
 
 ### 4. Anwendung ausführen
 
+#### Default-Version ausführen
+
 ```bash
 cd src/SiliconLife.Default
 dotnet run
 ```
 
 Der Webserver startet unter `http://localhost:8080`
+
+#### Fast-Version ausführen (Nur Windows)
+
+```bash
+cd src/SiliconLife.Fast
+dotnet run
+```
+
+Die Anwendung startet im Formularmodus, minimiert im System Tray, mit dem Webserver ebenfalls unter `http://localhost:8080`
 
 ### 5. Web-UI zugreifen
 

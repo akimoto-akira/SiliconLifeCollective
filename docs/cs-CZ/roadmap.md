@@ -4,6 +4,25 @@
 
 [English](../en/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | **Čeština**
 
+## Duální Verze Plánu
+
+### SiliconLife.Default (Výchozí Verze)
+Aktuální fáze 1-10.6 jsou dokončeny, systém běží stabilně.
+
+### SiliconLife.Fast (Vysoce Výkonná Verze)
+Základní přenos architektury je dokončen, průběžná optimalizace probíhá.
+
+**Plán Vývoje Fast Verze**:
+- ✅ Fáze 1: Přenos základní struktury projektu a konfiguračního systému
+- ✅ Fáze 2: Přenos Web UI a controllerů
+- ✅ Fáze 3: Optimalizace úložného systému (paměťové úložiště + asynchronní perzistence)
+- 🚧 Fáze 4: Vývoj systémové lišty a formulářové aplikace
+- 📋 Fáze 5: Optimalizace výkonu (fond připojení, fond objektů, lock-free souběžnost)
+- 📋 Fáze 6: Náhrada webového serveru Kestrel
+- 📋 Fáze 7: Binární serializace MessagePack
+
+---
+
 ## Guiding Principles
 
 Každá fáze končí **fungujícím, pozorovatelným** systémem. Žádná fáze nevytváří "spoustu infrastruktury s ničím k předvedení."

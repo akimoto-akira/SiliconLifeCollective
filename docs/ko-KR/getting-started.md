@@ -4,6 +4,24 @@
 
 [English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | **한국어** | [Deutsch](../de-DE/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
+## 버전 선택
+
+이 프로젝트는 두 구현 버전을 제공합니다:
+
+### SiliconLife.Default (기본 버전)
+- **실행 모드**: 콘솔 애플리케이션
+- **저장소**: 파일 시스템 JSON 저장소
+- **적용 시나리오**: 데이터 보안 우선, 소량 데이터, 개발 디버깅
+- **플랫폼 지원**: Windows, Linux, macOS
+
+### SiliconLife.Fast (고성능 버전)
+- **실행 모드**: Windows 양식 애플리케이션 (시스템 트레이)
+- **저장소**: 메모리 저장소 + 비동기 영속성
+- **적용 시나리오**: 높은 동시성, 낮은 지연 시간, 대용량 데이터
+- **플랫폼 지원**: Windows 전용
+
+> **초보자 권장**: 처음 사용자는 **SiliconLife.Default** 부터 시작하여 시스템에 익숙해진 후 필요에 따라 Fast 버전으로 마이그레이션하는 것을 권장합니다.
+
 ## 사전 요구사항
 
 - **.NET 9 SDK** - [다운로드](https://dotnet.microsoft.com/download/dotnet/9.0)
@@ -59,12 +77,23 @@ dotnet build
 
 ### 4. 애플리케이션 실행
 
+#### Default 버전 실행
+
 ```bash
 cd src/SiliconLife.Default
 dotnet run
 ```
 
 웹 서버가 `http://localhost:8080`에서 시작됩니다.
+
+#### Fast 버전 실행 (Windows 전용)
+
+```bash
+cd src/SiliconLife.Fast
+dotnet run
+```
+
+애플리케이션이 양식 모드로 시작되어 시스템 트레이로 최소화되며, 웹 서버도 `http://localhost:8080`에서 시작됩니다.
 
 ### 5. Web UI 접속
 

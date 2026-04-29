@@ -6,6 +6,22 @@
 
 SiliconLifeCollective에 기여해 주셔서 감사합니다!
 
+## 듀얼 버전 기여
+
+이 프로젝트에는 두 구현 버전이 있습니다. 관심사에 따라 기여 방향을 선택할 수 있습니다:
+
+### SiliconLife.Default (기본 버전)
+- **기술 스택**: .NET 9 콘솔 애플리케이션
+- **기여 방향**: 핵심 기능 개발, 도구 구현, 현지화, 문서
+- **적합한 사람**: 모든 개발자
+
+### SiliconLife.Fast (고성능 버전)
+- **기술 스택**: .NET 9 Windows 양식 애플리케이션
+- **기여 방향**: 성능 최적화, 메모리 저장소, 시스템 트레이, 락 프리 동시성
+- **적합한 사람**: Windows 개발 경험이 있고 성능 최적화에 관심 있는 개발자
+
+> **중요 알림**: 두 버전은 SiliconLife.Core 및 SiliconLife.Common 프로젝트를 공유하며, 핵심 인터페이스 개선은 두 버전 모두에 동시에 영향을 미칩니다.
+
 ## 행동 강령
 
 이 프로젝트는 Apache 2.0 라이선스를 따릅니다. 모든 상호작용에서 존중하고 전문적으로 대하십시오.
@@ -46,6 +62,16 @@ dotnet test
 ```bash
 git checkout -b feature/your-feature-name
 ```
+
+### 5. 개발 프로젝트 선택
+
+기여 유형에 따라 적절한 프로젝트 선택:
+
+- **핵심 인터페이스/추상 클래스** → `SiliconLife.Core` 수정
+- **공유 구현** → `SiliconLife.Common` 수정
+- **Default 버전 전용** → `SiliconLife.Default` 수정
+- **Fast 버전 전용** → `SiliconLife.Fast` 수정
+- **다국어 문서** → `docs/` 디렉토리 수정
 
 ---
 

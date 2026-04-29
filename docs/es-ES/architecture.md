@@ -4,6 +4,25 @@
 
 [English](../en/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | **Español** | [Deutsch](../de-DE/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md)
 
+## Arquitectura de Versión Dual
+
+Este proyecto proporciona dos versiones de implementación que comparten el mismo diseño de arquitectura pero difieren en almacenamiento y optimización de rendimiento:
+
+### SiliconLife.Default (Versión Predeterminada)
+- **Modo de Ejecución**: Aplicación de consola
+- **Almacenamiento**: Almacenamiento JSON del sistema de archivos puro
+- **Escenario de Aplicación**: Requisitos altos de seguridad de datos, recursos de memoria limitados, escenarios de bajo volumen de datos
+
+### SiliconLife.Fast (Versión de Alto Rendimiento)
+- **Modo de Ejecución**: Aplicación de formularios Windows (con soporte de bandeja del sistema)
+- **Almacenamiento**: Almacenamiento en memoria + persistencia por lotes asíncrona (registro WAL)
+- **Escenario de Aplicación**: Escenarios de alta concurrencia, baja latencia, gran volumen de datos
+- **Mejora de Rendimiento**: Latencia de lectura de almacenamiento reducida 1000 veces, latencia de escritura reducida 15000 veces
+
+> **Nota**: La arquitectura descrita en este documento se aplica a ambas versiones, con diferencias solo en la parte de implementación de almacenamiento.
+
+---
+
 ## Conceptos Centrales
 
 ### Ser Silicona

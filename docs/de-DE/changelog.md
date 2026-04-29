@@ -11,6 +11,15 @@ und dieses Projekt遵循 [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## Über dieses Änderungsprotokoll
 
+### Duale Projektversionen
+
+Dieses Projekt bietet zwei Implementierungsversionen:
+
+- **SiliconLife.Default**: Standardversion, Konsolenanwendung, Dateisystem-JSON-Speicher
+- **SiliconLife.Fast**: Hochleistungsversion, Windows-Formularanwendung, In-Memory-Speicher + asynchrone Persistenz
+
+Beide Versionen teilen dieselben Schnittstellen und Funktionen, mit Unterschieden nur in der Speicherimplementierung und dem Ausführungsmodus.
+
 ### Projektursprung
 
 - Dieses Projekt entstand am 20. März 2026.

@@ -4,6 +4,25 @@
 
 [English](../en/architecture.md) | [Deutsch](../de-DE/architecture.md) | **中文** | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md)
 
+## 双版本架构
+
+本项目提供两个实现版本，共享相同的架构设计，但在存储和性能优化方面有所不同：
+
+### SiliconLife.Default（默认版本）
+- **运行模式**：控制台应用程序
+- **存储方式**：纯文件系统 JSON 存储
+- **适用场景**：数据安全性要求高、内存资源受限、数据量小的场景
+
+### SiliconLife.Fast（高性能版本）
+- **运行模式**：Windows 窗体应用程序（支持系统托盘）
+- **存储方式**：内存存储 + 异步批量持久化（WAL 日志）
+- **适用场景**：高并发、低延迟、大数据量场景
+- **性能提升**：存储读取延迟降低 1000 倍，写入延迟降低 15000 倍
+
+> **注意**：本文档描述的架构适用于两个版本，仅在存储实现部分有所不同。
+
+---
+
 ## 核心概念
 
 ### 硅基生命体

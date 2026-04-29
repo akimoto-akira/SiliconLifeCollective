@@ -4,6 +4,25 @@
 
 [English](../en/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | **中文** | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
 
+## 双版本路线图
+
+### SiliconLife.Default（默认版本）
+当前阶段 1-10.6 已完成，系统稳定运行。
+
+### SiliconLife.Fast（高性能版本）
+已完成基础架构移植，正在持续优化中。
+
+**Fast 版本开发计划**：
+- ✅ 阶段 1：基础项目结构和配置系统移植
+- ✅ 阶段 2：Web UI 和控制器移植
+- ✅ 阶段 3：存储系统优化（内存存储 + 异步持久化）
+- 🚧 阶段 4：系统托盘和窗体应用开发
+- 📋 阶段 5：性能优化（连接池、对象池、无锁并发）
+- 📋 阶段 6：Kestrel Web 服务器替换
+- 📋 阶段 7：MessagePack 二进制序列化
+
+---
+
 ## 指导原则
 
 每个阶段都以**可运行、可观察**的系统结束。没有阶段会产生"一堆基础设施却没有可展示的东西"。

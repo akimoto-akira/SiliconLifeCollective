@@ -4,6 +4,24 @@
 
 [English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
+## Choose Version
+
+This project provides two implementation versions:
+
+### SiliconLife.Default (Default Version)
+- **Runtime Mode**: Console application
+- **Storage**: File system JSON storage
+- **Use Case**: Data security priority, small data volume, development debugging
+- **Platform Support**: Windows, Linux, macOS
+
+### SiliconLife.Fast (High-Performance Version)
+- **Runtime Mode**: Windows Forms application (system tray)
+- **Storage**: In-memory storage + asynchronous persistence
+- **Use Case**: High concurrency, low latency, large data volume
+- **Platform Support**: Windows only
+
+> **Beginner Suggestion**: First-time users are recommended to start with **SiliconLife.Default**, and migrate to the Fast version as needed after becoming familiar with the system.
+
 ## Prerequisites
 
 - **.NET 9 SDK** - [Download](https://dotnet.microsoft.com/download/dotnet/9.0)
@@ -59,12 +77,23 @@ Edit `src/SiliconLife.Default/Config/DefaultConfigData.cs` or modify configurati
 
 ### 4. Run the Application
 
+#### Run Default Version
+
 ```bash
 cd src/SiliconLife.Default
 dotnet run
 ```
 
 The web server will start at `http://localhost:8080`
+
+#### Run Fast Version (Windows Only)
+
+```bash
+cd src/SiliconLife.Fast
+dotnet run
+```
+
+The application will start in form mode, minimized to system tray, with the web server also starting at `http://localhost:8080`
 
 ### 5. Access the Web UI
 

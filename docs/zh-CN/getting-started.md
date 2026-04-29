@@ -4,6 +4,24 @@
 
 [English](../en/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | **中文** | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
+## 选择版本
+
+本项目提供两个实现版本：
+
+### SiliconLife.Default（默认版本）
+- **运行模式**：控制台应用程序
+- **存储方式**：文件系统 JSON 存储
+- **适用场景**：数据安全优先、小数据量、开发调试
+- **平台支持**：Windows、Linux、macOS
+
+### SiliconLife.Fast（高性能版本）
+- **运行模式**：Windows 窗体应用程序（系统托盘）
+- **存储方式**：内存存储 + 异步持久化
+- **适用场景**：高并发、低延迟、大数据量
+- **平台支持**：仅 Windows
+
+> **新手建议**：首次使用推荐从 **SiliconLife.Default** 开始，熟悉系统后再根据需要迁移到 Fast 版本。
+
 ## 前置条件
 
 - **.NET 9 SDK** - [下载](https://dotnet.microsoft.com/download/dotnet/9.0)
@@ -59,12 +77,23 @@ dotnet build
 
 ### 4. 运行应用程序
 
+#### 运行 Default 版本
+
 ```bash
 cd src/SiliconLife.Default
 dotnet run
 ```
 
 Web 服务器将在 `http://localhost:8080` 启动
+
+#### 运行 Fast 版本（仅 Windows）
+
+```bash
+cd src/SiliconLife.Fast
+dotnet run
+```
+
+应用程序将以窗体模式启动，最小化到系统托盘，Web 服务器同样在 `http://localhost:8080` 启动
 
 ### 5. 访问 Web UI
 

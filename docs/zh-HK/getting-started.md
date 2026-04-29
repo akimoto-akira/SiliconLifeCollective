@@ -4,6 +4,24 @@
 
 [English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | **繁體中文** | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
+## 選擇版本
+
+本專案提供兩個實現版本：
+
+### SiliconLife.Default（預設版本）
+- **執行模式**：主控台應用程式
+- **儲存方式**：檔案系統 JSON 儲存
+- **適用場景**：資料安全優先、小資料量、開發調試
+- **平台支援**：Windows、Linux、macOS
+
+### SiliconLife.Fast（高效能版本）
+- **執行模式**：Windows 視窗應用程式（系統匣）
+- **儲存方式**：記憶體儲存 + 異步持久化
+- **適用場景**：高併發、低延遲、大資料量
+- **平台支援**：僅 Windows
+
+> **新手建議**：首次使用推薦從 **SiliconLife.Default** 開始，熟悉系統後再根據需要遷移到 Fast 版本。
+
 ## 前置條件
 
 - **.NET 9 SDK** - [下載](https://dotnet.microsoft.com/download/dotnet/9.0)
@@ -59,12 +77,23 @@ dotnet build
 
 ### 4. 執行應用程式
 
+#### 執行 Default 版本
+
 ```bash
 cd src/SiliconLife.Default
 dotnet run
 ```
 
 Web 伺服器將在 `http://localhost:8080` 啟動
+
+#### 執行 Fast 版本（僅 Windows）
+
+```bash
+cd src/SiliconLife.Fast
+dotnet run
+```
+
+應用程式將以視窗模式啟動，最小化到系統匣，Web 伺服器同樣在 `http://localhost:8080` 啟動
 
 ### 5. 存取 Web UI
 

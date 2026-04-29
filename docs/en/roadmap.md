@@ -4,6 +4,25 @@
 
 [English](../en/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
 
+## Dual-Version Roadmap
+
+### SiliconLife.Default (Default Version)
+Current phases 1-10.6 are completed, system is running stably.
+
+### SiliconLife.Fast (High-Performance Version)
+Basic architecture porting is completed, ongoing optimization in progress.
+
+**Fast Version Development Plan**:
+- ✅ Phase 1: Basic project structure and configuration system porting
+- ✅ Phase 2: Web UI and controller porting
+- ✅ Phase 3: Storage system optimization (in-memory storage + asynchronous persistence)
+- 🚧 Phase 4: System tray and forms application development
+- 📋 Phase 5: Performance optimization (connection pool, object pool, lock-free concurrency)
+- 📋 Phase 6: Kestrel web server replacement
+- 📋 Phase 7: MessagePack binary serialization
+
+---
+
 ## Guiding Principles
 
 Each phase ends with a **working, observable** system. No phase produces "a bunch of infrastructure with nothing to show."

@@ -6,6 +6,22 @@
 
 感谢您有兴趣为 SiliconLifeCollective 做出贡献！
 
+## 双版本贡献
+
+本项目有两个实现版本，您可以根据兴趣选择贡献方向：
+
+### SiliconLife.Default（默认版本）
+- **技术栈**：.NET 9 控制台应用
+- **贡献方向**：核心功能开发、工具实现、本地化、文档
+- **适合人群**：所有开发者
+
+### SiliconLife.Fast（高性能版本）
+- **技术栈**：.NET 9 Windows 窗体应用
+- **贡献方向**：性能优化、内存存储、系统托盘、无锁并发
+- **适合人群**：有 Windows 开发经验、对性能优化感兴趣的开发者
+
+> **重要提示**：两个版本共享 SiliconLife.Core 和 SiliconLife.Common 项目，对核心接口的改进会同时影响两个版本。
+
 ## 行为准则
 
 本项目遵循 Apache 2.0 许可证。在所有互动中保持尊重和专业。
@@ -46,6 +62,16 @@ dotnet test
 ```bash
 git checkout -b feature/your-feature-name
 ```
+
+### 5. 选择开发项目
+
+根据您的贡献类型选择合适的项目：
+
+- **核心接口/抽象类** → 修改 `SiliconLife.Core`
+- **共享实现** → 修改 `SiliconLife.Common`
+- **Default 版本特定** → 修改 `SiliconLife.Default`
+- **Fast 版本特定** → 修改 `SiliconLife.Fast`
+- **多语言文档** → 修改 `docs/` 目录
 
 ---
 
