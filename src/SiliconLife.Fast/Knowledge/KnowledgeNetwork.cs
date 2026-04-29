@@ -13,34 +13,47 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
-using System.Text.Json;
+using LiteDB;
 
 namespace SiliconLife.Fast.Knowledge;
 
 /// <summary>
 /// Knowledge network manager - Default implementation
 /// Implements IKnowledgeNetwork interface, providing complete knowledge network operation capabilities
+/// Uses LiteDB for persistent storage
 /// </summary>
 public class KnowledgeNetwork : IKnowledgeNetwork
 {
     private readonly Dictionary<string, KnowledgeEntry> _entries = new();
     private readonly KnowledgeGraph _graph = new();
-    private string _storagePath = string.Empty;
     private readonly ReaderWriterLockSlim _lock = new();
+    private bool _initialized;
+
+    // LiteDB collection
+    private object? _entriesCollection;
+    private object? _graphCollection;
 
     /// <summary>
     /// Initialize the knowledge network
     /// </summary>
     public void Initialize(string storagePath)
     {
-        _storagePath = storagePath;
+        if (_initialized) return;
 
-        if (!Directory.Exists(storagePath))
-        {
-            Directory.CreateDirectory(storagePath);
-        }
+        // Initialize LiteDB collections
+        _entriesCollection = LiteDBManager.GetCollection<KnowledgeEntryRecord>("knowledge_entries");
+        _graphCollection = LiteDBManager.GetCollection<KnowledgeGraphRecord>("knowledge_graph");
+
+        // Create indexes
+        ((ILiteCollection<KnowledgeEntryRecord>)_entriesCollection).EnsureIndex(x => x.EntryId);
+        ((ILiteCollection<KnowledgeEntryRecord>)_entriesCollection).EnsureIndex(x => x.TripleSubject);
+        ((ILiteCollection<KnowledgeEntryRecord>)_entriesCollection).EnsureIndex(x => x.TriplePredicate);
+        ((ILiteCollection<KnowledgeEntryRecord>)_entriesCollection).EnsureIndex(x => x.TripleObject);
+
+        ((ILiteCollection<KnowledgeGraphRecord>)_graphCollection).EnsureIndex(x => x.RecordId);
 
         Load();
+        _initialized = true;
     }
 
     /// <summary>
@@ -394,57 +407,206 @@ public class KnowledgeNetwork : IKnowledgeNetwork
     }
 
     /// <summary>
-    /// Save knowledge network to file system
+    /// Save knowledge network to LiteDB
     /// </summary>
     public void Save()
     {
-        if (string.IsNullOrEmpty(_storagePath))
+        if (!_initialized)
             throw new InvalidOperationException("Knowledge network not initialized");
 
-        var entriesPath = Path.Combine(_storagePath, "entries.json");
-        var graphPath = Path.Combine(_storagePath, "graph.json");
-
-        var options = new JsonSerializerOptions
+        _lock.EnterReadLock();
+        try
         {
-            WriteIndented = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
+            var entriesColl = (ILiteCollection<KnowledgeEntryRecord>)_entriesCollection!;
+            var graphColl = (ILiteCollection<KnowledgeGraphRecord>)_graphCollection!;
 
-        var entriesJson = JsonSerializer.Serialize(_entries.Values, options);
-        File.WriteAllText(entriesPath, entriesJson);
+            // Save entries
+            entriesColl.DeleteAll();
+            foreach (var entry in _entries.Values)
+            {
+                var record = new KnowledgeEntryRecord
+                {
+                    EntryId = entry.Id,
+                    TripleSubject = entry.Triple.Subject,
+                    TriplePredicate = entry.Triple.Predicate,
+                    TripleObject = entry.Triple.Object,
+                    TripleTags = entry.Triple.Tags,
+                    TripleCategory = entry.Triple.Category,
+                    TripleConfidence = entry.Triple.Confidence,
+                    TripleSource = entry.Triple.Source,
+                    CreatedBy = entry.CreatedBy,
+                    ModifiedBy = entry.ModifiedBy,
+                    CreatedAt = entry.CreatedAt,
+                    ModifiedAt = entry.ModifiedAt,
+                    ValidationStatus = entry.ValidationStatus,
+                    ValidatedBy = entry.ValidatedBy,
+                    ChangeHistory = entry.ChangeHistory,
+                    Data = BsonMapper.Global.Serialize(entry).AsDocument
+                };
+                entriesColl.Insert(record);
+            }
 
-        var graphData = new
+            // Save graph
+            graphColl.DeleteAll();
+            var graphRecord = new KnowledgeGraphRecord
+            {
+                RecordId = "graph",
+                SubjectIndex = _graph.SubjectIndex,
+                ObjectIndex = _graph.ObjectIndex,
+                PredicateIndex = _graph.PredicateIndex,
+                TripleIds = _graph.TripleIds.ToList(),
+                TotalTriples = _graph.Statistics.TotalTriples,
+                TotalSubjects = _graph.Statistics.TotalSubjects,
+                TotalObjects = _graph.Statistics.TotalObjects,
+                TotalPredicates = _graph.Statistics.TotalPredicates,
+                Data = BsonMapper.Global.Serialize(new
+                {
+                    SubjectIndex = _graph.SubjectIndex,
+                    ObjectIndex = _graph.ObjectIndex,
+                    PredicateIndex = _graph.PredicateIndex,
+                    TripleIds = _graph.TripleIds.ToList()
+                }).AsDocument
+            };
+            graphColl.Insert(graphRecord);
+        }
+        finally
         {
-            SubjectIndex = _graph.SubjectIndex,
-            ObjectIndex = _graph.ObjectIndex,
-            PredicateIndex = _graph.PredicateIndex,
-            TripleIds = _graph.TripleIds.ToList()
-        };
-        var graphJson = JsonSerializer.Serialize(graphData, options);
-        File.WriteAllText(graphPath, graphJson);
+            _lock.ExitReadLock();
+        }
     }
 
     /// <summary>
-    /// Load knowledge network from file system
+    /// Load knowledge network from LiteDB
     /// </summary>
     public void Load()
     {
-        if (string.IsNullOrEmpty(_storagePath))
+        if (!_initialized)
             throw new InvalidOperationException("Knowledge network not initialized");
-
-        var entriesPath = Path.Combine(_storagePath, "entries.json");
-        var graphPath = Path.Combine(_storagePath, "graph.json");
 
         _lock.EnterWriteLock();
         try
         {
+            var entriesColl = (ILiteCollection<KnowledgeEntryRecord>)_entriesCollection!;
+            var graphColl = (ILiteCollection<KnowledgeGraphRecord>)_graphCollection!;
+
+            // Load entries
+            _entries.Clear();
+            var entryRecords = entriesColl.FindAll().ToList();
+            foreach (var record in entryRecords)
+            {
+                if (record.Data != null)
+                {
+                    var entry = BsonMapper.Global.Deserialize<KnowledgeEntry>(record.Data);
+                    if (entry != null)
+                    {
+                        _entries[entry.Id] = entry;
+                    }
+                }
+            }
+
+            // Load graph
+            var graphRecord = graphColl.FindOne(x => x.RecordId == "graph");
+            if (graphRecord != null)
+            {
+                _graph.Clear();
+                _graph.SubjectIndex = graphRecord.SubjectIndex ?? new();
+                _graph.ObjectIndex = graphRecord.ObjectIndex ?? new();
+                _graph.PredicateIndex = graphRecord.PredicateIndex ?? new();
+                _graph.TripleIds = new HashSet<string>(graphRecord.TripleIds ?? new());
+                _graph.Statistics.TotalTriples = graphRecord.TotalTriples;
+                _graph.Statistics.TotalSubjects = graphRecord.TotalSubjects;
+                _graph.Statistics.TotalObjects = graphRecord.TotalObjects;
+                _graph.Statistics.TotalPredicates = graphRecord.TotalPredicates;
+            }
+        }
+        finally
+        {
+            _lock.ExitWriteLock();
+        }
+    }
+
+    /// <summary>
+    /// Backup knowledge network (export to JSON files)
+    /// </summary>
+    public void Backup(string backupPath)
+    {
+        if (!_initialized)
+            throw new InvalidOperationException("Knowledge network not initialized");
+
+        if (!Directory.Exists(backupPath))
+        {
+            Directory.CreateDirectory(backupPath);
+        }
+
+        var options = new System.Text.Json.JsonSerializerOptions
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+        };
+
+        _lock.EnterReadLock();
+        try
+        {
+            // Export entries
+            var entriesList = _entries.Values.ToList();
+            var entriesJson = System.Text.Json.JsonSerializer.Serialize(entriesList, options);
+            File.WriteAllText(Path.Combine(backupPath, "entries.json"), entriesJson);
+
+            // Export graph
+            var graphData = new
+            {
+                SubjectIndex = _graph.SubjectIndex,
+                ObjectIndex = _graph.ObjectIndex,
+                PredicateIndex = _graph.PredicateIndex,
+                TripleIds = _graph.TripleIds.ToList()
+            };
+            var graphJson = System.Text.Json.JsonSerializer.Serialize(graphData, options);
+            File.WriteAllText(Path.Combine(backupPath, "graph.json"), graphJson);
+        }
+        finally
+        {
+            _lock.ExitReadLock();
+        }
+    }
+
+    /// <summary>
+    /// Restore knowledge network from backup (import JSON files)
+    /// </summary>
+    public void Restore(string backupPath)
+    {
+        if (!_initialized)
+            throw new InvalidOperationException("Knowledge network not initialized");
+
+        var entriesPath = Path.Combine(backupPath, "entries.json");
+        var graphPath = Path.Combine(backupPath, "graph.json");
+
+        if (!File.Exists(entriesPath) && !File.Exists(graphPath))
+        {
+            throw new FileNotFoundException("Backup files not found");
+        }
+
+        _lock.EnterWriteLock();
+        try
+        {
+            var entriesColl = (ILiteCollection<KnowledgeEntryRecord>)_entriesCollection!;
+            var graphColl = (ILiteCollection<KnowledgeGraphRecord>)_graphCollection!;
+
+            // Clear current data
+            entriesColl.DeleteAll();
+            graphColl.DeleteAll();
+            _entries.Clear();
+            _graph.Clear();
+
+            // Import entries
             if (File.Exists(entriesPath))
             {
                 var entriesJson = File.ReadAllText(entriesPath);
-                var readOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var entries = JsonSerializer.Deserialize<List<KnowledgeEntry>>(entriesJson, readOptions);
+                var readOptions = new System.Text.Json.JsonSerializerOptions 
+                { 
+                    PropertyNameCaseInsensitive = true 
+                };
+                var entries = System.Text.Json.JsonSerializer.Deserialize<List<KnowledgeEntry>>(entriesJson, readOptions);
 
-                _entries.Clear();
                 if (entries != null)
                 {
                     foreach (var entry in entries)
@@ -454,13 +616,16 @@ public class KnowledgeNetwork : IKnowledgeNetwork
                 }
             }
 
+            // Import graph
             if (File.Exists(graphPath))
             {
                 var graphJson = File.ReadAllText(graphPath);
-                var graphReadOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var graphData = JsonSerializer.Deserialize<GraphData>(graphJson, graphReadOptions);
+                var graphReadOptions = new System.Text.Json.JsonSerializerOptions 
+                { 
+                    PropertyNameCaseInsensitive = true 
+                };
+                var graphData = System.Text.Json.JsonSerializer.Deserialize<GraphData>(graphJson, graphReadOptions);
 
-                _graph.Clear();
                 if (graphData != null)
                 {
                     _graph.SubjectIndex = graphData.SubjectIndex ?? new();
@@ -473,62 +638,14 @@ public class KnowledgeNetwork : IKnowledgeNetwork
                     _graph.Statistics.TotalPredicates = _graph.PredicateIndex.Count;
                 }
             }
+
+            // Save to LiteDB
+            Save();
         }
         finally
         {
             _lock.ExitWriteLock();
         }
-    }
-
-    /// <summary>
-    /// Backup knowledge network
-    /// </summary>
-    public void Backup(string backupPath)
-    {
-        if (string.IsNullOrEmpty(_storagePath))
-            throw new InvalidOperationException("Knowledge network not initialized");
-
-        if (!Directory.Exists(backupPath))
-        {
-            Directory.CreateDirectory(backupPath);
-        }
-
-        var entriesPath = Path.Combine(_storagePath, "entries.json");
-        var graphPath = Path.Combine(_storagePath, "graph.json");
-
-        if (File.Exists(entriesPath))
-        {
-            File.Copy(entriesPath, Path.Combine(backupPath, "entries.json"), true);
-        }
-
-        if (File.Exists(graphPath))
-        {
-            File.Copy(graphPath, Path.Combine(backupPath, "graph.json"), true);
-        }
-    }
-
-    /// <summary>
-    /// Restore knowledge network from backup
-    /// </summary>
-    public void Restore(string backupPath)
-    {
-        if (string.IsNullOrEmpty(_storagePath))
-            throw new InvalidOperationException("Knowledge network not initialized");
-
-        var entriesPath = Path.Combine(backupPath, "entries.json");
-        var graphPath = Path.Combine(backupPath, "graph.json");
-
-        if (File.Exists(entriesPath))
-        {
-            File.Copy(entriesPath, Path.Combine(_storagePath, "entries.json"), true);
-        }
-
-        if (File.Exists(graphPath))
-        {
-            File.Copy(graphPath, Path.Combine(_storagePath, "graph.json"), true);
-        }
-
-        Load();
     }
 
     #region Private helper methods
@@ -628,4 +745,46 @@ file class GraphData
     public Dictionary<string, Dictionary<string, List<string>>> ObjectIndex { get; set; } = new();
     public Dictionary<string, List<(string Subject, string Object)>> PredicateIndex { get; set; } = new();
     public List<string> TripleIds { get; set; } = new();
+}
+
+/// <summary>
+/// Knowledge entry record for LiteDB storage
+/// </summary>
+internal class KnowledgeEntryRecord
+{
+    public ObjectId Id { get; set; } = ObjectId.NewObjectId();
+    public string EntryId { get; set; } = string.Empty;
+    public string TripleSubject { get; set; } = string.Empty;
+    public string TriplePredicate { get; set; } = string.Empty;
+    public string TripleObject { get; set; } = string.Empty;
+    public List<string> TripleTags { get; set; } = new();
+    public string TripleCategory { get; set; } = string.Empty;
+    public double TripleConfidence { get; set; }
+    public string TripleSource { get; set; } = string.Empty;
+    public string CreatedBy { get; set; } = string.Empty;
+    public string ModifiedBy { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
+    public DateTime ModifiedAt { get; set; }
+    public KnowledgeValidationStatus ValidationStatus { get; set; }
+    public List<string> ValidatedBy { get; set; } = new();
+    public List<KnowledgeChangeLog> ChangeHistory { get; set; } = new();
+    public BsonDocument? Data { get; set; }
+}
+
+/// <summary>
+/// Knowledge graph record for LiteDB storage
+/// </summary>
+internal class KnowledgeGraphRecord
+{
+    public ObjectId Id { get; set; } = ObjectId.NewObjectId();
+    public string RecordId { get; set; } = string.Empty;
+    public Dictionary<string, Dictionary<string, List<string>>> SubjectIndex { get; set; } = new();
+    public Dictionary<string, Dictionary<string, List<string>>> ObjectIndex { get; set; } = new();
+    public Dictionary<string, List<(string Subject, string Object)>> PredicateIndex { get; set; } = new();
+    public List<string> TripleIds { get; set; } = new();
+    public int TotalTriples { get; set; }
+    public int TotalSubjects { get; set; }
+    public int TotalObjects { get; set; }
+    public int TotalPredicates { get; set; }
+    public BsonDocument? Data { get; set; }
 }
