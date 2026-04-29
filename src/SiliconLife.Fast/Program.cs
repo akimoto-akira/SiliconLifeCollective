@@ -45,12 +45,17 @@ public class Program
         RegisterLocalizations();
         ConfigDataBaseConverter.RegisterConfigType("Default", typeof(DefaultConfigData));
 
+        // Initialize LiteDB before loading configuration
+        string dbPath = GetDatabasePath();
+        LiteDBManager.Initialize(dbPath);
+        _logger.Info(null, "LiteDB initialized at {0}", dbPath);
+
         Config config = Config.Instance;
         config.Initialize(new DefaultConfigData());
         config.LoadConfig();
 
         DefaultConfigData configData = (DefaultConfigData)config.Data;
-        LogManager.Instance.AddProvider(new FileSystemLoggerProvider(configData));
+        LogManager.Instance.AddProvider(new LiteDBLoggerProvider());
         configData.AIConfig.TryGetValue("endpoint", out var endpointValue);
         configData.AIConfig.TryGetValue("model", out var modelValue);
         _logger.Info(null, "Configuration loaded: endpoint={0}, model={1}",
@@ -61,14 +66,13 @@ public class Program
         Console.WriteLine(localization.WelcomeMessage);
         Console.WriteLine();
 
-        IStorage storage = new FileSystemStorage(configData.DataDirectory.FullName);
-        ITimeStorage timeStorage = new FileSystemTimeStorage(
-            Path.Combine(configData.DataDirectory.FullName, "chat"));
+        IStorage storage = new LiteDBStorage();
+        ITimeStorage timeStorage = new LiteDBTimeStorage();
 
         // Register storage factories for SiliconBeing creation
-        ServiceLocator.Instance.Register<Func<string, ITimeStorage>>(dir => new FileSystemTimeStorage(dir));
-        ServiceLocator.Instance.Register<Func<string, IStorage>>(dir => new FileSystemStorage(dir));
-        ServiceLocator.Instance.Register<Func<string, IWorkNoteStorage>>(dir => new FileSystemWorkNoteStorage(dir));
+        ServiceLocator.Instance.Register<Func<string, ITimeStorage>>(dir => new LiteDBTimeStorage());
+        ServiceLocator.Instance.Register<Func<string, IStorage>>(dir => new LiteDBStorage());
+        ServiceLocator.Instance.Register<Func<string, IWorkNoteStorage>>(dir => new LiteDBWorkNoteStorage());
         ServiceLocator.Instance.Register<Func<SiliconBeingBase, object>>(being => new PlaywrightWebView((DefaultSiliconBeing)being));
         _logger.Info(null, "Registered: Storage Factories");
 
@@ -80,22 +84,19 @@ public class Program
         ChatSystem chatSystem = new ChatSystem(timeStorage);
         _logger.Info(null, "Initialized: ChatSystem");
 
-        ITimeStorage auditStorage = new FileSystemTimeStorage(
-            Path.Combine(configData.DataDirectory.FullName, "audit"));
+        ITimeStorage auditStorage = new LiteDBTimeStorage();
         AuditLogger auditLogger = new AuditLogger(auditStorage);
         _logger.Info(null, "Initialized: AuditLogger");
 
-        ITimeStorage tokenUsageStorage = new FileSystemTimeStorage(
-            Path.Combine(configData.DataDirectory.FullName, "token-usage"));
+        ITimeStorage tokenUsageStorage = new LiteDBTimeStorage();
         TokenUsageAuditManager tokenUsageAuditManager = new TokenUsageAuditManager(tokenUsageStorage);
         _logger.Info(null, "Initialized: TokenUsageAuditManager");
 
         // Initialize knowledge network system
-        string knowledgeStoragePath = Path.Combine(configData.DataDirectory.FullName, "knowledge");
         KnowledgeNetwork knowledgeNetwork = new KnowledgeNetwork();
-        knowledgeNetwork.Initialize(knowledgeStoragePath);
+        knowledgeNetwork.Initialize(configData.DataDirectory.FullName);
         ServiceLocator.Instance.Register<IKnowledgeNetwork>(knowledgeNetwork);
-        _logger.Info(null, "Initialized: KnowledgeNetwork at {0}", knowledgeStoragePath);
+        _logger.Info(null, "Initialized: KnowledgeNetwork at {0}", configData.DataDirectory.FullName);
 
         GlobalACL globalAcl = new GlobalACL(storage);
         _logger.Info(null, "Initialized: GlobalACL");
@@ -181,6 +182,10 @@ public class Program
         {
             await _host.StopAsync();
         }
+
+        // Shutdown LiteDB
+        LiteDBManager.Shutdown();
+        _logger.Info(null, "LiteDB shutdown complete");
 
         _shouldExit = true;
         _logger.Info(null, "Application shutdown complete");
@@ -283,6 +288,24 @@ public class Program
         LocalizationManager.Instance.Register<DeCH>(Language.DeCH);
         LocalizationManager.Instance.Register<DeLU>(Language.DeLU);
         LocalizationManager.Instance.Register<DeLI>(Language.DeLI);
+    }
+
+    /// <summary>
+    /// Determines the database file path
+    /// </summary>
+    private static string GetDatabasePath()
+    {
+        // Use siliconlife.db in the application base directory
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string dbPath = Path.Combine(baseDir, "siliconlife.db");
+        
+        if (!File.Exists(dbPath))
+        {
+            // Fallback to current directory
+            dbPath = Path.Combine(Directory.GetCurrentDirectory(), "siliconlife.db");
+        }
+        
+        return dbPath;
     }
 
     public static void RequestExit()
