@@ -37,6 +37,13 @@ public class InitController : Controller
 
     public override void Handle()
     {
+        // If configuration already exists (system initialized), redirect to home
+        if (_configData.ConfigExists() && Request.HttpMethod != "POST")
+        {
+            Redirect("/");
+            return;
+        }
+
         if (Request.HttpMethod == "POST")
         {
             HandlePost();

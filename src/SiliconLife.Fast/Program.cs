@@ -106,8 +106,18 @@ public class Program
         StreamCancellationManager streamCancellationManager = new StreamCancellationManager();
         _logger.Info(null, "Initialized: StreamCancellationManager");
 
+        // Clean up duplicate config records (if any)
+        try
+        {
+            LiteDBManager.DeduplicateConfig();
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(null, "Failed to deduplicate config: {0}", ex.Message);
+        }
+
         Router router = new Router();
-        router.SetInitialized(File.Exists(configData.GetConfigPath()));
+        router.SetInitialized(configData.ConfigExists());
         IIMProvider imProvider = new WebUIProvider(router);
         imProvider.ExitRequested += (s, e) => RequestExit();
 

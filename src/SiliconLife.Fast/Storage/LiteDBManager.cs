@@ -98,7 +98,45 @@ internal static class LiteDBManager
     {
         EnsureInitialized();
         config.UpdatedAt = DateTime.UtcNow;
+        
+        // Find existing config by ConfigType to reuse its Id (prevent duplicate records)
+        var existing = _configCollection!.FindOne(x => x.ConfigType == config.ConfigType);
+        if (existing != null)
+        {
+            config.Id = existing.Id; // Reuse existing Id to ensure Upsert updates instead of inserts
+        }
+        
         _configCollection!.Upsert(config);
+    }
+
+    /// <summary>
+    /// Checks whether application configuration exists in LiteDB
+    /// </summary>
+    public static bool ConfigExists()
+    {
+        EnsureInitialized();
+        return _configCollection!.Exists(x => x.ConfigType == "Default");
+    }
+
+    /// <summary>
+    /// Removes duplicate configuration records, keeping only the latest one
+    /// </summary>
+    public static void DeduplicateConfig()
+    {
+        EnsureInitialized();
+        var allConfigs = _configCollection!.FindAll().ToList();
+        
+        // Group by ConfigType and keep only the latest (by UpdatedAt)
+        var duplicates = allConfigs
+            .GroupBy(x => x.ConfigType)
+            .Where(g => g.Count() > 1)
+            .SelectMany(g => g.OrderByDescending(x => x.UpdatedAt).Skip(1))
+            .ToList();
+        
+        foreach (var dup in duplicates)
+        {
+            _configCollection!.Delete(dup.Id);
+        }
     }
 
     /// <summary>

@@ -107,6 +107,12 @@ public abstract class ConfigDataBase
     public abstract string GetConfigPath();
 
     /// <summary>
+    /// Checks whether the configuration data exists
+    /// </summary>
+    /// <returns>True if configuration exists, false otherwise</returns>
+    public abstract bool ConfigExists();
+
+    /// <summary>
     /// Loads configuration from the configuration file
     /// </summary>
     public abstract void LoadConfig();

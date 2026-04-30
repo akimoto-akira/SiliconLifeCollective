@@ -128,6 +128,11 @@ public class DefaultConfigData : ConfigDataBase
         return GetConfigFilePath();
     }
 
+    public override bool ConfigExists()
+    {
+        return File.Exists(GetConfigFilePath());
+    }
+
     public override void LoadConfig()
     {
         string configPath = GetConfigFilePath();

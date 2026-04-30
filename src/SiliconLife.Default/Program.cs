@@ -105,7 +105,7 @@ public class Program
         _logger.Info(null, "Initialized: StreamCancellationManager");
 
         Router router = new Router();
-        router.SetInitialized(File.Exists(configData.GetConfigPath()));
+        router.SetInitialized(configData.ConfigExists());
         IIMProvider imProvider = new WebUIProvider(router);
         imProvider.ExitRequested += (s, e) => RequestExit();
 

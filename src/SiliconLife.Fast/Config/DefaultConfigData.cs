@@ -120,6 +120,21 @@ public class DefaultConfigData : ConfigDataBase
     }
 
     /// <summary>
+    /// Checks whether the configuration exists in LiteDB
+    /// </summary>
+    public override bool ConfigExists()
+    {
+        try
+        {
+            return LiteDBManager.ConfigExists();
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
     /// Loads configuration from LiteDB (replaces config.json)
     /// </summary>
     public override void LoadConfig()
