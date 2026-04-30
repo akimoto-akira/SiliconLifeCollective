@@ -13,6 +13,20 @@ public class H
         "link", "meta", "param", "source", "track", "wbr"
     };
 
+    /// <summary>
+    /// HTML 转义
+    /// </summary>
+    public static string Escape(string? text)
+    {
+        if (string.IsNullOrEmpty(text)) return "";
+        return text
+            .Replace("&", "&amp;")
+            .Replace("<", "&lt;")
+            .Replace(">", "&gt;")
+            .Replace("\"", "&quot;")
+            .Replace("'", "&#39;");
+    }
+
     public string TagName { get; }
     private readonly Dictionary<string, string> _attrs = new();
     private readonly List<object> _children = new();
