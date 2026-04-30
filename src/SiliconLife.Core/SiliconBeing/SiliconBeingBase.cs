@@ -37,6 +37,9 @@ public enum BeingActivity
 
     /// <summary>Compressing memory (corresponds to ThinkOnMemoryCompress).</summary>
     MemoryCompression,
+
+    /// <summary>The being has been stopped and is no longer running.</summary>
+    Stopped,
 }
 
 /// <summary>

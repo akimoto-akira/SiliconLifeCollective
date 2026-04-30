@@ -711,6 +711,7 @@ public class ZhHK : DefaultLocalizationBase
         BeingActivity.Task => "執行任務",
         BeingActivity.Timer => "執行定時任務",
         BeingActivity.MemoryCompression => "壓縮記憶",
+        BeingActivity.Stopped => "已停止",
         _ => activity.ToString()
     };
 

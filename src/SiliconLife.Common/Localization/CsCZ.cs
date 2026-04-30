@@ -935,6 +935,7 @@ public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
         BeingActivity.Task => "Plnění úkolu",
         BeingActivity.Timer => "Spuštění časovače",
         BeingActivity.MemoryCompression => "Komprese paměti",
+        BeingActivity.Stopped => "Zastaveno",
         _ => activity.ToString()
     };
 

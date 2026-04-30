@@ -857,6 +857,7 @@ public class ZhCN : DefaultLocalizationBase
         BeingActivity.Task => "执行任务",
         BeingActivity.Timer => "执行定时任务",
         BeingActivity.MemoryCompression => "压缩记忆",
+        BeingActivity.Stopped => "已停止",
         _ => activity.ToString()
     };
 

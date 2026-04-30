@@ -857,6 +857,7 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
         BeingActivity.Task => "Executing Task",
         BeingActivity.Timer => "Running Timer",
         BeingActivity.MemoryCompression => "Compressing Memory",
+        BeingActivity.Stopped => "Stopped",
         _ => activity.ToString()
     };
 

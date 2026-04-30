@@ -857,6 +857,7 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         BeingActivity.Task => "Ejecutando tarea",
         BeingActivity.Timer => "Ejecutando temporizador",
         BeingActivity.MemoryCompression => "Comprimiendo memoria",
+        BeingActivity.Stopped => "Detenido",
         _ => activity.ToString()
     };
 

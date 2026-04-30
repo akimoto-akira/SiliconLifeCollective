@@ -857,6 +857,7 @@ public class KoKR : DefaultLocalizationBase
         BeingActivity.Task => "작업 실행 중",
         BeingActivity.Timer => "타이머 실행 중",
         BeingActivity.MemoryCompression => "메모리 압축 중",
+        BeingActivity.Stopped => "중지됨",
         _ => activity.ToString()
     };
 

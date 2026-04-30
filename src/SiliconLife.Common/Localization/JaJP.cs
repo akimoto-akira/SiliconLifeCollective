@@ -857,6 +857,7 @@ public class JaJP : DefaultLocalizationBase
         BeingActivity.Task => "タスク実行中",
         BeingActivity.Timer => "タイマー実行中",
         BeingActivity.MemoryCompression => "メモリ圧縮中",
+        BeingActivity.Stopped => "停止済み",
         _ => activity.ToString()
     };
 

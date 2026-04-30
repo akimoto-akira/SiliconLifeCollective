@@ -28,6 +28,8 @@ public class DefaultSiliconBeing : SiliconBeingBase
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<DefaultSiliconBeing>();
     private volatile bool _isProcessing;
     private volatile int _activityRaw = (int)BeingActivity.Idle;
+    private int _consecutiveErrorCount;
+    private const int ConsecutiveErrorStopCount = 10;
     
     // WebView instance (nullable, created on demand)
     private IWebViewCore? _webView;
@@ -39,6 +41,13 @@ public class DefaultSiliconBeing : SiliconBeingBase
     /// a full tick elapses without triggering any scene.
     /// </summary>
     public override BeingActivity CurrentActivity => (BeingActivity)_activityRaw;
+
+    /// <summary>
+    /// Resets the consecutive error count, allowing the being to resume processing.
+    /// Call this when an external disturbance (e.g. user message, AI config change)
+    /// should give the being another chance to recover from a stopped state.
+    /// </summary>
+    public void ResetConsecutiveErrorCount() => _consecutiveErrorCount = 0;
 
     /// <summary>
     /// Initializes a new instance of the DefaultSiliconBeing class
@@ -152,20 +161,41 @@ public class DefaultSiliconBeing : SiliconBeingBase
     /// <param name="deltaTime">Time elapsed since the last tick</param>
     public override void Tick(TimeSpan deltaTime)
     {
-        // 1. Check if AI config has changed
+        // 1. Check if AI config has changed (external disturbance - resets error count)
         if (CheckAndRebuildAIClient())
         {
-            // Config changed and client rebuilt, skip this tick
+            _consecutiveErrorCount = 0;
             return;
         }
-        
-        // 2. Original tick logic
+
+        // 2. If consecutive errors reached threshold, check for external triggers
+        if (_consecutiveErrorCount >= ConsecutiveErrorStopCount)
+        {
+            if (HasPendingChatWork())
+            {
+                _consecutiveErrorCount = 0;
+                List<SessionBase> allSession = BuildSessionList();
+                foreach(SessionBase sb in allSession)
+                {
+                    ContextManager cm = new ContextManager(this, sb);
+                    cm.CommitMessagesAsRead();
+                }
+            }
+            else
+            {
+                _activityRaw = (int)BeingActivity.Stopped;
+                return;
+            }
+        }
+
+        // 3. Original tick logic
         if (_isProcessing || AIClient == null)
         {
             return;
         }
 
         _isProcessing = true;
+        bool errorOccurred = false;
         try
         {
             var sessions = BuildSessionList();
@@ -176,7 +206,8 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 {
                     _activityRaw = (int)BeingActivity.SingleChat;
                     _logger.Info(Id, "Being {0}: detected continuation in session {1}", Name, session.Id);
-                    ExecuteBrain("ThinkContinuation", session, brain => brain.ThinkOnChat());
+                    if (!ExecuteBrain("ThinkContinuation", session, brain => brain.ThinkOnChat()))
+                        errorOccurred = true;
                     return;
                 }
             }
@@ -200,7 +231,8 @@ public class DefaultSiliconBeing : SiliconBeingBase
 
                     _activityRaw = (int)BeingActivity.SingleChat;
                     _logger.Info(Id, "Being {0}: detected pending messages in session {1}", Name, session.Id);
-                    ExecuteBrain("ThinkOnChat", session, _ => brain.ThinkOnChat());
+                    if (!ExecuteBrain("ThinkOnChat", session, _ => brain.ThinkOnChat()))
+                        errorOccurred = true;
                     return;
                 }
             }
@@ -218,7 +250,8 @@ public class DefaultSiliconBeing : SiliconBeingBase
                         Name, timer.Name, timer.ExecutionState, timer.CurrentStep);
 
                     // Execute step-by-step logic (using new ContextManager constructor for timer)
-                    ExecuteBrain("ThinkOnTimerStep", null, _ => new ContextManager(this, timer).ThinkOnTimerStep(timer));
+                    if (!ExecuteBrain("ThinkOnTimerStep", null, _ => new ContextManager(this, timer).ThinkOnTimerStep(timer)))
+                        errorOccurred = true;
                     return;
                 }
             }
@@ -231,7 +264,8 @@ public class DefaultSiliconBeing : SiliconBeingBase
                     TaskItem task = runnable[0];
                     _activityRaw = (int)BeingActivity.Task;
                     _logger.Info(Id, "Being {0}: pending task detected - {1} ({2})", Name, task.Title, task.Id);
-                    ExecuteBrain("ThinkOnTask", null, _ => new ContextManager(this, (SessionBase?)null).ThinkOnTask(task));
+                    if (!ExecuteBrain("ThinkOnTask", null, _ => new ContextManager(this, (SessionBase?)null).ThinkOnTask(task)))
+                        errorOccurred = true;
                     return;
                 }
             }
@@ -240,7 +274,8 @@ public class DefaultSiliconBeing : SiliconBeingBase
             {
                 _activityRaw = (int)BeingActivity.MemoryCompression;
                 _logger.Debug(Id, "Being {0}: memory compression needed at level {1}", Name, compressData.Value.Level);
-                ExecuteBrain("ThinkOnMemoryCompress", null, _ => new ContextManager(this, (SessionBase?)null).ThinkOnMemoryCompress(compressData));
+                if (!ExecuteBrain("ThinkOnMemoryCompress", null, _ => new ContextManager(this, (SessionBase?)null).ThinkOnMemoryCompress(compressData)))
+                    errorOccurred = true;
                 return;
             }
 
@@ -253,7 +288,8 @@ public class DefaultSiliconBeing : SiliconBeingBase
         }
         catch (Exception ex)
         {
-            _logger.Error(Id, "Being {0}: unexpected error during tick", Name, ex);
+            errorOccurred = true;
+            _logger.Error(Id, "Being {0}: unexpected error during tick (consecutive={1})", Name, ex, _consecutiveErrorCount + 1);
 
             Language language = Config.Instance.Data.Language;
             DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(language);
@@ -263,8 +299,29 @@ public class DefaultSiliconBeing : SiliconBeingBase
         }
         finally
         {
+            if (errorOccurred)
+                _consecutiveErrorCount++;
+            else
+                _consecutiveErrorCount = 0;
             _isProcessing = false;
         }
+    }
+
+    /// <summary>
+    /// Checks if there is pending chat work (continuation or unread messages).
+    /// Used to detect external disturbances (user messages) that should reset the error count.
+    /// </summary>
+    private bool HasPendingChatWork()
+    {
+        var sessions = BuildSessionList();
+        foreach (var session in sessions)
+        {
+            if (ContextManager.NeedsContinuation(this, session))
+                return true;
+            if (new ContextManager(this, session).HasWork)
+                return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -305,8 +362,9 @@ public class DefaultSiliconBeing : SiliconBeingBase
 
     /// <summary>
     /// Executes a brain function with logging and continuation tracking.
+    /// Returns true if the brain scene executed successfully, false otherwise.
     /// </summary>
-    private void ExecuteBrain(string sceneName, SessionBase? session, Func<ContextManager, AIResponse> thinkFunc)
+    private bool ExecuteBrain(string sceneName, SessionBase? session, Func<ContextManager, AIResponse> thinkFunc)
     {
         _logger.Info(Id, "Being {0}: executing brain scene {1}", Name, sceneName);
 
@@ -335,11 +393,14 @@ public class DefaultSiliconBeing : SiliconBeingBase
         {
             _logger.Error(Id, "Being {0}: brain scene {1} failed: {2}", Name, sceneName, response.ErrorMessage ?? "unknown");
             _logger.Info(Id, "{0}: {1} {2}", Name, localization.ErrorMessage, response.ErrorMessage);
+            return false;
         }
         else
         {
             _logger.Debug(Id, "Being {0}: brain scene {1} completed", Name, sceneName);
         }
+
+        return true;
     }
     
     /// <summary>

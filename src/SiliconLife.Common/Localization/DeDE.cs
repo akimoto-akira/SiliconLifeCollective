@@ -825,6 +825,7 @@ public class DeDE : DefaultLocalizationBase
         BeingActivity.Task => "Aufgabe ausführen",
         BeingActivity.Timer => "Timer ausführen",
         BeingActivity.MemoryCompression => "Speicher komprimieren",
+        BeingActivity.Stopped => "Gestoppt",
         _ => activity.ToString()
     };
 
