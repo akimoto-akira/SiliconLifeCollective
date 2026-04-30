@@ -19,9 +19,19 @@ namespace SiliconLife.Fast.Web.Component;
 public class SelectComponent : ComponentBase
 {
     private readonly List<(string Value, string Text, bool Disabled)> _options = new();
+    private string _name = "";
     private string? _selectedValue;
     private bool _multiple = false;
     private bool _required = false;
+
+    /// <summary>
+    /// Set select name
+    /// </summary>
+    public SelectComponent Name(string name)
+    {
+        _name = name;
+        return this;
+    }
 
     /// <summary>
     /// Add an option
@@ -74,6 +84,9 @@ public class SelectComponent : ComponentBase
     public override string Render()
     {
         var select = H.Select();
+
+        if (!string.IsNullOrEmpty(_name))
+            select.Attr("name", _name);
 
         if (!string.IsNullOrEmpty(Id))
             select.Id(Id);

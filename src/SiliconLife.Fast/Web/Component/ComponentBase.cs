@@ -39,39 +39,71 @@ public abstract class ComponentBase
     public Dictionary<string, string> Attributes { get; } = new();
 
     /// <summary>
-    /// Set component ID
+    /// Set component ID (chainable)
     /// </summary>
-    public T WithId<T>(string id) where T : ComponentBase
+    public T SetId<T>(string id) where T : ComponentBase
     {
         Id = id;
         return (T)this;
     }
 
     /// <summary>
-    /// Set CSS class
+    /// Set component ID (legacy)
     /// </summary>
-    public T WithClass<T>(string className) where T : ComponentBase
+    public T WithId<T>(string id) where T : ComponentBase
+    {
+        return SetId<T>(id);
+    }
+
+    /// <summary>
+    /// Set CSS class (chainable)
+    /// </summary>
+    public T SetClass<T>(string className) where T : ComponentBase
     {
         Class = string.IsNullOrEmpty(Class) ? className : $"{Class} {className}";
         return (T)this;
     }
 
     /// <summary>
-    /// Set inline style
+    /// Set CSS class (legacy)
     /// </summary>
-    public T WithStyle<T>(string style) where T : ComponentBase
+    public T WithClass<T>(string className) where T : ComponentBase
+    {
+        return SetClass<T>(className);
+    }
+
+    /// <summary>
+    /// Set inline style (chainable)
+    /// </summary>
+    public T SetStyle<T>(string style) where T : ComponentBase
     {
         Style = string.IsNullOrEmpty(Style) ? style : $"{Style};{style}";
         return (T)this;
     }
 
     /// <summary>
-    /// Add custom attribute
+    /// Set inline style (legacy)
     /// </summary>
-    public T WithAttribute<T>(string name, string value) where T : ComponentBase
+    public T WithStyle<T>(string style) where T : ComponentBase
+    {
+        return SetStyle<T>(style);
+    }
+
+    /// <summary>
+    /// Add custom attribute (chainable)
+    /// </summary>
+    public T SetAttr<T>(string name, string value) where T : ComponentBase
     {
         Attributes[name] = value;
         return (T)this;
+    }
+
+    /// <summary>
+    /// Add custom attribute (legacy)
+    /// </summary>
+    public T WithAttribute<T>(string name, string value) where T : ComponentBase
+    {
+        return SetAttr<T>(name, value);
     }
 
     /// <summary>

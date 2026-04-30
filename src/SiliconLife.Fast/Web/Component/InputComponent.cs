@@ -19,12 +19,22 @@ namespace SiliconLife.Fast.Web.Component;
 public class InputComponent : ComponentBase
 {
     private string _type = "text";
+    private string _name = "";
     private string _placeholder = "";
     private string _value = "";
     private bool _required = false;
     private bool _readonly = false;
     private string? _onchange;
     private string? _oninput;
+
+    /// <summary>
+    /// Set input name
+    /// </summary>
+    public InputComponent Name(string name)
+    {
+        _name = name;
+        return this;
+    }
 
     /// <summary>
     /// Set input type
@@ -93,6 +103,9 @@ public class InputComponent : ComponentBase
     {
         var input = H.Input()
             .Attr("type", _type);
+
+        if (!string.IsNullOrEmpty(_name))
+            input.Attr("name", _name);
 
         if (!string.IsNullOrEmpty(_placeholder))
             input.Placeholder(_placeholder);

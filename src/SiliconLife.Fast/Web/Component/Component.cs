@@ -169,4 +169,52 @@ public static class Component
     {
         return new RichTextComponent();
     }
+
+    /// <summary>
+    /// Create form group component
+    /// </summary>
+    public static FormGroupComponent FormGroup()
+    {
+        return new FormGroupComponent();
+    }
+
+    /// <summary>
+    /// Create heading component (h1)
+    /// </summary>
+    public static HeadingComponent H1(string text)
+    {
+        return new HeadingComponent("h1").Text(text);
+    }
+
+    /// <summary>
+    /// Create heading component (h3)
+    /// </summary>
+    public static HeadingComponent H3(string text)
+    {
+        return new HeadingComponent("h3").Text(text);
+    }
+
+    /// <summary>
+    /// Create heading component (h4)
+    /// </summary>
+    public static HeadingComponent H4(string text)
+    {
+        return new HeadingComponent("h4").Text(text);
+    }
+
+    /// <summary>
+    /// Create paragraph component
+    /// </summary>
+    public static PComponent P(string text)
+    {
+        return new PComponent(text);
+    }
+
+    /// <summary>
+    /// Create anchor link component
+    /// </summary>
+    public static AComponent A(string text)
+    {
+        return new AComponent(text);
+    }
 }

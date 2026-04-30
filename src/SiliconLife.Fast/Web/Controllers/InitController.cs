@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -15,7 +15,7 @@ using System.Text;
 using SiliconLife.Collective;
 using SiliconLife.Common.AI;
 using SiliconLife.Fast.Help;
-
+using SiliconLife.Fast.Web.Component;
 using SiliconLife.Common.Localization;
 
 namespace SiliconLife.Fast.Web;
@@ -75,103 +75,148 @@ public class InitController : Controller
 
     private void ShowFormInternal(string? error)
     {
-        var form = new List<object>();
+        var form = new FormComponent()
+            .Action("/init")
+            .Method("POST")
+            .WithAttribute<ComponentBase>("class", "init-form")
+            .WithAttribute<ComponentBase>("onsubmit", "return validateInitForm()");
 
-        BuildLanguageFormGroup(form);
+        // Language form group
+        form.Add(BuildLanguageFormGroup());
 
-        form.Add(H.Create("div",
-            H.Create("label", _localization.InitNicknameLabel).Attr("for", "nickname"),
-            H.Input().Attr("type", "text").Attr("name", "nickname").Attr("placeholder", _localization.InitNicknamePlaceholder).Attr("value", _configData.UserNickname).Attr("required", "required")
-        ).Class("form-group"));
+        // Nickname field
+        form.Add(new FormGroupComponent()
+            .Add(new LabelComponent().For("nickname").Text(_localization.InitNicknameLabel))
+            .Add(new InputComponent()
+                .Type("text")
+                .Name("nickname")
+                .Placeholder(_localization.InitNicknamePlaceholder)
+                .Value(_configData.UserNickname)
+                .Required()));
 
-        form.Add(H.Create("div",
-            H.Create("label", _localization.InitCuratorNameLabel).Attr("for", "curatorName"),
-            H.Input().Attr("type", "text").Attr("name", "curatorName").Attr("placeholder", _localization.InitCuratorNamePlaceholder).Attr("required", "required")
-        ).Class("form-group"));
+        // Curator name field
+        form.Add(new FormGroupComponent()
+            .Add(new LabelComponent().For("curatorName").Text(_localization.InitCuratorNameLabel))
+            .Add(new InputComponent()
+                .Type("text")
+                .Name("curatorName")
+                .Placeholder(_localization.InitCuratorNamePlaceholder)
+                .Required()));
 
-        form.Add(H.Create("div",
-            H.Create("label", _localization.InitAIClientTypeLabel).Attr("for", "aiClientType"),
-            H.Create("select", GetAIClientTypeOptions()).Attr("name", "aiClientType").Attr("id", "aiClientTypeSelect").Attr("onchange", "onClientTypeChange(this.value)")
-        ).Class("form-group"));
+        // AI client type select
+        form.Add(new FormGroupComponent()
+            .Add(new LabelComponent().For("aiClientType").Text(_localization.InitAIClientTypeLabel))
+            .Add(BuildAIClientTypeSelect()));
 
-        // AI client help link container (dynamically updated)
-        form.Add(H.Create("div", H.Create("div").Attr("id", "aiClientHelpLink")).Attr("id", "aiClientHelpContainer").Class("form-group"));
+        // AI client help link container
+        form.Add(new DivComponent().WithAttribute<ComponentBase>("id", "aiClientHelpContainer").WithAttribute<ComponentBase>("class", "form-group")
+            .Add(new DivComponent().WithAttribute<ComponentBase>("id", "aiClientHelpLink")));
 
-        form.Add(H.Create("div", H.Create("div").Attr("id", "aiConfigFields")).Attr("id", "aiConfigContainer").Class("form-group"));
+        // AI config fields container
+        form.Add(new DivComponent().WithAttribute<ComponentBase>("id", "aiConfigContainer").WithAttribute<ComponentBase>("class", "form-group")
+            .Add(new DivComponent().WithAttribute<ComponentBase>("id", "aiConfigFields")));
 
-        BuildDataDirectoryFormGroup(form);
+        // Data directory field
+        form.Add(BuildDataDirectoryFormGroup());
 
-        BuildSkinFormGroup(form);
+        // Skin selection
+        form.Add(BuildSkinFormGroup());
 
-        form.Add(H.Create("div",
-            H.Create("button", _localization.InitSubmitButton).Attr("type", "submit")
-        ).Class("form-actions"));
+        // Submit button
+        form.Add(new DivComponent().WithAttribute<ComponentBase>("class", "form-actions")
+            .Add(new ButtonComponent()
+                .Text(_localization.InitSubmitButton)
+                .Type("submit")));
 
-        var html = H.DocType() + 
-            H.Create("html",
-                H.Create("head",
-                    H.Meta().Attr("charset", "utf-8"),
-                    H.Meta().Attr("name", "viewport").Attr("content", "width=device-width, initial-scale=1"),
-                    H.Create("title", $"{_localization.InitPageTitle} - Silicon Life Collective"),
-                    H.Create("style", GetStyles()),
-                    H.Create("script", GetSkinSwitchScript())
-                ),
-                H.Create("body",
-                    H.Create("div",
-                        H.Create("div",
-                            H.Create("h1", "Silicon Life Collective"),
-                            H.Create("p", _localization.InitDescription),
-                            !string.IsNullOrEmpty(error) ? new object[] { H.Create("div", H.Create("p", error ?? "")).Class("form-error") } : Array.Empty<object>(),
-                            H.Create("form", form.ToArray()).Attr("action", "/init").Attr("method", "post").Class("init-form")
-                                .Attr("onsubmit", "return validateInitForm()"),
-                            H.Create("div", 
-                                H.Create("p", _localization.InitFooterHint),
-                                H.Create("a", _localization.InitHelpLink).Attr("href", "/help").Class("init-help-link")
-                            ).Class("init-footer")
-                        ).Class("init-card")
-                    ).Class("init-container")
-                )
-            ).Build();
+        // Build page HTML
+        var page = new DivComponent().WithAttribute<ComponentBase>("class", "init-container")
+            .Add(new DivComponent().WithAttribute<ComponentBase>("class", "init-card")
+                .Add(new HeadingComponent("h1").Text("Silicon Life Collective"))
+                .Add(new PComponent(_localization.InitDescription))
+                .Add(error != null ? new DivComponent().WithAttribute<ComponentBase>("class", "form-error")
+                    .Add(new PComponent(error)) : null)
+                .Add(form)
+                .Add(new DivComponent().WithAttribute<ComponentBase>("class", "init-footer")
+                    .Add(new PComponent(_localization.InitFooterHint))
+                    .Add(new AComponent(_localization.InitHelpLink)
+                        .Href("/help")
+                        .WithAttribute<ComponentBase>("class", "init-help-link"))));
+
+        var html = H.DocType() +
+            H.Html()
+                .Add(H.Head()
+                    .Add(H.Meta().WithAttribute<ComponentBase>("charset", "utf-8"))
+                    .Add(H.Meta().WithAttribute<ComponentBase>("name", "viewport").WithAttribute<ComponentBase>("content", "width=device-width, initial-scale=1"))
+                    .Add(H.Title($"{_localization.InitPageTitle} - Silicon Life Collective"))
+                    .Add(H.Style(GetStyles()))
+                    .Add(H.Script(GetSkinSwitchScript().Build())))
+                .Add(H.Body()
+                    .Add(new RawHtml(page.Render())))
+                .Build();
 
         RenderHtml(html);
     }
 
-    private void BuildLanguageFormGroup(List<object> form)
+    private ComponentBase BuildLanguageFormGroup()
     {
         var currentLang = _localization.LanguageCode;
-        var options = new List<object>();
+        var select = new SelectComponent().Name("language").WithAttribute<ComponentBase>("id", "languageSelect")
+            .Attr("data-current", currentLang)
+            .WithAttribute<ComponentBase>("onchange", "switchLanguage(this.value)");
+
         foreach (var lang in LocalizationManager.Instance.GetRegisteredLanguages())
         {
             var loc = LocalizationManager.Instance.GetLocalization(lang);
-            var opt = H.Create("option", loc.LanguageName).Attr("value", lang.ToString());
-            if (loc.LanguageCode == currentLang) opt.Attr("selected", "selected");
-            options.Add(opt);
+            var optionText = loc.LanguageName;
+            var optionValue = lang.ToString();
+            var isSelected = loc.LanguageCode == currentLang;
+            select.AddOption(optionValue, optionText);
+            if (isSelected)
+            {
+                select.Selected(optionValue);
+            }
         }
-        form.Add(H.Create("div",
-            H.Create("label", _localization.InitLanguageLabel).Attr("for", "language"),
-            H.Create("div",
-                H.Create("select", options.ToArray()).Attr("name", "language").Attr("id", "languageSelect")
-                    .Attr("data-current", currentLang).Attr("onchange", "switchLanguage(this.value)"),
-                H.Create("button", _localization.InitLanguageSwitchBtn).Attr("type", "button")
-                    .Class("lang-switch-btn").Attr("style", "display:none;").Attr("onclick", "applyLanguage()")
-            ).Class("lang-selector-row")
-        ).Class("form-group"));
+
+        var switchBtn = new ButtonComponent()
+            .Text(_localization.InitLanguageSwitchBtn)
+            .Type("button")
+            .WithAttribute<ComponentBase>("class", "lang-switch-btn")
+            .WithAttribute<ComponentBase>("style", "display:none;")
+            .WithAttribute<ComponentBase>("onclick", "applyLanguage()");
+
+        return new FormGroupComponent()
+            .Add(new LabelComponent().For("language").Text(_localization.InitLanguageLabel))
+            .Add(new DivComponent().WithAttribute<ComponentBase>("class", "lang-selector-row")
+                .Add(select)
+                .Add(switchBtn));
     }
 
-    private void BuildDataDirectoryFormGroup(List<object> form)
+    private ComponentBase BuildDataDirectoryFormGroup()
     {
-        form.Add(H.Create("div",
-            H.Create("label", _localization.InitDataDirectoryLabel).Attr("for", "dataDirectory"),
-            H.Create("div",
-                H.Input().Attr("type", "text").Attr("name", "dataDirectory").Attr("placeholder", _localization.InitDataDirectoryPlaceholder).Attr("value", _configData.DataDirectory.FullName).Attr("id", "dataDirInput"),
-                H.Create("button", _localization.InitDataDirectoryBrowse).Attr("type", "button")
-                    .Class("dir-browse-btn").Attr("onclick", "openDirBrowser()")
-            ).Class("dir-input-row"),
-            H.Create("div").Attr("id", "dirBrowser").Class("dir-browser").Attr("style", "display:none;")
-        ).Class("form-group"));
+        var browseBtn = new ButtonComponent()
+            .Text(_localization.InitDataDirectoryBrowse)
+            .Type("button")
+            .WithAttribute<ComponentBase>("class", "dir-browse-btn")
+            .WithAttribute<ComponentBase>("onclick", "openDirBrowser()");
+
+        var inputRow = new DivComponent().WithAttribute<ComponentBase>("class", "dir-input-row")
+            .Add(new InputComponent()
+                .Type("text")
+                .Name("dataDirectory")
+                .Placeholder(_localization.InitDataDirectoryPlaceholder)
+                .Value(_configData.DataDirectory.FullName)
+                .WithAttribute<ComponentBase>("id", "dataDirInput"))
+            .Add(browseBtn);
+
+        var browser = new DivComponent().WithAttribute<ComponentBase>("id", "dirBrowser").WithAttribute<ComponentBase>("class", "dir-browser").WithAttribute<ComponentBase>("style", "display:none;");
+
+        return new FormGroupComponent()
+            .Add(new LabelComponent().For("dataDirectory").Text(_localization.InitDataDirectoryLabel))
+            .Add(inputRow)
+            .Add(browser);
     }
 
-    private void BuildSkinFormGroup(List<object> form)
+    private ComponentBase BuildSkinFormGroup()
     {
         var skins = _skinManager.GetAvailableSkins()
             .Select(c => (Code: c, Skin: _skinManager.GetSkin(c)!))
@@ -179,54 +224,65 @@ public class InitController : Controller
             .ToList();
         var currentSkin = _configData.WebSkin ?? skins.FirstOrDefault().Code;
 
-        var skinCards = new List<object>();
+        var skinGrid = new DivComponent().WithAttribute<ComponentBase>("class", "skin-grid");
         foreach (var (code, skin) in skins)
         {
-            var codeStr = code;
             var p = skin.PreviewInfo;
             var gradient = $"linear-gradient(135deg,{p.BackgroundColor} 0%,{p.CardColor} 100%)";
-            var card = H.Create("div",
-                H.Create("div", p.Icon).Class("skin-icon"),
-                H.Create("div", skin.Name).Class("skin-desc"),
-                H.Create("div", p.Description).Class("skin-desc"),
-                H.Create("div",
-                    H.Create("span").Class("color-dot").Attr("style", $"background:{p.BackgroundColor};"),
-                    H.Create("span").Class("color-dot").Attr("style", $"background:{p.CardColor};"),
-                    H.Create("span").Class("color-dot").Attr("style", $"background:{p.AccentColor};")
-                ).Class("skin-colors")
-            ).Class("skin-option" + (code == currentSkin ? " selected" : ""))
-             .Attr("data-skin", code).Attr("onclick", $"selectSkin('{code}')")
-             .Attr("style", $"border-color:{p.BorderColor};background:{gradient};color:{p.TextColor};");
-            skinCards.Add(card);
+            var isSelected = code == currentSkin;
+
+            var card = new DivComponent()
+                .Class("skin-option" + (isSelected ? " selected" : ""))
+                .Attr("data-skin", code)
+                .Attr("onclick", $"selectSkin('{code}')")
+                .Attr("style", $"border-color:{p.BorderColor};background:{gradient};color:{p.TextColor};")
+                .Add(new DivComponent(p.Icon).WithAttribute<ComponentBase>("class", "skin-icon"))
+                .Add(new DivComponent(skin.Name).WithAttribute<ComponentBase>("class", "skin-desc"))
+                .Add(new DivComponent(p.Description).WithAttribute<ComponentBase>("class", "skin-desc"))
+                .Add(new DivComponent()
+                    .WithAttribute<ComponentBase>("class", "skin-colors")
+                    .Add(new SpanComponent().WithAttribute<ComponentBase>("class", "color-dot").Attr("style", $"background:{p.BackgroundColor};"))
+                    .Add(new SpanComponent().WithAttribute<ComponentBase>("class", "color-dot").Attr("style", $"background:{p.CardColor};"))
+                    .Add(new SpanComponent().WithAttribute<ComponentBase>("class", "color-dot").Attr("style", $"background:{p.AccentColor};")));
+
+            skinGrid.Add(card);
         }
 
         var previewP = _skinManager.GetSkin(currentSkin)?.PreviewInfo ?? skins.First().Skin.PreviewInfo;
-        var previewSection = H.Create("div",
-            H.Create("h3", "Preview").Class("skin-preview-title"),
-            H.Create("div",
-                H.Create("div",
-                    H.Create("h4", _localization.InitSkinPreviewCardTitle),
-                    H.Create("p", _localization.InitSkinPreviewCardContent)
-                ).Class("preview-card").Attr("style", $"background:{previewP.CardColor};border-color:{previewP.BorderColor};"),
-                H.Create("div",
-                    H.Create("button", _localization.InitSkinPreviewPrimaryBtn).Attr("type", "button")
-                        .Class("preview-btn").Attr("style", $"background:{previewP.AccentColor};color:#fff;"),
-                    H.Create("button", _localization.InitSkinPreviewSecondaryBtn).Attr("type", "button")
-                        .Class("preview-btn").Attr("style", $"background:{previewP.AccentColor};opacity:0.6;color:#fff;")
-                ).Class("preview-btns")
-            ).Class("preview-inner"),
-            H.Input().Attr("type", "hidden").Attr("name", "webSkin").Attr("value", currentSkin).Attr("id", "skinInput")
-        ).Attr("id", "preview").Class("skin-preview-box")
-         .Attr("style", $"background:{previewP.BackgroundColor};color:{previewP.TextColor};border-color:{previewP.BorderColor};");
+        var previewSection = new DivComponent().WithAttribute<ComponentBase>("id", "preview").WithAttribute<ComponentBase>("class", "skin-preview-box")
+            .Attr("style", $"background:{previewP.BackgroundColor};color:{previewP.TextColor};border-color:{previewP.BorderColor};")
+            .Add(new HeadingComponent("h3").Text("Preview").WithAttribute<ComponentBase>("class", "skin-preview-title"))
+            .Add(new DivComponent().WithAttribute<ComponentBase>("class", "preview-inner")
+                .Add(new DivComponent()
+                    .WithAttribute<ComponentBase>("class", "preview-card")
+                    .Attr("style", $"background:{previewP.CardColor};border-color:{previewP.BorderColor};")
+                    .Add(new HeadingComponent("h4").Text(_localization.InitSkinPreviewCardTitle))
+                    .Add(new PComponent(_localization.InitSkinPreviewCardContent)))
+                .Add(new DivComponent().WithAttribute<ComponentBase>("class", "preview-btns")
+                    .Add(new ButtonComponent()
+                        .Text(_localization.InitSkinPreviewPrimaryBtn)
+                        .Type("button")
+                        .WithAttribute<ComponentBase>("class", "preview-btn")
+                        .Attr("style", $"background:{previewP.AccentColor};color:#fff;"))
+                    .Add(new ButtonComponent()
+                        .Text(_localization.InitSkinPreviewSecondaryBtn)
+                        .Type("button")
+                        .WithAttribute<ComponentBase>("class", "preview-btn")
+                        .Attr("style", $"background:{previewP.AccentColor};opacity:0.6;color:#fff;"))))
+            .Add(new InputComponent()
+                .Type("hidden")
+                .Name("webSkin")
+                .Value(currentSkin)
+                .WithAttribute<ComponentBase>("id", "skinInput"));
 
-        form.Add(H.Create("div",
-            H.Create("label", _localization.InitSkinLabel).Attr("for", "webSkin"),
-            H.Create("div", skinCards.ToArray()).Class("skin-grid"),
-            H.Create("div", previewSection).Class("skin-preview-section")
-        ).Class("form-group"));
+        return new FormGroupComponent()
+            .Add(new LabelComponent().For("webSkin").Text(_localization.InitSkinLabel))
+            .Add(skinGrid)
+            .Add(new DivComponent().WithAttribute<ComponentBase>("class", "skin-preview-section")
+                .Add(previewSection));
     }
 
-    private object[] GetAIClientTypeOptions()
+    private ComponentBase BuildAIClientTypeSelect()
     {
         // Auto-discover all types that implement IAIClientFactory via reflection
         var factoryTypes = AppDomain.CurrentDomain.GetAssemblies()
@@ -234,7 +290,13 @@ public class InitController : Controller
             .Where(type => typeof(IAIClientFactory).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
             .ToList();
 
-        var options = new List<object>();
+        var select = new SelectComponent()
+            .Name("aiClientType")
+            .WithAttribute<ComponentBase>("id", "aiClientTypeSelect")
+            .WithAttribute<ComponentBase>("onchange", "onClientTypeChange(this.value)");
+
+        string? currentType = _configData.AIClientType;
+
         foreach (var type in factoryTypes)
         {
             try
@@ -246,7 +308,13 @@ public class InitController : Controller
                 // Use current _localization to get localized display name
                 var displayName = _localization.GetConfigDisplayName(typeName, out _) ?? typeName;
                 
-                options.Add(H.Create("option", displayName).Attr("value", type.Name));
+                select.AddOption(type.Name, displayName);
+                
+                // Set current selected item
+                if (type.Name == currentType)
+                {
+                    select.Selected(type.Name);
+                }
             }
             catch
             {
@@ -254,21 +322,13 @@ public class InitController : Controller
             }
         }
 
-        // Set current selected item
-        var currentType = _configData.AIClientType ?? (options.FirstOrDefault() as System.Xml.Linq.XElement)?.Attribute("value")?.Value;
-        if (!string.IsNullOrEmpty(currentType))
+        // If no type selected, select first one
+        if (string.IsNullOrEmpty(currentType) && factoryTypes.Count > 0)
         {
-            foreach (var opt in options.OfType<System.Xml.Linq.XElement>())
-            {
-                if (opt.Attribute("value")?.Value == currentType)
-                {
-                    opt.SetAttributeValue("selected", "selected");
-                    break;
-                }
-            }
+            select.Selected(factoryTypes[0].Name);
         }
 
-        return options.ToArray();
+        return select;
     }
 
     private Dictionary<string, string> GetAIClientHelpTopicMapping()
