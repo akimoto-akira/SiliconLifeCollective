@@ -146,6 +146,157 @@ internal static class LiteDBManager
         }
     }
 
+    // ==================== Collection Management ====================
+
+    /// <summary>
+    /// Gets all user collection names in the database (excludes system collections)
+    /// </summary>
+    public static IReadOnlyList<string> GetCollectionNames()
+    {
+        EnsureInitialized();
+        return _db!.GetCollectionNames().OrderBy(n => n).ToList();
+    }
+
+    /// <summary>
+    /// Checks whether a collection with the specified name exists
+    /// </summary>
+    public static bool CollectionExists(string name)
+    {
+        EnsureInitialized();
+        if (string.IsNullOrWhiteSpace(name)) return false;
+        return _db!.CollectionExists(name);
+    }
+
+    /// <summary>
+    /// Gets the document count of the specified collection
+    /// </summary>
+    public static int GetCollectionCount(string name)
+    {
+        EnsureInitialized();
+        if (string.IsNullOrWhiteSpace(name)) return 0;
+        if (!_db!.CollectionExists(name)) return 0;
+        return _db.GetCollection(name).Count();
+    }
+
+    /// <summary>
+    /// Creates a new collection if it does not already exist.
+    /// LiteDB creates collections lazily; this inserts and removes a probe document
+    /// to ensure the collection is materialised immediately.
+    /// </summary>
+    public static bool CreateCollection(string name)
+    {
+        EnsureInitialized();
+        if (string.IsNullOrWhiteSpace(name)) return false;
+        if (_db!.CollectionExists(name)) return false;
+
+        var col = _db.GetCollection(name);
+        var probe = new BsonDocument { ["_placeholder"] = true };
+        col.Insert(probe);
+        col.Delete(probe["_id"]);
+        return true;
+    }
+
+    /// <summary>
+    /// Drops the collection with the specified name
+    /// </summary>
+    public static bool DropCollection(string name)
+    {
+        EnsureInitialized();
+        if (string.IsNullOrWhiteSpace(name)) return false;
+        return _db!.DropCollection(name);
+    }
+
+    /// <summary>
+    /// Renames a collection
+    /// </summary>
+    public static bool RenameCollection(string oldName, string newName)
+    {
+        EnsureInitialized();
+        if (string.IsNullOrWhiteSpace(oldName) || string.IsNullOrWhiteSpace(newName)) return false;
+        if (!_db!.CollectionExists(oldName)) return false;
+        if (_db.CollectionExists(newName)) return false;
+        return _db.RenameCollection(oldName, newName);
+    }
+
+    // ==================== Document CRUD ====================
+
+    /// <summary>
+    /// Gets documents from the specified collection with pagination support.
+    /// Returns raw BsonDocuments so the admin UI can render any schema.
+    /// </summary>
+    public static IReadOnlyList<BsonDocument> GetDocuments(string collectionName, int skip = 0, int limit = 100)
+    {
+        EnsureInitialized();
+        if (string.IsNullOrWhiteSpace(collectionName)) return Array.Empty<BsonDocument>();
+        if (!_db!.CollectionExists(collectionName)) return Array.Empty<BsonDocument>();
+        if (skip < 0) skip = 0;
+        if (limit <= 0) limit = 100;
+
+        return _db.GetCollection(collectionName)
+            .Find(Query.All(), skip, limit)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Gets a single document by its _id from the specified collection
+    /// </summary>
+    public static BsonDocument? GetDocumentById(string collectionName, BsonValue id)
+    {
+        EnsureInitialized();
+        if (string.IsNullOrWhiteSpace(collectionName) || id == null || id.IsNull) return null;
+        if (!_db!.CollectionExists(collectionName)) return null;
+        return _db.GetCollection(collectionName).FindById(id);
+    }
+
+    /// <summary>
+    /// Inserts a document into the specified collection.
+    /// If the document has no _id it will be auto-generated.
+    /// </summary>
+    public static BsonValue InsertDocument(string collectionName, BsonDocument document)
+    {
+        EnsureInitialized();
+        if (string.IsNullOrWhiteSpace(collectionName)) throw new ArgumentException("Collection name is required", nameof(collectionName));
+        ArgumentNullException.ThrowIfNull(document);
+        return _db!.GetCollection(collectionName).Insert(document);
+    }
+
+    /// <summary>
+    /// Updates a document in the specified collection (keyed by _id).
+    /// Returns true when a matching document was updated.
+    /// </summary>
+    public static bool UpdateDocument(string collectionName, BsonDocument document)
+    {
+        EnsureInitialized();
+        if (string.IsNullOrWhiteSpace(collectionName)) return false;
+        ArgumentNullException.ThrowIfNull(document);
+        if (!_db!.CollectionExists(collectionName)) return false;
+        if (!document.ContainsKey("_id") || document["_id"].IsNull)
+            throw new InvalidOperationException("Document must contain a non-null _id for update");
+        return _db.GetCollection(collectionName).Update(document);
+    }
+
+    /// <summary>
+    /// Upserts (insert or update) a document in the specified collection.
+    /// </summary>
+    public static bool UpsertDocument(string collectionName, BsonDocument document)
+    {
+        EnsureInitialized();
+        if (string.IsNullOrWhiteSpace(collectionName)) return false;
+        ArgumentNullException.ThrowIfNull(document);
+        return _db!.GetCollection(collectionName).Upsert(document);
+    }
+
+    /// <summary>
+    /// Deletes a document from the specified collection by its _id
+    /// </summary>
+    public static bool DeleteDocument(string collectionName, BsonValue id)
+    {
+        EnsureInitialized();
+        if (string.IsNullOrWhiteSpace(collectionName) || id == null || id.IsNull) return false;
+        if (!_db!.CollectionExists(collectionName)) return false;
+        return _db.GetCollection(collectionName).Delete(id);
+    }
+
     /// <summary>
     /// Shuts down LiteDB and releases resources
     /// </summary>

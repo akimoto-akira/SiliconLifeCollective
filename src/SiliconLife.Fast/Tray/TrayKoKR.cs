@@ -114,6 +114,11 @@ public class TrayKoKR : TrayLocalizationBase
     public override string Configuration => "설정";
 
     /// <summary>
+    /// Gets the LiteDB management menu item text
+    /// </summary>
+    public override string LiteDBManagement => "LiteDB 관리";
+
+    /// <summary>
     /// Gets the exit menu item text
     /// </summary>
     public override string Exit => "종료";
