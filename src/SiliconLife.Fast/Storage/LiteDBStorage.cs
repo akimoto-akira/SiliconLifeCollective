@@ -36,6 +36,18 @@ public class LiteDBStorage : IStorage
             return default;
         }
 
+        // Special handling for .md files (raw text storage)
+        if (typeof(T) == typeof(string) && key.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+        {
+            // Try to extract string value from the stored document
+            if (record.Data.TryGetValue("value", out BsonValue stringValue))
+            {
+                return (T?)(object)stringValue.AsString;
+            }
+            // Fallback: try direct conversion
+            return (T?)(object)record.Data.ToString();
+        }
+
         return BsonMapper.Global.Deserialize<T>(record.Data);
     }
 
@@ -43,11 +55,29 @@ public class LiteDBStorage : IStorage
     {
         var existing = _collection.FindOne(x => x.Key == key);
         
-        var bsonData = BsonMapper.Global.Serialize(data);
+        // Special handling for string data with .md extension (raw text storage)
+        BsonValue bsonData;
+        if (data is string textData && key.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+        {
+            // Store markdown content as string value directly
+            bsonData = textData;
+        }
+        else
+        {
+            bsonData = BsonMapper.Global.Serialize(data);
+        }
         
         if (existing != null)
         {
-            existing.Data = bsonData.AsDocument;
+            // For .md files, store as string; for others, store as document
+            if (data is string && key.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+            {
+                existing.Data = new BsonDocument { ["value"] = bsonData };
+            }
+            else
+            {
+                existing.Data = bsonData.AsDocument;
+            }
             existing.DataType = typeof(T).FullName ?? typeof(T).Name;
             existing.UpdatedAt = DateTime.UtcNow;
             _collection.Update(existing);
@@ -58,7 +88,9 @@ public class LiteDBStorage : IStorage
             {
                 Key = key,
                 DataType = typeof(T).FullName ?? typeof(T).Name,
-                Data = bsonData.AsDocument,
+                Data = data is string && key.EndsWith(".md", StringComparison.OrdinalIgnoreCase)
+                    ? new BsonDocument { ["value"] = bsonData }
+                    : bsonData.AsDocument,
                 UpdatedAt = DateTime.UtcNow
             };
             _collection.Insert(record);

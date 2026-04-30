@@ -284,6 +284,37 @@ public class FileSystemTimeStorage : ITimeStorage
         => Query<object>(range).Count;
 
     /// <summary>
+    /// Returns the most recent entries for <paramref name="key"/>, ordered by
+    /// timestamp descending. Scans the entire key directory and takes the top
+    /// <paramref name="limit"/> entries.
+    /// </summary>
+    public List<TimeEntry<T>> QueryLatest<T>(string key, int limit)
+    {
+        _rwLock.EnterReadLock();
+        try
+        {
+            var result = new List<TimeEntry<T>>();
+            string dir = GetKeyDirectory(key);
+            if (!Directory.Exists(dir)) return result;
+
+            foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
+            {
+                if (!TryParseTimestampFromFile(dir, file, out IncompleteDate fileTime)) continue;
+
+                foreach (T data in ReadAllLines<T>(file))
+                    result.Add(new TimeEntry<T>(key, fileTime, data));
+            }
+
+            result.Sort((a, b) => b.Timestamp.CompareTo(a.Timestamp));
+            return limit > 0 ? result.Take(limit).ToList() : result;
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
+        }
+    }
+
+    /// <summary>
     /// Queries all entries at the next finer time level under the given IncompleteDate.
     /// Uses IncompleteDate.Expand() to get all possible values at the next level.
     /// </summary>

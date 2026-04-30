@@ -56,6 +56,15 @@ public interface ITimeStorage : IStorage
     /// <returns>All matching entries, ordered by timestamp ascending.</returns>
     List<TimeEntry<T>> Query<T>(IncompleteDate? range);
 
+    /// <summary>
+    /// Returns the most recent entries for the given key, ordered by timestamp descending.
+    /// Ignores any time range — the query is purely driven by the underlying storage order.
+    /// </summary>
+    /// <param name="key">The logical key prefix to match.</param>
+    /// <param name="limit">Maximum number of entries to return. Values &lt;= 0 return all entries.</param>
+    /// <returns>The matching entries, ordered by timestamp descending (most recent first).</returns>
+    List<TimeEntry<T>> QueryLatest<T>(string key, int limit);
+
 
     /// <summary>
     /// Returns the number of entries matching the given key and time range.

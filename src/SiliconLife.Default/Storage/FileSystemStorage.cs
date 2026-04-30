@@ -49,6 +49,7 @@ public class FileSystemStorage : IStorage
     /// <summary>
     /// Reads data from storage by key and deserializes to type <typeparamref name="T"/>.
     /// The file is expected to contain a single-line JSON record.
+    /// For .md files, reads raw text content.
     /// </summary>
     public T? Read<T>(string key)
     {
@@ -57,7 +58,14 @@ public class FileSystemStorage : IStorage
         if (!File.Exists(filePath))
             return default;
 
-        // Read only the first non-empty line
+        // Special handling for .md files (raw text)
+        if (typeof(T) == typeof(string) && key.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+        {
+            string content = File.ReadAllText(filePath);
+            return (T?)(object)content;
+        }
+
+        // Read only the first non-empty line for JSON files
         foreach (string line in File.ReadLines(filePath))
         {
             if (!string.IsNullOrWhiteSpace(line))
@@ -70,6 +78,7 @@ public class FileSystemStorage : IStorage
     /// <summary>
     /// Writes data to storage by key as a single-line JSON record,
     /// overwriting any existing content.
+    /// For string data with .md extension, writes raw text without JSON serialization.
     /// </summary>
     public void Write<T>(string key, T data)
     {
@@ -79,8 +88,16 @@ public class FileSystemStorage : IStorage
         if (directory != null && !Directory.Exists(directory))
             Directory.CreateDirectory(directory);
 
-        string line = JsonSerializer.Serialize(data, _jsonOptions);
-        File.WriteAllText(filePath, line + Environment.NewLine);
+        // Special handling for string data with .md extension (raw text)
+        if (data is string textData && key.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+        {
+            File.WriteAllText(filePath, textData);
+        }
+        else
+        {
+            string line = JsonSerializer.Serialize(data, _jsonOptions);
+            File.WriteAllText(filePath, line + Environment.NewLine);
+        }
     }
 
     /// <summary>

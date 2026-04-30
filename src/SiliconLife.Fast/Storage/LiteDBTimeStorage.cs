@@ -78,14 +78,26 @@ public class LiteDBTimeStorage : ITimeStorage
     public void Write<T>(string key, IncompleteDate timestamp, T data)
     {
         var (start, _) = timestamp.GetRange();
-        var bsonData = BsonMapper.Global.Serialize(data);
+        var bsonValue = BsonMapper.Global.Serialize(data);
+
+        // Ensure we have a BsonDocument for storage
+        BsonDocument bsonDoc;
+        if (bsonValue.IsDocument)
+        {
+            bsonDoc = bsonValue.AsDocument;
+        }
+        else
+        {
+            // Wrap non-document values in a document
+            bsonDoc = new BsonDocument { ["value"] = bsonValue };
+        }
 
         var record = new TimeRecord
         {
             Key = key,
             Timestamp = start,
             DataType = typeof(T).FullName ?? typeof(T).Name,
-            Data = bsonData.AsDocument
+            Data = bsonDoc
         };
 
         _collection.Insert(record);
@@ -101,7 +113,20 @@ public class LiteDBTimeStorage : ITimeStorage
             return default;
         }
 
-        return BsonMapper.Global.Deserialize<T>(record.Data);
+        // Try to deserialize from the stored document
+        try
+        {
+            return BsonMapper.Global.Deserialize<T>(record.Data);
+        }
+        catch
+        {
+            // Fallback: try extracting from wrapped value
+            if (record.Data.TryGetValue("value", out BsonValue wrappedValue))
+            {
+                return BsonMapper.Global.Deserialize<T>(wrappedValue);
+            }
+            return default;
+        }
     }
 
     public bool Exists(string key, IncompleteDate timestamp)
@@ -136,7 +161,7 @@ public class LiteDBTimeStorage : ITimeStorage
             r.Key,
             new IncompleteDate(r.Timestamp.Year, r.Timestamp.Month, r.Timestamp.Day, 
                              r.Timestamp.Hour, r.Timestamp.Minute, r.Timestamp.Second),
-            BsonMapper.Global.Deserialize<T>(r.Data)
+            SafeDeserialize<T>(r.Data)
         )).ToList();
     }
 
@@ -156,7 +181,23 @@ public class LiteDBTimeStorage : ITimeStorage
             r.Key,
             new IncompleteDate(r.Timestamp.Year, r.Timestamp.Month, r.Timestamp.Day, 
                              r.Timestamp.Hour, r.Timestamp.Minute, r.Timestamp.Second),
-            BsonMapper.Global.Deserialize<T>(r.Data)
+            SafeDeserialize<T>(r.Data)
+        )).ToList();
+    }
+
+    public List<TimeEntry<T>> QueryLatest<T>(string key, int limit)
+    {
+        var query = _collection.Query()
+            .Where(x => x.Key.StartsWith(key))
+            .OrderByDescending(x => x.Timestamp);
+
+        var records = limit > 0 ? query.Limit(limit).ToList() : query.ToList();
+
+        return records.Select(r => new TimeEntry<T>(
+            r.Key,
+            new IncompleteDate(r.Timestamp.Year, r.Timestamp.Month, r.Timestamp.Day,
+                             r.Timestamp.Hour, r.Timestamp.Minute, r.Timestamp.Second),
+            SafeDeserialize<T>(r.Data)
         )).ToList();
     }
 
@@ -210,7 +251,7 @@ public class LiteDBTimeStorage : ITimeStorage
             r.Key,
             new IncompleteDate(r.Timestamp.Year, r.Timestamp.Month, r.Timestamp.Day, 
                              r.Timestamp.Hour, r.Timestamp.Minute, r.Timestamp.Second),
-            BsonMapper.Global.Deserialize<T>(r.Data)
+            SafeDeserialize<T>(r.Data)
         )).ToList();
     }
 
@@ -275,7 +316,7 @@ public class LiteDBTimeStorage : ITimeStorage
         
         foreach (var record in records)
         {
-            var data = BsonMapper.Global.Deserialize<T>(record.Data);
+            var data = SafeDeserialize<T>(record.Data);
             if (data != null && summaryPropertySelector(data))
             {
                 return true;
@@ -299,7 +340,27 @@ public class LiteDBTimeStorage : ITimeStorage
             r.Key,
             new IncompleteDate(r.Timestamp.Year, r.Timestamp.Month, r.Timestamp.Day, 
                              r.Timestamp.Hour, r.Timestamp.Minute, r.Timestamp.Second),
-            BsonMapper.Global.Deserialize<T>(r.Data)
+            SafeDeserialize<T>(r.Data)
         )).ToList();
+    }
+
+    /// <summary>
+    /// Safely deserialize a BsonDocument to type T, handling wrapped values.
+    /// </summary>
+    private static T? SafeDeserialize<T>(BsonDocument data)
+    {
+        try
+        {
+            return BsonMapper.Global.Deserialize<T>(data);
+        }
+        catch
+        {
+            // Fallback: try extracting from wrapped value
+            if (data.TryGetValue("value", out BsonValue wrappedValue))
+            {
+                return BsonMapper.Global.Deserialize<T>(wrappedValue);
+            }
+            return default;
+        }
     }
 }

@@ -99,20 +99,22 @@ public readonly struct IncompleteDate : IEquatable<IncompleteDate>, IComparable<
     /// <param name="refMonth">Fallback month when month is unspecified (default 1).</param>
     public (DateTime Start, DateTime End) GetRange(int refMonth = 1)
     {
-        int m = Month ?? refMonth;
+        // When Month is unspecified, the range should span the entire year.
+        int startMonth = Month ?? 1;
+        int endMonth = Month ?? 12;
 
         int startDay = 1;
-        int endDay = DateTime.DaysInMonth(Year, m);
+        int endDay = DateTime.DaysInMonth(Year, endMonth);
         if (Day.HasValue)
         {
             startDay = Day.Value;
             endDay = Day.Value;
         }
 
-        var start = new DateTime(Year, m, startDay,
+        var start = new DateTime(Year, startMonth, startDay,
             Hour ?? 0, Minute ?? 0, Second ?? 0);
 
-        var end = new DateTime(Year, m, endDay,
+        var end = new DateTime(Year, endMonth, endDay,
             Hour ?? 23, Minute ?? 59, Second ?? 59);
 
         return (start, end);

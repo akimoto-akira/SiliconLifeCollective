@@ -120,9 +120,15 @@ public class BroadcastChannel : SessionBase
     {
         lock (_lock)
         {
-            List<ChatMessage> all = LoadAllMessages();
-            // Return the most recent messages
-            return all.Skip(Math.Max(0, all.Count - limit)).Take(limit).ToList();
+            // Pull the most recent N entries directly from storage — ignore time ranges.
+            List<TimeEntry<ChatMessage>> entries = _storage.QueryLatest<ChatMessage>(_storageKey, limit);
+            List<ChatMessage> messages = entries
+                .Where(e => e.Data != null)
+                .Select(e => e.Data!)
+                .ToList();
+
+            messages.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
+            return messages;
         }
     }
 
@@ -151,22 +157,16 @@ public class BroadcastChannel : SessionBase
     {
         lock (_lock)
         {
-            int year = DateTime.UtcNow.Year;
-            while (year >= 1)
+            List<TimeEntry<ChatMessage>> entries = _storage.Query<ChatMessage>(_storageKey, null);
+            foreach (TimeEntry<ChatMessage> entry in entries)
             {
-                IncompleteDate range = new(year);
-                List<TimeEntry<ChatMessage>> entries = _storage.Query<ChatMessage>(_storageKey, range);
-                foreach (TimeEntry<ChatMessage> entry in entries)
+                if (entry.Data?.Id == messageId && !entry.Data.ReadBy.Contains(readerId))
                 {
-                    if (entry.Data?.Id == messageId && !entry.Data.ReadBy.Contains(readerId))
-                    {
-                        entry.Data.ReadBy.Add(readerId);
-                        _storage.Write(_storageKey, entry.Timestamp, entry.Data);
-                        _logger.Trace(null, "BroadcastChannel {0}: message {1} read by {2}", _fixedId, messageId, readerId);
-                        return;
-                    }
+                    entry.Data.ReadBy.Add(readerId);
+                    _storage.Write(_storageKey, entry.Timestamp, entry.Data);
+                    _logger.Trace(null, "BroadcastChannel {0}: message {1} read by {2}", _fixedId, messageId, readerId);
+                    return;
                 }
-                year--;
             }
         }
     }
@@ -177,21 +177,18 @@ public class BroadcastChannel : SessionBase
         lock (_lock)
         {
             HashSet<Guid> ids = new(messageIds);
-            int year = DateTime.UtcNow.Year;
-            while (year >= 1 && ids.Count > 0)
+            if (ids.Count == 0) return;
+
+            List<TimeEntry<ChatMessage>> entries = _storage.Query<ChatMessage>(_storageKey, null);
+            foreach (TimeEntry<ChatMessage> entry in entries)
             {
-                IncompleteDate range = new(year);
-                List<TimeEntry<ChatMessage>> entries = _storage.Query<ChatMessage>(_storageKey, range);
-                foreach (TimeEntry<ChatMessage> entry in entries)
+                if (entry.Data != null && ids.Contains(entry.Data.Id) && !entry.Data.ReadBy.Contains(readerId))
                 {
-                    if (entry.Data != null && ids.Contains(entry.Data.Id) && !entry.Data.ReadBy.Contains(readerId))
-                    {
-                        entry.Data.ReadBy.Add(readerId);
-                        _storage.Write(_storageKey, entry.Timestamp, entry.Data);
-                        ids.Remove(entry.Data.Id);
-                    }
+                    entry.Data.ReadBy.Add(readerId);
+                    _storage.Write(_storageKey, entry.Timestamp, entry.Data);
+                    ids.Remove(entry.Data.Id);
+                    if (ids.Count == 0) break;
                 }
-                year--;
             }
         }
     }
@@ -200,18 +197,11 @@ public class BroadcastChannel : SessionBase
 
     private List<ChatMessage> LoadAllMessages()
     {
-        List<ChatMessage> all = [];
-        int year = DateTime.UtcNow.Year;
-        while (year >= 2026)          // broadcast channels didn't exist before the project started
-        {
-            IncompleteDate range = new(year);
-            List<TimeEntry<ChatMessage>> entries = _storage.Query<ChatMessage>(_storageKey, range);
-            foreach (TimeEntry<ChatMessage> e in entries)
-            {
-                if (e.Data != null) all.Add(e.Data);
-            }
-            year--;
-        }
+        List<TimeEntry<ChatMessage>> entries = _storage.Query<ChatMessage>(_storageKey, null);
+        List<ChatMessage> all = entries
+            .Where(e => e.Data != null)
+            .Select(e => e.Data!)
+            .ToList();
         all.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
         return all;
     }
