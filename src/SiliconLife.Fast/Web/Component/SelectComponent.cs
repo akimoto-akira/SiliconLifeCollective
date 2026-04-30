@@ -25,6 +25,42 @@ public class SelectComponent : ComponentBase
     private bool _required = false;
 
     /// <summary>
+    /// Set ID (returns SelectComponent for chaining)
+    /// </summary>
+    public new SelectComponent Id(string id)
+    {
+        base.Id = id;
+        return this;
+    }
+
+    /// <summary>
+    /// Set Class (returns SelectComponent for chaining)
+    /// </summary>
+    public new SelectComponent Class(string className)
+    {
+        base.Class = string.IsNullOrEmpty(base.Class) ? className : $"{base.Class} {className}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Style (returns SelectComponent for chaining)
+    /// </summary>
+    public new SelectComponent Style(string style)
+    {
+        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Attribute (returns SelectComponent for chaining)
+    /// </summary>
+    public new SelectComponent Attr(string name, string value)
+    {
+        base.Attributes[name] = value;
+        return this;
+    }
+
+    /// <summary>
     /// Set select name
     /// </summary>
     public SelectComponent Name(string name)
@@ -88,18 +124,18 @@ public class SelectComponent : ComponentBase
         if (!string.IsNullOrEmpty(_name))
             select.Attr("name", _name);
 
-        if (!string.IsNullOrEmpty(Id))
-            select.Id(Id);
+        if (!string.IsNullOrEmpty(base.Id))
+            select.Attr("id", base.Id);
 
         var classes = new List<string>();
-        if (!string.IsNullOrEmpty(Class))
-            classes.Add(Class);
+        if (!string.IsNullOrEmpty(base.Class))
+            classes.Add(base.Class);
         
         if (classes.Count > 0)
             select.Class(string.Join(" ", classes));
 
-        if (!string.IsNullOrEmpty(Style))
-            select.Style(Style);
+        if (!string.IsNullOrEmpty(base.Style))
+            select.Attr("style", base.Style);
 
         if (_multiple)
             select.Attr("multiple", "multiple");

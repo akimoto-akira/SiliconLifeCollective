@@ -24,6 +24,42 @@ public class ButtonComponent : ComponentBase
     private string? _onclick;
 
     /// <summary>
+    /// Set ID (returns ButtonComponent for chaining)
+    /// </summary>
+    public new ButtonComponent Id(string id)
+    {
+        base.Id = id;
+        return this;
+    }
+
+    /// <summary>
+    /// Set Class (returns ButtonComponent for chaining)
+    /// </summary>
+    public new ButtonComponent Class(string className)
+    {
+        base.Class = string.IsNullOrEmpty(base.Class) ? className : $"{base.Class} {className}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Style (returns ButtonComponent for chaining)
+    /// </summary>
+    public new ButtonComponent Style(string style)
+    {
+        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Attribute (returns ButtonComponent for chaining)
+    /// </summary>
+    public new ButtonComponent Attr(string name, string value)
+    {
+        base.Attributes[name] = value;
+        return this;
+    }
+
+    /// <summary>
     /// Set button text
     /// </summary>
     public ButtonComponent Text(string text)
@@ -74,14 +110,14 @@ public class ButtonComponent : ComponentBase
             .Attr("type", _type)
             .Text(H.Escape(_text));
 
-        if (!string.IsNullOrEmpty(Id))
-            button.Id(Id);
+        if (!string.IsNullOrEmpty(base.Id))
+            button.Attr("id", base.Id);
 
-        if (!string.IsNullOrEmpty(Class))
-            button.Class(Class);
+        if (!string.IsNullOrEmpty(base.Class))
+            button.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(Style))
-            button.Style(Style);
+        if (!string.IsNullOrEmpty(base.Style))
+            button.Attr("style", base.Style);
 
         foreach (var kvp in Attributes)
         {

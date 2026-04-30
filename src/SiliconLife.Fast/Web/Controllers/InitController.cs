@@ -45,6 +45,10 @@ public class InitController : Controller
         {
             HandleBrowse();
         }
+        else if (Request.Url?.AbsolutePath == "/init/ai-config-metadata" || Request.Url?.AbsolutePath == "/init/ai-config-metadata/")
+        {
+            HandleGetAIConfigMetadata();
+        }
         else
         {
             ResolveLocalizationFromQuery();
@@ -78,8 +82,8 @@ public class InitController : Controller
         var form = new FormComponent()
             .Action("/init")
             .Method("POST")
-            .WithAttribute<ComponentBase>("class", "init-form")
-            .WithAttribute<ComponentBase>("onsubmit", "return validateInitForm()");
+            .Class("init-form")
+            .Attr("onsubmit", "return validateInitForm()");
 
         // Language form group
         form.Add(BuildLanguageFormGroup());
@@ -109,12 +113,12 @@ public class InitController : Controller
             .Add(BuildAIClientTypeSelect()));
 
         // AI client help link container
-        form.Add(new DivComponent().WithAttribute<ComponentBase>("id", "aiClientHelpContainer").WithAttribute<ComponentBase>("class", "form-group")
-            .Add(new DivComponent().WithAttribute<ComponentBase>("id", "aiClientHelpLink")));
+        form.Add(new DivComponent().Id("aiClientHelpContainer").Class("form-group")
+            .Add(new DivComponent().Id("aiClientHelpLink")));
 
         // AI config fields container
-        form.Add(new DivComponent().WithAttribute<ComponentBase>("id", "aiConfigContainer").WithAttribute<ComponentBase>("class", "form-group")
-            .Add(new DivComponent().WithAttribute<ComponentBase>("id", "aiConfigFields")));
+        form.Add(new DivComponent().Id("aiConfigContainer").Class("form-group")
+            .Add(new DivComponent().Id("aiConfigFields")));
 
         // Data directory field
         form.Add(BuildDataDirectoryFormGroup());
@@ -123,35 +127,36 @@ public class InitController : Controller
         form.Add(BuildSkinFormGroup());
 
         // Submit button
-        form.Add(new DivComponent().WithAttribute<ComponentBase>("class", "form-actions")
+        form.Add(new DivComponent().Class("form-actions")
             .Add(new ButtonComponent()
                 .Text(_localization.InitSubmitButton)
                 .Type("submit")));
 
         // Build page HTML
-        var page = new DivComponent().WithAttribute<ComponentBase>("class", "init-container")
-            .Add(new DivComponent().WithAttribute<ComponentBase>("class", "init-card")
+        var page = new DivComponent().Class("init-container")
+            .Add(new DivComponent().Class("init-card")
                 .Add(new HeadingComponent("h1").Text("Silicon Life Collective"))
                 .Add(new PComponent(_localization.InitDescription))
-                .Add(error != null ? new DivComponent().WithAttribute<ComponentBase>("class", "form-error")
+                .Add(error != null ? new DivComponent().Class("form-error")
                     .Add(new PComponent(error)) : null)
                 .Add(form)
-                .Add(new DivComponent().WithAttribute<ComponentBase>("class", "init-footer")
+                .Add(new DivComponent().Class("init-footer")
                     .Add(new PComponent(_localization.InitFooterHint))
                     .Add(new AComponent(_localization.InitHelpLink)
                         .Href("/help")
-                        .WithAttribute<ComponentBase>("class", "init-help-link"))));
+                        .Class("init-help-link"))));
 
         var html = H.DocType() +
             H.Html()
                 .Add(H.Head()
-                    .Add(H.Meta().WithAttribute<ComponentBase>("charset", "utf-8"))
-                    .Add(H.Meta().WithAttribute<ComponentBase>("name", "viewport").WithAttribute<ComponentBase>("content", "width=device-width, initial-scale=1"))
+                    .Add(H.Meta().Attr("charset", "utf-8"))
+                    .Add(H.Meta().Attr("name", "viewport").Attr("content", "width=device-width, initial-scale=1"))
                     .Add(H.Title($"{_localization.InitPageTitle} - Silicon Life Collective"))
                     .Add(H.Style(GetStyles()))
                     .Add(H.Script(GetSkinSwitchScript().Build())))
                 .Add(H.Body()
-                    .Add(new RawHtml(page.Render())))
+                    .AddRendered(page.Render())
+                )
                 .Build();
 
         RenderHtml(html);
@@ -160,9 +165,9 @@ public class InitController : Controller
     private ComponentBase BuildLanguageFormGroup()
     {
         var currentLang = _localization.LanguageCode;
-        var select = new SelectComponent().Name("language").WithAttribute<ComponentBase>("id", "languageSelect")
+        var select = new SelectComponent().Name("language").Id("languageSelect")
             .Attr("data-current", currentLang)
-            .WithAttribute<ComponentBase>("onchange", "switchLanguage(this.value)");
+            .Attr("onchange", "switchLanguage(this.value)");
 
         foreach (var lang in LocalizationManager.Instance.GetRegisteredLanguages())
         {
@@ -180,13 +185,13 @@ public class InitController : Controller
         var switchBtn = new ButtonComponent()
             .Text(_localization.InitLanguageSwitchBtn)
             .Type("button")
-            .WithAttribute<ComponentBase>("class", "lang-switch-btn")
-            .WithAttribute<ComponentBase>("style", "display:none;")
-            .WithAttribute<ComponentBase>("onclick", "applyLanguage()");
+            .Class("lang-switch-btn")
+            .Style("display:none;")
+            .Attr("onclick", "applyLanguage()");
 
         return new FormGroupComponent()
             .Add(new LabelComponent().For("language").Text(_localization.InitLanguageLabel))
-            .Add(new DivComponent().WithAttribute<ComponentBase>("class", "lang-selector-row")
+            .Add(new DivComponent().Class("lang-selector-row")
                 .Add(select)
                 .Add(switchBtn));
     }
@@ -196,19 +201,19 @@ public class InitController : Controller
         var browseBtn = new ButtonComponent()
             .Text(_localization.InitDataDirectoryBrowse)
             .Type("button")
-            .WithAttribute<ComponentBase>("class", "dir-browse-btn")
-            .WithAttribute<ComponentBase>("onclick", "openDirBrowser()");
+            .Class("dir-browse-btn")
+            .Attr("onclick", "openDirBrowser()");
 
-        var inputRow = new DivComponent().WithAttribute<ComponentBase>("class", "dir-input-row")
+        var inputRow = new DivComponent().Class("dir-input-row")
             .Add(new InputComponent()
                 .Type("text")
                 .Name("dataDirectory")
                 .Placeholder(_localization.InitDataDirectoryPlaceholder)
                 .Value(_configData.DataDirectory.FullName)
-                .WithAttribute<ComponentBase>("id", "dataDirInput"))
+                .Id("dataDirInput"))
             .Add(browseBtn);
 
-        var browser = new DivComponent().WithAttribute<ComponentBase>("id", "dirBrowser").WithAttribute<ComponentBase>("class", "dir-browser").WithAttribute<ComponentBase>("style", "display:none;");
+        var browser = new DivComponent().Id("dirBrowser").Class("dir-browser").Style("display:none;");
 
         return new FormGroupComponent()
             .Add(new LabelComponent().For("dataDirectory").Text(_localization.InitDataDirectoryLabel))
@@ -224,7 +229,7 @@ public class InitController : Controller
             .ToList();
         var currentSkin = _configData.WebSkin ?? skins.FirstOrDefault().Code;
 
-        var skinGrid = new DivComponent().WithAttribute<ComponentBase>("class", "skin-grid");
+        var skinGrid = new DivComponent().Class("skin-grid");
         foreach (var (code, skin) in skins)
         {
             var p = skin.PreviewInfo;
@@ -236,49 +241,49 @@ public class InitController : Controller
                 .Attr("data-skin", code)
                 .Attr("onclick", $"selectSkin('{code}')")
                 .Attr("style", $"border-color:{p.BorderColor};background:{gradient};color:{p.TextColor};")
-                .Add(new DivComponent(p.Icon).WithAttribute<ComponentBase>("class", "skin-icon"))
-                .Add(new DivComponent(skin.Name).WithAttribute<ComponentBase>("class", "skin-desc"))
-                .Add(new DivComponent(p.Description).WithAttribute<ComponentBase>("class", "skin-desc"))
+                .Add(new SpanComponent(p.Icon).Class("skin-icon"))
+                .Add(new SpanComponent(skin.Name).Class("skin-desc"))
+                .Add(new SpanComponent(p.Description).Class("skin-desc"))
                 .Add(new DivComponent()
-                    .WithAttribute<ComponentBase>("class", "skin-colors")
-                    .Add(new SpanComponent().WithAttribute<ComponentBase>("class", "color-dot").Attr("style", $"background:{p.BackgroundColor};"))
-                    .Add(new SpanComponent().WithAttribute<ComponentBase>("class", "color-dot").Attr("style", $"background:{p.CardColor};"))
-                    .Add(new SpanComponent().WithAttribute<ComponentBase>("class", "color-dot").Attr("style", $"background:{p.AccentColor};")));
+                    .Class("skin-colors")
+                    .Add(new SpanComponent().Class("color-dot").Attr("style", $"background:{p.BackgroundColor};"))
+                    .Add(new SpanComponent().Class("color-dot").Attr("style", $"background:{p.CardColor};"))
+                    .Add(new SpanComponent().Class("color-dot").Attr("style", $"background:{p.AccentColor};")));
 
             skinGrid.Add(card);
         }
 
         var previewP = _skinManager.GetSkin(currentSkin)?.PreviewInfo ?? skins.First().Skin.PreviewInfo;
-        var previewSection = new DivComponent().WithAttribute<ComponentBase>("id", "preview").WithAttribute<ComponentBase>("class", "skin-preview-box")
+        var previewSection = new DivComponent().Id("preview").Class("skin-preview-box")
             .Attr("style", $"background:{previewP.BackgroundColor};color:{previewP.TextColor};border-color:{previewP.BorderColor};")
-            .Add(new HeadingComponent("h3").Text("Preview").WithAttribute<ComponentBase>("class", "skin-preview-title"))
-            .Add(new DivComponent().WithAttribute<ComponentBase>("class", "preview-inner")
+            .Add(new HeadingComponent("h3").Text("Preview").Class("skin-preview-title"))
+            .Add(new DivComponent().Class("preview-inner")
                 .Add(new DivComponent()
-                    .WithAttribute<ComponentBase>("class", "preview-card")
+                    .Class("preview-card")
                     .Attr("style", $"background:{previewP.CardColor};border-color:{previewP.BorderColor};")
                     .Add(new HeadingComponent("h4").Text(_localization.InitSkinPreviewCardTitle))
                     .Add(new PComponent(_localization.InitSkinPreviewCardContent)))
-                .Add(new DivComponent().WithAttribute<ComponentBase>("class", "preview-btns")
+                .Add(new DivComponent().Class("preview-btns")
                     .Add(new ButtonComponent()
                         .Text(_localization.InitSkinPreviewPrimaryBtn)
                         .Type("button")
-                        .WithAttribute<ComponentBase>("class", "preview-btn")
+                        .Class("preview-btn")
                         .Attr("style", $"background:{previewP.AccentColor};color:#fff;"))
                     .Add(new ButtonComponent()
                         .Text(_localization.InitSkinPreviewSecondaryBtn)
                         .Type("button")
-                        .WithAttribute<ComponentBase>("class", "preview-btn")
+                        .Class("preview-btn")
                         .Attr("style", $"background:{previewP.AccentColor};opacity:0.6;color:#fff;"))))
             .Add(new InputComponent()
                 .Type("hidden")
                 .Name("webSkin")
                 .Value(currentSkin)
-                .WithAttribute<ComponentBase>("id", "skinInput"));
+                .Id("skinInput"));
 
         return new FormGroupComponent()
             .Add(new LabelComponent().For("webSkin").Text(_localization.InitSkinLabel))
             .Add(skinGrid)
-            .Add(new DivComponent().WithAttribute<ComponentBase>("class", "skin-preview-section")
+            .Add(new DivComponent().Class("skin-preview-section")
                 .Add(previewSection));
     }
 
@@ -292,8 +297,8 @@ public class InitController : Controller
 
         var select = new SelectComponent()
             .Name("aiClientType")
-            .WithAttribute<ComponentBase>("id", "aiClientTypeSelect")
-            .WithAttribute<ComponentBase>("onchange", "onClientTypeChange(this.value)");
+            .Id("aiClientTypeSelect")
+            .Attr("onchange", "onClientTypeChange(this.value)");
 
         string? currentType = _configData.AIClientType;
 
@@ -442,6 +447,98 @@ public class InitController : Controller
         }
 
         RenderJson(new { directories = result, currentPath = basePath?.Replace('\\', '/') ?? "" });
+    }
+
+    private void HandleGetAIConfigMetadata()
+    {
+        var clientType = GetQueryValue("clientType");
+        if (string.IsNullOrEmpty(clientType))
+        {
+            RenderJson(new { success = false, message = "clientType parameter is required" });
+            return;
+        }
+
+        try
+        {
+            var factory = CreateFactoryByType(clientType);
+            if (factory == null)
+            {
+                RenderJson(new { success = false, message = $"Factory type '{clientType}' not found" });
+                return;
+            }
+
+            // Get current language
+            var currentLanguage = Enum.TryParse<Language>(_localization.LanguageCode.Replace("-", ""), ignoreCase: true, out var lang)
+                ? lang
+                : _configData.Language;
+
+            // Get current config values from query string (optional)
+            var valuesParam = GetQueryValue("values");
+            var currentConfig = new Dictionary<string, object>();
+            
+            if (!string.IsNullOrEmpty(valuesParam))
+            {
+                // Parse JSON values from frontend
+                try
+                {
+                    var jsonDoc = System.Text.Json.JsonDocument.Parse(Uri.UnescapeDataString(valuesParam));
+                    foreach (var property in jsonDoc.RootElement.EnumerateObject())
+                    {
+                        // Remove "ai_" prefix if present
+                        var key = property.Name.StartsWith("ai_") ? property.Name.Substring(3) : property.Name;
+                        currentConfig[key] = property.Value.GetString() ?? "";
+                    }
+                }
+                catch
+                {
+                    // If parsing fails, fall back to config file values
+                    currentConfig = _configData.AIConfig.ToDictionary(kvp => kvp.Key, kvp => (object)kvp.Value);
+                }
+            }
+            else
+            {
+                // Use values from config file
+                currentConfig = _configData.AIConfig.ToDictionary(kvp => kvp.Key, kvp => (object)kvp.Value);
+            }
+
+            // Get config keys metadata
+            var configKeys = factory.GetConfigKeysMetadata(currentLanguage);
+            var fields = new List<object>();
+
+            // Build complete field data with current values
+            foreach (var kvp in configKeys)
+            {
+                var configKey = kvp.Key;
+                var label = kvp.Value;
+                var currentValue = currentConfig.ContainsKey(configKey) ? currentConfig[configKey].ToString() : "";
+                var options = factory.GetConfigKeyOptions(configKey, currentConfig, currentLanguage);
+
+                var fieldData = new Dictionary<string, object>
+                {
+                    ["key"] = configKey,
+                    ["label"] = label,
+                    ["value"] = currentValue
+                };
+
+                if (options != null && options.Count > 0)
+                {
+                    fieldData["options"] = options;
+                }
+
+                fields.Add(fieldData);
+            }
+
+            RenderJson(new
+            {
+                success = true,
+                clientType = clientType,
+                fields = fields
+            });
+        }
+        catch (Exception ex)
+        {
+            RenderJson(new { success = false, message = ex.Message });
+        }
     }
 
     private void HandlePost()
@@ -722,6 +819,7 @@ public class InitController : Controller
             }
         }
         
+        // Store initial metadata (for fallback)
         js.Add(() => Js.Const(() => "aiConfigMetadata", () => aiConfigData));
         
         // Add AI help titles mapping
@@ -752,18 +850,63 @@ public class InitController : Controller
             .Add(() => Js.Return(() => Js.Id(() => "values")));
         js.Add(() => Js.Func(() => "getCurrentAIConfigValues", () => new List<string>(), () => getCurrentValuesBody));
 
-        // onClientTypeChange function
+        // onClientTypeChange function - now fetches metadata from API for dynamic dropdown refresh
         var onClientTypeChangeBody = Js.Block()
-            .Add(() => Js.Const(() => "currentValues", () => Js.Id(() => "getCurrentAIConfigValues").Invoke()))
-            .Add(() => Js.Const(() => "metadata", () => Js.Id(() => "aiConfigMetadata").Index(() => Js.Id(() => "clientType"))))
+            .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "aiConfigFields"))));
+        
+        // Fetch metadata from API endpoint
+        var fetchUrl = Js.Str(() => "/init/ai-config-metadata?clientType=").Op(() => "+", () => (JsSyntax)Js.Id(() => "encodeURIComponent").Invoke(() => Js.Id(() => "clientType")));
+        
+        var fetchSuccessBody = Js.Block()
+            .Add(() => Js.Const(() => "result", () => Js.Id(() => "data")))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "result").Prop(() => "success").Op(() => "===", () => (JsSyntax)Js.Bool(() => true)), new List<JsSyntax>
+                    {
+                        // Render config fields with new data
+                        Js.Id(() => "renderAIConfigFields").Invoke(
+                            () => Js.Id(() => "result").Prop(() => "fields")
+                        ).Stmt(),
+                        // Update help link
+                        Js.Id(() => "updateAIclientHelp").Invoke(() => Js.Id(() => "clientType")).Stmt()
+                    })
+                },
+                { (null, new List<JsSyntax>
+                    {
+                        // Show error message without clearing fields
+                        Js.Id(() => "alert").Invoke(() => Js.Str(() => "Failed to load configuration: ").Op(() => "+", () => (JsSyntax)Js.Id(() => "result").Prop(() => "message"))).Stmt()
+                    })
+                }
+            }));
+        
+        var fetchErrorBody = Js.Block()
+            // Show error without clearing fields
+            .Add(() => Js.Id(() => "alert").Invoke(() => Js.Str(() => "Failed to load configuration. Please try again.")).Stmt());
+        
+        // Wrap fetchSuccessBody in an arrow function with 'data' parameter
+        var aiConfigJsonThenArrow = Js.Arrow(() => new List<string> { "data" }, () => fetchSuccessBody);
+        
+        var aiConfigFetchThenArrow = Js.Arrow(() => new List<string> { "response" }, () => Js.Block()
+            .Add(() => Js.Id(() => "response").Call(() => "json").Call(() => "then", () => aiConfigJsonThenArrow).Stmt()));
+        
+        var aiConfigFetchCatchArrow = Js.Arrow(() => new List<string> { "error" }, () => fetchErrorBody);
+        
+        onClientTypeChangeBody.Add(() => Js.Id(() => "fetch").Invoke(() => fetchUrl)
+            .Call(() => "then", () => aiConfigFetchThenArrow)
+            .Call(() => "catch", () => aiConfigFetchCatchArrow).Stmt());
+        
+        js.Add(() => Js.Func(() => "onClientTypeChange", () => new List<string> { "clientType" }, () => onClientTypeChangeBody));
+        
+        // renderAIConfigFields function - renders config fields from API response
+        var renderFieldsBody = Js.Block()
             .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "aiConfigFields"))))
             .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Str(() => "")));
         
-        // forEach loop body - render select or input based on whether options exist
+        // forEach loop body - render each field
         var forEachBody = Js.Block()
-            .Add(() => Js.Const(() => "fieldMeta", () => Js.Id(() => "metadata").Index(() => Js.Id(() => "key"))))
-            .Add(() => Js.Const(() => "label", () => Js.Id(() => "fieldMeta").Prop(() => "label")))
-            .Add(() => Js.Const(() => "value", () => Js.Id(() => "currentValues").Index(() => Js.Id(() => "key")).Op(() => "||", () => (JsSyntax)Js.Str(() => ""))))
+            .Add(() => Js.Const(() => "key", () => Js.Id(() => "field").Prop(() => "key")))
+            .Add(() => Js.Const(() => "label", () => Js.Id(() => "field").Prop(() => "label")))
+            .Add(() => Js.Const(() => "value", () => Js.Id(() => "field").Prop(() => "value")))
             .Add(() => Js.Const(() => "div", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
             .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "ai-config-field")))
             .Add(() => Js.Const(() => "labelEl", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "label"))))
@@ -775,7 +918,7 @@ public class InitController : Controller
         var optionForEachBody = Js.Block()
             .Add(() => Js.Const(() => "option", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "option"))))
             .Add(() => Js.Assign(() => Js.Id(() => "option").Prop(() => "value"), () => Js.Id(() => "optKey")))
-            .Add(() => Js.Assign(() => Js.Id(() => "option").Prop(() => "textContent"), () => Js.Id(() => "fieldMeta").Prop(() => "options").Index(() => Js.Id(() => "optKey"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "option").Prop(() => "textContent"), () => Js.Id(() => "field").Prop(() => "options").Index(() => Js.Id(() => "optKey"))))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 { (Js.Id(() => "optKey").Op(() => "===", () => (JsSyntax)Js.Id(() => "value")), new List<JsSyntax>
@@ -785,14 +928,18 @@ public class InitController : Controller
                 }
             }))
             .Add(() => Js.Id(() => "select").Call(() => "appendChild", () => Js.Id(() => "option")));
-        
+                
         var selectRenderingBody = Js.Block()
             .Add(() => Js.Const(() => "select", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "select"))))
             .Add(() => Js.Assign(() => Js.Id(() => "select").Prop(() => "name"), () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key"))))
             .Add(() => Js.Assign(() => Js.Id(() => "select").Prop(() => "id"), () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key"))))
-            .Add(() => Js.Id(() => "Object").Call(() => "keys", () => Js.Id(() => "fieldMeta").Prop(() => "options")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "optKey" }, () => optionForEachBody)).Stmt())
+            .Add(() => Js.Id(() => "Object").Call(() => "keys", () => Js.Id(() => "field").Prop(() => "options")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "optKey" }, () => optionForEachBody)).Stmt())
+            // Bind onchange event to trigger refresh with current values
+            .Add(() => Js.Id(() => "select").Call(() => "addEventListener", () => Js.Str(() => "change"), () => Js.Arrow(() => new List<string>(), () => Js.Block()
+                .Add(() => Js.Id(() => "refreshAIConfigFields").Invoke().Stmt())
+            )))
             .Add(() => Js.Id(() => "div").Call(() => "appendChild", () => Js.Id(() => "select")));
-        
+                
         var inputRenderingBody = Js.Block()
             .Add(() => Js.Const(() => "input", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "input"))))
             .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "type"), () => Js.Str(() => "text")))
@@ -800,22 +947,74 @@ public class InitController : Controller
             .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "id"), () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key"))))
             .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "placeholder"), () => Js.Id(() => "label")))
             .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "value"), () => Js.Id(() => "value")))
+            // Bind onchange event to trigger refresh with current values
+            .Add(() => Js.Id(() => "input").Call(() => "addEventListener", () => Js.Str(() => "change"), () => Js.Arrow(() => new List<string>(), () => Js.Block()
+                .Add(() => Js.Id(() => "refreshAIConfigFields").Invoke().Stmt())
+            )))
             .Add(() => Js.Id(() => "div").Call(() => "appendChild", () => Js.Id(() => "input")));
         
         forEachBody.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
         {
-            { (Js.Id(() => "fieldMeta").Prop(() => "options"), new List<JsSyntax> { selectRenderingBody }) },
+            { (Js.Id(() => "field").Prop(() => "options"), new List<JsSyntax> { selectRenderingBody }) },
             { (null, new List<JsSyntax> { inputRenderingBody }) }
         }));
         
         forEachBody.Add(() => Js.Id(() => "container").Call(() => "appendChild", () => Js.Id(() => "div")));
         
-        onClientTypeChangeBody.Add(() => Js.Id(() => "Object").Call(() => "keys", () => Js.Id(() => "metadata")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "key" }, () => forEachBody)));
+        renderFieldsBody.Add(() => Js.Id(() => "fields").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "field" }, () => forEachBody)));
         
-        // Call updateAIclientHelp to update the help link
-        onClientTypeChangeBody.Add(() => Js.Id(() => "updateAIclientHelp").Invoke(() => Js.Id(() => "clientType")).Stmt());
+        js.Add(() => Js.Func(() => "renderAIConfigFields", () => new List<string> { "fields" }, () => renderFieldsBody));
         
-        js.Add(() => Js.Func(() => "onClientTypeChange", () => new List<string> { "clientType" }, () => onClientTypeChangeBody));
+        // refreshAIConfigFields function - collects current values and re-fetches from API
+        var refreshBody = Js.Block()
+            // Get current client type
+            .Add(() => Js.Const(() => "clientType", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "aiClientTypeSelect")).Prop(() => "value")))
+            // Collect all current AI config values
+            .Add(() => Js.Const(() => "currentValues", () => Js.Obj()))
+            .Add(() => Js.Const(() => "allInputs", () => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => "#aiConfigFields input, #aiConfigFields select"))))
+            .Add(() => Js.Id(() => "allInputs").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "el" }, () => Js.Block()
+                .Add(() => Js.Assign(() => Js.Id(() => "currentValues").Index(() => Js.Id(() => "el").Prop(() => "name")), () => Js.Id(() => "el").Prop(() => "value")))
+            )));
+        
+        // Build URL with current values as JSON in query string
+        var refreshFetchUrl = Js.Str(() => "/init/ai-config-metadata?clientType=").Op(() => "+", () => (JsSyntax)Js.Id(() => "encodeURIComponent").Invoke(() => Js.Id(() => "clientType")))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "&values="))
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "encodeURIComponent").Invoke(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "currentValues"))));
+        
+        var refreshSuccessBody = Js.Block()
+            .Add(() => Js.Const(() => "result", () => Js.Id(() => "data")))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "result").Prop(() => "success").Op(() => "===", () => (JsSyntax)Js.Bool(() => true)), new List<JsSyntax>
+                    {
+                        // Re-render fields with updated data
+                        Js.Id(() => "renderAIConfigFields").Invoke(
+                            () => Js.Id(() => "result").Prop(() => "fields")
+                        ).Stmt()
+                    })
+                },
+                { (null, new List<JsSyntax>
+                    {
+                        // Show error but keep current fields
+                        Js.Id(() => "alert").Invoke(() => Js.Str(() => "Failed to update: ").Op(() => "+", () => (JsSyntax)Js.Id(() => "result").Prop(() => "message"))).Stmt()
+                    })
+                }
+            }));
+        
+        var refreshErrorBody = Js.Block()
+            // Show error but keep current fields
+            .Add(() => Js.Id(() => "alert").Invoke(() => Js.Str(() => "Failed to update configuration.")).Stmt());
+        
+        var refreshJsonThenArrow = Js.Arrow(() => new List<string> { "data" }, () => refreshSuccessBody);
+        var refreshFetchThenArrow = Js.Arrow(() => new List<string> { "response" }, () => Js.Block()
+            .Add(() => Js.Id(() => "response").Call(() => "json").Call(() => "then", () => refreshJsonThenArrow).Stmt()));
+        var refreshFetchCatchArrow = Js.Arrow(() => new List<string> { "error" }, () => refreshErrorBody);
+        
+        refreshBody.Add(() => Js.Id(() => "fetch").Invoke(() => refreshFetchUrl)
+            .Call(() => "then", () => refreshFetchThenArrow)
+            .Call(() => "catch", () => refreshFetchCatchArrow).Stmt());
+        
+        js.Add(() => Js.Func(() => "refreshAIConfigFields", () => new List<string>(), () => refreshBody));
 
         // updateAIclientHelp function - updates help link based on selected AI client type
         var updateHelpBody = Js.Block()
@@ -847,15 +1046,17 @@ public class InitController : Controller
             }));
         js.Add(() => Js.Func(() => "updateAIclientHelp", () => new List<string> { "clientType" }, () => updateHelpBody));
 
-        // Initialize on page load
+        // Initialize on page load - just call init once
         var initBody = Js.Block()
-            .Add(() => Js.Const(() => "initialType", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "aiClientTypeSelect")).Prop(() => "value")))
+            .Add(() => Js.Const(() => "selectEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "aiClientTypeSelect"))))
+            .Add(() => Js.Const(() => "initialType", () => Js.Id(() => "selectEl").Prop(() => "value")))
             .Add(() => Js.Id(() => "onClientTypeChange").Invoke(() => Js.Id(() => "initialType")).Stmt())
             .Add(() => Js.Id(() => "updateAIclientHelp").Invoke(() => Js.Id(() => "initialType")).Stmt());
-        js.Add(() => Js.Id(() => "window").Prop(() => "addEventListener").Invoke(
-            () => Js.Str(() => "load"),
-            () => Js.Arrow(() => new List<string>(), () => initBody)
-        ));
+        
+        var initFunc = Js.Func(() => "initPage", () => new List<string>(), () => initBody);
+        js.Add(() => initFunc);
+        // Call initPage after DOM is loaded (script is in <head>, body not yet parsed when script runs)
+        js.Add(() => Js.Id(() => "document").Call(() => "addEventListener", () => Js.Str(() => "DOMContentLoaded"), () => Js.Id(() => "initPage")).Stmt());
 
         return js;
     }
@@ -885,45 +1086,68 @@ public class InitController : Controller
     private static string GetStyles()
     {
         return CssBuilder.Create()
+            // CSS Variables - Enterprise Design System
+            .WithVariable("bg-primary", "#0f172a")
+            .WithVariable("bg-secondary", "#1e293b")
+            .WithVariable("bg-card", "#334155")
+            .WithVariable("bg-hover", "#475569")
+            .WithVariable("border-color", "#475569")
+            .WithVariable("text-primary", "#f1f5f9")
+            .WithVariable("text-secondary", "#94a3b8")
+            .WithVariable("text-muted", "#64748b")
+            .WithVariable("accent-primary", "#3b82f6")
+            .WithVariable("accent-secondary", "#10b981")
+            .WithVariable("accent-warning", "#f59e0b")
+            .WithVariable("accent-danger", "#ef4444")
+            .WithVariable("card-radius", "8px")
+            .WithVariable("transition", "0.2s ease")
+            
+            // Base Reset
             .Selector("*")
                 .Property("box-sizing", "border-box")
                 .Property("margin", "0")
                 .Property("padding", "0")
             .EndSelector()
             .Selector("body")
-                .Property("font-family", "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif")
-                .Property("background", "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)")
+                .Property("font-family", "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif")
+                .Property("background", "var(--bg-primary)")
                 .Property("min-height", "100vh")
                 .Property("display", "flex")
                 .Property("align-items", "center")
                 .Property("justify-content", "center")
-                .Property("color", "#e2e8f0")
+                .Property("color", "var(--text-primary)")
+                .Property("line-height", "1.5")
             .EndSelector()
+            
+            // Init Container
             .Selector(".init-container")
                 .Property("width", "100%")
-                .Property("max-width", "460px")
-                .Property("padding", "20px")
+                .Property("max-width", "600px")
+                .Property("padding", "24px")
             .EndSelector()
+            
+            // Init Card
             .Selector(".init-card")
-                .Property("background", "rgba(30, 41, 59, 0.8)")
-                .Property("border", "1px solid rgba(148, 163, 184, 0.1)")
-                .Property("border-radius", "16px")
+                .Property("background", "var(--bg-secondary)")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "var(--card-radius)")
                 .Property("padding", "40px 32px")
-                .Property("backdrop-filter", "blur(20px)")
                 .Property("max-width", "600px")
                 .Property("width", "100%")
             .EndSelector()
             .Selector(".init-card h1")
                 .Property("font-size", "24px")
-                .Property("font-weight", "600")
+                .Property("font-weight", "700")
                 .Property("margin-bottom", "8px")
-                .Property("color", "#f1f5f9")
+                .Property("color", "var(--text-primary)")
             .EndSelector()
             .Selector(".init-card > p")
                 .Property("font-size", "14px")
-                .Property("color", "#94a3b8")
+                .Property("color", "var(--text-secondary)")
                 .Property("margin-bottom", "32px")
             .EndSelector()
+            
+            // Form
             .Selector(".init-form")
                 .Property("display", "flex")
                 .Property("flex-direction", "column")
@@ -937,25 +1161,50 @@ public class InitController : Controller
             .Selector(".form-group label")
                 .Property("font-size", "13px")
                 .Property("font-weight", "500")
-                .Property("color", "#cbd5e1")
+                .Property("color", "var(--text-secondary)")
             .EndSelector()
-            .Selector(".form-group input")
+            
+            // Input Fields
+            .Selector(".form-group input[type='text']")
                 .Property("width", "100%")
                 .Property("padding", "10px 14px")
-                .Property("border", "1px solid rgba(148, 163, 184, 0.2)")
-                .Property("border-radius", "8px")
-                .Property("background", "rgba(15, 23, 42, 0.6)")
-                .Property("color", "#f1f5f9")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "6px")
+                .Property("background", "var(--bg-primary)")
+                .Property("color", "var(--text-primary)")
                 .Property("font-size", "14px")
                 .Property("outline", "none")
-                .Property("transition", "border-color 0.2s")
+                .Property("transition", "var(--transition)")
             .EndSelector()
             .Selector(".form-group input::placeholder")
-                .Property("color", "#64748b")
+                .Property("color", "var(--text-muted)")
             .EndSelector()
             .Selector(".form-group input:focus")
-                .Property("border-color", "#3b82f6")
+                .Property("border-color", "var(--accent-primary)")
             .EndSelector()
+            
+            // Select Fields
+            .Selector(".form-group select")
+                .Property("width", "100%")
+                .Property("padding", "10px 14px")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "6px")
+                .Property("background", "var(--bg-primary)")
+                .Property("color", "var(--text-primary)")
+                .Property("font-size", "14px")
+                .Property("outline", "none")
+                .Property("transition", "var(--transition)")
+                .Property("cursor", "pointer")
+            .EndSelector()
+            .Selector(".form-group select:focus")
+                .Property("border-color", "var(--accent-primary)")
+            .EndSelector()
+            .Selector(".form-group select option")
+                .Property("background", "var(--bg-secondary)")
+                .Property("color", "var(--text-primary)")
+            .EndSelector()
+            
+            // Directory Browser
             .Selector(".dir-input-row")
                 .Property("display", "flex")
                 .Property("gap", "8px")
@@ -965,46 +1214,50 @@ public class InitController : Controller
             .EndSelector()
             .Selector(".dir-browse-btn")
                 .Property("padding", "10px 16px")
-                .Property("border", "1px solid rgba(148, 163, 184, 0.3)")
-                .Property("border-radius", "8px")
-                .Property("background", "rgba(51, 65, 85, 0.6)")
-                .Property("color", "#cbd5e1")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "6px")
+                .Property("background", "var(--bg-card)")
+                .Property("color", "var(--text-secondary)")
                 .Property("font-size", "13px")
                 .Property("cursor", "pointer")
-                .Property("transition", "background 0.2s")
+                .Property("transition", "var(--transition)")
                 .Property("white-space", "nowrap")
             .EndSelector()
             .Selector(".dir-browse-btn:hover")
-                .Property("background", "rgba(51, 65, 85, 0.9)")
+                .Property("background", "var(--bg-hover)")
             .EndSelector()
             .Selector(".dir-browser")
                 .Property("margin-top", "8px")
-                .Property("border", "1px solid rgba(148, 163, 184, 0.2)")
-                .Property("border-radius", "8px")
-                .Property("background", "rgba(15, 23, 42, 0.8)")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "6px")
+                .Property("background", "var(--bg-primary)")
                 .Property("max-height", "220px")
                 .Property("overflow-y", "auto")
             .EndSelector()
+            
+            // Scrollbar
             .Selector(".dir-browser::-webkit-scrollbar")
                 .Property("width", "6px")
             .EndSelector()
             .Selector(".dir-browser::-webkit-scrollbar-track")
-                .Property("background", "transparent")
+                .Property("background", "var(--bg-secondary)")
             .EndSelector()
             .Selector(".dir-browser::-webkit-scrollbar-thumb")
-                .Property("background", "rgba(148,163,184,0.3)")
+                .Property("background", "var(--bg-hover)")
                 .Property("border-radius", "3px")
             .EndSelector()
+            
+            // Directory Items
             .Selector(".dir-header")
                 .Property("padding", "10px 12px")
-                .Property("border-bottom", "1px solid rgba(148, 163, 184, 0.15)")
+                .Property("border-bottom", "1px solid var(--border-color)")
                 .Property("position", "sticky")
                 .Property("top", "0")
-                .Property("background", "rgba(15, 23, 42, 0.95)")
+                .Property("background", "var(--bg-primary)")
             .EndSelector()
             .Selector(".dir-current")
                 .Property("font-size", "12px")
-                .Property("color", "#94a3b8")
+                .Property("color", "var(--text-secondary)")
                 .Property("font-family", "'SF Mono', Consolas, monospace")
                 .Property("overflow", "hidden")
                 .Property("text-overflow", "ellipsis")
@@ -1021,25 +1274,14 @@ public class InitController : Controller
                 .Property("padding", "8px 12px")
                 .Property("cursor", "pointer")
                 .Property("font-size", "13px")
-                .Property("color", "#cbd5e1")
-                .Property("transition", "background 0.15s")
+                .Property("color", "var(--text-secondary)")
+                .Property("transition", "var(--transition)")
             .EndSelector()
             .Selector(".dir-item:hover")
                 .Property("background", "rgba(59, 130, 246, 0.1)")
             .EndSelector()
-            .Selector(".dir-parent")
-                .Property("color", "#94a3b8")
-            .EndSelector()
-            .Selector(".dir-icon")
-                .Property("font-size", "14px")
-                .Property("width", "20px")
-                .Property("text-align", "center")
-            .EndSelector()
-            .Media("(max-width: 480px)")
-                .Selector(".skin-grid")
-                    .Property("grid-template-columns", "repeat(2, 1fr)")
-                .EndSelector()
-            .EndMedia()
+            
+            // Skin Grid
             .Selector(".skin-grid")
                 .Property("display", "grid")
                 .Property("grid-template-columns", "repeat(4, 1fr)")
@@ -1048,10 +1290,10 @@ public class InitController : Controller
             .EndSelector()
             .Selector(".skin-option")
                 .Property("cursor", "pointer")
-                .Property("transition", "all 0.3s ease")
+                .Property("transition", "var(--transition)")
                 .Property("text-align", "center")
                 .Property("padding", "14px 8px")
-                .Property("border-radius", "10px")
+                .Property("border-radius", "var(--card-radius)")
                 .Property("border", "2px solid transparent")
                 .Property("position", "relative")
                 .Property("user-select", "none")
@@ -1098,20 +1340,22 @@ public class InitController : Controller
                 .Property("border-radius", "50%")
                 .Property("display", "inline-block")
             .EndSelector()
+            
+            // Skin Preview
             .Selector(".skin-preview-section")
                 .Property("margin-top", "12px")
             .EndSelector()
             .Selector(".skin-preview-title")
                 .Property("font-size", "13px")
                 .Property("font-weight", "500")
-                .Property("color", "#cbd5e1")
+                .Property("color", "var(--text-secondary)")
                 .Property("margin-bottom", "8px")
             .EndSelector()
             .Selector(".skin-preview-box")
-                .Property("border-radius", "10px")
+                .Property("border-radius", "var(--card-radius)")
                 .Property("border", "1px solid")
                 .Property("padding", "20px")
-                .Property("transition", "all 0.3s ease")
+                .Property("transition", "var(--transition)")
                 .Property("min-height", "160px")
             .EndSelector()
             .Selector(".preview-inner")
@@ -1121,9 +1365,9 @@ public class InitController : Controller
             .EndSelector()
             .Selector(".preview-card")
                 .Property("padding", "14px")
-                .Property("border-radius", "8px")
+                .Property("border-radius", "6px")
                 .Property("border", "1px solid")
-                .Property("transition", "all 0.3s ease")
+                .Property("transition", "var(--transition)")
             .EndSelector()
             .Selector(".preview-card h4")
                 .Property("font-size", "14px")
@@ -1146,12 +1390,14 @@ public class InitController : Controller
                 .Property("border", "none")
                 .Property("cursor", "pointer")
                 .Property("font-size", "12px")
-                .Property("transition", "all 0.3s ease")
+                .Property("transition", "var(--transition)")
             .EndSelector()
+            
+            // Error Message
             .Selector(".form-error")
                 .Property("background", "rgba(239, 68, 68, 0.1)")
-                .Property("border", "1px solid rgba(239, 68, 68, 0.3)")
-                .Property("border-radius", "8px")
+                .Property("border", "1px solid var(--accent-danger)")
+                .Property("border-radius", "6px")
                 .Property("padding", "10px 14px")
                 .Property("margin-bottom", "8px")
             .EndSelector()
@@ -1159,6 +1405,8 @@ public class InitController : Controller
                 .Property("font-size", "13px")
                 .Property("color", "#fca5a5")
             .EndSelector()
+            
+            // Submit Button
             .Selector(".form-actions")
                 .Property("margin-top", "8px")
             .EndSelector()
@@ -1166,37 +1414,41 @@ public class InitController : Controller
                 .Property("width", "100%")
                 .Property("padding", "12px")
                 .Property("border", "none")
-                .Property("border-radius", "8px")
-                .Property("background", "#3b82f6")
-                .Property("color", "white")
+                .Property("border-radius", "6px")
+                .Property("background", "var(--accent-primary)")
+                .Property("color", "#ffffff")
                 .Property("font-size", "15px")
                 .Property("font-weight", "500")
                 .Property("cursor", "pointer")
-                .Property("transition", "background 0.2s")
+                .Property("transition", "var(--transition)")
             .EndSelector()
             .Selector(".form-actions button:hover")
                 .Property("background", "#2563eb")
             .EndSelector()
+            
+            // Footer
             .Selector(".init-footer")
                 .Property("margin-top", "24px")
                 .Property("text-align", "center")
             .EndSelector()
             .Selector(".init-footer p")
                 .Property("font-size", "12px")
-                .Property("color", "#64748b")
+                .Property("color", "var(--text-muted)")
             .EndSelector()
             .Selector(".init-help-link")
                 .Property("display", "inline-block")
                 .Property("margin-top", "12px")
                 .Property("font-size", "13px")
-                .Property("color", "#3b82f6")
+                .Property("color", "var(--accent-primary)")
                 .Property("text-decoration", "none")
-                .Property("transition", "color 0.2s")
+                .Property("transition", "var(--transition)")
             .EndSelector()
             .Selector(".init-help-link:hover")
                 .Property("color", "#2563eb")
                 .Property("text-decoration", "underline")
             .EndSelector()
+            
+            // Language Selector
             .Selector(".lang-selector-row")
                 .Property("display", "flex")
                 .Property("gap", "8px")
@@ -1205,37 +1457,23 @@ public class InitController : Controller
             .EndSelector()
             .Selector(".lang-selector-row select")
                 .Property("flex", "1")
-                .Property("padding", "10px 14px")
-                .Property("border", "1px solid rgba(148, 163, 184, 0.2)")
-                .Property("border-radius", "8px")
-                .Property("background", "rgba(15, 23, 42, 0.6)")
-                .Property("color", "#f1f5f9")
-                .Property("font-size", "14px")
-                .Property("outline", "none")
-                .Property("transition", "border-color 0.2s")
-                .Property("cursor", "pointer")
-            .EndSelector()
-            .Selector(".lang-selector-row select:focus")
-                .Property("border-color", "#3b82f6")
-            .EndSelector()
-            .Selector(".lang-selector-row select option")
-                .Property("background", "#1e293b")
-                .Property("color", "#f1f5f9")
             .EndSelector()
             .Selector(".lang-switch-btn")
                 .Property("padding", "10px 16px")
-                .Property("border", "1px solid rgba(148, 163, 184, 0.3)")
-                .Property("border-radius", "8px")
-                .Property("background", "rgba(51, 65, 85, 0.6)")
-                .Property("color", "#cbd5e1")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "6px")
+                .Property("background", "var(--bg-card)")
+                .Property("color", "var(--text-secondary)")
                 .Property("font-size", "13px")
                 .Property("cursor", "pointer")
-                .Property("transition", "background 0.2s")
+                .Property("transition", "var(--transition)")
                 .Property("white-space", "nowrap")
             .EndSelector()
             .Selector(".lang-switch-btn:hover")
-                .Property("background", "rgba(51, 65, 85, 0.9)")
+                .Property("background", "var(--bg-hover)")
             .EndSelector()
+            
+            // AI Config Fields
             .Selector(".ai-config-field")
                 .Property("margin-bottom", "12px")
             .EndSelector()
@@ -1243,42 +1481,52 @@ public class InitController : Controller
                 .Property("display", "block")
                 .Property("font-size", "13px")
                 .Property("font-weight", "500")
-                .Property("color", "#cbd5e1")
+                .Property("color", "var(--text-secondary)")
                 .Property("margin-bottom", "4px")
             .EndSelector()
             .Selector(".ai-config-field input")
                 .Property("width", "100%")
                 .Property("padding", "10px 14px")
-                .Property("border", "1px solid rgba(148, 163, 184, 0.2)")
-                .Property("border-radius", "8px")
-                .Property("background", "rgba(15, 23, 42, 0.6)")
-                .Property("color", "#f1f5f9")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "6px")
+                .Property("background", "var(--bg-primary)")
+                .Property("color", "var(--text-primary)")
                 .Property("font-size", "14px")
                 .Property("outline", "none")
-                .Property("transition", "border-color 0.2s")
+                .Property("transition", "var(--transition)")
             .EndSelector()
             .Selector(".ai-config-field input:focus")
-                .Property("border-color", "#3b82f6")
+                .Property("border-color", "var(--accent-primary)")
             .EndSelector()
             .Selector(".ai-config-field select")
                 .Property("width", "100%")
                 .Property("padding", "10px 14px")
-                .Property("border", "1px solid rgba(148, 163, 184, 0.2)")
-                .Property("border-radius", "8px")
-                .Property("background", "rgba(15, 23, 42, 0.6)")
-                .Property("color", "#f1f5f9")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "6px")
+                .Property("background", "var(--bg-primary)")
+                .Property("color", "var(--text-primary)")
                 .Property("font-size", "14px")
                 .Property("outline", "none")
-                .Property("transition", "border-color 0.2s")
+                .Property("transition", "var(--transition)")
                 .Property("cursor", "pointer")
             .EndSelector()
             .Selector(".ai-config-field select:focus")
-                .Property("border-color", "#3b82f6")
+                .Property("border-color", "var(--accent-primary)")
             .EndSelector()
             .Selector(".ai-config-field select option")
-                .Property("background", "#1e293b")
-                .Property("color", "#f1f5f9")
+                .Property("background", "var(--bg-secondary)")
+                .Property("color", "var(--text-primary)")
             .EndSelector()
+            
+            // Loading Text
+            .Selector(".loading-text")
+                .Property("padding", "12px")
+                .Property("text-align", "center")
+                .Property("color", "var(--text-muted)")
+                .Property("font-size", "13px")
+            .EndSelector()
+            
+            // AI Help Link
             .Selector("#aiClientHelpContainer")
                 .Property("margin-top", "-12px")
                 .Property("margin-bottom", "8px")
@@ -1287,14 +1535,22 @@ public class InitController : Controller
                 .Property("font-size", "13px")
             .EndSelector()
             .Selector(".ai-help-link")
-                .Property("color", "#3b82f6")
+                .Property("color", "var(--accent-primary)")
                 .Property("text-decoration", "none")
-                .Property("transition", "color 0.2s")
+                .Property("transition", "var(--transition)")
             .EndSelector()
             .Selector(".ai-help-link:hover")
                 .Property("color", "#2563eb")
                 .Property("text-decoration", "underline")
             .EndSelector()
+            
+            // Responsive
+            .Media("(max-width: 480px)")
+                .Selector(".skin-grid")
+                    .Property("grid-template-columns", "repeat(2, 1fr)")
+                .EndSelector()
+            .EndMedia()
+            
             .Build();
     }
 }

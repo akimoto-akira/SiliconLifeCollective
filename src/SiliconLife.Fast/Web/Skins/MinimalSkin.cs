@@ -13,21 +13,25 @@
 
 namespace SiliconLife.Fast.Web.Skins;
 
-public class ChatSkin : ISkin
+/// <summary>
+/// Minimal theme - distraction-free writing experience
+/// Target: Writers, bloggers, focused work
+/// </summary>
+public class MinimalSkin : ISkin
 {
-    public string Code => "chat";
-    public string Name => "Chat";
+    public string Code => "minimal";
+    public string Name => "Minimal";
 
     public SkinPreviewInfo PreviewInfo => new()
     {
-        Icon = "\U0001f4ac",
-        Description = "Modern dark blue",
-        BackgroundColor = "#1a1a2e",
-        SecondaryBgColor = "#16213e",
-        CardColor = "#16213e",
-        AccentColor = "#4d96ff",
-        TextColor = "#eaeaea",
-        BorderColor = "#0f3460"
+        Icon = "\u2728",
+        Description = "Distraction-free",
+        BackgroundColor = "#fafafa",
+        SecondaryBgColor = "#f5f5f5",
+        CardColor = "#ffffff",
+        AccentColor = "#1a1a1a",
+        TextColor = "#333333",
+        BorderColor = "#e0e0e0"
     };
 
     // New interface methods
@@ -75,45 +79,38 @@ public class ChatSkin : ISkin
     public CssBuilder GetStyles()
     {
         return CssBuilder.Create()
-            .WithVariable("bg-primary", "#1a1a2e")
-            .WithVariable("bg-card", "#16213e")
-            .WithVariable("border", "#0f3460")
-            .WithVariable("text-primary", "#eaeaea")
-            .WithVariable("text-secondary", "#a0a0a0")
-            .WithVariable("accent-primary", "#4d96ff")
-            .WithVariable("accent-success", "#6bcb77")
-            .WithVariable("accent-warning", "#ffd93d")
-            .WithVariable("accent-error", "#ff6b6b")
-            .WithVariable("accent-info", "#4ecdc4")
             .Selector("*")
             .Property("box-sizing", "border-box")
             .Property("margin", "0")
             .Property("padding", "0")
             .EndSelector()
             .Selector("body")
-            .Property("font-family", "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif")
+            .Property("font-family", "'Georgia', 'Microsoft YaHei', serif")
             .Property("background", "var(--bg-primary)")
             .Property("color", "var(--text-primary)")
-            .Property("padding", "24px")
+            .Property("font-size", "16px")
+            .Property("line-height", "1.8")
+            .Property("padding", "40px 24px")
             .EndSelector()
             .Selector(".container")
-            .Property("max-width", "1200px")
+            .Property("max-width", "800px")
             .Property("margin", "0 auto")
             .EndSelector()
             .Selector(".error")
             .Property("background", "var(--bg-card)")
-            .Property("padding", "40px")
-            .Property("border-radius", "12px")
+            .Property("padding", "60px 40px")
+            .Property("border-radius", "4px")
             .Property("text-align", "center")
-            .Property("border", "1px solid var(--border)")
+            .Property("border", "1px solid var(--border-color)")
             .EndSelector()
             .Selector(".error h1")
-            .Property("color", "var(--accent-error)")
-            .Property("margin-bottom", "20px")
+            .Property("color", "var(--accent-primary)")
+            .Property("margin-bottom", "24px")
+            .Property("font-weight", "400")
             .EndSelector()
             .Selector(".error a")
             .Property("color", "var(--accent-primary)")
-            .Property("text-decoration", "none")
+            .Property("text-decoration", "underline")
             .EndSelector();
     }
 
@@ -125,19 +122,15 @@ public class ChatSkin : ISkin
     public CssBuilder GetThemeCss()
     {
         return CssBuilder.Create()
-            .WithVariable("bg-primary", "#1a1a2e")
-            .WithVariable("bg-card", "#16213e")
-            .WithVariable("bg-secondary", "#1e3a5f")
-            .WithVariable("bg-tertiary", "#0f3460")
-            .WithVariable("border", "#0f3460")
-            .WithVariable("border-color", "#0f3460")
-            .WithVariable("text-primary", "#eaeaea")
-            .WithVariable("text-secondary", "#a0a0a0")
-            .WithVariable("accent-primary", "#4d96ff")
-            .WithVariable("accent-color", "#4d96ff")
-            .WithVariable("accent-success", "#6bcb77")
-            .WithVariable("accent-warning", "#ffd93d")
-            .WithVariable("accent-error", "#ff6b6b")
-            .WithVariable("accent-info", "#4ecdc4");
+            .WithVariable("bg-primary", "#fafafa")
+            .WithVariable("bg-secondary", "#f5f5f5")
+            .WithVariable("bg-card", "#ffffff")
+            .WithVariable("border-color", "#e0e0e0")
+            .WithVariable("text-primary", "#333333")
+            .WithVariable("text-secondary", "#666666")
+            .WithVariable("accent-primary", "#1a1a1a")
+            .WithVariable("accent-success", "#2e7d32")
+            .WithVariable("accent-warning", "#ed6c02")
+            .WithVariable("accent-danger", "#d32f2f");
     }
 }

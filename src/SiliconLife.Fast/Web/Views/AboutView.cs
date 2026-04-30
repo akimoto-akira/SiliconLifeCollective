@@ -72,7 +72,7 @@ public class AboutView : ViewBase
 
         var socialItems = vm.SocialMediaList.Select(sm =>
             H.A(
-                new RawHtml(sm.IconContent),
+                sm.IconContent,
                 H.Span(vm.Localization.GetSocialMediaName(sm.Platform))
             ).Href(sm.Url).Attr("target", "_blank").Class("about-social-item")
         ).ToArray();

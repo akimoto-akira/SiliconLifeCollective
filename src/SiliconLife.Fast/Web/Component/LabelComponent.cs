@@ -22,6 +22,42 @@ public class LabelComponent : ComponentBase
     private string? _for;
 
     /// <summary>
+    /// Set ID (returns LabelComponent for chaining)
+    /// </summary>
+    public new LabelComponent Id(string id)
+    {
+        base.Id = id;
+        return this;
+    }
+
+    /// <summary>
+    /// Set Class (returns LabelComponent for chaining)
+    /// </summary>
+    public new LabelComponent Class(string className)
+    {
+        base.Class = string.IsNullOrEmpty(base.Class) ? className : $"{base.Class} {className}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Style (returns LabelComponent for chaining)
+    /// </summary>
+    public new LabelComponent Style(string style)
+    {
+        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Attribute (returns LabelComponent for chaining)
+    /// </summary>
+    public new LabelComponent Attr(string name, string value)
+    {
+        base.Attributes[name] = value;
+        return this;
+    }
+
+    /// <summary>
     /// Set label text
     /// </summary>
     public LabelComponent Text(string text)
@@ -47,14 +83,14 @@ public class LabelComponent : ComponentBase
         if (!string.IsNullOrEmpty(_for))
             label.Attr("for", _for);
 
-        if (!string.IsNullOrEmpty(Id))
-            label.Id(Id);
+        if (!string.IsNullOrEmpty(base.Id))
+            label.Attr("id", base.Id);
 
-        if (!string.IsNullOrEmpty(Class))
-            label.Class(Class);
+        if (!string.IsNullOrEmpty(base.Class))
+            label.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(Style))
-            label.Style(Style);
+        if (!string.IsNullOrEmpty(base.Style))
+            label.Attr("style", base.Style);
 
         foreach (var kvp in Attributes)
         {

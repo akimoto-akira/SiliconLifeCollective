@@ -24,6 +24,42 @@ public class FormComponent : ComponentBase
     private string? _onsubmit;
 
     /// <summary>
+    /// Set ID (returns FormComponent for chaining)
+    /// </summary>
+    public new FormComponent Id(string id)
+    {
+        base.Id = id;
+        return this;
+    }
+
+    /// <summary>
+    /// Set Class (returns FormComponent for chaining)
+    /// </summary>
+    public new FormComponent Class(string className)
+    {
+        base.Class = string.IsNullOrEmpty(base.Class) ? className : $"{base.Class} {className}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Style (returns FormComponent for chaining)
+    /// </summary>
+    public new FormComponent Style(string style)
+    {
+        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Attribute (returns FormComponent for chaining)
+    /// </summary>
+    public new FormComponent Attr(string name, string value)
+    {
+        base.Attributes[name] = value;
+        return this;
+    }
+
+    /// <summary>
     /// Set form action URL
     /// </summary>
     public FormComponent Action(string action)
@@ -46,7 +82,8 @@ public class FormComponent : ComponentBase
     /// </summary>
     public FormComponent Add(ComponentBase child)
     {
-        _children.Add(child);
+        if (child != null)
+            _children.Add(child);
         return this;
     }
 
@@ -71,14 +108,14 @@ public class FormComponent : ComponentBase
         if (!string.IsNullOrEmpty(_onsubmit))
             form.Attr("onsubmit", $"{_onsubmit}; return false;");
 
-        if (!string.IsNullOrEmpty(Id))
-            form.Id(Id);
+        if (!string.IsNullOrEmpty(base.Id))
+            form.Attr("id", base.Id);
 
-        if (!string.IsNullOrEmpty(Class))
-            form.Class(Class);
+        if (!string.IsNullOrEmpty(base.Class))
+            form.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(Style))
-            form.Style(Style);
+        if (!string.IsNullOrEmpty(base.Style))
+            form.Attr("style", base.Style);
 
         foreach (var kvp in Attributes)
         {
@@ -87,7 +124,7 @@ public class FormComponent : ComponentBase
 
         foreach (var child in _children)
         {
-            form.Add(new RawHtml(child.Render()));
+            form.AddRendered(child.Render());
         }
 
         return form.Build();

@@ -89,7 +89,7 @@ public class CardComponent : ComponentBase
             }
             if (_header != null)
             {
-                headerDiv.Add(new RawHtml(_header.Render()));
+                headerDiv.AddRendered(_header.Render());
             }
             card.Add(headerDiv);
         }
@@ -98,7 +98,7 @@ public class CardComponent : ComponentBase
         if (_body != null)
         {
             var bodyDiv = H.Div().Class("card-body");
-            bodyDiv.Add(new RawHtml(_body.Render()));
+            bodyDiv.AddRendered(_body.Render());
             card.Add(bodyDiv);
         }
 
@@ -106,7 +106,7 @@ public class CardComponent : ComponentBase
         if (_footer != null)
         {
             var footerDiv = H.Div().Class("card-footer");
-            footerDiv.Add(new RawHtml(_footer.Render()));
+            footerDiv.AddRendered(_footer.Render());
             card.Add(footerDiv);
         }
 

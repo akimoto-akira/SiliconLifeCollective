@@ -51,11 +51,10 @@ public class H
         foreach (var child in children)
         {
             if (child is null) continue;
-            if (child is H h) el._children.Add(h);
-            else if (child is string s) el._children.Add(s);
-            else if (child is JsSyntax js) el._children.Add(js);
-            else if (child is CssBuilder css) el._children.Add(css);
-            else if (child is RawHtml raw) el._children.Add(raw);
+            if (child is H h) el.Add(h);
+            else if (child is string s) el.Add(s);
+            else if (child is JsSyntax js) el.Add(js);
+            else if (child is CssBuilder css) el.Add(css);
             else if (child is object[] arr) AddChildren(el, arr);
             else if (child is System.Collections.IEnumerable nested) AddChildren(el, nested);
         }
@@ -163,9 +162,18 @@ public class H
         return this;
     }
 
-    public H Add(string text)
+    private H Add(string text)
     {
         _children.Add(text);
+        return this;
+    }
+
+    /// <summary>
+    /// Add pre-rendered HTML string (for internal component use)
+    /// </summary>
+    internal H AddRendered(string html)
+    {
+        _children.Add(html);
         return this;
     }
 
@@ -178,12 +186,6 @@ public class H
     public H Add(CssBuilder css)
     {
         _children.Add(css);
-        return this;
-    }
-
-    public H Add(RawHtml raw)
-    {
-        _children.Add(raw);
         return this;
     }
 
@@ -237,16 +239,14 @@ public class H
                     h.BuildTo(sb, indentLevel + 1);
                     break;
                 case string s:
-                    sb.Append(indent).Append(IndentString).Append(EscapeText(s)).Append('\n');
+                    // 不转义,直接输出(假设所有字符串都是已渲染的HTML)
+                    sb.Append(indent).Append(IndentString).Append(s).Append('\n');
                     break;
                 case JsSyntax js:
                     sb.Append(indent).Append(IndentString).Append(js.Build()).Append('\n');
                     break;
                 case CssBuilder css:
                     sb.Append(indent).Append(IndentString).Append(css.Build()).Append('\n');
-                    break;
-                case RawHtml raw:
-                    sb.Append(raw.Content).Append('\n');
                     break;
             }
         }
@@ -273,23 +273,10 @@ public static class HExtensions
         if (condition)
         {
             if (child is H h) el.Add(h);
-            else if (child is string s) el.Add(s);
+            else if (child is string s) el.AddRendered(s);
             else if (child is JsSyntax js) el.Add(js);
             else if (child is CssBuilder css) el.Add(css);
-            else if (child is RawHtml raw) el.Add(raw);
         }
         return el;
     }
-}
-
-public class RawHtml
-{
-    public string Content { get; }
-
-    public RawHtml(string content)
-    {
-        Content = content;
-    }
-
-    public static RawHtml From(string content) => new(content);
 }

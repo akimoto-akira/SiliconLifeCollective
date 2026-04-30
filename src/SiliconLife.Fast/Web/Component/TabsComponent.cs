@@ -97,7 +97,7 @@ public class TabsComponent : ComponentBase
                 .Id(tab.Id)
                 .Attr("role", "tabpanel")
                 .Attr("aria-labelledby", $"{tab.Id}-tab");
-            paneDiv.Add(new RawHtml(tab.Content.Render()));
+            paneDiv.AddRendered(tab.Content.Render());
             contentDiv.Add(paneDiv);
         }
         container.Add(contentDiv);

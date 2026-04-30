@@ -287,9 +287,9 @@ public class TrayStatusWindow : Form
         Size = new Size(350, 280);
         Opacity = 0.95;
         TopMost = true;
-        
+
         // Add rounded corners effect (basic)
-        Region = Region.FromHrgn(CreateRoundRectRgn(-Width, -Height, Width, Height, 10, 10));
+        Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, Width, Height, 10, 10));
         Icon = new Icon(new MemoryStream(SiliconLife.Common.icons.slc));
     }
 

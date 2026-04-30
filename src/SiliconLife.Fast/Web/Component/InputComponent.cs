@@ -28,6 +28,42 @@ public class InputComponent : ComponentBase
     private string? _oninput;
 
     /// <summary>
+    /// Set ID (returns InputComponent for chaining)
+    /// </summary>
+    public new InputComponent Id(string id)
+    {
+        base.Id = id;
+        return this;
+    }
+
+    /// <summary>
+    /// Set Class (returns InputComponent for chaining)
+    /// </summary>
+    public new InputComponent Class(string className)
+    {
+        base.Class = string.IsNullOrEmpty(base.Class) ? className : $"{base.Class} {className}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Style (returns InputComponent for chaining)
+    /// </summary>
+    public new InputComponent Style(string style)
+    {
+        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Attribute (returns InputComponent for chaining)
+    /// </summary>
+    public new InputComponent Attr(string name, string value)
+    {
+        base.Attributes[name] = value;
+        return this;
+    }
+
+    /// <summary>
     /// Set input name
     /// </summary>
     public InputComponent Name(string name)
@@ -125,14 +161,14 @@ public class InputComponent : ComponentBase
         if (!string.IsNullOrEmpty(_oninput))
             input.Attr("oninput", _oninput);
 
-        if (!string.IsNullOrEmpty(Id))
-            input.Id(Id);
+        if (!string.IsNullOrEmpty(base.Id))
+            input.Attr("id", base.Id);
 
-        if (!string.IsNullOrEmpty(Class))
-            input.Class(Class);
+        if (!string.IsNullOrEmpty(base.Class))
+            input.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(Style))
-            input.Style(Style);
+        if (!string.IsNullOrEmpty(base.Style))
+            input.Attr("style", base.Style);
 
         foreach (var kvp in Attributes)
         {

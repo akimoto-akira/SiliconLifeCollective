@@ -28,6 +28,42 @@ public class PComponent : ComponentBase
     }
 
     /// <summary>
+    /// Set ID (returns PComponent for chaining)
+    /// </summary>
+    public new PComponent Id(string id)
+    {
+        base.Id = id;
+        return this;
+    }
+
+    /// <summary>
+    /// Set Class (returns PComponent for chaining)
+    /// </summary>
+    public new PComponent Class(string className)
+    {
+        base.Class = string.IsNullOrEmpty(base.Class) ? className : $"{base.Class} {className}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Style (returns PComponent for chaining)
+    /// </summary>
+    public new PComponent Style(string style)
+    {
+        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Attribute (returns PComponent for chaining)
+    /// </summary>
+    public new PComponent Attr(string name, string value)
+    {
+        base.Attributes[name] = value;
+        return this;
+    }
+
+    /// <summary>
     /// Set paragraph text
     /// </summary>
     public PComponent Text(string text)
@@ -40,14 +76,14 @@ public class PComponent : ComponentBase
     {
         var p = H.P();
 
-        if (!string.IsNullOrEmpty(Id))
-            p.Id(Id);
+        if (!string.IsNullOrEmpty(base.Id))
+            p.Attr("id", base.Id);
 
-        if (!string.IsNullOrEmpty(Class))
-            p.Class(Class);
+        if (!string.IsNullOrEmpty(base.Class))
+            p.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(Style))
-            p.Style(Style);
+        if (!string.IsNullOrEmpty(base.Style))
+            p.Attr("style", base.Style);
 
         foreach (var kvp in Attributes)
         {
@@ -56,7 +92,7 @@ public class PComponent : ComponentBase
 
         if (!string.IsNullOrEmpty(_text))
         {
-            p.Add(new RawHtml(H.Escape(_text)));
+            p.Add(H.Span(H.Escape(_text)));
         }
 
         return p.Build();

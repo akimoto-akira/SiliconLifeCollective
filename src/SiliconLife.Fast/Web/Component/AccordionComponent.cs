@@ -77,7 +77,7 @@ public class AccordionComponent : ComponentBase
                 .Attr("aria-labelledby", $"heading-{item.Id}")
                 .Attr("data-bs-parent", $"#{Id}");
             var bodyDiv = H.Div().Class("accordion-body");
-            bodyDiv.Add(new RawHtml(item.Content.Render()));
+            bodyDiv.AddRendered(item.Content.Render());
             collapseDiv.Add(bodyDiv);
             itemDiv.Add(collapseDiv);
 

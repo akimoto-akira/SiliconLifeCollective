@@ -139,6 +139,7 @@ public class Router
         RegisterController(() => new InitController(), "/init", "GET");
         RegisterController(() => new InitController(), "/init", "POST");
         RegisterController(() => new InitController(), "/init/browse", "GET");
+        RegisterController(() => new InitController(), "/init/ai-config-metadata", "GET");
     }
 
     /// <summary>Sets the callback invoked when first-run initialization completes.</summary>

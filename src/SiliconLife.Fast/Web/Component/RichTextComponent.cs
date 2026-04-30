@@ -87,7 +87,7 @@ public class RichTextComponent : ComponentBase
 
         if (!string.IsNullOrEmpty(_content))
         {
-            contentArea.Add(new RawHtml(_content));
+            contentArea.AddRendered(_content);
         }
 
         editor.Add(contentArea);

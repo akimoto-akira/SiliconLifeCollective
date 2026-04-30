@@ -22,11 +22,48 @@ public class DivComponent : ComponentBase
     private string _innerHTML = "";
 
     /// <summary>
+    /// Set ID (returns DivComponent for chaining)
+    /// </summary>
+    public new DivComponent Id(string id)
+    {
+        base.Id = id;
+        return this;
+    }
+
+    /// <summary>
+    /// Set Class (returns DivComponent for chaining)
+    /// </summary>
+    public new DivComponent Class(string className)
+    {
+        base.Class = string.IsNullOrEmpty(base.Class) ? className : $"{base.Class} {className}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Style (returns DivComponent for chaining)
+    /// </summary>
+    public new DivComponent Style(string style)
+    {
+        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Attribute (returns DivComponent for chaining)
+    /// </summary>
+    public new DivComponent Attr(string name, string value)
+    {
+        base.Attributes[name] = value;
+        return this;
+    }
+
+    /// <summary>
     /// Add child component
     /// </summary>
     public DivComponent Add(ComponentBase child)
     {
-        _children.Add(child);
+        if (child != null)
+            _children.Add(child);
         return this;
     }
 
@@ -52,14 +89,14 @@ public class DivComponent : ComponentBase
     {
         var div = H.Div();
 
-        if (!string.IsNullOrEmpty(Id))
-            div.Id(Id);
+        if (!string.IsNullOrEmpty(base.Id))
+            div.Attr("id", base.Id);
 
-        if (!string.IsNullOrEmpty(Class))
-            div.Class(Class);
+        if (!string.IsNullOrEmpty(base.Class))
+            div.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(Style))
-            div.Style(Style);
+        if (!string.IsNullOrEmpty(base.Style))
+            div.Attr("style", base.Style);
 
         foreach (var kvp in Attributes)
         {
@@ -68,13 +105,13 @@ public class DivComponent : ComponentBase
 
         if (!string.IsNullOrEmpty(_innerHTML))
         {
-            div.Add(new RawHtml(_innerHTML));
+            div.AddRendered(_innerHTML);
         }
         else
         {
             foreach (var child in _children)
             {
-                div.Add(new RawHtml(child.Render()));
+                div.AddRendered(child.Render());
             }
         }
 

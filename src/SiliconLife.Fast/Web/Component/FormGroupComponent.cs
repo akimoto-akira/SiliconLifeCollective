@@ -21,11 +21,48 @@ public class FormGroupComponent : ComponentBase
     private readonly List<ComponentBase> _children = new();
 
     /// <summary>
+    /// Set ID (returns FormGroupComponent for chaining)
+    /// </summary>
+    public new FormGroupComponent Id(string id)
+    {
+        base.Id = id;
+        return this;
+    }
+
+    /// <summary>
+    /// Set Class (returns FormGroupComponent for chaining)
+    /// </summary>
+    public new FormGroupComponent Class(string className)
+    {
+        base.Class = string.IsNullOrEmpty(base.Class) ? className : $"{base.Class} {className}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Style (returns FormGroupComponent for chaining)
+    /// </summary>
+    public new FormGroupComponent Style(string style)
+    {
+        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Attribute (returns FormGroupComponent for chaining)
+    /// </summary>
+    public new FormGroupComponent Attr(string name, string value)
+    {
+        base.Attributes[name] = value;
+        return this;
+    }
+
+    /// <summary>
     /// Add child component
     /// </summary>
     public FormGroupComponent Add(ComponentBase child)
     {
-        _children.Add(child);
+        if (child != null)
+            _children.Add(child);
         return this;
     }
 
@@ -33,16 +70,16 @@ public class FormGroupComponent : ComponentBase
     {
         var div = H.Div();
 
-        if (!string.IsNullOrEmpty(Id))
-            div.Id(Id);
+        if (!string.IsNullOrEmpty(base.Id))
+            div.Attr("id", base.Id);
 
         var classes = new List<string> { "form-group" };
-        if (!string.IsNullOrEmpty(Class))
-            classes.Add(Class);
+        if (!string.IsNullOrEmpty(base.Class))
+            classes.Add(base.Class);
         div.Class(string.Join(" ", classes));
 
-        if (!string.IsNullOrEmpty(Style))
-            div.Style(Style);
+        if (!string.IsNullOrEmpty(base.Style))
+            div.Attr("style", base.Style);
 
         foreach (var kvp in Attributes)
         {
@@ -51,7 +88,7 @@ public class FormGroupComponent : ComponentBase
 
         foreach (var child in _children)
         {
-            div.Add(new RawHtml(child.Render()));
+            div.AddRendered(child.Render());
         }
 
         return div.Build();

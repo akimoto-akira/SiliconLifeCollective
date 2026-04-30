@@ -21,6 +21,49 @@ public class SpanComponent : ComponentBase
     private readonly List<ComponentBase> _children = new();
     private string _text = "";
 
+    public SpanComponent() { }
+
+    public SpanComponent(string text)
+    {
+        _text = text;
+    }
+
+    /// <summary>
+    /// Set ID (returns SpanComponent for chaining)
+    /// </summary>
+    public new SpanComponent Id(string id)
+    {
+        base.Id = id;
+        return this;
+    }
+
+    /// <summary>
+    /// Set Class (returns SpanComponent for chaining)
+    /// </summary>
+    public new SpanComponent Class(string className)
+    {
+        base.Class = string.IsNullOrEmpty(base.Class) ? className : $"{base.Class} {className}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Style (returns SpanComponent for chaining)
+    /// </summary>
+    public new SpanComponent Style(string style)
+    {
+        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Attribute (returns SpanComponent for chaining)
+    /// </summary>
+    public new SpanComponent Attr(string name, string value)
+    {
+        base.Attributes[name] = value;
+        return this;
+    }
+
     /// <summary>
     /// Set text content
     /// </summary>
@@ -35,7 +78,8 @@ public class SpanComponent : ComponentBase
     /// </summary>
     public SpanComponent Add(ComponentBase child)
     {
-        _children.Add(child);
+        if (child != null)
+            _children.Add(child);
         return this;
     }
 
@@ -43,14 +87,14 @@ public class SpanComponent : ComponentBase
     {
         var span = H.Span();
 
-        if (!string.IsNullOrEmpty(Id))
-            span.Id(Id);
+        if (!string.IsNullOrEmpty(base.Id))
+            span.Attr("id", base.Id);
 
-        if (!string.IsNullOrEmpty(Class))
-            span.Class(Class);
+        if (!string.IsNullOrEmpty(base.Class))
+            span.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(Style))
-            span.Style(Style);
+        if (!string.IsNullOrEmpty(base.Style))
+            span.Attr("style", base.Style);
 
         foreach (var kvp in Attributes)
         {
@@ -65,7 +109,7 @@ public class SpanComponent : ComponentBase
         {
             foreach (var child in _children)
             {
-                span.Add(new RawHtml(child.Render()));
+                span.AddRendered(child.Render());
             }
         }
 

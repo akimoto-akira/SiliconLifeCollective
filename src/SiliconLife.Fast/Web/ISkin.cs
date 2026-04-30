@@ -16,7 +16,8 @@ using SiliconLife.Collective;
 namespace SiliconLife.Fast.Web;
 
 /// <summary>
-/// Provides skin preview data (color palette, icon, description) for the init page skin selector.
+/// Skin preview data for the init page skin selector.
+/// Provides color palette, icon, and description.
 /// </summary>
 public class SkinPreviewInfo
 {
@@ -26,61 +27,78 @@ public class SkinPreviewInfo
     /// <summary>Short description shown below the skin name</summary>
     public string Description { get; init; } = "";
 
-    /// <summary>Primary color palette for the preview card (background, card, accent)</summary>
-    public string BackgroundColor { get; init; } = "#1e293b";
+    /// <summary>Primary background color</summary>
+    public string BackgroundColor { get; init; } = "#0f172a";
 
-    public string CardColor { get; init; } = "#0f172a";
+    /// <summary>Secondary background color (sidebar, header)</summary>
+    public string SecondaryBgColor { get; init; } = "#1e293b";
 
+    /// <summary>Card background color</summary>
+    public string CardColor { get; init; } = "#334155";
+
+    /// <summary>Primary accent color (buttons, links)</summary>
     public string AccentColor { get; init; } = "#3b82f6";
 
     /// <summary>Text color (foreground)</summary>
     public string TextColor { get; init; } = "#f1f5f9";
 
-    /// <summary>Border color for the preview card</summary>
-    public string BorderColor { get; init; } = "#334155";
+    /// <summary>Border color</summary>
+    public string BorderColor { get; init; } = "#475569";
 }
 
+/// <summary>
+/// Skin interface defining the visual theme and layout structure.
+/// Based on enterprise-grade UI design (Azure Portal / Alibaba Cloud Console style).
+/// </summary>
 public interface ISkin
 {
+    /// <summary>Skin code identifier (e.g., "enterprise", "light", "geek")</summary>
     string Code { get; }
+
+    /// <summary>Skin display name</summary>
     string Name { get; }
 
-    /// <summary>
-    /// Gets preview information for displaying in the skin selector on the init page.
-    /// </summary>
+    /// <summary>Preview information for skin selector</summary>
     SkinPreviewInfo PreviewInfo { get; }
-    H RenderHtml(H content);
-    H RenderError(H message);
-    CssBuilder GetStyles();
-    JsSyntax GetScripts();
 
-    H RenderButton(string text, string variant = "primary", string size = "medium");
-    H RenderInput(string placeholder = "", string size = "medium", string? value = null);
-    H RenderTextarea(string placeholder = "", int rows = 4);
-    H RenderSelect(IEnumerable<string> options, string? selected = null);
-    H RenderCheckbox(string label, bool isChecked = false);
-    H RenderBadge(string text, string variant = "primary");
-    H RenderTag(string text);
-    H RenderCard(string title, string content);
-    H RenderAvatar(string text, string size = "medium");
-    H RenderBubble(string text, bool isMine = false);
-    H RenderSwitch(bool isChecked = false);
-    H RenderProgress(double value, string variant = "primary");
-    H RenderTabs(IEnumerable<string> tabs, int activeIndex = 0);
-    H RenderListItem(string title, string? subtitle = null, string? avatar = null, bool active = false);
-    H RenderDivider();
-    H RenderCode(string code);
-    H RenderStatCard(string label, string value, string variant = "primary");
-    H RenderBreadcrumb(IEnumerable<string> items);
-    H RenderTable(IEnumerable<string> headers, IEnumerable<IEnumerable<string>> rows);
-    H RenderPagination(int totalPages, int currentPage = 1);
-    H RenderDropdown(string triggerText, IEnumerable<string> items);
-    H RenderStatusIndicator(string status);
-    H RenderQuote(string text);
-    H RenderInspirationCard(string icon, string text);
-    CssBuilder GetThemeCss();
+    /// <summary>
+    /// Get CSS variables for this skin theme.
+    /// Returns CSS variable definitions like:
+    /// :root { --bg-primary: #0f172a; --accent-primary: #3b82f6; ... }
+    /// </summary>
+    CssBuilder GetThemeVariables();
+
+    /// <summary>
+    /// Render the complete page layout with sidebar, header, and content area.
+    /// This is the main entry point for page rendering.
+    /// </summary>
+    /// <param name="content">The page content to render in the main area</param>
+    /// <returns>Complete HTML structure</returns>
+    H RenderLayout(H content);
+
+    /// <summary>
+    /// Render error page layout.
+    /// </summary>
+    /// <param name="message">Error message component</param>
+    /// <returns>Error page HTML</returns>
+    H RenderErrorPage(H message);
+
+    /// <summary>
+    /// Get additional custom styles (beyond theme variables).
+    /// Use this for skin-specific component styling.
+    /// </summary>
+    CssBuilder GetCustomStyles();
+
+    /// <summary>
+    /// Get skin-specific JavaScript.
+    /// Use this for theme-specific interactions (e.g., dark mode toggle).
+    /// </summary>
+    JsSyntax GetScripts();
 }
 
+/// <summary>
+/// Manages skin registration and discovery.
+/// </summary>
 public class SkinManager
 {
     private readonly Dictionary<string, Type> _skins = new();
@@ -90,6 +108,10 @@ public class SkinManager
     {
     }
 
+    /// <summary>
+    /// Register a skin type.
+    /// </summary>
+    /// <param name="skinType">Type implementing ISkin</param>
     public void RegisterSkin(Type skinType)
     {
         if (!typeof(ISkin).IsAssignableFrom(skinType))
@@ -101,7 +123,7 @@ public class SkinManager
     }
 
     /// <summary>
-    /// Automatically discovers and registers all ISkin implementations in the given assembly.
+    /// Automatically discover and register all ISkin implementations in the given assembly.
     /// </summary>
     public void DiscoverSkins(System.Reflection.Assembly assembly)
     {
@@ -114,6 +136,9 @@ public class SkinManager
         }
     }
 
+    /// <summary>
+    /// Get a skin instance by code.
+    /// </summary>
     public ISkin? GetSkin(string code)
     {
         if (_skins.TryGetValue(code, out var skinType))
@@ -123,6 +148,9 @@ public class SkinManager
         return null;
     }
 
+    /// <summary>
+    /// Get the current active skin from configuration.
+    /// </summary>
     public ISkin? GetSkin()
     {
         if (Config.Instance.Data is DefaultConfigData defaultConfig && !string.IsNullOrEmpty(defaultConfig.WebSkin))
@@ -132,8 +160,14 @@ public class SkinManager
         return null;
     }
 
+    /// <summary>
+    /// Get all registered skin codes.
+    /// </summary>
     public IEnumerable<string> GetAvailableSkins() => _skins.Keys;
 
+    /// <summary>
+    /// Get skin name by code.
+    /// </summary>
     public string? GetSkinName(string code) =>
         _skinNames.GetValueOrDefault(code);
 }

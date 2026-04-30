@@ -27,6 +27,42 @@ public class HeadingComponent : ComponentBase
     }
 
     /// <summary>
+    /// Set ID (returns HeadingComponent for chaining)
+    /// </summary>
+    public new HeadingComponent Id(string id)
+    {
+        base.Id = id;
+        return this;
+    }
+
+    /// <summary>
+    /// Set Class (returns HeadingComponent for chaining)
+    /// </summary>
+    public new HeadingComponent Class(string className)
+    {
+        base.Class = string.IsNullOrEmpty(base.Class) ? className : $"{base.Class} {className}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Style (returns HeadingComponent for chaining)
+    /// </summary>
+    public new HeadingComponent Style(string style)
+    {
+        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Attribute (returns HeadingComponent for chaining)
+    /// </summary>
+    public new HeadingComponent Attr(string name, string value)
+    {
+        base.Attributes[name] = value;
+        return this;
+    }
+
+    /// <summary>
     /// Set heading text
     /// </summary>
     public HeadingComponent Text(string text)
@@ -39,14 +75,14 @@ public class HeadingComponent : ComponentBase
     {
         var heading = H.Create(_tag);
 
-        if (!string.IsNullOrEmpty(Id))
-            heading.Id(Id);
+        if (!string.IsNullOrEmpty(base.Id))
+            heading.Attr("id", base.Id);
 
-        if (!string.IsNullOrEmpty(Class))
-            heading.Class(Class);
+        if (!string.IsNullOrEmpty(base.Class))
+            heading.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(Style))
-            heading.Style(Style);
+        if (!string.IsNullOrEmpty(base.Style))
+            heading.Attr("style", base.Style);
 
         foreach (var kvp in Attributes)
         {
@@ -55,7 +91,7 @@ public class HeadingComponent : ComponentBase
 
         if (!string.IsNullOrEmpty(_text))
         {
-            heading.Add(new RawHtml(H.Escape(_text)));
+            heading.Add(H.Span(H.Escape(_text)));
         }
 
         return heading.Build();

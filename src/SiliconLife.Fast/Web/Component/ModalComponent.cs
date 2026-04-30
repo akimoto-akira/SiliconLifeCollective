@@ -113,7 +113,7 @@ public class ModalComponent : ComponentBase
         if (_body != null)
         {
             var bodyDiv = H.Div().Class("modal-body");
-            bodyDiv.Add(new RawHtml(_body.Render()));
+            bodyDiv.AddRendered(_body.Render());
             contentDiv.Add(bodyDiv);
         }
 
@@ -121,7 +121,7 @@ public class ModalComponent : ComponentBase
         if (_footer != null)
         {
             var footerDiv = H.Div().Class("modal-footer");
-            footerDiv.Add(new RawHtml(_footer.Render()));
+            footerDiv.AddRendered(_footer.Render());
             contentDiv.Add(footerDiv);
         }
 

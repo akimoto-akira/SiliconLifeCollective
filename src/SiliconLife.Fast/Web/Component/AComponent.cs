@@ -29,6 +29,42 @@ public class AComponent : ComponentBase
     }
 
     /// <summary>
+    /// Set ID (returns AComponent for chaining)
+    /// </summary>
+    public new AComponent Id(string id)
+    {
+        base.Id = id;
+        return this;
+    }
+
+    /// <summary>
+    /// Set Class (returns AComponent for chaining)
+    /// </summary>
+    public new AComponent Class(string className)
+    {
+        base.Class = string.IsNullOrEmpty(base.Class) ? className : $"{base.Class} {className}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Style (returns AComponent for chaining)
+    /// </summary>
+    public new AComponent Style(string style)
+    {
+        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        return this;
+    }
+
+    /// <summary>
+    /// Set Attribute (returns AComponent for chaining)
+    /// </summary>
+    public new AComponent Attr(string name, string value)
+    {
+        base.Attributes[name] = value;
+        return this;
+    }
+
+    /// <summary>
     /// Set link text
     /// </summary>
     public AComponent Text(string text)
@@ -53,14 +89,14 @@ public class AComponent : ComponentBase
         if (!string.IsNullOrEmpty(_href))
             a.Attr("href", _href);
 
-        if (!string.IsNullOrEmpty(Id))
-            a.Id(Id);
+        if (!string.IsNullOrEmpty(base.Id))
+            a.Attr("id", base.Id);
 
-        if (!string.IsNullOrEmpty(Class))
-            a.Class(Class);
+        if (!string.IsNullOrEmpty(base.Class))
+            a.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(Style))
-            a.Style(Style);
+        if (!string.IsNullOrEmpty(base.Style))
+            a.Attr("style", base.Style);
 
         foreach (var kvp in Attributes)
         {
@@ -69,7 +105,7 @@ public class AComponent : ComponentBase
 
         if (!string.IsNullOrEmpty(_text))
         {
-            a.Add(new RawHtml(H.Escape(_text)));
+            a.Add(H.Span(H.Escape(_text)));
         }
 
         return a.Build();

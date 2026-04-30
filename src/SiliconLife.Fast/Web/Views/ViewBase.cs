@@ -37,8 +37,8 @@ public abstract class ViewBase
     protected string RenderPage(ISkin skin, string title, string activeMenu, DefaultLocalizationBase localization, H bodyContent,
         JsSyntax? inlineScripts = null, CssBuilder? inlineStyles = null, string? helpTopicId = null)
     {
-        var themeCss = skin.GetThemeCss().Build();
-        var baseCss = skin.GetStyles().Build();
+        var themeCss = skin.GetThemeVariables().Build();
+        var baseCss = skin.GetCustomStyles().Build();
         var shellCss = GetShellCss().Build();
         var commonCss = GetCommonCss().Build();
 

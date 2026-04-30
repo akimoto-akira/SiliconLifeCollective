@@ -23,11 +23,21 @@ public class CreativeSkin : ISkin
         Icon = "\u270f\ufe0f",
         Description = "Warm artistic",
         BackgroundColor = "#fdf6e3",
+        SecondaryBgColor = "#eee8d5",
         CardColor = "#fffef9",
         AccentColor = "#d4a574",
         TextColor = "#5c4b37",
         BorderColor = "#e8dfd0"
     };
+
+    // New interface methods
+    public CssBuilder GetThemeVariables() => GetThemeCss();
+
+    public H RenderLayout(H content) => RenderHtml(content);
+
+    public H RenderErrorPage(H message) => RenderError(message);
+
+    public CssBuilder GetCustomStyles() => GetStyles();
 
     public H RenderHtml(H content)
     {
@@ -101,237 +111,6 @@ public class CreativeSkin : ISkin
     public JsSyntax GetScripts()
     {
         return new JsBlock();
-    }
-
-    public H RenderButton(string text, string variant = "primary", string size = "medium")
-    {
-        var cls = "btn";
-        if (variant == "primary") cls = "btn btn-primary";
-        else if (variant == "secondary") cls = "btn btn-secondary";
-        else if (variant == "success") cls = "btn btn-success";
-        else if (variant == "outline") cls = "btn btn-outline";
-
-        if (size != "medium") cls += $" btn-{size}";
-
-        return H.Button(text).Class(cls);
-    }
-
-    public H RenderInput(string placeholder = "", string size = "medium", string? value = null)
-    {
-        var cls = "input";
-        if (size != "medium") cls += $" input-{size}";
-
-        return H.InputText().Placeholder(placeholder).Value(value ?? "").Class(cls);
-    }
-
-    public H RenderTextarea(string placeholder = "", int rows = 4)
-    {
-        return H.Textarea().Placeholder(placeholder).Attr("rows", rows.ToString()).Class("input textarea");
-    }
-
-    public H RenderSelect(IEnumerable<string> options, string? selected = null)
-    {
-        var select = H.Select();
-        foreach (var opt in options)
-        {
-            var option = H.Option(opt).Value(opt);
-            if (opt == selected) option.Selected();
-            select.Add(option);
-        }
-        return select.Class("select");
-    }
-
-    public H RenderCheckbox(string label, bool isChecked = false)
-    {
-        var checkMark = isChecked ? "✓" : string.Empty;
-        var checkboxBoxClass = "checkbox-box" + (isChecked ? " checked" : string.Empty);
-        return H.Div(
-            H.Div(checkMark).Class(checkboxBoxClass),
-            H.Span(label)
-        ).Class("checkbox");
-    }
-
-    public H RenderBadge(string text, string variant = "primary")
-    {
-        return H.Span(text).Class($"badge badge-{variant}");
-    }
-
-    public H RenderTag(string text)
-    {
-        return H.Span(text).Class("tag");
-    }
-
-    public H RenderCard(string title, string content)
-    {
-        return H.Div(
-            H.Div(title).Class("card-header"),
-            H.Div(content).Class("card-body")
-        ).Class("card");
-    }
-
-    public H RenderAvatar(string text, string size = "medium")
-    {
-        return H.Div(text).Class($"avatar avatar-{size}");
-    }
-
-    public H RenderBubble(string text, bool isMine = false)
-    {
-        return H.Div(text).Class($"bubble{(isMine ? " mine" : string.Empty)}");
-    }
-
-    public H RenderSwitch(bool isChecked = false)
-    {
-        var switchClass = "switch" + (isChecked ? " active" : string.Empty);
-        return H.Div().Class(switchClass);
-    }
-
-    public H RenderProgress(double value, string variant = "primary")
-    {
-        return H.Div(
-            H.Div().Class("progress-bar").Style($"width: {value}%")
-        ).Class("progress");
-    }
-
-    public H RenderTabs(IEnumerable<string> tabs, int activeIndex = 0)
-    {
-        var items = new List<object>();
-        var idx = 0;
-        foreach (var tab in tabs)
-        {
-            items.Add(H.Span(tab).Class($"tab{(idx == activeIndex ? " active" : string.Empty)}"));
-            idx++;
-        }
-        return H.Div(items);
-    }
-
-    public H RenderListItem(string title, string? subtitle = null, string? avatar = null, bool active = false)
-    {
-        var children = new List<object>();
-        if (!string.IsNullOrEmpty(avatar))
-        {
-            children.Add(H.Div(avatar).Class("avatar"));
-        }
-
-        var innerChildren = new List<object> { title };
-        if (!string.IsNullOrEmpty(subtitle))
-        {
-            innerChildren.Add(H.Div(subtitle).Style("font-size: 12px; color: var(--text-secondary);"));
-        }
-        children.Add(H.Div(innerChildren));
-
-        return H.Div(children).Class($"list-item{(active ? " active" : string.Empty)}");
-    }
-
-    public H RenderDivider()
-    {
-        return H.Hr();
-    }
-
-    public H RenderCode(string code)
-    {
-        return H.Pre(H.Code(code));
-    }
-
-    public H RenderStatCard(string label, string value, string variant = "primary")
-    {
-        return H.Div(
-            H.Div(value).Class("stat-value").Style($"color: var(--accent-{variant})"),
-            H.Div(label).Class("stat-label")
-        ).Class("card-elevated");
-    }
-
-    public H RenderBreadcrumb(IEnumerable<string> items)
-    {
-        var children = new List<object>();
-        var isFirst = true;
-        foreach (var item in items)
-        {
-            if (!isFirst) children.Add(" / ");
-            children.Add(H.Span(item));
-            isFirst = false;
-        }
-        return H.Div(children).Class("breadcrumb");
-    }
-
-    public H RenderTable(IEnumerable<string> headers, IEnumerable<IEnumerable<string>> rows)
-    {
-        var thCells = new List<object>();
-        foreach (var header in headers)
-        {
-            thCells.Add(H.Th(header));
-        }
-
-        var bodyRows = new List<object>();
-        foreach (var row in rows)
-        {
-            var cells = new List<object>();
-            foreach (var cell in row)
-            {
-                cells.Add(H.Td(cell));
-            }
-            bodyRows.Add(H.Tr(cells));
-        }
-
-        return H.Table(
-            H.Thead(H.Tr(thCells)),
-            H.Tbody(bodyRows)
-        );
-    }
-
-    public H RenderPagination(int totalPages, int currentPage = 1)
-    {
-        var items = new List<object>
-        {
-            H.Div("‹").Class("page-btn"),
-        };
-
-        for (int i = 1; i <= totalPages; i++)
-        {
-            items.Add(H.Div(i.ToString()).Class($"page-btn{(i == currentPage ? " active" : string.Empty)}"));
-        }
-
-        items.Add(H.Div("›").Class("page-btn"));
-        return H.Div(items).Class("pagination");
-    }
-
-    public H RenderDropdown(string triggerText, IEnumerable<string> items)
-    {
-        var menuItems = new List<object>();
-        foreach (var item in items)
-        {
-            menuItems.Add(H.Div(item).Class("dropdown-item"));
-        }
-
-        return H.Div(
-            H.Button($"{triggerText} ▼").Class("btn btn-primary"),
-            H.Div(menuItems).Class("dropdown-menu")
-        ).Class("dropdown");
-    }
-
-    public H RenderStatusIndicator(string status)
-    {
-        var statusClass = status.ToLower() switch
-        {
-            "online" => "status-online",
-            "offline" => "status-offline",
-            "busy" => "status-busy",
-            _ => "status-offline"
-        };
-
-        return H.Span().Class($"status-dot {statusClass}");
-    }
-
-    public H RenderQuote(string text)
-    {
-        return H.Div($"\"{text}\"").Class("quote");
-    }
-
-    public H RenderInspirationCard(string icon, string text)
-    {
-        return H.Div(
-            H.Div(icon).Class("inspiration-icon"),
-            H.Div($"\"{text}\"").Class("inspiration-text")
-        ).Class("inspiration-card");
     }
 
     public CssBuilder GetThemeCss()
