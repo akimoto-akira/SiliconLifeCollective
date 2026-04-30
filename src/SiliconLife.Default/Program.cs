@@ -209,11 +209,9 @@ public class Program
             configData.SaveConfig();
             _logger.Info(null, "Curator created: {0} ({1})", curator.Name, curator.Id);
 
-            // Write default soul file
-            string beingDirectory = Path.Combine(configData.DataDirectory.FullName, "SiliconManager", curator.Id.ToString());
+            // Write default soul content to storage
             string soulContent = localization.DefaultCuratorSoul;
             curator.SoulContent = soulContent;
-            SoulFileManager.SaveSoul(beingDirectory, soulContent);
 
             RegisterAndConfigureCurator(curator, configData, dynamicBeingLoader);
         });

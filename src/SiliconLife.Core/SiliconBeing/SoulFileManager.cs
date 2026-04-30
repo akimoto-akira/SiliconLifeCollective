@@ -14,78 +14,77 @@
 namespace SiliconLife.Collective;
 
 /// <summary>
-/// Manages loading and saving of silicon being soul files
+/// Manages loading and saving of silicon being soul files through IStorage interface.
+/// Soul content is stored as a string value with key "soul.md" in the being's storage.
 /// </summary>
 public static class SoulFileManager
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger(typeof(SoulFileManager));
-    private const string SoulFileName = "soul.md";
+    private const string SoulKey = "soul.md";
 
     /// <summary>
-    /// Loads the soul content from a silicon being's directory
+    /// Loads the soul content from a silicon being's storage
     /// </summary>
-    /// <param name="beingDirectory">The directory path of the silicon being</param>
-    /// <returns>The soul content, or null if the file does not exist</returns>
-    public static string? LoadSoul(string beingDirectory)
+    /// <param name="storage">The storage instance for the silicon being</param>
+    /// <returns>The soul content, or null if not found</returns>
+    public static string? LoadSoul(IStorage storage)
     {
-        string soulFilePath = Path.Combine(beingDirectory, SoulFileName);
-
-        if (!File.Exists(soulFilePath))
-        {
-            _logger.Debug(null, "Soul file not found: {0}", soulFilePath);
-            return null;
-        }
-
         try
         {
-            string content = File.ReadAllText(soulFilePath);
-            _logger.Info(null, "Soul loaded from {0}, length={1}", soulFilePath, content.Length);
+            string? content = storage.Read<string>(SoulKey);
+            if (string.IsNullOrEmpty(content))
+            {
+                _logger.Debug(null, "Soul not found in storage");
+                return null;
+            }
+            _logger.Info(null, "Soul loaded from storage, length={0}", content.Length);
             return content;
         }
         catch (Exception ex)
         {
-            _logger.Warn(null, "Failed to load soul from {0}", soulFilePath, ex);
+            _logger.Warn(null, "Failed to load soul from storage", ex);
             return null;
         }
     }
 
     /// <summary>
-    /// Saves the soul content to a silicon being's directory
+    /// Saves the soul content to a silicon being's storage
     /// </summary>
-    /// <param name="beingDirectory">The directory path of the silicon being</param>
+    /// <param name="storage">The storage instance for the silicon being</param>
     /// <param name="soulContent">The soul content to save</param>
     /// <returns>True if successful, false otherwise</returns>
-    public static bool SaveSoul(string beingDirectory, string soulContent)
+    public static bool SaveSoul(IStorage storage, string soulContent)
     {
         try
         {
-            if (!Directory.Exists(beingDirectory))
-            {
-                Directory.CreateDirectory(beingDirectory);
-            }
-
-            string soulFilePath = Path.Combine(beingDirectory, SoulFileName);
-            File.WriteAllText(soulFilePath, soulContent);
-            _logger.Info(null, "Soul saved to {0}, length={1}", soulFilePath, soulContent.Length);
+            storage.Write(SoulKey, soulContent);
+            _logger.Info(null, "Soul saved to storage, length={0}", soulContent.Length);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.Error(null, "Failed to save soul to {0}", Path.Combine(beingDirectory, SoulFileName), ex);
+            _logger.Error(null, "Failed to save soul to storage", ex);
             return false;
         }
     }
 
     /// <summary>
-    /// Checks if a soul file exists in the given directory
+    /// Checks if a soul exists in the given storage
     /// </summary>
-    /// <param name="beingDirectory">The directory path of the silicon being</param>
-    /// <returns>True if the soul file exists, false otherwise</returns>
-    public static bool SoulExists(string beingDirectory)
+    /// <param name="storage">The storage instance for the silicon being</param>
+    /// <returns>True if the soul exists, false otherwise</returns>
+    public static bool SoulExists(IStorage storage)
     {
-        string soulFilePath = Path.Combine(beingDirectory, SoulFileName);
-        bool exists = File.Exists(soulFilePath);
-        _logger.Trace(null, "Soul file exists check: {0} = {1}", soulFilePath, exists);
-        return exists;
+        try
+        {
+            bool exists = storage.Exists(SoulKey);
+            _logger.Trace(null, "Soul exists check in storage = {0}", exists);
+            return exists;
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(null, "Failed to check soul existence in storage", ex);
+            return false;
+        }
     }
 }

@@ -67,7 +67,7 @@ public abstract class SiliconBeingBase
 
     /// <summary>
     /// Gets or sets the soul content (system prompt) for this silicon being.
-    /// Automatically syncs with the soul file on disk when modified.
+    /// Automatically syncs with storage when modified.
     /// </summary>
     public string? SoulContent
     {
@@ -75,10 +75,10 @@ public abstract class SiliconBeingBase
         set
         {
             _soulContent = value;
-            // Auto-save to disk when soul content is modified
-            if (!string.IsNullOrEmpty(BeingDirectory))
+            // Auto-save to storage when soul content is modified
+            if (Storage != null)
             {
-                SoulFileManager.SaveSoul(BeingDirectory, value ?? string.Empty);
+                SoulFileManager.SaveSoul(Storage, value ?? string.Empty);
             }
         }
     }
@@ -101,6 +101,12 @@ public abstract class SiliconBeingBase
     /// Used by Memory for time-indexed queries.
     /// </summary>
     public ITimeStorage? TimeStorage { get; set; }
+
+    /// <summary>
+    /// Gets or sets the key-value storage for this silicon being.
+    /// Used for persisting soul, state, and other configuration data.
+    /// </summary>
+    public IStorage? Storage { get; set; }
 
     /// <summary>
     /// Gets or sets the memory system for this silicon being.

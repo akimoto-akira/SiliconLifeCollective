@@ -48,25 +48,28 @@ public class DefaultSiliconBeing : SiliconBeingBase
     }
 
     /// <summary>
-    /// Saves this being's state (name, AI config) to state.json in its directory.
+    /// Saves this being's state (name, AI config) to storage.
     /// Called by the factory on first creation and when config changes.
     /// </summary>
     public void SaveState()
     {
-        if (BeingDirectory == null) return;
+        if (Storage == null)
+        {
+            _logger.Warn(Id, "Being {0}: Storage is not available, cannot save state", Name);
+            return;
+        }
+        
         try
         {
-            var state = new Dictionary<string, object>
+            var state = new StateFileManager.BeingState
             {
-                ["name"] = Name,
-                ["aiClientType"] = AIClientType ?? "",
-                ["aiConfig"] = AIClientConfig ?? new Dictionary<string, object>()
+                Name = Name,
+                AIClientType = AIClientType ?? "",
+                AIConfig = AIClientConfig ?? new Dictionary<string, object>()
             };
             
-            string json = JsonSerializer.Serialize(state, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(Path.Combine(BeingDirectory, "state.json"), json);
-            
-            _logger.Debug(Id, "Being {0}: state saved to {1}", Name, Path.Combine(BeingDirectory, "state.json"));
+            StateFileManager.SaveState(Storage, state);
+            _logger.Debug(Id, "Being {0}: state saved to storage", Name);
         }
         catch (Exception ex)
         {
@@ -75,61 +78,36 @@ public class DefaultSiliconBeing : SiliconBeingBase
     }
 
     /// <summary>
-    /// Loads this being's name and AI config from state.json in its directory.
+    /// Loads this being's name and AI config from storage.
     /// Returns true if state was loaded successfully.
     /// </summary>
     public bool LoadState()
     {
-        if (BeingDirectory == null) return false;
+        if (Storage == null) return false;
+        
         try
         {
-            string stateFilePath = Path.Combine(BeingDirectory, "state.json");
-            if (!File.Exists(stateFilePath)) return false;
+            var state = StateFileManager.LoadState(Storage);
+            if (state == null) return false;
 
-            string json = File.ReadAllText(stateFilePath);
-            var state = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+            // Apply loaded state
+            Name = state.Name;
+            AIClientType = state.AIClientType;
+            AIClientConfig = state.AIConfig;
             
-            if (state != null)
+            // Initialize backup config
+            BackupAIClientConfig = AIClientConfig?.ToDictionary(k => k.Key, v => v.Value);
+            
+            _logger.Debug(Id, "Being {0}: state loaded from storage", Name);
+
+            Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            if (LocalizationManager.Instance.TryGetLocalization(language, out LocalizationBase? loc) &&
+                loc is DefaultLocalizationBase defaultLoc)
             {
-                // Load name
-                if (state.TryGetValue("name", out var nameObj))
-                {
-                    Name = nameObj?.ToString() ?? "";
-                }
-                
-                // Load aiClientType
-                if (state.TryGetValue("aiClientType", out var typeObj))
-                {
-                    AIClientType = typeObj?.ToString();
-                }
-                
-                // Load aiConfig
-                if (state.TryGetValue("aiConfig", out var configObj))
-                {
-                    if (configObj is JsonElement configElement)
-                    {
-                        AIClientConfig = DeserializeDictionary(configElement);
-                    }
-                    else if (configObj is Dictionary<string, object> dict)
-                    {
-                        AIClientConfig = dict;
-                    }
-                }
-                
-                // Initialize backup config
-                BackupAIClientConfig = AIClientConfig?.ToDictionary(k => k.Key, v => v.Value);
-                
-                _logger.Debug(Id, "Being {0}: state loaded from {1}", Name, stateFilePath);
-
-                Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
-                if (LocalizationManager.Instance.TryGetLocalization(language, out LocalizationBase? loc) &&
-                    loc is DefaultLocalizationBase defaultLoc)
-                {
-                    Memory?.Add(defaultLoc.FormatMemoryEventStartup());
-                }
-
-                return true;
+                Memory?.Add(defaultLoc.FormatMemoryEventStartup());
             }
+
+            return true;
         }
         catch (Exception ex)
         {

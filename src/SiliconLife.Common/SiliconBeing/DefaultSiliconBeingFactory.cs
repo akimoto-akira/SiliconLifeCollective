@@ -122,14 +122,21 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     /// </summary>
     private SiliconBeingBase CreateAndConfigureBeing(Guid id, string name, string beingDirectory)
     {
-        string? soulContent = SoulFileManager.LoadSoul(beingDirectory);
-
         // Determine if this is the curator
         Guid curatorGuid = Config.Instance?.Data?.CuratorGuid ?? Guid.Empty;
         bool isCurator = id == curatorGuid;
 
         DefaultSiliconBeing being = new(id, name);
         being.BeingDirectory = beingDirectory;
+
+        // Create per-being storage for soul, TaskSystem and TimerSystem (data stored in SiliconManager\{GUID})
+        var storageFactory = ServiceLocator.Instance.StorageFactory 
+            ?? throw new InvalidOperationException("StorageFactory not registered in ServiceLocator");
+        IStorage beingStorage = storageFactory(beingDirectory);
+        being.Storage = beingStorage;
+
+        // Load soul content from storage
+        string? soulContent = SoulFileManager.LoadSoul(beingStorage);
         being.SoulContent = soulContent;
 
         // Load or save state — the being manages its own data (includes AI config)
@@ -182,11 +189,6 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
             ?? throw new InvalidOperationException("TimeStorageFactory not registered in ServiceLocator");
         ITimeStorage beingTimeStorage = timeStorageFactory(beingTimeStorageDir);
         being.TimeStorage = beingTimeStorage;
-
-        // Create per-being storage for TaskSystem and TimerSystem (data stored in SiliconManager\{GUID})
-        var storageFactory = ServiceLocator.Instance.StorageFactory 
-            ?? throw new InvalidOperationException("StorageFactory not registered in ServiceLocator");
-        IStorage beingStorage = storageFactory(beingDirectory);
 
         // Create Memory, TaskSystem, TimerSystem for this being
         being.Memory = new Memory(beingTimeStorage);

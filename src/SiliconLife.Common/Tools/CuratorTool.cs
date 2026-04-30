@@ -144,19 +144,23 @@ public class CuratorTool : ITool
 
         Guid newId = Guid.NewGuid();
 
-        // Write the soul file before CreateBeing so the factory picks it up during initialization
-        string beingDirectory = GetBeingDirectory(newId);
-        if (!Directory.Exists(beingDirectory))
-        {
-            Directory.CreateDirectory(beingDirectory);
-        }
-
-        if (!SoulFileManager.SaveSoul(beingDirectory, soulContent))
-        {
-            return ToolResult.Failed($"Failed to save soul file for being {newId:N}.");
-        }
-
+        // Create being first to get its Storage instance
         SiliconBeingBase newBeing = factory.CreateBeing(newId, name);
+        
+        // Save soul content to the being's storage
+        if (newBeing.Storage == null)
+        {
+            return ToolResult.Failed($"Storage is not available for being {newId:N}.");
+        }
+
+        if (!SoulFileManager.SaveSoul(newBeing.Storage, soulContent))
+        {
+            return ToolResult.Failed($"Failed to save soul for being {newId:N}.");
+        }
+
+        // Update the being's SoulContent property (will also trigger auto-save)
+        newBeing.SoulContent = soulContent;
+        
         beingManager.RegisterBeing(newBeing);
 
         RecordMemoryForCaller(callerId, loc => loc.FormatMemoryEventBeingCreated(name, newId.ToString("N")));
