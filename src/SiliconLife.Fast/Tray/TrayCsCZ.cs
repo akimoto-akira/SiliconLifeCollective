@@ -122,4 +122,14 @@ public class TrayCsCZ : TrayLocalizationBase
     /// Gets the exit menu item text
     /// </summary>
     public override string Exit => "Ukončit";
+
+    /// <summary>
+    /// Gets the web server startup error title
+    /// </summary>
+    public override string WebServerStartupErrorTitle => "Chyba spuštění webového serveru";
+
+    /// <summary>
+    /// Gets the web server startup error message
+    /// </summary>
+    public override string WebServerStartupErrorMessage => "Webový server se nepodařilo spustit. Aplikace bude ukončena.\n\nChyba: {0}";
 }

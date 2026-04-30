@@ -27,14 +27,18 @@ public class DefaultSiliconBeing : SiliconBeingBase
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<DefaultSiliconBeing>();
     private volatile bool _isProcessing;
+    private volatile int _activityRaw = (int)BeingActivity.Idle;
     
     // WebView instance (nullable, created on demand)
     private IWebViewCore? _webView;
 
     /// <summary>
-    /// Gets whether this silicon being is idle (no pending tasks and not thinking).
+    /// Gets the current activity of this silicon being.
+    /// Updated by <see cref="Tick"/> when entering a brain scene, and kept
+    /// as-is across ticks. Reset to <see cref="BeingActivity.Idle"/> only when
+    /// a full tick elapses without triggering any scene.
     /// </summary>
-    public override bool IsIdle => !_isProcessing;
+    public override BeingActivity CurrentActivity => (BeingActivity)_activityRaw;
 
     /// <summary>
     /// Initializes a new instance of the DefaultSiliconBeing class
@@ -45,6 +49,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
         : base(id, name)
     {
         _isProcessing = false;
+        _activityRaw = (int)BeingActivity.Idle;
     }
 
     /// <summary>
@@ -169,6 +174,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
             {
                 if (ContextManager.NeedsContinuation(this, session))
                 {
+                    _activityRaw = (int)BeingActivity.SingleChat;
                     _logger.Info(Id, "Being {0}: detected continuation in session {1}", Name, session.Id);
                     ExecuteBrain("ThinkContinuation", session, brain => brain.ThinkOnChat());
                     return;
@@ -181,7 +187,10 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 if (brain.HasWork)
                 {
                     // Check if the last AI response was a mark_read action
-                    // If so, skip ThinkOnChat to save tokens (read but no reply)
+                    // If so, skip ThinkOnChat to save tokens (read but no reply).
+                    // mark_read is a lightweight bookkeeping step: keep the
+                    // previous activity value intact rather than counting it
+                    // as a fresh scene trigger.
                     if (WasJustMarkRead(session))
                     {
                         brain.CommitMessagesAsRead();
@@ -189,6 +198,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
                         return;
                     }
 
+                    _activityRaw = (int)BeingActivity.SingleChat;
                     _logger.Info(Id, "Being {0}: detected pending messages in session {1}", Name, session.Id);
                     ExecuteBrain("ThinkOnChat", session, _ => brain.ThinkOnChat());
                     return;
@@ -203,6 +213,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 if (timersToProcess.Count > 0)
                 {
                     TimerItem timer = timersToProcess[0]; // Process one timer per tick
+                    _activityRaw = (int)BeingActivity.Timer;
                     _logger.Info(Id, "Being {0}: processing timer {1} (state={2}, step={3})",
                         Name, timer.Name, timer.ExecutionState, timer.CurrentStep);
 
@@ -218,6 +229,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 if (runnable.Count > 0)
                 {
                     TaskItem task = runnable[0];
+                    _activityRaw = (int)BeingActivity.Task;
                     _logger.Info(Id, "Being {0}: pending task detected - {1} ({2})", Name, task.Title, task.Id);
                     ExecuteBrain("ThinkOnTask", null, _ => new ContextManager(this, (SessionBase?)null).ThinkOnTask(task));
                     return;
@@ -226,10 +238,18 @@ public class DefaultSiliconBeing : SiliconBeingBase
 
             if (Memory != null && Memory.ShouldCompress(out var compressData))
             {
+                _activityRaw = (int)BeingActivity.MemoryCompression;
                 _logger.Debug(Id, "Being {0}: memory compression needed at level {1}", Name, compressData.Value.Level);
                 ExecuteBrain("ThinkOnMemoryCompress", null, _ => new ContextManager(this, (SessionBase?)null).ThinkOnMemoryCompress(compressData));
                 return;
             }
+
+            // Reached the end of Tick without triggering any scene branch
+            // (all the early-return branches above were skipped). Only in
+            // this "fully idle tick" case do we fall back to Idle, so that
+            // the previously displayed activity stays visible until the
+            // being actually has nothing to do.
+            _activityRaw = (int)BeingActivity.Idle;
         }
         catch (Exception ex)
         {

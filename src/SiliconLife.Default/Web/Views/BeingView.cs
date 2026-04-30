@@ -12,6 +12,7 @@
 using SiliconLife.Default.Web.Models;
 
 using SiliconLife.Common.Localization;
+using SiliconLife.Collective;
 
 namespace SiliconLife.Default.Web.Views;
 
@@ -92,7 +93,7 @@ public class BeingView : ViewBase
                 .Property("background", "rgba(107,203,119,0.15)")
                 .Property("color", "var(--accent-success)")
             .EndSelector()
-            .Selector(".being-status.running")
+            .Selector(".being-status.active")
                 .Property("background", "rgba(77,150,255,0.15)")
                 .Property("color", "var(--accent-primary)")
             .EndSelector()
@@ -139,7 +140,7 @@ public class BeingView : ViewBase
             .Selector(".detail-value.idle")
                 .Property("color", "var(--accent-success)")
             .EndSelector()
-            .Selector(".detail-value.running")
+            .Selector(".detail-value.active")
                 .Property("color", "var(--accent-primary)")
             .EndSelector()
             .Selector(".soul-content")
@@ -173,8 +174,8 @@ public class BeingView : ViewBase
     {
         var forEachBody = Js.Block()
             .Add(() => Js.Const(() => "card", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
-            .Add(() => Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "b").Prop(() => "isIdle"), () => Js.Str(() => "idle"), () => Js.Str(() => "running"))))
-            .Add(() => Js.Const(() => "statusText", () => Js.Ternary(() => Js.Id(() => "b").Prop(() => "isIdle"), () => Js.Str(() => loc.BeingsStatusIdle), () => Js.Str(() => loc.BeingsStatusRunning))))
+            .Add(() => Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "b").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "Idle")), () => Js.Str(() => "idle"), () => Js.Str(() => "active"))))
+            .Add(() => Js.Const(() => "statusText", () => Js.Id(() => "activityNameMap").Index(() => Js.Id(() => "b").Prop(() => "activity"))))
             .Add(() => Js.Const(() => "isSelected", () => Js.Id(() => "selectedBeingId").Op(() => "===", () => Js.Id(() => "b").Prop(() => "id"))))
             .Add(() => Js.Assign(() => Js.Id(() => "card").Prop(() => "className"), () => Js.Ternary(() => Js.Id(() => "isSelected"), () => Js.Str(() => "being-card selected"), () => Js.Str(() => "being-card"))))
             .Add(() => Js.Assign(() => Js.Id(() => "card").Prop(() => "onclick"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "selectBeing").Invoke(() => Js.Id(() => "b").Prop(() => "id"), () => Js.Id(() => "b").Prop(() => "name")))))
@@ -204,8 +205,8 @@ public class BeingView : ViewBase
             .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/beings/list")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
 
         var selectThenBody = Js.Block()
-            .Add(() => Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "data").Prop(() => "isIdle"), () => Js.Str(() => "idle"), () => Js.Str(() => "running"))))
-            .Add(() => Js.Const(() => "statusText", () => Js.Ternary(() => Js.Id(() => "data").Prop(() => "isIdle"), () => Js.Str(() => loc.BeingsStatusIdle), () => Js.Str(() => loc.BeingsStatusRunning))))
+            .Add(() => Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "data").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "Idle")), () => Js.Str(() => "idle"), () => Js.Str(() => "active"))))
+            .Add(() => Js.Const(() => "statusText", () => Js.Id(() => "activityNameMap").Index(() => Js.Id(() => "data").Prop(() => "activity"))))
             .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "detail-content")).Prop(() => "innerHTML"), () => BuildDetailHtml(loc)));
 
         var selectBeingBody = Js.Block()
@@ -214,6 +215,17 @@ public class BeingView : ViewBase
             .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/beings/detail?id=").Op(() => "+", () => Js.Id(() => "id"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => selectThenBody)).Stmt());
 
         return Js.Block()
+            .Add(() =>
+            {
+                var map = Js.Obj()
+                    .Prop(() => "Idle", () => Js.Str(() => loc.BeingsStatusIdle))
+                    .Prop(() => "SingleChat", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.SingleChat)))
+                    .Prop(() => "GroupChat", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.GroupChat)))
+                    .Prop(() => "Task", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.Task)))
+                    .Prop(() => "Timer", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.Timer)))
+                    .Prop(() => "MemoryCompression", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.MemoryCompression)));
+                return Js.Const(() => "activityNameMap", () => map);
+            })
             .Add(() => Js.Let(() => "selectedBeingId", () => Js.Null()))
             .Add(() => Js.Func(() => "loadBeings", () => new List<string>(), () => loadBeingsBody))
             .Add(() => Js.Func(() => "selectBeing", () => new List<string> { "id", "name" }, () => selectBeingBody))

@@ -356,6 +356,19 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string MemoryStatTypeDistribution => "Distribución por tipo";
     public override string MemoryStatKeywordFrequency => "Frecuencia de palabras clave";
     public override string MemoryCardViewDetail => "Ver detalle";
+    public override string MemoryTimelineEmptyState => "Sin datos de memoria";
+    public override string MemoryYearSummaryLabel => "Resumen anual";
+    public override string MemoryMonthSummaryLabel => "Resumen mensual";
+    public override string MemoryDaySummaryLabel => "Resumen diario";
+    public override string MemoryHourSummaryLabel => "Resumen por hora";
+    public override string MemoryMinuteSummaryLabel => "Resumen por minuto";
+    public override string MemorySummaryBadge => "Resumen comprimido";
+    public override string MemoryTimelineYearFormat => "{0} ({1} entradas)";
+    public override string MemoryTimelineMonthFormat => "{0}/{1} ({2} entradas)";
+    public override string MemoryTimelineDayFormat => "{0}-{1}-{2} ({3} entradas)";
+    public override string MemoryTimelineHourFormat => "{0}:00 ({1} entradas)";
+    public override string MemoryTimelineMinuteFormat => "{0}:{1} ({2} entradas)";
+    public override string MemoryRelatedBeingsLabel => "👥 Relacionados: {0} seres";
 
     // ===== Projects Page Localization =====
 
@@ -782,7 +795,6 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         ["DashScopeModel_kimi-k2.5"] = "Kimi K2.5 (Contexto largo)",
         ["DashScopeModel_llama-4-maverick"] = "Llama 4 Maverick",
         ["WebPort"] = "Puerto web",
-        ["AllowIntranetAccess"] = "Permitir acceso de intranet",
         ["WebSkin"] = "Tema web",
         ["UserNickname"] = "Apodo del usuario"
     };
@@ -802,7 +814,6 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         ["DashScopeRegion"] = "Región del servicio Alibaba Cloud DashScope",
         ["DashScopeModel"] = "Modelo de Alibaba Cloud DashScope a usar",
         ["WebPort"] = "Puerto del servidor web",
-        ["AllowIntranetAccess"] = "Permitir acceso de intranet (requiere administrador)",
         ["WebSkin"] = "Nombre del tema web",
         ["UserNickname"] = "Apodo del usuario humano"
     };
@@ -833,6 +844,20 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         LogLevel.Critical => "Crítico",
         LogLevel.None => "Ninguno",
         _ => logLevel.ToString()
+    };
+
+    /// <summary>
+    /// Gets the localized display name for a silicon being activity state.
+    /// </summary>
+    public override string GetBeingActivityName(BeingActivity activity) => activity switch
+    {
+        BeingActivity.Idle => "Inactivo",
+        BeingActivity.SingleChat => "En chat privado",
+        BeingActivity.GroupChat => "En chat grupal",
+        BeingActivity.Task => "Ejecutando tarea",
+        BeingActivity.Timer => "Ejecutando temporizador",
+        BeingActivity.MemoryCompression => "Comprimiendo memoria",
+        _ => activity.ToString()
     };
 
     // ===== Tool Display Name Localization =====

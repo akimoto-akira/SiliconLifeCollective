@@ -123,4 +123,14 @@ public abstract class TrayLocalizationBase
     /// Gets the exit menu item text
     /// </summary>
     public abstract string Exit { get; }
+
+    /// <summary>
+    /// Gets the web server startup error title
+    /// </summary>
+    public abstract string WebServerStartupErrorTitle { get; }
+
+    /// <summary>
+    /// Gets the web server startup error message
+    /// </summary>
+    public abstract string WebServerStartupErrorMessage { get; }
 }

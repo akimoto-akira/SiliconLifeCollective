@@ -22,18 +22,16 @@ public class WebHost : IDisposable
     private HttpListener? _listener;
     private readonly Router _router;
     private readonly int _port;
-    private readonly bool _allowIntranet;
     private CancellationTokenSource? _cts;
     private Task? _listenerTask;
     private bool _isRunning;
 
     public bool IsRunning => _isRunning;
 
-    public WebHost(int port, Router router, bool allowIntranet = false)
+    public WebHost(int port, Router router)
     {
         _port = port;
         _router = router;
-        _allowIntranet = allowIntranet;
     }
 
     public static WebHostBuilder CreateBuilder() => new();
@@ -45,7 +43,7 @@ public class WebHost : IDisposable
 
         _logger.Info(null, $"Web server starting on port {_port}");
         _listener = new HttpListener();
-        string prefix = _allowIntranet ? $"http://+:{_port}/" : $"http://localhost:{_port}/";
+        string prefix = $"http://localhost:{_port}/";
         _listener.Prefixes.Add(prefix);
         
         try

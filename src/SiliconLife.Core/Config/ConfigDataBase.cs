@@ -25,12 +25,6 @@ public abstract class ConfigDataBase
     public abstract string ConfigType { get; set; }
 
     /// <summary>
-    /// Gets or sets the data directory for storing all application data
-    /// </summary>
-    [ConfigGroup("Basic", Order = 2, DisplayNameKey = "DataDirectory", DescriptionKey = "DataDirectory")]
-    public abstract DirectoryInfo DataDirectory { get; set; }
-
-    /// <summary>
     /// Gets or sets the GUID of the curator (main administrator)
     /// </summary>
     [ConfigIgnore("系统内部标识，不建议手动修改")]

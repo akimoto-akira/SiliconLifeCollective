@@ -23,7 +23,6 @@ internal class AppConfig
 {
     public ObjectId Id { get; set; } = ObjectId.NewObjectId();
     public string ConfigType { get; set; } = "Default";
-    public string DataDirectory { get; set; } = "./data";
     public Guid CuratorGuid { get; set; }
     public Language Language { get; set; } = Language.ZhCN;
     public int TickTimeoutMinutes { get; set; } = 10;
@@ -33,7 +32,6 @@ internal class AppConfig
     public string AIClientType { get; set; } = "OllamaClient";
     public BsonDocument AIConfig { get; set; } = new BsonDocument();
     public int WebPort { get; set; } = 8080;
-    public bool AllowIntranet { get; set; } = false;
     public string? WebSkin { get; set; }
     public string UserNickname { get; set; } = "User";
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

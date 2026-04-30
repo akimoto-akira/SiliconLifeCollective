@@ -1,4 +1,4 @@
-﻿# Quick Start
+# Quick Start
 
 > **Version: v0.1.0-alpha**
 
@@ -9,18 +9,22 @@
 This project provides two implementation versions:
 
 ### SiliconLife.Default (Default Version)
+- **Positioning**: Default implementation, primarily used for architecture feasibility verification
 - **Runtime Mode**: Console application
 - **Storage**: File system JSON storage
-- **Use Case**: Data security priority, small data volume, development debugging
+- **Use Case**: Data security priority, small data volume, development debugging, architecture verification
 - **Platform Support**: Windows, Linux, macOS
+- **Role Description**: Serves as the baseline implementation for architecture verification, providing a simple and reliable runtime mode, suitable for first-time contact with this project or development debugging
 
 ### SiliconLife.Fast (High-Performance Version)
+- **Positioning**: Main production version
 - **Runtime Mode**: Windows Forms application (system tray)
 - **Storage**: In-memory storage + asynchronous persistence
-- **Use Case**: High concurrency, low latency, large data volume
+- **Use Case**: High concurrency, low latency, large data volume, long-term production operation
 - **Platform Support**: Windows only
+- **Role Description**: A production-grade implementation with deep optimization, the first choice for long-term operation and actual production environments
 
-> **Beginner Suggestion**: First-time users are recommended to start with **SiliconLife.Default**, and migrate to the Fast version as needed after becoming familiar with the system.
+> **Beginner Suggestion**: First-time users are recommended to start with **SiliconLife.Default** to quickly verify architecture feasibility; after becoming familiar with the system, we strongly recommend migrating to **SiliconLife.Fast** as the production environment runtime version.
 
 ## Prerequisites
 

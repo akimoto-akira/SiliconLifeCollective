@@ -23,17 +23,17 @@ public sealed class BeingSummary
     public bool IsCurator { get; }
     public bool IsCustomCompiled { get; }
     public string? CustomTypeName { get; }
-    public bool IsIdle { get; }
+    public BeingActivity CurrentActivity { get; }
 
     public BeingSummary(Guid id, string name, bool isCurator, bool isCustomCompiled,
-        string? customTypeName, bool isIdle)
+        string? customTypeName, BeingActivity currentActivity)
     {
         Id = id;
         Name = name;
         IsCurator = isCurator;
         IsCustomCompiled = isCustomCompiled;
         CustomTypeName = customTypeName;
-        IsIdle = isIdle;
+        CurrentActivity = currentActivity;
     }
 }
 

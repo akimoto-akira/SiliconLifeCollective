@@ -17,7 +17,7 @@ namespace SiliconLife.Collective;
 
 /// <summary>
 /// Manages loading, compiling, and persisting dynamically compiled silicon beings.
-/// Handles the full lifecycle: read code.enc â†?decrypt â†?compile â†?instantiate.
+/// Handles the full lifecycle: read code.enc ï¿½?decrypt ï¿½?compile ï¿½?instantiate.
 /// Falls back to a default type if anything fails.
 /// Uses CompilationCore directly for compilation without security scanning.
 /// </summary>
@@ -83,34 +83,31 @@ public class DynamicBeingLoader
     }
 
     /// <summary>
-    /// Checks if a silicon being has custom compiled code in its directory.
+    /// Checks if a silicon being has custom compiled code stored.
     /// </summary>
-    /// <param name="beingDirectory">The silicon being's data directory</param>
+    /// <param name="storage">The silicon being's storage</param>
     /// <returns>True if code.enc exists</returns>
-    public static bool HasCustomCode(string beingDirectory)
+    public static bool HasCustomCode(IStorage storage)
     {
-        string codePath = Path.Combine(beingDirectory, CodeFileName);
-        return File.Exists(codePath);
+        return storage.Exists(CodeFileName);
     }
 
     /// <summary>
-    /// Loads and compiles a silicon being's custom code from its directory.
+    /// Loads and compiles a silicon being's custom code from storage.
     /// Returns null if no custom code exists, the default type should be used.
     /// Throws if compilation fails (caller should catch and fall back).
     /// </summary>
     /// <param name="beingId">The silicon being's GUID (used for decryption key)</param>
-    /// <param name="beingDirectory">The silicon being's data directory</param>
+    /// <param name="storage">The silicon being's storage</param>
     /// <returns>The compiled Type if successful, null if no custom code</returns>
-    public Type? LoadBeingType(Guid beingId, string beingDirectory)
+    public Type? LoadBeingType(Guid beingId, IStorage storage)
     {
-        string codePath = Path.Combine(beingDirectory, CodeFileName);
-        if (!File.Exists(codePath))
+        byte[]? encryptedCode = storage.Read<byte[]>(CodeFileName);
+        if (encryptedCode == null || encryptedCode.Length == 0)
         {
             _logger.Debug(null, "No custom code found for being {0}", beingId);
             return null;
         }
-
-        byte[] encryptedCode = File.ReadAllBytes(codePath);
 
         if (!CodeEncryption.TryDecryptToString(encryptedCode, beingId, out string? sourceCode) || sourceCode == null)
         {
@@ -198,7 +195,7 @@ public class DynamicBeingLoader
 
     /// <summary>
     /// Compiles source code for a being and creates an instance.
-    /// Does NOT persist â€?used for preview/verification.
+    /// Does NOT persist ï¿½?used for preview/verification.
     /// Uses CompilationCore directly (no security scan).
     /// </summary>
     /// <param name="sourceCode">The C# source code</param>
@@ -238,31 +235,28 @@ public class DynamicBeingLoader
     /// <summary>
     /// Checks if a being has a custom permission callback stored.
     /// </summary>
-    /// <param name="beingDirectory">The silicon being's data directory</param>
+    /// <param name="storage">The silicon being's storage</param>
     /// <returns>True if permission.enc exists</returns>
-    public static bool HasCustomPermissionCallback(string beingDirectory)
+    public static bool HasCustomPermissionCallback(IStorage storage)
     {
-        string permPath = Path.Combine(beingDirectory, PermissionCodeFileName);
-        return File.Exists(permPath);
+        return storage.Exists(PermissionCodeFileName);
     }
 
     /// <summary>
-    /// Loads and compiles a custom IPermissionCallback from the being's directory.
+    /// Loads and compiles a custom IPermissionCallback from storage.
     /// This is the independent permission callback channel.
     /// </summary>
     /// <param name="beingId">The silicon being's GUID</param>
-    /// <param name="beingDirectory">The silicon being's data directory</param>
-    /// <returns>CompilationResult â€?check Success and use CompiledType</returns>
-    public CompilationResult LoadPermissionCallback(Guid beingId, string beingDirectory)
+    /// <param name="storage">The silicon being's storage</param>
+    /// <returns>CompilationResult â€” check Success and use CompiledType</returns>
+    public CompilationResult LoadPermissionCallback(Guid beingId, IStorage storage)
     {
-        string permPath = Path.Combine(beingDirectory, PermissionCodeFileName);
-        if (!File.Exists(permPath))
+        byte[]? encryptedCode = storage.Read<byte[]>(PermissionCodeFileName);
+        if (encryptedCode == null || encryptedCode.Length == 0)
         {
             _logger.Debug(null, "No permission callback file found for being {0}", beingId);
             return new CompilationResult(false, null, ["No permission callback file found."]);
         }
-
-        byte[] encryptedCode = File.ReadAllBytes(permPath);
 
         if (!CodeEncryption.TryDecryptToString(encryptedCode, beingId, out string? sourceCode) || sourceCode == null)
         {
@@ -349,20 +343,19 @@ public class DynamicBeingLoader
     /// Used by Web UI to display the current code for editing.
     /// </summary>
     /// <param name="beingId">The silicon being's GUID</param>
-    /// <param name="beingDirectory">The silicon being's data directory</param>
+    /// <param name="storage">The silicon being's storage interface</param>
     /// <returns>The decrypted source code, or empty string if not found or failed</returns>
-    public string GetPermissionCallbackSourceCode(Guid beingId, string beingDirectory)
+    public string GetPermissionCallbackSourceCode(Guid beingId, IStorage storage)
     {
         try
         {
-            string permPath = Path.Combine(beingDirectory, PermissionCodeFileName);
-            if (!File.Exists(permPath))
+            // Load encrypted permission callback code from storage
+            byte[]? encryptedCode = BeingCodeFileManager.LoadCode(storage);
+            if (encryptedCode == null || encryptedCode.Length == 0)
             {
-                _logger.Debug(null, "No permission callback file found for being {0}", beingId);
+                _logger.Debug(null, "No permission callback code found in storage for being {0}", beingId);
                 return string.Empty;
             }
-
-            byte[] encryptedCode = File.ReadAllBytes(permPath);
 
             if (!CodeEncryption.TryDecryptToString(encryptedCode, beingId, out string? sourceCode) || sourceCode == null)
             {
@@ -380,13 +373,13 @@ public class DynamicBeingLoader
     }
 
     /// <summary>
-    /// Persists a custom permission callback to disk (encrypted).
+    /// Persists a custom permission callback to storage (encrypted).
     /// </summary>
     /// <param name="beingId">The silicon being's GUID</param>
-    /// <param name="beingDirectory">The silicon being's data directory</param>
+    /// <param name="storage">The silicon being's storage</param>
     /// <param name="sourceCode">The C# source code implementing IPermissionCallback</param>
     /// <returns>True if persistence succeeded</returns>
-    public bool SavePermissionCallback(Guid beingId, string beingDirectory, string sourceCode)
+    public bool SavePermissionCallback(Guid beingId, IStorage storage, string sourceCode)
     {
         ArgumentNullException.ThrowIfNull(sourceCode);
 
@@ -399,14 +392,8 @@ public class DynamicBeingLoader
 
         try
         {
-            if (!Directory.Exists(beingDirectory))
-            {
-                Directory.CreateDirectory(beingDirectory);
-            }
-
             byte[] encrypted = CodeEncryption.Encrypt(sourceCode, beingId);
-            string permPath = Path.Combine(beingDirectory, PermissionCodeFileName);
-            File.WriteAllBytes(permPath, encrypted);
+            storage.Write(PermissionCodeFileName, encrypted);
             _logger.Info(null, "Permission callback saved for being {0}", beingId);
             return true;
         }
@@ -421,32 +408,22 @@ public class DynamicBeingLoader
     /// Deletes the custom code file for a silicon being.
     /// After deletion, the being will use its default implementation.
     /// </summary>
-    /// <param name="beingDirectory">The silicon being's data directory</param>
+    /// <param name="storage">The silicon being's storage</param>
     /// <returns>True if the file was deleted or didn't exist</returns>
-    public static bool DeleteCustomCode(string beingDirectory)
+    public static bool DeleteCustomCode(IStorage storage)
     {
-        string codePath = Path.Combine(beingDirectory, CodeFileName);
-        if (File.Exists(codePath))
-        {
-            File.Delete(codePath);
-            return true;
-        }
+        storage.Delete(CodeFileName);
         return true;
     }
 
     /// <summary>
     /// Deletes the custom permission callback file for a silicon being.
     /// </summary>
-    /// <param name="beingDirectory">The silicon being's data directory</param>
+    /// <param name="storage">The silicon being's storage</param>
     /// <returns>True if the file was deleted or didn't exist</returns>
-    public static bool DeleteCustomPermissionCallback(string beingDirectory)
+    public static bool DeleteCustomPermissionCallback(IStorage storage)
     {
-        string permPath = Path.Combine(beingDirectory, PermissionCodeFileName);
-        if (File.Exists(permPath))
-        {
-            File.Delete(permPath);
-            return true;
-        }
+        storage.Delete(PermissionCodeFileName);
         return true;
     }
 }

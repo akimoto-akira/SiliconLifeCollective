@@ -1,4 +1,6 @@
-﻿# Silicon Life Collective
+![Silicon Life Collective](../../icon/wordIcon.png)
+
+# Silicon Life Collective
 
 **Version: v0.1.0-alpha** | **Silicon Life Collective** — A multi-agent collaboration platform based on .NET 9, where AI agents are called **Silicon Beings**, capable of self-evolution through Roslyn dynamic compilation.
 
@@ -49,18 +51,22 @@
 This project provides two implementation versions to meet different scenario needs:
 
 ### SiliconLife.Default (Default Version)
+- **Positioning**: Default implementation, primarily used for architecture feasibility verification
 - **Runtime Mode**: Console application
 - **Storage Method**: Pure file system JSON storage
-- **Applicable Scenarios**: High data security requirements, limited memory resources, small data volume
+- **Applicable Scenarios**: High data security requirements, limited memory resources, small data volume scenarios
 - **Features**: Simple and reliable, immediate data persistence, no memory loss risk
+- **Role Description**: Serves as the baseline implementation for architecture verification, suitable for first-time contact, development debugging, or data security priority scenarios
 - **Startup Command**: `dotnet run --project src/SiliconLife.Default`
 
 ### SiliconLife.Fast (High-Performance Version)
+- **Positioning**: Main production version
 - **Runtime Mode**: Windows Forms application (supports system tray)
 - **Storage Method**: Memory storage + asynchronous batch persistence
 - **Applicable Scenarios**: High concurrency, low latency, large data volume scenarios
 - **Features**: Extreme performance optimization, tray background operation, memory database + WAL logs ensure data security
 - **Performance Improvement**: Storage read latency reduced by 1000x, write latency reduced by 15000x, concurrent processing capacity increased by 50x
+- **Role Description**: A production-grade implementation with deep optimization, the first choice for long-term operation and actual production environments
 - **Startup Command**: `dotnet run --project src/SiliconLife.Fast`
 
 ### Version Comparison

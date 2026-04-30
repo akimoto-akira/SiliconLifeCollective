@@ -18,6 +18,7 @@ public class ChatViewModel : ViewModelBase
     public List<ChatSessionItem> Sessions { get; set; } = new();
     public List<ChatMessage> Messages { get; set; } = new();
     public Guid UserId { get; set; }
+    public Guid? CurrentSessionId { get; set; }
     public Guid? CurrentBeingId { get; set; }
     public string CurrentBeingName { get; set; } = string.Empty;
 
@@ -27,6 +28,12 @@ public class ChatViewModel : ViewModelBase
     /// client-side lookup table so the frontend never needs to call the server again.
     /// </summary>
     public Dictionary<string, string> ToolDisplayNames { get; set; } = new();
+
+    /// <summary>
+    /// Maps being activity names (e.g. "Idle", "SingleChat") to their localized display names.
+    /// Populated at render time by ChatController for frontend status badge display.
+    /// </summary>
+    public Dictionary<string, string> ActivityStatusNames { get; set; } = new();
 }
 
 public class ChatSessionItem
@@ -36,4 +43,5 @@ public class ChatSessionItem
     public string LastMessage { get; set; } = string.Empty;
     public DateTime LastMessageAt { get; set; }
     public int UnreadCount { get; set; }
+    public Guid? BeingId { get; set; }
 }

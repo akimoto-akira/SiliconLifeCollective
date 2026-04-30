@@ -122,4 +122,14 @@ public class TrayZhCN : TrayLocalizationBase
     /// Gets the exit menu item text
     /// </summary>
     public override string Exit => "退出应用";
+
+    /// <summary>
+    /// Gets the web server startup error title
+    /// </summary>
+    public override string WebServerStartupErrorTitle => "Web 服务器启动失败";
+
+    /// <summary>
+    /// Gets the web server startup error message
+    /// </summary>
+    public override string WebServerStartupErrorMessage => "Web 服务器启动失败，程序将退出。\n\n错误信息：{0}";
 }

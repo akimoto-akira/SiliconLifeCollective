@@ -135,12 +135,16 @@ OutOfMemoryException
 ```
 
 **Lösung**:
-1. Heap-Größe erhöhen:
+1. **SiliconLife.Default**: Heap-Größe erhöhen:
 ```bash
-dotnet run --server.gcHeapCount 4
+dotnet run --project src/SiliconLife.Default --server.gcHeapCount 4
 ```
 
-2. Alte Daten bereinigen:
+2. **SiliconLife.Fast**: Die Fast-Version selbst hat einen hohen Speicherverbrauch (~500MB). Wenn der Speicher dauerhaft knapp ist, wird empfohlen:
+   - Anzahl gleichzeitig laufender Silicon Beings reduzieren
+   - Alte Daten bereinigen, um Speicher freizugeben
+
+3. Alte Daten bereinigen:
 ```bash
 # Alte Logs archivieren
 mv logs/ logs-archive/
@@ -149,6 +153,8 @@ mkdir logs
 # Alte Speicher bereinigen
 # Über Web-UI: Speicherverwaltung > Bereinigen
 ```
+
+> **Tipp**: SiliconLife.Default hat einen niedrigen Speicherverbrauch (~200MB), geeignet für Umgebungen mit begrenztem Speicher; SiliconLife.Fast hat einen höheren Speicherverbrauch, aber bessere Performance, geeignet für Produktionsumgebungen.
 
 ---
 
@@ -454,6 +460,7 @@ tail -f logs/*.log
 
 ### Debugger verwenden
 
+**SiliconLife.Default (Standardimplementierung)**:
 ```bash
 # Mit Debugger ausführen
 dotnet run --project src/SiliconLife.Default --configuration Debug
@@ -461,6 +468,17 @@ dotnet run --project src/SiliconLife.Default --configuration Debug
 # Debugger attachen
 # Über IDE: An Prozess attachen > SiliconLife.Default
 ```
+
+**SiliconLife.Fast (Hochleistungsversion)**:
+```bash
+# Mit Debugger ausführen
+dotnet run --project src/SiliconLife.Fast --configuration Debug
+
+# Debugger attachen
+# Über IDE: An Prozess attachen > SiliconLife.Fast
+```
+
+> **Empfehlung**: Für Entwicklungs-Debugging wird die Verwendung von SiliconLife.Default empfohlen. Nach erfolgreicher Architekturverifizierung SiliconLife.Fast für Produktionsbereitstellung verwenden.
 
 ---
 
@@ -527,8 +545,15 @@ Immer zuerst Logs auf Fehlerdetails prüfen.
 
 1. Logs auf Ursache prüfen
 2. Anwendung neu starten:
+
+**SiliconLife.Default (Standardimplementierung)**:
 ```bash
 dotnet run --project src/SiliconLife.Default
+```
+
+**SiliconLife.Fast (Haupt-Produktionsversion)**:
+```bash
+dotnet run --project src/SiliconLife.Fast
 ```
 
 3. Bei Bedarf aus Backup wiederherstellen

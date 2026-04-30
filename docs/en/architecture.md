@@ -1,4 +1,4 @@
-﻿# Architecture
+# Architecture
 
 > **Version: v0.1.0-alpha**
 
@@ -9,17 +9,21 @@
 This project provides two implementation versions that share the same architecture design but differ in storage and performance optimization:
 
 ### SiliconLife.Default (Default Version)
+- **Positioning**: Default implementation, primarily used for architecture feasibility verification
 - **Runtime Mode**: Console application
 - **Storage**: Pure file system JSON storage
 - **Use Case**: High data security requirements, limited memory resources, small data volume scenarios
+- **Role Description**: Serves as the baseline implementation for architecture verification, providing a simple and reliable runtime mode, suitable for first-time contact with this project, development debugging, or data security priority scenarios
 
 ### SiliconLife.Fast (High-Performance Version)
+- **Positioning**: Main production version
 - **Runtime Mode**: Windows Forms application (with system tray support)
 - **Storage**: In-memory storage + asynchronous batch persistence (WAL log)
 - **Use Case**: High concurrency, low latency, large data volume scenarios
 - **Performance Improvement**: Storage read latency reduced by 1000x, write latency reduced by 15000x
+- **Role Description**: A production-grade implementation with deep optimization, featuring system tray background operation, extreme performance optimization, etc., the first choice for long-term operation and actual production environments
 
-> **Note**: The architecture described in this document applies to both versions, with differences only in the storage implementation.
+> **Note**: The architecture described in this document applies to both versions, with differences only in the storage implementation. SiliconLife.Default serves as the architecture verification baseline, and SiliconLife.Fast is the main version for production environments.
 
 ---
 

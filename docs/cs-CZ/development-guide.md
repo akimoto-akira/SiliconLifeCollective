@@ -1,4 +1,4 @@
-﻿# Vývojový Průvodce
+# Vývojový Průvodce
 
 > **Verze: v0.1.0-alpha**
 
@@ -14,11 +14,20 @@ SiliconLifeCollective následuje **architekturu tělo-mozek** s přísným oddě
 SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/      # Rozhraní, abstraktní třídy, obecná infrastruktura
-│   └── SiliconLife.Default/   # Konkrétní implementace, vstupní body
+│   ├── SiliconLife.Common/    # Společné implementace (používány oběma verzemi)
+│   ├── SiliconLife.Default/   # Výchozí implementace, vstupní bod (ověření proveditelnosti architektury)
+│   └── SiliconLife.Fast/      # Vysoce výkonná implementace, vstupní bod (hlavní produkční verze)
 └── docs/                      # Vícejazyčná dokumentace
 ```
 
-**Směr závislosti**: `SiliconLife.Default` → `SiliconLife.Core` (jednosměrný)
+**Směr závislosti**:
+- `SiliconLife.Default` → `SiliconLife.Core` (jednosměrný)
+- `SiliconLife.Fast` → `SiliconLife.Core` (jednosměrný)
+- `SiliconLife.Common` → `SiliconLife.Core` (jednosměrný)
+
+**Popis rolí verzí**:
+- **SiliconLife.Default**: Výchozí implementace, používána především pro ověření proveditelnosti architektury. Poskytuje jednoduché a spolehlivé souborové úložiště, vhodné pro vývojové ladění a ověření architektury.
+- **SiliconLife.Fast**: Hlavní produkční verze. Na základě architektury ověřené v Default přijímá paměťové úložiště + asynchronní perzistenci, aby poskytla extrémní optimalizaci výkonu. Nejlepší volba pro dlouhodobý provoz a reálné produkční prostředí.
 
 ## Základní koncepty
 

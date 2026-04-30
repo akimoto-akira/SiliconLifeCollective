@@ -14,11 +14,20 @@ SiliconLifeCollective folgt der **Body-Brain-Architektur**, mit strenger Trennun
 SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/      # Schnittstellen, abstrakte Klassen, allgemeine Infrastruktur
-│   └── SiliconLife.Default/   # Konkrete Implementierungen, Einstiegspunkte
+│   ├── SiliconLife.Common/    # Gemeinsame Implementierungen (von beiden Versionen genutzt)
+│   ├── SiliconLife.Default/   # Standardimplementierung, Einstiegspunkt (Architektur-Machbarkeitsverifizierung)
+│   └── SiliconLife.Fast/      # Hochleistungsimplementierung, Einstiegspunkt (Haupt-Produktionsversion)
 └── docs/                      # Mehrsprachige Dokumentation
 ```
 
-**Abhängigkeitsrichtung**: `SiliconLife.Default` → `SiliconLife.Core` (einfach gerichtet)
+**Abhängigkeitsrichtung**:
+- `SiliconLife.Default` → `SiliconLife.Core` (einfach gerichtet)
+- `SiliconLife.Fast` → `SiliconLife.Core` (einfach gerichtet)
+- `SiliconLife.Common` → `SiliconLife.Core` (einfach gerichtet)
+
+**Versions-Rollenbeschreibung**:
+- **SiliconLife.Default**: Standardimplementierung, hauptsächlich für Architektur-Machbarkeitsverifizierung. Bietet eine einfache und zuverlässige Dateisystem-Speicherimplementierung, geeignet für Entwicklungs-Debugging und Architekturverifizierung.
+- **SiliconLife.Fast**: Haupt-Produktionsversion. Basierend auf der in Default verifizierten Architektur, übernimmt In-Memory-Speicher + asynchrone Persistenz, um extreme Performance-Optimierung zu bieten. Die beste Wahl für Langzeitbetrieb und echte Produktionsumgebungen.
 
 ## Kernkonzepte
 

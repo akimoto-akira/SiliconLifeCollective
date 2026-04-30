@@ -122,4 +122,14 @@ public class TrayDeDE : TrayLocalizationBase
     /// Gets the exit menu item text
     /// </summary>
     public override string Exit => "Beenden";
+
+    /// <summary>
+    /// Gets the web server startup error title
+    /// </summary>
+    public override string WebServerStartupErrorTitle => "Webserver-Start fehlgeschlagen";
+
+    /// <summary>
+    /// Gets the web server startup error message
+    /// </summary>
+    public override string WebServerStartupErrorMessage => "Der Webserver konnte nicht gestartet werden. Die Anwendung wird beendet.\n\nFehler: {0}";
 }

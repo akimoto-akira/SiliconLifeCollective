@@ -10,8 +10,10 @@
 // limitations under the License.
 
 using SiliconLife.Fast.Web.Models;
+using SiliconLife.Fast.Web.Component;
 
 using SiliconLife.Common.Localization;
+using SiliconLife.Collective;
 
 namespace SiliconLife.Fast.Web.Views;
 
@@ -27,99 +29,132 @@ public class BeingView : ViewBase
 
     private static H RenderBody(BeingViewModel vm)
     {
-        return H.Div(
-            H.Div(
-                H.H1(vm.Localization.BeingsPageHeader),
-                H.Div(
-                    H.Span(string.Format(vm.Localization.BeingsTotalCount, "")).Id("total-count").Class("stat-value")
-                ).Class("page-stat")
-            ).Class("page-header"),
-            H.Div().Id("beings-grid").Class("beings-grid"),
-            H.Div(
-                H.Div(
-                    H.P(vm.Localization.BeingsNoSelectionPlaceholder)
-                ).Id("detail-content").Class("detail-content")
-            ).Id("detail-panel").Class("detail-panel")
-        ).Class("page-content");
+        var pageHeader = new DivComponent()
+            .Class("page-header")
+            .Add(new HeadingComponent("h1").Text(vm.Localization.BeingsPageHeader))
+            .Add(new DivComponent()
+                .Class("page-stat")
+                .Add(new SpanComponent()
+                    .Id("total-count")
+                    .Class("stat-value")
+                    .Text(string.Format(vm.Localization.BeingsTotalCount, ""))));
+
+        var beingsGrid = new DivComponent()
+            .Id("beings-grid")
+            .Class("beings-grid");
+
+        var detailPanel = new DivComponent()
+            .Id("detail-panel")
+            .Class("detail-panel")
+            .Add(new DivComponent()
+                .Id("detail-content")
+                .Class("detail-content")
+                .Add(new PComponent().Text(vm.Localization.BeingsNoSelectionPlaceholder)));
+
+        var pageContent = new DivComponent()
+            .Class("page-content")
+            .Add(pageHeader)
+            .Add(beingsGrid)
+            .Add(detailPanel);
+
+        return H.Div().AddRendered(pageContent.Render());
     }
 
     private static CssBuilder GetStyles()
     {
         return CssBuilder.Create()
+            // 页面统计
             .Selector(".page-stat")
                 .Property("margin-left", "16px")
                 .Property("font-size", "14px")
                 .Property("color", "var(--text-secondary)")
             .EndSelector()
             .Selector(".stat-value")
-                .Property("font-weight", "bold")
+                .Property("font-weight", "600")
                 .Property("color", "var(--accent-primary)")
             .EndSelector()
+            // 硅基人卡片网格
             .Selector(".beings-grid")
                 .Property("display", "grid")
                 .Property("grid-template-columns", "repeat(auto-fill, minmax(280px, 1fr))")
-                .Property("gap", "20px")
-                .Property("margin-bottom", "30px")
+                .Property("gap", "var(--card-gap, 16px)")
+                .Property("margin-bottom", "24px")
             .EndSelector()
+            // 硅基人卡片
             .Selector(".being-card")
-                .Property("background", "var(--bg-card)")
+                .Property("background", "var(--bg-secondary)")
                 .Property("padding", "20px")
-                .Property("border-radius", "12px")
-                .Property("border", "1px solid var(--border)")
+                .Property("border-radius", "var(--card-radius, 8px)")
+                .Property("border", "1px solid var(--border-color)")
                 .Property("cursor", "pointer")
-                .Property("transition", "transform 0.2s, box-shadow 0.2s")
+                .Property("transition", "var(--transition, 0.2s ease)")
+                .Property("position", "relative")
             .EndSelector()
             .Selector(".being-card:hover")
-                .Property("transform", "translateY(-4px)")
-                .Property("box-shadow", "0 4px 16px rgba(0,0,0,0.12)")
+                .Property("border-color", "var(--accent-primary)")
+                .Property("transform", "translateY(-2px)")
             .EndSelector()
             .Selector(".being-card.selected")
                 .Property("border", "2px solid var(--accent-primary)")
             .EndSelector()
-            .Selector(".being-name")
-                .Property("font-size", "18px")
-                .Property("font-weight", "bold")
-                .Property("color", "var(--text-primary)")
-                .Property("margin-bottom", "8px")
+            // 卡片头部
+            .Selector(".being-header")
+                .Property("display", "flex")
+                .Property("justify-content", "space-between")
+                .Property("align-items", "flex-start")
+                .Property("margin-bottom", "12px")
             .EndSelector()
+            .Selector(".being-name")
+                .Property("font-size", "16px")
+                .Property("font-weight", "600")
+                .Property("color", "var(--text-primary)")
+            .EndSelector()
+            // 状态徽章
             .Selector(".being-status")
-                .Property("display", "inline-block")
-                .Property("padding", "4px 12px")
+                .Property("display", "inline-flex")
+                .Property("align-items", "center")
+                .Property("gap", "6px")
+                .Property("padding", "4px 10px")
                 .Property("border-radius", "12px")
                 .Property("font-size", "12px")
+                .Property("font-weight", "500")
             .EndSelector()
             .Selector(".being-status.idle")
-                .Property("background", "rgba(107,203,119,0.15)")
-                .Property("color", "var(--accent-success)")
+                .Property("background", "rgba(245, 158, 11, 0.15)")
+                .Property("color", "var(--status-warning, var(--accent-warning))")
             .EndSelector()
-            .Selector(".being-status.running")
-                .Property("background", "rgba(77,150,255,0.15)")
-                .Property("color", "var(--accent-primary)")
+            .Selector(".being-status.active")
+                .Property("background", "rgba(16, 185, 129, 0.15)")
+                .Property("color", "var(--status-active, var(--accent-secondary))")
             .EndSelector()
-            .Selector(".being-info")
-                .Property("font-size", "12px")
-                .Property("color", "var(--text-secondary)")
-                .Property("margin-top", "8px")
+            .Selector(".status-dot")
+                .Property("width", "6px")
+                .Property("height", "6px")
+                .Property("border-radius", "50%")
+                .Property("background", "currentColor")
             .EndSelector()
+            // 类型标签
             .Selector(".being-type-badge")
                 .Property("display", "inline-block")
                 .Property("padding", "2px 8px")
                 .Property("border-radius", "4px")
                 .Property("font-size", "11px")
-                .Property("background", "rgba(156,136,255,0.15)")
-                .Property("color", "#9c88ff")
+                .Property("background", "var(--bg-card)")
+                .Property("color", "var(--text-secondary)")
                 .Property("margin-left", "8px")
             .EndSelector()
+            // 详情面板
             .Selector(".detail-panel")
-                .Property("background", "var(--bg-card)")
-                .Property("padding", "20px")
-                .Property("border-radius", "12px")
-                .Property("border", "1px solid var(--border)")
+                .Property("background", "var(--bg-secondary)")
+                .Property("padding", "24px")
+                .Property("border-radius", "var(--card-radius, 8px)")
+                .Property("border", "1px solid var(--border-color)")
             .EndSelector()
             .Selector(".detail-content h2")
-                .Property("font-size", "22px")
+                .Property("font-size", "18px")
+                .Property("font-weight", "600")
                 .Property("color", "var(--text-primary)")
-                .Property("margin-bottom", "15px")
+                .Property("margin-bottom", "16px")
             .EndSelector()
             .Selector(".detail-row")
                 .Property("display", "flex")
@@ -127,45 +162,55 @@ public class BeingView : ViewBase
                 .Property("align-items", "flex-start")
             .EndSelector()
             .Selector(".detail-label")
-                .Property("font-weight", "bold")
-                .Property("color", "var(--text-secondary)")
+                .Property("font-size", "13px")
+                .Property("font-weight", "600")
+                .Property("color", "var(--text-muted)")
                 .Property("width", "100px")
                 .Property("flex-shrink", "0")
+                .Property("text-transform", "uppercase")
+                .Property("letter-spacing", "0.5px")
             .EndSelector()
             .Selector(".detail-value")
+                .Property("font-size", "14px")
                 .Property("color", "var(--text-primary)")
+                .Property("font-weight", "500")
                 .Property("word-break", "break-all")
             .EndSelector()
             .Selector(".detail-value.idle")
-                .Property("color", "var(--accent-success)")
+                .Property("color", "var(--status-warning, var(--accent-warning))")
             .EndSelector()
-            .Selector(".detail-value.running")
-                .Property("color", "var(--accent-primary)")
+            .Selector(".detail-value.active")
+                .Property("color", "var(--status-active, var(--accent-secondary))")
             .EndSelector()
+            // 灵魂内容区
             .Selector(".soul-content")
-                .Property("background", "var(--bg-secondary, rgba(0,0,0,0.1))")
-                .Property("padding", "12px")
-                .Property("border-radius", "8px")
+                .Property("background", "var(--bg-card)")
+                .Property("padding", "16px")
+                .Property("border-radius", "6px")
                 .Property("font-size", "13px")
                 .Property("line-height", "1.6")
+                .Property("color", "var(--text-secondary)")
                 .Property("max-height", "200px")
                 .Property("overflow-y", "auto")
                 .Property("white-space", "pre-wrap")
             .EndSelector()
+            // 详情链接
             .Selector(".detail-link")
                 .Property("color", "var(--accent-primary)")
                 .Property("text-decoration", "none")
-                .Property("font-weight", "bold")
-                .Property("transition", "color 0.2s")
+                .Property("font-weight", "500")
+                .Property("transition", "var(--transition, 0.2s ease)")
             .EndSelector()
             .Selector(".detail-link:hover")
                 .Property("color", "var(--accent-secondary, var(--accent-primary))")
                 .Property("text-decoration", "underline")
             .EndSelector()
+            // 空状态
             .Selector(".empty-state")
                 .Property("text-align", "center")
                 .Property("padding", "40px")
-                .Property("color", "var(--text-secondary)")
+                .Property("color", "var(--text-muted)")
+                .Property("font-size", "14px")
             .EndSelector();
     }
 
@@ -173,8 +218,8 @@ public class BeingView : ViewBase
     {
         var forEachBody = Js.Block()
             .Add(() => Js.Const(() => "card", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
-            .Add(() => Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "b").Prop(() => "isIdle"), () => Js.Str(() => "idle"), () => Js.Str(() => "running"))))
-            .Add(() => Js.Const(() => "statusText", () => Js.Ternary(() => Js.Id(() => "b").Prop(() => "isIdle"), () => Js.Str(() => loc.BeingsStatusIdle), () => Js.Str(() => loc.BeingsStatusRunning))))
+            .Add(() => Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "b").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "Idle")), () => Js.Str(() => "idle"), () => Js.Str(() => "active"))))
+            .Add(() => Js.Const(() => "statusText", () => Js.Id(() => "activityNameMap").Index(() => Js.Id(() => "b").Prop(() => "activity"))))
             .Add(() => Js.Const(() => "isSelected", () => Js.Id(() => "selectedBeingId").Op(() => "===", () => Js.Id(() => "b").Prop(() => "id"))))
             .Add(() => Js.Assign(() => Js.Id(() => "card").Prop(() => "className"), () => Js.Ternary(() => Js.Id(() => "isSelected"), () => Js.Str(() => "being-card selected"), () => Js.Str(() => "being-card"))))
             .Add(() => Js.Assign(() => Js.Id(() => "card").Prop(() => "onclick"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "selectBeing").Invoke(() => Js.Id(() => "b").Prop(() => "id"), () => Js.Id(() => "b").Prop(() => "name")))))
@@ -204,8 +249,8 @@ public class BeingView : ViewBase
             .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/beings/list")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
 
         var selectThenBody = Js.Block()
-            .Add(() => Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "data").Prop(() => "isIdle"), () => Js.Str(() => "idle"), () => Js.Str(() => "running"))))
-            .Add(() => Js.Const(() => "statusText", () => Js.Ternary(() => Js.Id(() => "data").Prop(() => "isIdle"), () => Js.Str(() => loc.BeingsStatusIdle), () => Js.Str(() => loc.BeingsStatusRunning))))
+            .Add(() => Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "data").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "Idle")), () => Js.Str(() => "idle"), () => Js.Str(() => "active"))))
+            .Add(() => Js.Const(() => "statusText", () => Js.Id(() => "activityNameMap").Index(() => Js.Id(() => "data").Prop(() => "activity"))))
             .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "detail-content")).Prop(() => "innerHTML"), () => BuildDetailHtml(loc)));
 
         var selectBeingBody = Js.Block()
@@ -214,6 +259,17 @@ public class BeingView : ViewBase
             .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/beings/detail?id=").Op(() => "+", () => Js.Id(() => "id"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => selectThenBody)).Stmt());
 
         return Js.Block()
+            .Add(() =>
+            {
+                var map = Js.Obj()
+                    .Prop(() => "Idle", () => Js.Str(() => loc.BeingsStatusIdle))
+                    .Prop(() => "SingleChat", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.SingleChat)))
+                    .Prop(() => "GroupChat", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.GroupChat)))
+                    .Prop(() => "Task", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.Task)))
+                    .Prop(() => "Timer", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.Timer)))
+                    .Prop(() => "MemoryCompression", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.MemoryCompression)));
+                return Js.Const(() => "activityNameMap", () => map);
+            })
             .Add(() => Js.Let(() => "selectedBeingId", () => Js.Null()))
             .Add(() => Js.Func(() => "loadBeings", () => new List<string>(), () => loadBeingsBody))
             .Add(() => Js.Func(() => "selectBeing", () => new List<string> { "id", "name" }, () => selectBeingBody))
@@ -227,21 +283,27 @@ public class BeingView : ViewBase
             () => Js.Str(() => "<span class='being-type-badge'>").Op(() => "+", () => (JsSyntax)Js.Id(() => "b").Prop(() => "customTypeName")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</span>")),
             () => Js.Str(() => ""));
 
-        return Js.Str(() => "<div class=\"being-name\">")
-            .Op(() => "+", () => (JsSyntax)Js.Id(() => "b").Prop(() => "name"))
-            .Op(() => "+", () => (JsSyntax)typeBadge)
-            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><span class=\"being-status "))
+        // 构建 status-badge 结构（带状态点）
+        var statusBadge = Js.Str(() => "<span class='being-status ")
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "statusClass"))
-            .Op(() => "+", () => (JsSyntax)Js.Str(() => "\">"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "'><span class='status-dot'></span>"))
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "statusText"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</span>"));
+
+        return Js.Str(() => "<div class='being-header'><span class='being-name'>")
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "b").Prop(() => "name"))
+            .Op(() => "+", () => (JsSyntax)typeBadge)
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</span>"))
+            .Op(() => "+", () => (JsSyntax)statusBadge)
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"));
     }
 
     private static JsSyntax BuildDetailHtml(DefaultLocalizationBase loc)
     {
+        // 状态徽章（带状态点）
         var statusValue = Js.Str(() => "<span class=\"detail-value ")
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "statusClass"))
-            .Op(() => "+", () => (JsSyntax)Js.Str(() => "\">"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "\'>"))
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "statusText"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</span>"));
 

@@ -35,7 +35,9 @@ public sealed class FileSystemLoggerProvider : ILoggerProvider, ILogReader
 
     public FileSystemLoggerProvider(ConfigDataBase config)
     {
-        string logDirectory = Path.Combine(config.DataDirectory.FullName, LogFolderName);
+        // DataDirectory is specific to DefaultConfigData
+        string dataDirectory = (config as DefaultConfigData)?.DataDirectory?.FullName ?? "./data";
+        string logDirectory = Path.Combine(dataDirectory, LogFolderName);
         _storage = new FileSystemTimeStorage(logDirectory);
         _jsonOptions = new JsonSerializerOptions
         {

@@ -7,10 +7,14 @@
 ## Duální Verze Plánu
 
 ### SiliconLife.Default (Výchozí Verze)
-Aktuální fáze 1-10.6 jsou dokončeny, systém běží stabilně.
+- **Pozicování**: Výchozí implementace, používána především pro ověření proveditelnosti architektury
+- **Aktuální stav**: Fáze 1-10.6 jsou dokončeny, systém běží stabilně
+- **Popis role**: Referenční implementace pro ověření architektury, zajišťuje správnost a proveditelnost návrhu základní architektury
 
 ### SiliconLife.Fast (Vysoce Výkonná Verze)
-Základní přenos architektury je dokončen, průběžná optimalizace probíhá.
+- **Pozicování**: Hlavní produkční verze
+- **Aktuální stav**: Základní přenos architektury je dokončen, průběžná optimalizace probíhá
+- **Popis role**: Na základě architektury ověřené ve verzi Default provádí hlubokou optimalizaci výkonu a posílení produkčních charakteristik, nejlepší volba pro reálné nasazení
 
 **Plán Vývoje Fast Verze**:
 - ✅ Fáze 1: Přenos základní struktury projektu a konfiguračního systému

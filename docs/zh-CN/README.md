@@ -1,4 +1,6 @@
-﻿# Silicon Life Collective
+![Silicon Life Collective](../../icon/wordIcon.png)
+
+# Silicon Life Collective
 
 **版本：v0.1.0-alpha** | **硅基生命群** — 一个基于 .NET 9 的多智能体协作平台，AI 智能体被称为**硅基生命体**，通过 Roslyn 动态编译实现自我进化。
 
@@ -49,18 +51,22 @@
 本项目提供两个实现版本，满足不同场景需求：
 
 ### SiliconLife.Default（默认版本）
+- **定位**：默认实现，主要用于验证架构可行性
 - **运行模式**：控制台应用程序
 - **存储方式**：纯文件系统 JSON 存储
 - **适用场景**：数据安全性要求高、内存资源受限、数据量小的场景
 - **特点**：简单可靠、数据持久化即时、无内存丢失风险
+- **角色说明**：作为架构验证的基准实现，适合初次接触、开发调试或数据安全优先的场景
 - **启动命令**：`dotnet run --project src/SiliconLife.Default`
 
 ### SiliconLife.Fast（高性能版本）
+- **定位**：主推生产版本
 - **运行模式**：Windows 窗体应用程序（支持系统托盘）
 - **存储方式**：内存存储 + 异步批量持久化
 - **适用场景**：高并发、低延迟、大数据量场景
 - **特点**：极致性能优化、托盘后台运行、内存数据库 + WAL 日志保证数据安全
 - **性能提升**：存储读取延迟降低 1000 倍，写入延迟降低 15000 倍，并发处理能力提升 50 倍
+- **角色说明**：经过深度优化的生产级实现，是长期运行和实际生产环境的首选
 - **启动命令**：`dotnet run --project src/SiliconLife.Fast`
 
 ### 版本对比
@@ -318,19 +324,21 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 
 ### 我应该使用哪个版本？
 
-**选择 SiliconLife.Default，如果：**
-- 📌 您是第一次使用本项目
+**SiliconLife.Default（默认实现 — 验证架构可行性）：**
+- 📌 您第一次接触本项目，希望快速了解系统架构
+- 📌 您正在进行开发调试，需要简单直接的运行方式
 - 📌 数据安全性是您的首要考虑
 - 📌 您的系统内存小于 4GB
-- 📌 您只需要单人使用
-- 📌 您希望简单直接的部署方式
+- 📌 您只需要单人使用或数据量较小
 
-**选择 SiliconLife.Fast，如果：**
-- ⚡ 您已经使用 Default 版本 3 个月以上
-- ⚡ 您感觉系统响应速度变慢
+**SiliconLife.Fast（主推生产版本）：**
+- ⚡ 您需要长期稳定运行的生产环境
+- ⚡ 您已经熟悉系统架构，准备正式部署
 - ⚡ 您需要支持多用户并发访问
 - ⚡ 您需要系统托盘后台运行
 - ⚡ 您追求极致的性能体验
+
+> **总体建议**：SiliconLife.Default 适合作为架构验证和入门体验；对于实际生产环境，强烈推荐使用 SiliconLife.Fast。
 
 ### 可以从 Default 迁移到 Fast 吗？
 
@@ -351,10 +359,10 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 
 **可以！** 推荐以下部署策略：
 
-**策略 1：开发用 Fast，生产用 Default**
+**策略 1：Default 验证，Fast 生产**
 ```
-开发环境：SiliconLife.Fast（快速迭代测试）
-生产环境：SiliconLife.Default（数据安全第一）
+开发/验证环境：SiliconLife.Default（验证架构、调试功能）
+生产环境：SiliconLife.Fast（高性能、后台运行、处理实时请求）
 ```
 
 **策略 2：Fast 主运行，Default 定期备份**

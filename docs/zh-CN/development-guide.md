@@ -1,4 +1,4 @@
-﻿# 开发指南
+# 开发指南
 
 > **版本：v0.1.0-alpha**
 
@@ -14,11 +14,20 @@ SiliconLifeCollective 遵循**身体-大脑架构**，核心接口和默认实�
 SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/      # 接口、抽象类、通用基础设施
-│   └── SiliconLife.Default/   # 具体实现、入口点
+│   ├── SiliconLife.Common/    # 共享实现（两个版本共用）
+│   ├── SiliconLife.Default/   # 默认实现、入口点（验证架构可行性）
+│   └── SiliconLife.Fast/      # 高性能实现、入口点（主推生产版本）
 └── docs/                      # 多语言文档
 ```
 
-**依赖方向**：`SiliconLife.Default` → `SiliconLife.Core`（单向）
+**依赖方向**：
+- `SiliconLife.Default` → `SiliconLife.Core`（单向）
+- `SiliconLife.Fast` → `SiliconLife.Core`（单向）
+- `SiliconLife.Common` → `SiliconLife.Core`（单向）
+
+**版本角色说明**：
+- **SiliconLife.Default**：默认实现，主要用于验证架构可行性。提供简单可靠的文件系统存储实现，适合开发调试和架构验证。
+- **SiliconLife.Fast**：主推生产版本。在 Default 验证的架构基础上，采用内存存储 + 异步持久化，提供极致性能优化，是长期运行和实际生产环境的首选。
 
 ## 核心概念
 

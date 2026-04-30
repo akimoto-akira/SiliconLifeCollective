@@ -14,11 +14,20 @@ SiliconLifeCollective sigue la **arquitectura cuerpo-cerebro**, con estricta sep
 SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/      # Interfaces, clases abstractas, infraestructura común
-│   └── SiliconLife.Default/   # Implementaciones concretas, puntos de entrada
+│   ├── SiliconLife.Common/    # Implementaciones compartidas (usadas por ambas versiones)
+│   ├── SiliconLife.Default/   # Implementación predeterminada, punto de entrada (verificación de viabilidad de arquitectura)
+│   └── SiliconLife.Fast/      # Implementación de alto rendimiento, punto de entrada (versión de producción principal)
 └── docs/                      # Documentación multilingüe
 ```
 
-**Dirección de dependencia**: `SiliconLife.Default` → `SiliconLife.Core` (unidireccional)
+**Dirección de dependencia**:
+- `SiliconLife.Default` → `SiliconLife.Core` (unidireccional)
+- `SiliconLife.Fast` → `SiliconLife.Core` (unidireccional)
+- `SiliconLife.Common` → `SiliconLife.Core` (unidireccional)
+
+**Descripción de Roles de Versión**:
+- **SiliconLife.Default**: Implementación predeterminada, utilizada principalmente para verificación de viabilidad de arquitectura. Proporciona una implementación de almacenamiento en sistema de archivos simple y confiable, adecuada para depuración de desarrollo y verificación de arquitectura.
+- **SiliconLife.Fast**: Versión de producción principal. Basada en la arquitectura verificada en Default, adopta almacenamiento en memoria + persistencia asíncrona para proporcionar optimización extrema de rendimiento. La mejor opción para operaciones a largo plazo y entornos de producción reales.
 
 ## Conceptos Centrales
 

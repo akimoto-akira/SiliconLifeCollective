@@ -9,17 +9,21 @@
 Dieses Projekt bietet zwei Implementierungsversionen, die dasselbe Architekturentwurf teilen, sich aber in Speicher und Leistungsoptimierung unterscheiden:
 
 ### SiliconLife.Default (Standardversion)
+- **Positionierung**: Standardimplementierung, hauptsächlich für Architektur-Machbarkeitsverifizierung
 - **Ausführungsmodus**: Konsolenanwendung
 - **Speicher**: Reines Dateisystem-JSON-Speicher
 - **Anwendungsszenario**: Hohe Datensicherheitsanforderungen, begrenzte Speicherressourcen, Szenarien mit kleinem Datenvolumen
+- **Rollenbeschreibung**: Referenzimplementierung für Architekturverifizierung, bietet eine einfache und zuverlässige Ausführung, geeignet für ersten Kontakt, Entwicklungs-Debugging oder Szenarien mit Datensicherheitspriorität
 
 ### SiliconLife.Fast (Hochleistungsversion)
+- **Positionierung**: Haupt-Produktionsversion
 - **Ausführungsmodus**: Windows-Formularanwendung (mit System Tray-Unterstützung)
 - **Speicher**: In-Memory-Speicher + asynchrone Batch-Persistenz (WAL-Protokoll)
 - **Anwendungsszenario**: Szenarien mit hoher Parallelität, niedriger Latenz, großem Datenvolumen
 - **Leistungsverbesserung**: Speicherlese-Latenz um das 1000-fache reduziert, Schreiblatenz um das 15000-fache reduziert
+- **Rollenbeschreibung**: Produktionsreife Implementierung mit tiefer Optimierung, mit System Tray-Hintergrundausführung und extremer Performance-Optimierung, die beste Wahl für Langzeitbetrieb und echte Produktionsumgebungen
 
-> **Hinweis**: Die in diesem Dokument beschriebene Architektur gilt für beide Versionen, mit Unterschieden nur im Speicherimplementierungsteil.
+> **Hinweis**: Die in diesem Dokument beschriebene Architektur gilt für beide Versionen, mit Unterschieden nur im Speicherimplementierungsteil. SiliconLife.Default ist die Referenz für Architekturverifizierung, SiliconLife.Fast ist die Hauptversion für Produktionsumgebungen.
 
 ---
 

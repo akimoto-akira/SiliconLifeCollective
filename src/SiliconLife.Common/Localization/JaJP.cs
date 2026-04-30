@@ -356,6 +356,19 @@ public class JaJP : DefaultLocalizationBase
     public override string MemoryStatTypeDistribution => "タイプ分布";
     public override string MemoryStatKeywordFrequency => "キーワード頻度";
     public override string MemoryCardViewDetail => "詳細を見る";
+    public override string MemoryTimelineEmptyState => "メモリデータなし";
+    public override string MemoryYearSummaryLabel => "年次概要";
+    public override string MemoryMonthSummaryLabel => "月次概要";
+    public override string MemoryDaySummaryLabel => "日次概要";
+    public override string MemoryHourSummaryLabel => "時間概要";
+    public override string MemoryMinuteSummaryLabel => "分概要";
+    public override string MemorySummaryBadge => "圧縮概要";
+    public override string MemoryTimelineYearFormat => "{0}年 ({1}件)";
+    public override string MemoryTimelineMonthFormat => "{0}年{1}月 ({2}件)";
+    public override string MemoryTimelineDayFormat => "{0}-{1}-{2} ({3}件)";
+    public override string MemoryTimelineHourFormat => "{0}:00 ({1}件)";
+    public override string MemoryTimelineMinuteFormat => "{0}:{1} ({2}件)";
+    public override string MemoryRelatedBeingsLabel => "👥 関連: {0} エージェント";
 
     // ===== Projects Page Localization =====
 
@@ -782,7 +795,6 @@ public class JaJP : DefaultLocalizationBase
         ["DashScopeModel_kimi-k2.5"] = "Kimi K2.5（長コンテキスト）",
         ["DashScopeModel_llama-4-maverick"] = "Llama 4 Maverick",
         ["WebPort"] = "Webポート",
-        ["AllowIntranetAccess"] = "イントラネットアクセス許可",
         ["WebSkin"] = "Webスキン",
         ["UserNickname"] = "ユーザーニックネーム"
     };
@@ -802,7 +814,6 @@ public class JaJP : DefaultLocalizationBase
         ["DashScopeRegion"] = "Alibaba Cloud DashScopeサービスリージョン",
         ["DashScopeModel"] = "Alibaba Cloud DashScopeで使用するモデル",
         ["WebPort"] = "Webサーバーポート",
-        ["AllowIntranetAccess"] = "イントラネットアクセス許可（管理者権限が必要）",
         ["WebSkin"] = "Webスキン名",
         ["UserNickname"] = "人間ユーザーのニックネーム"
     };
@@ -833,6 +844,20 @@ public class JaJP : DefaultLocalizationBase
         LogLevel.Critical => "重大",
         LogLevel.None => "なし",
         _ => logLevel.ToString()
+    };
+
+    /// <summary>
+    /// Gets the localized display name for a silicon being activity state.
+    /// </summary>
+    public override string GetBeingActivityName(BeingActivity activity) => activity switch
+    {
+        BeingActivity.Idle => "待機中",
+        BeingActivity.SingleChat => "1対1チャット中",
+        BeingActivity.GroupChat => "グループチャット中",
+        BeingActivity.Task => "タスク実行中",
+        BeingActivity.Timer => "タイマー実行中",
+        BeingActivity.MemoryCompression => "メモリ圧縮中",
+        _ => activity.ToString()
     };
 
     // ===== Tool Display Name Localization =====

@@ -27,12 +27,6 @@ public class DefaultConfigData : ConfigDataBase
     public override string ConfigType { get; set; } = "Default";
 
     /// <summary>
-    /// Gets or sets the data directory for storing all application data
-    /// </summary>
-    [ConfigGroup("Basic", Order = 2, DisplayNameKey = "DataDirectory", DescriptionKey = "DataDirectory")]
-    public override DirectoryInfo DataDirectory { get; set; } = new DirectoryInfo("./data");
-
-    /// <summary>
     /// Gets or sets the GUID of the curator (main administrator)
     /// </summary>
     [ConfigIgnore("系统内部标识，不建议手动修改")]
@@ -94,12 +88,6 @@ public class DefaultConfigData : ConfigDataBase
     public int WebPort { get; set; } = 8080;
 
     /// <summary>
-    /// Gets or sets whether to allow intranet access (requires admin)
-    /// </summary>
-    [ConfigGroup("Web", Order = 3, DisplayNameKey = "AllowIntranetAccess", DescriptionKey = "AllowIntranetAccess")]
-    public bool AllowIntranet { get; set; } = false;
-
-    /// <summary>
     /// Gets or sets the web skin name
     /// </summary>
     [ConfigGroup("Web", Order = 4, DisplayNameKey = "WebSkin", DescriptionKey = "WebSkin")]
@@ -145,7 +133,7 @@ public class DefaultConfigData : ConfigDataBase
             
             // Map AppConfig -> DefaultConfigData
             ConfigType = appConfig.ConfigType;
-            DataDirectory = new DirectoryInfo(appConfig.DataDirectory);
+            // DataDirectory removed - Fast project uses LiteDB storage, no file-based data directory
             CuratorGuid = appConfig.CuratorGuid;
             Language = appConfig.Language;
             TickTimeout = TimeSpan.FromMinutes(appConfig.TickTimeoutMinutes);
@@ -158,7 +146,6 @@ public class DefaultConfigData : ConfigDataBase
             AIConfig = BsonMapper.Global.Deserialize<Dictionary<string, object>>(appConfig.AIConfig) ?? new Dictionary<string, object>();
             
             WebPort = appConfig.WebPort;
-            AllowIntranet = appConfig.AllowIntranet;
             WebSkin = appConfig.WebSkin ?? string.Empty;
             UserNickname = appConfig.UserNickname;
         }
@@ -178,7 +165,6 @@ public class DefaultConfigData : ConfigDataBase
             var appConfig = new AppConfig
             {
                 ConfigType = ConfigType,
-                DataDirectory = DataDirectory.FullName,
                 CuratorGuid = CuratorGuid,
                 Language = Language,
                 TickTimeoutMinutes = (int)TickTimeout.TotalMinutes,
@@ -188,7 +174,6 @@ public class DefaultConfigData : ConfigDataBase
                 AIClientType = AIClientType,
                 AIConfig = BsonMapper.Global.Serialize(AIConfig).AsDocument,
                 WebPort = WebPort,
-                AllowIntranet = AllowIntranet,
                 WebSkin = string.IsNullOrEmpty(WebSkin) ? null : WebSkin,
                 UserNickname = UserNickname
             };

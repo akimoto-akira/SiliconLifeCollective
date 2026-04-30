@@ -218,7 +218,7 @@ public class Program
 
         router.RegisterControllers();
 
-        _webHost = new WebHost(configData.WebPort, router, configData.AllowIntranet);
+        _webHost = new WebHost(configData.WebPort, router);
 
         try
         {
@@ -294,17 +294,15 @@ public class Program
     /// </summary>
     private static void RegisterAndConfigureCurator(SiliconBeingBase curator, DefaultConfigData configData, DynamicBeingLoader dynamicBeingLoader)
     {
-        string beingDirectory = Path.Combine(configData.DataDirectory.FullName, "SiliconManager", curator.Id.ToString());
-
         // Register being FIRST before applying custom callbacks
         MainLoop.BeingManager.RegisterBeing(curator);
         _logger.Info(null, "Registered curator: {0} ({1})", curator.Name, curator.Id);
 
-        if (DynamicBeingLoader.HasCustomPermissionCallback(beingDirectory))
+        if (curator.Storage != null && DynamicBeingLoader.HasCustomPermissionCallback(curator.Storage))
         {
             try
             {
-                CompilationResult permResult = dynamicBeingLoader.LoadPermissionCallback(curator.Id, beingDirectory);
+                CompilationResult permResult = dynamicBeingLoader.LoadPermissionCallback(curator.Id, curator.Storage);
                 if (permResult.Success && permResult.CompiledType != null)
                 {
                     MainLoop.BeingManager.ReplacePermissionCallback(curator.Id, permResult.CompiledType);
@@ -317,11 +315,11 @@ public class Program
             }
         }
 
-        if (DynamicBeingLoader.HasCustomCode(beingDirectory))
+        if (curator.Storage != null && DynamicBeingLoader.HasCustomCode(curator.Storage))
         {
             try
             {
-                Type? customType = dynamicBeingLoader.LoadBeingType(curator.Id, beingDirectory);
+                Type? customType = dynamicBeingLoader.LoadBeingType(curator.Id, curator.Storage);
                 if (customType != null)
                 {
                     MainLoop.BeingManager.ReplaceBeing(curator.Id, customType);

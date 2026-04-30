@@ -245,6 +245,19 @@ public class CsCZ : DefaultLocalizationBase
     public override string MemoryStatOldest => "Nejstarší";
     public override string MemoryStatNewest => "Nejnovější";
     public override string MemoryCardViewDetail => "Zobrazit detail";
+    public override string MemoryTimelineEmptyState => "Žádná data paměti";
+    public override string MemoryYearSummaryLabel => "Roční přehled";
+    public override string MemoryMonthSummaryLabel => "Měsíční přehled";
+    public override string MemoryDaySummaryLabel => "Denní přehled";
+    public override string MemoryHourSummaryLabel => "Hodinový přehled";
+    public override string MemoryMinuteSummaryLabel => "Minutový přehled";
+    public override string MemorySummaryBadge => "Komprimovaný přehled";
+    public override string MemoryTimelineYearFormat => "{0} ({1} záznamů)";
+    public override string MemoryTimelineMonthFormat => "{0}/{1} ({2} záznamů)";
+    public override string MemoryTimelineDayFormat => "{0}-{1}-{2} ({3} záznamů)";
+    public override string MemoryTimelineHourFormat => "{0}:00 ({1} záznamů)";
+    public override string MemoryTimelineMinuteFormat => "{0}:{1} ({2} záznamů)";
+    public override string MemoryRelatedBeingsLabel => "👥 Související: {0} bytostí";
     public override string MemoryToolNotAvailable => "Nástroj paměti není k dispozici";
     public override string MemoryToolMissingAction => "Chybějící akce";
     public override string MemoryToolInvalidYear => "Neplatný rok";
@@ -910,6 +923,20 @@ public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
     }
 
     public override string GetLogLevelName(LogLevel level) => level.ToString();
+
+    /// <summary>
+    /// Gets the localized display name for a silicon being activity state.
+    /// </summary>
+    public override string GetBeingActivityName(BeingActivity activity) => activity switch
+    {
+        BeingActivity.Idle => "Nečinný",
+        BeingActivity.SingleChat => "V 1:1 chatu",
+        BeingActivity.GroupChat => "Ve skupinovém chatu",
+        BeingActivity.Task => "Plnění úkolu",
+        BeingActivity.Timer => "Spuštění časovače",
+        BeingActivity.MemoryCompression => "Komprese paměti",
+        _ => activity.ToString()
+    };
 
     public override string GetTranslation(string key) => key;
 

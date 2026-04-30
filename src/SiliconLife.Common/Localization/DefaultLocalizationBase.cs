@@ -1196,6 +1196,71 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// </summary>
     public abstract string MemoryCardViewDetail { get; }
 
+    /// <summary>
+    /// Gets the timeline empty state text when no memory records exist
+    /// </summary>
+    public abstract string MemoryTimelineEmptyState { get; }
+
+    /// <summary>
+    /// Gets the year summary label in timeline
+    /// </summary>
+    public abstract string MemoryYearSummaryLabel { get; }
+
+    /// <summary>
+    /// Gets the month summary label in timeline
+    /// </summary>
+    public abstract string MemoryMonthSummaryLabel { get; }
+
+    /// <summary>
+    /// Gets the day summary label in timeline
+    /// </summary>
+    public abstract string MemoryDaySummaryLabel { get; }
+
+    /// <summary>
+    /// Gets the hour summary label in timeline
+    /// </summary>
+    public abstract string MemoryHourSummaryLabel { get; }
+
+    /// <summary>
+    /// Gets the minute summary label in timeline
+    /// </summary>
+    public abstract string MemoryMinuteSummaryLabel { get; }
+
+    /// <summary>
+    /// Gets the summary badge text on memory card
+    /// </summary>
+    public abstract string MemorySummaryBadge { get; }
+
+    /// <summary>
+    /// Gets the year label format for timeline (e.g., "{0}年 ({1}条)")
+    /// </summary>
+    public abstract string MemoryTimelineYearFormat { get; }
+
+    /// <summary>
+    /// Gets the month label format for timeline (e.g., "{0}年{1}月 ({2}条)")
+    /// </summary>
+    public abstract string MemoryTimelineMonthFormat { get; }
+
+    /// <summary>
+    /// Gets the day label format for timeline (e.g., "{0}-{1}-{2} ({3}条)")
+    /// </summary>
+    public abstract string MemoryTimelineDayFormat { get; }
+
+    /// <summary>
+    /// Gets the hour label format for timeline (e.g., "{0}:00 ({1}条)")
+    /// </summary>
+    public abstract string MemoryTimelineHourFormat { get; }
+
+    /// <summary>
+    /// Gets the minute label format for timeline (e.g., "{0}:{1} ({2}条)")
+    /// </summary>
+    public abstract string MemoryTimelineMinuteFormat { get; }
+
+    /// <summary>
+    /// Gets the related beings label (e.g., "👥 关联: {0} 个智能体")
+    /// </summary>
+    public abstract string MemoryRelatedBeingsLabel { get; }
+
     // ===== Projects Page Localization =====
 
     /// <summary>

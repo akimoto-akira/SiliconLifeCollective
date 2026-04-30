@@ -74,13 +74,22 @@ public class PermissionController : Controller
             return;
         }
 
-        // Load current permission callback code
-        var dataDirectory = Config.Instance?.Data?.DataDirectory?.FullName 
-            ?? Path.Combine(Environment.CurrentDirectory, "data");
-        string beingDirectory = Path.Combine(dataDirectory, "SiliconManager", beingId.ToString());
+        // Get being's Storage for permission callback code management
+        var being = MainLoop.BeingManager?.GetBeing(beingId);
+        if (being?.Storage == null)
+        {
+            var loc = LocalizationManager.Instance.GetLocalization(Config.Instance?.Data?.Language ?? Language.ZhCN);
+            string errorMsg = "Being or Storage not found";
+            if (loc is DefaultLocalizationBase defaultLoc)
+            {
+                errorMsg = defaultLoc.PermissionBeingNotFound;
+            }
+            RenderHtml($"<html><body><h1>{errorMsg}</h1></body></html>");
+            return;
+        }
                 
         var dynamicLoader = ServiceLocator.Instance.GetService<DynamicBeingLoader>();
-        string callbackCode = dynamicLoader?.GetPermissionCallbackSourceCode(beingId, beingDirectory) ?? "";
+        string callbackCode = dynamicLoader?.GetPermissionCallbackSourceCode(beingId, being.Storage) ?? "";
         
         var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
                 
@@ -179,10 +188,13 @@ public class PermissionController : Controller
 
             string sourceCode = requestData["code"];
 
-            // Use DynamicBeingLoader to get silicon being directory
-            var dataDirectory = Config.Instance?.Data?.DataDirectory?.FullName 
-                ?? Path.Combine(Environment.CurrentDirectory, "data");
-            string beingDirectory = Path.Combine(dataDirectory, "SiliconManager", beingId.ToString());
+            // Get being's Storage for permission callback code management
+            var being = MainLoop.BeingManager?.GetBeing(beingId);
+            if (being?.Storage == null)
+            {
+                RenderJson(new { success = false, error = "Being or Storage not found" });
+                return;
+            }
             
             var dynamicLoader = ServiceLocator.Instance.GetService<DynamicBeingLoader>();
             if (dynamicLoader == null)
@@ -201,7 +213,7 @@ public class PermissionController : Controller
             {
                 try
                 {
-                    DynamicBeingLoader.DeleteCustomPermissionCallback(beingDirectory);
+                    DynamicBeingLoader.DeleteCustomPermissionCallback(being.Storage);
                     MainLoop.BeingManager?.ResetPermissionCallback(beingId);
                     
                     string removeSuccess = "Permission callback removed";
@@ -237,8 +249,8 @@ public class PermissionController : Controller
                 return;
             }
 
-            // Step 2: Compilation succeeded, now save to disk (includes security scan)
-            bool saved = dynamicLoader.SavePermissionCallback(beingId, beingDirectory, sourceCode);
+            // Step 2: Compilation succeeded, now save to storage (includes security scan)
+            bool saved = dynamicLoader.SavePermissionCallback(beingId, being.Storage, sourceCode);
             if (!saved)
             {
                 string securityFailed = "Failed to save permission callback (security scan failed)";

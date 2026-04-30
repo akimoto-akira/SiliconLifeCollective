@@ -7,10 +7,14 @@
 ## Duale Versions-Roadmap
 
 ### SiliconLife.Default (Standardversion)
-Aktuelle Phasen 1-10.6 sind abgeschlossen, System läuft stabil.
+- **Positionierung**: Standardimplementierung, hauptsächlich für Architektur-Machbarkeitsverifizierung
+- **Aktueller Status**: Phasen 1-10.6 sind abgeschlossen, System läuft stabil
+- **Rollenbeschreibung**: Referenzimplementierung für Architekturverifizierung, gewährleistet die Korrektheit und Machbarkeit des Kernarchitektur-Designs
 
 ### SiliconLife.Fast (Hochleistungsversion)
-Grundlegende Architekturportierung ist abgeschlossen, kontinuierliche Optimierung läuft.
+- **Positionierung**: Haupt-Produktionsversion
+- **Aktueller Status**: Grundlegende Architekturportierung ist abgeschlossen, kontinuierliche Optimierung läuft
+- **Rollenbeschreibung**: Basierend auf der in der Default-Version verifizierten Architektur, führt tiefe Performance-Optimierung und Produktionsmerkmal-Verstärkung durch, die beste Wahl für echte Bereitstellung
 
 **Fast Version Entwicklungsplan**:
 - ✅ Phase 1: Grundlegende Projektstruktur und Konfigurationssystem-Portierung

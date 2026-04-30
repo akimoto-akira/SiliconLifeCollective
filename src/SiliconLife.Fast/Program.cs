@@ -79,7 +79,8 @@ public class Program
         _logger.Info(null, "Registered: Storage Factories");
 
         // Initialize project manager
-        IProjectManager projectManager = new ProjectManager(storage, configData.DataDirectory.FullName);
+        // Fast project uses LiteDB, no file-based data directory; use current directory as placeholder
+        IProjectManager projectManager = new ProjectManager(storage, Environment.CurrentDirectory);
         ServiceLocator.Instance.Register<IProjectManager>(projectManager);
         _logger.Info(null, "Initialized: ProjectManager");
 
@@ -95,10 +96,11 @@ public class Program
         _logger.Info(null, "Initialized: TokenUsageAuditManager");
 
         // Initialize knowledge network system
+        // Fast project uses LiteDB, no file-based data directory; use current directory as placeholder
         KnowledgeNetwork knowledgeNetwork = new KnowledgeNetwork();
-        knowledgeNetwork.Initialize(configData.DataDirectory.FullName);
+        knowledgeNetwork.Initialize(Environment.CurrentDirectory);
         ServiceLocator.Instance.Register<IKnowledgeNetwork>(knowledgeNetwork);
-        _logger.Info(null, "Initialized: KnowledgeNetwork at {0}", configData.DataDirectory.FullName);
+        _logger.Info(null, "Initialized: KnowledgeNetwork at {0}", Environment.CurrentDirectory);
 
         GlobalACL globalAcl = new GlobalACL(storage);
         _logger.Info(null, "Initialized: GlobalACL");
@@ -121,7 +123,8 @@ public class Program
         IIMProvider imProvider = new WebUIProvider(router);
         imProvider.ExitRequested += (s, e) => RequestExit();
 
-        DefaultPermissionCallback permissionCallback = new DefaultPermissionCallback(configData.DataDirectory.FullName);
+        // Fast project uses LiteDB, no file-based data directory; pass empty string
+        DefaultPermissionCallback permissionCallback = new DefaultPermissionCallback(string.Empty);
         IMPermissionAskHandler askHandler = new IMPermissionAskHandler(imProvider);
 
         IMManager imManager = new IMManager(imProvider, chatSystem, MainLoop.BeingManager);
@@ -131,7 +134,7 @@ public class Program
             configData.AIConfig,
             storage,
             timeStorage,
-            configData.DataDirectory.FullName,
+            Environment.CurrentDirectory, // Fast project uses LiteDB, no file-based data directory
             permissionCallback,
             askHandler);
 
@@ -251,7 +254,7 @@ public class Program
 
         router.RegisterControllers();
 
-        _webHost = new WebHost(configData.WebPort, router, configData.AllowIntranet);
+        _webHost = new WebHost(configData.WebPort, router);
 
         try
         {
@@ -272,6 +275,21 @@ public class Program
         catch (Exception ex)
         {
             _logger.Error(null, "Failed to start web server: {0}", ex, ex.Message);
+            
+            // Get localized tray strings
+            var language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            var trayLoc = GetTrayLocalization(language);
+            
+            // Show error message box
+            string errorMessage = string.Format(trayLoc.WebServerStartupErrorMessage, ex.Message);
+            System.Windows.Forms.MessageBox.Show(
+                errorMessage,
+                trayLoc.WebServerStartupErrorTitle,
+                System.Windows.Forms.MessageBoxButtons.OK,
+                System.Windows.Forms.MessageBoxIcon.Error);
+            
+            // Exit the application
+            Environment.Exit(1);
         }
     }
 
@@ -397,17 +415,15 @@ public class Program
     /// </summary>
     private static void RegisterAndConfigureCurator(SiliconBeingBase curator, DefaultConfigData configData, DynamicBeingLoader dynamicBeingLoader)
     {
-        string beingDirectory = Path.Combine(configData.DataDirectory.FullName, "SiliconManager", curator.Id.ToString());
-
         // Register being FIRST before applying custom callbacks
         MainLoop.BeingManager.RegisterBeing(curator);
         _logger.Info(null, "Registered curator: {0} ({1})", curator.Name, curator.Id);
 
-        if (DynamicBeingLoader.HasCustomPermissionCallback(beingDirectory))
+        if (curator.Storage != null && DynamicBeingLoader.HasCustomPermissionCallback(curator.Storage))
         {
             try
             {
-                CompilationResult permResult = dynamicBeingLoader.LoadPermissionCallback(curator.Id, beingDirectory);
+                CompilationResult permResult = dynamicBeingLoader.LoadPermissionCallback(curator.Id, curator.Storage);
                 if (permResult.Success && permResult.CompiledType != null)
                 {
                     MainLoop.BeingManager.ReplacePermissionCallback(curator.Id, permResult.CompiledType);
@@ -420,11 +436,11 @@ public class Program
             }
         }
 
-        if (DynamicBeingLoader.HasCustomCode(beingDirectory))
+        if (curator.Storage != null && DynamicBeingLoader.HasCustomCode(curator.Storage))
         {
             try
             {
-                Type? customType = dynamicBeingLoader.LoadBeingType(curator.Id, beingDirectory);
+                Type? customType = dynamicBeingLoader.LoadBeingType(curator.Id, curator.Storage);
                 if (customType != null)
                 {
                     MainLoop.BeingManager.ReplaceBeing(curator.Id, customType);

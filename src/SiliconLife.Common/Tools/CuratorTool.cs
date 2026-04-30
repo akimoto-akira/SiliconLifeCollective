@@ -187,9 +187,9 @@ public class CuratorTool : ITool
         {
             string status = being.IsCurator ? "[CURATOR]" : "[BEING]";
             string compiled = being.IsCustomCompiled ? $" (custom: {being.CustomTypeName})" : " (default)";
-            string idle = being.IsIdle ? "idle" : "busy";
+            string activity = being.CurrentActivity.ToString().ToLowerInvariant();
 
-            lines.Add($"  {status} {being.Id:N} — {being.Name}{compiled} — {idle}");
+            lines.Add($"  {status} {being.Id:N} — {being.Name}{compiled} — {activity}");
         }
 
         return ToolResult.Successful(string.Join("\n", lines));
@@ -197,15 +197,27 @@ public class CuratorTool : ITool
 
     private ToolResult ExecuteGetCode(Guid beingId)
     {
-        string beingDirectory = GetBeingDirectory(beingId);
-        string codePath = Path.Combine(beingDirectory, "code.enc");
+        SiliconBeingBase? being = MainLoop.BeingManager?.GetBeing(beingId);
+        if (being == null)
+        {
+            return ToolResult.Failed($"Being {beingId:N} not found.");
+        }
 
-        if (!File.Exists(codePath))
+        if (being.Storage == null)
+        {
+            return ToolResult.Failed($"Storage is not available for being {beingId:N}.");
+        }
+
+        if (!BeingCodeFileManager.CodeExists(being.Storage))
         {
             return ToolResult.Successful($"Being {beingId:N} is using the default implementation (no custom code).");
         }
 
-        byte[] encryptedCode = File.ReadAllBytes(codePath);
+        byte[]? encryptedCode = BeingCodeFileManager.LoadCode(being.Storage);
+        if (encryptedCode == null)
+        {
+            return ToolResult.Failed($"Failed to load code for being {beingId:N}.");
+        }
 
         if (!CodeEncryption.TryDecryptToString(encryptedCode, beingId, out string? sourceCode))
         {
@@ -222,8 +234,18 @@ public class CuratorTool : ITool
 
     private ToolResult ExecuteReset(Guid callerId, Guid beingId)
     {
-        string beingDirectory = GetBeingDirectory(beingId);
-        DynamicBeingLoader.DeleteCustomCode(beingDirectory);
+        SiliconBeingBase? being = MainLoop.BeingManager?.GetBeing(beingId);
+        if (being == null)
+        {
+            return ToolResult.Failed($"Being {beingId:N} not found.");
+        }
+
+        if (being.Storage == null)
+        {
+            return ToolResult.Failed($"Storage is not available for being {beingId:N}.");
+        }
+
+        BeingCodeFileManager.DeleteCode(being.Storage);
 
         SiliconBeingManager? beingManager = MainLoop.BeingManager;
         if (beingManager != null)
@@ -236,15 +258,6 @@ public class CuratorTool : ITool
         return ToolResult.Successful($"Being {beingId:N} has been reset to the default implementation.");
     }
 
-    /// <summary>
-    /// Gets the data directory for a silicon being.
-    /// </summary>
-    private static string GetBeingDirectory(Guid beingId)
-    {
-        string dataDirectory = Config.Instance?.Data?.DataDirectory?.FullName
-            ?? Path.Combine(Environment.CurrentDirectory, "data");
-        return Path.Combine(dataDirectory, "SiliconManager", beingId.ToString());
-    }
 
     /// <summary>
     /// Records a localized memory event to the calling being's memory.

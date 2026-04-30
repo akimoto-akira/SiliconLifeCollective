@@ -1,4 +1,4 @@
-﻿# Development Guide
+# Development Guide
 
 > **Version: v0.1.0-alpha**
 
@@ -12,13 +12,22 @@ SiliconLifeCollective follows a **body-brain architecture** with strict separati
 
 ```
 SiliconLifeCollective/
-├── src/
-│   ├── SiliconLife.Core/      # Interfaces, abstract classes, common infrastructure
-│   └── SiliconLife.Default/   # Concrete implementations, entry points
-└── docs/                      # Multi-language documentation
+鈹溾攢鈹€ src/
+鈹?  鈹溾攢鈹€ SiliconLife.Core/      # Interfaces, abstract classes, common infrastructure
+鈹?  鈹溾攢鈹€ SiliconLife.Common/    # Shared implementations (used by both versions)
+鈹?  鈹溾攢鈹€ SiliconLife.Default/   # Default implementation, entry points (architecture feasibility verification)
+鈹?  鈹斺攢鈹€ SiliconLife.Fast/      # High-performance implementation, entry points (main production version)
+鈹斺攢鈹€ docs/                      # Multi-language documentation
 ```
 
-**Dependency direction**: `SiliconLife.Default` → `SiliconLife.Core` (one-way)
+**Dependency direction**:
+- `SiliconLife.Default` → `SiliconLife.Core` (one-way)
+- `SiliconLife.Fast` → `SiliconLife.Core` (one-way)
+- `SiliconLife.Common` → `SiliconLife.Core` (one-way)
+
+**Version Role Description**:
+- **SiliconLife.Default**: Default implementation, primarily used for architecture feasibility verification. Provides a simple and reliable file system storage implementation, suitable for development debugging and architecture verification.
+- **SiliconLife.Fast**: Main production version. Based on the architecture verified by Default, adopts in-memory storage + asynchronous persistence, providing extreme performance optimization, the first choice for long-term operation and actual production environments.
 
 ## Core Concepts
 

@@ -1,4 +1,6 @@
-﻿# Silicon Life Collective
+![Silicon Life Collective](../../icon/wordIcon.png)
+
+# Silicon Life Collective
 
 **Verze: v0.1.0-alpha** | **Siliconové bytosti** — Multiagentní platforma založená na .NET 9, kde jsou AI agenti nazýváni **silikonové bytosti** s schopností sebevývoje prostřednictvím dynamické kompilace Roslyn.
 
@@ -49,18 +51,22 @@
 Tento projekt poskytuje dvě implementační verze pro splnění různých požadavků scénářů:
 
 ### SiliconLife.Default (Výchozí verze)
+- **Pozicování**: Výchozí implementace, používána především pro ověření proveditelnosti architektury
 - **Režim spuštění**: Konzolová aplikace
 - **Metoda úložiště**: Čisté úložiště JSON na souborovém systému
 - **Použitelné scénáře**: Vysoké požadavky na zabezpečení dat, omezené paměťové zdroje, malý objem dat
 - **Charakteristiky**: Jednoduché a spolehlivé, okamžitá perzistence dat, žádné riziko ztráty paměti
+- **Popis role**: Referenční implementace pro ověření architektury, vhodná pro první kontakt, vývojové ladění nebo scénáře s prioritou bezpečnosti dat
 - **Spouštěcí příkaz**: `dotnet run --project src/SiliconLife.Default`
 
 ### SiliconLife.Fast (Vysoce výkonná verze)
+- **Pozicování**: Hlavní produkční verze
 - **Režim spuštění**: Windows Forms aplikace (podporuje systémový tray)
 - **Metoda úložiště**: Úložiště v paměti + asynchronní dávková perzistence
 - **Použitelné scénáře**: Vysoká souběžnost, nízká latence, scénáře s velkým objemem dat
 - **Charakteristiky**: Extrémní optimalizace výkonu, běh na pozadí v tray, databáze v paměti + WAL protokoly zajišťují bezpečnost dat
 - **Zlepšení výkonu**: Latence čtení úložiště snížena 1000x, latence zápisu snížena 15000x, kapacita souběžného zpracování zvýšena 50x
+- **Popis role**: Produkční implementace s hlubokou optimalizací, nejlepší volba pro dlouhodobý provoz a reálné produkční prostředí
 - **Spouštěcí příkaz**: `dotnet run --project src/SiliconLife.Fast`
 
 ### Porovnání verzí

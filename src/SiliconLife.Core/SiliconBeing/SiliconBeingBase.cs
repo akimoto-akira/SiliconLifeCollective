@@ -14,6 +14,32 @@
 namespace SiliconLife.Collective;
 
 /// <summary>
+/// Represents the current activity a silicon being is engaged in.
+/// Values correspond to the brain scenes defined in <see cref="ContextManager"/>
+/// (one value per ThinkOnXxx scenario, plus <see cref="Idle"/> for no activity).
+/// </summary>
+public enum BeingActivity
+{
+    /// <summary>Not engaged in any activity (no pending work).</summary>
+    Idle,
+
+    /// <summary>Engaged in a one-on-one chat (corresponds to ThinkOnChat / ThinkOnChatStreamAsync).</summary>
+    SingleChat,
+
+    /// <summary>Engaged in a group chat (corresponds to ThinkOnGroupChat / ThinkOnGroupChatStreamAsync).</summary>
+    GroupChat,
+
+    /// <summary>Executing a task (corresponds to ThinkOnTask).</summary>
+    Task,
+
+    /// <summary>Executing a scheduled timer (corresponds to ThinkOnTimer / ThinkOnTimerStep).</summary>
+    Timer,
+
+    /// <summary>Compressing memory (corresponds to ThinkOnMemoryCompress).</summary>
+    MemoryCompression,
+}
+
+/// <summary>
 /// Abstract base class for all silicon beings
 /// </summary>
 public abstract class SiliconBeingBase
@@ -145,9 +171,10 @@ public abstract class SiliconBeingBase
     public bool IsCurator => Id == (Config.Instance?.Data?.CuratorGuid ?? Guid.Empty);
 
     /// <summary>
-    /// Gets whether this silicon being is idle (no pending tasks)
+    /// Gets the current activity of this silicon being.
+    /// Each non-Idle value corresponds to a brain scene in <see cref="ContextManager"/>.
     /// </summary>
-    public abstract bool IsIdle { get; }
+    public abstract BeingActivity CurrentActivity { get; }
 
     /// <summary>
     /// Gets whether this silicon being is using a custom compiled implementation

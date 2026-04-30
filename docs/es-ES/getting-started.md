@@ -1,4 +1,4 @@
-﻿# Inicio Rápido
+# Inicio Rápido
 
 > **Versión: v0.1.0-alpha**
 
@@ -9,18 +9,22 @@
 Este proyecto proporciona dos versiones de implementación:
 
 ### SiliconLife.Default (Versión Predeterminada)
+- **Posicionamiento**: Implementación predeterminada, utilizada principalmente para verificación de viabilidad de arquitectura
 - **Modo de Ejecución**: Aplicación de consola
 - **Almacenamiento**: Almacenamiento JSON del sistema de archivos
-- **Escenario de Aplicación**: Prioridad de seguridad de datos, bajo volumen de datos, depuración de desarrollo
+- **Escenario de Aplicación**: Prioridad de seguridad de datos, bajo volumen de datos, depuración de desarrollo, verificación de arquitectura
 - **Soporte de Plataforma**: Windows, Linux, macOS
+- **Descripción de Rol**: Implementación de referencia para verificación de arquitectura que proporciona una ejecución simple y confiable, adecuada para primer contacto o depuración de desarrollo
 
 ### SiliconLife.Fast (Versión de Alto Rendimiento)
+- **Posicionamiento**: Versión de producción principal
 - **Modo de Ejecución**: Aplicación de formularios Windows (bandeja del sistema)
 - **Almacenamiento**: Almacenamiento en memoria + persistencia asíncrona
-- **Escenario de Aplicación**: Alta concurrencia, baja latencia, gran volumen de datos
+- **Escenario de Aplicación**: Alta concurrencia, baja latencia, gran volumen de datos, operaciones de producción a largo plazo
 - **Soporte de Plataforma**: Solo Windows
+- **Descripción de Rol**: Implementación de nivel de producción con optimización profunda, la mejor opción para operaciones a largo plazo y entornos de producción reales
 
-> **Sugerencia para Principiantes**: Se recomienda que los usuarios primerizos comiencen con **SiliconLife.Default** y migren a la versión Fast según sea necesario después de familiarizarse con el sistema.
+> **Sugerencia para Principiantes**: Se recomienda que los usuarios primerizos comiencen con **SiliconLife.Default** para verificar rápidamente la viabilidad de la arquitectura. Después de familiarizarse con el sistema, se recomienda encarecidamente migrar a **SiliconLife.Fast**.
 
 ## Prerrequisitos
 

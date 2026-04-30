@@ -9,18 +9,22 @@
 Dieses Projekt bietet zwei Implementierungsversionen:
 
 ### SiliconLife.Default (Standardversion)
+- **Positionierung**: Standardimplementierung, hauptsächlich für Architektur-Machbarkeitsverifizierung
 - **Ausführungsmodus**: Konsolenanwendung
 - **Speicher**: Dateisystem-JSON-Speicher
-- **Anwendungsszenario**: Datensicherheitspriorität, kleines Datenvolumen, Entwicklungsdebugging
+- **Anwendungsszenario**: Datensicherheitspriorität, kleines Datenvolumen, Entwicklungsdebugging, Architekturverifizierung
 - **Plattformunterstützung**: Windows, Linux, macOS
+- **Rollenbeschreibung**: Referenzimplementierung für Architekturverifizierung, bietet eine einfache und zuverlässige Ausführung, geeignet für ersten Kontakt oder Entwicklungs-Debugging
 
 ### SiliconLife.Fast (Hochleistungsversion)
+- **Positionierung**: Haupt-Produktionsversion
 - **Ausführungsmodus**: Windows-Formularanwendung (System Tray)
 - **Speicher**: In-Memory-Speicher + asynchrone Persistenz
-- **Anwendungsszenario**: Hohe Parallelität, niedrige Latenz, großes Datenvolumen
+- **Anwendungsszenario**: Hohe Parallelität, niedrige Latenz, großes Datenvolumen, Langzeit-Produktionsbetrieb
 - **Plattformunterstützung**: Nur Windows
+- **Rollenbeschreibung**: Produktionsreife Implementierung mit tiefer Optimierung, die beste Wahl für Langzeitbetrieb und echte Produktionsumgebungen
 
-> **Anfängerempfehlung**: Erstbenutzer sollten mit **SiliconLife.Default** beginnen und nach Vertrautheit mit dem System bei Bedarf zur Fast-Version migrieren.
+> **Anfängerempfehlung**: Erstbenutzer sollten mit **SiliconLife.Default** beginnen, um schnell die Architektur-Machbarkeit zu verifizieren. Nach Vertrautheit mit dem System wird eine Migration zu **SiliconLife.Fast** dringend empfohlen.
 
 ## Voraussetzungen
 

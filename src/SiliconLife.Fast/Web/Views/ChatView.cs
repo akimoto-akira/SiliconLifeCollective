@@ -12,6 +12,7 @@
 // limitations under the License.
 
 using SiliconLife.Fast.Web.Models;
+using SiliconLife.Fast.Web.Component;
 
 using SiliconLife.Common.Localization;
 
@@ -34,11 +35,18 @@ public class ChatView : ViewBase
         var sessionItems = new List<object>();
         foreach (var session in vm.Sessions)
         {
-            var isActive = vm.CurrentBeingId.HasValue && session.Id == vm.CurrentBeingId.Value;
-            sessionItems.Add(H.Div(
+            var isActive = vm.CurrentSessionId.HasValue && session.Id == vm.CurrentSessionId.Value;
+            var item = H.Div(
                 H.Div(session.Name).Class("being-name"),
                 H.Div(session.LastMessage).Class("being-last-message")
-            ).Class("being-item" + (isActive ? " active" : "")).Data("id", session.Id.ToString()));
+            ).Class("being-item" + (isActive ? " active" : "")).Data("id", session.Id.ToString());
+            
+            if (session.BeingId.HasValue)
+            {
+                item.Data("being-id", session.BeingId.Value.ToString());
+            }
+            
+            sessionItems.Add(item);
         }
 
         var msgItems = new List<object>();
@@ -56,6 +64,11 @@ public class ChatView : ViewBase
                 H.Div(
                     H.Span(string.IsNullOrEmpty(vm.CurrentBeingName) ? vm.Localization.ChatNoConversationSelected : vm.CurrentBeingName)
                         .Class("chat-header-name")
+                        .Id("chat-header-name"),
+                    H.Span("")
+                        .Id("being-status-badge")
+                        .Class("being-status-badge")
+                        .Style("display:none")
                 ).Id("chat-header").Class("chat-header"),
                 H.Div(msgItems.ToArray()).Id("chat-messages").Class("chat-messages"),
                 H.Div(
@@ -155,94 +168,44 @@ public class ChatView : ViewBase
         ).Class("chat-layout");
     }
 
-    private static H RenderMessage(ChatMessage msg, DefaultLocalizationBase localization)
+    private static object RenderMessage(ChatMessage msg, DefaultLocalizationBase localization)
     {
-        if (msg.IsUser)
+        var component = new ChatMessageComponent()
+            .IsUser(msg.IsUser)
+            .Text(msg.Text ?? "")
+            .Thinking(msg.Thinking)
+            .SenderName(msg.SenderName)
+            .Time(msg.Time)
+            .PromptTokens(msg.PromptTokens)
+            .CompletionTokens(msg.CompletionTokens)
+            .TotalTokens(msg.TotalTokens)
+            .UserDisplayName(localization.ChatUserDisplayName)
+            .DefaultBeingName(localization.ChatDefaultBeingName)
+            .ThinkingSummary(localization.ChatThinkingSummary)
+            .ToolCallsSummaryFormat(localization.GetChatToolCallsSummary(0).Replace("{0}", "{0}"));
+
+        if (msg.ToolCalls != null && msg.ToolCalls.Any())
         {
-            var bubble = H.Div(
-                msg.Text ?? ""
-            ).Class("msg-user-bubble");
-            var content = H.Div(bubble).Class("msg-user-content");
-            if (!string.IsNullOrEmpty(msg.Time))
-                content.Add(H.Div(msg.Time).Class("msg-time"));
-            var avatar = H.Div(H.Div("U").Class("msg-avatar-icon"), H.Div(localization.ChatUserDisplayName).Class("msg-avatar-name")).Class("msg-user-avatar");
-            return H.Div(content, avatar).Class("msg-user");
-        }
-
-        var beingDisplayName = !string.IsNullOrEmpty(msg.SenderName) ? msg.SenderName : localization.ChatDefaultBeingName;
-        var avatar2 = H.Div(H.Div(beingDisplayName.Substring(0, 1)).Class("msg-avatar-icon"), H.Div(beingDisplayName).Class("msg-avatar-name")).Class("msg-being-avatar");
-
-        var children = new List<object>();
-
-        if (!string.IsNullOrEmpty(msg.SenderName))
-            children.Add(H.Div(msg.SenderName).Class("msg-being-sender"));
-
-        var bodyChildren = new List<object>();
-
-        var thinkContent = msg.Thinking ?? "";
-        if (!string.IsNullOrEmpty(thinkContent))
-        {
-            bodyChildren.Add(H.Details(
-                H.Summary(localization.ChatThinkingSummary),
-                H.Div(thinkContent).Class("msg-thinking-content")
-            ).Class("msg-collapsible"));
-        }
-
-        if (!string.IsNullOrEmpty(msg.Text))
-            bodyChildren.Add(H.Div().Class("msg-being-text markdown-body").Data("md-raw", msg.Text));
-
-        var tools = msg.ToolCalls?.ToList();
-        if (tools != null && tools.Count > 0)
-        {
-            var toolItems = new List<object>();
-            foreach (var tool in tools)
+            var toolInfos = msg.ToolCalls.Select(t => new SiliconLife.Fast.Web.Component.ToolCallInfo
             {
-                var icon = tool.Success ? "✓" : "✗";
-                var cls = tool.Success ? "msg-tool-success" : "msg-tool-fail";
-                var target = !string.IsNullOrEmpty(tool.Target) ? $" · {tool.Target}" : "";
-                toolItems.Add(H.Div(
-                    H.Span(icon).Class($"tool-status {cls}"),
-                    H.Span($"{tool.Name}{target}")
-                ).Class("msg-tool-item"));
-            }
-            bodyChildren.Add(H.Details(
-                H.Summary(localization.GetChatToolCallsSummary(tools.Count)),
-                H.Div(toolItems.ToArray()).Class("msg-tools-list")
-            ).Class("msg-collapsible"));
+                Name = t.Name,
+                Target = t.Target,
+                Success = t.Success
+            }).ToList();
+            component.ToolCalls(toolInfos);
         }
 
-        children.Add(H.Div(bodyChildren.ToArray()).Class("msg-being-body"));
-
-        {
-            var prompt = msg.PromptTokens ?? 0;
-            var completion = msg.CompletionTokens ?? 0;
-            var total = msg.TotalTokens ?? 0;
-            children.Add(H.Div($"Token: ↑{prompt} ↓{completion} Σ{total}").Class("msg-token-stats"));
-        }
-
-        if (!string.IsNullOrEmpty(msg.Time))
-            children.Add(H.Div(msg.Time).Class("msg-time"));
-
-        var content2 = H.Div(
-            H.Div(children.ToArray()).Class("msg-being-card")
-        ).Class("msg-being-content");
-
-        return H.Div(avatar2, content2).Class("msg-being");
+        return component.Build();
     }
 
     private static CssBuilder GetStyles()
     {
         return CssBuilder.Create()
-            .Comment("Remove body whitespace")
-            .Selector("body")
-                .Property("margin", "0")
-                .Property("padding", "0")
-            .EndSelector()
-
             .Comment("Chat Layout")
             .Selector(".chat-layout")
                 .Property("display", "flex")
-                .Property("height", "100%")
+                .Property("flex", "1 1 0")
+                .Property("min-height", "0")
                 .Property("overflow", "hidden")
             .EndSelector()
 
@@ -294,7 +257,9 @@ public class ChatView : ViewBase
 
             .Comment("Chat Main Area")
             .Selector(".chat-main")
-                .Property("flex", "1")
+                .Property("flex", "1 1 0")
+                .Property("min-width", "0")
+                .Property("min-height", "0")
                 .Property("display", "flex")
                 .Property("flex-direction", "column")
                 .Property("overflow", "hidden")
@@ -311,9 +276,36 @@ public class ChatView : ViewBase
                 .Property("color", "var(--text-primary)")
             .EndSelector()
 
+            .Comment("Being Status Badge in Chat Header")
+            .Selector(".being-status-badge")
+                .Property("display", "inline-flex")
+                .Property("align-items", "center")
+                .Property("gap", "6px")
+                .Property("padding", "4px 10px")
+                .Property("border-radius", "12px")
+                .Property("font-size", "12px")
+                .Property("font-weight", "500")
+                .Property("margin-left", "12px")
+            .EndSelector()
+            .Selector(".being-status-badge.idle")
+                .Property("background", "rgba(245, 158, 11, 0.15)")
+                .Property("color", "var(--status-warning, var(--accent-warning))")
+            .EndSelector()
+            .Selector(".being-status-badge.active")
+                .Property("background", "rgba(16, 185, 129, 0.15)")
+                .Property("color", "var(--status-active, var(--accent-secondary))")
+            .EndSelector()
+            .Selector(".status-dot")
+                .Property("width", "6px")
+                .Property("height", "6px")
+                .Property("border-radius", "50%")
+                .Property("background", "currentColor")
+            .EndSelector()
+
             .Comment("Messages")
             .Selector(".chat-messages")
-                .Property("flex", "1")
+                .Property("flex", "1 1 0")
+                .Property("min-height", "0")
                 .Property("overflow-y", "auto")
                 .Property("padding", "20px")
                 .Property("display", "flex")
@@ -331,6 +323,7 @@ public class ChatView : ViewBase
                 .Property("padding", "40px 20px")
                 .Property("color", "var(--text-secondary)")
                 .Property("gap", "16px")
+                .Property("flex-shrink", "0")
             .EndSelector()
             .Selector(".loading-indicator.active")
                 .Property("display", "flex")
@@ -682,6 +675,12 @@ public class ChatView : ViewBase
                 .Property("display", "flex")
                 .Property("gap", "12px")
                 .Property("align-items", "flex-end")
+                .Property("flex-shrink", "0")
+            .EndSelector()
+            .Selector(".queue-indicator")
+                .Property("flex-shrink", "0")
+            .EndSelector()
+            .Selector(".file-panel")
                 .Property("flex-shrink", "0")
             .EndSelector()
             .Selector(".chat-input-area textarea")
@@ -1057,13 +1056,19 @@ public class ChatView : ViewBase
 
     private static JsSyntax GetScripts(ChatViewModel vm)
     {
-        var currentSessionId = vm.CurrentBeingId?.ToString() ?? "";
+        var currentSessionId = vm.CurrentSessionId?.ToString() ?? "";
+        var currentBeingId = vm.CurrentBeingId?.ToString() ?? "";
         var userId = vm.UserId.ToString();
         var beingName = vm.CurrentBeingName ?? "AI";
 
         // Serialize the tool display name map as a JS object literal
         var toolDisplayNamesLiteral = "{" + string.Join(",",
             vm.ToolDisplayNames.Select(kv =>
+                $"\"{kv.Key}\":\"{kv.Value}\"")) + "}";
+
+        // Serialize the activity status name map as a JS object literal
+        var activityStatusNamesLiteral = "{" + string.Join(",",
+            vm.ActivityStatusNames.Select(kv =>
                 $"\"{kv.Key}\":\"{kv.Value}\"")) + "}";
 
         var js = Js.Block()
@@ -1075,7 +1080,11 @@ public class ChatView : ViewBase
             .Add(() => Js.Let(() => "lastStreamElementId", () => Js.Null()))
             .Add(() => Js.Let(() => "messageCache", () => Js.New(() => Js.Id(() => "Array"))))
             .Add(() => Js.Let(() => "toolCallMap", () => Js.New(() => Js.Id(() => "Map"))))
-            .Add(() => Js.Const(() => "toolDisplayNames", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Str(() => toolDisplayNamesLiteral))));
+            .Add(() => Js.Const(() => "toolDisplayNames", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Str(() => toolDisplayNamesLiteral))))
+            .Add(() => Js.Const(() => "activityNameMap", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Str(() => activityStatusNamesLiteral))))
+            // Being status polling
+            .Add(() => Js.Let(() => "beingStatusInterval", () => Js.Null()))
+            .Add(() => Js.Let(() => "currentBeingId", () => currentBeingId.Length > 0 ? Js.Str(() => currentBeingId) : Js.Null()));
 
         var autoResizeBody = Js.Block()
             .Add(() => Js.Assign(() => Js.Id(() => "textarea").Prop(() => "style").Prop(() => "height"), () => Js.Str(() => "auto")))
@@ -1623,14 +1632,19 @@ public class ChatView : ViewBase
         js.Add(() => Js.Func(() => "sendMessage", () => new List<string>(), () => sendMessageBody));
 
         var selectSessionBody = Js.Block()
+            .Add(() => Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "selectSession called, sessionId:"), () => Js.Id(() => "sessionId"), () => Js.Str(() => ", beingId:"), () => Js.Id(() => "beingId")).Stmt())
+            .Add(() => Js.Id(() => "stopStatusPolling").Invoke().Stmt())
             .Add(() => Js.Assign(() => Js.Id(() => "currentSessionId"), () => Js.Id(() => "sessionId")))
+            .Add(() => Js.Assign(() => Js.Id(() => "currentBeingId"), () => Js.Id(() => "beingId")))
+            .Add(() => Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "After assignment, currentBeingId:"), () => Js.Id(() => "currentBeingId")).Stmt())
             .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "querySelector", () => Js.Str(() => ".chat-header-name")).Prop(() => "textContent"), () => Js.Id(() => "name")))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages")).Call(() => "setAttribute", () => Js.Str(() => "data-session-id"), () => Js.Id(() => "sessionId")).Stmt())
             .Add(() => Js.Assign(() => Js.Id(() => "messageCache"), () => Js.New(() => Js.Id(() => "Array"))))
             .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages")).Prop(() => "innerHTML"), () => Js.Str(() => "")))
             .Add(() => Js.Id(() => "showLoading").Invoke().Stmt())
-            .Add(() => Js.Id(() => "connectSSE").Invoke().Stmt());
-        js.Add(() => Js.Func(() => "selectSession", () => new List<string> { "sessionId", "name" }, () => selectSessionBody));
+            .Add(() => Js.Id(() => "connectSSE").Invoke().Stmt())
+            .Add(() => Js.Id(() => "startStatusPolling").Invoke().Stmt());
+        js.Add(() => Js.Func(() => "selectSession", () => new List<string> { "sessionId", "name", "beingId" }, () => selectSessionBody));
 
         var keydownHandlerBody = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
@@ -1652,7 +1666,7 @@ public class ChatView : ViewBase
         var clickHandlerBody = Js.Block()
             .Add(() => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => ".being-item")).Call(() => "forEach", () => removeActiveArrow).Stmt())
             .Add(() => Js.Id(() => "item").Prop(() => "classList").Call(() => "add", () => Js.Str(() => "active")).Stmt())
-            .Add(() => Js.Id(() => "selectSession").Invoke(() => Js.Id(() => "item").Prop(() => "dataset").Prop(() => "id"), () => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".being-name")).Prop(() => "textContent")).Stmt());
+            .Add(() => Js.Id(() => "selectSession").Invoke(() => Js.Id(() => "item").Prop(() => "dataset").Prop(() => "id"), () => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".being-name")).Prop(() => "textContent"), () => Js.Id(() => "item").Prop(() => "dataset").Prop(() => "beingId")).Stmt());
         var forEachItemBody = Js.Block()
             .Add(() => Js.Id(() => "item").Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string>(), () => clickHandlerBody)).Stmt());
         var initSessionListBody = Js.Block()
@@ -1677,6 +1691,8 @@ public class ChatView : ViewBase
                 .Add(() => Js.Const(() => "div", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
                 .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "being-item")))
                 .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "dataset").Prop(() => "id"), () => Js.Id(() => "item").Prop(() => "sessionId")))
+                .Add(() => Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "Rendering session:"), () => Js.Id(() => "item").Prop(() => "displayName"), () => Js.Str(() => "beingId:"), () => Js.Id(() => "item").Prop(() => "beingId")).Stmt())
+                .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "dataset").Prop(() => "beingId"), () => Js.Id(() => "item").Prop(() => "beingId")))
                 .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"being-name\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "item").Prop(() => "displayName")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><div class=\"being-last-message\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "item").Prop(() => "lastMessage")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"))))
                 .Add(() => Js.Id(() => "list").Call(() => "appendChild", () => Js.Id(() => "div")).Stmt())
             )))
@@ -1884,7 +1900,7 @@ public class ChatView : ViewBase
         {
             { (Js.Id(() => "currentSessionId"), new List<JsSyntax>
                 {
-                    Js.Id(() => "selectSession").Invoke(() => Js.Id(() => "currentSessionId"), () => Js.Id(() => "beingName")).Stmt()
+                    Js.Id(() => "selectSession").Invoke(() => Js.Id(() => "currentSessionId"), () => Js.Id(() => "beingName"), () => Js.Id(() => "currentBeingId")).Stmt()
                 }
             )},
             { (null, new List<JsSyntax>
@@ -2254,6 +2270,75 @@ public class ChatView : ViewBase
                 })}
             }));
         js.Add(() => Js.Assign(() => Js.Id(() => "connectSSE"), () => Js.Arrow(() => new List<string>(), () => connectSSEOverrideBody)));
+
+        // --- Being Status Badge Functions ---
+
+        var updateBeingStatusBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "currentBeingId").Not(), new List<JsSyntax>
+                    {
+                        Js.Return(() => Js.Id(() => "undefined"))
+                    }
+                )}
+            }))
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/beings/activity?id=").Op(() => "+", () => (JsSyntax)Js.Id(() => "currentBeingId")))
+                .Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json")))
+                .Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => Js.Block()
+                    .Add(() => Js.Const(() => "badge", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "being-status-badge"))))
+                    .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        { (Js.Id(() => "badge"), new List<JsSyntax>
+                            {
+                                Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "data").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "Idle")), () => Js.Str(() => "idle"), () => Js.Str(() => "active"))),
+                                Js.Const(() => "statusText", () => Js.Id(() => "activityNameMap").Index(() => Js.Id(() => "data").Prop(() => "activity"))),
+                                Js.Assign(() => Js.Id(() => "badge").Prop(() => "className"), () => Js.Str(() => "being-status-badge ").Op(() => "+", () => (JsSyntax)Js.Id(() => "statusClass"))),
+                                Js.Assign(() => Js.Id(() => "badge").Prop(() => "innerHTML"), () => Js.Str(() => "<span class='status-dot'></span>").Op(() => "+", () => (JsSyntax)Js.Id(() => "statusText"))),
+                                Js.Assign(() => Js.Id(() => "badge").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "inline-flex"))
+                            }
+                        )}
+                    }))
+                )));
+
+        var startStatusPollingBody = Js.Block()
+            .Add(() => Js.Id(() => "updateBeingStatus").Invoke().Stmt())
+            .Add(() => Js.Assign(() => Js.Id(() => "beingStatusInterval"), () => Js.Id(() => "setInterval").Invoke(() => Js.Id(() => "updateBeingStatus"), () => Js.Num(() => "2000"))))
+            .Add(() => Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "Being status polling started")).Stmt());
+
+        var stopStatusPollingBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "beingStatusInterval"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "clearInterval").Invoke(() => Js.Id(() => "beingStatusInterval")).Stmt(),
+                        Js.Assign(() => Js.Id(() => "beingStatusInterval"), () => Js.Null()),
+                        Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "Being status polling stopped")).Stmt()
+                    }
+                )}
+            }))
+            .Add(() => Js.Const(() => "badge", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "being-status-badge"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "badge"), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "badge").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "none"))
+                    }
+                )}
+            }));
+
+        js.Add(() => Js.Func(() => "updateBeingStatus", () => new List<string>(), () => updateBeingStatusBody));
+        js.Add(() => Js.Func(() => "startStatusPolling", () => new List<string>(), () => startStatusPollingBody));
+        js.Add(() => Js.Func(() => "stopStatusPolling", () => new List<string>(), () => stopStatusPollingBody));
+
+        // Auto-start polling when a being is selected
+        js.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+        {
+            { (Js.Id(() => "currentBeingId"), new List<JsSyntax>
+                {
+                    Js.Id(() => "startStatusPolling").Invoke().Stmt()
+                }
+            )}
+        }));
 
         return js;
     }

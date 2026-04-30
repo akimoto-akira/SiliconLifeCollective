@@ -574,7 +574,6 @@ public class LogTool : ITool
         sb.AppendLine($"  User Nickname: {config.UserNickname}");
         sb.AppendLine($"  AI Client Type: {config.AIClientType}");
         sb.AppendLine($"  Minimum Log Level: {config.MinimumLogLevel}");
-        sb.AppendLine($"  Data Directory: {config.DataDirectory.FullName}");
         
         if (includeDetails)
         {

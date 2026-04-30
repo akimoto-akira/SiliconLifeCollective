@@ -122,4 +122,14 @@ public class TrayJaJP : TrayLocalizationBase
     /// Gets the exit menu item text
     /// </summary>
     public override string Exit => "終了";
+
+    /// <summary>
+    /// Gets the web server startup error title
+    /// </summary>
+    public override string WebServerStartupErrorTitle => "Web サーバー起動失敗";
+
+    /// <summary>
+    /// Gets the web server startup error message
+    /// </summary>
+    public override string WebServerStartupErrorMessage => "Web サーバーの起動に失敗しました。アプリケーションを終了します。\n\nエラー: {0}";
 }

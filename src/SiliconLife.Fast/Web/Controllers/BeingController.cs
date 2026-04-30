@@ -43,6 +43,8 @@ public class BeingController : Controller
             GetList();
         else if (path == "/api/beings/detail")
             GetDetail();
+        else if (path == "/api/beings/activity")
+            GetActivity();
         else if (path.StartsWith("/beings/soul"))
             SoulEditor();
         else if (path == "/beings/ai-config")
@@ -76,7 +78,7 @@ public class BeingController : Controller
         {
             id = b.Id.ToString(),
             name = b.Name,
-            isIdle = b.IsIdle,
+            activity = b.CurrentActivity.ToString(),
             isCustomCompiled = b.IsCustomCompiled,
             customTypeName = b.CustomTypeName ?? ""
         }).ToList();
@@ -104,7 +106,7 @@ public class BeingController : Controller
         {
             id = being.Id.ToString(),
             name = being.Name,
-            isIdle = being.IsIdle,
+            activity = being.CurrentActivity.ToString(),
             isCustomCompiled = being.IsCustomCompiled,
             customTypeName = being.CustomTypeName ?? "",
             soulContent = being.SoulContent ?? "",
@@ -114,6 +116,30 @@ public class BeingController : Controller
             aiClientConfig = (being.AIClientConfig != null && being.AIClientConfig.Count > 0) 
                 ? System.Text.Json.JsonSerializer.Serialize(being.AIClientConfig) 
                 : null
+        });
+    }
+
+    private void GetActivity()
+    {
+        var idStr = Request.QueryString["id"];
+        if (string.IsNullOrEmpty(idStr) || !Guid.TryParse(idStr, out var id))
+        {
+            RenderJson(new { error = "Invalid ID" });
+            return;
+        }
+
+        var being = _beingManager.GetBeing(id);
+        if (being == null)
+        {
+            RenderJson(new { error = "Not found" });
+            return;
+        }
+
+        RenderJson(new
+        {
+            id = being.Id.ToString(),
+            name = being.Name,
+            activity = being.CurrentActivity.ToString()
         });
     }
 

@@ -10,6 +10,8 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
+using SiliconLife.Common.Localization;
+using SiliconLife.Fast.Web.Component;
 
 namespace SiliconLife.Fast.Web;
 
@@ -243,80 +245,208 @@ public class MemoryController : Controller
 
     private string BuildTimelineHtml(List<MemoryEntry> entries, Guid beingId)
     {
+        var loc = ((DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(((DefaultConfigData)Config.Instance.Data).Language));
+        
         if (entries.Count == 0)
-            return "<p style='text-align: center; padding: 40px; color: var(--text-secondary);'>暂无记忆数据</p>";
-
-        var sb = new System.Text.StringBuilder();
-        sb.Append("<div class='memory-tree'>");
+        {
+            return new PComponent(loc.MemoryTimelineEmptyState)
+                .Style("text-align: center; padding: 40px; color: var(--text-secondary);")
+                .Render();
+        }
 
         var grouped = entries
             .Select(e => new { Entry = e, Ts = ResolveTimestamp(e.Timestamp) })
+            .ToList();
+
+        // Group ALL entries (including summaries) by hierarchy
+        var allGrouped = grouped
             .GroupBy(x => x.Ts.Year)
             .OrderByDescending(g => g.Key)
             .Select(yg => new
             {
                 Year = yg.Key,
-                Count = yg.Count(),
+                Count = yg.Count(x => !x.Entry.IsSummary), // Only count regular entries
                 Months = yg
                     .GroupBy(x => x.Ts.Month)
                     .OrderByDescending(g => g.Key)
                     .Select(mg => new
                     {
                         Month = mg.Key,
-                        Count = mg.Count(),
+                        Count = mg.Count(x => !x.Entry.IsSummary),
                         Days = mg
                             .GroupBy(x => x.Ts.Day)
                             .OrderByDescending(g => g.Key)
                             .Select(dg => new
                             {
                                 Day = dg.Key,
-                                Count = dg.Count(),
+                                Count = dg.Count(x => !x.Entry.IsSummary),
                                 Hours = dg
                                     .GroupBy(x => x.Ts.Hour)
                                     .OrderByDescending(g => g.Key)
                                     .Select(hg => new
                                     {
                                         Hour = hg.Key,
-                                        Count = hg.Count(),
-                                        Items = hg.Select(x => ConvertToMemoryItem(x.Entry, beingId)).ToList()
+                                        Count = hg.Count(x => !x.Entry.IsSummary),
+                                        Minutes = hg
+                                            .GroupBy(x => x.Ts.Minute)
+                                            .OrderByDescending(g => g.Key)
+                                            .Select(mg => new
+                                            {
+                                                Minute = mg.Key,
+                                                Count = mg.Count(x => !x.Entry.IsSummary),
+                                                Items = mg.Where(x => !x.Entry.IsSummary).Select(x => ConvertToMemoryItem(x.Entry, beingId)).ToList()
+                                            }).ToList()
                                     }).ToList()
                             }).ToList()
                     }).ToList()
             }).ToList();
 
-        foreach (var year in grouped)
+        // Extract summaries for quick lookup
+        var summariesByTime = grouped
+            .Where(x => x.Entry.IsSummary)
+            .GroupBy(x => new { x.Ts.Year, x.Ts.Month, x.Ts.Day, x.Ts.Hour, x.Ts.Minute, x.Ts.Second })
+            .ToDictionary(g => g.Key, g => g.First());
+
+        var tree = new DivComponent().Class("memory-tree");
+
+        foreach (var year in allGrouped)
         {
-            sb.Append($"<details open><summary style='font-size: 16px; font-weight: 600; padding: 8px; cursor: pointer;'>📅 {year.Year}年 ({year.Count}条)</summary><div style='padding-left: 20px;'>");
+            var yearSummaryKey = new { Year = year.Year, Month = 1, Day = 1, Hour = 0, Minute = 0, Second = 0 };
+            var yearSummary = summariesByTime.ContainsKey(yearSummaryKey) ? summariesByTime[yearSummaryKey] : null;
+
+            var yearDetails = new DetailsComponent().Open();
+            yearDetails.AddSummary(new SpanComponent()
+                .Style("font-size: 16px; font-weight: 600; padding: 8px; cursor: pointer;")
+                .Text($"📅 {string.Format(loc.MemoryTimelineYearFormat, year.Year, year.Count)}"));
+            if (yearSummary != null)
+            {
+                yearDetails.AddSummary(BuildSummaryBlock(loc.MemoryYearSummaryLabel, yearSummary.Entry.Content,
+                    padding: 10, fontSizeLabel: 12, fontSizeContent: 13, marginTop: 6, summaryId: yearSummary.Entry.Id.ToString()));
+            }
+
+            var yearBody = new DivComponent().Style("padding-left: 20px;");
             foreach (var month in year.Months)
             {
-                sb.Append($"<details><summary style='font-size: 14px; padding: 6px; cursor: pointer;'>📅 {year.Year}年{month.Month}月 ({month.Count}条)</summary><div style='padding-left: 20px;'>");
+                var monthSummaryKey = new { Year = year.Year, Month = month.Month, Day = 1, Hour = 0, Minute = 0, Second = 0 };
+                var monthSummary = summariesByTime.ContainsKey(monthSummaryKey) ? summariesByTime[monthSummaryKey] : null;
+
+                var monthDetails = new DetailsComponent();
+                monthDetails.AddSummary(new SpanComponent()
+                    .Style("font-size: 14px; padding: 6px; cursor: pointer;")
+                    .Text($"📅 {string.Format(loc.MemoryTimelineMonthFormat, year.Year, month.Month, month.Count)}"));
+                if (monthSummary != null)
+                {
+                    monthDetails.AddSummary(BuildSummaryBlock(loc.MemoryMonthSummaryLabel, monthSummary.Entry.Content,
+                        padding: 8, fontSizeLabel: 11, fontSizeContent: 12, marginTop: 5, summaryId: monthSummary.Entry.Id.ToString()));
+                }
+
+                var monthBody = new DivComponent().Style("padding-left: 20px;");
                 foreach (var day in month.Days)
                 {
+                    var daySummaryKey = new { Year = year.Year, Month = month.Month, Day = day.Day, Hour = 0, Minute = 0, Second = 0 };
+                    var daySummary = summariesByTime.ContainsKey(daySummaryKey) ? summariesByTime[daySummaryKey] : null;
+
                     var moStr = month.Month.ToString().PadLeft(2, '0');
                     var dStr = day.Day.ToString().PadLeft(2, '0');
-                    sb.Append($"<details><summary style='font-size: 13px; padding: 4px; cursor: pointer;'>📅 {year.Year}-{moStr}-{dStr} ({day.Count}条)</summary><div style='padding-left: 20px;'>");
+
+                    var dayDetails = new DetailsComponent();
+                    dayDetails.AddSummary(new SpanComponent()
+                        .Style("font-size: 13px; padding: 4px; cursor: pointer;")
+                        .Text($"📅 {string.Format(loc.MemoryTimelineDayFormat, year.Year, moStr, dStr, day.Count)}"));
+                    if (daySummary != null)
+                    {
+                        dayDetails.AddSummary(BuildSummaryBlock(loc.MemoryDaySummaryLabel, daySummary.Entry.Content,
+                            padding: 6, fontSizeLabel: 11, fontSizeContent: 12, marginTop: 4, summaryId: daySummary.Entry.Id.ToString()));
+                    }
+
+                    var dayBody = new DivComponent().Style("padding-left: 20px;");
                     foreach (var hour in day.Hours)
                     {
+                        var hourSummaryKey = new { Year = year.Year, Month = month.Month, Day = day.Day, Hour = hour.Hour, Minute = 0, Second = 0 };
+                        var hourSummary = summariesByTime.ContainsKey(hourSummaryKey) ? summariesByTime[hourSummaryKey] : null;
+
                         var hStr = hour.Hour.ToString().PadLeft(2, '0');
-                        sb.Append($"<details><summary style='font-size: 12px; padding: 4px; cursor: pointer;'>🕐 {hStr}:00 ({hour.Count}条)</summary><div style='padding-left: 20px;'>");
-                        foreach (var memory in hour.Items)
+
+                        var hourDetails = new DetailsComponent();
+                        hourDetails.AddSummary(new SpanComponent()
+                            .Style("font-size: 12px; padding: 4px; cursor: pointer;")
+                            .Text($"🕐 {string.Format(loc.MemoryTimelineHourFormat, hStr, hour.Count)}"));
+                        if (hourSummary != null)
                         {
-                            sb.Append(RenderMemoryCardHtml(memory));
+                            hourDetails.AddSummary(BuildSummaryBlock(loc.MemoryHourSummaryLabel, hourSummary.Entry.Content,
+                                padding: 6, fontSizeLabel: 11, fontSizeContent: 12, marginTop: 4, summaryId: hourSummary.Entry.Id.ToString()));
                         }
-                        sb.Append("</div></details>");
+
+                        var hourBody = new DivComponent().Style("padding-left: 20px;");
+                        foreach (var minute in hour.Minutes)
+                        {
+                            var minuteSummaryKey = new { Year = year.Year, Month = month.Month, Day = day.Day, Hour = hour.Hour, Minute = minute.Minute, Second = 0 };
+                            var minuteSummary = summariesByTime.ContainsKey(minuteSummaryKey) ? summariesByTime[minuteSummaryKey] : null;
+
+                            var mStr = minute.Minute.ToString().PadLeft(2, '0');
+
+                            var minuteDetails = new DetailsComponent();
+                            minuteDetails.AddSummary(new SpanComponent()
+                                .Style("font-size: 11px; padding: 3px; cursor: pointer;")
+                                .Text($"🕐 {string.Format(loc.MemoryTimelineMinuteFormat, hStr, mStr, minute.Count)}"));
+                            if (minuteSummary != null)
+                            {
+                                minuteDetails.AddSummary(BuildSummaryBlock(loc.MemoryMinuteSummaryLabel, minuteSummary.Entry.Content,
+                                    padding: 5, fontSizeLabel: 10, fontSizeContent: 11, marginTop: 3, summaryId: minuteSummary.Entry.Id.ToString()));
+                            }
+
+                            var minuteBody = new DivComponent().Style("padding-left: 20px;");
+                            foreach (var memory in minute.Items)
+                            {
+                                minuteBody.Add(BuildMemoryCard(memory, loc));
+                            }
+                            minuteDetails.Add(minuteBody);
+
+                            hourBody.Add(minuteDetails);
+                        }
+                        hourDetails.Add(hourBody);
+
+                        dayBody.Add(hourDetails);
                     }
-                    sb.Append("</div></details>");
+                    dayDetails.Add(dayBody);
+
+                    monthBody.Add(dayDetails);
                 }
-                sb.Append("</div></details>");
+                monthDetails.Add(monthBody);
+
+                yearBody.Add(monthDetails);
             }
-            sb.Append("</div></details>");
+            yearDetails.Add(yearBody);
+
+            tree.Add(yearDetails);
         }
 
-        sb.Append("</div>");
-        return sb.ToString();
+        return tree.Render();
     }
 
-    private string RenderMemoryCardHtml(Models.MemoryItem memory)
+    private static DivComponent BuildSummaryBlock(string label, string content,
+        int padding, int fontSizeLabel, int fontSizeContent, int marginTop, string summaryId = "")
+    {
+        var summaryDiv = new DivComponent()
+            .Style($"background: var(--bg-secondary); padding: {padding}px; border-radius: 6px; margin-top: {marginTop}px; border-left: 3px solid var(--accent-primary); font-weight: normal; cursor: pointer;")
+            .Add(new DivComponent()
+                .Style($"font-size: {fontSizeLabel}px; color: var(--text-secondary); margin-bottom: {Math.Max(2, marginTop - 2)}px;")
+                .Add(new SpanComponent().Text($"📝 {label}")))
+            .Add(new DivComponent()
+                .Style($"font-size: {fontSizeContent}px; line-height: 1.6;")
+                .Add(new SpanComponent().Text(content)));
+
+        // Add click handler and data attributes if summaryId is provided
+        if (!string.IsNullOrEmpty(summaryId))
+        {
+            summaryDiv.Attr("data-summary-id", summaryId)
+                      .Attr("onclick", $"showSummaryDetail('{summaryId}')");
+        }
+
+        return summaryDiv;
+    }
+
+    private DivComponent BuildMemoryCard(Models.MemoryItem memory, DefaultLocalizationBase loc)
     {
         var typeColor = "var(--border-color)";
         var typeIcon = "📝";
@@ -328,35 +458,55 @@ public class MemoryController : Controller
             case "timer": typeColor = "#9C27B0"; typeIcon = "⏰"; break;
         }
 
-        var sb = new System.Text.StringBuilder();
-        sb.Append($"<div class='memory-card' data-id='{memory.Id}' style='padding: 15px; margin-bottom: 15px; border-left: 4px solid {typeColor}; border-radius: 8px; position: relative; background: var(--bg-secondary); cursor: pointer;'>");
-        sb.Append("<div style='display: flex; align-items: center; gap: 10px; margin-bottom: 8px;'>");
-        sb.Append($"<span style='font-size: 18px;'>{typeIcon}</span>");
-        sb.Append($"<span style='font-size: 12px; color: var(--text-secondary);'>{memory.TimestampDisplay}</span>");
+        var card = new DivComponent()
+            .Class("memory-card")
+            .Attr("data-id", memory.Id.ToString())
+            .Style($"padding: 15px; margin-bottom: 15px; border-left: 4px solid {typeColor}; border-radius: 8px; position: relative; background: var(--bg-secondary); cursor: pointer;");
+
+        // Header row: icon + timestamp + optional summary badge
+        var headerRow = new DivComponent()
+            .Style("display: flex; align-items: center; gap: 10px; margin-bottom: 8px;")
+            .Add(new SpanComponent().Style("font-size: 18px;").Text(typeIcon))
+            .Add(new SpanComponent()
+                .Style("font-size: 12px; color: var(--text-secondary);")
+                .Text(memory.TimestampDisplay));
+
         if (memory.IsSummary)
         {
-            sb.Append("<span style='background: var(--accent-color); color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: auto;'>压缩总结</span>");
+            headerRow.Add(new SpanComponent()
+                .Style("background: var(--accent-color); color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: auto;")
+                .Text(loc.MemorySummaryBadge));
         }
-        sb.Append("</div>");
-        sb.Append($"<div style='margin-bottom: 8px; line-height: 1.5;'>{System.Web.HttpUtility.HtmlEncode(memory.Content)}</div>");
+        card.Add(headerRow);
 
+        // Content
+        card.Add(new DivComponent()
+            .Style("margin-bottom: 8px; line-height: 1.5;")
+            .Add(new SpanComponent().Text(memory.Content)));
+
+        // Keywords
         if (memory.Keywords.Count > 0)
         {
-            sb.Append("<div style='display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 5px;'>");
+            var kwRow = new DivComponent()
+                .Style("display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 5px;");
             foreach (var kw in memory.Keywords)
             {
-                sb.Append($"<span style='background: var(--bg-tertiary); padding: 2px 8px; border-radius: 3px; font-size: 11px; color: var(--text-secondary);'>#{System.Web.HttpUtility.HtmlEncode(kw)}</span>");
+                kwRow.Add(new SpanComponent()
+                    .Style("background: var(--bg-tertiary); padding: 2px 8px; border-radius: 3px; font-size: 11px; color: var(--text-secondary);")
+                    .Text($"#{kw}"));
             }
-            sb.Append("</div>");
+            card.Add(kwRow);
         }
 
+        // Related beings
         if (memory.RelatedBeings.Count > 0)
         {
-            sb.Append($"<div style='font-size: 11px; color: var(--text-secondary);'>👥 关联: {memory.RelatedBeings.Count} 个智能体</div>");
+            card.Add(new DivComponent()
+                .Style("font-size: 11px; color: var(--text-secondary);")
+                .Add(new SpanComponent().Text(string.Format(loc.MemoryRelatedBeingsLabel, memory.RelatedBeings.Count))));
         }
 
-        sb.Append("</div>");
-        return sb.ToString();
+        return card;
     }
 
     private void GetDetail()

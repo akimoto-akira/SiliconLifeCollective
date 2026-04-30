@@ -1,4 +1,4 @@
-﻿# 문제 해결 가이드
+# 문제 해결 가이드
 
 > **버전: v0.1.0-alpha**
 
@@ -135,12 +135,16 @@ OutOfMemoryException
 ```
 
 **해결책**:
-1. 힙 크기 증가:
+1. **SiliconLife.Default**: 힙 크기 증가:
 ```bash
-dotnet run --server.gcHeapCount 4
+dotnet run --project src/SiliconLife.Default --server.gcHeapCount 4
 ```
 
-2. 오래된 데이터 정리:
+2. **SiliconLife.Fast**: Fast 버전 자체 메모리 사용량이 높음 (~500MB). 메모리가 지속적으로 부족한 경우, 다음을 권장합니다:
+   - 동시 실행 실리콘 생명체 수 줄이기
+   - 오래된 데이터 정리하여 메모리 해제
+
+3. 오래된 데이터 정리:
 ```bash
 # 오래된 로그 아카이브
 mv logs/ logs-archive/
@@ -149,6 +153,8 @@ mkdir logs
 # 오래된 메모리 정리
 # Web UI 통해: 메모리 관리 > 정리
 ```
+
+> **팁**: SiliconLife.Default 메모리 사용량이 낮음 (~200MB), 메모리 제한 환경에 적합; SiliconLife.Fast 메모리 사용량이 높지만 성능이 더 우수하여, 프로덕션 환경에 적합합니다.
 
 ---
 
@@ -454,6 +460,7 @@ tail -f logs/*.log
 
 ### 디버거 사용
 
+**SiliconLife.Default (기본 구현)**:
 ```bash
 # 디버거로 실행
 dotnet run --project src/SiliconLife.Default --configuration Debug
@@ -461,6 +468,17 @@ dotnet run --project src/SiliconLife.Default --configuration Debug
 # 디버거 연결
 # IDE 통해: 프로세스에 연결 > SiliconLife.Default
 ```
+
+**SiliconLife.Fast (고성능 버전)**:
+```bash
+# 디버거로 실행
+dotnet run --project src/SiliconLife.Fast --configuration Debug
+
+# 디버거 연결
+# IDE 통해: 프로세스에 연결 > SiliconLife.Fast
+```
+
+> **권장**: 개발 디버깅 단계에서는 SiliconLife.Default 사용을 권장하며, 아키텍처 검증 통과 후 SiliconLife.Fast를 사용하여 프로덕션 배포하세요.
 
 ---
 
@@ -527,8 +545,15 @@ dotnet run --project src/SiliconLife.Default --configuration Debug
 
 1. 원인에 대한 로그 확인
 2. 애플리케이션 재시작:
+
+**SiliconLife.Default (기본 구현)**:
 ```bash
 dotnet run --project src/SiliconLife.Default
+```
+
+**SiliconLife.Fast (주력 프로덕션 버전)**:
+```bash
+dotnet run --project src/SiliconLife.Fast
 ```
 
 3. 필요한 경우 백업에서 복원

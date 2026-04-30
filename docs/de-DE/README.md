@@ -1,3 +1,5 @@
+![Silicon Life Collective](../../icon/wordIcon.png)
+
 # Silicon Life Collective
 
 **Version: v0.1.0-alpha** | **Silicon Life Collective** — Eine auf .NET 9 basierende Multi-Agenten-Kollaborationsplattform, auf der KI-Agenten als **Silicon Beings** bezeichnet werden und sich durch Roslyn-Dynamikkompilierung selbst weiterentwickeln können.
@@ -49,18 +51,22 @@
 Dieses Projekt bietet zwei Implementierungsversionen, um unterschiedliche Szenarioanforderungen zu erfüllen:
 
 ### SiliconLife.Default (Standardversion)
+- **Positionierung**: Standardimplementierung, hauptsächlich für Architektur-Machbarkeitsverifizierung
 - **Ausführungsmodus**: Konsolenanwendung
 - **Speichermethode**: Reines Dateisystem-JSON-Speicher
 - **Anwendbare Szenarien**: Hohe Datensicherheitsanforderungen, begrenzte Speicherressourcen, kleines Datenvolumen
 - **Merkmale**: Einfach und zuverlässig, sofortige Datenpersistenz, kein Speicherverlustrisiko
+- **Rollenbeschreibung**: Referenzimplementierung für Architekturverifizierung, geeignet für ersten Kontakt, Entwicklungs-Debugging oder Szenarien mit Datensicherheitspriorität
 - **Startbefehl**: `dotnet run --project src/SiliconLife.Default`
 
 ### SiliconLife.Fast (Hochleistungsversion)
+- **Positionierung**: Haupt-Produktionsversion
 - **Ausführungsmodus**: Windows Forms-Anwendung (unterstützt Systemtray)
 - **Speichermethode**: Speicherspeicher + asynchrone Batch-Persistenz
 - **Anwendbare Szenarien**: Hohe Parallelität, niedrige Latenz, große Datenmengen
 - **Merkmale**: Extreme Performance-Optimierung, Tray-Hintergrundausführung, Speicherdatenbank + WAL-Protokolle gewährleisten Datensicherheit
 - **Performance-Verbesserung**: Speicherlese-Latenz um 1000x reduziert, Schreiblatenz um 15000x reduziert, parallele Verarbeitungskapazität um 50x erhöht
+- **Rollenbeschreibung**: Produktionsreife Implementierung mit tiefer Optimierung, die beste Wahl für Langzeitbetrieb und echte Produktionsumgebungen
 - **Startbefehl**: `dotnet run --project src/SiliconLife.Fast`
 
 ### Versionsvergleich

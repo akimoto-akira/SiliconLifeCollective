@@ -1,4 +1,4 @@
-﻿# Průvodce Řešením Problémů
+# Průvodce Řešením Problémů
 
 > **Verze: v0.1.0-alpha**
 
@@ -135,12 +135,16 @@ OutOfMemoryException
 ```
 
 **Řešení**:
-1. Zvyšte velikost haldy:
+1. **SiliconLife.Default**: Zvyšte velikost haldy:
 ```bash
-dotnet run --server.gcHeapCount 4
+dotnet run --project src/SiliconLife.Default --server.gcHeapCount 4
 ```
 
-2. Vyčistěte stará data:
+2. **SiliconLife.Fast**: Verze Fast sama o sobě má vysokou spotřebu paměti (~500MB). Pokud je paměť dlouhodobě nedostatečná, doporučuje se:
+   - Snížit počet souběžně běžících silikonových bytostí
+   - Vyčistit stará data pro uvolnění paměti
+
+3. Vyčistěte stará data:
 ```bash
 # Archivujte staré logy
 mv logs/ logs-archive/
@@ -149,6 +153,8 @@ mkdir logs
 # Vyčistěte staré vzpomínky
 # Prostřednictvím Web UI: Správa Paměti > Vyčistit
 ```
+
+> **Tip**: SiliconLife.Default má nízkou spotřebu paměti (~200MB), vhodné pro prostředí s omezenou pamětí; SiliconLife.Fast má vyšší spotřebu paměti, ale lepší výkon, vhodné pro produkční prostředí.
 
 ---
 

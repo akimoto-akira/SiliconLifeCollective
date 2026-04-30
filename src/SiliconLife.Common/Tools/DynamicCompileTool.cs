@@ -128,12 +128,23 @@ public class DynamicCompileTool : ITool
             return ToolResult.Failed($"Compilation failed.{errors}");
         }
 
-        string beingDirectory = GetBeingDirectory(callerId);
-        bool saved = _loader.SaveBeingCode(callerId, beingDirectory, sourceCode);
+        // Encrypt and save code using BeingCodeFileManager
+        byte[]? encryptedCode = CodeEncryption.Encrypt(sourceCode, callerId);
+        if (encryptedCode == null)
+        {
+            return ToolResult.Failed("Failed to encrypt code.");
+        }
+
+        SiliconBeingBase? being = MainLoop.BeingManager?.GetBeing(callerId);
+        if (being?.Storage == null)
+        {
+            return ToolResult.Failed("Storage is not available.");
+        }
+
+        bool saved = BeingCodeFileManager.SaveCode(being.Storage, encryptedCode);
         if (!saved)
         {
-            return ToolResult.Failed(
-                "Failed to save code: Security scan rejected the code or file write failed.");
+            return ToolResult.Failed("Failed to save code to storage.");
         }
 
         return ToolResult.Successful(
@@ -160,12 +171,23 @@ public class DynamicCompileTool : ITool
             return ToolResult.Failed($"Compilation failed.{errors}");
         }
 
-        string beingDirectory = GetBeingDirectory(callerId);
-        bool saved = _loader.SaveBeingCode(callerId, beingDirectory, sourceCode);
+        // Encrypt and save code using BeingCodeFileManager
+        byte[]? encryptedCode = CodeEncryption.Encrypt(sourceCode, callerId);
+        if (encryptedCode == null)
+        {
+            return ToolResult.Failed("Failed to encrypt code.");
+        }
+
+        SiliconBeingBase? being = MainLoop.BeingManager?.GetBeing(callerId);
+        if (being?.Storage == null)
+        {
+            return ToolResult.Failed("Storage is not available.");
+        }
+
+        bool saved = BeingCodeFileManager.SaveCode(being.Storage, encryptedCode);
         if (!saved)
         {
-            return ToolResult.Failed(
-                "Failed to save code: Security scan rejected the code or file write failed.");
+            return ToolResult.Failed("Failed to save code to storage.");
         }
 
         SiliconBeingManager? beingManager = MainLoop.BeingManager;
@@ -185,28 +207,45 @@ public class DynamicCompileTool : ITool
 
     private ToolResult ExecuteActivate(Guid callerId)
     {
-        string beingDirectory = GetBeingDirectory(callerId);
-        string codePath = Path.Combine(beingDirectory, "code.enc");
-
-        if (!File.Exists(codePath))
+        SiliconBeingBase? being = MainLoop.BeingManager?.GetBeing(callerId);
+        if (being == null)
         {
-            return ToolResult.Failed(
-                "No saved code found. Use action='save' to compile and save your code first.");
+            return ToolResult.Failed($"Being {callerId:N} not found.");
         }
 
-        Type? compiledType;
-        try
+        if (being.Storage == null)
         {
-            compiledType = _loader.LoadBeingType(callerId, beingDirectory);
-            if (compiledType == null)
-            {
-                return ToolResult.Failed(
-                    "Saved code exists but failed to load. It may be corrupted.");
-            }
+            return ToolResult.Failed($"Storage is not available for being {callerId:N}.");
         }
-        catch (Exception ex)
+
+        if (!BeingCodeFileManager.CodeExists(being.Storage))
         {
-            return ToolResult.Failed($"Failed to load saved code: {ex.Message}");
+            return ToolResult.Failed("No saved code found. Use action='save' to compile and save your code first.");
+        }
+
+        byte[]? encryptedCode = BeingCodeFileManager.LoadCode(being.Storage);
+        if (encryptedCode == null)
+        {
+            return ToolResult.Failed("Saved code exists but failed to load. It may be corrupted.");
+        }
+
+        if (!CodeEncryption.TryDecryptToString(encryptedCode, callerId, out string? sourceCode))
+        {
+            return ToolResult.Failed("Failed to decrypt saved code.");
+        }
+
+        if (string.IsNullOrEmpty(sourceCode))
+        {
+            return ToolResult.Failed("Decrypted code is empty.");
+        }
+
+        CompilationResult compileResult = _loader.CompileBeing(sourceCode, callerId);
+        if (!compileResult.Success)
+        {
+            string errors = compileResult.Errors.Count > 0
+                ? "\nErrors:\n  " + string.Join("\n  ", compileResult.Errors)
+                : "";
+            return ToolResult.Failed($"Failed to compile saved code.{errors}");
         }
 
         SiliconBeingManager? beingManager = MainLoop.BeingManager;
@@ -215,7 +254,7 @@ public class DynamicCompileTool : ITool
             return ToolResult.Failed("SiliconBeingManager is not available.");
         }
 
-        bool replaced = beingManager.ReplaceBeing(callerId, compiledType);
+        bool replaced = beingManager.ReplaceBeing(callerId, compileResult.CompiledType!);
         if (!replaced)
         {
             return ToolResult.Failed("Failed to activate saved code. You may not be registered.");
@@ -226,15 +265,27 @@ public class DynamicCompileTool : ITool
 
     private ToolResult ExecutePreviewSaved(Guid callerId)
     {
-        string beingDirectory = GetBeingDirectory(callerId);
-        string codePath = Path.Combine(beingDirectory, "code.enc");
+        SiliconBeingBase? being = MainLoop.BeingManager?.GetBeing(callerId);
+        if (being == null)
+        {
+            return ToolResult.Successful($"Being {callerId:N} not found.");
+        }
 
-        if (!File.Exists(codePath))
+        if (being.Storage == null)
+        {
+            return ToolResult.Failed($"Storage is not available for being {callerId:N}.");
+        }
+
+        if (!BeingCodeFileManager.CodeExists(being.Storage))
         {
             return ToolResult.Successful("No saved code found. Use action='save' to compile and save your code.");
         }
 
-        byte[] encryptedCode = File.ReadAllBytes(codePath);
+        byte[]? encryptedCode = BeingCodeFileManager.LoadCode(being.Storage);
+        if (encryptedCode == null)
+        {
+            return ToolResult.Failed("Failed to load saved code.");
+        }
 
         if (!CodeEncryption.TryDecryptToString(encryptedCode, callerId, out string? sourceCode))
         {
@@ -251,16 +302,20 @@ public class DynamicCompileTool : ITool
 
     private ToolResult ExecuteClearSaved(Guid callerId)
     {
-        string beingDirectory = GetBeingDirectory(callerId);
-        DynamicBeingLoader.DeleteCustomCode(beingDirectory);
+        SiliconBeingBase? being = MainLoop.BeingManager?.GetBeing(callerId);
+        if (being == null)
+        {
+            return ToolResult.Failed($"Being {callerId:N} not found.");
+        }
+
+        if (being.Storage == null)
+        {
+            return ToolResult.Failed($"Storage is not available for being {callerId:N}.");
+        }
+
+        BeingCodeFileManager.DeleteCode(being.Storage);
 
         return ToolResult.Successful($"Saved code for being {callerId:N} has been cleared.");
     }
 
-    private static string GetBeingDirectory(Guid beingId)
-    {
-        string dataDirectory = Config.Instance?.Data?.DataDirectory?.FullName
-            ?? Path.Combine(Environment.CurrentDirectory, "data");
-        return Path.Combine(dataDirectory, "SiliconManager", beingId.ToString());
-    }
 }

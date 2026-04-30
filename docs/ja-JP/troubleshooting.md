@@ -1,4 +1,4 @@
-﻿# トラブルシューティングガイド
+# トラブルシューティングガイド
 
 > **バージョン: v0.1.0-alpha**
 
@@ -135,12 +135,16 @@ OutOfMemoryException
 ```
 
 **解決策**：
-1. ヒープサイズを増加：
+1. **SiliconLife.Default**：ヒープサイズを増加：
 ```bash
-dotnet run --server.gcHeapCount 4
+dotnet run --project src/SiliconLife.Default --server.gcHeapCount 4
 ```
 
-2. 古いデータをクリーンアップ：
+2. **SiliconLife.Fast**：Fast バージョン自体のメモリ使用量が高い（~500MB）。メモリが継続的に不足する場合は、以下を推奨します：
+   - 同時実行シリコン生命体の数を減らす
+   - 古いデータをクリーンアップしてメモリを解放
+
+3. 古いデータをクリーンアップ：
 ```bash
 # 古いログをアーカイブ
 mv logs/ logs-archive/
@@ -149,6 +153,8 @@ mkdir logs
 # 古いメモリをクリーンアップ
 # Web UI 経由：メモリ管理 > クリーンアップ
 ```
+
+> **ヒント**：SiliconLife.Default のメモリ使用量は低い（~200MB）ため、メモリ制限のある環境に適しています。SiliconLife.Fast はメモリ使用量が高いですがパフォーマンスが優れており、本番環境に適しています。
 
 ---
 

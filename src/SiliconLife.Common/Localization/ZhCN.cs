@@ -356,6 +356,19 @@ public class ZhCN : DefaultLocalizationBase
     public override string MemoryStatTypeDistribution => "类型分布";
     public override string MemoryStatKeywordFrequency => "关键词频率";
     public override string MemoryCardViewDetail => "查看详情";
+    public override string MemoryTimelineEmptyState => "暂无记忆数据";
+    public override string MemoryYearSummaryLabel => "年度总结";
+    public override string MemoryMonthSummaryLabel => "月度总结";
+    public override string MemoryDaySummaryLabel => "日总结";
+    public override string MemoryHourSummaryLabel => "时段总结";
+    public override string MemoryMinuteSummaryLabel => "分钟总结";
+    public override string MemorySummaryBadge => "压缩总结";
+    public override string MemoryTimelineYearFormat => "{0}年 ({1}条)";
+    public override string MemoryTimelineMonthFormat => "{0}年{1}月 ({2}条)";
+    public override string MemoryTimelineDayFormat => "{0}-{1}-{2} ({3}条)";
+    public override string MemoryTimelineHourFormat => "{0}:00 ({1}条)";
+    public override string MemoryTimelineMinuteFormat => "{0}:{1} ({2}条)";
+    public override string MemoryRelatedBeingsLabel => "👥 关联: {0} 个智能体";
 
     // ===== Projects Page Localization =====
 
@@ -782,7 +795,6 @@ public class ZhCN : DefaultLocalizationBase
         ["DashScopeModel_kimi-k2.5"] = "Kimi K2.5（长上下文）",
         ["DashScopeModel_llama-4-maverick"] = "Llama 4 Maverick",
         ["WebPort"] = "Web 端口",
-        ["AllowIntranetAccess"] = "允许内网访问",
         ["WebSkin"] = "Web 皮肤",
         ["UserNickname"] = "用户昵称"
     };
@@ -802,7 +814,6 @@ public class ZhCN : DefaultLocalizationBase
         ["DashScopeRegion"] = "阿里云百炼服务地域",
         ["DashScopeModel"] = "阿里云百炼平台使用的模型",
         ["WebPort"] = "Web 服务器端口",
-        ["AllowIntranetAccess"] = "允许内网访问（需要管理员权限）",
         ["WebSkin"] = "Web 皮肤名称",
         ["UserNickname"] = "人类用户的昵称"
     };
@@ -833,6 +844,20 @@ public class ZhCN : DefaultLocalizationBase
         LogLevel.Critical => "严重",
         LogLevel.None => "无",
         _ => logLevel.ToString()
+    };
+
+    /// <summary>
+    /// Gets the localized display name for a silicon being activity state.
+    /// </summary>
+    public override string GetBeingActivityName(BeingActivity activity) => activity switch
+    {
+        BeingActivity.Idle => "空闲",
+        BeingActivity.SingleChat => "单聊中",
+        BeingActivity.GroupChat => "群聊中",
+        BeingActivity.Task => "执行任务",
+        BeingActivity.Timer => "执行定时任务",
+        BeingActivity.MemoryCompression => "压缩记忆",
+        _ => activity.ToString()
     };
 
     // ===== Tool Display Name Localization =====

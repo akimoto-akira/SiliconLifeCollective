@@ -1,4 +1,4 @@
-﻿# Rychlý Start
+# Rychlý Start
 
 > **Verze: v0.1.0-alpha**
 
@@ -9,18 +9,22 @@
 Tento projekt poskytuje dvě implementační verze:
 
 ### SiliconLife.Default (Výchozí Verze)
+- **Pozicování**: Výchozí implementace, používána především pro ověření proveditelnosti architektury
 - **Režim Spuštění**: Konzolová aplikace
 - **Úložiště**: Souborové JSON úložiště
-- **Scénář Použití**: Priorita bezpečnosti dat, malý objem dat, vývojové ladění
+- **Scénář Použití**: Priorita bezpečnosti dat, malý objem dat, vývojové ladění, ověření architektury
 - **Podpora Platformy**: Windows, Linux, macOS
+- **Popis role**: Referenční implementace pro ověření architektury, poskytuje jednoduché a spolehlivé spuštění, vhodná pro první kontakt nebo vývojové ladění
 
 ### SiliconLife.Fast (Vysoce Výkonná Verze)
+- **Pozicování**: Hlavní produkční verze
 - **Režim Spuštění**: Windows Forms aplikace (systémová lišta)
 - **Úložiště**: Paměťové úložiště + asynchronní perzistence
-- **Scénář Použití**: Vysoká souběžnost, nízká latence, velký objem dat
+- **Scénář Použití**: Vysoká souběžnost, nízká latence, velký objem dat, dlouhodobý produkční provoz
 - **Podpora Platformy**: Pouze Windows
+- **Popis role**: Produkční implementace s hlubokou optimalizací, nejlepší volba pro dlouhodobý provoz a reálné produkční prostředí
 
-> **Doporučení pro Začátečníky**: Noví uživatelé by měli začít s **SiliconLife.Default** a po seznámení se systémem v případě potřeby migrovat na verzi Fast.
+> **Doporučení pro Začátečníky**: Noví uživatelé by měli začít s **SiliconLife.Default**, aby rychle ověřili proveditelnost architektury. Po seznámení se systémem se důrazně doporučuje migrovat na **SiliconLife.Fast**.
 
 ## Předpoklady
 

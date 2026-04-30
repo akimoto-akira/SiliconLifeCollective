@@ -217,4 +217,20 @@ public static class Component
     {
         return new AComponent(text);
     }
+
+    /// <summary>
+    /// Create details/summary collapsible component
+    /// </summary>
+    public static DetailsComponent Details()
+    {
+        return new DetailsComponent();
+    }
+
+    /// <summary>
+    /// Create markdown editor component with CodeMirror integration
+    /// </summary>
+    public static MarkdownEditorComponent MarkdownEditor()
+    {
+        return new MarkdownEditorComponent();
+    }
 }

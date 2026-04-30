@@ -5,451 +5,685 @@
 Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-und dieses Projekt遵循 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+und das Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
 ## Über dieses Änderungsprotokoll
 
-### Duale Projektversionen
+### Projekt-Zweiversion
 
 Dieses Projekt bietet zwei Implementierungsversionen:
 
-- **SiliconLife.Default**: Standardversion, Konsolenanwendung, Dateisystem-JSON-Speicher
-- **SiliconLife.Fast**: Hochleistungsversion, Windows-Formularanwendung, In-Memory-Speicher + asynchrone Persistenz
+- **SiliconLife.Default**: Standardimplementierung, hauptsächlich zur Validierung der Architekturfähigkeit. Konsolenanwendung, Dateisystem-JSON-Speicher.
+- **SiliconLife.Fast**: Empfohlene Produktionsversion. Windows Forms-Anwendung, Arbeitsspeicherspeicher + asynchrone Persistenz, tiefgehend optimiert für Leistung.
 
-Beide Versionen teilen dieselben Schnittstellen und Funktionen, mit Unterschieden nur in der Speicherimplementierung und dem Ausführungsmodus.
+Beide Versionen teilen die gleichen Schnittstellen und Funktionen und unterscheiden sich nur in der Speicherimplementierung und dem Ausführungsmodus. SiliconLife.Default dient als Architekturvalidierungsbenchmark, SiliconLife.Fast als empfohlene Produktionsversion.
 
 ### Projektursprung
 
 - Dieses Projekt entstand am 20. März 2026.
-- Vor diesem Projekt gab es ein Verifizierungs-Demo, das aufgrund eines irrationalen Architekturentwurfs scheiterte, was die Integration mit mehreren KI-Plattformen verhinderte.
+- Vor diesem Projekt gab es ein Validierungsdemo, das aufgrund unzureichender Architekturgestaltung fehlschlug und keine Integration mit mehreren AI-Plattformen ermöglichte.
 
-### Verwendete KI-IDE-Tools
+### Genutzte AI-IDE-Tools
 
 #### Kiro (Amazon AWS)
-- Das Projekt wurde ursprünglich von Kiro gepflegt und im Spec-Modus gestartet.
-- Kiro ist eine von Amazon AWS entwickelte agentic KI-Entwicklungsumgebung.
+- Projekt wurde ursprünglich von Kiro gewartet und mit dem Spec-Modus gestartet.
+- Kiro ist eine agentische AI-Entwicklungsumgebung von Amazon AWS.
 - Basierend auf Code OSS (VS Code), unterstützt VS Code-Einstellungen und Open VSX-kompatible Erweiterungen.
-- Verfügt über einen spezifikationsgetriebenen Entwicklungsworkflow für strukturiertes KI-Coding.
+- Verfügt über einen spezifikationsgetriebenen Entwicklungsworkflow für strukturierte AI-Codierung.
 
 #### Comate AI IDE / 文心快码 (Baidu)
-- Gelegentlich verwendet für Copywriting und Dokumentationsarbeiten.
-- Comate AI IDE ist ein von Baidu Wenxin am 23. Juni 2025 veröffentlichtes KI-natives Entwicklungsumgebungstool.
-- Die erste multimodale, multi-agent kollaborative KI-IDE der Branche.
-- Funktionen umfassen Design-zu-Code-Konvertierung und vollständige KI-unterstützte Codierung.
-- Angetrieben vom Baidu Wenxin 4.0 X1 Turbo-Modell.
+- Gelegentlich für Text- und Dokumentationsarbeiten verwendet.
+- Comate AI IDE ist ein AI-natives Entwicklungsumgebungstool, das von Baidu Wenxin am 23. Juni 2025 veröffentlicht wurde.
+- Branchenerstes multimodales, multi-agentenbasiertes AI-IDE.
+- Funktionen umfassen Design-zu-Code-Konvertierung und AI-unterstützte Codierung im gesamten Prozess.
+- Angetrieben von dem Baidu Wenxin 4.0 X1 Turbo-Modell.
 
 #### Trae (ByteDance)
-- Dieses Projekt wurde die meiste Zeit hauptsächlich mit Trae gepflegt.
-- Trae ist eine von SPRING PTE, einer singapurischen Tochtergesellschaft von ByteDance, entwickelte KI-IDE.
-- Als 10x AI Engineer, fähig, eigenständig Softwarelösungen zu entwickeln.
-- Verfügt über intelligente Produktivitätstools, flexible Entwicklungsrythmusanpassung und kollaborative Projektlieferung.
-- Bietet Enterprise-Grade-Leistung mit konfigurierbarem Agentensystem.
+- Dieses Projekt wurde überwiegend mit Trae gewartet.
+- Trae ist eine AI-IDE der ByteDance-Tochtergesellschaft SPRING PTE in Singapur.
+- Als 10x AI Engineer in der Lage, Softwarelösungen unabhängig zu entwickeln.
+- Verfügt über intelligente Produktivitätstools, flexible Anpassung an den Entwicklungsrhythmus und Funktionen für die gemeinsame Projektabgabe.
+- Bietet unternehmensweite Leistung und ein konfigurierbares Agentsystem.
 
 #### Qoder (Alibaba)
-- Seit dem 18. April 2026 wird dieses Projekt mit Qoder gepflegt.
-- Qoder excelt bei Quellcodeanalyse und Domänendokumentgenerierung und leistet außergewöhnliche Arbeit beim Verständnis komplexer Codebasen.
-- Adoptiert ein Null-Berechnungskosten-Preismodell, was es hocheffizient für automatisierte Dokumentverarbeitung und Routineaufgaben macht.
-- Eine KI-gestützte agentic Coding-Plattform, entworfen für echte Softwareentwicklung.
-- Verfügt über intelligente Codegenerierung, konversationelle Programmierung, fortgeschrittene Kontextanalyse-Engine und Multi-Agent-Kollaboration.
-- Bietet tiefes Codeverständnis mit minimalem Ressourcenverbrauch, ideal für langfristige Projektwartung und Wissensakkumulation.
+- Seit dem 18. April 2026 wird dieses Projekt mit Qoder gewartet.
+- Qoder zeichnet sich durch hervorragende Quellcodeanalyse und Generierung von Domänendokumenten aus und ist bei der Untersuchung komplexer Codebasen überlegen.
+- Verwendet ein Preismodell mit Null-Berechnungskosten, was es äußerst kosteneffizient für automatisierte Dokumentenverarbeitung und Routineaufgaben macht.
+- Eine AI-getriebene agentische Codierplattform, die speziell für die tatsächliche Softwareentwicklung entwickelt wurde.
+- Verfügt über intelligente Codegenerierung, dialogbasierte Programmierung, eine erweiterte Kontextanalyse-Engine und Funktionen für die Zusammenarbeit mehrerer Agenten.
+- Bietet eine tiefgehende Codeverstehen mit minimalen Ressourcenverbrauch, ideal für die langfristige Projektwartung und Wissensakkumulation.
 
-### Anforderungsdokument
+### Anforderungsdokumentation
 
-- Das Anforderungsdokument für dieses Projekt ist nicht öffentlich verfügbar.
-- Anforderungen wurden durch Iterationen mit 12+ internationalen KI-Plattformen und großen Modellserien validiert, was ein benutzergeschichtengesteuertes Anforderungsdokument von über 2000 Zeilen erzeugte, das für Menschen fast unverständlich ist.
+- Die Anforderungsdokumentation dieses Projekts ist nicht öffentlich.
+- Die Anforderungen wurden über 12 internationale AI-Plattformen und große Modellsysteme hinweg wiederholt validiert, was zu über 2000 Zeilen an Benutzerhistorie-getriebener Anforderungsdokumentation führte, die fast unmenschlich zu verstehen ist.
 
 ---
+
+## [Unveröffentlicht]
+
+### 2026-04-30
+
+#### System-Tray-Funktion
+- `101b203` - Implementierung des Tray-Statusfensters und ApplicationContext
+  - Neue Tray-Icon-Ressourcen hinzugefügt (alpha.png, noWord.png, slc.ico, wordIcon.png)
+  - TrayStatusWindow-Statusfenster implementiert
+  - Unterstützung für Tray-Lokalisierung in 9 Sprachen (TrayCsCZ, TrayDeDE, TrayEnUS u.a.)
+  - TrayLocalizationBase abstrakte Basisklasse
+  - 24 Dateien geändert, 27995 Zeilen hinzugefügt, 1 Zeile gelöscht (inkl. Ressourcendateien)
+
+#### Komponentenbasierte UI-Architektur
+- `e61cfaa` - Komponentenbasierte UI-Architektur abgeschlossen, 24 Komponenten implementiert
+  - MVP-Phase (8): ComponentBase, Div, Span, Button, Input, Form, Select, Label
+  - Zweite Phase (6): Accordion, Card, Tabs, Table, Modal, Message
+  - Dritte Phase (5): Calendar, Tree, Chart, FileUpload, RichText
+  - Neue Hilfsklassen Js, Behavior, DomUpdate hinzugefügt
+  - 25 Dateien geändert, 2666 Zeilen hinzugefügt
+
+- `7449e51` - Verbesserung des Komponentensystems und Hinzufügen neuer Skin-Themen
+  - Verstärkung von A, Button, Div, Form, Input und anderen Komponenten
+  - 3 neue Skin-Themen hinzugefügt: HighContrast (Hoher Kontrast), Light (Hell), Minimal (Minimal)
+  - Aktuelle Skins aktualisiert (Admin, Chat, Creative, Dev)
+  - InitController-Komponentenmigration
+  - 32 Dateien geändert, 1466 Zeilen hinzugefügt, 1238 Zeilen gelöscht
+
+- `1ba8636` - InitController-Komponentenmigration gestartet (laufend)
+  - 9 Dateien geändert, 574 Zeilen hinzugefügt, 145 Zeilen gelöscht
+
+#### Speichersystemvereinheitlichung
+- `895dff9` - Vereinheitlichung von soul.md und state.json mit IStorage-Schnittstelle
+  - DefaultSiliconBeing nutzt IStorage zum Lesen/Schreiben von Soul-Dateien und Zuständen
+  - Neuer StateFileManager-Zustandsdateimanager hinzugefügt
+  - SoulFileManager refaktoriert, um IStorage zu unterstützen
+  - 8 Dateien geändert, 201 Zeilen hinzugefügt, 116 Zeilen gelöscht
+
+#### LiteDB-Verwaltungsverbesserung
+- `a34bef4` - Hinzufügen von LiteDBManager und Verstärkung der Tray-Lokalisierung
+  - Neuer LiteDB-Verwaltungs-Einstieg in Tray-Menü hinzugefügt
+  - Tray-Lokalisierung in 9 Sprachen aktualisiert
+  - 10 Dateien geändert, 196 Zeilen hinzugefügt
+
+- `c4a79ca` - Hinzufügen eines sprachsensitiven Localizer-Factories für LiteDB-Verwaltungsfenster
+  - 1 Datei geändert, 78 Zeilen hinzugefügt
+
+- `5ebc55e` - Konvertierung von LiteDBAdminLocalization in abstrakte Basisklasse
+  - 10 Dateien geändert, 1356 Zeilen hinzugefügt
+
+#### Konfigurationssystemfix
+- `2da5256` - Hinzufügen von ConfigExists abstrakter Methode und Fix für LiteDB-Doppelkonfigurationsdatensätze
+  - ConfigExists-Methode in ConfigDataBase hinzugefügt
+  - Fast-Version DefaultConfigData implementiert LiteDB-Konfigurationsprüfung
+  - Fix für LiteDB-Doppelkonfigurationsschlüsselproblem
+  - 9 Dateien geändert, 210 Zeilen hinzugefügt, 2 Zeilen gelöscht
+
+#### Chat- und View-Optimierung
+- `d3618ec` - Optimierung von Chat-Session, Speichersystem, Zeitmodell und View-Basisklasse
+  - BroadcastChannel, GroupChatSession, SingleChatSession optimiert
+  - Neue Abfragemethoden in ITimeStorage hinzugefügt
+  - FileSystemStorage und LiteDBStorage synchronisiert
+  - ViewBase refaktoriert und optimiert (Default- und Fast-Version)
+  - 11 Dateien geändert, 622 Zeilen hinzugefügt, 392 Zeilen gelöscht
+
+### 2026-04-29
+
+#### Architekturrekonstruktion: Extraktion gemeinsamer Module
+- `a102428` - Verschiebung gemeinsamer Module von SiliconLife.Default zu SiliconLife.Common
+  - 32 Kalenderimplementierungen in Common-Projekt extrahiert
+  - Lokalisierungsbasisklasse und 21 Sprachimplementierungen in Common-Projekt extrahiert
+  - Berechtigungsmanager und Standard-SiliconBeing-Implementierung in Common-Projekt extrahiert
+  - 23 integrierte Tool-Implementierungen in Common-Projekt extrahiert
+  - Playwright WebView-Implementierung in Common-Projekt extrahiert
+  - Namespace auf SiliconLife.Collective aktualisiert
+  - 122 Dateien geändert, 586 Zeilen hinzugefügt, 343 Zeilen gelöscht
+
+#### Codequalitätsverbesserung
+- `17566fe` - Ersetzung von Console.WriteLine durch Log-System in Core-, Common- und Default-Projekten
+  - 6 Dateien aktualisiert: ContextManager, AuditLogger, DefaultConfigData u.a.
+  - Einheitliche Nutzung von ILogger-Schnittstelle, erhöhte Codewartbarkeit
+  - 6 Dateien geändert, 12 Zeilen hinzugefügt, 8 Zeilen gelöscht
+
+#### SiliconLife.Fast Hochleistungsversion
+- `54a0307` - Hinzufügen von SiliconLife.Fast-Projekt und Abschluss der Kompilierungsfixes
+  - Vollständiger Windows Forms-Anwendungseinstieg
+  - System-Tray-Unterstützung (NotifyIcon)
+  - Alle Web-UI-Controller portiert (20+)
+  - Alle Web-View-Komponenten portiert
+  - 4 Skin-Themen portiert (Admin, Chat, Creative, Dev)
+  - 125 Dateien geändert, 61186 Zeilen hinzugefügt
+
+#### Mehrsprachige Dokumentsynchronisation
+- `265fde8` - Synchronisierung der Zweiversionsarchitekturdokumentation auf alle Sprachen
+  - architecture.md, changelog.md in 7 Sprachen aktualisiert
+  - contributing.md in 6 Sprachen aktualisiert
+  - getting-started.md, roadmap.md in 7 Sprachen aktualisiert
+  - 47 Dateien geändert, 1214 Zeilen hinzugefügt, 38 Zeilen gelöscht
+
+#### LiteDB-Speichersystem (Fast-Version)
+- `4704862` - Hinzufügen von LiteDB-Abhängigkeit und Infrastruktur
+  - Neuer LiteDBManager-Verwaltungsklasse hinzugefügt
+  - Neue LiteDBModels-Datenmodelle hinzugefügt
+  - 3 Dateien geändert, 252 Zeilen hinzugefügt
+
+- `4220036` - Implementierung von LiteDB-Speicherklassen
+  - LiteDBStorage: Implementierung der IStorage-Schnittstelle
+  - LiteDBTimeStorage: Implementierung der ITimeStorage-Schnittstelle
+  - LiteDBWorkNoteStorage: Implementierung der IWorkNoteStorage-Schnittstelle
+  - 3 Dateien geändert, 581 Zeilen hinzugefügt
+
+- `38ebd23` - Migration von Konfigurations- und Log-System zu LiteDB
+  - DefaultConfigData angepasst für LiteDB-Speicher
+  - Neuer LiteDBLoggerProvider-Loganbieter hinzugefügt
+  - 2 Dateien geändert, 203 Zeilen hinzugefügt, 67 Zeilen gelöscht
+
+- `e687157` - Migration des Wissensnetzwerks von Dateisystem zu LiteDB
+  - KnowledgeNetwork vollständig refaktoriert, nutzt LiteDB zum Speichern von Tripel-Daten
+  - 1 Datei geändert, 231 Zeilen hinzugefügt, 72 Zeilen gelöscht
+
+- `4220169` - Integration von LiteDB-Speicher in Program und ProjectManager
+  - Program.cs initialisiert LiteDB-Speicher
+  - ProjectManager angepasst für LiteDB-WorkNote-Speicher
+  - 2 Dateien geändert, 40 Zeilen hinzugefügt, 17 Zeilen gelöscht
+
+- `5f3a709` - Entfernung veralteter Dateisystem-Speicherimplementierungen
+  - FileSystemLoggerProvider, FileSystemStorage, FileSystemTimeStorage u.a. gelöscht
+  - 6 Dateien geändert, 1518 Zeilen gelöscht
+
+- `e1a4ef2` - docs: Hinzufügen von v0.1.0-alpha-Versionskennzeichen zu all Dokumentation
+  - 127 Dateien geändert, 2297 Zeilen hinzugefügt, 2471 Zeilen gelöscht
 
 ## [v0.1.0-alpha] - 2026-04-28
 
 ### 2026-04-28
 
-#### Speichersystem-Refaktorierung
-- `8dd26e3` - Vereinheitlichte ITimeStorage-Schnittstelle zur Verwendung von IncompleteDate und hierarchische Query-API hinzugefügt
-  - DateTime-Überladungsmethoden aus ITimeStorage-Schnittstelle entfernt, vereinheitlicht zur Verwendung von IncompleteDate
-  - CompareTo(DateTime)-Vergleichsmethode und Expand()-Erweiterungsmethode zu IncompleteDate hinzugefügt
-  - GetEarliestTimestamp(), GetLatestTimestamp() hierarchische Query-API hinzugefügt
-  - HasSummary()- und QueryWithLevel()-Methoden hinzugefügt, unterstützen Abfragen nach Zeitebene
-  - Memory.cs Refaktorierung des Kompressionsalgorithmus, Verwendung der neuen hierarchischen Query-API zur Effizienzsteigerung
-  - FileSystemTimeStorage.cs implementiert vollständig die neuen Schnittstellenmethoden
-  - Synchronisierte Updates aller Aufrufer: ChatSystem, ChatSession, BroadcastChannel, AuditLogger, TokenUsageRecord, usw.
-  - Tool-System-Updates: HelpTool, LogTool, TokenAuditTool an neue Schnittstelle angepasst
-  - Web-Controller-Updates: AuditController, ChatController, ChatHistoryController an neue Schnittstelle angepasst
-  - Gesamt: 41 Dateien geändert (+1820/-903 Zeilen)
+#### Speichersystemrekonstruktion
+- `8dd26e3` - Vereinheitlichung der ITimeStorage-Schnittstelle mit IncompleteDate und Hinzufügen von hierarchischer Abfrage-API
+  - Entfernung von DateTime-Überladungsmethoden aus ITimeStorage-Schnittstelle, einheitliche Nutzung von IncompleteDate
+  - IncompleteDate neue CompareTo(DateTime)-Vergleichsmethode und Expand()-Methode hinzugefügt
+  - Neue hierarchische Abfrage-API: GetEarliestTimestamp(), GetLatestTimestamp()
+  - Neue Methoden HasSummary() und QueryWithLevel() hinzugefügt, unterstützt Zeitbereichsabfrage
+  - Memory.cs-Kompressionsalgorithmus refaktoriert, nutzt neue hierarchische Abfrage-API zur Effizienzsteigerung
+  - FileSystemTimeStorage.cs vollständig implementiert neue Schnittstellenmethoden
+  - Synchronisierung aller Aufrufer: ChatSystem, ChatSession, BroadcastChannel, AuditLogger, TokenUsageRecord u.a.
+  - Tool-System aktualisiert: HelpTool, LogTool, TokenAuditTool angepasst an neue Schnittstelle
+  - Web-Controller aktualisiert: AuditController, ChatController, ChatHistoryController angepasst an neue Schnittstelle
+  - 41 Dateien geändert, 1820 Zeilen hinzugefügt, 903 Zeilen gelöscht
 
 ### 2026-04-27
 
-#### Hilfedokumentationssystem-Erweiterung
-- `9989d79` - Aktualisierte Lokalisierung, Hilfesystem und Webansichten
-  - IAIClientFactoryHelp.cs KI-Clientfabrik-Hilfedokumentationsschnittstelle hinzugefügt
-  - 9-Sprachen-Übersetzung für alle Hilfedokumente abgeschlossen
-  - HelpTopics.cs 40 Hilfethemendefinitionen hinzugefügt
-  - Webansichten umfassend aktualisiert: InitController, AuditView, ConfigView, KnowledgeView, LogView, usw.
-  - Lokalisierungssystem-Erweiterung: alle Sprachversionen haben neue Lokalisierungsschlüssel hinzugefügt
-  - KI-Clientfabrik-Updates: DashScopeClientFactory, OllamaClientFactory Verbesserungen
+#### Hilfedokumentsystemverbesserung
+- `9989d79` - Aktualisierung von Lokalisierung, Hilfssystem und Web-Views
+  - Neue IAIClientFactoryHelp.cs AI-Client-Factory-Hilfedokumentationsschnittstelle hinzugefügt
+  - Übersetzung aller Hilfedokumente in 9 Sprachen abgeschlossen
+  - HelpTopics.cs 40 neue Hilfethemen-Definitionen hinzugefügt
+  - Web-Views vollständig aktualisiert: InitController, AuditView, ConfigView, KnowledgeView, LogView u.a.
+  - Lokalisierungssystem verstärkt: Alle Sprachversionen neue Lokalisierungsschlüssel hinzugefügt
+  - AI-Client-Factory aktualisiert: DashScopeClientFactory, OllamaClientFactory verbessert
+  - 30 Dateien geändert, 10086 Zeilen hinzugefügt, 15 Zeilen gelöscht
 
-#### Hilfedokumentation neuer Inhalt
-- `e7afe94` - Seelendatei- und Auditprotokoll-Hilfedokumentation hinzugefügt
-  - Seelendateiverwaltung-Hilfedokumentation hinzugefügt
-  - Auditprotokoll-Hilfedokumentation hinzugefügt
-  - HelpTopics.cs Themendefinitionen hinzugefügt
-  - HelpView.cs erheblich refaktorisiert, Dokumentrenderlogik verbessert
-  - PermissionView.cs refaktorisiert, Berechtigungsverwaltungsschnittstelle verbessert
-  - Kernmodul-Erweiterung: SiliconBeingManager, TaskSystem, ToolManager Verbesserungen
-  - TaskTool.cs refaktorisiert, Aufgabenverwaltungsfunktionalität verbessert
-  - Webansichten umfassend aktualisiert: alle Ansichtskomponenten synchronisiert
-  - HelpController.cs vereinfacht, Controllerlogik optimiert
+#### Neue Hilfedokumente
+- `e7afe94` - Neue Soul-Datei- und Audit-Log-Hilfedokumente hinzugefügt
+  - Neues Soul-Dateiverwaltungs-Hilfedokument hinzugefügt
+  - Neues Audit-Log-Hilfedokument hinzugefügt
+  - HelpTopics.cs neue Themensdefinitionen hinzugefügt
+  - HelpView.cs stark refaktoriert, Dokumentenrendering-Logik verbessert
+  - PermissionView.cs refaktoriert, Berechtigungsverwaltungs-UI verbessert
+  - Kernmodule verstärkt: SiliconBeingManager, TaskSystem, ToolManager verbessert
+  - TaskTool.cs refaktoriert, Aufgabenverwaltungsfunktion verbessert
+  - Web-Views vollständig aktualisiert: Alle View-Komponenten synchronisiert
+  - HelpController.cs vereinfacht, Controller-Logik optimiert
+  - 30 Dateien geändert, 7100 Zeilen hinzugefügt, 897 Zeilen gelöscht
 
 ### 2026-04-26
 
-#### Hilfedokumentationssystem
-- `07895d7` - Hilfedokumentationssystem erweitert, 3 Dokumente hinzugefügt und 9-Sprachen-Übersetzung abgeschlossen
-  - Speichersystem-, Ollama-Installationskonfigurations-, Alibaba Cloud Bailian-Plattformbenutzungsleitfaden hinzugefügt
-  - 9-Sprachen-Übersetzung für alle 10 Hilfedokumente abgeschlossen
-  - HelpView-Renderlogik vereinfacht
+#### Hilfedokumentsystem
+- `07895d7` - Verstärkung des Hilfedokumentsystems, 3 neue Dokumente hinzugefügt und 9 Sprachübersetzungen abgeschlossen
+  - Neue Speichersystem-, Ollama-Installationskonfigurations- und Alibaba Cloud Tongyi-Plattform-Nutzungsanleitungen hinzugefügt
+  - Übersetzung aller 10 Hilfedokumente in 9 Sprachen abgeschlossen
+  - HelpView-Rendering-Logik vereinfacht
+  - 18 Dateien geändert, 14418 Zeilen hinzugefügt, 1364 Zeilen gelöscht
 
 #### Deutsche Lokalisierung
-- `0cfd8a1` - Vollständige deutsche (de-DE) Lokalisierungsunterstützung hinzugefügt
+- `0cfd8a1` - Hinzufügen vollständiger deutscher (de-DE) Lokalisierungsunterstützung
   - Vollständige deutsche Lokalisierungsdateien
-  - Deutsche Unterstützung für chinesischen historischen Kalender hinzugefügt
-  - Deutsche Übersetzung der Hilfedokumentation hinzugefügt
-  - Alle Dokumente in 9 Sprachen vollständig synchronisiert
+  - Neue Unterstützung für Chinesischen Historischen Kalender auf Deutsch
+  - Neue deutsche Übersetzungen für Hilfedokumente
+  - Vollständige Synchronisierung aller Dokumente in 9 Sprachen
+  - 135 Dateien geändert, 26186 Zeilen hinzugefügt, 14371 Zeilen gelöscht
 
-#### Dokumentationssynchronisation
-- `3aada7d` - Traditionelle chinesische (zh-HK) Dokumentation mit vereinfachter Chinesisch synchronisiert
-- `2f6abff` - Hilfstool-Anzeigename-Lokalisierung für alle Sprachen hinzugefügt
+#### Dokumentsynchronisation
+- `3aada7d` - Synchronisierung traditioneller Chinesisch (zh-HK) Dokumente mit vereinfachtem Chinesisch
+  - 3 Dateien geändert, 519 Zeilen hinzugefügt, 422 Zeilen gelöscht
+- `2f6abff` - Hinzufügen von Hilfswerkzeug-Anzeigenamen-Lokalisierung für alle Sprachen
+  - 7 Dateien geändert, 47 Zeilen hinzugefügt, 7 Zeilen gelöscht
 
-#### Wissenssystem-Refaktorierung
-- `60944fe` - Namespace zu SiliconLife.Collective vereinheitlicht
-- `69c51c5` - Hilfedokumentationssystem hinzugefügt und Codekommentare ins Englische übersetzt
+#### Wissenssystemrekonstruktion
+- `60944fe` - Vereinheitlichung des Namespaces auf SiliconLife.Collective
+  - 8 Dateien geändert, 5 Zeilen hinzugefügt, 8 Zeilen gelöscht
+- `69c51c5` - Hinzufügen von Hilfedokumentsystem und Übersetzung von Codekommentaren ins Englische
+  - 29 Dateien geändert, 3385 Zeilen hinzugefügt, 22 Zeilen gelöscht
 
 ### 2026-04-25
 
 #### WebView-Browserautomatisierung
-- `41757c3` - Plattformübergreifende WebView-Browserautomatisierung basierend auf Playwright implementiert
+- `41757c3` - Implementierung von Playwright-basierter plattformübergreifender WebView-Browserautomatisierung
+  - 6 Dateien geändert, 1152 Zeilen hinzugefügt
 
-#### Dokumentationsupdates
-- `0ff797b` - KnowledgeTool- und WorkNoteTool-Dokumentation hinzugefügt (7 Sprachen)
-- `ad77415` - Alle Changelog-Dateien aktualisiert, Git-Verlauf vom 2026-04-25 hinzugefügt
+#### Dokumentupdates
+- `0ff797b` - Hinzufügen von KnowledgeTool- und WorkNoteTool-Dokumenten (7 Sprachen)
+  - 28 Dateien geändert, 4983 Zeilen hinzugefügt
+- `ad77415` - Aktualisierung aller changelog-Dateien, Hinzufügen von Git-Verlauf vom 25. April 2026
+  - 7 Dateien geändert, 168 Zeilen hinzugefügt
 
 #### Projektarbeitsbereichsverwaltung
-- `785c551` - Projektarbeitsbereichsverwaltung mit Arbeitsnotizen und Aufgabensystem implementiert
-  - Projektarbeitsbereichsverwaltungssystem hinzugefügt
-  - Arbeitsnotizenfunktionalität zur Verfolgung des Projektfortschritts
-  - Aufgabenverwaltungssystemintegration
+- `785c551` - Implementierung der Projektarbeitsbereichsverwaltung mit WorkNotes und Task-System
+  - Neues Projektarbeitsbereichsverwaltungssystem hinzugefügt
+  - WorkNote-Funktion zum Verfolgen des Projektfortschritts
+  - Task-Management-System-Integration
+  - 29 Dateien geändert, 4256 Zeilen hinzugefügt, 36 Zeilen gelöscht
 
 #### Tschechische Lokalisierung
-- `b4bbf39` - Vollständige tschechische (cs-CZ) Lokalisierung hinzugefügt und alle Sprachdokumentation aktualisiert
-- `faf078f` - Tschechische Lokalisierungs-Kompilierungsfehler behoben
+- `b4bbf39` - Hinzufügen vollständiger tschechischer (cs-CZ) Lokalisierung und Aktualisierung aller Sprachdokumente
+  - 116 Dateien geändert, 4933 Zeilen hinzugefügt, 222 Zeilen gelöscht
+- `faf078f` - Fix von tschechischen Lokalisierungskompilierungsfehlern
+  - 3 Dateien geändert, 910 Zeilen hinzugefügt, 1 Zeile gelöscht
 
-#### Wissenssystem-Erweiterung
-- `20adaac` - KnowledgeTool mit vollständiger Lokalisierungsunterstützung hinzugefügt
+#### Wissenssystemverbesserung
+- `20adaac` - Hinzufügen von KnowledgeTool mit vollständiger Lokalisierungsunterstützung
+  - 34 Dateien geändert, 2331 Zeilen hinzugefügt, 56 Zeilen gelöscht
 
 ### 2026-04-24
 
-#### Speicherverwaltung-Erweiterung
-- `c7b2ecc` - Speicherverwaltung mit erweitertem Filtern, Statistiken und Detailansichten erweitert
-  - Erweiterte Speicherfilterung hinzugefügt
-  - Speicherstatistiken implementiert
-  - Speicherdetailansichtseite hinzugefügt
+#### Speicherverwaltungssystemverbesserung
+- `c7b2ecc` - Verstärkung der Speicherverwaltungsfunktion, Hinzufügen von Advanced Filtering, Statistik und Detailansicht
+  - Neue Advanced Filtering-Funktion für Speicher hinzugefügt
+  - Statistikfunktion für Speicher implementiert
+  - Detailansichtsseite für Speicher hinzugefügt
   - Mehrsprachige Lokalisierungsunterstützung (6 Sprachen)
+  - 13 Dateien geändert, 840 Zeilen hinzugefügt, 86 Zeilen gelöscht
 
-#### Berechtigungssystem-Erweiterung
-- `4489ad6` - wttr.in-Wetterservice zur Netzwerk-Whitelist hinzugefügt
-  - Vollständige mehrsprachige Dokumentationssynchronisation (6 Sprachen)
+#### Berechtigungssystemerweiterung
+- `4489ad6` - Hinzufügen von wttr.in Wetterdienst zur Netzwerk-Whitelist
+  - Vollständige mehrsprachige Dokumentsynchronisation (6 Sprachen)
+  - 14 Dateien geändert, 417 Zeilen hinzugefügt, 1 Zeile gelöscht
 
-#### Webinterface-Korrekturen
-- `d9d72e9` - CSS-Prioritätsproblem im Arbeitsnotiz-Detailmodal behoben
+#### Web-Interface-Fix
+- `d9d72e9` - Fix von CSS-Prioritätsproblem im WorkNote-Detail-Modal
+  - 19 Dateien geändert, 1744 Zeilen hinzugefügt, 6 Zeilen gelöscht
 
-#### Chatverlauf-Optimierung
-- `0df599c` - Problem behoben, bei dem Toolergebnisse als separate Chatnachrichten gerendert wurden
-- `057b09d` - Chatverlaufdetailanzeige optimiert, Toolaufrufrendering verbessert
+#### Chat-Verlaufsoptimierung
+- `0df599c` - Fix von Tool-Ergebnissen, die als separate Chat-Nachrichten gerendert wurden
+  - 1 Datei geändert, 222 Zeilen hinzugefügt, 21 Zeilen gelöscht
+- `057b09d` - Optimierung der Chat-Verlaufsdetailanzeige, Verbesserung der Tool-Aufruf-Rendering
+  - 3 Dateien geändert, 389 Zeilen hinzugefügt, 68 Zeilen gelöscht
 
 #### Timer-Ausführungsverlauf
-- `fa3f06f` - Timer-Ausführungsverlaufsfunktion mit Detailansicht hinzugefügt
-- `d824835` - Timer-Ausführungsverlauf-Lokalisierungsschlüssel hinzugefügt (alle Sprachen)
+- `fa3f06f` - Hinzufügen von Timer-Ausführungsverlaufsfunktion mit Detailansicht
+  - 8 Dateien geändert, 937 Zeilen hinzugefügt, 10 Zeilen gelöscht
+- `d824835` - Hinzufügen von Timer-Ausführungsverlauf-Lokalisierungsschlüsseln (alle Sprachen)
+  - 7 Dateien geändert, 88 Zeilen hinzugefügt
 
-#### Lokalisierungs-Erweiterung
-- `c13cb17` - Spanische Sprachvariante registriert
-- `9c44f34` - Mehrsprachige Lokalisierungsunterstützung für chinesischen historischen Kalender hinzugefügt
+#### Lokalisierungsverbesserung
+- `c13cb17` - Registrierung von Spanisch-Sprachvarianten
+  - 1 Datei geändert, 4 Zeilen hinzugefügt
+- `9c44f34` - Hinzufügen von mehrsprachiger Lokalisierungsunterstützung für Chinesischen Historischen Kalender
+  - 16 Dateien geändert, 6049 Zeilen hinzugefügt, 1 Zeile gelöscht
 
-#### Kernfunktionalitätsverbesserungen
-- `1e7c7b2` - Speicherkomprimierung und Toolausführungsverfolgung verbessert
+#### Kernfunktionsverbesserung
+- `1e7c7b2` - Verbesserung der Speicherkompression und Tool-Ausführung-Verfolgung
+  - 4 Dateien geändert, 338 Zeilen hinzugefügt, 86 Zeilen gelöscht
 
 ### 2026-04-23
 
 #### Tool-Lokalisierung
-- `192fc6e` - Fehlende Toolnamen-Lokalisierung für 5 Tools hinzugefügt
+- `192fc6e` - Hinzufügen fehlender Tool-Name-Lokalisierung für 5 Tools
+  - 6 Dateien geändert, 30 Zeilen hinzugefügt
 
-#### Dokumentationsupdates
-- `882c08f` - Alle Changelog-Dateien aktualisiert, vollständigen Git-Verlauf hinzugefügt und falsche Versionsnummern entfernt
+#### Dokumentupdates
+- `882c08f` - Aktualisierung aller changelog-Dateien, Hinzufügen vollständigen Git-Verlaufs und Entfernung von falschen Versionsnummern
+  - 45 Dateien geändert, 8815 Zeilen hinzugefügt, 1611 Zeilen gelöscht
 
-#### Chatseite-Erweiterung
-- `65c157b` - Ladeindikator zur Chatseite hinzugefügt und Kuratorsitzung automatisch ausgewählt
+#### Chat-Seitenverbesserung
+- `65c157b` - Hinzufügen von Ladeindikator auf Chat-Seite und automatische Auswahl von Moderator-Session
+  - 10 Dateien geändert, 211 Zeilen hinzugefügt, 7 Zeilen gelöscht
 
-#### Chatverlaufsfunktion
-- `e483348` - Siliziumwesen-Chatverlaufsanzeigefunktion implementiert
-  - ChatHistoryController hinzugefügt
+#### Chat-Verlaufsfunktion
+- `e483348` - Implementierung von SiliconBeing-Chat-Verlaufsanzeigefunktion
+  - Neuer ChatHistoryController hinzugefügt
   - ChatHistoryViewModel erstellt
-  - ChatHistoryListView- und ChatHistoryDetailView-Seiten implementiert
-  - Lokalisierungsschlüssel für Chatverlauf hinzugefügt (5 Sprachen)
+  - ChatHistoryListView und ChatHistoryDetailView Seiten implementiert
+  - Lokalisierungsschlüssel für Chat-Verlauf hinzugefügt (5 Sprachen)
+  - 12 Dateien geändert, 1178 Zeilen hinzugefügt
 
-#### KI-Flusssteuerung-Erweiterung
-- `30a2d4e` - KI-Flussabbruch, IM-Integration und Kernhostinitialisierung erweitert
+#### AI-Flusskontrollverbesserung
+- `30a2d4e` - Verstärkung von AI-Flussabbruch, IM-Integration und Kernhost-Initialisierung
+  - 11 Dateien geändert, 387 Zeilen hinzugefügt, 12 Zeilen gelöscht
 
-#### Chatnachrichtenwarteschlange
-- `db48c51` - Chatnachrichtenwarteschlange, Dateimetadaten und Streamabbruchunterstützung hinzugefügt
+#### Chat-Nachrichtenwarteschlange
+- `db48c51` - Hinzufügen von Chat-Nachrichtenwarteschlange, Dateimetadaten und Flussabbruchunterstützung
+  - 4 Dateien geändert, 357 Zeilen hinzugefügt
 
 #### Dateiupload-Unterstützung
-- `28fb344` - Dateiquellendialog und Dateiuploadunterstützung implementiert
-- `1d3e2cc` - Dateiquellendialog-Lokalisierungszeichenfolgen hinzugefügt (6 Sprachen)
+- `28fb344` - Implementierung von Dateiquellendialog und Dateiupload-Unterstützung
+  - 3 Dateien geändert, 1100 Zeilen hinzugefügt, 2 Zeilen gelöscht
+- `1d3e2cc` - Hinzufügen von Lokalisierungszeichenfolgen für Dateiquellendialog (6 Sprachen)
+  - 6 Dateien geändert, 30 Zeilen hinzugefügt
 
-#### Dokumentationsupdates
-- `8111e92` - Wiki-Link zum README-Repositoryabschnitt hinzugefügt
+#### Dokumentupdates
+- `8111e92` - Hinzufügen von Wiki-Link im Repository-Bereich des README
+  - 1 Datei geändert, 3 Zeilen hinzugefügt, 1 Zeile gelöscht
 
 ### 2026-04-22
 
-#### Dokumentationslokalisierung
-- `66c11eb` - Chinesische Kommentare ins Englische übersetzt und alle Changelogs aktualisiert
+#### Dokumentlokalisierung
+- `66c11eb` - Übersetzung von Chinesisch-Kommentaren ins Englische und Aktualisierung aller changelog-Dateien
+  - 11 Dateien geändert, 373 Zeilen hinzugefügt, 163 Zeilen gelöscht
 
-#### SSE-Nachrichtenerweiterung
-- `b574b2b` - senderName zu historischen Nachrichten für KI-Identifikation hinzugefügt
+#### SSE-Nachrichtenverbesserung
+- `b574b2b` - Hinzufügen von senderName für historische Nachrichten zur AI-Erkennung
+  - 1 Datei geändert, 9 Zeilen hinzugefügt
 
-#### Chatfunktionen
-- `601fc14` - mark_read-Aktion für Sitzungsendemarkierung hinzugefügt
+#### Chat-Funktion
+- `601fc14` - Hinzufügen von mark_read-Operation für Session-Endmarkierung
+  - 7 Dateien geändert, 196 Zeilen hinzugefügt, 36 Zeilen gelöscht
 
-#### Toolsystem-Optimierung
-- `7a03a19` - LogTool-Konversationsabfrageflexibilität verbessert
+#### Tool-Systemoptimierung
+- `7a03a19` - Verbesserung der LogTool-Dialogabfrageflexibilität
+  - 1 Datei geändert, 57 Zeilen hinzugefügt, 24 Zeilen gelöscht
 
-#### Lokalisierungs-Erweiterung
-- `0a8d750` - Gemeinsamen Systemprompt für aktive Siliziumwesenverhaltens hinzugefügt
+#### Lokalisierungsverbesserung
+- `0a8d750` - Hinzufügen von universellem Systemprompt für aktive SiliconBeing-Verhalten
+  - 8 Dateien geändert, 460 Zeilen hinzugefügt, 48 Zeilen gelöscht
 
-#### Protokollsystem-Refaktorierung
-- `2b771f3` - LogController von Datei-I/O entkoppelt, Protokolllese-API hinzugefügt
-- `12da302` - Siliziumwesenfilter zur Protokollansicht hinzugefügt
-- `8f6cb1e` - beingId-Parameter zu ILogger-Schnittstelle hinzugefügt, System/Siliziumwesen-Protokolltrennung implementiert
+#### Log-Systemrekonstruktion
+- `2b771f3` - Entkopplung von LogController und Datei-I/O, Hinzufügen von Log-Lese-API
+  - 4 Dateien geändert, 172 Zeilen hinzugefügt, 137 Zeilen gelöscht
+- `12da302` - Hinzufügen von SiliconBeing-Filter für Log-View
+  - 9 Dateien geändert, 147 Zeilen hinzugefügt, 10 Zeilen gelöscht
+- `8f6cb1e` - Hinzufügen von beingId-Parameter zu ILogger-Schnittstelle, Implementierung von System/SiliconBeing-Log-Trennung
+  - 47 Dateien geändert, 524 Zeilen hinzugefügt, 490 Zeilen gelöscht
 
-#### Berechtigungssystem-Verbesserungen
-- `4c747ad` - PermissionTool, ExecuteCodeTool refaktorisiert, EvaluatePermission-API hinzugefügt
+#### Berechtigungssystemverbesserung
+- `4c747ad` - Rekonstruktion von PermissionTool, ExecuteCodeTool, Hinzufügen von EvaluatePermission-API
+  - 18 Dateien geändert, 680 Zeilen hinzugefügt, 492 Zeilen gelöscht
 
-#### Bugfixes
-- `1c96e99` - Suchfehler im Stammverzeichnis von search_files und search_content behoben
+#### Bug-Fix
+- `1c96e99` - Fix von search_files und search_content Root-Verzeichnis-Suche失败
+  - 1 Datei geändert, 98 Zeilen hinzugefügt, 41 Zeilen gelöscht
 
-#### Toolintegration
-- `135710d` - SearchTool entfernt, lokale Suche zu DiskTool verschoben
+#### Tool-Integration
+- `135710d` - Entfernung von SearchTool, Verschiebung von lokaler Suche zu DiskTool
+  - 2 Dateien geändert, 185 Zeilen hinzugefügt, 365 Zeilen gelöscht
 
-#### Toolsystem-Erweiterung
-- `70ce7fb` - DatabaseTool für strukturierte Datenbankabfragen implementiert
-- `be29a09` - LogTool für Operations- und Konversationsverlaufabfragen implementiert
-- `4ea7702` - PermissionTool für dynamische Berechtigungsverwaltung implementiert
-- `1384ff4` - ExecuteCodeTool für mehrsprachige Codeausführung implementiert
-- `82d1e11` - SearchTool für Informationsabruf implementiert
+#### Tool-Systemerweiterung
+- `70ce7fb` - Implementierung von DatabaseTool für strukturierte Datenbankabfragen
+  - 1 Datei geändert, 382 Zeilen hinzugefügt
+- `be29a09` - Implementierung von LogTool für Betriebs- und Dialogverlaufsabfragen
+  - 1 Datei geändert, 298 Zeilen hinzugefügt
+- `4ea7702` - Implementierung von PermissionTool für dynamische Berechtigungsverwaltung
+  - 1 Datei geändert, 457 Zeilen hinzugefügt
+- `1384ff4` - Implementierung von ExecuteCodeTool für mehrsprachige Codeausführung
+  - 1 Datei geändert, 477 Zeilen hinzugefügt
+- `82d1e11` - Implementierung von SearchTool für Informationssuche
+  - 1 Datei geändert, 363 Zeilen hinzugefügt
 
-#### Webinterface-Optimierung
-- `0675c45` - Markdown-Codeblockhervorhebung im Vorschaubereich optimiert
-- `702b3f3` - Aufgabenansicht mit Statusabzeichen und Metadatenanzeige erweitert
-- `6ed9a79` - Chatnachrichtenspeicher und Ansichtsrendering verbessert
+#### Web-Interface-Optimierung
+- `0675c45` - Optimierung von Markdown-Codeblock-Highlighting in Vorschau-Paneel
+  - 1 Datei geändert, 4 Zeilen hinzugefügt, 23 Zeilen gelöscht
+- `702b3f3` - Verstärkung von Task-View, Hinzufügen von Status-Badges und Metadatenanzeige
+  - 8 Dateien geändert, 221 Zeilen hinzugefügt, 9 Zeilen gelöscht
+- `6ed9a79` - Verbesserung von Chat-Nachrichtenspeicher und View-Rendering
+  - 8 Dateien geändert, 140 Zeilen hinzugefügt, 29 Zeilen gelöscht
 
 ### 2026-04-21
 
-#### Bugfixes
-- `c6b518b` - Timer-Nachrichtenübermittlung und Chatnachrichtenspeicher behoben
+#### Bug-Fix
+- `c6b518b` - Fix von Timer-Nachrichtenübertragung und Chat-Nachrichtenspeicher
+  - 3 Dateien geändert, 297 Zeilen hinzugefügt, 124 Zeilen gelöscht
 
-#### Konfigurationsverwaltung
-- `4305769` - .gitattributes für Zeilenendeverwaltung hinzugefügt
+#### Konfigurationsmanagement
+- `4305769` - Hinzufügen von .gitattributes für Zeilenendungsverwaltung
+  - 1 Datei geändert, 32 Zeilen hinzugefügt
 
-#### Webinterface-Verbesserungen
-- `188c6f8` - Aufgabenlisten-API-Route registriert und Leerezustandsanzeige hinzugefügt
-- `634e8ca` - Berechtigungsseite-Rückkehr-zur-Liste-Link hinzugefügt
-- `6ba591d` - Unabhängigen KI-Konfigurationseditor für Siliziumwesen hinzugefügt
-- `0a826f5` - Speichererfolgshinweis im Codeeditor hinzugefügt
-- `2940373` - Webinterface mit Code-Hoverhinweisen und UI-Verbesserungen erweitert
+#### Web-Interface-Verbesserung
+- `188c6f8` - Registrierung von Task-List-API-Route und Hinzufügen von leerer Statusanzeige
+  - 2 Dateien geändert, 35 Zeilen hinzugefügt, 2 Zeilen gelöscht
+- `634e8ca` - Hinzufügen von Rückkehr-Liste-Link auf Berechtigungsseite
+  - 1 Datei geändert, 16 Zeilen hinzugefügt
+- `6ba591d` - Hinzufügen von unabhängigem AI-Konfigurationseditor für SiliconBeing
+  - 11 Dateien geändert, 842 Zeilen hinzugefügt, 18 Zeilen gelöscht
+- `0a826f5` - Hinzufügen von Speichererfolgsmeldung in Code-Editor
+  - 1 Datei geändert, 9 Zeilen hinzugefügt, 2 Zeilen gelöscht
+- `2940373` - Verstärkung von Web-Interface, Hinzufügen von Code-Hover-Tooltips und UI-Verbesserungen
+  - 11 Dateien geändert, 1054 Zeilen hinzugefügt, 75 Zeilen gelöscht
 
-#### Berechtigungssystemkorrekturen
-- `592c7ab` - Callback-Instanziierung und Registrierungsreihenfolge behoben
+#### Berechtigungssystemfix
+- `592c7ab` - Fix von Callback-Instanziierung und Registrierungsreihenfolge
+  - 2 Dateien geändert, 38 Zeilen hinzugefügt, 7 Zeilen gelöscht
 
-#### Sicherheitserweiterung
-- `833ead2` - Assemblyreferenzverifizierung für dynamische Kompilierung hinzugefügt
+#### Sicherheitsverbesserung
+- `833ead2` - Hinzufügen von Assembly-Referenzvalidierung für dynamische Kompilierung
+  - 4 Dateien geändert, 135 Zeilen hinzugefügt, 8 Zeilen gelöscht
 
-#### Berechtigungssystem-Erweiterung
-- `5879621` - Berechtigung-Callback-Vorkompilierungsverifizierung und erweiterte Fehlerbehandlung hinzugefügt
+#### Berechtigungssystemverbesserung
+- `5879621` - Hinzufügen von Callback-Vorkompilierungsvalidierung und verbessertem Fehlerhandling
+  - 21 Dateien geändert, 617 Zeilen hinzugefügt, 26 Zeilen gelöscht
 
-#### Dokumentationsupdates
-- `4dbf659` - Changelog auf v0.5.1 aktualisiert, GitHub-Platzhalter-URLs ersetzt, Gitee-Spiegel hinzugefügt, Bilibili-Name nach Sprache lokalisiert, E-Mail aktualisiert
+#### Dokumentupdates
+- `4dbf659` - Aktualisierung von changelog zu v0.5.1, Ersetzung von GitHub-Platzhalter-URLs, Hinzufügen von Gitee-Mirror, Lokalisierung von Bilibili-Namen nach Sprache, Aktualisierung von E-Mail
+  - 32 Dateien geändert, 489 Zeilen hinzugefügt, 180 Zeilen gelöscht
 
 #### Konfiguration und Einstieg
-- `0fc1693` - Programmeinstieg und Projektkonfiguration aktualisiert
+- `0fc1693` - Aktualisierung von Programmeinstieg und Projektkonfiguration
+  - 2 Dateien geändert, 7 Zeilen hinzugefügt
 
-#### Berechtigungssystem-Refaktorierung
-- `ea9179a` - Berechtigungssystemimplementierung verbessert
+#### Berechtigungssystemrekonstruktion
+- `ea9179a` - Verbesserung der Berechtigungssystemimplementierung
+  - 5 Dateien geändert, 358 Zeilen hinzugefügt, 152 Zeilen gelöscht
 
-#### Bugfixes
-- `928a96d` - Kalenderberechnungsimplementierung behoben
+#### Bug-Fix
+- `928a96d` - Fix von Kalenderberechnungsimplementierung
+  - 4 Dateien geändert, 12 Zeilen hinzugefügt, 12 Zeilen gelöscht
 
-#### KI und Kalender
-- `646813e` - KI-Clientfabrikimplementierung verbessert
+#### AI und Kalender
+- `646813e` - Verbesserung der AI-Client-Factory-Implementierung
+  - 2 Dateien geändert, 21 Zeilen hinzugefügt, 20 Zeilen gelöscht
 
 #### Lokalisierung
-- `7940d9c` - Koreanische Lokalisierungsunterstützung hinzugefügt
-- `4ff98ad` - Dokumentation für mehrsprachige Unterstützung refaktorisiert
+- `7940d9c` - Hinzufügen von koreanischer Lokalisierungsunterstützung
+  - 7 Dateien geändert, 2424 Zeilen hinzugefügt, 10 Zeilen gelöscht
+- `4ff98ad` - Rekonstruktion von Dokumenten, Unterstützung für mehrsprachigkeit
+  - 81 Dateien geändert, 23818 Zeilen hinzugefügt, 1886 Zeilen gelöscht
 
 ### 2026-04-20
 
-#### Kernfunktionalitätsabschluss
-- `28905b5` - Vollständige mehrsprachige Unterstützung, KI-Clientfabrik, Berechtigungssystem und Lokalisierungseinstellungen
-  - Protokollsystem mit Manager, Einträgen und verschiedenen Protokollebenen
-  - Tokenauditssystem zum Abfragen und Verfolgen der Tokenverwendung
-  - KI-Clientfabriken zur automatischen Erkennung verschiedener KI-Plattformen
-  - Berechtigung-Callback-System mit eigenem Speicher
-  - Konsolenprotokolliererimplementierung
+#### Kernfunktionsvervollständigung
+- `28905b5` - Vollständige mehrsprachige Unterstützung, AI-Client-Factory, Berechtigungssystem und Lokalisierungseinstellungen
+  - Log-System mit Manager, Einträgen und verschiedenen Log-Levels
+  - Token-Audit-System zur Abfrage und Verfolgung von Token-Nutzung
+  - AI-Client-Factory zur automatischen Erkennung verschiedener AI-Plattformen
+  - Berechtigungs-Callback-System mit eigenem Speicher
+  - Konsolenlogger-Implementierung
   - Mehrsprachige Unterstützung für Englisch und vereinfachtes Chinesisch
-  - WebUI-Messenger mit WebSocket für Echtzeit-Chat
-  - Standard-Siliziumwesen mit Lokalisierung erweitert
+  - WebUI-Boten mit WebSocket für Echtzeit-Chat
+  - Standard-SiliconBeing mit Lokalisierungsverbesserung
+  - 39 Dateien geändert, 4670 Zeilen hinzugefügt, 175 Zeilen gelöscht
 
 ### 2026-04-19
 
 #### Timer und Kalender
-- `c933fd8` - Lokalisierung, Timersystem, Webansichten aktualisiert und Tools hinzugefügt
+- `c933fd8` - Aktualisierung von Lokalisierung, Timer-System, Web-Views und Hinzufügen von Tools
   - Besserer Lokalisierungsmanager
   - Planungssystem für zeitgesteuerte Aufgaben
-  - KI-Konfiguration und Kontextverwaltung
-  - Kalendertool, das 32 Kalendertypen unterstützt
-  - Webcontroller für Kalender-APIs
+  - AI-Konfiguration und Kontextmanagement
+  - Kalendertool mit Unterstützung für 32 Kalendertypen
+  - Web-Controller für Kalender-API
   - Aufgabenverwaltungstool
+  - 46 Dateien geändert, 4018 Zeilen hinzugefügt, 975 Zeilen gelöscht
 
-**Architekturverbesserungen**
-- Webansichtsarchitektur für bessere Skinunterstützung neu gestaltet
-- Wesensverwaltungssystem mit besserer Zustandsverarbeitung verbessert
+**Architekturverbesserung**
+- Neugestaltung der Web-View-Architektur zur besseren Skin-Unterstützung
+- Verbesserung des Being-Management-Systems mit besserer Zustandsverarbeitung
 
 ### 2026-04-18
 
-- `9f585e1` - Lokalisierung, Timersystem, Webansichten aktualisiert und Tools hinzugefügt
+- `9f585e1` - Aktualisierung von Lokalisierung, Timer-System, Web-Views und Hinzufügen von Tools
   - Timer- und Planungsverbesserungen
-  - Bessere Webansichten mit verbesserten UI-Komponenten
-  - Weitere Toolimplementierungen
+  - Bessere Web-Views mit verbesserten UI-Komponenten
+  - Mehr Tool-Implementierungen
+  - 57 Dateien geändert, 3328 Zeilen hinzugefügt, 389 Zeilen gelöscht
 
 ### 2026-04-17
 
-- `9b71fcd` - Kernmodule aktualisiert, zh-HK-Dokumentation, Broadcastkanal, Konfigurationstools und Auditwebansichten hinzugefügt
-  - Broadcastkanal für mehrere Siliziumwesen, die zusammen chatten
-  - Konfigurationstoolsystem
-  - Auditwebansichten
-  - Traditionelle chinesische Dokumentation
+- `9b71fcd` - Aktualisierung von Kernmodulen, Hinzufügen von zh-HK-Dokumenten, Broadcast-Channel, Konfigurationstool und Audit-Web-View
+  - Broadcast-Channel für gemeinsames Chatten mehrerer SiliconBeings
+  - Konfigurationstool-System
+  - Audit-Web-View
+  - Traditionell chinesische Dokumente
+  - 42 Dateien geändert, 3533 Zeilen hinzugefügt, 268 Zeilen gelöscht
 
 ### 2026-04-16
 
-- `5040f05` - Kern- und Standardmodule aktualisiert
-  - Moduloptimierung und Bugfixes
+- `5040f05` - Aktualisierung von Kern- und Standardmodulen
+  - Moduloptimierungen und Bug-Fixes
   - Implementierungsupdates und Verbesserungen
+  - 58 Dateien geändert, 9916 Zeilen hinzugefügt, 111 Zeilen gelöscht
 
 ### 2026-04-15
 
-- `3efab5f` - Mehrere Module aktualisiert: AI, Chat, IM, Tools, Web, Localization, Storage
-  - KI-Clientverbesserungen
-  - Chatsystemerweiterung
-  - Messengerprovider-Updates
-  - Toolsystemoptimierung
-  - Webinfrastrukturverbesserungen
+- `3efab5f` - Aktualisierung mehrerer Module: AI, Chat, IM, Tools, Web, Localization, Storage
+  - AI-Client-Verbesserungen
+  - Chat-Systemverstärkung
+  - Messenger-Anbieteraktualisierung
+  - Tool-Systemoptimierung
+  - Web-Infrastrukturverbesserung
   - Lokalisierungsoptimierung
-  - Speichersystemupdates
+  - Speichersystemaktualisierung
+  - 33 Dateien geändert, 788 Zeilen hinzugefügt, 232 Zeilen gelöscht
 
 ### 2026-04-14
 
-- `4241a2f` - Chatfunktionen grundlegend abgeschlossen, UI-Uploadoptimierung
-  - Chatsystemfunktionalität abgeschlossen
-  - UI-Optimierung für Dateiuploads
+- `4241a2f` - Chat-Funktion grundsätzlich abgeschlossen, UI-Upload-Optimierung
+  - Chat-Systemfunktion abgeschlossen
+  - UI-Optimierung für Dateiupload
+  - 16 Dateien geändert, 1234 Zeilen hinzugefügt, 102 Zeilen gelöscht
 
 ### 2026-04-13
 
-- `c498c31` - Codeupdates
-  - Allgemeine Codeverbesserungen und Optimierung
+- `c498c31` - Codeaktualisierung
+  - Allgemeine Codeverbesserungen und Optimierungen
+  - 32 Dateien geändert, 1045 Zeilen hinzugefügt, 546 Zeilen gelöscht
 
 ### 2026-04-12
 
 #### Dokumentation und Lokalisierung
-- `2161002` - Dokumentation refaktorisiert und Lokalisierung erweitert
-- `03d94e4` - Konfigurationssystem und Lokalisierung erweitert
-- `9976a35` - Über-Seite und Lokalisierung hinzugefügt
+- `2161002` - Rekonstruktion von Dokumenten und Verstärkung der Lokalisierung
+  - 17 Dateien geändert, 982 Zeilen hinzugefügt, 92 Zeilen gelöscht
+- `03d94e4` - Verstärkung von Konfigurationssystem und Lokalisierung
+  - 25 Dateien geändert, 1378 Zeilen hinzugefügt, 154 Zeilen gelöscht
+- `9976a35` - Hinzufügen von About-Seite und Lokalisierung
+  - 14 Dateien geändert, 699 Zeilen hinzugefügt, 44 Zeilen gelöscht
 
-#### Chat und Webansichten
-- `0c8ccfc` - Chatsystem, Lokalisierung und Webansichten erweitert
-- `a8f1342` - Webkommunikationsschicht neu gestaltet, von WebSocket zu SSE gewechselt
+#### Chat und Web-Views
+- `0c8ccfc` - Verstärkung von Chat-System, Lokalisierung und Web-Views
+  - 13 Dateien geändert, 402 Zeilen hinzugefügt, 56 Zeilen gelöscht
+- `a8f1342` - Neugestaltung der Web-Kommunikationsebene, Wechsel von WebSocket zu SSE
+  - 27 Dateien geändert, 793 Zeilen hinzugefügt, 935 Zeilen gelöscht
 
 ### 2026-04-11
 
-#### Protokollsystem
-- `e8fe259` - Protokollsystem und Codeoptimierung hinzugefügt
-- `f01c519` - Protokollsystem hinzugefügt, KI-Schnittstelle und Webansichten aktualisiert
+#### Log-System
+- `e8fe259` - Hinzufügen von Log-System und Codeoptimierung
+  - 37 Dateien geändert, 624 Zeilen hinzugefügt, 91 Zeilen gelöscht
+- `f01c519` - Hinzufügen von Log-System, Aktualisierung von AI-Schnittstelle und Web-Views
+  - 31 Dateien geändert, 1758 Zeilen hinzugefügt, 63 Zeilen gelöscht
 
 ### 2026-04-10
 
-- `4962924` - WebSocket-Handler, Chatansichten und Messengerinteraktion erweitert
-  - Kontextmanagerverbesserungen
-  - Chatsystemerweiterung
-  - Messengerprovider-Schnittstellenupdates
-  - WebUIproviderneugestaltung
-  - JavaScriptbuilder und Router-Updates
-  - Chatansichtoptimierung
-  - WebSockethandlerverbesserungen
+- `4962924` - Verstärkung von WebSocket-Handler, Chat-View und Messenger-Interaktion
+  - Context-Manager-Verbesserungen
+  - Chat-Systemverstärkung
+  - Messenger-Anbieter-Schnittstellenaktualisierung
+  - WebUI-Anbieter-Neugestaltung
+  - JavaScript-Builder und Router-Aktualisierung
+  - Chat-View-Optimierung
+  - WebSocket-Handler-Verbesserungen
+  - 9 Dateien geändert, 365 Zeilen hinzugefügt, 134 Zeilen gelöscht
 
 ### 2026-04-09
 
-- `f9302bf` - Messengerprovider-Schnittstelle, Chatsystem und Web-UI-Interaktion erweitert
-  - Messengerprovider-Schnittstellenerweiterung
-  - Chatnachrichten- und Systemverbesserungen
-  - Kontextmanageroptimierung
-  - Standard-Siliziumwesenerweiterung
-  - Web-UI-Chatansichtverbesserungen
-  - WebSockethandlerupdates
+- `f9302bf` - Verstärkung von Messenger-Anbieter-Schnittstelle, Chat-System und Web UI-Interaktion
+  - Messenger-Anbieter-Schnittstellenerweiterung
+  - Chat-Nachrichten- und Systemverbesserungen
+  - Context-Manager-Optimierung
+  - Standard-SiliconBeing-Verstärkung
+  - Web UI-Chat-View-Verbesserungen
+  - WebSocket-Handler-Aktualisierung
+  - 10 Dateien geändert, 427 Zeilen hinzugefügt, 93 Zeilen gelöscht
 
 ### 2026-04-07
 
-- `6831ee8` - Webansichten und JavaScriptbuilder neu gestaltet
-  - Vollständige Webcontrollerneugestaltung
-  - JavaScriptbuilder komplett neu geschrieben
-  - Alle Ansichtskomponenten aktualisiert
-  - Skinsystemverbesserungen
-  - Ansichtsbasisklassenarchitekturaktualisierung
+- `6831ee8` - Neugestaltung von Web-Views und JavaScript-Builder
+  - Komplette Web-Controller-Neugestaltung
+  - JavaScript-Builder vollständig neu geschrieben
+  - Alle View-Komponenten aktualisiert
+  - Skin-Systemverbesserung
+  - View-Basisklassenarchitekturverbesserung
+  - 23 Dateien geändert, 2004 Zeilen hinzugefügt, 1983 Zeilen gelöscht
 
 ### 2026-04-05
 
-- `41e97fb` - Mehrere Kernmodule und Webcontroller aktualisiert
-  - Kontextmanagerverbesserungen
-  - Chatsystem und Sitzungsverwaltung
-  - Servicelocatorneugestaltung
-  - Siliziumwesenbasisklasse und Managerupdates
-  - Webcontroller umfassend aktualisiert (17 Controller)
-  - Standard-Siliziumwesenfabrikverbesserungen
-- `67988d4` - Web-UI-Modul verbessert, Executoransicht hinzugefügt, Ansichten und Kernmodule bereinigt
+- `41e97fb` - Aktualisierung mehrerer Kernmodule und Web-Controller
+  - Context-Manager-Verbesserungen
+  - Chat-System und Session-Management
+  - Service-Locator-Neugestaltung
+  - SiliconBeing-Basisklasse und Manager-Aktualisierung
+  - Web-Controller vollständig aktualisiert (17 Controller)
+  - Standard-SiliconBeing-Factory-Verbesserung
+  - 31 Dateien geändert, 681 Zeilen hinzugefügt, 326 Zeilen gelöscht
+- `67988d4` - Verbesserung von Web UI-Modul, Hinzufügen von Executor-View, Reinigung von Views und Kernmodulen
+  - 61 Dateien geändert, 3148 Zeilen hinzugefügt, 3726 Zeilen gelöscht
 
 ### 2026-04-04
 
-- `b58bb1c` - Initialisierungscontroller hinzugefügt und Webmodul neu gestaltet
+- `b58bb1c` - Hinzufügen von Initialisierungscontroller und Neugestaltung von Web-Modul
   - Initialisierungscontroller
-  - Konfigurationsmodulneugestaltung
-  - Lokalisierungsmodulupdates
-  - Skinsystemverbesserungen
-  - Routererweiterung
-- `f03ac0b` - Web-UI-Modul hinzugefügt, Messengerfunktionalität verbessert
+  - Konfigurationsmodul-Neugestaltung
+  - Lokalisierungsmodulaktualisierung
+  - Skin-Systemverbesserung
+  - Router-Verstärkung
+  - 29 Dateien geändert, 1269 Zeilen hinzugefügt, 289 Zeilen gelöscht
+- `f03ac0b` - Hinzufügen von Web UI-Modul, Verbesserung von Messenger-Funktionen
+  - 60 Dateien geändert, 8481 Zeilen hinzugefügt, 165 Zeilen gelöscht
 
 ### 2026-04-03
 
-- `192e57b` - Projektstruktur und Kernruntimekomponenten aktualisiert
-- `59faec8` - Kern- und Standardimplementierungsupdates
-- `d488485` - Dynamische Kompilierungsfunktionalität und Kuratortoolmodul hinzugefügt
-- `753d1d9` - Sicherheitsmodul hinzugefügt, Executoren, Messengerprovider, Lokalisierung und Tools aktualisiert
-- `a378697` - Stufe 5 abgeschlossen - Toolsystem + Executoren
+- `192e57b` - Aktualisierung von Projektstruktur und Kernlaufzeitkomponenten
+  - 22 Dateien geändert, 446 Zeilen hinzugefügt, 179 Zeilen gelöscht
+- `59faec8` - Kern- und Standardimplementierungsaktualisierung
+  - 25 Dateien geändert, 3056 Zeilen hinzugefügt, 18 Zeilen gelöscht
+- `d488485` - Hinzufügen von dynamischer Kompilierungsfunktion und Moderator-Tool-Modul
+  - 19 Dateien geändert, 1727 Zeilen hinzugefügt, 11 Zeilen gelöscht
+- `753d1d9` - Hinzufügen von Sicherheitsmodul, Aktualisierung von Executor, Messenger-Anbieter, Lokalisierung und Tools
+  - 29 Dateien geändert, 2352 Zeilen hinzugefügt, 93 Zeilen gelöscht
+- `a378697` - Abschluss Phase 5 - Tool-System + Executor
+  - 41 Dateien geändert, 2651 Zeilen hinzugefügt, 363 Zeilen gelöscht
 
 ### 2026-04-02
 
-- `e6ad94b` - Problem beim Laden des Chatverlaufs beim Löschen von Konfigurationsdateien während des Testens behoben
-- `daa56f5` - Stufe 4 abgeschlossen: persistenter Speicher (Chatsystem + Messengerkanal)
+- `e6ad94b` - Fix von Chat-Verlaufs-Ladefehler bei Konfigurationsdateilöschung während Tests
+  - 4 Dateien geändert, 49 Zeilen hinzugefügt, 45 Zeilen gelöscht
+- `daa56f5` - Abschluss Phase 4: Persistente Speicherung (Chat-System + Messenger-Kanal)
+  - 29 Dateien geändert, 2051 Zeilen hinzugefügt, 538 Zeilen gelöscht
 
 ### 2026-04-01
 
-- `bbe2dbb` - Konfigurationsladen und Chatdienstnachrichtenrouting behoben
-- `2fa6305` - Stufe 2 implementiert: Hauptschleifenframework und Uhrzeitobjektsystem
-- `32b99a1` - Stufe 1 implementiert - grundlegende Chatfunktionalität
+- `bbe2dbb` - Fix von Konfigurationsladung und Chat-Dienst-Nachrichtenrouting
+  - 27 Dateien geändert, 1633 Zeilen hinzugefügt, 147 Zeilen gelöscht
+- `2fa6305` - Implementierung Phase 2: Hauptschleifenframework und Clock-Objektsystem
+  - 9 Dateien geändert, 594 Zeilen hinzugefügt, 41 Zeilen gelöscht
+- `32b99a1` - Implementierung Phase 1 - Grundlegende Chat-Funktion
+  - 19 Dateien geändert, 1185 Zeilen hinzugefügt
 - `358e368` - Initialer Commit: Projektdokumentation und Lizenz
+  - 10 Dateien geändert, 1873 Zeilen hinzugefügt

@@ -1,4 +1,4 @@
-﻿# 開発ガイド
+# 開発ガイド
 
 > **バージョン: v0.1.0-alpha**
 
@@ -14,11 +14,20 @@ SiliconLifeCollective は**身体-大脳アーキテクチャ**に従い、コ�
 SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/      # インターフェース、抽象クラス、共通インフラ
-│   └── SiliconLife.Default/   # 具体実装、エントリーポイント
+│   ├── SiliconLife.Common/    # 共有実装（両バージョンで共用）
+│   ├── SiliconLife.Default/   # デフォルト実装、エントリーポイント（アーキテクチャ実現可能性検証）
+│   └── SiliconLife.Fast/      # 高性能実装、エントリーポイント（主力本番バージョン）
 └── docs/                      # 多言語ドキュメント
 ```
 
-**依存方向**：`SiliconLife.Default` → `SiliconLife.Core`（単方向）
+**依存方向**：
+- `SiliconLife.Default` → `SiliconLife.Core`（単方向）
+- `SiliconLife.Fast` → `SiliconLife.Core`（単方向）
+- `SiliconLife.Common` → `SiliconLife.Core`（単方向）
+
+**バージョン役割説明**：
+- **SiliconLife.Default**：デフォルト実装、アーキテクチャの実現可能性検証に主に使用。シンプルで信頼性の高いファイルシステムストレージ実装を提供し、開発デバッグとアーキテクチャ検証に適しています。
+- **SiliconLife.Fast**：主力本番バージョン。Default で検証されたアーキテクチャの基盤上に、メモリストレージ + 非同期永続化を採用し、極限のパフォーマンス最適化を提供します。長期運用と実際の本番環境の第一選択です。
 
 ## コアコンセプト
 

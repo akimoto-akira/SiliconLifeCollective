@@ -15,15 +15,15 @@ a tento projekt dodržuje [Semantické verzování](https://semver.org/spec/v2.0
 
 Tento projekt poskytuje dvě implementační verze:
 
-- **SiliconLife.Default**: Výchozí verze, konzolová aplikace, souborové JSON úložiště
-- **SiliconLife.Fast**: Vysoce výkonná verze, Windows Forms aplikace, paměťové úložiště + asynchronní perzistence
+- **SiliconLife.Default**: Výchozí implementace, primárně použita pro ověření architectury. Konzolová aplikace, JSON úložiště v souborovém systému.
+- **SiliconLife.Fast**: Verze pro produkční prostředí. Aplikace Windows Forms, paměťové úložiště + asynchronní perzistence, hloubce optimalizovaná pro výkon.
 
-Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci úložiště a režimu spuštění.
+Obě verze sdílejí stejná rozhraní a funkce, liší se pouze implementací úložiště a režimem spuštění. SiliconLife.Default slouží jako referenční baseline pro ověření architektury, zatímco SiliconLife.Fast je hlavní verze pro produkční prostředí.
 
 ### Původ projektu
 
 - Tento projekt vznikl 20. března 2026.
-- Před tímto projektem existoval ověřovací demo, který selhal kvůli iracionálnímu návrhu architektury, což znemožnilo integraci s více AI platformami.
+- Před tímto projektem existoval ověřovací demo, které selhalo kvůli špatnému návrhu architektury, což znemožnilo integraci s více AI platformami.
 
 ### Použité AI IDE nástroje
 
@@ -58,9 +58,140 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
 ### Požadavkový dokument
 
 - Požadavkový dokument pro tento projekt není veřejně dostupný.
-- Požadavky byly validovány prostřednictvím iterací s 12+ mezinárodními AI platformami a velkými modelovými sériemi, což vytvořilo uživatelskými příběhy řízený požadavkový dokument o více než 2000 řádcích, který je téměř nesrozumitelný pro lidi.
+- Požadavky byly validovány prostřednictvím iterací s více než 12 mezinárodními AI platformami a velkými modelovými sériemi, což vytvořilo uživatelskými příběhy řízený požadavkový dokument o více než 2000 řádcích, který je téměř nesrozumitelný pro lidi.
 
 ---
+
+## [Neuvedeno]
+
+### 2026-04-30
+
+#### Funkcionalita systémové lišty
+- `101b203` - Implementováno okno stavu lišty a ApplicationContext
+  - Přidány zdroje ikon lišty (alpha.png, noWord.png, slc.ico, wordIcon.png)
+  - Implementováno stavové okno TrayStatusWindow
+  - Podpora lokalizace lišty v 9 jazycích (TrayCsCZ, TrayDeDE, TrayEnUS atd.)
+  - Abstraktní základní třída TrayLocalizationBase
+  - 24 souborů změněno, 27995 řádků přidáno, 1 řádek smazán (včetně zdrojových souborů)
+
+#### Komponentová architektura UI
+- `e61cfaa` - Dokončena komponentová architektura UI, implementováno 24 komponent
+  - Fáze MVP (8): ComponentBase, Div, Span, Button, Input, Form, Select, Label
+  - Fáze 2 (6): Accordion, Card, Tabs, Table, Modal, Message
+  - Fáze 3 (5): Calendar, Tree, Chart, FileUpload, RichText
+  - Přidány pomocné třídy Js, Behavior, DomUpdate
+  - 25 souborů změněno, 2666 řádků přidáno
+
+- `7449e51` - Vylepšen systém komponent a přidány nové skinové motivy
+  - Vylepšeny komponenty A, Button, Div, Form, Input
+  - Přidány 3 skinové motivy: HighContrast, Light, Minimal
+  - Aktualizovány existující skiny (Admin, Chat, Creative, Dev)
+  - Migrace komponentizace InitController
+  - 32 souborů změněno, 1466 řádků přidáno, 1238 řádků smazáno
+
+- `1ba8636` - Zahájena migrace komponentizace InitController (v průběhu)
+  - 9 souborů změněno, 574 řádků přidáno, 145 řádků smazáno
+
+#### Sjednocení úložného systému
+- `895dff9` - Sjednoceny soul.md a state.json pro použití rozhraní IStorage
+  - DefaultSiliconBeing používá IStorage pro čtení/zápis souborů duše a stavu
+  - Přidán správce stavových souborů StateFileManager
+  - Refaktoring SoulFileManager pro přizpůsobení IStorage
+  - 8 souborů změněno, 201 řádků přidáno, 116 řádků smazáno
+
+#### Rozšíření správy LiteDB
+- `a34bef4` - Přidán LiteDBManager a rozšířena lokalizace lišty
+  - Přidána položka správy LiteDB do menu lišty
+  - Aktualizována lokalizace lišty v 9 jazycích
+  - 10 souborů změněno, 196 řádků přidáno
+
+- `c4a79ca` - Přidána jazykově vědomá lokalizační továrna pro okno správy LiteDB
+  - 1 soubor změněn, 78 řádků přidáno
+
+- `5ebc55e` - Převedena LiteDBAdminLocalization na abstraktní základní třídu
+  - 10 souborů změněno, 1356 řádků přidáno
+
+#### Oprava konfiguračního systému
+- `2da5256` - Přidána abstraktní metoda ConfigExists a opraveny duplicitní konfigurační záznamy LiteDB
+  - ConfigDataBase přidal metodu ConfigExists
+  - Verze Fast DefaultConfigData implementuje kontrolu existence konfigurace LiteDB
+  - Opraven problém s duplicitními konfiguračními klíči LiteDB
+  - 9 souborů změněno, 210 řádků přidáno, 2 řádky smazány
+
+#### Optimalizace chatu a zobrazení
+- `d3618ec` - Optimalizovány chatovací relace, úložný systém, časový model a základní třídy zobrazení
+  - Optimalizace BroadcastChannel, GroupChatSession, SingleChatSession
+  - ITimeStorage přidal metody dotazování
+  - Synchronizované aktualizace FileSystemStorage a LiteDBStorage
+  - Optimalizace refaktoringu ViewBase (verze Default a Fast)
+  - 11 souborů změněno, 622 řádků přidáno, 392 řádků smazáno
+
+### 2026-04-29
+
+#### Refaktoring architektury: Extrakce sdílených modulů
+- `a102428` - Migrovány sdílené moduly z SiliconLife.Default do SiliconLife.Common
+  - Extrahováno 32 implementací kalendáře do projektu Common
+  - Extrahovány základní třídy lokalizace a 21 jazykových implementací do projektu Common
+  - Extrahován správce oprávnění a výchozí implementace silicon being do projektu Common
+  - Extrahováno 23 implementací vestavěných nástrojů do projektu Common
+  - Extrahována implementace Playwright WebView do projektu Common
+  - Aktualizován namespace na SiliconLife.Collective
+  - 122 souborů změněno, 586 řádků přidáno, 343 řádků smazáno
+
+#### Zlepšení kvality kódu
+- `17566fe` - Nahrazen Console.WriteLine systémem logování v projektech Core, Common a Default
+  - Aktualizováno ContextManager, AuditLogger, DefaultConfigData a 6 dalších souborů
+  - Jednotné použití rozhraní ILogger, zlepšení udržovatelnosti kódu
+  - 6 souborů změněno, 12 řádků přidáno, 8 řádků smazáno
+
+#### Verze SiliconLife.Fast s vysokým výkonem
+- `54a0307` - Přidán projekt SiliconLife.Fast a dokončeny opravy kompilace
+  - Úplný vstupní bod aplikace Windows Forms
+  - Podpora systémové lišty (NotifyIcon)
+  - Portovány všechny Web UI kontroléry (20+)
+  - Portovány všechny Web zobrazovací komponenty
+  - Portovány 4 skinové motivy (Admin, Chat, Creative, Dev)
+  - 125 souborů změněno, 61186 řádků přidáno
+
+#### Synchronizace vícejazyčné dokumentace
+- `265fde8` - Dokumentace architektury duální verze synchronizována do všech jazyků
+  - Aktualizovány architecture.md, changelog.md v 7 jazycích
+  - Aktualizován contributing.md v 6 jazycích
+  - Aktualizovány getting-started.md, roadmap.md v 7 jazycích
+  - 47 souborů změněno, 1214 řádků přidáno, 38 řádků smazáno
+
+#### Úložný systém LiteDB (verze Fast)
+- `4704862` - Přidány závislosti a infrastruktura LiteDB
+  - Přidána správcovská třída LiteDBManager
+  - Přidány datové modely LiteDBModels
+  - 3 soubory změněny, 252 řádků přidáno
+
+- `4220036` - Implementovány třídy úložiště LiteDB
+  - LiteDBStorage: implementuje rozhraní IStorage
+  - LiteDBTimeStorage: implementuje rozhraní ITimeStorage
+  - LiteDBWorkNoteStorage: implementuje rozhraní IWorkNoteStorage
+  - 3 soubory změněny, 581 řádků přidáno
+
+- `38ebd23` - Migrován konfigurační a logovací systém na LiteDB
+  - DefaultConfigData přizpůsoben úložišti LiteDB
+  - Přidán poskytovatel logování LiteDBLoggerProvider
+  - 2 soubory změněny, 203 řádků přidáno, 67 řádků smazáno
+
+- `e687157` - Migrována znalostní síť ze souborového systému na LiteDB
+  - KnowledgeNetwork kompletně refaktoringován, používá LiteDB pro ukládání trojic dat
+  - 1 soubor změněn, 231 řádků přidáno, 72 řádků smazáno
+
+- `4220169` - Integrováno úložiště LiteDB do Program a ProjectManager
+  - Program.cs inicializuje úložiště LiteDB
+  - ProjectManager přizpůsoben úložišti pracovních poznámek LiteDB
+  - 2 soubory změněny, 40 řádků přidáno, 17 řádků smazáno
+
+- `5f3a709` - Odstraněny zastaralé implementace úložiště souborového systému
+  - Smazány FileSystemLoggerProvider, FileSystemStorage, FileSystemTimeStorage atd.
+  - 6 souborů změněno, 1518 řádků smazáno
+
+- `e1a4ef2` - docs: add v0.1.0-alpha version identifier to all documentation
+  - 127 souborů změněno, 2297 řádků přidáno, 2471 řádků smazáno
 
 ## [v0.1.0-alpha] - 2026-04-28
 
@@ -77,7 +208,7 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - Synchronizované aktualizace všech volajících: ChatSystem, ChatSession, BroadcastChannel, AuditLogger, TokenUsageRecord, atd.
   - Aktualizace systému nástrojů: HelpTool, LogTool, TokenAuditTool přizpůsobeny novému rozhraní
   - Aktualizace webových kontrolerů: AuditController, ChatController, ChatHistoryController přizpůsobeny novému rozhraní
-  - Celkem: 41 souborů změněno (+1820/-903 řádků)
+  - 41 souborů změněno, 1820 řádků přidáno, 903 řádků smazáno
 
 ### 2026-04-27
 
@@ -89,6 +220,7 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - Webová zobrazení komplexně aktualizována: InitController, AuditView, ConfigView, KnowledgeView, LogView, atd.
   - Vylepšení systému lokalizace: všechny jazykové verze přidány nové lokalizační klíče
   - Aktualizace továrny AI klienta: vylepšení DashScopeClientFactory, OllamaClientFactory
+  - 30 souborů změněno, 10086 řádků přidáno, 15 řádků smazáno
 
 #### Nový obsah nápovědní dokumentace
 - `e7afe94` - Přidána nápovědní dokumentace pro soubory duše a auditní záznamy
@@ -101,14 +233,16 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - TaskTool.cs refaktorizován, zlepšena funkce správy úkolů
   - Webová zobrazení komplexně aktualizována: všechny komponenty zobrazení synchronizovány
   - HelpController.cs zjednodušen, optimalizována logika kontroléru
+  - 30 souborů změněno, 7100 řádků přidáno, 897 řádků smazáno
 
 ### 2026-04-26
 
 #### Systém nápovědní dokumentace
 - `07895d7` - Vylepšen systém nápovědní dokumentace, přidány 3 dokumenty a dokončen překlad do 9 jazyků
-  - Přidán průvodce použitím systému paměti, konfigurace instalace Ollama, platformy Alibaba Cloud Bailian
+  - Přidán průvodce použitím systému paměti, konfigurace instalace Ollama, platformy Alibaba Cloud DashScope
   - Dokončen překlad všech 10 nápovědních dokumentů do 9 jazyků
   - Zjednodušena logika vykreslování HelpView
+  - 18 souborů změněno, 14418 řádků přidáno, 1364 řádků smazáno
 
 #### Německá lokalizace
 - `0cfd8a1` - Přidána kompletní podpora německé (de-DE) lokalizace
@@ -116,36 +250,48 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - Přidána německá podpora pro čínský historický kalendář
   - Přidán německý překlad nápovědní dokumentace
   - Plně synchronizovány všechny dokumenty v 9 jazycích
+  - 135 souborů změněno, 26186 řádků přidáno, 14371 řádků smazáno
 
 #### Synchronizace dokumentace
 - `3aada7d` - Synchronizována dokumentace v tradiční čínštině (zh-HK) se zjednodušenou čínštinou
+  - 3 soubory změněny, 519 řádků přidáno, 422 řádky smazány
 - `2f6abff` - Přidána lokalizace zobrazovaných názvů nástrojů nápovědy pro všechny jazyky
+  - 7 souborů změněno, 47 řádků přidáno, 7 řádků smazáno
 
 #### Refaktorizace systému znalostí
 - `60944fe` - Sjednocen jmenný prostor na SiliconLife.Collective
+  - 8 souborů změněno, 5 řádků přidáno, 8 řádků smazáno
 - `69c51c5` - Přidán systém nápovědní dokumentace a přeloženy komentáře kódu do angličtiny
+  - 29 souborů změněno, 3385 řádků přidáno, 22 řádky smazány
 
 ### 2026-04-25
 
 #### Automatizace prohlížeče WebView
-- `41757c3` - Implementována跨platformní automatizace prohlížeče WebView založená na Playwright
+- `41757c3` - Implementována cross-platformní automatizace prohlížeče WebView založená na Playwright
+  - 6 souborů změněno, 1152 řádků přidáno
 
 #### Aktualizace dokumentace
 - `0ff797b` - Přidána dokumentace KnowledgeTool a WorkNoteTool (7 jazyků)
+  - 28 souborů změněno, 4983 řádků přidáno
 - `ad77415` - Aktualizovány všechny soubory changelog, přidána historie Git z 2026-04-25
+  - 7 souborů změněno, 168 řádků přidáno
 
 #### Správa pracovního prostoru projektu
 - `785c551` - Implementována správa pracovního prostoru projektu s pracovními poznámkami a systémem úkolů
   - Přidán systém správy pracovního prostoru projektu
   - Funkce pracovních poznámek pro sledování postupu projektu
   - Integrace systému správy úkolů
+  - 29 souborů změněno, 4256 řádků přidáno, 36 řádků smazáno
 
 #### Česká lokalizace
 - `b4bbf39` - Přidána kompletní česká (cs-CZ) lokalizace a aktualizována veškerá jazyková dokumentace
+  - 116 souborů změněno, 4933 řádků přidáno, 222 řádky smazány
 - `faf078f` - Opraveny chyby kompilace české lokalizace
+  - 3 soubory změněny, 910 řádků přidáno, 1 řádek smazán
 
 #### Vylepšení systému znalostí
 - `20adaac` - Přidán KnowledgeTool s kompletní podporou lokalizace
+  - 34 souborů změněno, 2331 řádků přidáno, 56 řádků smazáno
 
 ### 2026-04-24
 
@@ -155,39 +301,52 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - Implementovány statistiky paměti
   - Přidána stránka podrobného zobrazení paměti
   - Podpora vícejazyčné lokalizace (6 jazyků)
+  - 13 souborů změněno, 840 řádků přidáno, 86 řádků smazáno
 
 #### Rozšíření systému oprávnění
 - `4489ad6` - Přidána meteorologická služba wttr.in na seznam povolených sítí
   - Kompletní synchronizace vícejazyčné dokumentace (6 jazyků)
+  - 14 souborů změněno, 417 řádků přidáno, 1 řádek smazán
 
 #### Opravy webového rozhraní
 - `d9d72e9` - Opraven problém priority CSS v modálním okně detailu pracovní poznámky
+  - 19 souborů změněno, 1744 řádků přidáno, 6 řádků smazáno
 
 #### Optimalizace historie chatu
 - `0df599c` - Opraveno vykreslování výsledků nástrojů jako samostatných zpráv chatu
+  - 1 soubor změněn, 222 řádků přidáno, 21 řádků smazáno
 - `057b09d` - Optimalizováno zobrazení detailů historie chatu, zlepšeno vykreslování volání nástrojů
+  - 3 soubory změněny, 389 řádků přidáno, 68 řádků smazáno
 
 #### Historie provádění časovače
 - `fa3f06f` - Přidána funkce historie provádění časovače s podrobným zobrazením
+  - 8 souborů změněno, 937 řádků přidáno, 10 řádků smazáno
 - `d824835` - Přidány lokalizační klíče historie provádění časovače (všechny jazyky)
+  - 7 souborů změněno, 88 řádků přidáno
 
 #### Vylepšení lokalizace
 - `c13cb17` - Registrována jazyková varianta španělštiny
+  - 1 soubor změněn, 4 řádky přidáno
 - `9c44f34` - Přidána podpora vícejazyčné lokalizace pro čínský historický kalendář
+  - 16 souborů změněno, 6049 řádků přidáno, 1 řádek smazán
 
 #### Vylepšení hlavní funkčnosti
 - `1e7c7b2` - Zlepšena komprese paměti a sledování provádění nástrojů
+  - 4 soubory změněny, 338 řádků přidáno, 86 řádků smazáno
 
 ### 2026-04-23
 
 #### Lokalizace nástrojů
 - `192fc6e` - Přidána chybějící lokalizace názvů nástrojů pro 5 nástrojů
+  - 6 souborů změněno, 30 řádků přidáno
 
 #### Aktualizace dokumentace
 - `882c08f` - Aktualizovány všechny soubory changelog, přidána kompletní historie Git a odstraněna falešná čísla verzí
+  - 45 souborů změněno, 8815 řádků přidáno, 1611 řádků smazáno
 
 #### Vylepšení stránky chatu
 - `65c157b` - Přidán indikátor načítání na stránku chatu a automatický výběr relace kurátora
+  - 10 souborů změněno, 211 řádků přidáno, 7 řádků smazáno
 
 #### Funkce historie chatu
 - `e483348` - Implementována funkce zobrazení historie chatu křemíkové bytosti
@@ -195,105 +354,147 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - Vytvořen ChatHistoryViewModel
   - Implementovány stránky ChatHistoryListView a ChatHistoryDetailView
   - Přidány lokalizační klíče pro historii chatu (5 jazyků)
+  - 12 souborů změněno, 1178 řádků přidáno
 
 #### Vylepšení řízení toku AI
 - `30a2d4e` - Vylepšeno rušení toku AI, integrace IM a inicializace hlavního hostitele
+  - 11 souborů změněno, 387 řádků přidáno, 12 řádků smazáno
 
 #### Fronta zpráv chatu
 - `db48c51` - Přidána fronta zpráv chatu, metadata souborů a podpora rušení streamu
+  - 4 soubory změněny, 357 řádků přidáno
 
 #### Podpora nahrávání souborů
 - `28fb344` - Implementován dialog zdrojů souborů a podpora nahrávání souborů
+  - 3 soubory změněny, 1100 řádků přidáno, 2 řádky smazány
 - `1d3e2cc` - Přidány lokalizační řetězce dialogu zdrojů souborů (6 jazyků)
+  - 6 souborů změněno, 30 řádků přidáno
 
 #### Aktualizace dokumentace
 - `8111e92` - Přidán odkaz Wiki do sekce repozitáře README
+  - 1 soubor změněn, 3 řádky přidáno, 1 řádek smazán
 
 ### 2026-04-22
 
 #### Lokalizace dokumentace
 - `66c11eb` - Přeloženy čínské komentáře do angličtiny a aktualizovány všechny changelogy
+  - 11 souborů změněno, 373 řádků přidáno, 163 řádky smazány
 
 #### Vylepšení zpráv SSE
 - `b574b2b` - Přidáno senderName do historických zpráv pro identifikaci AI
+  - 1 soubor změněn, 9 řádků přidáno
 
 #### Funkce chatu
 - `601fc14` - Přidána akce mark_read pro označení konce relace
+  - 7 souborů změněno, 196 řádků přidáno, 36 řádků smazáno
 
 #### Optimalizace systému nástrojů
 - `7a03a19` - Zlepšena flexibilita dotazů na konverzaci LogTool
+  - 1 soubor změněn, 57 řádků přidáno, 24 řádky smazány
 
 #### Vylepšení lokalizace
 - `0a8d750` - Přidán běžný systémový prompt pro aktivní chování křemíkové bytosti
+  - 8 souborů změněno, 460 řádků přidáno, 48 řádků smazáno
 
 #### Refaktorizace systému protokolů
 - `2b771f3` - Odpojen LogController od souborového I/O, přidáno API pro čtení protokolů
+  - 4 soubory změněny, 172 řádků přidáno, 137 řádků smazáno
 - `12da302` - Přidán filtr křemíkové bytosti do zobrazení protokolů
+  - 9 souborů změněno, 147 řádků přidáno, 10 řádků smazáno
 - `8f6cb1e` - Přidán parametr beingId do rozhraní ILogger, implementováno oddělení protokolů systému/křemíkové bytosti
+  - 47 souborů změněno, 524 řádků přidáno, 490 řádků smazáno
 
 #### Vylepšení systému oprávnění
 - `4c747ad` - Refaktorizovány PermissionTool, ExecuteCodeTool, přidáno API EvaluatePermission
+  - 18 souborů změněno, 680 řádků přidáno, 492 řádků smazáno
 
 #### Opravy chyb
 - `1c96e99` - Opraveno selhání vyhledávání v kořenovém adresáři search_files a search_content
+  - 1 soubor změněn, 98 řádků přidáno, 41 řádek smazán
 
 #### Integrace nástrojů
 - `135710d` - Odstraněn SearchTool, místní vyhledávání přesunuto do DiskTool
+  - 2 soubory změněny, 185 řádků přidáno, 365 řádků smazáno
 
 #### Rozšíření systému nástrojů
 - `70ce7fb` - Implementován DatabaseTool pro strukturované dotazy na databázi
+  - 1 soubor změněn, 382 řádky přidáno
 - `be29a09` - Implementován LogTool pro dotazy na historii operací a konverzací
+  - 1 soubor změněn, 298 řádků přidáno
 - `4ea7702` - Implementován PermissionTool pro dynamickou správu oprávnění
+  - 1 soubor změněn, 457 řádků přidáno
 - `1384ff4` - Implementován ExecuteCodeTool pro více-jazykové provádění kódu
+  - 1 soubor změněn, 477 řádků přidáno
 - `82d1e11` - Implementován SearchTool pro vyhledávání informací
+  - 1 soubor změněn, 363 řádky přidáno
 
 #### Optimalizace webového rozhraní
 - `0675c45` - Optimalizováno zvýraznění bloků kódu markdown v náhledovém panelu
+  - 1 soubor změněn, 4 řádky přidáno, 23 řádky smazány
 - `702b3f3` - Vylepšeno zobrazení úkolů se stavovými odznaky a zobrazením metadat
+  - 8 souborů změněno, 221 řádků přidáno, 9 řádků smazáno
 - `6ed9a79` - Zlepšeno ukládání zpráv chatu a vykreslování zobrazení
+  - 8 souborů změněno, 140 řádků přidáno, 29 řádků smazáno
 
 ### 2026-04-21
 
 #### Opravy chyb
 - `c6b518b` - Opraveno doručování zpráv časovače a ukládání zpráv chatu
+  - 3 soubory změněny, 297 řádků přidáno, 124 řádky smazány
 
 #### Správa konfigurace
 - `4305769` - Přidán .gitattributes pro správu konců řádků
+  - 1 soubor změněn, 32 řádky přidáno
 
 #### Vylepšení webového rozhraní
 - `188c6f8` - Registrována trasa API seznamu úkolů a přidáno zobrazení prázdného stavu
+  - 2 soubory změněny, 35 řádků přidáno, 2 řádky smazány
 - `634e8ca` - Přidán odkaz na návrat na seznam stránky oprávnění
+  - 1 soubor změněn, 16 řádků přidáno
 - `6ba591d` - Přidán nezávislý editor konfigurace AI pro křemíkové bytosti
+  - 11 souborů změněno, 842 řádků přidáno, 18 řádků smazáno
 - `0a826f5` - Přidán prompt úspěšného uložení v editoru kódu
+  - 1 soubor změněn, 9 řádků přidáno, 2 řádky smazány
 - `2940373` - Vylepšeno webové rozhraní s nápovědami při najetí na kód a vylepšeními UI
+  - 11 souborů změněno, 1054 řádků přidáno, 75 řádků smazáno
 
 #### Opravy systému oprávnění
 - `592c7ab` - Opravena inicializace callbacku a pořadí registrace
+  - 2 soubory změněny, 38 řádků přidáno, 7 řádků smazáno
 
 #### Vylepšení zabezpečení
 - `833ead2` - Přidána ověření referencí sestavení pro dynamickou kompilaci
+  - 4 soubory změněny, 135 řádků přidáno, 8 řádků smazáno
 
 #### Vylepšení systému oprávnění
 - `5879621` - Přidáno ověření předkompilace callbacku oprávnění a vylepšené zpracování chyb
+  - 21 souborů změněno, 617 řádků přidáno, 26 řádků smazáno
 
 #### Aktualizace dokumentace
 - `4dbf659` - Aktualizován changelog na v0.5.1, nahrazeny URL zástupných symbolů GitHub, přidán zrcadlový server Gitee, lokalizován název Bilibili podle jazyka, aktualizován email
+  - 32 souborů změněno, 489 řádků přidáno, 180 řádků smazáno
 
 #### Konfigurace a vstup
 - `0fc1693` - Aktualizován vstup programu a konfigurace projektu
+  - 2 soubory změněny, 7 řádků přidáno
 
 #### Refaktorizace systému oprávnění
 - `ea9179a` - Vylepšena implementace systému oprávnění
+  - 5 souborů změněno, 358 řádků přidáno, 152 řádků smazáno
 
 #### Opravy chyb
 - `928a96d` - Opravena implementace výpočtu kalendáře
+  - 4 soubory změněny, 12 řádků přidáno, 12 řádků smazáno
 
 #### AI a kalendář
 - `646813e` - Vylepšena implementace továrny AI klienta
+  - 2 soubory změněny, 21 řádků přidáno, 20 řádků smazáno
 
 #### Lokalizace
 - `7940d9c` - Přidána podpora korejské lokalizace
+  - 7 souborů změněno, 2424 řádků přidáno, 10 řádků smazáno
 - `4ff98ad` - Refaktorizována dokumentace pro podporu více jazyků
+  - 81 souborů změněno, 23818 řádků přidáno, 1886 řádků smazáno
 
 ### 2026-04-20
 
@@ -307,6 +508,7 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - Podpora více jazyků pro angličtinu a zjednodušenou čínštinu
   - WebUI messenger s WebSocket pro chat v reálném čase
   - Vylepšená výchozí křemíková bytost s lokalizací
+  - 39 souborů změněno, 4670 řádků přidáno, 175 řádků smazáno
 
 ### 2026-04-19
 
@@ -318,6 +520,7 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - Nástroj kalendáře podporující 32 typů kalendáře
   - Webový kontrolér pro API kalendáře
   - Nástroj správy úkolů
+  - 46 souborů změněno, 4018 řádků přidáno, 975 řádků smazáno
 
 **Vylepšení architektury**
 - Znovu navržena architektura webového zobrazení pro lepší podporu skinů
@@ -329,6 +532,7 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - Vylepšení časovače a plánování
   - Lepší webová zobrazení s vylepšenými komponentami UI
   - Více implementací nástrojů
+  - 57 souborů změněno, 3328 řádků přidáno, 389 řádků smazáno
 
 ### 2026-04-17
 
@@ -337,12 +541,14 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - Systém nástrojů konfigurace
   - Auditní webová zobrazení
   - Dokumentace v tradiční čínštině
+  - 42 souborů změněno, 3533 řádků přidáno, 268 řádků smazáno
 
 ### 2026-04-16
 
 - `5040f05` - Aktualizovány hlavní a výchozí moduly
   - Optimalizace modulů a opravy chyb
   - Aktualizace a vylepšení implementace
+  - 58 souborů změněno, 9916 řádků přidáno, 111 řádků smazáno
 
 ### 2026-04-15
 
@@ -354,34 +560,44 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - Vylepšení webové infrastruktury
   - Optimalizace lokalizace
   - Aktualizace systému úložiště
+  - 33 souborů změněno, 788 řádků přidáno, 232 řádků smazáno
 
 ### 2026-04-14
 
 - `4241a2f` - Funkce chatu základně dokončeny, optimalizace nahrávání UI
   - Funkce systému chatu dokončeny
   - Optimalizace UI pro nahrávání souborů
+  - 16 souborů změněno, 1234 řádků přidáno, 102 řádky smazány
 
 ### 2026-04-13
 
 - `c498c31` - Aktualizace kódu
   - Obecná vylepšení a optimalizace kódu
+  - 32 soubory změněny, 1045 řádků přidáno, 546 řádků smazáno
 
 ### 2026-04-12
 
 #### Dokumentace a lokalizace
 - `2161002` - Refaktorizována dokumentace a vylepšena lokalizace
+  - 17 souborů změněno, 982 řádků přidáno, 92 řádky smazány
 - `03d94e4` - Vylepšen systém konfigurace a lokalizace
+  - 25 souborů změněno, 1378 řádků přidáno, 154 řádky smazány
 - `9976a35` - Přidána stránka o projektu a lokalizace
+  - 14 souborů změněno, 699 řádků přidáno, 44 řádky smazány
 
 #### Chat a webová zobrazení
 - `0c8ccfc` - Vylepšen systém chatu, lokalizace a webová zobrazení
+  - 13 souborů změněno, 402 řádků přidáno, 56 řádků smazáno
 - `a8f1342` - Znovu navržena vrstva webové komunikace, přepnuto z WebSocket na SSE
+  - 27 souborů změněno, 793 řádků přidáno, 935 řádků smazáno
 
 ### 2026-04-11
 
 #### Systém protokolů
 - `e8fe259` - Přidán systém protokolů a optimalizace kódu
+  - 37 souborů změněno, 624 řádků přidáno, 91 řádků smazáno
 - `f01c519` - Přidán systém protokolů, aktualizováno rozhraní AI a webová zobrazení
+  - 31 souborů změněno, 1758 řádků přidáno, 63 řádky smazány
 
 ### 2026-04-10
 
@@ -393,6 +609,7 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - Aktualizace sestavovače JavaScriptu a směrovače
   - Optimalizace zobrazení chatu
   - Vylepšení obslužného programu WebSocket
+  - 9 souborů změněno, 365 řádků přidáno, 134 řádky smazány
 
 ### 2026-04-09
 
@@ -403,6 +620,7 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - Vylepšení výchozí křemíkové bytosti
   - Vylepšení zobrazení chatu webového UI
   - Aktualizace obslužného programu WebSocket
+  - 10 souborů změněno, 427 řádků přidáno, 93 řádky smazány
 
 ### 2026-04-07
 
@@ -412,6 +630,7 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - Všechny komponenty zobrazení aktualizovány
   - Vylepšení systému skinů
   - Upgrade architektury základní třídy zobrazení
+  - 23 soubory změněny, 2004 řádků přidáno, 1983 řádky smazány
 
 ### 2026-04-05
 
@@ -422,7 +641,9 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - Aktualizace základní třídy a správce křemíkové bytosti
   - Webové kontroléry komplexně aktualizovány (17 kontrolérů)
   - Vylepšení továrny výchozí křemíkové bytosti
+  - 31 souborů změněno, 681 řádků přidáno, 326 řádků smazáno
 - `67988d4` - Vylepšen modul webového UI, přidáno zobrazení exekutoru, vyčištěna zobrazení a hlavní moduly
+  - 61 souborů změněno, 3148 řádků přidáno, 3726 řádků smazáno
 
 ### 2026-04-04
 
@@ -432,24 +653,37 @@ Obě verze sdílejí stejné rozhraní a funkce, s rozdíly pouze v implementaci
   - Aktualizace modulu lokalizace
   - Vylepšení systému skinů
   - Vylepšení směrovače
+  - 29 souborů změněno, 1269 řádků přidáno, 289 řádků smazáno
 - `f03ac0b` - Přidán modul webového UI, vylepšena funkce messengeru
+  - 60 souborů změněno, 8481 řádků přidáno, 165 řádků smazáno
 
 ### 2026-04-03
 
 - `192e57b` - Aktualizována struktura projektu a hlavní runtime komponenty
+  - 22 soubory změněny, 446 řádků přidáno, 179 řádků smazáno
 - `59faec8` - Aktualizace hlavní a výchozí implementace
+  - 25 souborů změněno, 3056 řádků přidáno, 18 řádků smazáno
 - `d488485` - Přidána funkce dynamické kompilace a modul nástrojů kurátora
+  - 19 souborů změněno, 1727 řádků přidáno, 11 řádků smazáno
 - `753d1d9` - Přidán modul zabezpečení, aktualizovány exekutory, poskytovatelé messengeru, lokalizace a nástroje
+  - 29 souborů změněno, 2352 řádků přidáno, 93 řádků smazáno
 - `a378697` - Dokončena fáze 5 - systém nástrojů + exekutory
+  - 41 souborů změněno, 2651 řádků přidáno, 363 řádky smazány
 
 ### 2026-04-02
 
 - `e6ad94b` - Opraveno selhání načítání historie chatu při odstraňování konfiguračních souborů během testování
+  - 4 soubory změněny, 49 řádků přidáno, 45 řádků smazáno
 - `daa56f5` - Dokončena fáze 4: perzistentní paměť (systém chatu + kanál messengeru)
+  - 29 souborů změněno, 2051 řádků přidáno, 538 řádků smazáno
 
 ### 2026-04-01
 
 - `bbe2dbb` - Opraveno načítání konfigurace a směrování zpráv služby chatu
+  - 27 souborů změněno, 1633 řádků přidáno, 147 řádků smazáno
 - `2fa6305` - Implementována fáze 2: rámec hlavní smyčky a systém objektů hodin
+  - 9 souborů změněno, 594 řádků přidáno, 41 řádek smazán
 - `32b99a1` - Implementována fáze 1 - základní funkce chatu
+  - 19 souborů změněno, 1185 řádků přidáno
 - `358e368` - Počáteční commit: dokumentace projektu a licence
+  - 10 souborů změněno, 1873 řádků přidáno

@@ -1,4 +1,4 @@
-﻿# 故障排除指南
+# 故障排除指南
 
 > **版本：v0.1.0-alpha**
 
@@ -135,12 +135,16 @@ OutOfMemoryException
 ```
 
 **解決方案**：
-1. 增加堆大小：
+1. **SiliconLife.Default**：增加堆大小：
 ```bash
-dotnet run --server.gcHeapCount 4
+dotnet run --project src/SiliconLife.Default --server.gcHeapCount 4
 ```
 
-2. 清理舊資料：
+2. **SiliconLife.Fast**：Fast 版本本身記憶體佔用較高（~500MB），如記憶體持續不足，建議：
+   - 減少並發矽基生命體數量
+   - 清理舊資料釋放記憶體
+
+3. 清理舊資料：
 ```bash
 # 歸档舊記錄
 mv logs/ logs-archive/
@@ -149,6 +153,8 @@ mkdir logs
 # 清理舊記憶
 # 通過 Web UI：記憶管理 > 清理
 ```
+
+> **提示**：SiliconLife.Default 記憶體佔用較低（~200MB），適合記憶體受限環境；SiliconLife.Fast 記憶體佔用較高但效能更好，適合生產環境。
 
 ---
 
@@ -454,6 +460,7 @@ tail -f logs/*.log
 
 ### 使用偵錯器
 
+**SiliconLife.Default（預設實現）**：
 ```bash
 # 使用偵錯器執行
 dotnet run --project src/SiliconLife.Default --configuration Debug
@@ -461,6 +468,17 @@ dotnet run --project src/SiliconLife.Default --configuration Debug
 # 附加偵錯器
 # 通過 IDE：附加到進程 > SiliconLife.Default
 ```
+
+**SiliconLife.Fast（高效能版本）**：
+```bash
+# 使用偵錯器執行
+dotnet run --project src/SiliconLife.Fast --configuration Debug
+
+# 附加偵錯器
+# 通過 IDE：附加到進程 > SiliconLife.Fast
+```
+
+> **建議**：開發調試階段推薦使用 SiliconLife.Default，架構驗證通過後再使用 SiliconLife.Fast 進行生產部署。
 
 ---
 
@@ -527,8 +545,15 @@ dotnet run --project src/SiliconLife.Default --configuration Debug
 
 1. 檢查記錄以获取原因
 2. 重啟應用程式程式：
+
+**SiliconLife.Default（預設實現）**：
 ```bash
 dotnet run --project src/SiliconLife.Default
+```
+
+**SiliconLife.Fast（主推生產版本）**：
+```bash
+dotnet run --project src/SiliconLife.Fast
 ```
 
 3. 如需從備份復原

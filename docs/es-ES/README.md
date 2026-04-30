@@ -1,4 +1,6 @@
-﻿# Silicon Life Collective
+![Silicon Life Collective](../../icon/wordIcon.png)
+
+# Silicon Life Collective
 
 **Versión: v0.1.0-alpha** | **Silicon Life Collective** — Una plataforma de colaboración multiagente basada en .NET 9, donde los agentes de IA se denominan **Ser Silicona**, capaces de auto-evolucionarse mediante compilación dinámica Roslyn.
 
@@ -49,18 +51,22 @@
 Este proyecto proporciona dos versiones de implementación para satisfacer diferentes necesidades de escenarios:
 
 ### SiliconLife.Default (Versión Predeterminada)
+- **Posicionamiento**: Implementación predeterminada, utilizada principalmente para verificación de viabilidad de arquitectura
 - **Modo de Ejecución**: Aplicación de consola
 - **Método de Almacenamiento**: Almacenamiento JSON puro en sistema de archivos
 - **Escenarios Aplicables**: Requisitos altos de seguridad de datos, recursos de memoria limitados, pequeño volumen de datos
 - **Características**: Simple y confiable, persistencia de datos inmediata, sin riesgo de pérdida de memoria
+- **Descripción de Rol**: Implementación de referencia para verificación de arquitectura, adecuada para primer contacto, depuración de desarrollo o escenarios donde la seguridad de datos es prioritaria
 - **Comando de Inicio**: `dotnet run --project src/SiliconLife.Default`
 
 ### SiliconLife.Fast (Versión de Alto Rendimiento)
+- **Posicionamiento**: Versión de producción principal
 - **Modo de Ejecución**: Aplicación de formularios Windows (soporta bandeja del sistema)
 - **Método de Almacenamiento**: Almacenamiento en memoria + persistencia asíncrona por lotes
 - **Escenarios Aplicables**: Alta concurrencia, baja latencia, escenarios de gran volumen de datos
 - **Características**: Optimización extrema de rendimiento, ejecución en segundo plano de la bandeja, base de datos en memoria + registros WAL garantizan seguridad de datos
 - **Mejora de Rendimiento**: Latencia de lectura de almacenamiento reducida 1000x, latencia de escritura reducida 15000x, capacidad de procesamiento concurrente aumentada 50x
+- **Descripción de Rol**: Implementación de nivel de producción con optimización profunda, la mejor opción para operaciones a largo plazo y entornos de producción reales
 - **Comando de Inicio**: `dotnet run --project src/SiliconLife.Fast`
 
 ### Comparación de Versiones

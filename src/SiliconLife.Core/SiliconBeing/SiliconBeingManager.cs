@@ -450,10 +450,8 @@ public class SiliconBeingManager : TickObject
 
             try
             {
-                // Get the app data directory from config
-                string appDataDirectory = Config.Instance?.Data?.DataDirectory?.FullName ?? string.Empty;
-                
-                // Find the constructor that takes a single string parameter
+                // Find the constructor that takes a single string parameter (appDataDirectory)
+                // For Fast project, pass empty string since it uses LiteDB storage
                 ConstructorInfo? ctor = callbackType.GetConstructor(new[] { typeof(string) });
                 if (ctor == null)
                 {
@@ -461,8 +459,8 @@ public class SiliconBeingManager : TickObject
                     return;
                 }
                 
-                // Invoke constructor directly with appDataDirectory
-                IPermissionCallback? callback = (IPermissionCallback?)ctor.Invoke(new object[] { appDataDirectory });
+                // Invoke constructor directly with empty string (Fast project uses LiteDB, no file-based data directory)
+                IPermissionCallback? callback = (IPermissionCallback?)ctor.Invoke(new object[] { string.Empty });
                     
                 if (callback != null)
                 {

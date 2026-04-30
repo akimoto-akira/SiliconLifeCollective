@@ -76,7 +76,7 @@ public class BeingController : Controller
         {
             id = b.Id.ToString(),
             name = b.Name,
-            isIdle = b.IsIdle,
+            activity = b.CurrentActivity.ToString(),
             isCustomCompiled = b.IsCustomCompiled,
             customTypeName = b.CustomTypeName ?? ""
         }).ToList();
@@ -104,7 +104,7 @@ public class BeingController : Controller
         {
             id = being.Id.ToString(),
             name = being.Name,
-            isIdle = being.IsIdle,
+            activity = being.CurrentActivity.ToString(),
             isCustomCompiled = being.IsCustomCompiled,
             customTypeName = being.CustomTypeName ?? "",
             soulContent = being.SoulContent ?? "",

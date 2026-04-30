@@ -122,4 +122,14 @@ public class TrayEnUS : TrayLocalizationBase
     /// Gets the exit menu item text
     /// </summary>
     public override string Exit => "Exit";
+
+    /// <summary>
+    /// Gets the web server startup error title
+    /// </summary>
+    public override string WebServerStartupErrorTitle => "Web Server Startup Failed";
+
+    /// <summary>
+    /// Gets the web server startup error message
+    /// </summary>
+    public override string WebServerStartupErrorMessage => "Web server failed to start. The application will exit.\n\nError: {0}";
 }

@@ -72,6 +72,15 @@ public abstract class LocalizationBase
     /// <returns>The localized display name</returns>
     public abstract string GetLogLevelName(LogLevel logLevel);
 
+    // ===== Being Activity Localization =====
+
+    /// <summary>
+    /// Gets the localized display name for a silicon being activity state.
+    /// </summary>
+    /// <param name="activity">The activity state</param>
+    /// <returns>The localized display name (e.g., "Idle", "Thinking...", "Executing Timer")</returns>
+    public abstract string GetBeingActivityName(BeingActivity activity);
+
     // ===== Memory Event Localization =====
 
     /// <summary>

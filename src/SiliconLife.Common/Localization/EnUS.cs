@@ -356,6 +356,19 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string MemoryStatTypeDistribution => "Type Distribution";
     public override string MemoryStatKeywordFrequency => "Keyword Frequency";
     public override string MemoryCardViewDetail => "View Detail";
+    public override string MemoryTimelineEmptyState => "No memory data";
+    public override string MemoryYearSummaryLabel => "Year Summary";
+    public override string MemoryMonthSummaryLabel => "Month Summary";
+    public override string MemoryDaySummaryLabel => "Day Summary";
+    public override string MemoryHourSummaryLabel => "Hour Summary";
+    public override string MemoryMinuteSummaryLabel => "Minute Summary";
+    public override string MemorySummaryBadge => "Compressed Summary";
+    public override string MemoryTimelineYearFormat => "{0} ({1} entries)";
+    public override string MemoryTimelineMonthFormat => "{0}/{1} ({2} entries)";
+    public override string MemoryTimelineDayFormat => "{0}-{1}-{2} ({3} entries)";
+    public override string MemoryTimelineHourFormat => "{0}:00 ({1} entries)";
+    public override string MemoryTimelineMinuteFormat => "{0}:{1} ({2} entries)";
+    public override string MemoryRelatedBeingsLabel => "👥 Related: {0} beings";
 
     // ===== Projects Page Localization =====
 
@@ -782,7 +795,6 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
         ["DashScopeModel_kimi-k2.5"] = "Kimi K2.5 (Long Context)",
         ["DashScopeModel_llama-4-maverick"] = "Llama 4 Maverick",
         ["WebPort"] = "Web Port",
-        ["AllowIntranetAccess"] = "Allow Intranet Access",
         ["WebSkin"] = "Web Skin",
         ["UserNickname"] = "User Nickname"
     };
@@ -802,7 +814,6 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
         ["DashScopeRegion"] = "Alibaba Cloud DashScope service region",
         ["DashScopeModel"] = "Alibaba Cloud DashScope model to use",
         ["WebPort"] = "Web server port",
-        ["AllowIntranetAccess"] = "Allow intranet access (requires admin)",
         ["WebSkin"] = "Web skin name",
         ["UserNickname"] = "Nickname of the human user"
     };
@@ -833,6 +844,20 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
         LogLevel.Critical => "Critical",
         LogLevel.None => "None",
         _ => logLevel.ToString()
+    };
+
+    /// <summary>
+    /// Gets the localized display name for a silicon being activity state.
+    /// </summary>
+    public override string GetBeingActivityName(BeingActivity activity) => activity switch
+    {
+        BeingActivity.Idle => "Idle",
+        BeingActivity.SingleChat => "In 1-on-1 Chat",
+        BeingActivity.GroupChat => "In Group Chat",
+        BeingActivity.Task => "Executing Task",
+        BeingActivity.Timer => "Running Timer",
+        BeingActivity.MemoryCompression => "Compressing Memory",
+        _ => activity.ToString()
     };
 
     // ===== Tool Display Name Localization =====

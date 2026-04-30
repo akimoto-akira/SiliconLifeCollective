@@ -64,7 +64,7 @@ public class DashboardController : Controller
         RenderJson(new
         {
             beingCount = beings.Count,
-            activeBeings = beings.Count(b => !b.IsIdle),
+            activeBeings = beings.Count(b => b.CurrentActivity != BeingActivity.Idle),
             uptime = uptime.ToString(@"hh\:mm\:ss"),
             memoryMB = Math.Round(process.WorkingSet64 / 1024.0 / 1024.0, 2)
         });

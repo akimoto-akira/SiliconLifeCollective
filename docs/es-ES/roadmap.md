@@ -1,4 +1,4 @@
-﻿# Hoja de Ruta
+# Hoja de Ruta
 
 > **Versión: v0.1.0-alpha**
 
@@ -7,10 +7,14 @@
 ## Hoja de Ruta de Versión Dual
 
 ### SiliconLife.Default (Versión Predeterminada)
-Las fases actuales 1-10.6 están completadas, el sistema se ejecuta de manera estable.
+- **Posicionamiento**: Implementación predeterminada, utilizada principalmente para verificación de viabilidad de arquitectura
+- **Estado Actual**: Las fases actuales 1-10.6 están completadas, el sistema se ejecuta de manera estable
+- **Descripción de Rol**: Implementación de referencia para verificación de arquitectura que garantiza la corrección y viabilidad del diseño de arquitectura central
 
 ### SiliconLife.Fast (Versión de Alto Rendimiento)
-La portería de arquitectura básica está completada, optimización continua en progreso.
+- **Posicionamiento**: Versión de producción principal
+- **Estado Actual**: La portería de arquitectura básica está completada, optimización continua en progreso
+- **Descripción de Rol**: Basada en la arquitectura verificada en la versión Default, realiza optimización profunda de rendimiento y fortalecimiento de características de producción, la mejor opción para despliegue real
 
 **Plan de Desarrollo de Fast**:
 - ✅ Fase 1: Portería de estructura de proyecto básica y sistema de configuración

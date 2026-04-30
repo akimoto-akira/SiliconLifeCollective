@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -47,10 +47,6 @@ public class InitController : Controller
         if (Request.HttpMethod == "POST")
         {
             HandlePost();
-        }
-        else if (Request.Url?.AbsolutePath == "/init/browse" || Request.Url?.AbsolutePath == "/init/browse/")
-        {
-            HandleBrowse();
         }
         else if (Request.Url?.AbsolutePath == "/init/ai-config-metadata" || Request.Url?.AbsolutePath == "/init/ai-config-metadata/")
         {
@@ -127,8 +123,7 @@ public class InitController : Controller
         form.Add(new DivComponent().Id("aiConfigContainer").Class("form-group")
             .Add(new DivComponent().Id("aiConfigFields")));
 
-        // Data directory field
-        form.Add(BuildDataDirectoryFormGroup());
+        // Data directory field removed - Fast project uses LiteDB storage
 
         // Skin selection
         form.Add(BuildSkinFormGroup());
@@ -201,31 +196,6 @@ public class InitController : Controller
             .Add(new DivComponent().Class("lang-selector-row")
                 .Add(select)
                 .Add(switchBtn));
-    }
-
-    private ComponentBase BuildDataDirectoryFormGroup()
-    {
-        var browseBtn = new ButtonComponent()
-            .Text(_localization.InitDataDirectoryBrowse)
-            .Type("button")
-            .Class("dir-browse-btn")
-            .Attr("onclick", "openDirBrowser()");
-
-        var inputRow = new DivComponent().Class("dir-input-row")
-            .Add(new InputComponent()
-                .Type("text")
-                .Name("dataDirectory")
-                .Placeholder(_localization.InitDataDirectoryPlaceholder)
-                .Value(_configData.DataDirectory.FullName)
-                .Id("dataDirInput"))
-            .Add(browseBtn);
-
-        var browser = new DivComponent().Id("dirBrowser").Class("dir-browser").Style("display:none;");
-
-        return new FormGroupComponent()
-            .Add(new LabelComponent().For("dataDirectory").Text(_localization.InitDataDirectoryLabel))
-            .Add(inputRow)
-            .Add(browser);
     }
 
     private ComponentBase BuildSkinFormGroup()
@@ -390,72 +360,6 @@ public class InitController : Controller
         return (IAIClientFactory)Activator.CreateInstance(factoryType)!;
     }
 
-    private void HandleBrowse()
-    {
-        var dir = GetQueryValue("dir");
-        string? basePath;
-        bool showDrives = false;
-
-        if (string.IsNullOrEmpty(dir) || dir == "/")
-        {
-            basePath = AppDomain.CurrentDomain.BaseDirectory;
-        }
-        else if (dir == "__drives__")
-        {
-            basePath = null;
-            showDrives = true;
-        }
-        else
-        {
-            basePath = Path.GetFullPath(dir);
-        }
-
-        var result = new List<object>();
-        try
-        {
-            if (showDrives)
-            {
-                foreach (var drive in DriveInfo.GetDrives()
-                    .Where(d => d.IsReady && d.DriveType == DriveType.Fixed || d.DriveType == DriveType.Removable || d.DriveType == DriveType.Network)
-                    .OrderBy(d => d.Name))
-                {
-                    var root = drive.RootDirectory.FullName;
-                    result.Add(new { name = drive.Name.TrimEnd('\\'), path = root.Replace('\\', '/'), isParent = false });
-                }
-            }
-            else if (Directory.Exists(basePath))
-            {
-                var isRoot = Path.GetPathRoot(basePath) == basePath;
-                if (!isRoot)
-                {
-                    var parent = Directory.GetParent(basePath)?.FullName;
-                    if (parent != null)
-                    {
-                        result.Add(new { name = "..", path = parent.Replace('\\', '/'), isParent = true });
-                    }
-                }
-                else
-                {
-                    result.Add(new { name = "..", path = "__drives__", isParent = true });
-                }
-
-                foreach (var d in Directory.GetDirectories(basePath)
-                    .OrderBy(d => d)
-                    .Take(50))
-                {
-                    var name = Path.GetFileName(d);
-                    result.Add(new { name, path = d.Replace('\\', '/'), isParent = false });
-                }
-            }
-        }
-        catch
-        {
-            // ignore access errors
-        }
-
-        RenderJson(new { directories = result, currentPath = basePath?.Replace('\\', '/') ?? "" });
-    }
-
     private void HandleGetAIConfigMetadata()
     {
         var clientType = GetQueryValue("clientType");
@@ -559,15 +463,7 @@ public class InitController : Controller
             return;
         }
 
-        var dataDir = form.GetValueOrDefault("dataDirectory", "").Trim();
-        if (string.IsNullOrEmpty(dataDir))
-        {
-            ShowFormWithError(_localization.InitDataDirectoryRequiredError);
-            return;
-        }
-
         _configData.UserNickname = nickname;
-        _configData.DataDirectory = new DirectoryInfo(dataDir);
 
         var curatorName = form.GetValueOrDefault("curatorName", "").Trim();
         if (string.IsNullOrEmpty(curatorName))
@@ -684,66 +580,14 @@ public class InitController : Controller
 
         var validateBody = Js.Block()
             .Add(() => Js.Const(() => "n", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "nickname"))))
-            .Add(() => Js.Const(() => "d", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dataDirInput"))))
             .Add(() => Js.Const(() => "c", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "curatorName"))))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 { (Js.Id(() => "n").Prop(() => "value").Call(() => "trim").Not(), new List<JsSyntax> { Js.Id(() => "n").Call(() => "focus").Stmt(), Js.Return(() => Js.Bool(() => false)) }) },
                 { (Js.Id(() => "c").Prop(() => "value").Call(() => "trim").Not(), new List<JsSyntax> { Js.Id(() => "c").Call(() => "focus").Stmt(), Js.Return(() => Js.Bool(() => false)) }) },
-                { (Js.Id(() => "d").Prop(() => "value").Call(() => "trim").Not(), new List<JsSyntax> { Js.Id(() => "d").Call(() => "focus").Stmt(), Js.Return(() => Js.Bool(() => false)) }) },
                 { (null, new List<JsSyntax> { Js.Return(() => Js.Bool(() => true)) }) }
             }));
         js.Add(() => Js.Func(() => "validateInitForm", () => new List<string>(), () => validateBody));
-
-        js.Add(() => Js.Let(() => "dirBrowserOpen", () => Js.Bool(() => false)));
-
-        var openDirBody = Js.Block()
-            .Add(() => Js.Const(() => "db", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirBrowser"))))
-            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
-            {
-                { (Js.Id(() => "dirBrowserOpen"), new List<JsSyntax>
-                    {
-                        Js.Assign(() => Js.Id(() => "db").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "none")),
-                        Js.Assign(() => Js.Id(() => "dirBrowserOpen"), () => Js.Bool(() => false)),
-                        Js.Return(() => Js.Str(() => ""))
-                    })
-                }
-            }))
-            .Add(() => Js.Assign(() => Js.Id(() => "dirBrowserOpen"), () => Js.Bool(() => true)))
-            .Add(() => Js.Assign(() => Js.Id(() => "db").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "block")))
-            .Add(() => Js.Id(() => "browseDir").Invoke(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dataDirInput")).Prop(() => "value").Op(() => "||", () => (JsSyntax)Js.Str(() => "/"))).Stmt());
-        js.Add(() => Js.Func(() => "openDirBrowser", () => new List<string>(), () => openDirBody));
-
-        var browseDirBody = Js.Block()
-            .Add(() => Js.Const(() => "url", () => Js.Str(() => "/init/browse?dir=").Op(() => "+", () => (JsSyntax)Js.Id(() => "encodeURIComponent").Invoke(() => Js.Id(() => "path")))))
-            .Add(() => Js.Const(() => "db", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirBrowser"))));
-
-        var escapeHtml = Js.Id(() => "s")
-            .Call(() => "replace", () => Js.Regex(() => @"\&", () => "g"), () => Js.Str(() => "&amp;"))
-            .Call(() => "replace", () => Js.Regex(() => "\"", () => "g"), () => Js.Str(() => "&quot;"))
-            .Call(() => "replace", () => Js.Regex(() => "<", () => "g"), () => Js.Str(() => "&lt;"))
-            .Call(() => "replace", () => Js.Regex(() => ">", () => "g"), () => Js.Str(() => "&gt;"));
-        browseDirBody.Add(() => Js.Const(() => "h", () => Js.Arrow(() => new List<string> { "s" }, () => escapeHtml)));
-
-        var forEachBlock = Js.Block()
-            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "<div class=\"dir-item\" onclick=\"browseDir('")).Call(() => "concat", () => Js.Id(() => "d").Prop(() => "path")).Call(() => "concat", () => Js.Str(() => "')\">"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Id(() => "h").Invoke(() => Js.Id(() => "d").Prop(() => "name"))).Call(() => "concat", () => Js.Str(() => "</div>"))));
-
-        var innerBlock = Js.Block()
-            .Add(() => Js.Let(() => "html", () => Js.Str(() => "<div class=\"dir-header\"><span class=\"dir-current\">")))
-            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Id(() => "h").Invoke(() => Js.Id(() => "data").Prop(() => "currentPath")))))
-            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "</span></div><div class=\"dir-list\">"))))
-            .Add(() => Js.Id(() => "data").Prop(() => "directories").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "d" }, () => forEachBlock)))
-            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "</div>"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "db").Prop(() => "innerHTML"), () => Js.Id(() => "html")));
-
-        var dataArrow = Js.Arrow(() => new List<string> { "data" }, () => innerBlock);
-        var responseBlock = Js.Block()
-            .Add(() => Js.Id(() => "response").Call(() => "json").Call(() => "then", () => dataArrow));
-        var fetchThenArrow = Js.Arrow(() => new List<string> { "response" }, () => responseBlock);
-
-        browseDirBody.Add(() => Js.Id(() => "fetch").Invoke(() => Js.Id(() => "url")).Call(() => "then", () => fetchThenArrow));
-        js.Add(() => Js.Func(() => "browseDir", () => new List<string> { "path" }, () => browseDirBody));
 
         var switchLangBody = Js.Block()
             .Add(() => Js.Const(() => "current", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "languageSelect")).Prop(() => "dataset").Prop(() => "current")))

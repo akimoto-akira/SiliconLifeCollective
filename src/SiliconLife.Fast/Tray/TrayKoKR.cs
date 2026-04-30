@@ -122,4 +122,14 @@ public class TrayKoKR : TrayLocalizationBase
     /// Gets the exit menu item text
     /// </summary>
     public override string Exit => "종료";
+
+    /// <summary>
+    /// Gets the web server startup error title
+    /// </summary>
+    public override string WebServerStartupErrorTitle => "웹 서버 시작 실패";
+
+    /// <summary>
+    /// Gets the web server startup error message
+    /// </summary>
+    public override string WebServerStartupErrorMessage => "웹 서버를 시작하지 못했습니다. 애플리케이션이 종료됩니다.\n\n오류: {0}";
 }

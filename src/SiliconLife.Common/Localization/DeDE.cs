@@ -330,6 +330,19 @@ public class DeDE : DefaultLocalizationBase
     public override string MemoryStatTypeDistribution => "Typverteilung";
     public override string MemoryStatKeywordFrequency => "Schlüsselworthäufigkeit";
     public override string MemoryCardViewDetail => "Details anzeigen";
+    public override string MemoryTimelineEmptyState => "Keine Erinnerungsdaten";
+    public override string MemoryYearSummaryLabel => "Jahreszusammenfassung";
+    public override string MemoryMonthSummaryLabel => "Monatszusammenfassung";
+    public override string MemoryDaySummaryLabel => "Tageszusammenfassung";
+    public override string MemoryHourSummaryLabel => "Stundenzusammenfassung";
+    public override string MemoryMinuteSummaryLabel => "Minutenzusammenfassung";
+    public override string MemorySummaryBadge => "Komprimierte Zusammenfassung";
+    public override string MemoryTimelineYearFormat => "{0} ({1} Einträge)";
+    public override string MemoryTimelineMonthFormat => "{0}/{1} ({2} Einträge)";
+    public override string MemoryTimelineDayFormat => "{0}-{1}-{2} ({3} Einträge)";
+    public override string MemoryTimelineHourFormat => "{0}:00 ({1} Einträge)";
+    public override string MemoryTimelineMinuteFormat => "{0}:{1} ({2} Einträge)";
+    public override string MemoryRelatedBeingsLabel => "👥 Verbunden: {0} Wesen";
 
     // ===== Projects Page Localization =====
 
@@ -750,7 +763,6 @@ public class DeDE : DefaultLocalizationBase
         ["DashScopeModel_kimi-k2.5"] = "Kimi K2.5 (Langer Kontext)",
         ["DashScopeModel_llama-4-maverick"] = "Llama 4 Maverick",
         ["WebPort"] = "Web-Port",
-        ["AllowIntranetAccess"] = "Intranet-Zugriff erlauben",
         ["WebSkin"] = "Web-Skin",
         ["UserNickname"] = "Benutzername"
     };
@@ -770,7 +782,6 @@ public class DeDE : DefaultLocalizationBase
         ["DashScopeRegion"] = "Alibaba Cloud DashScope Dienstregion",
         ["DashScopeModel"] = "Auf Alibaba Cloud DashScope verwendetes Modell",
         ["WebPort"] = "Web-Server-Port",
-        ["AllowIntranetAccess"] = "Intranet-Zugriff erlauben (Admin-Rechte erforderlich)",
         ["WebSkin"] = "Web-Skin-Name",
         ["UserNickname"] = "Spitzname des menschlichen Benutzers"
     };
@@ -801,6 +812,20 @@ public class DeDE : DefaultLocalizationBase
         LogLevel.Critical => "Kritisch",
         LogLevel.None => "Keine",
         _ => logLevel.ToString()
+    };
+
+    /// <summary>
+    /// Gets the localized display name for a silicon being activity state.
+    /// </summary>
+    public override string GetBeingActivityName(BeingActivity activity) => activity switch
+    {
+        BeingActivity.Idle => "Untätig",
+        BeingActivity.SingleChat => "Im Einzelchat",
+        BeingActivity.GroupChat => "Im Gruppenchat",
+        BeingActivity.Task => "Aufgabe ausführen",
+        BeingActivity.Timer => "Timer ausführen",
+        BeingActivity.MemoryCompression => "Speicher komprimieren",
+        _ => activity.ToString()
     };
 
     // ===== Tool Display Name Localization =====

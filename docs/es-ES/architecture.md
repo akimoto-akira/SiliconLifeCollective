@@ -9,17 +9,21 @@
 Este proyecto proporciona dos versiones de implementación que comparten el mismo diseño de arquitectura pero difieren en almacenamiento y optimización de rendimiento:
 
 ### SiliconLife.Default (Versión Predeterminada)
+- **Posicionamiento**: Implementación predeterminada, utilizada principalmente para verificación de viabilidad de arquitectura
 - **Modo de Ejecución**: Aplicación de consola
 - **Almacenamiento**: Almacenamiento JSON del sistema de archivos puro
 - **Escenario de Aplicación**: Requisitos altos de seguridad de datos, recursos de memoria limitados, escenarios de bajo volumen de datos
+- **Descripción de Rol**: Implementación de referencia para verificación de arquitectura que proporciona una ejecución simple y confiable, adecuada para primer contacto, depuración de desarrollo o escenarios donde la seguridad de datos es prioritaria
 
 ### SiliconLife.Fast (Versión de Alto Rendimiento)
+- **Posicionamiento**: Versión de producción principal
 - **Modo de Ejecución**: Aplicación de formularios Windows (con soporte de bandeja del sistema)
 - **Almacenamiento**: Almacenamiento en memoria + persistencia por lotes asíncrona (registro WAL)
 - **Escenario de Aplicación**: Escenarios de alta concurrencia, baja latencia, gran volumen de datos
 - **Mejora de Rendimiento**: Latencia de lectura de almacenamiento reducida 1000 veces, latencia de escritura reducida 15000 veces
+- **Descripción de Rol**: Implementación de nivel de producción con optimización profunda que incluye ejecución en segundo plano de la bandeja del sistema y optimización extrema de rendimiento, la mejor opción para operaciones a largo plazo y entornos de producción reales
 
-> **Nota**: La arquitectura descrita en este documento se aplica a ambas versiones, con diferencias solo en la parte de implementación de almacenamiento.
+> **Nota**: La arquitectura descrita en este documento se aplica a ambas versiones, con diferencias solo en la parte de implementación de almacenamiento. SiliconLife.Default es la referencia de verificación de arquitectura, SiliconLife.Fast es la versión principal para entornos de producción.
 
 ---
 

@@ -1,4 +1,4 @@
-﻿# Roadmap
+# Roadmap
 
 > **Version: v0.1.0-alpha**
 
@@ -7,10 +7,14 @@
 ## Dual-Version Roadmap
 
 ### SiliconLife.Default (Default Version)
-Current phases 1-10.6 are completed, system is running stably.
+- **Positioning**: Default implementation, primarily used for architecture feasibility verification
+- **Current Status**: Phases 1-10.6 are completed, system is running stably
+- **Role Description**: Serves as the baseline implementation for architecture verification, ensuring the correctness and feasibility of the core architecture design
 
 ### SiliconLife.Fast (High-Performance Version)
-Basic architecture porting is completed, ongoing optimization in progress.
+- **Positioning**: Main production version
+- **Current Status**: Basic architecture porting is completed, ongoing optimization in progress
+- **Role Description**: Based on the architecture verified by the Default version, performs deep performance optimization and production feature enhancements, the first choice for actual deployment
 
 **Fast Version Development Plan**:
 - ✅ Phase 1: Basic project structure and configuration system porting

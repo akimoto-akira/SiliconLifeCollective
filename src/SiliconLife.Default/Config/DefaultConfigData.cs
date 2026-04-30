@@ -29,7 +29,7 @@ public class DefaultConfigData : ConfigDataBase
     /// Gets or sets the data directory for storing all application data
     /// </summary>
     [ConfigGroup("Basic", Order = 2, DisplayNameKey = "DataDirectory", DescriptionKey = "DataDirectory")]
-    public override DirectoryInfo DataDirectory { get; set; } = new DirectoryInfo("./data");
+    public DirectoryInfo DataDirectory { get; set; } = new DirectoryInfo("./data");
 
     /// <summary>
     /// Gets or sets the GUID of the curator (main administrator)
@@ -91,12 +91,6 @@ public class DefaultConfigData : ConfigDataBase
     /// </summary>
     [ConfigGroup("Web", Order = 2, DisplayNameKey = "WebPort", DescriptionKey = "WebPort")]
     public int WebPort { get; set; } = 8080;
-
-    /// <summary>
-    /// Gets or sets whether to allow intranet access (requires admin)
-    /// </summary>
-    [ConfigGroup("Web", Order = 3, DisplayNameKey = "AllowIntranetAccess", DescriptionKey = "AllowIntranetAccess")]
-    public bool AllowIntranet { get; set; } = false;
 
     /// <summary>
     /// Gets or sets the web skin name
@@ -167,7 +161,6 @@ public class DefaultConfigData : ConfigDataBase
                     AIClientType = loadedData.AIClientType;
                     AIConfig = loadedData.AIConfig ?? new Dictionary<string, object>();
                     WebPort = loadedData.WebPort;
-                    AllowIntranet = loadedData.AllowIntranet;
                     WebSkin = loadedData.WebSkin;
                     UserNickname = loadedData.UserNickname;
                 }

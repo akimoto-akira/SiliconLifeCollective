@@ -95,6 +95,7 @@ public class ChatController : Controller
 
         var sessions = new List<ChatSessionItem>();
         Guid? currentSessionId = null;
+        Guid? currentBeingId = null;
         string currentBeingName = "";
         Guid? curatorSessionId = null;
         string curatorBeingName = "";
@@ -105,12 +106,14 @@ public class ChatController : Controller
             var lastMsg = messages.LastOrDefault();
 
             string displayName;
+            Guid? beingId = null;
             if (session.Type == SessionType.SingleChat)
             {
                 var otherId = session.Members.FirstOrDefault(id => id != _userId);
                 if (otherId != Guid.Empty && beingDict.TryGetValue(otherId, out var being))
                 {
                     displayName = loc.GetSingleChatDisplayName(being.Name);
+                    beingId = otherId;
                     // Track curator session separately to prioritize it
                     if (being.IsCurator)
                     {
@@ -121,6 +124,7 @@ public class ChatController : Controller
                     if (currentSessionId == null)
                     {
                         currentSessionId = session.Id;
+                        currentBeingId = otherId;
                         currentBeingName = displayName;
                     }
                 }
@@ -146,7 +150,8 @@ public class ChatController : Controller
                 Id = session.Id,
                 Name = displayName,
                 LastMessage = lastMsg?.Content ?? "",
-                LastMessageAt = lastMsg?.Timestamp ?? DateTime.MinValue
+                LastMessageAt = lastMsg?.Timestamp ?? DateTime.MinValue,
+                BeingId = beingId
             });
         }
 
@@ -154,6 +159,13 @@ public class ChatController : Controller
         if (curatorSessionId.HasValue)
         {
             currentSessionId = curatorSessionId;
+            // Find the being ID for curator session
+            var curatorSession = _chatSystem.GetSessionsForUser(_userId, beings.Select(b => b.Id))
+                .FirstOrDefault(s => s.Id == curatorSessionId);
+            if (curatorSession != null)
+            {
+                currentBeingId = curatorSession.Members.FirstOrDefault(id => id != _userId);
+            }
             currentBeingName = curatorBeingName;
         }
 
@@ -163,7 +175,8 @@ public class ChatController : Controller
             ActiveMenu = "chat",
             UserId = _userId,
             Sessions = sessions,
-            CurrentBeingId = currentSessionId,
+            CurrentSessionId = currentSessionId,
+            CurrentBeingId = currentBeingId,
             CurrentBeingName = currentBeingName
         };
 
@@ -179,6 +192,12 @@ public class ChatController : Controller
                 if (tool != null)
                     vm.ToolDisplayNames[toolName] = tool.GetDisplayName(language);
             }
+        }
+
+        // Build activity status name map for the frontend status badge
+        foreach (var activity in Enum.GetValues<BeingActivity>())
+        {
+            vm.ActivityStatusNames[activity.ToString()] = loc.GetBeingActivityName(activity);
         }
 
         var html = view.Render(vm);
@@ -241,6 +260,16 @@ public class ChatController : Controller
                     {
                         continue;
                     }
+
+                    conversations.Add(new
+                    {
+                        sessionId = session.Id.ToString(),
+                        beingId = otherId.ToString(),
+                        type,
+                        displayName,
+                        lastMessage = lastMsg?.Content ?? "",
+                        lastTime = lastMsg?.Timestamp.ToString("HH:mm") ?? ""
+                    });
                 }
                 else
                 {
@@ -249,16 +278,17 @@ public class ChatController : Controller
                         .Select(id => id == _userId ? userNickname : beingDict.GetValueOrDefault(id)?.Name ?? id.ToString("N").Substring(0, 8))
                         .ToArray();
                     displayName = string.Join(", ", memberNames);
-                }
 
-                conversations.Add(new
-                {
-                    sessionId = session.Id.ToString(),
-                    type,
-                    displayName,
-                    lastMessage = lastMsg?.Content ?? "",
-                    lastTime = lastMsg?.Timestamp.ToString("HH:mm") ?? ""
-                });
+                    conversations.Add(new
+                    {
+                        sessionId = session.Id.ToString(),
+                        beingId = (string?)null,
+                        type,
+                        displayName,
+                        lastMessage = lastMsg?.Content ?? "",
+                        lastTime = lastMsg?.Timestamp.ToString("HH:mm") ?? ""
+                    });
+                }
             }
 
             RenderJson(conversations);

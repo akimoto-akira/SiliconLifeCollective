@@ -10,7 +10,10 @@ Silicon Life Collective 採用分層架構設計：
 
 ```
 ┌─────────────────────────────────────────┐
-│   SiliconLife.Default (實現 + 入口點)    │
+│   SiliconLife.Default (預設實現 + 入口點) │
+│   SiliconLife.Fast (高效能實現 + 入口點)  │
+├─────────────────────────────────────────┤
+│   SiliconLife.Common (共享實現)          │
 ├─────────────────────────────────────────┤
 │   SiliconLife.Core (介面 + 抽象類別)     │
 └─────────────────────────────────────────┘
@@ -19,9 +22,18 @@ Silicon Life Collective 採用分層架構設計：
 ### 專案結構
 
 - **SiliconLife.Core** - 核心介面、抽象類別和通用基礎設施
-- **SiliconLife.Default** - 具體實現、業務邏輯和應用程式入口點
+- **SiliconLife.Common** - 共享實現（兩個版本共用）
+- **SiliconLife.Default** - 預設實現、應用程式入口點（架構可行性驗證）
+- **SiliconLife.Fast** - 高效能實現、應用程式入口點（主推生產版本）
 
-依賴方向：Default → Core（單向依賴）
+**依賴方向**：
+- `SiliconLife.Default` → `SiliconLife.Core`（單向）
+- `SiliconLife.Fast` → `SiliconLife.Core`（單向）
+- `SiliconLife.Common` → `SiliconLife.Core`（單向）
+
+**版本角色說明**：
+- **SiliconLife.Default**：預設實現，主要用於驗證架構可行性。提供簡單可靠的檔案系統儲存實現，適合開發調試和架構驗證。
+- **SiliconLife.Fast**：主推生產版本。在 Default 驗證的架構基礎上，採用記憶體儲存 + 異步持久化，提供極致效能最佳化，是長期運行和實際生產環境的首選。
 
 ---
 

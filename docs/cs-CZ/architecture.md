@@ -9,17 +9,21 @@
 Tento projekt poskytuje dvě implementační verze, které sdílejí stejný návrh architektury, ale liší se v úložišti a optimalizaci výkonu:
 
 ### SiliconLife.Default (Výchozí Verze)
+- **Pozicování**: Výchozí implementace, používána především pro ověření proveditelnosti architektury
 - **Režim Spuštění**: Konzolová aplikace
 - **Úložiště**: Čisté souborové JSON úložiště
 - **Scénář Použití**: Vysoké požadavky na bezpečnost dat, omezené paměťové zdroje, scénáře s malým objemem dat
+- **Popis role**: Referenční implementace pro ověření architektury, poskytuje jednoduché a spolehlivé spuštění, vhodná pro první kontakt, vývojové ladění nebo scénáře s prioritou bezpečnosti dat
 
 ### SiliconLife.Fast (Vysoce Výkonná Verze)
+- **Pozicování**: Hlavní produkční verze
 - **Režim Spuštění**: Windows Forms aplikace (s podporou systémové lišty)
 - **Úložiště**: Paměťové úložiště + asynchronní dávková perzistence (WAL protokol)
 - **Scénář Použití**: Scénáře s vysokou souběžností, nízkou latencí, velkým objemem dat
 - **Zlepšení Výkonu**: Latence čtení úložiště snížena 1000x, latence zápisu snížena 15000x
+- **Popis role**: Produkční implementace s hlubokou optimalizací, se systémovou lištou na pozadí a extrémní optimalizací výkonu, nejlepší volba pro dlouhodobý provoz a reálné produkční prostředí
 
-> **Poznámka**: Architektura popsaná v tomto dokumentu platí pro obě verze, s rozdíly pouze v části implementace úložiště.
+> **Poznámka**: Architektura popsaná v tomto dokumentu platí pro obě verze, s rozdíly pouze v části implementace úložiště. SiliconLife.Default je referenční ověření architektury, SiliconLife.Fast je hlavní verze pro produkční prostředí.
 
 ---
 

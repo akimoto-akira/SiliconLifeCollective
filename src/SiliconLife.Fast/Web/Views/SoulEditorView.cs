@@ -12,6 +12,7 @@
 // limitations under the License.
 
 using SiliconLife.Fast.Web.Models;
+using SiliconLife.Fast.Web.Component;
 
 namespace SiliconLife.Fast.Web.Views;
 
@@ -32,7 +33,7 @@ public class SoulEditorView : ViewBase
     private static H RenderBody(SoulEditorViewModel vm)
     {
         var editorId = "soulEditor";  // Use camelCase to avoid invalid JS identifier (no hyphens)
-        var editorWidget = MarkdownEditorView.RenderWidget(
+        var editorWidget = MarkdownEditorComponent.RenderWidget(
             editorId,
             vm.SoulContent,
             $"soul.md ({vm.BeingName})",
@@ -57,7 +58,7 @@ public class SoulEditorView : ViewBase
 
     private static CssBuilder GetStyles()
     {
-        var markdownStyles = MarkdownEditorView.GetWidgetStyles();
+        var markdownStyles = MarkdownEditorComponent.GetWidgetStyles();
         
         return markdownStyles
             .Selector(".soul-editor-header")
@@ -95,7 +96,7 @@ public class SoulEditorView : ViewBase
     private static JsSyntax GetScripts(SoulEditorViewModel vm)
     {
         var editorId = "soulEditor";  // Use camelCase to avoid invalid JS identifier (no hyphens)
-        var editorScripts = MarkdownEditorView.GetWidgetScripts(
+        var editorScripts = MarkdownEditorComponent.GetWidgetScripts(
             editorId,
             initialContent: vm.SoulContent,
             readOnly: false,

@@ -1,4 +1,4 @@
-﻿# 개발 가이드
+# 개발 가이드
 
 > **버전: v0.1.0-alpha**
 
@@ -14,11 +14,20 @@ SiliconLifeCollective는 핵심 인터페이스와 기본 구현 간 엄격한 �
 SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/      # 인터페이스, 추상화, 공통 인프라
-│   └── SiliconLife.Default/   # 구체 구현, 진입점
+│   ├── SiliconLife.Common/    # 공유 구현 (두 버전 모두 사용)
+│   ├── SiliconLife.Default/   # 기본 구현, 진입점 (아키텍처 실현 가능성 검증)
+│   └── SiliconLife.Fast/      # 고성능 구현, 진입점 (주력 프로덕션 버전)
 └── docs/                      # 다국어 문서
 ```
 
-**의존 방향**: `SiliconLife.Default` → `SiliconLife.Core` (단방향)
+**의존 방향**:
+- `SiliconLife.Default` → `SiliconLife.Core` (단방향)
+- `SiliconLife.Fast` → `SiliconLife.Core` (단방향)
+- `SiliconLife.Common` → `SiliconLife.Core` (단방향)
+
+**버전 역할 설명**:
+- **SiliconLife.Default**: 기본 구현, 아키텍처 실현 가능성 검증에 주로 사용. 단순하고 신뢰성 높은 파일 시스템 저장소 구현을 제공하며, 개발 디버깅과 아키텍처 검증에 적합합니다.
+- **SiliconLife.Fast**: 주력 프로덕션 버전. Default에서 검증된 아키텍처 기반 위에 메모리 저장소 + 비동기 영속성을 채택하여 극한의 성능 최적화를 제공합니다. 장기 운영 및 실제 프로덕션 환경의 최선의 선택입니다.
 
 ## 핵심 개념
 
