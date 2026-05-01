@@ -72,7 +72,7 @@ public class ProjectManager : IProjectManager
         project.StoragePath = projectDir;
 
         // Initialize work note system for the project
-        var workNoteStorage = new LiteDBWorkNoteStorage();
+        var workNoteStorage = new SpeedyWorkNoteStorage();
         var workNoteSystem = new WorkNoteSystem(workNoteStorage, project.Id, WorkNoteOwnerType.Project);
         lock (_lock)
         {
@@ -319,7 +319,7 @@ public class ProjectManager : IProjectManager
                 SaveProjectsInternal(projects);
             }
 
-            var storage = new LiteDBWorkNoteStorage();
+            var storage = new SpeedyWorkNoteStorage();
             var system = new WorkNoteSystem(storage, project.Id, WorkNoteOwnerType.Project);
             _workNoteSystems[projectId] = system;
             return system;
@@ -356,7 +356,7 @@ public class ProjectManager : IProjectManager
                 SaveProjectsInternal(projects);
             }
 
-            var storage = new LiteDBStorage();
+            var storage = new SpeedyStorage();
             var system = new ProjectTaskSystem(project.Id, storage);
             _projectTaskSystems[projectId] = system;
             return system;

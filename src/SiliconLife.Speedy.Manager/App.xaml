@@ -1,0 +1,15 @@
+﻿<Application x:Class="SiliconLife.Speedy.Manager.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:SiliconLife.Speedy.Manager.Converters">
+    <Application.Resources>
+        <!-- ─── Converters ─── -->
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:ByteSizeToStringConverter x:Key="ByteSizeToStringConverter"/>
+        <converters:ContentTypeToIconConverter x:Key="ContentTypeToIconConverter"/>
+
+        <!-- ─── Null-to-Collapsed converter ─── -->
+        <!-- Used in dialogs to hide validation error text when null -->
+        <converters:NullToCollapsedConverter x:Key="NullToCollapsedConverter"/>
+    </Application.Resources>
+</Application>

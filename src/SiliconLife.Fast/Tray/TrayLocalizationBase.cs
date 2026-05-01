@@ -115,11 +115,6 @@ public abstract class TrayLocalizationBase
     public abstract string Configuration { get; }
 
     /// <summary>
-    /// Gets the LiteDB management menu item text
-    /// </summary>
-    public abstract string LiteDBManagement { get; }
-
-    /// <summary>
     /// Gets the exit menu item text
     /// </summary>
     public abstract string Exit { get; }

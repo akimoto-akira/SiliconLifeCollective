@@ -13,14 +13,13 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
-using LiteDB;
+using System.Text.Json;
 
 namespace SiliconLife.Fast.Knowledge;
 
 /// <summary>
-/// Knowledge network manager - Default implementation
-/// Implements IKnowledgeNetwork interface, providing complete knowledge network operation capabilities
-/// Uses LiteDB for persistent storage
+/// Knowledge network manager - Default implementation.
+/// Uses SpeedyStorage for persistent storage.
 /// </summary>
 public class KnowledgeNetwork : IKnowledgeNetwork
 {
@@ -29,9 +28,17 @@ public class KnowledgeNetwork : IKnowledgeNetwork
     private readonly ReaderWriterLockSlim _lock = new();
     private bool _initialized;
 
-    // LiteDB collection
-    private object? _entriesCollection;
-    private object? _graphCollection;
+    private SpeedyStorage? _storage;
+
+    private const string EntriesKey = "knowledge/entries";
+    private const string GraphKey   = "knowledge/graph";
+
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        WriteIndented = false,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true
+    };
 
     /// <summary>
     /// Initialize the knowledge network
@@ -40,17 +47,7 @@ public class KnowledgeNetwork : IKnowledgeNetwork
     {
         if (_initialized) return;
 
-        // Initialize LiteDB collections
-        _entriesCollection = LiteDBManager.GetCollection<KnowledgeEntryRecord>("knowledge_entries");
-        _graphCollection = LiteDBManager.GetCollection<KnowledgeGraphRecord>("knowledge_graph");
-
-        // Create indexes
-        ((ILiteCollection<KnowledgeEntryRecord>)_entriesCollection).EnsureIndex(x => x.EntryId);
-        ((ILiteCollection<KnowledgeEntryRecord>)_entriesCollection).EnsureIndex(x => x.TripleSubject);
-        ((ILiteCollection<KnowledgeEntryRecord>)_entriesCollection).EnsureIndex(x => x.TriplePredicate);
-        ((ILiteCollection<KnowledgeEntryRecord>)_entriesCollection).EnsureIndex(x => x.TripleObject);
-
-        ((ILiteCollection<KnowledgeGraphRecord>)_graphCollection).EnsureIndex(x => x.RecordId);
+        _storage = new SpeedyStorage();
 
         _initialized = true;
         Load();
@@ -407,67 +404,26 @@ public class KnowledgeNetwork : IKnowledgeNetwork
     }
 
     /// <summary>
-    /// Save knowledge network to LiteDB
+    /// Save knowledge network to storage.
     /// </summary>
     public void Save()
     {
-        if (!_initialized)
+        if (!_initialized || _storage == null)
             throw new InvalidOperationException("Knowledge network not initialized");
 
         _lock.EnterReadLock();
         try
         {
-            var entriesColl = (ILiteCollection<KnowledgeEntryRecord>)_entriesCollection!;
-            var graphColl = (ILiteCollection<KnowledgeGraphRecord>)_graphCollection!;
+            _storage.Write(EntriesKey, _entries.Values.ToList());
 
-            // Save entries
-            entriesColl.DeleteAll();
-            foreach (var entry in _entries.Values)
+            var graphSnapshot = new GraphSnapshot
             {
-                var record = new KnowledgeEntryRecord
-                {
-                    EntryId = entry.Id,
-                    TripleSubject = entry.Triple.Subject,
-                    TriplePredicate = entry.Triple.Predicate,
-                    TripleObject = entry.Triple.Object,
-                    TripleTags = entry.Triple.Tags,
-                    TripleCategory = entry.Triple.Category,
-                    TripleConfidence = entry.Triple.Confidence,
-                    TripleSource = entry.Triple.Source,
-                    CreatedBy = entry.CreatedBy,
-                    ModifiedBy = entry.ModifiedBy,
-                    CreatedAt = entry.CreatedAt,
-                    ModifiedAt = entry.ModifiedAt,
-                    ValidationStatus = entry.ValidationStatus,
-                    ValidatedBy = entry.ValidatedBy,
-                    ChangeHistory = entry.ChangeHistory,
-                    Data = BsonMapper.Global.Serialize(entry).AsDocument
-                };
-                entriesColl.Insert(record);
-            }
-
-            // Save graph
-            graphColl.DeleteAll();
-            var graphRecord = new KnowledgeGraphRecord
-            {
-                RecordId = "graph",
-                SubjectIndex = _graph.SubjectIndex,
-                ObjectIndex = _graph.ObjectIndex,
+                SubjectIndex   = _graph.SubjectIndex,
+                ObjectIndex    = _graph.ObjectIndex,
                 PredicateIndex = _graph.PredicateIndex,
-                TripleIds = _graph.TripleIds.ToList(),
-                TotalTriples = _graph.Statistics.TotalTriples,
-                TotalSubjects = _graph.Statistics.TotalSubjects,
-                TotalObjects = _graph.Statistics.TotalObjects,
-                TotalPredicates = _graph.Statistics.TotalPredicates,
-                Data = BsonMapper.Global.Serialize(new
-                {
-                    SubjectIndex = _graph.SubjectIndex,
-                    ObjectIndex = _graph.ObjectIndex,
-                    PredicateIndex = _graph.PredicateIndex,
-                    TripleIds = _graph.TripleIds.ToList()
-                }).AsDocument
+                TripleIds      = _graph.TripleIds.ToList()
             };
-            graphColl.Insert(graphRecord);
+            _storage.Write(GraphKey, graphSnapshot);
         }
         finally
         {
@@ -476,47 +432,34 @@ public class KnowledgeNetwork : IKnowledgeNetwork
     }
 
     /// <summary>
-    /// Load knowledge network from LiteDB
+    /// Load knowledge network from storage.
     /// </summary>
     public void Load()
     {
-        if (!_initialized)
+        if (!_initialized || _storage == null)
             throw new InvalidOperationException("Knowledge network not initialized");
 
         _lock.EnterWriteLock();
         try
         {
-            var entriesColl = (ILiteCollection<KnowledgeEntryRecord>)_entriesCollection!;
-            var graphColl = (ILiteCollection<KnowledgeGraphRecord>)_graphCollection!;
-
-            // Load entries
             _entries.Clear();
-            var entryRecords = entriesColl.FindAll().ToList();
-            foreach (var record in entryRecords)
-            {
-                if (record.Data != null)
-                {
-                    var entry = BsonMapper.Global.Deserialize<KnowledgeEntry>(record.Data);
-                    if (entry != null)
-                    {
-                        _entries[entry.Id] = entry;
-                    }
-                }
-            }
+            var entries = _storage.Read<List<KnowledgeEntry>>(EntriesKey);
+            if (entries != null)
+                foreach (var entry in entries)
+                    _entries[entry.Id] = entry;
 
-            // Load graph
-            var graphRecord = graphColl.FindOne(x => x.RecordId == "graph");
-            if (graphRecord != null)
+            _graph.Clear();
+            var graphSnapshot = _storage.Read<GraphSnapshot>(GraphKey);
+            if (graphSnapshot != null)
             {
-                _graph.Clear();
-                _graph.SubjectIndex = graphRecord.SubjectIndex ?? new();
-                _graph.ObjectIndex = graphRecord.ObjectIndex ?? new();
-                _graph.PredicateIndex = graphRecord.PredicateIndex ?? new();
-                _graph.TripleIds = new HashSet<string>(graphRecord.TripleIds ?? new());
-                _graph.Statistics.TotalTriples = graphRecord.TotalTriples;
-                _graph.Statistics.TotalSubjects = graphRecord.TotalSubjects;
-                _graph.Statistics.TotalObjects = graphRecord.TotalObjects;
-                _graph.Statistics.TotalPredicates = graphRecord.TotalPredicates;
+                _graph.SubjectIndex   = graphSnapshot.SubjectIndex   ?? new();
+                _graph.ObjectIndex    = graphSnapshot.ObjectIndex    ?? new();
+                _graph.PredicateIndex = graphSnapshot.PredicateIndex ?? new();
+                _graph.TripleIds      = new HashSet<string>(graphSnapshot.TripleIds ?? new());
+                _graph.Statistics.TotalTriples    = _graph.TripleIds.Count;
+                _graph.Statistics.TotalSubjects   = _graph.SubjectIndex.Count;
+                _graph.Statistics.TotalObjects    = _graph.ObjectIndex.Count;
+                _graph.Statistics.TotalPredicates = _graph.PredicateIndex.Count;
             }
         }
         finally
@@ -588,12 +531,7 @@ public class KnowledgeNetwork : IKnowledgeNetwork
         _lock.EnterWriteLock();
         try
         {
-            var entriesColl = (ILiteCollection<KnowledgeEntryRecord>)_entriesCollection!;
-            var graphColl = (ILiteCollection<KnowledgeGraphRecord>)_graphCollection!;
-
             // Clear current data
-            entriesColl.DeleteAll();
-            graphColl.DeleteAll();
             _entries.Clear();
             _graph.Clear();
 
@@ -639,7 +577,7 @@ public class KnowledgeNetwork : IKnowledgeNetwork
                 }
             }
 
-            // Save to LiteDB
+            // Save restored data
             Save();
         }
         finally
@@ -748,43 +686,12 @@ file class GraphData
 }
 
 /// <summary>
-/// Knowledge entry record for LiteDB storage
+/// Graph snapshot for SpeedyStorage persistence.
 /// </summary>
-internal class KnowledgeEntryRecord
+internal sealed class GraphSnapshot
 {
-    public ObjectId Id { get; set; } = ObjectId.NewObjectId();
-    public string EntryId { get; set; } = string.Empty;
-    public string TripleSubject { get; set; } = string.Empty;
-    public string TriplePredicate { get; set; } = string.Empty;
-    public string TripleObject { get; set; } = string.Empty;
-    public List<string> TripleTags { get; set; } = new();
-    public string TripleCategory { get; set; } = string.Empty;
-    public double TripleConfidence { get; set; }
-    public string TripleSource { get; set; } = string.Empty;
-    public string CreatedBy { get; set; } = string.Empty;
-    public string ModifiedBy { get; set; } = string.Empty;
-    public DateTime CreatedAt { get; set; }
-    public DateTime ModifiedAt { get; set; }
-    public KnowledgeValidationStatus ValidationStatus { get; set; }
-    public List<string> ValidatedBy { get; set; } = new();
-    public List<KnowledgeChangeLog> ChangeHistory { get; set; } = new();
-    public BsonDocument? Data { get; set; }
-}
-
-/// <summary>
-/// Knowledge graph record for LiteDB storage
-/// </summary>
-internal class KnowledgeGraphRecord
-{
-    public ObjectId Id { get; set; } = ObjectId.NewObjectId();
-    public string RecordId { get; set; } = string.Empty;
     public Dictionary<string, Dictionary<string, List<string>>> SubjectIndex { get; set; } = new();
     public Dictionary<string, Dictionary<string, List<string>>> ObjectIndex { get; set; } = new();
     public Dictionary<string, List<(string Subject, string Object)>> PredicateIndex { get; set; } = new();
     public List<string> TripleIds { get; set; } = new();
-    public int TotalTriples { get; set; }
-    public int TotalSubjects { get; set; }
-    public int TotalObjects { get; set; }
-    public int TotalPredicates { get; set; }
-    public BsonDocument? Data { get; set; }
 }

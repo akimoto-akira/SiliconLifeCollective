@@ -114,11 +114,6 @@ public class TrayCsCZ : TrayLocalizationBase
     public override string Configuration => "Konfigurace";
 
     /// <summary>
-    /// Gets the LiteDB management menu item text
-    /// </summary>
-    public override string LiteDBManagement => "Správa LiteDB";
-
-    /// <summary>
     /// Gets the exit menu item text
     /// </summary>
     public override string Exit => "Ukončit";

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -19,6 +19,7 @@ using SiliconLife.Fast.Logging;
 using SiliconLife.Fast.Tray;
 using SiliconLife.Fast.Web;
 using System.Text;
+using SiliconLife.Common;
 using SiliconLife.Common.Security;
 using SiliconLife.Common.SiliconBeing;
 using SiliconLife.Common.WebView;
@@ -42,22 +43,20 @@ public class Program
 
     public static async Task Main(string[] args)
     {
+        Debug.RegisterCallback(msg => System.Windows.Forms.MessageBox.Show(msg));
+
+        SpeedyPackRegistry.Initialize();
         _logger.Info(null, "Application starting...");
 
         RegisterLocalizations();
         ConfigDataBaseConverter.RegisterConfigType("Default", typeof(DefaultConfigData));
-
-        // Initialize LiteDB before loading configuration
-        string dbPath = GetDatabasePath();
-        LiteDBManager.Initialize(dbPath);
-        _logger.Info(null, "LiteDB initialized at {0}", dbPath);
 
         Config config = Config.Instance;
         config.Initialize(new DefaultConfigData());
         config.LoadConfig();
 
         DefaultConfigData configData = (DefaultConfigData)config.Data;
-        LogManager.Instance.AddProvider(new LiteDBLoggerProvider());
+        LogManager.Instance.AddProvider(new SpeedyLoggerProvider());
         configData.AIConfig.TryGetValue("endpoint", out var endpointValue);
         configData.AIConfig.TryGetValue("model", out var modelValue);
         _logger.Info(null, "Configuration loaded: endpoint={0}, model={1}",
@@ -65,21 +64,15 @@ public class Program
 
         DefaultLocalizationBase localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(configData.Language);
 
-        Console.WriteLine(localization.WelcomeMessage);
-        Console.WriteLine();
-
-        IStorage storage = new LiteDBStorage();
-        ITimeStorage timeStorage = new LiteDBTimeStorage();
-
-        // Register storage factories for SiliconBeing creation
-        ServiceLocator.Instance.Register<Func<string, ITimeStorage>>(dir => new LiteDBTimeStorage());
-        ServiceLocator.Instance.Register<Func<string, IStorage>>(dir => new LiteDBStorage());
-        ServiceLocator.Instance.Register<Func<string, IWorkNoteStorage>>(dir => new LiteDBWorkNoteStorage());
+        IStorage storage = new SpeedyStorage();
+        ITimeStorage timeStorage = new SpeedyTimeStorage();
+        ServiceLocator.Instance.Register<Func<string, ITimeStorage>>(dir => new SpeedyTimeStorage(dir));
+        ServiceLocator.Instance.Register<Func<string, IStorage>>(dir => new SpeedyStorage());
+        ServiceLocator.Instance.Register<Func<string, IWorkNoteStorage>>(dir => new SpeedyWorkNoteStorage());
         ServiceLocator.Instance.Register<Func<SiliconBeingBase, object>>(being => new PlaywrightWebView((DefaultSiliconBeing)being));
         _logger.Info(null, "Registered: Storage Factories");
 
         // Initialize project manager
-        // Fast project uses LiteDB, no file-based data directory; use current directory as placeholder
         IProjectManager projectManager = new ProjectManager(storage, Environment.CurrentDirectory);
         ServiceLocator.Instance.Register<IProjectManager>(projectManager);
         _logger.Info(null, "Initialized: ProjectManager");
@@ -87,16 +80,15 @@ public class Program
         ChatSystem chatSystem = new ChatSystem(timeStorage);
         _logger.Info(null, "Initialized: ChatSystem");
 
-        ITimeStorage auditStorage = new LiteDBTimeStorage();
+        ITimeStorage auditStorage = new SpeedyTimeStorage();
         AuditLogger auditLogger = new AuditLogger(auditStorage);
         _logger.Info(null, "Initialized: AuditLogger");
 
-        ITimeStorage tokenUsageStorage = new LiteDBTimeStorage();
+        ITimeStorage tokenUsageStorage = new SpeedyTimeStorage();
         TokenUsageAuditManager tokenUsageAuditManager = new TokenUsageAuditManager(tokenUsageStorage);
         _logger.Info(null, "Initialized: TokenUsageAuditManager");
 
         // Initialize knowledge network system
-        // Fast project uses LiteDB, no file-based data directory; use current directory as placeholder
         KnowledgeNetwork knowledgeNetwork = new KnowledgeNetwork();
         knowledgeNetwork.Initialize(Environment.CurrentDirectory);
         ServiceLocator.Instance.Register<IKnowledgeNetwork>(knowledgeNetwork);
@@ -108,22 +100,11 @@ public class Program
         StreamCancellationManager streamCancellationManager = new StreamCancellationManager();
         _logger.Info(null, "Initialized: StreamCancellationManager");
 
-        // Clean up duplicate config records (if any)
-        try
-        {
-            LiteDBManager.DeduplicateConfig();
-        }
-        catch (Exception ex)
-        {
-            _logger.Warn(null, "Failed to deduplicate config: {0}", ex.Message);
-        }
-
         Router router = new Router();
         router.SetInitialized(configData.ConfigExists());
         IIMProvider imProvider = new WebUIProvider(router);
         imProvider.ExitRequested += (s, e) => RequestExit();
 
-        // Fast project uses LiteDB, no file-based data directory; pass empty string
         DefaultPermissionCallback permissionCallback = new DefaultPermissionCallback(string.Empty);
         IMPermissionAskHandler askHandler = new IMPermissionAskHandler(imProvider);
 
@@ -134,7 +115,7 @@ public class Program
             configData.AIConfig,
             storage,
             timeStorage,
-            Environment.CurrentDirectory, // Fast project uses LiteDB, no file-based data directory
+            Environment.CurrentDirectory,
             permissionCallback,
             askHandler);
 
@@ -179,12 +160,6 @@ public class Program
         var trayContext = new TrayApplicationContext(_trayWindow);
         Application.Run(trayContext);
 
-        Console.CancelKeyPress += async (s, e) =>
-        {
-            e.Cancel = true;
-            await ShutdownAsync();
-        };
-
         while (!_shouldExit)
         {
             await Task.Delay(100);
@@ -215,9 +190,8 @@ public class Program
         // Dispose tray window
         _trayWindow?.Dispose();
 
-        // Shutdown LiteDB
-        LiteDBManager.Shutdown();
-        _logger.Info(null, "LiteDB shutdown complete");
+        // Flush and close the single SpeedyPack file handle
+        SpeedyPackRegistry.Dispose();
 
         _shouldExit = true;
         _logger.Info(null, "Application shutdown complete");
@@ -333,24 +307,6 @@ public class Program
         LocalizationManager.Instance.Register<DeCH>(Language.DeCH);
         LocalizationManager.Instance.Register<DeLU>(Language.DeLU);
         LocalizationManager.Instance.Register<DeLI>(Language.DeLI);
-    }
-
-    /// <summary>
-    /// Determines the database file path
-    /// </summary>
-    private static string GetDatabasePath()
-    {
-        // Use siliconlife.db in the application base directory
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string dbPath = Path.Combine(baseDir, "siliconlife.db");
-        
-        if (!File.Exists(dbPath))
-        {
-            // Fallback to current directory
-            dbPath = Path.Combine(Directory.GetCurrentDirectory(), "siliconlife.db");
-        }
-        
-        return dbPath;
     }
 
     public static void RequestExit()

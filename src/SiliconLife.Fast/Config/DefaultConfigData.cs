@@ -11,67 +11,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using SiliconLife.Collective;
 using System.Text.Json;
-using LiteDB;
+using SiliconLife.Collective;
 
 namespace SiliconLife.Fast;
 
 /// <summary>
-/// Default implementation of configuration data
+/// Default implementation of configuration data.
+/// Configuration is persisted as <c>config.json</c> in the application base directory.
 /// </summary>
 public class DefaultConfigData : ConfigDataBase
 {
-    private static readonly ILogger _logger = LogManager.Instance.GetLogger<DefaultConfigData>();
     [ConfigIgnore("系统内部使用，用于多态反序列化")]
     public override string ConfigType { get; set; } = "Default";
 
-    /// <summary>
-    /// Gets or sets the GUID of the curator (main administrator)
-    /// </summary>
     [ConfigIgnore("系统内部标识，不建议手动修改")]
     public override Guid CuratorGuid { get; set; }
 
-    /// <summary>
-    /// Gets or sets the language setting for the application
-    /// </summary>
     [ConfigGroup("Basic", Order = 4, DisplayNameKey = "Language", DescriptionKey = "Language")]
     public override Language Language { get; set; } = Language.ZhCN;
 
-    /// <summary>
-    /// Gets or sets the timeout duration for each tick execution
-    /// </summary>
     [ConfigGroup("Runtime", Order = 1, DisplayNameKey = "TickTimeout", DescriptionKey = "TickTimeout")]
     public override TimeSpan TickTimeout { get; set; } = TimeSpan.FromMinutes(10);
 
-    /// <summary>
-    /// Gets or sets the maximum number of consecutive timeouts allowed before circuit breaker triggers
-    /// </summary>
     [ConfigGroup("Runtime", Order = 2, DisplayNameKey = "MaxTimeoutCount", DescriptionKey = "MaxTimeoutCount")]
     public override int MaxTimeoutCount { get; set; } = 3;
 
-    /// <summary>
-    /// Gets or sets the watchdog timeout duration.
-    /// </summary>
     [ConfigGroup("Runtime", Order = 3, DisplayNameKey = "WatchdogTimeout", DescriptionKey = "WatchdogTimeout")]
     public override TimeSpan WatchdogTimeout { get; set; } = TimeSpan.FromMinutes(10);
 
-    /// <summary>
-    /// Gets or sets the global minimum log level.
-    /// </summary>
     [ConfigGroup("Runtime", Order = 4, DisplayNameKey = "MinLogLevel", DescriptionKey = "MinLogLevel")]
     public override LogLevel MinimumLogLevel { get; set; } = LogLevel.Trace;
 
-    /// <summary>
-    /// Gets or sets the AI client type to use
-    /// </summary>
     [ConfigGroup("AI", Order = 0, DisplayNameKey = "AIClientType", DescriptionKey = "AIClientType")]
     public override string AIClientType { get; set; } = "OllamaClient";
 
-    /// <summary>
-    /// Gets or sets the global AI client configuration dictionary.
-    /// Used when silicon beings don't have their own AI config.
-    /// </summary>
     [ConfigGroup("AI", Order = 1, DisplayNameKey = "AIConfig", DescriptionKey = "AIConfigDescription")]
     public override Dictionary<string, object> AIConfig { get; set; } = new Dictionary<string, object>
     {
@@ -81,108 +55,84 @@ public class DefaultConfigData : ConfigDataBase
         ["maxTokens"] = 4096
     };
 
-    /// <summary>
-    /// Gets or sets the web server port
-    /// </summary>
     [ConfigGroup("Web", Order = 2, DisplayNameKey = "WebPort", DescriptionKey = "WebPort")]
     public int WebPort { get; set; } = 8080;
 
-    /// <summary>
-    /// Gets or sets the web skin name
-    /// </summary>
     [ConfigGroup("Web", Order = 4, DisplayNameKey = "WebSkin", DescriptionKey = "WebSkin")]
     public string WebSkin { get; set; } = null!;
 
-    /// <summary>
-    /// Gets or sets the nickname of the human user
-    /// </summary>
     [ConfigGroup("User", Order = 2, DisplayNameKey = "UserNickname", DescriptionKey = "UserNickname")]
     public override string UserNickname { get; set; } = "User";
 
-    /// <summary>
-    /// Returns identifier indicating LiteDB storage
-    /// </summary>
-    public override string GetConfigPath()
+    private string GetConfigFilePath()
     {
-        return "LiteDB:app_config";
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string configPath = Path.Combine(baseDir, "config.json");
+
+        if (File.Exists(configPath))
+            return configPath;
+
+        return Path.Combine(Directory.GetCurrentDirectory(), "config.json");
     }
 
-    /// <summary>
-    /// Checks whether the configuration exists in LiteDB
-    /// </summary>
-    public override bool ConfigExists()
-    {
-        try
-        {
-            return LiteDBManager.ConfigExists();
-        }
-        catch
-        {
-            return false;
-        }
-    }
+    public override string GetConfigPath() => GetConfigFilePath();
 
-    /// <summary>
-    /// Loads configuration from LiteDB (replaces config.json)
-    /// </summary>
+    public override bool ConfigExists() => File.Exists(GetConfigFilePath());
+
     public override void LoadConfig()
     {
+        string configPath = GetConfigFilePath();
+        if (!File.Exists(configPath)) return;
+
         try
         {
-            var appConfig = LiteDBManager.GetConfig();
-            
-            // Map AppConfig -> DefaultConfigData
-            ConfigType = appConfig.ConfigType;
-            // DataDirectory removed - Fast project uses LiteDB storage, no file-based data directory
-            CuratorGuid = appConfig.CuratorGuid;
-            Language = appConfig.Language;
-            TickTimeout = TimeSpan.FromMinutes(appConfig.TickTimeoutMinutes);
-            MaxTimeoutCount = appConfig.MaxTimeoutCount;
-            WatchdogTimeout = TimeSpan.FromMinutes(appConfig.WatchdogTimeoutMinutes);
-            MinimumLogLevel = appConfig.MinimumLogLevel;
-            AIClientType = appConfig.AIClientType;
-            
-            // Deserialize AIConfig from BsonDocument
-            AIConfig = BsonMapper.Global.Deserialize<Dictionary<string, object>>(appConfig.AIConfig) ?? new Dictionary<string, object>();
-            
-            WebPort = appConfig.WebPort;
-            WebSkin = appConfig.WebSkin ?? string.Empty;
-            UserNickname = appConfig.UserNickname;
+            string json = File.ReadAllText(configPath);
+            DefaultConfigData? loaded = JsonSerializer.Deserialize<DefaultConfigData>(json, new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                Converters =
+                {
+                    new System.Text.Json.Serialization.JsonStringEnumConverter(),
+                    new GuidConverter(),
+                    new ConfigDataBaseConverter()
+                }
+            });
+
+            if (loaded == null) return;
+
+            ConfigType = loaded.ConfigType;
+            CuratorGuid = loaded.CuratorGuid;
+            Language = loaded.Language;
+            TickTimeout = loaded.TickTimeout;
+            MaxTimeoutCount = loaded.MaxTimeoutCount;
+            WatchdogTimeout = loaded.WatchdogTimeout;
+            MinimumLogLevel = loaded.MinimumLogLevel;
+            AIClientType = loaded.AIClientType;
+            AIConfig = loaded.AIConfig ?? new Dictionary<string, object>();
+            WebPort = loaded.WebPort;
+            WebSkin = loaded.WebSkin;
+            UserNickname = loaded.UserNickname;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            _logger.Error(null, "Config Load Error from LiteDB: {0}", ex.Message);
         }
     }
 
-    /// <summary>
-    /// Saves configuration to LiteDB (replaces config.json)
-    /// </summary>
     public override void SaveConfig()
     {
-        try
+        string json = JsonSerializer.Serialize(this, new JsonSerializerOptions
         {
-            var appConfig = new AppConfig
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters =
             {
-                ConfigType = ConfigType,
-                CuratorGuid = CuratorGuid,
-                Language = Language,
-                TickTimeoutMinutes = (int)TickTimeout.TotalMinutes,
-                MaxTimeoutCount = MaxTimeoutCount,
-                WatchdogTimeoutMinutes = (int)WatchdogTimeout.TotalMinutes,
-                MinimumLogLevel = MinimumLogLevel,
-                AIClientType = AIClientType,
-                AIConfig = BsonMapper.Global.Serialize(AIConfig).AsDocument,
-                WebPort = WebPort,
-                WebSkin = string.IsNullOrEmpty(WebSkin) ? null : WebSkin,
-                UserNickname = UserNickname
-            };
-            
-            LiteDBManager.SaveConfig(appConfig);
-        }
-        catch (Exception ex)
-        {
-            _logger.Error(null, "Config Save Error to LiteDB: {0}", ex.Message);
-        }
+                new System.Text.Json.Serialization.JsonStringEnumConverter(),
+                new GuidConverter(),
+                new ConfigDataBaseConverter()
+            }
+        });
+
+        File.WriteAllText(GetConfigFilePath(), json);
     }
 }

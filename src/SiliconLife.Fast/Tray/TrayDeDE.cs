@@ -114,11 +114,6 @@ public class TrayDeDE : TrayLocalizationBase
     public override string Configuration => "Konfiguration";
 
     /// <summary>
-    /// Gets the LiteDB management menu item text
-    /// </summary>
-    public override string LiteDBManagement => "LiteDB-Verwaltung";
-
-    /// <summary>
     /// Gets the exit menu item text
     /// </summary>
     public override string Exit => "Beenden";

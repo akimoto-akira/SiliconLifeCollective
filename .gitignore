@@ -71,3 +71,5 @@ YLog/
 YDoc/
 .qoderignore
 .qoder/
+.kiro/
+src/TravelCodeWikiWithAI/

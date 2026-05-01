@@ -18,6 +18,7 @@ using SiliconLife.Default.Knowledge;
 using SiliconLife.Default.Logging;
 using SiliconLife.Default.Web;
 using System.Text;
+using SiliconLife.Common;
 using SiliconLife.Common.Security;
 using SiliconLife.Common.SiliconBeing;
 using SiliconLife.Common.WebView;
@@ -41,6 +42,8 @@ public class Program
 
     public static async Task Main(string[] args)
     {
+        Debug.RegisterCallback(Console.WriteLine);
+
         _logger.Info(null, "Application starting...");
 
         RegisterLocalizations();

@@ -1,4 +1,4 @@
-﻿# 認识您的数字伴侣
+# 認识您的数字伴侣
 
 > **版本：v0.1.0-alpha**
 
@@ -184,6 +184,6 @@
 
 ---
 
-*由 Hoshino Kennji 和開源社群用心构建*
+*由天源墾驥和開源社群用心构建*
 
 [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective) | [碼雲](https://gitee.com/hoshinokennji/SiliconLifeCollective) | [YouTube](https://www.youtube.com/@hoshinokennji) | [嗶哩嗶哩](https://space.bilibili.com/617827040)

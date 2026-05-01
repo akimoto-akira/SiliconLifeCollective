@@ -12,7 +12,6 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
-using SiliconLife.Fast.LiteDB;
 using System.Diagnostics;
 using System.Drawing;
 using System.Resources;
@@ -98,10 +97,6 @@ public class TrayStatusWindow : Form
         var configItem = new ToolStripMenuItem(_localization.Configuration);
         configItem.Click += (s, e) => OpenConfiguration();
         contextMenuStrip1.Items.Add(configItem);
-
-        var liteDbItem = new ToolStripMenuItem(_localization.LiteDBManagement);
-        liteDbItem.Click += (s, e) => OpenLiteDBManagement();
-        contextMenuStrip1.Items.Add(liteDbItem);
 
         contextMenuStrip1.Items.Add(new ToolStripSeparator());
 
@@ -222,36 +217,6 @@ public class TrayStatusWindow : Form
         catch (Exception ex)
         {
             MessageBox.Show($"Failed to open configuration: {ex.Message}", "Error",
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
-
-    /// <summary>
-    /// Opens the LiteDB management window as a modeless dialog.
-    /// If a window already exists, it is brought to the front instead of creating a new one.
-    /// </summary>
-    private LiteDBAdminWindow? _liteDbWindow;
-    private void OpenLiteDBManagement()
-    {
-        try
-        {
-            if (_liteDbWindow == null || _liteDbWindow.IsDisposed)
-            {
-                var localization = CreateLiteDBLocalization();
-                _liteDbWindow = new LiteDBAdminWindow(localization);
-                _liteDbWindow.FormClosed += (s, e) => _liteDbWindow = null;
-                _liteDbWindow.Show();
-            }
-            else
-            {
-                if (_liteDbWindow.WindowState == FormWindowState.Minimized)
-                    _liteDbWindow.WindowState = FormWindowState.Normal;
-                _liteDbWindow.Activate();
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Failed to open LiteDB management: {ex.Message}", "Error",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
@@ -646,49 +611,6 @@ public class TrayStatusWindow : Form
     /// </summary>
     [System.Runtime.InteropServices.DllImport("gdi32.dll")]
     private static extern IntPtr CreateRoundRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidthEllipse, int nHeightEllipse);
-
-    /// <summary>
-    /// Creates a LiteDBAdminLocalization instance based on the current configured language.
-    /// </summary>
-    private LiteDBAdminLocalization CreateLiteDBLocalization()
-    {
-        var language = Config.Instance?.Data?.Language ?? Language.EnUS;
-        
-        return language switch
-        {
-            Language.ZhCN => new LiteDBAdminLocalizationZhCN(),
-            Language.ZhHK => new LiteDBAdminLocalizationZhHK(),
-            Language.ZhTW => new LiteDBAdminLocalizationZhHK(), // Fallback to ZhHK
-            Language.ZhMO => new LiteDBAdminLocalizationZhHK(), // Fallback to ZhHK
-            Language.ZhSG => new LiteDBAdminLocalizationZhCN(), // Fallback to ZhCN
-            Language.ZhMY => new LiteDBAdminLocalizationZhCN(), // Fallback to ZhCN
-            
-            Language.EnUS => new LiteDBAdminLocalizationEnUS(),
-            Language.EnGB => new LiteDBAdminLocalizationEnUS(), // Fallback to EnUS
-            Language.EnCA => new LiteDBAdminLocalizationEnUS(), // Fallback to EnUS
-            Language.EnAU => new LiteDBAdminLocalizationEnUS(), // Fallback to EnUS
-            Language.EnIN => new LiteDBAdminLocalizationEnUS(), // Fallback to EnUS
-            Language.EnSG => new LiteDBAdminLocalizationEnUS(), // Fallback to EnUS
-            Language.EnZA => new LiteDBAdminLocalizationEnUS(), // Fallback to EnUS
-            Language.EnIE => new LiteDBAdminLocalizationEnUS(), // Fallback to EnUS
-            Language.EnNZ => new LiteDBAdminLocalizationEnUS(), // Fallback to EnUS
-            Language.EnMY => new LiteDBAdminLocalizationEnUS(), // Fallback to EnUS
-            
-            Language.JaJP => new LiteDBAdminLocalizationJaJP(),
-            Language.KoKR => new LiteDBAdminLocalizationKoKR(),
-            Language.EsES => new LiteDBAdminLocalizationEsES(),
-            Language.EsMX => new LiteDBAdminLocalizationEsES(), // Fallback to EsES
-            Language.CsCZ => new LiteDBAdminLocalizationCsCZ(),
-            
-            Language.DeDE => new LiteDBAdminLocalizationDeDE(),
-            Language.DeAT => new LiteDBAdminLocalizationDeDE(), // Fallback to DeDE
-            Language.DeCH => new LiteDBAdminLocalizationDeDE(), // Fallback to DeDE
-            Language.DeLU => new LiteDBAdminLocalizationDeDE(), // Fallback to DeDE
-            Language.DeLI => new LiteDBAdminLocalizationDeDE(), // Fallback to DeDE
-            
-            _ => new LiteDBAdminLocalizationEnUS() // Default to English
-        };
-    }
 }
 
 /// <summary>

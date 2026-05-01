@@ -114,11 +114,6 @@ public class TrayZhCN : TrayLocalizationBase
     public override string Configuration => "配置设置";
 
     /// <summary>
-    /// Gets the LiteDB management menu item text
-    /// </summary>
-    public override string LiteDBManagement => "LiteDB 管理";
-
-    /// <summary>
     /// Gets the exit menu item text
     /// </summary>
     public override string Exit => "退出应用";

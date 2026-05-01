@@ -1,0 +1,82 @@
+<Window x:Class="SiliconLife.Speedy.Manager.Views.Dialogs.FileInfoDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="文件信息"
+        Width="480" Height="380"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="文件路径:" FontWeight="Bold" Margin="0,4"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding FilePath}" TextWrapping="Wrap" Margin="0,4"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="文件大小:" FontWeight="Bold" Margin="0,4"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding FileSize}" Margin="0,4"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Magic:" FontWeight="Bold" Margin="0,4"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Magic}" Margin="0,4"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="版本:" FontWeight="Bold" Margin="0,4"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Version}" Margin="0,4"/>
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="标志位:" FontWeight="Bold" Margin="0,4"/>
+                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Flags}" Margin="0,4"/>
+
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="目录区偏移:" FontWeight="Bold" Margin="0,4"/>
+                <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding DirectoryOffset}" Margin="0,4"/>
+
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="目录区长度:" FontWeight="Bold" Margin="0,4"/>
+                <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding DirectoryLength}" Margin="0,4"/>
+
+                <TextBlock Grid.Row="7" Grid.Column="0" Text="总条目数:" FontWeight="Bold" Margin="0,4"/>
+                <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding TotalEntries}" Margin="0,4"/>
+
+                <TextBlock Grid.Row="8" Grid.Column="0" Text="JSON 条目:" FontWeight="Bold" Margin="0,4"/>
+                <TextBlock Grid.Row="8" Grid.Column="1" Text="{Binding JsonEntries}" Margin="0,4"/>
+
+                <TextBlock Grid.Row="9" Grid.Column="0" Text="Raw 条目:" FontWeight="Bold" Margin="0,4"/>
+                <TextBlock Grid.Row="9" Grid.Column="1" Text="{Binding RawEntries}" Margin="0,4"/>
+
+                <TextBlock Grid.Row="10" Grid.Column="0" Text="Text 条目:" FontWeight="Bold" Margin="0,4"/>
+                <TextBlock Grid.Row="10" Grid.Column="1" Text="{Binding TextEntries}" Margin="0,4"/>
+            </Grid>
+        </ScrollViewer>
+
+        <Button Grid.Row="1"
+                Content="关闭"
+                Command="{Binding CloseCommand}"
+                Width="80"
+                HorizontalAlignment="Right"
+                Margin="0,12,0,0"
+                IsDefault="True"
+                IsCancel="True"/>
+    </Grid>
+</Window>

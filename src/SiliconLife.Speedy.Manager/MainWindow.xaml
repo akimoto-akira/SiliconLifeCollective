@@ -1,0 +1,267 @@
+﻿<Window x:Class="SiliconLife.Speedy.Manager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SiliconLife.Speedy.Manager"
+        xmlns:vm="clr-namespace:SiliconLife.Speedy.Manager.ViewModels"
+        xmlns:converters="clr-namespace:SiliconLife.Speedy.Manager.Converters"
+        xmlns:controls="clr-namespace:SiliconLife.Speedy.Manager.Views.Controls"
+        mc:Ignorable="d"
+        Title="{Binding WindowTitle}"
+        Height="700" Width="1100"
+        MinHeight="500" MinWidth="800">
+
+    <Window.Resources>
+        <Style x:Key="ToolbarButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="6,3"/>
+            <Setter Property="Margin" Value="1,0"/>
+            <Setter Property="MinWidth" Value="60"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E0E0E0"/>
+                    <Setter Property="BorderBrush" Value="#BDBDBD"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#BDBDBD"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.4"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- ═══ Menu Bar ═══ -->
+        <Menu DockPanel.Dock="Top">
+            <!-- 文件 -->
+            <MenuItem Header="文件(_F)">
+                <MenuItem Header="打开文件(_O)..."
+                          Command="{Binding OpenFileCommand}"
+                          InputGestureText="Ctrl+O"/>
+                <MenuItem Header="以只读模式打开(_R)..."
+                          Command="{Binding OpenFileReadOnlyCommand}"/>
+                <Separator/>
+                <MenuItem Header="最近文件(_E)" x:Name="RecentFilesMenuItem">
+                    <MenuItem.ItemsSource>
+                        <Binding Path="RecentFiles"/>
+                    </MenuItem.ItemsSource>
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="MenuItem">
+                            <Setter Property="Header" Value="{Binding}"/>
+                            <Setter Property="Command" Value="{Binding DataContext.OpenRecentFileCommand,
+                                RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            <Setter Property="CommandParameter" Value="{Binding}"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="关闭文件(_C)"
+                          Command="{Binding CloseFileCommand}"/>
+                <Separator/>
+                <MenuItem Header="退出(_X)"
+                          Click="ExitMenuItem_Click"
+                          InputGestureText="Alt+F4"/>
+            </MenuItem>
+
+            <!-- 编辑 -->
+            <MenuItem Header="编辑(_E)">
+                <MenuItem Header="新建条目(_N)..."
+                          Command="{Binding TreeViewModel.NewEntryCommand}"/>
+                <MenuItem Header="删除条目(_D)"
+                          Command="{Binding TreeViewModel.DeleteEntryCommand}"
+                          CommandParameter="{Binding TreeViewModel.SelectedNode}"/>
+                <Separator/>
+                <MenuItem Header="导入文件(_I)..."
+                          Command="{Binding TreeViewModel.ImportFilesCommand}"/>
+                <MenuItem Header="导出条目(_X)..."
+                          Command="{Binding TreeViewModel.ExportEntryCommand}"
+                          CommandParameter="{Binding TreeViewModel.SelectedNode}"/>
+            </MenuItem>
+
+            <!-- 视图 -->
+            <MenuItem Header="视图(_V)">
+                <MenuItem Header="刷新树(_R)"
+                          Command="{Binding TreeViewModel.ExpandNodeCommand}"
+                          CommandParameter="{Binding TreeViewModel.SelectedNode}"/>
+            </MenuItem>
+
+            <!-- 工具 -->
+            <MenuItem Header="工具(_T)">
+                <MenuItem Header="刷新到磁盘(_F) (Flush)"
+                          Command="{Binding FlushCommand}"/>
+                <MenuItem Header="压缩文件(_C) (Compact)"
+                          Command="{Binding CompactCommand}"/>
+                <Separator/>
+                <MenuItem Header="文件信息(_I)..."
+                          Command="{Binding ShowFileInfoCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- ═══ Toolbar ═══ -->
+        <ToolBarTray DockPanel.Dock="Top">
+            <ToolBar>
+                <!-- 文件操作组 -->
+                <Button Style="{StaticResource ToolbarButtonStyle}"
+                        Command="{Binding OpenFileCommand}"
+                        ToolTip="打开文件 (Ctrl+O)">
+                    📂 打开
+                </Button>
+                <Button Style="{StaticResource ToolbarButtonStyle}"
+                        Command="{Binding CloseFileCommand}"
+                        ToolTip="关闭文件">
+                    ✖ 关闭
+                </Button>
+                <Button Style="{StaticResource ToolbarButtonStyle}"
+                        Command="{Binding OpenFileReadOnlyCommand}"
+                        ToolTip="以只读模式打开">
+                    🔒 只读打开
+                </Button>
+
+                <Separator/>
+
+                <!-- 条目操作组 -->
+                <Button Style="{StaticResource ToolbarButtonStyle}"
+                        Command="{Binding TreeViewModel.NewEntryCommand}"
+                        ToolTip="新建条目">
+                    ➕ 新建
+                </Button>
+                <Button Style="{StaticResource ToolbarButtonStyle}"
+                        Command="{Binding TreeViewModel.DeleteEntryCommand}"
+                        CommandParameter="{Binding TreeViewModel.SelectedNode}"
+                        ToolTip="删除选中条目">
+                    🗑 删除
+                </Button>
+                <Button Style="{StaticResource ToolbarButtonStyle}"
+                        Command="{Binding TreeViewModel.ImportFilesCommand}"
+                        ToolTip="导入文件">
+                    📥 导入
+                </Button>
+                <Button Style="{StaticResource ToolbarButtonStyle}"
+                        Command="{Binding TreeViewModel.ExportEntryCommand}"
+                        CommandParameter="{Binding TreeViewModel.SelectedNode}"
+                        ToolTip="导出条目">
+                    📤 导出
+                </Button>
+
+                <Separator/>
+
+                <!-- 维护操作组 -->
+                <Button Style="{StaticResource ToolbarButtonStyle}"
+                        Command="{Binding FlushCommand}"
+                        ToolTip="刷新到磁盘 (Flush)">
+                    💾 Flush
+                </Button>
+                <Button Style="{StaticResource ToolbarButtonStyle}"
+                        Command="{Binding CompactCommand}"
+                        ToolTip="压缩文件 (Compact)">
+                    🗜 Compact
+                </Button>
+
+                <Separator/>
+
+                <!-- 信息 -->
+                <Button Style="{StaticResource ToolbarButtonStyle}"
+                        Command="{Binding ShowFileInfoCommand}"
+                        ToolTip="文件信息">
+                    ℹ 文件信息
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+
+        <!-- ═══ Status Bar ═══ -->
+        <StatusBar DockPanel.Dock="Bottom" Height="24">
+            <StatusBarItem>
+                <TextBlock Text="{Binding StatusViewModel.FilePath}"
+                           ToolTip="{Binding StatusViewModel.FilePath}"
+                           MaxWidth="400"
+                           TextTrimming="CharacterEllipsis"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock Text="{Binding StatusViewModel.FileSize}"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock>
+                    <Run Text="条目: "/>
+                    <Run Text="{Binding StatusViewModel.TotalEntries, Mode=OneWay}"/>
+                </TextBlock>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock Text="[只读]"
+                           Foreground="OrangeRed"
+                           FontWeight="Bold"
+                           Visibility="{Binding StatusViewModel.IsReadOnly,
+                               Converter={StaticResource BoolToVisibilityConverter}}"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock Text="{Binding StatusViewModel.StatusMessage}"
+                           Foreground="Gray"/>
+            </StatusBarItem>
+        </StatusBar>
+
+        <!-- ═══ Main Content Area ═══ -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <!-- Left: Directory Tree panel (~250px) -->
+                <ColumnDefinition Width="250" MinWidth="150"/>
+                <ColumnDefinition Width="4"/>
+                <!-- Center: Content + Metadata -->
+                <ColumnDefinition Width="*" MinWidth="300"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ─── Left Panel: Directory Tree ─── -->
+            <Border Grid.Column="0"
+                    BorderBrush="#CCCCCC"
+                    BorderThickness="0,0,1,0">
+                <controls:DirectoryTreeView DataContext="{Binding TreeViewModel}"/>
+            </Border>
+
+            <!-- ─── Vertical Splitter ─── -->
+            <GridSplitter Grid.Column="1"
+                          Width="4"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          Background="#DDDDDD"
+                          ShowsPreview="True"/>
+
+            <!-- ─── Right Panel: Content Viewer + Metadata ─── -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <!-- Content Viewer -->
+                    <RowDefinition Height="*" MinHeight="100"/>
+                    <RowDefinition Height="4"/>
+                    <!-- Metadata Panel (~120px) -->
+                    <RowDefinition Height="120" MinHeight="60"/>
+                </Grid.RowDefinitions>
+
+                <!-- Content Viewer (task 9.3) -->
+                <controls:ContentViewerPanel Grid.Row="0"
+                                             DataContext="{Binding ContentViewModel}"/>
+
+                <!-- Horizontal Splitter -->
+                <GridSplitter Grid.Row="1"
+                              Height="4"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
+                              Background="#DDDDDD"
+                              ShowsPreview="True"/>
+
+                <!-- Metadata Panel (task 9.4) -->
+                <Border Grid.Row="2"
+                        BorderBrush="#CCCCCC"
+                        BorderThickness="0,1,0,0">
+                    <controls:MetadataPanel DataContext="{Binding MetadataViewModel}"/>
+                </Border>
+            </Grid>
+        </Grid>
+    </DockPanel>
+</Window>

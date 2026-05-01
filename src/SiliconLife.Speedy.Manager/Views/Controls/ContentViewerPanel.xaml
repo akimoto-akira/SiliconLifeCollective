@@ -1,0 +1,213 @@
+<UserControl x:Class="SiliconLife.Speedy.Manager.Views.Controls.ContentViewerPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:SiliconLife.Speedy.Manager.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:ContentViewerViewModel}"
+             Background="#FAFAFA">
+
+    <UserControl.Resources>
+        <!-- Style for toolbar buttons -->
+        <Style x:Key="ContentToolbarButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="6,3"/>
+            <Setter Property="Margin" Value="2,0"/>
+            <Setter Property="MinWidth" Value="60"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#BDBDBD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E0E0E0"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#BDBDBD"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.4"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style for TextBox with optional red border when JsonError is set -->
+        <Style x:Key="ContentEditBoxStyle" TargetType="TextBox">
+            <Setter Property="BorderBrush" Value="#BDBDBD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding JsonError}" Value="{x:Null}">
+                    <Setter Property="BorderBrush" Value="#BDBDBD"/>
+                </DataTrigger>
+                <!-- When JsonError is not null, show red border -->
+                <DataTrigger Binding="{Binding JsonError, Converter={StaticResource NullToCollapsedConverter}}"
+                             Value="Visible">
+                    <Setter Property="BorderBrush" Value="Red"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Row 0: Toolbar -->
+            <RowDefinition Height="Auto"/>
+            <!-- Row 1: Truncation banner -->
+            <RowDefinition Height="Auto"/>
+            <!-- Row 2: Content area (fills remaining space) -->
+            <RowDefinition Height="*"/>
+            <!-- Row 3: JSON error display -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══ Row 0: Toolbar ═══ -->
+        <Border Grid.Row="0"
+                BorderBrush="#CCCCCC"
+                BorderThickness="0,0,0,1"
+                Background="#F0F0F0"
+                Padding="4,3">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left side: Toggle view button + unsaved indicator -->
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+
+                    <!-- Toggle view button: label changes based on IsJsonView -->
+                    <Button Style="{StaticResource ContentToolbarButtonStyle}"
+                            Command="{Binding ToggleViewCommand}"
+                            ToolTip="在 JSON 格式化视图和十六进制/文本视图之间切换">
+                        <Button.Content>
+                            <TextBlock>
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="切换到 JSON 视图"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsJsonView}" Value="True">
+                                                <Setter Property="Text" Value="切换到十六进制视图"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Button.Content>
+                    </Button>
+
+                    <!-- Unsaved changes indicator -->
+                    <TextBlock Text="● 未保存更改"
+                               Foreground="OrangeRed"
+                               FontSize="11"
+                               VerticalAlignment="Center"
+                               Margin="8,0,0,0"
+                               Visibility="{Binding HasUnsavedChanges,
+                                   Converter={StaticResource BoolToVisibilityConverter}}"/>
+                </StackPanel>
+
+                <!-- Right side: Edit / Save / Cancel buttons -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+
+                    <!-- 编辑 button: visible only when NOT in edit mode -->
+                    <Button Style="{StaticResource ContentToolbarButtonStyle}"
+                            Content="✏ 编辑"
+                            Command="{Binding EnterEditModeCommand}"
+                            ToolTip="进入编辑模式"
+                            Visibility="{Binding IsEditMode,
+                                Converter={StaticResource BoolToVisibilityConverter},
+                                ConverterParameter=Invert}"/>
+
+                    <!-- 保存 button: visible only in edit mode -->
+                    <Button Style="{StaticResource ContentToolbarButtonStyle}"
+                            Content="💾 保存"
+                            Command="{Binding SaveCommand}"
+                            ToolTip="保存更改"
+                            Visibility="{Binding IsEditMode,
+                                Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                    <!-- 取消 button: visible only in edit mode -->
+                    <Button Style="{StaticResource ContentToolbarButtonStyle}"
+                            Content="✖ 取消"
+                            Command="{Binding CancelEditCommand}"
+                            ToolTip="取消编辑，恢复原始内容"
+                            Visibility="{Binding IsEditMode,
+                                Converter={StaticResource BoolToVisibilityConverter}}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ═══ Row 1: Truncation banner ═══ -->
+        <Border Grid.Row="1"
+                Background="#FFF3CD"
+                BorderBrush="#FFC107"
+                BorderThickness="0,0,0,1"
+                Padding="8,4"
+                Visibility="{Binding IsTruncated,
+                    Converter={StaticResource BoolToVisibilityConverter}}">
+            <TextBlock Text="⚠ 内容已截断：仅显示前 1 MB"
+                       Foreground="#856404"
+                       FontWeight="SemiBold"/>
+        </Border>
+
+        <!-- ═══ Row 2: Content area ═══ -->
+        <Grid Grid.Row="2">
+
+            <!-- Read-only mode: TextBlock in ScrollViewer (visible when NOT in edit mode) -->
+            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto"
+                          Visibility="{Binding IsEditMode,
+                              Converter={StaticResource BoolToVisibilityConverter},
+                              ConverterParameter=Invert}">
+                <TextBlock Text="{Binding DisplayContent}"
+                           FontFamily="Consolas, Courier New, monospace"
+                           FontSize="12"
+                           Padding="8"
+                           TextWrapping="NoWrap"/>
+            </ScrollViewer>
+
+            <!-- Edit mode: TextBox (visible when in edit mode) -->
+            <TextBox Text="{Binding DisplayContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     FontFamily="Consolas, Courier New, monospace"
+                     FontSize="12"
+                     Padding="8"
+                     AcceptsReturn="True"
+                     AcceptsTab="True"
+                     HorizontalScrollBarVisibility="Auto"
+                     VerticalScrollBarVisibility="Auto"
+                     TextWrapping="NoWrap"
+                     Style="{StaticResource ContentEditBoxStyle}"
+                     Visibility="{Binding IsEditMode,
+                         Converter={StaticResource BoolToVisibilityConverter}}"/>
+        </Grid>
+
+        <!-- ═══ Row 3: JSON error display ═══ -->
+        <!-- Visible only when JsonError is not null AND in edit mode -->
+        <Border Grid.Row="3"
+                Background="#FFF0F0"
+                BorderBrush="#FFCCCC"
+                BorderThickness="0,1,0,0"
+                Padding="8,4">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <!-- Show when JsonError is not null -->
+                        <DataTrigger Binding="{Binding JsonError, Converter={StaticResource NullToCollapsedConverter}}"
+                                     Value="Visible">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <TextBlock Text="{Binding JsonError}"
+                       Foreground="Red"
+                       FontSize="11"
+                       TextWrapping="Wrap"/>
+        </Border>
+    </Grid>
+</UserControl>

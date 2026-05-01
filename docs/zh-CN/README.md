@@ -378,7 +378,7 @@ SiliconLife.Default（冷数据归档，数据安全兜底）
 
 ## 👨‍💻 作者
 
-**Hoshino Kennji**
+**天源垦骥**
 
 - GitHub: [@akimoto-akira](https://github.com/akimoto-akira/SiliconLifeCollective)
 - 码云: [hoshinokennji](https://gitee.com/hoshinokennji/SiliconLifeCollective)

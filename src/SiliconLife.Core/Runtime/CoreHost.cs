@@ -25,6 +25,7 @@ public class CoreHost
     private readonly CoreHostBuilder _builder;
     private CancellationTokenSource _shutdownCts = new();
     private Task? _imManagerTask;
+    private PluginLoader? _pluginLoader;
 
     /// <summary>
     /// Initializes a new <see cref="CoreHost"/> from the given builder configuration.
@@ -110,9 +111,19 @@ public class CoreHost
             _logger.Debug(null, "Registered service: {0}", nameof(StreamCancellationManager));
         }
 
+        if (_builder.PluginDirectory != null)
+        {
+            _pluginLoader = new PluginLoader(_builder.PluginDirectory);
+            _pluginLoader.LoadAll();
+            ServiceLocator.Instance.Register(_pluginLoader);
+            _logger.Debug(null, "Registered service: {0}", nameof(PluginLoader));
+        }
+
         MainLoop.SetConfig(_builder.Config!);
         MainLoop.Start();
         _logger.Info(null, "MainLoop started");
+
+        _pluginLoader?.NotifyAllStarted();
 
         if (_builder.IMManager != null)
         {
@@ -135,6 +146,8 @@ public class CoreHost
 
         _shutdownCts.Cancel();
 
+        _pluginLoader?.NotifyAllStopping();
+
         MainLoop.Stop();
         _logger.Debug(null, "Stopped: MainLoop");
 
@@ -146,6 +159,10 @@ public class CoreHost
 
         ServiceLocator.Instance.Clear();
         _logger.Debug(null, "Stopped: ServiceLocator");
+
+        _pluginLoader?.UnloadAll();
+        _pluginLoader = null;
+
         _logger.Info(null, "CoreHost stopped");
     }
 }

@@ -271,7 +271,7 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 
 ## 👨‍💻 作者
 
-**Hoshino Kennji**
+**天源墾驥**
 
 - GitHub: [@akimoto-akira](https://github.com/akimoto-akira/SiliconLifeCollective)
 - 码云: [hoshinokennji](https://gitee.com/hoshinokennji/SiliconLifeCollective)
