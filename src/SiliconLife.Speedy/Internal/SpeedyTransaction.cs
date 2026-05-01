@@ -1,101 +1,102 @@
+// Copyright (c) 2026 Hoshino Kennji
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using System.Text.Json;
 
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// Buffers write and delete operations locally until <see cref="Commit"/> is called.
-/// Implements <see cref="SiliconLife.Speedy.IPackTransaction"/> (AC-6.1 – AC-6.7).
+/// Atomic transaction implementation for batch operations.
 /// </summary>
-internal sealed class SpeedyTransaction : SiliconLife.Speedy.IPackTransaction
+internal sealed class SpeedyTransaction : IPackTransaction
 {
     private readonly SpeedyPack _pack;
-    private readonly List<WriteOperation> _pending = new();
-    private bool _committed;
+    private readonly List<WriteOperation> _operations = new();
     private bool _disposed;
 
-    internal SpeedyTransaction(SpeedyPack pack)
+    public bool IsCommitted { get; private set; }
+
+    public SpeedyTransaction(SpeedyPack pack)
     {
-        _pack = pack ?? throw new ArgumentNullException(nameof(pack));
+        _pack = pack;
     }
 
-    // ─── IPackTransaction ─────────────────────────────────────────────────────
-
-    /// <inheritdoc/>
-    public bool IsCommitted => _committed;
-
-    /// <summary>
-    /// Buffers a raw-bytes write. Does not affect the main cache or file (AC-6.2).
-    /// </summary>
     public void Write(string path, ReadOnlySpan<byte> data)
     {
-        ThrowIfDone();
+        ThrowIfDisposed();
         var normalizedPath = PathNormalizer.Normalize(path);
-        _pending.Add(new WriteEntry(normalizedPath, data.ToArray(), "raw"));
+        _operations.Add(new WriteEntry(normalizedPath, data.ToArray(), "raw"));
     }
 
-    /// <summary>
-    /// Buffers a raw-bytes write (byte[] overload to avoid generic ambiguity).
-    /// </summary>
-    public void Write(string path, byte[] data) => Write(path, data.AsSpan());
+    public void Write(string path, byte[] data)
+    {
+        Write(path, data.AsSpan());
+    }
 
-    /// <summary>
-    /// Serializes <paramref name="value"/> as JSON and buffers the write (AC-6.2).
-    /// </summary>
     public void Write<T>(string path, T value)
     {
-        ThrowIfDone();
+        ThrowIfDisposed();
         var normalizedPath = PathNormalizer.Normalize(path);
         var bytes = JsonSerializer.SerializeToUtf8Bytes(value);
-        _pending.Add(new WriteEntry(normalizedPath, bytes, "json"));
+        _operations.Add(new WriteEntry(normalizedPath, bytes, "json"));
     }
 
-    /// <summary>
-    /// Buffers a delete. Does not affect the main cache or file (AC-6.2).
-    /// </summary>
     public void Delete(string path)
     {
-        ThrowIfDone();
+        ThrowIfDisposed();
         var normalizedPath = PathNormalizer.Normalize(path);
-        _pending.Add(new DeleteEntry(normalizedPath));
+        _operations.Add(new DeleteEntry(normalizedPath));
     }
 
     /// <summary>
-    /// Atomically applies all buffered operations to the main cache and write queue (AC-6.3).
+    /// Atomically commits all buffered operations to the main pack.
     /// </summary>
     public void Commit()
     {
-        ThrowIfDone();
-        _pack.ApplyTransactionBatch(_pending);
-        _committed = true;
+        ThrowIfDisposed();
+
+        if (IsCommitted)
+            throw new InvalidOperationException("Transaction already committed.");
+
+        // Apply all operations atomically to the pack
+        _pack.ApplyTransactionBatch(_operations);
+        IsCommitted = true;
     }
 
     /// <summary>
-    /// Discards all buffered operations. The main cache and file are unaffected (AC-6.4).
+    /// Discards all buffered operations without affecting the main pack.
     /// </summary>
     public void Rollback()
     {
-        if (_committed) return;
-        _pending.Clear();
+        ThrowIfDisposed();
+        _operations.Clear();
     }
 
-    /// <summary>
-    /// Automatically rolls back if <see cref="Commit"/> was not called (AC-6.5).
-    /// </summary>
     public void Dispose()
     {
-        if (_disposed) return;
-        _disposed = true;
+        if (_disposed)
+            return;
 
-        if (!_committed)
-            Rollback();
+        // Auto-rollback if not committed
+        if (!IsCommitted)
+            _operations.Clear();
+
+        _disposed = true;
     }
 
-    // ─── Private helpers ──────────────────────────────────────────────────────
-
-    private void ThrowIfDone()
+    private void ThrowIfDisposed()
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
-        if (_committed)
-            throw new InvalidOperationException("Transaction has already been committed.");
+        if (_disposed)
+            throw new ObjectDisposedException(nameof(SpeedyTransaction));
     }
 }

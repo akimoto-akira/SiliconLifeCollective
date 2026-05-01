@@ -1,59 +1,102 @@
+// Copyright (c) 2026 Hoshino Kennji
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System.Text;
+
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// Provides path normalization utilities for SpeedyPack entry paths.
-/// All paths are normalized to lowercase, forward-slash separated, with no leading/trailing slashes,
-/// and with all ".." traversal segments removed.
+/// Normalizes virtual paths to ensure consistency across platforms.
+/// Converts to lowercase, forward slashes, removes leading/trailing slashes.
 /// </summary>
 internal static class PathNormalizer
 {
+    private const char Separator = '/';
+
     /// <summary>
-    /// Normalizes a path string:
-    /// - Returns empty string for null/empty input
-    /// - Replaces backslashes with forward slashes
-    /// - Splits by '/' and filters out empty segments, '.' segments, and '..' segments
-    /// - Joins remaining segments with '/'
-    /// - Converts to lowercase
+    /// Normalizes a virtual path for consistent internal representation.
     /// </summary>
-    /// <param name="path">The raw path string to normalize.</param>
-    /// <returns>A normalized path string, never starting or ending with '/'.</returns>
-    public static string Normalize(string? path)
+    public static string Normalize(string path)
     {
-        if (string.IsNullOrEmpty(path))
+        if (string.IsNullOrWhiteSpace(path))
             return string.Empty;
 
         // Replace backslashes with forward slashes
-        var normalized = path.Replace('\\', '/');
+        var normalized = path.Replace('\\', Separator);
 
-        // Split, filter out empty/dot/dotdot segments, then join
-        var segments = normalized
-            .Split('/')
-            .Where(s => s.Length > 0 && s != "." && s != "..")
-            .ToArray();
+        // Convert to lowercase for case-insensitive comparison
+        normalized = normalized.ToLowerInvariant();
 
-        return string.Join('/', segments).ToLowerInvariant();
+        // Remove leading and trailing slashes
+        normalized = normalized.Trim(Separator);
+
+        // Collapse multiple consecutive slashes
+        while (normalized.Contains($"{Separator}{Separator}"))
+        {
+            normalized = normalized.Replace($"{Separator}{Separator}", $"{Separator}");
+        }
+
+        return normalized;
     }
 
     /// <summary>
-    /// Returns the parent directory portion of an already-normalized path.
-    /// If the path has no '/' (root-level entry), returns empty string.
+    /// Extracts the parent directory path from a given path.
     /// </summary>
-    /// <param name="normalizedPath">An already-normalized path (output of <see cref="Normalize"/>).</param>
-    /// <returns>
-    /// The parent directory path, or empty string if the entry is at the root level.
-    /// </returns>
-    /// <example>
-    /// "config/profile/settings" → "config/profile"
-    /// "config/profile"         → "config"
-    /// "config"                 → ""
-    /// ""                       → ""
-    /// </example>
-    public static string GetParentDirectory(string normalizedPath)
+    public static string GetParent(string path)
     {
-        if (string.IsNullOrEmpty(normalizedPath))
+        var normalized = Normalize(path);
+        if (string.IsNullOrEmpty(normalized))
             return string.Empty;
 
-        var lastSlash = normalizedPath.LastIndexOf('/');
-        return lastSlash < 0 ? string.Empty : normalizedPath[..lastSlash];
+        var lastSlash = normalized.LastIndexOf(Separator);
+        return lastSlash < 0 ? string.Empty : normalized.Substring(0, lastSlash);
+    }
+
+    /// <summary>
+    /// Extracts the file/entry name from a path.
+    /// </summary>
+    public static string GetName(string path)
+    {
+        var normalized = Normalize(path);
+        if (string.IsNullOrEmpty(normalized))
+            return string.Empty;
+
+        var lastSlash = normalized.LastIndexOf(Separator);
+        return lastSlash < 0 ? normalized : normalized.Substring(lastSlash + 1);
+    }
+
+    /// <summary>
+    /// Combines multiple path segments into a single normalized path.
+    /// </summary>
+    public static string Combine(params string[] paths)
+    {
+        if (paths == null || paths.Length == 0)
+            return string.Empty;
+
+        var builder = new StringBuilder();
+        foreach (var path in paths)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+                continue;
+
+            var trimmed = path.Trim(Separator);
+            if (builder.Length > 0 && !string.IsNullOrEmpty(trimmed))
+            {
+                builder.Append(Separator);
+            }
+            builder.Append(trimmed);
+        }
+
+        return Normalize(builder.ToString());
     }
 }

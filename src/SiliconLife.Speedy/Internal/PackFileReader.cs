@@ -1,123 +1,93 @@
+// Copyright (c) 2026 Hoshino Kennji
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using MessagePack;
 
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// Handles all read operations on a .spk file:
-/// validating the header, loading the directory index, and reading entry bytes.
+/// Handles reading data from .spk files.
 /// </summary>
 internal sealed class PackFileReader : IDisposable
 {
+    private readonly string _filePath;
     private readonly FileStream _stream;
-    private bool _disposed;
+    private readonly BinaryReader _reader;
+    private readonly object _lock = new();
 
-    private PackFileReader(FileStream stream)
+    private PackFileReader(string filePath, FileStream stream)
     {
+        _filePath = filePath;
         _stream = stream;
+        _reader = new BinaryReader(_stream);
     }
 
-    // ─── Factory ──────────────────────────────────────────────────────────────
-
     /// <summary>
-    /// Opens an existing .spk file for reading, validates the header magic bytes,
-    /// and returns a <see cref="PackFileReader"/> ready for use.
+    /// Opens a .spk file for reading.
     /// </summary>
-    /// <exception cref="InvalidDataException">
-    /// Thrown when the file does not start with the expected "SPKY" magic bytes.
-    /// </exception>
     public static PackFileReader Open(string filePath)
     {
-        var stream = new FileStream(
-            filePath,
-            FileMode.Open,
-            FileAccess.Read,
-            FileShare.ReadWrite,
-            bufferSize: 4096,
-            useAsync: false);
-
-        var reader = new PackFileReader(stream);
-        // Validate header immediately on open
-        reader.ReadHeader();
-        return reader;
+        var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        return new PackFileReader(filePath, stream);
     }
 
-    // ─── Header ───────────────────────────────────────────────────────────────
-
     /// <summary>
-    /// Reads and validates the 32-byte header from the beginning of the file.
+    /// Reads the file header.
     /// </summary>
-    /// <exception cref="InvalidDataException">
-    /// Thrown when the magic bytes do not match "SPKY".
-    /// </exception>
     public SpkHeader ReadHeader()
     {
-        _stream.Seek(0, SeekOrigin.Begin);
-        using var br = new BinaryReader(_stream, System.Text.Encoding.UTF8, leaveOpen: true);
-        return SpkHeader.ReadFrom(br);
+        lock (_lock)
+        {
+            _stream.Position = 0;
+            return SpkHeader.ReadFrom(_reader);
+        }
     }
 
-    // ─── Directory Region ─────────────────────────────────────────────────────
-
     /// <summary>
-    /// Reads the Directory Region from the file using the offsets stored in the header,
-    /// deserializes it with MessagePack, and returns the full directory dictionary.
+    /// Reads a data block at the specified offset and length.
     /// </summary>
-    /// <returns>
-    /// A dictionary mapping normalized paths to their <see cref="DirectoryEntry"/> metadata.
-    /// Returns an empty dictionary if <see cref="SpkHeader.DirectoryLength"/> is 0.
-    /// </returns>
-    public Dictionary<string, DirectoryEntry> LoadDirectory()
-    {
-        var header = ReadHeader();
-
-        if (header.DirectoryLength == 0)
-            return new Dictionary<string, DirectoryEntry>();
-
-        _stream.Seek(header.DirectoryOffset, SeekOrigin.Begin);
-        var bytes = new byte[header.DirectoryLength];
-        _stream.ReadExactly(bytes);
-
-        return MessagePackSerializer.Deserialize<Dictionary<string, DirectoryEntry>>(bytes);
-    }
-
-    // ─── Data Region ──────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Seeks to <paramref name="offset"/> in the file and reads exactly
-    /// <paramref name="length"/> bytes, returning them as a new array.
-    /// </summary>
-    /// <param name="offset">
-    /// The byte offset of the entry's data (as stored in <see cref="DirectoryEntry.Offset"/>).
-    /// This points directly to the data bytes, not the 4-byte length prefix.
-    /// </param>
-    /// <param name="length">Number of bytes to read.</param>
-    /// <returns>The raw entry bytes.</returns>
-    /// <exception cref="InvalidDataException">
-    /// Thrown when fewer bytes than expected are available at the given offset.
-    /// </exception>
     public byte[] ReadAt(long offset, int length)
     {
-        _stream.Seek(offset, SeekOrigin.Begin);
-        var buffer = new byte[length];
-        int totalRead = 0;
-        while (totalRead < length)
+        lock (_lock)
         {
-            int read = _stream.Read(buffer, totalRead, length - totalRead);
-            if (read == 0)
-                throw new InvalidDataException(
-                    $"Unexpected end of file reading {length} bytes at offset {offset}. " +
-                    $"Only {totalRead} bytes were available.");
-            totalRead += read;
+            _stream.Position = offset;
+            return _reader.ReadBytes(length);
         }
-        return buffer;
     }
 
-    // ─── IDisposable ──────────────────────────────────────────────────────────
+    /// <summary>
+    /// Loads the directory index from the file.
+    /// </summary>
+    public Dictionary<string, DirectoryEntry> LoadDirectory()
+    {
+        lock (_lock)
+        {
+            var header = ReadHeader();
+            
+            if (header.DirectoryLength == 0)
+                return new Dictionary<string, DirectoryEntry>(StringComparer.Ordinal);
+
+            _stream.Position = header.DirectoryOffset;
+            var dirBytes = _reader.ReadBytes(header.DirectoryLength);
+
+            return MessagePackSerializer.Deserialize<Dictionary<string, DirectoryEntry>>(dirBytes)
+                   ?? new Dictionary<string, DirectoryEntry>(StringComparer.Ordinal);
+        }
+    }
 
     public void Dispose()
     {
-        if (_disposed) return;
-        _disposed = true;
-        _stream.Dispose();
+        _reader?.Dispose();
+        _stream?.Dispose();
     }
 }

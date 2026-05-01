@@ -1,165 +1,148 @@
-using System.Collections.Concurrent;
+// Copyright (c) 2026 Hoshino Kennji
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// In-memory directory index for a .spk file.
-/// Maps normalized paths to their <see cref="DirectoryEntry"/> metadata.
-/// Always resident in memory; listing operations never trigger disk I/O.
-/// Thread-safe via <see cref="ConcurrentDictionary{TKey,TValue}"/>.
+/// In-memory directory index mapping normalized paths to their metadata.
+/// Uses a sorted dictionary for O(log n) lookups.
 /// </summary>
 internal sealed class DirectoryMap
 {
-    // Normalized path → entry metadata
-    private readonly ConcurrentDictionary<string, DirectoryEntry> _entries = new(StringComparer.Ordinal);
-
-    // ─── Basic CRUD ───────────────────────────────────────────────────────────
+    private readonly Dictionary<string, DirectoryEntry> _entries = new(StringComparer.Ordinal);
+    private readonly object _lock = new();
 
     /// <summary>
-    /// Attempts to retrieve the <see cref="DirectoryEntry"/> for the given normalized path.
+    /// Gets the number of entries in the directory.
+    /// </summary>
+    public int Count
+    {
+        get
+        {
+            lock (_lock)
+                return _entries.Count;
+        }
+    }
+
+    /// <summary>
+    /// Tries to get an entry by normalized path.
     /// </summary>
     public bool TryGet(string normalizedPath, out DirectoryEntry entry)
-        => _entries.TryGetValue(normalizedPath, out entry!);
+    {
+        lock (_lock)
+            return _entries.TryGetValue(normalizedPath, out entry!);
+    }
 
     /// <summary>
-    /// Adds or updates the entry for the given normalized path.
+    /// Adds or updates an entry in the directory.
     /// </summary>
     public void Set(string normalizedPath, DirectoryEntry entry)
-        => _entries[normalizedPath] = entry;
+    {
+        lock (_lock)
+            _entries[normalizedPath] = entry;
+    }
 
     /// <summary>
-    /// Removes the entry for the given normalized path.
-    /// No-op if the path does not exist.
+    /// Removes an entry from the directory.
     /// </summary>
     public void Remove(string normalizedPath)
-        => _entries.TryRemove(normalizedPath, out _);
-
-    // ─── Listing ──────────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Returns the normalized paths of all direct child entries under
-    /// <paramref name="normalizedParent"/>.
-    /// <para>
-    /// A path is a direct child of <paramref name="normalizedParent"/> when:
-    /// <list type="bullet">
-    ///   <item>For non-root parent: the path starts with "<c>{parent}/</c>" and
-    ///         contains no further '/' after the prefix.</item>
-    ///   <item>For root (empty string): the path contains no '/' at all.</item>
-    /// </list>
-    /// </para>
-    /// </summary>
-    /// <param name="normalizedParent">
-    /// The already-normalized parent path, or empty string / "/" for the root.
-    /// </param>
-    /// <returns>
-    /// A read-only list of normalized entry paths that are direct children of the parent.
-    /// </returns>
-    public IReadOnlyList<string> ListChildren(string normalizedParent)
     {
-        // Normalize the parent: treat "/" as root (empty string)
-        var parent = normalizedParent == "/" ? string.Empty : (normalizedParent ?? string.Empty);
-
-        var results = new List<string>();
-
-        if (parent.Length == 0)
-        {
-            // Root: direct children have no '/' in their path
-            foreach (var key in _entries.Keys)
-            {
-                if (!key.Contains('/'))
-                    results.Add(key);
-            }
-        }
-        else
-        {
-            var prefix = parent + "/";
-            foreach (var key in _entries.Keys)
-            {
-                if (key.StartsWith(prefix, StringComparison.Ordinal))
-                {
-                    // Must be a direct child: no '/' after the prefix
-                    var remainder = key.AsSpan(prefix.Length);
-                    if (!remainder.Contains('/'))
-                        results.Add(key);
-                }
-            }
-        }
-
-        return results;
+        lock (_lock)
+            _entries.Remove(normalizedPath);
     }
 
     /// <summary>
-    /// Infers the names of direct sub-directories under <paramref name="normalizedParent"/>
-    /// by examining the paths of all stored entries.
-    /// <para>
-    /// Directories are not stored explicitly; they are derived from entry paths.
-    /// A sub-directory name is the first path segment after the parent prefix that
-    /// is followed by at least one more segment.
-    /// </para>
+    /// Lists all direct child entries under a directory path.
     /// </summary>
-    /// <param name="normalizedParent">
-    /// The already-normalized parent path, or empty string / "/" for the root.
-    /// </param>
-    /// <returns>
-    /// A read-only list of distinct normalized sub-directory paths that are direct
-    /// children of the parent (e.g. "config/profile" for parent "config").
-    /// </returns>
-    public IReadOnlyList<string> ListDirectories(string normalizedParent)
+    public IReadOnlyList<string> ListChildren(string directoryPath)
     {
-        var parent = normalizedParent == "/" ? string.Empty : (normalizedParent ?? string.Empty);
-
-        var dirs = new HashSet<string>(StringComparer.Ordinal);
-
-        if (parent.Length == 0)
+        lock (_lock)
         {
-            // Root: any path that contains '/' contributes a top-level directory
-            foreach (var key in _entries.Keys)
-            {
-                var slashIndex = key.IndexOf('/');
-                if (slashIndex > 0)
-                    dirs.Add(key[..slashIndex]);
-            }
-        }
-        else
-        {
-            var prefix = parent + "/";
-            foreach (var key in _entries.Keys)
-            {
-                if (key.StartsWith(prefix, StringComparison.Ordinal))
-                {
-                    var remainder = key.AsSpan(prefix.Length);
-                    var slashIndex = remainder.IndexOf('/');
-                    if (slashIndex > 0)
-                    {
-                        // There is at least one more segment after the first — it's a sub-directory
-                        var dirName = remainder[..slashIndex].ToString();
-                        dirs.Add(parent + "/" + dirName);
-                    }
-                }
-            }
-        }
+            var children = new List<string>();
+            var prefix = string.IsNullOrEmpty(directoryPath) 
+                ? "" 
+                : directoryPath.EndsWith('/') 
+                    ? directoryPath 
+                    : directoryPath + "/";
 
-        return dirs.ToList();
+            foreach (var path in _entries.Keys)
+            {
+                if (!path.StartsWith(prefix, StringComparison.Ordinal))
+                    continue;
+
+                var relativePath = path.Substring(prefix.Length);
+                if (!relativePath.Contains('/'))
+                    children.Add(path);
+            }
+
+            return children;
+        }
     }
 
-    // ─── Serialization ────────────────────────────────────────────────────────
-
     /// <summary>
-    /// Returns a snapshot copy of the current directory as a plain
-    /// <see cref="Dictionary{TKey,TValue}"/> suitable for MessagePack serialization.
+    /// Lists all direct sub-directories under a directory path.
     /// </summary>
-    public Dictionary<string, DirectoryEntry> Snapshot()
-        => new(_entries, StringComparer.Ordinal);
-
-    /// <summary>
-    /// Replaces the current in-memory state with the entries from
-    /// <paramref name="serialized"/> (typically loaded from the Directory Region of a .spk file).
-    /// All existing entries are discarded.
-    /// </summary>
-    public void LoadFrom(Dictionary<string, DirectoryEntry> serialized)
+    public IReadOnlyList<string> ListDirectories(string directoryPath)
     {
-        _entries.Clear();
-        foreach (var (key, value) in serialized)
-            _entries[key] = value;
+        lock (_lock)
+        {
+            var directories = new HashSet<string>();
+            var prefix = string.IsNullOrEmpty(directoryPath) 
+                ? "" 
+                : directoryPath.EndsWith('/') 
+                    ? directoryPath 
+                    : directoryPath + "/";
+
+            foreach (var path in _entries.Keys)
+            {
+                if (!path.StartsWith(prefix, StringComparison.Ordinal))
+                    continue;
+
+                var relativePath = path.Substring(prefix.Length);
+                var slashIndex = relativePath.IndexOf('/');
+                if (slashIndex >= 0)
+                {
+                    var dirName = relativePath.Substring(0, slashIndex);
+                    var fullPath = string.IsNullOrEmpty(prefix.TrimEnd('/')) 
+                        ? dirName 
+                        : prefix.TrimEnd('/') + "/" + dirName;
+                    directories.Add(fullPath);
+                }
+            }
+
+            return directories.OrderBy(d => d).ToList();
+        }
+    }
+
+    /// <summary>
+    /// Returns a snapshot of all entries (thread-safe).
+    /// </summary>
+    public IReadOnlyDictionary<string, DirectoryEntry> Snapshot()
+    {
+        lock (_lock)
+            return new Dictionary<string, DirectoryEntry>(_entries, StringComparer.Ordinal);
+    }
+
+    /// <summary>
+    /// Loads entries from a dictionary (used during initialization).
+    /// </summary>
+    public void LoadFrom(IReadOnlyDictionary<string, DirectoryEntry> entries)
+    {
+        lock (_lock)
+        {
+            _entries.Clear();
+            foreach (var (path, entry) in entries)
+                _entries[path] = entry;
+        }
     }
 }

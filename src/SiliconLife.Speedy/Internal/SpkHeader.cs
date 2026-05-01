@@ -1,86 +1,76 @@
+// Copyright (c) 2026 Hoshino Kennji
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using MessagePack;
+
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// Represents the fixed 32-byte header at the start of every .spk file.
-/// Layout:
-///   [0..3]   Magic       — ASCII "SPKY" (4 bytes)
-///   [4..5]   Version     — uint16 (2 bytes)
-///   [6..7]   Flags       — uint16 (2 bytes)
-///   [8..15]  DirectoryOffset — int64 (8 bytes)
-///   [16..19] DirectoryLength — int32 (4 bytes)
-///   [20..31] Reserved    — 12 bytes (zeroed)
+/// 32-byte header at the beginning of every .spk file.
 /// </summary>
-internal struct SpkHeader
+internal sealed class SpkHeader
 {
     public const int Size = 32;
-    public const string MagicString = "SPKY";
-    public const ushort CurrentVersion = 1;
+    public static readonly byte[] MagicBytes = { 0x53, 0x50, 0x4B, 0x59 }; // "SPKY"
 
-    private static readonly byte[] MagicBytes = "SPKY"u8.ToArray();
+    public byte[] Magic { get; set; } = MagicBytes;
+    public ushort Version { get; set; } = 1;
+    public ushort Flags { get; set; } = 0;
+    public long DirectoryOffset { get; set; }
+    public int DirectoryLength { get; set; }
 
-    public byte[] Magic;        // 4 bytes
-    public ushort Version;      // 2 bytes
-    public ushort Flags;        // 2 bytes
-    public long DirectoryOffset;  // 8 bytes
-    public int DirectoryLength;   // 4 bytes
-    // 12 reserved bytes (not stored as a field — written as zeros)
-
-    /// <summary>
-    /// Creates a default header for a new .spk file.
-    /// DirectoryOffset is set to 32 (immediately after the header),
-    /// DirectoryLength is 0 (empty directory).
-    /// </summary>
-    public static SpkHeader CreateNew() => new()
+    public static SpkHeader CreateNew()
     {
-        Magic = MagicBytes,
-        Version = CurrentVersion,
-        Flags = 0,
-        DirectoryOffset = Size,   // data region starts right after header
-        DirectoryLength = 0
-    };
-
-    /// <summary>
-    /// Writes this header to the given <see cref="BinaryWriter"/>.
-    /// The writer's stream position is advanced by exactly 32 bytes.
-    /// </summary>
-    public readonly void WriteTo(BinaryWriter writer)
-    {
-        writer.Write(Magic);                // 4 bytes
-        writer.Write(Version);              // 2 bytes
-        writer.Write(Flags);               // 2 bytes
-        writer.Write(DirectoryOffset);     // 8 bytes
-        writer.Write(DirectoryLength);     // 4 bytes
-        writer.Write(new byte[12]);        // 12 reserved bytes
+        return new SpkHeader
+        {
+            Magic = MagicBytes,
+            Version = 1,
+            Flags = 0,
+            DirectoryOffset = Size, // Directory starts right after header
+            DirectoryLength = 0
+        };
     }
 
-    /// <summary>
-    /// Reads a header from the given <see cref="BinaryReader"/>.
-    /// Throws <see cref="InvalidDataException"/> if the magic bytes are wrong.
-    /// </summary>
+    public void WriteTo(BinaryWriter writer)
+    {
+        writer.Write(Magic);
+        writer.Write(Version);
+        writer.Write(Flags);
+        writer.Write(DirectoryOffset);
+        writer.Write(DirectoryLength);
+        // Pad to 32 bytes
+        var padding = Size - (4 + 2 + 2 + 8 + 4); // 12 bytes padding
+        for (int i = 0; i < padding; i++)
+            writer.Write((byte)0);
+    }
+
     public static SpkHeader ReadFrom(BinaryReader reader)
     {
         var magic = reader.ReadBytes(4);
-        if (magic.Length != 4 ||
-            magic[0] != MagicBytes[0] || magic[1] != MagicBytes[1] ||
-            magic[2] != MagicBytes[2] || magic[3] != MagicBytes[3])
-        {
-            throw new InvalidDataException(
-                $"Invalid .spk file: expected magic 'SPKY', got '{System.Text.Encoding.ASCII.GetString(magic)}'.");
-        }
-
         var version = reader.ReadUInt16();
         var flags = reader.ReadUInt16();
-        var directoryOffset = reader.ReadInt64();
-        var directoryLength = reader.ReadInt32();
-        reader.ReadBytes(12); // consume reserved bytes
+        var dirOffset = reader.ReadInt64();
+        var dirLength = reader.ReadInt32();
+        // Skip padding
+        reader.ReadBytes(12);
 
         return new SpkHeader
         {
             Magic = magic,
             Version = version,
             Flags = flags,
-            DirectoryOffset = directoryOffset,
-            DirectoryLength = directoryLength
+            DirectoryOffset = dirOffset,
+            DirectoryLength = dirLength
         };
     }
 }

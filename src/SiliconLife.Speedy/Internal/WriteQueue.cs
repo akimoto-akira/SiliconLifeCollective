@@ -1,214 +1,207 @@
-using System.Threading.Channels;
+// Copyright (c) 2026 Hoshino Kennji
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System.Collections.Concurrent;
 
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// Asynchronous write queue backed by a <see cref="Channel{T}"/>.
-/// A single background <see cref="Task"/> serially consumes operations, guaranteeing
-/// that writes to the same path are applied in the order they were enqueued.
+/// Asynchronous write queue. Producers (public API) call <see cref="Enqueue"/>
+/// and return immediately; a single consumer task drains operations in batches
+/// and writes them to disk via <see cref="PackFileWriter"/>.
 /// </summary>
-/// <remarks>
-/// Satisfies AC-5.1 – AC-5.5:
-/// <list type="bullet">
-///   <item>AC-5.1  Callers enqueue and return immediately; file I/O happens in the background.</item>
-///   <item>AC-5.2  Single consumer Task, unbounded Channel.</item>
-///   <item>AC-5.3  New entries are appended; old space is left as free.</item>
-///   <item>AC-5.4  <see cref="FlushAsync"/> waits until the queue is drained and data is flushed.</item>
-///   <item>AC-5.5  <see cref="Dispose"/> calls <see cref="FlushAsync"/> before closing.</item>
-/// </list>
-/// </remarks>
 internal sealed class WriteQueue : IDisposable
 {
     private readonly PackFileWriter _writer;
     private readonly DirectoryMap _directoryMap;
+    private readonly EntryCache _entryCache;
 
-    // Unbounded channel — writers never block (AC-5.2)
-    private readonly Channel<WriteOperation> _channel =
-        Channel.CreateUnbounded<WriteOperation>(new UnboundedChannelOptions
-        {
-            SingleReader = true,   // only the background task reads
-            SingleWriter = false   // multiple threads may enqueue
-        });
+    private readonly ConcurrentQueue<WriteOperation> _queue = new();
+    private readonly ManualResetEventSlim _hasItems = new(initialState: false);
+    private readonly CancellationTokenSource _cts = new();
+    private readonly Task _consumerTask;
 
-    private readonly Task _backgroundTask;
-    private bool _disposed;
+    private readonly object _flushLock = new();
+    private TaskCompletionSource? _flushTcs;
 
-    // ─── Constructor ──────────────────────────────────────────────────────────
+    private volatile bool _disposed;
 
-    /// <summary>
-    /// Initialises the queue and starts the background consumer task.
-    /// </summary>
-    /// <param name="writer">The file writer used to persist operations.</param>
-    /// <param name="directoryMap">The in-memory directory index to keep in sync.</param>
-    public WriteQueue(PackFileWriter writer, DirectoryMap directoryMap)
+    public WriteQueue(PackFileWriter writer, DirectoryMap directoryMap, EntryCache entryCache)
     {
-        _writer = writer ?? throw new ArgumentNullException(nameof(writer));
-        _directoryMap = directoryMap ?? throw new ArgumentNullException(nameof(directoryMap));
-        _backgroundTask = Task.Run(ConsumeLoopAsync);
+        _writer = writer;
+        _directoryMap = directoryMap;
+        _entryCache = entryCache;
+        _consumerTask = Task.Factory.StartNew(
+            ConsumeLoop,
+            _cts.Token,
+            TaskCreationOptions.LongRunning,
+            TaskScheduler.Default);
     }
 
-    // ─── Enqueue ──────────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Enqueues a single write or delete operation.
-    /// Returns immediately; the operation is applied asynchronously.
-    /// </summary>
+    /// <summary>Enqueues a single operation for later persistence.</summary>
     public void Enqueue(WriteOperation op)
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
-        // TryWrite on an unbounded channel always succeeds unless the channel is closed.
-        _channel.Writer.TryWrite(op);
+        if (_disposed) throw new ObjectDisposedException(nameof(WriteQueue));
+        _queue.Enqueue(op);
+        _hasItems.Set();
     }
 
-    /// <summary>
-    /// Enqueues a batch of operations atomically (all or nothing in terms of ordering).
-    /// Used by transaction commit to ensure the batch is contiguous in the queue.
-    /// </summary>
-    public void EnqueueBatch(IEnumerable<WriteOperation> ops)
+    /// <summary>Enqueues a batch of operations (transaction commit).</summary>
+    public void EnqueueBatch(IReadOnlyList<WriteOperation> ops)
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
+        if (_disposed) throw new ObjectDisposedException(nameof(WriteQueue));
         foreach (var op in ops)
-            _channel.Writer.TryWrite(op);
+            _queue.Enqueue(op);
+        _hasItems.Set();
     }
 
-    // ─── FlushAsync ───────────────────────────────────────────────────────────
-
     /// <summary>
-    /// Waits until all currently-enqueued operations have been processed and
-    /// persisted to disk (AC-5.4).
+    /// Returns a task that completes when every operation enqueued prior to
+    /// this call has been persisted to disk. If the queue is empty and no
+    /// batch is in flight, returns a completed task immediately.
     /// </summary>
-    /// <remarks>
-    /// Implementation: enqueues a sentinel <see cref="FlushSentinel"/> operation and
-    /// awaits a <see cref="TaskCompletionSource"/> that the background task completes
-    /// when it processes the sentinel.
-    /// </remarks>
     public Task FlushAsync()
     {
-        if (_disposed)
-            return Task.CompletedTask;
+        // Wait for current batch to complete, even if queue is empty.
+        lock (_flushLock)
+        {
+            if (_queue.IsEmpty && _flushTcs == null)
+                return Task.CompletedTask;
 
-        var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        var sentinel = new FlushSentinel(tcs);
-        _channel.Writer.TryWrite(sentinel);
-        return tcs.Task;
+            _flushTcs ??= new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            _hasItems.Set(); // Make sure the consumer wakes up.
+            return _flushTcs.Task;
+        }
     }
 
-    // ─── Background consumer ──────────────────────────────────────────────────
-
-    private async Task ConsumeLoopAsync()
+    private void ConsumeLoop()
     {
-        await foreach (var op in _channel.Reader.ReadAllAsync())
+        var ct = _cts.Token;
+        while (!ct.IsCancellationRequested)
         {
             try
             {
-                ProcessOperation(op);
+                // Block until work arrives or a short poll interval elapses.
+                _hasItems.Wait(ct);
+                _hasItems.Reset();
+
+                ProcessBatch();
+
+                // Signal any awaiting FlushAsync callers now that the queue is drained.
+                if (_queue.IsEmpty)
+                {
+                    TaskCompletionSource? toSignal = null;
+                    lock (_flushLock)
+                    {
+                        if (_flushTcs != null)
+                        {
+                            toSignal = _flushTcs;
+                            _flushTcs = null;
+                        }
+                    }
+                    toSignal?.TrySetResult();
+                }
             }
-            catch
+            catch (OperationCanceledException)
             {
-                // Swallow individual operation errors to keep the consumer alive.
-                // In a production implementation you would log or surface these.
+                break;
+            }
+            catch (Exception ex)
+            {
+                // Fail the current flush tcs so callers don't hang forever,
+                // then swallow — the queue keeps running for future work.
+                TaskCompletionSource? toFail = null;
+                lock (_flushLock)
+                {
+                    if (_flushTcs != null)
+                    {
+                        toFail = _flushTcs;
+                        _flushTcs = null;
+                    }
+                }
+                toFail?.TrySetException(ex);
             }
         }
-    }
 
-    private void ProcessOperation(WriteOperation op)
-    {
-        switch (op)
+        // Drain remaining work on shutdown so Dispose + FlushAsync stays consistent.
+        try { ProcessBatch(); } catch { /* ignore */ }
+
+        TaskCompletionSource? shutdownTcs;
+        lock (_flushLock)
         {
-            case WriteEntry write:
-                ApplyWrite(write);
-                break;
-
-            case DeleteEntry delete:
-                ApplyDelete(delete);
-                break;
-
-            case FlushSentinel sentinel:
-                // All preceding operations have been processed; flush to disk.
-                _writer.Flush();
-                sentinel.Completion.TrySetResult();
-                break;
+            shutdownTcs = _flushTcs;
+            _flushTcs = null;
         }
+        shutdownTcs?.TrySetResult();
     }
 
-    /// <summary>
-    /// Appends the entry's data to the Data Region, updates the DirectoryMap,
-    /// and rewrites the Directory Region (AC-5.3).
-    /// </summary>
-    private void ApplyWrite(WriteEntry write)
+    private void ProcessBatch()
     {
-        DirectoryEntry newEntry;
+        var operations = new List<WriteOperation>();
+        while (_queue.TryDequeue(out var op))
+            operations.Add(op);
 
-        if (_directoryMap.TryGet(write.NormalizedPath, out var existing))
+        if (operations.Count == 0)
+            return;
+
+        // Collapse duplicate writes to the same path — only the last wins,
+        // reducing disk I/O and keeping the directory region compact.
+        var latestByPath = new Dictionary<string, WriteOperation>(StringComparer.Ordinal);
+        foreach (var op in operations)
+            latestByPath[op.NormalizedPath] = op;
+
+        var dirtyPaths = new List<string>(latestByPath.Count);
+
+        foreach (var op in latestByPath.Values)
         {
-            // Update: preserve CreatedAt, old space becomes free (not reclaimed until Compact)
-            newEntry = _writer.AppendEntryUpdate(
-                write.NormalizedPath, write.Data, write.ContentType, existing);
-        }
-        else
-        {
-            // New entry
-            newEntry = _writer.AppendEntry(write.NormalizedPath, write.Data, write.ContentType);
+            switch (op)
+            {
+                case WriteEntry write:
+                    var entry = _writer.AppendEntry(write.NormalizedPath, write.Data, write.ContentType);
+                    _directoryMap.Set(write.NormalizedPath, entry);
+                    dirtyPaths.Add(write.NormalizedPath);
+                    break;
+
+                case DeleteEntry delete:
+                    _directoryMap.Remove(delete.NormalizedPath);
+                    _entryCache.Invalidate(delete.NormalizedPath);
+                    break;
+            }
         }
 
-        // Keep the in-memory index in sync
-        _directoryMap.Set(write.NormalizedPath, newEntry);
+        // Persist directory region + header and fsync.
+        var snapshot = _directoryMap.Snapshot();
+        _writer.WriteDirectory(snapshot);
+        _writer.Flush();
 
-        // Rewrite the Directory Region so the file is always consistent
-        _writer.WriteDirectory(_directoryMap.Snapshot());
+        // Unpin successfully-persisted writes so TTL/LRU eviction may reclaim them.
+        foreach (var path in dirtyPaths)
+            _entryCache.Unpin(path);
     }
 
-    /// <summary>
-    /// Removes the entry from the DirectoryMap and rewrites the Directory Region.
-    /// The old data bytes in the Data Region are left as free space (reclaimed by Compact).
-    /// </summary>
-    private void ApplyDelete(DeleteEntry delete)
-    {
-        _directoryMap.Remove(delete.NormalizedPath);
-        _writer.WriteDirectory(_directoryMap.Snapshot());
-    }
-
-    // ─── Dispose ──────────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Flushes all pending operations to disk, then closes the channel and waits
-    /// for the background task to finish (AC-5.5).
-    /// </summary>
     public void Dispose()
     {
         if (_disposed) return;
         _disposed = true;
 
-        // Drain the queue before closing
-        try
-        {
-            FlushAsync().GetAwaiter().GetResult();
-        }
-        catch
-        {
-            // Best-effort flush on dispose
-        }
+        // Wake the consumer so it can notice cancellation and drain.
+        _hasItems.Set();
+        _cts.Cancel();
 
-        // Signal the channel that no more items will be written
-        _channel.Writer.TryComplete();
+        try { _consumerTask.Wait(TimeSpan.FromSeconds(10)); }
+        catch { /* ignore */ }
 
-        // Wait for the background task to finish processing remaining items
-        try
-        {
-            _backgroundTask.GetAwaiter().GetResult();
-        }
-        catch
-        {
-            // Ignore task cancellation / completion exceptions
-        }
+        _hasItems.Dispose();
+        _cts.Dispose();
     }
-
-    // ─── Private sentinel type ────────────────────────────────────────────────
-
-    /// <summary>
-    /// Internal sentinel operation used by <see cref="FlushAsync"/> to detect
-    /// when all preceding operations have been processed.
-    /// </summary>
-    private sealed record FlushSentinel(TaskCompletionSource Completion)
-        : WriteOperation(string.Empty);
 }

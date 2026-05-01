@@ -1,155 +1,151 @@
-using System.Collections.Concurrent;
+// Copyright (c) 2026 Hoshino Kennji
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// In-memory entry cache with TTL-based lazy eviction and LRU capacity eviction.
-/// Thread-safe via <see cref="ConcurrentDictionary{TKey,TValue}"/>.
+/// In-memory cache with TTL and LRU eviction strategies.
+/// Supports "pinned" entries which are not evicted — used to keep
+/// not-yet-persisted writes alive until the WriteQueue flushes them.
 /// </summary>
-/// <remarks>
-/// Satisfies AC-4.1 through AC-4.5:
-/// <list type="bullet">
-///   <item>AC-4.1: Written entries are immediately readable from cache.</item>
-///   <item>AC-4.2: Callers populate the cache on first disk read (lazy loading).</item>
-///   <item>AC-4.3: TTL-expired entries are lazily evicted on next access.</item>
-///   <item>AC-4.4: When count exceeds <c>maxEntries</c>, the LRU entry is evicted.</item>
-///   <item>AC-4.5: <see cref="Invalidate"/> synchronously removes the entry.</item>
-/// </list>
-/// </remarks>
 internal sealed class EntryCache
 {
-    // ─── Inner type ───────────────────────────────────────────────────────────
+    private readonly int _maxEntries;
+    private readonly TimeSpan _ttl;
+    private readonly Dictionary<string, CacheEntry> _cache = new(StringComparer.Ordinal);
+    private readonly object _lock = new();
 
-    private sealed class CacheItem
+    private sealed class CacheEntry
     {
         public byte[] Data { get; }
-        public DateTime CreatedAt { get; }
+        public DateTime ExpiresAt { get; set; }
         public DateTime LastAccessed { get; set; }
+        public bool Pinned { get; set; }
 
-        public CacheItem(byte[] data, DateTime now)
+        public CacheEntry(byte[] data, DateTime expiresAt, bool pinned)
         {
             Data = data;
-            CreatedAt = now;
-            LastAccessed = now;
+            ExpiresAt = expiresAt;
+            LastAccessed = DateTime.UtcNow;
+            Pinned = pinned;
         }
     }
 
-    // ─── Fields ───────────────────────────────────────────────────────────────
-
-    private readonly ConcurrentDictionary<string, CacheItem> _entries =
-        new(StringComparer.Ordinal);
-
-    private readonly int _maxEntries;
-    private readonly TimeSpan _ttl;
-
-    /// <summary>
-    /// Provides the current UTC time. Defaults to <see cref="DateTime.UtcNow"/>.
-    /// Inject a custom provider in tests to control time without sleeping.
-    /// </summary>
-    private readonly Func<DateTime> _utcNow;
-
-    // ─── Constructor ──────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Initialises the cache with the given capacity and TTL.
-    /// </summary>
-    /// <param name="maxEntries">Maximum number of entries before LRU eviction kicks in.</param>
-    /// <param name="ttl">Time-to-live for each entry. Expired entries are lazily removed.</param>
-    /// <param name="utcNow">
-    /// Optional time provider. Defaults to <c>() =&gt; DateTime.UtcNow</c>.
-    /// Pass a custom delegate in unit tests to control time deterministically.
-    /// </param>
-    public EntryCache(int maxEntries, TimeSpan ttl, Func<DateTime>? utcNow = null)
+    public EntryCache(int maxEntries, TimeSpan ttl)
     {
-        if (maxEntries <= 0)
-            throw new ArgumentOutOfRangeException(nameof(maxEntries), "Must be greater than zero.");
-
         _maxEntries = maxEntries;
         _ttl = ttl;
-        _utcNow = utcNow ?? (() => DateTime.UtcNow);
     }
 
-    // ─── Public API ───────────────────────────────────────────────────────────
+    /// <summary>
+    /// Sets a cache entry, (re)starting the TTL timer.
+    /// When <paramref name="pinned"/> is true, the entry is excluded from
+    /// TTL expiration and LRU eviction until <see cref="Unpin"/> is called.
+    /// </summary>
+    public void Set(string normalizedPath, byte[] data, bool pinned = false)
+    {
+        lock (_lock)
+        {
+            var expiresAt = DateTime.UtcNow.Add(_ttl);
+            _cache[normalizedPath] = new CacheEntry(data, expiresAt, pinned);
+            EvictIfNecessary();
+        }
+    }
 
     /// <summary>
-    /// Attempts to retrieve the cached bytes for <paramref name="normalizedPath"/>.
-    /// Returns <c>false</c> (and removes the entry) if the entry has expired.
-    /// Updates <c>LastAccessed</c> on a cache hit.
+    /// Tries to get a cached entry. Resets TTL timer on successful access.
+    /// Expired (non-pinned) entries are lazily evicted here.
     /// </summary>
     public bool TryGet(string normalizedPath, out byte[] data)
     {
-        if (_entries.TryGetValue(normalizedPath, out var item))
+        lock (_lock)
         {
-            var now = _utcNow();
+            data = Array.Empty<byte>();
 
-            // AC-4.3: Lazy TTL eviction
-            if (now - item.CreatedAt > _ttl)
+            if (!_cache.TryGetValue(normalizedPath, out var entry))
+                return false;
+
+            // Non-pinned expired entries are lazily evicted.
+            if (!entry.Pinned && DateTime.UtcNow > entry.ExpiresAt)
             {
-                _entries.TryRemove(normalizedPath, out _);
-                data = Array.Empty<byte>();
+                _cache.Remove(normalizedPath);
                 return false;
             }
 
-            // AC-4.1 / AC-4.4: Update LRU timestamp on hit
-            item.LastAccessed = now;
-            data = item.Data;
+            // Reset TTL timer and LRU timestamp on read access (per spec).
+            var now = DateTime.UtcNow;
+            entry.LastAccessed = now;
+            entry.ExpiresAt = now.Add(_ttl);
+            data = entry.Data;
             return true;
         }
-
-        data = Array.Empty<byte>();
-        return false;
     }
 
     /// <summary>
-    /// Stores <paramref name="data"/> under <paramref name="normalizedPath"/>.
-    /// If the cache is at capacity, the least-recently-used entry is evicted first.
-    /// </summary>
-    public void Set(string normalizedPath, byte[] data)
-    {
-        var now = _utcNow();
-
-        // AC-4.4: LRU eviction when at capacity (only when adding a brand-new key)
-        if (!_entries.ContainsKey(normalizedPath) && _entries.Count >= _maxEntries)
-            EvictLru();
-
-        _entries[normalizedPath] = new CacheItem(data, now);
-    }
-
-    /// <summary>
-    /// Removes the entry for <paramref name="normalizedPath"/> from the cache.
-    /// No-op if the path is not cached. Satisfies AC-4.5.
+    /// Removes a specific cache entry regardless of pin state.
     /// </summary>
     public void Invalidate(string normalizedPath)
-        => _entries.TryRemove(normalizedPath, out _);
-
-    /// <summary>
-    /// Removes all entries from the cache.
-    /// </summary>
-    public void Clear()
-        => _entries.Clear();
-
-    // ─── Private helpers ──────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Scans all entries and removes the one with the oldest <c>LastAccessed</c> timestamp.
-    /// This is a best-effort scan; in a highly concurrent scenario the evicted entry
-    /// may not be the globally oldest, but correctness (no data corruption) is preserved.
-    /// </summary>
-    private void EvictLru()
     {
-        string? lruKey = null;
-        DateTime lruTime = DateTime.MaxValue;
+        lock (_lock)
+            _cache.Remove(normalizedPath);
+    }
 
-        foreach (var (key, item) in _entries)
+    /// <summary>
+    /// Releases the pin on an entry, allowing it to be evicted normally.
+    /// Called by the WriteQueue after successful persistence.
+    /// </summary>
+    public void Unpin(string normalizedPath)
+    {
+        lock (_lock)
         {
-            if (item.LastAccessed < lruTime)
+            if (_cache.TryGetValue(normalizedPath, out var entry))
             {
-                lruTime = item.LastAccessed;
-                lruKey = key;
+                entry.Pinned = false;
+                entry.LastAccessed = DateTime.UtcNow;
+                entry.ExpiresAt = DateTime.UtcNow.Add(_ttl);
+                // After unpinning, size limit might need enforcement.
+                EvictIfNecessary();
             }
         }
+    }
 
-        if (lruKey is not null)
-            _entries.TryRemove(lruKey, out _);
+    /// <summary>
+    /// Evicts non-pinned entries if cache exceeds maximum capacity (LRU).
+    /// Pinned entries are always retained so pending writes never get lost.
+    /// </summary>
+    private void EvictIfNecessary()
+    {
+        while (_cache.Count > _maxEntries)
+        {
+            string? lruKey = null;
+            DateTime oldestAccess = DateTime.MaxValue;
+
+            foreach (var (key, entry) in _cache)
+            {
+                if (entry.Pinned)
+                    continue;
+
+                if (entry.LastAccessed < oldestAccess)
+                {
+                    oldestAccess = entry.LastAccessed;
+                    lruKey = key;
+                }
+            }
+
+            if (lruKey == null)
+                break; // All remaining entries are pinned — can't evict.
+
+            _cache.Remove(lruKey);
+        }
     }
 }

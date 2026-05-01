@@ -11,21 +11,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SiliconLife.Speedy;
+namespace SiliconLife.Speedy.Manager;
 
-/// <summary>
-/// Header and statistics information about a .spk file.
-/// </summary>
-public record SpkFileInfo(
-    string FilePath,
-    long FileSize,
-    string Magic,
-    ushort Version,
-    ushort Flags,
-    long DirectoryOffset,
-    int DirectoryLength,
-    int TotalEntries,
-    int JsonEntries,
-    int RawEntries,
-    int TextEntries
-);
+internal static class Program
+{
+    /// <summary>
+    ///  The main entry point for the application.
+    /// </summary>
+    [STAThread]
+    static void Main()
+    {
+        ApplicationConfiguration.Initialize();
+        Application.Run(new MainForm());
+    }
+}

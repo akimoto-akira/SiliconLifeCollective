@@ -1,12 +1,26 @@
+// Copyright (c) 2026 Hoshino Kennji
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using System.Text.Json;
+using MessagePack;
 using SiliconLife.Speedy.Internal;
 
 namespace SiliconLife.Speedy;
 
 /// <summary>
 /// The primary entry point for reading and writing data in a .spk pack file.
-/// Combines an in-memory <see cref="DirectoryMap"/>, an <see cref="EntryCache"/>,
-/// and an asynchronous <see cref="WriteQueue"/> to deliver low-latency reads and
+/// Combines an in-memory DirectoryMap, an EntryCache,
+/// and an asynchronous WriteQueue to deliver low-latency reads and
 /// non-blocking writes.
 /// </summary>
 /// <remarks>
@@ -14,24 +28,32 @@ namespace SiliconLife.Speedy;
 /// </remarks>
 public sealed class SpeedyPack : IDisposable
 {
-    // ─── Fields ───────────────────────────────────────────────────────────────
+    // Static constructor to configure MessagePack serializers
+    static SpeedyPack()
+    {
+        // Configure MessagePack to handle DateTime properly
+        var resolver = MessagePack.Resolvers.CompositeResolver.Create(
+            MessagePack.Resolvers.BuiltinResolver.Instance,
+            MessagePack.Resolvers.ContractlessStandardResolver.Instance);
+        
+        var options = MessagePackSerializerOptions.Standard
+            .WithResolver(resolver)
+            .WithCompression(MessagePackCompression.Lz4Block);
+        
+        MessagePackSerializer.DefaultOptions = options;
+    }
 
     private readonly string _filePath;
     private readonly SpeedyPackOptions _options;
     private readonly DirectoryMap _directoryMap;
     private readonly EntryCache _entryCache;
 
-    // These are mutable so CompactAsync can reinitialize them after replacing the file.
-    private WriteQueue? _writeQueue;       // null when ReadOnly
-    private PackFileWriter? _writer;       // null when ReadOnly
+    private WriteQueue? _writeQueue;
+    private PackFileWriter? _writer;
     private PackFileReader _reader;
 
     private bool _disposed;
-
-    // Compact operations must be serialized; reads/writes can proceed concurrently.
     private readonly SemaphoreSlim _compactLock = new(1, 1);
-
-    // ─── Private constructor ──────────────────────────────────────────────────
 
     private SpeedyPack(
         string filePath,
@@ -51,14 +73,10 @@ public sealed class SpeedyPack : IDisposable
         _writeQueue = writeQueue;
     }
 
-    // ─── 7.1: Factory methods ─────────────────────────────────────────────────
-
     /// <summary>
     /// Opens an existing .spk file, loading its directory index into memory.
-    /// If the file does not exist, a new empty pack is created automatically (AC-1.2).
+    /// If the file does not exist, a new empty pack is created automatically.
     /// </summary>
-    /// <param name="filePath">Path to the .spk file.</param>
-    /// <param name="options">Optional configuration. Defaults are used when null.</param>
     public static SpeedyPack Open(string filePath, SpeedyPackOptions? options = null)
     {
         options ??= new SpeedyPackOptions();
@@ -68,7 +86,6 @@ public sealed class SpeedyPack : IDisposable
 
         if (File.Exists(filePath))
         {
-            // Open existing file — load directory index
             var reader = PackFileReader.Open(filePath);
             var directory = reader.LoadDirectory();
             directoryMap.LoadFrom(directory);
@@ -80,27 +97,24 @@ public sealed class SpeedyPack : IDisposable
             }
 
             var writer = PackFileWriter.Open(filePath);
-            var writeQueue = new WriteQueue(writer, directoryMap);
+            var writeQueue = new WriteQueue(writer, directoryMap, entryCache);
             return new SpeedyPack(filePath, options, directoryMap, entryCache,
                 reader, writer, writeQueue);
         }
         else
         {
-            // File does not exist — create a new empty pack (AC-1.2)
             EnsureDirectoryExists(filePath);
             var writer = PackFileWriter.Create(filePath);
             var reader = PackFileReader.Open(filePath);
-            var writeQueue = new WriteQueue(writer, directoryMap);
+            var writeQueue = new WriteQueue(writer, directoryMap, entryCache);
             return new SpeedyPack(filePath, options, directoryMap, entryCache,
                 reader, writer, writeQueue);
         }
     }
 
     /// <summary>
-    /// Force-creates a new .spk file, overwriting any existing file (AC-1.3).
+    /// Force-creates a new .spk file, overwriting any existing file.
     /// </summary>
-    /// <param name="filePath">Path to the .spk file.</param>
-    /// <param name="options">Optional configuration. Defaults are used when null.</param>
     public static SpeedyPack Create(string filePath, SpeedyPackOptions? options = null)
     {
         options ??= new SpeedyPackOptions();
@@ -110,20 +124,17 @@ public sealed class SpeedyPack : IDisposable
         var directoryMap = new DirectoryMap();
         var entryCache = new EntryCache(options.MaxCacheEntries, options.EntryCacheTtl);
 
-        // Force-create (overwrites if exists)
         var writer = PackFileWriter.Create(filePath);
         var reader = PackFileReader.Open(filePath);
-        var writeQueue = new WriteQueue(writer, directoryMap);
+        var writeQueue = new WriteQueue(writer, directoryMap, entryCache);
 
         return new SpeedyPack(filePath, options, directoryMap, entryCache,
             reader, writer, writeQueue);
     }
 
-    // ─── 7.2: Write ───────────────────────────────────────────────────────────
-
     /// <summary>
-    /// Writes raw bytes to <paramref name="path"/>.
-    /// The cache is updated synchronously; file persistence is asynchronous (AC-5.1).
+    /// Writes raw bytes to path.
+    /// The cache is updated synchronously; file persistence is asynchronous.
     /// </summary>
     public void Write(string path, ReadOnlySpan<byte> data)
     {
@@ -131,36 +142,35 @@ public sealed class SpeedyPack : IDisposable
         var normalizedPath = PathNormalizer.Normalize(path);
         var bytes = data.ToArray();
 
-        // AC-4.1: Update cache synchronously so the value is immediately readable
-        _entryCache.Set(normalizedPath, bytes);
-
-        // AC-5.1: Enqueue for async persistence
+        // Pin the cache entry so it survives LRU/TTL eviction until the
+        // WriteQueue has persisted it to disk and updated the DirectoryMap.
+        _entryCache.Set(normalizedPath, bytes, pinned: true);
         _writeQueue!.Enqueue(new WriteEntry(normalizedPath, bytes, "raw"));
     }
 
     /// <summary>
-    /// Writes raw bytes to <paramref name="path"/>.
-    /// Convenience overload for <c>byte[]</c> to avoid ambiguity with the generic overload.
+    /// Writes raw bytes to path. Convenience overload for byte[].
     /// </summary>
     public void Write(string path, byte[] data) => Write(path, data.AsSpan());
 
     /// <summary>
-    /// Writes bytes to <paramref name="path"/> with an explicit <paramref name="contentType"/>.
+    /// Writes bytes to path with an explicit contentType.
     /// Valid content types are "raw", "json", and "text".
-    /// The cache is updated synchronously; file persistence is asynchronous.
     /// </summary>
     public void Write(string path, byte[] data, string contentType)
     {
         ThrowIfReadOnly();
+        if (data is null) throw new ArgumentNullException(nameof(data));
+        if (string.IsNullOrEmpty(contentType)) contentType = "raw";
         var normalizedPath = PathNormalizer.Normalize(path);
 
-        _entryCache.Set(normalizedPath, data);
+        _entryCache.Set(normalizedPath, data, pinned: true);
         _writeQueue!.Enqueue(new WriteEntry(normalizedPath, data, contentType));
     }
 
     /// <summary>
-    /// Serializes <paramref name="value"/> as JSON and writes it to <paramref name="path"/>.
-    /// The cache is updated synchronously; file persistence is asynchronous (AC-5.1).
+    /// Serializes value as JSON and writes it to path.
+    /// The cache is updated synchronously; file persistence is asynchronous.
     /// </summary>
     public void Write<T>(string path, T value)
     {
@@ -168,43 +178,35 @@ public sealed class SpeedyPack : IDisposable
         var normalizedPath = PathNormalizer.Normalize(path);
         var bytes = JsonSerializer.SerializeToUtf8Bytes(value);
 
-        // AC-4.1: Update cache synchronously
-        _entryCache.Set(normalizedPath, bytes);
-
-        // AC-5.1: Enqueue for async persistence
+        _entryCache.Set(normalizedPath, bytes, pinned: true);
         _writeQueue!.Enqueue(new WriteEntry(normalizedPath, bytes, "json"));
     }
 
-    // ─── 7.3: Read ────────────────────────────────────────────────────────────
-
     /// <summary>
-    /// Reads the raw bytes stored at <paramref name="path"/>.
-    /// Returns <c>null</c> if the path does not exist.
+    /// Reads the raw bytes stored at path.
+    /// Returns null if the path does not exist.
     /// </summary>
     public byte[]? Read(string path)
     {
         var normalizedPath = PathNormalizer.Normalize(path);
 
-        // AC-4.2: Check cache first
+        // Cache (includes pinned, not-yet-persisted writes) wins first.
         if (_entryCache.TryGet(normalizedPath, out var cached))
             return cached;
 
-        // Cache miss — check directory index
         if (!_directoryMap.TryGet(normalizedPath, out var entry))
             return null;
 
-        // Load from file
         var bytes = _reader.ReadAt(entry.Offset, entry.Length);
-
-        // Populate cache for future reads
-        _entryCache.Set(normalizedPath, bytes);
+        // Populate cache as a regular (non-pinned) entry subject to TTL/LRU.
+        _entryCache.Set(normalizedPath, bytes, pinned: false);
 
         return bytes;
     }
 
     /// <summary>
-    /// Reads and deserializes the JSON value stored at <paramref name="path"/>.
-    /// Returns <c>default</c> if the path does not exist.
+    /// Reads and deserializes the JSON value stored at path.
+    /// Returns default if the path does not exist.
     /// </summary>
     public T? Read<T>(string path)
     {
@@ -215,10 +217,8 @@ public sealed class SpeedyPack : IDisposable
         return JsonSerializer.Deserialize<T>(bytes);
     }
 
-    // ─── 7.4: Exists / Delete ─────────────────────────────────────────────────
-
     /// <summary>
-    /// Returns <c>true</c> if an entry exists at <paramref name="path"/> (AC-2.3).
+    /// Returns true if an entry exists at path.
     /// </summary>
     public bool Exists(string path)
     {
@@ -227,29 +227,23 @@ public sealed class SpeedyPack : IDisposable
     }
 
     /// <summary>
-    /// Deletes the entry at <paramref name="path"/>.
-    /// Silent no-op if the path does not exist (AC-2.4).
-    /// The cache entry is invalidated synchronously (AC-4.5).
+    /// Deletes the entry at path.
+    /// Silent no-op if the path does not exist.
+    /// The cache entry is invalidated synchronously.
     /// </summary>
     public void Delete(string path)
     {
         ThrowIfReadOnly();
         var normalizedPath = PathNormalizer.Normalize(path);
 
-        // AC-4.5: Invalidate cache synchronously
+        // Synchronously make the entry unreadable; persistence happens async.
         _entryCache.Invalidate(normalizedPath);
-
-        // Remove from directory map immediately so Exists() returns false right away
         _directoryMap.Remove(normalizedPath);
-
-        // Enqueue async persistence of the delete (rewrites directory region)
         _writeQueue!.Enqueue(new DeleteEntry(normalizedPath));
     }
 
-    // ─── 7.4b: GetMetadata ────────────────────────────────────────────────────
-
     /// <summary>
-    /// Returns metadata for the entry at <paramref name="path"/>, or <c>null</c> if not found.
+    /// Returns metadata for the entry at path, or null if not found.
     /// Returns a tuple of (ContentType, Length, CreatedAt, UpdatedAt).
     /// </summary>
     public (string ContentType, int Length, DateTime CreatedAt, DateTime UpdatedAt)? GetEntryMetadata(string path)
@@ -260,8 +254,6 @@ public sealed class SpeedyPack : IDisposable
 
         return (entry.ContentType, entry.Length, entry.CreatedAt, entry.UpdatedAt);
     }
-
-    // ─── 7.4c: GetFileInfo ────────────────────────────────────────────────────
 
     /// <summary>
     /// Returns header and statistics information about the current .spk file.
@@ -298,11 +290,8 @@ public sealed class SpeedyPack : IDisposable
             TextEntries: textEntries);
     }
 
-    // ─── 7.5: ListEntries / ListDirectories ───────────────────────────────────
-
     /// <summary>
-    /// Returns the normalized paths of all direct child entries under
-    /// <paramref name="directoryPath"/> (AC-3.1, AC-3.3, AC-3.4).
+    /// Returns the normalized paths of all direct child entries under directoryPath.
     /// No disk I/O — the directory index is always in memory.
     /// </summary>
     public IReadOnlyList<string> ListEntries(string directoryPath = "")
@@ -312,8 +301,7 @@ public sealed class SpeedyPack : IDisposable
     }
 
     /// <summary>
-    /// Returns the normalized paths of all direct sub-directories under
-    /// <paramref name="directoryPath"/> (AC-3.2, AC-3.4).
+    /// Returns the normalized paths of all direct sub-directories under directoryPath.
     /// No disk I/O — the directory index is always in memory.
     /// </summary>
     public IReadOnlyList<string> ListDirectories(string directoryPath = "")
@@ -322,11 +310,9 @@ public sealed class SpeedyPack : IDisposable
         return _directoryMap.ListDirectories(normalizedPath);
     }
 
-    // ─── Transaction ──────────────────────────────────────────────────────────
-
     /// <summary>
     /// Begins a new transaction. Operations are buffered until
-    /// <see cref="IPackTransaction.Commit"/> is called (AC-6.1).
+    /// IPackTransaction.Commit is called.
     /// </summary>
     public IPackTransaction BeginTransaction()
     {
@@ -334,10 +320,8 @@ public sealed class SpeedyPack : IDisposable
         return new SpeedyTransaction(this);
     }
 
-    // ─── 7.6: FlushAsync / CompactAsync ──────────────────────────────────────
-
     /// <summary>
-    /// Waits until all enqueued write operations have been persisted to disk (AC-5.4).
+    /// Waits until all enqueued write operations have been persisted to disk.
     /// </summary>
     public Task FlushAsync()
     {
@@ -349,7 +333,7 @@ public sealed class SpeedyPack : IDisposable
 
     /// <summary>
     /// Flushes all pending writes, then rewrites the file compacting away free/deleted
-    /// space. All entries remain readable before and after (AC-7.4).
+    /// space. All entries remain readable before and after.
     /// </summary>
     public async Task CompactAsync()
     {
@@ -358,13 +342,10 @@ public sealed class SpeedyPack : IDisposable
         await _compactLock.WaitAsync().ConfigureAwait(false);
         try
         {
-            // Flush all pending writes first so the file is consistent
             await FlushAsync().ConfigureAwait(false);
 
-            // Snapshot the current live entries
             var snapshot = _directoryMap.Snapshot();
 
-            // Write all live entries to a temp file, then replace the original
             var tempPath = _filePath + ".compact.tmp";
             try
             {
@@ -374,7 +355,6 @@ public sealed class SpeedyPack : IDisposable
                 {
                     foreach (var (normalizedPath, oldEntry) in snapshot)
                     {
-                        // Read the current bytes (from cache or file)
                         byte[] bytes;
                         if (_entryCache.TryGet(normalizedPath, out var cached))
                         {
@@ -390,30 +370,24 @@ public sealed class SpeedyPack : IDisposable
                         newEntries[normalizedPath] = newEntry;
                     }
 
-                    // Write the directory region to the temp file
                     tempWriter.WriteDirectory(newEntries);
                     tempWriter.Flush();
                 }
 
-                // Dispose the current write queue, reader, and writer before replacing the file
                 _writeQueue!.Dispose();
                 _reader.Dispose();
                 _writer!.Dispose();
 
-                // Replace the original file with the compacted temp file
                 File.Move(tempPath, _filePath, overwrite: true);
 
-                // Reload the directory map with new offsets
                 _directoryMap.LoadFrom(newEntries);
 
-                // Reinitialize reader, writer, and write queue with the new file
                 _reader = PackFileReader.Open(_filePath);
                 _writer = PackFileWriter.Open(_filePath);
-                _writeQueue = new WriteQueue(_writer, _directoryMap);
+                _writeQueue = new WriteQueue(_writer, _directoryMap, _entryCache);
             }
             catch
             {
-                // Clean up temp file on failure
                 if (File.Exists(tempPath))
                     File.Delete(tempPath);
                 throw;
@@ -425,24 +399,37 @@ public sealed class SpeedyPack : IDisposable
         }
     }
 
-    // ─── 7.7: Dispose ─────────────────────────────────────────────────────────
-
     /// <summary>
-    /// Flushes all pending writes, then closes all file handles (AC-1.5, AC-5.5).
+    /// Flushes all pending writes, then closes all file handles.
     /// </summary>
     public void Dispose()
     {
         if (_disposed) return;
         _disposed = true;
 
-        // AC-5.5: Drain the write queue before closing
-        _writeQueue?.Dispose();
+        // Drain pending writes first so the .spk file on disk is consistent.
+        if (_writeQueue != null)
+        {
+            try
+            {
+                var flushTask = _writeQueue.FlushAsync();
+                flushTask.Wait(TimeSpan.FromSeconds(10));
+                if (!flushTask.IsCompletedSuccessfully)
+                {
+                    // If flush didn't complete, try to force process remaining operations
+                    try { _writeQueue.Dispose(); } catch { /* ignore */ }
+                }
+            }
+            catch
+            {
+                // Ignore exceptions during flush
+            }
+        }
+
         _reader.Dispose();
         _writer?.Dispose();
         _compactLock.Dispose();
     }
-
-    // ─── Private helpers ──────────────────────────────────────────────────────
 
     private static void EnsureDirectoryExists(string filePath)
     {
@@ -457,24 +444,21 @@ public sealed class SpeedyPack : IDisposable
             throw new InvalidOperationException("This SpeedyPack instance is read-only.");
     }
 
-    // ─── Internal transaction support ────────────────────────────────────────
-
     /// <summary>
-    /// Called by <see cref="SpeedyTransaction.Commit"/> to apply a batch of operations
-    /// atomically to the main cache and write queue (AC-6.3).
+    /// Called by SpeedyTransaction.Commit to apply a batch of operations
+    /// atomically to the main cache and write queue.
     /// </summary>
     internal void ApplyTransactionBatch(IEnumerable<WriteOperation> ops)
     {
-        // Materialize once so we can iterate twice
         var opList = ops as IReadOnlyList<WriteOperation> ?? ops.ToList();
 
-        // Update cache synchronously first
         foreach (var op in opList)
         {
             switch (op)
             {
                 case WriteEntry write:
-                    _entryCache.Set(write.NormalizedPath, write.Data);
+                    // Pin until the WriteQueue persists the batch.
+                    _entryCache.Set(write.NormalizedPath, write.Data, pinned: true);
                     break;
                 case DeleteEntry delete:
                     _entryCache.Invalidate(delete.NormalizedPath);
@@ -483,7 +467,6 @@ public sealed class SpeedyPack : IDisposable
             }
         }
 
-        // Enqueue all operations as a batch for async persistence
         _writeQueue!.EnqueueBatch(opList);
     }
 }
