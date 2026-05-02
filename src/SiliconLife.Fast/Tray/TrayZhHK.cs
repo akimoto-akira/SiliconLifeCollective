@@ -114,6 +114,11 @@ public class TrayZhHK : TrayLocalizationBase
     public override string Configuration => "設定";
 
     /// <summary>
+    /// Gets the Speedy Pack Manager menu item text
+    /// </summary>
+    public override string SpeedyPackManager => "Speedy Pack 管理員";
+
+    /// <summary>
     /// Gets the exit menu item text
     /// </summary>
     public override string Exit => "退出應用程式";

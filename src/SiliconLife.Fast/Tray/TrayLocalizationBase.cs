@@ -115,6 +115,11 @@ public abstract class TrayLocalizationBase
     public abstract string Configuration { get; }
 
     /// <summary>
+    /// Gets the Speedy Pack Manager menu item text
+    /// </summary>
+    public abstract string SpeedyPackManager { get; }
+
+    /// <summary>
     /// Gets the exit menu item text
     /// </summary>
     public abstract string Exit { get; }

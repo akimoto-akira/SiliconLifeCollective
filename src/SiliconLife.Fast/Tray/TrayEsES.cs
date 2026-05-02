@@ -114,6 +114,11 @@ public class TrayEsES : TrayLocalizationBase
     public override string Configuration => "Configuración";
 
     /// <summary>
+    /// Gets the Speedy Pack Manager menu item text
+    /// </summary>
+    public override string SpeedyPackManager => "Administrador Speedy Pack";
+
+    /// <summary>
     /// Gets the exit menu item text
     /// </summary>
     public override string Exit => "Salir";

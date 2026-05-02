@@ -12,6 +12,7 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
+using SiliconLife.Fast;
 using System.Diagnostics;
 using System.Drawing;
 using System.Resources;
@@ -97,6 +98,10 @@ public class TrayStatusWindow : Form
         var configItem = new ToolStripMenuItem(_localization.Configuration);
         configItem.Click += (s, e) => OpenConfiguration();
         contextMenuStrip1.Items.Add(configItem);
+
+        var speedyPackManagerItem = new ToolStripMenuItem(_localization.SpeedyPackManager);
+        speedyPackManagerItem.Click += (s, e) => OpenSpeedyPackManager();
+        contextMenuStrip1.Items.Add(speedyPackManagerItem);
 
         contextMenuStrip1.Items.Add(new ToolStripSeparator());
 
@@ -217,6 +222,27 @@ public class TrayStatusWindow : Form
         catch (Exception ex)
         {
             MessageBox.Show($"Failed to open configuration: {ex.Message}", "Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    /// <summary>
+    /// Opens the Speedy Pack Manager window
+    /// </summary>
+    private void OpenSpeedyPackManager()
+    {
+        try
+        {
+            // Get the current SpeedyPack from the registry
+            var currentPack = SpeedyPackRegistry.Pack;
+            
+            // Create and show the MainForm directly with the current pack
+            var managerForm = new SiliconLife.Speedy.Manager.MainForm(currentPack);
+            managerForm.Show();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Failed to open Speedy Pack Manager: {ex.Message}", "Error",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
