@@ -167,12 +167,27 @@ internal sealed class WriteQueue : IDisposable
             switch (op)
             {
                 case WriteEntry write:
-                    var entry = _writer.AppendEntry(write.NormalizedPath, write.Data, write.ContentType);
+                    // 覆写时：释放旧条目占用的空间给 FreeList，并保留原 CreatedAt，
+                    // 这样 AppendEntry 在 FreeList 中可能就地复用同一块空间，
+                    // 避免文件无限增长。
+                    DateTime? createdAt = null;
+                    if (_directoryMap.TryGet(write.NormalizedPath, out var oldEntry))
+                    {
+                        createdAt = oldEntry.CreatedAt;
+                        _writer.ReleaseEntry(oldEntry);
+                    }
+                    var entry = _writer.AppendEntry(
+                        write.NormalizedPath, write.Data, write.ContentType, createdAt);
                     _directoryMap.Set(write.NormalizedPath, entry);
                     dirtyPaths.Add(write.NormalizedPath);
                     break;
 
                 case DeleteEntry delete:
+                    // 删除时：利用 SpeedyPack.Delete / ApplyTransactionBatch 提前捕获的 OldEntry
+                    // 把旧空间归还给 FreeList，DirectoryMap 的同步移除在此之前已经完成，
+                    // 此处再执行一次 Remove / Invalidate 保持幂等。
+                    if (delete.OldEntry != null)
+                        _writer.ReleaseEntry(delete.OldEntry);
                     _directoryMap.Remove(delete.NormalizedPath);
                     _entryCache.Invalidate(delete.NormalizedPath);
                     break;

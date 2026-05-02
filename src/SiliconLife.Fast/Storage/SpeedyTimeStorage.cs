@@ -47,10 +47,21 @@ public sealed class SpeedyTimeStorage : ITimeStorage, IDisposable
     private static string ExtractKeyPrefix(string dir)
     {
         if (string.IsNullOrWhiteSpace(dir)) return "";
-        string dirName = Path.GetFileName(dir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-        if (Guid.TryParse(dirName, out _))
-            return dirName + "/";
-        return "";
+        
+        // Extract relative path from full directory path
+        // e.g., "d:\data\SiliconManager\{GUID}" → "SiliconManager/{GUID}"
+        string currentDir = Environment.CurrentDirectory;
+        string relativePath = dir;
+        
+        if (relativePath.StartsWith(currentDir, StringComparison.OrdinalIgnoreCase))
+        {
+            relativePath = relativePath.Substring(currentDir.Length).TrimStart('\\', '/');
+        }
+        
+        // Normalize path separators to forward slashes
+        relativePath = relativePath.Replace('\\', '/').TrimEnd('/');
+        
+        return string.IsNullOrEmpty(relativePath) ? "" : relativePath + "/";
     }
 
     private string PrefixKey(string key) => _keyPrefix + key;

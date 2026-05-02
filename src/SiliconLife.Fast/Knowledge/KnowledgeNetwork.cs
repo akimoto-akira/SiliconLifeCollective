@@ -14,6 +14,7 @@
 
 using SiliconLife.Collective;
 using System.Text.Json;
+using SiliconLife.Fast;
 
 namespace SiliconLife.Fast.Knowledge;
 
@@ -469,31 +470,19 @@ public class KnowledgeNetwork : IKnowledgeNetwork
     }
 
     /// <summary>
-    /// Backup knowledge network (export to JSON files)
+    /// Backup knowledge network (export to SpeedyPack)
     /// </summary>
     public void Backup(string backupPath)
     {
         if (!_initialized)
             throw new InvalidOperationException("Knowledge network not initialized");
 
-        if (!Directory.Exists(backupPath))
-        {
-            Directory.CreateDirectory(backupPath);
-        }
-
-        var options = new System.Text.Json.JsonSerializerOptions
-        {
-            WriteIndented = true,
-            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
-        };
-
         _lock.EnterReadLock();
         try
         {
             // Export entries
             var entriesList = _entries.Values.ToList();
-            var entriesJson = System.Text.Json.JsonSerializer.Serialize(entriesList, options);
-            File.WriteAllText(Path.Combine(backupPath, "entries.json"), entriesJson);
+            SpeedyPackRegistry.Pack.Write($"knowledge/backup/{backupPath}/entries", entriesList);
 
             // Export graph
             var graphData = new
@@ -503,8 +492,7 @@ public class KnowledgeNetwork : IKnowledgeNetwork
                 PredicateIndex = _graph.PredicateIndex,
                 TripleIds = _graph.TripleIds.ToList()
             };
-            var graphJson = System.Text.Json.JsonSerializer.Serialize(graphData, options);
-            File.WriteAllText(Path.Combine(backupPath, "graph.json"), graphJson);
+            SpeedyPackRegistry.Pack.Write($"knowledge/backup/{backupPath}/graph", graphData);
         }
         finally
         {
@@ -513,20 +501,12 @@ public class KnowledgeNetwork : IKnowledgeNetwork
     }
 
     /// <summary>
-    /// Restore knowledge network from backup (import JSON files)
+    /// Restore knowledge network from backup (import from SpeedyPack)
     /// </summary>
     public void Restore(string backupPath)
     {
         if (!_initialized)
             throw new InvalidOperationException("Knowledge network not initialized");
-
-        var entriesPath = Path.Combine(backupPath, "entries.json");
-        var graphPath = Path.Combine(backupPath, "graph.json");
-
-        if (!File.Exists(entriesPath) && !File.Exists(graphPath))
-        {
-            throw new FileNotFoundException("Backup files not found");
-        }
 
         _lock.EnterWriteLock();
         try
@@ -536,45 +516,27 @@ public class KnowledgeNetwork : IKnowledgeNetwork
             _graph.Clear();
 
             // Import entries
-            if (File.Exists(entriesPath))
+            var entries = SpeedyPackRegistry.Pack.Read<List<KnowledgeEntry>>($"knowledge/backup/{backupPath}/entries");
+            if (entries != null)
             {
-                var entriesJson = File.ReadAllText(entriesPath);
-                var readOptions = new System.Text.Json.JsonSerializerOptions 
-                { 
-                    PropertyNameCaseInsensitive = true 
-                };
-                var entries = System.Text.Json.JsonSerializer.Deserialize<List<KnowledgeEntry>>(entriesJson, readOptions);
-
-                if (entries != null)
+                foreach (var entry in entries)
                 {
-                    foreach (var entry in entries)
-                    {
-                        _entries[entry.Id] = entry;
-                    }
+                    _entries[entry.Id] = entry;
                 }
             }
 
             // Import graph
-            if (File.Exists(graphPath))
+            var graphData = SpeedyPackRegistry.Pack.Read<GraphData>($"knowledge/backup/{backupPath}/graph");
+            if (graphData != null)
             {
-                var graphJson = File.ReadAllText(graphPath);
-                var graphReadOptions = new System.Text.Json.JsonSerializerOptions 
-                { 
-                    PropertyNameCaseInsensitive = true 
-                };
-                var graphData = System.Text.Json.JsonSerializer.Deserialize<GraphData>(graphJson, graphReadOptions);
-
-                if (graphData != null)
-                {
-                    _graph.SubjectIndex = graphData.SubjectIndex ?? new();
-                    _graph.ObjectIndex = graphData.ObjectIndex ?? new();
-                    _graph.PredicateIndex = graphData.PredicateIndex ?? new();
-                    _graph.TripleIds = new HashSet<string>(graphData.TripleIds ?? new());
-                    _graph.Statistics.TotalTriples = _graph.TripleIds.Count;
-                    _graph.Statistics.TotalSubjects = _graph.SubjectIndex.Count;
-                    _graph.Statistics.TotalObjects = _graph.ObjectIndex.Count;
-                    _graph.Statistics.TotalPredicates = _graph.PredicateIndex.Count;
-                }
+                _graph.SubjectIndex = graphData.SubjectIndex ?? new();
+                _graph.ObjectIndex = graphData.ObjectIndex ?? new();
+                _graph.PredicateIndex = graphData.PredicateIndex ?? new();
+                _graph.TripleIds = new HashSet<string>(graphData.TripleIds ?? new());
+                _graph.Statistics.TotalTriples = _graph.TripleIds.Count;
+                _graph.Statistics.TotalSubjects = _graph.SubjectIndex.Count;
+                _graph.Statistics.TotalObjects = _graph.ObjectIndex.Count;
+                _graph.Statistics.TotalPredicates = _graph.PredicateIndex.Count;
             }
 
             // Save restored data

@@ -30,24 +30,38 @@ namespace SiliconLife.Fast;
 public sealed class SpeedyStorage : IStorage, IDisposable
 {
     private readonly SpeedyPack _pack;
+    private readonly string _basePath;
 
     /// <summary>
     /// Wraps the single shared <see cref="SpeedyPack"/> from
     /// <see cref="SpeedyPackRegistry"/> as an <see cref="IStorage"/> implementation.
     /// </summary>
-    public SpeedyStorage()
+    /// <param name="basePath">The base path prefix for key isolation. Can be empty for global storage.</param>
+    public SpeedyStorage(string basePath = "")
     {
         _pack = SpeedyPackRegistry.Pack;
+        _basePath = basePath.TrimEnd('/', '\\');
+        if (!string.IsNullOrEmpty(_basePath) && !_basePath.EndsWith("/"))
+        {
+            _basePath += "/";
+        }
     }
 
     // ─── Path mapping ─────────────────────────────────────────────────────────
 
-    private static string MapKey(string key)
+    private string MapKey(string key)
     {
         string safeKey = key.Replace("..", string.Empty);
         safeKey = safeKey.Replace('\\', '/');
         if (string.IsNullOrEmpty(Path.GetExtension(safeKey)))
             safeKey += ".json";
+        
+        // Prepend base path for isolation if configured
+        if (!string.IsNullOrEmpty(_basePath))
+        {
+            safeKey = _basePath + safeKey;
+        }
+        
         return safeKey;
     }
 

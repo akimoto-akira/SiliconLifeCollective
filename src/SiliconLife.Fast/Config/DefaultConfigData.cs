@@ -13,6 +13,7 @@
 
 using System.Text.Json;
 using SiliconLife.Collective;
+using SiliconLife.Fast;
 
 namespace SiliconLife.Fast;
 
@@ -64,41 +65,17 @@ public class DefaultConfigData : ConfigDataBase
     [ConfigGroup("User", Order = 2, DisplayNameKey = "UserNickname", DescriptionKey = "UserNickname")]
     public override string UserNickname { get; set; } = "User";
 
-    private string GetConfigFilePath()
-    {
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string configPath = Path.Combine(baseDir, "config.json");
+    private string GetConfigKey() => "config";
 
-        if (File.Exists(configPath))
-            return configPath;
+    public override string GetConfigPath() => GetConfigKey();
 
-        return Path.Combine(Directory.GetCurrentDirectory(), "config.json");
-    }
-
-    public override string GetConfigPath() => GetConfigFilePath();
-
-    public override bool ConfigExists() => File.Exists(GetConfigFilePath());
+    public override bool ConfigExists() => SpeedyPackRegistry.Pack.Exists(GetConfigKey());
 
     public override void LoadConfig()
     {
-        string configPath = GetConfigFilePath();
-        if (!File.Exists(configPath)) return;
-
         try
         {
-            string json = File.ReadAllText(configPath);
-            DefaultConfigData? loaded = JsonSerializer.Deserialize<DefaultConfigData>(json, new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                Converters =
-                {
-                    new System.Text.Json.Serialization.JsonStringEnumConverter(),
-                    new GuidConverter(),
-                    new ConfigDataBaseConverter()
-                }
-            });
-
+            var loaded = SpeedyPackRegistry.Pack.Read<DefaultConfigData>(GetConfigKey());
             if (loaded == null) return;
 
             ConfigType = loaded.ConfigType;
@@ -121,18 +98,12 @@ public class DefaultConfigData : ConfigDataBase
 
     public override void SaveConfig()
     {
-        string json = JsonSerializer.Serialize(this, new JsonSerializerOptions
+        try
         {
-            WriteIndented = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            Converters =
-            {
-                new System.Text.Json.Serialization.JsonStringEnumConverter(),
-                new GuidConverter(),
-                new ConfigDataBaseConverter()
-            }
-        });
-
-        File.WriteAllText(GetConfigFilePath(), json);
+            SpeedyPackRegistry.Pack.Write(GetConfigKey(), this);
+        }
+        catch (Exception)
+        {
+        }
     }
 }

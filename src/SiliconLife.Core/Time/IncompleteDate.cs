@@ -11,6 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Text.Json.Serialization;
+
 namespace SiliconLife.Collective;
 
 /// <summary>
@@ -49,6 +51,7 @@ public readonly struct IncompleteDate : IEquatable<IncompleteDate>, IComparable<
     /// component to leave it unspecified.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">A component is out of its valid range.</exception>
+    [JsonConstructor]
     public IncompleteDate(int year, int? month = null, int? day = null,
                           int? hour = null, int? minute = null, int? second = null)
     {

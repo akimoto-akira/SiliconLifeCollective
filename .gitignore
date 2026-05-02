@@ -72,4 +72,5 @@ YDoc/
 .qoderignore
 .qoder/
 .kiro/
+*.csproj.targets
 src/TravelCodeWikiWithAI/

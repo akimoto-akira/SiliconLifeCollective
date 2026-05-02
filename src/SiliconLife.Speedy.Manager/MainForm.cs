@@ -12,6 +12,8 @@
 // limitations under the License.
 
 using SiliconLife.Speedy;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SiliconLife.Speedy.Manager;
 
@@ -495,7 +497,21 @@ public partial class MainForm : Form
             var metadata = _currentPack.GetEntryMetadata(path);
             string content;
             
-            if (metadata?.ContentType == "json" || metadata?.ContentType == "text")
+            if (metadata?.ContentType == "json")
+            {
+                // Read as UTF-8 string first
+                content = System.Text.Encoding.UTF8.GetString(bytes);
+                
+                // Decode Unicode escape sequences (\uXXXX) to actual characters
+                content = DecodeUnicodeEscapes(content);
+                
+                // Limit preview to 2000 characters
+                if (content.Length > 2000)
+                {
+                    content = content.Substring(0, 2000) + "\n\n... [预览已截断]";
+                }
+            }
+            else if (metadata?.ContentType == "text")
             {
                 content = System.Text.Encoding.UTF8.GetString(bytes);
                 // Limit preview to 2000 characters
@@ -535,7 +551,15 @@ public partial class MainForm : Form
             var metadata = _currentPack.GetEntryMetadata(path);
             string content;
             
-            if (metadata?.ContentType == "json" || metadata?.ContentType == "text")
+            if (metadata?.ContentType == "json")
+            {
+                // Read as UTF-8 string first
+                content = System.Text.Encoding.UTF8.GetString(bytes);
+                
+                // Decode Unicode escape sequences (\uXXXX) to actual characters
+                content = DecodeUnicodeEscapes(content);
+            }
+            else if (metadata?.ContentType == "text")
             {
                 content = System.Text.Encoding.UTF8.GetString(bytes);
             }
@@ -563,6 +587,79 @@ public partial class MainForm : Form
         if (bytes < 1024 * 1024)
             return $"{bytes / 1024.0:F2} KB";
         return $"{bytes / (1024.0 * 1024.0):F2} MB";
+    }
+
+    /// <summary>
+    /// 解码 JSON 字符串中的 Unicode 转义序列（\uXXXX）为实际字符
+    /// </summary>
+    private static string DecodeUnicodeEscapes(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        var result = new System.Text.StringBuilder(input.Length);
+        int i = 0;
+        
+        while (i < input.Length)
+        {
+            // 检查是否是 Unicode 转义序列
+            if (i + 5 < input.Length && 
+                input[i] == '\\' && 
+                input[i + 1] == 'u' &&
+                IsHexDigit(input[i + 2]) &&
+                IsHexDigit(input[i + 3]) &&
+                IsHexDigit(input[i + 4]) &&
+                IsHexDigit(input[i + 5]))
+            {
+                // 提取十六进制值
+                string hex = input.Substring(i + 2, 4);
+                int codePoint = Convert.ToInt32(hex, 16);
+                
+                // 处理代理对（Surrogate Pair）
+                if (char.IsHighSurrogate((char)codePoint) && 
+                    i + 11 < input.Length &&
+                    input[i + 6] == '\\' &&
+                    input[i + 7] == 'u')
+                {
+                    string lowHex = input.Substring(i + 8, 4);
+                    if (IsHexDigit(lowHex[0]) && IsHexDigit(lowHex[1]) && 
+                        IsHexDigit(lowHex[2]) && IsHexDigit(lowHex[3]))
+                    {
+                        int lowCodePoint = Convert.ToInt32(lowHex, 16);
+                        char highSurrogate = (char)codePoint;
+                        char lowSurrogate = (char)lowCodePoint;
+                        
+                        if (char.IsLowSurrogate(lowSurrogate))
+                        {
+                            result.Append(char.ConvertFromUtf32(char.ConvertToUtf32(highSurrogate, lowSurrogate)));
+                            i += 12;
+                            continue;
+                        }
+                    }
+                }
+                
+                // 普通字符
+                result.Append((char)codePoint);
+                i += 6;
+            }
+            else
+            {
+                result.Append(input[i]);
+                i++;
+            }
+        }
+        
+        return result.ToString();
+    }
+
+    /// <summary>
+    /// 检查字符是否为十六进制数字
+    /// </summary>
+    private static bool IsHexDigit(char c)
+    {
+        return (c >= '0' && c <= '9') ||
+               (c >= 'a' && c <= 'f') ||
+               (c >= 'A' && c <= 'F');
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e)

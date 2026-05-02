@@ -36,9 +36,10 @@ public sealed class SpeedyWorkNoteStorage : IWorkNoteStorage, IDisposable
     /// Wraps the single shared <see cref="SpeedyPack"/> from
     /// <see cref="SpeedyPackRegistry"/> as an <see cref="IWorkNoteStorage"/> implementation.
     /// </summary>
-    public SpeedyWorkNoteStorage()
+    /// <param name="dir">Optional directory path used to extract a key prefix for isolation.</param>
+    public SpeedyWorkNoteStorage(string dir = "")
     {
-        _storage = new SpeedyStorage();
+        _storage = new SpeedyStorage(dir);
     }
 
     // ─── Path helpers ─────────────────────────────────────────────────────────

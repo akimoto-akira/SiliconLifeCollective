@@ -33,6 +33,7 @@ public class Program
     private static bool _shouldExit = false;
     private static CoreHost? _host;
     private static WebHost? _webHost;
+    private static PluginLoader? _pluginLoader;
 
     static Program()
     {
@@ -55,6 +56,13 @@ public class Program
 
         DefaultConfigData configData = (DefaultConfigData)config.Data;
         LogManager.Instance.AddProvider(new FileSystemLoggerProvider(configData));
+
+        // Load plugins after logging is initialized
+        string pluginDir = Path.Combine(AppContext.BaseDirectory, "plugins");
+        _pluginLoader = new PluginLoader(pluginDir);
+        _pluginLoader.LoadAll();
+        _logger.Info(null, "Plugins loaded from {0}", pluginDir);
+
         configData.AIConfig.TryGetValue("endpoint", out var endpointValue);
         configData.AIConfig.TryGetValue("model", out var modelValue);
         _logger.Info(null, "Configuration loaded: endpoint={0}, model={1}",
@@ -147,6 +155,9 @@ public class Program
         await _host.StartAsync();
         _logger.Info(null, "CoreHost started");
 
+        // Notify all plugins that the host is fully started
+        _pluginLoader?.NotifyAllStarted();
+
         // Only create curator if it was previously initialized (CuratorGuid is set)
         if (configData.CuratorGuid != Guid.Empty)
         {
@@ -185,6 +196,11 @@ public class Program
         {
             await _host.StopAsync();
         }
+
+        // Unload all plugins before exit
+        _pluginLoader?.NotifyAllStopping();
+        _pluginLoader?.UnloadAll();
+        _logger.Info(null, "Plugins unloaded");
 
         _shouldExit = true;
         _logger.Info(null, "Application shutdown complete");

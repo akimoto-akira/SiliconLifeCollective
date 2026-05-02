@@ -63,17 +63,26 @@ public class PluginLoader
             var context = new AssemblyLoadContext(dirName, isCollectible: true);
             Assembly assembly = context.LoadFromAssemblyPath(dllPath);
 
-            Type? pluginType = assembly.GetTypes()
-                .FirstOrDefault(t => typeof(IPlugin).IsAssignableFrom(t) && t != typeof(IPlugin) && !t.IsAbstract);
+            Type[] pluginTypes = assembly.GetTypes()
+                .Where(t => typeof(IPlugin).IsAssignableFrom(t) && t != typeof(IPlugin) && !t.IsAbstract)
+                .ToArray();
 
-            if (pluginType == null)
+            if (pluginTypes.Length == 0)
             {
                 _logger.Warn(null, "No IPlugin implementation found in {0}", dllPath);
                 context.Unload();
                 return;
             }
 
-            IPlugin plugin = (IPlugin)Activator.CreateInstance(pluginType)!;
+            if (pluginTypes.Length > 1)
+            {
+                string typeNames = string.Join(", ", pluginTypes.Select(t => t.Name));
+                _logger.Error(null, "Multiple IPlugin implementations found in {0}: [{1}]. Only one is allowed.", dllPath, typeNames);
+                context.Unload();
+                return;
+            }
+
+            IPlugin plugin = (IPlugin)Activator.CreateInstance(pluginTypes[0])!;
             plugin.OnLoad();
 
             _loadedPlugins.Add(new LoadedPlugin(plugin, context, dllPath));

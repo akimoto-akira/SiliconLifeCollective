@@ -32,6 +32,7 @@ namespace SiliconLife.Fast;
 public static class SpeedyPackRegistry
 {
     private static SpeedyPack? _pack;
+    private static SpeedyPackAutoCompactor? _autoCompactor;
     private static readonly Lock _lock = new();
 
     // ─── Public API ───────────────────────────────────────────────────────────
@@ -59,6 +60,7 @@ public static class SpeedyPackRegistry
         {
             if (_pack is not null) return;
             _pack = SpeedyPack.Open(PackFilePath, options);
+            _autoCompactor = new SpeedyPackAutoCompactor(_pack);
         }
     }
 
@@ -91,6 +93,7 @@ public static class SpeedyPackRegistry
     {
         lock (_lock)
         {
+            _autoCompactor = null;
             _pack?.Dispose();
             _pack = null;
         }

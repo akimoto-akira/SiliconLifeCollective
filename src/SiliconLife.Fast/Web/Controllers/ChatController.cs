@@ -19,6 +19,7 @@ using SiliconLife.Fast.IM;
 using SiliconLife.Fast.Web.Models;
 using SiliconLife.Fast.Web.Views;
 using System.IO;
+using SiliconLife.Fast;
 
 namespace SiliconLife.Fast.Web;
 
@@ -505,7 +506,9 @@ public class ChatController : Controller
                 return;
             }
 
-            // Check file exists
+            // Check file exists - using SpeedyPackRegistry
+            // Note: For local file paths, we still need to check existence directly
+            // since SpeedyPackRegistry manages the .spk file, not arbitrary files
             if (!File.Exists(fullPath))
             {
                 RenderJson(new { success = false, error = "File not found" });
@@ -681,16 +684,10 @@ public class ChatController : Controller
                 return;
             }
 
-            // Save file to temporary directory
-            var tempDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "uploads");
-            if (!Directory.Exists(tempDir))
-            {
-                Directory.CreateDirectory(tempDir);
-            }
-
+            // Store uploaded file in SpeedyPack
             var fileName = SanitizeFileName(fileData.FileName ?? "uploaded_file");
-            var tempFilePath = Path.Combine(tempDir, $"{Guid.NewGuid()}_{fileName}");
-            File.WriteAllBytes(tempFilePath, fileData.Data);
+            var uploadKey = $"uploads/{Guid.NewGuid()}/{fileName}";
+            SpeedyPackRegistry.Pack.Write(uploadKey, fileData.Data);
 
             // Create file message
             var fileMessage = new SiliconLife.Collective.ChatMessage
@@ -703,11 +700,11 @@ public class ChatController : Controller
                 Type = MessageType.File,
                 FileMetadata = new FileMetadata
                 {
-                    FilePath = tempFilePath,
+                    FilePath = uploadKey,
                     FileName = fileName,
                     FileSize = fileData.Data.Length,
                     MimeType = fileData.ContentType ?? GetMimeType(Path.GetExtension(fileName)),
-                    IsLocalPath = true
+                    IsLocalPath = false // Now stored in SpeedyPack
                 }
             };
 

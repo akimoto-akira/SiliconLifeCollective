@@ -35,6 +35,7 @@ public class Program
     private static CoreHost? _host;
     private static WebHost? _webHost;
     private static TrayStatusWindow? _trayWindow;
+    private static PluginLoader? _pluginLoader;
 
     static Program()
     {
@@ -57,6 +58,13 @@ public class Program
 
         DefaultConfigData configData = (DefaultConfigData)config.Data;
         LogManager.Instance.AddProvider(new SpeedyLoggerProvider());
+
+        // Load plugins after SpeedyPack and logging are initialized
+        string pluginDir = Path.Combine(AppContext.BaseDirectory, "plugins");
+        _pluginLoader = new PluginLoader(pluginDir);
+        _pluginLoader.LoadAll();
+        _logger.Info(null, "Plugins loaded from {0}", pluginDir);
+
         configData.AIConfig.TryGetValue("endpoint", out var endpointValue);
         configData.AIConfig.TryGetValue("model", out var modelValue);
         _logger.Info(null, "Configuration loaded: endpoint={0}, model={1}",
@@ -67,7 +75,20 @@ public class Program
         IStorage storage = new SpeedyStorage();
         ITimeStorage timeStorage = new SpeedyTimeStorage();
         ServiceLocator.Instance.Register<Func<string, ITimeStorage>>(dir => new SpeedyTimeStorage(dir));
-        ServiceLocator.Instance.Register<Func<string, IStorage>>(dir => new SpeedyStorage());
+        ServiceLocator.Instance.Register<Func<string, IStorage>>(dir =>
+        {
+            // Extract relative path from full directory path for key prefix
+            // e.g., "d:\data\SiliconManager\{GUID}" → "SiliconManager/{GUID}"
+            string relativePath = dir;
+            string currentDir = Environment.CurrentDirectory;
+            if (relativePath.StartsWith(currentDir, StringComparison.OrdinalIgnoreCase))
+            {
+                relativePath = relativePath.Substring(currentDir.Length).TrimStart('\\', '/');
+            }
+            // Normalize path separators to forward slashes for consistent key mapping
+            relativePath = relativePath.Replace('\\', '/').TrimEnd('/');
+            return new SpeedyStorage(relativePath);
+        });
         ServiceLocator.Instance.Register<Func<string, IWorkNoteStorage>>(dir => new SpeedyWorkNoteStorage());
         ServiceLocator.Instance.Register<Func<SiliconBeingBase, object>>(being => new PlaywrightWebView((DefaultSiliconBeing)being));
         _logger.Info(null, "Registered: Storage Factories");
@@ -140,6 +161,9 @@ public class Program
         await _host.StartAsync();
         _logger.Info(null, "CoreHost started");
 
+        // Notify all plugins that the host is fully started
+        _pluginLoader?.NotifyAllStarted();
+
         // Only create curator if it was previously initialized (CuratorGuid is set)
         if (configData.CuratorGuid != Guid.Empty)
         {
@@ -189,6 +213,11 @@ public class Program
 
         // Dispose tray window
         _trayWindow?.Dispose();
+
+        // Unload all plugins before disposing core resources
+        _pluginLoader?.NotifyAllStopping();
+        _pluginLoader?.UnloadAll();
+        _logger.Info(null, "Plugins unloaded");
 
         // Flush and close the single SpeedyPack file handle
         SpeedyPackRegistry.Dispose();

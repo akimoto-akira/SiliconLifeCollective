@@ -743,17 +743,35 @@ public class MemoryController : Controller
     {
         try
         {
-            return new DateTime(
-                Math.Max(1, d.Year),
-                Math.Max(1, d.Month ?? 1),
-                Math.Max(1, d.Day ?? 1),
-                d.Hour ?? 0,
-                d.Minute ?? 0,
-                d.Second ?? 0);
+            // Year must be valid (1-9999)
+            int year = d.Year >= 1 && d.Year <= 9999 ? d.Year : 1;
+            
+            // Month defaults to 1 if null or invalid
+            int month = d.Month.HasValue && d.Month.Value >= 1 && d.Month.Value <= 12 
+                ? d.Month.Value : 1;
+            
+            // Day defaults to 1 if null or invalid
+            int day = d.Day.HasValue && d.Day.Value >= 1 && d.Day.Value <= 31 
+                ? d.Day.Value : 1;
+            
+            // Hour defaults to 0 if null or invalid
+            int hour = d.Hour.HasValue && d.Hour.Value >= 0 && d.Hour.Value <= 23 
+                ? d.Hour.Value : 0;
+            
+            // Minute defaults to 0 if null or invalid
+            int minute = d.Minute.HasValue && d.Minute.Value >= 0 && d.Minute.Value <= 59 
+                ? d.Minute.Value : 0;
+            
+            // Second defaults to 0 if null or invalid
+            int second = d.Second.HasValue && d.Second.Value >= 0 && d.Second.Value <= 59 
+                ? d.Second.Value : 0;
+            
+            return new DateTime(year, month, day, hour, minute, second);
         }
         catch
         {
-            return DateTime.MinValue;
+            // Fallback to current time if everything fails
+            return DateTime.Now;
         }
     }
 

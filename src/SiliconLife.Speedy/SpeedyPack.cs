@@ -28,6 +28,16 @@ namespace SiliconLife.Speedy;
 /// </remarks>
 public sealed class SpeedyPack : IDisposable
 {
+    // Shared JSON options used for serialization and deserialization.
+    // PropertyNameCaseInsensitive is required so that readonly structs with
+    // parameterized constructors (e.g. IncompleteDate) can be deserialized
+    // correctly — constructor parameters are camelCase while JSON property
+    // names are PascalCase.
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     // Static constructor to configure MessagePack serializers
     static SpeedyPack()
     {
@@ -96,7 +106,8 @@ public sealed class SpeedyPack : IDisposable
                     reader, writer: null, writeQueue: null);
             }
 
-            var writer = PackFileWriter.Open(filePath);
+            // 传入 directory 使 PackFileWriter 能正确重建 FreeList。
+            var writer = PackFileWriter.Open(filePath, directory);
             var writeQueue = new WriteQueue(writer, directoryMap, entryCache);
             return new SpeedyPack(filePath, options, directoryMap, entryCache,
                 reader, writer, writeQueue);
@@ -176,7 +187,7 @@ public sealed class SpeedyPack : IDisposable
     {
         ThrowIfReadOnly();
         var normalizedPath = PathNormalizer.Normalize(path);
-        var bytes = JsonSerializer.SerializeToUtf8Bytes(value);
+        var bytes = JsonSerializer.SerializeToUtf8Bytes(value, _jsonOptions);
 
         _entryCache.Set(normalizedPath, bytes, pinned: true);
         _writeQueue!.Enqueue(new WriteEntry(normalizedPath, bytes, "json"));
@@ -214,7 +225,7 @@ public sealed class SpeedyPack : IDisposable
         if (bytes is null)
             return default;
 
-        return JsonSerializer.Deserialize<T>(bytes);
+        return JsonSerializer.Deserialize<T>(bytes, _jsonOptions);
     }
 
     /// <summary>
@@ -236,10 +247,13 @@ public sealed class SpeedyPack : IDisposable
         ThrowIfReadOnly();
         var normalizedPath = PathNormalizer.Normalize(path);
 
-        // Synchronously make the entry unreadable; persistence happens async.
+        // 同步捕获旧条目，以便 WriteQueue 后续归还其占用的空间给 FreeList；
+        // 随后再同步移除 DirectoryMap / Invalidate 缓存保证读可见性。
+        _directoryMap.TryGet(normalizedPath, out var oldEntry);
+
         _entryCache.Invalidate(normalizedPath);
         _directoryMap.Remove(normalizedPath);
-        _writeQueue!.Enqueue(new DeleteEntry(normalizedPath));
+        _writeQueue!.Enqueue(new DeleteEntry(normalizedPath) { OldEntry = oldEntry });
     }
 
     /// <summary>
@@ -383,7 +397,9 @@ public sealed class SpeedyPack : IDisposable
                 _directoryMap.LoadFrom(newEntries);
 
                 _reader = PackFileReader.Open(_filePath);
-                _writer = PackFileWriter.Open(_filePath);
+                // Compact 后新文件中只有 live 条目，FreeList 不会有旧碎片，
+                // 仍然需要传入 directory 以正确构造头部/目录区域的占用记录。
+                _writer = PackFileWriter.Open(_filePath, newEntries);
                 _writeQueue = new WriteQueue(_writer, _directoryMap, _entryCache);
             }
             catch
@@ -461,6 +477,9 @@ public sealed class SpeedyPack : IDisposable
                     _entryCache.Set(write.NormalizedPath, write.Data, pinned: true);
                     break;
                 case DeleteEntry delete:
+                    // 捕获旧条目传给 WriteQueue，以便后续归还其 FreeList 空间。
+                    if (_directoryMap.TryGet(delete.NormalizedPath, out var existing))
+                        delete.OldEntry = existing;
                     _entryCache.Invalidate(delete.NormalizedPath);
                     _directoryMap.Remove(delete.NormalizedPath);
                     break;

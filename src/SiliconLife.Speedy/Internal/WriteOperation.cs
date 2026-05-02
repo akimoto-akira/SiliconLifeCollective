@@ -47,6 +47,15 @@ internal sealed class WriteEntry : WriteOperation
 /// </summary>
 internal sealed class DeleteEntry : WriteOperation
 {
+    /// <summary>
+    /// The live directory entry captured at the moment Delete was requested,
+    /// carried here so <see cref="WriteQueue"/> can return its occupied space
+    /// back to the <see cref="FreeList"/> even after the synchronous
+    /// DirectoryMap removal (needed for read-visibility) has already happened.
+    /// Null when the path did not exist.
+    /// </summary>
+    public DirectoryEntry? OldEntry { get; set; }
+
     public DeleteEntry(string normalizedPath)
         : base(normalizedPath)
     {

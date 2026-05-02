@@ -28,15 +28,9 @@ public sealed class SpeedyPackOptions
     /// <summary>
     /// Maximum number of entries to keep in the in-memory cache.
     /// When exceeded, the least-recently-used entry is evicted.
-    /// Default: 10,000.
+    /// Default: 100,000.
     /// </summary>
-    public int MaxCacheEntries { get; init; } = 100000;
-
-    /// <summary>
-    /// Whether to enable per-entry compression.
-    /// Default: false.
-    /// </summary>
-    public bool EnableCompression { get; init; } = false;
+    public int MaxCacheEntries { get; init; } = 100_000;
 
     /// <summary>
     /// Whether to open the pack in read-only mode.

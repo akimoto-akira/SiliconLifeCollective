@@ -12,6 +12,7 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
+using SiliconLife.Fast;
 
 namespace SiliconLife.Fast;
 
@@ -62,14 +63,9 @@ public class ProjectManager : IProjectManager
             Status = ProjectStatus.Active
         };
 
-        // Create project storage directory
-        string projectDir = Path.Combine(_baseDirectory, "Projects", project.Id.ToString());
-        if (!Directory.Exists(projectDir))
-        {
-            Directory.CreateDirectory(projectDir);
-        }
-
-        project.StoragePath = projectDir;
+        // Store project metadata in SpeedyPack
+        string projectKey = $"projects/{project.Id}";
+        SpeedyPackRegistry.Pack.Write(projectKey, project);
 
         // Initialize work note system for the project
         var workNoteStorage = new SpeedyWorkNoteStorage();
@@ -147,18 +143,9 @@ public class ProjectManager : IProjectManager
             project.Status = ProjectStatus.Destroyed;
             project.UpdatedAt = DateTime.UtcNow;
 
-            // Clean up project storage directory
-            if (!string.IsNullOrEmpty(project.StoragePath) && Directory.Exists(project.StoragePath))
-            {
-                try
-                {
-                    Directory.Delete(project.StoragePath, recursive: true);
-                }
-                catch (Exception ex)
-                {
-                    _logger.Warn(null, "Failed to delete project directory {0}: {1}", project.StoragePath, ex.Message);
-                }
-            }
+            // Clean up project metadata from SpeedyPack
+            string projectKey = $"projects/{project.Id}";
+            SpeedyPackRegistry.Pack.Delete(projectKey);
 
             _workNoteSystems.Remove(projectId);
             _projectTaskSystems.Remove(projectId);
@@ -310,12 +297,9 @@ public class ProjectManager : IProjectManager
 
             if (string.IsNullOrEmpty(project.StoragePath))
             {
-                // Legacy project without storage path, create one
-                project.StoragePath = Path.Combine(_baseDirectory, "Projects", project.Id.ToString());
-                if (!Directory.Exists(project.StoragePath))
-                {
-                    Directory.CreateDirectory(project.StoragePath);
-                }
+                // Legacy project without storage path, store metadata in SpeedyPack
+                string projectKey = $"projects/{project.Id}";
+                SpeedyPackRegistry.Pack.Write(projectKey, project);
                 SaveProjectsInternal(projects);
             }
 
@@ -347,12 +331,9 @@ public class ProjectManager : IProjectManager
 
             if (string.IsNullOrEmpty(project.StoragePath))
             {
-                // Legacy project without storage path, create one
-                project.StoragePath = Path.Combine(_baseDirectory, "Projects", project.Id.ToString());
-                if (!Directory.Exists(project.StoragePath))
-                {
-                    Directory.CreateDirectory(project.StoragePath);
-                }
+                // Legacy project without storage path, store metadata in SpeedyPack
+                string projectKey = $"projects/{project.Id}";
+                SpeedyPackRegistry.Pack.Write(projectKey, project);
                 SaveProjectsInternal(projects);
             }
 
