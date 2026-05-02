@@ -320,6 +320,7 @@ public class KoKR : DefaultLocalizationBase
 
     public override string MemoryPageHeader => "메모리 브라우저";
     public override string WorkNotesPageHeader => "작업 노트";
+    public override string WorkNotesBackToPrevious => "← 뒤로";
     public override string WorkNotesTotalPages => "총 {0} 페이지";
     public override string WorkNotesEmptyState => "작업 노트가 없습니다";
     public override string WorkNotesSearchPlaceholder => "노트 검색...";

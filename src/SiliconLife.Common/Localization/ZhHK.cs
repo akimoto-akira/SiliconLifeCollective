@@ -175,6 +175,7 @@ public class ZhHK : DefaultLocalizationBase
 
     public override string MemoryPageHeader => "記憶瀏覽";
     public override string WorkNotesPageHeader => "工作筆記";
+    public override string WorkNotesBackToPrevious => "← 返回";
     public override string WorkNotesTotalPages => "共 {0} 頁";
     public override string WorkNotesEmptyState => "暫無工作筆記";
     public override string WorkNotesSearchPlaceholder => "搜索筆記...";

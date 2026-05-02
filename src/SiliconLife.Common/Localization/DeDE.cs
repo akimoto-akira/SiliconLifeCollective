@@ -294,6 +294,7 @@ public class DeDE : DefaultLocalizationBase
 
     public override string MemoryPageHeader => "Erinnerungsdurchsicht";
     public override string WorkNotesPageHeader => "Arbeitsnotizen";
+    public override string WorkNotesBackToPrevious => "← Zurück";
     public override string WorkNotesTotalPages => "Insgesamt {0} Seiten";
     public override string WorkNotesEmptyState => "Noch keine Arbeitsnotizen";
     public override string WorkNotesSearchPlaceholder => "Notizen suchen...";

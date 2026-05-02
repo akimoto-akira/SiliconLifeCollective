@@ -21,7 +21,7 @@ namespace SiliconLife.Fast.Logging;
 /// </summary>
 public sealed class SpeedyLoggerProvider : ILoggerProvider, ILogReader
 {
-    private const string DefaultKey = "default";
+    private const string DefaultKey = "log";
 
     private readonly ITimeStorage _storage;
     private LogLevel _minimumLevel = LogLevel.Trace;

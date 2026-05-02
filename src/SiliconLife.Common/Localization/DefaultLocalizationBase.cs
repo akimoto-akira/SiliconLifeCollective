@@ -715,6 +715,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string WorkNotesPageHeader { get; }
 
     /// <summary>
+    /// Gets the back-to-previous link text for work notes page
+    /// </summary>
+    public abstract string WorkNotesBackToPrevious { get; }
+
+    /// <summary>
     /// Gets the work notes total pages text
     /// </summary>
     public abstract string WorkNotesTotalPages { get; }

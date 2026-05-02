@@ -21,13 +21,13 @@ public abstract class ConfigDataBase
     /// <summary>
     /// Gets or sets the configuration type identifier for polymorphic deserialization
     /// </summary>
-    [ConfigIgnore("系统内部使用，用于多态反序列化")]
+    [ConfigIgnore("Internal system use, for polymorphic deserialization")]
     public abstract string ConfigType { get; set; }
 
     /// <summary>
     /// Gets or sets the GUID of the curator (main administrator)
     /// </summary>
-    [ConfigIgnore("系统内部标识，不建议手动修改")]
+    [ConfigIgnore("Internal system identifier, not recommended to modify manually")]
     public abstract Guid CuratorGuid { get; set; }
 
     /// <summary>
@@ -66,13 +66,13 @@ public abstract class ConfigDataBase
     /// <summary>
     /// Gets the reserved GUID representing the human user
     /// </summary>
-    [ConfigIgnore("系统保留 GUID，固定值不可修改")]
+    [ConfigIgnore("System reserved GUID, fixed value cannot be modified")]
     public Guid UserGuid { get; } = new Guid("00000000-0000-0000-0000-000000000001");
 
     /// <summary>
     /// Gets the reserved GUID representing the global broadcast channel
     /// </summary>
-    [ConfigIgnore("系统保留 GUID，固定值不可修改")]
+    [ConfigIgnore("System reserved GUID, fixed value cannot be modified")]
     public Guid BroadcastChannelGuid { get; } = new Guid("00000000-0000-0000-0000-000000000002");
 
     /// <summary>

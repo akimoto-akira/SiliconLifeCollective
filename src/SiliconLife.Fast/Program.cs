@@ -58,6 +58,7 @@ public class Program
 
         DefaultConfigData configData = (DefaultConfigData)config.Data;
         LogManager.Instance.AddProvider(new SpeedyLoggerProvider());
+        LogManager.Instance.AddProvider(new DebugLoggerProvider());
 
         // Load plugins after SpeedyPack and logging are initialized
         string pluginDir = Path.Combine(AppContext.BaseDirectory, "plugins");

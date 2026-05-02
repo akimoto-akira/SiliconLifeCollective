@@ -152,6 +152,74 @@ public class ToolManager
     }
 
     /// <summary>
+    /// Scans the assemblies of all currently-loaded plugins (resolved via
+    /// <see cref="ServiceLocator"/> &#8594; <see cref="PluginLoader"/>) for ITool implementations
+    /// and registers them. Honors the same <see cref="SiliconManagerOnlyAttribute"/> filtering
+    /// rules as <see cref="ScanAssembly"/>.
+    /// <para>Returns 0 if no <see cref="PluginLoader"/> is registered or no plugins are loaded.</para>
+    /// </summary>
+    /// <returns>The total number of tools discovered and registered across all plugin assemblies</returns>
+    public int ScanAllPluginAssemblies()
+    {
+        PluginLoader? loader = ServiceLocator.Instance.GetService<PluginLoader>();
+        if (loader == null)
+        {
+            _logger.Debug(null, "PluginLoader not registered; skipping plugin tool scan");
+            return 0;
+        }
+
+        int total = 0;
+        var plugins = loader.Plugins;
+        foreach (IPlugin plugin in plugins)
+        {
+            try
+            {
+                total += ScanAssembly(plugin.GetType().Assembly);
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(null, $"Failed to scan plugin assembly for '{plugin.Id}': {ex.Message}");
+            }
+        }
+
+        _logger.Info(null, $"Plugin assemblies scan: registered {total} tool(s) from {plugins.Count} plugin(s)");
+        return total;
+    }
+
+    /// <summary>
+    /// Scans the assemblies of all currently-loaded plugins for ALL ITool implementations
+    /// regardless of <see cref="SiliconManagerOnlyAttribute"/>. Used by curator beings.
+    /// <para>Returns 0 if no <see cref="PluginLoader"/> is registered or no plugins are loaded.</para>
+    /// </summary>
+    /// <returns>The total number of tools discovered and registered across all plugin assemblies</returns>
+    public int ScanAllPluginAssembliesAll()
+    {
+        PluginLoader? loader = ServiceLocator.Instance.GetService<PluginLoader>();
+        if (loader == null)
+        {
+            _logger.Debug(null, "PluginLoader not registered; skipping plugin tool scan");
+            return 0;
+        }
+
+        int total = 0;
+        var plugins = loader.Plugins;
+        foreach (IPlugin plugin in plugins)
+        {
+            try
+            {
+                total += ScanAssemblyAll(plugin.GetType().Assembly);
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(null, $"Failed to scan plugin assembly for '{plugin.Id}': {ex.Message}");
+            }
+        }
+
+        _logger.Info(null, $"Plugin assemblies scan (all): registered {total} tool(s) from {plugins.Count} plugin(s)");
+        return total;
+    }
+
+    /// <summary>
     /// Gets tool definitions for all registered tools (for AI request)
     /// </summary>
     /// <returns>List of tool definitions</returns>

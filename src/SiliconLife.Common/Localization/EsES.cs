@@ -320,6 +320,7 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
 
     public override string MemoryPageHeader => "Navegador de memoria";
     public override string WorkNotesPageHeader => "Notas de Trabajo";
+    public override string WorkNotesBackToPrevious => "← Volver";
     public override string WorkNotesTotalPages => "{0} páginas en total";
     public override string WorkNotesEmptyState => "No hay notas de trabajo";
     public override string WorkNotesSearchPlaceholder => "Buscar notas...";

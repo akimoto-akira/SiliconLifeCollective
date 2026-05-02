@@ -170,6 +170,7 @@ public class SiliconBeingRunner
 public class SiliconBeingManager : TickObject
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<SiliconBeingManager>();
+    private static SiliconBeingManager? _instance;
     private readonly List<SiliconBeingBase> _beings = [];
     private readonly Dictionary<SiliconBeingBase, SiliconBeingRunner> _runners = [];
     private readonly object _lock = new();
@@ -179,6 +180,7 @@ public class SiliconBeingManager : TickObject
         : base(TimeSpan.Zero, false)
     {
         Priority = 0;
+        _instance = this;
     }
 
     private TimeSpan TickTimeout => Config.Instance?.Data?.TickTimeout ?? TimeSpan.FromSeconds(1);
@@ -192,6 +194,29 @@ public class SiliconBeingManager : TickObject
             {
                 return _beings.Count;
             }
+        }
+    }
+
+    /// <summary>
+    /// Gets the curator silicon being instance.
+    /// </summary>
+    /// <returns>The curator being if exists, otherwise null</returns>
+    public static SiliconBeingBase? GetCuratorBeing()
+    {
+        if (_instance == null)
+        {
+            return null;
+        }
+
+        Guid curatorGuid = Config.Instance?.Data?.CuratorGuid ?? Guid.Empty;
+        if (curatorGuid == Guid.Empty)
+        {
+            return null;
+        }
+
+        lock (_instance._lock)
+        {
+            return _instance._beings.FirstOrDefault(b => b.Id == curatorGuid);
         }
     }
 

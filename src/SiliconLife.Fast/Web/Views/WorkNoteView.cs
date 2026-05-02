@@ -19,6 +19,17 @@ namespace SiliconLife.Fast.Web.Views;
 
 public class WorkNoteView : ViewBase
 {
+    private readonly string _returnUrl;
+
+    /// <summary>
+    /// Initializes a new instance of the WorkNoteView class.
+    /// </summary>
+    /// <param name="returnUrl">The URL to return to (e.g., "/being" or "/projects/{id}"). Null to hide the link.</param>
+    public WorkNoteView(string returnUrl)
+    {
+        _returnUrl = returnUrl;
+    }
+
     public override string Render(object model)
     {
         var vm = model as WorkNoteViewModel;
@@ -28,16 +39,28 @@ public class WorkNoteView : ViewBase
         return RenderPage(vm.Skin, pageTitle, "work-notes", vm.Localization, body, GetScripts(vm.Localization, vm.BeingId, vm.ProjectId), GetStyles(), "work-notes");
     }
 
-    private static H RenderBody(WorkNoteViewModel vm)
+    private H RenderBody(WorkNoteViewModel vm)
     {
         string headerText = vm.ProjectId.HasValue ? vm.Localization.ProjectWorkNotesPageHeader : vm.Localization.WorkNotesPageHeader;
         string totalLabel = vm.ProjectId.HasValue ? vm.Localization.ProjectWorkNotesTotalPages : vm.Localization.WorkNotesTotalPages;
+        
+        var headerElements = new List<H>();
+        
+        // Add return link if provided
+        if (!string.IsNullOrEmpty(_returnUrl))
+        {
+            string backText = vm.Localization.WorkNotesBackToPrevious;
+            headerElements.Add(H.A(backText).Href(_returnUrl).Class("back-link"));
+        }
+        
+        headerElements.Add(H.H1(headerText));
+        headerElements.Add(H.Div(
+            H.Span(string.Format(totalLabel, "")).Id("total-pages").Class("stat-value")
+        ).Class("page-stat"));
+        
         return H.Div(
             H.Div(
-                H.H1(headerText),
-                H.Div(
-                    H.Span(string.Format(totalLabel, "")).Id("total-pages").Class("stat-value")
-                ).Class("page-stat")
+                headerElements.ToArray()
             ).Class("page-header"),
             H.Div().Id("notes-grid").Class("notes-grid"),
             H.Div().Id("note-detail").Class("note-detail")
@@ -47,6 +70,17 @@ public class WorkNoteView : ViewBase
     private static CssBuilder GetStyles()
     {
         return CssBuilder.Create()
+            .Selector(".back-link")
+                .Property("display", "inline-block")
+                .Property("margin-bottom", "12px")
+                .Property("color", "var(--accent-primary)")
+                .Property("text-decoration", "none")
+                .Property("font-size", "14px")
+                .Property("font-weight", "500")
+            .EndSelector()
+            .Selector(".back-link:hover")
+                .Property("text-decoration", "underline")
+            .EndSelector()
             .Selector(".page-stat")
                 .Property("margin-left", "16px")
                 .Property("font-size", "14px")

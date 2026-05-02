@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiliconLife.Speedy", "src\S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiliconLife.Speedy.Manager", "src\SiliconLife.Speedy.Manager\SiliconLife.Speedy.Manager.csproj", "{9A5D993D-3443-49FD-969E-803D8B6FBD67}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TravelCodeWikiWithAI", "src\TravelCodeWikiWithAI\TravelCodeWikiWithAI.csproj", "{EB7D2D5A-AB2A-418A-9778-9E74A5785EE6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,6 +101,18 @@ Global
 		{9A5D993D-3443-49FD-969E-803D8B6FBD67}.Release|x64.Build.0 = Release|Any CPU
 		{9A5D993D-3443-49FD-969E-803D8B6FBD67}.Release|x86.ActiveCfg = Release|Any CPU
 		{9A5D993D-3443-49FD-969E-803D8B6FBD67}.Release|x86.Build.0 = Release|Any CPU
+		{EB7D2D5A-AB2A-418A-9778-9E74A5785EE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB7D2D5A-AB2A-418A-9778-9E74A5785EE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB7D2D5A-AB2A-418A-9778-9E74A5785EE6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EB7D2D5A-AB2A-418A-9778-9E74A5785EE6}.Debug|x64.Build.0 = Debug|Any CPU
+		{EB7D2D5A-AB2A-418A-9778-9E74A5785EE6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EB7D2D5A-AB2A-418A-9778-9E74A5785EE6}.Debug|x86.Build.0 = Debug|Any CPU
+		{EB7D2D5A-AB2A-418A-9778-9E74A5785EE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB7D2D5A-AB2A-418A-9778-9E74A5785EE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB7D2D5A-AB2A-418A-9778-9E74A5785EE6}.Release|x64.ActiveCfg = Release|Any CPU
+		{EB7D2D5A-AB2A-418A-9778-9E74A5785EE6}.Release|x64.Build.0 = Release|Any CPU
+		{EB7D2D5A-AB2A-418A-9778-9E74A5785EE6}.Release|x86.ActiveCfg = Release|Any CPU
+		{EB7D2D5A-AB2A-418A-9778-9E74A5785EE6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -110,5 +124,6 @@ Global
 		{B4927608-481A-481B-94A1-BDF4EC72112E} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{FA557B83-D5D7-4B70-898D-A3AC63AD6CC6} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{9A5D993D-3443-49FD-969E-803D8B6FBD67} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{EB7D2D5A-AB2A-418A-9778-9E74A5785EE6} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 EndGlobal

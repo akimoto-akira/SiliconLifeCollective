@@ -1077,6 +1077,7 @@ public class ChatView : ViewBase
             .Add(() => Js.Let(() => "eventSource", () => Js.Null()))
             .Add(() => Js.Let(() => "currentStreamId", () => Js.Null()))
             .Add(() => Js.Let(() => "streamingMessage", () => Js.Null()))
+            .Add(() => Js.Let(() => "currentPermissionRequestId", () => Js.Str(() => ""))) // Store current permission request ID
             .Add(() => Js.Let(() => "lastStreamElementId", () => Js.Null()))
             .Add(() => Js.Let(() => "messageCache", () => Js.New(() => Js.Id(() => "Array"))))
             .Add(() => Js.Let(() => "toolCallMap", () => Js.New(() => Js.Id(() => "Map"))))
@@ -1393,6 +1394,7 @@ public class ChatView : ViewBase
             {
                 { (Js.Id(() => "overlay").Not(), new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
             }))
+            .Add(() => Js.Assign(() => Js.Id(() => "currentPermissionRequestId"), () => Js.Id(() => "data").Prop(() => "requestId")))
             .Add(() => Js.Assign(() => Js.Id(() => "typeEl").Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "permissionType")))
             .Add(() => Js.Assign(() => Js.Id(() => "resourceEl").Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "resource")))
             .Add(() => Js.Assign(() => Js.Id(() => "contentEl").Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "content").Call(() => "replace", () => Js.Regex(() => "^Allow code:.*$", () => "gm"), () => Js.Str(() => "")).Call(() => "replace", () => Js.Regex(() => "^Deny code:.*$", () => "gm"), () => Js.Str(() => "")).Call(() => "trim")))
@@ -1414,7 +1416,9 @@ public class ChatView : ViewBase
             .Add(() => Js.Const(() => "addToCache", () => Js.Id(() => "cacheCheckbox").Prop(() => "checked")))
             .Add(() => Js.Const(() => "cacheDuration", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "permission-cache-duration")).Prop(() => "value")))
             .Add(() => Js.Assign(() => Js.Id(() => "overlay").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "none")))
-            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/permission/respond").Op(() => "+", () => (JsSyntax)Js.Str(() => "?userId=")).Op(() => "+", () => (JsSyntax)Js.Str(() => userId)).Op(() => "+", () => (JsSyntax)Js.Str(() => "&allowed=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "allowed")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&addToCache=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "addToCache")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&cacheDuration=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "cacheDuration")), () => Js.Obj()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/permission/respond").Op(() => "+", () => (JsSyntax)Js.Str(() => "?requestId="))
+                .Op(() => "+", () => (JsSyntax)Js.Id(() => "currentPermissionRequestId"))
+                .Op(() => "+", () => (JsSyntax)Js.Str(() => "&userId=")).Op(() => "+", () => (JsSyntax)Js.Str(() => userId)).Op(() => "+", () => (JsSyntax)Js.Str(() => "&allowed=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "allowed")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&addToCache=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "addToCache")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&cacheDuration=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "cacheDuration")), () => Js.Obj()
                 .Prop(() => "method", () => Js.Str(() => "GET"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "result" }, () => Js.Block()
                 .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                 {

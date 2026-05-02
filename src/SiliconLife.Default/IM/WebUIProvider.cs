@@ -47,7 +47,7 @@ public class WebUIProvider : IIMProvider
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<WebUIProvider>();
     private readonly Router _router;
     private readonly SSEHandler _sseHandler;
-    private readonly Dictionary<Guid, TaskCompletionSource<AskPermissionResult>> _pendingPermissionRequests = new();
+    private readonly PermissionRequestQueue _permissionQueue;
     private readonly Dictionary<Guid, StreamingBuffer> _streamingBuffers = new();
     private readonly object _streamingLock = new();
 
@@ -59,12 +59,8 @@ public class WebUIProvider : IIMProvider
 
     public Func<Guid, TaskCompletionSource<AskPermissionResult>> GetPermissionTcs => (Guid userId) =>
     {
-        if (!_pendingPermissionRequests.TryGetValue(userId, out var tcs))
-        {
-            tcs = new TaskCompletionSource<AskPermissionResult>();
-            _pendingPermissionRequests[userId] = tcs;
-        }
-        return tcs;
+        // This is deprecated, use PermissionRequestQueue instead
+        throw new NotImplementedException("Use PermissionRequestQueue instead");
     };
 
     public SSEHandler SSEHandler => _sseHandler;
@@ -76,7 +72,11 @@ public class WebUIProvider : IIMProvider
         _sseHandler.OnConnected += OnSSEConnected;
         _sseHandler.OnDisconnected += OnSSEDisconnected;
         _router.SetSharedSSEHandler(_sseHandler);
-        _logger.Info(null, "WebUIProvider initialized with SSE");
+        
+        // Initialize permission queue with send action
+        _permissionQueue = new PermissionRequestQueue(SendActivePermissionRequestAsync);
+        
+        _logger.Info(null, "WebUIProvider initialized with SSE and permission queue");
     }
 
     private void OnSSEConnected(SSEClient client)
@@ -87,6 +87,9 @@ public class WebUIProvider : IIMProvider
         {
             _ = SendHistoryToClientAsync(client);
         }
+        
+        // Trigger permission queue processing when client connects
+        _permissionQueue.OnClientConnected();
     }
 
     private void OnSSEDisconnected(SSEClient client)
@@ -144,17 +147,8 @@ public class WebUIProvider : IIMProvider
 
     public void HandlePermissionResponse(Guid userId, bool allowed, bool addToCache = false, TimeSpan? cacheDuration = null)
     {
-        if (_pendingPermissionRequests.TryGetValue(userId, out TaskCompletionSource<AskPermissionResult>? tcs))
-        {
-            AskPermissionResult result = new AskPermissionResult
-            {
-                Allowed = allowed,
-                AddToCache = addToCache,
-                CacheDuration = cacheDuration
-            };
-            tcs.SetResult(result);
-            _pendingPermissionRequests.Remove(userId);
-        }
+        // Delegate to permission queue
+        _permissionQueue.HandleResponse(userId, allowed, addToCache, cacheDuration);
     }
 
     public Task StartAsync()
@@ -252,35 +246,59 @@ public class WebUIProvider : IIMProvider
     {
         Guid userId = Config.Instance.Data.UserGuid;
 
+        var request = new PendingPermissionRequest
+        {
+            RequestId = Guid.NewGuid(),
+            UserId = userId,
+            PermissionType = permissionType,
+            Resource = resource,
+            AllowCode = allowCode,
+            DenyCode = denyCode,
+            Tcs = new TaskCompletionSource<AskPermissionResult>(),
+            CreatedAt = DateTime.UtcNow,
+            TimeoutCts = new CancellationTokenSource(TimeSpan.FromMinutes(1))
+        };
+
+        // Register timeout callback
+        request.TimeoutCts.Token.Register(() => HandlePermissionTimeout(request));
+
+        // Enqueue and wait for result
+        return await _permissionQueue.EnqueueAsync(request);
+    }
+
+    /// <summary>
+    /// Sends the active permission request to all connected SSE clients.
+    /// </summary>
+    private async Task SendActivePermissionRequestAsync()
+    {
+        var request = _permissionQueue.GetActiveRequest();
+        if (request == null)
+        {
+            _logger.Warn(null, "No active permission request to send");
+            return;
+        }
+
         var message = new
         {
             type = "permission_ask",
-            permissionType = permissionType.ToString(),
-            resource,
-            allowCode,
-            denyCode,
-            content = $"Permission required: {permissionType}\nResource: {resource}\nAllow code: {allowCode}\nDeny code: {denyCode}",
+            requestId = request.RequestId.ToString(),
+            permissionType = request.PermissionType.ToString(),
+            resource = request.Resource,
+            allowCode = request.AllowCode,
+            denyCode = request.DenyCode,
+            content = $"Permission required: {request.PermissionType}\nResource: {request.Resource}\nAllow code: {request.AllowCode}\nDeny code: {request.DenyCode}",
             timestamp = DateTime.UtcNow
         };
 
         await _sseHandler.SendToAllAsync("permission", message);
+    }
 
-        var tcs = new TaskCompletionSource<AskPermissionResult>();
-        _pendingPermissionRequests[userId] = tcs;
-
-        try
-        {
-            var result = await tcs.Task.WaitAsync(TimeSpan.FromMinutes(1));
-            return result;
-        }
-        catch (TimeoutException)
-        {
-            return new AskPermissionResult { Allowed = false };
-        }
-        finally
-        {
-            _pendingPermissionRequests.Remove(userId);
-        }
+    /// <summary>
+    /// Handles timeout for a permission request.
+    /// </summary>
+    private void HandlePermissionTimeout(PendingPermissionRequest request)
+    {
+        _permissionQueue.HandleTimeout(request);
     }
 
     public async Task NotifyChannelChanged(Guid userId, Guid channelId)

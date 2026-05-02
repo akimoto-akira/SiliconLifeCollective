@@ -67,7 +67,7 @@ public class WorkNoteController : Controller
         }
 
         var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
-        var view = new Views.WorkNoteView();
+        var view = new Views.WorkNoteView("/beings");
         var vm = new Models.WorkNoteViewModel
         {
             Skin = skin,

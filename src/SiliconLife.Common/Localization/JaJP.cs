@@ -320,6 +320,7 @@ public class JaJP : DefaultLocalizationBase
 
     public override string MemoryPageHeader => "メモリブラウザ";
     public override string WorkNotesPageHeader => "作業ノート";
+    public override string WorkNotesBackToPrevious => "← 戻る";
     public override string WorkNotesTotalPages => "合計 {0} ページ";
     public override string WorkNotesEmptyState => "作業ノートはありません";
     public override string WorkNotesSearchPlaceholder => "ノートを検索...";

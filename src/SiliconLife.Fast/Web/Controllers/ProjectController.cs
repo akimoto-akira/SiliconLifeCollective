@@ -521,7 +521,7 @@ public class ProjectController : Controller
             int pageCount = workNoteSystem?.PageCount ?? 0;
 
             var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
-            var view = new Views.WorkNoteView();
+            var view = new Views.WorkNoteView($"/project");
             var vm = new Models.WorkNoteViewModel
             {
                 Skin = skin,

@@ -278,7 +278,7 @@ public class Router
             }
         }
 
-        _logger.Warn(null, $"No route matched: {method} {path}");
+        _logger.Debug(null, $"No route matched: {method} {path}");
         return (null, new Dictionary<string, string>());
     }
 

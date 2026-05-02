@@ -133,6 +133,7 @@ public class PermissionRequestController : Controller
 
     private void Respond()
     {
+        var requestIdStr = Request.QueryString["requestId"];
         var userIdStr = Request.QueryString["userId"];
         var allowedStr = Request.QueryString["allowed"];
         var addToCacheStr = Request.QueryString["addToCache"];
@@ -157,10 +158,20 @@ public class PermissionRequestController : Controller
             cacheDuration = TimeSpan.FromHours(hours);
         }
 
-        var tcs = _getPermissionTcs(userId);
-        if (tcs != null)
+        // Use WebUIProvider's HandlePermissionResponse to delegate to the queue
+        var imProvider = ServiceLocator.Instance.Get<IIMProvider>();
+        if (imProvider is IM.WebUIProvider webUIProvider)
         {
-            tcs.SetResult(new AskPermissionResult { Allowed = allowed, AddToCache = addToCache, CacheDuration = cacheDuration });
+            webUIProvider.HandlePermissionResponse(userId, allowed, addToCache, cacheDuration);
+        }
+        else
+        {
+            // Fallback to old system if WebUIProvider is not available
+            var tcs = _getPermissionTcs(userId);
+            if (tcs != null)
+            {
+                tcs.SetResult(new AskPermissionResult { Allowed = allowed, AddToCache = addToCache, CacheDuration = cacheDuration });
+            }
         }
 
         RenderJson(new { success = true });

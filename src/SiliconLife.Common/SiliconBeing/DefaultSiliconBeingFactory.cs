@@ -158,14 +158,17 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
 
         // Create and configure ToolManager for this being
         // Curators get ALL tools (normal + curator-only); normal beings get only non-curator tools
+        // Tools are gathered from the default assembly AND from every loaded plugin assembly.
         ToolManager toolManager = new ToolManager(curatorOnly: isCurator);
         if (isCurator)
         {
             toolManager.ScanAssemblyAll(typeof(DefaultSiliconBeingFactory).Assembly);
+            toolManager.ScanAllPluginAssembliesAll();
         }
         else
         {
             toolManager.ScanAssembly(typeof(DefaultSiliconBeingFactory).Assembly);
+            toolManager.ScanAllPluginAssemblies();
         }
         being.ToolManager = toolManager;
 

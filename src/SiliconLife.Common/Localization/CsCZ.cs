@@ -164,6 +164,7 @@ public class CsCZ : DefaultLocalizationBase
     public override string WorkNotePageHeader => "Pracovní poznámka";
     public override string WorkNotePageDescription => "Poznámky pro toto bytí";
     public override string WorkNotesPageHeader => "Pracovní poznámky";
+    public override string WorkNotesBackToPrevious => "← Zpět";
     public override string WorkNotesTotalPages => "Celkem stránek";
     public override string WorkNotesSearchPlaceholder => "Hledat poznámky...";
     public override string WorkNotesSearchButton => "Hledat";

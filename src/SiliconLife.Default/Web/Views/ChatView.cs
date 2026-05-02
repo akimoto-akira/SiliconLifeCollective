@@ -1074,6 +1074,7 @@ public class ChatView : ViewBase
         var js = Js.Block()
             .Add(() => Js.Let(() => "currentSessionId", () => currentSessionId.Length > 0 ? Js.Str(() => currentSessionId) : Js.Null()))
             .Add(() => Js.Let(() => "beingName", () => Js.Str(() => beingName)))
+            .Add(() => Js.Let(() => "currentPermissionRequestId", () => Js.Str(() => ""))) // Store current permission request ID
             .Add(() => Js.Let(() => "eventSource", () => Js.Null()))
             .Add(() => Js.Let(() => "currentStreamId", () => Js.Null()))
             .Add(() => Js.Let(() => "streamingMessage", () => Js.Null()))
@@ -1389,6 +1390,8 @@ public class ChatView : ViewBase
             {
                 { (Js.Id(() => "overlay").Not(), new List<JsSyntax> { Js.Return(() => Js.Id(() => "undefined")) }) }
             }))
+            // Store current permission request ID
+            .Add(() => Js.Assign(() => Js.Id(() => "currentPermissionRequestId"), () => Js.Id(() => "data").Prop(() => "requestId")))
             .Add(() => Js.Assign(() => Js.Id(() => "typeEl").Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "permissionType")))
             .Add(() => Js.Assign(() => Js.Id(() => "resourceEl").Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "resource")))
             .Add(() => Js.Assign(() => Js.Id(() => "contentEl").Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "content").Call(() => "replace", () => Js.Regex(() => "^Allow code:.*$", () => "gm"), () => Js.Str(() => "")).Call(() => "replace", () => Js.Regex(() => "^Deny code:.*$", () => "gm"), () => Js.Str(() => "")).Call(() => "trim")))

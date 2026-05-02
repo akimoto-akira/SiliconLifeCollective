@@ -320,6 +320,7 @@ public class ZhCN : DefaultLocalizationBase
 
     public override string MemoryPageHeader => "记忆浏览";
     public override string WorkNotesPageHeader => "工作笔记";
+    public override string WorkNotesBackToPrevious => "← 返回";
     public override string WorkNotesTotalPages => "共 {0} 页";
     public override string WorkNotesEmptyState => "暂无工作笔记";
     public override string WorkNotesSearchPlaceholder => "搜索笔记...";
