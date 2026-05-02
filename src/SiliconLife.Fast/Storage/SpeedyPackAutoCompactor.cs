@@ -29,7 +29,7 @@ internal sealed class SpeedyPackAutoCompactor : TickObject
     /// <param name="pack">要压缩的 SpeedyPack 实例</param>
     /// <param name="autoRegister">是否自动注册到 MainLoop（默认 true）</param>
     public SpeedyPackAutoCompactor(SpeedyPack pack, bool autoRegister = true)
-        : base(TimeSpan.FromMinutes(5), autoRegister)
+        : base(TimeSpan.FromMinutes(30), autoRegister)
     {
         _pack = pack ?? throw new ArgumentNullException(nameof(pack));
     }

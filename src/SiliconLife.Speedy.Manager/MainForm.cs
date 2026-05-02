@@ -401,9 +401,12 @@ public partial class MainForm : Form
     {
         if (_currentPack == null || e.Node == null) return;
 
-        // Root node should not respond to click events
+        // Root node should navigate to root directory
         if (e.Node.Text == "Root")
         {
+            _currentPath = string.Empty;
+            RefreshListView(string.Empty);
+            UpdateBreadcrumb();
             return;
         }
 
@@ -501,17 +504,17 @@ public partial class MainForm : Form
             {
                 // Read as UTF-8 string first
                 content = System.Text.Encoding.UTF8.GetString(bytes);
-                
-                // Decode Unicode escape sequences (\uXXXX) to actual characters
+                            
+                // Decode Unicode escape sequences (\\uXXXX) to actual characters
                 content = DecodeUnicodeEscapes(content);
-                
+                            
                 // Limit preview to 2000 characters
                 if (content.Length > 2000)
                 {
                     content = content.Substring(0, 2000) + "\n\n... [Preview truncated]";
                 }
             }
-            else if (metadata?.ContentType == "text")
+            else if (metadata?.ContentType == "text" || path.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
             {
                 content = System.Text.Encoding.UTF8.GetString(bytes);
                 // Limit preview to 2000 characters
@@ -555,11 +558,11 @@ public partial class MainForm : Form
             {
                 // Read as UTF-8 string first
                 content = System.Text.Encoding.UTF8.GetString(bytes);
-                
-                // Decode Unicode escape sequences (\uXXXX) to actual characters
+                            
+                // Decode Unicode escape sequences (\\uXXXX) to actual characters
                 content = DecodeUnicodeEscapes(content);
             }
-            else if (metadata?.ContentType == "text")
+            else if (metadata?.ContentType == "text" || path.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
             {
                 content = System.Text.Encoding.UTF8.GetString(bytes);
             }

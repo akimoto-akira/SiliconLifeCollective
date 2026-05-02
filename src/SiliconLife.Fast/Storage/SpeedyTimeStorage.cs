@@ -80,8 +80,7 @@ public sealed class SpeedyTimeStorage : ITimeStorage, IDisposable
         if (timestamp.Minute.HasValue) parts.Add(timestamp.Minute.Value.ToString("D2"));
         if (timestamp.Second.HasValue) parts.Add(timestamp.Second.Value.ToString("D2"));
 
-        string path = string.Join("/", parts);
-        if (timestamp.Second.HasValue) path += ".json";
+        string path = string.Join("/", parts) + ".json";
         return path;
     }
 
@@ -371,7 +370,8 @@ public sealed class SpeedyTimeStorage : ITimeStorage, IDisposable
     public bool HasSummary<T>(string key, IncompleteDate timestamp, Func<T, bool> summaryPropertySelector)
     {
         string path = GetTimeFilePath(key, timestamp);
-        return _pack.Exists(path) && ReadArray<T>(path).Any(summaryPropertySelector);
+        var array = ReadArray<T>(path);
+        return array.Any(summaryPropertySelector);
     }
 
     public List<TimeEntry<T>> QueryWithLevel<T>(string key, IncompleteDate level)

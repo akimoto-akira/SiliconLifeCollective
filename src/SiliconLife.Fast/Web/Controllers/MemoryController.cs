@@ -265,36 +265,36 @@ public class MemoryController : Controller
             .Select(yg => new
             {
                 Year = yg.Key,
-                Count = yg.Count(x => !x.Entry.IsSummary), // Only count regular entries
+                Count = yg.Count(), // Count all entries including summaries
                 Months = yg
                     .GroupBy(x => x.Ts.Month)
                     .OrderByDescending(g => g.Key)
                     .Select(mg => new
                     {
                         Month = mg.Key,
-                        Count = mg.Count(x => !x.Entry.IsSummary),
+                        Count = mg.Count(),
                         Days = mg
                             .GroupBy(x => x.Ts.Day)
                             .OrderByDescending(g => g.Key)
                             .Select(dg => new
                             {
                                 Day = dg.Key,
-                                Count = dg.Count(x => !x.Entry.IsSummary),
+                                Count = dg.Count(),
                                 Hours = dg
                                     .GroupBy(x => x.Ts.Hour)
                                     .OrderByDescending(g => g.Key)
                                     .Select(hg => new
                                     {
                                         Hour = hg.Key,
-                                        Count = hg.Count(x => !x.Entry.IsSummary),
+                                        Count = hg.Count(),
                                         Minutes = hg
                                             .GroupBy(x => x.Ts.Minute)
                                             .OrderByDescending(g => g.Key)
                                             .Select(mg => new
                                             {
                                                 Minute = mg.Key,
-                                                Count = mg.Count(x => !x.Entry.IsSummary),
-                                                Items = mg.Where(x => !x.Entry.IsSummary).Select(x => ConvertToMemoryItem(x.Entry, beingId)).ToList()
+                                                Count = mg.Count(),
+                                                Items = mg.Select(x => ConvertToMemoryItem(x.Entry, beingId)).ToList()
                                             }).ToList()
                                     }).ToList()
                             }).ToList()
