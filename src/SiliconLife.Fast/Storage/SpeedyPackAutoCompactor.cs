@@ -17,17 +17,17 @@ using SiliconLife.Speedy;
 namespace SiliconLife.Fast;
 
 /// <summary>
-/// 自动压缩定时器，每5分钟压缩一次 SpeedyPack 以释放空间
+/// Auto-compaction timer that compacts SpeedyPack every 5 minutes to reclaim space
 /// </summary>
 internal sealed class SpeedyPackAutoCompactor : TickObject
 {
     private readonly SpeedyPack _pack;
 
     /// <summary>
-    /// 创建自动压缩定时器
+    /// Creates an auto-compaction timer
     /// </summary>
-    /// <param name="pack">要压缩的 SpeedyPack 实例</param>
-    /// <param name="autoRegister">是否自动注册到 MainLoop（默认 true）</param>
+    /// <param name="pack">The SpeedyPack instance to compact</param>
+    /// <param name="autoRegister">Whether to auto-register with MainLoop (default true)</param>
     public SpeedyPackAutoCompactor(SpeedyPack pack, bool autoRegister = true)
         : base(TimeSpan.FromMinutes(30), autoRegister)
     {
@@ -35,9 +35,9 @@ internal sealed class SpeedyPackAutoCompactor : TickObject
     }
 
     /// <summary>
-    /// 每5分钟执行一次压缩操作
+    /// Executes a compaction operation every 5 minutes
     /// </summary>
-    /// <param name="deltaTime">自上次 Tick 以来经过的时间</param>
+    /// <param name="deltaTime">Time elapsed since the last Tick</param>
     protected override async void OnTick(TimeSpan deltaTime)
     {
         try
@@ -46,8 +46,8 @@ internal sealed class SpeedyPackAutoCompactor : TickObject
         }
         catch
         {
-            // 压缩失败不影响主循环，仅记录日志
-            // TODO: 添加日志记录
+            // Compaction failure does not affect the main loop; only log the error
+            // TODO: Add log recording
         }
     }
 }

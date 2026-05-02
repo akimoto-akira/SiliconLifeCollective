@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -63,7 +63,7 @@ public class BeingView : ViewBase
     private static CssBuilder GetStyles()
     {
         return CssBuilder.Create()
-            // 页面统计
+            // Page stats
             .Selector(".page-stat")
                 .Property("margin-left", "16px")
                 .Property("font-size", "14px")
@@ -73,14 +73,14 @@ public class BeingView : ViewBase
                 .Property("font-weight", "600")
                 .Property("color", "var(--accent-primary)")
             .EndSelector()
-            // 硅基人卡片网格
+            // Being card grid
             .Selector(".beings-grid")
                 .Property("display", "grid")
                 .Property("grid-template-columns", "repeat(auto-fill, minmax(280px, 1fr))")
                 .Property("gap", "var(--card-gap, 16px)")
                 .Property("margin-bottom", "24px")
             .EndSelector()
-            // 硅基人卡片
+            // Being card
             .Selector(".being-card")
                 .Property("background", "var(--bg-secondary)")
                 .Property("padding", "20px")
@@ -97,7 +97,7 @@ public class BeingView : ViewBase
             .Selector(".being-card.selected")
                 .Property("border", "2px solid var(--accent-primary)")
             .EndSelector()
-            // 卡片头部
+            // Card header
             .Selector(".being-header")
                 .Property("display", "flex")
                 .Property("justify-content", "space-between")
@@ -109,7 +109,7 @@ public class BeingView : ViewBase
                 .Property("font-weight", "600")
                 .Property("color", "var(--text-primary)")
             .EndSelector()
-            // 状态徽章
+            // Status badge
             .Selector(".being-status")
                 .Property("display", "inline-flex")
                 .Property("align-items", "center")
@@ -133,7 +133,7 @@ public class BeingView : ViewBase
                 .Property("border-radius", "50%")
                 .Property("background", "currentColor")
             .EndSelector()
-            // 类型标签
+            // Type badge
             .Selector(".being-type-badge")
                 .Property("display", "inline-block")
                 .Property("padding", "2px 8px")
@@ -143,7 +143,7 @@ public class BeingView : ViewBase
                 .Property("color", "var(--text-secondary)")
                 .Property("margin-left", "8px")
             .EndSelector()
-            // 详情面板
+            // Detail panel
             .Selector(".detail-panel")
                 .Property("background", "var(--bg-secondary)")
                 .Property("padding", "24px")
@@ -182,7 +182,7 @@ public class BeingView : ViewBase
             .Selector(".detail-value.active")
                 .Property("color", "var(--status-active, var(--accent-secondary))")
             .EndSelector()
-            // 灵魂内容区
+            // Soul content area
             .Selector(".soul-content")
                 .Property("background", "var(--bg-card)")
                 .Property("padding", "16px")
@@ -194,7 +194,7 @@ public class BeingView : ViewBase
                 .Property("overflow-y", "auto")
                 .Property("white-space", "pre-wrap")
             .EndSelector()
-            // 详情链接
+            // Detail link
             .Selector(".detail-link")
                 .Property("color", "var(--accent-primary)")
                 .Property("text-decoration", "none")
@@ -205,7 +205,7 @@ public class BeingView : ViewBase
                 .Property("color", "var(--accent-secondary, var(--accent-primary))")
                 .Property("text-decoration", "underline")
             .EndSelector()
-            // 空状态
+            // Empty state
             .Selector(".empty-state")
                 .Property("text-align", "center")
                 .Property("padding", "40px")
@@ -283,7 +283,7 @@ public class BeingView : ViewBase
             () => Js.Str(() => "<span class='being-type-badge'>").Op(() => "+", () => (JsSyntax)Js.Id(() => "b").Prop(() => "customTypeName")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</span>")),
             () => Js.Str(() => ""));
 
-        // 构建 status-badge 结构（带状态点）
+        // Build status-badge structure (with status dot)
         var statusBadge = Js.Str(() => "<span class='being-status ")
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "statusClass"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "'><span class='status-dot'></span>"))
@@ -300,7 +300,7 @@ public class BeingView : ViewBase
 
     private static JsSyntax BuildDetailHtml(DefaultLocalizationBase loc)
     {
-        // 状态徽章（带状态点）
+        // Status badge (with status dot)
         var statusValue = Js.Str(() => "<span class=\"detail-value ")
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "statusClass"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "\'>"))

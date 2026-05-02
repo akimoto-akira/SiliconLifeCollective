@@ -14,7 +14,7 @@ public class H
     };
 
     /// <summary>
-    /// HTML 转义
+    /// HTML escaping
     /// </summary>
     public static string Escape(string? text)
     {
@@ -239,7 +239,7 @@ public class H
                     h.BuildTo(sb, indentLevel + 1);
                     break;
                 case string s:
-                    // 不转义,直接输出(假设所有字符串都是已渲染的HTML)
+                    // No escaping, output directly (assuming all strings are pre-rendered HTML)
                     sb.Append(indent).Append(IndentString).Append(s).Append('\n');
                     break;
                 case JsSyntax js:

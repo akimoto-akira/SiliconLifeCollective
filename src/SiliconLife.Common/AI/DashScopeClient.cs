@@ -101,6 +101,13 @@ public class DashScopeClient : IAIClient
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
 
+    // 速率控制相关字段
+    private readonly SemaphoreSlim _rateSemaphore = new SemaphoreSlim(1, 1);
+    private DateTime _lastRequestEndTime = DateTime.MinValue;
+    private readonly TimeSpan _minRequestInterval;
+    private const int MaxRetryCount = 3;
+    private const int BaseRetryDelayMs = 1000;
+
     /// <summary>
     /// Gets the endpoint URL of the DashScope service
     /// </summary>
@@ -123,11 +130,13 @@ public class DashScopeClient : IAIClient
     /// <param name="apiKey">DashScope API key for authentication</param>
     /// <param name="endpoint">The DashScope API endpoint URL</param>
     /// <param name="defaultModel">The default model name to use</param>
-    public DashScopeClient(string apiKey, string endpoint, string defaultModel)
+    /// <param name="minRequestIntervalMs">Minimum interval between requests in milliseconds (default: 200ms for 300 RPM)</param>
+    public DashScopeClient(string apiKey, string endpoint, string defaultModel, int minRequestIntervalMs = 200)
     {
         _apiKey = apiKey;
         Endpoint = endpoint.TrimEnd('/');
         DefaultModel = defaultModel;
+        _minRequestInterval = TimeSpan.FromMilliseconds(minRequestIntervalMs);
         _httpClient = new HttpClient
         {
             Timeout = TimeSpan.FromMinutes(5)
@@ -152,51 +161,110 @@ public class DashScopeClient : IAIClient
     /// <summary>
     /// Sends a chat request to DashScope and returns the response asynchronously.
     /// Supports tool definitions in the request and tool_calls in the response.
+    /// Implements two-layer rate control:
+    /// 1. Self rate control: enforces minimum interval between requests
+    /// 2. Server rate limit: handles 429 errors with exponential backoff retry
     /// </summary>
     public async Task<AIResponse> ChatAsync(AIRequest request)
     {
-        try
+        int retryCount = 0;
+        Exception? lastException = null;
+
+        while (retryCount <= MaxRetryCount)
         {
-            string model = string.IsNullOrEmpty(request.Model) ? DefaultModel : request.Model;
-
-            _logger.Info(null, "DashScope request: model={0}, messages={1}, hasTools={2}",
-                model, request.Messages.Count, request.Tools != null && request.Tools.Count > 0);
-
-            string requestBody = BuildRequestBody(request, model, stream: false);
-            StringContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
-
-            HttpResponseMessage response = await _httpClient.PostAsync(Endpoint, content);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                string errorBody = await response.Content.ReadAsStringAsync();
-                _logger.Error(null, "DashScope HTTP error: {0} {1}", (int)response.StatusCode, errorBody);
-                return AIResponse.Failed($"HTTP {(int)response.StatusCode}: {errorBody}");
+                // 第一层速率控制: 自主速率控制
+                await EnforceRateLimitAsync();
+
+                string model = string.IsNullOrEmpty(request.Model) ? DefaultModel : request.Model;
+
+                _logger.Info(null, "DashScope request: model={0}, messages={1}, hasTools={2}, retry={3}",
+                    model, request.Messages.Count, request.Tools != null && request.Tools.Count > 0, retryCount);
+
+                string requestBody = BuildRequestBody(request, model, stream: false);
+                StringContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+
+                DateTime requestStartTime = DateTime.UtcNow;
+                HttpResponseMessage response = await _httpClient.PostAsync(Endpoint, content);
+                DateTime requestEndTime = DateTime.UtcNow;
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorBody = await response.Content.ReadAsStringAsync();
+                    _logger.Error(null, "DashScope HTTP error: {0} {1}", (int)response.StatusCode, errorBody);
+
+                    // 第二层速率控制: 处理服务器速率限制(429错误)
+                    if ((int)response.StatusCode == 429)
+                    {
+                        retryCount++;
+                        if (retryCount <= MaxRetryCount)
+                        {
+                            TimeSpan waitTime = CalculateRetryDelay(retryCount, errorBody);
+                            _logger.Warn(null, "DashScope rate limited (429), retry {0}/{1} after {2}ms",
+                                retryCount, MaxRetryCount, waitTime.TotalMilliseconds);
+                            await Task.Delay(waitTime);
+                            continue;
+                        }
+                        return AIResponse.Failed($"Rate limit exceeded after {MaxRetryCount} retries: {errorBody}");
+                    }
+
+                    return AIResponse.Failed($"HTTP {(int)response.StatusCode}: {errorBody}");
+                }
+
+                string json = await response.Content.ReadAsStringAsync();
+                AIResponse result = ParseChatResponse(json);
+
+                // 更新最后一次请求结束时间
+                UpdateLastRequestTime(requestEndTime);
+
+                _logger.Info(null, "DashScope response: model={0}, tokens={1}/{2}/{3}, hasToolCalls={4}",
+                    model, result.PromptTokens, result.CompletionTokens, result.TotalTokens, result.HasToolCalls);
+
+                return result;
             }
+            catch (HttpRequestException ex)
+            {
+                lastException = ex;
+                _logger.Error(null, "DashScope connection error: {0}", ex.Message);
+                
+                // 网络连接错误也进行重试
+                retryCount++;
+                if (retryCount <= MaxRetryCount)
+                {
+                    TimeSpan waitTime = CalculateRetryDelay(retryCount, null);
+                    _logger.Warn(null, "DashScope connection error, retry {0}/{1} after {2}ms",
+                        retryCount, MaxRetryCount, waitTime.TotalMilliseconds);
+                    await Task.Delay(waitTime);
+                    continue;
+                }
+                return AIResponse.Failed($"Connection error after {MaxRetryCount} retries: {ex.Message}");
+            }
+            catch (TaskCanceledException ex)
+            {
+                _logger.Warn(null, "DashScope request timeout: {0}", ex.Message);
+                return AIResponse.Failed($"Request timeout: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                lastException = ex;
+                _logger.Error(null, "DashScope request failed: {0}", ex.Message);
+                
+                // 其他异常也进行重试
+                retryCount++;
+                if (retryCount <= MaxRetryCount)
+                {
+                    TimeSpan waitTime = CalculateRetryDelay(retryCount, null);
+                    _logger.Warn(null, "DashScope unexpected error, retry {0}/{1} after {2}ms",
+                        retryCount, MaxRetryCount, waitTime.TotalMilliseconds);
+                    await Task.Delay(waitTime);
+                    continue;
+                }
+                return AIResponse.Failed($"Unexpected error after {MaxRetryCount} retries: {ex.Message}");
+            }
+        }
 
-            string json = await response.Content.ReadAsStringAsync();
-            AIResponse result = ParseChatResponse(json);
-
-            _logger.Info(null, "DashScope response: model={0}, tokens={1}/{2}/{3}, hasToolCalls={4}",
-                model, result.PromptTokens, result.CompletionTokens, result.TotalTokens, result.HasToolCalls);
-
-            return result;
-        }
-        catch (HttpRequestException ex)
-        {
-            _logger.Error(null, "DashScope connection error: {0}", ex.Message);
-            return AIResponse.Failed($"Connection error: {ex.Message}");
-        }
-        catch (TaskCanceledException ex)
-        {
-            _logger.Warn(null, "DashScope request timeout: {0}", ex.Message);
-            return AIResponse.Failed($"Request timeout: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            _logger.Error(null, "DashScope request failed: {0}", ex.Message);
-            return AIResponse.Failed($"Unexpected error: {ex.Message}");
-        }
+        return AIResponse.Failed($"Failed after {MaxRetryCount} retries: {lastException?.Message}");
     }
 
     /// <summary>
@@ -672,4 +740,95 @@ public class DashScopeClient : IAIClient
 
         return toolCalls;
     }
+
+    #region 速率控制
+
+    /// <summary>
+    /// 第一层速率控制: 确保从上一个请求结束到本次请求开始有最小间隔时间
+    /// </summary>
+    private async Task EnforceRateLimitAsync()
+    {
+        await _rateSemaphore.WaitAsync();
+        try
+        {
+            TimeSpan elapsed = DateTime.UtcNow - _lastRequestEndTime;
+            if (elapsed < _minRequestInterval)
+            {
+                TimeSpan waitTime = _minRequestInterval - elapsed;
+                _logger.Debug(null, "DashScope rate control: waiting {0}ms before next request", waitTime.TotalMilliseconds);
+                await Task.Delay(waitTime);
+            }
+        }
+        finally
+        {
+            _rateSemaphore.Release();
+        }
+    }
+
+    /// <summary>
+    /// 更新最后一次请求结束时间
+    /// </summary>
+    private void UpdateLastRequestTime(DateTime endTime)
+    {
+        _rateSemaphore.Wait();
+        try
+        {
+            _lastRequestEndTime = endTime;
+        }
+        finally
+        {
+            _rateSemaphore.Release();
+        }
+    }
+
+    /// <summary>
+    /// 第二层速率控制: 计算重试延迟时间(指数退避策略)
+    /// 从429错误响应中解析Retry-After头信息(如果存在)
+    /// </summary>
+    private TimeSpan CalculateRetryDelay(int retryCount, string? errorBody)
+    {
+        // 指数退避: 1s, 2s, 4s, 8s...
+        int delayMs = BaseRetryDelayMs * (int)Math.Pow(2, retryCount - 1);
+        
+        // 添加随机抖动(0-500ms)避免多个客户端同时重试
+        int jitter = Random.Shared.Next(0, 500);
+        delayMs += jitter;
+
+        // 尝试从错误响应中解析Retry-After信息
+        if (!string.IsNullOrEmpty(errorBody))
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(errorBody);
+                if (doc.RootElement.TryGetProperty("error", out var error) &&
+                    error.TryGetProperty("message", out var message))
+                {
+                    string messageStr = message.GetString() ?? "";
+                    
+                    // 尝试解析 "Please try again after X seconds" 格式
+                    if (messageStr.Contains("try again after") && 
+                        int.TryParse(new string(messageStr.Where(char.IsDigit).ToArray()), out int seconds))
+                    {
+                        if (seconds > 0 && seconds <= 60)
+                        {
+                            _logger.Info(null, "DashScope: server suggests retry after {0}s", seconds);
+                            return TimeSpan.FromSeconds(seconds);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // 忽略解析错误,使用默认退避策略
+            }
+        }
+
+        // 最大延迟不超过30秒
+        if (delayMs > 30000)
+            delayMs = 30000;
+
+        return TimeSpan.FromMilliseconds(delayMs);
+    }
+
+    #endregion
 }
