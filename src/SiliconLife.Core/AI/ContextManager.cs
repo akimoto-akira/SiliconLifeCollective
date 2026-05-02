@@ -478,7 +478,7 @@ public class ContextManager
         if (memories.Count == 0) return null;
 
         StringBuilder sb = new();
-        sb.AppendLine("From your past experiences, you remember:");
+        sb.AppendLine("You remember...");
         foreach (MemoryEntry memory in memories)
         {
             sb.AppendLine($"- [{memory.Timestamp}] {memory.Content}");
