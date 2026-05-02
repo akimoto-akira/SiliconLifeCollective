@@ -106,7 +106,7 @@ public sealed class SpeedyPack : IDisposable
                     reader, writer: null, writeQueue: null);
             }
 
-            // 传入 directory 使 PackFileWriter 能正确重建 FreeList。
+            // Pass directory to PackFileWriter so it can correctly rebuild the FreeList.
             var writer = PackFileWriter.Open(filePath, directory);
             var writeQueue = new WriteQueue(writer, directoryMap, entryCache);
             return new SpeedyPack(filePath, options, directoryMap, entryCache,
@@ -247,8 +247,9 @@ public sealed class SpeedyPack : IDisposable
         ThrowIfReadOnly();
         var normalizedPath = PathNormalizer.Normalize(path);
 
-        // 同步捕获旧条目，以便 WriteQueue 后续归还其占用的空间给 FreeList；
-        // 随后再同步移除 DirectoryMap / Invalidate 缓存保证读可见性。
+        // Synchronously capture the old entry so that WriteQueue can later
+        // return its occupied space to the FreeList; then synchronously remove
+        // from DirectoryMap and invalidate cache to ensure read visibility.
         _directoryMap.TryGet(normalizedPath, out var oldEntry);
 
         _entryCache.Invalidate(normalizedPath);
@@ -397,8 +398,9 @@ public sealed class SpeedyPack : IDisposable
                 _directoryMap.LoadFrom(newEntries);
 
                 _reader = PackFileReader.Open(_filePath);
-                // Compact 后新文件中只有 live 条目，FreeList 不会有旧碎片，
-                // 仍然需要传入 directory 以正确构造头部/目录区域的占用记录。
+                // After compaction, the new file contains only live entries, so the
+                // FreeList has no old fragments. We still need to pass the directory
+                // to correctly construct the header/directory region occupancy records.
                 _writer = PackFileWriter.Open(_filePath, newEntries);
                 _writeQueue = new WriteQueue(_writer, _directoryMap, _entryCache);
             }
@@ -477,7 +479,8 @@ public sealed class SpeedyPack : IDisposable
                     _entryCache.Set(write.NormalizedPath, write.Data, pinned: true);
                     break;
                 case DeleteEntry delete:
-                    // 捕获旧条目传给 WriteQueue，以便后续归还其 FreeList 空间。
+                    // Capture the old entry and pass it to WriteQueue so it can
+                    // later return its FreeList space.
                     if (_directoryMap.TryGet(delete.NormalizedPath, out var existing))
                         delete.OldEntry = existing;
                     _entryCache.Invalidate(delete.NormalizedPath);

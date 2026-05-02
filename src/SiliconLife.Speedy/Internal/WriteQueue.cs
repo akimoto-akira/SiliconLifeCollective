@@ -167,9 +167,10 @@ internal sealed class WriteQueue : IDisposable
             switch (op)
             {
                 case WriteEntry write:
-                    // 覆写时：释放旧条目占用的空间给 FreeList，并保留原 CreatedAt，
-                    // 这样 AppendEntry 在 FreeList 中可能就地复用同一块空间，
-                    // 避免文件无限增长。
+                    // On overwrite: release the space occupied by the old entry to
+                    // FreeList, and preserve the original CreatedAt so that
+                    // AppendEntry may reuse the same block in-place in the FreeList,
+                    // avoiding infinite file growth.
                     DateTime? createdAt = null;
                     if (_directoryMap.TryGet(write.NormalizedPath, out var oldEntry))
                     {
@@ -183,9 +184,11 @@ internal sealed class WriteQueue : IDisposable
                     break;
 
                 case DeleteEntry delete:
-                    // 删除时：利用 SpeedyPack.Delete / ApplyTransactionBatch 提前捕获的 OldEntry
-                    // 把旧空间归还给 FreeList，DirectoryMap 的同步移除在此之前已经完成，
-                    // 此处再执行一次 Remove / Invalidate 保持幂等。
+                    // On deletion: use the OldEntry pre-captured by
+                    // SpeedyPack.Delete / ApplyTransactionBatch to return the old
+                    // space to FreeList. The synchronous DirectoryMap removal has
+                    // already been performed; we perform Remove/Invalidate again
+                    // here to keep it idempotent.
                     if (delete.OldEntry != null)
                         _writer.ReleaseEntry(delete.OldEntry);
                     _directoryMap.Remove(delete.NormalizedPath);

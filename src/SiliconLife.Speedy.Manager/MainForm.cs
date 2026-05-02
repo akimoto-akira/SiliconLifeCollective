@@ -32,7 +32,7 @@ public partial class MainForm : Form
             _currentPack = pack;
             Text = $"Speedy Pack Manager - Inside";
             UpdateBreadcrumb();
-            _statusLabel.Text = $"内部调起";
+            _statusLabel.Text = $"Internal launch";
 
             _btnRefresh.Enabled = true;
             _btnCompact.Enabled = false;
@@ -82,8 +82,8 @@ public partial class MainForm : Form
     {
         using var dialog = new OpenFileDialog
         {
-            Filter = "Speedy Pack 文件 (*.spk)|*.spk|所有文件 (*.*)|*.*",
-            Title = "打开 Speedy Pack 文件"
+            Filter = "Speedy Pack Files (*.spk)|*.spk|All Files (*.*)|*.*",
+            Title = "Open Speedy Pack File"
         };
 
         if (dialog.ShowDialog() == DialogResult.OK)
@@ -98,16 +98,16 @@ public partial class MainForm : Form
 
         try
         {
-            _statusLabel.Text = "正在压缩...";
+            _statusLabel.Text = "Compacting...";
             await _currentPack.CompactAsync();
-            _statusLabel.Text = "压缩完成";
+            _statusLabel.Text = "Compact completed";
             RefreshView();
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"压缩失败: {ex.Message}", "错误",
+            MessageBox.Show($"Compact failed: {ex.Message}", "Error",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
-            _statusLabel.Text = "压缩失败";
+            _statusLabel.Text = "Compact failed";
         }
     }
 
@@ -120,7 +120,7 @@ public partial class MainForm : Form
             _currentFilePath = filePath;
             _currentPath = string.Empty;
 
-            // 初始化文件夹图标
+            // Initialize folder icons
             SetupTreeIcons();
 
             var fileName = Path.GetFileName(filePath);
@@ -129,7 +129,7 @@ public partial class MainForm : Form
 
             Text = $"Speedy Pack Manager - {fileName}";
             UpdateBreadcrumb();
-            _statusLabel.Text = $"已加载: {fileName} ({sizeStr})";
+            _statusLabel.Text = $"Loaded: {fileName} ({sizeStr})";
             
             _btnRefresh.Enabled = true;
             _btnCompact.Enabled = true;
@@ -138,9 +138,9 @@ public partial class MainForm : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"打开文件失败: {ex.Message}", "错误",
+            MessageBox.Show($"Failed to open file: {ex.Message}", "Error",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
-            _statusLabel.Text = "打开文件失败";
+            _statusLabel.Text = "Failed to open file";
         }
     }
 
@@ -160,7 +160,7 @@ public partial class MainForm : Form
         {
             _breadcrumbFlow.Controls.Add(new Label
             {
-                Text = "未打开文件",
+                Text = "No file opened",
                 AutoSize = true,
                 Font = new Font("Segoe UI", 10F),
                 ForeColor = Color.FromArgb(64, 64, 64),
@@ -228,27 +228,27 @@ public partial class MainForm : Form
     }
 
     /// <summary>
-    /// 创建文件夹图标并加载到 ImageList
+    /// Create folder icon and load it into ImageList
     /// </summary>
     private void SetupTreeIcons()
     {
-        // 创建 16x16 的文件夹图标
+        // Create a 16x16 folder icon
         var folderIcon = new Bitmap(16, 16);
         using (var g = Graphics.FromImage(folderIcon))
         {
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             
-            // 文件夹主体（黄色）
+            // Folder body (yellow)
             var bodyBrush = new SolidBrush(Color.FromArgb(255, 204, 102));
             var folderBody = new RectangleF(0, 4, 16, 11);
             g.FillRectangle(bodyBrush, folderBody);
             
-            // 文件夹顶部（深黄色）
+            // Folder tab (dark yellow)
             var topBrush = new SolidBrush(Color.FromArgb(240, 180, 80));
             var folderTop = new RectangleF(2, 1, 12, 4);
             g.FillRectangle(topBrush, folderTop);
             
-            // 标签凸起
+            // Tab protrusion
             var tabBrush = new SolidBrush(Color.FromArgb(240, 180, 80));
             var tab = new RectangleF(2, 1, 6, 3);
             g.FillRectangle(tabBrush, tab);
@@ -260,7 +260,7 @@ public partial class MainForm : Form
         
         _treeImageList.Images.Add("folder", folderIcon);
         
-        // 设置节点使用文件夹图标
+        // Set nodes to use folder icon
         _treeView.ImageIndex = 0;
         _treeView.SelectedImageIndex = 0;
     }
@@ -278,7 +278,7 @@ public partial class MainForm : Form
         {
             _treeView.Nodes.Clear();
             
-            // 递归收集所有目录路径（BFS）
+            // Recursively collect all directory paths (BFS)
             var allPaths = new HashSet<string>();
             var queue = new Queue<string>();
             queue.Enqueue(string.Empty);
@@ -352,7 +352,7 @@ public partial class MainForm : Form
             
             foreach (var dir in directories)
             {
-                // 提取最后一级目录名
+                // Extract the last-level directory name
                 var dirName = dir.Contains('/') 
                     ? dir.Split('/').Last() 
                     : dir;
@@ -387,7 +387,7 @@ public partial class MainForm : Form
                 }
             }
 
-            _itemCountLabel.Text = $"{_listView.Items.Count} 个项目";
+            _itemCountLabel.Text = $"{_listView.Items.Count} items";
         }
         finally
         {
@@ -401,7 +401,7 @@ public partial class MainForm : Form
     {
         if (_currentPack == null || e.Node == null) return;
 
-        // Root 节点不应该有点击反应
+        // Root node should not respond to click events
         if (e.Node.Text == "Root")
         {
             return;
@@ -472,12 +472,12 @@ public partial class MainForm : Form
             }
             else
             {
-                _previewTextBox.Text = "选择一个文件以预览内容";
+                _previewTextBox.Text = "Select a file to preview content";
             }
         }
         else
         {
-            _previewTextBox.Text = "选择一个文件以预览内容";
+            _previewTextBox.Text = "Select a file to preview content";
         }
     }
 
@@ -490,7 +490,7 @@ public partial class MainForm : Form
             var bytes = _currentPack.Read(path);
             if (bytes == null)
             {
-                _previewTextBox.Text = "无法读取内容";
+                _previewTextBox.Text = "Unable to read content";
                 return;
             }
 
@@ -508,7 +508,7 @@ public partial class MainForm : Form
                 // Limit preview to 2000 characters
                 if (content.Length > 2000)
                 {
-                    content = content.Substring(0, 2000) + "\n\n... [预览已截断]";
+                    content = content.Substring(0, 2000) + "\n\n... [Preview truncated]";
                 }
             }
             else if (metadata?.ContentType == "text")
@@ -517,12 +517,12 @@ public partial class MainForm : Form
                 // Limit preview to 2000 characters
                 if (content.Length > 2000)
                 {
-                    content = content.Substring(0, 2000) + "\n\n... [预览已截断]";
+                    content = content.Substring(0, 2000) + "\n\n... [Preview truncated]";
                 }
             }
             else
             {
-                content = $"[二进制数据 - {bytes.Length} 字节]\n\n十六进制预览:\n";
+                content = $"[Binary Data - {bytes.Length} bytes]\n\nHex preview:\n";
                 var preview = bytes.Take(Math.Min(256, bytes.Length)).ToArray();
                 content += BitConverter.ToString(preview).Replace("-", " ");
             }
@@ -531,7 +531,7 @@ public partial class MainForm : Form
         }
         catch (Exception ex)
         {
-            _previewTextBox.Text = $"读取内容时出错: {ex.Message}";
+            _previewTextBox.Text = $"Error reading content: {ex.Message}";
         }
     }
     
@@ -590,7 +590,7 @@ public partial class MainForm : Form
     }
 
     /// <summary>
-    /// 解码 JSON 字符串中的 Unicode 转义序列（\uXXXX）为实际字符
+    /// Decode Unicode escape sequences (\uXXXX) in a JSON string to actual characters
     /// </summary>
     private static string DecodeUnicodeEscapes(string input)
     {
@@ -602,7 +602,7 @@ public partial class MainForm : Form
         
         while (i < input.Length)
         {
-            // 检查是否是 Unicode 转义序列
+            // Check if this is a Unicode escape sequence
             if (i + 5 < input.Length && 
                 input[i] == '\\' && 
                 input[i + 1] == 'u' &&
@@ -611,11 +611,11 @@ public partial class MainForm : Form
                 IsHexDigit(input[i + 4]) &&
                 IsHexDigit(input[i + 5]))
             {
-                // 提取十六进制值
+                // Extract hexadecimal value
                 string hex = input.Substring(i + 2, 4);
                 int codePoint = Convert.ToInt32(hex, 16);
                 
-                // 处理代理对（Surrogate Pair）
+                // Handle surrogate pairs
                 if (char.IsHighSurrogate((char)codePoint) && 
                     i + 11 < input.Length &&
                     input[i + 6] == '\\' &&
@@ -638,7 +638,7 @@ public partial class MainForm : Form
                     }
                 }
                 
-                // 普通字符
+                // Regular character
                 result.Append((char)codePoint);
                 i += 6;
             }
@@ -653,7 +653,7 @@ public partial class MainForm : Form
     }
 
     /// <summary>
-    /// 检查字符是否为十六进制数字
+    /// Check if a character is a hexadecimal digit
     /// </summary>
     private static bool IsHexDigit(char c)
     {

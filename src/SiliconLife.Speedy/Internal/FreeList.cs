@@ -14,24 +14,25 @@
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// 空闲区间表。维护一组 (offset, length) 的空闲块集合，支持分配与归还，
-/// 归还时自动与前后相邻块合并，使 SpeedyPack 能像真实硬盘那样就地复用空间。
+/// Free block table. Maintains a collection of free blocks as (offset, length)
+/// pairs, supporting allocation and release. On release, automatically merges
+/// with adjacent blocks so that SpeedyPack can reuse space in-place like a real disk.
 /// </summary>
 /// <remarks>
-/// - 不做持久化，启动时由 <see cref="PackFileWriter"/> 从 Directory + FileLength 重建；
-/// - 内部使用 <see cref="SortedDictionary{TKey,TValue}"/>（offset -> length），
-///   Release 合并相邻块耗 O(n)，Allocate 为 first-fit 也耗 O(n)，
-///   已满足"实现优先于性能"的项目原则；
-/// - 线程安全：所有公共方法均在内部锁保护下执行。
+/// - Not persisted; rebuilt on startup by <see cref="PackFileWriter"/> from Directory + FileLength;
+/// - Internally uses <see cref="SortedDictionary{TKey,TValue}"/> (offset -> length).
+///   Release merging of adjacent blocks is O(n); Allocate is first-fit and also O(n),
+///   which satisfies the project principle of "implementation before performance";
+/// - Thread-safe: all public methods are executed under internal lock protection.
 /// </remarks>
 internal sealed class FreeList
 {
-    // key = 空闲块起始 offset，value = 空闲块长度（字节）。按 offset 升序。
+    // key = free block start offset, value = free block length (bytes). Sorted by offset ascending.
     private readonly SortedDictionary<long, long> _blocks = new();
     private readonly object _lock = new();
 
     /// <summary>
-    /// 当前空闲块数量（便于调试与诊断）。
+    /// Current number of free blocks (useful for debugging and diagnostics).
     /// </summary>
     public int BlockCount
     {
@@ -39,7 +40,7 @@ internal sealed class FreeList
     }
 
     /// <summary>
-    /// 当前所有空闲块的总字节数（便于诊断"垃圾率"）。
+    /// Total bytes of all current free blocks (useful for diagnosing "garbage ratio").
     /// </summary>
     public long TotalFreeBytes
     {
@@ -56,7 +57,8 @@ internal sealed class FreeList
     }
 
     /// <summary>
-    /// 归还一段空间。会自动与紧邻的前块/后块合并，避免碎片堆积。
+    /// Release a block of space. Automatically merges with adjacent preceding/successor
+    /// blocks to avoid fragmentation buildup.
     /// </summary>
     public void Release(long offset, long length)
     {
@@ -68,8 +70,8 @@ internal sealed class FreeList
             long mergedOffset = offset;
             long mergedLength = length;
 
-            // 查找紧邻的"前块"：key + length == offset
-            // SortedDictionary 按 key 升序遍历，一旦 key >= offset 即可停。
+            // Look for the immediately adjacent "preceding block": key + length == offset.
+            // SortedDictionary iterates in key ascending order; stop once key >= offset.
             long? prevKey = null;
             foreach (var kvp in _blocks)
             {
@@ -77,7 +79,7 @@ internal sealed class FreeList
                 if (kvp.Key + kvp.Value == offset)
                 {
                     prevKey = kvp.Key;
-                    // 不会再有更靠右的前块（_blocks 无重叠），可直接 break。
+                    // No further rightward preceding block exists (_blocks has no overlap); safe to break.
                     break;
                 }
             }
@@ -89,7 +91,7 @@ internal sealed class FreeList
                 mergedLength = prevLen + length;
             }
 
-            // 查找紧邻的"后块"：key == mergedOffset + mergedLength
+            // Look for the immediately adjacent "successor block": key == mergedOffset + mergedLength
             var nextKey = mergedOffset + mergedLength;
             if (_blocks.TryGetValue(nextKey, out var nextLen))
             {
@@ -102,10 +104,10 @@ internal sealed class FreeList
     }
 
     /// <summary>
-    /// 尝试分配一块不小于 <paramref name="requiredLength"/> 的空闲区间（first-fit）。
-    /// 成功时将剩余部分重新加入空闲表。
+    /// Try to allocate a free block of at least <paramref name="requiredLength"/> bytes (first-fit).
+    /// On success, the remaining portion (if any) is re-added to the free list.
     /// </summary>
-    /// <returns>分配成功返回 true 并通过 <paramref name="offset"/> 返回起始位置；失败返回 false。</returns>
+    /// <returns>true on success with the start position returned via <paramref name="offset"/>; false on failure.</returns>
     public bool TryAllocate(long requiredLength, out long offset)
     {
         offset = -1;
@@ -113,7 +115,7 @@ internal sealed class FreeList
 
         lock (_lock)
         {
-            // 取第一个容量足够的块（first-fit）。
+            // Take the first block with sufficient capacity (first-fit).
             long? hitKey = null;
             long hitLen = 0;
             foreach (var kvp in _blocks)
@@ -140,7 +142,7 @@ internal sealed class FreeList
     }
 
     /// <summary>
-    /// 清空空闲表。仅供 Compact/重建使用。
+    /// Clear the free list. Only for use during Compact/rebuild.
     /// </summary>
     public void Clear()
     {

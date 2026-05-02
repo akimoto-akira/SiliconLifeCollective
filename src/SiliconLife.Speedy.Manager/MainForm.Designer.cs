@@ -109,7 +109,7 @@ partial class MainForm
         _statusLabel.Name = "_statusLabel";
         _statusLabel.Size = new Size(1352, 32);
         _statusLabel.Spring = true;
-        _statusLabel.Text = "就绪";
+        _statusLabel.Text = "Ready";
         _statusLabel.TextAlign = ContentAlignment.MiddleLeft;
         // 
         // _itemCountLabel
@@ -117,7 +117,7 @@ partial class MainForm
         _itemCountLabel.Font = new Font("Segoe UI", 9F);
         _itemCountLabel.Name = "_itemCountLabel";
         _itemCountLabel.Size = new Size(109, 32);
-        _itemCountLabel.Text = "0 个项目";
+        _itemCountLabel.Text = "0 items";
         // 
         // _breadcrumbPanel
         // 
@@ -170,7 +170,7 @@ partial class MainForm
         _btnOpen.Name = "_btnOpen";
         _btnOpen.Size = new Size(146, 56);
         _btnOpen.TabIndex = 0;
-        _btnOpen.Text = "📂 打开";
+        _btnOpen.Text = "📂 Open";
         _btnOpen.UseVisualStyleBackColor = false;
         // 
         // _lblFileGroup
@@ -181,7 +181,7 @@ partial class MainForm
         _lblFileGroup.Name = "_lblFileGroup";
         _lblFileGroup.Size = new Size(100, 31);
         _lblFileGroup.TabIndex = 1;
-        _lblFileGroup.Text = "文件";
+        _lblFileGroup.Text = "File";
         _lblFileGroup.TextAlign = ContentAlignment.MiddleCenter;
         // 
         // _ribbonSeparator
@@ -207,7 +207,7 @@ partial class MainForm
         _btnRefresh.Name = "_btnRefresh";
         _btnRefresh.Size = new Size(132, 56);
         _btnRefresh.TabIndex = 3;
-        _btnRefresh.Text = "🔄刷新";
+        _btnRefresh.Text = "🔄 Refresh";
         _btnRefresh.UseVisualStyleBackColor = false;
         // 
         // _btnCompact
@@ -225,7 +225,7 @@ partial class MainForm
         _btnCompact.Name = "_btnCompact";
         _btnCompact.Size = new Size(148, 56);
         _btnCompact.TabIndex = 4;
-        _btnCompact.Text = "🗜️压缩";
+        _btnCompact.Text = "🗜️ Compact";
         _btnCompact.UseVisualStyleBackColor = false;
         // 
         // _lblViewGroup
@@ -236,7 +236,7 @@ partial class MainForm
         _lblViewGroup.Name = "_lblViewGroup";
         _lblViewGroup.Size = new Size(148, 31);
         _lblViewGroup.TabIndex = 5;
-        _lblViewGroup.Text = "视图";
+        _lblViewGroup.Text = "View";
         _lblViewGroup.TextAlign = ContentAlignment.MiddleCenter;
         // 
         // _contentPanel
@@ -312,7 +312,7 @@ partial class MainForm
         // 
         _treeRefreshMenuItem.Name = "_treeRefreshMenuItem";
         _treeRefreshMenuItem.Size = new Size(136, 38);
-        _treeRefreshMenuItem.Text = "刷新";
+        _treeRefreshMenuItem.Text = "Refresh";
         // 
         // _rightSplitContainer
         // 
@@ -351,23 +351,23 @@ partial class MainForm
         // 
         // _colName
         // 
-        _colName.Text = "名称";
+        _colName.Text = "Name";
         _colName.Width = 320;
         // 
         // _colType
         // 
-        _colType.Text = "类型";
+        _colType.Text = "Type";
         _colType.Width = 120;
         // 
         // _colSize
         // 
-        _colSize.Text = "大小";
+        _colSize.Text = "Size";
         _colSize.Width = 100;
         _colSize.TextAlign = HorizontalAlignment.Right;
         // 
         // _colModified
         // 
-        _colModified.Text = "修改时间";
+        _colModified.Text = "Modified";
         _colModified.Width = 180;
         // 
         // _listContextMenu
@@ -381,7 +381,7 @@ partial class MainForm
         // 
         _listViewContentMenuItem.Name = "_listViewContentMenuItem";
         _listViewContentMenuItem.Size = new Size(184, 38);
-        _listViewContentMenuItem.Text = "查看内容";
+        _listViewContentMenuItem.Text = "View Content";
         // 
         // _listSeparator
         // 
@@ -392,7 +392,7 @@ partial class MainForm
         // 
         _listRefreshMenuItem.Name = "_listRefreshMenuItem";
         _listRefreshMenuItem.Size = new Size(184, 38);
-        _listRefreshMenuItem.Text = "刷新";
+        _listRefreshMenuItem.Text = "Refresh";
         // 
         // _previewPanel
         // 
@@ -418,7 +418,7 @@ partial class MainForm
         _previewTextBox.ScrollBars = ScrollBars.Both;
         _previewTextBox.Size = new Size(219, 567);
         _previewTextBox.TabIndex = 0;
-        _previewTextBox.Text = "选择一个文件以预览内容";
+        _previewTextBox.Text = "Select a file to preview content";
         // 
         // MainForm
         // 
@@ -458,16 +458,16 @@ partial class MainForm
 
     #endregion
 
-    // 状态栏
+    // Status bar
     private StatusStrip _statusStrip;
     private ToolStripStatusLabel _statusLabel;
     private ToolStripStatusLabel _itemCountLabel;
     
-    // 面包屑导航
+    // Breadcrumb navigation
     private Panel _breadcrumbPanel;
     private FlowLayoutPanel _breadcrumbFlow;
     
-    // Ribbon 工具栏
+    // Ribbon toolbar
     private Panel _ribbonPanel;
     private Button _btnOpen;
     private Button _btnRefresh;
@@ -476,8 +476,8 @@ partial class MainForm
     private Label _lblViewGroup;
     private Panel _ribbonSeparator;
     
-    // 主分割容器
-    private Panel _contentPanel;  // 内容容器
+    // Main split container
+    private Panel _contentPanel;  // Content container
     private SplitContainer _mainSplitContainer;
     private Panel _treePanel;
     private TreeView _treeView;
@@ -491,7 +491,7 @@ partial class MainForm
     private Panel _previewPanel;
     private TextBox _previewTextBox;
     
-    // 右键菜单
+    // Context menus
     private ContextMenuStrip _treeContextMenu;
     private ToolStripMenuItem _treeRefreshMenuItem;
     private ContextMenuStrip _listContextMenu;
