@@ -499,6 +499,7 @@ public class ZhHK : DefaultLocalizationBase
     public override string AboutGitHubLink => "GitHub 倉庫";
     public override string AboutGiteeLink => "Gitee 鏡像";
     public override string AboutSocialMediaLabel => "自媒體平台";
+    public override string AboutPluginListLabel => "插件列表";
 
     public override string GetSocialMediaName(string platform) => platform switch
     {

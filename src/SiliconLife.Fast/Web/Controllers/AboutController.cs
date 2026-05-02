@@ -12,6 +12,7 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
+using SiliconLife.Fast.Web.Models;
 
 namespace SiliconLife.Fast.Web;
 
@@ -42,8 +43,43 @@ public class AboutController : Controller
     {
         var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
         var view = new Views.AboutView();
-        var vm = new Models.AboutViewModel { Skin = skin, ActiveMenu = "about" };
+        var vm = new Models.AboutViewModel 
+        { 
+            Skin = skin, 
+            ActiveMenu = "about",
+            PluginList = GetPluginList()
+        };
         var html = view.Render(vm);
         RenderHtml(html);
+    }
+
+    /// <summary>
+    /// Gets the plugin list from PluginLoader
+    /// </summary>
+    private static Dictionary<string, AboutViewModel.PluginInfo> GetPluginList()
+    {
+        var result = new Dictionary<string, AboutViewModel.PluginInfo>();
+        var language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+        
+        // Get PluginLoader from ServiceLocator
+        var pluginLoader = ServiceLocator.Instance.GetService<PluginLoader>();
+        if (pluginLoader == null)
+        {
+            return result;
+        }
+        
+        // Get all loaded plugins
+        foreach (var plugin in pluginLoader.Plugins)
+        {
+            result[plugin.Id] = new AboutViewModel.PluginInfo
+            {
+                Name = plugin.GetName(language),
+                Version = plugin.Version,
+                Description = plugin.GetDescription(language),
+                Author = plugin.GetAuthor(language)
+            };
+        }
+        
+        return result;
     }
 }

@@ -644,6 +644,7 @@ public class JaJP : DefaultLocalizationBase
     public override string AboutGitHubLink => "GitHubリポジトリ";
     public override string AboutGiteeLink => "Giteeミラー";
     public override string AboutSocialMediaLabel => "ソーシャルメディアプラットフォーム";
+    public override string AboutPluginListLabel => "プラグインリスト";
     public override string GetSocialMediaName(string platform) => platform switch
     {
         "Bilibili" => "B站",

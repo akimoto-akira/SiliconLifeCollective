@@ -27,6 +27,23 @@ public class AboutViewModel : ViewModelBase
     public string License { get; set; } = "Apache License 2.0";
     public string GitHubUrl { get; set; } = "https://github.com/akimoto-akira/SiliconLifeCollective";
     public string GiteeUrl { get; set; } = "https://gitee.com/hoshinokennji/SiliconLifeCollective";
+    
+    /// <summary>
+    /// Plugin list item with detailed information
+    /// </summary>
+    public class PluginInfo
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Version { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Author { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// Plugin list (plugin ID -> plugin info)
+    /// </summary>
+    public Dictionary<string, PluginInfo> PluginList { get; set; } = new();
+    
     public List<SocialMedia> SocialMediaList { get; set; } = new()
     {
         new SocialMedia

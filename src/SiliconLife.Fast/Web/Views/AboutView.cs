@@ -58,6 +58,7 @@ public class AboutView : ViewBase
                         ).Class("about-links")
                     ).Class("about-info-row")
                 ).Class("card"),
+                RenderPluginSection(vm),
                 H.Div(
                     H.P(vm.Localization.AboutCopyright).Class("about-copyright")
                 ).Class("about-footer")
@@ -83,6 +84,33 @@ public class AboutView : ViewBase
                 H.Div(socialItems).Class("about-social-list")
             ).Class("about-social-section")
         ).Class("about-info-row");
+    }
+
+    private static H RenderPluginSection(AboutViewModel vm)
+    {
+        if (vm.PluginList == null || vm.PluginList.Count == 0)
+            return H.Div();
+
+        var pluginItems = vm.PluginList.Select(kv =>
+            H.Div(
+                H.Div(
+                    H.Span(kv.Value.Name).Class("about-plugin-name"),
+                    H.Span("v" + kv.Value.Version).Class("about-plugin-version")
+                ).Class("about-plugin-header"),
+                H.P(kv.Value.Description).Class("about-plugin-description"),
+                H.Div(
+                    H.Span(vm.Localization.AboutAuthorLabel + ": ").Class("about-plugin-label"),
+                    H.Span(kv.Value.Author).Class("about-plugin-author")
+                ).Class("about-plugin-footer")
+            ).Class("about-plugin-item")
+        ).ToArray();
+
+        return H.Div(
+            H.Details(
+                H.Summary(vm.Localization.AboutPluginListLabel).Class("about-summary"),
+                H.Div(pluginItems).Class("about-plugin-list")
+            ).Class("about-plugin-section")
+        ).Class("card about-plugin-card");
     }
 
     private static CssBuilder GetStyles()
@@ -170,6 +198,69 @@ public class AboutView : ViewBase
             .EndSelector()
             .Selector(".about-copyright")
                 .Property("margin", "0")
+            .EndSelector()
+            .Selector(".about-plugin-card")
+                .Property("margin-top", "24px")
+            .EndSelector()
+            .Selector(".about-plugin-section")
+                .Property("width", "100%")
+            .EndSelector()
+            .Selector(".about-plugin-section[open] .about-summary::before")
+                .Property("transform", "rotate(90deg)")
+            .EndSelector()
+            .Selector(".about-plugin-list")
+                .Property("padding", "12px 0 12px 24px")
+                .Property("display", "grid")
+                .Property("grid-template-columns", "repeat(auto-fill, minmax(300px, 1fr))")
+                .Property("gap", "16px")
+            .EndSelector()
+            .Selector(".about-plugin-item")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+                .Property("padding", "16px")
+                .Property("background", "var(--bg-secondary)")
+                .Property("border-radius", "8px")
+                .Property("transition", "background 0.2s")
+                .Property("border", "1px solid var(--border-color)")
+            .EndSelector()
+            .Selector(".about-plugin-item:hover")
+                .Property("background", "var(--bg-tertiary)")
+            .EndSelector()
+            .Selector(".about-plugin-header")
+                .Property("display", "flex")
+                .Property("justify-content", "space-between")
+                .Property("align-items", "center")
+                .Property("margin-bottom", "10px")
+            .EndSelector()
+            .Selector(".about-plugin-name")
+                .Property("font-weight", "700")
+                .Property("font-size", "16px")
+                .Property("color", "var(--text-primary)")
+            .EndSelector()
+            .Selector(".about-plugin-version")
+                .Property("font-size", "13px")
+                .Property("color", "var(--accent-primary)")
+                .Property("font-weight", "600")
+            .EndSelector()
+            .Selector(".about-plugin-description")
+                .Property("color", "var(--text-secondary)")
+                .Property("line-height", "1.6")
+                .Property("margin", "0 0 12px 0")
+                .Property("flex-grow", "1")
+            .EndSelector()
+            .Selector(".about-plugin-footer")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("padding-top", "10px")
+                .Property("border-top", "1px solid var(--border-color)")
+                .Property("font-size", "13px")
+            .EndSelector()
+            .Selector(".about-plugin-label")
+                .Property("color", "var(--text-secondary)")
+            .EndSelector()
+            .Selector(".about-plugin-author")
+                .Property("color", "var(--text-primary)")
+                .Property("font-weight", "500")
             .EndSelector();
     }
 }

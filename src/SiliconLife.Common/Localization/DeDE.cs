@@ -612,6 +612,7 @@ public class DeDE : DefaultLocalizationBase
     public override string AboutGitHubLink => "GitHub Repository";
     public override string AboutGiteeLink => "Gitee Mirror";
     public override string AboutSocialMediaLabel => "Social Media Plattformen";
+    public override string AboutPluginListLabel => "Plugin-Liste";
     public override string GetSocialMediaName(string platform) => platform switch
     {
         "Bilibili" => "Bilibili",

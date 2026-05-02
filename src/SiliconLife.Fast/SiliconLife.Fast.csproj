@@ -17,4 +17,5 @@
     <Company>Hoshino Kennji</Company>
   </PropertyGroup>
 
+  <Import Project="SiliconLife.Fast.csproj.targets" Condition="Exists('SiliconLife.Fast.csproj.targets')" />
 </Project>

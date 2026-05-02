@@ -63,6 +63,7 @@ public class Program
         string pluginDir = Path.Combine(AppContext.BaseDirectory, "plugins");
         _pluginLoader = new PluginLoader(pluginDir);
         _pluginLoader.LoadAll();
+        ServiceLocator.Instance.Register(_pluginLoader);
         _logger.Info(null, "Plugins loaded from {0}", pluginDir);
 
         configData.AIConfig.TryGetValue("endpoint", out var endpointValue);

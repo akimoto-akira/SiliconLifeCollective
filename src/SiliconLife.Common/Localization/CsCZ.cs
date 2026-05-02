@@ -228,6 +228,7 @@ public class CsCZ : DefaultLocalizationBase
     public override string AboutLicenseLabel => "Licence";
     public override string AboutCopyright => "Copyright © 2024 Silicon Life Collective";
     public override string AboutSocialMediaLabel => "Sociální média";
+    public override string AboutPluginListLabel => "Seznam pluginů";
 
     // ===== Memory Page =====
     public override string MemoryPageHeader => "Paměť";

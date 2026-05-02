@@ -1028,6 +1028,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string AboutSocialMediaLabel { get; }
 
     /// <summary>
+    /// Gets the plugin list label for about page
+    /// </summary>
+    public abstract string AboutPluginListLabel { get; }
+
+    /// <summary>
     /// Gets the localized display name for a social media platform
     /// </summary>
     /// <param name="platform">The platform identifier</param>
