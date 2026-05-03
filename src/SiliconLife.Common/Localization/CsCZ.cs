@@ -189,6 +189,7 @@ public class CsCZ : DefaultLocalizationBase
     public override string ChatDetailPageTitle => "Detail chatu";
     public override string ChatDetailPageHeader => "Detail chatu";
     public override string ChatDetailNoMessages => "Žádné zprávy";
+    public override string ChatDetailMembers => "Členové";
     public override string BeingsYes => "Ano";
     public override string BeingsNo => "Ne";
     public override string BeingsNotSet => "Nenastaveno";
@@ -479,6 +480,8 @@ public override string ProjectTasksLinkLabel => "Úkoly";
 
 public override string ProjectWorkNotesLinkLabel => "Pracovní poznámky";
 public override string ProjectWorkflowsLinkLabel => "Pracovní postupy";
+public override string ProjectGroupChatLinkLabel => "Skupinový chat";
+public override string ProjectBroadcastLinkLabel => "Vysílání";
 public override string ProjectWorkflowsPageHeader => "Pracovní postupy projektu";
 public override string ProjectWorkflowsEmptyState => "Žádné pracovní postupy pro tento projekt";
 public override string CreateWorkflowButton => "Vytvořit pracovní postup";

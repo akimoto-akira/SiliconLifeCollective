@@ -50,6 +50,12 @@ public static class HelpLocalizationFactory
         Language.DeCH => new HelpLocalizationDeCH(),
         Language.DeLU => new HelpLocalizationDeLU(),
         Language.DeLI => new HelpLocalizationDeLI(),
+        
+        // French variants
+        Language.FrFR => new HelpLocalizationFrFR(),
+        Language.FrCA => new HelpLocalizationFrCA(),
+        Language.FrCH => new HelpLocalizationFrCH(),
+        
         _ => new HelpLocalizationEnUS() // Default to English
     };
 }

@@ -398,6 +398,8 @@ public class KoKR : DefaultLocalizationBase
     
     public override string ProjectWorkNotesLinkLabel => "작업 노트";
     public override string ProjectWorkflowsLinkLabel => "워크플로우";
+    public override string ProjectGroupChatLinkLabel => "그룹 채팅";
+    public override string ProjectBroadcastLinkLabel => "브로드캐스트";
     public override string ProjectWorkflowsPageHeader => "프로젝트 워크플로우";
     public override string ProjectWorkflowsEmptyState => "이 프로젝트에 워크플로우가 없습니다";
     public override string CreateWorkflowButton => "워크플로우 생성";
@@ -629,6 +631,7 @@ public class KoKR : DefaultLocalizationBase
     public override string ChatDetailPageTitle => "채팅 상세";
     public override string ChatDetailPageHeader => "대화 상세";
     public override string ChatDetailNoMessages => "메시지가 없습니다";
+    public override string ChatDetailMembers => "멤버";
     public override string BeingsYes => "예";
     public override string BeingsNo => "아니오";
     public override string BeingsNotSet => "미설정";

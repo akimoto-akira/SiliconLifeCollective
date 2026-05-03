@@ -166,6 +166,7 @@ public class ProjectController : Controller
 
             string? name = body.TryGetValue("name", out var nameObj) ? nameObj?.ToString() : null;
             string? description = body.TryGetValue("description", out var descObj) ? descObj?.ToString() : null;
+            string? workflowTemplate = body.TryGetValue("workflowTemplate", out var wtObj) ? wtObj?.ToString() : null;
 
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -186,7 +187,7 @@ public class ProjectController : Controller
                 return;
             }
 
-            var project = _projectManager.CreateProject(name, description ?? "", createdBy);
+            var project = _projectManager.CreateProject(name, description ?? "", createdBy, workflowTemplate);
             RenderJson(new
             {
                 success = true,
@@ -196,6 +197,9 @@ public class ProjectController : Controller
                     name = project.Name,
                     description = project.Description,
                     status = project.Status.ToString().ToLowerInvariant(),
+                    workflowTemplate = project.WorkflowTemplateName,
+                    groupChatSessionId = project.GroupChatSessionId?.ToString(),
+                    broadcastChannelId = project.BroadcastChannelId?.ToString(),
                     createdAt = project.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")
                 }
             });
@@ -933,8 +937,12 @@ public class ProjectController : Controller
                 createdAtFormatted = t.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
                 startedAt = t.StartedAt,
                 completedAt = t.CompletedAt,
-                assigneeGuids = t.AssigneeGuids,
-                assigneeNames = t.AssigneeGuids.Select(g => beingManager?.GetBeing(g)?.Name ?? g.ToString().Substring(0, 8)).ToList(),
+                assigneeGuid = t.AssigneeGuid,
+                assigneeName = beingManager?.GetBeing(t.AssigneeGuid)?.Name ?? t.AssigneeGuid.ToString().Substring(0, 8),
+                executorGuids = t.ExecutorGuids,
+                executorNames = t.ExecutorGuids.Select(g => beingManager?.GetBeing(g)?.Name ?? g.ToString().Substring(0, 8)).ToList(),
+                reviewerGuids = t.ReviewerGuids,
+                reviewerNames = t.ReviewerGuids.Select(g => beingManager?.GetBeing(g)?.Name ?? g.ToString().Substring(0, 8)).ToList(),
                 createdByGuid = t.CreatedByGuid,
                 createdByName = beingManager?.GetBeing(t.CreatedByGuid)?.Name ?? t.CreatedByGuid.ToString().Substring(0, 8),
                 errorMessage = t.ErrorMessage ?? ""
@@ -988,10 +996,22 @@ public class ProjectController : Controller
                 Guid.TryParse(creatorObj.ToString(), out createdBy);
             }
 
-            List<Guid>? assignees = null;
-            if (body.TryGetValue("assignees", out var assignObj) && assignObj is List<object> assignList)
+            List<Guid>? executors = null;
+            if (body.TryGetValue("executors", out var execObj) && execObj is List<object> execList)
             {
-                assignees = assignList.Select(a => Guid.TryParse(a?.ToString(), out Guid g) ? g : Guid.Empty).Where(g => g != Guid.Empty).ToList();
+                executors = execList.Select(a => Guid.TryParse(a?.ToString(), out Guid g) ? g : Guid.Empty).Where(g => g != Guid.Empty).ToList();
+            }
+
+            if (executors == null || executors.Count == 0)
+            {
+                RenderJson(new { success = false, error = "执行者列表不能为空" });
+                return;
+            }
+
+            List<Guid>? reviewers = null;
+            if (body.TryGetValue("reviewers", out var revObj) && revObj is List<object> revList)
+            {
+                reviewers = revList.Select(a => Guid.TryParse(a?.ToString(), out Guid g) ? g : Guid.Empty).Where(g => g != Guid.Empty).ToList();
             }
 
             var taskSystem = _projectManager.GetTaskSystem(projectId);
@@ -1001,7 +1021,7 @@ public class ProjectController : Controller
                 return;
             }
 
-            var task = taskSystem.Create(title, description, createdBy, priority, assignees);
+            var task = taskSystem.Create(title, description, createdBy, executors, reviewers, priority);
 
             RenderJson(new
             {
@@ -1014,7 +1034,9 @@ public class ProjectController : Controller
                     status = task.Status.ToString().ToLowerInvariant(),
                     priority = task.Priority,
                     createdAt = task.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
-                    assigneeGuids = task.AssigneeGuids,
+                    assigneeGuid = task.AssigneeGuid,
+                    executorGuids = task.ExecutorGuids,
+                    reviewerGuids = task.ReviewerGuids,
                     createdByGuid = task.CreatedByGuid
                 }
             });

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -88,6 +88,15 @@ public class Program
         IProjectManager projectManager = new ProjectManager(storage, configData.DataDirectory.FullName);
         ServiceLocator.Instance.Register<IProjectManager>(projectManager);
         _logger.Info(null, "Initialized: ProjectManager");
+
+        // Initialize workflow engine
+        var serviceProvider = new ServiceProvider();
+        var workflowEngine = new WorkflowEngine(timeStorage, serviceProvider);
+        workflowEngine.RegisterTemplate(CodeReviewWorkflow.CreateTemplate());
+        ((ProjectManager)projectManager).SetWorkflowEngine(workflowEngine);
+        ServiceLocator.Instance.Register<WorkflowEngine>(workflowEngine);
+        new WorkflowTickObject(workflowEngine);
+        _logger.Info(null, "Initialized: WorkflowEngine");
 
         ChatSystem chatSystem = new ChatSystem(timeStorage);
         _logger.Info(null, "Initialized: ChatSystem");
@@ -301,6 +310,11 @@ public class Program
         LocalizationManager.Instance.Register<DeCH>(Language.DeCH);
         LocalizationManager.Instance.Register<DeLU>(Language.DeLU);
         LocalizationManager.Instance.Register<DeLI>(Language.DeLI);
+        
+        // French
+        LocalizationManager.Instance.Register<FrFR>(Language.FrFR);
+        LocalizationManager.Instance.Register<FrCA>(Language.FrCA);
+        LocalizationManager.Instance.Register<FrCH>(Language.FrCH);
     }
 
     public static void RequestExit()

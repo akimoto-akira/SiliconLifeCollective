@@ -51,28 +51,31 @@ public class FileSystemStorage : IStorage
     /// The file is expected to contain a single-line JSON record.
     /// For .md files, reads raw text content.
     /// </summary>
-    public T? Read<T>(string key)
+    public T[] Read<T>(string key)
     {
         string filePath = GetFilePath(key);
 
         if (!File.Exists(filePath))
-            return default;
+            return Array.Empty<T>();
 
         // Special handling for .md files (raw text)
         if (typeof(T) == typeof(string) && key.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
         {
             string content = File.ReadAllText(filePath);
-            return (T?)(object)content;
+            return new T[] { (T)(object)content };
         }
 
         // Read only the first non-empty line for JSON files
         foreach (string line in File.ReadLines(filePath))
         {
             if (!string.IsNullOrWhiteSpace(line))
-                return JsonSerializer.Deserialize<T>(line, _jsonOptions);
+            {
+                var result = JsonSerializer.Deserialize<T>(line, _jsonOptions);
+                return result is not null ? new T[] { result } : Array.Empty<T>();
+            }
         }
 
-        return default;
+        return Array.Empty<T>();
     }
 
     /// <summary>
@@ -117,6 +120,39 @@ public class FileSystemStorage : IStorage
 
         if (File.Exists(filePath))
             File.Delete(filePath);
+    }
+
+    /// <summary>
+    /// Lists all child keys under the given prefix by scanning directories and files.
+    /// Semantically equivalent to listing files/folders in a directory.
+    /// </summary>
+    public IEnumerable<string> ListKeys(string prefix = "")
+    {
+        var keys = new List<string>();
+        string searchPath = string.IsNullOrEmpty(prefix) 
+            ? _baseDirectory 
+            : GetFilePath(prefix).Replace(".json", "");
+
+        if (!Directory.Exists(searchPath))
+            return keys;
+
+        // List files in the directory
+        foreach (string file in Directory.GetFiles(searchPath))
+        {
+            string relativePath = Path.GetRelativePath(_baseDirectory, file);
+            string key = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+            keys.Add(key);
+        }
+
+        // List subdirectories
+        foreach (string dir in Directory.GetDirectories(searchPath))
+        {
+            string relativePath = Path.GetRelativePath(_baseDirectory, dir);
+            string key = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+            keys.Add(key + "/");
+        }
+
+        return keys;
     }
 
     /// <summary>

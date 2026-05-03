@@ -16,21 +16,24 @@ using MessagePack;
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// Handles writing data to .spk files with 4K alignment and a FreeList-based
-/// block allocator. Overwrites and deletes release their old space back to the
-/// FreeList so future writes can reuse it in-place, behaving like a real disk
-/// allocator rather than a pure append-only log.
+/// .spk 文件的写入器，对外提供 4K 对齐的 FreeList 分配器以及"数据写入 +
+/// Directory 切换 + Header 双缓冲原子提交"的安全提交协议。
 /// </summary>
 /// <remarks>
-/// Layout: [Header(32B, padded to 4K)] [Data blocks, 4K aligned] [Directory region (4K aligned)].
-/// Each entry and each directory region occupies <c>AlignUp(length, 4K)</c> bytes of the
-/// file. When released, that aligned space goes back to the <see cref="FreeList"/>.
-/// The FreeList is always in memory; on open it is reconstructed from the on-disk
-/// directory snapshot plus the current file length.
+/// 文件布局（v2）：
+///   [0..4K)   HeaderSlotA
+///   [4K..8K)  HeaderSlotB
+///   [8K..)    数据块 + Directory（通过 FreeList 分配，4K 对齐）
+///
+/// 提交协议（原子性关键）：
+///   1. 新数据块始终分配到新的位置（COW），绝不覆盖旧数据；
+///   2. 新 Directory 也分配到新位置；
+///   3. 新 Header 写到"对侧"空闲槽位，并在 fsync 之后切换活动槽位；
+///   4. 任意步骤崩溃，未完成的写入对旧活动槽位完全不可见。
 /// </remarks>
 internal sealed class PackFileWriter : IDisposable
 {
-    private const int AlignmentSize = 4096; // 4K alignment
+    public const int AlignmentSize = 4096;
 
     private readonly string _filePath;
     private readonly FileStream _stream;
@@ -39,59 +42,67 @@ internal sealed class PackFileWriter : IDisposable
     private readonly FreeList _freeList = new();
 
     private SpkHeader _header;
+    private int _activeSlot; // 当前生效的 Header 槽位（0 或 1）
 
-    private PackFileWriter(string filePath, FileStream stream, SpkHeader header)
+    private PackFileWriter(string filePath, FileStream stream, SpkHeader header, int activeSlot)
     {
         _filePath = filePath;
         _stream = stream;
         _writer = new BinaryWriter(_stream);
         _header = header;
+        _activeSlot = activeSlot;
     }
 
     /// <summary>
-    /// Creates a new .spk file with initial header. File is truncated if exists.
+    /// 创建一个新的 v2 .spk 文件：初始化双 Header 槽位（槽位 A 有效、槽位 B 为空），
+    /// 文件长度恰好等于 TotalHeaderSize=8K。
     /// </summary>
     public static PackFileWriter Create(string filePath)
     {
         var header = SpkHeader.CreateNew();
         var stream = new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
 
-        // Reserve first 4K for header (aligned). Directory initially at 4K (empty).
-        var writer = new BinaryWriter(stream);
-        header.DirectoryOffset = AlignmentSize;
-        header.DirectoryLength = 0;
-        header.WriteTo(writer);
-        writer.Flush();
-        stream.SetLength(AlignmentSize);
-        stream.Flush(true);
+        // 先把文件扩展到 8K，整块清零，再写有效槽位 A。
+        stream.SetLength(SpkHeader.TotalHeaderSize);
+        var zeroSlot = new byte[SpkHeader.SlotSize];
+        stream.Position = 0;
+        stream.Write(zeroSlot, 0, SpkHeader.SlotSize);
+        stream.Write(zeroSlot, 0, SpkHeader.SlotSize);
 
-        // FreeList starts empty; future writes will extend the file when needed.
-        return new PackFileWriter(filePath, stream, header);
+        header.DirectoryOffset = SpkHeader.TotalHeaderSize;
+        header.DirectoryLength = 0;
+        header.Sequence = 1;
+        header.WriteToSlot(stream, 0);
+
+        stream.Flush();
+        stream.Flush(flushToDisk: true);
+
+        return new PackFileWriter(filePath, stream, header, activeSlot: 0);
     }
 
     /// <summary>
-    /// Opens an existing .spk file for writing and rebuilds its FreeList from
-    /// the supplied directory snapshot plus the current file length. Any gap
-    /// between live regions (live entries + current directory + header) becomes
-    /// a reusable free block.
+    /// 以给定的"活动 Header + 活动槽位 + 已加载的 Directory"打开文件用于写入，
+    /// 并据此重建 FreeList。
     /// </summary>
-    public static PackFileWriter Open(string filePath, IReadOnlyDictionary<string, DirectoryEntry> directory)
+    public static PackFileWriter Open(
+        string filePath,
+        IReadOnlyDictionary<string, DirectoryEntry> directory,
+        SpkHeader activeHeader,
+        int activeSlot)
     {
         var stream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
-        var reader = new BinaryReader(stream);
-        stream.Position = 0;
-        var header = SpkHeader.ReadFrom(reader);
+        // 确保文件至少有双 Header 区域长度。
+        if (stream.Length < SpkHeader.TotalHeaderSize)
+            stream.SetLength(SpkHeader.TotalHeaderSize);
 
-        var writer = new PackFileWriter(filePath, stream, header);
+        var writer = new PackFileWriter(filePath, stream, activeHeader, activeSlot);
         writer.BuildFreeList(directory, stream.Length);
         return writer;
     }
 
     /// <summary>
-    /// Rebuilds the in-memory FreeList by walking live occupied regions
-    /// (header, directory, every live entry) in offset order; every gap,
-    /// plus any trailing pre-allocated space past the last live region, is
-    /// added as a reusable free block.
+    /// 根据"活动 Directory + 活动 Header Directory 区 + 文件长度"重建 FreeList。
+    /// 双 Header 区（前 8K）视为占用；任何落在 live 区域之间的间隙都视为可复用空间。
     /// </summary>
     private void BuildFreeList(IReadOnlyDictionary<string, DirectoryEntry> directory, long fileLength)
     {
@@ -99,17 +110,17 @@ internal sealed class PackFileWriter : IDisposable
 
         var occupied = new List<(long Offset, long Length)>
         {
-            // The first 4K is reserved for the header region.
-            (0L, (long)AlignmentSize)
+            // 双 Header 槽位区，永久占用。
+            (0L, (long)SpkHeader.TotalHeaderSize)
         };
 
         foreach (var entry in directory.Values)
         {
-            if (entry.Length > 0 && entry.Offset >= AlignmentSize)
+            if (entry.Length > 0 && entry.Offset >= SpkHeader.TotalHeaderSize)
                 occupied.Add((entry.Offset, AlignUp(entry.Length)));
         }
 
-        if (_header.DirectoryLength > 0 && _header.DirectoryOffset >= AlignmentSize)
+        if (_header.DirectoryLength > 0 && _header.DirectoryOffset >= SpkHeader.TotalHeaderSize)
             occupied.Add((_header.DirectoryOffset, AlignUp(_header.DirectoryLength)));
 
         occupied.Sort((a, b) => a.Offset.CompareTo(b.Offset));
@@ -123,15 +134,12 @@ internal sealed class PackFileWriter : IDisposable
             if (end > cursor) cursor = end;
         }
 
-        // Trailing pre-allocated space past the last live region is reusable too.
         if (fileLength > cursor)
             _freeList.Release(cursor, fileLength - cursor);
     }
 
     /// <summary>
-    /// Appends (or in-place reuses) a data entry. The allocator tries the
-    /// FreeList first and only extends the file when no suitable free block
-    /// exists, so repeated overwrites of the same key no longer bloat the file.
+    /// 追加（或复用空闲块）一个数据条目，返回新的 DirectoryEntry。
     /// </summary>
     public DirectoryEntry AppendEntry(string normalizedPath, byte[] data, string contentType, DateTime? createdAt = null)
     {
@@ -156,24 +164,17 @@ internal sealed class PackFileWriter : IDisposable
         }
     }
 
-    /// <summary>
-    /// Appends a rewritten entry while preserving the original CreatedAt.
-    /// </summary>
+    /// <summary>在保留原 CreatedAt 的前提下，重写条目到新的位置。</summary>
     public DirectoryEntry AppendEntryUpdate(string normalizedPath, byte[] data, string contentType, DirectoryEntry oldEntry)
     {
         return AppendEntry(normalizedPath, data, contentType, oldEntry.CreatedAt);
     }
 
-    /// <summary>
-    /// Releases the space previously occupied by <paramref name="entry"/> back
-    /// to the FreeList so subsequent allocations can reuse it. Callers invoke
-    /// this from <see cref="WriteQueue"/> before overwriting or deleting an
-    /// entry. The physical length returned is <c>AlignUp(entry.Length)</c>.
-    /// </summary>
+    /// <summary>将旧条目占用的对齐空间归还给 FreeList。</summary>
     public void ReleaseEntry(DirectoryEntry entry)
     {
         if (entry is null) return;
-        if (entry.Length <= 0 || entry.Offset < AlignmentSize) return;
+        if (entry.Length <= 0 || entry.Offset < SpkHeader.TotalHeaderSize) return;
 
         lock (_lock)
         {
@@ -182,43 +183,60 @@ internal sealed class PackFileWriter : IDisposable
     }
 
     /// <summary>
-    /// Writes the directory region and updates the header. The new directory
-    /// is allocated via the FreeList (falling back to file extension), and the
-    /// previous directory region is returned to the FreeList.
+    /// 安全提交协议：先把新的 Directory 写到新位置并 fsync，再把新 Header
+    /// 写到对侧槽位并 fsync，然后切换活动槽位，最后把旧 Directory 区释放
+    /// 给 FreeList。中途任意崩溃都不会让活动槽位指向不完整状态。
     /// </summary>
-    public void WriteDirectory(IReadOnlyDictionary<string, DirectoryEntry> entries)
+    public void WriteDirectoryAndCommit(IReadOnlyDictionary<string, DirectoryEntry> entries)
     {
         lock (_lock)
         {
             var oldDirOffset = _header.DirectoryOffset;
             var oldDirLength = _header.DirectoryLength;
 
-            // Release old dir region BEFORE allocating the new one so the new
-            // directory can reuse the same spot when it fits.
-            if (oldDirLength > 0 && oldDirOffset >= AlignmentSize)
-                _freeList.Release(oldDirOffset, AlignUp(oldDirLength));
-
+            // 1. 序列化并分配新 Directory 区（新位置，不覆盖旧 Directory）。
             var dirBytes = MessagePackSerializer.Serialize(entries);
             var alignedSize = AlignUp(dirBytes.Length);
-            var dirOffset = AllocateSpaceInternal(alignedSize);
+            var newDirOffset = AllocateSpaceInternal(alignedSize);
 
-            _stream.Position = dirOffset;
+            // 2. 写 Directory 数据并 fsync：必须在切换 Header 之前落盘。
+            _stream.Position = newDirOffset;
             _writer.Write(dirBytes);
             _writer.Flush();
+            _stream.Flush(flushToDisk: true);
 
-            _header.DirectoryOffset = dirOffset;
-            _header.DirectoryLength = dirBytes.Length;
-
-            // Rewrite header at position 0.
-            _stream.Position = 0;
-            _header.WriteTo(_writer);
+            // 3. 构造新 Header 写入对侧槽位，并 fsync。Sequence 严格自增，
+            //    确保崩溃恢复时能明确区分新旧槽位。
+            var inactiveSlot = 1 - _activeSlot;
+            var newHeader = new SpkHeader
+            {
+                Magic = SpkHeader.MagicBytes,
+                Version = SpkHeader.CurrentVersion,
+                Flags = _header.Flags,
+                DirectoryOffset = newDirOffset,
+                DirectoryLength = dirBytes.Length,
+                Sequence = _header.Sequence + 1
+            };
+            newHeader.WriteToSlot(_stream, inactiveSlot);
             _writer.Flush();
+            _stream.Flush(flushToDisk: true);
+
+            // 4. Header fsync 成功后，对侧槽位正式成为活动槽位。
+            _header = newHeader;
+            _activeSlot = inactiveSlot;
+
+            // 5. 旧 Directory 区此时才能归还给 FreeList（在此之前若崩溃，
+            //    旧槽位仍然指向它，必须保持可读）。
+            if (oldDirLength > 0 && oldDirOffset >= SpkHeader.TotalHeaderSize)
+                _freeList.Release(oldDirOffset, AlignUp(oldDirLength));
         }
     }
 
-    /// <summary>
-    /// Forces all buffered writes down to the OS and to the physical device.
-    /// </summary>
+    /// <summary>兼容旧签名；等价于 WriteDirectoryAndCommit。</summary>
+    public void WriteDirectory(IReadOnlyDictionary<string, DirectoryEntry> entries)
+        => WriteDirectoryAndCommit(entries);
+
+    /// <summary>强制所有已缓冲的写入落到磁盘。</summary>
     public void Flush()
     {
         lock (_lock)
@@ -228,13 +246,20 @@ internal sealed class PackFileWriter : IDisposable
         }
     }
 
-    // ─── Internal allocator ───────────────────────────────────────────────────
+    /// <summary>当前活动槽位索引（供诊断与测试使用）。</summary>
+    public int ActiveSlot
+    {
+        get { lock (_lock) return _activeSlot; }
+    }
 
-    /// <summary>
-    /// Allocates <paramref name="alignedLength"/> bytes. Prefers a reusable
-    /// FreeList block; when none fits, extends the underlying file by exactly
-    /// the requested size. Must be called under <see cref="_lock"/>.
-    /// </summary>
+    /// <summary>当前活动 Header 的 Sequence（供诊断使用）。</summary>
+    public long Sequence
+    {
+        get { lock (_lock) return _header.Sequence; }
+    }
+
+    // ─── 内部分配器 ────────────────────────────────────────────────────────
+
     private long AllocateSpaceInternal(long alignedLength)
     {
         if (alignedLength <= 0)
@@ -243,15 +268,11 @@ internal sealed class PackFileWriter : IDisposable
         if (_freeList.TryAllocate(alignedLength, out var offset))
             return offset;
 
-        // No free block big enough — extend the file.
         offset = _stream.Length;
         _stream.SetLength(offset + alignedLength);
         return offset;
     }
 
-    /// <summary>
-    /// Rounds up to the nearest 4K boundary (returns 0 when value is 0).
-    /// </summary>
     private static long AlignUp(long value)
     {
         if (value <= 0) return 0;

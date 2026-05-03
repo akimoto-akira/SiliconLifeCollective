@@ -29,6 +29,9 @@ public class ChatSystem
     {
         _storage = storage;
         _logger.Info(null, "ChatSystem initialized");
+        
+        // Load existing group chat sessions from storage
+        LoadGroupChatSessions();
     }
 
     /// <summary>
@@ -114,14 +117,107 @@ public class ChatSystem
     /// <summary>
     /// Create a new group chat session with the specified members.
     /// </summary>
-    public SessionBase CreateGroupSession(List<Guid> members, string name = "")
+    /// <param name="members">Member list</param>
+    /// <param name="name">Group display name</param>
+    /// <param name="fixedSessionId">Optional fixed session ID. If provided, uses this ID instead of generating a new one.</param>
+    public SessionBase CreateGroupSession(List<Guid> members, string name = "", Guid? fixedSessionId = null)
     {
         lock (_lock)
         {
-            GroupChatSession newSession = new(members, _storage, name);
+            Guid sessionId = fixedSessionId ?? Guid.NewGuid();
+            
+            // Check if session with this ID already exists
+            if (_sessions.ContainsKey(sessionId))
+            {
+                _logger.Info(null, "Reusing existing group chat session: {0}", sessionId);
+                return _sessions[sessionId];
+            }
+            
+            GroupChatSession newSession = new(sessionId, members, _storage, name);
             _sessions[newSession.Id] = newSession;
             _logger.Info(null, "Created group chat session: {0}, members={1}", newSession.Id, members.Count);
             return newSession;
+        }
+    }
+
+    /// <summary>
+    /// Load existing group chat sessions from storage on startup.
+    /// Scans sessions/group/*/meta for persisted session metadata.
+    /// </summary>
+    private void LoadGroupChatSessions()
+    {
+        try
+        {
+            // List all session directories under sessions/group/
+            // Returns keys like: "sessions/group/{sessionId}/"
+            var sessionKeys = _storage.ListKeys("sessions/group");
+            
+            if (!sessionKeys.Any())
+            {
+                _logger.Info(null, "No existing group chat sessions found in storage");
+                return;
+            }
+
+            int loadedCount = 0;
+            lock (_lock)
+            {
+                foreach (var sessionKey in sessionKeys)
+                {
+                    // Extract sessionId from key path
+                    // Format: "sessions/group/{sessionId}/" or "{sessionId}/"
+                    string sessionIdStr = sessionKey.TrimEnd('/');
+                    int lastSlash = sessionIdStr.LastIndexOf('/');
+                    if (lastSlash >= 0)
+                    {
+                        sessionIdStr = sessionIdStr[(lastSlash + 1)..];
+                    }
+
+                    if (!Guid.TryParse(sessionIdStr, out Guid sessionId))
+                    {
+                        _logger.Warn(null, "Invalid session ID format in storage: {0}", sessionKey);
+                        continue;
+                    }
+
+                    // Skip if already loaded
+                    if (_sessions.ContainsKey(sessionId))
+                        continue;
+
+                    // Read session metadata
+                    string metaKey = $"sessions/group/{sessionIdStr}/meta";
+                    var metaDictArray = _storage.Read<Dictionary<string, object>>(metaKey);
+                    var metaDict = metaDictArray.FirstOrDefault();
+                    
+                    if (metaDict == null)
+                    {
+                        _logger.Warn(null, "Failed to read metadata for session: {0}", sessionId);
+                        continue;
+                    }
+
+                    string name = metaDict.TryGetValue("Name", out var nameObj) ? nameObj?.ToString() ?? "" : "";
+                    var members = new List<Guid>();
+                    
+                    if (metaDict.TryGetValue("Members", out var membersObj) && membersObj is List<object> memberList)
+                    {
+                        foreach (var m in memberList)
+                        {
+                            if (Guid.TryParse(m?.ToString(), out Guid memberId))
+                                members.Add(memberId);
+                        }
+                    }
+
+                    // Recreate the session with fixed ID
+                    GroupChatSession session = new(sessionId, members, _storage, name);
+                    _sessions[sessionId] = session;
+                    loadedCount++;
+                    _logger.Info(null, "Loaded group chat session from storage: {0}, name='{1}', members={2}", sessionId, name, members.Count);
+                }
+            }
+
+            _logger.Info(null, "Loaded {0} group chat session(s) from storage", loadedCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(null, "Failed to load group chat sessions from storage: {0}", ex.Message);
         }
     }
 

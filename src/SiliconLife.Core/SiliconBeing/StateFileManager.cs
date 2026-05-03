@@ -41,7 +41,8 @@ public static class StateFileManager
     {
         try
         {
-            BeingState? state = storage.Read<BeingState>(StateKey);
+            BeingState[] states = storage.Read<BeingState>(StateKey);
+            BeingState? state = states.FirstOrDefault();
             if (state == null)
             {
                 _logger.Debug(null, "State not found in storage");

@@ -36,7 +36,7 @@ public enum SessionType
 public abstract class SessionBase
 {
     /// <summary>Unique session identifier (deterministic)</summary>
-    public Guid Id { get; }
+    public abstract Guid Id { get; }
 
     /// <summary>Session type</summary>
     public abstract SessionType Type { get; }
@@ -46,15 +46,6 @@ public abstract class SessionBase
 
     /// <summary>Member list</summary>
     public abstract List<Guid> Members { get; protected set; }
-
-    /// <summary>
-    /// Protected constructor that generates a deterministic ID from member GUIDs.
-    /// </summary>
-    /// <param name="members">Member GUID collection for ID generation</param>
-    protected SessionBase(IEnumerable<Guid> members)
-    {
-        Id = ComputeDeterministicId(members);
-    }
 
     /// <summary>
     /// Computes a deterministic GUID from a collection of member GUIDs.

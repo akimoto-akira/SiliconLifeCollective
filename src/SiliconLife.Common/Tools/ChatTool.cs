@@ -53,10 +53,16 @@ public class ChatTool : ITool
                     ["enum"] = new[] { "send", "mark_read" },
                     ["description"] = "Action to perform: 'send' to send a message, 'mark_read' to mark all pending messages from target as read without replying"
                 },
+                ["chat_type"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["enum"] = new[] { "single", "group" },
+                    ["description"] = "Chat type: 'single' for direct message with one being, 'group' for group chat session"
+                },
                 ["target_id"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "The GUID of the target being or user"
+                    ["description"] = "The GUID of the target being (for 'single' chat) or group session (for 'group' chat)"
                 },
                 ["message"] = new Dictionary<string, object>
                 {
@@ -64,7 +70,7 @@ public class ChatTool : ITool
                     ["description"] = "The message content to send (required for 'send' action, optional for 'mark_read')"
                 }
             },
-            ["required"] = new[] { "action", "target_id" }
+            ["required"] = new[] { "action", "chat_type", "target_id" }
         };
     }
 
@@ -76,9 +82,22 @@ public class ChatTool : ITool
             return ToolResult.Failed("ChatSystem is not configured");
         }
 
+        // Validate chat_type (required)
+        if (!parameters.TryGetValue("chat_type", out object? chatTypeObj) || string.IsNullOrWhiteSpace(chatTypeObj?.ToString()))
+        {
+            return ToolResult.Failed("Missing required 'chat_type' parameter. Must be 'single' or 'group'");
+        }
+
+        string chatType = chatTypeObj.ToString()!.ToLowerInvariant();
+        if (chatType != "single" && chatType != "group")
+        {
+            return ToolResult.Failed($"Invalid chat_type: '{chatType}'. Must be 'single' or 'group'");
+        }
+
+        // Validate target_id (required)
         if (!parameters.TryGetValue("target_id", out object? targetObj) || string.IsNullOrWhiteSpace(targetObj?.ToString()))
         {
-            return ToolResult.Failed("Missing 'target_id' parameter");
+            return ToolResult.Failed("Missing required 'target_id' parameter");
         }
 
         if (!Guid.TryParse(targetObj.ToString(), out Guid targetId))
@@ -98,9 +117,9 @@ public class ChatTool : ITool
             switch (action)
             {
                 case "send":
-                    return ExecuteSend(callerId, targetId, parameters, chatSystem);
+                    return ExecuteSend(callerId, targetId, chatType, parameters, chatSystem);
                 case "mark_read":
-                    return ExecuteMarkRead(callerId, targetId, chatSystem);
+                    return ExecuteMarkRead(callerId, targetId, chatType, chatSystem);
                 default:
                     return ToolResult.Failed($"Unknown action: '{action}'. Valid actions are: 'send', 'mark_read'");
             }
@@ -114,15 +133,28 @@ public class ChatTool : ITool
     /// <summary>
     /// Execute the 'send' action: send a message to the target.
     /// </summary>
-    private ToolResult ExecuteSend(Guid callerId, Guid targetId, Dictionary<string, object> parameters, ChatSystem chatSystem)
+    private ToolResult ExecuteSend(Guid callerId, Guid targetId, string chatType, Dictionary<string, object> parameters, ChatSystem chatSystem)
     {
         if (!parameters.TryGetValue("message", out object? messageObj) || string.IsNullOrWhiteSpace(messageObj?.ToString()))
         {
             return ToolResult.Failed("Missing 'message' parameter for 'send' action");
         }
 
-        // Get or create the session between caller and target to obtain the correct session ID
-        SessionBase session = chatSystem.GetOrCreateSession(callerId, targetId);
+        SessionBase? session;
+        if (chatType == "single")
+        {
+            // For single chat: target_id is the other being's ID, get or create session between caller and target
+            session = chatSystem.GetOrCreateSession(callerId, targetId);
+        }
+        else
+        {
+            // For group chat: target_id is the group session ID, must exist
+            session = chatSystem.GetSession(targetId);
+            if (session == null)
+            {
+                return ToolResult.Failed($"Group session {targetId} not found. Cannot send message to non-existent group.");
+            }
+        }
 
         string content = messageObj.ToString()!;
         ChatMessage chatMsg = new(callerId, session.Id, content)
@@ -143,17 +175,31 @@ public class ChatTool : ITool
             _ = imManager.SendMessageAsync(callerId, session.Id, content, senderName: senderName);
         }
 
-        return ToolResult.Successful($"Message sent to {targetId}");
+        string targetType = chatType == "single" ? "being" : "group";
+        return ToolResult.Successful($"Message sent to {targetType} {targetId}");
     }
 
     /// <summary>
     /// Execute the 'mark_read' action: mark all pending messages from the target as read.
     /// This allows the caller to acknowledge messages without sending a reply (read but no response).
     /// </summary>
-    private ToolResult ExecuteMarkRead(Guid callerId, Guid targetId, ChatSystem chatSystem)
+    private ToolResult ExecuteMarkRead(Guid callerId, Guid targetId, string chatType, ChatSystem chatSystem)
     {
-        // Get the session between caller and target
-        SessionBase session = chatSystem.GetOrCreateSession(callerId, targetId);
+        SessionBase? session;
+        if (chatType == "single")
+        {
+            // For single chat: target_id is the other being's ID, get or create session
+            session = chatSystem.GetOrCreateSession(callerId, targetId);
+        }
+        else
+        {
+            // For group chat: target_id is the group session ID, must exist
+            session = chatSystem.GetSession(targetId);
+            if (session == null)
+            {
+                return ToolResult.Failed($"Group session {targetId} not found. Cannot mark messages as read for non-existent group.");
+            }
+        }
 
         // Get pending messages from the target (messages sent by target that caller hasn't read)
         List<ChatMessage> pendingMessages = session.GetPendingMessages(callerId);
@@ -172,8 +218,9 @@ public class ChatTool : ITool
         // Mark all as read
         session.MarkMessagesAsRead(messageIdsToMark, callerId);
 
-        _logger.Info(callerId, "Marked {0} messages from {1} as read (mark_read action)", messageIdsToMark.Count, targetId);
+        string targetType = chatType == "single" ? "being" : "group";
+        _logger.Info(callerId, "Marked {0} messages from {1} ({2}) as read (mark_read action)", messageIdsToMark.Count, targetId, targetType);
 
-        return ToolResult.Successful($"Marked {messageIdsToMark.Count} message(s) from {targetId} as read");
+        return ToolResult.Successful($"Marked {messageIdsToMark.Count} message(s) from {targetType} {targetId} as read");
     }
 }

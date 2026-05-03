@@ -24,7 +24,7 @@ public interface IStorage
     /// <typeparam name="T">The type to deserialize to</typeparam>
     /// <param name="key">The key to read</param>
     /// <returns>The deserialized object, or default if not found</returns>
-    T? Read<T>(string key);
+    T[] Read<T>(string key);
 
     /// <summary>
     /// Writes data to storage by key with automatic JSON serialization.
@@ -46,4 +46,11 @@ public interface IStorage
     /// </summary>
     /// <param name="key">The key to delete</param>
     void Delete(string key);
+
+    /// <summary>
+    /// Lists all child keys under a given key prefix (semantically equivalent to listing files/folders in a directory).
+    /// </summary>
+    /// <param name="prefix">The key prefix to search under (e.g., "users/" to list all users)</param>
+    /// <returns>A collection of child keys that match the prefix</returns>
+    IEnumerable<string> ListKeys(string prefix = "");
 }

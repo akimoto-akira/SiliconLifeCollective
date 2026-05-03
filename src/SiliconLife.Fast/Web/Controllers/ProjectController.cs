@@ -137,7 +137,9 @@ public class ProjectController : Controller
                 archivedAt = p.ArchivedAt?.ToString("yyyy-MM-dd HH:mm:ss"),
                 assignedBeings = p.AssignedBeings,
                 beingCount = p.AssignedBeings.Count,
-                workflowTemplateName = p.WorkflowTemplateName
+                workflowTemplateName = p.WorkflowTemplateName,
+                groupChatSessionId = p.GroupChatSessionId?.ToString(),
+                broadcastChannelId = p.BroadcastChannelId?.ToString()
             }).ToList();
 
             RenderJson(new { success = true, data, total = data.Count });

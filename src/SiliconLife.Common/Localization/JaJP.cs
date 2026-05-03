@@ -398,6 +398,8 @@ public class JaJP : DefaultLocalizationBase
     
     public override string ProjectWorkNotesLinkLabel => "ワークノート";
     public override string ProjectWorkflowsLinkLabel => "ワークフロー";
+    public override string ProjectGroupChatLinkLabel => "グループチャット";
+    public override string ProjectBroadcastLinkLabel => "ブロードキャスト";
     public override string ProjectWorkflowsPageHeader => "プロジェクトワークフロー";
     public override string ProjectWorkflowsEmptyState => "このプロジェクトにはワークフローがありません";
     public override string CreateWorkflowButton => "ワークフローを作成";
@@ -629,6 +631,7 @@ public class JaJP : DefaultLocalizationBase
     public override string ChatDetailPageTitle => "チャット詳細";
     public override string ChatDetailPageHeader => "会話詳細";
     public override string ChatDetailNoMessages => "メッセージはありません";
+    public override string ChatDetailMembers => "メンバー";
     public override string BeingsYes => "はい";
     public override string BeingsNo => "いいえ";
     public override string BeingsNotSet => "未設定";

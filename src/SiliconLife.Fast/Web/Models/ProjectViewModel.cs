@@ -31,4 +31,6 @@ public class ProjectItem
     public string Status { get; set; } = "active";
     public int BeingCount { get; set; }
     public string WorkflowTemplateName { get; set; } = string.Empty;
+    public Guid? GroupChatSessionId { get; set; }
+    public Guid? BroadcastChannelId { get; set; }
 }

@@ -16,15 +16,20 @@ using System.Collections.Concurrent;
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// Asynchronous write queue. Producers (public API) call <see cref="Enqueue"/>
-/// and return immediately; a single consumer task drains operations in batches
-/// and writes them to disk via <see cref="PackFileWriter"/>.
+/// 异步写入队列。生产者（公共 API）调用 <see cref="Enqueue"/> 立即返回，
+/// 单线程消费者按批次将操作：
+///   1) 先以"WAL 批次 + CRC + Commit"落盘；
+///   2) 再把数据和新 Directory 写到主 .spk 文件；
+///   3) 通过双 Header 槽位切换原子提交；
+///   4) 最后截断 WAL。
+/// 任意一步崩溃后重启时都可以通过 WAL 重放或 Header 回退恢复到一致状态。
 /// </summary>
 internal sealed class WriteQueue : IDisposable
 {
     private readonly PackFileWriter _writer;
     private readonly DirectoryMap _directoryMap;
     private readonly EntryCache _entryCache;
+    private readonly WriteAheadLog _wal;
 
     private readonly ConcurrentQueue<WriteOperation> _queue = new();
     private readonly ManualResetEventSlim _hasItems = new(initialState: false);
@@ -36,11 +41,12 @@ internal sealed class WriteQueue : IDisposable
 
     private volatile bool _disposed;
 
-    public WriteQueue(PackFileWriter writer, DirectoryMap directoryMap, EntryCache entryCache)
+    public WriteQueue(PackFileWriter writer, DirectoryMap directoryMap, EntryCache entryCache, WriteAheadLog wal)
     {
         _writer = writer;
         _directoryMap = directoryMap;
         _entryCache = entryCache;
+        _wal = wal;
         _consumerTask = Task.Factory.StartNew(
             ConsumeLoop,
             _cts.Token,
@@ -48,7 +54,7 @@ internal sealed class WriteQueue : IDisposable
             TaskScheduler.Default);
     }
 
-    /// <summary>Enqueues a single operation for later persistence.</summary>
+    /// <summary>入队单个操作。</summary>
     public void Enqueue(WriteOperation op)
     {
         if (_disposed) throw new ObjectDisposedException(nameof(WriteQueue));
@@ -56,7 +62,7 @@ internal sealed class WriteQueue : IDisposable
         _hasItems.Set();
     }
 
-    /// <summary>Enqueues a batch of operations (transaction commit).</summary>
+    /// <summary>入队一批操作（事务提交）。</summary>
     public void EnqueueBatch(IReadOnlyList<WriteOperation> ops)
     {
         if (_disposed) throw new ObjectDisposedException(nameof(WriteQueue));
@@ -66,20 +72,17 @@ internal sealed class WriteQueue : IDisposable
     }
 
     /// <summary>
-    /// Returns a task that completes when every operation enqueued prior to
-    /// this call has been persisted to disk. If the queue is empty and no
-    /// batch is in flight, returns a completed task immediately.
+    /// 返回一个在"当前所有已入队操作都已持久化"后完成的 Task。
     /// </summary>
     public Task FlushAsync()
     {
-        // Wait for current batch to complete, even if queue is empty.
         lock (_flushLock)
         {
             if (_queue.IsEmpty && _flushTcs == null)
                 return Task.CompletedTask;
 
             _flushTcs ??= new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-            _hasItems.Set(); // Make sure the consumer wakes up.
+            _hasItems.Set();
             return _flushTcs.Task;
         }
     }
@@ -91,13 +94,11 @@ internal sealed class WriteQueue : IDisposable
         {
             try
             {
-                // Block until work arrives or a short poll interval elapses.
                 _hasItems.Wait(ct);
                 _hasItems.Reset();
 
                 ProcessBatch();
 
-                // Signal any awaiting FlushAsync callers now that the queue is drained.
                 if (_queue.IsEmpty)
                 {
                     TaskCompletionSource? toSignal = null;
@@ -118,8 +119,6 @@ internal sealed class WriteQueue : IDisposable
             }
             catch (Exception ex)
             {
-                // Fail the current flush tcs so callers don't hang forever,
-                // then swallow — the queue keeps running for future work.
                 TaskCompletionSource? toFail = null;
                 lock (_flushLock)
                 {
@@ -133,7 +132,7 @@ internal sealed class WriteQueue : IDisposable
             }
         }
 
-        // Drain remaining work on shutdown so Dispose + FlushAsync stays consistent.
+        // 关机时排空剩余工作，保证 Dispose + FlushAsync 的一致性。
         try { ProcessBatch(); } catch { /* ignore */ }
 
         TaskCompletionSource? shutdownTcs;
@@ -154,23 +153,25 @@ internal sealed class WriteQueue : IDisposable
         if (operations.Count == 0)
             return;
 
-        // Collapse duplicate writes to the same path — only the last wins,
-        // reducing disk I/O and keeping the directory region compact.
+        // 合并对同一路径的重复写入：只保留最后一个，减少磁盘 I/O 并压缩 Directory。
         var latestByPath = new Dictionary<string, WriteOperation>(StringComparer.Ordinal);
         foreach (var op in operations)
             latestByPath[op.NormalizedPath] = op;
+        var finalOps = new List<WriteOperation>(latestByPath.Values);
 
-        var dirtyPaths = new List<string>(latestByPath.Count);
+        // ─── 第 1 步：WAL 预写 ───
+        // 将整批操作（包含数据体）追加到 WAL 并 fsync。
+        // 之后任何崩溃都可以通过重放 WAL 恢复这一批。
+        _wal.AppendBatch(finalOps);
 
-        foreach (var op in latestByPath.Values)
+        // ─── 第 2 步：写主文件数据块 ───
+        var dirtyPaths = new List<string>(finalOps.Count);
+
+        foreach (var op in finalOps)
         {
             switch (op)
             {
                 case WriteEntry write:
-                    // On overwrite: release the space occupied by the old entry to
-                    // FreeList, and preserve the original CreatedAt so that
-                    // AppendEntry may reuse the same block in-place in the FreeList,
-                    // avoiding infinite file growth.
                     DateTime? createdAt = null;
                     if (_directoryMap.TryGet(write.NormalizedPath, out var oldEntry))
                     {
@@ -184,11 +185,6 @@ internal sealed class WriteQueue : IDisposable
                     break;
 
                 case DeleteEntry delete:
-                    // On deletion: use the OldEntry pre-captured by
-                    // SpeedyPack.Delete / ApplyTransactionBatch to return the old
-                    // space to FreeList. The synchronous DirectoryMap removal has
-                    // already been performed; we perform Remove/Invalidate again
-                    // here to keep it idempotent.
                     if (delete.OldEntry != null)
                         _writer.ReleaseEntry(delete.OldEntry);
                     _directoryMap.Remove(delete.NormalizedPath);
@@ -197,12 +193,14 @@ internal sealed class WriteQueue : IDisposable
             }
         }
 
-        // Persist directory region + header and fsync.
+        // ─── 第 3 步：写新 Directory + 原子切换双 Header 槽位 ───
         var snapshot = _directoryMap.Snapshot();
-        _writer.WriteDirectory(snapshot);
-        _writer.Flush();
+        _writer.WriteDirectoryAndCommit(snapshot);
 
-        // Unpin successfully-persisted writes so TTL/LRU eviction may reclaim them.
+        // ─── 第 4 步：至此新状态已在磁盘生效，WAL 可以安全清空 ───
+        _wal.Truncate();
+
+        // 清除 pin，允许 TTL/LRU 正常回收。
         foreach (var path in dirtyPaths)
             _entryCache.Unpin(path);
     }
@@ -212,7 +210,6 @@ internal sealed class WriteQueue : IDisposable
         if (_disposed) return;
         _disposed = true;
 
-        // Wake the consumer so it can notice cancellation and drain.
         _hasItems.Set();
         _cts.Cancel();
 

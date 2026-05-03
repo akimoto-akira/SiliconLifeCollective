@@ -398,6 +398,8 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     
     public override string ProjectWorkNotesLinkLabel => "Work Notes";
     public override string ProjectWorkflowsLinkLabel => "Workflows";
+    public override string ProjectGroupChatLinkLabel => "Group Chat";
+    public override string ProjectBroadcastLinkLabel => "Broadcast";
     public override string ProjectWorkflowsPageHeader => "Project Workflows";
     public override string ProjectWorkflowsEmptyState => "No workflows for this project";
     public override string CreateWorkflowButton => "Create Workflow";
@@ -629,6 +631,7 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string ChatDetailPageTitle => "Chat Detail";
     public override string ChatDetailPageHeader => "Conversation Detail";
     public override string ChatDetailNoMessages => "No messages";
+    public override string ChatDetailMembers => "Members";
     public override string BeingsYes => "Yes";
     public override string BeingsNo => "No";
     public override string BeingsNotSet => "Not set";

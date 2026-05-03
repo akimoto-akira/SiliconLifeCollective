@@ -48,13 +48,13 @@ public class FileSystemTimeStorage : ITimeStorage
     /// Returns the most recently timestamped entry for <paramref name="key"/>,
     /// or <c>default</c> if the key does not exist.
     /// </summary>
-    public T? Read<T>(string key)
+    public T[] Read<T>(string key)
     {
         _rwLock.EnterReadLock();
         try
         {
             string dir = GetKeyDirectory(key);
-            if (!Directory.Exists(dir)) return default;
+            if (!Directory.Exists(dir)) return Array.Empty<T>();
 
             T? latest = default;
             IncompleteDate latestTime = new IncompleteDate(1);
@@ -70,7 +70,7 @@ public class FileSystemTimeStorage : ITimeStorage
                 }
             }
 
-            return latest;
+            return latest is not null ? new T[] { latest } : Array.Empty<T>();
         }
         finally
         {
@@ -120,6 +120,38 @@ public class FileSystemTimeStorage : ITimeStorage
         finally
         {
             _rwLock.ExitWriteLock();
+        }
+    }
+
+    /// <summary>
+    /// Lists all child keys under the given prefix by scanning directories.
+    /// For time-indexed storage, this lists the first-level subdirectories (keys).
+    /// </summary>
+    public IEnumerable<string> ListKeys(string prefix = "")
+    {
+        _rwLock.EnterReadLock();
+        try
+        {
+            var keys = new List<string>();
+            string searchPath = string.IsNullOrEmpty(prefix)
+                ? _baseDirectory
+                : GetKeyDirectory(prefix);
+
+            if (!Directory.Exists(searchPath))
+                return keys;
+
+            // List subdirectories (each represents a key)
+            foreach (string dir in Directory.GetDirectories(searchPath))
+            {
+                string keyName = Path.GetFileName(dir);
+                keys.Add(string.IsNullOrEmpty(prefix) ? keyName : prefix + "/" + keyName);
+            }
+
+            return keys;
+        }
+        finally
+        {
+            _rwLock.ExitReadLock();
         }
     }
 

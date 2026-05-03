@@ -253,6 +253,8 @@ public class ZhHK : DefaultLocalizationBase
     
     public override string ProjectWorkNotesLinkLabel => "工作筆記";
     public override string ProjectWorkflowsLinkLabel => "工作流";
+    public override string ProjectGroupChatLinkLabel => "項目群聊";
+    public override string ProjectBroadcastLinkLabel => "項目廣播";
     public override string ProjectWorkflowsPageHeader => "項目工作流";
     public override string ProjectWorkflowsEmptyState => "該項目暫無工作流";
     public override string CreateWorkflowButton => "创建工作流";
@@ -484,6 +486,7 @@ public class ZhHK : DefaultLocalizationBase
     public override string ChatDetailPageTitle => "聊天詳情";
     public override string ChatDetailPageHeader => "會話詳情";
     public override string ChatDetailNoMessages => "暫無消息";
+    public override string ChatDetailMembers => "成員";
     public override string BeingsYes => "是";
     public override string BeingsNo => "否";
     public override string BeingsNotSet => "未設定";

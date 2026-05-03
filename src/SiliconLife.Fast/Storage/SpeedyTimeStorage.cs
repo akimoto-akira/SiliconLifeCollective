@@ -144,29 +144,16 @@ public sealed class SpeedyTimeStorage : ITimeStorage, IDisposable
 
     // ─── IStorage ─────────────────────────────────────────────────────────────
 
-    public T? Read<T>(string key)
+    public T[] Read<T>(string key)
     {
         string keyDirPrefix = GetKeyDirectoryPrefix(key);
-        IncompleteDate latestTime = new IncompleteDate(1);
-        T? latest = default;
-        bool found = false;
-
-        foreach (string entryPath in EnumerateAllEntries(keyDirPrefix))
-        {
-            if (!TryParseTimestampFromPath(keyDirPrefix, entryPath, out IncompleteDate fileTime)) continue;
-            if (!found || fileTime > latestTime)
-            {
-                var list = ReadArray<T>(entryPath);
-                if (list.Count > 0) { latestTime = fileTime; latest = list[^1]; found = true; }
-            }
-        }
-        return latest;
+        return ReadArray<T>(keyDirPrefix).ToArray();
     }
 
     public void Write<T>(string key, T data)
     {
         var now = DateTime.UtcNow;
-        Write(key, new IncompleteDate(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second), data);
+        UpsertIntoArray(key, data);
     }
 
     public bool Exists(string key) => EnumerateAllEntries(GetKeyDirectoryPrefix(key)).Any();
@@ -175,6 +162,38 @@ public sealed class SpeedyTimeStorage : ITimeStorage, IDisposable
     {
         foreach (string p in EnumerateAllEntries(GetKeyDirectoryPrefix(key)).ToList())
             _pack.Delete(p);
+    }
+
+    /// <summary>
+    /// Lists all child keys under the given prefix by scanning directories.
+    /// For time-indexed storage, this lists the first-level subdirectories (keys).
+    /// </summary>
+    public IEnumerable<string> ListKeys(string prefix = "")
+    {
+        var keys = new List<string>();
+        string searchPrefix = GetKeyDirectoryPrefix(prefix);
+        
+        // List subdirectories (each represents a key)
+        foreach (string dir in _pack.ListDirectories(searchPrefix))
+        {
+            // Extract the key name from the directory path
+            string keyName = dir;
+            if (!string.IsNullOrEmpty(_keyPrefix) && keyName.StartsWith(_keyPrefix))
+            {
+                keyName = keyName[_keyPrefix.Length..];
+            }
+            // Remove trailing slash and get the last segment
+            keyName = keyName.TrimEnd('/');
+            int lastSlash = keyName.LastIndexOf('/');
+            if (lastSlash >= 0)
+            {
+                keyName = keyName[(lastSlash + 1)..];
+            }
+            
+            keys.Add(string.IsNullOrEmpty(prefix) ? keyName : prefix + "/" + keyName);
+        }
+
+        return keys;
     }
 
     // ─── ITimeStorage ─────────────────────────────────────────────────────────

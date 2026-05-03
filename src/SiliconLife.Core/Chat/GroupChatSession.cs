@@ -14,13 +14,16 @@
 namespace SiliconLife.Collective;
 
 /// <summary>
-/// Group chat session �?persists messages via <see cref="ITimeStorage"/>.
+/// Group chat session — persists messages via <see cref="ITimeStorage"/>.
+/// Uses a fixed session ID (not derived from members) to ensure stability
+/// when members are added or removed.
 /// </summary>
 public class GroupChatSession : SessionBase
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<GroupChatSession>();
     private readonly ITimeStorage _storage;
     private readonly string _storageKey;
+    private readonly string _metaKey;
     private readonly object _lock = new();
 
     /// <inheritdoc/>
@@ -32,19 +35,28 @@ public class GroupChatSession : SessionBase
     /// <inheritdoc/>
     public override List<Guid> Members { get; protected set; }
 
+    /// <inheritdoc/>
+    public override Guid Id { get; }
+
     /// <summary>
-    /// Initialize group chat session.
+    /// Initialize group chat session with a fixed ID.
     /// </summary>
+    /// <param name="sessionId">Fixed session ID (e.g. from ProjectSpace.GroupChatSessionId)</param>
     /// <param name="members">Member list</param>
     /// <param name="storage">Time-indexed storage for message persistence</param>
     /// <param name="name">Group display name (optional)</param>
-    public GroupChatSession(List<Guid> members, ITimeStorage storage, string name = "")
-        : base(members)
+    public GroupChatSession(Guid sessionId, List<Guid> members, ITimeStorage storage, string name = "")
     {
+        Id = sessionId;
         Members = new(members);
         Name = name;
         _storage = storage;
-        _storageKey = $"sessions/group/{Id}";
+        _storageKey = $"sessions/group/{sessionId}";
+        _metaKey = $"sessions/group/{sessionId}/meta";
+        
+        // Persist session metadata on creation
+        SaveMetadata();
+        _logger.Info(null, "GroupChatSession created: {0}, name='{1}', members={2}", sessionId, name, members.Count);
     }
 
     /// <summary>
@@ -57,6 +69,8 @@ public class GroupChatSession : SessionBase
             if (!Members.Contains(memberId))
             {
                 Members.Add(memberId);
+                SaveMetadata();
+                _logger.Info(null, "GroupChatSession {0}: member {1} added, total={2}", Id, memberId, Members.Count);
             }
         }
     }
@@ -68,7 +82,11 @@ public class GroupChatSession : SessionBase
     {
         lock (_lock)
         {
-            Members.Remove(memberId);
+            if (Members.Remove(memberId))
+            {
+                SaveMetadata();
+                _logger.Info(null, "GroupChatSession {0}: member {1} removed, total={2}", Id, memberId, Members.Count);
+            }
         }
     }
 
@@ -159,5 +177,25 @@ public class GroupChatSession : SessionBase
                 }
             }
         }
+    }
+
+    // ── metadata persistence ──────────────────────────────────────────────
+
+    /// <summary>
+    /// Persist session metadata (ID, name, members, type) to storage.
+    /// </summary>
+    private void SaveMetadata()
+    {
+        var meta = new
+        {
+            Id = Id,
+            Name = Name,
+            Members = Members,
+            Type = Type.ToString(),
+            UpdatedAt = DateTime.UtcNow
+        };
+        // Metadata is not time-indexed, use IStorage.Write (inherited by ITimeStorage)
+        _storage.Write(_metaKey, meta);
+        _logger.Trace(null, "GroupChatSession {0}: metadata saved", Id);
     }
 }

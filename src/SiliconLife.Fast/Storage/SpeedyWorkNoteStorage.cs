@@ -56,7 +56,7 @@ public sealed class SpeedyWorkNoteStorage : IWorkNoteStorage, IDisposable
     // ─── Index helpers ────────────────────────────────────────────────────────
 
     private List<Guid> LoadIndex(WorkNoteOwnerType ownerType, string ownerId) =>
-        _storage.Read<List<Guid>>(IndexKey(ownerType, ownerId)) ?? new List<Guid>();
+        _storage.Read<Guid>(IndexKey(ownerType, ownerId)).ToList();
 
     private void SaveIndex(WorkNoteOwnerType ownerType, string ownerId, List<Guid> index) =>
         _storage.Write(IndexKey(ownerType, ownerId), index);
@@ -83,16 +83,19 @@ public sealed class SpeedyWorkNoteStorage : IWorkNoteStorage, IDisposable
 
     public WorkNoteEntry? ReadNote(Guid noteId)
     {
-        var ownerRef = _storage.Read<NoteOwnerRef>(GlobalRefKey(noteId));
+        var ownerRefs = _storage.Read<NoteOwnerRef>(GlobalRefKey(noteId));
+        var ownerRef = ownerRefs.FirstOrDefault();
         if (ownerRef == null) return null;
-        return _storage.Read<WorkNoteEntry>(NoteKey(ownerRef.OwnerType, ownerRef.OwnerId, noteId));
+        var notes = _storage.Read<WorkNoteEntry>(NoteKey(ownerRef.OwnerType, ownerRef.OwnerId, noteId));
+        return notes.FirstOrDefault();
     }
 
     public WorkNoteEntry? ReadNoteByPage(WorkNoteOwnerType ownerType, string ownerId, int pageNumber)
     {
         foreach (var id in LoadIndex(ownerType, ownerId))
         {
-            var note = _storage.Read<WorkNoteEntry>(NoteKey(ownerType, ownerId, id));
+            var notes = _storage.Read<WorkNoteEntry>(NoteKey(ownerType, ownerId, id));
+            var note = notes.FirstOrDefault();
             if (note?.PageNumber == pageNumber)
                 return note;
         }
@@ -119,7 +122,8 @@ public sealed class SpeedyWorkNoteStorage : IWorkNoteStorage, IDisposable
 
     public bool DeleteNote(Guid noteId)
     {
-        var ownerRef = _storage.Read<NoteOwnerRef>(GlobalRefKey(noteId));
+        var ownerRefs = _storage.Read<NoteOwnerRef>(GlobalRefKey(noteId));
+        var ownerRef = ownerRefs.FirstOrDefault();
         if (ownerRef == null) return false;
 
         _storage.Delete(NoteKey(ownerRef.OwnerType, ownerRef.OwnerId, noteId));
@@ -134,14 +138,15 @@ public sealed class SpeedyWorkNoteStorage : IWorkNoteStorage, IDisposable
 
     public List<WorkNoteEntry> ListNotes(WorkNoteOwnerType ownerType, string ownerId)
     {
-        var notes = new List<WorkNoteEntry>();
+        var noteEntries = new List<WorkNoteEntry>();
         foreach (var id in LoadIndex(ownerType, ownerId))
         {
-            var note = _storage.Read<WorkNoteEntry>(NoteKey(ownerType, ownerId, id));
-            if (note != null) notes.Add(note);
+            var notes = _storage.Read<WorkNoteEntry>(NoteKey(ownerType, ownerId, id));
+            var note = notes.FirstOrDefault();
+            if (note != null) noteEntries.Add(note);
         }
-        notes.Sort((a, b) => a.PageNumber.CompareTo(b.PageNumber));
-        return notes;
+        noteEntries.Sort((a, b) => a.PageNumber.CompareTo(b.PageNumber));
+        return noteEntries;
     }
 
     public string GenerateDirectory(WorkNoteOwnerType ownerType, string ownerId)

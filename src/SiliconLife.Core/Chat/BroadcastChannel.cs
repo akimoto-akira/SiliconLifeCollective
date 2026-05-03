@@ -47,21 +47,18 @@ public class BroadcastChannel : SessionBase
     /// <param name="storage">Time-indexed storage for message persistence</param>
     /// <param name="name">Channel display name</param>
     public BroadcastChannel(Guid channelId, ITimeStorage storage, string name = "")
-        : base(Array.Empty<Guid>())
     {
         // Override the deterministic ID with the fixed one
         // We use a backing field trick via the protected constructor route:
         // Since SessionBase computes Id in constructor, we shadow it here.
-        _fixedId = channelId;
+        Id = channelId;
         Name = name;
         _storage = storage;
         _storageKey = $"sessions/broadcast/{channelId}";
     }
-
-    // Shadow Id so we can use a fixed channel GUID instead of member-derived hash
-    private readonly Guid _fixedId;
+    
     /// <inheritdoc/>
-    public new Guid Id => _fixedId;
+    public override Guid Id { get; }
 
     /// <summary>
     /// Subscribe a silicon being to this channel.
@@ -75,7 +72,7 @@ public class BroadcastChannel : SessionBase
             {
                 _subscriptions[beingId] = DateTime.UtcNow;
                 Members.Add(beingId);
-                _logger.Info(null, "BroadcastChannel {0}: {1} subscribed at {2:u}", _fixedId, beingId, _subscriptions[beingId]);
+                _logger.Info(null, "BroadcastChannel {0}: {1} subscribed at {2:u}", Id, beingId, _subscriptions[beingId]);
             }
         }
     }
@@ -89,7 +86,7 @@ public class BroadcastChannel : SessionBase
         {
             _subscriptions.Remove(beingId);
             Members.Remove(beingId);
-            _logger.Info(null, "BroadcastChannel {0}: {1} unsubscribed", _fixedId, beingId);
+            _logger.Info(null, "BroadcastChannel {0}: {1} unsubscribed", Id, beingId);
         }
     }
 
@@ -111,7 +108,7 @@ public class BroadcastChannel : SessionBase
         {
             var ts = message.Timestamp;
             _storage.Write(_storageKey, new IncompleteDate(ts.Year, ts.Month, ts.Day, ts.Hour, ts.Minute, ts.Second), message);
-            _logger.Debug(null, "BroadcastChannel {0}: message from {1}", _fixedId, message.SenderId);
+            _logger.Debug(null, "BroadcastChannel {0}: message from {1}", Id, message.SenderId);
         }
     }
 
@@ -164,7 +161,7 @@ public class BroadcastChannel : SessionBase
                 {
                     entry.Data.ReadBy.Add(readerId);
                     _storage.Write(_storageKey, entry.Timestamp, entry.Data);
-                    _logger.Trace(null, "BroadcastChannel {0}: message {1} read by {2}", _fixedId, messageId, readerId);
+                    _logger.Trace(null, "BroadcastChannel {0}: message {1} read by {2}", Id, messageId, readerId);
                     return;
                 }
             }

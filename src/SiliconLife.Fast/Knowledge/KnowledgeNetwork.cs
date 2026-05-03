@@ -444,13 +444,14 @@ public class KnowledgeNetwork : IKnowledgeNetwork
         try
         {
             _entries.Clear();
-            var entries = _storage.Read<List<KnowledgeEntry>>(EntriesKey);
+            var entries = _storage.Read<KnowledgeEntry>(EntriesKey);
             if (entries != null)
                 foreach (var entry in entries)
                     _entries[entry.Id] = entry;
 
             _graph.Clear();
-            var graphSnapshot = _storage.Read<GraphSnapshot>(GraphKey);
+            var graphSnapshots = _storage.Read<GraphSnapshot>(GraphKey);
+            var graphSnapshot = graphSnapshots.FirstOrDefault();
             if (graphSnapshot != null)
             {
                 _graph.SubjectIndex   = graphSnapshot.SubjectIndex   ?? new();

@@ -27,7 +27,7 @@ public class ProjectManager : IProjectManager
     private readonly IStorage _storage;
     private readonly string _baseDirectory;
     private readonly object _lock = new();
-    private const string ProjectsKey = "projects/index";
+    private const string ProjectsPrefix = "projects/";
     private readonly Dictionary<Guid, WorkNoteSystem> _workNoteSystems = new();
     private readonly Dictionary<Guid, ProjectTaskSystem> _projectTaskSystems = new();
     private WorkflowEngine? _workflowEngine;
@@ -103,10 +103,6 @@ public class ProjectManager : IProjectManager
             );
             project.BroadcastChannelId = broadcastChannel.Id;
         }
-
-        // Store project metadata in SpeedyPack
-        string projectKey = $"projects/{project.Id}";
-        SpeedyPackRegistry.Pack.Write(projectKey, project);
 
         // Initialize work note system for the project
         var workNoteStorage = new SpeedyWorkNoteStorage();
@@ -188,10 +184,6 @@ public class ProjectManager : IProjectManager
             project.Status = ProjectStatus.Destroyed;
             project.UpdatedAt = DateTime.UtcNow;
 
-            // Clean up project metadata from SpeedyPack
-            string projectKey = $"projects/{project.Id}";
-            SpeedyPackRegistry.Pack.Delete(projectKey);
-
             _workNoteSystems.Remove(projectId);
             _projectTaskSystems.Remove(projectId);
             SaveProjectsInternal(projects);
@@ -242,6 +234,9 @@ public class ProjectManager : IProjectManager
                 project.AssignedBeings.Add(beingId);
                 project.UpdatedAt = DateTime.UtcNow;
                 SaveProjectsInternal(projects);
+                
+                // Sync group chat session members
+                SyncGroupChatMembers(project);
             }
 
             return true;
@@ -264,6 +259,9 @@ public class ProjectManager : IProjectManager
             {
                 project.UpdatedAt = DateTime.UtcNow;
                 SaveProjectsInternal(projects);
+                
+                // Sync group chat session members
+                SyncGroupChatMembers(project);
             }
 
             return true;
@@ -312,13 +310,38 @@ public class ProjectManager : IProjectManager
 
     private List<ProjectSpace> LoadProjectsInternal()
     {
-        var projects = _storage.Read<List<ProjectSpace>>(ProjectsKey);
-        return projects ?? new List<ProjectSpace>();
+        var projects = new List<ProjectSpace>();
+        
+        // Scan all project keys under "projects/" prefix
+        var projectKeys = _storage.ListKeys(ProjectsPrefix);
+        
+        foreach (var key in projectKeys)
+        {
+            string metaKey = key + "meta.json";
+            if (!_storage.Exists(metaKey))
+            {
+                continue;
+            }
+            
+            // Read project data (each meta key stores one ProjectSpace)
+            var projectData = _storage.Read<ProjectSpace>(metaKey);
+            if (projectData != null && projectData.Length > 0)
+            {
+                projects.AddRange(projectData);
+            }
+        }
+        
+        return projects;
     }
 
     private void SaveProjectsInternal(List<ProjectSpace> projects)
     {
-        _storage.Write(ProjectsKey, projects);
+        // Save each project to its own meta key
+        foreach (var project in projects)
+        {
+            string projectKey = $"{ProjectsPrefix}{project.Id}/meta";
+            _storage.Write(projectKey, project);
+        }
     }
 
     /// <inheritdoc/>
@@ -340,11 +363,46 @@ public class ProjectManager : IProjectManager
                 return null;
             }
 
+            // Ensure group chat session is loaded in ChatSystem
+            if (project.GroupChatSessionId.HasValue)
+            {
+                var chatSystem = ServiceLocator.Instance.ChatSystem;
+                if (chatSystem != null)
+                {
+                    // Try to get existing session, if not found, restore it
+                    var existingSession = chatSystem.GetSession(project.GroupChatSessionId.Value);
+                    if (existingSession == null)
+                    {
+                        // Session not in memory, need to restore from storage
+                        // Read metadata from storage to get members and name
+                        string metaKey = $"sessions/group/{project.GroupChatSessionId.Value}/meta";
+                        var metaDicts = _storage.Read<Dictionary<string, object>>(metaKey);
+                        var metaDict = metaDicts.FirstOrDefault();
+                        
+                        if (metaDict != null)
+                        {
+                            string name = metaDict.TryGetValue("Name", out var nameObj) ? nameObj?.ToString() ?? "" : "";
+                            var members = new List<Guid>();
+                            
+                            if (metaDict.TryGetValue("Members", out var membersObj) && membersObj is List<object> memberList)
+                            {
+                                foreach (var m in memberList)
+                                {
+                                    if (Guid.TryParse(m?.ToString(), out Guid memberId))
+                                        members.Add(memberId);
+                                }
+                            }
+                            
+                            // Restore session with fixed ID
+                            chatSystem.CreateGroupSession(members, name, project.GroupChatSessionId.Value);
+                            _logger.Info(null, "Restored group chat session for project {0}: {1}", projectId, project.GroupChatSessionId.Value);
+                        }
+                    }
+                }
+            }
+
             if (string.IsNullOrEmpty(project.StoragePath))
             {
-                // Legacy project without storage path, store metadata in SpeedyPack
-                string projectKey = $"projects/{project.Id}";
-                SpeedyPackRegistry.Pack.Write(projectKey, project);
                 SaveProjectsInternal(projects);
             }
 
@@ -374,11 +432,46 @@ public class ProjectManager : IProjectManager
                 return null;
             }
 
+            // Ensure group chat session is loaded in ChatSystem
+            if (project.GroupChatSessionId.HasValue)
+            {
+                var chatSystem = ServiceLocator.Instance.ChatSystem;
+                if (chatSystem != null)
+                {
+                    // Try to get existing session, if not found, restore it
+                    var existingSession = chatSystem.GetSession(project.GroupChatSessionId.Value);
+                    if (existingSession == null)
+                    {
+                        // Session not in memory, need to restore from storage
+                        // Read metadata from storage to get members and name
+                        string metaKey = $"sessions/group/{project.GroupChatSessionId.Value}/meta";
+                        var metaDicts = _storage.Read<Dictionary<string, object>>(metaKey);
+                        var metaDict = metaDicts.FirstOrDefault();
+                        
+                        if (metaDict != null)
+                        {
+                            string name = metaDict.TryGetValue("Name", out var nameObj) ? nameObj?.ToString() ?? "" : "";
+                            var members = new List<Guid>();
+                            
+                            if (metaDict.TryGetValue("Members", out var membersObj) && membersObj is List<object> memberList)
+                            {
+                                foreach (var m in memberList)
+                                {
+                                    if (Guid.TryParse(m?.ToString(), out Guid memberId))
+                                        members.Add(memberId);
+                                }
+                            }
+                            
+                            // Restore session with fixed ID
+                            chatSystem.CreateGroupSession(members, name, project.GroupChatSessionId.Value);
+                            _logger.Info(null, "Restored group chat session for project {0}: {1}", projectId, project.GroupChatSessionId.Value);
+                        }
+                    }
+                }
+            }
+
             if (string.IsNullOrEmpty(project.StoragePath))
             {
-                // Legacy project without storage path, store metadata in SpeedyPack
-                string projectKey = $"projects/{project.Id}";
-                SpeedyPackRegistry.Pack.Write(projectKey, project);
                 SaveProjectsInternal(projects);
             }
 
@@ -404,5 +497,64 @@ public class ProjectManager : IProjectManager
     {
         _workflowEngine = engine ?? throw new ArgumentNullException(nameof(engine));
         _logger.Info(null, "Workflow engine registered with ProjectManager");
+    }
+
+    /// <summary>
+    /// Synchronize group chat session members with project's assigned beings.
+    /// Uses full sync strategy: removes members not in project, adds missing members.
+    /// This ensures data consistency even if some operations were missed.
+    /// </summary>
+    private void SyncGroupChatMembers(ProjectSpace project)
+    {
+        if (!project.GroupChatSessionId.HasValue)
+        {
+            return;
+        }
+
+        var chatSystem = ServiceLocator.Instance.ChatSystem;
+        if (chatSystem == null)
+        {
+            return;
+        }
+
+        var session = chatSystem.GetSession(project.GroupChatSessionId.Value) as GroupChatSession;
+        if (session == null)
+        {
+            _logger.Warn(null, "Group chat session {0} not found for project {1}, cannot sync members", 
+                project.GroupChatSessionId.Value, project.Id);
+            return;
+        }
+
+        // Get current members from both sources
+        var currentMembers = session.Members.ToList();
+        var expectedMembers = project.AssignedBeings.ToList();
+
+        // Find members to remove (in session but not in project)
+        var membersToRemove = currentMembers.Where(m => !expectedMembers.Contains(m)).ToList();
+        
+        // Find members to add (in project but not in session)
+        var membersToAdd = expectedMembers.Where(m => !currentMembers.Contains(m)).ToList();
+
+        // Remove extra members
+        foreach (var memberId in membersToRemove)
+        {
+            session.RemoveMember(memberId);
+            _logger.Info(null, "Removed being {0} from group chat for project {1} (not in project)", 
+                memberId, project.Id);
+        }
+
+        // Add missing members
+        foreach (var memberId in membersToAdd)
+        {
+            session.AddMember(memberId);
+            _logger.Info(null, "Added being {0} to group chat for project {1} (was missing)", 
+                memberId, project.Id);
+        }
+
+        if (membersToRemove.Count > 0 || membersToAdd.Count > 0)
+        {
+            _logger.Info(null, "Synced group chat for project {0}: removed {1}, added {2}, total members: {3}",
+                project.Id, membersToRemove.Count, membersToAdd.Count, session.Members.Count);
+        }
     }
 }

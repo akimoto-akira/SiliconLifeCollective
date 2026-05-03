@@ -553,8 +553,8 @@ public sealed class TimerSystem
     {
         try
         {
-            List<TimerItem>? timers = _storage.Read<List<TimerItem>>(_storageKey);
-            _timers = timers ?? new List<TimerItem>();
+            TimerItem[] timers = _storage.Read<TimerItem>(_storageKey);
+            _timers = timers?.ToList() ?? new List<TimerItem>();
 
             foreach (TimerItem timer in _timers.Where(t => t.Status == TimerStatus.Triggered))
             {

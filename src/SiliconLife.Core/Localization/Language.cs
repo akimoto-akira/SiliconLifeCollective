@@ -146,5 +146,20 @@ public enum Language
     /// <summary>
     /// German (Liechtenstein)
     /// </summary>
-    DeLI
+    DeLI,
+
+    /// <summary>
+    /// French (France)
+    /// </summary>
+    FrFR,
+
+    /// <summary>
+    /// French (Canada)
+    /// </summary>
+    FrCA,
+
+    /// <summary>
+    /// French (Switzerland)
+    /// </summary>
+    FrCH
 }

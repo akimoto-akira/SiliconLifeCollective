@@ -14,6 +14,7 @@
 using SiliconLife.Collective;
 using SiliconLife.Fast.Web.Models;
 using SiliconLife.Fast.Web.Views;
+using SiliconLife.Common.Localization;
 
 namespace SiliconLife.Fast.Web;
 
@@ -23,6 +24,7 @@ public class ChatHistoryController : Controller
     private readonly SiliconBeingManager _beingManager;
     private readonly ChatSystem _chatSystem;
     private readonly SkinManager _skinManager;
+    private readonly DefaultLocalizationBase _localization;
     private readonly Guid _userId;
 
     public ChatHistoryController()
@@ -32,6 +34,7 @@ public class ChatHistoryController : Controller
         _chatSystem = locator.ChatSystem!;
         _skinManager = locator.GetService<SkinManager>()!;
         _userId = Config.Instance.Data.UserGuid;
+        _localization = (DefaultLocalizationBase)LocalizationManager.Instance.GetLocalization(Config.Instance.Data.Language);
     }
 
     public override void Handle()
@@ -46,6 +49,10 @@ public class ChatHistoryController : Controller
             GetConversations();
         else if (path == "/api/chat-history/messages")
             GetMessages();
+        else if (path == "/group-chat-history-detail")
+            GroupChatDetail();
+        else if (path == "/broadcast-history-detail")
+            BroadcastDetail();
         else
         {
             Response.StatusCode = 404;
@@ -170,13 +177,34 @@ public class ChatHistoryController : Controller
             }
         }
         
+        // Build member names list (empty for Broadcast)
+        var memberNames = new List<string>();
+        if (session.Type != SessionType.Broadcast)
+        {
+            var allBeings = _beingManager.GetAllBeings();
+            var beingDict = allBeings.ToDictionary(b => b.Id);
+            foreach (var memberId in session.Members)
+            {
+                if (beingDict.TryGetValue(memberId, out var memberBeing))
+                    memberNames.Add(memberBeing.Name);
+                else if (memberId == _userId)
+                    memberNames.Add(Config.Instance?.Data?.UserNickname ?? "User");
+                else
+                    memberNames.Add(memberId.ToString("N"));
+            }
+        }
+        
         var vm = new ChatHistoryDetailViewModel
         {
             Skin = skin,
             ActiveMenu = "beings",
             SessionId = sessionId,
             BeingId = Guid.TryParse(beingIdStr, out var bid2) ? bid2 : Guid.Empty,
-            ToolDisplayNames = toolDisplayNames
+            SessionType = session.Type,
+            BackUrl = $"/chat-history?beingId={(Guid.TryParse(beingIdStr, out var bid3) ? bid3 : Guid.Empty)}",
+            BackText = _localization.ChatHistoryBackToList,
+            ToolDisplayNames = toolDisplayNames,
+            MemberNames = memberNames
         };
         var html = view.Render(vm);
         RenderHtml(html);
@@ -314,5 +342,130 @@ public class ChatHistoryController : Controller
         {
             RenderJson(new { messages = Array.Empty<object>(), error = ex.Message });
         }
+    }
+
+    // ── Group Chat History ───────────────────────────────────────────────────
+
+    private void GroupChatDetail()
+    {
+        var sessionIdStr = Request.QueryString["sessionId"];
+
+        if (string.IsNullOrEmpty(sessionIdStr) || !Guid.TryParse(sessionIdStr, out var sessionId))
+        {
+            Response.StatusCode = 400;
+            RenderHtml("<h1>Invalid Session ID</h1>");
+            return;
+        }
+
+        var session = _chatSystem.GetSession(sessionId);
+        if (session == null || session.Type != SessionType.GroupChat)
+        {
+            Response.StatusCode = 404;
+            RenderHtml("<h1>Group Session Not Found</h1>");
+            return;
+        }
+
+        var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
+        var view = new ChatHistoryDetailView();
+        
+        // Get the first being to access tool manager (for tool display names)
+        var being = _beingManager.GetAllBeings().FirstOrDefault();
+        
+        // Build tool display names dictionary
+        var toolDisplayNames = new Dictionary<string, string>();
+        if (being != null && being.ToolManager != null)
+        {
+            var language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            foreach (var toolName in being.ToolManager.GetToolNames())
+            {
+                if (toolDisplayNames.ContainsKey(toolName)) continue;
+                var tool = being.ToolManager.GetTool(toolName);
+                if (tool != null)
+                    toolDisplayNames[toolName] = tool.GetDisplayName(language);
+            }
+        }
+        
+        // Build member names list for group chat
+        var memberNames = new List<string>();
+        var allBeings = _beingManager.GetAllBeings();
+        var beingDict = allBeings.ToDictionary(b => b.Id);
+        foreach (var memberId in session.Members)
+        {
+            if (beingDict.TryGetValue(memberId, out var memberBeing))
+                memberNames.Add(memberBeing.Name);
+            else if (memberId == _userId)
+                memberNames.Add(Config.Instance?.Data?.UserNickname ?? "User");
+            else
+                memberNames.Add(memberId.ToString("N"));
+        }
+        
+        var vm = new ChatHistoryDetailViewModel
+        {
+            Skin = skin,
+            ActiveMenu = "chat",
+            SessionId = sessionId,
+            BeingId = Guid.Empty,
+            SessionType = SessionType.GroupChat,
+            BackUrl = "/project",
+            BackText = _localization.ProjectTasksBackToProjects,
+            ToolDisplayNames = toolDisplayNames,
+            MemberNames = memberNames
+        };
+        var html = view.Render(vm);
+        RenderHtml(html);
+    }
+
+    // ── Broadcast Channel History ────────────────────────────────────────────
+
+    private void BroadcastDetail()
+    {
+        var sessionIdStr = Request.QueryString["sessionId"];
+
+        if (string.IsNullOrEmpty(sessionIdStr) || !Guid.TryParse(sessionIdStr, out var sessionId))
+        {
+            Response.StatusCode = 400;
+            RenderHtml("<h1>Invalid Session ID</h1>");
+            return;
+        }
+
+        // Note: Broadcast channel may not be registered in ChatSystem memory,
+        // but we can still display the detail page. The message list will be empty
+        // if no messages exist in storage, or will load from storage on demand.
+        // This is consistent with how SingleChatSession works.
+
+        var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
+        var view = new ChatHistoryDetailView();
+        
+        // Get the first being to access tool manager (for tool display names)
+        var being = _beingManager.GetAllBeings().FirstOrDefault();
+        
+        // Build tool display names dictionary
+        var toolDisplayNames = new Dictionary<string, string>();
+        if (being != null && being.ToolManager != null)
+        {
+            var language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            foreach (var toolName in being.ToolManager.GetToolNames())
+            {
+                if (toolDisplayNames.ContainsKey(toolName)) continue;
+                var tool = being.ToolManager.GetTool(toolName);
+                if (tool != null)
+                    toolDisplayNames[toolName] = tool.GetDisplayName(language);
+            }
+        }
+        
+        var vm = new ChatHistoryDetailViewModel
+        {
+            Skin = skin,
+            ActiveMenu = "chat",
+            SessionId = sessionId,
+            BeingId = Guid.Empty,
+            SessionType = SessionType.Broadcast,
+            BackUrl = "/project",
+            BackText = _localization.ProjectTasksBackToProjects,
+            ToolDisplayNames = toolDisplayNames,
+            MemberNames = new List<string>() // Broadcast has no fixed members
+        };
+        var html = view.Render(vm);
+        RenderHtml(html);
     }
 }

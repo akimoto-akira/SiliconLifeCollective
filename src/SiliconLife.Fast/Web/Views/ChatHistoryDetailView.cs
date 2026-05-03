@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using SiliconLife.Collective;
 using SiliconLife.Fast.Web.Models;
 
 namespace SiliconLife.Fast.Web.Views;
@@ -30,20 +31,42 @@ public class ChatHistoryDetailView : ViewBase
 
     private static H RenderBody(ChatHistoryDetailViewModel vm)
     {
-        return H.Div(
+        var contentElements = new List<H>
+        {
             H.Div(
                 H.Div(
-                    H.A(vm.Localization.ChatHistoryBackToList).Href($"/chat-history?beingId={vm.BeingId}").Class("back-link")
+                    H.A(vm.BackText).Href(vm.BackUrl).Class("back-link")
                 ).Class("back-nav"),
                 H.H1(vm.Localization.ChatDetailPageHeader),
                 H.P($"会话ID: {vm.SessionId}").Class("page-subtitle")
-            ).Class("page-header"),
-            H.Div().Id("message-list").Class("message-list"),
+            ).Class("page-header")
+        };
+        
+        // Add member list for non-broadcast sessions
+        if (vm.SessionType != SessionType.Broadcast && vm.MemberNames.Count > 0)
+        {
+            contentElements.Add(
+                H.Div(
+                    H.Div(
+                        H.Span("👥 ").Class("members-icon"),
+                        H.Span(vm.Localization.ChatDetailMembers ?? "Members").Class("members-label")
+                    ).Class("members-header"),
+                    H.Div(
+                        vm.MemberNames.Select(name => H.Span(name).Class("member-tag"))
+                    ).Class("members-list")
+                ).Class("members-section")
+            );
+        }
+        
+        contentElements.Add(H.Div().Id("message-list").Class("message-list"));
+        contentElements.Add(
             H.Div(
                 H.Div("").Class("loading-spinner"),
                 H.Div(vm.Localization.ChatLoading).Class("loading-text")
             ).Id("loading-indicator").Class("loading-indicator")
-        ).Class("page-content");
+        );
+        
+        return H.Div(contentElements.ToArray()).Class("page-content");
     }
 
     private static CssBuilder GetStyles()
@@ -72,6 +95,42 @@ public class ChatHistoryDetailView : ViewBase
                 .Property("color", "var(--text-secondary)")
                 .Property("margin-top", "8px")
                 .Property("font-family", "monospace")
+            .EndSelector()
+            .Selector(".members-section")
+                .Property("margin-top", "20px")
+                .Property("margin-bottom", "20px")
+                .Property("padding", "16px")
+                .Property("background", "var(--bg-card)")
+                .Property("border-radius", "12px")
+                .Property("border", "1px solid var(--border)")
+            .EndSelector()
+            .Selector(".members-header")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("gap", "8px")
+                .Property("margin-bottom", "12px")
+            .EndSelector()
+            .Selector(".members-icon")
+                .Property("font-size", "18px")
+            .EndSelector()
+            .Selector(".members-label")
+                .Property("font-size", "14px")
+                .Property("font-weight", "600")
+                .Property("color", "var(--text-primary)")
+            .EndSelector()
+            .Selector(".members-list")
+                .Property("display", "flex")
+                .Property("flex-wrap", "wrap")
+                .Property("gap", "8px")
+            .EndSelector()
+            .Selector(".member-tag")
+                .Property("display", "inline-block")
+                .Property("padding", "6px 12px")
+                .Property("background", "var(--bg-secondary, rgba(0,0,0,0.05))")
+                .Property("border-radius", "6px")
+                .Property("font-size", "13px")
+                .Property("color", "var(--text-primary)")
+                .Property("border", "1px solid var(--border)")
             .EndSelector()
             .Selector(".message-list")
                 .Property("display", "flex")

@@ -31,7 +31,8 @@ public static class SoulFileManager
     {
         try
         {
-            string? content = storage.Read<string>(SoulKey);
+            string[] contents = storage.Read<string>(SoulKey);
+            string? content = contents.FirstOrDefault();
             if (string.IsNullOrEmpty(content))
             {
                 _logger.Debug(null, "Soul not found in storage");

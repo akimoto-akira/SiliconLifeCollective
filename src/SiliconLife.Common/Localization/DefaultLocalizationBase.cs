@@ -798,6 +798,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the no messages message
     /// </summary>
     public abstract string ChatDetailNoMessages { get; }
+    
+    /// <summary>
+    /// Gets the chat detail members label
+    /// </summary>
+    public abstract string ChatDetailMembers { get; }
 
     /// <summary>
     /// Gets the "Yes" text for boolean values
@@ -1332,6 +1337,16 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the project workflows link label
     /// </summary>
     public abstract string ProjectWorkflowsLinkLabel { get; }
+
+    /// <summary>
+    /// Gets the project group chat link label
+    /// </summary>
+    public abstract string ProjectGroupChatLinkLabel { get; }
+
+    /// <summary>
+    /// Gets the project broadcast link label
+    /// </summary>
+    public abstract string ProjectBroadcastLinkLabel { get; }
 
     /// <summary>
     /// Gets the project workflows page header text

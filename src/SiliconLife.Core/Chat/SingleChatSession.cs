@@ -23,6 +23,11 @@ public class SingleChatSession : SessionBase
     private readonly string _storageKey;
     private readonly object _lock = new();
 
+    public override Guid Id
+    {
+        get => ComputeDeterministicId(Members);
+    }
+
     /// <inheritdoc/>
     public override SessionType Type => SessionType.SingleChat;
 
@@ -42,7 +47,6 @@ public class SingleChatSession : SessionBase
     /// Initialize single chat session.
     /// </summary>
     public SingleChatSession(Guid participant1, Guid participant2, ITimeStorage storage)
-        : base(new[] { participant1, participant2 })
     {
         Participant1 = participant1;
         Participant2 = participant2;

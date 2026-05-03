@@ -67,8 +67,8 @@ public sealed class ProjectTaskSystem
     {
         try
         {
-            List<TaskItem>? tasks = _storage.Read<List<TaskItem>>(_storageKey);
-            _tasks = tasks ?? new List<TaskItem>();
+            TaskItem[] tasks = _storage.Read<TaskItem>(_storageKey);
+            _tasks = tasks?.ToList() ?? new List<TaskItem>();
         }
         catch (Exception)
         {

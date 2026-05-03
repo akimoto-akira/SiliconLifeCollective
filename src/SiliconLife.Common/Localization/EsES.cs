@@ -398,6 +398,8 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     
     public override string ProjectWorkNotesLinkLabel => "Notas de trabajo";
     public override string ProjectWorkflowsLinkLabel => "Flujos de trabajo";
+    public override string ProjectGroupChatLinkLabel => "Chat grupal";
+    public override string ProjectBroadcastLinkLabel => "Transmisión";
     public override string ProjectWorkflowsPageHeader => "Flujos de trabajo del proyecto";
     public override string ProjectWorkflowsEmptyState => "No hay flujos de trabajo para este proyecto";
     public override string CreateWorkflowButton => "Crear flujo de trabajo";
@@ -629,6 +631,7 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string ChatDetailPageTitle => "Detalle del chat";
     public override string ChatDetailPageHeader => "Detalle de la conversación";
     public override string ChatDetailNoMessages => "Sin mensajes";
+    public override string ChatDetailMembers => "Miembros";
     public override string BeingsYes => "Sí";
     public override string BeingsNo => "No";
     public override string BeingsNotSet => "No configurado";

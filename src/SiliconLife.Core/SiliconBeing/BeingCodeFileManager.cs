@@ -52,7 +52,8 @@ public static class BeingCodeFileManager
     {
         try
         {
-            byte[]? code = storage.Read<byte[]>(CodeKey);
+            byte[][] codes = storage.Read<byte[]>(CodeKey);
+            byte[]? code = codes.FirstOrDefault();
             if (code == null || code.Length == 0)
             {
                 _logger.Debug(null, "Being code not found in storage");

@@ -68,18 +68,19 @@ public sealed class SpeedyStorage : IStorage, IDisposable
     // ─── IStorage ─────────────────────────────────────────────────────────────
 
     /// <inheritdoc/>
-    public T? Read<T>(string key)
+    public T[] Read<T>(string key)
     {
         string mappedPath = MapKey(key);
 
         if (typeof(T) == typeof(string) && key.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
         {
             byte[]? rawBytes = _pack.Read(mappedPath);
-            if (rawBytes is null) return default;
-            return (T?)(object)Encoding.UTF8.GetString(rawBytes);
+            if (rawBytes is null) return Array.Empty<T>();
+            return new T[] { (T)(object)Encoding.UTF8.GetString(rawBytes) };
         }
 
-        return _pack.Read<T>(mappedPath);
+        var result = _pack.Read<T>(mappedPath);
+        return result is not null ? new T[] { result } : Array.Empty<T>();
     }
 
     /// <inheritdoc/>
@@ -101,6 +102,47 @@ public sealed class SpeedyStorage : IStorage, IDisposable
 
     /// <inheritdoc/>
     public void Delete(string key) => _pack.Delete(MapKey(key));
+
+    /// <inheritdoc/>
+    public IEnumerable<string> ListKeys(string prefix = "")
+    {
+        var keys = new List<string>();
+        if (string.IsNullOrWhiteSpace(prefix))
+        {
+            return keys;
+        }
+        
+        // List entries (files) in the prefix directory
+        foreach (string entry in _pack.ListEntries(prefix))
+        {
+            // Remove the base path prefix to get the relative key
+            string relativeKey = entry;
+            if (!string.IsNullOrEmpty(_basePath) && relativeKey.StartsWith(_basePath))
+            {
+                relativeKey = relativeKey[_basePath.Length..];
+            }
+            keys.Add(relativeKey);
+        }
+
+        // List subdirectories
+        foreach (string dir in _pack.ListDirectories(prefix))
+        {
+            // Remove the base path prefix to get the relative key
+            string relativeKey = dir;
+            if (!string.IsNullOrEmpty(_basePath) && relativeKey.StartsWith(_basePath))
+            {
+                relativeKey = relativeKey[_basePath.Length..];
+            }
+            // Ensure directory keys end with '/'
+            if (!relativeKey.EndsWith("/"))
+            {
+                relativeKey += "/";
+            }
+            keys.Add(relativeKey);
+        }
+
+        return keys;
+    }
 
     // ─── IDisposable ──────────────────────────────────────────────────────────
 

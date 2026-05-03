@@ -49,7 +49,7 @@ internal sealed class AclRuleData
 }
 
 /// <summary>
-/// Global Access Control List â€?prefix-matching rule table shared across all silicon beings.
+/// Global Access Control List ï¿½?prefix-matching rule table shared across all silicon beings.
 /// Persists to IStorage. Supports user management (add/remove rules).
 /// First match wins; no match returns null.
 /// </summary>
@@ -185,8 +185,8 @@ public class GlobalACL
 
         try
         {
-            List<AclRuleData>? ruleData = _storage.Read<List<AclRuleData>>(RulesKey);
-            if (ruleData == null) return;
+            AclRuleData[] ruleData = _storage.Read<AclRuleData>(RulesKey);
+            if (ruleData == null || ruleData.Length == 0) return;
 
             foreach (var item in ruleData)
             {

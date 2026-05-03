@@ -16,7 +16,8 @@ using MessagePack;
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// Handles reading data from .spk files.
+/// 负责从 .spk 文件读取数据块与 Directory 区域。v2 文件采用双 Header 槽位，
+/// 读取时会择优选择 CRC 有效且 Sequence 更大的那个槽位作为活动 Header。
 /// </summary>
 internal sealed class PackFileReader : IDisposable
 {
@@ -33,7 +34,7 @@ internal sealed class PackFileReader : IDisposable
     }
 
     /// <summary>
-    /// Opens a .spk file for reading.
+    /// 打开 .spk 文件用于读取。
     /// </summary>
     public static PackFileReader Open(string filePath)
     {
@@ -42,19 +43,63 @@ internal sealed class PackFileReader : IDisposable
     }
 
     /// <summary>
-    /// Reads the file header.
+    /// 选取当前活动 Header。在两个槽位中优先取 CRC 有效且 Sequence 更大的。
+    /// 若两个槽位都无效，返回 null（调用者据此判断是否需要走 legacy / 错误处理）。
     /// </summary>
-    public SpkHeader ReadHeader()
+    public (SpkHeader Header, int Slot)? TryReadActiveHeader()
     {
         lock (_lock)
         {
-            _stream.Position = 0;
-            return SpkHeader.ReadFrom(_reader);
+            var a = SpkHeader.TryReadSlot(_stream, 0);
+            var b = SpkHeader.TryReadSlot(_stream, 1);
+
+            if (a != null && b != null)
+                return a.Sequence >= b.Sequence ? (a, 0) : (b, 1);
+            if (a != null) return (a, 0);
+            if (b != null) return (b, 1);
+            return null;
         }
     }
 
     /// <summary>
-    /// Reads a data block at the specified offset and length.
+    /// 读取某个 Header 指向的 Directory 区域并反序列化。
+    /// </summary>
+    public Dictionary<string, DirectoryEntry> LoadDirectory(SpkHeader header)
+    {
+        lock (_lock)
+        {
+            if (header.DirectoryLength == 0)
+                return new Dictionary<string, DirectoryEntry>(StringComparer.Ordinal);
+
+            _stream.Position = header.DirectoryOffset;
+            var dirBytes = _reader.ReadBytes(header.DirectoryLength);
+
+            var map = MessagePackSerializer.Deserialize<Dictionary<string, DirectoryEntry>>(dirBytes)
+                      ?? new Dictionary<string, DirectoryEntry>(StringComparer.Ordinal);
+
+            // 保证返回字典使用 Ordinal 比较器，避免大小写敏感性差异。
+            if (!ReferenceEquals(map.Comparer, StringComparer.Ordinal))
+            {
+                var reCompared = new Dictionary<string, DirectoryEntry>(StringComparer.Ordinal);
+                foreach (var (k, v) in map) reCompared[k] = v;
+                return reCompared;
+            }
+            return map;
+        }
+    }
+
+    /// <summary>
+    /// 供外部查询当前活动 Header 的简化接口。未找到有效槽位时抛错。
+    /// </summary>
+    public SpkHeader ReadHeader()
+    {
+        var active = TryReadActiveHeader()
+            ?? throw new InvalidDataException("Neither header slot is valid.");
+        return active.Header;
+    }
+
+    /// <summary>
+    /// 读取指定偏移、长度的原始数据。
     /// </summary>
     public byte[] ReadAt(long offset, int length)
     {
@@ -62,26 +107,6 @@ internal sealed class PackFileReader : IDisposable
         {
             _stream.Position = offset;
             return _reader.ReadBytes(length);
-        }
-    }
-
-    /// <summary>
-    /// Loads the directory index from the file.
-    /// </summary>
-    public Dictionary<string, DirectoryEntry> LoadDirectory()
-    {
-        lock (_lock)
-        {
-            var header = ReadHeader();
-            
-            if (header.DirectoryLength == 0)
-                return new Dictionary<string, DirectoryEntry>(StringComparer.Ordinal);
-
-            _stream.Position = header.DirectoryOffset;
-            var dirBytes = _reader.ReadBytes(header.DirectoryLength);
-
-            return MessagePackSerializer.Deserialize<Dictionary<string, DirectoryEntry>>(dirBytes)
-                   ?? new Dictionary<string, DirectoryEntry>(StringComparer.Ordinal);
         }
     }
 

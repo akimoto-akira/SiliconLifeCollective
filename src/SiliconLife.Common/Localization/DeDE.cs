@@ -372,6 +372,8 @@ public class DeDE : DefaultLocalizationBase
     
     public override string ProjectWorkNotesLinkLabel => "Arbeitsnotizen";
     public override string ProjectWorkflowsLinkLabel => "Arbeitsabläufe";
+    public override string ProjectGroupChatLinkLabel => "Gruppenchat";
+    public override string ProjectBroadcastLinkLabel => "Rundfunk";
     public override string ProjectWorkflowsPageHeader => "Projektarbeitsabläufe";
     public override string ProjectWorkflowsEmptyState => "Dieses Projekt hat noch keine Arbeitsabläufe";
     public override string CreateWorkflowButton => "Arbeitsablauf erstellen";
@@ -597,6 +599,7 @@ public class DeDE : DefaultLocalizationBase
     public override string ChatDetailPageTitle => "Chatdetails";
     public override string ChatDetailPageHeader => "Gesprächsdetails";
     public override string ChatDetailNoMessages => "Noch keine Nachrichten";
+    public override string ChatDetailMembers => "Mitglieder";
     public override string BeingsYes => "Ja";
     public override string BeingsNo => "Nein";
     public override string BeingsNotSet => "Nicht gesetzt";

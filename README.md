@@ -16,6 +16,7 @@ Choose your preferred language:
 - **[Español](docs/es-ES/README.md)**
 - **[Čeština](docs/cs-CZ/README.md)**
 - **[Deutsch](docs/de-DE/README.md)**
+- **[Français](docs/fr-FR/README.md)**
 
 ## Quick Links
 

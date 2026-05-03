@@ -102,7 +102,8 @@ public class DynamicBeingLoader
     /// <returns>The compiled Type if successful, null if no custom code</returns>
     public Type? LoadBeingType(Guid beingId, IStorage storage)
     {
-        byte[]? encryptedCode = storage.Read<byte[]>(CodeFileName);
+        byte[][] encryptedCodes = storage.Read<byte[]>(CodeFileName);
+        byte[]? encryptedCode = encryptedCodes.FirstOrDefault();
         if (encryptedCode == null || encryptedCode.Length == 0)
         {
             _logger.Debug(null, "No custom code found for being {0}", beingId);
@@ -251,7 +252,8 @@ public class DynamicBeingLoader
     /// <returns>CompilationResult — check Success and use CompiledType</returns>
     public CompilationResult LoadPermissionCallback(Guid beingId, IStorage storage)
     {
-        byte[]? encryptedCode = storage.Read<byte[]>(PermissionCodeFileName);
+        byte[][] encryptedCodes = storage.Read<byte[]>(PermissionCodeFileName);
+        byte[]? encryptedCode = encryptedCodes.FirstOrDefault();
         if (encryptedCode == null || encryptedCode.Length == 0)
         {
             _logger.Debug(null, "No permission callback file found for being {0}", beingId);

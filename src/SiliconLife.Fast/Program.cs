@@ -353,6 +353,11 @@ public class Program
         LocalizationManager.Instance.Register<DeCH>(Language.DeCH);
         LocalizationManager.Instance.Register<DeLU>(Language.DeLU);
         LocalizationManager.Instance.Register<DeLI>(Language.DeLI);
+        
+        // French
+        LocalizationManager.Instance.Register<FrFR>(Language.FrFR);
+        LocalizationManager.Instance.Register<FrCA>(Language.FrCA);
+        LocalizationManager.Instance.Register<FrCH>(Language.FrCH);
     }
 
     public static void RequestExit()
@@ -406,6 +411,11 @@ public class Program
             Language.DeCH => new TrayDeCH(),
             Language.DeLU => new TrayDeLU(),
             Language.DeLI => new TrayDeLI(),
+            
+            // French variants
+            Language.FrFR => new TrayFrFR(),
+            Language.FrCA => new TrayFrCA(),
+            Language.FrCH => new TrayFrCH(),
             
             // Default to English
             _ => new TrayEnUS()
