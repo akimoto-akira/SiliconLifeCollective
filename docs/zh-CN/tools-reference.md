@@ -1,4 +1,4 @@
-﻿# 工具参考
+# 工具参考
 
 > **版本：v0.1.0-alpha**
 
@@ -19,6 +19,7 @@
 - **开发工具** — 代码执行、日志查询
 - **实用工具** — 系统信息、Token 审计、帮助文档、知识网络
 - **浏览器工具** — WebView 浏览器自动化
+- **插件工具** — 通过插件系统注册的第三方工具
 
 ---
 
@@ -718,7 +719,16 @@ public class MyCustomTool : ITool
 
 ### 步骤 2: 添加到项目
 
-将工具文件放置在 `src/SiliconLife.Default/Tools/` 目录中。`ToolManager` 会在启动时通过反射自动发现并注册。
+将工具文件放置在 `src/SiliconLife.Common/Tools/` 目录中（共享工具）或 `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` 目录中（版本特定工具）。`ToolManager` 会在启动时通过反射自动发现并注册。
+
+### 步骤 2a: 通过插件注册工具
+
+也可以通过插件系统注册自定义工具：
+
+1. 在插件项目中实现 `ITool` 接口
+2. 编译插件 DLL 并放入插件目录
+3. `ToolManager.ScanAllPluginAssemblies()` 会自动扫描所有已加载插件中的 ITool 实现
+4. 插件工具受相同的权限系统约束
 
 ### 步骤 3: （可选）标记为主理人专用
 

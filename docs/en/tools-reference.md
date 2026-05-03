@@ -1,10 +1,10 @@
-﻿# Tools Reference
+# Tools Reference
 
 > **Version: v0.1.0-alpha**
 
 This document provides detailed information about all built-in tools in the Silicon Life Collective platform.
 
-[English](../en/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md)
+**English** | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md)
 
 ## Overview
 
@@ -19,6 +19,7 @@ The tool system allows silicon beings to interact with the external world throug
 - **Development Tools** — Code execution, log queries
 - **Utility Tools** — System information, token audit, help documentation, knowledge network
 - **Browser Tools** — WebView browser automation
+- **Plugin Tools** — Third-party tools registered through the plugin system
 
 ---
 
@@ -718,7 +719,16 @@ public class MyCustomTool : ITool
 
 ### Step 2: Add to Project
 
-Place the tool file in the `src/SiliconLife.Default/Tools/` directory. The `ToolManager` will automatically discover and register it through reflection at startup.
+Place the tool file in the `src/SiliconLife.Common/Tools/` directory (shared tools) or `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` directory (version-specific tools). The `ToolManager` will automatically discover and register it through reflection at startup.
+
+### Step 2a: Register Tools via Plugin
+
+You can also register custom tools through the plugin system:
+
+1. Implement the `ITool` interface in the plugin project
+2. Compile the plugin DLL and place it in the plugins directory
+3. `ToolManager.ScanAllPluginAssemblies()` will automatically scan all loaded plugins for ITool implementations
+4. Plugin tools are subject to the same permission system constraints
 
 ### Step 3: (Optional) Mark as Curator Only
 

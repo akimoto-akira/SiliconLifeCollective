@@ -16,7 +16,7 @@
 本项目提供两个实现版本：
 
 - **SiliconLife.Default**：默认实现，主要用于验证架构可行性。控制台应用程序，文件系统 JSON 存储。
-- **SiliconLife.Fast**：主推生产版本。Windows 窗体应用程序，内存存储 + 异步持久化，经过深度性能优化。
+- **SiliconLife.Fast**：主推生产版本。Windows 窗体应用程序，SpeedyPack 内存存储 + 异步持久化，经过深度性能优化。
 
 两个版本共享相同的接口和功能，仅在存储实现和运行模式上有所不同。SiliconLife.Default 作为架构验证基准，SiliconLife.Fast 作为生产环境主推版本。
 
@@ -63,6 +63,142 @@
 ---
 
 ## [未发布]
+
+### 2026-05-03
+
+#### 项目基础设施
+- `2664b0c` - 更新项目基础设施和依赖
+  - SiliconLife.Speedy.Manager 新增 WPF 管理界面（MainForm.Designer.cs、MainForm.resx）
+  - 新增 slc.ico 图标资源（1.5MB）
+  - PluginLoader 大幅增强安全扫描（622 行新增）
+  - 新增 PermissionedStreamFactory 权限流工厂（779 行）
+  - 新增 PermissionRequestQueue 权限请求队列（Default 和 Fast 版本）
+  - 新增 DebugLoggerProvider 调试日志提供者
+  - ConfigDataBase 配置基类增强
+  - ToolManager 新增插件工具扫描功能（ScanAllPluginAssemblies）
+  - SiliconBeingManager 生命周期管理增强
+  - DashScopeClient 阿里云 AI 客户端大幅增强（227 行新增）
+  - DefaultSiliconBeingFactory 工厂增强
+  - Web 视图和控制器更新（ChatView、WorkNoteView、PermissionRequestController）
+  - 9 种语言本地化新增键值
+  - 35 个文件变更，28080 行新增，336 行删除
+
+### 2026-05-02
+
+#### AI 客户端增强
+- `c16f99f` - 更新 AI 客户端、Web UI 和存储组件
+  - DashScopeClient 阿里云客户端大幅改进
+  - SpeedyPackAutoCompactor 自动压缩器优化
+  - Web 视图基类和 BeingView 改进
+  - 6 个文件变更，240 行新增，81 行删除
+
+#### 插件系统
+- `242dc98` - 在关于页面添加插件列表
+  - AboutController 新增插件信息展示
+  - AboutViewModel 新增插件数据模型
+  - AboutView 新增插件列表渲染
+  - 9 种语言本地化新增插件相关键值
+  - 14 个文件变更，160 行新增，1 行删除
+
+#### AI 优化
+- `147f8f4` - 简化上下文记忆提示文本
+  - ContextManager 优化 AI 提示词
+  - 1 个文件变更，1 行新增，1 行删除
+
+#### Speedy 存储优化
+- `8bda2d3` - 更新 Speedy 存储和记忆控制器实现
+  - SpeedyPackAutoCompactor 间隔修正
+  - SpeedyTimeStorage 路径处理优化
+  - MemoryController 记忆控制器改进
+  - SpeedyPack.Manager UI 更新
+  - 4 个文件变更，21 行新增，18 行删除
+
+#### 托盘增强
+- `8972654` - 增强托盘状态窗口的本地化支持
+  - 9 种语言托盘本地化新增 Speedy 管理入口
+  - TrayStatusWindow 新增 Speedy 管理菜单项
+  - 11 个文件变更，72 行新增
+
+#### Speedy.Manager 优化
+- `6f5db09` - 优化 SpeedyPack 管理器 UI 和内部组件
+  - MainForm 界面重构
+  - FreeList 内存管理优化
+  - WriteQueue 写入队列改进
+  - SpeedyPack 核心优化
+  - 5 个文件变更，96 行新增，88 行删除
+
+#### 存储系统增强
+- `57f9d5d` - 改进存储系统，添加自动压缩和不完整日期支持
+  - 新增 SpeedyPackAutoCompactor 自动压缩定时器（30 分钟间隔）
+  - SpeedyPackRegistry 单例管理器增强
+  - SpeedyStorage、SpeedyTimeStorage、SpeedyWorkNoteStorage 适配改进
+  - SpeedyPack 新增 FreeList 空闲空间管理（149 行）
+  - PackFileWriter 写入器重构优化
+  - WriteOperation、WriteQueue 写入队列增强
+  - SpeedyPackOptions 配置选项扩展
+  - IncompleteDate 新增比较方法
+  - PluginLoader 插件加载器改进
+  - Default 和 Fast 版本 Program.cs 初始化流程更新
+  - DefaultConfigData 配置数据简化
+  - KnowledgeNetwork 知识网络精简
+  - ChatController、MemoryController 控制器优化
+  - SpeedyPack.Manager MainForm 功能增强
+  - 22 个文件变更，639 行新增，253 行删除
+
+#### Speedy.Manager 更新
+- `b04ed33` - 更新 Speedy.Manager 文件
+
+### 2026-05-01
+
+#### 架构重构：Speedy 存储替换 LiteDB
+- `6600972` - 用 Speedy 存储替换 LiteDB，添加插件系统和 Speedy 项目
+  - **新增 SiliconLife.Speedy 项目**：高性能 .spk 存储引擎
+    - SpeedyPack 核心类（489 行）：内存目录映射 + 条目缓存 + 异步写入队列
+    - SpeedyPackOptions 配置类：缓存 TTL、最大缓存条目数、只读模式
+    - IPackTransaction 事务接口：支持原子写入操作
+    - SpkFileInfo 文件信息类
+    - Internal 目录：DirectoryMap、EntryCache、PackFileReader、PackFileWriter、WriteQueue、WriteOperation、SpeedyTransaction、SpkHeader、PathNormalizer、FreeList
+    - 依赖 MessagePack 3.1.4 进行二进制序列化（LZ4 压缩）
+  - **新增 SiliconLife.Speedy.Manager 项目**：WPF 管理工具
+    - MVVM 架构：MainViewModel、DirectoryTreeViewModel、ContentViewerViewModel 等
+    - 服务层：PackService、FileDialogService、RecentFilesService、NotificationService
+    - 转换器：BoolToVisibility、ByteSizeToString、ContentTypeToIcon、NullToCollapsed
+    - 视图：MainWindow、DirectoryTreeView、ContentViewerPanel、MetadataPanel
+    - 对话框：FileInfoDialog、ImportDialog、NewEntryDialog
+  - **SiliconLife.Fast 存储迁移**：LiteDB → SpeedyPack
+    - 新增 SpeedyStorage（IStorage 适配器）
+    - 新增 SpeedyTimeStorage（ITimeStorage 适配器）
+    - 新增 SpeedyWorkNoteStorage（IWorkNoteStorage 适配器）
+    - 新增 SpeedyPackRegistry（进程级单例管理）
+    - 新增 SpeedyPackAutoCompactor（自动压缩定时器）
+    - 移除 LiteDB 相关存储实现（LiteDBStorage、LiteDBTimeStorage、LiteDBWorkNoteStorage、LiteDBLoggerProvider、LiteDBManager、LiteDBModels）
+    - 移除 LiteDB 管理窗口相关代码
+  - **插件系统**：
+    - 新增 IPlugin 接口（Core/Plugins/IPlugin.cs）
+    - 新增 PluginLoader 插件加载器（Core/Plugins/PluginLoader.cs）
+    - 支持从目录加载插件 DLL
+    - 安全扫描：禁止命名空间检查（System.IO、System.Net、Microsoft.CodeAnalysis 等）
+    - 可信程序集白名单（Google.Protobuf、Newtonsoft.Json、MessagePack 等）
+    - 自定义 AssemblyLoadContext 隔离加载
+    - ToolManager 新增 ScanAllPluginAssemblies 方法
+    - CoreHost 集成插件加载器
+  - 119 个文件变更，6926 行新增，3066 行删除
+
+#### 硅基生命体增强
+- `3aef4c3` - 添加 Stopped 活动状态和错误处理改进
+  - 硅基生命体新增 Stopped 状态
+  - 错误处理和恢复机制增强
+
+#### 本地化更新
+- `513c65d` - 更新所有语言版本和文档
+  - 新增 MarkdownEditorComponent 组件（625 行）
+  - 新增 DetailsComponent 组件（130 行）
+  - 新增 AccordionComponent 手风琴组件（285 行）
+  - BeingController、ChatController、MemoryController、PermissionController 控制器更新
+  - BeingView、ChatView、MemoryView、SoulEditorView 视图重构
+  - 移除旧 MarkdownEditorView
+  - InitController 组件化迁移
+  - 115 个文件变更，5761 行新增，2362 行删除
 
 ### 2026-04-30
 

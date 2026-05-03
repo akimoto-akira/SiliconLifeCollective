@@ -64,6 +64,142 @@
 
 ## [未發布]
 
+### 2026-05-03
+
+#### 專案基礎設施
+- `2664b0c` - 更新專案基礎設施和相依性
+  - SiliconLife.Speedy.Manager 新增 WPF 管理介面（MainForm.Designer.cs、MainForm.resx）
+  - 新增 slc.ico 圖示資源（1.5MB）
+  - PluginLoader 大幅增強安全掃描（622 行新增）
+  - 新增 PermissionedStreamFactory 權限流工廠（779 行）
+  - 新增 PermissionRequestQueue 權限請求佇列（Default 和 Fast 版本）
+  - 新增 DebugLoggerProvider 除錯日誌提供者
+  - ConfigDataBase 配置基底類別增強
+  - ToolManager 新增插件工具掃描功能（ScanAllPluginAssemblies）
+  - SiliconBeingManager 生命週期管理增強
+  - DashScopeClient 阿里雲 AI 客戶端大幅增強（227 行新增）
+  - DefaultSiliconBeingFactory 工廠增強
+  - Web 視圖和控制器更新（ChatView、WorkNoteView、PermissionRequestController）
+  - 9 種語言本地化新增鍵值
+  - 35 個檔案變更，28080 行新增，336 行刪除
+
+### 2026-05-02
+
+#### AI 客戶端增強
+- `c16f99f` - 更新 AI 客戶端、Web UI 和儲存元件
+  - DashScopeClient 阿里雲客戶端大幅改進
+  - SpeedyPackAutoCompactor 自動壓縮器最佳化
+  - Web 視圖基底類別和 BeingView 改進
+  - 6 個檔案變更，240 行新增，81 行刪除
+
+#### 插件系統
+- `242dc98` - 在關於頁面添加插件列表
+  - AboutController 新增插件資訊展示
+  - AboutViewModel 新增插件資料模型
+  - AboutView 新增插件列表渲染
+  - 9 種語言本地化新增插件相關鍵值
+  - 14 個檔案變更，160 行新增，1 行刪除
+
+#### AI 最佳化
+- `147f8f4` - 簡化上下文記憶提示文字
+  - ContextManager 最佳化 AI 提示詞
+  - 1 個檔案變更，1 行新增，1 行刪除
+
+#### Speedy 儲存最佳化
+- `8bda2d3` - 更新 Speedy 儲存和記憶控制器實現
+  - SpeedyPackAutoCompactor 間隔修正
+  - SpeedyTimeStorage 路徑處理最佳化
+  - MemoryController 記憶控制器改進
+  - SpeedyPack.Manager UI 更新
+  - 4 個檔案變更，21 行新增，18 行刪除
+
+#### 托盤增強
+- `8972654` - 增強托盤狀態視窗的本地化支援
+  - 9 種語言托盤本地化新增 Speedy 管理入口
+  - TrayStatusWindow 新增 Speedy 管理功能表項
+  - 11 個檔案變更，72 行新增
+
+#### Speedy.Manager 最佳化
+- `6f5db09` - 最佳化 SpeedyPack 管理器 UI 和內部元件
+  - MainForm 介面重構
+  - FreeList 記憶體管理最佳化
+  - WriteQueue 寫入佇列改進
+  - SpeedyPack 核心最佳化
+  - 5 個檔案變更，96 行新增，88 行刪除
+
+#### 儲存系統增強
+- `57f9d5d` - 改進儲存系統，添加自動壓縮和不完整日期支援
+  - 新增 SpeedyPackAutoCompactor 自動壓縮定時器（30 分鐘間隔）
+  - SpeedyPackRegistry 單例管理器增強
+  - SpeedyStorage、SpeedyTimeStorage、SpeedyWorkNoteStorage 適配改進
+  - SpeedyPack 新增 FreeList 空閒空間管理（149 行）
+  - PackFileWriter 寫入器重構最佳化
+  - WriteOperation、WriteQueue 寫入佇列增強
+  - SpeedyPackOptions 配置選項擴展
+  - IncompleteDate 新增比較方法
+  - PluginLoader 插件載入器改進
+  - Default 和 Fast 版本 Program.cs 初始化流程更新
+  - DefaultConfigData 配置資料簡化
+  - KnowledgeNetwork 知識網路精簡
+  - ChatController、MemoryController 控制器最佳化
+  - SpeedyPack.Manager MainForm 功能增強
+  - 22 個檔案變更，639 行新增，253 行刪除
+
+#### Speedy.Manager 更新
+- `b04ed33` - 更新 Speedy.Manager 檔案
+
+### 2026-05-01
+
+#### 架構重構：Speedy 儲存替換 LiteDB
+- `6600972` - 用 Speedy 儲存替換 LiteDB，添加插件系統和 Speedy 專案
+  - **新增 SiliconLife.Speedy 專案**：高效能 .spk 儲存引擎
+    - SpeedyPack 核心類別（489 行）：記憶體目錄映射 + 條目快取 + 異步寫入佇列
+    - SpeedyPackOptions 配置類別：快取 TTL、最大快取條目數、唯讀模式
+    - IPackTransaction 事務介面：支援原子寫入操作
+    - SpkFileInfo 檔案資訊類別
+    - Internal 目錄：DirectoryMap、EntryCache、PackFileReader、PackFileWriter、WriteQueue、WriteOperation、SpeedyTransaction、SpkHeader、PathNormalizer、FreeList
+    - 相依 MessagePack 3.1.4 進行二進位序列化（LZ4 壓縮）
+  - **新增 SiliconLife.Speedy.Manager 專案**：WPF 管理工具
+    - MVVM 架構：MainViewModel、DirectoryTreeViewModel、ContentViewerViewModel 等
+    - 服務層：PackService、FileDialogService、RecentFilesService、NotificationService
+    - 轉換器：BoolToVisibility、ByteSizeToString、ContentTypeToIcon、NullToCollapsed
+    - 視圖：MainWindow、DirectoryTreeView、ContentViewerPanel、MetadataPanel
+    - 對話方塊：FileInfoDialog、ImportDialog、NewEntryDialog
+  - **SiliconLife.Fast 儲存遷移**：LiteDB → SpeedyPack
+    - 新增 SpeedyStorage（IStorage 適配器）
+    - 新增 SpeedyTimeStorage（ITimeStorage 適配器）
+    - 新增 SpeedyWorkNoteStorage（IWorkNoteStorage 適配器）
+    - 新增 SpeedyPackRegistry（行程級單例管理）
+    - 新增 SpeedyPackAutoCompactor（自動壓縮定時器）
+    - 移除 LiteDB 相關儲存實現（LiteDBStorage、LiteDBTimeStorage、LiteDBWorkNoteStorage、LiteDBLoggerProvider、LiteDBManager、LiteDBModels）
+    - 移除 LiteDB 管理視窗相關程式碼
+  - **插件系統**：
+    - 新增 IPlugin 介面（Core/Plugins/IPlugin.cs）
+    - 新增 PluginLoader 插件載入器（Core/Plugins/PluginLoader.cs）
+    - 支援從目錄載入插件 DLL
+    - 安全掃描：禁止命名空間檢查（System.IO、System.Net、Microsoft.CodeAnalysis 等）
+    - 可信組件白名單（Google.Protobuf、Newtonsoft.Json、MessagePack 等）
+    - 自訂 AssemblyLoadContext 隔離載入
+    - ToolManager 新增 ScanAllPluginAssemblies 方法
+    - CoreHost 整合插件載入器
+  - 119 個檔案變更，6926 行新增，3066 行刪除
+
+#### 矽基生命體增強
+- `3aef4c3` - 添加 Stopped 活動狀態和錯誤處理改進
+  - 矽基生命體新增 Stopped 狀態
+  - 錯誤處理和恢復機制增強
+
+#### 本地化更新
+- `513c65d` - 更新所有語言版本和文件
+  - 新增 MarkdownEditorComponent 元件（625 行）
+  - 新增 DetailsComponent 元件（130 行）
+  - 新增 AccordionComponent 手風琴元件（285 行）
+  - BeingController、ChatController、MemoryController、PermissionController 控制器更新
+  - BeingView、ChatView、MemoryView、SoulEditorView 視圖重構
+  - 移除舊 MarkdownEditorView
+  - InitController 元件化遷移
+  - 115 個檔案變更，5761 行新增，2362 行刪除
+
 ### 2026-04-30
 
 #### 系統托盤功能

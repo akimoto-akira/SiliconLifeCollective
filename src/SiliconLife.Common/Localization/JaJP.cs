@@ -170,6 +170,16 @@ public class JaJP : DefaultLocalizationBase
     public override string PermissionCacheDuration30Days => "30日";
 
     /// <summary>
+    /// Gets the prefix for project group chat session names
+    /// </summary>
+    public override string ProjectGroupChatPrefix => "プロジェクトグループ";
+
+    /// <summary>
+    /// Gets the prefix for project broadcast channel names
+    /// </summary>
+    public override string ProjectBroadcastPrefix => "プロジェクト放送";
+
+    /// <summary>
     /// Gets the localized display name for a permission type
     /// </summary>
     public override string GetPermissionTypeName(PermissionType permissionType) => permissionType switch
@@ -387,6 +397,20 @@ public class JaJP : DefaultLocalizationBase
     public override string ProjectTasksLinkLabel => "タスク";
     
     public override string ProjectWorkNotesLinkLabel => "ワークノート";
+    public override string ProjectWorkflowsLinkLabel => "ワークフロー";
+    public override string ProjectWorkflowsPageHeader => "プロジェクトワークフロー";
+    public override string ProjectWorkflowsEmptyState => "このプロジェクトにはワークフローがありません";
+    public override string CreateWorkflowButton => "ワークフローを作成";
+    public override string ActiveWorkflowsHeader => "アクティブなワークフロー";
+    public override string BackToProject => "プロジェクトに戻る";
+    public override string WorkflowCurrentStateLabel => "現在の状態:";
+    public override string WorkflowCreatedByLabel => "作成者:";
+    public override string WorkflowUpdatedAtLabel => "更新日時:";
+    public override string WorkflowBusinessKeyPrompt => "ビジネスキーを入力してください（例：PR番号、Issue ID）:";
+    public override string WorkflowCreatedSuccess => "ワークフローが正常に作成されました！";
+    public override string WorkflowCreateFailed => "作成に失敗しました:";
+    public override string WorkflowDetailInProgress => "ワークフロー詳細機能は開発中...";
+    public override string WorkflowInstanceIdLabel => "インスタンスID:";
     public override string ProjectWorkNotesPageHeader => "プロジェクト作業ノート";
     public override string ProjectWorkNotesEmptyState => "このプロジェクトには作業ノートがありません";
     public override string ProjectWorkNotesTotalPages => "総ページ数：{0}";

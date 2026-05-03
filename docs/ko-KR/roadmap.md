@@ -2,7 +2,7 @@
 
 > **버전: v0.1.0-alpha**
 
-[English](../en/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | **한국어** | [Čeština](../cs-CZ/roadmap.md)
+[English](../en/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | **한국어** | [Čeština](../cs-CZ/roadmap.md)
 
 ## 듀얼 버전 로드맵
 
@@ -13,13 +13,15 @@
 
 ### SiliconLife.Fast (고성능 버전)
 - **포지셔닝**: 주력 프로덕션 버전
-- **현재 상태**: 기본 아키텍처 이식이 완료되었으며, 지속적인 최적화가 진행 중입니다
+- **현재 상태**: 기본 아키텍처 이식이 완료되었으며, SpeedyPack 스토리지 엔진 및 플러그인 시스템이 구현되었습니다
 - **역할 설명**: Default 버전에서 검증된 아키텍처 기반 위에 심층 성능 최적화 및 프로덕션 특성 강화를 수행하여, 실제 배포의 최선의 선택입니다
 
 **Fast 버전 개발 계획**:
 - ✅ 단계 1: 기본 프로젝트 구조 및 구성 시스템 이식
 - ✅ 단계 2: Web UI 및 컨트롤러 이식
-- ✅ 단계 3: 저장소 시스템 최적화 (메모리 저장소 + 비동기 영속성)
+- ✅ 단계 3: 저장소 시스템 최적화 (SpeedyPack 메모리 저장소 + 비동기 영속성)
+- ✅ 단계 3.5: SpeedyPack 관리 도구 (SiliconLife.Speedy.Manager WPF 애플리케이션)
+- ✅ 단계 3.6: 플러그인 시스템 (IPlugin 인터페이스, 보안 샌드박스, AssemblyLoadContext 격리)
 - 🚧 단계 4: 시스템 트레이 및 양식 애플리케이션 개발
 - 📋 단계 5: 성능 최적화 (커넥션 풀, 오브젝트 풀, 락 프리 동시성)
 - 📋 단계 6: Kestrel 웹 서버 교체
@@ -58,7 +60,7 @@
 
 | # | 모듈 | 설명 |
 |---|--------|-------------|
-| 2.1 | 저장 (최소화) | `IStorage` 인터페이스 (Read/Write/Exists/Delete, 키-값 쌍). `FileSystemStorage` 구현. 인스턴스 클래스 (정적 아님). 직접 파일 시스템 접근 —— **AI는 IStorage를 제어할 수 없음** | [Deutsch](../de-DE/roadmap.md) |
+| 2.1 | 저장 (최소화) | `IStorage` 인터페이스 (Read/Write/Exists/Delete, 키-값 쌍). `FileSystemStorage` 구현. 인스턴스 클래스 (정적 아님). 직접 파일 시스템 접근 —— **AI는 IStorage를 제어할 수 없음** |
 | 2.2 | 메인 루프 + 클럭 객체 | 무한 루프, 정확한 클럭 간격 (`Stopwatch` + `Thread.Sleep`). 우선순위 스케줄링 |
 | 2.3 | IAIClient 표준화 | `IAIClientFactory` 인터페이스. OllamaClient가 표준 인터페이스 구현하도록 리팩토링 |
 | 2.4 | 콘솔 마이그레이션 | `while(true)`를 메인 루프 기반 클럭 객체로 마이그레이션. 단계 1과 동일한 동작 |
@@ -304,5 +306,5 @@
 | # | 모듈 | 설명 |
 |---|--------|-------------|
 | 12.1 | 지식 네트워크 | 트리플 구조 (주어-술어-목적어)를 사용하는 공유 지식 그래프 |
-| 12.2 | 플러그인 시스템 | 보안 검사 및 샌드박스가 있는 외부 플러그인 로딩 |
+| 12.2 | ~~플러그인 시스템~~ ✅ 완료됨 | 보안 검사 및 샌드박스가 있는 외부 플러그인 로딩 (IPlugin 인터페이스, PluginLoader, AssemblyLoadContext 격리) |
 | 12.3 | 스킬 생태계 | 생명체 능력을 위한 재사용 가능한 스킬 마켓플레이스 |

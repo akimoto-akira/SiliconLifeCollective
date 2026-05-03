@@ -1,4 +1,4 @@
-﻿# 安全設計
+# 安全設計
 
 > **版本：v0.1.0-alpha**
 
@@ -268,3 +268,41 @@ Silicon Life Collective 的安全性建立在**分層防禦**模型之上。核�
 - 安全掃描增強
 
 保持系統最新以獲得最佳保護。
+
+---
+
+## 插件安全
+
+插件系統引入了第三方程式碼執行的安全風險，通過以下機制緩解：
+
+### 安全沙箱
+
+`PluginLoader` 在載入插件時執行嚴格的安全掃描：
+
+1. **禁止命名空間檢查** — 插件不能引用以下命名空間：
+   - `System.IO` — 檔案系統存取
+   - `System.Net.Http` — HTTP 請求
+   - `System.Net.WebSockets` — WebSocket 連線
+   - `System.Net.Sockets` — 原始通訊端
+   - `Microsoft.CodeAnalysis` — 編譯器 API
+
+2. **可信組件白名單** — 以下組件的引用被允許：
+   - `Google.Protobuf`、`Newtonsoft.Json`、`MessagePack`
+   - `Serilog`、`Microsoft.Extensions.Logging.Abstractions`
+   - `Dapper`
+
+3. **禁止類型檢查** — 掃描插件中引用的危險類型
+
+4. **禁止成員檢查** — 掃描插件中呼叫的危險方法
+
+### 隔離載入
+
+- 使用自訂 `AssemblyLoadContext` 隔離載入每個插件
+- 插件之間的類型和組件不會互相干擾
+- 插件卸載時可以釋放相關資源
+
+### 工具權限約束
+
+- 插件通過 `ITool` 介面註冊的工具受相同的權限系統約束
+- 插件工具不能繞過 5 級權限鏈
+- 插件工具受 `[SiliconManagerOnly]` 標記約束

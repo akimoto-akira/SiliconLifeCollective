@@ -97,26 +97,30 @@ public sealed class ProjectTaskSystem
     /// </summary>
     /// <param name="title">The title of the task.</param>
     /// <param name="description">The description of the task.</param>
-    /// <param name="createdBy">The GUID of the being creating the task.</param>
+    /// <param name="assigneeGuid">The GUID of the assignee who created/assigned this task (single person).</param>
+    /// <param name="executorGuids">The list of executor GUIDs responsible for executing this task (cannot be empty).</param>
+    /// <param name="reviewerGuids">Optional list of reviewer GUIDs for reviewing this task.</param>
     /// <param name="priority">The priority of the task (lower values = higher priority).</param>
-    /// <param name="assigneeGuids">Optional list of assignee GUIDs.</param>
     /// <param name="dependencies">Optional list of task IDs that this task depends on.</param>
     /// <returns>The created task item.</returns>
-    public TaskItem Create(string title, string description, Guid createdBy, int priority = 100, List<Guid>? assigneeGuids = null, List<Guid>? dependencies = null)
+    public TaskItem Create(string title, string description, Guid assigneeGuid, List<Guid> executorGuids, List<Guid>? reviewerGuids = null, int priority = 100, List<Guid>? dependencies = null)
     {
+        if (executorGuids == null || executorGuids.Count == 0)
+        {
+            throw new ArgumentException("执行者列表不能为空", nameof(executorGuids));
+        }
+
         lock (_lock)
         {
             var task = new TaskItem(title, description)
             {
                 ProjectId = _projectId,
-                CreatedByGuid = createdBy,
+                AssigneeGuid = assigneeGuid,
+                ExecutorGuids = executorGuids.ToList(),
+                ReviewerGuids = reviewerGuids?.ToList() ?? new List<Guid>(),
+                CreatedByGuid = assigneeGuid,
                 Priority = priority
             };
-
-            if (assigneeGuids != null)
-            {
-                task.AssigneeGuids = assigneeGuids.ToList();
-            }
 
             if (dependencies != null)
             {
@@ -126,7 +130,8 @@ public sealed class ProjectTaskSystem
             _tasks.Add(task);
             Save();
 
-            _logger.Info(null, "Project task added: {0} ({1}), project={2}, priority={3}", title, task.Id, _projectId, priority);
+            _logger.Info(null, "Project task added: {0} ({1}), project={2}, priority={3}, executors={4}", 
+                title, task.Id, _projectId, priority, executorGuids.Count);
 
             return task;
         }
@@ -209,10 +214,10 @@ public sealed class ProjectTaskSystem
     }
 
     /// <summary>
-    /// Assigns a being to a task.
+    /// Assigns an executor to a task.
     /// </summary>
     /// <param name="taskId">The task ID.</param>
-    /// <param name="beingGuid">The being GUID to assign.</param>
+    /// <param name="beingGuid">The being GUID to assign as executor.</param>
     /// <returns>True if assigned successfully; otherwise, false.</returns>
     public bool Assign(Guid taskId, Guid beingGuid)
     {
@@ -222,11 +227,11 @@ public sealed class ProjectTaskSystem
             if (task == null)
                 return false;
 
-            if (!task.AssigneeGuids.Contains(beingGuid))
+            if (!task.ExecutorGuids.Contains(beingGuid))
             {
-                task.AssigneeGuids.Add(beingGuid);
+                task.ExecutorGuids.Add(beingGuid);
                 Save();
-                _logger.Info(null, "Assigned being {0} to project task {1}", beingGuid, taskId);
+                _logger.Info(null, "Assigned executor {0} to project task {1}", beingGuid, taskId);
             }
 
             return true;
@@ -234,10 +239,10 @@ public sealed class ProjectTaskSystem
     }
 
     /// <summary>
-    /// Removes an assignee from a task.
+    /// Removes an executor from a task.
     /// </summary>
     /// <param name="taskId">The task ID.</param>
-    /// <param name="beingGuid">The being GUID to remove.</param>
+    /// <param name="beingGuid">The being GUID to remove from executors.</param>
     /// <returns>True if removed successfully; otherwise, false.</returns>
     public bool RemoveAssignee(Guid taskId, Guid beingGuid)
     {
@@ -247,10 +252,10 @@ public sealed class ProjectTaskSystem
             if (task == null)
                 return false;
 
-            if (task.AssigneeGuids.Remove(beingGuid))
+            if (task.ExecutorGuids.Remove(beingGuid))
             {
                 Save();
-                _logger.Info(null, "Removed assignee {0} from project task {1}", beingGuid, taskId);
+                _logger.Info(null, "Removed executor {0} from project task {1}", beingGuid, taskId);
             }
 
             return true;

@@ -4,7 +4,7 @@
 
 Dieses Dokument beschreibt detailliert alle integrierten Tools der Silicon Life Collective-Plattform.
 
-[English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md)
+[English](../en/tools-reference.md) | **Deutsch** | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md)
 
 ## Übersicht
 
@@ -19,6 +19,7 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 - **Entwicklungstools** — Codeausführung, Protokollabfragen
 - **Dienstprogramme** — Systeminformationen, Token-Audit, Hilfedokumentation, Wissensnetzwerk
 - **Browser-Tools** — WebView-Browserautomatisierung
+- **Plugin-Tools** — Über das Plugin-System registrierte Drittanbieter-Tools
 
 ---
 
@@ -718,7 +719,16 @@ public class MyCustomTool : ITool
 
 ### Schritt 2: Zum Projekt hinzufügen
 
-Platzieren Sie die Tool-Datei im Verzeichnis `src/SiliconLife.Default/Tools/`. Der `ToolManager` wird es beim Start automatisch durch Reflektion entdecken und registrieren.
+Platzieren Sie die Tool-Datei im Verzeichnis `src/SiliconLife.Common/Tools/` (gemeinsame Tools) oder `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (versionsspezifische Tools). Der `ToolManager` wird sie beim Start automatisch durch Reflektion entdecken und registrieren.
+
+### Schritt 2a: Über Plugin registrieren
+
+Benutzerdefinierte Tools können auch über das Plugin-System registriert werden:
+
+1. `ITool`-Schnittstelle im Plugin-Projekt implementieren
+2. Plugin-DLL kompilieren und im Plugin-Verzeichnis ablegen
+3. `ToolManager.ScanAllPluginAssemblies()` scannt automatisch alle ITool-Implementierungen in geladenen Plugins
+4. Plugin-Tools unterliegen demselben Berechtigungssystem
 
 ### Schritt 3: (Optional) Als Curator-exklusiv markieren
 

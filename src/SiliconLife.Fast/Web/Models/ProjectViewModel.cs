@@ -30,4 +30,5 @@ public class ProjectItem
     public DateTime UpdatedAt { get; set; }
     public string Status { get; set; } = "active";
     public int BeingCount { get; set; }
+    public string WorkflowTemplateName { get; set; } = string.Empty;
 }

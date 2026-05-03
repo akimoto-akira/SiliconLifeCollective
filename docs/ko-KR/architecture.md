@@ -2,7 +2,7 @@
 
 > **버전: v0.1.0-alpha**
 
-[English](../en/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | **한국어** | [Deutsch](../de-DE/architecture.md) | [Čeština](../cs-CZ/architecture.md)
+[English](../en/architecture.md) | [Deutsch](../de-DE/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | **한국어** | [Čeština](../cs-CZ/architecture.md)
 
 ## 듀얼 버전 아키텍처
 
@@ -18,7 +18,7 @@
 ### SiliconLife.Fast (고성능 버전)
 - **포지셔닝**: 주력 프로덕션 버전
 - **실행 모드**: Windows 양식 애플리케이션 (시스템 트레이 지원)
-- **저장소**: 메모리 저장소 + 비동기 일괄 영속성 (WAL 로그)
+- **저장소**: SpeedyPack 메모리 저장소 + 비동기 일괄 영속화 (.spk 파일 형식)
 - **적용 시나리오**: 높은 동시성, 낮은 지연 시간, 대용량 데이터 시나리오
 - **성능 향상**: 저장소 읽기 지연 시간 1000배 감소, 쓰기 지연 시간 15000배 감소
 - **역할 설명**: 심층 최적화가 적용된 프로덕션급 구현으로, 시스템 트레이 백그라운드 실행, 극한 성능 최적화 등의 특성을 갖추고 있어 장기 운영 및 실제 프로덕션 환경의 최선의 선택입니다
@@ -114,6 +114,10 @@
 │  │  ┌──────────┐ ┌────▼─────┐ ┌──────────────────┐  │   │
 │  │  │ AI 클라이언트│  │실행기    │  │   도구 관리자      │  │   │
 │  │  └──────────┘ └──────────┘ └──────────────────┘  │   │
+│  │  ┌──────────┐ ┌──────────┐                        │   │
+│  │  │플러그인   │ │지식 네트워크│                       │   │
+│  │  │로더       │ │          │                        │   │
+│  │  └──────────┘ └──────────┘                        │   │
 │  └──────────────────────────────────────────────────┘   │
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐   │
@@ -544,4 +548,159 @@ data/
         ├── state.json
         ├── code.enc
         └── permission.enc
+```
+
+---
+
+## SpeedyPack 스토리지 엔진
+
+SiliconLife.Fast은 자체 개발한 SpeedyPack 스토리지 엔진(.spk 형식)을 사용하여 이전 LiteDB 방식을 대체하고 극한의 읽기/쓰기 성능을 구현합니다.
+
+### 아키텍처 설계
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    SpeedyPack                             │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
+│  │ DirectoryMap  │  │  EntryCache   │  │  WriteQueue   │  │
+│  │ (메모리 디렉토리│  │  (항목 캐시)  │  │ (비동기 쓰기  │  │
+│  │  매핑)        │  │              │  │  큐)          │  │
+│  └──────┬───────┘  └──────┬───────┘  └───────┬───────┘  │
+│         │                  │                   │          │
+│  ┌──────▼──────────────────▼───────────────────▼───────┐  │
+│  │              PackFileReader / PackFileWriter          │  │
+│  │              (팩 파일 리더/라이터)                      │  │
+│  └──────────────────────────┬──────────────────────────┘  │
+│                              │                             │
+│  ┌──────────────────────────▼──────────────────────────┐  │
+│  │              .spk 파일 (MessagePack + LZ4 압축)       │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐                      │
+│  │  FreeList     │  │ SpeedyPack   │                      │
+│  │ (여유 공간    │  │ AutoCompactor│                      │
+│  │  관리)        │  │ (자동 압축)   │                      │
+│  └──────────────┘  └──────────────┘                      │
+└──────────────────────────────────────────────────────────┘
+```
+
+### 핵심 컴포넌트
+
+| 컴포넌트 | 설명 |
+|------|------|
+| `SpeedyPack` | 핵심 클래스, DirectoryMap, EntryCache 및 WriteQueue를 조합하여 저지연 읽기/쓰기 제공 |
+| `DirectoryMap` | 메모리 디렉토리 매핑, 가상 경로에서 파일 항목으로의 매핑 관계 유지 |
+| `EntryCache` | 항목 캐시, TTL 기반 최근 액세스 항목 캐시 |
+| `WriteQueue` | 비동기 쓰기 큐, 쓰기 작업을 백그라운드 스레드에 큐잉 |
+| `FreeList` | 여유 공간 관리, .spk 파일의 재사용 가능한 공간 추적 |
+| `PackFileReader` | 팩 파일 리더, .spk 파일에서 데이터 읽기 |
+| `PackFileWriter` | 팩 파일 라이터, .spk 파일에 데이터 쓰기 |
+| `SpeedyPackAutoCompactor` | 자동 압축 타이머, 정기적으로 .spk 파일을 압축하여 여유 공간 회수 |
+| `SpeedyPackRegistry` | 프로세스 수준 싱글톤 관리자, 전체 애플리케이션이 동일한 SpeedyPack 인스턴스를 사용하도록 보장 |
+
+### 스토리지 어댑터
+
+SiliconLife.Fast은 다음 어댑터를 통해 SpeedyPack을 시스템 인터페이스에 통합합니다:
+
+| 어댑터 | 인터페이스 | 설명 |
+|--------|------|------|
+| `SpeedyStorage` | `IStorage` | 범용 키-값 스토리지 어댑터 |
+| `SpeedyTimeStorage` | `ITimeStorage` | 시간 인덱스 스토리지 어댑터 |
+| `SpeedyWorkNoteStorage` | `IWorkNoteStorage` | 작업 노트 스토리지 어댑터 |
+
+### 설정 옵션
+
+`SpeedyPackOptions`는 다음 설정을 제공합니다:
+
+| 옵션 | 타입 | 기본값 | 설명 |
+|------|------|--------|------|
+| `CacheTtl` | `TimeSpan` | 5분 | 캐시 항목의 생존 시간 |
+| `MaxCacheEntries` | `int` | 1000 | 최대 캐시 항목 수 |
+| `ReadOnly` | `bool` | false | 읽기 전용 모드 |
+
+### 트랜잭션 지원
+
+SpeedyPack은 `IPackTransaction` 인터페이스를 통해 원자적 쓰기 작업을 지원합니다:
+
+- `SpeedyTransaction`이 트랜잭션 메커니즘을 구현
+- 일괄 쓰기의 원자성 지원
+- 트랜잭션 커밋 시 모든 쓰기 작업이 전부 성공하거나 전부 롤백
+
+---
+
+## 플러그인 시스템
+
+SiliconLife은 플러그인 시스템을 통해 기능 확장을 지원하며, 서드파티 개발자가 플랫폼에 새로운 기능을 추가할 수 있습니다.
+
+### 핵심 인터페이스
+
+```csharp
+public interface IPlugin
+{
+    string Id { get; }
+    string GetName(Language language);
+    string Version { get; }
+    string GetDescription(Language language);
+    string GetAuthor(Language language);
+    void OnLoad();
+    void OnStart();
+    void OnStop();
+    void OnUnload();
+}
+```
+
+### 플러그인 로더
+
+`PluginLoader`는 지정된 디렉토리에서 플러그인 DLL을 로드하고 엄격한 보안 검사를 실행합니다:
+
+1. **디렉토리 스캔** — 플러그인 디렉토리의 모든 .dll 파일 스캔
+2. **보안 스캔** — 플러그인이 금지된 네임스페이스를 참조하는지 검사
+3. **격리 로딩** — 커스텀 `AssemblyLoadContext`를 사용하여 플러그인 격리 로딩
+4. **수명주기 관리** — 플러그인의 OnLoad, OnStart, OnStop, OnUnload 메서드 호출
+
+### 보안 샌드박스
+
+플러그인 로더는 다음 보안 검사를 실행합니다:
+
+| 검사 항목 | 설명 |
+|--------|------|
+| 금지된 네임스페이스 | System.IO, System.Net.Http, System.Net.WebSockets, System.Net.Sockets, Microsoft.CodeAnalysis |
+| 신뢰할 수 있는 어셈블리 허용 목록 | Google.Protobuf, Newtonsoft.Json, MessagePack, Serilog, Microsoft.Extensions.Logging.Abstractions, Dapper |
+| 금지된 타입 검사 | 플러그인에서 참조된 위험한 타입 스캔 |
+| 금지된 멤버 검사 | 플러그인에서 호출된 위험한 메서드 스캔 |
+
+### 도구 통합
+
+플러그인은 `ITool` 인터페이스를 구현하여 커스텀 도구를 등록할 수 있습니다:
+
+- `ToolManager.ScanAllPluginAssemblies()` 메서드가 로드된 모든 플러그인에서 ITool 구현을 스캔
+- 플러그인 도구는 도구 호출 루프에 자동 통합
+- 플러그인 도구는 동일한 권한 시스템의 제약을 받음
+
+### 플러그인 수명주기
+
+```
+로드 (OnLoad) → 시작 (OnStart) → 실행 중 → 중지 (OnStop) → 언로드 (OnUnload)
+```
+
+---
+
+## 실리콘 생명체 활동 상태
+
+실리콘 생명체는 다음 활동 상태를 가집니다:
+
+| 상태 | 설명 |
+|------|------|
+| `Idle` | 대기 상태, 클록 트리거 대기 |
+| `Running` | AI 요청 + 도구 호출 1라운드 실행 중 |
+| `WaitingPermission` | 사용자 권한 승인 대기 |
+| `Stopped` | 오류 또는 수동 중지로 인해 중지됨 |
+
+상태 전환:
+```
+Idle → Running → Idle (정상 완료)
+Running → WaitingPermission → Running (권한 승인 후 계속)
+Running → Stopped (오류 또는 수동 중지)
+Stopped → Idle (재시작)
 ```

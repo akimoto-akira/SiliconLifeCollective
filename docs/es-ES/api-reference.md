@@ -1,8 +1,8 @@
-﻿# Referencia de API
+# Referencia de API
 
 > **Versión: v0.1.0-alpha**
 
-[English](../en/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | **Español** | [Deutsch](../de-DE/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
+[English](../en/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | **Español** | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
 
 ## Endpoints de Web API
 
@@ -33,6 +33,8 @@ La mayoría de los endpoints requieren autenticación a través de cookie de ses
   ]
 }
 ```
+
+**Valores de estado**: `idle` | `running` | `waiting_permission` | `stopped`
 
 ### Crear Ser
 
@@ -101,15 +103,48 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ### Obtener Historial de Chat
 
-**GET** `/api/chat/history?beingId={id}&sessionId={sid}`
+**GET** `/api/chat/{sessionId}/history`
+
+**Respuesta**:
+```json
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello",
+      "timestamp": "2026-04-20T10:30:00Z"
+    },
+    {
+      "role": "assistant",
+      "content": "Hi there!",
+      "timestamp": "2026-04-20T10:30:05Z"
+    }
+  ]
+}
+```
 
 ---
 
-## Sistema de Configuración
+## Configuración
 
 ### Obtener Configuración
 
 **GET** `/api/config`
+
+**Respuesta**:
+```json
+{
+  "aiClients": {
+    "Ollama": {
+      "baseUrl": "http://localhost:11434",
+      "model": "qwen2.5:7b"
+    }
+  },
+  "storage": {
+    "basePath": "./data"
+  }
+}
+```
 
 ### Actualizar Configuración
 
@@ -118,8 +153,12 @@ data: {"type": "complete", "sessionId": "uuid"}
 **Solicitud**:
 ```json
 {
-  "key": "AIClients.Ollama.Model",
-  "value": "qwen2.5:7b"
+  "aiClients": {
+    "Ollama": {
+      "baseUrl": "http://localhost:11434",
+      "model": "qwen2.5:14b"
+    }
+  }
 }
 ```
 
@@ -129,9 +168,23 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ### Obtener Permisos
 
-**GET** `/api/permissions?userId={uid}`
+**GET** `/api/permissions`
 
-### Añadir Regla de Permiso
+**Respuesta**:
+```json
+{
+  "rules": [
+    {
+      "userId": "user-uuid",
+      "resource": "disk:read",
+      "allowed": true,
+      "expiresAt": "2026-04-21T00:00:00Z"
+    }
+  ]
+}
+```
+
+### Conceder Permiso
 
 **POST** `/api/permissions`
 
@@ -139,23 +192,39 @@ data: {"type": "complete", "sessionId": "uuid"}
 ```json
 {
   "userId": "user-uuid",
-  "resource": "disk:read",
+  "resource": "disk:write",
   "allowed": true,
   "duration": 3600
 }
 ```
 
-### Eliminar Regla de Permiso
+### Revocar Permiso
 
-**DELETE** `/api/permissions/{rule-id}`
+**DELETE** `/api/permissions/{id}`
+
+### Verificar Permiso
+
+**POST** `/api/permissions/check`
+
+**Solicitud**:
+```json
+{
+  "userId": "user-uuid",
+  "resource": "network:http"
+}
+```
+
+**Respuesta**:
+```json
+{
+  "allowed": true,
+  "reason": "Granted by curator"
+}
+```
 
 ---
 
-## Sistema de Tareas
-
-### Obtener Tareas
-
-**GET** `/api/tasks?beingId={id}`
+## Sistema de Tareas y Temporizadores
 
 ### Crear Tarea
 
@@ -167,21 +236,24 @@ data: {"type": "complete", "sessionId": "uuid"}
   "beingId": "being-uuid",
   "description": "Review code",
   "priority": 5,
-  "dueDate": "2026-04-21T00:00:00Z"
+  "dueDate": "2026-04-21T12:00:00Z"
 }
 ```
 
-### Actualizar Tarea
+### Obtener Tareas
 
-**PUT** `/api/tasks/{task-id}`
+**GET** `/api/tasks?beingId={id}&status=pending`
 
----
+### Actualizar Estado de Tarea
 
-## Sistema de Temporizadores
+**PATCH** `/api/tasks/{id}`
 
-### Obtener Temporizadores
-
-**GET** `/api/timers?beingId={id}`
+**Solicitud**:
+```json
+{
+  "status": "completed"
+}
+```
 
 ### Crear Temporizador
 
@@ -197,181 +269,231 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
----
+### Eliminar Temporizador
 
-## Sistema de Memoria
-
-### Obtener Memoria
-
-**GET** `/api/memory?beingId={id}&date={date}`
-
-### Buscar Memoria
-
-**GET** `/api/memory/search?beingId={id}&query={q}`
+**DELETE** `/api/timers/{id}`
 
 ---
 
-## Sistema de Conocimiento
+## Auditoría y Registros
 
-### Añadir Conocimiento
+### Obtener Uso de Tokens
 
-**POST** `/api/knowledge`
+**GET** `/api/audit/tokens?startDate={date}&endDate={date}`
+
+**Respuesta**:
+```json
+{
+  "summary": {
+    "totalTokens": 150000,
+    "promptTokens": 100000,
+    "completionTokens": 50000,
+    "totalCost": 0.15
+  },
+  "byModel": {
+    "qwen2.5:7b": {
+      "tokens": 100000,
+      "cost": 0.10
+    }
+  }
+}
+```
+
+### Obtener Registros
+
+**GET** `/api/logs?level=error&limit=100`
+
+**Respuesta**:
+```json
+{
+  "logs": [
+    {
+      "timestamp": "2026-04-20T10:30:00Z",
+      "level": "error",
+      "message": "Failed to connect to AI service",
+      "source": "OllamaClient"
+    }
+  ]
+}
+```
+
+---
+
+## API de Almacenamiento
+
+### Leer Valor
+
+**GET** `/api/storage?key={key}`
+
+**Respuesta**:
+```json
+{
+  "key": "being:uuid:memory",
+  "value": "{...}",
+  "timestamp": "2026-04-20T10:30:00Z"
+}
+```
+
+### Escribir Valor
+
+**POST** `/api/storage`
 
 **Solicitud**:
 ```json
 {
-  "subject": "Python",
-  "relation": "es_un",
-  "object": "lenguaje_de_programación"
+  "key": "being:uuid:memory",
+  "value": "{...}"
 }
 ```
 
-### Consultar Conocimiento
+### Consultar por Rango de Tiempo
 
-**GET** `/api/knowledge?subject={s}`
+**GET** `/api/storage/time?start={start}&end={end}&prefix={prefix}`
 
-### Obtener Ruta
-
-**GET** `/api/knowledge/path?from={subject1}&to={subject2}`
-
----
-
-## Sistema de Registros
-
-### Obtener Registros
-
-**GET** `/api/logs?level={level}&from={date}&to={date}`
-
----
-
-## Sistema de Auditoría
-
-### Obtener Uso de Tokens
-
-**GET** `/api/audit/tokens?beingId={id}&from={date}&to={date}`
-
-### Obtener Resumen
-
-**GET** `/api/audit/summary?beingId={id}`
+**Respuesta**:
+```json
+{
+  "entries": [
+    {
+      "key": "being:uuid:chat:2026-04-20",
+      "value": "{...}",
+      "timestamp": "2026-04-20T10:30:00Z"
+    }
+  ]
+}
+```
 
 ---
 
-## Panel de Control
+## Información del Sistema
 
-### Obtener Métricas del Sistema
+### Obtener Página Acerca de
+
+**GET** `/about`
+
+Devuelve la página acerca de, incluyendo información del sistema y la lista de plugins cargados.
+
+**Datos de Lista de Plugins**:
+```json
+{
+  "plugins": {
+    "plugin-id": {
+      "name": "My Plugin",
+      "version": "1.0.0",
+      "description": "Plugin description",
+      "author": "Author Name"
+    }
+  }
+}
+```
+
+### Solicitud de Permiso
+
+**GET** `/permission/request?userId={id}&type={type}&resource={resource}`
+
+Muestra la página de solicitud de permiso, permitiendo al usuario aprobar o denegar la solicitud de permiso del Ser Silicona.
+
+**Parámetros de Consulta**:
+
+| Parámetro | Tipo | Descripción |
+|------|------|------|
+| `userId` | `Guid` | ID del Ser Silicona que solicita el permiso |
+| `type` | `string` | Tipo de permiso |
+| `resource` | `string` | Ruta del recurso solicitado |
+| `allowCode` | `string` | Código de identificación de la operación permitida |
+| `denyCode` | `string` | Código de identificación de la operación denegada |
+
+**Verificar Solicitud de Permiso Pendiente**:
+
+**GET** `/permission/check?userId={id}`
+
+**Respuesta**:
+```json
+{
+  "pending": true
+}
+```
+
+**Responder Solicitud de Permiso**:
+
+**GET** `/permission/respond?userId={id}&allowed={bool}&addToCache={bool}&cacheDuration={hours}`
+
+**Parámetros de Consulta**:
+
+| Parámetro | Tipo | Descripción |
+|------|------|------|
+| `userId` | `Guid` | ID del Ser Silicona |
+| `allowed` | `bool` | Si se permite |
+| `addToCache` | `bool` | Si se almacena en caché la decisión |
+| `cacheDuration` | `double` | Duración de la caché (horas) |
+
+**Respuesta**:
+```json
+{
+  "success": true
+}
+```
+
+### Obtener Datos del Panel de Control
 
 **GET** `/api/dashboard`
 
 **Respuesta**:
 ```json
 {
-  "cpu": 45.2,
-  "memory": 1024,
-  "uptime": 86400,
   "beings": {
     "total": 5,
-    "running": 3
+    "running": 3,
+    "stopped": 2
+  },
+  "performance": {
+    "cpu": 45.2,
+    "memory": 1024,
+    "uptime": 86400
+  },
+  "aiUsage": {
+    "todayTokens": 50000,
+    "todayCost": 0.05
   }
 }
 ```
 
-### Eventos SSE
+### Obtener Estado del Sistema
 
-**GET** `/api/dashboard/events`
+**GET** `/api/status`
 
----
-
-## Sistema de Archivos
-
-### Listar Archivos
-
-**GET** `/api/files?path={path}`
-
-### Leer Archivo
-
-**GET** `/api/files/read?path={path}`
-
-### Escribir Archivo
-
-**POST** `/api/files/write`
-
-**Solicitud**:
+**Respuesta**:
 ```json
 {
-  "path": "/path/to/file.txt",
-  "content": "File content"
+  "version": "1.0.0",
+  "runtime": ".NET 9.0",
+  "uptime": 86400,
+  "health": "healthy"
 }
 ```
 
 ---
 
-## Sistema de Proyectos
+## Respuestas de Error
 
-### Obtener Proyectos
+Todos los endpoints devuelven respuestas de error estandarizadas:
 
-**GET** `/api/projects`
-
-### Crear Proyecto
-
-**POST** `/api/projects`
-
-**Solicitud**:
 ```json
 {
-  "name": "My Project",
-  "description": "Project description"
+  "error": {
+    "code": "PERMISSION_DENIED",
+    "message": "You don't have permission to access this resource",
+    "details": "Required: disk:write, Current: disk:read"
+  }
 }
 ```
 
----
+### Códigos de Error Comunes
 
-## Sistema de Notas de Trabajo
-
-### Obtener Notas
-
-**GET** `/api/worknotes?beingId={id}`
-
-### Crear Nota
-
-**POST** `/api/worknotes`
-
-**Solicitud**:
-```json
-{
-  "beingId": "being-uuid",
-  "title": "Nota title",
-  "content": "# Content\n\nNote content...",
-  "keywords": ["keyword1", "keyword2"]
-}
-```
-
-### Buscar Notas
-
-**GET** `/api/worknotes/search?beingId={id}&query={q}`
-
-### Generar Índice
-
-**GET** `/api/worknotes/index?beingId={id}`
-
----
-
-## Códigos de Error
-
-| Código | Descripción |
-|--------|-------------|
-| 200 | Éxito |
-| 201 | Creado |
-| 400 | Solicitud incorrecta |
-| 401 | No autorizado |
-| 403 | Prohibido |
-| 404 | No encontrado |
-| 500 | Error interno del servidor |
-
----
-
-## Próximos Pasos
-
-- 📚 Leer la [Guía de Arquitectura](architecture.md)
-- 🛠️ Consultar la [Guía de Desarrollo](development-guide.md)
-- 🔧 Ver la [Referencia de Herramientas](tools-reference.md)
-- 🚀 Comenzar con la [Guía de Inicio Rápido](getting-started.md)
+| Código | Estado HTTP | Descripción |
+|------|-------------|-------------|
+| `PERMISSION_DENIED` | 403 | Permisos insuficientes |
+| `NOT_FOUND` | 404 | Recurso no encontrado |
+| `VALIDATION_ERROR` | 400 | Parámetros de solicitud inválidos |
+| `INTERNAL_ERROR` | 500 | Error interno del servidor |
+| `SERVICE_UNAVAILABLE` | 503 | Servicio de IA no disponible |

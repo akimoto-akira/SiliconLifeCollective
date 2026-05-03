@@ -2,7 +2,7 @@
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Deutsch](../de-DE/development-guide.md) | [Čeština](../cs-CZ/development-guide.md)
+**English** | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Deutsch](../de-DE/development-guide.md) | [Čeština](../cs-CZ/development-guide.md)
 
 ## Architecture Overview
 
@@ -12,12 +12,14 @@ SiliconLifeCollective follows a **body-brain architecture** with strict separati
 
 ```
 SiliconLifeCollective/
-鈹溾攢鈹€ src/
-鈹?  鈹溾攢鈹€ SiliconLife.Core/      # Interfaces, abstract classes, common infrastructure
-鈹?  鈹溾攢鈹€ SiliconLife.Common/    # Shared implementations (used by both versions)
-鈹?  鈹溾攢鈹€ SiliconLife.Default/   # Default implementation, entry points (architecture feasibility verification)
-鈹?  鈹斺攢鈹€ SiliconLife.Fast/      # High-performance implementation, entry points (main production version)
-鈹斺攢鈹€ docs/                      # Multi-language documentation
+├── src/
+│   ├── SiliconLife.Core/            # Interfaces, abstract classes, common infrastructure
+│   ├── SiliconLife.Common/          # Shared implementations (used by both versions)
+│   ├── SiliconLife.Default/         # Default implementation, entry points (architecture feasibility verification)
+│   ├── SiliconLife.Fast/            # High-performance implementation, entry points (main production version)
+│   ├── SiliconLife.Speedy/          # SpeedyPack high-performance storage engine
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack management tool (WPF)
+└── docs/                            # Multi-language documentation
 ```
 
 **Dependency direction**:
@@ -27,7 +29,7 @@ SiliconLifeCollective/
 
 **Version Role Description**:
 - **SiliconLife.Default**: Default implementation, primarily used for architecture feasibility verification. Provides a simple and reliable file system storage implementation, suitable for development debugging and architecture verification.
-- **SiliconLife.Fast**: Main production version. Based on the architecture verified by Default, adopts in-memory storage + asynchronous persistence, providing extreme performance optimization, the first choice for long-term operation and actual production environments.
+- **SiliconLife.Fast**: Main production version. Based on the architecture verified by Default, adopts SpeedyPack in-memory storage + asynchronous persistence, providing extreme performance optimization, the first choice for long-term operation and actual production environments.
 
 ## Core Concepts
 
@@ -177,6 +179,50 @@ public class DatabaseStorage : IStorage, ITimeStorage
     }
 }
 ```
+
+### Adding a New Plugin
+
+1. Create a class library project implementing the `IPlugin` interface:
+
+```csharp
+using SiliconLife.Collective;
+using SiliconLife.Collective.Localization;
+using SiliconLife.Collective.Tools;
+
+public class MyPlugin : IPlugin
+{
+    public string Id => "my-plugin";
+    public string Version => "1.0.0";
+    
+    public string GetName(Language language) => "My Plugin";
+    public string GetDescription(Language language) => "A custom plugin";
+    public string GetAuthor(Language language) => "Author Name";
+    
+    public void OnLoad() { }
+    public void OnStart() { }
+    public void OnStop() { }
+    public void OnUnload() { }
+}
+```
+
+2. (Optional) Implement the `ITool` interface in the plugin to register custom tools:
+
+```csharp
+public class MyPluginTool : ITool
+{
+    public string Name => "my_plugin_tool";
+    public string Description => "A tool provided by my plugin";
+    
+    public async Task<ToolResult> ExecuteAsync(ToolCall call)
+    {
+        return new ToolResult { Success = true, Output = "Done" };
+    }
+}
+```
+
+3. Place the compiled DLL in the plugins directory, `PluginLoader` will automatically load it.
+
+> **Security Restrictions**: Plugins cannot reference `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` and other namespaces. Plugins are loaded in isolation via `AssemblyLoadContext`.
 
 ### Adding a New Skin
 
@@ -373,9 +419,10 @@ Test complete flows:
 
 ### Storage System
 
-- Storage system prioritizes **functionality over performance**
-- Default uses file-based JSON storage
-- Time-indexed queries use directory structure
+- Default version uses file-based JSON storage
+- Fast version uses SpeedyPack in-memory storage engine (.spk format)
+- SpeedyPack uses in-memory directory mapping + entry cache + asynchronous write queue
+- Time-indexed queries use `ITimeStorage` interface
 
 ### Main Loop Scheduler
 

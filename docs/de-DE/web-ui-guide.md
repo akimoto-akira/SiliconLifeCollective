@@ -2,7 +2,7 @@
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/web-ui-guide.md) | [Deutsch](../de-DE/web-ui-guide.md) | [中文](../zh-CN/web-ui-guide.md) | [繁體中文](../zh-HK/web-ui-guide.md) | [Español](../es-ES/web-ui-guide.md) | [日本語](../ja-JP/web-ui-guide.md) | [한국어](../ko-KR/web-ui-guide.md) | [Čeština](../cs-CZ/web-ui-guide.md)
+[English](../en/web-ui-guide.md) | **Deutsch** | [中文](../zh-CN/web-ui-guide.md) | [繁體中文](../zh-HK/web-ui-guide.md) | [Español](../es-ES/web-ui-guide.md) | [日本語](../ja-JP/web-ui-guide.md) | [한국어](../ko-KR/web-ui-guide.md) | [Čeština](../cs-CZ/web-ui-guide.md)
 
 ## Übersicht
 
@@ -127,9 +127,8 @@ KI-Backend konfigurieren:
 
 ### Storage-Einstellungen
 
-- Basispfad
-- Zeitindex
-- Bereinigungsstrategie
+- Default-Version: Basispfad, Zeitindex, Bereinigungsstrategie
+- Fast-Version: SpeedyPack-Speicher-Engine-Konfiguration, .spk-Dateiverwaltung, Auto-Komprimierungseinstellungen
 
 ### Lokalisierung
 
@@ -149,6 +148,9 @@ Zwischen 21 Sprachvarianten wechseln:
 2. **Chat** - Konversationszentriertes Design
 3. **Creative** - Kreativer und künstlerischer Stil
 4. **Dev** - Entwicklerorientiertes Layout
+5. **HighContrast** - Hoher Kontrast (Fast-Version)
+6. **Minimal** - Minimalistischer Stil (Fast-Version)
+7. **Light** - Helles Thema (Fast-Version)
 
 ### Skin wechseln
 

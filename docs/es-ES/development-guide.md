@@ -13,11 +13,13 @@ SiliconLifeCollective sigue la **arquitectura cuerpo-cerebro**, con estricta sep
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/      # Interfaces, clases abstractas, infraestructura común
-│   ├── SiliconLife.Common/    # Implementaciones compartidas (usadas por ambas versiones)
-│   ├── SiliconLife.Default/   # Implementación predeterminada, punto de entrada (verificación de viabilidad de arquitectura)
-│   └── SiliconLife.Fast/      # Implementación de alto rendimiento, punto de entrada (versión de producción principal)
-└── docs/                      # Documentación multilingüe
+│   ├── SiliconLife.Core/            # Interfaces, clases abstractas, infraestructura común
+│   ├── SiliconLife.Common/          # Implementaciones compartidas (usadas por ambas versiones)
+│   ├── SiliconLife.Default/         # Implementación predeterminada, punto de entrada (verificación de viabilidad de arquitectura)
+│   ├── SiliconLife.Fast/            # Implementación de alto rendimiento, punto de entrada (versión de producción principal)
+│   ├── SiliconLife.Speedy/          # Motor de almacenamiento de alto rendimiento SpeedyPack
+│   └── SiliconLife.Speedy.Manager/  # Herramienta de gestión SpeedyPack (WPF)
+└── docs/                            # Documentación multilingüe
 ```
 
 **Dirección de dependencia**:
@@ -27,7 +29,7 @@ SiliconLifeCollective/
 
 **Descripción de Roles de Versión**:
 - **SiliconLife.Default**: Implementación predeterminada, utilizada principalmente para verificación de viabilidad de arquitectura. Proporciona una implementación de almacenamiento en sistema de archivos simple y confiable, adecuada para depuración de desarrollo y verificación de arquitectura.
-- **SiliconLife.Fast**: Versión de producción principal. Basada en la arquitectura verificada en Default, adopta almacenamiento en memoria + persistencia asíncrona para proporcionar optimización extrema de rendimiento. La mejor opción para operaciones a largo plazo y entornos de producción reales.
+- **SiliconLife.Fast**: Versión de producción principal. Basada en la arquitectura verificada en Default, adopta almacenamiento en memoria SpeedyPack + persistencia asíncrona (formato de archivo .spk) para proporcionar optimización extrema de rendimiento. La mejor opción para operaciones a largo plazo y entornos de producción reales.
 
 ## Conceptos Centrales
 
@@ -114,26 +116,113 @@ public class AdminTool : ITool { ... }
 ```csharp
 public class MyAIClient : IAIClient
 {
-    public async Task<ChatResponse> ChatAsync(ChatRequest request)
+    public string Name => "my_ai";
+    
+    public async Task<AIResponse> ChatAsync(AIRequest request)
     {
-        // Implementar lógica de comunicación con IA
+        // Llamar a tu API de IA
+        var response = await CallMyAPI(request);
+        
+        return new AIResponse
+        {
+            Content = response.Message,
+            ToolCalls = response.ToolCalls,
+            Usage = response.Usage
+        };
+    }
+    
+    public async IAsyncEnumerable<string> StreamChatAsync(AIRequest request)
+    {
+        // Implementar streaming
+        await foreach (var chunk in StreamFromAPI(request))
+        {
+            yield return chunk;
+        }
     }
 }
 ```
 
-2. Crear fábrica correspondiente:
+2. Crear fábrica:
 
 ```csharp
 public class MyAIClientFactory : IAIClientFactory
 {
-    public IAIClient CreateClient(Dictionary<string, object> config)
+    public IAIClient CreateClient(AIClientConfig config)
     {
         return new MyAIClient(config);
     }
 }
 ```
 
-3. Registrar fábrica en la configuración
+3. La fábrica se descubre y registra automáticamente.
+
+### Añadir Nuevo Backend de Almacenamiento
+
+1. Implementar `IStorage` e `ITimeStorage` en `src/SiliconLife.Default/Storage/`:
+
+```csharp
+public class DatabaseStorage : IStorage, ITimeStorage
+{
+    public async Task<string> ReadAsync(string key)
+    {
+        // Leer de tu base de datos
+    }
+    
+    public async Task WriteAsync(string key, string value)
+    {
+        // Escribir en tu base de datos
+    }
+    
+    public async Task<IEnumerable<string>> ReadByTimeAsync(DateTime start, DateTime end)
+    {
+        // Consulta indexada por tiempo
+    }
+}
+```
+
+### Añadir Nuevo Plugin
+
+1. Crear un proyecto de biblioteca de clases que implemente la interfaz `IPlugin`:
+
+```csharp
+using SiliconLife.Collective;
+using SiliconLife.Collective.Localization;
+using SiliconLife.Collective.Tools;
+
+public class MyPlugin : IPlugin
+{
+    public string Id => "my-plugin";
+    public string Version => "1.0.0";
+    
+    public string GetName(Language language) => "My Plugin";
+    public string GetDescription(Language language) => "A custom plugin";
+    public string GetAuthor(Language language) => "Author Name";
+    
+    public void OnLoad() { }
+    public void OnStart() { }
+    public void OnStop() { }
+    public void OnUnload() { }
+}
+```
+
+2. (Opcional) Implementar la interfaz `ITool` en el plugin para registrar herramientas personalizadas:
+
+```csharp
+public class MyPluginTool : ITool
+{
+    public string Name => "my_plugin_tool";
+    public string Description => "A tool provided by my plugin";
+    
+    public async Task<ToolResult> ExecuteAsync(ToolCall call)
+    {
+        return new ToolResult { Success = true, Output = "Done" };
+    }
+}
+```
+
+3. Colocar la DLL compilada en el directorio de plugins, `PluginLoader` la cargará automáticamente.
+
+> **Restricciones de seguridad**: Los plugins no pueden referenciar espacios de nombres como `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`. Los plugins se cargan de forma aislada a través de `AssemblyLoadContext`.
 
 ### Añadir Nuevo Calendario
 
@@ -184,21 +273,31 @@ public class MyCustomSkin : ISkin
 
 - **Clases**: PascalCase, con prefijo funcional (ej. `DefaultSiliconBeing`)
 - **Interfaces**: Prefijo I (ej. `IAIClient`, `ITool`)
-- **Métodos**: PascalCase (ej. `ExecuteAsync`, `GetConfig`)
-- **Propiedades**: PascalCase (ej. `Name`, `Description`)
-- **Parámetros**: camelCase (ej. `config`, `requestId`)
+- **Implementaciones**: Terminan con el nombre de la interfaz (ej. `OllamaClient` implementa `IAIClient`)
+- **Herramientas**: Terminan con `Tool` (ej. `CalendarTool`, `ChatTool`)
+- **Modelos de Vista**: Terminan con `ViewModel` (ej. `BeingViewModel`)
 
-### Estructura de Archivos
+### Organización del Código
 
 ```
-NombreDeClase.cs
-├── Licencia (encabezado Apache 2.0)
-├── Usings
-├── Namespace
-│   └── Clase
-│       ├── Propiedades
-│       ├── Constructor
-│       └── Métodos
+SiliconLife.Default/
+├── AI/                    # Implementaciones de clientes de IA
+├── Calendar/              # Implementaciones de calendario
+├── Config/                # Datos de configuración predeterminados
+├── Executors/             # Implementaciones de ejecutores
+├── IM/                    # Implementaciones de proveedores de mensajería instantánea
+├── Localization/          # Implementaciones de localización
+├── Logging/               # Implementaciones de proveedores de registro
+├── Runtime/               # Componentes de tiempo de ejecución
+├── Security/              # Implementaciones de seguridad
+├── SiliconBeing/          # Implementación predeterminada de Ser Silicona
+├── Storage/               # Implementaciones de almacenamiento
+├── Tools/                 # Herramientas integradas
+└── Web/                   # Implementación de Web UI
+    ├── Controllers/       # Controladores de rutas
+    ├── Models/            # Modelos de vista
+    ├── Views/             # Vistas HTML
+    └── Skins/             # Temas de piel
 ```
 
 ### Comentarios
@@ -283,19 +382,20 @@ var state = being.GetState();
 Console.WriteLine($"Estado: {state.Status}");
 ```
 
-## Rendimiento
+## Consideraciones de Rendimiento
 
-### Optimizaciones
+### Sistema de Almacenamiento
 
-1. **Caché de Frecuencia de Usuario**: Reduce verificaciones de permisos repetitivas
-2. **Indexación por Tiempo**: Consultas eficientes por rango de tiempo
-3. **Hilos de Ejecutor Independientes**: Aislamiento y paralelismo
+- La versión Default usa almacenamiento JSON basado en archivos
+- La versión Fast usa el motor de almacenamiento en memoria SpeedyPack (formato .spk)
+- SpeedyPack adopta mapeo de directorios en memoria + caché de entradas + cola de escritura asíncrona
+- Las consultas indexadas por tiempo usan la interfaz `ITimeStorage`
 
-### Monitoreo
+### Programador del Bucle Principal
 
-- Monitorear tiempos de ejecución de reloj
-- Rastrear consumo de tokens
-- Verificar colas de ejecutor
+- Programación justa por intervalo de tiempo basada en reloj
+- Temporizador watchdog para detectar operaciones bloqueadas
+- Cortacircuitos para prevenir fallos en cascada
 
 ## Guía de Contribución
 

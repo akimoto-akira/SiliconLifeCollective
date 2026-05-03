@@ -2,7 +2,7 @@
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
+**English** | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
 
 ## Dual-Version Roadmap
 
@@ -13,13 +13,15 @@
 
 ### SiliconLife.Fast (High-Performance Version)
 - **Positioning**: Main production version
-- **Current Status**: Basic architecture porting is completed, ongoing optimization in progress
+- **Current Status**: Basic architecture porting is completed, SpeedyPack storage engine and plugin system are implemented
 - **Role Description**: Based on the architecture verified by the Default version, performs deep performance optimization and production feature enhancements, the first choice for actual deployment
 
 **Fast Version Development Plan**:
 - ✅ Phase 1: Basic project structure and configuration system porting
 - ✅ Phase 2: Web UI and controller porting
-- ✅ Phase 3: Storage system optimization (in-memory storage + asynchronous persistence)
+- ✅ Phase 3: Storage system optimization (SpeedyPack in-memory storage + asynchronous persistence)
+- ✅ Phase 3.5: SpeedyPack management tool (SiliconLife.Speedy.Manager WPF application)
+- ✅ Phase 3.6: Plugin system (IPlugin interface, security sandbox, AssemblyLoadContext isolation)
 - 🚧 Phase 4: System tray and forms application development
 - 📋 Phase 5: Performance optimization (connection pool, object pool, lock-free concurrency)
 - 📋 Phase 6: Kestrel web server replacement
@@ -304,5 +306,5 @@ Each phase ends with a **working, observable** system. No phase produces "a bunc
 | # | Module | Description |
 |---|--------|-------------|
 | 12.1 | Knowledge Network | Shared knowledge graph using triple structure (subject-predicate-object) |
-| 12.2 | Plugin System | External plugin loading with security checks and sandboxing |
+| 12.2 | ~~Plugin System~~ ✅ Completed | External plugin loading with security checks and sandboxing (IPlugin interface, PluginLoader, AssemblyLoadContext isolation) |
 | 12.3 | Skills Ecosystem | Reusable skills marketplace for being capabilities |

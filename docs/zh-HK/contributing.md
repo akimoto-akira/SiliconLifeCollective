@@ -1,4 +1,4 @@
-﻿# 貢獻指南
+# 貢獻指南
 
 > **版本：v0.1.0-alpha**
 
@@ -17,7 +17,7 @@
 
 ### SiliconLife.Fast（高效能版本）
 - **技術棧**：.NET 9 Windows 視窗應用
-- **貢献方向**：效能優化、記憶體儲存、系統匣、無鎖並發
+- **貢献方向**：效能優化、SpeedyPack 儲存、系統匣、無鎖並發
 - **適合人群**：有 Windows 開發經驗、對效能優化感興趣的開發者
 
 > **重要提示**：兩個版本共享 SiliconLife.Core 和 SiliconLife.Common 專案，對核心介面的改進會同時影響兩個版本。
@@ -71,6 +71,9 @@ git checkout -b feature/your-feature-name
 - **共享實現** → 修改 `SiliconLife.Common`
 - **Default 版本特定** → 修改 `SiliconLife.Default`
 - **Fast 版本特定** → 修改 `SiliconLife.Fast`
+- **儲存引擎** → 修改 `SiliconLife.Speedy`
+- **儲存管理工具** → 修改 `SiliconLife.Speedy.Manager`
+- **插件開發** → 修改 `SiliconLife.Core/Plugins`
 - **多語言文檔** → 修改 `docs/` 目錄
 
 ---

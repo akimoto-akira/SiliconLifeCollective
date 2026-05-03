@@ -1,4 +1,4 @@
-﻿# Diseño de Seguridad
+# Diseño de Seguridad
 
 > **Versión: v0.1.0-alpha**
 
@@ -9,7 +9,7 @@
 La seguridad de Silicon Life Collective se basa en un modelo de **defensa en profundidad**. Principio central: **todas las operaciones de E/S deben pasar por ejecutores**, y los ejecutores refuerzan verificaciones de permisos antes de la ejecución.
 
 ```
-Invocación de herramienta → Ejecutor → Gestor de permisos → caché de alta denegación → caché de alta允许 → callback → preguntar al usuario
+Invocación de herramienta → Ejecutor → Gestor de permisos → caché de alta denegación → caché de alta permitida → callback → preguntar al usuario
 ```
 
 ---
@@ -32,9 +32,9 @@ Cada verificación de permisos devuelve uno de tres resultados:
 
 | Resultado | Comportamiento |
 |--------|----------|
-| [Deutsch](../de-DE/security.md) | **Allowed (Permitido)** | La operación procede inmediatamente |
-| [Deutsch](../de-DE/security.md) | **Denied (Denegado)** | La operación se bloquea, se registra en auditoría |
-| [Deutsch](../de-DE/security.md) | **AskUser (Preguntar al usuario)** | La operación se pausa, requiere confirmación del usuario |
+| **Allowed (Permitido)** | La operación procede inmediatamente |
+| **Denied (Denegado)** | La operación se bloquea, se registra en auditoría |
+| **AskUser (Preguntar al usuario)** | La operación se pausa, requiere confirmación del usuario |
 
 ### Rol Especial: Curador Silicona
 
@@ -168,8 +168,8 @@ Para reducir prompts de permisos repetitivos, el sistema mantiene dos cachés **
 
 | Caché | Uso |
 |-------|---------|
-| [Deutsch](../de-DE/security.md) | **HighAllow (Alta Permitida)** | Recursos frecuentemente permitidos por el usuario |
-| [Deutsch](../de-DE/security.md) | **HighDeny (Alta Denegación)** | Recursos frecuentemente denegados por el usuario |
+| **HighAllow (Alta Permitida)** | Recursos frecuentemente permitidos por el usuario |
+| **HighDeny (Alta Denegación)** | Recursos frecuentemente denegados por el usuario |
 
 ### Cómo Funciona
 
@@ -308,3 +308,41 @@ Los registros persisten al almacenamiento y son visibles a través de la Web UI 
 - **Acceso solo para curador** — `TokenAuditTool` (marcado con `[SiliconManagerOnly]`) permite al curador consultar y resumir uso de tokens.
 - **Panel web** — `AuditController` proporciona panel basado en navegador con gráficos de tendencias y exportación de datos.
 - **Almacenamiento persistente** — Registros almacenados a través de `ITimeStorage` para consultas de series de tiempo y análisis a largo plazo.
+
+---
+
+## Seguridad de Plugins
+
+El sistema de plugins introduce riesgos de seguridad por ejecución de código de terceros, mitigados a través de los siguientes mecanismos:
+
+### Sandbox de Seguridad
+
+`PluginLoader` ejecuta un escaneo de seguridad estricto al cargar plugins:
+
+1. **Verificación de espacios de nombres prohibidos** — Los plugins no pueden referenciar los siguientes espacios de nombres:
+   - `System.IO` — Acceso al sistema de archivos
+   - `System.Net.Http` — Solicitudes HTTP
+   - `System.Net.WebSockets` — Conexiones WebSocket
+   - `System.Net.Sockets` — Sockets sin procesar
+   - `Microsoft.CodeAnalysis` — API del compilador
+
+2. **Lista blanca de ensamblados de confianza** — Se permiten referencias a los siguientes ensamblados:
+   - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
+   - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
+   - `Dapper`
+
+3. **Verificación de tipos prohibidos** — Escaneo de tipos peligrosos referenciados en el plugin
+
+4. **Verificación de miembros prohibidos** — Escaneo de métodos peligrosos invocados en el plugin
+
+### Carga Aislada
+
+- Cada plugin se carga de forma aislada usando un `AssemblyLoadContext` personalizado
+- Los tipos y ensamblados entre plugins no interfieren entre sí
+- Los recursos relacionados pueden liberarse cuando el plugin se descarga
+
+### Restricciones de Permisos de Herramientas
+
+- Las herramientas registradas por plugins a través de la interfaz `ITool` están sujetas al mismo sistema de permisos
+- Las herramientas de plugins no pueden eludir la cadena de permisos de 5 niveles
+- Las herramientas de plugins están sujetas a la marca `[SiliconManagerOnly]`

@@ -170,6 +170,16 @@ public class ZhCN : DefaultLocalizationBase
     public override string PermissionCacheDuration30Days => "30 天";
 
     /// <summary>
+    /// Gets the prefix for project group chat session names
+    /// </summary>
+    public override string ProjectGroupChatPrefix => "项目群聊";
+
+    /// <summary>
+    /// Gets the prefix for project broadcast channel names
+    /// </summary>
+    public override string ProjectBroadcastPrefix => "项目广播";
+
+    /// <summary>
     /// Gets the localized display name for a permission type
     /// </summary>
     public override string GetPermissionTypeName(PermissionType permissionType) => permissionType switch
@@ -387,6 +397,20 @@ public class ZhCN : DefaultLocalizationBase
     public override string ProjectTasksLinkLabel => "任务";
     
     public override string ProjectWorkNotesLinkLabel => "工作笔记";
+    public override string ProjectWorkflowsLinkLabel => "工作流";
+    public override string ProjectWorkflowsPageHeader => "项目工作流";
+    public override string ProjectWorkflowsEmptyState => "该项目暂无工作流";
+    public override string CreateWorkflowButton => "创建工作流";
+    public override string ActiveWorkflowsHeader => "活跃工作流";
+    public override string BackToProject => "返回项目";
+    public override string WorkflowCurrentStateLabel => "当前状态:";
+    public override string WorkflowCreatedByLabel => "创建者:";
+    public override string WorkflowUpdatedAtLabel => "更新时间:";
+    public override string WorkflowBusinessKeyPrompt => "请输入业务标识（如 PR 编号、Issue ID 等）:";
+    public override string WorkflowCreatedSuccess => "工作流创建成功！";
+    public override string WorkflowCreateFailed => "创建失败:";
+    public override string WorkflowDetailInProgress => "工作流详情功能开发中...";
+    public override string WorkflowInstanceIdLabel => "实例ID:";
     public override string ProjectWorkNotesPageHeader => "项目工作笔记";
     public override string ProjectWorkNotesEmptyState => "该项目暂无工作笔记";
     public override string ProjectWorkNotesTotalPages => "总页数：{0}";

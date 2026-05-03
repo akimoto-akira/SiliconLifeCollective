@@ -1,8 +1,8 @@
-﻿# 보안 설계
+# 보안 설계
 
 > **버전: v0.1.0-alpha**
 
-[English](../en/security.md) | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | **한국어** | [Čeština](../cs-CZ/security.md)
+[English](../en/security.md) | [Deutsch](../de-DE/security.md) | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | **한국어** | [Čeština](../cs-CZ/security.md)
 
 ## 개요
 
@@ -32,9 +32,9 @@ Silicon Life Collective의 보안은 **다층 방어** 모델 위에 구축됩�
 
 | 결과 | 동작 |
 |--------|----------|
-| [Deutsch](../de-DE/security.md) | **Allowed (허용)** | 작업 즉시 진행 |
-| [Deutsch](../de-DE/security.md) | **Denied (거부)** | 작업 차단, 감사 로그 기록 |
-| [Deutsch](../de-DE/security.md) | **AskUser (사용자에게 문의)** | 작업 일시중지, 사용자 확인 필요 |
+| **Allowed (허용)** | 작업 즉시 진행 |
+| **Denied (거부)** | 작업 차단, 감사 로그 기록 |
+| **AskUser (사용자에게 문의)** | 작업 일시중지, 사용자 확인 필요 |
 
 ### 특수 역할: 실리콘 큐레이터
 
@@ -164,8 +164,8 @@ Silicon Life Collective의 보안은 **다층 방어** 모델 위에 구축됩�
 
 | 캐시 | 용도 |
 |-------|---------|
-| [Deutsch](../de-DE/security.md) | **HighAllow (고허용)** | 사용자가 자주 허용한 리소스 |
-| [Deutsch](../de-DE/security.md) | **HighDeny (고거부)** | 사용자가 자주 거부한 리소스 |
+| **HighAllow (고허용)** | 사용자가 자주 허용한 리소스 |
+| **HighDeny (고거부)** | 사용자가 자주 거부한 리소스 |
 
 ### 작동 방식
 
@@ -304,3 +304,41 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 - **큐레이터 전용 접근** — `TokenAuditTool` (`[SiliconManagerOnly]` 표시)은 큐레이터가 token 사용 쿼리 및 집계 가능.
 - **웹 대시보드** — `AuditController`는 추세 차트 및 데이터 내보내기가 포함된 브라우저 기반 대시보드 제공.
 - **영속화 저장** — 기록은 `ITimeStorage`를 통해 저장되어, 시계열 쿼리 및 장기 분석 가능.
+
+---
+
+## 플러그인 보안
+
+플러그인 시스템은 서드파티 코드 실행의 보안 위험을 도입하며, 다음 메커니즘으로 완화됩니다:
+
+### 보안 샌드박스
+
+`PluginLoader`는 플러그인 로딩 시 엄격한 보안 스캔을 실행합니다:
+
+1. **금지 네임스페이스 검사** — 플러그인은 다음 네임스페이스를 참조할 수 없습니다:
+   - `System.IO` — 파일 시스템 접근
+   - `System.Net.Http` — HTTP 요청
+   - `System.Net.WebSockets` — WebSocket 연결
+   - `System.Net.Sockets` — 원시 소켓
+   - `Microsoft.CodeAnalysis` — 컴파일러 API
+
+2. **신뢰할 수 있는 어셈블리 화이트리스트** — 다음 어셈블리의 참조가 허용됩니다:
+   - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
+   - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
+   - `Dapper`
+
+3. **금지 타입 검사** — 플러그인에서 참조하는 위험한 타입 스캔
+
+4. **금지 멤버 검사** — 플러그인에서 호출하는 위험한 메서드 스캔
+
+### 격리 로딩
+
+- 각 플러그인은 커스텀 `AssemblyLoadContext`로 격리하여 로딩
+- 플러그인 간의 타입 및 어셈블리가 서로 간섭하지 않음
+- 플러그인 언로드 시 관련 리소스 해제 가능
+
+### 도구 권한 제약
+
+- 플러그인이 `ITool` 인터페이스를 통해 등록한 도구는 동일한 권한 시스템의 제약을 받음
+- 플러그인 도구는 5단계 권한 체인을 우회할 수 없음
+- 플러그인 도구는 `[SiliconManagerOnly]` 마크의 제약을 받음

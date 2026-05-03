@@ -19,7 +19,7 @@
 ### SiliconLife.Fast（高效能版本）
 - **定位**：主推生產版本
 - **執行模式**：Windows 視窗應用程式（系統匣）
-- **儲存方式**：記憶體儲存 + 異步持久化
+- **儲存方式**：SpeedyPack 記憶體儲存 + 異步持久化
 - **適用場景**：高併發、低延遲、大資料量、長期生產運行
 - **平台支援**：僅 Windows
 - **角色說明**：經過深度優化的生產級實現，是長期運行和實際生產環境的首選
@@ -197,9 +197,13 @@ lsof -ti:8080 | xargs kill -9
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/      # 核心介面和抽象類別
-│   └── SiliconLife.Default/   # 預設實現 + 入口點
-├── docs/                      # 文件（多語言，21 種語言變體）
+│   ├── SiliconLife.Core/            # 核心介面和抽象類別
+│   ├── SiliconLife.Common/          # 共享實現
+│   ├── SiliconLife.Default/         # 預設實現 + 入口點
+│   ├── SiliconLife.Fast/            # 高效能實現 + 入口點
+│   ├── SiliconLife.Speedy/          # SpeedyPack 高效能儲存引擎
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理工具（WPF）
+├── docs/                            # 文件（多語言，21 種語言變體）
 │   ├── en/                    # 英語
 │   ├── zh-CN/                 # 簡體中文
 │   ├── zh-HK/                 # 繁體中文

@@ -2,7 +2,7 @@
 
 > **Verze: v0.1.0-alpha**
 
-[English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | **Čeština**
+[English](../en/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | **Čeština**
 
 ## Vybrat Verzi
 
@@ -19,7 +19,7 @@ Tento projekt poskytuje dvě implementační verze:
 ### SiliconLife.Fast (Vysoce Výkonná Verze)
 - **Pozicování**: Hlavní produkční verze
 - **Režim Spuštění**: Windows Forms aplikace (systémová lišta)
-- **Úložiště**: Paměťové úložiště + asynchronní perzistence
+- **Úložiště**: SpeedyPack paměťové úložiště + asynchronní perzistence (.spk souborový formát)
 - **Scénář Použití**: Vysoká souběžnost, nízká latence, velký objem dat, dlouhodobý produkční provoz
 - **Podpora Platformy**: Pouze Windows
 - **Popis role**: Produkční implementace s hlubokou optimalizací, nejlepší volba pro dlouhodobý provoz a reálné produkční prostředí
@@ -197,18 +197,22 @@ lsof -ti:8080 | xargs kill -9
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/      # Core rozhraní a abstraktní třídy
-│   └── SiliconLife.Default/   # Výchozí implementace + vstupní bod
-├── docs/                      # Dokumentace (vícejazyčná, 21 jazykových variant)
-│   ├── en/                    # Angličtina
-│   ├── zh-CN/                 # Zjednodušená čínština
-│   ├── zh-HK/                 # Tradiční čínština
-│   ├── es-ES/                 # Španělština
-│   ├── ja-JP/                 # Japonština
-│   ├── ko-KR/                 # Korejština
-│   └── cs-CZ/                 # Čeština
-├── 总文档/                     # Požadavky a dokumenty architektury (čínština)
-└── README.md                  # Popis projektu
+│   ├── SiliconLife.Core/            # Core rozhraní a abstraktní třídy
+│   ├── SiliconLife.Common/          # Sdílené implementace (společné pro obě verze)
+│   ├── SiliconLife.Default/         # Výchozí implementace + vstupní bod (konzolová verze)
+│   ├── SiliconLife.Fast/            # Vysoce výkonná implementace + vstupní bod (verze s formuláři)
+│   ├── SiliconLife.Speedy/          # SpeedyPack vysoce výkonný úložný engine
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack nástroj pro správu (WPF)
+├── docs/                            # Dokumentace (vícejazyčná, 21 jazykových variant)
+│   ├── en/                          # Angličtina
+│   ├── zh-CN/                       # Zjednodušená čínština
+│   ├── zh-HK/                       # Tradiční čínština
+│   ├── es-ES/                       # Španělština
+│   ├── ja-JP/                       # Japonština
+│   ├── ko-KR/                       # Korejština
+│   └── cs-CZ/                       # Čeština
+├── 总文档/                           # Požadavky a dokumenty architektury (čínština)
+└── README.md                        # Popis projektu
 ```
 
 ## Potřebujete Pomoc?

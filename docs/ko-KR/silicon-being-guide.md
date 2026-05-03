@@ -1,8 +1,8 @@
-﻿# 실리콘 생명체 가이드
+# 실리콘 생명체 가이드
 
 > **버전: v0.1.0-alpha**
 
-[English](../en/silicon-being-guide.md) | [中文](../zh-CN/silicon-being-guide.md) | [繁體中文](../zh-HK/silicon-being-guide.md) | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | **한국어** | [Deutsch](../de-DE/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md)
+[English](../en/silicon-being-guide.md) | [Deutsch](../de-DE/silicon-being-guide.md) | [中文](../zh-CN/silicon-being-guide.md) | [繁體中文](../zh-HK/silicon-being-guide.md) | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | **한국어** | [Čeština](../cs-CZ/silicon-being-guide.md)
 
 ## 개요
 
@@ -168,6 +168,7 @@ await timerSystem.StartAsync(timer);
 
 ### 저장 구조
 
+Default 버전:
 ```
 data/
 └── beings/
@@ -180,6 +181,17 @@ data/
         │       └── 2026-04-21.json
         └── tasks/
             └── task-history.json
+```
+
+Fast 버전 (SpeedyPack 저장):
+```
+data/
+├── speedy/
+│   ├── {being-id}.spk       # SpeedyPack 저장 파일
+│   └── {being-id}.spk.idx   # 인덱스 파일
+└── beings/
+    └── {being-id}/
+        └── soul.md
 ```
 
 ## 작업 노트 시스템

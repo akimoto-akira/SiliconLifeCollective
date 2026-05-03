@@ -2,7 +2,7 @@
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
+**English** | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
 ## Choose Version
 
@@ -19,7 +19,7 @@ This project provides two implementation versions:
 ### SiliconLife.Fast (High-Performance Version)
 - **Positioning**: Main production version
 - **Runtime Mode**: Windows Forms application (system tray)
-- **Storage**: In-memory storage + asynchronous persistence
+- **Storage**: SpeedyPack in-memory storage + asynchronous persistence (.spk file format)
 - **Use Case**: High concurrency, low latency, large data volume, long-term production operation
 - **Platform Support**: Windows only
 - **Role Description**: A production-grade implementation with deep optimization, the first choice for long-term operation and actual production environments
@@ -197,18 +197,22 @@ lsof -ti:8080 | xargs kill -9
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/      # Core interfaces and abstractions
-│   └── SiliconLife.Default/   # Default implementation + entry point
-├── docs/                      # Documentation (multi-language, 21 language variants)
-│   ├── en/                    # English
-│   ├── zh-CN/                 # Simplified Chinese
-│   ├── zh-HK/                 # Traditional Chinese
-│   ├── es-ES/                 # Spanish
-│   ├── ja-JP/                 # Japanese
-│   ├── ko-KR/                 # Korean
-│   └── cs-CZ/                 # Czech
-├── 总文档/                     # Requirements and architecture docs (Chinese)
-└── README.md                  # Project readme
+│   ├── SiliconLife.Core/            # Core interfaces and abstractions
+│   ├── SiliconLife.Common/          # Shared implementations (used by both versions)
+│   ├── SiliconLife.Default/         # Default implementation + entry point (console version)
+│   ├── SiliconLife.Fast/            # High-performance implementation + entry point (forms version)
+│   ├── SiliconLife.Speedy/          # SpeedyPack high-performance storage engine
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack management tool (WPF)
+├── docs/                            # Documentation (multi-language, 21 language variants)
+│   ├── en/                          # English
+│   ├── zh-CN/                       # Simplified Chinese
+│   ├── zh-HK/                       # Traditional Chinese
+│   ├── es-ES/                       # Spanish
+│   ├── ja-JP/                       # Japanese
+│   ├── ko-KR/                       # Korean
+│   └── cs-CZ/                       # Czech
+├── 总文档/                           # Requirements and architecture docs
+└── README.md                        # Project readme
 ```
 
 ## Need Help?

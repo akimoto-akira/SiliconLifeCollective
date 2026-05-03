@@ -2,7 +2,7 @@
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/security.md) | [Deutsch](../de-DE/security.md) | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Čeština](../cs-CZ/security.md)
+[English](../en/security.md) | **Deutsch** | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Čeština](../cs-CZ/security.md)
 
 ## Übersicht
 
@@ -307,3 +307,41 @@ Protokolle persistent im Storage, einsehbar durch Web UI (Log-Controller).
 - **Nur Curator-Zugriff** — `TokenAuditTool` (markiert `[SiliconManagerOnly]`) erlaubt Curator Token-Nutzung abzufragen und zusammenzufassen.
 - **Web-Dashboard** — `AuditController` bietet browserbasiertes Dashboard mit Trendgrafiken und Datenexport.
 - **Persistenter Storage** — Datensätze gespeichert durch `ITimeStorage` für Zeitreihenabfragen und Langzeitanalyse.
+
+---
+
+## Plugin-Sicherheit
+
+Das Plugin-System führt Sicherheitsrisiken durch Drittanbieter-Code-Ausführung ein, die durch folgende Mechanismen gemildert werden:
+
+### Sicherheits-Sandbox
+
+`PluginLoader` führt beim Laden strege Sicherheitsprüfungen durch:
+
+1. **Verbotene Namespace-Prüfung** — Plugins dürfen nicht auf folgende Namespaces verweisen:
+   - `System.IO` — Dateisystemzugriff
+   - `System.Net.Http` — HTTP-Anfragen
+   - `System.Net.WebSockets` — WebSocket-Verbindungen
+   - `System.Net.Sockets` — Raw-Sockets
+   - `Microsoft.CodeAnalysis` — Compiler-API
+
+2. **Vertrauenswürdige Assembly-Whitelist** — Referenzen auf folgende Assemblys sind erlaubt:
+   - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
+   - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
+   - `Dapper`
+
+3. **Verbotene Typ-Prüfung** — Scannt nach gefährlichen Typen, die im Plugin referenziert werden
+
+4. **Verbotene Member-Prüfung** — Scannt nach gefährlichen Methoden, die im Plugin aufgerufen werden
+
+### Isoliertes Laden
+
+- Jedes Plugin wird durch benutzerdefinierten `AssemblyLoadContext` isoliert geladen
+- Typen und Assemblys zwischen Plugins stören sich nicht gegenseitig
+- Beim Entladen eines Plugins können zugehörige Ressourcen freigegeben werden
+
+### Tool-Berechtigungsbeschränkungen
+
+- Plugins, die Tools über `ITool`-Schnittstelle registrieren, unterliegen demselben Berechtigungssystem
+- Plugin-Tools können die 5-stufige Berechtigungskette nicht umgehen
+- Plugin-Tools unterliegen der `[SiliconManagerOnly]`-Markierung

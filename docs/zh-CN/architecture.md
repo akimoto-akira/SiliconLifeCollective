@@ -1,4 +1,4 @@
-﻿# 架构
+# 架构
 
 > **版本：v0.1.0-alpha**
 
@@ -18,10 +18,10 @@
 ### SiliconLife.Fast（高性能版本）
 - **定位**：主推生产版本
 - **运行模式**：Windows 窗体应用程序（支持系统托盘）
-- **存储方式**：内存存储 + 异步批量持久化（WAL 日志）
+- **存储方式**：SpeedyPack 内存存储 + 异步批量持久化（.spk 文件格式）
 - **适用场景**：高并发、低延迟、大数据量场景
 - **性能提升**：存储读取延迟降低 1000 倍，写入延迟降低 15000 倍
-- **角色说明**：经过深度优化的生产级实现，具备系统托盘后台运行、极致性能优化等特性，是长期运行和实际生产环境的首选
+- **角色说明**：经过深度优化的生产级实现，具备系统托盘后台运行、SpeedyPack 引擎 + 自动压缩等特性，是长期运行和实际生产环境的首选
 
 > **注意**：本文档描述的架构适用于两个版本，仅在存储实现部分有所不同。SiliconLife.Default 作为架构验证基准，SiliconLife.Fast 作为生产环境主推版本。
 
@@ -114,6 +114,9 @@
 │  │  ┌──────────┐ ┌────▼─────┐ ┌──────────────────┐  │   │
 │  │  │ AI 客户端 │  │执行器     │  │   工具管理器      │  │   │
 │  │  └──────────┘ └──────────┘ └──────────────────┘  │   │
+│  │  ┌──────────┐ ┌──────────┐                        │   │
+│  │  │插件加载器 │  │知识网络   │                        │   │
+│  │  └──────────┘ └──────────┘                        │   │
 │  └──────────────────────────────────────────────────┘   │
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐   │
@@ -544,4 +547,158 @@ data/
         ├── state.json
         ├── code.enc
         └── permission.enc
+```
+
+---
+
+## SpeedyPack 存储引擎
+
+SiliconLife.Fast 使用自研的 SpeedyPack 存储引擎（.spk 格式），替代了之前的 LiteDB 方案，实现了极致的读写性能。
+
+### 架构设计
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    SpeedyPack                             │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
+│  │ DirectoryMap  │  │  EntryCache   │  │  WriteQueue   │  │
+│  │ (内存目录映射) │  │  (条目缓存)    │  │ (异步写入队列) │  │
+│  └──────┬───────┘  └──────┬───────┘  └───────┬───────┘  │
+│         │                  │                   │          │
+│  ┌──────▼──────────────────▼───────────────────▼───────┐  │
+│  │              PackFileReader / PackFileWriter          │  │
+│  │              (包文件读写器)                             │  │
+│  └──────────────────────────┬──────────────────────────┘  │
+│                              │                             │
+│  ┌──────────────────────────▼──────────────────────────┐  │
+│  │              .spk 文件 (MessagePack + LZ4 压缩)       │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐                      │
+│  │  FreeList     │  │ SpeedyPack   │                      │
+│  │ (空闲空间管理) │  │ AutoCompactor│                      │
+│  │              │  │ (自动压缩)    │                      │
+│  └──────────────┘  └──────────────┘                      │
+└──────────────────────────────────────────────────────────┘
+```
+
+### 核心组件
+
+| 组件 | 描述 |
+|------|------|
+| `SpeedyPack` | 核心类，组合 DirectoryMap、EntryCache 和 WriteQueue 提供低延迟读写 |
+| `DirectoryMap` | 内存目录映射，维护虚拟路径到文件条目的映射关系 |
+| `EntryCache` | 条目缓存，基于 TTL 的最近访问条目缓存 |
+| `WriteQueue` | 异步写入队列，将写入操作排队到后台线程执行 |
+| `FreeList` | 空闲空间管理，跟踪 .spk 文件中的可重用空间 |
+| `PackFileReader` | 包文件读取器，从 .spk 文件中读取数据 |
+| `PackFileWriter` | 包文件写入器，将数据写入 .spk 文件 |
+| `SpeedyPackAutoCompactor` | 自动压缩定时器，定期压缩 .spk 文件回收空闲空间 |
+| `SpeedyPackRegistry` | 进程级单例管理器，确保整个应用使用同一个 SpeedyPack 实例 |
+
+### 存储适配器
+
+SiliconLife.Fast 通过以下适配器将 SpeedyPack 集成到系统接口：
+
+| 适配器 | 接口 | 描述 |
+|--------|------|------|
+| `SpeedyStorage` | `IStorage` | 通用键值存储适配器 |
+| `SpeedyTimeStorage` | `ITimeStorage` | 时间索引存储适配器 |
+| `SpeedyWorkNoteStorage` | `IWorkNoteStorage` | 工作笔记存储适配器 |
+
+### 配置选项
+
+`SpeedyPackOptions` 提供以下配置：
+
+| 选项 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `CacheTtl` | `TimeSpan` | 5 分钟 | 缓存条目的生存时间 |
+| `MaxCacheEntries` | `int` | 1000 | 最大缓存条目数 |
+| `ReadOnly` | `bool` | false | 只读模式 |
+
+### 事务支持
+
+SpeedyPack 通过 `IPackTransaction` 接口支持原子写入操作：
+
+- `SpeedyTransaction` 实现了事务机制
+- 支持批量写入的原子性
+- 事务提交时所有写入操作要么全部成功，要么全部回滚
+
+---
+
+## 插件系统
+
+SiliconLife 通过插件系统支持功能扩展，允许第三方开发者为平台添加新功能。
+
+### 核心接口
+
+```csharp
+public interface IPlugin
+{
+    string Id { get; }
+    string GetName(Language language);
+    string Version { get; }
+    string GetDescription(Language language);
+    string GetAuthor(Language language);
+    void OnLoad();
+    void OnStart();
+    void OnStop();
+    void OnUnload();
+}
+```
+
+### 插件加载器
+
+`PluginLoader` 负责从指定目录加载插件 DLL，并执行严格的安全检查：
+
+1. **目录扫描** — 扫描插件目录中的所有 .dll 文件
+2. **安全扫描** — 检查插件是否引用了禁止的命名空间
+3. **隔离加载** — 使用自定义 `AssemblyLoadContext` 隔离加载插件
+4. **生命周期管理** — 调用插件的 OnLoad、OnStart、OnStop、OnUnload 方法
+
+### 安全沙箱
+
+插件加载器执行以下安全检查：
+
+| 检查项 | 描述 |
+|--------|------|
+| 禁止命名空间 | System.IO、System.Net.Http、System.Net.WebSockets、System.Net.Sockets、Microsoft.CodeAnalysis |
+| 可信程序集白名单 | Google.Protobuf、Newtonsoft.Json、MessagePack、Serilog、Microsoft.Extensions.Logging.Abstractions、Dapper |
+| 禁止类型检查 | 扫描插件中引用的危险类型 |
+| 禁止成员检查 | 扫描插件中调用的危险方法 |
+
+### 工具集成
+
+插件可以通过实现 `ITool` 接口注册自定义工具：
+
+- `ToolManager.ScanAllPluginAssemblies()` 方法扫描所有已加载插件中的 ITool 实现
+- 插件工具自动集成到工具调用循环
+- 插件工具受相同的权限系统约束
+
+### 插件生命周期
+
+```
+加载（OnLoad）→ 启动（OnStart）→ 运行中 → 停止（OnStop）→ 卸载（OnUnload）
+```
+
+---
+
+## 硅基生命体活动状态
+
+硅基生命体具有以下活动状态：
+
+| 状态 | 描述 |
+|------|------|
+| `Idle` | 空闲状态，等待时钟触发 |
+| `Running` | 正在执行一轮 AI 请求 + 工具调用 |
+| `WaitingPermission` | 等待用户权限审批 |
+| `Stopped` | 已停止，因错误或手动停止 |
+
+状态转换：
+```
+Idle → Running → Idle（正常完成）
+Running → WaitingPermission → Running（权限审批后继续）
+Running → Stopped（错误或手动停止）
+Stopped → Idle（重新启动）
 ```

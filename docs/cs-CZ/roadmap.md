@@ -1,8 +1,8 @@
-﻿# Roadmap
+# Roadmap
 
 > **Verze: v0.1.0-alpha**
 
-[English](../en/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | **Čeština**
+[English](../en/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | **Čeština**
 
 ## Duální Verze Plánu
 
@@ -13,13 +13,15 @@
 
 ### SiliconLife.Fast (Vysoce Výkonná Verze)
 - **Pozicování**: Hlavní produkční verze
-- **Aktuální stav**: Základní přenos architektury je dokončen, průběžná optimalizace probíhá
+- **Aktuální stav**: Základní přenos architektury je dokončen, SpeedyPack storage engine a systém pluginů jsou implementovány
 - **Popis role**: Na základě architektury ověřené ve verzi Default provádí hlubokou optimalizaci výkonu a posílení produkčních charakteristik, nejlepší volba pro reálné nasazení
 
 **Plán Vývoje Fast Verze**:
 - ✅ Fáze 1: Přenos základní struktury projektu a konfiguračního systému
 - ✅ Fáze 2: Přenos Web UI a controllerů
-- ✅ Fáze 3: Optimalizace úložného systému (paměťové úložiště + asynchronní perzistence)
+- ✅ Fáze 3: Optimalizace úložného systému (paměťové úložiště SpeedyPack + asynchronní perzistence)
+- ✅ Fáze 3.5: SpeedyPack správcovský nástroj (SiliconLife.Speedy.Manager WPF aplikace)
+- ✅ Fáze 3.6: Systém pluginů (rozhraní IPlugin, bezpečnostní sandbox, izolace AssemblyLoadContext)
 - 🚧 Fáze 4: Vývoj systémové lišty a formulářové aplikace
 - 📋 Fáze 5: Optimalizace výkonu (fond připojení, fond objektů, lock-free souběžnost)
 - 📋 Fáze 6: Náhrada webového serveru Kestrel
@@ -304,5 +306,5 @@ Každá fáze končí **fungujícím, pozorovatelným** systémem. Žádná fáz
 | # | Modul | Popis |
 |---|--------|-------------|
 | 12.1 | Znalostní síť | Sdílený znalostní graf pomocí trojčlenné struktury (subjekt-predikát-objekt) |
-| 12.2 | Systém pluginů | Načítání externích pluginů s bezpečnostními kontrolami a sandboxem |
+| 12.2 | ~~Systém pluginů~~ ✅ Dokončeno | Načítání externích pluginů s bezpečnostními kontrolami a sandboxem (rozhraní IPlugin, PluginLoader, izolace AssemblyLoadContext) |
 | 12.3 | Ekosystém dovedností | Trh znovu použitelných dovedností pro schopnosti bytostí |

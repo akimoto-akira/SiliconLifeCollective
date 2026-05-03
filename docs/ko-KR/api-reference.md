@@ -1,8 +1,8 @@
-﻿# API 참고
+# API 참고
 
 > **버전: v0.1.0-alpha**
 
-[English](../en/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | **한국어** | [Deutsch](../de-DE/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
+[English](../en/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | **한국어** | [Čeština](../cs-CZ/api-reference.md)
 
 ## Web API 엔드포인트
 
@@ -33,6 +33,8 @@
   ]
 }
 ```
+
+**상태값**: `idle` | `running` | `waiting_permission` | `stopped`
 
 ### 생명체 만들기
 
@@ -364,6 +366,73 @@ data: {"type": "complete", "sessionId": "uuid"}
 ---
 
 ## 시스템 정보
+
+### 정보 페이지 가져오기
+
+**GET** `/about`
+
+시스템 정보와 로드된 플러그인 목록이 포함된 정보 페이지를 반환합니다.
+
+**플러그인 목록 데이터**:
+```json
+{
+  "plugins": {
+    "plugin-id": {
+      "name": "My Plugin",
+      "version": "1.0.0",
+      "description": "플러그인 설명",
+      "author": "작성자 이름"
+    }
+  }
+}
+```
+
+### 권한 요청
+
+**GET** `/permission/request?userId={id}&type={type}&resource={resource}`
+
+권한 요청 페이지를 표시하여 사용자가 실리콘 생명체의 권한 요청을 승인하거나 거부할 수 있도록 합니다.
+
+**쿼리 매개변수**:
+
+| 매개변수 | 유형 | 설명 |
+|------|------|------|
+| `userId` | `Guid` | 권한을 요청하는 실리콘 생명체 ID |
+| `type` | `string` | 권한 유형 |
+| `resource` | `string` | 요청된 리소스 경로 |
+| `allowCode` | `string` | 허용 작업의 코드 식별자 |
+| `denyCode` | `string` | 거부 작업의 코드 식별자 |
+
+**대기 중인 권한 요청 확인**:
+
+**GET** `/permission/check?userId={id}`
+
+**응답**:
+```json
+{
+  "pending": true
+}
+```
+
+**권한 요청 응답**:
+
+**GET** `/permission/respond?userId={id}&allowed={bool}&addToCache={bool}&cacheDuration={hours}`
+
+**쿼리 매개변수**:
+
+| 매개변수 | 유형 | 설명 |
+|------|------|------|
+| `userId` | `Guid` | 실리콘 생명체 ID |
+| `allowed` | `bool` | 허용 여부 |
+| `addToCache` | `bool` | 결정을 캐시할지 여부 |
+| `cacheDuration` | `double` | 캐시 지속 시간 (시간) |
+
+**응답**:
+```json
+{
+  "success": true
+}
+```
 
 ### 대시보드 데이터 가져오기
 

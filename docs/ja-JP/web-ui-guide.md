@@ -1,8 +1,8 @@
-﻿# Web UI ガイド
+# Web UI ガイド
 
 > **バージョン: v0.1.0-alpha**
 
-[English](../en/web-ui-guide.md) | [中文](../zh-CN/web-ui-guide.md) | [繁體中文](../zh-HK/web-ui-guide.md) | [Español](../es-ES/web-ui-guide.md) | **日本語** | [한국어](../ko-KR/web-ui-guide.md) | [Čeština](../cs-CZ/web-ui-guide.md)
+[English](../en/web-ui-guide.md) | [Deutsch](../de-DE/web-ui-guide.md) | [中文](../zh-CN/web-ui-guide.md) | [繁體中文](../zh-HK/web-ui-guide.md) | [Español](../es-ES/web-ui-guide.md) | **日本語** | [한국어](../ko-KR/web-ui-guide.md) | [Čeština](../cs-CZ/web-ui-guide.md)
 
 ## 概要
 
@@ -127,9 +127,8 @@ AI バックエンドの設定：
 
 ### ストレージ設定
 
-- ベースパス
-- 時間インデックス
-- クリーンアップ戦略
+- Default 版：ベースパス、時間インデックス、クリーンアップ戦略
+- Fast 版：SpeedyPack ストレージエンジン設定、.spk ファイル管理、自動圧縮設定
 
 ### ローカライゼーション
 

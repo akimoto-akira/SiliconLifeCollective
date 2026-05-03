@@ -18,7 +18,7 @@
 ### SiliconLife.Fast（高效能版本）
 - **定位**：主推生產版本
 - **執行模式**：Windows 視窗應用程式（支援系統匣）
-- **儲存方式**：記憶體儲存 + 異步批次持久化（WAL 日誌）
+- **儲存方式**：SpeedyPack 記憶體儲存 + 異步批次持久化（WAL 日誌）
 - **適用場景**：高併發、低延遲、大資料量場景
 - **效能提升**：儲存讀取延遲降低 1000 倍，寫入延遲降低 15000 倍
 - **角色說明**：經過深度優化的生產級實現，具備系統匣後台運行、極致效能最佳化等特性，是長期運行和實際生產環境的首選
@@ -525,6 +525,139 @@ Web UI 遵循**類 MVC 模式**，20+ 個控制器處理不同方面：
 - **持久化儲存**：知識三元組持久化到檔案系統，支援時間索引查詢。
 - **置信度評分**：每個知識條目帶有置信度評分（0-1），支援知識的模糊匹配和排序。
 - **標籤分類**：支援為知識添加標籤，便於分類和檢索。
+
+---
+
+## SpeedyPack 儲存引擎
+
+SiliconLife.Fast 使用自研的 SpeedyPack 儲存引擎（.spk 格式），實現了極致的讀寫效能。
+
+### 架構設計
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    SpeedyPack                             │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
+│  │ DirectoryMap  │  │  EntryCache   │  │  WriteQueue   │  │
+│  │ (記憶體目錄映射) │  │  (條目快取)    │  │ (異步寫入佇列) │  │
+│  └──────┬───────┘  └──────┬───────┘  └───────┬───────┘  │
+│         │                  │                   │          │
+│  ┌──────▼──────────────────▼───────────────────▼───────┐  │
+│  │              PackFileReader / PackFileWriter          │  │
+│  │              (包檔案讀寫器)                             │  │
+│  └──────────────────────────┬──────────────────────────┘  │
+│                              │                             │
+│  ┌──────────────────────────▼──────────────────────────┐  │
+│  │              .spk 檔案 (MessagePack + LZ4 壓縮)       │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐                      │
+│  │  FreeList     │  │ SpeedyPack   │                      │
+│  │ (空閒空間管理) │  │ AutoCompactor│                      │
+│  │              │  │ (自動壓縮)    │                      │
+│  └──────────────┘  └──────────────┘                      │
+└──────────────────────────────────────────────────────────┘
+```
+
+### 核心元件
+
+| 元件 | 描述 |
+|------|------|
+| `SpeedyPack` | 核心類別，組合 DirectoryMap、EntryCache 和 WriteQueue 提供低延遲讀寫 |
+| `DirectoryMap` | 記憶體目錄映射，維護虛擬路徑到檔案條目的映射關係 |
+| `EntryCache` | 條目快取，基於 TTL 的最近存取條目快取 |
+| `WriteQueue` | 異步寫入佇列，將寫入操作排隊到背景執行緒執行 |
+| `FreeList` | 空閒空間管理，追蹤 .spk 檔案中的可重用空間 |
+| `PackFileReader` | 包檔案讀取器，從 .spk 檔案中讀取資料 |
+| `PackFileWriter` | 包檔案寫入器，將資料寫入 .spk 檔案 |
+| `SpeedyPackAutoCompactor` | 自動壓縮定時器，定期壓縮 .spk 檔案回收空閒空間 |
+| `SpeedyPackRegistry` | 行程級單例管理器，確保整個應用使用同一個 SpeedyPack 實例 |
+
+### 儲存適配器
+
+SiliconLife.Fast 通過以下適配器將 SpeedyPack 整合到系統介面：
+
+| 適配器 | 介面 | 描述 |
+|--------|------|------|
+| `SpeedyStorage` | `IStorage` | 通用鍵值儲存適配器 |
+| `SpeedyTimeStorage` | `ITimeStorage` | 時間索引儲存適配器 |
+| `SpeedyWorkNoteStorage` | `IWorkNoteStorage` | 工作筆記儲存適配器 |
+
+### 配置選項
+
+`SpeedyPackOptions` 提供以下配置：
+
+| 選項 | 類型 | 預設值 | 描述 |
+|------|------|--------|------|
+| `CacheTtl` | `TimeSpan` | 5 分鐘 | 快取條目的存活時間 |
+| `MaxCacheEntries` | `int` | 1000 | 最大快取條目數 |
+| `ReadOnly` | `bool` | false | 唯讀模式 |
+
+### 事務支援
+
+SpeedyPack 通過 `IPackTransaction` 介面支援原子寫入操作：
+
+- `SpeedyTransaction` 實現了事務機制
+- 支援批次寫入的原子性
+- 事務提交時所有寫入操作要麼全部成功，要麼全部回滾
+
+---
+
+## 插件系統
+
+SiliconLife 通過插件系統支援功能擴展，允許第三方開發者為平台添加新功能。
+
+### 核心介面
+
+```csharp
+public interface IPlugin
+{
+    string Id { get; }
+    string GetName(Language language);
+    string Version { get; }
+    string GetDescription(Language language);
+    string GetAuthor(Language language);
+    void OnLoad();
+    void OnStart();
+    void OnStop();
+    void OnUnload();
+}
+```
+
+### 插件載入器
+
+`PluginLoader` 負責從指定目錄載入插件 DLL，並執行嚴格的安全檢查：
+
+1. **目錄掃描** — 掃描插件目錄中的所有 .dll 檔案
+2. **安全掃描** — 檢查插件是否引用了禁止的命名空間
+3. **隔離載入** — 使用自訂 `AssemblyLoadContext` 隔離載入插件
+4. **生命週期管理** — 呼叫插件的 OnLoad、OnStart、OnStop、OnUnload 方法
+
+### 安全沙箱
+
+插件載入器執行以下安全檢查：
+
+| 檢查項 | 描述 |
+|--------|------|
+| 禁止命名空間 | System.IO、System.Net.Http、System.Net.WebSockets、System.Net.Sockets、Microsoft.CodeAnalysis |
+| 可信組件白名單 | Google.Protobuf、Newtonsoft.Json、MessagePack、Serilog、Microsoft.Extensions.Logging.Abstractions、Dapper |
+| 禁止類型檢查 | 掃描插件中引用的危險類型 |
+| 禁止成員檢查 | 掃描插件中呼叫的危險方法 |
+
+### 工具整合
+
+插件可以通過實現 `ITool` 介面註冊自訂工具：
+
+- `ToolManager.ScanAllPluginAssemblies()` 方法掃描所有已載入插件中的 ITool 實現
+- 插件工具自動整合到工具呼叫循環
+- 插件工具受相同的權限系統約束
+
+### 插件生命週期
+
+```
+載入（OnLoad）→ 啟動（OnStart）→ 運行中 → 停止（OnStop）→ 卸載（OnUnload）
+```
 
 ---
 

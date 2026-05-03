@@ -2,7 +2,7 @@
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md)
+[English](../en/troubleshooting.md) | **Deutsch** | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md)
 
 ## Häufige Probleme
 
@@ -267,6 +267,30 @@ IOException: Access denied
 
 3. Korrupte Dateien manuell reparieren
 
+#### Problem: SpeedyPack-Speicherdatei beschädigt (Fast-Version)
+
+**Symptome**:
+- `.spk`-Datei kann nicht geladen werden
+- SpeedyStorage-Initialisierung fehlschlägt
+
+**Lösung**:
+1. `SiliconLife.Speedy.Manager`-Tool zum Prüfen und Reparieren von `.spk`-Dateien verwenden
+2. Prüfen ob `.spk.idx`-Indexdatei mit `.spk`-Datei übereinstimmt
+3. Wenn Indexdatei beschädigt ist, `.spk.idx`-Datei löschen — das System erstellt den Index automatisch neu
+4. `.spk`-Datei aus Backup wiederherstellen
+
+#### Problem: SpeedyPack-Auto-Komprimierung fehlschlägt (Fast-Version)
+
+**Symptome**:
+- `.spk`-Datei wächst kontinuierlich
+- Festplattenspeicher wird knapp
+
+**Lösung**:
+1. Prüfen ob `SpeedyPackAutoCompactor` ordnungsgemäß läuft
+2. Komprimierungsoperation manuell auslösen
+3. Komprimierungsschwellenwert-Konfiguration prüfen
+4. `SiliconLife.Speedy.Manager`-Tool für manuelle Komprimierung verwenden
+
 ---
 
 ### Tool-Ausführungsprobleme
@@ -296,6 +320,34 @@ Tool execution failed: ...
 2. Eingabeparameter verifizieren
 3. Tool unabhängig testen
 4. Berechtigungen prüfen
+
+---
+
+### Plugin-Probleme
+
+#### Problem: Plugin-Laden fehlgeschlagen
+
+**Symptome**:
+```
+Plugin load failed: Security check failed
+```
+
+**Lösung**:
+1. Prüfen ob das Plugin verbotene Namespaces referenziert (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
+2. Verifizieren dass das Plugin nur Assemblys aus der vertrauenswürdigen Assembly-Whitelist referenziert
+3. Prüfen ob das Plugin die `IPlugin`-Schnittstelle korrekt implementiert
+4. Logs auf detaillierte Sicherheitsprüfungsfehler prüfen
+
+#### Problem: Plugin-Tools nicht registriert
+
+**Symptome**:
+- Plugin erfolgreich geladen, aber Tools erscheinen nicht in der Tool-Liste
+
+**Lösung**:
+1. Bestätigen dass die Tool-Klasse im Plugin die `ITool`-Schnittstelle korrekt implementiert
+2. Prüfen ob die Tool-Klasse public ist
+3. Verifizieren dass `ToolManager.ScanAllPluginAssemblies()` aufgerufen wurde
+4. Plugin neu bauen und Anwendung neu starten
 
 ---
 

@@ -14,6 +14,12 @@
 - **身体-大脑架构** — *身体*（SiliconBeing）维持生命体征并检测触发场景；*大脑*（ContextManager）负责加载历史、调用 AI、执行工具和持久化响应
 - **自我进化能力** — 通过 Roslyn 动态编译技术，硅基生命体可以重写自己的代码实现进化
 
+### 插件系统
+- **插件扩展架构** — 通过 IPlugin 接口实现功能扩展，支持从目录动态加载插件 DLL
+- **安全沙箱** — 插件加载器执行严格的安全扫描，禁止访问 System.IO、System.Net 等命名空间
+- **隔离加载** — 使用自定义 AssemblyLoadContext 隔离加载，防止插件影响主程序稳定性
+- **工具集成** — 插件可通过 ITool 接口注册自定义工具，自动集成到工具调用循环
+
 ### 工具与执行
 - **23 个内置工具** — 涵盖日历、聊天、配置、磁盘、网络、记忆、任务、定时器、知识库、工作笔记、WebView 浏览器等
 - **工具调用循环** — AI 返回工具调用 → 执行工具 → 结果反馈给 AI → 持续循环直到返回纯文本响应
@@ -30,7 +36,7 @@
 
 ### Web 界面
 - **现代化 Web UI** — 内置 HTTP 服务器，支持 SSE 实时更新
-- **4 种皮肤主题** — 管理版、聊天版、创作版、开发版，支持自动发现和切换
+- **7 种皮肤主题** — 管理版、聊天版、创作版、开发版、高对比度、浅色、极简，支持自动发现和切换
 - **20+ 个控制器** — 完整的系统管理、聊天、配置、监控功能
 - **零前端框架依赖** — 通过 `H`、`CssBuilder` 和 `JsBuilder` 在服务端生成 HTML/CSS/JS
 
@@ -42,8 +48,10 @@
   - 日语：ja-JP | 韩语：ko-KR | 捷克语：cs-CZ
 
 ### 数据与存储
-- **零数据库依赖** — 纯文件系统存储（JSON 格式）
+- **SpeedyPack 高性能存储** — 自研 .spk 存储引擎，内存目录映射 + 条目缓存 + 异步写入队列
+- **零数据库依赖** — Default 版本使用纯文件系统存储（JSON 格式），Fast 版本使用 SpeedyPack 内存存储
 - **时间索引查询** — 通过 `ITimeStorage` 接口支持按时间范围的高效查询
+- **自动压缩** — SpeedyPack 支持定时自动压缩，回收空闲空间
 - **最小依赖** — 核心库仅依赖 Microsoft.CodeAnalysis.CSharp 用于动态编译
 
 ## 🔄 双版本架构
@@ -62,9 +70,9 @@
 ### SiliconLife.Fast（高性能版本）
 - **定位**：主推生产版本
 - **运行模式**：Windows 窗体应用程序（支持系统托盘）
-- **存储方式**：内存存储 + 异步批量持久化
+- **存储方式**：SpeedyPack 内存存储 + 异步批量持久化（.spk 文件格式）
 - **适用场景**：高并发、低延迟、大数据量场景
-- **特点**：极致性能优化、托盘后台运行、内存数据库 + WAL 日志保证数据安全
+- **特点**：极致性能优化、托盘后台运行、SpeedyPack 引擎 + 自动压缩保证数据安全
 - **性能提升**：存储读取延迟降低 1000 倍，写入延迟降低 15000 倍，并发处理能力提升 50 倍
 - **角色说明**：经过深度优化的生产级实现，是长期运行和实际生产环境的首选
 - **启动命令**：`dotnet run --project src/SiliconLife.Fast`
@@ -77,12 +85,13 @@
 | **用户界面** | Web UI（浏览器访问） | 托盘图标 + 托盘窗口 + Web UI |
 | **系统托盘** | ❌ 无 | ✅ 支持最小化到托盘 |
 | **后台运行** | ❌ 控制台关闭即退出 | ✅ 托盘后台持续运行 |
-| **存储方式** | 文件系统 JSON 存储 | 内存存储 + 异步持久化 |
+| **存储方式** | 文件系统 JSON 存储 | SpeedyPack 内存存储 + 异步持久化 |
+| **存储引擎** | 文件系统 I/O | SiliconLife.Speedy（.spk 格式） |
 | **读取延迟** | ~10ms（磁盘 I/O） | ~0.01ms（内存操作） |
 | **写入延迟** | ~15ms（同步写入） | ~0.001ms（异步写入） |
 | **并发能力** | ~100 req/s | ~5000 req/s |
 | **内存占用** | ~200MB | ~500MB |
-| **数据安全性** | 极高（即时持久化） | 高（WAL 日志 + 异步持久化） |
+| **数据安全性** | 极高（即时持久化） | 高（异步持久化 + 自动压缩） |
 | **适用场景** | 数据安全优先、小数据量 | 性能优先、大数据量、高并发 |
 
 ## 🛠️ 技术栈
@@ -93,10 +102,11 @@
 | 编程语言 | C# | C# |
 | 应用类型 | 控制台应用程序 | Windows 窗体应用程序 |
 | AI 集成 | Ollama（本地）、阿里云百炼（云端） | Ollama（本地）、阿里云百炼（云端） |
-| 数据存储 | 文件系统（JSON + 时间索引目录） | 内存存储 + 异步持久化（WAL 日志） |
+| 数据存储 | 文件系统（JSON + 时间索引目录） | SpeedyPack（.spk 格式，内存映射 + 异步持久化） |
 | Web 服务器 | HttpListener（.NET 内置） | HttpListener（.NET 内置） |
 | 动态编译 | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
 | 浏览器自动化 | Playwright（WebView） | Playwright（WebView） |
+| 插件系统 | ✅ 支持（IPlugin + PluginLoader） | ✅ 支持（IPlugin + PluginLoader） |
 | 系统托盘 | ❌ 不支持 | ✅ 支持（NotifyIcon） |
 | 许可证 | Apache-2.0 | Apache-2.0 |
 
@@ -116,6 +126,7 @@ SiliconLifeCollective.sln
 │   │   ├── Knowledge/                     # 知识网络系统
 │   │   ├── Localization/                  # 本地化系统
 │   │   ├── Logging/                       # 日志系统
+│   │   ├── Plugins/                       # 插件系统（IPlugin 接口、PluginLoader 加载器）
 │   │   ├── Project/                       # 项目管理系统
 │   │   ├── Runtime/                       # 主循环、时钟对象、核心主机
 │   │   ├── Security/                      # 权限管理系统
@@ -169,14 +180,38 @@ SiliconLifeCollective.sln
 │       ├── Project/                       # 项目系统实现
 │       ├── Security/                      # 优化权限回调
 │       ├── SiliconBeing/                  # 高性能硅基生命体实现
-│       ├── Storage/                       # 内存存储 + 异步持久化
+│       ├── Storage/                       # SpeedyPack 存储适配器
 │       ├── Tools/                         # 优化内置工具实现
+│       ├── Tray/                          # 系统托盘（9 种语言本地化）
 │       ├── WebView/                       # Playwright WebView 实现
 │       └── Web/                           # 高性能 Web UI 实现
+│           ├── Component/                 # UI 组件库（30+ 组件）
 │           ├── Controllers/               # 20+ 个控制器
 │           ├── Models/                    # 视图模型
 │           ├── Views/                     # HTML 视图
-│           └── Skins/                     # 4 种皮肤主题
+│           └── Skins/                     # 7 种皮肤主题
+│
+│   ├── SiliconLife.Speedy/                # SpeedyPack 高性能存储引擎
+│   │   ├── SpeedyPack.cs                  # 核心类（内存目录映射 + 缓存 + 异步写入）
+│   │   ├── SpeedyPackOptions.cs           # 配置选项（缓存 TTL、最大条目数等）
+│   │   ├── IPackTransaction.cs            # 事务接口
+│   │   ├── SpkFileInfo.cs                 # 文件信息
+│   │   └── Internal/                      # 内部实现
+│       │   ├── DirectoryMap.cs            # 内存目录映射
+│       │   ├── EntryCache.cs              # 条目缓存
+│       │   ├── FreeList.cs                # 空闲空间管理
+│       │   ├── PackFileReader.cs          # 包文件读取器
+│       │   ├── PackFileWriter.cs          # 包文件写入器
+│       │   ├── WriteQueue.cs              # 异步写入队列
+│       │   ├── WriteOperation.cs          # 写入操作
+│       │   ├── SpeedyTransaction.cs       # 事务实现
+│       │   ├── SpkHeader.cs              # 包文件头
+│       │   └── PathNormalizer.cs          # 路径规范化
+│   │
+│   └── SiliconLife.Speedy.Manager/        # SpeedyPack 管理工具（WPF）
+│       ├── MainForm.cs                    # 主窗体
+│       ├── Program.cs                     # 入口点
+│       └── slc.ico                        # 应用图标
 │
 ├── docs/                                  # 多语言文档
 │   ├── zh-CN/                             # 简体中文文档
@@ -287,10 +322,12 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 - [x] 阶段 10：Web UI（HTTP + SSE，20+ 控制器，4 种皮肤）
 - [x] 阶段 10.5：增量增强（广播频道、Token 审计、32 种日历、工具增强、21 语言本地化）
 - [x] 阶段 10.6：完善与优化（WebView、帮助系统、项目工作区、知识网络）
+- [x] 阶段 11：SpeedyPack 存储引擎（替换 LiteDB、内存映射、异步写入队列、自动压缩）
+- [x] 阶段 12：插件系统（IPlugin 接口、PluginLoader 安全沙箱、隔离加载、工具集成）
 
 ### 🚧 计划中
-- [ ] 阶段 11：外部即时通讯集成（飞书 / WhatsApp / Telegram）
-- [ ] 阶段 12：插件系统和技能生态系统
+- [ ] 阶段 13：外部即时通讯集成（飞书 / WhatsApp / Telegram）
+- [ ] 阶段 14：技能生态系统（插件市场、技能包分发）
 
 ## 📚 文档
 
@@ -344,7 +381,6 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 
 **完全可以！** 两个版本共享相同的：
 - ✅ 配置文件格式（config.json）
-- ✅ 数据目录结构
 - ✅ 工具接口
 - ✅ Being 配置
 - ✅ Web UI 界面
@@ -352,7 +388,7 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 **迁移步骤：**
 1. 备份您的 Default 数据目录
 2. 使用相同的数据目录启动 Fast 版本
-3. Fast 会自动加载现有数据到内存
+3. Fast 会自动将现有数据导入 SpeedyPack 存储引擎
 4. 验证功能正常后，即可日常使用 Fast 版本
 
 ### 两个版本可以共存吗？

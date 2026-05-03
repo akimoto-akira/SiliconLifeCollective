@@ -2,7 +2,7 @@
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
+[English](../en/api-reference.md) | **Deutsch** | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
 
 ## Web-API-Endpunkte
 
@@ -33,6 +33,8 @@ Die meisten Endpunkte erfordern Authentifizierung über Sitzungs-Cookies, die vo
   ]
 }
 ```
+
+**Statuswerte**: `idle` | `running` | `waiting_permission` | `stopped`
 
 ### Being erstellen
 
@@ -364,6 +366,73 @@ data: {"type": "complete", "sessionId": "uuid"}
 ---
 
 ## Systeminformationen
+
+### Über-Seite abrufen
+
+**GET** `/about`
+
+Gibt die Über-Seite mit Systeminformationen und Liste der geladenen Plugins zurück.
+
+**Plugin-Listendaten**:
+```json
+{
+  "plugins": {
+    "plugin-id": {
+      "name": "My Plugin",
+      "version": "1.0.0",
+      "description": "Plugin description",
+      "author": "Author Name"
+    }
+  }
+}
+```
+
+### Berechtigungsanfrage
+
+**GET** `/permission/request?userId={id}&type={type}&resource={resource}`
+
+Zeigt die Berechtigungsanfrageseite an, die es Benutzern ermöglicht, Berechtigungsanfragen von Silicon Beings zu genehmigen oder abzulehnen.
+
+**Abfrageparameter**:
+
+| Parameter | Typ | Beschreibung |
+|------|------|------|
+| `userId` | `Guid` | ID des Silicon Beings, das Berechtigung anfragt |
+| `type` | `string` | Berechtigungstyp |
+| `resource` | `string` | Angeforderter Ressourcenpfad |
+| `allowCode` | `string` | Code-ID für Erlaubnisoperation |
+| `denyCode` | `string` | Code-ID für Verweigerungsoperation |
+
+**Ausstehende Berechtigungsanfragen prüfen**:
+
+**GET** `/permission/check?userId={id}`
+
+**Antwort**:
+```json
+{
+  "pending": true
+}
+```
+
+**Auf Berechtigungsanfrage antworten**:
+
+**GET** `/permission/respond?userId={id}&allowed={bool}&addToCache={bool}&cacheDuration={hours}`
+
+**Abfrageparameter**:
+
+| Parameter | Typ | Beschreibung |
+|------|------|------|
+| `userId` | `Guid` | Silicon Being-ID |
+| `allowed` | `bool` | Ob erlaubt |
+| `addToCache` | `bool` | Ob Entscheidung zwischengespeichert werden soll |
+| `cacheDuration` | `double` | Cache-Dauer (Stunden) |
+
+**Antwort**:
+```json
+{
+  "success": true
+}
+```
 
 ### Dashboard-Daten abrufen
 

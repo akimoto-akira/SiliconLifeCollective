@@ -1,4 +1,4 @@
-﻿# 開發指南
+# 開發指南
 
 > **版本：v0.1.0-alpha**
 
@@ -25,6 +25,8 @@ Silicon Life Collective 採用分層架構設計：
 - **SiliconLife.Common** - 共享實現（兩個版本共用）
 - **SiliconLife.Default** - 預設實現、應用程式入口點（架構可行性驗證）
 - **SiliconLife.Fast** - 高效能實現、應用程式入口點（主推生產版本）
+- **SiliconLife.Speedy** - SpeedyPack 高效能儲存引擎
+- **SiliconLife.Speedy.Manager** - SpeedyPack 管理工具（WPF）
 
 **依賴方向**：
 - `SiliconLife.Default` → `SiliconLife.Core`（單向）
@@ -33,7 +35,7 @@ Silicon Life Collective 採用分層架構設計：
 
 **版本角色說明**：
 - **SiliconLife.Default**：預設實現，主要用於驗證架構可行性。提供簡單可靠的檔案系統儲存實現，適合開發調試和架構驗證。
-- **SiliconLife.Fast**：主推生產版本。在 Default 驗證的架構基礎上，採用記憶體儲存 + 異步持久化，提供極致效能最佳化，是長期運行和實際生產環境的首選。
+- **SiliconLife.Fast**：主推生產版本。在 Default 驗證的架構基礎上，採用 SpeedyPack 記憶體儲存 + 異步持久化，提供極致效能最佳化，是長期運行和實際生產環境的首選。
 
 ---
 
@@ -89,7 +91,7 @@ public class MyCustomTool : ITool
 
 #### 步驟 2: 添加到專案
 
-將工具檔案放置在 `src/SiliconLife.Default/Tools/` 目錄中。`ToolManager` 會在啟動時通過反射自動發現並註冊。
+將工具檔案放置在 `src/SiliconLife.Common/Tools/` 目錄中（共享工具）或 `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` 目錄中（版本特定工具）。`ToolManager` 會在啟動時通過反射自動發現並註冊。
 
 #### 步驟 3: （可選）標記為主理人專用
 
@@ -100,6 +102,50 @@ public class AdminOnlyTool : ITool
     // 僅矽基主理人可存取
 }
 ```
+
+### 建立新插件
+
+1. 建立一個類別庫專案，實現 `IPlugin` 介面：
+
+```csharp
+using SiliconLife.Collective;
+using SiliconLife.Collective.Localization;
+using SiliconLife.Collective.Tools;
+
+public class MyPlugin : IPlugin
+{
+    public string Id => "my-plugin";
+    public string Version => "1.0.0";
+    
+    public string GetName(Language language) => "My Plugin";
+    public string GetDescription(Language language) => "A custom plugin";
+    public string GetAuthor(Language language) => "Author Name";
+    
+    public void OnLoad() { }
+    public void OnStart() { }
+    public void OnStop() { }
+    public void OnUnload() { }
+}
+```
+
+2. （可選）在插件中實現 `ITool` 介面以註冊自訂工具：
+
+```csharp
+public class MyPluginTool : ITool
+{
+    public string Name => "my_plugin_tool";
+    public string Description => "A tool provided by my plugin";
+    
+    public async Task<ToolResult> ExecuteAsync(ToolCall call)
+    {
+        return new ToolResult { Success = true, Output = "Done" };
+    }
+}
+```
+
+3. 將編譯後的 DLL 放入插件目錄，`PluginLoader` 將自動載入。
+
+> **安全限制**：插件不能引用 `System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis` 等命名空間。插件通過 `AssemblyLoadContext` 隔離載入。
 
 ### 建立自訂執行器
 

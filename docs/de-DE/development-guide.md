@@ -2,7 +2,7 @@
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/development-guide.md) | [Deutsch](../de-DE/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/development-guide.md)
+[English](../en/development-guide.md) | **Deutsch** | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/development-guide.md)
 
 ## Architekturübersicht
 
@@ -13,11 +13,13 @@ SiliconLifeCollective folgt der **Body-Brain-Architektur**, mit strenger Trennun
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/      # Schnittstellen, abstrakte Klassen, allgemeine Infrastruktur
-│   ├── SiliconLife.Common/    # Gemeinsame Implementierungen (von beiden Versionen genutzt)
-│   ├── SiliconLife.Default/   # Standardimplementierung, Einstiegspunkt (Architektur-Machbarkeitsverifizierung)
-│   └── SiliconLife.Fast/      # Hochleistungsimplementierung, Einstiegspunkt (Haupt-Produktionsversion)
-└── docs/                      # Mehrsprachige Dokumentation
+│   ├── SiliconLife.Core/            # Schnittstellen, abstrakte Klassen, allgemeine Infrastruktur
+│   ├── SiliconLife.Common/          # Gemeinsame Implementierungen (von beiden Versionen genutzt)
+│   ├── SiliconLife.Default/         # Standardimplementierung, Einstiegspunkt (Architektur-Machbarkeitsverifizierung)
+│   ├── SiliconLife.Fast/            # Hochleistungsimplementierung, Einstiegspunkt (Haupt-Produktionsversion)
+│   ├── SiliconLife.Speedy/          # SpeedyPack Hochleistungs-Speicher-Engine
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack Verwaltungstool (WPF)
+└── docs/                            # Mehrsprachige Dokumentation
 ```
 
 **Abhängigkeitsrichtung**:
@@ -27,7 +29,7 @@ SiliconLifeCollective/
 
 **Versions-Rollenbeschreibung**:
 - **SiliconLife.Default**: Standardimplementierung, hauptsächlich für Architektur-Machbarkeitsverifizierung. Bietet eine einfache und zuverlässige Dateisystem-Speicherimplementierung, geeignet für Entwicklungs-Debugging und Architekturverifizierung.
-- **SiliconLife.Fast**: Haupt-Produktionsversion. Basierend auf der in Default verifizierten Architektur, übernimmt In-Memory-Speicher + asynchrone Persistenz, um extreme Performance-Optimierung zu bieten. Die beste Wahl für Langzeitbetrieb und echte Produktionsumgebungen.
+- **SiliconLife.Fast**: Haupt-Produktionsversion. Basierend auf der in Default verifizierten Architektur, übernimmt SpeedyPack In-Memory-Speicher + asynchrone Persistenz (.spk-Format), um extreme Performance-Optimierung zu bieten. Die beste Wahl für Langzeitbetrieb und echte Produktionsumgebungen.
 
 ## Kernkonzepte
 
@@ -203,6 +205,50 @@ public class MyCustomSkin : ISkin
 
 2. Skins werden automatisch von `SkinManager` entdeckt.
 
+### Neues Plugin hinzufügen
+
+1. Ein Klassenbibliothek-Projekt erstellen, das `IPlugin`-Schnittstelle implementiert:
+
+```csharp
+using SiliconLife.Collective;
+using SiliconLife.Collective.Localization;
+using SiliconLife.Collective.Tools;
+
+public class MyPlugin : IPlugin
+{
+    public string Id => "my-plugin";
+    public string Version => "1.0.0";
+    
+    public string GetName(Language language) => "My Plugin";
+    public string GetDescription(Language language) => "A custom plugin";
+    public string GetAuthor(Language language) => "Author Name";
+    
+    public void OnLoad() { }
+    public void OnStart() { }
+    public void OnStop() { }
+    public void OnUnload() { }
+}
+```
+
+2. (Optional) `ITool`-Schnittstelle im Plugin implementieren, um benutzerdefinierte Tools zu registrieren:
+
+```csharp
+public class MyPluginTool : ITool
+{
+    public string Name => "my_plugin_tool";
+    public string Description => "A tool provided by my plugin";
+    
+    public async Task<ToolResult> ExecuteAsync(ToolCall call)
+    {
+        return new ToolResult { Success = true, Output = "Done" };
+    }
+}
+```
+
+3. Kompilierte DLL im Plugin-Verzeichnis ablegen, `PluginLoader` lädt sie automatisch.
+
+> **Sicherheitsbeschränkung**: Plugins dürfen nicht auf `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` etc. Namespaces verweisen. Plugins werden durch `AssemblyLoadContext` isoliert geladen.
+
 ## Code-Style-Richtlinien
 
 ### Namenskonventionen
@@ -373,9 +419,10 @@ Vollständigen Ablauf testen:
 
 ### Storage-System
 
-- Storage-System priorisiert **Funktionalität über Performance**
-- Standardmäßig dateibasierte JSON-Speicherung
-- Zeitindex-Abfragen verwenden Verzeichnisstruktur
+- Default-Version verwendet dateibasierte JSON-Speicherung
+- Fast-Version verwendet SpeedyPack In-Memory-Speicher-Engine (.spk-Format)
+- SpeedyPack verwendet In-Memory-Verzeichniszuordnung + Eintrags-Cache + asynchrone Schreibwarteschlange
+- Zeitindex-Abfragen verwenden `ITimeStorage`-Schnittstelle
 
 ### Hauptschleifen-Scheduler
 

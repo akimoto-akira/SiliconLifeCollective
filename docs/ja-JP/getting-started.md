@@ -2,7 +2,7 @@
 
 > **バージョン: v0.1.0-alpha**
 
-[English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | **日本語** | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
+[English](../en/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | **日本語** | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
 ## バージョンの選択
 
@@ -19,7 +19,7 @@
 ### SiliconLife.Fast（高性能バージョン）
 - **ポジショニング**：主力本番バージョン
 - **実行モード**：Windowsフォームアプリケーション（システムトレイ）
-- **ストレージ**：メモリストレージ + 非同期永続化
+- **ストレージ**：SpeedyPack メモリストレージ + 非同期永続化（.spk ファイル形式）
 - **適用シナリオ**：高同時実行性、低レイテンシ、大データ量、長期本番運用
 - **プラットフォームサポート**：Windowsのみ
 - **役割説明**：深い最適化が施された本番グレードの実装であり、長期運用と実際の本番環境の第一選択です
@@ -197,8 +197,12 @@ lsof -ti:8080 | xargs kill -9
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/      # コアインターフェースと抽象クラス
-│   └── SiliconLife.Default/   # デフォルト実装 + エントリーポイント
+│   ├── SiliconLife.Core/            # コアインターフェースと抽象クラス
+│   ├── SiliconLife.Common/          # 共有実装（両バージョンで共用）
+│   ├── SiliconLife.Default/         # デフォルト実装 + エントリーポイント（コンソール版）
+│   ├── SiliconLife.Fast/            # 高性能実装 + エントリーポイント（フォーム版）
+│   ├── SiliconLife.Speedy/          # SpeedyPack 高性能ストレージエンジン
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理ツール（WPF）
 ├── docs/                      # ドキュメント（多言語、21種類の言語バリアント）
 │   ├── en/                    # 英語
 │   ├── zh-CN/                 # 簡体字中国語

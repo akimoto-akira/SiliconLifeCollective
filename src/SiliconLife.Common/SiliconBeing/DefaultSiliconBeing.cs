@@ -256,9 +256,9 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 }
             }
 
-            if (TaskSystem != null && TaskSystem.HasPendingTasks())
+            if (TaskSystem != null && TaskSystem.HasPendingTasks(Id))
             {
-                List<TaskItem> runnable = TaskSystem.GetRunnableTasks();
+                List<TaskItem> runnable = TaskSystem.GetRunnableTasks(Id);
                 if (runnable.Count > 0)
                 {
                     TaskItem task = runnable[0];

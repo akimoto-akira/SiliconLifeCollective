@@ -1,8 +1,8 @@
-﻿# 권한 시스템
+# 권한 시스템
 
 > **버전: v0.1.0-alpha**
 
-[English](../en/permission-system.md) | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | [Español](../es-ES/permission-system.md) | [日本語](../ja-JP/permission-system.md) | **한국어** | [Deutsch](../de-DE/permission-system.md) | [Čeština](../cs-CZ/permission-system.md)
+[English](../en/permission-system.md) | [Deutsch](../de-DE/permission-system.md) | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | [Español](../es-ES/permission-system.md) | [日本語](../ja-JP/permission-system.md) | **한국어** | [Čeština](../cs-CZ/permission-system.md)
 
 ## 개요
 
@@ -147,6 +147,16 @@ public class IMPermissionAskHandler : IPermissionAskHandler
     }
 }
 ```
+
+### PermissionRequestQueue 권한 요청 큐
+
+`PermissionRequestQueue`는 대기 중인 권한 요청을 관리하며, 사용자 응답을 비동기적으로 대기합니다:
+
+- **요청 인큐** — 권한 체인이 레벨 5에 도달하면 `TaskCompletionSource<AskPermissionResult>`를 생성하여 인큐
+- **Web UI 표시** — `PermissionRequestController`를 통해 Web UI에 대기 중인 권한 요청 표시
+- **사용자 응답** — 사용자가 Web UI에서 승인 또는 거부, 선택적으로 의사 결정 캐시 및 캐시 지속 시간 설정 가능
+- **캐시 옵션** — 사용자는 권한 의사 결정을 1시간, 24시간, 7일 또는 30일 동안 캐시 가능
+- **타임아웃 메커니즘** — 60초 무응답 시 자동으로 요청 페이지 닫힘
 
 ## 감사 시스템
 

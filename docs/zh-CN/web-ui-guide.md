@@ -1,4 +1,4 @@
-﻿# Web UI 指南
+# Web UI 指南
 
 > **版本：v0.1.0-alpha**
 
@@ -127,9 +127,8 @@ dashboard.onmessage = (event) => {
 
 ### 存储设置
 
-- 基础路径
-- 时间索引
-- 清理策略
+- Default 版本：基础路径、时间索引、清理策略
+- Fast 版本：SpeedyPack 存储引擎配置、.spk 文件管理、自动压缩设置
 
 ### 本地化
 
@@ -149,6 +148,9 @@ dashboard.onmessage = (event) => {
 2. **Chat** - 以对话为中心的设计
 3. **Creative** - 创意和艺术风格
 4. **Dev** - 面向开发者的布局
+5. **HighContrast** - 高对比度主题（Fast 版本）
+6. **Minimal** - 极简风格（Fast 版本）
+7. **Light** - 明亮主题（Fast 版本）
 
 ### 切换皮肤
 

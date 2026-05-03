@@ -1,4 +1,4 @@
-﻿# 安全设计
+# 安全设计
 
 > **版本：v0.1.0-alpha**
 
@@ -304,3 +304,41 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 - **仅主理人访问** —— `TokenAuditTool`（标记为 `[SiliconManagerOnly]`）允许主理人查询和汇总 token 使用。
 - **Web 仪表板** —— `AuditController` 提供基于浏览器的仪表板，带趋势图和数据导出。
 - **持久化存储** —— 记录通过 `ITimeStorage` 存储，用于时间序列查询和长期分析。
+
+---
+
+## 插件安全
+
+插件系统引入了第三方代码执行的安全风险，通过以下机制缓解：
+
+### 安全沙箱
+
+`PluginLoader` 在加载插件时执行严格的安全扫描：
+
+1. **禁止命名空间检查** — 插件不能引用以下命名空间：
+   - `System.IO` — 文件系统访问
+   - `System.Net.Http` — HTTP 请求
+   - `System.Net.WebSockets` — WebSocket 连接
+   - `System.Net.Sockets` — 原始套接字
+   - `Microsoft.CodeAnalysis` — 编译器 API
+
+2. **可信程序集白名单** — 以下程序集的引用被允许：
+   - `Google.Protobuf`、`Newtonsoft.Json`、`MessagePack`
+   - `Serilog`、`Microsoft.Extensions.Logging.Abstractions`
+   - `Dapper`
+
+3. **禁止类型检查** — 扫描插件中引用的危险类型
+
+4. **禁止成员检查** — 扫描插件中调用的危险方法
+
+### 隔离加载
+
+- 使用自定义 `AssemblyLoadContext` 隔离加载每个插件
+- 插件之间的类型和程序集不会互相干扰
+- 插件卸载时可以释放相关资源
+
+### 工具权限约束
+
+- 插件通过 `ITool` 接口注册的工具受相同的权限系统约束
+- 插件工具不能绕过 5 级权限链
+- 插件工具受 `[SiliconManagerOnly]` 标记约束

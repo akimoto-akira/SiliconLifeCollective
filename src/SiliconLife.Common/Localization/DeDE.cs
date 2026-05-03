@@ -170,6 +170,16 @@ public class DeDE : DefaultLocalizationBase
     public override string PermissionCacheDuration30Days => "30 Tage";
 
     /// <summary>
+    /// Gets the prefix for project group chat session names
+    /// </summary>
+    public override string ProjectGroupChatPrefix => "Projektgruppe";
+
+    /// <summary>
+    /// Gets the prefix for project broadcast channel names
+    /// </summary>
+    public override string ProjectBroadcastPrefix => "Projektrundfunk";
+
+    /// <summary>
     /// Gets the localized display name for a permission type
     /// </summary>
     public override string GetPermissionTypeName(PermissionType permissionType) => permissionType switch
@@ -361,6 +371,20 @@ public class DeDE : DefaultLocalizationBase
     public override string ProjectTasksLinkLabel => "Aufgaben";
     
     public override string ProjectWorkNotesLinkLabel => "Arbeitsnotizen";
+    public override string ProjectWorkflowsLinkLabel => "Arbeitsabläufe";
+    public override string ProjectWorkflowsPageHeader => "Projektarbeitsabläufe";
+    public override string ProjectWorkflowsEmptyState => "Dieses Projekt hat noch keine Arbeitsabläufe";
+    public override string CreateWorkflowButton => "Arbeitsablauf erstellen";
+    public override string ActiveWorkflowsHeader => "Aktive Arbeitsabläufe";
+    public override string BackToProject => "Zurück zum Projekt";
+    public override string WorkflowCurrentStateLabel => "Aktueller Status:";
+    public override string WorkflowCreatedByLabel => "Erstellt von:";
+    public override string WorkflowUpdatedAtLabel => "Aktualisiert am:";
+    public override string WorkflowBusinessKeyPrompt => "Bitte Geschäftsschlüssel eingeben (z.B. PR-Nummer, Issue-ID):";
+    public override string WorkflowCreatedSuccess => "Arbeitsablauf erfolgreich erstellt!";
+    public override string WorkflowCreateFailed => "Erstellung fehlgeschlagen:";
+    public override string WorkflowDetailInProgress => "Arbeitsablauf-Detailfunktion in Entwicklung...";
+    public override string WorkflowInstanceIdLabel => "Instanz-ID:";
     public override string ProjectWorkNotesPageHeader => "Projektarbeitsnotizen";
     public override string ProjectWorkNotesEmptyState => "Dieses Projekt hat noch keine Arbeitsnotizen";
     public override string ProjectWorkNotesTotalPages => "Gesamtseiten: {0}";

@@ -2,7 +2,7 @@
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md)
+**English** | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md)
 
 ## Common Issues
 
@@ -267,6 +267,30 @@ IOException: Access denied
 
 3. Manually fix corrupted files
 
+#### Issue: SpeedyPack Storage File Corruption (Fast Version)
+
+**Symptoms**:
+- `.spk` file cannot be loaded
+- SpeedyStorage initialization fails
+
+**Solution**:
+1. Use the `SiliconLife.Speedy.Manager` tool to check and repair `.spk` files
+2. Check if the `.spk.idx` index file matches the `.spk` file
+3. If the index file is corrupted, delete the `.spk.idx` file and the system will automatically rebuild the index
+4. Restore the `.spk` file from backup
+
+#### Issue: SpeedyPack Auto-Compaction Failure (Fast Version)
+
+**Symptoms**:
+- `.spk` file keeps growing
+- Disk space running low
+
+**Solution**:
+1. Check if `SpeedyPackAutoCompactor` is running normally
+2. Manually trigger compaction
+3. Check compaction threshold configuration
+4. Use the `SiliconLife.Speedy.Manager` tool for manual compaction
+
 ---
 
 ### Tool Execution Issues
@@ -282,7 +306,7 @@ Tool "xyz" not found
 1. Verify tool name is correct
 2. Check tool exists in Tools directory
 3. Rebuild the project
-4. Check tool implements correctly
+4. Check tool is properly implemented
 
 #### Issue: Tool returns error
 
@@ -296,6 +320,34 @@ Tool execution failed: ...
 2. Verify input parameters
 3. Test tool independently
 4. Check permissions
+
+---
+
+### Plugin Issues
+
+#### Issue: Plugin Load Failure
+
+**Symptoms**:
+```
+Plugin load failed: Security check failed
+```
+
+**Solution**:
+1. Check if the plugin references forbidden namespaces (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
+2. Verify the plugin only references assemblies in the trusted assembly whitelist
+3. Check if the plugin correctly implements the `IPlugin` interface
+4. Check logs for detailed security check failure reasons
+
+#### Issue: Plugin Tool Not Registered
+
+**Symptoms**:
+- Plugin loads successfully but tools don't appear in the tool list
+
+**Solution**:
+1. Confirm the tool class in the plugin correctly implements the `ITool` interface
+2. Check if the tool class is public
+3. Verify `ToolManager.ScanAllPluginAssemblies()` is being called
+4. Rebuild the plugin and restart the application
 
 ---
 

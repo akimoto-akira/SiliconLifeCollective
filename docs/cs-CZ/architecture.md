@@ -1,4 +1,4 @@
-﻿# Architektura
+# Architektura
 
 > **Verze: v0.1.0-alpha**
 
@@ -18,10 +18,10 @@ Tento projekt poskytuje dvě implementační verze, které sdílejí stejný ná
 ### SiliconLife.Fast (Vysoce Výkonná Verze)
 - **Pozicování**: Hlavní produkční verze
 - **Režim Spuštění**: Windows Forms aplikace (s podporou systémové lišty)
-- **Úložiště**: Paměťové úložiště + asynchronní dávková perzistence (WAL protokol)
+- **Úložiště**: SpeedyPack paměťové úložiště + asynchronní dávková perzistence (.spk formát souboru)
 - **Scénář Použití**: Scénáře s vysokou souběžností, nízkou latencí, velkým objemem dat
 - **Zlepšení Výkonu**: Latence čtení úložiště snížena 1000x, latence zápisu snížena 15000x
-- **Popis role**: Produkční implementace s hlubokou optimalizací, se systémovou lištou na pozadí a extrémní optimalizací výkonu, nejlepší volba pro dlouhodobý provoz a reálné produkční prostředí
+- **Popis role**: Produkční implementace s hlubokou optimalizací, se systémovou lištou na pozadí, SpeedyPack engine + automatická komprese zajišťují bezpečnost dat, nejlepší volba pro dlouhodobý provoz a reálné produkční prostředí
 
 > **Poznámka**: Architektura popsaná v tomto dokumentu platí pro obě verze, s rozdíly pouze v části implementace úložiště. SiliconLife.Default je referenční ověření architektury, SiliconLife.Fast je hlavní verze pro produkční prostředí.
 
@@ -117,6 +117,10 @@ To zajišťuje reakci na interakci uživatele, aniž by narušovalo probíhajíc
 │  │  │ AI       │  │Exekutor  │  │ Správce         │  │   │
 │  │  │ klient   │  │          │  │ nástrojů        │  │   │
 │  │  └──────────┘ └──────────┘ └──────────────────┘  │   │
+│  │  ┌──────────┐ ┌──────────┐                        │   │
+│  │  │Zavaděč   │  │Znalostní │                        │   │
+│  │  │pluginů   │  │ síť      │                        │   │
+│  │  └──────────┘ └──────────┘                        │   │
 │  └──────────────────────────────────────────────────┘   │
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐   │
@@ -227,205 +231,358 @@ Model `ChatMessage` obsahuje pole pro kontext AI konverzace a sledování token�
 - **Čištění zdrojů** — Správně čistí přidružené zdroje při zrušení
 - **Souběžně bezpečný** — Podporuje správu více streamů současně
 
+### Zobrazení Historie Chatu
+
+Nová funkce zobrazení historie chatu umožňuje uživatelům procházet historické konverzace silikonových bytostí:
+
+- **Seznam relací** — Zobrazuje všechny historické relace
+- **Detaily zpráv** — Zobrazení úplné historie zpráv
+- **Časová osa** — Zobrazení zpráv v chronologickém pořadí
+- **API podpora** — Poskytuje RESTful API pro získávání dat relací a zpráv
+
 ---
 
 ## AI Klientský Systém
 
-### IAIClient Rozhraní
+Systém podporuje více AI backendů prostřednictvím rozhraní `IAIClient`:
 
-```csharp
-public interface IAIClient
-{
-    string Name { get; }
-    Task<AIResponse> ChatAsync(AIRequest request);
-    IAsyncEnumerable<string> StreamChatAsync(AIRequest request);
-}
-```
+### OllamaClient
 
-### Implementace Klientů
+- **Typ**: Lokální AI služba
+- **Protokol**: Nativní Ollama HTTP API (`/api/chat`, `/api/generate`)
+- **Funkce**: Streamování, volání nástrojů, lokální hostování modelů
+- **Konfigurace**: `endpoint`, `model`, `temperature`, `maxTokens`
 
-- **OllamaClient** — Lokální AI přes Ollama API
-- **DashScopeClient** — Cloudová AI přes Alibaba Cloud Bailian API
+### DashScopeClient (Alibaba Cloud Bailian)
 
-### Factory Pattern
+- **Typ**: Cloudová AI služba
+- **Protokol**: API kompatibilní s OpenAI (`/compatible-mode/v1/chat/completions`)
+- **Autentizace**: Bearer token (API klíč)
+- **Funkce**: Streamování, volání nástrojů, obsah reasoningu (řetězec myšlenek), nasazení ve více regionech
+- **Podporované regiony**:
+  - `beijing` — Severní Čína 2 (Peking)
+  - `virginia` — USA (Virginie)
+  - `singapore` — Singapur
+  - `hongkong` — Hongkong, Čína
+  - `frankfurt` — Německo (Frankfurt)
+- **Podporované modely** (dynamicky objevované přes API, s fallback seznamem):
+  - **Řada Qwen**: qwen3-max, qwen3.6-plus, qwen3.6-flash, qwen-max, qwen-plus, qwen-turbo, qwen3-coder-plus
+  - **Reasoning**: qwq-plus
+  - **Třetí strany**: deepseek-v3.2, deepseek-r1, glm-5.1, kimi-k2.5, llama-4-maverick
+- **Konfigurace**: `apiKey`, `region`, `model`
+- **Objevování modelů**: Za běhu načítá dostupné modely z Bailian API; při selhání sítě se vrátí k kurátorovanému seznamu
 
-Každý AI klient má odpovídající factory:
+### Factory Pattern Klientů
 
-```csharp
-public interface IAIClientFactory
-{
-    IAIClient CreateClient(AIClientConfig config);
-}
-```
+Každý typ AI klienta má odpovídající factory implementaci `IAIClientFactory`:
 
-Factory jsou automaticky objevovány a registrovány prostřednictvím reflexe.
+- `OllamaClientFactory` — Vytváří instance OllamaClient
+- `DashScopeClientFactory` — Vytváří instance DashScopeClient
 
----
+Factory poskytují:
+- `CreateClient(Dictionary<string, object> config)` — Inicializuje klienta z konfigurace
+- `GetConfigKeyOptions(string key, ...)` — Vrací dynamické možnosti pro konfigurační klíč (např. dostupné modely, regiony)
+- `GetDisplayName()` — Lokalizovaný zobrazovaný název typu klienta
 
-## Systém Nástrojů
+### Seznam Podpory AI Platforem
 
-### Objevování Nástrojů
+#### Popis Stavu
+- ✅ Implementováno
+- 🚧 Ve vývoji
+- 📋 Plánováno
+- 💡 Zvažováno
 
-Nástroje jsou automaticky objevovány prostřednictvím reflexe:
+*Poznámka: Vzhledem k síťovému prostředí vývojáře může přístup ke zvažovaným zámořským cloudovým AI službám vyžadovat použití síťových proxy nástrojů a proces ladění může být nestabilní.*
 
-1. Skenování všech sestav pro třídy implementující `ITool`
-2. Vytvoření instance a registrace do `ToolManager` každé bytosti
-3. Podpora atributu `[SiliconManagerOnly]` pro nástroje pouze pro kurátora
+#### Seznam Platforem
 
-### Vykonávání Nástrojů
-
-```
-AI vrací tool_calls
-  ↓
-ToolManager najde a ověří použití nástroje
-  ↓
-Správce oprávnění zkontroluje řetězec oprávnění
-  ↓
-Exekutor provede operaci přístupu ke zdroji
-  ↓
-AI přijme výsledek nástroje, pokračuje v myšlení
-```
-
----
-
-## 32 Kalendářových Systémů
-
-Platforma podporuje 32 kalendářových systémů:
-
-### Hlavní Kalendáře (6)
-- Gregoriánský, Čínský lunární, Islámský, Hebrejský, Perský, Indický
-
-### Čínské Historické (2)
-- Čínský historický (cyklický letopočet + éry panovníků), Sexagenární
-
-### Východoasijské (6)
-- Japonský, Vietnamský, Tibetský, Mongolský, Dai, Dehong Dai
-
-### Historické (6)
-- Mayský, Římský, Juliánský, Francouzský republikánský, Koptský, Etiopský
-
-### Regionální (6)
-- Buddhistický, Saka, Vikram Samvat, Jávský, Chula Sakarat, Khmerský
-
-### Moderní (3)
-- ROC, Čučche, Zoroastriánský
-
-### Etnické (3)
-- Yi, Čerokézský, Inuitský
+| Platforma | Stav | Typ | Popis |
+|------|------|------|------|
+| Ollama | ✅ | Lokální | Lokální AI služba, podpora nasazení lokálních modelů |
+| DashScope (Alibaba Cloud Bailian) | ✅ | Cloud | Alibaba Cloud Bailian AI služba, podpora nasazení ve více regionech |
+| Baidu Qianfan (Wenxin Yiyan) | 📋 | Cloud | Baidu Wenxin Yiyan AI služba |
+| Zhipu AI (GLM) | 📋 | Cloud | Zhipu Qingyan AI služba |
+| Moonshot (Kimi) | 📋 | Cloud | Moonshot Kimi AI služba |
+| Volcano Ark Engine Doubao | 📋 | Cloud | ByteDance Doubao AI služba |
+| DeepSeek (přímé připojení) | 📋 | Cloud | DeepSeek AI služba |
+| Yi (Zero-One) | 📋 | Cloud | Yi AI služba |
+| Tencent Hunyuan | 📋 | Cloud | Tencent Hunyuan AI služba |
+| SiliconFlow | 📋 | Cloud | SiliconFlow AI služba |
+| MiniMax | 📋 | Cloud | MiniMax AI služba |
+| OpenAI | 💡 | Cloud | OpenAI API služba (řada GPT) |
+| Anthropic | 💡 | Cloud | Anthropic Claude AI služba |
+| Google DeepMind | 💡 | Cloud | Google Gemini AI služba |
+| Mistral AI | 💡 | Cloud | Mistral AI služba |
+| Groq | 💡 | Cloud | Groq vysokorychlostní AI inference služba |
+| Together AI | 💡 | Cloud | Together AI služba open-source modelů |
+| xAI | 💡 | Cloud | xAI Grok služba |
+| Cohere | 💡 | Cloud | Cohere enterprise NLP služba |
+| Replicate | 💡 | Cloud | Replicate platforma pro hostování open-source modelů |
+| Hugging Face | 💡 | Cloud | Hugging Face open-source AI komunita a platforma modelů |
+| Cerebras | 💡 | Cloud | Cerebras AI inference optimalizační služba |
+| Databricks | 💡 | Cloud | Databricks enterprise AI platforma (MosaicML) |
+| Perplexity AI | 💡 | Cloud | Perplexity AI vyhledávací Q&A služba |
+| NVIDIA NIM | 💡 | Cloud | NVIDIA AI inference mikroservis |
 
 ---
 
-## Web UI Architektura
+## Klíčová Rozhodnutí o Designu
 
-### Server-Side Rendering
+### Úložiště jako Instance (ne Statické)
 
-Web UI používá čistý server-side rendering, žádná závislost na frontendovém frameworku:
+`IStorage` je navrženo jako injectable instance, nikoli jako statický nástroj. To zajišťuje:
 
-- **HtmlBuilder** — Generuje HTML z C#
-- **CssBuilder** — Generuje CSS styly
-- **JsBuilder** — Generuje JavaScript
-
-### SSE (Server-Sent Events)
-
-Real-time aktualizace přes Server-Sent Events:
-
-- Streamování chatovacích odpovědí
-- Aktualizace stavu bytostí
-- Systémová oznámení
-- Automatické opětovné připojení klienta
-
-### Systém Skinů
-
-Skinů jsou automaticky objevovány prostřednictvím reflexe:
-
-- **Admin** — Profesionální správcovské rozhraní
-- **Chat** — Design zaměřený na konverzaci
-- **Creative** — Kreativní a umělecký styl
-- **Dev** — Rozložení orientované na vývojáře
-
----
-
-## Bezpečnostní Architektura
-
-### Vrstvená Obrana
-
-```
-Volání nástroje → Exekutor → Správce oprávnění → Vysoké zamítnutí → Vysoké povolení → Callback → Dotaz uživatele
-```
+- Přímý přístup k souborovému systému — IStorage je interní perzistenční kanál systému, **není** směrován přes exekutory.
+- **AI nemůže ovládat IStorage** — Exekutory spravují IO iniciované AI nástroji; IStorage spravuje vlastní interní čtení a zápis dat frameworku. Toto jsou zásadně odlišné zájmy.
+- Testovatelnost s mock implementacemi.
+- Budoucí podpora různých úložných backendů bez úpravy konzumentů.
 
 ### Exekutory jako Bezpečnostní Hranice
 
-- Všechny I/O operace musí procházet přes exekutory
-- Každý exekutor má nezávislé plánovací vlákno
-- Kontrola oprávnění před provedením
-- Zpracování časového limitu a izolace výjimek
+Exekutory jsou **jedinou** cestou pro I/O operace. Nástroje vyžadující přístup k disku, síti nebo příkazovému řádku **musí** procházet přes exekutory. Tento design vynucuje:
 
-### Dynamická Kompilační Bezpečnost
+- **Nezávislé plánovací vlákno** pro každý exekutor s uzamčením vlákna pro ověřování oprávnění.
+- Centralizovaná kontrola oprávnění — exekutory dotazují **privátního správce oprávnění** bytosti.
+- Fronta požadavků s podporou priority a řízení časového limitu.
+- Auditní logování všech externích operací.
+- Izolace výjimek — selhání jednoho exekutoru neovlivňuje ostatní.
+- Jistič — po sobě jdoucí selhání dočasně zastaví exekutor, aby se předešlo kaskádovým selháním.
 
-- AES-256 šifrování zkompilovaného kódu
-- Statické skenování nebezpečných vzorů kódu
-- Kontrola referencí při kompilaci (vyloučení nebezpečných sestav)
-- Izolace paměti pro kompilovaný kód
+### ContextManager jako Lehký Objekt
 
----
+Každé `ExecuteOneRound()` vytváří novou instanci `ContextManager`:
 
-## Datové Úložiště
+1. Načte soubor duše + nedávnou historii chatu.
+2. Odešle požadavek AI klientovi.
+3. Zpracuje volání nástrojů ve smyčce, dokud AI nevrátí čistý text.
+4. Perzistuje odpověď do chatovacího systému.
+5. Uvolní.
 
-### IStorage Rozhraní
+To udržuje každé kolo izolované a bezstavové.
 
-```csharp
-public interface IStorage
-{
-    Task<string> ReadAsync(string key);
-    Task WriteAsync(string key, string value);
-    Task<bool> ExistsAsync(string key);
-    Task DeleteAsync(string key);
-}
-```
+### Sebevývoj Přepsáním Třídy
 
-### ITimeStorage Rozhraní
+Silikonové bytosti mohou za běhu přepisovat své vlastní C# třídy:
 
-```csharp
-public interface ITimeStorage
-{
-    Task<IEnumerable<string>> ReadByTimeAsync(DateTime start, DateTime end);
-    Task<IEnumerable<string>> ReadByTimeAsync(DateTime start, DateTime end, string prefix);
-}
-```
+1. AI generuje nový kód třídy (musí dědit z `SiliconBeingBase`).
+2. **Kontrola referencí při kompilaci** (primární obrana): kompilátor získá pouze povolený seznam sestav — `System.IO`, `System.Reflection` atd. jsou vyloučeny, takže nebezpečný kód je nemožný na úrovni typů.
+3. **Statická analýza za běhu** (sekundární obrana): `SecurityScanner` skenuje kód po úspěšné kompilaci na nebezpečné vzory.
+4. Roslyn zkompiluje kód v paměti.
+5. Při úspěchu: `SiliconBeingManager.ReplaceBeing()` vymění aktuální instanci, migruje stav a perzistuje šifrovaný kód na disk.
+6. Při selhání: nový kód je zahozen, stávající implementace zůstává.
 
-### Implementace
+Vlastní implementace `IPermissionCallback` může být také zkompilována a injektována prostřednictvím `ReplacePermissionCallback()`, což umožňuje bytostem přizpůsobit svou vlastní logiku oprávnění.
 
-- **FileSystemStorage** — Výchozí implementace založená na souborovém systému
-- Struktura klíč-hodnota
-- Časově indexované dotazy
-- Přístup k přímému souborovému systému — **AI nemůže ovládat IStorage**
+Kód je na disku uložen šifrovaný pomocí AES-256. Šifrovací klíč je odvozen z GUID bytosti (velká písmena) pomocí PBKDF2.
 
 ---
 
-## Lokalizační Systém
+## Audit Využití Tokenů
 
-### Podporované Jazyky (21 variant)
+Prostřednictvím `DefaultConfigData.Language` je vybráno aktivní jazykové prostředí a řešeno přes `LocalizationManager`.
 
-- **Čínština (6)**: Zjednodušená, Tradiční, Singapurská, Macajská, Tchajwanská, Malajsijská
-- **Angličtina (10)**: Americká, Britská, Kanadská, Australská, Indická, Singapurská, Jihhoafrická, Irská, Novozélandská, Malajsijská
-- **Španělština (2)**: Španělská, Mexická
-- **Japonština, Korejština, Čeština**
+---
 
-### Implementace
+### Systém Automatizace WebView Prohlížeče (Nové)
 
-```csharp
-public abstract class LocalizationBase
-{
-    public abstract string LanguageCode { get; }
-    public abstract string GetTranslation(string key);
-}
+Systém integruje automatizační funkce WebView prohlížeče založené na **Playwright**:
+
+- **Individuální izolace**: Každá silikonová bytost má vlastní instanci prohlížeče, cookies a úložiště relací, zcela izolované a vzájemně neovlivňované.
+- **Headless režim**: Prohlížeč běží v uživateli zcela neviditelném headless režimu, silikonové bytosti operují autonomně na pozadí.
+- **WebViewBrowserTool**: Poskytuje kompletní schopnosti ovládání prohlížeče, včetně:
+  - Navigace na stránce, kliknutí, zadávání textu, získávání obsahu stránky
+  - Spouštění JavaScriptu, pořizování snímků obrazovky, čekání na prvky
+  - Správa stavu prohlížeče a čištění zdrojů
+- **Bezpečnostní kontrola**: Všechny operace prohlížeče musí projít řetězcem ověřování oprávnění, aby se zabránilo přístupu k škodlivým webovým stránkám.
+
+### Znalostní Síť (Nové)
+
+Systém obsahuje vestavěný systém znalostního grafu založený na **trojicové struktuře**:
+
+- **Reprezentace znalostí**: Používá strukturu trojice "subjekt-relace-objekt" (např.: Python-je_programovací_jazyk)
+- **KnowledgeTool**: Poskytuje správu celého životního cyklu znalostí:
+  - `add`/`query`/`update`/`delete` - základní CRUD operace
+  - `search` - fulltextové vyhledávání a shoda klíčových slov
+  - `get_path` - objevování asociačních cest mezi dvěma koncepty
+  - `validate` - kontrola úplnosti znalostí
+  - `stats` - statistická analýza znalostní sítě
+- **Perzistentní úložiště**: Trojice znalostí jsou perzistovány na souborový systém s podporou časově indexovaných dotazů.
+- **Skóre důvěryhodnosti**: Každá položka znalostí má skóre důvěryhodnosti (0-1), podporuje fuzzy matching a řazení znalostí.
+- **Tagová klasifikace**: Podpora přidávání tagů ke znalostem pro snadnější kategorizaci a vyhledávání.
+
+---
+
+## Struktura Datového Adresáře
+
+```
+data/
+└── SiliconManager/
+    ├── {curator-guid}/
+    │   ├── soul.md          # Soubor duše kurátora
+    │   ├── state.json       # Stav za běhu
+    │   ├── code.enc         # AES šifrovaný kód vlastní třídy
+    │   └── permission.enc   # AES šifrované vlastní zpětné volání oprávnění
+    │
+    └── {being-guid}/
+        ├── soul.md
+        ├── state.json
+        ├── code.enc
+        └── permission.enc
 ```
 
 ---
 
-## Další Kroky
+## SpeedyPack Úložný Engine
 
-- 🚀 Podívejte se na [Průvodce Rychlým Startem](getting-started.md)
-- 🛠️ Přečtěte si [Vývojářskou Příručku](development-guide.md)
-- 📚 Prozkoumejte [Referenci API](api-reference.md)
-- 🔒 Pochopte [Bezpečnostní Návrh](security.md)
+SiliconLife.Fast používá vlastní SpeedyPack úložný engine (.spk formát), který nahradil předchozí řešení LiteDB a dosahuje extrémní výkon čtení a zápisu.
+
+### Návrh Architektury
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    SpeedyPack                             │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
+│  │ DirectoryMap  │  │  EntryCache   │  │  WriteQueue   │  │
+│  │ (mapování     │  │  (mezipaměť   │  │ (asynchronní  │  │
+│  │  paměťových   │  │   záznamů)    │  │  fronta       │  │
+│  │  adresářů)    │  │              │  │  zápisu)      │  │
+│  └──────┬───────┘  └──────┬───────┘  └───────┬───────┘  │
+│         │                  │                   │          │
+│  ┌──────▼──────────────────▼───────────────────▼───────┐  │
+│  │              PackFileReader / PackFileWriter          │  │
+│  │              (čtečka/zapisovač balíčkových souborů)   │  │
+│  └──────────────────────────┬──────────────────────────┘  │
+│                              │                             │
+│  ┌──────────────────────────▼──────────────────────────┐  │
+│  │              .spk soubor (MessagePack + LZ4 komprese) │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐                      │
+│  │  FreeList     │  │ SpeedyPack   │                      │
+│  │ (správa       │  │ AutoCompactor│                      │
+│  │  volného      │  │ (automatická │                      │
+│  │  prostoru)    │  │  komprese)   │                      │
+│  └──────────────┘  └──────────────┘                      │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Core Komponenty
+
+| Komponenta | Popis |
+|------|------|
+| `SpeedyPack` | Jádrová třída, kombinuje DirectoryMap, EntryCache a WriteQueue pro nízkolatencní čtení a zápis |
+| `DirectoryMap` | Mapování paměťových adresářů, udržuje mapování virtuálních cest na záznamy souborů |
+| `EntryCache` | Mezipaměť záznamů, TTL-based mezipaměť nedávno přístupných záznamů |
+| `WriteQueue` | Asynchronní fronta zápisu, řadí operace zápisu do vlákna na pozadí |
+| `FreeList` | Správa volného prostoru, sleduje znovupoužitelný prostor v .spk souborech |
+| `PackFileReader` | Čtečka balíčkových souborů, čte data z .spk souborů |
+| `PackFileWriter` | Zapisovač balíčkových souborů, zapisuje data do .spk souborů |
+| `SpeedyPackAutoCompactor` | Automatický kompresní časovač, pravidelně komprimuje .spk soubory pro uvolnění volného prostoru |
+| `SpeedyPackRegistry` | Správce singleton na úrovni procesu, zajišťuje, že celá aplikace používá stejnou instanci SpeedyPack |
+
+### Úložné Adaptéry
+
+SiliconLife.Fast integruje SpeedyPack do systémových rozhraní prostřednictvím následujících adaptérů:
+
+| Adaptér | Rozhraní | Popis |
+|--------|------|------|
+| `SpeedyStorage` | `IStorage` | Adaptér obecného úložiště klíč-hodnota |
+| `SpeedyTimeStorage` | `ITimeStorage` | Adaptér časově indexovaného úložiště |
+| `SpeedyWorkNoteStorage` | `IWorkNoteStorage` | Adaptér úložiště pracovních poznámek |
+
+### Konfigurační Možnosti
+
+`SpeedyPackOptions` poskytuje následující konfiguraci:
+
+| Možnost | Typ | Výchozí hodnota | Popis |
+|------|------|--------|------|
+| `CacheTtl` | `TimeSpan` | 5 minut | Doba života položek mezipaměti |
+| `MaxCacheEntries` | `int` | 1000 | Maximální počet položek mezipaměti |
+| `ReadOnly` | `bool` | false | Režim pouze pro čtení |
+
+### Podpora Transakcí
+
+SpeedyPack podporuje atomické operace zápisu prostřednictvím rozhraní `IPackTransaction`:
+
+- `SpeedyTransaction` implementuje transakční mechanismus
+- Podporuje atomicitu dávkového zápisu
+- Při commitu transakce všechny operace zápisu buď uspějí, nebo se všechny vrátí zpět
+
+---
+
+## Plugin Systém
+
+SiliconLife podporuje rozšíření funkcí prostřednictvím plugin systému, umožňující vývojářům třetích stran přidávat do platformy nové funkce.
+
+### Core Rozhraní
+
+```csharp
+public interface IPlugin
+{
+    string Id { get; }
+    string GetName(Language language);
+    string Version { get; }
+    string GetDescription(Language language);
+    string GetAuthor(Language language);
+    void OnLoad();
+    void OnStart();
+    void OnStop();
+    void OnUnload();
+}
+```
+
+### Zavaděč Pluginů
+
+`PluginLoader` je zodpovědný za načítání plugin DLL z určeného adresáře a provádění přísných bezpečnostních kontrol:
+
+1. **Skenování adresáře** — Skenuje všechny .dll soubory v adresáři pluginů
+2. **Bezpečnostní skenování** — Kontroluje, zda pluginy neodkazují na zakázané jmenné prostory
+3. **Izolované načítání** — Používá vlastní `AssemblyLoadContext` pro izolované načítání pluginů
+4. **Správa životního cyklu** — Volá metody OnLoad, OnStart, OnStop, OnUnload pluginů
+
+### Bezpečnostní Sandbox
+
+Zavaděč pluginů provádí následující bezpečnostní kontroly:
+
+| Kontrola | Popis |
+|--------|------|
+| Zakázané jmenné prostory | System.IO, System.Net.Http, System.Net.WebSockets, System.Net.Sockets, Microsoft.CodeAnalysis |
+| Whitelist důvěryhodných sestav | Google.Protobuf, Newtonsoft.Json, MessagePack, Serilog, Microsoft.Extensions.Logging.Abstractions, Dapper |
+| Kontrola zakázaných typů | Skenování nebezpečných typů odkazovaných v pluginech |
+| Kontrola zakázaných členů | Skenování nebezpečných metod volaných v pluginech |
+
+### Integrace Nástrojů
+
+Pluginy mohou registrovat vlastní nástroje implementací rozhraní `ITool`:
+
+- Metoda `ToolManager.ScanAllPluginAssemblies()` skenuje implementace ITool ve všech načtených pluginech
+- Pluginové nástroje jsou automaticky integrovány do cyklu volání nástrojů
+- Pluginové nástroje podléhají stejnému systému oprávnění
+
+### Životní Cyklus Pluginu
+
+```
+Načtení (OnLoad) → Spuštění (OnStart) → Běží → Zastavení (OnStop) → Uvolnění (OnUnload)
+```
+
+---
+
+## Stavy Aktivity Silikonové Bytosti
+
+Silikonové bytosti mají následující stavy aktivity:
+
+| Stav | Popis |
+|------|------|
+| `Idle` | Nečinný stav, čeká na spuštění hodin |
+| `Running` | Provádí jedno kolo AI požadavku + volání nástrojů |
+| `WaitingPermission` | Čeká na schválení oprávnění uživatelem |
+| `Stopped` | Zastaveno, z důvodu chyby nebo ručního zastavení |
+
+Přechody stavů:
+```
+Idle → Running → Idle (normální dokončení)
+Running → WaitingPermission → Running (pokračování po schválení oprávnění)
+Running → Stopped (chyba nebo ruční zastavení)
+Stopped → Idle (restartování)
+```

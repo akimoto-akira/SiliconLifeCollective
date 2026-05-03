@@ -19,7 +19,7 @@ Este proyecto proporciona dos versiones de implementación:
 ### SiliconLife.Fast (Versión de Alto Rendimiento)
 - **Posicionamiento**: Versión de producción principal
 - **Modo de Ejecución**: Aplicación de formularios Windows (bandeja del sistema)
-- **Almacenamiento**: Almacenamiento en memoria + persistencia asíncrona
+- **Almacenamiento**: Almacenamiento en memoria SpeedyPack + persistencia asíncrona (formato de archivo .spk)
 - **Escenario de Aplicación**: Alta concurrencia, baja latencia, gran volumen de datos, operaciones de producción a largo plazo
 - **Soporte de Plataforma**: Solo Windows
 - **Descripción de Rol**: Implementación de nivel de producción con optimización profunda, la mejor opción para operaciones a largo plazo y entornos de producción reales
@@ -197,18 +197,22 @@ lsof -ti:8080 | xargs kill -9
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/      # Interfaces centrales y clases abstractas
-│   └── SiliconLife.Default/   # Implementación predeterminada + punto de entrada
-├── docs/                      # Documentación (multilingüe, 21 variantes de idioma)
-│   ├── en/                    # Inglés
-│   ├── zh-CN/                 # Chino simplificado
-│   ├── zh-HK/                 # Chino tradicional
-│   ├── es-ES/                 # Español
-│   ├── ja-JP/                 # Japonés
-│   ├── ko-KR/                 # Coreano
-│   └── cs-CZ/                 # Checo
-├── 总文档/                     # Documentos de requisitos y arquitectura (chino)
-└── README.md                  # Descripción del proyecto
+│   ├── SiliconLife.Core/            # Interfaces centrales y clases abstractas
+│   ├── SiliconLife.Common/          # Implementación compartida (común a ambas versiones)
+│   ├── SiliconLife.Default/         # Implementación predeterminada + punto de entrada (versión consola)
+│   ├── SiliconLife.Fast/            # Implementación de alto rendimiento + punto de entrada (versión formularios)
+│   ├── SiliconLife.Speedy/          # Motor de almacenamiento de alto rendimiento SpeedyPack
+│   └── SiliconLife.Speedy.Manager/  # Herramienta de gestión SpeedyPack (WPF)
+├── docs/                            # Documentación (multilingüe, 21 variantes de idioma)
+│   ├── en/                          # Inglés
+│   ├── zh-CN/                       # Chino simplificado
+│   ├── zh-HK/                       # Chino tradicional
+│   ├── es-ES/                       # Español
+│   ├── ja-JP/                       # Japonés
+│   ├── ko-KR/                       # Coreano
+│   └── cs-CZ/                       # Checo
+├── 总文档/                           # Documentos de requisitos y arquitectura (chino)
+└── README.md                        # Descripción del proyecto
 ```
 
 ## ¿Necesitas Ayuda?

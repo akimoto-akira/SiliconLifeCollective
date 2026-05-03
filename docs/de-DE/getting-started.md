@@ -2,7 +2,7 @@
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
+[English](../en/getting-started.md) | **Deutsch** | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
 
 ## Version Wählen
 
@@ -19,7 +19,7 @@ Dieses Projekt bietet zwei Implementierungsversionen:
 ### SiliconLife.Fast (Hochleistungsversion)
 - **Positionierung**: Haupt-Produktionsversion
 - **Ausführungsmodus**: Windows-Formularanwendung (System Tray)
-- **Speicher**: In-Memory-Speicher + asynchrone Persistenz
+- **Speicher**: SpeedyPack In-Memory-Speicher + asynchrone Persistenz (.spk-Dateiformat)
 - **Anwendungsszenario**: Hohe Parallelität, niedrige Latenz, großes Datenvolumen, Langzeit-Produktionsbetrieb
 - **Plattformunterstützung**: Nur Windows
 - **Rollenbeschreibung**: Produktionsreife Implementierung mit tiefer Optimierung, die beste Wahl für Langzeitbetrieb und echte Produktionsumgebungen
@@ -197,19 +197,22 @@ lsof -ti:8080 | xargs kill -9
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/      # Kernschnittstellen und abstrakte Klassen
-│   └── SiliconLife.Default/   # Standardimplementierung + Einstiegspunkt
-├── docs/                      # Dokumentation (mehrsprachig, 21 Sprachvarianten)
-│   ├── en/                    # Englisch
-│   ├── de-DE/                 # Deutsch
-│   ├── zh-CN/                 # Vereinfachtes Chinesisch
-│   ├── zh-HK/                 # Traditionelles Chinesisch
-│   ├── es-ES/                 # Spanisch
-│   ├── ja-JP/                 # Japanisch
-│   ├── ko-KR/                 # Koreanisch
-│   └── cs-CZ/                 # Tschechisch
-├── 总文档/                     # Anforderungs- und Architekturdokumente (Chinesisch)
-└── README.md                  # Projektübersicht
+│   ├── SiliconLife.Core/            # Kernschnittstellen und abstrakte Klassen
+│   ├── SiliconLife.Common/          # Gemeinsame Implementierung (von beiden Versionen genutzt)
+│   ├── SiliconLife.Default/         # Standardimplementierung + Einstiegspunkt (Konsolenversion)
+│   ├── SiliconLife.Fast/            # Hochleistungsimplementierung + Einstiegspunkt (Formularversion)
+│   ├── SiliconLife.Speedy/          # SpeedyPack Hochleistungs-Speicher-Engine
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack Verwaltungstool (WPF)
+├── docs/                            # Dokumentation (mehrsprachig, 21 Sprachvarianten)
+│   ├── en/                          # Englisch
+│   ├── zh-CN/                       # Vereinfachtes Chinesisch
+│   ├── zh-HK/                       # Traditionelles Chinesisch
+│   ├── es-ES/                       # Spanisch
+│   ├── ja-JP/                       # Japanisch
+│   ├── ko-KR/                       # Koreanisch
+│   └── cs-CZ/                       # Tschechisch
+├── 总文档/                           # Anforderungs- und Architekturdokumente (Chinesisch)
+└── README.md                        # Projektübersicht
 ```
 
 ## Hilfe benötigt?

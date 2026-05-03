@@ -2,9 +2,9 @@
 
 # Silicon Life Collective
 
-**버전: v0.1.0-alpha** | **실리콘 생명군** — .NET 9 기반의 멀티 에이전트 협업 플랫폼으로, AI 에이전트를 **실리콘 생명체(Silicon Being)**라고 부륾며, Roslyn 동적 컴파일을 통해 자가 진화를 구현합니다.
+**버전: v0.1.0-alpha** | **실리콘 생명군** — .NET 9 기반의 멀티 에이전트 협업 플랫폼으로, AI 에이전트를 **실리콘 생명체(Silicon Being)**라고 부르며, Roslyn 동적 컴파일을 통해 자가 진화를 구현합니다.
 
-[English](../README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | **한국어** | [Deutsch](../de-DE/README.md) | [Čeština](../cs-CZ/README.md)
+[English](../README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | **한국어** | [Čeština](../cs-CZ/README.md)
 
 ## 🌟 핵심 기능
 
@@ -13,6 +13,12 @@
 - **소울 파일 기반** — 각 실리콘 생명체는 핵심 프롬프트 파일(`soul.md`)에 의해 구동되며, 독특한 개성과 행동 패턴을 정의
 - **신체-두뇌 아키텍처** — *신체*(SiliconBeing)는 생명 상태를 유지하고 트리거 시나리오를 감지; *두뇌*(ContextManager)는 기록 로드, AI 호출, 도구 실행 및 응답 영속화 담당
 - **자가 진화 능력** — Roslyn 동적 컴파일 기술을 통해 실리콘 생명체가 자신의 코드를 재작성하여 진화 가능
+
+### 플러그인 시스템
+- **플러그인 확장 아키텍처** — IPlugin 인터페이스를 통해 기능 확장 구현, 디렉토리에서 플러그인 DLL 동적 로드 지원
+- **보안 샌드박스** — 플러그인 로더가 엄격한 보안 스캔을 실행하여 System.IO, System.Net 등 네임스페이스 접근 금지
+- **격리 로딩** — 커스텀 AssemblyLoadContext를 사용한 격리 로딩으로 플러그인이 메인 프로그램 안정성에 영향을 주지 않음
+- **도구 통합** — 플러그인은 ITool 인터페이스를 통해 커스텀 도구를 등록할 수 있으며, 도구 호출 루프에 자동 통합
 
 ### 도구 및 실행
 - **23개 내장 도구** — 달력, 채팅, 설정, 디스크, 네트워크, 메모리, 작업, 타이머, 지식베이스, 작업 노트, WebView 브라우저 등 포괄
@@ -30,7 +36,7 @@
 
 ### 웹 인터페이스
 - **모던 Web UI** — 내장 HTTP 서버, SSE 실시간 업데이트 지원
-- **4가지 스킨 테마** — 관리자 버전, 채팅 버전, 창작 버전, 개발 버전, 자동 감지 및 전환 지원
+- **7가지 스킨 테마** — 관리자 버전, 채팅 버전, 창작 버전, 개발 버전, 고대비, 라이트, 미니멀, 자동 감지 및 전환 지원
 - **20개 이상 컨트롤러** — 완전한 시스템 관리, 채팅, 설정, 모니터링 기능
 - **프론트엔드 프레임워크 의존성 제로** — `H`, `CssBuilder`, `JsBuilder`를 통해 서버에서 HTML/CSS/JS 생성
 
@@ -42,8 +48,10 @@
   - 일본어: ja-JP | 한국어: ko-KR | 체코어: cs-CZ
 
 ### 데이터 및 스토리지
-- **데이터베이스 의존성 제로** — 순수 파일 시스템 스토리지 (JSON 형식)
+- **SpeedyPack 고성능 스토리지** — 자체 개발 .spk 스토리지 엔진, 메모리 디렉토리 매핑 + 항목 캐시 + 비동기 쓰기 큐
+- **데이터베이스 의존성 제로** — Default 버전은 순수 파일 시스템 스토리지(JSON 형식), Fast 버전은 SpeedyPack 메모리 스토리지 사용
 - **시간 인덱스 쿼리** — `ITimeStorage` 인터페이스를 통해 시간 범위별 효율적 쿼리 지원
+- **자동 압축** — SpeedyPack 정기 자동 압축 지원, 여유 공간 회수
 - **최소 의존성** — 핵심 라이브러리는 동적 컴파일을 위한 Microsoft.CodeAnalysis.CSharp만 의존
 
 ## 🔄 듀얼 버전 아키텍처
@@ -62,9 +70,9 @@
 ### SiliconLife.Fast (고성능 버전)
 - **포지셔닝**: 주력 프로덕션 버전
 - **실행 모드**: Windows 폼 애플리케이션 (시스템 트레이 지원)
-- **저장 방식**: 메모리 저장소 + 비동기 배치 영속화
+- **저장 방식**: SpeedyPack 메모리 저장소 + 비동기 배치 영속화 (.spk 파일 형식)
 - **적용 시나리오**: 높은 동시 실행, 낮은 지연 시간, 대용량 데이터 시나리오
-- **특징**: 극한 성능 최적화, 트레이 백그라운드 실행, 메모리 데이터베이스 + WAL 로그로 데이터 보안 보장
+- **특징**: 극한 성능 최적화, 트레이 백그라운드 실행, SpeedyPack 엔진 + 자동 압축으로 데이터 보안 보장
 - **성능 향상**: 저장소 읽기 지연 시간 1000배 감소, 쓰기 지연 시간 15000배 감소, 동시 실행 처리 능력 50배 향상
 - **역할 설명**: 심층 최적화가 적용된 프로덕션급 구현으로, 장기 운영 및 실제 프로덕션 환경의 최선의 선택
 - **시작 명령**: `dotnet run --project src/SiliconLife.Fast`
@@ -77,26 +85,30 @@
 | **사용자 인터페이스** | Web UI (브라우저 액세스) | 트레이 아이콘 + 트레이 윈도우 + Web UI |
 | **시스템 트레이** | ❌ 없음 | ✅ 트레이로 최소화 지원 |
 | **백그라운드 실행** | ❌ 콘솔 닫으면 종료 | ✅ 트레이에서 지속 백그라운드 실행 |
-| **저장 방식** | 파일 시스템 JSON 저장소 | 메모리 저장소 + 비동기 영속화 |
+| **저장 방식** | 파일 시스템 JSON 저장소 | SpeedyPack 메모리 저장소 + 비동기 영속화 |
+| **저장 엔진** | 파일 시스템 I/O | SiliconLife.Speedy (.spk 형식) |
 | **읽기 지연 시간** | ~10ms (디스크 I/O) | ~0.01ms (메모리 작업) |
 | **쓰기 지연 시간** | ~15ms (동기 쓰기) | ~0.001ms (비동기 쓰기) |
 | **동시 실행 능력** | ~100 req/s | ~5000 req/s |
 | **메모리 사용량** | ~200MB | ~500MB |
-| **데이터 보안** | 매우 높음 (즉시 영속화) | 높음 (WAL 로그 + 비동기 영속화) |
+| **데이터 보안** | 매우 높음 (즉시 영속화) | 높음 (비동기 영속화 + 자동 압축) |
 | **적용 시나리오** | 데이터 보안 우선, 소량 데이터 | 성능 우선, 대용량 데이터, 높은 동시 실행 |
 
 ## 🛠️ 기술 스택
 
-| 구성 요소 | 기술 |
-|------|------|
-| 런타임 | .NET 9 |
-| 프로그래밍 언어 | C# |
-| AI 통합 | Ollama (로컬), 알리바바 클라우드 Bailian (클라우드) |
-| 데이터 스토리지 | 파일 시스템 (JSON + 시간 인덱스 디렉토리) |
-| 웹 서버 | HttpListener (.NET 내장) |
-| 동적 컴파일 | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
-| 브라우저 자동화 | Playwright (WebView) |
-| 라이선스 | Apache-2.0 |
+| 구성 요소 | SiliconLife.Default | SiliconLife.Fast |
+|------|---------------------|------------------|
+| 런타임 | .NET 9 | .NET 9 Windows |
+| 프로그래밍 언어 | C# | C# |
+| 애플리케이션 유형 | 콘솔 애플리케이션 | Windows 폼 애플리케이션 |
+| AI 통합 | Ollama (로컬), 알리바바 클라우드 Bailian (클라우드) | Ollama (로컬), 알리바바 클라우드 Bailian (클라우드) |
+| 데이터 스토리지 | 파일 시스템 (JSON + 시간 인덱스 디렉토리) | SpeedyPack (.spk 형식, 메모리 매핑 + 비동기 영속화) |
+| 웹 서버 | HttpListener (.NET 내장) | HttpListener (.NET 내장) |
+| 동적 컴파일 | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
+| 브라우저 자동화 | Playwright (WebView) | Playwright (WebView) |
+| 플러그인 시스템 | ✅ 지원 (IPlugin + PluginLoader) | ✅ 지원 (IPlugin + PluginLoader) |
+| 시스템 트레이 | ❌ 미지원 | ✅ 지원 (NotifyIcon) |
+| 라이선스 | Apache-2.0 | Apache-2.0 |
 
 ## 📁 프로젝트 구조
 
@@ -114,6 +126,7 @@ SiliconLifeCollective.sln
 │   │   ├── Knowledge/                     # 지식 네트워크 시스템
 │   │   ├── Localization/                  # 지역화 시스템
 │   │   ├── Logging/                       # 로깅 시스템
+│   │   ├── Plugins/                       # 플러그인 시스템 (IPlugin 인터페이스, PluginLoader 로더)
 │   │   ├── Project/                       # 프로젝트 관리 시스템
 │   │   ├── Runtime/                       # 메인 루프, 클록 객체, 핵심 호스트
 │   │   ├── Security/                      # 권한 관리 시스템
@@ -124,29 +137,81 @@ SiliconLifeCollective.sln
 │   │   ├── WebView/                       # WebView 브라우저 인터페이스
 │   │   └── ServiceLocator.cs              # 글로벌 서비스 로케이터
 │   │
-│   └── SiliconLife.Default/               # 기본 구현 + 애플리케이션 진입점
-│       ├── Program.cs                     # 진입점 (모든 구성 요소 조립)
-│       ├── AI/                            # Ollama 클라이언트, Bailian 클라이언트
-│       ├── Calendar/                      # 32가지 달력 구현
-│       ├── Config/                        # 기본 설정 데이터
-│       ├── Executors/                     # 기본 실행기 구현
+│   ├── SiliconLife.Common/                # 공유 구현 (두 버전 공용)
+│   │   ├── AI/                            # AI 클라이언트 팩토리
+│   │   ├── Calendar/                      # 32가지 달력 구현
+│   │   ├── Localization/                  # 지역화 베이스 클래스
+│   │   ├── Security/                      # 권한 관리자
+│   │   ├── SiliconBeing/                  # 기본 실리콘 생명체 구현
+│   │   ├── Tools/                         # 공통 도구 구현
+│   │   └── WebView/                       # WebView 인터페이스
+│   │
+│   ├── SiliconLife.Default/               # 기본 구현 + 애플리케이션 진입점 (콘솔 버전)
+│   │   ├── Program.cs                     # 진입점 (모든 구성 요소 조립)
+│   │   ├── Config/                        # 기본 설정 데이터
+│   │   ├── Executors/                     # 기본 실행기 구현
+│   │   ├── Help/                          # 도움말 문서 시스템
+│   │   ├── IM/                            # WebUI 제공자
+│   │   ├── Knowledge/                     # 지식 네트워크 구현
+│   │   ├── Localization/                  # 21개 언어 지역화
+│   │   ├── Logging/                       # 로깅 제공자 구현
+│   │   ├── Project/                       # 프로젝트 시스템 구현
+│   │   ├── Runtime/                       # 테스트 클록 객체
+│   │   ├── Security/                      # 기본 권한 콜백
+│   │   ├── SiliconBeing/                  # 기본 실리콘 생명체 구현
+│   │   ├── Storage/                       # 파일 시스템 스토리지 구현
+│   │   ├── Tools/                         # 내장 도구 구현
+│   │   ├── WebView/                       # Playwright WebView 구현
+│   │   └── Web/                           # Web UI 구현
+│   │       ├── Controllers/               # 20개 이상 컨트롤러
+│   │       ├── Models/                    # 뷰 모델
+│   │       ├── Views/                     # HTML 뷰
+│   │       └── Skins/                     # 4가지 스킨 테마
+│   │
+│   └── SiliconLife.Fast/                  # 고성능 구현 + 애플리케이션 진입점 (폼 버전)
+│       ├── Program.cs                     # 진입점 (폼 애플리케이션)
+│       ├── Config/                        # 설정 데이터 (Default와 공유)
+│       ├── Executors/                     # 최적화 실행기 구현
 │       ├── Help/                          # 도움말 문서 시스템
 │       ├── IM/                            # WebUI 제공자
-│       ├── Knowledge/                     # 지식 네트워크 구현
+│       ├── Knowledge/                     # 지식 네트워크 구현 (메모리 최적화)
 │       ├── Localization/                  # 21개 언어 지역화
-│       ├── Logging/                       # 로깅 제공자 구현
+│       ├── Logging/                       # 고성능 로깅 제공자
 │       ├── Project/                       # 프로젝트 시스템 구현
-│       ├── Runtime/                       # 테스트 클록 객체
-│       ├── Security/                      # 기본 권한 콜백
-│       ├── SiliconBeing/                  # 기본 실리콘 생명체 구현
-│       ├── Storage/                       # 파일 시스템 스토리지 구현
-│       ├── Tools/                         # 23개 내장 도구 구현
+│       ├── Security/                      # 최적화 권한 콜백
+│       ├── SiliconBeing/                  # 고성능 실리콘 생명체 구현
+│       ├── Storage/                       # SpeedyPack 스토리지 어댑터
+│       ├── Tools/                         # 최적화 내장 도구 구현
+│       ├── Tray/                          # 시스템 트레이 (9개 언어 지역화)
 │       ├── WebView/                       # Playwright WebView 구현
-│       └── Web/                           # Web UI 구현
+│       └── Web/                           # 고성능 Web UI 구현
+│           ├── Component/                 # UI 컴포넌트 라이브러리 (30개 이상 컴포넌트)
 │           ├── Controllers/               # 20개 이상 컨트롤러
 │           ├── Models/                    # 뷰 모델
 │           ├── Views/                     # HTML 뷰
-│           └── Skins/                     # 4가지 스킨 테마
+│           └── Skins/                     # 7가지 스킨 테마
+│
+│   ├── SiliconLife.Speedy/                # SpeedyPack 고성능 스토리지 엔진
+│   │   ├── SpeedyPack.cs                  # 핵심 클래스 (메모리 디렉토리 매핑 + 캐시 + 비동기 쓰기)
+│   │   ├── SpeedyPackOptions.cs           # 설정 옵션 (캐시 TTL, 최대 항목 수 등)
+│   │   ├── IPackTransaction.cs            # 트랜잭션 인터페이스
+│   │   ├── SpkFileInfo.cs                 # 파일 정보
+│   │   └── Internal/                      # 내부 구현
+│       │   ├── DirectoryMap.cs            # 메모리 디렉토리 매핑
+│       │   ├── EntryCache.cs              # 항목 캐시
+│       │   ├── FreeList.cs                # 여유 공간 관리
+│       │   ├── PackFileReader.cs          # 팩 파일 리더
+│       │   ├── PackFileWriter.cs          # 팩 파일 라이터
+│       │   ├── WriteQueue.cs              # 비동기 쓰기 큐
+│       │   ├── WriteOperation.cs          # 쓰기 작업
+│       │   ├── SpeedyTransaction.cs       # 트랜잭션 구현
+│       │   ├── SpkHeader.cs              # 팩 파일 헤더
+│       │   └── PathNormalizer.cs          # 경로 정규화
+│   │
+│   └── SiliconLife.Speedy.Manager/        # SpeedyPack 관리 도구 (WPF)
+│       ├── MainForm.cs                    # 메인 폼
+│       ├── Program.cs                     # 진입점
+│       └── slc.ico                        # 애플리케이션 아이콘
 │
 ├── docs/                                  # 다국어 문서
 │   ├── zh-CN/                             # 중국어 간체 문서
@@ -198,22 +263,47 @@ dotnet build
 
 ### 시스템 실행
 
+#### 방식 1: Default 버전 실행 (콘솔 애플리케이션)
+
 ```bash
 dotnet run --project src/SiliconLife.Default
 ```
 
 애플리케이션이 웹 서버를 시작하고 자동으로 브라우저에서 Web UI를 엽니다.
 
+**적용 시나리오**:
+- ✅ 데이터 보안 요구가 매우 높음
+- ✅ 메모리 리소스가 제한됨 (RAM < 2GB)
+- ✅ 데이터 양이 적고 단기 사용
+- ✅ 개발 디버깅 단계
+
+#### 방식 2: Fast 버전 실행 (Windows 폼 애플리케이션)
+
+```bash
+dotnet run --project src/SiliconLife.Fast
+```
+
+애플리케이션이 폼 모드로 시작되어 시스템 트레이로 최소화되고 백그라운드에서 지속 실행됩니다.
+
+**적용 시나리오**:
+- ✅ 높은 동시 실행 시나리오 (> 5 사용자)
+- ✅ 대용량 데이터 (3개월 이상 사용)
+- ✅ 낮은 지연 시간 응답 필요
+- ✅ 트레이 백그라운드 실행 필요
+
 ### 단일 파일 게시
 
 ```bash
-# Windows
+# Windows - Default 버전
 dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-# Linux
+# Windows - Fast 버전
+dotnet publish src/SiliconLife.Fast -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
+
+# Linux - Default 버전만
 dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 
-# macOS
+# macOS - Default 버전만
 dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
@@ -232,10 +322,12 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 - [x] 단계 10: Web UI (HTTP + SSE, 20개 이상 컨트롤러, 4가지 스킨)
 - [x] 단계 10.5: 점진적 향상 (브로드캐스트 채널, Token 감사, 32개 달력, 도구 향상, 21개 언어 지역화)
 - [x] 단계 10.6: 완성 및 최적화 (WebView, 도움말 시스템, 프로젝트 워크스페이스, 지식 네트워크)
+- [x] 단계 11: SpeedyPack 스토리지 엔진 (LiteDB 교체, 메모리 매핑, 비동기 쓰기 큐, 자동 압축)
+- [x] 단계 12: 플러그인 시스템 (IPlugin 인터페이스, PluginLoader 보안 샌드박스, 격리 로딩, 도구 통합)
 
 ### 🚧 계획 중
-- [ ] 단계 11: 외부 인스턴트 메시징 통합 (Feishu / WhatsApp / Telegram)
-- [ ] 단계 12: 플러그인 시스템 및 스킬 생태계
+- [ ] 단계 13: 외부 인스턴트 메시징 통합 (Feishu / WhatsApp / Telegram)
+- [ ] 단계 14: 스킬 생태계 (플러그인 마켓플레이스, 스킬 팩 배포)
 
 ## 📚 문서
 
@@ -265,18 +357,69 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 4. 브랜치에 푸시 (`git push origin feature/AmazingFeature`)
 5. Pull Request 제출
 
-## 📄 라이선스
+## � 버전 선택 가이드
 
-이 프로젝트는 Apache License 2.0 라이선스를 따릅니다 — 자세한 내용은 [LICENSE](../../LICENSE) 파일을 참조하세요.
+### 어떤 버전을 사용해야 하나요?
+
+**SiliconLife.Default (기본 구현 — 아키텍처 실현 가능성 검증):**
+- 📌 이 프로젝트를 처음 접하고 시스템 아키텍처를 빠르게 이해하고 싶음
+- 📌 개발 디버깅 중이며 간단하고 직접적인 실행 방식이 필요
+- 📌 데이터 보안이 최우선 고려사항
+- 📌 시스템 메모리가 4GB 미만
+- 📌 1인 사용 또는 데이터 양이 적음
+
+**SiliconLife.Fast (주력 프로덕션 버전):**
+- ⚡ 장기 안정 운영되는 프로덕션 환경이 필요
+- ⚡ 시스템 아키텍처에 익숙하며 정식 배포 준비 완료
+- ⚡ 다중 사용자 동시 접속 지원이 필요
+- ⚡ 시스템 트레이 백그라운드 실행이 필요
+- ⚡ 극한의 성능 경험을 추구
+
+> **전체 권장 사항**: SiliconLife.Default는 아키텍처 검증 및 입문 체험에 적합; 실제 프로덕션 환경에는 SiliconLife.Fast 사용을 강력히 권장.
+
+### Default에서 Fast로 마이그레이션할 수 있나요?
+
+**완전히 가능합니다!** 두 버전은 동일한 것을 공유합니다:
+- ✅ 설정 파일 형식 (config.json)
+- ✅ 도구 인터페이스
+- ✅ Being 설정
+- ✅ Web UI 인터페이스
+
+**마이그레이션 단계:**
+1. Default 데이터 디렉토리 백업
+2. 동일한 데이터 디렉토리로 Fast 버전 시작
+3. Fast가 기존 데이터를 SpeedyPack 스토리지 엔진에 자동 가져오기
+4. 기능 정상 확인 후 Fast 버전을 일상적으로 사용
+
+### 두 버전을 공존시킬 수 있나요?
+
+**가능합니다!** 다음 배포 전략을 권장합니다:
+
+**전략 1: Default 검증, Fast 프로덕션**
+```
+개발/검증 환경: SiliconLife.Default (아키텍처 검증, 기능 디버깅)
+프로덕션 환경: SiliconLife.Fast (고성능, 백그라운드 실행, 실시간 요청 처리)
+```
+
+**전략 2: Fast 메인 실행, Default 정기 백업**
+```
+SiliconLife.Fast (일상 사용, 실시간 요청 처리)
+    ↓ 정기 백업
+SiliconLife.Default (콜드 데이터 아카이빙, 데이터 보안 보장)
+```
+
+## �📄 라이선스
+
+본 프로젝트는 Apache License 2.0 라이선스를 따릅니다 — 자세한 내용은 [LICENSE](../../LICENSE) 파일을 참조하세요.
 
 ## 👨‍💻 저자
 
-**호시노 켄지**
+**天源垦骥**
 
 - GitHub: [@akimoto-akira](https://github.com/akimoto-akira/SiliconLifeCollective)
-- Gitee: [hoshinokennji](https://gitee.com/hoshinokennji/SiliconLifeCollective)
+- 码云: [hoshinokennji](https://gitee.com/hoshinokennji/SiliconLifeCollective)
 - YouTube: [@hoshinokennji](https://www.youtube.com/@hoshinokennji)
-- Bilibili: [617827040](https://space.bilibili.com/617827040)
+- 哔哩哔哩: [617827040](https://space.bilibili.com/617827040)
 
 ## 🙏 감사의 말
 

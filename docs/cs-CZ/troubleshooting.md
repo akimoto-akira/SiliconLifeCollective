@@ -2,7 +2,7 @@
 
 > **Verze: v0.1.0-alpha**
 
-[English](../en/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | **Čeština**
+[English](../en/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | **Čeština**
 
 ## Časté Problémy
 
@@ -160,230 +160,502 @@ mkdir logs
 
 ### Problémy s Oprávněním
 
-#### Problém: Operace Trvale Zamítnuta
+#### Problém: Oprávnění Zamítnuto
 
 **Příznaky**:
 ```
-Permission Denied: disk:write
+Permission denied: disk:write
 ```
 
 **Řešení**:
-1. Zkontrolujte globální ACL:
+1. Zkontrolujte aktuální oprávnění:
 ```bash
 curl http://localhost:8080/api/permissions
 ```
 
-2. Ověřte stav IsCurator uživatele
-3. Zkontroluje HighDeny cache
-4. Zkontrolujte auditní logy:
+2. Udělte oprávnění:
 ```bash
-curl http://localhost:8080/api/logs?level=error
+curl -X POST http://localhost:8080/api/permissions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "resource": "disk:write",
+    "allowed": true,
+    "duration": 3600
+  }'
 ```
 
-#### Problém: Dotaz Uživatele se Nikdy Nezobrazí
+3. Nebo použijte Web UI: Správa Oprávnění
+
+#### Problém: Oprávnění Nevyprší
 
 **Příznaky**:
-- Operace zůstává ve stavu "Čeká"
-- Žádný prompt se nezobrazí
+- Oprávnění zůstávají platná po uplynutí doby platnosti
 
 **Řešení**:
-1. Ověřte, že IPermissionAskHandler je registrován
-2. Zkontrolujte, že komunikační kanál je aktivní
-3. Ověřte, že není překročen časový limit
+1. Zkontrolujte synchronizaci systémových hodin
+2. Ověřte, že pole `expiresAt` je správně nastaveno
+3. Vymažte cache oprávnění
 
 ---
 
-### Problémy s Nástroji
+### Problémy s Web UI
+
+#### Problém: Nelze Přistupovat k Web UI
+
+**Příznaky**:
+- Prohlížeč zobrazuje "Connection refused"
+
+**Řešení**:
+1. Ověřte, že server běží
+2. Zkontrolujte správnou URL: `http://localhost:8080`
+3. Zkontrolujte nastavení firewallu
+4. Zkontrolujte logy pro chyby při spuštění
+
+#### Problém: SSE Nefunguje
+
+**Příznaky**:
+- Aktualizace v reálném čase se nezobrazují
+- Chat se nestreamuje
+
+**Řešení**:
+1. Zkontrolujte, že prohlížeč podporuje SSE
+2. Zakažte proxy bufferování pro SSE
+3. Zkontrolujte stabilitu sítě
+4. Zkuste jiný prohlížeč
+
+#### Problém: UI Vypadá Poškozeně
+
+**Příznaky**:
+- Styly jsou nesprávné
+- Rozložení je rozbité
+
+**Řešení**:
+1. Vymažte cache prohlížeče
+2. Zkuste jiný skin: Nastavení > Skin
+3. Zkontrolujte chyby v konzoli prohlížeče
+4. Zakažte rozšíření prohlížeče
+
+---
+
+### Problémy s Úložištěm
+
+#### Problém: Nelze Číst/Zapisovat Data
+
+**Příznaky**:
+```
+IOException: Access denied
+```
+
+**Řešení**:
+1. Zkontrolujte oprávnění souborů
+2. Ověřte, že cesta k úložišti existuje
+3. Zkontrolujte místo na disku
+4. Spusťte s příslušnými oprávněními
+
+#### Problém: Poškození Dat
+
+**Příznaky**:
+- Chyby parsování JSON
+- Ztráta dat
+
+**Řešení**:
+1. Obnovte ze zálohy
+2. Zkontrolujte integritu úložiště:
+```bash
+# Prostřednictvím Web UI: Systém > Kontrola Úložiště
+```
+
+3. Ručně opravte poškozené soubory
+
+#### Problém: Poškození Souboru SpeedyPack Úložiště (Verze Fast)
+
+**Příznaky**:
+- Soubor `.spk` nelze načíst
+- Inicializace SpeedyStorage selhává
+
+**Řešení**:
+1. Použijte nástroj `SiliconLife.Speedy.Manager` pro kontrolu a opravu `.spk` souborů
+2. Zkontrolujte, zda soubor `.spk.idx` odpovídá souboru `.spk`
+3. Pokud je indexový soubor poškozen, smažte soubor `.spk.idx`, systém automaticky obnoví index
+4. Obnovte soubor `.spk` ze zálohy
+
+#### Problém: Selhání Automatické Komprese SpeedyPack (Verze Fast)
+
+**Příznaky**:
+- Soubor `.spk` neustále roste
+- Nedostatek místa na disku
+
+**Řešení**:
+1. Zkontrolujte, zda `SpeedyPackAutoCompactor` běží správně
+2. Ručně spusťte kompresní operaci
+3. Zkontrolujte konfiguraci prahu komprese
+4. Použijte nástroj `SiliconLife.Speedy.Manager` pro ruční kompresi
+
+---
+
+### Problémy s Prováděním Nástrojů
 
 #### Problém: Nástroj Nenalezen
 
 **Příznaky**:
 ```
-Tool 'calendar' not found
+Tool "xyz" not found
 ```
 
 **Řešení**:
-1. Zkontrolujte, že soubor nástroje je ve složce `Tools/`
-2. Ověřte, že nástroj implementuje `ITool`
-3. Znovu sestavte projekt:
-```bash
-dotnet build
-```
-
-4. Zkontrolujte logy pro chyby načítání:
-```bash
-grep -i "tool" logs/*.log
-```
+1. Ověřte, že název nástroje je správný
+2. Zkontrolujte, že nástroj je v adresáři Tools
+3. Znovu sestavte projekt
+4. Zkontrolujte, že nástroj je správně implementován
 
 #### Problém: Nástroj Vrací Chybu
 
 **Příznaky**:
 ```
-Tool execution failed: Invalid parameters
+Tool execution failed: ...
 ```
 
 **Řešení**:
-1. Zkontrolujte formát parametrů
-2. Ověřte, že všechny požadované parametry jsou přítomny
-3. Zkontrolujte dokumentaci nástroje pro správné použití
-4. Otestujte nástroj izolovaně
+1. Zkontrolujte logy nástroje
+2. Ověřte vstupní parametry
+3. Otestujte nástroj izolovaně
+4. Zkontrolujte oprávnění
 
 ---
 
-### Webové UI Problémy
+### Problémy s Pluginy
 
-#### Problém: Nelze se Připojit k Web UI
+#### Problém: Načtení Pluginu Selhalo
 
 **Příznaky**:
-- Prohlížeč zobrazuje "Nelze se připojit"
-- Chyba CORS
-
-**Řešení**:
-1. Ověřte, že server běží
-2. Zkontrolujte, že port 8080 není blokován firewallem
-3. Ověřte konfiguraci serveru:
-```bash
-curl http://localhost:8080/api/status
+```
+Plugin load failed: Security check failed
 ```
 
-#### Problém: SSE nefunguje
+**Řešení**:
+1. Zkontrolujte, zda plugin neodkazuje na zakázané jmenné prostory (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
+2. Ověřte, že plugin odkazuje pouze na sestavení ze seznamu důvěryhodných sestavení
+3. Zkontrolujte, že plugin správně implementuje rozhraní `IPlugin`
+4. Zkontrolujte logy pro podrobnosti o selhání bezpečnostní kontroly
+
+#### Problém: Nástroje Pluginu Nejsou Registrovány
 
 **Příznaky**:
-- Chat se neaktualizuje v reálném čase
-- Žádné streamované odpovědi
+- Plugin se úspěšně načetl, ale nástroje se neobjevují v seznamu nástrojů
 
 **Řešení**:
-1. Zkontrolujte podporu prohlížeče pro Server-Sent Events
-2. Ověřte, že žádný proxy server nebufferuje SSE
-3. Zkontrolujte konzoli prohlížeče pro chyby
-4. Ověřte, že server podporuje SSE
+1. Potvrďte, že třídy nástrojů v pluginu správně implementují rozhraní `ITool`
+2. Zkontrolujte, že třídy nástrojů jsou public
+3. Ověřte, že `ToolManager.ScanAllPluginAssemblies()` byl volán
+4. Znovu sestavte plugin a restartujte aplikaci
 
 ---
 
-### Problémy s Kalendářem
+### Problémy s Pracovními Poznámkami
 
-#### Problém: Nesprávný Převod Data
-
-**Příznaky**:
-- Převedené datum je nesprávné
-- Chybějící přestupné měsíce
-
-**Řešení**:
-1. Ověřte, že je zadán správný kalendářový systém
-2. Zkontrolujte formát data (YYYY-MM-DD)
-3. Ověřte, že datum existuje v cílovém kalendáři
-4. Zkontrolujte logy pro varování
-
----
-
-### Problémy s Pamětí
-
-#### Problém: Bytost Zapomíná Kontext
+#### Problém: Nelze Vytvořit Pracovní Poznámku
 
 **Příznaky**:
-- Bytost si nepamatuje předchozí konverzace
-- Ztráta kontextu mezi relacemi
-
-**Řešení**:
-1. Ověřte, že úložiště je přístupné
-2. Zkontrolujte logy pro chyby čtení/zápisu
-3. Ověřte, že paměť není poškozena:
-```bash
-# Prostřednictvím Web UI: Správa Paměti > Ověřit
+```
+Failed to create work note
 ```
 
-4. Zvažte kompresi paměti pro starší záznamy
+**Řešení**:
+1. Zkontrolujte, že bytost existuje a je v běžícím stavu
+2. Ověřte, že cesta k úložišti má oprávnění k zápisu
+3. Zkontrolujte, že obsah není prázdný (obsah je povinný)
+4. Zkontrolujte logy pro podrobné informace o chybě
+
+#### Problém: Vyhledávání Poznámek Bez Výsledků
+
+**Příznaky**:
+- Hledání klíčového slova vrací prázdné výsledky
+- Ale jsou k dispozici relevantní poznámky
+
+**Řešení**:
+1. Zkontrolujte, zda je klíčové slovo napsáno správně
+2. Zkuste použít obecnější klíčové slovo
+3. Ověřte, že poznámka obsahuje dané klíčové slovo (rozlišují se velká a malá písmena)
+4. Zvyšte hodnotu parametru `max_results`
+
+#### Problém: Pomalé Generování Obsahu Poznámek
+
+**Příznaky**:
+- Dlouhá doba odpovědi při generování obsahu
+- Bytost má velké množství poznámek (>1000 stránek)
+
+**Řešení**:
+1. Toto je normální jev, vyžaduje procházení všech poznámek
+2. Zvažte pravidelnou archivaci starých poznámek
+3. Použijte funkci vyhledávání místo procházení obsahu
+4. Plánovaná optimalizace: přidání mechanismu cache obsahu
 
 ---
 
-## Pokročilé Řešení Problémů
+### Problémy se Znalostní Sítí
+
+#### Problém: Dotaz na Znalosti Vrací Prázdné Výsledky
+
+**Příznaky**:
+```
+No knowledge triples found
+```
+
+**Řešení**:
+1. Ověřte psaní subjektu a predikátu
+2. Zkontrolujte, zda byly znalosti přidány do sítě
+3. Použijte funkci vyhledávání pro fuzzy shodu:
+```json
+{
+  "action": "search",
+  "query": "klíčové slovo"
+}
+```
+
+#### Problém: Selhání Hledání Cesty ve Znalostech
+
+**Příznaky**:
+```
+No path found between concepts
+```
+
+**Řešení**:
+1. Ověřte, že oba koncepty existují ve znalostní síti
+2. Zkontrolujte, zda existuje spojovací cesta (nemusí existovat přímá ani nepřímá relace)
+3. Zkuste přidat více znalostí pro vytvoření spojení
+4. Snižte limit délky cesty (pokud je nastaven)
+
+#### Problém: Selhání Validace Znalostí
+
+**Příznaky**:
+```
+Knowledge validation failed
+```
+
+**Řešení**:
+1. Zkontrolujte, že formát tripletu je správný (subjekt, predikát, objekt jsou povinné)
+2. Ověřte, že spolehlivost je v rozsahu 0.0-1.0
+3. Zkontrolujte, zda neexistují duplicitní triplety
+4. Zkontrolujte podrobnosti chyby validace pro konkrétní problém
+
+#### Problém: Nepřesné Statistiky Znalostní Sítě
+
+**Příznaky**:
+- Statistiky neodpovídají očekávání
+- Statistiky se neaktualizují po přidání znalostí
+
+**Řešení**:
+1. Statistiky se mohou aktualizovat s několikasekundovým zpožděním (cache)
+2. Zkontrolujte, zda nebyly nějaké operace smazání neúspěšné
+3. Restartujte aplikaci pro vynucení obnovení statistik
+4. Znovu dotazujte statistiky prostřednictvím API
+
+---
+
+### Problémy se Správou Projektů
+
+#### Problém: Nelze Vytvořit Projekt
+
+**Příznaky**:
+```
+Failed to create project
+```
+
+**Řešení**:
+1. Zkontrolujte, že název projektu není prázdný (povinný)
+2. Ověřte, že název projektu není duplicitní
+3. Zkontrolujte, že cesta k úložišti má oprávnění k zápisu
+4. Zkontrolujte logy pro podrobné informace o chybě
+
+#### Problém: Ztráta Dat Projektu
+
+**Příznaky**:
+- Informace o projektu nelze načíst
+- Soubory projektu jsou poškozeny
+
+**Řešení**:
+1. Zkontrolujte, že adresář úložiště projektu existuje
+2. Obnovte data projektu ze zálohy
+3. Ověřte, že formát JSON souboru je správný
+4. Ručně opravte poškozené soubory projektu
+
+---
+
+## Ladění
 
 ### Povolení Podrobného Logování
 
-```bash
-# Nastavte úroveň logování na Debug
-export LOG_LEVEL=Debug
-
-# Nebo v konfiguraci:
+Upravte konfiguraci:
+```json
 {
-  "Logging": {
-    "LogLevel": "Debug"
+  "logging": {
+    "level": "debug"
   }
 }
 ```
 
-### Analyzátor Výkonu
+### Kontrola Logů
 
+Logy jsou uloženy v:
+```
+logs/
+├── system.log
+├── ai.log
+├── permission.log
+└── error.log
+```
+
+Zobrazení v reálném čase:
 ```bash
-# Sledujte využití zdrojů
-dotnet counters monitor --process-id <PID>
-
-# Profilujte aplikaci
-dotnet trace collect --process-id <PID>
+tail -f logs/*.log
 ```
 
-### ladění Dynamické Kompilace
+### Použití Debuggeru
 
-```csharp
-// Povolte výstup kompilace
-var compiler = new DynamicCompilationExecutor
-{
-    EmitDebugInformation = true,
-    LogCompiledCode = true
-};
-```
-
-### Kontrola Zdraví Systému
-
+**SiliconLife.Default (Výchozí Implementace)**:
 ```bash
-# Získejte stav systému
-curl http://localhost:8080/api/status
+# Spuštění s debuggerem
+dotnet run --project src/SiliconLife.Default --configuration Debug
 
-# Získejte metriky dashboardu
-curl http://localhost:8080/api/dashboard
-
-# Zkontrolujte aktivní bytosti
-curl http://localhost:8080/api/beings
+# Připojení debuggeru
+# Prostřednictvím IDE: Připojit k Procesu > SiliconLife.Default
 ```
+
+**SiliconLife.Fast (Vysoce Výkonná Verze)**:
+```bash
+# Spuštění s debuggerem
+dotnet run --project src/SiliconLife.Fast --configuration Debug
+
+# Připojení debuggeru
+# Prostřednictvím IDE: Připojit k Procesu > SiliconLife.Fast
+```
+
+> **Doporučení**: Ve fázi vývoje a ladění se doporučuje používat SiliconLife.Default, po ověření architektury použijte SiliconLife.Fast pro produkční nasazení.
+
+---
+
+### Problémy s Výkonem
+
+#### Pomalá Doba Odpovědi
+
+**Optimalizace**:
+1. Snížte složitost AI modelu
+2. Povolte cache
+3. Vyčistěte stará data
+4. Zvyšte systémové zdroje
+
+#### Vysoké Využití CPU
+
+**Kontrola**:
+- Běží příliš mnoho bytostí
+- Nekonečná smyčka v nástrojích
+- Časté spouštění časovačů
+
+**Řešení**:
+- Snižte počet souběžných bytostí
+- Optimalizujte kód nástrojů
+- Upravte intervaly časovačů
+
+#### Vysoké Využití Paměti
+
+**Monitorování**:
+```bash
+# Prostřednictvím Web UI: Dashboard > Paměť
+```
+
+**Optimalizace**:
+- Vyčistěte staré vzpomínky
+- Snižte velikost kontextu
+- Implementujte stránkování
 
 ---
 
 ## Získání Pomoci
 
-### Logy
+### Zobrazení Dokumentace
 
-Logy jsou umístěny ve:
-```
-logs/
-├── system.log
-├── beings/
-│   ├── {being-id-1}.log
-│   └── {being-id-2}.log
-└── audit.log
-```
+- [Průvodce Rychlým Startem](getting-started.md)
+- [Vývojářská Příručka](development-guide.md)
+- [Reference API](api-reference.md)
+- [Průvodce Architekturou](architecture.md)
+
+### Kontrola Logů
+
+Vždy nejprve zkontrolujte logy pro podrobnosti o chybách.
 
 ### Komunitní Podpora
 
-- **GitHub Issues**: https://github.com/akimoto-akira/SiliconLifeCollective/issues
-- **Diskuse**: GitHub Discussions
-- **Dokumentace**: docs/ adresář
+- GitHub Issues: Nahlášení bugů
+- Discussions: Dotazy
+- Dokumentace: Hledání řešení
 
-### Poskytování Informací o Chybě
+---
 
-Při hlášení problému uveďte:
+### Nouzové Postupy
 
-1. **Verze**: `dotnet --version`
-2. **OS**: Windows/Linux/Mac
-3. **Logy**: Příslušné části logů
-4. **Kroky k Reprodukci**: Jak problém reprodukovat
-5. **Očekávané Chování**: Co by se mělo stát
-6. **Skutečné Chování**: Co se skutečně stalo
+#### Pád Systému
+
+1. Zkontrolujte logy pro příčinu
+2. Restartujte aplikaci:
+
+**SiliconLife.Default (Výchozí Implementace)**:
+```bash
+dotnet run --project src/SiliconLife.Default
+```
+
+**SiliconLife.Fast (Hlavní Produkční Verze)**:
+```bash
+dotnet run --project src/SiliconLife.Fast
+```
+
+3. V případě potřeby obnovte ze zálohy
+
+#### Ztráta Dat
+
+1. Okamžitě zastavte aplikaci
+2. Zkontrolujte záložní soubory
+3. Obnovte data
+4. Ověřte integritu
+
+#### Bezpečnostní Incident
+
+1. Zastavte všechny bytosti
+2. Odvolejte všechna oprávnění
+3. Zkontrolujte auditní logy
+4. Zkontrolujte řízení přístupu
+5. Restartujte s omezenými oprávněními
+
+---
+
+### Prevence
+
+### Nejlepší Praktiky
+
+1. **Pravidelné Zálohování**
+   - Zálohujte datový adresář
+   - Zálohujte konfiguraci
+   - Testujte proces obnovy
+
+2. **Monitorování Zdrojů**
+   - Sledujte využití CPU/paměti
+   - Monitorujte místo na disku
+   - Zkontrolujte síťové připojení
+
+3. **Udržování Aktualizací**
+   - Aktualizujte .NET SDK
+   - Aktualizujte závislosti
+   - Aplikujte bezpečnostní záplaty
+
+4. **Testování Změn**
+   - Nejprve testujte ve vývoji
+   - Používejte verzování
+   - Dokumentujte změny
 
 ---
 
 ## Další Kroky
 
-- 📚 Přečtěte si [Průvodce Architektury](architecture.md)
+- 📚 Přečtěte si [Průvodce Architekturou](architecture.md)
 - 🛠️ Podívejte se na [Vývojářskou Příručku](development-guide.md)
-- 📖 Přečtěte si [Referenci API](api-reference.md)
-- 🚀 Začněte s [Průvodcem Rychlým Startem](getting-started.md)
+- 🚀 Podívejte se na [Průvodce Rychlým Startem](getting-started.md)
+- 🔒 Podívejte se na [Bezpečnostní Dokumentaci](security.md)

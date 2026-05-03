@@ -1,4 +1,4 @@
-﻿# Sistema de Permisos
+# Sistema de Permisos
 
 > **Versión: v0.1.0-alpha**
 
@@ -147,6 +147,16 @@ public class IMPermissionAskHandler : IPermissionAskHandler
     }
 }
 ```
+
+### Cola de Solicitudes de Permiso PermissionRequestQueue
+
+`PermissionRequestQueue` gestiona las solicitudes de permiso pendientes, soportando espera asíncrona de respuesta del usuario:
+
+- **Encolar solicitud** — Cuando la cadena de permisos llega al nivel 5, se crea un `TaskCompletionSource<AskPermissionResult>` y se encola
+- **Visualización en Web UI** — Las solicitudes de permiso pendientes se muestran en la Web UI a través de `PermissionRequestController`
+- **Respuesta del usuario** — El usuario aprueba o deniega en la Web UI, con opción de almacenar en caché la decisión y establecer la duración de la caché
+- **Opciones de caché** — El usuario puede almacenar en caché la decisión de permisos por 1 hora, 24 horas, 7 días o 30 días
+- **Mecanismo de timeout** — La página de solicitud se cierra automáticamente después de 60 segundos sin respuesta
 
 ## Sistema de Auditoría
 

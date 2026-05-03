@@ -2,7 +2,7 @@
 
 > **バージョン: v0.1.0-alpha**
 
-[English](roadmap.md) | [简体中文](docs/zh-CN/roadmap.md) | [繁體中文](docs/zh-HK/roadmap.md) | [Español](docs/es-ES/roadmap.md) | [日本語](docs/ja-JP/roadmap.md) | [한국어](docs/ko-KR/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | [Čeština](docs/cs-CZ/roadmap.md)
+[English](../en/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | **日本語** | [한국어](../ko-KR/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
 
 ## デュアルバージョンロードマップ
 
@@ -13,13 +13,15 @@
 
 ### SiliconLife.Fast（高性能バージョン）
 - **ポジショニング**：主力本番バージョン
-- **現在の状態**：基本アーキテクチャの移植は完了し、継続的な最適化が進行中です
+- **現在の状態**：基本アーキテクチャの移植は完了、SpeedyPack ストレージエンジンとプラグインシステムが実装済み
 - **役割説明**：Default バージョンで検証されたアーキテクチャの基盤上に、深いパフォーマンス最適化と本番特性の強化を行い、実際のデプロイメントの第一選択です
 
 **Fast バージョン開発計画**：
 - ✅ フェーズ 1：基本プロジェクト構造と設定システムの移植
 - ✅ フェーズ 2：Web UI とコントローラーの移植
-- ✅ フェーズ 3：ストレージシステムの最適化（メモリストレージ + 非同期永続化）
+- ✅ フェーズ 3：ストレージシステムの最適化（SpeedyPack メモリストレージ + 非同期永続化）
+- ✅ フェーズ 3.5：SpeedyPack 管理ツール（SiliconLife.Speedy.Manager WPF アプリ）
+- ✅ フェーズ 3.6：プラグインシステム（IPlugin インターフェース、セキュリティサンドボックス、AssemblyLoadContext 分離）
 - 🚧 フェーズ 4：システムトレイとフォームアプリケーションの開発
 - 📋 フェーズ 5：パフォーマンスの最適化（コネクションプール、オブジェクトプール、ロックフリー並行性）
 - 📋 フェーズ 6：Kestrel Web サーバーへの置き換え

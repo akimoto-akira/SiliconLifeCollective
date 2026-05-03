@@ -2,7 +2,7 @@
 
 > **バージョン: v0.1.0-alpha**
 
-[English](../en/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | **日本語** | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/development-guide.md)
+[English](../en/development-guide.md) | [Deutsch](../de-DE/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | **日本語** | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/development-guide.md)
 
 ## アーキテクチャ概要
 
@@ -13,11 +13,13 @@ SiliconLifeCollective は**身体-大脳アーキテクチャ**に従い、コ�
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/      # インターフェース、抽象クラス、共通インフラ
-│   ├── SiliconLife.Common/    # 共有実装（両バージョンで共用）
-│   ├── SiliconLife.Default/   # デフォルト実装、エントリーポイント（アーキテクチャ実現可能性検証）
-│   └── SiliconLife.Fast/      # 高性能実装、エントリーポイント（主力本番バージョン）
-└── docs/                      # 多言語ドキュメント
+│   ├── SiliconLife.Core/            # インターフェース、抽象クラス、共通インフラ
+│   ├── SiliconLife.Common/          # 共有実装（両バージョンで共用）
+│   ├── SiliconLife.Default/         # デフォルト実装、エントリーポイント（アーキテクチャ実現可能性検証）
+│   ├── SiliconLife.Fast/            # 高性能実装、エントリーポイント（主力本番バージョン）
+│   ├── SiliconLife.Speedy/          # SpeedyPack 高性能ストレージエンジン
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理ツール（WPF）
+└── docs/                            # 多言語ドキュメント
 ```
 
 **依存方向**：
@@ -27,7 +29,7 @@ SiliconLifeCollective/
 
 **バージョン役割説明**：
 - **SiliconLife.Default**：デフォルト実装、アーキテクチャの実現可能性検証に主に使用。シンプルで信頼性の高いファイルシステムストレージ実装を提供し、開発デバッグとアーキテクチャ検証に適しています。
-- **SiliconLife.Fast**：主力本番バージョン。Default で検証されたアーキテクチャの基盤上に、メモリストレージ + 非同期永続化を採用し、極限のパフォーマンス最適化を提供します。長期運用と実際の本番環境の第一選択です。
+- **SiliconLife.Fast**：主力本番バージョン。Default で検証されたアーキテクチャの基盤上に、SpeedyPack メモリストレージ + 非同期永続化を採用し、極限のパフォーマンス最適化を提供します。長期運用と実際の本番環境の第一選択です。
 
 ## コアコンセプト
 
@@ -178,6 +180,50 @@ public class DatabaseStorage : IStorage, ITimeStorage
 }
 ```
 
+### 新プラグインの追加
+
+1. クラスライブラリプロジェクトを作成し、`IPlugin` インターフェースを実装：
+
+```csharp
+using SiliconLife.Collective;
+using SiliconLife.Collective.Localization;
+using SiliconLife.Collective.Tools;
+
+public class MyPlugin : IPlugin
+{
+    public string Id => "my-plugin";
+    public string Version => "1.0.0";
+    
+    public string GetName(Language language) => "My Plugin";
+    public string GetDescription(Language language) => "A custom plugin";
+    public string GetAuthor(Language language) => "Author Name";
+    
+    public void OnLoad() { }
+    public void OnStart() { }
+    public void OnStop() { }
+    public void OnUnload() { }
+}
+```
+
+2. （オプション）プラグイン内で `ITool` インターフェースを実装してカスタムツールを登録：
+
+```csharp
+public class MyPluginTool : ITool
+{
+    public string Name => "my_plugin_tool";
+    public string Description => "A tool provided by my plugin";
+    
+    public async Task<ToolResult> ExecuteAsync(ToolCall call)
+    {
+        return new ToolResult { Success = true, Output = "Done" };
+    }
+}
+```
+
+3. コンパイル済み DLL をプラグインディレクトリに配置すると、`PluginLoader` が自動的にロードします。
+
+> **セキュリティ制限**：プラグインは `System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis` などの名前空間を参照できません。プラグインは `AssemblyLoadContext` を介して分離ロードされます。
+
 ### 新スキンの追加
 
 1. `src/SiliconLife.Default/Web/Skins/` で `ISkin` を実装：
@@ -209,135 +255,249 @@ public class MyCustomSkin : ISkin
 
 - **クラス**：PascalCase。機能プレフィックス付き（例：`DefaultSiliconBeing`）
 - **インターフェース**：`I` で開始（例：`IAIClient`、`ITool`）
-- **メソッド**：PascalCase（例：`ExecuteAsync`）
-- **プロパティ**：PascalCase（例：`BaseUrl`）
-- **パラメータ**：camelCase（例：`request`）
-- **プライベートフィールド**：`_` プレフィックス + camelCase（例：`_client`）
+- **実装**：インターフェース名で終了（例：`OllamaClient` は `IAIClient` を実装）
+- **ツール**：`Tool` で終了（例：`CalendarTool`、`ChatTool`）
+- **ビューモデル**：`ViewModel` で終了（例：`BeingViewModel`）
 
-### ドキュメントコメント
+### コード構織
 
-すべての public/protected メンバーに XML ドキュメントコメント：
-
-```csharp
-/// <summary>
-/// AI クライアントとのチャットを実行。
-/// </summary>
-/// <param name="request">AI リクエスト</param>
-/// <returns>AI 応答</returns>
-public async Task<AIResponse> ChatAsync(AIRequest request)
-{
-    // 実装
-}
+```
+SiliconLife.Default/
+├── AI/                    # AI クライアント実装
+├── Calendar/              # カレンダー実装
+├── Config/                # デフォルト設定データ
+├── Executors/             # エグゼキューター実装
+├── IM/                    # インスタントメッセンジャープロバイダー実装
+├── Localization/          # ローカライゼーション実装
+├── Logging/               # ログプロバイダー実装
+├── Runtime/               # ランタイムコンポーネント
+├── Security/              # セキュリティ実装
+├── SiliconBeing/          # デフォルトシリコン生命体実装
+├── Storage/               # ストレージ実装
+├── Tools/                 # 内蔵ツール
+└── Web/                   # Web UI 実装
+    ├── Controllers/       # ルートコントローラー
+    ├── Models/            # ビューモデル
+    ├── Views/             # HTML ビュー
+    └── Skins/             # スキンテーマ
 ```
 
-### エラー処理
+### ドキュメント
 
-- 非同期操作には `async/await` を使用
-- 具体的な例外タイプをスロー
-- 意味のあるエラーメッセージを提供
-- 上位レベルで例外を適切にキャッチ
+- すべてのパブリック API には XML ドキュメントコメントが必要
+- すべてのソースファイルは Apache 2.0 ライセンスヘッダーを使用
+- .NET 9 の機能を活用（暗黙的 using、null 許容参照型）
+
+## 開発ワークフロー
+
+### 1. 開発環境のセットアップ
+
+```bash
+# リポジトリをクローン
+git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
+cd SiliconLifeCollective
+
+# 依存関係を復元
+dotnet restore
+
+# ビルド
+dotnet build
+```
+
+### 2. テストの実行
+
+```bash
+# すべてのテストを実行
+dotnet test
+
+# 特定のテストプロジェクトを実行
+dotnet test tests/SiliconLife.Core.Tests
+```
+
+### 3. デバッグ
+
+```bash
+# デバッグ出力で実行
+dotnet run --project src/SiliconLife.Default --configuration Debug
+```
+
+### 4. コードフォーマット
+
+```bash
+# コードをフォーマット
+dotnet format
+```
+
+## カスタム機能のビルド
+
+### 例：カスタムカレンダーの追加
 
 ```csharp
-public async Task<string> ReadFileAsync(string path)
+public class MyCustomCalendar : CalendarBase
 {
-    if (string.IsNullOrEmpty(path))
+    public override string Name => "MyCalendar";
+    
+    public override CalendarDate ConvertFromGregorian(GregorianDate date)
     {
-        throw new ArgumentException("パスを指定してください", nameof(path));
+        // 変換ロジック
+        return new CalendarDate(year, month, day);
     }
     
-    try
+    public override GregorianDate ConvertToGregorian(CalendarDate date)
     {
-        return await File.ReadAllTextAsync(path);
-    }
-    catch (FileNotFoundException ex)
-    {
-        throw new InvalidOperationException($"ファイルが見つかりません: {path}", ex);
+        // 逆変換
+        return new GregorianDate(year, month, day);
     }
 }
 ```
 
-## テスト
+### 例：カスタムエグゼキューターの追加
+
+```csharp
+public class CustomExecutor : ExecutorBase
+{
+    public override string Name => "custom";
+    
+    public override async Task<ExecutorResult> ExecuteAsync(ExecutorRequest request)
+    {
+        // まず権限を検証
+        var permission = await CheckPermissionAsync(request);
+        if (!permission.Allowed)
+        {
+            return ExecutorResult.Denied(permission.Reason);
+        }
+        
+        // 操作を実行
+        var result = await PerformOperation(request);
+        
+        return ExecutorResult.Success(result);
+    }
+}
+```
+
+## テストガイド
 
 ### 単体テスト
 
-xUnit を使用して単体テストを作成：
-
 ```csharp
-public class CalendarToolTests
+[TestClass]
+public class MyToolTests
 {
-    [Fact]
-    public async Task Convert_ShouldReturnCorrectDate()
+    [TestMethod]
+    public async Task ExecuteAsync_ValidInput_ReturnsSuccess()
     {
         // 配置
-        var tool = new CalendarTool();
+        var tool = new MyCustomTool();
+        var call = new ToolCall 
+        { 
+            Name = "my_custom_tool",
+            Parameters = new Dictionary<string, object> 
+            { 
+                ["param1"] = "test" 
+            }
+        };
         
         // 実行
-        var result = await tool.ExecuteAsync(new ToolCall
-        {
-            Parameters = new Dictionary<string, object>
-            {
-                ["action"] = "convert",
-                ["date"] = "2026-04-20",
-                ["from_calendar"] = "gregorian",
-                ["to_calendar"] = "chinese_lunar"
-            }
-        });
+        var result = await tool.ExecuteAsync(call);
         
         // 検証
-        Assert.True(result.Success);
-        Assert.Contains("旧暦", result.Output);
+        Assert.IsTrue(result.Success);
+        Assert.IsNotNull(result.Output);
     }
 }
 ```
 
-### テストの実行
+### 統合テスト
 
-```bash
-dotnet test
-```
+完全なフローをテスト：
+1. AI がツール呼び出しを返す
+2. ツールが実行
+3. 結果が AI にフィードバック
+4. AI が最終応答を返す
 
-## デバッグ
+## パフォーマンス考慮事項
 
-### ログ
+### ストレージシステム
 
-組み込みログシステムを使用：
+- Default 版はファイルベースの JSON ストレージを使用
+- Fast 版は SpeedyPack メモリストレージエンジンを使用（.spk 形式）
+- SpeedyPack はメモリディレクトリマッピング + エントリキャッシュ + 非同期書き込みキューを採用
+- 時間インデックスクエリは `ITimeStorage` インターフェースを使用
+
+### メインループスケジューラ
+
+- クロックベースのタイムスライス公平スケジューリング
+- ウォッチドッグタイマーでスタック操作を検出
+- ヒューズでカスケード障害を防止
+
+## ベストプラクティス
+
+### 1. 常に権限を検証
+
+AI が開始するすべての操作は権限チェーンを通過する必要があります：
 
 ```csharp
-var logger = ServiceLocator.Instance.Get<ILogger>();
-logger.Info("Operation started");
-logger.Warning("Something might be wrong");
-logger.Error("Operation failed", exception);
+var permission = await permissionManager.CheckAsync(request);
+if (!permission.Allowed)
+{
+    return Result.Denied(permission.Reason);
+}
 ```
 
-### デバッガー
+### 2. サービスロケーターを使用
 
-Visual Studio または VS Code でデバッグ：
+グローバルにサービスを登録および検索：
 
-1. ブレークポイントを設定
-2. F5 でデバッグ開始
-3. 変数を検査
-4. ステップ実行
+```csharp
+// 初期化時
+ServiceLocator.Instance.Register<ICustomService>(myService);
 
-## パフォーマンス
+// 必要時
+var service = ServiceLocator.Instance.Get<ICustomService>();
+```
 
-### 最適化のヒント
+### 3. 身体-大脳分離に従う
 
-1. **非同期 I/O**：すべての I/O 操作に `async/await` を使用
-2. **キャッシュ**：頻繁にアクセスされるデータをキャッシュ
-3. **バッチ処理**：複数の操作をバッチ
-4. **メモリ管理**：大きなオブジェクトを適切に破棄
+- 身体は状態とトリガーを処理
+- 大脳は AI インタラクションとツール実行を処理
 
-### プロファイリング
+### 4. 適切なエラー処理を実装
 
-```bash
-# .NET プロファイラーを使用
-dotnet trace collect --process-id <PID>
-dotnet counters monitor --process-id <PID>
+```csharp
+try
+{
+    var result = await operation();
+    return Result.Success(result);
+}
+catch (Exception ex)
+{
+    Logger.Error($"Operation failed: {ex.Message}");
+    return Result.Failure(ex.Message);
+}
+```
+
+## コントリビューションガイド
+
+1. リポジトリをフォーク
+2. フィーチャーブランチを作成（`git checkout -b feature/amazing-feature`）
+3. Conventional Commits で変更をコミット
+4. ブランチにプッシュ（`git push origin feature/amazing-feature`）
+5. プルリクエストを作成
+
+### コミットメッセージ形式
+
+```
+<type>(<scope>): <description>
+
+例：
+feat(tool): add custom calendar tool
+fix(permission): fix null pointer in callback
+docs: update development guide
 ```
 
 ## 次のステップ
 
 - 📚 [アーキテクチャガイド](architecture.md)を読む
 - 📖 [API リファレンス](api-reference.md)を探る
-- 🔧 [ツールリファレンス](tools-reference.md)を見る
+- 🔒 [セキュリティドキュメント](security.md)を見る
 - 🚀 [クイックスタートガイド](getting-started.md)で始める

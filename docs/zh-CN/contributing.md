@@ -1,4 +1,4 @@
-﻿# 贡献指南
+# 贡献指南
 
 > **版本：v0.1.0-alpha**
 
@@ -17,7 +17,7 @@
 
 ### SiliconLife.Fast（高性能版本）
 - **技术栈**：.NET 9 Windows 窗体应用
-- **贡献方向**：性能优化、内存存储、系统托盘、无锁并发
+- **贡献方向**：性能优化、SpeedyPack 存储、系统托盘、无锁并发
 - **适合人群**：有 Windows 开发经验、对性能优化感兴趣的开发者
 
 > **重要提示**：两个版本共享 SiliconLife.Core 和 SiliconLife.Common 项目，对核心接口的改进会同时影响两个版本。
@@ -71,6 +71,9 @@ git checkout -b feature/your-feature-name
 - **共享实现** → 修改 `SiliconLife.Common`
 - **Default 版本特定** → 修改 `SiliconLife.Default`
 - **Fast 版本特定** → 修改 `SiliconLife.Fast`
+- **存储引擎** → 修改 `SiliconLife.Speedy`
+- **存储管理工具** → 修改 `SiliconLife.Speedy.Manager`
+- **插件开发** → 修改 `SiliconLife.Core/Plugins`
 - **多语言文档** → 修改 `docs/` 目录
 
 ---

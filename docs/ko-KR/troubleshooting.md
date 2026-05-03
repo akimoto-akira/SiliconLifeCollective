@@ -2,7 +2,7 @@
 
 > **버전: v0.1.0-alpha**
 
-[English](../en/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | **한국어** | [Deutsch](../de-DE/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md)
+[English](../en/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | **한국어** | [Čeština](../cs-CZ/troubleshooting.md)
 
 ## 일반 문제
 
@@ -267,6 +267,30 @@ IOException: Access denied
 
 3. 손상된 파일 수동으로 수정
 
+#### 문제: SpeedyPack 저장 파일 손상 (Fast 버전)
+
+**증상**:
+- `.spk` 파일을 로드할 수 없음
+- SpeedyStorage 초기화 실패
+
+**해결책**:
+1. `SiliconLife.Speedy.Manager` 도구를 사용하여 `.spk` 파일 검사 및 복구
+2. `.spk.idx` 인덱스 파일이 `.spk` 파일과 일치하는지 확인
+3. 인덱스 파일이 손상된 경우, `.spk.idx` 파일을 삭제하면 시스템이 자동으로 인덱스 재구축
+4. 백업에서 `.spk` 파일 복원
+
+#### 문제: SpeedyPack 자동 압축 실패 (Fast 버전)
+
+**증상**:
+- `.spk` 파일이 계속 증가
+- 디스크 공간 부족
+
+**해결책**:
+1. `SpeedyPackAutoCompactor`가 정상적으로 실행 중인지 확인
+2. 수동으로 압축 작업 트리거
+3. 압축 임계값 구성 확인
+4. `SiliconLife.Speedy.Manager` 도구를 사용하여 수동 압축
+
 ---
 
 ### 도구 실행 문제
@@ -296,6 +320,34 @@ Tool execution failed: ...
 2. 입력 매개변수 확인
 3. 독립적으로 도구 테스트
 4. 권한 확인
+
+---
+
+### 플러그인 문제
+
+#### 문제: 플러그인 로딩 실패
+
+**증상**:
+```
+Plugin load failed: Security check failed
+```
+
+**해결책**:
+1. 플러그인이 금지된 네임스페이스를 참조하지 않았는지 확인 (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
+2. 플러그인이 신뢰할 수 있는 어셈블리 화이트리스트의 어셈블리만 참조하는지 확인
+3. 플러그인이 `IPlugin` 인터페이스를 올바르게 구현했는지 확인
+4. 로그에서 보안 검사 실패의 상세 원인 확인
+
+#### 문제: 플러그인 도구가 등록되지 않음
+
+**증상**:
+- 플러그인이 로딩되었지만 도구가 도구 목록에 나타나지 않음
+
+**해결책**:
+1. 플러그인의 도구 클래스가 `ITool` 인터페이스를 올바르게 구현했는지 확인
+2. 도구 클래스가 public인지 확인
+3. `ToolManager.ScanAllPluginAssemblies()`가 호출되었는지 확인
+4. 플러그인을 재빌드하고 애플리케이션 재시작
 
 ---
 

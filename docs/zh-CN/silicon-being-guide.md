@@ -1,4 +1,4 @@
-﻿# 硅基生命体指南
+# 硅基生命体指南
 
 > **版本：v0.1.0-alpha**
 
@@ -168,6 +168,7 @@ await timerSystem.StartAsync(timer);
 
 ### 存储结构
 
+Default 版本：
 ```
 data/
 └── beings/
@@ -180,6 +181,17 @@ data/
         │       └── 2026-04-21.json
         └── tasks/
             └── task-history.json
+```
+
+Fast 版本（SpeedyPack 存储）：
+```
+data/
+├── speedy/
+│   ├── {being-id}.spk       # SpeedyPack 存储文件
+│   └── {being-id}.spk.idx   # 索引文件
+└── beings/
+    └── {being-id}/
+        └── soul.md
 ```
 
 ## 工作笔记系统

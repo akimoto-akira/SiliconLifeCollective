@@ -1,8 +1,8 @@
-﻿# Meet Your Digital Companions
+# Meet Your Digital Companions
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/promo.md) | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Deutsch](../de-DE/promo.md) | [Čeština](../cs-CZ/promo.md)
+**English** | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Deutsch](../de-DE/promo.md) | [Čeština](../cs-CZ/promo.md)
 
 ## What if your computer could think for itself?
 
@@ -116,6 +116,15 @@ This is open-source software. Free to use, modify, share with friends. No monthl
 ### Grows with you
 
 Start with a single simple assistant. As you discover what's possible, create more specialized companions. The system is designed to scale from casual use to serious productivity workflows.
+
+### Extensible Plugin System
+
+Extend functionality through plugins — community-built tools and capabilities can be easily added. Each plugin runs in a security sandbox, ensuring system safety.
+
+### Dual Version Options
+
+- **Default Version**: Lightweight console application, suitable for development debugging and resource-constrained environments
+- **Fast Version**: High-performance Windows application, using SpeedyPack in-memory storage engine, suitable for production deployment
 
 ### Built by a community
 

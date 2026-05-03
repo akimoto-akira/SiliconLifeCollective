@@ -267,6 +267,30 @@ IOException: Access denied
 
 3. 手動修復损壞的檔案
 
+#### 問題：SpeedyPack 儲存檔案損壞（Fast 版本）
+
+**症狀**：
+- `.spk` 檔案無法載入
+- SpeedyStorage 初始化失敗
+
+**解決方案**：
+1. 使用 `SiliconLife.Speedy.Manager` 工具檢查和修復 `.spk` 檔案
+2. 檢查 `.spk.idx` 索引檔案是否與 `.spk` 檔案匹配
+3. 如果索引檔案損壞，刪除 `.spk.idx` 檔案，系統會自動重建索引
+4. 從備份復原 `.spk` 檔案
+
+#### 問題：SpeedyPack 自動壓縮失敗（Fast 版本）
+
+**症狀**：
+- `.spk` 檔案持續增長
+- 磁碟空間不足
+
+**解決方案**：
+1. 檢查 `SpeedyPackAutoCompactor` 是否正常運行
+2. 手動觸發壓縮操作
+3. 檢查壓縮閾值配置
+4. 使用 `SiliconLife.Speedy.Manager` 工具手動壓縮
+
 ---
 
 ### 工具執行問題
@@ -298,6 +322,32 @@ Tool execution failed: ...
 4. 檢查權限
 
 ---
+
+### 插件問題
+
+#### 問題：插件載入失敗
+
+**症狀**：
+```
+Plugin load failed: Security check failed
+```
+
+**解決方案**：
+1. 檢查插件是否引用了禁止的命名空間（`System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis`）
+2. 驗證插件只引用了可信組件白名單中的組件
+3. 檢查插件是否正確實現 `IPlugin` 介面
+4. 檢視日誌獲取詳細的安全檢查失敗原因
+
+#### 問題：插件工具未註冊
+
+**症狀**：
+- 插件載入成功但工具未出現在工具列表中
+
+**解決方案**：
+1. 確認插件中的工具類別正確實現了 `ITool` 介面
+2. 檢查工具類別是否為 public
+3. 驗證 `ToolManager.ScanAllPluginAssemblies()` 是否被呼叫
+4. 重新建構插件並重啟應用
 
 ### 工作筆記問題
 

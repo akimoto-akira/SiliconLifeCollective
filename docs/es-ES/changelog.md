@@ -16,7 +16,7 @@ y el proyecto sigue [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Este proyecto ofrece dos versiones de implementación:
 
 - **SiliconLife.Default**: Implementación predeterminada, utilizada principalmente para validar la viabilidad de la arquitectura. Aplicación de consola, almacenamiento JSON en sistema de archivos.
-- **SiliconLife.Fast**: Versión de producción principal. Aplicación de Windows Forms, almacenamiento en memoria + persistencia asincrónica, optimizada profundamente para el rendimiento.
+- **SiliconLife.Fast**: Versión de producción principal. Aplicación de Windows Forms, almacenamiento en memoria SpeedyPack + persistencia asíncrona (formato de archivo .spk), optimizada profundamente para el rendimiento.
 
 Ambas versiones comparten las mismas interfaces y funcionalidades, difiriendo solo en la implementación del almacenamiento y el modo de ejecución. SiliconLife.Default sirve como referencia para la validación de la arquitectura, mientras que SiliconLife.Fast es la versión principal para entornos de producción.
 
@@ -63,6 +63,142 @@ Ambas versiones comparten las mismas interfaces y funcionalidades, difiriendo so
 ---
 
 ## [Sin Publicar]
+
+### 2026-05-03
+
+#### Infraestructura del Proyecto
+- `2664b0c` - Actualizar infraestructura del proyecto y dependencias
+  - SiliconLife.Speedy.Manager nueva interfaz de gestión WPF agregada (MainForm.Designer.cs, MainForm.resx)
+  - Nuevo recurso de icono slc.ico agregado (1.5MB)
+  - PluginLoader seguridad de escaneo significativamente mejorada (622 líneas agregadas)
+  - Nuevo PermissionedStreamFactory fábrica de flujos con permisos (779 líneas)
+  - Nueva PermissionRequestQueue cola de solicitudes de permisos (versiones Default y Fast)
+  - Nuevo DebugLoggerProvider proveedor de registro de depuración
+  - ConfigDataBase clase base de configuración mejorada
+  - ToolManager nueva función de escaneo de herramientas de plugins (ScanAllPluginAssemblies)
+  - SiliconBeingManager gestión de ciclo de vida mejorada
+  - DashScopeClient cliente de IA Alibaba Cloud significativamente mejorado (227 líneas agregadas)
+  - DefaultSiliconBeingFactory fábrica mejorada
+  - Vista web y controladores actualizados (ChatView, WorkNoteView, PermissionRequestController)
+  - 9 idiomas de localización con nuevos valores clave agregados
+  - 35 archivos modificados, 28080 líneas agregadas, 336 líneas eliminadas
+
+### 2026-05-02
+
+#### Mejora de Clientes de IA
+- `c16f99f` - Actualizar clientes de IA, Web UI y componentes de almacenamiento
+  - DashScopeClient cliente Alibaba Cloud significativamente mejorado
+  - SpeedyPackAutoCompactor compactador automático optimizado
+  - Clase base de vista web y BeingView mejorados
+  - 6 archivos modificados, 240 líneas agregadas, 81 líneas eliminadas
+
+#### Sistema de Plugins
+- `242dc98` - Agregar lista de plugins en la página Acerca de
+  - AboutController nueva visualización de información de plugins
+  - AboutViewModel nuevo modelo de datos de plugins
+  - AboutView nuevo renderizado de lista de plugins
+  - 9 idiomas de localización con nuevos valores clave relacionados con plugins
+  - 14 archivos modificados, 160 líneas agregadas, 1 línea eliminada
+
+#### Optimización de IA
+- `147f8f4` - Simplificar texto del prompt de memoria contextual
+  - ContextManager optimización del prompt de IA
+  - 1 archivo modificado, 1 línea agregada, 1 línea eliminada
+
+#### Optimización de Almacenamiento Speedy
+- `8bda2d3` - Actualizar almacenamiento Speedy e implementación del controlador de memoria
+  - SpeedyPackAutoCompactor intervalo corregido
+  - SpeedyTimeStorage optimización del manejo de rutas
+  - MemoryController controlador de memoria mejorado
+  - SpeedyPack.Manager UI actualizada
+  - 4 archivos modificados, 21 líneas agregadas, 18 líneas eliminadas
+
+#### Mejora de Bandeja
+- `8972654` - Mejorar soporte de localización de la ventana de estado de la bandeja
+  - 9 idiomas de localización de bandeja con nueva entrada de gestión Speedy
+  - TrayStatusWindow nuevo elemento de menú de gestión Speedy
+  - 11 archivos modificados, 72 líneas agregadas
+
+#### Optimización de Speedy.Manager
+- `6f5db09` - Optimizar UI del gestor SpeedyPack y componentes internos
+  - MainForm interfaz refactorizada
+  - FreeList gestión de memoria optimizada
+  - WriteQueue cola de escritura mejorada
+  - SpeedyPack núcleo optimizado
+  - 5 archivos modificados, 96 líneas agregadas, 88 líneas eliminadas
+
+#### Mejora del Sistema de Almacenamiento
+- `57f9d5d` - Mejorar sistema de almacenamiento, agregar compactación automática y soporte de fecha incompleta
+  - Nuevo SpeedyPackAutoCompactor temporizador de compactación automática (intervalo de 30 minutos)
+  - SpeedyPackRegistry gestor singleton mejorado
+  - SpeedyStorage, SpeedyTimeStorage, SpeedyWorkNoteStorage adaptadores mejorados
+  - SpeedyPack nuevo FreeList gestión de espacio libre (149 líneas)
+  - PackFileWriter escritor refactorizado y optimizado
+  - WriteOperation, WriteQueue cola de escritura mejorada
+  - SpeedyPackOptions opciones de configuración ampliadas
+  - IncompleteDate nuevos métodos de comparación agregados
+  - PluginLoader cargador de plugins mejorado
+  - Versiones Default y Fast Program.cs flujo de inicialización actualizado
+  - DefaultConfigData datos de configuración simplificados
+  - KnowledgeNetwork red de conocimiento simplificada
+  - ChatController, MemoryController controladores optimizados
+  - SpeedyPack.Manager MainForm funcionalidad mejorada
+  - 22 archivos modificados, 639 líneas agregadas, 253 líneas eliminadas
+
+#### Actualización de Speedy.Manager
+- `b04ed33` - Actualizar archivos de Speedy.Manager
+
+### 2026-05-01
+
+#### Reconstrucción de Arquitectura: Almacenamiento Speedy Reemplaza LiteDB
+- `6600972` - Reemplazar LiteDB con almacenamiento Speedy, agregar sistema de plugins y proyecto Speedy
+  - **Nuevo proyecto SiliconLife.Speedy**: Motor de almacenamiento .spk de alto rendimiento
+    - Clase central SpeedyPack (489 líneas): mapeo de directorios en memoria + caché de entradas + cola de escritura asíncrona
+    - Clase de configuración SpeedyPackOptions: TTL de caché, máximo de entradas en caché, modo de solo lectura
+    - Interfaz de transacciones IPackTransaction: soporte para operaciones de escritura atómica
+    - Clase de información de archivos SpkFileInfo
+    - Directorio Internal: DirectoryMap, EntryCache, PackFileReader, PackFileWriter, WriteQueue, WriteOperation, SpeedyTransaction, SpkHeader, PathNormalizer, FreeList
+    - Dependencia de MessagePack 3.1.4 para serialización binaria (compresión LZ4)
+  - **Nuevo proyecto SiliconLife.Speedy.Manager**: Herramienta de gestión WPF
+    - Arquitectura MVVM: MainViewModel, DirectoryTreeViewModel, ContentViewerViewModel, etc.
+    - Capa de servicios: PackService, FileDialogService, RecentFilesService, NotificationService
+    - Convertidores: BoolToVisibility, ByteSizeToString, ContentTypeToIcon, NullToCollapsed
+    - Vistas: MainWindow, DirectoryTreeView, ContentViewerPanel, MetadataPanel
+    - Diálogos: FileInfoDialog, ImportDialog, NewEntryDialog
+  - **Migración de almacenamiento de SiliconLife.Fast**: LiteDB → SpeedyPack
+    - Nuevo SpeedyStorage (adaptador IStorage)
+    - Nuevo SpeedyTimeStorage (adaptador ITimeStorage)
+    - Nuevo SpeedyWorkNoteStorage (adaptador IWorkNoteStorage)
+    - Nuevo SpeedyPackRegistry (gestión singleton a nivel de proceso)
+    - Nuevo SpeedyPackAutoCompactor (temporizador de compactación automática)
+    - Eliminadas implementaciones de almacenamiento LiteDB (LiteDBStorage, LiteDBTimeStorage, LiteDBWorkNoteStorage, LiteDBLoggerProvider, LiteDBManager, LiteDBModels)
+    - Eliminado código relacionado con la ventana de gestión de LiteDB
+  - **Sistema de Plugins**:
+    - Nueva interfaz IPlugin (Core/Plugins/IPlugin.cs)
+    - Nuevo cargador de plugins PluginLoader (Core/Plugins/PluginLoader.cs)
+    - Soporte para carga de DLLs de plugins desde directorio
+    - Escaneo de seguridad: verificación de espacios de nombres prohibidos (System.IO, System.Net, Microsoft.CodeAnalysis, etc.)
+    - Lista blanca de ensamblados de confianza (Google.Protobuf, Newtonsoft.Json, MessagePack, etc.)
+    - Carga aislada con AssemblyLoadContext personalizado
+    - ToolManager nuevo método ScanAllPluginAssemblies
+    - CoreHost integración del cargador de plugins
+  - 119 archivos modificados, 6926 líneas agregadas, 3066 líneas eliminadas
+
+#### Mejora de Seres Silicona
+- `3aef4c3` - Agregar estado de actividad Stopped y mejora del manejo de errores
+  - Seres Silicona nuevo estado Stopped
+  - Manejo de errores y mecanismo de recuperación mejorados
+
+#### Actualización de Localización
+- `513c65d` - Actualizar todas las versiones de idiomas y documentación
+  - Nuevo componente MarkdownEditorComponent (625 líneas)
+  - Nuevo componente DetailsComponent (130 líneas)
+  - Nuevo componente AccordionComponent (285 líneas)
+  - BeingController, ChatController, MemoryController, PermissionController controladores actualizados
+  - BeingView, ChatView, MemoryView, SoulEditorView vistas refactorizadas
+  - Eliminado antiguo MarkdownEditorView
+  - Migración a componentes de InitController
+  - 115 archivos modificados, 5761 líneas agregadas, 2362 líneas eliminadas
 
 ### 2026-04-30
 

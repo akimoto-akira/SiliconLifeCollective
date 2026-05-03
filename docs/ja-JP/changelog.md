@@ -16,7 +16,7 @@
 このプロジェクトは2つの実装バージョンを提供します：
 
 - **SiliconLife.Default**：デフォルト実装、主にアーキテクチャの実現可能性を検証するために使用。コンソールアプリケーション、ファイルシステムJSONストレージ。
-- **SiliconLife.Fast**：本番環境向けの主推バージョン。Windowsフォームアプリケーション、メモリストレージ + 非同期永続化、深度なパフォーマンス最適化が施されています。
+- **SiliconLife.Fast**：本番環境向けの主推バージョン。Windowsフォームアプリケーション、SpeedyPack メモリストレージ + 非同期永続化、深度なパフォーマンス最適化が施されています。
 
 両バージョンは同じインターフェースと機能を共有し、ストレージ実装と実行モードのみが異なります。SiliconLife.Default はアーキテクチャ検証の基準として、SiliconLife.Fast は本番環境の主推バージョンとして機能します。
 
@@ -63,6 +63,142 @@
 ---
 
 ## [未リリース]
+
+### 2026-05-03
+
+#### プロジェクトインフラストラクチャ
+- `2664b0c` - プロジェクトインフラストラクチャと依存関係を更新
+  - SiliconLife.Speedy.Manager に WPF 管理インターフェースを追加（MainForm.Designer.cs、MainForm.resx）
+  - slc.ico アイコンリソースを追加（1.5MB）
+  - PluginLoader セキュリティスキャンを大幅に強化（622行追加）
+  - PermissionedStreamFactory 権限ストリームファクトリーを追加（779行）
+  - PermissionRequestQueue 権限リクエストキューを追加（Default および Fast 版）
+  - DebugLoggerProvider デバッグログプロバイダーを追加
+  - ConfigDataBase 設定基底クラスを強化
+  - ToolManager にプラグインツールスキャン機能を追加（ScanAllPluginAssemblies）
+  - SiliconBeingManager ライフサイクル管理を強化
+  - DashScopeClient Alibaba Cloud AI クライアントを大幅に強化（227行追加）
+  - DefaultSiliconBeingFactory ファクトリーを強化
+  - Web ビューとコントローラーを更新（ChatView、WorkNoteView、PermissionRequestController）
+  - 9言語のローカライゼーションに新しいキーを追加
+  - 35ファイル変更、28080行追加、336行削除
+
+### 2026-05-02
+
+#### AI クライアント強化
+- `c16f99f` - AI クライアント、Web UI、ストレージコンポーネントを更新
+  - DashScopeClient Alibaba Cloud クライアントを大幅に改善
+  - SpeedyPackAutoCompactor 自動圧縮器を最適化
+  - Web ビュー基底クラスと BeingView を改善
+  - 6ファイル変更、240行追加、81行削除
+
+#### プラグインシステム
+- `242dc98` - バージョン情報ページにプラグインリストを追加
+  - AboutController にプラグイン情報表示を追加
+  - AboutViewModel にプラグインデータモデルを追加
+  - AboutView にプラグインリストレンダリングを追加
+  - 9言語のローカライゼーションにプラグイン関連キーを追加
+  - 14ファイル変更、160行追加、1行削除
+
+#### AI 最適化
+- `147f8f4` - コンテキストメモリプロンプトテキストを簡素化
+  - ContextManager AI プロンプトを最適化
+  - 1ファイル変更、1行追加、1行削除
+
+#### Speedy ストレージ最適化
+- `8bda2d3` - Speedy ストレージとメモリコントローラーの実装を更新
+  - SpeedyPackAutoCompactor インターバル修正
+  - SpeedyTimeStorage パス処理を最適化
+  - MemoryController メモリコントローラーを改善
+  - SpeedyPack.Manager UI を更新
+  - 4ファイル変更、21行追加、18行削除
+
+#### トレイ強化
+- `8972654` - トレイステータスウィンドウのローカライゼーションサポートを強化
+  - 9言語のトレイローカライゼーションに Speedy 管理エントリを追加
+  - TrayStatusWindow に Speedy 管理メニュー項目を追加
+  - 11ファイル変更、72行追加
+
+#### Speedy.Manager 最適化
+- `6f5db09` - SpeedyPack マネージャー UI と内部コンポーネントを最適化
+  - MainForm インターフェースをリファクタリング
+  - FreeList メモリ管理を最適化
+  - WriteQueue 書き込みキューを改善
+  - SpeedyPack コアを最適化
+  - 5ファイル変更、96行追加、88行削除
+
+#### ストレージシステム強化
+- `57f9d5d` - ストレージシステムを改善、自動圧縮と不完全日付サポートを追加
+  - SpeedyPackAutoCompactor 自動圧縮タイマーを追加（30分間隔）
+  - SpeedyPackRegistry シングルトンマネージャーを強化
+  - SpeedyStorage、SpeedyTimeStorage、SpeedyWorkNoteStorage アダプターを改善
+  - SpeedyPack に FreeList 空き領域管理を追加（149行）
+  - PackFileWriter ライターをリファクタリング最適化
+  - WriteOperation、WriteQueue 書き込みキューを強化
+  - SpeedyPackOptions 設定オプションを拡張
+  - IncompleteDate に比較メソッドを追加
+  - PluginLoader プラグインローダーを改善
+  - Default および Fast 版 Program.cs 初期化フローを更新
+  - DefaultConfigData 設定データを簡素化
+  - KnowledgeNetwork ナレッジネットワークを簡素化
+  - ChatController、MemoryController コントローラーを最適化
+  - SpeedyPack.Manager MainForm 機能を強化
+  - 22ファイル変更、639行追加、253行削除
+
+#### Speedy.Manager 更新
+- `b04ed33` - Speedy.Manager ファイルを更新
+
+### 2026-05-01
+
+#### アーキテクチャリファクタリング：Speedy ストレージが LiteDB を置き換え
+- `6600972` - Speedy ストレージで LiteDB を置き換え、プラグインシステムと Speedy プロジェクトを追加
+  - **SiliconLife.Speedy プロジェクトを追加**：高性能 .spk ストレージエンジン
+    - SpeedyPack コアクラス（489行）：メモリディレクトリマッピング + エントリキャッシュ + 非同期書き込みキュー
+    - SpeedyPackOptions 設定クラス：キャッシュ TTL、最大キャッシュエントリ数、読み取り専用モード
+    - IPackTransaction トランザクションインターフェース：アトミック書き込み操作をサポート
+    - SpkFileInfo ファイル情報クラス
+    - Internal ディレクトリ：DirectoryMap、EntryCache、PackFileReader、PackFileWriter、WriteQueue、WriteOperation、SpeedyTransaction、SpkHeader、PathNormalizer、FreeList
+    - MessagePack 3.1.4 に依存してバイナリシリアライズ（LZ4 圧縮）
+  - **SiliconLife.Speedy.Manager プロジェクトを追加**：WPF 管理ツール
+    - MVVM アーキテクチャ：MainViewModel、DirectoryTreeViewModel、ContentViewerViewModel など
+    - サービス層：PackService、FileDialogService、RecentFilesService、NotificationService
+    - コンバーター：BoolToVisibility、ByteSizeToString、ContentTypeToIcon、NullToCollapsed
+    - ビュー：MainWindow、DirectoryTreeView、ContentViewerPanel、MetadataPanel
+    - ダイアログ：FileInfoDialog、ImportDialog、NewEntryDialog
+  - **SiliconLife.Fast ストレージ移行**：LiteDB → SpeedyPack
+    - SpeedyStorage（IStorage アダプター）を追加
+    - SpeedyTimeStorage（ITimeStorage アダプター）を追加
+    - SpeedyWorkNoteStorage（IWorkNoteStorage アダプター）を追加
+    - SpeedyPackRegistry（プロセスレベルシングルトン管理）を追加
+    - SpeedyPackAutoCompactor（自動圧縮タイマー）を追加
+    - LiteDB 関連ストレージ実装を削除（LiteDBStorage、LiteDBTimeStorage、LiteDBWorkNoteStorage、LiteDBLoggerProvider、LiteDBManager、LiteDBModels）
+    - LiteDB 管理ウィンドウ関連コードを削除
+  - **プラグインシステム**：
+    - IPlugin インターフェースを追加（Core/Plugins/IPlugin.cs）
+    - PluginLoader プラグインローダーを追加（Core/Plugins/PluginLoader.cs）
+    - ディレクトリからのプラグイン DLL ロードをサポート
+    - セキュリティスキャン：禁止名前空間チェック（System.IO、System.Net、Microsoft.CodeAnalysis など）
+    - 信頼できるアセンブリホワイトリスト（Google.Protobuf、Newtonsoft.Json、MessagePack など）
+    - カスタム AssemblyLoadContext 分離ロード
+    - ToolManager に ScanAllPluginAssemblies メソッドを追加
+    - CoreHost にプラグインローダーを統合
+  - 119ファイル変更、6926行追加、3066行削除
+
+#### シリコン生命体強化
+- `3aef4c3` - Stopped アクティビティ状態とエラー処理改善を追加
+  - シリコン生命体に Stopped 状態を追加
+  - エラー処理とリカバリーメカニズムを強化
+
+#### ローカライゼーション更新
+- `513c65d` - すべての言語バージョンとドキュメントを更新
+  - MarkdownEditorComponent コンポーネントを追加（625行）
+  - DetailsComponent コンポーネントを追加（130行）
+  - AccordionComponent アコーディオンコンポーネントを追加（285行）
+  - BeingController、ChatController、MemoryController、PermissionController コントローラーを更新
+  - BeingView、ChatView、MemoryView、SoulEditorView ビューをリファクタリング
+  - 古い MarkdownEditorView を削除
+  - InitController コンポーネント化移行
+  - 115ファイル変更、5761行追加、2362行削除
 
 ### 2026-04-30
 

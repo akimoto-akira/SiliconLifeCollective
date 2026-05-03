@@ -1,8 +1,8 @@
-﻿# 権限システム
+# 権限システム
 
 > **バージョン: v0.1.0-alpha**
 
-[English](../en/permission-system.md) | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | [Español](../es-ES/permission-system.md) | **日本語** | [한국어](../ko-KR/permission-system.md) | [Čeština](../cs-CZ/permission-system.md)
+[English](../en/permission-system.md) | [Deutsch](../de-DE/permission-system.md) | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | [Español](../es-ES/permission-system.md) | **日本語** | [한국어](../ko-KR/permission-system.md) | [Čeština](../cs-CZ/permission-system.md)
 
 ## 概要
 
@@ -147,6 +147,16 @@ public class IMPermissionAskHandler : IPermissionAskHandler
     }
 }
 ```
+
+### PermissionRequestQueue 権限リクエストキュー
+
+`PermissionRequestQueue` は保留中の権限リクエストを管理し、ユーザー応答の非同期待機をサポート：
+
+- **リクエストのエンキュー** — 権限チェーンがレベル 5 に達した場合、`TaskCompletionSource<AskPermissionResult>` を作成してエンキュー
+- **Web UI 表示** — `PermissionRequestController` を介して Web UI に保留中の権限リクエストを表示
+- **ユーザー応答** — ユーザーが Web UI で承認または拒否、決定のキャッシュとキャッシュ期間の設定が可能
+- **キャッシュオプション** — ユーザーは権限決定を 1 時間、24 時間、7 日間、または 30 日間キャッシュ可能
+- **タイムアウトメカニズム** — 60 秒間応答がない場合、リクエストページが自動的に閉じる
 
 ## 監査システム
 

@@ -1,8 +1,8 @@
-﻿# 기여 가이드
+# 기여 가이드
 
 > **버전: v0.1.0-alpha**
 
-[English](../en/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | **한국어** | [Deutsch](../de-DE/contributing.md) | [Čeština](../cs-CZ/contributing.md)
+[English](../en/contributing.md) | [Deutsch](../de-DE/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | **한국어** | [Čeština](../cs-CZ/contributing.md)
 
 SiliconLifeCollective에 기여해 주셔서 감사합니다!
 
@@ -17,7 +17,7 @@ SiliconLifeCollective에 기여해 주셔서 감사합니다!
 
 ### SiliconLife.Fast (고성능 버전)
 - **기술 스택**: .NET 9 Windows 양식 애플리케이션
-- **기여 방향**: 성능 최적화, 메모리 저장소, 시스템 트레이, 락 프리 동시성
+- **기여 방향**: 성능 최적화, SpeedyPack 스토리지, 시스템 트레이, 락 프리 동시성
 - **적합한 사람**: Windows 개발 경험이 있고 성능 최적화에 관심 있는 개발자
 
 > **중요 알림**: 두 버전은 SiliconLife.Core 및 SiliconLife.Common 프로젝트를 공유하며, 핵심 인터페이스 개선은 두 버전 모두에 동시에 영향을 미칩니다.
@@ -71,6 +71,9 @@ git checkout -b feature/your-feature-name
 - **공유 구현** → `SiliconLife.Common` 수정
 - **Default 버전 전용** → `SiliconLife.Default` 수정
 - **Fast 버전 전용** → `SiliconLife.Fast` 수정
+- **스토리지 엔진** → `SiliconLife.Speedy` 수정
+- **스토리지 관리 도구** → `SiliconLife.Speedy.Manager` 수정
+- **플러그인 개발** → `SiliconLife.Core/Plugins` 수정
 - **다국어 문서** → `docs/` 디렉토리 수정
 
 ---

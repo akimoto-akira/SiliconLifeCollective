@@ -15,7 +15,7 @@ This project has two implementation versions. You can choose your contribution d
 
 ### SiliconLife.Fast (High-Performance Version)
 - **Tech Stack**: .NET 9 Windows Forms Application
-- **Contribution Direction**: Performance optimization, in-memory storage, system tray, lock-free concurrency
+- **Contribution Direction**: Performance optimization, SpeedyPack storage, system tray, lock-free concurrency
 - **Suitable For**: Developers with Windows development experience and interest in performance optimization
 
 > **Important Note**: Both versions share the SiliconLife.Core and SiliconLife.Common projects. Improvements to core interfaces will affect both versions simultaneously.
@@ -69,6 +69,9 @@ Select the appropriate project based on your contribution type:
 - **Shared Implementations** → Modify `SiliconLife.Common`
 - **Default Version Specific** → Modify `SiliconLife.Default`
 - **Fast Version Specific** → Modify `SiliconLife.Fast`
+- **Storage Engine** → Modify `SiliconLife.Speedy`
+- **Storage Management Tool** → Modify `SiliconLife.Speedy.Manager`
+- **Plugin Development** → Modify `SiliconLife.Core/Plugins`
 - **Multi-language Documentation** → Modify `docs/` directory
 
 ---

@@ -170,6 +170,16 @@ public class EnUS : DefaultLocalizationBase
     public override string PermissionCacheDuration30Days => "30 days";
 
     /// <summary>
+    /// Gets the prefix for project group chat session names
+    /// </summary>
+    public override string ProjectGroupChatPrefix => "Project Group";
+
+    /// <summary>
+    /// Gets the prefix for project broadcast channel names
+    /// </summary>
+    public override string ProjectBroadcastPrefix => "Project Broadcast";
+
+    /// <summary>
     /// Gets the localized display name for a permission type
     /// </summary>
     public override string GetPermissionTypeName(PermissionType permissionType) => permissionType switch
@@ -387,6 +397,20 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string ProjectTasksLinkLabel => "Tasks";
     
     public override string ProjectWorkNotesLinkLabel => "Work Notes";
+    public override string ProjectWorkflowsLinkLabel => "Workflows";
+    public override string ProjectWorkflowsPageHeader => "Project Workflows";
+    public override string ProjectWorkflowsEmptyState => "No workflows for this project";
+    public override string CreateWorkflowButton => "Create Workflow";
+    public override string ActiveWorkflowsHeader => "Active Workflows";
+    public override string BackToProject => "Back to Project";
+    public override string WorkflowCurrentStateLabel => "Current State:";
+    public override string WorkflowCreatedByLabel => "Created By:";
+    public override string WorkflowUpdatedAtLabel => "Updated At:";
+    public override string WorkflowBusinessKeyPrompt => "Please enter business key (e.g., PR number, Issue ID):";
+    public override string WorkflowCreatedSuccess => "Workflow created successfully!";
+    public override string WorkflowCreateFailed => "Creation failed:";
+    public override string WorkflowDetailInProgress => "Workflow detail feature in development...";
+    public override string WorkflowInstanceIdLabel => "Instance ID:";
     public override string ProjectWorkNotesPageHeader => "Project Work Notes";
     public override string ProjectWorkNotesEmptyState => "No work notes for this project";
     public override string ProjectWorkNotesTotalPages => "Total Pages: {0}";

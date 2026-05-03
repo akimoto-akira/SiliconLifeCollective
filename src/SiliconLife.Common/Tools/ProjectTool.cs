@@ -35,7 +35,7 @@ public class ProjectTool : ITool
         "'restore' (restore an archived project), 'destroy' (destroy a project and clean up data), " +
         "'list' (list all projects), 'get' (get project details), " +
         "'assign' (assign a silicon being to a project), 'remove' (remove a being from a project), " +
-        "'update' (update project name/description).";
+        "'update' (update project name/description), 'list-workflow-templates' (list all available workflow templates).";
 
     /// <inheritdoc/>
     public string GetDisplayName(Language language)
@@ -57,8 +57,8 @@ public class ProjectTool : ITool
                 ["action"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "The action to perform: create, archive, restore, destroy, list, get, assign, remove, update",
-                    ["enum"] = new[] { "create", "archive", "restore", "destroy", "list", "get", "assign", "remove", "update" }
+                    ["description"] = "The action to perform: create, archive, restore, destroy, list, get, assign, remove, update, list-workflow-templates",
+                    ["enum"] = new[] { "create", "archive", "restore", "destroy", "list", "get", "assign", "remove", "update", "list-workflow-templates" }
                 },
                 ["name"] = new Dictionary<string, object>
                 {
@@ -84,6 +84,11 @@ public class ProjectTool : ITool
                 {
                     ["type"] = "boolean",
                     ["description"] = "Whether to include archived projects in list (used with list)"
+                },
+                ["workflow_template"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["description"] = "Workflow template name for the project (used with create, cannot be changed after creation)"
                 }
             },
             ["required"] = new[] { "action" }
@@ -134,6 +139,7 @@ public class ProjectTool : ITool
                 "assign" => ExecuteAssign(projectManager, parameters),
                 "remove" => ExecuteRemove(projectManager, parameters),
                 "update" => ExecuteUpdate(projectManager, parameters),
+                "list-workflow-templates" => ExecuteListWorkflowTemplates(),
                 _ => ToolResult.Failed($"Unknown action: {action}")
             };
         }
@@ -152,15 +158,34 @@ public class ProjectTool : ITool
 
         string name = nameObj!.ToString()!.Trim();
         string description = parameters.TryGetValue("description", out var descObj) ? descObj?.ToString() ?? "" : "";
+        string? workflowTemplate = parameters.TryGetValue("workflow_template", out var wtObj) ? wtObj?.ToString() : null;
 
-        var project = pm.CreateProject(name, description, being.Id);
+        var project = pm.CreateProject(name, description, being.Id, workflowTemplate);
 
-        return ToolResult.Successful(
-            $"Project created successfully.\n" +
-            $"Name: {project.Name}\n" +
-            $"ID: {project.Id}\n" +
-            $"Status: {project.Status}",
-            project);
+        var resultLines = new List<string>
+        {
+            "Project created successfully.",
+            $"Name: {project.Name}",
+            $"ID: {project.Id}",
+            $"Status: {project.Status}"
+        };
+
+        if (!string.IsNullOrEmpty(project.WorkflowTemplateName))
+        {
+            resultLines.Add($"Workflow Template: {project.WorkflowTemplateName}");
+        }
+
+        if (project.GroupChatSessionId.HasValue)
+        {
+            resultLines.Add($"Group Chat: {project.GroupChatSessionId.Value}");
+        }
+
+        if (project.BroadcastChannelId.HasValue)
+        {
+            resultLines.Add($"Broadcast Channel: {project.BroadcastChannelId.Value}");
+        }
+
+        return ToolResult.Successful(string.Join("\n", resultLines), project);
     }
 
     private static ToolResult ExecuteArchive(IProjectManager pm, Dictionary<string, object> parameters)
@@ -343,5 +368,30 @@ public class ProjectTool : ITool
                 project);
         }
         return ToolResult.Failed($"Failed to update project {projectId} (not found or not active).");
+    }
+
+    private static ToolResult ExecuteListWorkflowTemplates()
+    {
+        var workflowEngine = ServiceLocator.Instance.GetService<WorkflowEngine>();
+        if (workflowEngine == null)
+        {
+            return ToolResult.Failed("Workflow engine is not initialized");
+        }
+
+        var templates = workflowEngine.GetAllTemplates();
+        if (templates.Count == 0)
+        {
+            return ToolResult.Successful("No workflow templates available.");
+        }
+
+        var lines = new List<string> { $"Found {templates.Count} workflow template(s):" };
+        foreach (var template in templates)
+        {
+            var stateCount = template.States.Count;
+            var terminalStates = string.Join(", ", template.TerminalStates);
+            lines.Add($"  - {template.Name}: {template.Description} ({stateCount} states, terminal: {terminalStates})");
+        }
+
+        return ToolResult.Successful(string.Join("\n", lines), templates.Select(t => t.Name).ToList());
     }
 }

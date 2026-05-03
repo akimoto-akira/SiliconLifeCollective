@@ -16,7 +16,7 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 Dieses Projekt bietet zwei Implementierungsversionen:
 
 - **SiliconLife.Default**: Standardimplementierung, hauptsächlich zur Validierung der Architekturfähigkeit. Konsolenanwendung, Dateisystem-JSON-Speicher.
-- **SiliconLife.Fast**: Empfohlene Produktionsversion. Windows Forms-Anwendung, Arbeitsspeicherspeicher + asynchrone Persistenz, tiefgehend optimiert für Leistung.
+- **SiliconLife.Fast**: Empfohlene Produktionsversion. Windows Forms-Anwendung, SpeedyPack-In-Memory-Speicher + asynchrone Persistenz, tiefgehend optimiert für Leistung.
 
 Beide Versionen teilen die gleichen Schnittstellen und Funktionen und unterscheiden sich nur in der Speicherimplementierung und dem Ausführungsmodus. SiliconLife.Default dient als Architekturvalidierungsbenchmark, SiliconLife.Fast als empfohlene Produktionsversion.
 
@@ -63,6 +63,142 @@ Beide Versionen teilen die gleichen Schnittstellen und Funktionen und unterschei
 ---
 
 ## [Unveröffentlicht]
+
+### 2026-05-03
+
+#### Projektinfrastruktur
+- `2664b0c` - Aktualisierung der Projektinfrastruktur und Abhängigkeiten
+  - SiliconLife.Speedy.Manager neue WPF-Verwaltungsoberfläche (MainForm.Designer.cs, MainForm.resx)
+  - Neue slc.ico-Icon-Ressource (1,5 MB)
+  - PluginLoader erheblich verstärkte Sicherheits-Scans (622 Zeilen hinzugefügt)
+  - Neue PermissionedStreamFactory Berechtigungs-Stream-Factory (779 Zeilen)
+  - Neue PermissionRequestQueue Berechtigungsanfrage-Warteschlange (Default- und Fast-Version)
+  - Neuer DebugLoggerProvider Debug-Log-Provider
+  - ConfigDataBase Konfigurations-Basisklasse verstärkt
+  - ToolManager neue Plugin-Tool-Scan-Funktion (ScanAllPluginAssemblies)
+  - SiliconBeingManager Lebenszyklusverwaltung verstärkt
+  - DashScopeClient Alibaba Cloud AI-Client erheblich verstärkt (227 Zeilen hinzugefügt)
+  - DefaultSiliconBeingFactory Factory-Verbesserung
+  - Web-Views und Controller aktualisiert (ChatView, WorkNoteView, PermissionRequestController)
+  - 9 Sprachlokalisierungen neue Schlüssel hinzugefügt
+  - 35 Dateien geändert, 28080 Zeilen hinzugefügt, 336 Zeilen gelöscht
+
+### 2026-05-02
+
+#### AI-Client-Verbesserung
+- `c16f99f` - Aktualisierung von AI-Client, Web-UI und Speicherkomponenten
+  - DashScopeClient Alibaba Cloud-Client erheblich verbessert
+  - SpeedyPackAutoCompactor Auto-Komprimierung optimiert
+  - Web-View-Basisklasse und BeingView verbessert
+  - 6 Dateien geändert, 240 Zeilen hinzugefügt, 81 Zeilen gelöscht
+
+#### Plugin-System
+- `242dc98` - Plugin-Liste zur Info-Seite hinzugefügt
+  - AboutController neue Plugin-Information-Anzeige
+  - AboutViewModel neues Plugin-Datenmodell
+  - AboutView neue Plugin-Liste-Rendering
+  - 9 Sprachlokalisierungen neue Plugin-bezogene Schlüssel hinzugefügt
+  - 14 Dateien geändert, 160 Zeilen hinzugefügt, 1 Zeile gelöscht
+
+#### AI-Optimierung
+- `147f8f4` - Vereinfachung des Kontextspeicher-Prompt-Textes
+  - ContextManager AI-Prompt optimiert
+  - 1 Datei geändert, 1 Zeile hinzugefügt, 1 Zeile gelöscht
+
+#### Speedy-Speicher-Optimierung
+- `8bda2d3` - Aktualisierung von Speedy-Speicher und Speicher-Controller-Implementierung
+  - SpeedyPackAutoCompactor Intervall korrigiert
+  - SpeedyTimeStorage Pfadverarbeitung optimiert
+  - MemoryController Speicher-Controller verbessert
+  - SpeedyPack.Manager UI aktualisiert
+  - 4 Dateien geändert, 21 Zeilen hinzugefügt, 18 Zeilen gelöscht
+
+#### Tray-Verbesserung
+- `8972654` - Verstärkung der Lokalisierungsunterstützung für Tray-Statusfenster
+  - 9 Sprach-Tray-Lokalisierung neuen Speedy-Verwaltungs-Einstieg hinzugefügt
+  - TrayStatusWindow neuer Speedy-Verwaltungs-Menüeintrag
+  - 11 Dateien geändert, 72 Zeilen hinzugefügt
+
+#### Speedy.Manager-Optimierung
+- `6f5db09` - Optimierung von SpeedyPack-Manager-UI und internen Komponenten
+  - MainForm-Oberfläche refaktoriert
+  - FreeList Speicherverwaltung optimiert
+  - WriteQueue Schreibwarteschlange verbessert
+  - SpeedyPack-Kern optimiert
+  - 5 Dateien geändert, 96 Zeilen hinzugefügt, 88 Zeilen gelöscht
+
+#### Speichersystem-Verbesserung
+- `57f9d5d` - Verbesserung des Speichersystems, Hinzufügen von Auto-Komprimierung und unvollständiger Datumsunterstützung
+  - Neuer SpeedyPackAutoCompactor Auto-Komprimierungs-Timer (30-Minuten-Intervall)
+  - SpeedyPackRegistry Singleton-Manager verstärkt
+  - SpeedyStorage, SpeedyTimeStorage, SpeedyWorkNoteStorage Adapter verbessert
+  - SpeedyPack neuer FreeList Freiraum-Verwaltung (149 Zeilen)
+  - PackFileWriter Schreiber refaktoriert und optimiert
+  - WriteOperation, WriteQueue Schreibwarteschlange verstärkt
+  - SpeedyPackOptions Konfigurationsoptionen erweitert
+  - IncompleteDate neue Vergleichsmethoden hinzugefügt
+  - PluginLoader Plugin-Loader verbessert
+  - Default- und Fast-Version Program.cs Initialisierungsablauf aktualisiert
+  - DefaultConfigData Konfigurationsdaten vereinfacht
+  - KnowledgeNetwork Wissensnetzwerk verschlankt
+  - ChatController, MemoryController Controller optimiert
+  - SpeedyPack.Manager MainForm Funktionalität verstärkt
+  - 22 Dateien geändert, 639 Zeilen hinzugefügt, 253 Zeilen gelöscht
+
+#### Speedy.Manager-Update
+- `b04ed33` - Aktualisierung von Speedy.Manager-Dateien
+
+### 2026-05-01
+
+#### Architekturrekonstruktion: Speedy-Speicher ersetzt LiteDB
+- `6600972` - Ersetzung von LiteDB durch Speedy-Speicher, Hinzufügen von Plugin-System und Speedy-Projekt
+  - **Neues SiliconLife.Speedy-Projekt**: Hochleistungs-.spk-Speicher-Engine
+    - SpeedyPack-Kernklasse (489 Zeilen): In-Memory-Verzeichniszuordnung + Eintrags-Cache + asynchrone Schreibwarteschlange
+    - SpeedyPackOptions Konfigurationsklasse: Cache-TTL, maximale Cache-Einträge, schreibgeschützter Modus
+    - IPackTransaction Transaktionsschnittstelle: Unterstützt atomare Schreiboperationen
+    - SpkFileInfo Dateiinformationsklasse
+    - Internes Verzeichnis: DirectoryMap, EntryCache, PackFileReader, PackFileWriter, WriteQueue, WriteOperation, SpeedyTransaction, SpkHeader, PathNormalizer, FreeList
+    - Abhängig von MessagePack 3.1.4 für binäre Serialisierung (LZ4-Komprimierung)
+  - **Neues SiliconLife.Speedy.Manager-Projekt**: WPF-Verwaltungstool
+    - MVVM-Architektur: MainViewModel, DirectoryTreeViewModel, ContentViewerViewModel u.a.
+    - Service-Schicht: PackService, FileDialogService, RecentFilesService, NotificationService
+    - Konverter: BoolToVisibility, ByteSizeToString, ContentTypeToIcon, NullToCollapsed
+    - Views: MainWindow, DirectoryTreeView, ContentViewerPanel, MetadataPanel
+    - Dialoge: FileInfoDialog, ImportDialog, NewEntryDialog
+  - **SiliconLife.Fast Speichermigration**: LiteDB → SpeedyPack
+    - Neuer SpeedyStorage (IStorage-Adapter)
+    - Neuer SpeedyTimeStorage (ITimeStorage-Adapter)
+    - Neuer SpeedyWorkNoteStorage (IWorkNoteStorage-Adapter)
+    - Neuer SpeedyPackRegistry (prozessweiter Singleton-Manager)
+    - Neuer SpeedyPackAutoCompactor (Auto-Komprimierungs-Timer)
+    - Entfernung von LiteDB-Speicherimplementierungen (LiteDBStorage, LiteDBTimeStorage, LiteDBWorkNoteStorage, LiteDBLoggerProvider, LiteDBManager, LiteDBModels)
+    - Entfernung von LiteDB-Verwaltungsfenster-Code
+  - **Plugin-System**:
+    - Neue IPlugin-Schnittstelle (Core/Plugins/IPlugin.cs)
+    - Neuer PluginLoader (Core/Plugins/PluginLoader.cs)
+    - Unterstützung für Laden von Plugin-DLLs aus Verzeichnis
+    - Sicherheits-Scan: Verbotene Namespace-Prüfung (System.IO, System.Net, Microsoft.CodeAnalysis u.a.)
+    - Vertrauenswürdige Assembly-Whitelist (Google.Protobuf, Newtonsoft.Json, MessagePack u.a.)
+    - Benutzerdefinierter AssemblyLoadContext für isoliertes Laden
+    - ToolManager neue ScanAllPluginAssemblies-Methode
+    - CoreHost integriert Plugin-Loader
+  - 119 Dateien geändert, 6926 Zeilen hinzugefügt, 3066 Zeilen gelöscht
+
+#### Silicon Being-Verbesserung
+- `3aef4c3` - Hinzufügen von Stopped-Aktivitätsstatus und Fehlerbehandlungsverbesserungen
+  - Silicon Being neuer Stopped-Status
+  - Fehlerbehandlungs- und Wiederherstellungsmechanismus verstärkt
+
+#### Lokalisierungsupdate
+- `513c65d` - Aktualisierung aller Sprachversionen und Dokumentation
+  - Neuer MarkdownEditorComponent (625 Zeilen)
+  - Neuer DetailsComponent (130 Zeilen)
+  - Neuer AccordionComponent Akkordeon-Komponente (285 Zeilen)
+  - BeingController, ChatController, MemoryController, PermissionController Controller aktualisiert
+  - BeingView, ChatView, MemoryView, SoulEditorView Views refaktoriert
+  - Alter MarkdownEditorView entfernt
+  - InitController Komponentenmigration
+  - 115 Dateien geändert, 5761 Zeilen hinzugefügt, 2362 Zeilen gelöscht
 
 ### 2026-04-30
 

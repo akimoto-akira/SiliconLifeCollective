@@ -112,9 +112,19 @@ public sealed class TaskItem
     public Guid? ProjectId { get; set; }
 
     /// <summary>
-    /// Gets or sets the list of assignee GUIDs responsible for this task.
+    /// Gets or sets the GUID of the assignee who created/assigned this task (single person).
     /// </summary>
-    public List<Guid> AssigneeGuids { get; set; } = new();
+    public Guid AssigneeGuid { get; set; }
+
+    /// <summary>
+    /// Gets or sets the list of executor GUIDs responsible for executing this task (multiple people, cannot be empty).
+    /// </summary>
+    public List<Guid> ExecutorGuids { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the list of reviewer GUIDs responsible for reviewing this task (multiple people, can be empty).
+    /// </summary>
+    public List<Guid> ReviewerGuids { get; set; } = new();
 
     /// <summary>
     /// Gets or sets the GUID of the being who created this task.
@@ -404,15 +414,16 @@ public sealed class TaskSystem
     }
 
     /// <summary>
-    /// Gets all tasks that can run (pending and with all dependencies completed).
+    /// Gets all tasks that can run by the specified being (pending, dependencies completed, and being is an executor).
     /// </summary>
-    /// <returns>A list of runnable task items.</returns>
-    public List<TaskItem> GetRunnableTasks()
+    /// <param name="beingGuid">The GUID of the being to filter tasks for.</param>
+    /// <returns>A list of runnable task items for the specified being.</returns>
+    public List<TaskItem> GetRunnableTasks(Guid beingGuid)
     {
         lock (_lock)
         {
             return _tasks
-                .Where(t => t.CanRun(_tasks))
+                .Where(t => t.CanRun(_tasks) && t.ExecutorGuids.Contains(beingGuid))
                 .OrderBy(t => t.Priority)
                 .ThenBy(t => t.CreatedAt)
                 .ToList();
@@ -420,15 +431,16 @@ public sealed class TaskSystem
     }
 
     /// <summary>
-    /// Attempts to start the next runnable task.
+    /// Attempts to start the next runnable task for the specified being.
     /// </summary>
+    /// <param name="beingGuid">The GUID of the being to get tasks for.</param>
     /// <param name="task">The started task if successful; otherwise, null.</param>
     /// <returns>True if a task was started; otherwise, false.</returns>
-    public bool TryStartNext(out TaskItem? task)
+    public bool TryStartNext(Guid beingGuid, out TaskItem? task)
     {
         lock (_lock)
         {
-            var runnable = GetRunnableTasks();
+            var runnable = GetRunnableTasks(beingGuid);
             task = runnable.FirstOrDefault();
 
             if (task != null)
@@ -444,15 +456,16 @@ public sealed class TaskSystem
     }
 
     /// <summary>
-    /// Checks whether there are any tasks that can run.
+    /// Checks whether there are any tasks that can run by the specified being.
     /// </summary>
-    /// <returns>True if there are runnable tasks; otherwise, false.</returns>
-    public bool HasPendingTasks()
+    /// <param name="beingGuid">The GUID of the being to check tasks for.</param>
+    /// <returns>True if there are runnable tasks for the being; otherwise, false.</returns>
+    public bool HasPendingTasks(Guid beingGuid)
     {
         lock (_lock)
         {
-            bool hasPending = _tasks.Any(t => t.CanRun(_tasks));
-            _logger.Debug(_owner.Id, "Checking pending tasks: {0} pending", _tasks.Count(t => t.Status == TaskStatus.Pending));
+            bool hasPending = _tasks.Any(t => t.CanRun(_tasks) && t.ExecutorGuids.Contains(beingGuid));
+            _logger.Debug(_owner.Id, "Checking pending tasks for being {0}: {1} pending", beingGuid, _tasks.Count(t => t.Status == TaskStatus.Pending));
             return hasPending;
         }
     }

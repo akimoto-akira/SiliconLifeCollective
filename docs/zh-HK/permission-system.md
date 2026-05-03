@@ -1,4 +1,4 @@
-﻿# 權限系統
+# 權限系統
 
 > **版本：v0.1.0-alpha**
 
@@ -130,12 +130,16 @@ public class DefaultPermissionCallback : IPermissionCallback
 
 當所有其他級别都未決定时询問使用者權限。
 
+### IMPermissionAskHandler 實現
+
+`IMPermissionAskHandler` 通過 Web UI 向使用者發送權限請求：
+
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
 {
     public async Task<AskPermissionResult> AskAsync(PermissionRequest request)
     {
-        // 通過即时通訊向使用者發送訊息
+        // 通過即時通訊向使用者發送訊息
         await SendMessageAsync($"Allow {request.Resource}?");
         
         // 等待使用者回應
@@ -147,6 +151,16 @@ public class IMPermissionAskHandler : IPermissionAskHandler
     }
 }
 ```
+
+### PermissionRequestQueue 權限請求佇列
+
+`PermissionRequestQueue` 管理待處理的權限請求，支援異步等待使用者回應：
+
+- **請求入隊** — 當權限鏈到達級别 5 時，建立一個 `TaskCompletionSource<AskPermissionResult>` 並入隊
+- **Web UI 展示** — 通過 `PermissionRequestController` 在 Web UI 中展示待處理的權限請求
+- **使用者回應** — 使用者在 Web UI 中批准或拒絕，可選擇快取決策和設定快取持續時間
+- **快取選項** — 使用者可以將權限決策快取 1 小時、24 小時、7 天或 30 天
+- **超時機制** — 60 秒無回應自動關閉請求頁面
 
 ## 稽核系統
 

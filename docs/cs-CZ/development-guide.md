@@ -2,7 +2,7 @@
 
 > **Verze: v0.1.0-alpha**
 
-[English](../en/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Deutsch](../de-DE/development-guide.md) | **Čeština**
+[English](../en/development-guide.md) | [Deutsch](../de-DE/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | **Čeština**
 
 ## Přehled architektury
 
@@ -13,11 +13,13 @@ SiliconLifeCollective následuje **architekturu tělo-mozek** s přísným oddě
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/      # Rozhraní, abstraktní třídy, obecná infrastruktura
-│   ├── SiliconLife.Common/    # Společné implementace (používány oběma verzemi)
-│   ├── SiliconLife.Default/   # Výchozí implementace, vstupní bod (ověření proveditelnosti architektury)
-│   └── SiliconLife.Fast/      # Vysoce výkonná implementace, vstupní bod (hlavní produkční verze)
-└── docs/                      # Vícejazyčná dokumentace
+│   ├── SiliconLife.Core/            # Rozhraní, abstraktní třídy, obecná infrastruktura
+│   ├── SiliconLife.Common/          # Společné implementace (používány oběma verzemi)
+│   ├── SiliconLife.Default/         # Výchozí implementace, vstupní bod (ověření proveditelnosti architektury)
+│   ├── SiliconLife.Fast/            # Vysoce výkonná implementace, vstupní bod (hlavní produkční verze)
+│   ├── SiliconLife.Speedy/          # SpeedyPack vysoce výkonný storage engine
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack správcovský nástroj (WPF)
+└── docs/                            # Vícejazyčná dokumentace
 ```
 
 **Směr závislosti**:
@@ -27,7 +29,7 @@ SiliconLifeCollective/
 
 **Popis rolí verzí**:
 - **SiliconLife.Default**: Výchozí implementace, používána především pro ověření proveditelnosti architektury. Poskytuje jednoduché a spolehlivé souborové úložiště, vhodné pro vývojové ladění a ověření architektury.
-- **SiliconLife.Fast**: Hlavní produkční verze. Na základě architektury ověřené v Default přijímá paměťové úložiště + asynchronní perzistenci, aby poskytla extrémní optimalizaci výkonu. Nejlepší volba pro dlouhodobý provoz a reálné produkční prostředí.
+- **SiliconLife.Fast**: Hlavní produkční verze. Na základě architektury ověřené v Default přijímá paměťové úložiště SpeedyPack + asynchronní perzistenci, aby poskytla extrémní optimalizaci výkonu. Nejlepší volba pro dlouhodobý provoz a reálné produkční prostředí.
 
 ## Základní koncepty
 
@@ -203,6 +205,50 @@ public class MyCustomSkin : ISkin
 
 2. Skiny jsou automaticky objevovány `SkinManager`.
 
+### Přidání nového pluginu
+
+1. Vytvořte projekt knihovny tříd implementující rozhraní `IPlugin`:
+
+```csharp
+using SiliconLife.Collective;
+using SiliconLife.Collective.Localization;
+using SiliconLife.Collective.Tools;
+
+public class MyPlugin : IPlugin
+{
+    public string Id => "my-plugin";
+    public string Version => "1.0.0";
+    
+    public string GetName(Language language) => "My Plugin";
+    public string GetDescription(Language language) => "A custom plugin";
+    public string GetAuthor(Language language) => "Author Name";
+    
+    public void OnLoad() { }
+    public void OnStart() { }
+    public void OnStop() { }
+    public void OnUnload() { }
+}
+```
+
+2. (Volitelné) Implementujte rozhraní `ITool` v pluginu pro registraci vlastních nástrojů:
+
+```csharp
+public class MyPluginTool : ITool
+{
+    public string Name => "my_plugin_tool";
+    public string Description => "Nástroj poskytovaný mým pluginem";
+    
+    public async Task<ToolResult> ExecuteAsync(ToolCall call)
+    {
+        return new ToolResult { Success = true, Output = "Hotovo" };
+    }
+}
+```
+
+3. Zkompilovaný DLL vložte do adresáře pluginů, `PluginLoader` jej automaticky načte.
+
+> **Bezpečnostní omezení**: Pluginy nemohou odkazovat na jmenné prostory `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` atd. Pluginy jsou izolovaně načítány prostřednictvím `AssemblyLoadContext`.
+
 ## Pravidla stylu kódu
 
 ### Konvence pojmenování
@@ -373,9 +419,10 @@ Testování kompletního toku:
 
 ### Systém úložiště
 
-- Systém úložiště upřednostňuje **funkčnost před výkonem**
-- Výchozí používá JSON úložiště založené na souborech
-- Dotazy s časovým indexem používají strukturu adresářů
+- Výchozí verze používá JSON úložiště založené na souborech
+- Verze Fast používá paměťový storage engine SpeedyPack (formát .spk)
+- SpeedyPack využívá mapování paměťových adresářů + mezipaměť záznamů + asynchronní frontu zápisu
+- Dotazy s časovým indexem používají rozhraní `ITimeStorage`
 
 ### Hlavní smyčkový scheduler
 

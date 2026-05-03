@@ -66,6 +66,16 @@ public class ZhHK : DefaultLocalizationBase
     public override string PermissionCacheDuration7Days => "7 天";
     public override string PermissionCacheDuration30Days => "30 天";
 
+    /// <summary>
+    /// Gets the prefix for project group chat session names
+    /// </summary>
+    public override string ProjectGroupChatPrefix => "項目群組";
+
+    /// <summary>
+    /// Gets the prefix for project broadcast channel names
+    /// </summary>
+    public override string ProjectBroadcastPrefix => "項目廣播";
+
     public override string GetPermissionTypeName(PermissionType permissionType) => permissionType switch
     {
         PermissionType.NetworkAccess => "網絡存取",
@@ -242,6 +252,20 @@ public class ZhHK : DefaultLocalizationBase
     public override string ProjectTasksLinkLabel => "任務";
     
     public override string ProjectWorkNotesLinkLabel => "工作筆記";
+    public override string ProjectWorkflowsLinkLabel => "工作流";
+    public override string ProjectWorkflowsPageHeader => "項目工作流";
+    public override string ProjectWorkflowsEmptyState => "該項目暫無工作流";
+    public override string CreateWorkflowButton => "创建工作流";
+    public override string ActiveWorkflowsHeader => "活躍工作流";
+    public override string BackToProject => "返回項目";
+    public override string WorkflowCurrentStateLabel => "當前狀態:";
+    public override string WorkflowCreatedByLabel => "創建者:";
+    public override string WorkflowUpdatedAtLabel => "更新時間:";
+    public override string WorkflowBusinessKeyPrompt => "請輸入業務標識（如 PR 編號、Issue ID 等）:";
+    public override string WorkflowCreatedSuccess => "工作流創建成功！";
+    public override string WorkflowCreateFailed => "創建失敗:";
+    public override string WorkflowDetailInProgress => "工作流詳情功能開發中...";
+    public override string WorkflowInstanceIdLabel => "實例ID:";
     public override string ProjectWorkNotesPageHeader => "項目工作筆記";
     public override string ProjectWorkNotesEmptyState => "該項目暫無工作筆記";
     public override string ProjectWorkNotesTotalPages => "總頁數：{0}";

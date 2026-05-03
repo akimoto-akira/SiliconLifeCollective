@@ -1,4 +1,4 @@
-﻿# 权限系统
+# 权限系统
 
 > **版本：v0.1.0-alpha**
 
@@ -130,6 +130,10 @@ public class DefaultPermissionCallback : IPermissionCallback
 
 当所有其他级别都未决定时询问用户权限。
 
+### IMPermissionAskHandler 实现
+
+`IMPermissionAskHandler` 通过 Web UI 向用户发送权限请求：
+
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
 {
@@ -147,6 +151,16 @@ public class IMPermissionAskHandler : IPermissionAskHandler
     }
 }
 ```
+
+### PermissionRequestQueue 权限请求队列
+
+`PermissionRequestQueue` 管理待处理的权限请求，支持异步等待用户响应：
+
+- **请求入队** — 当权限链到达级别 5 时，创建一个 `TaskCompletionSource<AskPermissionResult>` 并入队
+- **Web UI 展示** — 通过 `PermissionRequestController` 在 Web UI 中展示待处理的权限请求
+- **用户响应** — 用户在 Web UI 中批准或拒绝，可选择缓存决策和设置缓存持续时间
+- **缓存选项** — 用户可以将权限决策缓存 1 小时、24 小时、7 天或 30 天
+- **超时机制** — 60 秒无响应自动关闭请求页面
 
 ## 审计系统
 

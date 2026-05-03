@@ -26,8 +26,9 @@ public interface IProjectManager
     /// <param name="name">The name of the project</param>
     /// <param name="description">The description of the project</param>
     /// <param name="createdBy">The GUID of the curator creating the project</param>
+    /// <param name="workflowTemplateName">Optional workflow template name (cannot be changed after creation)</param>
     /// <returns>The created project space</returns>
-    ProjectSpace CreateProject(string name, string description, Guid createdBy);
+    ProjectSpace CreateProject(string name, string description, Guid createdBy, string? workflowTemplateName = null);
 
     /// <summary>
     /// Archives a project space. Archived projects become read-only.
@@ -123,4 +124,11 @@ public interface IProjectManager
     /// <param name="projectId">The project ID</param>
     /// <returns>The task system for the project, or null</returns>
     ProjectTaskSystem? GetTaskSystem(Guid projectId);
+
+    /// <summary>
+    /// Gets the workflow engine for managing workflow instances.
+    /// Returns null if workflow engine is not initialized.
+    /// </summary>
+    /// <returns>The workflow engine, or null</returns>
+    WorkflowEngine? GetWorkflowEngine();
 }

@@ -127,9 +127,8 @@ Configurar backends de IA:
 
 ### Ajustes de Almacenamiento
 
-- Ruta base
-- Indexación por tiempo
-- Estrategia de limpieza
+- Versión Default: ruta base, indexación por tiempo, estrategia de limpieza
+- Versión Fast: configuración del motor de almacenamiento SpeedyPack, gestión de archivos .spk, ajustes de auto-compresión
 
 ### Localización
 
@@ -149,6 +148,9 @@ Cambiar entre 21 variantes de idioma:
 2. **Chat** - Diseño centrado en conversaciones
 3. **Creative** - Estilo creativo y artístico
 4. **Dev** - Layout orientado a desarrolladores
+5. **HighContrast** - Tema de alto contraste (versión Fast)
+6. **Minimal** - Estilo minimalista (versión Fast)
+7. **Light** - Tema claro (versión Fast)
 
 ### Cambiar Piel
 
@@ -200,236 +202,338 @@ Ver todas las decisiones de permisos:
 - Usuario
 - Recurso
 - Decisión
+- Razón
 
 ---
 
-## Sistema de Registros
+## Gestión de Tareas
+
+### Lista de Tareas
+
+- Todas las tareas y su estado
+- Filtrar por ser o estado
+- Indicadores de prioridad
+
+### Detalles de Tarea
+
+- Descripción
+- Prioridad
+- Fecha límite
+- Historial de ejecución
+- Resultado de salida
+
+### Crear Tarea
+
+1. Hacer clic en **Crear Tarea**
+2. Completar:
+   - Asignación de ser
+   - Descripción
+   - Prioridad (1-10)
+   - Fecha límite
+3. Crear
+
+---
+
+## Gestión de Temporizadores
+
+### Temporizadores Activos
+
+- Lista de temporizadores en ejecución
+- Próxima ejecución
+- Estado de repetición
+
+### Crear Temporizador
+
+1. Hacer clic en **Crear Temporizador**
+2. Configurar:
+   - Asignación de ser
+   - Intervalo o expresión cron
+   - Acción a ejecutar
+   - Configuración de repetición
+3. Iniciar
+
+---
+
+## Visor de Registros
 
 ### Funcionalidades
 
-- Ver registros del sistema en tiempo real
-- Filtrar por nivel (Info, Warning, Error)
-- Filtrar por Ser Silicona
-- Consulta por rango de tiempo
+- Filtrar por nivel (Información/Advertencia/Error)
+- Buscar por palabra clave
+- Selección de rango de tiempo
+- Actualizaciones en tiempo real
 
-### Niveles de Registro
+### Detalles de Registro
 
-- **Info** - Información general
-- **Warning** - Advertencias
-- **Error** - Errores
-- **Debug** - Información de depuración
-
----
-
-## Sistema de Memoria
-
-### Vista de Línea de Tiempo
-
-Visualizar memoria a largo plazo en vista cronológica:
-- Eventos y interacciones indexados por tiempo
-- Navegación por fecha
-- Filtrado avanzado
-
-### Filtrado
-
-- Por fecha
-- Por tipo de evento
-- Por palabras clave
-- Por ser
+Cada entrada de registro muestra:
+- Marca de tiempo
+- Nivel
+- Origen
+- Mensaje
+- Traza de pila (para errores)
 
 ---
 
-## Base de Conocimiento
+## Informe de Auditoría
 
-### Gestión de Tripletas
+### Uso de Tokens
 
-Crear y gestionar conocimiento usando estructura de tripla:
-- **Sujeto**: El concepto principal
-- **Relación**: La conexión entre conceptos
-- **Objeto**: El concepto relacionado
+- Total de tokens utilizados
+- Desglose por modelo
+- Cálculo de costos
+- Gráficos basados en tiempo
 
-### Descubrimiento de Rutas
+### Exportar Informe
 
-Encontrar conexiones entre conceptos:
-- Visualización gráfica
-- Ruta más corta
-- Puntuación de confianza
-
-### Búsqueda
-
-- Búsqueda de texto completo
-- Coincidencia de palabras clave
-- Filtrado por etiquetas
-
----
-
-## Explorador de Código
-
-### Árbol de Archivos
-
-Navegar la estructura de archivos del proyecto:
-- Expandir/colapsar directorios
-- Iconos de tipo de archivo
-- Búsqueda de archivos
-
-### Resaltado de Sintaxis
-
-Soporte para múltiples lenguajes:
-- C#
-- JavaScript
-- Python
-- Markdown
-- Y más...
+Descargar datos de auditoría:
+- Formato CSV
+- Selección de rango de fechas
+- Filtrar por ser o modelo
 
 ---
 
 ## Editor de Código
 
-### Monaco Editor
+### Funcionalidades
 
-Editor de código profesional con:
-- Resaltado de sintaxis
-- Autocompletado
-- Indicaciones flotantes
-- Plegado de código
-- Búsqueda y reemplazo
+- Resaltado de sintaxis (Monaco Editor)
+- Autocompletado de código
+- Indicaciones flotantes para identificadores
+- Compilación en tiempo real
 
 ### Indicaciones Flotantes
 
-Al pasar el cursor sobre código:
-- Ver documentación
-- Ver definiciones de tipos
-- Ver referencias
+Al pasar el cursor sobre cualquier identificador:
+- Información de tipo
+- Documentación
+- Ubicación de definición
+- Referencias
 
 ---
 
-## Gestión de Proyectos
+## Visualización de Historial de Chat
 
-### Espacio de Trabajo
+### Funcionalidades
 
-Organizar proyectos:
-- Crear proyectos
-- Configurar directorios
-- Gestionar miembros
+- Navegación del historial de chat de Seres Silicona
+- Lista de sesiones
+- Detalles de mensajes
+- Vista de línea de tiempo
 
-### Sistema de Tareas
+### Usar Historial de Chat
 
-Gestionar tareas del proyecto:
-- Crear tareas
-- Asignar prioridades
-- Seguimiento de progreso
+1. Navegar a la página de **Seres**
+2. Hacer clic en el enlace **Historial de Chat** del Ser Silicona
+3. Ver lista de sesiones:
+   - Título de la sesión
+   - Fecha de creación
+   - Número de mensajes
+4. Hacer clic en una sesión para ver detalles:
+   - Historial completo de mensajes
+   - Marcas de tiempo
+   - Información del remitente
+   - Registros de invocación de herramientas
 
-### Notas de Trabajo
+### Implementación Técnica
 
-Sistema de notas personales para seres:
-- Crear notas en formato Markdown
-- Añadir palabras clave
-- Generar índice
-- Búsqueda de notas
-
----
-
-## Sistema de Temporizadores
-
-### Tipos de Temporizadores
-
-1. **Una vez**: Ejecutar una vez después de un retraso
-2. **Intervalo**: Ejecutar repetidamente a intervalos fijos
-3. **Cron**: Ejecutar basado en expresión cron
-
-### Gestión
-
-- Crear temporizadores
-- Pausar/reanudar
-- Ver historial de ejecución
-- Eliminar temporizadores
+- **Controlador**: `ChatHistoryController`
+- **Modelo de vista**: `ChatHistoryViewModel`
+- **Vistas**:
+  - `ChatHistoryListView` - Lista de sesiones
+  - `ChatHistoryDetailView` - Detalles de mensajes
+- **Rutas API**:
+  - `/api/chat-history/{beingId}/conversations` - Obtener lista de sesiones
+  - `/api/chat-history/{beingId}/conversation/{conversationId}` - Obtener detalles de mensajes
 
 ---
 
-## Sistema de Ayuda
+## Subida de Archivos
 
-### Documentos Multilingües
+### Funcionalidades
 
-Acceder a documentos de ayuda en múltiples idiomas:
-- Selección de idioma
-- Búsqueda por tema
-- Navegación por categorías
+- Diálogo de fuente de archivos
+- Soporte para subida de múltiples archivos
+- Gestión de metadatos de archivos
+- Visualización del progreso de subida
 
-### Temas de Ayuda
+### Usar Subida de Archivos
 
-- Introducción
-- Arquitectura
-- Guía de desarrollo
-- Referencia de herramientas
-- Solución de problemas
-- Y más...
+1. En la interfaz de chat, hacer clic en el botón **Subir Archivo**
+2. Se abre el diálogo de fuente de archivos
+3. Seleccionar fuente de archivos:
+   - Archivo local
+   - Ruta del sistema de archivos
+4. Seleccionar archivos (soporte para selección múltiple)
+5. Confirmar subida
+6. La información del archivo se adjuntará al mensaje
+
+### Tipos de Archivo Soportados
+
+- Archivos de texto (.txt, .md, .json, .xml, etc.)
+- Archivos de código (.cs, .js, .py, .java, etc.)
+- Archivos de configuración (.yml, .yaml, .ini, .conf, etc.)
+- Archivos de documento (.csv, .log, etc.)
 
 ---
 
-## Mejores Prácticas
+## Indicador de Carga
 
-### 1. Usar SSE para Actualizaciones en Tiempo Real
+### Funcionalidades
 
-Para características en tiempo real, usar eventos SSE en lugar de sondeo:
+- Visualización del estado de carga de la página de chat
+- Selección automática de la sesión del principal
+- Retroalimentación del progreso de carga de datos
 
-```javascript
-const source = new EventSource('/api/events');
-source.onmessage = (event) => {
-    // Manejar actualización
-};
+### Comportamiento
+
+- Mostrar animación de carga al cargar la página
+- Ocultar automáticamente cuando se completa la carga de datos
+- Selección automática de la sesión del principal (si existe)
+- Texto de indicación de carga multilingüe
+
+---
+
+## Sistema de Documentación de Ayuda (Nuevo)
+
+### Resumen de Funcionalidades
+
+El sistema de documentación de ayuda proporciona soporte de documentación multilingüe para Seres Silicona y usuarios.
+
+### Usar la Documentación de Ayuda
+
+1. Navegar a la página de **Ayuda**
+2. Ver lista de temas de ayuda:
+   - Guía de inicio rápido
+   - Referencia de uso de herramientas
+   - Guía de gestión de permisos
+   - Manual de solución de problemas
+   - Guía de desarrollo
+3. Hacer clic en un tema para ver contenido detallado:
+   - Contenido documental estructurado (renderizado Markdown)
+   - Soporte multilingüe (sigue la configuración de localización del sistema)
+   - Recomendación de temas relacionados
+4. Usar la función de búsqueda para localizar rápidamente:
+   - Búsqueda por palabra clave (soporta chino, inglés)
+   - Resultados de búsqueda ordenados por relevancia
+
+### Acceso de Seres Silicona a la Ayuda
+
+Los Seres Silicona pueden acceder a la documentación de ayuda a través de la herramienta `help`:
+```json
+{
+  "action": "get_topics"
+}
 ```
 
-### 2. Gestionar Reconexión
+### Implementación Técnica
 
-Implementar lógica de reconexión para conexiones SSE:
+- **Controlador**: `HelpController`
+- **Herramienta**: `HelpTool`
+- **Rutas API**:
+  - `/api/help` - Obtener lista de temas de ayuda
+  - `/api/help/{topicId}` - Obtener detalles del tema
+  - `/api/help/search?q=keyword` - Buscar documentación de ayuda
 
-```javascript
-source.onerror = () => {
-    setTimeout(() => {
-        source.close();
-        // Reconectar
-    }, 5000);
-};
-```
+---
 
-### 3. Usar Pieles Apropiadas
+## Espacio de Trabajo de Proyectos (Nuevo)
 
-Elegir piel basada en tarea:
-- **Admin** para gestión del sistema
-- **Chat** para interacción con IA
-- **Creative** para trabajo creativo
-- **Dev** para desarrollo de código
+### Resumen de Funcionalidades
+
+El espacio de trabajo de proyectos proporciona un entorno de trabajo estructurado que soporta gestión de proyectos, seguimiento de tareas y notas de trabajo.
+
+### Gestión de Proyectos
+
+1. **Crear proyecto**:
+   - Nombre y descripción del proyecto
+   - Etiquetas del proyecto (categorización)
+   - Estado del proyecto (en progreso, completado, archivado)
+2. **Ver detalles del proyecto**:
+   - Información básica del proyecto
+   - Lista de tareas asociadas
+   - Lista de notas de trabajo
+   - Estadísticas de progreso del proyecto
+3. **Archivar proyecto**: Conservar datos históricos pero ya no activo
+
+### Notas de Trabajo (Privadas)
+
+Notas de trabajo personales de los Seres Silicona, similares a un diario:
+
+1. **Crear nota**:
+   - Resumen (descripción breve)
+   - Contenido (soporta formato Markdown)
+   - Palabras clave (para búsqueda)
+   - Registro automático de marca de tiempo
+2. **Gestionar notas**:
+   - Navegar por línea de tiempo (diseño paginado)
+   - Buscar notas (por palabra clave, resumen, contenido)
+   - Generar directorio (navegación rápida de la estructura de notas)
+   - Actualizar y eliminar notas
+3. **Control de permisos**:
+   - Privadas por defecto, solo el ser mismo puede acceder
+   - El Principal Silicona puede gestionar todas las notas
+
+### Implementación Técnica
+
+- **Controlador**: `WorkNoteController`
+- **Herramientas**: `WorkNoteTool`, `ProjectTool`, `ProjectWorkNoteTool`
+- **Rutas API**:
+  - `/api/worknotes` - Obtener lista de notas de trabajo
+  - `/api/worknotes/{id}` - Obtener detalles de la nota
+  - `/api/worknotes/search?q=keyword` - Buscar notas
+  - `/api/worknotes/directory` - Generar directorio de notas
+  - `/api/projects` - API de gestión de proyectos
+
+---
+
+## Diseño Responsivo
+
+La Web UI se adapta a diferentes tamaños de pantalla:
+- Escritorio: Layout completo
+- Tablet: Barra lateral comprimida
+- Móvil: Menú colapsable
+
+---
+
+## Atajos de Teclado
+
+| Atajo | Acción |
+|----------|--------|
+| `Ctrl+K` | Búsqueda rápida |
+| `Ctrl+B` | Alternar barra lateral |
+| `Ctrl+Enter` | Enviar mensaje |
+| `Esc` | Cancelar/Cerrar |
 
 ---
 
 ## Solución de Problemas
 
-### No Se Puede Acceder a Web UI
+### No Se Puede Conectar
 
 **Verificar**:
-1. La aplicación se está ejecutando
-2. El puerto 8080 no está en uso
-3. El firewall permite el puerto 8080
+- El servidor está ejecutándose
+- El puerto 8080 no está bloqueado
+- Configuración de firewall
 
 ### SSE No Funciona
 
 **Verificar**:
-1. El navegador soporta SSE
-2. La conexión no está bloqueada
-3. Los registros del servidor muestran conexiones SSE
+- El navegador soporta SSE
+- Sin buffer de proxy para SSE
+- Estabilidad de red
 
-### Piel No Se Carga Correctamente
+### Rendimiento Lento
 
-**Verificar**:
-1. La piel está registrada en `SkinManager`
-2. No hay errores de CSS
-3. El navegador cacheó CSS antiguo (limpiar caché)
+**Optimizar**:
+- Reducir nivel de detalle de registros
+- Limpiar datos de auditoría antiguos
+- Verificar recursos del sistema
 
 ---
 
 ## Próximos Pasos
 
 - 📚 Leer la [Guía de Arquitectura](architecture.md)
-- 🛠️ Consultar la [Guía de Desarrollo](development-guide.md)
-- 🔧 Ver la [Referencia de Herramientas](tools-reference.md)
-- 🚀 Comenzar con la [Guía de Inicio Rápido](getting-started.md)
+- 🛠️ Ver la [Guía de Desarrollo](development-guide.md)
+- � Explorar la [Referencia de API](api-reference.md)
+- 🚀 Ver la [Guía de Inicio Rápido](getting-started.md)

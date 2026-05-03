@@ -1,8 +1,8 @@
-﻿# Web UI 가이드
+# Web UI 가이드
 
 > **버전: v0.1.0-alpha**
 
-[English](../en/web-ui-guide.md) | [中文](../zh-CN/web-ui-guide.md) | [繁體中文](../zh-HK/web-ui-guide.md) | [Español](../es-ES/web-ui-guide.md) | [日本語](../ja-JP/web-ui-guide.md) | **한국어** | [Deutsch](../de-DE/web-ui-guide.md) | [Čeština](../cs-CZ/web-ui-guide.md)
+[English](../en/web-ui-guide.md) | [Deutsch](../de-DE/web-ui-guide.md) | [中文](../zh-CN/web-ui-guide.md) | [繁體中文](../zh-HK/web-ui-guide.md) | [Español](../es-ES/web-ui-guide.md) | [日本語](../ja-JP/web-ui-guide.md) | **한국어** | [Čeština](../cs-CZ/web-ui-guide.md)
 
 ## 개요
 
@@ -127,9 +127,8 @@ AI 백엔드 설정:
 
 ### 저장 설정
 
-- 기본 경로
-- 시간 인덱스
-- 정리 정책
+- Default 버전: 기본 경로, 시간 인덱스, 정리 정책
+- Fast 버전: SpeedyPack 저장 엔진 설정, .spk 파일 관리, 자동 압축 설정
 
 ### 지역화
 
@@ -149,6 +148,9 @@ AI 백엔드 설정:
 2. **Chat** - 대화 중심 디자인
 3. **Creative** - 창의적이고 예술적인 스타일
 4. **Dev** - 개발자 지향 레이아웃
+5. **HighContrast** - 고대비 테마 (Fast 버전)
+6. **Minimal** - 미니멀 스타일 (Fast 버전)
+7. **Light** - 밝은 테마 (Fast 버전)
 
 ### 스킨 전환
 

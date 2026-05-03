@@ -170,6 +170,16 @@ public class KoKR : DefaultLocalizationBase
     public override string PermissionCacheDuration30Days => "30일";
 
     /// <summary>
+    /// Gets the prefix for project group chat session names
+    /// </summary>
+    public override string ProjectGroupChatPrefix => "프로젝트 그룹";
+
+    /// <summary>
+    /// Gets the prefix for project broadcast channel names
+    /// </summary>
+    public override string ProjectBroadcastPrefix => "프로젝트 방송";
+
+    /// <summary>
     /// Gets the localized display name for a permission type
     /// </summary>
     public override string GetPermissionTypeName(PermissionType permissionType) => permissionType switch
@@ -387,6 +397,20 @@ public class KoKR : DefaultLocalizationBase
     public override string ProjectTasksLinkLabel => "작업";
     
     public override string ProjectWorkNotesLinkLabel => "작업 노트";
+    public override string ProjectWorkflowsLinkLabel => "워크플로우";
+    public override string ProjectWorkflowsPageHeader => "프로젝트 워크플로우";
+    public override string ProjectWorkflowsEmptyState => "이 프로젝트에 워크플로우가 없습니다";
+    public override string CreateWorkflowButton => "워크플로우 생성";
+    public override string ActiveWorkflowsHeader => "활성 워크플로우";
+    public override string BackToProject => "프로젝트로 돌아가기";
+    public override string WorkflowCurrentStateLabel => "현재 상태:";
+    public override string WorkflowCreatedByLabel => "생성자:";
+    public override string WorkflowUpdatedAtLabel => "업데이트 시간:";
+    public override string WorkflowBusinessKeyPrompt => "비즈니스 키를 입력하세요 (예: PR 번호, Issue ID):";
+    public override string WorkflowCreatedSuccess => "워크플로우가 성공적으로 생성되었습니다!";
+    public override string WorkflowCreateFailed => "생성 실패:";
+    public override string WorkflowDetailInProgress => "워크플로우 상세 기능 개발 중...";
+    public override string WorkflowInstanceIdLabel => "인스턴스 ID:";
     public override string ProjectWorkNotesPageHeader => "프로젝트 작업 노트";
     public override string ProjectWorkNotesEmptyState => "이 프로젝트에 작업 노트가 없습니다";
     public override string ProjectWorkNotesTotalPages => "총 페이지 수: {0}";

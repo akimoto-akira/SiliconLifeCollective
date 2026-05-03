@@ -53,6 +53,16 @@ public class CsCZ : DefaultLocalizationBase
     public override string PermissionCacheDuration24Hours => "24 hodin";
     public override string PermissionCacheDuration7Days => "7 dní";
     public override string PermissionCacheDuration30Days => "30 dní";
+
+    /// <summary>
+    /// Gets the prefix for project group chat session names
+    /// </summary>
+    public override string ProjectGroupChatPrefix => "Skupina projektu";
+
+    /// <summary>
+    /// Gets the prefix for project broadcast channel names
+    /// </summary>
+    public override string ProjectBroadcastPrefix => "Vysílání projektu";
     public override string PermissionDialogTitle => "Žádost o oprávnění";
     public override string PermissionTypeLabel => "Typ";
     public override string PermissionResourceLabel => "Zdroj";
@@ -468,6 +478,20 @@ public override string ProjectStatusDestroyedLabel => "Zničeno";
 public override string ProjectTasksLinkLabel => "Úkoly";
 
 public override string ProjectWorkNotesLinkLabel => "Pracovní poznámky";
+public override string ProjectWorkflowsLinkLabel => "Pracovní postupy";
+public override string ProjectWorkflowsPageHeader => "Pracovní postupy projektu";
+public override string ProjectWorkflowsEmptyState => "Žádné pracovní postupy pro tento projekt";
+public override string CreateWorkflowButton => "Vytvořit pracovní postup";
+public override string ActiveWorkflowsHeader => "Aktivní pracovní postupy";
+public override string BackToProject => "Zpět na projekt";
+public override string WorkflowCurrentStateLabel => "Aktuální stav:";
+public override string WorkflowCreatedByLabel => "Vytvořil:";
+public override string WorkflowUpdatedAtLabel => "Aktualizováno:";
+public override string WorkflowBusinessKeyPrompt => "Zadejte obchodní klíč (např. číslo PR, ID problému):";
+public override string WorkflowCreatedSuccess => "Pracovní postup úspěšně vytvořen!";
+public override string WorkflowCreateFailed => "Vytvoření selhalo:";
+public override string WorkflowDetailInProgress => "Funkce detailu pracovního postupu ve vývoji...";
+public override string WorkflowInstanceIdLabel => "ID instance:";
 public override string ProjectWorkNotesPageHeader => "Pracovní poznámky projektu";
 public override string ProjectWorkNotesEmptyState => "Žádné pracovní poznámky pro tento projekt";
 public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";

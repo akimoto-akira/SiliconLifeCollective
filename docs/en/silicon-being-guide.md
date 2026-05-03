@@ -1,8 +1,8 @@
-﻿# Silicon Being Guide
+# Silicon Being Guide
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/silicon-being-guide.md) | [中文](../zh-CN/silicon-being-guide.md) | [繁體中文](../zh-HK/silicon-being-guide.md) | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | [한국어](../ko-KR/silicon-being-guide.md) | [Deutsch](../de-DE/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md)
+**English** | [中文](../zh-CN/silicon-being-guide.md) | [繁體中文](../zh-HK/silicon-being-guide.md) | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | [한국어](../ko-KR/silicon-being-guide.md) | [Deutsch](../de-DE/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md)
 
 ## Overview
 
@@ -168,6 +168,7 @@ await timerSystem.StartAsync(timer);
 
 ### Storage Structure
 
+Default version (File system storage):
 ```
 data/
 └── beings/
@@ -180,6 +181,17 @@ data/
         │       └── 2026-04-21.json
         └── tasks/
             └── task-history.json
+```
+
+Fast version (SpeedyPack storage):
+```
+data/
+├── speedy/
+│   ├── {being-id}.spk       # SpeedyPack storage file
+│   └── {being-id}.spk.idx   # Index file
+└── beings/
+    └── {being-id}/
+        └── soul.md
 ```
 
 ## Work Notes System

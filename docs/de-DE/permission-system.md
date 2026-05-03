@@ -2,7 +2,7 @@
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/permission-system.md) | [Deutsch](../de-DE/permission-system.md) | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | [Español](../es-ES/permission-system.md) | [日本語](../ja-JP/permission-system.md) | [한국어](../ko-KR/permission-system.md) | [Čeština](../cs-CZ/permission-system.md)
+[English](../en/permission-system.md) | **Deutsch** | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | [Español](../es-ES/permission-system.md) | [日本語](../ja-JP/permission-system.md) | [한국어](../ko-KR/permission-system.md) | [Čeština](../cs-CZ/permission-system.md)
 
 ## Übersicht
 
@@ -147,6 +147,16 @@ public class IMPermissionAskHandler : IPermissionAskHandler
     }
 }
 ```
+
+### PermissionRequestQueue Berechtigungsanfrage-Warteschlange
+
+`PermissionRequestQueue` verwaltet ausstehende Berechtigungsanfragen und unterstützt asynchrones Warten auf Benutzerantworten:
+
+- **Anfrage einreihen** — Wenn die Berechtigungskette Stufe 5 erreicht, wird ein `TaskCompletionSource<AskPermissionResult>` erstellt und eingereiht
+- **Web-UI-Anzeige** — Ausstehende Berechtigungsanfragen werden über den `PermissionRequestController` in der Web-UI angezeigt
+- **Benutzerantwort** — Benutzer genehmigen oder verweigern in der Web-UI, mit optionaler Zwischenspeicherung der Entscheidung und Cache-Dauer
+- **Cache-Optionen** — Benutzer können Berechtigungsentscheidungen für 1 Stunde, 24 Stunden, 7 Tage oder 30 Tage zwischenspeichern
+- **Timeout-Mechanismus** — Automatisches Schließen der Anfrageseite nach 60 Sekunden ohne Antwort
 
 ## Audit-System
 

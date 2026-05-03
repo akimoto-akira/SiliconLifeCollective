@@ -1,8 +1,8 @@
-﻿# Security Design
+# Security Design
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/security.md) | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Deutsch](../de-DE/security.md) | [Čeština](../cs-CZ/security.md)
+**English** | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Deutsch](../de-DE/security.md) | [Čeština](../cs-CZ/security.md)
 
 ## Overview
 
@@ -304,3 +304,41 @@ Logs are persisted to storage and viewable via Web UI (Log Controller).
 - **Curator-only access** — `TokenAuditTool` (marked `[SiliconManagerOnly]`) allows curator to query and summarize token usage.
 - **Web dashboard** — `AuditController` provides browser-based dashboard with trend charts and data export.
 - **Persistent storage** — Records are stored via `ITimeStorage` for time-series queries and long-term analysis.
+
+---
+
+## Plugin Security
+
+The plugin system introduces security risks from third-party code execution, mitigated through the following mechanisms:
+
+### Security Sandbox
+
+`PluginLoader` performs strict security scanning when loading plugins:
+
+1. **Forbidden Namespace Check** — Plugins cannot reference the following namespaces:
+   - `System.IO` — File system access
+   - `System.Net.Http` — HTTP requests
+   - `System.Net.WebSockets` — WebSocket connections
+   - `System.Net.Sockets` — Raw sockets
+   - `Microsoft.CodeAnalysis` — Compiler API
+
+2. **Trusted Assembly Whitelist** — References to the following assemblies are allowed:
+   - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
+   - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
+   - `Dapper`
+
+3. **Forbidden Type Check** — Scans for dangerous types referenced in plugins
+
+4. **Forbidden Member Check** — Scans for dangerous methods called in plugins
+
+### Isolated Loading
+
+- Each plugin is loaded in isolation using a custom `AssemblyLoadContext`
+- Types and assemblies between plugins do not interfere with each other
+- Resources can be released when a plugin is unloaded
+
+### Tool Permission Constraints
+
+- Tools registered by plugins via the `ITool` interface are subject to the same permission system constraints
+- Plugin tools cannot bypass the 5-level permission chain
+- Plugin tools are subject to `[SiliconManagerOnly]` attribute constraints

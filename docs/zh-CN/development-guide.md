@@ -13,11 +13,13 @@ SiliconLifeCollective 遵循**身体-大脑架构**，核心接口和默认实�
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/      # 接口、抽象类、通用基础设施
-│   ├── SiliconLife.Common/    # 共享实现（两个版本共用）
-│   ├── SiliconLife.Default/   # 默认实现、入口点（验证架构可行性）
-│   └── SiliconLife.Fast/      # 高性能实现、入口点（主推生产版本）
-└── docs/                      # 多语言文档
+│   ├── SiliconLife.Core/            # 接口、抽象类、通用基础设施
+│   ├── SiliconLife.Common/          # 共享实现（两个版本共用）
+│   ├── SiliconLife.Default/         # 默认实现、入口点（验证架构可行性）
+│   ├── SiliconLife.Fast/            # 高性能实现、入口点（主推生产版本）
+│   ├── SiliconLife.Speedy/          # SpeedyPack 高性能存储引擎
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理工具（WPF）
+└── docs/                            # 多语言文档
 ```
 
 **依赖方向**：
@@ -27,7 +29,7 @@ SiliconLifeCollective/
 
 **版本角色说明**：
 - **SiliconLife.Default**：默认实现，主要用于验证架构可行性。提供简单可靠的文件系统存储实现，适合开发调试和架构验证。
-- **SiliconLife.Fast**：主推生产版本。在 Default 验证的架构基础上，采用内存存储 + 异步持久化，提供极致性能优化，是长期运行和实际生产环境的首选。
+- **SiliconLife.Fast**：主推生产版本。在 Default 验证的架构基础上，采用 SpeedyPack 内存存储 + 异步持久化，提供极致性能优化，是长期运行和实际生产环境的首选。
 
 ## 核心概念
 
@@ -177,6 +179,50 @@ public class DatabaseStorage : IStorage, ITimeStorage
     }
 }
 ```
+
+### 添加新插件
+
+1. 创建一个类库项目，实现 `IPlugin` 接口：
+
+```csharp
+using SiliconLife.Collective;
+using SiliconLife.Collective.Localization;
+using SiliconLife.Collective.Tools;
+
+public class MyPlugin : IPlugin
+{
+    public string Id => "my-plugin";
+    public string Version => "1.0.0";
+    
+    public string GetName(Language language) => "My Plugin";
+    public string GetDescription(Language language) => "A custom plugin";
+    public string GetAuthor(Language language) => "Author Name";
+    
+    public void OnLoad() { }
+    public void OnStart() { }
+    public void OnStop() { }
+    public void OnUnload() { }
+}
+```
+
+2. （可选）在插件中实现 `ITool` 接口以注册自定义工具：
+
+```csharp
+public class MyPluginTool : ITool
+{
+    public string Name => "my_plugin_tool";
+    public string Description => "A tool provided by my plugin";
+    
+    public async Task<ToolResult> ExecuteAsync(ToolCall call)
+    {
+        return new ToolResult { Success = true, Output = "Done" };
+    }
+}
+```
+
+3. 将编译后的 DLL 放入插件目录，`PluginLoader` 将自动加载。
+
+> **安全限制**：插件不能引用 `System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis` 等命名空间。插件通过 `AssemblyLoadContext` 隔离加载。
 
 ### 添加新皮肤
 
@@ -373,9 +419,10 @@ public class MyToolTests
 
 ### 存储系统
 
-- 存储系统优先考虑**功能而非性能**
-- 默认使用基于文件的 JSON 存储
-- 时间索引查询使用目录结构
+- Default 版本使用基于文件的 JSON 存储
+- Fast 版本使用 SpeedyPack 内存存储引擎（.spk 格式）
+- SpeedyPack 采用内存目录映射 + 条目缓存 + 异步写入队列
+- 时间索引查询使用 `ITimeStorage` 接口
 
 ### 主循环调度器
 

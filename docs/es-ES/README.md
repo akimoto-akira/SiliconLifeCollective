@@ -4,7 +4,7 @@
 
 **Versión: v0.1.0-alpha** | **Silicon Life Collective** — Una plataforma de colaboración multiagente basada en .NET 9, donde los agentes de IA se denominan **Ser Silicona**, capaces de auto-evolucionarse mediante compilación dinámica Roslyn.
 
-[English](../README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | **Español** | [Deutsch](../de-DE/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Čeština](../cs-CZ/README.md)
+[English](../README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | **Español** | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Čeština](../cs-CZ/README.md)
 
 ## 🌟 Características Principales
 
@@ -13,6 +13,12 @@
 - **Impulsado por Archivo de Alma** — Cada Ser Silicona es impulsado por un archivo de indicación central (`soul.md`), definiendo personalidad y patrones de comportamiento únicos
 - **Arquitectura Cuerpo-Cerebro** — El *Cuerpo* (SiliconBeing) mantiene signos vitales y detecta escenarios de activación; el *Cerebro* (ContextManager) carga historial, invoca IA, ejecuta herramientas y persiste respuestas
 - **Capacidad de Auto-Evolución** — Mediante tecnología de compilación dinámica Roslyn, los Seres Silicona pueden reescribir su propio código para evolucionar
+
+### Sistema de Plugins
+- **Arquitectura de Extensión por Plugins** — Extensión de funcionalidad mediante la interfaz IPlugin, soportando carga dinámica de DLLs de plugins desde directorios
+- **Sandbox de Seguridad** — El cargador de plugins ejecuta un escaneo de seguridad estricto, prohibiendo el acceso a espacios de nombres como System.IO, System.Net, etc.
+- **Carga Aislada** — Usa AssemblyLoadContext personalizado para carga aislada, evitando que los plugins afecten la estabilidad del programa principal
+- **Integración de Herramientas** — Los plugins pueden registrar herramientas personalizadas mediante la interfaz ITool, integrándose automáticamente al ciclo de invocación de herramientas
 
 ### Herramientas y Ejecución
 - **23 Herramientas Integradas** — Cubren calendario, chat, configuración, disco, red, memoria, tareas, temporizadores, base de conocimientos, notas de trabajo, navegador WebView, etc.
@@ -30,7 +36,7 @@
 
 ### Interfaz Web
 - **Web UI Moderna** — Servidor HTTP integrado, soporte para actualizaciones en tiempo real SSE
-- **4 Temas de Piel** — Versión de gestión, versión de chat, versión de creación, versión de desarrollo, soporte para descubrimiento y cambio automáticos
+- **7 Temas de Piel** — Versión de gestión, versión de chat, versión de creación, versión de desarrollo, alto contraste, claro, minimalista, soporte para descubrimiento y cambio automáticos
 - **20+ Controladores** — Funcionalidad completa de gestión del sistema, chat, configuración y monitoreo
 - **Sin Dependencias de Framework Frontend** — Generación de HTML/CSS/JS en el servidor mediante `H`, `CssBuilder` y `JsBuilder`
 
@@ -42,8 +48,10 @@
   - Japonés: ja-JP | Coreano: ko-KR | Checo: cs-CZ
 
 ### Datos y Almacenamiento
-- **Sin Dependencia de Base de Datos** — Almacenamiento puro en sistema de archivos (formato JSON)
+- **Almacenamiento de Alto Rendimiento SpeedyPack** — Motor de almacenamiento .spk propio, mapeo de directorios en memoria + caché de entradas + cola de escritura asíncrona
+- **Sin Dependencia de Base de Datos** — La versión Default usa almacenamiento puro en sistema de archivos (formato JSON), la versión Fast usa almacenamiento en memoria SpeedyPack
 - **Consulta Indexada por Tiempo** — Soporte para consultas eficientes por rango de tiempo a través de la interfaz `ITimeStorage`
+- **Compresión Automática** — SpeedyPack soporta compresión automática programada, recuperando espacio libre
 - **Dependencias Mínimas** — La biblioteca central solo depende de Microsoft.CodeAnalysis.CSharp para compilación dinámica
 
 ## 🔄 Arquitectura de Versión Dual
@@ -62,9 +70,9 @@ Este proyecto proporciona dos versiones de implementación para satisfacer difer
 ### SiliconLife.Fast (Versión de Alto Rendimiento)
 - **Posicionamiento**: Versión de producción principal
 - **Modo de Ejecución**: Aplicación de formularios Windows (soporta bandeja del sistema)
-- **Método de Almacenamiento**: Almacenamiento en memoria + persistencia asíncrona por lotes
+- **Método de Almacenamiento**: Almacenamiento en memoria SpeedyPack + persistencia asíncrona por lotes (formato .spk)
 - **Escenarios Aplicables**: Alta concurrencia, baja latencia, escenarios de gran volumen de datos
-- **Características**: Optimización extrema de rendimiento, ejecución en segundo plano de la bandeja, base de datos en memoria + registros WAL garantizan seguridad de datos
+- **Características**: Optimización extrema de rendimiento, ejecución en segundo plano de la bandeja, motor SpeedyPack + compresión automática garantizan seguridad de datos
 - **Mejora de Rendimiento**: Latencia de lectura de almacenamiento reducida 1000x, latencia de escritura reducida 15000x, capacidad de procesamiento concurrente aumentada 50x
 - **Descripción de Rol**: Implementación de nivel de producción con optimización profunda, la mejor opción para operaciones a largo plazo y entornos de producción reales
 - **Comando de Inicio**: `dotnet run --project src/SiliconLife.Fast`
@@ -77,26 +85,30 @@ Este proyecto proporciona dos versiones de implementación para satisfacer difer
 | **Interfaz de Usuario** | Web UI (acceso por navegador) | Icono de bandeja + ventana de bandeja + Web UI |
 | **Bandeja del Sistema** | ❌ Ninguna | ✅ Soporta minimizar a la bandeja |
 | **Ejecución en Segundo Plano** | ❌ Sale cuando se cierra la consola | ✅ Ejecución continua en segundo plano de la bandeja |
-| **Método de Almacenamiento** | Almacenamiento JSON en sistema de archivos | Almacenamiento en memoria + persistencia asíncrona |
+| **Método de Almacenamiento** | Almacenamiento JSON en sistema de archivos | Almacenamiento en memoria SpeedyPack + persistencia asíncrona |
+| **Motor de Almacenamiento** | I/O de sistema de archivos | SiliconLife.Speedy (formato .spk) |
 | **Latencia de Lectura** | ~10ms (I/O de disco) | ~0.01ms (operación en memoria) |
 | **Latencia de Escritura** | ~15ms (escritura síncrona) | ~0.001ms (escritura asíncrona) |
 | **Concurrencia** | ~100 req/s | ~5000 req/s |
 | **Uso de Memoria** | ~200MB | ~500MB |
-| **Seguridad de Datos** | Extremadamente alta (persistencia inmediata) | Alta (registros WAL + persistencia asíncrona) |
+| **Seguridad de Datos** | Extremadamente alta (persistencia inmediata) | Alta (persistencia asíncrona + compresión automática) |
 | **Escenarios Aplicables** | Seguridad de datos primero, datos pequeños | Rendimiento primero, datos grandes, alta concurrencia |
 
 ## 🛠️ Stack Tecnológico
 
-| Componente | Tecnología |
-|------|------|
-| Runtime | .NET 9 |
-| Lenguaje de Programación | C# |
-| Integración IA | Ollama (local), Alibaba Cloud Bailian (nube) |
-| Almacenamiento de Datos | Sistema de archivos (JSON + directorios indexados por tiempo) |
-| Servidor Web | HttpListener (integrado en .NET) |
-| Compilación Dinámica | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
-| Automatización de Navegador | Playwright (WebView) |
-| Licencia | Apache-2.0 |
+| Componente | SiliconLife.Default | SiliconLife.Fast |
+|------|---------------------|------------------|
+| Runtime | .NET 9 | .NET 9 Windows |
+| Lenguaje de Programación | C# | C# |
+| Tipo de Aplicación | Aplicación de consola | Aplicación de formularios Windows |
+| Integración IA | Ollama (local), Alibaba Cloud Bailian (nube) | Ollama (local), Alibaba Cloud Bailian (nube) |
+| Almacenamiento de Datos | Sistema de archivos (JSON + directorios indexados por tiempo) | SpeedyPack (formato .spk, mapeo en memoria + persistencia asíncrona) |
+| Servidor Web | HttpListener (integrado en .NET) | HttpListener (integrado en .NET) |
+| Compilación Dinámica | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
+| Automatización de Navegador | Playwright (WebView) | Playwright (WebView) |
+| Sistema de Plugins | ✅ Soportado (IPlugin + PluginLoader) | ✅ Soportado (IPlugin + PluginLoader) |
+| Bandeja del Sistema | ❌ No soportado | ✅ Soportado (NotifyIcon) |
+| Licencia | Apache-2.0 | Apache-2.0 |
 
 ## 📁 Estructura del Proyecto
 
@@ -114,6 +126,7 @@ SiliconLifeCollective.sln
 │   │   ├── Knowledge/                     # Sistema de red de conocimiento
 │   │   ├── Localization/                  # Sistema de localización
 │   │   ├── Logging/                       # Sistema de registro
+│   │   ├── Plugins/                       # Sistema de plugins (interfaz IPlugin, cargador PluginLoader)
 │   │   ├── Project/                       # Sistema de gestión de proyectos
 │   │   ├── Runtime/                       # Bucle principal, objetos de reloj, host central
 │   │   ├── Security/                      # Sistema de gestión de permisos
@@ -124,29 +137,81 @@ SiliconLifeCollective.sln
 │   │   ├── WebView/                       # Interfaz de navegador WebView
 │   │   └── ServiceLocator.cs              # Localizador de servicios global
 │   │
-│   └── SiliconLife.Default/               # Implementación predeterminada + punto de entrada de la aplicación
-│       ├── Program.cs                     # Punto de entrada (ensambla todos los componentes)
-│       ├── AI/                            # Cliente Ollama, cliente Bailian
-│       ├── Calendar/                      # 32 implementaciones de calendario
-│       ├── Config/                        # Datos de configuración predeterminados
-│       ├── Executors/                     # Implementaciones predeterminadas de ejecutores
+│   ├── SiliconLife.Common/                # Implementación compartida (común a ambas versiones)
+│   │   ├── AI/                            # Fábrica de clientes IA
+│   │   ├── Calendar/                      # 32 implementaciones de calendario
+│   │   ├── Localization/                  # Clases base de localización
+│   │   ├── Security/                      # Gestor de permisos
+│   │   ├── SiliconBeing/                  # Implementación predeterminada de Ser Silicona
+│   │   ├── Tools/                         # Implementaciones de herramientas comunes
+│   │   └── WebView/                       # Interfaz WebView
+│   │
+│   ├── SiliconLife.Default/               # Implementación predeterminada + punto de entrada de la aplicación (versión consola)
+│   │   ├── Program.cs                     # Punto de entrada (ensambla todos los componentes)
+│   │   ├── Config/                        # Datos de configuración predeterminados
+│   │   ├── Executors/                     # Implementaciones predeterminadas de ejecutores
+│   │   ├── Help/                          # Sistema de documentos de ayuda
+│   │   ├── IM/                            # Proveedor WebUI
+│   │   ├── Knowledge/                     # Implementación de red de conocimiento
+│   │   ├── Localization/                  # Localización en 21 idiomas
+│   │   ├── Logging/                       # Implementaciones de proveedores de registro
+│   │   ├── Project/                       # Implementación del sistema de proyectos
+│   │   ├── Runtime/                       # Objeto de reloj de prueba
+│   │   ├── Security/                      # Callbacks de permisos predeterminados
+│   │   ├── SiliconBeing/                  # Implementación predeterminada de Ser Silicona
+│   │   ├── Storage/                       # Implementación de almacenamiento en sistema de archivos
+│   │   ├── Tools/                         # Implementaciones de herramientas integradas
+│   │   ├── WebView/                       # Implementación Playwright WebView
+│   │   └── Web/                           # Implementación Web UI
+│   │       ├── Controllers/               # 20+ controladores
+│   │       ├── Models/                    # Modelos de vista
+│   │       ├── Views/                     # Vistas HTML
+│   │       └── Skins/                     # 4 temas de piel
+│   │
+│   └── SiliconLife.Fast/                  # Implementación de alto rendimiento + punto de entrada de la aplicación (versión formularios)
+│       ├── Program.cs                     # Punto de entrada (aplicación de formularios)
+│       ├── Config/                        # Datos de configuración (compartidos con Default)
+│       ├── Executors/                     # Implementaciones de ejecutores optimizadas
 │       ├── Help/                          # Sistema de documentos de ayuda
 │       ├── IM/                            # Proveedor WebUI
-│       ├── Knowledge/                     # Implementación de red de conocimiento
+│       ├── Knowledge/                     # Implementación de red de conocimiento (optimizada en memoria)
 │       ├── Localization/                  # Localización en 21 idiomas
-│       ├── Logging/                       # Implementaciones de proveedores de registro
+│       ├── Logging/                       # Proveedor de registro de alto rendimiento
 │       ├── Project/                       # Implementación del sistema de proyectos
-│       ├── Runtime/                       # Objeto de reloj de prueba
-│       ├── Security/                      # Callbacks de permisos predeterminados
-│       ├── SiliconBeing/                  # Implementación predeterminada de Ser Silicona
-│       ├── Storage/                       # Implementación de almacenamiento en sistema de archivos
-│       ├── Tools/                         # 23 implementaciones de herramientas integradas
+│       ├── Security/                      # Callbacks de permisos optimizados
+│       ├── SiliconBeing/                  # Implementación de Ser Silicona de alto rendimiento
+│       ├── Storage/                       # Adaptadores de almacenamiento SpeedyPack
+│       ├── Tools/                         # Implementaciones de herramientas integradas optimizadas
+│       ├── Tray/                          # Bandeja del sistema (localización en 9 idiomas)
 │       ├── WebView/                       # Implementación Playwright WebView
-│       └── Web/                           # Implementación Web UI
+│       └── Web/                           # Implementación Web UI de alto rendimiento
+│           ├── Component/                 # Biblioteca de componentes UI (30+ componentes)
 │           ├── Controllers/               # 20+ controladores
 │           ├── Models/                    # Modelos de vista
 │           ├── Views/                     # Vistas HTML
-│           └── Skins/                     # 4 temas de piel
+│           └── Skins/                     # 7 temas de piel
+│
+│   ├── SiliconLife.Speedy/                # Motor de almacenamiento de alto rendimiento SpeedyPack
+│   │   ├── SpeedyPack.cs                  # Clase central (mapeo de directorios en memoria + caché + escritura asíncrona)
+│   │   ├── SpeedyPackOptions.cs           # Opciones de configuración (TTL de caché, máximo de entradas, etc.)
+│   │   ├── IPackTransaction.cs            # Interfaz de transacciones
+│   │   ├── SpkFileInfo.cs                 # Información de archivo
+│   │   └── Internal/                      # Implementación interna
+│       │   ├── DirectoryMap.cs            # Mapeo de directorios en memoria
+│       │   ├── EntryCache.cs              # Caché de entradas
+│       │   ├── FreeList.cs                # Gestión de espacio libre
+│       │   ├── PackFileReader.cs          # Lector de archivos de paquete
+│       │   ├── PackFileWriter.cs          # Escritor de archivos de paquete
+│       │   ├── WriteQueue.cs              # Cola de escritura asíncrona
+│       │   ├── WriteOperation.cs          # Operación de escritura
+│       │   ├── SpeedyTransaction.cs       # Implementación de transacciones
+│       │   ├── SpkHeader.cs              # Cabecera de archivo de paquete
+│       │   └── PathNormalizer.cs          # Normalización de rutas
+│   │
+│   └── SiliconLife.Speedy.Manager/        # Herramienta de gestión SpeedyPack (WPF)
+│       ├── MainForm.cs                    # Ventana principal
+│       ├── Program.cs                     # Punto de entrada
+│       └── slc.ico                        # Icono de la aplicación
 │
 ├── docs/                                  # Documentación multilingüe
 │   ├── zh-CN/                             # Documentación en chino simplificado
@@ -198,22 +263,47 @@ dotnet build
 
 ### Ejecutar el Sistema
 
+#### Método 1: Ejecutar la versión Default (Aplicación de consola)
+
 ```bash
 dotnet run --project src/SiliconLife.Default
 ```
 
 La aplicación iniciará el servidor web y abrirá automáticamente la Web UI en el navegador.
 
+**Escenarios aplicables**:
+- ✅ Requisitos extremadamente altos de seguridad de datos
+- ✅ Recursos de memoria limitados (RAM < 2GB)
+- ✅ Pequeño volumen de datos, uso a corto plazo
+- ✅ Fase de depuración de desarrollo
+
+#### Método 2: Ejecutar la versión Fast (Aplicación de formularios Windows)
+
+```bash
+dotnet run --project src/SiliconLife.Fast
+```
+
+La aplicación se iniciará en modo formulario, se minimizará a la bandeja del sistema y se ejecutará continuamente en segundo plano.
+
+**Escenarios aplicables**:
+- ✅ Escenarios de alta concurrencia (> 5 usuarios)
+- ✅ Gran volumen de datos (uso de más de 3 meses)
+- ✅ Necesidad de respuesta de baja latencia
+- ✅ Necesidad de ejecución en segundo plano de la bandeja
+
 ### Publicar como Archivo Único
 
 ```bash
-# Windows
+# Windows - Versión Default
 dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-# Linux
+# Windows - Versión Fast
+dotnet publish src/SiliconLife.Fast -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
+
+# Linux - Solo versión Default
 dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 
-# macOS
+# macOS - Solo versión Default
 dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
@@ -232,10 +322,12 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 - [x] Fase 10: Web UI (HTTP + SSE, 20+ controladores, 4 pieles)
 - [x] Fase 10.5: Mejoras incrementales (canales de broadcast, auditoría de tokens, 32 calendarios, mejoras de herramientas, localización en 21 idiomas)
 - [x] Fase 10.6: Perfeccionamiento y optimización (WebView, sistema de ayuda, espacio de trabajo de proyectos, red de conocimiento)
+- [x] Fase 11: Motor de almacenamiento SpeedyPack (reemplazo de LiteDB, mapeo en memoria, cola de escritura asíncrona, compresión automática)
+- [x] Fase 12: Sistema de plugins (interfaz IPlugin, sandbox de seguridad PluginLoader, carga aislada, integración de herramientas)
 
 ### 🚧 Planificado
-- [ ] Fase 11: Integración de mensajería instantánea externa (Feishu / WhatsApp / Telegram)
-- [ ] Fase 12: Sistema de plugins y ecosistema de habilidades
+- [ ] Fase 13: Integración de mensajería instantánea externa (Feishu / WhatsApp / Telegram)
+- [ ] Fase 14: Ecosistema de habilidades (mercado de plugins, distribución de paquetes de habilidades)
 
 ## 📚 Documentación
 
@@ -264,6 +356,57 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 3. Confirmar cambios (`git commit -m 'feat: add some AmazingFeature'`)
 4. Push a la rama (`git push origin feature/AmazingFeature`)
 5. Enviar un Pull Request
+
+## � Guía de Selección de Versión
+
+### ¿Qué versión debería usar?
+
+**SiliconLife.Default (Implementación predeterminada — verificación de viabilidad de arquitectura):**
+- 📌 Es su primer contacto con este proyecto, desea comprender rápidamente la arquitectura del sistema
+- 📌 Está realizando depuración de desarrollo, necesita una forma de ejecución simple y directa
+- 📌 La seguridad de datos es su principal consideración
+- 📌 Su sistema tiene menos de 4GB de memoria
+- 📌 Solo necesita uso individual o un volumen de datos pequeño
+
+**SiliconLife.Fast (Versión de producción principal):**
+- ⚡ Necesita un entorno de producción estable a largo plazo
+- ⚡ Ya está familiarizado con la arquitectura del sistema, listo para despliegue oficial
+- ⚡ Necesita soportar acceso concurrente de múltiples usuarios
+- ⚡ Necesita ejecución en segundo plano de la bandeja del sistema
+- ⚡ Busca la experiencia de rendimiento extrema
+
+> **Recomendación general**: SiliconLife.Default es adecuado como verificación de arquitectura y experiencia de introducción; para entornos de producción reales, se recomienda encarecidamente usar SiliconLife.Fast.
+
+### ¿Se puede migrar de Default a Fast?
+
+**¡Por supuesto!** Ambas versiones comparten lo mismo:
+- ✅ Formato de archivo de configuración (config.json)
+- ✅ Interfaz de herramientas
+- ✅ Configuración de Being
+- ✅ Interfaz Web UI
+
+**Pasos de migración:**
+1. Haga una copia de seguridad de su directorio de datos Default
+2. Inicie la versión Fast con el mismo directorio de datos
+3. Fast importará automáticamente los datos existentes al motor de almacenamiento SpeedyPack
+4. Después de verificar que las funciones son normales, puede usar la versión Fast diariamente
+
+### ¿Pueden coexistir ambas versiones?
+
+**¡Sí!** Se recomienda la siguiente estrategia de despliegue:
+
+**Estrategia 1: Default para verificación, Fast para producción**
+```
+Entorno de desarrollo/verificación: SiliconLife.Default (verificar arquitectura, depurar funciones)
+Entorno de producción: SiliconLife.Fast (alto rendimiento, ejecución en segundo plano, procesamiento de solicitudes en tiempo real)
+```
+
+**Estrategia 2: Fast como ejecución principal, Default para copias de seguridad periódicas**
+```
+SiliconLife.Fast (uso diario, procesamiento de solicitudes en tiempo real)
+    ↓ Copias de seguridad periódicas
+SiliconLife.Default (archivado de datos fríos, respaldo de seguridad de datos)
+```
 
 ## 📄 Licencia
 

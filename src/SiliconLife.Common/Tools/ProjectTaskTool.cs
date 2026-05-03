@@ -176,7 +176,7 @@ public class ProjectTaskTool : ITool
             priority = p;
         }
 
-        var task = taskSystem.Create(title, description, callerId, priority);
+        var task = taskSystem.Create(title, description, callerId, new List<Guid> { callerId });
         return ToolResult.Successful($"Project task created: {task.Title} (ID: {task.Id}, Priority: {task.Priority})");
     }
 
@@ -239,8 +239,10 @@ public class ProjectTaskTool : ITool
             $"Description: {task.Description}"
         };
 
-        if (task.AssigneeGuids.Count > 0)
-            lines.Add($"Assignees: {string.Join(", ", task.AssigneeGuids)}");
+        if (task.ExecutorGuids.Count > 0)
+            lines.Add($"Executors: {string.Join(", ", task.ExecutorGuids)}");
+        if (task.ReviewerGuids.Count > 0)
+            lines.Add($"Reviewers: {string.Join(", ", task.ReviewerGuids)}");
         if (task.StartedAt.HasValue)
             lines.Add($"Started: {task.StartedAt:yyyy-MM-dd HH:mm:ss}");
         if (task.CompletedAt.HasValue)

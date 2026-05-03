@@ -170,6 +170,16 @@ public class EsES : DefaultLocalizationBase
     public override string PermissionCacheDuration30Days => "30 días";
 
     /// <summary>
+    /// Gets the prefix for project group chat session names
+    /// </summary>
+    public override string ProjectGroupChatPrefix => "Grupo del Proyecto";
+
+    /// <summary>
+    /// Gets the prefix for project broadcast channel names
+    /// </summary>
+    public override string ProjectBroadcastPrefix => "Difusión del Proyecto";
+
+    /// <summary>
     /// Gets the localized display name for a permission type
     /// </summary>
     public override string GetPermissionTypeName(PermissionType permissionType) => permissionType switch
@@ -387,6 +397,20 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string ProjectTasksLinkLabel => "Tareas";
     
     public override string ProjectWorkNotesLinkLabel => "Notas de trabajo";
+    public override string ProjectWorkflowsLinkLabel => "Flujos de trabajo";
+    public override string ProjectWorkflowsPageHeader => "Flujos de trabajo del proyecto";
+    public override string ProjectWorkflowsEmptyState => "No hay flujos de trabajo para este proyecto";
+    public override string CreateWorkflowButton => "Crear flujo de trabajo";
+    public override string ActiveWorkflowsHeader => "Flujos de trabajo activos";
+    public override string BackToProject => "Volver al proyecto";
+    public override string WorkflowCurrentStateLabel => "Estado actual:";
+    public override string WorkflowCreatedByLabel => "Creado por:";
+    public override string WorkflowUpdatedAtLabel => "Actualizado en:";
+    public override string WorkflowBusinessKeyPrompt => "Ingrese clave de negocio (ej., número de PR, ID de problema):";
+    public override string WorkflowCreatedSuccess => "¡Flujo de trabajo creado exitosamente!";
+    public override string WorkflowCreateFailed => "Error al crear:";
+    public override string WorkflowDetailInProgress => "Función de detalle del flujo de trabajo en desarrollo...";
+    public override string WorkflowInstanceIdLabel => "ID de instancia:";
     public override string ProjectWorkNotesPageHeader => "Notas de trabajo del proyecto";
     public override string ProjectWorkNotesEmptyState => "No hay notas de trabajo para este proyecto";
     public override string ProjectWorkNotesTotalPages => "Páginas totales: {0}";

@@ -193,6 +193,16 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string PermissionCacheDuration30Days { get; }
 
     /// <summary>
+    /// Gets the prefix for project group chat session names (e.g., "项目群聊" or "Project Group")
+    /// </summary>
+    public abstract string ProjectGroupChatPrefix { get; }
+
+    /// <summary>
+    /// Gets the prefix for project broadcast channel names (e.g., "项目广播" or "Project Broadcast")
+    /// </summary>
+    public abstract string ProjectBroadcastPrefix { get; }
+
+    /// <summary>
     /// Gets the localized display name for a permission type
     /// </summary>
     /// <param name="permissionType">The permission type</param>
@@ -1317,6 +1327,76 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the project work notes link label
     /// </summary>
     public abstract string ProjectWorkNotesLinkLabel { get; }
+
+    /// <summary>
+    /// Gets the project workflows link label
+    /// </summary>
+    public abstract string ProjectWorkflowsLinkLabel { get; }
+
+    /// <summary>
+    /// Gets the project workflows page header text
+    /// </summary>
+    public abstract string ProjectWorkflowsPageHeader { get; }
+
+    /// <summary>
+    /// Gets the empty state text when no project workflows exist
+    /// </summary>
+    public abstract string ProjectWorkflowsEmptyState { get; }
+
+    /// <summary>
+    /// Gets the create workflow button text
+    /// </summary>
+    public abstract string CreateWorkflowButton { get; }
+
+    /// <summary>
+    /// Gets the active workflows section header
+    /// </summary>
+    public abstract string ActiveWorkflowsHeader { get; }
+
+    /// <summary>
+    /// Gets the back to project link text
+    /// </summary>
+    public abstract string BackToProject { get; }
+
+    /// <summary>
+    /// Gets the workflow current state label
+    /// </summary>
+    public abstract string WorkflowCurrentStateLabel { get; }
+
+    /// <summary>
+    /// Gets the workflow created by label
+    /// </summary>
+    public abstract string WorkflowCreatedByLabel { get; }
+
+    /// <summary>
+    /// Gets the workflow updated at label
+    /// </summary>
+    public abstract string WorkflowUpdatedAtLabel { get; }
+
+    /// <summary>
+    /// Gets the workflow business key prompt text
+    /// </summary>
+    public abstract string WorkflowBusinessKeyPrompt { get; }
+
+    /// <summary>
+    /// Gets the workflow created success message
+    /// </summary>
+    public abstract string WorkflowCreatedSuccess { get; }
+
+    /// <summary>
+    /// Gets the workflow create failed message prefix
+    /// </summary>
+    public abstract string WorkflowCreateFailed { get; }
+
+    /// <summary>
+    /// Gets the workflow detail in development message
+    /// </summary>
+    public abstract string WorkflowDetailInProgress { get; }
+
+    /// <summary>
+    /// Gets the workflow instance ID label
+    /// </summary>
+    public abstract string WorkflowInstanceIdLabel { get; }
 
     /// <summary>
     /// Gets the project work notes page header text

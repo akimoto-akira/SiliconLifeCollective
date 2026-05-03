@@ -2,9 +2,9 @@
 
 # Silicon Life Collective
 
-**Verze: v0.1.0-alpha** | **Siliconové bytosti** — Multiagentní platforma založená na .NET 9, kde jsou AI agenti nazýváni **silikonové bytosti** s schopností sebevývoje prostřednictvím dynamické kompilace Roslyn.
+**Verze: v0.1.0-alpha** | **Silikonové bytosti** — Multiagentní platforma založená na .NET 9, kde jsou AI agenti nazýváni **silikonové bytosti** s schopností sebevývoje prostřednictvím dynamické kompilace Roslyn.
 
-[English](../README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Deutsch](../de-DE/README.md) | **Čeština**
+[English](../README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | **Čeština**
 
 ## 🌟 Klíčové funkce
 
@@ -13,6 +13,12 @@
 - **Řízeno souborem duše** — Každá silikonová bytost je řízena souborem core prompt (`soul.md`), který definuje jedinečnou osobnost a vzorce chování
 - **Architektura Tělo-Mozek** — *Tělo* (SiliconBeing) udržuje stav života a detekuje spouštěcí scénáře; *Mozek* (ContextManager) načítá historii, volá AI, provádí nástroje a perzistuje odpovědi
 - **Schopnost sebevývoje** — Prostřednictvím technologie dynamické kompilace Roslyn mohou silikonové bytosti přepisovat svůj vlastní kód pro evoluci
+
+### Plugin systém
+- **Architektura rozšíření pluginů** — Rozšíření funkcí prostřednictvím rozhraní IPlugin, podpora dynamického načítání plugin DLL z adresáře
+- **Bezpečnostní sandbox** — Zavaděč pluginů provádí přísné bezpečnostní skenování, zakazuje přístup k jmenným prostorům System.IO, System.Net atd.
+- **Izolované načítání** — Izolované načítání pomocí vlastního AssemblyLoadContext, zabraňuje vlivu pluginů na stabilitu hlavního programu
+- **Integrace nástrojů** — Pluginy mohou registrovat vlastní nástroje prostřednictvím rozhraní ITool, automatická integrace do cyklu volání nástrojů
 
 ### Nástroje a provádění
 - **23 vestavěných nástrojů** — Pokrývá kalendář, chat, konfiguraci, disk, síť, paměť, úkoly, časovače, znalostní bázi, pracovní poznámky, WebView prohlížeč a další
@@ -30,7 +36,7 @@
 
 ### Webové rozhraní
 - **Moderní Web UI** — Vestavěný HTTP server s podporou SSE pro aktualizace v reálném čase
-- **4 témata skinů** — Administrační, chat, kreativní, vývojářská verze s automatickou detekcí a přepínáním
+- **7 témat skinů** — Administrační, chat, kreativní, vývojářská, vysoký kontrast, světlý, minimalistický, s automatickou detekcí a přepínáním
 - **20+ kontrolerů** — Kompletní správa systému, chat, konfigurace, monitoring
 - **Žádná závislost na frontendovém frameworku** — Generování HTML/CSS/JS na serveru pomocí `H`, `CssBuilder` a `JsBuilder`
 
@@ -42,8 +48,10 @@
   - Japonština: ja-JP | Korejština: ko-KR | Čeština: cs-CZ
 
 ### Data a úložiště
-- **Žádná závislost na databázi** — Čisté úložiště na souborovém systému (formát JSON)
+- **SpeedyPack vysoce výkonné úložiště** — Vlastní .spk úložný engine, mapování paměťových adresářů + mezipaměť záznamů + asynchronní fronta zápisu
+- **Žádná závislost na databázi** — Výchozí verze používá čisté úložiště na souborovém systému (formát JSON), Fast verze používá SpeedyPack paměťové úložiště
 - **Časově indexované dotazy** — Efektivní dotazování podle časového rozsahu prostřednictvím rozhraní `ITimeStorage`
+- **Automatická komprese** — SpeedyPack podporuje pravidelnou automatickou kompresi pro uvolnění volného prostoru
 - **Minimální závislosti** — Core knihovna závisí pouze na Microsoft.CodeAnalysis.CSharp pro dynamickou kompilaci
 
 ## 🔄 Duální verze architektury
@@ -62,9 +70,9 @@ Tento projekt poskytuje dvě implementační verze pro splnění různých poža
 ### SiliconLife.Fast (Vysoce výkonná verze)
 - **Pozicování**: Hlavní produkční verze
 - **Režim spuštění**: Windows Forms aplikace (podporuje systémový tray)
-- **Metoda úložiště**: Úložiště v paměti + asynchronní dávková perzistence
+- **Metoda úložiště**: SpeedyPack paměťové úložiště + asynchronní dávková perzistence (.spk formát souboru)
 - **Použitelné scénáře**: Vysoká souběžnost, nízká latence, scénáře s velkým objemem dat
-- **Charakteristiky**: Extrémní optimalizace výkonu, běh na pozadí v tray, databáze v paměti + WAL protokoly zajišťují bezpečnost dat
+- **Charakteristiky**: Extrémní optimalizace výkonu, běh na pozadí v tray, SpeedyPack engine + automatická komprese zajišťují bezpečnost dat
 - **Zlepšení výkonu**: Latence čtení úložiště snížena 1000x, latence zápisu snížena 15000x, kapacita souběžného zpracování zvýšena 50x
 - **Popis role**: Produkční implementace s hlubokou optimalizací, nejlepší volba pro dlouhodobý provoz a reálné produkční prostředí
 - **Spouštěcí příkaz**: `dotnet run --project src/SiliconLife.Fast`
@@ -77,26 +85,30 @@ Tento projekt poskytuje dvě implementační verze pro splnění různých poža
 | **Uživatelské rozhraní** | Web UI (přístup přes prohlížeč) | Ikona tray + okno tray + Web UI |
 | **Systémový tray** | ❌ Žádný | ✅ Podporuje minimalizaci do tray |
 | **Běh na pozadí** | ❌ Ukončí se při zavření konzole | ✅ Nepřetržitý běh na pozadí v tray |
-| **Metoda úložiště** | Úložiště JSON na souborovém systému | Úložiště v paměti + asynchronní perzistence |
+| **Metoda úložiště** | Úložiště JSON na souborovém systému | SpeedyPack paměťové úložiště + asynchronní perzistence |
+| **Úložný engine** | I/O souborového systému | SiliconLife.Speedy (.spk formát) |
 | **Latence čtení** | ~10ms (I/O disku) | ~0.01ms (operace v paměti) |
 | **Latence zápisu** | ~15ms (synchronní zápis) | ~0.001ms (asynchronní zápis) |
 | **Souběžnost** | ~100 req/s | ~5000 req/s |
 | **Využití paměti** | ~200MB | ~500MB |
-| **Bezpečnost dat** | Extrémně vysoká (okamžitá perzistence) | Vysoká (WAL protokoly + asynchronní perzistence) |
+| **Bezpečnost dat** | Extrémně vysoká (okamžitá perzistence) | Vysoká (asynchronní perzistence + automatická komprese) |
 | **Použitelné scénáře** | Bezpečnost dat jako priorita, malá data | Výkon jako priorita, velká data, vysoká souběžnost |
 
 ## 🛠️ Technologický stack
 
-| Komponenta | Technologie |
-|------|------|
-| Runtime | .NET 9 |
-| Programovací jazyk | C# |
-| AI integrace | Ollama (lokální), Alibaba Cloud Bailian (cloud) |
-| Úložiště dat | Souborový systém (JSON + časově indexované adresáře) |
-| Webový server | HttpListener (vestavěný v .NET) |
-| Dynamická kompilace | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
-| Automatizace prohlížeče | Playwright (WebView) |
-| Licence | Apache-2.0 |
+| Komponenta | SiliconLife.Default | SiliconLife.Fast |
+|------|---------------------|------------------|
+| Runtime | .NET 9 | .NET 9 Windows |
+| Programovací jazyk | C# | C# |
+| Typ aplikace | Konzolová aplikace | Windows Forms aplikace |
+| AI integrace | Ollama (lokální), Alibaba Cloud Bailian (cloud) | Ollama (lokální), Alibaba Cloud Bailian (cloud) |
+| Úložiště dat | Souborový systém (JSON + časově indexované adresáře) | SpeedyPack (.spk formát, mapování paměti + asynchronní perzistence) |
+| Webový server | HttpListener (vestavěný v .NET) | HttpListener (vestavěný v .NET) |
+| Dynamická kompilace | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
+| Automatizace prohlížeče | Playwright (WebView) | Playwright (WebView) |
+| Plugin systém | ✅ Podporováno (IPlugin + PluginLoader) | ✅ Podporováno (IPlugin + PluginLoader) |
+| Systémový tray | ❌ Nepodporováno | ✅ Podporováno (NotifyIcon) |
+| Licence | Apache-2.0 | Apache-2.0 |
 
 ## 📁 Struktura projektu
 
@@ -114,6 +126,7 @@ SiliconLifeCollective.sln
 │   │   ├── Knowledge/                     # Systém znalostní sítě
 │   │   ├── Localization/                  # Lokalizační systém
 │   │   ├── Logging/                       # Systém protokolování
+│   │   ├── Plugins/                       # Plugin systém (rozhraní IPlugin, zavaděč PluginLoader)
 │   │   ├── Project/                       # Systém správy projektů
 │   │   ├── Runtime/                       # Hlavní smyčka, objekty hodin, core hostitel
 │   │   ├── Security/                      # Systém správy oprávnění
@@ -124,29 +137,81 @@ SiliconLifeCollective.sln
 │   │   ├── WebView/                       # Rozhraní WebView prohlížeče
 │   │   └── ServiceLocator.cs              # Globální lokátor služeb
 │   │
-│   └── SiliconLife.Default/               # Výchozí implementace + vstup aplikace
-│       ├── Program.cs                     # Vstupní bod (sestavení všech komponent)
-│       ├── AI/                            # Klient Ollama, klient Bailian
-│       ├── Calendar/                      # 32 implementací kalendářů
-│       ├── Config/                        # Výchozí konfigurační data
-│       ├── Executors/                     # Výchozí implementace exekutorů
+│   ├── SiliconLife.Common/                # Sdílená implementace (společná pro obě verze)
+│   │   ├── AI/                            # Továrna AI klientů
+│   │   ├── Calendar/                      # 32 implementací kalendářů
+│   │   ├── Localization/                  # Základní třída lokalizace
+│   │   ├── Security/                      # Správce oprávnění
+│   │   ├── SiliconBeing/                  # Výchozí implementace silikonových bytostí
+│   │   ├── Tools/                         # Obecná implementace nástrojů
+│   │   └── WebView/                       # Rozhraní WebView
+│   │
+│   ├── SiliconLife.Default/               # Výchozí implementace + vstup aplikace (konzolová verze)
+│   │   ├── Program.cs                     # Vstupní bod (sestavení všech komponent)
+│   │   ├── Config/                        # Výchozí konfigurační data
+│   │   ├── Executors/                     # Výchozí implementace exekutorů
+│   │   ├── Help/                          # Systém nápovědy
+│   │   ├── IM/                            # Poskytovatel WebUI
+│   │   ├── Knowledge/                     # Implementace znalostní sítě
+│   │   ├── Localization/                  # Lokalizace 21 jazyků
+│   │   ├── Logging/                       # Implementace poskytovatelů protokolů
+│   │   ├── Project/                       # Implementace systémů projektů
+│   │   ├── Runtime/                       # Testovací objekty hodin
+│   │   ├── Security/                      # Výchozí zpětné volání oprávnění
+│   │   ├── SiliconBeing/                  # Výchozí implementace silikonových bytostí
+│   │   ├── Storage/                       # Implementace úložiště na souborovém systému
+│   │   ├── Tools/                         # Implementace vestavěných nástrojů
+│   │   ├── WebView/                       # Implementace Playwright WebView
+│   │   └── Web/                           # Implementace Web UI
+│   │       ├── Controllers/               # 20+ kontrolerů
+│   │       ├── Models/                    # View modely
+│   │       ├── Views/                     # HTML pohledy
+│   │       └── Skins/                     # 4 témata skinů
+│   │
+│   └── SiliconLife.Fast/                  # Vysoce výkonná implementace + vstup aplikace (Forms verze)
+│       ├── Program.cs                     # Vstupní bod (Forms aplikace)
+│       ├── Config/                        # Konfigurační data (sdílená s Default)
+│       ├── Executors/                     # Optimalizovaná implementace exekutorů
 │       ├── Help/                          # Systém nápovědy
 │       ├── IM/                            # Poskytovatel WebUI
-│       ├── Knowledge/                     # Implementace znalostní sítě
+│       ├── Knowledge/                     # Implementace znalostní sítě (optimalizace paměti)
 │       ├── Localization/                  # Lokalizace 21 jazyků
-│       ├── Logging/                       # Implementace poskytovatelů protokolů
+│       ├── Logging/                       # Vysoce výkonný poskytovatel protokolů
 │       ├── Project/                       # Implementace systémů projektů
-│       ├── Runtime/                       # Testovací objekty hodin
-│       ├── Security/                      # Výchozí zpětné volání oprávnění
-│       ├── SiliconBeing/                  # Výchozí implementace silikonových bytostí
-│       ├── Storage/                       # Implementace úložiště na souborovém systému
-│       ├── Tools/                         # 23 vestavěných nástrojů
+│       ├── Security/                      # Optimalizované zpětné volání oprávnění
+│       ├── SiliconBeing/                  # Vysoce výkonná implementace silikonových bytostí
+│       ├── Storage/                       # SpeedyPack adaptér úložiště
+│       ├── Tools/                         # Optimalizovaná implementace vestavěných nástrojů
+│       ├── Tray/                          # Systémový tray (9 jazykových lokalizací)
 │       ├── WebView/                       # Implementace Playwright WebView
-│       └── Web/                           # Implementace Web UI
+│       └── Web/                           # Vysoce výkonná implementace Web UI
+│           ├── Component/                 # Knihovna UI komponent (30+ komponent)
 │           ├── Controllers/               # 20+ kontrolerů
 │           ├── Models/                    # View modely
 │           ├── Views/                     # HTML pohledy
-│           └── Skins/                     # 4 témata skinů
+│           └── Skins/                     # 7 témat skinů
+│
+│   ├── SiliconLife.Speedy/                # SpeedyPack vysoce výkonný úložný engine
+│   │   ├── SpeedyPack.cs                  # Jádrová třída (mapování paměťových adresářů + mezipaměť + asynchronní zápis)
+│   │   ├── SpeedyPackOptions.cs           # Konfigurační možnosti (TTL mezipaměti, max. počet záznamů atd.)
+│   │   ├── IPackTransaction.cs            # Rozhraní transakcí
+│   │   ├── SpkFileInfo.cs                 # Informace o souboru
+│   │   └── Internal/                      # Interní implementace
+│       │   ├── DirectoryMap.cs            # Mapování paměťových adresářů
+│       │   ├── EntryCache.cs              # Mezipaměť záznamů
+│       │   ├── FreeList.cs                # Správa volného prostoru
+│       │   ├── PackFileReader.cs          # Čtečka balíčkových souborů
+│       │   ├── PackFileWriter.cs          # Zapisovač balíčkových souborů
+│       │   ├── WriteQueue.cs              # Asynchronní fronta zápisu
+│       │   ├── WriteOperation.cs          # Operace zápisu
+│       │   ├── SpeedyTransaction.cs       # Implementace transakcí
+│       │   ├── SpkHeader.cs              # Hlavička balíčkového souboru
+│       │   └── PathNormalizer.cs          # Normalizace cest
+│   │
+│   └── SiliconLife.Speedy.Manager/        # SpeedyPack správní nástroj (WPF)
+│       ├── MainForm.cs                    # Hlavní okno
+│       ├── Program.cs                     # Vstupní bod
+│       └── slc.ico                        # Ikona aplikace
 │
 ├── docs/                                  # Vícejazyčná dokumentace
 │   ├── zh-CN/                             # Dokumentace v zjednodušené čínštině
@@ -168,7 +233,7 @@ Hlavní smyčka (vyhrazený thread, watchdog + jistič)
        └── Správce silikonových bytostí
             └── Běžec silikonových bytostí (dočasný thread, timeout + jistič)
                  └── SiliconBeing.Tick()
-                      └── ContextManager.思考()
+                      └── ContextManager.Přemýšlet()
                            └── AI Klient.Chat()
                                 └── Cyklus volání nástrojů → Perzistence do systému chatu
 ```
@@ -198,22 +263,47 @@ dotnet build
 
 ### Spuštění systému
 
+#### Metoda 1: Spuštění výchozí verze (konzolová aplikace)
+
 ```bash
 dotnet run --project src/SiliconLife.Default
 ```
 
 Aplikace spustí webový server a automaticky otevře Web UI v prohlížeči.
 
+**Použitelné scénáře**:
+- ✅ Extrémně vysoké požadavky na bezpečnost dat
+- ✅ Omezené paměťové zdroje (RAM < 2GB)
+- ✅ Malý objem dat, krátkodobé použití
+- ✅ Fáze vývojového ladění
+
+#### Metoda 2: Spuštění Fast verze (Windows Forms aplikace)
+
+```bash
+dotnet run --project src/SiliconLife.Fast
+```
+
+Aplikace se spustí v režimu okna, minimalizuje se do systémového tray a běží nepřetržitě na pozadí.
+
+**Použitelné scénáře**:
+- ✅ Scénáře s vysokou souběžností (> 5 uživatelů)
+- ✅ Velký objem dat (použití více než 3 měsíce)
+- ✅ Potřeba nízkolatencních odpovědí
+- ✅ Potřeba běhu na pozadí v tray
+
 ### Publikování jako jeden soubor
 
 ```bash
-# Windows
+# Windows - výchozí verze
 dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-# Linux
+# Windows - Fast verze
+dotnet publish src/SiliconLife.Fast -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
+
+# Linux - pouze výchozí verze
 dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 
-# macOS
+# macOS - pouze výchozí verze
 dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
@@ -232,10 +322,12 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 - [x] Fáze 10: Web UI (HTTP + SSE, 20+ kontrolerů, 4 skiny)
 - [x] Fáze 10.5: Přírůstková vylepšení (broadcast kanál, audit tokenů, 32 kalendářů, vylepšení nástrojů, lokalizace 21 jazyků)
 - [x] Fáze 10.6: Dokončení a optimalizace (WebView, systém nápovědy, pracovní prostor projektu, znalostní síť)
+- [x] Fáze 11: SpeedyPack úložný engine (náhrada LiteDB, mapování paměti, asynchronní fronta zápisu, automatická komprese)
+- [x] Fáze 12: Plugin systém (rozhraní IPlugin, bezpečnostní sandbox PluginLoader, izolované načítání, integrace nástrojů)
 
 ### 🚧 Plánováno
-- [ ] Fáze 11: Integrace externích instantních zpráv (Feishu / WhatsApp / Telegram)
-- [ ] Fáze 12: Systém pluginů a ekosystém dovedností
+- [ ] Fáze 13: Integrace externích instantních zpráv (Feishu / WhatsApp / Telegram)
+- [ ] Fáze 14: Ekosystém dovedností (tržiště pluginů, distribuce balíčků dovedností)
 
 ## 📚 Dokumentace
 
@@ -264,6 +356,37 @@ Vítáme všechny formy příspěvků! Podrobnosti naleznete v [Průvodci přisp
 3. Commitněte změny (`git commit -m 'feat: add some AmazingFeature'`)
 4. Pushněte do větve (`git push origin feature/AmazingFeature`)
 5. Otevřete Pull Request
+
+## 💡 Průvodce výběrem verze
+
+### Kterou verzi bych měl použít?
+
+**SiliconLife.Default (Výchozí implementace — ověření proveditelnosti architektury):**
+- 📌 Poprvé se setkáváte s tímto projektem a chcete rychle pochopit systémovou architekturu
+- 📌 Provádíte vývojové ladění a potřebujete jednoduchý a přímý způsob spuštění
+
+**SiliconLife.Fast (Vysoce výkonná verze — hlavní produkční verze):**
+- 🚀 Provozní prostředí vyžadující vysoký výkon a nízkou latenci
+- 🚀 Dlouhodobý provoz, nepřetržitý běh na pozadí
+- 🚀 Velký objem dat, scénáře s vysokou souběžností
+
+### Jak migrovat z Default na Fast?
+
+**Lze migrovat?** Ano! Obě verze sdílejí:
+- ✔️ Formát konfiguračních souborů (config.json)
+- ✔️ Strukturu datových adresářů
+- ✔️ Rozhraní nástrojů
+- ✔️ Konfiguraci Being
+- ✔️ Rozhraní Web UI
+
+**Kroky migrace:**
+1. Zálohujte svůj datový adresář Default
+2. Spusťte Fast verzi se stejným datovým adresářem
+3. Fast automaticky importuje existující data do SpeedyPack úložného enginu
+4. Po ověření správné funkce můžete Fast verzi používat pro každodenní práci
+
+### Mohou obě verze existovat vedle sebe?
+Ano, ale **nedoporučuje se** spouštět obě verze současně se stejným datovým adresářem, aby se předešlo konfliktům při zápisu dat. Doporučuje se používat pouze jednu verzi v daném okamžiku.
 
 ## 📄 Licence
 

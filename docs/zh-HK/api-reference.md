@@ -1,4 +1,4 @@
-﻿# API 參考
+# API 參考
 
 > **版本：v0.1.0-alpha**
 
@@ -358,6 +358,81 @@ data: {"type": "complete", "sessionId": "uuid"}
       "timestamp": "2026-04-20T10:30:00Z"
     }
   ]
+}
+```
+
+---
+
+## 關於頁面
+
+### 獲取關於頁面
+
+**GET** `/about`
+
+返回關於頁面，包含系統資訊和已載入的插件列表。
+
+**插件列表資料**：
+```json
+{
+  "plugins": {
+    "plugin-id": {
+      "name": "My Plugin",
+      "version": "1.0.0",
+      "description": "Plugin description",
+      "author": "Author Name"
+    }
+  }
+}
+```
+
+---
+
+## 權限請求 API
+
+### 權限請求頁面
+
+**GET** `/permission/request?userId={id}&type={type}&resource={resource}`
+
+顯示權限請求頁面，允許使用者批准或拒絕矽基生命體的權限請求。
+
+**查詢參數**：
+
+| 參數 | 類型 | 描述 |
+|------|------|------|
+| `userId` | `Guid` | 請求權限的矽基生命體 ID |
+| `type` | `string` | 權限類型 |
+| `resource` | `string` | 請求的資源路徑 |
+| `allowCode` | `string` | 允許操作的代碼標識 |
+| `denyCode` | `string` | 拒絕操作的代碼標識 |
+
+### 檢查待處理權限請求
+
+**GET** `/permission/check?userId={id}`
+
+**回應**：
+```json
+{
+  "pending": true
+}
+```
+
+### 回應權限請求
+
+**GET** `/permission/respond?userId={id}&allowed={bool}&addToCache={bool}&cacheDuration={hours}`
+
+**查詢參數**：
+
+| 參數 | 類型 | 描述 |
+|------|------|------|
+| `userId` | `Guid` | 矽基生命體 ID |
+| `allowed` | `bool` | 是否允許 |
+| `addToCache` | `bool` | 是否將決策快取 |
+| `cacheDuration` | `double` | 快取持續時間（小時） |
+
+**回應**：
+```json
+{
+  "success": true
 }
 ```
 

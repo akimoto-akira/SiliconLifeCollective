@@ -1,8 +1,8 @@
-﻿# 도구 참고
+# 도구 참고
 
 > **버전: v0.1.0-alpha**
 
-[English](../en/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | **한국어** | [Deutsch](../de-DE/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md)
+[English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | **한국어** | [Čeština](../cs-CZ/tools-reference.md)
 
 ## 개요
 
@@ -17,6 +17,7 @@
 - **개발 도구** — 코드 실행, 로그 쿼리
 - **유틸리티 도구** — 시스템 정보, Token 감사, 도움말 문서, 지식 네트워크
 - **브라우저 도구** — WebView 브라우저 자동화
+- **플러그인 도구** — 플러그인 시스템을 통해 등록된 서드파티 도구
 
 ---
 
@@ -397,19 +398,239 @@
 
 ---
 
-### 15-23. 기타 도구
+### 15. 프로젝트 도구 (ProjectTool)
 
-시스템에는 다음 도구도 포함되어 있습니다:
+**도구 이름**: `project`
 
-15. **ProjectTool** - 프로젝트 워크스페이스 관리
-16. **ProjectTaskTool** - 프로젝트 작업 관리
-17. **ProjectWorkNoteTool** - 프로젝트 작업 노트
-18. **SystemTool** - 시스템 정보 및 리소스 모니터링
-19. **TaskTool** - 개인 작업 관리
-20. **TimerTool** - 타이머 관리
-21. **TokenAuditTool** 🔒 - Token 사용 감사
-22. **WebViewBrowserTool** - 브라우저 자동화 (Playwright 기반)
-23. **WorkNoteTool** - 개인 작업 노트
+**기능 설명**: 프로젝트 워크스페이스 관리.
+
+**지원 작업**:
+- `create` — 프로젝트 만들기
+- `list` — 프로젝트 나열
+- `get_info` — 프로젝트 정보 가져오기
+- `update` — 프로젝트 업데이트
+- `archive` — 프로젝트 보관
+
+**사용 예시**:
+```json
+{
+  "action": "create",
+  "name": "My Project",
+  "description": "프로젝트 설명"
+}
+```
+
+---
+
+### 16. 프로젝트 작업 도구 (ProjectTaskTool)
+
+**도구 이름**: `project_task`
+
+**기능 설명**: 프로젝트 작업 관리.
+
+**지원 작업**:
+- `create` — 작업 만들기
+- `list` — 작업 나열
+- `update` — 작업 업데이트
+- `complete` — 작업 완료
+- `get_stats` — 작업 통계 가져오기
+
+**사용 예시**:
+```json
+{
+  "action": "create",
+  "project_id": "project-uuid",
+  "description": "작업 설명 완료",
+  "priority": 5
+}
+```
+
+---
+
+### 17. 프로젝트 작업 노트 도구 (ProjectWorkNoteTool)
+
+**도구 이름**: `project_work_note`
+
+**기능 설명**: 프로젝트 작업 노트 관리 (공개, 작업장 비슷).
+
+**지원 작업**:
+- `create` — 노트 만들기
+- `read` — 노트 읽기
+- `update` — 노트 업데이트
+- `delete` — 노트 삭제
+- `list` — 노트 나열
+- `search` — 노트 검색
+- `directory` — 목차 생성
+
+**사용 예시**:
+```json
+{
+  "action": "create",
+  "project_id": "project-uuid",
+  "summary": "사용자 인증 모듈 완료",
+  "content": "## 구현 세부정보\n\n- JWT token 사용",
+  "keywords": "인증,JWT"
+}
+```
+
+---
+
+### 18. 시스템 도구 (SystemTool)
+
+**도구 이름**: `system`
+
+**기능 설명**: 시스템 정보 및 리소스 사용 현황 가져오기.
+
+**지원 작업**:
+- `info` — 시스템 정보 가져오기
+- `resource_usage` — 리소스 사용 현황 가져오기
+- `find_process` — 프로세스 찾기
+- `list_beings` — 실리콘 생명체 나열
+
+**사용 예시**:
+```json
+{
+  "action": "info"
+}
+```
+
+---
+
+### 19. 작업 도구 (TaskTool)
+
+**도구 이름**: `task`
+
+**기능 설명**: 실리콘 생명체 개인 작업 관리.
+
+**지원 작업**:
+- `create` — 작업 만들기
+- `list` — 작업 나열
+- `update` — 작업 업데이트
+- `complete` — 작업 완료
+- `delete` — 작업 삭제
+- `get_dependencies` — 의존성 가져오기
+
+**사용 예시**:
+```json
+{
+  "action": "create",
+  "description": "코드 검토",
+  "priority": 5
+}
+```
+
+---
+
+### 20. 타이머 도구 (TimerTool)
+
+**도구 이름**: `timer`
+
+**기능 설명**: 타이머 만들기 및 관리.
+
+**지원 작업**:
+- `create` — 타이머 만들기
+- `list` — 타이머 나열
+- `delete` — 타이머 삭제
+- `pause` — 타이머 일시중지
+- `resume` — 타이머 재개
+- `get_execution_history` — 실행 기록 가져오기
+
+**사용 예시**:
+```json
+{
+  "action": "create",
+  "interval": 3600,
+  "repeat": true,
+  "message": "매시간 알림"
+}
+```
+
+---
+
+### 21. Token 감사 도구 (TokenAuditTool) 🔒
+
+**도구 이름**: `token_audit`
+
+**권한 요구사항**: 실리콘 큐레이터 전용
+
+**기능 설명**: AI token 사용 현황 쿼리 및 집계.
+
+**지원 작업**:
+- `get_usage` — token 사용 통계 가져오기
+- `get_by_being` — 생명체별 사용 현황 가져오기
+- `get_by_model` — 모델별 사용 현황 가져오기
+- `get_trend` — 사용 추세 가져오기
+- `export` — 데이터 내보내기
+
+**사용 예시**:
+```json
+{
+  "action": "get_usage",
+  "start_date": "2026-04-01",
+  "end_date": "2026-04-26"
+}
+```
+
+---
+
+### 22. WebView 브라우저 도구 (WebViewBrowserTool)
+
+**도구 이름**: `webview`
+
+**기능 설명**: Playwright 기반 브라우저 자동화 작업.
+
+**지원 작업**:
+- `open_browser` — 브라우저 열기
+- `close_browser` — 브라우저 닫기
+- `navigate` — URL로 이동
+- `click` — 요소 클릭
+- `input` — 텍스트 입력
+- `get_page_text` — 페이지 텍스트 가져오기
+- `get_screenshot` — 스크린샷 가져오기
+- `execute_script` — JavaScript 실행
+- `wait_for_element` — 요소 나타날 때까지 대기
+- `get_browser_status` — 브라우저 상태 가져오기
+
+**기능**:
+- 각 실리콘 생명체 독립 인스턴스
+- 완전히 격리된 Cookie 및 세션
+- 사용자에게 완전히 보이지 않음 (헤드리스 모드)
+- 완전한 JavaScript 및 CSS 지원
+
+**사용 예시**:
+```json
+{
+  "action": "navigate",
+  "url": "https://example.com"
+}
+```
+
+---
+
+### 23. 작업 노트 도구 (WorkNoteTool)
+
+**도구 이름**: `work_note`
+
+**기능 설명**: 실리콘 생명체 개인 작업 노트 관리 (비공개, 일기장 비슷).
+
+**지원 작업**:
+- `create` — 노트 만들기
+- `read` — 노트 읽기
+- `update` — 노트 업데이트
+- `delete` — 노트 삭제
+- `list` — 노트 나열
+- `search` — 노트 검색
+- `directory` — 목차 생성
+
+**사용 예시**:
+```json
+{
+  "action": "create",
+  "summary": "사용자 인증 모듈 완료",
+  "content": "## 구현 세부정보\n\n- JWT token 사용\n- OAuth2 지원",
+  "keywords": "인증,JWT,OAuth2"
+}
+```
 
 ---
 
@@ -438,7 +659,84 @@
 └──────────┘
 ```
 
-## 모범 사례
+## 권한 검증
+
+모든 도구 실행은 5단계 권한 체인을 통과합니다:
+
+1. **IsCurator** — 실리콘 큐레이터는 모든 검사 우회
+2. **UserFrequencyCache** — 사용자 고빈도 허용/거부 캐시
+3. **GlobalACL** — 글로벌 접근 제어 목록
+4. **IPermissionCallback** — 맞춤형 권한 콜백 함수
+5. **IPermissionAskHandler** — 사용자에게 문의
+
+## 맞춤형 도구 만들기
+
+### 단계 1: ITool 인터페이스 구현
+
+```csharp
+public class MyCustomTool : ITool
+{
+    public string Name => "my_tool";
+    
+    public string Description => "도구 설명";
+    
+    public ToolDefinition Definition => new ToolDefinition
+    {
+        Name = Name,
+        Description = Description,
+        Parameters = new Dictionary<string, object>
+        {
+            ["param1"] = new { type = "string", description = "매개변수 설명" }
+        }
+    };
+    
+    public async Task<ToolResult> ExecuteAsync(ToolCall call)
+    {
+        try
+        {
+            var param1 = call.Parameters["param1"]?.ToString();
+            var result = await DoWork(param1);
+            
+            return new ToolResult
+            {
+                Success = true,
+                Output = result
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ToolResult
+            {
+                Success = false,
+                Error = ex.Message
+            };
+        }
+    }
+}
+```
+
+### 단계 2: 프로젝트에 추가
+
+도구 파일을 `src/SiliconLife.Common/Tools/` 디렉토리(공유 도구) 또는 `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` 디렉토리(버전별 도구)에 배치합니다. `ToolManager`는 시작 시 리플렉션을 통해 자동으로 발견하고 등록합니다.
+
+### 단계 2a: 플러그인을 통해 도구 등록
+
+플러그인 시스템을 통해 맞춤형 도구를 등록할 수도 있습니다:
+
+1. 플러그인 프로젝트에서 `ITool` 인터페이스 구현
+2. 플러그인 DLL을 컴파일하여 플러그인 디렉토리에 배치
+3. `ToolManager.ScanAllPluginAssemblies()`가 모든 로드된 플러그인에서 ITool 구현을 자동 스캔
+4. 플러그인 도구는 동일한 권한 시스템의 제약을 받음
+
+### 단계 3: (선택) 큐레이터 전용으로 표시
+
+```csharp
+[SiliconManagerOnly]
+public class AdminOnlyTool : ITool
+{
+    // 실리콘 큐레이터만 접근 가능
+}
+```
 
 ### 1. 항상 매개변수 검증
 
@@ -465,7 +763,56 @@ catch (Exception ex)
 
 ### 3. 권한 시스템 존중
 
-권한 검사를 절대 우회하지 마세요. 항상 실행기를 통해 리소스에 접근하세요.
+권한 검사를 절대 우회하지 마세요. 항상 실행기를 통해 리소스에 접근하세요:
+
+```csharp
+var permission = await permissionManager.CheckAsync(request);
+if (!permission.Allowed)
+{
+    return ToolResult.Denied(permission.Reason);
+}
+```
+
+### 4. 명확한 도구 설명 제공
+
+AI가 도구를 언제, 어떻게 사용할지 이해하도록 도와주세요:
+
+```csharp
+public string Description => 
+    "다양한 캘린더 시스템 간 날짜 변환에 사용." +
+    "'date', 'from_calendar' 및 'to_calendar' 매개변수가 필요합니다.";
+```
+
+## 문제 해결
+
+### 도구를 찾을 수 없음
+
+**문제**: AI가 존재하지 않는 도구를 호출하려고 함.
+
+**해결 방법**:
+- 도구 이름이 정확히 일치하는지 확인
+- 도구 파일이 `Tools/` 디렉토리에 있는지 확인
+- 프로젝트 재빌드 (`dotnet build`)
+
+### 권한 거부됨
+
+**문제**: 도구 실행 실패, 권한 오류 반환.
+
+**해결 방법**:
+- 권한 감사 로그 확인
+- 실리콘 생명체에 필요한 권한이 있는지 확인
+- 글로벌 ACL 설정 확인
+- 큐레이터인 경우 `[SiliconManagerOnly]` 마크 사용 여부 확인
+
+### 도구 실행 오류 반환
+
+**문제**: 도구가 실행되지만 실패 결과 반환.
+
+**해결 방법**:
+- 도구가 반환한 오류 메시지 확인
+- 입력 매개변수 형식이 올바른지 확인
+- 시스템 로그에서 상세 오류 정보 확인
+- 도구 기능 독립 테스트
 
 ---
 

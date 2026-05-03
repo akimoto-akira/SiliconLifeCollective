@@ -1,8 +1,8 @@
-﻿# Systém Oprávnění
+# Systém Oprávnění
 
 > **Verze: v0.1.0-alpha**
 
-[English](../en/permission-system.md) | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | [Español](../es-ES/permission-system.md) | [日本語](../ja-JP/permission-system.md) | [한국어](../ko-KR/permission-system.md) | [Deutsch](../de-DE/permission-system.md) | **Čeština**
+[English](../en/permission-system.md) | [Deutsch](../de-DE/permission-system.md) | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | [Español](../es-ES/permission-system.md) | [日本語](../ja-JP/permission-system.md) | [한국어](../ko-KR/permission-system.md) | **Čeština**
 
 ## Přehled
 
@@ -147,6 +147,16 @@ public class IMPermissionAskHandler : IPermissionAskHandler
     }
 }
 ```
+
+### Fronta Požadavků na Oprávnění PermissionRequestQueue
+
+`PermissionRequestQueue` spravuje čekající požadavky na oprávnění s podporou asynchronního čekání na odpověď uživatele:
+
+- **Zařazení požadavku** — Když řetězec oprávnění dosáhne úrovně 5, vytvoří `TaskCompletionSource<AskPermissionResult>` a zařadí jej do fronty
+- **Zobrazení ve Web UI** — Čekající požadavky na oprávnění se zobrazují ve Web UI prostřednictvím `PermissionRequestController`
+- **Odpověď uživatele** — Uživatel může ve Web UI schválit nebo zamítnout, s možností cacheování rozhodnutí a nastavením doby trvání cache
+- **Možnosti cache** — Uživatel může cacheovat rozhodnutí o oprávnění na 1 hodinu, 24 hodin, 7 dní nebo 30 dní
+- **Mechanismus časového limitu** — Po 60 sekundách bez odpovědi se stránka požadavku automaticky zavře
 
 ## Auditní Systém
 

@@ -1,4 +1,4 @@
-﻿# API 参考
+# API 参考
 
 > **版本：v0.1.0-alpha**
 
@@ -33,6 +33,8 @@
   ]
 }
 ```
+
+**状态值**：`idle` | `running` | `waiting_permission` | `stopped`
 
 ### 创建生命体
 
@@ -364,6 +366,73 @@ data: {"type": "complete", "sessionId": "uuid"}
 ---
 
 ## 系统信息
+
+### 获取关于页面
+
+**GET** `/about`
+
+返回关于页面，包含系统信息和已加载的插件列表。
+
+**插件列表数据**：
+```json
+{
+  "plugins": {
+    "plugin-id": {
+      "name": "My Plugin",
+      "version": "1.0.0",
+      "description": "Plugin description",
+      "author": "Author Name"
+    }
+  }
+}
+```
+
+### 权限请求
+
+**GET** `/permission/request?userId={id}&type={type}&resource={resource}`
+
+显示权限请求页面，允许用户批准或拒绝硅基生命体的权限请求。
+
+**查询参数**：
+
+| 参数 | 类型 | 描述 |
+|------|------|------|
+| `userId` | `Guid` | 请求权限的硅基生命体 ID |
+| `type` | `string` | 权限类型 |
+| `resource` | `string` | 请求的资源路径 |
+| `allowCode` | `string` | 允许操作的代码标识 |
+| `denyCode` | `string` | 拒绝操作的代码标识 |
+
+**检查待处理权限请求**：
+
+**GET** `/permission/check?userId={id}`
+
+**响应**：
+```json
+{
+  "pending": true
+}
+```
+
+**响应权限请求**：
+
+**GET** `/permission/respond?userId={id}&allowed={bool}&addToCache={bool}&cacheDuration={hours}`
+
+**查询参数**：
+
+| 参数 | 类型 | 描述 |
+|------|------|------|
+| `userId` | `Guid` | 硅基生命体 ID |
+| `allowed` | `bool` | 是否允许 |
+| `addToCache` | `bool` | 是否将决策缓存 |
+| `cacheDuration` | `double` | 缓存持续时间（小时） |
+
+**响应**：
+```json
+{
+  "success": true
+}
+```
 
 ### 获取仪表板数据
 

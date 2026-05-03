@@ -2,7 +2,7 @@
 
 > **バージョン: v0.1.0-alpha**
 
-[English](../en/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | **日本語** | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md)
+[English](../en/architecture.md) | [Deutsch](../de-DE/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | **日本語** | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md)
 
 ## デュアルバージョンアーキテクチャ
 
@@ -18,10 +18,10 @@
 ### SiliconLife.Fast（高性能バージョン）
 - **ポジショニング**：主力本番バージョン
 - **実行モード**: Windowsフォームアプリケーション（システムトレイ対応）
-- **ストレージ**: メモリストレージ + 非同期バッチ永続化（WALログ）
+- **ストレージ**: SpeedyPack メモリストレージ + 非同期バッチ永続化（.spk ファイル形式）
 - **適用シナリオ**: 高同時実行性、低レイテンシ、大データ量シナリオ
 - **パフォーマンス向上**: ストレージ読み取りレイテンシ1000倍削減、書き込みレイテンシ15000倍削減
-- **役割説明**：深い最適化が施された本番グレードの実装であり、システムトレイバックグラウンド実行、極限パフォーマンス最適化などの特性を備え、長期運用と実際の本番環境の第一選択です
+- **役割説明**：深い最適化が施された本番グレードの実装であり、システムトレイバックグラウンド実行、SpeedyPack エンジン + 自動圧縮などの特性を備え、長期運用と実際の本番環境の第一選択です
 
 > **注意**: 本ドキュメントで説明するアーキテクチャは両方のバージョンに適用され、ストレージ実装部分のみが異なります。SiliconLife.Default はアーキテクチャ検証のベースラインとして、SiliconLife.Fast は本番環境の主力バージョンとして機能します。
 
@@ -548,4 +548,158 @@ data/
         ├── state.json
         ├── code.enc
         └── permission.enc
+```
+
+---
+
+## SpeedyPack ストレージエンジン
+
+SiliconLife.Fast は独自の SpeedyPack ストレージエンジン（.spk 形式）を使用。以前の LiteDB 方式を置き換え、究極の読み書きパフォーマンスを実現。
+
+### アーキテクチャ設計
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    SpeedyPack                             │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
+│  │ DirectoryMap  │  │  EntryCache   │  │  WriteQueue   │  │
+│  │ (メモリディレクトリマッピング) │  │  (エントリキャッシュ) │  │  │ (非同期書き込みキュー) │  │
+│  └──────┬───────┘  └──────┬───────┘  └───────┬───────┘  │
+│         │                  │                   │          │
+│  ┌──────▼──────────────────▼───────────────────▼───────┐  │
+│  │              PackFileReader / PackFileWriter          │  │
+│  │              (パックファイルリーダー/ライター)          │  │
+│  └──────────────────────────┬──────────────────────────┘  │
+│                              │                             │
+│  ┌──────────────────────────▼──────────────────────────┐  │
+│  │              .spk ファイル (MessagePack + LZ4 圧縮)    │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐                      │
+│  │  FreeList     │  │ SpeedyPack   │                      │
+│  │ (空き領域管理) │  │ AutoCompactor│                      │
+│  │              │  │ (自動圧縮)    │                      │
+│  └──────────────┘  └──────────────┘                      │
+└──────────────────────────────────────────────────────────┘
+```
+
+### コアコンポーネント
+
+| コンポーネント | 説明 |
+|------|------|
+| `SpeedyPack` | コアクラス。DirectoryMap、EntryCache、WriteQueue を組み合わせて低レイテンシ読み書きを提供 |
+| `DirectoryMap` | メモリディレクトリマッピング。仮想パスからファイルエントリへのマッピング関係を維持 |
+| `EntryCache` | エントリキャッシュ。TTL ベースの最近アクセスされたエントリのキャッシュ |
+| `WriteQueue` | 非同期書き込みキュー。書き込み操作をバックグラウンドスレッドにキューイングして実行 |
+| `FreeList` | 空き領域管理。.spk ファイル内の再利用可能な空き領域を追跡 |
+| `PackFileReader` | パックファイルリーダー。.spk ファイルからデータを読み取り |
+| `PackFileWriter` | パックファイルライター。データを .spk ファイルに書き込み |
+| `SpeedyPackAutoCompactor` | 自動圧縮タイマー。定期的に .spk ファイルを圧縮し、空き領域を回収 |
+| `SpeedyPackRegistry` | プロセスレベルのシングルトンマネージャー。アプリケーション全体で同じ SpeedyPack インスタンスを使用することを保証 |
+
+### ストレージアダプター
+
+SiliconLife.Fast は以下のアダプターを介して SpeedyPack をシステムインターフェースに統合：
+
+| アダプター | インターフェース | 説明 |
+|--------|------|------|
+| `SpeedyStorage` | `IStorage` | 汎用キーバリューストレージアダプター |
+| `SpeedyTimeStorage` | `ITimeStorage` | 時間インデックスストレージアダプター |
+| `SpeedyWorkNoteStorage` | `IWorkNoteStorage` | 作業ノートストレージアダプター |
+
+### 設定オプション
+
+`SpeedyPackOptions` は以下の設定を提供：
+
+| オプション | タイプ | デフォルト値 | 説明 |
+|------|------|--------|------|
+| `CacheTtl` | `TimeSpan` | 5 分 | キャッシュエントリの生存時間 |
+| `MaxCacheEntries` | `int` | 1000 | 最大キャッシュエントリ数 |
+| `ReadOnly` | `bool` | false | 読み取り専用モード |
+
+### トランザクションサポート
+
+SpeedyPack は `IPackTransaction` インターフェースを介してアトミック書き込み操作をサポート：
+
+- `SpeedyTransaction` がトランザクションメカニズムを実装
+- バッチ書き込みの原子性をサポート
+- トランザクションコミット時、すべての書き込み操作が成功するか、すべてロールバックされる
+
+---
+
+## プラグインシステム
+
+SiliconLife はプラグインシステムを介して機能拡張をサポート。サードパーティ開発者がプラットフォームに新機能を追加可能。
+
+### コアインターフェース
+
+```csharp
+public interface IPlugin
+{
+    string Id { get; }
+    string GetName(Language language);
+    string Version { get; }
+    string GetDescription(Language language);
+    string GetAuthor(Language language);
+    void OnLoad();
+    void OnStart();
+    void OnStop();
+    void OnUnload();
+}
+```
+
+### プラグインローダー
+
+`PluginLoader` は指定されたディレクトリからプラグイン DLL をロードし、厳格なセキュリティチェックを実行：
+
+1. **ディレクトリスキャン** — プラグインディレクトリ内のすべての .dll ファイルをスキャン
+2. **セキュリティスキャン** — プラグインが禁止された名前空間を参照していないかチェック
+3. **分離ロード** — カスタム `AssemblyLoadContext` を使用してプラグインを分離ロード
+4. **ライフサイクル管理** — プラグインの OnLoad、OnStart、OnStop、OnUnload メソッドを呼び出し
+
+### セキュリティサンドボックス
+
+プラグインローダーは以下のセキュリティチェックを実行：
+
+| チェック項目 | 説明 |
+|--------|------|
+| 禁止名前空間 | System.IO、System.Net.Http、System.Net.WebSockets、System.Net.Sockets、Microsoft.CodeAnalysis |
+| 信頼できるアセンブリホワイトリスト | Google.Protobuf、Newtonsoft.Json、MessagePack、Serilog、Microsoft.Extensions.Logging.Abstractions、Dapper |
+| 禁止タイプチェック | プラグイン内で参照されている危険なタイプをスキャン |
+| 禁止メンバーチェック | プラグイン内で呼び出されている危険なメソッドをスキャン |
+
+### ツール統合
+
+プラグインは `ITool` インターフェースを実装してカスタムツールを登録可能：
+
+- `ToolManager.ScanAllPluginAssemblies()` メソッドがロード済みのすべてのプラグイン内の ITool 実装をスキャン
+- プラグインツールはツール呼び出しループに自動的に統合
+- プラグインツールは同じ権限システムの制約を受ける
+
+### プラグインライフサイクル
+
+```
+ロード（OnLoad）→ 開始（OnStart）→ 実行中 → 停止（OnStop）→ アンロード（OnUnload）
+```
+
+---
+
+## シリコン生命体アクティビティ状態
+
+シリコン生命体には以下のアクティビティ状態があります：
+
+| 状態 | 説明 |
+|------|------|
+| `Idle` | アイドル状態。クロックトリガーを待機 |
+| `Running` | AI リクエスト + ツール呼び出しの1ラウンドを実行中 |
+| `WaitingPermission` | ユーザーの権限承認を待機 |
+| `Stopped` | 停止済み。エラーまたは手動停止による |
+
+状態遷移：
+```
+Idle → Running → Idle（正常完了）
+Running → WaitingPermission → Running（権限承認後に続行）
+Running → Stopped（エラーまたは手動停止）
+Stopped → Idle（再起動）
 ```

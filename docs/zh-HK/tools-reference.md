@@ -1,4 +1,4 @@
-﻿# 工具參考
+# 工具參考
 
 > **版本：v0.1.0-alpha**
 
@@ -17,6 +17,7 @@
 - **開發工具** — 程式碼執行、日誌查詢
 - **實用工具** — 系統資訊、Token 審計、說明文件、知識網路
 - **瀏覽器工具** — WebView 瀏覽器自動化
+- **插件工具** — 通過插件系統註冊的第三方工具
 
 ---
 
@@ -436,6 +437,75 @@
 ┌──────────┐
 │   AI     │ 接收工具結果，繼續思考
 └──────────┘
+```
+
+## 建立自訂工具
+
+### 步驟 1: 實現 ITool 介面
+
+```csharp
+public class MyCustomTool : ITool
+{
+    public string Name => "my_tool";
+    
+    public string Description => "工具描述";
+    
+    public ToolDefinition Definition => new ToolDefinition
+    {
+        Name = Name,
+        Description = Description,
+        Parameters = new Dictionary<string, object>
+        {
+            ["param1"] = new { type = "string", description = "參數說明" }
+        }
+    };
+    
+    public async Task<ToolResult> ExecuteAsync(ToolCall call)
+    {
+        try
+        {
+            var param1 = call.Parameters["param1"]?.ToString();
+            var result = await DoWork(param1);
+            
+            return new ToolResult
+            {
+                Success = true,
+                Output = result
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ToolResult
+            {
+                Success = false,
+                Error = ex.Message
+            };
+        }
+    }
+}
+```
+
+### 步驟 2: 添加到專案
+
+將工具檔案放置在 `src/SiliconLife.Common/Tools/` 目錄中（共享工具）或 `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` 目錄中（版本特定工具）。`ToolManager` 會在啟動時通過反射自動發現並註冊。
+
+### 步驟 2a: 通過插件註冊工具
+
+也可以通過插件系統註冊自訂工具：
+
+1. 在插件專案中實現 `ITool` 介面
+2. 編譯插件 DLL 並放入插件目錄
+3. `ToolManager.ScanAllPluginAssemblies()` 會自動掃描所有已載入插件中的 ITool 實現
+4. 插件工具受相同的權限系統約束
+
+### 步驟 3: （可選）標記為主理人專用
+
+```csharp
+[SiliconManagerOnly]
+public class AdminOnlyTool : ITool
+{
+    // 僅矽基主理人可存取
+}
 ```
 
 ## 最佳實踐

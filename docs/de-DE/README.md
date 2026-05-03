@@ -4,7 +4,7 @@
 
 **Version: v0.1.0-alpha** | **Silicon Life Collective** — Eine auf .NET 9 basierende Multi-Agenten-Kollaborationsplattform, auf der KI-Agenten als **Silicon Beings** bezeichnet werden und sich durch Roslyn-Dynamikkompilierung selbst weiterentwickeln können.
 
-[English](../README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Čeština](../cs-CZ/README.md)
+[English](../README.md) | **Deutsch** | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Čeština](../cs-CZ/README.md)
 
 ## 🌟 Kernfunktionen
 
@@ -12,7 +12,13 @@
 - **Multi-Agenten-Orchestrierung** — Zentrale Verwaltung durch den *Silicon Curator*, mit clock-gesteuertem Time-Slice-Fair-Scheduling-Mechanismus
 - **Soul-Datei-gesteuert** — Jedes Silicon Being wird durch eine zentrale Prompt-Datei (`soul.md`) gesteuert, die einzigartige Persönlichkeit und Verhaltensmuster definiert
 - **Body-Brain-Architektur** — *Body* (SiliconBeing) erhält Vitalzeichen und erkennt Triggerszenarien; *Brain* (ContextManager) ist verantwortlich für das Laden von Verlauf, KI-Aufruf, Tool-Ausführung und Persistierung von Antworten
-- **Selbstentwicklungsfähigkeit** — Durch Roslyn-Dynamikkompilierungstechnologie können Silicon Beings ihren eigenen Code überschreiben, um Evolution zu实现
+- **Selbstentwicklungsfähigkeit** — Durch Roslyn-Dynamikkompilierungstechnologie können Silicon Beings ihren eigenen Code überschreiben, um Evolution zu realisieren
+
+### Plugin-System
+- **Plugin-Erweiterungsarchitektur** — Funktionserweiterung durch IPlugin-Schnittstelle, unterstützt dynamisches Laden von Plugin-DLLs aus Verzeichnis
+- **Sicherer Sandkasten** — Plugin-Loader führt strenge Sicherheits-Scans durch, verbietet Zugriff auf System.IO, System.Net und andere Namespaces
+- **Isoliertes Laden** — Verwendung von benutzerdefiniertem AssemblyLoadContext für isoliertes Laden, verhindert, dass Plugins die Hauptprogrammstabilität beeinträchtigen
+- **Tool-Integration** — Plugins können über die ITool-Schnittstelle benutzerdefinierte Tools registrieren, die automatisch in den Tool-Aufruf-Zyklus integriert werden
 
 ### Tools & Ausführung
 - **23 integrierte Tools** — Abdeckend Kalender, Chat, Konfiguration, Festplatte, Netzwerk, Speicher, Aufgaben, Timer, Wissensdatenbank, Arbeitsnotizen, WebView-Browser usw.
@@ -30,7 +36,7 @@
 
 ### Web-Oberfläche
 - **Moderne Web-UI** — Integrierter HTTP-Server mit SSE-Echtzeitaktualisierungen
-- **4 Skin-Themes** — Admin-, Chat-, Creative-, Dev-Versionen, unterstützt automatische Erkennung und Umschaltung
+- **7 Skin-Themes** — Admin-, Chat-, Creative-, Dev-, High-Contrast-, Light-, Minimal-Versionen, unterstützt automatische Erkennung und Umschaltung
 - **20+ Controller** — Vollständige Systemverwaltung, Chat, Konfiguration, Überwachungsfunktionalität
 - **Null Frontend-Framework-Abhängigkeit** — HTML/CSS/JS serverseitig generiert durch `H`, `CssBuilder` und `JsBuilder`
 
@@ -42,8 +48,10 @@
   - Japanisch: ja-JP | Koreanisch: ko-KR | Tschechisch: cs-CZ
 
 ### Daten & Speicherung
-- **Null Datenbankabhängigkeit** — Reines Dateisystem-Speicher (JSON-Format)
+- **SpeedyPack Hochleistungsspeicher** — Eigenentwickelte .spk-Speicher-Engine, In-Memory-Verzeichniszuordnung + Eintrags-Cache + asynchrone Schreibwarteschlange
+- **Null Datenbankabhängigkeit** — Default-Version verwendet reinen Dateisystem-Speicher (JSON-Format), Fast-Version verwendet SpeedyPack-In-Memory-Speicher
 - **Zeitindex-Abfrage** — Effiziente Abfrage nach Zeitbereich über `ITimeStorage`-Schnittstelle
+- **Automatische Komprimierung** — SpeedyPack unterstützt zeitgesteuerte automatische Komprimierung zur Rückgewinnung von freiem Speicherplatz
 - **Minimale Abhängigkeiten** — Kernbibliothek abhängt nur von Microsoft.CodeAnalysis.CSharp für Dynamikkompilierung
 
 ## 🔄 Duale Versionsarchitektur
@@ -62,9 +70,9 @@ Dieses Projekt bietet zwei Implementierungsversionen, um unterschiedliche Szenar
 ### SiliconLife.Fast (Hochleistungsversion)
 - **Positionierung**: Haupt-Produktionsversion
 - **Ausführungsmodus**: Windows Forms-Anwendung (unterstützt Systemtray)
-- **Speichermethode**: Speicherspeicher + asynchrone Batch-Persistenz
+- **Speichermethode**: SpeedyPack-In-Memory-Speicher + asynchrone Batch-Persistenz (.spk-Dateiformat)
 - **Anwendbare Szenarien**: Hohe Parallelität, niedrige Latenz, große Datenmengen
-- **Merkmale**: Extreme Performance-Optimierung, Tray-Hintergrundausführung, Speicherdatenbank + WAL-Protokolle gewährleisten Datensicherheit
+- **Merkmale**: Extreme Performance-Optimierung, Tray-Hintergrundausführung, SpeedyPack-Engine + automatische Komprimierung gewährleisten Datensicherheit
 - **Performance-Verbesserung**: Speicherlese-Latenz um 1000x reduziert, Schreiblatenz um 15000x reduziert, parallele Verarbeitungskapazität um 50x erhöht
 - **Rollenbeschreibung**: Produktionsreife Implementierung mit tiefer Optimierung, die beste Wahl für Langzeitbetrieb und echte Produktionsumgebungen
 - **Startbefehl**: `dotnet run --project src/SiliconLife.Fast`
@@ -77,26 +85,30 @@ Dieses Projekt bietet zwei Implementierungsversionen, um unterschiedliche Szenar
 | **Benutzeroberfläche** | Web UI (Browser-Zugriff) | Tray-Symbol + Tray-Fenster + Web UI |
 | **Systemtray** | ❌ Keine | ✅ Unterstützt Minimieren ins Tray |
 | **Hintergrundausführung** | ❌ Beendet beim Schließen der Konsole | ✅ Kontinuierliche Tray-Hintergrundausführung |
-| **Speichermethode** | Dateisystem-JSON-Speicher | Speicherspeicher + asynchrone Persistenz |
+| **Speichermethode** | Dateisystem-JSON-Speicher | SpeedyPack-In-Memory-Speicher + asynchrone Persistenz |
+| **Speicher-Engine** | Dateisystem-I/O | SiliconLife.Speedy (.spk-Format) |
 | **Leselatenz** | ~10ms (Festplatten-I/O) | ~0.01ms (Speicheroperation) |
 | **Schreiblatenz** | ~15ms (synchrones Schreiben) | ~0.001ms (asynchrones Schreiben) |
 | **Parallelität** | ~100 req/s | ~5000 req/s |
 | **Speichernutzung** | ~200MB | ~500MB |
-| **Datensicherheit** | Extrem hoch (sofortige Persistenz) | Hoch (WAL-Protokolle + asynchrone Persistenz) |
+| **Datensicherheit** | Extrem hoch (sofortige Persistenz) | Hoch (asynchrone Persistenz + automatische Komprimierung) |
 | **Anwendbare Szenarien** | Datensicherheit zuerst, kleine Daten | Performance zuerst, große Daten, hohe Parallelität |
 
 ## 🛠️ Technologie-Stack
 
-| Komponente | Technologie |
-|------|------|
-| Runtime | .NET 9 |
-| Programmiersprache | C# |
-| KI-Integration | Ollama (lokal), Alibaba Cloud DashScope (Cloud) |
-| Datenspeicherung | Dateisystem (JSON + Zeitindex-Verzeichnis) |
-| Webserver | HttpListener (.NET integriert) |
-| Dynamikkompilierung | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
-| Browser-Automatisierung | Playwright (WebView) |
-| Lizenz | Apache-2.0 |
+| Komponente | SiliconLife.Default | SiliconLife.Fast |
+|------|---------------------|------------------|
+| Runtime | .NET 9 | .NET 9 Windows |
+| Programmiersprache | C# | C# |
+| Anwendungstyp | Konsolenanwendung | Windows Forms-Anwendung |
+| KI-Integration | Ollama (lokal), Alibaba Cloud DashScope (Cloud) | Ollama (lokal), Alibaba Cloud DashScope (Cloud) |
+| Datenspeicherung | Dateisystem (JSON + Zeitindex-Verzeichnis) | SpeedyPack (.spk-Format, In-Memory-Zuordnung + asynchrone Persistenz) |
+| Webserver | HttpListener (.NET integriert) | HttpListener (.NET integriert) |
+| Dynamikkompilierung | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
+| Browser-Automatisierung | Playwright (WebView) | Playwright (WebView) |
+| Plugin-System | ✅ Unterstützt (IPlugin + PluginLoader) | ✅ Unterstützt (IPlugin + PluginLoader) |
+| Systemtray | ❌ Nicht unterstützt | ✅ Unterstützt (NotifyIcon) |
+| Lizenz | Apache-2.0 | Apache-2.0 |
 
 ## 📁 Projektstruktur
 
@@ -114,6 +126,7 @@ SiliconLifeCollective.sln
 │   │   ├── Knowledge/                     # Wissensnetzwerksystem
 │   │   ├── Localization/                  # Lokalisierungssystem
 │   │   ├── Logging/                       # Protokollierungssystem
+│   │   ├── Plugins/                       # Plugin-System (IPlugin-Schnittstelle, PluginLoader)
 │   │   ├── Project/                       # Projektverwaltungssystem
 │   │   ├── Runtime/                       # Hauptschleife, Clock-Objekte, Kern-Host
 │   │   ├── Security/                      # Berechtigungsmanagementsystem
@@ -124,29 +137,81 @@ SiliconLifeCollective.sln
 │   │   ├── WebView/                       # WebView-Browser-Schnittstellen
 │   │   └── ServiceLocator.cs              # Globaler Service-Locator
 │   │
-│   └── SiliconLife.Default/               # Standardimplementierung + Anwendungseinstieg
-│       ├── Program.cs                     # Einstiegspunkt (Alle Komponenten assemblieren)
-│       ├── AI/                            # Ollama-Client, DashScope-Client
-│       ├── Calendar/                      # 32 Kalenderimplementierungen
-│       ├── Config/                        # Standard-Konfigurationsdaten
-│       ├── Executors/                     # Standard-Executor-Implementierungen
+│   ├── SiliconLife.Common/                # Gemeinsame Implementierung (beide Versionen)
+│   │   ├── AI/                            # KI-Client-Factory
+│   │   ├── Calendar/                      # 32 Kalenderimplementierungen
+│   │   ├── Localization/                  # Lokalisierung-Basisklasse
+│   │   ├── Security/                      # Berechtigungsmanager
+│   │   ├── SiliconBeing/                  # Standard-Silicon-Being-Implementierung
+│   │   ├── Tools/                         # Gemeinsame Tool-Implementierungen
+│   │   └── WebView/                       # WebView-Schnittstellen
+│   │
+│   ├── SiliconLife.Default/               # Standardimplementierung + Anwendungseinstieg (Konsolenversion)
+│   │   ├── Program.cs                     # Einstiegspunkt (Alle Komponenten assemblieren)
+│   │   ├── Config/                        # Standard-Konfigurationsdaten
+│   │   ├── Executors/                     # Standard-Executor-Implementierungen
+│   │   ├── Help/                          # Hilfedokumentationssystem
+│   │   ├── IM/                            # WebUI-Provider
+│   │   ├── Knowledge/                     # Wissensnetzwerk-Implementierung
+│   │   ├── Localization/                  # 21 Sprachlokalisierungen
+│   │   ├── Logging/                       # Logging-Provider-Implementierungen
+│   │   ├── Project/                       # Projektssystem-Implementierung
+│   │   ├── Runtime/                       # Test-Clock-Objekte
+│   │   ├── Security/                      # Standard-Berechtigungs-Callbacks
+│   │   ├── SiliconBeing/                  # Standard-Silicon-Being-Implementierung
+│   │   ├── Storage/                       # Dateisystem-Speicherimplementierung
+│   │   ├── Tools/                         # Integrierte Tool-Implementierungen
+│   │   ├── WebView/                       # Playwright-WebView-Implementierung
+│   │   └── Web/                           # Web-UI-Implementierung
+│   │       ├── Controllers/               # 20+ Controller
+│   │       ├── Models/                    # View-Modelle
+│   │       ├── Views/                     # HTML-Ansichten
+│   │       └── Skins/                     # 4 Skin-Themes
+│   │
+│   └── SiliconLife.Fast/                  # Hochleistungsimplementierung + Anwendungseinstieg (Forms-Version)
+│       ├── Program.cs                     # Einstiegspunkt (Forms-Anwendung)
+│       ├── Config/                        # Konfigurationsdaten (mit Default geteilt)
+│       ├── Executors/                     # Optimierte Executor-Implementierungen
 │       ├── Help/                          # Hilfedokumentationssystem
 │       ├── IM/                            # WebUI-Provider
-│       ├── Knowledge/                     # Wissensnetzwerk-Implementierung
+│       ├── Knowledge/                     # Wissensnetzwerk-Implementierung (Speicheroptimiert)
 │       ├── Localization/                  # 21 Sprachlokalisierungen
-│       ├── Logging/                       # Logging-Provider-Implementierungen
+│       ├── Logging/                       # Hochleistungs-Logging-Provider
 │       ├── Project/                       # Projektssystem-Implementierung
-│       ├── Runtime/                       # Test-Clock-Objekte
-│       ├── Security/                      # Standard-Berechtigungs-Callbacks
-│       ├── SiliconBeing/                  # Standard-Silicon-Being-Implementierung
-│       ├── Storage/                       # Dateisystem-Speicherimplementierung
-│       ├── Tools/                         # 23 integrierte Tool-Implementierungen
+│       ├── Security/                      # Optimierte Berechtigungs-Callbacks
+│       ├── SiliconBeing/                  # Hochleistungs-Silicon-Being-Implementierung
+│       ├── Storage/                       # SpeedyPack-Speicheradapter
+│       ├── Tools/                         # Optimierte integrierte Tool-Implementierungen
+│       ├── Tray/                          # Systemtray (9 Sprachlokalisierungen)
 │       ├── WebView/                       # Playwright-WebView-Implementierung
-│       └── Web/                           # Web-UI-Implementierung
+│       └── Web/                           # Hochleistungs-Web-UI-Implementierung
+│           ├── Component/                 # UI-Komponentenbibliothek (30+ Komponenten)
 │           ├── Controllers/               # 20+ Controller
 │           ├── Models/                    # View-Modelle
 │           ├── Views/                     # HTML-Ansichten
-│           └── Skins/                     # 4 Skin-Themes
+│           └── Skins/                     # 7 Skin-Themes
+│
+│   ├── SiliconLife.Speedy/                # SpeedyPack Hochleistungsspeicher-Engine
+│   │   ├── SpeedyPack.cs                  # Kernklasse (In-Memory-Verzeichniszuordnung + Cache + asynchrones Schreiben)
+│   │   ├── SpeedyPackOptions.cs           # Konfigurationsoptionen (Cache-TTL, max. Einträge usw.)
+│   │   ├── IPackTransaction.cs            # Transaktionsschnittstelle
+│   │   ├── SpkFileInfo.cs                 # Dateiinformationen
+│   │   └── Internal/                      # Interne Implementierung
+│       │   ├── DirectoryMap.cs            # In-Memory-Verzeichniszuordnung
+│       │   ├── EntryCache.cs              # Eintrags-Cache
+│       │   ├── FreeList.cs                # Freiraumverwaltung
+│       │   ├── PackFileReader.cs          # Paketdatei-Leser
+│       │   ├── PackFileWriter.cs          # Paketdatei-Schreiber
+│       │   ├── WriteQueue.cs              # Asynchrone Schreibwarteschlange
+│       │   ├── WriteOperation.cs          # Schreiboperation
+│       │   ├── SpeedyTransaction.cs       # Transaktionsimplementierung
+│       │   ├── SpkHeader.cs              # Paketdatei-Header
+│       │   └── PathNormalizer.cs          # Pfadnormalisierung
+│   │
+│   └── SiliconLife.Speedy.Manager/        # SpeedyPack-Verwaltungstool (WPF)
+│       ├── MainForm.cs                    # Hauptformular
+│       ├── Program.cs                     # Einstiegspunkt
+│       └── slc.ico                        # Anwendungssymbol
 │
 ├── docs/                                  # Mehrsprachige Dokumentation
 │   ├── zh-CN/                             # Vereinfachtes Chinesisch
@@ -199,22 +264,47 @@ dotnet build
 
 ### System ausführen
 
+#### Methode 1: Default-Version ausführen (Konsolenanwendung)
+
 ```bash
 dotnet run --project src/SiliconLife.Default
 ```
 
 Die Anwendung startet den Webserver und öffnet automatisch die Web-UI im Browser.
 
+**Anwendbare Szenarien**:
+- ✅ Äußerst hohe Datensicherheitsanforderungen
+- ✅ Begrenzte Speicherressourcen (RAM < 2GB)
+- ✅ Kleines Datenvolumen, kurzfristige Nutzung
+- ✅ Entwicklungs- und Debugging-Phase
+
+#### Methode 2: Fast-Version ausführen (Windows Forms-Anwendung)
+
+```bash
+dotnet run --project src/SiliconLife.Fast
+```
+
+Die Anwendung startet im Forms-Modus, minimiert sich in den Systemtray und läuft im Hintergrund weiter.
+
+**Anwendbare Szenarien**:
+- ✅ Hochparallele Szenarien (> 5 Benutzer)
+- ✅ Große Datenmengen (Nutzung über 3 Monate)
+- ✅ Niedrige Latenz-Anforderungen
+- ✅ Tray-Hintergrundbetrieb erforderlich
+
 ### Einzeldatei veröffentlichen
 
 ```bash
-# Windows
+# Windows - Default-Version
 dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-# Linux
+# Windows - Fast-Version
+dotnet publish src/SiliconLife.Fast -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
+
+# Linux - Nur Default-Version
 dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 
-# macOS
+# macOS - Nur Default-Version
 dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
@@ -233,10 +323,12 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 - [x] Phase 10: Web-UI (HTTP + SSE, 20+ Controller, 4 Skins)
 - [x] Phase 10.5: Inkrementelle Verbesserungen (Broadcast-Kanäle, Token-Audit, 32 Kalender, Tool-Verbesserungen, 21-Sprach-Lokalisierung)
 - [x] Phase 10.6: Vervollständigung & Optimierung (WebView, Hilfesystem, Projekt-Workspace, Wissensnetzwerk)
+- [x] Phase 11: SpeedyPack-Speicher-Engine (Ersetzung von LiteDB, In-Memory-Zuordnung, asynchrone Schreibwarteschlange, automatische Komprimierung)
+- [x] Phase 12: Plugin-System (IPlugin-Schnittstelle, PluginLoader-Sicherheits-Sandkasten, isoliertes Laden, Tool-Integration)
 
 ### 🚧 Geplant
-- [ ] Phase 11: Externe IM-Integration (Feishu / WhatsApp / Telegram)
-- [ ] Phase 12: Plugin-System und Skill-Ökosystem
+- [ ] Phase 13: Externe IM-Integration (Feishu / WhatsApp / Telegram)
+- [ ] Phase 14: Skill-Ökosystem (Plugin-Marktplatz, Skill-Paket-Verteilung)
 
 ## 📚 Dokumentation
 
@@ -254,6 +346,19 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 - [Roadmap](roadmap.md) — Vollständiger Entwicklungsplan
 - [Änderungsprotokoll](changelog.md) — Versionsupdateverlauf
 - [Beitragsleitfaden](contributing.md) — Wie am Projekt teilnehmen
+
+## 💡 Versionsauswahl-Leitfaden
+
+### Welche Version sollte ich verwenden?
+
+**SiliconLife.Default (Standardimplementierung — Architektur-Machbarkeitsverifizierung):**
+- 📌 Sie haben zum ersten Mal Kontakt mit diesem Projekt und möchten die Systemarchitektur schnell verstehen
+- 📌 Sie befinden sich in der Entwicklungs- und Debugging-Phase und benötigen eine einfache, direkte Ausführungsmethode
+
+**SiliconLife.Fast (Hochleistungsversion — Produktionseinsatz):**
+- 📌 Sie benötigen Langzeitbetrieb und hohe Performance
+- 📌 Sie haben große Datenmengen oder hohe Parallelitätsanforderungen
+- 📌 Sie möchten die Anwendung im Systemtray im Hintergrund laufen lassen
 
 ## 🤝 Mitwirken
 

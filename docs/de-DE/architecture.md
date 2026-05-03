@@ -2,7 +2,7 @@
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/architecture.md) | [Deutsch](../de-DE/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md)
+[English](../en/architecture.md) | **Deutsch** | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md)
 
 ## Duale Versionsarchitektur
 
@@ -18,10 +18,10 @@ Dieses Projekt bietet zwei Implementierungsversionen, die dasselbe Architekturen
 ### SiliconLife.Fast (Hochleistungsversion)
 - **Positionierung**: Haupt-Produktionsversion
 - **Ausführungsmodus**: Windows-Formularanwendung (mit System Tray-Unterstützung)
-- **Speicher**: In-Memory-Speicher + asynchrone Batch-Persistenz (WAL-Protokoll)
+- **Speicher**: SpeedyPack-In-Memory-Speicher + asynchrone Batch-Persistenz (.spk-Dateiformat)
 - **Anwendungsszenario**: Szenarien mit hoher Parallelität, niedriger Latenz, großem Datenvolumen
 - **Leistungsverbesserung**: Speicherlese-Latenz um das 1000-fache reduziert, Schreiblatenz um das 15000-fache reduziert
-- **Rollenbeschreibung**: Produktionsreife Implementierung mit tiefer Optimierung, mit System Tray-Hintergrundausführung und extremer Performance-Optimierung, die beste Wahl für Langzeitbetrieb und echte Produktionsumgebungen
+- **Rollenbeschreibung**: Produktionsreife Implementierung mit tiefer Optimierung, mit System Tray-Hintergrundausführung, SpeedyPack-Engine + automatische Komprimierung, die beste Wahl für Langzeitbetrieb und echte Produktionsumgebungen
 
 > **Hinweis**: Die in diesem Dokument beschriebene Architektur gilt für beide Versionen, mit Unterschieden nur im Speicherimplementierungsteil. SiliconLife.Default ist die Referenz für Architekturverifizierung, SiliconLife.Fast ist die Hauptversion für Produktionsumgebungen.
 
@@ -114,6 +114,10 @@ Dies gewährleistet Reaktion auf Benutzerinteraktionen ohne Beeinträchtigung la
 │  │  ┌──────────┐ ┌────▼─────┐ ┌──────────────────┐  │   │
 │  │  │AI-Client │  │Executors │  │   ToolManager     │  │   │
 │  │  └──────────┘ └──────────┘ └──────────────────┘  │   │
+│  │  ┌──────────┐ ┌──────────┐                        │   │
+│  │  │Plugin-   │ │Wissens-  │                        │   │
+│  │  │Loader    │ │netzwerk  │                        │   │
+│  │  └──────────┘ └──────────┘                        │   │
 │  └──────────────────────────────────────────────────┘   │
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐   │
@@ -437,11 +441,14 @@ Die Web-UI hat ein **pluggable Skin-System**, das vollständige UI-Anpassung ohn
   - Generiert Theme-CSS durch `CssBuilder`
   - `SkinPreviewInfo` — Farbpalette und Icons für Skin-Auswahl auf Initialisierungsseite
 
-- **Eingebaute Skins** — 4 produktionsreife Skins:
+- **Eingebaute Skins** — 7 produktionsreife Skins:
   - **Admin** — Professionelle, datenfokussierte Systemverwaltungs-Oberfläche
   - **Chat** — Konversationelles, nachrichtenzentriertes Design für KI-Interaktion
   - **Creative** — Künstlerisches, visuell reichhaltiges Layout für kreative Workflows
   - **Dev** — Entwicklerzentriertes, codezentriertes Interface mit Syntax-Hervorhebung
+  - **High Contrast** — Hoher Kontrast für Barrierefreiheit
+  - **Light** — Helles, klares Design
+  - **Minimal** — Reduziertes, minimales Interface
 
 - **Skin-Entdeckung** — `SkinManager` entdeckt und registriert automatisch alle `ISkin`-Implementierungen durch Reflektion
 
@@ -544,4 +551,161 @@ data/
         ├── state.json
         ├── code.enc
         └── permission.enc
+```
+
+---
+
+## SpeedyPack-Speicher-Engine
+
+SiliconLife.Fast verwendet die eigenentwickelte SpeedyPack-Speicher-Engine (.spk-Format), die das vorherige LiteDB-Schema ersetzt und extreme Lese-/Schreibleistung realisiert.
+
+### Architekturdesign
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    SpeedyPack                             │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
+│  │ DirectoryMap  │  │  EntryCache   │  │  WriteQueue   │  │
+│  │ (In-Memory-  │  │  (Eintrags-   │  │ (Asynchrone   │  │
+│  │  Verzeichnis) │  │   Cache)      │  │  Schreib-     │  │
+│  │              │  │              │  │  warteschlange)│  │
+│  └──────┬───────┘  └──────┬───────┘  └───────┬───────┘  │
+│         │                  │                   │          │
+│  ┌──────▼──────────────────▼───────────────────▼───────┐  │
+│  │              PackFileReader / PackFileWriter          │  │
+│  │              (Paketdatei-Leser/Schreiber)             │  │
+│  └──────────────────────────┬──────────────────────────┘  │
+│                              │                             │
+│  ┌──────────────────────────▼──────────────────────────┐  │
+│  │              .spk-Datei (MessagePack + LZ4-Komprimierung) │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐                      │
+│  │  FreeList     │  │ SpeedyPack   │                      │
+│  │ (Freiraum-   │  │ AutoCompactor│                      │
+│  │  verwaltung) │  │ (Auto-       │                      │
+│  │              │  │  Komprimierung)│                     │
+│  └──────────────┘  └──────────────┘                      │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Kernkomponenten
+
+| Komponente | Beschreibung |
+|------|------|
+| `SpeedyPack` | Kernklasse, kombiniert DirectoryMap, EntryCache und WriteQueue für niedrige Latenz Lese-/Schreibzugriff |
+| `DirectoryMap` | In-Memory-Verzeichniszuordnung, pflegt Zuordnung von virtuellen Pfaden zu Dateieinträgen |
+| `EntryCache` | Eintrags-Cache, TTL-basierter Cache für zuletzt zugegriffene Einträge |
+| `WriteQueue` | Asynchrone Schreibwarteschlange, reiht Schreiboperationen zur Ausführung im Hintergrund-Thread ein |
+| `FreeList` | Freiraumverwaltung, verfolgt wiederverwendbaren Speicherplatz in .spk-Dateien |
+| `PackFileReader` | Paketdatei-Leser, liest Daten aus .spk-Dateien |
+| `PackFileWriter` | Paketdatei-Schreiber, schreibt Daten in .spk-Dateien |
+| `SpeedyPackAutoCompactor` | Automatischer Komprimierungs-Timer, komprimiert .spk-Dateien regelmäßig zur Rückgewinnung von freiem Speicherplatz |
+| `SpeedyPackRegistry` | Prozessweiter Singleton-Manager, stellt sicher, dass die gesamte Anwendung dieselbe SpeedyPack-Instanz verwendet |
+
+### Speicheradapter
+
+SiliconLife.Fast integriert SpeedyPack über folgende Adapter in die Systemschnittstellen:
+
+| Adapter | Schnittstelle | Beschreibung |
+|--------|------|------|
+| `SpeedyStorage` | `IStorage` | Allgemeiner Schlüssel-Wert-Speicheradapter |
+| `SpeedyTimeStorage` | `ITimeStorage` | Zeitindex-Speicheradapter |
+| `SpeedyWorkNoteStorage` | `IWorkNoteStorage` | Arbeitsnotiz-Speicheradapter |
+
+### Konfigurationsoptionen
+
+`SpeedyPackOptions` bietet folgende Konfiguration:
+
+| Option | Typ | Standardwert | Beschreibung |
+|------|------|--------|------|
+| `CacheTtl` | `TimeSpan` | 5 Minuten | Lebensdauer der Cache-Einträge |
+| `MaxCacheEntries` | `int` | 1000 | Maximale Anzahl von Cache-Einträgen |
+| `ReadOnly` | `bool` | false | Schreibgeschützter Modus |
+
+### Transaktionsunterstützung
+
+SpeedyPack unterstützt atomare Schreiboperationen über die `IPackTransaction`-Schnittstelle:
+
+- `SpeedyTransaction` implementiert den Transaktionsmechanismus
+- Unterstützt Atomizität von Batch-Schreibvorgängen
+- Beim Transaktions-Commit werden alle Schreiboperationen entweder vollständig erfolgreich oder vollständig zurückgerollt
+
+---
+
+## Plugin-System
+
+SiliconLife unterstützt Funktionserweiterungen über ein Plugin-System, das Drittanbietern ermöglicht, neue Funktionen zur Plattform hinzuzufügen.
+
+### Kernschnittstelle
+
+```csharp
+public interface IPlugin
+{
+    string Id { get; }
+    string GetName(Language language);
+    string Version { get; }
+    string GetDescription(Language language);
+    string GetAuthor(Language language);
+    void OnLoad();
+    void OnStart();
+    void OnStop();
+    void OnUnload();
+}
+```
+
+### Plugin-Loader
+
+`PluginLoader` ist verantwortlich für das Laden von Plugin-DLLs aus einem angegebenen Verzeichnis und führt strenge Sicherheitsprüfungen durch:
+
+1. **Verzeichnis-Scan** — Scannt alle .dll-Dateien im Plugin-Verzeichnis
+2. **Sicherheits-Scan** — Prüft, ob das Plugin verbotene Namespaces referenziert
+3. **Isoliertes Laden** — Verwendet benutzerdefinierten `AssemblyLoadContext` zum isolierten Laden von Plugins
+4. **Lebenszyklusverwaltung** — Ruft OnLoad-, OnStart-, OnStop-, OnUnload-Methoden des Plugins auf
+
+### Sicherheits-Sandkasten
+
+Der Plugin-Loader führt folgende Sicherheitsprüfungen durch:
+
+| Prüfgegenstand | Beschreibung |
+|--------|------|
+| Verbotene Namespaces | System.IO, System.Net.Http, System.Net.WebSockets, System.Net.Sockets, Microsoft.CodeAnalysis |
+| Vertrauenswürdige Assembly-Whitelist | Google.Protobuf, Newtonsoft.Json, MessagePack, Serilog, Microsoft.Extensions.Logging.Abstractions, Dapper |
+| Verbotene Typ-Prüfung | Scannt gefährliche Typen, die im Plugin referenziert werden |
+| Verbotene Member-Prüfung | Scannt gefährliche Methoden, die im Plugin aufgerufen werden |
+
+### Tool-Integration
+
+Plugins können benutzerdefinierte Tools durch Implementierung der `ITool`-Schnittstelle registrieren:
+
+- `ToolManager.ScanAllPluginAssemblies()` scannt alle geladenen Plugins nach ITool-Implementierungen
+- Plugin-Tools werden automatisch in den Tool-Aufruf-Zyklus integriert
+- Plugin-Tools unterliegen demselben Berechtigungssystem
+
+### Plugin-Lebenszyklus
+
+```
+Laden (OnLoad) → Starten (OnStart) → Laufend → Stoppen (OnStop) → Entladen (OnUnload)
+```
+
+---
+
+## Silicon Being-Aktivitätsstatus
+
+Silicon Beings haben folgende Aktivitätszustände:
+
+| Status | Beschreibung |
+|------|------|
+| `Idle` | Leerlauf, wartet auf Clock-Trigger |
+| `Running` | Führt eine Runde KI-Anfrage + Tool-Aufrufe aus |
+| `WaitingPermission` | Wartet auf Benutzerberechtigungs-Genehmigung |
+| `Stopped` | Gestoppt, aufgrund von Fehler oder manuellem Stopp |
+
+Zustandsübergänge:
+```
+Idle → Running → Idle (Normaler Abschluss)
+Running → WaitingPermission → Running (Fortsetzung nach Berechtigungs-Genehmigung)
+Running → Stopped (Fehler oder manueller Stopp)
+Stopped → Idle (Neustart)
 ```

@@ -1,8 +1,8 @@
-﻿# Bezpečnostní Návrh
+# Bezpečnostní Návrh
 
 > **Verze: v0.1.0-alpha**
 
-[English](../en/security.md) | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Deutsch](../de-DE/security.md) | **Čeština**
+[English](../en/security.md) | [Deutsch](../de-DE/security.md) | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | **Čeština**
 
 ## Přehled
 
@@ -33,7 +33,7 @@ Každá kontrola oprávnění vrací jeden ze tří výsledků:
 | Výsledek | Chování |
 |--------|----------|
 | **Allowed (Povoleno)** | Operace okamžitě pokračuje |
-| **Denied (Zamítnuto)** | Operace je blokována, zaznamenána do auditu |
+| **Denied (Zamítnuto)** | Operace je blokována, zaznamenána do auditního logu |
 | **AskUser (Dotaz uživatele)** | Operace pozastavena, vyžaduje potvrzení uživatele |
 
 ### Speciální Role: Silikonový Kurátor
@@ -205,64 +205,147 @@ Webový frontend okamžitě zobrazí **interaktivní kartu** zobrazující:
 
 ### IM (Bez Podpory Karet): Náhodný Kód
 
-Pro IM kanály bez podpory karet:
+Pro zasílací platformy bez podpory interaktivních karet:
 
-1. Systém generuje 6místný náhodný kód.
-2. Odešle zprávu uživateli s kódem a popisem.
-3. Uživatel odpoví kódem + rozhodnutím.
-4. Systém ověří kód a aplikuje rozhodnutí.
+1. Systém generuje dva náhodné 6místné kódy: **kód povolení** a **kód zamítnutí**.
+2. Odešle zprávu obsahující informace o zdroji a oba kódy.
+3. Uživatel musí odpovědět přesným kódem povolení pro autorizaci. Jakákoli jiná odpověď je považována za zamítnutí.
+4. Kódy jsou jednorázové pro prevenci útoků opakováním.
+
+### Časový Limit
+
+- Pro všechny požadavky Dotaz uživatele je nastaven časový limit.
+- Při vypršení časového limitu je požadavek považován za **zamítnutý** a zámek vlákna exekutoru je uvolněn.
 
 ---
 
-## Auditní Systém
+## Auditní Logy
 
-Všechny operace oprávnění jsou zaznamenávány:
+Všechna rozhodnutí o oprávněních jsou zaznamenávána:
 
-```json
-{
-  "timestamp": "2026-04-20T10:30:00Z",
-  "beingId": "being-uuid",
-  "userId": "user-0",
-  "resource": "disk:write",
-  "result": "Allowed",
-  "level": "GlobalACL",
-  "reason": "Explicitní pravidlo uděleno"
-}
+```
+[2026-04-01 15:30:25] ALLOWED  | Being:AssistantA | Type:NetworkAccess | Resource:api.github.com | Source:HighAllowCache
+[2026-04-01 15:30:26] DENIED   | Being:AssistantB | Type:FileAccess    | Resource:C:\Windows\System32 | Source:HighDenyCache
+[2026-04-01 15:30:27] ASK_USER | Being:Curator    | Type:CommandLine   | Resource:del /f /q *.log | Source:Callback
+[2026-04-01 15:30:28] ALLOWED  | Being:Curator    | Type:CommandLine   | Resource:del /f /q *.log | Source:UserDecision
 ```
 
-### Auditing Událostí
-
-| Událost | Popis |
-|--------|----------|
-| `PermissionCheck` | Pokus o kontrolu oprávnění |
-| `PermissionAllowed` | Oprávnění uděleno |
-| `PermissionDenied` | Oprávnění zamítnuto |
-| `PermissionAsked` | Vyžadováno rozhodnutí uživatele |
-| `CacheUpdated` | Aktualizace frekvenční cache |
+Logy jsou perzistentní do úložiště, prohlížitelné prostřednictvím Web UI (kontrolér logů).
 
 ---
 
-## Dynamická Kompilace: Bezpečnostní Mechanismy
+## Audit Použití Tokenů
 
-### Šifrování Kódu
+`TokenUsageAuditManager` poskytuje sledování spotřeby AI tokenů související s bezpečností:
 
-- Všechny dynamicky kompilované kódy jsou šifrovány pomocí **AES-256**.
-- Klíč odvozen z GUID bytosti pomocí **PBKDF2**.
-- Kód je dešifrován pouze při kompilaci.
+- **Záznam každého požadavku** — Každé volání AI zaznamenává ID bytosti, model, prompt tokeny, doplňovací tokeny a časové razítko.
+- **Detekce anomálií** — Neobvyklé vzory spotřeby tokenů mohou naznačovat prompt injekci nebo zneužití zdrojů.
+- **Přístup pouze pro kurátora** — `TokenAuditTool` (označený `[SiliconManagerOnly]`) umožňuje kurátorovi dotazovat se a shrnovat využití tokenů.
+- **Webový dashboard** — `AuditController` poskytuje dashboard založený na prohlížeči s trendy a exportem dat.
+- **Perzistentní úložiště** — Záznamy jsou uloženy prostřednictvím `ITimeStorage` pro časové řady dotazů a dlouhodobou analýzu.
 
-### Bezpečnostní Skenování
+---
 
-Před načtením zkompilovaného kódu:
+## Zabezpečení Pluginů
 
-1. **Statická analýza**: Skenování nebezpečných vzorů kódu.
-2. **Kontrola referencí**: Vyloučení nebezpečných sestav (System.IO, Reflection atd.).
-3. **Kontrola volání**: Detekce zakázaných API volání.
+Systém pluginů zavádí bezpečnostní rizika spouštění kódu třetích stran, která jsou zmírňována následujícími mechanismy:
 
-### Izolace Paměti
+### Bezpečnostní Sandbox
 
-- Kompilovaný kód běží v izolované paměťové oblasti.
-- Žádný přímý přístup k paměti hlavního procesu.
-- Automatické čištění při selhání kompilace.
+`PluginLoader` provádí přísné bezpečnostní skenování při načítání pluginů:
+
+1. **Kontrola zakázaných jmenných prostorů** — Pluginy nemohou odkazovat na následující jmenné prostory:
+   - `System.IO` — přístup k souborovému systému
+   - `System.Net.Http` — HTTP požadavky
+   - `System.Net.WebSockets` — WebSocket připojení
+   - `System.Net.Sockets` — raw sockety
+   - `Microsoft.CodeAnalysis` — API kompilátoru
+
+2. **Whitelist důvěryhodných sestavení** — Reference na následující sestavení jsou povoleny:
+   - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
+   - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
+   - `Dapper`
+
+3. **Kontrola zakázaných typů** — Skenování nebezpečných typů odkazovaných v pluginu
+
+4. **Kontrola zakázaných členů** — Skenování nebezpečných metod volaných v pluginu
+
+### Izolované Načítání
+
+- Každý plugin je izolovaně načten pomocí vlastního `AssemblyLoadContext`
+- Typy a sestavení mezi pluginy se navzájem neovlivňují
+- Při uvolnění pluginu lze uvolnit související zdroje
+
+### Omezení Oprávnění Nástrojů
+
+- Nástroje registrované pluginy prostřednictvím rozhraní `ITool` podléhají stejnému systému oprávnění
+- Nástroje pluginů nemohou obejít 5-úrovňový řetězec oprávnění
+- Nástroje pluginů podléhají označení `[SiliconManagerOnly]`
+
+---
+
+## Dynamická Kompilace: Bezpečnost
+
+Samoevoluce (přepis tříd) přináší jedinečné bezpečnostní riziko. Systém je zmírňuje pomocí **vrstvené strategie**:
+
+### Vrstva 1: Kontrola Referencí při Kompilaci (Primární Obrana)
+
+- Kompilátor získá pouze **povolený seznam referencí na sestavení**.
+- **Povoleno**: `System.Runtime`, `System.Private.CoreLib`, projektová sestavení (rozhraní ITool atd.)
+- **Blokováno**: `System.IO`, `System.Reflection`, `System.Runtime.InteropServices` atd.
+- Pokud kód odkazuje na blokované sestavení, **kompilátor sám kód odmítne**.
+- Toto je spolehlivější než běhové skenování — nebezpečné operace jsou nemožné na úrovni typů.
+
+### Vrstva 2: Běhová Statická Analýza (Sekundární Obrana)
+
+- I po úspěšné kompilaci je kód podroben statickému skenování vzorů.
+- Detekce nebezpečných vzorů operací (přímé I/O, systémová volání atd.).
+- Pokud je nalezen nebezpečný kód, načtení je odmítnuto a systém se vrátí k výchozí funkčnosti.
+
+### Omezení Dědičnosti
+
+Všechny vlastní třídy silikonových bytostí **musí** dědit z `SiliconBeingBase`. Kompilátor vynucuje toto omezení na úrovni typů.
+
+### Šifrované Úložiště
+
+Zkompilovaný kód je na disku uložen šifrovaný pomocí AES-256:
+
+- **Odvození klíče**: Z GUID bytosti (velká písmena) pomocí PBKDF2.
+- **Selhání dešifrování**: Návrat k výchozí implementaci.
+- **Běhová rekompilace**: Nový kód je nejprve zkompilován v paměti; perzistence probíhá až po úspěšné kompilaci a nahrazení instance.
+
+### Atomické Nahrazení
+
+Proces nahrazení je atomický:
+
+1. Zkompilujte nový kód v paměti → získejte `Type`.
+2. Vytvořte novou instanci z `Type`.
+3. Migrujte stav ze staré instance do nové instance.
+4. Prohoďte reference.
+5. Perzistujte šifrovaný kód.
+
+Pokud kterýkoli krok selže, stará instance zůstává aktivní.
+
+---
+
+## Callback Funkce Oprávnění
+
+### Návrh
+
+Každý PermissionManager drží **proměnnou callback funkce**:
+
+- **Výchozí**: Odkazuje na vestavěnou výchozí funkci oprávnění.
+- **Po dynamické kompilaci**: Přepsáno vlastní funkcí oprávnění bytosti.
+- **Výběr jednoho ze dvou**: V každém okamžiku je aktivní pouze jeden callback.
+- **Selhání kompilace**: Neovlivňuje aktuální callback — výchozí nebo poslední úspěšná vlastní funkce zůstává platná.
+
+### Signatura Callbacku
+
+```
+PermissionResult Callback(PermissionType type, string resourcePath, Guid callerId)
+```
+
+Vrací `Allowed`, `Denied` nebo `AskUser`.
 
 ---
 

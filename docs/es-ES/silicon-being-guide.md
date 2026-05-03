@@ -1,4 +1,4 @@
-﻿# Guía de Ser Silicona
+# Guía de Ser Silicona
 
 > **Versión: v0.1.0-alpha**
 
@@ -171,6 +171,7 @@ await timerSystem.StartAsync(timer);
 
 ### Estructura de Almacenamiento
 
+Versión Default:
 ```
 data/
 └── beings/
@@ -183,6 +184,17 @@ data/
         │       └── 2026-04-21.json
         └── tasks/
             └── task-history.json
+```
+
+Versión Fast (almacenamiento SpeedyPack):
+```
+data/
+├── speedy/
+│   ├── {being-id}.spk       # Archivo de almacenamiento SpeedyPack
+│   └── {being-id}.spk.idx   # Archivo de índice
+└── beings/
+    └── {being-id}/
+        └── soul.md
 ```
 
 ## Sistema de Notas de Trabajo

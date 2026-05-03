@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 This project provides two implementation versions:
 
 - **SiliconLife.Default**: Default implementation, primarily used for verifying architecture feasibility. Console application with file system JSON storage.
-- **SiliconLife.Fast**: Production-ready version. Windows Forms application with in-memory storage + asynchronous persistence, deeply performance-optimized.
+- **SiliconLife.Fast**: Production-ready version. Windows Forms application with SpeedyPack in-memory storage + asynchronous persistence (.spk file format), deeply performance-optimized.
 
 Both versions share the same interfaces and functionality, differing only in storage implementation and runtime mode. SiliconLife.Default serves as an architecture validation baseline, while SiliconLife.Fast is the production-ready flagship version.
 
@@ -63,6 +63,142 @@ Both versions share the same interfaces and functionality, differing only in sto
 ---
 
 ## [Unreleased]
+
+### 2026-05-03
+
+#### Project Infrastructure
+- `2664b0c` - Updated project infrastructure and dependencies
+  - SiliconLife.Speedy.Manager added WPF management interface (MainForm.Designer.cs, MainForm.resx)
+  - Added slc.ico icon resource (1.5MB)
+  - PluginLoader significantly enhanced security scanning (622 lines added)
+  - Added PermissionedStreamFactory permission stream factory (779 lines)
+  - Added PermissionRequestQueue permission request queue (Default and Fast versions)
+  - Added DebugLoggerProvider debug logger provider
+  - ConfigDataBase configuration base class enhanced
+  - ToolManager added plugin tool scanning (ScanAllPluginAssemblies)
+  - SiliconBeingManager lifecycle management enhanced
+  - DashScopeClient Alibaba Cloud AI client significantly enhanced (227 lines added)
+  - DefaultSiliconBeingFactory factory enhanced
+  - Web views and controllers updated (ChatView, WorkNoteView, PermissionRequestController)
+  - 9-language localization added new keys
+  - 35 files changed, 28080 lines added, 336 lines deleted
+
+### 2026-05-02
+
+#### AI Client Enhancement
+- `c16f99f` - Updated AI client, Web UI, and storage components
+  - DashScopeClient Alibaba Cloud client significantly improved
+  - SpeedyPackAutoCompactor auto-compactor optimized
+  - Web view base class and BeingView improved
+  - 6 files changed, 240 lines added, 81 lines deleted
+
+#### Plugin System
+- `242dc98` - Added plugin list on about page
+  - AboutController added plugin information display
+  - AboutViewModel added plugin data model
+  - AboutView added plugin list rendering
+  - 9-language localization added plugin-related keys
+  - 14 files changed, 160 lines added, 1 line deleted
+
+#### AI Optimization
+- `147f8f4` - Simplified context memory prompt text
+  - ContextManager optimized AI prompts
+  - 1 file changed, 1 line added, 1 line deleted
+
+#### Speedy Storage Optimization
+- `8bda2d3` - Updated Speedy storage and memory controller implementation
+  - SpeedyPackAutoCompactor interval correction
+  - SpeedyTimeStorage path handling optimization
+  - MemoryController memory controller improvements
+  - SpeedyPack.Manager UI update
+  - 4 files changed, 21 lines added, 18 lines deleted
+
+#### Tray Enhancement
+- `8972654` - Enhanced tray status window localization support
+  - 9-language tray localization added Speedy management entry
+  - TrayStatusWindow added Speedy management menu item
+  - 11 files changed, 72 lines added
+
+#### Speedy.Manager Optimization
+- `6f5db09` - Optimized SpeedyPack Manager UI and internal components
+  - MainForm interface refactoring
+  - FreeList memory management optimization
+  - WriteQueue write queue improvements
+  - SpeedyPack core optimization
+  - 5 files changed, 96 lines added, 88 lines deleted
+
+#### Storage System Enhancement
+- `57f9d5d` - Improved storage system, added auto-compaction and incomplete date support
+  - Added SpeedyPackAutoCompactor auto-compaction timer (30-minute interval)
+  - SpeedyPackRegistry singleton manager enhanced
+  - SpeedyStorage, SpeedyTimeStorage, SpeedyWorkNoteStorage adapter improvements
+  - SpeedyPack added FreeList free space management (149 lines)
+  - PackFileWriter writer refactoring optimization
+  - WriteOperation, WriteQueue write queue enhancement
+  - SpeedyPackOptions configuration options expansion
+  - IncompleteDate added comparison methods
+  - PluginLoader plugin loader improvements
+  - Default and Fast versions Program.cs initialization flow updated
+  - DefaultConfigData configuration data simplified
+  - KnowledgeNetwork knowledge network streamlined
+  - ChatController, MemoryController controller optimization
+  - SpeedyPack.Manager MainForm functionality enhanced
+  - 22 files changed, 639 lines added, 253 lines deleted
+
+#### Speedy.Manager Update
+- `b04ed33` - Updated Speedy.Manager files
+
+### 2026-05-01
+
+#### Architecture Refactoring: Speedy Storage Replaces LiteDB
+- `6600972` - Replaced LiteDB with Speedy storage, added plugin system and Speedy projects
+  - **Added SiliconLife.Speedy project**: High-performance .spk storage engine
+    - SpeedyPack core class (489 lines): In-memory directory mapping + entry cache + asynchronous write queue
+    - SpeedyPackOptions configuration class: Cache TTL, max cache entries, read-only mode
+    - IPackTransaction transaction interface: Supports atomic write operations
+    - SpkFileInfo file information class
+    - Internal directory: DirectoryMap, EntryCache, PackFileReader, PackFileWriter, WriteQueue, WriteOperation, SpeedyTransaction, SpkHeader, PathNormalizer, FreeList
+    - Uses MessagePack 3.1.4 for binary serialization (LZ4 compression)
+  - **Added SiliconLife.Speedy.Manager project**: WPF management tool
+    - MVVM architecture: MainViewModel, DirectoryTreeViewModel, ContentViewerViewModel, etc.
+    - Service layer: PackService, FileDialogService, RecentFilesService, NotificationService
+    - Converters: BoolToVisibility, ByteSizeToString, ContentTypeToIcon, NullToCollapsed
+    - Views: MainWindow, DirectoryTreeView, ContentViewerPanel, MetadataPanel
+    - Dialogs: FileInfoDialog, ImportDialog, NewEntryDialog
+  - **SiliconLife.Fast storage migration**: LiteDB → SpeedyPack
+    - Added SpeedyStorage (IStorage adapter)
+    - Added SpeedyTimeStorage (ITimeStorage adapter)
+    - Added SpeedyWorkNoteStorage (IWorkNoteStorage adapter)
+    - Added SpeedyPackRegistry (process-level singleton management)
+    - Added SpeedyPackAutoCompactor (auto-compaction timer)
+    - Removed LiteDB-related storage implementations (LiteDBStorage, LiteDBTimeStorage, LiteDBWorkNoteStorage, LiteDBLoggerProvider, LiteDBManager, LiteDBModels)
+    - Removed LiteDB management window related code
+  - **Plugin System**:
+    - Added IPlugin interface (Core/Plugins/IPlugin.cs)
+    - Added PluginLoader plugin loader (Core/Plugins/PluginLoader.cs)
+    - Support loading plugin DLLs from directory
+    - Security scanning: Forbidden namespace checking (System.IO, System.Net, Microsoft.CodeAnalysis, etc.)
+    - Trusted assembly whitelist (Google.Protobuf, Newtonsoft.Json, MessagePack, etc.)
+    - Custom AssemblyLoadContext isolated loading
+    - ToolManager added ScanAllPluginAssemblies method
+    - CoreHost integrated plugin loader
+  - 119 files changed, 6926 lines added, 3066 lines deleted
+
+#### Silicon Being Enhancement
+- `3aef4c3` - Added Stopped activity state and error handling improvements
+  - Silicon beings now have Stopped state
+  - Error handling and recovery mechanism enhanced
+
+#### Localization Update
+- `513c65d` - Updated all language versions and documentation
+  - Added MarkdownEditorComponent component (625 lines)
+  - Added DetailsComponent component (130 lines)
+  - Added AccordionComponent accordion component (285 lines)
+  - BeingController, ChatController, MemoryController, PermissionController controller updates
+  - BeingView, ChatView, MemoryView, SoulEditorView view refactoring
+  - Removed old MarkdownEditorView
+  - InitController componentization migration
+  - 115 files changed, 5761 lines added, 2362 lines deleted
 
 ### 2026-04-30
 

@@ -1,12 +1,23 @@
-﻿# ツールリファレンス
+# ツールリファレンス
 
 > **バージョン: v0.1.0-alpha**
 
-[English](tools-reference.md) | [简体中文](docs/zh-CN/tools-reference.md) | [繁體中文](docs/zh-HK/tools-reference.md) | [Español](docs/es-ES/tools-reference.md) | [日本語](docs/ja-JP/tools-reference.md) | [한국어](docs/ko-KR/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [Čeština](docs/cs-CZ/tools-reference.md)
+[English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | **日本語** | [한국어](../ko-KR/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md)
 
 ## 概要
 
-ツールは AI がシステムと対話できるようにする関数です。各ツールは `ITool` インターフェースを実装し、リフレクションを介して自動的に検出されます。
+ツールシステムは、シリコン生命体が標準化されたインターフェースを介して外部世界と対話できるようにします。各ツールは `ITool` インターフェースを実装し、`ToolManager` がリフレクションを介して自動的に検出および登録。
+
+### ツール分類
+
+- **システム管理ツール** — 設定、権限、動的コンパイル
+- **通信ツール** — チャット、ネットワークリクエスト
+- **データストレージツール** — ディスク操作、データベース、メモリ、作業ノート
+- **時間管理ツール** — カレンダー、タイマー、タスク
+- **開発ツール** — コード実行、ログクエリ
+- **ユーティリティツール** — システム情報、トークン監査、ヘルプドキュメント、ナレッジネットワーク
+- **ブラウザツール** — WebView ブラウザ自動化
+- **プラグインツール** — プラグインシステムを介して登録されたサードパーティツール
 
 ---
 
@@ -508,13 +519,20 @@ public class MyCustomTool : ITool
 }
 ```
 
-### ステップ 2: ツールを配置
+### ステップ 2: プロジェクトに追加
 
-`src/SiliconLife.Default/Tools/` にファイルを配置
+ツールファイルを `src/SiliconLife.Common/Tools/` ディレクトリ（共有ツール）または `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` ディレクトリ（バージョン固有ツール）に配置。`ToolManager` は起動時にリフレクションを介して自動的に検出および登録。
 
-### ステップ 3: 自動的に検出
+### ステップ 2a: プラグイン経由でツールを登録
 
-ツールはアプリケーション起動時に自動的に検出および登録されます - 手動設定は不要！
+プラグインシステムを介してカスタムツールを登録することも可能：
+
+1. プラグインプロジェクトで `ITool` インターフェースを実装
+2. プラグイン DLL をコンパイルしてプラグインディレクトリに配置
+3. `ToolManager.ScanAllPluginAssemblies()` がロード済みのすべてのプラグイン内の ITool 実装を自動的にスキャン
+4. プラグインツールは同じ権限システムの制約を受ける
+
+### ステップ 3: （オプション）管理人専用としてマーク
 
 ---
 

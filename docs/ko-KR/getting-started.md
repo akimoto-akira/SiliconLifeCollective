@@ -2,7 +2,7 @@
 
 > **버전: v0.1.0-alpha**
 
-[English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | **한국어** | [Deutsch](../de-DE/getting-started.md) | [Čeština](../cs-CZ/getting-started.md)
+[English](../en/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | **한국어** | [Čeština](../cs-CZ/getting-started.md)
 
 ## 버전 선택
 
@@ -19,7 +19,7 @@
 ### SiliconLife.Fast (고성능 버전)
 - **포지셔닝**: 주력 프로덕션 버전
 - **실행 모드**: Windows 양식 애플리케이션 (시스템 트레이)
-- **저장소**: 메모리 저장소 + 비동기 영속성
+- **저장소**: SpeedyPack 메모리 스토리지 + 비동기 영속성 (.spk 파일 형식)
 - **적용 시나리오**: 높은 동시성, 낮은 지연 시간, 대용량 데이터, 장기 프로덕션 운영
 - **플랫폼 지원**: Windows 전용
 - **역할 설명**: 심층 최적화가 적용된 프로덕션급 구현으로, 장기 운영 및 실제 프로덕션 환경의 최선의 선택
@@ -240,16 +240,41 @@ public LogLevel LogLevel = LogLevel.Debug;
 - 브라우저 콘솔에서 JavaScript 오류 확인
 - 방화벽 설정 확인
 
+## 프로젝트 구조
+
+```
+SiliconLifeCollective/
+├── src/
+│   ├── SiliconLife.Core/            # 핵심 인터페이스 및 추상 클래스
+│   ├── SiliconLife.Common/          # 공유 구현 (두 버전 모두 사용)
+│   ├── SiliconLife.Default/         # 기본 구현 + 진입점 (콘솔 버전)
+│   ├── SiliconLife.Fast/            # 고성능 구현 + 진입점 (폼 버전)
+│   ├── SiliconLife.Speedy/          # SpeedyPack 고성능 스토리지 엔진
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 관리 도구 (WPF)
+├── docs/                            # 문서 (다국어, 21개 언어 변형)
+│   ├── en/                          # 영어
+│   ├── zh-CN/                       # 간체 중국어
+│   ├── zh-HK/                       # 번체 중국어
+│   ├── es-ES/                       # 스페인어
+│   ├── ja-JP/                       # 일본어
+│   ├── ko-KR/                       # 한국어
+│   └── cs-CZ/                       # 체코어
+├── 总文档/                           # 요구 사항 및 아키텍처 문서 (중국어)
+└── README.md                        # 프로젝트 설명
+```
+
 ## 다음 단계
 
-- 📚 [아키텍처 가이드](architecture.md) 읽기
-- 🛠️ [도구 참고](tools-reference.md) 탐색
-- 🔒 [보안 모델](security.md) 이해
-- 🎨 [Web UI 가이드](web-ui-guide.md) 학습
-- 🤖 [실리콘 생명체 가이드](silicon-being-guide.md)로 생명체 만들기
+- 📚 [아키텍처 가이드](architecture.md) 읽어 시스템 설계 이해
+- 🛠️ [개발 가이드](development-guide.md) 확인하여 시스템 확장
+- 📖 [API 레퍼런스](api-reference.md) 탐색하여 통합 세부 정보 파악
+- 🔒 [보안 문서](security.md) 확인하여 권한 시스템 이해
+- 🧰 [도구 참고](tools-reference.md) 확인하여 모든 내장 도구 파악
+- 🌐 [Web UI 가이드](web-ui-guide.md) 확인하여 인터페이스 기능 학습
 
 ## 도움이 필요하신가요?
 
-- [문제 해결](troubleshooting.md) 가이드 확인
-- [기여 가이드](contributing.md) 읽기
-- GitHub에서 [이슈 제출](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 📖 [도움말 문서 시스템](web-ui-guide.md#도움말-문서-시스템) 확인 (다국어 지원)
+- 📚 [전체 문서](docs/) 읽기
+- 🐛 [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)에서 문제 보고
+- 💬 커뮤니티 토론 참여

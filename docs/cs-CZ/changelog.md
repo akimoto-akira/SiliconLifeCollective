@@ -64,6 +64,142 @@ Obě verze sdílejí stejná rozhraní a funkce, liší se pouze implementací �
 
 ## [Neuvedeno]
 
+### 2026-05-03
+
+#### Projektová infrastruktura
+- `2664b0c` - Aktualizována projektová infrastruktura a závislosti
+  - SiliconLife.Speedy.Manager přidáno WPF rozhraní (MainForm.Designer.cs, MainForm.resx)
+  - Přidán zdroj ikony slc.ico (1.5MB)
+  - PluginLoader výrazně vylepšeno bezpečnostní skenování (622 řádků přidáno)
+  - Přidána PermissionedStreamFactory továrna oprávněných streamů (779 řádků)
+  - Přidána PermissionRequestQueue fronta požadavků na oprávnění (verze Default a Fast)
+  - Přidán DebugLoggerProvider poskytovatel ladících logů
+  - ConfigDataBase vylepšena konfigurační základní třída
+  - ToolManager přidána funkce skenování pluginových nástrojů (ScanAllPluginAssemblies)
+  - SiliconBeingManager vylepšena správa životního cyklu
+  - DashScopeClient Alibaba Cloud AI klient výrazně vylepšen (227 řádků přidáno)
+  - DefaultSiliconBeingFactory vylepšena továrna
+  - Aktualizována webová zobrazení a kontroléry (ChatView, WorkNoteView, PermissionRequestController)
+  - 9 jazyků lokalizace přidány nové klíče
+  - 35 souborů změněno, 28080 řádků přidáno, 336 řádků smazáno
+
+### 2026-05-02
+
+#### Vylepšení AI klienta
+- `c16f99f` - Aktualizován AI klient, Web UI a komponenty úložiště
+  - DashScopeClient Alibaba Cloud klient výrazně vylepšen
+  - SpeedyPackAutoCompactor optimalizace automatického kompresoru
+  - Vylepšeny základní třídy webových zobrazení a BeingView
+  - 6 souborů změněno, 240 řádků přidáno, 81 řádků smazáno
+
+#### Pluginový systém
+- `242dc98` - Přidán seznam pluginů na stránku O aplikaci
+  - AboutController přidáno zobrazení informací o pluginech
+  - AboutViewModel přidán datový model pluginů
+  - AboutView přidáno vykreslení seznamu pluginů
+  - 9 jazyků lokalizace přidány klíče související s pluginy
+  - 14 souborů změněno, 160 řádků přidáno, 1 řádek smazán
+
+#### AI optimalizace
+- `147f8f4` - Zjednodušen text promptu kontextové paměti
+  - ContextManager optimalizovány AI prompty
+  - 1 soubor změněn, 1 řádek přidán, 1 řádek smazán
+
+#### Optimalizace Speedy úložiště
+- `8bda2d3` - Aktualizována implementace Speedy úložiště a kontroléru paměti
+  - SpeedyPackAutoCompactor oprava intervalu
+  - SpeedyTimeStorage optimalizace zpracování cest
+  - MemoryController vylepšení kontroléru paměti
+  - SpeedyPack.Manager aktualizace UI
+  - 4 soubory změněny, 21 řádků přidáno, 18 řádků smazáno
+
+#### Vylepšení systémové lišty
+- `8972654` - Vylepšena lokalizační podpora okna stavu lišty
+  - 9 jazyků lokalizace lišty přidána položka Speedy správy
+  - TrayStatusWindow přidána položka menu Speedy správy
+  - 11 souborů změněno, 72 řádků přidáno
+
+#### Speedy.Manager optimalizace
+- `6f5db09` - Optimalizováno UI SpeedyPack manažeru a interní komponenty
+  - MainForm rekonstrukce rozhraní
+  - FreeList optimalizace správy paměti
+  - WriteQueue vylepšení fronty zápisu
+  - SpeedyPack optimalizace jádra
+  - 5 souborů změněno, 96 řádků přidáno, 88 řádků smazáno
+
+#### Vylepšení úložného systému
+- `57f9d5d` - Vylepšen úložný systém, přidána automatická komprese a podpora neúplných dat
+  - Přidán SpeedyPackAutoCompactor automatický kompresní časovač (30minutový interval)
+  - SpeedyPackRegistry vylepšen správce singletonu
+  - SpeedyStorage, SpeedyTimeStorage, SpeedyWorkNoteStorage vylepšeny adaptéry
+  - SpeedyPack přidána správa volného prostoru FreeList (149 řádků)
+  - PackFileWriter refaktorizován a optimalizován zapisovač
+  - WriteOperation, WriteQueue vylepšena fronta zápisu
+  - SpeedyPackOptions rozšířeny konfigurační možnosti
+  - IncompleteDate přidány metody porovnání
+  - PluginLoader vylepšen zavaděč pluginů
+  - Default a Fast verze Program.cs aktualizován inicializační proces
+  - DefaultConfigData zjednodušena konfigurační data
+  - KnowledgeNetwork zjednodušena znalostní síť
+  - ChatController, MemoryController optimalizovány kontroléry
+  - SpeedyPack.Manager MainForm vylepšena funkčnost
+  - 22 souborů změněno, 639 řádků přidáno, 253 řádků smazáno
+
+#### Speedy.Manager aktualizace
+- `b04ed33` - Aktualizovány soubory Speedy.Manager
+
+### 2026-05-01
+
+#### Refaktoring architektury: Speedy úložiště nahrazuje LiteDB
+- `6600972` - Nahrazeno Speedy úložištěm za LiteDB, přidán pluginový systém a Speedy projekt
+  - **Přidán projekt SiliconLife.Speedy**: vysoce výkonný .spk úložný engine
+    - SpeedyPack jádrová třída (489 řádků): mapování paměťových adresářů + mezipaměť záznamů + asynchronní fronta zápisu
+    - SpeedyPackOptions konfigurační třída: TTL mezipaměti, max. položek mezipaměti, režim pouze pro čtení
+    - IPackTransaction transakční rozhraní: podpora atomických operací zápisu
+    - SpkFileInfo třída informací o souboru
+    - Adresář Internal: DirectoryMap, EntryCache, PackFileReader, PackFileWriter, WriteQueue, WriteOperation, SpeedyTransaction, SpkHeader, PathNormalizer, FreeList
+    - Závisí na MessagePack 3.1.4 pro binární serializaci (LZ4 komprese)
+  - **Přidán projekt SiliconLife.Speedy.Manager**: WPF nástroj pro správu
+    - MVVM architektura: MainViewModel, DirectoryTreeViewModel, ContentViewerViewModel atd.
+    - Službová vrstva: PackService, FileDialogService, RecentFilesService, NotificationService
+    - Konvertory: BoolToVisibility, ByteSizeToString, ContentTypeToIcon, NullToCollapsed
+    - Zobrazení: MainWindow, DirectoryTreeView, ContentViewerPanel, MetadataPanel
+    - Dialogy: FileInfoDialog, ImportDialog, NewEntryDialog
+  - **Migrace úložiště SiliconLife.Fast**: LiteDB → SpeedyPack
+    - Přidán SpeedyStorage (IStorage adaptér)
+    - Přidán SpeedyTimeStorage (ITimeStorage adaptér)
+    - Přidán SpeedyWorkNoteStorage (IWorkNoteStorage adaptér)
+    - Přidán SpeedyPackRegistry (správa singletonu na úrovni procesu)
+    - Přidán SpeedyPackAutoCompactor (automatický kompresní časovač)
+    - Odstraněny implementace úložiště související s LiteDB (LiteDBStorage, LiteDBTimeStorage, LiteDBWorkNoteStorage, LiteDBLoggerProvider, LiteDBManager, LiteDBModels)
+    - Odstraněn kód související s oknem správy LiteDB
+  - **Pluginový systém**:
+    - Přidáno rozhraní IPlugin (Core/Plugins/IPlugin.cs)
+    - Přidán zavaděč pluginů PluginLoader (Core/Plugins/PluginLoader.cs)
+    - Podpora načítání pluginových DLL z adresáře
+    - Bezpečnostní skenování: kontrola zakázaných jmenných prostorů (System.IO, System.Net, Microsoft.CodeAnalysis atd.)
+    - Seznam důvěryhodných sestavení (Google.Protobuf, Newtonsoft.Json, MessagePack atd.)
+    - Izolované načítání s vlastním AssemblyLoadContext
+    - ToolManager přidána metoda ScanAllPluginAssemblies
+    - CoreHost integrován zavaděč pluginů
+  - 119 souborů změněno, 6926 řádků přidáno, 3066 řádků smazáno
+
+#### Vylepšení křemíkových bytostí
+- `3aef4c3` - Přidán stav aktivity Stopped a vylepšeno zpracování chyb
+  - Křemíkové bytosti přidán stav Stopped
+  - Vylepšeno zpracování chyb a mechanismus obnovy
+
+#### Aktualizace lokalizace
+- `513c65d` - Aktualizovány všechny jazykové verze a dokumentace
+  - Přidána komponenta MarkdownEditorComponent (625 řádků)
+  - Přidána komponenta DetailsComponent (130 řádků)
+  - Přidána komponenta AccordionComponent (285 řádků)
+  - Aktualizovány kontroléry BeingController, ChatController, MemoryController, PermissionController
+  - Refaktorizována zobrazení BeingView, ChatView, MemoryView, SoulEditorView
+  - Odstraněno staré MarkdownEditorView
+  - Migrace komponentizace InitController
+  - 115 souborů změněno, 5761 řádků přidáno, 2362 řádků smazáno
+
 ### 2026-04-30
 
 #### Funkcionalita systémové lišty

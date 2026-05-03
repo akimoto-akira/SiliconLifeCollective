@@ -71,6 +71,24 @@ public sealed class ProjectSpace
     public string StoragePath { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the workflow template name associated with this project (set at creation, immutable).
+    /// Empty string means no workflow template is assigned.
+    /// </summary>
+    public string WorkflowTemplateName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the group chat session ID for this project (auto-created on project creation).
+    /// Used for project-specific group communication between silicon beings.
+    /// </summary>
+    public Guid? GroupChatSessionId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the broadcast channel ID for this project (auto-created on project creation).
+    /// Used for project-wide announcements and notifications.
+    /// </summary>
+    public Guid? BroadcastChannelId { get; set; }
+
+    /// <summary>
     /// Creates a new project space with default values
     /// </summary>
     public ProjectSpace()

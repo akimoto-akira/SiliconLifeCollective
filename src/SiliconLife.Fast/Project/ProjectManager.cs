@@ -13,6 +13,7 @@
 
 using SiliconLife.Collective;
 using SiliconLife.Fast;
+using SiliconLife.Common.Localization;
 
 namespace SiliconLife.Fast;
 
@@ -29,6 +30,7 @@ public class ProjectManager : IProjectManager
     private const string ProjectsKey = "projects/index";
     private readonly Dictionary<Guid, WorkNoteSystem> _workNoteSystems = new();
     private readonly Dictionary<Guid, ProjectTaskSystem> _projectTaskSystems = new();
+    private WorkflowEngine? _workflowEngine;
 
     /// <inheritdoc/>
     public int ActiveProjectCount => ListProjects(includeArchived: false).Count;
@@ -48,7 +50,7 @@ public class ProjectManager : IProjectManager
     }
 
     /// <inheritdoc/>
-    public ProjectSpace CreateProject(string name, string description, Guid createdBy)
+    public ProjectSpace CreateProject(string name, string description, Guid createdBy, string? workflowTemplateName = null)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -60,8 +62,47 @@ public class ProjectManager : IProjectManager
             Name = name.Trim(),
             Description = description?.Trim() ?? string.Empty,
             CreatedBy = createdBy,
-            Status = ProjectStatus.Active
+            Status = ProjectStatus.Active,
+            WorkflowTemplateName = workflowTemplateName?.Trim() ?? string.Empty
         };
+
+        // Auto-create group chat session for the project
+        var chatSystem = ServiceLocator.Instance.ChatSystem;
+        if (chatSystem != null)
+        {
+            // Get localized prefix for group chat name
+            string groupChatPrefix = "Project Group";
+            var language = Config.Instance?.Data?.Language ?? Language.EnUS;
+            if (LocalizationManager.Instance.TryGetLocalization(language, out var loc) && loc is DefaultLocalizationBase defaultLoc)
+            {
+                groupChatPrefix = defaultLoc.ProjectGroupChatPrefix;
+            }
+            
+            var groupChatSession = chatSystem.CreateGroupSession(
+                new List<Guid> { createdBy }, // Initially only the creator
+                $"{groupChatPrefix}：{project.Name}"
+            );
+            project.GroupChatSessionId = groupChatSession.Id;
+        }
+
+        // Auto-create broadcast channel for the project
+        var broadcastId = Guid.NewGuid();
+        if (chatSystem != null)
+        {
+            // Get localized prefix for broadcast channel name
+            string broadcastPrefix = "Project Broadcast";
+            var language = Config.Instance?.Data?.Language ?? Language.EnUS;
+            if (LocalizationManager.Instance.TryGetLocalization(language, out var loc) && loc is DefaultLocalizationBase defaultLoc)
+            {
+                broadcastPrefix = defaultLoc.ProjectBroadcastPrefix;
+            }
+            
+            var broadcastChannel = chatSystem.GetOrCreateBroadcastChannel(
+                broadcastId,
+                $"{broadcastPrefix}：{project.Name}"
+            );
+            project.BroadcastChannelId = broadcastChannel.Id;
+        }
 
         // Store project metadata in SpeedyPack
         string projectKey = $"projects/{project.Id}";
@@ -78,7 +119,11 @@ public class ProjectManager : IProjectManager
             SaveProjectsInternal(projects);
         }
 
-        _logger.Info(createdBy, "Created project space '{0}' (ID: {1})", project.Name, project.Id);
+        _logger.Info(createdBy, "Created project space '{0}' (ID: {1}), workflow template: {2}, group chat: {3}, broadcast: {4}", 
+            project.Name, project.Id, 
+            string.IsNullOrEmpty(project.WorkflowTemplateName) ? "None" : project.WorkflowTemplateName,
+            project.GroupChatSessionId,
+            project.BroadcastChannelId);
         return project;
     }
 
@@ -342,5 +387,22 @@ public class ProjectManager : IProjectManager
             _projectTaskSystems[projectId] = system;
             return system;
         }
+    }
+
+    /// <inheritdoc/>
+    public WorkflowEngine? GetWorkflowEngine()
+    {
+        return _workflowEngine;
+    }
+
+    /// <summary>
+    /// Sets the workflow engine for this project manager.
+    /// Called during initialization to register the engine.
+    /// </summary>
+    /// <param name="engine">The workflow engine to set</param>
+    public void SetWorkflowEngine(WorkflowEngine engine)
+    {
+        _workflowEngine = engine ?? throw new ArgumentNullException(nameof(engine));
+        _logger.Info(null, "Workflow engine registered with ProjectManager");
     }
 }

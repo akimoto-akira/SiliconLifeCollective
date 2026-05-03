@@ -100,6 +100,21 @@ public class Program
         ServiceLocator.Instance.Register<IProjectManager>(projectManager);
         _logger.Info(null, "Initialized: ProjectManager");
 
+        // Initialize workflow engine
+        var serviceProvider = new ServiceProvider();
+        var workflowEngine = new WorkflowEngine(timeStorage, serviceProvider);
+        
+        // Register example workflows
+        workflowEngine.RegisterTemplate(CodeReviewWorkflow.CreateTemplate());
+        
+        ((ProjectManager)projectManager).SetWorkflowEngine(workflowEngine);
+        ServiceLocator.Instance.Register<WorkflowEngine>(workflowEngine);
+        
+        // Register workflow tick object (ticks every 60 seconds)
+        new WorkflowTickObject(workflowEngine);
+        
+        _logger.Info(null, "Initialized: WorkflowEngine");
+
         ChatSystem chatSystem = new ChatSystem(timeStorage);
         _logger.Info(null, "Initialized: ChatSystem");
 

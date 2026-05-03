@@ -1,8 +1,8 @@
-﻿# API Reference
+# API Reference
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
+**English** | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
 
 ## Web API Endpoints
 
@@ -33,6 +33,8 @@ Most endpoints require authentication via session cookies managed by the Web UI.
   ]
 }
 ```
+
+**Status Values**: `idle` | `running` | `waiting_permission` | `stopped`
 
 ### Create Being
 
@@ -364,6 +366,73 @@ data: {"type": "complete", "sessionId": "uuid"}
 ---
 
 ## System Information
+
+### Get About Page
+
+**GET** `/about`
+
+Returns the about page, including system information and loaded plugin list.
+
+**Plugin List Data**:
+```json
+{
+  "plugins": {
+    "plugin-id": {
+      "name": "My Plugin",
+      "version": "1.0.0",
+      "description": "Plugin description",
+      "author": "Author Name"
+    }
+  }
+}
+```
+
+### Permission Request
+
+**GET** `/permission/request?userId={id}&type={type}&resource={resource}`
+
+Displays the permission request page, allowing users to approve or deny a silicon being's permission request.
+
+**Query Parameters**:
+
+| Parameter | Type | Description |
+|------|------|------|
+| `userId` | `Guid` | Silicon being ID requesting permission |
+| `type` | `string` | Permission type |
+| `resource` | `string` | Requested resource path |
+| `allowCode` | `string` | Code identifier for allow action |
+| `denyCode` | `string` | Code identifier for deny action |
+
+**Check Pending Permission Requests**:
+
+**GET** `/permission/check?userId={id}`
+
+**Response**:
+```json
+{
+  "pending": true
+}
+```
+
+**Respond to Permission Request**:
+
+**GET** `/permission/respond?userId={id}&allowed={bool}&addToCache={bool}&cacheDuration={hours}`
+
+**Query Parameters**:
+
+| Parameter | Type | Description |
+|------|------|------|
+| `userId` | `Guid` | Silicon being ID |
+| `allowed` | `bool` | Whether to allow |
+| `addToCache` | `bool` | Whether to cache the decision |
+| `cacheDuration` | `double` | Cache duration (hours) |
+
+**Response**:
+```json
+{
+  "success": true
+}
+```
 
 ### Get Dashboard Data
 

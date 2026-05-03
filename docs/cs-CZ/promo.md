@@ -1,8 +1,8 @@
-﻿# Seznamte se se Svými Digitálními Společníky
+# Seznamte se se Svými Digitálními Společníky
 
 > **Verze: v0.1.0-alpha**
 
-[English](../en/promo.md) | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Deutsch](../de-DE/promo.md) | **Čeština**
+[English](../en/promo.md) | [Deutsch](../de-DE/promo.md) | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | **Čeština**
 
 ## Co kdyby váš počítač dokázal přemýšlet sám?
 
@@ -116,6 +116,15 @@ Toto je open-source software. Používejte zdarma, upravujte, sdílejte s přát
 ### Roste s vámi
 
 Začněte s jedním jednoduchým asistentem. Jak objevíte, co je možné, vytvořte více specializovaných společníků. Systém je navržen tak, aby škáloval od příležitostného používání až po seriózní produktivní pracovní postupy.
+
+### Rozšiřitelný systém pluginů
+
+Rozšiřte funkčnost pomocí pluginů — nástroje a schopnosti vytvořené komunitou, které lze snadno přidat. Každý plugin běží v bezpečném sandboxu, což zajišťuje bezpečnost systému.
+
+### Výběr duální verze
+
+- **Verze Default**: Lehká konzolová aplikace, vhodná pro vývojové ladění a prostředí s omezenými zdroji
+- **Verze Fast**: Vysoce výkonná Windows aplikace s paměťovým storage enginem SpeedyPack, vhodná pro produkční nasazení
 
 ### Vytvořeno komunitou
 

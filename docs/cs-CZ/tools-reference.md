@@ -1,10 +1,10 @@
-﻿# Reference Nástrojů
+# Reference Nástrojů
 
 > **Verze: v0.1.0-alpha**
 
 Tento dokument poskytuje podrobné informace o všech vestavěných nástrojích platformy Silicon Life Collective.
 
-[English](../en/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | **Čeština**
+[English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | **Čeština**
 
 ## Přehled
 
@@ -19,6 +19,7 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 - **Vývojové Nástroje** — Spouštění kódu, dotazování logů
 - **Utility Nástroje** — Systémové informace, audit tokenů, nápověda, znalostní síť
 - **Nástroje Prohlížeče** — Automatizace WebView prohlížeče
+- **Nástroje Pluginů** — Nástroje třetích stran registrované prostřednictvím systému pluginů
 
 ---
 
@@ -718,7 +719,16 @@ public class MyCustomTool : ITool
 
 ### Krok 2: Přidání do Projektu
 
-Umístěte soubor nástroje do adresáře `src/SiliconLife.Default/Tools/`. `ToolManager` jej automaticky objeví a zaregistruje při spuštění pomocí reflexe.
+Umístěte soubor nástroje do adresáře `src/SiliconLife.Common/Tools/` (sdílené nástroje) nebo `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (nástroje specifické pro verzi). `ToolManager` jej automaticky objeví a zaregistruje při spuštění pomocí reflexe.
+
+### Krok 2a: Registrace Nástroje přes Plugin
+
+Nástroje lze také registrovat prostřednictvím systému pluginů:
+
+1. Implementujte rozhraní `ITool` v projektu pluginu
+2. Zkompilujte DLL pluginu a vložte jej do adresáře pluginů
+3. `ToolManager.ScanAllPluginAssemblies()` automaticky proskenuje všechny načtené pluginy pro implementace ITool
+4. Nástroje pluginů podléhají stejnému systému oprávnění
 
 ### Krok 3: (Volitelné) Označení jako Vyhrazené pro Kurátora
 

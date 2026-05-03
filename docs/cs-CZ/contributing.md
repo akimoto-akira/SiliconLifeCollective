@@ -1,8 +1,8 @@
-﻿# Přispívání
+# Přispívání
 
 > **Verze: v0.1.0-alpha**
 
-[English](../en/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Deutsch](../de-DE/contributing.md) | **Čeština**
+[English](../en/contributing.md) | [Deutsch](../de-DE/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | **Čeština**
 
 Děkujeme vám za zájem přispět do SiliconLifeCollective!
 
@@ -71,6 +71,9 @@ Vyberte vhodný projekt podle typu vašeho příspěvku:
 - **Sdílené Implementace** → Upravit `SiliconLife.Common`
 - **Specifické pro Default** → Upravit `SiliconLife.Default`
 - **Specifické pro Fast** → Upravit `SiliconLife.Fast`
+- **Storage Engine** → Upravit `SiliconLife.Speedy`
+- **Správcovský nástroj úložiště** → Upravit `SiliconLife.Speedy.Manager`
+- **Vývoj pluginů** → Upravit `SiliconLife.Core/Plugins`
 - **Vícejazyčná Dokumentace** → Upravit adresář `docs/`
 
 ---

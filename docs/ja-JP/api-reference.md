@@ -1,8 +1,8 @@
-﻿# API リファレンス
+# API リファレンス
 
 > **バージョン: v0.1.0-alpha**
 
-[English](api-reference.md) | [简体中文](docs/zh-CN/api-reference.md) | [繁體中文](docs/zh-HK/api-reference.md) | [Español](docs/es-ES/api-reference.md) | [日本語](docs/ja-JP/api-reference.md) | [한국어](docs/ko-KR/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [Čeština](docs/cs-CZ/api-reference.md)
+[English](../en/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | **日本語** | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
 
 ## Web API エンドポイント
 
@@ -33,6 +33,8 @@
   ]
 }
 ```
+
+**ステータス値**：`idle` | `running` | `waiting_permission` | `stopped`
 
 ### 生命体を作成
 
@@ -364,6 +366,73 @@ data: {"type": "complete", "sessionId": "uuid"}
 ---
 
 ## システム情報
+
+### バージョン情報を取得
+
+**GET** `/about`
+
+バージョン情報ページを返します。システム情報と読み込み済みプラグインリストを含みます。
+
+**プラグインリストデータ**：
+```json
+{
+  "plugins": {
+    "plugin-id": {
+      "name": "My Plugin",
+      "version": "1.0.0",
+      "description": "Plugin description",
+      "author": "Author Name"
+    }
+  }
+}
+```
+
+### 権限リクエスト
+
+**GET** `/permission/request?userId={id}&type={type}&resource={resource}`
+
+権限リクエストページを表示し、ユーザーがシリコン生命体の権限リクエストを承認または拒否できるようにします。
+
+**クエリパラメータ**：
+
+| パラメータ | タイプ | 説明 |
+|------|------|------|
+| `userId` | `Guid` | 権限をリクエストするシリコン生命体 ID |
+| `type` | `string` | 権限タイプ |
+| `resource` | `string` | リクエストするリソースパス |
+| `allowCode` | `string` | 許可操作のコード識別子 |
+| `denyCode` | `string` | 拒否操作のコード識別子 |
+
+**保留中の権限リクエストを確認**：
+
+**GET** `/permission/check?userId={id}`
+
+**レスポンス**：
+```json
+{
+  "pending": true
+}
+```
+
+**権限リクエストに応答**：
+
+**GET** `/permission/respond?userId={id}&allowed={bool}&addToCache={bool}&cacheDuration={hours}`
+
+**クエリパラメータ**：
+
+| パラメータ | タイプ | 説明 |
+|------|------|------|
+| `userId` | `Guid` | シリコン生命体 ID |
+| `allowed` | `bool` | 許可するかどうか |
+| `addToCache` | `bool` | 決定をキャッシュするかどうか |
+| `cacheDuration` | `double` | キャッシュ期間（時間） |
+
+**レスポンス**：
+```json
+{
+  "success": true
+}
+```
 
 ### ダッシュボードデータを取得
 

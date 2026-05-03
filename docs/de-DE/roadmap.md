@@ -2,7 +2,7 @@
 
 > **Version: v0.1.0-alpha**
 
-[English](../en/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
+[English](../en/roadmap.md) | **Deutsch** | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
 
 ## Duale Versions-Roadmap
 
@@ -13,13 +13,15 @@
 
 ### SiliconLife.Fast (Hochleistungsversion)
 - **Positionierung**: Haupt-Produktionsversion
-- **Aktueller Status**: Grundlegende Architekturportierung ist abgeschlossen, kontinuierliche Optimierung läuft
+- **Aktueller Status**: Grundlegende Architekturportierung ist abgeschlossen, SpeedyPack-Speicher-Engine und Plugin-System implementiert
 - **Rollenbeschreibung**: Basierend auf der in der Default-Version verifizierten Architektur, führt tiefe Performance-Optimierung und Produktionsmerkmal-Verstärkung durch, die beste Wahl für echte Bereitstellung
 
 **Fast Version Entwicklungsplan**:
 - ✅ Phase 1: Grundlegende Projektstruktur und Konfigurationssystem-Portierung
 - ✅ Phase 2: Web-UI und Controller-Portierung
-- ✅ Phase 3: Speichersystemoptimierung (In-Memory-Speicher + asynchrone Persistenz)
+- ✅ Phase 3: Speichersystemoptimierung (SpeedyPack-In-Memory-Speicher + asynchrone Persistenz)
+- ✅ Phase 3.5: SpeedyPack-Verwaltungstool (SiliconLife.Speedy.Manager WPF-Anwendung)
+- ✅ Phase 3.6: Plugin-System (IPlugin-Schnittstelle, Sicherheits-Sandbox, AssemblyLoadContext-Isolation)
 - 🚧 Phase 4: System Tray und Formularanwendungsentwicklung
 - 📋 Phase 5: Leistungsoptimierung (Verbindungspool, Objektpool, Lock-Free-Parallelität)
 - 📋 Phase 6: Kestrel Webserver-Ersetzung
@@ -304,5 +306,5 @@ Jede Phase endet mit einem **funktionsfähigen, beobachtbaren** System. Keine Ph
 | # | Modul | Beschreibung |
 |---|--------|-------------|
 | 12.1 | Wissensnetzwerk | Geteiltes Wissensgraph mit Triple-Struktur (Subjekt-Prädikat-Objekt) |
-| 12.2 | Plugin-System | Externes Plugin-Laden mit Sicherheitsprüfung und Sandboxing |
+| 12.2 | ~~Plugin-System~~ ✅ Abgeschlossen | Externes Plugin-Laden mit Sicherheitsprüfung und Sandbox (IPlugin-Schnittstelle, PluginLoader, AssemblyLoadContext-Isolation) |
 | 12.3 | Skill-Ökosystem | Wiederverwendbarer Skill-Marktplatz für Being-Fähigkeiten |

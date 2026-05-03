@@ -19,7 +19,7 @@
 ### SiliconLife.Fast（高性能版本）
 - **定位**：主推生产版本
 - **运行模式**：Windows 窗体应用程序（系统托盘）
-- **存储方式**：内存存储 + 异步持久化
+- **存储方式**：SpeedyPack 内存存储 + 异步持久化（.spk 文件格式）
 - **适用场景**：高并发、低延迟、大数据量、长期生产运行
 - **平台支持**：仅 Windows
 - **角色说明**：经过深度优化的生产级实现，是长期运行和实际生产环境的首选
@@ -197,18 +197,22 @@ lsof -ti:8080 | xargs kill -9
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/      # 核心接口和抽象类
-│   └── SiliconLife.Default/   # 默认实现 + 入口点
-├── docs/                      # 文档（多语言，21 种语言变体）
-│   ├── en/                    # 英语
-│   ├── zh-CN/                 # 简体中文
-│   ├── zh-HK/                 # 繁体中文
-│   ├── es-ES/                 # 西班牙语
-│   ├── ja-JP/                 # 日语
-│   ├── ko-KR/                 # 韩语
-│   └── cs-CZ/                 # 捷克语
-├── 总文档/                     # 需求和架构文档（中文）
-└── README.md                  # 项目说明
+│   ├── SiliconLife.Core/            # 核心接口和抽象类
+│   ├── SiliconLife.Common/          # 共享实现（两个版本共用）
+│   ├── SiliconLife.Default/         # 默认实现 + 入口点（控制台版）
+│   ├── SiliconLife.Fast/            # 高性能实现 + 入口点（窗体版）
+│   ├── SiliconLife.Speedy/          # SpeedyPack 高性能存储引擎
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理工具（WPF）
+├── docs/                            # 文档（多语言，21 种语言变体）
+│   ├── en/                          # 英语
+│   ├── zh-CN/                       # 简体中文
+│   ├── zh-HK/                       # 繁体中文
+│   ├── es-ES/                       # 西班牙语
+│   ├── ja-JP/                       # 日语
+│   ├── ko-KR/                       # 韩语
+│   └── cs-CZ/                       # 捷克语
+├── 总文档/                           # 需求和架构文档（中文）
+└── README.md                        # 项目说明
 ```
 
 ## 需要帮助？

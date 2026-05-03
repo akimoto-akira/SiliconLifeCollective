@@ -1,4 +1,4 @@
-﻿# Arquitectura
+# Arquitectura
 
 > **Versión: v0.1.0-alpha**
 
@@ -18,10 +18,10 @@ Este proyecto proporciona dos versiones de implementación que comparten el mism
 ### SiliconLife.Fast (Versión de Alto Rendimiento)
 - **Posicionamiento**: Versión de producción principal
 - **Modo de Ejecución**: Aplicación de formularios Windows (con soporte de bandeja del sistema)
-- **Almacenamiento**: Almacenamiento en memoria + persistencia por lotes asíncrona (registro WAL)
+- **Almacenamiento**: Almacenamiento en memoria SpeedyPack + persistencia por lotes asíncrona (formato de archivo .spk)
 - **Escenario de Aplicación**: Escenarios de alta concurrencia, baja latencia, gran volumen de datos
 - **Mejora de Rendimiento**: Latencia de lectura de almacenamiento reducida 1000 veces, latencia de escritura reducida 15000 veces
-- **Descripción de Rol**: Implementación de nivel de producción con optimización profunda que incluye ejecución en segundo plano de la bandeja del sistema y optimización extrema de rendimiento, la mejor opción para operaciones a largo plazo y entornos de producción reales
+- **Descripción de Rol**: Implementación de nivel de producción con optimización profunda que incluye ejecución en segundo plano de la bandeja del sistema, motor SpeedyPack + compresión automática, la mejor opción para operaciones a largo plazo y entornos de producción reales
 
 > **Nota**: La arquitectura descrita en este documento se aplica a ambas versiones, con diferencias solo en la parte de implementación de almacenamiento. SiliconLife.Default es la referencia de verificación de arquitectura, SiliconLife.Fast es la versión principal para entornos de producción.
 
@@ -117,6 +117,10 @@ Esto asegura respuesta a interacciones de usuario sin interferir con tareas en p
 │  │  │Cliente IA│  │Ejecutores│  │  Gestor de       │  │   │
 │  │  │          │  │          │  │   Herramientas   │  │   │
 │  │  └──────────┘ └──────────┘ └──────────────────┘  │   │
+│  │  ┌──────────┐ ┌──────────┐                        │   │
+│  │  │Cargador  │ │Red de    │                        │   │
+│  │  │de Plugins│ │Conocim.  │                        │   │
+│  │  └──────────┘ └──────────┘                        │   │
 │  └──────────────────────────────────────────────────┘   │
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐   │
@@ -547,4 +551,161 @@ data/
         ├── state.json
         ├── code.enc
         └── permission.enc
+```
+
+---
+
+## Motor de Almacenamiento SpeedyPack
+
+SiliconLife.Fast usa el motor de almacenamiento SpeedyPack propio (formato .spk), reemplazando la solución LiteDB anterior, logrando rendimiento extremo de lectura y escritura.
+
+### Diseño de Arquitectura
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    SpeedyPack                             │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
+│  │ DirectoryMap  │  │  EntryCache   │  │  WriteQueue   │  │
+│  │ (Mapeo de    │  │  (Caché de    │  │ (Cola de      │  │
+│  │  directorio  │  │   entradas)   │  │  escritura    │  │
+│  │  en memoria) │  │               │  │  asíncrona)   │  │
+│  └──────┬───────┘  └──────┬───────┘  └───────┬───────┘  │
+│         │                  │                   │          │
+│  ┌──────▼──────────────────▼───────────────────▼───────┐  │
+│  │              PackFileReader / PackFileWriter          │  │
+│  │              (Lector/Escritor de archivos de paquete) │  │
+│  └──────────────────────────┬──────────────────────────┘  │
+│                              │                             │
+│  ┌──────────────────────────▼──────────────────────────┐  │
+│  │              Archivo .spk (MessagePack + compresión LZ4) │
+│  └─────────────────────────────────────────────────────┘  │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐                      │
+│  │  FreeList     │  │ SpeedyPack   │                      │
+│  │ (Gestión de  │  │ AutoCompactor│                      │
+│  │  espacio     │  │ (Compresión  │                      │
+│  │  libre)      │  │  automática) │                      │
+│  └──────────────┘  └──────────────┘                      │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Componentes Centrales
+
+| Componente | Descripción |
+|------|------|
+| `SpeedyPack` | Clase central, combina DirectoryMap, EntryCache y WriteQueue para proporcionar lectura/escritura de baja latencia |
+| `DirectoryMap` | Mapeo de directorios en memoria, mantiene la relación de mapeo de rutas virtuales a entradas de archivos |
+| `EntryCache` | Caché de entradas, caché de entradas accedidas recientemente basada en TTL |
+| `WriteQueue` | Cola de escritura asíncrona, encola operaciones de escritura para ejecución en hilo de fondo |
+| `FreeList` | Gestión de espacio libre, rastrea el espacio reutilizable en archivos .spk |
+| `PackFileReader` | Lector de archivos de paquete, lee datos de archivos .spk |
+| `PackFileWriter` | Escritor de archivos de paquete, escribe datos en archivos .spk |
+| `SpeedyPackAutoCompactor` | Temporizador de compresión automática, comprime periódicamente archivos .spk para recuperar espacio libre |
+| `SpeedyPackRegistry` | Gestor singleton a nivel de proceso, asegura que toda la aplicación use la misma instancia de SpeedyPack |
+
+### Adaptadores de Almacenamiento
+
+SiliconLife.Fast integra SpeedyPack en las interfaces del sistema a través de los siguientes adaptadores:
+
+| Adaptador | Interfaz | Descripción |
+|--------|------|------|
+| `SpeedyStorage` | `IStorage` | Adaptador de almacenamiento de clave-valor general |
+| `SpeedyTimeStorage` | `ITimeStorage` | Adaptador de almacenamiento indexado por tiempo |
+| `SpeedyWorkNoteStorage` | `IWorkNoteStorage` | Adaptador de almacenamiento de notas de trabajo |
+
+### Opciones de Configuración
+
+`SpeedyPackOptions` proporciona las siguientes configuraciones:
+
+| Opción | Tipo | Valor Predeterminado | Descripción |
+|------|------|--------|------|
+| `CacheTtl` | `TimeSpan` | 5 minutos | Tiempo de vida de las entradas en caché |
+| `MaxCacheEntries` | `int` | 1000 | Número máximo de entradas en caché |
+| `ReadOnly` | `bool` | false | Modo de solo lectura |
+
+### Soporte de Transacciones
+
+SpeedyPack soporta operaciones de escritura atómica a través de la interfaz `IPackTransaction`:
+
+- `SpeedyTransaction` implementa el mecanismo de transacciones
+- Soporta atomicidad para escrituras por lotes
+- Al confirmar la transacción, todas las operaciones de escritura tienen éxito completamente o se revierten completamente
+
+---
+
+## Sistema de Plugins
+
+SiliconLife soporta extensión de funcionalidad a través del sistema de plugins, permitiendo a desarrolladores de terceros añadir nuevas funcionalidades a la plataforma.
+
+### Interfaz Central
+
+```csharp
+public interface IPlugin
+{
+    string Id { get; }
+    string GetName(Language language);
+    string Version { get; }
+    string GetDescription(Language language);
+    string GetAuthor(Language language);
+    void OnLoad();
+    void OnStart();
+    void OnStop();
+    void OnUnload();
+}
+```
+
+### Cargador de Plugins
+
+`PluginLoader` es responsable de cargar DLLs de plugins desde un directorio especificado y ejecutar comprobaciones de seguridad estrictas:
+
+1. **Escaneo de directorio** — Escanea todos los archivos .dll en el directorio de plugins
+2. **Escaneo de seguridad** — Verifica si el plugin referencia espacios de nombres prohibidos
+3. **Carga aislada** — Usa `AssemblyLoadContext` personalizado para cargar plugins de forma aislada
+4. **Gestión de ciclo de vida** — Llama a los métodos OnLoad, OnStart, OnStop, OnUnload del plugin
+
+### Sandbox de Seguridad
+
+El cargador de plugins ejecuta las siguientes comprobaciones de seguridad:
+
+| Elemento de Comprobación | Descripción |
+|--------|------|
+| Espacios de nombres prohibidos | System.IO, System.Net.Http, System.Net.WebSockets, System.Net.Sockets, Microsoft.CodeAnalysis |
+| Lista blanca de ensamblados de confianza | Google.Protobuf, Newtonsoft.Json, MessagePack, Serilog, Microsoft.Extensions.Logging.Abstractions, Dapper |
+| Verificación de tipos prohibidos | Escanea tipos peligrosos referenciados en el plugin |
+| Verificación de miembros prohibidos | Escanea métodos peligrosos llamados en el plugin |
+
+### Integración de Herramientas
+
+Los plugins pueden registrar herramientas personalizadas implementando la interfaz `ITool`:
+
+- El método `ToolManager.ScanAllPluginAssemblies()` escanea implementaciones de ITool en todos los plugins cargados
+- Las herramientas del plugin se integran automáticamente al ciclo de invocación de herramientas
+- Las herramientas del plugin están sujetas a las mismas restricciones del sistema de permisos
+
+### Ciclo de Vida del Plugin
+
+```
+Carga (OnLoad) → Inicio (OnStart) → En ejecución → Detención (OnStop) → Descarga (OnUnload)
+```
+
+---
+
+## Estados de Actividad del Ser Silicona
+
+Los Seres Silicona tienen los siguientes estados de actividad:
+
+| Estado | Descripción |
+|------|------|
+| `Idle` | Estado inactivo, esperando activación por reloj |
+| `Running` | Ejecutando una ronda de solicitud de IA + invocación de herramientas |
+| `WaitingPermission` | Esperando aprobación de permisos del usuario |
+| `Stopped` | Detenido, por error o detención manual |
+
+Transiciones de estado:
+```
+Idle → Running → Idle (completado normalmente)
+Running → WaitingPermission → Running (continúa después de aprobación de permisos)
+Running → Stopped (error o detención manual)
+Stopped → Idle (reiniciado)
 ```

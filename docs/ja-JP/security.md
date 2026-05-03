@@ -1,8 +1,8 @@
-﻿# セキュリティ設計
+# セキュリティ設計
 
 > **バージョン: v0.1.0-alpha**
 
-[English](../en/security.md) | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | **日本語** | [한국어](../ko-KR/security.md) | [Čeština](../cs-CZ/security.md)
+[English](../en/security.md) | [Deutsch](../de-DE/security.md) | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | **日本語** | [한국어](../ko-KR/security.md) | [Čeština](../cs-CZ/security.md)
 
 ## 概要
 
@@ -32,9 +32,9 @@ Silicon Life Collective のセキュリティは**多層防御**モデルに基�
 
 | 結果 | 動作 |
 |--------|----------|
-| [Deutsch](../de-DE/security.md) | **Allowed（許可）** | 操作は直ちに進行 |
-| [Deutsch](../de-DE/security.md) | **Denied（拒否）** | 操作はブロックされ、監査ログに記録 |
-| [Deutsch](../de-DE/security.md) | **AskUser（ユーザーに確認）** | 操作は一時停止。ユーザー確認が必要 |
+| **Allowed（許可）** | 操作は直ちに進行 |
+| **Denied（拒否）** | 操作はブロックされ、監査ログに記録 |
+| **AskUser（ユーザーに確認）** | 操作は一時停止。ユーザー確認が必要 |
 
 ### 特別なロール：シリコン管理人
 
@@ -168,8 +168,8 @@ Silicon Life Collective のセキュリティは**多層防御**モデルに基�
 
 | キャッシュ | 用途 |
 |-------|---------|
-| [Deutsch](../de-DE/security.md) | **HighAllow（高許可）** | ユーザーが頻繁に許可するリソース |
-| [Deutsch](../de-DE/security.md) | **HighDeny（高拒否）** | ユーザーが頻繁に拒否するリソース |
+| **HighAllow（高許可）** | ユーザーが頻繁に許可するリソース |
+| **HighDeny（高拒否）** | ユーザーが頻繁に拒否するリソース |
 
 ### 動作原理
 
@@ -308,3 +308,41 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 - **管理人のみアクセス** — `TokenAuditTool`（`[SiliconManagerOnly]` でマーク）は、管理人がトークン使用をクエリおよび集計することを許可。
 - **Web ダッシュボード** — `AuditController` は、トレンドグラフとデータエクスポート付きのブラウザベースダッシュボードを提供。
 - **永続化ストレージ** — 記録は `ITimeStorage` を介して保存。時系列クエリと長期分析用。
+
+---
+
+## プラグインセキュリティ
+
+プラグインシステムはサードパーティコード実行のセキュリティリスクを導入する。以下のメカニズムで緩和：
+
+### セキュリティサンドボックス
+
+`PluginLoader` はプラグインのロード時に厳格なセキュリティスキャンを実行：
+
+1. **禁止名前空間チェック** — プラグインは以下の名前空間を参照できない：
+   - `System.IO` — ファイルシステムアクセス
+   - `System.Net.Http` — HTTP リクエスト
+   - `System.Net.WebSockets` — WebSocket 接続
+   - `System.Net.Sockets` — 生ソケット
+   - `Microsoft.CodeAnalysis` — コンパイラ API
+
+2. **信頼できるアセンブリホワイトリスト** — 以下のアセンブリの参照が許可：
+   - `Google.Protobuf`、`Newtonsoft.Json`、`MessagePack`
+   - `Serilog`、`Microsoft.Extensions.Logging.Abstractions`
+   - `Dapper`
+
+3. **禁止タイプチェック** — プラグイン内で参照される危険なタイプをスキャン
+
+4. **禁止メンバーチェック** — プラグイン内で呼び出される危険なメソッドをスキャン
+
+### 分離ロード
+
+- カスタム `AssemblyLoadContext` を使用して各プラグインを分離ロード
+- プラグイン間のタイプとアセンブリは互いに干渉しない
+- プラグインのアンロード時に関連リソースを解放可能
+
+### ツール権限制約
+
+- プラグインが `ITool` インターフェースを介して登録するツールは、同じ権限システムの制約を受ける
+- プラグインツールは5段階権限チェーンをバイパスできない
+- プラグインツールは `[SiliconManagerOnly]` マークの制約を受ける

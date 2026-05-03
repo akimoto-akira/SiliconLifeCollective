@@ -2,7 +2,7 @@
 
 > **버전: v0.1.0-alpha**
 
-[English](../en/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | **한국어** | [Deutsch](../de-DE/development-guide.md) | [Čeština](../cs-CZ/development-guide.md)
+[English](../en/development-guide.md) | [Deutsch](../de-DE/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | **한국어** | [Čeština](../cs-CZ/development-guide.md)
 
 ## 아키텍처 개요
 
@@ -13,11 +13,13 @@ SiliconLifeCollective는 핵심 인터페이스와 기본 구현 간 엄격한 �
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/      # 인터페이스, 추상화, 공통 인프라
-│   ├── SiliconLife.Common/    # 공유 구현 (두 버전 모두 사용)
-│   ├── SiliconLife.Default/   # 기본 구현, 진입점 (아키텍처 실현 가능성 검증)
-│   └── SiliconLife.Fast/      # 고성능 구현, 진입점 (주력 프로덕션 버전)
-└── docs/                      # 다국어 문서
+│   ├── SiliconLife.Core/            # 인터페이스, 추상화, 공통 인프라
+│   ├── SiliconLife.Common/          # 공유 구현 (두 버전 모두 사용)
+│   ├── SiliconLife.Default/         # 기본 구현, 진입점 (아키텍처 실현 가능성 검증)
+│   ├── SiliconLife.Fast/            # 고성능 구현, 진입점 (주력 프로덕션 버전)
+│   ├── SiliconLife.Speedy/          # SpeedyPack 고성능 스토리지 엔진
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 관리 도구 (WPF)
+└── docs/                            # 다국어 문서
 ```
 
 **의존 방향**:
@@ -27,7 +29,7 @@ SiliconLifeCollective/
 
 **버전 역할 설명**:
 - **SiliconLife.Default**: 기본 구현, 아키텍처 실현 가능성 검증에 주로 사용. 단순하고 신뢰성 높은 파일 시스템 저장소 구현을 제공하며, 개발 디버깅과 아키텍처 검증에 적합합니다.
-- **SiliconLife.Fast**: 주력 프로덕션 버전. Default에서 검증된 아키텍처 기반 위에 메모리 저장소 + 비동기 영속성을 채택하여 극한의 성능 최적화를 제공합니다. 장기 운영 및 실제 프로덕션 환경의 최선의 선택입니다.
+- **SiliconLife.Fast**: 주력 프로덕션 버전. Default에서 검증된 아키텍처 기반 위에 SpeedyPack 메모리 스토리지 + 비동기 영속성을 채택하여 극한의 성능 최적화를 제공합니다. 장기 운영 및 실제 프로덕션 환경의 최선의 선택입니다.
 
 ## 핵심 개념
 
@@ -203,6 +205,50 @@ public class MyCustomSkin : ISkin
 
 2. 스킨은 `SkinManager`에 의해 자동으로 검색됩니다.
 
+### 새 플러그인 추가
+
+1. 클래스 라이브러리 프로젝트를 생성하고 `IPlugin` 인터페이스를 구현합니다:
+
+```csharp
+using SiliconLife.Collective;
+using SiliconLife.Collective.Localization;
+using SiliconLife.Collective.Tools;
+
+public class MyPlugin : IPlugin
+{
+    public string Id => "my-plugin";
+    public string Version => "1.0.0";
+    
+    public string GetName(Language language) => "My Plugin";
+    public string GetDescription(Language language) => "A custom plugin";
+    public string GetAuthor(Language language) => "Author Name";
+    
+    public void OnLoad() { }
+    public void OnStart() { }
+    public void OnStop() { }
+    public void OnUnload() { }
+}
+```
+
+2. (선택사항) 플러그인에서 `ITool` 인터페이스를 구현하여 사용자 정의 도구를 등록합니다:
+
+```csharp
+public class MyPluginTool : ITool
+{
+    public string Name => "my_plugin_tool";
+    public string Description => "A tool provided by my plugin";
+    
+    public async Task<ToolResult> ExecuteAsync(ToolCall call)
+    {
+        return new ToolResult { Success = true, Output = "Done" };
+    }
+}
+```
+
+3. 컴파일된 DLL을 플러그인 디렉토리에 넣으면 `PluginLoader`가 자동으로 로드합니다.
+
+> **보안 제한**: 플러그인은 `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` 등의 네임스페이스를 참조할 수 없습니다. 플러그인은 `AssemblyLoadContext`를 통해 격리 로드됩니다.
+
 ## 코드 스타일 가이드라인
 
 ### 명명 규칙
@@ -373,9 +419,10 @@ public class MyToolTests
 
 ### 저장소 시스템
 
-- 저장소 시스템은 **성능보다 기능**을 우선시합니다
-- 기본적으로 파일 기반 JSON 저장소 사용
-- 시간 인덱스 쿼리는 디렉토리 구조 사용
+- Default 버전은 파일 기반 JSON 저장소 사용
+- Fast 버전은 SpeedyPack 메모리 스토리지 엔진 사용 (.spk 형식)
+- SpeedyPack은 메모리 디렉토리 매핑 + 엔트리 캐시 + 비동기 쓰기 큐 채택
+- 시간 인덱스 쿼리는 `ITimeStorage` 인터페이스 사용
 
 ### MainLoop 스케줄러
 
