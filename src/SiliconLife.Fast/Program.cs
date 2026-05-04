@@ -363,6 +363,20 @@ public class Program
     public static void RequestExit()
     {
         _shouldExit = true;
+
+        // Break the Windows Forms message loop (Application.Run) so the
+        // post-Run shutdown sequence can execute. Safe to call from any thread.
+        try
+        {
+            if (System.Windows.Forms.Application.MessageLoop)
+            {
+                System.Windows.Forms.Application.Exit();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(null, "Application.Exit() failed during RequestExit", ex);
+        }
     }
 
     /// <summary>
