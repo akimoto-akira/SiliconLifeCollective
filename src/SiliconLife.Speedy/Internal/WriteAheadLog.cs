@@ -16,14 +16,15 @@ using System.Text;
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// 预写日志 (Write-Ahead Log) 管理器。
-/// 在批次写入主 .spk 文件之前，先把操作以"记录 + CRC"的形式追加写入 .wal
-/// 文件，并 fsync 到磁盘。只有当 .spk 文件的新 Header 槽位也成功落盘之后，
-/// WAL 才会被截断。这样无论在哪一步崩溃，重启时都能通过重放 WAL 将主文件
-/// 恢复到最近一次已提交批次之后的一致状态。
+/// Write-Ahead Log (WAL) manager.
+/// Before batch writing to the main .spk file, operations are first appended to the .wal
+/// file in "record + CRC" form and fsynced to disk. Only after the new Header slot of the .spk
+/// file has been successfully flushed to disk will the WAL be truncated. This way, no matter
+/// at which step a crash occurs, the main file can be recovered to a consistent state after
+/// the most recently committed batch by replaying the WAL upon restart.
 /// </summary>
 /// <remarks>
-/// 记录格式（小端字节序）：
+/// Record format (little-endian):
 ///   [0..4)  Magic "WALR"            (uint32)
 ///   [4..5)  RecordVersion = 1       (byte)
 ///   [5..6)  Type: 1=Write,2=Delete,0xFF=Commit (byte)
@@ -32,11 +33,11 @@ namespace SiliconLife.Speedy.Internal;
 ///     Write:  PathLen(uint16) + Path(UTF-8) + CtLen(byte) + CT(ASCII)
 ///             + DataLen(int32) + Data
 ///     Delete: PathLen(uint16) + Path(UTF-8)
-///     Commit: (空)
+///     Commit: (empty)
 ///   [tail..tail+4) CRC32 covering all preceding bytes of this record.
 ///
-/// 只有紧跟着 Commit 记录的那一批 Write/Delete 才算已提交；其余视作未完成，
-/// 重启时将被跳过。
+/// Only the batch of Write/Delete operations immediately followed by a Commit record is
+/// considered committed; the rest are treated as incomplete and will be skipped upon restart.
 /// </remarks>
 internal sealed class WriteAheadLog : IDisposable
 {
@@ -61,7 +62,7 @@ internal sealed class WriteAheadLog : IDisposable
         _filePath = filePath;
     }
 
-    /// <summary>打开（或创建）WAL 文件。</summary>
+    /// <summary>Opens (or creates) the WAL file.</summary>
     public void Open()
     {
         lock (_lock)
@@ -76,8 +77,8 @@ internal sealed class WriteAheadLog : IDisposable
     }
 
     /// <summary>
-    /// 将一个批次的 Write/Delete 操作以及 Commit 标记原子性地追加到 WAL，
-    /// 并强制刷盘。返回该批次的 BatchId。
+    /// Atomically appends a batch of Write/Delete operations and a Commit marker to the WAL,
+    /// and forces a flush to disk. Returns the BatchId of this batch.
     /// </summary>
     public long AppendBatch(IReadOnlyList<WriteOperation> ops)
     {
@@ -109,8 +110,8 @@ internal sealed class WriteAheadLog : IDisposable
     }
 
     /// <summary>
-    /// 清空 WAL。应当在主文件的新 Header 槽位已 fsync 之后调用，意味着此前
-    /// 的所有已提交批次都已真正生效。
+    /// Clears the WAL. Should be called after the new Header slot of the main file has been
+    /// fsynced, meaning all previously committed batches have truly taken effect.
     /// </summary>
     public void Truncate()
     {
@@ -124,8 +125,8 @@ internal sealed class WriteAheadLog : IDisposable
     }
 
     /// <summary>
-    /// 扫描 WAL，返回所有"已提交且完整"的批次（按 BatchId 升序）。
-    /// 任何不完整 / CRC 失败 / 未跟随 Commit 的记录都会被静默丢弃。
+    /// Scans the WAL and returns all "committed and complete" batches (in ascending BatchId order).
+    /// Any incomplete / CRC failure / non-Commit-following records are silently discarded.
     /// </summary>
     public IReadOnlyList<IReadOnlyList<WriteOperation>> RecoverCommittedBatches()
     {
@@ -155,7 +156,7 @@ internal sealed class WriteAheadLog : IDisposable
                     }
                     else
                     {
-                        // 允许空批次（没有 write/delete 只有 commit）— 不常见但视为已提交的空操作
+                        // Allow empty batches (no write/delete, only commit) — rare but treated as committed no-op
                         committed.Add((batchId, new List<WriteOperation>()));
                     }
                 }
@@ -181,7 +182,7 @@ internal sealed class WriteAheadLog : IDisposable
         }
     }
 
-    // ─── 记录写入 ─────────────────────────────────────────────────────────────
+    // ─── Record Writing ─────────────────────────────────────────────────────────────
 
     private static void WriteWriteRecord(Stream stream, long batchId, WriteEntry we)
     {
@@ -251,9 +252,9 @@ internal sealed class WriteAheadLog : IDisposable
         stream.Write(crcBytes, 0, 4);
     }
 
-    // ─── 记录读取 ─────────────────────────────────────────────────────────────
+    // ─── Record Reading ─────────────────────────────────────────────────────────────
 
-    /// <summary>尝试读取下一条记录。失败时返回 null 并回退 stream 位置。</summary>
+    /// <summary>Tries to read the next record. Returns null and rewinds stream position on failure.</summary>
     private static (byte Type, long BatchId, WriteOperation? Op)? TryReadRecord(Stream stream)
     {
         var startPos = stream.Position;

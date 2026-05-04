@@ -108,6 +108,14 @@ public static class HelpTopics
         },
         new()
         {
+            Id = "volcengine-ark",
+            PropertyName = nameof(HelpLocalizationBase.VolcengineArk),
+            TitlePropertyName = nameof(HelpLocalizationBase.VolcengineArk_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.VolcengineArk_Tags),
+            Icon = "🌋"
+        },
+        new()
+        {
             Id = "ai-clients",
             PropertyName = nameof(HelpLocalizationBase.AIClients),
             TitlePropertyName = nameof(HelpLocalizationBase.AIClients_Title),

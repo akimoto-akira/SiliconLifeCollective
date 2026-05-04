@@ -20,69 +20,65 @@ using System.Text.Json.Serialization;
 namespace SiliconLife.Common.AI;
 
 /// <summary>
-/// DashScope (Alibaba Cloud Bailian) API request model (OpenAI-compatible format)
+/// Volcengine Ark API request model (OpenAI-compatible format)
 /// </summary>
-internal class DashScopeRequest
+internal class VolcengineArkRequest
 {
     public string Model { get; set; } = string.Empty;
-    public List<DashScopeMessage> Messages { get; set; } = new();
+    public List<VolcengineArkMessage> Messages { get; set; } = new();
     [JsonPropertyName("tools")]
-    public List<DashScopeTool>? Tools { get; set; }
+    public List<VolcengineArkTool>? Tools { get; set; }
     public bool Stream { get; set; } = false;
 }
 
 /// <summary>
-/// DashScope API message model (OpenAI-compatible format)
+/// Volcengine Ark API message model (OpenAI-compatible format)
 /// </summary>
-internal class DashScopeMessage
+internal class VolcengineArkMessage
 {
     public string Role { get; set; } = string.Empty;
     public string? Content { get; set; }
     [JsonPropertyName("reasoning_content")]
     public string? ReasoningContent { get; set; }
     [JsonPropertyName("tool_calls")]
-    public List<DashScopeToolCall>? ToolCalls { get; set; }
+    public List<VolcengineArkToolCall>? ToolCalls { get; set; }
     [JsonPropertyName("tool_call_id")]
     public string? ToolCallId { get; set; }
 }
 
 /// <summary>
-/// DashScope tool call in assistant response
+/// Volcengine Ark tool call in assistant response
 /// </summary>
-internal class DashScopeToolCall
+internal class VolcengineArkToolCall
 {
     [JsonPropertyName("id")]
     public string? Id { get; set; }
     public string Type { get; set; } = "function";
-    public DashScopeToolCallFunction? Function { get; set; }
+    public VolcengineArkToolCallFunction? Function { get; set; }
 }
 
 /// <summary>
-/// DashScope tool call function definition
+/// Volcengine Ark tool call function definition
 /// </summary>
-internal class DashScopeToolCallFunction
+internal class VolcengineArkToolCallFunction
 {
     public string Name { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Arguments as a JSON string (DashScope/OpenAI returns arguments as a string, not an object)
-    /// </summary>
     public string? Arguments { get; set; }
 }
 
 /// <summary>
-/// DashScope tool definition for request
+/// Volcengine Ark tool definition for request
 /// </summary>
-internal class DashScopeTool
+internal class VolcengineArkTool
 {
     public string Type { get; set; } = "function";
-    public DashScopeToolFunction? Function { get; set; }
+    public VolcengineArkToolFunction? Function { get; set; }
 }
 
 /// <summary>
-/// DashScope tool function definition
+/// Volcengine Ark tool function definition
 /// </summary>
-internal class DashScopeToolFunction
+internal class VolcengineArkToolFunction
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
@@ -90,18 +86,18 @@ internal class DashScopeToolFunction
 }
 
 /// <summary>
-/// Alibaba Cloud DashScope (Bailian) AI client implementation.
+/// Volcengine Ark AI client implementation.
 /// Uses OpenAI-compatible API format with Bearer token authentication.
 /// Supports tool calling (function calling), streaming, and reasoning content.
 /// </summary>
-public class DashScopeClient : IAIClient
+public class VolcengineArkClient : IAIClient
 {
-    private static readonly ILogger _logger = LogManager.Instance.GetLogger<DashScopeClient>();
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<VolcengineArkClient>();
     private readonly string _apiKey;
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
 
-    // Rate control related fields
+    // Rate control fields
     private readonly SemaphoreSlim _rateSemaphore = new SemaphoreSlim(1, 1);
     private DateTime _lastRequestEndTime = DateTime.MinValue;
     private readonly TimeSpan _minRequestInterval;
@@ -109,29 +105,29 @@ public class DashScopeClient : IAIClient
     private const int BaseRetryDelayMs = 1000;
 
     /// <summary>
-    /// Gets the endpoint URL of the DashScope service
+    /// Gets the endpoint URL of the Volcengine Ark service
     /// </summary>
     public string Endpoint { get; }
 
     /// <summary>
-    /// Gets the default model name
+    /// Gets the default model (inference endpoint ID)
     /// </summary>
     public string DefaultModel { get; }
 
     /// <summary>
-    /// DashScope supports both streaming and non-streaming modes.
+    /// Volcengine Ark supports both streaming and non-streaming modes.
     /// Returns null to indicate both are supported, with streaming preferred.
     /// </summary>
     public bool? StreamingMode => null;
 
     /// <summary>
-    /// Creates a new DashScope client with the specified configuration
+    /// Creates a new Volcengine Ark client with the specified configuration
     /// </summary>
-    /// <param name="apiKey">DashScope API key for authentication</param>
-    /// <param name="endpoint">The DashScope API endpoint URL</param>
-    /// <param name="defaultModel">The default model name to use</param>
-    /// <param name="minRequestIntervalMs">Minimum interval between requests in milliseconds (default: 200ms for 300 RPM)</param>
-    public DashScopeClient(string apiKey, string endpoint, string defaultModel, int minRequestIntervalMs = 200)
+    /// <param name="apiKey">Volcengine Ark API key for authentication</param>
+    /// <param name="endpoint">The Volcengine Ark API endpoint URL</param>
+    /// <param name="defaultModel">The default inference endpoint ID to use</param>
+    /// <param name="minRequestIntervalMs">Minimum interval between requests in milliseconds (default: 200ms)</param>
+    public VolcengineArkClient(string apiKey, string endpoint, string defaultModel, int minRequestIntervalMs = 200)
     {
         _apiKey = apiKey;
         Endpoint = endpoint.TrimEnd('/');
@@ -151,7 +147,7 @@ public class DashScopeClient : IAIClient
     }
 
     /// <summary>
-    /// Sends a chat request to DashScope and returns the response
+    /// Sends a chat request to Volcengine Ark and returns the response
     /// </summary>
     public AIResponse Chat(AIRequest request)
     {
@@ -159,7 +155,7 @@ public class DashScopeClient : IAIClient
     }
 
     /// <summary>
-    /// Sends a chat request to DashScope and returns the response asynchronously.
+    /// Sends a chat request to Volcengine Ark and returns the response asynchronously.
     /// Supports tool definitions in the request and tool_calls in the response.
     /// Implements two-layer rate control:
     /// 1. Self rate control: enforces minimum interval between requests
@@ -174,12 +170,11 @@ public class DashScopeClient : IAIClient
         {
             try
             {
-                // First-layer rate control: self-imposed rate limiting
                 await EnforceRateLimitAsync();
 
                 string model = string.IsNullOrEmpty(request.Model) ? DefaultModel : request.Model;
 
-                _logger.Info(null, "DashScope request: model={0}, messages={1}, hasTools={2}, retry={3}",
+                _logger.Info(null, "VolcengineArk request: model={0}, messages={1}, hasTools={2}, retry={3}",
                     model, request.Messages.Count, request.Tools != null && request.Tools.Count > 0, retryCount);
 
                 string requestBody = BuildRequestBody(request, model, stream: false);
@@ -192,16 +187,15 @@ public class DashScopeClient : IAIClient
                 if (!response.IsSuccessStatusCode)
                 {
                     string errorBody = await response.Content.ReadAsStringAsync();
-                    _logger.Error(null, "DashScope HTTP error: {0} {1}", (int)response.StatusCode, errorBody);
+                    _logger.Error(null, "VolcengineArk HTTP error: {0} {1}", (int)response.StatusCode, errorBody);
 
-                    // Second-layer rate control: handle server rate limiting (429 errors)
                     if ((int)response.StatusCode == 429)
                     {
                         retryCount++;
                         if (retryCount <= MaxRetryCount)
                         {
                             TimeSpan waitTime = CalculateRetryDelay(retryCount, errorBody);
-                            _logger.Warn(null, "DashScope rate limited (429), retry {0}/{1} after {2}ms",
+                            _logger.Warn(null, "VolcengineArk rate limited (429), retry {0}/{1} after {2}ms",
                                 retryCount, MaxRetryCount, waitTime.TotalMilliseconds);
                             await Task.Delay(waitTime);
                             continue;
@@ -215,10 +209,9 @@ public class DashScopeClient : IAIClient
                 string json = await response.Content.ReadAsStringAsync();
                 AIResponse result = ParseChatResponse(json);
 
-                // Update the last request end time
                 UpdateLastRequestTime(requestEndTime);
 
-                _logger.Info(null, "DashScope response: model={0}, tokens={1}/{2}/{3}, hasToolCalls={4}",
+                _logger.Info(null, "VolcengineArk response: model={0}, tokens={1}/{2}/{3}, hasToolCalls={4}",
                     model, result.PromptTokens, result.CompletionTokens, result.TotalTokens, result.HasToolCalls);
 
                 return result;
@@ -226,14 +219,13 @@ public class DashScopeClient : IAIClient
             catch (HttpRequestException ex)
             {
                 lastException = ex;
-                _logger.Error(null, "DashScope connection error: {0}", ex.Message);
-                
-                // Retry on network connection errors
+                _logger.Error(null, "VolcengineArk connection error: {0}", ex.Message);
+
                 retryCount++;
                 if (retryCount <= MaxRetryCount)
                 {
                     TimeSpan waitTime = CalculateRetryDelay(retryCount, null);
-                    _logger.Warn(null, "DashScope connection error, retry {0}/{1} after {2}ms",
+                    _logger.Warn(null, "VolcengineArk connection error, retry {0}/{1} after {2}ms",
                         retryCount, MaxRetryCount, waitTime.TotalMilliseconds);
                     await Task.Delay(waitTime);
                     continue;
@@ -242,20 +234,19 @@ public class DashScopeClient : IAIClient
             }
             catch (TaskCanceledException ex)
             {
-                _logger.Warn(null, "DashScope request timeout: {0}", ex.Message);
+                _logger.Warn(null, "VolcengineArk request timeout: {0}", ex.Message);
                 return AIResponse.Failed($"Request timeout: {ex.Message}");
             }
             catch (Exception ex)
             {
                 lastException = ex;
-                _logger.Error(null, "DashScope request failed: {0}", ex.Message);
-                
-                // Retry on other exceptions
+                _logger.Error(null, "VolcengineArk request failed: {0}", ex.Message);
+
                 retryCount++;
                 if (retryCount <= MaxRetryCount)
                 {
                     TimeSpan waitTime = CalculateRetryDelay(retryCount, null);
-                    _logger.Warn(null, "DashScope unexpected error, retry {0}/{1} after {2}ms",
+                    _logger.Warn(null, "VolcengineArk unexpected error, retry {0}/{1} after {2}ms",
                         retryCount, MaxRetryCount, waitTime.TotalMilliseconds);
                     await Task.Delay(waitTime);
                     continue;
@@ -268,7 +259,7 @@ public class DashScopeClient : IAIClient
     }
 
     /// <summary>
-    /// Sends a streaming chat request to DashScope, yielding incremental token responses.
+    /// Sends a streaming chat request to Volcengine Ark, yielding incremental token responses.
     /// Each yielded AIResponse contains only the new token content.
     /// The final yield has IsStreamFinal = true and contains usage statistics.
     /// </summary>
@@ -278,7 +269,7 @@ public class DashScopeClient : IAIClient
     {
         string model = string.IsNullOrEmpty(request.Model) ? DefaultModel : request.Model;
 
-        _logger.Info(null, "DashScope stream started: model={0}", model);
+        _logger.Info(null, "VolcengineArk stream started: model={0}", model);
 
         string requestBody = BuildRequestBody(request, model, stream: true);
         StringContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
@@ -292,18 +283,18 @@ public class DashScopeClient : IAIClient
             if (!response.IsSuccessStatusCode)
             {
                 string errorBody = await response.Content.ReadAsStringAsync(cancellationToken);
-                _logger.Error(null, "DashScope stream HTTP error: {0} {1}", (int)response.StatusCode, errorBody);
+                _logger.Error(null, "VolcengineArk stream HTTP error: {0} {1}", (int)response.StatusCode, errorBody);
                 errorResponse = AIResponse.Failed($"HTTP {(int)response.StatusCode}: {errorBody}");
             }
         }
         catch (HttpRequestException ex)
         {
-            _logger.Error(null, "DashScope stream connection error: {0}", ex.Message);
+            _logger.Error(null, "VolcengineArk stream connection error: {0}", ex.Message);
             errorResponse = AIResponse.Failed($"Connection error: {ex.Message}");
         }
         catch (OperationCanceledException)
         {
-            _logger.Debug(null, "DashScope stream cancelled");
+            _logger.Debug(null, "VolcengineArk stream cancelled");
             yield break;
         }
 
@@ -356,7 +347,6 @@ public class DashScopeClient : IAIClient
 
             JsonElement choice = choices[0];
 
-            // Defensive: skip chunks without delta
             if (!choice.TryGetProperty("delta", out var delta))
                 continue;
 
@@ -381,7 +371,7 @@ public class DashScopeClient : IAIClient
                 chunk.Thinking = thinkElem.GetString();
             }
 
-            // Accumulate tool_calls (wrapped in try/catch for robustness)
+            // Accumulate tool_calls
             if (delta.TryGetProperty("tool_calls", out var tcDelta))
             {
                 try
@@ -417,7 +407,7 @@ public class DashScopeClient : IAIClient
                 }
                 catch (Exception ex)
                 {
-                    _logger.Warn(null, "DashScope stream: failed to parse tool_calls chunk: {0}", ex.Message);
+                    _logger.Warn(null, "VolcengineArk stream: failed to parse tool_calls chunk: {0}", ex.Message);
                 }
             }
 
@@ -426,7 +416,7 @@ public class DashScopeClient : IAIClient
             {
                 chunk.IsStreamFinal = true;
 
-                // Extract usage statistics from the final chunk (defensive)
+                // Extract usage statistics from the final chunk
                 if (root.TryGetProperty("usage", out var usage) &&
                     usage.ValueKind == JsonValueKind.Object)
                 {
@@ -450,7 +440,7 @@ public class DashScopeClient : IAIClient
                     }).ToList();
                 }
 
-                _logger.Info(null, "DashScope stream completed: model={0}, totalTokens={1}",
+                _logger.Info(null, "VolcengineArk stream completed: model={0}, totalTokens={1}",
                     model, chunk.TotalTokens);
             }
 
@@ -509,7 +499,7 @@ public class DashScopeClient : IAIClient
     }
 
     /// <summary>
-    /// Sends a generation request asynchronously (delegates to ChatAsync with single user message)
+    /// Sends a generation request asynchronously
     /// </summary>
     public async Task<AIResponse> GenerateAsync(string prompt)
     {
@@ -538,11 +528,11 @@ public class DashScopeClient : IAIClient
     }
 
     /// <summary>
-    /// Builds the JSON request body for DashScope API (OpenAI-compatible format)
+    /// Builds the JSON request body for Volcengine Ark API (OpenAI-compatible format)
     /// </summary>
     private string BuildRequestBody(AIRequest request, string model, bool stream)
     {
-        DashScopeRequest dashScopeRequest = new DashScopeRequest
+        VolcengineArkRequest arkRequest = new VolcengineArkRequest
         {
             Model = model,
             Messages = MapMessages(request.Messages),
@@ -552,10 +542,10 @@ public class DashScopeClient : IAIClient
         // Add tool definitions if present
         if (request.Tools != null && request.Tools.Count > 0)
         {
-            dashScopeRequest.Tools = request.Tools.Select(t => new DashScopeTool
+            arkRequest.Tools = request.Tools.Select(t => new VolcengineArkTool
             {
                 Type = "function",
-                Function = new DashScopeToolFunction
+                Function = new VolcengineArkToolFunction
                 {
                     Name = t.Name,
                     Description = t.Description,
@@ -564,15 +554,15 @@ public class DashScopeClient : IAIClient
             }).ToList();
         }
 
-        return JsonSerializer.Serialize(dashScopeRequest, _jsonOptions);
+        return JsonSerializer.Serialize(arkRequest, _jsonOptions);
     }
 
     /// <summary>
-    /// Maps core ChatMessage list to DashScope message list, preserving tool_calls and tool role
+    /// Maps core ChatMessage list to Volcengine Ark message list, preserving tool_calls and tool role
     /// </summary>
-    private static List<DashScopeMessage> MapMessages(List<ChatMessage> messages)
+    private static List<VolcengineArkMessage> MapMessages(List<ChatMessage> messages)
     {
-        List<DashScopeMessage> result = new();
+        List<VolcengineArkMessage> result = new();
 
         // Merge all system messages into one
         List<string> systemContents = new();
@@ -586,7 +576,7 @@ public class DashScopeClient : IAIClient
 
         if (systemContents.Count > 0)
         {
-            result.Add(new DashScopeMessage
+            result.Add(new VolcengineArkMessage
             {
                 Role = "system",
                 Content = string.Join("\n", systemContents)
@@ -600,7 +590,7 @@ public class DashScopeClient : IAIClient
 
             MessageRole role = msg.Role;
 
-            DashScopeMessage dashScopeMsg = new DashScopeMessage
+            VolcengineArkMessage arkMsg = new VolcengineArkMessage
             {
                 Role = MapRole(role),
                 Content = msg.Content,
@@ -615,11 +605,11 @@ public class DashScopeClient : IAIClient
                     List<ToolCall>? toolCalls = JsonSerializer.Deserialize<List<ToolCall>>(msg.ToolCallsJson);
                     if (toolCalls != null && toolCalls.Count > 0)
                     {
-                        dashScopeMsg.ToolCalls = toolCalls.Select(tc => new DashScopeToolCall
+                        arkMsg.ToolCalls = toolCalls.Select(tc => new VolcengineArkToolCall
                         {
                             Id = tc.Id,
                             Type = "function",
-                            Function = new DashScopeToolCallFunction
+                            Function = new VolcengineArkToolCallFunction
                             {
                                 Name = tc.Name,
                                 Arguments = JsonSerializer.Serialize(tc.Arguments)
@@ -633,17 +623,17 @@ public class DashScopeClient : IAIClient
             // Add tool_call_id for tool role messages
             if (role == MessageRole.Tool && !string.IsNullOrEmpty(msg.ToolCallId))
             {
-                dashScopeMsg.ToolCallId = msg.ToolCallId;
+                arkMsg.ToolCallId = msg.ToolCallId;
             }
 
-            result.Add(dashScopeMsg);
+            result.Add(arkMsg);
         }
 
         return result;
     }
 
     /// <summary>
-    /// Maps MessageRole to DashScope/OpenAI role string
+    /// Maps MessageRole to Volcengine Ark/OpenAI role string
     /// </summary>
     private static string MapRole(MessageRole role)
     {
@@ -703,7 +693,7 @@ public class DashScopeClient : IAIClient
         }
         catch (Exception ex)
         {
-            _logger.Error(null, "DashScope response parse error: {0}", ex.Message);
+            _logger.Error(null, "VolcengineArk response parse error: {0}", ex.Message);
             return AIResponse.Failed($"Failed to parse response: {ex.Message}");
         }
     }
@@ -741,10 +731,10 @@ public class DashScopeClient : IAIClient
         return toolCalls;
     }
 
-    #region 速率控制
+    #region Rate Control
 
     /// <summary>
-    /// First-layer rate control: ensures a minimum interval between the end of the previous request and the start of this request
+    /// First layer rate control: ensures minimum interval between consecutive requests
     /// </summary>
     private async Task EnforceRateLimitAsync()
     {
@@ -755,7 +745,7 @@ public class DashScopeClient : IAIClient
             if (elapsed < _minRequestInterval)
             {
                 TimeSpan waitTime = _minRequestInterval - elapsed;
-                _logger.Debug(null, "DashScope rate control: waiting {0}ms before next request", waitTime.TotalMilliseconds);
+                _logger.Debug(null, "VolcengineArk rate control: waiting {0}ms before next request", waitTime.TotalMilliseconds);
                 await Task.Delay(waitTime);
             }
         }
@@ -766,7 +756,7 @@ public class DashScopeClient : IAIClient
     }
 
     /// <summary>
-    /// Update the last request end time
+    /// Updates the last request end time
     /// </summary>
     private void UpdateLastRequestTime(DateTime endTime)
     {
@@ -782,19 +772,15 @@ public class DashScopeClient : IAIClient
     }
 
     /// <summary>
-    /// Second-layer rate control: calculates retry delay (exponential backoff strategy)
-    /// Parses Retry-After header from 429 error response (if present)
+    /// Second layer rate control: calculates retry delay with exponential backoff
     /// </summary>
     private TimeSpan CalculateRetryDelay(int retryCount, string? errorBody)
     {
-        // Exponential backoff: 1s, 2s, 4s, 8s...
         int delayMs = BaseRetryDelayMs * (int)Math.Pow(2, retryCount - 1);
-        
-        // Add random jitter (0-500ms) to avoid multiple clients retrying simultaneously
+
         int jitter = Random.Shared.Next(0, 500);
         delayMs += jitter;
 
-        // Try to parse Retry-After information from the error response
         if (!string.IsNullOrEmpty(errorBody))
         {
             try
@@ -804,14 +790,13 @@ public class DashScopeClient : IAIClient
                     error.TryGetProperty("message", out var message))
                 {
                     string messageStr = message.GetString() ?? "";
-                    
-                    // Try to parse "Please try again after X seconds" format
-                    if (messageStr.Contains("try again after") && 
+
+                    if (messageStr.Contains("try again after") &&
                         int.TryParse(new string(messageStr.Where(char.IsDigit).ToArray()), out int seconds))
                     {
                         if (seconds > 0 && seconds <= 60)
                         {
-                            _logger.Info(null, "DashScope: server suggests retry after {0}s", seconds);
+                            _logger.Info(null, "VolcengineArk: server suggests retry after {0}s", seconds);
                             return TimeSpan.FromSeconds(seconds);
                         }
                     }
@@ -819,11 +804,10 @@ public class DashScopeClient : IAIClient
             }
             catch
             {
-                // Ignore parsing errors, use default backoff strategy
+                // Ignore parse errors, use default backoff strategy
             }
         }
 
-        // Maximum delay does not exceed 30 seconds
         if (delayMs > 30000)
             delayMs = 30000;
 

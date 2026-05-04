@@ -1,4 +1,4 @@
-﻿using SiliconLife.Common.Localization;
+using SiliconLife.Common.Localization;
 
 // Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,27 +18,27 @@ using SiliconLife.Collective;
 namespace SiliconLife.Common.Calendar.ChineseHistorical;
 
 /// <summary>
-/// Database of Chinese historical dynasties and era names (年号)
+/// Database of Chinese historical dynasties and era names (Nianhao)
 /// 
 /// This class maintains a comprehensive database of Chinese dynasties and their era names,
 /// including start and end years in the Gregorian calendar.
 /// 
 /// Supported periods:
 /// - Ancient dynasties (Xia, Shang, Zhou)
-/// - Qin Dynasty (秦朝): 221-206 BCE
-/// - Han Dynasty (汉朝): 206 BCE - 220 CE
-/// - Three Kingdoms (三国): 220-280 CE
-/// - Jin Dynasty (晋朝): 265-420 CE
-/// - Southern and Northern Dynasties (南北朝): 420-589 CE
-/// - Sui Dynasty (隋朝): 581-618 CE
-/// - Tang Dynasty (唐朝): 618-907 CE
-/// - Five Dynasties and Ten Kingdoms (五代十国): 907-979 CE
-/// - Song Dynasty (宋朝): 960-1279 CE
-/// - Yuan Dynasty (元朝): 1271-1368 CE
-/// - Ming Dynasty (明朝): 1368-1644 CE
-/// - Qing Dynasty (清朝): 1644-1912 CE
-/// - Republic of China (民国): 1912-1949 CE
-/// - Common Era (公元): 1949-present
+/// - Qin Dynasty: 221-206 BCE
+/// - Han Dynasty: 206 BCE - 220 CE
+/// - Three Kingdoms: 220-280 CE
+/// - Jin Dynasty: 265-420 CE
+/// - Southern and Northern Dynasties: 420-589 CE
+/// - Sui Dynasty: 581-618 CE
+/// - Tang Dynasty: 618-907 CE
+/// - Five Dynasties and Ten Kingdoms: 907-979 CE
+/// - Song Dynasty: 960-1279 CE
+/// - Yuan Dynasty: 1271-1368 CE
+/// - Ming Dynasty: 1368-1644 CE
+/// - Qing Dynasty: 1644-1912 CE
+/// - Republic of China: 1912-1949 CE
+/// - Common Era: 1949-present
 /// </summary>
 public class ChineseHistoricalEraDatabase
 {

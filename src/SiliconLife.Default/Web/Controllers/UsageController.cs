@@ -15,13 +15,13 @@ using SiliconLife.Default.Web.Models;
 namespace SiliconLife.Default.Web;
 
 [WebCode]
-public class AuditController : Controller
+public class UsageController : Controller
 {
     private readonly SkinManager _skinManager;
     private readonly ITokenUsageAudit? _audit;
     private readonly SiliconBeingManager? _beingManager;
 
-    public AuditController()
+    public UsageController()
     {
         var locator = ServiceLocator.Instance;
         _skinManager = locator.GetService<SkinManager>()!;
@@ -31,15 +31,15 @@ public class AuditController : Controller
 
     public override void Handle()
     {
-        var path = Request.Url?.AbsolutePath ?? "/audit";
+        var path = Request.Url?.AbsolutePath ?? "/usage";
 
-        if (path == "/audit" || path == "/audit/index")
+        if (path == "/usage" || path == "/usage/index")
             Index();
-        else if (path == "/api/audit/summary")
+        else if (path == "/api/usage/summary")
             GetSummary();
-        else if (path == "/api/audit/trend")
+        else if (path == "/api/usage/trend")
             GetTrend();
-        else if (path == "/api/audit/export")
+        else if (path == "/api/usage/export")
             Export();
         else
         {
@@ -51,8 +51,8 @@ public class AuditController : Controller
     private void Index()
     {
         var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
-        var view = new Views.AuditView();
-        var vm = new Models.AuditViewModel { Skin = skin, ActiveMenu = "audit" };
+        var view = new Views.UsageView();
+        var vm = new Models.UsageViewModel { Skin = skin, ActiveMenu = "usage" };
         var html = view.Render(vm);
         RenderHtml(html);
     }
@@ -67,8 +67,8 @@ public class AuditController : Controller
                 totalPromptTokens = 0L,
                 totalCompletionTokens = 0L,
                 totalTokens = 0L,
-                byClient = new List<AuditSummaryItem>(),
-                byBeing = new List<AuditSummaryItem>()
+                byClient = new List<UsageSummaryItem>(),
+                byBeing = new List<UsageSummaryItem>()
             });
             return;
         }
@@ -147,7 +147,7 @@ public class AuditController : Controller
             };
         }
 
-        var byClient = summary.ByAIClientType.Select(kvp => new AuditSummaryItem
+        var byClient = summary.ByAIClientType.Select(kvp => new UsageSummaryItem
         {
             Key = kvp.Key,
             Name = kvp.Key,
@@ -163,7 +163,7 @@ public class AuditController : Controller
                 .ToDictionary(x => x.Guid.ToString(), x => x.Being?.Name ?? x.Guid.ToString())
             : summary.ByBeingId.Keys.ToDictionary(id => id.ToString(), id => id.ToString());
 
-        var byBeing = summary.ByBeingId.Select(kvp => new AuditSummaryItem
+        var byBeing = summary.ByBeingId.Select(kvp => new UsageSummaryItem
         {
             Key = kvp.Key.ToString(),
             Name = beingNameMap.TryGetValue(kvp.Key.ToString(), out string? name) ? name : kvp.Key.ToString(),
@@ -419,7 +419,7 @@ public class AuditController : Controller
         }
 
         Response.ContentType = "text/csv";
-        Response.Headers["Content-Disposition"] = "attachment; filename=audit_export.csv";
+        Response.Headers["Content-Disposition"] = "attachment; filename=usage_export.csv";
         var bytes = System.Text.Encoding.UTF8.GetBytes(csv.ToString());
         Response.ContentLength64 = bytes.Length;
         Response.OutputStream.Write(bytes, 0, bytes.Length);

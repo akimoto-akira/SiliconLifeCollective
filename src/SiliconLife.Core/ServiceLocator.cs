@@ -69,6 +69,9 @@ public class ServiceLocator
     /// <summary>Gets the registered factory for creating WebView, or <c>null</c>.</summary>
     public Func<SiliconBeingBase, object>? WebViewFactory => Get<Func<SiliconBeingBase, object>>();
 
+    /// <summary>Gets the registered <see cref="IProjectManager"/>, or <c>null</c>.</summary>
+    public IProjectManager? ProjectManager => Get<IProjectManager>();
+
     /// <summary>Gets the registered <typeparamref name="T"/> service, or <c>null</c>.</summary>
     public T? GetService<T>() where T : class => Get<T>();
 

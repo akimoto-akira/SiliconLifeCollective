@@ -14,9 +14,9 @@
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// 轻量级 CRC32 (IEEE 802.3 多项式 0xEDB88320) 实现。
-/// 用于 SpkHeader 双缓冲槽位的完整性校验以及 WAL 记录的完整性校验，
-/// 使我们能在崩溃重启后识别并丢弃不完整 / 被截断的写入。
+/// Lightweight CRC32 (IEEE 802.3 polynomial 0xEDB88320) implementation.
+/// Used for integrity verification of SpkHeader dual-buffer slots and WAL records,
+/// allowing us to identify and discard incomplete/truncated writes after crash recovery.
 /// </summary>
 internal static class Crc32
 {
@@ -38,7 +38,7 @@ internal static class Crc32
         return table;
     }
 
-    /// <summary>计算一段数据的 CRC32 值。</summary>
+    /// <summary>Computes the CRC32 value of a data segment.</summary>
     public static uint Compute(ReadOnlySpan<byte> data)
     {
         uint crc = 0xFFFFFFFFu;

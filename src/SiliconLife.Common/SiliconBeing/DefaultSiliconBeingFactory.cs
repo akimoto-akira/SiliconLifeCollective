@@ -275,6 +275,7 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         {
             "OllamaClient" => new OllamaClientFactory(),
             "DashScopeClient" => new DashScopeClientFactory(),
+            "VolcengineArkClient" => new VolcengineArkClientFactory(),
             _ => throw new NotSupportedException($"AI client type '{clientType}' is not supported")
         };
     }

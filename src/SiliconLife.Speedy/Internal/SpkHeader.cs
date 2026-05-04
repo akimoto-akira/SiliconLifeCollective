@@ -14,32 +14,33 @@
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// .spk 文件头部结构。采用"双缓冲 Header 槽位 + CRC32 + 单调递增 Sequence"
-/// 的设计来确保任何时刻至少有一个槽位处于一致状态：
+/// .spk file header structure. Uses a "dual-buffer Header slot + CRC32 + monotonically increasing Sequence"
+/// design to ensure at least one slot is in a consistent state at any time:
 ///
-/// 布局：
+/// Layout:
 ///   [0x0000..0x1000) HeaderSlotA (4K)
 ///   [0x1000..0x2000) HeaderSlotB (4K)
-///   [0x2000..)       数据块 / Directory 区域（由 FreeList 分配）
+///   [0x2000..)       Data block / Directory area (allocated by FreeList)
 ///
-/// 每个槽位的结构：
+/// Structure of each slot:
 ///   [0..4)   Magic "SPKY"        (4)
 ///   [4..6)   Version             (2)
 ///   [6..8)   Flags               (2)
 ///   [8..16)  DirectoryOffset     (8)
 ///   [16..20) DirectoryLength     (4)
-///   [20..28) Sequence            (8)     — 每次成功提交自增
-///   [28..32) CRC32               (4)     — 覆盖 [0..28)
-///   [32..4096) 保留（写入时填 0）
+///   [20..28) Sequence            (8)     — incremented on each successful commit
+///   [28..32) CRC32               (4)     — covers [0..28)
+///   [32..4096) Reserved (filled with 0 when writing)
 ///
-/// 提交流程始终先写数据、再写对侧空闲的槽位；成功 fsync 后对侧槽位变为
-/// "当前活动槽位"。这意味着崩溃恢复时：
-///   * 两个槽位 CRC 都有效 → 选择 Sequence 更大的作为活动槽位；
-///   * 仅一个槽位 CRC 有效 → 选择它；
-///   * 都无效 → 尝试按 v1 legacy 格式解析，然后触发升级。
+/// The commit flow always writes data first, then writes to the idle slot on the opposite side;
+/// after successful fsync, the opposite slot becomes the "current active slot". This means during
+/// crash recovery:
+///   * Both slots have valid CRC → choose the one with larger Sequence as the active slot;
+///   * Only one slot has valid CRC → choose it;
+///   * Both invalid → try parsing in v1 legacy format, then trigger upgrade.
 ///
-/// 兼容性：v1 的旧文件 Header 长度为 32B 写在 0 偏移，没有 Sequence / CRC；
-/// SpeedyPack 在 Open 时若检测到 v1 会触发全量迁移到 v2。
+/// Compatibility: v1 old files have Header length of 32B at offset 0, without Sequence / CRC;
+/// SpeedyPack triggers a full migration to v2 when v1 is detected during Open.
 /// </summary>
 internal sealed class SpkHeader
 {
@@ -62,7 +63,7 @@ internal sealed class SpkHeader
     public int DirectoryLength { get; set; }
     public long Sequence { get; set; } = 0;
 
-    /// <summary>创建一个全新的 v2 Header，Sequence=1。</summary>
+    /// <summary>Creates a brand new v2 Header with Sequence=1.</summary>
     public static SpkHeader CreateNew()
     {
         return new SpkHeader
@@ -77,8 +78,8 @@ internal sealed class SpkHeader
     }
 
     /// <summary>
-    /// 将 Header 写入指定槽位（0 或 1）。槽位整体 4K 区域会被清零并写入
-    /// 32B 的有效 payload，其余保持 0。调用者负责 fsync。
+    /// Writes the Header to the specified slot (0 or 1). The entire 4K slot area is cleared and
+    /// written with 32B of valid payload, the rest remains 0. Caller is responsible for fsync.
     /// </summary>
     public void WriteToSlot(Stream stream, int slotIndex)
     {
@@ -98,8 +99,8 @@ internal sealed class SpkHeader
     }
 
     /// <summary>
-    /// 尝试读取指定槽位的 Header 并校验 CRC。无效（Magic 错 / CRC 错 /
-    /// Version 错 / 超出文件长度）返回 null。
+    /// Tries to read the Header from the specified slot and verify CRC. Invalid (wrong Magic / CRC error /
+    /// Version error / beyond file length) returns null.
     /// </summary>
     public static SpkHeader? TryReadSlot(Stream stream, int slotIndex)
     {
@@ -137,8 +138,8 @@ internal sealed class SpkHeader
     }
 
     /// <summary>
-    /// 尝试以 v1 legacy 格式（32B，无 CRC/Sequence）读取文件开头的头部。
-    /// 仅用于识别老文件并触发迁移。
+    /// Tries to read the header at the beginning of the file in v1 legacy format (32B, no CRC/Sequence).
+    /// Only used to identify old files and trigger migration.
     /// </summary>
     public static SpkHeader? TryReadLegacyV1(Stream stream)
     {

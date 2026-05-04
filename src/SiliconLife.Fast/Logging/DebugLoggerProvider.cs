@@ -17,7 +17,7 @@ using SiliconLife.Common;
 namespace SiliconLife.Fast.Logging;
 
 /// <summary>
-/// Debug 日志提供者，在 Debug 模式下将 Warn 及以上级别的日志输出到 Debug.Log
+/// Debug logger provider, outputs Warn and above level logs to Debug.Log in Debug mode
 /// </summary>
 public sealed class DebugLoggerProvider : ILoggerProvider
 {

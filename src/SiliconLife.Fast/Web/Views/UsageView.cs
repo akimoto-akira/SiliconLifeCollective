@@ -1,8 +1,10 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,74 +17,74 @@ using SiliconLife.Common.Localization;
 
 namespace SiliconLife.Fast.Web.Views;
 
-public class AuditView : ViewBase
+public class UsageView : ViewBase
 {
     public override string Render(object model)
     {
-        var vm = model as AuditViewModel;
+        var vm = model as UsageViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.PageTitleAudit, "audit", vm.Localization, body, GetScripts(vm.Localization), GetStyles(), "audit-log");
+        return RenderPage(vm.Skin, vm.Localization.PageTitleUsage, "usage", vm.Localization, body, GetScripts(vm.Localization), GetStyles(), "usage-log");
     }
 
-    private static H RenderBody(AuditViewModel vm)
+    private static H RenderBody(UsageViewModel vm)
     {
         return H.Div(
             H.Div(
-                H.H1(vm.Localization.AuditPageHeader),
-                H.Button(vm.Localization.AuditExport).Id("export-btn").OnClick("exportAudit()").Class("export-btn")
+                H.H1(vm.Localization.UsagePageHeader),
+                H.Button(vm.Localization.UsageExport).Id("export-btn").OnClick("exportUsage()").Class("export-btn")
             ).Class("page-header"),
             H.Div(
                 H.Div(
-                    H.Span(vm.Localization.AuditTotalRequests).Class("stat-label"),
+                    H.Span(vm.Localization.UsageTotalRequests).Class("stat-label"),
                     H.Span("").Id("stat-request-count").Class("stat-value")
                 ).Class("stat-item"),
                 H.Div(
-                    H.Span(vm.Localization.AuditPromptTokens).Class("stat-label"),
+                    H.Span(vm.Localization.UsagePromptTokens).Class("stat-label"),
                     H.Span("").Id("stat-prompt-tokens").Class("stat-value")
                 ).Class("stat-item"),
                 H.Div(
-                    H.Span(vm.Localization.AuditCompletionTokens).Class("stat-label"),
+                    H.Span(vm.Localization.UsageCompletionTokens).Class("stat-label"),
                     H.Span("").Id("stat-completion-tokens").Class("stat-value")
                 ).Class("stat-item"),
                 H.Div(
-                    H.Span(vm.Localization.AuditTotalTokens).Class("stat-label"),
+                    H.Span(vm.Localization.UsageTotalTokens).Class("stat-label"),
                     H.Span("").Id("stat-total-tokens").Class("stat-value")
                 ).Class("stat-item")
             ).Class("stats-bar"),
             H.Div(
                 H.Div(
-                    H.Label(vm.Localization.AuditAIClientType).Attr("for", "client-type").Class("filter-label"),
+                    H.Label(vm.Localization.UsageAIClientType).Attr("for", "client-type").Class("filter-label"),
                     H.Select(
-                        H.Option(vm.Localization.AuditAllClientTypes).Value("")
+                        H.Option(vm.Localization.UsageAllClientTypes).Value("")
                     ).Id("client-type").Class("filter-select")
                 ).Class("filter-group"),
                 H.Div(
-                    H.Label(vm.Localization.AuditBeing).Attr("for", "being-select").Class("filter-label"),
+                    H.Label(vm.Localization.UsageBeing).Attr("for", "being-select").Class("filter-label"),
                     H.Select(
-                        H.Option(vm.Localization.AuditAllBeings).Value("")
+                        H.Option(vm.Localization.UsageAllBeings).Value("")
                     ).Id("being-select").Class("filter-select")
                 ).Class("filter-group")
             ).Class("filter-bar"),
             H.Div(
-                H.Button(vm.Localization.AuditTimeToday).OnClick("setTimeRange('today')").Class("time-btn").Id("btn-today"),
-                H.Button(vm.Localization.AuditTimeWeek).OnClick("setTimeRange('week')").Class("time-btn").Id("btn-week"),
-                H.Button(vm.Localization.AuditTimeMonth).OnClick("setTimeRange('month')").Class("time-btn active").Id("btn-month"),
-                H.Button(vm.Localization.AuditTimeYear).OnClick("setTimeRange('year')").Class("time-btn").Id("btn-year")
+                H.Button(vm.Localization.UsageTimeToday).OnClick("setTimeRange('today')").Class("time-btn").Id("btn-today"),
+                H.Button(vm.Localization.UsageTimeWeek).OnClick("setTimeRange('week')").Class("time-btn").Id("btn-week"),
+                H.Button(vm.Localization.UsageTimeMonth).OnClick("setTimeRange('month')").Class("time-btn active").Id("btn-month"),
+                H.Button(vm.Localization.UsageTimeYear).OnClick("setTimeRange('year')").Class("time-btn").Id("btn-year")
             ).Class("time-range-bar"),
             H.Div(
-                H.H3(vm.Localization.AuditTrendTitle),
+                H.H3(vm.Localization.UsageTrendTitle),
                 H.Div(
                     H.Svg().Id("trend-chart").Attr("viewBox", "0 0 800 300").Attr("preserveAspectRatio", "none"),
                     H.Div().Id("chart-tooltip").Class("chart-tooltip")
                 ).Class("chart-container"),
                 H.Div(
                     H.Span("").Class("legend-color prompt-color"),
-                    H.Span(vm.Localization.AuditTrendPrompt).Class("legend-label"),
+                    H.Span(vm.Localization.UsageTrendPrompt).Class("legend-label"),
                     H.Span("").Class("legend-color completion-color"),
-                    H.Span(vm.Localization.AuditTrendCompletion).Class("legend-label"),
+                    H.Span(vm.Localization.UsageTrendCompletion).Class("legend-label"),
                     H.Span("").Class("legend-color total-color"),
-                    H.Span(vm.Localization.AuditTrendTotal).Class("legend-label")
+                    H.Span(vm.Localization.UsageTrendTotal).Class("legend-label")
                 ).Class("chart-legend")
             ).Class("card trend-card")
         ).Class("page-content");
@@ -397,13 +399,13 @@ public class AuditView : ViewBase
                         .Add(() => {
                             var tooltipHtml = (JsSyntax)Js.Str(() => "<div class='tooltip-date'>").Op(() => "+", () => (JsSyntax)Js.Id(() => "point").Prop(() => "date"))
                                 .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"))
-                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "<div class='tooltip-row'><span class='tooltip-label'>" + loc.AuditTooltipPrompt + ":</span><span class='tooltip-value prompt-color'>"))
+                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "<div class='tooltip-row'><span class='tooltip-label'>" + loc.UsageTooltipPrompt + ":</span><span class='tooltip-value prompt-color'>"))
                                 .Op(() => "+", () => (JsSyntax)Js.Id(() => "point").Prop(() => "promptTokens").Call(() => "toLocaleString"))
                                 .Op(() => "+", () => (JsSyntax)Js.Str(() => "</span></div>"))
-                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "<div class='tooltip-row'><span class='tooltip-label'>" + loc.AuditTooltipCompletion + ":</span><span class='tooltip-value completion-color'>"))
+                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "<div class='tooltip-row'><span class='tooltip-label'>" + loc.UsageTooltipCompletion + ":</span><span class='tooltip-value completion-color'>"))
                                 .Op(() => "+", () => (JsSyntax)Js.Id(() => "point").Prop(() => "completionTokens").Call(() => "toLocaleString"))
                                 .Op(() => "+", () => (JsSyntax)Js.Str(() => "</span></div>"))
-                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "<div class='tooltip-row'><span class='tooltip-label'>" + loc.AuditTooltipTotal + ":</span><span class='tooltip-value total-color'>"))
+                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "<div class='tooltip-row'><span class='tooltip-label'>" + loc.UsageTooltipTotal + ":</span><span class='tooltip-value total-color'>"))
                                 .Op(() => "+", () => (JsSyntax)Js.Id(() => "point").Prop(() => "totalTokens").Call(() => "toLocaleString"))
                                 .Op(() => "+", () => (JsSyntax)Js.Str(() => "</span></div>"));
                             return Js.Assign(() => Js.Id(() => "tooltip").Prop(() => "innerHTML"), () => tooltipHtml);
@@ -416,17 +418,17 @@ public class AuditView : ViewBase
                 .Add(() => Js.Id(() => "tooltip").Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
             )).Stmt());
 
-        var loadAuditBody = Js.Block()
+        var loadUsageBody = Js.Block()
             .Add(() => Js.Const(() => "clientType", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "client-type")).Prop(() => "value")))
             .Add(() => Js.Const(() => "beingId", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "being-select")).Prop(() => "value")))
             .Add(() => Js.Const(() => "params", () => buildParamsExpr))
-            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/audit/summary").Op(() => "+", () => (JsSyntax)Js.Id(() => "params"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => (JsSyntax)Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "summary" }, () => (JsSyntax)loadSummaryThenBody)).Stmt())
-            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/audit/trend").Op(() => "+", () => (JsSyntax)Js.Id(() => "params"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => (JsSyntax)Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => (JsSyntax)drawTrendBody)).Stmt());
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/usage/summary").Op(() => "+", () => (JsSyntax)Js.Id(() => "params"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => (JsSyntax)Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "summary" }, () => (JsSyntax)loadSummaryThenBody)).Stmt())
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/usage/trend").Op(() => "+", () => (JsSyntax)Js.Id(() => "params"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => (JsSyntax)Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => (JsSyntax)drawTrendBody)).Stmt());
 
         var updateClientFilterBody = Js.Block()
             .Add(() => Js.Const(() => "select", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "client-type"))))
             .Add(() => Js.Const(() => "currentValue", () => Js.Id(() => "select").Prop(() => "value")))
-            .Add(() => Js.Assign(() => Js.Id(() => "select").Prop(() => "innerHTML"), () => Js.Str(() => $"<option value=''>{loc.AuditAllClientTypes}</option>")))
+            .Add(() => Js.Assign(() => Js.Id(() => "select").Prop(() => "innerHTML"), () => Js.Str(() => $"<option value=''>{loc.UsageAllClientTypes}</option>")))
             .Add(() => Js.Id(() => "clients").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "c" }, () => (JsSyntax)Js.Block()
                 .Add(() => Js.Const(() => "opt", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "option"))))
                 .Add(() => Js.Assign(() => Js.Id(() => "opt").Prop(() => "value"), () => Js.Id(() => "c").Prop(() => "key")))
@@ -444,7 +446,7 @@ public class AuditView : ViewBase
         var updateBeingFilterBody = Js.Block()
             .Add(() => Js.Const(() => "select", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "being-select"))))
             .Add(() => Js.Const(() => "currentValue", () => Js.Id(() => "select").Prop(() => "value")))
-            .Add(() => Js.Assign(() => Js.Id(() => "select").Prop(() => "innerHTML"), () => Js.Str(() => $"<option value=''>{loc.AuditAllBeings}</option>")))
+            .Add(() => Js.Assign(() => Js.Id(() => "select").Prop(() => "innerHTML"), () => Js.Str(() => $"<option value=''>{loc.UsageAllBeings}</option>")))
             .Add(() => Js.Id(() => "beings").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "b" }, () => (JsSyntax)Js.Block()
                 .Add(() => Js.Const(() => "opt", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "option"))))
                 .Add(() => Js.Assign(() => Js.Id(() => "opt").Prop(() => "value"), () => Js.Id(() => "b").Prop(() => "key")))
@@ -465,22 +467,22 @@ public class AuditView : ViewBase
                 .Add(() => Js.Id(() => "btn").Prop(() => "classList").Call(() => "remove", () => Js.Str(() => "active")).Stmt())
             )).Stmt())
             .Add(() => { JsSyntax addActiveExpr = Js.Id(() => "document").Call(() => "getElementById", () => (JsSyntax)Js.Str(() => "btn-").Op(() => "+", () => (JsSyntax)Js.Id(() => "range"))).Prop(() => "classList").Call(() => "add", () => Js.Str(() => "active")); return addActiveExpr.Stmt(); })
-            .Add(() => Js.Id(() => "loadAudit").Invoke().Stmt());
+            .Add(() => Js.Id(() => "loadUsage").Invoke().Stmt());
 
         var exportBody = Js.Block()
             .Add(() => Js.Const(() => "clientType", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "client-type")).Prop(() => "value")))
             .Add(() => Js.Const(() => "beingId", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "being-select")).Prop(() => "value")))
             .Add(() => Js.Const(() => "params", () => buildParamsExpr))
-            .Add(() => { JsSyntax exportUrl = Js.Str(() => "/api/audit/export").Op(() => "+", () => (JsSyntax)Js.Id(() => "params")); JsSyntax hrefTarget = Js.Id(() => "window").Prop(() => "location").Prop(() => "href"); return (JsSyntax)Js.Assign(() => hrefTarget, () => exportUrl); });
+            .Add(() => { JsSyntax exportUrl = Js.Str(() => "/api/usage/export").Op(() => "+", () => (JsSyntax)Js.Id(() => "params")); JsSyntax hrefTarget = Js.Id(() => "window").Prop(() => "location").Prop(() => "href"); return (JsSyntax)Js.Assign(() => hrefTarget, () => exportUrl); });
 
         return Js.Block()
             .Add(() => Js.Let(() => "currentTimeRange", () => Js.Str(() => "month")))
             .Add(() => Js.Let(() => "beingNames", () => Js.Id(() => "{}")))
-            .Add(() => Js.Func(() => "loadAudit", () => new List<string>(), () => loadAuditBody))
+            .Add(() => Js.Func(() => "loadUsage", () => new List<string>(), () => loadUsageBody))
             .Add(() => Js.Func(() => "updateClientFilter", () => new List<string> { "clients" }, () => updateClientFilterBody))
             .Add(() => Js.Func(() => "updateBeingFilter", () => new List<string> { "beings" }, () => updateBeingFilterBody))
             .Add(() => Js.Func(() => "setTimeRange", () => new List<string> { "range" }, () => setTimeRangeBody))
-            .Add(() => Js.Func(() => "exportAudit", () => new List<string>(), () => exportBody))
-            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => (JsSyntax)Js.Id(() => "loadAudit").Invoke())));
+            .Add(() => Js.Func(() => "exportUsage", () => new List<string>(), () => exportBody))
+            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => (JsSyntax)Js.Id(() => "loadUsage").Invoke())));
     }
 }

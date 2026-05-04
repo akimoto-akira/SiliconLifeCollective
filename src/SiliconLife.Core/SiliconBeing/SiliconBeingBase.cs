@@ -35,6 +35,9 @@ public enum BeingActivity
     /// <summary>Executing a scheduled timer (corresponds to ThinkOnTimer / ThinkOnTimerStep).</summary>
     Timer,
 
+    /// <summary>Working on project tasks (corresponds to ThinkOnProject).</summary>
+    Project,
+
     /// <summary>Compressing memory (corresponds to ThinkOnMemoryCompress).</summary>
     MemoryCompression,
 

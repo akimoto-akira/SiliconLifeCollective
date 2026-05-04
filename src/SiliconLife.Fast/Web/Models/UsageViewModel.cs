@@ -11,11 +11,11 @@
 
 namespace SiliconLife.Fast.Web.Models;
 
-public class AuditViewModel : ViewModelBase
+public class UsageViewModel : ViewModelBase
 {
 }
 
-public class AuditSummaryItem
+public class UsageSummaryItem
 {
     public string Key { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;

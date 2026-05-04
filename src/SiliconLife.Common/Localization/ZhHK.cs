@@ -152,7 +152,7 @@ public class ZhHK : DefaultLocalizationBase
     public override string NavMenuChat => "聊天";
     public override string NavMenuDashboard => "儀表板";
     public override string NavMenuBeings => "矽基人";
-    public override string NavMenuAudit => "審計";
+    public override string NavMenuUsage => "用量";
     public override string NavMenuTasks => "任務";
     public override string NavMenuMemory => "記憶";
     public override string NavMenuKnowledge => "知識";
@@ -174,7 +174,7 @@ public class ZhHK : DefaultLocalizationBase
     public override string PageTitleKnowledge => "知識圖譜 - 矽基生命群";
     public override string PageTitleProjects => "專案空間管理 - 矽基生命群";
     public override string PageTitleLogs => "日誌查詢 - 矽基生命群";
-    public override string PageTitleAudit => "Token 審計 - 矽基生命群";
+    public override string PageTitleUsage => "Token 用量 - 矽基生命群";
     public override string PageTitleConfig => "系統設定 - 矽基生命群";
     public override string PageTitleExecutor => "執行器監控 - 矽基生命群";
     public override string PageTitleCodeBrowser => "程式碼瀏覽 - 矽基生命群";
@@ -602,38 +602,38 @@ public class ZhHK : DefaultLocalizationBase
     public override string LogsPrevPage => "上一頁";
     public override string LogsNextPage => "下一頁";
 
-    public override string AuditPageHeader => "Token 用量審計";
-    public override string AuditTotalTokens => "總 Token 數";
-    public override string AuditTotalRequests => "總請求數";
-    public override string AuditSuccessCount => "成功";
-    public override string AuditFailureCount => "失敗";
-    public override string AuditPromptTokens => "輸入 Token";
-    public override string AuditCompletionTokens => "輸出 Token";
-    public override string AuditStartTime => "開始時間";
-    public override string AuditEndTime => "結束時間";
-    public override string AuditFilterButton => "查詢";
-    public override string AuditEmptyState => "暫無審計記錄";
-    public override string AuditAIClientType => "AI 客戶端";
-    public override string AuditAllClientTypes => "全部類型";
-    public override string AuditGroupByClient => "按客戶端分組";
-    public override string AuditGroupByBeing => "按矽基人分組";
-    public override string AuditPrevPage => "上一頁";
-    public override string AuditNextPage => "下一頁";
-    public override string AuditBeing => "矽基人";
-    public override string AuditAllBeings => "全部矽基人";
-    public override string AuditTimeToday => "今日";
-    public override string AuditTimeWeek => "本週";
-    public override string AuditTimeMonth => "本月";
-    public override string AuditTimeYear => "本年";
-    public override string AuditExport => "匯出";
-    public override string AuditTrendTitle => "Token 用量趨勢";
-    public override string AuditTrendPrompt => "輸入 Token";
-    public override string AuditTrendCompletion => "輸出 Token";
-    public override string AuditTrendTotal => "總 Token";
-    public override string AuditTooltipDate => "日期";
-    public override string AuditTooltipPrompt => "輸入 Token";
-    public override string AuditTooltipCompletion => "輸出 Token";
-    public override string AuditTooltipTotal => "總 Token";
+    public override string UsagePageHeader => "Token 用量";
+    public override string UsageTotalTokens => "總 Token 數";
+    public override string UsageTotalRequests => "總請求數";
+    public override string UsageSuccessCount => "成功";
+    public override string UsageFailureCount => "失敗";
+    public override string UsagePromptTokens => "輸入 Token";
+    public override string UsageCompletionTokens => "輸出 Token";
+    public override string UsageStartTime => "開始時間";
+    public override string UsageEndTime => "結束時間";
+    public override string UsageFilterButton => "查詢";
+    public override string UsageEmptyState => "暫無用量記錄";
+    public override string UsageAIClientType => "AI 客戶端";
+    public override string UsageAllClientTypes => "全部類型";
+    public override string UsageGroupByClient => "按客戶端分組";
+    public override string UsageGroupByBeing => "按矽基人分組";
+    public override string UsagePrevPage => "上一頁";
+    public override string UsageNextPage => "下一頁";
+    public override string UsageBeing => "矽基人";
+    public override string UsageAllBeings => "全部矽基人";
+    public override string UsageTimeToday => "今日";
+    public override string UsageTimeWeek => "本週";
+    public override string UsageTimeMonth => "本月";
+    public override string UsageTimeYear => "本年";
+    public override string UsageExport => "匯出";
+    public override string UsageTrendTitle => "Token 用量趨勢";
+    public override string UsageTrendPrompt => "輸入 Token";
+    public override string UsageTrendCompletion => "輸出 Token";
+    public override string UsageTrendTotal => "總 Token";
+    public override string UsageTooltipDate => "日期";
+    public override string UsageTooltipPrompt => "輸入 Token";
+    public override string UsageTooltipCompletion => "輸出 Token";
+    public override string UsageTooltipTotal => "總 Token";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {
@@ -680,6 +680,9 @@ public class ZhHK : DefaultLocalizationBase
         ["DashScopeModel_glm-5.1"] = "GLM 5.1（智譜）",
         ["DashScopeModel_kimi-k2.5"] = "Kimi K2.5（長上下文）",
         ["DashScopeModel_llama-4-maverick"] = "Llama 4 Maverick",
+        ["VolcengineArkClient"] = "火山方舟引擎客戶端",
+        ["VolcengineArkApiKey"] = "API 金鑰",
+        ["VolcengineArkEndpointId"] = "推理接入點 ID",
         ["WebPort"] = "Web 連接埠",
         ["WebSkin"] = "Web 主題",
         ["UserNickname"] = "用戶暱稱"
@@ -699,6 +702,8 @@ public class ZhHK : DefaultLocalizationBase
         ["DashScopeApiKey"] = "阿里雲百鍊平台 API 金鑰",
         ["DashScopeRegion"] = "阿里雲百鍊服務地域",
         ["DashScopeModel"] = "阿里雲百鍊平台使用的模型",
+        ["VolcengineArkApiKey"] = "火山方舟引擎 API 金鑰",
+        ["VolcengineArkEndpointId"] = "火山方舟引擎推理接入點 ID",
         ["WebPort"] = "Web 伺服器連接埠",
         ["WebSkin"] = "Web 主題名稱",
         ["UserNickname"] = "人類用戶的暱稱"
@@ -765,7 +770,7 @@ public class ZhHK : DefaultLocalizationBase
         ["task"] = "任務",
         ["system"] = "系統",
         ["timer"] = "計時器",
-        ["token_audit"] = "Token審計",
+        ["token_audit"] = "Token用量",
         ["work_note"] = "工作筆記",
         ["project"] = "項目",
         ["project_task"] = "項目任務",
@@ -1580,6 +1585,9 @@ public class ZhHK : DefaultLocalizationBase
 
     public override string FormatMemoryEventTask(string content)
         => $"[任務] 執行任務，結果：{content}";
+
+    public override string FormatMemoryEventProject(string content)
+        => $"[項目] 項目思考，結果：{content}";
 
     public override string FormatMemoryEventTimer(string content)
         => $"[定時] 定時觸發，回應：{content}";

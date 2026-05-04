@@ -16,20 +16,20 @@ using MessagePack;
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// .spk 文件的写入器，对外提供 4K 对齐的 FreeList 分配器以及"数据写入 +
-/// Directory 切换 + Header 双缓冲原子提交"的安全提交协议。
+/// .spk file writer, providing a 4K-aligned FreeList allocator and a safe commit protocol of
+/// "data writing + Directory switching + Header dual-buffer atomic commit".
 /// </summary>
 /// <remarks>
-/// 文件布局（v2）：
+/// File layout (v2):
 ///   [0..4K)   HeaderSlotA
 ///   [4K..8K)  HeaderSlotB
-///   [8K..)    数据块 + Directory（通过 FreeList 分配，4K 对齐）
+///   [8K..)    Data blocks + Directory (allocated via FreeList, 4K-aligned)
 ///
-/// 提交协议（原子性关键）：
-///   1. 新数据块始终分配到新的位置（COW），绝不覆盖旧数据；
-///   2. 新 Directory 也分配到新位置；
-///   3. 新 Header 写到"对侧"空闲槽位，并在 fsync 之后切换活动槽位；
-///   4. 任意步骤崩溃，未完成的写入对旧活动槽位完全不可见。
+/// Commit protocol (atomicity key):
+///   1. New data blocks are always allocated to new locations (COW), never overwriting old data;
+///   2. New Directory is also allocated to a new location;
+///   3. New Header is written to the "opposite" idle slot, and the active slot is switched after fsync;
+///   4. At any step crash, incomplete writes are completely invisible to the old active slot.
 /// </remarks>
 internal sealed class PackFileWriter : IDisposable
 {
@@ -54,15 +54,15 @@ internal sealed class PackFileWriter : IDisposable
     }
 
     /// <summary>
-    /// 创建一个新的 v2 .spk 文件：初始化双 Header 槽位（槽位 A 有效、槽位 B 为空），
-    /// 文件长度恰好等于 TotalHeaderSize=8K。
+    /// Creates a new v2 .spk file: initializes dual Header slots (slot A valid, slot B empty),
+    /// file length exactly equals TotalHeaderSize=8K.
     /// </summary>
     public static PackFileWriter Create(string filePath)
     {
         var header = SpkHeader.CreateNew();
         var stream = new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
 
-        // 先把文件扩展到 8K，整块清零，再写有效槽位 A。
+        // First expand the file to 8K, clear the entire block, then write valid slot A.
         stream.SetLength(SpkHeader.TotalHeaderSize);
         var zeroSlot = new byte[SpkHeader.SlotSize];
         stream.Position = 0;
@@ -81,8 +81,8 @@ internal sealed class PackFileWriter : IDisposable
     }
 
     /// <summary>
-    /// 以给定的"活动 Header + 活动槽位 + 已加载的 Directory"打开文件用于写入，
-    /// 并据此重建 FreeList。
+    /// Opens the file for writing with the given "active Header + active slot + loaded Directory",
+    /// and rebuilds the FreeList accordingly.
     /// </summary>
     public static PackFileWriter Open(
         string filePath,
@@ -91,7 +91,7 @@ internal sealed class PackFileWriter : IDisposable
         int activeSlot)
     {
         var stream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
-        // 确保文件至少有双 Header 区域长度。
+        // Ensure the file is at least as long as the dual Header area.
         if (stream.Length < SpkHeader.TotalHeaderSize)
             stream.SetLength(SpkHeader.TotalHeaderSize);
 
@@ -101,8 +101,8 @@ internal sealed class PackFileWriter : IDisposable
     }
 
     /// <summary>
-    /// 根据"活动 Directory + 活动 Header Directory 区 + 文件长度"重建 FreeList。
-    /// 双 Header 区（前 8K）视为占用；任何落在 live 区域之间的间隙都视为可复用空间。
+    /// Rebuilds FreeList based on "active Directory + active Header Directory area + file length".
+    /// The dual Header area (first 8K) is treated as occupied; any gaps between live areas are treated as reusable space.
     /// </summary>
     private void BuildFreeList(IReadOnlyDictionary<string, DirectoryEntry> directory, long fileLength)
     {
@@ -110,7 +110,7 @@ internal sealed class PackFileWriter : IDisposable
 
         var occupied = new List<(long Offset, long Length)>
         {
-            // 双 Header 槽位区，永久占用。
+            // Dual Header slot area, permanently occupied.
             (0L, (long)SpkHeader.TotalHeaderSize)
         };
 
@@ -139,7 +139,7 @@ internal sealed class PackFileWriter : IDisposable
     }
 
     /// <summary>
-    /// 追加（或复用空闲块）一个数据条目，返回新的 DirectoryEntry。
+    /// Appends (or reuses a free block) a data entry, returning the new DirectoryEntry.
     /// </summary>
     public DirectoryEntry AppendEntry(string normalizedPath, byte[] data, string contentType, DateTime? createdAt = null)
     {
@@ -164,13 +164,13 @@ internal sealed class PackFileWriter : IDisposable
         }
     }
 
-    /// <summary>在保留原 CreatedAt 的前提下，重写条目到新的位置。</summary>
+    /// <summary>Rewrites the entry to a new location while preserving the original CreatedAt.</summary>
     public DirectoryEntry AppendEntryUpdate(string normalizedPath, byte[] data, string contentType, DirectoryEntry oldEntry)
     {
         return AppendEntry(normalizedPath, data, contentType, oldEntry.CreatedAt);
     }
 
-    /// <summary>将旧条目占用的对齐空间归还给 FreeList。</summary>
+    /// <summary>Returns the aligned space occupied by the old entry to the FreeList.</summary>
     public void ReleaseEntry(DirectoryEntry entry)
     {
         if (entry is null) return;
@@ -183,9 +183,9 @@ internal sealed class PackFileWriter : IDisposable
     }
 
     /// <summary>
-    /// 安全提交协议：先把新的 Directory 写到新位置并 fsync，再把新 Header
-    /// 写到对侧槽位并 fsync，然后切换活动槽位，最后把旧 Directory 区释放
-    /// 给 FreeList。中途任意崩溃都不会让活动槽位指向不完整状态。
+    /// Safe commit protocol: first writes the new Directory to a new location and fsyncs, then writes the new Header
+    /// to the opposite slot and fsyncs, then switches the active slot, and finally releases the old Directory area
+    /// to the FreeList. A crash at any point will not leave the active slot pointing to an incomplete state.
     /// </summary>
     public void WriteDirectoryAndCommit(IReadOnlyDictionary<string, DirectoryEntry> entries)
     {
@@ -194,19 +194,19 @@ internal sealed class PackFileWriter : IDisposable
             var oldDirOffset = _header.DirectoryOffset;
             var oldDirLength = _header.DirectoryLength;
 
-            // 1. 序列化并分配新 Directory 区（新位置，不覆盖旧 Directory）。
+            // 1. Serialize and allocate new Directory area (new location, does not overwrite old Directory).
             var dirBytes = MessagePackSerializer.Serialize(entries);
             var alignedSize = AlignUp(dirBytes.Length);
             var newDirOffset = AllocateSpaceInternal(alignedSize);
 
-            // 2. 写 Directory 数据并 fsync：必须在切换 Header 之前落盘。
+            // 2. Write Directory data and fsync: must be flushed to disk before switching Header.
             _stream.Position = newDirOffset;
             _writer.Write(dirBytes);
             _writer.Flush();
             _stream.Flush(flushToDisk: true);
 
-            // 3. 构造新 Header 写入对侧槽位，并 fsync。Sequence 严格自增，
-            //    确保崩溃恢复时能明确区分新旧槽位。
+            // 3. Construct new Header and write to opposite slot, then fsync. Sequence strictly increments,
+            //    ensuring clear distinction between old and new slots during crash recovery.
             var inactiveSlot = 1 - _activeSlot;
             var newHeader = new SpkHeader
             {
@@ -221,22 +221,22 @@ internal sealed class PackFileWriter : IDisposable
             _writer.Flush();
             _stream.Flush(flushToDisk: true);
 
-            // 4. Header fsync 成功后，对侧槽位正式成为活动槽位。
+            // 4. After Header fsync succeeds, the opposite slot officially becomes the active slot.
             _header = newHeader;
             _activeSlot = inactiveSlot;
 
-            // 5. 旧 Directory 区此时才能归还给 FreeList（在此之前若崩溃，
-            //    旧槽位仍然指向它，必须保持可读）。
+            // 5. Old Directory area can only be returned to FreeList at this point (if a crash occurs before this,
+            //    the old slot still points to it and must remain readable).
             if (oldDirLength > 0 && oldDirOffset >= SpkHeader.TotalHeaderSize)
                 _freeList.Release(oldDirOffset, AlignUp(oldDirLength));
         }
     }
 
-    /// <summary>兼容旧签名；等价于 WriteDirectoryAndCommit。</summary>
+    /// <summary>Compatible with old signature; equivalent to WriteDirectoryAndCommit.</summary>
     public void WriteDirectory(IReadOnlyDictionary<string, DirectoryEntry> entries)
         => WriteDirectoryAndCommit(entries);
 
-    /// <summary>强制所有已缓冲的写入落到磁盘。</summary>
+    /// <summary>Forces all buffered writes to disk.</summary>
     public void Flush()
     {
         lock (_lock)
@@ -246,19 +246,19 @@ internal sealed class PackFileWriter : IDisposable
         }
     }
 
-    /// <summary>当前活动槽位索引（供诊断与测试使用）。</summary>
+    /// <summary>Current active slot index (for diagnostics and testing).</summary>
     public int ActiveSlot
     {
         get { lock (_lock) return _activeSlot; }
     }
 
-    /// <summary>当前活动 Header 的 Sequence（供诊断使用）。</summary>
+    /// <summary>Sequence of the current active Header (for diagnostics).</summary>
     public long Sequence
     {
         get { lock (_lock) return _header.Sequence; }
     }
 
-    // ─── 内部分配器 ────────────────────────────────────────────────────────
+    // ─── Internal Allocator ────────────────────────────────────────────────────────
 
     private long AllocateSpaceInternal(long alignedLength)
     {

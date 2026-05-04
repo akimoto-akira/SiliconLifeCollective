@@ -271,7 +271,7 @@ public class DeDE : DefaultLocalizationBase
     public override string NavMenuChat => "Chat";
     public override string NavMenuDashboard => "Dashboard";
     public override string NavMenuBeings => "Silicon Beings";
-    public override string NavMenuAudit => "Audit";
+    public override string NavMenuUsage => "Nutzung";
     public override string NavMenuTasks => "Aufgaben";
     public override string NavMenuMemory => "Erinnerung";
     public override string NavMenuKnowledge => "Wissen";
@@ -293,7 +293,7 @@ public class DeDE : DefaultLocalizationBase
     public override string PageTitleKnowledge => "Wissensgraph - Silicon Life Collective";
     public override string PageTitleProjects => "Projektraumverwaltung - Silicon Life Collective";
     public override string PageTitleLogs => "Protokollabfrage - Silicon Life Collective";
-    public override string PageTitleAudit => "Token-Audit - Silicon Life Collective";
+    public override string PageTitleUsage => "Token-Nutzung - Silicon Life Collective";
     public override string PageTitleConfig => "Systemkonfiguration - Silicon Life Collective";
     public override string PageTitleExecutor => "Executor-Überwachung - Silicon Life Collective";
     public override string PageTitleCodeBrowser => "Code-Browser - Silicon Life Collective";
@@ -713,38 +713,38 @@ public class DeDE : DefaultLocalizationBase
     public override string LogsPrevPage => "Vorherige Seite";
     public override string LogsNextPage => "Nächste Seite";
 
-    public override string AuditPageHeader => "Token-Verbrauchsprüfung";
-    public override string AuditTotalTokens => "Gesamt-Token";
-    public override string AuditTotalRequests => "Gesamt-Anfragen";
-    public override string AuditSuccessCount => "Erfolg";
-    public override string AuditFailureCount => "Fehler";
-    public override string AuditPromptTokens => "Eingabe-Token";
-    public override string AuditCompletionTokens => "Ausgabe-Token";
-    public override string AuditStartTime => "Startzeit";
-    public override string AuditEndTime => "Endzeit";
-    public override string AuditFilterButton => "Abfragen";
-    public override string AuditEmptyState => "Noch keine Prüfungsprotokolle";
-    public override string AuditAIClientType => "KI-Client";
-    public override string AuditAllClientTypes => "Alle Typen";
-    public override string AuditGroupByClient => "Nach Client gruppieren";
-    public override string AuditGroupByBeing => "Nach Silicon Being gruppieren";
-    public override string AuditPrevPage => "Vorherige Seite";
-    public override string AuditNextPage => "Nächste Seite";
-    public override string AuditBeing => "Silicon Being";
-    public override string AuditAllBeings => "Alle Silicon Beings";
-    public override string AuditTimeToday => "Heute";
-    public override string AuditTimeWeek => "Diese Woche";
-    public override string AuditTimeMonth => "Dieser Monat";
-    public override string AuditTimeYear => "Dieses Jahr";
-    public override string AuditExport => "Exportieren";
-    public override string AuditTrendTitle => "Token-Verbrauchstrend";
-    public override string AuditTrendPrompt => "Eingabe-Token";
-    public override string AuditTrendCompletion => "Ausgabe-Token";
-    public override string AuditTrendTotal => "Gesamt-Token";
-    public override string AuditTooltipDate => "Datum";
-    public override string AuditTooltipPrompt => "Eingabe-Token";
-    public override string AuditTooltipCompletion => "Ausgabe-Token";
-    public override string AuditTooltipTotal => "Gesamt-Token";
+    public override string UsagePageHeader => "Token-Verbrauch";
+    public override string UsageTotalTokens => "Gesamt-Token";
+    public override string UsageTotalRequests => "Gesamt-Anfragen";
+    public override string UsageSuccessCount => "Erfolg";
+    public override string UsageFailureCount => "Fehler";
+    public override string UsagePromptTokens => "Eingabe-Token";
+    public override string UsageCompletionTokens => "Ausgabe-Token";
+    public override string UsageStartTime => "Startzeit";
+    public override string UsageEndTime => "Endzeit";
+    public override string UsageFilterButton => "Abfragen";
+    public override string UsageEmptyState => "Noch keine Nutzungsprotokolle";
+    public override string UsageAIClientType => "KI-Client";
+    public override string UsageAllClientTypes => "Alle Typen";
+    public override string UsageGroupByClient => "Nach Client gruppieren";
+    public override string UsageGroupByBeing => "Nach Silicon Being gruppieren";
+    public override string UsagePrevPage => "Vorherige Seite";
+    public override string UsageNextPage => "Nächste Seite";
+    public override string UsageBeing => "Silicon Being";
+    public override string UsageAllBeings => "Alle Silicon Beings";
+    public override string UsageTimeToday => "Heute";
+    public override string UsageTimeWeek => "Diese Woche";
+    public override string UsageTimeMonth => "Dieser Monat";
+    public override string UsageTimeYear => "Dieses Jahr";
+    public override string UsageExport => "Exportieren";
+    public override string UsageTrendTitle => "Token-Verbrauchstrend";
+    public override string UsageTrendPrompt => "Eingabe-Token";
+    public override string UsageTrendCompletion => "Ausgabe-Token";
+    public override string UsageTrendTotal => "Gesamt-Token";
+    public override string UsageTooltipDate => "Datum";
+    public override string UsageTooltipPrompt => "Eingabe-Token";
+    public override string UsageTooltipCompletion => "Ausgabe-Token";
+    public override string UsageTooltipTotal => "Gesamt-Token";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {
@@ -791,6 +791,9 @@ public class DeDE : DefaultLocalizationBase
         ["DashScopeModel_glm-5.1"] = "GLM 5.1 (Zhipu)",
         ["DashScopeModel_kimi-k2.5"] = "Kimi K2.5 (Langer Kontext)",
         ["DashScopeModel_llama-4-maverick"] = "Llama 4 Maverick",
+        ["VolcengineArkClient"] = "Volcengine Ark Client",
+        ["VolcengineArkApiKey"] = "API-Schlüssel",
+        ["VolcengineArkEndpointId"] = "Inferenz-Endpunkt-ID",
         ["WebPort"] = "Web-Port",
         ["WebSkin"] = "Web-Skin",
         ["UserNickname"] = "Benutzername"
@@ -810,6 +813,8 @@ public class DeDE : DefaultLocalizationBase
         ["DashScopeApiKey"] = "Alibaba Cloud DashScope API-Schlüssel",
         ["DashScopeRegion"] = "Alibaba Cloud DashScope Dienstregion",
         ["DashScopeModel"] = "Auf Alibaba Cloud DashScope verwendetes Modell",
+        ["VolcengineArkApiKey"] = "Volcengine Ark API-Schlüssel",
+        ["VolcengineArkEndpointId"] = "Volcengine Ark Inferenz-Endpunkt-ID",
         ["WebPort"] = "Web-Server-Port",
         ["WebSkin"] = "Web-Skin-Name",
         ["UserNickname"] = "Spitzname des menschlichen Benutzers"
@@ -879,7 +884,7 @@ public class DeDE : DefaultLocalizationBase
         ["task"] = "Aufgabe",
         ["system"] = "System",
         ["timer"] = "Timer",
-        ["token_audit"] = "Token-Audit",
+        ["token_audit"] = "Token-Nutzung",
         ["work_note"] = "Arbeitsnotiz",
         ["project"] = "Projekt",
         ["project_task"] = "Projektaufgabe",
@@ -1687,6 +1692,9 @@ public class DeDE : DefaultLocalizationBase
 
     public override string FormatMemoryEventTask(string content)
         => $"[Aufgabe] Aufgabe ausgeführt, Ergebnis: {content}";
+
+    public override string FormatMemoryEventProject(string content)
+        => $"[Projekt] Projekt-Denken, Ergebnis: {content}";
 
     public override string FormatMemoryEventTimer(string content)
         => $"[Timer] Timer ausgelöst, Reaktion: {content}";

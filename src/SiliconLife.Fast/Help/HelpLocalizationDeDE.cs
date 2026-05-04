@@ -24,6 +24,7 @@ public class HelpLocalizationDeDE : HelpLocalizationBase
   public override string Memory_Title => "Speichersystem";
   public override string OllamaSetup_Title => "Ollama-Installation und Modell-Download";
   public override string BailianDashScope_Title => "Leitfaden für die Alibaba Cloud Bailian-Plattform";
+  public override string VolcengineArk_Title => "Volcengine Ark Plattform-Benutzerhandbuch";
   public override string AIClients_Title => "KI-Client-Konfiguration";
 
   public override string BeingSoul_Title => "Soul-Datei";
@@ -78,6 +79,9 @@ public class HelpLocalizationDeDE : HelpLocalizationBase
 
   public override string[] BailianDashScope_Tags => new[]
     { "Bailian", "DashScope", "Alibaba Cloud", "Cloud-KI", "API", "Konfiguration", "Modell", "Bezahlung" };
+
+  public override string[] VolcengineArk_Tags => new[]
+    { "Volcengine", "Ark", "Doubao", "ByteDance", "Cloud-KI", "API", "Konfiguration", "Modell" };
 
   public override string[] AIClients_Tags => new[]
     { "KI-Client", "KI-Dienst", "Modell", "Konfiguration", "Lokal", "Cloud", "Ollama", "DashScope", "Einrichtung" };
@@ -2324,6 +2328,150 @@ Nach der Konfiguration von Bailian können Sie:
 - Hochwertige Cloud-KI-Modelle in Silicon Life verwenden
 - Ultrahohe Intelligenz-KI-Dienste erleben
 - Sich keine Sorgen über lokale Hardwarekonfiguration machen
+
+Viel Spaß bei der Verwendung!
+";
+
+  public override string VolcengineArk => @"
+# Volcengine Ark Plattform-Benutzerhandbuch
+
+## Was ist Volcengine Ark?
+
+Volcengine Ark ist die One-Stop-Plattform von ByteDance für große Sprachmodelle, die die Doubao-Serie und verschiedene Drittanbietermodelle (DeepSeek, GLM, Kimi, usw.) bietet.
+
+**Vorteile:**
+- Doubao Seed Serie Flaggschiff-Modelle, außergewöhnliche Intelligenz (256K Kontext)
+- Keine lokale Hardware erforderlich, läuft in der Cloud
+- Unterstützt mehrere Top-KI-Modelle
+- Pay-as-you-go-Abrechnung, sehr wettbewerbsfähige Preise
+- Vollständig kompatibel mit dem OpenAI API-Format
+- Chinesische Plattform, stabiler Zugriff ohne spezielle Netzwerkanforderungen
+
+## Registrierung und Einrichtung
+
+### Schritt 1: Volcengine-Konto registrieren
+
+1. Besuchen Sie die Volcengine-Konsole: https://console.volcengine.com
+2. Klicken Sie auf ""Kostenlose Registrierung""
+3. Schließen Sie die Registrierung ab (Telefonnummer, E-Mail)
+4. Schließen Sie die Identitätsprüfung ab
+
+### Schritt 2: Ark-Dienst aktivieren
+
+1. Melden Sie sich in der Volcengine-Konsole an
+2. Suchen Sie im linken Menü nach ""Ark""
+3. Gehen Sie zur Ark-Produktseite
+4. Klicken Sie auf ""Jetzt aktivieren""
+5. Lesen Sie die Servicevereinbarung und stimmen Sie zu
+
+### Schritt 3: Inferenz-Endpunkt erstellen
+
+Volcengine Ark verwendet ""Inferenz-Endpunkte"", um Modelle zu identifizieren, anstatt direkt Modellnamen zu verwenden.
+
+1. Gehen Sie in der Ark-Konsole zur Seite ""Inferenz-Endpunkte""
+2. Klicken Sie auf ""Inferenz-Endpunkt erstellen""
+3. Wählen Sie das gewünschte Modell aus (z.B. doubao-seed-1-6-251015)
+4. Benennen Sie Ihren Endpunkt
+5. Kopieren Sie nach der Erstellung die Endpunkt-ID (Format: ep-20241212123456-abcde)
+
+### Schritt 4: API-Schlüssel erhalten
+
+1. Finden Sie in der Ark-Konsole ""API-Schlüsselverwaltung""
+2. Klicken Sie auf ""API-Schlüssel erstellen""
+3. Benennen Sie Ihren Schlüssel (z.B. ""SiliconLife"")
+4. Kopieren und speichern Sie den API-Schlüssel (**wird nur einmal angezeigt, sicher aufbewahren**)
+
+## Volcengine Ark in Silicon Life konfigurieren
+
+### Konfigurationsschritte
+
+1. Öffnen Sie das Silicon Life-System
+2. Gehen Sie zur **⚙ Konfiguration**-Seite
+3. Wählen Sie bei ""KI-Client-Typ"" den Eintrag `VolcengineArkClientFactory`
+4. Füllen Sie in der ""KI-Konfiguration"" aus:
+   - **API-Schlüssel**: Fügen Sie Ihren API-Schlüssel ein
+   - **Inferenz-Endpunkt-ID**: Fügen Sie Ihre Inferenz-Endpunkt-ID ein (z.B. ep-20241212123456-abcde)
+   (**Nach Eingabe des API-Schlüssels ruft das System automatisch Ihre Inferenz-Endpunktliste ab**)
+5. Speichern Sie die Konfiguration
+
+**Hinweis:**
+- Der API-Schlüssel muss zuerst eingegeben werden, damit die Inferenz-Endpunkt-Dropdown-Liste geladen wird
+- Wenn das Laden fehlschlägt, können Sie die Inferenz-Endpunkt-ID manuell eingeben
+
+### Modellauswahl
+
+Volcengine Ark ruft Modelle über Inferenz-Endpunkte auf, jeder Endpunkt entspricht einem Modell.
+
+**Beliebte Modelle:**
+
+| Modellserie | Modell-ID | Merkmale |
+|------------|----------|---------|
+| **Doubao-Seed-1.8** | doubao-seed-1-8-YYMMDD | Neuestes Flaggschiff, stärkere Agent-Funktionen |
+| **Doubao-Seed-1.6** | doubao-seed-1-6-251015 | Allgemeines Modell, für den täglichen Gebrauch empfohlen |
+| **Doubao-Seed-1.6-Flash** | doubao-seed-1-6-flash | Ultra-geringe Latenz |
+| **Doubao-Seed-1.6-Lite** | doubao-seed-1-6-lite | Leicht, hervorragendes Preis-Leistungs-Verhältnis |
+| **Doubao-Seed-Code** | doubao-seed-code-preview-latest | Code-spezialisiertes Modell |
+| **Doubao-Pro-32K** | doubao-pro-32k | Klassische Profi-Version |
+| **Doubao-Lite-32K** | doubao-lite-32k | Klassische Leichtgewicht-Version |
+
+## Preise
+
+### Abrechnungsmethode
+
+Volcengine Ark verwendet **Pay-as-you-go**-Abrechnung:
+- Abrechnung nach Anzahl der Eingabe- und Ausgabe-Tokens
+- Doubao Seed Serie einheitliche Preise:
+  - Eingabe 0~32K: 0,8 Yuan/Million Tokens
+  - Ausgabe 0~32K: 8 Yuan/Million Tokens
+  - Eingabe 32K~128K: 1,2 Yuan/Million Tokens
+  - Längerer Kontext, höherer Preis
+
+### Kostenloses Kontingent
+
+- Neue Benutzer erhalten 500.000 kostenlose Inferenz-Tokens pro Modell (Identitätsprüfung erforderlich)
+- Kostenloses Kontingent gültig für 30 Tage
+- Unterstützt ""Sicherheitsmodus"", der nur das kostenlose Kontingent verbraucht und bei Erschöpfung automatisch stoppt
+
+### Tipps zur Kostenersparnis
+
+- Wählen Sie das richtige Modell (Lite-Serie bietet hervorragendes Preis-Leistungs-Verhältnis)
+- Kontrollieren Sie die Eingabelänge sinnvoll
+- Verwenden Sie Context Cache, um Kosten zu senken
+- Überprüfen Sie regelmäßig die Nutzung
+
+## FAQ
+
+### F: Was ist ein Inferenz-Endpunkt?
+
+**A:** Ein Inferenz-Endpunkt ist ein einzigartiges Konzept von Volcengine Ark. Sie erstellen zuerst einen Inferenz-Endpunkt in der Ark-Konsole, wählen das zu verwendende Modell aus, und das System weist eine Endpunkt-ID zu. Wenn Sie diese ID in Silicon Life konfigurieren, können Sie das entsprechende Modell aufrufen.
+
+### F: Wo erhalte ich meinen API-Schlüssel?
+
+**A:**
+1. Melden Sie sich in der Volcengine-Konsole an
+2. Gehen Sie zur ""API-Schlüsselverwaltung"" von Ark
+3. Erstellen Sie einen neuen API-Schlüssel
+4. Kopieren und sicher aufbewahren
+
+### F: Was ist der Unterschied zwischen Volcengine Ark und Bailian?
+
+| Funktion | Volcengine Ark | Bailian (DashScope) |
+|---------|---------------|---------------------|
+| Anbieter | ByteDance | Alibaba Cloud |
+| Flaggschiff-Modelle | Doubao Seed Serie | Qwen Serie |
+| Modellaufruf | Inferenz-Endpunkt | Direkter Modellname |
+| Preis | Sehr wettbewerbsfähig | Mittel |
+| Kostenloses Kontingent | 500K Tokens pro Modell | Kostenlose Testversion |
+| Zugriff in China | Stabil | Stabil |
+
+### F: Was tun, wenn der API-Aufruf fehlschlägt?
+
+**Prüfen:**
+1. Ist der API-Schlüssel korrekt?
+2. Ist die Inferenz-Endpunkt-ID korrekt und veröffentlicht?
+3. Ist das Kontoguthaben ausreichend?
+4. Ist das kostenlose Kontingent aufgebraucht?
+5. Läuft der Inferenz-Endpunkt?
 
 Viel Spaß bei der Verwendung!
 ";

@@ -297,7 +297,7 @@ public class JaJP : DefaultLocalizationBase
     public override string NavMenuChat => "チャット";
     public override string NavMenuDashboard => "ダッシュボード";
     public override string NavMenuBeings => "シリコンライフ";
-    public override string NavMenuAudit => "監査";
+    public override string NavMenuUsage => "使用量";
     public override string NavMenuTasks => "タスク";
     public override string NavMenuMemory => "メモリ";
     public override string NavMenuKnowledge => "ナレッジ";
@@ -319,7 +319,7 @@ public class JaJP : DefaultLocalizationBase
     public override string PageTitleKnowledge => "ナレッジグラフ - シリコンライフコレクティブ";
     public override string PageTitleProjects => "プロジェクトスペース管理 - シリコンライフコレクティブ";
     public override string PageTitleLogs => "ログクエリ - シリコンライフコレクティブ";
-    public override string PageTitleAudit => "Token監査 - シリコンライフコレクティブ";
+    public override string PageTitleUsage => "Token使用量 - シリコンライフコレクティブ";
     public override string PageTitleConfig => "システム設定 - シリコンライフコレクティブ";
     public override string PageTitleExecutor => "エグゼキューターモニタ - シリコンライフコレクティブ";
     public override string PageTitleCodeBrowser => "コードブラウザ - シリコンライフコレクティブ";
@@ -745,38 +745,38 @@ public class JaJP : DefaultLocalizationBase
     public override string LogsPrevPage => "前へ";
     public override string LogsNextPage => "次へ";
 
-    public override string AuditPageHeader => "Token使用量監査";
-    public override string AuditTotalTokens => "総Token数";
-    public override string AuditTotalRequests => "総リクエスト数";
-    public override string AuditSuccessCount => "成功";
-    public override string AuditFailureCount => "失敗";
-    public override string AuditPromptTokens => "入力Token";
-    public override string AuditCompletionTokens => "出力Token";
-    public override string AuditStartTime => "開始時間";
-    public override string AuditEndTime => "終了時間";
-    public override string AuditFilterButton => "クエリ";
-    public override string AuditEmptyState => "監査記録なし";
-    public override string AuditAIClientType => "AIクライアント";
-    public override string AuditAllClientTypes => "すべてのタイプ";
-    public override string AuditGroupByClient => "クライアント別グループ化";
-    public override string AuditGroupByBeing => "シリコンライフ別グループ化";
-    public override string AuditPrevPage => "前へ";
-    public override string AuditNextPage => "次へ";
-    public override string AuditBeing => "シリコンライフ";
-    public override string AuditAllBeings => "すべてのシリコンライフ";
-    public override string AuditTimeToday => "今日";
-    public override string AuditTimeWeek => "今週";
-    public override string AuditTimeMonth => "今月";
-    public override string AuditTimeYear => "今年";
-    public override string AuditExport => "エクスポート";
-    public override string AuditTrendTitle => "Token使用量トレンド";
-    public override string AuditTrendPrompt => "入力Token";
-    public override string AuditTrendCompletion => "出力Token";
-    public override string AuditTrendTotal => "総Token";
-    public override string AuditTooltipDate => "日付";
-    public override string AuditTooltipPrompt => "入力Token";
-    public override string AuditTooltipCompletion => "出力Token";
-    public override string AuditTooltipTotal => "総Token";
+    public override string UsagePageHeader => "Token使用量";
+    public override string UsageTotalTokens => "総Token数";
+    public override string UsageTotalRequests => "総リクエスト数";
+    public override string UsageSuccessCount => "成功";
+    public override string UsageFailureCount => "失敗";
+    public override string UsagePromptTokens => "入力Token";
+    public override string UsageCompletionTokens => "出力Token";
+    public override string UsageStartTime => "開始時間";
+    public override string UsageEndTime => "終了時間";
+    public override string UsageFilterButton => "クエリ";
+    public override string UsageEmptyState => "使用量記録なし";
+    public override string UsageAIClientType => "AIクライアント";
+    public override string UsageAllClientTypes => "すべてのタイプ";
+    public override string UsageGroupByClient => "クライアント別グループ化";
+    public override string UsageGroupByBeing => "シリコンライフ別グループ化";
+    public override string UsagePrevPage => "前へ";
+    public override string UsageNextPage => "次へ";
+    public override string UsageBeing => "シリコンライフ";
+    public override string UsageAllBeings => "すべてのシリコンライフ";
+    public override string UsageTimeToday => "今日";
+    public override string UsageTimeWeek => "今週";
+    public override string UsageTimeMonth => "今月";
+    public override string UsageTimeYear => "今年";
+    public override string UsageExport => "エクスポート";
+    public override string UsageTrendTitle => "Token使用量トレンド";
+    public override string UsageTrendPrompt => "入力Token";
+    public override string UsageTrendCompletion => "出力Token";
+    public override string UsageTrendTotal => "総Token";
+    public override string UsageTooltipDate => "日付";
+    public override string UsageTooltipPrompt => "入力Token";
+    public override string UsageTooltipCompletion => "出力Token";
+    public override string UsageTooltipTotal => "総Token";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {
@@ -823,6 +823,9 @@ public class JaJP : DefaultLocalizationBase
         ["DashScopeModel_glm-5.1"] = "GLM 5.1（Zhipu）",
         ["DashScopeModel_kimi-k2.5"] = "Kimi K2.5（長コンテキスト）",
         ["DashScopeModel_llama-4-maverick"] = "Llama 4 Maverick",
+        ["VolcengineArkClient"] = "Volcengine Arkクライアント",
+        ["VolcengineArkApiKey"] = "APIキー",
+        ["VolcengineArkEndpointId"] = "推論エンドポイントID",
         ["WebPort"] = "Webポート",
         ["WebSkin"] = "Webスキン",
         ["UserNickname"] = "ユーザーニックネーム"
@@ -842,6 +845,8 @@ public class JaJP : DefaultLocalizationBase
         ["DashScopeApiKey"] = "Alibaba Cloud DashScope APIキー",
         ["DashScopeRegion"] = "Alibaba Cloud DashScopeサービスリージョン",
         ["DashScopeModel"] = "Alibaba Cloud DashScopeで使用するモデル",
+        ["VolcengineArkApiKey"] = "Volcengine Ark APIキー",
+        ["VolcengineArkEndpointId"] = "Volcengine Ark推論エンドポイントID",
         ["WebPort"] = "Webサーバーポート",
         ["WebSkin"] = "Webスキン名",
         ["UserNickname"] = "人間ユーザーのニックネーム"
@@ -911,7 +916,7 @@ public class JaJP : DefaultLocalizationBase
         ["task"] = "タスク",
         ["system"] = "システム",
         ["timer"] = "タイマー",
-        ["token_audit"] = "Token監査",
+        ["token_audit"] = "Token使用量",
         ["work_note"] = "作業ノート",
         ["project"] = "プロジェクト",
         ["project_task"] = "プロジェクトタスク",
@@ -1726,6 +1731,9 @@ public class JaJP : DefaultLocalizationBase
 
     public override string FormatMemoryEventTask(string content)
         => $"[タスク] タスク実行、結果：{content}";
+
+    public override string FormatMemoryEventProject(string content)
+        => $"[プロジェクト] プロジェクト思考、結果：{content}";
 
     public override string FormatMemoryEventTimer(string content)
         => $"[タイマー] タイマートリガー、応答：{content}";

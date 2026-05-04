@@ -71,11 +71,11 @@ public class Router
         RegisterController(() => new LogController(), "/api/logs/list");
         RegisterController(() => new LogController(), "/api/logs/beings");
         RegisterController(() => new LogController(), "/api/logs/levels");
-        RegisterController(() => new AuditController(), "/audit");
-        RegisterController(() => new AuditController(), "/api/audit/list");
-        RegisterController(() => new AuditController(), "/api/audit/summary");
-        RegisterController(() => new AuditController(), "/api/audit/trend");
-        RegisterController(() => new AuditController(), "/api/audit/export");
+        RegisterController(() => new UsageController(), "/usage");
+        RegisterController(() => new UsageController(), "/api/usage/list");
+        RegisterController(() => new UsageController(), "/api/usage/summary");
+        RegisterController(() => new UsageController(), "/api/usage/trend");
+        RegisterController(() => new UsageController(), "/api/usage/export");
         RegisterController(() => new ConfigController(), "/config");
         RegisterController(() => new ConfigController(), "/config/save", "POST");
         RegisterController(() => new ConfigController(), "/config/aioptions", "GET");

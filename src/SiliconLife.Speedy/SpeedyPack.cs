@@ -18,21 +18,21 @@ using SiliconLife.Speedy.Internal;
 namespace SiliconLife.Speedy;
 
 /// <summary>
-/// .spk 数据包的读写入口。内部整合了：
-///   · 内存 <see cref="DirectoryMap"/>（目录索引）
-///   · <see cref="EntryCache"/>（TTL/LRU 缓存，支持 pin）
-///   · <see cref="WriteAheadLog"/>（预写日志，保证批次原子性）
-///   · <see cref="PackFileWriter"/> 的双缓冲 Header 提交协议
-/// 以实现低延迟读、异步写，并在进程正常/异常退出时都能保持文件一致性。
+/// Read/write entry point for .spk data packages. Internally integrates:
+///   · In-memory <see cref="DirectoryMap"/> (directory index)
+///   · <see cref="EntryCache"/> (TTL/LRU cache, supports pin)
+///   · <see cref="WriteAheadLog"/> (write-ahead log, ensures batch atomicity)
+///   · <see cref="PackFileWriter"/> dual-buffer Header commit protocol
+/// To achieve low-latency reads, asynchronous writes, and file consistency on both normal and abnormal process exit.
 /// </summary>
 /// <remarks>
-/// 崩溃一致性由三道防线保障：
-///   1. 数据写入遵循 Copy-on-Write：新数据和新 Directory 都写到新位置，旧版本
-///      在 Header 切换前一直可读；
-///   2. 双 Header 槽位交替写入并 fsync，保证任意时刻至少有一个槽位处于一致状态；
-///   3. WAL 记录每一批待提交操作（含数据体），若主文件的 Header 切换尚未完成，
-///      重启时可通过重放 WAL 把这一批重新应用到主文件。
-/// 线程安全：公共成员可跨线程并发调用。
+/// Crash consistency is guaranteed by three lines of defense:
+///   1. Data writes follow Copy-on-Write: new data and new Directory are written to new locations, old versions
+///      remain readable until Header switch;
+///   2. Dual Header slots are written alternately and fsynced, ensuring at least one slot is in a consistent state at any time;
+///   3. WAL records each batch of pending operations (including data bodies); if the main file's Header switch is not yet complete,
+///      this batch can be reapplied to the main file by replaying WAL upon restart.
+/// Thread safety: public members can be called concurrently across threads.
 /// </remarks>
 public sealed class SpeedyPack : IDisposable
 {
@@ -88,11 +88,11 @@ public sealed class SpeedyPack : IDisposable
     }
 
     /// <summary>
-    /// 打开现有的 .spk 文件并加载其 Directory；若文件不存在则自动创建。
-    /// 打开时会执行以下崩溃恢复动作：
-    ///   1. 若检测到旧版 v1 格式，先就地迁移到 v2；
-    ///   2. 读取双 Header 槽位并选择有效且 Sequence 最大的作为活动 Header；
-    ///   3. 扫描 .wal，重放所有"已提交但未应用"的批次并清空 WAL。
+    /// Opens an existing .spk file and loads its Directory; creates automatically if the file does not exist.
+    /// The following crash recovery actions are performed on open:
+    ///   1. If legacy v1 format is detected, migrate to v2 in place first;
+    ///   2. Read dual Header slots and select the valid one with the largest Sequence as the active Header;
+    ///   3. Scan .wal, replay all "committed but not yet applied" batches and clear WAL.
     /// </summary>
     public static SpeedyPack Open(string filePath, SpeedyPackOptions? options = null)
     {
@@ -119,10 +119,10 @@ public sealed class SpeedyPack : IDisposable
                 newReader, options.ReadOnly ? null : newWriter, newQueue, newWal);
         }
 
-        // 1. 检测 v1 旧文件并就地迁移。
+        // 1. Detect legacy v1 files and migrate in place.
         UpgradeLegacyFileIfNeeded(filePath);
 
-        // 2. 读活动 Header + 加载 Directory。
+        // 2. Read active Header + load Directory.
         var reader = PackFileReader.Open(filePath);
         var active = reader.TryReadActiveHeader()
             ?? throw new InvalidDataException(
@@ -137,10 +137,10 @@ public sealed class SpeedyPack : IDisposable
                 reader, writer: null, writeQueue: null, wal: null);
         }
 
-        // 3. 打开 writer（重建 FreeList）。
+        // 3. Open writer (rebuild FreeList).
         var writer = PackFileWriter.Open(filePath, directory, active.Header, active.Slot);
 
-        // 4. 打开 WAL 并恢复任何未应用的已提交批次。
+        // 4. Open WAL and recover any committed but not yet applied batches.
         var wal = new WriteAheadLog(filePath + ".wal");
         wal.Open();
         var pendingBatches = wal.RecoverCommittedBatches();
@@ -149,9 +149,9 @@ public sealed class SpeedyPack : IDisposable
 
         if (pendingBatches.Count > 0)
         {
-            // 将待恢复批次交给 WriteQueue 正常处理：会重新 AppendBatch、
-            // 写主文件、切换 Header、Truncate WAL。对已应用过的批次重放是
-            // 幂等的（会写到新位置并覆盖 Directory 条目）。
+            // Hand off pending recovery batches to WriteQueue for normal processing: will re-AppendBatch,
+            // write main file, switch Header, Truncate WAL. Replaying already-applied batches is
+            // idempotent (will write to new locations and overwrite Directory entries).
             foreach (var batch in pendingBatches)
             {
                 if (batch.Count > 0)
@@ -162,7 +162,7 @@ public sealed class SpeedyPack : IDisposable
         }
         else
         {
-            // 没有待恢复批次但 WAL 文件可能存在残片（Commit 未写完的半批）。
+            // No pending recovery batches but WAL file may contain fragments (half-batch with unwritten Commit).
             wal.Truncate();
         }
 
@@ -171,7 +171,7 @@ public sealed class SpeedyPack : IDisposable
     }
 
     /// <summary>
-    /// 强制创建一个新的 .spk 文件（若已存在则覆盖），并清理对应的 .wal。
+    /// Force creates a new .spk file (overwrites if already exists), and cleans up the corresponding .wal.
     /// </summary>
     public static SpeedyPack Create(string filePath, SpeedyPackOptions? options = null)
     {
@@ -179,7 +179,7 @@ public sealed class SpeedyPack : IDisposable
 
         EnsureDirectoryExists(filePath);
 
-        // 覆盖创建前清理可能存在的 WAL 残留。
+        // Clean up possible WAL residue before overwrite creation.
         var walPath = filePath + ".wal";
         if (File.Exists(walPath))
         {
@@ -199,7 +199,7 @@ public sealed class SpeedyPack : IDisposable
             reader, writer, writeQueue, wal);
     }
 
-    /// <summary>写入原始字节数据。缓存同步更新，磁盘持久化异步。</summary>
+    /// <summary>Writes raw byte data. Cache is updated synchronously, disk persistence is asynchronous.</summary>
     public void Write(string path, ReadOnlySpan<byte> data)
     {
         ThrowIfReadOnly();
@@ -210,11 +210,11 @@ public sealed class SpeedyPack : IDisposable
         _writeQueue!.Enqueue(new WriteEntry(normalizedPath, bytes, "raw"));
     }
 
-    /// <summary>写入原始字节数据（byte[] 重载）。</summary>
+    /// <summary>Writes raw byte data (byte[] overload).</summary>
     public void Write(string path, byte[] data) => Write(path, data.AsSpan());
 
     /// <summary>
-    /// 以显式 contentType（"raw" / "json" / "text"）写入字节。
+    /// Writes bytes with explicit contentType ("raw" / "json" / "text").
     /// </summary>
     public void Write(string path, byte[] data, string contentType)
     {
@@ -227,7 +227,7 @@ public sealed class SpeedyPack : IDisposable
         _writeQueue!.Enqueue(new WriteEntry(normalizedPath, data, contentType));
     }
 
-    /// <summary>序列化为 JSON 后写入。</summary>
+    /// <summary>Serializes to JSON and then writes.</summary>
     public void Write<T>(string path, T value)
     {
         ThrowIfReadOnly();
@@ -238,7 +238,7 @@ public sealed class SpeedyPack : IDisposable
         _writeQueue!.Enqueue(new WriteEntry(normalizedPath, bytes, "json"));
     }
 
-    /// <summary>读取原始字节；不存在返回 null。</summary>
+    /// <summary>Reads raw bytes; returns null if not exists.</summary>
     public byte[]? Read(string path)
     {
         var normalizedPath = PathNormalizer.Normalize(path);
@@ -254,7 +254,7 @@ public sealed class SpeedyPack : IDisposable
         return bytes;
     }
 
-    /// <summary>读取并反序列化 JSON 值；不存在返回 default。</summary>
+    /// <summary>Reads and deserializes JSON value; returns default if not exists.</summary>
     public T? Read<T>(string path)
     {
         var bytes = Read(path);
@@ -262,14 +262,14 @@ public sealed class SpeedyPack : IDisposable
         return JsonSerializer.Deserialize<T>(bytes, _jsonOptions);
     }
 
-    /// <summary>判断路径是否存在。</summary>
+    /// <summary>Checks if the path exists.</summary>
     public bool Exists(string path)
     {
         var normalizedPath = PathNormalizer.Normalize(path);
         return _directoryMap.TryGet(normalizedPath, out _);
     }
 
-    /// <summary>删除指定路径；缓存同步失效，磁盘持久化异步。</summary>
+    /// <summary>Deletes the specified path; cache is invalidated synchronously, disk persistence is asynchronous.</summary>
     public void Delete(string path)
     {
         ThrowIfReadOnly();
@@ -281,7 +281,7 @@ public sealed class SpeedyPack : IDisposable
         _writeQueue!.Enqueue(new DeleteEntry(normalizedPath) { OldEntry = oldEntry });
     }
 
-    /// <summary>返回条目元数据（ContentType、长度、时间戳）。</summary>
+    /// <summary>Returns entry metadata (ContentType, length, timestamp).</summary>
     public (string ContentType, int Length, DateTime CreatedAt, DateTime UpdatedAt)? GetEntryMetadata(string path)
     {
         var normalizedPath = PathNormalizer.Normalize(path);
@@ -291,7 +291,7 @@ public sealed class SpeedyPack : IDisposable
         return (entry.ContentType, entry.Length, entry.CreatedAt, entry.UpdatedAt);
     }
 
-    /// <summary>返回文件头部和整体统计信息。</summary>
+    /// <summary>Returns file header and overall statistics.</summary>
     public SpkFileInfo GetFileInfo()
     {
         var header = _reader.ReadHeader();
@@ -324,28 +324,28 @@ public sealed class SpeedyPack : IDisposable
             TextEntries: textEntries);
     }
 
-    /// <summary>列举指定目录的直接子条目（路径）。</summary>
+    /// <summary>Lists direct child entries (paths) of the specified directory.</summary>
     public IReadOnlyList<string> ListEntries(string directoryPath = "")
     {
         var normalizedPath = PathNormalizer.Normalize(directoryPath);
         return _directoryMap.ListChildren(normalizedPath);
     }
 
-    /// <summary>列举指定目录的直接子目录。</summary>
+    /// <summary>Lists direct subdirectories of the specified directory.</summary>
     public IReadOnlyList<string> ListDirectories(string directoryPath = "")
     {
         var normalizedPath = PathNormalizer.Normalize(directoryPath);
         return _directoryMap.ListDirectories(normalizedPath);
     }
 
-    /// <summary>开启一个事务。操作会缓冲直至 Commit 时一并落盘。</summary>
+    /// <summary>Begins a transaction. Operations are buffered until Commit persists them all at once.</summary>
     public IPackTransaction BeginTransaction()
     {
         ThrowIfReadOnly();
         return new SpeedyTransaction(this);
     }
 
-    /// <summary>等待所有已入队写入持久化完成。</summary>
+    /// <summary>Waits for all enqueued writes to be persisted.</summary>
     public Task FlushAsync()
     {
         if (_writeQueue is null) return Task.CompletedTask;
@@ -353,7 +353,7 @@ public sealed class SpeedyPack : IDisposable
     }
 
     /// <summary>
-    /// 将文件压缩重写，剔除 FreeList 空洞。过程中使用临时文件，成功后原子替换。
+    /// Compacts and rewrites the file, removing FreeList holes. Uses a temporary file during the process, atomically replaces on success.
     /// </summary>
     public async Task CompactAsync()
     {
@@ -390,7 +390,7 @@ public sealed class SpeedyPack : IDisposable
                     tempWriter.Flush();
                 }
 
-                // 关闭旧的 writer / WAL / reader，准备替换。
+                // Close old writer / WAL / reader, preparing for replacement.
                 _writeQueue!.Dispose();
                 _reader.Dispose();
                 _writer!.Dispose();
@@ -398,7 +398,7 @@ public sealed class SpeedyPack : IDisposable
 
                 File.Move(tempPath, _filePath, overwrite: true);
 
-                // 原 WAL 也要清空（压缩后其内容已失去意义）。
+                // Original WAL also needs to be cleared (its contents become meaningless after compaction).
                 var walPath = _filePath + ".wal";
                 if (File.Exists(walPath))
                 {
@@ -432,8 +432,8 @@ public sealed class SpeedyPack : IDisposable
     }
 
     /// <summary>
-    /// 清空所有挂起写入后关闭所有文件句柄。即便 Flush 超时，WAL 里的已提交批次
-    /// 会在下次 Open 时被重放，因此不会丢失已 Commit 的数据。
+    /// Closes all file handles after clearing all pending writes. Even if Flush times out, committed batches in WAL
+    /// will be replayed on next Open, so committed data will not be lost.
     /// </summary>
     public void Dispose()
     {
@@ -473,8 +473,8 @@ public sealed class SpeedyPack : IDisposable
     }
 
     /// <summary>
-    /// 供 <see cref="SpeedyTransaction.Commit"/> 使用：以原子方式把一批操作
-    /// 同时应用到主缓存和写入队列。
+    /// For use by <see cref="SpeedyTransaction.Commit"/>: atomically applies a batch of operations
+    /// to both the main cache and the write queue.
     /// </summary>
     internal void ApplyTransactionBatch(IEnumerable<WriteOperation> ops)
     {
@@ -499,27 +499,27 @@ public sealed class SpeedyPack : IDisposable
         _writeQueue!.EnqueueBatch(opList);
     }
 
-    // ─── Legacy v1 迁移 ─────────────────────────────────────────────────────
+    // ─── Legacy v1 Migration ─────────────────────────────────────────────────────
 
     /// <summary>
-    /// 检测文件是否为 v1 legacy 格式；若是则将其迁移为 v2 双 Header 格式。
-    /// 迁移通过"临时文件 + 原子 File.Move"完成，过程中原文件不会被破坏。
+    /// Detects if the file is in v1 legacy format; if so, migrates it to v2 dual Header format.
+    /// Migration is done via "temporary file + atomic File.Move", the original file is not damaged during the process.
     /// </summary>
     private static void UpgradeLegacyFileIfNeeded(string filePath)
     {
-        // 先以只读方式检查头部，避免与后续 PackFileReader 抢独占。
+        // First check the header in read-only mode to avoid competing for exclusive access with subsequent PackFileReader.
         SpkHeader? v1Header;
         Dictionary<string, DirectoryEntry>? legacyDirectory = null;
         using (var probe = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
         {
-            // 若其中任一 v2 槽位有效，则认为文件已是 v2，直接返回。
+            // If either v2 slot is valid, the file is considered v2, return directly.
             var slotA = SpkHeader.TryReadSlot(probe, 0);
             var slotB = SpkHeader.TryReadSlot(probe, 1);
             if (slotA != null || slotB != null) return;
 
-            // 否则尝试读 v1 legacy 头部。
+            // Otherwise try reading v1 legacy header.
             v1Header = SpkHeader.TryReadLegacyV1(probe);
-            if (v1Header == null) return; // 不是 v1 也不是有效 v2，交由上层处理
+            if (v1Header == null) return; // Not v1 nor valid v2, handled by upper layer
 
             if (v1Header.DirectoryLength > 0)
             {
@@ -541,7 +541,7 @@ public sealed class SpeedyPack : IDisposable
             }
         }
 
-        // 用临时 v2 文件重写所有 entry。
+        // Rewrite all entries to a temporary v2 file.
         var tmpPath = filePath + ".v2upgrade.tmp";
         if (File.Exists(tmpPath))
         {
@@ -562,10 +562,10 @@ public sealed class SpeedyPack : IDisposable
             newWriter.Flush();
         }
 
-        // 原子替换原文件；失败时保留原文件不动。
+        // Atomically replace original file; keep original file intact on failure.
         File.Move(tmpPath, filePath, overwrite: true);
 
-        // 迁移后清理可能存在的旧 .wal（v1 没有 WAL，但以防残留）。
+        // Clean up possible old .wal after migration (v1 has no WAL, but just in case of residue).
         var walPath = filePath + ".wal";
         if (File.Exists(walPath))
         {

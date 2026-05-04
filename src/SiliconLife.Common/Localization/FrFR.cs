@@ -271,7 +271,7 @@ public class FrFR : DefaultLocalizationBase
     public override string NavMenuChat => "Chat";
     public override string NavMenuDashboard => "Tableau de bord";
     public override string NavMenuBeings => "Silicon Beings";
-    public override string NavMenuAudit => "Audit";
+    public override string NavMenuUsage => "Utilisation";
     public override string NavMenuTasks => "Tâches";
     public override string NavMenuMemory => "Mémoire";
     public override string NavMenuKnowledge => "Connaissances";
@@ -293,7 +293,7 @@ public class FrFR : DefaultLocalizationBase
     public override string PageTitleKnowledge => "Graphe de connaissances - Silicon Life Collective";
     public override string PageTitleProjects => "Gestion des espaces projet - Silicon Life Collective";
     public override string PageTitleLogs => "Consultation des journaux - Silicon Life Collective";
-    public override string PageTitleAudit => "Audit de tokens - Silicon Life Collective";
+    public override string PageTitleUsage => "Utilisation de tokens - Silicon Life Collective";
     public override string PageTitleConfig => "Configuration système - Silicon Life Collective";
     public override string PageTitleExecutor => "Surveillance des exécuteurs - Silicon Life Collective";
     public override string PageTitleCodeBrowser => "Navigateur de code - Silicon Life Collective";
@@ -714,38 +714,38 @@ public class FrFR : DefaultLocalizationBase
     public override string LogsPrevPage => "Page précédente";
     public override string LogsNextPage => "Page suivante";
 
-    public override string AuditPageHeader => "Audit de consommation de tokens";
-    public override string AuditTotalTokens => "Total tokens";
-    public override string AuditTotalRequests => "Total requêtes";
-    public override string AuditSuccessCount => "Succès";
-    public override string AuditFailureCount => "Échecs";
-    public override string AuditPromptTokens => "Tokens d'entrée";
-    public override string AuditCompletionTokens => "Tokens de sortie";
-    public override string AuditStartTime => "Heure de début";
-    public override string AuditEndTime => "Heure de fin";
-    public override string AuditFilterButton => "Rechercher";
-    public override string AuditEmptyState => "Aucun journal d'audit pour le moment";
-    public override string AuditAIClientType => "Client IA";
-    public override string AuditAllClientTypes => "Tous les types";
-    public override string AuditGroupByClient => "Grouper par client";
-    public override string AuditGroupByBeing => "Grouper par Silicon Being";
-    public override string AuditPrevPage => "Page précédente";
-    public override string AuditNextPage => "Page suivante";
-    public override string AuditBeing => "Silicon Being";
-    public override string AuditAllBeings => "Tous les Silicon Beings";
-    public override string AuditTimeToday => "Aujourd'hui";
-    public override string AuditTimeWeek => "Cette semaine";
-    public override string AuditTimeMonth => "Ce mois";
-    public override string AuditTimeYear => "Cette année";
-    public override string AuditExport => "Exporter";
-    public override string AuditTrendTitle => "Tendance de consommation de tokens";
-    public override string AuditTrendPrompt => "Tokens d'entrée";
-    public override string AuditTrendCompletion => "Tokens de sortie";
-    public override string AuditTrendTotal => "Total tokens";
-    public override string AuditTooltipDate => "Date";
-    public override string AuditTooltipPrompt => "Tokens d'entrée";
-    public override string AuditTooltipCompletion => "Tokens de sortie";
-    public override string AuditTooltipTotal => "Total tokens";
+    public override string UsagePageHeader => "Utilisation de tokens";
+    public override string UsageTotalTokens => "Total tokens";
+    public override string UsageTotalRequests => "Total requêtes";
+    public override string UsageSuccessCount => "Succès";
+    public override string UsageFailureCount => "Échecs";
+    public override string UsagePromptTokens => "Tokens d'entrée";
+    public override string UsageCompletionTokens => "Tokens de sortie";
+    public override string UsageStartTime => "Heure de début";
+    public override string UsageEndTime => "Heure de fin";
+    public override string UsageFilterButton => "Rechercher";
+    public override string UsageEmptyState => "Aucune donnée d'utilisation pour le moment";
+    public override string UsageAIClientType => "Client IA";
+    public override string UsageAllClientTypes => "Tous les types";
+    public override string UsageGroupByClient => "Grouper par client";
+    public override string UsageGroupByBeing => "Grouper par Silicon Being";
+    public override string UsagePrevPage => "Page précédente";
+    public override string UsageNextPage => "Page suivante";
+    public override string UsageBeing => "Silicon Being";
+    public override string UsageAllBeings => "Tous les Silicon Beings";
+    public override string UsageTimeToday => "Aujourd'hui";
+    public override string UsageTimeWeek => "Cette semaine";
+    public override string UsageTimeMonth => "Ce mois";
+    public override string UsageTimeYear => "Cette année";
+    public override string UsageExport => "Exporter";
+    public override string UsageTrendTitle => "Tendance de consommation de tokens";
+    public override string UsageTrendPrompt => "Tokens d'entrée";
+    public override string UsageTrendCompletion => "Tokens de sortie";
+    public override string UsageTrendTotal => "Total tokens";
+    public override string UsageTooltipDate => "Date";
+    public override string UsageTooltipPrompt => "Tokens d'entrée";
+    public override string UsageTooltipCompletion => "Tokens de sortie";
+    public override string UsageTooltipTotal => "Total tokens";
 
     // ===== Log Level Localization =====
 
@@ -937,6 +937,9 @@ public class FrFR : DefaultLocalizationBase
         ["DashScopeModel_glm-5.1"] = "GLM 5.1 (Zhipu)",
         ["DashScopeModel_kimi-k2.5"] = "Kimi K2.5 (Contexte long)",
         ["DashScopeModel_llama-4-maverick"] = "Llama 4 Maverick",
+        ["VolcengineArkClient"] = "Client Volcengine Ark",
+        ["VolcengineArkApiKey"] = "Clé API",
+        ["VolcengineArkEndpointId"] = "ID du point de terminaison d'inférence",
         ["WebPort"] = "Port Web",
         ["WebSkin"] = "Thème Web",
         ["UserNickname"] = "Nom d'utilisateur"
@@ -956,6 +959,8 @@ public class FrFR : DefaultLocalizationBase
         ["DashScopeApiKey"] = "Clé API Alibaba Cloud DashScope",
         ["DashScopeRegion"] = "Région de service Alibaba Cloud DashScope",
         ["DashScopeModel"] = "Modèle utilisé sur Alibaba Cloud DashScope",
+        ["VolcengineArkApiKey"] = "Clé API Volcengine Ark",
+        ["VolcengineArkEndpointId"] = "ID du point de terminaison d'inférence Volcengine Ark",
         ["WebPort"] = "Port du serveur Web",
         ["WebSkin"] = "Nom du thème Web",
         ["UserNickname"] = "Pseudonyme de l'utilisateur humain"
@@ -1674,6 +1679,9 @@ public class FrFR : DefaultLocalizationBase
 
     public override string FormatMemoryEventTask(string content)
         => $"[Tâche] Tâche exécutée, résultat : {content}";
+
+    public override string FormatMemoryEventProject(string content)
+        => $"[Projet] Réflexion sur le projet, résultat : {content}";
 
     public override string FormatMemoryEventTimer(string content)
         => $"[Minuteur] Minuteur déclenché, réponse : {content}";

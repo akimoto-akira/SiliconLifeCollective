@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -90,7 +90,7 @@ public abstract class ViewBase
             ("chat", "💬", localization.NavMenuChat, "/chat"),
             ("dashboard", "📊", localization.NavMenuDashboard, "/dashboard"),
             ("beings", "🧠", localization.NavMenuBeings, "/beings"),
-            ("audit", "🔍", localization.NavMenuAudit, "/audit"),
+            ("usage", "🔍", localization.NavMenuUsage, "/usage"),
             ("knowledge", "📚", localization.NavMenuKnowledge, "/knowledge"),
             ("projects", "📁", localization.NavMenuProjects, "/project"),
             ("logs", "📝", localization.NavMenuLogs, "/logs"),
@@ -115,7 +115,7 @@ public abstract class ViewBase
     protected static CssBuilder GetShellCss()
     {
         return CssBuilder.Create()
-            // 基础重置
+            // Base reset
             .Selector("body")
                 .Property("margin", "0")
                 .Property("padding", "0")
@@ -124,7 +124,7 @@ public abstract class ViewBase
             .Selector("*, *::before, *::after")
                 .Property("box-sizing", "border-box")
             .EndSelector()
-            // 整体布局
+            // Overall layout
             .Selector(".shell")
                 .Property("display", "flex")
                 .Property("flex-direction", "column")
@@ -134,7 +134,7 @@ public abstract class ViewBase
                 .Property("font-family", "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif")
                 .Property("line-height", "1.5")
             .EndSelector()
-            // 头部样式
+            // Header styles
             .Selector(".shell-header")
                 .Property("display", "flex")
                 .Property("align-items", "center")
@@ -174,13 +174,13 @@ public abstract class ViewBase
                 .Property("color", "var(--accent-primary)")
                 .Property("background", "var(--bg-card)")
             .EndSelector()
-            // 主体区域
+            // Main content area
             .Selector(".shell-body")
                 .Property("display", "flex")
                 .Property("flex", "1")
                 .Property("overflow", "hidden")
             .EndSelector()
-            // 侧边栏
+            // Sidebar
             .Selector(".shell-sidebar")
                 .Property("width", "200px")
                 .Property("background", "var(--bg-secondary)")
@@ -189,7 +189,7 @@ public abstract class ViewBase
                 .Property("overflow-y", "auto")
                 .Property("flex-shrink", "0")
             .EndSelector()
-            // 菜单项
+            // Menu items
             .Selector(".shell-menu-item")
                 .Property("display", "flex")
                 .Property("align-items", "center")
@@ -218,14 +218,14 @@ public abstract class ViewBase
                 .Property("flex-shrink", "0")
                 .Property("font-size", "18px")
             .EndSelector()
-            // 主内容区
+            // Main content area
             .Selector(".shell-content")
                 .Property("flex", "1")
                 .Property("overflow-y", "auto")
                 .Property("display", "flex")
                 .Property("flex-direction", "column")
             .EndSelector()
-            // 滚动条样式
+            // Scrollbar styles
             .Selector("::-webkit-scrollbar")
                 .Property("width", "6px")
                 .Property("height", "6px")
@@ -240,7 +240,7 @@ public abstract class ViewBase
             .Selector("::-webkit-scrollbar-thumb:hover")
                 .Property("background", "var(--border-color)")
             .EndSelector()
-            // 响应式设计
+            // Responsive design
             .Media("(max-width: 1024px)")
                 .Selector(".shell-sidebar")
                     .Property("width", "180px")
@@ -273,14 +273,14 @@ public abstract class ViewBase
     protected static CssBuilder GetCommonCss()
     {
         return CssBuilder.Create()
-            // 页面内容区
+            // Page content area
             .Selector(".page-content")
                 .Property("flex", "1")
                 .Property("overflow-y", "auto")
                 .Property("padding", "24px")
                 .Property("max-width", "1400px")
             .EndSelector()
-            // 页面头部
+            // Page header
             .Selector(".page-header")
                 .Property("margin-bottom", "24px")
             .EndSelector()
@@ -294,7 +294,7 @@ public abstract class ViewBase
                 .Property("gap", "10px")
                 .Property("margin-top", "12px")
             .EndSelector()
-            // 卡片系统
+            // Card system
             .Selector(".card")
                 .Property("background", "var(--bg-secondary)")
                 .Property("padding", "20px")
@@ -326,7 +326,7 @@ public abstract class ViewBase
                 .Property("font-weight", "600")
                 .Property("margin-bottom", "12px")
             .EndSelector()
-            // 按钮系统
+            // Button system
             .Selector(".btn")
                 .Property("display", "inline-flex")
                 .Property("align-items", "center")
@@ -364,7 +364,7 @@ public abstract class ViewBase
                 .Property("padding", "6px 12px")
                 .Property("font-size", "13px")
             .EndSelector()
-            // 表单系统
+            // Form system
             .Selector(".form-group")
                 .Property("margin-bottom", "15px")
             .EndSelector()
@@ -389,7 +389,7 @@ public abstract class ViewBase
                 .Property("outline", "none")
                 .Property("border-color", "var(--accent-primary)")
             .EndSelector()
-            // 数据表格
+            // Data tables
             .Selector("table")
                 .Property("width", "100%")
                 .Property("border-collapse", "collapse")
@@ -412,7 +412,7 @@ public abstract class ViewBase
             .Selector("table tbody tr:hover")
                 .Property("background", "var(--bg-card)")
             .EndSelector()
-            // 状态标签
+            // Status badges
             .Selector(".badge")
                 .Property("display", "inline-flex")
                 .Property("align-items", "center")
@@ -434,7 +434,7 @@ public abstract class ViewBase
                 .Property("background", "rgba(239, 68, 68, 0.15)")
                 .Property("color", "var(--accent-danger, var(--accent-error))")
             .EndSelector()
-            // 筛选栏
+            // Filter bar
             .Selector(".filter-bar")
                 .Property("display", "flex")
                 .Property("gap", "10px")
@@ -453,7 +453,7 @@ public abstract class ViewBase
             .Selector(".filter-bar button")
                 .Property("padding", "8px 16px")
             .EndSelector()
-            // 分页
+            // Pagination
             .Selector(".pagination")
                 .Property("display", "flex")
                 .Property("gap", "8px")
@@ -475,7 +475,7 @@ public abstract class ViewBase
                 .Property("color", "#fff")
                 .Property("border-color", "var(--accent-primary)")
             .EndSelector()
-            // 搜索栏
+            // Search bar
             .Selector(".search-bar")
                 .Property("display", "flex")
                 .Property("gap", "10px")
@@ -489,7 +489,7 @@ public abstract class ViewBase
                 .Property("background", "var(--bg-card)")
                 .Property("color", "var(--text-primary)")
             .EndSelector()
-            // 统计网格
+            // Stats grid
             .Selector(".stats-grid")
                 .Property("display", "grid")
                 .Property("grid-template-columns", "repeat(auto-fit, minmax(200px, 1fr))")
@@ -516,7 +516,7 @@ public abstract class ViewBase
                 .Property("font-weight", "700")
                 .Property("color", "var(--text-primary)")
             .EndSelector()
-            // 警告框
+            // Alert boxes
             .Selector(".alert")
                 .Property("padding", "15px")
                 .Property("border-radius", "8px")

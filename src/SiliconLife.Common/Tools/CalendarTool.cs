@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -327,7 +327,7 @@ public class CalendarTool : ITool
 
         string dateStr = dateObj.ToString()!;
 
-        // 1. Try the calendar's own Parse (native format, e.g. "正月初一" for lunar)
+        // 1. Try the calendar's own Parse (native format, e.g. "1st day of 1st month" for lunar calendar)
         if (calendar != null)
         {
             try

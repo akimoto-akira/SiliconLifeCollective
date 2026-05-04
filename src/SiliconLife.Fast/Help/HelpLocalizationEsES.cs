@@ -25,6 +25,7 @@ public class HelpLocalizationEsES : HelpLocalizationBase
   public override string Memory_Title => "Sistema de Memoria";
   public override string OllamaSetup_Title => "Instalación de Ollama y Descarga de Modelos";
   public override string BailianDashScope_Title => "Guía de Uso de la Plataforma Alibaba Cloud Bailian";
+  public override string VolcengineArk_Title => "Guía de Uso de la Plataforma Volcengine Ark";
   public override string AIClients_Title => "Configuración de Cliente de IA";
 
   public override string BeingSoul_Title => "Archivo de Alma";
@@ -89,6 +90,9 @@ public class HelpLocalizationEsES : HelpLocalizationBase
 
   public override string[] BailianDashScope_Tags => new[]
     { "Bailian", "DashScope", "Alibaba Cloud", "IA en la nube", "API", "configuración", "modelo", "pago" };
+
+  public override string[] VolcengineArk_Tags => new[]
+    { "Volcengine", "Ark", "Doubao", "ByteDance", "IA en la nube", "API", "configuración", "modelo" };
 
   public override string[] AIClients_Tags => new[]
     { "cliente de IA", "servicio de IA", "modelo", "configuración", "local", "nube", "Ollama", "DashScope", "ajustes" };
@@ -2342,6 +2346,150 @@ Después de configurar Bailian, puede:
 - No preocuparse por la configuración de hardware local
 
 ¡Le deseamos un uso agradable!
+";
+
+  public override string VolcengineArk => @"
+# Guía de Uso de la Plataforma Volcengine Ark
+
+## ¿Qué es Volcengine Ark?
+
+Volcengine Ark es la plataforma integral de servicios de modelos de lenguaje grandes de ByteDance, que ofrece la serie Doubao y varios modelos de terceros (DeepSeek, GLM, Kimi, etc.).
+
+**Ventajas:**
+- Modelos insignia de la serie Doubao Seed, inteligencia excepcional (contexto 256K)
+- No requiere hardware local, funciona en la nube
+- Compatible con múltiples modelos de IA de primer nivel
+- Pago por uso, precios muy competitivos
+- Totalmente compatible con el formato OpenAI API
+- Plataforma china, acceso estable sin red especial
+
+## Registro y configuración
+
+### Paso 1: Registrar una cuenta de Volcengine
+
+1. Visite la consola de Volcengine: https://console.volcengine.com
+2. Haga clic en ""Registro gratuito""
+3. Complete el registro (teléfono, correo electrónico)
+4. Complete la verificación de identidad
+
+### Paso 2: Activar el servicio Ark
+
+1. Inicie sesión en la consola de Volcengine
+2. En el menú izquierdo, busque ""Ark""
+3. Entre en la página del producto Ark
+4. Haga clic en ""Activar ahora""
+5. Lea y acepte el acuerdo de servicio
+
+### Paso 3: Crear un punto de conexión de inferencia
+
+Volcengine Ark utiliza ""puntos de conexión de inferencia"" para identificar modelos, en lugar de usar nombres de modelos directamente.
+
+1. En la consola de Ark, vaya a la página ""Puntos de conexión de inferencia""
+2. Haga clic en ""Crear punto de conexión de inferencia""
+3. Seleccione el modelo a utilizar (ej. doubao-seed-1-6-251015)
+4. Asigne un nombre a su punto de conexión
+5. Después de la creación, copie el ID del punto de conexión (formato: ep-20241212123456-abcde)
+
+### Paso 4: Obtener una clave API
+
+1. En la consola de Ark, busque ""Gestión de claves API""
+2. Haga clic en ""Crear clave API""
+3. Asigne un nombre a su clave (ej. ""SiliconLife"")
+4. Copie y guarde la clave API (**se muestra solo una vez, consérvela segura**)
+
+## Configurar Volcengine Ark en Silicon Life
+
+### Pasos de configuración
+
+1. Abra el sistema Silicon Life
+2. Vaya a la página **⚙ Configuración**
+3. Busque ""Tipo de cliente IA"", seleccione `VolcengineArkClientFactory`
+4. En ""Configuración de IA"", complete:
+   - **Clave API**: pegue su clave API
+   - **ID del punto de conexión de inferencia**: pegue su ID de punto de conexión (ej. ep-20241212123456-abcde)
+   (**Después de ingresar la clave API, el sistema obtendrá automáticamente su lista de puntos de conexión**)
+5. Guarde la configuración
+
+**Consejo:**
+- La clave API debe ingresarse primero para que se cargue la lista desplegable de puntos de conexión
+- Si la carga falla, puede ingresar manualmente el ID del punto de conexión
+
+### Selección de modelo
+
+Volcengine Ark llama a los modelos a través de puntos de conexión de inferencia, cada punto de conexión corresponde a un modelo.
+
+**Modelos populares:**
+
+| Serie de modelos | ID del modelo | Características |
+|----------------|-------------|----------------|
+| **Doubao-Seed-1.8** | doubao-seed-1-8-YYMMDD | Último modelo insignia, capacidades Agent mejoradas |
+| **Doubao-Seed-1.6** | doubao-seed-1-6-251015 | Modelo polivalente, recomendado para uso diario |
+| **Doubao-Seed-1.6-Flash** | doubao-seed-1-6-flash | Versión de latencia ultra baja |
+| **Doubao-Seed-1.6-Lite** | doubao-seed-1-6-lite | Ligero, excelente relación calidad-precio |
+| **Doubao-Seed-Code** | doubao-seed-code-preview-latest | Modelo especializado en código |
+| **Doubao-Pro-32K** | doubao-pro-32k | Versión profesional clásica |
+| **Doubao-Lite-32K** | doubao-lite-32k | Versión ligera clásica |
+
+## Precios
+
+### Método de facturación
+
+Volcengine Ark utiliza facturación **de pago por uso**:
+- Facturación según la cantidad de tokens de entrada y salida
+- Precios unificados para la serie Doubao Seed:
+  - Entrada 0~32K: 0,8 yuanes/millón de tokens
+  - Salida 0~32K: 8 yuanes/millón de tokens
+  - Entrada 32K~128K: 1,2 yuanes/millón de tokens
+  - Contexto más largo, precio más alto
+
+### Cuota gratuita
+
+- Los nuevos usuarios reciben 500.000 tokens de inferencia gratuitos por modelo (se requiere verificación de identidad)
+- Cuota gratuita válida por 30 días
+- Compatible con ""modo seguro"" que solo consume la cuota gratuita y se detiene automáticamente al agotarse
+
+### Consejos para ahorrar costos
+
+- Elija el modelo adecuado (la serie Lite ofrece una excelente relación calidad-precio)
+- Controle la longitud de entrada de manera inteligente
+- Use el caché de contexto (Context Cache) para reducir costos
+- Revise el uso regularmente
+
+## Preguntas frecuentes
+
+### P: ¿Qué es un punto de conexión de inferencia?
+
+**R:** Un punto de conexión de inferencia es un concepto único de Volcengine Ark. Primero crea un punto de conexión en la consola de Ark, selecciona el modelo a utilizar, y el sistema asigna un ID de punto de conexión. Cuando configura este ID en Silicon Life, puede llamar al modelo correspondiente.
+
+### P: ¿Dónde obtengo mi clave API?
+
+**R:**
+1. Inicie sesión en la consola de Volcengine
+2. Vaya a ""Gestión de claves API"" de Ark
+3. Cree una nueva clave API
+4. Cópiela y guárdela de forma segura
+
+### P: ¿Cuál es la diferencia entre Volcengine Ark y Bailian?
+
+| Característica | Volcengine Ark | Bailian (DashScope) |
+|--------------|--------------|-------------------|
+| Proveedor | ByteDance | Alibaba Cloud |
+| Modelos insignia | Serie Doubao Seed | Serie Qwen |
+| Llamada de modelo | Punto de conexión de inferencia | Nombre del modelo directo |
+| Precio | Muy competitivo | Medio |
+| Cuota gratuita | 500K tokens por modelo | Prueba gratuita |
+| Acceso en China | Estable | Estable |
+
+### P: ¿Qué hacer si falla la llamada a la API?
+
+**Verifique:**
+1. ¿La clave API es correcta?
+2. ¿El ID del punto de conexión es correcto y está publicado?
+3. ¿El saldo de la cuenta es suficiente?
+4. ¿Se ha agotado la cuota gratuita?
+5. ¿El punto de conexión está en ejecución?
+
+¡Disfrute usando el sistema!
 ";
 
   public override string AIClients => @"

@@ -7,7 +7,6 @@ namespace SiliconLife.Default.Help;
 
 /// <summary>
 /// Japanese help documentation implementation
-/// 日本語ヘルプドキュメント実装
 /// </summary>
 public class HelpLocalizationJaJP : HelpLocalizationBase
 {

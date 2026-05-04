@@ -47,6 +47,9 @@ public abstract class HelpLocalizationBase
     /// <summary>Bailian DashScope</summary>
     public abstract string BailianDashScope { get; }
 
+    /// <summary>Volcengine Ark</summary>
+    public abstract string VolcengineArk { get; }
+
     /// <summary>AI Clients</summary>
     public abstract string AIClients { get; }
 
@@ -108,6 +111,9 @@ public abstract class HelpLocalizationBase
     /// <summary>Bailian DashScope Title</summary>
     public abstract string BailianDashScope_Title { get; }
 
+    /// <summary>Volcengine Ark Title</summary>
+    public abstract string VolcengineArk_Title { get; }
+
     /// <summary>AI Clients Title</summary>
     public abstract string AIClients_Title { get; }
 
@@ -168,6 +174,9 @@ public abstract class HelpLocalizationBase
 
     /// <summary>Bailian DashScope Tags</summary>
     public abstract string[] BailianDashScope_Tags { get; }
+
+    /// <summary>Volcengine Ark Tags</summary>
+    public abstract string[] VolcengineArk_Tags { get; }
 
     /// <summary>AI Clients Tags</summary>
     public abstract string[] AIClients_Tags { get; }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -30,134 +30,134 @@ public abstract class ChineseHistoricalLocalizationBase
     #region Dynasty Names (28 Dynasties)
 
     // Ancient Dynasties
-    /// <summary>夏朝 (Xia Dynasty, c. 2070-1600 BCE)</summary>
+    /// <summary>Xia Dynasty (c. 2070-1600 BCE)</summary>
     public abstract string Xia { get; }
-    /// <summary>商朝 (Shang Dynasty, c. 1600-1046 BCE)</summary>
+    /// <summary>Shang Dynasty (c. 1600-1046 BCE)</summary>
     public abstract string Shang { get; }
-    /// <summary>周朝 (Zhou Dynasty, c. 1046-256 BCE)</summary>
+    /// <summary>Zhou Dynasty (c. 1046-256 BCE)</summary>
     public abstract string Zhou { get; }
 
     // Imperial China - Early Period
-    /// <summary>秦朝 (Qin Dynasty, 221-206 BCE)</summary>
+    /// <summary>Qin Dynasty (221-206 BCE)</summary>
     public abstract string Qin { get; }
-    /// <summary>汉朝 (Han Dynasty, 206 BCE-220 CE)</summary>
+    /// <summary>Han Dynasty (206 BCE-220 CE)</summary>
     public abstract string Han { get; }
-    /// <summary>新朝 (Xin Dynasty, 9-23 CE)</summary>
+    /// <summary>Xin Dynasty (9-23 CE)</summary>
     public abstract string Xin { get; }
 
     // Three Kingdoms Period
-    /// <summary>曹魏 (Wei Dynasty, 220-266 CE)</summary>
+    /// <summary>Wei Dynasty (220-266 CE)</summary>
     public abstract string Wei { get; }
-    /// <summary>蜀汉 (Shu Han, 221-263 CE)</summary>
+    /// <summary>Shu Han (221-263 CE)</summary>
     public abstract string Shu { get; }
-    /// <summary>东吴 (Eastern Wu, 222-280 CE)</summary>
+    /// <summary>Eastern Wu (222-280 CE)</summary>
     public abstract string Wu { get; }
 
     // Jin Dynasty
-    /// <summary>晋朝 (Jin Dynasty, 265-420 CE)</summary>
+    /// <summary>Jin Dynasty (265-420 CE)</summary>
     public abstract string Jin { get; }
 
     // Southern and Northern Dynasties
-    /// <summary>北魏 (Northern Wei, 386-534 CE)</summary>
+    /// <summary>Northern Wei (386-534 CE)</summary>
     public abstract string NorthernWei { get; }
-    /// <summary>东魏 (Eastern Wei, 534-550 CE)</summary>
+    /// <summary>Eastern Wei (534-550 CE)</summary>
     public abstract string EasternWei { get; }
-    /// <summary>西魏 (Western Wei, 535-556 CE)</summary>
+    /// <summary>Western Wei (535-556 CE)</summary>
     public abstract string WesternWei { get; }
-    /// <summary>北齐 (Northern Qi, 550-577 CE)</summary>
+    /// <summary>Northern Qi (550-577 CE)</summary>
     public abstract string NorthernQi { get; }
-    /// <summary>北周 (Northern Zhou, 557-581 CE)</summary>
+    /// <summary>Northern Zhou (557-581 CE)</summary>
     public abstract string NorthernZhou { get; }
 
     // Medieval Dynasties
-    /// <summary>隋朝 (Sui Dynasty, 581-618 CE)</summary>
+    /// <summary>Sui Dynasty (581-618 CE)</summary>
     public abstract string Sui { get; }
-    /// <summary>唐朝 (Tang Dynasty, 618-907 CE)</summary>
+    /// <summary>Tang Dynasty (618-907 CE)</summary>
     public abstract string Tang { get; }
 
     // Five Dynasties and Ten Kingdoms
-    /// <summary>后梁 (Later Liang, 907-923 CE)</summary>
+    /// <summary>Later Liang (907-923 CE)</summary>
     public abstract string LaterLiang { get; }
-    /// <summary>后唐 (Later Tang, 923-936 CE)</summary>
+    /// <summary>Later Tang (923-936 CE)</summary>
     public abstract string LaterTang { get; }
-    /// <summary>后晋 (Later Jin, 936-947 CE)</summary>
+    /// <summary>Later Jin (936-947 CE)</summary>
     public abstract string LaterJin { get; }
-    /// <summary>后汉 (Later Han, 947-950 CE)</summary>
+    /// <summary>Later Han (947-950 CE)</summary>
     public abstract string LaterHan { get; }
-    /// <summary>后周 (Later Zhou, 951-960 CE)</summary>
+    /// <summary>Later Zhou (951-960 CE)</summary>
     public abstract string LaterZhou { get; }
 
     // Song, Yuan, Ming, Qing
-    /// <summary>宋朝 (Song Dynasty, 960-1279 CE)</summary>
+    /// <summary>Song Dynasty (960-1279 CE)</summary>
     public abstract string Song { get; }
-    /// <summary>元朝 (Yuan Dynasty, 1271-1368 CE)</summary>
+    /// <summary>Yuan Dynasty (1271-1368 CE)</summary>
     public abstract string Yuan { get; }
-    /// <summary>明朝 (Ming Dynasty, 1368-1644 CE)</summary>
+    /// <summary>Ming Dynasty (1368-1644 CE)</summary>
     public abstract string Ming { get; }
-    /// <summary>清朝 (Qing Dynasty, 1644-1912 CE)</summary>
+    /// <summary>Qing Dynasty (1644-1912 CE)</summary>
     public abstract string Qing { get; }
 
     // Modern Era
-    /// <summary>中华民国 (Republic of China, 1912-1949)</summary>
+    /// <summary>Republic of China (1912-1949)</summary>
     public abstract string ROC { get; }
-    /// <summary>中华人民共和国 (People's Republic of China, 1949-present)</summary>
+    /// <summary>People's Republic of China (1949-present)</summary>
     public abstract string PRC { get; }
 
     #endregion
 
     #region Era Names - Xia Dynasty
 
-    /// <summary>夏朝时期 (Xia Dynasty Period)</summary>
+    /// <summary>Xia Dynasty Period</summary>
     public abstract string EraXiaDynasty { get; }
 
     #endregion
 
     #region Era Names - Shang Dynasty
 
-    /// <summary>商朝早期 (Early Shang)</summary>
+    /// <summary>Early Shang</summary>
     public abstract string EraEarlyShang { get; }
-    /// <summary>商朝晚期 (Late Shang / Yin Period)</summary>
+    /// <summary>Late Shang / Yin Period</summary>
     public abstract string EraLateShang { get; }
 
     #endregion
 
     #region Era Names - Zhou Dynasty
 
-    /// <summary>西周 (Western Zhou)</summary>
+    /// <summary>Western Zhou</summary>
     public abstract string EraWesternZhou { get; }
-    /// <summary>春秋时期 (Spring and Autumn Period)</summary>
+    /// <summary>Spring and Autumn Period</summary>
     public abstract string EraSpringAndAutumn { get; }
-    /// <summary>战国时期 (Warring States Period)</summary>
+    /// <summary>Warring States Period</summary>
     public abstract string EraWarringStates { get; }
 
     #endregion
 
     #region Era Names - Qin Dynasty
 
-    /// <summary>秦王政时期 (King Zheng of Qin)</summary>
+    /// <summary>King Zheng of Qin</summary>
     public abstract string EraKingZheng { get; }
-    /// <summary>秦始皇 (Qin Shi Huang)</summary>
+    /// <summary>Qin Shi Huang</summary>
     public abstract string EraQinShiHuang { get; }
-    /// <summary>秦二世 (Qin Er Shi)</summary>
+    /// <summary>Qin Er Shi</summary>
     public abstract string EraQinErShi { get; }
-    /// <summary>子婴 (Ziying)</summary>
+    /// <summary>Ziying</summary>
     public abstract string EraZiying { get; }
 
     #endregion
 
     #region Era Names - Han Dynasty (Western Han)
 
-    /// <summary>楚汉相争 (Chu-Han Contention)</summary>
+    /// <summary>Chu-Han Contention</summary>
     public abstract string EraChuHanContention { get; }
-    /// <summary>高祖 (Gaozu / Liu Bang)</summary>
+    /// <summary>Gaozu / Liu Bang</summary>
     public abstract string EraGaozu { get; }
-    /// <summary>惠帝 (Huidi)</summary>
+    /// <summary>Huidi</summary>
     public abstract string EraHuidi { get; }
-    /// <summary>吕后 (Empress Lü)</summary>
+    /// <summary>Empress Lü</summary>
     public abstract string EraEmpressLü { get; }
-    /// <summary>文帝 (Wendi)</summary>
+    /// <summary>Wendi</summary>
     public abstract string EraWendi { get; }
-    /// <summary>景帝 (Jingdi)</summary>
+    /// <summary>Jingdi</summary>
     public abstract string EraJingdi { get; }
 
     #endregion
@@ -500,15 +500,15 @@ public abstract class ChineseHistoricalLocalizationBase
 
     #region Era Names - Southern and Northern Dynasties
 
-    /// <summary>北魏时期 (Northern Wei Period)</summary>
+    /// <summary>Northern Wei Period</summary>
     public abstract string EraNorthernWeiPeriod { get; }
-    /// <summary>东魏时期 (Eastern Wei Period)</summary>
+    /// <summary>Eastern Wei Period</summary>
     public abstract string EraEasternWeiPeriod { get; }
-    /// <summary>西魏时期 (Western Wei Period)</summary>
+    /// <summary>Western Wei Period</summary>
     public abstract string EraWesternWeiPeriod { get; }
-    /// <summary>北齐时期 (Northern Qi Period)</summary>
+    /// <summary>Northern Qi Period</summary>
     public abstract string EraNorthernQiPeriod { get; }
-    /// <summary>北周时期 (Northern Zhou Period)</summary>
+    /// <summary>Northern Zhou Period</summary>
     public abstract string EraNorthernZhouPeriod { get; }
 
     #endregion
@@ -756,7 +756,7 @@ public abstract class ChineseHistoricalLocalizationBase
     public abstract string EraJingde { get; }
     /// <summary>大中祥符 (Dazhongxiangfu)</summary>
     public abstract string EraDazhongxiangfu { get; }
-    /// <summary>天禧 (Tianxi) - Song Dynasty</summary>
+    /// <summary>Tianxi - Song Dynasty</summary>
     public abstract string EraTianxiSong { get; }
     /// <summary>乾兴 (Qianxing)</summary>
     public abstract string EraQianxing { get; }
@@ -950,9 +950,9 @@ public abstract class ChineseHistoricalLocalizationBase
 
     #region Era Names - Republic of China and Common Era
 
-    /// <summary>民国 (Republic Era, 1912-1949)</summary>
+    /// <summary>Republic Era (1912-1949)</summary>
     public abstract string EraRepublic { get; }
-    /// <summary>公元 (Common Era, 1949-present)</summary>
+    /// <summary>Common Era (1949-present)</summary>
     public abstract string EraCommonEra { get; }
 
     #endregion

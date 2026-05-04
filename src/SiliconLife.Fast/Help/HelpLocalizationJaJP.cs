@@ -7,7 +7,6 @@ namespace SiliconLife.Fast.Help;
 
 /// <summary>
 /// Japanese help documentation implementation
-/// 日本語ヘルプドキュメント実装
 /// </summary>
 public class HelpLocalizationJaJP : HelpLocalizationBase
 {
@@ -25,6 +24,7 @@ public class HelpLocalizationJaJP : HelpLocalizationBase
     public override string Memory_Title => "メモリシステム";
     public override string OllamaSetup_Title => "Ollama インストールとモデルダウンロード";
     public override string BailianDashScope_Title => "アリババクラウド百錬プラットフォーム使用ガイド";
+    public override string VolcengineArk_Title => "Volcengine Ark プラットフォーム使用ガイド";
     public override string AIClients_Title => "AIクライアント設定";
 
     public override string BeingSoul_Title => "ソウルファイル";
@@ -59,6 +59,9 @@ public class HelpLocalizationJaJP : HelpLocalizationBase
 
     public override string[] BailianDashScope_Tags =>
         new[] { "百錬", "DashScope", "アリババクラウド", "クラウドAI", "API", "設定", "モデル", "有料" };
+
+    public override string[] VolcengineArk_Tags => new[]
+        { "Volcengine", "Ark", "Doubao", "ByteDance", "クラウドAI", "API", "設定", "モデル" };
 
     public override string[] AIClients_Tags => new[]
         { "AIクライアント", "AIサービス", "モデル", "設定", "ローカル", "クラウド", "Ollama", "DashScope", "構成" };
@@ -1884,6 +1887,150 @@ Ollama をインストールしてモデルをダウンロードした後、以�
 - 超高知能のAIサービスを体験。
 - ローカルハードウェア構成を心配する必要はない。
 愉快的なご使用をお祈りします！
+";
+
+    public override string VolcengineArk => @"
+# Volcengine Ark プラットフォーム使用ガイド
+
+## Volcengine Ark とは？
+
+Volcengine Ark は ByteDance が提供するワンストップ大規模言語モデルサービスプラットフォームです。Doubao シリーズモデルやさまざまなサードパーティモデル（DeepSeek、GLM、Kimi など）を提供しています。
+
+**利点：**
+- Doubao Seed シリーズフラッグシップモデル、非常に高い知能（256Kコンテキスト）
+- ローカルハードウェア不要、クラウドで動作
+- 複数のトップAIモデルをサポート
+- 従量課金制、非常に競争力のある価格
+- OpenAI API 形式と完全互換
+- 中国国内プラットフォーム、特別なネットワーク不要で安定したアクセス
+
+## 登録と設定
+
+### ステップ1：Volcengine アカウントの登録
+
+1. Volcengine コンソールにアクセス：https://console.volcengine.com
+2. 「無料登録」をクリック
+3. 登録を完了（電話番号、メールアドレス対応）
+4. 本人確認を完了
+
+### ステップ2：Ark サービスの有効化
+
+1. Volcengine コンソールにログイン
+2. 左側メニューから「Ark」を検索
+3. Ark 製品ページに入る
+4. 「今すぐ有効化」をクリック
+5. サービス契約を読んで同意
+
+### ステップ3：推論エンドポイントの作成
+
+Volcengine Ark はモデルを識別するために「推論エンドポイント」を使用し、モデル名を直接使用しません。
+
+1. Ark コンソールで「推論エンドポイント」ページに移動
+2. 「推論エンドポイントを作成」をクリック
+3. 使用するモデルを選択（例：doubao-seed-1-6-251015）
+4. エンドポイントに名前を付ける
+5. 作成後、エンドポイントIDをコピー（形式：ep-20241212123456-abcde）
+
+### ステップ4：API Key の取得
+
+1. Ark コンソールで「API Key 管理」を見つける
+2. 「API Key を作成」をクリック
+3. キーに名前を付ける（例：「SiliconLife」）
+4. API Key をコピーして保存（**一度しか表示されないため、安全に保管してください**）
+
+## Silicon Life での Volcengine Ark の設定
+
+### 設定手順
+
+1. Silicon Life システムを開く
+2. **⚙ 設定** ページに移動
+3. 「AIクライアントタイプ」で `VolcengineArkClientFactory` を選択
+4. 「AI設定」で以下を入力：
+   - **API Key**：API Key を貼り付け
+   - **推論エンドポイントID**：推論エンドポイントIDを貼り付け（例：ep-20241212123456-abcde）
+   （**API Key を入力すると、システムが自動的に推論エンドポイント一覧を取得します**）
+5. 設定を保存
+
+**ヒント：**
+- API Key を先に入力しないと、推論エンドポイントのドロップダウンが読み込まれません
+- リストの読み込みに失敗した場合、手動で推論エンドポイントIDを入力できます
+
+### モデル選択
+
+Volcengine Ark は推論エンドポイントを介してモデルを呼び出します。各エンドポイントは1つのモデルに対応します。
+
+**人気モデル：**
+
+| モデルシリーズ | モデル ID | 特徴 |
+|-------------|---------|------|
+| **Doubao-Seed-1.8** | doubao-seed-1-8-YYMMDD | 最新フラッグシップ、強力なAgent機能 |
+| **Doubao-Seed-1.6** | doubao-seed-1-6-251015 | 汎用モデル、日常使用におすすめ |
+| **Doubao-Seed-1.6-Flash** | doubao-seed-1-6-flash | 超低遅延バージョン |
+| **Doubao-Seed-1.6-Lite** | doubao-seed-1-6-lite | 軽量、コストパフォーマンスに優れる |
+| **Doubao-Seed-Code** | doubao-seed-code-preview-latest | コード専門モデル |
+| **Doubao-Pro-32K** | doubao-pro-32k | クラシックプロ版 |
+| **Doubao-Lite-32K** | doubao-lite-32k | クラシック軽量版 |
+
+## 料金
+
+### 課金方法
+
+Volcengine Ark は**従量課金制**を採用：
+- 入力および出力の Token 数に基づいて課金
+- Doubao Seed シリーズ統一価格：
+  - 入力 0~32K：0.8 元/100万 Token
+  - 出力 0~32K：8 元/100万 Token
+  - 入力 32K~128K：1.2 元/100万 Token
+  - より長いコンテキストは高料金
+
+### 無料枠
+
+- 新規ユーザーはモデルごとに50万の無料推論 Token を獲得（本人確認が必要）
+- 無料枠の有効期限は30日間
+- 「セーフモード」は無料枠のみを消費し、枯渇すると自動停止
+
+### コスト削減のヒント
+
+- 適切なモデルを選択（Lite シリーズはコストパフォーマンスが高い）
+- 入力長を適切に制御
+- コンテキストキャッシュ（Context Cache）を使用してコスト削減
+- 使用量を定期的に確認
+
+## よくある質問
+
+### Q：推論エンドポイントとは？
+
+**A：** 推論エンドポイントは Volcengine Ark の独自の概念です。Ark コンソールで推論エンドポイントを作成し、使用するモデルを選択すると、システムがエンドポイントIDを割り当てます。Silicon Life でこのIDを設定すると、対応するモデルを呼び出すことができます。
+
+### Q：API Key はどこで取得できますか？
+
+**A：**
+1. Volcengine コンソールにログイン
+2. Ark の「API Key 管理」に移動
+3. 新しい API Key を作成
+4. コピーして安全に保管
+
+### Q：Volcengine Ark と Bailian の違いは？
+
+| 特徴 | Volcengine Ark | Bailian（DashScope） |
+|------|--------------|---------------------|
+| 提供元 | ByteDance | Alibaba Cloud |
+| フラッグシップモデル | Doubao Seed シリーズ | Qwen シリーズ |
+| モデル呼び出し | 推論エンドポイント | 直接モデル名 |
+| 価格 | 非常に競争力がある | 中程度 |
+| 無料枠 | モデルごとに50万Token | 無料トライアル |
+| 中国国内アクセス | 安定 | 安定 |
+
+### Q：API 呼び出しが失敗した場合は？
+
+**確認事項：**
+1. API Key は正しいですか？
+2. 推論エンドポイントIDは正しく、公開されていますか？
+3. アカウント残高は十分ですか？
+4. 無料枠は使い果たしていませんか？
+5. 推論エンドポイントは実行中ですか？
+
+楽しくお使いください！
 ";
 
     public override string AIClients => @"

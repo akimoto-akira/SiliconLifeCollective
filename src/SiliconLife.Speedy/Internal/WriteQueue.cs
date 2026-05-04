@@ -16,13 +16,13 @@ using System.Collections.Concurrent;
 namespace SiliconLife.Speedy.Internal;
 
 /// <summary>
-/// 异步写入队列。生产者（公共 API）调用 <see cref="Enqueue"/> 立即返回，
-/// 单线程消费者按批次将操作：
-///   1) 先以"WAL 批次 + CRC + Commit"落盘；
-///   2) 再把数据和新 Directory 写到主 .spk 文件；
-///   3) 通过双 Header 槽位切换原子提交；
-///   4) 最后截断 WAL。
-/// 任意一步崩溃后重启时都可以通过 WAL 重放或 Header 回退恢复到一致状态。
+/// Asynchronous write queue. Producers (public API) call <see cref="Enqueue"/> and return immediately,
+/// single-thread consumer processes operations in batches:
+///   1) First persist with "WAL batch + CRC + Commit";
+///   2) Then write data and new Directory to the main .spk file;
+///   3) Atomically commit via dual Header slot switching;
+///   4) Finally truncate WAL.
+/// After a crash at any step, a consistent state can be recovered via WAL replay or Header rollback upon restart.
 /// </summary>
 internal sealed class WriteQueue : IDisposable
 {
@@ -54,7 +54,7 @@ internal sealed class WriteQueue : IDisposable
             TaskScheduler.Default);
     }
 
-    /// <summary>入队单个操作。</summary>
+    /// <summary>Enqueues a single operation.</summary>
     public void Enqueue(WriteOperation op)
     {
         if (_disposed) throw new ObjectDisposedException(nameof(WriteQueue));
@@ -62,7 +62,7 @@ internal sealed class WriteQueue : IDisposable
         _hasItems.Set();
     }
 
-    /// <summary>入队一批操作（事务提交）。</summary>
+    /// <summary>Enqueues a batch of operations (transaction commit).</summary>
     public void EnqueueBatch(IReadOnlyList<WriteOperation> ops)
     {
         if (_disposed) throw new ObjectDisposedException(nameof(WriteQueue));
@@ -72,7 +72,7 @@ internal sealed class WriteQueue : IDisposable
     }
 
     /// <summary>
-    /// 返回一个在"当前所有已入队操作都已持久化"后完成的 Task。
+    /// Returns a Task that completes after "all currently enqueued operations have been persisted".
     /// </summary>
     public Task FlushAsync()
     {
@@ -132,7 +132,7 @@ internal sealed class WriteQueue : IDisposable
             }
         }
 
-        // 关机时排空剩余工作，保证 Dispose + FlushAsync 的一致性。
+        // Drain remaining work during shutdown to ensure Dispose + FlushAsync consistency.
         try { ProcessBatch(); } catch { /* ignore */ }
 
         TaskCompletionSource? shutdownTcs;
@@ -153,18 +153,18 @@ internal sealed class WriteQueue : IDisposable
         if (operations.Count == 0)
             return;
 
-        // 合并对同一路径的重复写入：只保留最后一个，减少磁盘 I/O 并压缩 Directory。
+        // Merge duplicate writes to the same path: keep only the last one, reducing disk I/O and compressing Directory.
         var latestByPath = new Dictionary<string, WriteOperation>(StringComparer.Ordinal);
         foreach (var op in operations)
             latestByPath[op.NormalizedPath] = op;
         var finalOps = new List<WriteOperation>(latestByPath.Values);
 
-        // ─── 第 1 步：WAL 预写 ───
-        // 将整批操作（包含数据体）追加到 WAL 并 fsync。
-        // 之后任何崩溃都可以通过重放 WAL 恢复这一批。
+        // ─── Step 1: WAL Pre-write ───
+        // Append the entire batch of operations (including data bodies) to WAL and fsync.
+        // After this, any crash can be recovered by replaying WAL.
         _wal.AppendBatch(finalOps);
 
-        // ─── 第 2 步：写主文件数据块 ───
+        // ─── Step 2: Write main file data blocks ───
         var dirtyPaths = new List<string>(finalOps.Count);
 
         foreach (var op in finalOps)
@@ -193,14 +193,14 @@ internal sealed class WriteQueue : IDisposable
             }
         }
 
-        // ─── 第 3 步：写新 Directory + 原子切换双 Header 槽位 ───
+        // ─── Step 3: Write new Directory + atomically switch dual Header slots ───
         var snapshot = _directoryMap.Snapshot();
         _writer.WriteDirectoryAndCommit(snapshot);
 
-        // ─── 第 4 步：至此新状态已在磁盘生效，WAL 可以安全清空 ───
+        // ─── Step 4: At this point the new state has taken effect on disk, WAL can be safely cleared ───
         _wal.Truncate();
 
-        // 清除 pin，允许 TTL/LRU 正常回收。
+        // Clear pin, allowing TTL/LRU to reclaim normally.
         foreach (var path in dirtyPaths)
             _entryCache.Unpin(path);
     }

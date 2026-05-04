@@ -25,6 +25,7 @@ public class HelpLocalizationKoKR : HelpLocalizationBase
     public override string Memory_Title => "기억 시스템";
     public override string OllamaSetup_Title => "Ollama 설치 및 모델 다운로드";
     public override string BailianDashScope_Title => "알리클라우드 바이롄 플랫폼 사용 가이드";
+    public override string VolcengineArk_Title => "Volcengine Ark 플랫폼 사용 가이드";
     public override string AIClients_Title => "AI 클라이언트 설정";
 
     public override string BeingSoul_Title => "소울 파일";
@@ -51,6 +52,9 @@ public class HelpLocalizationKoKR : HelpLocalizationBase
 
     public override string[] BailianDashScope_Tags =>
         new[] { "바이롄", "DashScope", "알리클라우드", "클라우드AI", "API", "구성", "모델", "유료" };
+
+    public override string[] VolcengineArk_Tags => new[]
+        { "Volcengine", "Ark", "Doubao", "ByteDance", "클라우드AI", "API", "구성", "모델" };
 
     public override string[] AIClients_Tags => new[]
         { "AI클라이언트", "AI서비스", "모델", "설정", "로컬", "클라우드", "Ollama", "DashScope", "구성" };
@@ -1862,6 +1866,150 @@ Ollama를 설치하고 모델을 다운로드한 후 다음을 할 수 있습니
 - 초고 지능의 AI 서비스를 경험합니다.
 - 로컬 하드웨어 구성을 걱정할 필요가 없습니다.
 즐거운 사용 되세요!
+";
+
+    public override string VolcengineArk => @"
+# Volcengine Ark 플랫폼 사용 가이드
+
+## Volcengine Ark란?
+
+Volcengine Ark는 ByteDance가 제공하는 원스톱 대규모 언어 모델 서비스 플랫폼입니다. Doubao 시리즈 모델과 다양한 타사 모델(DeepSeek, GLM, Kimi 등)을 제공합니다.
+
+**장점:**
+- Doubao Seed 시리즈 플래그십 모델, 매우 높은 지능(256K 컨텍스트)
+- 로컬 하드웨어 불필요, 클라우드에서 실행
+- 여러 최고급 AI 모델 지원
+- 종량제 과금, 매우 경쟁력 있는 가격
+- OpenAI API 형식과 완벽 호환
+- 중국 내 플랫폼, 특별한 네트워크 없이 안정적인 액세스
+
+## 등록 및 설정
+
+### 1단계: Volcengine 계정 등록
+
+1. Volcengine 콘솔 방문: https://console.volcengine.com
+2. ""무료 등록"" 클릭
+3. 등록 완료(전화번호, 이메일 지원)
+4. 본인 인증 완료
+
+### 2단계: Ark 서비스 활성화
+
+1. Volcengine 콘솔에 로그인
+2. 왼쪽 메뉴에서 ""Ark"" 검색
+3. Ark 제품 페이지로 이동
+4. ""지금 활성화"" 클릭
+5. 서비스 계약 읽고 동의
+
+### 3단계: 추론 엔드포인트 생성
+
+Volcengine Ark는 모델을 식별하기 위해 ""추론 엔드포인트""를 사용하며, 모델 이름을 직접 사용하지 않습니다.
+
+1. Ark 콘솔에서 ""추론 엔드포인트"" 페이지로 이동
+2. ""추론 엔드포인트 생성"" 클릭
+3. 사용할 모델 선택(예: doubao-seed-1-6-251015)
+4. 엔드포인트 이름 지정
+5. 생성 후 엔드포인트 ID 복사(형식: ep-20241212123456-abcde)
+
+### 4단계: API Key 획득
+
+1. Ark 콘솔에서 ""API Key 관리"" 찾기
+2. ""API Key 생성"" 클릭
+3. 키 이름 지정(예: ""SiliconLife"")
+4. API Key 복사 및 저장(**한 번만 표시되므로 안전하게 보관하세요**)
+
+## Silicon Life에서 Volcengine Ark 설정
+
+### 설정 단계
+
+1. Silicon Life 시스템 열기
+2. **⚙ 설정** 페이지로 이동
+3. ""AI 클라이언트 유형""에서 `VolcengineArkClientFactory` 선택
+4. ""AI 설정""에서 다음 입력:
+   - **API Key**: API Key 붙여넣기
+   - **추론 엔드포인트 ID**: 추론 엔드포인트 ID 붙여넣기(예: ep-20241212123456-abcde)
+   (**API Key를 입력하면 시스템이 자동으로 추론 엔드포인트 목록을 가져옵니다**)
+5. 설정 저장
+
+**팁:**
+- API Key를 먼저 입력해야 추론 엔드포인트 드롭다운이 로드됩니다
+- 목록 로드에 실패하면 수동으로 추론 엔드포인트 ID를 입력할 수 있습니다
+
+### 모델 선택
+
+Volcengine Ark는 추론 엔드포인트를 통해 모델을 호출합니다. 각 엔드포인트는 하나의 모델에 해당합니다.
+
+**인기 모델:**
+
+| 모델 시리즈 | 모델 ID | 특징 |
+|-----------|---------|------|
+| **Doubao-Seed-1.8** | doubao-seed-1-8-YYMMDD | 최신 플래그십, 강력한 Agent 기능 |
+| **Doubao-Seed-1.6** | doubao-seed-1-6-251015 | 범용 모델, 일상 사용에 추천 |
+| **Doubao-Seed-1.6-Flash** | doubao-seed-1-6-flash | 초저지연 버전 |
+| **Doubao-Seed-1.6-Lite** | doubao-seed-1-6-lite | 경량, 가성비 우수 |
+| **Doubao-Seed-Code** | doubao-seed-code-preview-latest | 코드 전문 모델 |
+| **Doubao-Pro-32K** | doubao-pro-32k | 클래식 프로 버전 |
+| **Doubao-Lite-32K** | doubao-lite-32k | 클래식 경량 버전 |
+
+## 요금
+
+### 과금 방식
+
+Volcengine Ark는 **종량제** 과금 방식을 채택:
+- 입력 및 출력 Token 수에 따라 과금
+- Doubao Seed 시리즈 통일 가격:
+  - 입력 0~32K: 0.8 위안/100만 Token
+  - 출력 0~32K: 8 위안/100만 Token
+  - 입력 32K~128K: 1.2 위안/100만 Token
+  - 더 긴 컨텍스트, 더 높은 가격
+
+### 무료 할당량
+
+- 신규 사용자는 모델당 50만 무료 추론 Token 제공(본인 인증 필요)
+- 무료 할당량 유효 기간 30일
+- ""안전 모드""는 무료 할당량만 소비하고 소진 시 자동 중지
+
+### 비용 절감 팁
+
+- 적절한 모델 선택(Lite 시리즈 가성비 우수)
+- 입력 길이 합리적으로 제어
+- 컨텍스트 캐시(Context Cache) 사용하여 비용 절감
+- 사용량 정기적으로 확인
+
+## 자주 묻는 질문
+
+### Q: 추론 엔드포인트란?
+
+**A:** 추론 엔드포인트는 Volcengine Ark의 독특한 개념입니다. Ark 콘솔에서 추론 엔드포인트를 생성하고 사용할 모델을 선택하면 시스템이 엔드포인트 ID를 할당합니다. Silicon Life에서 이 ID를 설정하면 해당 모델을 호출할 수 있습니다.
+
+### Q: API Key는 어디서 얻나요?
+
+**A:**
+1. Volcengine 콘솔에 로그인
+2. Ark의 ""API Key 관리""로 이동
+3. 새 API Key 생성
+4. 복사하여 안전하게 보관
+
+### Q: Volcengine Ark와 Bailian의 차이점은?
+
+| 특징 | Volcengine Ark | Bailian(DashScope) |
+|------|--------------|-------------------|
+| 제공업체 | ByteDance | Alibaba Cloud |
+| 플래그십 모델 | Doubao Seed 시리즈 | Qwen 시리즈 |
+| 모델 호출 | 추론 엔드포인트 | 직접 모델명 |
+| 가격 | 매우 경쟁력 있음 | 중간 |
+| 무료 할당량 | 모델당 50만 Token | 무료 체험 |
+| 중국 내 액세스 | 안정적 | 안정적 |
+
+### Q: API 호출이 실패하면?
+
+**확인 사항:**
+1. API Key가 올바른가요?
+2. 추론 엔드포인트 ID가 올바르고 게시되었나요?
+3. 계정 잔액이 충분한가요?
+4. 무료 할당량이 소진되었나요?
+5. 추론 엔드포인트가 실행 중인가요?
+
+즐겁게 사용하세요!
 ";
 
     public override string AIClients => @"

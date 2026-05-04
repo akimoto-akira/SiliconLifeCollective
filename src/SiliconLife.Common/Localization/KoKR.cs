@@ -297,7 +297,7 @@ public class KoKR : DefaultLocalizationBase
     public override string NavMenuChat => "채팅";
     public override string NavMenuDashboard => "대시보드";
     public override string NavMenuBeings => "실리콘 라이프";
-    public override string NavMenuAudit => "감사";
+    public override string NavMenuUsage => "사용량";
     public override string NavMenuTasks => "작업";
     public override string NavMenuMemory => "메모리";
     public override string NavMenuKnowledge => "지식";
@@ -319,7 +319,7 @@ public class KoKR : DefaultLocalizationBase
     public override string PageTitleKnowledge => "지식 그래프 - 실리콘 라이프 콜렉티브";
     public override string PageTitleProjects => "프로젝트 공간 관리 - 실리콘 라이프 콜렉티브";
     public override string PageTitleLogs => "로그 조회 - 실리콘 라이프 콜렉티브";
-    public override string PageTitleAudit => "Token 감사 - 실리콘 라이프 콜렉티브";
+    public override string PageTitleUsage => "Token 사용량 - 실리콘 라이프 콜렉티브";
     public override string PageTitleConfig => "시스템 설정 - 실리콘 라이프 콜렉티브";
     public override string PageTitleExecutor => "실행기 모니터 - 실리콘 라이프 콜렉티브";
     public override string PageTitleCodeBrowser => "코드 브라우저 - 실리콘 라이프 콜렉티브";
@@ -745,38 +745,38 @@ public class KoKR : DefaultLocalizationBase
     public override string LogsPrevPage => "이전";
     public override string LogsNextPage => "다음";
 
-    public override string AuditPageHeader => "Token 사용량 감사";
-    public override string AuditTotalTokens => "총 Token 수";
-    public override string AuditTotalRequests => "총 요청 수";
-    public override string AuditSuccessCount => "성공";
-    public override string AuditFailureCount => "실패";
-    public override string AuditPromptTokens => "입력 Token";
-    public override string AuditCompletionTokens => "출력 Token";
-    public override string AuditStartTime => "시작 시간";
-    public override string AuditEndTime => "종료 시간";
-    public override string AuditFilterButton => "조회";
-    public override string AuditEmptyState => "감사 기록 없음";
-    public override string AuditAIClientType => "AI 클라이언트";
-    public override string AuditAllClientTypes => "모든 유형";
-    public override string AuditGroupByClient => "클라이언트별 그룹화";
-    public override string AuditGroupByBeing => "실리콘 라이프별 그룹화";
-    public override string AuditPrevPage => "이전";
-    public override string AuditNextPage => "다음";
-    public override string AuditBeing => "실리콘 라이프";
-    public override string AuditAllBeings => "모든 실리콘 라이프";
-    public override string AuditTimeToday => "오늘";
-    public override string AuditTimeWeek => "이번 주";
-    public override string AuditTimeMonth => "이번 달";
-    public override string AuditTimeYear => "올해";
-    public override string AuditExport => "내보내기";
-    public override string AuditTrendTitle => "Token 사용량 추세";
-    public override string AuditTrendPrompt => "입력 Token";
-    public override string AuditTrendCompletion => "출력 Token";
-    public override string AuditTrendTotal => "총 Token";
-    public override string AuditTooltipDate => "날짜";
-    public override string AuditTooltipPrompt => "입력 Token";
-    public override string AuditTooltipCompletion => "출력 Token";
-    public override string AuditTooltipTotal => "총 Token";
+    public override string UsagePageHeader => "Token 사용량";
+    public override string UsageTotalTokens => "총 Token 수";
+    public override string UsageTotalRequests => "총 요청 수";
+    public override string UsageSuccessCount => "성공";
+    public override string UsageFailureCount => "실패";
+    public override string UsagePromptTokens => "입력 Token";
+    public override string UsageCompletionTokens => "출력 Token";
+    public override string UsageStartTime => "시작 시간";
+    public override string UsageEndTime => "종료 시간";
+    public override string UsageFilterButton => "조회";
+    public override string UsageEmptyState => "사용량 기록 없음";
+    public override string UsageAIClientType => "AI 클라이언트";
+    public override string UsageAllClientTypes => "모든 유형";
+    public override string UsageGroupByClient => "클라이언트별 그룹화";
+    public override string UsageGroupByBeing => "실리콘 라이프별 그룹화";
+    public override string UsagePrevPage => "이전";
+    public override string UsageNextPage => "다음";
+    public override string UsageBeing => "실리콘 라이프";
+    public override string UsageAllBeings => "모든 실리콘 라이프";
+    public override string UsageTimeToday => "오늘";
+    public override string UsageTimeWeek => "이번 주";
+    public override string UsageTimeMonth => "이번 달";
+    public override string UsageTimeYear => "올해";
+    public override string UsageExport => "내보내기";
+    public override string UsageTrendTitle => "Token 사용량 추세";
+    public override string UsageTrendPrompt => "입력 Token";
+    public override string UsageTrendCompletion => "출력 Token";
+    public override string UsageTrendTotal => "총 Token";
+    public override string UsageTooltipDate => "날짜";
+    public override string UsageTooltipPrompt => "입력 Token";
+    public override string UsageTooltipCompletion => "출력 Token";
+    public override string UsageTooltipTotal => "총 Token";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {
@@ -823,6 +823,9 @@ public class KoKR : DefaultLocalizationBase
         ["DashScopeModel_glm-5.1"] = "GLM 5.1(Zhipu)",
         ["DashScopeModel_kimi-k2.5"] = "Kimi K2.5(장문맥)",
         ["DashScopeModel_llama-4-maverick"] = "Llama 4 Maverick",
+        ["VolcengineArkClient"] = "Volcengine Ark 클라이언트",
+        ["VolcengineArkApiKey"] = "API 키",
+        ["VolcengineArkEndpointId"] = "추론 엔드포인트 ID",
         ["WebPort"] = "Web 포트",
         ["WebSkin"] = "Web 스킨",
         ["UserNickname"] = "사용자 닉네임"
@@ -842,6 +845,8 @@ public class KoKR : DefaultLocalizationBase
         ["DashScopeApiKey"] = "Alibaba Cloud DashScope API 키",
         ["DashScopeRegion"] = "Alibaba Cloud DashScope 서비스 리전",
         ["DashScopeModel"] = "Alibaba Cloud DashScope에서 사용할 모델",
+        ["VolcengineArkApiKey"] = "Volcengine Ark API 키",
+        ["VolcengineArkEndpointId"] = "Volcengine Ark 추론 엔드포인트 ID",
         ["WebPort"] = "Web 서버 포트",
         ["WebSkin"] = "Web 스킨 이름",
         ["UserNickname"] = "사용자 닉네임"
@@ -911,7 +916,7 @@ public class KoKR : DefaultLocalizationBase
         ["task"] = "작업",
         ["system"] = "시스템",
         ["timer"] = "타이머",
-        ["token_audit"] = "Token 감사",
+        ["token_audit"] = "Token사용량",
         ["work_note"] = "작업 노트",
         ["project"] = "프로젝트",
         ["project_task"] = "프로젝트 작업",
@@ -1726,6 +1731,9 @@ public class KoKR : DefaultLocalizationBase
 
     public override string FormatMemoryEventTask(string content)
         => $"[작업] 작업 실행, 결과: {content}";
+
+    public override string FormatMemoryEventProject(string content)
+        => $"[프로젝트] 프로젝트 사고, 결과: {content}";
 
     public override string FormatMemoryEventTimer(string content)
         => $"[타이머] 타이머 트리거, 응답: {content}";

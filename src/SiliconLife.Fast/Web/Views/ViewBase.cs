@@ -90,7 +90,7 @@ public abstract class ViewBase
             ("chat", "💬", localization.NavMenuChat, "/chat"),
             ("dashboard", "📊", localization.NavMenuDashboard, "/dashboard"),
             ("beings", "🧠", localization.NavMenuBeings, "/beings"),
-            ("audit", "🔍", localization.NavMenuAudit, "/audit"),
+            ("usage", "🔍", localization.NavMenuUsage, "/usage"),
             ("knowledge", "📚", localization.NavMenuKnowledge, "/knowledge"),
             ("projects", "📁", localization.NavMenuProjects, "/project"),
             ("logs", "📝", localization.NavMenuLogs, "/logs"),

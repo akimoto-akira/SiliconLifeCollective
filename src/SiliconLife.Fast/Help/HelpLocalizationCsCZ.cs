@@ -23,6 +23,7 @@ public class HelpLocalizationCsCZ : HelpLocalizationBase
   public override string Memory_Title => "Paměťový systém";
   public override string OllamaSetup_Title => "Instalace Ollama a stahování modelů";
   public override string BailianDashScope_Title => "Průvodce používáním platformy Alibaba Cloud Bailian";
+  public override string VolcengineArk_Title => "Průvodce používáním platformy Volcengine Ark";
   public override string AIClients_Title => "Konfigurace AI klienta";
 
   public override string BeingSoul_Title => "Soubor Duše";
@@ -75,6 +76,9 @@ public class HelpLocalizationCsCZ : HelpLocalizationBase
 
   public override string[] BailianDashScope_Tags => new[]
     { "Bailian", "DashScope", "Alibaba Cloud", "cloudová AI", "API", "konfigurace", "model", "placené" };
+
+  public override string[] VolcengineArk_Tags => new[]
+    { "Volcengine", "Ark", "Doubao", "ByteDance", "cloudová AI", "API", "konfigurace", "model" };
 
   public override string[] AIClients_Tags => new[]
     { "AI klient", "AI služba", "model", "konfigurace", "lokální", "cloud", "Ollama", "DashScope", "nastavení" };
@@ -2317,6 +2321,150 @@ Po konfiguraci Bailian můžete:
 - Používat vysoce kvalitní cloudové AI modely v Silicon Life
 - Zažít AI služby s ultravysokým IQ
 - Nemusíte se starat o konfiguraci lokálního hardwaru
+
+Příjemné používání!
+";
+
+  public override string VolcengineArk => @"
+# Průvodce používáním platformy Volcengine Ark
+
+## Co je Volcengine Ark?
+
+Volcengine Ark je komplexní platforma pro služby velkých jazykových modelů od ByteDance, nabízející řadu Doubao a různé modely třetích stran (DeepSeek, GLM, Kimi atd.).
+
+**Výhody:**
+- Vlajkové modely řady Doubao Seed, výjimečná inteligence (256K kontext)
+- Není vyžadován lokální hardware, běží v cloudu
+- Podporuje několik špičkových AI modelů
+- Platba za použití, velmi konkurenceschopné ceny
+- Plně kompatibilní s formátem OpenAI API
+- Čínská platforma, stabilní přístup bez speciální sítě
+
+## Registrace a nastavení
+
+### Krok 1: Registrace účtu Volcengine
+
+1. Navštivte konzoli Volcengine: https://console.volcengine.com
+2. Klikněte na ""Bezplatná registrace""
+3. Dokončete registraci (telefon, e-mail)
+4. Dokončete ověření totožnosti
+
+### Krok 2: Aktivace služby Ark
+
+1. Přihlaste se do konzole Volcengine
+2. V levém menu najděte ""Ark""
+3. Vstupte na stránku produktu Ark
+4. Klikněte na ""Aktivovat nyní""
+5. Přečtěte si a přijměte smlouvu o poskytování služeb
+
+### Krok 3: Vytvoření inferenčního endpointu
+
+Volcengine Ark používá k identifikaci modelů ""inferenční endpointy"" místo přímého použití názvů modelů.
+
+1. V konzoli Ark přejděte na stránku ""Inferenční endpointy""
+2. Klikněte na ""Vytvořit inferenční endpoint""
+3. Vyberte model, který chcete použít (např. doubao-seed-1-6-251015)
+4. Pojmenujte svůj endpoint
+5. Po vytvoření zkopírujte ID endpointu (formát: ep-20241212123456-abcde)
+
+### Krok 4: Získání API klíče
+
+1. V konzoli Ark najděte ""Správa API klíčů""
+2. Klikněte na ""Vytvořit API klíč""
+3. Pojmenujte svůj klíč (např. ""SiliconLife"")
+4. Zkopírujte a uložte API klíč (**zobrazen pouze jednou, bezpečně jej uschovejte**)
+
+## Konfigurace Volcengine Ark v Silicon Life
+
+### Kroky konfigurace
+
+1. Otevřete systém Silicon Life
+2. Přejděte na stránku **⚙ Konfigurace**
+3. Najděte ""Typ AI klienta"", vyberte `VolcengineArkClientFactory`
+4. V ""AI konfiguraci"" vyplňte:
+   - **API klíč**: vložte svůj API klíč
+   - **ID inferenčního endpointu**: vložte ID svého inferenčního endpointu (např. ep-20241212123456-abcde)
+   (**Po zadání API klíče systém automaticky načte seznam vašich inferenčních endpointů**)
+5. Uložte konfiguraci
+
+**Tip:**
+- API klíč musí být zadán nejprve, aby se načetl rozevírací seznam inferenčních endpointů
+- Pokud se načtení nezdaří, můžete ID inferenčního endpointu zadat ručně
+
+### Výběr modelu
+
+Volcengine Ark volá modely prostřednictvím inferenčních endpointů, každý endpoint odpovídá jednomu modelu.
+
+**Populární modely:**
+
+| Řada modelů | ID modelu | Vlastnosti |
+|------------|----------|-----------|
+| **Doubao-Seed-1.8** | doubao-seed-1-8-YYMMDD | Nejnovější vlajková loď, silnější Agent schopnosti |
+| **Doubao-Seed-1.6** | doubao-seed-1-6-251015 | Univerzální model, doporučeno pro každodenní použití |
+| **Doubao-Seed-1.6-Flash** | doubao-seed-1-6-flash | Verze s ultra nízkou latencí |
+| **Doubao-Seed-1.6-Lite** | doubao-seed-1-6-lite | Lehký, vynikající poměr cena/výkon |
+| **Doubao-Seed-Code** | doubao-seed-code-preview-latest | Model specializovaný na kód |
+| **Doubao-Pro-32K** | doubao-pro-32k | Klasická profesionální verze |
+| **Doubao-Lite-32K** | doubao-lite-32k | Klasická lehká verze |
+
+## Ceny
+
+### Způsob účtování
+
+Volcengine Ark používá **platbu za použití**:
+- Účtování na základě počtu vstupních a výstupních tokenů
+- Jednotné ceny pro řadu Doubao Seed:
+  - Vstup 0~32K: 0,8 yuanů/milion tokenů
+  - Výstup 0~32K: 8 yuanů/milion tokenů
+  - Vstup 32K~128K: 1,2 yuanů/milion tokenů
+  - Delší kontext, vyšší cena
+
+### Bezplatný limit
+
+- Noví uživatelé získají 500 000 bezplatných inferenčních tokenů na model (vyžaduje ověření totožnosti)
+- Bezplatný limit platný 30 dní
+- Podporuje ""bezpečný režim"", který spotřebovává pouze bezplatný limit a po vyčerpání se automaticky zastaví
+
+### Tipy pro úsporu nákladů
+
+- Vyberte vhodný model (řada Lite nabízí vynikající poměr cena/výkon)
+- Rozumně kontrolujte délku vstupu
+- Použijte mezipaměť kontextu (Context Cache) ke snížení nákladů
+- Pravidelně kontrolujte využití
+
+## Často kladené otázky
+
+### Q: Co je inferenční endpoint?
+
+**A:** Inferenční endpoint je jedinečný koncept Volcengine Ark. Nejprve vytvoříte inferenční endpoint v konzoli Ark, vyberete model k použití a systém přiřadí ID endpointu. Když toto ID nakonfigurujete v Silicon Life, můžete volat odpovídající model.
+
+### Q: Kde získám API klíč?
+
+**A:**
+1. Přihlaste se do konzole Volcengine
+2. Přejděte do ""Správy API klíčů"" Ark
+3. Vytvořte nový API klíč
+4. Zkopírujte a bezpečně uložte
+
+### Q: Jaký je rozdíl mezi Volcengine Ark a Bailian?
+
+| Funkce | Volcengine Ark | Bailian (DashScope) |
+|-------|--------------|-------------------|
+| Poskytovatel | ByteDance | Alibaba Cloud |
+| Vlajkové modely | Řada Doubao Seed | Řada Qwen |
+| Volání modelu | Inferenční endpoint | Přímý název modelu |
+| Cena | Velmi konkurenceschopná | Střední |
+| Bezplatný limit | 500K tokenů na model | Bezplatná zkušební verze |
+| Přístup v Číně | Stabilní | Stabilní |
+
+### Q: Co dělat, když volání API selže?
+
+**Zkontrolujte:**
+1. Je API klíč správný?
+2. Je ID inferenčního endpointu správné a publikované?
+3. Je zůstatek na účtu dostatečný?
+4. Je bezplatný limit vyčerpán?
+5. Je inferenční endpoint spuštěn?
 
 Příjemné používání!
 ";

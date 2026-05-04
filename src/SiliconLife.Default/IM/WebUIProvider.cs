@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -52,7 +52,7 @@ public class WebUIProvider : IIMProvider
     private readonly object _streamingLock = new();
 
     public event EventHandler<IMMessageEventArgs>? MessageReceived;
-#pragma warning disable CS0067 // 事件为接口要求或为将来扩展预留
+#pragma warning disable CS0067 // Event is required by interface or reserved for future expansion
     public event EventHandler<StreamChunkEventArgs>? StreamChunkReceived;
     public event EventHandler? ExitRequested;
 #pragma warning restore CS0067

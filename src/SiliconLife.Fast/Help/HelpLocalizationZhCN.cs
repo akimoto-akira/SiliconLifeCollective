@@ -22,6 +22,7 @@ public class HelpLocalizationZhCN : HelpLocalizationBase
     public override string Memory_Title => "记忆系统";
     public override string OllamaSetup_Title => "Ollama 安装与模型下载";
     public override string BailianDashScope_Title => "阿里云百炼平台使用指南";
+    public override string VolcengineArk_Title => "火山方舟引擎使用指南";
     public override string AIClients_Title => "AI 客户端配置";
 
     public override string BeingSoul_Title => "灵魂文件";
@@ -46,6 +47,9 @@ public class HelpLocalizationZhCN : HelpLocalizationBase
 
     public override string[] BailianDashScope_Tags =>
         new[] { "百炼", "DashScope", "阿里云", "云端AI", "API", "配置", "模型", "付费" };
+
+    public override string[] VolcengineArk_Tags =>
+        new[] { "火山方舟", "Volcengine", "Ark", "豆包", "字节跳动", "云端AI", "API", "配置", "模型" };
 
     public override string[] AIClients_Tags =>
         new[] { "AI客户端", "AI服务", "模型", "配置", "本地", "云端", "Ollama", "DashScope", "设置" };
@@ -2191,6 +2195,150 @@ ollama pull qwen3.5
 - 在 Silicon Life 中使用高质量的云端AI模型
 - 体验超高智商的AI服务
 - 无需担心本地硬件配置
+
+祝您使用愉快！
+";
+
+    public override string VolcengineArk => @"
+# 火山方舟引擎使用指南
+
+## 什么是火山方舟？
+
+火山方舟（Volcengine Ark）是字节跳动旗下火山引擎推出的一站式大模型服务平台，提供豆包（Doubao）系列模型及多种第三方模型（DeepSeek、GLM、Kimi等）。
+
+**优点：**
+- 豆包 Seed 系列旗舰模型，智商极高（256K上下文）
+- 无需本地硬件，云端运行
+- 支持多种顶级AI模型
+- 按量付费，价格极具竞争力
+- 完全兼容 OpenAI API 格式
+- 国内平台，访问稳定无需特殊网络
+
+## 注册和开通服务
+
+### 步骤1：注册火山引擎账号
+
+1. 访问火山引擎官网：https://console.volcengine.com
+2. 点击""免费注册""
+3. 按提示完成注册（支持手机号、邮箱注册）
+4. 完成实名认证
+
+### 步骤2：开通方舟服务
+
+1. 登录火山引擎控制台
+2. 在左侧菜单找到""方舟""或搜索""方舟""
+3. 进入方舟产品页面
+4. 点击""立即开通""
+5. 阅读并同意服务协议
+
+### 步骤3：创建推理接入点
+
+火山方舟使用""推理接入点""（Endpoint）来标识模型，而不是直接使用模型名称。
+
+1. 进入方舟控制台的""推理接入点""页面
+2. 点击""创建推理接入点""
+3. 选择您想使用的模型（如 doubao-seed-1-6-251015）
+4. 为接入点命名
+5. 创建完成后，复制接入点 ID（格式如 ep-20241212123456-abcde）
+
+### 步骤4：获取 API Key
+
+1. 在方舟控制台找到""API Key 管理""
+2. 点击""创建 API Key""
+3. 为密钥命名（如""SiliconLife""）
+4. 复制并保存 API Key（**只显示一次，请妥善保存**）
+
+## 在 Silicon Life 中配置火山方舟
+
+### 配置步骤
+
+1. 打开 Silicon Life 系统
+2. 进入 **⚙ 配置** 页面
+3. 找到""AI客户端类型""，选择 `VolcengineArkClientFactory`
+4. 在""AI配置""中填写：
+   - **API Key**：粘贴您复制的 API Key
+   - **推理接入点 ID**：粘贴您创建的推理接入点 ID（如 ep-20241212123456-abcde）
+   （**填写 API Key 后，系统会自动拉取您的推理接入点列表供选择**）
+5. 保存配置
+
+**提示：**
+- 必须先填写 API Key，推理接入点下拉列表才会加载
+- 如果列表加载失败，可以直接手动输入推理接入点 ID
+
+### 模型选择
+
+火山方舟使用推理接入点（Endpoint）来调用模型，每个接入点对应一个模型。
+
+**热门模型：**
+
+| 模型系列 | 模型 ID | 特点 |
+|---------|---------|------|
+| **Doubao-Seed-1.8** | doubao-seed-1-8-YYMMDD | 最新旗舰，更强Agent能力 |
+| **Doubao-Seed-1.6** | doubao-seed-1-6-251015 | 综合模型，推荐日常使用 |
+| **Doubao-Seed-1.6-Flash** | doubao-seed-1-6-flash | 超低延迟版本 |
+| **Doubao-Seed-1.6-Lite** | doubao-seed-1-6-lite | 轻量版，性价比高 |
+| **Doubao-Seed-Code** | doubao-seed-code-preview-latest | 编程专用模型 |
+| **Doubao-Pro-32K** | doubao-pro-32k | 经典专业版 |
+| **Doubao-Lite-32K** | doubao-lite-32k | 经典轻量版 |
+
+## 费用说明
+
+### 计费方式
+
+火山方舟采用**按量付费**模式：
+- 按输入的 token 数量计费
+- 豆包 Seed 系列统一定价：
+  - 输入 0~32K：0.8元/百万tokens
+  - 输出 0~32K：8元/百万tokens
+  - 输入 32K~128K：1.2元/百万tokens
+  - 更长上下文价格递增
+
+### 免费额度
+
+- 注册赠送每个模型50万tokens免费推理额度（需完成实名认证）
+- 免费额度有效期30天
+- 支持""安心模式""，仅消耗免费额度，用完自动暂停
+
+### 节省费用建议
+
+- 选择适合的模型（Lite 系列性价比极高）
+- 合理控制输入长度
+- 利用上下文缓存（Context Cache）降低成本
+- 定期查看用量
+
+## 常见问题
+
+### Q: 什么是推理接入点？
+
+**A:** 推理接入点（Endpoint）是火山方舟的独特概念。您需要先在方舟控制台创建一个推理接入点，选择要使用的模型，然后系统会分配一个接入点 ID。在 Silicon Life 中配置时，填入这个 ID 即可调用对应的模型。
+
+### Q: API Key 在哪里获取？
+
+**A:**
+1. 登录火山引擎控制台
+2. 进入方舟的""API Key 管理""
+3. 创建新的 API Key
+4. 复制并妥善保存
+
+### Q: 火山方舟和百炼有什么区别？
+
+| 特性 | 火山方舟（Ark） | 百炼（DashScope） |
+|------|----------------|------------------|
+| 提供商 | 字节跳动 | 阿里云 |
+| 旗舰模型 | 豆包 Seed 系列 | 通义千问系列 |
+| 模型调用 | 推理接入点方式 | 直接模型名称 |
+| 价格 | 性价比极高 | 中等 |
+| 免费额度 | 每模型50万tokens | 有免费试用 |
+| 国内访问 | 稳定 | 稳定 |
+
+### Q: 调用失败怎么办？
+
+**检查：**
+1. API Key 是否正确
+2. 推理接入点 ID 是否正确且已发布
+3. 账户余额是否充足
+4. 是否超出免费额度
+5. 推理接入点是否处于运行中状态
 
 祝您使用愉快！
 ";

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -156,7 +156,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
     /// <summary>
     /// Called by SiliconBeingManager on each tick.
     /// Detects the trigger scene and calls the corresponding brain method.
-    /// Priority: AI Config Change > Continuation > Chat > Timer > Task > MemoryCompression
+    /// Priority: AI config change > continuation > chat > timer > task > project > memory compression
     /// </summary>
     /// <param name="deltaTime">Time elapsed since the last tick</param>
     public override void Tick(TimeSpan deltaTime)
@@ -180,6 +180,8 @@ public class DefaultSiliconBeing : SiliconBeingBase
                     ContextManager cm = new ContextManager(this, sb);
                     cm.CommitMessagesAsRead();
                 }
+                _activityRaw = (int)BeingActivity.Idle;
+                return;
             }
             else
             {
@@ -268,6 +270,16 @@ public class DefaultSiliconBeing : SiliconBeingBase
                         errorOccurred = true;
                     return;
                 }
+            }
+
+            // Project thinking: check for pending project work
+            if (ServiceLocator.Instance.ProjectManager != null && HasProjectWork())
+            {
+                _activityRaw = (int)BeingActivity.Project;
+                _logger.Info(Id, "Being {0}: detected pending project work", Name);
+                if (!ExecuteBrain("ThinkOnProject", null, _ => new ContextManager(this, (SessionBase?)null).ThinkOnProject()))
+                    errorOccurred = true;
+                return;
             }
 
             if (Memory != null && Memory.ShouldCompress(out var compressData))
@@ -552,6 +564,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
         {
             "OllamaClient" => new OllamaClientFactory(),
             "DashScopeClient" => new DashScopeClientFactory(),
+            "VolcengineArkClient" => new VolcengineArkClientFactory(),
             _ => new OllamaClientFactory()
         };
     }
@@ -726,6 +739,50 @@ public class DefaultSiliconBeing : SiliconBeingBase
             _webView.Dispose();
             _webView = null;
             _logger.Info(Id, "Being {0}: WebView closed", Name);
+        }
+    }
+
+    /// <summary>
+    /// Checks if there is pending project work (projects assigned to this being with pending tasks).
+    /// Used to detect external disturbances that should trigger project thinking.
+    /// </summary>
+    private bool HasProjectWork()
+    {
+        try
+        {
+            // Get ProjectManager from ServiceLocator
+            var projectManager = ServiceLocator.Instance.ProjectManager;
+            if (projectManager == null)
+                return false;
+
+            // Get all active projects
+            var projects = projectManager.ListProjects(includeArchived: false);
+            if (projects.Count == 0)
+                return false;
+
+            // Check each project for assignment and pending work
+            foreach (var project in projects)
+            {
+                // Check if this silicon being is assigned to the project
+                if (projectManager.IsBeingAssigned(project.Id, Id))
+                {
+                    // Get the project task system
+                    var taskSystem = projectManager.GetTaskSystem(project.Id);
+                    if (taskSystem != null && taskSystem.PendingCount > 0)
+                    {
+                        _logger.Debug(Id, "Project {0} has {1} pending tasks for being {2}", 
+                            project.Name, taskSystem.PendingCount, Name);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(Id, "Failed to check project work", ex);
+            return false;
         }
     }
 }

@@ -22,6 +22,7 @@ public class HelpLocalizationEnUS : HelpLocalizationBase
     public override string Memory_Title => "Memory System";
     public override string OllamaSetup_Title => "Ollama Installation and Model Download";
     public override string BailianDashScope_Title => "Alibaba Cloud Bailian Platform User Guide";
+    public override string VolcengineArk_Title => "Volcengine Ark Platform User Guide";
     public override string AIClients_Title => "AI Client Configuration";
 
     public override string BeingSoul_Title => "Being Soul File";
@@ -70,6 +71,9 @@ public class HelpLocalizationEnUS : HelpLocalizationBase
 
     public override string[] BailianDashScope_Tags => new[]
         { "Bailian", "DashScope", "Alibaba Cloud", "cloud AI", "API", "configuration", "model", "billing" };
+
+    public override string[] VolcengineArk_Tags => new[]
+        { "Volcengine", "Ark", "Doubao", "ByteDance", "cloud AI", "API", "configuration", "model" };
 
     public override string[] AIClients_Tags => new[]
         { "AI client", "AI service", "model", "configuration", "local", "cloud", "Ollama", "DashScope", "setup" };
@@ -2234,6 +2238,150 @@ After configuring Bailian, you can:
 - Use high-quality cloud AI models in Silicon Life
 - Experience ultra-high intelligence AI services
 - No need to worry about local hardware configuration
+
+Enjoy using the system!
+";
+
+    public override string VolcengineArk => @"
+# Volcengine Ark Platform User Guide
+
+## What is Volcengine Ark?
+
+Volcengine Ark is ByteDance's one-stop large model service platform, offering the Doubao series of models and various third-party models (DeepSeek, GLM, Kimi, etc.).
+
+**Benefits:**
+- Doubao Seed series flagship models with exceptional intelligence (256K context)
+- No local hardware required, runs on the cloud
+- Supports multiple top-tier AI models
+- Pay-as-you-go pricing, very competitive rates
+- Fully compatible with OpenAI API format
+- Chinese platform, stable access without special network requirements
+
+## Registration and Setup
+
+### Step 1: Register a Volcengine Account
+
+1. Visit the Volcengine console: https://console.volcengine.com
+2. Click ""Free Registration""
+3. Complete registration (supports phone number, email)
+4. Complete identity verification
+
+### Step 2: Enable Ark Service
+
+1. Log in to the Volcengine console
+2. Find ""Ark"" in the left menu or search for ""Ark""
+3. Enter the Ark product page
+4. Click ""Enable Now""
+5. Read and agree to the service agreement
+
+### Step 3: Create an Inference Endpoint
+
+Volcengine Ark uses ""Inference Endpoints"" to identify models, rather than using model names directly.
+
+1. Go to the ""Inference Endpoints"" page in the Ark console
+2. Click ""Create Inference Endpoint""
+3. Select the model you want to use (e.g., doubao-seed-1-6-251015)
+4. Name your endpoint
+5. After creation, copy the endpoint ID (format like ep-20241212123456-abcde)
+
+### Step 4: Get API Key
+
+1. In the Ark console, find ""API Key Management""
+2. Click ""Create API Key""
+3. Name your key (e.g., ""SiliconLife"")
+4. Copy and save the API Key (**displayed only once, keep it safe**)
+
+## Configuring Volcengine Ark in Silicon Life
+
+### Configuration Steps
+
+1. Open the Silicon Life system
+2. Go to the **⚙ Configuration** page
+3. Find ""AI Client Type"", select `VolcengineArkClientFactory`
+4. In ""AI Configuration"", fill in:
+   - **API Key**: Paste your API Key
+   - **Inference Endpoint ID**: Paste your inference endpoint ID (e.g., ep-20241212123456-abcde)
+   (**After filling in the API Key, the system will automatically fetch your inference endpoint list**)
+5. Save the configuration
+
+**Tip:**
+- The API Key must be filled in first for the inference endpoint dropdown to load
+- If the list fails to load, you can manually enter the inference endpoint ID
+
+### Model Selection
+
+Volcengine Ark uses Inference Endpoints to call models, each endpoint corresponds to one model.
+
+**Popular Models:**
+
+| Model Series | Model ID | Features |
+|-------------|---------|----------|
+| **Doubao-Seed-1.8** | doubao-seed-1-8-YYMMDD | Latest flagship, stronger Agent capability |
+| **Doubao-Seed-1.6** | doubao-seed-1-6-251015 | General model, recommended for daily use |
+| **Doubao-Seed-1.6-Flash** | doubao-seed-1-6-flash | Ultra-low latency version |
+| **Doubao-Seed-1.6-Lite** | doubao-seed-1-6-lite | Lightweight, great value |
+| **Doubao-Seed-Code** | doubao-seed-code-preview-latest | Code-specialized model |
+| **Doubao-Pro-32K** | doubao-pro-32k | Classic pro version |
+| **Doubao-Lite-32K** | doubao-lite-32k | Classic lightweight version |
+
+## Pricing
+
+### Billing Method
+
+Volcengine Ark uses **pay-as-you-go** billing:
+- Charged by input token count
+- Doubao Seed series unified pricing:
+  - Input 0~32K: 0.8 RMB/million tokens
+  - Output 0~32K: 8 RMB/million tokens
+  - Input 32K~128K: 1.2 RMB/million tokens
+  - Longer context, higher pricing
+
+### Free Quota
+
+- New users receive 500K free inference tokens per model (identity verification required)
+- Free quota valid for 30 days
+- Supports ""Safe Mode"" which only consumes free quota and auto-pauses when exhausted
+
+### Cost Saving Tips
+
+- Choose the right model (Lite series offers great value)
+- Control input length wisely
+- Use Context Cache to reduce costs
+- Check usage regularly
+
+## FAQ
+
+### Q: What is an Inference Endpoint?
+
+**A:** An Inference Endpoint is a unique concept of Volcengine Ark. You first create an inference endpoint in the Ark console, select the model to use, and the system assigns an endpoint ID. When configuring in Silicon Life, fill in this ID to call the corresponding model.
+
+### Q: Where do I get my API Key?
+
+**A:**
+1. Log in to the Volcengine console
+2. Go to Ark's ""API Key Management""
+3. Create a new API Key
+4. Copy and save it securely
+
+### Q: What's the difference between Volcengine Ark and Bailian?
+
+| Feature | Volcengine Ark | Bailian (DashScope) |
+|---------|----------------|---------------------|
+| Provider | ByteDance | Alibaba Cloud |
+| Flagship Models | Doubao Seed Series | Qwen Series |
+| Model Calling | Inference Endpoint | Direct model name |
+| Pricing | Very competitive | Moderate |
+| Free Quota | 500K tokens per model | Free trial available |
+| Access in China | Stable | Stable |
+
+### Q: What if the API call fails?
+
+**Check:**
+1. Is the API Key correct?
+2. Is the inference endpoint ID correct and published?
+3. Is the account balance sufficient?
+4. Has the free quota been exceeded?
+5. Is the inference endpoint in running status?
 
 Enjoy using the system!
 ";

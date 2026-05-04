@@ -297,7 +297,7 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string NavMenuChat => "Chat";
     public override string NavMenuDashboard => "Panel";
     public override string NavMenuBeings => "Seres";
-    public override string NavMenuAudit => "Auditoría";
+    public override string NavMenuUsage => "Uso";
     public override string NavMenuTasks => "Tareas";
     public override string NavMenuMemory => "Memoria";
     public override string NavMenuKnowledge => "Conocimiento";
@@ -319,7 +319,7 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string PageTitleKnowledge => "Conocimiento - Silicon Life Collective";
     public override string PageTitleProjects => "Proyectos - Silicon Life Collective";
     public override string PageTitleLogs => "Registros - Silicon Life Collective";
-    public override string PageTitleAudit => "Auditoría de tokens - Silicon Life Collective";
+    public override string PageTitleUsage => "Uso de tokens - Silicon Life Collective";
     public override string PageTitleConfig => "Configuración - Silicon Life Collective";
     public override string PageTitleExecutor => "Ejecutor - Silicon Life Collective";
     public override string PageTitleCodeBrowser => "Navegador de código - Silicon Life Collective";
@@ -745,38 +745,38 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string LogsPrevPage => "Anterior";
     public override string LogsNextPage => "Siguiente";
 
-    public override string AuditPageHeader => "Auditoría de uso de tokens";
-    public override string AuditTotalTokens => "Total de tokens";
-    public override string AuditTotalRequests => "Total de solicitudes";
-    public override string AuditSuccessCount => "Exitosos";
-    public override string AuditFailureCount => "Fallidos";
-    public override string AuditPromptTokens => "Tokens de prompt";
-    public override string AuditCompletionTokens => "Tokens de completado";
-    public override string AuditStartTime => "Hora de inicio";
-    public override string AuditEndTime => "Hora de fin";
-    public override string AuditFilterButton => "Filtrar";
-    public override string AuditEmptyState => "No se encontraron registros de auditoría";
-    public override string AuditAIClientType => "Cliente de IA";
-    public override string AuditAllClientTypes => "Todos los tipos";
-    public override string AuditGroupByClient => "Agrupar por cliente";
-    public override string AuditGroupByBeing => "Agrupar por ser";
-    public override string AuditPrevPage => "Anterior";
-    public override string AuditNextPage => "Siguiente";
-    public override string AuditBeing => "Ser";
-    public override string AuditAllBeings => "Todos los seres";
-    public override string AuditTimeToday => "Hoy";
-    public override string AuditTimeWeek => "Esta semana";
-    public override string AuditTimeMonth => "Este mes";
-    public override string AuditTimeYear => "Este año";
-    public override string AuditExport => "Exportar";
-    public override string AuditTrendTitle => "Tendencia de uso de tokens";
-    public override string AuditTrendPrompt => "Tokens de prompt";
-    public override string AuditTrendCompletion => "Tokens de completado";
-    public override string AuditTrendTotal => "Total de tokens";
-    public override string AuditTooltipDate => "Fecha";
-    public override string AuditTooltipPrompt => "Tokens de prompt";
-    public override string AuditTooltipCompletion => "Tokens de completado";
-    public override string AuditTooltipTotal => "Total de tokens";
+    public override string UsagePageHeader => "Uso de tokens";
+    public override string UsageTotalTokens => "Total de tokens";
+    public override string UsageTotalRequests => "Total de solicitudes";
+    public override string UsageSuccessCount => "Exitosos";
+    public override string UsageFailureCount => "Fallidos";
+    public override string UsagePromptTokens => "Tokens de prompt";
+    public override string UsageCompletionTokens => "Tokens de completado";
+    public override string UsageStartTime => "Hora de inicio";
+    public override string UsageEndTime => "Hora de fin";
+    public override string UsageFilterButton => "Filtrar";
+    public override string UsageEmptyState => "No se encontraron registros de uso";
+    public override string UsageAIClientType => "Cliente de IA";
+    public override string UsageAllClientTypes => "Todos los tipos";
+    public override string UsageGroupByClient => "Agrupar por cliente";
+    public override string UsageGroupByBeing => "Agrupar por ser";
+    public override string UsagePrevPage => "Anterior";
+    public override string UsageNextPage => "Siguiente";
+    public override string UsageBeing => "Ser";
+    public override string UsageAllBeings => "Todos los seres";
+    public override string UsageTimeToday => "Hoy";
+    public override string UsageTimeWeek => "Esta semana";
+    public override string UsageTimeMonth => "Este mes";
+    public override string UsageTimeYear => "Este año";
+    public override string UsageExport => "Exportar";
+    public override string UsageTrendTitle => "Tendencia de uso de tokens";
+    public override string UsageTrendPrompt => "Tokens de prompt";
+    public override string UsageTrendCompletion => "Tokens de completado";
+    public override string UsageTrendTotal => "Total de tokens";
+    public override string UsageTooltipDate => "Fecha";
+    public override string UsageTooltipPrompt => "Tokens de prompt";
+    public override string UsageTooltipCompletion => "Tokens de completado";
+    public override string UsageTooltipTotal => "Total de tokens";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {
@@ -823,6 +823,9 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         ["DashScopeModel_glm-5.1"] = "GLM 5.1 (Zhipu)",
         ["DashScopeModel_kimi-k2.5"] = "Kimi K2.5 (Contexto largo)",
         ["DashScopeModel_llama-4-maverick"] = "Llama 4 Maverick",
+        ["VolcengineArkClient"] = "Cliente Volcengine Ark",
+        ["VolcengineArkApiKey"] = "Clave API",
+        ["VolcengineArkEndpointId"] = "ID de endpoint de inferencia",
         ["WebPort"] = "Puerto web",
         ["WebSkin"] = "Tema web",
         ["UserNickname"] = "Apodo del usuario"
@@ -842,6 +845,8 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         ["DashScopeApiKey"] = "Clave API de Alibaba Cloud DashScope",
         ["DashScopeRegion"] = "Región del servicio Alibaba Cloud DashScope",
         ["DashScopeModel"] = "Modelo de Alibaba Cloud DashScope a usar",
+        ["VolcengineArkApiKey"] = "Clave API de Volcengine Ark",
+        ["VolcengineArkEndpointId"] = "ID de endpoint de inferencia de Volcengine Ark",
         ["WebPort"] = "Puerto del servidor web",
         ["WebSkin"] = "Nombre del tema web",
         ["UserNickname"] = "Apodo del usuario humano"
@@ -911,7 +916,7 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         ["task"] = "Tarea",
         ["system"] = "Sistema",
         ["timer"] = "Temporizador",
-        ["token_audit"] = "Auditoría de tokens",
+        ["token_audit"] = "Uso de tokens",
         ["work_note"] = "Nota de Trabajo",
         ["project"] = "Proyecto",
         ["project_task"] = "Tarea de proyecto",
@@ -1728,6 +1733,9 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
 
     public override string FormatMemoryEventTask(string content)
         => $"[Tarea] Tarea ejecutada, resultado: {content}";
+
+    public override string FormatMemoryEventProject(string content)
+        => $"[Proyecto] Reflexión del proyecto, resultado: {content}";
 
     public override string FormatMemoryEventTimer(string content)
         => $"[Temporizador] Temporizador activado, respondido: {content}";

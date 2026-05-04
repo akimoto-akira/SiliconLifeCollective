@@ -25,7 +25,7 @@ public abstract class LocalizationBase
     public abstract string LanguageCode { get; }
 
     /// <summary>
-    /// Gets the language name (e.g., "简体中文", "English")
+    /// Gets the language name (e.g., "Simplified Chinese", "English")
     /// </summary>
     public abstract string LanguageName { get; }
 
@@ -109,6 +109,12 @@ public abstract class LocalizationBase
     /// </summary>
     /// <param name="content">The AI response content for the task</param>
     public abstract string FormatMemoryEventTask(string content);
+
+    /// <summary>
+    /// Formats a memory record for a project thinking event.
+    /// </summary>
+    /// <param name="content">The AI response content for the project</param>
+    public abstract string FormatMemoryEventProject(string content);
 
     /// <summary>
     /// Formats a memory record for a timer-triggered event.

@@ -32,6 +32,7 @@ public class HelpLocalizationFrFR : HelpLocalizationBase
     public override string Memory_Title => "Système de mémoire";
     public override string OllamaSetup_Title => "Installation Ollama et téléchargement de modèles";
     public override string BailianDashScope_Title => "Guide utilisateur de la plateforme Alibaba Cloud Bailian";
+    public override string VolcengineArk_Title => "Guide utilisateur de la plateforme Volcengine Ark";
     public override string AIClients_Title => "Configuration du client IA";
 
     public override string BeingSoul_Title => "Fichier âme du Being";
@@ -80,6 +81,9 @@ public class HelpLocalizationFrFR : HelpLocalizationBase
 
     public override string[] BailianDashScope_Tags => new[]
         { "Bailian", "DashScope", "Alibaba Cloud", "IA cloud", "API", "configuration", "modèle", "facturation" };
+
+    public override string[] VolcengineArk_Tags => new[]
+        { "Volcengine", "Ark", "Doubao", "ByteDance", "IA cloud", "API", "configuration", "modèle" };
 
     public override string[] AIClients_Tags => new[]
         { "client IA", "service IA", "modèle", "configuration", "local", "cloud", "Ollama", "DashScope" };
@@ -1217,6 +1221,150 @@ Utilisateurs domestiques : beijing (Pékin). Utilisateurs overseas : la région 
 | Coût | À l'utilisation | Gratuit |
 | Internet | Obligatoire | Non requis après téléchargement |
 | Confidentialité | Données envoyées au cloud | Complètement local |
+";
+
+    public override string VolcengineArk => @"
+# Guide utilisateur de la plateforme Volcengine Ark
+
+## Qu'est-ce que Volcengine Ark ?
+
+Volcengine Ark est la plateforme de services de grands modèles de langage tout-en-un de ByteDance, proposant la série Doubao et divers modèles tiers (DeepSeek, GLM, Kimi, etc.).
+
+**Avantages :**
+- Modèles phares de la série Doubao Seed, intelligence exceptionnelle (contexte 256K)
+- Aucun matériel local requis, fonctionne dans le cloud
+- Prend en charge plusieurs modèles d'IA de premier plan
+- Paiement à l'utilisation, tarifs très compétitifs
+- Entièrement compatible avec le format OpenAI API
+- Plateforme chinoise, accès stable sans réseau spécial
+
+## Inscription et configuration
+
+### Étape 1 : Créer un compte Volcengine
+
+1. Accédez à la console Volcengine : https://console.volcengine.com
+2. Cliquez sur ""Inscription gratuite""
+3. Terminez l'inscription (numéro de téléphone, e-mail)
+4. Effectuez la vérification d'identité
+
+### Étape 2 : Activer le service Ark
+
+1. Connectez-vous à la console Volcengine
+2. Dans le menu de gauche, trouvez ""Ark""
+3. Accédez à la page produit Ark
+4. Cliquez sur ""Activer maintenant""
+5. Lisez et acceptez le contrat de service
+
+### Étape 3 : Créer un point de terminaison d'inférence
+
+Volcengine Ark utilise des ""points de terminaison d'inférence"" pour identifier les modèles, plutôt que d'utiliser directement les noms de modèles.
+
+1. Dans la console Ark, accédez à la page ""Points de terminaison d'inférence""
+2. Cliquez sur ""Créer un point de terminaison d'inférence""
+3. Sélectionnez le modèle à utiliser (ex. doubao-seed-1-6-251015)
+4. Nommez votre point de terminaison
+5. Après la création, copiez l'ID du point de terminaison (format : ep-20241212123456-abcde)
+
+### Étape 4 : Obtenir une clé API
+
+1. Dans la console Ark, trouvez ""Gestion des clés API""
+2. Cliquez sur ""Créer une clé API""
+3. Nommez votre clé (ex. ""SiliconLife"")
+4. Copiez et enregistrez la clé API (**affichée une seule fois, conservez-la en sécurité**)
+
+## Configuration de Volcengine Ark dans Silicon Life
+
+### Étapes de configuration
+
+1. Ouvrez le système Silicon Life
+2. Allez dans la page **⚙ Configuration**
+3. Trouvez ""Type de client IA"", sélectionnez `VolcengineArkClientFactory`
+4. Dans ""Configuration IA"", remplissez :
+   - **Clé API** : collez votre clé API
+   - **ID du point de terminaison d'inférence** : collez votre ID de point de terminaison (ex. ep-20241212123456-abcde)
+   (**Après avoir saisi la clé API, le système récupérera automatiquement votre liste de points de terminaison**)
+5. Enregistrez la configuration
+
+**Astuce :**
+- La clé API doit être saisie en premier pour que la liste déroulante des points de terminaison se charge
+- Si le chargement échoue, vous pouvez saisir manuellement l'ID du point de terminaison
+
+### Sélection du modèle
+
+Volcengine Ark appelle les modèles via des points de terminaison d'inférence, chaque point de terminaison correspond à un modèle.
+
+**Modèles populaires :**
+
+| Série de modèles | ID du modèle | Caractéristiques |
+|----------------|-------------|-----------------|
+| **Doubao-Seed-1.8** | doubao-seed-1-8-YYMMDD | Dernier modèle phare, capacités Agent renforcées |
+| **Doubao-Seed-1.6** | doubao-seed-1-6-251015 | Modèle polyvalent, recommandé pour un usage quotidien |
+| **Doubao-Seed-1.6-Flash** | doubao-seed-1-6-flash | Version à très faible latence |
+| **Doubao-Seed-1.6-Lite** | doubao-seed-1-6-lite | Léger, excellent rapport qualité-prix |
+| **Doubao-Seed-Code** | doubao-seed-code-preview-latest | Modèle spécialisé en code |
+| **Doubao-Pro-32K** | doubao-pro-32k | Version professionnelle classique |
+| **Doubao-Lite-32K** | doubao-lite-32k | Version légère classique |
+
+## Tarifs
+
+### Méthode de facturation
+
+Volcengine Ark utilise la facturation **à l'utilisation** :
+- Facturation basée sur le nombre de tokens d'entrée et de sortie
+- Prix unifiés pour la série Doubao Seed :
+  - Entrée 0~32K : 0,8 yuan/million de tokens
+  - Sortie 0~32K : 8 yuan/million de tokens
+  - Entrée 32K~128K : 1,2 yuan/million de tokens
+  - Contexte plus long, tarif plus élevé
+
+### Quota gratuit
+
+- Les nouveaux utilisateurs reçoivent 500 000 tokens d'inférence gratuits par modèle (vérification d'identité requise)
+- Quota gratuit valable 30 jours
+- Prend en charge le ""mode sécurisé"" qui ne consomme que le quota gratuit et s'arrête automatiquement à épuisement
+
+### Conseils pour économiser
+
+- Choisissez le modèle approprié (la série Lite offre un excellent rapport qualité-prix)
+- Contrôlez judicieusement la longueur des entrées
+- Utilisez le cache de contexte (Context Cache) pour réduire les coûts
+- Vérifiez régulièrement votre utilisation
+
+## FAQ
+
+### Q : Qu'est-ce qu'un point de terminaison d'inférence ?
+
+**R :** Un point de terminaison d'inférence est un concept unique de Volcengine Ark. Vous créez d'abord un point de terminaison dans la console Ark, sélectionnez le modèle à utiliser, et le système attribue un ID de point de terminaison. Lorsque vous configurez cet ID dans Silicon Life, vous pouvez appeler le modèle correspondant.
+
+### Q : Où puis-je obtenir ma clé API ?
+
+**R :**
+1. Connectez-vous à la console Volcengine
+2. Allez dans ""Gestion des clés API"" d'Ark
+3. Créez une nouvelle clé API
+4. Copiez-la et conservez-la en sécurité
+
+### Q : Quelle est la différence entre Volcengine Ark et Bailian ?
+
+| Fonctionnalité | Volcengine Ark | Bailian (DashScope) |
+|--------------|--------------|-------------------|
+| Fournisseur | ByteDance | Alibaba Cloud |
+| Modèles phares | Série Doubao Seed | Série Qwen |
+| Appel de modèle | Point de terminaison d'inférence | Nom du modèle direct |
+| Tarif | Très compétitif | Moyen |
+| Quota gratuit | 500K tokens par modèle | Essai gratuit |
+| Accès en Chine | Stable | Stable |
+
+### Q : Que faire si l'appel API échoue ?
+
+**Vérifiez :**
+1. La clé API est-elle correcte ?
+2. L'ID du point de terminaison est-il correct et publié ?
+3. Le solde du compte est-il suffisant ?
+4. Le quota gratuit est-il épuisé ?
+5. Le point de terminaison est-il en cours d'exécution ?
+
+Profitez bien du système !
 ";
 
     public override string AIClients => @"

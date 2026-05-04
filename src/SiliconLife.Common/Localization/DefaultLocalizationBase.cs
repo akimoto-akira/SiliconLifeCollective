@@ -426,7 +426,7 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <summary>
     /// Gets the label for the audit menu item
     /// </summary>
-    public abstract string NavMenuAudit { get; }
+    public abstract string NavMenuUsage { get; }
 
     /// <summary>
     /// Gets the label for the tasks menu item
@@ -523,7 +523,7 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <summary>
     /// Gets the page title for audit page
     /// </summary>
-    public abstract string PageTitleAudit { get; }
+    public abstract string PageTitleUsage { get; }
 
     /// <summary>
     /// Gets the page title for config page
@@ -1928,167 +1928,167 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// </summary>
     public abstract string LogsNextPage { get; }
 
-    // ===== Audit Page Localization =====
+    // ===== Usage Page Localization =====
 
     /// <summary>
-    /// Gets the audit page header text
+    /// Gets the usage page header text
     /// </summary>
-    public abstract string AuditPageHeader { get; }
+    public abstract string UsagePageHeader { get; }
 
     /// <summary>
     /// Gets the label for total token count
     /// </summary>
-    public abstract string AuditTotalTokens { get; }
+    public abstract string UsageTotalTokens { get; }
 
     /// <summary>
     /// Gets the label for total requests
     /// </summary>
-    public abstract string AuditTotalRequests { get; }
+    public abstract string UsageTotalRequests { get; }
 
     /// <summary>
     /// Gets the label for success count
     /// </summary>
-    public abstract string AuditSuccessCount { get; }
+    public abstract string UsageSuccessCount { get; }
 
     /// <summary>
     /// Gets the label for failure count
     /// </summary>
-    public abstract string AuditFailureCount { get; }
+    public abstract string UsageFailureCount { get; }
 
     /// <summary>
     /// Gets the label for prompt tokens
     /// </summary>
-    public abstract string AuditPromptTokens { get; }
+    public abstract string UsagePromptTokens { get; }
 
     /// <summary>
     /// Gets the label for completion tokens
     /// </summary>
-    public abstract string AuditCompletionTokens { get; }
+    public abstract string UsageCompletionTokens { get; }
 
     /// <summary>
     /// Gets the label for start time filter
     /// </summary>
-    public abstract string AuditStartTime { get; }
+    public abstract string UsageStartTime { get; }
 
     /// <summary>
     /// Gets the label for end time filter
     /// </summary>
-    public abstract string AuditEndTime { get; }
+    public abstract string UsageEndTime { get; }
 
     /// <summary>
     /// Gets the text for the filter button
     /// </summary>
-    public abstract string AuditFilterButton { get; }
+    public abstract string UsageFilterButton { get; }
 
     /// <summary>
-    /// Gets the empty state text when no audit records exist
+    /// Gets the empty state text when no usage records exist
     /// </summary>
-    public abstract string AuditEmptyState { get; }
+    public abstract string UsageEmptyState { get; }
 
     /// <summary>
     /// Gets the label for AI client type filter
     /// </summary>
-    public abstract string AuditAIClientType { get; }
+    public abstract string UsageAIClientType { get; }
 
     /// <summary>
     /// Gets the text for "All Types" option in AI client type filter
     /// </summary>
-    public abstract string AuditAllClientTypes { get; }
+    public abstract string UsageAllClientTypes { get; }
 
     /// <summary>
     /// Gets the label for grouping by AI client type
     /// </summary>
-    public abstract string AuditGroupByClient { get; }
+    public abstract string UsageGroupByClient { get; }
 
     /// <summary>
     /// Gets the label for grouping by being
     /// </summary>
-    public abstract string AuditGroupByBeing { get; }
+    public abstract string UsageGroupByBeing { get; }
 
     /// <summary>
     /// Gets the text for previous page button
     /// </summary>
-    public abstract string AuditPrevPage { get; }
+    public abstract string UsagePrevPage { get; }
 
     /// <summary>
     /// Gets the text for next page button
     /// </summary>
-    public abstract string AuditNextPage { get; }
+    public abstract string UsageNextPage { get; }
 
     /// <summary>
     /// Gets the label for silicon being filter
     /// </summary>
-    public abstract string AuditBeing { get; }
+    public abstract string UsageBeing { get; }
 
     /// <summary>
     /// Gets the text for "All Beings" option in being filter
     /// </summary>
-    public abstract string AuditAllBeings { get; }
+    public abstract string UsageAllBeings { get; }
 
     /// <summary>
     /// Gets the text for "Today" time range button
     /// </summary>
-    public abstract string AuditTimeToday { get; }
+    public abstract string UsageTimeToday { get; }
 
     /// <summary>
     /// Gets the text for "This Week" time range button
     /// </summary>
-    public abstract string AuditTimeWeek { get; }
+    public abstract string UsageTimeWeek { get; }
 
     /// <summary>
     /// Gets the text for "This Month" time range button
     /// </summary>
-    public abstract string AuditTimeMonth { get; }
+    public abstract string UsageTimeMonth { get; }
 
     /// <summary>
     /// Gets the text for "This Year" time range button
     /// </summary>
-    public abstract string AuditTimeYear { get; }
+    public abstract string UsageTimeYear { get; }
 
     /// <summary>
     /// Gets the text for the export button
     /// </summary>
-    public abstract string AuditExport { get; }
+    public abstract string UsageExport { get; }
 
     /// <summary>
     /// Gets the title for the token usage trend chart
     /// </summary>
-    public abstract string AuditTrendTitle { get; }
+    public abstract string UsageTrendTitle { get; }
 
     /// <summary>
     /// Gets the legend label for prompt tokens in trend chart
     /// </summary>
-    public abstract string AuditTrendPrompt { get; }
+    public abstract string UsageTrendPrompt { get; }
 
     /// <summary>
     /// Gets the legend label for completion tokens in trend chart
     /// </summary>
-    public abstract string AuditTrendCompletion { get; }
+    public abstract string UsageTrendCompletion { get; }
 
     /// <summary>
     /// Gets the legend label for total tokens in trend chart
     /// </summary>
-    public abstract string AuditTrendTotal { get; }
+    public abstract string UsageTrendTotal { get; }
 
     /// <summary>
     /// Gets the tooltip label for date in chart hover
     /// </summary>
-    public abstract string AuditTooltipDate { get; }
+    public abstract string UsageTooltipDate { get; }
 
     /// <summary>
     /// Gets the tooltip label for prompt tokens in chart hover
     /// </summary>
-    public abstract string AuditTooltipPrompt { get; }
+    public abstract string UsageTooltipPrompt { get; }
 
     /// <summary>
     /// Gets the tooltip label for completion tokens in chart hover
     /// </summary>
-    public abstract string AuditTooltipCompletion { get; }
+    public abstract string UsageTooltipCompletion { get; }
 
     /// <summary>
     /// Gets the tooltip label for total tokens in chart hover
     /// </summary>
-    public abstract string AuditTooltipTotal { get; }
+    public abstract string UsageTooltipTotal { get; }
 
     /// <summary>
     /// Gets the localized display name for a configuration group
@@ -2806,7 +2806,7 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// </summary>
     public abstract string? GetChineseLunarDayName(int day);
 
-    /// <summary>Gets the localized leap month prefix (e.g. "闰" / "閏").</summary>
+    /// <summary>Gets the localized leap month prefix (e.g. "Leap" / "閏").</summary>
     public abstract string ChineseLunarLeapPrefix { get; }
 
     /// <summary>Gets the localized label for the leap month indicator component.</summary>
@@ -2866,12 +2866,12 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <summary>Formats a full Japanese date-time into a localized human-readable string.</summary>
     public abstract string LocalizeJapaneseDate(int eraIndex, int year, int month, int day, int hour, int minute, int second);
 
-    // ===== Yi Calendar (彝历) =====
+    // ===== Yi Calendar =====
 
     /// <summary>Gets the display name of the Yi ethnic solar calendar system.</summary>
     public abstract string CalendarYiName { get; }
 
-    /// <summary>Gets the localized label for the Yi season component (五季).</summary>
+    /// <summary>Gets the localized label for the Yi season component (five seasons).</summary>
     public abstract string CalendarComponentYiSeason { get; }
 
     /// <summary>Gets the localized label for the Yi xun (旬) component.</summary>
@@ -2886,7 +2886,7 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <summary>Gets the localized season name for the given season index (0–4: 木火土金水).</summary>
     public abstract string? GetYiSeasonName(int seasonIndex);
 
-    /// <summary>Gets the localized xun name for the given xun index (0=上旬, 1=中旬, 2=下旬).</summary>
+    /// <summary>Gets the localized xun name for the given xun index (0=early, 1=mid, 2=late).</summary>
     public abstract string? GetYiXunName(int xunIndex);
 
     /// <summary>Gets the localized day-animal name for the given animal index (0–11).</summary>
@@ -2936,7 +2936,7 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <summary>Formats a full Sexagenary date-time into a localized human-readable string.</summary>
     public abstract string LocalizeSexagenaryDate(int yearStem, int yearBranch, int monthStem, int monthBranch, int dayStem, int dayBranch, int hour, int minute, int second);
 
-    // ── Dai Calendar (Xishuangbanna / 西双版纳小傣历) ─────────────────────────
+    // ── Dai Calendar (Xishuangbanna) ─────────────────────────
 
     /// <summary>Gets the display name of the Xishuangbanna Dai calendar system.</summary>
     public abstract string CalendarDaiName { get; }
@@ -2953,7 +2953,7 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <summary>Formats a full Dai calendar date-time into a localized human-readable string.</summary>
     public abstract string LocalizeDaiDate(int year, int month, int day, bool isLeap, int hour, int minute, int second);
 
-    // ── Dehong Dai Calendar (德宏大傣历) ──────────────────────────────────────
+    // ── Dehong Dai Calendar ──────────────────────────────────────
 
     /// <summary>Gets the display name of the Dehong Dai calendar system.</summary>
     public abstract string CalendarDehongDaiName { get; }
@@ -3090,21 +3090,21 @@ public abstract class DefaultLocalizationBase : LocalizationBase
 
     // ===== Help Module UI Labels =====
 
-    /// <summary>帮助文档 (Help Documentation)</summary>
+    /// <summary>Help Documentation</summary>
     public abstract string Help_Title { get; }
 
-    /// <summary>搜索帮助 (Search Help)</summary>
+    /// <summary>Search Help</summary>
     public abstract string Help_Search { get; }
 
-    /// <summary>文档列表 (Document List)</summary>
+    /// <summary>Document List</summary>
     public abstract string Help_DocList { get; }
 
-    /// <summary>无搜索结果 (No Results Found)</summary>
+    /// <summary>No Results Found</summary>
     public abstract string Help_NoResults { get; }
 
-    /// <summary>上一篇 (Previous)</summary>
+    /// <summary>Previous</summary>
     public abstract string Help_Previous { get; }
 
-    /// <summary>下一篇 (Next)</summary>
+    /// <summary>Next</summary>
     public abstract string Help_Next { get; }
 }

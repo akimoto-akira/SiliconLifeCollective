@@ -297,7 +297,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string NavMenuChat => "聊天";
     public override string NavMenuDashboard => "仪表盘";
     public override string NavMenuBeings => "硅基人";
-    public override string NavMenuAudit => "审计";
+    public override string NavMenuUsage => "用量";
     public override string NavMenuTasks => "任务";
     public override string NavMenuMemory => "记忆";
     public override string NavMenuKnowledge => "知识";
@@ -319,7 +319,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string PageTitleKnowledge => "知识图谱 - 硅基生命群";
     public override string PageTitleProjects => "项目空间管理 - 硅基生命群";
     public override string PageTitleLogs => "日志查询 - 硅基生命群";
-    public override string PageTitleAudit => "Token 审计 - 硅基生命群";
+    public override string PageTitleUsage => "Token 用量 - 硅基生命群";
     public override string PageTitleConfig => "系统配置 - 硅基生命群";
     public override string PageTitleExecutor => "执行器监控 - 硅基生命群";
     public override string PageTitleCodeBrowser => "代码浏览 - 硅基生命群";
@@ -745,38 +745,38 @@ public class ZhCN : DefaultLocalizationBase
     public override string LogsPrevPage => "上一页";
     public override string LogsNextPage => "下一页";
 
-    public override string AuditPageHeader => "Token 用量审计";
-    public override string AuditTotalTokens => "总 Token 数";
-    public override string AuditTotalRequests => "总请求数";
-    public override string AuditSuccessCount => "成功";
-    public override string AuditFailureCount => "失败";
-    public override string AuditPromptTokens => "输入 Token";
-    public override string AuditCompletionTokens => "输出 Token";
-    public override string AuditStartTime => "开始时间";
-    public override string AuditEndTime => "结束时间";
-    public override string AuditFilterButton => "查询";
-    public override string AuditEmptyState => "暂无审计记录";
-    public override string AuditAIClientType => "AI 客户端";
-    public override string AuditAllClientTypes => "全部类型";
-    public override string AuditGroupByClient => "按客户端分组";
-    public override string AuditGroupByBeing => "按硅基人分组";
-    public override string AuditPrevPage => "上一页";
-    public override string AuditNextPage => "下一页";
-    public override string AuditBeing => "硅基人";
-    public override string AuditAllBeings => "全部硅基人";
-    public override string AuditTimeToday => "今日";
-    public override string AuditTimeWeek => "本周";
-    public override string AuditTimeMonth => "本月";
-    public override string AuditTimeYear => "本年";
-    public override string AuditExport => "导出";
-    public override string AuditTrendTitle => "Token 用量趋势";
-    public override string AuditTrendPrompt => "输入 Token";
-    public override string AuditTrendCompletion => "输出 Token";
-    public override string AuditTrendTotal => "总 Token";
-    public override string AuditTooltipDate => "日期";
-    public override string AuditTooltipPrompt => "输入 Token";
-    public override string AuditTooltipCompletion => "输出 Token";
-    public override string AuditTooltipTotal => "总 Token";
+    public override string UsagePageHeader => "Token 用量";
+    public override string UsageTotalTokens => "总 Token 数";
+    public override string UsageTotalRequests => "总请求数";
+    public override string UsageSuccessCount => "成功";
+    public override string UsageFailureCount => "失败";
+    public override string UsagePromptTokens => "输入 Token";
+    public override string UsageCompletionTokens => "输出 Token";
+    public override string UsageStartTime => "开始时间";
+    public override string UsageEndTime => "结束时间";
+    public override string UsageFilterButton => "查询";
+    public override string UsageEmptyState => "暂无用量记录";
+    public override string UsageAIClientType => "AI 客户端";
+    public override string UsageAllClientTypes => "全部类型";
+    public override string UsageGroupByClient => "按客户端分组";
+    public override string UsageGroupByBeing => "按硅基人分组";
+    public override string UsagePrevPage => "上一页";
+    public override string UsageNextPage => "下一页";
+    public override string UsageBeing => "硅基人";
+    public override string UsageAllBeings => "全部硅基人";
+    public override string UsageTimeToday => "今日";
+    public override string UsageTimeWeek => "本周";
+    public override string UsageTimeMonth => "本月";
+    public override string UsageTimeYear => "本年";
+    public override string UsageExport => "导出";
+    public override string UsageTrendTitle => "Token 用量趋势";
+    public override string UsageTrendPrompt => "输入 Token";
+    public override string UsageTrendCompletion => "输出 Token";
+    public override string UsageTrendTotal => "总 Token";
+    public override string UsageTooltipDate => "日期";
+    public override string UsageTooltipPrompt => "输入 Token";
+    public override string UsageTooltipCompletion => "输出 Token";
+    public override string UsageTooltipTotal => "总 Token";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {
@@ -823,6 +823,9 @@ public class ZhCN : DefaultLocalizationBase
         ["DashScopeModel_glm-5.1"] = "GLM 5.1（智谱）",
         ["DashScopeModel_kimi-k2.5"] = "Kimi K2.5（长上下文）",
         ["DashScopeModel_llama-4-maverick"] = "Llama 4 Maverick",
+        ["VolcengineArkClient"] = "火山方舟引擎客户端",
+        ["VolcengineArkApiKey"] = "API 密钥",
+        ["VolcengineArkEndpointId"] = "推理接入点 ID",
         ["WebPort"] = "Web 端口",
         ["WebSkin"] = "Web 皮肤",
         ["UserNickname"] = "用户昵称"
@@ -842,6 +845,8 @@ public class ZhCN : DefaultLocalizationBase
         ["DashScopeApiKey"] = "阿里云百炼平台 API 密钥",
         ["DashScopeRegion"] = "阿里云百炼服务地域",
         ["DashScopeModel"] = "阿里云百炼平台使用的模型",
+        ["VolcengineArkApiKey"] = "火山方舟引擎 API 密钥",
+        ["VolcengineArkEndpointId"] = "火山方舟引擎推理接入点 ID",
         ["WebPort"] = "Web 服务器端口",
         ["WebSkin"] = "Web 皮肤名称",
         ["UserNickname"] = "人类用户的昵称"
@@ -911,7 +916,7 @@ public class ZhCN : DefaultLocalizationBase
         ["task"] = "任务",
         ["system"] = "系统",
         ["timer"] = "定时器",
-        ["token_audit"] = "Token审计",
+        ["token_audit"] = "Token用量",
         ["work_note"] = "工作笔记",
         ["project"] = "项目",
         ["project_task"] = "项目任务",
@@ -1726,6 +1731,9 @@ public class ZhCN : DefaultLocalizationBase
 
     public override string FormatMemoryEventTask(string content)
         => $"[任务] 执行任务，结果：{content}";
+
+    public override string FormatMemoryEventProject(string content)
+        => $"[项目] 项目思考，结果：{content}";
 
     public override string FormatMemoryEventTimer(string content)
         => $"[定时] 定时触发，响应：{content}";

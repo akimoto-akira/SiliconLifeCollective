@@ -17,8 +17,8 @@ using System.IO;
 using System.Buffers.Binary;
 
 /// <summary>
-/// 增强型权限流：提供安全的文件访问，并支持大端序/小端序的各种数据类型直接读写
-/// 通过方法名区分字节序：ReadBigEndianInt32() / ReadLittleEndianInt32()
+/// Enhanced permissioned stream: provides secure file access and supports direct read/write of various data types in big-endian/little-endian
+/// Byte order is distinguished by method name: ReadBigEndianInt32() / ReadLittleEndianInt32()
 /// </summary>
 public sealed class PermissionedStream : Stream
 {
@@ -29,7 +29,7 @@ public sealed class PermissionedStream : Stream
         _innerStream = innerStream ?? throw new ArgumentNullException(nameof(innerStream));
     }
     
-    // 基础 Stream 重写
+    // Base Stream overrides
     public override bool CanRead => _innerStream.CanRead;
     public override bool CanSeek => _innerStream.CanSeek;
     public override bool CanWrite => _innerStream.CanWrite;
@@ -54,7 +54,7 @@ public sealed class PermissionedStream : Stream
         base.Dispose(disposing);
     }
     
-    // ========== 大端序读取方法 (Big-Endian) ==========
+    // ========== Big-Endian Read Methods ==========
     public short ReadBigEndianInt16()
     {
         Span<byte> buffer = stackalloc byte[2];
@@ -111,7 +111,7 @@ public sealed class PermissionedStream : Stream
         return BinaryPrimitives.ReadDoubleBigEndian(buffer);
     }
     
-    // ========== 小端序读取方法 (Little-Endian) ==========
+    // ========== Little-Endian Read Methods ==========
     public short ReadLittleEndianInt16()
     {
         Span<byte> buffer = stackalloc byte[2];
@@ -168,7 +168,7 @@ public sealed class PermissionedStream : Stream
         return BinaryPrimitives.ReadDoubleLittleEndian(buffer);
     }
     
-    // ========== 大端序写入方法 (Big-Endian) ==========
+    // ========== Big-Endian Write Methods ==========
     public void WriteBigEndian(short value)
     {
         Span<byte> buffer = stackalloc byte[2];
@@ -225,7 +225,7 @@ public sealed class PermissionedStream : Stream
         _innerStream.Write(buffer);
     }
     
-    // ========== 小端序写入方法 (Little-Endian) ==========
+    // ========== Little-Endian Write Methods ==========
     public void WriteLittleEndian(short value)
     {
         Span<byte> buffer = stackalloc byte[2];
@@ -282,7 +282,7 @@ public sealed class PermissionedStream : Stream
         _innerStream.Write(buffer);
     }
     
-    // ========== 字符串读写 ==========
+    // ========== String Read/Write ==========
     public string ReadString(int length)
     {
         Span<byte> buffer = stackalloc byte[length];
@@ -303,7 +303,7 @@ public sealed class PermissionedStream : Stream
         _innerStream.Write(bytes);
     }
     
-    // ========== 变长整数读写 (VarInt) ==========
+    // ========== VarInt Read/Write ==========
     public ulong ReadVarInt()
     {
         ulong result = 0;

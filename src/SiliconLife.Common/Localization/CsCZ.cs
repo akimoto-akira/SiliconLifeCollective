@@ -109,7 +109,7 @@ public class CsCZ : DefaultLocalizationBase
     public override string NavMenuChat => "Chat";
     public override string NavMenuDashboard => "Panel";
     public override string NavMenuBeings => "Bytí";
-    public override string NavMenuAudit => "Audit";
+    public override string NavMenuUsage => "Využití";
     public override string NavMenuTasks => "Úkoly";
     public override string NavMenuMemory => "Paměť";
     public override string NavMenuKnowledge => "Znalosti";
@@ -132,7 +132,7 @@ public class CsCZ : DefaultLocalizationBase
     public override string PageTitleLogs => "Logy";
     public override string PageTitleConfig => "Konfigurace";
     public override string PageTitleAbout => "O aplikaci";
-    public override string PageTitleAudit => "Audit";
+    public override string PageTitleUsage => "Token využití - Silicon Life Collective";
     public override string PageTitleExecutor => "Executor";
     public override string PageTitleCodeBrowser => "Prohlížeč kódu";
     public override string PageTitlePermission => "Oprávnění";
@@ -324,17 +324,17 @@ public class CsCZ : DefaultLocalizationBase
     public override string ConfigErrorInvalidRequest => "Neplatný požadavek";
     public override string ConfigErrorInstanceNotFound => "Instance nebyla nalezena";
 
-    // ===== Audit Page =====
-    public override string AuditPageHeader => "Audit";
-    public override string AuditTotalRequests => "Celkem požadavků";
-    public override string AuditFilterButton => "Filtr";
+    // ===== Usage Page =====
+    public override string UsagePageHeader => "Využití tokenů";
+    public override string UsageTotalRequests => "Celkem požadavků";
+    public override string UsageFilterButton => "Filtr";
 
-    public override string AuditExport => "Export";
-    public override string AuditTrendTitle => "Trend využití tokenů";
-    public override string AuditTrendPrompt => "Tokeny promptu";
-    public override string AuditTrendCompletion => "Tokeny dokončení";
-    public override string AuditTrendTotal => "Celkem";
-    public override string AuditAllClientTypes => "Všechny typy klientů";
+    public override string UsageExport => "Export";
+    public override string UsageTrendTitle => "Trend využití tokenů";
+    public override string UsageTrendPrompt => "Tokeny promptu";
+    public override string UsageTrendCompletion => "Tokeny dokončení";
+    public override string UsageTrendTotal => "Celkem";
+    public override string UsageAllClientTypes => "Všechny typy klientů";
 
     // ===== Calendar Components =====
     public override string CalendarComponentYear => "Rok";
@@ -580,6 +580,7 @@ public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
     public override string FormatMemoryEventSingleChat(string speakerName, string listenerName, string content) => $"Jednoduchý chat: {speakerName} řekl {listenerName} - {content}";
     public override string FormatMemoryEventGroupChat(string group, string message) => $"Skupinový chat: {group} - {message}";
     public override string FormatMemoryEventTask(string task) => $"Úkol: {task}";
+    public override string FormatMemoryEventProject(string project) => $"Projekt: {project}";
     public override string FormatMemoryEventTaskCompleted(string task) => $"Úkol dokončen: {task}";
     public override string FormatMemoryEventTaskFailed(string task) => $"Úkol selhal: {task}";
     public override string FormatMemoryEventToolCall(string tool) => $"Volání nástroje: {tool}";
@@ -625,7 +626,7 @@ public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
         ["task"] = "Úkol",
         ["system"] = "Systém",
         ["timer"] = "Časovač",
-        ["token_audit"] = "Audit tokenů",
+        ["token_audit"] = "Token využití",
         ["work_note"] = "Pracovní poznámka",
         ["project"] = "Projekt",
         ["project_task"] = "Projektový úkol",
@@ -811,29 +812,29 @@ public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
     public override string GetVietnameseZodiacName(int index) => index >= 0 && index < VietnameseZodiacNames.Length ? VietnameseZodiacNames[index] : null;
 
     // ===== Missing Properties - Batch 1 =====
-    public override string AuditTimeToday => "Dnes";
-    public override string AuditTimeWeek => "Týden";
-    public override string AuditTimeMonth => "Měsíc";
-    public override string AuditTimeYear => "Rok";
-    public override string AuditAIClientType => "Typ AI klienta";
-    public override string AuditBeing => "Bytí";
-    public override string AuditStartTime => "Čas začátku";
-    public override string AuditEndTime => "Čas konce";
-    public override string AuditPrevPage => "Předchozí";
-    public override string AuditNextPage => "Další";
-    public override string AuditEmptyState => "Žádné audity";
-    public override string AuditTotalTokens => "Celkem tokenů";
-    public override string AuditPromptTokens => "Tokeny promptu";
-    public override string AuditCompletionTokens => "Tokeny dokončení";
-    public override string AuditSuccessCount => "Úspěšné";
-    public override string AuditFailureCount => "Selhané";
-    public override string AuditTooltipPrompt => "Tokeny promptu";
-    public override string AuditTooltipCompletion => "Tokeny dokončení";
-    public override string AuditTooltipTotal => "Celkem tokenů";
-    public override string AuditTooltipDate => "Datum";
-    public override string AuditGroupByBeing => "Podle bytí";
-    public override string AuditGroupByClient => "Podle klienta";
-    public override string AuditAllBeings => "Všechna bytí";
+    public override string UsageTimeToday => "Dnes";
+    public override string UsageTimeWeek => "Týden";
+    public override string UsageTimeMonth => "Měsíc";
+    public override string UsageTimeYear => "Rok";
+    public override string UsageAIClientType => "Typ AI klienta";
+    public override string UsageBeing => "Bytí";
+    public override string UsageStartTime => "Čas začátku";
+    public override string UsageEndTime => "Čas konce";
+    public override string UsagePrevPage => "Předchozí";
+    public override string UsageNextPage => "Další";
+    public override string UsageEmptyState => "Žádná data o využití";
+    public override string UsageTotalTokens => "Celkem tokenů";
+    public override string UsagePromptTokens => "Tokeny promptu";
+    public override string UsageCompletionTokens => "Tokeny dokončení";
+    public override string UsageSuccessCount => "Úspěšné";
+    public override string UsageFailureCount => "Selhané";
+    public override string UsageTooltipPrompt => "Tokeny promptu";
+    public override string UsageTooltipCompletion => "Tokeny dokončení";
+    public override string UsageTooltipTotal => "Celkem tokenů";
+    public override string UsageTooltipDate => "Datum";
+    public override string UsageGroupByBeing => "Podle bytí";
+    public override string UsageGroupByClient => "Podle klienta";
+    public override string UsageAllBeings => "Všechna bytí";
 
     public override string CalendarSexagenaryName => "Sexagenární cyklus";
     public override string CalendarComponentYearStem => "Nebeský kmen roku";
