@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IO;
 using System.Text;
 using System.Text.Json;
 
@@ -28,13 +29,17 @@ namespace SiliconLife.Collective;
 /// </summary>
 public class ContextManager
 {
+#if DEBUG
+    public const string AIDebugLogDirectory = "AIDebugLogs";
+#endif
+
     /// <summary>
     /// Maximum number of recent chat messages loaded into context per AI request.
     /// Limits the context window to avoid unbounded token consumption during
     /// long-running sessions. Older messages are still preserved in storage and
     /// summarized into long-term memory via the compression pipeline.
     /// </summary>
-    private const int MaxContextMessages = 30;
+    private const int MaxContextMessages = 20;
 
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<ContextManager>();
     private IAIClient _aiClient;
@@ -568,6 +573,10 @@ public class ContextManager
         AIRequest request = BuildRequest(scenarioContext);
         AIResponse response = _aiClient.Chat(request);
 
+#if DEBUG
+        SaveAIDebugLog(request, response, scenarioContext);
+#endif
+
         if (response.Success && response.HasToolCalls)
         {
             _logger.Debug(_being.Id, "AI returned tool calls, persisting intermediate round");
@@ -597,6 +606,10 @@ public class ContextManager
         {
             AIResponse response = await _aiClient.ChatAsync(request);
             
+#if DEBUG
+            SaveAIDebugLog(request, response, scenarioContext);
+#endif
+
             if (response.Success && response.HasToolCalls)
             {
                 _logger.Debug(_being.Id, "AI returned tool calls (async), persisting intermediate round");
@@ -738,6 +751,10 @@ public class ContextManager
             TotalTokens = totalTokens,
             Success = true
         };
+
+#if DEBUG
+        SaveAIDebugLog(request, response, scenarioContext);
+#endif
 
         if (response.Success && response.HasToolCalls)
         {
@@ -1899,4 +1916,74 @@ public class ContextManager
                || ex.Message.Contains("Name or service not known", StringComparison.OrdinalIgnoreCase)
                || ex.Message.Contains("No connection could be made", StringComparison.OrdinalIgnoreCase);
     }
+
+    /// <summary>
+    /// Saves AI request and response to a debug log file for analysis.
+    /// Only active in DEBUG builds.
+    /// </summary>
+    /// <param name="request">The AI request that was sent</param>
+    /// <param name="response">The AI response received</param>
+    /// <param name="scenario">Optional scenario description</param>
+#if DEBUG
+    private void SaveAIDebugLog(AIRequest request, AIResponse response, string? scenario = null)
+    {
+        try
+        {
+            string debugDir = Path.Combine(AppContext.BaseDirectory, AIDebugLogDirectory);
+            if (!Directory.Exists(debugDir))
+            {
+                Directory.CreateDirectory(debugDir);
+            }
+
+            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
+            string fileName = $"AI_Debug_{_being.Name}_{timestamp}.json";
+            string filePath = Path.Combine(debugDir, fileName);
+
+            var debugData = new
+            {
+                Timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"),
+                BeingId = _being.Id,
+                BeingName = _being.Name,
+                Scenario = scenario ?? "Unknown",
+                Request = new
+                {
+                    request.Model,
+                    Messages = request.Messages.Select(m => new
+                    {
+                        m.Role,
+                        m.Content,
+                        m.Thinking,
+                        m.ToolCallId
+                    }).ToList(),
+                    Tools = request.Tools?.Select(t => new { t.Name, t.Description }).ToList()
+                },
+                Response = new
+                {
+                    response.Success,
+                    response.Content,
+                    response.Thinking,
+                    response.Model,
+                    response.PromptTokens,
+                    response.CompletionTokens,
+                    response.TotalTokens,
+                    response.ErrorMessage,
+                    HasToolCalls = response.HasToolCalls,
+                    ToolCalls = response.ToolCalls?.Select(t => new { t.Name, t.Arguments }).ToList()
+                }
+            };
+
+            string json = JsonSerializer.Serialize(debugData, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+
+            File.WriteAllText(filePath, json);
+            _logger.Debug(_being.Id, "AI debug log saved to {0}", filePath);
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(_being.Id, "Failed to save AI debug log: {0}", ex.Message);
+        }
+    }
+#endif
 }

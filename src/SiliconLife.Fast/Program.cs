@@ -58,7 +58,6 @@ public class Program
 
         DefaultConfigData configData = (DefaultConfigData)config.Data;
         LogManager.Instance.AddProvider(new SpeedyLoggerProvider());
-        LogManager.Instance.AddProvider(new DebugLoggerProvider());
 
         // Load plugins after SpeedyPack and logging are initialized
         string pluginDir = Path.Combine(AppContext.BaseDirectory, "plugins");
@@ -191,7 +190,11 @@ public class Program
 
         await StartWebServerAsync(configData, router, (WebUIProvider)imProvider, beingFactory, dynamicBeingLoader, localization);
 
-        // Initialize tray status window after web server started
+        if (_shouldExit)
+        {
+            return;
+        }
+
         TrayLocalizationBase trayLocalization = GetTrayLocalization(configData.Language);
         _trayWindow = new TrayStatusWindow(trayLocalization, configData.WebPort);
         _trayWindow.ExitRequested += (s, e) => RequestExit();
@@ -201,11 +204,9 @@ public class Program
         var trayContext = new TrayApplicationContext(_trayWindow);
         Application.Run(trayContext);
 
-        while (!_shouldExit)
-        {
-            await Task.Delay(100);
-        }
-
+        // Application.Run has exited, proceed with shutdown
+        // _shouldExit is already set by RequestExit()
+        _logger.Info(null, "Windows Forms message loop exited, proceeding with shutdown");
         await ShutdownAsync();
     }
 
@@ -217,15 +218,21 @@ public class Program
         TrayLocalizationBase shutdownTrayLocalization = GetTrayLocalization(Config.Instance.Data.Language);
         _trayWindow?.UpdateStatus(shutdownTrayLocalization.ShuttingDown);
 
+        // Stop web server first to release port
         if (_webHost != null)
         {
+            _logger.Info(null, "Stopping web server...");
             await _webHost.StopAsync();
             _webHost.Dispose();
+            _logger.Info(null, "Web server stopped");
         }
 
+        // Stop core host
         if (_host != null)
         {
+            _logger.Info(null, "Stopping core host...");
             await _host.StopAsync();
+            _logger.Info(null, "Core host stopped");
         }
 
         // Dispose tray window
@@ -296,11 +303,9 @@ public class Program
         {
             _logger.Error(null, "Failed to start web server: {0}", ex, ex.Message);
             
-            // Get localized tray strings
             var language = Config.Instance?.Data?.Language ?? Language.ZhCN;
             var trayLoc = GetTrayLocalization(language);
             
-            // Show error message box
             string errorMessage = string.Format(trayLoc.WebServerStartupErrorMessage, ex.Message);
             System.Windows.Forms.MessageBox.Show(
                 errorMessage,
@@ -308,8 +313,7 @@ public class Program
                 System.Windows.Forms.MessageBoxButtons.OK,
                 System.Windows.Forms.MessageBoxIcon.Error);
             
-            // Exit the application
-            Environment.Exit(1);
+            await ShutdownAsync();
         }
     }
 
@@ -362,6 +366,7 @@ public class Program
 
     public static void RequestExit()
     {
+        _logger.Info(null, "Exit requested - initiating graceful shutdown");
         _shouldExit = true;
 
         // Break the Windows Forms message loop (Application.Run) so the
@@ -370,13 +375,17 @@ public class Program
         {
             if (System.Windows.Forms.Application.MessageLoop)
             {
-                System.Windows.Forms.Application.Exit();
+                System.Windows.Forms.Application.ExitThread();
             }
         }
         catch (Exception ex)
         {
-            _logger.Warn(null, "Application.Exit() failed during RequestExit", ex);
+            _logger.Warn(null, "Application.ExitThread() failed during RequestExit", ex);
         }
+
+        // If we're not in a message loop (e.g., called before Application.Run),
+        // we need to ensure the main loop will exit
+        _logger.Info(null, "Exit request completed");
     }
 
     /// <summary>

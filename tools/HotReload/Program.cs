@@ -22,7 +22,7 @@
 //   4. 重新启动 --target 目录下的 SiliconLife.Fast.exe
 //
 // 该程序必须独立编译部署（见 HotReload.csproj），不能放在 SiliconLife.Fast 的
-// bin 输出目录中，否则在"覆盖自身"时会因文件锁失败。
+// bin 输出目录中，否则在"覆盖自己"时会因文件锁失败。
 // ------------------------------------------------------------------
 
 using System.Diagnostics;
@@ -34,8 +34,8 @@ internal static class Program
     private const string FastProcessName = "SiliconLife.Fast";
     private const string FastExeName = "SiliconLife.Fast.exe";
     private const int DefaultPort = 8080;
-    private const int ShutdownTimeoutMs = 15_000;
-    private const int PostShutdownDelayMs = 500;
+    private const int ShutdownTimeoutMs = 30_000;  // 增加超时时间到30秒
+    private const int PostShutdownDelayMs = 2000;  // 增加延迟到2秒，确保端口释放
 
     // 文件名以这些前缀开头的文件属于更新器自身，复制时必须跳过。
     private static readonly string[] SelfFilePrefixes = new[]
@@ -54,7 +54,7 @@ internal static class Program
             return 2;
         }
 
-        // target 默认为 exe 自身所在目录
+        // target 默认为本 exe 所在目录
         string selfDir = AppContext.BaseDirectory.TrimEnd('\\', '/');
         string target = string.IsNullOrWhiteSpace(options.Target) ? selfDir : options.Target;
 
@@ -91,12 +91,12 @@ internal static class Program
     private static async Task Run(string sourcePath, string targetPath, int port)
     {
         // Step 1: graceful shutdown request
-        Console.WriteLine("🛑 [1/4] Requesting graceful shutdown...");
+        Console.WriteLine("🔌 [1/4] Requesting graceful shutdown...");
         await RequestGracefulShutdown(port);
 
         // Step 2: wait for the process to exit (fallback to force-kill on timeout)
         Console.WriteLine($"\n⏳ [2/4] Waiting for {FastProcessName} to exit...");
-        await WaitForProcessExit(FastProcessName, ShutdownTimeoutMs);
+        await WaitForProcessExit(FastExeName, ShutdownTimeoutMs);
 
         // Small buffer so OS releases file handles
         await Task.Delay(PostShutdownDelayMs);
@@ -137,29 +137,80 @@ internal static class Program
         }
     }
 
-    private static async Task WaitForProcessExit(string processName, int timeoutMs)
+    private static async Task WaitForProcessExit(string exeName, int timeoutMs)
     {
         var sw = Stopwatch.StartNew();
         while (sw.ElapsedMilliseconds < timeoutMs)
         {
-            var procs = Process.GetProcessesByName(processName);
-            if (procs.Length == 0)
+            var procs = FindProcessesByExeName(exeName);
+            if (procs.Count == 0)
             {
-                Console.WriteLine($"   ✅ {processName} has exited.");
+                Console.WriteLine($"   ✅ {FastProcessName} has exited.");
                 return;
             }
-            foreach (var p in procs) p.Dispose();
-            await Task.Delay(300);
+            
+            foreach (var p in procs) 
+            {
+                try 
+                {
+                    Console.WriteLine($"   Process still running: PID {p.Id}, {p.ProcessName}");
+                }
+                catch { }
+            }
+            
+            foreach (var p in procs) 
+            {
+                try 
+                {
+                    p.Dispose();
+                }
+                catch { }
+            }
+            
+            await Task.Delay(500);  // 增加检查间隔到500ms
         }
 
-        Console.WriteLine($"   ⚠️  Timed out after {timeoutMs / 1000}s; force-killing {processName}...");
-        ForceKill(processName);
-        await Task.Delay(500);
+        Console.WriteLine($"   ⚠️  Timed out after {timeoutMs / 1000}s; force-killing {FastProcessName}...");
+        ForceKill(FastExeName);
+        await Task.Delay(1000);  // 强制杀死后等待更长时间
     }
 
-    private static void ForceKill(string processName)
+    private static List<Process> FindProcessesByExeName(string exeName)
     {
-        foreach (var p in Process.GetProcessesByName(processName))
+        var result = new List<Process>();
+        try
+        {
+            var allProcs = Process.GetProcesses();
+            string exeNameWithoutExtension = Path.GetFileNameWithoutExtension(exeName);
+            foreach (var p in allProcs)
+            {
+                try
+                {
+                    // 使用 ProcessName 属性来查找进程，更加可靠
+                    if (p.ProcessName.Equals(exeNameWithoutExtension, StringComparison.OrdinalIgnoreCase) ||
+                        (!string.IsNullOrEmpty(p.MainModule?.FileName) && 
+                         p.MainModule.FileName.EndsWith(exeName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        result.Add(p);
+                    }
+                }
+                catch (Exception)
+                {
+                    // Skip processes we can't access
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // Skip any errors in getting processes
+        }
+        return result;
+    }
+
+    private static void ForceKill(string exeName)
+    {
+        var procs = FindProcessesByExeName(exeName);
+        foreach (var p in procs)
         {
             try
             {
@@ -173,7 +224,11 @@ internal static class Program
             }
             finally
             {
-                p.Dispose();
+                try
+                {
+                    p.Dispose();
+                }
+                catch { }
             }
         }
     }
@@ -244,6 +299,10 @@ internal static class Program
                 $"Fast executable not found after copy: {exePath}");
         }
 
+        // 额外等待确保端口完全释放
+        Console.WriteLine("   ⏳ Waiting for port to be fully released...");
+        Thread.Sleep(1000);
+
         var psi = new ProcessStartInfo
         {
             FileName = exePath,
@@ -274,52 +333,78 @@ internal static class Program
         var opts = new Options();
         for (int i = 0; i < args.Length; i++)
         {
-            string a = args[i];
-            switch (a)
+            string arg = args[i];
+            if (arg == "--source" && i + 1 < args.Length)
             {
-                case "--source":
-                case "-s":
-                    if (++i >= args.Length) return null;
-                    opts.Source = args[i];
-                    break;
-                case "--target":
-                case "-t":
-                    if (++i >= args.Length) return null;
-                    opts.Target = args[i];
-                    break;
-                case "--port":
-                case "-p":
-                    if (++i >= args.Length) return null;
-                    if (!int.TryParse(args[i], out int port)) return null;
-                    opts.Port = port;
-                    break;
-                case "-h":
-                case "--help":
-                case "/?":
+                opts.Source = args[++i];
+            }
+            else if (arg == "--target" && i + 1 < args.Length)
+            {
+                opts.Target = args[++i];
+            }
+            else if (arg == "--port" && i + 1 < args.Length)
+            {
+                if (int.TryParse(args[++i], out int p) && p > 0 && p <= 65535)
+                {
+                    opts.Port = p;
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Invalid port number: {args[i]}");
                     return null;
-                default:
-                    Console.Error.WriteLine($"Unknown argument: {a}");
+                }
+            }
+            else if (arg == "--build-only")
+            {
+                // 仅编译模式：不再继续执行
+                Console.WriteLine("=== Build-only mode ===");
+                Console.WriteLine("Source: " + opts.Source);
+                Console.WriteLine("Target: " + opts.Target);
+                if (!Directory.Exists(opts.Source))
+                {
+                    Console.Error.WriteLine($"Source directory not found: {opts.Source}");
                     return null;
+                }
+                if (!Directory.Exists(opts.Target))
+                {
+                    Console.Error.WriteLine($"Target directory not found: {opts.Target}");
+                    return null;
+                }
+                
+                Console.WriteLine("Copying files...");
+                int copied = CopyFiles(opts.Source, opts.Target);
+                Console.WriteLine($"Copied {copied} file(s).");
+                Console.WriteLine("✅ Build-only mode completed.");
+                return null; // 提前返回
+            }
+            else if (arg == "-?" || arg == "--help")
+            {
+                return null; // Print usage
             }
         }
 
+        // Validate required source argument
         if (string.IsNullOrWhiteSpace(opts.Source))
         {
-            Console.Error.WriteLine("Missing required argument: --source <path>");
+            Console.Error.WriteLine("Missing required argument --source");
             return null;
         }
+
         return opts;
     }
 
     private static void PrintUsage()
     {
-        Console.WriteLine();
-        Console.WriteLine("Usage:");
-        Console.WriteLine("  HotReload.exe --source <build-output-dir> [--target <deploy-dir>] [--port <port>]");
-        Console.WriteLine();
-        Console.WriteLine("Arguments:");
-        Console.WriteLine("  --source, -s   Required. Directory containing freshly built files to copy.");
-        Console.WriteLine("  --target, -t   Optional. Destination directory. Defaults to the folder of HotReload.exe itself.");
-        Console.WriteLine("  --port,   -p   Optional. Fast web server port. Default: 8080.");
+        Console.WriteLine("Usage: HotReload.exe [options]");
+        Console.WriteLine("\nOptions:");
+        Console.WriteLine("  --source <path>       Source directory of the new build (required)");
+        Console.WriteLine("  --target <path>       Target directory to copy to (default: current dir)");
+        Console.WriteLine("  --port <number>       Port number of the running Fast instance (default: 8080)");
+        Console.WriteLine("  --build-only          Only copy files, do not restart (useful for build scripts)");
+        Console.WriteLine("  -?, --help            Show this help message");
+        Console.WriteLine("\nExamples:");
+        Console.WriteLine("  HotReload.exe --source \"..\\SiliconLife.Fast\\bin\\Debug\"");
+        Console.WriteLine("  HotReload.exe --source \"C:\\build\\output\" --target \"C:\\prod\" --port 8081");
+        Console.WriteLine("  HotReload.exe --source \"C:\\build\" --build-only");
     }
 }

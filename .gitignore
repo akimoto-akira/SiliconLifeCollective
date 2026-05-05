@@ -74,3 +74,4 @@ YDoc/
 .kiro/
 *.csproj.targets
 src/TravelCodeWikiWithAI/
+.trae/

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -108,10 +108,15 @@ public class DiskTool : ITool
                     ["type"] = "boolean",
                     ["description"] = "Case sensitive search (for search actions, default: false)"
                 },
-                ["encoding"] = new Dictionary<string, object>
+                ["max_depth"] = new Dictionary<string, object>
                 {
-                    ["type"] = "string",
-                    ["description"] = "File encoding for read operations (e.g., 'utf-8', 'gb2312', 'shift_jis'). If not specified, auto-detects from file content, falls back to UTF-8."
+                    ["type"] = "integer",
+                    ["description"] = "Maximum search depth (for search actions, default: 10, 0 = current directory only)"
+                },
+                ["max_file_size"] = new Dictionary<string, object>
+                {
+                    ["type"] = "integer",
+                    ["description"] = "Maximum file size in bytes for content search (for search_content, default: 10485760 = 10MB)"
                 }
             },
             ["required"] = new[] { "action" }
@@ -160,6 +165,10 @@ public class DiskTool : ITool
 
         if (action == "count_lines")
         {
+            // Verify it's a text file before reading
+            if (!IsTextFile(path))
+                return ToolResult.Failed($"Cannot count lines: '{path}' is not a text file. Only text and code files are supported.");
+
             var readParams = new Dictionary<string, object>(requestParams);
             ExecutorRequest readRequest = new(callerId, path, "read_file", readParams);
             ExecutorResult readResult = DiskExecutor.Execute(readRequest);
@@ -172,6 +181,10 @@ public class DiskTool : ITool
 
         if (action == "read_lines")
         {
+            // Verify it's a text file before reading
+            if (!IsTextFile(path))
+                return ToolResult.Failed($"Cannot read lines: '{path}' is not a text file. Only text and code files are supported.");
+
             if (!parameters.TryGetValue("start_line", out object? startLineObj) ||
                 !int.TryParse(startLineObj?.ToString(), out int startLine) || startLine < 1)
                 return ToolResult.Failed("Missing or invalid 'start_line' parameter (must be a positive integer)");
@@ -203,6 +216,10 @@ public class DiskTool : ITool
 
             if (!parameters.TryGetValue("new_text", out object? newTextAllObj) || newTextAllObj == null)
                 return ToolResult.Failed("Missing 'new_text' parameter");
+
+            // Verify it's a text file before reading
+            if (!IsTextFile(path))
+                return ToolResult.Failed($"Cannot replace text: '{path}' is not a text file. Only text and code files are supported.");
 
             string oldTextAll = oldTextAllObj.ToString()!;
             string newTextAll = newTextAllObj.ToString()!;
@@ -241,6 +258,10 @@ public class DiskTool : ITool
 
             if (!parameters.TryGetValue("new_text", out object? newTextObj) || newTextObj == null)
                 return ToolResult.Failed("Missing 'new_text' parameter");
+
+            // Verify it's a text file before reading
+            if (!IsTextFile(path))
+                return ToolResult.Failed($"Cannot replace text: '{path}' is not a text file. Only text and code files are supported.");
 
             string oldText = oldTextObj.ToString()!;
             string newText = newTextObj.ToString()!;
@@ -283,6 +304,10 @@ public class DiskTool : ITool
             if (!parameters.TryGetValue("content", out object? replaceContentObj) || replaceContentObj == null)
                 return ToolResult.Failed("Missing 'content' parameter");
 
+            // Verify it's a text file before reading
+            if (!IsTextFile(path))
+                return ToolResult.Failed($"Cannot replace lines: '{path}' is not a text file. Only text and code files are supported.");
+
             var readParams = new Dictionary<string, object>(requestParams);
             ExecutorRequest readRequest = new(callerId, path, "read_file", readParams);
             ExecutorResult readResult = DiskExecutor.Execute(readRequest);
@@ -319,6 +344,10 @@ public class DiskTool : ITool
 
         if (action == "clear_file")
         {
+            // Verify it's a text file before clearing
+            if (!IsTextFile(path))
+                return ToolResult.Failed($"Cannot clear file: '{path}' is not a text file. Only text and code files are supported.");
+
             var clearParams = new Dictionary<string, object> { ["content"] = "" };
             ExecutorRequest clearRequest = new(callerId, path, "write_file", clearParams);
             ExecutorResult clearResult = DiskExecutor.Execute(clearRequest);
@@ -328,6 +357,13 @@ public class DiskTool : ITool
         }
 
         ExecutorRequest request = new(callerId, path, action, requestParams);
+        
+        // For read operations, verify it's a text file
+        if (action == "read_file" && !IsTextFile(path))
+        {
+            return ToolResult.Failed($"Cannot read file: '{path}' is not a text file. Only text and code files are supported. Use get_file_info for binary file metadata.");
+        }
+        
         ExecutorResult result = DiskExecutor.Execute(request);
 
         if (result.Success)
@@ -540,6 +576,7 @@ public class DiskTool : ITool
 
     /// <summary>
     /// Recursively search file contents, handling UnauthorizedAccessException per directory.
+    /// Only searches text and code files, skipping binary files.
     /// </summary>
     private static void SearchContentRecursive(
         string directory, string pattern, string keyword,
@@ -553,6 +590,11 @@ public class DiskTool : ITool
             foreach (var file in Directory.EnumerateFiles(directory, pattern, SearchOption.TopDirectoryOnly))
             {
                 if (results.Count >= maxResults) return;
+                
+                // Skip binary files - only search text and code files
+                if (!IsTextFile(file))
+                    continue;
+                
                 try
                 {
                     var content = File.ReadAllText(file);
@@ -588,5 +630,65 @@ public class DiskTool : ITool
         }
         catch (UnauthorizedAccessException) { }
         catch (IOException) { }
+    }
+
+    /// <summary>
+    /// Check if a file is likely a text/code file based on extension.
+    /// </summary>
+    private static bool IsTextFile(string filePath)
+    {
+        string extension = Path.GetExtension(filePath).ToLowerInvariant();
+        
+        // Text and code file extensions
+        var textExtensions = new HashSet<string>
+        {
+            // Code files
+            ".cs", ".vb", ".fs", ".cpp", ".c", ".h", ".hpp", ".cxx", ".cc",
+            ".java", ".kt", ".scala", ".groovy",
+            ".py", ".pyw", ".pyi", ".pyx",
+            ".js", ".jsx", ".ts", ".tsx", ".mjs",
+            ".html", ".htm", ".xhtml",
+            ".css", ".scss", ".sass", ".less",
+            ".json", ".xml", ".yaml", ".yml", ".toml", ".ini", ".cfg", ".conf",
+            ".md", ".markdown", ".txt", ".log",
+            ".sql", ".sh", ".bash", ".zsh", ".ps1", ".bat", ".cmd",
+            ".rb", ".php", ".go", ".rs", ".swift", ".m", ".mm",
+            ".r", ".R", ".pl", ".pm", ".t", ".lua", ".dart",
+            ".vue", ".svelte", ".astro",
+            ".dockerfile", ".gitignore", ".editorconfig",
+            ".csproj", ".vbproj", ".fsproj", ".sln",
+            ".props", ".targets", ".nuspec",
+            
+            // Config and data files
+            ".env", ".properties", ".gradle",
+            ".makefile", ".cmake",
+            ".graphql", ".proto",
+            ".svg", ".xml", ".xaml",
+            ".resx", ".licx",
+            ".mdx",
+            
+            // Markup and template files
+            ".ejs", ".pug", ".jade", ".hbs", ".mustache",
+            ".liquid", ".jinja", ".jinja2",
+            ".blade.php", ".twig",
+        };
+
+        // Check if file has no extension (could be Dockerfile, Makefile, etc.)
+        if (string.IsNullOrEmpty(extension))
+        {
+            string fileName = Path.GetFileName(filePath).ToLowerInvariant();
+            var specialFiles = new HashSet<string>
+            {
+                "dockerfile", "makefile", "rakefile", "gemfile",
+                "vagrantfile", "jenkinsfile", "brewfile",
+                ".gitignore", ".dockerignore", ".editorconfig",
+                ".env", ".env.example", ".env.local",
+                "license", "readme", "changelog",
+                "authors", "contributors"
+            };
+            return specialFiles.Contains(fileName);
+        }
+
+        return textExtensions.Contains(extension);
     }
 }

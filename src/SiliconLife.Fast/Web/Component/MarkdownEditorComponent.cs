@@ -113,7 +113,7 @@ public class MarkdownEditorComponent : ComponentBase
             H.Div(toolbarChildren.ToArray()).Class("md-editor-toolbar"),
             H.Div(
                 H.Div(
-                    H.Textarea().Id(textareaId).Class("md-editor-textarea").Placeholder("Write markdown here...")
+                    H.Textarea().Id(textareaId).Class("md-editor-textarea").Placeholder("Write markdown here...").Value(escapedMarkdown)
                 ).Class("md-editor-edit-pane"),
                 H.Div().Id(previewId).Class("md-editor-preview-pane")
             ).Class("md-editor-body"),
