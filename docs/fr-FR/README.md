@@ -13,6 +13,7 @@
 - **Piloté par fichier âme** — Chaque Silicon Being est contrôlé par un fichier prompt central (`soul.md`) qui définit une personnalité unique et des modèles de comportement
 - **Architecture Body-Brain** — Le *Body* (SiliconBeing) reçoit les signes vitaux et détecte les scénarios de déclenchement ; le *Brain* (ContextManager) est responsable du chargement de l'historique, des appels IA, de l'exécution des outils et de la persistance des réponses
 - **Capacité d'auto-développement** — Grâce à la technologie de compilation dynamique Roslyn, les Silicon Beings peuvent réécrire leur propre code pour réaliser une évolution
+- **Gestion des états d'activité** — Prise en charge de quatre états d'activité : Idle (inactif), Working (en travail), Error (erreur), Stopped (arrêté). Entrée automatique dans l'état Stopped après 10 erreurs consécutives
 
 ### Système de plugins
 - **Architecture d'extension par plugins** — Extension de fonctionnalités via l'interface IPlugin, prend en charge le chargement dynamique de DLL de plugins depuis un répertoire
@@ -21,7 +22,8 @@
 - **Intégration d'outils** — Les plugins peuvent enregistrer des outils personnalisés via l'interface ITool, automatiquement intégrés dans le cycle d'appel d'outils
 
 ### Outils & Exécution
-- **23 outils intégrés** — Couvrant calendrier, chat, configuration, disque, réseau, mémoire, tâches, minuteries, base de connaissances, notes de travail, navigateur WebView, etc.
+- **24 outils intégrés** — Couvrant calendrier, chat, configuration, disque, réseau, mémoire, tâches, minuteries, base de connaissances, notes de travail, navigateur WebView, rechargement à chaud, etc.
+- **Outil de rechargement à chaud** — Prend en charge la compilation automatique, la mise à jour des fichiers et le redémarrage de SiliconLife.Fast pendant l'exécution, sans intervention manuelle
 - **Boucle d'appel d'outils** — L'IA retourne un appel d'outil → Exécuter l'outil → Retourner les résultats à l'IA → Continuer la boucle jusqu'à une réponse en texte pur
 - **Sécurité des permissions de l'exécuteur** — Toutes les opérations E/S passent par une validation de permissions stricte via les exécuteurs
   - Chaîne de permissions à 5 niveaux : IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
@@ -31,6 +33,7 @@
 - **Prise en charge de multiples backends IA**
   - **Ollama** — Déploiement de modèles locaux, avec API HTTP native
   - **Alibaba Cloud DashScope (Bailian)** — Service IA cloud, compatible API OpenAI, prend en charge 13+ modèles, déploiement multi-région
+  - **Volcengine Ark (VolcengineArk)** — Service IA cloud de ByteDance, prend en charge les modes streaming et non-streaming, contrôle de vitesse intégré
 - **32 systèmes de calendrier** — Couverture complète des principaux calendriers mondiaux, incluant calendrier grégorien, calendrier lunaire chinois, calendrier islamique, calendrier hébraïque, calendrier japonais, calendrier persan, calendrier maya, calendrier historique chinois, etc.
 - **Système de réseau de connaissances** — Graphe de connaissances basé sur des triplets (sujet-relation-objet), prend en charge le stockage, les requêtes et la découverte de chemins
 
@@ -41,17 +44,18 @@
 - **Zéro dépendance framework frontend** — HTML/CSS/JS générés côté serveur via `H`, `CssBuilder` et `JsBuilder`
 
 ### Internationalisation & Localisation
-- **Prise en charge complète de 24 variantes linguistiques**
-  - Chinois : zh-CN, zh-HK, zh-SG, zh-MO, zh-TW, zhMY (6 variantes)
-  - Anglais : en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variantes)
-  - Espagnol : es-ES, es-MX (2 variantes)
-  - Allemand : de-DE, de-AT, de-CH, de-LU, de-LI (5 variantes)
-  - Français : fr-FR, fr-CA, fr-CH (3 variantes)
-  - Japonais : ja-JP | Coréen : ko-KR | Tchèque : cs-CZ
+- **Prise en charge complète de 29 implémentations linguistiques**, couvrant 2 systèmes d'écriture et multiples variantes régionales
+  - **Chinois simplifié** : zh-CN (Chine continentale), zh-SG (Singapour), zh-MY (Malaisie) (3 variantes)
+  - **Chinois traditionnel** : zh-HK (Hong Kong), zh-TW (Taïwan), zh-MO (Macao) (3 variantes)
+  - **Anglais** : en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variantes)
+  - **Espagnol** : es-ES, es-MX (2 variantes)
+  - **Allemand** : de-DE, de-AT, de-CH, de-LU, de-LI (5 variantes)
+  - **Français** : fr-FR, fr-CA, fr-CH (3 variantes)
+  - **Japonais** : ja-JP | **Coréen** : ko-KR | **Tchèque** : cs-CZ (3 variantes)
 
 ### Données & Stockage
-- **Stockage haute performance SpeedyPack** — Moteur de stockage .spk propriétaire, mappage de répertoires en mémoire + cache d'entrées + file d'écriture asynchrone
-- **Zéro dépendance de base de données** — La version Default utilise un stockage pur en système de fichiers (format JSON), la version Fast utilise le stockage en mémoire SpeedyPack
+- **Stockage haute performance SpeedyPack** — La version Fast utilise le moteur de stockage .spk propriétaire, mappage de répertoires en mémoire + cache d'entrées + file d'écriture asynchrone
+- **Stockage en système de fichiers** — La version Default utilise un stockage pur en système de fichiers JSON
 - **Requêtes par index temporel** — Requêtes efficaces par plage de temps via l'interface `ITimeStorage`
 - **Compression automatique** — SpeedyPack prend en charge la compression automatique planifiée pour récupérer l'espace de stockage
 - **Dépendances minimales** — La bibliothèque principale dépend uniquement de Microsoft.CodeAnalysis.CSharp pour la compilation dynamique
@@ -74,7 +78,13 @@ Ce projet propose deux versions d'implémentation pour répondre à différents 
 - **Mode d'exécution** : Application Windows Forms (prend en charge la barre d'état système)
 - **Méthode de stockage** : Stockage en mémoire SpeedyPack + persistance par lot asynchrone (format de fichier .spk)
 - **Scénarios applicables** : Concurrence élevée, faible latence, grands volumes de données
-- **Caractéristiques** : Optimisation de performance extrême, exécution en arrière-plan dans la barre d'état, moteur SpeedyPack + compression automatique garantissant la sécurité des données
+- **Caractéristiques** :
+  - Optimisation de performance extrême
+  - Exécution en arrière-plan dans la barre d'état, surveillance en temps réel via la fenêtre d'état de la barre d'état
+  - Moteur SpeedyPack + compression automatique garantissant la sécurité des données
+  - Architecture Component UI, 30+ composants déclaratifs
+  - 7 thèmes d'apparence, prend en charge la détection et la commutation automatiques
+  - Outil de rechargement à chaud pour les mises à jour et redémarrages en ligne
 - **Amélioration des performances** : Latence de lecture mémoire réduite de 1000x, latence d'écriture réduite de 15000x, capacité de traitement parallèle augmentée de 50x
 - **Description du rôle** : Implémentation prête pour la production avec optimisation approfondie, le meilleur choix pour l'exploitation à long terme et les véritables environnements de production
 - **Commande de démarrage** : `dotnet run --project src/SiliconLife.Fast`
@@ -103,7 +113,7 @@ Ce projet propose deux versions d'implémentation pour répondre à différents 
 | Runtime | .NET 9 | .NET 9 Windows |
 | Langage de programmation | C# | C# |
 | Type d'application | Application console | Application Windows Forms |
-| Intégration IA | Ollama (local), Alibaba Cloud DashScope (cloud) | Ollama (local), Alibaba Cloud DashScope (cloud) |
+| Intégration IA | Ollama (local), Alibaba Cloud DashScope (cloud) | Ollama (local), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud) |
 | Stockage de données | Système de fichiers (JSON + répertoire d'index temporel) | SpeedyPack (format .spk, mappage en mémoire + persistance asynchrone) |
 | Serveur Web | HttpListener (intégré .NET) | HttpListener (intégré .NET) |
 | Compilation dynamique | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |

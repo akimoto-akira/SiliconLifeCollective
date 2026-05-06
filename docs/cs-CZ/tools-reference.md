@@ -636,6 +636,51 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ---
 
+### 24. Nástroj Hot Reload (HotReloadTool)
+
+**Název nástroje**: `hot_reload`
+
+**Popis**: Podporuje automatickou kompilaci, aktualizaci souborů a restart SiliconLife.Fast za běhu, bez manuálního zásahu.
+
+**Podporované akce**:
+- `execute` — Provede kompletní proces build, kopírování a restartu
+- `build_only` — Pouze zkompiluje projekt, bez kopírování nebo restartu
+
+**Pracovní postup**:
+1. Zkompiluje projekt SiliconLife.Fast
+2. Elegantně uzavře běžící instanci Fast (prostřednictvím HTTP API)
+3. Počká na ukončení procesu a uvolnění portu
+4. Zkopíruje výstup buildu do cílového adresáře (vyloučí soubory HotReload)
+5. Restartuje instanci Fast
+
+**Charakteristiky**:
+- Automatická detekce a uzavření předchozího procesu
+- Bezpečné kopírování souborů (nepřepíše HotReload.exe)
+- Mechanismus čekání na uvolnění portu
+- Podpora vlastní konfigurace portu
+
+**Příklad použití**:
+```json
+{
+  "action": "execute",
+  "project_path": "src/SiliconLife.Fast",
+  "source_path": "src/SiliconLife.Fast/bin/Debug/net9.0",
+  "configuration": "Debug",
+  "port": 8080
+}
+```
+
+**Popis parametrů**:
+- `project_path`: Cesta k projektu (relativní ke kořenovému adresáři řešení)
+- `source_path`: Adresář výstupu buildu
+- `configuration`: Konfigurace buildu (Debug/Release)
+- `port`: Webový port instance Fast (výchozí 8080)
+
+**Poznámky**:
+- Použitelné pouze pro verzi SiliconLife.Fast
+- Vyžaduje HotReload.exe v adresáři tools/HotReload
+- Krátké přerušení služby během restartu (přibližně 3-5 sekund)
+
 ## Proces Volání Nástrojů
 
 ```

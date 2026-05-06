@@ -20,8 +20,14 @@ Ce projet propose deux versions d'implémentation, partageant la même conceptio
 - **Mode d'exécution** : Application Windows Forms (prend en charge la barre d'état système)
 - **Méthode de stockage** : Stockage en mémoire SpeedyPack + persistance par lot asynchrone (format de fichier .spk)
 - **Scénarios applicables** : Concurrence élevée, faible latence, grands volumes de données
+- **Caractéristiques** :
+  - Exécution en arrière-plan dans la barre d'état, surveillance en temps réel via la fenêtre d'état
+  - Moteur SpeedyPack + compression automatique garantissant la sécurité des données
+  - Architecture Component UI, 30+ composants déclaratifs
+  - 7 thèmes d'apparence, prend en charge la détection et la commutation automatiques
+  - Outil de rechargement à chaud pour les mises à jour et redémarrages en ligne
 - **Amélioration des performances** : Latence de lecture réduite de 1000x, latence d'écriture réduite de 15000x
-- **Description du rôle** : Implémentation prête pour la production avec optimisation approfondie, avec exécution en arrière-plan dans la barre d'état, moteur SpeedyPack + compression automatique garantissant la sécurité des données, le meilleur choix pour l'exploitation à long terme et les véritables environnements de production
+- **Description du rôle** : Implémentation prête pour la production avec optimisation approfondie, avec exécution en arrière-plan dans la barre d'état, moteur SpeedyPack + compression automatique, le meilleur choix pour l'exploitation à long terme et les véritables environnements de production
 
 > **Note** : L'architecture décrite dans ce document s'applique aux deux versions, seules les implémentations de stockage diffèrent. SiliconLife.Default sert de référence pour la vérification architecturale, SiliconLife.Fast est la version principale recommandée pour la production.
 
@@ -272,12 +278,24 @@ Le système prend en charge plusieurs backends IA via l'interface `IAIClient` :
 - **Configuration** : `apiKey`, `region`, `model`
 - **Découverte de modèles** : Récupération des modèles disponibles depuis l'API DashScope à l'exécution ; repli vers une liste sélectionnée en cas de panne réseau
 
+### VolcengineArkClient (Volcengine Ark)
+
+- **Type** : Service IA cloud
+- **Protocole** : API compatible OpenAI
+- **Authentification** : Bearer token (clé API)
+- **Fonctionnalités** : Prise en charge des modes streaming et non-streaming, contrôle de vitesse double intégré
+  - Contrôle de vitesse propre : Application d'un intervalle minimum entre les requêtes
+  - Limitation de vitesse du serveur : Gestion des erreurs 429, nouvelle tentative avec backoff exponentiel
+- **Configuration** : `apiKey`, `endpoint`, `model`
+- **Caractéristiques** : Service IA de ByteDance, prend en charge divers modèles Doubao
+
 ### Pattern Factory de clients IA
 
 Chaque type de client IA a une implémentation factory correspondante de `IAIClientFactory` :
 
 - `OllamaClientFactory` — Crée des instances OllamaClient
 - `DashScopeClientFactory` — Crée des instances DashScopeClient
+- `VolcengineArkClientFactory` — Crée des instances VolcengineArkClient
 
 La factory fournit :
 - `CreateClient(Dictionary<string, object> config)` — Instancie un client depuis la configuration
@@ -501,3 +519,29 @@ Le système prend en charge la localisation complète de **21 variantes linguist
 - **Anglais (10)** : en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY
 - **Espagnol (2)** : es-ES, es-MX
 - **Autres (3)** : ja-JP (japonais), ko-KR (coréen), cs-CZ (tchèque)
+
+---
+
+## États d'activité des Silicon Beings
+
+Les Silicon Beings ont les états d'activité suivants :
+
+| État | Description |
+|------|------|
+| `Idle` | État inactif, en attente du déclencheur d'horloge |
+| `Working` | En cours d'exécution d'un tour de requête IA + appel d'outil |
+| `Error` | Une erreur s'est produite pendant l'exécution |
+| `Stopped` | Arrêté, dû à des erreurs consécutives ou un arrêt manuel |
+
+**Mécanisme d'état Stopped** :
+- Lorsqu'un Silicon Being subit 10 erreurs consécutives, il entre automatiquement dans l'état `Stopped`
+- Une fois dans l'état Stopped, le Being n'exécutera plus aucune tâche
+- Une intervention manuelle est requise pour redémarrer
+
+Transitions d'état :
+```
+Idle → Working → Idle (terminaison normale)
+Working → Error → Working (récupération d'erreur)
+Working → Stopped (10 erreurs consécutives ou arrêt manuel)
+Stopped → Idle (redémarrage)
+```

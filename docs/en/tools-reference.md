@@ -636,6 +636,51 @@ The tool system allows silicon beings to interact with the external world throug
 
 ---
 
+### 24. Hot Reload Tool (HotReloadTool)
+
+**Tool Name**: `hot_reload`
+
+**Description**: Supports automatic compilation, file update, and restarting SiliconLife.Fast during runtime, without manual intervention.
+
+**Supported Actions**:
+- `execute` — Executes the complete build, copy, and restart process
+- `build_only` — Only compiles the project, without copying or restarting
+
+**Workflow**:
+1. Compiles the SiliconLife.Fast project
+2. Gracefully closes the running Fast instance (via HTTP API)
+3. Waits for process exit and port release
+4. Copies the build output to the target directory (excludes HotReload files)
+5. Restarts the Fast instance
+
+**Features**:
+- Automatic detection and closure of the previous process
+- Safe file copying (does not overwrite HotReload.exe)
+- Port release waiting mechanism
+- Supports custom port configuration
+
+**Usage Example**:
+```json
+{
+  "action": "execute",
+  "project_path": "src/SiliconLife.Fast",
+  "source_path": "src/SiliconLife.Fast/bin/Debug/net9.0",
+  "configuration": "Debug",
+  "port": 8080
+}
+```
+
+**Parameter Description**:
+- `project_path`: Project path (relative to solution root directory)
+- `source_path`: Build output directory
+- `configuration`: Build configuration (Debug/Release)
+- `port`: Fast instance Web port (default 8080)
+
+**Notes**:
+- Only applicable to SiliconLife.Fast version
+- Requires HotReload.exe in the tools/HotReload directory
+- Brief service interruption during restart (approximately 3-5 seconds)
+
 ## Tool Invocation Flow
 
 ```

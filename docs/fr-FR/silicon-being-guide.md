@@ -96,20 +96,36 @@ curl -X POST http://localhost:8080/api/beings \
 
 ## Cycle de vie d'un Being
 
-### États
+### États d'activité
+
+Les Silicon Beings ont les états d'activité suivants :
+
+| État | Description |
+|------|------|
+| `Idle` | État inactif, en attente du déclencheur d'horloge |
+| `Working` | En cours d'exécution d'un tour de requête IA + appel d'outil |
+| `Error` | Une erreur s'est produite pendant l'exécution |
+| `Stopped` | Arrêté, dû à des erreurs consécutives ou un arrêt manuel |
+
+**Mécanisme d'état Stopped** :
+- Lorsqu'un Silicon Being subit 10 erreurs consécutives, il entre automatiquement dans l'état `Stopped`
+- Une fois dans l'état Stopped, le Being n'exécutera plus aucune tâche
+- Une intervention manuelle est requise pour redémarrer
+
+### Transitions d'état
 
 ```
-Created → Starting → Running → Stopping → Stopped
-                    ↓
-                  Error
+Idle → Working → Idle (terminaison normale)
+Working → Error → Working (récupération d'erreur)
+Working → Stopped (10 erreurs consécutives ou arrêt manuel)
+Stopped → Idle (redémarrage)
 ```
 
 ### Opérations
 
 - **Démarrer** : Initialiser et commencer le traitement
 - **Arrêter** : Arrêt gracieux
-- **Pause** : Suspendre temporairement (état préservé)
-- **Reprendre** : Continuer depuis l'état de pause
+- **Redémarrer** : Retour à l'état Idle depuis l'état Stopped
 
 ## Système de tâches
 

@@ -41,19 +41,16 @@ Les deux versions partagent les mêmes interfaces et fonctionnalités, différan
 - Propulsé par le modèle Baidu Wenxin 4.0 X1 Turbo.
 
 #### Trae (ByteDance)
-- Ce projet a été principalement maintenu avec Trae pendant la majeure partie du temps.
-- Trae est un IDE IA développé par SPRING PTE, filiale singapourienne de ByteDance.
-- En tant que 10x AI Engineer, capable de construire indépendamment des solutions logicielles.
-- Fonctionnalités d'outils de productivité intelligents, adaptation flexible du rythme de développement et livraison collaborative de projets.
-- Performances de niveau entreprise, système d'agents configurable.
+- Utilisé d'octobre 2025 à avril 2026.
+- IDE IA avec génération intelligente de code et gestion de projet.
 
 #### Qoder (Alibaba)
-- Depuis le 18 avril 2026, ce projet est maintenu avec Qoder.
-- Qoder excelle dans l'analyse de code source et la génération de documentation de domaine, avec d'excellentes performances dans la compréhension de bases de code complexes.
-- Modèle de tarification à coût de calcul zéro, le rendant très rentable pour le traitement automatisé de documentation et les tâches routinières.
-- Plateforme de codage agentic pilotée par l'IA, conçue pour le développement logiciel réel.
-- Fonctionnalités de génération de code intelligente, programmation conversationnelle, moteur d'analyse de contexte avancé et collaboration multi-agent.
-- Fournit une compréhension approfondie du code avec une consommation minimale de ressources, idéal pour la maintenance de projets à long terme et l'accumulation de connaissances.
+- Utilisé pour la maintenance du projet depuis le 18 avril 2026.
+- Plateforme de codage IA supportant l'analyse de code, la génération de documentation et la collaboration multi-agent.
+
+#### CatPaw (Meituan)
+- Utilisé en combinaison avec Qoder depuis le 6 mai 2026.
+- Basé sur les modèles LongCat développés en interne par Meituan, avec de puissantes capacités de refactorisation complète de l'architecture du code.
 
 ### Documentation des exigences
 
@@ -63,6 +60,47 @@ Les deux versions partagent les mêmes interfaces et fonctionnalités, différan
 ---
 
 ## [Non publié]
+
+### 2026-05-06
+
+#### Refactorisation massive des modules
+- `eeb3be6` - Refactorisation et réorganisation massives des modules
+  - Restructuration du projet SiliconLife.App
+  - Réorganisation du projet SiliconLife.Fast
+  - Réorganisation du projet SiliconLife.Default
+  - Réorganisation des modules partagés SiliconLife.Common
+  - Réorganisation des modules principaux SiliconLife.Core
+  - Réorganisation du moteur de stockage SiliconLife.Speedy
+  - Réorganisation des outils de gestion SiliconLife.Speedy.Manager
+  - 119 fichiers modifiés, 6926 lignes ajoutées, 3066 lignes supprimées
+
+### 2026-05-04
+
+#### Client IA
+- `24d2c86` - Ajout de VolcengineArkClient et remplacement d'Audit par Usage tracking
+  - Nouveau client AI VolcengineArkClient Volcengine Ark
+  - Prise en charge des modes streaming et non-streaming
+  - Contrôle de vitesse double intégré (contrôle propre + limitation du serveur)
+  - Compatible avec le protocole API OpenAI
+  - Remplacement du système Audit par Usage tracking
+  - 24 fichiers modifiés, 802 lignes ajoutées, 21 lignes supprimées
+
+#### Système d'outils
+- `f27650a` - Ajout de l'outil de rechargement à chaud pour le redémarrage automatique de Fast
+  - Nouvel outil HotReloadTool de rechargement à chaud
+  - Prise en charge de la compilation en ligne, de la mise à jour et du redémarrage de SiliconLife.Fast
+  - Nouvel programme de mise à jour autonome HotReload.exe
+  - Mécanisme de copie sécurisée des fichiers (ne se écrase pas lui-même)
+  - Fermeture gracieuse et attente de libération de port
+  - 9 fichiers modifiés, 581 lignes ajoutées
+
+#### Localisation
+- `6a5aad8` - Mise à jour de tous les fichiers et ajout de la prise en charge de la localisation française
+  - Nouvelle localisation fr-FR française
+  - Mise à jour de toutes les versions linguistiques
+  - Traduction française de la documentation d'aide
+  - Traduction française de l'interface
+  - 100+ fichiers modifiés
 
 ### 2026-05-03
 

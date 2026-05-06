@@ -636,6 +636,51 @@ Le système d'outils permet aux Silicon Beings d'interagir avec le monde extéri
 
 ---
 
+### 24. Outil de rechargement à chaud (HotReloadTool)
+
+**Nom de l'outil**: `hot_reload`
+
+**Description**: Prend en charge la compilation automatique, la mise à jour des fichiers et le redémarrage de SiliconLife.Fast pendant l'exécution, sans intervention manuelle.
+
+**Opérations prises en charge**:
+- `execute` — Exécute le processus complet de build, copie et redémarrage
+- `build_only` — Build uniquement le projet, sans copie ni redémarrage
+
+**Flux de travail**:
+1. Compile le projet SiliconLife.Fast
+2. Ferme gracieusement l'instance Fast en cours d'exécution (via API HTTP)
+3. Attend la sortie du processus et la libération du port
+4. Copie la sortie de build vers le répertoire cible (exclut les fichiers HotReload)
+5. Redémarre l'instance Fast
+
+**Caractéristiques**:
+- Détection et fermeture automatiques de l'ancien processus
+- Copie sécurisée des fichiers (ne écrase pas HotReload.exe)
+- Mécanisme d'attente de libération de port
+- Support de configuration de port personnalisé
+
+**Exemple d'utilisation**:
+```json
+{
+  "action": "execute",
+  "project_path": "src/SiliconLife.Fast",
+  "source_path": "src/SiliconLife.Fast/bin/Debug/net9.0",
+  "configuration": "Debug",
+  "port": 8080
+}
+```
+
+**Description des paramètres**:
+- `project_path`: Chemin du projet (relatif au répertoire racine de la solution)
+- `source_path`: Répertoire de sortie de build
+- `configuration`: Configuration de build (Debug/Release)
+- `port`: Port Web de l'instance Fast (par défaut 8080)
+
+**Notes**:
+- Applicable uniquement à la version SiliconLife.Fast
+- Nécessite HotReload.exe dans le répertoire tools/HotReload
+- Brève interruption de service pendant le redémarrage (environ 3-5 secondes)
+
 ## Flux d'appel d'outil
 
 ```

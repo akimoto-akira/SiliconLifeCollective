@@ -13,6 +13,7 @@
 - **Soul File Driven** — Each silicon being is driven by a core prompt file (`soul.md`), defining unique personality and behavior patterns
 - **Body-Brain Architecture** — *Body* (SiliconBeing) maintains vital signs and detects trigger scenarios; *Brain* (ContextManager) handles loading history, calling AI, executing tools, and persisting responses
 - **Self-Evolution Capability** — Through Roslyn dynamic compilation technology, silicon beings can rewrite their own code to achieve evolution
+- **Activity State Management** — Supports four activity states: Idle, Working, Error, Stopped. Automatically enters Stopped state after 10 consecutive errors
 
 ### Plugin System
 - **Plugin Extension Architecture** — Feature extension via IPlugin interface, supporting dynamic loading of plugin DLLs from directories
@@ -21,7 +22,8 @@
 - **Tool Integration** — Plugins can register custom tools via ITool interface, automatically integrated into the tool call loop
 
 ### Tools & Execution
-- **23 Built-in Tools** — Covering calendar, chat, configuration, disk, network, memory, tasks, timers, knowledge base, work notes, WebView browser, etc.
+- **24 Built-in Tools** — Covering calendar, chat, configuration, disk, network, memory, tasks, timers, knowledge base, work notes, WebView browser, hot reload, etc.
+- **Hot Reload Tool** — Supports automatic compilation, file update, and restarting SiliconLife.Fast during runtime, without manual intervention
 - **Tool Call Loop** — AI returns tool call → Execute tool → Results fed back to AI → Continue loop until pure text response
 - **Executor-Permission Security** — All I/O operations go through strict permission validation via executors
   - 5-level permission chain: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
@@ -31,6 +33,7 @@
 - **Multiple AI Backend Support**
   - **Ollama** — Local model deployment, using native HTTP API
   - **Alibaba Cloud DashScope (Bailian)** — Cloud AI service, OpenAI API compatible, supporting 13+ models, multi-region deployment
+  - **Volcengine Ark** — ByteDance cloud AI service, supporting streaming and non-streaming modes, built-in dual rate limiting
 - **32 Calendar Systems** — Comprehensive coverage of global major calendars, including Gregorian, Chinese Lunar, Islamic, Hebrew, Japanese, Persian, Mayan, Chinese Historical Calendar, etc.
 - **Knowledge Network System** — Knowledge graph based on triplets (subject-relation-object), supporting storage, querying, and path discovery
 
@@ -41,15 +44,18 @@
 - **Zero Frontend Framework Dependency** — HTML/CSS/JS generated server-side via `H`, `CssBuilder`, and `JsBuilder`
 
 ### Internationalization & Localization
-- **Comprehensive support for 21 language variants**
-  - Chinese: zh-CN, zh-HK, zh-SG, zh-MO, zh-TW, zhMY (6 variants)
-  - English: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variants)
-  - Spanish: es-ES, es-MX (2 variants)
-  - Japanese: ja-JP | Korean: ko-KR | Czech: cs-CZ
+- **Comprehensive support for 29 language implementations**, covering 2 writing systems and multiple regional variants
+  - **Simplified Chinese**: zh-CN (China mainland), zh-SG (Singapore), zh-MY (Malaysia) (3 variants)
+  - **Traditional Chinese**: zh-HK (Hong Kong), zh-TW (Taiwan), zh-MO (Macau) (3 variants)
+  - **English**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variants)
+  - **Spanish**: es-ES, es-MX (2 variants)
+  - **German**: de-DE, de-AT, de-CH, de-LU, de-LI (5 variants)
+  - **French**: fr-FR, fr-CA, fr-CH (3 variants)
+  - **Japanese**: ja-JP | **Korean**: ko-KR | **Czech**: cs-CZ (3 variants)
 
 ### Data & Storage
-- **SpeedyPack High-Performance Storage** — Custom .spk storage engine, in-memory directory mapping + entry cache + asynchronous write queue
-- **Zero Database Dependency** — Default version uses pure file system storage (JSON format), Fast version uses SpeedyPack in-memory storage
+- **SpeedyPack High-Performance Storage** — Fast version uses custom .spk storage engine, in-memory directory mapping + entry cache + asynchronous write queue
+- **File System Storage** — Default version uses pure file system JSON storage
 - **Time Index Query** — Efficient querying by time range via `ITimeStorage` interface
 - **Auto-Compaction** — SpeedyPack supports scheduled auto-compaction, reclaiming free space
 - **Minimal Dependencies** — Core library only depends on Microsoft.CodeAnalysis.CSharp for dynamic compilation
@@ -72,7 +78,13 @@ This project provides two implementation versions to meet different scenario nee
 - **Runtime Mode**: Windows Forms application (supports system tray)
 - **Storage Method**: SpeedyPack in-memory storage + asynchronous batch persistence (.spk file format)
 - **Applicable Scenarios**: High concurrency, low latency, large data volume scenarios
-- **Features**: Extreme performance optimization, tray background operation, SpeedyPack engine + auto-compaction ensures data security
+- **Features**:
+  - Extreme performance optimization
+  - Tray background operation with real-time monitoring via tray status window
+  - SpeedyPack engine + auto-compaction ensures data security
+  - Component UI architecture, 30+ declarative components
+  - 7 Skin Themes with auto-discovery and switching
+  - Hot reload tool for online updates and restarts
 - **Performance Improvement**: Storage read latency reduced by 1000x, write latency reduced by 15000x, concurrent processing capacity increased by 50x
 - **Role Description**: A production-grade implementation with deep optimization, the first choice for long-term operation and actual production environments
 - **Startup Command**: `dotnet run --project src/SiliconLife.Fast`
@@ -101,7 +113,7 @@ This project provides two implementation versions to meet different scenario nee
 | Runtime | .NET 9 | .NET 9 Windows |
 | Programming Language | C# | C# |
 | Application Type | Console application | Windows Forms application |
-| AI Integration | Ollama (local), Alibaba Cloud DashScope (cloud) | Ollama (local), Alibaba Cloud DashScope (cloud) |
+| AI Integration | Ollama (local), Alibaba Cloud DashScope (cloud) | Ollama (local), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud) |
 | Data Storage | File system (JSON + time-indexed directories) | SpeedyPack (.spk format, memory mapping + asynchronous persistence) |
 | Web Server | HttpListener (.NET built-in) | HttpListener (.NET built-in) |
 | Dynamic Compilation | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |

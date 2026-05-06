@@ -20,6 +20,12 @@ Este proyecto proporciona dos versiones de implementación que comparten el mism
 - **Modo de Ejecución**: Aplicación de formularios Windows (con soporte de bandeja del sistema)
 - **Almacenamiento**: Almacenamiento en memoria SpeedyPack + persistencia por lotes asíncrona (formato de archivo .spk)
 - **Escenario de Aplicación**: Escenarios de alta concurrencia, baja latencia, gran volumen de datos
+- **Características**:
+  - Ejecución en segundo plano de la bandeja del sistema, monitoreo en tiempo real mediante ventana de estado
+  - Motor SpeedyPack + compresión automática garantizan seguridad de datos
+  - Arquitectura Component UI, 30+ componentes declarativos
+  - 7 temas de piel, soporte para descubrimiento y cambio automáticos
+  - Herramienta de recarga en caliente para actualizaciones y reinicios en línea
 - **Mejora de Rendimiento**: Latencia de lectura de almacenamiento reducida 1000 veces, latencia de escritura reducida 15000 veces
 - **Descripción de Rol**: Implementación de nivel de producción con optimización profunda que incluye ejecución en segundo plano de la bandeja del sistema, motor SpeedyPack + compresión automática, la mejor opción para operaciones a largo plazo y entornos de producción reales
 
@@ -272,12 +278,24 @@ El sistema soporta múltiples backends de IA a través de la interfaz `IAIClient
 - **Configuración**: `apiKey`, `region`, `model`
 - **Descubrimiento de modelos**: Obtiene modelos disponibles de la API de Bailian en tiempo de ejecución; respalda a lista seleccionada en caso de fallo de red
 
+### VolcengineArkClient (Volcengine Ark)
+
+- **Tipo**: Servicio de IA en la nube
+- **Protocolo**: API compatible con OpenAI
+- **Autenticación**: Token Bearer (clave API)
+- **Funcionalidades**: Soporta modos streaming y no-streaming, control de velocidad doble integrado
+  - Control de velocidad propio: Aplica intervalo mínimo entre solicitudes
+  - Limitación de velocidad del servidor: Maneja errores 429, reintentos con retroceso exponencial
+- **Configuración**: `apiKey`, `endpoint`, `model`
+- **Características**: Servicio de IA de ByteDance, soporta diversos modelos Doubao
+
 ### Patrón de Fábrica de Clientes
 
 Cada tipo de cliente de IA tiene una implementación de fábrica correspondiente que implementa `IAIClientFactory`:
 
 - `OllamaClientFactory` — Crea instancias de OllamaClient
 - `DashScopeClientFactory` — Crea instancias de DashScopeClient
+- `VolcengineArkClientFactory` — Crea instancias de VolcengineArkClient
 
 Las fábricas proporcionan:
 - `CreateClient(Dictionary<string, object> config)` — Instanciar cliente desde configuración
@@ -698,14 +716,19 @@ Los Seres Silicona tienen los siguientes estados de actividad:
 | Estado | Descripción |
 |------|------|
 | `Idle` | Estado inactivo, esperando activación por reloj |
-| `Running` | Ejecutando una ronda de solicitud de IA + invocación de herramientas |
-| `WaitingPermission` | Esperando aprobación de permisos del usuario |
-| `Stopped` | Detenido, por error o detención manual |
+| `Working` | Ejecutando una ronda de solicitud de IA + invocación de herramientas |
+| `Error` | Ocurrió un error durante la ejecución |
+| `Stopped` | Detenido, por errores consecutivos o detención manual |
+
+**Mecanismo de Estado Stopped**:
+- Cuando un Ser Silicona ocurre 10 errores consecutivos, entra automáticamente al estado `Stopped`
+- Una vez en estado Stopped, el Ser ya no ejecutará ninguna tarea
+- Se requiere intervención manual para reiniciar
 
 Transiciones de estado:
 ```
-Idle → Running → Idle (completado normalmente)
-Running → WaitingPermission → Running (continúa después de aprobación de permisos)
-Running → Stopped (error o detención manual)
+Idle → Working → Idle (completado normalmente)
+Working → Error → Working (recuperación de error)
+Working → Stopped (10 errores consecutivos o detención manual)
 Stopped → Idle (reiniciado)
 ```

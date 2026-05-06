@@ -99,20 +99,36 @@ curl -X POST http://localhost:8080/api/beings \
 
 ## Ciclo de Vida del Ser
 
-### Estados
+### Estados de Actividad
+
+Los Seres Silicona tienen los siguientes estados de actividad:
+
+| Estado | Descripción |
+|------|------|
+| `Idle` | Estado inactivo, esperando activación por reloj |
+| `Working` | Ejecutando una ronda de solicitud de IA + invocación de herramientas |
+| `Error` | Ocurrió un error durante la ejecución |
+| `Stopped` | Detenido, por errores consecutivos o detención manual |
+
+**Mecanismo de Estado Stopped**:
+- Cuando un Ser Silicona ocurre 10 errores consecutivos, entra automáticamente al estado `Stopped`
+- Una vez en estado Stopped, el Ser ya no ejecutará ninguna tarea
+- Se requiere intervención manual para reiniciar
+
+### Transiciones de Estado
 
 ```
-Created → Starting → Running → Stopping → Stopped
-                    ↓
-                  Error
+Idle → Working → Idle (completado normalmente)
+Working → Error → Working (recuperación de error)
+Working → Stopped (10 errores consecutivos o detención manual)
+Stopped → Idle (reiniciado)
 ```
 
 ### Operaciones
 
 - **Iniciar**: Inicializar y comenzar procesamiento
 - **Detener**: Cierre elegante
-- **Pausar**: Suspender temporalmente (mantener estado)
-- **Reanudar**: Continuar desde estado pausado
+- **Reiniciar**: Recuperar al estado Idle desde el estado Stopped
 
 ## Sistema de Tareas
 

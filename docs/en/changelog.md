@@ -41,19 +41,16 @@ Both versions share the same interfaces and functionality, differing only in sto
 - Powered by the Baidu Wenxin 4.0 X1 Turbo model.
 
 #### Trae (ByteDance)
-- This project was primarily maintained using Trae for most of the time.
-- Trae is an AI IDE developed by SPRING PTE, a Singapore subsidiary of ByteDance.
-- As a 10x AI Engineer, capable of independently building software solutions.
-- Features intelligent productivity tools, flexible development rhythm adaptation, and collaborative project delivery.
-- Provides enterprise-grade performance with configurable agent system.
+- Used from October 2025 to April 2026.
+- AI IDE with intelligent code generation and project management.
 
 #### Qoder (Alibaba)
-- Since April 18, 2026, this project has been maintained using Qoder.
-- Qoder excels at source code analysis and domain documentation generation, performing exceptionally well in understanding complex codebases.
-- Adopts a zero-computation-cost pricing model, making it highly cost-effective for automated documentation processing and routine task handling.
-- An AI-powered agentic coding platform designed for real-world software development.
-- Features intelligent code generation, conversational programming, advanced context analysis engine, and multi-agent collaboration.
-- Provides deep code understanding with minimal resource consumption, ideal for long-term project maintenance and knowledge accumulation.
+- Used for project maintenance since April 18, 2026.
+- AI coding platform supporting code analysis, documentation generation, and multi-agent collaboration.
+
+#### CatPaw (Meituan)
+- Used in combination with Qoder since May 6, 2026.
+- Based on Meituan's self-developed LongCat series models, with powerful full code architecture refactoring capabilities.
 
 ### Requirements Document
 
@@ -63,6 +60,47 @@ Both versions share the same interfaces and functionality, differing only in sto
 ---
 
 ## [Unreleased]
+
+### 2026-05-06
+
+#### Large-Scale Module Refactoring
+- `eeb3be6` - Large-scale module refactoring and reorganization
+  - SiliconLife.App project restructuring
+  - SiliconLife.Fast project reorganization
+  - SiliconLife.Default project reorganization
+  - SiliconLife.Common shared modules reorganization
+  - SiliconLife.Core core modules reorganization
+  - SiliconLife.Speedy storage engine reorganization
+  - SiliconLife.Speedy.Manager management tools reorganization
+  - 119 files changed, 6926 lines added, 3066 lines deleted
+
+### 2026-05-04
+
+#### AI Client
+- `24d2c86` - Added VolcengineArkClient and replaced Audit with Usage tracking
+  - New VolcengineArkClient Volcengine Ark AI client
+  - Supports streaming and non-streaming modes
+  - Built-in dual rate limiting (client-side + server-side)
+  - Compatible with OpenAI API protocol
+  - Replaced Audit system with Usage tracking
+  - 24 files changed, 802 lines added, 21 lines deleted
+
+#### Tool System
+- `f27650a` - Added hot reload tool for automatic Fast restart
+  - New HotReloadTool hot reload tool
+  - Supports online compilation, update, and restart of SiliconLife.Fast
+  - New standalone HotReload.exe updater program
+  - Safe file copying mechanism (does not overwrite itself)
+  - Graceful shutdown and port release waiting
+  - 9 files changed, 581 lines added
+
+#### Localization
+- `6a5aad8` - Updated all files and added French localization support
+  - New fr-FR French localization
+  - Updated all language versions
+  - French help documentation translation
+  - French interface translation
+  - 100+ files changed
 
 ### 2026-05-03
 

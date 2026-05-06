@@ -41,19 +41,16 @@ Ambas versiones comparten las mismas interfaces y funcionalidades, difiriendo so
 - Impulsado por el modelo Baidu Wenxin 4.0 X1 Turbo.
 
 #### Trae (ByteDance)
-- Este proyecto ha sido mantenido principalmente con Trae la mayor parte del tiempo.
-- Trae es un IDE de IA desarrollado por SPRING PTE, una filial de ByteDance en Singapur.
-- Como Ingeniero de IA 10x, es capaz de construir soluciones de software de forma independiente.
-- Cuenta con herramientas de productividad inteligentes, adaptación flexible al ritmo de desarrollo y funciones de entrega colaborativa de proyectos.
-- Ofrece rendimiento empresarial y un sistema de agentes configurable.
+- Utilizado desde octubre de 2025 hasta abril de 2026.
+- IDE de IA con generación inteligente de código y gestión de proyectos.
 
 #### Qoder (Alibaba)
-- Desde el 18 de abril de 2026, este proyecto se mantiene con Qoder.
-- Qoder se destaca por su excelente análisis de código fuente y generación de documentación de dominio, sobresaliendo en la comprensión de bases de código complejas.
-- Adopta un modelo de precios sin costos de cómputo, lo que lo hace extremadamente rentable para el procesamiento automatizado de documentos y tareas rutinarias.
-- Una plataforma de codificación agentic impulsada por IA, diseñada específicamente para el desarrollo de software real.
-- Cuenta con generación de código inteligente, programación conversacional, motor de análisis de contexto avanzado y funciones de colaboración multiagente.
-- Ofrece una comprensión profunda del código con un consumo mínimo de recursos, ideal para el mantenimiento a largo plazo de proyectos y acumulación de conocimientos.
+- Utilizado para mantenimiento del proyecto desde el 18 de abril de 2026.
+- Plataforma de codificación de IA que soporta análisis de código, generación de documentación y colaboración multi-agente.
+
+#### CatPaw (Meituan)
+- Utilizado en combinación con Qoder desde el 6 de mayo de 2026.
+- Basado en los modelos LongCat desarrollados internamente por Meituan, con potentes capacidades de refactorización completa de arquitectura de código.
 
 ### Documentación de Requisitos
 
@@ -63,6 +60,47 @@ Ambas versiones comparten las mismas interfaces y funcionalidades, difiriendo so
 ---
 
 ## [Sin Publicar]
+
+### 2026-05-06
+
+#### Refactorización Masiva de Módulos
+- `eeb3be6` - Refactorización y reorganización masiva de módulos
+  - Reestructuración del proyecto SiliconLife.App
+  - Reorganización del proyecto SiliconLife.Fast
+  - Reorganización del proyecto SiliconLife.Default
+  - Reorganización de módulos compartidos SiliconLife.Common
+  - Reorganización de módulos centrales SiliconLife.Core
+  - Reorganización del motor de almacenamiento SiliconLife.Speedy
+  - Reorganización de herramientas de gestión SiliconLife.Speedy.Manager
+  - 119 archivos modificados, 6926 líneas agregadas, 3066 líneas eliminadas
+
+### 2026-05-04
+
+#### Cliente de IA
+- `24d2c86` - Agregar VolcengineArkClient y reemplazar Audit por Usage tracking
+  - Nuevo cliente de IA VolcengineArkClient Volcengine Ark
+  - Soporta modos streaming y no-streaming
+  - Control de velocidad doble integrado (control propio + limitación del servidor)
+  - Compatible con protocolo API OpenAI
+  - Reemplazo del sistema Audit por Usage tracking
+  - 24 archivos modificados, 802 líneas agregadas, 21 líneas eliminadas
+
+#### Sistema de Herramientas
+- `f27650a` - Agregar herramienta de recarga en caliente para reinicio automático de Fast
+  - Nueva herramienta HotReloadTool de recarga en caliente
+  - Soporta compilación en línea, actualización y reinicio de SiliconLife.Fast
+  - Nuevo programa de actualización independiente HotReload.exe
+  - Mecanismo de copia segura de archivos (no se sobrescribe a sí mismo)
+  - Cierre elegante y espera de liberación de puerto
+  - 9 archivos modificados, 581 líneas agregadas
+
+#### Localización
+- `6a5aad8` - Actualizar todos los archivos y agregar soporte de localización francesa
+  - Nueva localización fr-FR francesa
+  - Actualización de todas las versiones de idiomas
+  - Traducción francesa de la documentación de ayuda
+  - Traducción francesa de la interfaz
+  - 100+ archivos modificados
 
 ### 2026-05-03
 

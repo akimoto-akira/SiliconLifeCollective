@@ -13,9 +13,11 @@
 - **靈魂文件驅動** — 每個矽基生命體由核心提示文件（`soul.md`）驅動，定義獨特個性和行為模式
 - **身體-大腦架構** — *身體*（SiliconBeing）維持生命體徵並檢測觸發場景；*大腦*（ContextManager）負責載入歷史、呼叫 AI、執行工具和持久化響應
 - **自我進化能力** — 通過 Roslyn 動態編譯技術，矽基生命體可以重寫自己的程式碼實現進化
+- **活動狀態管理** — 支援 Idle（空閒）、Working（工作）、Error（錯誤）、Stopped（已停止）四種活動狀態，連續 10 次錯誤自動進入 Stopped 狀態
 
 ### 工具與執行
-- **23 個內建工具** — 涵蓋日曆、聊天、配置、磁碟、網路、記憶、任務、定時器、知識庫、工作筆記、WebView 瀏覽器等
+- **24 個內建工具** — 涵蓋日曆、聊天、配置、磁碟、網路、記憶、任務、定時器、知識庫、工作筆記、WebView 瀏覽器、熱重載等
+- **熱重載工具** — 支援 SiliconLife.Fast 在執行中自動編譯、更新檔案並重啟，無需手動干預
 - **工具呼叫循環** — AI 返回工具呼叫 → 執行工具 → 結果反饋給 AI → 持續循環直到返回純文字響應
 - **執行器-權限安全** — 所有 I/O 操作通過執行器進行嚴格的權限驗證
   - 5 級權限鏈：IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
@@ -25,6 +27,7 @@
 - **多 AI 後端支援**
   - **Ollama** — 本地模型部署，使用原生 HTTP API
   - **阿里雲百煉（DashScope）** — 雲端 AI 服務，相容 OpenAI API，支援 13+ 模型，多區域部署
+  - **火山引擎 Ark（VolcengineArk）** — 位元組跳動雲端 AI 服務，支援流式和非流式模式，內建速率控制
 - **32 種日曆系統** — 全球主要曆法全覆蓋，包括公曆、農曆、伊斯蘭曆、希伯來曆、日本曆、波斯曆、瑪雅曆、中國歷史曆法等
 - **知識網路系統** — 基於三元組（主體-關係-客體）的知識圖譜，支援儲存、查詢和路徑發現
 
@@ -35,14 +38,18 @@
 - **零前端框架依賴** — 通過 `H`、`CssBuilder` 和 `JsBuilder` 在服務端生成 HTML/CSS/JS
 
 ### 國際化與本地化
-- **21 種語言變體**全面支援
-  - 中文：zh-CN, zh-HK, zh-SG, zh-MO, zh-TW, zhMY（6 種）
-  - 英文：en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY（10 種）
-  - 西班牙語：es-ES, es-MX（2 種）
-  - 日語：ja-JP | 韓語：ko-KR | 捷克語：cs-CZ
+- **29 種語言實現**全面支援，涵蓋 2 種書寫系統和多個地區變體
+  - **簡體中文**：zh-CN（中國大陸）、zh-SG（新加坡）、zh-MY（馬來西亞）（3 種）
+  - **繁體中文**：zh-HK（香港）、zh-TW（台灣）、zh-MO（澳門）（3 種）
+  - **英文**：en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY（10 種）
+  - **西班牙語**：es-ES, es-MX（2 種）
+  - **德語**：de-DE, de-AT, de-CH, de-LU, de-LI（5 種）
+  - **法語**：fr-FR, fr-CA, fr-CH（3 種）
+  - **日語**：ja-JP | **韓語**：ko-KR | **捷克語**：cs-CZ（3 種）
 
 ### 資料與儲存
-- **零資料庫依賴** — 純檔案系統儲存（JSON 格式）
+- **SpeedyPack 高效能儲存** — Fast 版本使用自研 .spk 儲存引擎，記憶體目錄對映 + 條目快取 + 非同步寫入佇列
+- **檔案系統儲存** — Default 版本使用純檔案系統 JSON 儲存
 - **時間索引查詢** — 通過 `ITimeStorage` 介面支援按時間範圍的高效查詢
 - **最小依賴** — 核心庫僅依賴 Microsoft.CodeAnalysis.CSharp 用於動態編譯
 
@@ -64,7 +71,13 @@
 - **運行模式**：Windows 視窗應用程式（支援系統匣）
 - **儲存方式**：SpeedyPack 記憶體儲存 + 異步批次持久化
 - **適用場景**：高並發、低延遲、大資料量場景
-- **特點**：極致效能最佳化、匣後台運行、記憶體資料庫 + WAL 日誌保證資料安全
+- **特點**：
+  - 極致效能最佳化
+  - 託盤後臺執行，支援託盤狀態視窗實時監控
+  - SpeedyPack 引擎 + 自動壓縮保證資料安全
+  - Component UI 架構，30+ 宣告式元件
+  - 7 種皮膚主題，支援自動發現和切換
+  - 熱重載工具支援線上更新和重啟
 - **效能提升**：儲存讀取延遲降低 1000 倍，寫入延遲降低 15000 倍，並發處理能力提升 50 倍
 - **角色說明**：經過深度優化的生產級實現，是長期運行和實際生產環境的首選
 - **啟動命令**：`dotnet run --project src/SiliconLife.Fast`
@@ -91,7 +104,7 @@
 |------|------|
 | 執行時 | .NET 9 |
 | 程式語言 | C# |
-| AI 整合 | Ollama（本地）、阿里雲百煉（雲端） |
+| AI 整合 | Ollama（本地）、阿里雲百煉（雲端）、火山引擎Ark（雲端） |
 | 資料儲存 | 檔案系統（JSON + 時間索引目錄） |
 | Web 伺服器 | HttpListener（.NET 內建） |
 | 動態編譯 | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
@@ -126,7 +139,7 @@ SiliconLifeCollective.sln
 │   │
 │   └── SiliconLife.Default/               # 預設實現 + 應用程式入口
 │       ├── Program.cs                     # 入口點（裝配所有元件）
-│       ├── AI/                            # Ollama 客戶端、百煉客戶端
+│       ├── AI/                            # Ollama 客户端、百煉客戶端
 │       ├── Calendar/                      # 32 種日曆實現
 │       ├── Config/                        # 預設配置資料
 │       ├── Executors/                     # 預設執行器實現
@@ -141,7 +154,7 @@ SiliconLifeCollective.sln
 │       ├── Security/                      # 預設權限回呼
 │       ├── SiliconBeing/                  # 預設矽基生命體實現
 │       ├── Storage/                       # 檔案系統儲存實現
-│       ├── Tools/                         # 23 個內建工具實現
+│       ├── Tools/                         # 24 個內建工具實現（含熱重載工具）
 │       ├── WebView/                       # Playwright WebView 實現
 │       └── Web/                           # Web UI 實現
 │           ├── Controllers/               # 20+ 個控制器
@@ -230,7 +243,7 @@ dotnet run --project src/SiliconLife.Default
 
 ### 發布單一檔案
 
-```bash
+```
 # Windows
 dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
@@ -301,7 +314,7 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 - GitHub: [@akimoto-akira](https://github.com/akimoto-akira/SiliconLifeCollective)
 - 碼雲: [hoshinokennji](https://gitee.com/hoshinokennji/SiliconLifeCollective)
 - YouTube: [@hoshinokennji](https://www.youtube.com/@hoshinokennji)
-- 嗶哩嗶哩: [617827040](https://space.bilibili.com/617827040)
+- 嗨哩嗶哩: [617827040](https://space.bilibili.com/617827040)
 
 ## 🙏 致謝
 

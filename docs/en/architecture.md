@@ -20,6 +20,12 @@ This project provides two implementation versions that share the same architectu
 - **Runtime Mode**: Windows Forms application (with system tray support)
 - **Storage**: SpeedyPack in-memory storage + asynchronous batch persistence (.spk file format)
 - **Use Case**: High concurrency, low latency, large data volume scenarios
+- **Features**:
+  - System tray background operation with real-time monitoring via tray status window
+  - SpeedyPack engine + auto-compaction ensures data security
+  - Component UI architecture, 30+ declarative components
+  - 7 Skin Themes with auto-discovery and switching
+  - Hot reload tool for online updates and restarts
 - **Performance Improvement**: Storage read latency reduced by 1000x, write latency reduced by 15000x
 - **Role Description**: A production-grade implementation with deep optimization, featuring system tray background operation, SpeedyPack engine + auto-compaction, etc., the first choice for long-term operation and actual production environments
 
@@ -272,12 +278,24 @@ The system supports multiple AI backends through the `IAIClient` interface:
 - **Configuration**: `apiKey`, `region`, `model`
 - **Model Discovery**: Fetches available models from Bailian API at runtime; falls back to curated list on network failure
 
+### VolcengineArkClient (Volcengine Ark)
+
+- **Type**: Cloud AI service
+- **Protocol**: OpenAI-compatible API
+- **Authentication**: Bearer token (API key)
+- **Features**: Supports streaming and non-streaming modes, built-in dual rate limiting
+  - Client-side rate limiting: Enforces minimum interval between requests
+  - Server rate limiting: Handles 429 errors, retries with exponential backoff
+- **Configuration**: `apiKey`, `endpoint`, `model`
+- **Characteristics**: ByteDance's AI service, supports various Doubao models
+
 ### Client Factory Pattern
 
 Each AI client type has a corresponding factory implementation of `IAIClientFactory`:
 
 - `OllamaClientFactory` — Creates OllamaClient instances
 - `DashScopeClientFactory` — Creates DashScopeClient instances
+- `VolcengineArkClientFactory` — Creates VolcengineArkClient instances
 
 Factories provide:
 - `CreateClient(Dictionary<string, object> config)` — Instantiate client from configuration
@@ -692,14 +710,19 @@ Silicon beings have the following activity states:
 | State | Description |
 |------|------|
 | `Idle` | Idle state, waiting for clock trigger |
-| `Running` | Executing a round of AI request + tool calls |
-| `WaitingPermission` | Waiting for user permission approval |
-| `Stopped` | Stopped, due to error or manual stop |
+| `Working` | Executing a round of AI request + tool calls |
+| `Error` | Error occurred during execution |
+| `Stopped` | Stopped, due to consecutive errors or manual stop |
+
+**Stopped State Mechanism**:
+- When a silicon being encounters 10 consecutive errors, it automatically enters the `Stopped` state
+- Once in Stopped state, the being will no longer execute any tasks
+- Manual intervention is required to restart
 
 State Transitions:
 ```
-Idle → Running → Idle (normal completion)
-Running → WaitingPermission → Running (continue after permission approval)
-Running → Stopped (error or manual stop)
+Idle → Working → Idle (normal completion)
+Working → Error → Working (error recovery)
+Working → Stopped (10 consecutive errors or manual stop)
 Stopped → Idle (restart)
 ```

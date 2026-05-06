@@ -41,19 +41,16 @@ Beide Versionen teilen die gleichen Schnittstellen und Funktionen und unterschei
 - Angetrieben von dem Baidu Wenxin 4.0 X1 Turbo-Modell.
 
 #### Trae (ByteDance)
-- Dieses Projekt wurde überwiegend mit Trae gewartet.
-- Trae ist eine AI-IDE der ByteDance-Tochtergesellschaft SPRING PTE in Singapur.
-- Als 10x AI Engineer in der Lage, Softwarelösungen unabhängig zu entwickeln.
-- Verfügt über intelligente Produktivitätstools, flexible Anpassung an den Entwicklungsrhythmus und Funktionen für die gemeinsame Projektabgabe.
-- Bietet unternehmensweite Leistung und ein konfigurierbares Agentsystem.
+- Verwendet von Oktober 2025 bis April 2026.
+- AI-IDE mit intelligenter Code-Generierung und Projektverwaltung.
 
 #### Qoder (Alibaba)
-- Seit dem 18. April 2026 wird dieses Projekt mit Qoder gewartet.
-- Qoder zeichnet sich durch hervorragende Quellcodeanalyse und Generierung von Domänendokumenten aus und ist bei der Untersuchung komplexer Codebasen überlegen.
-- Verwendet ein Preismodell mit Null-Berechnungskosten, was es äußerst kosteneffizient für automatisierte Dokumentenverarbeitung und Routineaufgaben macht.
-- Eine AI-getriebene agentische Codierplattform, die speziell für die tatsächliche Softwareentwicklung entwickelt wurde.
-- Verfügt über intelligente Codegenerierung, dialogbasierte Programmierung, eine erweiterte Kontextanalyse-Engine und Funktionen für die Zusammenarbeit mehrerer Agenten.
-- Bietet eine tiefgehende Codeverstehen mit minimalen Ressourcenverbrauch, ideal für die langfristige Projektwartung und Wissensakkumulation.
+- Verwendet für Projekt-Wartung seit dem 18. April 2026.
+- AI-Codierungsplattform mit Unterstützung für Code-Analyse, Dokumentationsgenerierung und Multi-Agenten-Kollaboration.
+
+#### CatPaw (Meituan)
+- Verwendet in Kombination mit Qoder seit dem 6. Mai 2026.
+- Basierend auf Meituans eigenentwickelten LongCat-Serienmodellen, mit leistungsstarken Fähigkeiten zur vollständigen Code-Architektur-Refaktorierung.
 
 ### Anforderungsdokumentation
 
@@ -63,6 +60,47 @@ Beide Versionen teilen die gleichen Schnittstellen und Funktionen und unterschei
 ---
 
 ## [Unveröffentlicht]
+
+### 2026-05-06
+
+#### Große Modul-Refaktorierung
+- `eeb3be6` - Große Modul-Refaktorierung und Neuorganisation
+  - SiliconLife.App Projekt-Restrukturierung
+  - SiliconLife.Fast Projekt-Neuorganisation
+  - SiliconLife.Default Projekt-Neuorganisation
+  - SiliconLife.Common gemeinsame Module Neuorganisation
+  - SiliconLife.Core Kernmodule Neuorganisation
+  - SiliconLife.Speedy Speicher-Engine Neuorganisation
+  - SiliconLife.Speedy.Manager Verwaltungs-Tools Neuorganisation
+  - 119 Dateien geändert, 6926 Zeilen hinzugefügt, 3066 Zeilen gelöscht
+
+### 2026-05-04
+
+#### AI-Client
+- `24d2c86` - VolcengineArkClient hinzugefügt und Audit durch Usage-Tracking ersetzt
+  - Neuer VolcengineArkClient Volcengine Ark AI-Client
+  - Unterstützt Streaming- und Nicht-Streaming-Modi
+  - Integrierte doppelte Ratenbegrenzung (clientseitig + serverseitig)
+  - Kompatibel mit OpenAI-API-Protokoll
+  - Audit-System durch Usage-Tracking ersetzt
+  - 24 Dateien geändert, 802 Zeilen hinzugefügt, 21 Zeilen gelöscht
+
+#### Tool-System
+- `f27650a` - Hot-Reload-Tool für automatischen Fast-Neustart hinzugefügt
+  - Neues HotReloadTool Hot-Reload-Tool
+  - Unterstützt Online-Kompilierung, Aktualisierung und Neustart von SiliconLife.Fast
+  - Neues eigenständiges HotReload.exe Updater-Programm
+  - Sicheres Dateikopier-Mechanismus (überschreibt sich nicht selbst)
+  - Ordnungsgemäßer Shutdown und Portfreigabe-Wartezeit
+  - 9 Dateien geändert, 581 Zeilen hinzugefügt
+
+#### Lokalisierung
+- `6a5aad8` - Alle Dateien aktualisiert und französische Lokalisierung hinzugefügt
+  - Neue fr-FR französische Lokalisierung
+  - Alle Sprachversionen aktualisiert
+  - Französische Hilfe-Dokumentation Übersetzung
+  - Französische Interface-Übersetzung
+  - 100+ Dateien geändert
 
 ### 2026-05-03
 

@@ -96,20 +96,36 @@ curl -X POST http://localhost:8080/api/beings \
 
 ## Životní cyklus bytosti
 
-### Stavy
+### Stavy aktivity
+
+Silikonové bytosti mají následující stavy aktivity:
+
+| Stav | Popis |
+|------|------|
+| `Idle` | Nečinný stav, čeká na spuštění hodin |
+| `Working` | Provádí jedno kolo AI požadavku + volání nástrojů |
+| `Error` | Během provádění došlo k chybě |
+| `Stopped` | Zastaveno, z důvodu po sobě jdoucích chyb nebo ručního zastavení |
+
+**Mechanismus stavu Stopped**:
+- Když silikonová bytost zaznamená 10 po sobě jdoucích chyb, automaticky přejde do stavu `Stopped`
+- Ve stavu Stopped již bytost nebude provádět žádné úkoly
+- K restartu je vyžadován manuální zásah
+
+### Přechody stavů
 
 ```
-Vytvořeno → Spouštění → Běží → Zastavování → Zastaveno
-                    ↓
-                  Chyba
+Idle → Working → Idle (normální dokončení)
+Working → Error → Working (obnovení po chybě)
+Working → Stopped (10 po sobě jdoucích chyb nebo ruční zastavení)
+Stopped → Idle (restartování)
 ```
 
 ### Operace
 
 - **Start**: Inicializace a začátek zpracování
 - **Stop**: Elegantní vypnutí
-- **Pozastavit**: Dočasné pozastavení (zachování stavu)
-- **Obnovit**: Pokračování z pozastaveného stavu
+- **Restart**: Obnovení do stavu Idle ze stavu Stopped
 
 ## Systém úkolů
 

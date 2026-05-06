@@ -20,6 +20,12 @@ Tento projekt poskytuje dvě implementační verze, které sdílejí stejný ná
 - **Režim Spuštění**: Windows Forms aplikace (s podporou systémové lišty)
 - **Úložiště**: SpeedyPack paměťové úložiště + asynchronní dávková perzistence (.spk formát souboru)
 - **Scénář Použití**: Scénáře s vysokou souběžností, nízkou latencí, velkým objemem dat
+- **Charakteristiky**:
+  - Běh na pozadí v systémové liště s monitorováním v reálném čase prostřednictvím stavového okna lišty
+  - SpeedyPack engine + automatická komprese zajišťují bezpečnost dat
+  - Architektura Component UI, 30+ deklarativních komponent
+  - 7 témat skinů, podpora automatické detekce a přepínání
+  - Nástroj hot reload pro online aktualizace a restarty
 - **Zlepšení Výkonu**: Latence čtení úložiště snížena 1000x, latence zápisu snížena 15000x
 - **Popis role**: Produkční implementace s hlubokou optimalizací, se systémovou lištou na pozadí, SpeedyPack engine + automatická komprese zajišťují bezpečnost dat, nejlepší volba pro dlouhodobý provoz a reálné produkční prostředí
 
@@ -272,12 +278,24 @@ Systém podporuje více AI backendů prostřednictvím rozhraní `IAIClient`:
 - **Konfigurace**: `apiKey`, `region`, `model`
 - **Objevování modelů**: Za běhu načítá dostupné modely z Bailian API; při selhání sítě se vrátí k kurátorovanému seznamu
 
+### VolcengineArkClient (Volcengine Ark)
+
+- **Typ**: Cloudová AI služba
+- **Protokol**: API kompatibilní s OpenAI
+- **Autentizace**: Bearer token (API klíč)
+- **Funkce**: Podporuje streaming a non-streaming režimy, integrované dvojí omezení rychlosti
+  - Klientské omezení rychlosti: Vynucuje minimální interval mezi požadavky
+  - Serverové omezení rychlosti: Zpracovává chyby 429, opakování s exponenciálním backoff
+- **Konfigurace**: `apiKey`, `endpoint`, `model`
+- **Charakteristiky**: AI služba ByteDance, podporuje různé modely Doubao
+
 ### Factory Pattern Klientů
 
 Každý typ AI klienta má odpovídající factory implementaci `IAIClientFactory`:
 
 - `OllamaClientFactory` — Vytváří instance OllamaClient
 - `DashScopeClientFactory` — Vytváří instance DashScopeClient
+- `VolcengineArkClientFactory` — Vytváří instance VolcengineArkClient
 
 Factory poskytují:
 - `CreateClient(Dictionary<string, object> config)` — Inicializuje klienta z konfigurace
@@ -575,14 +593,19 @@ Silikonové bytosti mají následující stavy aktivity:
 | Stav | Popis |
 |------|------|
 | `Idle` | Nečinný stav, čeká na spuštění hodin |
-| `Running` | Provádí jedno kolo AI požadavku + volání nástrojů |
-| `WaitingPermission` | Čeká na schválení oprávnění uživatelem |
-| `Stopped` | Zastaveno, z důvodu chyby nebo ručního zastavení |
+| `Working` | Provádí jedno kolo AI požadavku + volání nástrojů |
+| `Error` | Během provádění došlo k chybě |
+| `Stopped` | Zastaveno, z důvodu po sobě jdoucích chyb nebo ručního zastavení |
+
+**Mechanismus stavu Stopped**:
+- Když silikonová bytost zaznamená 10 po sobě jdoucích chyb, automaticky přejde do stavu `Stopped`
+- Ve stavu Stopped již bytost nebude provádět žádné úkoly
+- K restartu je vyžadován manuální zásah
 
 Přechody stavů:
 ```
-Idle → Running → Idle (normální dokončení)
-Running → WaitingPermission → Running (pokračování po schválení oprávnění)
-Running → Stopped (chyba nebo ruční zastavení)
+Idle → Working → Idle (normální dokončení)
+Working → Error → Working (obnovení po chybě)
+Working → Stopped (10 po sobě jdoucích chyb nebo ruční zastavení)
 Stopped → Idle (restartování)
 ```

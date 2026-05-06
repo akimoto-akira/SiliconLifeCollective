@@ -636,6 +636,53 @@
 
 ---
 
+### 24. 热重载工具 (HotReloadTool)
+
+**工具名称**: `hot_reload`
+
+**功能描述**: 支持 SiliconLife.Fast 在运行中自动编译、更新文件并重启，无需手动干预。
+
+**支持的操作**:
+- `execute` — 执行完整的构建、复制和重启流程
+- `build_only` — 仅构建项目，不复制和重启
+
+**工作流程**:
+1. 编译 SiliconLife.Fast 项目
+2. 优雅关闭当前运行的 Fast 实例（通过 HTTP API）
+3. 等待进程退出和端口释放
+4. 复制构建输出到目标目录（跳过 HotReload 自身文件）
+5. 重新启动 Fast 实例
+
+**特性**:
+- 自动检测并关闭旧进程
+- 安全文件复制（不覆盖 HotReload.exe）
+- 端口释放等待机制
+- 支持自定义端口配置
+
+**使用示例**:
+```json
+{
+  "action": "execute",
+  "project_path": "src/SiliconLife.Fast",
+  "source_path": "src/SiliconLife.Fast/bin/Debug/net9.0",
+  "configuration": "Debug",
+  "port": 8080
+}
+```
+
+**参数说明**:
+- `project_path`: 项目路径（相对于解决方案根目录）
+- `source_path`: 构建输出目录
+- `configuration`: 构建配置（Debug/Release）
+- `port`: Fast 实例的 Web 端口（默认 8080）
+
+**注意事项**:
+- 仅适用于 SiliconLife.Fast 版本
+- 需要 HotReload.exe 在 tools/HotReload 目录下
+- 重启过程中会有短暂的服务中断（约 3-5 秒）
+
+---
+
 ## 工具调用流程
 
 ```

@@ -41,19 +41,16 @@ Obě verze sdílejí stejná rozhraní a funkce, liší se pouze implementací �
 - Poháněno modelem Baidu Wenxin 4.0 X1 Turbo.
 
 #### Trae (ByteDance)
-- Většinu času byl tento projekt primárně udržován pomocí Trae.
-- Trae je AI IDE vyvinuté společností SPRING PTE, singapurskou dceřinou společností ByteDance.
-- Jako 10x AI Engineer, schopný samostatně budovat softwarová řešení.
-- Obsahuje inteligentní produktivity nástroje, flexibilní adaptaci vývojového rytmu a kolaborativní doručování projektů.
-- Poskytuje výkon podnikové úrovně s konfigurovatelným agentním systémem.
+- Používáno od října 2025 do dubna 2026.
+- AI IDE s inteligentním generováním kódu a správou projektů.
 
 #### Qoder (Alibaba)
-- Od 18. dubna 2026 je tento projekt udržován pomocí Qoder.
-- Qoder vyniká v analýze zdrojového kódu a generování doménové dokumentace, s vynikající schopností porozumět komplexním kódovým základnám.
-- Adoptuje model cenování s nulovými výpočetními náklady, což jej činí vysoce nákladově efektivním pro automatizované zpracování dokumentace a rutinní úkoly.
-- AI-powered agentic kódovací platforma navržená pro skutečný vývoj softwaru.
-- Obsahuje inteligentní generování kódu, konverzační programování, pokročilý engine analýzy kontextu a multi-agentní spolupráci.
-- Poskytuje hluboké porozumění kódu s minimální spotřebou zdrojů, ideální pro dlouhodobou údržbu projektů a akumulaci znalostí.
+- Používáno pro údržbu projektu od 18. dubna 2026.
+- AI kódovací platforma podporující analýzu kódu, generování dokumentace a spolupráci více agentů.
+
+#### CatPaw (Meituan)
+- Používáno v kombinaci s Qoder od 6. května 2026.
+- Založeno na vlastních modelech LongCat společnosti Meituan, s výkonnými schopnostmi kompletní refactorizace architektury kódu.
 
 ### Požadavkový dokument
 
@@ -63,6 +60,47 @@ Obě verze sdílejí stejná rozhraní a funkce, liší se pouze implementací �
 ---
 
 ## [Neuvedeno]
+
+### 2026-05-06
+
+#### Velká refaktorizace modulů
+- `eeb3be6` - Velká refaktorizace a reorganizace modulů
+  - Restrukturalizace projektu SiliconLife.App
+  - Reorganizace projektu SiliconLife.Fast
+  - Reorganizace projektu SiliconLife.Default
+  - Reorganizace sdílených modulů SiliconLife.Common
+  - Reorganizace core modulů SiliconLife.Core
+  - Reorganizace úložného enginu SiliconLife.Speedy
+  - Reorganizace správcovských nástrojů SiliconLife.Speedy.Manager
+  - 119 souborů změněno, 6926 řádků přidáno, 3066 řádků smazáno
+
+### 2026-05-04
+
+#### AI klient
+- `24d2c86` - Přidán VolcengineArkClient a nahrazen Audit sledováním Usage
+  - Nový VolcengineArkClient Volcengine Ark AI klient
+  - Podporuje streaming a non-streaming režimy
+  - Integrované dvojí omezení rychlosti (klientské + serverové)
+  - Kompatibilní s protokolem OpenAI API
+  - Nahrazen systém Audit sledováním Usage
+  - 24 souborů změněno, 802 řádků přidáno, 21 řádků smazáno
+
+#### Systém nástrojů
+- `f27650a` - Přidán nástroj hot reload pro automatický restart Fast
+  - Nový nástroj HotReloadTool hot reload
+  - Podporuje online kompilaci, aktualizaci a restart SiliconLife.Fast
+  - Nový samostatný aktualizační program HotReload.exe
+  - Bezpečný mechanismus kopírování souborů (nepřepisuje sám sebe)
+  - Elegantní vypnutí a čekání na uvolnění portu
+  - 9 souborů změněno, 581 řádků přidáno
+
+#### Lokalizace
+- `6a5aad8` - Aktualizovány všechny soubory a přidána francouzská lokalizace
+  - Nová francouzská lokalizace fr-FR
+  - Aktualizovány všechny jazykové verze
+  - Francouzský překlad nápovědy
+  - Francouzský překlad rozhraní
+  - 100+ souborů změněno
 
 ### 2026-05-03
 

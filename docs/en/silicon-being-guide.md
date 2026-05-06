@@ -96,20 +96,36 @@ curl -X POST http://localhost:8080/api/beings \
 
 ## Being Lifecycle
 
-### States
+### Activity States
+
+Silicon beings have the following activity states:
+
+| State | Description |
+|------|------|
+| `Idle` | Idle state, waiting for clock trigger |
+| `Working` | Executing a round of AI request + tool calls |
+| `Error` | Error occurred during execution |
+| `Stopped` | Stopped, due to consecutive errors or manual stop |
+
+**Stopped State Mechanism**:
+- When a silicon being encounters 10 consecutive errors, it automatically enters the `Stopped` state
+- Once in Stopped state, the being will no longer execute any tasks
+- Manual intervention is required to restart
+
+### State Transitions
 
 ```
-Created → Starting → Running → Stopping → Stopped
-                    ↓
-                  Error
+Idle → Working → Idle (normal completion)
+Working → Error → Working (error recovery)
+Working → Stopped (10 consecutive errors or manual stop)
+Stopped → Idle (restart)
 ```
 
 ### Operations
 
 - **Start**: Initialize and begin processing
 - **Stop**: Graceful shutdown
-- **Pause**: Temporary suspend (maintains state)
-- **Resume**: Continue from paused state
+- **Restart**: Recover to Idle state from Stopped state
 
 ## Task System
 

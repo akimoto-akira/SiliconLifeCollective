@@ -13,6 +13,7 @@
 - **Řízeno souborem duše** — Každá silikonová bytost je řízena souborem core prompt (`soul.md`), který definuje jedinečnou osobnost a vzorce chování
 - **Architektura Tělo-Mozek** — *Tělo* (SiliconBeing) udržuje stav života a detekuje spouštěcí scénáře; *Mozek* (ContextManager) načítá historii, volá AI, provádí nástroje a perzistuje odpovědi
 - **Schopnost sebevývoje** — Prostřednictvím technologie dynamické kompilace Roslyn mohou silikonové bytosti přepisovat svůj vlastní kód pro evoluci
+- **Správa stavů aktivity** — Podporuje čtyři stavy aktivity: Idle (nečinný), Working (pracující), Error (chyba), Stopped (zastavený). Automatický přechod do stavu Stopped po 10 po sobě jdoucích chybách
 
 ### Plugin systém
 - **Architektura rozšíření pluginů** — Rozšíření funkcí prostřednictvím rozhraní IPlugin, podpora dynamického načítání plugin DLL z adresáře
@@ -21,7 +22,8 @@
 - **Integrace nástrojů** — Pluginy mohou registrovat vlastní nástroje prostřednictvím rozhraní ITool, automatická integrace do cyklu volání nástrojů
 
 ### Nástroje a provádění
-- **23 vestavěných nástrojů** — Pokrývá kalendář, chat, konfiguraci, disk, síť, paměť, úkoly, časovače, znalostní bázi, pracovní poznámky, WebView prohlížeč a další
+- **24 vestavěných nástrojů** — Pokrývá kalendář, chat, konfiguraci, disk, síť, paměť, úkoly, časovače, znalostní bázi, pracovní poznámky, WebView prohlížeč, hot reload a další
+- **Nástroj Hot Reload** — Podporuje automatickou kompilaci, aktualizaci souborů a restart SiliconLife.Fast za běhu, bez manuálního zásahu
 - **Cyklus volání nástrojů** — AI vrací volání nástroje → provádění nástroje → výsledky zpět AI → pokračuje dokud nevrací čistý text
 - **Bezpečnost oprávnění-exekutor** — Všechny I/O operace procházejí přísným ověřováním oprávnění prostřednictvím exekutorů
   - 5úrovňový řetězec oprávnění: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
@@ -31,6 +33,7 @@
 - **Podpora více AI backendů**
   - **Ollama** — Lokální nasazení modelů pomocí nativního HTTP API
   - **Alibaba Cloud Bailian (DashScope)** — Cloudová AI služba, kompatibilní s OpenAI API, podpora 13+ modelů, více regionů
+  - **Volcengine Ark** — Cloudová AI služba ByteDance, podpora streaming a non-streaming režimů, integrované dvojí omezení rychlosti
 - **32 kalendářních systémů** — Globální pokrytí hlavních kalendářů včetně gregoriánského, lunárního, islámského, hebrejského, japonského, perského, mayského, čínského historického kalendáře atd.
 - **Systém znalostní sítě** — Znalostní graf založený na triplech (subjekt-vztah-objekt) s podporou ukládání, dotazování a objevování cest
 
@@ -41,15 +44,18 @@
 - **Žádná závislost na frontendovém frameworku** — Generování HTML/CSS/JS na serveru pomocí `H`, `CssBuilder` a `JsBuilder`
 
 ### Internacionalizace a lokalizace
-- **Plná podpora 21 jazykových variant**
-  - Čínština: zh-CN, zh-HK, zh-SG, zh-MO, zh-TW, zhMY (6 variant)
-  - Angličtina: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variant)
-  - Španělština: es-ES, es-MX (2 varianty)
-  - Japonština: ja-JP | Korejština: ko-KR | Čeština: cs-CZ
+- **Plná podpora 29 jazykových implementací**, pokrývající 2 psací systémy a více regionálních variant
+  - **Zjednodušená čínština**: zh-CN (pevninská Čína), zh-SG (Singapur), zh-MY (Malajsie) (3 varianty)
+  - **Tradiční čínština**: zh-HK (Hongkong), zh-TW (Tchaj-wan), zh-MO (Macao) (3 varianty)
+  - **Angličtina**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variant)
+  - **Španělština**: es-ES, es-MX (2 varianty)
+  - **Němčina**: de-DE, de-AT, de-CH, de-LU, de-LI (5 variant)
+  - **Francouzština**: fr-FR, fr-CA, fr-CH (3 varianty)
+  - **Japonština**: ja-JP | **Korejština**: ko-KR | **Čeština**: cs-CZ (3 varianty)
 
 ### Data a úložiště
-- **SpeedyPack vysoce výkonné úložiště** — Vlastní .spk úložný engine, mapování paměťových adresářů + mezipaměť záznamů + asynchronní fronta zápisu
-- **Žádná závislost na databázi** — Výchozí verze používá čisté úložiště na souborovém systému (formát JSON), Fast verze používá SpeedyPack paměťové úložiště
+- **SpeedyPack vysoce výkonné úložiště** — Fast verze používá vlastní .spk úložný engine, mapování paměťových adresářů + mezipaměť záznamů + asynchronní fronta zápisu
+- **Úložiště na souborovém systému** — Default verze používá čisté úložiště JSON na souborovém systému
 - **Časově indexované dotazy** — Efektivní dotazování podle časového rozsahu prostřednictvím rozhraní `ITimeStorage`
 - **Automatická komprese** — SpeedyPack podporuje pravidelnou automatickou kompresi pro uvolnění volného prostoru
 - **Minimální závislosti** — Core knihovna závisí pouze na Microsoft.CodeAnalysis.CSharp pro dynamickou kompilaci
@@ -72,7 +78,13 @@ Tento projekt poskytuje dvě implementační verze pro splnění různých poža
 - **Režim spuštění**: Windows Forms aplikace (podporuje systémový tray)
 - **Metoda úložiště**: SpeedyPack paměťové úložiště + asynchronní dávková perzistence (.spk formát souboru)
 - **Použitelné scénáře**: Vysoká souběžnost, nízká latence, scénáře s velkým objemem dat
-- **Charakteristiky**: Extrémní optimalizace výkonu, běh na pozadí v tray, SpeedyPack engine + automatická komprese zajišťují bezpečnost dat
+- **Charakteristiky**:
+  - Extrémní optimalizace výkonu
+  - Běh na pozadí v tray s monitorováním v reálném čase prostřednictvím stavového okna tray
+  - SpeedyPack engine + automatická komprese zajišťují bezpečnost dat
+  - Architektura Component UI, 30+ deklarativních komponent
+  - 7 témat skinů, podpora automatické detekce a přepínání
+  - Nástroj hot reload pro online aktualizace a restarty
 - **Zlepšení výkonu**: Latence čtení úložiště snížena 1000x, latence zápisu snížena 15000x, kapacita souběžného zpracování zvýšena 50x
 - **Popis role**: Produkční implementace s hlubokou optimalizací, nejlepší volba pro dlouhodobý provoz a reálné produkční prostředí
 - **Spouštěcí příkaz**: `dotnet run --project src/SiliconLife.Fast`
@@ -101,7 +113,7 @@ Tento projekt poskytuje dvě implementační verze pro splnění různých poža
 | Runtime | .NET 9 | .NET 9 Windows |
 | Programovací jazyk | C# | C# |
 | Typ aplikace | Konzolová aplikace | Windows Forms aplikace |
-| AI integrace | Ollama (lokální), Alibaba Cloud Bailian (cloud) | Ollama (lokální), Alibaba Cloud Bailian (cloud) |
+| AI integrace | Ollama (lokální), Alibaba Cloud Bailian (cloud) | Ollama (lokální), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud) |
 | Úložiště dat | Souborový systém (JSON + časově indexované adresáře) | SpeedyPack (.spk formát, mapování paměti + asynchronní perzistence) |
 | Webový server | HttpListener (vestavěný v .NET) | HttpListener (vestavěný v .NET) |
 | Dynamická kompilace | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |

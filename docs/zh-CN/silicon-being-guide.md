@@ -96,20 +96,36 @@ curl -X POST http://localhost:8080/api/beings \
 
 ## 生命体生命周期
 
-### 状态
+### 活动状态
+
+硅基生命体具有以下活动状态：
+
+| 状态 | 描述 |
+|------|------|
+| `Idle` | 空闲状态，等待时钟触发 |
+| `Working` | 正在执行一轮 AI 请求 + 工具调用 |
+| `Error` | 执行过程中出现错误 |
+| `Stopped` | 已停止，因连续错误或手动停止 |
+
+**Stopped 状态机制**：
+- 当硅基生命体连续发生 10 次错误时，自动进入 `Stopped` 状态
+- 进入 Stopped 状态后，生命体将不再执行任何任务
+- 需要手动干预才能重新启动
+
+### 状态转换
 
 ```
-Created → Starting → Running → Stopping → Stopped
-                    ↓
-                  Error
+Idle → Working → Idle（正常完成）
+Working → Error → Working（错误恢复）
+Working → Stopped（连续 10 次错误或手动停止）
+Stopped → Idle（重新启动）
 ```
 
 ### 操作
 
 - **启动**：初始化并开始处理
 - **停止**：优雅关闭
-- **暂停**：临时挂起（保持状态）
-- **恢复**：从暂停状态继续
+- **重启**：从 Stopped 状态恢复到 Idle 状态
 
 ## 任务系统
 

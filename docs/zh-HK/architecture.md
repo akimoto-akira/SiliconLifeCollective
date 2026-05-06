@@ -18,10 +18,16 @@
 ### SiliconLife.Fast（高效能版本）
 - **定位**：主推生產版本
 - **執行模式**：Windows 視窗應用程式（支援系統匣）
-- **儲存方式**：SpeedyPack 記憶體儲存 + 異步批次持久化（WAL 日誌）
+- **儲存方式**：SpeedyPack 記憶體儲存 + 異步批次持久化（.spk 檔案格式）
 - **適用場景**：高併發、低延遲、大資料量場景
+- **特點**：
+  - 系統託盤後臺執行，託盤狀態視窗實時監控
+  - SpeedyPack 引擎 + 自動壓縮保證資料安全
+  - Component UI 架構，30+ 宣告式元件
+  - 7 種皮膚主題，支援自動發現和切換
+  - 熱重載工具支援線上更新和重啟
 - **效能提升**：儲存讀取延遲降低 1000 倍，寫入延遲降低 15000 倍
-- **角色說明**：經過深度優化的生產級實現，具備系統匣後台運行、極致效能最佳化等特性，是長期運行和實際生產環境的首選
+- **角色說明**：經過深度優化的生產級實現，具備系統託盤後臺執行、SpeedyPack 引擎 + 自動壓縮等特性，是長期執行和實際生產環境的首選
 
 > **注意**：本文檔描述的架構適用於兩個版本，僅在儲存實現部分有所不同。SiliconLife.Default 作為架構驗證基準，SiliconLife.Fast 作為生產環境主推版本。
 
@@ -265,12 +271,24 @@
 - **設定**：`apiKey`、`region`、`model`
 - **模型發現**：執行時從百煉 API 獲取可用模型；網路故障時回退到精選列表
 
+### VolcengineArkClient（火山引擎 Ark）
+
+- **型別**：雲端 AI 服務
+- **協議**：相容 OpenAI 的 API
+- **認證**：Bearer token（API 金鑰）
+- **功能**：支援流式和非流式模式，內建雙層速率控制
+  - 自我速率控制：強制執行請求間最小間隔
+  - 伺服器速率限制：處理 429 錯誤，指數退避重試
+- **設定**：`apiKey`、`endpoint`、`model`
+- **特點**：位元跳動旗下 AI 服務，支援多種豆包模型
+
 ### 客戶端工廠模式
 
 每種 AI 客戶端類型都有相應的工廠實現 `IAIClientFactory`：
 
 - `OllamaClientFactory` —— 建立 OllamaClient 實例
 - `DashScopeClientFactory` —— 建立 DashScopeClient 實例
+- `VolcengineArkClientFactory` —— 建立 VolcengineArkClient 實例
 
 工廠提供：
 - `CreateClient(Dictionary<string, object> config)` —— 從設定實例化客戶端
@@ -678,3 +696,28 @@ data/
         ├── code.enc
         └── permission.enc
 ```
+
+## 矽基生命體活動狀態
+
+矽基生命體具有以下活動狀態：
+
+| 狀態 | 描述 |
+|------|------|
+| `Idle` | 空閒狀態，等待時鐘觸發 |
+| `Working` | 正在執行一輪 AI 請求 + 工具呼叫 |
+| `Error` | 執行過程中出現錯誤 |
+| `Stopped` | 已停止，因連續錯誤或手動停止 |
+
+**Stopped 狀態機制**：
+- 當矽基生命體連續發生 10 次錯誤時，自動進入 `Stopped` 狀態
+- 進入 Stopped 狀態後，生命體將不再執行任何任務
+- 需要手動干預才能重新啟動
+
+狀態轉換：
+```
+Idle → Working → Idle（正常完成）
+Working → Error → Working（錯誤恢復）
+Working → Stopped（連續 10 次錯誤或手動停止）
+Stopped → Idle（重新啟動）
+```
+

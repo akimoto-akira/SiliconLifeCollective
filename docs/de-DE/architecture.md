@@ -20,6 +20,12 @@ Dieses Projekt bietet zwei Implementierungsversionen, die dasselbe Architekturen
 - **Ausführungsmodus**: Windows-Formularanwendung (mit System Tray-Unterstützung)
 - **Speicher**: SpeedyPack-In-Memory-Speicher + asynchrone Batch-Persistenz (.spk-Dateiformat)
 - **Anwendungsszenario**: Szenarien mit hoher Parallelität, niedriger Latenz, großem Datenvolumen
+- **Merkmale**:
+  - System Tray-Hintergrundausführung mit Echtzeitüberwachung über Tray-Statusfenster
+  - SpeedyPack-Engine + automatische Komprimierung gewährleisten Datensicherheit
+  - Component-UI-Architektur, 30+ deklarative Komponenten
+  - 7 Skin-Themes, unterstützt automatische Erkennung und Umschaltung
+  - Hot-Reload-Tool für Online-Updates und Neustarts
 - **Leistungsverbesserung**: Speicherlese-Latenz um das 1000-fache reduziert, Schreiblatenz um das 15000-fache reduziert
 - **Rollenbeschreibung**: Produktionsreife Implementierung mit tiefer Optimierung, mit System Tray-Hintergrundausführung, SpeedyPack-Engine + automatische Komprimierung, die beste Wahl für Langzeitbetrieb und echte Produktionsumgebungen
 
@@ -269,12 +275,24 @@ Das System unterstützt mehrere KI-Backends durch die `IAIClient`-Schnittstelle:
 - **Konfiguration**: `apiKey`, `region`, `model`
 - **Modell-Entdeckung**: Runtime-Abruf verfügbarer Modelle von Bailian API; Fallback auf kuratierte Liste bei Netzwerkfehlern
 
+### VolcengineArkClient (Volcengine Ark)
+
+- **Typ**: Cloud-KI-Service
+- **Protokoll**: OpenAI-kompatible API
+- **Authentifizierung**: Bearer-Token (API-Schlüssel)
+- **Funktionen**: Unterstützt Streaming- und Nicht-Streaming-Modi, integrierte doppelte Ratenbegrenzung
+  - Clientseitige Ratenbegrenzung: Erzwingt minimales Intervall zwischen Anfragen
+  - Server-Ratenbegrenzung: Handhabt 429-Fehler, Wiederholungen mit exponentiellem Backoff
+- **Konfiguration**: `apiKey`, `endpoint`, `model`
+- **Merkmale**: ByteDances KI-Service, unterstützt verschiedene Doubao-Modelle
+
 ### Client-Factory-Pattern
 
 Jeder KI-Client-Typ hat entsprechende Factory-Implementierungen von `IAIClientFactory`:
 
 - `OllamaClientFactory` — Erstellt OllamaClient-Instanzen
 - `DashScopeClientFactory` — Erstellt DashScopeClient-Instanzen
+- `VolcengineArkClientFactory` — Erstellt VolcengineArkClient-Instanzen
 
 Factorys bieten:
 - `CreateClient(Dictionary<string, object> config)` — Instanziiert Client aus Konfiguration
@@ -698,14 +716,19 @@ Silicon Beings haben folgende Aktivitätszustände:
 | Status | Beschreibung |
 |------|------|
 | `Idle` | Leerlauf, wartet auf Clock-Trigger |
-| `Running` | Führt eine Runde KI-Anfrage + Tool-Aufrufe aus |
-| `WaitingPermission` | Wartet auf Benutzerberechtigungs-Genehmigung |
-| `Stopped` | Gestoppt, aufgrund von Fehler oder manuellem Stopp |
+| `Working` | Führt eine Runde KI-Anfrage + Tool-Aufrufe aus |
+| `Error` | Fehler während der Ausführung aufgetreten |
+| `Stopped` | Gestoppt, aufgrund von aufeinanderfolgenden Fehlern oder manuellem Stopp |
+
+**Gestoppt-Status-Mechanismus**:
+- Wenn ein Silicon Being 10 aufeinanderfolgende Fehler auftritt, wechselt es automatisch in den `Stopped`-Status
+- Im Stopped-Status führt das Being keine Aufgaben mehr aus
+- Manueller Eingriff ist erforderlich, um es neu zu starten
 
 Zustandsübergänge:
 ```
-Idle → Running → Idle (Normaler Abschluss)
-Running → WaitingPermission → Running (Fortsetzung nach Berechtigungs-Genehmigung)
-Running → Stopped (Fehler oder manueller Stopp)
+Idle → Working → Idle (Normaler Abschluss)
+Working → Error → Working (Fehlerwiederherstellung)
+Working → Stopped (10 aufeinanderfolgende Fehler oder manueller Stopp)
 Stopped → Idle (Neustart)
 ```

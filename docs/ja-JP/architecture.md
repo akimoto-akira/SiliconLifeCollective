@@ -20,6 +20,12 @@
 - **実行モード**: Windowsフォームアプリケーション（システムトレイ対応）
 - **ストレージ**: SpeedyPack メモリストレージ + 非同期バッチ永続化（.spk ファイル形式）
 - **適用シナリオ**: 高同時実行性、低レイテンシ、大データ量シナリオ
+- **特徴**：
+  - システムトレイバックグラウンド実行、トレイ状態ウィンドウによるリアルタイムモニタリング
+  - SpeedyPack エンジン + 自動圧縮でデータセキュリティを保証
+  - Component UI アーキテクチャ、30個以上の宣言的コンポーネント
+  - 7種類のスキンのテーマ、自動発見と切り替えをサポート
+  - ホットリロードツールでオンライン更新および再起動をサポート
 - **パフォーマンス向上**: ストレージ読み取りレイテンシ1000倍削減、書き込みレイテンシ15000倍削減
 - **役割説明**：深い最適化が施された本番グレードの実装であり、システムトレイバックグラウンド実行、SpeedyPack エンジン + 自動圧縮などの特性を備え、長期運用と実際の本番環境の第一選択です
 
@@ -269,12 +275,24 @@
 - **設定**：`apiKey`、`region`、`model`
 - **モデル発見**：実行時に DashScope API から利用可能なモデルを取得。ネットワーク障害時に厳選されたリストにフォールバック
 
+### VolcengineArkClient（Volcengine Ark）
+
+- **タイプ**：クラウド AI サービス
+- **プロトコル**：OpenAI 互換 API
+- **認証**：Bearer トークン（API キー）
+- **機能**：ストリーミングと非ストリーミングモードをサポート、内蔵二重速度制御
+  - 自己速度制御：リクエスト間の最小間隔を強制実行
+  - サーバー速度制限：429 エラー処理、指数バックオフ再試行
+- **設定**：`apiKey`、`endpoint`、`model`
+- **特徴**：ByteDance 傘下の AI サービス、多様な Doubao モデルをサポート
+
 ### クライアントファクトリーパターン
 
 各 AI クライアントタイプには、`IAIClientFactory` を実装する対応するファクトリー実装がある：
 
 - `OllamaClientFactory` — OllamaClient インスタンスを作成
 - `DashScopeClientFactory` — DashScopeClient インスタンスを作成
+- `VolcengineArkClientFactory` — VolcengineArkClient インスタンスを作成
 
 ファクトリーは提供：
 - `CreateClient(Dictionary<string, object> config)` — 設定からクライアントをインスタンス化
@@ -692,14 +710,19 @@ public interface IPlugin
 | 状態 | 説明 |
 |------|------|
 | `Idle` | アイドル状態。クロックトリガーを待機 |
-| `Running` | AI リクエスト + ツール呼び出しの1ラウンドを実行中 |
-| `WaitingPermission` | ユーザーの権限承認を待機 |
-| `Stopped` | 停止済み。エラーまたは手動停止による |
+| `Working` | AI リクエスト + ツール呼び出しの1ラウンドを実行中 |
+| `Error` | 実行中にエラーが発生 |
+| `Stopped` | 停止済み。連続エラーまたは手動停止による |
+
+**Stopped 状態メカニズム**：
+- シリコン生命体が連続10回のエラー发生时、自動的に `Stopped` 状態に進入
+- Stopped 状態に進入后、生命体はすべてのタスクの実行を停止
+- 手動介入でのみ再起動可能
 
 状態遷移：
 ```
-Idle → Running → Idle（正常完了）
-Running → WaitingPermission → Running（権限承認後に続行）
-Running → Stopped（エラーまたは手動停止）
+Idle → Working → Idle（正常完了）
+Working → Error → Working（エラー復旧）
+Working → Stopped（連続10回のエラーまたは手動停止）
 Stopped → Idle（再起動）
 ```

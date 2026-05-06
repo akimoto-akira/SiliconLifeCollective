@@ -96,20 +96,36 @@ curl -X POST http://localhost:8080/api/beings \
 
 ## 生命体生命週期
 
-### 狀態
+### 活動狀態
+
+矽基生命體具有以下活動狀態：
+
+| 狀態 | 描述 |
+|------|------|
+| `Idle` | 空閒狀態，等待時鐘觸發 |
+| `Working` | 正在執行一輪 AI 請求 + 工具呼叫 |
+| `Error` | 執行過程中出現錯誤 |
+| `Stopped` | 已停止，因連續錯誤或手動停止 |
+
+**Stopped 狀態機制**：
+- 當矽基生命體連續發生 10 次錯誤時，自動進入 `Stopped` 狀態
+- 進入 Stopped 狀態後，生命體將不再執行任何任務
+- 需要手動干預才能重新啟動
+
+### 狀態轉換
 
 ```
-Created → Starting → Running → Stopping → Stopped
-                    ↓
-                  Error
+Idle → Working → Idle（正常完成）
+Working → Error → Working（錯誤恢復）
+Working → Stopped（連續 10 次錯誤或手動停止）
+Stopped → Idle（重新啟動）
 ```
 
 ### 操作
 
 - **啟動**：初始化並開始處理
 - **停止**：優雅關閉
-- **暂停**：临时挂起（保持狀態）
-- **復原**：從暂停狀態继续
+- **重啟**：從 Stopped 狀態恢復到 Idle 狀態
 
 ## 工作系統
 

@@ -13,6 +13,7 @@
 - **灵魂文件驱动** — 每个硅基生命体由核心提示文件（`soul.md`）驱动，定义独特个性和行为模式
 - **身体-大脑架构** — *身体*（SiliconBeing）维持生命体征并检测触发场景；*大脑*（ContextManager）负责加载历史、调用 AI、执行工具和持久化响应
 - **自我进化能力** — 通过 Roslyn 动态编译技术，硅基生命体可以重写自己的代码实现进化
+- **活动状态管理** — 支持 Idle（空闲）、Working（工作）、Error（错误）、Stopped（已停止）四种活动状态，连续 10 次错误自动进入 Stopped 状态
 
 ### 插件系统
 - **插件扩展架构** — 通过 IPlugin 接口实现功能扩展，支持从目录动态加载插件 DLL
@@ -21,7 +22,8 @@
 - **工具集成** — 插件可通过 ITool 接口注册自定义工具，自动集成到工具调用循环
 
 ### 工具与执行
-- **23 个内置工具** — 涵盖日历、聊天、配置、磁盘、网络、记忆、任务、定时器、知识库、工作笔记、WebView 浏览器等
+- **24 个内置工具** — 涵盖日历、聊天、配置、磁盘、网络、记忆、任务、定时器、知识库、工作笔记、WebView 浏览器、热重载等
+- **热重载工具** — 支持 SiliconLife.Fast 在运行中自动编译、更新文件并重启，无需手动干预
 - **工具调用循环** — AI 返回工具调用 → 执行工具 → 结果反馈给 AI → 持续循环直到返回纯文本响应
 - **执行器-权限安全** — 所有 I/O 操作通过执行器进行严格的权限验证
   - 5 级权限链：IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
@@ -31,6 +33,7 @@
 - **多 AI 后端支持**
   - **Ollama** — 本地模型部署，使用原生 HTTP API
   - **阿里云百炼（DashScope）** — 云端 AI 服务，兼容 OpenAI API，支持 13+ 模型，多区域部署
+  - **火山引擎 Ark（VolcengineArk）** — 字节跳动云端 AI 服务，支持流式和非流式模式，内置速率控制
 - **32 种日历系统** — 全球主要历法全覆盖，包括公历、农历、伊斯兰历、希伯来历、日本历、波斯历、玛雅历、中国历史历法等
 - **知识网络系统** — 基于三元组（主体-关系-客体）的知识图谱，支持存储、查询和路径发现
 
@@ -41,15 +44,18 @@
 - **零前端框架依赖** — 通过 `H`、`CssBuilder` 和 `JsBuilder` 在服务端生成 HTML/CSS/JS
 
 ### 国际化与本地化
-- **21 种语言变体**全面支持
-  - 中文：zh-CN, zh-HK, zh-SG, zh-MO, zh-TW, zhMY（6 种）
-  - 英文：en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY（10 种）
-  - 西班牙语：es-ES, es-MX（2 种）
-  - 日语：ja-JP | 韩语：ko-KR | 捷克语：cs-CZ
+- **29 种语言实现**全面支持，涵盖 2 种书写系统和多个地区变体
+  - **简体中文**：zh-CN（中国大陆）、zh-SG（新加坡）、zh-MY（马来西亚）（3 种）
+  - **繁体中文**：zh-HK（香港）、zh-TW（台湾）、zh-MO（澳门）（3 种）
+  - **英语**：en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY（10 种）
+  - **西班牙语**：es-ES, es-MX（2 种）
+  - **德语**：de-DE, de-AT, de-CH, de-LU, de-LI（5 种）
+  - **法语**：fr-FR, fr-CA, fr-CH（3 种）
+  - **日语**：ja-JP | **韩语**：ko-KR | **捷克语**：cs-CZ（3 种）
 
 ### 数据与存储
-- **SpeedyPack 高性能存储** — 自研 .spk 存储引擎，内存目录映射 + 条目缓存 + 异步写入队列
-- **零数据库依赖** — Default 版本使用纯文件系统存储（JSON 格式），Fast 版本使用 SpeedyPack 内存存储
+- **SpeedyPack 高性能存储** — Fast 版本使用自研 .spk 存储引擎，内存目录映射 + 条目缓存 + 异步写入队列
+- **文件系统存储** — Default 版本使用纯文件系统 JSON 存储
 - **时间索引查询** — 通过 `ITimeStorage` 接口支持按时间范围的高效查询
 - **自动压缩** — SpeedyPack 支持定时自动压缩，回收空闲空间
 - **最小依赖** — 核心库仅依赖 Microsoft.CodeAnalysis.CSharp 用于动态编译
@@ -72,7 +78,13 @@
 - **运行模式**：Windows 窗体应用程序（支持系统托盘）
 - **存储方式**：SpeedyPack 内存存储 + 异步批量持久化（.spk 文件格式）
 - **适用场景**：高并发、低延迟、大数据量场景
-- **特点**：极致性能优化、托盘后台运行、SpeedyPack 引擎 + 自动压缩保证数据安全
+- **特点**：
+  - 极致性能优化
+  - 托盘后台运行，支持托盘状态窗口实时监控
+  - SpeedyPack 引擎 + 自动压缩保证数据安全
+  - Component UI 架构，30+ 声明式组件
+  - 7 种皮肤主题，支持自动发现和切换
+  - 热重载工具支持在线更新和重启
 - **性能提升**：存储读取延迟降低 1000 倍，写入延迟降低 15000 倍，并发处理能力提升 50 倍
 - **角色说明**：经过深度优化的生产级实现，是长期运行和实际生产环境的首选
 - **启动命令**：`dotnet run --project src/SiliconLife.Fast`
@@ -101,7 +113,7 @@
 | 运行时 | .NET 9 | .NET 9 Windows |
 | 编程语言 | C# | C# |
 | 应用类型 | 控制台应用程序 | Windows 窗体应用程序 |
-| AI 集成 | Ollama（本地）、阿里云百炼（云端） | Ollama（本地）、阿里云百炼（云端） |
+| AI 集成 | Ollama（本地）、阿里云百炼（云端） | Ollama（本地）、阿里云百炼（云端）、火山引擎Ark（云端） |
 | 数据存储 | 文件系统（JSON + 时间索引目录） | SpeedyPack（.spk 格式，内存映射 + 异步持久化） |
 | Web 服务器 | HttpListener（.NET 内置） | HttpListener（.NET 内置） |
 | 动态编译 | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
@@ -138,12 +150,12 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # 全局服务定位器
 │   │
 │   ├── SiliconLife.Common/                # 共享实现（两个版本共用）
-│   │   ├── AI/                            # AI 客户端工厂
+│   │   ├── AI/                            # AI 客户端工厂（Ollama、DashScope、VolcengineArk）
 │   │   ├── Calendar/                      # 32 种日历实现
 │   │   ├── Localization/                  # 本地化基类
 │   │   ├── Security/                      # 权限管理器
 │   │   ├── SiliconBeing/                  # 默认硅基生命体实现
-│   │   ├── Tools/                         # 通用工具实现
+│   │   ├── Tools/                         # 通用工具实现（含热重载工具）
 │   │   └── WebView/                       # WebView 接口
 │   │
 │   ├── SiliconLife.Default/               # 默认实现 + 应用程序入口（控制台版）

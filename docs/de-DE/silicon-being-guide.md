@@ -96,20 +96,36 @@ curl -X POST http://localhost:8080/api/beings \
 
 ## Being-Lebenszyklus
 
-### Status
+### Aktivitätszustände
+
+Silicon Beings haben folgende Aktivitätszustände:
+
+| Status | Beschreibung |
+|------|------|
+| `Idle` | Leerlauf, wartet auf Clock-Trigger |
+| `Working` | Führt eine Runde KI-Anfrage + Tool-Aufrufe aus |
+| `Error` | Fehler während der Ausführung aufgetreten |
+| `Stopped` | Gestoppt, aufgrund von aufeinanderfolgenden Fehlern oder manuellem Stopp |
+
+**Gestoppt-Status-Mechanismus**:
+- Wenn ein Silicon Being 10 aufeinanderfolgende Fehler auftritt, wechselt es automatisch in den `Stopped`-Status
+- Im Stopped-Status führt das Being keine Aufgaben mehr aus
+- Manueller Eingriff ist erforderlich, um es neu zu starten
+
+### Zustandsübergänge
 
 ```
-Created → Starting → Running → Stopping → Stopped
-                    ↓
-                  Error
+Idle → Working → Idle (Normaler Abschluss)
+Working → Error → Working (Fehlerwiederherstellung)
+Working → Stopped (10 aufeinanderfolgende Fehler oder manueller Stopp)
+Stopped → Idle (Neustart)
 ```
 
 ### Operationen
 
 - **Start**: Initialisieren und mit Verarbeitung beginnen
 - **Stopp**: Graceful Shutdown
-- **Pause**: Temporär suspendieren (Status beibehalten)
-- **Fortsetzen**: Von Pause-Status fortfahren
+- **Neustart**: Von Stopped-Status zu Idle-Status wiederherstellen
 
 ## Aufgaben-System
 

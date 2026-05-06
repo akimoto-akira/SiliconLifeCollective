@@ -13,6 +13,7 @@
 - **Soul-Datei-gesteuert** — Jedes Silicon Being wird durch eine zentrale Prompt-Datei (`soul.md`) gesteuert, die einzigartige Persönlichkeit und Verhaltensmuster definiert
 - **Body-Brain-Architektur** — *Body* (SiliconBeing) erhält Vitalzeichen und erkennt Triggerszenarien; *Brain* (ContextManager) ist verantwortlich für das Laden von Verlauf, KI-Aufruf, Tool-Ausführung und Persistierung von Antworten
 - **Selbstentwicklungsfähigkeit** — Durch Roslyn-Dynamikkompilierungstechnologie können Silicon Beings ihren eigenen Code überschreiben, um Evolution zu realisieren
+- **Aktivitätszustandsverwaltung** — Unterstützt vier Aktivitätszustände: Idle (inaktiv), Working (arbeitend), Error (Fehler), Stopped (gestoppt). Automatischer Wechsel zu Stopped nach 10 aufeinanderfolgenden Fehlern
 
 ### Plugin-System
 - **Plugin-Erweiterungsarchitektur** — Funktionserweiterung durch IPlugin-Schnittstelle, unterstützt dynamisches Laden von Plugin-DLLs aus Verzeichnis
@@ -21,7 +22,8 @@
 - **Tool-Integration** — Plugins können über die ITool-Schnittstelle benutzerdefinierte Tools registrieren, die automatisch in den Tool-Aufruf-Zyklus integriert werden
 
 ### Tools & Ausführung
-- **23 integrierte Tools** — Abdeckend Kalender, Chat, Konfiguration, Festplatte, Netzwerk, Speicher, Aufgaben, Timer, Wissensdatenbank, Arbeitsnotizen, WebView-Browser usw.
+- **24 integrierte Tools** — Abdeckend Kalender, Chat, Konfiguration, Festplatte, Netzwerk, Speicher, Aufgaben, Timer, Wissensdatenbank, Arbeitsnotizen, WebView-Browser, Hot-Reload usw.
+- **Hot-Reload-Tool** — Unterstützt automatische Kompilierung, Dateiaktualisierung und Neustart von SiliconLife.Fast während der Laufzeit, ohne manuelles Eingreifen
 - **Tool-Aufruf-Schleife** — KI gibt Tool-Aufruf zurück → Tool ausführen → Ergebnisse an KI zurückgeben → Schleife fortsetzen bis reine Textantwort
 - **Executor-Berechtigungssicherheit** — Alle I/O-Operationen durchlaufen strenge Berechtigungsvalidierung über Executoren
   - 5-stufige Berechtigungskette: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
@@ -31,6 +33,7 @@
 - **Multiple KI-Backend-Unterstützung**
   - **Ollama** — Lokale Modellbereitstellung, mit nativer HTTP-API
   - **Alibaba Cloud DashScope (Bailian)** — Cloud-KI-Service, OpenAI-API-kompatibel, unterstützt 13+ Modelle, Multi-Region-Bereitstellung
+  - **Volcengine Ark** — ByteDance Cloud-KI-Service, unterstützt Streaming- und Nicht-Streaming-Modi, integrierte doppelte Ratenbegrenzung
 - **32 Kalendersysteme** — Vollständige Abdeckung der wichtigsten globalen Kalender, einschließlich Gregorianischer Kalender, Chinesischer Mondkalender, Islamischer Kalender, Hebräischer Kalender, Japanischer Kalender, Persischer Kalender, Maya-Kalender, Chinesischer Historischer Kalender usw.
 - **Wissensnetzwerksystem** — Wissensgraph basierend auf Triplen (Subjekt-Relation-Objekt), unterstützt Speicherung, Abfrage und Pfadentdeckung
 
@@ -41,15 +44,18 @@
 - **Null Frontend-Framework-Abhängigkeit** — HTML/CSS/JS serverseitig generiert durch `H`, `CssBuilder` und `JsBuilder`
 
 ### Internationalisierung & Lokalisierung
-- **Umfassende Unterstützung für 21 Sprachvarianten**
-  - Chinesisch: zh-CN, zh-HK, zh-SG, zh-MO, zh-TW, zhMY (6 Varianten)
-  - Englisch: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 Varianten)
-  - Spanisch: es-ES, es-MX (2 Varianten)
-  - Japanisch: ja-JP | Koreanisch: ko-KR | Tschechisch: cs-CZ
+- **Umfassende Unterstützung für 29 Sprachimplementierungen**, abdeckend 2 Schriftsysteme und mehrere regionale Varianten
+  - **Chinesisch (Vereinfacht)**: zh-CN (China Festland), zh-SG (Singapur), zh-MY (Malaysia) (3 Varianten)
+  - **Chinesisch (Traditionell)**: zh-HK (Hongkong), zh-TW (Taiwan), zh-MO (Macao) (3 Varianten)
+  - **Englisch**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 Varianten)
+  - **Spanisch**: es-ES, es-MX (2 Varianten)
+  - **Deutsch**: de-DE, de-AT, de-CH, de-LU, de-LI (5 Varianten)
+  - **Französisch**: fr-FR, fr-CA, fr-CH (3 Varianten)
+  - **Japanisch**: ja-JP | **Koreanisch**: ko-KR | **Tschechisch**: cs-CZ (3 Varianten)
 
 ### Daten & Speicherung
-- **SpeedyPack Hochleistungsspeicher** — Eigenentwickelte .spk-Speicher-Engine, In-Memory-Verzeichniszuordnung + Eintrags-Cache + asynchrone Schreibwarteschlange
-- **Null Datenbankabhängigkeit** — Default-Version verwendet reinen Dateisystem-Speicher (JSON-Format), Fast-Version verwendet SpeedyPack-In-Memory-Speicher
+- **SpeedyPack Hochleistungsspeicher** — Fast-Version verwendet eigenentwickelte .spk-Speicher-Engine, In-Memory-Verzeichniszuordnung + Eintrags-Cache + asynchrone Schreibwarteschlange
+- **Dateisystem-Speicher** — Default-Version verwendet reinen Dateisystem-JSON-Speicher
 - **Zeitindex-Abfrage** — Effiziente Abfrage nach Zeitbereich über `ITimeStorage`-Schnittstelle
 - **Automatische Komprimierung** — SpeedyPack unterstützt zeitgesteuerte automatische Komprimierung zur Rückgewinnung von freiem Speicherplatz
 - **Minimale Abhängigkeiten** — Kernbibliothek abhängt nur von Microsoft.CodeAnalysis.CSharp für Dynamikkompilierung
@@ -72,7 +78,13 @@ Dieses Projekt bietet zwei Implementierungsversionen, um unterschiedliche Szenar
 - **Ausführungsmodus**: Windows Forms-Anwendung (unterstützt Systemtray)
 - **Speichermethode**: SpeedyPack-In-Memory-Speicher + asynchrone Batch-Persistenz (.spk-Dateiformat)
 - **Anwendbare Szenarien**: Hohe Parallelität, niedrige Latenz, große Datenmengen
-- **Merkmale**: Extreme Performance-Optimierung, Tray-Hintergrundausführung, SpeedyPack-Engine + automatische Komprimierung gewährleisten Datensicherheit
+- **Merkmale**:
+  - Extreme Performance-Optimierung
+  - Tray-Hintergrundausführung mit Echtzeitüberwachung über Tray-Statusfenster
+  - SpeedyPack-Engine + automatische Komprimierung gewährleisten Datensicherheit
+  - Component-UI-Architektur, 30+ deklarative Komponenten
+  - 7 Skin-Themes, unterstützt automatische Erkennung und Umschaltung
+  - Hot-Reload-Tool für Online-Updates und Neustarts
 - **Performance-Verbesserung**: Speicherlese-Latenz um 1000x reduziert, Schreiblatenz um 15000x reduziert, parallele Verarbeitungskapazität um 50x erhöht
 - **Rollenbeschreibung**: Produktionsreife Implementierung mit tiefer Optimierung, die beste Wahl für Langzeitbetrieb und echte Produktionsumgebungen
 - **Startbefehl**: `dotnet run --project src/SiliconLife.Fast`
@@ -101,7 +113,7 @@ Dieses Projekt bietet zwei Implementierungsversionen, um unterschiedliche Szenar
 | Runtime | .NET 9 | .NET 9 Windows |
 | Programmiersprache | C# | C# |
 | Anwendungstyp | Konsolenanwendung | Windows Forms-Anwendung |
-| KI-Integration | Ollama (lokal), Alibaba Cloud DashScope (Cloud) | Ollama (lokal), Alibaba Cloud DashScope (Cloud) |
+| KI-Integration | Ollama (lokal), Alibaba Cloud DashScope (Cloud) | Ollama (lokal), Alibaba Cloud DashScope (Cloud), Volcengine Ark (Cloud) |
 | Datenspeicherung | Dateisystem (JSON + Zeitindex-Verzeichnis) | SpeedyPack (.spk-Format, In-Memory-Zuordnung + asynchrone Persistenz) |
 | Webserver | HttpListener (.NET integriert) | HttpListener (.NET integriert) |
 | Dynamikkompilierung | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |

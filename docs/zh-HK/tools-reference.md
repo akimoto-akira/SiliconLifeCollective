@@ -411,6 +411,54 @@
 21. **TokenAuditTool** 🔒 - Token 使用審計
 22. **WebViewBrowserTool** - 瀏覽器自動化（基於 Playwright）
 23. **WorkNoteTool** - 個人工作筆記
+24. **HotReloadTool** - 熱重載工具（支援 Fast 線上更新和重啟）
+
+---
+
+### 24. 熱重載工具 (HotReloadTool)
+
+**工具名稱**: `hot_reload`
+
+**功能描述**: 支援 SiliconLife.Fast 在執行中自動編譯、更新檔案並重啟，無需手動干預。
+
+**支援的操作**:
+- `execute` — 執行完整的構建、複製和重啟流程
+- `build_only` — 僅構建專案，不複製和重啟
+
+**工作流程**:
+1. 編譯 SiliconLife.Fast 專案
+2. 優雅關閉當前執行的 Fast 實例（通過 HTTP API）
+3. 等待程序退出和連接埠釋放
+4. 複製構建輸出到目標目錄（跳過 HotReload 自身檔案）
+5. 重新啟動 Fast 實例
+
+**特性**:
+- 自動檢測並關閉舊程序
+- 安全檔案複製（不覆蓋 HotReload.exe）
+- 連接埠釋放等待機制
+- 支援自訂連接埠配置
+
+**使用示例**:
+```json
+{
+  "action": "execute",
+  "project_path": "src/SiliconLife.Fast",
+  "source_path": "src/SiliconLife.Fast/bin/Debug/net9.0",
+  "configuration": "Debug",
+  "port": 8080
+}
+```
+
+**引數說明**:
+- `project_path`: 專案路徑（相對於解決方案根目錄）
+- `source_path`: 構建輸出目錄
+- `configuration`: 構建配置（Debug/Release）
+- `port`: Fast 實例的 Web 連接埠（預設 8080）
+
+**注意事項**:
+- 僅適用於 SiliconLife.Fast 版本
+- 需要 HotReload.exe 在 tools/HotReload 目錄下
+- 重啟過程中會有短暫的服務中斷（約 3-5 秒）
 
 ---
 

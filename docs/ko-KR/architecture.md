@@ -20,8 +20,14 @@
 - **실행 모드**: Windows 양식 애플리케이션 (시스템 트레이 지원)
 - **저장소**: SpeedyPack 메모리 저장소 + 비동기 일괄 영속화 (.spk 파일 형식)
 - **적용 시나리오**: 높은 동시성, 낮은 지연 시간, 대용량 데이터 시나리오
+- **특징**:
+  - 시스템 트레이 백그라운드 실행, 트레이 상태 창 실시간 모니터링
+  - SpeedyPack 엔진 + 자동 압축으로 데이터 보안 보장
+  - Component UI 아키텍처, 30개 이상의 선언형 컴포넌트
+  - 7가지 스킨 테마, 자동 감지 및 전환 지원
+  - 핫 리로드 도구로 온라인 업데이트 및 재시작 지원
 - **성능 향상**: 저장소 읽기 지연 시간 1000배 감소, 쓰기 지연 시간 15000배 감소
-- **역할 설명**: 심층 최적화가 적용된 프로덕션급 구현으로, 시스템 트레이 백그라운드 실행, 극한 성능 최적화 등의 특성을 갖추고 있어 장기 운영 및 실제 프로덕션 환경의 최선의 선택입니다
+- **역할 설명**: 심층 최적화가 적용된 프로덕션급 구현으로, 시스템 트레이 백그라운드 실행, SpeedyPack 엔진 + 자동 압축 등의 특성을 갖추고 있어 장기 운영 및 실제 프로덕션 환경의 최선의 선택입니다
 
 > **참고**: 이 문서에서 설명하는 아키텍처는 두 버전 모두에 적용되며, 저장소 구현 부분에서만 차이가 있습니다. SiliconLife.Default는 아키텍처 검증 기준으로, SiliconLife.Fast는 프로덕션 환경의 주력 버전입니다.
 
@@ -269,12 +275,24 @@
 - **설정**: `apiKey`, `region`, `model`
 - **모델 발견**: 런타임에 Bailian API에서 사용 가능한 모델 가져오기; 네트워크 장애 시 선별된 목록으로 폴백
 
+### VolcengineArkClient (Volcengine Ark)
+
+- **타입**: 클라우드 AI 서비스
+- **프로토콜**: OpenAI 호환 API
+- **인증**: Bearer token (API 키)
+- **기능**: 스트리밍 및 비스트리밍 모드 지원, 내장 이중 속도 제어
+  - 자체 속도 제어: 요청 간 최소 간격 강제 실행
+  - 서버 속도 제한: 429 오류 처리, 지수 백오프 재시도
+- **설정**: `apiKey`, `endpoint`, `model`
+- **특징**: ByteDance 소속 AI 서비스, 다양한 Doubao 모델 지원
+
 ### 클라이언트 팩토리 패턴
 
 각 AI 클라이언트 타입은 `IAIClientFactory`를 구현하는 해당 팩토리를 가집니다:
 
 - `OllamaClientFactory` — OllamaClient 인스턴스 생성
 - `DashScopeClientFactory` — DashScopeClient 인스턴스 생성
+- `VolcengineArkClientFactory` — VolcengineArkClient 인스턴스 생성
 
 팩토리 제공:
 - `CreateClient(Dictionary<string, object> config)` — 설정에서 클라이언트 인스턴스화
@@ -693,14 +711,19 @@ public interface IPlugin
 | 상태 | 설명 |
 |------|------|
 | `Idle` | 대기 상태, 클록 트리거 대기 |
-| `Running` | AI 요청 + 도구 호출 1라운드 실행 중 |
-| `WaitingPermission` | 사용자 권한 승인 대기 |
-| `Stopped` | 오류 또는 수동 중지로 인해 중지됨 |
+| `Working` | AI 요청 + 도구 호출 1라운드 실행 중 |
+| `Error` | 실행 중 오류 발생 |
+| `Stopped` | 연속 오류 또는 수동 중지로 인해 중지됨 |
+
+**Stopped 상태 메커니즘**:
+- 실리콘 생명체가 연속 10 회 오류 발생 시 자동으로 `Stopped` 상태 진입
+- Stopped 상태 진입 후, 생명체는 더 이상 어떤 작업도 실행하지 않음
+- 수동 개입을 통해서만 재시작 가능
 
 상태 전환:
 ```
-Idle → Running → Idle (정상 완료)
-Running → WaitingPermission → Running (권한 승인 후 계속)
-Running → Stopped (오류 또는 수동 중지)
+Idle → Working → Idle (정상 완료)
+Working → Error → Working (오류 복구)
+Working → Stopped (연속 10 회 오류 또는 수동 중지)
 Stopped → Idle (재시작)
 ```

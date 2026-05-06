@@ -20,6 +20,12 @@
 - **运行模式**：Windows 窗体应用程序（支持系统托盘）
 - **存储方式**：SpeedyPack 内存存储 + 异步批量持久化（.spk 文件格式）
 - **适用场景**：高并发、低延迟、大数据量场景
+- **特点**：
+  - 系统托盘后台运行，托盘状态窗口实时监控
+  - SpeedyPack 引擎 + 自动压缩保证数据安全
+  - Component UI 架构，30+ 声明式组件
+  - 7 种皮肤主题，支持自动发现和切换
+  - 热重载工具支持在线更新和重启
 - **性能提升**：存储读取延迟降低 1000 倍，写入延迟降低 15000 倍
 - **角色说明**：经过深度优化的生产级实现，具备系统托盘后台运行、SpeedyPack 引擎 + 自动压缩等特性，是长期运行和实际生产环境的首选
 
@@ -268,12 +274,24 @@
 - **配置**：`apiKey`、`region`、`model`
 - **模型发现**：运行时从百炼 API 获取可用模型；网络故障时回退到精选列表
 
+### VolcengineArkClient（火山引擎 Ark）
+
+- **类型**：云端 AI 服务
+- **协议**：兼容 OpenAI 的 API
+- **认证**：Bearer token（API 密钥）
+- **功能**：支持流式和非流式模式，内置双层速率控制
+  - 自我速率控制：强制执行请求间最小间隔
+  - 服务器速率限制：处理 429 错误，指数退避重试
+- **配置**：`apiKey`、`endpoint`、`model`
+- **特点**：字节跳动旗下 AI 服务，支持多种豆包模型
+
 ### 客户端工厂模式
 
 每种 AI 客户端类型都有相应的工厂实现 `IAIClientFactory`：
 
 - `OllamaClientFactory` —— 创建 OllamaClient 实例
 - `DashScopeClientFactory` —— 创建 DashScopeClient 实例
+- `VolcengineArkClientFactory` —— 创建 VolcengineArkClient 实例
 
 工厂提供：
 - `CreateClient(Dictionary<string, object> config)` —— 从配置实例化客户端
@@ -691,14 +709,19 @@ public interface IPlugin
 | 状态 | 描述 |
 |------|------|
 | `Idle` | 空闲状态，等待时钟触发 |
-| `Running` | 正在执行一轮 AI 请求 + 工具调用 |
-| `WaitingPermission` | 等待用户权限审批 |
-| `Stopped` | 已停止，因错误或手动停止 |
+| `Working` | 正在执行一轮 AI 请求 + 工具调用 |
+| `Error` | 执行过程中出现错误 |
+| `Stopped` | 已停止，因连续错误或手动停止 |
+
+**Stopped 状态机制**：
+- 当硅基生命体连续发生 10 次错误时，自动进入 `Stopped` 状态
+- 进入 Stopped 状态后，生命体将不再执行任何任务
+- 需要手动干预才能重新启动
 
 状态转换：
 ```
-Idle → Running → Idle（正常完成）
-Running → WaitingPermission → Running（权限审批后继续）
-Running → Stopped（错误或手动停止）
+Idle → Working → Idle（正常完成）
+Working → Error → Working（错误恢复）
+Working → Stopped（连续 10 次错误或手动停止）
 Stopped → Idle（重新启动）
 ```
