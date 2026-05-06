@@ -13,6 +13,7 @@
 
 using System.Text.Json;
 using SiliconLife.Collective;
+using SiliconLife.Default.Config;
 
 namespace SiliconLife.Default.Logging;
 

@@ -14,7 +14,7 @@
 using System.Text;
 using System.Text.Json;
 using SiliconLife.Collective;
-using SiliconLife.Default.Web;
+using SiliconLife.App.Web;
 
 namespace SiliconLife.Default.IM;
 
@@ -244,7 +244,7 @@ public class WebUIProvider : IIMProvider
 
     public async Task<AskPermissionResult> AskPermissionAsync(PermissionType permissionType, string resource, string allowCode, string denyCode)
     {
-        Guid userId = Config.Instance.Data.UserGuid;
+        Guid userId = SiliconLife.Collective.Config.Instance.Data.UserGuid;
 
         var request = new PendingPermissionRequest
         {

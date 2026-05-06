@@ -11,98 +11,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using SiliconLife.App.Data;
 using SiliconLife.Collective;
 using System.Text.Json;
 
-namespace SiliconLife.Default;
+namespace SiliconLife.Default.Config;
 
 /// <summary>
 /// Default implementation of configuration data
 /// </summary>
-public class DefaultConfigData : ConfigDataBase
+public class DefaultConfigData : AppConfigData
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<DefaultConfigData>();
+
     [ConfigIgnore("系统内部使用，用于多态反序列化")]
     public override string ConfigType { get; set; } = "Default";
 
-    /// <summary>
-    /// Gets or sets the data directory for storing all application data
-    /// </summary>
-    [ConfigGroup("Basic", Order = 2, DisplayNameKey = "DataDirectory", DescriptionKey = "DataDirectory")]
-    public DirectoryInfo DataDirectory { get; set; } = new DirectoryInfo("./data");
-
-    /// <summary>
-    /// Gets or sets the GUID of the curator (main administrator)
-    /// </summary>
-    [ConfigIgnore("系统内部标识，不建议手动修改")]
-    public override Guid CuratorGuid { get; set; }
-
-    /// <summary>
-    /// Gets or sets the language setting for the application
-    /// </summary>
-    [ConfigGroup("Basic", Order = 4, DisplayNameKey = "Language", DescriptionKey = "Language")]
-    public override Language Language { get; set; } = Language.ZhCN;
-
-    /// <summary>
-    /// Gets or sets the timeout duration for each tick execution
-    /// </summary>
-    [ConfigGroup("Runtime", Order = 1, DisplayNameKey = "TickTimeout", DescriptionKey = "TickTimeout")]
-    public override TimeSpan TickTimeout { get; set; } = TimeSpan.FromMinutes(10);
-
-    /// <summary>
-    /// Gets or sets the maximum number of consecutive timeouts allowed before circuit breaker triggers
-    /// </summary>
-    [ConfigGroup("Runtime", Order = 2, DisplayNameKey = "MaxTimeoutCount", DescriptionKey = "MaxTimeoutCount")]
-    public override int MaxTimeoutCount { get; set; } = 3;
-
-    /// <summary>
-    /// Gets or sets the watchdog timeout duration.
-    /// </summary>
-    [ConfigGroup("Runtime", Order = 3, DisplayNameKey = "WatchdogTimeout", DescriptionKey = "WatchdogTimeout")]
-    public override TimeSpan WatchdogTimeout { get; set; } = TimeSpan.FromMinutes(10);
-
-    /// <summary>
-    /// Gets or sets the global minimum log level.
-    /// </summary>
-    [ConfigGroup("Runtime", Order = 4, DisplayNameKey = "MinLogLevel", DescriptionKey = "MinLogLevel")]
-    public override LogLevel MinimumLogLevel { get; set; } = LogLevel.Trace;
-
-    /// <summary>
-    /// Gets or sets the AI client type to use
-    /// </summary>
-    [ConfigGroup("AI", Order = 0, DisplayNameKey = "AIClientType", DescriptionKey = "AIClientType")]
-    public override string AIClientType { get; set; } = "OllamaClient";
-
-    /// <summary>
-    /// Gets or sets the global AI client configuration dictionary.
-    /// Used when silicon beings don't have their own AI config.
-    /// </summary>
-    [ConfigGroup("AI", Order = 1, DisplayNameKey = "AIConfig", DescriptionKey = "AIConfigDescription")]
-    public override Dictionary<string, object> AIConfig { get; set; } = new Dictionary<string, object>
-    {
-        ["endpoint"] = "http://localhost:11434",
-        ["model"] = "qwen3.5:cloud",
-        ["temperature"] = 0.7,
-        ["maxTokens"] = 4096
-    };
-
-    /// <summary>
-    /// Gets or sets the web server port
-    /// </summary>
-    [ConfigGroup("Web", Order = 2, DisplayNameKey = "WebPort", DescriptionKey = "WebPort")]
-    public int WebPort { get; set; } = 8080;
-
-    /// <summary>
-    /// Gets or sets the web skin name
-    /// </summary>
-    [ConfigGroup("Web", Order = 4, DisplayNameKey = "WebSkin", DescriptionKey = "WebSkin")]
-    public string WebSkin { get; set; } = null!;
-
-    /// <summary>
-    /// Gets or sets the nickname of the human user
-    /// </summary>
-    [ConfigGroup("User", Order = 2, DisplayNameKey = "UserNickname", DescriptionKey = "UserNickname")]
-    public override string UserNickname { get; set; } = "User";
 
     private string GetConfigFilePath()
     {

@@ -79,7 +79,7 @@ public class ProjectManager : IProjectManager
         if (chatSystem != null)
         {
             string groupChatPrefix = "Project Group";
-            var language = Config.Instance?.Data?.Language ?? Language.EnUS;
+            var language = SiliconLife.Collective.Config.Instance?.Data?.Language ?? Language.EnUS;
             if (LocalizationManager.Instance.TryGetLocalization(language, out var loc) && loc is DefaultLocalizationBase defaultLoc)
             {
                 groupChatPrefix = defaultLoc.ProjectGroupChatPrefix;
@@ -97,7 +97,7 @@ public class ProjectManager : IProjectManager
         if (chatSystem != null)
         {
             string broadcastPrefix = "Project Broadcast";
-            var language = Config.Instance?.Data?.Language ?? Language.EnUS;
+            var language = SiliconLife.Collective.Config.Instance?.Data?.Language ?? Language.EnUS;
             if (LocalizationManager.Instance.TryGetLocalization(language, out var loc) && loc is DefaultLocalizationBase defaultLoc)
             {
                 broadcastPrefix = defaultLoc.ProjectBroadcastPrefix;

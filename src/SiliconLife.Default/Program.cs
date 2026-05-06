@@ -16,7 +16,8 @@ using SiliconLife.Default;
 using SiliconLife.Default.IM;
 using SiliconLife.Default.Knowledge;
 using SiliconLife.Default.Logging;
-using SiliconLife.Default.Web;
+using SiliconLife.Default.Config;
+using SiliconLife.App.Web;
 using System.Text;
 using SiliconLife.Common;
 using SiliconLife.Common.Security;
@@ -50,7 +51,7 @@ public class Program
         RegisterLocalizations();
         ConfigDataBaseConverter.RegisterConfigType("Default", typeof(DefaultConfigData));
 
-        Config config = Config.Instance;
+        SiliconLife.Collective.Config config = SiliconLife.Collective.Config.Instance;
         config.Initialize(new DefaultConfigData());
         config.LoadConfig();
 

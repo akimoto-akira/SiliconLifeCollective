@@ -17,7 +17,8 @@ using SiliconLife.Fast.IM;
 using SiliconLife.Fast.Knowledge;
 using SiliconLife.Fast.Logging;
 using SiliconLife.Fast.Tray;
-using SiliconLife.Fast.Web;
+using SiliconLife.App.Web;
+using SiliconLife.Fast.Config;
 using System.Text;
 using SiliconLife.Common;
 using SiliconLife.Common.Security;
@@ -52,7 +53,7 @@ public class Program
         RegisterLocalizations();
         ConfigDataBaseConverter.RegisterConfigType("Default", typeof(DefaultConfigData));
 
-        Config config = Config.Instance;
+        SiliconLife.Collective.Config config = SiliconLife.Collective.Config.Instance;
         config.Initialize(new DefaultConfigData());
         config.LoadConfig();
 
@@ -215,7 +216,7 @@ public class Program
         _logger.Info(null, "Application shutting down...");
 
         // Update tray status
-        TrayLocalizationBase shutdownTrayLocalization = GetTrayLocalization(Config.Instance.Data.Language);
+        TrayLocalizationBase shutdownTrayLocalization = GetTrayLocalization(SiliconLife.Collective.Config.Instance.Data.Language);
         _trayWindow?.UpdateStatus(shutdownTrayLocalization.ShuttingDown);
 
         // Stop web server first to release port
@@ -303,7 +304,7 @@ public class Program
         {
             _logger.Error(null, "Failed to start web server: {0}", ex, ex.Message);
             
-            var language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            var language = SiliconLife.Collective.Config.Instance?.Data?.Language ?? Language.ZhCN;
             var trayLoc = GetTrayLocalization(language);
             
             string errorMessage = string.Format(trayLoc.WebServerStartupErrorMessage, ex.Message);

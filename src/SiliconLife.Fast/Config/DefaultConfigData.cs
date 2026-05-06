@@ -12,58 +12,20 @@
 // limitations under the License.
 
 using System.Text.Json;
+using SiliconLife.App.Data;
 using SiliconLife.Collective;
 using SiliconLife.Fast;
 
-namespace SiliconLife.Fast;
+namespace SiliconLife.Fast.Config;
 
 /// <summary>
-/// Default implementation of configuration data.
-/// Configuration is persisted as <c>config.json</c> in the application base directory.
+/// Fast implementation of configuration data.
+/// Configuration is persisted using the SpeedyPackRegistry for high-performance storage.
 /// </summary>
-public class DefaultConfigData : ConfigDataBase
+public class DefaultConfigData : AppConfigData
 {
     [ConfigIgnore("系统内部使用，用于多态反序列化")]
-    public override string ConfigType { get; set; } = "Default";
-
-    [ConfigIgnore("系统内部标识，不建议手动修改")]
-    public override Guid CuratorGuid { get; set; }
-
-    [ConfigGroup("Basic", Order = 4, DisplayNameKey = "Language", DescriptionKey = "Language")]
-    public override Language Language { get; set; } = Language.ZhCN;
-
-    [ConfigGroup("Runtime", Order = 1, DisplayNameKey = "TickTimeout", DescriptionKey = "TickTimeout")]
-    public override TimeSpan TickTimeout { get; set; } = TimeSpan.FromMinutes(10);
-
-    [ConfigGroup("Runtime", Order = 2, DisplayNameKey = "MaxTimeoutCount", DescriptionKey = "MaxTimeoutCount")]
-    public override int MaxTimeoutCount { get; set; } = 3;
-
-    [ConfigGroup("Runtime", Order = 3, DisplayNameKey = "WatchdogTimeout", DescriptionKey = "WatchdogTimeout")]
-    public override TimeSpan WatchdogTimeout { get; set; } = TimeSpan.FromMinutes(10);
-
-    [ConfigGroup("Runtime", Order = 4, DisplayNameKey = "MinLogLevel", DescriptionKey = "MinLogLevel")]
-    public override LogLevel MinimumLogLevel { get; set; } = LogLevel.Trace;
-
-    [ConfigGroup("AI", Order = 0, DisplayNameKey = "AIClientType", DescriptionKey = "AIClientType")]
-    public override string AIClientType { get; set; } = "OllamaClient";
-
-    [ConfigGroup("AI", Order = 1, DisplayNameKey = "AIConfig", DescriptionKey = "AIConfigDescription")]
-    public override Dictionary<string, object> AIConfig { get; set; } = new Dictionary<string, object>
-    {
-        ["endpoint"] = "http://localhost:11434",
-        ["model"] = "qwen3.5:cloud",
-        ["temperature"] = 0.7,
-        ["maxTokens"] = 4096
-    };
-
-    [ConfigGroup("Web", Order = 2, DisplayNameKey = "WebPort", DescriptionKey = "WebPort")]
-    public int WebPort { get; set; } = 8080;
-
-    [ConfigGroup("Web", Order = 4, DisplayNameKey = "WebSkin", DescriptionKey = "WebSkin")]
-    public string WebSkin { get; set; } = null!;
-
-    [ConfigGroup("User", Order = 2, DisplayNameKey = "UserNickname", DescriptionKey = "UserNickname")]
-    public override string UserNickname { get; set; } = "User";
+    public override string ConfigType { get; set; } = "Fast";
 
     private string GetConfigKey() => "config";
 

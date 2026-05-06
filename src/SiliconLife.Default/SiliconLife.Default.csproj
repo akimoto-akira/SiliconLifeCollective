@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SiliconLife.Core\SiliconLife.Core.csproj" />
     <ProjectReference Include="..\SiliconLife.Common\SiliconLife.Common.csproj" />
+    <ProjectReference Include="..\SiliconLife.App\SiliconLife.App.csproj" />
   </ItemGroup>
 
   <ItemGroup>

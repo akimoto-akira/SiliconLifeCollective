@@ -3,8 +3,9 @@
 
 using System.Text;
 using SiliconLife.Collective;
-using SiliconLife.Default.Help;
+using SiliconLife.Help;
 using SiliconLife.Common.Localization;
+using SiliconLife.Default.Config;
 
 namespace SiliconLife.Default;
 
@@ -59,7 +60,7 @@ public class HelpTool : ITool
         var query = parameters.TryGetValue("query", out var queryObj) ? queryObj?.ToString() ?? "" : "";
 
         // Get current language help localization
-        var currentLang = ((DefaultConfigData)Config.Instance.Data).Language;
+        var currentLang = ((DefaultConfigData)SiliconLife.Collective.Config.Instance.Data).Language;
         var helpLocalization = HelpLocalizationFactory.Create(currentLang);
 
         if (action == "list")
@@ -93,7 +94,7 @@ public class HelpTool : ITool
     /// </summary>
     private string ListAllTopics()
     {
-        var currentLang = ((DefaultConfigData)Config.Instance.Data).Language;
+        var currentLang = ((DefaultConfigData)SiliconLife.Collective.Config.Instance.Data).Language;
         var helpLocalization = HelpLocalizationFactory.Create(currentLang);
         
         var sb = new StringBuilder();
@@ -121,7 +122,7 @@ public class HelpTool : ITool
     /// </summary>
     private string SearchTopics(string query)
     {
-        var currentLang = ((DefaultConfigData)Config.Instance.Data).Language;
+        var currentLang = ((DefaultConfigData)SiliconLife.Collective.Config.Instance.Data).Language;
         var helpLocalization = HelpLocalizationFactory.Create(currentLang);
         var results = HelpTopics.Search(query, helpLocalization);
 
