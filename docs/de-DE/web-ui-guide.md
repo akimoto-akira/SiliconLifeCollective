@@ -132,10 +132,12 @@ KI-Backend konfigurieren:
 
 ### Lokalisierung
 
-Zwischen 21 Sprachvarianten wechseln:
+Zwischen 29 Sprachvarianten wechseln:
 - Chinesisch (6): Simplified, Traditional, Singapore, Macau, Taiwan, Malaysia
 - Englisch (10): US, UK, Canadian, Australian, Indian, Singapore, South African, Irish, New Zealand, Malaysia
 - Spanisch (2): Spanien, Mexiko
+- Deutsch (5): Deutschland, Österreich, Schweiz, Luxemburg, Liechtenstein
+- Französisch (3): Frankreich, Kanada, Schweiz
 - Japanisch, Koreanisch, Tschechisch
 
 ---

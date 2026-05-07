@@ -20,7 +20,7 @@
 - ✅ Fáze 1: Přenos základní struktury projektu a konfiguračního systému
 - ✅ Fáze 2: Přenos Web UI a controllerů
 - ✅ Fáze 3: Optimalizace úložného systému (paměťové úložiště SpeedyPack + asynchronní perzistence)
-- ✅ Fáze 3.5: SpeedyPack správcovský nástroj (SiliconLife.Speedy.Manager WPF aplikace)
+- ✅ Fáze 3.5: SpeedyPack správcovský nástroj (SiliconLife.Speedy.Manager Windows Forms aplikace)
 - ✅ Fáze 3.6: Systém pluginů (rozhraní IPlugin, bezpečnostní sandbox, izolace AssemblyLoadContext)
 - 🚧 Fáze 4: Vývoj systémové lišty a formulářové aplikace
 - 📋 Fáze 5: Optimalizace výkonu (fond připojení, fond objektů, lock-free souběžnost)

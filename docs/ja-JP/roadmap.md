@@ -20,9 +20,7 @@
 - ✅ フェーズ 1：基本プロジェクト構造と設定システムの移植
 - ✅ フェーズ 2：Web UI とコントローラーの移植
 - ✅ フェーズ 3：ストレージシステムの最適化（SpeedyPack メモリストレージ + 非同期永続化）
-- ✅ フェーズ 3.5：SpeedyPack 管理ツール（SiliconLife.Speedy.Manager WPF アプリ）
-- ✅ フェーズ 3.6：プラグインシステム（IPlugin インターフェース、セキュリティサンドボックス、AssemblyLoadContext 分離）
-- 🚧 フェーズ 4：システムトレイとフォームアプリケーションの開発
+- ✅ フェーズ 3.5：SpeedyPack 管理ツール（SiliconLife.Speedy.Manager Windows Forms アプリ）
 - 📋 フェーズ 5：パフォーマンスの最適化（コネクションプール、オブジェクトプール、ロックフリー並行性）
 - 📋 フェーズ 6：Kestrel Web サーバーへの置き換え
 - 📋 フェーズ 7：MessagePack バイナリシリアライゼーション

@@ -4,7 +4,7 @@
 
 **版本：v0.1.0-alpha** | **矽基生命群** — 一個基於 .NET 9 的多智能體協作平台，AI 智能體被稱為**矽基生命體**，通過 Roslyn 動態編譯實現自我進化。
 
-[English](../README.md) | [中文](../zh-CN/README.md) | **繁體中文** | [Deutsch](../de-DE/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md)
+[English](../README.md) | [中文](../zh-CN/README.md) | **繁體中文** | [Deutsch](../de-DE/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md) | [Italiano](../it-IT/README.md)
 
 ## 🌟 核心特性
 
@@ -137,63 +137,84 @@ SiliconLifeCollective.sln
 │   │   ├── WebView/                       # WebView 瀏覽器介面
 │   │   └── ServiceLocator.cs              # 全域服務定位器
 │   │
-│   └── SiliconLife.Default/               # 預設實現 + 應用程式入口
-│       ├── Program.cs                     # 入口點（裝配所有元件）
-│       ├── AI/                            # Ollama 客户端、百煉客戶端
-│       ├── Calendar/                      # 32 種日曆實現
-│       ├── Config/                        # 預設配置資料
-│       ├── Executors/                     # 預設執行器實現
-│       ├── Help/                          # 幫助文件系統
-│       ├── IM/                            # WebUI 提供者
-│       ├── Knowledge/                     # 知識網路實現
-│       ├── Localization/                  # 21 種語言本地化
-│       ├── Logging/                       # 日誌提供者實現
-│       ├── Plugins/                       # 插件系統實現
-│       ├── Project/                       # 專案系統實現
-│       ├── Runtime/                       # 測試時鐘物件
-│       ├── Security/                      # 預設權限回呼
-│       ├── SiliconBeing/                  # 預設矽基生命體實現
-│       ├── Storage/                       # 檔案系統儲存實現
-│       ├── Tools/                         # 24 個內建工具實現（含熱重載工具）
-│       ├── WebView/                       # Playwright WebView 實現
-│       └── Web/                           # Web UI 實現
-│           ├── Controllers/               # 20+ 個控制器
-│           ├── Models/                    # 檢視模型
-│           ├── Views/                     # HTML 檢視
-│           └── Skins/                     # 4 種皮膚主題
+│   ├── SiliconLife.Common/                # 共享實現（兩個版本共用）
+│   │   ├── AI/                            # AI 客戶端與工廠（Ollama、DashScope、VolcengineArk）
+│   │   ├── Calendar/                      # 32 種日曆實現
+│   │   ├── Localization/                  # 本地化基類與 29 種語言/地區變體實現
+│   │   ├── Resources/                     # 共享資源文件
+│   │   ├── Security/                      # 權限管理器
+│   │   ├── SiliconBeing/                  # 預設矽基生命體實現
+│   │   ├── Tools/                         # 23 個通用工具實現（含熱重載工具）
+│   │   ├── Web/                           # Web 基礎設施
+│   │   └── WebView/                       # Playwright WebView 實現
+│   │
+│   ├── SiliconLife.App/                   # 應用層（Web UI + 幫助文檔，Default 與 Fast 共享）
+│   │   ├── Config/                        # 應用配置
+│   │   ├── Data/                          # 數據目錄
+│   │   ├── Help/                          # 幫助文檔本地化（多語言）
+│   │   └── Web/                           # Web UI 實現
+│   │       ├── Component/                 # UI 組件庫（30+ 組件）
+│   │       ├── Controllers/               # 22 個控制器
+│   │       ├── Models/                    # 視圖模型
+│   │       ├── Views/                     # HTML 視圖
+│   │       └── Skins/                     # 7 種皮膚主題
+│   │
+│   ├── SiliconLife.Default/               # 預設實現 + 應用程式入口（控制台版）
+│   │   ├── Program.cs                     # 入口點（裝配所有組件）
+│   │   ├── Config/                        # 默認配置數據
+│   │   ├── IM/                            # WebUI 提供者
+│   │   ├── Knowledge/                     # 知識網絡實現
+│   │   ├── Logging/                       # 日誌提供者實現
+│   │   ├── Project/                       # 項目系統實現
+│   │   ├── Security/                      # 默認權限回調
+│   │   ├── Storage/                       # 文件系統存儲實現
+│   │   └── Tools/                         # 版本特有的工具實現（HelpTool）
+│   │
+│   ├── SiliconLife.Fast/                  # 高性能實現 + 應用程式入口（窗體版）
+│   │   ├── Program.cs                     # 入口點（窗體應用程序）
+│   │   ├── Config/                        # 配置數據（與 Default 共享）
+│   │   ├── IM/                            # WebUI 提供者
+│   │   ├── Knowledge/                     # 知識網絡實現（內存優化）
+│   │   ├── Logging/                       # 高性能日誌提供者
+│   │   ├── Project/                       # 項目系統實現
+│   │   ├── Security/                      # 優化權限回調
+│   │   ├── Storage/                       # SpeedyPack 存儲適配器
+│   │   ├── Tools/                         # 版本特有的工具實現（HelpTool）
+│   │   └── Tray/                          # 系統托盤（29 種語言變體本地化）
+│   │
+│   ├── SiliconLife.Speedy/                # SpeedyPack 高性能存儲引擎
+│   │   ├── SpeedyPack.cs                  # 核心類（內存目錄映射 + 緩存 + 異步寫入）
+│   │   ├── SpeedyPackOptions.cs           # 配置選項（緩存 TTL、最大條目數等）
+│   │   ├── IPackTransaction.cs            # 事務接口
+│   │   ├── SpkFileInfo.cs                 # 文件信息
+│   │   └── Internal/                      # 內部實現
+│   │       ├── DirectoryMap.cs            # 內存目錄映射
+│   │       ├── EntryCache.cs              # 條目緩存
+│   │       ├── FreeList.cs                # 空閒空間管理
+│   │       ├── PackFileReader.cs          # 包文件讀取器
+│   │       ├── PackFileWriter.cs          # 包文件寫入器
+│   │       ├── WriteQueue.cs              # 異步寫入隊列
+│   │       ├── WriteOperation.cs          # 寫入操作
+│   │       ├── SpeedyTransaction.cs       # 事務實現
+│   │       ├── SpkHeader.cs               # 包文件頭
+│   │       └── PathNormalizer.cs          # 路徑規範化
+│   │
+│   └── SiliconLife.Speedy.Manager/        # SpeedyPack 管理工具（Windows Forms）
+│       ├── MainForm.cs                    # 主窗體
+│       ├── Program.cs                     # 入口點
+│       └── slc.ico                        # 應用圖標
 │
-│   └── SiliconLife.Fast/                  # 高效能實現 + 應用程式入口
-│       ├── Program.cs                     # 入口點（裝配所有元件）
-│       ├── AI/                            # AI 客戶端實現
-│       ├── Executors/                     # 高效能執行器實現
-│       ├── Plugins/                       # 插件系統實現
-│       ├── SiliconBeing/                  # 高效能矽基生命體實現
-│       ├── Storage/                       # SpeedyPack 儲存實現
-│       ├── Tools/                         # 高效能工具實現
-│       └── Web/                           # Web UI 實現
-│           ├── Controllers/               # 20+ 個控制器
-│           ├── Skins/                     # 7 種皮膚主題
-│           └── ...
-│
-│   └── SiliconLife.Speedy/                # SpeedyPack 高效能儲存引擎
-│       ├── SpeedyPack.cs                  # 核心儲存引擎
-│       ├── SpeedyStorage.cs               # IStorage/ITimeStorage 實現
-│       ├── SpeedyPackRegistry.cs          # 儲存包註冊表
-│       └── SpeedyPackAutoCompactor.cs     # 自動壓縮器
-│
-│   └── SiliconLife.Speedy.Manager/        # SpeedyPack 管理工具（WPF）
-│       └── ...
-│
-├── docs/                                  # 多語言文件
-│   ├── zh-CN/                             # 簡體中文文件
-│   ├── zh-HK/                             # 繁體中文文件
-│   ├── en/                                # 英文文件
-│   └── ...                                # 其他語言文件
-│
-└── 總文件/                                 # 需求文件和架構文件
-    ├── 需求文件.md
-    ├── 架構大綱.md
-    └── 實現順序.md
+└── docs/                                  # 多語言文檔
+    ├── en/                                # 英語
+    ├── zh-CN/                             # 簡體中文
+    ├── zh-HK/                             # 繁體中文
+    ├── de-DE/                             # 德語
+    ├── ja-JP/                             # 日語
+    ├── ko-KR/                             # 韓語
+    ├── es-ES/                             # 西班牙語
+    ├── fr-FR/                             # 法語
+    ├── cs-CZ/                             # 捷克語
+    └── ...                                # 其他語言文檔
 ```
 
 ## 🏗️ 架構概覽

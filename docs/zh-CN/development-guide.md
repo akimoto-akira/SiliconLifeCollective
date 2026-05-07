@@ -18,7 +18,7 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # 默认实现、入口点（验证架构可行性）
 │   ├── SiliconLife.Fast/            # 高性能实现、入口点（主推生产版本）
 │   ├── SiliconLife.Speedy/          # SpeedyPack 高性能存储引擎
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理工具（WPF）
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理工具（Windows Forms）
 └── docs/                            # 多语言文档
 ```
 
@@ -75,7 +75,7 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### 添加新工具
 
-1. 在 `src/SiliconLife.Default/Tools/` 中创建新类：
+1. 在 `src/SiliconLife.Common/Tools/` 中创建新类（两个版本共享的工具）或 `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/`（版本特有工具）：
 
 ```csharp
 public class MyCustomTool : ITool
@@ -111,7 +111,7 @@ public class AdminTool : ITool { ... }
 
 ### 添加新 AI 客户端
 
-1. 在 `src/SiliconLife.Default/AI/` 中实现 `IAIClient`：
+1. 在 `src/SiliconLife.Common/AI/` 中实现 `IAIClient`：
 
 ```csharp
 public class MyAIClient : IAIClient
@@ -158,7 +158,7 @@ public class MyAIClientFactory : IAIClientFactory
 
 ### 添加新存储后端
 
-1. 在 `src/SiliconLife.Default/Storage/` 中实现 `IStorage` 和 `ITimeStorage`：
+1. 在 `src/SiliconLife.Default/Storage/`（文件系统实现）或 `src/SiliconLife.Fast/Storage/`（SpeedyPack 适配器）中实现 `IStorage` 和 `ITimeStorage`：
 
 ```csharp
 public class DatabaseStorage : IStorage, ITimeStorage
@@ -226,7 +226,7 @@ public class MyPluginTool : ITool
 
 ### 添加新皮肤
 
-1. 在 `src/SiliconLife.Default/Web/Skins/` 中实现 `ISkin`：
+1. 在 `src/SiliconLife.App/Web/Skins/` 中实现 `ISkin`：
 
 ```csharp
 public class MyCustomSkin : ISkin
@@ -262,24 +262,35 @@ public class MyCustomSkin : ISkin
 ### 代码组织
 
 ```
-SiliconLife.Default/
-├── AI/                    # AI 客户端实现
-├── Calendar/              # 日历实现
-├── Config/                # 默认配置数据
-├── Executors/             # 执行器实现
-├── IM/                    # 即时通讯提供者实现
-├── Localization/          # 本地化实现
-├── Logging/               # 日志提供者实现
-├── Runtime/               # 运行时组件
-├── Security/              # 安全实现
+SiliconLife.Common/
+├── AI/                    # AI 客户端与工厂实现
+├── Calendar/              # 32 种日历实现
+├── Localization/          # 本地化基类与 29 种语言实现
+├── Security/              # 权限管理器
 ├── SiliconBeing/          # 默认硅基生命体实现
-├── Storage/               # 存储实现
-├── Tools/                 # 内置工具
+├── Tools/                 # 共享的内置工具
+├── Web/                   # Web 基础设施
+└── WebView/               # Playwright WebView 实现
+
+SiliconLife.App/          # Default 与 Fast 共享的应用层
+├── Config/                # 应用配置
+├── Help/                  # 帮助文档本地化
 └── Web/                   # Web UI 实现
+    ├── Component/         # UI 组件库
     ├── Controllers/       # 路由控制器
     ├── Models/            # 视图模型
     ├── Views/             # HTML 视图
     └── Skins/             # 皮肤主题
+
+SiliconLife.Default/      # 版本特有目录
+├── Config/                # 默认配置数据
+├── IM/                    # WebUI 提供者
+├── Knowledge/             # 知识网络实现
+├── Logging/               # 日志提供者实现
+├── Project/               # 项目系统实现
+├── Security/              # 默认权限回调
+├── Storage/               # 文件系统存储实现
+└── Tools/                 # 版本特有的工具（HelpTool）
 ```
 
 ### 文档

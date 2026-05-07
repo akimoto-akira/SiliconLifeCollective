@@ -399,7 +399,7 @@
 - `TokenUsageSummary` —— 聚合统计
 - `TokenUsageQuery` —— 用于过滤记录的查询参数
 - 通过 `ITimeStorage` 持久化以进行时间序列查询
-- 可通过 Web UI（AuditController）和 `TokenAuditTool`（仅主理人）访问
+- 可通过 Web UI（UsageController）和 `TokenAuditTool`（仅主理人）访问
 
 ---
 
@@ -458,11 +458,14 @@ Web UI 具有**可插拔的皮肤系统**，允许完整的 UI 定制，无需�
   - 通过 `CssBuilder` 生成主题 CSS
   - `SkinPreviewInfo` —— 初始化页面皮肤选择器的调色板和图标
 
-- **内置皮肤** —— 4 种生产就绪的皮肤：
+- **内置皮肤** —— 7 种生产就绪的皮肤：
   - **Admin** —— 专业、数据聚焦的系统管理界面
   - **Chat** —— 对话式、以消息为中心的设计，用于 AI 交互
   - **Creative** —— 艺术性、视觉丰富的创意工作流程布局
   - **Dev** —— 以开发者为中心、以代码为中心的界面，带语法高亮
+  - **HighContrast** —— 高对比度无障碍主题
+  - **Light** —— 清爽的浅色主题
+  - **Minimal** —— 极简主义主题
 
 - **皮肤发现** —— `SkinManager` 通过反射自动发现和注册所有 `ISkin` 实现
 
@@ -476,12 +479,11 @@ Web UI 完全避免模板文件，在 C# 中生成所有标记：
 
 ### 控制器系统
 
-Web UI 遵循**类 MVC 模式**，20+ 个控制器处理不同方面：
+Web UI 遵循**类 MVC 模式**，22 个控制器处理不同方面：
 
 | 控制器 | 用途 |
 |------------|---------|
 | About | 关于页面和项目信息 |
-| Audit | Token 使用审计仪表板，带趋势图和导出 |
 | Being | 硅基生命体管理和状态 |
 | Chat | 带 SSE 的实时聊天界面 |
 | ChatHistory | 聊天历史查看，支持会话列表和消息详情 |
@@ -498,8 +500,10 @@ Web UI 遵循**类 MVC 模式**，20+ 个控制器处理不同方面：
 | Permission | 权限管理 |
 | PermissionRequest | 权限请求队列 |
 | Project | 项目管理，包含工作笔记和任务系统 |
+| System | 系统管理与运行时监控 |
 | Task | 任务系统界面 |
 | Timer | 定时器系统管理，包含执行历史 |
+| Usage | Token 使用审计仪表盘，带趋势图和导出 |
 | WorkNote | 工作笔记管理，支持搜索和目录生成 |
 
 ### 实时更新
@@ -510,10 +514,12 @@ Web UI 遵循**类 MVC 模式**，20+ 个控制器处理不同方面：
 
 ### 本地化
 
-系统支持 **21 种语言变体**的全面本地化：
-- **中文（6 种）**：zh-CN（简体）、zh-HK（繁体）、zh-SG（新加坡）、zh-MO（澳门）、zh-TW（台湾）、zhMY（马来西亚）
+系统支持 **29 种语言变体**的全面本地化：
+- **中文（6 种）**：zh-CN（简体）、zh-HK（繁体）、zh-SG（新加坡）、zh-MO（澳门）、zh-TW（台湾）、zh-MY（马来西亚）
 - **英文（10 种）**：en-US、en-GB、en-CA、en-AU、en-IN、en-SG、en-ZA、en-IE、en-NZ、en-MY
 - **西班牙语（2 种）**：es-ES、es-MX
+- **德语（5 种）**：de-DE、de-AT、de-CH、de-LU、de-LI
+- **法语（3 种）**：fr-FR、fr-CA、fr-CH
 - **其他（3 种）**：ja-JP（日语）、ko-KR（韩语）、cs-CZ（捷克语）
 
 通过 `DefaultConfigData.Language` 选择活动语言环境，并通过 `LocalizationManager` 解析。

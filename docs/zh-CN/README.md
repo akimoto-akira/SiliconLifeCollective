@@ -4,7 +4,7 @@
 
 **版本：v0.1.0-alpha** | **硅基生命群** — 一个基于 .NET 9 的多智能体协作平台，AI 智能体被称为**硅基生命体**，通过 Roslyn 动态编译实现自我进化。
 
-[English](../README.md) | [Deutsch](../de-DE/README.md) | **中文** | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md)
+[English](../README.md) | [Deutsch](../de-DE/README.md) | **中文** | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md) | [Italiano](../it-IT/README.md)
 
 ## 🌟 核心特性
 
@@ -150,77 +150,68 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # 全局服务定位器
 │   │
 │   ├── SiliconLife.Common/                # 共享实现（两个版本共用）
-│   │   ├── AI/                            # AI 客户端工厂（Ollama、DashScope、VolcengineArk）
+│   │   ├── AI/                            # AI 客户端与工厂（Ollama、DashScope、VolcengineArk）
 │   │   ├── Calendar/                      # 32 种日历实现
-│   │   ├── Localization/                  # 本地化基类
+│   │   ├── Localization/                  # 本地化基类与 29 种语言/地区变体实现
+│   │   ├── Resources/                     # 共享资源文件
 │   │   ├── Security/                      # 权限管理器
 │   │   ├── SiliconBeing/                  # 默认硅基生命体实现
-│   │   ├── Tools/                         # 通用工具实现（含热重载工具）
-│   │   └── WebView/                       # WebView 接口
+│   │   ├── Tools/                         # 23 个通用工具实现（含热重载工具）
+│   │   ├── Web/                           # Web 基础设施
+│   │   └── WebView/                       # Playwright WebView 实现
+│   │
+│   ├── SiliconLife.App/                   # 应用层（Web UI + 帮助文档，Default 与 Fast 共享）
+│   │   ├── Config/                        # 应用配置
+│   │   ├── Data/                          # 数据目录
+│   │   ├── Help/                          # 帮助文档本地化（多语言）
+│   │   └── Web/                           # Web UI 实现
+│   │       ├── Component/                 # UI 组件库（30+ 组件）
+│   │       ├── Controllers/               # 22 个控制器
+│   │       ├── Models/                    # 视图模型
+│   │       ├── Views/                     # HTML 视图
+│   │       └── Skins/                     # 7 种皮肤主题
 │   │
 │   ├── SiliconLife.Default/               # 默认实现 + 应用程序入口（控制台版）
 │   │   ├── Program.cs                     # 入口点（装配所有组件）
 │   │   ├── Config/                        # 默认配置数据
-│   │   ├── Executors/                     # 默认执行器实现
-│   │   ├── Help/                          # 帮助文档系统
 │   │   ├── IM/                            # WebUI 提供者
 │   │   ├── Knowledge/                     # 知识网络实现
-│   │   ├── Localization/                  # 21 种语言本地化
 │   │   ├── Logging/                       # 日志提供者实现
 │   │   ├── Project/                       # 项目系统实现
-│   │   ├── Runtime/                       # 测试时钟对象
 │   │   ├── Security/                      # 默认权限回调
-│   │   ├── SiliconBeing/                  # 默认硅基生命体实现
 │   │   ├── Storage/                       # 文件系统存储实现
-│   │   ├── Tools/                         # 内置工具实现
-│   │   ├── WebView/                       # Playwright WebView 实现
-│   │   └── Web/                           # Web UI 实现
-│   │       ├── Controllers/               # 20+ 个控制器
-│   │       ├── Models/                    # 视图模型
-│   │       ├── Views/                     # HTML 视图
-│   │       └── Skins/                     # 4 种皮肤主题
+│   │   └── Tools/                         # 版本特有的工具实现（HelpTool）
 │   │
-│   └── SiliconLife.Fast/                  # 高性能实现 + 应用程序入口（窗体版）
-│       ├── Program.cs                     # 入口点（窗体应用程序）
-│       ├── Config/                        # 配置数据（与 Default 共享）
-│       ├── Executors/                     # 优化执行器实现
-│       ├── Help/                          # 帮助文档系统
-│       ├── IM/                            # WebUI 提供者
-│       ├── Knowledge/                     # 知识网络实现（内存优化）
-│       ├── Localization/                  # 21 种语言本地化
-│       ├── Logging/                       # 高性能日志提供者
-│       ├── Project/                       # 项目系统实现
-│       ├── Security/                      # 优化权限回调
-│       ├── SiliconBeing/                  # 高性能硅基生命体实现
-│       ├── Storage/                       # SpeedyPack 存储适配器
-│       ├── Tools/                         # 优化内置工具实现
-│       ├── Tray/                          # 系统托盘（9 种语言本地化）
-│       ├── WebView/                       # Playwright WebView 实现
-│       └── Web/                           # 高性能 Web UI 实现
-│           ├── Component/                 # UI 组件库（30+ 组件）
-│           ├── Controllers/               # 20+ 个控制器
-│           ├── Models/                    # 视图模型
-│           ├── Views/                     # HTML 视图
-│           └── Skins/                     # 7 种皮肤主题
-│
+│   ├── SiliconLife.Fast/                  # 高性能实现 + 应用程序入口（窗体版）
+│   │   ├── Program.cs                     # 入口点（窗体应用程序）
+│   │   ├── Config/                        # 配置数据（与 Default 共享）
+│   │   ├── IM/                            # WebUI 提供者
+│   │   ├── Knowledge/                     # 知识网络实现（内存优化）
+│   │   ├── Logging/                       # 高性能日志提供者
+│   │   ├── Project/                       # 项目系统实现
+│   │   ├── Security/                      # 优化权限回调
+│   │   ├── Storage/                       # SpeedyPack 存储适配器
+│   │   ├── Tools/                         # 版本特有的工具实现（HelpTool）
+│   │   └── Tray/                          # 系统托盘（29 种语言变体本地化）
+│   │
 │   ├── SiliconLife.Speedy/                # SpeedyPack 高性能存储引擎
 │   │   ├── SpeedyPack.cs                  # 核心类（内存目录映射 + 缓存 + 异步写入）
 │   │   ├── SpeedyPackOptions.cs           # 配置选项（缓存 TTL、最大条目数等）
 │   │   ├── IPackTransaction.cs            # 事务接口
 │   │   ├── SpkFileInfo.cs                 # 文件信息
 │   │   └── Internal/                      # 内部实现
-│       │   ├── DirectoryMap.cs            # 内存目录映射
-│       │   ├── EntryCache.cs              # 条目缓存
-│       │   ├── FreeList.cs                # 空闲空间管理
-│       │   ├── PackFileReader.cs          # 包文件读取器
-│       │   ├── PackFileWriter.cs          # 包文件写入器
-│       │   ├── WriteQueue.cs              # 异步写入队列
-│       │   ├── WriteOperation.cs          # 写入操作
-│       │   ├── SpeedyTransaction.cs       # 事务实现
-│       │   ├── SpkHeader.cs              # 包文件头
-│       │   └── PathNormalizer.cs          # 路径规范化
+│   │       ├── DirectoryMap.cs            # 内存目录映射
+│   │       ├── EntryCache.cs              # 条目缓存
+│   │       ├── FreeList.cs                # 空闲空间管理
+│   │       ├── PackFileReader.cs          # 包文件读取器
+│   │       ├── PackFileWriter.cs          # 包文件写入器
+│   │       ├── WriteQueue.cs              # 异步写入队列
+│   │       ├── WriteOperation.cs          # 写入操作
+│   │       ├── SpeedyTransaction.cs       # 事务实现
+│   │       ├── SpkHeader.cs               # 包文件头
+│   │       └── PathNormalizer.cs          # 路径规范化
 │   │
-│   └── SiliconLife.Speedy.Manager/        # SpeedyPack 管理工具（WPF）
+│   └── SiliconLife.Speedy.Manager/        # SpeedyPack 管理工具（Windows Forms）
 │       ├── MainForm.cs                    # 主窗体
 │       ├── Program.cs                     # 入口点
 │       └── slc.ico                        # 应用图标

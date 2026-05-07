@@ -132,10 +132,11 @@ Configurar backends de IA:
 
 ### Localización
 
-Cambiar entre 21 variantes de idioma:
+Cambiar entre 29 variantes de idioma:
 - Chino (6 variantes): Simplificado, Tradicional, Singapur, Macao, Taiwán, Malasia
 - Inglés (10 variantes): EE.UU., Reino Unido, Canadá, Australia, India, Singapur, Sudáfrica, Irlanda, Nueva Zelanda, Malasia
-- Español (2 variantes): España, México
+- Alemán (5 variantes): Alemania, Austria, Suiza, Luxemburgo, Liechtenstein
+- Francés (3 variantes): Francia, Canadá, Suiza
 - Japonés, Coreano, Checo
 
 ---

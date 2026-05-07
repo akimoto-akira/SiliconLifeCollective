@@ -132,10 +132,11 @@ Configure AI backends:
 
 ### Localization
 
-Switch between 21 language variants:
+Switch between 29 language variants:
 - Chinese (6): Simplified, Traditional, Singapore, Macau, Taiwan, Malaysia
 - English (10): US, UK, Canadian, Australian, Indian, Singapore, South African, Irish, New Zealand, Malaysian
-- Spanish (2): Spain, Mexico
+- German (5): Germany, Austria, Switzerland, Luxembourg, Liechtenstein
+- French (3): France, Canada, Switzerland
 - Japanese, Korean, Czech
 
 ---

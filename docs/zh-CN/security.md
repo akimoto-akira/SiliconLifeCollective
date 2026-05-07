@@ -302,7 +302,7 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 - **每次请求记录** —— 每次 AI 调用记录生命体 ID、模型、提示词 token、补全 token 和时间戳。
 - **异常检测** —— 异常的 token 消耗模式可能表明提示词注入或资源滥用。
 - **仅主理人访问** —— `TokenAuditTool`（标记为 `[SiliconManagerOnly]`）允许主理人查询和汇总 token 使用。
-- **Web 仪表板** —— `AuditController` 提供基于浏览器的仪表板，带趋势图和数据导出。
+- **Web 仪表板** —— `UsageController` 提供基于浏览器的仪表板，带趋势图和数据导出。
 - **持久化存储** —— 记录通过 `ITimeStorage` 存储，用于时间序列查询和长期分析。
 
 ---

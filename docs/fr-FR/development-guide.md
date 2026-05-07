@@ -18,7 +18,7 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # Implémentation par défaut, point d'entrée (vérification de faisabilité)
 │   ├── SiliconLife.Fast/            # Implémentation haute performance, point d'entrée (version de production)
 │   ├── SiliconLife.Speedy/          # Moteur de stockage haute performance SpeedyPack
-│   └── SiliconLife.Speedy.Manager/  # Outil de gestion SpeedyPack (WPF)
+│   └── SiliconLife.Speedy.Manager/  # Outil de gestion SpeedyPack (Windows Forms)
 └── docs/                            # Documentation multilingue
 ```
 
@@ -74,7 +74,7 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### Ajouter un nouvel outil
 
-1. Créer une nouvelle classe dans `src/SiliconLife.Default/Tools/` :
+1. Créer une nouvelle classe dans `src/SiliconLife.Common/Tools/` (outils partagés entre les deux versions) ou `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (outils spécifiques à une version) :
 
 ```csharp
 public class MyCustomTool : ITool
@@ -110,7 +110,7 @@ public class AdminTool : ITool { ... }
 
 ### Ajouter un nouveau client IA
 
-1. Implémenter `IAIClient` dans `src/SiliconLife.Default/AI/` :
+1. Implémenter `IAIClient` dans `src/SiliconLife.Common/AI/` :
 
 ```csharp
 public class MyAIClient : IAIClient
@@ -157,7 +157,7 @@ public class MyAIClientFactory : IAIClientFactory
 
 ### Ajouter un nouveau backend de stockage
 
-1. Implémenter `IStorage` et `ITimeStorage` dans `src/SiliconLife.Default/Storage/` :
+1. Implémenter `IStorage` et `ITimeStorage` dans `src/SiliconLife.Default/Storage/` (implémentation système de fichiers) ou `src/SiliconLife.Fast/Storage/` (adaptateur SpeedyPack) :
 
 ```csharp
 public class DatabaseStorage : IStorage, ITimeStorage
@@ -225,7 +225,7 @@ public class MyPluginTool : ITool
 
 ### Ajouter un nouveau skin
 
-1. Implémenter `ISkin` dans `src/SiliconLife.Default/Web/Skins/` :
+1. Implémenter `ISkin` dans `src/SiliconLife.App/Web/Skins/` :
 
 ```csharp
 public class MyCustomSkin : ISkin
@@ -261,24 +261,35 @@ public class MyCustomSkin : ISkin
 ### Organisation du code
 
 ```
-SiliconLife.Default/
-├── AI/                    # Implémentations des clients IA
-├── Calendar/              # Implémentations des calendriers
-├── Config/                # Données de configuration par défaut
-├── Executors/             # Implémentations des exécuteurs
-├── IM/                    # Implémentations des fournisseurs de messagerie
-├── Localization/          # Implémentations de localisation
-├── Logging/               # Implémentations des fournisseurs de journaux
-├── Runtime/               # Composants d'exécution
-├── Security/              # Implémentations de sécurité
+SiliconLife.Common/
+├── AI/                    # Implémentations des clients IA et fabriques
+├── Calendar/              # 32 implémentations de calendriers
+├── Localization/          # Classe de base de localisation et 29 implémentations linguistiques
+├── Security/              # Gestionnaire de permissions
 ├── SiliconBeing/          # Implémentation du Silicon Being par défaut
-├── Storage/               # Implémentations de stockage
-├── Tools/                 # Outils intégrés
+├── Tools/                 # Outils intégrés partagés
+├── Web/                   # Infrastructure Web
+└── WebView/               # Implémentation Playwright WebView
+
+SiliconLife.App/          # Couche applicative partagée entre Default et Fast
+├── Config/                # Configuration applicative
+├── Help/                  # Localisation de la documentation d'aide
 └── Web/                   # Implémentation de l'interface Web
+    ├── Component/         # Bibliothèque de composants UI
     ├── Controllers/       # Contrôleurs de routage
     ├── Models/            # Modèles de vue
     ├── Views/             # Vues HTML
     └── Skins/             # Thèmes de skins
+
+SiliconLife.Default/      # Répertoires spécifiques à la version
+├── Config/                # Données de configuration par défaut
+├── IM/                    # Fournisseur WebUI
+├── Knowledge/             # Implémentation du réseau de connaissances
+├── Logging/               # Implémentations des fournisseurs de journaux
+├── Project/               # Implémentation du système de projets
+├── Security/              # Rappels de permissions par défaut
+├── Storage/               # Implémentation du stockage en système de fichiers
+└── Tools/                 # Outils spécifiques à la version (HelpTool)
 ```
 
 ### Documentation

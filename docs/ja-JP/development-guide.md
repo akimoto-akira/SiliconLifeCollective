@@ -18,7 +18,7 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # デフォルト実装、エントリーポイント（アーキテクチャ実現可能性検証）
 │   ├── SiliconLife.Fast/            # 高性能実装、エントリーポイント（主力本番バージョン）
 │   ├── SiliconLife.Speedy/          # SpeedyPack 高性能ストレージエンジン
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理ツール（WPF）
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理ツール（Windows Forms）
 └── docs/                            # 多言語ドキュメント
 ```
 
@@ -75,7 +75,7 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### 新ツールの追加
 
-1. `src/SiliconLife.Default/Tools/` に新クラスを作成：
+1. `src/SiliconLife.Common/Tools/`（2つのバージョンで共有するツール）または `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/`（バージョン固有のツール）に新クラスを作成：
 
 ```csharp
 public class MyCustomTool : ITool
@@ -111,7 +111,7 @@ public class AdminTool : ITool { ... }
 
 ### 新 AI クライアントの追加
 
-1. `src/SiliconLife.Default/AI/` で `IAIClient` を実装：
+1. `src/SiliconLife.Common/AI/` で `IAIClient` を実装：
 
 ```csharp
 public class MyAIClient : IAIClient
@@ -158,7 +158,7 @@ public class MyAIClientFactory : IAIClientFactory
 
 ### 新ストレージバックエンドの追加
 
-1. `src/SiliconLife.Default/Storage/` で `IStorage` と `ITimeStorage` を実装：
+1. `src/SiliconLife.Default/Storage/`（ファイルシステム実装）または `src/SiliconLife.Fast/Storage/`（SpeedyPack アダプター）で `IStorage` と `ITimeStorage` を実装：
 
 ```csharp
 public class DatabaseStorage : IStorage, ITimeStorage
@@ -226,7 +226,7 @@ public class MyPluginTool : ITool
 
 ### 新スキンの追加
 
-1. `src/SiliconLife.Default/Web/Skins/` で `ISkin` を実装：
+1. `src/SiliconLife.App/Web/Skins/` で `ISkin` を実装：
 
 ```csharp
 public class MyCustomSkin : ISkin
@@ -262,24 +262,35 @@ public class MyCustomSkin : ISkin
 ### コード構織
 
 ```
-SiliconLife.Default/
-├── AI/                    # AI クライアント実装
-├── Calendar/              # カレンダー実装
-├── Config/                # デフォルト設定データ
-├── Executors/             # エグゼキューター実装
-├── IM/                    # インスタントメッセンジャープロバイダー実装
-├── Localization/          # ローカライゼーション実装
-├── Logging/               # ログプロバイダー実装
-├── Runtime/               # ランタイムコンポーネント
-├── Security/              # セキュリティ実装
+SiliconLife.Common/
+├── AI/                    # AI クライアントとファクトリー実装
+├── Calendar/              # 32種類のカレンダー実装
+├── Localization/          # ローカライゼーションベースクラスと29種類の言語実装
+├── Security/              # 権限マネージャー
 ├── SiliconBeing/          # デフォルトシリコン生命体実装
-├── Storage/               # ストレージ実装
-├── Tools/                 # 内蔵ツール
+├── Tools/                 # 共有の内蔵ツール
+├── Web/                   # Web 基盤
+└── WebView/               # Playwright WebView 実装
+
+SiliconLife.App/          # Default と Fast で共有のアプリケーション層
+├── Config/                # アプリケーション設定
+├── Help/                  # ヘルプドキュメントローカライゼーション
 └── Web/                   # Web UI 実装
+    ├── Component/         # UI コンポーネントライブラリ
     ├── Controllers/       # ルートコントローラー
     ├── Models/            # ビューモデル
     ├── Views/             # HTML ビュー
     └── Skins/             # スキンテーマ
+
+SiliconLife.Default/      # バージョン固有ディレクトリ
+├── Config/                # デフォルト設定データ
+├── IM/                    # WebUI 提供者
+├── Knowledge/             # ナレッジネットワーク実装
+├── Logging/               # ログプロバイダー実装
+├── Project/               # プロジェクトシステム実装
+├── Security/              # デフォルト権限コールバック
+├── Storage/               # ファイルシステムストレージ実装
+└── Tools/                 # バージョン固有のツール（HelpTool）
 ```
 
 ### ドキュメント

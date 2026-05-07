@@ -306,7 +306,7 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 - **リクエストごとの記録** — 各 AI 呼び出しは生命体 ID、モデル、プロンプトートークン、補完トークン、タイムスタンプを記録。
 - **異常検出** — 異常なトークン消費パターンは、プロンプト注入やリソース乱用を示す可能性がある。
 - **管理人のみアクセス** — `TokenAuditTool`（`[SiliconManagerOnly]` でマーク）は、管理人がトークン使用をクエリおよび集計することを許可。
-- **Web ダッシュボード** — `AuditController` は、トレンドグラフとデータエクスポート付きのブラウザベースダッシュボードを提供。
+- **Web ダッシュボード** — `UsageController` は、トレンドグラフとデータエクスポート付きのブラウザベースダッシュボードを提供。
 - **永続化ストレージ** — 記録は `ITimeStorage` を介して保存。時系列クエリと長期分析用。
 
 ---

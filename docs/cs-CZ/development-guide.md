@@ -75,7 +75,7 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### Přidání nového nástroje
 
-1. Vytvořte novou třídu v `src/SiliconLife.Default/Tools/`:
+1. Vytvořte novou třídu v `src/SiliconLife.Common/Tools/` (nástroje sdílené oběma verzemi) nebo `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (nástroje specifické pro verzi):
 
 ```csharp
 public class MyCustomTool : ITool
@@ -111,7 +111,7 @@ public class AdminTool : ITool { ... }
 
 ### Přidání nového AI klienta
 
-1. Implementujte `IAIClient` v `src/SiliconLife.Default/AI/`:
+1. Implementujte `IAIClient` v `src/SiliconLife.Common/AI/`:
 
 ```csharp
 public class MyAIClient : IAIClient
@@ -158,7 +158,7 @@ public class MyAIClientFactory : IAIClientFactory
 
 ### Přidání nového backendu úložiště
 
-1. Implementujte `IStorage` a `ITimeStorage` v `src/SiliconLife.Default/Storage/`:
+1. Implementujte `IStorage` a `ITimeStorage` v `src/SiliconLife.Default/Storage/` (souborový systém) nebo `src/SiliconLife.Fast/Storage/` (SpeedyPack adaptér):
 
 ```csharp
 public class DatabaseStorage : IStorage, ITimeStorage
@@ -182,7 +182,7 @@ public class DatabaseStorage : IStorage, ITimeStorage
 
 ### Přidání nového skinu
 
-1. Implementujte `ISkin` v `src/SiliconLife.Default/Web/Skins/`:
+1. Implementujte `ISkin` v `src/SiliconLife.App/Web/Skins/`:
 
 ```csharp
 public class MyCustomSkin : ISkin
@@ -262,24 +262,35 @@ public class MyPluginTool : ITool
 ### Organizace kódu
 
 ```
-SiliconLife.Default/
-├── AI/                    # Implementace AI klientů
-├── Calendar/              # Implementace kalendářů
-├── Config/                # Výchozí konfigurační data
-├── Executors/             # Implementace exekutorů
-├── IM/                    # Implementace poskytovatelů IM
-├── Localization/          # Implementace lokalizace
-├── Logging/               # Implementace poskytovatelů logů
-├── Runtime/               # Komponenty runtime
-├── Security/              # Implementace zabezpečení
+SiliconLife.Common/
+├── AI/                    # Implementace AI klientů a továren
+├── Calendar/              # 32 implementací kalendářů
+├── Localization/          # Základní třída lokalizace a 29 jazykových implementací
+├── Security/              # Správce oprávnění
 ├── SiliconBeing/          # Výchozí implementace silikonových bytostí
-├── Storage/               # Implementace úložiště
-├── Tools/                 # Vestavěné nástroje
+├── Tools/                 # Sdílené vestavěné nástroje
+├── Web/                   # Webová infrastruktura
+└── WebView/               # Implementace Playwright WebView
+
+SiliconLife.App/          # Aplikační vrstva sdílená Default a Fast
+├── Config/                # Aplikační konfigurace
+├── Help/                  # Lokalizace nápovědní dokumentace
 └── Web/                   # Implementace Web UI
-    ├── Controllers/       # Řadiče routování
+    ├── Component/         # Knihovna UI komponent
+    ├── Controllers/       # Routovací kontrolery
     ├── Models/            # View modely
     ├── Views/             # HTML pohledy
     └── Skins/             # Témata skinů
+
+SiliconLife.Default/      # Adresáře specifické pro verzi
+├── Config/                # Výchozí konfigurační data
+├── IM/                    # Poskytovatel WebUI
+├── Knowledge/             # Implementace znalostní sítě
+├── Logging/               # Implementace poskytovatelů logů
+├── Project/               # Implementace projektového systému
+├── Security/              # Výchozí zpětné volání oprávnění
+├── Storage/               # Implementace úložiště na souborovém systému
+└── Tools/                 # Nástroje specifické pro verzi (HelpTool)
 ```
 
 ### Dokumentace

@@ -199,11 +199,12 @@ SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/            # コアインターフェースと抽象クラス
 │   ├── SiliconLife.Common/          # 共有実装（両バージョンで共用）
+│   ├── SiliconLife.App/             # Default と Fast で共有のアプリケーション層
 │   ├── SiliconLife.Default/         # デフォルト実装 + エントリーポイント（コンソール版）
 │   ├── SiliconLife.Fast/            # 高性能実装 + エントリーポイント（フォーム版）
 │   ├── SiliconLife.Speedy/          # SpeedyPack 高性能ストレージエンジン
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理ツール（WPF）
-├── docs/                      # ドキュメント（多言語、21種類の言語バリアント）
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理ツール（Windows Forms）
+├── docs/                      # ドキュメント（多言語、29種類の言語バリアント）
 │   ├── en/                    # 英語
 │   ├── zh-CN/                 # 簡体字中国語
 │   ├── zh-HK/                 # 繁体字中国語

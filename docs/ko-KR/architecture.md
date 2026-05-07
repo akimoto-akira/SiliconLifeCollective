@@ -400,7 +400,7 @@
 - `TokenUsageSummary` — 집계 통계
 - `TokenUsageQuery` — 기록 필터링을 위한 쿼리 매개변수
 - 시계열 쿼리를 위해 `ITimeStorage`를 통해 영속화
-- Web UI (AuditController) 및 `TokenAuditTool` (큐레이터 전용)를 통해 접근 가능
+- Web UI (UsageController) 및 `TokenAuditTool` (큐레이터 전용)를 통해 접근 가능
 
 ---
 
@@ -459,11 +459,14 @@ Web UI는 애플리케이션 로직 변경 없이 완전한 UI 커스터마이�
   - `CssBuilder`를 통한 테마 CSS 생성
   - `SkinPreviewInfo` — 초기화 페이지 스킨 선택기의 컬러 팔레트 및 아이콘
 
-- **내장 스킨** — 4개 프로덕션 준비 스킨:
+- **내장 스킨** — 7개 프로덕션 준비 스킨:
   - **Admin** — 전문적이고 데이터 중심의 시스템 관리 인터페이스
   - **Chat** — AI 상호작용을 위한 대화형, 메시지 중심 설계
   - **Creative** — 예술적이고 시각적으로 풍부한 창작 워크플로우 레이아웃
   - **Dev** — 개발자 중심, 코드 중심 인터페이스, 구문 강조 포함
+  - **HighContrast** — 고대비 접근성 테마
+  - **Light** — 깔끔한 라이트 테마
+  - **Minimal** — 미니멀리스트 테마
 
 - **스킨 발견** — `SkinManager`가 리플렉션을 통해 모든 `ISkin` 구현 자동 발견 및 등록
 
@@ -477,12 +480,11 @@ Web UI는 템플릿 파일을 완전히 피하고, C#에서 모든 마크업 생
 
 ### 컨트롤러 시스템
 
-Web UI는 20개 이상의 컨트롤러가 다양한 측면을 처리하는 **유사 MVC 패턴**을 따릅니다:
+Web UI는 22개의 컨트롤러가 다양한 측면을 처리하는 **유사 MVC 패턴**을 따릅니다:
 
 | 컨트롤러 | 용도 |
 |------------|---------|
 | About | 정보 페이지 및 프로젝트 정보 |
-| Audit | 추세 차트 및 내보내기가 포함된 Token 사용 감사 대시보드 |
 | Being | 실리콘 생명체 관리 및 상태 |
 | Chat | SSE를 사용한 실시간 채팅 인터페이스 |
 | ChatHistory | 세션 목록 및 메시지 세부정보를 지원하는 채팅 기록 보기 |
@@ -499,8 +501,10 @@ Web UI는 20개 이상의 컨트롤러가 다양한 측면을 처리하는 **유
 | Permission | 권한 관리 |
 | PermissionRequest | 권한 요청 큐 |
 | Project | 작업 노트 및 작업 시스템을 포함한 프로젝트 관리 |
+| System | 시스템 관리 및 런타임 모니터링 |
 | Task | 작업 시스템 인터페이스 |
 | Timer | 실행 기록을 포함한 타이머 시스템 관리 |
+| Usage | Token 사용 감사 대시보드, 추세 차트 및 내보내기 포함 |
 | WorkNote | 검색 및 목차 생성을 지원하는 작업 노트 관리 |
 
 ### 실시간 업데이트
@@ -511,10 +515,11 @@ Web UI는 20개 이상의 컨트롤러가 다양한 측면을 처리하는 **유
 
 ### 지역화
 
-시스템은 **21개 언어 변형**에 대한 포괄적인 지역화를 지원합니다:
-- **중국어 (6개)**: zh-CN (간체), zh-HK (번체), zh-SG (싱가포르), zh-MO (마카오), zh-TW (대만), zhMY (말레이시아)
+시스템은 **29개 언어 변형**에 대한 포괄적인 지역화를 지원합니다:
+- **중국어 (6개)**: zh-CN (간체), zh-HK (번체), zh-SG (싱가포르), zh-MO (마카오), zh-TW (대만), zh-MY (말레이시아)
 - **영어 (10개)**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY
-- **스페인어 (2개)**: es-ES, es-MX
+- **독일어 (5개)**: de-DE, de-AT, de-CH, de-LU, de-LI
+- **프랑스어 (3개)**: fr-FR, fr-CA, fr-CH
 - **기타 (3개)**: ja-JP (일본어), ko-KR (한국어), cs-CZ (체코어)
 
 `DefaultConfigData.Language`를 통해 활성 로캘 선택 및 `LocalizationManager`를 통해 확인.

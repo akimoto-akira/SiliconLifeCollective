@@ -161,5 +161,10 @@ public enum Language
     /// <summary>
     /// French (Switzerland)
     /// </summary>
-    FrCH
+    FrCH,
+
+    /// <summary>
+    /// Italian (Italy)
+    /// </summary>
+    ItIT
 }

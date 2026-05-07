@@ -199,11 +199,12 @@ SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/            # 核心接口和抽象类
 │   ├── SiliconLife.Common/          # 共享实现（两个版本共用）
+│   ├── SiliconLife.App/             # Default 与 Fast 共享的应用层
 │   ├── SiliconLife.Default/         # 默认实现 + 入口点（控制台版）
 │   ├── SiliconLife.Fast/            # 高性能实现 + 入口点（窗体版）
 │   ├── SiliconLife.Speedy/          # SpeedyPack 高性能存储引擎
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理工具（WPF）
-├── docs/                            # 文档（多语言，21 种语言变体）
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理工具（Windows Forms）
+├── docs/                            # 文档（多语言，29 种语言变体）
 │   ├── en/                          # 英语
 │   ├── zh-CN/                       # 简体中文
 │   ├── zh-HK/                       # 繁体中文

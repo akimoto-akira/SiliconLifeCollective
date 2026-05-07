@@ -197,7 +197,7 @@ Silicon Life Collective 的安全性建立在**分層防禦**模型之上。核�
 
 審計日誌可通過以下方式查詢：
 
-- **Web UI** - AuditController 儀表板
+- **Web UI** - UsageController 儀表板
 - **TokenAuditTool** - 僅主理人可用
 - **API** - `/api/audit` 端點
 

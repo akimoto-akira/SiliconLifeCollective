@@ -302,7 +302,7 @@ Logs are persisted to storage and viewable via Web UI (Log Controller).
 - **Per-request logging** — Each AI call records being ID, model, prompt tokens, completion tokens, and timestamp.
 - **Anomaly detection** — Unusual token consumption patterns may indicate prompt injection or resource abuse.
 - **Curator-only access** — `TokenAuditTool` (marked `[SiliconManagerOnly]`) allows curator to query and summarize token usage.
-- **Web dashboard** — `AuditController` provides browser-based dashboard with trend charts and data export.
+- **Web dashboard** — `UsageController` provides browser-based dashboard with trend charts and data export.
 - **Persistent storage** — Records are stored via `ITimeStorage` for time-series queries and long-term analysis.
 
 ---

@@ -306,7 +306,7 @@ Los registros persisten al almacenamiento y son visibles a través de la Web UI 
 - **Registro por solicitud** — Cada llamada de IA registra ID de ser, modelo, tokens de prompt, tokens de completación y marca de tiempo.
 - **Detección de anomalías** — Patrones de consumo de tokens inusuales pueden indicar inyección de prompt o abuso de recursos.
 - **Acceso solo para curador** — `TokenAuditTool` (marcado con `[SiliconManagerOnly]`) permite al curador consultar y resumir uso de tokens.
-- **Panel web** — `AuditController` proporciona panel basado en navegador con gráficos de tendencias y exportación de datos.
+- **Panel web** — `UsageController` proporciona panel basado en navegador con gráficos de tendencias y exportación de datos.
 - **Almacenamiento persistente** — Registros almacenados a través de `ITimeStorage` para consultas de series de tiempo y análisis a largo plazo.
 
 ---

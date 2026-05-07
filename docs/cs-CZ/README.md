@@ -4,7 +4,7 @@
 
 **Verze: v0.1.0-alpha** | **Silikonové bytosti** — Multiagentní platforma založená na .NET 9, kde jsou AI agenti nazýváni **silikonové bytosti** s schopností sebevývoje prostřednictvím dynamické kompilace Roslyn.
 
-[English](../README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | **Čeština**
+[English](../README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | **Čeština** | [Italiano](../it-IT/README.md)
 
 ## 🌟 Klíčové funkce
 
@@ -376,20 +376,26 @@ Vítáme všechny formy příspěvků! Podrobnosti naleznete v [Průvodci přisp
 **SiliconLife.Default (Výchozí implementace — ověření proveditelnosti architektury):**
 - 📌 Poprvé se setkáváte s tímto projektem a chcete rychle pochopit systémovou architekturu
 - 📌 Provádíte vývojové ladění a potřebujete jednoduchý a přímý způsob spuštění
+- 📌 Bezpečnost dat je vaší nejvyšší prioritou
+- 📌 Váš systém má méně než 4 GB RAM
+- 📌 Potřebujete pouze jednoho uživatele nebo malý objem dat
 
-**SiliconLife.Fast (Vysoce výkonná verze — hlavní produkční verze):**
-- 🚀 Provozní prostředí vyžadující vysoký výkon a nízkou latenci
-- 🚀 Dlouhodobý provoz, nepřetržitý běh na pozadí
-- 🚀 Velký objem dat, scénáře s vysokou souběžností
+**SiliconLife.Fast (Hlavní produkční verze):**
+- ⚡ Potřebujete dlouhodobě stabilní produkční prostředí
+- ⚡ Již znáte systémovou architekturu a připravujete se na oficiální nasazení
+- ⚡ Potřebujete podporovat souběžný přístup více uživatelů
+- ⚡ Potřebujete běh na pozadí v systémové liště
+- ⚡ Usilujete o extrémní výkonnostní zážitek
 
-### Jak migrovat z Default na Fast?
+> **Obecné doporučení**: SiliconLife.Default je vhodný pro ověření architektury a první seznámení. Pro skutečné produkční prostředí důrazně doporučujeme SiliconLife.Fast.
 
-**Lze migrovat?** Ano! Obě verze sdílejí:
-- ✔️ Formát konfiguračních souborů (config.json)
-- ✔️ Strukturu datových adresářů
-- ✔️ Rozhraní nástrojů
-- ✔️ Konfiguraci Being
-- ✔️ Rozhraní Web UI
+### Lze migrovat z Default na Fast?
+
+**Ano, zcela!** Obě verze sdílejí stejné:
+- ✅ Formát konfiguračních souborů (config.json)
+- ✅ Rozhraní nástrojů
+- ✅ Konfiguraci Being
+- ✅ Web UI rozhraní
 
 **Kroky migrace:**
 1. Zálohujte svůj datový adresář Default
@@ -398,7 +404,21 @@ Vítáme všechny formy příspěvků! Podrobnosti naleznete v [Průvodci přisp
 4. Po ověření správné funkce můžete Fast verzi používat pro každodenní práci
 
 ### Mohou obě verze existovat vedle sebe?
-Ano, ale **nedoporučuje se** spouštět obě verze současně se stejným datovým adresářem, aby se předešlo konfliktům při zápisu dat. Doporučuje se používat pouze jednu verzi v daném okamžiku.
+
+**Ano!** Doporučujeme následující strategie nasazení:
+
+**Strategie 1: Default pro ověření, Fast pro produkci**
+```
+Vývojové/ověřovací prostředí: SiliconLife.Default (ověření architektury, ladění funkcí)
+Produkční prostředí: SiliconLife.Fast (vysoký výkon, běh na pozadí, zpracování požadavků v reálném čase)
+```
+
+**Strategie 2: Fast jako hlavní, Default jako pravidelné zálohování**
+```
+SiliconLife.Fast (každodenní použití, zpracování požadavků v reálném čase)
+    ↓ Pravidelné zálohování
+SiliconLife.Default (archivace studených dat, záchrana bezpečnosti dat)
+```
 
 ## 📄 Licence
 

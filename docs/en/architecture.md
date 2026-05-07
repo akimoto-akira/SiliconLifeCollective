@@ -403,7 +403,7 @@ Code is stored on disk encrypted with AES-256. Encryption key is derived from th
 - `TokenUsageSummary` — Aggregated statistics
 - `TokenUsageQuery` — Query parameters for filtering records
 - Persisted via `ITimeStorage` for time-series queries
-- Accessible via Web UI (AuditController) and `TokenAuditTool` (curator-only)
+- Accessible via Web UI (UsageController) and `TokenAuditTool` (curator-only)
 
 ---
 
@@ -462,11 +462,14 @@ The Web UI features a **pluggable skin system** allowing complete UI customizati
   - Theme CSS generation via `CssBuilder`
   - `SkinPreviewInfo` — Color palette and icons for initialization page skin selector
 
-- **Built-in Skins** — 4 production-ready skins:
+- **Built-in Skins** — 7 production-ready skins:
   - **Admin** — Professional, data-focused system administration interface
   - **Chat** — Conversational, message-centric design for AI interaction
   - **Creative** — Artistic, visually rich layout for creative workflows
   - **Dev** — Developer-centric, code-focused interface with syntax highlighting
+  - **HighContrast** — High-contrast accessibility theme
+  - **Light** — Clean light theme
+  - **Minimal** — Minimalist theme
 
 - **Skin Discovery** — `SkinManager` automatically discovers and registers all `ISkin` implementations via reflection
 
@@ -480,12 +483,11 @@ The Web UI completely avoids template files, generating all markup in C#:
 
 ### Controller System
 
-The Web UI follows a **MVC-like pattern** with 20+ controllers handling different aspects:
+The Web UI follows a **MVC-like pattern** with 22 controllers handling different aspects:
 
 | Controller | Purpose |
 |------------|---------|
 | About | About page and project information |
-| Audit | Token usage audit dashboard with trend charts and export |
 | Being | Silicon being management and status |
 | Chat | Real-time chat interface with SSE |
 | ChatHistory | Chat history viewer with session list and message details |
@@ -502,8 +504,10 @@ The Web UI follows a **MVC-like pattern** with 20+ controllers handling differen
 | Permission | Permission management |
 | PermissionRequest | Permission request queue |
 | Project | Project management with work notes and task system |
+| System | System management and runtime monitoring |
 | Task | Task system interface |
 | Timer | Timer system management with execution history |
+| Usage | Token usage audit dashboard with trend charts and export |
 | WorkNote | Work note management with search and directory generation |
 
 ### Real-time Updates
@@ -514,10 +518,11 @@ The Web UI follows a **MVC-like pattern** with 20+ controllers handling differen
 
 ### Localization
 
-The system supports comprehensive localization across **21 language variants**:
+The system supports comprehensive localization across **29 language variants**:
 - **Chinese (6)**: zh-CN (Simplified), zh-HK (Traditional), zh-SG (Singapore), zh-MO (Macau), zh-TW (Taiwan), zhMY (Malaysia)
 - **English (10)**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY
-- **Spanish (2)**: es-ES, es-MX
+- **German (5)**: de-DE, de-AT, de-CH, de-LU, de-LI
+- **French (3)**: fr-FR, fr-CA, fr-CH
 - **Others (3)**: ja-JP (Japanese), ko-KR (Korean), cs-CZ (Czech)
 
 Active locale is selected via `DefaultConfigData.Language` and resolved through `LocalizationManager`.

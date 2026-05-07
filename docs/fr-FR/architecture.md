@@ -403,7 +403,7 @@ Le code est stocké sur disque chiffré en AES-256. La clé de chiffrement est d
 - `TokenUsageSummary` — Statistiques agrégées
 - `TokenUsageQuery` — Paramètres de requête pour filtrer les enregistrements
 - Persistance via `ITimeStorage` pour les requêtes de séries temporelles
-- Accessible via l'interface Web (AuditController) et `TokenAuditTool` (Curator uniquement)
+- Accessible via l'interface Web (UsageController) et `TokenAuditTool` (Curator uniquement)
 
 ---
 
@@ -462,11 +462,14 @@ L'interface Web dispose d'un **système de skins enfichable**, permettant une pe
   - Génération de CSS thématique via `CssBuilder`
   - `SkinPreviewInfo` — Palette de couleurs et icône pour le sélecteur de skins de la page d'initialisation
 
-- **Skins intégrés** — 4 skins prêts pour la production :
+- **Skins intégrés** — 7 skins prêts pour la production :
   - **Admin** — Interface d'administration professionnelle, axée sur les données
   - **Chat** — Design conversationnel, centré sur les messages, pour l'interaction IA
   - **Creative** — Disposition artistique et visuellement riche pour les flux de travail créatifs
   - **Dev** — Interface centrée sur le développeur et le code, avec coloration syntaxique
+  - **HighContrast** — Thème d'accessibilité à contraste élevé
+  - **Light** — Thème clair et épuré
+  - **Minimal** — Thème minimaliste
 
 - **Découverte de skins** — `SkinManager` découvre et enregistre automatiquement toutes les implémentations `ISkin` via réflexion
 
@@ -480,12 +483,11 @@ L'interface Web évite entièrement les fichiers de modèles, générant tout le
 
 ### Système de contrôleurs
 
-L'interface Web suit un **pattern de type MVC**, avec 20+ contrôleurs gérant différents aspects :
+L'interface Web suit un **pattern de type MVC**, avec 22 contrôleurs gérant différents aspects :
 
 | Contrôleur | Objectif |
 |------------|----------|
 | About | Page À propos et informations du projet |
-| Audit | Tableau de bord d'audit d'utilisation des tokens, avec graphiques de tendance et export |
 | Being | Gestion et statut des Silicon Beings |
 | Chat | Interface de chat en temps réel avec SSE |
 | ChatHistory | Historique de chat, liste de sessions et détails des messages |
@@ -502,8 +504,10 @@ L'interface Web suit un **pattern de type MVC**, avec 20+ contrôleurs gérant d
 | Permission | Gestion des permissions |
 | PermissionRequest | File d'attente des requêtes de permissions |
 | Project | Gestion de projets, avec notes de travail et système de tâches |
+| System | Surveillance des performances système et métriques |
 | Task | Interface du système de tâches |
 | Timer | Gestion du système de minuteries, avec historique d'exécution |
+| Usage | Tableau de bord d'utilisation des tokens, avec graphiques de tendance et export |
 | WorkNote | Gestion des notes de travail, recherche et génération de sommaire |
 
 ### Mises à jour en temps réel
@@ -514,10 +518,11 @@ L'interface Web suit un **pattern de type MVC**, avec 20+ contrôleurs gérant d
 
 ### Localisation
 
-Le système prend en charge la localisation complète de **21 variantes linguistiques** :
+Le système prend en charge la localisation complète de **29 variantes linguistiques** :
 - **Chinois (6)** : zh-CN (simplifié), zh-HK (traditionnel), zh-SG (Singapour), zh-MO (Macao), zh-TW (Taïwan), zhMY (Malaisie)
 - **Anglais (10)** : en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY
-- **Espagnol (2)** : es-ES, es-MX
+- **Allemand (5)** : de-DE, de-AT, de-CH, de-LU, de-LI
+- **Français (3)** : fr-FR, fr-CA, fr-CH
 - **Autres (3)** : ja-JP (japonais), ko-KR (coréen), cs-CZ (tchèque)
 
 ---

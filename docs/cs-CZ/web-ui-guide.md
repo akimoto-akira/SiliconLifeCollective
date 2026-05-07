@@ -132,10 +132,12 @@ Konfigurace AI backendu:
 
 ### Lokalizace
 
-Přepínejte mezi 21 jazykovými variantami:
+Přepínejte mezi 29 jazykovými variantami:
 - Čínština (6 variant): Zjednodušená čínština, Tradiční čínština, Singapurská čínština, Macajská čínština, Tchajwanská čínština, Malajsijská čínština
-- Angličtina (10 variant): Americká, Britská, Kanadská, Australská, Indická, Singapurská, Jihhoafrická, Irská, Novozélandská, Malajsijská angličtina
+- Angličtina (10 variant): Americká, Britská, Kanadská, Australská, Indická, Singapurská, Jihoafrická, Irská, Novozélandská, Malajsijská angličtina
 - Španělština (2 varianty): Španělská, Mexická
+- Němčina (5 variant): Německá, Rakouská, Švýcarská, Lucemburská, Lichtenštejnská
+- Francouzština (3 varianty): Francouzská, Kanadská, Švýcarská
 - Japonština, Korejština, Čeština
 
 ---

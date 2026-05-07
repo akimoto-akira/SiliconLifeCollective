@@ -302,7 +302,7 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 - **요청별 기록** — 각 AI 호출이 생명체 ID, 모델, 프롬프트 token, 완성 token 및 타임스탬프 기록.
 - **이상 감지** — 비정상적인 token 소모 패턴은 프롬프트 주입 또는 리소스 남용을 나타낼 수 있음.
 - **큐레이터 전용 접근** — `TokenAuditTool` (`[SiliconManagerOnly]` 표시)은 큐레이터가 token 사용 쿼리 및 집계 가능.
-- **웹 대시보드** — `AuditController`는 추세 차트 및 데이터 내보내기가 포함된 브라우저 기반 대시보드 제공.
+- **웹 대시보드** — `UsageController`는 추세 차트 및 데이터 내보내기가 포함된 브라우저 기반 대시보드 제공.
 - **영속화 저장** — 기록은 `ITimeStorage`를 통해 저장되어, 시계열 쿼리 및 장기 분석 가능.
 
 ---

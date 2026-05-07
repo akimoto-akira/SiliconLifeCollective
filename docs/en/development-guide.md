@@ -18,7 +18,7 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # Default implementation, entry points (architecture feasibility verification)
 │   ├── SiliconLife.Fast/            # High-performance implementation, entry points (main production version)
 │   ├── SiliconLife.Speedy/          # SpeedyPack high-performance storage engine
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack management tool (WPF)
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack management tool (Windows Forms)
 └── docs/                            # Multi-language documentation
 ```
 
@@ -75,7 +75,7 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### Adding a New Tool
 
-1. Create a new class in `src/SiliconLife.Default/Tools/`:
+1. Create a new class in `src/SiliconLife.Common/Tools/` (shared tools for both versions) or `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (version-specific tools):
 
 ```csharp
 public class MyCustomTool : ITool
@@ -111,7 +111,7 @@ public class AdminTool : ITool { ... }
 
 ### Adding a New AI Client
 
-1. Implement `IAIClient` in `src/SiliconLife.Default/AI/`:
+1. Implement `IAIClient` in `src/SiliconLife.Common/AI/`:
 
 ```csharp
 public class MyAIClient : IAIClient
@@ -158,7 +158,7 @@ public class MyAIClientFactory : IAIClientFactory
 
 ### Adding a New Storage Backend
 
-1. Implement `IStorage` and `ITimeStorage` in `src/SiliconLife.Default/Storage/`:
+1. Implement `IStorage` and `ITimeStorage` in `src/SiliconLife.Default/Storage/` (file system implementation) or `src/SiliconLife.Fast/Storage/` (SpeedyPack adapter):
 
 ```csharp
 public class DatabaseStorage : IStorage, ITimeStorage
@@ -226,7 +226,7 @@ public class MyPluginTool : ITool
 
 ### Adding a New Skin
 
-1. Implement `ISkin` in `src/SiliconLife.Default/Web/Skins/`:
+1. Implement `ISkin` in `src/SiliconLife.App/Web/Skins/`:
 
 ```csharp
 public class MyCustomSkin : ISkin
@@ -262,24 +262,35 @@ public class MyCustomSkin : ISkin
 ### Code Organization
 
 ```
-SiliconLife.Default/
-├── AI/                    # AI client implementations
-├── Calendar/              # Calendar implementations
-├── Config/                # Default configuration data
-├── Executors/             # Executor implementations
-├── IM/                    # IM provider implementations
-├── Localization/          # Localization implementations
-├── Logging/               # Log provider implementations
-├── Runtime/               # Runtime components
-├── Security/              # Security implementations
+SiliconLife.Common/
+├── AI/                    # AI clients and factory implementations
+├── Calendar/              # 32 calendar implementations
+├── Localization/          # Localization base classes and 29 language implementations
+├── Security/              # Permission manager
 ├── SiliconBeing/          # Default silicon being implementation
-├── Storage/               # Storage implementations
-├── Tools/                 # Built-in tools
+├── Tools/                 # Shared built-in tools
+├── Web/                   # Web infrastructure
+└── WebView/               # Playwright WebView implementation
+
+SiliconLife.App/          # Application layer shared by Default and Fast
+├── Config/                # Application configuration
+├── Help/                  # Help documentation localization
 └── Web/                   # Web UI implementation
+    ├── Component/         # UI component library
     ├── Controllers/       # Route controllers
     ├── Models/            # View models
     ├── Views/             # HTML views
     └── Skins/             # Skin themes
+
+SiliconLife.Default/      # Version-specific directory
+├── Config/                # Default configuration data
+├── IM/                    # WebUI provider
+├── Knowledge/             # Knowledge network implementation
+├── Logging/               # Log provider implementations
+├── Project/               # Project system implementation
+├── Security/              # Default permission callbacks
+├── Storage/               # File system storage implementation
+└── Tools/                 # Version-specific tools (HelpTool)
 ```
 
 ### Documentation

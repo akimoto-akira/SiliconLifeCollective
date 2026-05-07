@@ -247,11 +247,12 @@ SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/            # 핵심 인터페이스 및 추상 클래스
 │   ├── SiliconLife.Common/          # 공유 구현 (두 버전 모두 사용)
+│   ├── SiliconLife.App/             # Default와 Fast가 공유하는 애플리케이션 계층
 │   ├── SiliconLife.Default/         # 기본 구현 + 진입점 (콘솔 버전)
 │   ├── SiliconLife.Fast/            # 고성능 구현 + 진입점 (폼 버전)
 │   ├── SiliconLife.Speedy/          # SpeedyPack 고성능 스토리지 엔진
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 관리 도구 (WPF)
-├── docs/                            # 문서 (다국어, 21개 언어 변형)
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 관리 도구 (Windows Forms)
+├── docs/                            # 문서 (다국어, 29개 언어 변형)
 │   ├── en/                          # 영어
 │   ├── zh-CN/                       # 간체 중국어
 │   ├── zh-HK/                       # 번체 중국어

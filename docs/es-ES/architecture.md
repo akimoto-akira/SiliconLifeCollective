@@ -403,7 +403,7 @@ El código se almacena cifrado en disco usando AES-256. La clave de cifrado se d
 - `TokenUsageSummary` — Estadísticas agregadas
 - `TokenUsageQuery` — Parámetros de consulta para filtrar registros
 - Persistido a través de `ITimeStorage` para consultas de series de tiempo
-- Accesible a través de Web UI (AuditController) y `TokenAuditTool` (solo curador)
+- Accesible a través de Web UI (UsageController) y `TokenAuditTool` (solo curador)
 
 ---
 
@@ -462,11 +462,14 @@ La Web UI tiene un **sistema de pieles enchufable** que permite personalización
   - Generación de CSS temático a través de `CssBuilder`
   - `SkinPreviewInfo` — Paleta de colores e iconos para selector de piel en página de inicialización
 
-- **Pieles integradas** — 4 pieles listas para producción:
+- **Pieles integradas** — 7 pieles listas para producción:
   - **Admin** — Interfaz profesional y enfocada en datos para administración del sistema
   - **Chat** — Diseño conversacional y centrado en mensajes para interacción con IA
   - **Creative** — Layout artísticamente rico visualmente para flujos de trabajo creativos
   - **Dev** — Interfaz centrada en desarrolladores y código con resaltado de sintaxis
+  - **HighContrast** — Tema de accesibilidad de alto contraste
+  - **Light** — Tema claro y limpio
+  - **Minimal** — Tema minimalista
 
 - **Descubrimiento de pieles** — `SkinManager` descubre y registra automáticamente todas las implementaciones de `ISkin` a través de reflexión
 
@@ -480,12 +483,11 @@ La Web UI evita completamente archivos de plantillas, generando todo el marcado 
 
 ### Sistema de Controladores
 
-La Web UI sigue un **patrón similar a MVC**, con 20+ controladores manejando diferentes aspectos:
+La Web UI sigue un **patrón similar a MVC**, con 22 controladores manejando diferentes aspectos:
 
 | Controlador | Propósito |
 |------------|---------|
 | About | Página acerca de e información del proyecto |
-| Audit | Panel de auditoría de uso de tokens, con gráficos de tendencias y exportación |
 | Being | Gestión y estado de Seres Silicona |
 | Chat | Interfaz de chat en tiempo real con SSE |
 | ChatHistory | Visualización de historial de chat, soporta lista de sesiones y detalles de mensajes |
@@ -502,8 +504,10 @@ La Web UI sigue un **patrón similar a MVC**, con 20+ controladores manejando di
 | Permission | Gestión de permisos |
 | PermissionRequest | Cola de solicitudes de permisos |
 | Project | Gestión de proyectos, incluye notas de trabajo y sistema de tareas |
+| System | Monitoreo del rendimiento del sistema y métricas en tiempo de ejecución |
 | Task | Interfaz del sistema de tareas |
 | Timer | Gestión del sistema de temporizadores, incluye historial de ejecución |
+| Usage | Panel de auditoría de uso de tokens, con gráficos de tendencias y exportación |
 | WorkNote | Gestión de notas de trabajo, soporta búsqueda y generación de índice |
 
 ### Actualizaciones en Tiempo Real
@@ -514,10 +518,12 @@ La Web UI sigue un **patrón similar a MVC**, con 20+ controladores manejando di
 
 ### Localización
 
-El sistema soporta localización completa para **21 variantes de idioma**:
-- **Chino (6 variantes)**: zh-CN (simplificado), zh-HK (tradicional), zh-SG (Singapur), zh-MO (Macao), zh-TW (Taiwán), zhMY (Malasia)
+El sistema soporta localización completa para **29 variantes de idioma**:
+- **Chino (6 variantes)**: zh-CN (simplificado), zh-HK (tradicional), zh-SG (Singapur), zh-MO (Macao), zh-TW (Taiwán), zh-MY (Malasia)
 - **Inglés (10 variantes)**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY
 - **Español (2 variantes)**: es-ES, es-MX
+- **Alemán (5 variantes)**: de-DE, de-AT, de-CH, de-LU, de-LI
+- **Francés (3 variantes)**: fr-FR, fr-CA, fr-CH
 - **Otros (3 variantes)**: ja-JP (japonés), ko-KR (coreano), cs-CZ (checo)
 
 El locale activo se selecciona a través de `DefaultConfigData.Language` y se resuelve a través de `LocalizationManager`.

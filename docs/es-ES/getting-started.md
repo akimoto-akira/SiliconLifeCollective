@@ -199,11 +199,12 @@ SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/            # Interfaces centrales y clases abstractas
 │   ├── SiliconLife.Common/          # Implementación compartida (común a ambas versiones)
+│   ├── SiliconLife.App/             # Capa de aplicación compartida entre Default y Fast
 │   ├── SiliconLife.Default/         # Implementación predeterminada + punto de entrada (versión consola)
 │   ├── SiliconLife.Fast/            # Implementación de alto rendimiento + punto de entrada (versión formularios)
 │   ├── SiliconLife.Speedy/          # Motor de almacenamiento de alto rendimiento SpeedyPack
-│   └── SiliconLife.Speedy.Manager/  # Herramienta de gestión SpeedyPack (WPF)
-├── docs/                            # Documentación (multilingüe, 21 variantes de idioma)
+│   └── SiliconLife.Speedy.Manager/  # Herramienta de gestión SpeedyPack (Windows Forms)
+├── docs/                            # Documentación (multilingüe, 29 variantes de idioma)
 │   ├── en/                          # Inglés
 │   ├── zh-CN/                       # Chino simplificado
 │   ├── zh-HK/                       # Chino tradicional

@@ -363,6 +363,9 @@ public class Program
         LocalizationManager.Instance.Register<FrFR>(Language.FrFR);
         LocalizationManager.Instance.Register<FrCA>(Language.FrCA);
         LocalizationManager.Instance.Register<FrCH>(Language.FrCH);
+        
+        // Italian
+        LocalizationManager.Instance.Register<ItIT>(Language.ItIT);
     }
 
     public static void RequestExit()
@@ -440,6 +443,9 @@ public class Program
             Language.FrFR => new TrayFrFR(),
             Language.FrCA => new TrayFrCA(),
             Language.FrCH => new TrayFrCH(),
+            
+            // Italian
+            Language.ItIT => new TrayItIT(),
             
             // Default to English
             _ => new TrayEnUS()

@@ -199,11 +199,12 @@ SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/            # Kernschnittstellen und abstrakte Klassen
 │   ├── SiliconLife.Common/          # Gemeinsame Implementierung (von beiden Versionen genutzt)
+│   ├── SiliconLife.App/             # Von Default und Fast gemeinsam genutzte Anwendungsschicht
 │   ├── SiliconLife.Default/         # Standardimplementierung + Einstiegspunkt (Konsolenversion)
 │   ├── SiliconLife.Fast/            # Hochleistungsimplementierung + Einstiegspunkt (Formularversion)
 │   ├── SiliconLife.Speedy/          # SpeedyPack Hochleistungs-Speicher-Engine
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack Verwaltungstool (WPF)
-├── docs/                            # Dokumentation (mehrsprachig, 21 Sprachvarianten)
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack Verwaltungstool (Windows Forms)
+├── docs/                            # Dokumentation (mehrsprachig, 29 Sprachvarianten)
 │   ├── en/                          # Englisch
 │   ├── zh-CN/                       # Vereinfachtes Chinesisch
 │   ├── zh-HK/                       # Traditionelles Chinesisch
@@ -211,7 +212,6 @@ SiliconLifeCollective/
 │   ├── ja-JP/                       # Japanisch
 │   ├── ko-KR/                       # Koreanisch
 │   └── cs-CZ/                       # Tschechisch
-├── 总文档/                           # Anforderungs- und Architekturdokumente (Chinesisch)
 └── README.md                        # Projektübersicht
 ```
 

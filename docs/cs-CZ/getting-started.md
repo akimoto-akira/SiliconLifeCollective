@@ -199,11 +199,12 @@ SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/            # Core rozhraní a abstraktní třídy
 │   ├── SiliconLife.Common/          # Sdílené implementace (společné pro obě verze)
+│   ├── SiliconLife.App/             # Aplikační vrstva sdílená Default a Fast
 │   ├── SiliconLife.Default/         # Výchozí implementace + vstupní bod (konzolová verze)
 │   ├── SiliconLife.Fast/            # Vysoce výkonná implementace + vstupní bod (verze s formuláři)
 │   ├── SiliconLife.Speedy/          # SpeedyPack vysoce výkonný úložný engine
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack nástroj pro správu (WPF)
-├── docs/                            # Dokumentace (vícejazyčná, 21 jazykových variant)
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack nástroj pro správu (Windows Forms)
+├── docs/                            # Dokumentace (vícejazyčná, 29 jazykových variant)
 │   ├── en/                          # Angličtina
 │   ├── zh-CN/                       # Zjednodušená čínština
 │   ├── zh-HK/                       # Tradiční čínština

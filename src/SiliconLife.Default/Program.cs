@@ -316,6 +316,9 @@ public class Program
         LocalizationManager.Instance.Register<FrFR>(Language.FrFR);
         LocalizationManager.Instance.Register<FrCA>(Language.FrCA);
         LocalizationManager.Instance.Register<FrCH>(Language.FrCH);
+        
+        // Italian
+        LocalizationManager.Instance.Register<ItIT>(Language.ItIT);
     }
 
     public static void RequestExit()

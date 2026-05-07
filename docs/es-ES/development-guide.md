@@ -18,7 +18,7 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # Implementación predeterminada, punto de entrada (verificación de viabilidad de arquitectura)
 │   ├── SiliconLife.Fast/            # Implementación de alto rendimiento, punto de entrada (versión de producción principal)
 │   ├── SiliconLife.Speedy/          # Motor de almacenamiento de alto rendimiento SpeedyPack
-│   └── SiliconLife.Speedy.Manager/  # Herramienta de gestión SpeedyPack (WPF)
+│   └── SiliconLife.Speedy.Manager/  # Herramienta de gestión SpeedyPack (Windows Forms)
 └── docs/                            # Documentación multilingüe
 ```
 
@@ -75,7 +75,7 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### Añadir Nueva Herramienta
 
-1. Crear nueva clase en `src/SiliconLife.Default/Tools/`:
+1. Crear nueva clase en `src/SiliconLife.Common/Tools/` (herramientas compartidas entre ambas versiones) o `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (herramientas específicas de versión):
 
 ```csharp
 public class MyCustomTool : ITool
@@ -111,7 +111,7 @@ public class AdminTool : ITool { ... }
 
 ### Añadir Nuevo Cliente de IA
 
-1. Implementar `IAIClient` en `src/SiliconLife.Default/AI/`:
+1. Implementar `IAIClient` en `src/SiliconLife.Common/AI/`:
 
 ```csharp
 public class MyAIClient : IAIClient
@@ -158,7 +158,7 @@ public class MyAIClientFactory : IAIClientFactory
 
 ### Añadir Nuevo Backend de Almacenamiento
 
-1. Implementar `IStorage` e `ITimeStorage` en `src/SiliconLife.Default/Storage/`:
+1. Implementar `IStorage` e `ITimeStorage` en `src/SiliconLife.Default/Storage/` (implementación de sistema de archivos) o `src/SiliconLife.Fast/Storage/` (adaptador SpeedyPack):
 
 ```csharp
 public class DatabaseStorage : IStorage, ITimeStorage
@@ -249,7 +249,7 @@ public class MyCustomCalendar : CalendarBase
 
 ### Añadir Nueva Piel
 
-1. Implementar `ISkin` en `src/SiliconLife.Default/Web/Skins/`:
+1. Implementar `ISkin` en `src/SiliconLife.App/Web/Skins/`:
 
 ```csharp
 public class MyCustomSkin : ISkin
@@ -280,24 +280,35 @@ public class MyCustomSkin : ISkin
 ### Organización del Código
 
 ```
-SiliconLife.Default/
-├── AI/                    # Implementaciones de clientes de IA
-├── Calendar/              # Implementaciones de calendario
-├── Config/                # Datos de configuración predeterminados
-├── Executors/             # Implementaciones de ejecutores
-├── IM/                    # Implementaciones de proveedores de mensajería instantánea
-├── Localization/          # Implementaciones de localización
-├── Logging/               # Implementaciones de proveedores de registro
-├── Runtime/               # Componentes de tiempo de ejecución
-├── Security/              # Implementaciones de seguridad
+SiliconLife.Common/
+├── AI/                    # Implementaciones de clientes IA y fábricas
+├── Calendar/              # 32 implementaciones de calendario
+├── Localization/          # Clase base de localización y 29 implementaciones de idioma
+├── Security/              # Gestor de permisos
 ├── SiliconBeing/          # Implementación predeterminada de Ser Silicona
-├── Storage/               # Implementaciones de almacenamiento
-├── Tools/                 # Herramientas integradas
+├── Tools/                 # Herramientas integradas compartidas
+├── Web/                   # Infraestructura Web
+└── WebView/               # Implementación Playwright WebView
+
+SiliconLife.App/          # Capa de aplicación compartida entre Default y Fast
+├── Config/                # Configuración de la aplicación
+├── Help/                  # Localización de documentación de ayuda
 └── Web/                   # Implementación de Web UI
+    ├── Component/         # Biblioteca de componentes UI
     ├── Controllers/       # Controladores de rutas
     ├── Models/            # Modelos de vista
     ├── Views/             # Vistas HTML
     └── Skins/             # Temas de piel
+
+SiliconLife.Default/      # Directorios específicos de versión
+├── Config/                # Datos de configuración predeterminados
+├── IM/                    # Proveedor WebUI
+├── Knowledge/             # Implementación de red de conocimiento
+├── Logging/               # Implementaciones de proveedores de registro
+├── Project/               # Implementación del sistema de proyectos
+├── Security/              # Callbacks de permisos predeterminados
+├── Storage/               # Implementación de almacenamiento en sistema de archivos
+└── Tools/                 # Herramientas específicas de versión (HelpTool)
 ```
 
 ### Comentarios

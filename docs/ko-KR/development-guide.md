@@ -18,7 +18,7 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # 기본 구현, 진입점 (아키텍처 실현 가능성 검증)
 │   ├── SiliconLife.Fast/            # 고성능 구현, 진입점 (주력 프로덕션 버전)
 │   ├── SiliconLife.Speedy/          # SpeedyPack 고성능 스토리지 엔진
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 관리 도구 (WPF)
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 관리 도구 (Windows Forms)
 └── docs/                            # 다국어 문서
 ```
 
@@ -262,24 +262,35 @@ public class MyPluginTool : ITool
 ### 코드 구성
 
 ```
-SiliconLife.Default/
-├── AI/                    # AI 클라이언트 구현
-├── Calendar/              # 캘린더 구현
-├── Config/                # 기본 설정 데이터
-├── Executors/             # Executor 구현
-├── IM/                    # IM 제공자 구현
-├── Localization/          # 현지화 구현
-├── Logging/               # 로거 제공자 구현
-├── Runtime/               # 런타임 구성 요소
-├── Security/              # 보안 구현
-├── SiliconBeing/          # 기본 silicon being 구현
-├── Storage/               # 저장소 구현
-├── Tools/                 # 내장 도구
+SiliconLife.Common/
+├── AI/                    # AI 클라이언트 및 팩토리 구현
+├── Calendar/              # 32가지 캘린더 구현
+├── Localization/          # 현지화 기본 클래스 및 29개 언어 구현
+├── Security/              # 권한 관리자
+├── SiliconBeing/          # 기본 실리콘 비잉 구현
+├── Tools/                 # 공유 내장 도구
+├── Web/                   # 웹 인프라
+└── WebView/               # Playwright WebView 구현
+
+SiliconLife.App/          # Default와 Fast가 공유하는 애플리케이션 계층
+├── Config/                # 애플리케이션 설정
+├── Help/                  # 도움말 문서 현지화
 └── Web/                   # Web UI 구현
+    ├── Component/         # UI 컴포넌트 라이브러리
     ├── Controllers/       # 라우트 컨트롤러
     ├── Models/            # 뷰 모델
     ├── Views/             # HTML 뷰
     └── Skins/             # 스킨 테마
+
+SiliconLife.Default/      # 버전별 디렉토리
+├── Config/                # 기본 설정 데이터
+├── IM/                    # WebUI 제공자
+├── Knowledge/             # 지식 네트워크 구현
+├── Logging/               # 로그 제공자 구현
+├── Project/               # 프로젝트 시스템 구현
+├── Security/              # 기본 권한 콜백
+├── Storage/               # 파일 시스템 저장소 구현
+└── Tools/                 # 버전별 도구 (HelpTool)
 ```
 
 ### 문서

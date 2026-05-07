@@ -20,9 +20,7 @@
 - ✅ 階段 1：基礎專案結構和配置系統移植
 - ✅ 階段 2：Web UI 和控制器移植
 - ✅ 階段 3：儲存系統優化（SpeedyPack 記憶體儲存 + 異步持久化）
-- ✅ 階段 3.5：SpeedyPack 管理工具（SiliconLife.Speedy.Manager WPF 應用）
-- ✅ 階段 3.6：插件系統（IPlugin 介面、安全沙箱、AssemblyLoadContext 隔離）
-- 🚧 階段 4：系統匣和視窗應用開發
+- ✅ 階段 3.5：SpeedyPack 管理工具（SiliconLife.Speedy.Manager Windows Forms 應用）
 - 📋 階段 5：效能優化（連線池、物件池、無鎖並發）
 - 📋 階段 6：Kestrel Web 伺服器替換
 - 📋 階段 7：MessagePack 二進位序列化

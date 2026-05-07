@@ -23,10 +23,11 @@ Silicon Life Collective 採用分層架構設計：
 
 - **SiliconLife.Core** - 核心介面、抽象類別和通用基礎設施
 - **SiliconLife.Common** - 共享實現（兩個版本共用）
+- **SiliconLife.App** - Default 和 Fast 共享的應用層（Web UI、配置、幫助文檔）
 - **SiliconLife.Default** - 預設實現、應用程式入口點（架構可行性驗證）
 - **SiliconLife.Fast** - 高效能實現、應用程式入口點（主推生產版本）
 - **SiliconLife.Speedy** - SpeedyPack 高效能儲存引擎
-- **SiliconLife.Speedy.Manager** - SpeedyPack 管理工具（WPF）
+- **SiliconLife.Speedy.Manager** - SpeedyPack 管理工具（Windows Forms）
 
 **依賴方向**：
 - `SiliconLife.Default` → `SiliconLife.Core`（單向）

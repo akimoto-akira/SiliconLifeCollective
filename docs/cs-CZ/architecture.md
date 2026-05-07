@@ -344,6 +344,86 @@ Factory poskytují:
 
 ---
 
+## Web UI Architektura
+
+### Systém Skinů
+
+Web UI má **pluginový systém skinů**, který umožňuje kompletní přizpůsobení UI bez změny aplikační logiky:
+
+- **Rozhraní ISkin** — Definuje kontrakt pro všechny skiny, včetně:
+  - Core renderovací metody (`RenderHtml`, `RenderError`)
+  - 20+ UI komponentových metod (tlačítka, vstupy, karty, tabulky, odznaky, bubliny, progres, štítky atd.)
+  - Generování CSS motivu prostřednictvím `CssBuilder`
+  - `SkinPreviewInfo` — Paleta barev a ikony pro výběr skinu na úvodní stránce
+
+- **Vestavěné skiny** — 7 produkčně připravených skinů:
+  - **Admin** — Profesionální, datově zaměřené rozhraní správy systému
+  - **Chat** — Konverzační, na zprávy zaměřený design pro AI interakce
+  - **Creative** — Umělecké, vizuálně bohaté rozložení pro kreativní pracovní postupy
+  - **Dev** — Na vývojáře zaměřené, kódově orientované rozhraní se zvýrazněním syntaxe
+  - **HighContrast** — Téma s vysokým kontrastem pro přístupnost
+  - **Light** — Čisté světlé téma
+  - **Minimal** — Minimalistické téma
+
+- **Objevování skinů** — `SkinManager` automaticky objevuje a registruje všechny implementace `ISkin` prostřednictvím reflexe
+
+### HTML / CSS / JS Buildery
+
+Web UI se zcela vyhýbá šablonovým souborům a generuje veškerý markup v C#:
+
+- **`H`** — Flow HTML builder DSL pro vytváření stromu HTML v kódu
+- **`CssBuilder`** — CSS builder podporující selektory a media queries
+- **`JsBuilder` (`JsSyntax`)** — JavaScript builder pro inline skripty
+
+### Kontrolerový Systém
+
+Web UI následuje **MVC-like pattern** s 22 kontrolery zpracovávajícími různé aspekty:
+
+| Kontroler | Účel |
+|------------|---------|
+| About | O aplikaci a informace o projektu |
+| Being | Správa a stav silikonových bytostí |
+| Chat | Rozhraní chatu v reálném čase s SSE |
+| ChatHistory | Zobrazení historie chatu, podpora seznamu relací a detailů zpráv |
+| CodeBrowser | Prohlížení a úprava kódu |
+| CodeHover | Plovoucí nápovědy kódu, podpora zvýraznění syntaxe |
+| Config | Správa systémové konfigurace |
+| Dashboard | Přehled systému a metriky |
+| Executor | Stav a správa exekutorů |
+| Help | Systém nápovědní dokumentace, vícejazyčná podpora |
+| Init | Průvodce inicializací při prvním spuštění |
+| Knowledge | Vizualizace a dotazování znalostního grafu |
+| Log | Prohlížeč systémových logů, podpora filtrování silikonových bytostí |
+| Memory | Prohlížeč dlouhodobé paměti, podpora pokročilého filtrování, statistik a detailů |
+| Permission | Správa oprávnění |
+| PermissionRequest | Fronta žádostí o oprávnění |
+| Project | Správa projektů, včetně pracovních poznámek a úkolového systému |
+| System | Systémová správa a monitorování běhu |
+| Task | Rozhraní úkolového systému |
+| Timer | Správa systému časovačů, včetně historie provádění |
+| Usage | Dashboard auditu využití tokenů s grafy trendů a exportem |
+| WorkNote | Správa pracovních poznámek, podpora vyhledávání a generování obsahu |
+
+### Aktualizace v Reálném Čase
+
+- **SSE (Server-Sent Events)** — Push aktualizace chatových zpráv, stavu bytostí a systémových událostí prostřednictvím `SSEHandler`
+- **Žádný WebSocket** — Jednodušší architektura s SSE pro většinu požadavků v reálném čase
+- **Automatické znovupřipojení** — Logika znovupřipojení na straně klienta pro odolné připojení
+
+### Lokalizace
+
+Systém podporuje kompletní lokalizaci **29 jazykových variant**:
+- **Čínština (6)**: zh-CN (zjednodušená), zh-HK (tradiční), zh-SG (Singapur), zh-MO (Macao), zh-TW (Tchaj-wan), zh-MY (Malajsie)
+- **Angličtina (10)**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY
+- **Španělština (2)**: es-ES, es-MX
+- **Němčina (5)**: de-DE, de-AT, de-CH, de-LU, de-LI
+- **Francouzština (3)**: fr-FR, fr-CA, fr-CH
+- **Ostatní (3)**: ja-JP (japonština), ko-KR (korejština), cs-CZ (čeština)
+
+Aktivní jazykové prostředí je vybráno prostřednictvím `DefaultConfigData.Language` a vyhodnoceno přes `LocalizationManager`.
+
+---
+
 ## Klíčová Rozhodnutí o Designu
 
 ### Úložiště jako Instance (ne Statické)
@@ -397,7 +477,13 @@ Kód je na disku uložen šifrovaný pomocí AES-256. Šifrovací klíč je odvo
 
 ## Audit Využití Tokenů
 
-Prostřednictvím `DefaultConfigData.Language` je vybráno aktivní jazykové prostředí a řešeno přes `LocalizationManager`.
+`TokenUsageAuditManager` sleduje spotřebu AI tokenů napříč všemi bytostmi:
+
+- `TokenUsageRecord` — Záznam každého požadavku (ID bytosti, model, prompt tokeny, completion tokeny, časové razítko)
+- `TokenUsageSummary` — Agregované statistiky
+- `TokenUsageQuery` — Parametry dotazu pro filtrování záznamů
+- Perzistentní prostřednictvím `ITimeStorage` pro časové řady dotazů
+- Přístupné přes Web UI (UsageController) a `TokenAuditTool` (pouze kurátor)
 
 ---
 

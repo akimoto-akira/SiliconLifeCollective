@@ -400,7 +400,7 @@ Code wird auf Festplatte mit AES-256 verschlüsselt gespeichert. Verschlüsselun
 - `TokenUsageSummary` — Aggregierte Statistiken
 - `TokenUsageQuery` — Query-Parameter zum Filtern von Datensätzen
 - Persistiert durch `ITimeStorage` für Zeitreihenabfragen
-- Zugänglich durch Web-UI (AuditController) und `TokenAuditTool` (nur Curator)
+- Zugänglich durch Web-UI (UsageController) und `TokenAuditTool` (nur Curator)
 
 ---
 
@@ -480,12 +480,11 @@ Die Web-UI vermeidet vollständig Template-Dateien, generiert alle Markierungen 
 
 ### Controller-System
 
-Die Web-UI folgt **MVC-ähnlichem Pattern**, 20+ Controller behandeln verschiedene Aspekte:
+Die Web-UI folgt **MVC-ähnlichem Pattern**, 22 Controller behandeln verschiedene Aspekte:
 
 | Controller | Zweck |
 |------------|---------|
 | About | Über-Seite und Projektinformationen |
-| Audit | Token-Nutzungsaudit-Dashboard mit Trendgrafiken und Export |
 | Being | Silicon Being-Verwaltung und Status |
 | Chat | Echtzeit-Chat-Oberfläche mit SSE |
 | ChatHistory | Chat-Verlaufsansicht mit Sitzungsliste und Nachrichtendetails |
@@ -502,8 +501,10 @@ Die Web-UI folgt **MVC-ähnlichem Pattern**, 20+ Controller behandeln verschiede
 | Permission | Berechtigungsverwaltung |
 | PermissionRequest | Berechtigungsanfrage-Warteschlange |
 | Project | Projektverwaltung mit Arbeitsnotizen und Aufgabensystem |
+| System | Systemverwaltung und Laufzeitüberwachung |
 | Task | Aufgabensystem-Oberfläche |
 | Timer | Timer-Systemverwaltung mit Ausführungsverlauf |
+| Usage | Token-Nutzungsaudit-Dashboard mit Trendgrafiken und Export |
 | WorkNote | Arbeitsnotizenverwaltung mit Suche und Inhaltsverzeichnis |
 
 ### Echtzeitaktualisierungen
@@ -514,10 +515,12 @@ Die Web-UI folgt **MVC-ähnlichem Pattern**, 20+ Controller behandeln verschiede
 
 ### Lokalisierung
 
-Das System unterstützt umfassende Lokalisierung für **21 Sprachvarianten**:
-- **Chinesisch (6)**: zh-CN (Simplified), zh-HK (Traditional), zh-SG (Singapur), zh-MO (Macau), zh-TW (Taiwan), zhMY (Malaysia)
+Das System unterstützt umfassende Lokalisierung für **29 Sprachvarianten**:
+- **Chinesisch (6)**: zh-CN (Simplified), zh-HK (Traditional), zh-SG (Singapur), zh-MO (Macau), zh-TW (Taiwan), zh-MY (Malaysia)
 - **Englisch (10)**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY
 - **Spanisch (2)**: es-ES, es-MX
+- **Deutsch (5)**: de-DE, de-AT, de-CH, de-LU, de-LI
+- **Französisch (3)**: fr-FR, fr-CA, fr-CH
 - **Andere (3)**: ja-JP (Japanisch), ko-KR (Koreanisch), cs-CZ (Tschechisch)
 
 Aktives Locale ausgewählt durch `DefaultConfigData.Language`, aufgelöst durch `LocalizationManager`.

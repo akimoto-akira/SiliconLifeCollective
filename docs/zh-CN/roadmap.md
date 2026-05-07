@@ -20,7 +20,7 @@
 - ✅ 阶段 1：基础项目结构和配置系统移植
 - ✅ 阶段 2：Web UI 和控制器移植
 - ✅ 阶段 3：存储系统优化（SpeedyPack 内存存储 + 异步持久化）
-- ✅ 阶段 3.5：SpeedyPack 管理工具（SiliconLife.Speedy.Manager WPF 应用）
+- ✅ 阶段 3.5：SpeedyPack 管理工具（SiliconLife.Speedy.Manager Windows Forms 应用）
 - ✅ 阶段 3.6：插件系统（IPlugin 接口、安全沙箱、AssemblyLoadContext 隔离）
 - 🚧 阶段 4：系统托盘和窗体应用开发
 - 📋 阶段 5：性能优化（连接池、对象池、无锁并发）

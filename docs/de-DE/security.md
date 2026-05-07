@@ -305,7 +305,7 @@ Protokolle persistent im Storage, einsehbar durch Web UI (Log-Controller).
 - **Pro Anfrage Datensatz** — Jeder KI-Aufruf protokolliert Being-ID, Modell, Prompt-Token, Completion-Token und Zeitstempel.
 - **Anomalie-Erkennung** — Ungewöhnliche Token-Verbrauchsmuster können Prompt-Injection oder Ressourcenmissbrauch indizieren.
 - **Nur Curator-Zugriff** — `TokenAuditTool` (markiert `[SiliconManagerOnly]`) erlaubt Curator Token-Nutzung abzufragen und zusammenzufassen.
-- **Web-Dashboard** — `AuditController` bietet browserbasiertes Dashboard mit Trendgrafiken und Datenexport.
+- **Web-Dashboard** — `UsageController` bietet browserbasiertes Dashboard mit Trendgrafiken und Datenexport.
 - **Persistenter Storage** — Datensätze gespeichert durch `ITimeStorage` für Zeitreihenabfragen und Langzeitanalyse.
 
 ---

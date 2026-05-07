@@ -20,9 +20,7 @@
 - ✅ Phase 1 : Portage de la structure de projet de base et du système de configuration
 - ✅ Phase 2 : Portage de l'interface Web et des contrôleurs
 - ✅ Phase 3 : Optimisation du système de stockage (stockage en mémoire SpeedyPack + persistance asynchrone)
-- ✅ Phase 3.5 : Outil de gestion SpeedyPack (application WPF SiliconLife.Speedy.Manager)
-- ✅ Phase 3.6 : Système de plugins (interface IPlugin, bac à sable de sécurité, isolation AssemblyLoadContext)
-- 🚧 Phase 4 : Barre d'état système et développement d'application Forms
+- ✅ Phase 3.5 : Outil de gestion SpeedyPack (application Windows Forms SiliconLife.Speedy.Manager)
 - 📋 Phase 5 : Optimisation des performances (pool de connexions, pool d'objets, concurrence sans verrou)
 - 📋 Phase 6 : Remplacement du serveur Web Kestrel
 - 📋 Phase 7 : Sérialisation binaire MessagePack

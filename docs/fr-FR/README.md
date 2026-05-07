@@ -4,7 +4,7 @@
 
 **Version : v0.1.0-alpha** | **Silicon Life Collective** — Une plateforme de collaboration multi-agents basée sur .NET 9, où les agents IA sont appelés **Silicon Beings** et peuvent s'auto-développer grâce à la compilation dynamique Roslyn.
 
-[English](../README.md) | [Deutsch](../de-DE/README.md) | **Français** | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Čeština](../cs-CZ/README.md)
+[English](../README.md) | [Deutsch](../de-DE/README.md) | **Français** | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Čeština](../cs-CZ/README.md) | [Italiano](../it-IT/README.md)
 
 ## 🌟 Fonctionnalités clés
 
@@ -150,59 +150,50 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # Localisateur de services global
 │   │
 │   ├── SiliconLife.Common/                # Implémentation commune (les deux versions)
-│   │   ├── AI/                            # Fabrique de clients IA
+│   │   ├── AI/                            # Clients IA et fabriques (Ollama, DashScope, VolcengineArk)
 │   │   ├── Calendar/                      # 32 implémentations de calendriers
-│   │   ├── Localization/                  # Classe de base de localisation
+│   │   ├── Localization/                  # Classe de base de localisation et 29 variantes linguistiques/régionales
+│   │   ├── Resources/                     # Fichiers de ressources partagés
 │   │   ├── Security/                      # Gestionnaire de permissions
 │   │   ├── SiliconBeing/                  # Implémentation standard du Silicon Being
-│   │   ├── Tools/                         # Implémentations communes des outils
-│   │   └── WebView/                       # Interfaces WebView
+│   │   ├── Tools/                         # 23 outils communs (dont outil de rechargement à chaud)
+│   │   ├── Web/                           # Infrastructure Web
+│   │   └── WebView/                       # Implémentation Playwright WebView
+│   │
+│   ├── SiliconLife.App/                   # Couche applicative (Web UI + aide, partagée entre Default et Fast)
+│   │   ├── Config/                        # Configuration applicative
+│   │   ├── Data/                          # Répertoire de données
+│   │   ├── Help/                          # Localisation de la documentation d'aide (multilingue)
+│   │   └── Web/                           # Implémentation de l'interface Web
+│   │       ├── Component/                 # Bibliothèque de composants UI (30+ composants)
+│   │       ├── Controllers/               # 22 contrôleurs
+│   │       ├── Models/                    # Modèles de vue
+│   │       ├── Views/                     # Vues HTML
+│   │       └── Skins/                     # 7 thèmes d'apparence
 │   │
 │   ├── SiliconLife.Default/               # Implémentation standard + point d'entrée (version console)
 │   │   ├── Program.cs                     # Point d'entrée (assemblage de tous les composants)
 │   │   ├── Config/                        # Données de configuration standard
-│   │   ├── Executors/                     # Implémentations standard des exécuteurs
-│   │   ├── Help/                          # Système de documentation d'aide
 │   │   ├── IM/                            # Fournisseur WebUI
 │   │   ├── Knowledge/                     # Implémentation du réseau de connaissances
-│   │   ├── Localization/                  # 24 localisations linguistiques
 │   │   ├── Logging/                       # Implémentations des fournisseurs de journalisation
 │   │   ├── Project/                       # Implémentation du système de projets
-│   │   ├── Runtime/                       # Objets horloge de test
 │   │   ├── Security/                      # Rappels de permissions standard
-│   │   ├── SiliconBeing/                  # Implémentation standard du Silicon Being
 │   │   ├── Storage/                       # Implémentation du stockage en système de fichiers
-│   │   ├── Tools/                         # Implémentations des outils intégrés
-│   │   ├── WebView/                       # Implémentation Playwright WebView
-│   │   └── Web/                           # Implémentation de l'interface Web
-│   │       ├── Controllers/               # 20+ contrôleurs
-│   │       ├── Models/                    # Modèles de vue
-│   │       ├── Views/                     # Vues HTML
-│   │       └── Skins/                     # 4 thèmes d'apparence
+│   │   └── Tools/                         # Outils spécifiques à la version (HelpTool)
 │   │
-│   └── SiliconLife.Fast/                  # Implémentation haute performance + point d'entrée (version Forms)
-│       ├── Program.cs                     # Point d'entrée (application Forms)
-│       ├── Config/                        # Données de configuration (partagées avec Default)
-│       ├── Executors/                     # Implémentations optimisées des exécuteurs
-│       ├── Help/                          # Système de documentation d'aide
-│       ├── IM/                            # Fournisseur WebUI
-│       ├── Knowledge/                     # Implémentation du réseau de connaissances (optimisée mémoire)
-│       ├── Localization/                  # 24 localisations linguistiques
-│       ├── Logging/                       # Fournisseurs de journalisation haute performance
-│       ├── Project/                       # Implémentation du système de projets
-│       ├── Security/                      # Rappels de permissions optimisés
-│       ├── SiliconBeing/                  # Implémentation haute performance du Silicon Being
-│       ├── Storage/                       # Adaptateur de stockage SpeedyPack
-│       ├── Tools/                         # Implémentations optimisées des outils intégrés
-│       ├── Tray/                          # Barre d'état système (9 localisations linguistiques)
-│       ├── WebView/                       # Implémentation Playwright WebView
-│       └── Web/                           # Implémentation haute performance de l'interface Web
-│           ├── Component/                 # Bibliothèque de composants UI (30+ composants)
-│           ├── Controllers/               # 20+ contrôleurs
-│           ├── Models/                    # Modèles de vue
-│           ├── Views/                     # Vues HTML
-│           └── Skins/                     # 7 thèmes d'apparence
-│
+│   ├── SiliconLife.Fast/                  # Implémentation haute performance + point d'entrée (version Forms)
+│   │   ├── Program.cs                     # Point d'entrée (application Forms)
+│   │   ├── Config/                        # Données de configuration (partagées avec Default)
+│   │   ├── IM/                            # Fournisseur WebUI
+│   │   ├── Knowledge/                     # Implémentation du réseau de connaissances (optimisée mémoire)
+│   │   ├── Logging/                       # Fournisseurs de journalisation haute performance
+│   │   ├── Project/                       # Implémentation du système de projets
+│   │   ├── Security/                      # Rappels de permissions optimisés
+│   │   ├── Storage/                       # Adaptateur de stockage SpeedyPack
+│   │   ├── Tools/                         # Outils spécifiques à la version (HelpTool)
+│   │   └── Tray/                          # Barre d'état système (29 variantes linguistiques)
+│   │
 │   ├── SiliconLife.Speedy/                # Moteur de stockage haute performance SpeedyPack
 │   │   ├── SpeedyPack.cs                  # Classe principale (mappage de répertoires en mémoire + cache + écriture asynchrone)
 │   │   ├── SpeedyPackOptions.cs           # Options de configuration (TTL du cache, max entrées, etc.)
@@ -220,22 +211,15 @@ SiliconLifeCollective.sln
 │       │   ├── SpkHeader.cs              # En-tête de fichier paquet
 │       │   └── PathNormalizer.cs          # Normalisation de chemin
 │   │
-│   └── SiliconLife.Speedy.Manager/        # Outil de gestion SpeedyPack (WPF)
+│   └── SiliconLife.Speedy.Manager/        # Outil de gestion SpeedyPack (Windows Forms)
 │       ├── MainForm.cs                    # Formulaire principal
 │       ├── Program.cs                     # Point d'entrée
 │       └── slc.ico                        # Icône de l'application
 │
 ├── docs/                                  # Documentation multilingue
 │   ├── zh-CN/                             # Chinois simplifié
-│   ├── de-DE/                             # Allemand
-│   ├── fr-FR/                             # Français
 │   ├── en/                                # Anglais
 │   └── ...                                # Autres langues
-│
-└── 总文档/                                 # Documents d'exigences et d'architecture
-    ├── 需求文档.md
-    ├── 架构大纲.md
-    └── 实现顺序.md
 ```
 
 ## 🏗️ Aperçu de l'architecture
@@ -333,8 +317,8 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 - [x] Phase 7 : Compilation dynamique + auto-développement (Roslyn)
 - [x] Phase 8 : Stockage à long terme + tâches + minuteries
 - [x] Phase 9 : Hôte principal + collaboration multi-agents
-- [x] Phase 10 : Interface Web (HTTP + SSE, 20+ contrôleurs, 4 thèmes)
-- [x] Phase 10.5 : Améliorations incrémentales (canaux de diffusion, audit de tokens, 32 calendriers, améliorations d'outils, localisation en 24 langues)
+- [x] Phase 10 : Interface Web (HTTP + SSE, 20+ contrôleurs, 7 thèmes)
+- [x] Phase 10.5 : Améliorations incrémentales (canaux de diffusion, audit de tokens, 32 calendriers, améliorations d'outils, localisation en 29 langues)
 - [x] Phase 10.6 : Complétion & Optimisation (WebView, système d'aide, espace de projet, réseau de connaissances)
 - [x] Phase 11 : Moteur de stockage SpeedyPack (remplacement de LiteDB, mappage en mémoire, file d'écriture asynchrone, compression automatique)
 - [x] Phase 12 : Système de plugins (interface IPlugin, bac à sable de sécurité PluginLoader, chargement isolé, intégration d'outils)

@@ -4,7 +4,7 @@
 
 **バージョン: v0.1.0-alpha** | **シリコン生命群** — .NET 9 をベースとしたマルチエージェント協力プラットフォーム。AI エージェントは**シリコン生命体**と呼ばれ、Roslyn 動的コンパイル技術による自己進化を実現します。
 
-[English](../README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | **日本語** | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md)
+[English](../README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | **日本語** | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md) | [Italiano](../it-IT/README.md)
 
 ## 🌟 コア機能
 
@@ -40,7 +40,7 @@
 ### Web インターフェース
 - **モダン Web UI** — 組み込み HTTP サーバー、SSE リアルタイム更新をサポート
 - **7種類のスキンのテーマ** — 管理版、チャット版、創作版、開発版、ハイコントラスト、ライト、ミニマル。自動発見と切り替えをサポート
-- **20+ のコントローラー** — 完全なシステム管理、チャット、設定、モニタリング機能
+- **22 のコントローラー** — 完全なシステム管理、チャット、設定、モニタリング機能
 - **ゼロフロントエンドフレームワーク依存** — `H`、`CssBuilder`、`JsBuilder` を介してサーバーサイドで HTML/CSS/JS を生成
 
 ### 国際化とローカライゼーション
@@ -150,59 +150,50 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # グローバルサービスロケーター
 │   │
 │   ├── SiliconLife.Common/                # 共有実装（2つのバージョンで共用）
-│   │   ├── AI/                            # AI クライアントファクトリー
+│   │   ├── AI/                            # AI クライアントとファクトリー（Ollama、DashScope、VolcengineArk）
 │   │   ├── Calendar/                      # 32種類のカレンダー実装
-│   │   ├── Localization/                  # ローカライゼーションベースクラス
+│   │   ├── Localization/                  # ローカライゼーションベースクラスと29種類の言語/地域バリアント実装
+│   │   ├── Resources/                     # 共有リソースファイル
 │   │   ├── Security/                      # 権限マネージャー
 │   │   ├── SiliconBeing/                  # デフォルトシリコン生命体実装
-│   │   ├── Tools/                         # 共通ツール実装
-│   │   └── WebView/                       # WebView インターフェース
+│   │   ├── Tools/                         # 23個の共通ツール実装（ホットリロードツール含む）
+│   │   ├── Web/                           # Web 基盤
+│   │   └── WebView/                       # Playwright WebView 実装
+│   │
+│   ├── SiliconLife.App/                   # アプリケーション層（Web UI + ヘルプドキュメント、Default と Fast で共用）
+│   │   ├── Config/                        # アプリケーション設定
+│   │   ├── Data/                          # データディレクトリ
+│   │   ├── Help/                          # ヘルプドキュメントローカライゼーション（多言語）
+│   │   └── Web/                           # Web UI 実装
+│   │       ├── Component/                 # UI コンポーネントライブラリ（30+ コンポーネント）
+│   │       ├── Controllers/               # 22 のコントローラー
+│   │       ├── Models/                    # ビューモデル
+│   │       ├── Views/                     # HTML ビュー
+│   │       └── Skins/                     # 7 種類のスキンのテーマ
 │   │
 │   ├── SiliconLife.Default/               # デフォルト実装 + アプリケーションエントリーポイント（コンソール版）
 │   │   ├── Program.cs                     # エントリーポイント（すべてのコンポーネントをアセンブル）
 │   │   ├── Config/                        # デフォルト設定データ
-│   │   ├── Executors/                     # デフォルト実行器実装
-│   │   ├── Help/                          # ヘルプドキュメントシステム
 │   │   ├── IM/                            # WebUI 提供者
 │   │   ├── Knowledge/                     # ナレッジネットワーク実装
-│   │   ├── Localization/                  # 21種類の言語ローカライゼーション
 │   │   ├── Logging/                       # ログ提供者実装
 │   │   ├── Project/                       # プロジェクトシステム実装
-│   │   ├── Runtime/                       # テストクロックオブジェクト
 │   │   ├── Security/                      # デフォルト権限コールバック
-│   │   ├── SiliconBeing/                  # デフォルトシリコン生命体実装
 │   │   ├── Storage/                       # ファイルシステムストレージ実装
-│   │   ├── Tools/                         # 組み込みツール実装
-│   │   ├── WebView/                       # Playwright WebView 実装
-│   │   └── Web/                           # Web UI 実装
-│   │       ├── Controllers/               # 20+ のコントローラー
-│   │       ├── Models/                    # ビューモデル
-│   │       ├── Views/                     # HTML ビュー
-│   │       └── Skins/                     # 4種類のスキンのテーマ
+│   │   └── Tools/                         # バージョン固有のツール実装（HelpTool）
 │   │
-│   └── SiliconLife.Fast/                  # 高性能実装 + アプリケーションエントリーポイント（フォーム版）
-│       ├── Program.cs                     # エントリーポイント（フォームアプリケーション）
-│       ├── Config/                        # 設定データ（Default と共有）
-│       ├── Executors/                     # 最適化実行器実装
-│       ├── Help/                          # ヘルプドキュメントシステム
-│       ├── IM/                            # WebUI 提供者
-│       ├── Knowledge/                     # ナレッジネットワーク実装（メモリ最適化）
-│       ├── Localization/                  # 21種類の言語ローカライゼーション
-│       ├── Logging/                       # 高性能ログ提供者
-│       ├── Project/                       # プロジェクトシステム実装
-│       ├── Security/                      # 最適化権限コールバック
-│       ├── SiliconBeing/                  # 高性能シリコン生命体実装
-│       ├── Storage/                       # SpeedyPack ストレージアダプター
-│       ├── Tools/                         # 最適化組み込みツール実装
-│       ├── Tray/                          # システムトレイ（9種類の言語ローカライゼーション）
-│       ├── WebView/                       # Playwright WebView 実装
-│       └── Web/                           # 高性能 Web UI 実装
-│           ├── Component/                 # UI コンポーネントライブラリ（30+ コンポーネント）
-│           ├── Controllers/               # 20+ のコントローラー
-│           ├── Models/                    # ビューモデル
-│           ├── Views/                     # HTML ビュー
-│           └── Skins/                     # 7種類のスキンのテーマ
-│
+│   ├── SiliconLife.Fast/                  # 高性能実装 + アプリケーションエントリーポイント（フォーム版）
+│   │   ├── Program.cs                     # エントリーポイント（フォームアプリケーション）
+│   │   ├── Config/                        # 設定データ（Default と共有）
+│   │   ├── IM/                            # WebUI 提供者
+│   │   ├── Knowledge/                     # ナレッジネットワーク実装（メモリ最適化）
+│   │   ├── Logging/                       # 高性能ログ提供者
+│   │   ├── Project/                       # プロジェクトシステム実装
+│   │   ├── Security/                      # 最適化権限コールバック
+│   │   ├── Storage/                       # SpeedyPack ストレージアダプター
+│   │   ├── Tools/                         # バージョン固有のツール実装（HelpTool）
+│   │   └── Tray/                          # システムトレイ（29種類の言語ローカライゼーション）
+│   │
 │   ├── SiliconLife.Speedy/                # SpeedyPack 高性能ストレージエンジン
 │   │   ├── SpeedyPack.cs                  # コアクラス（メモリディレクトリマッピング + キャッシュ + 非同期書き込み）
 │   │   ├── SpeedyPackOptions.cs           # 設定オプション（キャッシュ TTL、最大エントリ数など）
@@ -220,7 +211,7 @@ SiliconLifeCollective.sln
 │       │   ├── SpkHeader.cs              # パッケージファイルヘッダー
 │       │   └── PathNormalizer.cs          # パス正規化
 │   │
-│   └── SiliconLife.Speedy.Manager/        # SpeedyPack 管理ツール（WPF）
+│   └── SiliconLife.Speedy.Manager/        # SpeedyPack 管理ツール（Windows Forms）
 │       ├── MainForm.cs                    # メインフォーム
 │       ├── Program.cs                     # エントリーポイント
 │       └── slc.ico                        # アプリケーションアイコン
@@ -229,11 +220,6 @@ SiliconLifeCollective.sln
 │   ├── zh-CN/                             # 簡体字中国語ドキュメント
 │   ├── en/                                # 英語ドキュメント
 │   └── ...                                # その他の言語ドキュメント
-│
-└── 总文档/                                 # 要件ドキュメントとアーキテクチャドキュメント
-    ├── 需求文档.md
-    ├── 架构大纲.md
-    └── 实现顺序.md
 ```
 
 ## 🏗️ アーキテクチャ概要
@@ -331,8 +317,8 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 - [x] フェーズ 7：動的コンパイル + 自己進化（Roslyn）
 - [x] フェーズ 8：長期メモリ + タスク + タイマー
 - [x] フェーズ 9：コアホスト + マルチエージェント協力
-- [x] フェーズ 10：Web UI（HTTP + SSE、20+ コントローラー、4種類のスキン）
-- [x] フェーズ 10.5：増分強化（ブロードキャストチャンネル、トークン監査、32種類のカレンダー、ツール強化、21言語ローカライゼーション）
+- [x] フェーズ 10：Web UI（HTTP + SSE、20+ コントローラー、7種類のスキン）
+- [x] フェーズ 10.5：増分強化（ブロードキャストチャンネル、トークン監査、32種類のカレンダー、ツール強化、29言語ローカライゼーション）
 - [x] フェーズ 10.6：完成と最適化（WebView、ヘルプシステム、プロジェクトワークスペース、ナレッジネットワーク）
 - [x] フェーズ 11：SpeedyPack ストレージエンジン（LiteDB 置き換え、メモリマッピング、非同期書き込みキュー、自動圧縮）
 - [x] フェーズ 12：プラグインシステム（IPlugin インターフェース、PluginLoader セキュリティサンドボックス、隔離読み込み、ツール統合）

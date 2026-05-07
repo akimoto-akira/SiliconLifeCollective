@@ -4,7 +4,7 @@
 
 **Version: v0.1.0-alpha** | **Silicon Life Collective** — Eine auf .NET 9 basierende Multi-Agenten-Kollaborationsplattform, auf der KI-Agenten als **Silicon Beings** bezeichnet werden und sich durch Roslyn-Dynamikkompilierung selbst weiterentwickeln können.
 
-[English](../README.md) | **Deutsch** | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md)
+[English](../README.md) | **Deutsch** | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md) | [Italiano](../it-IT/README.md)
 
 ## 🌟 Kernfunktionen
 
@@ -40,7 +40,7 @@
 ### Web-Oberfläche
 - **Moderne Web-UI** — Integrierter HTTP-Server mit SSE-Echtzeitaktualisierungen
 - **7 Skin-Themes** — Admin-, Chat-, Creative-, Dev-, High-Contrast-, Light-, Minimal-Versionen, unterstützt automatische Erkennung und Umschaltung
-- **20+ Controller** — Vollständige Systemverwaltung, Chat, Konfiguration, Überwachungsfunktionalität
+- **22 Controller** — Vollständige Systemverwaltung, Chat, Konfiguration, Überwachungsfunktionalität
 - **Null Frontend-Framework-Abhängigkeit** — HTML/CSS/JS serverseitig generiert durch `H`, `CssBuilder` und `JsBuilder`
 
 ### Internationalisierung & Lokalisierung
@@ -150,77 +150,68 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # Globaler Service-Locator
 │   │
 │   ├── SiliconLife.Common/                # Gemeinsame Implementierung (beide Versionen)
-│   │   ├── AI/                            # KI-Client-Factory
+│   │   ├── AI/                            # KI-Client-Factory (Ollama, DashScope, VolcengineArk)
 │   │   ├── Calendar/                      # 32 Kalenderimplementierungen
-│   │   ├── Localization/                  # Lokalisierung-Basisklasse
+│   │   ├── Localization/                  # Lokalisierung-Basisklasse mit 29 Sprach-/Regionvarianten
+│   │   ├── Resources/                     # Gemeinsame Ressourcendateien
 │   │   ├── Security/                      # Berechtigungsmanager
 │   │   ├── SiliconBeing/                  # Standard-Silicon-Being-Implementierung
-│   │   ├── Tools/                         # Gemeinsame Tool-Implementierungen
-│   │   └── WebView/                       # WebView-Schnittstellen
+│   │   ├── Tools/                         # 23 gemeinsame Tool-Implementierungen (inkl. Hot-Reload-Tool)
+│   │   ├── Web/                           # Web-Infrastruktur
+│   │   └── WebView/                       # Playwright WebView-Implementierung
+│   │
+│   ├── SiliconLife.App/                   # Anwendungsschicht (Web UI + Hilfe, von Default und Fast gemeinsam genutzt)
+│   │   ├── Config/                        # Anwendungskonfiguration
+│   │   ├── Data/                          # Datenverzeichnis
+│   │   ├── Help/                          # Hilfedokumentations-Lokalisierung (mehrsprachig)
+│   │   └── Web/                           # Web-UI-Implementierung
+│   │       ├── Component/                 # UI-Komponentenbibliothek (30+ Komponenten)
+│   │       ├── Controllers/               # 22 Controller
+│   │       ├── Models/                    # View-Modelle
+│   │       ├── Views/                     # HTML-Ansichten
+│   │       └── Skins/                     # 7 Skin-Themes
 │   │
 │   ├── SiliconLife.Default/               # Standardimplementierung + Anwendungseinstieg (Konsolenversion)
 │   │   ├── Program.cs                     # Einstiegspunkt (Alle Komponenten assemblieren)
 │   │   ├── Config/                        # Standard-Konfigurationsdaten
-│   │   ├── Executors/                     # Standard-Executor-Implementierungen
-│   │   ├── Help/                          # Hilfedokumentationssystem
 │   │   ├── IM/                            # WebUI-Provider
 │   │   ├── Knowledge/                     # Wissensnetzwerk-Implementierung
-│   │   ├── Localization/                  # 21 Sprachlokalisierungen
 │   │   ├── Logging/                       # Logging-Provider-Implementierungen
 │   │   ├── Project/                       # Projektssystem-Implementierung
-│   │   ├── Runtime/                       # Test-Clock-Objekte
 │   │   ├── Security/                      # Standard-Berechtigungs-Callbacks
-│   │   ├── SiliconBeing/                  # Standard-Silicon-Being-Implementierung
 │   │   ├── Storage/                       # Dateisystem-Speicherimplementierung
-│   │   ├── Tools/                         # Integrierte Tool-Implementierungen
-│   │   ├── WebView/                       # Playwright-WebView-Implementierung
-│   │   └── Web/                           # Web-UI-Implementierung
-│   │       ├── Controllers/               # 20+ Controller
-│   │       ├── Models/                    # View-Modelle
-│   │       ├── Views/                     # HTML-Ansichten
-│   │       └── Skins/                     # 4 Skin-Themes
+│   │   └── Tools/                         # Versionsspezifische Tool-Implementierungen (HelpTool)
 │   │
-│   └── SiliconLife.Fast/                  # Hochleistungsimplementierung + Anwendungseinstieg (Forms-Version)
-│       ├── Program.cs                     # Einstiegspunkt (Forms-Anwendung)
-│       ├── Config/                        # Konfigurationsdaten (mit Default geteilt)
-│       ├── Executors/                     # Optimierte Executor-Implementierungen
-│       ├── Help/                          # Hilfedokumentationssystem
-│       ├── IM/                            # WebUI-Provider
-│       ├── Knowledge/                     # Wissensnetzwerk-Implementierung (Speicheroptimiert)
-│       ├── Localization/                  # 21 Sprachlokalisierungen
-│       ├── Logging/                       # Hochleistungs-Logging-Provider
-│       ├── Project/                       # Projektssystem-Implementierung
-│       ├── Security/                      # Optimierte Berechtigungs-Callbacks
-│       ├── SiliconBeing/                  # Hochleistungs-Silicon-Being-Implementierung
-│       ├── Storage/                       # SpeedyPack-Speicheradapter
-│       ├── Tools/                         # Optimierte integrierte Tool-Implementierungen
-│       ├── Tray/                          # Systemtray (9 Sprachlokalisierungen)
-│       ├── WebView/                       # Playwright-WebView-Implementierung
-│       └── Web/                           # Hochleistungs-Web-UI-Implementierung
-│           ├── Component/                 # UI-Komponentenbibliothek (30+ Komponenten)
-│           ├── Controllers/               # 20+ Controller
-│           ├── Models/                    # View-Modelle
-│           ├── Views/                     # HTML-Ansichten
-│           └── Skins/                     # 7 Skin-Themes
-│
+│   ├── SiliconLife.Fast/                  # Hochleistungsimplementierung + Anwendungseinstieg (Forms-Version)
+│   │   ├── Program.cs                     # Einstiegspunkt (Forms-Anwendung)
+│   │   ├── Config/                        # Konfigurationsdaten (mit Default geteilt)
+│   │   ├── IM/                            # WebUI-Provider
+│   │   ├── Knowledge/                     # Wissensnetzwerk-Implementierung (Speicheroptimiert)
+│   │   ├── Logging/                       # Hochleistungs-Logging-Provider
+│   │   ├── Project/                       # Projektssystem-Implementierung
+│   │   ├── Security/                      # Optimierte Berechtigungs-Callbacks
+│   │   ├── Storage/                       # SpeedyPack-Speicheradapter
+│   │   ├── Tools/                         # Versionsspezifische Tool-Implementierungen (HelpTool)
+│   │   └── Tray/                          # Systemtray (29 Sprachlokalisierungen)
+│   │
 │   ├── SiliconLife.Speedy/                # SpeedyPack Hochleistungsspeicher-Engine
 │   │   ├── SpeedyPack.cs                  # Kernklasse (In-Memory-Verzeichniszuordnung + Cache + asynchrones Schreiben)
 │   │   ├── SpeedyPackOptions.cs           # Konfigurationsoptionen (Cache-TTL, max. Einträge usw.)
 │   │   ├── IPackTransaction.cs            # Transaktionsschnittstelle
 │   │   ├── SpkFileInfo.cs                 # Dateiinformationen
 │   │   └── Internal/                      # Interne Implementierung
-│       │   ├── DirectoryMap.cs            # In-Memory-Verzeichniszuordnung
-│       │   ├── EntryCache.cs              # Eintrags-Cache
-│       │   ├── FreeList.cs                # Freiraumverwaltung
-│       │   ├── PackFileReader.cs          # Paketdatei-Leser
-│       │   ├── PackFileWriter.cs          # Paketdatei-Schreiber
-│       │   ├── WriteQueue.cs              # Asynchrone Schreibwarteschlange
-│       │   ├── WriteOperation.cs          # Schreiboperation
-│       │   ├── SpeedyTransaction.cs       # Transaktionsimplementierung
-│       │   ├── SpkHeader.cs              # Paketdatei-Header
-│       │   └── PathNormalizer.cs          # Pfadnormalisierung
+│   │       ├── DirectoryMap.cs            # In-Memory-Verzeichniszuordnung
+│   │       ├── EntryCache.cs              # Eintrags-Cache
+│   │       ├── FreeList.cs                # Freiraumverwaltung
+│   │       ├── PackFileReader.cs          # Paketdatei-Leser
+│   │       ├── PackFileWriter.cs          # Paketdatei-Schreiber
+│   │       ├── WriteQueue.cs              # Asynchrone Schreibwarteschlange
+│   │       ├── WriteOperation.cs          # Schreiboperation
+│   │       ├── SpeedyTransaction.cs       # Transaktionsimplementierung
+│   │       ├── SpkHeader.cs               # Paketdatei-Header
+│   │       └── PathNormalizer.cs          # Pfadnormalisierung
 │   │
-│   └── SiliconLife.Speedy.Manager/        # SpeedyPack-Verwaltungstool (WPF)
+│   └── SiliconLife.Speedy.Manager/        # SpeedyPack-Verwaltungstool (Windows Forms)
 │       ├── MainForm.cs                    # Hauptformular
 │       ├── Program.cs                     # Einstiegspunkt
 │       └── slc.ico                        # Anwendungssymbol

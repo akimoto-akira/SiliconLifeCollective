@@ -305,7 +305,7 @@ Le `TokenUsageAuditManager` fournit un suivi de la consommation de tokens IA per
 - **Enregistrement par requête** — Chaque appel IA enregistre l'ID du Being, le modèle, les tokens de prompt, les tokens de complétion et l'horodatage.
 - **Détection d'anomalies** — Des modèles de consommation de tokens inhabituels peuvent indiquer une injection de prompt ou un abus de ressources.
 - **Accès Curator uniquement** — `TokenAuditTool` (marqué `[SiliconManagerOnly]`) permet au Curator de consulter et résumer l'utilisation des tokens.
-- **Tableau de bord Web** — `AuditController` fournit un tableau de bord basé sur le navigateur avec graphiques de tendance et export de données.
+- **Tableau de bord Web** — `UsageController` fournit un tableau de bord basé sur le navigateur avec graphiques de tendance et export de données.
 - **Stockage persistant** — Les enregistrements sont stockés via `ITimeStorage` pour les requêtes de séries temporelles et l'analyse à long terme.
 
 ---

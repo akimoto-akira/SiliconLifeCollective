@@ -18,7 +18,7 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # Standardimplementierung, Einstiegspunkt (Architektur-Machbarkeitsverifizierung)
 │   ├── SiliconLife.Fast/            # Hochleistungsimplementierung, Einstiegspunkt (Haupt-Produktionsversion)
 │   ├── SiliconLife.Speedy/          # SpeedyPack Hochleistungs-Speicher-Engine
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack Verwaltungstool (WPF)
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack Verwaltungstool (Windows Forms)
 └── docs/                            # Mehrsprachige Dokumentation
 ```
 
@@ -75,7 +75,7 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### Neues Tool hinzufügen
 
-1. Neue Klasse in `src/SiliconLife.Default/Tools/` erstellen:
+1. Neue Klasse in `src/SiliconLife.Common/Tools/` erstellen (von beiden Versionen geteilte Tools) oder `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (versionsspezifische Tools):
 
 ```csharp
 public class MyCustomTool : ITool
@@ -111,7 +111,7 @@ public class AdminTool : ITool { ... }
 
 ### Neuen KI-Client hinzufügen
 
-1. `IAIClient` in `src/SiliconLife.Default/AI/` implementieren:
+1. `IAIClient` in `src/SiliconLife.Common/AI/` implementieren:
 
 ```csharp
 public class MyAIClient : IAIClient
@@ -158,7 +158,7 @@ public class MyAIClientFactory : IAIClientFactory
 
 ### Neues Storage-Backend hinzufügen
 
-1. `IStorage` und `ITimeStorage` in `src/SiliconLife.Default/Storage/` implementieren:
+1. `IStorage` und `ITimeStorage` in `src/SiliconLife.Default/Storage/` (Dateisystemimplementierung) oder `src/SiliconLife.Fast/Storage/` (SpeedyPack-Adapter) implementieren:
 
 ```csharp
 public class DatabaseStorage : IStorage, ITimeStorage
@@ -182,7 +182,7 @@ public class DatabaseStorage : IStorage, ITimeStorage
 
 ### Neuen Skin hinzufügen
 
-1. `ISkin` in `src/SiliconLife.Default/Web/Skins/` implementieren:
+1. `ISkin` in `src/SiliconLife.App/Web/Skins/` implementieren:
 
 ```csharp
 public class MyCustomSkin : ISkin
@@ -262,24 +262,35 @@ public class MyPluginTool : ITool
 ### Code-Organisation
 
 ```
-SiliconLife.Default/
-├── AI/                    # KI-Client-Implementierungen
-├── Calendar/              # Kalender-Implementierungen
-├── Config/                # Standard-Konfigurationsdaten
-├── Executors/             # Executor-Implementierungen
-├── IM/                    # IM-Provider-Implementierungen
-├── Localization/          # Lokalisierungs-Implementierungen
-├── Logging/               # Logging-Provider-Implementierungen
-├── Runtime/               # Runtime-Komponenten
-├── Security/              # Sicherheits-Implementierungen
+SiliconLife.Common/
+├── AI/                    # KI-Client- und Factory-Implementierungen
+├── Calendar/              # 32 Kalenderimplementierungen
+├── Localization/          # Lokalisierungsbasisklasse mit 29 Sprachimplementierungen
+├── Security/              # Berechtigungsmanager
 ├── SiliconBeing/          # Standard-Silicon-Being-Implementierung
-├── Storage/               # Storage-Implementierungen
-├── Tools/                 # Integrierte Tools
+├── Tools/                 # Gemeinsame integrierte Tools
+├── Web/                   # Web-Infrastruktur
+└── WebView/               # Playwright WebView-Implementierung
+
+SiliconLife.App/          # Von Default und Fast gemeinsam genutzte Anwendungsschicht
+├── Config/                # Anwendungskonfiguration
+├── Help/                  # Hilfedokumentations-Lokalisierung
 └── Web/                   # Web-UI-Implementierung
+    ├── Component/         # UI-Komponentenbibliothek
     ├── Controllers/       # Route-Controller
     ├── Models/            # ViewModels
     ├── Views/             # HTML-Ansichten
     └── Skins/             # Skin-Themes
+
+SiliconLife.Default/      # Versionsspezifische Verzeichnisse
+├── Config/                # Standard-Konfigurationsdaten
+├── IM/                    # WebUI-Provider
+├── Knowledge/             # Wissensnetzwerk-Implementierung
+├── Logging/               # Logging-Provider-Implementierungen
+├── Project/               # Projektsystem-Implementierung
+├── Security/              # Standard-Berechtigungs-Callbacks
+├── Storage/               # Dateisystem-Speicherimplementierung
+└── Tools/                 # Versionsspezifische Tools (HelpTool)
 ```
 
 ### Dokumentation

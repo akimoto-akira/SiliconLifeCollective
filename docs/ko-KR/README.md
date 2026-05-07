@@ -4,7 +4,7 @@
 
 **버전: v0.1.0-alpha** | **실리콘 생명군** — .NET 9 기반의 멀티 에이전트 협업 플랫폼으로, AI 에이전트를 **실리콘 생명체(Silicon Being)**라고 부르며, Roslyn 동적 컴파일을 통해 자가 진화를 구현합니다.
 
-[English](../README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | **한국어** | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md)
+[English](../README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | **한국어** | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md) | [Italiano](../it-IT/README.md)
 
 ## 🌟 핵심 기능
 
@@ -150,90 +150,83 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # 글로벌 서비스 로케이터
 │   │
 │   ├── SiliconLife.Common/                # 공유 구현 (두 버전 공용)
-│   │   ├── AI/                            # AI 클라이언트 팩토리
+│   │   ├── AI/                            # AI 클라이언트 및 팩토리 (Ollama, DashScope, VolcengineArk)
 │   │   ├── Calendar/                      # 32가지 달력 구현
-│   │   ├── Localization/                  # 지역화 베이스 클래스
+│   │   ├── Localization/                  # 지역화 베이스 클래스 및 29개 언어/지역 변형 구현
+│   │   ├── Resources/                     # 공유 리소스 파일
 │   │   ├── Security/                      # 권한 관리자
 │   │   ├── SiliconBeing/                  # 기본 실리콘 생명체 구현
-│   │   ├── Tools/                         # 공통 도구 구현
-│   │   └── WebView/                       # WebView 인터페이스
+│   │   ├── Tools/                         # 23개 일반 도구 구현 (핫 리로드 도구 포함)
+│   │   ├── Web/                           # Web 기반 시설
+│   │   └── WebView/                       # Playwright WebView 구현
+│   │
+│   ├── SiliconLife.App/                   # 애플리케이션 레이어 (Web UI + 도움말 문서, Default와 Fast 공유)
+│   │   ├── Config/                        # 애플리케이션 설정
+│   │   ├── Data/                          # 데이터 디렉토리
+│   │   ├── Help/                          # 도움말 문서 지역화 (다국어)
+│   │   └── Web/                           # Web UI 구현
+│   │       ├── Component/                 # UI 컴포넌트 라이브러리 (30+ 컴포넌트)
+│   │       ├── Controllers/               # 22개 컨트롤러
+│   │       ├── Models/                    # 뷰 모델
+│   │       ├── Views/                     # HTML 뷰
+│   │       └── Skins/                     # 7가지 스킨 테마
 │   │
 │   ├── SiliconLife.Default/               # 기본 구현 + 애플리케이션 진입점 (콘솔 버전)
 │   │   ├── Program.cs                     # 진입점 (모든 구성 요소 조립)
 │   │   ├── Config/                        # 기본 설정 데이터
-│   │   ├── Executors/                     # 기본 실행기 구현
-│   │   ├── Help/                          # 도움말 문서 시스템
 │   │   ├── IM/                            # WebUI 제공자
 │   │   ├── Knowledge/                     # 지식 네트워크 구현
-│   │   ├── Localization/                  # 21개 언어 지역화
 │   │   ├── Logging/                       # 로깅 제공자 구현
 │   │   ├── Project/                       # 프로젝트 시스템 구현
-│   │   ├── Runtime/                       # 테스트 클록 객체
 │   │   ├── Security/                      # 기본 권한 콜백
-│   │   ├── SiliconBeing/                  # 기본 실리콘 생명체 구현
 │   │   ├── Storage/                       # 파일 시스템 스토리지 구현
-│   │   ├── Tools/                         # 내장 도구 구현
-│   │   ├── WebView/                       # Playwright WebView 구현
-│   │   └── Web/                           # Web UI 구현
-│   │       ├── Controllers/               # 20개 이상 컨트롤러
-│   │       ├── Models/                    # 뷰 모델
-│   │       ├── Views/                     # HTML 뷰
-│   │       └── Skins/                     # 4가지 스킨 테마
+│   │   └── Tools/                         # 버전별 도구 구현 (HelpTool)
 │   │
-│   └── SiliconLife.Fast/                  # 고성능 구현 + 애플리케이션 진입점 (폼 버전)
-│       ├── Program.cs                     # 진입점 (폼 애플리케이션)
-│       ├── Config/                        # 설정 데이터 (Default와 공유)
-│       ├── Executors/                     # 최적화 실행기 구현
-│       ├── Help/                          # 도움말 문서 시스템
-│       ├── IM/                            # WebUI 제공자
-│       ├── Knowledge/                     # 지식 네트워크 구현 (메모리 최적화)
-│       ├── Localization/                  # 21개 언어 지역화
-│       ├── Logging/                       # 고성능 로깅 제공자
-│       ├── Project/                       # 프로젝트 시스템 구현
-│       ├── Security/                      # 최적화 권한 콜백
-│       ├── SiliconBeing/                  # 고성능 실리콘 생명체 구현
-│       ├── Storage/                       # SpeedyPack 스토리지 어댑터
-│       ├── Tools/                         # 최적화 내장 도구 구현
-│       ├── Tray/                          # 시스템 트레이 (9개 언어 지역화)
-│       ├── WebView/                       # Playwright WebView 구현
-│       └── Web/                           # 고성능 Web UI 구현
-│           ├── Component/                 # UI 컴포넌트 라이브러리 (30개 이상 컴포넌트)
-│           ├── Controllers/               # 20개 이상 컨트롤러
-│           ├── Models/                    # 뷰 모델
-│           ├── Views/                     # HTML 뷰
-│           └── Skins/                     # 7가지 스킨 테마
-│
+│   ├── SiliconLife.Fast/                  # 고성능 구현 + 애플리케이션 진입점 (폼 버전)
+│   │   ├── Program.cs                     # 진입점 (폼 애플리케이션)
+│   │   ├── Config/                        # 설정 데이터 (Default와 공유)
+│   │   ├── IM/                            # WebUI 제공자
+│   │   ├── Knowledge/                     # 지식 네트워크 구현 (메모리 최적화)
+│   │   ├── Logging/                       # 고성능 로깅 제공자
+│   │   ├── Project/                       # 프로젝트 시스템 구현
+│   │   ├── Security/                      # 최적화 권한 콜백
+│   │   ├── Storage/                       # SpeedyPack 스토리지 어댑터
+│   │   ├── Tools/                         # 버전별 도구 구현 (HelpTool)
+│   │   └── Tray/                          # 시스템 트레이 (29개 언어 변형 지역화)
+│   │
 │   ├── SiliconLife.Speedy/                # SpeedyPack 고성능 스토리지 엔진
 │   │   ├── SpeedyPack.cs                  # 핵심 클래스 (메모리 디렉토리 매핑 + 캐시 + 비동기 쓰기)
 │   │   ├── SpeedyPackOptions.cs           # 설정 옵션 (캐시 TTL, 최대 항목 수 등)
 │   │   ├── IPackTransaction.cs            # 트랜잭션 인터페이스
 │   │   ├── SpkFileInfo.cs                 # 파일 정보
 │   │   └── Internal/                      # 내부 구현
-│       │   ├── DirectoryMap.cs            # 메모리 디렉토리 매핑
-│       │   ├── EntryCache.cs              # 항목 캐시
-│       │   ├── FreeList.cs                # 여유 공간 관리
-│       │   ├── PackFileReader.cs          # 팩 파일 리더
-│       │   ├── PackFileWriter.cs          # 팩 파일 라이터
-│       │   ├── WriteQueue.cs              # 비동기 쓰기 큐
-│       │   ├── WriteOperation.cs          # 쓰기 작업
-│       │   ├── SpeedyTransaction.cs       # 트랜잭션 구현
-│       │   ├── SpkHeader.cs              # 팩 파일 헤더
-│       │   └── PathNormalizer.cs          # 경로 정규화
+│   │       ├── DirectoryMap.cs            # 메모리 디렉토리 매핑
+│   │       ├── EntryCache.cs              # 항목 캐시
+│   │       ├── FreeList.cs                # 여유 공간 관리
+│   │       ├── PackFileReader.cs          # 팩 파일 리더
+│   │       ├── PackFileWriter.cs          # 팩 파일 라이터
+│   │       ├── WriteQueue.cs              # 비동기 쓰기 큐
+│   │       ├── WriteOperation.cs          # 쓰기 작업
+│   │       ├── SpeedyTransaction.cs       # 트랜잭션 구현
+│   │       ├── SpkHeader.cs               # 팩 파일 헤더
+│   │       └── PathNormalizer.cs          # 경로 정규화
 │   │
-│   └── SiliconLife.Speedy.Manager/        # SpeedyPack 관리 도구 (WPF)
+│   └── SiliconLife.Speedy.Manager/        # SpeedyPack 관리 도구 (Windows Forms)
 │       ├── MainForm.cs                    # 메인 폼
 │       ├── Program.cs                     # 진입점
 │       └── slc.ico                        # 애플리케이션 아이콘
 │
 ├── docs/                                  # 다국어 문서
-│   ├── zh-CN/                             # 중국어 간체 문서
-│   ├── en/                                # 영어 문서
+│   ├── en/                                # 영어
+│   ├── zh-CN/                             # 중국어 간체
+│   ├── zh-HK/                             # 중국어 번체
+│   ├── de-DE/                             # 독일어
+│   ├── ja-JP/                             # 일본어
+│   ├── ko-KR/                             # 한국어
+│   ├── es-ES/                             # 스페인어
+│   ├── fr-FR/                             # 프랑스어
+│   ├── cs-CZ/                             # 체코어
 │   └── ...                                # 기타 언어 문서
-│
-└── 总文档/                                 # 요구사항 문서 및 아키텍처 문서
-    ├── 需求文档.md
-    ├── 架构大纲.md
-    └── 实现顺序.md
 ```
 
 ## 🏗️ 아키텍처 개요
@@ -331,8 +324,8 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 - [x] 단계 7: 동적 컴파일 + 자가 진화 (Roslyn)
 - [x] 단계 8: 장기 메모리 + 작업 + 타이머
 - [x] 단계 9: 핵심 호스트 + 멀티 에이전트 협업
-- [x] 단계 10: Web UI (HTTP + SSE, 20개 이상 컨트롤러, 4가지 스킨)
-- [x] 단계 10.5: 점진적 향상 (브로드캐스트 채널, Token 감사, 32개 달력, 도구 향상, 21개 언어 지역화)
+- [x] 단계 10: Web UI (HTTP + SSE, 20개 이상 컨트롤러, 7가지 스킨)
+- [x] 단계 10.5: 점진적 향상 (브로드캐스트 채널, Token 감사, 32개 달력, 도구 향상, 29개 언어 지역화)
 - [x] 단계 10.6: 완성 및 최적화 (WebView, 도움말 시스템, 프로젝트 워크스페이스, 지식 네트워크)
 - [x] 단계 11: SpeedyPack 스토리지 엔진 (LiteDB 교체, 메모리 매핑, 비동기 쓰기 큐, 자동 압축)
 - [x] 단계 12: 플러그인 시스템 (IPlugin 인터페이스, PluginLoader 보안 샌드박스, 격리 로딩, 도구 통합)

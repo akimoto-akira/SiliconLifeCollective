@@ -20,9 +20,7 @@
 - ✅ 단계 1: 기본 프로젝트 구조 및 구성 시스템 이식
 - ✅ 단계 2: Web UI 및 컨트롤러 이식
 - ✅ 단계 3: 저장소 시스템 최적화 (SpeedyPack 메모리 저장소 + 비동기 영속성)
-- ✅ 단계 3.5: SpeedyPack 관리 도구 (SiliconLife.Speedy.Manager WPF 애플리케이션)
-- ✅ 단계 3.6: 플러그인 시스템 (IPlugin 인터페이스, 보안 샌드박스, AssemblyLoadContext 격리)
-- 🚧 단계 4: 시스템 트레이 및 양식 애플리케이션 개발
+- ✅ 단계 3.5: SpeedyPack 관리 도구 (SiliconLife.Speedy.Manager Windows Forms 애플리케이션)
 - 📋 단계 5: 성능 최적화 (커넥션 풀, 오브젝트 풀, 락 프리 동시성)
 - 📋 단계 6: Kestrel 웹 서버 교체
 - 📋 단계 7: MessagePack 바이너리 직렬화
