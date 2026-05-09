@@ -13,11 +13,12 @@
 
 using SiliconLife.Collective;
 using SiliconLife.Default;
-using SiliconLife.Default.IM;
 using SiliconLife.Default.Knowledge;
 using SiliconLife.Default.Logging;
 using SiliconLife.Default.Config;
 using SiliconLife.App.Web;
+using SiliconLife.App.IM;
+using SiliconLife.App;
 using System.Text;
 using SiliconLife.Common;
 using SiliconLife.Common.Security;
@@ -62,6 +63,7 @@ public class Program
         string pluginDir = Path.Combine(AppContext.BaseDirectory, "plugins");
         _pluginLoader = new PluginLoader(pluginDir);
         _pluginLoader.LoadAll();
+        ServiceLocator.Instance.RegisterToolAssembly(typeof(SiliconLife.App.Web.Router).Assembly);
         _logger.Info(null, "Plugins loaded from {0}", pluginDir);
 
         configData.AIConfig.TryGetValue("endpoint", out var endpointValue);
@@ -226,7 +228,6 @@ public class Program
         locator.Register(skinManager);
         locator.Register(codeBrowser);
         locator.Register(router);
-        locator.Register<Func<Guid, TaskCompletionSource<AskPermissionResult>>>(webUiProvider.GetPermissionTcs);
 
         router.SetOnFirstInit((curatorName) =>
         {

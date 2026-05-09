@@ -13,7 +13,7 @@
 
 using SiliconLife.Collective;
 
-namespace SiliconLife.Default;
+namespace SiliconLife.App;
 
 /// <summary>
 /// IM-based permission ask handler.

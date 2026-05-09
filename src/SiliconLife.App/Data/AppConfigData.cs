@@ -28,11 +28,6 @@ public abstract class AppConfigData : ConfigDataBase
     [ConfigIgnore("系统内部标识，不建议手动修改")]
     public override Guid CuratorGuid { get; set; }
 
-    /// <summary>
-    /// Gets or sets the data directory for storing all application data (from Default version)
-    /// </summary>
-    [ConfigGroup("Basic", Order = 2, DisplayNameKey = "DataDirectory", DescriptionKey = "DataDirectory")]
-    public DirectoryInfo DataDirectory { get; set; } = new DirectoryInfo("./data");
 
     [ConfigGroup("Basic", Order = 4, DisplayNameKey = "Language", DescriptionKey = "Language")]
     public override Language Language { get; set; } = Language.ZhCN;

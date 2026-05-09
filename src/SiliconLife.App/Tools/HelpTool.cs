@@ -5,9 +5,10 @@ using System.Text;
 using SiliconLife.Collective;
 using SiliconLife.Help;
 using SiliconLife.Common.Localization;
-using SiliconLife.Default.Config;
+using SiliconLife.App.Data;
+using SiliconLife.App.Web.Views;
 
-namespace SiliconLife.Default;
+namespace SiliconLife.App;
 
 /// <summary>
 /// Help documentation lookup tool for AI.
@@ -60,7 +61,7 @@ public class HelpTool : ITool
         var query = parameters.TryGetValue("query", out var queryObj) ? queryObj?.ToString() ?? "" : "";
 
         // Get current language help localization
-        var currentLang = ((DefaultConfigData)SiliconLife.Collective.Config.Instance.Data).Language;
+        var currentLang = ((AppConfigData)SiliconLife.Collective.Config.Instance.Data).Language;
         var helpLocalization = HelpLocalizationFactory.Create(currentLang);
 
         if (action == "list")
@@ -94,7 +95,7 @@ public class HelpTool : ITool
     /// </summary>
     private string ListAllTopics()
     {
-        var currentLang = ((DefaultConfigData)SiliconLife.Collective.Config.Instance.Data).Language;
+        var currentLang = ((AppConfigData)SiliconLife.Collective.Config.Instance.Data).Language;
         var helpLocalization = HelpLocalizationFactory.Create(currentLang);
         
         var sb = new StringBuilder();
@@ -122,7 +123,7 @@ public class HelpTool : ITool
     /// </summary>
     private string SearchTopics(string query)
     {
-        var currentLang = ((DefaultConfigData)SiliconLife.Collective.Config.Instance.Data).Language;
+        var currentLang = ((AppConfigData)SiliconLife.Collective.Config.Instance.Data).Language;
         var helpLocalization = HelpLocalizationFactory.Create(currentLang);
         var results = HelpTopics.Search(query, helpLocalization);
 
@@ -170,25 +171,5 @@ public class HelpTool : ITool
         }
 
         return content;
-    }
-}
-
-// Extension method for title case (if not already defined)
-public static class HelpToolStringExtensions
-{
-    public static string ToTitleCase(this string str)
-    {
-        if (string.IsNullOrEmpty(str))
-            return str;
-
-        var words = str.Split(' ');
-        for (int i = 0; i < words.Length; i++)
-        {
-            if (words[i].Length > 0)
-            {
-                words[i] = char.ToUpper(words[i][0]) + words[i].Substring(1).ToLower();
-            }
-        }
-        return string.Join(" ", words);
     }
 }

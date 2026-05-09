@@ -1,4 +1,4 @@
-﻿﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -13,6 +13,7 @@
 
 using System.Text.Json;
 using SiliconLife.Collective;
+using SiliconLife.App.IM;
 
 using SiliconLife.Common.Localization;
 
@@ -21,11 +22,11 @@ namespace SiliconLife.App.Web.Controllers;
 [WebCode]
 public class PermissionRequestController : Controller
 {
-    private readonly Func<Guid, TaskCompletionSource<AskPermissionResult>> _getPermissionTcs;
+    private readonly WebUIProvider _webUIProvider;
 
     public PermissionRequestController()
     {
-        _getPermissionTcs = ServiceLocator.Instance.Get<Func<Guid, TaskCompletionSource<AskPermissionResult>>>()!;
+        _webUIProvider = (WebUIProvider)ServiceLocator.Instance.Get<IIMProvider>()!;
     }
 
     public override void Handle()
@@ -127,8 +128,27 @@ public class PermissionRequestController : Controller
             return;
         }
 
-        var hasPending = _getPermissionTcs(userId) != null;
-        RenderJson(new { pending = hasPending });
+        var activeRequest = _webUIProvider.GetActivePermissionRequest();
+        var hasPending = activeRequest != null && activeRequest.UserId == userId;
+
+        if (hasPending && activeRequest != null)
+        {
+            RenderJson(new
+            {
+                pending = true,
+                type = "permission_ask",
+                requestId = activeRequest.RequestId.ToString(),
+                permissionType = activeRequest.PermissionType.ToString(),
+                resource = activeRequest.Resource,
+                allowCode = activeRequest.AllowCode,
+                denyCode = activeRequest.DenyCode,
+                content = $"Permission required: {activeRequest.PermissionType}\nResource: {activeRequest.Resource}\nAllow code: {activeRequest.AllowCode}\nDeny code: {activeRequest.DenyCode}"
+            });
+        }
+        else
+        {
+            RenderJson(new { pending = false });
+        }
     }
 
     private void Respond()
@@ -158,12 +178,8 @@ public class PermissionRequestController : Controller
             cacheDuration = TimeSpan.FromHours(hours);
         }
 
-        // Handle permission response
-        var tcs = _getPermissionTcs(userId);
-        if (tcs != null)
-        {
-            tcs.SetResult(new AskPermissionResult { Allowed = allowed, AddToCache = addToCache, CacheDuration = cacheDuration });
-        }
+        // Handle permission response via WebUIProvider's queue system
+        _webUIProvider.HandlePermissionResponse(userId, allowed, addToCache, cacheDuration);
 
         RenderJson(new { success = true });
     }

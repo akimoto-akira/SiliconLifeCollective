@@ -13,11 +13,12 @@
 
 using SiliconLife.Collective;
 using SiliconLife.Fast;
-using SiliconLife.Fast.IM;
 using SiliconLife.Fast.Knowledge;
 using SiliconLife.Fast.Logging;
 using SiliconLife.Fast.Tray;
 using SiliconLife.App.Web;
+using SiliconLife.App.IM;
+using SiliconLife.App;
 using SiliconLife.Fast.Config;
 using System.Text;
 using SiliconLife.Common;
@@ -51,7 +52,7 @@ public class Program
         _logger.Info(null, "Application starting...");
 
         RegisterLocalizations();
-        ConfigDataBaseConverter.RegisterConfigType("Default", typeof(DefaultConfigData));
+        ConfigDataBaseConverter.RegisterConfigType("Fast", typeof(DefaultConfigData));
 
         SiliconLife.Collective.Config config = SiliconLife.Collective.Config.Instance;
         config.Initialize(new DefaultConfigData());
@@ -65,6 +66,7 @@ public class Program
         _pluginLoader = new PluginLoader(pluginDir);
         _pluginLoader.LoadAll();
         ServiceLocator.Instance.Register(_pluginLoader);
+        ServiceLocator.Instance.RegisterToolAssembly(typeof(SiliconLife.App.Web.Router).Assembly);
         _logger.Info(null, "Plugins loaded from {0}", pluginDir);
 
         configData.AIConfig.TryGetValue("endpoint", out var endpointValue);
@@ -261,7 +263,6 @@ public class Program
         locator.Register(skinManager);
         locator.Register(codeBrowser);
         locator.Register(router);
-        locator.Register<Func<Guid, TaskCompletionSource<AskPermissionResult>>>(webUiProvider.GetPermissionTcs);
 
         router.SetOnFirstInit((curatorName) =>
         {
