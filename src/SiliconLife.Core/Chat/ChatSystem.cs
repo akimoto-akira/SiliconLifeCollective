@@ -253,6 +253,27 @@ public class ChatSystem
     }
 
     /// <summary>
+    /// Get all group chat sessions where the specified being is a member.
+    /// </summary>
+    /// <param name="memberId">The ID of the being to find group sessions for</param>
+    /// <returns>List of group chat sessions the being is a member of</returns>
+    public List<GroupChatSession> GetGroupChatSessionsForMember(Guid memberId)
+    {
+        var result = new List<GroupChatSession>();
+        lock (_lock)
+        {
+            foreach (var session in _sessions.Values)
+            {
+                if (session.Type == SessionType.GroupChat && session.Members.Contains(memberId))
+                {
+                    result.Add((GroupChatSession)session);
+                }
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
     /// Collect all pending (unprocessed) messages across all sessions for the given being.
     /// </summary>
     public List<ChatMessage> GetPendingMessages(Guid beingId)
@@ -435,5 +456,19 @@ public class ChatSystem
         }
         _logger.Debug(null, "{0} pending broadcast(s) for {1}", result.Count, beingId);
         return result;
+    }
+
+    /// <summary>
+    /// Marks a broadcast message as read by the specified being across all channels.
+    /// </summary>
+    public void MarkBroadcastAsRead(Guid messageId, Guid readerId)
+    {
+        lock (_lock)
+        {
+            foreach (BroadcastChannel channel in _broadcastChannels.Values)
+            {
+                channel.MarkMessageAsRead(messageId, readerId);
+            }
+        }
     }
 }

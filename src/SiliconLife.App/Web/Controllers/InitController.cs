@@ -346,10 +346,29 @@ public class InitController : Controller
         return helpMapping;
     }
 
-    // Factory creation disabled for shared module - will be implemented in Fast version
+    // Factory creation for shared module - enhanced with proper error handling
     private object CreateFactoryByType(string clientType)
     {
-        throw new NotSupportedException("AI client factory creation is not supported in shared module");
+        try
+        {
+            // Auto-discover all types that implement IAIClientFactory via reflection
+            var factoryTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(assembly => assembly.GetTypes())
+                .Where(type => typeof(IAIClientFactory).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+                .ToList();
+
+            var factoryType = factoryTypes.FirstOrDefault(t => t.Name == clientType);
+            if (factoryType != null)
+            {
+                return Activator.CreateInstance(factoryType)!;
+            }
+
+            return null!;
+        }
+        catch
+        {
+            return null!;
+        }
     }
 
     private void HandleGetAIConfigMetadata()
@@ -404,24 +423,53 @@ public class InitController : Controller
                 currentConfig = _configData.AIConfig.ToDictionary(kvp => kvp.Key, kvp => (object)kvp.Value);
             }
 
-            // Config keys metadata disabled for shared module
+            // Get config keys metadata from factory
             var fields = new List<object>();
 
-            // Build complete field data with current values
-            foreach (var kvp in new Dictionary<string, string>())
+            if (factory is IAIClientFactory aiFactory)
             {
-                var configKey = kvp.Key;
-                var label = kvp.Value;
-                var currentValue = currentConfig.ContainsKey(configKey) ? currentConfig[configKey].ToString() : "";
-
-                var fieldData = new Dictionary<string, object>
+                try
                 {
-                    ["key"] = configKey,
-                    ["label"] = label,
-                    ["value"] = currentValue
-                };
+                    // Get metadata using current language
+                    var metadata = aiFactory.GetConfigKeysMetadata(currentLanguage);
 
-                fields.Add(fieldData);
+                    // Build complete field data with current values
+                    foreach (var kvp in metadata)
+                    {
+                        var configKey = kvp.Key;
+                        var label = kvp.Value;
+                        var currentValue = currentConfig.ContainsKey(configKey) ? currentConfig[configKey].ToString() : "";
+
+                        // Get options for this config key
+                        var options = aiFactory.GetConfigKeyOptions(configKey, currentConfig, currentLanguage);
+
+                        var fieldData = new Dictionary<string, object>
+                        {
+                            ["key"] = configKey,
+                            ["label"] = label,
+                            ["value"] = currentValue
+                        };
+
+                        // Add options if available
+                        if (options != null && options.Count > 0)
+                        {
+                            var optionsDict = new Dictionary<string, string>();
+                            foreach (var opt in options)
+                            {
+                                optionsDict[opt.Key] = opt.Value;
+                            }
+                            fieldData["options"] = optionsDict;
+                        }
+
+                        fields.Add(fieldData);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // If metadata retrieval fails, return error
+                    RenderJson(new { success = false, message = $"Failed to get config metadata: {ex.Message}" });
+                    return;
+                }
             }
 
             RenderJson(new
@@ -479,10 +527,24 @@ public class InitController : Controller
             _configData.Language = lang;
         }
 
-        _configData.SaveConfig();
-        _router.NotifyInitialized(curatorName);
-
-        Redirect("/");
+        try
+        {
+            _configData.SaveConfig();
+            
+            // Verify config was actually saved
+            if (!_configData.ConfigExists())
+            {
+                throw new Exception("Configuration file was not created after save operation");
+            }
+            
+            _router.NotifyInitialized(curatorName);
+            Redirect("/");
+        }
+        catch (Exception ex)
+        {
+            ShowFormWithError(_localization.ConfigErrorSaveFailed.Replace("{0}", ex.Message));
+            return;
+        }
     }
 
     private JsSyntax GetSkinSwitchScript()

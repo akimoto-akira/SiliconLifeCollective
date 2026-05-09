@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -77,6 +77,11 @@ public class Router
         RegisterController(() => new UsageController(), "/api/usage/summary");
         RegisterController(() => new UsageController(), "/api/usage/trend");
         RegisterController(() => new UsageController(), "/api/usage/export");
+        RegisterController(() => new AuditController(), "/audit");
+        RegisterController(() => new AuditController(), "/audit/index");
+        RegisterController(() => new AuditController(), "/api/audit/list");
+        RegisterController(() => new AuditController(), "/api/audit/summary");
+        RegisterController(() => new AuditController(), "/api/audit/beings");
         RegisterController(() => new ConfigController(), "/config");
         RegisterController(() => new ConfigController(), "/config/save", "POST");
         RegisterController(() => new ConfigController(), "/config/aioptions", "GET");
@@ -170,6 +175,7 @@ public class Router
     {
         _isInitialized = initialized;
     }
+
 
     public void NotifyInitialized(string curatorName)
     {

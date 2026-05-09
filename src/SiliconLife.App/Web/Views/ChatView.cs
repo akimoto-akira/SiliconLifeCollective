@@ -1,4 +1,4 @@
-﻿﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -601,7 +601,7 @@ public class ChatView : ViewBase
             .Selector(".msg-tool")
                 .Property("margin", "8px 0")
             .EndSelector()
-            .Selector(".msg-tool .msg-collapsible")
+            .Selector(".msg-collapsible-tool")
                 .Property("background", "var(--bg-secondary, rgba(255,255,255,0.03))")
                 .Property("border", "1px solid var(--border)")
                 .Property("border-left", "3px solid var(--accent-warning, #f59e0b)")
@@ -638,6 +638,19 @@ public class ChatView : ViewBase
                 .Property("overflow-x", "auto")
                 .Property("max-height", "300px")
                 .Property("overflow-y", "auto")
+            .EndSelector()
+            .Selector(".msg-tool-body")
+                .Property("font-size", "14px")
+                .Property("line-height", "1.7")
+                .Property("color", "var(--text-primary)")
+                .Property("word-break", "break-word")
+                .Property("margin-bottom", "8px")
+            .EndSelector()
+            .Selector(".msg-tool-text")
+                .Property("font-size", "14px")
+                .Property("line-height", "1.7")
+                .Property("color", "var(--text-primary)")
+                .Property("word-break", "break-word")
             .EndSelector()
 
             .Comment("Message Time")
@@ -1136,6 +1149,16 @@ public class ChatView : ViewBase
             .Add(() => Js.Const(() => "data", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "event").Prop(() => "data"))))
             .Add(() => Js.Id(() => "handlePermission").Invoke(() => Js.Id(() => "data")).Stmt());
 
+        var checkPendingThenBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "data").Prop(() => "pending"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "showPermissionDialog").Invoke(() => Js.Id(() => "data")).Stmt()
+                    }
+                )}
+            }));
+
         var connectSSEBody = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
@@ -1157,6 +1180,7 @@ public class ChatView : ViewBase
             .Add(() => Js.Assign(() => Js.Id(() => "eventSource"), () => Js.New(() => Js.Id(() => "EventSource"), () => Js.Id(() => "url"))))
             .Add(() => Js.Id(() => "eventSource").Prop(() => "onopen").Assign(() => Js.Arrow(() => new List<string>(), () => Js.Block()
                 .Add(() => Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "SSE connected")).Stmt())
+                .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/permission/check?userId=").Op(() => "+", () => (JsSyntax)Js.Str(() => userId))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => checkPendingThenBody)).Stmt())
             )))
             .Add(() => Js.Id(() => "eventSource").Prop(() => "onerror").Assign(() => Js.Arrow(() => new List<string> { "err" }, () => Js.Block()
                 .Add(() => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "SSE error:"), () => Js.Id(() => "err")).Stmt())
@@ -1238,11 +1262,38 @@ public class ChatView : ViewBase
                     }
                 )}
             }))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "messageCache").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0")), new List<JsSyntax>
+                    {
+                        Js.Const(() => "lastCached", () => Js.Id(() => "messageCache").Index(() => Js.Id(() => "messageCache").Prop(() => "length").Op(() => "-", () => Js.Num(() => "1")))),
+                        Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                        {
+                            { (Js.Id(() => "lastCached").Prop(() => "role").Op(() => "===", () => Js.Str(() => "Assistant")).Op(() => "&&", () => Js.Id(() => "lastCached").Prop(() => "toolCallsJson").Not()), new List<JsSyntax>
+                                {
+                                    Js.Id(() => "messageCache").Call(() => "pop").Stmt()
+                                }
+                            )}
+                        })
+                    }
+                )}
+            }))
             .Add(() => Js.Id(() => "appendMessage").Invoke(() => Js.Obj()
                 .Prop(() => "isUser", () => Js.Id(() => "isCurrentUser"))
                 .Prop(() => "text", () => Js.Id(() => "data").Prop(() => "content"))
                 .Prop(() => "thinking", () => Js.Id(() => "data").Prop(() => "thinking"))
                 .Prop(() => "senderName", () => Js.Id(() => "data").Prop(() => "senderName"))
+                .Prop(() => "promptTokens", () => Js.Id(() => "data").Prop(() => "promptTokens"))
+                .Prop(() => "completionTokens", () => Js.Id(() => "data").Prop(() => "completionTokens"))
+                .Prop(() => "totalTokens", () => Js.Id(() => "data").Prop(() => "totalTokens"))).Stmt())
+            .Add(() => Js.Id(() => "messageCache").Call(() => "push", () => Js.Obj()
+                .Prop(() => "role", () => Js.Ternary(() => Js.Id(() => "isCurrentUser"), () => Js.Str(() => "User"), () => Js.Str(() => "Assistant")))
+                .Prop(() => "content", () => Js.Id(() => "data").Prop(() => "content"))
+                .Prop(() => "thinking", () => Js.Id(() => "data").Prop(() => "thinking"))
+                .Prop(() => "senderName", () => Js.Id(() => "data").Prop(() => "senderName"))
+                .Prop(() => "toolCallsJson", () => Js.Null())
+                .Prop(() => "toolCallId", () => Js.Null())
+                .Prop(() => "toolResults", () => Js.Null())
                 .Prop(() => "promptTokens", () => Js.Id(() => "data").Prop(() => "promptTokens"))
                 .Prop(() => "completionTokens", () => Js.Id(() => "data").Prop(() => "completionTokens"))
                 .Prop(() => "totalTokens", () => Js.Id(() => "data").Prop(() => "totalTokens"))).Stmt());
@@ -1255,22 +1306,50 @@ public class ChatView : ViewBase
             }))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
-                { (Js.Id(() => "lastStreamElementId"), new List<JsSyntax>
+                { (Js.Id(() => "data").Prop(() => "toolCallsJson").Op(() => "&&", () => Js.Id(() => "messageCache").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0"))), new List<JsSyntax>
                     {
-                        Js.Const(() => "streamEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Id(() => "lastStreamElementId"))),
+                        Js.Const(() => "prevMsg", () => Js.Id(() => "messageCache").Index(() => Js.Id(() => "messageCache").Prop(() => "length").Op(() => "-", () => Js.Num(() => "1")))),
                         Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                         {
-                            { (Js.Id(() => "streamEl"), new List<JsSyntax>
+                            { (Js.Id(() => "prevMsg").Prop(() => "role").Op(() => "!==", () => Js.Str(() => "User")).Op(() => "&&", () => Js.Id(() => "prevMsg").Prop(() => "role").Op(() => "!==", () => Js.Str(() => "Tool"))).Op(() => "&&", () => Js.Id(() => "prevMsg").Prop(() => "toolCallsJson").Not()).Op(() => "&&", () => Js.Id(() => "prevMsg").Prop(() => "content").Not()).Op(() => "&&", () => Js.Id(() => "prevMsg").Prop(() => "thinking").Not()), new List<JsSyntax>
                                 {
-                                    Js.Id(() => "streamEl").Call(() => "remove").Stmt()
+                                    Js.Id(() => "messageCache").Call(() => "pop").Stmt(),
+                                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                                    {
+                                        { (Js.Id(() => "lastStreamElementId"), new List<JsSyntax>
+                                            {
+                                                Js.Const(() => "streamEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Id(() => "lastStreamElementId"))),
+                                                Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                                                {
+                                                    { (Js.Id(() => "streamEl"), new List<JsSyntax>
+                                                        {
+                                                            Js.Id(() => "streamEl").Call(() => "remove").Stmt()
+                                                        }
+                                                    )}
+                                                }),
+                                                Js.Assign(() => Js.Id(() => "lastStreamElementId"), () => Js.Null())
+                                            }
+                                        )},
+                                        { (null, new List<JsSyntax>
+                                            {
+                                                Js.Const(() => "msgContainer", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))),
+                                                Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                                                {
+                                                    { (Js.Id(() => "msgContainer").Op(() => "&&", () => Js.Id(() => "msgContainer").Prop(() => "lastElementChild")), new List<JsSyntax>
+                                                        {
+                                                            Js.Id(() => "msgContainer").Prop(() => "lastElementChild").Call(() => "remove").Stmt()
+                                                        }
+                                                    )}
+                                                })
+                                            }
+                                        )}
+                                    })
                                 }
                             )}
-                        }),
-                        Js.Assign(() => Js.Id(() => "lastStreamElementId"), () => Js.Null())
+                        })
                     }
                 )}
             }))
-            // Cache the message regardless of type
             .Add(() => Js.Id(() => "messageCache").Call(() => "push", () => Js.Obj()
                 .Prop(() => "role", () => Js.Id(() => "data").Prop(() => "role"))
                 .Prop(() => "content", () => Js.Id(() => "data").Prop(() => "content"))
@@ -1467,6 +1546,17 @@ public class ChatView : ViewBase
                         }),
                         Js.Assign(() => Js.Id(() => "lastStreamElementId"), () => Js.Id(() => "streamingMessage").Prop(() => "elementId").Op(() => "||", () => (JsSyntax)Js.Null())),
                         Js.Assign(() => Js.Id(() => "currentStreamId"), () => Js.Null()),
+                        Js.Id(() => "messageCache").Call(() => "push", () => Js.Obj()
+                            .Prop(() => "role", () => Js.Str(() => "Assistant"))
+                            .Prop(() => "content", () => Js.Id(() => "streamingMessage").Prop(() => "text"))
+                            .Prop(() => "thinking", () => Js.Id(() => "streamingMessage").Prop(() => "thinking"))
+                            .Prop(() => "senderName", () => Js.Id(() => "streamingMessage").Prop(() => "senderName"))
+                            .Prop(() => "toolCallsJson", () => Js.Null())
+                            .Prop(() => "toolCallId", () => Js.Null())
+                            .Prop(() => "toolResults", () => Js.Null())
+                            .Prop(() => "promptTokens", () => Js.Id(() => "streamingMessage").Prop(() => "promptTokens"))
+                            .Prop(() => "completionTokens", () => Js.Id(() => "streamingMessage").Prop(() => "completionTokens"))
+                            .Prop(() => "totalTokens", () => Js.Id(() => "streamingMessage").Prop(() => "totalTokens"))).Stmt(),
                         Js.Assign(() => Js.Id(() => "streamingMessage"), () => Js.Null()),
                         Js.Return(() => Js.Id(() => "undefined"))
                     }
@@ -1558,6 +1648,13 @@ public class ChatView : ViewBase
                 .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                 {
                     (Js.Id(() => "m").Prop(() => "role").Op(() => "===", () => Js.Str(() => "Tool")), new List<JsSyntax>
+                    {
+                        Js.Return(() => Js.Id(() => "undefined"))
+                    })
+                }))
+                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                {
+                    (Js.Id(() => "m").Prop(() => "role").Op(() => "!==", () => Js.Str(() => "User")).Op(() => "&&", () => Js.Id(() => "m").Prop(() => "toolCallsJson").Not()).Op(() => "&&", () => Js.Id(() => "m").Prop(() => "content").Not()).Op(() => "&&", () => Js.Id(() => "m").Prop(() => "thinking").Not()), new List<JsSyntax>
                     {
                         Js.Return(() => Js.Id(() => "undefined"))
                     })
@@ -1789,12 +1886,33 @@ public class ChatView : ViewBase
         //   2) msg.toolResults present → ChatHistoryDetailView style (backend-merged results, also render responses)
         var renderToolMessageBody = Js.Block()
             .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "className"), () => Js.Str(() => "msg-tool")))
-            // Parse tool calls array from toolCallsJson
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "msg").Prop(() => "text").Op(() => "||", () => Js.Id(() => "msg").Prop(() => "thinking")), new List<JsSyntax>
+                    {
+                        Js.Const(() => "escText", () => Js.Id(() => "msg").Prop(() => "text")
+                            .Call(() => "replace", () => Js.Regex(() => @"&", () => "g"), () => Js.Str(() => "&amp;"))
+                            .Call(() => "replace", () => Js.Regex(() => "\"", () => "g"), () => Js.Str(() => "&quot;"))
+                            .Call(() => "replace", () => Js.Regex(() => @"<", () => "g"), () => Js.Str(() => "&lt;"))
+                            .Call(() => "replace", () => Js.Regex(() => @">", () => "g"), () => Js.Str(() => "&gt;"))),
+                        Js.Const(() => "thinkSection", () => Js.Ternary(
+                            () => Js.Id(() => "msg").Prop(() => "thinking"),
+                            () => Js.Str(() => "<details class=\"msg-collapsible\"><summary>" + vm.Localization.ChatThinkingSummary + "</summary><div class=\"msg-thinking-content\">")
+                                .Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "thinking"))
+                                .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></details>")),
+                            () => Js.Str(() => ""))),
+                        Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-tool-body\">")
+                            .Op(() => "+", () => (JsSyntax)Js.Id(() => "thinkSection"))
+                            .Op(() => "+", () => (JsSyntax)Js.Str(() => "<div class=\"msg-tool-text markdown-body\" data-md-raw=\""))
+                            .Op(() => "+", () => (JsSyntax)Js.Id(() => "escText"))
+                            .Op(() => "+", () => (JsSyntax)Js.Str(() => "\"></div></div>")))
+                    }
+                )}
+            }))
             .Add(() => Js.Const(() => "tcs", () => Js.Ternary(
                 () => Js.Id(() => "msg").Prop(() => "toolCallsJson"),
                 () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "msg").Prop(() => "toolCallsJson")),
                 () => Js.New(() => Js.Id(() => "Array")))))
-            // Build result map from toolResults (ChatHistoryDetailView style)
             .Add(() => Js.Const(() => "resultMap", () => Js.Obj()))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
@@ -1805,43 +1923,50 @@ public class ChatView : ViewBase
                             .Add(() => Js.Assign(() => Js.Id(() => "resultMap").Index(() => Js.Id(() => "r").Prop(() => "toolCallId")), () => Js.Id(() => "r"))))).Stmt()
                 })
             }))
-            // Start building HTML
-            .Add(() => Js.Let(() => "html", () => Js.Str(() => "<details class=\"msg-collapsible\"><summary>")
+            .Add(() => Js.Let(() => "toolHtml", () => Js.Str(() => "<details class=\"msg-collapsible msg-collapsible-tool\"><summary>")
                 .Op(() => "+", () => Js.Id(() => "getToolSummary").Invoke(() => Js.Id(() => "msg")))
                 .Op(() => "+", () => Js.Str(() => "</summary><div class=\"msg-tool-content\">"))))
-            // Render each tool call with its matching result
             .Add(() => Js.Id(() => "tcs").Call(() => "forEach",
                 () => Js.Arrow(() => new List<string> { "tc" }, () => Js.Block()
                     .Add(() => Js.Const(() => "dn", () => Js.Id(() => "toolDisplayNames").Index(() => Js.Id(() => "tc").Prop(() => "Name")).Op(() => "||", () => Js.Id(() => "tc").Prop(() => "Name"))))
-                    // Section header with tool display name + data-tool-call-id for precise matching
-                    .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
+                    .Add(() => Js.Assign(() => Js.Id(() => "toolHtml"), () => Js.Id(() => "toolHtml")
                         .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-section' data-tool-call-id='"))
                         .Op(() => "+", () => Js.Id(() => "tc").Prop(() => "Id"))
                         .Op(() => "+", () => Js.Str(() => "'>"))
                         .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-label'>🔧 "))
                         .Op(() => "+", () => Js.Id(() => "dn"))
                         .Op(() => "+", () => Js.Str(() => "</div>"))))
-                    // Individual request
-                    .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
+                    .Add(() => Js.Assign(() => Js.Id(() => "toolHtml"), () => Js.Id(() => "toolHtml")
                         .Op(() => "+", () => Js.Str(() => "<pre class='msg-tool-code'>"))
                         .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "tc"), () => Js.Null(), () => Js.Num(() => "2"))))
                         .Op(() => "+", () => Js.Str(() => "</pre>"))))
-                    // Matching result from resultMap (ChatHistoryDetailView style)
                     .Add(() => Js.Const(() => "res", () => Js.Id(() => "resultMap").Index(() => Js.Id(() => "tc").Prop(() => "Id"))))
                     .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                     {
                         (Js.Id(() => "res").Op(() => "&&", () => Js.Id(() => "res").Prop(() => "content")), new List<JsSyntax>
                         {
-                            Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
+                            Js.Assign(() => Js.Id(() => "toolHtml"), () => Js.Id(() => "toolHtml")
                                 .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-label'>Response:</div><pre class='msg-tool-code'>"))
                                 .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "res").Prop(() => "content")))
                                 .Op(() => "+", () => Js.Str(() => "</pre>"))).Stmt()
                         })
                     }))
-                    .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Op(() => "+", () => Js.Str(() => "</div>"))))
+                    .Add(() => Js.Assign(() => Js.Id(() => "toolHtml"), () => Js.Id(() => "toolHtml").Op(() => "+", () => Js.Str(() => "</div>"))))
                 )).Stmt())
-            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Op(() => "+", () => Js.Str(() => "</div></details>"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Id(() => "html")));
+            .Add(() => Js.Assign(() => Js.Id(() => "toolHtml"), () => Js.Id(() => "toolHtml").Op(() => "+", () => Js.Str(() => "</div></details>"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "msg").Prop(() => "text").Op(() => "||", () => Js.Id(() => "msg").Prop(() => "thinking")), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Id(() => "div").Prop(() => "innerHTML").Op(() => "+", () => Js.Id(() => "toolHtml")))
+                    }
+                )},
+                { (null, new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Id(() => "toolHtml"))
+                    }
+                )}
+            }));
         var renderToolMessageFunc = Js.Func(() => "renderToolMessage", () => new List<string> { "msg", "div" }, () => renderToolMessageBody);
         js.Add(() => renderToolMessageFunc);
         var beingMsgBody = new List<JsSyntax>

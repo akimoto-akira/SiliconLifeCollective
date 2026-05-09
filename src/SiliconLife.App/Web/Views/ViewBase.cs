@@ -91,6 +91,7 @@ public abstract class ViewBase
             ("dashboard", "📊", localization.NavMenuDashboard, "/dashboard"),
             ("beings", "🧠", localization.NavMenuBeings, "/beings"),
             ("usage", "🔍", localization.NavMenuUsage, "/usage"),
+            ("audit", "🛡", localization.NavMenuAudit, "/audit"),
             ("knowledge", "📚", localization.NavMenuKnowledge, "/knowledge"),
             ("projects", "📁", localization.NavMenuProjects, "/project"),
             ("logs", "📝", localization.NavMenuLogs, "/logs"),

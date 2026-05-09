@@ -302,18 +302,28 @@ public class MemoryController : Controller
                     }).ToList()
             }).ToList();
 
-        // Extract summaries for quick lookup
-        var summariesByTime = grouped
-            .Where(x => x.Entry.IsSummary)
-            .GroupBy(x => new { x.Ts.Year, x.Ts.Month, x.Ts.Day, x.Ts.Hour, x.Ts.Minute, x.Ts.Second })
-            .ToDictionary(g => g.Key, g => g.First());
+        var summaries = entries.Where(e => e.IsSummary).ToList();
+        var yearSummaries = summaries
+            .Where(e => e.Timestamp.Month == null)
+            .ToDictionary(e => e.Timestamp.Year, e => e);
+        var monthSummaries = summaries
+            .Where(e => e.Timestamp.Month != null && e.Timestamp.Day == null)
+            .ToDictionary(e => (e.Timestamp.Year, e.Timestamp.Month.Value), e => e);
+        var daySummaries = summaries
+            .Where(e => e.Timestamp.Day != null && e.Timestamp.Hour == null)
+            .ToDictionary(e => (e.Timestamp.Year, e.Timestamp.Month!.Value, e.Timestamp.Day.Value), e => e);
+        var hourSummaries = summaries
+            .Where(e => e.Timestamp.Hour != null && e.Timestamp.Minute == null)
+            .ToDictionary(e => (e.Timestamp.Year, e.Timestamp.Month!.Value, e.Timestamp.Day!.Value, e.Timestamp.Hour.Value), e => e);
+        var minuteSummaries = summaries
+            .Where(e => e.Timestamp.Minute != null && e.Timestamp.Second == null)
+            .ToDictionary(e => (e.Timestamp.Year, e.Timestamp.Month!.Value, e.Timestamp.Day!.Value, e.Timestamp.Hour!.Value, e.Timestamp.Minute.Value), e => e);
 
         var tree = new DivComponent().Class("memory-tree");
 
         foreach (var year in allGrouped)
         {
-            var yearSummaryKey = new { Year = year.Year, Month = 1, Day = 1, Hour = 0, Minute = 0, Second = 0 };
-            var yearSummary = summariesByTime.ContainsKey(yearSummaryKey) ? summariesByTime[yearSummaryKey] : null;
+            var yearSummary = yearSummaries.ContainsKey(year.Year) ? yearSummaries[year.Year] : null;
 
             var yearDetails = new DetailsComponent().Open();
             yearDetails.AddSummary(new SpanComponent()
@@ -321,15 +331,14 @@ public class MemoryController : Controller
                 .Text($"📅 {string.Format(loc.MemoryTimelineYearFormat, year.Year, year.Count)}"));
             if (yearSummary != null)
             {
-                yearDetails.AddSummary(BuildSummaryBlock(loc.MemoryYearSummaryLabel, yearSummary.Entry.Content,
-                    padding: 10, fontSizeLabel: 12, fontSizeContent: 13, marginTop: 6, summaryId: yearSummary.Entry.Id.ToString()));
+                yearDetails.AddSummary(BuildSummaryBlock(loc.MemoryYearSummaryLabel, yearSummary.Content,
+                    padding: 10, fontSizeLabel: 12, fontSizeContent: 13, marginTop: 6, summaryId: yearSummary.Id.ToString()));
             }
 
             var yearBody = new DivComponent().Style("padding-left: 20px;");
             foreach (var month in year.Months)
             {
-                var monthSummaryKey = new { Year = year.Year, Month = month.Month, Day = 1, Hour = 0, Minute = 0, Second = 0 };
-                var monthSummary = summariesByTime.ContainsKey(monthSummaryKey) ? summariesByTime[monthSummaryKey] : null;
+                var monthSummary = monthSummaries.ContainsKey((year.Year, month.Month)) ? monthSummaries[(year.Year, month.Month)] : null;
 
                 var monthDetails = new DetailsComponent();
                 monthDetails.AddSummary(new SpanComponent()
@@ -337,15 +346,14 @@ public class MemoryController : Controller
                     .Text($"📅 {string.Format(loc.MemoryTimelineMonthFormat, year.Year, month.Month, month.Count)}"));
                 if (monthSummary != null)
                 {
-                    monthDetails.AddSummary(BuildSummaryBlock(loc.MemoryMonthSummaryLabel, monthSummary.Entry.Content,
-                        padding: 8, fontSizeLabel: 11, fontSizeContent: 12, marginTop: 5, summaryId: monthSummary.Entry.Id.ToString()));
+                    monthDetails.AddSummary(BuildSummaryBlock(loc.MemoryMonthSummaryLabel, monthSummary.Content,
+                        padding: 8, fontSizeLabel: 11, fontSizeContent: 12, marginTop: 5, summaryId: monthSummary.Id.ToString()));
                 }
 
                 var monthBody = new DivComponent().Style("padding-left: 20px;");
                 foreach (var day in month.Days)
                 {
-                    var daySummaryKey = new { Year = year.Year, Month = month.Month, Day = day.Day, Hour = 0, Minute = 0, Second = 0 };
-                    var daySummary = summariesByTime.ContainsKey(daySummaryKey) ? summariesByTime[daySummaryKey] : null;
+                    var daySummary = daySummaries.ContainsKey((year.Year, month.Month, day.Day)) ? daySummaries[(year.Year, month.Month, day.Day)] : null;
 
                     var moStr = month.Month.ToString().PadLeft(2, '0');
                     var dStr = day.Day.ToString().PadLeft(2, '0');
@@ -356,15 +364,14 @@ public class MemoryController : Controller
                         .Text($"📅 {string.Format(loc.MemoryTimelineDayFormat, year.Year, moStr, dStr, day.Count)}"));
                     if (daySummary != null)
                     {
-                        dayDetails.AddSummary(BuildSummaryBlock(loc.MemoryDaySummaryLabel, daySummary.Entry.Content,
-                            padding: 6, fontSizeLabel: 11, fontSizeContent: 12, marginTop: 4, summaryId: daySummary.Entry.Id.ToString()));
+                        dayDetails.AddSummary(BuildSummaryBlock(loc.MemoryDaySummaryLabel, daySummary.Content,
+                            padding: 6, fontSizeLabel: 11, fontSizeContent: 12, marginTop: 4, summaryId: daySummary.Id.ToString()));
                     }
 
                     var dayBody = new DivComponent().Style("padding-left: 20px;");
                     foreach (var hour in day.Hours)
                     {
-                        var hourSummaryKey = new { Year = year.Year, Month = month.Month, Day = day.Day, Hour = hour.Hour, Minute = 0, Second = 0 };
-                        var hourSummary = summariesByTime.ContainsKey(hourSummaryKey) ? summariesByTime[hourSummaryKey] : null;
+                        var hourSummary = hourSummaries.ContainsKey((year.Year, month.Month, day.Day, hour.Hour)) ? hourSummaries[(year.Year, month.Month, day.Day, hour.Hour)] : null;
 
                         var hStr = hour.Hour.ToString().PadLeft(2, '0');
 
@@ -374,15 +381,14 @@ public class MemoryController : Controller
                             .Text($"🕐 {string.Format(loc.MemoryTimelineHourFormat, hStr, hour.Count)}"));
                         if (hourSummary != null)
                         {
-                            hourDetails.AddSummary(BuildSummaryBlock(loc.MemoryHourSummaryLabel, hourSummary.Entry.Content,
-                                padding: 6, fontSizeLabel: 11, fontSizeContent: 12, marginTop: 4, summaryId: hourSummary.Entry.Id.ToString()));
+                            hourDetails.AddSummary(BuildSummaryBlock(loc.MemoryHourSummaryLabel, hourSummary.Content,
+                                padding: 6, fontSizeLabel: 11, fontSizeContent: 12, marginTop: 4, summaryId: hourSummary.Id.ToString()));
                         }
 
                         var hourBody = new DivComponent().Style("padding-left: 20px;");
                         foreach (var minute in hour.Minutes)
                         {
-                            var minuteSummaryKey = new { Year = year.Year, Month = month.Month, Day = day.Day, Hour = hour.Hour, Minute = minute.Minute, Second = 0 };
-                            var minuteSummary = summariesByTime.ContainsKey(minuteSummaryKey) ? summariesByTime[minuteSummaryKey] : null;
+                            var minuteSummary = minuteSummaries.ContainsKey((year.Year, month.Month, day.Day, hour.Hour, minute.Minute)) ? minuteSummaries[(year.Year, month.Month, day.Day, hour.Hour, minute.Minute)] : null;
 
                             var mStr = minute.Minute.ToString().PadLeft(2, '0');
 
@@ -392,8 +398,8 @@ public class MemoryController : Controller
                                 .Text($"🕐 {string.Format(loc.MemoryTimelineMinuteFormat, hStr, mStr, minute.Count)}"));
                             if (minuteSummary != null)
                             {
-                                minuteDetails.AddSummary(BuildSummaryBlock(loc.MemoryMinuteSummaryLabel, minuteSummary.Entry.Content,
-                                    padding: 5, fontSizeLabel: 10, fontSizeContent: 11, marginTop: 3, summaryId: minuteSummary.Entry.Id.ToString()));
+                                minuteDetails.AddSummary(BuildSummaryBlock(loc.MemoryMinuteSummaryLabel, minuteSummary.Content,
+                                    padding: 5, fontSizeLabel: 10, fontSizeContent: 11, marginTop: 3, summaryId: minuteSummary.Id.ToString()));
                             }
 
                             var minuteBody = new DivComponent().Style("padding-left: 20px;");

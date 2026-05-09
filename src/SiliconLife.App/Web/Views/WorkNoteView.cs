@@ -55,7 +55,7 @@ public class WorkNoteView : ViewBase
         
         headerElements.Add(H.H1(headerText));
         headerElements.Add(H.Div(
-            H.Span(string.Format(totalLabel, "")).Id("total-pages").Class("stat-value")
+            H.Span(string.Format(totalLabel, "0")).Id("total-pages").Class("stat-value")
         ).Class("page-stat"));
         
         return H.Div(
@@ -203,6 +203,7 @@ public class WorkNoteView : ViewBase
         string readUrlPrefix = projectId.HasValue
             ? $"/api/projects/{projectId}/work-notes/read?pageNumber="
             : "/api/work-notes/read?beingId=" + beingId + "&pageNumber=";
+        string totalLabel = projectId.HasValue ? loc.ProjectWorkNotesTotalPages : loc.WorkNotesTotalPages;
 
         var cardBlock = Js.Block()
             .Add(() => Js.Const(() => "card", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
@@ -221,7 +222,7 @@ public class WorkNoteView : ViewBase
                 {
                     Js.Const(() => "grid", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "notes-grid"))).Stmt(),
                     Js.Assign(() => Js.Id(() => "grid").Prop(() => "innerHTML"), () => Js.Str(() => "")).Stmt(),
-                    Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "total-pages")).Prop(() => "textContent"), () => Js.Id(() => "result").Prop(() => "total")).Stmt(),
+                    Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "total-pages")).Prop(() => "textContent"), () => Js.Id(() => "totalLabel").Call(() => "replace", () => Js.Str(() => "{0}"), () => Js.Id(() => "result").Prop(() => "total"))).Stmt(),
                     Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                     {
                         (Js.Id(() => "result").Prop(() => "data").Prop(() => "length").Op(() => "===", () => Js.Num(() => "0")), new List<JsSyntax>
@@ -317,12 +318,23 @@ public class WorkNoteView : ViewBase
     
         return Js.Block()
             .Add(() => Js.Const(() => "beingId", () => Js.Str(() => beingId.ToString())))
+            .Add(() => Js.Const(() => "totalLabel", () => Js.Str(() => totalLabel)))
             .Add(() => Js.Func(() => "renderNoteDetailMarkdown", () => new List<string>(), () => renderMarkdownBodyBody))
             .Add(() => markedLoadCheck)
             .Add(() => Js.Func(() => "loadNotes", () => new List<string>(), () => Js.Block()
-                .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => listUrl)).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => (JsSyntax)Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "result" }, () => (JsSyntax)loadNotesThenBody)).Stmt())))
+                .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => listUrl)).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => (JsSyntax)Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "result" }, () => (JsSyntax)loadNotesThenBody)).Call(() => "catch", () => Js.Arrow(() => new List<string> { "err" }, () => (JsSyntax)Js.Block().Add(() => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Failed to load notes:"), () => Js.Id(() => "err")).Stmt()).Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "notes-grid")).Prop(() => "innerHTML"), () => Js.Str(() => $"<div class='empty-state'>{loc.WorkNotesEmptyState}</div>")).Stmt()))).Stmt())))
             .Add(() => Js.Func(() => "loadNoteDetail", () => new List<string> { "pageNumber" }, () => Js.Block()
-                .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => readUrlPrefix).Op(() => "+", () => Js.Id(() => "pageNumber"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => (JsSyntax)Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "result" }, () => (JsSyntax)loadNoteDetailThenBody)).Stmt())))
-            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "loadNotes").Invoke())));
+                .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => readUrlPrefix).Op(() => "+", () => Js.Id(() => "pageNumber"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => (JsSyntax)Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "result" }, () => (JsSyntax)loadNoteDetailThenBody)).Call(() => "catch", () => Js.Arrow(() => new List<string> { "err" }, () => (JsSyntax)Js.Block().Add(() => Js.Id(() => "console").Call(() => "error", () => Js.Str(() => "Failed to load note detail:"), () => Js.Id(() => "err")).Stmt()))).Stmt())))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "document").Prop(() => "readyState").Op(() => "===", () => Js.Str(() => "loading")), new List<JsSyntax>
+                {
+                    Js.Id(() => "document").Call(() => "addEventListener", () => Js.Str(() => "DOMContentLoaded"), () => Js.Id(() => "loadNotes")).Stmt()
+                }),
+                (null, new List<JsSyntax>
+                {
+                    Js.Id(() => "loadNotes").Invoke().Stmt()
+                })
+            }));
     }
 }

@@ -320,6 +320,11 @@ public class ChatHistoryController : Controller
                 }
                 else
                 {
+                    if (m.Role != MessageRole.User && string.IsNullOrEmpty(m.Content) && string.IsNullOrEmpty(m.Thinking))
+                    {
+                        continue;
+                    }
+
                     // Regular message (User or Assistant without tool calls)
                     result.Add(new
                     {

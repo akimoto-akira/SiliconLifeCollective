@@ -88,7 +88,6 @@ public class MarkdownEditorComponent : ComponentBase
         if (char.IsDigit(safeEditorId[0]))
             safeEditorId = "_" + safeEditorId;  // Identifiers can't start with digits
         
-        var escapedMarkdown = EscapeCodeForWebJs(markdown);
         var textareaId = safeEditorId + "-textarea";
         var previewId = safeEditorId + "-preview";
 
@@ -113,7 +112,7 @@ public class MarkdownEditorComponent : ComponentBase
             H.Div(toolbarChildren.ToArray()).Class("md-editor-toolbar"),
             H.Div(
                 H.Div(
-                    H.Textarea().Id(textareaId).Class("md-editor-textarea").Placeholder("Write markdown here...").Value(escapedMarkdown)
+                    H.Textarea().Id(textareaId).Class("md-editor-textarea").Placeholder("Write markdown here...").Text(markdown)
                 ).Class("md-editor-edit-pane"),
                 H.Div().Id(previewId).Class("md-editor-preview-pane")
             ).Class("md-editor-body"),
@@ -278,7 +277,7 @@ public class MarkdownEditorComponent : ComponentBase
                 .Property("background", "none")
                 .Property("padding", "0")
             .EndSelector()
-            .Selector(".md-editor-preview-pane pre.hlWebJs")
+            .Selector(".md-editor-preview-pane pre.hljs")
                 .Property("background", "var(--bg-secondary, rgba(0,0,0,0.3))")
                 .Property("padding", "16px")
                 .Property("border-radius", "6px")
@@ -286,7 +285,7 @@ public class MarkdownEditorComponent : ComponentBase
                 .Property("margin", "1em 0")
                 .Property("tab-size", "4")
             .EndSelector()
-            .Selector(".md-editor-preview-pane .hlWebJs")
+            .Selector(".md-editor-preview-pane .hljs")
                 .Property("display", "block")
                 .Property("overflow-x", "auto")
                 .Property("padding", "0")
@@ -383,8 +382,6 @@ public class MarkdownEditorComponent : ComponentBase
                     WebJs.Return(() => WebJs.Str(() => ""))
                 })
             }))
-            // Set initial content to textarea before creating CodeMirror
-            .Add(() => WebJs.Assign(() => WebJs.Id(() => "textarea").Prop(() => "value"), () => WebJs.Str(() => initialContent)))
             // Initialize CodeMirror editor
             .Add(() => WebJs.Let(() => "editor", () => WebJs.Id(() => "window").Prop(() => "CodeMirror").Call(() => "fromTextArea", () => WebJs.Id(() => "textarea"), () => WebJs.Obj()
                 .Prop(() => "mode", () => WebJs.Str(() => "text/x-markdown"))
@@ -433,13 +430,13 @@ public class MarkdownEditorComponent : ComponentBase
                 {
                     // Render markdown to HTML
                     WebJs.Assign(() => WebJs.Id(() => "previewEl").Prop(() => "innerHTML"), () => WebJs.Id(() => "marked").Call(() => "parse", () => WebJs.Id(() => "md"))).Stmt(),
-                    // Apply highlight.WebJs to code blocks in preview pane
+                    // Apply highlight.js to code blocks in preview pane
                     WebJs.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                     {
-                        (WebJs.Id(() => "typeof").Invoke(() => WebJs.Id(() => "hlWebJs")).Op(() => "!==", () => WebJs.Str(() => "undefined")), new List<JsSyntax>
+                        (WebJs.Id(() => "typeof").Invoke(() => WebJs.Id(() => "hljs")).Op(() => "!==", () => WebJs.Str(() => "undefined")), new List<JsSyntax>
                         {
                             WebJs.Id(() => "previewEl").Call(() => "querySelectorAll", () => WebJs.Str(() => "pre code")).Call(() => "forEach", () => WebJs.Arrow(() => new List<string> { "block" }, () =>
-                                WebJs.Id(() => "hlWebJs").Call(() => "highlightElement", () => WebJs.Id(() => "block"))
+                                WebJs.Id(() => "hljs").Call(() => "highlightElement", () => WebJs.Id(() => "block"))
                             )).Stmt()
                         })
                     })
@@ -570,14 +567,14 @@ public class MarkdownEditorComponent : ComponentBase
                         }),
                         (null, new List<JsSyntax>
                         {
-                            // Load marked.WebJs and highlight.WebJs
+                            // Load marked.js and highlight.js
                             WebJs.Let(() => "scriptMarked", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "script"))),
-                            WebJs.Assign(() => WebJs.Id(() => "scriptMarked").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.WebJs")),
+                            WebJs.Assign(() => WebJs.Id(() => "scriptMarked").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js")),
                             WebJs.Assign(() => WebJs.Id(() => "scriptMarked").Prop(() => "onload"), () => WebJs.Arrow(() => new List<string>(), () => WebJs.Block()
-                                .Add(() => WebJs.Let(() => "scriptHlWebJs", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "script"))))
-                                .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptHlWebJs").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/@highlightWebJs/cdn-assets@11.9.0/highlight.min.WebJs")))
-                                .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptHlWebJs").Prop(() => "onload"), () => WebJs.Arrow(() => new List<string>(), () => WebJs.Id(() => $"mdEditorInit_{safeEditorId}").Invoke())))
-                                .Add(() => WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "scriptHlWebJs")).Stmt()))),
+                                .Add(() => WebJs.Let(() => "scriptHljs", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "script"))))
+                                .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptHljs").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js")))
+                                .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptHljs").Prop(() => "onload"), () => WebJs.Arrow(() => new List<string>(), () => WebJs.Id(() => $"mdEditorInit_{safeEditorId}").Invoke())))
+                                .Add(() => WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "scriptHljs")).Stmt()))),
                             WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "scriptMarked")).Stmt()
                         })
                     })
@@ -591,35 +588,25 @@ public class MarkdownEditorComponent : ComponentBase
                     WebJs.Assign(() => WebJs.Id(() => "linkCss").Prop(() => "href"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css")),
                     WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "linkCss")).Stmt(),
                     
-                    // Load CodeMirror WebJs
+                    // Load CodeMirror JS
                     WebJs.Let(() => "scriptCodeMirror", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "script"))),
-                    WebJs.Assign(() => WebJs.Id(() => "scriptCodeMirror").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.WebJs")),
+                    WebJs.Assign(() => WebJs.Id(() => "scriptCodeMirror").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js")),
                     WebJs.Assign(() => WebJs.Id(() => "scriptCodeMirror").Prop(() => "onload"), () => WebJs.Arrow(() => new List<string>(), () => WebJs.Block()
                         // Load Markdown mode
                         .Add(() => WebJs.Let(() => "scriptMdMode", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "script"))))
-                        .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptMdMode").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/markdown/markdown.min.WebJs")))
-                        // Load marked.WebJs
+                        .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptMdMode").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/markdown/markdown.min.js")))
+                        // Load marked.js
                         .Add(() => WebJs.Let(() => "scriptMarked", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "script"))))
-                        .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptMarked").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.WebJs")))
+                        .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptMarked").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js")))
                         .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptMarked").Prop(() => "onload"), () => WebJs.Arrow(() => new List<string>(), () => WebJs.Block()
-                            .Add(() => WebJs.Let(() => "scriptHlWebJs", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "script"))))
-                            .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptHlWebJs").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/@highlightWebJs/cdn-assets@11.9.0/highlight.min.WebJs")))
-                            .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptHlWebJs").Prop(() => "onload"), () => WebJs.Arrow(() => new List<string>(), () => WebJs.Id(() => $"mdEditorInit_{safeEditorId}").Invoke())))
-                            .Add(() => WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "scriptHlWebJs")).Stmt()))))
+                            .Add(() => WebJs.Let(() => "scriptHljs", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "script"))))
+                            .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptHljs").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js")))
+                            .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptHljs").Prop(() => "onload"), () => WebJs.Arrow(() => new List<string>(), () => WebJs.Id(() => $"mdEditorInit_{safeEditorId}").Invoke())))
+                            .Add(() => WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "scriptHljs")).Stmt()))))
                         .Add(() => WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "scriptMarked")).Stmt())
                         .Add(() => WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "scriptMdMode")).Stmt()))),
                     WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "scriptCodeMirror")).Stmt()
                 })
             }));
-    }
-
-    private static string EscapeCodeForWebJs(string code)
-    {
-        return code
-            .Replace("\\", "\\\\")
-            .Replace("\"", "\\\"")
-            .Replace("\n", "\\n")
-            .Replace("\r", "\\r")
-            .Replace("\t", "\\t");
     }
 }

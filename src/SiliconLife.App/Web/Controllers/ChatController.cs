@@ -383,14 +383,28 @@ public class ChatController : Controller
                 return;
             }
 
-var imProvider = ServiceLocator.Instance.GetService<IIMProvider>();
-        // TODO: Fast-specific WebUIProvider code removed for shared module
-        // WebUIProvider functionality is Fast-specific and not available in shared module
+            // Create chat message
+            var message = new SiliconLife.Collective.ChatMessage
+            {
+                Id = Guid.NewGuid(),
+                SenderId = _userId,
+                ChannelId = channelId,
+                Content = body.Content,
+                Timestamp = DateTime.Now,
+                Type = MessageType.Text,
+                Role = MessageRole.User
+            };
 
-            RenderJson(new { success = true });
+            // Add message to chat system - this will trigger AI processing
+            _chatSystem.AddMessage(message);
+
+            _logger.Debug(null, "User message added to chat system: channel={0}, contentLength={1}", channelId, body.Content.Length);
+
+            RenderJson(new { success = true, messageId = message.Id.ToString() });
         }
         catch (Exception ex)
         {
+            _logger.Error(null, "SendMessage failed: {0}", ex.Message);
             RenderJson(new { success = false, error = ex.Message });
         }
     }

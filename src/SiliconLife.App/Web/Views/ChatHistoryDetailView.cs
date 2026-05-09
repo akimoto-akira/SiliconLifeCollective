@@ -574,6 +574,13 @@ public class ChatHistoryDetailView : ViewBase
                     Js.Return(() => Js.Id(() => "renderToolMessage").Invoke(() => Js.Id(() => "msg")))
                 })
             }))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "msg").Prop(() => "role").Op(() => "!==", () => Js.Str(() => "User")).Op(() => "&&", () => Js.Id(() => "msg").Prop(() => "content").Not()).Op(() => "&&", () => Js.Id(() => "msg").Prop(() => "thinking").Not()), new List<JsSyntax>
+                {
+                    Js.Return(() => Js.Str(() => ""))
+                })
+            }))
             .Add(() => Js.Let(() => "html", () => Js.Str(() => "<div class='message-item'>")))
             .Add(() =>
             {
@@ -702,7 +709,7 @@ public class ChatHistoryDetailView : ViewBase
                             Js.Return(() => Js.Null())
                         })
                     }))
-                    .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Id(() => "data").Prop(() => "messages").Call(() => "map", () => Js.Id(() => "renderMessageItem")).Call(() => "join", () => Js.Str(() => ""))))
+                    .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Id(() => "data").Prop(() => "messages").Call(() => "filter", () => Js.Arrow(() => new List<string> { "m" }, () => Js.Id(() => "m").Prop(() => "role").Op(() => "===", () => Js.Str(() => "User")).Op(() => "||", () => Js.Id(() => "m").Prop(() => "toolCallsJson")).Op(() => "||", () => Js.Id(() => "m").Prop(() => "content")).Op(() => "||", () => Js.Id(() => "m").Prop(() => "thinking")))).Call(() => "map", () => Js.Id(() => "renderMessageItem")).Call(() => "join", () => Js.Str(() => ""))))
                     .Add(() => Js.Id(() => "renderMarkdownBody").Invoke(() => Js.Id(() => "container")).Stmt())
                     .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                     {
