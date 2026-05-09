@@ -272,6 +272,7 @@ public class DeDE : DefaultLocalizationBase
     public override string NavMenuDashboard => "Dashboard";
     public override string NavMenuBeings => "Silicon Beings";
     public override string NavMenuUsage => "Nutzung";
+    public override string NavMenuAudit => "Audit";
     public override string NavMenuTasks => "Aufgaben";
     public override string NavMenuMemory => "Erinnerung";
     public override string NavMenuKnowledge => "Wissen";
@@ -294,6 +295,7 @@ public class DeDE : DefaultLocalizationBase
     public override string PageTitleProjects => "Projektraumverwaltung - Silicon Life Collective";
     public override string PageTitleLogs => "Protokollabfrage - Silicon Life Collective";
     public override string PageTitleUsage => "Token-Nutzung - Silicon Life Collective";
+    public override string PageTitleAudit => "Berechtigungs-Audit - Silicon Life Collective";
     public override string PageTitleConfig => "Systemkonfiguration - Silicon Life Collective";
     public override string PageTitleExecutor => "Executor-Überwachung - Silicon Life Collective";
     public override string PageTitleCodeBrowser => "Code-Browser - Silicon Life Collective";
@@ -745,6 +747,30 @@ public class DeDE : DefaultLocalizationBase
     public override string UsageTooltipPrompt => "Eingabe-Token";
     public override string UsageTooltipCompletion => "Ausgabe-Token";
     public override string UsageTooltipTotal => "Gesamt-Token";
+
+    public override string AuditPageHeader => "Berechtigungs-Audit-Protokoll";
+    public override string AuditTotalEntries => "Gesamteinträge";
+    public override string AuditAllowedCount => "Erlaubt";
+    public override string AuditDeniedCount => "Verweigert";
+    public override string AuditAskUserCount => "Benutzer fragen";
+    public override string AuditPermissionType => "Berechtigungstyp";
+    public override string AuditAllPermissionTypes => "Alle Typen";
+    public override string AuditResult => "Ergebnis";
+    public override string AuditAllResults => "Alle Ergebnisse";
+    public override string AuditBeing => "Silicon Being";
+    public override string AuditAllBeings => "Alle Beings";
+    public override string AuditStartTime => "Startzeit";
+    public override string AuditEndTime => "Endzeit";
+    public override string AuditFilterButton => "Filtern";
+    public override string AuditEmptyState => "Keine Audit-Einträge gefunden";
+    public override string AuditPrevPage => "Zurück";
+    public override string AuditNextPage => "Weiter";
+    public override string AuditColumnCaller => "Aufrufer";
+    public override string AuditColumnPermissionType => "Berechtigungstyp";
+    public override string AuditColumnResource => "Ressource";
+    public override string AuditColumnResult => "Ergebnis";
+    public override string AuditColumnReason => "Grund";
+    public override string AuditColumnTimestamp => "Zeitstempel";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {

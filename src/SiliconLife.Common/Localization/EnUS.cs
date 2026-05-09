@@ -298,6 +298,7 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string NavMenuDashboard => "Dashboard";
     public override string NavMenuBeings => "Beings";
     public override string NavMenuUsage => "Usage";
+    public override string NavMenuAudit => "Audit";
     public override string NavMenuTasks => "Tasks";
     public override string NavMenuMemory => "Memory";
     public override string NavMenuKnowledge => "Knowledge";
@@ -320,6 +321,7 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string PageTitleProjects => "Projects - Silicon Life Collective";
     public override string PageTitleLogs => "Logs - Silicon Life Collective";
     public override string PageTitleUsage => "Token Usage - Silicon Life Collective";
+    public override string PageTitleAudit => "Permission Audit - Silicon Life Collective";
     public override string PageTitleConfig => "Config - Silicon Life Collective";
     public override string PageTitleExecutor => "Executor - Silicon Life Collective";
     public override string PageTitleCodeBrowser => "Code Browser - Silicon Life Collective";
@@ -777,6 +779,30 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string UsageTooltipPrompt => "Prompt Tokens";
     public override string UsageTooltipCompletion => "Completion Tokens";
     public override string UsageTooltipTotal => "Total Tokens";
+
+    public override string AuditPageHeader => "Permission Audit Log";
+    public override string AuditTotalEntries => "Total Entries";
+    public override string AuditAllowedCount => "Allowed";
+    public override string AuditDeniedCount => "Denied";
+    public override string AuditAskUserCount => "Ask User";
+    public override string AuditPermissionType => "Permission Type";
+    public override string AuditAllPermissionTypes => "All Types";
+    public override string AuditResult => "Result";
+    public override string AuditAllResults => "All Results";
+    public override string AuditBeing => "Silicon Being";
+    public override string AuditAllBeings => "All Beings";
+    public override string AuditStartTime => "Start Time";
+    public override string AuditEndTime => "End Time";
+    public override string AuditFilterButton => "Filter";
+    public override string AuditEmptyState => "No audit entries found";
+    public override string AuditPrevPage => "Previous";
+    public override string AuditNextPage => "Next";
+    public override string AuditColumnCaller => "Caller";
+    public override string AuditColumnPermissionType => "Permission Type";
+    public override string AuditColumnResource => "Resource";
+    public override string AuditColumnResult => "Result";
+    public override string AuditColumnReason => "Reason";
+    public override string AuditColumnTimestamp => "Timestamp";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {

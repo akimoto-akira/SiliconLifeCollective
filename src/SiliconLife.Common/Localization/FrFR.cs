@@ -272,6 +272,7 @@ public class FrFR : DefaultLocalizationBase
     public override string NavMenuDashboard => "Tableau de bord";
     public override string NavMenuBeings => "Silicon Beings";
     public override string NavMenuUsage => "Utilisation";
+    public override string NavMenuAudit => "Audit";
     public override string NavMenuTasks => "Tâches";
     public override string NavMenuMemory => "Mémoire";
     public override string NavMenuKnowledge => "Connaissances";
@@ -294,6 +295,7 @@ public class FrFR : DefaultLocalizationBase
     public override string PageTitleProjects => "Gestion des espaces projet - Silicon Life Collective";
     public override string PageTitleLogs => "Consultation des journaux - Silicon Life Collective";
     public override string PageTitleUsage => "Utilisation de tokens - Silicon Life Collective";
+    public override string PageTitleAudit => "Audit des permissions - Silicon Life Collective";
     public override string PageTitleConfig => "Configuration système - Silicon Life Collective";
     public override string PageTitleExecutor => "Surveillance des exécuteurs - Silicon Life Collective";
     public override string PageTitleCodeBrowser => "Navigateur de code - Silicon Life Collective";
@@ -746,6 +748,30 @@ public class FrFR : DefaultLocalizationBase
     public override string UsageTooltipPrompt => "Tokens d'entrée";
     public override string UsageTooltipCompletion => "Tokens de sortie";
     public override string UsageTooltipTotal => "Total tokens";
+
+    public override string AuditPageHeader => "Journal d'audit des permissions";
+    public override string AuditTotalEntries => "Total des entrées";
+    public override string AuditAllowedCount => "Autorisé";
+    public override string AuditDeniedCount => "Refusé";
+    public override string AuditAskUserCount => "Demander à l'utilisateur";
+    public override string AuditPermissionType => "Type de permission";
+    public override string AuditAllPermissionTypes => "Tous les types";
+    public override string AuditResult => "Résultat";
+    public override string AuditAllResults => "Tous les résultats";
+    public override string AuditBeing => "Silicon Being";
+    public override string AuditAllBeings => "Tous les Beings";
+    public override string AuditStartTime => "Heure de début";
+    public override string AuditEndTime => "Heure de fin";
+    public override string AuditFilterButton => "Filtrer";
+    public override string AuditEmptyState => "Aucune entrée d'audit trouvée";
+    public override string AuditPrevPage => "Précédent";
+    public override string AuditNextPage => "Suivant";
+    public override string AuditColumnCaller => "Appelant";
+    public override string AuditColumnPermissionType => "Type de permission";
+    public override string AuditColumnResource => "Ressource";
+    public override string AuditColumnResult => "Résultat";
+    public override string AuditColumnReason => "Raison";
+    public override string AuditColumnTimestamp => "Horodatage";
 
     // ===== Log Level Localization =====
 

@@ -153,6 +153,7 @@ public class ZhHK : DefaultLocalizationBase
     public override string NavMenuDashboard => "儀表板";
     public override string NavMenuBeings => "矽基人";
     public override string NavMenuUsage => "用量";
+    public override string NavMenuAudit => "審計";
     public override string NavMenuTasks => "任務";
     public override string NavMenuMemory => "記憶";
     public override string NavMenuKnowledge => "知識";
@@ -175,6 +176,7 @@ public class ZhHK : DefaultLocalizationBase
     public override string PageTitleProjects => "專案空間管理 - 矽基生命群";
     public override string PageTitleLogs => "日誌查詢 - 矽基生命群";
     public override string PageTitleUsage => "Token 用量 - 矽基生命群";
+    public override string PageTitleAudit => "權限審計 - 矽基生命群";
     public override string PageTitleConfig => "系統設定 - 矽基生命群";
     public override string PageTitleExecutor => "執行器監控 - 矽基生命群";
     public override string PageTitleCodeBrowser => "程式碼瀏覽 - 矽基生命群";
@@ -634,6 +636,30 @@ public class ZhHK : DefaultLocalizationBase
     public override string UsageTooltipPrompt => "輸入 Token";
     public override string UsageTooltipCompletion => "輸出 Token";
     public override string UsageTooltipTotal => "總 Token";
+
+    public override string AuditPageHeader => "權限審計日誌";
+    public override string AuditTotalEntries => "總記錄數";
+    public override string AuditAllowedCount => "允許";
+    public override string AuditDeniedCount => "拒絕";
+    public override string AuditAskUserCount => "詢問使用者";
+    public override string AuditPermissionType => "權限類型";
+    public override string AuditAllPermissionTypes => "全部類型";
+    public override string AuditResult => "結果";
+    public override string AuditAllResults => "全部結果";
+    public override string AuditBeing => "矽基人";
+    public override string AuditAllBeings => "全部矽基人";
+    public override string AuditStartTime => "開始時間";
+    public override string AuditEndTime => "結束時間";
+    public override string AuditFilterButton => "篩選";
+    public override string AuditEmptyState => "暫無審計記錄";
+    public override string AuditPrevPage => "上一頁";
+    public override string AuditNextPage => "下一頁";
+    public override string AuditColumnCaller => "呼叫者";
+    public override string AuditColumnPermissionType => "權限類型";
+    public override string AuditColumnResource => "資源";
+    public override string AuditColumnResult => "結果";
+    public override string AuditColumnReason => "原因";
+    public override string AuditColumnTimestamp => "時間";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {

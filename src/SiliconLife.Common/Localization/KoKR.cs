@@ -298,6 +298,7 @@ public class KoKR : DefaultLocalizationBase
     public override string NavMenuDashboard => "대시보드";
     public override string NavMenuBeings => "실리콘 라이프";
     public override string NavMenuUsage => "사용량";
+    public override string NavMenuAudit => "감사";
     public override string NavMenuTasks => "작업";
     public override string NavMenuMemory => "메모리";
     public override string NavMenuKnowledge => "지식";
@@ -320,6 +321,7 @@ public class KoKR : DefaultLocalizationBase
     public override string PageTitleProjects => "프로젝트 공간 관리 - 실리콘 라이프 콜렉티브";
     public override string PageTitleLogs => "로그 조회 - 실리콘 라이프 콜렉티브";
     public override string PageTitleUsage => "Token 사용량 - 실리콘 라이프 콜렉티브";
+    public override string PageTitleAudit => "권한 감사 - 실리콘 라이프 콜렉티브";
     public override string PageTitleConfig => "시스템 설정 - 실리콘 라이프 콜렉티브";
     public override string PageTitleExecutor => "실행기 모니터 - 실리콘 라이프 콜렉티브";
     public override string PageTitleCodeBrowser => "코드 브라우저 - 실리콘 라이프 콜렉티브";
@@ -777,6 +779,30 @@ public class KoKR : DefaultLocalizationBase
     public override string UsageTooltipPrompt => "입력 Token";
     public override string UsageTooltipCompletion => "출력 Token";
     public override string UsageTooltipTotal => "총 Token";
+
+    public override string AuditPageHeader => "권한 감사 로그";
+    public override string AuditTotalEntries => "총 항목 수";
+    public override string AuditAllowedCount => "허용";
+    public override string AuditDeniedCount => "거부";
+    public override string AuditAskUserCount => "사용자 확인";
+    public override string AuditPermissionType => "권한 유형";
+    public override string AuditAllPermissionTypes => "모든 유형";
+    public override string AuditResult => "결과";
+    public override string AuditAllResults => "모든 결과";
+    public override string AuditBeing => "실리콘 라이프";
+    public override string AuditAllBeings => "모든 라이프";
+    public override string AuditStartTime => "시작 시간";
+    public override string AuditEndTime => "종료 시간";
+    public override string AuditFilterButton => "필터";
+    public override string AuditEmptyState => "감사 기록이 없습니다";
+    public override string AuditPrevPage => "이전";
+    public override string AuditNextPage => "다음";
+    public override string AuditColumnCaller => "호출자";
+    public override string AuditColumnPermissionType => "권한 유형";
+    public override string AuditColumnResource => "리소스";
+    public override string AuditColumnResult => "결과";
+    public override string AuditColumnReason => "사유";
+    public override string AuditColumnTimestamp => "타임스탬프";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {

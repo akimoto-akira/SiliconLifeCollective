@@ -298,6 +298,7 @@ public class JaJP : DefaultLocalizationBase
     public override string NavMenuDashboard => "ダッシュボード";
     public override string NavMenuBeings => "シリコンライフ";
     public override string NavMenuUsage => "使用量";
+    public override string NavMenuAudit => "監査";
     public override string NavMenuTasks => "タスク";
     public override string NavMenuMemory => "メモリ";
     public override string NavMenuKnowledge => "ナレッジ";
@@ -320,6 +321,7 @@ public class JaJP : DefaultLocalizationBase
     public override string PageTitleProjects => "プロジェクトスペース管理 - シリコンライフコレクティブ";
     public override string PageTitleLogs => "ログクエリ - シリコンライフコレクティブ";
     public override string PageTitleUsage => "Token使用量 - シリコンライフコレクティブ";
+    public override string PageTitleAudit => "権限監査 - シリコンライフコレクティブ";
     public override string PageTitleConfig => "システム設定 - シリコンライフコレクティブ";
     public override string PageTitleExecutor => "エグゼキューターモニタ - シリコンライフコレクティブ";
     public override string PageTitleCodeBrowser => "コードブラウザ - シリコンライフコレクティブ";
@@ -777,6 +779,30 @@ public class JaJP : DefaultLocalizationBase
     public override string UsageTooltipPrompt => "入力Token";
     public override string UsageTooltipCompletion => "出力Token";
     public override string UsageTooltipTotal => "総Token";
+
+    public override string AuditPageHeader => "権限監査ログ";
+    public override string AuditTotalEntries => "総エントリ数";
+    public override string AuditAllowedCount => "許可";
+    public override string AuditDeniedCount => "拒否";
+    public override string AuditAskUserCount => "ユーザーに確認";
+    public override string AuditPermissionType => "権限タイプ";
+    public override string AuditAllPermissionTypes => "すべてのタイプ";
+    public override string AuditResult => "結果";
+    public override string AuditAllResults => "すべての結果";
+    public override string AuditBeing => "シリコンライフ";
+    public override string AuditAllBeings => "すべてのライフ";
+    public override string AuditStartTime => "開始時間";
+    public override string AuditEndTime => "終了時間";
+    public override string AuditFilterButton => "フィルター";
+    public override string AuditEmptyState => "監査記録がありません";
+    public override string AuditPrevPage => "前へ";
+    public override string AuditNextPage => "次へ";
+    public override string AuditColumnCaller => "呼び出し元";
+    public override string AuditColumnPermissionType => "権限タイプ";
+    public override string AuditColumnResource => "リソース";
+    public override string AuditColumnResult => "結果";
+    public override string AuditColumnReason => "理由";
+    public override string AuditColumnTimestamp => "タイムスタンプ";
 
     private static readonly Dictionary<string, string> ConfigGroupNames = new()
     {

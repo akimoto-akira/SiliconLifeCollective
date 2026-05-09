@@ -429,6 +429,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string NavMenuUsage { get; }
 
     /// <summary>
+    /// Gets the label for the permission audit menu item
+    /// </summary>
+    public abstract string NavMenuAudit { get; }
+
+    /// <summary>
     /// Gets the label for the tasks menu item
     /// </summary>
     public abstract string NavMenuTasks { get; }
@@ -524,6 +529,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the page title for audit page
     /// </summary>
     public abstract string PageTitleUsage { get; }
+
+    /// <summary>
+    /// Gets the page title for permission audit page
+    /// </summary>
+    public abstract string PageTitleAudit { get; }
 
     /// <summary>
     /// Gets the page title for config page
@@ -2089,6 +2099,123 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the tooltip label for total tokens in chart hover
     /// </summary>
     public abstract string UsageTooltipTotal { get; }
+
+    // ===== Audit Page Localization =====
+
+    /// <summary>
+    /// Gets the audit page header text
+    /// </summary>
+    public abstract string AuditPageHeader { get; }
+
+    /// <summary>
+    /// Gets the label for total audit entries count
+    /// </summary>
+    public abstract string AuditTotalEntries { get; }
+
+    /// <summary>
+    /// Gets the label for allowed count
+    /// </summary>
+    public abstract string AuditAllowedCount { get; }
+
+    /// <summary>
+    /// Gets the label for denied count
+    /// </summary>
+    public abstract string AuditDeniedCount { get; }
+
+    /// <summary>
+    /// Gets the label for ask user count
+    /// </summary>
+    public abstract string AuditAskUserCount { get; }
+
+    /// <summary>
+    /// Gets the label for permission type filter
+    /// </summary>
+    public abstract string AuditPermissionType { get; }
+
+    /// <summary>
+    /// Gets the text for "All Types" option in permission type filter
+    /// </summary>
+    public abstract string AuditAllPermissionTypes { get; }
+
+    /// <summary>
+    /// Gets the label for result filter
+    /// </summary>
+    public abstract string AuditResult { get; }
+
+    /// <summary>
+    /// Gets the text for "All Results" option in result filter
+    /// </summary>
+    public abstract string AuditAllResults { get; }
+
+    /// <summary>
+    /// Gets the label for silicon being filter
+    /// </summary>
+    public abstract string AuditBeing { get; }
+
+    /// <summary>
+    /// Gets the text for "All Beings" option in being filter
+    /// </summary>
+    public abstract string AuditAllBeings { get; }
+
+    /// <summary>
+    /// Gets the label for start time filter
+    /// </summary>
+    public abstract string AuditStartTime { get; }
+
+    /// <summary>
+    /// Gets the label for end time filter
+    /// </summary>
+    public abstract string AuditEndTime { get; }
+
+    /// <summary>
+    /// Gets the text for the filter button
+    /// </summary>
+    public abstract string AuditFilterButton { get; }
+
+    /// <summary>
+    /// Gets the empty state text when no audit entries exist
+    /// </summary>
+    public abstract string AuditEmptyState { get; }
+
+    /// <summary>
+    /// Gets the text for previous page button
+    /// </summary>
+    public abstract string AuditPrevPage { get; }
+
+    /// <summary>
+    /// Gets the text for next page button
+    /// </summary>
+    public abstract string AuditNextPage { get; }
+
+    /// <summary>
+    /// Gets the label for the caller column
+    /// </summary>
+    public abstract string AuditColumnCaller { get; }
+
+    /// <summary>
+    /// Gets the label for the permission type column
+    /// </summary>
+    public abstract string AuditColumnPermissionType { get; }
+
+    /// <summary>
+    /// Gets the label for the resource column
+    /// </summary>
+    public abstract string AuditColumnResource { get; }
+
+    /// <summary>
+    /// Gets the label for the result column
+    /// </summary>
+    public abstract string AuditColumnResult { get; }
+
+    /// <summary>
+    /// Gets the label for the reason column
+    /// </summary>
+    public abstract string AuditColumnReason { get; }
+
+    /// <summary>
+    /// Gets the label for the timestamp column
+    /// </summary>
+    public abstract string AuditColumnTimestamp { get; }
 
     /// <summary>
     /// Gets the localized display name for a configuration group

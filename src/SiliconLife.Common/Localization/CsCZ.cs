@@ -110,6 +110,7 @@ public class CsCZ : DefaultLocalizationBase
     public override string NavMenuDashboard => "Panel";
     public override string NavMenuBeings => "Bytí";
     public override string NavMenuUsage => "Využití";
+    public override string NavMenuAudit => "Audit";
     public override string NavMenuTasks => "Úkoly";
     public override string NavMenuMemory => "Paměť";
     public override string NavMenuKnowledge => "Znalosti";
@@ -133,6 +134,7 @@ public class CsCZ : DefaultLocalizationBase
     public override string PageTitleConfig => "Konfigurace";
     public override string PageTitleAbout => "O aplikaci";
     public override string PageTitleUsage => "Token využití - Silicon Life Collective";
+    public override string PageTitleAudit => "Audit oprávnění - Silicon Life Collective";
     public override string PageTitleExecutor => "Executor";
     public override string PageTitleCodeBrowser => "Prohlížeč kódu";
     public override string PageTitlePermission => "Oprávnění";
@@ -835,6 +837,30 @@ public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
     public override string UsageGroupByBeing => "Podle bytí";
     public override string UsageGroupByClient => "Podle klienta";
     public override string UsageAllBeings => "Všechna bytí";
+
+    public override string AuditPageHeader => "Protokol auditu oprávnění";
+    public override string AuditTotalEntries => "Celkové záznamy";
+    public override string AuditAllowedCount => "Povoleno";
+    public override string AuditDeniedCount => "Odepřeno";
+    public override string AuditAskUserCount => "Zeptat se uživatele";
+    public override string AuditPermissionType => "Typ oprávnění";
+    public override string AuditAllPermissionTypes => "Všechny typy";
+    public override string AuditResult => "Výsledek";
+    public override string AuditAllResults => "Všechny výsledky";
+    public override string AuditBeing => "Bytí";
+    public override string AuditAllBeings => "Všechna bytí";
+    public override string AuditStartTime => "Čas začátku";
+    public override string AuditEndTime => "Čas konce";
+    public override string AuditFilterButton => "Filtrovat";
+    public override string AuditEmptyState => "Nebyly nalezeny žádné záznamy auditu";
+    public override string AuditPrevPage => "Předchozí";
+    public override string AuditNextPage => "Další";
+    public override string AuditColumnCaller => "Volající";
+    public override string AuditColumnPermissionType => "Typ oprávnění";
+    public override string AuditColumnResource => "Zdroj";
+    public override string AuditColumnResult => "Výsledek";
+    public override string AuditColumnReason => "Důvod";
+    public override string AuditColumnTimestamp => "Časové razítko";
 
     public override string CalendarSexagenaryName => "Sexagenární cyklus";
     public override string CalendarComponentYearStem => "Nebeský kmen roku";
