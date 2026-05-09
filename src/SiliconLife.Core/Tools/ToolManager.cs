@@ -236,6 +236,40 @@ public class ToolManager
     }
 
     /// <summary>
+    /// Gets tool definitions for specific tools by name (for task-specific AI requests)
+    /// </summary>
+    /// <param name="requiredToolNames">List of tool names to get definitions for</param>
+    /// <returns>List of tool definitions for the specified tools</returns>
+    public List<ToolDefinition> GetToolDefinitions(List<string> requiredToolNames)
+    {
+        if (requiredToolNames == null || requiredToolNames.Count == 0)
+        {
+            return GetToolDefinitions();
+        }
+
+        lock (_lock)
+        {
+            var definitions = new List<ToolDefinition>();
+            foreach (var toolName in requiredToolNames)
+            {
+                if (_tools.TryGetValue(toolName, out ITool? tool))
+                {
+                    definitions.Add(new ToolDefinition(
+                        tool.Name,
+                        tool.Description,
+                        tool.GetParameterSchema()
+                    ));
+                }
+                else
+                {
+                    _logger?.Warn(null, "Required tool '{0}' not found in tool manager", toolName);
+                }
+            }
+            return definitions;
+        }
+    }
+
+    /// <summary>
     /// Executes a tool by name with the given parameters
     /// </summary>
     /// <param name="name">The tool name</param>

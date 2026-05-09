@@ -319,7 +319,7 @@ public class ContextManager
     /// Builds an AIRequest from the current context
     /// </summary>
     /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
-    private AIRequest BuildRequest(string? scenarioContext = null)
+    private AIRequest BuildRequest(string? scenarioContext = null, TaskItem? task = null)
     {
         // Record unread user messages to memory before building the request
         RecordUnreadMessagesToMemory();
@@ -379,7 +379,15 @@ public class ContextManager
         ToolManager? toolManager = _being.ToolManager;
         if (toolManager != null && toolManager.ToolCount > 0)
         {
-            request.Tools = toolManager.GetToolDefinitions();
+            // If task has specific required tools, only load those; otherwise load all tools
+            if (task?.RequiredTools != null && task.RequiredTools.Count > 0)
+            {
+                request.Tools = toolManager.GetToolDefinitions(task.RequiredTools);
+            }
+            else
+            {
+                request.Tools = toolManager.GetToolDefinitions();
+            }
         }
 
         _logger.Debug(_being.Id, "Building AI request: {0} messages, {1} tools, memory={2}",
@@ -568,9 +576,14 @@ public class ContextManager
     /// <returns>The AI response (may contain tool_calls or plain text)</returns>
     public AIResponse GetResponse(string? scenarioContext = null)
     {
+        return GetResponse(scenarioContext, null);
+    }
+
+    public AIResponse GetResponse(string? scenarioContext, TaskItem? task)
+    {
         _logger.Info(_being.Id, "Getting AI response for being {0}", _being.Name);
 
-        AIRequest request = BuildRequest(scenarioContext);
+        AIRequest request = BuildRequest(scenarioContext, task);
         AIResponse response = _aiClient.Chat(request);
 
 #if DEBUG
@@ -1079,7 +1092,7 @@ public class ContextManager
         _logger.Info(_being.Id, "ThinkOnTask: being={0}, task={1} ({2})", _being.Name, task.Title, task.Id);
 
         string? scenarioContext = BuildTaskScenarioContext(task);
-        AIResponse response = GetResponse(scenarioContext);
+        AIResponse response = GetResponse(scenarioContext, task);
 
         if (response.Success && !string.IsNullOrEmpty(response.Content))
         {
@@ -1091,27 +1104,9 @@ public class ContextManager
         return response;
     }
 
-    /// <summary>
-    /// Scene: project thinking.
-    /// Loads project context, calls AI to think about project-related tasks and progress.
-    /// </summary>
-    /// <returns>The AI response</returns>
-    public AIResponse ThinkOnProject()
-    {
-        _logger.Info(_being.Id, "ThinkOnProject: being={0}", _being.Name);
-
-        string? scenarioContext = BuildProjectScenarioContext();
-        AIResponse response = GetResponse(scenarioContext);
-
-        if (response.Success && !string.IsNullOrEmpty(response.Content))
-        {
-            Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
-            LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
-            RecordToMemory(loc.FormatMemoryEventProject(response.Content));
-        }
-
-        return response;
-    }
+    // ThinkOnProject has been removed as part of the centralized task management strategy.
+    // Project scenarios are now handled through TaskCenter and processed using ThinkOnTask.
+    // This simplifies Tick scheduling logic and unifies the task processing pipeline.
 
     /// <summary>
     /// Scene: scheduled timer.
@@ -1477,62 +1472,9 @@ public class ContextManager
         return sb.ToString();
     }
 
-    private string BuildProjectScenarioContext()
-    {
-        StringBuilder sb = new();
-        sb.AppendLine("Scene: Project thinking");
-
-        // Get project manager and find projects assigned to this being
-        var projectManager = ServiceLocator.Instance.ProjectManager;
-        if (projectManager != null)
-        {
-            var projects = projectManager.ListProjects(includeArchived: false);
-            var assignedProjects = projects.Where(p => projectManager.IsBeingAssigned(p.Id, _being.Id)).ToList();
-
-            if (assignedProjects.Count > 0)
-            {
-                sb.AppendLine($"Assigned projects: {assignedProjects.Count}");
-                foreach (var project in assignedProjects)
-                {
-                    sb.AppendLine($"- Project: {project.Name} (ID: {project.Id})");
-                    if (!string.IsNullOrEmpty(project.Description))
-                        sb.AppendLine($"  Description: {project.Description}");
-
-                    // Get task system for this project
-                    var taskSystem = projectManager.GetTaskSystem(project.Id);
-                    if (taskSystem != null)
-                    {
-                        var pendingTasks = taskSystem.GetPending();
-                        if (pendingTasks.Count > 0)
-                        {
-                            sb.AppendLine($"  Pending tasks: {pendingTasks.Count}");
-                            foreach (var task in pendingTasks.Take(5)) // Show first 5 tasks
-                            {
-                                sb.AppendLine($"    - {task.Title} (Priority: {task.Priority})");
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                sb.AppendLine("No projects assigned to this being.");
-            }
-        }
-        else
-        {
-            sb.AppendLine("Project manager not available.");
-        }
-
-        sb.AppendLine();
-        sb.AppendLine("PROJECT THINKING GUIDELINES:");
-        sb.AppendLine("- Review the status of your assigned projects.");
-        sb.AppendLine("- Identify pending tasks that need attention.");
-        sb.AppendLine("- Consider project progress and any blockers.");
-        sb.AppendLine("- Provide updates or take action on project tasks.");
-
-        return sb.ToString();
-    }
+    // BuildProjectScenarioContext has been removed as part of the ThinkOnProject removal.
+    // Project scenarios are now handled through TaskCenter and processed using ThinkOnTask.
+    // This simplifies the context building logic and unifies the task processing pipeline.
 
     private static string BuildTimerScenarioContext(TimerItem timer)
     {

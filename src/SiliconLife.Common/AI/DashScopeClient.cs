@@ -430,11 +430,11 @@ public class DashScopeClient : IAIClient
                 if (root.TryGetProperty("usage", out var usage) &&
                     usage.ValueKind == JsonValueKind.Object)
                 {
-                    if (usage.TryGetProperty("prompt_tokens", out var pt))
+                    if (usage.TryGetProperty("prompt_tokens", out var pt) && pt.ValueKind != JsonValueKind.Null)
                         chunk.PromptTokens = pt.GetInt32();
-                    if (usage.TryGetProperty("completion_tokens", out var ct))
+                    if (usage.TryGetProperty("completion_tokens", out var ct) && ct.ValueKind != JsonValueKind.Null)
                         chunk.CompletionTokens = ct.GetInt32();
-                    if (usage.TryGetProperty("total_tokens", out var tt))
+                    if (usage.TryGetProperty("total_tokens", out var tt) && tt.ValueKind != JsonValueKind.Null)
                         chunk.TotalTokens = tt.GetInt32();
                 }
 
@@ -685,11 +685,14 @@ public class DashScopeClient : IAIClient
             };
 
             // Parse usage
-            if (root.TryGetProperty("usage", out var usage))
+            if (root.TryGetProperty("usage", out var usage) && usage.ValueKind == JsonValueKind.Object)
             {
-                aiResponse.PromptTokens = usage.GetProperty("prompt_tokens").GetInt32();
-                aiResponse.CompletionTokens = usage.GetProperty("completion_tokens").GetInt32();
-                aiResponse.TotalTokens = usage.GetProperty("total_tokens").GetInt32();
+                if (usage.TryGetProperty("prompt_tokens", out var pt) && pt.ValueKind != JsonValueKind.Null)
+                    aiResponse.PromptTokens = pt.GetInt32();
+                if (usage.TryGetProperty("completion_tokens", out var ct) && ct.ValueKind != JsonValueKind.Null)
+                    aiResponse.CompletionTokens = ct.GetInt32();
+                if (usage.TryGetProperty("total_tokens", out var tt) && tt.ValueKind != JsonValueKind.Null)
+                    aiResponse.TotalTokens = tt.GetInt32();
             }
 
             // Parse tool_calls

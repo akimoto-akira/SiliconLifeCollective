@@ -155,7 +155,7 @@ public static class CommandLineExecutor
     private static bool CheckPermission(ExecutorRequest request)
     {
         PermissionManager? pm = ServiceLocator.Instance.GetPermissionManager(request.CallerId);
-        if (pm == null) return true;
+        if (pm == null) return false; // Fixed: deny by default when no permission manager available
         return pm.CheckPermission(request.CallerId, PermissionType.CommandLine, request.ResourcePath);
     }
 }

@@ -11,6 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Reflection;
+
 namespace SiliconLife.Collective;
 
 /// <summary>
@@ -23,6 +25,7 @@ public class ServiceLocator
     private static readonly Lazy<ServiceLocator> _instance = new(() => new ServiceLocator());
     private readonly Dictionary<Type, object> _services = new();
     private readonly Dictionary<Guid, PermissionManager> _permissionManagers = new();
+    private readonly List<Assembly> _toolAssemblies = new();
     private readonly object _lock = new();
 
     /// <summary>Gets the singleton instance of <see cref="ServiceLocator"/>.</summary>
@@ -146,6 +149,38 @@ public class ServiceLocator
     }
 
     /// <summary>
+    /// Registers an additional assembly to be scanned for ITool implementations.
+    /// This allows tools defined in application-specific assemblies (e.g., SiliconLife.App)
+    /// to be discovered by the <see cref="ToolManager"/> during being creation.
+    /// </summary>
+    /// <param name="assembly">The assembly containing tool implementations.</param>
+    public void RegisterToolAssembly(Assembly assembly)
+    {
+        lock (_lock)
+        {
+            if (!_toolAssemblies.Contains(assembly))
+            {
+                _toolAssemblies.Add(assembly);
+            }
+        }
+        _logger.Debug(null, $"Tool assembly registered: {assembly.GetName().Name}");
+    }
+
+    /// <summary>
+    /// Gets all registered additional tool assemblies.
+    /// </summary>
+    public IReadOnlyList<Assembly> ToolAssemblies
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _toolAssemblies.ToList().AsReadOnly();
+            }
+        }
+    }
+
+    /// <summary>
     /// Clears all registered services and permission managers.
     /// Typically called during host shutdown.
     /// </summary>
@@ -155,6 +190,7 @@ public class ServiceLocator
         {
             _services.Clear();
             _permissionManagers.Clear();
+            _toolAssemblies.Clear();
         }
         _logger.Info(null, "Service locator cleared");
     }
