@@ -606,6 +606,7 @@ public class ChatView : ViewBase
                 .Property("border", "1px solid var(--border)")
                 .Property("border-left", "3px solid var(--accent-warning, #f59e0b)")
                 .Property("border-radius", "8px")
+                .Property("margin-top", "8px")
             .EndSelector()
             .Selector(".msg-tool-content")
                 .Property("padding", "0 12px 10px")
@@ -1311,7 +1312,7 @@ public class ChatView : ViewBase
                         Js.Const(() => "prevMsg", () => Js.Id(() => "messageCache").Index(() => Js.Id(() => "messageCache").Prop(() => "length").Op(() => "-", () => Js.Num(() => "1")))),
                         Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                         {
-                            { (Js.Id(() => "prevMsg").Prop(() => "role").Op(() => "!==", () => Js.Str(() => "User")).Op(() => "&&", () => Js.Id(() => "prevMsg").Prop(() => "role").Op(() => "!==", () => Js.Str(() => "Tool"))).Op(() => "&&", () => Js.Id(() => "prevMsg").Prop(() => "toolCallsJson").Not()).Op(() => "&&", () => Js.Id(() => "prevMsg").Prop(() => "content").Not()).Op(() => "&&", () => Js.Id(() => "prevMsg").Prop(() => "thinking").Not()), new List<JsSyntax>
+                            { (Js.Id(() => "prevMsg").Prop(() => "role").Op(() => "!==", () => Js.Str(() => "User")).Op(() => "&&", () => Js.Id(() => "prevMsg").Prop(() => "role").Op(() => "!==", () => Js.Str(() => "Tool"))).Op(() => "&&", () => Js.Id(() => "prevMsg").Prop(() => "toolCallsJson").Not()), new List<JsSyntax>
                                 {
                                     Js.Id(() => "messageCache").Call(() => "pop").Stmt(),
                                     Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
@@ -1413,8 +1414,8 @@ public class ChatView : ViewBase
                     Js.Return(() => Js.Id(() => "undefined"))
                 })
             }))
-            // Fallback: find the last .msg-tool element's content div
-            .Add(() => Js.Const(() => "toolMsgs", () => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => ".msg-tool"))))
+            // Fallback: find the last .msg-being element's tool content div
+            .Add(() => Js.Const(() => "toolMsgs", () => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => ".msg-being"))))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 (Js.Id(() => "toolMsgs").Prop(() => "length").Op(() => "===", () => Js.Num(() => "0")), new List<JsSyntax>
@@ -1800,8 +1801,6 @@ public class ChatView : ViewBase
         js.Add(() => Js.Func(() => "loadConversations", () => new List<string>(), () => loadConversationsBody));
 
         var msgIsUserCond = Js.Id(() => "msg").Prop(() => "isUser");
-        var msgIsToolCond = Js.Id(() => "msg").Prop(() => "toolCallsJson");
-        var toolCallRequestExpr = Js.Ternary(() => Js.Id(() => "toolCallMap").Call(() => "has", () => Js.Id(() => "msg").Prop(() => "toolCallId")), () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "toolCallMap").Call(() => "get", () => Js.Id(() => "msg").Prop(() => "toolCallId")), () => Js.Null(), () => Js.Num(() => "2")), () => Js.Str(() => "{}"));
 
         // Helper: build token stats HTML string from msg
         var getTokenStatsBody = Js.Block()
@@ -1967,6 +1966,55 @@ public class ChatView : ViewBase
                     }
                 )}
             }));
+        var buildToolCallHtmlBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "msg").Prop(() => "toolCallsJson").Not(), new List<JsSyntax> { Js.Return(() => Js.Str(() => "")) }) }
+            }))
+            .Add(() => Js.Const(() => "tcs", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "msg").Prop(() => "toolCallsJson"))))
+            .Add(() => Js.Const(() => "resultMap", () => Js.Obj()))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "msg").Prop(() => "toolResults").Op(() => "&&", () => Js.Id(() => "msg").Prop(() => "toolResults").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0"))), new List<JsSyntax>
+                {
+                    Js.Id(() => "msg").Prop(() => "toolResults").Call(() => "forEach",
+                        () => Js.Arrow(() => new List<string> { "r" }, () => Js.Block()
+                            .Add(() => Js.Assign(() => Js.Id(() => "resultMap").Index(() => Js.Id(() => "r").Prop(() => "toolCallId")), () => Js.Id(() => "r"))))).Stmt()
+                })
+            }))
+            .Add(() => Js.Let(() => "toolHtml", () => Js.Str(() => "<details class=\"msg-collapsible msg-collapsible-tool\"><summary>")
+                .Op(() => "+", () => Js.Id(() => "getToolSummary").Invoke(() => Js.Id(() => "msg")))
+                .Op(() => "+", () => Js.Str(() => "</summary><div class=\"msg-tool-content\">"))))
+            .Add(() => Js.Id(() => "tcs").Call(() => "forEach",
+                () => Js.Arrow(() => new List<string> { "tc" }, () => Js.Block()
+                    .Add(() => Js.Const(() => "dn", () => Js.Id(() => "toolDisplayNames").Index(() => Js.Id(() => "tc").Prop(() => "Name")).Op(() => "||", () => Js.Id(() => "tc").Prop(() => "Name"))))
+                    .Add(() => Js.Assign(() => Js.Id(() => "toolHtml"), () => Js.Id(() => "toolHtml")
+                        .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-section' data-tool-call-id='"))
+                        .Op(() => "+", () => Js.Id(() => "tc").Prop(() => "Id"))
+                        .Op(() => "+", () => Js.Str(() => "'>"))
+                        .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-label'>🔧 "))
+                        .Op(() => "+", () => Js.Id(() => "dn"))
+                        .Op(() => "+", () => Js.Str(() => "</div>"))))
+                    .Add(() => Js.Assign(() => Js.Id(() => "toolHtml"), () => Js.Id(() => "toolHtml")
+                        .Op(() => "+", () => Js.Str(() => "<pre class='msg-tool-code'>"))
+                        .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "tc"), () => Js.Null(), () => Js.Num(() => "2"))))
+                        .Op(() => "+", () => Js.Str(() => "</pre>"))))
+                    .Add(() => Js.Const(() => "res", () => Js.Id(() => "resultMap").Index(() => Js.Id(() => "tc").Prop(() => "Id"))))
+                    .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "res").Op(() => "&&", () => Js.Id(() => "res").Prop(() => "content")), new List<JsSyntax>
+                        {
+                            Js.Assign(() => Js.Id(() => "toolHtml"), () => Js.Id(() => "toolHtml")
+                                .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-label'>Response:</div><pre class='msg-tool-code'>"))
+                                .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "res").Prop(() => "content")))
+                                .Op(() => "+", () => Js.Str(() => "</pre>"))).Stmt()
+                        })
+                    }))
+                    .Add(() => Js.Assign(() => Js.Id(() => "toolHtml"), () => Js.Id(() => "toolHtml").Op(() => "+", () => Js.Str(() => "</div>"))))
+                )).Stmt())
+            .Add(() => Js.Assign(() => Js.Id(() => "toolHtml"), () => Js.Id(() => "toolHtml").Op(() => "+", () => Js.Str(() => "</div></details>"))))
+            .Add(() => Js.Return(() => Js.Id(() => "toolHtml")));
+        js.Add(() => Js.Func(() => "buildToolCallHtml", () => new List<string> { "msg" }, () => buildToolCallHtmlBody));
         var renderToolMessageFunc = Js.Func(() => "renderToolMessage", () => new List<string> { "msg", "div" }, () => renderToolMessageBody);
         js.Add(() => renderToolMessageFunc);
         var beingMsgBody = new List<JsSyntax>
@@ -1989,7 +2037,7 @@ public class ChatView : ViewBase
                 .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></details>")),
             () => Js.Str(() => ""));
 
-        beingMsgBody.Add(Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-being-avatar\"><div class=\"msg-avatar-icon\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "senderName").Op(() => "||", () => (JsSyntax)Js.Id(() => "beingName")).Paren().Call(() => "charAt", () => Js.Num(() => "0"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><div class=\"msg-avatar-name\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "senderName").Op(() => "||", () => (JsSyntax)Js.Id(() => "beingName")).Paren()).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div><div class=\"msg-being-content\"><div class=\"msg-being-card\"><div class=\"msg-being-body\">")).Op(() => "+", () => (JsSyntax)thinkingSection).Op(() => "+", () => (JsSyntax)Js.Str(() => "<div class=\"msg-being-text markdown-body\" data-md-raw=\"")).Op(() => "+", () => (JsSyntax)escapeBeingText).Op(() => "+", () => (JsSyntax)Js.Str(() => "\"></div></div>")).Op(() => "+", () => (JsSyntax)Js.Id(() => "getTokenStats").Invoke(() => Js.Id(() => "msg"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div>"))));
+        beingMsgBody.Add(Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-being-avatar\"><div class=\"msg-avatar-icon\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "senderName").Op(() => "||", () => (JsSyntax)Js.Id(() => "beingName")).Paren().Call(() => "charAt", () => Js.Num(() => "0"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><div class=\"msg-avatar-name\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "senderName").Op(() => "||", () => (JsSyntax)Js.Id(() => "beingName")).Paren()).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div><div class=\"msg-being-content\"><div class=\"msg-being-card\"><div class=\"msg-being-body\">")).Op(() => "+", () => (JsSyntax)thinkingSection).Op(() => "+", () => (JsSyntax)Js.Str(() => "<div class=\"msg-being-text markdown-body\" data-md-raw=\"")).Op(() => "+", () => (JsSyntax)escapeBeingText).Op(() => "+", () => (JsSyntax)Js.Str(() => "\"></div>")).Op(() => "+", () => (JsSyntax)Js.Id(() => "buildToolCallHtml").Invoke(() => Js.Id(() => "msg"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>")).Op(() => "+", () => (JsSyntax)Js.Id(() => "getTokenStats").Invoke(() => Js.Id(() => "msg"))).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></div>"))));
         var appendMessageBody = Js.Block()
             .Add(() => Js.Const(() => "messages", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))))
             .Add(() => Js.Const(() => "div", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
@@ -2004,11 +2052,6 @@ public class ChatView : ViewBase
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 { (msgIsUserCond, userMsgBody) },
-                { (msgIsToolCond, new List<JsSyntax>
-                    {
-                        Js.Id(() => "renderToolMessage").Invoke(() => Js.Id(() => "msg"), () => Js.Id(() => "div")),
-                    }
-                ) },
                 { (null, beingMsgBody) }
             }))
             .Add(() => Js.Id(() => "messages").Call(() => "appendChild", () => Js.Id(() => "div")).Stmt())
