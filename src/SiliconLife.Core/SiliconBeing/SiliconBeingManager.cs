@@ -543,6 +543,7 @@ public class SiliconBeingManager : TickObject
         // Migrate systems — only if new being doesn't already have them
         // (ReplaceWithDefault creates fresh instances via factory; ReplaceBeing does not)
         newBeing.TaskSystem ??= oldBeing.TaskSystem;
+        newBeing.TaskEnumerator ??= oldBeing.TaskEnumerator;
         newBeing.TimerSystem ??= oldBeing.TimerSystem;
         newBeing.Memory ??= oldBeing.Memory;
         newBeing.WorkNoteSystem ??= oldBeing.WorkNoteSystem;

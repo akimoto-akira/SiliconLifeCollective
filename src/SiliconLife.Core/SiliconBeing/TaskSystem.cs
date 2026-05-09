@@ -127,6 +127,12 @@ public sealed class TaskItem
     public List<Guid> ReviewerGuids { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets the list of required tool names for this task.
+    /// When executing ThinkOnTask, only these specific tools will be loaded.
+    /// </summary>
+    public List<string> RequiredTools { get; set; } = new();
+
+    /// <summary>
     /// Gets or sets the GUID of the being who created this task.
     /// </summary>
     public Guid CreatedByGuid { get; set; }
@@ -255,9 +261,6 @@ public sealed class TaskSystem
     private readonly SiliconBeingBase _owner;
     private readonly IStorage _storage;
     private readonly string _storageKey;
-    private readonly object _lock = new();
-
-    private List<TaskItem> _tasks = new();
 
     /// <summary>
     /// Gets the owner being's GUID (computed in real-time from the owner)
@@ -275,24 +278,25 @@ public sealed class TaskSystem
     public bool IsCurator => _owner.IsCurator;
 
     /// <summary>
-    /// Gets the total number of tasks.
+    /// Gets the total number of tasks for this being (from TaskCenter).
     /// </summary>
-    public int Count => _tasks.Count;
+    public int Count => TaskCenter.Instance.GetTasksForBeing(OwnerId).Count();
 
     /// <summary>
-    /// Gets the number of pending tasks.
+    /// Gets the number of pending tasks for this being (from TaskCenter).
     /// </summary>
-    public int PendingCount => _tasks.Count(t => t.Status == TaskStatus.Pending);
+    public int PendingCount => TaskCenter.Instance.GetRunnableTasks(OwnerId).Count;
 
     /// <summary>
-    /// Gets the number of running tasks.
+    /// Gets the number of running tasks (from TaskCenter).
     /// </summary>
-    public int RunningCount => _tasks.Count(t => t.Status == TaskStatus.Running);
+    public int RunningCount => TaskCenter.Instance.GetTasksForBeing(OwnerId).Count(t => t.Status == TaskStatus.Running);
 
     /// <summary>
     /// Initializes a new instance of the TaskSystem class with the specified owner and storage.
     /// Each being holds its own TaskSystem instance; the owner reference enables real-time
     /// identity queries (OwnerId, OwnerName, IsCurator) without duplicating state.
+    /// TaskSystem is a thin facade over TaskCenter — all data lives in the centralized store.
     /// </summary>
     /// <param name="owner">The silicon being that owns this TaskSystem</param>
     /// <param name="storage">The storage to use for persisting tasks.</param>
@@ -305,35 +309,39 @@ public sealed class TaskSystem
 
         _logger.Info(_owner.Id, "TaskSystem created for being {0} ({1})", owner.Name, owner.Id);
 
-        Load();
+        LoadIntoTaskCenter();
     }
 
-    private void Load()
+    private void LoadIntoTaskCenter()
     {
         try
         {
             TaskItem[] tasks = _storage.Read<TaskItem>(_storageKey);
-            _tasks = tasks?.ToList() ?? new List<TaskItem>();
+            if (tasks != null)
+            {
+                foreach (var task in tasks)
+                {
+                    TaskCenter.Instance.AddTask(task);
+                }
+                _logger.Info(_owner.Id, "Loaded {0} task(s) from storage into TaskCenter", tasks.Length);
+            }
         }
         catch (Exception ex)
         {
             _logger.Warn(_owner.Id, "Failed to load tasks from storage", ex);
-            _tasks = new List<TaskItem>();
         }
     }
 
-    /// <summary>
-    /// Saves all tasks to storage.
-    /// </summary>
-    public void Save()
+    private void Persist()
     {
         try
         {
-            _storage.Write(_storageKey, _tasks);
+            var tasks = TaskCenter.Instance.GetTasksForBeing(OwnerId).ToList();
+            _storage.Write(_storageKey, tasks);
         }
         catch (Exception ex)
         {
-            _logger.Error(_owner.Id, "Failed to save tasks to storage", ex);
+            _logger.Error(_owner.Id, "Failed to persist tasks to storage", ex);
         }
     }
 
@@ -347,38 +355,34 @@ public sealed class TaskSystem
     /// <returns>The created task item.</returns>
     public TaskItem Create(string title, string description = "", int priority = 100, List<Guid>? dependencies = null)
     {
-        lock (_lock)
+        var task = new TaskItem(title, description)
         {
-            var task = new TaskItem(title, description)
-            {
-                Priority = priority
-            };
+            Priority = priority,
+            ExecutorGuids = new List<Guid> { OwnerId },
+            CreatedByGuid = OwnerId
+        };
 
-            if (dependencies != null)
-            {
-                task.Dependencies = dependencies;
-            }
-
-            _tasks.Add(task);
-            Save();
-
-            _logger.Info(_owner.Id, "Task added: {0} ({1}), priority={2}", title, task.Id, priority);
-
-            return task;
+        if (dependencies != null)
+        {
+            task.Dependencies = dependencies;
         }
+
+        // Add to TaskCenter (centralized task management)
+        TaskCenter.Instance.AddTask(task);
+
+        _logger.Info(_owner.Id, "Task created and added to TaskCenter: {0} ({1}), priority={2}", title, task.Id, priority);
+
+        return task;
     }
 
     /// <summary>
-    /// Gets a task by its ID.
+    /// Gets a task by its ID from TaskCenter.
     /// </summary>
     /// <param name="taskId">The ID of the task to retrieve.</param>
     /// <returns>The task item if found; otherwise, null.</returns>
     public TaskItem? Get(Guid taskId)
     {
-        lock (_lock)
-        {
-            return _tasks.FirstOrDefault(t => t.Id == taskId);
-        }
+        return TaskCenter.Instance.GetTask(taskId);
     }
 
     /// <summary>
@@ -388,13 +392,12 @@ public sealed class TaskSystem
     /// <returns>A list of task items.</returns>
     public List<TaskItem> GetAll(TaskStatus? status = null)
     {
-        lock (_lock)
-        {
-            if (status == null)
-                return _tasks.ToList();
+        var tasks = TaskCenter.Instance.GetTasksForBeing(OwnerId);
+        
+        if (status == null)
+            return tasks.ToList();
 
-            return _tasks.Where(t => t.Status == status).ToList();
-        }
+        return tasks.Where(t => t.Status == status).ToList();
     }
 
     /// <summary>
@@ -403,14 +406,7 @@ public sealed class TaskSystem
     /// <returns>A list of pending task items.</returns>
     public List<TaskItem> GetPending()
     {
-        lock (_lock)
-        {
-            return _tasks
-                .Where(t => t.Status == TaskStatus.Pending)
-                .OrderBy(t => t.Priority)
-                .ThenBy(t => t.CreatedAt)
-                .ToList();
-        }
+        return TaskCenter.Instance.GetRunnableTasks(OwnerId);
     }
 
     /// <summary>
@@ -420,14 +416,7 @@ public sealed class TaskSystem
     /// <returns>A list of runnable task items for the specified being.</returns>
     public List<TaskItem> GetRunnableTasks(Guid beingGuid)
     {
-        lock (_lock)
-        {
-            return _tasks
-                .Where(t => t.CanRun(_tasks) && t.ExecutorGuids.Contains(beingGuid))
-                .OrderBy(t => t.Priority)
-                .ThenBy(t => t.CreatedAt)
-                .ToList();
-        }
+        return TaskCenter.Instance.GetRunnableTasks(beingGuid);
     }
 
     /// <summary>
@@ -438,21 +427,19 @@ public sealed class TaskSystem
     /// <returns>True if a task was started; otherwise, false.</returns>
     public bool TryStartNext(Guid beingGuid, out TaskItem? task)
     {
-        lock (_lock)
+        var runnable = GetRunnableTasks(beingGuid);
+        task = runnable.FirstOrDefault();
+
+        if (task != null)
         {
-            var runnable = GetRunnableTasks(beingGuid);
-            task = runnable.FirstOrDefault();
-
-            if (task != null)
-            {
-                task.Start();
-                Save();
-                _logger.Info(_owner.Id, "Task started: {0} ({1})", task.Title, task.Id);
-                return true;
-            }
-
-            return false;
+            task.Start();
+            TaskCenter.Instance.UpdateTask(task);
+            Persist();
+            _logger.Info(_owner.Id, "Task started: {0} ({1})", task.Title, task.Id);
+            return true;
         }
+
+        return false;
     }
 
     /// <summary>
@@ -462,12 +449,7 @@ public sealed class TaskSystem
     /// <returns>True if there are runnable tasks for the being; otherwise, false.</returns>
     public bool HasPendingTasks(Guid beingGuid)
     {
-        lock (_lock)
-        {
-            bool hasPending = _tasks.Any(t => t.CanRun(_tasks) && t.ExecutorGuids.Contains(beingGuid));
-            _logger.Debug(_owner.Id, "Checking pending tasks for being {0}: {1} pending", beingGuid, _tasks.Count(t => t.Status == TaskStatus.Pending));
-            return hasPending;
-        }
+        return TaskCenter.Instance.HasPendingTasks(beingGuid);
     }
 
     /// <summary>
@@ -477,19 +459,16 @@ public sealed class TaskSystem
     /// <returns>True if the task was started; otherwise, false.</returns>
     public bool Start(Guid taskId)
     {
-        lock (_lock)
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task != null && task.Status == TaskStatus.Pending)
         {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task != null && task.Status == TaskStatus.Pending)
-            {
-                task.Start();
-                Save();
-                _logger.Info(_owner.Id, "Task started: {0} ({1})", task.Title, task.Id);
-                return true;
-            }
-
-            return false;
+            task.Start();
+            TaskCenter.Instance.UpdateTask(task);
+            _logger.Info(_owner.Id, "Task started: {0} ({1})", task.Title, task.Id);
+            return true;
         }
+
+        return false;
     }
 
     /// <summary>
@@ -498,15 +477,12 @@ public sealed class TaskSystem
     /// <param name="taskId">The ID of the task to complete.</param>
     public void Complete(Guid taskId)
     {
-        lock (_lock)
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task != null && task.Status == TaskStatus.Running)
         {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task != null && task.Status == TaskStatus.Running)
-            {
-                task.Complete();
-                Save();
-                _logger.Info(_owner.Id, "Task completed: {0} ({1})", task.Title, task.Id);
-            }
+            task.Complete();
+            TaskCenter.Instance.UpdateTask(task);
+            _logger.Info(_owner.Id, "Task completed: {0} ({1})", task.Title, task.Id);
         }
     }
 
@@ -517,15 +493,13 @@ public sealed class TaskSystem
     /// <param name="error">The error message.</param>
     public void Fail(Guid taskId, string error)
     {
-        lock (_lock)
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task != null && task.Status == TaskStatus.Running)
         {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task != null && task.Status == TaskStatus.Running)
-            {
-                task.Fail(error);
-                Save();
-                _logger.Warn(_owner.Id, "Task failed: {0} ({1}), error={2}", task.Title, task.Id, error);
-            }
+            task.Fail(error);
+            TaskCenter.Instance.UpdateTask(task);
+            Persist();
+            _logger.Warn(_owner.Id, "Task failed: {0} ({1}), error={2}", task.Title, task.Id, error);
         }
     }
 
@@ -535,15 +509,13 @@ public sealed class TaskSystem
     /// <param name="taskId">The ID of the task to cancel.</param>
     public void Cancel(Guid taskId)
     {
-        lock (_lock)
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task != null && task.Status == TaskStatus.Pending)
         {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task != null && task.Status == TaskStatus.Pending)
-            {
-                task.Cancel();
-                Save();
-                _logger.Info(_owner.Id, "Task cancelled: {0} ({1})", task.Title, task.Id);
-            }
+            task.Cancel();
+            TaskCenter.Instance.UpdateTask(task);
+            Persist();
+            _logger.Info(_owner.Id, "Task cancelled: {0} ({1})", task.Title, task.Id);
         }
     }
 
@@ -555,18 +527,16 @@ public sealed class TaskSystem
     /// <returns>True if the priority was updated; otherwise, false.</returns>
     public bool UpdatePriority(Guid taskId, int newPriority)
     {
-        lock (_lock)
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task != null && task.Status == TaskStatus.Pending)
         {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task != null && task.Status == TaskStatus.Pending)
-            {
-                task.Priority = newPriority;
-                Save();
-                return true;
-            }
-
-            return false;
+            task.Priority = newPriority;
+            TaskCenter.Instance.UpdateTask(task);
+            Persist();
+            return true;
         }
+
+        return false;
     }
 
     /// <summary>
@@ -577,22 +547,20 @@ public sealed class TaskSystem
     /// <returns>True if the dependency was added; otherwise, false.</returns>
     public bool AddDependency(Guid taskId, Guid dependencyId)
     {
-        lock (_lock)
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task != null && task.Status == TaskStatus.Pending && !task.Dependencies.Contains(dependencyId))
         {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task != null && task.Status == TaskStatus.Pending && !task.Dependencies.Contains(dependencyId))
+            var dep = TaskCenter.Instance.GetTask(dependencyId);
+            if (dep != null)
             {
-                var dep = _tasks.FirstOrDefault(t => t.Id == dependencyId);
-                if (dep != null)
-                {
-                    task.Dependencies.Add(dependencyId);
-                    Save();
-                    return true;
-                }
+                task.Dependencies.Add(dependencyId);
+                TaskCenter.Instance.UpdateTask(task);
+                Persist();
+                return true;
             }
-
-            return false;
         }
+
+        return false;
     }
 
     /// <summary>
@@ -602,14 +570,12 @@ public sealed class TaskSystem
     /// <param name="dependencyId">The ID of the dependency to remove.</param>
     public void RemoveDependency(Guid taskId, Guid dependencyId)
     {
-        lock (_lock)
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task != null)
         {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task != null)
-            {
-                task.Dependencies.Remove(dependencyId);
-                Save();
-            }
+            task.Dependencies.Remove(dependencyId);
+            TaskCenter.Instance.UpdateTask(task);
+            Persist();
         }
     }
 
@@ -620,18 +586,15 @@ public sealed class TaskSystem
     /// <returns>True if the task was deleted; otherwise, false.</returns>
     public bool Delete(Guid taskId)
     {
-        lock (_lock)
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task != null && task.Status != TaskStatus.Running)
         {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task != null && task.Status != TaskStatus.Running)
-            {
-                _tasks.Remove(task);
-                Save();
-                return true;
-            }
-
-            return false;
+            TaskCenter.Instance.RemoveTask(taskId);
+            Persist();
+            return true;
         }
+
+        return false;
     }
 
     /// <summary>
@@ -640,19 +603,23 @@ public sealed class TaskSystem
     /// <param name="status">The status to clear (null to clear all tasks).</param>
     public void Clear(TaskStatus? status = null)
     {
-        lock (_lock)
+        var tasks = TaskCenter.Instance.GetTasksForBeing(OwnerId);
+        if (status == null)
         {
-            if (status == null)
+            foreach (var task in tasks.ToList())
             {
-                _tasks.Clear();
+                TaskCenter.Instance.RemoveTask(task.Id);
             }
-            else
-            {
-                _tasks = _tasks.Where(t => t.Status != status).ToList();
-            }
-
-            Save();
         }
+        else
+        {
+            foreach (var task in tasks.Where(t => t.Status == status).ToList())
+            {
+                TaskCenter.Instance.RemoveTask(task.Id);
+            }
+        }
+
+        Persist();
     }
 
     /// <summary>
@@ -661,18 +628,16 @@ public sealed class TaskSystem
     /// <returns>A TaskStatistics object with counts for each status.</returns>
     public TaskStatistics GetStatistics()
     {
-        lock (_lock)
+        var tasks = TaskCenter.Instance.GetTasksForBeing(OwnerId).ToList();
+        return new TaskStatistics
         {
-            return new TaskStatistics
-            {
-                Total = _tasks.Count,
-                Pending = _tasks.Count(t => t.Status == TaskStatus.Pending),
-                Running = _tasks.Count(t => t.Status == TaskStatus.Running),
-                Completed = _tasks.Count(t => t.Status == TaskStatus.Completed),
-                Failed = _tasks.Count(t => t.Status == TaskStatus.Failed),
-                Cancelled = _tasks.Count(t => t.Status == TaskStatus.Cancelled)
-            };
-        }
+            Total = tasks.Count,
+            Pending = tasks.Count(t => t.Status == TaskStatus.Pending),
+            Running = tasks.Count(t => t.Status == TaskStatus.Running),
+            Completed = tasks.Count(t => t.Status == TaskStatus.Completed),
+            Failed = tasks.Count(t => t.Status == TaskStatus.Failed),
+            Cancelled = tasks.Count(t => t.Status == TaskStatus.Cancelled)
+        };
     }
 
     /// <summary>
@@ -682,10 +647,9 @@ public sealed class TaskSystem
     /// <returns>A list of tasks that depend on the specified task.</returns>
     public List<TaskItem> GetDependents(Guid taskId)
     {
-        lock (_lock)
-        {
-            return _tasks.Where(t => t.Dependencies.Contains(taskId)).ToList();
-        }
+        return TaskCenter.Instance.GetTasksForBeing(OwnerId)
+            .Where(t => t.Dependencies.Contains(taskId))
+            .ToList();
     }
 
     /// <summary>
@@ -696,35 +660,32 @@ public sealed class TaskSystem
     /// <returns>True if adding the dependency would create a cycle; otherwise, false.</returns>
     public bool HasCircularDependency(Guid taskId, Guid newDependencyId)
     {
-        lock (_lock)
+        var visited = new HashSet<Guid>();
+        var queue = new Queue<Guid>();
+        queue.Enqueue(newDependencyId);
+
+        while (queue.Count > 0)
         {
-            var visited = new HashSet<Guid>();
-            var queue = new Queue<Guid>();
-            queue.Enqueue(newDependencyId);
+            var current = queue.Dequeue();
 
-            while (queue.Count > 0)
+            if (current == taskId)
+                return true;
+
+            if (visited.Contains(current))
+                continue;
+
+            visited.Add(current);
+
+            var task = TaskCenter.Instance.GetTask(current);
+            if (task != null)
             {
-                var current = queue.Dequeue();
-
-                if (current == taskId)
-                    return true;
-
-                if (visited.Contains(current))
-                    continue;
-
-                visited.Add(current);
-
-                var task = _tasks.FirstOrDefault(t => t.Id == current);
-                if (task != null)
+                foreach (var dep in task.Dependencies)
                 {
-                    foreach (var dep in task.Dependencies)
-                    {
-                        queue.Enqueue(dep);
-                    }
+                    queue.Enqueue(dep);
                 }
             }
-
-            return false;
         }
+
+        return false;
     }
 }

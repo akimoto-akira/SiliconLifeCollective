@@ -206,11 +206,22 @@ public class DefaultSiliconBeing : SiliconBeingBase
             {
                 if (ContextManager.NeedsContinuation(this, session))
                 {
-                    _activityRaw = (int)BeingActivity.SingleChat;
-                    _logger.Info(Id, "Being {0}: detected continuation in session {1}", Name, session.Id);
-                    if (!ExecuteBrain("ThinkContinuation", session, brain => brain.ThinkOnChat()))
-                        errorOccurred = true;
-                    return;
+                    if (session.Type == SessionType.GroupChat)
+                    {
+                        _activityRaw = (int)BeingActivity.GroupChat;
+                        _logger.Info(Id, "Being {0}: detected group chat continuation in session {1}", Name, session.Id);
+                        if (!ExecuteBrain("ThinkContinuation", session, brain => brain.ThinkOnGroupChat()))
+                            errorOccurred = true;
+                        return;
+                    }
+                    else
+                    {
+                        _activityRaw = (int)BeingActivity.SingleChat;
+                        _logger.Info(Id, "Being {0}: detected continuation in session {1}", Name, session.Id);
+                        if (!ExecuteBrain("ThinkContinuation", session, brain => brain.ThinkOnChat()))
+                            errorOccurred = true;
+                        return;
+                    }
                 }
             }
 
@@ -220,7 +231,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 if (brain.HasWork)
                 {
                     // Check if the last AI response was a mark_read action
-                    // If so, skip ThinkOnChat to save tokens (read but no reply).
+                    // If so, skip thinking to save tokens (read but no reply).
                     // mark_read is a lightweight bookkeeping step: keep the
                     // previous activity value intact rather than counting it
                     // as a fresh scene trigger.
@@ -231,10 +242,39 @@ public class DefaultSiliconBeing : SiliconBeingBase
                         return;
                     }
 
-                    _activityRaw = (int)BeingActivity.SingleChat;
-                    _logger.Info(Id, "Being {0}: detected pending messages in session {1}", Name, session.Id);
-                    if (!ExecuteBrain("ThinkOnChat", session, _ => brain.ThinkOnChat()))
-                        errorOccurred = true;
+                    if (session.Type == SessionType.GroupChat)
+                    {
+                        _activityRaw = (int)BeingActivity.GroupChat;
+                        _logger.Info(Id, "Being {0}: detected pending messages in group chat session {1}", Name, session.Id);
+                        if (!ExecuteBrain("ThinkOnGroupChat", session, _ => brain.ThinkOnGroupChat()))
+                            errorOccurred = true;
+                        return;
+                    }
+                    else
+                    {
+                        _activityRaw = (int)BeingActivity.SingleChat;
+                        _logger.Info(Id, "Being {0}: detected pending messages in session {1}", Name, session.Id);
+                        if (!ExecuteBrain("ThinkOnChat", session, _ => brain.ThinkOnChat()))
+                            errorOccurred = true;
+                        return;
+                    }
+                }
+            }
+
+            // Broadcast processing: check for pending broadcast messages
+            ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
+            if (chatSystem != null)
+            {
+                List<ChatMessage> pendingBroadcasts = chatSystem.GetPendingBroadcasts(Id);
+                if (pendingBroadcasts.Count > 0)
+                {
+                    _activityRaw = (int)BeingActivity.Broadcast;
+                    _logger.Info(Id, "Being {0}: {1} pending broadcast message(s) detected", Name, pendingBroadcasts.Count);
+                    foreach (var broadcast in pendingBroadcasts)
+                    {
+                        Memory?.Add($"Broadcast received: {broadcast.Content}");
+                        chatSystem.MarkBroadcastAsRead(broadcast.Id, Id);
+                    }
                     return;
                 }
             }
@@ -258,9 +298,9 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 }
             }
 
-            if (TaskSystem != null && TaskSystem.HasPendingTasks(Id))
+            if (TaskEnumerator != null && TaskEnumerator.HasRunnableTasks())
             {
-                List<TaskItem> runnable = TaskSystem.GetRunnableTasks(Id);
+                List<TaskItem> runnable = TaskEnumerator.EnumerateRunnable().ToList();
                 if (runnable.Count > 0)
                 {
                     TaskItem task = runnable[0];
@@ -272,15 +312,13 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 }
             }
 
-            // Project thinking: check for pending project work
-            if (ServiceLocator.Instance.ProjectManager != null && HasProjectWork())
-            {
-                _activityRaw = (int)BeingActivity.Project;
-                _logger.Info(Id, "Being {0}: detected pending project work", Name);
-                if (!ExecuteBrain("ThinkOnProject", null, _ => new ContextManager(this, (SessionBase?)null).ThinkOnProject()))
-                    errorOccurred = true;
-                return;
-            }
+            // Project work: query project-related tasks from TaskCenter instead of ThinkOnProject
+            // This has been replaced by the centralized task management strategy:
+            // - Project scenarios are now handled through TaskCenter
+            // - Project-related tasks are queried from TaskCenter
+            // - Being uses ThinkOnTask to handle project tasks
+            // ThinkOnProject has been removed to simplify the Tick scheduling logic
+            // Project work is now handled through the regular task processing pipeline
 
             if (Memory != null && Memory.ShouldCompress(out var compressData))
             {
@@ -338,7 +376,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
 
     /// <summary>
     /// Builds the list of chat sessions:
-    /// single chat sessions with the project user ID + all other silicon beings (excluding self).
+    /// single chat sessions with the project user ID + all other silicon beings (excluding self) + group chat sessions.
     /// </summary>
     private List<SessionBase> BuildSessionList()
     {
@@ -369,6 +407,13 @@ public class DefaultSiliconBeing : SiliconBeingBase
             }
         }
 
+        // Add group chat sessions where this being is a member
+        var groupSessions = chatSystem.GetGroupChatSessionsForMember(Id);
+        foreach (var groupSession in groupSessions)
+        {
+            sessions.Add(groupSession);
+        }
+
         return sessions;
     }
 
@@ -388,9 +433,16 @@ public class DefaultSiliconBeing : SiliconBeingBase
         ContextManager brain = new ContextManager(this, session);
 
         AIResponse response;
-        if (sceneName == "ThinkOnChat" || sceneName == "ThinkContinuation")
+        if (sceneName == "ThinkOnChat" || sceneName == "ThinkContinuation" || sceneName == "ThinkOnGroupChat")
         {
-            response = brain.ThinkOnChatStreamAsync().GetAwaiter().GetResult();
+            if (sceneName == "ThinkOnGroupChat")
+            {
+                response = brain.ThinkOnGroupChatStreamAsync().GetAwaiter().GetResult();
+            }
+            else
+            {
+                response = brain.ThinkOnChatStreamAsync().GetAwaiter().GetResult();
+            }
         }
         else
         {
@@ -596,7 +648,9 @@ public class DefaultSiliconBeing : SiliconBeingBase
 
     /// <summary>
     /// Checks if the last AI response in the session was a mark_read action.
-    /// This is used to skip ThinkOnChat after AI explicitly marked messages as read (read but no reply).
+    /// This is used to skip thinking after AI explicitly marked messages as read (read but no reply).
+    /// For group chats, checks if the last message from this being was mark_read.
+    /// For single chats, maintains original logic of checking if user is in session.
     /// </summary>
     /// <param name="session">The chat session to check</param>
     /// <returns>True if the last assistant message called mark_read tool</returns>
@@ -604,7 +658,8 @@ public class DefaultSiliconBeing : SiliconBeingBase
     {
         try
         {
-            if (session.Members.Contains(Config.Instance.Data.UserGuid))
+            // For single chat sessions (with user): skip mark_read logic
+            if (session.Type != SessionType.GroupChat && session.Members.Contains(Config.Instance.Data.UserGuid))
             {
                 return false;
             }
@@ -613,11 +668,13 @@ public class DefaultSiliconBeing : SiliconBeingBase
             if (messages.Count < 2)
                 return false;
 
-            // Find the last assistant message
+            // Find the last assistant message from this being
             for (int i = messages.Count - 1; i >= 0; i--)
             {
                 var msg = messages[i];
-                if (msg.Role == MessageRole.Assistant && !string.IsNullOrEmpty(msg.ToolCallsJson))
+                // For group chats, only check messages from this being
+                // For single chats, check any assistant message
+                if (msg.Role == MessageRole.Assistant && msg.SenderId == Id && !string.IsNullOrEmpty(msg.ToolCallsJson))
                 {
                     // Parse tool calls JSON
                     try
@@ -635,7 +692,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
                                         string? action = actionObj?.ToString()?.ToLowerInvariant();
                                         if (action == "mark_read")
                                         {
-                                            _logger.Debug(Id, "Detected mark_read action in last assistant message for session {0}", session.Id);
+                                            _logger.Debug(Id, "Detected mark_read action in last assistant message from this being for session {0}", session.Id);
                                             return true;
                                         }
                                     }
@@ -648,7 +705,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
                         _logger.Warn(Id, "Failed to parse ToolCallsJson for session {0}: {1}", session.Id, ex.Message);
                     }
 
-                    // Found an assistant message with tool calls, but not mark_read
+                    // Found an assistant message with tool calls from this being, but not mark_read
                     break;
                 }
             }
@@ -743,46 +800,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
     }
 
     /// <summary>
-    /// Checks if there is pending project work (projects assigned to this being with pending tasks).
-    /// Used to detect external disturbances that should trigger project thinking.
-    /// </summary>
-    private bool HasProjectWork()
-    {
-        try
-        {
-            // Get ProjectManager from ServiceLocator
-            var projectManager = ServiceLocator.Instance.ProjectManager;
-            if (projectManager == null)
-                return false;
-
-            // Get all active projects
-            var projects = projectManager.ListProjects(includeArchived: false);
-            if (projects.Count == 0)
-                return false;
-
-            // Check each project for assignment and pending work
-            foreach (var project in projects)
-            {
-                // Check if this silicon being is assigned to the project
-                if (projectManager.IsBeingAssigned(project.Id, Id))
-                {
-                    // Get the project task system
-                    var taskSystem = projectManager.GetTaskSystem(project.Id);
-                    if (taskSystem != null && taskSystem.PendingCount > 0)
-                    {
-                        _logger.Debug(Id, "Project {0} has {1} pending tasks for being {2}", 
-                            project.Name, taskSystem.PendingCount, Name);
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-        catch (Exception ex)
-        {
-            _logger.Warn(Id, "Failed to check project work", ex);
-            return false;
-        }
-    }
+    // HasProjectWork has been removed as part of the ThinkOnProject removal.
+    // Project work is now handled through the centralized task management strategy
+    // and processed through the regular task pipeline using ThinkOnTask.
 }

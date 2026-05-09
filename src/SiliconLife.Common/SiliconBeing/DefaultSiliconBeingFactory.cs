@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -81,11 +81,6 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
 
         string beingDirectory = Path.Combine(_dataDirectory, "SiliconManager", id.ToString());
 
-        if (!Directory.Exists(beingDirectory))
-        {
-            Directory.CreateDirectory(beingDirectory);
-        }
-
         return CreateAndConfigureBeing(id, name, beingDirectory);
     }
 
@@ -158,16 +153,20 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
 
         // Create and configure ToolManager for this being
         // Curators get ALL tools (normal + curator-only); normal beings get only non-curator tools
-        // Tools are gathered from the default assembly AND from every loaded plugin assembly.
+        // Tools are gathered from the default assembly, additional tool assemblies, AND from every loaded plugin assembly.
         ToolManager toolManager = new ToolManager(curatorOnly: isCurator);
         if (isCurator)
         {
             toolManager.ScanAssemblyAll(typeof(DefaultSiliconBeingFactory).Assembly);
+            foreach (var asm in ServiceLocator.Instance.ToolAssemblies)
+                toolManager.ScanAssemblyAll(asm);
             toolManager.ScanAllPluginAssembliesAll();
         }
         else
         {
             toolManager.ScanAssembly(typeof(DefaultSiliconBeingFactory).Assembly);
+            foreach (var asm in ServiceLocator.Instance.ToolAssemblies)
+                toolManager.ScanAssembly(asm);
             toolManager.ScanAllPluginAssemblies();
         }
         being.ToolManager = toolManager;
@@ -196,6 +195,7 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         // Create Memory, TaskSystem, TimerSystem for this being
         being.Memory = new Memory(beingTimeStorage);
         being.TaskSystem = new TaskSystem(being, beingStorage);
+        being.TaskEnumerator = new TaskEnumerator(id);
 
         Func<Dictionary<string, CalendarBase>> registryFactory = CalendarBase.BuildCalendarRegistry;
         CalendarNextOccurrenceResolver resolver = CalendarTimerResolvers.CreateResolver(registryFactory);

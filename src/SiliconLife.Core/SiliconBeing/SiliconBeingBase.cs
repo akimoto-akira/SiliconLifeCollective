@@ -35,6 +35,9 @@ public enum BeingActivity
     /// <summary>Executing a scheduled timer (corresponds to ThinkOnTimer / ThinkOnTimerStep).</summary>
     Timer,
 
+    /// <summary>Processing broadcast messages.</summary>
+    Broadcast,
+
     /// <summary>Working on project tasks (corresponds to ThinkOnProject).</summary>
     Project,
 
@@ -151,6 +154,12 @@ public abstract class SiliconBeingBase
     /// Each being holds its own TaskSystem instance.
     /// </summary>
     public TaskSystem? TaskSystem { get; set; }
+
+    /// <summary>
+    /// Gets or sets the task enumerator for this silicon being.
+    /// Provides filtered, read-only access to tasks from the centralized TaskCenter.
+    /// </summary>
+    public TaskEnumerator? TaskEnumerator { get; set; }
 
     /// <summary>
     /// Gets or sets the timer system for this silicon being.
