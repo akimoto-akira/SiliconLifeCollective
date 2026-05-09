@@ -25,6 +25,8 @@ public class ToolManager
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<ToolManager>();
     private readonly Dictionary<string, ITool> _tools = new();
+    private readonly Dictionary<string, ToolScenarioFlag> _toolScenarios = new();
+    private readonly HashSet<string> _chatOnlyTools = new();
     private readonly object _lock = new();
     private readonly bool _curatorOnly;
 
@@ -60,6 +62,15 @@ public class ToolManager
         lock (_lock)
         {
             _tools[tool.Name] = tool;
+
+            Type toolType = tool.GetType();
+            var scenarioAttr = toolType.GetCustomAttribute<ToolScenarioAttribute>();
+            _toolScenarios[tool.Name] = scenarioAttr?.Scenarios ?? ToolScenarioFlag.All;
+
+            if (toolType.GetCustomAttribute<ChatOnlyAttribute>() != null)
+            {
+                _chatOnlyTools.Add(tool.Name);
+            }
         }
         _logger.Debug(null, $"Tool registered: {tool.Name}");
     }
@@ -266,6 +277,35 @@ public class ToolManager
                 }
             }
             return definitions;
+        }
+    }
+
+    public List<ToolDefinition> GetToolDefinitions(ToolScenarioFlag scenario)
+    {
+        lock (_lock)
+        {
+            var definitions = new List<ToolDefinition>();
+            foreach (var kvp in _tools)
+            {
+                if ((_toolScenarios.TryGetValue(kvp.Key, out var flags) && (flags & scenario) != 0) ||
+                    !_toolScenarios.ContainsKey(kvp.Key))
+                {
+                    definitions.Add(new ToolDefinition(
+                        kvp.Value.Name,
+                        kvp.Value.Description,
+                        kvp.Value.GetParameterSchema()
+                    ));
+                }
+            }
+            return definitions;
+        }
+    }
+
+    public bool IsChatOnlyTool(string toolName)
+    {
+        lock (_lock)
+        {
+            return _chatOnlyTools.Contains(toolName);
         }
     }
 

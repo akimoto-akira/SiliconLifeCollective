@@ -319,7 +319,7 @@ public class ContextManager
     /// Builds an AIRequest from the current context
     /// </summary>
     /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
-    private AIRequest BuildRequest(string? scenarioContext = null, TaskItem? task = null)
+    private AIRequest BuildRequest(string? scenarioContext = null, TaskItem? task = null, ToolScenarioFlag scenario = ToolScenarioFlag.All)
     {
         // Record unread user messages to memory before building the request
         RecordUnreadMessagesToMemory();
@@ -379,14 +379,13 @@ public class ContextManager
         ToolManager? toolManager = _being.ToolManager;
         if (toolManager != null && toolManager.ToolCount > 0)
         {
-            // If task has specific required tools, only load those; otherwise load all tools
             if (task?.RequiredTools != null && task.RequiredTools.Count > 0)
             {
                 request.Tools = toolManager.GetToolDefinitions(task.RequiredTools);
             }
             else
             {
-                request.Tools = toolManager.GetToolDefinitions();
+                request.Tools = toolManager.GetToolDefinitions(scenario);
             }
         }
 
@@ -574,16 +573,11 @@ public class ContextManager
     /// </summary>
     /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
     /// <returns>The AI response (may contain tool_calls or plain text)</returns>
-    public AIResponse GetResponse(string? scenarioContext = null)
-    {
-        return GetResponse(scenarioContext, null);
-    }
-
-    public AIResponse GetResponse(string? scenarioContext, TaskItem? task)
+    public AIResponse GetResponse(string? scenarioContext = null, TaskItem? task = null, ToolScenarioFlag scenario = ToolScenarioFlag.All)
     {
         _logger.Info(_being.Id, "Getting AI response for being {0}", _being.Name);
 
-        AIRequest request = BuildRequest(scenarioContext, task);
+        AIRequest request = BuildRequest(scenarioContext, task, scenario);
         AIResponse response = _aiClient.Chat(request);
 
 #if DEBUG
@@ -611,9 +605,9 @@ public class ContextManager
     /// </summary>
     /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
     /// <returns>The AI response (may contain tool_calls or plain text)</returns>
-    public async Task<AIResponse> GetResponseAsync(string? scenarioContext = null)
+    public async Task<AIResponse> GetResponseAsync(string? scenarioContext = null, ToolScenarioFlag scenario = ToolScenarioFlag.All)
     {
-        AIRequest request = BuildRequest(scenarioContext);
+        AIRequest request = BuildRequest(scenarioContext, scenario: scenario);
         
         try
         {
@@ -654,16 +648,16 @@ public class ContextManager
     /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
     /// <param name="cancellationToken">Cancellation token to abort the stream</param>
     /// <returns>The final AI response (assembled from all stream chunks)</returns>
-    public async Task<AIResponse> GetResponseStreamAsync(string? scenarioContext = null, CancellationToken cancellationToken = default)
+    public async Task<AIResponse> GetResponseStreamAsync(string? scenarioContext = null, CancellationToken cancellationToken = default, ToolScenarioFlag scenario = ToolScenarioFlag.All)
     {
         bool? streamingMode = _aiClient.StreamingMode;
         if (streamingMode == false)
         {
             _logger.Warn(_being.Id, "Falling back to non-streaming mode");
-            return await GetResponseAsync(scenarioContext);
+            return await GetResponseAsync(scenarioContext, scenario);
         }
 
-        AIRequest request = BuildRequest(scenarioContext);
+        AIRequest request = BuildRequest(scenarioContext, scenario: scenario);
         StringBuilder contentBuilder = new();
         StringBuilder thinkingBuilder = new();
         List<ToolCall>? toolCalls = null;
@@ -730,7 +724,7 @@ public class ContextManager
                 return AIResponse.Failed("AI client requires streaming but ChatStreamAsync is not implemented");
             }
             _logger.Warn(_being.Id, "Streaming not implemented, falling back to non-streaming mode");
-            return await GetResponseAsync(scenarioContext);
+            return await GetResponseAsync(scenarioContext, scenario);
         }
 
         // If the token was cancelled (OllamaClient may have swallowed OperationCanceledException
@@ -744,7 +738,7 @@ public class ContextManager
                 return AIResponse.Failed("AI client requires streaming but stream ended without final chunk");
             }
             _logger.Warn(_being.Id, "Stream ended without final chunk, falling back to non-streaming mode");
-            return await GetResponseAsync(scenarioContext);
+            return await GetResponseAsync(scenarioContext, scenario);
         }
 
         StreamChunk endChunk = StreamChunk.End(streamId, promptTokens: promptTokens, completionTokens: completionTokens, totalTokens: totalTokens);
@@ -792,7 +786,7 @@ public class ContextManager
         _logger.Info(_being.Id, "ThinkOnChat: being={0}, session={1}", _being.Name, _session?.Id.ToString() ?? "null");
 
         string? scenarioContext = BuildSingleChatScenarioContext();
-        AIResponse response = GetResponse(scenarioContext);
+        AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Chat);
 
         if (response.Success && response.HasToolCalls)
         {
@@ -943,7 +937,7 @@ public class ContextManager
         AIResponse response;
         try
         {
-            response = await GetResponseStreamAsync(scenarioContext, effectiveToken);
+            response = await GetResponseStreamAsync(scenarioContext, effectiveToken, ToolScenarioFlag.Chat);
         }
         catch (OperationCanceledException) when (effectiveToken.IsCancellationRequested)
         {
@@ -1018,11 +1012,10 @@ public class ContextManager
         _logger.Info(_being.Id, "ThinkOnGroupChat: being={0}", _being.Name);
 
         string? scenarioContext = BuildGroupChatScenarioContext();
-        AIResponse response = GetResponse(scenarioContext);
+        AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Chat);
 
         if (response.Success && response.HasToolCalls)
         {
-            // Tool calls executed, results persisted → yield time slice
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
@@ -1055,11 +1048,10 @@ public class ContextManager
         _logger.Info(_being.Id, "ThinkOnGroupChatStream: being={0}", _being.Name);
 
         string? scenarioContext = BuildGroupChatScenarioContext();
-        AIResponse response = await GetResponseStreamAsync(scenarioContext, cancellationToken);
+        AIResponse response = await GetResponseStreamAsync(scenarioContext, cancellationToken, ToolScenarioFlag.Chat);
 
         if (response.Success && response.HasToolCalls)
         {
-            // Tool calls executed, results persisted → yield time slice
             Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
             LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
             string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
@@ -1092,7 +1084,7 @@ public class ContextManager
         _logger.Info(_being.Id, "ThinkOnTask: being={0}, task={1} ({2})", _being.Name, task.Title, task.Id);
 
         string? scenarioContext = BuildTaskScenarioContext(task);
-        AIResponse response = GetResponse(scenarioContext, task);
+        AIResponse response = GetResponse(scenarioContext, task, ToolScenarioFlag.Task);
 
         if (response.Success && !string.IsNullOrEmpty(response.Content))
         {
@@ -1157,11 +1149,11 @@ public class ContextManager
                 bool? streamingMode = _aiClient.StreamingMode;
                 if (streamingMode == true)
                 {
-                    response = GetResponseStreamAsync(scenarioContext).GetAwaiter().GetResult();
+                    response = GetResponseStreamAsync(scenarioContext, scenario: ToolScenarioFlag.Timer).GetAwaiter().GetResult();
                 }
                 else
                 {
-                    response = GetResponse(scenarioContext);
+                    response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Timer);
                 }
 
                 if (!response.Success)
@@ -1327,7 +1319,7 @@ public class ContextManager
         });
 
         // 4. Call AI (first time)
-        AIResponse response = GetResponse(scenarioContext);
+        AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Timer);
 
         // 5. Update state
         timer.CurrentStep = 1;
@@ -1393,9 +1385,7 @@ public class ContextManager
 
         // 2. Continue tool loop
         string scenarioContext = BuildTimerScenarioContext(timer);
-        AIResponse response = GetResponse(scenarioContext);
-
-        // 3. Decide next step based on AI response
+        AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Timer);
         if (!response.Success)
         {
             timer.ExecutionState = TimerExecutionState.Failed;
