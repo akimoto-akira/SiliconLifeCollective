@@ -75,3 +75,4 @@ YDoc/
 *.csproj.targets
 src/TravelCodeWikiWithAI/
 .trae/
+.catpaw/

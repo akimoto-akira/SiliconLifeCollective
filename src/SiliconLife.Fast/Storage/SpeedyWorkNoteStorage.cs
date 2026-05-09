@@ -55,8 +55,11 @@ public sealed class SpeedyWorkNoteStorage : IWorkNoteStorage, IDisposable
 
     // ─── Index helpers ────────────────────────────────────────────────────────
 
-    private List<Guid> LoadIndex(WorkNoteOwnerType ownerType, string ownerId) =>
-        _storage.Read<Guid>(IndexKey(ownerType, ownerId)).ToList();
+    private List<Guid> LoadIndex(WorkNoteOwnerType ownerType, string ownerId)
+    {
+        var lists = _storage.Read<List<Guid>>(IndexKey(ownerType, ownerId));
+        return lists.FirstOrDefault() ?? new List<Guid>();
+    }
 
     private void SaveIndex(WorkNoteOwnerType ownerType, string ownerId, List<Guid> index) =>
         _storage.Write(IndexKey(ownerType, ownerId), index);

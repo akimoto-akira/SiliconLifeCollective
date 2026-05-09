@@ -13,6 +13,7 @@
 
 using SiliconLife.App.Data;
 using SiliconLife.Collective;
+using System.IO;
 using System.Text.Json;
 
 namespace SiliconLife.Default.Config;
@@ -27,6 +28,11 @@ public class DefaultConfigData : AppConfigData
     [ConfigIgnore("系统内部使用，用于多态反序列化")]
     public override string ConfigType { get; set; } = "Default";
 
+    /// <summary>
+    /// Gets or sets the data directory for storing all application data
+    /// </summary>
+    [ConfigGroup("Basic", Order = 2, DisplayNameKey = "DataDirectory", DescriptionKey = "DataDirectory")]
+    public DirectoryInfo DataDirectory { get; set; } = new DirectoryInfo("./data");
 
     private string GetConfigFilePath()
     {
@@ -62,8 +68,9 @@ public class DefaultConfigData : AppConfigData
                 string json = File.ReadAllText(configPath);
                 DefaultConfigData? loadedData = JsonSerializer.Deserialize<DefaultConfigData>(json, new JsonSerializerOptions
                 {
-                    WriteIndented = true,
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve,
+                    MaxDepth = 128,
                     Converters = 
                     { 
                         new System.Text.Json.Serialization.JsonStringEnumConverter(),
@@ -102,6 +109,8 @@ public class DefaultConfigData : AppConfigData
         {
             WriteIndented = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve,
+            MaxDepth = 128,
             Converters = 
             { 
                 new System.Text.Json.Serialization.JsonStringEnumConverter(),

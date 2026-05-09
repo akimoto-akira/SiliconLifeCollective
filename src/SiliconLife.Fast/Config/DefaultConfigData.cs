@@ -24,6 +24,8 @@ namespace SiliconLife.Fast.Config;
 /// </summary>
 public class DefaultConfigData : AppConfigData
 {
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger<DefaultConfigData>();
+    
     [ConfigIgnore("系统内部使用，用于多态反序列化")]
     public override string ConfigType { get; set; } = "Fast";
 
@@ -63,9 +65,12 @@ public class DefaultConfigData : AppConfigData
         try
         {
             SpeedyPackRegistry.Pack.Write(GetConfigKey(), this);
+            _logger.Info(null, "Configuration saved successfully to SpeedyPack");
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.Error(null, "Failed to save configuration: {0}", ex.Message);
+            throw; // Re-throw to ensure caller knows save failed
         }
     }
 }

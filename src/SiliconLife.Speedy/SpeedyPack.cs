@@ -38,7 +38,9 @@ public sealed class SpeedyPack : IDisposable
 {
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
-        PropertyNameCaseInsensitive = true
+        PropertyNameCaseInsensitive = true,
+        ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve,
+        MaxDepth = 128
     };
 
     static SpeedyPack()
@@ -266,6 +268,12 @@ public sealed class SpeedyPack : IDisposable
     public bool Exists(string path)
     {
         var normalizedPath = PathNormalizer.Normalize(path);
+        
+        // First check the entry cache (for recently written items that haven't been persisted yet)
+        if (_entryCache.TryGet(normalizedPath, out _))
+            return true;
+            
+        // Then check the directory map (for persisted items)
         return _directoryMap.TryGet(normalizedPath, out _);
     }
 
