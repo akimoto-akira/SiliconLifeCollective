@@ -1,4 +1,4 @@
-﻿// Copyright 2026 Silicon Life Collective
+// Copyright 2026 Silicon Life Collective
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ namespace SiliconLife.Default.Knowledge;
 /// Knowledge network tool - provides unified entry point for AI to operate knowledge network
 /// Implements ITool interface, supporting knowledge add, query, update, delete and other operations
 /// </summary>
+[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class KnowledgeTool : ITool
 {
     private readonly IKnowledgeNetwork? _knowledgeNetwork;

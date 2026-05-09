@@ -27,6 +27,7 @@ namespace SiliconLife.Common.Tools;
 /// restarts Fast — giving the system a basic "self-development" capability.
 /// </summary>
 [SiliconManagerOnly]
+[ToolScenario(ToolScenarioFlag.Chat)]
 public class HotReloadTool : ITool
 {
     // Default paths — may be overridden via tool parameters at invocation time.

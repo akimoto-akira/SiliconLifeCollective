@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -24,6 +24,7 @@ namespace SiliconLife.Common.Tools;
 /// (including this one). All management logic is handled directly by this tool.
 /// </summary>
 [SiliconManagerOnly]
+[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class CuratorTool : ITool
 {
     public string Name => "silicon_manager";

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -23,6 +23,7 @@ namespace SiliconLife.Common.Tools;
 /// Returns aggregated data similar to the Web audit dashboard.
 /// </summary>
 [SiliconManagerOnly]
+[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class TokenAuditTool : ITool
 {
     public string Name => "token_audit";

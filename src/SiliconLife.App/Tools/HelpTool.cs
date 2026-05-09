@@ -14,6 +14,8 @@ namespace SiliconLife.App;
 /// Help documentation lookup tool for AI.
 /// Allows AI to search and retrieve help documentation content.
 /// </summary>
+[ToolScenario(ToolScenarioFlag.Chat)]
+[ChatOnly]
 public class HelpTool : ITool
 {
     public string Name => "help";
