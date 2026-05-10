@@ -73,7 +73,20 @@ public sealed class SpeedyLoggerProvider : ILoggerProvider, ILogReader
         LogLevel? levelFilter = null,
         int maxCount = 0)
     {
-        var entries = _storage.Query<LogEntryDto>(DefaultKey, null);
+        const int defaultLimit = 5000;
+
+        List<TimeEntry<LogEntryDto>> entries;
+
+        if (!startTime.HasValue && !endTime.HasValue)
+        {
+            int limit = maxCount > 0 ? Math.Max(maxCount, defaultLimit) : defaultLimit;
+            entries = _storage.QueryLatest<LogEntryDto>(DefaultKey, limit);
+        }
+        else
+        {
+            entries = _storage.Query<LogEntryDto>(DefaultKey, null);
+        }
+
         var results = new List<LogEntry>();
 
         foreach (var timeEntry in entries)

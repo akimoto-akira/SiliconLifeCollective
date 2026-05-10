@@ -263,14 +263,40 @@ public sealed class SpeedyTimeStorage : ITimeStorage, IDisposable
     public List<TimeEntry<T>> QueryLatest<T>(string key, int limit)
     {
         string keyDirPrefix = GetKeyDirectoryPrefix(key);
-        var result = new List<TimeEntry<T>>();
+
+        if (limit <= 0)
+        {
+            var allResults = new List<TimeEntry<T>>();
+            foreach (string p in EnumerateAllEntries(keyDirPrefix))
+            {
+                if (!TryParseTimestampFromPath(keyDirPrefix, p, out IncompleteDate ft)) continue;
+                foreach (T data in ReadArray<T>(p)) allResults.Add(new TimeEntry<T>(key, ft, data));
+            }
+            allResults.Sort((a, b) => b.Timestamp.CompareTo(a.Timestamp));
+            return allResults;
+        }
+
+        var pathEntries = new List<(string Path, IncompleteDate Timestamp)>();
         foreach (string p in EnumerateAllEntries(keyDirPrefix))
         {
-            if (!TryParseTimestampFromPath(keyDirPrefix, p, out IncompleteDate ft)) continue;
-            foreach (T data in ReadArray<T>(p)) result.Add(new TimeEntry<T>(key, ft, data));
+            if (TryParseTimestampFromPath(keyDirPrefix, p, out IncompleteDate ft))
+                pathEntries.Add((p, ft));
         }
+
+        pathEntries.Sort((a, b) => b.Timestamp.CompareTo(a.Timestamp));
+
+        if (pathEntries.Count > limit)
+            pathEntries = pathEntries.Take(limit).ToList();
+
+        var result = new List<TimeEntry<T>>();
+        foreach (var (path, timestamp) in pathEntries)
+        {
+            foreach (T data in ReadArray<T>(path))
+                result.Add(new TimeEntry<T>(key, timestamp, data));
+        }
+
         result.Sort((a, b) => b.Timestamp.CompareTo(a.Timestamp));
-        return limit > 0 ? result.Take(limit).ToList() : result;
+        return result;
     }
 
     public int Count(string key, IncompleteDate range) => Query<object>(key, range).Count;
