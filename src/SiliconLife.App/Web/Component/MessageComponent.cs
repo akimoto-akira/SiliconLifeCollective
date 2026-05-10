@@ -71,7 +71,7 @@ public class MessageComponent : ComponentBase
             classes.Add(Class);
         message.Class(string.Join(" ", classes));
 
-        if (!string.IsNullOrEmpty(Style))
+        if (Style != null && Style.HasInlineStyles)
             message.Style(Style);
 
         foreach (var kvp in Attributes)

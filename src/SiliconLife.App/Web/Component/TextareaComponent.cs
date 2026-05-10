@@ -91,7 +91,7 @@ public class TextareaComponent : ComponentBase
         if (!string.IsNullOrEmpty(Class))
             textarea.Class(Class);
 
-        if (!string.IsNullOrEmpty(Style))
+        if (Style != null && Style.HasInlineStyles)
             textarea.Style(Style);
 
         foreach (var kvp in Attributes)

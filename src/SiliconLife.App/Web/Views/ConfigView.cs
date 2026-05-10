@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -9,6 +9,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using SiliconLife.App.Web.Component;
 using SiliconLife.App.Web.Models;
 
 using SiliconLife.Common.Localization;
@@ -93,6 +94,7 @@ public class ConfigView : ViewBase
                 H.H1(loc.ConfigPageHeader)
             ).Class("page-header"),
             H.Div(groupCards.ToArray()),
+            H.Create("div").AddRendered(SelectComponent.GetSearchableGlobalScript()).Style(new CssBuilder().InlineProperty("display", "none")),
             H.Div(
                 H.Div(
                     H.Div(
@@ -108,23 +110,23 @@ public class ConfigView : ViewBase
                         H.Div(
                             H.Label(loc.ConfigEditValueLabel).Attr("for", "editValueNumber"),
                             H.Input().Attr("type", "number").Id("editValueNumber").Attr("step", "any")
-                        ).Class("form-group").Id("inputNumber").Style("display:none"),
+                        ).Class("form-group").Id("inputNumber").Style(new CssBuilder().InlineProperty("display", "none")),
                         H.Div(
                             H.Label(loc.ConfigEditValueLabel).Attr("for", "editValueBool"),
                             H.Input().Attr("type", "checkbox").Id("editValueBool")
-                        ).Class("form-group").Id("inputBool").Style("display:none"),
+                        ).Class("form-group").Id("inputBool").Style(new CssBuilder().InlineProperty("display", "none")),
                         H.Div(
                             H.Label(loc.ConfigEditValueLabel).Attr("for", "editValueDirectory"),
                             H.Div(
                                 H.Input().Attr("type", "text").Id("editValueDirectory").Attr("readonly", "readonly"),
                                 H.Button(loc.ConfigBrowseButton).Class("btn btn-sm").Id("btnBrowseDir")
                             ).Class("input-with-btn"),
-                            H.Div().Id("dirBrowser").Class("dir-browser").Style("display:none")
-                        ).Class("form-group").Id("inputDirectory").Style("display:none"),
+                            H.Div().Id("dirBrowser").Class("dir-browser").Style(new CssBuilder().InlineProperty("display", "none"))
+                        ).Class("form-group").Id("inputDirectory").Style(new CssBuilder().InlineProperty("display", "none")),
                         H.Div(
                             H.Label(loc.ConfigEditValueLabel).Attr("for", "editValueDatetime"),
                             H.Input().Attr("type", "datetime-local").Id("editValueDatetime")
-                        ).Class("form-group").Id("inputDatetime").Style("display:none"),
+                        ).Class("form-group").Id("inputDatetime").Style(new CssBuilder().InlineProperty("display", "none")),
                         H.Div(
                             H.Label(loc.ConfigTimeSettingsLabel),
                             H.Div(
@@ -137,18 +139,18 @@ public class ConfigView : ViewBase
                                 H.Label(loc.ConfigSecondsLabel).Attr("for", "editValueTimespanSeconds"),
                                 H.Input().Attr("type", "number").Id("editValueTimespanSeconds").Attr("min", "0").Attr("max", "59").Attr("step", "1").Class("timespan-input")
                             ).Class("timespan-inputs")
-                        ).Class("form-group").Id("inputTimespan").Style("display:none"),
+                        ).Class("form-group").Id("inputTimespan").Style(new CssBuilder().InlineProperty("display", "none")),
                         H.Div(
-                            H.Label(loc.ConfigEditValueLabel).Attr("for", "editValueEnum"),
-                            H.Select().Id("editValueEnum")
-                        ).Class("form-group").Id("inputEnum").Style("display:none"),
+                            H.Label(loc.ConfigEditValueLabel).Attr("for", "editValueEnumContainer"),
+                            H.Div().Id("editValueEnumContainer")
+                        ).Class("form-group").Id("inputEnum").Style(new CssBuilder().InlineProperty("display", "none")),
                         H.Div(
                             H.Label(loc.ConfigDictionaryLabel),
                             H.Div().Id("dictEditorContainer").Class("dict-editor"),
                             H.Div(
                                 H.Button(loc.ConfigDictAddButton).Class("btn btn-add").Id("btnAddDictRow")
                             ).Class("dict-actions")
-                        ).Class("form-group").Id("inputDictionary").Style("display:none"),
+                        ).Class("form-group").Id("inputDictionary").Style(new CssBuilder().InlineProperty("display", "none")),
                         H.Div(
                             H.Button(loc.ConfigSaveButton).Class("btn btn-primary").Id("btnSave"),
                             H.Button(loc.ConfigCancelButton).Class("btn btn-secondary").Id("btnCancel")
@@ -456,15 +458,13 @@ public class ConfigView : ViewBase
             {
                 { (Js.Id(() => "d").Prop(() => "success").Op(() => "&&", () => Js.Id(() => "d").Prop(() => "hasOptions")), new List<JsSyntax>
                     {
-                        Js.Const(() => "sel", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "select"))).Stmt(),
-                        Js.Id(() => "Object").Prop(() => "keys").Invoke(() => Js.Id(() => "d").Prop(() => "options")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "k" }, () => Js.Block()
-                            .Add(() => Js.Const(() => "o", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "option"))))
-                            .Add(() => Js.Id(() => "o").Prop(() => "value").Assign(() => Js.Id(() => "k")))
-                            .Add(() => Js.Id(() => "o").Prop(() => "textContent").Assign(() => Js.Id(() => "d").Prop(() => "options").Index(() => Js.Id(() => "k"))))
-                            .Add(() => Js.Id(() => "o").Prop(() => "selected").Assign(() => Js.Id(() => "k").Op(() => "===", () => Js.Id(() => "valueInput").Prop(() => "value"))))
-                            .Add(() => Js.Id(() => "sel").Call(() => "appendChild", () => Js.Id(() => "o"))))
-                        ).Stmt(),
-                        Js.Id(() => "valueInput").Call(() => "replaceWith", () => Js.Id(() => "sel")).Stmt()
+                        Js.Const(() => "dictValWrapper", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))).Stmt(),
+                        Js.Id(() => "dictValWrapper").Prop(() => "style").Prop(() => "flex").Assign(() => Js.Str(() => "1")).Stmt(),
+                        Js.Id(() => "valueInput").Call(() => "replaceWith", () => Js.Id(() => "dictValWrapper")).Stmt(),
+                        Js.Id(() => "slSelectSearch_create").Invoke(() => Js.Id(() => "dictValWrapper"), () => Js.Obj()
+                            .Prop(() => "value", () => Js.Id(() => "valueInput").Prop(() => "value"))
+                            .Prop(() => "options", () => Js.Id(() => "d").Prop(() => "options"))
+                        ).Stmt()
                     }
                 )}
             }));
@@ -650,14 +650,18 @@ public class ConfigView : ViewBase
                 { (Js.Str(() => "enum"), new List<JsSyntax>
                     {
                         Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputEnum")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "block")).Stmt(),
-                        Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValueEnum")).Prop(() => "innerHTML").Assign(() => Js.Str(() => "")).Stmt(),
+                        Js.Const(() => "enumContainer", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValueEnumContainer"))).Stmt(),
+                        Js.Id(() => "enumContainer").Prop(() => "innerHTML").Assign(() => Js.Str(() => "")).Stmt(),
+                        Js.Const(() => "enumOpts", () => Js.Obj()).Stmt(),
                         Js.Id(() => "enumValues").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "v", "i" }, () => Js.Block()
-                            .Add(() => Js.Const(() => "opt", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "option"))))
-                            .Add(() => Js.Id(() => "opt").Prop(() => "value").Assign(() => Js.Id(() => "v")))
-                            .Add(() => Js.Id(() => "opt").Prop(() => "textContent").Assign(() => Js.Id(() => "enumDisplayNames").Index(() => Js.Id(() => "i"))))
-                            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValueEnum")).Call(() => "appendChild", () => Js.Id(() => "opt")))
+                            .Add(() => Js.Assign(() => Js.Id(() => "enumOpts").Index(() => Js.Id(() => "v")), () => Js.Id(() => "enumDisplayNames").Index(() => Js.Id(() => "i"))))
                         )).Stmt(),
-                        Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValueEnum")).Prop(() => "value").Assign(() => Js.Id(() => "value")).Stmt(),
+                        Js.Id(() => "slSelectSearch_create").Invoke(() => Js.Id(() => "enumContainer"), () => Js.Obj()
+                            .Prop(() => "id", () => Js.Str(() => "editValueEnum"))
+                            .Prop(() => "name", () => Js.Str(() => "editValueEnum"))
+                            .Prop(() => "value", () => Js.Id(() => "value"))
+                            .Prop(() => "options", () => Js.Id(() => "enumOpts"))
+                        ).Stmt(),
                         Js.Break()
                     })
                 },

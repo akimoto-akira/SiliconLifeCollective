@@ -71,7 +71,7 @@ public class FileUploadComponent : ComponentBase
             classes.Add(Class);
         upload.Class(string.Join(" ", classes));
 
-        if (!string.IsNullOrEmpty(Style))
+        if (Style != null && Style.HasInlineStyles)
             upload.Style(Style);
 
         foreach (var kvp in Attributes)

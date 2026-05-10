@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -10,7 +10,7 @@
 // limitations under the License.
 
 using SiliconLife.App.Web.Models;
-
+using SiliconLife.App.Web.Component;
 using SiliconLife.Common.Localization;
 
 namespace SiliconLife.App.Web.Views;
@@ -59,7 +59,8 @@ public class LogView : ViewBase
                 H.Button(vm.Localization.LogsFilterButton).OnClick("loadLogs()").Class("filter-btn")
             ).Class("filter-bar"),
             H.Div(
-                H.Div().Id("logs-list").Class("logs-list")
+                H.Div().Id("logs-list").Class("logs-list"),
+                new LoadingComponent(vm.Localization.LogsLoading).Id("logs-loading").Active(true).ToH()
             ).Class("card logs-card"),
             H.Div(
                 H.Button(vm.Localization.LogsPrevPage).Id("prev-btn").OnClick("prevPage()").Class("page-btn"),
@@ -71,7 +72,7 @@ public class LogView : ViewBase
 
     private static CssBuilder GetStyles()
     {
-        return CssBuilder.Create()
+        var css = CssBuilder.Create()
             .Selector(".page-stat")
                 .Property("margin-left", "16px")
                 .Property("font-size", "14px")
@@ -234,6 +235,7 @@ public class LogView : ViewBase
                 .Property("font-size", "48px")
                 .Property("margin-bottom", "16px")
             .EndSelector();
+        return LoadingComponent.AddStyles(css);
     }
 
     private static JsSyntax GetScripts(DefaultLocalizationBase loc)
@@ -247,6 +249,8 @@ public class LogView : ViewBase
 
         var thenBody = Js.Block()
             .Add(() => Js.Const(() => "list", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "logs-list"))))
+            .Add(() => Js.Const(() => "loading", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "logs-loading"))))
+            .Add(() => Js.Id(() => "loading").Prop(() => "classList").Call(() => "remove", () => Js.Str(() => "loading-indicator-active")).Stmt())
             .Add(() => Js.Assign(() => Js.Id(() => "list").Prop(() => "innerHTML"), () => Js.Str(() => "")))
             .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "total-count")).Prop(() => "textContent"), () => Js.Id(() => "data").Prop(() => "total")))
             .Add(() => Js.Assign(() => Js.Id(() => "currentPage"), () => Js.Id(() => "data").Prop(() => "page")))
@@ -271,6 +275,8 @@ public class LogView : ViewBase
             .Add(() => Js.Const(() => "beingId", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "being-filter")).Prop(() => "value")))
             .Add(() => Js.Const(() => "startDate", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "start-date")).Prop(() => "value")))
             .Add(() => Js.Const(() => "endDate", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "end-date")).Prop(() => "value")))
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "logs-loading")).Prop(() => "classList").Call(() => "add", () => Js.Str(() => "loading-indicator-active")).Stmt())
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "logs-list")).Prop(() => "innerHTML"), () => Js.Str(() => "")))
             .Add(() => Js.Const(() => "params", () => Js.Str(() => "?page=").Op(() => "+", () => (JsSyntax)Js.Id(() => "currentPage")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&level=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "level")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&beingId=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "beingId")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&startDate=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "startDate")).Op(() => "+", () => (JsSyntax)Js.Str(() => "&endDate=")).Op(() => "+", () => (JsSyntax)Js.Id(() => "endDate"))))
             .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/logs/list").Op(() => "+", () => (JsSyntax)Js.Id(() => "params"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
 
@@ -346,11 +352,9 @@ public class LogView : ViewBase
             .Add(() => Js.Func(() => "prevPage", () => new List<string>(), () => prevPageBody))
             .Add(() => Js.Func(() => "nextPage", () => new List<string>(), () => nextPageBody))
             .Add(() => Js.Func(() => "toggleException", () => new List<string> { "item" }, () => toggleExceptionBody))
-            .Add(() => Js.Assign(() => Js.Id(() => "window").Prop(() => "onload"), () => Js.Arrow(() => new List<string>(), () => Js.Block()
-                .Add(() => Js.Id(() => "loadLevels").Invoke().Stmt())
-                .Add(() => Js.Id(() => "loadBeings").Invoke().Stmt())
-                .Add(() => Js.Id(() => "loadLogs").Invoke().Stmt())
-            )));
+            .Add(() => Js.Id(() => "loadLevels").Invoke().Stmt())
+            .Add(() => Js.Id(() => "loadBeings").Invoke().Stmt())
+            .Add(() => Js.Id(() => "loadLogs").Invoke().Stmt());
     }
 
     private static JsSyntax BuildLogItemHtml(DefaultLocalizationBase loc)

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -311,15 +311,30 @@ public class ConfigController : Controller
             var order = attr?.Order ?? 0;
 
             var value = prop.GetValue(config);
-            var displayValue = value switch
+            string? displayValue;
+            if (value is System.Collections.IDictionary dict)
             {
-                Guid guid => guid.ToString(),
-                TimeSpan ts => ts.ToString(),
-                DateTime dt => dt.ToString("O"),
-                System.Collections.IDictionary dict => System.Text.Json.JsonSerializer.Serialize(dict),
-                null => null,
-                _ => value.ToString()
-            };
+                if (prop.Name == "AIConfig")
+                {
+                    var filteredDict = FilterAIConfigByClientType(dict, config.AIClientType, config.Language);
+                    displayValue = System.Text.Json.JsonSerializer.Serialize(filteredDict);
+                }
+                else
+                {
+                    displayValue = System.Text.Json.JsonSerializer.Serialize(dict);
+                }
+            }
+            else
+            {
+                displayValue = value switch
+                {
+                    Guid guid => guid.ToString(),
+                    TimeSpan ts => ts.ToString(),
+                    DateTime dt => dt.ToString("O"),
+                    null => null,
+                    _ => value.ToString()
+                };
+            }
 
             List<string>? enumValues = null;
             List<string>? enumDisplayNames = null;
@@ -505,6 +520,34 @@ public class ConfigController : Controller
                 AIClientType = currentClientType
             });
         }
+    }
+
+    private Dictionary<string, object> FilterAIConfigByClientType(System.Collections.IDictionary aiConfig, string clientType, Language language)
+    {
+        var factory = CreateAIClientFactory(clientType);
+        if (factory == null)
+        {
+            var result = new Dictionary<string, object>();
+            foreach (System.Collections.DictionaryEntry entry in aiConfig)
+            {
+                var key = entry.Key?.ToString();
+                if (key != null)
+                    result[key] = entry.Value!;
+            }
+            return result;
+        }
+
+        var supportedKeys = factory.GetConfigKeysMetadata(language);
+        var filtered = new Dictionary<string, object>();
+        foreach (System.Collections.DictionaryEntry entry in aiConfig)
+        {
+            var key = entry.Key?.ToString();
+            if (key != null && supportedKeys.ContainsKey(key))
+            {
+                filtered[key] = entry.Value!;
+            }
+        }
+        return filtered;
     }
 
     private IAIClientFactory? CreateAIClientFactory(string clientType)

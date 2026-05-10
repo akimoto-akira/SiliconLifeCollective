@@ -51,7 +51,7 @@ public class CalendarComponent : ComponentBase
             classes.Add(Class);
         calendar.Class(string.Join(" ", classes));
 
-        if (!string.IsNullOrEmpty(Style))
+        if (Style != null && Style.HasInlineStyles)
             calendar.Style(Style);
 
         foreach (var kvp in Attributes)

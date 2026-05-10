@@ -31,7 +31,7 @@ public abstract class ComponentBase
     /// <summary>
     /// Inline styles
     /// </summary>
-    public string? Style { get; protected set; }
+    public CssBuilder? Style { get; protected set; }
 
     /// <summary>
     /// Custom attributes
@@ -75,16 +75,19 @@ public abstract class ComponentBase
     /// <summary>
     /// Set inline style (chainable)
     /// </summary>
-    public T SetStyle<T>(string style) where T : ComponentBase
+    public T SetStyle<T>(CssBuilder style) where T : ComponentBase
     {
-        Style = string.IsNullOrEmpty(Style) ? style : $"{Style};{style}";
+        if (Style == null)
+            Style = style;
+        else
+            Style.MergeInlineFrom(style);
         return (T)this;
     }
 
     /// <summary>
     /// Set inline style (legacy)
     /// </summary>
-    public T WithStyle<T>(string style) where T : ComponentBase
+    public T WithStyle<T>(CssBuilder style) where T : ComponentBase
     {
         return SetStyle<T>(style);
     }
@@ -112,6 +115,18 @@ public abstract class ComponentBase
     public abstract string Render();
 
     /// <summary>
+    /// Returns an <see cref="H"/> tree representing this component.
+    /// The default implementation wraps <see cref="Render"/> via <c>H.AddRendered</c>;
+    /// subclasses that build <see cref="H"/> trees natively should override this method.
+    /// </summary>
+    public virtual H ToH()
+    {
+        var wrapper = H.Div();
+        wrapper.AddRendered(Render());
+        return wrapper;
+    }
+
+    /// <summary>
     /// Generate HTML attributes string
     /// </summary>
     protected string RenderAttributes()
@@ -124,8 +139,8 @@ public abstract class ComponentBase
         if (!string.IsNullOrEmpty(Class))
             attrs.Add($"class=\"{Class}\"");
 
-        if (!string.IsNullOrEmpty(Style))
-            attrs.Add($"style=\"{Style}\"");
+        if (Style != null && Style.HasInlineStyles)
+            attrs.Add($"style=\"{Style.BuildInline()}\"");
 
         foreach (var kvp in Attributes)
         {

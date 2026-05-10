@@ -48,9 +48,9 @@ public class PComponent : ComponentBase
     /// <summary>
     /// Set Style (returns PComponent for chaining)
     /// </summary>
-    public new PComponent Style(string style)
+    public new PComponent Style(CssBuilder style)
     {
-        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        if (base.Style == null) base.Style = style; else base.Style.MergeInlineFrom(style);
         return this;
     }
 
@@ -82,8 +82,8 @@ public class PComponent : ComponentBase
         if (!string.IsNullOrEmpty(base.Class))
             p.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(base.Style))
-            p.Attr("style", base.Style);
+        if (base.Style != null && base.Style.HasInlineStyles)
+            p.Attr("style", base.Style.BuildInline());
 
         foreach (var kvp in Attributes)
         {

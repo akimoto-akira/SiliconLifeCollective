@@ -61,7 +61,7 @@ public class RichTextComponent : ComponentBase
             classes.Add(Class);
         editor.Class(string.Join(" ", classes));
 
-        if (!string.IsNullOrEmpty(Style))
+        if (Style != null && Style.HasInlineStyles)
             editor.Style(Style);
 
         foreach (var kvp in Attributes)

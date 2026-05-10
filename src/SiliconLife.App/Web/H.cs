@@ -145,7 +145,7 @@ public class H
     public H Data(string name, string value) => Attr($"data-{name}", value);
     public H Value(string value) => Attr("value", value);
     public H Href(string url) => Attr("href", url);
-    public H Style(string style) => Attr("style", style);
+    public H Style(CssBuilder style) => Attr("style", style.BuildInline());
     public H Selected() => Attr("selected", "selected");
     public H Checked() => Attr("checked", "checked");
     public H Disabled() => Attr("disabled", "disabled");

@@ -44,9 +44,9 @@ public class ButtonComponent : ComponentBase
     /// <summary>
     /// Set Style (returns ButtonComponent for chaining)
     /// </summary>
-    public new ButtonComponent Style(string style)
+    public new ButtonComponent Style(CssBuilder style)
     {
-        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        if (base.Style == null) base.Style = style; else base.Style.MergeInlineFrom(style);
         return this;
     }
 
@@ -116,8 +116,8 @@ public class ButtonComponent : ComponentBase
         if (!string.IsNullOrEmpty(base.Class))
             button.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(base.Style))
-            button.Attr("style", base.Style);
+        if (base.Style != null && base.Style.HasInlineStyles)
+            button.Attr("style", base.Style.BuildInline());
 
         foreach (var kvp in Attributes)
         {

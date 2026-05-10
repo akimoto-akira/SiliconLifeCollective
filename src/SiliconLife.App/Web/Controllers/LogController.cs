@@ -102,14 +102,14 @@ public class LogController : Controller
             }
         }
 
-        // Use LogManager to read logs instead of direct file access
+        var maxCount = page * pageSize + 1;
         var logEntries = LogManager.Instance.ReadLogs(
             startTime: startTime,
             endTime: endTime,
             beingId: beingIdFilter,
             systemOnly: systemOnly,
             levelFilter: level,
-            maxCount: 0); // No limit here, we'll paginate
+            maxCount: maxCount);
 
         var logs = logEntries.Select(e => new LogItem
         {
@@ -121,8 +121,10 @@ public class LogController : Controller
             BeingId = e.BeingId
         }).ToList();
 
-        var total = logs.Count;
-        var totalPages = (int)Math.Ceiling(total / (double)pageSize);
+        var hasMore = logs.Count >= maxCount;
+        if (hasMore) logs.RemoveAt(logs.Count - 1);
+        var total = hasMore ? 9999 : logs.Count;
+        var totalPages = hasMore ? 9999 : (int)Math.Ceiling(total / (double)pageSize);
         var pagedLogs = logs.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
         RenderJson(new
@@ -157,9 +159,10 @@ public class LogController : Controller
         {
             new { value = "Trace", displayName = localization!.GetLogLevelName(LogLevel.Trace) },
             new { value = "Debug", displayName = localization.GetLogLevelName(LogLevel.Debug) },
-            new { value = "Info", displayName = localization.GetLogLevelName(LogLevel.Information) },
+            new { value = "Information", displayName = localization.GetLogLevelName(LogLevel.Information) },
             new { value = "Warning", displayName = localization.GetLogLevelName(LogLevel.Warning) },
-            new { value = "Error", displayName = localization.GetLogLevelName(LogLevel.Error) }
+            new { value = "Error", displayName = localization.GetLogLevelName(LogLevel.Error) },
+            new { value = "Critical", displayName = localization.GetLogLevelName(LogLevel.Critical) }
         };
 
         RenderJson(levels);

@@ -187,7 +187,7 @@ public class ChatMessageComponent : ComponentBase
             wrapper.Id(Id);
         if (!string.IsNullOrEmpty(Class))
             wrapper.Class(Class);
-        if (!string.IsNullOrEmpty(Style))
+        if (Style != null && Style.HasInlineStyles)
             wrapper.Style(Style);
         foreach (var kvp in Attributes)
             wrapper.Attr(kvp.Key, kvp.Value);
@@ -270,7 +270,7 @@ public class ChatMessageComponent : ComponentBase
             wrapper.Id(Id);
         if (!string.IsNullOrEmpty(Class))
             wrapper.Class(Class);
-        if (!string.IsNullOrEmpty(Style))
+        if (Style != null && Style.HasInlineStyles)
             wrapper.Style(Style);
         foreach (var kvp in Attributes)
             wrapper.Attr(kvp.Key, kvp.Value);

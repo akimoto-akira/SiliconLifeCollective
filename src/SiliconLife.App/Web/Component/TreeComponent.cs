@@ -41,7 +41,7 @@ public class TreeComponent : ComponentBase
             classes.Add(Class);
         tree.Class(string.Join(" ", classes));
 
-        if (!string.IsNullOrEmpty(Style))
+        if (Style != null && Style.HasInlineStyles)
             tree.Style(Style);
 
         foreach (var kvp in Attributes)

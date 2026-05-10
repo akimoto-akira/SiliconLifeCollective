@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Text;
 
 namespace SiliconLife.App.Web;
@@ -20,6 +21,7 @@ public class CssBuilder
     private readonly StringBuilder _sb = new();
     private readonly Stack<string> _selectorStack = new();
     private readonly Dictionary<string, string> _variables = new();
+    private readonly List<(string Name, string Value)> _inlineStyles = new();
     private int _indentLevel = 0;
 
     public static CssBuilder Create() => new();
@@ -103,6 +105,26 @@ public class CssBuilder
         _sb.AppendLine("}");
         return this;
     }
+
+    public CssBuilder InlineProperty(string name, string value)
+    {
+        _inlineStyles.Add((name, value));
+        return this;
+    }
+
+    public CssBuilder MergeInlineFrom(CssBuilder other)
+    {
+        foreach (var (name, value) in other._inlineStyles)
+            _inlineStyles.Add((name, value));
+        return this;
+    }
+
+    public string BuildInline()
+    {
+        return string.Join(" ", _inlineStyles.Select(s => $"{s.Name}: {s.Value};"));
+    }
+
+    public bool HasInlineStyles => _inlineStyles.Count > 0;
 
     public override string ToString()
     {

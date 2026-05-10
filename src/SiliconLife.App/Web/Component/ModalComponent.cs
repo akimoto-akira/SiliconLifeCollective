@@ -86,7 +86,7 @@ public class ModalComponent : ComponentBase
         if (_staticBackdrop)
             modal.Attr("data-bs-backdrop", "static");
 
-        if (!string.IsNullOrEmpty(Style))
+        if (Style != null && Style.HasInlineStyles)
             modal.Style(Style);
 
         foreach (var kvp in Attributes)

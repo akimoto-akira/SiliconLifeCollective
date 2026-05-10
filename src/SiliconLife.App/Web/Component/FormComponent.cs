@@ -44,9 +44,9 @@ public class FormComponent : ComponentBase
     /// <summary>
     /// Set Style (returns FormComponent for chaining)
     /// </summary>
-    public new FormComponent Style(string style)
+    public new FormComponent Style(CssBuilder style)
     {
-        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        if (base.Style == null) base.Style = style; else base.Style.MergeInlineFrom(style);
         return this;
     }
 
@@ -114,8 +114,8 @@ public class FormComponent : ComponentBase
         if (!string.IsNullOrEmpty(base.Class))
             form.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(base.Style))
-            form.Attr("style", base.Style);
+        if (base.Style != null && base.Style.HasInlineStyles)
+            form.Attr("style", base.Style.BuildInline());
 
         foreach (var kvp in Attributes)
         {

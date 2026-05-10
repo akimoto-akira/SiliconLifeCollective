@@ -251,7 +251,7 @@ public class MemoryController : Controller
         if (entries.Count == 0)
         {
             return new PComponent(loc.MemoryTimelineEmptyState)
-                .Style("text-align: center; padding: 40px; color: var(--text-secondary);")
+                .Style(new CssBuilder().InlineProperty("text-align", "center").InlineProperty("padding", "40px").InlineProperty("color", "var(--text-secondary)"))
                 .Render();
         }
 
@@ -327,7 +327,7 @@ public class MemoryController : Controller
 
             var yearDetails = new DetailsComponent().Open();
             yearDetails.AddSummary(new SpanComponent()
-                .Style("font-size: 16px; font-weight: 600; padding: 8px; cursor: pointer;")
+                .Style(new CssBuilder().InlineProperty("font-size", "16px").InlineProperty("font-weight", "600").InlineProperty("padding", "8px").InlineProperty("cursor", "pointer"))
                 .Text($"📅 {string.Format(loc.MemoryTimelineYearFormat, year.Year, year.Count)}"));
             if (yearSummary != null)
             {
@@ -335,14 +335,14 @@ public class MemoryController : Controller
                     padding: 10, fontSizeLabel: 12, fontSizeContent: 13, marginTop: 6, summaryId: yearSummary.Id.ToString()));
             }
 
-            var yearBody = new DivComponent().Style("padding-left: 20px;");
+            var yearBody = new DivComponent().Style(new CssBuilder().InlineProperty("padding-left", "20px"));
             foreach (var month in year.Months)
             {
                 var monthSummary = monthSummaries.ContainsKey((year.Year, month.Month)) ? monthSummaries[(year.Year, month.Month)] : null;
 
                 var monthDetails = new DetailsComponent();
                 monthDetails.AddSummary(new SpanComponent()
-                    .Style("font-size: 14px; padding: 6px; cursor: pointer;")
+                    .Style(new CssBuilder().InlineProperty("font-size", "14px").InlineProperty("padding", "6px").InlineProperty("cursor", "pointer"))
                     .Text($"📅 {string.Format(loc.MemoryTimelineMonthFormat, year.Year, month.Month, month.Count)}"));
                 if (monthSummary != null)
                 {
@@ -350,7 +350,7 @@ public class MemoryController : Controller
                         padding: 8, fontSizeLabel: 11, fontSizeContent: 12, marginTop: 5, summaryId: monthSummary.Id.ToString()));
                 }
 
-                var monthBody = new DivComponent().Style("padding-left: 20px;");
+                var monthBody = new DivComponent().Style(new CssBuilder().InlineProperty("padding-left", "20px"));
                 foreach (var day in month.Days)
                 {
                     var daySummary = daySummaries.ContainsKey((year.Year, month.Month, day.Day)) ? daySummaries[(year.Year, month.Month, day.Day)] : null;
@@ -360,7 +360,7 @@ public class MemoryController : Controller
 
                     var dayDetails = new DetailsComponent();
                     dayDetails.AddSummary(new SpanComponent()
-                        .Style("font-size: 13px; padding: 4px; cursor: pointer;")
+                        .Style(new CssBuilder().InlineProperty("font-size", "13px").InlineProperty("padding", "4px").InlineProperty("cursor", "pointer"))
                         .Text($"📅 {string.Format(loc.MemoryTimelineDayFormat, year.Year, moStr, dStr, day.Count)}"));
                     if (daySummary != null)
                     {
@@ -368,7 +368,7 @@ public class MemoryController : Controller
                             padding: 6, fontSizeLabel: 11, fontSizeContent: 12, marginTop: 4, summaryId: daySummary.Id.ToString()));
                     }
 
-                    var dayBody = new DivComponent().Style("padding-left: 20px;");
+                    var dayBody = new DivComponent().Style(new CssBuilder().InlineProperty("padding-left", "20px"));
                     foreach (var hour in day.Hours)
                     {
                         var hourSummary = hourSummaries.ContainsKey((year.Year, month.Month, day.Day, hour.Hour)) ? hourSummaries[(year.Year, month.Month, day.Day, hour.Hour)] : null;
@@ -377,7 +377,7 @@ public class MemoryController : Controller
 
                         var hourDetails = new DetailsComponent();
                         hourDetails.AddSummary(new SpanComponent()
-                            .Style("font-size: 12px; padding: 4px; cursor: pointer;")
+                            .Style(new CssBuilder().InlineProperty("font-size", "12px").InlineProperty("padding", "4px").InlineProperty("cursor", "pointer"))
                             .Text($"🕐 {string.Format(loc.MemoryTimelineHourFormat, hStr, hour.Count)}"));
                         if (hourSummary != null)
                         {
@@ -385,7 +385,7 @@ public class MemoryController : Controller
                                 padding: 6, fontSizeLabel: 11, fontSizeContent: 12, marginTop: 4, summaryId: hourSummary.Id.ToString()));
                         }
 
-                        var hourBody = new DivComponent().Style("padding-left: 20px;");
+                        var hourBody = new DivComponent().Style(new CssBuilder().InlineProperty("padding-left", "20px"));
                         foreach (var minute in hour.Minutes)
                         {
                             var minuteSummary = minuteSummaries.ContainsKey((year.Year, month.Month, day.Day, hour.Hour, minute.Minute)) ? minuteSummaries[(year.Year, month.Month, day.Day, hour.Hour, minute.Minute)] : null;
@@ -394,7 +394,7 @@ public class MemoryController : Controller
 
                             var minuteDetails = new DetailsComponent();
                             minuteDetails.AddSummary(new SpanComponent()
-                                .Style("font-size: 11px; padding: 3px; cursor: pointer;")
+                                .Style(new CssBuilder().InlineProperty("font-size", "11px").InlineProperty("padding", "3px").InlineProperty("cursor", "pointer"))
                                 .Text($"🕐 {string.Format(loc.MemoryTimelineMinuteFormat, hStr, mStr, minute.Count)}"));
                             if (minuteSummary != null)
                             {
@@ -402,7 +402,7 @@ public class MemoryController : Controller
                                     padding: 5, fontSizeLabel: 10, fontSizeContent: 11, marginTop: 3, summaryId: minuteSummary.Id.ToString()));
                             }
 
-                            var minuteBody = new DivComponent().Style("padding-left: 20px;");
+                            var minuteBody = new DivComponent().Style(new CssBuilder().InlineProperty("padding-left", "20px"));
                             foreach (var memory in minute.Items)
                             {
                                 minuteBody.Add(BuildMemoryCard(memory, loc));
@@ -435,12 +435,12 @@ public class MemoryController : Controller
         int padding, int fontSizeLabel, int fontSizeContent, int marginTop, string summaryId = "")
     {
         var summaryDiv = new DivComponent()
-            .Style($"background: var(--bg-secondary); padding: {padding}px; border-radius: 6px; margin-top: {marginTop}px; border-left: 3px solid var(--accent-primary); font-weight: normal; cursor: pointer;")
+            .Style(new CssBuilder().InlineProperty("background", "var(--bg-secondary)").InlineProperty("padding", $"{padding}px").InlineProperty("border-radius", "6px").InlineProperty("margin-top", $"{marginTop}px").InlineProperty("border-left", "3px solid var(--accent-primary)").InlineProperty("font-weight", "normal").InlineProperty("cursor", "pointer"))
             .Add(new DivComponent()
-                .Style($"font-size: {fontSizeLabel}px; color: var(--text-secondary); margin-bottom: {Math.Max(2, marginTop - 2)}px;")
+                .Style(new CssBuilder().InlineProperty("font-size", $"{fontSizeLabel}px").InlineProperty("color", "var(--text-secondary)").InlineProperty("margin-bottom", $"{Math.Max(2, marginTop - 2)}px"))
                 .Add(new SpanComponent().Text($"📝 {label}")))
             .Add(new DivComponent()
-                .Style($"font-size: {fontSizeContent}px; line-height: 1.6;")
+                .Style(new CssBuilder().InlineProperty("font-size", $"{fontSizeContent}px").InlineProperty("line-height", "1.6"))
                 .Add(new SpanComponent().Text(content)));
 
         // Add click handler and data attributes if summaryId is provided
@@ -468,38 +468,38 @@ public class MemoryController : Controller
         var card = new DivComponent()
             .Class("memory-card")
             .Attr("data-id", memory.Id.ToString())
-            .Style($"padding: 15px; margin-bottom: 15px; border-left: 4px solid {typeColor}; border-radius: 8px; position: relative; background: var(--bg-secondary); cursor: pointer;");
+            .Style(new CssBuilder().InlineProperty("padding", "15px").InlineProperty("margin-bottom", "15px").InlineProperty("border-left", $"4px solid {typeColor}").InlineProperty("border-radius", "8px").InlineProperty("position", "relative").InlineProperty("background", "var(--bg-secondary)").InlineProperty("cursor", "pointer"));
 
         // Header row: icon + timestamp + optional summary badge
         var headerRow = new DivComponent()
-            .Style("display: flex; align-items: center; gap: 10px; margin-bottom: 8px;")
-            .Add(new SpanComponent().Style("font-size: 18px;").Text(typeIcon))
+            .Style(new CssBuilder().InlineProperty("display", "flex").InlineProperty("align-items", "center").InlineProperty("gap", "10px").InlineProperty("margin-bottom", "8px"))
+            .Add(new SpanComponent().Style(new CssBuilder().InlineProperty("font-size", "18px")).Text(typeIcon))
             .Add(new SpanComponent()
-                .Style("font-size: 12px; color: var(--text-secondary);")
+                .Style(new CssBuilder().InlineProperty("font-size", "12px").InlineProperty("color", "var(--text-secondary)"))
                 .Text(memory.TimestampDisplay));
 
         if (memory.IsSummary)
         {
             headerRow.Add(new SpanComponent()
-                .Style("background: var(--accent-color); color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: auto;")
+                .Style(new CssBuilder().InlineProperty("background", "var(--accent-color)").InlineProperty("color", "white").InlineProperty("padding", "2px 8px").InlineProperty("border-radius", "4px").InlineProperty("font-size", "11px").InlineProperty("margin-left", "auto"))
                 .Text(loc.MemorySummaryBadge));
         }
         card.Add(headerRow);
 
         // Content
         card.Add(new DivComponent()
-            .Style("margin-bottom: 8px; line-height: 1.5;")
+            .Style(new CssBuilder().InlineProperty("margin-bottom", "8px").InlineProperty("line-height", "1.5"))
             .Add(new SpanComponent().Text(memory.Content)));
 
         // Keywords
         if (memory.Keywords.Count > 0)
         {
             var kwRow = new DivComponent()
-                .Style("display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 5px;");
+                .Style(new CssBuilder().InlineProperty("display", "flex").InlineProperty("gap", "5px").InlineProperty("flex-wrap", "wrap").InlineProperty("margin-bottom", "5px"));
             foreach (var kw in memory.Keywords)
             {
                 kwRow.Add(new SpanComponent()
-                    .Style("background: var(--bg-tertiary); padding: 2px 8px; border-radius: 3px; font-size: 11px; color: var(--text-secondary);")
+                    .Style(new CssBuilder().InlineProperty("background", "var(--bg-tertiary)").InlineProperty("padding", "2px 8px").InlineProperty("border-radius", "3px").InlineProperty("font-size", "11px").InlineProperty("color", "var(--text-secondary)"))
                     .Text($"#{kw}"));
             }
             card.Add(kwRow);
@@ -509,7 +509,7 @@ public class MemoryController : Controller
         if (memory.RelatedBeings.Count > 0)
         {
             card.Add(new DivComponent()
-                .Style("font-size: 11px; color: var(--text-secondary);")
+                .Style(new CssBuilder().InlineProperty("font-size", "11px").InlineProperty("color", "var(--text-secondary)"))
                 .Add(new SpanComponent().Text(string.Format(loc.MemoryRelatedBeingsLabel, memory.RelatedBeings.Count))));
         }
 

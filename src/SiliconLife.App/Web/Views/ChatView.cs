@@ -68,20 +68,20 @@ public class ChatView : ViewBase
                     H.Span("")
                         .Id("being-status-badge")
                         .Class("being-status-badge")
-                        .Style("display:none")
+                        .Style(new CssBuilder().InlineProperty("display", "none"))
                 ).Id("chat-header").Class("chat-header"),
                 H.Div(msgItems.ToArray()).Id("chat-messages").Class("chat-messages"),
                 H.Div(
                     H.Div("").Class("loading-spinner"),
                     H.Div(vm.Localization.ChatLoading).Class("loading-text")
                 ).Id("loading-indicator").Class("loading-indicator"),
-                H.Div("").Id("queue-indicator").Class("queue-indicator").Style("display:none"),
+                H.Div("").Id("queue-indicator").Class("queue-indicator").Style(new CssBuilder().InlineProperty("display", "none")),
                 H.Div(
                     H.Textarea().Id("message-input").Placeholder(vm.Localization.ChatMessageInputPlaceholder),
                     H.Div(H.Button(vm.Localization.ChatSendButton).OnClick("sendMessage()")).Class("send-button"),
-                    H.Button("\u23F9").Id("stop-button").OnClick("stopThinking()").Class("stop-button").Style("display:none"),
+                    H.Button("\u23F9").Id("stop-button").OnClick("stopThinking()").Class("stop-button").Style(new CssBuilder().InlineProperty("display", "none")),
                     H.Button("\uD83D\uDCC1").Id("file-button").OnClick("showFileSourceDialog()").Class("file-button"),
-                    H.Input().Id("file-input").Attr("type", "file").Attr("multiple", "multiple").Attr("webkitdirectory", "webkitdirectory").Style("display:none").OnChange("handleFileSelected()")
+                    H.Input().Id("file-input").Attr("type", "file").Attr("multiple", "multiple").Attr("webkitdirectory", "webkitdirectory").Style(new CssBuilder().InlineProperty("display", "none")).OnChange("handleFileSelected()")
                 ).Class("chat-input-area"),
                 H.Div(
                     H.Div(
@@ -99,7 +99,7 @@ public class ChatView : ViewBase
                             H.Button("\u53D6\u6D88").OnClick("toggleFilePanel()").Class("btn-secondary")
                         ).Class("panel-actions")
                     ).Class("file-upload-panel")
-                ).Id("file-panel").Class("file-panel").Style("display:none")
+                ).Id("file-panel").Class("file-panel").Style(new CssBuilder().InlineProperty("display", "none"))
             ).Class("chat-main"),
             // File source dialog: moved outside chat-main to avoid overflow clipping
             H.Div(

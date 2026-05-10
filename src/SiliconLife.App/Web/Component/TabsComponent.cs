@@ -53,7 +53,7 @@ public class TabsComponent : ComponentBase
         if (!string.IsNullOrEmpty(Class))
             container.Class(Class);
 
-        if (!string.IsNullOrEmpty(Style))
+        if (Style != null && Style.HasInlineStyles)
             container.Style(Style);
 
         foreach (var kvp in Attributes)

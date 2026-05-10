@@ -61,7 +61,7 @@ public class ChartComponent : ComponentBase
             classes.Add(Class);
         chart.Class(string.Join(" ", classes));
 
-        if (!string.IsNullOrEmpty(Style))
+        if (Style != null && Style.HasInlineStyles)
             chart.Style(Style);
 
         foreach (var kvp in Attributes)

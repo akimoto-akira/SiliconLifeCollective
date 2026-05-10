@@ -41,7 +41,7 @@ public class AccordionComponent : ComponentBase
             classes.Add(Class);
         accordion.Class(string.Join(" ", classes));
 
-        if (!string.IsNullOrEmpty(Style))
+        if (Style != null && Style.HasInlineStyles)
             accordion.Style(Style);
 
         foreach (var kvp in Attributes)

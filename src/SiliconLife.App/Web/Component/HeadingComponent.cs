@@ -47,9 +47,9 @@ public class HeadingComponent : ComponentBase
     /// <summary>
     /// Set Style (returns HeadingComponent for chaining)
     /// </summary>
-    public new HeadingComponent Style(string style)
+    public new HeadingComponent Style(CssBuilder style)
     {
-        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        if (base.Style == null) base.Style = style; else base.Style.MergeInlineFrom(style);
         return this;
     }
 
@@ -81,8 +81,8 @@ public class HeadingComponent : ComponentBase
         if (!string.IsNullOrEmpty(base.Class))
             heading.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(base.Style))
-            heading.Attr("style", base.Style);
+        if (base.Style != null && base.Style.HasInlineStyles)
+            heading.Attr("style", base.Style.BuildInline());
 
         foreach (var kvp in Attributes)
         {

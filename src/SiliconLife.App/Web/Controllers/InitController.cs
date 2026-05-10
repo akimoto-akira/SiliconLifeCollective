@@ -191,7 +191,7 @@ public class InitController : Controller
             .Text(_localization.InitLanguageSwitchBtn)
             .Type("button")
             .Class("lang-switch-btn")
-            .Style("display:none;")
+            .Style(new CssBuilder().InlineProperty("display", "none"))
             .Attr("onclick", "applyLanguage()");
 
         return new FormGroupComponent()

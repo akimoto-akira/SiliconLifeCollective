@@ -71,7 +71,7 @@ public class CardComponent : ComponentBase
             classes.Add(Class);
         card.Class(string.Join(" ", classes));
 
-        if (!string.IsNullOrEmpty(Style))
+        if (Style != null && Style.HasInlineStyles)
             card.Style(Style);
 
         foreach (var kvp in Attributes)

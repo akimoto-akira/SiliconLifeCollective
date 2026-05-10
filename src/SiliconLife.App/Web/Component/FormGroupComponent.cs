@@ -41,9 +41,9 @@ public class FormGroupComponent : ComponentBase
     /// <summary>
     /// Set Style (returns FormGroupComponent for chaining)
     /// </summary>
-    public new FormGroupComponent Style(string style)
+    public new FormGroupComponent Style(CssBuilder style)
     {
-        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        if (base.Style == null) base.Style = style; else base.Style.MergeInlineFrom(style);
         return this;
     }
 
@@ -78,8 +78,8 @@ public class FormGroupComponent : ComponentBase
             classes.Add(base.Class);
         div.Class(string.Join(" ", classes));
 
-        if (!string.IsNullOrEmpty(base.Style))
-            div.Attr("style", base.Style);
+        if (base.Style != null && base.Style.HasInlineStyles)
+            div.Attr("style", base.Style.BuildInline());
 
         foreach (var kvp in Attributes)
         {

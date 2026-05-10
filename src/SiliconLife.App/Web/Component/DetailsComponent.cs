@@ -45,9 +45,9 @@ public class DetailsComponent : ComponentBase
     /// <summary>
     /// Set Style (returns DetailsComponent for chaining)
     /// </summary>
-    public new DetailsComponent Style(string style)
+    public new DetailsComponent Style(CssBuilder style)
     {
-        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        if (base.Style == null) base.Style = style; else base.Style.MergeInlineFrom(style);
         return this;
     }
 
@@ -103,8 +103,8 @@ public class DetailsComponent : ComponentBase
         if (!string.IsNullOrEmpty(base.Class))
             details.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(base.Style))
-            details.Attr("style", base.Style);
+        if (base.Style != null && base.Style.HasInlineStyles)
+            details.Attr("style", base.Style.BuildInline());
 
         foreach (var kvp in Attributes)
         {

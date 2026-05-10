@@ -41,9 +41,9 @@ public class SelectComponent : ComponentBase
         return this;
     }
 
-    public new SelectComponent Style(string style)
+    public new SelectComponent Style(CssBuilder style)
     {
-        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        if (base.Style == null) base.Style = style; else base.Style.MergeInlineFrom(style);
         return this;
     }
 
@@ -146,8 +146,8 @@ public class SelectComponent : ComponentBase
         if (classes.Count > 0)
             select.Class(string.Join(" ", classes));
 
-        if (!string.IsNullOrEmpty(base.Style))
-            select.Attr("style", base.Style);
+        if (base.Style != null && base.Style.HasInlineStyles)
+            select.Attr("style", base.Style.BuildInline());
 
         if (_multiple)
             select.Attr("multiple", "multiple");
@@ -242,8 +242,8 @@ public class SelectComponent : ComponentBase
             wrapperClass += " " + base.Class;
 
         var wrapperStyle = "";
-        if (!string.IsNullOrEmpty(base.Style))
-            wrapperStyle = $" style=\"{H.Escape(base.Style)}\"";
+        if (base.Style != null && base.Style.HasInlineStyles)
+            wrapperStyle = $" style=\"{H.Escape(base.Style.BuildInline())}\"";
 
         return $@"<div class=""{H.Escape(wrapperClass)}"" id=""{H.Escape(wrapperId)}""{wrapperStyle}>
   <input {hiddenAttrs} />

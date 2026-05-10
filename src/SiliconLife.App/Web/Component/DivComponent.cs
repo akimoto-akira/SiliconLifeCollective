@@ -42,9 +42,9 @@ public class DivComponent : ComponentBase
     /// <summary>
     /// Set Style (returns DivComponent for chaining)
     /// </summary>
-    public new DivComponent Style(string style)
+    public new DivComponent Style(CssBuilder style)
     {
-        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        if (base.Style == null) base.Style = style; else base.Style.MergeInlineFrom(style);
         return this;
     }
 
@@ -95,8 +95,8 @@ public class DivComponent : ComponentBase
         if (!string.IsNullOrEmpty(base.Class))
             div.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(base.Style))
-            div.Attr("style", base.Style);
+        if (base.Style != null && base.Style.HasInlineStyles)
+            div.Attr("style", base.Style.BuildInline());
 
         foreach (var kvp in Attributes)
         {

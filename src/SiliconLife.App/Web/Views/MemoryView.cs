@@ -39,7 +39,7 @@ public class MemoryView : ViewBase
         return H.Div(
             H.Div(
                 H.H1(vm.Localization.MemoryPageHeader).Id("page-title"),
-                H.Div().Id("being-name").Class("being-name").Style("font-size: 14px; color: var(--text-secondary); margin-top: 5px;")
+                H.Div().Id("being-name").Class("being-name").Style(new CssBuilder().InlineProperty("font-size", "14px").InlineProperty("color", "var(--text-secondary)").InlineProperty("margin-top", "5px"))
             ).Class("page-header"),
             // Stats panel first row
             H.Div(
@@ -48,19 +48,19 @@ public class MemoryView : ViewBase
                 H.Div(H.Div("📄 " + vm.Localization.MemoryFilterOriginalOnly).Class("stat-label"), H.Div().Id("stat-original").Class("stat-value").Text("0")).Class("stat-card"),
                 H.Div(H.Div("📅 " + vm.Localization.MemoryStatOldest).Class("stat-label"), H.Div().Id("stat-oldest").Class("stat-value").Text("-")).Class("stat-card"),
                 H.Div(H.Div("🕐 " + vm.Localization.MemoryStatNewest).Class("stat-label"), H.Div().Id("stat-newest").Class("stat-value").Text("-")).Class("stat-card")
-            ).Class("stats-grid").Style("display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 15px;"),
+            ).Class("stats-grid").Style(new CssBuilder().InlineProperty("display", "grid").InlineProperty("grid-template-columns", "repeat(5, 1fr)").InlineProperty("gap", "15px").InlineProperty("margin-bottom", "15px")),
             // Timeline
             H.Div(H.Div().Id("memory-timeline").Class("memory-timeline")).Class("card"),
             // Detail modal
             H.Div(
                 H.Div(
                     H.Div(
-                        H.H3(vm.Localization.MemoryDetailTitle).Style("margin: 0;"),
-                        H.Button("×").Id("detail-close").Class("btn btn-secondary").Style("font-size: 20px; padding: 0 8px;")
-                    ).Style("display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;"),
+                        H.H3(vm.Localization.MemoryDetailTitle).Style(new CssBuilder().InlineProperty("margin", "0")),
+                        H.Button("×").Id("detail-close").Class("btn btn-secondary").Style(new CssBuilder().InlineProperty("font-size", "20px").InlineProperty("padding", "0 8px"))
+                    ).Style(new CssBuilder().InlineProperty("display", "flex").InlineProperty("justify-content", "space-between").InlineProperty("align-items", "center").InlineProperty("margin-bottom", "15px")),
                     H.Div().Id("detail-content")
-                ).Class("modal-content").Style("background: var(--bg-primary); padding: 20px; border-radius: 8px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;")
-            ).Id("detail-modal").Class("modal").Style("display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;")
+                ).Class("modal-content").Style(new CssBuilder().InlineProperty("background", "var(--bg-primary)").InlineProperty("padding", "20px").InlineProperty("border-radius", "8px").InlineProperty("max-width", "600px").InlineProperty("width", "90%").InlineProperty("max-height", "80vh").InlineProperty("overflow-y", "auto"))
+            ).Id("detail-modal").Class("modal").Style(new CssBuilder().InlineProperty("display", "none").InlineProperty("position", "fixed").InlineProperty("top", "0").InlineProperty("left", "0").InlineProperty("width", "100%").InlineProperty("height", "100%").InlineProperty("background", "rgba(0,0,0,0.5)").InlineProperty("z-index", "1000").InlineProperty("justify-content", "center").InlineProperty("align-items", "center"))
         ).Class("page-content");
     }
 

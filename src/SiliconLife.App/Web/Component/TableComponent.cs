@@ -89,7 +89,7 @@ public class TableComponent : ComponentBase
         if (classes.Count > 0)
             table.Class(string.Join(" ", classes));
 
-        if (!string.IsNullOrEmpty(Style))
+        if (Style != null && Style.HasInlineStyles)
             table.Style(Style);
 
         foreach (var kvp in Attributes)

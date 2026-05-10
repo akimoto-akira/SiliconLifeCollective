@@ -48,9 +48,9 @@ public class InputComponent : ComponentBase
     /// <summary>
     /// Set Style (returns InputComponent for chaining)
     /// </summary>
-    public new InputComponent Style(string style)
+    public new InputComponent Style(CssBuilder style)
     {
-        base.Style = string.IsNullOrEmpty(base.Style) ? style : $"{base.Style};{style}";
+        if (base.Style == null) base.Style = style; else base.Style.MergeInlineFrom(style);
         return this;
     }
 
@@ -167,8 +167,8 @@ public class InputComponent : ComponentBase
         if (!string.IsNullOrEmpty(base.Class))
             input.Attr("class", base.Class);
 
-        if (!string.IsNullOrEmpty(base.Style))
-            input.Attr("style", base.Style);
+        if (base.Style != null && base.Style.HasInlineStyles)
+            input.Attr("style", base.Style.BuildInline());
 
         foreach (var kvp in Attributes)
         {
