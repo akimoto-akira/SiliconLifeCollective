@@ -715,6 +715,7 @@ public class FrFR : DefaultLocalizationBase
     public override string LogsExceptionLabel => "Détails de l'exception : ";
     public override string LogsPrevPage => "Page précédente";
     public override string LogsNextPage => "Page suivante";
+    public override string LogsLoading => "Chargement des journaux...";
 
     public override string UsagePageHeader => "Utilisation de tokens";
     public override string UsageTotalTokens => "Total tokens";

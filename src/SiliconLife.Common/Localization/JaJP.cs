@@ -746,6 +746,7 @@ public class JaJP : DefaultLocalizationBase
     public override string LogsExceptionLabel => "例外詳細：";
     public override string LogsPrevPage => "前へ";
     public override string LogsNextPage => "次へ";
+    public override string LogsLoading => "ログを読み込み中...";
 
     public override string UsagePageHeader => "Token使用量";
     public override string UsageTotalTokens => "総Token数";

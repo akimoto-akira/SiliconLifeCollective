@@ -709,6 +709,7 @@ public class ItIT : DefaultLocalizationBase
     public override string LogsExceptionLabel => "Dettagli eccezione: ";
     public override string LogsPrevPage => "Pagina precedente";
     public override string LogsNextPage => "Pagina successiva";
+    public override string LogsLoading => "Caricamento registri...";
 
     // ===== Usage Page Localization =====
 

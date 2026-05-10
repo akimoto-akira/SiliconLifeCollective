@@ -461,6 +461,7 @@ public class CsCZ : DefaultLocalizationBase
     public override string LogsExceptionLabel => "Výjimka";
     public override string LogsPrevPage => "Předchozí";
     public override string LogsNextPage => "Další";
+    public override string LogsLoading => "Načítání protokolů...";
 
 
     // ===== Knowledge =====

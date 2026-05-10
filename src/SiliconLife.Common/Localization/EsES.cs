@@ -746,6 +746,7 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string LogsExceptionLabel => "Excepción: ";
     public override string LogsPrevPage => "Anterior";
     public override string LogsNextPage => "Siguiente";
+    public override string LogsLoading => "Cargando registros...";
 
     public override string UsagePageHeader => "Uso de tokens";
     public override string UsageTotalTokens => "Total de tokens";

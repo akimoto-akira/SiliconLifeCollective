@@ -603,6 +603,7 @@ public class ZhHK : DefaultLocalizationBase
     public override string LogsExceptionLabel => "例外詳情：";
     public override string LogsPrevPage => "上一頁";
     public override string LogsNextPage => "下一頁";
+    public override string LogsLoading => "正在載入日誌...";
 
     public override string UsagePageHeader => "Token 用量";
     public override string UsageTotalTokens => "總 Token 數";

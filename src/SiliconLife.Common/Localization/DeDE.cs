@@ -714,6 +714,7 @@ public class DeDE : DefaultLocalizationBase
     public override string LogsExceptionLabel => "Ausnahmedetails: ";
     public override string LogsPrevPage => "Vorherige Seite";
     public override string LogsNextPage => "Nächste Seite";
+    public override string LogsLoading => "Protokolle werden geladen...";
 
     public override string UsagePageHeader => "Token-Verbrauch";
     public override string UsageTotalTokens => "Gesamt-Token";

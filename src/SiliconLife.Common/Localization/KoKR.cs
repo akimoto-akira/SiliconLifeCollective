@@ -746,6 +746,7 @@ public class KoKR : DefaultLocalizationBase
     public override string LogsExceptionLabel => "예외 상세:";
     public override string LogsPrevPage => "이전";
     public override string LogsNextPage => "다음";
+    public override string LogsLoading => "로그를 불러오는 중...";
 
     public override string UsagePageHeader => "Token 사용량";
     public override string UsageTotalTokens => "총 Token 수";

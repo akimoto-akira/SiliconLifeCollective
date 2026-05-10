@@ -746,6 +746,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string LogsExceptionLabel => "异常详情：";
     public override string LogsPrevPage => "上一页";
     public override string LogsNextPage => "下一页";
+    public override string LogsLoading => "正在加载日志...";
 
     public override string UsagePageHeader => "Token 用量";
     public override string UsageTotalTokens => "总 Token 数";

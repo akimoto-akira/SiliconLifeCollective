@@ -746,6 +746,7 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string LogsExceptionLabel => "Exception: ";
     public override string LogsPrevPage => "Previous";
     public override string LogsNextPage => "Next";
+    public override string LogsLoading => "Loading logs...";
 
     public override string UsagePageHeader => "Token Usage";
     public override string UsageTotalTokens => "Total Tokens";

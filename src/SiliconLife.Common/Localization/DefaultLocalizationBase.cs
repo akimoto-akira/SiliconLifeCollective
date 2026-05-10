@@ -1938,6 +1938,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// </summary>
     public abstract string LogsNextPage { get; }
 
+    /// <summary>
+    /// Gets the loading text displayed while logs are being fetched
+    /// </summary>
+    public abstract string LogsLoading { get; }
+
     // ===== Usage Page Localization =====
 
     /// <summary>
