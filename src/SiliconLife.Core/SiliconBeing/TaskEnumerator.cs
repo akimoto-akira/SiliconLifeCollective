@@ -256,6 +256,9 @@ public class TaskEnumerator
             Total = allTasks.Count,
             Pending = allTasks.Count(t => t.Status == TaskStatus.Pending),
             Running = allTasks.Count(t => t.Status == TaskStatus.Running),
+            SubmittedForReview = allTasks.Count(t => t.Status == TaskStatus.SubmittedForReview),
+            UnderReview = allTasks.Count(t => t.Status == TaskStatus.UnderReview),
+            Rework = allTasks.Count(t => t.Status == TaskStatus.Rework),
             Completed = allTasks.Count(t => t.Status == TaskStatus.Completed),
             Failed = allTasks.Count(t => t.Status == TaskStatus.Failed),
             Cancelled = allTasks.Count(t => t.Status == TaskStatus.Cancelled)

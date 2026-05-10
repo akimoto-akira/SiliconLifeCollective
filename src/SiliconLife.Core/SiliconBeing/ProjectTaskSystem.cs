@@ -13,373 +13,200 @@
 
 namespace SiliconLife.Collective;
 
-/// <summary>
-/// System for managing tasks within a project space.
-/// Project tasks are independent from being tasks and support assignees.
-/// </summary>
 public sealed class ProjectTaskSystem
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<ProjectTaskSystem>();
     private readonly Guid _projectId;
-    private readonly IStorage _storage;
-    private readonly string _storageKey;
-    private readonly object _lock = new();
 
-    private List<TaskItem> _tasks = new();
-
-    /// <summary>
-    /// Gets the project ID that owns this task system.
-    /// </summary>
     public Guid ProjectId => _projectId;
+    public int Count => TaskCenter.Instance.GetProjectTasks(_projectId).Count();
+    public int PendingCount => TaskCenter.Instance.GetProjectTasks(_projectId).Count(t => t.Status == TaskStatus.Pending);
+    public int RunningCount => TaskCenter.Instance.GetProjectTasks(_projectId).Count(t => t.Status == TaskStatus.Running);
 
-    /// <summary>
-    /// Gets the total number of tasks.
-    /// </summary>
-    public int Count => _tasks.Count;
-
-    /// <summary>
-    /// Gets the number of pending tasks.
-    /// </summary>
-    public int PendingCount => _tasks.Count(t => t.Status == TaskStatus.Pending);
-
-    /// <summary>
-    /// Gets the number of running tasks.
-    /// </summary>
-    public int RunningCount => _tasks.Count(t => t.Status == TaskStatus.Running);
-
-    /// <summary>
-    /// Initializes a new instance of the ProjectTaskSystem class.
-    /// </summary>
-    /// <param name="projectId">The project ID that owns this task system.</param>
-    /// <param name="storage">The storage to use for persisting tasks.</param>
     public ProjectTaskSystem(Guid projectId, IStorage storage)
     {
         _projectId = projectId;
-        _storage = storage ?? throw new ArgumentNullException(nameof(storage));
-        _storageKey = "project-tasks";
+
+        if (storage != null)
+        {
+            TaskCenter.Instance.Initialize(storage);
+        }
 
         _logger.Info(null, "ProjectTaskSystem created for project {0}", projectId);
-
-        Load();
     }
 
-    private void Load()
+    public TaskItem Create(string title, string description, Guid assigneeGuid, Guid executorGuid, Guid? reviewerGuid = null, int priority = 100, List<Guid>? dependencies = null)
     {
-        try
+        var task = new TaskItem(title, description)
         {
-            TaskItem[] tasks = _storage.Read<TaskItem>(_storageKey);
-            _tasks = tasks?.ToList() ?? new List<TaskItem>();
-        }
-        catch (Exception)
+            ProjectId = _projectId,
+            AssigneeGuid = assigneeGuid,
+            ExecutorGuid = executorGuid,
+            ReviewerGuid = reviewerGuid,
+            CreatedByGuid = assigneeGuid,
+            Priority = priority
+        };
+
+        if (dependencies != null)
         {
-            _logger.Warn(null, "Failed to load project tasks from storage for project {0}", _projectId);
-            _tasks = new List<TaskItem>();
+            task.Dependencies = dependencies.ToList();
         }
+
+        task.ChatHistory.Add(new ChatHistoryCycle(TaskStatus.Pending));
+
+        TaskCenter.Instance.AddTask(task);
+
+        _logger.Info(null, "Project task added: {0} ({1}), project={2}, priority={3}, executor={4}",
+            title, task.Id, _projectId, priority, executorGuid);
+
+        return task;
     }
 
-    /// <summary>
-    /// Saves all tasks to storage.
-    /// </summary>
-    public void Save()
-    {
-        try
-        {
-            _storage.Write(_storageKey, _tasks);
-        }
-        catch (Exception)
-        {
-            _logger.Error(null, "Failed to save project tasks to storage for project {0}", _projectId);
-        }
-    }
-
-    /// <summary>
-    /// Creates a new project task with the specified parameters.
-    /// </summary>
-    /// <param name="title">The title of the task.</param>
-    /// <param name="description">The description of the task.</param>
-    /// <param name="assigneeGuid">The GUID of the assignee who created/assigned this task (single person).</param>
-    /// <param name="executorGuids">The list of executor GUIDs responsible for executing this task (cannot be empty).</param>
-    /// <param name="reviewerGuids">Optional list of reviewer GUIDs for reviewing this task.</param>
-    /// <param name="priority">The priority of the task (lower values = higher priority).</param>
-    /// <param name="dependencies">Optional list of task IDs that this task depends on.</param>
-    /// <returns>The created task item.</returns>
-    public TaskItem Create(string title, string description, Guid assigneeGuid, List<Guid> executorGuids, List<Guid>? reviewerGuids = null, int priority = 100, List<Guid>? dependencies = null)
-    {
-        if (executorGuids == null || executorGuids.Count == 0)
-        {
-            throw new ArgumentException("执行者列表不能为空", nameof(executorGuids));
-        }
-
-        lock (_lock)
-        {
-            var task = new TaskItem(title, description)
-            {
-                ProjectId = _projectId,
-                AssigneeGuid = assigneeGuid,
-                ExecutorGuids = executorGuids.ToList(),
-                ReviewerGuids = reviewerGuids?.ToList() ?? new List<Guid>(),
-                CreatedByGuid = assigneeGuid,
-                Priority = priority
-            };
-
-            if (dependencies != null)
-            {
-                task.Dependencies = dependencies.ToList();
-            }
-
-            _tasks.Add(task);
-            Save();
-
-            _logger.Info(null, "Project task added: {0} ({1}), project={2}, priority={3}, executors={4}", 
-                title, task.Id, _projectId, priority, executorGuids.Count);
-
-            return task;
-        }
-    }
-
-    /// <summary>
-    /// Gets a task by its ID.
-    /// </summary>
-    /// <param name="taskId">The ID of the task to retrieve.</param>
-    /// <returns>The task item if found; otherwise, null.</returns>
     public TaskItem? Get(Guid taskId)
     {
-        lock (_lock)
-        {
-            return _tasks.FirstOrDefault(t => t.Id == taskId);
-        }
+        return TaskCenter.Instance.GetTask(taskId);
     }
 
-    /// <summary>
-    /// Gets all tasks, optionally filtered by status.
-    /// </summary>
-    /// <param name="status">The status to filter by (null for all tasks).</param>
-    /// <returns>A list of task items.</returns>
     public List<TaskItem> GetAll(TaskStatus? status = null)
     {
-        lock (_lock)
-        {
-            if (status == null)
-                return _tasks.ToList();
+        var tasks = TaskCenter.Instance.GetProjectTasks(_projectId);
 
-            return _tasks.Where(t => t.Status == status).ToList();
-        }
+        if (status == null)
+            return tasks.ToList();
+
+        return tasks.Where(t => t.Status == status).ToList();
     }
 
-    /// <summary>
-    /// Gets all pending tasks ordered by priority and creation time.
-    /// </summary>
-    /// <returns>A list of pending task items.</returns>
     public List<TaskItem> GetPending()
     {
-        lock (_lock)
-        {
-            return _tasks
-                .Where(t => t.Status == TaskStatus.Pending)
-                .OrderBy(t => t.Priority)
-                .ThenBy(t => t.CreatedAt)
-                .ToList();
-        }
+        return TaskCenter.Instance.GetProjectTasks(_projectId)
+            .Where(t => t.Status == TaskStatus.Pending)
+            .OrderBy(t => t.Priority)
+            .ThenBy(t => t.CreatedAt)
+            .ToList();
     }
 
-    /// <summary>
-    /// Updates a task's properties.
-    /// </summary>
-    /// <param name="taskId">The ID of the task to update.</param>
-    /// <param name="title">New title (null to keep existing).</param>
-    /// <param name="description">New description (null to keep existing).</param>
-    /// <param name="priority">New priority (null to keep existing).</param>
-    /// <returns>True if updated successfully; otherwise, false.</returns>
     public bool Update(Guid taskId, string? title = null, string? description = null, int? priority = null)
     {
-        lock (_lock)
-        {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task == null)
-                return false;
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task == null)
+            return false;
 
-            if (title != null)
-                task.Title = title;
+        if (title != null)
+            task.Title = title;
 
-            if (description != null)
-                task.Description = description;
+        if (description != null)
+            task.Description = description;
 
-            if (priority.HasValue)
-                task.Priority = priority.Value;
+        if (priority.HasValue)
+            task.Priority = priority.Value;
 
-            Save();
-            _logger.Info(null, "Project task updated: {0} ({1})", task.Title, taskId);
-            return true;
-        }
+        TaskCenter.Instance.UpdateTask(task);
+        _logger.Info(null, "Project task updated: {0} ({1})", task.Title, taskId);
+        return true;
     }
 
-    /// <summary>
-    /// Assigns an executor to a task.
-    /// </summary>
-    /// <param name="taskId">The task ID.</param>
-    /// <param name="beingGuid">The being GUID to assign as executor.</param>
-    /// <returns>True if assigned successfully; otherwise, false.</returns>
     public bool Assign(Guid taskId, Guid beingGuid)
     {
-        lock (_lock)
-        {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task == null)
-                return false;
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task == null)
+            return false;
 
-            if (!task.ExecutorGuids.Contains(beingGuid))
-            {
-                task.ExecutorGuids.Add(beingGuid);
-                Save();
-                _logger.Info(null, "Assigned executor {0} to project task {1}", beingGuid, taskId);
-            }
-
-            return true;
-        }
+        task.ExecutorGuid = beingGuid;
+        TaskCenter.Instance.UpdateTask(task);
+        _logger.Info(null, "Assigned executor {0} to project task {1}", beingGuid, taskId);
+        return true;
     }
 
-    /// <summary>
-    /// Removes an executor from a task.
-    /// </summary>
-    /// <param name="taskId">The task ID.</param>
-    /// <param name="beingGuid">The being GUID to remove from executors.</param>
-    /// <returns>True if removed successfully; otherwise, false.</returns>
     public bool RemoveAssignee(Guid taskId, Guid beingGuid)
     {
-        lock (_lock)
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task == null)
+            return false;
+
+        if (task.ExecutorGuid == beingGuid)
         {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task == null)
-                return false;
-
-            if (task.ExecutorGuids.Remove(beingGuid))
-            {
-                Save();
-                _logger.Info(null, "Removed executor {0} from project task {1}", beingGuid, taskId);
-            }
-
-            return true;
+            task.ExecutorGuid = Guid.Empty;
+            TaskCenter.Instance.UpdateTask(task);
+            _logger.Info(null, "Removed executor {0} from project task {1}", beingGuid, taskId);
         }
+
+        return true;
     }
 
-    /// <summary>
-    /// Marks a task as started.
-    /// </summary>
-    /// <param name="taskId">The task ID.</param>
-    /// <returns>True if started successfully; otherwise, false.</returns>
     public bool Start(Guid taskId)
     {
-        lock (_lock)
-        {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task == null || task.Status != TaskStatus.Pending)
-                return false;
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task == null || task.Status != TaskStatus.Pending)
+            return false;
 
-            task.Start();
-            Save();
-            _logger.Info(null, "Project task started: {0} ({1})", task.Title, taskId);
-            return true;
-        }
+        task.Start();
+        TaskCenter.Instance.UpdateTask(task);
+        _logger.Info(null, "Project task started: {0} ({1})", task.Title, taskId);
+        return true;
     }
 
-    /// <summary>
-    /// Marks a task as completed successfully.
-    /// </summary>
-    /// <param name="taskId">The task ID.</param>
-    /// <returns>True if completed successfully; otherwise, false.</returns>
     public bool Complete(Guid taskId)
     {
-        lock (_lock)
-        {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task == null || task.Status != TaskStatus.Running)
-                return false;
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task == null || task.Status != TaskStatus.Running)
+            return false;
 
-            task.Complete();
-            Save();
-            _logger.Info(null, "Project task completed: {0} ({1})", task.Title, taskId);
-            return true;
-        }
+        task.Complete();
+        TaskCenter.Instance.UpdateTask(task);
+        _logger.Info(null, "Project task completed: {0} ({1})", task.Title, taskId);
+        return true;
     }
 
-    /// <summary>
-    /// Marks a task as failed with an error message.
-    /// </summary>
-    /// <param name="taskId">The task ID.</param>
-    /// <param name="error">The error message.</param>
-    /// <returns>True if failed successfully; otherwise, false.</returns>
     public bool Fail(Guid taskId, string error)
     {
-        lock (_lock)
-        {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task == null || task.Status != TaskStatus.Running)
-                return false;
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task == null || task.Status != TaskStatus.Running)
+            return false;
 
-            task.Fail(error);
-            Save();
-            _logger.Info(null, "Project task failed: {0} ({1}), error={2}", task.Title, taskId, error);
-            return true;
-        }
+        task.Fail(error);
+        TaskCenter.Instance.UpdateTask(task);
+        _logger.Info(null, "Project task failed: {0} ({1}), error={2}", task.Title, taskId, error);
+        return true;
     }
 
-    /// <summary>
-    /// Cancels a pending task.
-    /// </summary>
-    /// <param name="taskId">The task ID.</param>
-    /// <returns>True if cancelled successfully; otherwise, false.</returns>
     public bool Cancel(Guid taskId)
     {
-        lock (_lock)
-        {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task == null || task.Status != TaskStatus.Pending)
-                return false;
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task == null || task.Status != TaskStatus.Pending)
+            return false;
 
-            task.Cancel();
-            Save();
-            _logger.Info(null, "Project task cancelled: {0} ({1})", task.Title, taskId);
-            return true;
-        }
+        task.Cancel();
+        TaskCenter.Instance.UpdateTask(task);
+        _logger.Info(null, "Project task cancelled: {0} ({1})", task.Title, taskId);
+        return true;
     }
 
-    /// <summary>
-    /// Deletes a task by its ID.
-    /// </summary>
-    /// <param name="taskId">The task ID.</param>
-    /// <returns>True if deleted successfully; otherwise, false.</returns>
     public bool Delete(Guid taskId)
     {
-        lock (_lock)
-        {
-            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (task == null)
-                return false;
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task == null)
+            return false;
 
-            _tasks.Remove(task);
-            Save();
-            _logger.Info(null, "Project task deleted: {0} ({1})", task.Title, taskId);
-            return true;
-        }
+        TaskCenter.Instance.RemoveTask(taskId);
+        _logger.Info(null, "Project task deleted: {0} ({1})", task.Title, taskId);
+        return true;
     }
 
-    /// <summary>
-    /// Gets statistics about the task system.
-    /// </summary>
-    /// <returns>A TaskStatistics object containing counts.</returns>
     public TaskStatistics GetStatistics()
     {
-        lock (_lock)
+        var tasks = TaskCenter.Instance.GetProjectTasks(_projectId).ToList();
+        return new TaskStatistics
         {
-            return new TaskStatistics
-            {
-                Total = _tasks.Count,
-                Pending = _tasks.Count(t => t.Status == TaskStatus.Pending),
-                Running = _tasks.Count(t => t.Status == TaskStatus.Running),
-                Completed = _tasks.Count(t => t.Status == TaskStatus.Completed),
-                Failed = _tasks.Count(t => t.Status == TaskStatus.Failed),
-                Cancelled = _tasks.Count(t => t.Status == TaskStatus.Cancelled)
-            };
-        }
+            Total = tasks.Count,
+            Pending = tasks.Count(t => t.Status == TaskStatus.Pending),
+            Running = tasks.Count(t => t.Status == TaskStatus.Running),
+            SubmittedForReview = tasks.Count(t => t.Status == TaskStatus.SubmittedForReview),
+            UnderReview = tasks.Count(t => t.Status == TaskStatus.UnderReview),
+            Rework = tasks.Count(t => t.Status == TaskStatus.Rework),
+            Completed = tasks.Count(t => t.Status == TaskStatus.Completed),
+            Failed = tasks.Count(t => t.Status == TaskStatus.Failed),
+            Cancelled = tasks.Count(t => t.Status == TaskStatus.Cancelled)
+        };
     }
 }

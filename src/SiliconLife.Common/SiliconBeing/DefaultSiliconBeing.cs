@@ -279,23 +279,32 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 }
             }
 
-            // Timer processing: step-by-step execution
             if (TimerSystem != null && HasTimerWork())
             {
                 List<TimerItem> timersToProcess = GetTimersToProcess();
 
                 if (timersToProcess.Count > 0)
                 {
-                    TimerItem timer = timersToProcess[0]; // Process one timer per tick
+                    TimerItem timer = timersToProcess[0];
                     _activityRaw = (int)BeingActivity.Timer;
                     _logger.Info(Id, "Being {0}: processing timer {1} (state={2}, step={3})",
                         Name, timer.Name, timer.ExecutionState, timer.CurrentStep);
 
-                    // Execute step-by-step logic (using new ContextManager constructor for timer)
-                    if (!ExecuteBrain("ThinkOnTimerStep", null, _ => new ContextManager(this, timer).ThinkOnTimerStep(timer)))
+                    if (!ExecuteBrain("ThinkOnTimer", null, _ => new ContextManager(this, timer).ThinkOnTimer(timer)))
                         errorOccurred = true;
                     return;
                 }
+            }
+
+            List<TaskItem> continuationTasks = TaskCenter.Instance.GetContinuationTasks(Id);
+            if (continuationTasks.Count > 0)
+            {
+                TaskItem task = continuationTasks[0];
+                _activityRaw = (int)BeingActivity.Task;
+                _logger.Info(Id, "Being {0}: continuing task - {1} ({2})", Name, task.Title, task.Id);
+                if (!ExecuteBrain("ThinkOnTask", null, _ => new ContextManager(this, task).ThinkOnTask(task)))
+                    errorOccurred = true;
+                return;
             }
 
             if (TaskEnumerator != null && TaskEnumerator.HasRunnableTasks())
@@ -306,7 +315,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
                     TaskItem task = runnable[0];
                     _activityRaw = (int)BeingActivity.Task;
                     _logger.Info(Id, "Being {0}: pending task detected - {1} ({2})", Name, task.Title, task.Id);
-                    if (!ExecuteBrain("ThinkOnTask", null, _ => new ContextManager(this, (SessionBase?)null).ThinkOnTask(task)))
+                    if (!ExecuteBrain("ThinkOnTask", null, _ => new ContextManager(this, task).ThinkOnTask(task)))
                         errorOccurred = true;
                     return;
                 }
@@ -744,26 +753,44 @@ public class DefaultSiliconBeing : SiliconBeingBase
 
         if (TimerSystem == null) return result;
 
-        // 1. Newly triggered timers
-        List<TimerItem> triggered = TimerSystem.Tick();
-        foreach (var timer in triggered)
-        {
-            timer.ExecutionState = TimerExecutionState.Idle;
-            result.Add(timer);
-        }
-
-        // 2. Ongoing timers (not completed from last tick)
         List<TimerItem> allTimers = TimerSystem.GetAll();
         foreach (var timer in allTimers)
         {
             if (timer.ExecutionState == TimerExecutionState.Started ||
                 timer.ExecutionState == TimerExecutionState.Executing)
             {
-                // Avoid duplicates (already in triggered list)
-                if (!result.Any(t => t.Id == timer.Id))
+                result.Add(timer);
+            }
+        }
+
+        List<TimerItem> triggered = TimerSystem.Tick();
+        foreach (var timer in triggered)
+        {
+            if (result.Any(t => t.Id == timer.Id))
+            {
+                switch (timer.OverlapPolicy)
                 {
-                    result.Add(timer);
+                    case TimerOverlapPolicy.Wait:
+                        _logger.Info(Id, "Timer {0}: previous execution still running, waiting (OverlapPolicy=Wait)", timer.Name);
+                        continue;
+                    case TimerOverlapPolicy.Skip:
+                        _logger.Info(Id, "Timer {0}: previous execution still running, skipping this trigger (OverlapPolicy=Skip)", timer.Name);
+                        continue;
+                    case TimerOverlapPolicy.ForceNew:
+                        _logger.Info(Id, "Timer {0}: previous execution still running, forcing new cycle (OverlapPolicy=ForceNew)", timer.Name);
+                        timer.SealCurrentCycle(TimerExecutionState.Failed);
+                        timer.ExecutionState = TimerExecutionState.Idle;
+                        timer.AppendNewCycle(timer.TriggerTime);
+                        result.RemoveAll(t => t.Id == timer.Id);
+                        result.Add(timer);
+                        break;
                 }
+            }
+            else
+            {
+                timer.ExecutionState = TimerExecutionState.Idle;
+                timer.AppendNewCycle(timer.TriggerTime);
+                result.Add(timer);
             }
         }
 

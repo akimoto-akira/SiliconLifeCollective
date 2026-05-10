@@ -20,8 +20,6 @@ namespace SiliconLife.Fast;
 /// <see cref="IWorkNoteStorage"/> adapter backed by a <see cref="SpeedyStorage"/> (.spk) file.
 /// Notes are stored as JSON at paths: <c>work_notes/{ownerType}/{ownerId}/{noteId}.json</c>.
 /// An index per owner is maintained at <c>work_notes/{ownerType}/{ownerId}/_index.json</c>.
-/// A global reverse-lookup at <c>work_notes/_global/{noteId}.json</c> enables
-/// <see cref="ReadNote"/> by ID without scanning all owners.
 /// </summary>
 /// <remarks>
 /// The underlying <see cref="SpeedyPack"/> is the single instance owned by
@@ -50,9 +48,6 @@ public sealed class SpeedyWorkNoteStorage : IWorkNoteStorage, IDisposable
     private static string IndexKey(WorkNoteOwnerType ownerType, string ownerId) =>
         $"work_notes/{ownerType}/{ownerId}/_index";
 
-    private static string GlobalRefKey(Guid noteId) =>
-        $"work_notes/_global/{noteId}";
-
     // ─── Index helpers ────────────────────────────────────────────────────────
 
     private List<Guid> LoadIndex(WorkNoteOwnerType ownerType, string ownerId)
@@ -72,7 +67,6 @@ public sealed class SpeedyWorkNoteStorage : IWorkNoteStorage, IDisposable
             note.PageNumber = GetPageCount(note.OwnerType, note.OwnerId) + 1;
 
         _storage.Write(NoteKey(note.OwnerType, note.OwnerId, note.Id), note);
-        _storage.Write(GlobalRefKey(note.Id), new NoteOwnerRef(note.OwnerType, note.OwnerId));
 
         var index = LoadIndex(note.OwnerType, note.OwnerId);
         if (!index.Contains(note.Id))
@@ -84,12 +78,9 @@ public sealed class SpeedyWorkNoteStorage : IWorkNoteStorage, IDisposable
         return note;
     }
 
-    public WorkNoteEntry? ReadNote(Guid noteId)
+    public WorkNoteEntry? ReadNote(WorkNoteOwnerType ownerType, string ownerId, Guid noteId)
     {
-        var ownerRefs = _storage.Read<NoteOwnerRef>(GlobalRefKey(noteId));
-        var ownerRef = ownerRefs.FirstOrDefault();
-        if (ownerRef == null) return null;
-        var notes = _storage.Read<WorkNoteEntry>(NoteKey(ownerRef.OwnerType, ownerRef.OwnerId, noteId));
+        var notes = _storage.Read<WorkNoteEntry>(NoteKey(ownerType, ownerId, noteId));
         return notes.FirstOrDefault();
     }
 
@@ -111,7 +102,6 @@ public sealed class SpeedyWorkNoteStorage : IWorkNoteStorage, IDisposable
         note.UpdatedAt = DateTime.UtcNow;
 
         _storage.Write(NoteKey(note.OwnerType, note.OwnerId, note.Id), note);
-        _storage.Write(GlobalRefKey(note.Id), new NoteOwnerRef(note.OwnerType, note.OwnerId));
 
         var index = LoadIndex(note.OwnerType, note.OwnerId);
         if (!index.Contains(note.Id))
@@ -123,18 +113,13 @@ public sealed class SpeedyWorkNoteStorage : IWorkNoteStorage, IDisposable
         return note;
     }
 
-    public bool DeleteNote(Guid noteId)
+    public bool DeleteNote(WorkNoteOwnerType ownerType, string ownerId, Guid noteId)
     {
-        var ownerRefs = _storage.Read<NoteOwnerRef>(GlobalRefKey(noteId));
-        var ownerRef = ownerRefs.FirstOrDefault();
-        if (ownerRef == null) return false;
+        _storage.Delete(NoteKey(ownerType, ownerId, noteId));
 
-        _storage.Delete(NoteKey(ownerRef.OwnerType, ownerRef.OwnerId, noteId));
-        _storage.Delete(GlobalRefKey(noteId));
-
-        var index = LoadIndex(ownerRef.OwnerType, ownerRef.OwnerId);
+        var index = LoadIndex(ownerType, ownerId);
         if (index.Remove(noteId))
-            SaveIndex(ownerRef.OwnerType, ownerRef.OwnerId, index);
+            SaveIndex(ownerType, ownerId, index);
 
         return true;
     }
@@ -189,6 +174,4 @@ public sealed class SpeedyWorkNoteStorage : IWorkNoteStorage, IDisposable
     /// <see cref="SpeedyPackRegistry.Dispose"/>.
     /// </summary>
     public void Dispose() { }
-
-    private sealed record NoteOwnerRef(WorkNoteOwnerType OwnerType, string OwnerId);
 }

@@ -84,7 +84,7 @@ public static class CodeReviewWorkflow
                             $"Code Review: {instance.BusinessKey}",
                             $"Review the code changes in {instance.BusinessKey}",
                             instance.CreatedBy,
-                            new List<Guid> { reviewer },
+                            reviewer,
                             priority: 50
                         );
                     }
@@ -180,7 +180,7 @@ public static class CodeReviewWorkflow
                     $"Rework Required: {instance.BusinessKey}",
                     $"Address review comments and fix issues",
                     instance.CreatedBy,
-                    new List<Guid> { instance.CreatedBy },
+                    instance.CreatedBy,
                     priority: 60
                 );
 

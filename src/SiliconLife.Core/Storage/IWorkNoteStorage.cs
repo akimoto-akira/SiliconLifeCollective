@@ -28,11 +28,13 @@ public interface IWorkNoteStorage
     WorkNoteEntry CreateNote(WorkNoteEntry note);
 
     /// <summary>
-    /// Reads a specific work note page by ID
+    /// Reads a specific work note page by owner and note ID
     /// </summary>
+    /// <param name="ownerType">The owner type (silicon being or project)</param>
+    /// <param name="ownerId">The owner ID</param>
     /// <param name="noteId">The unique note page ID</param>
     /// <returns>The note entry, or null if not found</returns>
-    WorkNoteEntry? ReadNote(Guid noteId);
+    WorkNoteEntry? ReadNote(WorkNoteOwnerType ownerType, string ownerId, Guid noteId);
 
     /// <summary>
     /// Reads a specific work note page by owner and page number
@@ -53,9 +55,11 @@ public interface IWorkNoteStorage
     /// <summary>
     /// Deletes a work note page
     /// </summary>
+    /// <param name="ownerType">The owner type (silicon being or project)</param>
+    /// <param name="ownerId">The owner ID</param>
     /// <param name="noteId">The unique note page ID</param>
     /// <returns>True if successfully deleted, false if not found</returns>
-    bool DeleteNote(Guid noteId);
+    bool DeleteNote(WorkNoteOwnerType ownerType, string ownerId, Guid noteId);
 
     /// <summary>
     /// Lists all note pages for a specific owner

@@ -97,10 +97,13 @@ public class FileSystemWorkNoteStorage : IWorkNoteStorage
     }
 
     /// <inheritdoc/>
-    public WorkNoteEntry? ReadNote(Guid noteId)
+    public WorkNoteEntry? ReadNote(WorkNoteOwnerType ownerType, string ownerId, Guid noteId)
     {
         var data = LoadData();
-        return data.Notes.FirstOrDefault(n => n.Id == noteId);
+        return data.Notes.FirstOrDefault(n =>
+            n.OwnerType == ownerType &&
+            n.OwnerId == ownerId &&
+            n.Id == noteId);
     }
 
     /// <inheritdoc/>
@@ -135,10 +138,13 @@ public class FileSystemWorkNoteStorage : IWorkNoteStorage
     }
 
     /// <inheritdoc/>
-    public bool DeleteNote(Guid noteId)
+    public bool DeleteNote(WorkNoteOwnerType ownerType, string ownerId, Guid noteId)
     {
         var data = LoadData();
-        var note = data.Notes.FirstOrDefault(n => n.Id == noteId);
+        var note = data.Notes.FirstOrDefault(n =>
+            n.OwnerType == ownerType &&
+            n.OwnerId == ownerId &&
+            n.Id == noteId);
         if (note == null) return false;
 
         data.Notes.Remove(note);

@@ -177,7 +177,19 @@ public class ProjectTaskTool : ITool
             priority = p;
         }
 
-        var task = taskSystem.Create(title, description, callerId, new List<Guid> { callerId });
+        Guid executorGuid = callerId;
+        if (parameters.TryGetValue("assignee_id", out var assigneeObj) && Guid.TryParse(assigneeObj?.ToString(), out Guid assigneeId))
+        {
+            executorGuid = assigneeId;
+        }
+
+        Guid? reviewerGuid = null;
+        if (parameters.TryGetValue("reviewer_id", out var reviewerObj) && Guid.TryParse(reviewerObj?.ToString(), out Guid revId))
+        {
+            reviewerGuid = revId;
+        }
+
+        var task = taskSystem.Create(title, description, callerId, executorGuid, reviewerGuid, priority);
         return ToolResult.Successful($"Project task created: {task.Title} (ID: {task.Id}, Priority: {task.Priority})");
     }
 
@@ -193,6 +205,9 @@ public class ProjectTaskTool : ITool
                 {
                     "pending" => TaskStatus.Pending,
                     "running" => TaskStatus.Running,
+                    "submitted_for_review" => TaskStatus.SubmittedForReview,
+                    "under_review" => TaskStatus.UnderReview,
+                    "rework" => TaskStatus.Rework,
                     "completed" => TaskStatus.Completed,
                     "failed" => TaskStatus.Failed,
                     "cancelled" => TaskStatus.Cancelled,
@@ -240,10 +255,10 @@ public class ProjectTaskTool : ITool
             $"Description: {task.Description}"
         };
 
-        if (task.ExecutorGuids.Count > 0)
-            lines.Add($"Executors: {string.Join(", ", task.ExecutorGuids)}");
-        if (task.ReviewerGuids.Count > 0)
-            lines.Add($"Reviewers: {string.Join(", ", task.ReviewerGuids)}");
+        if (task.ExecutorGuid != Guid.Empty)
+            lines.Add($"Executor: {task.ExecutorGuid}");
+        if (task.ReviewerGuid.HasValue && task.ReviewerGuid.Value != Guid.Empty)
+            lines.Add($"Reviewer: {task.ReviewerGuid.Value}");
         if (task.StartedAt.HasValue)
             lines.Add($"Started: {task.StartedAt:yyyy-MM-dd HH:mm:ss}");
         if (task.CompletedAt.HasValue)
@@ -410,6 +425,9 @@ public class ProjectTaskTool : ITool
             $"  Total: {stats.Total}",
             $"  Pending: {stats.Pending}",
             $"  Running: {stats.Running}",
+            $"  SubmittedForReview: {stats.SubmittedForReview}",
+            $"  UnderReview: {stats.UnderReview}",
+            $"  Rework: {stats.Rework}",
             $"  Completed: {stats.Completed}",
             $"  Failed: {stats.Failed}",
             $"  Cancelled: {stats.Cancelled}"

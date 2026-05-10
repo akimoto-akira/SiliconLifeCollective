@@ -33,7 +33,8 @@ public class TaskTool : ITool
         "Actions: 'create' (create a new task), 'list' (list tasks), 'get' (get task details), " +
         "'complete' (mark task complete), 'fail' (mark task failed), 'cancel' (cancel task), " +
         "'delete' (delete task), 'update_priority' (change priority), " +
-        "'add_dependency' (add task dependency), 'stats' (get task statistics).";
+        "'add_dependency' (add task dependency), 'submit_for_review' (submit task for review), " +
+        "'stats' (get task statistics).";
 
     /// <inheritdoc/>
     public string GetDisplayName(Language language)
@@ -54,8 +55,8 @@ public class TaskTool : ITool
                 ["action"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "The action to perform: create, list, get, complete, fail, cancel, delete, update_priority, add_dependency, stats",
-                    ["enum"] = new[] { "create", "list", "get", "complete", "fail", "cancel", "delete", "update_priority", "add_dependency", "stats" }
+                    ["description"] = "The action to perform: create, list, get, complete, fail, cancel, delete, update_priority, add_dependency, submit_for_review, stats",
+                    ["enum"] = new[] { "create", "list", "get", "complete", "fail", "cancel", "delete", "update_priority", "add_dependency", "submit_for_review", "stats" }
                 },
                 ["title"] = new Dictionary<string, object>
                 {
@@ -126,6 +127,7 @@ public class TaskTool : ITool
                 "delete" => ExecuteDelete(being, parameters),
                 "update_priority" => ExecuteUpdatePriority(being, parameters),
                 "add_dependency" => ExecuteAddDependency(being, parameters),
+                "submit_for_review" => ExecuteSubmitForReview(being, parameters),
                 "stats" => ExecuteStats(being, parameters),
                 _ => ToolResult.Failed($"Unknown action: {action}")
             };
@@ -186,6 +188,9 @@ public class TaskTool : ITool
             {
                 "pending" => Collective.TaskStatus.Pending,
                 "running" => Collective.TaskStatus.Running,
+                "submitted_for_review" => Collective.TaskStatus.SubmittedForReview,
+                "under_review" => Collective.TaskStatus.UnderReview,
+                "rework" => Collective.TaskStatus.Rework,
                 "completed" => Collective.TaskStatus.Completed,
                 "failed" => Collective.TaskStatus.Failed,
                 "cancelled" => Collective.TaskStatus.Cancelled,
@@ -413,11 +418,39 @@ public class TaskTool : ITool
             $"- Total: {stats.Total}",
             $"- Pending: {stats.Pending}",
             $"- Running: {stats.Running}",
+            $"- SubmittedForReview: {stats.SubmittedForReview}",
+            $"- UnderReview: {stats.UnderReview}",
+            $"- Rework: {stats.Rework}",
             $"- Completed: {stats.Completed}",
             $"- Failed: {stats.Failed}",
             $"- Cancelled: {stats.Cancelled}"
         };
 
         return ToolResult.Successful(string.Join("\n", lines));
+    }
+
+    private ToolResult ExecuteSubmitForReview(SiliconBeingBase being, Dictionary<string, object> parameters)
+    {
+        if (!parameters.TryGetValue("task_id", out object? idObj) || !Guid.TryParse(idObj?.ToString(), out Guid taskId))
+        {
+            return ToolResult.Failed("Missing or invalid 'task_id' parameter");
+        }
+
+        var task = being.TaskSystem!.Get(taskId);
+        if (task == null)
+        {
+            return ToolResult.Failed($"Task not found: {taskId}");
+        }
+
+        if (task.Status != Collective.TaskStatus.Running)
+        {
+            return ToolResult.Failed($"Task '{task.Title}' is {task.Status}, only running tasks can be submitted for review");
+        }
+
+        task.SealCurrentCycle(Collective.TaskStatus.SubmittedForReview);
+        task.SubmitForReview();
+        task.AppendNewCycle();
+        TaskCenter.Instance.UpdateTask(task);
+        return ToolResult.Successful($"Task '{task.Title}' submitted for review.");
     }
 }

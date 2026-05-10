@@ -123,7 +123,7 @@ public sealed class WorkNoteSystem
     /// <returns>The note entry, or null if not found</returns>
     public WorkNoteEntry? ReadNote(Guid noteId)
     {
-        return _storage.ReadNote(noteId);
+        return _storage.ReadNote(_ownerType, _beingId.ToString(), noteId);
     }
 
     /// <summary>
@@ -179,7 +179,7 @@ public sealed class WorkNoteSystem
             return false;
         }
 
-        bool deleted = _storage.DeleteNote(note.Id);
+        bool deleted = _storage.DeleteNote(_ownerType, _beingId.ToString(), note.Id);
         if (deleted)
         {
             _logger.Info(_beingId, "Deleted work note page {0}", pageNumber);

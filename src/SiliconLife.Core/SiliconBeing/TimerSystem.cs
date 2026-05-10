@@ -88,6 +88,13 @@ public enum TimerExecutionState
     Failed
 }
 
+public enum TimerOverlapPolicy
+{
+    Wait,
+    Skip,
+    ForceNew
+}
+
 /// <summary>
 /// Resolves calendar-specific component conditions to the next DateTime
 /// that satisfies those conditions, starting from the given anchor time.
@@ -199,6 +206,18 @@ public sealed class TimerItem
     /// Gets or sets additional metadata for the timer.
     /// </summary>
     public Dictionary<string, string> Metadata { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the chat history cycles for this timer.
+    /// Each cycle represents one timer trigger execution.
+    /// </summary>
+    public List<ChatHistoryCycle> ChatHistory { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the overlap policy for recurring timers.
+    /// Determines what happens when a new trigger occurs while the previous execution is still running.
+    /// </summary>
+    public TimerOverlapPolicy OverlapPolicy { get; set; } = TimerOverlapPolicy.Wait;
 
     /// <summary>
     /// Gets or sets the current execution state for step-by-step processing.
@@ -393,6 +412,43 @@ public sealed class TimerItem
 
         TimeSpan diff = TriggerTime - DateTime.Now;
         return diff > TimeSpan.Zero ? diff : TimeSpan.Zero;
+    }
+
+    public ChatHistoryCycle GetCurrentCycle()
+    {
+        if (ChatHistory.Count == 0)
+        {
+            ChatHistory.Add(new ChatHistoryCycle(TimerExecutionState.Started, TriggerTime));
+        }
+        return ChatHistory[^1];
+    }
+
+    public void SealCurrentCycle(TimerExecutionState endStatus)
+    {
+        if (ChatHistory.Count == 0) return;
+        ChatHistory[^1].SetEndStatus(endStatus);
+    }
+
+    public void AppendNewCycle(DateTime? triggerTime = null)
+    {
+        ChatHistory.Add(new ChatHistoryCycle(TimerExecutionState.Started, triggerTime ?? TriggerTime));
+    }
+
+    public bool IsCurrentCycleSealed()
+    {
+        if (ChatHistory.Count == 0) return true;
+        return ChatHistory[^1].EndStatus != null;
+    }
+
+    public bool NeedsContinuation()
+    {
+        if (ExecutionState != TimerExecutionState.Executing && ExecutionState != TimerExecutionState.Started)
+            return false;
+        if (ChatHistory.Count == 0) return false;
+        var lastCycle = ChatHistory[^1];
+        if (lastCycle.EndStatus != null) return false;
+        if (lastCycle.Messages.Count == 0) return false;
+        return lastCycle.Messages[^1].Role == MessageRole.Tool;
     }
 }
 

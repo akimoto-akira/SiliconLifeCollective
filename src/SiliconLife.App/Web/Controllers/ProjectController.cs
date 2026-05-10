@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -943,10 +943,10 @@ public class ProjectController : Controller
                 completedAt = t.CompletedAt,
                 assigneeGuid = t.AssigneeGuid,
                 assigneeName = beingManager?.GetBeing(t.AssigneeGuid)?.Name ?? t.AssigneeGuid.ToString().Substring(0, 8),
-                executorGuids = t.ExecutorGuids,
-                executorNames = t.ExecutorGuids.Select(g => beingManager?.GetBeing(g)?.Name ?? g.ToString().Substring(0, 8)).ToList(),
-                reviewerGuids = t.ReviewerGuids,
-                reviewerNames = t.ReviewerGuids.Select(g => beingManager?.GetBeing(g)?.Name ?? g.ToString().Substring(0, 8)).ToList(),
+                executorGuid = t.ExecutorGuid,
+                executorName = beingManager?.GetBeing(t.ExecutorGuid)?.Name ?? t.ExecutorGuid.ToString().Substring(0, 8),
+                reviewerGuid = t.ReviewerGuid,
+                reviewerName = t.ReviewerGuid.HasValue ? (beingManager?.GetBeing(t.ReviewerGuid.Value)?.Name ?? t.ReviewerGuid.Value.ToString().Substring(0, 8)) : "",
                 createdByGuid = t.CreatedByGuid,
                 createdByName = beingManager?.GetBeing(t.CreatedByGuid)?.Name ?? t.CreatedByGuid.ToString().Substring(0, 8),
                 errorMessage = t.ErrorMessage ?? ""
@@ -1000,22 +1000,22 @@ public class ProjectController : Controller
                 Guid.TryParse(creatorObj.ToString(), out createdBy);
             }
 
-            List<Guid>? executors = null;
-            if (body.TryGetValue("executors", out var execObj) && execObj is List<object> execList)
+            Guid executor = Guid.Empty;
+            if (body.TryGetValue("executor", out var execObj) && !string.IsNullOrWhiteSpace(execObj?.ToString()))
             {
-                executors = execList.Select(a => Guid.TryParse(a?.ToString(), out Guid g) ? g : Guid.Empty).Where(g => g != Guid.Empty).ToList();
+                Guid.TryParse(execObj.ToString(), out executor);
             }
 
-            if (executors == null || executors.Count == 0)
+            if (executor == Guid.Empty)
             {
-                RenderJson(new { success = false, error = "执行者列表不能为空" });
-                return;
+                executor = createdBy;
             }
 
-            List<Guid>? reviewers = null;
-            if (body.TryGetValue("reviewers", out var revObj) && revObj is List<object> revList)
+            Guid? reviewer = null;
+            if (body.TryGetValue("reviewer", out var revObj) && !string.IsNullOrWhiteSpace(revObj?.ToString()))
             {
-                reviewers = revList.Select(a => Guid.TryParse(a?.ToString(), out Guid g) ? g : Guid.Empty).Where(g => g != Guid.Empty).ToList();
+                if (Guid.TryParse(revObj.ToString(), out Guid revGuid))
+                    reviewer = revGuid;
             }
 
             var taskSystem = _projectManager.GetTaskSystem(projectId);
@@ -1025,7 +1025,7 @@ public class ProjectController : Controller
                 return;
             }
 
-            var task = taskSystem.Create(title, description, createdBy, executors, reviewers, priority);
+            var task = taskSystem.Create(title, description, createdBy, executor, reviewer, priority);
 
             RenderJson(new
             {
@@ -1039,8 +1039,8 @@ public class ProjectController : Controller
                     priority = task.Priority,
                     createdAt = task.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
                     assigneeGuid = task.AssigneeGuid,
-                    executorGuids = task.ExecutorGuids,
-                    reviewerGuids = task.ReviewerGuids,
+                    executorGuid = task.ExecutorGuid,
+                    reviewerGuid = task.ReviewerGuid,
                     createdByGuid = task.CreatedByGuid
                 }
             });

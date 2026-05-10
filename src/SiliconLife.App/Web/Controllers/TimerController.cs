@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -209,7 +209,6 @@ public class TimerController : Controller
             return;
         }
 
-        // Find timer
         TimerItem? timer = FindTimer(timerId);
         if (timer == null)
         {
@@ -218,16 +217,13 @@ public class TimerController : Controller
             return;
         }
 
-        // Get execution history from TimerItem
-        var executions = timer.GetExecutionHistory();
-        var result = executions.Select(e => new
+        var result = timer.ChatHistory.Select((c, i) => new
         {
-            executionId = e.ExecutionId.ToString(),
-            triggeredAt = e.TriggeredAt.ToString("yyyy-MM-dd HH:mm:ss"),
-            completedAt = e.CompletedAt?.ToString("yyyy-MM-dd HH:mm:ss"),
-            state = e.State.ToString(),
-            stepCount = e.CurrentStep,
-            messageCount = e.Messages.Count
+            cycleIndex = i,
+            triggeredAt = c.TriggerTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? c.StartedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+            completedAt = c.EndedAt?.ToString("yyyy-MM-dd HH:mm:ss"),
+            state = c.EndStatus ?? c.StartStatus,
+            messageCount = c.Messages.Count
         }).ToList();
 
         _logger.Info(null, "GetExecutionList: Returning {0} executions for timer {1}", result.Count, timerId);
@@ -236,15 +232,13 @@ public class TimerController : Controller
 
     private void ShowExecutionDetail()
     {
-        // Get executionId from route parameters
-        if (!Parameters.TryGetValue("executionId", out var executionIdStr) || !Guid.TryParse(executionIdStr, out var executionId))
+        if (!Parameters.TryGetValue("cycleIndex", out var cycleIndexStr) || !int.TryParse(cycleIndexStr, out var cycleIndex))
         {
             Response.StatusCode = 400;
             Response.Close();
             return;
         }
 
-        // Get timerId from query string
         var timerIdStr = Request.QueryString["timerId"];
         if (string.IsNullOrEmpty(timerIdStr) || !Guid.TryParse(timerIdStr, out var timerId))
         {
@@ -253,25 +247,16 @@ public class TimerController : Controller
             return;
         }
 
-        // Find timer and load execution
         TimerItem? timer = FindTimer(timerId);
 
-        if (timer == null || string.IsNullOrEmpty(timer.CurrentExecutionFile))
+        if (timer == null || cycleIndex < 0 || cycleIndex >= timer.ChatHistory.Count)
         {
             Response.StatusCode = 404;
             Response.Close();
             return;
         }
 
-        var execution = timer.GetExecution(executionId);
-
-        if (execution == null)
-        {
-            Response.StatusCode = 404;
-            Response.Close();
-            return;
-        }
-
+        var cycle = timer.ChatHistory[cycleIndex];
         var being = FindTimerOwner(timerId);
         var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
         var view = new Views.TimerExecutionDetailView();
@@ -280,11 +265,11 @@ public class TimerController : Controller
             Skin = skin,
             ActiveMenu = "timers",
             TimerId = timerId,
-            ExecutionId = executionId.ToString(),
-            TimerName = execution.TimerName,
-            TriggeredAt = execution.TriggeredAt.ToString("yyyy-MM-dd HH:mm:ss"),
-            CompletedAt = execution.CompletedAt?.ToString("yyyy-MM-dd HH:mm:ss"),
-            State = execution.State.ToString(),
+            ExecutionId = cycleIndex.ToString(),
+            TimerName = timer.Name,
+            TriggeredAt = (cycle.TriggerTime ?? cycle.StartedAt).ToString("yyyy-MM-dd HH:mm:ss"),
+            CompletedAt = cycle.EndedAt?.ToString("yyyy-MM-dd HH:mm:ss"),
+            State = cycle.EndStatus ?? cycle.StartStatus,
             ToolDisplayNames = GetToolDisplayNames(being)
         };
         var html = view.Render(vm);
@@ -293,10 +278,10 @@ public class TimerController : Controller
 
     private void GetExecutionMessages()
     {
-        var executionIdStr = Request.QueryString["executionId"];
-        if (string.IsNullOrEmpty(executionIdStr) || !Guid.TryParse(executionIdStr, out var executionId))
+        var cycleIndexStr = Request.QueryString["cycleIndex"];
+        if (string.IsNullOrEmpty(cycleIndexStr) || !int.TryParse(cycleIndexStr, out var cycleIndex))
         {
-            _logger.Warn(null, "GetExecutionMessages: Invalid executionId parameter");
+            _logger.Warn(null, "GetExecutionMessages: Invalid cycleIndex parameter");
             RenderJson(new { messages = new List<object>() });
             return;
         }
@@ -309,7 +294,6 @@ public class TimerController : Controller
             return;
         }
 
-        // Find timer
         TimerItem? timer = FindTimer(timerId);
         if (timer == null)
         {
@@ -318,16 +302,15 @@ public class TimerController : Controller
             return;
         }
 
-        // Get execution from TimerItem
-        var execution = timer.GetExecution(executionId);
-        if (execution == null)
+        if (cycleIndex < 0 || cycleIndex >= timer.ChatHistory.Count)
         {
-            _logger.Warn(null, "GetExecutionMessages: Execution not found: {0}", executionId);
+            _logger.Warn(null, "GetExecutionMessages: Cycle index {0} out of range for timer {1}", cycleIndex, timerId);
             RenderJson(new { messages = new List<object>() });
             return;
         }
 
-        _logger.Info(null, "GetExecutionMessages: Loaded execution with {0} messages", execution.Messages.Count);
+        var messages = timer.ChatHistory[cycleIndex].Messages;
+        _logger.Info(null, "GetExecutionMessages: Loaded cycle {0} with {1} messages", cycleIndex, messages.Count);
 
         // Get being for sender name resolution
         var being = FindTimerOwner(timerId);
@@ -340,7 +323,7 @@ public class TimerController : Controller
         var toolCallMap = new Dictionary<string, int>(); // toolCallId -> index in result list
         var result = new List<dynamic>();
 
-        foreach (var m in execution.Messages)
+        foreach (var m in messages)
         {
             var senderBeing = _beingManager.GetBeing(m.SenderId);
             var senderName = senderBeing?.Name ?? (m.SenderId == userId ? userNickname : m.SenderId.ToString());

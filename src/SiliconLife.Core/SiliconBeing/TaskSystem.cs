@@ -20,30 +20,47 @@ namespace SiliconLife.Collective;
 /// </summary>
 public enum TaskStatus
 {
-    /// <summary>
-    /// The task is pending and not yet started.
-    /// </summary>
     Pending,
-
-    /// <summary>
-    /// The task is currently running.
-    /// </summary>
     Running,
-
-    /// <summary>
-    /// The task has been completed successfully.
-    /// </summary>
+    SubmittedForReview,
+    UnderReview,
+    Rework,
     Completed,
-
-    /// <summary>
-    /// The task has failed.
-    /// </summary>
     Failed,
-
-    /// <summary>
-    /// The task has been cancelled.
-    /// </summary>
     Cancelled
+}
+
+public sealed class ChatHistoryCycle
+{
+    public List<ChatMessage> Messages { get; set; } = new();
+    public string StartStatus { get; set; } = string.Empty;
+    public string? EndStatus { get; set; }
+    public DateTime StartedAt { get; set; }
+    public DateTime? EndedAt { get; set; }
+    public DateTime? TriggerTime { get; set; }
+
+    public ChatHistoryCycle() { }
+
+    public ChatHistoryCycle(TaskStatus startStatus)
+    {
+        StartStatus = startStatus.ToString();
+        StartedAt = DateTime.Now;
+    }
+
+    public ChatHistoryCycle(TimerExecutionState startStatus, DateTime? triggerTime = null)
+    {
+        StartStatus = startStatus.ToString();
+        StartedAt = DateTime.Now;
+        TriggerTime = triggerTime;
+    }
+
+    public TaskStatus GetTaskStartStatus() => Enum.TryParse<TaskStatus>(StartStatus, out var s) ? s : TaskStatus.Pending;
+    public TaskStatus? GetTaskEndStatus() => EndStatus != null && Enum.TryParse<TaskStatus>(EndStatus, out var s) ? s : null;
+    public TimerExecutionState GetTimerStartStatus() => Enum.TryParse<TimerExecutionState>(StartStatus, out var s) ? s : TimerExecutionState.Idle;
+    public TimerExecutionState? GetTimerEndStatus() => EndStatus != null && Enum.TryParse<TimerExecutionState>(EndStatus, out var s) ? s : null;
+
+    public void SetEndStatus(TaskStatus status) { EndStatus = status.ToString(); EndedAt = DateTime.Now; }
+    public void SetEndStatus(TimerExecutionState status) { EndStatus = status.ToString(); EndedAt = DateTime.Now; }
 }
 
 /// <summary>
@@ -111,31 +128,17 @@ public sealed class TaskItem
     /// </summary>
     public Guid? ProjectId { get; set; }
 
-    /// <summary>
-    /// Gets or sets the GUID of the assignee who created/assigned this task (single person).
-    /// </summary>
     public Guid AssigneeGuid { get; set; }
 
-    /// <summary>
-    /// Gets or sets the list of executor GUIDs responsible for executing this task (multiple people, cannot be empty).
-    /// </summary>
-    public List<Guid> ExecutorGuids { get; set; } = new();
+    public Guid ExecutorGuid { get; set; }
 
-    /// <summary>
-    /// Gets or sets the list of reviewer GUIDs responsible for reviewing this task (multiple people, can be empty).
-    /// </summary>
-    public List<Guid> ReviewerGuids { get; set; } = new();
+    public Guid? ReviewerGuid { get; set; }
 
-    /// <summary>
-    /// Gets or sets the list of required tool names for this task.
-    /// When executing ThinkOnTask, only these specific tools will be loaded.
-    /// </summary>
     public List<string> RequiredTools { get; set; } = new();
 
-    /// <summary>
-    /// Gets or sets the GUID of the being who created this task.
-    /// </summary>
     public Guid CreatedByGuid { get; set; }
+
+    public List<ChatHistoryCycle> ChatHistory { get; set; } = new();
 
     /// <summary>
     /// Initializes a new instance of the TaskItem class.
@@ -206,49 +209,58 @@ public sealed class TaskItem
         ErrorMessage = error;
     }
 
-    /// <summary>
-    /// Cancels the task.
-    /// </summary>
     public void Cancel()
     {
         Status = TaskStatus.Cancelled;
         CompletedAt = DateTime.Now;
     }
+
+    public void SubmitForReview()
+    {
+        Status = TaskStatus.SubmittedForReview;
+    }
+
+    public void StartReview()
+    {
+        Status = TaskStatus.UnderReview;
+    }
+
+    public void ReworkTask()
+    {
+        Status = TaskStatus.Rework;
+    }
+
+    public ChatHistoryCycle GetCurrentCycle()
+    {
+        if (ChatHistory.Count == 0)
+        {
+            ChatHistory.Add(new ChatHistoryCycle(Status));
+        }
+        return ChatHistory[^1];
+    }
+
+    public void SealCurrentCycle(TaskStatus endStatus)
+    {
+        if (ChatHistory.Count == 0) return;
+        ChatHistory[^1].SetEndStatus(endStatus);
+    }
+
+    public void AppendNewCycle()
+    {
+        ChatHistory.Add(new ChatHistoryCycle(Status));
+    }
 }
 
-/// <summary>
-/// Provides statistics about the task system.
-/// </summary>
 public sealed class TaskStatistics
 {
-    /// <summary>
-    /// Gets or sets the total number of tasks.
-    /// </summary>
     public int Total { get; set; }
-
-    /// <summary>
-    /// Gets or sets the number of pending tasks.
-    /// </summary>
     public int Pending { get; set; }
-
-    /// <summary>
-    /// Gets or sets the number of running tasks.
-    /// </summary>
     public int Running { get; set; }
-
-    /// <summary>
-    /// Gets or sets the number of completed tasks.
-    /// </summary>
+    public int SubmittedForReview { get; set; }
+    public int UnderReview { get; set; }
+    public int Rework { get; set; }
     public int Completed { get; set; }
-
-    /// <summary>
-    /// Gets or sets the number of failed tasks.
-    /// </summary>
     public int Failed { get; set; }
-
-    /// <summary>
-    /// Gets or sets the number of cancelled tasks.
-    /// </summary>
     public int Cancelled { get; set; }
 }
 
@@ -259,90 +271,24 @@ public sealed class TaskSystem
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<TaskSystem>();
     private readonly SiliconBeingBase _owner;
-    private readonly IStorage _storage;
-    private readonly string _storageKey;
 
-    /// <summary>
-    /// Gets the owner being's GUID (computed in real-time from the owner)
-    /// </summary>
     public Guid OwnerId => _owner.Id;
-
-    /// <summary>
-    /// Gets the name of the owner being (computed in real-time from the owner)
-    /// </summary>
     public string OwnerName => _owner.Name;
-
-    /// <summary>
-    /// Gets whether the owner is a curator (computed in real-time from the owner)
-    /// </summary>
     public bool IsCurator => _owner.IsCurator;
-
-    /// <summary>
-    /// Gets the total number of tasks for this being (from TaskCenter).
-    /// </summary>
     public int Count => TaskCenter.Instance.GetTasksForBeing(OwnerId).Count();
-
-    /// <summary>
-    /// Gets the number of pending tasks for this being (from TaskCenter).
-    /// </summary>
     public int PendingCount => TaskCenter.Instance.GetRunnableTasks(OwnerId).Count;
-
-    /// <summary>
-    /// Gets the number of running tasks (from TaskCenter).
-    /// </summary>
     public int RunningCount => TaskCenter.Instance.GetTasksForBeing(OwnerId).Count(t => t.Status == TaskStatus.Running);
 
-    /// <summary>
-    /// Initializes a new instance of the TaskSystem class with the specified owner and storage.
-    /// Each being holds its own TaskSystem instance; the owner reference enables real-time
-    /// identity queries (OwnerId, OwnerName, IsCurator) without duplicating state.
-    /// TaskSystem is a thin facade over TaskCenter — all data lives in the centralized store.
-    /// </summary>
-    /// <param name="owner">The silicon being that owns this TaskSystem</param>
-    /// <param name="storage">The storage to use for persisting tasks.</param>
-    /// <exception cref="ArgumentNullException">Thrown when owner or storage is null.</exception>
     public TaskSystem(SiliconBeingBase owner, IStorage storage)
     {
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
-        _storage = storage ?? throw new ArgumentNullException(nameof(storage));
-        _storageKey = "tasks";
+
+        if (storage != null)
+        {
+            TaskCenter.Instance.Initialize(storage);
+        }
 
         _logger.Info(_owner.Id, "TaskSystem created for being {0} ({1})", owner.Name, owner.Id);
-
-        LoadIntoTaskCenter();
-    }
-
-    private void LoadIntoTaskCenter()
-    {
-        try
-        {
-            TaskItem[] tasks = _storage.Read<TaskItem>(_storageKey);
-            if (tasks != null)
-            {
-                foreach (var task in tasks)
-                {
-                    TaskCenter.Instance.AddTask(task);
-                }
-                _logger.Info(_owner.Id, "Loaded {0} task(s) from storage into TaskCenter", tasks.Length);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.Warn(_owner.Id, "Failed to load tasks from storage", ex);
-        }
-    }
-
-    private void Persist()
-    {
-        try
-        {
-            var tasks = TaskCenter.Instance.GetTasksForBeing(OwnerId).ToList();
-            _storage.Write(_storageKey, tasks);
-        }
-        catch (Exception ex)
-        {
-            _logger.Error(_owner.Id, "Failed to persist tasks to storage", ex);
-        }
     }
 
     /// <summary>
@@ -353,12 +299,16 @@ public sealed class TaskSystem
     /// <param name="priority">The priority of the task (lower values = higher priority).</param>
     /// <param name="dependencies">Optional list of task IDs that this task depends on.</param>
     /// <returns>The created task item.</returns>
-    public TaskItem Create(string title, string description = "", int priority = 100, List<Guid>? dependencies = null)
+    public TaskItem Create(string title, string description = "", int priority = 100, List<Guid>? dependencies = null, Guid? assigneeGuid = null, Guid? executorGuid = null)
     {
+        Guid effectiveAssignee = assigneeGuid ?? OwnerId;
+        Guid effectiveExecutor = executorGuid ?? OwnerId;
+
         var task = new TaskItem(title, description)
         {
             Priority = priority,
-            ExecutorGuids = new List<Guid> { OwnerId },
+            AssigneeGuid = effectiveAssignee,
+            ExecutorGuid = effectiveExecutor,
             CreatedByGuid = OwnerId
         };
 
@@ -367,7 +317,8 @@ public sealed class TaskSystem
             task.Dependencies = dependencies;
         }
 
-        // Add to TaskCenter (centralized task management)
+        task.ChatHistory.Add(new ChatHistoryCycle(TaskStatus.Pending));
+
         TaskCenter.Instance.AddTask(task);
 
         _logger.Info(_owner.Id, "Task created and added to TaskCenter: {0} ({1}), priority={2}", title, task.Id, priority);
@@ -434,7 +385,6 @@ public sealed class TaskSystem
         {
             task.Start();
             TaskCenter.Instance.UpdateTask(task);
-            Persist();
             _logger.Info(_owner.Id, "Task started: {0} ({1})", task.Title, task.Id);
             return true;
         }
@@ -498,7 +448,6 @@ public sealed class TaskSystem
         {
             task.Fail(error);
             TaskCenter.Instance.UpdateTask(task);
-            Persist();
             _logger.Warn(_owner.Id, "Task failed: {0} ({1}), error={2}", task.Title, task.Id, error);
         }
     }
@@ -514,7 +463,6 @@ public sealed class TaskSystem
         {
             task.Cancel();
             TaskCenter.Instance.UpdateTask(task);
-            Persist();
             _logger.Info(_owner.Id, "Task cancelled: {0} ({1})", task.Title, task.Id);
         }
     }
@@ -532,19 +480,12 @@ public sealed class TaskSystem
         {
             task.Priority = newPriority;
             TaskCenter.Instance.UpdateTask(task);
-            Persist();
             return true;
         }
 
         return false;
     }
 
-    /// <summary>
-    /// Adds a dependency to a pending task.
-    /// </summary>
-    /// <param name="taskId">The ID of the task to add the dependency to.</param>
-    /// <param name="dependencyId">The ID of the task to depend on.</param>
-    /// <returns>True if the dependency was added; otherwise, false.</returns>
     public bool AddDependency(Guid taskId, Guid dependencyId)
     {
         var task = TaskCenter.Instance.GetTask(taskId);
@@ -555,7 +496,6 @@ public sealed class TaskSystem
             {
                 task.Dependencies.Add(dependencyId);
                 TaskCenter.Instance.UpdateTask(task);
-                Persist();
                 return true;
             }
         }
@@ -575,22 +515,15 @@ public sealed class TaskSystem
         {
             task.Dependencies.Remove(dependencyId);
             TaskCenter.Instance.UpdateTask(task);
-            Persist();
         }
     }
 
-    /// <summary>
-    /// Deletes a task (cannot delete running tasks).
-    /// </summary>
-    /// <param name="taskId">The ID of the task to delete.</param>
-    /// <returns>True if the task was deleted; otherwise, false.</returns>
     public bool Delete(Guid taskId)
     {
         var task = TaskCenter.Instance.GetTask(taskId);
         if (task != null && task.Status != TaskStatus.Running)
         {
             TaskCenter.Instance.RemoveTask(taskId);
-            Persist();
             return true;
         }
 
@@ -618,14 +551,8 @@ public sealed class TaskSystem
                 TaskCenter.Instance.RemoveTask(task.Id);
             }
         }
-
-        Persist();
     }
 
-    /// <summary>
-    /// Gets statistics about the task system.
-    /// </summary>
-    /// <returns>A TaskStatistics object with counts for each status.</returns>
     public TaskStatistics GetStatistics()
     {
         var tasks = TaskCenter.Instance.GetTasksForBeing(OwnerId).ToList();
@@ -634,6 +561,9 @@ public sealed class TaskSystem
             Total = tasks.Count,
             Pending = tasks.Count(t => t.Status == TaskStatus.Pending),
             Running = tasks.Count(t => t.Status == TaskStatus.Running),
+            SubmittedForReview = tasks.Count(t => t.Status == TaskStatus.SubmittedForReview),
+            UnderReview = tasks.Count(t => t.Status == TaskStatus.UnderReview),
+            Rework = tasks.Count(t => t.Status == TaskStatus.Rework),
             Completed = tasks.Count(t => t.Status == TaskStatus.Completed),
             Failed = tasks.Count(t => t.Status == TaskStatus.Failed),
             Cancelled = tasks.Count(t => t.Status == TaskStatus.Cancelled)
