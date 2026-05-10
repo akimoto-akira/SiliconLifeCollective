@@ -22,7 +22,7 @@ public class TimerExecutionHistoryView : ViewBase
         var vm = model as TimerExecutionHistoryViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.TimerExecutionHistoryTitle, "timer-execution-history", vm.Localization, body, GetScripts(vm), GetStyles(), "timer");
+        return RenderPage(vm.Skin, vm.Localization.TimerExecutionHistoryTitle, "timer-cycle-history", vm.Localization, body, GetScripts(vm), GetStyles(), "timer");
     }
 
     private static H RenderBody(TimerExecutionHistoryViewModel vm)
@@ -132,8 +132,8 @@ public class TimerExecutionHistoryView : ViewBase
                 () => new List<string>(),
                 () => Js.Assign(
                     () => Js.Id(() => "window").Prop(() => "location"),
-                    () => Js.Str(() => "/timer-execution/")
-                        .Op(() => "+", () => Js.Id(() => "e").Prop(() => "executionId"))
+                    () => Js.Str(() => "/timer-cycle/")
+                        .Op(() => "+", () => Js.Id(() => "e").Prop(() => "cycleIndex"))
                         .Op(() => "+", () => Js.Str(() => "?timerId="))
                         .Op(() => "+", () => Js.Id(() => "timerId"))
                 )
@@ -161,7 +161,7 @@ public class TimerExecutionHistoryView : ViewBase
         var loadBody = Js.Block()
             .Add(() => Js.Const(() => "emptyMessage", () => Js.Str(() => vm.Localization.TimerExecutionNoRecords)))
             .Add(() => Js.Id(() => "fetch")
-                .Invoke(() => Js.Str(() => "/api/timer-executions/list?timerId=").Op(() => "+", () => Js.Id(() => "timerId")))
+                .Invoke(() => Js.Str(() => "/api/timer-cycles/list?timerId=").Op(() => "+", () => Js.Id(() => "timerId")))
                 .Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json")))
                 .Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
 
@@ -187,8 +187,8 @@ public class TimerExecutionHistoryView : ViewBase
                     .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>")),
                 () => Js.Str(() => "")
             ))
-            .Op(() => "+", () => Js.Str(() => "<div class='execution-info'><span class='execution-info-label'>Steps:</span>"))
-            .Op(() => "+", () => (JsSyntax)Js.Id(() => "e").Prop(() => "stepCount"))
+            .Op(() => "+", () => Js.Str(() => "<div class='execution-info'><span class='execution-info-label'>Rounds:</span>"))
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "e").Prop(() => "roundCount"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => " | Messages: "))
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "e").Prop(() => "messageCount"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"));

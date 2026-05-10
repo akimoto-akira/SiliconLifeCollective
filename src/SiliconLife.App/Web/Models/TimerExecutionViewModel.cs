@@ -32,7 +32,7 @@ public class TimerExecutionItem
     public string TriggeredAt { get; set; } = "";
     public string? CompletedAt { get; set; }
     public string State { get; set; } = "";
-    public int StepCount { get; set; }
+    public int RoundCount { get; set; }
     public int MessageCount { get; set; }
 }
 
@@ -42,7 +42,7 @@ public class TimerExecutionItem
 public class TimerExecutionDetailViewModel : ViewModelBase
 {
     public Guid TimerId { get; set; }
-    public string ExecutionId { get; set; } = "";
+    public int CycleIndex { get; set; }
     public string TimerName { get; set; } = "";
     public string TriggeredAt { get; set; } = "";
     public string? CompletedAt { get; set; }

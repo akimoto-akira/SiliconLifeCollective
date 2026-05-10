@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -59,10 +59,10 @@ public class Router
         RegisterController(() => new ChatHistoryController(), "/broadcast-history-detail");
         RegisterController(() => new TimerController(), "/timers");
         RegisterController(() => new TimerController(), "/api/timers/list");
-        RegisterController(() => new TimerController(), "/timer-executions/{timerId}");
-        RegisterController(() => new TimerController(), "/api/timer-executions/list");
-        RegisterController(() => new TimerController(), "/timer-execution/{executionId}");
-        RegisterController(() => new TimerController(), "/api/timer-execution/messages");
+        RegisterController(() => new TimerController(), "/timer-cycles/{timerId}");
+        RegisterController(() => new TimerController(), "/api/timer-cycles/list");
+        RegisterController(() => new TimerController(), "/timer-cycle/{cycleIndex}");
+        RegisterController(() => new TimerController(), "/api/timer-cycle/messages");
         RegisterController(() => new TaskController(), "/tasks");
         RegisterController(() => new TaskController(), "/api/tasks/list");
         RegisterController(() => new PermissionController(), "/permissions");

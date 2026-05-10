@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -156,7 +156,8 @@ public class InitController : Controller
                     .Add(H.Meta().Attr("name", "viewport").Attr("content", "width=device-width, initial-scale=1"))
                     .Add(H.Title($"{_localization.InitPageTitle} - Silicon Life Collective"))
                     .Add(H.Style(GetStyles()))
-                    .Add(H.Script(GetSkinSwitchScript().Build())))
+                    .Add(H.Script(GetSkinSwitchScript().Build()))
+                    .AddRendered(SelectComponent.GetSearchableGlobalScript()))
                 .Add(H.Body()
                     .AddRendered(page.Render())
                 )
@@ -169,6 +170,7 @@ public class InitController : Controller
     {
         var currentLang = _localization.LanguageCode;
         var select = new SelectComponent().Name("language").Id("languageSelect")
+            .Searchable()
             .Attr("data-current", currentLang)
             .Attr("onchange", "switchLanguage(this.value)");
 
@@ -276,6 +278,7 @@ public class InitController : Controller
         var select = new SelectComponent()
             .Name("aiClientType")
             .Id("aiClientTypeSelect")
+            .Searchable()
             .Attr("onchange", "onClientTypeChange(this.value)");
 
         string? currentType = _configData.AIClientType;
@@ -741,7 +744,7 @@ public class InitController : Controller
         // getCurrentAIConfigValues function
         var getCurrentValuesBody = Js.Block()
             .Add(() => Js.Const(() => "values", () => Js.Obj()))
-            .Add(() => Js.Const(() => "inputs", () => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => "#aiConfigFields input"))))
+            .Add(() => Js.Const(() => "inputs", () => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => "#aiConfigFields input[name^='ai_']"))))
             .Add(() => Js.Id(() => "inputs").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "input" }, () => Js.Block()
                 .Add(() => Js.Assign(() => Js.Id(() => "values").Index(() => Js.Id(() => "input").Prop(() => "name").Call(() => "substring", () => Js.Str(() => "3"))), () => Js.Id(() => "input").Prop(() => "value")))
             )))
@@ -812,31 +815,18 @@ public class InitController : Controller
             .Add(() => Js.Assign(() => Js.Id(() => "labelEl").Prop(() => "textContent"), () => Js.Id(() => "label")))
             .Add(() => Js.Id(() => "div").Call(() => "appendChild", () => Js.Id(() => "labelEl")));
         
-        // If has options, render select dropdown; otherwise render input text box
-        var optionForEachBody = Js.Block()
-            .Add(() => Js.Const(() => "option", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "option"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "option").Prop(() => "value"), () => Js.Id(() => "optKey")))
-            .Add(() => Js.Assign(() => Js.Id(() => "option").Prop(() => "textContent"), () => Js.Id(() => "field").Prop(() => "options").Index(() => Js.Id(() => "optKey"))))
-            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
-            {
-                { (Js.Id(() => "optKey").Op(() => "===", () => (JsSyntax)Js.Id(() => "value")), new List<JsSyntax>
-                    {
-                        Js.Assign(() => Js.Id(() => "option").Prop(() => "selected"), () => Js.Bool(() => true))
-                    })
-                }
-            }))
-            .Add(() => Js.Id(() => "select").Call(() => "appendChild", () => Js.Id(() => "option")));
-                
         var selectRenderingBody = Js.Block()
-            .Add(() => Js.Const(() => "select", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "select"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "select").Prop(() => "name"), () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "select").Prop(() => "id"), () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key"))))
-            .Add(() => Js.Id(() => "Object").Call(() => "keys", () => Js.Id(() => "field").Prop(() => "options")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "optKey" }, () => optionForEachBody)).Stmt())
-            // Bind onchange event to trigger refresh with current values
-            .Add(() => Js.Id(() => "select").Call(() => "addEventListener", () => Js.Str(() => "change"), () => Js.Arrow(() => new List<string>(), () => Js.Block()
-                .Add(() => Js.Id(() => "refreshAIConfigFields").Invoke().Stmt())
-            )))
-            .Add(() => Js.Id(() => "div").Call(() => "appendChild", () => Js.Id(() => "select")));
+            .Add(() => Js.Id(() => "window").Prop(() => "slSelectSearch_create").Invoke(
+                () => Js.Id(() => "div"),
+                () => Js.Obj()
+                    .Prop(() => "name", () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key")))
+                    .Prop(() => "id", () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key")))
+                    .Prop(() => "value", () => Js.Id(() => "value"))
+                    .Prop(() => "options", () => Js.Id(() => "field").Prop(() => "options"))
+                    .Prop(() => "onchange", () => Js.Arrow(() => new List<string>(), () => Js.Block()
+                        .Add(() => Js.Id(() => "refreshAIConfigFields").Invoke().Stmt())
+                    ))
+            ).Stmt());
                 
         var inputRenderingBody = Js.Block()
             .Add(() => Js.Const(() => "input", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "input"))))
@@ -869,7 +859,7 @@ public class InitController : Controller
             .Add(() => Js.Const(() => "clientType", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "aiClientTypeSelect")).Prop(() => "value")))
             // Collect all current AI config values
             .Add(() => Js.Const(() => "currentValues", () => Js.Obj()))
-            .Add(() => Js.Const(() => "allInputs", () => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => "#aiConfigFields input, #aiConfigFields select"))))
+            .Add(() => Js.Const(() => "allInputs", () => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => "#aiConfigFields input[name^='ai_'], #aiConfigFields select"))))
             .Add(() => Js.Id(() => "allInputs").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "el" }, () => Js.Block()
                 .Add(() => Js.Assign(() => Js.Id(() => "currentValues").Index(() => Js.Id(() => "el").Prop(() => "name")), () => Js.Id(() => "el").Prop(() => "value")))
             )));

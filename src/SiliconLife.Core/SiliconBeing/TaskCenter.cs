@@ -58,14 +58,14 @@ public class TaskCenter
 
         try
         {
-            TaskItem[] tasks = _storage.Read<TaskItem>(StorageKey);
+            List<TaskItem>? tasks = _storage.Read<List<TaskItem>>(StorageKey).FirstOrDefault();
             if (tasks != null)
             {
                 foreach (var task in tasks)
                 {
                     _tasks.TryAdd(task.Id, task);
                 }
-                _logger.Info(null, "TaskCenter loaded {0} task(s) from storage", tasks.Length);
+                _logger.Info(null, "TaskCenter loaded {0} task(s) from storage", tasks.Count);
             }
         }
         catch (Exception ex)

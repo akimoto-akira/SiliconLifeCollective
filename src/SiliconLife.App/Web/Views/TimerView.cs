@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -199,7 +199,7 @@ public class TimerView : ViewBase
             () => Js.Str(() => $"<div class='timer-info'><span class='timer-info-label'>{loc.TimersCalendarLabel}</span>").Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "calendarDescription")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>")),
             () => Js.Str(() => ""));
 
-        var viewHistoryLink = Js.Str(() => "<div class='timer-info'><a href='/timer-executions/")
+        var viewHistoryLink = Js.Str(() => "<div class='timer-info'><a href='/timer-cycles/")
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "id"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "' class='view-history-link'>"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.TimerViewExecutionHistory))

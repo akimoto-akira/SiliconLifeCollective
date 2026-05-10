@@ -225,95 +225,17 @@ public sealed class TimerItem
     public TimerExecutionState ExecutionState { get; set; } = TimerExecutionState.Idle;
 
     /// <summary>
-    /// Gets or sets the current execution step number.
+    /// Gets or sets the current AI interaction round within this execution cycle.
+    /// Each round represents one AI call (which may include tool calls that need follow-up).
     /// </summary>
-    public int CurrentStep { get; set; } = 0;
+    public int CurrentRound { get; set; } = 0;
 
     /// <summary>
-    /// Gets or sets the maximum steps allowed (prevent infinite loops).
+    /// Gets or sets the maximum AI interaction rounds allowed per execution cycle (prevent infinite loops).
     /// </summary>
-    public int MaxSteps { get; set; } = 20;
+    public int MaxRounds { get; set; } = 20;
 
-    /// <summary>
-    /// Gets or sets the file path of the current execution context (optional, for reference).
-    /// </summary>
-    public string? CurrentExecutionFile { get; set; }
 
-    /// <summary>
-    /// Gets all execution history files for this timer.
-    /// Returns a list of TimerExecution objects sorted by triggered time (newest first).
-    /// </summary>
-    public List<TimerExecution> GetExecutionHistory()
-    {
-        var result = new List<TimerExecution>();
-
-        if (string.IsNullOrEmpty(CurrentExecutionFile))
-            return result;
-
-        var execDir = Path.GetDirectoryName(CurrentExecutionFile);
-        if (string.IsNullOrEmpty(execDir) || !Directory.Exists(execDir))
-            return result;
-
-        var files = Directory.GetFiles(execDir, "*.json")
-            .OrderByDescending(f => new FileInfo(f).CreationTime);
-
-        foreach (var file in files)
-        {
-            try
-            {
-                var execution = TimerExecution.Load(file);
-                if (execution != null && execution.TimerId == Id)
-                {
-                    result.Add(execution);
-                }
-            }
-            catch
-            {
-                // Skip invalid files
-            }
-        }
-
-        return result;
-    }
-
-    /// <summary>
-    /// Gets a specific execution by ID.
-    /// </summary>
-    /// <param name="executionId">The execution ID to find</param>
-    /// <returns>The TimerExecution if found, otherwise null</returns>
-    public TimerExecution? GetExecution(Guid executionId)
-    {
-        if (string.IsNullOrEmpty(CurrentExecutionFile))
-            return null;
-
-        var execDir = Path.GetDirectoryName(CurrentExecutionFile);
-        if (string.IsNullOrEmpty(execDir) || !Directory.Exists(execDir))
-            return null;
-
-        // Try direct lookup by ExecutionId-based filename first
-        var execFile = Path.Combine(execDir, $"{executionId}.json");
-        var execution = TimerExecution.Load(execFile);
-        if (execution != null && execution.TimerId == Id)
-            return execution;
-
-        // Fallback: scan all files for matching ExecutionId (supports old format filenames)
-        var files = Directory.GetFiles(execDir, "*.json");
-        foreach (var file in files)
-        {
-            try
-            {
-                var ex = TimerExecution.Load(file);
-                if (ex != null && ex.ExecutionId == executionId && ex.TimerId == Id)
-                    return ex;
-            }
-            catch
-            {
-                // Skip invalid files
-            }
-        }
-
-        return null;
-    }
 
     /// <summary>
     /// Initializes a new instance of the TimerItem class.
@@ -609,8 +531,8 @@ public sealed class TimerSystem
     {
         try
         {
-            TimerItem[] timers = _storage.Read<TimerItem>(_storageKey);
-            _timers = timers?.ToList() ?? new List<TimerItem>();
+            List<TimerItem>? timers = _storage.Read<List<TimerItem>>(_storageKey).FirstOrDefault();
+            _timers = timers ?? new List<TimerItem>();
 
             foreach (TimerItem timer in _timers.Where(t => t.Status == TimerStatus.Triggered))
             {
@@ -1063,88 +985,5 @@ public sealed class TimerSystem
                 .OrderBy(t => t.TriggerTime)
                 .FirstOrDefault();
         }
-    }
-}
-
-/// <summary>
-/// Represents a single timer execution with full context.
-/// Reuses ChatMessage structure for message history.
-/// </summary>
-public sealed class TimerExecution
-{
-    /// <summary>
-    /// Unique execution identifier.
-    /// </summary>
-    public Guid ExecutionId { get; set; } = Guid.NewGuid();
-
-    /// <summary>
-    /// Associated timer ID.
-    /// </summary>
-    public Guid TimerId { get; set; }
-
-    /// <summary>
-    /// Timer name (for display).
-    /// </summary>
-    public string TimerName { get; set; } = "";
-
-    /// <summary>
-    /// Trigger timestamp.
-    /// </summary>
-    public DateTime TriggeredAt { get; set; }
-
-    /// <summary>
-    /// Completion timestamp (null if still running).
-    /// </summary>
-    public DateTime? CompletedAt { get; set; }
-
-    /// <summary>
-    /// Current execution state.
-    /// </summary>
-    public TimerExecutionState State { get; set; } = TimerExecutionState.Idle;
-
-    /// <summary>
-    /// Current step number.
-    /// </summary>
-    public int CurrentStep { get; set; } = 0;
-
-    /// <summary>
-    /// Message history (reuses ChatMessage structure).
-    /// </summary>
-    public List<ChatMessage> Messages { get; set; } = new();
-
-    /// <summary>
-    /// File path for persistence.
-    /// </summary>
-    public string FilePath { get; set; } = "";
-
-    /// <summary>
-    /// Load execution from JSON file.
-    /// </summary>
-    /// <param name="filePath">Path to the JSON file</param>
-    /// <returns>The loaded TimerExecution, or null if file doesn't exist</returns>
-    public static TimerExecution? Load(string filePath)
-    {
-        if (!File.Exists(filePath)) return null;
-        string json = File.ReadAllText(filePath);
-        var execution = JsonSerializer.Deserialize<TimerExecution>(json);
-        if (execution != null)
-            execution.FilePath = filePath;
-        return execution;
-    }
-
-    /// <summary>
-    /// Save execution to JSON file.
-    /// </summary>
-    public void Save()
-    {
-        string? directory = Path.GetDirectoryName(FilePath);
-        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-            Directory.CreateDirectory(directory);
-
-        string json = JsonSerializer.Serialize(this, new JsonSerializerOptions
-        {
-            WriteIndented = true
-        });
-        File.WriteAllText(FilePath, json);
     }
 }

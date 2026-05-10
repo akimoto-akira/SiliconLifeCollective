@@ -1220,7 +1220,7 @@ public class ContextManager
         DeliverTimerOutput(startMessage);
 
         timer.ExecutionState = TimerExecutionState.Started;
-        timer.CurrentStep = 0;
+        timer.CurrentRound = 0;
 
         string scenarioContext = BuildTimerScenarioContext(timer);
 
@@ -1234,7 +1234,7 @@ public class ContextManager
         cycle.Messages.AddRange(_messages);
 
         AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Timer);
-        timer.CurrentStep++;
+        timer.CurrentRound++;
 
         if (!response.Success)
         {
@@ -1265,20 +1265,20 @@ public class ContextManager
 
     private AIResponse ExecuteTimerContinue(TimerItem timer, LocalizationBase loc)
     {
-        timer.CurrentStep++;
+        timer.CurrentRound++;
 
-        if (timer.CurrentStep > timer.MaxSteps)
+        if (timer.CurrentRound > timer.MaxRounds)
         {
-            _logger.Warn(_being.Id, "Timer {0}: Max steps ({1}) reached", timer.Name, timer.MaxSteps);
+            _logger.Warn(_being.Id, "Timer {0}: Max rounds ({1}) reached", timer.Name, timer.MaxRounds);
             timer.ExecutionState = TimerExecutionState.Completed;
             timer.SealCurrentCycle(TimerExecutionState.Failed);
-            string endMessage = loc.FormatTimerEndNotification(timer.Name, "Timer executed (max steps reached)");
+            string endMessage = loc.FormatTimerEndNotification(timer.Name, "Timer executed (max rounds reached)");
             DeliverTimerOutput(endMessage);
             _being.TimerSystem?.Save();
-            return AIResponse.Failed("Max steps reached");
+            return AIResponse.Failed("Max rounds reached");
         }
 
-        _logger.Info(_being.Id, "Timer continue step {0}: {1}", timer.CurrentStep, timer.Name);
+        _logger.Info(_being.Id, "Timer continue round {0}: {1}", timer.CurrentRound, timer.Name);
 
         string scenarioContext = BuildTimerScenarioContext(timer);
         AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Timer);

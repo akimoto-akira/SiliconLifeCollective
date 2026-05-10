@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -37,13 +37,13 @@ public class TimerController : Controller
             Index();
         else if (path == "/api/timers/list")
             GetList();
-        else if (path.StartsWith("/timer-executions/"))
+        else if (path.StartsWith("/timer-cycles/"))
             ShowExecutionHistory();
-        else if (path == "/api/timer-executions/list")
+        else if (path == "/api/timer-cycles/list")
             GetExecutionList();
-        else if (path.StartsWith("/timer-execution/"))
+        else if (path.StartsWith("/timer-cycle/"))
             ShowExecutionDetail();
-        else if (path == "/api/timer-execution/messages")
+        else if (path == "/api/timer-cycle/messages")
             GetExecutionMessages();
         else
         {
@@ -223,10 +223,11 @@ public class TimerController : Controller
             triggeredAt = c.TriggerTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? c.StartedAt.ToString("yyyy-MM-dd HH:mm:ss"),
             completedAt = c.EndedAt?.ToString("yyyy-MM-dd HH:mm:ss"),
             state = c.EndStatus ?? c.StartStatus,
+            roundCount = c.Messages.Count(m => m.Role == MessageRole.Assistant),
             messageCount = c.Messages.Count
         }).ToList();
 
-        _logger.Info(null, "GetExecutionList: Returning {0} executions for timer {1}", result.Count, timerId);
+        _logger.Info(null, "GetExecutionList: Returning {0} cycles for timer {1}", result.Count, timerId);
         RenderJson(result);
     }
 
@@ -265,7 +266,7 @@ public class TimerController : Controller
             Skin = skin,
             ActiveMenu = "timers",
             TimerId = timerId,
-            ExecutionId = cycleIndex.ToString(),
+            CycleIndex = cycleIndex,
             TimerName = timer.Name,
             TriggeredAt = (cycle.TriggerTime ?? cycle.StartedAt).ToString("yyyy-MM-dd HH:mm:ss"),
             CompletedAt = cycle.EndedAt?.ToString("yyyy-MM-dd HH:mm:ss"),

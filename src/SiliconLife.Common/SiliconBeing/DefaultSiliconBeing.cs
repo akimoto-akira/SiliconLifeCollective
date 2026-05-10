@@ -287,8 +287,8 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 {
                     TimerItem timer = timersToProcess[0];
                     _activityRaw = (int)BeingActivity.Timer;
-                    _logger.Info(Id, "Being {0}: processing timer {1} (state={2}, step={3})",
-                        Name, timer.Name, timer.ExecutionState, timer.CurrentStep);
+                    _logger.Info(Id, "Being {0}: processing timer {1} (state={2}, round={3})",
+                        Name, timer.Name, timer.ExecutionState, timer.CurrentRound);
 
                     if (!ExecuteBrain("ThinkOnTimer", null, _ => new ContextManager(this, timer).ThinkOnTimer(timer)))
                         errorOccurred = true;

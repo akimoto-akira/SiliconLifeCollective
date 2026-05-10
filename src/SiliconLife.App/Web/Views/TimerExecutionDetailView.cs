@@ -25,16 +25,16 @@ public class TimerExecutionDetailView : ViewBase
         var scripts = GetScripts(vm);
         var styles = GetStyles();
         
-        return RenderPage(vm.Skin, vm.Localization.TimerExecutionDetailTitle, "timer-execution-detail", vm.Localization, body, scripts, styles, "timer");
+        return RenderPage(vm.Skin, vm.Localization.TimerExecutionDetailTitle, "timer-cycle-detail", vm.Localization, body, scripts, styles, "timer");
     }
 
     private static H RenderBody(TimerExecutionDetailViewModel vm)
     {
         return H.Div(
             H.Div(
-                H.A("← Back to Execution History").Href($"/timer-executions/{vm.TimerId}").Class("back-link"),
+                H.A("← Back to Execution History").Href($"/timer-cycles/{vm.TimerId}").Class("back-link"),
                 H.H1(vm.Localization.TimerExecutionDetailHeader),
-                H.P($"{vm.Localization.TimerExecutionTimerName.Replace("{0}", vm.TimerName)} | Execution: {vm.ExecutionId}").Class("page-subtitle")
+                H.P($"{vm.Localization.TimerExecutionTimerName.Replace("{0}", vm.TimerName)} | Cycle #{vm.CycleIndex}").Class("page-subtitle")
             ).Class("page-header"),
             H.Div().Id("message-list").Class("message-list"),
             H.Div(
@@ -53,7 +53,7 @@ public class TimerExecutionDetailView : ViewBase
     private static JsSyntax GetScripts(TimerExecutionDetailViewModel vm)
     {
         // Reuse ChatHistoryDetailView scripts logic
-        var apiUrl = $"/api/timer-execution/messages?executionId={vm.ExecutionId}&timerId={vm.TimerId}";
+        var apiUrl = $"/api/timer-cycle/messages?cycleIndex={vm.CycleIndex}&timerId={vm.TimerId}";
         return ChatHistoryDetailView.GetScriptsStatic(vm.ToolDisplayNames, apiUrl, "No messages in this execution");
     }
 }
