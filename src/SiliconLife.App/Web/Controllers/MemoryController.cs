@@ -252,7 +252,8 @@ public class MemoryController : Controller
         {
             return new PComponent(loc.MemoryTimelineEmptyState)
                 .Style(new CssBuilder().InlineProperty("text-align", "center").InlineProperty("padding", "40px").InlineProperty("color", "var(--text-secondary)"))
-                .Render();
+                .Render()
+                .Build();
         }
 
         var grouped = entries
@@ -428,7 +429,7 @@ public class MemoryController : Controller
             tree.Add(yearDetails);
         }
 
-        return tree.Render();
+        return tree.Render().Build();
     }
 
     private static DivComponent BuildSummaryBlock(string label, string content,

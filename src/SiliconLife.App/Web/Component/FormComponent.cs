@@ -96,7 +96,7 @@ public class FormComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var form = H.Form();
 
@@ -124,9 +124,9 @@ public class FormComponent : ComponentBase
 
         foreach (var child in _children)
         {
-            form.AddRendered(child.Render());
+            form.Add(child.Render());
         }
 
-        return form.Build();
+        return form;
     }
 }

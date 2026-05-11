@@ -75,7 +75,7 @@ public class LabelComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var label = H.Label()
             .Text(H.Escape(_text));
@@ -97,6 +97,6 @@ public class LabelComponent : ComponentBase
             label.Attr(kvp.Key, kvp.Value);
         }
 
-        return label.Build();
+        return label;
     }
 }

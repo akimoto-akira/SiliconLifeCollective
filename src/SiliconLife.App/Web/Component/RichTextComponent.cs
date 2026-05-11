@@ -49,7 +49,7 @@ public class RichTextComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var editor = H.Div();
 
@@ -69,7 +69,6 @@ public class RichTextComponent : ComponentBase
             editor.Attr(kvp.Key, kvp.Value);
         }
 
-        // Toolbar
         var toolbar = H.Div().Class("rich-text-toolbar");
         toolbar.Add(H.Button().Text("B").Class("toolbar-btn").Attr("data-command", "bold"));
         toolbar.Add(H.Button().Text("I").Class("toolbar-btn").Attr("data-command", "italic"));
@@ -79,7 +78,6 @@ public class RichTextComponent : ComponentBase
         toolbar.Add(H.Button().Text("List").Class("toolbar-btn").Attr("data-command", "insertUnorderedList"));
         editor.Add(toolbar);
 
-        // Editor content area
         var contentArea = H.Div()
             .Class("rich-text-content")
             .Attr("contenteditable", _readonly ? "false" : "true")
@@ -92,6 +90,6 @@ public class RichTextComponent : ComponentBase
 
         editor.Add(contentArea);
 
-        return editor.Build();
+        return editor;
     }
 }

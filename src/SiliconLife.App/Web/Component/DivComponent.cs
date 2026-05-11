@@ -85,7 +85,7 @@ public class DivComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var div = H.Div();
 
@@ -111,10 +111,10 @@ public class DivComponent : ComponentBase
         {
             foreach (var child in _children)
             {
-                div.AddRendered(child.Render());
+                div.Add(child.Render());
             }
         }
 
-        return div.Build();
+        return div;
     }
 }

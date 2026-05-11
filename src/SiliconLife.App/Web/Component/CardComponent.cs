@@ -59,7 +59,7 @@ public class CardComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var card = H.Div();
 
@@ -79,7 +79,6 @@ public class CardComponent : ComponentBase
             card.Attr(kvp.Key, kvp.Value);
         }
 
-        // Header
         if (_header != null || !string.IsNullOrEmpty(_title))
         {
             var headerDiv = H.Div().Class("card-header");
@@ -89,27 +88,25 @@ public class CardComponent : ComponentBase
             }
             if (_header != null)
             {
-                headerDiv.AddRendered(_header.Render());
+                headerDiv.Add(_header.Render());
             }
             card.Add(headerDiv);
         }
 
-        // Body
         if (_body != null)
         {
             var bodyDiv = H.Div().Class("card-body");
-            bodyDiv.AddRendered(_body.Render());
+            bodyDiv.Add(_body.Render());
             card.Add(bodyDiv);
         }
 
-        // Footer
         if (_footer != null)
         {
             var footerDiv = H.Div().Class("card-footer");
-            footerDiv.AddRendered(_footer.Render());
+            footerDiv.Add(_footer.Render());
             card.Add(footerDiv);
         }
 
-        return card.Build();
+        return card;
     }
 }

@@ -104,7 +104,7 @@ public class ButtonComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var button = H.Button()
             .Attr("type", _type)
@@ -130,6 +130,6 @@ public class ButtonComponent : ComponentBase
         if (!string.IsNullOrEmpty(_onclick))
             button.OnClick(_onclick);
 
-        return button.Build();
+        return button;
     }
 }

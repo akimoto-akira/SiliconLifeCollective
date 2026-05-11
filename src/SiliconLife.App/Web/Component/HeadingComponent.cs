@@ -71,7 +71,7 @@ public class HeadingComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var heading = H.Create(_tag);
 
@@ -94,6 +94,6 @@ public class HeadingComponent : ComponentBase
             heading.Add(H.Span(H.Escape(_text)));
         }
 
-        return heading.Build();
+        return heading;
     }
 }

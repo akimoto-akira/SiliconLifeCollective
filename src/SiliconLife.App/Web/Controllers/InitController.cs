@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -157,9 +157,9 @@ public class InitController : Controller
                     .Add(H.Title($"{_localization.InitPageTitle} - Silicon Life Collective"))
                     .Add(H.Style(GetStyles()))
                     .Add(H.Script(GetSkinSwitchScript().Build()))
-                    .AddRendered(SelectComponent.GetSearchableGlobalScript()))
+                    .Add(SelectComponent.GetSearchableGlobalScript()))
                 .Add(H.Body()
-                    .AddRendered(page.Render())
+                    .Add(page.Render())
                 )
                 .Build();
 

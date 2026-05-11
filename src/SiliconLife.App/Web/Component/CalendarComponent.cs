@@ -39,7 +39,7 @@ public class CalendarComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var calendar = H.Div();
 
@@ -59,14 +59,12 @@ public class CalendarComponent : ComponentBase
             calendar.Attr(kvp.Key, kvp.Value);
         }
 
-        // Header
         var header = H.Div().Class("calendar-header");
         header.Add(H.Button().Text("◀").Class("calendar-prev"));
         header.Add(H.H3($"{_date:yyyy年MM月}").Class("calendar-title"));
         header.Add(H.Button().Text("▶").Class("calendar-next"));
         calendar.Add(header);
 
-        // Weekday headers
         var weekdays = H.Div().Class("calendar-weekdays");
         var dayNames = new[] { "日", "一", "二", "三", "四", "五", "六" };
         foreach (var day in dayNames)
@@ -75,19 +73,16 @@ public class CalendarComponent : ComponentBase
         }
         calendar.Add(weekdays);
 
-        // Days grid
         var daysGrid = H.Div().Class("calendar-days");
         var firstDay = new DateTime(_date.Year, _date.Month, 1);
         var daysInMonth = DateTime.DaysInMonth(_date.Year, _date.Month);
         var startDayOfWeek = (int)firstDay.DayOfWeek;
 
-        // Empty cells before first day
         for (int i = 0; i < startDayOfWeek; i++)
         {
             daysGrid.Add(H.Div().Class("calendar-day empty"));
         }
 
-        // Day cells
         for (int day = 1; day <= daysInMonth; day++)
         {
             var isToday = day == DateTime.Today.Day && 
@@ -100,6 +95,6 @@ public class CalendarComponent : ComponentBase
 
         calendar.Add(daysGrid);
 
-        return calendar.Build();
+        return calendar;
     }
 }

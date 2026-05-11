@@ -59,7 +59,7 @@ public class MessageComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var message = H.Div();
 
@@ -79,7 +79,6 @@ public class MessageComponent : ComponentBase
             message.Attr(kvp.Key, kvp.Value);
         }
 
-        // Avatar
         if (!string.IsNullOrEmpty(_avatar))
         {
             message.Add(H.Img()
@@ -88,10 +87,8 @@ public class MessageComponent : ComponentBase
                 .Attr("alt", "avatar"));
         }
 
-        // Message body
         var bodyDiv = H.Div().Class("message-body");
 
-        // Sender and time
         if (!string.IsNullOrEmpty(_sender) || _time.HasValue)
         {
             var metaDiv = H.Div().Class("message-meta");
@@ -106,19 +103,15 @@ public class MessageComponent : ComponentBase
             bodyDiv.Add(metaDiv);
         }
 
-        // Content
         bodyDiv.Add(H.Div(H.Escape(_content)).Class("message-content"));
 
         message.Add(bodyDiv);
 
-        return message.Build();
+        return message;
     }
 
-    /// <summary>
-    /// Quickly build message HTML (for SSE push)
-    /// </summary>
     public string Build()
     {
-        return Render();
+        return Render().Build();
     }
 }

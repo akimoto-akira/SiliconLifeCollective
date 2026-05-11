@@ -29,7 +29,7 @@ public class TreeComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var tree = H.Ul();
 
@@ -54,7 +54,7 @@ public class TreeComponent : ComponentBase
             tree.Add(RenderNode(node));
         }
 
-        return tree.Build();
+        return tree;
     }
 
     private H RenderNode(TreeNode node)

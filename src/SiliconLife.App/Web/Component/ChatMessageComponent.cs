@@ -159,7 +159,7 @@ public class ChatMessageComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         if (_isUser)
         {
@@ -168,7 +168,7 @@ public class ChatMessageComponent : ComponentBase
         return RenderBeingMessage();
     }
 
-    private string RenderUserMessage()
+    private H RenderUserMessage()
     {
         var bubble = H.Div(_text).Class("msg-user-bubble");
         var content = H.Div(bubble).Class("msg-user-content");
@@ -192,10 +192,10 @@ public class ChatMessageComponent : ComponentBase
         foreach (var kvp in Attributes)
             wrapper.Attr(kvp.Key, kvp.Value);
         
-        return wrapper.Build();
+        return wrapper;
     }
 
-    private string RenderBeingMessage()
+    private H RenderBeingMessage()
     {
         var beingDisplayName = !string.IsNullOrEmpty(_senderName) ? _senderName : _defaultBeingName;
         var avatar = H.Div(
@@ -275,11 +275,8 @@ public class ChatMessageComponent : ComponentBase
         foreach (var kvp in Attributes)
             wrapper.Attr(kvp.Key, kvp.Value);
         
-        return wrapper.Build();
+        return wrapper;
     }
 
-    /// <summary>
-    /// Quickly build message HTML
-    /// </summary>
-    public string Build() => Render();
+    public string Build() => Render().Build();
 }

@@ -82,7 +82,7 @@ public class AComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var a = H.A();
 
@@ -108,6 +108,6 @@ public class AComponent : ComponentBase
             a.Add(H.Span(H.Escape(_text)));
         }
 
-        return a.Build();
+        return a;
     }
 }

@@ -69,7 +69,7 @@ public class TextareaComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var textarea = H.Textarea()
             .Text(H.Escape(_value));
@@ -99,6 +99,6 @@ public class TextareaComponent : ComponentBase
             textarea.Attr(kvp.Key, kvp.Value);
         }
 
-        return textarea.Build();
+        return textarea;
     }
 }

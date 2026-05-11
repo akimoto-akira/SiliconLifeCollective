@@ -58,7 +58,7 @@ public class BeingView : ViewBase
             .Add(beingsGrid)
             .Add(detailPanel);
 
-        return H.Div().AddRendered(pageContent.Render());
+        return H.Div().Add(pageContent.Render());
     }
 
     private static CssBuilder GetStyles()

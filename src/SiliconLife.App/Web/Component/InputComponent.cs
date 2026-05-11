@@ -135,7 +135,7 @@ public class InputComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var input = H.Input()
             .Attr("type", _type);
@@ -175,6 +175,6 @@ public class InputComponent : ComponentBase
             input.Attr(kvp.Key, kvp.Value);
         }
 
-        return input.Build();
+        return input;
     }
 }

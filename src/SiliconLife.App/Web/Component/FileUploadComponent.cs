@@ -59,7 +59,7 @@ public class FileUploadComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var upload = H.Div();
 
@@ -79,7 +79,6 @@ public class FileUploadComponent : ComponentBase
             upload.Attr(kvp.Key, kvp.Value);
         }
 
-        // File input
         var input = H.Input()
             .Attr("type", "file")
             .Class("file-upload-input");
@@ -95,12 +94,10 @@ public class FileUploadComponent : ComponentBase
 
         upload.Add(input);
 
-        // Upload button label
         upload.Add(H.Span(H.Escape(_label)).Class("file-upload-label"));
 
-        // File list display area
         upload.Add(H.Div().Class("file-upload-list"));
 
-        return upload.Build();
+        return upload;
     }
 }

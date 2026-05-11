@@ -29,7 +29,7 @@ public class AccordionComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var accordion = H.Div();
 
@@ -53,10 +53,8 @@ public class AccordionComponent : ComponentBase
         {
             var itemClass = item.IsOpen ? "" : " collapsed";
 
-            // Accordion item
             var itemDiv = H.Div().Class("accordion-item");
 
-            // Header
             var headerH2 = H.H2().Class("accordion-header").Id($"heading-{item.Id}");
             var button = H.Button()
                 .Class($"accordion-button{itemClass}")
@@ -69,7 +67,6 @@ public class AccordionComponent : ComponentBase
             headerH2.Add(button);
             itemDiv.Add(headerH2);
 
-            // Content
             var showClass = item.IsOpen ? " show" : "";
             var collapseDiv = H.Div()
                 .Id($"collapse-{item.Id}")
@@ -77,13 +74,13 @@ public class AccordionComponent : ComponentBase
                 .Attr("aria-labelledby", $"heading-{item.Id}")
                 .Attr("data-bs-parent", $"#{Id}");
             var bodyDiv = H.Div().Class("accordion-body");
-            bodyDiv.AddRendered(item.Content.Render());
+            bodyDiv.Add(item.Content.Render());
             collapseDiv.Add(bodyDiv);
             itemDiv.Add(collapseDiv);
 
             accordion.Add(itemDiv);
         }
 
-        return accordion.Build();
+        return accordion;
     }
 }

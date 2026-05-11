@@ -90,7 +90,7 @@ public class DetailsComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var details = H.Details();
 
@@ -111,20 +111,18 @@ public class DetailsComponent : ComponentBase
             details.Attr(kvp.Key, kvp.Value);
         }
 
-        // <summary> block - always visible
         var summary = H.Summary();
         foreach (var child in _summaryChildren)
         {
-            summary.AddRendered(child.Render());
+            summary.Add(child.Render());
         }
         details.Add(summary);
 
-        // Collapsible children - visible only when expanded
         foreach (var child in _children)
         {
-            details.AddRendered(child.Render());
+            details.Add(child.Render());
         }
 
-        return details.Build();
+        return details;
     }
 }

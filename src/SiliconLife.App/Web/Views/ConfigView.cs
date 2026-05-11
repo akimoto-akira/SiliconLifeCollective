@@ -94,7 +94,7 @@ public class ConfigView : ViewBase
                 H.H1(loc.ConfigPageHeader)
             ).Class("page-header"),
             H.Div(groupCards.ToArray()),
-            H.Create("div").AddRendered(SelectComponent.GetSearchableGlobalScript()).Style(new CssBuilder().InlineProperty("display", "none")),
+            H.Create("div").Add(SelectComponent.GetSearchableGlobalScript()).Style(new CssBuilder().InlineProperty("display", "none")),
             H.Div(
                 H.Div(
                     H.Div(

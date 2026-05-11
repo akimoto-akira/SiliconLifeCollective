@@ -71,7 +71,7 @@ public class TableComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var table = H.Table();
 
@@ -97,7 +97,6 @@ public class TableComponent : ComponentBase
             table.Attr(kvp.Key, kvp.Value);
         }
 
-        // Table head
         if (_headers.Count > 0)
         {
             var thead = H.Thead();
@@ -110,7 +109,6 @@ public class TableComponent : ComponentBase
             table.Add(thead);
         }
 
-        // Table body
         if (_rows.Count > 0)
         {
             var tbody = H.Tbody();
@@ -126,6 +124,6 @@ public class TableComponent : ComponentBase
             table.Add(tbody);
         }
 
-        return table.Build();
+        return table;
     }
 }

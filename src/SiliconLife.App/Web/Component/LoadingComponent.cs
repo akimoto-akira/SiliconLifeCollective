@@ -49,7 +49,7 @@ public class LoadingComponent : ComponentBase
         return this;
     }
 
-    public override H ToH()
+    public override H Render()
     {
         var cssClass = "loading-indicator";
         if (_active) cssClass += " loading-indicator-active";
@@ -66,8 +66,6 @@ public class LoadingComponent : ComponentBase
 
         return el;
     }
-
-    public override string Render() => ToH().Build();
 
     public static CssBuilder AddStyles(CssBuilder css)
     {

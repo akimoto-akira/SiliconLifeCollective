@@ -72,7 +72,7 @@ public class PComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var p = H.P();
 
@@ -95,6 +95,6 @@ public class PComponent : ComponentBase
             p.Add(H.Span(H.Escape(_text)));
         }
 
-        return p.Build();
+        return p;
     }
 }

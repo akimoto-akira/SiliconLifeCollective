@@ -109,22 +109,7 @@ public abstract class ComponentBase
         return SetAttr<T>(name, value);
     }
 
-    /// <summary>
-    /// Render component to HTML string
-    /// </summary>
-    public abstract string Render();
-
-    /// <summary>
-    /// Returns an <see cref="H"/> tree representing this component.
-    /// The default implementation wraps <see cref="Render"/> via <c>H.AddRendered</c>;
-    /// subclasses that build <see cref="H"/> trees natively should override this method.
-    /// </summary>
-    public virtual H ToH()
-    {
-        var wrapper = H.Div();
-        wrapper.AddRendered(Render());
-        return wrapper;
-    }
+    public abstract H Render();
 
     /// <summary>
     /// Generate HTML attributes string

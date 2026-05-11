@@ -83,7 +83,7 @@ public class SpanComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var span = H.Span();
 
@@ -109,10 +109,10 @@ public class SpanComponent : ComponentBase
         {
             foreach (var child in _children)
             {
-                span.AddRendered(child.Render());
+                span.Add(child.Render());
             }
         }
 
-        return span.Build();
+        return span;
     }
 }

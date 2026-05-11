@@ -49,7 +49,7 @@ public class ChartComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var chart = H.Div();
 
@@ -69,7 +69,6 @@ public class ChartComponent : ComponentBase
             chart.Attr(kvp.Key, kvp.Value);
         }
 
-        // Chart container with data attributes for JS chart library
         chart.Attr("data-chart-type", _chartType);
         chart.Attr("data-chart-data", System.Text.Json.JsonSerializer.Serialize(_data));
 
@@ -78,9 +77,8 @@ public class ChartComponent : ComponentBase
             chart.Add(H.H3(H.Escape(_title)).Class("chart-title"));
         }
 
-        // Placeholder div for chart rendering
         chart.Add(H.Div().Class("chart-canvas"));
 
-        return chart.Build();
+        return chart;
     }
 }

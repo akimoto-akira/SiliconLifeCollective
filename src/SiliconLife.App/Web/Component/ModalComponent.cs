@@ -69,7 +69,7 @@ public class ModalComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var modal = H.Div();
 
@@ -94,12 +94,10 @@ public class ModalComponent : ComponentBase
             modal.Attr(kvp.Key, kvp.Value);
         }
 
-        // Dialog container
         var sizeClass = !string.IsNullOrEmpty(_size) ? $" modal-{_size}" : "";
         var dialogDiv = H.Div().Class($"modal-dialog{sizeClass}");
         var contentDiv = H.Div().Class("modal-content");
 
-        // Header
         var headerDiv = H.Div().Class("modal-header");
         headerDiv.Add(H.Create("h5", H.Escape(_title)).Class("modal-title"));
         headerDiv.Add(H.Button()
@@ -109,25 +107,23 @@ public class ModalComponent : ComponentBase
             .Attr("aria-label", "Close"));
         contentDiv.Add(headerDiv);
 
-        // Body
         if (_body != null)
         {
             var bodyDiv = H.Div().Class("modal-body");
-            bodyDiv.AddRendered(_body.Render());
+            bodyDiv.Add(_body.Render());
             contentDiv.Add(bodyDiv);
         }
 
-        // Footer
         if (_footer != null)
         {
             var footerDiv = H.Div().Class("modal-footer");
-            footerDiv.AddRendered(_footer.Render());
+            footerDiv.Add(_footer.Render());
             contentDiv.Add(footerDiv);
         }
 
         dialogDiv.Add(contentDiv);
         modal.Add(dialogDiv);
 
-        return modal.Build();
+        return modal;
     }
 }

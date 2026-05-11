@@ -43,7 +43,7 @@ public class TabsComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
         var container = H.Div();
 
@@ -61,7 +61,6 @@ public class TabsComponent : ComponentBase
             container.Attr(kvp.Key, kvp.Value);
         }
 
-        // Tab navigation
         var navUl = H.Ul().Class("nav nav-tabs").Attr("role", "tablist");
         foreach (var tab in _tabs)
         {
@@ -85,7 +84,6 @@ public class TabsComponent : ComponentBase
         }
         container.Add(navUl);
 
-        // Tab content
         var contentDiv = H.Div().Class("tab-content");
         foreach (var tab in _tabs)
         {
@@ -97,11 +95,11 @@ public class TabsComponent : ComponentBase
                 .Id(tab.Id)
                 .Attr("role", "tabpanel")
                 .Attr("aria-labelledby", $"{tab.Id}-tab");
-            paneDiv.AddRendered(tab.Content.Render());
+            paneDiv.Add(tab.Content.Render());
             contentDiv.Add(paneDiv);
         }
         container.Add(contentDiv);
 
-        return container.Build();
+        return container;
     }
 }

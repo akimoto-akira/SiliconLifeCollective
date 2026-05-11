@@ -60,7 +60,7 @@ public class LogView : ViewBase
             ).Class("filter-bar"),
             H.Div(
                 H.Div().Id("logs-list").Class("logs-list"),
-                new LoadingComponent(vm.Localization.LogsLoading).Id("logs-loading").Active(true).ToH()
+                new LoadingComponent(vm.Localization.LogsLoading).Id("logs-loading").Active(true).Render()
             ).Class("card logs-card"),
             H.Div(
                 H.Button(vm.Localization.LogsPrevPage).Id("prev-btn").OnClick("prevPage()").Class("page-btn"),

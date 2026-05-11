@@ -71,11 +71,10 @@ public class MarkdownEditorComponent : ComponentBase
         return this;
     }
 
-    public override string Render()
+    public override H Render()
     {
-        // Sanitize editorId to ensure it's a valid JavaScript identifier
         var editorId = base.Id ?? "md-editor-" + Guid.NewGuid().ToString("N")[..8];
-        return RenderWidget(editorId, _markdown, _filePath, _readOnly, _initialMode, _saveEndpoint).Build();
+        return RenderWidget(editorId, _markdown, _filePath, _readOnly, _initialMode, _saveEndpoint);
     }
 
     public static H RenderWidget(string editorId, string markdown, string filePath = "",
