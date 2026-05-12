@@ -4,27 +4,27 @@
 
 [English](../en/contributing.md) | [中文](../zh-CN/contributing.md) | **繁體中文** | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md)
 
-感谢您有興趣為 SiliconLifeCollective 做出貢献！
+感謝您有興趣為 SiliconLifeCollective 做出貢獻！
 
 ## 雙版本貢献
 
-本專案有兩個實現版本，您可以根據興趣選擇貢献方向：
+本專案有兩個實現版本，您可以根據興趣選擇貢獻方向：
 
 ### SiliconLife.Default（預設版本）
 - **技術棧**：.NET 9 主控台應用
-- **貢献方向**：核心功能開發、工具實現、本地化、文檔
+- **貢獻方向**：核心功能開發、工具實現、本地化、文檔
 - **適合人群**：所有開發者
 
 ### SiliconLife.Fast（高效能版本）
 - **技術棧**：.NET 9 Windows 視窗應用
-- **貢献方向**：效能優化、SpeedyPack 儲存、系統匣、無鎖並發
-- **適合人群**：有 Windows 開發經驗、對效能優化感興趣的開發者
+- **貢獻方向**：效能最佳化、SpeedyPack 儲存、系統匣、無鎖並發
+- **適合人群**：有 Windows 開發經驗、對效能最佳化感興趣的開發者
 
 > **重要提示**：兩個版本共享 SiliconLife.Core 和 SiliconLife.Common 專案，對核心介面的改進會同時影響兩個版本。
 
 ## 行為准則
 
-本項目遵循 Apache 2.0 授權證。在所有互動中保持尊重和專業。
+本專案遵循 Apache 2.0 授權證。在所有互動中保持尊重和專業。
 
 ---
 
@@ -32,7 +32,7 @@
 
 ### 1. Fork 倉程式庫
 
-点擊 GitHub 上的"Fork"按钮建立您自己的副本。
+點擊 GitHub 上的"Fork"按鈕建立您自己的副本。
 
 ### 2. 克隆您的 Fork
 
@@ -47,10 +47,10 @@ cd SiliconLifeCollective
 # 安裝 .NET 9 SDK
 # https://dotnet.microsoft.com/download/dotnet/9.0
 
-# 復原依赖
+# 復原依賴
 dotnet restore
 
-# 构建項目
+# 建構專案
 dotnet build
 
 # 執行測試
@@ -65,7 +65,7 @@ git checkout -b feature/your-feature-name
 
 ### 5. 選擇開發專案
 
-根據您的貢献類型選擇合適的專案：
+根據您的貢獻類型選擇合適的專案：
 
 - **核心介面/抽象類別** → 修改 `SiliconLife.Core`
 - **共享實現** → 修改 `SiliconLife.Common`
@@ -73,7 +73,7 @@ git checkout -b feature/your-feature-name
 - **Fast 版本特定** → 修改 `SiliconLife.Fast`
 - **儲存引擎** → 修改 `SiliconLife.Speedy`
 - **儲存管理工具** → 修改 `SiliconLife.Speedy.Manager`
-- **插件開發** → 修改 `SiliconLife.Core/Plugins`
+- **外掛程式開發** → 修改 `SiliconLife.Core/Plugins`
 - **多語言文檔** → 修改 `docs/` 目錄
 
 ---
@@ -82,7 +82,7 @@ git checkout -b feature/your-feature-name
 
 ### 程式碼風格
 
-- 遵循 C# 编码約定
+- 遵循 C# 編碼約定
 - 類別名使用 PascalCase
 - 方法參數使用 camelCase
 - 私有字段使用 `_camelCase`
@@ -103,7 +103,7 @@ git checkout -b feature/your-feature-name
 - `style`：程式碼格式
 - `refactor`：程式碼重构
 - `test`：測試变更
-- `chore`：构建/工具变更
+- `chore`：建構/工具變更
 
 **示例**：
 ```bash
@@ -115,7 +115,7 @@ refactor(web): simplify controller structure
 
 ### 進行更改
 
-1. **编寫程式碼**
+1. **編寫程式碼**
    - 遵循现有模式
    - 為新功能添加測試
    - 更新文檔
@@ -125,7 +125,7 @@ refactor(web): simplify controller structure
    # 執行所有測試
    dotnet test
    
-   # 以發佈模式构建
+   # 以發佈模式建構
    dotnet build --configuration Release
    ```
 
@@ -214,7 +214,7 @@ feat(localization): add Korean language support
 
 **流程**：
 1. 在 Issues/Discussions 中討論功能
-2. 获得維護者核准
+2. 取得維護者核准
 3. 實現功能
 4. 添加全面的測試
 5. 更新文檔
@@ -230,28 +230,27 @@ feat(localization): add Korean language support
 
 **流程**：
 1. 識別文檔空白
-2. 编寫/更新文檔
+2. 編寫/更新文檔
 3. 提交 PR
 
 **要求**：
 - 清晰简洁
 - 包含示例
-- 如适用支援多语言
+- 如適用支援多語言
 
-### 4. 程式碼重构
+### 4. 程式碼重構
 
-**流程**：
-1. 在 Issue 中提議重构
-2. 获得核准
-3. 重构程式碼
-4. 确保所有測試通過
+1. 在 Issue 中提議重構
+2. 取得核准
+3. 重構程式碼
+4. 確保所有測試通過
 5. 提交 PR
 
 **要求**：
-- 无功能变更
+- 無功能變更
 - 所有測試通過
-- 改善程式碼质量
-- 清晰解释
+- 改善程式碼品質
+- 清晰解釋
 
 ---
 
@@ -296,7 +295,7 @@ public void MyFeature_ShouldWork_AsExpected()
 ### 程式碼註解
 
 - 所有公共 API 使用 XML 註解
-- 复雜逻辑使用內联註解
+- 複雜邏輯使用內聯註解
 - 程式碼註解使用英语
 
 ### 文檔檔案
@@ -324,9 +323,9 @@ public void MyFeature_ShouldWork_AsExpected()
    - 文檔完善
 
 2. **測試**
-   - 覆盖充分
+   - 覆蓋充分
    - 所有測試通過
-   - 覆盖邊界情况
+   - 覆蓋邊界情況
 
 3. **文檔**
    - 已更新
@@ -353,7 +352,7 @@ public void MyFeature_ShouldWork_AsExpected()
 **原因**：
 - 不遵循指南
 - 測試不足
-- 未通知的破壞性变更
+- 未通知的破壞性變更
 - 程式碼质量差
 
 **解決方案**：
@@ -370,7 +369,7 @@ git fetch origin
 git rebase origin/master
 
 # 解決衝突
-# 编辑衝突檔案
+# 編輯衝突檔案
 git add .
 git rebase --continue
 
@@ -380,7 +379,7 @@ git push --force-with-lease
 
 ---
 
-## 获取幫助
+## 取得幫助
 
 ### 資源
 
@@ -399,7 +398,7 @@ git push --force-with-lease
 
 ## 致谢
 
-貢献者将在以下位置获得認可：
+貢獻者將在以下位置取得認可：
 - README.md 貢献者部分
 - 發佈說明
 - 項目文檔
@@ -408,7 +407,7 @@ git push --force-with-lease
 
 ## 授權證
 
-通過貢献，您同意您的貢献将在 Apache 2.0 授權證下获得許可。
+透過貢獻，您同意您的貢獻將在 Apache 2.0 授權證下取得許可。
 
 ---
 

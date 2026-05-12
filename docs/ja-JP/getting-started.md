@@ -32,6 +32,7 @@
 - **Git** - [ダウンロード](https://git-scm.com/)
 - **Ollama**（オプション、ローカル AI 用） - [ダウンロード](https://ollama.com/)
 - **DashScope API キー**（オプション、クラウド AI 用） - [申請](https://bailian.console.aliyun.com/)
+- **Volcengine Ark API キー**（オプション、クラウド AI 用） - [申請](https://console.volcengine.com/ark)
 
 ## クイックスタート
 
@@ -78,6 +79,22 @@ dotnet build
   }
 }
 ```
+
+#### オプション C：Volcengine Ark（クラウド）
+
+```json
+{
+  "AIClients": {
+    "VolcengineArk": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+      "Model": "ep-xxxxxxxxxxxxx-xxxxx"
+    }
+  }
+}
+```
+
+> **注意**：Volcengine Ark の Model パラメータには、モデル名ではなく推論エンドポイント ID（例：`ep-20241212123456-abcde`）を使用します。
 
 ### 4. アプリケーションの実行
 

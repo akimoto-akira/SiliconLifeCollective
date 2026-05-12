@@ -32,6 +32,7 @@ Questo progetto offre due versioni di implementazione:
 - **Git** - [Scarica](https://git-scm.com/)
 - **Ollama** (opzionale, per IA locale) - [Scarica](https://ollama.com/)
 - **Chiave API DashScope** (opzionale, per IA cloud) - [Richiedi](https://bailian.console.aliyun.com/)
+- **Chiave API Volcengine Ark** (opzionale, per IA cloud) - [Richiedi](https://console.volcengine.com/ark)
 
 ## Avvio rapido
 
@@ -78,6 +79,22 @@ Modifica `src/SiliconLife.Default/Config/DefaultConfigData.cs` o cambia la confi
   }
 }
 ```
+
+#### Opzione C: Volcengine Ark (cloud)
+
+```json
+{
+  "AIClients": {
+    "VolcengineArk": {
+      "ApiKey": "la-tua-chiave-api-qui",
+      "Endpoint": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+      "Model": "ep-xxxxxxxxxxxxx-xxxxx"
+    }
+  }
+}
+```
+
+> **Nota**: Il parametro Model di Volcengine Ark accetta un ID endpoint di inferenza (es. `ep-20241212123456-abcde`), non un nome modello.
 
 ### 4. Eseguire l'applicazione
 

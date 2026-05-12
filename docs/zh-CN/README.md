@@ -113,7 +113,7 @@
 | 运行时 | .NET 9 | .NET 9 Windows |
 | 编程语言 | C# | C# |
 | 应用类型 | 控制台应用程序 | Windows 窗体应用程序 |
-| AI 集成 | Ollama（本地）、阿里云百炼（云端） | Ollama（本地）、阿里云百炼（云端）、火山引擎Ark（云端） |
+| AI 集成 | Ollama（本地）、阿里云百炼（云端）、火山引擎Ark（云端） | Ollama（本地）、阿里云百炼（云端）、火山引擎Ark（云端） |
 | 数据存储 | 文件系统（JSON + 时间索引目录） | SpeedyPack（.spk 格式，内存映射 + 异步持久化） |
 | Web 服务器 | HttpListener（.NET 内置） | HttpListener（.NET 内置） |
 | 动态编译 | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
@@ -256,6 +256,7 @@ SiliconLifeCollective.sln
 - **AI 后端**（选择其一）：
   - **Ollama**：[安装 Ollama](https://ollama.com) 并拉取模型（例如 `ollama pull llama3`）
   - **阿里云百炼**：从[百炼控制台](https://bailian.console.aliyun.com/)获取 API 密钥
+  - **火山引擎 Ark**：从[火山引擎控制台](https://console.volcengine.com/ark)获取 API 密钥
 
 ### 构建项目
 

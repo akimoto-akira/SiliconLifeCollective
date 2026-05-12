@@ -24,7 +24,7 @@
 - **平台支援**：僅 Windows
 - **角色說明**：經過深度優化的生產級實現，是長期運行和實際生產環境的首選
 
-> **新手建議**：首次使用推薦從 **SiliconLife.Default** 開始，快速驗證架構可行性；熟悉系統後，強烈建議遷移到 **SiliconLife.Fast** 作為生產環境運行版本。
+> **新手建議**：首次使用推薦從 **SiliconLife.Default** 開始，快速驗證架構可行性；熟悉系統後，強烈建議遷移到 **SiliconLife.Fast** 作為生產環境執行版本。
 
 ## 前置條件
 
@@ -32,6 +32,7 @@
 - **Git** - [下載](https://git-scm.com/)
 - **Ollama**（可選，用於本地 AI） - [下載](https://ollama.com/)
 - **百煉 API 金鑰**（可選，用於雲端 AI） - [申請](https://bailian.console.aliyun.com/)
+- **火山引擎 Ark API 金鑰**（可選，用於雲端 AI） - [申請](https://console.volcengine.com/ark)
 
 ## 快速開始
 
@@ -79,6 +80,22 @@ dotnet build
 }
 ```
 
+#### 選項 C：火山引擎 Ark（雲端）
+
+```json
+{
+  "AIClients": {
+    "VolcengineArk": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+      "Model": "ep-xxxxxxxxxxxxx-xxxxx"
+    }
+  }
+}
+```
+
+> **注意**：火山引擎 Ark 的 Model 參數接受推理接入點 ID（例如 `ep-20241212123456-abcde`），而非模型名稱。
+
 ### 4. 執行應用程式
 
 #### 執行 Default 版本
@@ -119,7 +136,7 @@ http://localhost:8080
 
 1. 在 Web UI 中導航到**生命體管理**
 2. 點擊**建立新生命體**
-3. 設定靈魂文件（`soul.md`），包含個性和行為
+3. 設定靈魂檔案（`soul.md`），包含個性和行為
 4. 啟動生命體
 
 ### soul.md 範例
@@ -188,7 +205,7 @@ lsof -ti:8080 | xargs kill -9
 - 📚 閱讀[架構指南](architecture.md)了解系統設計
 - 🛠️ 查看[開發指南](development-guide.md)擴展系統
 - 📖 探索[API 參考](api-reference.md)了解整合詳情
-- 🔒 查看[安全文件](security.md)了解權限系統
+- 🔒 查看[安全文檔](security.md)了解權限系統
 - 🧰 查看[工具參考](tools-reference.md)了解所有內建工具
 - 🌐 查看[Web UI 指南](web-ui-guide.md)了解介面功能
 
@@ -204,7 +221,7 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Fast/            # 高效能實現 + 入口點
 │   ├── SiliconLife.Speedy/          # SpeedyPack 高效能儲存引擎
 │   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理工具（Windows Forms）
-├── docs/                            # 文件（多語言，29 種語言變體）
+├── docs/                            # 文檔（多語言，29 種語言變體）
 │   ├── en/                    # 英語
 │   ├── zh-CN/                 # 簡體中文
 │   ├── zh-HK/                 # 繁體中文
@@ -218,7 +235,7 @@ SiliconLifeCollective/
 
 ## 需要協助？
 
-- 📖 查看[說明文件系統](web-ui-guide.md#幫助文檔系統新增)（多語言支援）
-- 📚 閱讀[完整文件](docs/)
+- 📖 查看[說明文檔系統](web-ui-guide.md#幫助文檔系統新增)（多語言支援）
+- 📚 閱讀[完整文檔](docs/)
 - 🐛 在 [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues) 上回報問題
 - 💬 參與社群討論

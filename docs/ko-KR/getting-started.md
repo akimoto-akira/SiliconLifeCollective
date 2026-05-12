@@ -32,6 +32,7 @@
 - **Git** - [다운로드](https://git-scm.com/)
 - **Ollama** (선택 사항, 로컬 AI용) - [다운로드](https://ollama.com/)
 - **Bailian API 키** (선택 사항, 클라우드 AI용) - [신청](https://bailian.console.aliyun.com/)
+- **Volcengine Ark API 키** (선택 사항, 클라우드 AI용) - [신청](https://console.volcengine.com/ark)
 
 ## 빠른 시작
 
@@ -78,6 +79,22 @@ dotnet build
   }
 }
 ```
+
+#### 옵션 C: Volcengine Ark (클라우드)
+
+```json
+{
+  "AIClients": {
+    "VolcengineArk": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+      "Model": "ep-xxxxxxxxxxxxx-xxxxx"
+    }
+  }
+}
+```
+
+> **참고**: Volcengine Ark의 Model 매개변수는 모델 이름이 아닌 추론 엔드포인트 ID(예: `ep-20241212123456-abcde`)를 사용합니다.
 
 ### 4. 애플리케이션 실행
 

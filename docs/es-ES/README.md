@@ -251,6 +251,7 @@ Invocación de herramienta → Ejecutor → Gestor de permisos → [IsCurator �
 - **Backend de IA** (elegir uno):
   - **Ollama**: [Instalar Ollama](https://ollama.com) y obtener modelo (ej. `ollama pull llama3`)
   - **Alibaba Cloud Bailian**: Obtener clave API desde [Consola Bailian](https://bailian.console.aliyun.com/)
+  - **Volcengine Ark**: Obtener clave API desde [Consola Volcengine](https://console.volcengine.com/ark)
 
 ### Construir el Proyecto
 

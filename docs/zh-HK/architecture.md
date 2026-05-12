@@ -37,7 +37,7 @@
 
 ### 矽基生命體
 
-系統中的每個 AI 智能體都是一個**矽基生命體** —— 一個具有自身身份、個性和能力的自主實體。每個矽基生命體都由一個**靈魂文件**（Markdown 提示詞）驅動，定義其行為模式。
+系統中的每個 AI 智能體都是一個**矽基生命體** —— 一個具有自身身份、個性和能力的自主實體。每個矽基生命體都由一個**靈魂檔案**（Markdown 提示詞）驅動，定義其行為模式。
 
 ### 矽基主理人
 
@@ -49,9 +49,9 @@
 - 監控執行品質並處理失敗
 - 使用**優先調度**響應使用者訊息（見下文）
 
-### 靈魂文件
+### 靈魂檔案
 
-儲存在每個矽基生命體資料目錄中的 Markdown 文件（`soul.md`）。它作為系統提示詞注入到每個 AI 請求中，定義生命體的個性、決策模式和行為約束。
+儲存在每個矽基生命體資料目錄中的 Markdown 檔案（`soul.md`）。它作為系統提示詞注入到每個 AI 請求中，定義生命體的個性、決策模式和行為約束。
 
 ---
 
@@ -59,7 +59,7 @@
 
 ### 主循環 + 時鐘物件
 
-系統在專用後台執行緒上運行一個**時鐘驅動的主循環**：
+系統在專用後台執行緒上執行一個**時鐘驅動的主循環**：
 
 ```
 主循環（專用執行緒，看門狗 + 熔斷器）
@@ -74,11 +74,11 @@
 
 關鍵設計決策：
 
-- **矽基生命體不繼承時鐘物件。** 它們有自己的 `Tick()` 方法，由 `SiliconBeingManager` 通過 `SiliconBeingRunner` 調用，而不是直接註冊到主循環。
+- **矽基生命體不繼承時鐘物件。** 它們有自己的 `Tick()` 方法，由 `SiliconBeingManager` 透過 `SiliconBeingRunner` 呼叫，而不是直接註冊到主循環。
 - **矽基生命體管理器**由主循環直接時鐘觸發，並作為所有生命體的單一代理。
 - **矽基生命體執行器**在臨時執行緒上包裝每個生命體的 `Tick()`，具有超時和每個生命體的熔斷器（連續 3 次超時 → 1 分鐘冷卻）。
-- 每個生命體的執行限制為每次時鐘觸發**一輪** AI 請求 + 工具調用，確保沒有生命體可以壟斷主循環。
-- **效能監控器**跟蹤時鐘執行時間以實現可觀察性。
+- 每個生命體的執行限制為每次時鐘觸發**一輪** AI 請求 + 工具呼叫，確保沒有生命體可以壟斷主循環。
+- **效能監控器**追蹤時鐘執行時間以實現可觀察性。
 
 ### 主理人優先響應
 
@@ -155,7 +155,7 @@
 | `BeingFactory` | `ISiliconBeingFactory` | 建立生命體的工廠 |
 | `BeingManager` | `SiliconBeingManager` | 活動生命體生命週期管理器 |
 | `DynamicBeingLoader` | `DynamicBeingLoader` | 動態編譯載入器 |
-| `TokenUsageAudit` | `ITokenUsageAudit` | Token 使用跟蹤 |
+| `TokenUsageAudit` | `ITokenUsageAudit` | Token 使用追蹤 |
 | `TokenUsageAuditManager` | `TokenUsageAuditManager` | Token 使用報告 |
 
 它還維護每個生命體的 `PermissionManager` 註冊表，以生命體 GUID 為鍵。
@@ -194,16 +194,16 @@
 | `ChannelId` | `Guid` | 頻道/對話標識符 |
 | `Content` | `string` | 訊息內容 |
 | `Timestamp` | `DateTime` | 訊息發送時間 |
-| `Type` | `MessageType` | 文字、圖片、文件或系統通知 |
+| `Type` | `MessageType` | 文字、圖片、檔案或系統通知 |
 | `ReadBy` | `List<Guid>` | 已閱讀此訊息的參與者 ID |
 | `Role` | `MessageRole` | AI 對話角色（使用者、助手、工具） |
-| `ToolCallId` | `string?` | 工具結果訊息的工具調用 ID |
-| `ToolCallsJson` | `string?` | 助手訊息的序列化工具調用 JSON |
+| `ToolCallId` | `string?` | 工具結果訊息的工具呼叫 ID |
+| `ToolCallsJson` | `string?` | 助手訊息的序列化工具呼叫 JSON |
 | `Thinking` | `string?` | AI 的思維鏈推理 |
 | `PromptTokens` | `int?` | 提示詞中的 token 數量（輸入） |
 | `CompletionTokens` | `int?` | 補完中的 token 數量（輸出） |
 | `TotalTokens` | `int?` | 使用的總 token 數量（輸入 + 輸出） |
-| `FileMetadata` | `FileMetadata?` | 附加的文件後設資料（如果訊息包含文件） |
+| `FileMetadata` | `FileMetadata?` | 附加的檔案後設資料（如果訊息包含檔案） |
 
 ### 聊天訊息佇列
 
@@ -214,13 +214,13 @@
 - **訊息排序** - 保持訊息的時間順序
 - **批次操作** - 支援批次獲取訊息
 
-### 文件後設資料
+### 檔案後設資料
 
-`FileMetadata` 用於管理附加到聊天訊息的文件資訊：
+`FileMetadata` 用於管理附加到聊天訊息的檔案資訊：
 
-- **文件資訊** - 檔案名、大小、類型、路徑
-- **上傳時間** - 文件上傳的時間戳
-- **上傳者** - 上傳文件的使用者或矽基生命體 ID
+- **檔案資訊** - 檔案名、大小、類型、路徑
+- **上傳時間** - 檔案上傳的時間戳
+- **上傳者** - 上傳檔案的使用者或矽基生命體 ID
 
 ### 串流取消管理器
 
@@ -249,7 +249,7 @@
 
 - **類型**：本地 AI 服務
 - **協議**：原生 Ollama HTTP API（`/api/chat`、`/api/generate`）
-- **功能**：串流傳輸、工具調用、本地模型託管
+- **功能**：串流傳輸、工具呼叫、本地模型託管
 - **設定**：`endpoint`、`model`、`temperature`、`maxTokens`
 
 ### DashScopeClient（阿里雲百煉）
@@ -257,7 +257,7 @@
 - **類型**：雲端 AI 服務
 - **協議**：相容 OpenAI 的 API（`/compatible-mode/v1/chat/completions`）
 - **認證**：Bearer token（API 金鑰）
-- **功能**：串流傳輸、工具調用、推理內容（思維鏈）、多區域部署
+- **功能**：串流傳輸、工具呼叫、推理內容（思維鏈）、多區域部署
 - **支援的區域**：
   - `beijing` —— 華北2（北京）
   - `virginia` —— 美國（維吉尼亞）
@@ -269,7 +269,7 @@
   - **推理**：qwq-plus
   - **第三方**：deepseek-v3.2、deepseek-r1、glm-5.1、kimi-k2.5、llama-4-maverick
 - **設定**：`apiKey`、`region`、`model`
-- **模型發現**：執行時從百煉 API 獲取可用模型；網路故障時回退到精選列表
+- **模型發現**：執行時從百煉 API 取得可用模型；網路故障時回退到精選列表
 
 ### VolcengineArkClient（火山引擎 Ark）
 
@@ -314,7 +314,7 @@
 | 百度千帆（文心一言） | 📋 | 雲端 | 百度文心一言AI服務 |
 | 智普AI（GLM） | 📋 | 雲端 | 智譜清言AI服務 |
 | 月之暗面（Kimi） | 📋 | 雲端 | 月之暗面Kimi AI服務 |
-| 火山方舟引擎.豆包 | 📋 | 雲端 | 位元跳動豆包AI服務 |
+| 火山方舟引擎.豆包 | ✅ | 雲端 | 位元組跳動豆包AI服務 |
 | DeepSeek（直連） | 📋 | 雲端 | 深度求索AI服務 |
 | 零一萬物 | 📋 | 雲端 | 零一萬物AI服務 |
 | 騰訊混元 | 📋 | 雲端 | 騰訊混元AI服務 |
@@ -363,9 +363,9 @@
 
 每次 `ExecuteOneRound()` 建立一個新的 `ContextManager` 實例：
 
-1. 載入靈魂文件 + 最近的聊天歷史。
+1. 載入靈魂檔案 + 最近的聊天歷史。
 2. 將請求發送到 AI 客戶端。
-3. 循環處理工具調用，直到 AI 返回純文字。
+3. 循環處理工具呼叫，直到 AI 返回純文字。
 4. 將響應持久化到聊天系統。
 5. 釋放。
 
@@ -468,7 +468,7 @@ Web UI 具有**可插拔的皮膚系統**，允許完整的 UI 客製化，無�
 
 ### HTML / CSS / JS 建構器
 
-Web UI 完全避免範本文件，在 C# 中生成所有標記：
+Web UI 完全避免範本檔案，在 C# 中生成所有標記：
 
 - **`H`** —— 流式 HTML 建構器 DSL，用於在程式碼中構建 HTML 樹
 - **`CssBuilder`** —— CSS 建構器，支援選擇器和媒體查詢
@@ -527,7 +527,7 @@ Web UI 遵循**類 MVC 模式**，22 個控制器處理不同方面：
 系統整合了基於 **Playwright** 的 WebView 瀏覽器自動化功能：
 
 - **個體隔離**：每個矽基生命體擁有獨立的瀏覽器實例、Cookie 和會話儲存，完全隔離互不干擾。
-- **無頭模式**：瀏覽器運行在使用者完全不可見的無頭模式下，矽基生命體後台自主操作。
+- **無頭模式**：瀏覽器執行在使用者完全不可見的無頭模式下，矽基生命體後台自主操作。
 - **WebViewBrowserTool**：提供完整的瀏覽器操作能力，包括：
   - 頁面導航、點擊、輸入文字、獲取頁面內容
   - 執行 JavaScript、獲取截圖、等待元素出現
@@ -563,7 +563,7 @@ SiliconLife.Fast 使用自研的 SpeedyPack 儲存引擎（.spk 格式），實�
 │                                                          │
 │  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
 │  │ DirectoryMap  │  │  EntryCache   │  │  WriteQueue   │  │
-│  │ (記憶體目錄映射) │  │  (條目快取)    │  │ (異步寫入佇列) │  │
+│  │ (記憶體目錄對映) │  │  (條目快取)    │  │ (非同步寫入佇列) │  │
 │  └──────┬───────┘  └──────┬───────┘  └───────┬───────┘  │
 │         │                  │                   │          │
 │  ┌──────▼──────────────────▼───────────────────▼───────┐  │
@@ -588,24 +588,24 @@ SiliconLife.Fast 使用自研的 SpeedyPack 儲存引擎（.spk 格式），實�
 | 元件 | 描述 |
 |------|------|
 | `SpeedyPack` | 核心類別，組合 DirectoryMap、EntryCache 和 WriteQueue 提供低延遲讀寫 |
-| `DirectoryMap` | 記憶體目錄映射，維護虛擬路徑到檔案條目的映射關係 |
+| `DirectoryMap` | 記憶體目錄對映，維護虛擬路徑到檔案條目的對映關係 |
 | `EntryCache` | 條目快取，基於 TTL 的最近存取條目快取 |
-| `WriteQueue` | 異步寫入佇列，將寫入操作排隊到背景執行緒執行 |
+| `WriteQueue` | 非同步寫入佇列，將寫入操作排隊到背景執行緒執行 |
 | `FreeList` | 空閒空間管理，追蹤 .spk 檔案中的可重用空間 |
 | `PackFileReader` | 包檔案讀取器，從 .spk 檔案中讀取資料 |
 | `PackFileWriter` | 包檔案寫入器，將資料寫入 .spk 檔案 |
 | `SpeedyPackAutoCompactor` | 自動壓縮定時器，定期壓縮 .spk 檔案回收空閒空間 |
 | `SpeedyPackRegistry` | 行程級單例管理器，確保整個應用使用同一個 SpeedyPack 實例 |
 
-### 儲存適配器
+### 儲存配接器
 
-SiliconLife.Fast 通過以下適配器將 SpeedyPack 整合到系統介面：
+SiliconLife.Fast 透過以下配接器將 SpeedyPack 整合到系統介面：
 
-| 適配器 | 介面 | 描述 |
-|--------|------|------|
-| `SpeedyStorage` | `IStorage` | 通用鍵值儲存適配器 |
-| `SpeedyTimeStorage` | `ITimeStorage` | 時間索引儲存適配器 |
-| `SpeedyWorkNoteStorage` | `IWorkNoteStorage` | 工作筆記儲存適配器 |
+| 配接器 | 介面 | 描述 |
+|------|------|------|
+| `SpeedyStorage` | `IStorage` | 通用鍵值儲存配接器 |
+| `SpeedyTimeStorage` | `ITimeStorage` | 時間索引儲存配接器 |
+| `SpeedyWorkNoteStorage` | `IWorkNoteStorage` | 工作筆記儲存配接器 |
 
 ### 配置選項
 
@@ -627,9 +627,9 @@ SpeedyPack 通過 `IPackTransaction` 介面支援原子寫入操作：
 
 ---
 
-## 插件系統
+## 外掛程式系統
 
-SiliconLife 通過插件系統支援功能擴展，允許第三方開發者為平台添加新功能。
+SiliconLife 透過外掛程式系統支援功能擴展，允許第三方開發者為平台添加新功能。
 
 ### 核心介面
 
@@ -648,35 +648,35 @@ public interface IPlugin
 }
 ```
 
-### 插件載入器
+### 外掛程式載入器
 
-`PluginLoader` 負責從指定目錄載入插件 DLL，並執行嚴格的安全檢查：
+`PluginLoader` 負責從指定目錄載入外掛程式 DLL，並執行嚴格的安全檢查：
 
-1. **目錄掃描** — 掃描插件目錄中的所有 .dll 檔案
-2. **安全掃描** — 檢查插件是否引用了禁止的命名空間
-3. **隔離載入** — 使用自訂 `AssemblyLoadContext` 隔離載入插件
-4. **生命週期管理** — 呼叫插件的 OnLoad、OnStart、OnStop、OnUnload 方法
+1. **目錄掃描** — 掃描外掛程式目錄中的所有 .dll 檔案
+2. **安全掃描** — 檢查外掛程式是否引用了禁止的命名空間
+3. **隔離載入** — 使用自訂 `AssemblyLoadContext` 隔離載入外掛程式
+4. **生命週期管理** — 呼叫外掛程式的 OnLoad、OnStart、OnStop、OnUnload 方法
 
 ### 安全沙箱
 
-插件載入器執行以下安全檢查：
+外掛程式載入器執行以下安全檢查：
 
 | 檢查項 | 描述 |
 |--------|------|
 | 禁止命名空間 | System.IO、System.Net.Http、System.Net.WebSockets、System.Net.Sockets、Microsoft.CodeAnalysis |
 | 可信組件白名單 | Google.Protobuf、Newtonsoft.Json、MessagePack、Serilog、Microsoft.Extensions.Logging.Abstractions、Dapper |
-| 禁止類型檢查 | 掃描插件中引用的危險類型 |
-| 禁止成員檢查 | 掃描插件中呼叫的危險方法 |
+| 禁止類型檢查 | 掃描外掛程式中引用的危險類型 |
+| 禁止成員檢查 | 掃描外掛程式中呼叫的危險方法 |
 
 ### 工具整合
 
-插件可以通過實現 `ITool` 介面註冊自訂工具：
+外掛程式可以透過實現 `ITool` 介面註冊自訂工具：
 
-- `ToolManager.ScanAllPluginAssemblies()` 方法掃描所有已載入插件中的 ITool 實現
-- 插件工具自動整合到工具呼叫循環
-- 插件工具受相同的權限系統約束
+- `ToolManager.ScanAllPluginAssemblies()` 方法掃描所有已載入外掛程式中的 ITool 實現
+- 外掛程式工具自動整合到工具呼叫循環
+- 外掛程式工具受相同的權限系統約束
 
-### 插件生命週期
+### 外掛程式生命週期
 
 ```
 載入（OnLoad）→ 啟動（OnStart）→ 運行中 → 停止（OnStop）→ 卸載（OnUnload）
@@ -690,7 +690,7 @@ public interface IPlugin
 data/
 └── SiliconManager/
     ├── {curator-guid}/
-    │   ├── soul.md          # 主理人的靈魂文件
+    │   ├── soul.md          # 主理人的靈魂檔案
     │   ├── state.json       # 執行時狀態
     │   ├── code.enc         # AES 加密的自訂類別程式碼
     │   └── permission.enc   # AES 加密的自訂權限回呼

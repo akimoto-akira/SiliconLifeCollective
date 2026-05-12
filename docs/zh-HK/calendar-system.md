@@ -1,4 +1,4 @@
-﻿# 日歷系統
+# 日歷系統
 
 > **版本：v0.1.0-alpha**
 
@@ -191,7 +191,7 @@ public class MyCustomCalendar : CalendarBase
 
 ### 天文計算
 
-- 基於实际天文資料
+- 基於實際天文資料
 - 支援歷史日期
 - 處理日歷改革
 
@@ -238,7 +238,7 @@ public class MyCustomCalendar : CalendarBase
 
 ---
 
-## 最佳实践
+## 最佳實踐
 
 ### 1. 始终指定日歷
 
@@ -286,14 +286,14 @@ public class MyCustomCalendar : CalendarBase
 
 **檢查**：
 - 日歷支援闰月
-- 年份确实有闰月
+- 年份確實有閏月
 - 闰月計算正确
 
 ### 未找到歷史朝代
 
 **檢查**：
 - 朝代名称拼寫
-- 朝代日期范围
+- 朝代日期範圍
 - 資料庫包含该朝代
 
 ---

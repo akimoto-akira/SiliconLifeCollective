@@ -251,6 +251,7 @@ SiliconLifeCollective.sln
 - **AI バックエンド**（いずれかを選択）：
   - **Ollama**：[Ollama をインストール](https://ollama.com) しモデルをプル（例：`ollama pull llama3`）
   - **Alibaba Cloud DashScope**：[DashScope コンソール](https://bailian.console.aliyun.com/) から API キーを取得
+  - **Volcengine Ark**：[Volcengine コンソール](https://console.volcengine.com/ark) から API キーを取得
 
 ### プロジェクトのビルド
 

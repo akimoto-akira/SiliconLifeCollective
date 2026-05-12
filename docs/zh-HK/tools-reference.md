@@ -6,7 +6,7 @@
 
 ## 概述
 
-工具系統允許矽基生命體通過標準化介面與外部世界互動。每個工具實現 `ITool` 介面，由 `ToolManager` 通過反射自動發現和註冊。
+工具系統允許矽基生命體透過標準化介面與外部世界互動。每個工具實現 `ITool` 介面，由 `ToolManager` 透過反射自動發現和註冊。
 
 ### 工具分類
 
@@ -17,7 +17,7 @@
 - **開發工具** — 程式碼執行、日誌查詢
 - **實用工具** — 系統資訊、Token 審計、說明文件、知識網路
 - **瀏覽器工具** — WebView 瀏覽器自動化
-- **插件工具** — 通過插件系統註冊的第三方工具
+- **外掛程式工具** — 透過外掛程式系統註冊的第三方工具
 
 ---
 
@@ -427,7 +427,7 @@
 
 **工作流程**:
 1. 編譯 SiliconLife.Fast 專案
-2. 優雅關閉當前執行的 Fast 實例（通過 HTTP API）
+2. 優雅關閉當前執行的 Fast 實例（透過 HTTP API）
 3. 等待程序退出和連接埠釋放
 4. 複製構建輸出到目標目錄（跳過 HotReload 自身檔案）
 5. 重新啟動 Fast 實例
@@ -436,7 +436,7 @@
 - 自動檢測並關閉舊程序
 - 安全檔案複製（不覆蓋 HotReload.exe）
 - 連接埠釋放等待機制
-- 支援自訂連接埠配置
+- 支援自訂連接埠設定
 
 **使用示例**:
 ```json
@@ -452,7 +452,7 @@
 **引數說明**:
 - `project_path`: 專案路徑（相對於解決方案根目錄）
 - `source_path`: 構建輸出目錄
-- `configuration`: 構建配置（Debug/Release）
+- `configuration`: 建構配置（Debug/Release）
 - `port`: Fast 實例的 Web 連接埠（預設 8080）
 
 **注意事項**:
@@ -535,16 +535,16 @@ public class MyCustomTool : ITool
 
 ### 步驟 2: 添加到專案
 
-將工具檔案放置在 `src/SiliconLife.Common/Tools/` 目錄中（共享工具）或 `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` 目錄中（版本特定工具）。`ToolManager` 會在啟動時通過反射自動發現並註冊。
+將工具檔案放置在 `src/SiliconLife.Common/Tools/` 目錄中（共享工具）或 `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` 目錄中（版本特定工具）。`ToolManager` 會在啟動時透過反射自動發現並註冊。
 
-### 步驟 2a: 通過插件註冊工具
+### 步驟 2a: 透過外掛程式註冊工具
 
-也可以通過插件系統註冊自訂工具：
+也可以透過外掛程式系統註冊自訂工具：
 
-1. 在插件專案中實現 `ITool` 介面
-2. 編譯插件 DLL 並放入插件目錄
-3. `ToolManager.ScanAllPluginAssemblies()` 會自動掃描所有已載入插件中的 ITool 實現
-4. 插件工具受相同的權限系統約束
+1. 在外掛程式專案中實現 `ITool` 介面
+2. 編譯外掛程式 DLL 並放入外掛程式目錄
+3. `ToolManager.ScanAllPluginAssemblies()` 會自動掃描所有已載入外掛程式中的 ITool 實現
+4. 外掛程式工具受相同的權限系統約束
 
 ### 步驟 3: （可選）標記為主理人專用
 
@@ -583,7 +583,7 @@ catch (Exception ex)
 
 ### 3. 尊重權限系統
 
-永遠不要繞過權限檢查。始終通過執行器存取資源。
+永遠不要繞過權限檢查。始終透過執行器存取資源。
 
 ---
 

@@ -252,6 +252,7 @@ Chiamata strumento → Esecutore → Gestore permessi → [IsCurator → Cache f
 - **Backend IA** (scegline uno):
   - **Ollama**: [Installa Ollama](https://ollama.com) e scarica un modello (es. `ollama pull llama3`)
   - **Alibaba Cloud DashScope**: Ottieni una chiave API dalla [console DashScope](https://bailian.console.aliyun.com/)
+  - **Volcengine Ark**: Ottieni una chiave API dalla [console Volcengine](https://console.volcengine.com/ark)
 
 ### Compilare il progetto
 

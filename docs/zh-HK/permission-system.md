@@ -6,7 +6,7 @@
 
 ## 概述
 
-權限系統确保所有 AI 發起的操作都经過适當驗證和稽核。
+權限系統確保所有 AI 發起的操作都經過適當驗證和稽核。
 
 ## 5 級權限链
 
@@ -85,11 +85,11 @@ if (!cache.CheckLimit(userId, resource))
 
 ## 級别 4：IPermissionCallback
 
-用於動态權限逻辑的自定義回调。
+用於動態權限邏輯的自訂回呼。
 
-### DefaultPermissionCallback 默認實現
+### DefaultPermissionCallback 預設實現
 
-`DefaultPermissionCallback` 提供了全面的默認權限規則，包括：
+`DefaultPermissionCallback` 提供了全面的預設權限規則，包括：
 
 #### 網絡訪問規則
 - **環回地址**：允許 localhost, 127.0.0.1, ::1
@@ -98,7 +98,7 @@ if (!cache.CheckLimit(userId, resource))
   - 10.x.x.x (Class A) - 允許
   - 172.16-31.x.x (Class B) - 詢問用戶
 - **域名白名單**：
-  - 搜索引擎：Google, Bing, DuckDuckGo, Yandex, Sogou 等
+  - 搜尋引擎：Google, Bing, DuckDuckGo, Yandex, Sogou 等
   - AI 服務：OpenAI, Anthropic, HuggingFace, Ollama 等
   - 開發者服務：GitHub, StackOverflow, npm, NuGet 等
   - 社交媒體：微博、知乎、Reddit、Discord 等
@@ -132,14 +132,14 @@ public class DefaultPermissionCallback : IPermissionCallback
 
 ### IMPermissionAskHandler 實現
 
-`IMPermissionAskHandler` 通過 Web UI 向使用者發送權限請求：
+`IMPermissionAskHandler` 透過 Web UI 向使用者發送權限請求：
 
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
 {
     public async Task<AskPermissionResult> AskAsync(PermissionRequest request)
     {
-        // 通過即時通訊向使用者發送訊息
+        // 透過即時通訊向使用者發送訊息
         await SendMessageAsync($"Allow {request.Resource}?");
         
         // 等待使用者回應
@@ -157,7 +157,7 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 `PermissionRequestQueue` 管理待處理的權限請求，支援異步等待使用者回應：
 
 - **請求入隊** — 當權限鏈到達級别 5 時，建立一個 `TaskCompletionSource<AskPermissionResult>` 並入隊
-- **Web UI 展示** — 通過 `PermissionRequestController` 在 Web UI 中展示待處理的權限請求
+- **Web UI 展示** — 透過 `PermissionRequestController` 在 Web UI 中展示待處理的權限請求
 - **使用者回應** — 使用者在 Web UI 中批准或拒絕，可選擇快取決策和設定快取持續時間
 - **快取選項** — 使用者可以將權限決策快取 1 小時、24 小時、7 天或 30 天
 - **超時機制** — 60 秒無回應自動關閉請求頁面
@@ -208,16 +208,16 @@ public PermissionResult EvaluatePermission(
 
 ### 授予權限
 
-**通過 Web UI**：
+**透過 Web UI**：
 1. 導航到**權限管理**
 2. 点擊**添加規則**
 3. 設定：
    - 使用者
    - 資源
    - 允許/拒絕
-   - 持续時間
+   - 持續時間
 
-**通過 API**：
+**透過 API**：
 ```bash
 curl -X POST http://localhost:8080/api/permissions \
   -H "Content-Type: application/json" \
@@ -241,7 +241,7 @@ curl -X DELETE http://localhost:8080/api/permissions/{rule-id}
 curl http://localhost:8080/api/permissions?userId=user-uuid
 ```
 
-## 最佳实践
+## 最佳實踐
 
 ### 1. 最小權限原則
 
@@ -266,9 +266,9 @@ curl http://localhost:8080/api/permissions?userId=user-uuid
 - 例外模式
 - 權限升級
 
-### 4. 實現自定義回调
+### 4. 實現自訂回呼
 
-對於复雜逻辑，使用 `IPermissionCallback`：
+對於複雜邏輯，使用 `IPermissionCallback`：
 
 ```csharp
 public async Task<PermissionResult> CheckAsync(PermissionRequest request)
@@ -312,7 +312,7 @@ AI："我想編譯和執行程式碼"
 1. IsCurator？否
 2. 速率限制？正常
 3. GlobalACL？未找到規則
-4. 回调？返回未決定
+4. 回呼？返回未決定
 5. 询問使用者？使用者核准
 6. 結果：允許
 ```
@@ -336,7 +336,7 @@ AI："我需要發出 100 個 HTTP 要求"
 1. 使用者的 IsCurator 狀態
 2. 速率限制設定
 3. GlobalACL 規則
-4. 回调逻辑
+4. 回呼邏輯
 5. 使用者回應超时
 
 ### 權限未過期

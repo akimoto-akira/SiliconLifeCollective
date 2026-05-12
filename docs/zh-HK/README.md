@@ -161,50 +161,50 @@ SiliconLifeCollective.sln
 │   │
 │   ├── SiliconLife.Default/               # 預設實現 + 應用程式入口（控制台版）
 │   │   ├── Program.cs                     # 入口點（裝配所有組件）
-│   │   ├── Config/                        # 默認配置數據
+│   │   ├── Config/                        # 預設配置資料
 │   │   ├── IM/                            # WebUI 提供者
-│   │   ├── Knowledge/                     # 知識網絡實現
+│   │   ├── Knowledge/                     # 知識網路實現
 │   │   ├── Logging/                       # 日誌提供者實現
-│   │   ├── Project/                       # 項目系統實現
-│   │   ├── Security/                      # 默認權限回調
-│   │   ├── Storage/                       # 文件系統存儲實現
+│   │   ├── Project/                       # 專案系統實現
+│   │   ├── Security/                      # 預設權限回呼
+│   │   ├── Storage/                       # 檔案系統儲存實現
 │   │   └── Tools/                         # 版本特有的工具實現（HelpTool）
 │   │
-│   ├── SiliconLife.Fast/                  # 高性能實現 + 應用程式入口（窗體版）
-│   │   ├── Program.cs                     # 入口點（窗體應用程序）
-│   │   ├── Config/                        # 配置數據（與 Default 共享）
+│   ├── SiliconLife.Fast/                  # 高效能實現 + 應用程式入口（視窗版）
+│   │   ├── Program.cs                     # 入口點（視窗應用程式）
+│   │   ├── Config/                        # 配置資料（與 Default 共享）
 │   │   ├── IM/                            # WebUI 提供者
-│   │   ├── Knowledge/                     # 知識網絡實現（內存優化）
-│   │   ├── Logging/                       # 高性能日誌提供者
-│   │   ├── Project/                       # 項目系統實現
-│   │   ├── Security/                      # 優化權限回調
-│   │   ├── Storage/                       # SpeedyPack 存儲適配器
+│   │   ├── Knowledge/                     # 知識網路實現（記憶體最佳化）
+│   │   ├── Logging/                       # 高效能日誌提供者
+│   │   ├── Project/                       # 專案系統實現
+│   │   ├── Security/                      # 最佳化權限回呼
+│   │   ├── Storage/                       # SpeedyPack 儲存配接器
 │   │   ├── Tools/                         # 版本特有的工具實現（HelpTool）
-│   │   └── Tray/                          # 系統托盤（29 種語言變體本地化）
+│   │   └── Tray/                          # 系統匣（29 種語言變體本地化）
 │   │
-│   ├── SiliconLife.Speedy/                # SpeedyPack 高性能存儲引擎
-│   │   ├── SpeedyPack.cs                  # 核心類（內存目錄映射 + 緩存 + 異步寫入）
-│   │   ├── SpeedyPackOptions.cs           # 配置選項（緩存 TTL、最大條目數等）
-│   │   ├── IPackTransaction.cs            # 事務接口
-│   │   ├── SpkFileInfo.cs                 # 文件信息
+│   ├── SiliconLife.Speedy/                # SpeedyPack 高效能儲存引擎
+│   │   ├── SpeedyPack.cs                  # 核心類別（記憶體目錄對映 + 快取 + 非同步寫入）
+│   │   ├── SpeedyPackOptions.cs           # 配置選項（快取 TTL、最大條目數等）
+│   │   ├── IPackTransaction.cs            # 交易介面
+│   │   ├── SpkFileInfo.cs                 # 檔案資訊
 │   │   └── Internal/                      # 內部實現
-│   │       ├── DirectoryMap.cs            # 內存目錄映射
-│   │       ├── EntryCache.cs              # 條目緩存
+│   │       ├── DirectoryMap.cs            # 記憶體目錄對映
+│   │       ├── EntryCache.cs              # 條目快取
 │   │       ├── FreeList.cs                # 空閒空間管理
-│   │       ├── PackFileReader.cs          # 包文件讀取器
-│   │       ├── PackFileWriter.cs          # 包文件寫入器
-│   │       ├── WriteQueue.cs              # 異步寫入隊列
+│   │       ├── PackFileReader.cs          # 封包檔案讀取器
+│   │       ├── PackFileWriter.cs          # 封包檔案寫入器
+│   │       ├── WriteQueue.cs              # 非同步寫入佇列
 │   │       ├── WriteOperation.cs          # 寫入操作
-│   │       ├── SpeedyTransaction.cs       # 事務實現
-│   │       ├── SpkHeader.cs               # 包文件頭
+│   │       ├── SpeedyTransaction.cs       # 交易實現
+│   │       ├── SpkHeader.cs               # 封包檔案標頭
 │   │       └── PathNormalizer.cs          # 路徑規範化
 │   │
 │   └── SiliconLife.Speedy.Manager/        # SpeedyPack 管理工具（Windows Forms）
-│       ├── MainForm.cs                    # 主窗體
+│       ├── MainForm.cs                    # 主表單
 │       ├── Program.cs                     # 入口點
-│       └── slc.ico                        # 應用圖標
+│       └── slc.ico                        # 應用程式圖示
 │
-└── docs/                                  # 多語言文檔
+├── docs/                                  # 多語言文檔
     ├── en/                                # 英語
     ├── zh-CN/                             # 簡體中文
     ├── zh-HK/                             # 繁體中文
@@ -215,6 +215,8 @@ SiliconLifeCollective.sln
     ├── fr-FR/                             # 法語
     ├── cs-CZ/                             # 捷克語
     └── ...                                # 其他語言文檔
+├── 總文件/                     # 需求和架構文件（中文）
+└── README.md                  # 專案說明
 ```
 
 ## 🏗️ 架構概覽
@@ -246,15 +248,16 @@ SiliconLifeCollective.sln
 - **AI 後端**（選擇其一）：
   - **Ollama**：[安裝 Ollama](https://ollama.com) 並拉取模型（例如 `ollama pull llama3`）
   - **阿里雲百煉**：從[百煉控制台](https://bailian.console.aliyun.com/)獲取 API 金鑰
+  - **火山引擎 Ark**：從[火山引擎控制台](https://console.volcengine.com/ark)獲取 API 金鑰
 
-### 構建專案
+### 建構專案
 
 ```bash
 dotnet restore
 dotnet build
 ```
 
-### 運行系統
+### 執行系統
 
 ```bash
 dotnet run --project src/SiliconLife.Default
@@ -262,7 +265,7 @@ dotnet run --project src/SiliconLife.Default
 
 應用程式將啟動 Web 伺服器並自動在瀏覽器中開啟 Web UI。
 
-### 發布單一檔案
+### 發佈單一檔案
 
 ```
 # Windows

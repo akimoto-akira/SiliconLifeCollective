@@ -257,6 +257,7 @@ Tool-Aufruf → Executor → Berechtigungsmanager → [IsCurator → Frequenz-Ca
 - **KI-Backend** (wählen Sie eines):
   - **Ollama**: [Ollama installieren](https://ollama.com) und Modell abrufen (z.B. `ollama pull llama3`)
   - **Alibaba Cloud DashScope**: API-Schlüssel von [DashScope-Konsole](https://bailian.console.aliyun.com/) erhalten
+  - **Volcengine Ark**: API-Schlüssel von [Volcengine-Konsole](https://console.volcengine.com/ark) erhalten
 
 ### Projekt bauen
 

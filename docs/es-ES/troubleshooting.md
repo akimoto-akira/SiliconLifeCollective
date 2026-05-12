@@ -1,4 +1,4 @@
-﻿# Guía de Solución de Problemas
+# Guía de Solución de Problemas
 
 > **Versión: v0.1.0-alpha**
 
@@ -86,6 +86,21 @@ HTTP 404: Model not found
 2. Comprobar que el nombre del modelo coincida con el catálogo de Bailian
 3. Verificar que el endpoint de región sea correcto
 4. Comprobar que la cuenta tenga acceso al modelo
+
+#### Problema: Fallo de conexión con Volcengine Ark
+
+**Síntomas**:
+```
+HTTP 401: Unauthorized
+o
+HTTP 404: Endpoint not found
+```
+
+**Solución**:
+1. Verificar que la clave API sea correcta
+2. Verificar que el formato de la URL del endpoint sea correcto (predeterminado: `https://ark.cn-beijing.volces.com/api/v3/chat/completions`)
+3. Confirmar que el parámetro Model utilice un ID de endpoint de inferencia (ej. `ep-20241212123456-abcde`), no un nombre de modelo
+4. Comprobar que la cuenta tenga acceso al endpoint
 
 ---
 

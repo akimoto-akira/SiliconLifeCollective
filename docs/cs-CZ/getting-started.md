@@ -32,6 +32,7 @@ Tento projekt poskytuje dvě implementační verze:
 - **Git** - [Stáhnout](https://git-scm.com/)
 - **Ollama** (volitelné, pro lokální AI) - [Stáhnout](https://ollama.com/)
 - **Bailian API klíč** (volitelné, pro cloudovou AI) - [Žádat](https://bailian.console.aliyun.com/)
+- **Volcengine Ark API klíč** (volitelné, pro cloudovou AI) - [Žádat](https://console.volcengine.com/ark)
 
 ## Rychlý Start
 
@@ -78,6 +79,22 @@ Upravte `src/SiliconLife.Default/Config/DefaultConfigData.cs` nebo změňte konf
   }
 }
 ```
+
+#### Možnost C: Volcengine Ark (Cloudový)
+
+```json
+{
+  "AIClients": {
+    "VolcengineArk": {
+      "ApiKey": "vas-api-klic-zde",
+      "Endpoint": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+      "Model": "ep-xxxxxxxxxxxxx-xxxxx"
+    }
+  }
+}
+```
+
+> **Poznámka**: Parametr Model služby Volcengine Ark přijímá ID inferenčního koncového bodu (např. `ep-20241212123456-abcde`), nikoli název modelu.
 
 ### 4. Spustit Aplikaci
 

@@ -1,4 +1,4 @@
-﻿# Guía de Web UI
+# Guía de Web UI
 
 > **Versión: v0.1.0-alpha**
 
@@ -123,6 +123,7 @@ Cuando la IA invoca una herramienta:
 Configurar backends de IA:
 - Ollama (local)
 - Bailian (nube)
+- Volcengine Ark (nube)
 - Clientes personalizados
 
 ### Ajustes de Almacenamiento

@@ -123,6 +123,7 @@ Když AI volá nástroj:
 Konfigurace AI backendu:
 - Ollama (lokální)
 - Bailian (cloudový)
+- Volcengine Ark (cloudový)
 - Vlastní klienti
 
 ### Nastavení Úložiště

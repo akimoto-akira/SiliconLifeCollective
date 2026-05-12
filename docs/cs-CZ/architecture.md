@@ -321,7 +321,7 @@ Factory poskytují:
 | Baidu Qianfan (Wenxin Yiyan) | 📋 | Cloud | Baidu Wenxin Yiyan AI služba |
 | Zhipu AI (GLM) | 📋 | Cloud | Zhipu Qingyan AI služba |
 | Moonshot (Kimi) | 📋 | Cloud | Moonshot Kimi AI služba |
-| Volcano Ark Engine Doubao | 📋 | Cloud | ByteDance Doubao AI služba |
+| Volcano Ark Engine Doubao | ✅ | Cloud | ByteDance Doubao AI služba |
 | DeepSeek (přímé připojení) | 📋 | Cloud | DeepSeek AI služba |
 | Yi (Zero-One) | 📋 | Cloud | Yi AI služba |
 | Tencent Hunyuan | 📋 | Cloud | Tencent Hunyuan AI služba |

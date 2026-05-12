@@ -87,6 +87,21 @@ HTTP 404: Model not found
 3. リージョンエンドポイントが正しいことを確認
 4. アカウントがモデルにアクセスできるか確認
 
+#### 問題：Volcengine Ark 接続失敗
+
+**症状**：
+```
+HTTP 401: Unauthorized
+または
+HTTP 404: Endpoint not found
+```
+
+**解決策**：
+1. API キーが正しいことを確認
+2. Endpoint URL の形式が正しいことを確認（デフォルト：`https://ark.cn-beijing.volces.com/api/v3/chat/completions`）
+3. Model パラメータにモデル名ではなく推論エンドポイント ID（例：`ep-20241212123456-abcde`）を使用しているか確認
+4. アカウントがエンドポイントにアクセスできるか確認
+
 ---
 
 ### 実行時問題

@@ -318,7 +318,7 @@
 | Baidu 千帆（文心一言） | 📋 | クラウド | Baidu 文心一言 AI サービス |
 | Zhipu AI（GLM） | 📋 | クラウド | Zhipu 清言 AI サービス |
 | Moonshot（Kimi） | 📋 | クラウド | Moonshot Kimi AI サービス |
-| Volcano Ark Engine.Doubao | 📋 | クラウド | ByteDance Doubao AI サービス |
+| Volcano Ark Engine.Doubao | ✅ | クラウド | ByteDance Doubao AI サービス |
 | DeepSeek（直接接続） | 📋 | クラウド | DeepSeek AI サービス |
 | 01.AI | 📋 | クラウド | 01.AI サービス |
 | Tencent Hunyuan | 📋 | クラウド | Tencent Hunyuan AI サービス |

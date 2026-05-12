@@ -321,7 +321,7 @@ Las fábricas proporcionan:
 | Baidu Qianfan (Wenxin Yiyan) | 📋 | Nube | Servicio de IA Baidu Wenxin Yiyan |
 | Zhipu AI (GLM) | 📋 | Nube | Servicio de IA Zhipu Qingyan |
 | Moonshot AI (Kimi) | 📋 | Nube | Servicio de IA Moonshot Kimi |
-| Volcengine Ark Engine.Doubao | 📋 | Nube | Servicio de IA ByteDance Doubao |
+| Volcengine Ark Engine.Doubao | ✅ | Nube | Servicio de IA ByteDance Doubao |
 | DeepSeek (conexión directa) | 📋 | Nube | Servicio de IA DeepSeek |
 | 01.AI | 📋 | Nube | Servicio de IA 01.AI |
 | Tencent Hunyuan | 📋 | Nube | Servicio de IA Tencent Hunyuan |

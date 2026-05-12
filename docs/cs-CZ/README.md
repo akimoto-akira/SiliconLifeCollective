@@ -265,6 +265,7 @@ Volání nástroje → Exekutor → Správce oprávnění → [IsCurator → Fre
 - **AI Backend** (vyberte jeden):
   - **Ollama**: [Instalace Ollama](https://ollama.com) a pull modelu (např. `ollama pull llama3`)
   - **Alibaba Cloud Bailian**: Získejte API klíč z [Bailian konzole](https://bailian.console.aliyun.com/)
+  - **Volcengine Ark**: Získejte API klíč z [Volcengine konzole](https://console.volcengine.com/ark)
 
 ### Sestavení projektu
 

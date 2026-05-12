@@ -123,6 +123,7 @@ Wenn KI ein Tool aufruft:
 KI-Backend konfigurieren:
 - Ollama (lokal)
 - DashScope (Cloud)
+- Volcengine Ark (Cloud)
 - Benutzerdefinierte Clients
 
 ### Storage-Einstellungen

@@ -123,6 +123,7 @@ Lorsque l'IA appelle un outil :
 Configurer le backend IA :
 - Ollama (local)
 - DashScope (cloud)
+- Volcengine Ark (cloud)
 - Clients personnalisés
 
 ### Paramètres de stockage

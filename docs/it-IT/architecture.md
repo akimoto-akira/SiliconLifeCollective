@@ -321,7 +321,7 @@ La factory fornisce:
 | Baidu Qianfan (Wenxin) | 📋 | Cloud | Servizio IA Wenxin di Baidu |
 | Zhipu AI (GLM) | 📋 | Cloud | Servizio IA Zhipu Qingyan |
 | Moonshot (Kimi) | 📋 | Cloud | Servizio IA Kimi di Moonshot AI |
-| Volcengine Ark.Doubao | 📋 | Cloud | Servizio IA Doubao di ByteDance |
+| Volcengine Ark.Doubao | ✅ | Cloud | Servizio IA Doubao di ByteDance |
 | DeepSeek (connessione diretta) | 📋 | Cloud | Servizio IA DeepSeek |
 | 01.AI (Yi) | 📋 | Cloud | Servizio IA 01.AI |
 | Tencent Hunyuan | 📋 | Cloud | Servizio IA Tencent Hunyuan |

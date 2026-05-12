@@ -258,6 +258,7 @@ SiliconLifeCollective.sln
 - **AI 백엔드** (둘 중 하나 선택):
   - **Ollama**: [Ollama 설치](https://ollama.com) 및 모델 풀 (예: `ollama pull llama3`)
   - **알리바바 클라우드 Bailian**: [Bailian 콘솔](https://bailian.console.aliyun.com/)에서 API 키 획득
+  - **Volcengine Ark**: [Volcengine 콘솔](https://console.volcengine.com/ark)에서 API 키 획득
 
 ### 프로젝트 빌드
 

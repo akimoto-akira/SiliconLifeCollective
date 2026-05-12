@@ -87,6 +87,21 @@ HTTP 404: Model not found
 3. Ověřte, že koncový bod regionu je správný
 4. Zkontrolujte, že účet má přístup k modelu
 
+#### Problém: Připojení k Volcengine Ark selhalo
+
+**Příznaky**:
+```
+HTTP 401: Unauthorized
+nebo
+HTTP 404: Endpoint not found
+```
+
+**Řešení**:
+1. Ověřte, že API klíč je správný
+2. Zkontrolujte, že formát URL koncového bodu je správný (výchozí: `https://ark.cn-beijing.volces.com/api/v3/chat/completions`)
+3. Potvrďte, že parametr Model používá ID inferenčního koncového bodu (např. `ep-20241212123456-abcde`), nikoli název modelu
+4. Zkontrolujte, že účet má přístup ke koncovému bodu
+
 ---
 
 ### Problémy za Běhu

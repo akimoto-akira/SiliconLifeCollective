@@ -92,7 +92,7 @@ public class MyCustomTool : ITool
 
 #### 步驟 2: 添加到專案
 
-將工具檔案放置在 `src/SiliconLife.Common/Tools/` 目錄中（共享工具）或 `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` 目錄中（版本特定工具）。`ToolManager` 會在啟動時通過反射自動發現並註冊。
+將工具檔案放置在 `src/SiliconLife.Common/Tools/` 目錄中（共享工具）或 `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` 目錄中（版本特定工具）。`ToolManager` 會在啟動時透過反射自動發現並註冊。
 
 #### 步驟 3: （可選）標記為主理人專用
 
@@ -104,7 +104,7 @@ public class AdminOnlyTool : ITool
 }
 ```
 
-### 建立新插件
+### 建立新外掛程式
 
 1. 建立一個類別庫專案，實現 `IPlugin` 介面：
 
@@ -129,7 +129,7 @@ public class MyPlugin : IPlugin
 }
 ```
 
-2. （可選）在插件中實現 `ITool` 介面以註冊自訂工具：
+2. （可選）在外掛程式中實現 `ITool` 介面以註冊自訂工具：
 
 ```csharp
 public class MyPluginTool : ITool
@@ -144,9 +144,9 @@ public class MyPluginTool : ITool
 }
 ```
 
-3. 將編譯後的 DLL 放入插件目錄，`PluginLoader` 將自動載入。
+3. 將編譯後的 DLL 放入外掛程式目錄，`PluginLoader` 將自動載入。
 
-> **安全限制**：插件不能引用 `System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis` 等命名空間。插件通過 `AssemblyLoadContext` 隔離載入。
+> **安全限制**：外掛程式不能引用 `System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis` 等命名空間。外掛程式透過 `AssemblyLoadContext` 隔離載入。
 
 ### 建立自訂執行器
 
@@ -237,7 +237,7 @@ public class MyAIClientFactory : IAIClientFactory
 
 #### 步驟 3: 註冊工廠
 
-在配置中添加您的 AI 客戶端類型，系統會自動發現並使用。
+在設定中添加您的 AI 客戶端類型，系統會自動發現並使用。
 
 ---
 
@@ -274,7 +274,7 @@ public class MyCustomCalendar : CalendarBase
 
 #### 步驟 2: 自動註冊
 
-日曆系統通過反射自動發現所有繼承自 `CalendarBase` 的類別，無需手動註冊。
+日曆系統透過反射自動發現所有繼承自 `CalendarBase` 的類別，無需手動註冊。
 
 ---
 
@@ -315,7 +315,7 @@ public class MyCustomSkin : ISkin
 
 ### 步驟 2: 自動發現
 
-`SkinManager` 會通過反射自動發現並註冊所有 `ISkin` 實現。
+`SkinManager` 會透過反射自動發現並註冊所有 `ISkin` 實現。
 
 ---
 

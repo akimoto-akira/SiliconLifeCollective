@@ -4,19 +4,19 @@
 
 [English](../en/api-reference.md) | [中文](../zh-CN/api-reference.md) | **繁體中文** | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
 
-## Web API 端点
+## Web API 端點
 
-基础 URL：`http://localhost:8080`
+基礎 URL：`http://localhost:8080`
 
 ### 認證
 
-大多数端点需要通過 Web UI 管理的會话 cookie 進行認證。
+大多數端點需要透過 Web UI 管理的會話 cookie 進行認證。
 
 ---
 
-## 硅基生命体管理
+## 矽基生命體管理
 
-### 获取所有生命体
+### 取得所有生命體
 
 **GET** `/api/beings`
 
@@ -56,7 +56,7 @@
 
 **POST** `/api/beings/{id}/stop`
 
-### 获取生命体详情
+### 取得生命體詳情
 
 **GET** `/api/beings/{id}`
 
@@ -99,7 +99,7 @@ data: {"type": "chunk", "content": " thinking..."}
 data: {"type": "complete", "sessionId": "uuid"}
 ```
 
-### 获取聊天歷史
+### 取得聊天歷史
 
 **GET** `/api/chat/{sessionId}/history`
 
@@ -125,7 +125,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ## 設定
 
-### 获取設定
+### 取得設定
 
 **GET** `/api/config`
 
@@ -164,7 +164,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ## 權限系統
 
-### 获取權限
+### 取得權限
 
 **GET** `/api/permissions`
 
@@ -238,7 +238,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 获取工作
+### 取得工作
 
 **GET** `/api/tasks?beingId={id}&status=pending`
 
@@ -275,7 +275,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ## 稽核和記錄
 
-### 获取 Token 使用
+### 取得 Token 使用
 
 **GET** `/api/audit/tokens?startDate={date}&endDate={date}`
 
@@ -297,7 +297,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 获取記錄
+### 取得記錄
 
 **GET** `/api/logs?level=error&limit=100`
 
@@ -344,7 +344,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 按時間范围查詢
+### 按時間範圍查詢
 
 **GET** `/api/storage/time?start={start}&end={end}&prefix={prefix}`
 
@@ -369,9 +369,9 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/about`
 
-返回關於頁面，包含系統資訊和已載入的插件列表。
+返回關於頁面，包含系統資訊和已載入的外掛程式列表。
 
-**插件列表資料**：
+**外掛程式列表資料**：
 ```json
 {
   "plugins": {
@@ -440,7 +440,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ## 系統資訊
 
-### 获取儀表板資料
+### 取得儀表板資料
 
 **GET** `/api/dashboard`
 
@@ -464,7 +464,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 获取系統狀態
+### 取得系統狀態
 
 **GET** `/api/status`
 
@@ -482,7 +482,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ## 錯誤回應
 
-所有端点返回標準化的錯誤回應：
+所有端點返回標準化的錯誤回應：
 
 ```json
 {
@@ -508,7 +508,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ## SSE 事件
 
-伺服器發送事件用於实时更新：
+伺服器發送事件用於即時更新：
 
 ### 聊天事件
 
@@ -701,7 +701,7 @@ public class ToolResult
 
 **DELETE** `/api/beings/{id}/work-notes/{pageNumber}`
 
-### 搜索筆記
+### 搜尋筆記
 
 **GET** `/api/beings/{id}/work-notes/search?keyword=認證&maxResults=10`
 
@@ -764,7 +764,7 @@ public class ToolResult
 }
 ```
 
-### 搜索知識
+### 搜尋知識
 
 **GET** `/api/knowledge/search?query=programming+language&limit=10`
 

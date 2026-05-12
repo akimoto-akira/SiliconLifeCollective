@@ -87,6 +87,21 @@ HTTP 404: Model not found
 3. 验证区域端点正确
 4. 检查帐户有权访问该模型
 
+#### 问题：火山引擎 Ark 连接失败
+
+**症状**：
+```
+HTTP 401: Unauthorized
+或
+HTTP 404: Endpoint not found
+```
+
+**解决方案**：
+1. 验证 API 密钥正确
+2. 检查 Endpoint URL 格式正确（默认：`https://ark.cn-beijing.volces.com/api/v3/chat/completions`）
+3. 确认 Model 参数使用推理接入点 ID（例如 `ep-20241212123456-abcde`），而非模型名称
+4. 检查帐户有权访问该接入点
+
 ---
 
 ### 运行时问题

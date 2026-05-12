@@ -318,7 +318,7 @@ Factorys bieten:
 | Baidu Qianfan (Wenxin Yiyan) | 📋 | Cloud | Baidu Wenxin Yiyan KI-Service |
 | Zhipu AI (GLM) | 📋 | Cloud | Zhipu Qingyan KI-Service |
 | Moonshot (Kimi) | 📋 | Cloud | Moonshot Kimi KI-Service |
-| Volcano Ark Engine.Doubao | 📋 | Cloud | ByteDance Doubao KI-Service |
+| Volcano Ark Engine.Doubao | ✅ | Cloud | ByteDance Doubao KI-Service |
 | DeepSeek (Direktverbindung) | 📋 | Cloud | DeepSeek KI-Service |
 | 01.AI | 📋 | Cloud | 01.AI KI-Service |
 | Tencent Hunyuan | 📋 | Cloud | Tencent Hunyuan KI-Service |

@@ -123,6 +123,7 @@ dashboard.onmessage = (event) => {
 配置 AI 后端：
 - Ollama（本地）
 - 百炼（云端）
+- 火山引擎 Ark（云端）
 - 自定义客户端
 
 ### 存储设置

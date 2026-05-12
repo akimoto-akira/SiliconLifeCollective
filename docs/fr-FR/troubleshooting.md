@@ -87,6 +87,21 @@ HTTP 404: Model not found
 3. Vérifier le point de terminaison régional
 4. Vérifier l'accès du compte au modèle
 
+#### Problème : Échec de connexion Volcengine Ark
+
+**Symptômes** :
+```
+HTTP 401: Unauthorized
+ou
+HTTP 404: Endpoint not found
+```
+
+**Solution** :
+1. Vérifier la clé API
+2. Vérifier le format de l'URL du point de terminaison (par défaut : `https://ark.cn-beijing.volces.com/api/v3/chat/completions`)
+3. Vérifier que le paramètre Model utilise un ID de point de terminaison d'inférence (ex. `ep-20241212123456-abcde`), et non un nom de modèle
+4. Vérifier l'accès du compte au point de terminaison
+
 ---
 
 ### Problèmes d'exécution

@@ -32,6 +32,7 @@
 - **Git** - [下载](https://git-scm.com/)
 - **Ollama**（可选，用于本地 AI） - [下载](https://ollama.com/)
 - **百炼 API 密钥**（可选，用于云端 AI） - [申请](https://bailian.console.aliyun.com/)
+- **火山引擎 Ark API 密钥**（可选，用于云端 AI） - [申请](https://console.volcengine.com/ark)
 
 ## 快速开始
 
@@ -78,6 +79,22 @@ dotnet build
   }
 }
 ```
+
+#### 选项 C：火山引擎 Ark（云端）
+
+```json
+{
+  "AIClients": {
+    "VolcengineArk": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+      "Model": "ep-xxxxxxxxxxxxx-xxxxx"
+    }
+  }
+}
+```
+
+> **注意**：火山引擎 Ark 的 Model 参数接受推理接入点 ID（例如 `ep-20241212123456-abcde`），而非模型名称。
 
 ### 4. 运行应用程序
 
