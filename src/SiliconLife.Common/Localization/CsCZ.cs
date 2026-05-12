@@ -208,6 +208,13 @@ public class CsCZ : DefaultLocalizationBase
     public override string TimerExecutionDetailTitle => "Detail spuštění";
     public override string TimerExecutionDetailHeader => "Detail spuštění";
     public override string TimerExecutionNoRecords => "Žádné záznamy";
+    public override string TaskExecutionHistoryTitle => "Historie provedení úkolu";
+    public override string TaskExecutionHistoryHeader => "Historie provedení";
+    public override string TaskExecutionBackToTasks => "← Zpět na úkoly";
+    public override string TaskExecutionTaskName => "Úkol: {0}";
+    public override string TaskExecutionDetailTitle => "Detail provedení úkolu";
+    public override string TaskExecutionDetailHeader => "Detail provedení";
+    public override string TaskExecutionNoRecords => "Žádné záznamy";
     public override string TimersStatusActive => "Aktivní";
     public override string TimersStatusPaused => "Pozastaveno";
     public override string TimersStatusTriggered => "Spuštěno";
@@ -290,6 +297,7 @@ public class CsCZ : DefaultLocalizationBase
     public override string TasksStatusFailed => "Selhalo";
     public override string TasksAssignedToLabel => "Přiřazeno";
     public override string TasksCreatedAtLabel => "Vytvořeno";
+    public override string TaskViewExecutionHistory => "Zobrazit historii";
     
     public override string ProjectTasksPageHeader => "Úkoly projektu";
     

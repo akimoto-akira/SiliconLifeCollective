@@ -431,6 +431,7 @@ public class JaJP : DefaultLocalizationBase
     public override string TasksPriorityLabel => "優先度";
     public override string TasksAssignedToLabel => "担当者";
     public override string TasksCreatedAtLabel => "作成日時";
+    public override string TaskViewExecutionHistory => "実行履歴を表示";
     
     public override string ProjectTasksPageHeader => "プロジェクトタスク";
     
@@ -651,6 +652,13 @@ public class JaJP : DefaultLocalizationBase
     public override string TimerExecutionDetailTitle => "実行詳細";
     public override string TimerExecutionDetailHeader => "実行メッセージログ";
     public override string TimerExecutionNoRecords => "実行記録がありません";
+    public override string TaskExecutionHistoryTitle => "タスク実行履歴";
+    public override string TaskExecutionHistoryHeader => "実行履歴";
+    public override string TaskExecutionBackToTasks => "← タスク一覧に戻る";
+    public override string TaskExecutionTaskName => "タスク：{0}";
+    public override string TaskExecutionDetailTitle => "タスク実行詳細";
+    public override string TaskExecutionDetailHeader => "実行詳細";
+    public override string TaskExecutionNoRecords => "実行記録がありません";
     public override string TimersStatusActive => "実行中";
     public override string TimersStatusPaused => "一時停止";
     public override string TimersStatusTriggered => "トリガー済み";

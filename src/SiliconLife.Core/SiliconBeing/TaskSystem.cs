@@ -279,14 +279,9 @@ public sealed class TaskSystem
     public int PendingCount => TaskCenter.Instance.GetRunnableTasks(OwnerId).Count;
     public int RunningCount => TaskCenter.Instance.GetTasksForBeing(OwnerId).Count(t => t.Status == TaskStatus.Running);
 
-    public TaskSystem(SiliconBeingBase owner, IStorage storage)
+    public TaskSystem(SiliconBeingBase owner)
     {
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
-
-        if (storage != null)
-        {
-            TaskCenter.Instance.Initialize(storage);
-        }
 
         _logger.Info(_owner.Id, "TaskSystem created for being {0} ({1})", owner.Name, owner.Id);
     }
@@ -465,6 +460,20 @@ public sealed class TaskSystem
             TaskCenter.Instance.UpdateTask(task);
             _logger.Info(_owner.Id, "Task cancelled: {0} ({1})", task.Title, task.Id);
         }
+    }
+
+    public bool SubmitForReview(Guid taskId)
+    {
+        var task = TaskCenter.Instance.GetTask(taskId);
+        if (task == null || task.Status != TaskStatus.Running)
+            return false;
+
+        task.SealCurrentCycle(TaskStatus.SubmittedForReview);
+        task.SubmitForReview();
+        task.AppendNewCycle();
+        TaskCenter.Instance.UpdateTask(task);
+        _logger.Info(_owner.Id, "Task submitted for review: {0} ({1})", task.Title, task.Id);
+        return true;
     }
 
     /// <summary>

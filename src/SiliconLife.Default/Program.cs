@@ -87,6 +87,9 @@ public class Program
         ServiceLocator.Instance.Register<Func<SiliconBeingBase, object>>(being => new PlaywrightWebView((DefaultSiliconBeing)being));
         _logger.Info(null, "Registered: Storage Factories");
 
+        TaskCenter.Instance.Initialize(storage);
+        _logger.Info(null, "Initialized: TaskCenter");
+
         // Initialize project manager
         IProjectManager projectManager = new ProjectManager(storage, configData.DataDirectory.FullName);
         ServiceLocator.Instance.Register<IProjectManager>(projectManager);

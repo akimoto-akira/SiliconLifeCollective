@@ -431,6 +431,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string TasksPriorityLabel => "优先级";
     public override string TasksAssignedToLabel => "负责人";
     public override string TasksCreatedAtLabel => "创建时间";
+    public override string TaskViewExecutionHistory => "查看执行记录";
     
     public override string ProjectTasksPageHeader => "项目任务";
     
@@ -651,6 +652,13 @@ public class ZhCN : DefaultLocalizationBase
     public override string TimerExecutionDetailTitle => "执行详情";
     public override string TimerExecutionDetailHeader => "执行消息记录";
     public override string TimerExecutionNoRecords => "暂无执行记录";
+    public override string TaskExecutionHistoryTitle => "任务执行记录";
+    public override string TaskExecutionHistoryHeader => "执行记录";
+    public override string TaskExecutionBackToTasks => "← 返回任务列表";
+    public override string TaskExecutionTaskName => "任务：{0}";
+    public override string TaskExecutionDetailTitle => "任务执行详情";
+    public override string TaskExecutionDetailHeader => "执行详情";
+    public override string TaskExecutionNoRecords => "暂无执行记录";
     public override string TimersStatusActive => "运行中";
     public override string TimersStatusPaused => "已暂停";
     public override string TimersStatusTriggered => "已触发";

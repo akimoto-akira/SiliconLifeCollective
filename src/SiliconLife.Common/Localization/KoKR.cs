@@ -431,6 +431,7 @@ public class KoKR : DefaultLocalizationBase
     public override string TasksPriorityLabel => "우선순위";
     public override string TasksAssignedToLabel => "담당자";
     public override string TasksCreatedAtLabel => "생성일";
+    public override string TaskViewExecutionHistory => "실행 기록 보기";
     
     public override string ProjectTasksPageHeader => "프로젝트 작업";
     
@@ -651,6 +652,13 @@ public class KoKR : DefaultLocalizationBase
     public override string TimerExecutionDetailTitle => "실행 세부정보";
     public override string TimerExecutionDetailHeader => "실행 메시지 기록";
     public override string TimerExecutionNoRecords => "실행 기록이 없습니다";
+    public override string TaskExecutionHistoryTitle => "작업 실행 기록";
+    public override string TaskExecutionHistoryHeader => "실행 기록";
+    public override string TaskExecutionBackToTasks => "← 작업 목록으로 돌아가기";
+    public override string TaskExecutionTaskName => "작업: {0}";
+    public override string TaskExecutionDetailTitle => "작업 실행 상세";
+    public override string TaskExecutionDetailHeader => "실행 상세";
+    public override string TaskExecutionNoRecords => "실행 기록이 없습니다";
     public override string TimersStatusActive => "실행 중";
     public override string TimersStatusPaused => "일시 정지";
     public override string TimersStatusTriggered => "트리거됨";

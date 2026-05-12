@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -88,6 +88,16 @@ public class TaskView : ViewBase
                 .Property("text-align", "center")
                 .Property("padding", "40px")
                 .Property("color", "var(--text-secondary)")
+            .EndSelector()
+            .Selector(".view-history-link")
+                .Property("color", "var(--accent-primary)")
+                .Property("text-decoration", "none")
+                .Property("font-weight", "bold")
+                .Property("transition", "color 0.2s")
+            .EndSelector()
+            .Selector(".view-history-link:hover")
+                .Property("color", "var(--accent-secondary, var(--accent-primary))")
+                .Property("text-decoration", "underline")
             .EndSelector();
     }
 
@@ -135,7 +145,11 @@ public class TaskView : ViewBase
                     .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.TasksCreatedAtLabel))
                     .Op(() => "+", () => (JsSyntax)Js.Str(() => ": "))
                     .Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "createdAtFormatted"))
-                    .Op(() => "+", () => (JsSyntax)Js.Str(() => "</span></div>"))))
+                    .Op(() => "+", () => (JsSyntax)Js.Str(() => "</span></div><div class='task-meta'><a href='/task-cycles/"))
+                    .Op(() => "+", () => (JsSyntax)Js.Id(() => "t").Prop(() => "id"))
+                    .Op(() => "+", () => (JsSyntax)Js.Str(() => "' class='view-history-link'>"))
+                    .Op(() => "+", () => (JsSyntax)Js.Str(() => loc.TaskViewExecutionHistory))
+                    .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a></div>"))))
             .Add(() => Js.Id(() => "list").Call(() => "appendChild", () => Js.Id(() => "item")).Stmt());
 
         var thenBody = Js.Block()

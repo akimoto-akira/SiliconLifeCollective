@@ -286,6 +286,7 @@ public class ZhHK : DefaultLocalizationBase
     public override string TasksPriorityLabel => "優先級";
     public override string TasksAssignedToLabel => "負責人";
     public override string TasksCreatedAtLabel => "建立時間";
+    public override string TaskViewExecutionHistory => "查看執行記錄";
     
     public override string ProjectTasksPageHeader => "項目任務";
     
@@ -506,6 +507,13 @@ public class ZhHK : DefaultLocalizationBase
     public override string TimerExecutionDetailTitle => "執行詳情";
     public override string TimerExecutionDetailHeader => "執行訊息記錄";
     public override string TimerExecutionNoRecords => "暫無執行記錄";
+    public override string TaskExecutionHistoryTitle => "任務執行記錄";
+    public override string TaskExecutionHistoryHeader => "執行記錄";
+    public override string TaskExecutionBackToTasks => "← 返回任務列表";
+    public override string TaskExecutionTaskName => "任務：{0}";
+    public override string TaskExecutionDetailTitle => "任務執行詳情";
+    public override string TaskExecutionDetailHeader => "執行詳情";
+    public override string TaskExecutionNoRecords => "暫無執行記錄";
     public override string TimersStatusActive => "執行中";
     public override string TimersStatusPaused => "已暫停";
     public override string TimersStatusTriggered => "已觸發";

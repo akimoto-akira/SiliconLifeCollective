@@ -409,6 +409,7 @@ public class ItIT : DefaultLocalizationBase
     public override string TasksPriorityLabel => "Priorità";
     public override string TasksAssignedToLabel => "Assegnato a";
     public override string TasksCreatedAtLabel => "Data di creazione";
+    public override string TaskViewExecutionHistory => "Visualizza cronologia esecuzione";
 
     public override string ProjectTasksPageHeader => "Attività del progetto";
 
@@ -612,6 +613,13 @@ public class ItIT : DefaultLocalizationBase
     public override string TimerExecutionDetailTitle => "Dettagli esecuzione";
     public override string TimerExecutionDetailHeader => "Registro messaggi esecuzione";
     public override string TimerExecutionNoRecords => "Nessun registro esecuzione per il momento";
+    public override string TaskExecutionHistoryTitle => "Cronologia esecuzione attività";
+    public override string TaskExecutionHistoryHeader => "Cronologia esecuzione";
+    public override string TaskExecutionBackToTasks => "← Torna alle attività";
+    public override string TaskExecutionTaskName => "Attività: {0}";
+    public override string TaskExecutionDetailTitle => "Dettaglio esecuzione attività";
+    public override string TaskExecutionDetailHeader => "Dettaglio esecuzione";
+    public override string TaskExecutionNoRecords => "Nessun registro esecuzione per il momento";
     public override string TimersStatusActive => "Attivo";
     public override string TimersStatusPaused => "In pausa";
     public override string TimersStatusTriggered => "Attivato";

@@ -504,8 +504,7 @@ public class ProjectManager : IProjectManager
                 SaveProjectsInternal(projects);
             }
 
-            var storage = new FileSystemStorage(project.StoragePath);
-            var system = new ProjectTaskSystem(project.Id, storage);
+            var system = new ProjectTaskSystem(project.Id);
             _projectTaskSystems[projectId] = system;
             return system;
         }

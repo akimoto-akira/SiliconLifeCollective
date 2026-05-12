@@ -409,6 +409,7 @@ public class FrFR : DefaultLocalizationBase
     public override string TasksPriorityLabel => "Priorité";
     public override string TasksAssignedToLabel => "Responsable";
     public override string TasksCreatedAtLabel => "Date de création";
+    public override string TaskViewExecutionHistory => "Voir l'historique d'exécution";
 
     public override string ProjectTasksPageHeader => "Tâches du projet";
 
@@ -620,6 +621,13 @@ public class FrFR : DefaultLocalizationBase
     public override string TimerExecutionDetailTitle => "Détails de l'exécution";
     public override string TimerExecutionDetailHeader => "Journal des messages d'exécution";
     public override string TimerExecutionNoRecords => "Aucun journal d'exécution pour le moment";
+    public override string TaskExecutionHistoryTitle => "Historique d'exécution des tâches";
+    public override string TaskExecutionHistoryHeader => "Historique d'exécution";
+    public override string TaskExecutionBackToTasks => "← Retour aux tâches";
+    public override string TaskExecutionTaskName => "Tâche : {0}";
+    public override string TaskExecutionDetailTitle => "Détail d'exécution de tâche";
+    public override string TaskExecutionDetailHeader => "Détail d'exécution";
+    public override string TaskExecutionNoRecords => "Aucun journal d'exécution pour le moment";
     public override string TimersStatusActive => "Actif";
     public override string TimersStatusPaused => "En pause";
     public override string TimersStatusTriggered => "Déclenché";

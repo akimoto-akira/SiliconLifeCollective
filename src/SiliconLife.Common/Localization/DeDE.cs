@@ -405,6 +405,7 @@ public class DeDE : DefaultLocalizationBase
     public override string TasksPriorityLabel => "Priorität";
     public override string TasksAssignedToLabel => "Verantwortlich";
     public override string TasksCreatedAtLabel => "Erstellungszeit";
+    public override string TaskViewExecutionHistory => "Ausführungsverlauf anzeigen";
     
     public override string ProjectTasksPageHeader => "Projektaufgaben";
     
@@ -619,6 +620,13 @@ public class DeDE : DefaultLocalizationBase
     public override string TimerExecutionDetailTitle => "Ausführungsdetails";
     public override string TimerExecutionDetailHeader => "Ausführungs-Nachrichtenprotokoll";
     public override string TimerExecutionNoRecords => "Noch keine Ausführungsprotokolle";
+    public override string TaskExecutionHistoryTitle => "Aufgabenausführungsverlauf";
+    public override string TaskExecutionHistoryHeader => "Ausführungsverlauf";
+    public override string TaskExecutionBackToTasks => "← Zurück zu Aufgaben";
+    public override string TaskExecutionTaskName => "Aufgabe: {0}";
+    public override string TaskExecutionDetailTitle => "Aufgabenausführungsdetail";
+    public override string TaskExecutionDetailHeader => "Ausführungsdetail";
+    public override string TaskExecutionNoRecords => "Noch keine Ausführungsprotokolle";
     public override string TimersStatusActive => "Läuft";
     public override string TimersStatusPaused => "Pausiert";
     public override string TimersStatusTriggered => "Ausgelöst";

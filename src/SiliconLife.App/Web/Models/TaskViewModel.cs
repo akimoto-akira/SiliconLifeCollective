@@ -30,3 +30,20 @@ public class TaskItem
     public DateTime? CompletedAt { get; set; }
     public string AssignedTo { get; set; } = string.Empty;
 }
+
+public class TaskExecutionHistoryViewModel : ViewModelBase
+{
+    public Guid TaskId { get; set; }
+    public string TaskName { get; set; } = "";
+}
+
+public class TaskExecutionDetailViewModel : ViewModelBase
+{
+    public Guid TaskId { get; set; }
+    public int CycleIndex { get; set; }
+    public string TaskName { get; set; } = "";
+    public string StartedAt { get; set; } = "";
+    public string? EndedAt { get; set; }
+    public string State { get; set; } = "";
+    public Dictionary<string, string> ToolDisplayNames { get; set; } = new();
+}

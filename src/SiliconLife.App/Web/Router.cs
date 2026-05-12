@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -65,6 +65,10 @@ public class Router
         RegisterController(() => new TimerController(), "/api/timer-cycle/messages");
         RegisterController(() => new TaskController(), "/tasks");
         RegisterController(() => new TaskController(), "/api/tasks/list");
+        RegisterController(() => new TaskController(), "/task-cycles/{taskId}");
+        RegisterController(() => new TaskController(), "/api/task-cycles/list");
+        RegisterController(() => new TaskController(), "/task-cycle/{cycleIndex}");
+        RegisterController(() => new TaskController(), "/api/task-cycle/messages");
         RegisterController(() => new PermissionController(), "/permissions");
         RegisterController(() => new PermissionController(), "/api/permissions/list");
         RegisterController(() => new PermissionController(), "/api/permissions/save", "POST");

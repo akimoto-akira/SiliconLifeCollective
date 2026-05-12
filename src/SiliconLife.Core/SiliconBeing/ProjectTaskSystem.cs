@@ -23,14 +23,9 @@ public sealed class ProjectTaskSystem
     public int PendingCount => TaskCenter.Instance.GetProjectTasks(_projectId).Count(t => t.Status == TaskStatus.Pending);
     public int RunningCount => TaskCenter.Instance.GetProjectTasks(_projectId).Count(t => t.Status == TaskStatus.Running);
 
-    public ProjectTaskSystem(Guid projectId, IStorage storage)
+    public ProjectTaskSystem(Guid projectId)
     {
         _projectId = projectId;
-
-        if (storage != null)
-        {
-            TaskCenter.Instance.Initialize(storage);
-        }
 
         _logger.Info(null, "ProjectTaskSystem created for project {0}", projectId);
     }

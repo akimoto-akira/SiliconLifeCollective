@@ -431,6 +431,7 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string TasksPriorityLabel => "Prioridad";
     public override string TasksAssignedToLabel => "Asignado a";
     public override string TasksCreatedAtLabel => "Creado";
+    public override string TaskViewExecutionHistory => "Ver historial de ejecución";
     
     public override string ProjectTasksPageHeader => "Tareas del proyecto";
     
@@ -651,6 +652,13 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string TimerExecutionDetailTitle => "Detalle de ejecución";
     public override string TimerExecutionDetailHeader => "Registro de Mensajes de Ejecución";
     public override string TimerExecutionNoRecords => "No se encontraron registros de ejecución";
+    public override string TaskExecutionHistoryTitle => "Historial de ejecución de tareas";
+    public override string TaskExecutionHistoryHeader => "Historial de ejecución";
+    public override string TaskExecutionBackToTasks => "← Volver a tareas";
+    public override string TaskExecutionTaskName => "Tarea: {0}";
+    public override string TaskExecutionDetailTitle => "Detalle de ejecución de tarea";
+    public override string TaskExecutionDetailHeader => "Detalle de ejecución";
+    public override string TaskExecutionNoRecords => "No se encontraron registros de ejecución";
     public override string TimersStatusActive => "Activo";
     public override string TimersStatusPaused => "Pausado";
     public override string TimersStatusTriggered => "Activado";

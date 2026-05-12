@@ -194,7 +194,7 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
 
         // Create Memory, TaskSystem, TimerSystem for this being
         being.Memory = new Memory(beingTimeStorage);
-        being.TaskSystem = new TaskSystem(being, beingStorage);
+        being.TaskSystem = new TaskSystem(being);
         being.TaskEnumerator = new TaskEnumerator(id);
 
         Func<Dictionary<string, CalendarBase>> registryFactory = CalendarBase.BuildCalendarRegistry;

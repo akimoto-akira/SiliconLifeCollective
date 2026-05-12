@@ -887,6 +887,41 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string TimerExecutionNoRecords { get; }
 
     /// <summary>
+    /// Gets the task execution history page title
+    /// </summary>
+    public abstract string TaskExecutionHistoryTitle { get; }
+
+    /// <summary>
+    /// Gets the task execution history page header
+    /// </summary>
+    public abstract string TaskExecutionHistoryHeader { get; }
+
+    /// <summary>
+    /// Gets the back to tasks link text
+    /// </summary>
+    public abstract string TaskExecutionBackToTasks { get; }
+
+    /// <summary>
+    /// Gets the task name label for execution history
+    /// </summary>
+    public abstract string TaskExecutionTaskName { get; }
+
+    /// <summary>
+    /// Gets the task execution detail page title
+    /// </summary>
+    public abstract string TaskExecutionDetailTitle { get; }
+
+    /// <summary>
+    /// Gets the task execution detail page header
+    /// </summary>
+    public abstract string TaskExecutionDetailHeader { get; }
+
+    /// <summary>
+    /// Task execution history empty state message
+    /// </summary>
+    public abstract string TaskExecutionNoRecords { get; }
+
+    /// <summary>
     /// Gets the active status text
     /// </summary>
     public abstract string TimersStatusActive { get; }
@@ -1489,6 +1524,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// Gets the created-at label for tasks
     /// </summary>
     public abstract string TasksCreatedAtLabel { get; }
+
+    /// <summary>
+    /// Gets the link text for viewing task execution history
+    /// </summary>
+    public abstract string TaskViewExecutionHistory { get; }
 
     /// <summary>
     /// Gets the project tasks page header text

@@ -21,9 +21,11 @@ public class TaskCenter
     private static TaskCenter? _instance;
     private static readonly object _lock = new();
 
-    private readonly ConcurrentDictionary<Guid, TaskItem> _tasks = new();
+    private readonly ConcurrentDictionary<Guid, TaskItem> _loadedTasks = new();
+    private readonly ConcurrentDictionary<Guid, byte> _knownTaskIds = new();
     private IStorage? _storage;
-    private const string StorageKey = "tasks";
+    private bool _initialized;
+    private const string TaskDirectory = "tasks";
 
     private TaskCenter() {}
 
@@ -48,45 +50,103 @@ public class TaskCenter
 
     public void Initialize(IStorage storage)
     {
+        if (_initialized) return;
+
         _storage = storage ?? throw new ArgumentNullException(nameof(storage));
-        LoadAll();
+        ScanTaskDirectory();
+        _initialized = true;
     }
 
-    private void LoadAll()
+    private void ScanTaskDirectory()
     {
         if (_storage == null) return;
 
         try
         {
-            List<TaskItem>? tasks = _storage.Read<List<TaskItem>>(StorageKey).FirstOrDefault();
-            if (tasks != null)
+            foreach (var key in _storage.ListKeys(TaskDirectory))
             {
-                foreach (var task in tasks)
+                if (key.EndsWith("/"))
+                    continue;
+
+                string fileName = Path.GetFileNameWithoutExtension(key);
+                if (Guid.TryParse(fileName, out Guid taskId))
                 {
-                    _tasks.TryAdd(task.Id, task);
+                    _knownTaskIds.TryAdd(taskId, 0);
                 }
-                _logger.Info(null, "TaskCenter loaded {0} task(s) from storage", tasks.Count);
             }
+
+            _logger.Info(null, "TaskCenter scanned {0} task(s) from storage", _knownTaskIds.Count);
         }
         catch (Exception ex)
         {
-            _logger.Warn(null, "Failed to load tasks from storage", ex);
+            _logger.Warn(null, "Failed to scan task directory", ex);
+        }
+    }
+
+    private static string GetTaskKey(Guid taskId) => $"{TaskDirectory}/{taskId}.json";
+
+    private TaskItem? LoadTask(Guid taskId)
+    {
+        if (_storage == null) return null;
+
+        try
+        {
+            var result = _storage.Read<TaskItem>(GetTaskKey(taskId)).FirstOrDefault();
+            if (result != null)
+            {
+                _loadedTasks.TryAdd(taskId, result);
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(null, "Failed to load task {0} from storage", taskId, ex);
+            return null;
+        }
+    }
+
+    private void EnsureAllTasksLoaded()
+    {
+        foreach (var taskId in _knownTaskIds.Keys)
+        {
+            if (!_loadedTasks.ContainsKey(taskId))
+            {
+                LoadTask(taskId);
+            }
+        }
+    }
+
+    private void SaveTask(TaskItem task)
+    {
+        if (_storage == null) return;
+
+        try
+        {
+            _storage.Write(GetTaskKey(task.Id), task);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(null, "Failed to save task {0} to storage", task.Id, ex);
+        }
+    }
+
+    private void DeleteTaskFile(Guid taskId)
+    {
+        if (_storage == null) return;
+
+        try
+        {
+            _storage.Delete(GetTaskKey(taskId));
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(null, "Failed to delete task {0} from storage", taskId, ex);
         }
     }
 
     public void Save()
     {
-        if (_storage == null) return;
-
-        try
-        {
-            var tasks = _tasks.Values.ToList();
-            _storage.Write(StorageKey, tasks);
-        }
-        catch (Exception ex)
-        {
-            _logger.Error(null, "Failed to save tasks to storage", ex);
-        }
     }
 
     public bool AddTask(TaskItem task)
@@ -94,16 +154,18 @@ public class TaskCenter
         if (task == null)
             throw new ArgumentNullException(nameof(task));
 
-        bool added = _tasks.TryAdd(task.Id, task);
+        bool added = _knownTaskIds.TryAdd(task.Id, 0);
         if (added)
         {
+            _loadedTasks[task.Id] = task;
+            SaveTask(task);
             _logger.Info(null, "Task added to TaskCenter: {0} (ID: {1})", task.Title, task.Id);
-            Save();
         }
         else
         {
             _logger.Warn(null, "Task already exists in TaskCenter: {0} (ID: {1})", task.Title, task.Id);
         }
+
         return added;
     }
 
@@ -112,62 +174,70 @@ public class TaskCenter
         if (task == null)
             throw new ArgumentNullException(nameof(task));
 
-        if (!_tasks.ContainsKey(task.Id))
+        if (!_knownTaskIds.ContainsKey(task.Id))
         {
             _logger.Warn(null, "Task not found for update: {0} (ID: {1})", task.Title, task.Id);
             return false;
         }
 
-        _tasks[task.Id] = task;
+        _loadedTasks[task.Id] = task;
+        SaveTask(task);
         _logger.Debug(null, "Task updated in TaskCenter: {0} (ID: {1})", task.Title, task.Id);
-        Save();
         return true;
     }
 
     public bool RemoveTask(Guid taskId)
     {
-        bool removed = _tasks.TryRemove(taskId, out TaskItem? removedTask);
+        bool removed = _knownTaskIds.TryRemove(taskId, out _);
         if (removed)
         {
+            _loadedTasks.TryRemove(taskId, out TaskItem? removedTask);
+            DeleteTaskFile(taskId);
             _logger.Info(null, "Task removed from TaskCenter: {0} (ID: {1})", removedTask?.Title ?? "Unknown", taskId);
-            Save();
         }
         else
         {
             _logger.Warn(null, "Task not found for removal (ID: {0})", taskId);
         }
+
         return removed;
     }
 
     public TaskItem? GetTask(Guid taskId)
     {
-        _tasks.TryGetValue(taskId, out TaskItem? task);
-        return task;
+        if (_loadedTasks.TryGetValue(taskId, out TaskItem? task))
+            return task;
+
+        if (!_knownTaskIds.ContainsKey(taskId))
+            return null;
+
+        return LoadTask(taskId);
     }
 
     public IEnumerable<TaskItem> GetAllTasks()
     {
-        return _tasks.Values;
+        EnsureAllTasksLoaded();
+        return _loadedTasks.Values;
     }
 
     public IEnumerable<TaskItem> GetTasksForBeing(Guid beingId)
     {
-        return _tasks.Values.Where(t => t.ExecutorGuid == beingId);
+        return GetAllTasks().Where(t => t.ExecutorGuid == beingId);
     }
 
     public IEnumerable<TaskItem> GetTasksForProject(Guid projectId)
     {
-        return _tasks.Values.Where(t => t.ProjectId == projectId);
+        return GetAllTasks().Where(t => t.ProjectId == projectId);
     }
 
     public IEnumerable<TaskItem> GetPersonalTasks(Guid beingId)
     {
-        return _tasks.Values.Where(t => t.ProjectId == null && t.ExecutorGuid == beingId);
+        return GetAllTasks().Where(t => t.ProjectId == null && t.ExecutorGuid == beingId);
     }
 
     public IEnumerable<TaskItem> GetProjectTasks(Guid projectId)
     {
-        return _tasks.Values.Where(t => t.ProjectId == projectId);
+        return GetAllTasks().Where(t => t.ProjectId == projectId);
     }
 
     public List<TaskItem> GetRunnableTasks(Guid beingId)
@@ -188,7 +258,7 @@ public class TaskCenter
 
     public List<TaskItem> GetContinuationTasks(Guid beingId)
     {
-        return _tasks.Values.Where(t =>
+        return GetAllTasks().Where(t =>
             t.ExecutorGuid == beingId &&
             t.Status == TaskStatus.Running &&
             t.ChatHistory.Count > 0 &&
@@ -214,7 +284,7 @@ public class TaskCenter
 
     public IEnumerable<TaskItem> GetTasksByStatus(TaskStatus status)
     {
-        return _tasks.Values.Where(t => t.Status == status);
+        return GetAllTasks().Where(t => t.Status == status);
     }
 
     public bool HasPendingTasks(Guid beingId)
@@ -222,7 +292,7 @@ public class TaskCenter
         return GetRunnableTasks(beingId).Count > 0;
     }
 
-    public int TaskCount => _tasks.Count;
+    public int TaskCount => _knownTaskIds.Count;
 
     public int GetPendingTaskCount(Guid beingId)
     {

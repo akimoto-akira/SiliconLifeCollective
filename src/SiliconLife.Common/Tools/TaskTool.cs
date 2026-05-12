@@ -447,10 +447,12 @@ public class TaskTool : ITool
             return ToolResult.Failed($"Task '{task.Title}' is {task.Status}, only running tasks can be submitted for review");
         }
 
-        task.SealCurrentCycle(Collective.TaskStatus.SubmittedForReview);
-        task.SubmitForReview();
-        task.AppendNewCycle();
-        TaskCenter.Instance.UpdateTask(task);
+        bool submitted = being.TaskSystem!.SubmitForReview(taskId);
+        if (!submitted)
+        {
+            return ToolResult.Failed($"Failed to submit task '{task.Title}' for review");
+        }
+
         return ToolResult.Successful($"Task '{task.Title}' submitted for review.");
     }
 }
