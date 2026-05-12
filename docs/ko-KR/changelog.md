@@ -61,6 +61,168 @@
 
 ## [미출시]
 
+### 2026-05-12
+
+#### 작업 시스템 웹 뷰
+- `0891b3c` - 작업 실행 상세 및 기록 뷰 추가
+  - TaskExecutionDetailView 작업 실행 상세 뷰 추가
+  - TaskExecutionHistoryView 작업 실행 기록 뷰 추가
+  - TaskController 실행 상세 및 기록 쿼리 인터페이스 추가
+  - TaskViewModel 작업 뷰 모델 추가
+  - TaskCenter 작업 센터 강화
+  - TaskSystem 작업 시스템 업데이트
+  - 9개 언어 현지화 작업 관련 키 추가
+  - 26개 파일 변경, 803행 추가, 55행 삭제
+
+### 2026-05-11
+
+#### 웹 컴포넌트 아키텍처 리팩토링
+- `5e687ad` - 컴포넌트 렌더링을 문자열에서 H-tree로 마이그레이션
+  - ComponentBase 렌더링 메서드를 문자열 패턴에서 H-tree 구조로 마이그레이션
+  - 모든 28개 컴포넌트를 새 렌더링 아키텍처에 적응 (A, Accordion, Button, Calendar, Card, Chart 등)
+  - SelectComponent 대규모 리팩토링 (889행 개선)
+  - 컨트롤러 및 뷰 동기화 업데이트
+  - 33개 파일 변경, 667행 추가, 435행 삭제
+
+- `bfd332d` - Style을 문자열에서 CssBuilder 인라인 스타일로 마이그레이션
+  - CssBuilder 스타일 빌더 추가
+  - ComponentBase 스타일 시스템을 문자열에서 구조화된 CssBuilder로 마이그레이션
+  - LoadingComponent 대폭 강화 (103행 추가)
+  - ConfigController, LogController, MemoryController 컨트롤러 스타일 마이그레이션
+  - ChatView, ConfigView, LogView, MemoryView 뷰 스타일 마이그레이션
+  - 37개 파일 변경, 351행 추가, 157행 삭제
+
+#### 스토리지 시스템 최적화
+- `d67a7ee` - 대규모 데이터셋을 위한 QueryLatest 최적화
+  - SpeedyTimeStorage QueryLatest 메서드 성능 최적화
+  - SpeedyLoggerProvider 로그 제공자 강화
+  - 2개 파일 변경, 44행 추가, 5행 삭제
+
+#### 캘린더 시스템 리팩토링
+- `9629f88` - TimerExecution 추출 및 타이머 웹 뷰 강화
+  - TimerSystem TimerExecution 로직 추출 (175행 제거)
+  - SelectComponent 대폭 강화 (427행 개선)
+  - TimerController 및 타이머 뷰 강화
+  - ContextManager 컨텍스트 관리자 업데이트
+  - 12개 파일 변경, 458행 추가, 267행 삭제
+
+#### 현지화
+- `5d8ca79` - LogsLoading 현지화 키 추가
+  - 9개 언어 LogsLoading 키 추가
+  - DefaultLocalizationBase 기본 클래스 정의 추가
+  - 11개 파일 변경, 15행 추가
+
+### 2026-05-10
+
+#### 작업 시스템 리팩토링
+- `54394f6` - 작업 시스템과 채팅 기록 주기 병합
+  - ProjectTaskSystem 프로젝트 작업 시스템 대폭 간소화 (411행 리팩토링)
+  - TaskSystem 작업 시스템 간소화 (254행 리팩토링)
+  - TaskCenter 작업 센터 리팩토링 (188행 개선)
+  - ContextManager 컨텍스트 관리자 최적화 (347행 리팩토링)
+  - DefaultSiliconBeing 실리콘 생명체 강화
+  - TimerSystem 타이머 시스템 작업 통합
+  - IWorkNoteStorage 인터페이스 업데이트
+  - SpeedyWorkNoteStorage 및 FileSystemWorkNoteStorage 적응
+  - 16개 파일 변경, 648행 추가, 897행 삭제
+
+### 2026-05-09
+
+#### 웹 인터페이스 강화
+- `bc50dd7` - 채팅 뷰 개선 및 감사 기능 추가
+  - AuditController 감사 컨트롤러 추가 (261행)
+  - AuditView 감사 뷰 추가 (379행)
+  - AuditViewModel 감사 뷰 모델 추가
+  - ChatView 채팅 뷰 대폭 개선 (171행 강화)
+  - ChatController 채팅 컨트롤러 업데이트
+  - MarkdownEditorComponent 컴포넌트 강화
+  - InitController 초기화 컨트롤러 개선
+  - ChatSystem 채팅 시스템 기능 추가
+  - 14개 파일 변경, 1030행 추가, 112행 삭제
+
+- `c9babce` - 채팅 뷰의 도구 호출 렌더링 개선
+  - ChatView 도구 호출 블록 렌더링 강화
+  - 1개 파일 변경, 54행 추가, 11행 삭제
+
+#### AI 도구 시나리오 시스템
+- `ff2eddd` - 도구 시나리오 필터링 시스템 구현
+  - ToolScenarioAttribute 도구 시나리오 속성 추가 (36행)
+  - ChatOnlyAttribute 채팅 전용 시나리오 속성 추가 (19행)
+  - ToolManager 도구 관리자 시나리오 필터링 추가 (40행)
+  - ContextManager 컨텍스트 관리자 시나리오 필터링 적응
+  - 4개 파일 변경, 115행 추가, 30행 삭제
+
+- `5709a33` - 도구 클래스에 시나리오 속성 추가
+  - 24개 도구 클래스 ToolScenario 속성 어노테이션 추가
+  - 캘린더, 채팅, 설정, 큐레이터, 데이터베이스, 디스크, 동적 컴파일 등 포함
+  - 24개 파일 변경, 46행 추가, 20행 삭제
+
+#### 작업 시스템 리팩토링
+- `2f19a5f` - TaskCenter 및 TaskEnumerator로 작업 시스템 재구성
+  - TaskCenter 작업 센터 추가 (235행)
+  - TaskEnumerator 작업 열거자 추가 (297행)
+  - TaskSystem 작업 시스템 리팩토링 및 간소화
+  - DefaultSiliconBeing 실리콘 생명체 새 아키텍처 적응
+  - DefaultSiliconBeingFactory 팩토리 업데이트
+  - SiliconBeingBase 기본 클래스 강화
+  - 7개 파일 변경, 796행 추가, 275행 삭제
+
+#### 권한 시스템 마이그레이션
+- `a06ed09` - IM 및 권한 시스템을 App 프로젝트로 마이그레이션
+  - PermissionRequestQueue를 Default/Fast에서 App 프로젝트로 마이그레이션 (443행 추가)
+  - Default 버전 WebUIProvider 제거 (403행 삭제)
+  - Default 버전 HelpTool 제거 (194행 삭제)
+  - Default/Fast 버전 중복 PermissionRequestQueue 제거
+  - Default 버전 IMPermissionAskHandler 제거
+  - PermissionRequestController 컨트롤러 업데이트
+  - 14개 파일 변경, 496행 추가, 1183행 삭제
+
+#### AI 컨텍스트 최적화
+- `4c8aaff` - 컨텍스트 관리자 최적화 및 서비스 로케이터 강화
+  - ContextManager 컨텍스트 관리자 간소화 및 최적화
+  - ServiceLocator 서비스 로케이터 강화 (36행 추가)
+  - ToolManager 도구 관리자 강화 (34행 추가)
+  - DashScopeClient 및 VolcengineArkClient 클라이언트 개선
+  - 실행자 (CommandLine, Disk, Network) 업데이트
+  - 8개 파일 변경, 116행 추가, 98행 삭제
+
+#### 현지화
+- `5c5eef7` - 감사 및 작업 현지화 키 추가
+  - DefaultLocalizationBase 127행 현지화 정의 추가
+  - 9개 언어 감사 및 작업 관련 키 추가 (각 26행)
+  - 11개 파일 변경, 387행 추가
+
+#### 프로젝트 설정
+- `2067db6` - 프로젝트 설정 및 gitignore 규칙 업데이트
+  - .gitignore 규칙 업데이트
+  - DefaultConfigData 및 Fast DefaultConfigData 설정 강화
+  - SpeedyWorkNoteStorage 스토리지 개선
+  - SpeedyPack 코어 강화
+  - 5개 파일 변경, 32행 추가, 6행 삭제
+
+### 2026-05-07
+
+#### 이탈리아어 현지화
+- `8adc18c` - 이탈리아어 현지화 지원 추가 및 다국어 문서 업데이트
+  - it-IT 이탈리아어 현지화 추가
+  - ItIT 현지화 구현 추가 (1909행)
+  - ChineseHistoricalItIT 중국 역사 캘린더 이탈리아어 지원 추가 (586행)
+  - TrayItIT 트레이 이탈리아어 현지화 추가 (135행)
+  - 이탈리아어 전체 문서 세트 추가 (14개 문서: README, API 참조, 아키텍처, 캘린더 시스템, 변경 로그, 기여 가이드 등)
+  - 모든 언어 버전의 아키텍처, 개발 가이드, 시작 가이드 등 업데이트
+  - Language 언어 열거에 이탈리아어 추가
+  - 86개 파일 변경, 11573행 추가, 769행 삭제
+
+#### 문서 동기화
+- `12a5deb` - 아키텍처, 변경 로그, 실리콘 생명체 가이드의 다국어 문서 업데이트
+  - 8개 언어 README 업데이트
+  - 8개 언어 아키텍처 문서 업데이트
+  - 8개 언어 변경 로그 업데이트
+  - 8개 언어 실리콘 생명체 가이드 업데이트
+  - 8개 언어 도구 참조 업데이트
+  - 용어집 재구성
+  - 46개 파일 변경, 1697행 추가, 442행 삭제
+
 ### 2026-05-06
 
 #### 대규모 모듈 리팩토링

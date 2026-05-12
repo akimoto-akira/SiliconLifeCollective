@@ -61,6 +61,168 @@ Both versions share the same interfaces and functionality, differing only in sto
 
 ## [Unreleased]
 
+### 2026-05-12
+
+#### Task System Web Views
+- `0891b3c` - Add task execution detail and history views
+  - Added TaskExecutionDetailView task execution detail view
+  - Added TaskExecutionHistoryView task execution history view
+  - TaskController added execution detail and history query interfaces
+  - Added TaskViewModel task view model
+  - TaskCenter task center enhanced
+  - TaskSystem task system updated
+  - 9 languages localization added task-related keys
+  - 26 files changed, 803 insertions(+), 55 deletions(-)
+
+### 2026-05-11
+
+#### Web Component Architecture Refactoring
+- `5e687ad` - Migrate component rendering from string to H-tree
+  - ComponentBase rendering method migrated from string pattern to H-tree structure
+  - All 28 components adapted to new rendering architecture (A, Accordion, Button, Calendar, Card, Chart, etc.)
+  - SelectComponent major refactoring (889 lines improved)
+  - Controllers and views updated accordingly
+  - 33 files changed, 667 insertions(+), 435 deletions(-)
+
+- `bfd332d` - Migrate Style from string to CssBuilder inline styles
+  - Added CssBuilder style builder
+  - ComponentBase style system migrated from string to structured CssBuilder
+  - LoadingComponent significantly enhanced (103 lines added)
+  - ConfigController, LogController, MemoryController controller style migration
+  - ChatView, ConfigView, LogView, MemoryView view style migration
+  - 37 files changed, 351 insertions(+), 157 deletions(-)
+
+#### Storage System Optimization
+- `d67a7ee` - Optimize QueryLatest for large datasets
+  - SpeedyTimeStorage QueryLatest method performance optimization
+  - SpeedyLoggerProvider logger provider enhanced
+  - 2 files changed, 44 insertions(+), 5 deletions(-)
+
+#### Calendar System Refactoring
+- `9629f88` - Extract TimerExecution and enhance timer web views
+  - TimerSystem extracted TimerExecution logic (175 lines removed)
+  - SelectComponent significantly enhanced (427 lines improved)
+  - TimerController and timer views enhanced
+  - ContextManager context manager updated
+  - 12 files changed, 458 insertions(+), 267 deletions(-)
+
+#### Localization
+- `5d8ca79` - Add LogsLoading localization key
+  - 9 languages added LogsLoading key
+  - DefaultLocalizationBase base class added definition
+  - 11 files changed, 15 insertions(+)
+
+### 2026-05-10
+
+#### Task System Refactoring
+- `54394f6` - Merge task system with chat history cycles
+  - ProjectTaskSystem project task system significantly streamlined (411 lines refactored)
+  - TaskSystem task system streamlined (254 lines refactored)
+  - TaskCenter task center refactored (188 lines improved)
+  - ContextManager context manager optimized (347 lines refactored)
+  - DefaultSiliconBeing silicon being enhanced
+  - TimerSystem timer system integrated with tasks
+  - IWorkNoteStorage interface updated
+  - SpeedyWorkNoteStorage and FileSystemWorkNoteStorage adapted
+  - 16 files changed, 648 insertions(+), 897 deletions(-)
+
+### 2026-05-09
+
+#### Web Interface Enhancement
+- `bc50dd7` - Improve chat view and add audit functionality
+  - Added AuditController audit controller (261 lines)
+  - Added AuditView audit view (379 lines)
+  - Added AuditViewModel audit view model
+  - ChatView chat view significantly improved (171 lines enhanced)
+  - ChatController chat controller updated
+  - MarkdownEditorComponent component enhanced
+  - InitController initialization controller improved
+  - ChatSystem chat system added features
+  - 14 files changed, 1030 insertions(+), 112 deletions(-)
+
+- `c9babce` - Improve tool call rendering in chat view
+  - ChatView tool call block rendering enhanced
+  - 1 file changed, 54 insertions(+), 11 deletions(-)
+
+#### AI Tool Scenario System
+- `ff2eddd` - Implement tool scenario filtering system
+  - Added ToolScenarioAttribute tool scenario attribute (36 lines)
+  - Added ChatOnlyAttribute chat-only scenario attribute (19 lines)
+  - ToolManager tool manager added scenario filtering (40 lines)
+  - ContextManager context manager adapted for scenario filtering
+  - 4 files changed, 115 insertions(+), 30 deletions(-)
+
+- `5709a33` - Add scenario attributes to tool classes
+  - 24 tool classes added ToolScenario attribute annotations
+  - Including calendar, chat, config, curator, database, disk, dynamic compile, etc.
+  - 24 files changed, 46 insertions(+), 20 deletions(-)
+
+#### Task System Refactoring
+- `2f19a5f` - Restructure task system with TaskCenter and TaskEnumerator
+  - Added TaskCenter task center (235 lines)
+  - Added TaskEnumerator task enumerator (297 lines)
+  - TaskSystem task system refactored and streamlined
+  - DefaultSiliconBeing silicon being adapted to new architecture
+  - DefaultSiliconBeingFactory factory updated
+  - SiliconBeingBase base class enhanced
+  - 7 files changed, 796 insertions(+), 275 deletions(-)
+
+#### Permission System Migration
+- `a06ed09` - Migrate IM and permission system to App project
+  - PermissionRequestQueue migrated from Default/Fast to App project (443 lines added)
+  - Removed Default version WebUIProvider (403 lines deleted)
+  - Removed Default version HelpTool (194 lines deleted)
+  - Removed Default/Fast duplicate PermissionRequestQueue
+  - Removed Default version IMPermissionAskHandler
+  - PermissionRequestController controller updated
+  - 14 files changed, 496 insertions(+), 1183 deletions(-)
+
+#### AI Context Optimization
+- `4c8aaff` - Optimize context manager and enhance service locator
+  - ContextManager context manager streamlined and optimized
+  - ServiceLocator service locator enhanced (36 lines added)
+  - ToolManager tool manager enhanced (34 lines added)
+  - DashScopeClient and VolcengineArkClient clients improved
+  - Executors (CommandLine, Disk, Network) updated
+  - 8 files changed, 116 insertions(+), 98 deletions(-)
+
+#### Localization
+- `5c5eef7` - Add audit and task localization keys
+  - DefaultLocalizationBase added 127 lines of localization definitions
+  - 9 languages added audit and task-related keys (26 lines each)
+  - 11 files changed, 387 insertions(+)
+
+#### Project Configuration
+- `2067db6` - Update project configs and gitignore rules
+  - .gitignore rules updated
+  - DefaultConfigData and Fast DefaultConfigData config enhanced
+  - SpeedyWorkNoteStorage storage improved
+  - SpeedyPack core enhanced
+  - 5 files changed, 32 insertions(+), 6 deletions(-)
+
+### 2026-05-07
+
+#### Italian Localization
+- `8adc18c` - Add Italian localization support and update multilingual documentation
+  - Added it-IT Italian localization
+  - Added ItIT localization implementation (1909 lines)
+  - Added ChineseHistoricalItIT Chinese historical calendar Italian support (586 lines)
+  - Added TrayItIT tray Italian localization (135 lines)
+  - Added Italian complete documentation set (14 documents: README, API reference, architecture, calendar system, changelog, contributing guide, etc.)
+  - Updated architecture, development guide, getting-started guide, etc. for all language versions
+  - Language enum added Italian
+  - 86 files changed, 11573 insertions(+), 769 deletions(-)
+
+#### Documentation Sync
+- `12a5deb` - Update multilingual documentation for architecture, changelog, and silicon being guide
+  - 8 languages README updated
+  - 8 languages architecture documentation updated
+  - 8 languages changelog updated
+  - 8 languages silicon being guide updated
+  - 8 languages tools reference updated
+  - Glossary restructured
+  - 46 files changed, 1697 insertions(+), 442 deletions(-)
+
 ### 2026-05-06
 
 #### Large-Scale Module Refactoring

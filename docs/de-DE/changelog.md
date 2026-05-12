@@ -61,6 +61,168 @@ Beide Versionen teilen die gleichen Schnittstellen und Funktionen und unterschei
 
 ## [Unveröffentlicht]
 
+### 2026-05-12
+
+#### Aufgaben-System Web-Ansichten
+- `0891b3c` - Aufgaben-Ausführungsdetail- und Verlaufsansichten hinzufügen
+  - TaskExecutionDetailView Aufgaben-Ausführungsdetailansicht hinzugefügt
+  - TaskExecutionHistoryView Aufgaben-Ausführungsverlaufsansicht hinzugefügt
+  - TaskController Ausführungsdetail- und Verlaufsanfrageschnittstellen hinzugefügt
+  - TaskViewModel Aufgaben-Ansichtsmodell hinzugefügt
+  - TaskCenter Aufgaben-Zentrum erweitert
+  - TaskSystem Aufgaben-System aktualisiert
+  - 9 Sprachen Lokalisierung aufgabenbezogene Schlüssel hinzugefügt
+  - 26 Dateien geändert, 803 Einfügungen(+), 55 Löschungen(-)
+
+### 2026-05-11
+
+#### Web-Komponenten-Architektur-Refaktorierung
+- `5e687ad` - Komponenten-Rendering von String zu H-tree migrieren
+  - ComponentBase Rendering-Methode von String-Muster zu H-tree-Struktur migriert
+  - Alle 28 Komponenten an neue Rendering-Architektur angepasst (A, Accordion, Button, Calendar, Card, Chart usw.)
+  - SelectComponent große Refaktorierung (889 Zeilen verbessert)
+  - Controller und Ansichten entsprechend aktualisiert
+  - 33 Dateien geändert, 667 Einfügungen(+), 435 Löschungen(-)
+
+- `bfd332d` - Style von String zu CssBuilder Inline-Stilen migrieren
+  - CssBuilder Stil-Builder hinzugefügt
+  - ComponentBase Stil-System von String zu strukturiertem CssBuilder migriert
+  - LoadingComponent deutlich erweitert (103 Zeilen hinzugefügt)
+  - ConfigController, LogController, MemoryController Controller-Stil-Migration
+  - ChatView, ConfigView, LogView, MemoryView Ansicht-Stil-Migration
+  - 37 Dateien geändert, 351 Einfügungen(+), 157 Löschungen(-)
+
+#### Speichersystem-Optimierung
+- `d67a7ee` - QueryLatest für große Datensätze optimieren
+  - SpeedyTimeStorage QueryLatest Methode Leistungsoptimierung
+  - SpeedyLoggerProvider Logger-Anbieter erweitert
+  - 2 Dateien geändert, 44 Einfügungen(+), 5 Löschungen(-)
+
+#### Kalendersystem-Refaktorierung
+- `9629f88` - TimerExecution extrahieren und Timer-Web-Ansichten erweitern
+  - TimerSystem TimerExecution-Logik extrahiert (175 Zeilen entfernt)
+  - SelectComponent deutlich erweitert (427 Zeilen verbessert)
+  - TimerController und Timer-Ansichten erweitert
+  - ContextManager Kontext-Manager aktualisiert
+  - 12 Dateien geändert, 458 Einfügungen(+), 267 Löschungen(-)
+
+#### Lokalisierung
+- `5d8ca79` - LogsLoading Lokalisierungsschlüssel hinzufügen
+  - 9 Sprachen LogsLoading-Schlüssel hinzugefügt
+  - DefaultLocalizationBase Basisklasse Definition hinzugefügt
+  - 11 Dateien geändert, 15 Einfügungen(+)
+
+### 2026-05-10
+
+#### Aufgaben-System-Refaktorierung
+- `54394f6` - Aufgaben-System mit Chat-Verlaufszyklen zusammenführen
+  - ProjectTaskSystem Projektaufgaben-System deutlich verschlankt (411 Zeilen refaktoriert)
+  - TaskSystem Aufgaben-System verschlankt (254 Zeilen refaktoriert)
+  - TaskCenter Aufgaben-Zentrum refaktoriert (188 Zeilen verbessert)
+  - ContextManager Kontext-Manager optimiert (347 Zeilen refaktoriert)
+  - DefaultSiliconBeing Silizium-Lebewesen erweitert
+  - TimerSystem Timer-System mit Aufgaben integriert
+  - IWorkNoteStorage Schnittstelle aktualisiert
+  - SpeedyWorkNoteStorage und FileSystemWorkNoteStorage angepasst
+  - 16 Dateien geändert, 648 Einfügungen(+), 897 Löschungen(-)
+
+### 2026-05-09
+
+#### Web-Oberfläche-Erweiterung
+- `bc50dd7` - Chat-Ansicht verbessern und Audit-Funktionalität hinzufügen
+  - AuditController Audit-Controller hinzugefügt (261 Zeilen)
+  - AuditView Audit-Ansicht hinzugefügt (379 Zeilen)
+  - AuditViewModel Audit-Ansichtsmodell hinzugefügt
+  - ChatView Chat-Ansicht deutlich verbessert (171 Zeilen erweitert)
+  - ChatController Chat-Controller aktualisiert
+  - MarkdownEditorComponent Komponente erweitert
+  - InitController Initialisierungs-Controller verbessert
+  - ChatSystem Chat-System Funktionen hinzugefügt
+  - 14 Dateien geändert, 1030 Einfügungen(+), 112 Löschungen(-)
+
+- `c9babce` - Werkzeugaufruf-Rendering in Chat-Ansicht verbessern
+  - ChatView Werkzeugaufruf-Block-Rendering erweitert
+  - 1 Datei geändert, 54 Einfügungen(+), 11 Löschungen(-)
+
+#### KI-Werkzeug-Szenario-System
+- `ff2eddd` - Werkzeug-Szenario-Filterungssystem implementieren
+  - ToolScenarioAttribute Werkzeug-Szenario-Attribut hinzugefügt (36 Zeilen)
+  - ChatOnlyAttribute Nur-Chat-Szenario-Attribut hinzugefügt (19 Zeilen)
+  - ToolManager Werkzeug-Manager Szenario-Filterung hinzugefügt (40 Zeilen)
+  - ContextManager Kontext-Manager für Szenario-Filterung angepasst
+  - 4 Dateien geändert, 115 Einfügungen(+), 30 Löschungen(-)
+
+- `5709a33` - Szenario-Attribute zu Werkzeugklassen hinzufügen
+  - 24 Werkzeugklassen ToolScenario-Attribut-Annotationen hinzugefügt
+  - Einschließlich Kalender, Chat, Konfiguration, Kurator, Datenbank, Festplatte, dynamische Kompilierung usw.
+  - 24 Dateien geändert, 46 Einfügungen(+), 20 Löschungen(-)
+
+#### Aufgaben-System-Refaktorierung
+- `2f19a5f` - Aufgaben-System mit TaskCenter und TaskEnumerator umstrukturieren
+  - TaskCenter Aufgaben-Zentrum hinzugefügt (235 Zeilen)
+  - TaskEnumerator Aufgaben-Enumerator hinzugefügt (297 Zeilen)
+  - TaskSystem Aufgaben-System refaktoriert und verschlankt
+  - DefaultSiliconBeing Silizium-Lebewesen an neue Architektur angepasst
+  - DefaultSiliconBeingFactory Fabrik aktualisiert
+  - SiliconBeingBase Basisklasse erweitert
+  - 7 Dateien geändert, 796 Einfügungen(+), 275 Löschungen(-)
+
+#### Berechtigungssystem-Migration
+- `a06ed09` - IM- und Berechtigungssystem zum App-Projekt migrieren
+  - PermissionRequestQueue von Default/Fast zum App-Projekt migriert (443 Zeilen hinzugefügt)
+  - Default-Version WebUIProvider entfernt (403 Zeilen gelöscht)
+  - Default-Version HelpTool entfernt (194 Zeilen gelöscht)
+  - Default/Fast doppelte PermissionRequestQueue entfernt
+  - Default-Version IMPermissionAskHandler entfernt
+  - PermissionRequestController Controller aktualisiert
+  - 14 Dateien geändert, 496 Einfügungen(+), 1183 Löschungen(-)
+
+#### KI-Kontext-Optimierung
+- `4c8aaff` - Kontext-Manager optimieren und Service-Locator erweitern
+  - ContextManager Kontext-Manager verschlankt und optimiert
+  - ServiceLocator Service-Locator erweitert (36 Zeilen hinzugefügt)
+  - ToolManager Werkzeug-Manager erweitert (34 Zeilen hinzugefügt)
+  - DashScopeClient und VolcengineArkClient Clients verbessert
+  - Executoren (CommandLine, Disk, Network) aktualisiert
+  - 8 Dateien geändert, 116 Einfügungen(+), 98 Löschungen(-)
+
+#### Lokalisierung
+- `5c5eef7` - Audit- und Aufgaben-Lokalisierungsschlüssel hinzufügen
+  - DefaultLocalizationBase 127 Zeilen Lokalisierungsdefinitionen hinzugefügt
+  - 9 Sprachen Audit- und aufgabenbezogene Schlüssel hinzugefügt (je 26 Zeilen)
+  - 11 Dateien geändert, 387 Einfügungen(+)
+
+#### Projektkonfiguration
+- `2067db6` - Projektkonfigurationen und gitignore-Regeln aktualisieren
+  - .gitignore-Regeln aktualisiert
+  - DefaultConfigData und Fast DefaultConfigData Konfiguration erweitert
+  - SpeedyWorkNoteStorage Speicher verbessert
+  - SpeedyPack Kern erweitert
+  - 5 Dateien geändert, 32 Einfügungen(+), 6 Löschungen(-)
+
+### 2026-05-07
+
+#### Italienische Lokalisierung
+- `8adc18c` - Italienische Lokalisierungsunterstützung hinzufügen und mehrsprachige Dokumentation aktualisieren
+  - it-IT Italienische Lokalisierung hinzugefügt
+  - ItIT Lokalisierungsimplementierung hinzugefügt (1909 Zeilen)
+  - ChineseHistoricalItIT Chinesischer historischer Kalender Italienisch-Unterstützung hinzugefügt (586 Zeilen)
+  - TrayItIT Tray Italienisch-Lokalisierung hinzugefügt (135 Zeilen)
+  - Italienisches vollständiges Dokumentationsset hinzugefügt (14 Dokumente: README, API-Referenz, Architektur, Kalendersystem, Änderungsprotokoll, Beitragsleitfaden usw.)
+  - Architektur, Entwicklungsleitfaden, Einstiegsleitfaden usw. für alle Sprachversionen aktualisiert
+  - Language Sprach-Enum Italienisch hinzugefügt
+  - 86 Dateien geändert, 11573 Einfügungen(+), 769 Löschungen(-)
+
+#### Dokumentations-Synchronisation
+- `12a5deb` - Mehrsprachige Dokumentation für Architektur, Änderungsprotokoll und Silizium-Lebewesen-Leitfaden aktualisieren
+  - 8 Sprachen README aktualisiert
+  - 8 Sprachen Architektur-Dokumentation aktualisiert
+  - 8 Sprachen Änderungsprotokoll aktualisiert
+  - 8 Sprachen Silizium-Lebewesen-Leitfaden aktualisiert
+  - 8 Sprachen Werkzeug-Referenz aktualisiert
+  - Glossar umstrukturiert
+  - 46 Dateien geändert, 1697 Einfügungen(+), 442 Löschungen(-)
+
 ### 2026-05-06
 
 #### Große Modul-Refaktorierung

@@ -61,6 +61,168 @@
 
 ## [未リリース]
 
+### 2026-05-12
+
+#### タスクシステム Web ビュー
+- `0891b3c` - タスク実行詳細と履歴ビューを追加
+  - TaskExecutionDetailView タスク実行詳細ビューを追加
+  - TaskExecutionHistoryView タスク実行履歴ビューを追加
+  - TaskController 実行詳細と履歴クエリインターフェースを追加
+  - TaskViewModel タスクビューモデルを追加
+  - TaskCenter タスクセンターを強化
+  - TaskSystem タスクシステムを更新
+  - 9言語のローカライズにタスク関連キーを追加
+  - 26ファイル変更、803行追加、55行削除
+
+### 2026-05-11
+
+#### Web コンポーネントアーキテクチャリファクタリング
+- `5e687ad` - コンポーネントレンダリングを文字列から H-tree に移行
+  - ComponentBase レンダリングメソッドを文字列パターンから H-tree 構造に移行
+  - 全28コンポーネントを新しいレンダリングアーキテクチャに適応（A、Accordion、Button、Calendar、Card、Chart など）
+  - SelectComponent 大規模リファクタリング（889行改善）
+  - コントローラーとビューを同期的に更新
+  - 33ファイル変更、667行追加、435行削除
+
+- `bfd332d` - Style を文字列から CssBuilder インラインスタイルに移行
+  - CssBuilder スタイルビルダーを追加
+  - ComponentBase スタイルシステムを文字列から構造化 CssBuilder に移行
+  - LoadingComponent 大幅に強化（103行追加）
+  - ConfigController、LogController、MemoryController コントローラースタイル移行
+  - ChatView、ConfigView、LogView、MemoryView ビュースタイル移行
+  - 37ファイル変更、351行追加、157行削除
+
+#### ストレージシステム最適化
+- `d67a7ee` - 大規模データセット向け QueryLatest を最適化
+  - SpeedyTimeStorage QueryLatest メソッドパフォーマンス最適化
+  - SpeedyLoggerProvider ログプロバイダーを強化
+  - 2ファイル変更、44行追加、5行削除
+
+#### カレンダーシステムリファクタリング
+- `9629f88` - TimerExecution を抽出しタイマー Web ビューを強化
+  - TimerSystem TimerExecution ロジックを抽出（175行削除）
+  - SelectComponent 大幅に強化（427行改善）
+  - TimerController とタイマービューを強化
+  - ContextManager コンテキストマネージャーを更新
+  - 12ファイル変更、458行追加、267行削除
+
+#### ローカライズ
+- `5d8ca79` - LogsLoading ローカライズキーを追加
+  - 9言語に LogsLoading キーを追加
+  - DefaultLocalizationBase 基底クラスに定義を追加
+  - 11ファイル変更、15行追加
+
+### 2026-05-10
+
+#### タスクシステムリファクタリング
+- `54394f6` - タスクシステムとチャット履歴サイクルを統合
+  - ProjectTaskSystem プロジェクトタスクシステムを大幅に簡素化（411行リファクタリング）
+  - TaskSystem タスクシステムを簡素化（254行リファクタリング）
+  - TaskCenter タスクセンターをリファクタリング（188行改善）
+  - ContextManager コンテキストマネージャーを最適化（347行リファクタリング）
+  - DefaultSiliconBeing シリコン生命体を強化
+  - TimerSystem タイマーシステムにタスクを統合
+  - IWorkNoteStorage インターフェースを更新
+  - SpeedyWorkNoteStorage と FileSystemWorkNoteStorage を適応
+  - 16ファイル変更、648行追加、897行削除
+
+### 2026-05-09
+
+#### Web インターフェース強化
+- `bc50dd7` - チャットビューを改善し監査機能を追加
+  - AuditController 監査コントローラーを追加（261行）
+  - AuditView 監査ビューを追加（379行）
+  - AuditViewModel 監査ビューモデルを追加
+  - ChatView チャットビューを大幅に改善（171行強化）
+  - ChatController チャットコントローラーを更新
+  - MarkdownEditorComponent コンポーネントを強化
+  - InitController 初期化コントローラーを改善
+  - ChatSystem チャットシステムに機能を追加
+  - 14ファイル変更、1030行追加、112行削除
+
+- `c9babce` - チャットビューのツール呼び出しレンダリングを改善
+  - ChatView ツール呼び出しブロックレンダリングを強化
+  - 1ファイル変更、54行追加、11行削除
+
+#### AI ツールシナリオシステム
+- `ff2eddd` - ツールシナリオフィルタリングシステムを実装
+  - ToolScenarioAttribute ツールシナリオ属性を追加（36行）
+  - ChatOnlyAttribute チャット専用シナリオ属性を追加（19行）
+  - ToolManager ツールマネージャーにシナリオフィルタリングを追加（40行）
+  - ContextManager コンテキストマネージャーをシナリオフィルタリングに適応
+  - 4ファイル変更、115行追加、30行削除
+
+- `5709a33` - ツールクラスにシナリオ属性を追加
+  - 24ツールクラスに ToolScenario 属性アノテーションを追加
+  - カレンダー、チャット、設定、キュレーター、データベース、ディスク、動的コンパイルなどを含む
+  - 24ファイル変更、46行追加、20行削除
+
+#### タスクシステムリファクタリング
+- `2f19a5f` - TaskCenter と TaskEnumerator でタスクシステムを再構築
+  - TaskCenter タスクセンターを追加（235行）
+  - TaskEnumerator タスク列挙子を追加（297行）
+  - TaskSystem タスクシステムをリファクタリング・簡素化
+  - DefaultSiliconBeing シリコン生命体を新アーキテクチャに適応
+  - DefaultSiliconBeingFactory ファクトリを更新
+  - SiliconBeingBase 基底クラスを強化
+  - 7ファイル変更、796行追加、275行削除
+
+#### 権限システム移行
+- `a06ed09` - IM と権限システムを App プロジェクトに移行
+  - PermissionRequestQueue を Default/Fast から App プロジェクトに移行（443行追加）
+  - Default 版 WebUIProvider を削除（403行削除）
+  - Default 版 HelpTool を削除（194行削除）
+  - Default/Fast 版重複 PermissionRequestQueue を削除
+  - Default 版 IMPermissionAskHandler を削除
+  - PermissionRequestController コントローラーを更新
+  - 14ファイル変更、496行追加、1183行削除
+
+#### AI コンテキスト最適化
+- `4c8aaff` - コンテキストマネージャーを最適化しサービスロケーターを強化
+  - ContextManager コンテキストマネージャーを簡素化・最適化
+  - ServiceLocator サービスロケーターを強化（36行追加）
+  - ToolManager ツールマネージャーを強化（34行追加）
+  - DashScopeClient と VolcengineArkClient クライアントを改善
+  - エグゼキューター（CommandLine、Disk、Network）を更新
+  - 8ファイル変更、116行追加、98行削除
+
+#### ローカライズ
+- `5c5eef7` - 監査とタスクのローカライズキーを追加
+  - DefaultLocalizationBase 127行のローカライズ定義を追加
+  - 9言語に監査とタスク関連キーを追加（各26行）
+  - 11ファイル変更、387行追加
+
+#### プロジェクト設定
+- `2067db6` - プロジェクト設定と gitignore ルールを更新
+  - .gitignore ルールを更新
+  - DefaultConfigData と Fast DefaultConfigData 設定を強化
+  - SpeedyWorkNoteStorage ストレージを改善
+  - SpeedyPack コアを強化
+  - 5ファイル変更、32行追加、6行削除
+
+### 2026-05-07
+
+#### イタリア語ローカライズ
+- `8adc18c` - イタリア語ローカライズサポートを追加し多言語ドキュメントを更新
+  - it-IT イタリア語ローカライズを追加
+  - ItIT ローカライズ実装を追加（1909行）
+  - ChineseHistoricalItIT 中国歴史カレンダーイタリア語サポートを追加（586行）
+  - TrayItIT トレイイタリア語ローカライズを追加（135行）
+  - イタリア語完全ドキュメントセットを追加（14文書：README、APIリファレンス、アーキテクチャ、カレンダーシステム、変更履歴、貢献ガイドなど）
+  - 全言語版のアーキテクチャ、開発ガイド、入門ガイドなどを更新
+  - Language 言語列挙にイタリア語を追加
+  - 86ファイル変更、11573行追加、769行削除
+
+#### ドキュメント同期
+- `12a5deb` - アーキテクチャ、変更履歴、シリコン生命体ガイドの多言語ドキュメントを更新
+  - 8言語の README を更新
+  - 8言語のアーキテクチャドキュメントを更新
+  - 8言語の変更履歴を更新
+  - 8言語のシリコン生命体ガイドを更新
+  - 8言語のツールリファレンスを更新
+  - 用語集を再構築
+  - 46ファイル変更、1697行追加、442行削除
+
 ### 2026-05-06
 
 #### 大規模モジュールリファクタリング

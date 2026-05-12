@@ -61,6 +61,168 @@ Entrambe le versioni condividono le stesse interfacce e funzionalità, differend
 
 ## [Non pubblicato]
 
+### 2026-05-12
+
+#### Visualizzazioni Web del sistema attività
+- `0891b3c` - Aggiungere visualizzazioni dettaglio e cronologia esecuzione attività
+  - Aggiunto TaskExecutionDetailView vista dettaglio esecuzione attività
+  - Aggiunto TaskExecutionHistoryView vista cronologia esecuzione attività
+  - TaskController aggiunte interfacce di query dettaglio e cronologia esecuzione
+  - Aggiunto TaskViewModel modello vista attività
+  - TaskCenter centro attività migliorato
+  - TaskSystem sistema attività aggiornato
+  - 9 lingue localizzazione aggiunti chiavi relative alle attività
+  - 26 file modificati, 803 inserimenti(+), 55 cancellazioni(-)
+
+### 2026-05-11
+
+#### Refactoring dell'architettura dei componenti Web
+- `5e687ad` - Migrare il rendering dei componenti da stringa a H-tree
+  - ComponentBase metodo di rendering migrato dal pattern stringa alla struttura H-tree
+  - Tutti i 28 componenti adattati alla nuova architettura di rendering (A, Accordion, Button, Calendar, Card, Chart, ecc.)
+  - SelectComponent grande refactoring (889 righe migliorate)
+  - Controller e viste aggiornati di conseguenza
+  - 33 file modificati, 667 inserimenti(+), 435 cancellazioni(-)
+
+- `bfd332d` - Migrare Style da stringa a stili inline CssBuilder
+  - Aggiunto CssBuilder costruttore di stili
+  - ComponentBase sistema di stili migrato da stringa a CssBuilder strutturato
+  - LoadingComponent significativamente migliorato (103 righe aggiunte)
+  - ConfigController, LogController, MemoryController migrazione stili controller
+  - ChatView, ConfigView, LogView, MemoryView migrazione stili viste
+  - 37 file modificati, 351 inserimenti(+), 157 cancellazioni(-)
+
+#### Ottimizzazione del sistema di archiviazione
+- `d67a7ee` - Ottimizzare QueryLatest per grandi set di dati
+  - SpeedyTimeStorage QueryLatest ottimizzazione delle prestazioni del metodo
+  - SpeedyLoggerProvider provider di logging migliorato
+  - 2 file modificati, 44 inserimenti(+), 5 cancellazioni(-)
+
+#### Refactoring del sistema calendario
+- `9629f88` - Estrarre TimerExecution e migliorare le viste Web del timer
+  - TimerSystem logica TimerExecution estratta (175 righe rimosse)
+  - SelectComponent significativamente migliorato (427 righe migliorate)
+  - TimerController e viste del timer migliorate
+  - ContextManager gestore di contesto aggiornato
+  - 12 file modificati, 458 inserimenti(+), 267 cancellazioni(-)
+
+#### Localizzazione
+- `5d8ca79` - Aggiungere chiave di localizzazione LogsLoading
+  - 9 lingue aggiunta chiave LogsLoading
+  - DefaultLocalizationBase classe base aggiunta definizione
+  - 11 file modificati, 15 inserimenti(+)
+
+### 2026-05-10
+
+#### Refactoring del sistema attività
+- `54394f6` - Unire il sistema attività con i cicli della cronologia chat
+  - ProjectTaskSystem sistema attività del progetto significativamente semplificato (411 righe refattorizzate)
+  - TaskSystem sistema attività semplificato (254 righe refattorizzate)
+  - TaskCenter centro attività refattorizzato (188 righe migliorate)
+  - ContextManager gestore di contesto ottimizzato (347 righe refattorizzate)
+  - DefaultSiliconBeing essere di silicio migliorato
+  - TimerSystem sistema timer integrato con le attività
+  - IWorkNoteStorage interfaccia aggiornata
+  - SpeedyWorkNoteStorage e FileSystemWorkNoteStorage adattati
+  - 16 file modificati, 648 inserimenti(+), 897 cancellazioni(-)
+
+### 2026-05-09
+
+#### Miglioramento dell'interfaccia Web
+- `bc50dd7` - Migliorare la vista chat e aggiungere funzionalità di audit
+  - Aggiunto AuditController controller di audit (261 righe)
+  - Aggiunto AuditView vista di audit (379 righe)
+  - Aggiunto AuditViewModel modello vista di audit
+  - ChatView vista chat significativamente migliorata (171 righe migliorate)
+  - ChatController controller chat aggiornato
+  - MarkdownEditorComponent componente migliorato
+  - InitController controller di inizializzazione migliorato
+  - ChatSystem sistema chat funzionalità aggiunte
+  - 14 file modificati, 1030 inserimenti(+), 112 cancellazioni(-)
+
+- `c9babce` - Migliorare il rendering delle chiamate degli strumenti nella vista chat
+  - ChatView rendering del blocco di chiamata degli strumenti migliorato
+  - 1 file modificato, 54 inserimenti(+), 11 cancellazioni(-)
+
+#### Sistema scenari strumenti IA
+- `ff2eddd` - Implementare il sistema di filtraggio scenari strumenti
+  - Aggiunto ToolScenarioAttribute attributo scenario strumenti (36 righe)
+  - Aggiunto ChatOnlyAttribute attributo scenario solo chat (19 righe)
+  - ToolManager gestore strumenti aggiunto filtraggio scenari (40 righe)
+  - ContextManager gestore di contesto adattato al filtraggio scenari
+  - 4 file modificati, 115 inserimenti(+), 30 cancellazioni(-)
+
+- `5709a33` - Aggiungere attributi scenario alle classi strumenti
+  - 24 classi strumenti aggiunte annotazioni attributo ToolScenario
+  - Inclusi calendario, chat, configurazione, curatore, database, disco, compilazione dinamica, ecc.
+  - 24 file modificati, 46 inserimenti(+), 20 cancellazioni(-)
+
+#### Refactoring del sistema attività
+- `2f19a5f` - Ristrutturare il sistema attività con TaskCenter e TaskEnumerator
+  - Aggiunto TaskCenter centro attività (235 righe)
+  - Aggiunto TaskEnumerator enumeratore attività (297 righe)
+  - TaskSystem sistema attività refattorizzato e semplificato
+  - DefaultSiliconBeing essere di silicio adattato alla nuova architettura
+  - DefaultSiliconBeingFactory fabbrica aggiornata
+  - SiliconBeingBase classe base migliorata
+  - 7 file modificati, 796 inserimenti(+), 275 cancellazioni(-)
+
+#### Migrazione del sistema permessi
+- `a06ed09` - Migrare il sistema IM e permessi al progetto App
+  - PermissionRequestQueue migrato da Default/Fast al progetto App (443 righe aggiunte)
+  - Rimosso WebUIProvider versione Default (403 righe cancellate)
+  - Rimosso HelpTool versione Default (194 righe cancellate)
+  - Rimossi PermissionRequestQueue duplicati da Default/Fast
+  - Rimosso IMPermissionAskHandler versione Default
+  - PermissionRequestController controller aggiornato
+  - 14 file modificati, 496 inserimenti(+), 1183 cancellazioni(-)
+
+#### Ottimizzazione del contesto IA
+- `4c8aaff` - Ottimizzare il gestore di contesto e migliorare il localizzatore di servizi
+  - ContextManager gestore di contesto semplificato e ottimizzato
+  - ServiceLocator localizzatore di servizi migliorato (36 righe aggiunte)
+  - ToolManager gestore strumenti migliorato (34 righe aggiunte)
+  - DashScopeClient e VolcengineArkClient client migliorati
+  - Esecutori (CommandLine, Disk, Network) aggiornati
+  - 8 file modificati, 116 inserimenti(+), 98 cancellazioni(-)
+
+#### Localizzazione
+- `5c5eef7` - Aggiungere chiavi di localizzazione audit e attività
+  - DefaultLocalizationBase aggiunte 127 righe di definizioni di localizzazione
+  - 9 lingue aggiunte chiavi relative ad audit e attività (26 righe ciascuna)
+  - 11 file modificati, 387 inserimenti(+)
+
+#### Configurazione del progetto
+- `2067db6` - Aggiornare le configurazioni del progetto e le regole gitignore
+  - Regole .gitignore aggiornate
+  - DefaultConfigData e Fast DefaultConfigData configurazione migliorate
+  - SpeedyWorkNoteStorage archiviazione migliorata
+  - SpeedyPack nucleo migliorato
+  - 5 file modificati, 32 inserimenti(+), 6 cancellazioni(-)
+
+### 2026-05-07
+
+#### Localizzazione italiana
+- `8adc18c` - Aggiungere il supporto alla localizzazione italiana e aggiornare la documentazione multilingue
+  - Aggiunta localizzazione it-IT italiana
+  - Aggiunta implementazione localizzazione ItIT (1909 righe)
+  - Aggiunto ChineseHistoricalItIT supporto italiano calendario storico cinese (586 righe)
+  - Aggiunta TrayItIT localizzazione italiana vassoio di sistema (135 righe)
+  - Aggiunto set completo di documentazione italiana (14 documenti: README, riferimento API, architettura, sistema calendario, registro modifiche, guida contributi, ecc.)
+  - Aggiornate architettura, guida sviluppo, guida introduttiva, ecc. per tutte le versioni linguistiche
+  - Language enumerazione lingue aggiunto italiano
+  - 86 file modificati, 11573 inserimenti(+), 769 cancellazioni(-)
+
+#### Sincronizzazione della documentazione
+- `12a5deb` - Aggiornare la documentazione multilingue per architettura, registro modifiche e guida dell'essere di silicio
+  - 8 lingue README aggiornato
+  - 8 lingue documentazione architettura aggiornata
+  - 8 lingue registro modifiche aggiornato
+  - 8 lingue guida dell'essere di silicio aggiornata
+  - 8 lingue riferimento strumenti aggiornato
+  - Glossario ristrutturato
+  - 46 file modificati, 1697 inserimenti(+), 442 cancellazioni(-)
+
 ### 2026-05-06
 
 #### Refactoring massivo dei moduli

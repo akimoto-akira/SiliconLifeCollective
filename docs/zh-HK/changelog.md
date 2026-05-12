@@ -61,6 +61,168 @@
 
 ## [未發布]
 
+### 2026-05-12
+
+#### 任務系統 Web 視圖
+- `0891b3c` - 添加任務執行詳情和歷史視圖
+  - 新增 TaskExecutionDetailView 任務執行詳情視圖
+  - 新增 TaskExecutionHistoryView 任務執行歷史視圖
+  - TaskController 新增執行詳情和歷史查詢介面
+  - TaskViewModel 新增任務視圖模型
+  - TaskCenter 任務中心增強
+  - TaskSystem 任務系統更新
+  - 9 種語言本地化新增任務相關鍵值
+  - 26 個檔案變更，803 行新增，55 行刪除
+
+### 2026-05-11
+
+#### Web 元件架構重構
+- `5e687ad` - 將元件渲染從字串遷移到 H-tree
+  - ComponentBase 渲染方法從字串模式遷移到 H-tree 結構
+  - 所有 28 個元件適配新渲染架構（A、Accordion、Button、Calendar、Card、Chart 等）
+  - SelectComponent 大幅重構（889 行改進）
+  - 控制器和視圖同步更新
+  - 33 個檔案變更，667 行新增，435 行刪除
+
+- `bfd332d` - 將 Style 從字串遷移到 CssBuilder 行內樣式
+  - 新增 CssBuilder 樣式構建器
+  - ComponentBase 樣式系統從字串遷移到結構化 CssBuilder
+  - LoadingComponent 大幅增強（103 行新增）
+  - ConfigController、LogController、MemoryController 控制器樣式遷移
+  - ChatView、ConfigView、LogView、MemoryView 視圖樣式遷移
+  - 37 個檔案變更，351 行新增，157 行刪除
+
+#### 儲存系統最佳化
+- `d67a7ee` - 最佳化 QueryLatest 大型資料集查詢
+  - SpeedyTimeStorage QueryLatest 方法效能最佳化
+  - SpeedyLoggerProvider 日誌提供者增強
+  - 2 個檔案變更，44 行新增，5 行刪除
+
+#### 日曆系統重構
+- `9629f88` - 提取 TimerExecution 並增強定時器 Web 視圖
+  - TimerSystem 提取 TimerExecution 邏輯（175 行移除）
+  - SelectComponent 大幅增強（427 行改進）
+  - TimerController 和定時器視圖增強
+  - ContextManager 上下文管理器更新
+  - 12 個檔案變更，458 行新增，267 行刪除
+
+#### 本地化
+- `5d8ca79` - 添加 LogsLoading 本地化鍵值
+  - 9 種語言新增 LogsLoading 鍵值
+  - DefaultLocalizationBase 基底類別新增定義
+  - 11 個檔案變更，15 行新增
+
+### 2026-05-10
+
+#### 任務系統重構
+- `54394f6` - 合併任務系統與聊天歷史週期
+  - ProjectTaskSystem 專案任務系統大幅精簡（411 行重構）
+  - TaskSystem 任務系統精簡（254 行重構）
+  - TaskCenter 任務中心重構（188 行改進）
+  - ContextManager 上下文管理器最佳化（347 行重構）
+  - DefaultSiliconBeing 矽基生命體增強
+  - TimerSystem 定時器系統整合任務
+  - IWorkNoteStorage 介面更新
+  - SpeedyWorkNoteStorage 和 FileSystemWorkNoteStorage 適配
+  - 16 個檔案變更，648 行新增，897 行刪除
+
+### 2026-05-09
+
+#### Web 介面增強
+- `bc50dd7` - 改進聊天視圖並添加稽核功能
+  - 新增 AuditController 稽核控制器（261 行）
+  - 新增 AuditView 稽核視圖（379 行）
+  - 新增 AuditViewModel 稽核視圖模型
+  - ChatView 聊天視圖大幅改進（171 行增強）
+  - ChatController 聊天控制器更新
+  - MarkdownEditorComponent 元件增強
+  - InitController 初始化控制器改進
+  - ChatSystem 聊天系統新增功能
+  - 14 個檔案變更，1030 行新增，112 行刪除
+
+- `c9babce` - 改進聊天視圖中的工具呼叫渲染
+  - ChatView 工具呼叫區塊渲染增強
+  - 1 個檔案變更，54 行新增，11 行刪除
+
+#### AI 工具場景系統
+- `ff2eddd` - 實現工具場景過濾系統
+  - 新增 ToolScenarioAttribute 工具場景屬性（36 行）
+  - 新增 ChatOnlyAttribute 僅聊天場景屬性（19 行）
+  - ToolManager 工具管理器新增場景過濾功能（40 行）
+  - ContextManager 上下文管理器適配場景過濾
+  - 4 個檔案變更，115 行新增，30 行刪除
+
+- `5709a33` - 為工具類別添加場景屬性
+  - 24 個工具類別添加 ToolScenario 屬性標註
+  - 包括日曆、聊天、設定、策展、資料庫、磁碟、動態編譯等工具
+  - 24 個檔案變更，46 行新增，20 行刪除
+
+#### 任務系統重構
+- `2f19a5f` - 使用 TaskCenter 和 TaskEnumerator 重構任務系統
+  - 新增 TaskCenter 任務中心（235 行）
+  - 新增 TaskEnumerator 任務列舉器（297 行）
+  - TaskSystem 任務系統重構精簡
+  - DefaultSiliconBeing 矽基生命體適配新架構
+  - DefaultSiliconBeingFactory 工廠更新
+  - SiliconBeingBase 基底類別增強
+  - 7 個檔案變更，796 行新增，275 行刪除
+
+#### 權限系統遷移
+- `a06ed09` - 將 IM 和權限系統遷移到 App 專案
+  - PermissionRequestQueue 從 Default/Fast 遷移到 App 專案（443 行新增）
+  - 移除 Default 版本 WebUIProvider（403 行刪除）
+  - 移除 Default 版本 HelpTool（194 行刪除）
+  - 移除 Default/Fast 版本重複的 PermissionRequestQueue
+  - 移除 Default 版本 IMPermissionAskHandler
+  - PermissionRequestController 控制器更新
+  - 14 個檔案變更，496 行新增，1183 行刪除
+
+#### AI 上下文最佳化
+- `4c8aaff` - 最佳化上下文管理器並增強服務定位器
+  - ContextManager 上下文管理器精簡最佳化
+  - ServiceLocator 服務定位器增強（36 行新增）
+  - ToolManager 工具管理器增強（34 行新增）
+  - DashScopeClient 和 VolcengineArkClient 客戶端改進
+  - 執行器（CommandLine、Disk、Network）更新
+  - 8 個檔案變更，116 行新增，98 行刪除
+
+#### 本地化
+- `5c5eef7` - 添加稽核和任務本地化鍵值
+  - DefaultLocalizationBase 新增 127 行本地化定義
+  - 9 種語言新增稽核和任務相關鍵值（每種 26 行）
+  - 11 個檔案變更，387 行新增
+
+#### 專案設定
+- `2067db6` - 更新專案設定和 gitignore 規則
+  - .gitignore 規則更新
+  - DefaultConfigData 和 Fast DefaultConfigData 設定增強
+  - SpeedyWorkNoteStorage 儲存改進
+  - SpeedyPack 核心增強
+  - 5 個檔案變更，32 行新增，6 行刪除
+
+### 2026-05-07
+
+#### 義大利語本地化
+- `8adc18c` - 添加義大利語本地化支援並更新多語言文件
+  - 新增 it-IT 義大利語本地化
+  - 新增 ItIT 本地化實現（1909 行）
+  - 新增 ChineseHistoricalItIT 中國歷史日曆義大利語支援（586 行）
+  - 新增 TrayItIT 托盤義大利語本地化（135 行）
+  - 新增義大利語完整文件集（14 個文件：README、API 參考、架構、日曆系統、變更日誌、貢獻指南等）
+  - 更新所有語言版本的架構、開發指南、入門指南等文件
+  - Language 語言列舉新增義大利語
+  - 86 個檔案變更，11573 行新增，769 行刪除
+
+#### 文件同步
+- `12a5deb` - 更新架構、變更日誌和矽基生命體指南的多語言文件
+  - 8 種語言的 README 更新
+  - 8 種語言的架構文件更新
+  - 8 種語言的變更日誌更新
+  - 8 種語言的矽基生命體指南更新
+  - 8 種語言的工具參考更新
+  - 詞彙表重構
+  - 46 個檔案變更，1697 行新增，442 行刪除
+
 ### 2026-05-06
 
 #### 大規模模組重構
@@ -112,8 +274,8 @@
   - 新增 PermissionedStreamFactory 權限流工廠（779 行）
   - 新增 PermissionRequestQueue 權限請求佇列（Default 和 Fast 版本）
   - 新增 DebugLoggerProvider 除錯日誌提供者
-  - ConfigDataBase 配置基底類別增強
-  - ToolManager 新增插件工具掃描功能（ScanAllPluginAssemblies）
+  - ConfigDataBase 設定基底類別增強
+  - ToolManager 新增外掛程式工具掃描功能（ScanAllPluginAssemblies）
   - SiliconBeingManager 生命週期管理增強
   - DashScopeClient 阿里雲 AI 客戶端大幅增強（227 行新增）
   - DefaultSiliconBeingFactory 工廠增強
@@ -130,12 +292,12 @@
   - Web 視圖基底類別和 BeingView 改進
   - 6 個檔案變更，240 行新增，81 行刪除
 
-#### 插件系統
-- `242dc98` - 在關於頁面添加插件列表
-  - AboutController 新增插件資訊展示
-  - AboutViewModel 新增插件資料模型
-  - AboutView 新增插件列表渲染
-  - 9 種語言本地化新增插件相關鍵值
+#### 外掛程式系統
+- `242dc98` - 在關於頁面添加外掛程式列表
+  - AboutController 新增外掛程式資訊展示
+  - AboutViewModel 新增外掛程式資料模型
+  - AboutView 新增外掛程式列表渲染
+  - 9 種語言本地化新增外掛程式相關鍵值
   - 14 個檔案變更，160 行新增，1 行刪除
 
 #### AI 最佳化
@@ -173,11 +335,11 @@
   - SpeedyPack 新增 FreeList 空閒空間管理（149 行）
   - PackFileWriter 寫入器重構最佳化
   - WriteOperation、WriteQueue 寫入佇列增強
-  - SpeedyPackOptions 配置選項擴展
+  - SpeedyPackOptions 設定選項擴展
   - IncompleteDate 新增比較方法
-  - PluginLoader 插件載入器改進
+  - PluginLoader 外掛程式載入器改進
   - Default 和 Fast 版本 Program.cs 初始化流程更新
-  - DefaultConfigData 配置資料簡化
+  - DefaultConfigData 設定資料簡化
   - KnowledgeNetwork 知識網路精簡
   - ChatController、MemoryController 控制器最佳化
   - SpeedyPack.Manager MainForm 功能增強
@@ -189,10 +351,10 @@
 ### 2026-05-01
 
 #### 架構重構：Speedy 儲存替換 LiteDB
-- `6600972` - 用 Speedy 儲存替換 LiteDB，添加插件系統和 Speedy 專案
+- `6600972` - 用 Speedy 儲存替換 LiteDB，添加外掛程式系統和 Speedy 專案
   - **新增 SiliconLife.Speedy 專案**：高效能 .spk 儲存引擎
-    - SpeedyPack 核心類別（489 行）：記憶體目錄映射 + 條目快取 + 異步寫入佇列
-    - SpeedyPackOptions 配置類別：快取 TTL、最大快取條目數、唯讀模式
+    - SpeedyPack 核心類別（489 行）：記憶體目錄映射 + 條目快取 + 非同步寫入佇列
+    - SpeedyPackOptions 設定類別：快取 TTL、最大快取條目數、唯讀模式
     - IPackTransaction 事務介面：支援原子寫入操作
     - SpkFileInfo 檔案資訊類別
     - Internal 目錄：DirectoryMap、EntryCache、PackFileReader、PackFileWriter、WriteQueue、WriteOperation、SpeedyTransaction、SpkHeader、PathNormalizer、FreeList
@@ -211,15 +373,15 @@
     - 新增 SpeedyPackAutoCompactor（自動壓縮定時器）
     - 移除 LiteDB 相關儲存實現（LiteDBStorage、LiteDBTimeStorage、LiteDBWorkNoteStorage、LiteDBLoggerProvider、LiteDBManager、LiteDBModels）
     - 移除 LiteDB 管理視窗相關程式碼
-  - **插件系統**：
+  - **外掛程式系統**：
     - 新增 IPlugin 介面（Core/Plugins/IPlugin.cs）
-    - 新增 PluginLoader 插件載入器（Core/Plugins/PluginLoader.cs）
-    - 支援從目錄載入插件 DLL
+    - 新增 PluginLoader 外掛程式載入器（Core/Plugins/PluginLoader.cs）
+    - 支援從目錄載入外掛程式 DLL
     - 安全掃描：禁止命名空間檢查（System.IO、System.Net、Microsoft.CodeAnalysis 等）
     - 可信組件白名單（Google.Protobuf、Newtonsoft.Json、MessagePack 等）
     - 自訂 AssemblyLoadContext 隔離載入
     - ToolManager 新增 ScanAllPluginAssemblies 方法
-    - CoreHost 整合插件載入器
+    - CoreHost 整合外掛程式載入器
   - 119 個檔案變更，6926 行新增，3066 行刪除
 
 #### 矽基生命體增強
@@ -285,11 +447,11 @@
 - `5ebc55e` - 將 LiteDBAdminLocalization 轉換為抽象基底類別
   - 10 個檔案變更，1356 行新增
 
-#### 配置系統修復
-- `2da5256` - 添加 ConfigExists 抽象方法並修復 LiteDB 重複配置記錄
+#### 設定系統修復
+- `2da5256` - 添加 ConfigExists 抽象方法並修復 LiteDB 重複設定記錄
   - ConfigDataBase 新增 ConfigExists 方法
-  - Fast 版本 DefaultConfigData 實現 LiteDB 配置存在性檢查
-  - 修復 LiteDB 重複配置鍵問題
+  - Fast 版本 DefaultConfigData 實現 LiteDB 設定存在性檢查
+  - 修復 LiteDB 重複設定鍵問題
   - 9 個檔案變更，210 行新增，2 行刪除
 
 #### 聊天和視圖最佳化
@@ -346,7 +508,7 @@
   - LiteDBWorkNoteStorage：實現 IWorkNoteStorage 介面
   - 3 個檔案變更，581 行新增
 
-- `38ebd23` - 將配置和日誌系統遷移到 LiteDB
+- `38ebd23` - 將設定和日誌系統遷移到 LiteDB
   - DefaultConfigData 適配 LiteDB 儲存
   - 新增 LiteDBLoggerProvider 日誌提供者
   - 2 個檔案變更，203 行新增，67 行刪除
@@ -413,7 +575,7 @@
 
 #### 幫助文件系統
 - `07895d7` - 增強幫助文件系統，新增 3 個文件並完成 9 種語言翻譯
-  - 新增記憶系統、Ollama 安裝配置、阿里雲百煉平台使用指南
+  - 新增記憶系統、Ollama 安裝設定、阿里雲百煉平台使用指南
   - 完成全部 10 個幫助文件的 9 種語言翻譯
   - 簡化 HelpView 渲染邏輯
   - 18 個檔案變更，14418 行新增，1364 行刪除
@@ -616,7 +778,7 @@
 - `c6b518b` - 修復定時器訊息傳遞和聊天訊息儲存
   - 3 個檔案變更，297 行新增，124 行刪除
 
-#### 配置管理
+#### 設定管理
 - `4305769` - 添加 .gitattributes 用於行尾管理
   - 1 個檔案變更，32 行新增
 
@@ -625,7 +787,7 @@
   - 2 個檔案變更，35 行新增，2 行刪除
 - `634e8ca` - 添加權限頁面返回列表連結
   - 1 個檔案變更，16 行新增
-- `6ba591d` - 添加獨立 AI 配置編輯器用於矽基生命體
+- `6ba591d` - 添加獨立 AI 設定編輯器用於矽基生命體
   - 11 個檔案變更，842 行新增，18 行刪除
 - `0a826f5` - 在程式碼編輯器中添加儲存成功提示
   - 1 個檔案變更，9 行新增，2 行刪除
@@ -648,8 +810,8 @@
 - `4dbf659` - 更新 changelog 到 v0.5.1，替換 GitHub 預留位置 URL，添加 Gitee 鏡像，按語言本地化 Bilibili 名稱，更新電子郵件
   - 32 個檔案變更，489 行新增，180 行刪除
 
-#### 配置與入口
-- `0fc1693` - 更新程式入口和專案配置
+#### 設定與入口
+- `0fc1693` - 更新程式入口和專案設定
   - 2 個檔案變更，7 行新增
 
 #### 權限系統重構
@@ -690,7 +852,7 @@
 - `c933fd8` - 更新本地化、定時器系統、Web 視圖並添加工具
   - 更好的本地化管理員
   - 定時任務的排程系統
-  - AI 配置和上下文管理
+  - AI 設定和上下文管理
   - 支援 32 種日曆類型的日曆工具
   - 用於日曆 API 的 Web 控制器
   - 任務管理工具
@@ -710,9 +872,9 @@
 
 ### 2026-04-17
 
-- `9b71fcd` - 更新核心模組，添加 zh-HK 文件、廣播頻道、配置工具和稽核 Web 視圖
+- `9b71fcd` - 更新核心模組，添加 zh-HK 文件、廣播頻道、設定工具和稽核 Web 視圖
   - 廣播頻道，用於多個矽基生命體一起聊天
-  - 配置工具系統
+  - 設定工具系統
   - 稽核 Web 視圖
   - 繁體中文文件
   - 42 個檔案變更，3533 行新增，268 行刪除
@@ -754,7 +916,7 @@
 #### 文件與本地化
 - `2161002` - 重構文件並增強本地化
   - 17 個檔案變更，982 行新增，92 行刪除
-- `03d94e4` - 增強配置系統和本地化
+- `03d94e4` - 增強設定系統和本地化
   - 25 個檔案變更，1378 行新增，154 行刪除
 - `9976a35` - 添加關於頁面和本地化
   - 14 個檔案變更，699 行新增，44 行刪除
@@ -823,7 +985,7 @@
 
 - `b58bb1c` - 添加初始化控制器並重新設計 Web 模組
   - 初始化控制器
-  - 配置模組重新設計
+  - 設定模組重新設計
   - 本地化模組更新
   - 外觀系統改進
   - 路由器增強
@@ -846,14 +1008,14 @@
 
 ### 2026-04-02
 
-- `e6ad94b` - 修復測試期間刪除配置檔案時聊天歷史載入失敗的問題
+- `e6ad94b` - 修復測試期間刪除設定檔案時聊天歷史載入失敗的問題
   - 4 個檔案變更，49 行新增，45 行刪除
 - `daa56f5` - 完成階段 4：持久化記憶（聊天系統 + 信使頻道）
   - 29 個檔案變更，2051 行新增，538 行刪除
 
 ### 2026-04-01
 
-- `bbe2dbb` - 修復配置載入和聊天服務訊息路由
+- `bbe2dbb` - 修復設定載入和聊天服務訊息路由
   - 27 個檔案變更，1633 行新增，147 行刪除
 - `2fa6305` - 實現階段 2：主迴圈框架和時鐘物件系統
   - 9 個檔案變更，594 行新增，41 行刪除

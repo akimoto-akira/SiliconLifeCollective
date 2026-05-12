@@ -61,6 +61,168 @@ Obě verze sdílejí stejná rozhraní a funkce, liší se pouze implementací �
 
 ## [Neuvedeno]
 
+### 2026-05-12
+
+#### Webová zobrazení systému úloh
+- `0891b3c` - Přidat zobrazení detailu a historie provádění úloh
+  - Přidán TaskExecutionDetailView detailní pohled na provádění úloh
+  - Přidán TaskExecutionHistoryView pohled na historii provádění úloh
+  - TaskController přidána rozhraní pro dotazy na detail a historii provádění
+  - Přidán TaskViewModel model zobrazení úloh
+  - TaskCenter centrum úloh vylepšeno
+  - TaskSystem systém úloh aktualizován
+  - 9 jazyků lokalizace přidány klíče související s úlohami
+  - 26 souborů změněno, 803 vložení(+), 55 odstranění(-)
+
+### 2026-05-11
+
+#### Refaktorizace architektury webových komponent
+- `5e687ad` - Migrace vykreslování komponent z řetězce do H-tree
+  - ComponentBase metoda vykreslování migrována ze vzoru řetězce do struktury H-tree
+  - Všech 28 komponent přizpůsobeno nové architektuře vykreslování (A, Accordion, Button, Calendar, Card, Chart atd.)
+  - SelectComponent velká refaktorizace (889 řádků vylepšeno)
+  - Kontroléry a zobrazení odpovídajícím způsobem aktualizovány
+  - 33 souborů změněno, 667 vložení(+), 435 odstranění(-)
+
+- `bfd332d` - Migrace Style z řetězce do CssBuilder inline stylů
+  - Přidán CssBuilder tvůrce stylů
+  - ComponentBase systém stylů migrován z řetězce do strukturovaného CssBuilder
+  - LoadingComponent výrazně vylepšen (103 řádků přidáno)
+  - ConfigController, LogController, MemoryController migrace stylů kontrolérů
+  - ChatView, ConfigView, LogView, MemoryView migrace stylů zobrazení
+  - 37 souborů změněno, 351 vložení(+), 157 odstranění(-)
+
+#### Optimalizace úložného systému
+- `d67a7ee` - Optimalizace QueryLatest pro velké datové sady
+  - SpeedyTimeStorage QueryLatest optimalizace výkonu metody
+  - SpeedyLoggerProvider poskytovatel protokolování vylepšen
+  - 2 soubory změněny, 44 vložení(+), 5 odstranění(-)
+
+#### Refaktorizace kalendářového systému
+- `9629f88` - Extrakce TimerExecution a vylepšení webových zobrazení časovače
+  - TimerSystem extrahována logika TimerExecution (175 řádků odstraněno)
+  - SelectComponent výrazně vylepšen (427 řádků vylepšeno)
+  - TimerController a zobrazení časovače vylepšeny
+  - ContextManager správce kontextu aktualizován
+  - 12 souborů změněno, 458 vložení(+), 267 odstranění(-)
+
+#### Lokalizace
+- `5d8ca79` - Přidat lokalizační klíč LogsLoading
+  - 9 jazyků přidán klíč LogsLoading
+  - DefaultLocalizationBase základní třída přidána definice
+  - 11 souborů změněno, 15 vložení(+)
+
+### 2026-05-10
+
+#### Refaktorizace systému úloh
+- `54394f6` - Sloučení systému úloh s cykly historie chatu
+  - ProjectTaskSystem systém úloh projektu výrazně zjednodušen (411 řádků refaktorováno)
+  - TaskSystem systém úloh zjednodušen (254 řádků refaktorováno)
+  - TaskCenter centrum úloh refaktorováno (188 řádků vylepšeno)
+  - ContextManager správce kontextu optimalizován (347 řádků refaktorováno)
+  - DefaultSiliconBeing křemíková bytost vylepšena
+  - TimerSystem systém časovače integrován s úlohami
+  - IWorkNoteStorage rozhraní aktualizováno
+  - SpeedyWorkNoteStorage a FileSystemWorkNoteStorage přizpůsobeny
+  - 16 souborů změněno, 648 vložení(+), 897 odstranění(-)
+
+### 2026-05-09
+
+#### Vylepšení webového rozhraní
+- `bc50dd7` - Vylepšení zobrazení chatu a přidání funkce auditu
+  - Přidán AuditController kontrolér auditu (261 řádků)
+  - Přidán AuditView zobrazení auditu (379 řádků)
+  - Přidán AuditViewModel model zobrazení auditu
+  - ChatView zobrazení chatu výrazně vylepšeno (171 řádků vylepšeno)
+  - ChatController kontrolér chatu aktualizován
+  - MarkdownEditorComponent komponenta vylepšena
+  - InitController kontrolér inicializace vylepšen
+  - ChatSystem systém chatu přidány funkce
+  - 14 souborů změněno, 1030 vložení(+), 112 odstranění(-)
+
+- `c9babce` - Vylepšení vykreslování volání nástrojů v zobrazení chatu
+  - ChatView vykreslování bloku volání nástrojů vylepšeno
+  - 1 soubor změněn, 54 vložení(+), 11 odstranění(-)
+
+#### Systém scénářů nástrojů AI
+- `ff2eddd` - Implementace systému filtrování scénářů nástrojů
+  - Přidán ToolScenarioAttribute atribut scénáře nástrojů (36 řádků)
+  - Přidán ChatOnlyAttribute atribut scénáře pouze chat (19 řádků)
+  - ToolManager správce nástrojů přidáno filtrování scénářů (40 řádků)
+  - ContextManager správce kontextu přizpůsoben filtrování scénářů
+  - 4 soubory změněny, 115 vložení(+), 30 odstranění(-)
+
+- `5709a33` - Přidat atributy scénáře ke třídám nástrojů
+  - 24 třídám nástrojů přidány anotace atributu ToolScenario
+  - Včetně kalendáře, chatu, konfigurace, kurátora, databáze, disku, dynamické kompilace atd.
+  - 24 souborů změněno, 46 vložení(+), 20 odstranění(-)
+
+#### Refaktorizace systému úloh
+- `2f19a5f` - Restrukturalizace systému úloh pomocí TaskCenter a TaskEnumerator
+  - Přidán TaskCenter centrum úloh (235 řádků)
+  - Přidán TaskEnumerator enumerátor úloh (297 řádků)
+  - TaskSystem systém úloh refaktorován a zjednodušen
+  - DefaultSiliconBeing křemíková bytost přizpůsobena nové architektuře
+  - DefaultSiliconBeingFactory továrna aktualizována
+  - SiliconBeingBase základní třída vylepšena
+  - 7 souborů změněno, 796 vložení(+), 275 odstranění(-)
+
+#### Migrace systému oprávnění
+- `a06ed09` - Migrace IM a systému oprávnění do projektu App
+  - PermissionRequestQueue migrována z Default/Fast do projektu App (443 řádků přidáno)
+  - Odstraněn WebUIProvider verze Default (403 řádků odstraněno)
+  - Odstraněn HelpTool verze Default (194 řádků odstraněno)
+  - Odstraněny duplicitní PermissionRequestQueue z Default/Fast
+  - Odstraněn IMPermissionAskHandler verze Default
+  - PermissionRequestController kontrolér aktualizován
+  - 14 souborů změněno, 496 vložení(+), 1183 odstranění(-)
+
+#### Optimalizace kontextu AI
+- `4c8aaff` - Optimalizace správce kontextu a vylepšení lokátoru služeb
+  - ContextManager správce kontextu zjednodušen a optimalizován
+  - ServiceLocator lokátor služeb vylepšen (36 řádků přidáno)
+  - ToolManager správce nástrojů vylepšen (34 řádků přidáno)
+  - DashScopeClient a VolcengineArkClient klienti vylepšeni
+  - Exekutoři (CommandLine, Disk, Network) aktualizováni
+  - 8 souborů změněno, 116 vložení(+), 98 odstranění(-)
+
+#### Lokalizace
+- `5c5eef7` - Přidat lokalizační klíče auditu a úloh
+  - DefaultLocalizationBase přidáno 127 řádků lokalizačních definic
+  - 9 jazyků přidány klíče související s auditem a úlohami (každý 26 řádků)
+  - 11 souborů změněno, 387 vložení(+)
+
+#### Konfigurace projektu
+- `2067db6` - Aktualizace konfigurací projektu a pravidel gitignore
+  - Pravidla .gitignore aktualizována
+  - DefaultConfigData a Fast DefaultConfigData konfigurace vylepšeny
+  - SpeedyWorkNoteStorage úložiště vylepšeno
+  - SpeedyPack jádro vylepšeno
+  - 5 souborů změněno, 32 vložení(+), 6 odstranění(-)
+
+### 2026-05-07
+
+#### Italská lokalizace
+- `8adc18c` - Přidat podporu italské lokalizace a aktualizovat vícejazyčnou dokumentaci
+  - Přidána it-IT italská lokalizace
+  - Přidána implementace lokalizace ItIT (1909 řádků)
+  - Přidán ChineseHistoricalItIT italská podpora čínského historického kalendáře (586 řádků)
+  - Přidána TrayItIT italská lokalizace systémové lišty (135 řádků)
+  - Přidána kompletní sada italské dokumentace (14 dokumentů: README, API reference, architektura, kalendářový systém, seznam změn, průvodce příspěvky atd.)
+  - Aktualizována architektura, průvodce vývojem, průvodce začátkem atd. pro všechny jazykové verze
+  - Language výčet jazyků přidána italština
+  - 86 souborů změněno, 11573 vložení(+), 769 odstranění(-)
+
+#### Synchronizace dokumentace
+- `12a5deb` - Aktualizovat vícejazyčnou dokumentaci pro architekturu, seznam změn a průvodce křemíkovou bytostí
+  - 8 jazyků README aktualizováno
+  - 8 jazyků dokumentace architektury aktualizována
+  - 8 jazyků seznam změn aktualizován
+  - 8 jazyků průvodce křemíkovou bytostí aktualizován
+  - 8 jazyků reference nástrojů aktualizována
+  - Glosář restrukturalizován
+  - 46 souborů změněno, 1697 vložení(+), 442 odstranění(-)
+
 ### 2026-05-06
 
 #### Velká refaktorizace modulů

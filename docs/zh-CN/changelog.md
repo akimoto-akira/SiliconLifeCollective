@@ -61,6 +61,168 @@
 
 ## [未发布]
 
+### 2026-05-12
+
+#### 任务系统 Web 视图
+- `0891b3c` - 添加任务执行详情和历史视图
+  - 新增 TaskExecutionDetailView 任务执行详情视图
+  - 新增 TaskExecutionHistoryView 任务执行历史视图
+  - TaskController 新增执行详情和历史查询接口
+  - 新增 TaskViewModel 任务视图模型
+  - TaskCenter 任务中心增强
+  - TaskSystem 任务系统更新
+  - 9 种语言本地化新增任务相关键值
+  - 26 个文件变更，803 行新增，55 行删除
+
+### 2026-05-11
+
+#### Web 组件架构重构
+- `5e687ad` - 将组件渲染从字符串迁移到 H-tree
+  - ComponentBase 渲染方法从字符串模式迁移到 H-tree 结构
+  - 所有 28 个组件适配新渲染架构（A、Accordion、Button、Calendar、Card、Chart 等）
+  - SelectComponent 大幅重构（889 行改进）
+  - 控制器和视图同步更新
+  - 33 个文件变更，667 行新增，435 行删除
+
+- `bfd332d` - 将 Style 从字符串迁移到 CssBuilder 内联样式
+  - 新增 CssBuilder 样式构建器
+  - ComponentBase 样式系统从字符串迁移到结构化 CssBuilder
+  - LoadingComponent 大幅增强（103 行新增）
+  - ConfigController、LogController、MemoryController 控制器样式迁移
+  - ChatView、ConfigView、LogView、MemoryView 视图样式迁移
+  - 37 个文件变更，351 行新增，157 行删除
+
+#### 存储系统优化
+- `d67a7ee` - 优化 QueryLatest 大型数据集查询
+  - SpeedyTimeStorage QueryLatest 方法性能优化
+  - SpeedyLoggerProvider 日志提供者增强
+  - 2 个文件变更，44 行新增，5 行删除
+
+#### 日历系统重构
+- `9629f88` - 提取 TimerExecution 并增强定时器 Web 视图
+  - TimerSystem 提取 TimerExecution 逻辑（175 行移除）
+  - SelectComponent 大幅增强（427 行改进）
+  - TimerController 和定时器视图增强
+  - ContextManager 上下文管理器更新
+  - 12 个文件变更，458 行新增，267 行删除
+
+#### 本地化
+- `5d8ca79` - 添加 LogsLoading 本地化键值
+  - 9 种语言新增 LogsLoading 键值
+  - DefaultLocalizationBase 基类新增定义
+  - 11 个文件变更，15 行新增
+
+### 2026-05-10
+
+#### 任务系统重构
+- `54394f6` - 合并任务系统与聊天历史周期
+  - ProjectTaskSystem 项目任务系统大幅精简（411 行重构）
+  - TaskSystem 任务系统精简（254 行重构）
+  - TaskCenter 任务中心重构（188 行改进）
+  - ContextManager 上下文管理器优化（347 行重构）
+  - DefaultSiliconBeing 硅基生命体增强
+  - TimerSystem 定时器系统整合任务
+  - IWorkNoteStorage 接口更新
+  - SpeedyWorkNoteStorage 和 FileSystemWorkNoteStorage 适配
+  - 16 个文件变更，648 行新增，897 行删除
+
+### 2026-05-09
+
+#### Web 界面增强
+- `bc50dd7` - 改进聊天视图并添加审计功能
+  - 新增 AuditController 审计控制器（261 行）
+  - 新增 AuditView 审计视图（379 行）
+  - 新增 AuditViewModel 审计视图模型
+  - ChatView 聊天视图大幅改进（171 行增强）
+  - ChatController 聊天控制器更新
+  - MarkdownEditorComponent 组件增强
+  - InitController 初始化控制器改进
+  - ChatSystem 聊天系统新增功能
+  - 14 个文件变更，1030 行新增，112 行删除
+
+- `c9babce` - 改进聊天视图中的工具调用渲染
+  - ChatView 工具调用块渲染增强
+  - 1 个文件变更，54 行新增，11 行删除
+
+#### AI 工具场景系统
+- `ff2eddd` - 实现工具场景过滤系统
+  - 新增 ToolScenarioAttribute 工具场景属性（36 行）
+  - 新增 ChatOnlyAttribute 仅聊天场景属性（19 行）
+  - ToolManager 工具管理器新增场景过滤功能（40 行）
+  - ContextManager 上下文管理器适配场景过滤
+  - 4 个文件变更，115 行新增，30 行删除
+
+- `5709a33` - 为工具类添加场景属性
+  - 24 个工具类添加 ToolScenario 属性标注
+  - 包括日历、聊天、配置、策展、数据库、磁盘、动态编译等工具
+  - 24 个文件变更，46 行新增，20 行删除
+
+#### 任务系统重构
+- `2f19a5f` - 使用 TaskCenter 和 TaskEnumerator 重构任务系统
+  - 新增 TaskCenter 任务中心（235 行）
+  - 新增 TaskEnumerator 任务枚举器（297 行）
+  - TaskSystem 任务系统重构精简
+  - DefaultSiliconBeing 硅基生命体适配新架构
+  - DefaultSiliconBeingFactory 工厂更新
+  - SiliconBeingBase 基类增强
+  - 7 个文件变更，796 行新增，275 行删除
+
+#### 权限系统迁移
+- `a06ed09` - 将 IM 和权限系统迁移到 App 项目
+  - PermissionRequestQueue 从 Default/Fast 迁移到 App 项目（443 行新增）
+  - 移除 Default 版本 WebUIProvider（403 行删除）
+  - 移除 Default 版本 HelpTool（194 行删除）
+  - 移除 Default/Fast 版本重复的 PermissionRequestQueue
+  - 移除 Default 版本 IMPermissionAskHandler
+  - PermissionRequestController 控制器更新
+  - 14 个文件变更，496 行新增，1183 行删除
+
+#### AI 上下文优化
+- `4c8aaff` - 优化上下文管理器并增强服务定位器
+  - ContextManager 上下文管理器精简优化
+  - ServiceLocator 服务定位器增强（36 行新增）
+  - ToolManager 工具管理器增强（34 行新增）
+  - DashScopeClient 和 VolcengineArkClient 客户端改进
+  - 执行器（CommandLine、Disk、Network）更新
+  - 8 个文件变更，116 行新增，98 行删除
+
+#### 本地化
+- `5c5eef7` - 添加审计和任务本地化键值
+  - DefaultLocalizationBase 新增 127 行本地化定义
+  - 9 种语言新增审计和任务相关键值（每种 26 行）
+  - 11 个文件变更，387 行新增
+
+#### 项目配置
+- `2067db6` - 更新项目配置和 gitignore 规则
+  - .gitignore 规则更新
+  - DefaultConfigData 和 Fast DefaultConfigData 配置增强
+  - SpeedyWorkNoteStorage 存储改进
+  - SpeedyPack 核心增强
+  - 5 个文件变更，32 行新增，6 行删除
+
+### 2026-05-07
+
+#### 意大利语本地化
+- `8adc18c` - 添加意大利语本地化支持并更新多语言文档
+  - 新增 it-IT 意大利语本地化
+  - 新增 ItIT 本地化实现（1909 行）
+  - 新增 ChineseHistoricalItIT 中国历史日历意大利语支持（586 行）
+  - 新增 TrayItIT 托盘意大利语本地化（135 行）
+  - 新增意大利语完整文档集（14 个文档：README、API 参考、架构、日历系统、变更日志、贡献指南等）
+  - 更新所有语言版本的架构、开发指南、入门指南等文档
+  - Language 语言枚举新增意大利语
+  - 86 个文件变更，11573 行新增，769 行删除
+
+#### 文档同步
+- `12a5deb` - 更新架构、变更日志和硅基生命体指南的多语言文档
+  - 8 种语言的 README 更新
+  - 8 种语言的架构文档更新
+  - 8 种语言的变更日志更新
+  - 8 种语言的硅基生命体指南更新
+  - 8 种语言的工具参考更新
+  - 词汇表重构
+  - 46 个文件变更，1697 行新增，442 行删除
+
 ### 2026-05-06
 
 #### 大规模模块重构
