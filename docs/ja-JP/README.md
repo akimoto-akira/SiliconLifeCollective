@@ -4,7 +4,7 @@
 
 **バージョン: v0.1.0-alpha** | **シリコン生命群** — .NET 9 をベースとしたマルチエージェント協力プラットフォーム。AI エージェントは**シリコン生命体**と呼ばれ、Roslyn 動的コンパイル技術による自己進化を実現します。
 
-[English](../README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | **日本語** | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md) | [Italiano](../it-IT/README.md)
+[English](../README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | **日本語** | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md) | [Italiano](../it-IT/README.md) | [Polski](../pl-PL/README.md)
 
 ## 🌟 コア機能
 

@@ -356,6 +356,9 @@ public class Program
         // Czech
         LocalizationManager.Instance.Register<CsCZ>(Language.CsCZ);
         
+        // Polish
+        LocalizationManager.Instance.Register<PlPL>(Language.PlPL);
+        
         // German
         LocalizationManager.Instance.Register<DeDE>(Language.DeDE);
         LocalizationManager.Instance.Register<DeAT>(Language.DeAT);
@@ -435,6 +438,9 @@ public class Program
             
             // Czech
             Language.CsCZ => new TrayCsCZ(),
+            
+            // Polish
+            Language.PlPL => new TrayPlPL(),
             
             // German variants
             Language.DeDE => new TrayDeDE(),

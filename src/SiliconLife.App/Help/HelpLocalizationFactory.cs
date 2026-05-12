@@ -43,6 +43,7 @@ public static class HelpLocalizationFactory
         Language.EsES => new HelpLocalizationEsES(),
         Language.EsMX => new HelpLocalizationEsMX(),
         Language.CsCZ => new HelpLocalizationCsCZ(),
+        Language.PlPL => new HelpLocalizationPlPL(),
         
         // German variants
         Language.DeDE => new HelpLocalizationDeDE(),

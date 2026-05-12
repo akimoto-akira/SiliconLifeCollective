@@ -166,5 +166,10 @@ public enum Language
     /// <summary>
     /// Italian (Italy)
     /// </summary>
-    ItIT
+    ItIT,
+
+    /// <summary>
+    /// Polish (Poland)
+    /// </summary>
+    PlPL
 }
