@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-14T01:03:00+08:00",
+  "lastUpdated": "2026-05-14T01:50:00+08:00",
   "tasks": [
     {
       "id": "task-101",
@@ -9,12 +9,14 @@
       "title": "修复 SpeedyPackAutoCompactor 异常静默问题",
       "description": "OnTick 方法中 catch 块完全静默，没有日志记录。如果 CompactAsync 持续失败，磁盘空间可能耗尽而无人知晓。需要添加错误日志记录。",
       "priority": "P0",
-      "status": "completed",
+      "status": "verified",
       "createdAt": "2026-05-14T01:03:00+08:00",
       "createdBy": "openclaw-main",
       "assignedTo": "catpaw",
       "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
+      "completedAt": "2026-05-14T01:30:00+08:00",
+      "verifiedAt": "2026-05-14T01:50:00+08:00",
+      "verifiedBy": "openclaw-main"
     },
     {
       "id": "task-102",
@@ -23,12 +25,14 @@
       "title": "实现 Workflow 异常处理流程",
       "description": "Workflow 执行失败时没有异常处理流程（第 269 行 TODO）。不会通知 Being、不会创建任务、不会记录错误，可能导致 Workflow 卡死在中间状态。",
       "priority": "P0",
-      "status": "completed",
+      "status": "verified",
       "createdAt": "2026-05-14T01:03:00+08:00",
       "createdBy": "openclaw-main",
       "assignedTo": "catpaw",
       "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
+      "completedAt": "2026-05-14T01:30:00+08:00",
+      "verifiedAt": "2026-05-14T01:50:00+08:00",
+      "verifiedBy": "openclaw-main"
     },
     {
       "id": "task-103",
@@ -37,12 +41,14 @@
       "title": "修复 Linux 退出确认对话框硬编码中文",
       "description": "第 378-382 行退出确认消息框使用硬编码中文字符串，违反项目国际化设计原则。需要在 TrayLocalizationBase 中添加 ExitConfirmation 属性。",
       "priority": "P1",
-      "status": "completed",
+      "status": "verified",
       "createdAt": "2026-05-14T01:03:00+08:00",
       "createdBy": "openclaw-main",
       "assignedTo": "catpaw",
       "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
+      "completedAt": "2026-05-14T01:30:00+08:00",
+      "verifiedAt": "2026-05-14T01:50:00+08:00",
+      "verifiedBy": "openclaw-main"
     },
     {
       "id": "task-104",
@@ -51,12 +57,14 @@
       "title": "优化 WatchdogRun 锁使用模式",
       "description": "第 195-218 行 WatchdogRun 在锁内调用 RestartMainThread，而后者也获取同一把锁。虽然当前不会死锁，但这种模式危险，建议重构。",
       "priority": "P1",
-      "status": "completed",
+      "status": "verified",
       "createdAt": "2026-05-14T01:03:00+08:00",
       "createdBy": "openclaw-main",
       "assignedTo": "catpaw",
       "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
+      "completedAt": "2026-05-14T01:30:00+08:00",
+      "verifiedAt": "2026-05-14T01:50:00+08:00",
+      "verifiedBy": "openclaw-main"
     },
     {
       "id": "task-105",
@@ -65,12 +73,14 @@
       "title": "完善 MigrateState 字段迁移",
       "description": "第 435-452 行 MigrateState 方法可能遗漏新添加的字段。如果 SiliconBeingBase 新增字段，动态替换 Being 时可能导致状态丢失。建议使用反射自动迁移或添加检查机制。",
       "priority": "P1",
-      "status": "completed",
+      "status": "verified",
       "createdAt": "2026-05-14T01:03:00+08:00",
       "createdBy": "openclaw-main",
       "assignedTo": "catpaw",
       "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
+      "completedAt": "2026-05-14T01:30:00+08:00",
+      "verifiedAt": "2026-05-14T01:50:00+08:00",
+      "verifiedBy": "openclaw-main"
     },
     {
       "id": "task-106",
@@ -79,12 +89,14 @@
       "title": "实现 CodeReviewWorkflow TODO 功能",
       "description": "第 66、153、229 行有三处 TODO 未实现：代码审查任务创建检查、拒绝状态添加、代码合并检查。这些是代码审查流程的关键检查点。",
       "priority": "P2",
-      "status": "completed",
+      "status": "verified",
       "createdAt": "2026-05-14T01:03:00+08:00",
       "createdBy": "openclaw-main",
       "assignedTo": "catpaw",
       "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
+      "completedAt": "2026-05-14T01:30:00+08:00",
+      "verifiedAt": "2026-05-14T01:50:00+08:00",
+      "verifiedBy": "openclaw-main"
     },
     {
       "id": "task-107",
@@ -93,12 +105,14 @@
       "title": "实现系统优雅关闭功能",
       "description": "第 71 行 TODO：共享模块的优雅关闭未实现。系统关闭时可能没有正确释放共享资源，可能导致数据丢失或文件损坏。",
       "priority": "P2",
-      "status": "completed",
+      "status": "verified",
       "createdAt": "2026-05-14T01:03:00+08:00",
       "createdBy": "openclaw-main",
       "assignedTo": "catpaw",
       "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
+      "completedAt": "2026-05-14T01:30:00+08:00",
+      "verifiedAt": "2026-05-14T01:50:00+08:00",
+      "verifiedBy": "openclaw-main"
     },
     {
       "id": "task-108",
@@ -107,12 +121,14 @@
       "title": "实现帮助系统搜索功能",
       "description": "第 382 行 TODO：帮助系统的搜索结果显示功能未实现，用户体验受损。",
       "priority": "P2",
-      "status": "completed",
+      "status": "verified",
       "createdAt": "2026-05-14T01:03:00+08:00",
       "createdBy": "openclaw-main",
       "assignedTo": "catpaw",
       "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
+      "completedAt": "2026-05-14T01:30:00+08:00",
+      "verifiedAt": "2026-05-14T01:50:00+08:00",
+      "verifiedBy": "openclaw-main"
     },
     {
       "id": "task-109",
@@ -121,12 +137,14 @@
       "title": "优化 Config 锁使用粒度",
       "description": "Config.cs 中 LoadConfig/SaveConfig 方法将整个 IO 操作放在锁内，可能阻塞其他线程的 Config 访问。建议只在读写_data 字段时加锁，IO 操作在锁外进行。",
       "priority": "P3",
-      "status": "completed",
+      "status": "verified",
       "createdAt": "2026-05-14T01:03:00+08:00",
       "createdBy": "openclaw-main",
       "assignedTo": "catpaw",
       "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
+      "completedAt": "2026-05-14T01:30:00+08:00",
+      "verifiedAt": "2026-05-14T01:50:00+08:00",
+      "verifiedBy": "openclaw-main"
     },
     {
       "id": "task-110",
@@ -135,18 +153,21 @@
       "title": "添加 ExecuteWithTimeout 异常日志",
       "description": "第 305-312 行 ExecuteWithTimeout 方法中所有异常都被静默忽略，没有日志记录，调试困难。需要添加错误日志。",
       "priority": "P3",
-      "status": "completed",
+      "status": "verified",
       "createdAt": "2026-05-14T01:03:00+08:00",
       "createdBy": "openclaw-main",
       "assignedTo": "catpaw",
       "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
+      "completedAt": "2026-05-14T01:30:00+08:00",
+      "verifiedAt": "2026-05-14T01:50:00+08:00",
+      "verifiedBy": "openclaw-main"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
     "completed": ["task-101", "task-102", "task-103", "task-104", "task-105", "task-106", "task-107", "task-108", "task-109", "task-110"],
+    "verified": ["task-101", "task-102", "task-103", "task-104", "task-105", "task-106", "task-107", "task-108", "task-109", "task-110"],
     "cancelled": []
   },
   "metadata": {
@@ -154,6 +175,14 @@
     "generatedAt": "2026-05-14T01:03:00+08:00",
     "generatedBy": "openclaw-main",
     "replacedTasks": ["task-001", "task-002", "task-003", "task-004", "task-005", "task-006"],
-    "reason": "代码审查发现新 bug，覆盖原有已完成任务列表"
+    "reason": "代码审查发现新 bug，覆盖原有已完成任务列表",
+    "验收报告": {
+      "验收时间": "2026-05-14T01:50:00+08:00",
+      "验收者": "openclaw-main",
+      "执行者": "catpaw",
+      "会话": "catpaw-20260514-0130",
+      "总任务数": 10,
+      "通过率": "100%"
+    }
   }
 }
