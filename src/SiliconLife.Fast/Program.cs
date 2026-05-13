@@ -223,8 +223,18 @@ public class Program
         _trayWindow = new TrayStatusWindow(trayLocalization, configData.WebPort);
         _trayWindow.ExitRequested += (s, e) => RequestExit();
         
-        // Register window with App (will be shown after Avalonia is ready)
         App.SetStatusWindow(_trayWindow);
+
+        string iconPath = Path.Combine(AppContext.BaseDirectory, "slc.ico");
+        if (File.Exists(iconPath))
+        {
+            App.InitializeTray(_trayWindow, iconPath, configData.WebPort, trayLocalization);
+            _logger.Info(null, "TrayIcon initialized: {0}", iconPath);
+        }
+        else
+        {
+            _logger.Warn(null, "Tray icon not found at {0}, tray icon will not be displayed", iconPath);
+        }
         
         Console.WriteLine($"[INFO] Status window created. Access web UI at: http://localhost:{configData.WebPort}/");
         _logger.Info(null, "Initialized: TrayStatusWindow (Avalonia). Web UI: http://localhost:{0}/", configData.WebPort);

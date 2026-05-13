@@ -27,6 +27,7 @@ obj/
 *.tmp_proj
 *_wpftmp.csproj
 *.log
+!.ai-collab/activity.log
 *.tlog
 *.vspscc
 *.vssscc

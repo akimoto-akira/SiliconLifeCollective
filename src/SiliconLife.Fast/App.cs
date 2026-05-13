@@ -11,6 +11,7 @@ public class App : Application
 {
     private static TrayIcon? _trayIcon;
     private static TrayStatusWindow? _trayWindow;
+    private static TrayLocalizationBase? _localization;
 
     public override void Initialize()
     {
@@ -21,58 +22,51 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Initialize core application (Avalonia is ready now)
+            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
             await Program.StartAsync();
-            
-            // Show window after initialization
-            if (_trayWindow != null)
-            {
-                _trayWindow.Show();
-                System.Diagnostics.Debug.WriteLine($"Status window shown");
-            }
         }
-        
+
         base.OnFrameworkInitializationCompleted();
     }
 
-    private static int _webPort = 8080; // Default fallback
+    private static int _webPort = 8080;
 
-    /// <summary>
-    /// Set the status window (called by Program.StartAsync)
-    /// </summary>
     public static void SetStatusWindow(TrayStatusWindow window)
     {
         _trayWindow = window;
     }
 
-    /// <summary>
-    /// Initialize system tray icon (cross-platform) - NOT USED for now
-    /// </summary>
-    public static void InitializeTray(TrayStatusWindow trayWindow, string iconPath, int webPort)
+    public static void InitializeTray(TrayStatusWindow trayWindow, string iconPath, int webPort, TrayLocalizationBase localization)
     {
         if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
             return;
 
         _trayWindow = trayWindow;
         _webPort = webPort;
+        _localization = localization;
 
-        // Create tray icon
         _trayIcon = new TrayIcon
         {
             Icon = new WindowIcon(iconPath),
-            ToolTipText = $"SiliconLife Fast (Port: {webPort})",
+            ToolTipText = $"{localization.SoftwareName} (Port: {webPort})",
             IsVisible = true
         };
 
-        // Create native menu for tray (Avalonia 11.x API)
+        _trayIcon.Clicked += OnTrayIconClicked;
+
         var nativeMenu = new NativeMenu();
-        
-        var openWebItem = new NativeMenuItem { Header = "Open Web Interface" };
+
+        var showStatusItem = new NativeMenuItem { Header = localization.ShowStatus };
+        showStatusItem.Click += (s, e) => ShowStatusWindow();
+
+        var openWebItem = new NativeMenuItem { Header = localization.OpenWebInterface };
         openWebItem.Click += (s, e) => OpenWebInterface();
-        
-        var exitItem = new NativeMenuItem { Header = "Exit" };
+
+        var exitItem = new NativeMenuItem { Header = localization.Exit };
         exitItem.Click += (s, e) => RequestExit();
 
+        nativeMenu.Items.Add(showStatusItem);
         nativeMenu.Items.Add(openWebItem);
         nativeMenu.Items.Add(new NativeMenuItemSeparator());
         nativeMenu.Items.Add(exitItem);
@@ -80,6 +74,30 @@ public class App : Application
         _trayIcon.Menu = nativeMenu;
 
         System.Diagnostics.Debug.WriteLine($"TrayIcon initialized: {iconPath}, Port: {webPort}");
+    }
+
+    private static void OnTrayIconClicked(object? sender, EventArgs e)
+    {
+        ShowStatusWindow();
+    }
+
+    private static void ShowStatusWindow()
+    {
+        if (_trayWindow == null)
+            return;
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (_trayWindow.IsVisible)
+            {
+                _trayWindow.Hide();
+            }
+            else
+            {
+                _trayWindow.Show();
+                _trayWindow.Activate();
+            }
+        });
     }
 
     private static void OpenWebInterface()

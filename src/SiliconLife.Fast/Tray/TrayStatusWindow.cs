@@ -394,6 +394,13 @@ public partial class TrayStatusWindow : Window
         });
     }
 
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        e.Cancel = true;
+        Hide();
+        base.OnClosing(e);
+    }
+
     protected override void OnClosed(EventArgs e)
     {
         _updateTimer.Stop();

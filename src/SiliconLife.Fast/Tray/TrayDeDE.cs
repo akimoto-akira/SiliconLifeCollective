@@ -13,123 +13,23 @@
 
 namespace SiliconLife.Fast.Tray;
 
-/// <summary>
-/// German (Germany) tray localization implementation
-/// </summary>
 public class TrayDeDE : TrayLocalizationBase
 {
-    /// <summary>
-    /// Gets the fast edition name
-    /// </summary>
     public override string SoftwareName => "Silicon Life Collective";
-
-    /// <summary>
-    /// Gets the status label
-    /// </summary>
     public override string Status => "Status";
-
-    /// <summary>
-    /// Gets the uptime label
-    /// </summary>
     public override string Uptime => "Betriebszeit";
-
-    /// <summary>
-    /// Gets the running status text
-    /// </summary>
-    public override string Running => "Läuft";
-
-    /// <summary>
-    /// Gets the shutting down status text
-    /// </summary>
     public override string ShuttingDown => "Herunterfahren";
-
-    /// <summary>
-    /// Gets the silicon beings label
-    /// </summary>
     public override string SiliconBeings => "Silizium-Lebewesen";
-
-    /// <summary>
-    /// Gets the active status text
-    /// </summary>
     public override string Active => "aktiv";
-
-    /// <summary>
-    /// Gets the name label
-    /// </summary>
     public override string Name => "Name";
-
-    /// <summary>
-    /// Gets the AI model label
-    /// </summary>
     public override string AIModel => "KI-Modell";
-
-    /// <summary>
-    /// Gets the memory label
-    /// </summary>
     public override string Memory => "Speicher";
-
-    /// <summary>
-    /// Gets the CPU label
-    /// </summary>
     public override string CPU => "CPU";
-
-    /// <summary>
-    /// Gets the web label
-    /// </summary>
     public override string Web => "Web";
-
-    /// <summary>
-    /// Gets the double-click action text
-    /// </summary>
-    public override string DoubleClick => "Doppelklick";
-
-    /// <summary>
-    /// Gets the right-click action text
-    /// </summary>
-    public override string RightClick => "Rechtsklick";
-
-    /// <summary>
-    /// Gets the show menu text
-    /// </summary>
-    public override string ShowMenu => "Menü anzeigen";
-
-    /// <summary>
-    /// Gets the open web interface menu item text
-    /// </summary>
+    public override string ShowStatus => "Status anzeigen";
     public override string OpenWebInterface => "Web-Oberfläche öffnen";
-
-    /// <summary>
-    /// Gets the dashboard menu item text
-    /// </summary>
     public override string Dashboard => "Dashboard";
-
-    /// <summary>
-    /// Gets the manage silicon beings menu item text
-    /// </summary>
     public override string ManageSiliconBeings => "Silizium-Lebewesen verwalten";
-
-    /// <summary>
-    /// Gets the configuration menu item text
-    /// </summary>
     public override string Configuration => "Konfiguration";
-
-    /// <summary>
-    /// Gets the Speedy Pack Manager menu item text
-    /// </summary>
-    public override string SpeedyPackManager => "Speedy Pack-Manager";
-
-    /// <summary>
-    /// Gets the exit menu item text
-    /// </summary>
     public override string Exit => "Beenden";
-
-    /// <summary>
-    /// Gets the web server startup error title
-    /// </summary>
-    public override string WebServerStartupErrorTitle => "Webserver-Start fehlgeschlagen";
-
-    /// <summary>
-    /// Gets the web server startup error message
-    /// </summary>
-    public override string WebServerStartupErrorMessage => "Der Webserver konnte nicht gestartet werden. Die Anwendung wird beendet.\n\nFehler: {0}";
 }

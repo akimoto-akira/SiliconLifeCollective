@@ -403,11 +403,13 @@
 !.ai-collab/registry.json
 !.ai-collab/changes/
 !.ai-collab/merge-reports/
+!.ai-collab/state.json
+!.ai-collab/sessions/
+!.ai-collab/activity.log
 
-# 不追踪（运行时状态）
-.ai-collab/state.json
-.ai-collab/sessions/
-.ai-collab/activity.log
+# 注意：*.log 规则会屏蔽 activity.log，需加例外
+# 在 .gitignore 的 *.log 规则后添加：
+# !.ai-collab/activity.log
 ```
 
 ---
