@@ -1,5 +1,3 @@
-using SiliconLife.Common.Localization;
-
 // Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +11,7 @@ using SiliconLife.Common.Localization;
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using SiliconLife.Common.Localization;
 using SiliconLife.Collective;
 
 namespace SiliconLife.Common.Calendar.ChineseHistorical;

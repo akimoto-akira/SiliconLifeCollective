@@ -1,5 +1,15 @@
-// Copyright (c) 2026 Silicon Life Collective
-// Licensed under the Apache License, Version 2.0
+// Copyright (c) 2026 Hoshino Kennji
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 using SiliconLife.Collective;
 using SiliconLife.Help;
@@ -405,7 +415,7 @@ public class HelpView : ViewBase
                     .Add(() => Js.Const(() => "contentEl", () => Js.Id(() => "document").Call(() => "querySelector", () => Js.Str(() => ".help-content"))))
                     .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                     {
-                        (Js.Id(() => "!data").Op(() => "||", () => Js.Id(() => "!data").Prop(() => "results").Op(() => "||", () => Js.Id(() => "!contentEl")), new List<JsSyntax>
+                        (Js.Id(() => "!data").Op(() => "||", () => Js.Id(() => "!data").Prop(() => "results").Op(() => "||", () => Js.Id(() => "!contentEl"))), new List<JsSyntax>
                         {
                             Js.Return(() => Js.Id(() => "undefined"))
                         })
@@ -415,11 +425,37 @@ public class HelpView : ViewBase
                         (Js.Id(() => "data").Prop(() => "count").Op(() => "===", () => Js.Num(() => "0")), new List<JsSyntax>
                         {
                             Js.Assign(() => Js.Id(() => "contentEl").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"search-no-results\">No results found</div>"))
+                        }),
+                        (null, new List<JsSyntax>
+                        {
+                            Js.Const(
+                                () => "html",
+                                () => Js.Id(() => "data")
+                                    .Prop(() => "results")
+                                    .Call(
+                                        () => "map",
+                                        () => Js.Arrow(
+                                            () => new List<string> { "t" },
+                                            () => Js.Str(() => "<a href=\"/help/")
+                                                .Op(() => "+", () => Js.Id(() => "t").Prop(() => "id"))
+                                                .Op(() => "+", () => Js.Str(() => "\" class=\"search-result-item\"><span class=\"topic-icon\">"))
+                                                .Op(() => "+", () => Js.Id(() => "t").Prop(() => "icon"))
+                                                .Op(() => "+", () => Js.Str(() => "</span><span>"))
+                                                .Op(() => "+", () => Js.Id(() => "t").Prop(() => "propertyName"))
+                                                .Op(() => "+", () => Js.Str(() => "</span></a>"))
+                                        )
+                                    )
+                                    .Call(() => "join", () => Js.Str(() => ""))
+                            ),
+                            Js.Assign(
+                                () => Js.Id(() => "contentEl").Prop(() => "innerHTML"),
+                                () => Js.Str(() => "<div class=\"search-results\"><h2>Search Results (")
+                                    .Op(() => "+", () => Js.Id(() => "data").Prop(() => "count"))
+                                    .Op(() => "+", () => Js.Str(() => ")</h2>"))
+                                    .Op(() => "+", () => Js.Id(() => "html"))
+                                    .Op(() => "+", () => Js.Str(() => "</div>"))
+                            )
                         })
-                    }, new List<JsSyntax>
-                    {
-                        Js.Const(() => "html", () => Js.Id(() => "data").Prop(() => "results").Call(() => "map", () => Js.Arrow(() => new List<string> { "t" }, () => Js.Str(() => "<a href=\"/help/").Op(() => "+", () => Js.Id(() => "t").Prop(() => "id")).Op(() => "+", () => Js.Str(() => "\" class=\"search-result-item\"><span class=\"topic-icon\">").Op(() => "+", () => Js.Id(() => "t").Prop(() => "icon")).Op(() => "+", () => Js.Str(() => "</span><span>").Op(() => "+", () => Js.Id(() => "t").Prop(() => "propertyName")).Op(() => "+", () => Js.Str(() => "</span></a>")))).Call(() => "join", () => Js.Str(() => ""))),
-                        Js.Assign(() => Js.Id(() => "contentEl").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"search-results\"><h2>Search Results (").Op(() => "+", () => Js.Id(() => "data").Prop(() => "count")).Op(() => "+", () => Js.Str(() => ")</h2>").Op(() => "+", () => Js.Id(() => "html")).Op(() => "+", () => Js.Str(() => "</div>")))
                     }))
                 )).Stmt());
 
