@@ -11,40 +11,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using SiliconLife.Collective;
-using SiliconLife.Fast;
+using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.Resources;
-using System.Windows.Forms;
+using System.IO;
+using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Threading;
+using SiliconLife.Collective;
+using SiliconLife.Common.SiliconBeing;
 
 namespace SiliconLife.Fast.Tray;
 
 /// <summary>
-/// Custom tray status popup window with tray icon management
-/// Displays detailed application status information
+/// Avalonia-based tray status popup window
 /// </summary>
-public class TrayStatusWindow : Form
+public partial class TrayStatusWindow : Window
 {
     private readonly TrayLocalizationBase _localization;
     private readonly int _webPort;
     private readonly DateTime _startTime;
-    private readonly System.Timers.Timer _updateTimer;
+    private readonly DispatcherTimer _updateTimer;
     private bool _isWindowShowing;
-    private Panel _mainPanel = null!;
-    private Label _lblTitle = null!;
-    private Label _lblStatus = null!;
-    private Label _lblUptime = null!;
-    private Label _lblBeings = null!;
-    private Label _lblBeingName = null!;
-    private Label _lblAIModel = null!;
-    private Label _lblMemory = null!;
-    private Label _lblCPU = null!;
-    private Label _lblWeb = null!;
-    private NotifyIcon notifyIcon1;
-    private System.ComponentModel.IContainer components;
-    private ContextMenuStrip contextMenuStrip1;
-    private Label _lblHint = null!;
+    
+    // UI Controls
+    private TextBlock? _titleText;
+    private TextBlock? _statusText;
+    private TextBlock? _uptimeText;
+    private TextBlock? _beingsText;
+    private TextBlock? _beingNameText;
+    private TextBlock? _aiModelText;
+    private TextBlock? _memoryText;
+    private TextBlock? _cpuText;
+    private TextBlock? _webText;
 
     /// <summary>
     /// Event triggered when exit is requested from tray menu
@@ -56,99 +57,93 @@ public class TrayStatusWindow : Form
     /// </summary>
     public string ApplicationStatus { get; private set; } = "Running";
 
-    /// <summary>
-    /// Initializes a new instance of the TrayStatusWindow
-    /// </summary>
     public TrayStatusWindow(TrayLocalizationBase localization, int webPort)
     {
         _localization = localization;
         _webPort = webPort;
         _startTime = DateTime.Now;
-        InitializeWindow();
-        InitializeComponent();
-
-        // Initialize context menu
-        SetupContextMenu();
         
-        // Start update timer
-        _updateTimer = new System.Timers.Timer(1000);
-        _updateTimer.Elapsed += OnTimerTick;
-        _updateTimer.Start();
-    }
-
-    /// <summary>
-    /// Sets up the context menu items
-    /// </summary>
-    private void SetupContextMenu()
-    {
-        contextMenuStrip1.Items.Clear();
-
-        var openWebItem = new ToolStripMenuItem(_localization.OpenWebInterface);
-        openWebItem.Click += (s, e) => OpenWebInterface();
-        contextMenuStrip1.Items.Add(openWebItem);
-
-        var dashboardItem = new ToolStripMenuItem(_localization.Dashboard);
-        dashboardItem.Click += (s, e) => OpenDashboard();
-        contextMenuStrip1.Items.Add(dashboardItem);
-
-        var manageBeingsItem = new ToolStripMenuItem(_localization.ManageSiliconBeings);
-        manageBeingsItem.Click += (s, e) => ManageBeings();
-        contextMenuStrip1.Items.Add(manageBeingsItem);
-
-        var configItem = new ToolStripMenuItem(_localization.Configuration);
-        configItem.Click += (s, e) => OpenConfiguration();
-        contextMenuStrip1.Items.Add(configItem);
-
-        var speedyPackManagerItem = new ToolStripMenuItem(_localization.SpeedyPackManager);
-        speedyPackManagerItem.Click += (s, e) => OpenSpeedyPackManager();
-        contextMenuStrip1.Items.Add(speedyPackManagerItem);
-
-        contextMenuStrip1.Items.Add(new ToolStripSeparator());
-
-        var exitItem = new ToolStripMenuItem(_localization.Exit);
-        exitItem.Click += (s, e) => RequestExit();
-        contextMenuStrip1.Items.Add(exitItem);
-    }
-
-    /// <summary>
-    /// Handles double-click on tray icon
-    /// </summary>
-    private void OnTrayIconDoubleClick(object? sender, MouseEventArgs e)
-    {
-        OpenWebInterface();
-    }
-
-    /// <summary>
-    /// Handles mouse move over tray icon - show status window
-    /// </summary>
-    private void OnTrayIconMouseMove(object? sender, MouseEventArgs e)
-    {
-        if (!_isWindowShowing && !IsDisposed)
+        // Set up window properties
+        Title = _localization.SoftwareName;
+        Width = 350;
+        Height = 280;
+        WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        Topmost = false;
+        CanResize = false;
+        SystemDecorations = SystemDecorations.Full; // Show title bar with close button
+        Background = Avalonia.Media.SolidColorBrush.Parse("#1E1E1E");
+        Opacity = 0.95;
+        
+        // Set window icon
+        try
         {
-            _isWindowShowing = true;
-            var screenPos = Cursor.Position;
-            ShowAt(screenPos);
-            
-            Task.Delay(5000).ContinueWith(_ =>
+            string iconPath = Path.Combine(AppContext.BaseDirectory, "slc.ico");
+            if (File.Exists(iconPath))
             {
-                if (!IsDisposed && _isWindowShowing)
-                {
-                    if (InvokeRequired)
-                    {
-                        Invoke(new Action(() =>
-                        {
-                            Hide();
-                            _isWindowShowing = false;
-                        }));
-                    }
-                }
-            });
+                Icon = new WindowIcon(iconPath);
+            }
+        }
+        catch { }
+        
+        // Load AXAML
+        try
+        {
+            Avalonia.Markup.Xaml.AvaloniaXamlLoader.Load(this);
+            System.Diagnostics.Debug.WriteLine("AXAML loaded successfully");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"AXAML load failed: {ex.Message}");
+            Console.WriteLine($"[ERROR] AXAML load failed: {ex.Message}");
+        }
+        
+        // Start update timer (1 second interval)
+        _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _updateTimer.Tick += (s, e) => UpdateContent();
+        _updateTimer.Start();
+        
+        // Handle right-click for context menu
+        AddHandler(InputElement.PointerPressedEvent, OnPointerPressed, RoutingStrategies.Tunnel);
+    }
+
+    private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        var properties = e.GetCurrentPoint(this).Properties;
+        
+        if (properties.IsRightButtonPressed)
+        {
+            // Right click: show context menu at mouse position
+            ShowContextMenu();
+            e.Handled = true;
+        }
+        else if (e.ClickCount == 2)
+        {
+            // Double click: open web interface
+            OpenWebInterface();
         }
     }
 
-    /// <summary>
-    /// Opens the web interface in default browser
-    /// </summary>
+    private void ShowContextMenu()
+    {
+        var menu = new ContextMenu();
+        
+        menu.Items.Add(new MenuItem { Header = _localization.OpenWebInterface });
+        menu.Items.Add(new MenuItem { Header = _localization.Dashboard });
+        menu.Items.Add(new MenuItem { Header = _localization.ManageSiliconBeings });
+        menu.Items.Add(new MenuItem { Header = _localization.Configuration });
+        menu.Items.Add(new Separator());
+        menu.Items.Add(new MenuItem { Header = _localization.Exit });
+        
+        // Attach click handlers
+        ((MenuItem)menu.Items[0]).Click += (s, e) => OpenWebInterface();
+        ((MenuItem)menu.Items[1]).Click += (s, e) => OpenDashboard();
+        ((MenuItem)menu.Items[2]).Click += (s, e) => ManageBeings();
+        ((MenuItem)menu.Items[3]).Click += (s, e) => OpenConfiguration();
+        ((MenuItem)menu.Items[5]).Click += (s, e) => RequestExit();
+        
+        menu.Open(this);
+    }
+
     private void OpenWebInterface()
     {
         try
@@ -161,14 +156,10 @@ public class TrayStatusWindow : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Failed to open web interface: {ex.Message}", "Error",
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Console.WriteLine($"Failed to open web interface: {ex.Message}");
         }
     }
 
-    /// <summary>
-    /// Opens the dashboard page
-    /// </summary>
     private void OpenDashboard()
     {
         try
@@ -181,14 +172,10 @@ public class TrayStatusWindow : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Failed to open dashboard: {ex.Message}", "Error",
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Console.WriteLine($"Failed to open dashboard: {ex.Message}");
         }
     }
 
-    /// <summary>
-    /// Opens the silicon beings management page
-    /// </summary>
     private void ManageBeings()
     {
         try
@@ -201,14 +188,10 @@ public class TrayStatusWindow : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Failed to open beings management: {ex.Message}", "Error",
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Console.WriteLine($"Failed to open beings management: {ex.Message}");
         }
     }
 
-    /// <summary>
-    /// Opens the configuration page
-    /// </summary>
     private void OpenConfiguration()
     {
         try
@@ -221,313 +204,93 @@ public class TrayStatusWindow : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Failed to open configuration: {ex.Message}", "Error",
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Console.WriteLine($"Failed to open configuration: {ex.Message}");
         }
     }
 
-    /// <summary>
-    /// Opens the Speedy Pack Manager window
-    /// </summary>
-    private void OpenSpeedyPackManager()
+    public void RequestExit()
     {
-        try
-        {
-            // Get the current SpeedyPack from the registry
-            var currentPack = SpeedyPackRegistry.Pack;
-            
-            // Create and show the MainForm directly with the current pack
-            var managerForm = new SiliconLife.Speedy.Manager.MainForm(currentPack);
-            managerForm.Show();
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Failed to open Speedy Pack Manager: {ex.Message}", "Error",
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-    }
-
-    /// <summary>
-    /// Requests application exit
-    /// </summary>
-    private void RequestExit()
-    {
-        notifyIcon1.Visible = false;
         ExitRequested?.Invoke(this, EventArgs.Empty);
     }
 
-    /// <summary>
-    /// Updates the application status
-    /// </summary>
     public void UpdateStatus(string status)
     {
         ApplicationStatus = status;
     }
 
-    /// <summary>
-    /// Disposes the tray status window and cleans up resources
-    /// </summary>
-    public new void Dispose()
+    protected override void OnOpened(EventArgs e)
     {
-        notifyIcon1.Visible = false;
-        notifyIcon1.Dispose();
-        contextMenuStrip1.Dispose();
-        base.Dispose();
-    }
-
-    /// <summary>
-    /// Timer tick handler - updates content safely across threads
-    /// </summary>
-    private void OnTimerTick(object? sender, System.Timers.ElapsedEventArgs e)
-    {
-        // Only update if window is showing and handle is created
-        if (IsDisposed || !IsHandleCreated || !Visible)
-            return;
-
+        base.OnOpened(e);
+        
         try
         {
-            if (InvokeRequired)
-            {
-                Invoke(new Action(UpdateContent));
-            }
-            else
-            {
-                UpdateContent();
-            }
+            // Find controls
+            _titleText = this.FindControl<TextBlock>("TitleText");
+            _statusText = this.FindControl<TextBlock>("StatusText");
+            _uptimeText = this.FindControl<TextBlock>("UptimeText");
+            _beingsText = this.FindControl<TextBlock>("BeingsText");
+            _beingNameText = this.FindControl<TextBlock>("BeingNameText");
+            _aiModelText = this.FindControl<TextBlock>("AIModelText");
+            _memoryText = this.FindControl<TextBlock>("MemoryText");
+            _cpuText = this.FindControl<TextBlock>("CPUText");
+            _webText = this.FindControl<TextBlock>("WebText");
+            
+            System.Diagnostics.Debug.WriteLine($"Controls found: Title={_titleText != null}, Status={_statusText != null}");
+            UpdateContent();
         }
-        catch
+        catch (Exception ex)
         {
-            // Ignore timer update errors
+            System.Diagnostics.Debug.WriteLine($"OnOpened error: {ex.Message}");
+            Console.WriteLine($"[ERROR] Failed to initialize window controls: {ex.Message}");
         }
     }
 
-    /// <summary>
-    /// Initializes the window properties
-    /// </summary>
-    private void InitializeWindow()
-    {
-        FormBorderStyle = FormBorderStyle.None;
-        ShowInTaskbar = false;
-        StartPosition = FormStartPosition.Manual;
-        BackColor = Color.FromArgb(30, 30, 30); // Dark background
-        Size = new Size(350, 280);
-        Opacity = 0.95;
-        TopMost = true;
-
-        // Add rounded corners effect (basic)
-        Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, Width, Height, 10, 10));
-        Icon = new Icon(new MemoryStream(SiliconLife.Common.icons.slc));
-    }
-
-    /// <summary>
-    /// Initializes the UI components
-    /// </summary>
-    private void InitializeComponent()
-    {
-        components = new System.ComponentModel.Container();
-        notifyIcon1 = new NotifyIcon(components);
-        contextMenuStrip1 = new ContextMenuStrip(components);
-        
-        _mainPanel = new Panel
-        {
-            Dock = DockStyle.Fill,
-            Padding = new Padding(15),
-            BackColor = Color.Transparent
-        };
-
-        // Title
-        _lblTitle = new Label
-        {
-            Text = _localization.SoftwareName,
-            ForeColor = Color.White,
-            Font = new Font("Segoe UI", 12, FontStyle.Bold),
-            AutoSize = true,
-            Location = new Point(15, 15)
-        };
-
-        // Separator
-        var sep1 = CreateSeparator(15, 45);
-
-        // Status
-        _lblStatus = new Label
-        {
-            ForeColor = Color.White,
-            Font = new Font("Segoe UI", 9),
-            AutoSize = true,
-            Location = new Point(15, 55)
-        };
-
-        // Uptime
-        _lblUptime = new Label
-        {
-            ForeColor = Color.White,
-            Font = new Font("Segoe UI", 9),
-            AutoSize = true,
-            Location = new Point(15, 77)
-        };
-
-        // Separator
-        var sep2 = CreateSeparator(15, 102);
-
-        // Silicon Beings count
-        _lblBeings = new Label
-        {
-            ForeColor = Color.White,
-            Font = new Font("Segoe UI", 9),
-            AutoSize = true,
-            Location = new Point(15, 112)
-        };
-
-        // Being name
-        _lblBeingName = new Label
-        {
-            ForeColor = Color.FromArgb(200, 200, 200),
-            Font = new Font("Segoe UI", 8),
-            AutoSize = true,
-            Location = new Point(30, 134)
-        };
-
-        // AI Model
-        _lblAIModel = new Label
-        {
-            ForeColor = Color.FromArgb(200, 200, 200),
-            Font = new Font("Segoe UI", 8),
-            AutoSize = true,
-            Location = new Point(30, 152)
-        };
-
-        // Separator
-        var sep3 = CreateSeparator(15, 172);
-
-        // Memory
-        _lblMemory = new Label
-        {
-            ForeColor = Color.White,
-            Font = new Font("Segoe UI", 9),
-            AutoSize = true,
-            Location = new Point(15, 182)
-        };
-
-        // CPU
-        _lblCPU = new Label
-        {
-            ForeColor = Color.White,
-            Font = new Font("Segoe UI", 9),
-            AutoSize = true,
-            Location = new Point(180, 182)
-        };
-
-        // Web
-        _lblWeb = new Label
-        {
-            ForeColor = Color.White,
-            Font = new Font("Segoe UI", 9),
-            AutoSize = true,
-            Location = new Point(15, 204)
-        };
-
-        // Separator
-        var sep4 = CreateSeparator(15, 224);
-
-        // Hint
-        _lblHint = new Label
-        {
-            Text = $"{_localization.DoubleClick}: {_localization.OpenWebInterface}  |  {_localization.RightClick}: {_localization.ShowMenu}",
-            ForeColor = Color.FromArgb(150, 150, 150),
-            Font = new Font("Segoe UI", 7),
-            AutoSize = true,
-            Location = new Point(15, 234)
-        };
-
-        _mainPanel.Controls.Add(_lblTitle);
-        _mainPanel.Controls.Add(sep1);
-        _mainPanel.Controls.Add(_lblStatus);
-        _mainPanel.Controls.Add(_lblUptime);
-        _mainPanel.Controls.Add(sep2);
-        _mainPanel.Controls.Add(_lblBeings);
-        _mainPanel.Controls.Add(_lblBeingName);
-        _mainPanel.Controls.Add(_lblAIModel);
-        _mainPanel.Controls.Add(sep3);
-        _mainPanel.Controls.Add(_lblMemory);
-        _mainPanel.Controls.Add(_lblCPU);
-        _mainPanel.Controls.Add(_lblWeb);
-        _mainPanel.Controls.Add(sep4);
-        _mainPanel.Controls.Add(_lblHint);
-
-        Controls.Add(_mainPanel);
-
-        // notifyIcon1
-        notifyIcon1.ContextMenuStrip = contextMenuStrip1;
-        notifyIcon1.Text = _localization.SoftwareName;
-        notifyIcon1.Visible = true;
-        notifyIcon1.MouseDoubleClick += new MouseEventHandler(OnTrayIconDoubleClick);
-        notifyIcon1.MouseMove += new MouseEventHandler(OnTrayIconMouseMove);
-        notifyIcon1.Icon = new Icon(new MemoryStream(SiliconLife.Common.icons.slc));
-
-        // Initial content update
-        UpdateContent();
-    }
-
-    /// <summary>
-    /// Creates a separator line
-    /// </summary>
-    private Panel CreateSeparator(int x, int y)
-    {
-        return new Panel
-        {
-            BackColor = Color.FromArgb(60, 60, 60),
-            Size = new Size(Width - 30, 1),
-            Location = new Point(x, y)
-        };
-    }
-
-    /// <summary>
-    /// Updates the window content with current status
-    /// </summary>
     private void UpdateContent()
     {
-        if (IsDisposed || !IsHandleCreated) return;
-
-        try
+        if (!IsVisible) return;
+        
+        Dispatcher.UIThread.Post(() =>
         {
-            // Status
-            _lblStatus.Text = $"{_localization.Status}: ● {GetApplicationStatus()}";
+            try
+            {
+                // Status
+                if (_statusText != null)
+                    _statusText.Text = $"{_localization.Status}: ● {GetApplicationStatus()}";
 
-            // Uptime
-            TimeSpan uptime = DateTime.Now - _startTime;
-            _lblUptime.Text = $"{_localization.Uptime}: {uptime:hh\\:mm\\:ss}";
+                // Uptime
+                TimeSpan uptime = DateTime.Now - _startTime;
+                if (_uptimeText != null)
+                    _uptimeText.Text = $"{_localization.Uptime}: {uptime:hh\\:mm\\:ss}";
 
-            // Silicon Beings
-            int beingCount = GetActiveBeingCount();
-            _lblBeings.Text = $"{_localization.SiliconBeings}: {beingCount} {_localization.Active}";
+                // Silicon Beings
+                int beingCount = GetActiveBeingCount();
+                if (_beingsText != null)
+                    _beingsText.Text = $"{_localization.SiliconBeings}: {beingCount} {_localization.Active}";
 
-            // Being info
-            var (name, model) = GetActiveBeingInfo();
-            _lblBeingName.Text = string.IsNullOrEmpty(name) ? "" : $"{_localization.Name}: {name}";
-            _lblAIModel.Text = string.IsNullOrEmpty(model) ? "" : $"{_localization.AIModel}: {model}";
+                // Being info
+                var (name, model) = GetActiveBeingInfo();
+                if (_beingNameText != null)
+                    _beingNameText.Text = string.IsNullOrEmpty(name) ? "" : $"{_localization.Name}: {name}";
+                if (_aiModelText != null)
+                    _aiModelText.Text = string.IsNullOrEmpty(model) ? "" : $"{_localization.AIModel}: {model}";
 
-            // Resources
-            _lblMemory.Text = $"{_localization.Memory}: {GetMemoryUsage()}";
-            _lblCPU.Text = $"{_localization.CPU}: {GetCpuUsage()}";
-            _lblWeb.Text = $"{_localization.Web}: http://localhost:{_webPort}";
-        }
-        catch
-        {
-            // Ignore update errors
-        }
+                // Resources
+                if (_memoryText != null)
+                    _memoryText.Text = $"{_localization.Memory}: {GetMemoryUsage()}";
+                if (_cpuText != null)
+                    _cpuText.Text = $"{_localization.CPU}: {GetCpuUsage()}";
+                if (_webText != null)
+                    _webText.Text = $"{_localization.Web}: http://localhost:{_webPort}";
+            }
+            catch
+            {
+                // Ignore update errors
+            }
+        });
     }
 
-    /// <summary>
-    /// Gets the current application status
-    /// </summary>
-    private string GetApplicationStatus()
-    {
-        return "Running"; // Can be extended to track actual status
-    }
+    private string GetApplicationStatus() => "Running";
 
-    /// <summary>
-    /// Gets the count of active silicon beings
-    /// </summary>
     private int GetActiveBeingCount()
     {
         try
@@ -540,9 +303,6 @@ public class TrayStatusWindow : Form
         }
     }
 
-    /// <summary>
-    /// Gets information about the active silicon being
-    /// </summary>
     private (string name, string model) GetActiveBeingInfo()
     {
         try
@@ -561,9 +321,6 @@ public class TrayStatusWindow : Form
         }
     }
 
-    /// <summary>
-    /// Gets the AI model name for a silicon being
-    /// </summary>
     private string GetBeingModelName(SiliconBeingBase being)
     {
         try
@@ -581,9 +338,6 @@ public class TrayStatusWindow : Form
         }
     }
 
-    /// <summary>
-    /// Gets current memory usage
-    /// </summary>
     private string GetMemoryUsage()
     {
         try
@@ -599,9 +353,6 @@ public class TrayStatusWindow : Form
         }
     }
 
-    /// <summary>
-    /// Gets current CPU usage percentage
-    /// </summary>
     private string GetCpuUsage()
     {
         try
@@ -623,47 +374,29 @@ public class TrayStatusWindow : Form
         }
     }
 
-    /// <summary>
-    /// Shows the window at the specified location
-    /// </summary>
-    public void ShowAt(Point location)
+    public void ShowAt(PixelPoint location)
     {
-        Location = new Point(location.X - Width / 2, location.Y - Height - 10);
+        Position = new PixelPoint(location.X - (int)(Width / 2), location.Y - (int)Height - 10);
         Show();
-    }
-
-    /// <summary>
-    /// Win32 API for creating rounded rectangles
-    /// </summary>
-    [System.Runtime.InteropServices.DllImport("gdi32.dll")]
-    private static extern IntPtr CreateRoundRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidthEllipse, int nHeightEllipse);
-}
-
-/// <summary>
-/// Application context for tray-only application (no main form visible)
-/// </summary>
-public class TrayApplicationContext : ApplicationContext
-{
-    private readonly TrayStatusWindow _trayWindow;
-
-    public TrayApplicationContext(TrayStatusWindow trayWindow)
-    {
-        _trayWindow = trayWindow;
-        _trayWindow.ExitRequested += OnExitRequested;
-    }
-
-    private void OnExitRequested(object? sender, EventArgs e)
-    {
-        ExitThread();
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
+        _isWindowShowing = true;
+        
+        // Auto-hide after 5 seconds
+        Task.Delay(5000).ContinueWith(_ =>
         {
-            _trayWindow.ExitRequested -= OnExitRequested;
-            _trayWindow.Dispose();
-        }
-        base.Dispose(disposing);
+            if (_isWindowShowing && IsVisible)
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    Hide();
+                    _isWindowShowing = false;
+                });
+            }
+        });
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        _updateTimer.Stop();
+        base.OnClosed(e);
     }
 }

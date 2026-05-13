@@ -1,0 +1,88 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SiliconLife.Fast.Tray.TrayStatusWindow"
+        Width="350" Height="280"
+        CanResize="False"
+        Background="#1E1E1E"
+        Opacity="0.95">
+    
+    <Panel Background="Transparent">
+        <StackPanel Margin="15">
+            <!-- Title -->
+            <TextBlock x:Name="TitleText" 
+                       Text="SiliconLife" 
+                       FontSize="16" 
+                       FontWeight="Bold"
+                       Foreground="White"
+                       Margin="0,0,0,10"/>
+            
+            <!-- Separator -->
+            <Rectangle Height="1" Fill="#3C3C3C" Margin="0,0,0,10"/>
+            
+            <!-- Status -->
+            <TextBlock x:Name="StatusText" 
+                       Text="Status: Running" 
+                       FontSize="11" 
+                       Foreground="White"
+                       Margin="0,0,0,5"/>
+            
+            <!-- Uptime -->
+            <TextBlock x:Name="UptimeText" 
+                       Text="Uptime: 00:00:00" 
+                       FontSize="11" 
+                       Foreground="White"
+                       Margin="0,0,0,15"/>
+            
+            <!-- Separator -->
+            <Rectangle Height="1" Fill="#3C3C3C" Margin="0,0,0,10"/>
+            
+            <!-- Beings -->
+            <TextBlock x:Name="BeingsText" 
+                       Text="Silicon Beings: 0 Active" 
+                       FontSize="11" 
+                       Foreground="White"
+                       Margin="0,0,0,5"/>
+            
+            <TextBlock x:Name="BeingNameText" 
+                       FontSize="10" 
+                       Foreground="#C8C8C8"
+                       Margin="15,0,0,5"/>
+            
+            <TextBlock x:Name="AIModelText" 
+                       FontSize="10" 
+                       Foreground="#C8C8C8"
+                       Margin="15,0,0,15"/>
+            
+            <!-- Separator -->
+            <Rectangle Height="1" Fill="#3C3C3C" Margin="0,0,0,10"/>
+            
+            <!-- Resources -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBlock x:Name="MemoryText" 
+                           Text="Memory: 0 MB" 
+                           FontSize="11" 
+                           Foreground="White"
+                           Margin="0,0,15,0"/>
+                <TextBlock x:Name="CPUText" 
+                           Text="CPU: 0%" 
+                           FontSize="11" 
+                           Foreground="White"/>
+            </StackPanel>
+            
+            <!-- Web -->
+            <TextBlock x:Name="WebText" 
+                       Text="Web: http://localhost:8080" 
+                       FontSize="11" 
+                       Foreground="White"
+                       Margin="0,0,15,0"/>
+            
+            <!-- Separator -->
+            <Rectangle Height="1" Fill="#3C3C3C" Margin="0,0,0,10"/>
+            
+            <!-- Hint -->
+            <TextBlock Text="Right-click: Show Menu  |  Double-click: Open Web" 
+                       FontSize="9" 
+                       Foreground="#969696"/>
+        </StackPanel>
+    </Panel>
+</Window>

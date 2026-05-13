@@ -1,0 +1,29 @@
+{
+  "knownActors": [
+    {
+      "id": "human",
+      "type": "human",
+      "name": "用户 2682"
+    },
+    {
+      "id": "openclaw-main",
+      "type": "resident-ai",
+      "platform": "OpenClaw",
+      "model": "gateway/jarvis",
+      "description": "常驻 AI，负责监控、交接处理和自动合并"
+    }
+  ],
+  "rules": {
+    "defaultMergeStrategy": "auto-if-no-conflict",
+    "humanReviewRequired": ["core-logic", "config-files", "architecture"],
+    "autoMergeAllowed": ["tests", "docs", "comments", "formatting"],
+    "sessionTimeoutMinutes": 120,
+    "pollIntervalSeconds": 30,
+    "newActorAuthorization": "human-only"
+  },
+  "authorizationPolicy": {
+    "newActorAddition": "必须由人类手动编辑 registry.json 并 commit，AI 不得自行添加",
+    "aiBehavior": "AI 检测到未知 actorId 时，应提示人类添加至注册表，而非自行操作"
+  },
+  "notes": "新 AI IDE 首次使用时，必须由人类手动添加到此注册表并授权"
+}

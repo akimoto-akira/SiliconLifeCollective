@@ -27,6 +27,10 @@ using SiliconLife.Common.SiliconBeing;
 using SiliconLife.Common.WebView;
 
 using SiliconLife.Common.Localization;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
 
 namespace SiliconLife.Fast;
 
@@ -44,9 +48,23 @@ public class Program
         _logger = LogManager.Instance.GetLogger<Program>();
     }
 
-    public static async Task Main(string[] args)
+    [STAThread]
+    public static void Main(string[] args)
     {
-        Debug.RegisterCallback(msg => System.Windows.Forms.MessageBox.Show(msg));
+        // Build and run Avalonia app
+        // Initialization happens in App.OnFrameworkInitializationCompleted
+        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, shutdownMode: ShutdownMode.OnExplicitShutdown);
+    }
+
+    public static AppBuilder BuildAvaloniaApp()
+        => AppBuilder.Configure<App>()
+            .UsePlatformDetect()
+            .WithInterFont()
+            .LogToTrace();
+
+    public static async Task StartAsync()
+    {
+        Debug.RegisterCallback(msg => _logger.Warn(null, "Debug: {0}", msg));
 
         SpeedyPackRegistry.Initialize();
         _logger.Info(null, "Application starting...");
@@ -108,16 +126,16 @@ public class Program
         // Initialize workflow engine
         var serviceProvider = new ServiceProvider();
         var workflowEngine = new WorkflowEngine(timeStorage, serviceProvider);
-        
+
         // Register example workflows
         workflowEngine.RegisterTemplate(CodeReviewWorkflow.CreateTemplate());
-        
+
         ((ProjectManager)projectManager).SetWorkflowEngine(workflowEngine);
         ServiceLocator.Instance.Register<WorkflowEngine>(workflowEngine);
-        
+
         // Register workflow tick object (ticks every 60 seconds)
         new WorkflowTickObject(workflowEngine);
-        
+
         _logger.Info(null, "Initialized: WorkflowEngine");
 
         ChatSystem chatSystem = new ChatSystem(timeStorage);
@@ -204,16 +222,12 @@ public class Program
         TrayLocalizationBase trayLocalization = GetTrayLocalization(configData.Language);
         _trayWindow = new TrayStatusWindow(trayLocalization, configData.WebPort);
         _trayWindow.ExitRequested += (s, e) => RequestExit();
-        _logger.Info(null, "Initialized: TrayStatusWindow");
         
-        // Start Windows Forms message loop with ApplicationContext (form stays hidden)
-        var trayContext = new TrayApplicationContext(_trayWindow);
-        Application.Run(trayContext);
-
-        // Application.Run has exited, proceed with shutdown
-        // _shouldExit is already set by RequestExit()
-        _logger.Info(null, "Windows Forms message loop exited, proceeding with shutdown");
-        await ShutdownAsync();
+        // Register window with App (will be shown after Avalonia is ready)
+        App.SetStatusWindow(_trayWindow);
+        
+        Console.WriteLine($"[INFO] Status window created. Access web UI at: http://localhost:{configData.WebPort}/");
+        _logger.Info(null, "Initialized: TrayStatusWindow (Avalonia). Web UI: http://localhost:{0}/", configData.WebPort);
     }
 
     private static async Task ShutdownAsync()
@@ -241,8 +255,8 @@ public class Program
             _logger.Info(null, "Core host stopped");
         }
 
-        // Dispose tray window
-        _trayWindow?.Dispose();
+        // Close tray window
+        _trayWindow?.Close();
 
         // Unload all plugins before disposing core resources
         _pluginLoader?.NotifyAllStopping();
@@ -307,18 +321,12 @@ public class Program
         catch (Exception ex)
         {
             _logger.Error(null, "Failed to start web server: {0}", ex, ex.Message);
-            
+
             var language = SiliconLife.Collective.Config.Instance?.Data?.Language ?? Language.ZhCN;
             var trayLoc = GetTrayLocalization(language);
-            
-            string errorMessage = string.Format(trayLoc.WebServerStartupErrorMessage, ex.Message);
-            System.Windows.Forms.MessageBox.Show(
-                errorMessage,
-                trayLoc.WebServerStartupErrorTitle,
-                System.Windows.Forms.MessageBoxButtons.OK,
-                System.Windows.Forms.MessageBoxIcon.Error);
-            
-            await ShutdownAsync();
+
+            _logger.Error(null, "Web server startup failed: {0}", ex, ex.Message);
+            RequestExit();
         }
     }
 
@@ -331,7 +339,7 @@ public class Program
         LocalizationManager.Instance.Register<ZhMO>(Language.ZhMO);
         LocalizationManager.Instance.Register<ZhTW>(Language.ZhTW);
         LocalizationManager.Instance.Register<ZhMY>(Language.ZhMY);
-        
+
         // English variants
         LocalizationManager.Instance.Register<EnGB>(Language.EnGB);
         LocalizationManager.Instance.Register<EnCA>(Language.EnCA);
@@ -342,35 +350,35 @@ public class Program
         LocalizationManager.Instance.Register<EnIE>(Language.EnIE);
         LocalizationManager.Instance.Register<EnNZ>(Language.EnNZ);
         LocalizationManager.Instance.Register<EnMY>(Language.EnMY);
-        
+
         // Japanese
         LocalizationManager.Instance.Register<JaJP>(Language.JaJP);
-        
+
         // Korean
         LocalizationManager.Instance.Register<KoKR>(Language.KoKR);
-        
+
         // Spanish
         LocalizationManager.Instance.Register<EsES>(Language.EsES);
         LocalizationManager.Instance.Register<EsMX>(Language.EsMX);
-        
+
         // Czech
         LocalizationManager.Instance.Register<CsCZ>(Language.CsCZ);
-        
+
         // Polish
         LocalizationManager.Instance.Register<PlPL>(Language.PlPL);
-        
+
         // German
         LocalizationManager.Instance.Register<DeDE>(Language.DeDE);
         LocalizationManager.Instance.Register<DeAT>(Language.DeAT);
         LocalizationManager.Instance.Register<DeCH>(Language.DeCH);
         LocalizationManager.Instance.Register<DeLU>(Language.DeLU);
         LocalizationManager.Instance.Register<DeLI>(Language.DeLI);
-        
+
         // French
         LocalizationManager.Instance.Register<FrFR>(Language.FrFR);
         LocalizationManager.Instance.Register<FrCA>(Language.FrCA);
         LocalizationManager.Instance.Register<FrCH>(Language.FrCH);
-        
+
         // Italian
         LocalizationManager.Instance.Register<ItIT>(Language.ItIT);
     }
@@ -380,22 +388,15 @@ public class Program
         _logger.Info(null, "Exit requested - initiating graceful shutdown");
         _shouldExit = true;
 
-        // Break the Windows Forms message loop (Application.Run) so the
-        // post-Run shutdown sequence can execute. Safe to call from any thread.
-        try
+        // Shutdown Avalonia application
+        Dispatcher.UIThread.Post(() =>
         {
-            if (System.Windows.Forms.Application.MessageLoop)
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
             {
-                System.Windows.Forms.Application.ExitThread();
+                lifetime.Shutdown();
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.Warn(null, "Application.ExitThread() failed during RequestExit", ex);
-        }
+        });
 
-        // If we're not in a message loop (e.g., called before Application.Run),
-        // we need to ensure the main loop will exit
         _logger.Info(null, "Exit request completed");
     }
 
@@ -413,7 +414,7 @@ public class Program
             Language.ZhSG => new TrayZhSG(),
             Language.ZhMO => new TrayZhHK(),
             Language.ZhMY => new TrayZhMY(),
-            
+
             // English variants
             Language.EnUS => new TrayEnUS(),
             Language.EnGB => new TrayEnGB(),
@@ -425,38 +426,38 @@ public class Program
             Language.EnIE => new TrayEnIE(),
             Language.EnNZ => new TrayEnNZ(),
             Language.EnMY => new TrayEnMY(),
-            
+
             // Japanese
             Language.JaJP => new TrayJaJP(),
-            
+
             // Korean
             Language.KoKR => new TrayKoKR(),
-            
+
             // Spanish variants
             Language.EsES => new TrayEsES(),
             Language.EsMX => new TrayEsMX(),
-            
+
             // Czech
             Language.CsCZ => new TrayCsCZ(),
-            
+
             // Polish
             Language.PlPL => new TrayPlPL(),
-            
+
             // German variants
             Language.DeDE => new TrayDeDE(),
             Language.DeAT => new TrayDeAT(),
             Language.DeCH => new TrayDeCH(),
             Language.DeLU => new TrayDeLU(),
             Language.DeLI => new TrayDeLI(),
-            
+
             // French variants
             Language.FrFR => new TrayFrFR(),
             Language.FrCA => new TrayFrCA(),
             Language.FrCH => new TrayFrCH(),
-            
+
             // Italian
             Language.ItIT => new TrayItIT(),
-            
+
             // Default to English
             _ => new TrayEnUS()
         };

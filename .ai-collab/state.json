@@ -1,0 +1,11 @@
+{
+  "currentActor": null,
+  "currentSession": null,
+  "lastSession": null,
+  "lastUpdate": "2026-05-13T08:56+08:00",
+  "pendingHandoff": null,
+  "activeLocks": [],
+  "pendingMergeReports": [],
+  "initializedAt": "2026-05-13T08:56+08:00",
+  "version": "1.0"
+}
