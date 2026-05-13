@@ -14,6 +14,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -34,6 +35,7 @@ public partial class TrayStatusWindow : Window
     private readonly int _webPort;
     private readonly DateTime _startTime;
     private readonly DispatcherTimer _updateTimer;
+    private readonly bool _isLinux;
     private bool _isWindowShowing;
     
     // UI Controls
@@ -63,6 +65,9 @@ public partial class TrayStatusWindow : Window
         _webPort = webPort;
         _startTime = DateTime.Now;
         
+        // Detect platform
+        _isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+        
         // Set up window properties
         Title = _localization.SoftwareName;
         Width = 350;
@@ -73,6 +78,12 @@ public partial class TrayStatusWindow : Window
         SystemDecorations = SystemDecorations.Full; // Show title bar with close button
         Background = Avalonia.Media.SolidColorBrush.Parse("#1E1E1E");
         Opacity = 0.95;
+        
+        // Linux: Keep window always visible, don't auto-hide
+        if (_isLinux)
+        {
+            Topmost = true; // Keep window on top
+        }
         
         // Set window icon
         try
@@ -394,11 +405,34 @@ public partial class TrayStatusWindow : Window
         });
     }
 
-    protected override void OnClosing(WindowClosingEventArgs e)
+    protected override async void OnClosing(WindowClosingEventArgs e)
     {
-        e.Cancel = true;
-        Hide();
         base.OnClosing(e);
+        
+        if (_isLinux)
+        {
+            // Linux: Show confirmation dialog when closing window
+            e.Cancel = true;
+            
+            var result = await ShowMessageBoxAsync(
+                _localization.SoftwareName,
+                "确定要退出程序吗？\n\n选择\"是\"将关闭应用程序。",
+                MessageBoxButton.YesNo);
+            
+            if (result == MessageBoxResult.Yes)
+            {
+                // User confirmed exit
+                _updateTimer.Stop();
+                RequestExit();
+            }
+            // else: Keep window open
+        }
+        else
+        {
+            // Windows/macOS: Hide window (tray icon available)
+            e.Cancel = true;
+            Hide();
+        }
     }
 
     protected override void OnClosed(EventArgs e)
@@ -406,4 +440,96 @@ public partial class TrayStatusWindow : Window
         _updateTimer.Stop();
         base.OnClosed(e);
     }
+
+    private async Task<MessageBoxResult> ShowMessageBoxAsync(string title, string message, MessageBoxButton buttons)
+    {
+        var tcs = new TaskCompletionSource<MessageBoxResult>();
+        
+        Dispatcher.UIThread.Post(() =>
+        {
+            var box = new Window
+            {
+                Title = title,
+                Width = 400,
+                Height = 200,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                CanResize = false,
+                SystemDecorations = SystemDecorations.Full,
+                Topmost = true,
+                Background = Avalonia.Media.SolidColorBrush.Parse("#2D2D2D")
+            };
+
+            var grid = new Grid
+            {
+                Margin = new Avalonia.Thickness(20)
+            };
+            grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto)); // Message
+            grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto)); // Buttons
+
+            var textBlock = new TextBlock
+            {
+                Text = message,
+                TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+                Foreground = Avalonia.Media.Brushes.White,
+                FontSize = 14,
+                Margin = new Avalonia.Thickness(0, 0, 0, 20)
+            };
+            Grid.SetRow(textBlock, 0);
+
+            var buttonPanel = new StackPanel
+            {
+                Orientation = Avalonia.Layout.Orientation.Horizontal,
+                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                Spacing = 10
+            };
+            Grid.SetRow(buttonPanel, 1);
+
+            var yesButton = new Button
+            {
+                Content = "是",
+                Width = 80,
+                Background = Avalonia.Media.SolidColorBrush.Parse("#E74C3C"),
+                Foreground = Avalonia.Media.Brushes.White
+            };
+            yesButton.Click += (s, e) =>
+            {
+                box.Close();
+                tcs.SetResult(MessageBoxResult.Yes);
+            };
+
+            var noButton = new Button
+            {
+                Content = "否",
+                Width = 80,
+                Background = Avalonia.Media.SolidColorBrush.Parse("#3498DB"),
+                Foreground = Avalonia.Media.Brushes.White
+            };
+            noButton.Click += (s, e) =>
+            {
+                box.Close();
+                tcs.SetResult(MessageBoxResult.No);
+            };
+
+            buttonPanel.Children.Add(yesButton);
+            buttonPanel.Children.Add(noButton);
+            grid.Children.Add(textBlock);
+            grid.Children.Add(buttonPanel);
+
+            box.Content = grid;
+            box.ShowDialog(this);
+        });
+
+        return await tcs.Task;
+    }
+}
+
+public enum MessageBoxResult
+{
+    Yes,
+    No
+}
+
+public enum MessageBoxButton
+{
+    YesNo
 }

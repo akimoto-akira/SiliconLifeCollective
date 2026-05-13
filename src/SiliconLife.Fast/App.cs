@@ -4,6 +4,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using SiliconLife.Fast.Tray;
+using System;
 
 namespace SiliconLife.Fast;
 
@@ -24,7 +25,7 @@ public class App : Application
         {
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-            await Program.StartAsync();
+            await Program.StartAsync(desktop.Args ?? Array.Empty<string>());
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -46,34 +47,44 @@ public class App : Application
         _webPort = webPort;
         _localization = localization;
 
-        _trayIcon = new TrayIcon
+        try
         {
-            Icon = new WindowIcon(iconPath),
-            ToolTipText = $"{localization.SoftwareName} (Port: {webPort})",
-            IsVisible = true
-        };
+            _trayIcon = new TrayIcon
+            {
+                Icon = new WindowIcon(iconPath),
+                ToolTipText = $"{localization.SoftwareName} (Port: {webPort})",
+                IsVisible = true
+            };
 
-        _trayIcon.Clicked += OnTrayIconClicked;
+            _trayIcon.Clicked += OnTrayIconClicked;
 
-        var nativeMenu = new NativeMenu();
+            var nativeMenu = new NativeMenu();
 
-        var showStatusItem = new NativeMenuItem { Header = localization.ShowStatus };
-        showStatusItem.Click += (s, e) => ShowStatusWindow();
+            var showStatusItem = new NativeMenuItem { Header = localization.ShowStatus };
+            showStatusItem.Click += (s, e) => ShowStatusWindow();
 
-        var openWebItem = new NativeMenuItem { Header = localization.OpenWebInterface };
-        openWebItem.Click += (s, e) => OpenWebInterface();
+            var openWebItem = new NativeMenuItem { Header = localization.OpenWebInterface };
+            openWebItem.Click += (s, e) => OpenWebInterface();
 
-        var exitItem = new NativeMenuItem { Header = localization.Exit };
-        exitItem.Click += (s, e) => RequestExit();
+            var exitItem = new NativeMenuItem { Header = localization.Exit };
+            exitItem.Click += (s, e) => RequestExit();
 
-        nativeMenu.Items.Add(showStatusItem);
-        nativeMenu.Items.Add(openWebItem);
-        nativeMenu.Items.Add(new NativeMenuItemSeparator());
-        nativeMenu.Items.Add(exitItem);
+            nativeMenu.Items.Add(showStatusItem);
+            nativeMenu.Items.Add(openWebItem);
+            nativeMenu.Items.Add(new NativeMenuItemSeparator());
+            nativeMenu.Items.Add(exitItem);
 
-        _trayIcon.Menu = nativeMenu;
+            _trayIcon.Menu = nativeMenu;
 
-        System.Diagnostics.Debug.WriteLine($"TrayIcon initialized: {iconPath}, Port: {webPort}");
+            System.Diagnostics.Debug.WriteLine($"TrayIcon initialized: {iconPath}, Port: {webPort}");
+        }
+        catch (Exception ex)
+        {
+            // TrayIcon initialization may fail on some Linux environments
+            System.Diagnostics.Debug.WriteLine($"TrayIcon initialization failed: {ex.Message}");
+            Console.WriteLine($"[WARN] Tray icon not available: {ex.Message}");
+            Console.WriteLine($"[INFO] Use Web UI at http://localhost:{webPort}/ for management");
+        }
     }
 
     private static void OnTrayIconClicked(object? sender, EventArgs e)

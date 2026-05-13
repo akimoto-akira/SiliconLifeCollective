@@ -62,7 +62,7 @@ public class Program
             .WithInterFont()
             .LogToTrace();
 
-    public static async Task StartAsync()
+    public static async Task StartAsync(string[] args)
     {
         Debug.RegisterCallback(msg => _logger.Warn(null, "Debug: {0}", msg));
 
@@ -223,20 +223,60 @@ public class Program
         _trayWindow = new TrayStatusWindow(trayLocalization, configData.WebPort);
         _trayWindow.ExitRequested += (s, e) => RequestExit();
         
+        // Platform-adaptive tray initialization
+        bool isLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
+            System.Runtime.InteropServices.OSPlatform.Linux);
+        bool noTray = args.Contains("--no-tray");
+        
         App.SetStatusWindow(_trayWindow);
 
-        string iconPath = Path.Combine(AppContext.BaseDirectory, "slc.ico");
-        if (File.Exists(iconPath))
+        if (!isLinux && !noTray)
         {
-            App.InitializeTray(_trayWindow, iconPath, configData.WebPort, trayLocalization);
-            _logger.Info(null, "TrayIcon initialized: {0}", iconPath);
+            // Windows/macOS: Initialize tray icon
+            string iconPath = Path.Combine(AppContext.BaseDirectory, "slc.ico");
+            if (File.Exists(iconPath))
+            {
+                App.InitializeTray(_trayWindow, iconPath, configData.WebPort, trayLocalization);
+                _logger.Info(null, "TrayIcon initialized: {0}", iconPath);
+            }
+            else
+            {
+                _logger.Warn(null, "Tray icon not found at {0}, tray icon will not be displayed", iconPath);
+            }
         }
         else
         {
-            _logger.Warn(null, "Tray icon not found at {0}, tray icon will not be displayed", iconPath);
+            // Linux: Skip tray icon (inconsistent support across desktop environments)
+            // Show status window directly and auto-open browser
+            _logger.Info(null, "Running on Linux - tray icon disabled. Web UI: http://localhost:{0}/", configData.WebPort);
+            
+            // Show status window on Linux (primary UI)
+            _trayWindow.Show();
+            
+            if (!noTray)
+            {
+                // Auto-open browser on Linux for better UX
+                try
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = $"http://localhost:{configData.WebPort}/",
+                        UseShellExecute = true
+                    });
+                    _logger.Info(null, "Auto-opened browser for Web UI");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Warn(null, "Failed to auto-open browser: {0}", ex.Message);
+                }
+            }
         }
         
         Console.WriteLine($"[INFO] Status window created. Access web UI at: http://localhost:{configData.WebPort}/");
+        if (isLinux)
+        {
+            Console.WriteLine($"[INFO] Linux detected: Status window shown. Close window to exit application.");
+        }
         _logger.Info(null, "Initialized: TrayStatusWindow (Avalonia). Web UI: http://localhost:{0}/", configData.WebPort);
     }
 
