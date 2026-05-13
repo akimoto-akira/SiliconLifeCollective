@@ -53,6 +53,21 @@
         "timezone": "Asia/Shanghai",
         "channel": "catpaw-ide"
       }
+    },
+    {
+      "id": "qoder",
+      "type": "ai-ide",
+      "platform": "Qoder",
+      "model": "Qoder",
+      "description": "Qoder AI 编程助手，负责代码开发与协作",
+      "runtimeEnv": {
+        "host": "PURELIGHT-WJX",
+        "os": "Windows 11 (x64)",
+        "shell": "PowerShell",
+        "workspace": "D:\\SiliconLifeCollective",
+        "timezone": "Asia/Shanghai",
+        "channel": "qoder-ide"
+      }
     }
   ],
   "rules": {
