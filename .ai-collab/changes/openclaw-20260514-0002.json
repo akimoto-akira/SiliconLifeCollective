@@ -34,9 +34,6 @@
   ],
   "commitHash": "d335aaf17cc83f73f354007e28c4d5e1a9ec3de2",
   "commitMessage": "[openclaw-main] feat: Linux 平台窗口始终显示 + 关闭确认对话框",
-  "handoff": {
-    "nextActor": null,
-    "pendingTasks": [],
-    "notes": "Linux 托盘适配完成：窗口自动显示、关闭需确认。Windows/macOS 保持托盘行为。"
-  }
+  "tasksCompleted": [],
+  "tasksCreated": []
 }
