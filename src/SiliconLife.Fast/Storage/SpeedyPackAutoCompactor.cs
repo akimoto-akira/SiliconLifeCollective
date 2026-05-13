@@ -44,10 +44,11 @@ internal sealed class SpeedyPackAutoCompactor : TickObject
         {
             await _pack.CompactAsync();
         }
-        catch
+        catch (Exception ex)
         {
             // Compaction failure does not affect the main loop; only log the error
-            // TODO: Add log recording
+            LogManager.Instance.GetLogger<SpeedyPackAutoCompactor>()
+                .Error(null, "SpeedyPack auto-compaction failed", ex);
         }
     }
 }

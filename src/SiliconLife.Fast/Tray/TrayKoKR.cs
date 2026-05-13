@@ -32,4 +32,7 @@ public class TrayKoKR : TrayLocalizationBase
     public override string ManageSiliconBeings => "실리콘 생명체 관리";
     public override string Configuration => "설정";
     public override string Exit => "종료";
+    public override string ExitConfirmation => "프로그램을 종료하시겠습니까?\n\n\"예\"를 선택하면 응용 프로그램이 종료됩니다.";
+    public override string Yes => "예";
+    public override string No => "아니요";
 }

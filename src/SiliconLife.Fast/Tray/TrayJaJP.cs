@@ -32,4 +32,7 @@ public class TrayJaJP : TrayLocalizationBase
     public override string ManageSiliconBeings => "シリコン生命体の管理";
     public override string Configuration => "設定";
     public override string Exit => "終了";
+    public override string ExitConfirmation => "アプリケーションを終了しますか？\n\n「はい」を選択するとアプリケーションが終了します。";
+    public override string Yes => "はい";
+    public override string No => "いいえ";
 }

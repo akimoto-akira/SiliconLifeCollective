@@ -16,13 +16,15 @@ using System.Text.Json;
 namespace SiliconLife.Collective;
 
 /// <summary>
-/// Configuration manager (Singleton pattern)
+/// Configuration manager (Singleton pattern).
+/// Uses ReaderWriterLockSlim for optimized lock granularity:
+/// multiple concurrent readers, exclusive writer.
 /// </summary>
-public class Config
+public class Config : IDisposable
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<Config>();
     private static readonly Lazy<Config> _instance = new Lazy<Config>(() => new Config());
-    private readonly object _lock = new object();
+    private readonly ReaderWriterLockSlim _lock = new();
     private ConfigDataBase _data;
     private readonly JsonSerializerOptions _jsonOptions;
 
@@ -38,9 +40,14 @@ public class Config
     {
         get
         {
-            lock (_lock)
+            _lock.EnterReadLock();
+            try
             {
                 return _data;
+            }
+            finally
+            {
+                _lock.ExitReadLock();
             }
         }
     }
@@ -51,10 +58,15 @@ public class Config
     /// <param name="data">The configuration data instance</param>
     public void Initialize(ConfigDataBase data)
     {
-        lock (_lock)
+        _lock.EnterWriteLock();
+        try
         {
             _data = data;
             _logger.Info(null, $"Config initialized with data type: {data.GetType().Name}");
+        }
+        finally
+        {
+            _lock.ExitWriteLock();
         }
     }
 
@@ -79,18 +91,25 @@ public class Config
     /// <returns>The full path to the configuration file</returns>
     public string GetConfigPath()
     {
-        lock (_lock)
+        _lock.EnterReadLock();
+        try
         {
             return _data.GetConfigPath();
+        }
+        finally
+        {
+            _lock.ExitReadLock();
         }
     }
 
     /// <summary>
-    /// Loads configuration from file using the configuration data's LoadConfig method
+    /// Loads configuration from file using the configuration data's LoadConfig method.
+    /// Uses write lock since loading modifies internal state of _data.
     /// </summary>
     public void LoadConfig()
     {
-        lock (_lock)
+        _lock.EnterWriteLock();
+        try
         {
             try
             {
@@ -103,14 +122,20 @@ public class Config
                 throw;
             }
         }
+        finally
+        {
+            _lock.ExitWriteLock();
+        }
     }
 
     /// <summary>
-    /// Saves current configuration to file using the configuration data's SaveConfig method
+    /// Saves current configuration to file using the configuration data's SaveConfig method.
+    /// Uses read lock since saving only reads _data without modification.
     /// </summary>
     public void SaveConfig()
     {
-        lock (_lock)
+        _lock.EnterReadLock();
+        try
         {
             try
             {
@@ -123,6 +148,10 @@ public class Config
                 throw;
             }
         }
+        finally
+        {
+            _lock.ExitReadLock();
+        }
     }
 
     /// <summary>
@@ -130,10 +159,12 @@ public class Config
     /// </summary>
     public void Reload()
     {
-        lock (_lock)
-        {
-            LoadConfig();
-            _logger.Info(null, $"Config reloaded from {_data.GetConfigPath()}");
-        }
+        LoadConfig();
+        _logger.Info(null, $"Config reloaded from {_data.GetConfigPath()}");
+    }
+
+    public void Dispose()
+    {
+        _lock.Dispose();
     }
 }

@@ -32,4 +32,7 @@ public class TrayItIT : TrayLocalizationBase
     public override string ManageSiliconBeings => "Gestisci Silicon Beings";
     public override string Configuration => "Configurazione";
     public override string Exit => "Esci";
+    public override string ExitConfirmation => "Sei sicuro di voler uscire?\n\nSelezionando \"Sì\" l'applicazione verrà chiusa.";
+    public override string Yes => "Sì";
+    public override string No => "No";
 }

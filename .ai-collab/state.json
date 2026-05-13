@@ -1,8 +1,8 @@
 {
-  "currentActor": "openclaw-main",
-  "currentSession": "openclaw-20260514-0103",
-  "lastSession": "trae-20260514-0110",
-  "lastUpdate": "2026-05-14T01:03:00+08:00",
+  "currentActor": null,
+  "currentSession": null,
+  "lastSession": "catpaw-20260514-0130",
+  "lastUpdate": "2026-05-14T01:50:00+08:00",
   "activeLocks": [],
   "pendingMergeReports": [],
   "initializedAt": "2026-05-13T08:56+08:00",

@@ -424,7 +424,7 @@ public partial class TrayStatusWindow : Window
             
             var result = await ShowMessageBoxAsync(
                 _localization.SoftwareName,
-                "确定要退出程序吗？\n\n选择\"是\"将关闭应用程序。",
+                _localization.ExitConfirmation,
                 MessageBoxButton.YesNo);
             
             if (result == MessageBoxResult.Yes)
@@ -499,7 +499,7 @@ public partial class TrayStatusWindow : Window
 
             var yesButton = new Button
             {
-                Content = "是",
+                Content = _localization.Yes,
                 Width = 80,
                 Background = Avalonia.Media.SolidColorBrush.Parse("#E74C3C"),
                 Foreground = Avalonia.Media.Brushes.White
@@ -512,7 +512,7 @@ public partial class TrayStatusWindow : Window
 
             var noButton = new Button
             {
-                Content = "否",
+                Content = _localization.No,
                 Width = 80,
                 Background = Avalonia.Media.SolidColorBrush.Parse("#3498DB"),
                 Foreground = Avalonia.Media.Brushes.White

@@ -521,7 +521,8 @@ public class SiliconBeingManager : TickObject
 
     /// <summary>
     /// Migrates state from an old silicon being to a new one.
-    /// Copies all mutable properties: AIClient, SoulContent, ToolManager, PermissionManager.
+    /// Uses reflection to auto-migrate all writable properties, with exclusion list for special cases.
+    /// PermissionManager is handled separately to ensure proper ownership transfer.
     /// </summary>
     /// <param name="oldBeing">The old being instance</param>
     /// <param name="newBeing">The new being instance</param>
@@ -529,17 +530,35 @@ public class SiliconBeingManager : TickObject
     {
         _logger.Debug(oldBeing.Id, "Migrating state from {0} to {1} for being {2}", oldBeing.GetType().Name, newBeing.GetType().Name, oldBeing.Id);
 
-        newBeing.AIClient = oldBeing.AIClient;
-        newBeing.SoulContent = oldBeing.SoulContent;
-        newBeing.ToolManager = oldBeing.ToolManager;
+        // Properties that should not be auto-migrated
+        var excludedProps = new HashSet<string>
+        {
+            nameof(SiliconBeingBase.Id),
+            nameof(SiliconBeingBase.Name),
+            nameof(SiliconBeingBase.PermissionManager),
+            nameof(SiliconBeingBase.IsCurator),
+            nameof(SiliconBeingBase.CurrentActivity),
+        };
 
-        newBeing.TaskSystem = oldBeing.TaskSystem;
-        newBeing.TaskEnumerator = oldBeing.TaskEnumerator;
-        newBeing.TimerSystem = oldBeing.TimerSystem;
-        newBeing.Memory = oldBeing.Memory;
-        newBeing.WorkNoteSystem = oldBeing.WorkNoteSystem;
-        newBeing.TimeStorage = oldBeing.TimeStorage;
-        newBeing.BeingDirectory = oldBeing.BeingDirectory;
+        // Auto-migrate all writable properties via reflection
+        var properties = typeof(SiliconBeingBase).GetProperties(
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+
+        foreach (var prop in properties)
+        {
+            if (!prop.CanWrite || excludedProps.Contains(prop.Name))
+                continue;
+
+            try
+            {
+                var value = prop.GetValue(oldBeing);
+                prop.SetValue(newBeing, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(oldBeing.Id, "Failed to migrate property {0} for being {1}: {2}", prop.Name, oldBeing.Id, ex.Message);
+            }
+        }
 
         // Migrate PermissionManager �?create new one with same owner (newBeing) but keep the old callback
         PermissionManager? oldPm = oldBeing.PermissionManager;

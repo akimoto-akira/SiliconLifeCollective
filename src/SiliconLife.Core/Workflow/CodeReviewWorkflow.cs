@@ -63,8 +63,15 @@ public static class CodeReviewWorkflow
                 var projectManager = serviceProvider.GetService(typeof(IProjectManager)) as IProjectManager;
                 if (projectManager == null) return false;
 
-                // TODO: Check if code review tasks are created
-                return instance.CurrentTaskIds.Count > 0;
+                // Check if code review tasks have been created for reviewers
+                if (instance.CurrentTaskIds.Count == 0)
+                    return false;
+
+                // Verify at least one review task exists in the task system
+                var taskSystem = projectManager.GetTaskSystem(instance.ProjectId);
+                if (taskSystem == null) return false;
+
+                return instance.CurrentTaskIds.Any(id => taskSystem.Get(id) != null);
             },
             Action = async (instance, serviceProvider) =>
             {
@@ -150,8 +157,12 @@ public static class CodeReviewWorkflow
                     .Where(t => t != null)
                     .ToList();
 
-                // TODO: Add rejection status to TaskItem
-                return reviewTasks.Any(t => t!.Status == TaskStatus.Failed);
+                // Check for explicit rejection (Failed status) or review with rejection notes
+                return reviewTasks.Any(t => t!.Status == TaskStatus.Failed
+                    || (t!.Status == TaskStatus.Completed
+                        && t!.Metadata != null
+                        && t!.Metadata.TryGetValue("Rejected", out var rejected)
+                        && rejected == "true"));
             },
             Action = async (instance, serviceProvider) =>
             {
@@ -226,8 +237,16 @@ public static class CodeReviewWorkflow
             Priority = 0,
             Condition = async (instance, serviceProvider) =>
             {
-                // TODO: Check if code is actually merged (e.g., git merge completed)
-                return instance.Metadata.ContainsKey("MergedAt");
+                // Check if code is actually merged via metadata markers
+                if (instance.Metadata.ContainsKey("MergedAt"))
+                    return true;
+
+                // Check if project manager reports merge completion via StageOutputs
+                if (instance.StageOutputs.TryGetValue("ReviewApproved", out var approved)
+                    && instance.Metadata.ContainsKey("MergeCommit"))
+                    return true;
+
+                return false;
             },
             Action = async (instance, serviceProvider) =>
             {

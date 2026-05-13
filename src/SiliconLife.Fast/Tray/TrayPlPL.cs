@@ -32,4 +32,7 @@ public class TrayPlPL : TrayLocalizationBase
     public override string ManageSiliconBeings => "Zarządzaj byciami krzemowymi";
     public override string Configuration => "Konfiguracja";
     public override string Exit => "Zakończ";
+    public override string ExitConfirmation => "Czy na pewno chcesz zakończyć?\n\nWybranie \"Tak\" zamknie aplikację.";
+    public override string Yes => "Tak";
+    public override string No => "Nie";
 }

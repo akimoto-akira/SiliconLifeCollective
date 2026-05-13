@@ -52,4 +52,10 @@ public abstract class TrayLocalizationBase
     public abstract string Configuration { get; }
 
     public abstract string Exit { get; }
+
+    public abstract string ExitConfirmation { get; }
+
+    public abstract string Yes { get; }
+
+    public abstract string No { get; }
 }

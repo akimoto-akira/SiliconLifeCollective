@@ -32,4 +32,7 @@ public class TrayDeDE : TrayLocalizationBase
     public override string ManageSiliconBeings => "Silizium-Lebewesen verwalten";
     public override string Configuration => "Konfiguration";
     public override string Exit => "Beenden";
+    public override string ExitConfirmation => "Möchten Sie das Programm wirklich beenden?\n\nWenn Sie \"Ja\" wählen, wird die Anwendung geschlossen.";
+    public override string Yes => "Ja";
+    public override string No => "Nein";
 }

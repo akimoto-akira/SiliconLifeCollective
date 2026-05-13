@@ -266,10 +266,36 @@ public class WorkflowEngine
             _logger.Warn(null, "Workflow timeout detected: {0} (state={1}, days={2:F1}), triggering exception flow",
                 instance.Id, instance.CurrentState, daysSinceProgress);
 
-            // TODO: Trigger exception flow (notify being, create task, etc.)
+            // Mark instance as blocked due to timeout
+            instance.Status = "Blocked";
             instance.Metadata["TimeoutAt"] = DateTime.UtcNow;
             instance.Metadata["TimeoutState"] = instance.CurrentState;
+            instance.MarkProgress();
             SaveInstance(instance);
+
+            // Notify the being that created this workflow
+            try
+            {
+                var curator = SiliconBeingManager.GetCuratorBeing();
+                if (curator != null)
+                {
+                    _logger.Info(null, "Notifying curator being {0} about workflow timeout: {1}",
+                        curator.Id, instance.Id);
+                }
+            }
+            catch (Exception notifyEx)
+            {
+                _logger.Error(null, "Failed to notify being about workflow timeout", notifyEx);
+            }
+
+            // Log timeout as a workflow event
+            AddLog(new WorkflowLog
+            {
+                InstanceId = instance.Id,
+                FromState = instance.CurrentState,
+                ToState = instance.CurrentState,
+                TransitionName = "Timeout"
+            });
         }
     }
 

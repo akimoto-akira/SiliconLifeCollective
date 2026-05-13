@@ -360,6 +360,30 @@ public class HelpView : ViewBase
                 .Property("border", "1px solid var(--border-color)")
                 .Property("border-radius", "6px")
                 .Property("font-size", "1em")
+            .EndSelector()
+            .Selector(".search-results")
+                .Property("margin-top", "20px")
+            .EndSelector()
+            .Selector(".search-result-item")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("gap", "10px")
+                .Property("padding", "12px 15px")
+                .Property("margin", "8px 0")
+                .Property("border-radius", "6px")
+                .Property("text-decoration", "none")
+                .Property("color", "var(--text-color)")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("transition", "background-color 0.2s")
+            .EndSelector()
+            .Selector(".search-result-item:hover")
+                .Property("background-color", "var(--hover-bg)")
+            .EndSelector()
+            .Selector(".search-no-results")
+                .Property("text-align", "center")
+                .Property("color", "var(--text-secondary)")
+                .Property("padding", "40px 20px")
+                .Property("font-size", "1.1em")
             .EndSelector();
     }
 
@@ -378,8 +402,25 @@ public class HelpView : ViewBase
             .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/help/search?q=").Op(() => "+", () => Js.Id(() => "encodeURIComponent").Invoke(() => Js.Id(() => "query"))))
                 .Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json")))
                 .Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => Js.Block()
-                    .Add(() => Js.Id(() => "console").Call(() => "log", () => Js.Id(() => "data")).Stmt())
-                    // TODO: Display search results
+                    .Add(() => Js.Const(() => "contentEl", () => Js.Id(() => "document").Call(() => "querySelector", () => Js.Str(() => ".help-content"))))
+                    .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "!data").Op(() => "||", () => Js.Id(() => "!data").Prop(() => "results").Op(() => "||", () => Js.Id(() => "!contentEl")), new List<JsSyntax>
+                        {
+                            Js.Return(() => Js.Id(() => "undefined"))
+                        })
+                    }))
+                    .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "data").Prop(() => "count").Op(() => "===", () => Js.Num(() => "0")), new List<JsSyntax>
+                        {
+                            Js.Assign(() => Js.Id(() => "contentEl").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"search-no-results\">No results found</div>"))
+                        })
+                    }, new List<JsSyntax>
+                    {
+                        Js.Const(() => "html", () => Js.Id(() => "data").Prop(() => "results").Call(() => "map", () => Js.Arrow(() => new List<string> { "t" }, () => Js.Str(() => "<a href=\"/help/").Op(() => "+", () => Js.Id(() => "t").Prop(() => "id")).Op(() => "+", () => Js.Str(() => "\" class=\"search-result-item\"><span class=\"topic-icon\">").Op(() => "+", () => Js.Id(() => "t").Prop(() => "icon")).Op(() => "+", () => Js.Str(() => "</span><span>").Op(() => "+", () => Js.Id(() => "t").Prop(() => "propertyName")).Op(() => "+", () => Js.Str(() => "</span></a>")))).Call(() => "join", () => Js.Str(() => ""))),
+                        Js.Assign(() => Js.Id(() => "contentEl").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"search-results\"><h2>Search Results (").Op(() => "+", () => Js.Id(() => "data").Prop(() => "count")).Op(() => "+", () => Js.Str(() => ")</h2>").Op(() => "+", () => Js.Id(() => "html")).Op(() => "+", () => Js.Str(() => "</div>")))
+                    }))
                 )).Stmt());
 
         // Markdown rendering function (same as ChatView)

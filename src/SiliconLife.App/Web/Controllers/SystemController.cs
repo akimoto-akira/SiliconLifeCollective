@@ -68,7 +68,28 @@ public class SystemController : Controller
             _ = Task.Run(async () =>
             {
                 await Task.Delay(200);
-                // TODO: Implement graceful shutdown for shared module
+
+                try
+                {
+                    // Stop MainLoop gracefully
+                    MainLoop.Stop();
+                    _logger.Info(null, "MainLoop stopped for graceful shutdown");
+                }
+                catch (Exception stopEx)
+                {
+                    _logger.Error(null, "Error stopping MainLoop during shutdown", stopEx);
+                }
+
+                try
+                {
+                    // Save current configuration
+                    Config.Instance.SaveConfig();
+                    _logger.Info(null, "Configuration saved for graceful shutdown");
+                }
+                catch (Exception saveEx)
+                {
+                    _logger.Error(null, "Error saving config during shutdown", saveEx);
+                }
             });
         }
         catch (Exception ex)

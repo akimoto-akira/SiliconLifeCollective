@@ -214,21 +214,26 @@ public static class MainLoop
             }
 
             Thread? hungThread = null;
+            bool needsRestart = false;
 
             lock (_restartLock)
             {
                 if (_thread is null || !_thread.IsAlive)
                 {
                     _logger.Critical(null, "Watchdog: Main thread is dead, restarting...");
-                    RestartMainThread();
-                    continue;
+                    needsRestart = true;
                 }
-
-                if ((DateTime.UtcNow - new DateTime(Interlocked.Read(ref _lastHeartbeatTicks))) > watchdogTimeout)
+                else if ((DateTime.UtcNow - new DateTime(Interlocked.Read(ref _lastHeartbeatTicks))) > watchdogTimeout)
                 {
                     _logger.Critical(null, "Watchdog: Main thread hung (no heartbeat for {0}), restarting...", watchdogTimeout);
                     hungThread = _thread;
                 }
+            }
+
+            if (needsRestart)
+            {
+                RestartMainThread();
+                continue;
             }
 
             if (hungThread != null)
@@ -359,8 +364,9 @@ public static class MainLoop
                 catch (OperationCanceledException)
                 {
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _logger.Error(null, "Tick action threw exception during ExecuteWithTimeout", ex);
                 }
             })
             {
