@@ -1,0 +1,42 @@
+{
+  "sessionId": "openclaw-20260514-0002",
+  "actorId": "openclaw-main",
+  "startTime": "2026-05-14T00:02:00+08:00",
+  "endTime": "2026-05-14T00:03:00+08:00",
+  "files": [
+    {
+      "path": "src/SiliconLife.Fast/Program.cs",
+      "intent": "添加 Linux 平台检测，自动显示窗口并打开浏览器",
+      "changeSummary": {
+        "additions": 31,
+        "deletions": 10,
+        "modifications": 1
+      }
+    },
+    {
+      "path": "src/SiliconLife.Fast/App.cs",
+      "intent": "传递命令行参数到 StartAsync，添加 try-catch 处理托盘初始化失败",
+      "changeSummary": {
+        "additions": 18,
+        "deletions": 7,
+        "modifications": 1
+      }
+    },
+    {
+      "path": "src/SiliconLife.Fast/Tray/TrayStatusWindow.cs",
+      "intent": "添加平台检测、Linux 窗口置顶、关闭确认对话框",
+      "changeSummary": {
+        "additions": 157,
+        "deletions": 12,
+        "modifications": 1
+      }
+    }
+  ],
+  "commitHash": "d335aaf17cc83f73f354007e28c4d5e1a9ec3de2",
+  "commitMessage": "[openclaw-main] feat: Linux 平台窗口始终显示 + 关闭确认对话框",
+  "handoff": {
+    "nextActor": null,
+    "pendingTasks": [],
+    "notes": "Linux 托盘适配完成：窗口自动显示、关闭需确认。Windows/macOS 保持托盘行为。"
+  }
+}

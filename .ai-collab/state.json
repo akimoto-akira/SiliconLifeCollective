@@ -1,8 +1,8 @@
 {
-  "currentActor": "trae-glm5",
-  "currentSession": "trae-20260513-1915",
-  "lastSession": "catpaw-20260513-1930",
-  "lastUpdate": "2026-05-13T20:00:00+08:00",
+  "currentActor": null,
+  "currentSession": null,
+  "lastSession": "openclaw-20260514-0002",
+  "lastUpdate": "2026-05-14T00:03:00+08:00",
   "pendingHandoff": null,
   "activeLocks": [],
   "pendingMergeReports": [],
