@@ -49,19 +49,22 @@ public class SiliconBeingRunner
         TimeSpan timeout = _config?.TickTimeout ?? TimeSpan.FromSeconds(1);
         bool success = false;
         Thread? worker = null;
+        using var cts = new CancellationTokenSource();
 
         _logger.Debug(_being.Id, "Executing being tick: {0} ({1})", _being.Name, _being.Id);
 
         try
         {
+            CancellationToken token = cts.Token;
             worker = new Thread(() =>
             {
                 try
                 {
+                    token.ThrowIfCancellationRequested();
                     _being.Tick(deltaTime);
                     success = true;
                 }
-                catch (ThreadAbortException)
+                catch (OperationCanceledException)
                 {
                 }
                 catch (Exception ex)
@@ -84,7 +87,7 @@ public class SiliconBeingRunner
             }
 
             _logger.Warn(_being.Id, "Being tick timed out: {0} after {1}ms", _being.Name, timeout.TotalMilliseconds);
-            KillThread(worker, _being.Name);
+            KillThread(worker, _being.Name, cts);
             HandleTimeout();
             return false;
         }
@@ -94,7 +97,7 @@ public class SiliconBeingRunner
         }
         catch
         {
-            KillThread(worker, _being.Name);
+            KillThread(worker, _being.Name, cts);
             return false;
         }
     }
@@ -102,28 +105,18 @@ public class SiliconBeingRunner
     /// <summary>
     /// Kill a thread aggressively: Interrupt �?Abort �?verify.
     /// </summary>
-    private static void KillThread(Thread? worker, string beingName)
+    private static void KillThread(Thread? worker, string beingName, CancellationTokenSource cts)
     {
         if (worker is null || !worker.IsAlive)
         {
             return;
         }
 
+        cts.Cancel();
         worker.Interrupt();
-        if (!worker.Join(TimeSpan.FromMilliseconds(200)))
+        if (!worker.Join(TimeSpan.FromMilliseconds(500)))
         {
-            try
-            {
-                worker.Abort();
-            }
-            catch (PlatformNotSupportedException)
-            {
-            }
-
-            if (!worker.Join(TimeSpan.FromMilliseconds(500)))
-            {
-                _logger.Error(null, "Worker thread for being {0} is out of control", beingName);
-            }
+            _logger.Error(null, "Worker thread for being {0} is out of control", beingName);
         }
     }
 
@@ -540,15 +533,13 @@ public class SiliconBeingManager : TickObject
         newBeing.SoulContent = oldBeing.SoulContent;
         newBeing.ToolManager = oldBeing.ToolManager;
 
-        // Migrate systems — only if new being doesn't already have them
-        // (ReplaceWithDefault creates fresh instances via factory; ReplaceBeing does not)
-        newBeing.TaskSystem ??= oldBeing.TaskSystem;
-        newBeing.TaskEnumerator ??= oldBeing.TaskEnumerator;
-        newBeing.TimerSystem ??= oldBeing.TimerSystem;
-        newBeing.Memory ??= oldBeing.Memory;
-        newBeing.WorkNoteSystem ??= oldBeing.WorkNoteSystem;
-        newBeing.TimeStorage ??= oldBeing.TimeStorage;
-        newBeing.BeingDirectory ??= oldBeing.BeingDirectory;
+        newBeing.TaskSystem = oldBeing.TaskSystem;
+        newBeing.TaskEnumerator = oldBeing.TaskEnumerator;
+        newBeing.TimerSystem = oldBeing.TimerSystem;
+        newBeing.Memory = oldBeing.Memory;
+        newBeing.WorkNoteSystem = oldBeing.WorkNoteSystem;
+        newBeing.TimeStorage = oldBeing.TimeStorage;
+        newBeing.BeingDirectory = oldBeing.BeingDirectory;
 
         // Migrate PermissionManager �?create new one with same owner (newBeing) but keep the old callback
         PermissionManager? oldPm = oldBeing.PermissionManager;

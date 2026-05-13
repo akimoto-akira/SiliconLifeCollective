@@ -22,6 +22,7 @@ public class Config
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<Config>();
     private static readonly Lazy<Config> _instance = new Lazy<Config>(() => new Config());
+    private readonly object _lock = new object();
     private ConfigDataBase _data;
     private readonly JsonSerializerOptions _jsonOptions;
 
@@ -33,7 +34,16 @@ public class Config
     /// <summary>
     /// Gets the configuration data
     /// </summary>
-    public ConfigDataBase Data => _data;
+    public ConfigDataBase Data
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _data;
+            }
+        }
+    }
 
     /// <summary>
     /// Initializes the config with a specific data type
@@ -41,8 +51,11 @@ public class Config
     /// <param name="data">The configuration data instance</param>
     public void Initialize(ConfigDataBase data)
     {
-        _data = data;
-        _logger.Info(null, $"Config initialized with data type: {data.GetType().Name}");
+        lock (_lock)
+        {
+            _data = data;
+            _logger.Info(null, $"Config initialized with data type: {data.GetType().Name}");
+        }
     }
 
     private Config()
@@ -66,7 +79,10 @@ public class Config
     /// <returns>The full path to the configuration file</returns>
     public string GetConfigPath()
     {
-        return _data.GetConfigPath();
+        lock (_lock)
+        {
+            return _data.GetConfigPath();
+        }
     }
 
     /// <summary>
@@ -74,15 +90,18 @@ public class Config
     /// </summary>
     public void LoadConfig()
     {
-        try
+        lock (_lock)
         {
-            _data.LoadConfig();
-            _logger.Info(null, $"Config loaded from {_data.GetConfigPath()}");
-        }
-        catch (Exception)
-        {
-            _logger.Error(null, $"Failed to load config from {_data.GetConfigPath()}");
-            throw;
+            try
+            {
+                _data.LoadConfig();
+                _logger.Info(null, $"Config loaded from {_data.GetConfigPath()}");
+            }
+            catch (Exception)
+            {
+                _logger.Error(null, $"Failed to load config from {_data.GetConfigPath()}");
+                throw;
+            }
         }
     }
 
@@ -91,15 +110,18 @@ public class Config
     /// </summary>
     public void SaveConfig()
     {
-        try
+        lock (_lock)
         {
-            _data.SaveConfig();
-            _logger.Info(null, $"Config saved to {_data.GetConfigPath()}");
-        }
-        catch (Exception)
-        {
-            _logger.Error(null, $"Failed to save config to {_data.GetConfigPath()}");
-            throw;
+            try
+            {
+                _data.SaveConfig();
+                _logger.Info(null, $"Config saved to {_data.GetConfigPath()}");
+            }
+            catch (Exception)
+            {
+                _logger.Error(null, $"Failed to save config to {_data.GetConfigPath()}");
+                throw;
+            }
         }
     }
 
@@ -108,7 +130,10 @@ public class Config
     /// </summary>
     public void Reload()
     {
-        LoadConfig();
-        _logger.Info(null, $"Config reloaded from {_data.GetConfigPath()}");
+        lock (_lock)
+        {
+            LoadConfig();
+            _logger.Info(null, $"Config reloaded from {_data.GetConfigPath()}");
+        }
     }
 }

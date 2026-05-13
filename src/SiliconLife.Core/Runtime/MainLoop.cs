@@ -26,6 +26,7 @@ public static class MainLoop
     private static CancellationTokenSource _mainCts = new();
     private static readonly CancellationTokenSource _watchdogCts = new();
     private static readonly object _lock = new();
+    private static readonly object _restartLock = new();
     private static Thread? _thread;
     private static Thread? _watchdogThread;
     private static volatile bool _isRunning;
@@ -154,18 +155,25 @@ public static class MainLoop
 
     public static void Stop()
     {
-        if (!_isRunning)
+        lock (_restartLock)
         {
-            return;
+            if (!_isRunning)
+            {
+                return;
+            }
+
+            _logger.Info(null, "MainLoop stopping...");
+            _isRunning = false;
+            _mainCts.Cancel();
         }
 
-        _logger.Info(null, "MainLoop stopping...");
-        _isRunning = false;
-        _mainCts.Cancel();
         _watchdogCts.Cancel();
 
-        _watchdogThread?.Join(1000);
-        _thread?.Join(1000);
+        lock (_restartLock)
+        {
+            _watchdogThread?.Join(1000);
+            _thread?.Join(1000);
+        }
         _logger.Info(null, "MainLoop stopped");
     }
 
@@ -205,16 +213,28 @@ public static class MainLoop
                 continue;
             }
 
-            if (_thread is null || !_thread.IsAlive)
+            Thread? hungThread = null;
+
+            lock (_restartLock)
             {
-                _logger.Critical(null, "Watchdog: Main thread is dead, restarting...");
-                RestartMainThread();
+                if (_thread is null || !_thread.IsAlive)
+                {
+                    _logger.Critical(null, "Watchdog: Main thread is dead, restarting...");
+                    RestartMainThread();
+                    continue;
+                }
+
+                if ((DateTime.UtcNow - new DateTime(Interlocked.Read(ref _lastHeartbeatTicks))) > watchdogTimeout)
+                {
+                    _logger.Critical(null, "Watchdog: Main thread hung (no heartbeat for {0}), restarting...", watchdogTimeout);
+                    hungThread = _thread;
+                }
             }
-            else if ((DateTime.UtcNow - new DateTime(Interlocked.Read(ref _lastHeartbeatTicks))) > watchdogTimeout)
+
+            if (hungThread != null)
             {
-                _logger.Critical(null, "Watchdog: Main thread hung (no heartbeat for {0}), restarting...", watchdogTimeout);
-                try { _thread.Interrupt(); } catch { }
-                if (_thread.Join(TimeSpan.FromSeconds(1)))
+                try { hungThread.Interrupt(); } catch { }
+                if (hungThread.Join(TimeSpan.FromSeconds(1)))
                 {
                     RestartMainThread();
                 }
@@ -224,27 +244,35 @@ public static class MainLoop
 
     private static void RestartMainThread()
     {
-        _logger.Warn(null, "Restarting main thread...");
-        _mainCts.Cancel();
-
-        lock (_lock)
+        lock (_restartLock)
         {
-            _consecutiveTimeoutCounts.Clear();
-            _circuitBreakerResetTimes.Clear();
+            if (!_isRunning)
+            {
+                return;
+            }
+
+            _logger.Warn(null, "Restarting main thread...");
+            _mainCts.Cancel();
+
+            lock (_lock)
+            {
+                _consecutiveTimeoutCounts.Clear();
+                _circuitBreakerResetTimes.Clear();
+            }
+
+            _mainCts.Dispose();
+            var newCts = new CancellationTokenSource();
+            _mainCts = newCts;
+
+            _thread = new Thread(Run)
+            {
+                IsBackground = true,
+                Name = "MainLoop"
+            };
+            _lastHeartbeatTicks = DateTime.UtcNow.Ticks;
+            _thread.Start();
+            _logger.Info(null, "Main thread restarted successfully");
         }
-
-        _mainCts.Dispose();
-        var newCts = new CancellationTokenSource();
-        _mainCts = newCts;
-
-        _thread = new Thread(Run)
-        {
-            IsBackground = true,
-            Name = "MainLoop"
-        };
-        _lastHeartbeatTicks = DateTime.UtcNow.Ticks;
-        _thread.Start();
-        _logger.Info(null, "Main thread restarted successfully");
     }
 
     private static void ExecuteTick(TimeSpan deltaTime)
@@ -315,19 +343,21 @@ public static class MainLoop
     {
         bool completed = false;
         Thread? worker = null;
+        using var cts = new CancellationTokenSource();
 
         try
         {
+            CancellationToken token = cts.Token;
             worker = new Thread(() =>
             {
                 try
                 {
+                    token.ThrowIfCancellationRequested();
                     action(deltaTime);
                     completed = true;
                 }
-                catch (ThreadAbortException)
+                catch (OperationCanceledException)
                 {
-                    // Thread was killed due to timeout
                 }
                 catch
                 {
@@ -345,29 +375,17 @@ public static class MainLoop
             }
 
             _logger.Warn(null, "Execution timed out after {0}ms", timeout.TotalMilliseconds);
+            cts.Cancel();
             worker.Interrupt();
-            if (!worker.Join(TimeSpan.FromMilliseconds(200)))
+            if (!worker.Join(TimeSpan.FromMilliseconds(500)))
             {
-                try
-                {
-                    worker.Abort();
-                }
-                catch (PlatformNotSupportedException)
-                {
-                    // .NET Core+ does not support Abort; thread must be cancelled cooperatively via Interrupt/CancellationToken
-                }
-
-                if (!worker.Join(TimeSpan.FromMilliseconds(500)))
-                {
-                    _logger.Error(null, "Worker thread is out of control, could not be terminated");
-                }
+                _logger.Error(null, "Worker thread is out of control, could not be terminated");
             }
 
             return false;
         }
         catch (ThreadInterruptedException)
         {
-            // Main thread was interrupted (e.g., by watchdog), worker may still be running fine
             return false;
         }
     }

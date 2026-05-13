@@ -37,6 +37,8 @@ public partial class TrayStatusWindow : Window
     private readonly DispatcherTimer _updateTimer;
     private readonly bool _isLinux;
     private bool _isWindowShowing;
+    private bool _isShuttingDown;
+    private readonly TaskCompletionSource<bool> _closedTcs = new();
     
     // UI Controls
     private TextBlock? _titleText;
@@ -391,27 +393,33 @@ public partial class TrayStatusWindow : Window
         Show();
         _isWindowShowing = true;
         
-        // Auto-hide after 5 seconds
-        Task.Delay(5000).ContinueWith(_ =>
+        if (!_isLinux)
         {
-            if (_isWindowShowing && IsVisible)
+            Task.Delay(5000).ContinueWith(_ =>
             {
-                Dispatcher.UIThread.Post(() =>
+                if (_isWindowShowing && IsVisible)
                 {
-                    Hide();
-                    _isWindowShowing = false;
-                });
-            }
-        });
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        Hide();
+                        _isWindowShowing = false;
+                    });
+                }
+            });
+        }
     }
 
     protected override async void OnClosing(WindowClosingEventArgs e)
     {
         base.OnClosing(e);
         
+        if (_isShuttingDown)
+        {
+            return;
+        }
+
         if (_isLinux)
         {
-            // Linux: Show confirmation dialog when closing window
             e.Cancel = true;
             
             var result = await ShowMessageBoxAsync(
@@ -421,15 +429,12 @@ public partial class TrayStatusWindow : Window
             
             if (result == MessageBoxResult.Yes)
             {
-                // User confirmed exit
                 _updateTimer.Stop();
                 RequestExit();
             }
-            // else: Keep window open
         }
         else
         {
-            // Windows/macOS: Hide window (tray icon available)
             e.Cancel = true;
             Hide();
         }
@@ -438,7 +443,15 @@ public partial class TrayStatusWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         _updateTimer.Stop();
+        _closedTcs.TrySetResult(true);
         base.OnClosed(e);
+    }
+
+    public async Task CloseAndWaitAsync()
+    {
+        _isShuttingDown = true;
+        Close();
+        await _closedTcs.Task;
     }
 
     private async Task<MessageBoxResult> ShowMessageBoxAsync(string title, string message, MessageBoxButton buttons)

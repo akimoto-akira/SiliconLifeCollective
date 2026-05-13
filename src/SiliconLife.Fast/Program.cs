@@ -305,8 +305,10 @@ public class Program
             _logger.Info(null, "Core host stopped");
         }
 
-        // Close tray window
-        _trayWindow?.Close();
+        if (_trayWindow != null)
+        {
+            await _trayWindow.CloseAndWaitAsync();
+        }
 
         // Unload all plugins before disposing core resources
         _pluginLoader?.NotifyAllStopping();

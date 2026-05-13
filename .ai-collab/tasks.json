@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-14T00:19:00+08:00",
+  "lastUpdated": "2026-05-14T01:30:00+08:00",
   "tasks": [
     {
       "id": "task-001",
@@ -9,12 +9,12 @@
       "title": "修复 Watchdog 竞态条件",
       "description": "WatchdogRun 方法中存在竞态条件，需要添加锁保护。当前代码在检查 _thread.IsAlive 和调用 RestartMainThread 时没有锁保护，可能导致并发问题。",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-14T00:15:00+08:00",
       "createdBy": "openclaw-main",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-14T01:05:00+08:00"
     },
     {
       "id": "task-002",
@@ -23,12 +23,12 @@
       "title": "替换 Thread.Abort 为 CancellationToken",
       "description": "Thread.Abort 在.NET Core 2.0+ 已废弃，会抛出 PlatformNotSupportedException。需要改用 CancellationToken 机制实现线程取消。影响 ExecuteWithTimeout 和 SiliconBeingRunner.KillThread 方法。",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-14T00:15:00+08:00",
       "createdBy": "openclaw-main",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-14T01:15:00+08:00"
     },
     {
       "id": "task-003",
@@ -37,12 +37,12 @@
       "title": "修复状态迁移不完整问题",
       "description": "MigrateState 方法中使用 ??= 操作符可能导致状态不一致。当 ReplaceBeing 或 ReplaceWithDefault 创建新 being 实例时，如果 factory 已经初始化了某些字段，??= 不会覆盖，导致旧 being 的状态未能完全迁移。应改为 = 强制覆盖。",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-14T00:15:00+08:00",
       "createdBy": "openclaw-main",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-14T01:30:00+08:00"
     },
     {
       "id": "task-004",
@@ -51,12 +51,12 @@
       "title": "修复 Linux 自动隐藏冲突",
       "description": "ShowAt 方法会在 5 秒后自动隐藏窗口，但 Linux 模式下期望窗口始终显示（作为主要 UI）。这两个行为冲突。需要在 ShowAt 中检查 _isLinux，如果是 Linux 则不自动隐藏。",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-14T00:15:00+08:00",
       "createdBy": "openclaw-main",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-14T01:30:00+08:00"
     },
     {
       "id": "task-005",
@@ -65,12 +65,12 @@
       "title": "添加 Config 线程安全保护",
       "description": "Config 类的 _data 字段没有锁保护，多线程同时调用 Initialize/LoadConfig/SaveConfig 可能导致竞态条件。需要添加锁保护。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-14T00:19:00+08:00",
       "createdBy": "openclaw-main",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-14T01:30:00+08:00"
     },
     {
       "id": "task-006",
@@ -79,18 +79,18 @@
       "title": "修复 ShutdownAsync 窗口关闭未等待",
       "description": "ShutdownAsync 中 _trayWindow?.Close() 是同步调用，但 Avalonia 窗口关闭可能涉及异步操作。应该等待窗口完全关闭后再继续后续清理。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-14T00:19:00+08:00",
       "createdBy": "openclaw-main",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-14T01:30:00+08:00"
     }
   ],
   "taskIndex": {
-    "pending": ["task-001", "task-002", "task-003", "task-004", "task-005", "task-006"],
+    "pending": [],
     "inProgress": [],
-    "completed": [],
+    "completed": ["task-001", "task-002", "task-003", "task-004", "task-005", "task-006"],
     "cancelled": []
   },
   "metadata": {
