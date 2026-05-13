@@ -275,28 +275,40 @@
     {
       "id": "human",
       "type": "human",
-      "name": "用户 2682"
+      "name": "用户 2682",
+      "runtimeEnv": null
     },
     {
       "id": "cursor-gpt4",
       "type": "ai-ide",
       "platform": "Cursor",
       "model": "GPT-4",
-      "description": "Cursor 默认 AI"
-    },
-    {
-      "id": "windsurf-claude",
-      "type": "ai-ide",
-      "platform": "Windsurf",
-      "model": "Claude",
-      "description": "Windsurf 默认 AI"
+      "description": "Cursor 默认 AI",
+      "runtimeEnv": {
+        "host": null,
+        "os": "Windows 11 / macOS",
+        "node": null,
+        "shell": "PowerShell / bash",
+        "workspace": "C:\\Projects\\... 或 ~/Projects/...",
+        "timezone": "Asia/Shanghai",
+        "channel": "vscode-cursor"
+      }
     },
     {
       "id": "openclaw-main",
       "type": "resident-ai",
       "platform": "OpenClaw",
       "model": "gateway/jarvis",
-      "description": "常驻 AI，负责监控和收尾"
+      "description": "常驻 AI，负责监控和收尾",
+      "runtimeEnv": {
+        "host": "iZwz92nm2lvnbib5tctc94Z",
+        "os": "Linux 5.15.0-144-generic (x64)",
+        "node": "v24.14.0",
+        "shell": "bash",
+        "workspace": "/home/admin/openclaw/workspace",
+        "timezone": "Asia/Shanghai",
+        "channel": "jvsclaw"
+      }
     }
   ],
   "rules": {
@@ -306,6 +318,23 @@
   }
 }
 ```
+
+**`runtimeEnv` 字段说明**：
+
+| 字段 | 说明 | 示例 |
+|------|------|------|
+| `host` | 主机名/实例 ID | `iZwz92nm2lvnbib5tctc94Z` |
+| `os` | 操作系统及版本 | `Linux 5.15.0-144-generic (x64)` |
+| `node` | Node.js 版本 | `v24.14.0` |
+| `shell` | 默认 Shell | `bash`, `PowerShell` |
+| `workspace` | 工作区路径 | `/home/admin/openclaw/workspace` |
+| `timezone` | 时区 | `Asia/Shanghai` |
+| `channel` | 通信渠道 | `jvsclaw`, `vscode-cursor` |
+
+**用途**：
+- 帮助 AI 理解运行环境差异（路径分隔符、命令兼容性等）
+- 交接时告知下一个 AI 运行环境信息
+- 生成环境相关的配置建议
 
 ### state.json — 当前状态
 

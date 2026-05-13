@@ -29,10 +29,17 @@ Choose your preferred language:
 
 ## Repository
 
+**Primary Repository (主力仓库):**
+- [Gitee / 码云](https://gitee.com/hoshinokennji/SiliconLifeCollective)
+  - 中文版详细文档已经上传至码云 Wiki
+  - 主要开发和维护在此进行
+
+**Mirror Repository (镜像仓库):**
 - [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective)
-  - Detailed English documentation has been uploaded to the GitHub Wiki.
-- [码云（中国镜像）](https://gitee.com/hoshinokennji/SiliconLifeCollective)
-  - 中文版详细文档已经上传至码云 Wiki。
+  - Detailed English documentation has been uploaded to the GitHub Wiki
+  - 自动同步自 Gitee，用于国际访问
+
+> 💡 **提示**：由于网络可达性考虑，建议优先访问 Gitee 仓库以获得更稳定的体验。GitHub 仓库通过自动化流程定期同步。
 
 ## License
 

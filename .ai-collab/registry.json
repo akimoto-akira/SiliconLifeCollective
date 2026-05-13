@@ -3,14 +3,24 @@
     {
       "id": "human",
       "type": "human",
-      "name": "用户 2682"
+      "name": "用户 2682",
+      "runtimeEnv": null
     },
     {
       "id": "openclaw-main",
       "type": "resident-ai",
       "platform": "OpenClaw",
       "model": "gateway/jarvis",
-      "description": "常驻 AI，负责监控、交接处理和自动合并"
+      "description": "常驻 AI，负责监控、交接处理和自动合并",
+      "runtimeEnv": {
+        "host": "iZwz92nm2lvnbib5tctc94Z",
+        "os": "Linux 5.15.0-144-generic (x64)",
+        "node": "v24.14.0",
+        "shell": "bash",
+        "workspace": "/home/admin/openclaw/workspace",
+        "timezone": "Asia/Shanghai",
+        "channel": "jvsclaw"
+      }
     }
   ],
   "rules": {
