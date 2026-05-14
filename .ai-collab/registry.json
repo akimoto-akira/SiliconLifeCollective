@@ -68,6 +68,29 @@
         "timezone": "Asia/Shanghai",
         "channel": "qoder-ide"
       }
+    },
+    {
+      "id": "siliconlife-mcpserver",
+      "type": "service",
+      "platform": "SiliconLife",
+      "model": "N/A",
+      "description": "SiliconLife MCP 浏览器能力服务器，为 AI IDE 提供浏览器自动化工具（HTTP API）",
+      "runtimeEnv": {
+        "host": "iZwz92nm2lvnbib5tctc94Z",
+        "os": "Linux 5.15.0-144-generic (x64)",
+        "node": "v24.14.0",
+        "shell": "bash",
+        "workspace": "/home/admin/openclaw/workspace/SiliconLifeCollective",
+        "timezone": "Asia/Shanghai",
+        "port": 5001,
+        "protocol": "HTTP"
+      },
+      "capabilities": {
+        "browser_control": true,
+        "test_execution": true,
+        "screenshot": true,
+        "javascript_execution": true
+      }
     }
   ],
   "rules": {

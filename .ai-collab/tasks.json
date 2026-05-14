@@ -1,7 +1,42 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-14T02:00:00+08:00",
+  "lastUpdated": "2026-05-14T12:18:00+08:00",
   "tasks": [
+    {
+      "id": "task-111",
+      "type": "feature",
+      "target": "src/SiliconLife.McpServer/",
+      "title": "创建 MCP 浏览器能力服务器",
+      "description": "为 AI IDE（Cursor/Trae 等）创建浏览器能力开放服务器。由于无影云电脑上的 OpenClaw 有浏览器工具，但本地 AI IDE 没有，需要通过 HTTP API 暴露浏览器能力。实现：1）创建 SiliconLife.McpServer 项目，2）使用 Playwright WebView，3）提供 10 个浏览器操作 API，4）集成到.sln 解决方案，5）确保编译成功。",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-14T11:32:00+08:00",
+      "createdBy": "用户 2682",
+      "assignedTo": "openclaw-main",
+      "relatedCommit": "待 commit",
+      "completedAt": "2026-05-14T12:18:00+08:00",
+      "metadata": {
+        "discussion": "AI 协作协议讨论 → MCP Server 方案",
+        "files_created": [
+          "src/SiliconLife.McpServer/SiliconLife.McpServer.csproj",
+          "src/SiliconLife.McpServer/Program.cs",
+          "src/SiliconLife.McpServer/BrowserPool.cs",
+          "src/SiliconLife.McpServer/README.md"
+        ],
+        "api_endpoints": [
+          "/api/browser/navigate",
+          "/api/browser/click",
+          "/api/browser/input",
+          "/api/browser/get_page_text",
+          "/api/browser/screenshot",
+          "/api/browser/evaluate",
+          "/api/browser/wait_for_element",
+          "/api/browser/status",
+          "/api/browser/close",
+          "/api/browser/run_test"
+        ]
+      }
+    },
     {
       "id": "task-101",
       "type": "bugfix",
@@ -146,7 +181,7 @@
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": ["task-101", "task-102", "task-103", "task-104", "task-105", "task-106", "task-107", "task-108", "task-109", "task-110"],
+    "completed": ["task-111", "task-101", "task-102", "task-103", "task-104", "task-105", "task-106", "task-107", "task-108", "task-109", "task-110"],
     "cancelled": []
   },
   "metadata": {
@@ -154,6 +189,12 @@
     "generatedAt": "2026-05-14T01:03:00+08:00",
     "generatedBy": "openclaw-main",
     "replacedTasks": ["task-001", "task-002", "task-003", "task-004", "task-005", "task-006"],
-    "reason": "代码审查发现新 bug，覆盖原有已完成任务列表"
+    "reason": "代码审查发现新 bug，覆盖原有已完成任务列表",
+    "lastAddedTask": {
+      "id": "task-111",
+      "addedAt": "2026-05-14T12:18:00+08:00",
+      "addedBy": "openclaw-main",
+      "type": "feature"
+    }
   }
 }
