@@ -68,12 +68,36 @@
         "timezone": "Asia/Shanghai",
         "channel": "qoder-ide"
       }
+    },
+    {
+      "id": "coze-agent",
+      "type": "resident-ai",
+      "platform": "Coze",
+      "model": "Doubao-pro",
+      "description": "扣子平台常驻AI，负责项目分析、架构决策、任务调度与开发辅助",
+      "runtimeEnv": {
+        "host": "sandbox",
+        "os": "Linux (x64)",
+        "shell": "bash",
+        "workspace": "/SiliconLifeCollective",
+        "timezone": "Asia/Shanghai",
+        "channel": "coze"
+      }
     }
   ],
   "rules": {
     "defaultMergeStrategy": "auto-if-no-conflict",
-    "humanReviewRequired": ["core-logic", "config-files", "architecture"],
-    "autoMergeAllowed": ["tests", "docs", "comments", "formatting"],
+    "humanReviewRequired": [
+      "core-logic",
+      "config-files",
+      "architecture"
+    ],
+    "autoMergeAllowed": [
+      "tests",
+      "docs",
+      "comments",
+      "formatting"
+    ],
     "sessionTimeoutMinutes": 120,
     "pollIntervalSeconds": 30,
     "newActorAuthorization": "human-only"
