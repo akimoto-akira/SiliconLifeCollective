@@ -24,6 +24,7 @@ public sealed class LogManager : IDisposable
     private readonly List<ILoggerProvider> _providers = new();
     private readonly Dictionary<string, ILogger> _loggers = new();
     private readonly object _lock = new();
+    private volatile LogLevel _globalMinimumLevel = LogLevel.Information;
 
     /// <summary>
     /// Gets the singleton instance of <see cref="LogManager"/>.
@@ -31,19 +32,27 @@ public sealed class LogManager : IDisposable
     public static LogManager Instance => _instance.Value;
 
     /// <summary>
-    /// Gets the global minimum log level from configuration.
+    /// Gets the global minimum log level.
     /// This affects all loggers that don't have an explicit minimum level set.
+    /// The value is cached locally to avoid acquiring Config's read lock
+    /// during logging operations (which could cause LockRecursionException
+    /// when logging is called while Config's write lock is held).
+    /// Call <see cref="UpdateGlobalMinimumLevel"/> to refresh from configuration.
     /// </summary>
-    public LogLevel GlobalMinimumLevel
+    public LogLevel GlobalMinimumLevel => _globalMinimumLevel;
+
+    /// <summary>
+    /// Updates the cached global minimum log level from configuration.
+    /// This method should be called after Config is initialized or when
+    /// the configuration changes. It safely reads from Config outside of
+    /// any write-lock context.
+    /// </summary>
+    public void UpdateGlobalMinimumLevel()
     {
-        get
+        ConfigDataBase? configData = Config.Instance.Data;
+        if (configData != null)
         {
-            ConfigDataBase? configData = Config.Instance.Data;
-            if (configData != null)
-            {
-                return configData.MinimumLogLevel;
-            }
-            return LogLevel.Information;
+            _globalMinimumLevel = configData.MinimumLogLevel;
         }
     }
 

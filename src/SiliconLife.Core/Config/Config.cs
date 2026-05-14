@@ -58,16 +58,19 @@ public class Config : IDisposable
     /// <param name="data">The configuration data instance</param>
     public void Initialize(ConfigDataBase data)
     {
+        string typeName;
         _lock.EnterWriteLock();
         try
         {
             _data = data;
-            _logger.Info(null, $"Config initialized with data type: {data.GetType().Name}");
+            typeName = data.GetType().Name;
         }
         finally
         {
             _lock.ExitWriteLock();
         }
+        _logger.Info(null, $"Config initialized with data type: {typeName}");
+        LogManager.Instance.UpdateGlobalMinimumLevel();
     }
 
     private Config()
@@ -108,23 +111,36 @@ public class Config : IDisposable
     /// </summary>
     public void LoadConfig()
     {
+        string configPath;
+        bool success = false;
         _lock.EnterWriteLock();
         try
         {
+            configPath = _data.GetConfigPath();
             try
             {
                 _data.LoadConfig();
-                _logger.Info(null, $"Config loaded from {_data.GetConfigPath()}");
+                success = true;
             }
             catch (Exception)
             {
-                _logger.Error(null, $"Failed to load config from {_data.GetConfigPath()}");
-                throw;
+                // Exit write lock before logging to avoid LockRecursionException
             }
         }
         finally
         {
             _lock.ExitWriteLock();
+        }
+
+        if (success)
+        {
+            _logger.Info(null, $"Config loaded from {configPath}");
+            LogManager.Instance.UpdateGlobalMinimumLevel();
+        }
+        else
+        {
+            _logger.Error(null, $"Failed to load config from {configPath}");
+            throw new InvalidOperationException($"Failed to load config from {configPath}");
         }
     }
 
@@ -134,23 +150,35 @@ public class Config : IDisposable
     /// </summary>
     public void SaveConfig()
     {
+        string configPath;
+        bool success = false;
         _lock.EnterReadLock();
         try
         {
+            configPath = _data.GetConfigPath();
             try
             {
                 _data.SaveConfig();
-                _logger.Info(null, $"Config saved to {_data.GetConfigPath()}");
+                success = true;
             }
             catch (Exception)
             {
-                _logger.Error(null, $"Failed to save config to {_data.GetConfigPath()}");
-                throw;
+                // Exit read lock before logging to avoid LockRecursionException
             }
         }
         finally
         {
             _lock.ExitReadLock();
+        }
+
+        if (success)
+        {
+            _logger.Info(null, $"Config saved to {configPath}");
+        }
+        else
+        {
+            _logger.Error(null, $"Failed to save config to {configPath}");
+            throw new InvalidOperationException($"Failed to save config to {configPath}");
         }
     }
 
@@ -160,7 +188,8 @@ public class Config : IDisposable
     public void Reload()
     {
         LoadConfig();
-        _logger.Info(null, $"Config reloaded from {_data.GetConfigPath()}");
+        string configPath = GetConfigPath();
+        _logger.Info(null, $"Config reloaded from {configPath}");
     }
 
     public void Dispose()
