@@ -75,12 +75,13 @@ This project provides two implementation versions to meet different scenario nee
 
 ### SiliconLife.Fast (High-Performance Version)
 - **Positioning**: Main production version
-- **Runtime Mode**: Windows Forms application (supports system tray)
+- **Runtime Mode**: Desktop application (Windows/macOS system tray / Linux status window)
 - **Storage Method**: SpeedyPack in-memory storage + asynchronous batch persistence (.spk file format)
 - **Applicable Scenarios**: High concurrency, low latency, large data volume scenarios
+- **Platform Support**: Windows/macOS (full features, including system tray), Linux (status window, no tray icon)
 - **Features**:
   - Extreme performance optimization
-  - Tray background operation with real-time monitoring via tray status window
+  - Windows/macOS tray background operation with real-time monitoring via tray status window; Linux status window displayed directly
   - SpeedyPack engine + auto-compaction ensures data security
   - Component UI architecture, 30+ declarative components
   - 7 Skin Themes with auto-discovery and switching
@@ -93,10 +94,10 @@ This project provides two implementation versions to meet different scenario nee
 
 | Feature | SiliconLife.Default | SiliconLife.Fast |
 |---------|---------------------|------------------|
-| **Runtime Mode** | Console application | Forms application (system tray) |
-| **User Interface** | Web UI (browser access) | Tray icon + tray window + Web UI |
-| **System Tray** | ❌ None | ✅ Supports minimize to tray |
-| **Background Operation** | ❌ Exits when console closes | ✅ Continuous tray background operation |
+| **Runtime Mode** | Console application | Desktop application (Windows/macOS system tray / Linux status window) |
+| **User Interface** | Web UI (browser access) | Windows/macOS: Tray icon + tray window + Web UI; Linux: Status window + Web UI |
+| **System Tray** | ❌ None | ✅ Windows/macOS supports minimize to tray; Linux no tray icon |
+| **Background Operation** | ❌ Exits when console closes | ✅ Windows/macOS continuous tray background operation; Linux status window operation |
 | **Storage Method** | File system JSON storage | SpeedyPack in-memory storage + asynchronous persistence |
 | **Storage Engine** | File system I/O | SiliconLife.Speedy (.spk format) |
 | **Read Latency** | ~10ms (disk I/O) | ~0.01ms (memory operation) |
@@ -110,16 +111,16 @@ This project provides two implementation versions to meet different scenario nee
 
 | Component | SiliconLife.Default | SiliconLife.Fast |
 |-----------|---------------------|------------------|
-| Runtime | .NET 9 | .NET 9 Windows |
+| Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Programming Language | C# | C# |
-| Application Type | Console application | Windows Forms application |
+| Application Type | Console application | Desktop application (Windows/macOS system tray / Linux status window) |
 | AI Integration | Ollama (local), Alibaba Cloud DashScope (cloud) | Ollama (local), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud) |
 | Data Storage | File system (JSON + time-indexed directories) | SpeedyPack (.spk format, memory mapping + asynchronous persistence) |
 | Web Server | HttpListener (.NET built-in) | HttpListener (.NET built-in) |
 | Dynamic Compilation | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
 | Browser Automation | Playwright (WebView) | Playwright (WebView) |
 | Plugin System | ✅ Supported (IPlugin + PluginLoader) | ✅ Supported (IPlugin + PluginLoader) |
-| System Tray | ❌ Not supported | ✅ Supported (NotifyIcon) |
+| System Tray | ❌ Not supported | ✅ Windows/macOS supported (NotifyIcon); Linux no tray icon |
 | License | Apache-2.0 | Apache-2.0 |
 
 ## 📁 Project Structure
@@ -272,13 +273,19 @@ The application will start the web server and automatically open the Web UI in t
 - ✅ Small data volume, short-term use
 - ✅ Development and debugging phase
 
-#### Option 2: Run Fast Version (Windows Forms Application)
+#### Option 2: Run Fast Version (Desktop Application)
 
 ```bash
 dotnet run --project src/SiliconLife.Fast
 ```
 
-The application will start in forms mode, minimize to the system tray, and run continuously in the background.
+**Windows/macOS**: The application will start in forms mode, minimize to the system tray, and run continuously in the background.
+
+**Linux**: The application will display a status window (no system tray icon) and automatically open the browser to access the Web UI. You can also use the `--no-tray` parameter to skip auto-opening the browser:
+
+```bash
+dotnet run --project src/SiliconLife.Fast -- --no-tray
+```
 
 **Applicable Scenarios**:
 - ✅ High concurrency scenarios (> 5 users)
@@ -295,11 +302,17 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 # Windows - Fast version
 dotnet publish src/SiliconLife.Fast -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-# Linux - Default version only
+# Linux - Default version
 dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 
-# macOS - Default version only
+# Linux - Fast version
+dotnet publish src/SiliconLife.Fast -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Default version
 dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Fast version
+dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
 ## 📋 Development Roadmap

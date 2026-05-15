@@ -17,15 +17,17 @@ Este proyecto proporciona dos versiones de implementación que comparten el mism
 
 ### SiliconLife.Fast (Versión de Alto Rendimiento)
 - **Posicionamiento**: Versión de producción principal
-- **Modo de Ejecución**: Aplicación de formularios Windows (con soporte de bandeja del sistema)
+- **Modo de Ejecución**: Aplicación de escritorio (Windows bandeja del sistema / Linux ventana de estado)
 - **Almacenamiento**: Almacenamiento en memoria SpeedyPack + persistencia por lotes asíncrona (formato de archivo .spk)
 - **Escenario de Aplicación**: Escenarios de alta concurrencia, baja latencia, gran volumen de datos
+- **Soporte de Plataforma**: Windows/macOS (funciones completas, incluyendo bandeja del sistema), Linux (ventana de estado, sin icono en bandeja)
 - **Características**:
-  - Ejecución en segundo plano de la bandeja del sistema, monitoreo en tiempo real mediante ventana de estado
+  - Windows/macOS ejecución en segundo plano de la bandeja del sistema, monitoreo en tiempo real mediante ventana de estado; Linux ventana de estado mostrada directamente
   - Motor SpeedyPack + compresión automática garantizan seguridad de datos
   - Arquitectura Component UI, 30+ componentes declarativos
   - 7 temas de piel, soporte para descubrimiento y cambio automáticos
   - Herramienta de recarga en caliente para actualizaciones y reinicios en línea
+  - Linux abre automáticamente el navegador para acceder a la Web UI, soporta el parámetro `--no-tray`
 - **Mejora de Rendimiento**: Latencia de lectura de almacenamiento reducida 1000 veces, latencia de escritura reducida 15000 veces
 - **Descripción de Rol**: Implementación de nivel de producción con optimización profunda que incluye ejecución en segundo plano de la bandeja del sistema, motor SpeedyPack + compresión automática, la mejor opción para operaciones a largo plazo y entornos de producción reales
 

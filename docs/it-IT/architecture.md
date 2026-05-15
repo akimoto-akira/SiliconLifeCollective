@@ -17,15 +17,17 @@ Questo progetto offre due versioni di implementazione, che condividono lo stesso
 
 ### SiliconLife.Fast (Versione ad alte prestazioni)
 - **Posizionamento**: Versione principale di produzione
-- **Modalità di esecuzione**: Applicazione Windows Forms (supporta la barra di stato di sistema)
+- **Modalità di esecuzione**: Applicazione desktop (Windows/macOS barra di stato di sistema / Linux finestra di stato)
 - **Metodo di archiviazione**: Archiviazione in memoria SpeedyPack + persistenza batch asincrona (formato file .spk)
 - **Scenari applicabili**: Alta concorrenza, bassa latenza, grandi volumi di dati
+- **Supporto piattaforma**: Windows (funzionalità complete, inclusa barra di stato), Linux (finestra di stato, nessuna icona nella barra)
 - **Caratteristiche**:
-  - Esecuzione in background nella barra di stato, monitoraggio in tempo reale tramite la finestra di stato
+  - Windows/macOS esecuzione in background nella barra di stato, monitoraggio in tempo reale tramite la finestra di stato; Linux finestra di stato visualizzata direttamente
   - Motore SpeedyPack + compressione automatica che garantisce la sicurezza dei dati
   - Architettura Component UI, 30+ componenti dichiarativi
   - 7 temi d'aspetto, supporta rilevamento e commutazione automatici
   - Strumento di hot reload per aggiornamenti e riavvii online
+  - Linux apre automaticamente il browser per l'accesso alla Web UI, supporta il parametro `--no-tray`
 - **Miglioramento delle prestazioni**: Latenza di lettura ridotta di 1000x, latenza di scrittura ridotta di 15000x
 - **Descrizione del ruolo**: Implementazione pronta per la produzione con ottimizzazione approfondita, con esecuzione in background nella barra di stato, motore SpeedyPack + compressione automatica, la scelta migliore per lo sfruttamento a lungo termine e i veri ambienti di produzione
 

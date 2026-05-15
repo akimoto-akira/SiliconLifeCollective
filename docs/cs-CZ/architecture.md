@@ -17,15 +17,17 @@ Tento projekt poskytuje dvě implementační verze, které sdílejí stejný ná
 
 ### SiliconLife.Fast (Vysoce Výkonná Verze)
 - **Pozicování**: Hlavní produkční verze
-- **Režim Spuštění**: Windows Forms aplikace (s podporou systémové lišty)
+- **Režim Spuštění**: Desktopová aplikace (Windows systémová lišta / Linux stavové okno)
 - **Úložiště**: SpeedyPack paměťové úložiště + asynchronní dávková perzistence (.spk formát souboru)
 - **Scénář Použití**: Scénáře s vysokou souběžností, nízkou latencí, velkým objemem dat
+- **Podpora Platformy**: Windows/macOS (plné funkce, včetně systémové lišty), Linux (stavové okno, bez ikony v liště)
 - **Charakteristiky**:
-  - Běh na pozadí v systémové liště s monitorováním v reálném čase prostřednictvím stavového okna lišty
+  - Windows/macOS běh na pozadí v systémové liště s monitorováním v reálném čase prostřednictvím stavového okna lišty; Linux stavové okno zobrazeno přímo
   - SpeedyPack engine + automatická komprese zajišťují bezpečnost dat
   - Architektura Component UI, 30+ deklarativních komponent
   - 7 témat skinů, podpora automatické detekce a přepínání
   - Nástroj hot reload pro online aktualizace a restarty
+  - Linux automaticky otevře prohlížeč pro přístup k Web UI, podporuje parametr `--no-tray`
 - **Zlepšení Výkonu**: Latence čtení úložiště snížena 1000x, latence zápisu snížena 15000x
 - **Popis role**: Produkční implementace s hlubokou optimalizací, se systémovou lištou na pozadí, SpeedyPack engine + automatická komprese zajišťují bezpečnost dat, nejlepší volba pro dlouhodobý provoz a reálné produkční prostředí
 

@@ -708,6 +708,7 @@ public class DeDE : DefaultLocalizationBase
     public override string ConfigDictAddButton => "Hinzufügen";
     public override string ConfigDictDeleteButton => "Löschen";
     public override string ConfigDictEmptyMessage => "Dictionary ist leer";
+    public override string SelectSearchHint => "Eingabe löschen, um alle Optionen anzuzeigen";
 
     public override string LogsPageHeader => "Protokollabfrage";
     public override string LogsTotalCount => "Insgesamt {0} Protokolleinträge";

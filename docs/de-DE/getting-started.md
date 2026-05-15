@@ -18,10 +18,10 @@ Dieses Projekt bietet zwei Implementierungsversionen:
 
 ### SiliconLife.Fast (Hochleistungsversion)
 - **Positionierung**: Haupt-Produktionsversion
-- **Ausführungsmodus**: Windows-Formularanwendung (System Tray)
+- **Ausführungsmodus**: Desktop-Anwendung (Windows/macOS System Tray / Linux Statusfenster)
 - **Speicher**: SpeedyPack In-Memory-Speicher + asynchrone Persistenz (.spk-Dateiformat)
 - **Anwendungsszenario**: Hohe Parallelität, niedrige Latenz, großes Datenvolumen, Langzeit-Produktionsbetrieb
-- **Plattformunterstützung**: Nur Windows
+- **Plattformunterstützung**: Windows/macOS (volle Funktionen, inkl. System Tray), Linux (Statusfenster, kein Tray-Icon)
 - **Rollenbeschreibung**: Produktionsreife Implementierung mit tiefer Optimierung, die beste Wahl für Langzeitbetrieb und echte Produktionsumgebungen
 
 > **Anfängerempfehlung**: Erstbenutzer sollten mit **SiliconLife.Default** beginnen, um schnell die Architektur-Machbarkeit zu verifizieren. Nach Vertrautheit mit dem System wird eine Migration zu **SiliconLife.Fast** dringend empfohlen.
@@ -107,14 +107,20 @@ dotnet run
 
 Der Webserver startet unter `http://localhost:8080`
 
-#### Fast-Version ausführen (Nur Windows)
+#### Fast-Version ausführen
 
 ```bash
 cd src/SiliconLife.Fast
 dotnet run
 ```
 
-Die Anwendung startet im Formularmodus, minimiert im System Tray, mit dem Webserver ebenfalls unter `http://localhost:8080`
+**Windows/macOS**: Die Anwendung startet im Formularmodus, minimiert im System Tray, mit dem Webserver ebenfalls unter `http://localhost:8080`
+
+**Linux**: Die Anwendung zeigt ein Statusfenster an (kein Tray-Icon) und öffnet automatisch den Browser für den Zugriff auf die Web-UI. Mit dem Parameter `--no-tray` kann das automatische Öffnen des Browsers übersprungen werden:
+
+```bash
+dotnet run -- --no-tray
+```
 
 ### 5. Web-UI zugreifen
 

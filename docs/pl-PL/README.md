@@ -76,12 +76,13 @@ Ten projekt oferuje dwie wersje implementacji, spełniające różne scenariusze
 
 ### SiliconLife.Fast (wersja wysokowydajna)
 - **Przeznaczenie**: główna wersja produkcyjna
-- **Tryb działania**: aplikacja okienkowa Windows (obsługa zasobnika systemowego)
+- **Tryb działania**: aplikacja desktopowa (Windows/macOS zasobnik systemowy / Linux okno stanu)
 - **Sposób przechowywania**: pamięć SpeedyPack + asynchroniczna trwałość wsadowa (format pliku .spk)
 - **Scenariusze zastosowania**: wysoka współbieżność, niskie opóźnienie, duże ilości danych
+- **Obsługa platform**: Windows/macOS (pełne funkcje, w tym zasobnik systemowy), Linux (okno stanu, brak ikony zasobnika)
 - **Cechy**:
   - Ekstremalna optymalizacja wydajności
-  - Działanie w tle w zasobniku, obsługa okna stanu zasobnika z monitorowaniem w czasie rzeczywistym
+  - Windows/macOS działanie w tle w zasobniku z monitorowaniem w czasie rzeczywistym; Linux okno stanu wyświetlane bezpośrednio
   - Silnik SpeedyPack + automatyczna kompresja gwarantująca bezpieczeństwo danych
   - Architektura Component UI, 30+ deklaratywnych komponentów
   - 7 motywów skórek, obsługa automatycznego wykrywania i przełączania
@@ -94,10 +95,10 @@ Ten projekt oferuje dwie wersje implementacji, spełniające różne scenariusze
 
 | Cecha | SiliconLife.Default | SiliconLife.Fast |
 |-------|---------------------|------------------|
-| **Tryb działania** | Aplikacja konsolowa | Aplikacja okienkowa (zasobnik systemowy) |
-| **Interfejs użytkownika** | Web UI (dostęp przez przeglądarkę) | Ikona zasobnika + okno zasobnika + Web UI |
-| **Zasobnik systemowy** | ❌ Brak | ✅ Obsługa minimalizacji do zasobnika |
-| **Działanie w tle** | ❌ Zamknięcie konsoli = wyjście | ✅ Ciągłe działanie w tle w zasobniku |
+| **Tryb działania** | Aplikacja konsolowa | Aplikacja desktopowa (Windows/macOS zasobnik systemowy / Linux okno stanu) |
+| **Interfejs użytkownika** | Web UI (dostęp przez przeglądarkę) | Windows/macOS: Ikona zasobnika + okno zasobnika + Web UI; Linux: Okno stanu + Web UI |
+| **Zasobnik systemowy** | ❌ Brak | ✅ Windows/macOS obsługa minimalizacji do zasobnika; Linux brak ikony zasobnika |
+| **Działanie w tle** | ❌ Zamknięcie konsoli = wyjście | ✅ Windows/macOS ciągłe działanie w tle w zasobniku; Linux działanie w oknie stanu |
 | **Sposób przechowywania** | Przechowywanie JSON w systemie plików | Pamięć SpeedyPack + asynchroniczna trwałość |
 | **Silnik przechowywania** | I/O systemu plików | SiliconLife.Speedy (format .spk) |
 | **Opóźnienie odczytu** | ~10ms (I/O dysku) | ~0.01ms (operacja w pamięci) |
@@ -111,16 +112,16 @@ Ten projekt oferuje dwie wersje implementacji, spełniające różne scenariusze
 
 | Komponent | SiliconLife.Default | SiliconLife.Fast |
 |-----------|---------------------|------------------|
-| Środowisko uruchomieniowe | .NET 9 | .NET 9 Windows |
+| Środowisko uruchomieniowe | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Język programowania | C# | C# |
-| Typ aplikacji | Aplikacja konsolowa | Aplikacja okienkowa Windows |
+| Typ aplikacji | Aplikacja konsolowa | Aplikacja desktopowa (Windows/macOS zasobnik systemowy / Linux okno stanu) |
 | Integracja AI | Ollama (lokalne), Alibaba Cloud Bailian (chmura), Volcengine Ark (chmura) | Ollama (lokalne), Alibaba Cloud Bailian (chmura), Volcengine Ark (chmura) |
 | Przechowywanie danych | System plików (JSON + katalogi indeksu czasowego) | SpeedyPack (format .spk, mapowanie w pamięci + asynchroniczna trwałość) |
 | Serwer Web | HttpListener (wbudowany w .NET) | HttpListener (wbudowany w .NET) |
 | Kompilacja dynamiczna | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
 | Automatyzacja przeglądarki | Playwright (WebView) | Playwright (WebView) |
 | System wtyczek | ✅ Obsługa (IPlugin + PluginLoader) | ✅ Obsługa (IPlugin + PluginLoader) |
-| Zasobnik systemowy | ❌ Brak obsługi | ✅ Obsługa (NotifyIcon) |
+| Zasobnik systemowy | ❌ Brak obsługi | ✅ Windows/macOS obsługa (NotifyIcon); Linux brak ikony zasobnika |
 | Licencja | Apache-2.0 | Apache-2.0 |
 
 ## 📁 Struktura projektu
@@ -282,13 +283,19 @@ Aplikacja uruchomi serwer Web i automatycznie otworzy Web UI w przeglądarce.
 - ✅ Mała ilość danych, krótkotrwałe użytkowanie
 - ✅ Faza debugowania rozwoju
 
-#### Sposób 2: Uruchomienie wersji Fast (aplikacja okienkowa Windows)
+#### Sposób 2: Uruchomienie wersji Fast (aplikacja desktopowa)
 
 ```bash
 dotnet run --project src/SiliconLife.Fast
 ```
 
-Aplikacja uruchomi się w trybie okienkowym, zminimalizuje do zasobnika systemowego i będzie działać w tle.
+**Windows/macOS**: Aplikacja uruchomi się w trybie okienkowym, zminimalizuje do zasobnika systemowego i będzie działać w tle.
+
+**Linux**: Aplikacja wyświetli okno stanu (brak ikony w zasobniku systemowym) i automatycznie otworzy przeglądarkę, aby uzyskać dostęp do Web UI. Można użyć parametru `--no-tray`, aby pominąć automatyczne otwieranie przeglądarki:
+
+```bash
+dotnet run --project src/SiliconLife.Fast -- --no-tray
+```
 
 **Scenariusze zastosowania**:
 - ✅ Scenariusze wysokiej współbieżności (> 5 użytkowników)
@@ -305,11 +312,17 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 # Windows - wersja Fast
 dotnet publish src/SiliconLife.Fast -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-# Linux - tylko wersja Default
+# Linux - wersja Default
 dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 
-# macOS - tylko wersja Default
+# Linux - wersja Fast
+dotnet publish src/SiliconLife.Fast -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - wersja Default
 dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - wersja Fast
+dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
 ## 📋 Plan rozwoju

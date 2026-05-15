@@ -740,6 +740,7 @@ public class JaJP : DefaultLocalizationBase
     public override string ConfigDictAddButton => "追加";
     public override string ConfigDictDeleteButton => "削除";
     public override string ConfigDictEmptyMessage => "辞書が空";
+    public override string SelectSearchHint => "入力欄をクリアすると全オプションが表示されます";
 
     public override string LogsPageHeader => "ログクエリ";
     public override string LogsTotalCount => "合計 {0} 件のログ";

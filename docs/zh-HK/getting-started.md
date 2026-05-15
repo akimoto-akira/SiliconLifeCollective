@@ -18,10 +18,10 @@
 
 ### SiliconLife.Fast（高效能版本）
 - **定位**：主推生產版本
-- **執行模式**：Windows 視窗應用程式（系統匣）
+- **執行模式**：桌面應用程式（Windows/macOS 系統匣 / Linux 狀態視窗）
 - **儲存方式**：SpeedyPack 記憶體儲存 + 異步持久化
 - **適用場景**：高併發、低延遲、大資料量、長期生產運行
-- **平台支援**：僅 Windows
+- **平台支援**：Windows/macOS（完整功能，含系統匣）、Linux（狀態視窗，無系統匣圖示）
 - **角色說明**：經過深度優化的生產級實現，是長期運行和實際生產環境的首選
 
 > **新手建議**：首次使用推薦從 **SiliconLife.Default** 開始，快速驗證架構可行性；熟悉系統後，強烈建議遷移到 **SiliconLife.Fast** 作為生產環境執行版本。
@@ -107,14 +107,20 @@ dotnet run
 
 Web 伺服器將在 `http://localhost:8080` 啟動
 
-#### 執行 Fast 版本（僅 Windows）
+#### 執行 Fast 版本
 
 ```bash
 cd src/SiliconLife.Fast
 dotnet run
 ```
 
-應用程式將以視窗模式啟動，最小化到系統匣，Web 伺服器同樣在 `http://localhost:8080` 啟動
+**Windows/macOS**：應用程式將以視窗模式啟動，最小化到系統匣，Web 伺服器同樣在 `http://localhost:8080` 啟動
+
+**Linux**：應用程式將顯示狀態視窗（無系統匣圖示），並自動開啟瀏覽器存取 Web UI。也可使用 `--no-tray` 參數跳過瀏覽器自動開啟：
+
+```bash
+dotnet run -- --no-tray
+```
 
 ### 5. 存取 Web UI
 

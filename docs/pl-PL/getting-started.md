@@ -18,10 +18,10 @@ Ten projekt oferuje dwie wersje implementacji:
 
 ### SiliconLife.Fast (wersja wysokowydajna)
 - **Przeznaczenie**: główna wersja produkcyjna
-- **Tryb działania**: aplikacja okienkowa Windows (zasobnik systemowy)
+- **Tryb działania**: aplikacja desktopowa (Windows/macOS zasobnik systemowy / Linux okno stanu)
 - **Sposób przechowywania**: pamięć SpeedyPack + asynchroniczna trwałość (format pliku .spk)
 - **Scenariusze zastosowania**: wysoka współbieżność, niskie opóźnienie, duże ilości danych, długotrwałe działanie produkcyjne
-- **Obsługa platform**: tylko Windows
+- **Obsługa platform**: Windows/macOS (pełna funkcjonalność, z zasobnikiem systemowym), Linux (okno stanu, brak ikony w zasobniku)
 - **Opis roli**: głęboko zoptymalizowana implementacja produkcyjna, preferowana do długotrwałego działania i rzeczywistych środowisk produkcyjnych
 
 > **Porada dla początkujących**: przy pierwszym użyciu zaleca się rozpoczęcie od **SiliconLife.Default**, aby szybko zweryfikować wykonalność architektury; po zapoznaniu się z systemem, zdecydowanie zaleca się migrację do **SiliconLife.Fast** jako wersji do środowiska produkcyjnego.
@@ -107,14 +107,20 @@ dotnet run
 
 Serwer Web uruchomi się na `http://localhost:8080`
 
-#### Uruchomienie wersji Fast (tylko Windows)
+#### Uruchomienie wersji Fast
 
 ```bash
 cd src/SiliconLife.Fast
 dotnet run
 ```
 
-Aplikacja uruchomi się w trybie okienkowym, minimalizując do zasobnika systemowego, serwer Web również uruchomi się na `http://localhost:8080`
+**Windows/macOS**: Aplikacja uruchomi się w trybie okienkowym, minimalizując do zasobnika systemowego, serwer Web również uruchomi się na `http://localhost:8080`
+
+**Linux**: Aplikacja wyświetli okno stanu (brak ikony w zasobniku systemowym) i automatycznie otworzy przeglądarkę, aby uzyskać dostęp do Web UI. Parametr `--no-tray` pozwala pominąć automatyczne otwieranie przeglądarki:
+
+```bash
+dotnet run -- --no-tray
+```
 
 ### 5. Dostęp do Web UI
 

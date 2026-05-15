@@ -18,10 +18,10 @@ Tento projekt poskytuje dvě implementační verze:
 
 ### SiliconLife.Fast (Vysoce Výkonná Verze)
 - **Pozicování**: Hlavní produkční verze
-- **Režim Spuštění**: Windows Forms aplikace (systémová lišta)
+- **Režim Spuštění**: Desktopová aplikace (Windows/macOS systémová lišta / Linux stavové okno)
 - **Úložiště**: SpeedyPack paměťové úložiště + asynchronní perzistence (.spk souborový formát)
 - **Scénář Použití**: Vysoká souběžnost, nízká latence, velký objem dat, dlouhodobý produkční provoz
-- **Podpora Platformy**: Pouze Windows
+- **Podpora Platformy**: Windows/macOS (plné funkce, včetně systémové lišty), Linux (stavové okno, bez ikony v liště)
 - **Popis role**: Produkční implementace s hlubokou optimalizací, nejlepší volba pro dlouhodobý provoz a reálné produkční prostředí
 
 > **Doporučení pro Začátečníky**: Noví uživatelé by měli začít s **SiliconLife.Default**, aby rychle ověřili proveditelnost architektury. Po seznámení se systémem se důrazně doporučuje migrovat na **SiliconLife.Fast**.
@@ -107,14 +107,20 @@ dotnet run
 
 Webový server se spustí na `http://localhost:8080`
 
-#### Spustit Fast Verzi (Pouze Windows)
+#### Spustit Fast Verzi
 
 ```bash
 cd src/SiliconLife.Fast
 dotnet run
 ```
 
-Aplikace se spustí v režimu formuláře, minimalizována do systémové lišty, s webovým serverem také na `http://localhost:8080`
+**Windows/macOS**: Aplikace se spustí v režimu formuláře, minimalizována do systémové lišty, s webovým serverem také na `http://localhost:8080`
+
+**Linux**: Aplikace zobrazí stavové okno (bez ikony v systémové liště) a automaticky otevře prohlížeč pro přístup k Web UI. Parametrem `--no-tray` lze přeskočit automatické otevření prohlížeče:
+
+```bash
+dotnet run -- --no-tray
+```
 
 ### 5. Přístup k Web UI
 

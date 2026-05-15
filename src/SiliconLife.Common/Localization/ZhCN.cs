@@ -740,6 +740,7 @@ public class ZhCN : DefaultLocalizationBase
     public override string ConfigDictAddButton => "添加";
     public override string ConfigDictDeleteButton => "删除";
     public override string ConfigDictEmptyMessage => "字典为空";
+    public override string SelectSearchHint => "若想显示全部菜单内容，请清空输入框";
 
     public override string LogsPageHeader => "日志查询";
     public override string LogsTotalCount => "共 {0} 条日志";

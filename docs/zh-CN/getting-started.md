@@ -18,10 +18,10 @@
 
 ### SiliconLife.Fast（高性能版本）
 - **定位**：主推生产版本
-- **运行模式**：Windows 窗体应用程序（系统托盘）
+- **运行模式**：桌面应用程序（Windows/macOS 系统托盘 / Linux 状态窗口）
 - **存储方式**：SpeedyPack 内存存储 + 异步持久化（.spk 文件格式）
 - **适用场景**：高并发、低延迟、大数据量、长期生产运行
-- **平台支持**：仅 Windows
+- **平台支持**：Windows/macOS（完整功能，含系统托盘）、Linux（状态窗口，无托盘图标）
 - **角色说明**：经过深度优化的生产级实现，是长期运行和实际生产环境的首选
 
 > **新手建议**：首次使用推荐从 **SiliconLife.Default** 开始，快速验证架构可行性；熟悉系统后，强烈建议迁移到 **SiliconLife.Fast** 作为生产环境运行版本。
@@ -107,14 +107,20 @@ dotnet run
 
 Web 服务器将在 `http://localhost:8080` 启动
 
-#### 运行 Fast 版本（仅 Windows）
+#### 运行 Fast 版本
 
 ```bash
 cd src/SiliconLife.Fast
 dotnet run
 ```
 
-应用程序将以窗体模式启动，最小化到系统托盘，Web 服务器同样在 `http://localhost:8080` 启动
+**Windows/macOS**：应用程序将以窗体模式启动，最小化到系统托盘，Web 服务器同样在 `http://localhost:8080` 启动
+
+**Linux**：应用程序将显示状态窗口（无系统托盘图标），并自动打开浏览器访问 Web UI。也可使用 `--no-tray` 参数跳过浏览器自动打开：
+
+```bash
+dotnet run -- --no-tray
+```
 
 ### 5. 访问 Web UI
 

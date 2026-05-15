@@ -740,6 +740,7 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string ConfigDictAddButton => "Add";
     public override string ConfigDictDeleteButton => "Delete";
     public override string ConfigDictEmptyMessage => "Dictionary is empty";
+    public override string SelectSearchHint => "Clear the input to show all options";
 
     public override string LogsPageHeader => "Log Query";
     public override string LogsTotalCount => "{0} logs total";

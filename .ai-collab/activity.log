@@ -123,3 +123,24 @@
 2026-05-14T12:15:00+08:00 | openclaw-main | solution_update | action=add_project | project=SiliconLife.McpServer
 2026-05-14T12:18:00+08:00 | openclaw-main | task_complete | task=task-111 | files_created=4
 2026-05-14T12:18:00+08:00 | openclaw-main | session_end | completed=task-111
+2026-05-15T20:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-20260515-2000 | task=task-113
+2026-05-15T20:00:00+08:00 | trae-glm5 | task_claim | task=task-113 | type=bugfix | fix=修复关于页面本地化问题
+2026-05-15T21:00:00+08:00 | trae-glm5 | task_complete | task=task-113 | type=bugfix | fix=搜索选择组件添加提示文字"若想显示全部菜单内容，请清空输入框"
+2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Component/SelectComponent.cs | added=hint_property,hint_css,hint_js_rendering
+2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Views/ConfigView.cs | added=hint_config_for_enum_select
+2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/DefaultLocalizationBase.cs | added=SelectSearchHint_property
+2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/ZhCN.cs | added=SelectSearchHint
+2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/EnUS.cs | added=SelectSearchHint
+2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/ZhHK.cs | added=SelectSearchHint
+2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/JaJP.cs | added=SelectSearchHint
+2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/KoKR.cs | added=SelectSearchHint
+2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/DeDE.cs | added=SelectSearchHint
+2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/FrFR.cs | added=SelectSearchHint
+2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/EsES.cs | added=SelectSearchHint
+2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/ItIT.cs | added=SelectSearchHint
+2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/CsCZ.cs | added=SelectSearchHint
+2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/PlPL.cs | added=SelectSearchHint
+2026-05-15T21:30:00+08:00 | trae-glm5 | session_start | sessionId=trae-20260515-2130 | task=task-112
+2026-05-15T21:30:00+08:00 | trae-glm5 | task_claim | task=task-112 | type=docs | fix=更新 Fast 版本文档明确支持 Linux
+2026-05-15T21:45:00+08:00 | trae-glm5 | task_complete | task=task-112 | updated=22 docs files across 11 languages (getting-started.md + architecture.md)
+2026-05-15T21:45:00+08:00 | trae-glm5 | session_end | sessionId=trae-20260515-2130 | status=completed

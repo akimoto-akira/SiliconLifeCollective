@@ -75,12 +75,13 @@
 
 ### SiliconLife.Fast (고성능 버전)
 - **포지셔닝**: 주력 프로덕션 버전
-- **실행 모드**: Windows 폼 애플리케이션 (시스템 트레이 지원)
-- **저장 방식**: SpeedyPack 메모리 저장소 + 비동기 배치 영속화 (.spk 파일 형식)
-- **적용 시나리오**: 높은 동시 실행, 낮은 지연 시간, 대용량 데이터 시나리오
+- **실행 모드**: 데스크톱 애플리케이션 (Windows/macOS 시스템 트레이 / Linux 상태 창)
+- **저장소**: SpeedyPack 메모리 스토리지 + 비동기 일괄 영속성 (.spk 파일 형식)
+- **적용 시나리오**: 높은 동시성, 낮은 지연 시간, 대용량 데이터 시나리오
+- **플랫폼 지원**: Windows/macOS (전체 기능, 시스템 트레이 포함), Linux (상태 창, 트레이 아이콘 없음)
 - **특징**:
   - 극한 성능 최적화
-  - 트레이 백그라운드 실행, 트레이 상태 창 실시간 모니터링 지원
+  - Windows/macOS 시스템 트레이 백그라운드 실행, 트레이 상태 창 실시간 모니터링; Linux 상태 창 직접 표시 지원
   - SpeedyPack 엔진 + 자동 압축으로 데이터 보안 보장
   - Component UI 아키텍처, 30개 이상의 선언형 컴포넌트
   - 7가지 스킨 테마, 자동 감지 및 전환 지원
@@ -93,10 +94,10 @@
 
 | 기능 | SiliconLife.Default | SiliconLife.Fast |
 |------|---------------------|------------------|
-| **실행 모드** | 콘솔 애플리케이션 | 폼 애플리케이션 (시스템 트레이) |
-| **사용자 인터페이스** | Web UI (브라우저 액세스) | 트레이 아이콘 + 트레이 윈도우 + Web UI |
-| **시스템 트레이** | ❌ 없음 | ✅ 트레이로 최소화 지원 |
-| **백그라운드 실행** | ❌ 콘솔 닫으면 종료 | ✅ 트레이에서 지속 백그라운드 실행 |
+| **실행 모드** | 콘솔 애플리케이션 | 데스크톱 애플리케이션 (Windows/macOS 시스템 트레이 / Linux 상태 창) |
+| **사용자 인터페이스** | Web UI (브라우저 액세스) | Windows/macOS: 트레이 아이콘 + 트레이 윈도우 + Web UI; Linux: 상태 창 + Web UI |
+| **시스템 트레이** | ❌ 없음 | ✅ Windows/macOS 트레이 최소화 지원; Linux 트레이 아이콘 없음 |
+| **백그라운드 실행** | ❌ 콘솔 닫으면 종료 | ✅ Windows/macOS 트레이 백그라운드 지속 실행; Linux 상태 창 실행 |
 | **저장 방식** | 파일 시스템 JSON 저장소 | SpeedyPack 메모리 저장소 + 비동기 영속화 |
 | **저장 엔진** | 파일 시스템 I/O | SiliconLife.Speedy (.spk 형식) |
 | **읽기 지연 시간** | ~10ms (디스크 I/O) | ~0.01ms (메모리 작업) |
@@ -306,11 +307,17 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 # Windows - Fast 버전
 dotnet publish src/SiliconLife.Fast -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-# Linux - Default 버전만
+# Linux - Default 버전
 dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 
-# macOS - Default 버전만
+# Linux - Fast 버전
+dotnet publish src/SiliconLife.Fast -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Default 버전
 dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Fast 버전
+dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
 ## 📋 개발 로드맵

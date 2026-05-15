@@ -75,12 +75,13 @@ Este proyecto proporciona dos versiones de implementación para satisfacer difer
 
 ### SiliconLife.Fast (Versión de Alto Rendimiento)
 - **Posicionamiento**: Versión de producción principal
-- **Modo de Ejecución**: Aplicación de formularios Windows (soporta bandeja del sistema)
+- **Modo de Ejecución**: Aplicación de escritorio (Windows/macOS bandeja del sistema / Linux ventana de estado)
 - **Método de Almacenamiento**: Almacenamiento en memoria SpeedyPack + persistencia asíncrona por lotes (formato .spk)
 - **Escenarios Aplicables**: Alta concurrencia, baja latencia, escenarios de gran volumen de datos
+- **Soporte de Plataforma**: Windows/macOS (funciones completas, incluyendo bandeja del sistema), Linux (ventana de estado, sin icono en bandeja)
 - **Características**:
   - Optimización extrema de rendimiento
-  - Ejecución en segundo plano de la bandeja, monitoreo en tiempo real mediante ventana de estado de la bandeja
+  - Windows/macOS ejecución en segundo plano en la bandeja con monitoreo en tiempo real; Linux ventana de estado mostrada directamente
   - Motor SpeedyPack + compresión automática garantizan seguridad de datos
   - Arquitectura Component UI, 30+ componentes declarativos
   - 7 Temas de Piel, soporte para descubrimiento y cambio automáticos
@@ -93,10 +94,10 @@ Este proyecto proporciona dos versiones de implementación para satisfacer difer
 
 | Característica | SiliconLife.Default | SiliconLife.Fast |
 |----------------|---------------------|------------------|
-| **Modo de Ejecución** | Aplicación de consola | Aplicación de formularios (bandeja del sistema) |
-| **Interfaz de Usuario** | Web UI (acceso por navegador) | Icono de bandeja + ventana de bandeja + Web UI |
-| **Bandeja del Sistema** | ❌ Ninguna | ✅ Soporta minimizar a la bandeja |
-| **Ejecución en Segundo Plano** | ❌ Sale cuando se cierra la consola | ✅ Ejecución continua en segundo plano de la bandeja |
+| **Modo de Ejecución** | Aplicación de consola | Aplicación de escritorio (Windows/macOS bandeja del sistema / Linux ventana de estado) |
+| **Interfaz de Usuario** | Web UI (acceso por navegador) | Windows/macOS: Icono de bandeja + ventana de bandeja + Web UI; Linux: Ventana de estado + Web UI |
+| **Bandeja del Sistema** | ❌ Ninguna | ✅ Windows/macOS soporta minimizar a la bandeja; Linux sin icono en bandeja |
+| **Ejecución en Segundo Plano** | ❌ Sale cuando se cierra la consola | ✅ Windows/macOS ejecución continua en segundo plano en la bandeja; Linux ejecución en ventana de estado |
 | **Método de Almacenamiento** | Almacenamiento JSON en sistema de archivos | Almacenamiento en memoria SpeedyPack + persistencia asíncrona |
 | **Motor de Almacenamiento** | I/O de sistema de archivos | SiliconLife.Speedy (formato .spk) |
 | **Latencia de Lectura** | ~10ms (I/O de disco) | ~0.01ms (operación en memoria) |
@@ -110,16 +111,16 @@ Este proyecto proporciona dos versiones de implementación para satisfacer difer
 
 | Componente | SiliconLife.Default | SiliconLife.Fast |
 |------|---------------------|------------------|
-| Runtime | .NET 9 | .NET 9 Windows |
+| Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Lenguaje de Programación | C# | C# |
-| Tipo de Aplicación | Aplicación de consola | Aplicación de formularios Windows |
+| Tipo de Aplicación | Aplicación de consola | Aplicación de escritorio (Windows/macOS bandeja del sistema / Linux ventana de estado) |
 | Integración IA | Ollama (local), Alibaba Cloud Bailian (nube) | Ollama (local), Alibaba Cloud Bailian (nube), Volcengine Ark (nube) |
 | Almacenamiento de Datos | Sistema de archivos (JSON + directorios indexados por tiempo) | SpeedyPack (formato .spk, mapeo en memoria + persistencia asíncrona) |
 | Servidor Web | HttpListener (integrado en .NET) | HttpListener (integrado en .NET) |
 | Compilación Dinámica | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
 | Automatización de Navegador | Playwright (WebView) | Playwright (WebView) |
 | Sistema de Plugins | ✅ Soportado (IPlugin + PluginLoader) | ✅ Soportado (IPlugin + PluginLoader) |
-| Bandeja del Sistema | ❌ No soportado | ✅ Soportado (NotifyIcon) |
+| Bandeja del Sistema | ❌ No soportado | ✅ Windows/macOS soportado (NotifyIcon); Linux sin icono en bandeja |
 | Licencia | Apache-2.0 | Apache-2.0 |
 
 ## 📁 Estructura del Proyecto
@@ -276,13 +277,19 @@ La aplicación iniciará el servidor web y abrirá automáticamente la Web UI en
 - ✅ Pequeño volumen de datos, uso a corto plazo
 - ✅ Fase de depuración de desarrollo
 
-#### Método 2: Ejecutar la versión Fast (Aplicación de formularios Windows)
+#### Método 2: Ejecutar la versión Fast (Aplicación de escritorio)
 
 ```bash
 dotnet run --project src/SiliconLife.Fast
 ```
 
-La aplicación se iniciará en modo formulario, se minimizará a la bandeja del sistema y se ejecutará continuamente en segundo plano.
+**Windows/macOS**: La aplicación se iniciará en modo formulario, se minimizará a la bandeja del sistema y se ejecutará continuamente en segundo plano.
+
+**Linux**: La aplicación mostrará una ventana de estado (sin icono en la bandeja del sistema) y abrirá automáticamente el navegador para acceder a la Web UI. Puede usar el parámetro `--no-tray` para omitir la apertura automática del navegador:
+
+```bash
+dotnet run --project src/SiliconLife.Fast -- --no-tray
+```
 
 **Escenarios aplicables**:
 - ✅ Escenarios de alta concurrencia (> 5 usuarios)
@@ -299,11 +306,17 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 # Windows - Versión Fast
 dotnet publish src/SiliconLife.Fast -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-# Linux - Solo versión Default
+# Linux - Versión Default
 dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 
-# macOS - Solo versión Default
+# Linux - Versión Fast
+dotnet publish src/SiliconLife.Fast -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Versión Default
 dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Versión Fast
+dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
 ## 📋 Hoja de Ruta de Desarrollo
