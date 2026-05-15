@@ -2,10 +2,11 @@ name: Sync from Gitee
 
 on:
   schedule:
-    # 每小时同步一次（UTC 时间，对应北京时间 +8）
     - cron: '0 * * * *'
-  # 也支持手动触发
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   sync:
@@ -21,13 +22,15 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Add Gitee remote
+      - name: Add Gitee remote with token
         run: |
-          git remote add gitee https://gitee.com/hoshinokennji/SiliconLifeCollective.git
+          git remote add gitee https://${{ secrets.GITEE_TOKEN }}@gitee.com/hoshinokennji/SiliconLifeCollective.git
 
       - name: Fetch from Gitee
         run: |
           git fetch gitee --tags --force
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
 
       - name: Sync master branch
         run: |
