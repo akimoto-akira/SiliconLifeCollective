@@ -1,0 +1,85 @@
+{
+  "archivedAt": "2026-05-15T02:52:00+08:00",
+  "archivedBy": "openclaw-main",
+  "reason": "任务清理 - 已完成任务归档",
+  "tasks": [
+    {
+      "id": "task-111",
+      "type": "feature",
+      "title": "创建 MCP 浏览器能力服务器",
+      "status": "completed",
+      "completedAt": "2026-05-14T12:18:00+08:00",
+      "note": "MCP Server 已创建，但后续发现非标准 MCP 协议，已删除"
+    },
+    {
+      "id": "task-101",
+      "type": "bugfix",
+      "title": "修复 SpeedyPackAutoCompactor 异常静默问题",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-102",
+      "type": "bugfix",
+      "title": "实现 Workflow 异常处理流程",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-103",
+      "type": "bugfix",
+      "title": "修复 Linux 退出确认对话框硬编码中文",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-104",
+      "type": "refactor",
+      "title": "优化 WatchdogRun 锁使用模式",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-105",
+      "type": "bugfix",
+      "title": "完善 MigrateState 字段迁移",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-106",
+      "type": "feature",
+      "title": "实现 CodeReviewWorkflow TODO 功能",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-107",
+      "type": "feature",
+      "title": "实现系统优雅关闭功能",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-108",
+      "type": "feature",
+      "title": "实现帮助系统搜索功能",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-109",
+      "type": "refactor",
+      "title": "优化 Config 锁使用粒度",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-110",
+      "type": "refactor",
+      "title": "添加 ExecuteWithTimeout 异常日志",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    }
+  ]
+}

@@ -1,187 +1,73 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-14T12:18:00+08:00",
+  "lastUpdated": "2026-05-15T19:08:00+08:00",
   "tasks": [
     {
-      "id": "task-111",
-      "type": "feature",
-      "target": "src/SiliconLife.McpServer/",
-      "title": "创建 MCP 浏览器能力服务器",
-      "description": "为 AI IDE（Cursor/Trae 等）创建浏览器能力开放服务器。由于无影云电脑上的 OpenClaw 有浏览器工具，但本地 AI IDE 没有，需要通过 HTTP API 暴露浏览器能力。实现：1）创建 SiliconLife.McpServer 项目，2）使用 Playwright WebView，3）提供 10 个浏览器操作 API，4）集成到.sln 解决方案，5）确保编译成功。",
+      "id": "task-113",
+      "type": "bugfix",
+      "target": "src/SiliconLife.App/Web/Controllers/AboutController.cs",
+      "title": "修复关于页面本地化问题：所有语言代码未注册",
+      "description": "全量巡检发现：切换语言后关于页面仍显示中文。根本原因：所有语言的本地化代码都没有注册到本地化系统中。需要：1）检查 AboutController 是否使用本地化键值，2）检查各语言文件（ZhCN、EnUS 等）是否有对应键值，3）确保所有语言文件都正确注册到 LocalizationManager，4）测试语言切换后关于页面是否正确显示对应语言。",
       "priority": "P1",
-      "status": "completed",
-      "createdAt": "2026-05-14T11:32:00+08:00",
-      "createdBy": "用户 2682",
-      "assignedTo": "openclaw-main",
-      "relatedCommit": "待 commit",
-      "completedAt": "2026-05-14T12:18:00+08:00",
+      "status": "pending",
+      "createdAt": "2026-05-15T19:08:00+08:00",
+      "createdBy": "openclaw-main",
+      "assignedTo": null,
+      "relatedCommit": null,
       "metadata": {
-        "discussion": "AI 协作协议讨论 → MCP Server 方案",
-        "files_created": [
-          "src/SiliconLife.McpServer/SiliconLife.McpServer.csproj",
-          "src/SiliconLife.McpServer/Program.cs",
-          "src/SiliconLife.McpServer/BrowserPool.cs",
-          "src/SiliconLife.McpServer/README.md"
+        "source": "全量巡检发现",
+        "verification": "2026-05-15 19:03 切换语言失败，关于页面仍显示中文",
+        "files_to_check": [
+          "src/SiliconLife.App/Web/Controllers/AboutController.cs",
+          "src/SiliconLife.Common/Localization/ZhCN.cs",
+          "src/SiliconLife.Common/Localization/EnUS.cs",
+          "src/SiliconLife.Common/Localization/LocalizationManager.cs"
         ],
-        "api_endpoints": [
-          "/api/browser/navigate",
-          "/api/browser/click",
-          "/api/browser/input",
-          "/api/browser/get_page_text",
-          "/api/browser/screenshot",
-          "/api/browser/evaluate",
-          "/api/browser/wait_for_element",
-          "/api/browser/status",
-          "/api/browser/close",
-          "/api/browser/run_test"
-        ]
+        "expected_behavior": "切换语言后，关于页面应显示对应语言的文本（标题、描述、作者、许可证等）",
+        "actual_behavior": "无论切换什么语言，关于页面始终显示中文"
       }
     },
     {
-      "id": "task-101",
-      "type": "bugfix",
-      "target": "src/SiliconLife.Fast/Storage/SpeedyPackAutoCompactor.cs",
-      "title": "修复 SpeedyPackAutoCompactor 异常静默问题",
-      "description": "OnTick 方法中 catch 块完全静默，没有日志记录。如果 CompactAsync 持续失败，磁盘空间可能耗尽而无人知晓。需要添加错误日志记录。",
-      "priority": "P0",
-      "status": "completed",
-      "createdAt": "2026-05-14T01:03:00+08:00",
-      "createdBy": "openclaw-main",
-      "assignedTo": "catpaw",
-      "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
-    },
-    {
-      "id": "task-102",
-      "type": "bugfix",
-      "target": "src/SiliconLife.Core/Workflow/WorkflowEngine.cs",
-      "title": "实现 Workflow 异常处理流程",
-      "description": "Workflow 执行失败时没有异常处理流程（第 269 行 TODO）。不会通知 Being、不会创建任务、不会记录错误，可能导致 Workflow 卡死在中间状态。",
-      "priority": "P0",
-      "status": "completed",
-      "createdAt": "2026-05-14T01:03:00+08:00",
-      "createdBy": "openclaw-main",
-      "assignedTo": "catpaw",
-      "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
-    },
-    {
-      "id": "task-103",
-      "type": "bugfix",
-      "target": "src/SiliconLife.Fast/Tray/TrayStatusWindow.cs",
-      "title": "修复 Linux 退出确认对话框硬编码中文",
-      "description": "第 378-382 行退出确认消息框使用硬编码中文字符串，违反项目国际化设计原则。需要在 TrayLocalizationBase 中添加 ExitConfirmation 属性。",
-      "priority": "P1",
-      "status": "completed",
-      "createdAt": "2026-05-14T01:03:00+08:00",
-      "createdBy": "openclaw-main",
-      "assignedTo": "catpaw",
-      "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
-    },
-    {
-      "id": "task-104",
-      "type": "refactor",
-      "target": "src/SiliconLife.Core/Runtime/MainLoop.cs",
-      "title": "优化 WatchdogRun 锁使用模式",
-      "description": "第 195-218 行 WatchdogRun 在锁内调用 RestartMainThread，而后者也获取同一把锁。虽然当前不会死锁，但这种模式危险，建议重构。",
-      "priority": "P1",
-      "status": "completed",
-      "createdAt": "2026-05-14T01:03:00+08:00",
-      "createdBy": "openclaw-main",
-      "assignedTo": "catpaw",
-      "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
-    },
-    {
-      "id": "task-105",
-      "type": "bugfix",
-      "target": "src/SiliconLife.Core/SiliconBeing/SiliconBeingManager.cs",
-      "title": "完善 MigrateState 字段迁移",
-      "description": "第 435-452 行 MigrateState 方法可能遗漏新添加的字段。如果 SiliconBeingBase 新增字段，动态替换 Being 时可能导致状态丢失。建议使用反射自动迁移或添加检查机制。",
-      "priority": "P1",
-      "status": "completed",
-      "createdAt": "2026-05-14T01:03:00+08:00",
-      "createdBy": "openclaw-main",
-      "assignedTo": "catpaw",
-      "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
-    },
-    {
-      "id": "task-106",
-      "type": "feature",
-      "target": "src/SiliconLife.Core/Workflow/CodeReviewWorkflow.cs",
-      "title": "实现 CodeReviewWorkflow TODO 功能",
-      "description": "第 66、153、229 行有三处 TODO 未实现：代码审查任务创建检查、拒绝状态添加、代码合并检查。这些是代码审查流程的关键检查点。",
+      "id": "task-112",
+      "type": "docs",
+      "target": "docs/zh-CN/getting-started.md",
+      "title": "更新 Fast 版本文档：明确支持 Linux",
+      "description": "当前文档（getting-started.md、architecture.md）中描述 SiliconLife.Fast 为'仅 Windows'，但实际代码已支持 Linux（Program.cs 第 196-213 行有 Linux 适配逻辑）。需要：1）更新 getting-started.md 中的平台支持说明，2）更新 architecture.md 中的 Fast 版本描述，3）添加 Linux 部署说明（无托盘图标，使用状态窗口），4）同步更新所有语言版本的文档。",
       "priority": "P2",
-      "status": "completed",
-      "createdAt": "2026-05-14T01:03:00+08:00",
+      "status": "pending",
+      "createdAt": "2026-05-15T02:52:00+08:00",
       "createdBy": "openclaw-main",
-      "assignedTo": "catpaw",
-      "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
-    },
-    {
-      "id": "task-107",
-      "type": "feature",
-      "target": "src/SiliconLife.App/Web/Controllers/SystemController.cs",
-      "title": "实现系统优雅关闭功能",
-      "description": "第 71 行 TODO：共享模块的优雅关闭未实现。系统关闭时可能没有正确释放共享资源，可能导致数据丢失或文件损坏。",
-      "priority": "P2",
-      "status": "completed",
-      "createdAt": "2026-05-14T01:03:00+08:00",
-      "createdBy": "openclaw-main",
-      "assignedTo": "catpaw",
-      "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
-    },
-    {
-      "id": "task-108",
-      "type": "feature",
-      "target": "src/SiliconLife.App/Web/Views/HelpView.cs",
-      "title": "实现帮助系统搜索功能",
-      "description": "第 382 行 TODO：帮助系统的搜索结果显示功能未实现，用户体验受损。",
-      "priority": "P2",
-      "status": "completed",
-      "createdAt": "2026-05-14T01:03:00+08:00",
-      "createdBy": "openclaw-main",
-      "assignedTo": "catpaw",
-      "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
-    },
-    {
-      "id": "task-109",
-      "type": "refactor",
-      "target": "src/SiliconLife.Core/Config/Config.cs",
-      "title": "优化 Config 锁使用粒度",
-      "description": "Config.cs 中 LoadConfig/SaveConfig 方法将整个 IO 操作放在锁内，可能阻塞其他线程的 Config 访问。建议只在读写_data 字段时加锁，IO 操作在锁外进行。",
-      "priority": "P3",
-      "status": "completed",
-      "createdAt": "2026-05-14T01:03:00+08:00",
-      "createdBy": "openclaw-main",
-      "assignedTo": "catpaw",
-      "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
-    },
-    {
-      "id": "task-110",
-      "type": "refactor",
-      "target": "src/SiliconLife.Core/Runtime/MainLoop.cs",
-      "title": "添加 ExecuteWithTimeout 异常日志",
-      "description": "第 305-312 行 ExecuteWithTimeout 方法中所有异常都被静默忽略，没有日志记录，调试困难。需要添加错误日志。",
-      "priority": "P3",
-      "status": "completed",
-      "createdAt": "2026-05-14T01:03:00+08:00",
-      "createdBy": "openclaw-main",
-      "assignedTo": "catpaw",
-      "relatedCommit": "fac9435",
-      "completedAt": "2026-05-14T01:30:00+08:00"
+      "assignedTo": null,
+      "relatedCommit": null,
+      "metadata": {
+        "source": "OpenClaw 巡检发现",
+        "verification": "2026-05-15 02:25 在云端 Linux 成功启动 SiliconLife.Fast",
+        "files_to_update": [
+          "docs/zh-CN/getting-started.md",
+          "docs/zh-CN/architecture.md",
+          "docs/en/getting-started.md",
+          "docs/en/architecture.md",
+          "docs/de-DE/getting-started.md",
+          "docs/es-ES/getting-started.md",
+          "docs/fr-FR/getting-started.md",
+          "docs/it-IT/getting-started.md",
+          "docs/ja-JP/getting-started.md",
+          "docs/ko-KR/getting-started.md",
+          "docs/cs-CZ/getting-started.md",
+          "docs/pl-PL/getting-started.md"
+        ],
+        "key_changes": [
+          "SiliconLife.Fast 平台支持从'仅 Windows'改为'Windows（完整功能）+ Linux（无托盘图标）'",
+          "添加 Linux 部署说明：--no-tray 参数或自动跳过托盘初始化",
+          "更新性能对比数据（如已测试）"
+        ]
+      }
     }
   ],
   "taskIndex": {
-    "pending": [],
+    "pending": ["task-113", "task-112"],
     "inProgress": [],
-    "completed": ["task-111", "task-101", "task-102", "task-103", "task-104", "task-105", "task-106", "task-107", "task-108", "task-109", "task-110"],
+    "completed": [],
     "cancelled": []
   },
   "metadata": {
@@ -191,10 +77,16 @@
     "replacedTasks": ["task-001", "task-002", "task-003", "task-004", "task-005", "task-006"],
     "reason": "代码审查发现新 bug，覆盖原有已完成任务列表",
     "lastAddedTask": {
-      "id": "task-111",
-      "addedAt": "2026-05-14T12:18:00+08:00",
+      "id": "task-113",
+      "addedAt": "2026-05-15T19:08:00+08:00",
       "addedBy": "openclaw-main",
-      "type": "feature"
+      "type": "bugfix"
+    },
+    "archivedTasks": {
+      "archivedAt": "2026-05-15T02:52:00+08:00",
+      "count": 11,
+      "taskIds": ["task-111", "task-101", "task-102", "task-103", "task-104", "task-105", "task-106", "task-107", "task-108", "task-109", "task-110"],
+      "note": "所有已完成任务已清理，归档到.ai-collab/archive/tasks-archived-20260515.json"
     }
   }
 }
