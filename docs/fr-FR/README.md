@@ -75,12 +75,13 @@ Ce projet propose deux versions d'implémentation pour répondre à différents 
 
 ### SiliconLife.Fast (Version haute performance)
 - **Positionnement** : Version principale de production
-- **Mode d'exécution** : Application Windows Forms (prend en charge la barre d'état système)
+- **Mode d'exécution** : Application de bureau (Windows/macOS barre d'état système / Linux fenêtre d'état)
 - **Méthode de stockage** : Stockage en mémoire SpeedyPack + persistance par lot asynchrone (format de fichier .spk)
 - **Scénarios applicables** : Concurrence élevée, faible latence, grands volumes de données
+- **Prise en charge des plateformes** : Windows/macOS (fonctionnalités complètes, y compris barre d'état système), Linux (fenêtre d'état, pas d'icône dans la barre d'état)
 - **Caractéristiques** :
   - Optimisation de performance extrême
-  - Exécution en arrière-plan dans la barre d'état, surveillance en temps réel via la fenêtre d'état de la barre d'état
+  - Windows/macOS exécution en arrière-plan dans la barre d'état avec surveillance en temps réel ; Linux fenêtre d'état affichée directement
   - Moteur SpeedyPack + compression automatique garantissant la sécurité des données
   - Architecture Component UI, 30+ composants déclaratifs
   - 7 thèmes d'apparence, prend en charge la détection et la commutation automatiques
@@ -93,10 +94,10 @@ Ce projet propose deux versions d'implémentation pour répondre à différents 
 
 | Caractéristique | SiliconLife.Default | SiliconLife.Fast |
 |---------|---------------------|------------------|
-| **Mode d'exécution** | Application console | Application Forms (barre d'état) |
-| **Interface utilisateur** | Interface Web (accès navigateur) | Icône de barre d'état + Fenêtre de barre d'état + Interface Web |
-| **Barre d'état système** | ❌ Non | ✅ Prend en charge la minimisation dans la barre d'état |
-| **Exécution en arrière-plan** | ❌ Se termine à la fermeture de la console | ✅ Exécution continue en arrière-plan dans la barre d'état |
+| **Mode d'exécution** | Application console | Application de bureau (Windows/macOS barre d'état système / Linux fenêtre d'état) |
+| **Interface utilisateur** | Interface Web (accès navigateur) | Windows/macOS : Icône de barre d'état + Fenêtre de barre d'état + Interface Web ; Linux : Fenêtre d'état + Interface Web |
+| **Barre d'état système** | ❌ Non | ✅ Windows/macOS prend en charge la minimisation dans la barre d'état ; Linux pas d'icône dans la barre d'état |
+| **Exécution en arrière-plan** | ❌ Se termine à la fermeture de la console | ✅ Windows/macOS exécution continue en arrière-plan dans la barre d'état ; Linux exécution dans la fenêtre d'état |
 | **Méthode de stockage** | Stockage JSON en système de fichiers | Stockage en mémoire SpeedyPack + persistance asynchrone |
 | **Moteur de stockage** | E/S système de fichiers | SiliconLife.Speedy (format .spk) |
 | **Latence de lecture** | ~10ms (E/S disque) | ~0.01ms (opération mémoire) |
@@ -110,16 +111,16 @@ Ce projet propose deux versions d'implémentation pour répondre à différents 
 
 | Composant | SiliconLife.Default | SiliconLife.Fast |
 |------|---------------------|------------------|
-| Runtime | .NET 9 | .NET 9 Windows |
+| Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Langage de programmation | C# | C# |
-| Type d'application | Application console | Application Windows Forms |
+| Type d'application | Application console | Application de bureau (Windows/macOS barre d'état système / Linux fenêtre d'état) |
 | Intégration IA | Ollama (local), Alibaba Cloud DashScope (cloud) | Ollama (local), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud) |
 | Stockage de données | Système de fichiers (JSON + répertoire d'index temporel) | SpeedyPack (format .spk, mappage en mémoire + persistance asynchrone) |
 | Serveur Web | HttpListener (intégré .NET) | HttpListener (intégré .NET) |
 | Compilation dynamique | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
 | Automatisation de navigateur | Playwright (WebView) | Playwright (WebView) |
 | Système de plugins | ✅ Pris en charge (IPlugin + PluginLoader) | ✅ Pris en charge (IPlugin + PluginLoader) |
-| Barre d'état système | ❌ Non pris en charge | ✅ Pris en charge (NotifyIcon) |
+| Barre d'état système | ❌ Non pris en charge | ✅ Windows/macOS pris en charge (NotifyIcon) ; Linux pas d'icône dans la barre d'état |
 | Licence | Apache-2.0 | Apache-2.0 |
 
 ## 📁 Structure du projet
@@ -276,13 +277,19 @@ L'application démarre le serveur Web et ouvre automatiquement l'interface Web d
 - ✅ Petit volume de données, utilisation à court terme
 - ✅ Phase de développement et de débogage
 
-#### Méthode 2 : Exécuter la version Fast (application Windows Forms)
+#### Méthode 2 : Exécuter la version Fast (Application de bureau)
 
 ```bash
 dotnet run --project src/SiliconLife.Fast
 ```
 
-L'application démarre en mode Forms, se minimise dans la barre d'état système et continue de fonctionner en arrière-plan.
+**Windows/macOS** : L'application démarre en mode fenêtre, se minimise dans la barre d'état système et continue de fonctionner en arrière-plan.
+
+**Linux** : L'application affiche une fenêtre d'état (pas d'icône dans la barre d'état système) et ouvre automatiquement le navigateur pour accéder à l'interface Web. Vous pouvez utiliser le paramètre `--no-tray` pour ignorer l'ouverture automatique du navigateur :
+
+```bash
+dotnet run --project src/SiliconLife.Fast -- --no-tray
+```
 
 **Scénarios applicables** :
 - ✅ Scénarios hautement parallèles (> 5 utilisateurs)
@@ -299,11 +306,17 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 # Windows - Version Fast
 dotnet publish src/SiliconLife.Fast -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-# Linux - Version Default uniquement
+# Linux - Version Default
 dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 
-# macOS - Version Default uniquement
+# Linux - Version Fast
+dotnet publish src/SiliconLife.Fast -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Version Default
 dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Version Fast
+dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
 ## 📋 Feuille de route de développement

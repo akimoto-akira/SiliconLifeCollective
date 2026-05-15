@@ -28,6 +28,7 @@ public class SelectComponent : ComponentBase
     private bool _searchable = false;
     private string _placeholder = "";
     private string _noResultText = "No results found";
+    private string _hint = "";
 
     public new SelectComponent Id(string id)
     {
@@ -116,6 +117,12 @@ public class SelectComponent : ComponentBase
     public SelectComponent NoResultText(string text)
     {
         _noResultText = text;
+        return this;
+    }
+
+    public SelectComponent Hint(string hint)
+    {
+        _hint = hint;
         return this;
     }
 
@@ -250,6 +257,10 @@ public class SelectComponent : ComponentBase
             dropdown.Add(optionDiv);
         }
         dropdown.Add(H.Div(H.Escape(_noResultText)).Class("sl-select-search-no-result").Attr("style", "display:none"));
+        if (!string.IsNullOrEmpty(_hint))
+        {
+            dropdown.Add(H.Div(H.Escape(_hint)).Class("sl-select-search-hint"));
+        }
         wrapper.Add(dropdown);
 
         var css = GetSearchableCss().Build();
@@ -334,6 +345,16 @@ public class SelectComponent : ComponentBase
                         })
                     }))
                     .Add(() => WebJs.Id(() => "d").Call(() => "appendChild", () => WebJs.Id(() => "nr")).Stmt())
+                    .Add(() => WebJs.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (WebJs.Id(() => "cfg").Prop(() => "hint"), new List<JsSyntax>
+                        {
+                            WebJs.Let(() => "ht", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "div"))),
+                            WebJs.Assign(() => WebJs.Id(() => "ht").Prop(() => "className"), () => WebJs.Str(() => "sl-select-search-hint")).Stmt(),
+                            WebJs.Assign(() => WebJs.Id(() => "ht").Prop(() => "textContent"), () => WebJs.Id(() => "cfg").Prop(() => "hint")).Stmt(),
+                            WebJs.Id(() => "d").Call(() => "appendChild", () => WebJs.Id(() => "ht")).Stmt()
+                        })
+                    }))
                     .Add(() => WebJs.Assign(() => WebJs.Id(() => "s").Prop(() => "value"), () => WebJs.Id(() => "selText")).Stmt())
                     .Add(() => WebJs.Let(() => "arrow", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "span"))))
                     .Add(() => WebJs.Assign(() => WebJs.Id(() => "arrow").Prop(() => "className"), () => WebJs.Str(() => "sl-select-search-arrow")).Stmt())
@@ -605,6 +626,14 @@ public class SelectComponent : ComponentBase
                 .Property("color", "var(--text-secondary,#999)")
                 .Property("font-size", "14px")
                 .Property("text-align", "center")
+            .EndSelector()
+            .Selector(".sl-select-search-hint")
+                .Property("padding", "6px 12px")
+                .Property("color", "var(--text-secondary,#999)")
+                .Property("font-size", "12px")
+                .Property("text-align", "center")
+                .Property("border-top", "1px solid var(--border-color,rgba(0,0,0,.1))")
+                .Property("background", "var(--bg-secondary,rgba(0,0,0,.02))")
             .EndSelector()
             .Selector(".sl-select-search-dropdown::-webkit-scrollbar")
                 .Property("width", "6px")

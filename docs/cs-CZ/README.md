@@ -75,12 +75,13 @@ Tento projekt poskytuje dvě implementační verze pro splnění různých poža
 
 ### SiliconLife.Fast (Vysoce výkonná verze)
 - **Pozicování**: Hlavní produkční verze
-- **Režim spuštění**: Windows Forms aplikace (podporuje systémový tray)
+- **Režim spuštění**: Desktopová aplikace (Windows/macOS systémový tray / Linux stavové okno)
 - **Metoda úložiště**: SpeedyPack paměťové úložiště + asynchronní dávková perzistence (.spk formát souboru)
 - **Použitelné scénáře**: Vysoká souběžnost, nízká latence, scénáře s velkým objemem dat
+- **Podpora platforem**: Windows/macOS (plné funkce, včetně systémového traye), Linux (stavové okno, žádná ikona v trayi)
 - **Charakteristiky**:
   - Extrémní optimalizace výkonu
-  - Běh na pozadí v tray s monitorováním v reálném čase prostřednictvím stavového okna tray
+  - Windows/macOS běh na pozadí v trayi s monitorováním v reálném čase; Linux stavové okno zobrazeno přímo
   - SpeedyPack engine + automatická komprese zajišťují bezpečnost dat
   - Architektura Component UI, 30+ deklarativních komponent
   - 7 témat skinů, podpora automatické detekce a přepínání
@@ -93,10 +94,10 @@ Tento projekt poskytuje dvě implementační verze pro splnění různých poža
 
 | Funkce | SiliconLife.Default | SiliconLife.Fast |
 |--------|---------------------|------------------|
-| **Režim spuštění** | Konzolová aplikace | Forms aplikace (systémový tray) |
-| **Uživatelské rozhraní** | Web UI (přístup přes prohlížeč) | Ikona tray + okno tray + Web UI |
-| **Systémový tray** | ❌ Žádný | ✅ Podporuje minimalizaci do tray |
-| **Běh na pozadí** | ❌ Ukončí se při zavření konzole | ✅ Nepřetržitý běh na pozadí v tray |
+| **Režim spuštění** | Konzolová aplikace | Desktopová aplikace (Windows/macOS systémový tray / Linux stavové okno) |
+| **Uživatelské rozhraní** | Web UI (přístup přes prohlížeč) | Windows/macOS: Ikona tray + okno tray + Web UI; Linux: Stavové okno + Web UI |
+| **Systémový tray** | ❌ Žádný | ✅ Windows/macOS podporuje minimalizaci do traye; Linux žádná ikona v trayi |
+| **Běh na pozadí** | ❌ Ukončí se při zavření konzole | ✅ Windows/macOS nepřetržitý běh na pozadí v trayi; Linux běh ve stavovém okně |
 | **Metoda úložiště** | Úložiště JSON na souborovém systému | SpeedyPack paměťové úložiště + asynchronní perzistence |
 | **Úložný engine** | I/O souborového systému | SiliconLife.Speedy (.spk formát) |
 | **Latence čtení** | ~10ms (I/O disku) | ~0.01ms (operace v paměti) |
@@ -110,16 +111,16 @@ Tento projekt poskytuje dvě implementační verze pro splnění různých poža
 
 | Komponenta | SiliconLife.Default | SiliconLife.Fast |
 |------|---------------------|------------------|
-| Runtime | .NET 9 | .NET 9 Windows |
+| Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Programovací jazyk | C# | C# |
-| Typ aplikace | Konzolová aplikace | Windows Forms aplikace |
+| Typ aplikace | Konzolová aplikace | Desktopová aplikace (Windows/macOS systémový tray / Linux stavové okno) |
 | AI integrace | Ollama (lokální), Alibaba Cloud Bailian (cloud) | Ollama (lokální), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud) |
 | Úložiště dat | Souborový systém (JSON + časově indexované adresáře) | SpeedyPack (.spk formát, mapování paměti + asynchronní perzistence) |
 | Webový server | HttpListener (vestavěný v .NET) | HttpListener (vestavěný v .NET) |
 | Dynamická kompilace | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
 | Automatizace prohlížeče | Playwright (WebView) | Playwright (WebView) |
 | Plugin systém | ✅ Podporováno (IPlugin + PluginLoader) | ✅ Podporováno (IPlugin + PluginLoader) |
-| Systémový tray | ❌ Nepodporováno | ✅ Podporováno (NotifyIcon) |
+| Systémový tray | ❌ Nepodporováno | ✅ Windows/macOS podporováno (NotifyIcon); Linux žádná ikona v trayi |
 | Licence | Apache-2.0 | Apache-2.0 |
 
 ## 📁 Struktura projektu
@@ -290,13 +291,19 @@ Aplikace spustí webový server a automaticky otevře Web UI v prohlížeči.
 - ✅ Malý objem dat, krátkodobé použití
 - ✅ Fáze vývojového ladění
 
-#### Metoda 2: Spuštění Fast verze (Windows Forms aplikace)
+#### Metoda 2: Spuštění Fast verze (Desktopová aplikace)
 
 ```bash
 dotnet run --project src/SiliconLife.Fast
 ```
 
-Aplikace se spustí v režimu okna, minimalizuje se do systémového tray a běží nepřetržitě na pozadí.
+**Windows/macOS**: Aplikace se spustí v režimu okna, minimalizuje se do systémového traye a běží nepřetržitě na pozadí.
+
+**Linux**: Aplikace zobrazí stavové okno (žádná ikona v systémovém trayi) a automaticky otevře prohlížeč pro přístup k Web UI. Parametr `--no-tray` lze použít pro přeskočení automatického otevření prohlížeče:
+
+```bash
+dotnet run --project src/SiliconLife.Fast -- --no-tray
+```
 
 **Použitelné scénáře**:
 - ✅ Scénáře s vysokou souběžností (> 5 uživatelů)
@@ -313,11 +320,17 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 # Windows - Fast verze
 dotnet publish src/SiliconLife.Fast -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-# Linux - pouze výchozí verze
+# Linux - výchozí verze
 dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 
-# macOS - pouze výchozí verze
+# Linux - Fast verze
+dotnet publish src/SiliconLife.Fast -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - výchozí verze
 dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Fast verze
+dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
 ## 📋 Roadmapa vývoje

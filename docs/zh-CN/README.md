@@ -75,12 +75,13 @@
 
 ### SiliconLife.Fast（高性能版本）
 - **定位**：主推生产版本
-- **运行模式**：Windows 窗体应用程序（支持系统托盘）
+- **运行模式**：桌面应用程序（Windows/macOS 系统托盘 / Linux 状态窗口）
 - **存储方式**：SpeedyPack 内存存储 + 异步批量持久化（.spk 文件格式）
 - **适用场景**：高并发、低延迟、大数据量场景
+- **平台支持**：Windows/macOS（完整功能，含系统托盘）、Linux（状态窗口，无托盘图标）
 - **特点**：
   - 极致性能优化
-  - 托盘后台运行，支持托盘状态窗口实时监控
+  - Windows/macOS 托盘后台运行，支持托盘状态窗口实时监控；Linux 状态窗口直接显示
   - SpeedyPack 引擎 + 自动压缩保证数据安全
   - Component UI 架构，30+ 声明式组件
   - 7 种皮肤主题，支持自动发现和切换
@@ -93,10 +94,10 @@
 
 | 特性 | SiliconLife.Default | SiliconLife.Fast |
 |------|---------------------|------------------|
-| **运行模式** | 控制台程序 | 窗体程序（系统托盘） |
-| **用户界面** | Web UI（浏览器访问） | 托盘图标 + 托盘窗口 + Web UI |
-| **系统托盘** | ❌ 无 | ✅ 支持最小化到托盘 |
-| **后台运行** | ❌ 控制台关闭即退出 | ✅ 托盘后台持续运行 |
+| **运行模式** | 控制台程序 | 桌面程序（Windows/macOS 系统托盘 / Linux 状态窗口） |
+| **用户界面** | Web UI（浏览器访问） | Windows/macOS：托盘图标 + 托盘窗口 + Web UI；Linux：状态窗口 + Web UI |
+| **系统托盘** | ❌ 无 | ✅ Windows/macOS 支持最小化到托盘；Linux 无托盘图标 |
+| **后台运行** | ❌ 控制台关闭即退出 | ✅ Windows/macOS 托盘后台持续运行；Linux 状态窗口运行 |
 | **存储方式** | 文件系统 JSON 存储 | SpeedyPack 内存存储 + 异步持久化 |
 | **存储引擎** | 文件系统 I/O | SiliconLife.Speedy（.spk 格式） |
 | **读取延迟** | ~10ms（磁盘 I/O） | ~0.01ms（内存操作） |
@@ -110,16 +111,16 @@
 
 | 组件 | SiliconLife.Default | SiliconLife.Fast |
 |------|---------------------|------------------|
-| 运行时 | .NET 9 | .NET 9 Windows |
+| 运行时 | .NET 9 | .NET 9（Windows/macOS/Linux） |
 | 编程语言 | C# | C# |
-| 应用类型 | 控制台应用程序 | Windows 窗体应用程序 |
+| 应用类型 | 控制台应用程序 | 桌面应用程序（Windows/macOS 系统托盘 / Linux 状态窗口） |
 | AI 集成 | Ollama（本地）、阿里云百炼（云端）、火山引擎Ark（云端） | Ollama（本地）、阿里云百炼（云端）、火山引擎Ark（云端） |
 | 数据存储 | 文件系统（JSON + 时间索引目录） | SpeedyPack（.spk 格式，内存映射 + 异步持久化） |
 | Web 服务器 | HttpListener（.NET 内置） | HttpListener（.NET 内置） |
 | 动态编译 | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
 | 浏览器自动化 | Playwright（WebView） | Playwright（WebView） |
 | 插件系统 | ✅ 支持（IPlugin + PluginLoader） | ✅ 支持（IPlugin + PluginLoader） |
-| 系统托盘 | ❌ 不支持 | ✅ 支持（NotifyIcon） |
+| 系统托盘 | ❌ 不支持 | ✅ Windows/macOS 支持（NotifyIcon）；Linux 无托盘图标 |
 | 许可证 | Apache-2.0 | Apache-2.0 |
 
 ## 📁 项目结构
@@ -281,13 +282,19 @@ dotnet run --project src/SiliconLife.Default
 - ✅ 数据量小，短期使用
 - ✅ 开发调试阶段
 
-#### 方式 2：运行 Fast 版本（Windows 窗体应用程序）
+#### 方式 2：运行 Fast 版本（桌面应用程序）
 
 ```bash
 dotnet run --project src/SiliconLife.Fast
 ```
 
-应用程序将以窗体模式启动，最小化到系统托盘，后台持续运行。
+**Windows/macOS**：应用程序将以窗体模式启动，最小化到系统托盘，后台持续运行。
+
+**Linux**：应用程序将显示状态窗口（无系统托盘图标），并自动打开浏览器访问 Web UI。也可使用 `--no-tray` 参数跳过浏览器自动打开：
+
+```bash
+dotnet run --project src/SiliconLife.Fast -- --no-tray
+```
 
 **适用场景**：
 - ✅ 高并发场景（> 5 用户）
@@ -304,11 +311,17 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 # Windows - Fast 版本
 dotnet publish src/SiliconLife.Fast -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-# Linux - 仅 Default 版本
+# Linux - Default 版本
 dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 
-# macOS - 仅 Default 版本
+# Linux - Fast 版本
+dotnet publish src/SiliconLife.Fast -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Default 版本
 dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Fast 版本
+dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
 ## 📋 开发路线图

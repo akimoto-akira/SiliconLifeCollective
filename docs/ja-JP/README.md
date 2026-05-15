@@ -110,16 +110,16 @@
 
 | コンポーネント | SiliconLife.Default | SiliconLife.Fast |
 |------|---------------------|------------------|
-| ランタイム | .NET 9 | .NET 9 Windows |
+| ランタイム | .NET 9 | .NET 9（Windows/macOS/Linux） |
 | プログラミング言語 | C# | C# |
-| アプリケーションタイプ | コンソールアプリケーション | Windows フォームアプリケーション |
+| アプリケーションタイプ | コンソールアプリケーション | デスクトップアプリケーション（Windows/macOS システムトレイ / Linux ステータスウィンドウ） |
 | AI 統合 | Ollama（ローカル）、Alibaba Cloud DashScope（クラウド） | Ollama（ローカル）、Alibaba Cloud DashScope（クラウド）、Volcengine Ark（クラウド） |
 | データストレージ | ファイルシステム（JSON + 時間インデックスディレクトリ） | SpeedyPack（.spk 形式、メモリマッピング + 非同期永続化） |
 | Web サーバー | HttpListener（.NET 組み込み） | HttpListener（.NET 組み込み） |
 | 動的コンパイル | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
 | ブラウザ自動化 | Playwright（WebView） | Playwright（WebView） |
 | プラグインシステム | ✅ サポート（IPlugin + PluginLoader） | ✅ サポート（IPlugin + PluginLoader） |
-| システムトレイ | ❌ サポートなし | ✅ サポート（NotifyIcon） |
+| システムトレイ | ❌ サポートなし | ✅ Windows/macOS サポート（NotifyIcon）；Linux トレイアイコンなし |
 | ライセンス | Apache-2.0 | Apache-2.0 |
 
 ## 📁 プロジェクト構造
@@ -299,11 +299,17 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 # Windows - Fast バージョン
 dotnet publish src/SiliconLife.Fast -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-# Linux - Default バージョンのみ
+# Linux - Default バージョン
 dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 
-# macOS - Default バージョンのみ
+# Linux - Fast バージョン
+dotnet publish src/SiliconLife.Fast -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Default バージョン
 dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Fast バージョン
+dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
 ## 📋 開発ロードマップ

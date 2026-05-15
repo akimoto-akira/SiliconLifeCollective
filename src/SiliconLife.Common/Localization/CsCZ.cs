@@ -906,6 +906,7 @@ public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
     public override string ConfigDictAddButton => "Přidat";
     public override string ConfigDictDeleteButton => "Smazat";
     public override string ConfigDictEmptyMessage => "Žádné položky";
+    public override string SelectSearchHint => "Vymažte pole pro zobrazení všech možností";
     public override string ConfigNullValue => "Null";
     public override string ConfigErrorUnsupportedType => "Nepodporovaný typ";
     public override string ConfigErrorConvertEnum => "Nelze převést na enum";

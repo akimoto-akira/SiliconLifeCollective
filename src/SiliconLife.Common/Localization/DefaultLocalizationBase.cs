@@ -1911,6 +1911,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// </summary>
     public abstract string ConfigDictEmptyMessage { get; }
 
+    /// <summary>
+    /// Gets the hint text for searchable select component
+    /// </summary>
+    public abstract string SelectSearchHint { get; }
+
     // ===== Logs Page Localization =====
 
     /// <summary>

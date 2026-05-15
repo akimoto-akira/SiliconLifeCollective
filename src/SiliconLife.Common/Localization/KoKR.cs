@@ -740,6 +740,7 @@ public class KoKR : DefaultLocalizationBase
     public override string ConfigDictAddButton => "추가";
     public override string ConfigDictDeleteButton => "삭제";
     public override string ConfigDictEmptyMessage => "사전이 비어 있습니다";
+    public override string SelectSearchHint => "입력란을 비우면 모든 옵션이 표시됩니다";
 
     public override string LogsPageHeader => "로그 조회";
     public override string LogsTotalCount => "총 {0}건의 로그";

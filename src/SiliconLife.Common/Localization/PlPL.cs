@@ -926,6 +926,7 @@ public class PlPL : DefaultLocalizationBase
     public override string ConfigDictAddButton => "Dodaj";
     public override string ConfigDictDeleteButton => "Usuń";
     public override string ConfigDictEmptyMessage => "Słownik jest pusty";
+    public override string SelectSearchHint => "Wyczyść pole, aby wyświetlić wszystkie opcje";
 
     // ===== Tasks Page Extended =====
     public override string TasksStatusCancelled => "Anulowane";

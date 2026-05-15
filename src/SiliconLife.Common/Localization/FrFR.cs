@@ -709,6 +709,7 @@ public class FrFR : DefaultLocalizationBase
     public override string ConfigDictAddButton => "Ajouter";
     public override string ConfigDictDeleteButton => "Supprimer";
     public override string ConfigDictEmptyMessage => "Le dictionnaire est vide";
+    public override string SelectSearchHint => "Effacez la saisie pour afficher toutes les options";
 
     public override string LogsPageHeader => "Consultation des journaux";
     public override string LogsTotalCount => "Total {0} entrées de journal";

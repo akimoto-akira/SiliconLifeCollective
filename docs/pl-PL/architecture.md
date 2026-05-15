@@ -17,15 +17,17 @@ Ten projekt oferuje dwie wersje implementacji, współdzielące tę samą archit
 
 ### SiliconLife.Fast (wersja wysokowydajna)
 - **Przeznaczenie**: główna wersja produkcyjna
-- **Tryb działania**: aplikacja okienkowa Windows (obsługa zasobnika systemowego)
+- **Tryb działania**: aplikacja desktopowa (Windows zasobnik systemowy / Linux okno stanu)
 - **Sposób przechowywania**: pamięć SpeedyPack + asynchroniczna trwałość wsadowa (format pliku .spk)
 - **Scenariusze zastosowania**: wysoka współbieżność, niskie opóźnienie, duże ilości danych
+- **Obsługa platform**: Windows/macOS (pełna funkcjonalność, z zasobnikiem systemowym), Linux (okno stanu, brak ikony w zasobniku)
 - **Cechy**:
-  - Działanie w tle w zasobniku systemowym, okno stanu zasobnika z monitorowaniem w czasie rzeczywistym
+  - Windows/macOS działanie w tle w zasobniku systemowym, okno stanu zasobnika z monitorowaniem w czasie rzeczywistym; Linux okno stanu wyświetlane bezpośrednio
   - Silnik SpeedyPack + automatyczna kompresja gwarantująca bezpieczeństwo danych
   - Architektura Component UI, 30+ deklaratywnych komponentów
   - 7 motywów skórek, obsługa automatycznego wykrywania i przełączania
   - Narzędzie gorącego przeładowania obsługujące aktualizacje online i restart
+  - Linux automatycznie otwiera przeglądarkę dla dostępu do Web UI, obsługuje parametr `--no-tray`
 - **Poprawa wydajności**: opóźnienie odczytu przechowywania zmniejszone 1000-krotnie, opóźnienie zapisu zmniejszone 15000-krotnie
 - **Opis roli**: głęboko zoptymalizowana implementacja produkcyjna, z funkcjami takimi jak działanie w tle w zasobniku systemowym, silnik SpeedyPack + automatyczna kompresja, preferowana do długotrwałego działania i rzeczywistych środowisk produkcyjnych
 

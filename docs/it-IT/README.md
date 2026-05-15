@@ -76,12 +76,13 @@ Questo progetto offre due versioni di implementazione per soddisfare diverse esi
 
 ### SiliconLife.Fast (Versione ad alte prestazioni)
 - **Posizionamento**: Versione principale di produzione
-- **Modalità di esecuzione**: Applicazione Windows Forms (supporta la barra di stato di sistema)
+- **Modalità di esecuzione**: Applicazione desktop (Windows/macOS tray di sistema / Linux finestra di stato)
 - **Metodo di archiviazione**: Archiviazione in memoria SpeedyPack + persistenza batch asincrona (formato file .spk)
 - **Scenari applicabili**: Alta concorrenza, bassa latenza, grandi volumi di dati
+- **Supporto piattaforma**: Windows/macOS (funzionalità complete, inclusa tray di sistema), Linux (finestra di stato, nessuna icona tray)
 - **Caratteristiche**:
   - Ottimizzazione delle prestazioni estrema
-  - Esecuzione in background nella barra di stato, monitoraggio in tempo reale tramite la finestra di stato della barra di stato
+  - Windows/macOS esecuzione in background nella tray di sistema con monitoraggio in tempo reale; Linux finestra di stato visualizzata direttamente
   - Motore SpeedyPack + compressione automatica che garantisce la sicurezza dei dati
   - Architettura Component UI, 30+ componenti dichiarativi
   - 7 temi d'aspetto, supporta rilevamento e commutazione automatici
@@ -111,9 +112,9 @@ Questo progetto offre due versioni di implementazione per soddisfare diverse esi
 
 | Componente | SiliconLife.Default | SiliconLife.Fast |
 |------|---------------------|------------------|
-| Runtime | .NET 9 | .NET 9 Windows |
+| Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Linguaggio di programmazione | C# | C# |
-| Tipo di applicazione | Applicazione console | Applicazione Windows Forms |
+| Tipo di applicazione | Applicazione console | Applicazione desktop (Windows/macOS tray di sistema / Linux finestra di stato) |
 | Integrazione IA | Ollama (locale), Alibaba Cloud DashScope (cloud) | Ollama (locale), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud) |
 | Archiviazione dati | File system (JSON + directory indice temporale) | SpeedyPack (formato .spk, mappatura in memoria + persistenza asincrona) |
 | Server Web | HttpListener (.NET integrato) | HttpListener (.NET integrato) |
@@ -277,13 +278,19 @@ L'applicazione avvia il server Web e apre automaticamente l'interfaccia Web nel 
 - ✅ Piccolo volume dati, utilizzo a breve termine
 - ✅ Fase sviluppo e debug
 
-#### Metodo 2: Eseguire la versione Fast (applicazione Windows Forms)
+#### Metodo 2: Eseguire la versione Fast (Applicazione desktop)
 
 ```bash
 dotnet run --project src/SiliconLife.Fast
 ```
 
-L'applicazione si avvia in modalità Forms, si minimizza nella barra di stato di sistema e continua a funzionare in background.
+**Windows/macOS**: L'applicazione si avvierà in modalità finestra, si minimizzerà nella tray di sistema e continuerà a funzionare in background.
+
+**Linux**: L'applicazione mostrerà una finestra di stato (nessuna icona nella tray di sistema) e aprirà automaticamente il browser per accedere alla Web UI. È possibile utilizzare il parametro `--no-tray` per saltare l'apertura automatica del browser:
+
+```bash
+dotnet run --project src/SiliconLife.Fast -- --no-tray
+```
 
 **Scenari applicabili**:
 - ✅ Scenari altamente paralleli (> 5 utenti)
@@ -300,11 +307,17 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 # Windows - Versione Fast
 dotnet publish src/SiliconLife.Fast -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-# Linux - Solo versione Default
+# Linux - Versione Default
 dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 
-# macOS - Solo versione Default
+# Linux - Versione Fast
+dotnet publish src/SiliconLife.Fast -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Versione Default
 dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Versione Fast
+dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
 ## 📋 Roadmap sviluppo

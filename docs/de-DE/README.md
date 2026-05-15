@@ -93,10 +93,10 @@ Dieses Projekt bietet zwei Implementierungsversionen, um unterschiedliche Szenar
 
 | Merkmal | SiliconLife.Default | SiliconLife.Fast |
 |---------|---------------------|------------------|
-| **Ausführungsmodus** | Konsolenanwendung | Forms-Anwendung (Systemtray) |
-| **Benutzeroberfläche** | Web UI (Browser-Zugriff) | Tray-Symbol + Tray-Fenster + Web UI |
-| **Systemtray** | ❌ Keine | ✅ Unterstützt Minimieren ins Tray |
-| **Hintergrundausführung** | ❌ Beendet beim Schließen der Konsole | ✅ Kontinuierliche Tray-Hintergrundausführung |
+| **Ausführungsmodus** | Konsolenanwendung | Desktop-Anwendung (Windows/macOS System Tray / Linux Statusfenster) |
+| **Benutzeroberfläche** | Web UI (Browser-Zugriff) | Windows/macOS: Tray-Icon + Tray-Fenster + Web UI; Linux: Statusfenster + Web UI |
+| **Systemtray** | ❌ Keine | ✅ Windows/macOS unterstützt Minimieren ins Tray; Linux kein Tray-Icon |
+| **Hintergrundausführung** | ❌ Beendet beim Schließen der Konsole | ✅ Windows/macOS kontinuierliche Tray-Hintergrundausführung; Linux Statusfenster-Betrieb |
 | **Speichermethode** | Dateisystem-JSON-Speicher | SpeedyPack-In-Memory-Speicher + asynchrone Persistenz |
 | **Speicher-Engine** | Dateisystem-I/O | SiliconLife.Speedy (.spk-Format) |
 | **Leselatenz** | ~10ms (Festplatten-I/O) | ~0.01ms (Speicheroperation) |
@@ -305,11 +305,17 @@ dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p
 # Windows - Fast-Version
 dotnet publish src/SiliconLife.Fast -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-# Linux - Nur Default-Version
+# Linux - Default-Version
 dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 
-# macOS - Nur Default-Version
+# Linux - Fast-Version
+dotnet publish src/SiliconLife.Fast -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Default-Version
 dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Fast-Version
+dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
 ## 📋 Entwicklungs-Roadmap

@@ -68,12 +68,13 @@
 
 ### SiliconLife.Fast（高效能版本）
 - **定位**：主推生產版本
-- **運行模式**：Windows 視窗應用程式（支援系統匣）
+- **運行模式**：桌面應用程式（Windows/macOS 系統匣 / Linux 狀態視窗）
 - **儲存方式**：SpeedyPack 記憶體儲存 + 異步批次持久化
 - **適用場景**：高並發、低延遲、大資料量場景
+- **平台支援**：Windows/macOS（完整功能，含系統匣）、Linux（狀態視窗，無匣圖示）
 - **特點**：
   - 極致效能最佳化
-  - 託盤後臺執行，支援託盤狀態視窗實時監控
+  - Windows/macOS 託盤後臺執行，支援託盤狀態視窗實時監控；Linux 狀態視窗直接顯示
   - SpeedyPack 引擎 + 自動壓縮保證資料安全
   - Component UI 架構，30+ 宣告式元件
   - 7 種皮膚主題，支援自動發現和切換
@@ -86,10 +87,10 @@
 
 | 特性 | SiliconLife.Default | SiliconLife.Fast |
 |------|---------------------|------------------|
-| **運行模式** | 控制台程式 | 視窗程式（系統匣） |
-| **使用者介面** | Web UI（瀏覽器存取） | 匣圖示 + 匣視窗 + Web UI |
-| **系統匣** | ❌ 無 | ✅ 支援最小化到匣 |
-| **後台運行** | ❌ 控制台關閉即退出 | ✅ 匣後台持續運行 |
+| **運行模式** | 控制台程式 | 桌面程式（Windows/macOS 系統匣 / Linux 狀態視窗） |
+| **使用者介面** | Web UI（瀏覽器存取） | Windows/macOS：匣圖示 + 匣視窗 + Web UI；Linux：狀態視窗 + Web UI |
+| **系統匣** | ❌ 無 | ✅ Windows/macOS 支援最小化到匣；Linux 無匣圖示 |
+| **後台運行** | ❌ 控制台關閉即退出 | ✅ Windows/macOS 匣後台持續運行；Linux 狀態視窗運行 |
 | **儲存方式** | 檔案系統 JSON 儲存 | SpeedyPack 記憶體儲存 + 異步持久化 |
 | **讀取延遲** | ~10ms（磁碟 I/O） | ~0.01ms（記憶體操作） |
 | **寫入延遲** | ~15ms（同步寫入） | ~0.001ms（非同步寫入） |
@@ -259,23 +260,48 @@ dotnet build
 
 ### 執行系統
 
+#### 方式 1：執行 Default 版本（控制台應用程式）
+
 ```bash
 dotnet run --project src/SiliconLife.Default
 ```
 
 應用程式將啟動 Web 伺服器並自動在瀏覽器中開啟 Web UI。
 
+#### 方式 2：執行 Fast 版本（桌面應用程式）
+
+```bash
+dotnet run --project src/SiliconLife.Fast
+```
+
+**Windows/macOS**：應用程式將以視窗模式啟動，最小化到系統匣，後台持續運行。
+
+**Linux**：應用程式將顯示狀態視窗（無系統匣圖示），並自動開啟瀏覽器存取 Web UI。也可使用 `--no-tray` 參數跳過瀏覽器自動開啟：
+
+```bash
+dotnet run --project src/SiliconLife.Fast -- --no-tray
+```
+
 ### 發佈單一檔案
 
 ```
-# Windows
+# Windows - Default 版本
 dotnet publish src/SiliconLife.Default -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
 
-# Linux
+# Windows - Fast 版本
+dotnet publish src/SiliconLife.Fast -c Release -r win-x64 --self-contained -p:PublishSingleFile=true
+
+# Linux - Default 版本
 dotnet publish src/SiliconLife.Default -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
 
-# macOS
+# Linux - Fast 版本
+dotnet publish src/SiliconLife.Fast -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Default 版本
 dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
+
+# macOS - Fast 版本
+dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
 ## 📋 開發路線圖

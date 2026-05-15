@@ -595,6 +595,7 @@ public class ZhHK : DefaultLocalizationBase
     public override string ConfigDictAddButton => "添加";
     public override string ConfigDictDeleteButton => "刪除";
     public override string ConfigDictEmptyMessage => "字典為空";
+    public override string SelectSearchHint => "若想顯示全部選單內容，請清空輸入框";
 
     // ===== Logs =====
 

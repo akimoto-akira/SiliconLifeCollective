@@ -17,15 +17,17 @@ This project provides two implementation versions that share the same architectu
 
 ### SiliconLife.Fast (High-Performance Version)
 - **Positioning**: Main production version
-- **Runtime Mode**: Windows Forms application (with system tray support)
+- **Runtime Mode**: Desktop application (Windows/macOS system tray / Linux status window)
 - **Storage**: SpeedyPack in-memory storage + asynchronous batch persistence (.spk file format)
 - **Use Case**: High concurrency, low latency, large data volume scenarios
+- **Platform Support**: Windows (full features, including system tray), Linux (status window, no tray icon)
 - **Features**:
-  - System tray background operation with real-time monitoring via tray status window
+  - Windows/macOS system tray background operation with real-time monitoring via tray status window; Linux status window displayed directly
   - SpeedyPack engine + auto-compaction ensures data security
   - Component UI architecture, 30+ declarative components
   - 7 Skin Themes with auto-discovery and switching
   - Hot reload tool for online updates and restarts
+  - Linux auto-opens browser for Web UI access, supports `--no-tray` parameter
 - **Performance Improvement**: Storage read latency reduced by 1000x, write latency reduced by 15000x
 - **Role Description**: A production-grade implementation with deep optimization, featuring system tray background operation, SpeedyPack engine + auto-compaction, etc., the first choice for long-term operation and actual production environments
 

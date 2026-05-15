@@ -1,18 +1,20 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-15T19:08:00+08:00",
+  "lastUpdated": "2026-05-15T21:45:00+08:00",
   "tasks": [
     {
       "id": "task-113",
       "type": "bugfix",
-      "target": "src/SiliconLife.App/Web/Controllers/AboutController.cs",
-      "title": "修复关于页面本地化问题：所有语言代码未注册",
-      "description": "全量巡检发现：切换语言后关于页面仍显示中文。根本原因：所有语言的本地化代码都没有注册到本地化系统中。需要：1）检查 AboutController 是否使用本地化键值，2）检查各语言文件（ZhCN、EnUS 等）是否有对应键值，3）确保所有语言文件都正确注册到 LocalizationManager，4）测试语言切换后关于页面是否正确显示对应语言。",
+      "target": "src/SiliconLife.App/Web/Component/SelectComponent.cs",
+      "title": "搜索选择组件缺少提示文字：清空输入框可显示全部选项",
+      "description": "配置页面的语言下拉菜单使用搜索选择组件，输入框预填当前值导致只显示匹配选项。用户不知道需要清空输入框才能看到全部选项。修复：1）在 SelectComponent 中添加 hint 属性支持，2）在 slSelectSearch_create 函数中渲染 hint 元素，3）添加 SelectSearchHint 本地化字符串到所有语言文件，4）在 ConfigView 的 enum 下拉框中传入 hint。提示文字：'若想显示全部菜单内容，请清空输入框'。",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-15T19:08:00+08:00",
       "createdBy": "openclaw-main",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
+      "completedAt": "2026-05-15T21:00:00+08:00",
+      "completedBy": "trae-glm5",
       "relatedCommit": null,
       "metadata": {
         "source": "全量巡检发现",
@@ -34,11 +36,13 @@
       "title": "更新 Fast 版本文档：明确支持 Linux",
       "description": "当前文档（getting-started.md、architecture.md）中描述 SiliconLife.Fast 为'仅 Windows'，但实际代码已支持 Linux（Program.cs 第 196-213 行有 Linux 适配逻辑）。需要：1）更新 getting-started.md 中的平台支持说明，2）更新 architecture.md 中的 Fast 版本描述，3）添加 Linux 部署说明（无托盘图标，使用状态窗口），4）同步更新所有语言版本的文档。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-15T02:52:00+08:00",
       "createdBy": "openclaw-main",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "relatedCommit": null,
+      "completedAt": "2026-05-15T21:45:00+08:00",
+      "completedBy": "trae-glm5",
       "metadata": {
         "source": "OpenClaw 巡检发现",
         "verification": "2026-05-15 02:25 在云端 Linux 成功启动 SiliconLife.Fast",
@@ -65,9 +69,9 @@
     }
   ],
   "taskIndex": {
-    "pending": ["task-113", "task-112"],
+    "pending": [],
     "inProgress": [],
-    "completed": [],
+    "completed": ["task-113", "task-112"],
     "cancelled": []
   },
   "metadata": {

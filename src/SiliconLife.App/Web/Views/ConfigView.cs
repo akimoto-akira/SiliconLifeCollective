@@ -661,6 +661,7 @@ public class ConfigView : ViewBase
                             .Prop(() => "name", () => Js.Str(() => "editValueEnum"))
                             .Prop(() => "value", () => Js.Id(() => "value"))
                             .Prop(() => "options", () => Js.Id(() => "enumOpts"))
+                            .Prop(() => "hint", () => Js.Str(() => loc.SelectSearchHint))
                         ).Stmt(),
                         Js.Break()
                     })

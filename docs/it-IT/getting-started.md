@@ -18,10 +18,10 @@ Questo progetto offre due versioni di implementazione:
 
 ### SiliconLife.Fast (Versione ad alte prestazioni)
 - **Posizionamento**: Versione principale di produzione
-- **Modalità di esecuzione**: Applicazione Windows Forms (barra di stato di sistema)
+- **Modalità di esecuzione**: Applicazione desktop (Windows/macOS barra di stato di sistema / Linux finestra di stato)
 - **Archiviazione**: Archiviazione in memoria SpeedyPack + persistenza asincrona (formato file .spk)
 - **Scenario d'uso**: Alta concorrenza, bassa latenza, grande volume di dati, sfruttamento in produzione a lungo termine
-- **Supporto piattaforma**: Solo Windows
+- **Supporto piattaforma**: Windows/macOS (funzionalità complete, inclusa barra di stato), Linux (finestra di stato, nessuna icona nella barra)
 - **Descrizione del ruolo**: Implementazione pronta per la produzione con ottimizzazione approfondita, la scelta migliore per lo sfruttamento a lungo termine e i veri ambienti di produzione
 
 > **Raccomandazione per i principianti**: I nuovi utenti dovrebbero iniziare con **SiliconLife.Default** per verificare rapidamente la fattibilità architetturale. Dopo aver familiarizzato con il sistema, si consiglia vivamente la migrazione a **SiliconLife.Fast**.
@@ -107,14 +107,20 @@ dotnet run
 
 Il server Web si avvia su `http://localhost:8080`
 
-#### Eseguire la versione Fast (solo Windows)
+#### Eseguire la versione Fast
 
 ```bash
 cd src/SiliconLife.Fast
 dotnet run
 ```
 
-L'applicazione si avvia in modalità Forms, minimizzata nella barra di stato di sistema, con il server Web anche su `http://localhost:8080`
+**Windows/macOS**: L'applicazione si avvia in modalità Forms, minimizzata nella barra di stato di sistema, con il server Web anche su `http://localhost:8080`
+
+**Linux**: L'applicazione mostra una finestra di stato (nessuna icona nella barra di sistema) e apre automaticamente il browser per accedere alla Web UI. È possibile utilizzare il parametro `--no-tray` per saltare l'apertura automatica del browser:
+
+```bash
+dotnet run -- --no-tray
+```
 
 ### 5. Accedere all'interfaccia Web
 

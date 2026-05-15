@@ -18,10 +18,10 @@ Este proyecto proporciona dos versiones de implementación:
 
 ### SiliconLife.Fast (Versión de Alto Rendimiento)
 - **Posicionamiento**: Versión de producción principal
-- **Modo de Ejecución**: Aplicación de formularios Windows (bandeja del sistema)
+- **Modo de Ejecución**: Aplicación de escritorio (Windows/macOS bandeja del sistema / Linux ventana de estado)
 - **Almacenamiento**: Almacenamiento en memoria SpeedyPack + persistencia asíncrona (formato de archivo .spk)
 - **Escenario de Aplicación**: Alta concurrencia, baja latencia, gran volumen de datos, operaciones de producción a largo plazo
-- **Soporte de Plataforma**: Solo Windows
+- **Soporte de Plataforma**: Windows/macOS (funciones completas, incluyendo bandeja del sistema), Linux (ventana de estado, sin icono en bandeja)
 - **Descripción de Rol**: Implementación de nivel de producción con optimización profunda, la mejor opción para operaciones a largo plazo y entornos de producción reales
 
 > **Sugerencia para Principiantes**: Se recomienda que los usuarios primerizos comiencen con **SiliconLife.Default** para verificar rápidamente la viabilidad de la arquitectura. Después de familiarizarse con el sistema, se recomienda encarecidamente migrar a **SiliconLife.Fast**.
@@ -107,14 +107,20 @@ dotnet run
 
 El servidor web se iniciará en `http://localhost:8080`
 
-#### Ejecutar Versión Fast (Solo Windows)
+#### Ejecutar Versión Fast
 
 ```bash
 cd src/SiliconLife.Fast
 dotnet run
 ```
 
-La aplicación se iniciará en modo formulario, minimizada en la bandeja del sistema, con el servidor web también iniciándose en `http://localhost:8080`
+**Windows/macOS**: La aplicación se iniciará en modo formulario, minimizada en la bandeja del sistema, con el servidor web también iniciándose en `http://localhost:8080`
+
+**Linux**: La aplicación mostrará una ventana de estado (sin icono en la bandeja del sistema) y abrirá automáticamente el navegador para acceder a la Web UI. Puede usar el parámetro `--no-tray` para omitir la apertura automática del navegador:
+
+```bash
+dotnet run -- --no-tray
+```
 
 ### 5. Acceder a la Web UI
 

@@ -701,6 +701,7 @@ public class ItIT : DefaultLocalizationBase
     public override string ConfigDictAddButton => "Aggiungi";
     public override string ConfigDictDeleteButton => "Elimina";
     public override string ConfigDictEmptyMessage => "Il dizionario è vuoto";
+    public override string SelectSearchHint => "Cancella il campo per mostrare tutte le opzioni";
 
     // ===== Logs Page Localization =====
 
