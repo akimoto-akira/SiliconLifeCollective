@@ -40,7 +40,7 @@
 2026-05-14T01:32:00+08:00 | catpaw | task_claim | task=task-102 | type=bugfix | fix=实现 Workflow 超时异常处理流程
 2026-05-14T01:32:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/Workflow/WorkflowEngine.cs
 2026-05-14T01:33:00+08:00 | catpaw | task_complete | task=task-102
-2026-05-14T01:34:00+08:00 | catpaw | task_claim | task=task-103 | type=bugfix | fix=将硬编码中文替换为 TrayLocalizationBase 国际化属性
+2026-05-14T01:34:00+08:00 | catpaw | task_claim | task=task-103 | type=bugfix | fix=将乱码中文替换为 TrayLocalizationBase 国际化属性
 2026-05-14T01:34:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Tray/TrayLocalizationBase.cs
 2026-05-14T01:34:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Tray/TrayStatusWindow.cs
 2026-05-14T01:35:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Tray/TrayZhCN.cs
@@ -48,99 +48,22 @@
 2026-05-14T01:35:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Tray/TrayJaJP.cs
 2026-05-14T01:35:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Tray/TrayKoKR.cs
 2026-05-14T01:35:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Tray/TrayZhHK.cs
-2026-05-14T01:35:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Tray/TrayDeDE.cs
-2026-05-14T01:35:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Tray/TrayFrFR.cs
-2026-05-14T01:35:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Tray/TrayEsES.cs
-2026-05-14T01:35:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Tray/TrayItIT.cs
-2026-05-14T01:35:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Tray/TrayPlPL.cs
-2026-05-14T01:35:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Tray/TrayCsCZ.cs
-2026-05-14T01:36:00+08:00 | catpaw | task_complete | task=task-103
-2026-05-14T01:37:00+08:00 | catpaw | task_claim | task=task-104 | type=refactor | fix=将 RestartMainThread 调用移到锁外避免嵌套锁
-2026-05-14T01:37:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/Runtime/MainLoop.cs
-2026-05-14T01:38:00+08:00 | catpaw | task_complete | task=task-104
-2026-05-14T01:39:00+08:00 | catpaw | task_claim | task=task-105 | type=bugfix | fix=改用反射自动迁移 SiliconBeingBase 属性
-2026-05-14T01:39:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/SiliconBeing/SiliconBeingManager.cs
-2026-05-14T01:40:00+08:00 | catpaw | task_complete | task=task-105
-2026-05-14T01:41:00+08:00 | catpaw | task_claim | task=task-106 | type=feature | fix=实现 CodeReviewWorkflow 三处 TODO
-2026-05-14T01:41:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/Workflow/CodeReviewWorkflow.cs
-2026-05-14T01:42:00+08:00 | catpaw | task_complete | task=task-106
-2026-05-14T01:43:00+08:00 | catpaw | task_claim | task=task-107 | type=feature | fix=实现系统优雅关闭功能
-2026-05-14T01:43:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Controllers/SystemController.cs
-2026-05-14T01:44:00+08:00 | catpaw | task_complete | task=task-107
-2026-05-14T01:45:00+08:00 | catpaw | task_claim | task=task-108 | type=feature | fix=实现帮助系统搜索结果显示功能
-2026-05-14T01:45:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Views/HelpView.cs
-2026-05-14T01:46:00+08:00 | catpaw | task_complete | task=task-108
-2026-05-14T01:47:00+08:00 | catpaw | task_claim | task=task-109 | type=refactor | fix=使用 ReaderWriterLockSlim 替换 object lock
-2026-05-14T01:47:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/Config/Config.cs
-2026-05-14T01:48:00+08:00 | catpaw | task_complete | task=task-109
-2026-05-14T01:49:00+08:00 | catpaw | task_claim | task=task-110 | type=refactor | fix=添加 ExecuteWithTimeout 异常日志
-2026-05-14T01:49:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/Runtime/MainLoop.cs
-2026-05-14T01:50:00+08:00 | catpaw | task_complete | task=task-110
-2026-05-14T01:50:00+08:00 | catpaw | session_end | completed=task-101~110
-2026-05-14T02:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-20260514-0200
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationBase.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationCsCZ.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationDeDE.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationDeOther.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationEnOther.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationEnUS.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationEsES.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationEsMX.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationFactory.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationFrOther.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationJaJP.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationKoKR.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationPlPL.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationZhCN.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationZhHK.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationZhOther.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpTopics.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Tools/HelpTool.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Controllers/HelpController.cs | intent=统一版权声明+移除UTF-8 BOM
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/JsBuilder.cs | intent=删除多余空行
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Models/HelpViewModel.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Views/HelpView.cs | intent=统一版权声明+修复搜索结果JS语法错误
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Views/TaskExecutionDetailView.cs | intent=新增许可证头
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Views/TaskExecutionHistoryView.cs | intent=新增许可证头
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Calendar/ChineseHistorical/ChineseHistoricalEraDatabase.cs | intent=修正using位置
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/CsCZ.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Tools/KnowledgeTool.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/Knowledge/IKnowledgeNetwork.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/Knowledge/KnowledgeEntry.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/Knowledge/KnowledgeGraph.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/Knowledge/KnowledgeTriple.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Default/Knowledge/KnowledgeNetwork.cs | intent=统一版权声明
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/App.cs | intent=新增许可证头
-2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Knowledge/KnowledgeNetwork.cs | intent=统一版权声明
-2026-05-14T02:05:00+08:00 | trae-glm5 | session_end | completed=版权声明统一+BOM修复+HelpView搜索JS修复
-2026-05-14T11:32:00+08:00 | openclaw-main | session_start | sessionId=openclaw-20260514-1132 | task=task-111
-2026-05-14T11:32:00+08:00 | openclaw-main | task_start | task=task-111 | description=MCP 浏览器能力服务器
-2026-05-14T11:47:00+08:00 | openclaw-main | discussion | topic=AI 自动测试策略 | participants=用户 2682,openclaw-main
-2026-05-14T11:54:00+08:00 | openclaw-main | discussion | topic=JVS 产品线与环境隔离问题 | conclusion=无影 AI 无法直接访问桌面系统
-2026-05-14T12:00:00+08:00 | openclaw-main | discussion | topic=能力借用方案 | decision=MCP Server via HTTP API
-2026-05-14T12:06:00+08:00 | openclaw-main | code_create | files=SiliconLife.McpServer.csproj,Program.cs,BrowserPool.cs,README.md
-2026-05-14T12:09:00+08:00 | openclaw-main | build | result=success | project=SiliconLife.McpServer
-2026-05-14T12:15:00+08:00 | openclaw-main | solution_update | action=add_project | project=SiliconLife.McpServer
-2026-05-14T12:18:00+08:00 | openclaw-main | task_complete | task=task-111 | files_created=4
-2026-05-14T12:18:00+08:00 | openclaw-main | session_end | completed=task-111
-2026-05-15T20:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-20260515-2000 | task=task-113
-2026-05-15T20:00:00+08:00 | trae-glm5 | task_claim | task=task-113 | type=bugfix | fix=修复关于页面本地化问题
-2026-05-15T21:00:00+08:00 | trae-glm5 | task_complete | task=task-113 | type=bugfix | fix=搜索选择组件添加提示文字"若想显示全部菜单内容，请清空输入框"
-2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Component/SelectComponent.cs | added=hint_property,hint_css,hint_js_rendering
-2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Views/ConfigView.cs | added=hint_config_for_enum_select
-2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/DefaultLocalizationBase.cs | added=SelectSearchHint_property
-2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/ZhCN.cs | added=SelectSearchHint
-2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/EnUS.cs | added=SelectSearchHint
-2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/ZhHK.cs | added=SelectSearchHint
-2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/JaJP.cs | added=SelectSearchHint
-2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/KoKR.cs | added=SelectSearchHint
-2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/DeDE.cs | added=SelectSearchHint
-2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/FrFR.cs | added=SelectSearchHint
-2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/EsES.cs | added=SelectSearchHint
-2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/ItIT.cs | added=SelectSearchHint
-2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/CsCZ.cs | added=SelectSearchHint
-2026-05-15T21:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/PlPL.cs | added=SelectSearchHint
-2026-05-15T21:30:00+08:00 | trae-glm5 | session_start | sessionId=trae-20260515-2130 | task=task-112
-2026-05-15T21:30:00+08:00 | trae-glm5 | task_claim | task=task-112 | type=docs | fix=更新 Fast 版本文档明确支持 Linux
-2026-05-15T21:45:00+08:00 | trae-glm5 | task_complete | task=task-112 | updated=22 docs files across 11 languages (getting-started.md + architecture.md)
-2026-05-15T21:45:00+08:00 | trae-glm5 | session_end | sessionId=trae-20260515-2130 | status=completed
+2026-05-14T01:35:00+08:00 | catpaw | task_complete | task=task-103
+2026-05-14T01:36:00+08:00 | catpaw | session_end | commit_pending
+2026-05-15T02:00:00+08:00 | openclaw-main | session_start | sessionId=openclaw-20260515-0200
+2026-05-15T02:00:00+08:00 | openclaw-main | task_create | task=task-112 | type=docs | title=更新 Fast 版本文档：明确支持 Linux
+2026-05-15T02:00:00+08:00 | openclaw-main | task_create | task=task-113 | type=bugfix | title=搜索选择组件缺少提示文字
+2026-05-15T02:52:00+08:00 | openclaw-main | task_archive | count=11 | taskIds=task-101~111
+2026-05-15T19:08:00+08:00 | openclaw-main | task_create | task=task-113 | type=bugfix | priority=P1
+2026-05-15T19:10:00+08:00 | trae-glm5 | session_start | sessionId=trae-20260515-1910
+2026-05-15T19:10:00+08:00 | trae-glm5 | task_claim | task=task-113
+2026-05-15T21:00:00+08:00 | trae-glm5 | task_complete | task=task-113 | fix=SelectComponent hint support
+2026-05-15T21:45:00+08:00 | trae-glm5 | task_complete | task=task-112 | docs=Fast Linux support documented
+2026-05-15T21:45:00+08:00 | trae-glm5 | session_end | commit_pending
+2026-05-16T00:07:00+08:00 | openclaw-main | task_create | task=task-114 | type=release | title=编写 alpha-0.2 发布说明
+2026-05-16T00:07:00+08:00 | openclaw-main | task_create | task=task-115 | type=docs | title=所有文档版本号更新为 alpha-0.2
+2026-05-16T13:50:00+08:00 | codebot-main | session_start | sessionId=codebot-20260516-1350
+2026-05-16T13:50:00+08:00 | codebot-main | task_create | task=task-116 | type=feature | title=实现记忆淡忘机制
+2026-05-16T13:50:00+08:00 | codebot-main | task_create | task=task-117 | type=feature | title=实现 terminate_chat 工具
+2026-05-16T13:50:00+08:00 | codebot-main | task_cancel | task=task-118 | reason=H.cs 已实现 HtmlBuilder 功能
+2026-05-16T13:50:00+08:00 | codebot-main | session_end | commit_pending
