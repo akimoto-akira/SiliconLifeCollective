@@ -40,7 +40,7 @@
 2026-05-14T01:32:00+08:00 | catpaw | task_claim | task=task-102 | type=bugfix | fix=实现 Workflow 超时异常处理流程
 2026-05-14T01:32:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/Workflow/WorkflowEngine.cs
 2026-05-14T01:33:00+08:00 | catpaw | task_complete | task=task-102
-2026-05-14T01:34:00+08:00 | catpaw | task_claim | task=task-103 | type=bugfix | fix=将硬编码中文替换为 TrayLocalizationBase 国际化属性
+2026-05-14T01:34:00+08:00 | catpaw | task_claim | task=task-103 | type=bugfix | fix=将乱码中文替换为 TrayLocalizationBase 国际化属性
 2026-05-14T01:34:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Tray/TrayLocalizationBase.cs
 2026-05-14T01:34:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Tray/TrayStatusWindow.cs
 2026-05-14T01:35:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Tray/TrayZhCN.cs
@@ -77,6 +77,10 @@
 2026-05-14T01:49:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/Runtime/MainLoop.cs
 2026-05-14T01:50:00+08:00 | catpaw | task_complete | task=task-110
 2026-05-14T01:50:00+08:00 | catpaw | session_end | completed=task-101~110
+2026-05-15T02:00:00+08:00 | openclaw-main | session_start | sessionId=openclaw-20260515-0200
+2026-05-15T02:00:00+08:00 | openclaw-main | task_create | task=task-112 | type=docs | title=更新 Fast 版本文档：明确支持 Linux
+2026-05-15T02:00:00+08:00 | openclaw-main | task_create | task=task-113 | type=bugfix | title=搜索选择组件缺少提示文字
+2026-05-15T02:52:00+08:00 | openclaw-main | task_archive | count=11 | taskIds=task-101~111
 2026-05-14T02:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-20260514-0200
 2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationBase.cs | intent=统一版权声明
 2026-05-14T02:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Help/HelpLocalizationCsCZ.cs | intent=统一版权声明
@@ -164,3 +168,11 @@
 2026-05-16T14:00:00+08:00 | trae-glm5 | batch_update | 11语言×15文档=约140个文件 | v0.1.0-alpha→v0.2.0-alpha, v0.1.0→v0.2.0, 0.1.0→0.2.0 | excluded=changelog.md(历史记录)
 2026-05-16T14:00:00+08:00 | trae-glm5 | task_complete | task=task-115 | completed=全11语言文档版本号从0.1.0更新为0.2.0（排除changelog历史记录）
 2026-05-16T14:00:00+08:00 | trae-glm5 | session_end | sessionId=trae-20260516-1330 | status=completed
+2026-05-15T19:08:00+08:00 | openclaw-main | task_create | task=task-113 | type=bugfix | priority=P1
+2026-05-16T00:07:00+08:00 | openclaw-main | task_create | task=task-114 | type=release | title=编写 alpha-0.2 发布说明
+2026-05-16T00:07:00+08:00 | openclaw-main | task_create | task=task-115 | type=docs | title=所有文档版本号更新为 alpha-0.2
+2026-05-16T13:50:00+08:00 | codebot-main | session_start | sessionId=codebot-20260516-1350
+2026-05-16T13:50:00+08:00 | codebot-main | task_create | task=task-116 | type=feature | title=实现记忆淡忘机制
+2026-05-16T13:50:00+08:00 | codebot-main | task_create | task=task-117 | type=feature | title=实现 terminate_chat 工具
+2026-05-16T13:50:00+08:00 | codebot-main | task_cancel | task=task-118 | reason=H.cs 已实现 HtmlBuilder 功能
+2026-05-16T13:50:00+08:00 | codebot-main | session_end | commit_pending
