@@ -185,3 +185,6 @@
 2026-05-16T22:00:00+08:00 | trae-glm5 | task_complete | task=task-116 | completed=记忆淡忘机制全部实现(访问追踪+指数衰减+分级存储+衰减服务)
 2026-05-16T22:00:00+08:00 | trae-glm5 | session_end | sessionId=trae-20260516-2200 | status=completed
 2026-05-16T22:15:00+08:00 | trae-glm5 | task_cancel | task=task-117 | reason=会话根据设计理念不应该被删除，会话属于不可变历史记录
+2026-05-17T10:00:00+08:00 | qoder | session_start | sessionId=qoder-20260517-1000
+2026-05-17T10:00:00+08:00 | qoder | file_moved | YDoc/feature-horizontal-expansion-analysis.md → .ai-collab/docs/feature-horizontal-expansion-analysis.md | intent=系统能力完整性分析报告归档
+2026-05-17T10:30:00+08:00 | qoder | session_end | sessionId=qoder-20260517-1000 | status=completed
