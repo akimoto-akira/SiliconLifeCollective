@@ -1,6 +1,6 @@
 # 安全设计
 
-> **版本：v0.1.0-alpha**
+> **版本：v0.2.0-alpha**
 
 [English](../en/security.md) | [Deutsch](../de-DE/security.md) | **中文** | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Čeština](../cs-CZ/security.md)
 

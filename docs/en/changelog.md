@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 This project provides two implementation versions:
 
 - **SiliconLife.Default**: Default implementation, primarily used for verifying architecture feasibility. Console application with file system JSON storage.
-- **SiliconLife.Fast**: Production-ready version. Windows Forms application with SpeedyPack in-memory storage + asynchronous persistence (.spk file format), deeply performance-optimized.
+- **SiliconLife.Fast**: Production-ready version. Cross-platform desktop application (Windows / macOS / Linux), SpeedyPack in-memory storage + asynchronous persistence (.spk file format), deeply performance-optimized.
 
 Both versions share the same interfaces and functionality, differing only in storage implementation and runtime mode. SiliconLife.Default serves as an architecture validation baseline, while SiliconLife.Fast is the production-ready flagship version.
 
@@ -60,6 +60,147 @@ Both versions share the same interfaces and functionality, differing only in sto
 ---
 
 ## [Unreleased]
+
+## Alpha-0.2
+
+### 2026-05-16
+
+#### Release Preparation
+- `476d839` - Add alpha-0.2 release tasks
+  - Created task-114 (CHANGELOG writing) and task-115 (version number update)
+  - 1 file changed
+
+### 2026-05-15
+
+#### Infrastructure
+- `672627b` - Add Gitee sync workflow with permission configuration
+  - Updated sync-from-gitee.yml workflow permissions
+  - 1 file changed, 7 insertions(+), 4 deletions(-)
+
+- `3cd5256` - Add GitHub Actions auto-sync from Gitee
+  - Added sync-from-gitee.yml workflow
+  - 1 file changed, 50 insertions(+)
+
+#### Documentation Updates
+- `aa1d2ad` - Update all 11 languages README/architecture/getting-started docs to reflect SiliconLife.Fast multi-platform support (ref task-112, task-113)
+  - Corrected documentation describing SiliconLife.Fast as Windows-only to reflect actual multi-platform support (Windows / macOS / Linux)
+  - Updated README.md, architecture.md, getting-started.md for all 11 languages
+  - SelectComponent added hint property support
+  - ConfigView enum dropdowns now pass hint parameter
+  - 11 languages localization added SelectSearchHint key
+  - 53 files changed, 690 insertions(+), 194 deletions(-)
+
+#### Task System
+- `3329f3d` - Add task system inspection mechanism + localization bug fix tasks
+  - Created task-113: Fix about page localization issue
+  - Updated task-112: Update Fast version docs for Linux support
+  - Archived completed tasks (11) to .ai-collab/archive/
+  - Inspection mechanism configured: quick inspection (every 30 min) + full inspection (daily at 06:00)
+  - 2 files changed, 148 insertions(+), 171 deletions(-)
+
+#### Collaboration Framework
+- `6038e22` - Register coze-agent to .ai-collab registry
+  - Added Coze platform resident AI registration
+  - 1 file changed
+
+### 2026-05-14
+
+#### AI Collaboration Framework
+- `7344fbb` - Remove handoff mode, switch to task-list-driven approach (v2.0)
+  - Restructured .ai-collab directory from handoff mode to task-list-driven
+  - Added tasks.json core task list file
+  - Added activity.log operation log
+  - Added changes/ and sessions/ directories
+
+- `589a48e` - Add .ai-collab session records
+  - Added AI collaboration session state records
+
+- `5481bcf` - Register Qoder AI IDE to collaboration registry
+  - Added Qoder AI coding assistant registration
+
+- `e2d7b61` - Supplement tasks.json relatedCommit and changes commitHash
+  - Completed task metadata associations
+
+- `a087f0c` - Accept all task-101~110 tasks
+  - Confirmed all 10 task fixes completed
+
+#### Bug Fixes
+- `fac9435` - Complete all task-101~110 bug fixes and implementations
+  - Fixed search select component missing hint text
+  - Fixed about page localization issues
+  - Fixed help system search JS errors
+  - 39 files changed, 684 insertions(+), 121 deletions(-)
+
+- `c46dfbc` - Complete all pending tasks (task-001~006)
+  - Completed initial 6 pending tasks
+
+- `ec176b2` - Override task list - code review found 10 new bugs
+  - Created task-101~110 (10 new tasks)
+
+#### Refactoring
+- `ab15915` - Unify copyright headers + fix HelpController BOM and HelpView search JS
+  - Unified Apache 2.0 copyright headers across all C# source files
+  - Fixed HelpController BOM encoding issue
+  - Fixed HelpView search JavaScript error
+
+#### New Features
+- `18a6f5d` - Create MCP browser capability server (ref task-111)
+  - Added SiliconLife.McpServer project
+  - Implemented Playwright browser automation MCP server
+
+- `9eb251a` - Remove SiliconLife.McpServer module (ref task-111)
+  - Removed standalone MCP server, functionality integrated into main project
+
+### 2026-05-13
+
+#### Localization
+- `7a62590` - Add Polish localization support
+  - Added pl-PL Polish localization implementation (PlPL.cs, 1089 lines)
+  - Added Polish help documentation localization (HelpLocalizationPlPL.cs, 3972 lines)
+  - Added Polish Chinese historical calendar support (ChineseHistoricalPlPL.cs, 600 lines)
+  - Added Polish tray localization (TrayPlPL.cs, 135 lines)
+  - Added Polish complete documentation set (15 documents)
+  - Language enum added Polish
+  - 35 files changed, 14379 insertions(+), 11 deletions(-)
+
+- `51f9c8e` - Update documentation with Ark AI references and terminology improvements
+  - Updated AI client terminology in multilingual documentation
+
+- `7587c12` - Add changelog entries for all languages
+  - Synchronized changelog updates across all language versions
+
+#### Window System Migration
+- `b49a07d` - Migrate to Avalonia window resident mode
+  - Removed Windows Forms dependency, fully migrated to Avalonia UI framework
+  - Status window displays correctly on Linux (verified via remote desktop)
+  - Added window controls: right-click menu, double-click to open Web, close button
+  - Added multi-AI collaboration framework (.ai-collab/)
+  - Fixed tray icon initialization (graceful degradation)
+  - Added App.axaml and App.cs Avalonia application entry
+  - 13 files changed, 1442 insertions(+), 541 deletions(-)
+
+- `d335aaf` - Linux platform window always visible + close confirmation dialog
+  - Linux automatically shows status window (no tray icon)
+  - Linux close window shows confirmation dialog
+  - Windows/macOS maintain original tray behavior
+  - Support --no-tray parameter to force disable tray
+  - Added ShowMessageBoxAsync method for confirmation dialogs
+  - 3 files changed, 206 insertions(+), 29 deletions(-)
+
+#### Tray System Refactoring
+- `841d384` - Refactor tray system and initialize AI collaboration framework
+  - Streamlined TrayLocalizationBase removing unused properties
+  - Added ShowStatus localization item
+  - App.cs added tray icon click to show status window, localized menu items
+  - Program.cs moved tray icon initialization to StartAsync
+  - TrayStatusWindow hides on close instead of exiting
+  - Registered trae-glm5 and catpaw to .ai-collab framework
+  - Updated .gitignore to ensure all .ai-collab files are tracked
+  - 22 files changed, 178 insertions(+), 1226 deletions(-)
+
+#### Documentation
+- `43653bc` - Update repository description and AI registry
+  - Updated project README and .ai-collab registration info
 
 ### 2026-05-12
 

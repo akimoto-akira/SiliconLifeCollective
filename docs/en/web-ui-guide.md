@@ -1,6 +1,6 @@
 # Web UI Guide
 
-> **Version: v0.1.0-alpha**
+> **Version: v0.2.0-alpha**
 
 **English** | [中文](../zh-CN/web-ui-guide.md) | [繁體中文](../zh-HK/web-ui-guide.md) | [Español](../es-ES/web-ui-guide.md) | [日本語](../ja-JP/web-ui-guide.md) | [한국어](../ko-KR/web-ui-guide.md) | [Deutsch](../de-DE/web-ui-guide.md) | [Čeština](../cs-CZ/web-ui-guide.md)
 

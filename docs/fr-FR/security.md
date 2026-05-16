@@ -1,6 +1,6 @@
 # Conception de sécurité
 
-> **Version : v0.1.0-alpha**
+> **Version : v0.2.0-alpha**
 
 [English](../en/security.md) | [Deutsch](../de-DE/security.md) | **Français** | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Čeština](../cs-CZ/security.md)
 

@@ -16,7 +16,7 @@
 이 프로젝트는 두 가지 구현 버전을 제공합니다:
 
 - **SiliconLife.Default**: 기본 구현으로, 주로 아키텍처 실현 가능성을 검증하는 데 사용됩니다. 콘솔 애플리케이션, 파일 시스템 JSON 스토리지.
-- **SiliconLife.Fast**: 프로덕션 환경을 위한 주요 버전입니다. Windows 폼 애플리케이션, SpeedyPack 메모리 스토리지 + 비동기 지속성, 심층적인 성능 최적화가 적용되었습니다.
+- **SiliconLife.Fast**: 프로덕션 환경을 위한 주요 버전입니다. 크로스 플랫폼 데스크톱 애플리케이션(Windows / macOS / Linux), SpeedyPack 메모리 스토리지 + 비동기 지속성, 심층적인 성능 최적화가 적용되었습니다.
 
 두 버전은 동일한 인터페이스와 기능을 공유하며, 스토리지 구현 및 실행 모드에서만 차이가 있습니다. SiliconLife.Default는 아키텍처 검증 기준으로 사용되고, SiliconLife.Fast는 프로덕션 환경을 위한 주요 버전입니다.
 
@@ -60,6 +60,147 @@
 ---
 
 ## [미출시]
+
+## Alpha-0.2
+
+### 2026-05-16
+
+#### 릴리스 준비
+- `476d839` - alpha-0.2 릴리스 작업 추가
+  - task-114(CHANGELOG 작성) 및 task-115(버전 번호 업데이트) 생성
+  - 1개 파일 변경
+
+### 2026-05-15
+
+#### 인프라
+- `672627b` - Gitee 동기화 워크플로우 추가(권한 구성 포함)
+  - sync-from-gitee.yml 워크플로우 권한 업데이트
+  - 1개 파일 변경, 7행 추가, 4행 삭제
+
+- `3cd5256` - GitHub Actions Gitee 자동 동기화 추가
+  - sync-from-gitee.yml 워크플로우 추가
+  - 1개 파일 변경, 50행 추가
+
+#### 문서 업데이트
+- `aa1d2ad` - 전체 11개 언어 README/아키텍처/시작 가이드 문서 업데이트, SiliconLife.Fast 멀티플랫폼 지원 반영 (ref task-112, task-113)
+  - SiliconLife.Fast을 Windows 전용으로 설명한 문서를 수정하여 실제 멀티플랫폼 지원(Windows / macOS / Linux) 반영
+  - 11개 언어의 README.md, architecture.md, getting-started.md 업데이트
+  - SelectComponent에 hint 속성 지원 추가
+  - ConfigView 열거형 드롭다운에 hint 매개변수 전달
+  - 11개 언어 현지화에 SelectSearchHint 키 추가
+  - 53개 파일 변경, 690행 추가, 194행 삭제
+
+#### 작업 시스템
+- `3329f3d` - 작업 시스템 검사 메커니즘 + 현지화 버그 수정 작업 추가
+  - task-113 생성: 정보 페이지 현지화 문제 수정
+  - task-112 업데이트: Fast 버전 문서 Linux 지원 업데이트
+  - 완료된 작업(11개)을 .ai-collab/archive/에 보관
+  - 검사 메커니즘 구성 완료: 빠른 검사(30분마다) + 전체 검사(매일 06:00)
+  - 2개 파일 변경, 148행 추가, 171행 삭제
+
+#### 협업 프레임워크
+- `6038e22` - coze-agent를 .ai-collab 레지스트리에 등록
+  - Coze 플랫폼 상주 AI 등록 정보 추가
+  - 1개 파일 변경
+
+### 2026-05-14
+
+#### AI 협업 프레임워크
+- `7344fbb` - handoff 모드 제거, 작업 목록 기반 방식으로 전환 (v2.0)
+  - .ai-collab 디렉토리 구조를 handoff 모드에서 작업 목록 기반으로 재구성
+  - tasks.json 핵심 작업 목록 파일 추가
+  - activity.log 작업 로그 추가
+  - changes/ 및 sessions/ 디렉토리 추가
+
+- `589a48e` - .ai-collab 세션 기록 추가
+  - AI 협업 세션 상태 기록 추가
+
+- `5481bcf` - Qoder AI IDE를 협업 레지스트리에 등록
+  - Qoder AI 코딩 어시스턴트 등록 정보 추가
+
+- `e2d7b61` - tasks.json relatedCommit 및 changes commitHash 보완
+  - 작업 메타데이터 연결 완료
+
+- `a087f0c` - task-101~110 전체 작업 검수
+  - 10개 작업 수정 모두 완료 확인
+
+#### 버그 수정
+- `fac9435` - task-101~110 전체 10개 작업 수정 및 구현 완료
+  - 검색 선택 컴포넌트 힌트 텍스트 누락 수정
+  - 정보 페이지 현지화 문제 수정
+  - 도움말 시스템 검색 JS 오류 수정
+  - 39개 파일 변경, 684행 추가, 121행 삭제
+
+- `c46dfbc` - 모든 대기 작업 완료 (task-001~006)
+  - 초기 6개 대기 작업 완료
+
+- `ec176b2` - 작업 목록 덮어쓰기 - 코드 리뷰에서 10개의 새 버그 발견
+  - task-101~110(10개 새 작업) 생성
+
+#### 리팩토링
+- `ab15915` - 저작권 헤더 통일 + HelpController BOM 및 HelpView 검색 JS 수정
+  - 모든 C# 소스 파일의 Apache 2.0 저작권 헤더 통일
+  - HelpController BOM 인코딩 문제 수정
+  - HelpView 검색 JavaScript 오류 수정
+
+#### 새 기능
+- `18a6f5d` - MCP 브라우저 기능 서버 생성 (ref task-111)
+  - SiliconLife.McpServer 프로젝트 추가
+  - Playwright 브라우저 자동화 MCP 서버 구현
+
+- `9eb251a` - SiliconLife.McpServer 모듈 제거 (ref task-111)
+  - 독립 MCP 서버 제거, 기능이 메인 프로젝트에 통합됨
+
+### 2026-05-13
+
+#### 현지화
+- `7a62590` - 폴란드어 현지화 지원 추가
+  - pl-PL 폴란드어 현지화 구현 추가(PlPL.cs, 1089행)
+  - 폴란드어 도움말 문서 현지화 추가(HelpLocalizationPlPL.cs, 3972행)
+  - 폴란드어 중국 역사 캘린더 지원 추가(ChineseHistoricalPlPL.cs, 600행)
+  - 폴란드어 트레이 현지화 추가(TrayPlPL.cs, 135행)
+  - 폴란드어 완전 문서 세트 추가(15개 문서)
+  - Language 열거형에 폴란드어 추가
+  - 35개 파일 변경, 14379행 추가, 11행 삭제
+
+- `51f9c8e` - 문서의 Ark AI 참조 및 용어 개선 업데이트
+  - 다국어 문서의 AI 클라이언트 용어 업데이트
+
+- `7587c12` - 모든 언어의 변경 로그 항목 추가
+  - 모든 언어 버전의 변경 로그 동기화 업데이트
+
+#### 창 시스템 마이그레이션
+- `b49a07d` - Avalonia 창 상주 모드로 마이그레이션
+  - Windows Forms 의존성 제거, Avalonia UI 프레임워크로 완전 마이그레이션
+  - 상태 창이 Linux에서 정상 표시(원격 데스크톱 검증)
+  - 창 컨트롤 추가: 우클릭 메뉴, 더블클릭으로 Web 열기, 닫기 버튼
+  - 다중 AI 협업 프레임워크(.ai-collab/) 추가
+  - 트레이 아이콘 초기화 수정(우아한 성능 저하)
+  - App.axaml 및 App.cs Avalonia 애플리케이션 진입점 추가
+  - 13개 파일 변경, 1442행 추가, 541행 삭제
+
+- `d335aaf` - Linux 플랫폼 창 항상 표시 + 종료 확인 대화상자
+  - Linux에서 상태 창 자동 표시(트레이 아이콘 없음)
+  - Linux에서 창 종료 시 확인 대화상자 표시
+  - Windows/macOS는 기존 트레이 동작 유지
+  - --no-tray 매개변수로 트레이 강제 비활성화 지원
+  - 확인 대화상자용 ShowMessageBoxAsync 메서드 추가
+  - 3개 파일 변경, 206행 추가, 29행 삭제
+
+#### 트레이 시스템 리팩토링
+- `841d384` - 트레이 시스템 리팩토링 및 AI 협업 프레임워크 초기화
+  - TrayLocalizationBase 정리 및 미사용 속성 제거
+  - ShowStatus 현지화 항목 추가
+  - App.cs에 트레이 아이콘 클릭 시 상태 창 표시, 현지화 메뉴 항목 추가
+  - Program.cs에서 트레이 아이콘 초기화를 StartAsync로 이동
+  - TrayStatusWindow 종료 시 종료 대신 숨김으로 변경
+  - trae-glm5 및 catpaw를 .ai-collab 프레임워크에 등록
+  - .gitignore 업데이트하여 .ai-collab의 모든 파일이 추적되도록 변경
+  - 22개 파일 변경, 178행 추가, 1226행 삭제
+
+#### 문서
+- `43653bc` - 저장소 설명 및 AI 레지스트리 업데이트
+  - 프로젝트 README 및 .ai-collab 등록 정보 업데이트
 
 ### 2026-05-12
 

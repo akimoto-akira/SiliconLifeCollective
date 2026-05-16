@@ -1,6 +1,6 @@
 # Hoja de Ruta
 
-> **Versión: v0.1.0-alpha**
+> **Versión: v0.2.0-alpha**
 
 [English](../en/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | **Español** | [Deutsch](../de-DE/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
 

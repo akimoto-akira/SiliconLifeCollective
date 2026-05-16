@@ -1,4 +1,4 @@
-﻿# Záznam změn
+# Záznam změn
 
 [English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | **Čeština**
 
@@ -16,7 +16,7 @@ a tento projekt dodržuje [Semantické verzování](https://semver.org/spec/v2.0
 Tento projekt poskytuje dvě implementační verze:
 
 - **SiliconLife.Default**: Výchozí implementace, primárně použita pro ověření architectury. Konzolová aplikace, JSON úložiště v souborovém systému.
-- **SiliconLife.Fast**: Verze pro produkční prostředí. Aplikace Windows Forms, paměťové úložiště + asynchronní perzistence, hloubce optimalizovaná pro výkon.
+- **SiliconLife.Fast**: Verze pro produkční prostředí. Multiplatformní desktopová aplikace (Windows / macOS / Linux), paměťové úložiště SpeedyPack + asynchronní perzistence, hloubce optimalizovaná pro výkon.
 
 Obě verze sdílejí stejná rozhraní a funkce, liší se pouze implementací úložiště a režimem spuštění. SiliconLife.Default slouží jako referenční baseline pro ověření architektury, zatímco SiliconLife.Fast je hlavní verze pro produkční prostředí.
 
@@ -60,6 +60,147 @@ Obě verze sdílejí stejná rozhraní a funkce, liší se pouze implementací �
 ---
 
 ## [Neuvedeno]
+
+## Alpha-0.2
+
+### 2026-05-16
+
+#### Příprava vydání
+- `476d839` - Přidány úkoly pro vydání alpha-0.2
+  - Vytvořeny task-114 (psaní CHANGELOG) a task-115 (aktualizace čísla verze)
+  - 1 soubor změněn
+
+### 2026-05-15
+
+#### Infrastruktura
+- `672627b` - Přidán workflow synchronizace Gitee (s konfigurací oprávnění)
+  - Aktualizována oprávnění workflow sync-from-gitee.yml
+  - 1 soubor změněn, 7 přidání(+), 4 odebrání(-)
+
+- `3cd5256` - Přidána automatická synchronizace Gitee přes GitHub Actions
+  - Přidán workflow sync-from-gitee.yml
+  - 1 soubor změněn, 50 přidání(+)
+
+#### Aktualizace dokumentace
+- `aa1d2ad` - Aktualizovány README/architektura/začínáme ve všech 11 jazycích, odrážející multiplatformní podporu SiliconLife.Fast (ref task-112, task-113)
+  - Opravena dokumentace popisující SiliconLife.Fast jako pouze Windows, odrážející skutečnou multiplatformní podporu (Windows / macOS / Linux)
+  - Aktualizovány README.md, architecture.md, getting-started.md ve 11 jazycích
+  - Přidána podpora vlastnosti hint v SelectComponent
+  - ConfigView nyní předává parametr hint rozbalovacím seznamům výčtů
+  - Přidán klíč SelectSearchHint do lokalizací 11 jazyků
+  - 53 souborů změněno, 690 přidání(+), 194 odebrání(-)
+
+#### Systém úkolů
+- `3329f3d` - Přidán mechanismus inspekce systému úkolů + úkoly opravy lokalizačních chyb
+  - Vytvořen task-113: opravit problém lokalizace na informační stránce
+  - Aktualizován task-112: aktualizovat dokumentaci verze Fast pro podporu Linuxu
+  - Archivovány dokončené úkoly (11) do .ai-collab/archive/
+  - Mechanismus inspekce nakonfigurován: rychlá inspekce (každých 30 min) + úplná inspekce (denně 06:00)
+  - 2 soubory změněny, 148 přidání(+), 171 odebrání(-)
+
+#### Rámec spolupráce
+- `6038e22` - coze-agent registrován v registru .ai-collab
+  - Přidány registrační informace rezidentní AI platformy Coze
+  - 1 soubor změněn
+
+### 2026-05-14
+
+#### Rámec AI spolupráce
+- `7344fbb` - Režim handoff odstraněn, přechod na přístup řízený seznamem úkolů (v2.0)
+  - Restrukturalizován adresář .ai-collab z režimu handoff na přístup řízený seznamem úkolů
+  - Přidán hlavní soubor seznamu úkolů tasks.json
+  - Přidán protokol operací activity.log
+  - Přidány adresáře changes/ a sessions/
+
+- `589a48e` - Přidány záznamy relací .ai-collab
+  - Přidány záznamy stavu relace AI spolupráce
+
+- `5481bcf` - Qoder AI IDE registrován v registru spolupráce
+  - Přidány registrační informace asistenta kódování Qoder AI
+
+- `e2d7b61` - relatedCommit a changes commitHash v tasks.json doplněny
+  - Asociace metadat úkolů dokončeny
+
+- `a087f0c` - Všechny úkoly task-101~110 přijaty
+  - Potvrzeno, že všech 10 oprav úkolů je dokončeno
+
+#### Opravy chyb
+- `fac9435` - Dokončeny všechny opravy a implementace task-101~110
+  - Opraven chybějící text nápovědy v komponentě výběru hledání
+  - Opraveny problémy lokalizace na informační stránce
+  - Opravena chyba JS vyhledávání v systému nápovědy
+  - 39 souborů změněno, 684 přidání(+), 121 odebrání(-)
+
+- `c46dfbc` - Dokončeny všechny čekající úkoly (task-001~006)
+  - Dokončeno 6 počátečních čekajících úkolů
+
+- `ec176b2` - Seznam úkolů přepsán - revize kódu našla 10 nových chyb
+  - Vytvořeny task-101~110 (10 nových úkolů)
+
+#### Refaktoring
+- `ab15915` - Sjednoceny hlavičky autorských práv + opraveny HelpController BOM a HelpView vyhledávací JS
+  - Sjednoceny hlavičky autorských práv Apache 2.0 ve všech zdrojových souborech C#
+  - Opraven problém kódování BOM v HelpController
+  - Opravena chyba JavaScript vyhledávání v HelpView
+
+#### Nové funkce
+- `18a6f5d` - Vytvořen MCP server schopností prohlížeče (ref task-111)
+  - Přidán projekt SiliconLife.McpServer
+  - Implementován MCP server automatizace prohlížeče Playwright
+
+- `9eb251a` - Odstraněn modul SiliconLife.McpServer (ref task-111)
+  - Samostatný MCP server odstraněn, funkce integrována do hlavního projektu
+
+### 2026-05-13
+
+#### Lokalizace
+- `7a62590` - Přidána podpora polské lokalizace
+  - Přidána implementace polské lokalizace pl-PL (PlPL.cs, 1089 řádků)
+  - Přidána lokalizace polské dokumentace nápovědy (HelpLocalizationPlPL.cs, 3972 řádků)
+  - Přidána podpora polského čínského historického kalendáře (ChineseHistoricalPlPL.cs, 600 řádků)
+  - Přidána lokalizace polského traye (TrayPlPL.cs, 135 řádků)
+  - Přidána kompletní sada polské dokumentace (15 dokumentů)
+  - Enumerace Language rozšířena o polštinu
+  - 35 souborů změněno, 14379 přidání(+), 11 odebrání(-)
+
+- `51f9c8e` - Aktualizovány odkazy na Ark AI a vylepšení terminologie v dokumentaci
+  - Aktualizována terminologie AI klienta ve vícejazyčné dokumentaci
+
+- `7587c12` - Přidány položky protokolu změn pro všechny jazyky
+  - Aktualizace protokolu změn synchronizovány ve všech jazykových verzích
+
+#### Migrace systému oken
+- `b49a07d` - Migrováno na rezidentní režim okna Avalonia
+  - Odstraněna závislost na Windows Forms, úplná migrace na framework Avalonia UI
+  - Okno stavu se správně zobrazuje na Linuxu (ověřeno přes vzdálenou plochu)
+  - Přidány ovládací prvky okna: kontextové menu, dvojklik pro otevření Webu, tlačítko zavření
+  - Přidán rámec multi-AI spolupráce (.ai-collab/)
+  - Opravena inicializace ikony traye (graceful degradation)
+  - Přidány App.axaml a App.cs jako vstupní body aplikace Avalonia
+  - 13 souborů změněno, 1442 přidání(+), 541 odebrání(-)
+
+- `d335aaf` - Okno vždy viditelné na platformě Linux + dialog potvrzení zavření
+  - Linux automaticky zobrazuje okno stavu (bez ikony traye)
+  - Linux zobrazuje dialog potvrzení při zavření okna
+  - Windows/macOS zachovávají původní chování traye
+  - Podporován parametr --no-tray pro vynucené zakázání traye
+  - Přidána metoda ShowMessageBoxAsync pro potvrzovací dialogy
+  - 3 soubory změněny, 206 přidání(+), 29 odebrání(-)
+
+#### Refaktoring systému traye
+- `841d384` - Refaktorován systém traye a inicializován rámec AI spolupráce
+  - TrayLocalizationBase zjednodušen, nepoužité vlastnosti odstraněny
+  - Přidána položka lokalizace ShowStatus
+  - App.cs: kliknutí na ikonu traye zobrazí okno stavu, přidány lokalizované položky menu
+  - Program.cs: inicializace ikony traye přesunuta do StartAsync
+  - TrayStatusWindow se při zavření skrývá místo ukončení
+  - Registrovány trae-glm5 a catpaw v rámci .ai-collab
+  - Aktualizován .gitignore pro zajištění sledování všech souborů .ai-collab
+  - 22 souborů změněno, 178 přidání(+), 1226 odebrání(-)
+
+#### Dokumentace
+- `43653bc` - Aktualizován popis repozitáře a AI registr
+  - Aktualizováno README projektu a registrační informace .ai-collab
 
 ### 2026-05-12
 

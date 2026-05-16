@@ -1,6 +1,6 @@
 # Tools Reference
 
-> **Version: v0.1.0-alpha**
+> **Version: v0.2.0-alpha**
 
 This document provides detailed information about all built-in tools in the Silicon Life Collective platform.
 

@@ -1,6 +1,6 @@
 # Referencia de API
 
-> **Versión: v0.1.0-alpha**
+> **Versión: v0.2.0-alpha**
 
 [English](../en/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | **Español** | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
 

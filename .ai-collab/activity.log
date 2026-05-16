@@ -144,3 +144,23 @@
 2026-05-15T21:30:00+08:00 | trae-glm5 | task_claim | task=task-112 | type=docs | fix=更新 Fast 版本文档明确支持 Linux
 2026-05-15T21:45:00+08:00 | trae-glm5 | task_complete | task=task-112 | updated=22 docs files across 11 languages (getting-started.md + architecture.md)
 2026-05-15T21:45:00+08:00 | trae-glm5 | session_end | sessionId=trae-20260515-2130 | status=completed
+2026-05-16T10:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-20260516-1000 | task=task-114
+2026-05-16T10:00:00+08:00 | trae-glm5 | task_claim | task=task-114 | type=release | scope=编写 alpha-0.2 CHANGELOG（全11语言）
+2026-05-16T10:30:00+08:00 | trae-glm5 | file_modified | docs/zh-CN/changelog.md | updated=SiliconLife.Fast平台描述+2026-05-13~16变更条目
+2026-05-16T10:45:00+08:00 | trae-glm5 | file_modified | docs/en/changelog.md | updated=SiliconLife.Fast platform description+2026-05-13~16 changelog entries
+2026-05-16T11:00:00+08:00 | trae-glm5 | file_modified | docs/ja-JP/changelog.md | updated=SiliconLife.Fast プラットフォーム記述+2026-05-13~16 変更エントリ
+2026-05-16T11:15:00+08:00 | trae-glm5 | file_modified | docs/ko-KR/changelog.md | updated=SiliconLife.Fast 플랫폼 설명+2026-05-13~16 변경 항목
+2026-05-16T11:30:00+08:00 | trae-glm5 | file_modified | docs/zh-HK/changelog.md | updated=SiliconLife.Fast 平台描述+2026-05-13~16 變更條目
+2026-05-16T11:45:00+08:00 | trae-glm5 | file_modified | docs/de-DE/changelog.md | updated=SiliconLife.Fast Plattformbeschreibung+2026-05-13~16 Änderungseinträge
+2026-05-16T12:00:00+08:00 | trae-glm5 | file_modified | docs/es-ES/changelog.md | updated=SiliconLife.Fast descripción de plataforma+2026-05-13~16 entradas de cambios
+2026-05-16T12:15:00+08:00 | trae-glm5 | file_modified | docs/fr-FR/changelog.md | updated=SiliconLife.Fast description de plateforme+2026-05-13~16 entrées de modifications
+2026-05-16T12:30:00+08:00 | trae-glm5 | file_modified | docs/it-IT/changelog.md | updated=SiliconLife.Fast descrizione piattaforma+2026-05-13~16 voci di modifica
+2026-05-16T12:45:00+08:00 | trae-glm5 | file_modified | docs/cs-CZ/changelog.md | updated=SiliconLife.Fast popis platformy+2026-05-13~16 položky změn
+2026-05-16T13:00:00+08:00 | trae-glm5 | file_modified | docs/pl-PL/changelog.md | updated=SiliconLife.Fast opis platformy+2026-05-13~16 wpisy zmian
+2026-05-16T13:00:00+08:00 | trae-glm5 | task_complete | task=task-114 | completed=全11语言changelog.md更新（平台描述修正+2026-05-13~16变更条目+Alpha-0.2章节）
+2026-05-16T13:00:00+08:00 | trae-glm5 | session_end | sessionId=trae-20260516-1000 | status=completed
+2026-05-16T13:30:00+08:00 | trae-glm5 | session_start | sessionId=trae-20260516-1330 | task=task-115
+2026-05-16T13:30:00+08:00 | trae-glm5 | task_claim | task=task-115 | type=docs | scope=所有文档版本号更新为alpha-0.2
+2026-05-16T14:00:00+08:00 | trae-glm5 | batch_update | 11语言×15文档=约140个文件 | v0.1.0-alpha→v0.2.0-alpha, v0.1.0→v0.2.0, 0.1.0→0.2.0 | excluded=changelog.md(历史记录)
+2026-05-16T14:00:00+08:00 | trae-glm5 | task_complete | task=task-115 | completed=全11语言文档版本号从0.1.0更新为0.2.0（排除changelog历史记录）
+2026-05-16T14:00:00+08:00 | trae-glm5 | session_end | sessionId=trae-20260516-1330 | status=completed

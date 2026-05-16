@@ -1,6 +1,6 @@
 # Reference Nástrojů
 
-> **Verze: v0.1.0-alpha**
+> **Verze: v0.2.0-alpha**
 
 Tento dokument poskytuje podrobné informace o všech vestavěných nástrojích platformy Silicon Life Collective.
 

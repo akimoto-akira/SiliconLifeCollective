@@ -1,6 +1,6 @@
 # API 参考
 
-> **版本：v0.1.0-alpha**
+> **版本：v0.2.0-alpha**
 
 [English](../en/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | **中文** | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
 

@@ -16,7 +16,7 @@
 本项目提供两个实现版本：
 
 - **SiliconLife.Default**：默认实现，主要用于验证架构可行性。控制台应用程序，文件系统 JSON 存储。
-- **SiliconLife.Fast**：主推生产版本。Windows 窗体应用程序，SpeedyPack 内存存储 + 异步持久化，经过深度性能优化。
+- **SiliconLife.Fast**：主推生产版本。跨平台桌面应用程序（Windows / macOS / Linux），SpeedyPack 内存存储 + 异步持久化，经过深度性能优化。
 
 两个版本共享相同的接口和功能，仅在存储实现和运行模式上有所不同。SiliconLife.Default 作为架构验证基准，SiliconLife.Fast 作为生产环境主推版本。
 
@@ -60,6 +60,147 @@
 ---
 
 ## [未发布]
+
+## Alpha-0.2
+
+### 2026-05-16
+
+#### 发布准备
+- `476d839` - 添加 alpha-0.2 发布任务
+  - 创建 task-114（CHANGELOG 编写）和 task-115（版本号更新）
+  - 1 个文件变更
+
+### 2026-05-15
+
+#### 基础设施
+- `672627b` - 添加 Gitee 同步工作流（带权限配置）
+  - 更新 sync-from-gitee.yml 工作流权限配置
+  - 1 个文件变更，7 行新增，4 行删除
+
+- `3cd5256` - 添加 GitHub Actions 自动同步 Gitee 代码
+  - 新增 sync-from-gitee.yml 工作流
+  - 1 个文件变更，50 行新增
+
+#### 文档更新
+- `aa1d2ad` - 更新全部 11 语言 README/架构/入门文档，体现 SiliconLife.Fast 多平台支持 (ref task-112, task-113)
+  - 修正文档中 SiliconLife.Fast 仅 Windows 的描述，体现实际多平台支持（Windows / macOS / Linux）
+  - 更新 11 种语言的 README.md、architecture.md、getting-started.md
+  - SelectComponent 添加 hint 属性支持
+  - ConfigView 枚举下拉框传入 hint
+  - 11 种语言本地化新增 SelectSearchHint 键值
+  - 53 个文件变更，690 行新增，194 行删除
+
+#### 任务系统
+- `3329f3d` - 添加任务系统巡检机制 + 本地化 Bug 修复任务
+  - 创建 task-113：修复关于页面本地化问题
+  - 更新 task-112：更新 Fast 版本文档支持 Linux
+  - 归档已完成任务（11 个）到 .ai-collab/archive/
+  - 巡检机制配置完成：快速巡检（每 30 分钟）+ 全量巡检（每天 06:00）
+  - 2 个文件变更，148 行新增，171 行删除
+
+#### 协作框架
+- `6038e22` - 注册 coze-agent 到 .ai-collab 协作注册表
+  - 新增扣子平台常驻 AI 注册信息
+  - 1 个文件变更
+
+### 2026-05-14
+
+#### AI 协作框架
+- `7344fbb` - 移除 handoff 模式，改为任务列表驱动 (v2.0)
+  - 重构 .ai-collab 目录结构，从 handoff 交接模式改为任务列表驱动
+  - 新增 tasks.json 任务列表核心文件
+  - 新增 activity.log 操作日志
+  - 新增 changes/ 和 sessions/ 目录
+
+- `589a48e` - 添加 .ai-collab 会话记录
+  - 新增 AI 协作会话状态记录
+
+- `5481bcf` - 注册 Qoder AI IDE 到协作注册表
+  - 新增 Qoder AI 编程助手注册信息
+
+- `e2d7b61` - 补充 tasks.json relatedCommit 和 changes commitHash
+  - 完善任务元数据关联
+
+- `a087f0c` - 验收 task-101~110 全部任务
+  - 确认 10 个任务修复全部完成
+
+#### Bug 修复
+- `fac9435` - 完成 task-101~110 全部 10 个任务修复与实现
+  - 修复搜索选择组件缺少提示文字
+  - 修复关于页面本地化问题
+  - 修复帮助系统搜索 JS 错误
+  - 39 个文件变更，684 行新增，121 行删除
+
+- `c46dfbc` - 完成所有待办任务 (task-001~006)
+  - 完成初始 6 个待办任务
+
+- `ec176b2` - 覆盖任务列表 - 代码审查发现 10 个新 bug
+  - 创建 task-101~110 共 10 个新任务
+
+#### 重构
+- `ab15915` - 统一版权头 + 修复 HelpController BOM 和 HelpView 搜索 JS
+  - 统一所有 C# 源文件 Apache 2.0 版权头
+  - 修复 HelpController BOM 编码问题
+  - 修复 HelpView 搜索 JavaScript 错误
+
+#### 新功能
+- `18a6f5d` - 创建 MCP 浏览器能力服务器 (ref task-111)
+  - 新增 SiliconLife.McpServer 项目
+  - 实现 Playwright 浏览器自动化 MCP 服务器
+
+- `9eb251a` - 移除 SiliconLife.McpServer 模块 (ref task-111)
+  - 移除独立 MCP 服务器，功能已集成到主项目
+
+### 2026-05-13
+
+#### 本地化
+- `7a62590` - 添加波兰语本地化支持
+  - 新增 pl-PL 波兰语本地化实现（PlPL.cs，1089 行）
+  - 新增波兰语帮助文档本地化（HelpLocalizationPlPL.cs，3972 行）
+  - 新增波兰语中国历史日历支持（ChineseHistoricalPlPL.cs，600 行）
+  - 新增波兰语托盘本地化（TrayPlPL.cs，135 行）
+  - 新增波兰语完整文档集（15 个文档）
+  - Language 枚举新增波兰语
+  - 35 个文件变更，14379 行新增，11 行删除
+
+- `51f9c8e` - 更新文档中的 Ark AI 引用和术语改进
+  - 更新多语言文档中的 AI 客户端术语
+
+- `7587c12` - 为所有语言添加变更日志条目
+  - 同步更新所有语言版本的 changelog
+
+#### 窗口系统迁移
+- `b49a07d` - 迁移到 Avalonia 窗口常驻模式
+  - 移除 Windows Forms 依赖，完全迁移到 Avalonia UI 框架
+  - 状态窗口在 Linux 上正常显示（远程桌面验证）
+  - 添加窗口控制：右键菜单、双击打开 Web、关闭按钮
+  - 添加多 AI 协作框架 (.ai-collab/)
+  - 修复托盘图标初始化（优雅降级）
+  - 新增 App.axaml 和 App.cs Avalonia 应用入口
+  - 13 个文件变更，1442 行新增，541 行删除
+
+- `d335aaf` - Linux 平台窗口始终显示 + 关闭确认对话框
+  - Linux 上自动显示状态窗口（无托盘图标）
+  - Linux 上关闭窗口时弹出确认对话框
+  - Windows/macOS 保持原有托盘行为
+  - 支持 --no-tray 参数强制禁用托盘
+  - 新增 ShowMessageBoxAsync 方法用于确认对话框
+  - 3 个文件变更，206 行新增，29 行删除
+
+#### 托盘系统重构
+- `841d384` - 重构托盘系统并初始化 AI 协作框架
+  - 精简 TrayLocalizationBase 移除未使用属性
+  - 添加 ShowStatus 本地化项
+  - App.cs 添加托盘图标点击显示状态窗口、本地化菜单项
+  - Program.cs 将托盘图标初始化移至 StartAsync
+  - TrayStatusWindow 关闭时隐藏而非退出
+  - 注册 trae-glm5 和 catpaw 至 .ai-collab 协作框架
+  - 更新 .gitignore 确保 .ai-collab 所有文件均被追踪
+  - 22 个文件变更，178 行新增，1226 行删除
+
+#### 文档
+- `43653bc` - 更新仓库说明和 AI 注册表
+  - 更新项目 README 和 .ai-collab 注册信息
 
 ### 2026-05-12
 

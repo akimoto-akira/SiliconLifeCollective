@@ -16,7 +16,7 @@ et ce projet adhère à la [Gestion sémantique de version](https://semver.org/s
 Ce projet propose deux versions d'implémentation :
 
 - **SiliconLife.Default** : Implémentation standard, principalement pour la vérification de faisabilité architecturale. Application console, stockage JSON en système de fichiers.
-- **SiliconLife.Fast** : Version principale de production. Application Windows Forms, stockage en mémoire SpeedyPack + persistance asynchrone, optimisation approfondie des performances.
+- **SiliconLife.Fast** : Version principale de production. Application de bureau multiplateforme (Windows / macOS / Linux), stockage en mémoire SpeedyPack + persistance asynchrone, optimisation approfondie des performances.
 
 Les deux versions partagent les mêmes interfaces et fonctionnalités, différant uniquement dans l'implémentation du stockage et le mode d'exécution. SiliconLife.Default sert de référence pour la vérification architecturale, SiliconLife.Fast est la version principale recommandée pour la production.
 
@@ -60,6 +60,147 @@ Les deux versions partagent les mêmes interfaces et fonctionnalités, différan
 ---
 
 ## [Non publié]
+
+## Alpha-0.2
+
+### 2026-05-16
+
+#### Préparation de la version
+- `476d839` - Tâches de version alpha-0.2 ajoutées
+  - Création de task-114 (rédaction du CHANGELOG) et task-115 (mise à jour du numéro de version)
+  - 1 fichier modifié
+
+### 2026-05-15
+
+#### Infrastructure
+- `672627b` - Workflow de synchronisation Gitee ajouté (avec configuration des permissions)
+  - Permissions du workflow sync-from-gitee.yml mises à jour
+  - 1 fichier modifié, 7 ajouts(+), 4 suppressions(-)
+
+- `3cd5256` - Synchronisation automatique Gitee via GitHub Actions ajoutée
+  - Workflow sync-from-gitee.yml ajouté
+  - 1 fichier modifié, 50 ajouts(+)
+
+#### Mises à jour de la documentation
+- `aa1d2ad` - Mise à jour des README/architecture/premiers-pas dans les 11 langues, reflétant le support multiplateforme de SiliconLife.Fast (ref task-112, task-113)
+  - Correction de la documentation décrivant SiliconLife.Fast comme Windows uniquement, reflétant le support multiplateforme réel (Windows / macOS / Linux)
+  - Mise à jour de README.md, architecture.md, getting-started.md dans les 11 langues
+  - Ajout du support de propriété hint à SelectComponent
+  - ConfigView transmet désormais le paramètre hint aux listes déroulantes d'énumération
+  - Ajout de la clé SelectSearchHint aux localisations des 11 langues
+  - 53 fichiers modifiés, 690 ajouts(+), 194 suppressions(-)
+
+#### Système de tâches
+- `3329f3d` - Mécanisme d'inspection du système de tâches + tâches de correction de bugs de localisation ajoutées
+  - Création de task-113 : corriger le problème de localisation de la page d'informations
+  - Mise à jour de task-112 : mettre à jour la documentation de la version Fast pour le support Linux
+  - Archivage des tâches terminées (11) dans .ai-collab/archive/
+  - Mécanisme d'inspection configuré : inspection rapide (toutes les 30 min) + inspection complète (quotidienne 06:00)
+  - 2 fichiers modifiés, 148 ajouts(+), 171 suppressions(-)
+
+#### Cadre de collaboration
+- `6038e22` - coze-agent enregistré dans le registre .ai-collab
+  - Ajout des informations d'enregistrement de l'AI résidente de la plateforme Coze
+  - 1 fichier modifié
+
+### 2026-05-14
+
+#### Cadre de collaboration AI
+- `7344fbb` - Mode handoff supprimé, passage à l'approche basée sur la liste de tâches (v2.0)
+  - Restructuration du répertoire .ai-collab du mode handoff à l'approche basée sur la liste de tâches
+  - Ajout du fichier principal de liste de tâches tasks.json
+  - Ajout du journal d'opérations activity.log
+  - Ajout des répertoires changes/ et sessions/
+
+- `589a48e` - Enregistrements de session .ai-collab ajoutés
+  - Ajout des enregistrements d'état de session de collaboration AI
+
+- `5481bcf` - Qoder AI IDE enregistré dans le registre de collaboration
+  - Ajout des informations d'enregistrement de l'assistant de codage Qoder AI
+
+- `e2d7b61` - relatedCommit et changes commitHash de tasks.json complétés
+  - Associations de métadonnées de tâches finalisées
+
+- `a087f0c` - Toutes les tâches task-101~110 acceptées
+  - Confirmation que les 10 corrections de tâches sont terminées
+
+#### Corrections de bugs
+- `fac9435` - Toutes les corrections et implémentations de task-101~110 terminées
+  - Correction du texte d'indice manquant dans le composant de sélection de recherche
+  - Correction des problèmes de localisation sur la page d'informations
+  - Correction de l'erreur JS de recherche dans le système d'aide
+  - 39 fichiers modifiés, 684 ajouts(+), 121 suppressions(-)
+
+- `c46dfbc` - Toutes les tâches en attente terminées (task-001~006)
+  - 6 tâches en attente initiales terminées
+
+- `ec176b2` - Liste de tâches écrasée - revue de code a trouvé 10 nouveaux bugs
+  - Création de task-101~110 (10 nouvelles tâches)
+
+#### Refactoring
+- `ab15915` - En-têtes de copyright unifiés + HelpController BOM et HelpView recherche JS corrigés
+  - En-têtes de copyright Apache 2.0 unifiés dans tous les fichiers sources C#
+  - Correction du problème d'encodage BOM de HelpController
+  - Correction de l'erreur JavaScript de recherche de HelpView
+
+#### Nouvelles fonctionnalités
+- `18a6f5d` - Serveur de capacité de navigateur MCP créé (ref task-111)
+  - Ajout du projet SiliconLife.McpServer
+  - Implémentation du serveur MCP d'automatisation de navigateur Playwright
+
+- `9eb251a` - Module SiliconLife.McpServer supprimé (ref task-111)
+  - Serveur MCP autonome supprimé, fonctionnalité intégrée au projet principal
+
+### 2026-05-13
+
+#### Localisation
+- `7a62590` - Support de localisation polonaise ajouté
+  - Ajout de l'implémentation de localisation polonaise pl-PL (PlPL.cs, 1089 lignes)
+  - Ajout de la localisation de documentation d'aide polonaise (HelpLocalizationPlPL.cs, 3972 lignes)
+  - Ajout du support de calendrier historique chinois polonais (ChineseHistoricalPlPL.cs, 600 lignes)
+  - Ajout de la localisation de barre d'état polonaise (TrayPlPL.cs, 135 lignes)
+  - Ajout du jeu de documentation polonaise complet (15 documents)
+  - Énumération Language étendue avec le polonais
+  - 35 fichiers modifiés, 14379 ajouts(+), 11 suppressions(-)
+
+- `51f9c8e` - Références Ark AI et améliorations de terminologie dans la documentation mises à jour
+  - Terminologie du client AI mise à jour dans la documentation multilingue
+
+- `7587c12` - Entrées de journal des modifications ajoutées pour toutes les langues
+  - Mises à jour du journal des modifications synchronisées dans toutes les versions linguistiques
+
+#### Migration du système de fenêtres
+- `b49a07d` - Migration vers le mode résident de fenêtre Avalonia
+  - Suppression de la dépendance Windows Forms, migration complète vers le framework Avalonia UI
+  - Fenêtre d'état s'affiche correctement sous Linux (vérifié par bureau à distance)
+  - Contrôles de fenêtre ajoutés : menu contextuel, double-clic pour ouvrir le Web, bouton de fermeture
+  - Ajout du cadre de collaboration multi-AI (.ai-collab/)
+  - Correction de l'initialisation de l'icône de barre d'état (dégradation gracieuse)
+  - Ajout de App.axaml et App.cs comme points d'entrée de l'application Avalonia
+  - 13 fichiers modifiés, 1442 ajouts(+), 541 suppressions(-)
+
+- `d335aaf` - Fenêtre toujours visible sur plateforme Linux + dialogue de confirmation de fermeture
+  - Linux affiche automatiquement la fenêtre d'état (sans icône de barre d'état)
+  - Linux affiche un dialogue de confirmation lors de la fermeture de la fenêtre
+  - Windows/macOS conservent le comportement de barre d'état original
+  - Paramètre --no-tray supporté pour désactiver forcerment la barre d'état
+  - Ajout de la méthode ShowMessageBoxAsync pour les dialogues de confirmation
+  - 3 fichiers modifiés, 206 ajouts(+), 29 suppressions(-)
+
+#### Refactoring du système de barre d'état
+- `841d384` - Système de barre d'état refactorisé et cadre de collaboration AI initialisé
+  - TrayLocalizationBase simplifié, propriétés inutilisées supprimées
+  - Ajout de l'élément de localisation ShowStatus
+  - App.cs : clic sur l'icône de barre d'état affiche la fenêtre d'état, éléments de menu localisés ajoutés
+  - Program.cs : initialisation de l'icône de barre d'état déplacée vers StartAsync
+  - TrayStatusWindow se masque au lieu de se fermer lors de la fermeture
+  - Enregistrement de trae-glm5 et catpaw dans le cadre .ai-collab
+  - Mise à jour de .gitignore pour assurer le suivi de tous les fichiers .ai-collab
+  - 22 fichiers modifiés, 178 ajouts(+), 1226 suppressions(-)
+
+#### Documentation
+- `43653bc` - Description du dépôt et registre AI mis à jour
+  - README du projet et informations d'enregistrement .ai-collab mis à jour
 
 ### 2026-05-12
 

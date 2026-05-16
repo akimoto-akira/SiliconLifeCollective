@@ -16,7 +16,7 @@ und das Projekt folgt [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 Dieses Projekt bietet zwei Implementierungsversionen:
 
 - **SiliconLife.Default**: Standardimplementierung, hauptsächlich zur Validierung der Architekturfähigkeit. Konsolenanwendung, Dateisystem-JSON-Speicher.
-- **SiliconLife.Fast**: Empfohlene Produktionsversion. Windows Forms-Anwendung, SpeedyPack-In-Memory-Speicher + asynchrone Persistenz, tiefgehend optimiert für Leistung.
+- **SiliconLife.Fast**: Empfohlene Produktionsversion. Plattformübergreifende Desktop-Anwendung (Windows / macOS / Linux), SpeedyPack-In-Memory-Speicher + asynchrone Persistenz, tiefgehend optimiert für Leistung.
 
 Beide Versionen teilen die gleichen Schnittstellen und Funktionen und unterscheiden sich nur in der Speicherimplementierung und dem Ausführungsmodus. SiliconLife.Default dient als Architekturvalidierungsbenchmark, SiliconLife.Fast als empfohlene Produktionsversion.
 
@@ -60,6 +60,147 @@ Beide Versionen teilen die gleichen Schnittstellen und Funktionen und unterschei
 ---
 
 ## [Unveröffentlicht]
+
+## Alpha-0.2
+
+### 2026-05-16
+
+#### Veröffentlichungsvorbereitung
+- `476d839` - Alpha-0.2-Veröffentlichungsaufgaben hinzugefügt
+  - task-114 (CHANGELOG-Erstellung) und task-115 (Versionsnummernaktualisierung) erstellt
+  - 1 Datei geändert
+
+### 2026-05-15
+
+#### Infrastruktur
+- `672627b` - Gitee-Sync-Workflow mit Berechtigungskonfiguration hinzugefügt
+  - sync-from-gitee.yml Workflow-Berechtigungen aktualisiert
+  - 1 Datei geändert, 7 Einfügungen(+), 4 Löschungen(-)
+
+- `3cd5256` - GitHub Actions Auto-Sync von Gitee hinzugefügt
+  - sync-from-gitee.yml Workflow hinzugefügt
+  - 1 Datei geändert, 50 Einfügungen(+)
+
+#### Dokumentationsaktualisierungen
+- `aa1d2ad` - Alle 11 Sprachen README/Architektur/Erste-Schritte-Dokumente aktualisiert, SiliconLife.Fast Multi-Plattform-Unterstützung widergespiegelt (ref task-112, task-113)
+  - Dokumentation korrigiert, die SiliconLife.Fast als Windows-only beschrieb, um tatsächliche Multi-Plattform-Unterstützung (Windows / macOS / Linux) widerzuspiegeln
+  - README.md, architecture.md, getting-started.md für alle 11 Sprachen aktualisiert
+  - SelectComponent um Hint-Eigenschaft erweitert
+  - ConfigView Enum-Dropdowns übergeben nun Hint-Parameter
+  - 11 Sprachen Lokalisierung um SelectSearchHint-Schlüssel erweitert
+  - 53 Dateien geändert, 690 Einfügungen(+), 194 Löschungen(-)
+
+#### Aufgabensystem
+- `3329f3d` - Aufgabensystem-Inspektionsmechanismus + Lokalisierungs-Bug-Fix-Aufgaben hinzugefügt
+  - task-113 erstellt: Info-Seite Lokalisierungsproblem beheben
+  - task-112 aktualisiert: Fast-Version Dokumentation für Linux-Support aktualisieren
+  - Abgeschlossene Aufgaben (11) nach .ai-collab/archive/ archiviert
+  - Inspektionsmechanismus konfiguriert: Schnellinspektion (alle 30 Min) + Vollinspektion (täglich 06:00)
+  - 2 Dateien geändert, 148 Einfügungen(+), 171 Löschungen(-)
+
+#### Kollaborations-Framework
+- `6038e22` - coze-agent im .ai-collab-Registrierungsregister eingetragen
+  - Coze-Plattform residente AI-Registrierungsinformationen hinzugefügt
+  - 1 Datei geändert
+
+### 2026-05-14
+
+#### AI-Kollaborations-Framework
+- `7344fbb` - Handoff-Modus entfernt, auf aufgabenlistengetriebenen Ansatz umgestellt (v2.0)
+  - .ai-collab-Verzeichnisstruktur vom Handoff-Modus auf aufgabenlistengetrieben umstrukturiert
+  - tasks.json Kern-Aufgabenlistendatei hinzugefügt
+  - activity.log Operationslog hinzugefügt
+  - changes/ und sessions/ Verzeichnisse hinzugefügt
+
+- `589a48e` - .ai-collab-Sitzungsaufzeichnungen hinzugefügt
+  - AI-Kollaboration-Sitzungszustandsaufzeichnungen hinzugefügt
+
+- `5481bcf` - Qoder AI IDE im Kollaborationsregister eingetragen
+  - Qoder AI-Coding-Assistent-Registrierungsinformationen hinzugefügt
+
+- `e2d7b61` - tasks.json relatedCommit und changes commitHash ergänzt
+  - Aufgaben-Metadaten-Verknüpfungen vervollständigt
+
+- `a087f0c` - Alle task-101~110-Aufgaben abgenommen
+  - Bestätigt, dass alle 10 Aufgaben-Fixes abgeschlossen sind
+
+#### Bug-Fixes
+- `fac9435` - Alle task-101~110 Bug-Fixes und Implementierungen abgeschlossen
+  - Fehlender Hinweistext in Suchauswahlkomponente behoben
+  - Lokalisierungsprobleme auf der Info-Seite behoben
+  - Hilfesystem-Such-JS-Fehler behoben
+  - 39 Dateien geändert, 684 Einfügungen(+), 121 Löschungen(-)
+
+- `c46dfbc` - Alle ausstehenden Aufgaben abgeschlossen (task-001~006)
+  - Initiale 6 ausstehende Aufgaben abgeschlossen
+
+- `ec176b2` - Aufgabenliste überschrieben - Code-Review fand 10 neue Bugs
+  - task-101~110 (10 neue Aufgaben) erstellt
+
+#### Refactoring
+- `ab15915` - Urheberrechtshinweise vereinheitlicht + HelpController BOM und HelpView-Such-JS behoben
+  - Apache 2.0 Urheberrechtshinweise in allen C#-Quelldateien vereinheitlicht
+  - HelpController BOM-Kodierungsproblem behoben
+  - HelpView-Such-JavaScript-Fehler behoben
+
+#### Neue Funktionen
+- `18a6f5d` - MCP-Browser-Fähigkeitsserver erstellt (ref task-111)
+  - SiliconLife.McpServer-Projekt hinzugefügt
+  - Playwright-Browser-Automatisierung MCP-Server implementiert
+
+- `9eb251a` - SiliconLife.McpServer-Modul entfernt (ref task-111)
+  - Eigenständigen MCP-Server entfernt, Funktionalität in Hauptprojekt integriert
+
+### 2026-05-13
+
+#### Lokalisierung
+- `7a62590` - Polnische Lokalisierungsunterstützung hinzugefügt
+  - pl-PL polnische Lokalisierungsimplementierung hinzugefügt (PlPL.cs, 1089 Zeilen)
+  - Polnische Hilfedokumentation-Lokalisierung hinzugefügt (HelpLocalizationPlPL.cs, 3972 Zeilen)
+  - Polnische chinesische historische Kalenderunterstützung hinzugefügt (ChineseHistoricalPlPL.cs, 600 Zeilen)
+  - Polnische Tray-Lokalisierung hinzugefügt (TrayPlPL.cs, 135 Zeilen)
+  - Vollständigen polnischen Dokumentationssatz hinzugefügt (15 Dokumente)
+  - Language-Enum um Polnisch erweitert
+  - 35 Dateien geändert, 14379 Einfügungen(+), 11 Löschungen(-)
+
+- `51f9c8e` - Dokumentation mit Ark-AI-Referenzen und Terminologieverbesserungen aktualisiert
+  - AI-Client-Terminologie in mehrsprachiger Dokumentation aktualisiert
+
+- `7587c12` - Änderungsprotokoll-Einträge für alle Sprachen hinzugefügt
+  - Änderungsprotokoll-Updates über alle Sprachversionen synchronisiert
+
+#### Fenstersystem-Migration
+- `b49a07d` - Auf Avalonia-Fenster-Resident-Modus migriert
+  - Windows Forms-Abhängigkeit entfernt, vollständig auf Avalonia UI-Framework migriert
+  - Statusfenster wird unter Linux korrekt angezeigt (über Remote-Desktop verifiziert)
+  - Fenstersteuerelemente hinzugefügt: Rechtsklick-Menü, Doppelklick zum Öffnen des Web, Schließen-Button
+  - Multi-AI-Kollaborations-Framework (.ai-collab/) hinzugefügt
+  - Tray-Icon-Initialisierung behoben (graceful Degradation)
+  - App.axaml und App.cs Avalonia-Anwendungseinstieg hinzugefügt
+  - 13 Dateien geändert, 1442 Einfügungen(+), 541 Löschungen(-)
+
+- `d335aaf` - Linux-Plattform-Fenster immer sichtbar + Schließen-Bestätigungsdialog
+  - Linux zeigt automatisch Statusfenster an (kein Tray-Icon)
+  - Linux zeigt Bestätigungsdialog beim Schließen des Fensters
+  - Windows/macOS behalten ursprüngliches Tray-Verhalten
+  - --no-tray-Parameter zum erzwungenen Deaktivieren des Trays unterstützt
+  - ShowMessageBoxAsync-Methode für Bestätigungsdialoge hinzugefügt
+  - 3 Dateien geändert, 206 Einfügungen(+), 29 Löschungen(-)
+
+#### Tray-System-Refactoring
+- `841d384` - Tray-System refaktoriert und AI-Kollaborations-Framework initialisiert
+  - TrayLocalizationBase gestrafft, ungenutzte Eigenschaften entfernt
+  - ShowStatus-Lokalisierungseintrag hinzugefügt
+  - App.cs: Tray-Icon-Klick zeigt Statusfenster, lokalisierte Menüeinträge hinzugefügt
+  - Program.cs: Tray-Icon-Initialisierung nach StartAsync verschoben
+  - TrayStatusWindow wird beim Schließen ausgeblendet statt beendet
+  - trae-glm5 und catpaw im .ai-collab-Framework registriert
+  - .gitignore aktualisiert, sodass alle .ai-collab-Dateien verfolgt werden
+  - 22 Dateien geändert, 178 Einfügungen(+), 1226 Löschungen(-)
+
+#### Dokumentation
+- `43653bc` - Repository-Beschreibung und AI-Register aktualisiert
+  - Projekt-README und .ai-collab-Registrierungsinformationen aktualisiert
 
 ### 2026-05-12
 

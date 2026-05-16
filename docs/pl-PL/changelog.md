@@ -16,7 +16,7 @@ ten projekt jest zgodny z [Semantycznym Wersjonowaniem](https://semver.org/spec/
 Ten projekt oferuje dwie wersje implementacji:
 
 - **SiliconLife.Default**: domyślna implementacja, głównie do weryfikacji wykonalności architektury. Aplikacja konsolowa, przechowywanie JSON w systemie plików.
-- **SiliconLife.Fast**: główna wersja produkcyjna. Aplikacja okienkowa Windows, pamięć SpeedyPack + asynchroniczna trwałość, głęboko zoptymalizowana pod kątem wydajności.
+- **SiliconLife.Fast**: główna wersja produkcyjna. Wieloplatformowa aplikacja desktopowa (Windows / macOS / Linux), pamięć SpeedyPack + asynchroniczna trwałość, głęboko zoptymalizowana pod kątem wydajności.
 
 Obie wersje współdzielą te same interfejsy i funkcjonalność, różniąc się jedynie implementacją przechowywania i trybem działania. SiliconLife.Default służy jako referencyjna implementacja weryfikacji architektury, a SiliconLife.Fast jako główna wersja do środowisk produkcyjnych.
 
@@ -60,6 +60,147 @@ Obie wersje współdzielą te same interfejsy i funkcjonalność, różniąc si�
 ---
 
 ## [Nieopublikowane]
+
+## Alpha-0.2
+
+### 2026-05-16
+
+#### Przygotowanie wydania
+- `476d839` - Dodano zadania wydania alpha-0.2
+  - Utworzono task-114 (pisanie CHANGELOG) i task-115 (aktualizacja numeru wersji)
+  - 1 plik zmieniony
+
+### 2026-05-15
+
+#### Infrastruktura
+- `672627b` - Dodano workflow synchronizacji Gitee (z konfiguracją uprawnień)
+  - Zaktualizowano uprawnienia workflow sync-from-gitee.yml
+  - 1 plik zmieniony, 7 dodań(+), 4 usunięć(-)
+
+- `3cd5256` - Dodano automatyczną synchronizację Gitee przez GitHub Actions
+  - Dodano workflow sync-from-gitee.yml
+  - 1 plik zmieniony, 50 dodań(+)
+
+#### Aktualizacje dokumentacji
+- `aa1d2ad` - Zaktualizowano README/architekturę/pierwsze-kroki we wszystkich 11 językach, odzwierciedlając wieloplatformowe wsparcie SiliconLife.Fast (ref task-112, task-113)
+  - Poprawiono dokumentację opisującą SiliconLife.Fast jako tylko Windows, odzwierciedlając rzeczywiste wsparcie wieloplatformowe (Windows / macOS / Linux)
+  - Zaktualizowano README.md, architecture.md, getting-started.md w 11 językach
+  - Dodano obsługę właściwości hint w SelectComponent
+  - ConfigView teraz przekazuje parametr hint do list rozwijanych enumeracji
+  - Dodano klucz SelectSearchHint do lokalizacji 11 języków
+  - 53 pliki zmienione, 690 dodań(+), 194 usunięć(-)
+
+#### System zadań
+- `3329f3d` - Dodano mechanizm inspekcji systemu zadań + zadania naprawy błędów lokalizacji
+  - Utworzono task-113: naprawić problem lokalizacji na stronie informacji
+  - Zaktualizowano task-112: zaktualizować dokumentację wersji Fast dla wsparcia Linux
+  - Zarchiwizowano ukończone zadania (11) do .ai-collab/archive/
+  - Mechanizm inspekcji skonfigurowany: szybka inspekcja (co 30 min) + pełna inspekcja (codziennie 06:00)
+  - 2 pliki zmienione, 148 dodań(+), 171 usunięć(-)
+
+#### Ramy współpracy
+- `6038e22` - coze-agent zarejestrowany w rejestrze .ai-collab
+  - Dodano informacje rejestracyjne rezydentnej AI platformy Coze
+  - 1 plik zmieniony
+
+### 2026-05-14
+
+#### Ramy współpracy AI
+- `7344fbb` - Usunięto tryb handoff, przejście na podejście oparte na liście zadań (v2.0)
+  - Zrestrukturyzowano katalog .ai-collab z trybu handoff na podejście oparte na liście zadań
+  - Dodano główny plik listy zadań tasks.json
+  - Dodano dziennik operacji activity.log
+  - Dodano katalogi changes/ i sessions/
+
+- `589a48e` - Dodano rekordy sesji .ai-collab
+  - Dodano rekordy stanu sesji współpracy AI
+
+- `5481bcf` - Qoder AI IDE zarejestrowany w rejestrze współpracy
+  - Dodano informacje rejestracyjne asystenta kodowania Qoder AI
+
+- `e2d7b61` - relatedCommit i changes commitHash w tasks.json uzupełnione
+  - Asocjacje metadanych zadań ukończone
+
+- `a087f0c` - Wszystkie zadania task-101~110 zaakceptowane
+  - Potwierdzono, że wszystkie 10 poprawek zadań jest ukończonych
+
+#### Naprawy błędów
+- `fac9435` - Ukończono wszystkie naprawy i implementacje task-101~110
+  - Naprawiono brakujący tekst podpowiedzi w komponencie wyboru wyszukiwania
+  - Naprawiono problemy lokalizacji na stronie informacji
+  - Naprawiono błąd JS wyszukiwania w systemie pomocy
+  - 39 plików zmienionych, 684 dodań(+), 121 usunięć(-)
+
+- `c46dfbc` - Ukończono wszystkie oczekujące zadania (task-001~006)
+  - Ukończono 6 początkowych oczekujących zadań
+
+- `ec176b2` - Lista zadań nadpisana - przegląd kodu znalazł 10 nowych błędów
+  - Utworzono task-101~110 (10 nowych zadań)
+
+#### Refaktoryzacja
+- `ab15915` - Ujednolicono nagłówki praw autorskich + naprawiono HelpController BOM i HelpView wyszukiwanie JS
+  - Ujednolicono nagłówki praw autorskich Apache 2.0 we wszystkich plikach źródłowych C#
+  - Naprawiono problem kodowania BOM w HelpController
+  - Naprawiono błąd JavaScript wyszukiwania w HelpView
+
+#### Nowe funkcje
+- `18a6f5d` - Utworzono serwer możliwości przeglądarki MCP (ref task-111)
+  - Dodano projekt SiliconLife.McpServer
+  - Zaimplementowano serwer MCP automatyzacji przeglądarki Playwright
+
+- `9eb251a` - Usunięto moduł SiliconLife.McpServer (ref task-111)
+  - Samodzielny serwer MCP usunięty, funkcjonalność zintegrowana w głównym projekcie
+
+### 2026-05-13
+
+#### Lokalizacja
+- `7a62590` - Dodano wsparcie lokalizacji polskiej
+  - Dodano implementację lokalizacji polskiej pl-PL (PlPL.cs, 1089 wierszy)
+  - Dodano lokalizację polskiej dokumentacji pomocy (HelpLocalizationPlPL.cs, 3972 wierszy)
+  - Dodano wsparcie polskiego chińskiego kalendarza historycznego (ChineseHistoricalPlPL.cs, 600 wierszy)
+  - Dodano lokalizację polskiej tacki (TrayPlPL.cs, 135 wierszy)
+  - Dodano kompletny zestaw polskiej dokumentacji (15 dokumentów)
+  - Enumeracja Language rozszerzona o polski
+  - 35 plików zmienionych, 14379 dodań(+), 11 usunięć(-)
+
+- `51f9c8e` - Zaktualizowano odniesienia do Ark AI i ulepszenia terminologii w dokumentacji
+  - Zaktualizowano terminologię klienta AI w wielojęzycznej dokumentacji
+
+- `7587c12` - Dodano wpisy dziennika zmian dla wszystkich języków
+  - Aktualizacje dziennika zmian zsynchronizowane we wszystkich wersjach językowych
+
+#### Migracja systemu okien
+- `b49a07d` - Migrowano do rezydentnego trybu okna Avalonia
+  - Usunięto zależność Windows Forms, pełna migracja do frameworka Avalonia UI
+  - Okno stanu wyświetla się poprawnie na Linuxie (zweryfikowane przez pulpit zdalny)
+  - Dodano kontrolki okna: menu kontekstowe, podwójne kliknięcie aby otworzyć Web, przycisk zamykania
+  - Dodano ramy współpracy multi-AI (.ai-collab/)
+  - Naprawiono inicjalizację ikony tacki (graceful degradation)
+  - Dodano App.axaml i App.cs jako punkty wejścia aplikacji Avalonia
+  - 13 plików zmienionych, 1442 dodań(+), 541 usunięć(-)
+
+- `d335aaf` - Okno zawsze widoczne na platformie Linux + dialog potwierdzenia zamknięcia
+  - Linux automatycznie wyświetla okno stanu (bez ikony tacki)
+  - Linux wyświetla dialog potwierdzenia przy zamykaniu okna
+  - Windows/macOS zachowują oryginalne zachowanie tacki
+  - Obsługiwany parametr --no-tray do wymuszonego wyłączenia tacki
+  - Dodano metodę ShowMessageBoxAsync dla dialogów potwierdzenia
+  - 3 pliki zmienione, 206 dodań(+), 29 usunięć(-)
+
+#### Refaktoryzacja systemu tacki
+- `841d384` - Zrefaktoryzowano system tacki i zainicjowano ramy współpracy AI
+  - TrayLocalizationBase uproszczony, nieużywane właściwości usunięte
+  - Dodano element lokalizacji ShowStatus
+  - App.cs: kliknięcie ikony tacki wyświetla okno stanu, dodano zlokalizowane elementy menu
+  - Program.cs: inicjalizacja ikony tacki przeniesiona do StartAsync
+  - TrayStatusWindow ukrywa się zamiast zamykać przy zamykaniu
+  - Zarejestrowano trae-glm5 i catpaw w ramach .ai-collab
+  - Zaktualizowano .gitignore aby zapewnić śledzenie wszystkich plików .ai-collab
+  - 22 pliki zmienione, 178 dodań(+), 1226 usunięć(-)
+
+#### Dokumentacja
+- `43653bc` - Zaktualizowano opis repozytorium i rejestr AI
+  - Zaktualizowano README projektu i informacje rejestracyjne .ai-collab
 
 ### 2026-05-12
 

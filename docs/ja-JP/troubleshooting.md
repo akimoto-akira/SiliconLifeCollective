@@ -1,6 +1,6 @@
 # トラブルシューティングガイド
 
-> **バージョン: v0.1.0-alpha**
+> **バージョン: v0.2.0-alpha**
 
 [English](../en/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | **日本語** | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md)
 

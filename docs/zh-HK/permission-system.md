@@ -1,6 +1,6 @@
 # 權限系統
 
-> **版本：v0.1.0-alpha**
+> **版本：v0.2.0-alpha**
 
 [English](../en/permission-system.md) | [中文](../zh-CN/permission-system.md) | **繁體中文** | [Español](../es-ES/permission-system.md) | [日本語](../ja-JP/permission-system.md) | [한국어](../ko-KR/permission-system.md) | [Čeština](../cs-CZ/permission-system.md)
 

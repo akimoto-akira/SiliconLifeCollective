@@ -1,6 +1,6 @@
 # Guía de Contribución
 
-> **Versión: v0.1.0-alpha**
+> **Versión: v0.2.0-alpha**
 
 [English](../en/contributing.md) | [Deutsch](../de-DE/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | **Español** | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md)
 

@@ -2,7 +2,7 @@
 
 # Silicon Life Collective
 
-**Wersja: v0.1.0-alpha** | **Kolektyw Życia Krzemowego** — platforma wieloagentowej współpracy oparta na .NET 9, w której agenty AI nazywane **Istotami Krzemowymi**, ewoluują samodzielnie dzięki dynamicznej kompilacji Roslyn.
+**Wersja: v0.2.0-alpha** | **Kolektyw Życia Krzemowego** — platforma wieloagentowej współpracy oparta na .NET 9, w której agenty AI nazywane **Istotami Krzemowymi**, ewoluują samodzielnie dzięki dynamicznej kompilacji Roslyn.
 
 [English](../en/README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md) | [Italiano](../it-IT/README.md) | **Polski**
 

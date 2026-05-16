@@ -1,6 +1,6 @@
 # ロードマップ
 
-> **バージョン: v0.1.0-alpha**
+> **バージョン: v0.2.0-alpha**
 
 [English](../en/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | **日本語** | [한국어](../ko-KR/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
 

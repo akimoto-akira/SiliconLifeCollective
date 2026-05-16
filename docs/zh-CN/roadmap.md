@@ -1,6 +1,6 @@
 # 路线图
 
-> **版本：v0.1.0-alpha**
+> **版本：v0.2.0-alpha**
 
 [English](../en/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | **中文** | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Čeština](../cs-CZ/roadmap.md)
 

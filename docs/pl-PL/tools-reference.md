@@ -1,6 +1,6 @@
 # Referencja narzędzi
 
-> **Wersja: v0.1.0-alpha**
+> **Wersja: v0.2.0-alpha**
 
 Ten dokument szczegółowo opisuje wszystkie wbudowane narzędzia platformy Silicon Life Collective.
 

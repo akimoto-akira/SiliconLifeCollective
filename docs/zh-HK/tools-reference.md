@@ -1,6 +1,6 @@
 # 工具參考
 
-> **版本：v0.1.0-alpha**
+> **版本：v0.2.0-alpha**
 
 [English](../en/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | **繁體中文** | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md)
 

@@ -1,6 +1,6 @@
 # 도구 참고
 
-> **버전: v0.1.0-alpha**
+> **버전: v0.2.0-alpha**
 
 [English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | **한국어** | [Čeština](../cs-CZ/tools-reference.md)
 

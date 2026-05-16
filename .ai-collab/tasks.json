@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-16T00:07:00+08:00",
+  "lastUpdated": "2026-05-16T14:00:00+08:00",
   "tasks": [
     {
       "id": "task-114",
@@ -9,10 +9,12 @@
       "title": "编写 alpha-0.2 发布说明（CHANGELOG）",
       "description": "为 v0.2.0-alpha 版本编写完整的 CHANGELOG.md，包含以下内容：\n\n1. **版本信息**：v0.2.0-alpha，发布日期\n2. **新增功能**：列出阶段 10.5-10.6 的所有新功能（百炼 AI、WebView 浏览器、帮助系统、项目工作区、知识网络等）\n3. **改进**：性能优化、UI 改进、本地化扩展\n4. **修复**：Bug 修复列表\n5. **文档**：11 种语言文档更新\n6. **基础设施**：GitHub/Gitee 自动同步配置\n\n参考：\n- .ai-collab/tasks.json 中的已完成任务\n- git log --oneline v0.1.0-alpha..HEAD\n- docs/zh-CN/roadmap.md 中的阶段 10.5-10.6 内容\n\n输出位置：CHANGELOG.md（项目根目录）",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-16T00:07:00+08:00",
       "createdBy": "openclaw-main",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
+      "completedAt": "2026-05-16T12:00:00+08:00",
+      "completedBy": "trae-glm5",
       "metadata": {
         "source": "alpha-0.2 发布准备",
         "deadline": "2026-05-16 12:00",
@@ -32,10 +34,12 @@
       "title": "所有文档版本号更新为 alpha-0.2",
       "description": "将所有文档中的版本号从 v0.1.0-alpha 更新为 v0.2.0-alpha：\n\n**需要更新的文件**：\n1. docs/*/roadmap.md（所有语言版本）\n2. docs/*/README.md（所有语言版本）\n3. docs/*/getting-started.md（所有语言版本）\n4. README.md（项目根目录）\n5. 其他提及版本号的文档\n\n**语言版本**（11 种）：\n- zh-CN, zh-HK, en, de-DE, es-ES, fr-FR, it-IT, ja-JP, ko-KR, cs-CZ, pl-PL\n\n**搜索关键词**：\n- v0.1.0-alpha\n- v0.1.0\n- 0.1.0\n\n**替换为**：\n- v0.2.0-alpha\n- v0.2.0\n- 0.2.0",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-16T00:07:00+08:00",
       "createdBy": "openclaw-main",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
+      "completedAt": "2026-05-16T14:00:00+08:00",
+      "completedBy": "trae-glm5",
       "metadata": {
         "source": "alpha-0.2 发布准备",
         "deadline": "2026-05-16 12:00",
@@ -124,9 +128,9 @@
     }
   ],
   "taskIndex": {
-    "pending": ["task-114", "task-115"],
+    "pending": [],
     "inProgress": [],
-    "completed": ["task-113", "task-112"],
+    "completed": ["task-115", "task-114", "task-113", "task-112"],
     "cancelled": []
   },
   "metadata": {
