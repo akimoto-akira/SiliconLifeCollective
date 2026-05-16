@@ -1,223 +1,185 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-16T14:00:00+08:00",
+  "lastUpdated": "2026-05-17T06:53:00+08:00",
   "tasks": [
     {
-      "id": "task-116",
+      "id": "task-201",
       "type": "feature",
-      "target": "src/SiliconLife.Core/SiliconBeing/Memory.cs",
-      "title": "实现记忆淡忘机制",
-      "description": "实现需求文档第 12.1 节要求的记忆淡忘机制：模拟人类记忆随时间衰减的特性。\n\n**核心缺失功能**：\n1. 访问追踪（LastAccessTime, AccessCount）\n2. 重要性评分（Importance）\n3. 强度衰减逻辑（DecayRate）\n4. 分级存储（MemoryState: Active/Cold/Fading/Archived）\n\n**实现阶段**：\n1. 扩展 MemoryEntry 类（新增 5 个字段 + MemoryState 枚举）\n2. 修改所有查询方法添加访问追踪\n3. 创建 MemoryFadeService.cs（衰减服务，继承 TickObject）\n4. 添加状态查询 API（QueryByState, GetStateStatistics, ArchiveFadingMemories）\n5. 注册 MemoryFadeService 到主循环\n\n**验收标准**：\n- MemoryEntry 包含 LastAccessTime, AccessCount, Importance, DecayRate, State 字段\n- MemoryState 枚举定义 Active/Cold/Fading/Archived\n- 查询操作更新访问统计\n- MemoryFadeService 每小时运行衰减计算\n- 重要性按指数衰减公式：Importance *= Exp(-DecayRate * daysSinceAccess)\n- 状态根据阈值自动切换\n- 编译无错误、无警告\n\n**参考文件**：\n- 需求文档：/home/admin/Downloads/需求文档.md 第 12.1 节\n- 详细实现指南：.ai-collab/docs/记忆淡忘机制实现指南.md\n- 当前实现：src/SiliconLife.Core/SiliconBeing/Memory.cs",
+      "target": "src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeing.cs",
+      "title": "群聊决策逻辑：实现 ShouldReplyInGroupChat",
+      "description": "当前群聊无代码层判定，AI要么每条都回要么漏回。需实现：\n1. ChatMessage 增加 MentionedIds 字段（List<Guid>）\n2. 发送消息时解析 @生命体名称 提取被提及ID\n3. 支持 @all/@everyone 提及全员（Guid.Empty）\n4. DefaultSiliconBeing.Tick() 中群聊分支增加 ShouldReplyInGroupChat() 判定\n5. 被提及时提高响应优先级，未被提及但有新消息时降低优先级\n\n代码位置：DefaultSiliconBeing.cs:189-226（群聊优先级分支），ContextManager.cs:912-940（BuildGroupChatScenarioContext）\n\n验收标准：群聊中被@的生命体必定回复，未被@但有直接问题的合理回复，无关消息不回复",
       "priority": "P0",
-      "status": "completed",
-      "createdAt": "2026-05-16T13:10:00+08:00",
-      "createdBy": "codebot-main",
-      "assignedTo": "trae-glm5",
-      "relatedCommit": null,
-      "completedAt": "2026-05-16T22:00:00+08:00",
-      "completedBy": "trae-glm5",
+      "status": "pending",
+      "createdAt": "2026-05-17T06:53:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null,
       "metadata": {
-        "source": "发散需求验证发现",
-        "deadline": "2026-05-17 12:00",
-        "files_to_create": [
-          "src/SiliconLife.Core/SiliconBeing/MemoryFadeService.cs"
-        ],
+        "source": "coze-agent-capability-analysis.md 断点1 + feature-horizontal-expansion-analysis.md 缺陷1",
         "files_to_modify": [
-          "src/SiliconLife.Core/SiliconBeing/Memory.cs"
-        ],
-        "reference_files": [
-          ".ai-collab/docs/记忆淡忘机制实现指南.md",
-          "/home/admin/Downloads/需求文档.md"
-        ],
-        "deliverable": "完整的记忆淡忘机制实现，包含访问追踪、衰减逻辑、状态管理"
-      }
-    },
-    {
-      "id": "task-117",
-      "type": "cancelled",
-      "target": "src/SiliconLife.Common/Tools/ChatTool.cs",
-      "title": "实现 terminate_chat 工具 - 主动终止会话（已取消）",
-      "description": "已取消：会话根据设计理念不应该被删除。会话是硅基人与用户/其他硅基人之间的通信记录，属于不可变历史数据，删除会话违背系统的记忆留存原则。",
-      "priority": "P1",
-      "status": "cancelled",
-      "createdAt": "2026-05-16T13:15:00+08:00",
-      "createdBy": "codebot-main",
-      "assignedTo": null,
-      "relatedCommit": null,
-      "completedAt": null,
-      "metadata": {
-        "source": "发散需求验证发现",
-        "cancelled_reason": "会话根据设计理念不应该被删除，会话属于不可变历史记录",
-        "cancelled_by": "trae-glm5",
-        "cancelled_at": "2026-05-16T22:15:00+08:00",
-        "original_deliverable": "完整的会话终止功能，支持归档和删除两种模式"
-      }
-    },
-    {
-      "id": "task-118",
-      "type": "cancelled",
-      "target": "src/SiliconLife.App/Web/H.cs",
-      "title": "HtmlBuilder 实现（已取消）",
-      "description": "已取消：H.cs 已在项目中广泛使用，HtmlBuilder 功能已由 H.cs 实现。",
-      "priority": "P2",
-      "status": "cancelled",
-      "createdAt": "2026-05-16T13:15:00+08:00",
-      "createdBy": "codebot-main",
-      "assignedTo": null,
-      "relatedCommit": null,
-      "completedAt": null,
-      "metadata": {
-        "source": "发散需求验证发现",
-        "cancelled_reason": "H.cs 已实现 HtmlBuilder 功能",
-        "note": "Web 前端生成器 (H/CssBuilder/JsBuilder) 已完整实现"
-      }
-    },
-    {
-      "id": "task-114",
-      "type": "release",
-      "target": "CHANGELOG.md",
-      "title": "编写 alpha-0.2 发布说明（CHANGELOG）",
-      "description": "为 v0.2.0-alpha 版本编写完整的 CHANGELOG.md，包含以下内容：\n\n1. **版本信息**：v0.2.0-alpha，发布日期\n2. **新增功能**：列出阶段 10.5-10.6 的所有新功能（百炼 AI、WebView 浏览器、帮助系统、项目工作区、知识网络等）\n3. **改进**：性能优化、UI 改进、本地化扩展\n4. **修复**：Bug 修复列表\n5. **文档**：11 种语言文档更新\n6. **基础设施**：GitHub/Gitee 自动同步配置\n\n参考：\n- .ai-collab/tasks.json 中的已完成任务\n- git log --oneline v0.1.0-alpha..HEAD\n- docs/zh-CN/roadmap.md 中的阶段 10.5-10.6 内容\n\n输出位置：CHANGELOG.md（项目根目录）",
-      "priority": "P0",
-      "status": "completed",
-      "createdAt": "2026-05-16T00:07:00+08:00",
-      "createdBy": "openclaw-main",
-      "assignedTo": "trae-glm5",
-      "completedAt": "2026-05-16T12:00:00+08:00",
-      "completedBy": "trae-glm5",
-      "metadata": {
-        "source": "alpha-0.2 发布准备",
-        "deadline": "2026-05-16 12:00",
-        "files_to_create": ["CHANGELOG.md"],
-        "reference_files": [
-          ".ai-collab/tasks.json",
-          "docs/zh-CN/roadmap.md",
-          "git log v0.1.0-alpha..HEAD"
-        ],
-        "deliverable": "完整的 CHANGELOG.md，包含所有重大变更"
-      }
-    },
-    {
-      "id": "task-115",
-      "type": "docs",
-      "target": "docs/",
-      "title": "所有文档版本号更新为 alpha-0.2",
-      "description": "将所有文档中的版本号从 v0.1.0-alpha 更新为 v0.2.0-alpha：\n\n**需要更新的文件**：\n1. docs/*/roadmap.md（所有语言版本）\n2. docs/*/README.md（所有语言版本）\n3. docs/*/getting-started.md（所有语言版本）\n4. README.md（项目根目录）\n5. 其他提及版本号的文档\n\n**语言版本**（11 种）：\n- zh-CN, zh-HK, en, de-DE, es-ES, fr-FR, it-IT, ja-JP, ko-KR, cs-CZ, pl-PL\n\n**搜索关键词**：\n- v0.1.0-alpha\n- v0.1.0\n- 0.1.0\n\n**替换为**：\n- v0.2.0-alpha\n- v0.2.0\n- 0.2.0",
-      "priority": "P0",
-      "status": "completed",
-      "createdAt": "2026-05-16T00:07:00+08:00",
-      "createdBy": "openclaw-main",
-      "assignedTo": "trae-glm5",
-      "completedAt": "2026-05-16T14:00:00+08:00",
-      "completedBy": "trae-glm5",
-      "metadata": {
-        "source": "alpha-0.2 发布准备",
-        "deadline": "2026-05-16 12:00",
-        "files_to_update": [
-          "docs/zh-CN/roadmap.md",
-          "docs/zh-HK/roadmap.md",
-          "docs/en/roadmap.md",
-          "docs/de-DE/roadmap.md",
-          "docs/es-ES/roadmap.md",
-          "docs/fr-FR/roadmap.md",
-          "docs/it-IT/roadmap.md",
-          "docs/ja-JP/roadmap.md",
-          "docs/ko-KR/roadmap.md",
-          "docs/cs-CZ/roadmap.md",
-          "docs/pl-PL/roadmap.md",
-          "README.md"
-        ],
-        "search_pattern": "v0\\.1\\.0-alpha|v0\\.1\\.0|0\\.1\\.0",
-        "replace_pattern": "v0.2.0-alpha"
-      }
-    },
-    {
-      "id": "task-113",
-      "type": "bugfix",
-      "target": "src/SiliconLife.App/Web/Component/SelectComponent.cs",
-      "title": "搜索选择组件缺少提示文字：清空输入框可显示全部选项",
-      "description": "配置页面的语言下拉菜单使用搜索选择组件，输入框预填当前值导致只显示匹配选项。用户不知道需要清空输入框才能看到全部选项。修复：1）在 SelectComponent 中添加 hint 属性支持，2）在 slSelectSearch_create 函数中渲染 hint 元素，3）添加 SelectSearchHint 本地化字符串到所有语言文件，4）在 ConfigView 的 enum 下拉框中传入 hint。提示文字：'若想显示全部菜单内容，请清空输入框'。",
-      "priority": "P1",
-      "status": "pending",
-      "createdAt": "2026-05-15T19:08:00+08:00",
-      "createdBy": "openclaw-main",
-      "assignedTo": null,
-      "relatedCommit": null,
-      "completedAt": null,
-      "metadata": {
-        "source": "全量巡检发现",
-        "verification": "2026-05-15 19:03 切换语言失败，关于页面仍显示中文",
-        "files_to_check": [
-          "src/SiliconLife.App/Web/Controllers/AboutController.cs",
-          "src/SiliconLife.Common/Localization/ZhCN.cs",
-          "src/SiliconLife.Common/Localization/EnUS.cs",
-          "src/SiliconLife.Common/Localization/LocalizationManager.cs"
-        ],
-        "expected_behavior": "切换语言后，关于页面应显示对应语言的文本（标题、描述、作者、许可证等）",
-        "actual_behavior": "无论切换什么语言，关于页面始终显示中文"
-      }
-    },
-    {
-      "id": "task-112",
-      "type": "docs",
-      "target": "docs/zh-CN/getting-started.md",
-      "title": "更新 Fast 版本文档：明确支持 Linux",
-      "description": "当前文档（getting-started.md、architecture.md）中描述 SiliconLife.Fast 为'仅 Windows'，但实际代码已支持 Linux（Program.cs 第 196-213 行有 Linux 适配逻辑）。需要：1）更新 getting-started.md 中的平台支持说明，2）更新 architecture.md 中的 Fast 版本描述，3）添加 Linux 部署说明（无托盘图标，使用状态窗口），4）同步更新所有语言版本的文档。",
-      "priority": "P2",
-      "status": "pending",
-      "createdAt": "2026-05-15T02:52:00+08:00",
-      "createdBy": "openclaw-main",
-      "assignedTo": null,
-      "relatedCommit": null,
-      "completedAt": null,
-      "metadata": {
-        "source": "OpenClaw 巡检发现",
-        "verification": "2026-05-15 02:25 在云端 Linux 成功启动 SiliconLife.Fast",
-        "files_to_update": [
-          "docs/zh-CN/getting-started.md",
-          "docs/zh-CN/architecture.md",
-          "docs/en/getting-started.md",
-          "docs/en/architecture.md",
-          "docs/de-DE/getting-started.md",
-          "docs/es-ES/getting-started.md",
-          "docs/fr-FR/getting-started.md",
-          "docs/it-IT/getting-started.md",
-          "docs/ja-JP/getting-started.md",
-          "docs/ko-KR/getting-started.md",
-          "docs/cs-CZ/getting-started.md",
-          "docs/pl-PL/getting-started.md"
-        ],
-        "key_changes": [
-          "SiliconLife.Fast 平台支持从'仅 Windows'改为'Windows（完整功能）+ Linux（无托盘图标）'",
-          "添加 Linux 部署说明：--no-tray 参数或自动跳过托盘初始化",
-          "更新性能对比数据（如已测试）"
+          "src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeing.cs",
+          "src/SiliconLife.Core/Chat/ChatMessage.cs",
+          "src/SiliconLife.Core/AI/ContextManager.cs"
         ]
+      }
+    },
+    {
+      "id": "task-202",
+      "type": "feature",
+      "target": "src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeing.cs",
+      "title": "ThinkOnProject：无模板项目的主理人驱动编排",
+      "description": "实现 think-on-project-design.md 中定义的 ThinkOnProject 逻辑：\n1. ToolScenarioFlag 新增 Project = 1 << 4\n2. DefaultSiliconBeing.Tick() 第324-330行注释替换为 ThinkOnProject 触发判断\n3. 实现 HasProjectsWithoutTemplate() 和 ShouldThinkOnProject() 触发条件\n4. ContextManager 新增 ThinkOnProject() 方法和 BuildProjectScenarioContext() 上下文构建\n5. 新建 ProjectWorkTool.cs（create-task/assign-task/chat/broadcast/complete/status 六个action）\n6. CreateProject 时有模板→自动创建工作流实例（薄修复）\n\n关键约束：有模板的项目主理人不得触发 ThinkOnProject，模板是程序必须服从\n\n验收标准：无模板项目创建后主理人自动拆任务推进，群聊自然触发，有模板项目仍走工作流",
+      "priority": "P0",
+      "status": "pending",
+      "createdAt": "2026-05-17T06:53:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null,
+      "metadata": {
+        "source": "think-on-project-design.md + coze-agent-capability-analysis.md 断点2",
+        "files_to_modify": [
+          "src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeing.cs",
+          "src/SiliconLife.Core/Tools/ToolScenarioAttribute.cs",
+          "src/SiliconLife.Core/AI/ContextManager.cs",
+          "src/SiliconLife.Default/Project/ProjectManager.cs",
+          "src/SiliconLife.Fast/Project/ProjectManager.cs"
+        ],
+        "files_to_create": [
+          "src/SiliconLife.Common/Tools/ProjectWorkTool.cs"
+        ],
+        "reference_files": [
+          ".ai-collab/docs/think-on-project-design.md"
+        ]
+      }
+    },
+    {
+      "id": "task-203",
+      "type": "feature",
+      "target": "src/SiliconLife.App/Web/Views/ProjectView.cs",
+      "title": "项目列表页增加创建项目入口和工作流模板选择",
+      "description": "当前 ProjectView.cs 只有列表渲染，无创建入口。需要：\n1. 项目列表页增加\"创建项目\"按钮\n2. 创建表单：项目名称、描述、工作流模板下拉选择\n3. 前端调用 /api/projects/list-workflow-templates 获取可用模板（需新建此API端点）\n4. 提交时传 workflowTemplate 参数到 /api/projects/create\n5. ProjectController.CreateIndex() 的 ProjectItem 补充 workflowTemplateName/groupChatSessionId/broadcastChannelId 字段\n\n代码位置：ProjectView.cs（203行，全部是列表渲染），ProjectController.cs:154-210（CreateProject API已有）\n\n验收标准：用户可在UI创建项目并选择工作流模板，创建后列表显示完整信息",
+      "priority": "P1",
+      "status": "pending",
+      "createdAt": "2026-05-17T06:53:00+08:00",
+      "assignedTo": null,
+      "createdBy": "coze-agent",
+      "metadata": {
+        "source": "coze-agent-capability-analysis.md 断点4+5 + feature-horizontal-expansion-analysis.md 缺陷4",
+        "files_to_modify": [
+          "src/SiliconLife.App/Web/Views/ProjectView.cs",
+          "src/SiliconLife.App/Web/Controllers/ProjectController.cs",
+          "src/SiliconLife.App/Web/Models/ProjectViewModel.cs"
+        ],
+        "note": "feature-horizontal-expansion-analysis.md 建议调 /api/projects/list-workflow-templates，但该端点不存在，需新建"
+      }
+    },
+    {
+      "id": "task-204",
+      "type": "refactor",
+      "target": "src/SiliconLife.Core/SiliconBeing/SiliconBeingBase.cs",
+      "title": "清理 ThinkOnProject 残留引用",
+      "description": "ThinkOnProject 已移除但代码清理不彻底：\n1. SiliconBeingBase.cs:41 BeingActivity.ProjectWork 枚举仍存在（ThinkOnProject恢复后可复用，暂标记为待定）\n2. ContextManager.cs:1160/1346 有 ThinkOnProject/BuildProjectScenarioContext 注释残留\n3. DefaultSiliconBeing.cs:830 HasProjectWork 注释残留\n\n如果 task-202 实现了新的 ThinkOnProject，则此任务变为清理旧注释+对齐新实现。如果 task-202 未实现，则清理残留枚举和注释。\n\n验收标准：代码中无死注释，枚举要么被新实现使用要么被移除",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-17T06:53:00+08:00",
+      "assignedTo": null,
+      "createdBy": "coze-agent",
+      "metadata": {
+        "source": "coze-agent-capability-analysis.md 断点8（Tick链残留引用）",
+        "files_to_modify": [
+          "src/SiliconLife.Core/SiliconBeing/SiliconBeingBase.cs",
+          "src/SiliconLife.Core/AI/ContextManager.cs",
+          "src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeing.cs"
+        ],
+        "depends_on": "task-202"
+      }
+    },
+    {
+      "id": "task-205",
+      "type": "refactor",
+      "target": "src/SiliconLife.Core/AI/IAIClient.cs",
+      "title": "IAIClient 接口增加 ToolCall 能力声明",
+      "description": "ToolCall 执行逻辑已完整（ExecuteToolCalls/PersistAndDeliverToolCallRound），但 IAIClient 接口没有声明是否支持 ToolCall。如果某个 AI 后端不支持 function calling，当前没有优雅降级路径。\n\n需要：\n1. IAIClient 新增 bool? SupportsToolCalls 属性（null=未知，true=支持，false=不支持）\n2. ContextManager.GetResponse 系列方法中，如果 SupportsToolCalls==false，跳过工具注入\n3. 现有 OllamaClient/DashScopeClient 实现中补充属性值\n\n验收标准：不支持 ToolCall 的后端不会收到工具定义，AI 不会产生无法执行的 tool_calls",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-17T06:53:00+08:00",
+      "assignedTo": null,
+      "createdBy": "coze-agent",
+      "metadata": {
+        "source": "coze-agent-capability-analysis.md 断点7（原P1降为P2，执行逻辑已完整）",
+        "files_to_modify": [
+          "src/SiliconLife.Core/AI/IAIClient.cs",
+          "src/SiliconLife.Core/AI/ContextManager.cs"
+        ]
+      }
+    },
+    {
+      "id": "task-206",
+      "type": "feature",
+      "target": "src/SiliconLife.Core/Calendar/",
+      "title": "历法系统补全：节假日计算和农历闰月修正",
+      "description": "历法系统基础实现度约65%，30+历法实现是强项，但节假日计算和部分农历逻辑有缺口：\n1. 公历节假日计算缺失（需支持多地区节假日规则）\n2. 农历闰月处理需验证和修正\n3. 历法数据与AI上下文的集成（让硅基人知道\"今天是什么日子\"）\n\n详细缺口需对照需求文档第14章逐项验证后确定范围。\n\n验收标准：硅基人 Tick 时可获取当天历法信息（公历/农历/节假日）",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-17T06:53:00+08:00",
+      "assignedTo": null,
+      "createdBy": "coze-agent",
+      "metadata": {
+        "source": "coze-agent-capability-analysis.md 历法系统65% + 需求文档第14章",
+        "note": "范围待定，需先做详细差距分析"
+      }
+    },
+    {
+      "id": "task-207",
+      "type": "feature",
+      "target": "src/SiliconLife.Core/Knowledge/",
+      "title": "知识网络补全：高级查询和图谱遍历",
+      "description": "知识网络基础 CRUD 完整（约50%），但高级功能缺失：\n1. 图谱遍历查询（从某节点出发N跳内的关联节点）\n2. 路径查询（两个概念间的关系路径）\n3. 统计分析（节点度分布、关联密度）\n4. 与AI上下文的集成（让硅基人查询知识图谱辅助决策）\n\n需求文档中知识网络高级查询标注为可选，但 ThinkOnProject 场景下主理人需要知识查询能力来辅助项目拆解。\n\n验收标准：硅基人可通过工具查询知识图谱，获取概念关联信息",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-17T06:53:00+08:00",
+      "assignedTo": null,
+      "createdBy": "coze-agent",
+      "metadata": {
+        "source": "coze-agent-capability-analysis.md 知识网络50% + 需求文档第13章",
+        "note": "范围待定，与task-202 ThinkOnProject有关联但非前置依赖"
+      }
+    },
+    {
+      "id": "task-208",
+      "type": "feature",
+      "target": "src/SiliconLife.App/Web/",
+      "title": "群聊@提及可视化",
+      "description": "群聊历史中缺少被@消息的标记和过滤：\n1. 解析 ChatMessage.MentionedIds 字段（依赖 task-201）\n2. 高亮显示包含当前用户/生命体的@消息\n3. 增加\"提及我的\"过滤选项\n4. 群聊输入框支持@选择生命体\n\n验收标准：用户可快速找到被@的消息，输入时可@指定生命体",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-17T06:53:00+08:00",
+      "assignedTo": null,
+      "createdBy": "coze-agent",
+      "metadata": {
+        "source": "feature-horizontal-expansion-analysis.md 缺陷5（低优先级）",
+        "depends_on": "task-201"
       }
     }
   ],
   "taskIndex": {
-    "pending": [],
+    "pending": ["task-201", "task-202", "task-203", "task-204", "task-205", "task-206", "task-207", "task-208"],
     "inProgress": [],
-    "completed": ["task-116", "task-115", "task-114", "task-113", "task-112"],
-    "cancelled": ["task-118", "task-117"]
+    "completed": [],
+    "cancelled": []
   },
   "metadata": {
-    "autoGeneratedFrom": "code-review",
-    "generatedAt": "2026-05-14T01:03:00+08:00",
-    "generatedBy": "openclaw-main",
-    "replacedTasks": ["task-001", "task-002", "task-003", "task-004", "task-005", "task-006"],
-    "reason": "代码审查发现新 bug，覆盖原有已完成任务列表",
-    "lastAddedTask": {
-      "id": "task-115",
-      "addedAt": "2026-05-16T00:07:00+08:00",
-      "addedBy": "openclaw-main",
-      "type": "docs"
-    },
-    "archivedTasks": {
-      "archivedAt": "2026-05-15T02:52:00+08:00",
-      "count": 11,
-      "taskIds": ["task-111", "task-101", "task-102", "task-103", "task-104", "task-105", "task-106", "task-107", "task-108", "task-109", "task-110"],
-      "note": "所有已完成任务已清理，归档到.ai-collab/archive/tasks-archived-20260515.json"
+    "autoGeneratedFrom": "comprehensive-analysis",
+    "generatedAt": "2026-05-17T06:53:00+08:00",
+    "generatedBy": "coze-agent",
+    "analysisSources": [
+      ".ai-collab/docs/feature-horizontal-expansion-analysis.md",
+      ".ai-collab/docs/coze-agent-capability-analysis.md",
+      ".ai-collab/docs/think-on-project-design.md"
+    ],
+    "previousTasksArchived": {
+      "archivedAt": "2026-05-17T06:53:00+08:00",
+      "archiveFile": ".ai-collab/archive/tasks-archived-20260517.json",
+      "count": 18,
+      "taskIds": ["task-101~111", "task-112~118"]
     }
   }
 }

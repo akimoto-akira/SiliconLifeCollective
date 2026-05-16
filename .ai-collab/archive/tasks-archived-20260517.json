@@ -1,0 +1,281 @@
+{
+  "archivedAt": "2026-05-17T06:53:00+08:00",
+  "archivedBy": "openclaw-main",
+  "reason": "任务清理 - 已完成任务归档",
+  "tasks": [
+    {
+      "id": "task-111",
+      "type": "feature",
+      "title": "创建 MCP 浏览器能力服务器",
+      "status": "completed",
+      "completedAt": "2026-05-14T12:18:00+08:00",
+      "note": "MCP Server 已创建，但后续发现非标准 MCP 协议，已删除"
+    },
+    {
+      "id": "task-101",
+      "type": "bugfix",
+      "title": "修复 SpeedyPackAutoCompactor 异常静默问题",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-102",
+      "type": "bugfix",
+      "title": "实现 Workflow 异常处理流程",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-103",
+      "type": "bugfix",
+      "title": "修复 Linux 退出确认对话框硬编码中文",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-104",
+      "type": "refactor",
+      "title": "优化 WatchdogRun 锁使用模式",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-105",
+      "type": "bugfix",
+      "title": "完善 MigrateState 字段迁移",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-106",
+      "type": "feature",
+      "title": "实现 CodeReviewWorkflow TODO 功能",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-107",
+      "type": "feature",
+      "title": "实现系统优雅关闭功能",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-108",
+      "type": "feature",
+      "title": "实现帮助系统搜索功能",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-109",
+      "type": "refactor",
+      "title": "优化 Config 锁使用粒度",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-110",
+      "type": "refactor",
+      "title": "添加 ExecuteWithTimeout 异常日志",
+      "status": "completed",
+      "completedAt": "2026-05-14T01:30:00+08:00"
+    },
+    {
+      "id": "task-116",
+      "type": "feature",
+      "target": "src/SiliconLife.Core/SiliconBeing/Memory.cs",
+      "title": "实现记忆淡忘机制",
+      "description": "实现需求文档第 12.1 节要求的记忆淡忘机制：模拟人类记忆随时间衰减的特性。\n\n**核心缺失功能**：\n1. 访问追踪（LastAccessTime, AccessCount）\n2. 重要性评分（Importance）\n3. 强度衰减逻辑（DecayRate）\n4. 分级存储（MemoryState: Active/Cold/Fading/Archived）\n\n**实现阶段**：\n1. 扩展 MemoryEntry 类（新增 5 个字段 + MemoryState 枚举）\n2. 修改所有查询方法添加访问追踪\n3. 创建 MemoryFadeService.cs（衰减服务，继承 TickObject）\n4. 添加状态查询 API（QueryByState, GetStateStatistics, ArchiveFadingMemories）\n5. 注册 MemoryFadeService 到主循环\n\n**验收标准**：\n- MemoryEntry 包含 LastAccessTime, AccessCount, Importance, DecayRate, State 字段\n- MemoryState 枚举定义 Active/Cold/Fading/Archived\n- 查询操作更新访问统计\n- MemoryFadeService 每小时运行衰减计算\n- 重要性按指数衰减公式：Importance *= Exp(-DecayRate * daysSinceAccess)\n- 状态根据阈值自动切换\n- 编译无错误、无警告\n\n**参考文件**：\n- 需求文档：/home/admin/Downloads/需求文档.md 第 12.1 节\n- 详细实现指南：.ai-collab/docs/记忆淡忘机制实现指南.md\n- 当前实现：src/SiliconLife.Core/SiliconBeing/Memory.cs",
+      "priority": "P0",
+      "status": "completed",
+      "createdAt": "2026-05-16T13:10:00+08:00",
+      "createdBy": "codebot-main",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-16T22:00:00+08:00",
+      "completedBy": "trae-glm5",
+      "metadata": {
+        "source": "发散需求验证发现",
+        "deadline": "2026-05-17 12:00",
+        "files_to_create": [
+          "src/SiliconLife.Core/SiliconBeing/MemoryFadeService.cs"
+        ],
+        "files_to_modify": [
+          "src/SiliconLife.Core/SiliconBeing/Memory.cs"
+        ],
+        "reference_files": [
+          ".ai-collab/docs/记忆淡忘机制实现指南.md",
+          "/home/admin/Downloads/需求文档.md"
+        ],
+        "deliverable": "完整的记忆淡忘机制实现，包含访问追踪、衰减逻辑、状态管理"
+      }
+    },
+    {
+      "id": "task-117",
+      "type": "cancelled",
+      "target": "src/SiliconLife.Common/Tools/ChatTool.cs",
+      "title": "实现 terminate_chat 工具 - 主动终止会话（已取消）",
+      "description": "已取消：会话根据设计理念不应该被删除。会话是硅基人与用户/其他硅基人之间的通信记录，属于不可变历史数据，删除会话违背系统的记忆留存原则。",
+      "priority": "P1",
+      "status": "cancelled",
+      "createdAt": "2026-05-16T13:15:00+08:00",
+      "createdBy": "codebot-main",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null,
+      "metadata": {
+        "source": "发散需求验证发现",
+        "cancelled_reason": "会话根据设计理念不应该被删除，会话属于不可变历史记录",
+        "cancelled_by": "trae-glm5",
+        "cancelled_at": "2026-05-16T22:15:00+08:00",
+        "original_deliverable": "完整的会话终止功能，支持归档和删除两种模式"
+      }
+    },
+    {
+      "id": "task-118",
+      "type": "cancelled",
+      "target": "src/SiliconLife.App/Web/H.cs",
+      "title": "HtmlBuilder 实现（已取消）",
+      "description": "已取消：H.cs 已在项目中广泛使用，HtmlBuilder 功能已由 H.cs 实现。",
+      "priority": "P2",
+      "status": "cancelled",
+      "createdAt": "2026-05-16T13:15:00+08:00",
+      "createdBy": "codebot-main",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null,
+      "metadata": {
+        "source": "发散需求验证发现",
+        "cancelled_reason": "H.cs 已实现 HtmlBuilder 功能",
+        "note": "Web 前端生成器 (H/CssBuilder/JsBuilder) 已完整实现"
+      }
+    },
+    {
+      "id": "task-114",
+      "type": "release",
+      "target": "CHANGELOG.md",
+      "title": "编写 alpha-0.2 发布说明（CHANGELOG）",
+      "description": "为 v0.2.0-alpha 版本编写完整的 CHANGELOG.md，包含以下内容：\n\n1. **版本信息**：v0.2.0-alpha，发布日期\n2. **新增功能**：列出阶段 10.5-10.6 的所有新功能（百炼 AI、WebView 浏览器、帮助系统、项目工作区、知识网络等）\n3. **改进**：性能优化、UI 改进、本地化扩展\n4. **修复**：Bug 修复列表\n5. **文档**：11 种语言文档更新\n6. **基础设施**：GitHub/Gitee 自动同步配置\n\n参考：\n- .ai-collab/tasks.json 中的已完成任务\n- git log --oneline v0.1.0-alpha..HEAD\n- docs/zh-CN/roadmap.md 中的阶段 10.5-10.6 内容\n\n输出位置：CHANGELOG.md（项目根目录）",
+      "priority": "P0",
+      "status": "completed",
+      "createdAt": "2026-05-16T00:07:00+08:00",
+      "createdBy": "openclaw-main",
+      "assignedTo": "trae-glm5",
+      "completedAt": "2026-05-16T12:00:00+08:00",
+      "completedBy": "trae-glm5",
+      "metadata": {
+        "source": "alpha-0.2 发布准备",
+        "deadline": "2026-05-16 12:00",
+        "files_to_create": [
+          "CHANGELOG.md"
+        ],
+        "reference_files": [
+          ".ai-collab/tasks.json",
+          "docs/zh-CN/roadmap.md",
+          "git log v0.1.0-alpha..HEAD"
+        ],
+        "deliverable": "完整的 CHANGELOG.md，包含所有重大变更"
+      }
+    },
+    {
+      "id": "task-115",
+      "type": "docs",
+      "target": "docs/",
+      "title": "所有文档版本号更新为 alpha-0.2",
+      "description": "将所有文档中的版本号从 v0.1.0-alpha 更新为 v0.2.0-alpha：\n\n**需要更新的文件**：\n1. docs/*/roadmap.md（所有语言版本）\n2. docs/*/README.md（所有语言版本）\n3. docs/*/getting-started.md（所有语言版本）\n4. README.md（项目根目录）\n5. 其他提及版本号的文档\n\n**语言版本**（11 种）：\n- zh-CN, zh-HK, en, de-DE, es-ES, fr-FR, it-IT, ja-JP, ko-KR, cs-CZ, pl-PL\n\n**搜索关键词**：\n- v0.1.0-alpha\n- v0.1.0\n- 0.1.0\n\n**替换为**：\n- v0.2.0-alpha\n- v0.2.0\n- 0.2.0",
+      "priority": "P0",
+      "status": "completed",
+      "createdAt": "2026-05-16T00:07:00+08:00",
+      "createdBy": "openclaw-main",
+      "assignedTo": "trae-glm5",
+      "completedAt": "2026-05-16T14:00:00+08:00",
+      "completedBy": "trae-glm5",
+      "metadata": {
+        "source": "alpha-0.2 发布准备",
+        "deadline": "2026-05-16 12:00",
+        "files_to_update": [
+          "docs/zh-CN/roadmap.md",
+          "docs/zh-HK/roadmap.md",
+          "docs/en/roadmap.md",
+          "docs/de-DE/roadmap.md",
+          "docs/es-ES/roadmap.md",
+          "docs/fr-FR/roadmap.md",
+          "docs/it-IT/roadmap.md",
+          "docs/ja-JP/roadmap.md",
+          "docs/ko-KR/roadmap.md",
+          "docs/cs-CZ/roadmap.md",
+          "docs/pl-PL/roadmap.md",
+          "README.md"
+        ],
+        "search_pattern": "v0\\.1\\.0-alpha|v0\\.1\\.0|0\\.1\\.0",
+        "replace_pattern": "v0.2.0-alpha"
+      }
+    },
+    {
+      "id": "task-113",
+      "type": "bugfix",
+      "target": "src/SiliconLife.App/Web/Component/SelectComponent.cs",
+      "title": "搜索选择组件缺少提示文字：清空输入框可显示全部选项",
+      "description": "配置页面的语言下拉菜单使用搜索选择组件，输入框预填当前值导致只显示匹配选项。用户不知道需要清空输入框才能看到全部选项。修复：1）在 SelectComponent 中添加 hint 属性支持，2）在 slSelectSearch_create 函数中渲染 hint 元素，3）添加 SelectSearchHint 本地化字符串到所有语言文件，4）在 ConfigView 的 enum 下拉框中传入 hint。提示文字：'若想显示全部菜单内容，请清空输入框'。",
+      "priority": "P1",
+      "status": "pending",
+      "createdAt": "2026-05-15T19:08:00+08:00",
+      "createdBy": "openclaw-main",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null,
+      "metadata": {
+        "source": "全量巡检发现",
+        "verification": "2026-05-15 19:03 切换语言失败，关于页面仍显示中文",
+        "files_to_check": [
+          "src/SiliconLife.App/Web/Controllers/AboutController.cs",
+          "src/SiliconLife.Common/Localization/ZhCN.cs",
+          "src/SiliconLife.Common/Localization/EnUS.cs",
+          "src/SiliconLife.Common/Localization/LocalizationManager.cs"
+        ],
+        "expected_behavior": "切换语言后，关于页面应显示对应语言的文本（标题、描述、作者、许可证等）",
+        "actual_behavior": "无论切换什么语言，关于页面始终显示中文"
+      }
+    },
+    {
+      "id": "task-112",
+      "type": "docs",
+      "target": "docs/zh-CN/getting-started.md",
+      "title": "更新 Fast 版本文档：明确支持 Linux",
+      "description": "当前文档（getting-started.md、architecture.md）中描述 SiliconLife.Fast 为'仅 Windows'，但实际代码已支持 Linux（Program.cs 第 196-213 行有 Linux 适配逻辑）。需要：1）更新 getting-started.md 中的平台支持说明，2）更新 architecture.md 中的 Fast 版本描述，3）添加 Linux 部署说明（无托盘图标，使用状态窗口），4）同步更新所有语言版本的文档。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-15T02:52:00+08:00",
+      "createdBy": "openclaw-main",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null,
+      "metadata": {
+        "source": "OpenClaw 巡检发现",
+        "verification": "2026-05-15 02:25 在云端 Linux 成功启动 SiliconLife.Fast",
+        "files_to_update": [
+          "docs/zh-CN/getting-started.md",
+          "docs/zh-CN/architecture.md",
+          "docs/en/getting-started.md",
+          "docs/en/architecture.md",
+          "docs/de-DE/getting-started.md",
+          "docs/es-ES/getting-started.md",
+          "docs/fr-FR/getting-started.md",
+          "docs/it-IT/getting-started.md",
+          "docs/ja-JP/getting-started.md",
+          "docs/ko-KR/getting-started.md",
+          "docs/cs-CZ/getting-started.md",
+          "docs/pl-PL/getting-started.md"
+        ],
+        "key_changes": [
+          "SiliconLife.Fast 平台支持从'仅 Windows'改为'Windows（完整功能）+ Linux（无托盘图标）'",
+          "添加 Linux 部署说明：--no-tray 参数或自动跳过托盘初始化",
+          "更新性能对比数据（如已测试）"
+        ]
+      }
+    }
+  ],
+  "count": 18,
+  "note": "全部归档：含原11条 + tasks.json中7条（task-112~118），由coze-agent基于综合分析重新发布任务"
+}
