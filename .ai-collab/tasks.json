@@ -1,7 +1,78 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-16T00:07:00+08:00",
+  "lastUpdated": "2026-05-16T13:50:00+08:00",
   "tasks": [
+    {
+      "id": "task-116",
+      "type": "feature",
+      "target": "src/SiliconLife.Core/SiliconBeing/Memory.cs",
+      "title": "实现记忆淡忘机制",
+      "description": "实现需求文档第 12.1 节要求的记忆淡忘机制：模拟人类记忆随时间衰减的特性。\n\n**核心缺失功能**：\n1. 访问追踪（LastAccessTime, AccessCount）\n2. 重要性评分（Importance）\n3. 强度衰减逻辑（DecayRate）\n4. 分级存储（MemoryState: Active/Cold/Fading/Archived）\n\n**实现阶段**：\n1. 扩展 MemoryEntry 类（新增 5 个字段 + MemoryState 枚举）\n2. 修改所有查询方法添加访问追踪\n3. 创建 MemoryFadeService.cs（衰减服务，继承 TickObject）\n4. 添加状态查询 API（QueryByState, GetStateStatistics, ArchiveFadingMemories）\n5. 注册 MemoryFadeService 到主循环\n\n**验收标准**：\n- MemoryEntry 包含 LastAccessTime, AccessCount, Importance, DecayRate, State 字段\n- MemoryState 枚举定义 Active/Cold/Fading/Archived\n- 查询操作更新访问统计\n- MemoryFadeService 每小时运行衰减计算\n- 重要性按指数衰减公式：Importance *= Exp(-DecayRate * daysSinceAccess)\n- 状态根据阈值自动切换\n- 编译无错误、无警告\n\n**参考文件**：\n- 需求文档：/home/admin/Downloads/需求文档.md 第 12.1 节\n- 当前实现：src/SiliconLife.Core/SiliconBeing/Memory.cs",
+      "priority": "P0",
+      "status": "pending",
+      "createdAt": "2026-05-16T13:10:00+08:00",
+      "createdBy": "codebot-main",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null,
+      "metadata": {
+        "source": "发散需求验证发现",
+        "deadline": "2026-05-17 12:00",
+        "files_to_create": [
+          "src/SiliconLife.Core/SiliconBeing/MemoryFadeService.cs"
+        ],
+        "files_to_modify": [
+          "src/SiliconLife.Core/SiliconBeing/Memory.cs"
+        ],
+        "reference_files": [
+          "/home/admin/Downloads/需求文档.md"
+        ],
+        "deliverable": "完整的记忆淡忘机制实现，包含访问追踪、衰减逻辑、状态管理"
+      }
+    },
+    {
+      "id": "task-117",
+      "type": "feature",
+      "target": "src/SiliconLife.Common/Tools/ChatTool.cs",
+      "title": "实现 terminate_chat 工具 - 主动终止会话",
+      "description": "为聊天系统添加主动终止会话的功能。\n\n**需求**：\n- 硅基人可以主动终止与用户或其他硅基人的会话\n- 支持会话归档（保留历史记录）\n- 支持会话删除（彻底清除）\n\n**实现内容**：\n1. 在 ChatTool 中添加 terminate 动作\n2. 在 ChatSystem 中实现 CloseSession() 方法\n3. 支持归档模式（标记为 closed，保留历史）\n4. 支持删除模式（从存储中移除）\n5. 添加权限验证（只能终止自己的会话）\n\n**参数 schema**：\n```json\n{\n  \"action\": \"terminate\",\n  \"chat_type\": \"single|group\",\n  \"target_id\": \"会话 ID 或对方 ID\",\n  \"mode\": \"archive|delete\" // 归档或删除\n}\n```\n\n**验收标准**：\n- ChatTool 支持 terminate 动作\n- ChatSystem.CloseSession() 方法可用\n- 归档模式正确标记会话为 closed\n- 删除模式彻底清除会话数据\n- 权限验证正确（只能终止自己的会话）\n- 编译无错误",
+      "priority": "P1",
+      "status": "pending",
+      "createdAt": "2026-05-16T13:15:00+08:00",
+      "createdBy": "codebot-main",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null,
+      "metadata": {
+        "source": "发散需求验证发现",
+        "deadline": "2026-05-18 12:00",
+        "files_to_create": [],
+        "files_to_modify": [
+          "src/SiliconLife.Common/Tools/ChatTool.cs",
+          "src/SiliconLife.Core/Chat/ChatSystem.cs"
+        ],
+        "deliverable": "完整的会话终止功能，支持归档和删除两种模式"
+      }
+    },
+    {
+      "id": "task-118",
+      "type": "cancelled",
+      "target": "src/SiliconLife.App/Web/H.cs",
+      "title": "HtmlBuilder 实现（已取消）",
+      "description": "已取消：H.cs 已在项目中广泛使用，HtmlBuilder 功能已由 H.cs 实现。",
+      "priority": "P2",
+      "status": "cancelled",
+      "createdAt": "2026-05-16T13:15:00+08:00",
+      "createdBy": "codebot-main",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null,
+      "metadata": {
+        "source": "发散需求验证发现",
+        "cancelled_reason": "H.cs 已实现 HtmlBuilder 功能",
+        "note": "Web 前端生成器 (H/CssBuilder/JsBuilder) 已完整实现"
+      }
+    },
     {
       "id": "task-114",
       "type": "release",
@@ -13,6 +84,8 @@
       "createdAt": "2026-05-16T00:07:00+08:00",
       "createdBy": "openclaw-main",
       "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null,
       "metadata": {
         "source": "alpha-0.2 发布准备",
         "deadline": "2026-05-16 12:00",
@@ -36,6 +109,8 @@
       "createdAt": "2026-05-16T00:07:00+08:00",
       "createdBy": "openclaw-main",
       "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null,
       "metadata": {
         "source": "alpha-0.2 发布准备",
         "deadline": "2026-05-16 12:00",
@@ -64,13 +139,12 @@
       "title": "搜索选择组件缺少提示文字：清空输入框可显示全部选项",
       "description": "配置页面的语言下拉菜单使用搜索选择组件，输入框预填当前值导致只显示匹配选项。用户不知道需要清空输入框才能看到全部选项。修复：1）在 SelectComponent 中添加 hint 属性支持，2）在 slSelectSearch_create 函数中渲染 hint 元素，3）添加 SelectSearchHint 本地化字符串到所有语言文件，4）在 ConfigView 的 enum 下拉框中传入 hint。提示文字：'若想显示全部菜单内容，请清空输入框'。",
       "priority": "P1",
-      "status": "completed",
+      "status": "pending",
       "createdAt": "2026-05-15T19:08:00+08:00",
       "createdBy": "openclaw-main",
-      "assignedTo": "trae-glm5",
-      "completedAt": "2026-05-15T21:00:00+08:00",
-      "completedBy": "trae-glm5",
+      "assignedTo": null,
       "relatedCommit": null,
+      "completedAt": null,
       "metadata": {
         "source": "全量巡检发现",
         "verification": "2026-05-15 19:03 切换语言失败，关于页面仍显示中文",
@@ -91,13 +165,12 @@
       "title": "更新 Fast 版本文档：明确支持 Linux",
       "description": "当前文档（getting-started.md、architecture.md）中描述 SiliconLife.Fast 为'仅 Windows'，但实际代码已支持 Linux（Program.cs 第 196-213 行有 Linux 适配逻辑）。需要：1）更新 getting-started.md 中的平台支持说明，2）更新 architecture.md 中的 Fast 版本描述，3）添加 Linux 部署说明（无托盘图标，使用状态窗口），4）同步更新所有语言版本的文档。",
       "priority": "P2",
-      "status": "completed",
+      "status": "pending",
       "createdAt": "2026-05-15T02:52:00+08:00",
       "createdBy": "openclaw-main",
-      "assignedTo": "trae-glm5",
+      "assignedTo": null,
       "relatedCommit": null,
-      "completedAt": "2026-05-15T21:45:00+08:00",
-      "completedBy": "trae-glm5",
+      "completedAt": null,
       "metadata": {
         "source": "OpenClaw 巡检发现",
         "verification": "2026-05-15 02:25 在云端 Linux 成功启动 SiliconLife.Fast",
@@ -124,10 +197,10 @@
     }
   ],
   "taskIndex": {
-    "pending": ["task-114", "task-115"],
+    "pending": ["task-117", "task-116", "task-115", "task-114", "task-113", "task-112"],
     "inProgress": [],
-    "completed": ["task-113", "task-112"],
-    "cancelled": []
+    "completed": [],
+    "cancelled": ["task-118"]
   },
   "metadata": {
     "autoGeneratedFrom": "code-review",
