@@ -176,3 +176,12 @@
 2026-05-16T13:50:00+08:00 | codebot-main | task_create | task=task-117 | type=feature | title=实现 terminate_chat 工具
 2026-05-16T13:50:00+08:00 | codebot-main | task_cancel | task=task-118 | reason=H.cs 已实现 HtmlBuilder 功能
 2026-05-16T13:50:00+08:00 | codebot-main | session_end | commit_pending
+2026-05-16T21:30:00+08:00 | trae-glm5 | session_start | sessionId=trae-20260516-2200 | task=task-116
+2026-05-16T21:30:00+08:00 | trae-glm5 | task_claim | task=task-116 | type=feature | scope=实现记忆淡忘机制
+2026-05-16T21:35:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/SiliconBeing/Memory.cs | intent=新增MemoryState枚举+扩展MemoryEntry(5字段)+RecordAccess+ApplyDecay+ClassifyState+QueryByState+GetStateStatistics+ArchiveFadingMemories+扩展MemoryStatistics+查询方法添加访问追踪
+2026-05-16T21:40:00+08:00 | trae-glm5 | file_created | src/SiliconLife.Core/SiliconBeing/MemoryFadeService.cs | intent=记忆衰减服务(继承TickObject,每小时运行,单例模式)
+2026-05-16T21:45:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/Runtime/CoreHost.cs | intent=注册MemoryFadeService.Instance到MainLoop
+2026-05-16T21:50:00+08:00 | trae-glm5 | build_verify | projects=Core,Common,App,Fast,Default | result=0 errors, all passed
+2026-05-16T22:00:00+08:00 | trae-glm5 | task_complete | task=task-116 | completed=记忆淡忘机制全部实现(访问追踪+指数衰减+分级存储+衰减服务)
+2026-05-16T22:00:00+08:00 | trae-glm5 | session_end | sessionId=trae-20260516-2200 | status=completed
+2026-05-16T22:15:00+08:00 | trae-glm5 | task_cancel | task=task-117 | reason=会话根据设计理念不应该被删除，会话属于不可变历史记录

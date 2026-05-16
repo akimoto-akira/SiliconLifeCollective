@@ -14,6 +14,32 @@
 namespace SiliconLife.Collective;
 
 /// <summary>
+/// Represents the state of a memory entry in the fading lifecycle.
+/// </summary>
+public enum MemoryState
+{
+    /// <summary>
+    /// Recently accessed, fully available memory.
+    /// </summary>
+    Active,
+
+    /// <summary>
+    /// Not recently accessed, beginning to fade but still retrievable.
+    /// </summary>
+    Cold,
+
+    /// <summary>
+    /// Significantly faded, at risk of being archived.
+    /// </summary>
+    Fading,
+
+    /// <summary>
+    /// Archived memory, deeply faded and only retrievable through explicit search.
+    /// </summary>
+    Archived
+}
+
+/// <summary>
 /// Represents a single memory entry stored in the memory system.
 /// </summary>
 public sealed class MemoryEntry
@@ -55,6 +81,35 @@ public sealed class MemoryEntry
     public List<string> Keywords { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets the last time this memory entry was accessed.
+    /// Null means never accessed since the fading mechanism was introduced.
+    /// </summary>
+    public DateTime? LastAccessTime { get; set; }
+
+    /// <summary>
+    /// Gets or sets the number of times this memory entry has been accessed.
+    /// </summary>
+    public int AccessCount { get; set; }
+
+    /// <summary>
+    /// Gets or sets the importance score of this memory entry (0.0 to 1.0).
+    /// Higher values indicate more important memories that fade more slowly.
+    /// </summary>
+    public double Importance { get; set; } = 0.5;
+
+    /// <summary>
+    /// Gets or sets the decay rate for this memory entry.
+    /// Controls how quickly the importance decreases over time.
+    /// Default is 0.01 (slow decay). Higher values cause faster fading.
+    /// </summary>
+    public double DecayRate { get; set; } = 0.01;
+
+    /// <summary>
+    /// Gets or sets the current state of this memory entry in the fading lifecycle.
+    /// </summary>
+    public MemoryState State { get; set; } = MemoryState.Active;
+
+    /// <summary>
     /// Initializes a new instance of the MemoryEntry class with the current timestamp.
     /// </summary>
     public MemoryEntry()
@@ -62,6 +117,7 @@ public sealed class MemoryEntry
         Id = Guid.NewGuid();
         var now = DateTime.Now;
         Timestamp = new IncompleteDate(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
+        LastAccessTime = now;
     }
 
     /// <summary>
@@ -71,6 +127,15 @@ public sealed class MemoryEntry
     public MemoryEntry(string content) : this()
     {
         Content = content;
+    }
+
+    /// <summary>
+    /// Records an access to this memory entry, updating LastAccessTime and incrementing AccessCount.
+    /// </summary>
+    public void RecordAccess()
+    {
+        LastAccessTime = DateTime.Now;
+        AccessCount++;
     }
 
     /// <summary>
@@ -105,6 +170,31 @@ public sealed class MemoryStatistics
     /// Gets or sets the timestamp of the newest entry.
     /// </summary>
     public IncompleteDate? NewestEntry { get; set; }
+
+    /// <summary>
+    /// Gets or sets the number of entries in Active state.
+    /// </summary>
+    public int ActiveCount { get; set; }
+
+    /// <summary>
+    /// Gets or sets the number of entries in Cold state.
+    /// </summary>
+    public int ColdCount { get; set; }
+
+    /// <summary>
+    /// Gets or sets the number of entries in Fading state.
+    /// </summary>
+    public int FadingCount { get; set; }
+
+    /// <summary>
+    /// Gets or sets the number of entries in Archived state.
+    /// </summary>
+    public int ArchivedCount { get; set; }
+
+    /// <summary>
+    /// Gets or sets the average importance across all entries.
+    /// </summary>
+    public double AverageImportance { get; set; }
 }
 
 /// <summary>
@@ -243,47 +333,50 @@ public sealed class Memory
     {
         var now = DateTime.Now;
 
-        // today
         var results = Query(new IncompleteDate(now.Year, now.Month, now.Day), count);
         if (results.Count >= count) return results;
 
-        // this month
         results = Query(new IncompleteDate(now.Year, now.Month), count);
         if (results.Count >= count) return results;
 
-        // this year
         results = Query(new IncompleteDate(now.Year), count);
         if (results.Count >= count) return results;
 
-        // all
         return QueryAll(count);
     }
 
-    /// <summary>
-    /// Queries memory entries within a specific time range.
-    /// </summary>
-    /// <param name="range">The time range to query (unspecified components are wildcards). Null means all entries.</param>
-    /// <param name="count">Maximum number of entries to return. 0 means no limit.</param>
-    /// <returns>A list of matching memory entries ordered by timestamp descending.</returns>
     public List<MemoryEntry> Query(IncompleteDate? range, int count = 0)
     {
         var entries = _timeStorage.Query<MemoryEntry>(_storageKey, range)
             .OrderByDescending(e => e.Timestamp)
-            .Select(e => e.Data);
+            .Select(e => e.Data)
+            .ToList();
 
-        return (count > 0 ? entries.Take(count) : entries).ToList();
+        foreach (var entry in entries)
+        {
+            entry.RecordAccess();
+            Save(entry);
+        }
+
+        var ordered = entries.AsEnumerable();
+        return (count > 0 ? ordered.Take(count) : ordered).ToList();
     }
 
-    /// <summary>
-    /// Returns all memory entries ordered by timestamp descending.
-    /// </summary>
-    /// <param name="count">Maximum number of entries to return. 0 means no limit.</param>
     public List<MemoryEntry> QueryAll(int count = 0)
     {
         var entries = _timeStorage.Query<MemoryEntry>(_storageKey, null)
             .OrderByDescending(e => e.Timestamp)
-            .Select(e => e.Data);
-        return (count > 0 ? entries.Take(count) : entries).ToList();
+            .Select(e => e.Data)
+            .ToList();
+
+        foreach (var entry in entries)
+        {
+            entry.RecordAccess();
+            Save(entry);
+        }
+
+        var ordered = entries.AsEnumerable();
+        return (count > 0 ? ordered.Take(count) : ordered).ToList();
     }
 
     /// <summary>
@@ -296,12 +389,137 @@ public sealed class Memory
         var oldest = all.MinBy(e => e.Timestamp);
         var newest = all.MaxBy(e => e.Timestamp);
 
+        var entries = all.Select(e => e.Data).ToList();
+
         return new MemoryStatistics
         {
             TotalEntries = all.Count,
             OldestEntry = oldest != null ? new IncompleteDate(oldest.Timestamp.Year, oldest.Timestamp.Month, oldest.Timestamp.Day, oldest.Timestamp.Hour, oldest.Timestamp.Minute, oldest.Timestamp.Second) : null,
             NewestEntry = newest != null ? new IncompleteDate(newest.Timestamp.Year, newest.Timestamp.Month, newest.Timestamp.Day, newest.Timestamp.Hour, newest.Timestamp.Minute, newest.Timestamp.Second) : null,
+            ActiveCount = entries.Count(e => e.State == MemoryState.Active),
+            ColdCount = entries.Count(e => e.State == MemoryState.Cold),
+            FadingCount = entries.Count(e => e.State == MemoryState.Fading),
+            ArchivedCount = entries.Count(e => e.State == MemoryState.Archived),
+            AverageImportance = entries.Count > 0 ? entries.Average(e => e.Importance) : 0.0,
         };
+    }
+
+    /// <summary>
+    /// Queries memory entries by their fading state.
+    /// </summary>
+    /// <param name="state">The memory state to filter by.</param>
+    /// <param name="count">Maximum number of entries to return. 0 means no limit.</param>
+    /// <returns>A list of memory entries in the specified state, ordered by importance descending.</returns>
+    public List<MemoryEntry> QueryByState(MemoryState state, int count = 0)
+    {
+        var entries = _timeStorage.Query<MemoryEntry>(_storageKey, null)
+            .Select(e => e.Data)
+            .Where(e => e.State == state)
+            .OrderByDescending(e => e.Importance);
+
+        return (count > 0 ? entries.Take(count) : entries).ToList();
+    }
+
+    /// <summary>
+    /// Gets statistics grouped by memory state.
+    /// </summary>
+    /// <returns>A dictionary mapping each MemoryState to its entry count.</returns>
+    public Dictionary<MemoryState, int> GetStateStatistics()
+    {
+        var all = _timeStorage.Query<MemoryEntry>(_storageKey, null)
+            .Select(e => e.Data)
+            .ToList();
+
+        return Enum.GetValues<MemoryState>()
+            .ToDictionary(s => s, s => all.Count(e => e.State == s));
+    }
+
+    /// <summary>
+    /// Archives all fading memories by setting their state to Archived.
+    /// Returns the number of entries that were archived.
+    /// </summary>
+    /// <returns>The count of archived entries.</returns>
+    public int ArchiveFadingMemories()
+    {
+        var fadingEntries = _timeStorage.Query<MemoryEntry>(_storageKey, null)
+            .Select(e => e.Data)
+            .Where(e => e.State == MemoryState.Fading)
+            .ToList();
+
+        foreach (var entry in fadingEntries)
+        {
+            entry.State = MemoryState.Archived;
+            Save(entry);
+        }
+
+        if (fadingEntries.Count > 0)
+        {
+            _logger.Info(null, "Archived {0} fading memories", fadingEntries.Count);
+        }
+
+        return fadingEntries.Count;
+    }
+
+    /// <summary>
+    /// Applies importance decay to all memory entries based on time elapsed since last access.
+    /// Uses exponential decay formula: Importance *= Exp(-DecayRate * daysSinceAccess).
+    /// Also updates the MemoryState based on importance thresholds.
+    /// Returns the number of entries whose state changed.
+    /// </summary>
+    /// <returns>The count of entries whose state changed during this decay cycle.</returns>
+    public int ApplyDecay()
+    {
+        var allEntries = _timeStorage.Query<MemoryEntry>(_storageKey, null)
+            .Select(e => e.Data)
+            .ToList();
+
+        int stateChangedCount = 0;
+        var now = DateTime.Now;
+
+        foreach (var entry in allEntries)
+        {
+            if (entry.IsSummary) continue;
+
+            var lastAccess = entry.LastAccessTime ?? now;
+            var daysSinceAccess = (now - lastAccess).TotalDays;
+
+            var previousState = entry.State;
+
+            entry.Importance *= Math.Exp(-entry.DecayRate * daysSinceAccess);
+
+            if (entry.Importance < 0) entry.Importance = 0;
+            if (entry.Importance > 1) entry.Importance = 1;
+
+            entry.State = ClassifyState(entry.Importance, entry.AccessCount);
+
+            if (entry.State != previousState)
+            {
+                stateChangedCount++;
+            }
+
+            Save(entry);
+        }
+
+        if (stateChangedCount > 0)
+        {
+            _logger.Info(null, "Memory decay applied: {0} entries changed state", stateChangedCount);
+        }
+
+        return stateChangedCount;
+    }
+
+    /// <summary>
+    /// Classifies a memory entry's state based on its importance and access count.
+    /// </summary>
+    /// <param name="importance">The current importance score.</param>
+    /// <param name="accessCount">The number of times the entry has been accessed.</param>
+    /// <returns>The appropriate MemoryState.</returns>
+    private static MemoryState ClassifyState(double importance, int accessCount)
+    {
+        if (importance >= 0.6) return MemoryState.Active;
+        if (importance >= 0.3) return MemoryState.Cold;
+        if (importance >= 0.1) return MemoryState.Fading;
+        return MemoryState.Archived;
     }
 
     /// <summary>
@@ -602,9 +820,17 @@ public sealed class Memory
             .Where(e => e.Data.Content.ToLowerInvariant().Contains(keywordLower) ||
                         e.Data.Keywords.Any(k => k.ToLowerInvariant().Contains(keywordLower)))
             .OrderByDescending(e => e.Timestamp)
-            .Select(e => e.Data);
+            .Select(e => e.Data)
+            .ToList();
 
-        return (count > 0 ? results.Take(count) : results).ToList();
+        foreach (var entry in results)
+        {
+            entry.RecordAccess();
+            Save(entry);
+        }
+
+        var ordered = results.AsEnumerable();
+        return (count > 0 ? ordered.Take(count) : ordered).ToList();
     }
 
     /// <summary>

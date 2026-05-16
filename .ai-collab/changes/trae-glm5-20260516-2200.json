@@ -1,0 +1,62 @@
+{
+  "actor": "trae-glm5",
+  "sessionId": "trae-20260516-2200",
+  "timestamp": "2026-05-16T22:00:00+08:00",
+  "type": "feature_implementation",
+  "summary": "实现 task-116 记忆淡忘机制：访问追踪、指数衰减、分级存储、衰减服务",
+  "task": {
+    "id": "task-116",
+    "title": "实现记忆淡忘机制",
+    "status": "completed"
+  },
+  "changes": {
+    "files_modified": [
+      {
+        "path": "src/SiliconLife.Core/SiliconBeing/Memory.cs",
+        "intent": "扩展记忆系统核心",
+        "details": [
+          "新增 MemoryState 枚举 (Active/Cold/Fading/Archived)",
+          "MemoryEntry 新增 5 字段: LastAccessTime, AccessCount, Importance, DecayRate, State",
+          "新增 RecordAccess() 方法",
+          "Query/QueryAll/Search 方法添加访问追踪 (RecordAccess + Save)",
+          "扩展 MemoryStatistics: ActiveCount, ColdCount, FadingCount, ArchivedCount, AverageImportance",
+          "新增 ApplyDecay() 方法 (指数衰减公式: Importance *= Exp(-DecayRate * daysSinceAccess))",
+          "新增 ClassifyState() 方法 (阈值: >=0.6 Active, >=0.3 Cold, >=0.1 Fading, <0.1 Archived)",
+          "新增 QueryByState() 方法",
+          "新增 GetStateStatistics() 方法",
+          "新增 ArchiveFadingMemories() 方法"
+        ]
+      },
+      {
+        "path": "src/SiliconLife.Core/Runtime/CoreHost.cs",
+        "intent": "注册衰减服务到主循环",
+        "details": [
+          "在 StartAsync() 中 MainLoop.Start() 后注册 MemoryFadeService.Instance"
+        ]
+      }
+    ],
+    "files_created": [
+      {
+        "path": "src/SiliconLife.Core/SiliconBeing/MemoryFadeService.cs",
+        "intent": "记忆衰减定时服务",
+        "details": [
+          "继承 TickObject, 每小时运行一次衰减计算",
+          "单例模式 (Instance)",
+          "OnTick() 遍历所有硅基人 Memory 调用 ApplyDecay + ArchiveFadingMemories",
+          "提供 TriggerDecayNow() 手动触发",
+          "提供 GetAllBeingsStateStatistics() 全局统计"
+        ]
+      }
+    ]
+  },
+  "verification": {
+    "build_result": "0 errors, all projects passed",
+    "projects_verified": [
+      "SiliconLife.Core",
+      "SiliconLife.Common",
+      "SiliconLife.App",
+      "SiliconLife.Fast",
+      "SiliconLife.Default"
+    ]
+  }
+}

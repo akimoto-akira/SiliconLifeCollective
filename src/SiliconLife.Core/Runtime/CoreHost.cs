@@ -123,6 +123,9 @@ public class CoreHost
         MainLoop.Start();
         _logger.Info(null, "MainLoop started");
 
+        MainLoop.Register(MemoryFadeService.Instance);
+        _logger.Info(null, "MemoryFadeService registered to MainLoop");
+
         _pluginLoader?.NotifyAllStarted();
 
         if (_builder.IMManager != null)
