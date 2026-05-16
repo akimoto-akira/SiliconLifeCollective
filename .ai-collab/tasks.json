@@ -7,7 +7,7 @@
       "type": "feature",
       "target": "src/SiliconLife.Core/SiliconBeing/Memory.cs",
       "title": "实现记忆淡忘机制",
-- 详细实现指南：.ai-collab/docs/记忆淡忘机制实现指南.md\n- 当前实现：src/SiliconLife.Core/SiliconBeing/Memory.cs",
+      "description": "实现需求文档第 12.1 节要求的记忆淡忘机制：模拟人类记忆随时间衰减的特性。\n\n**核心缺失功能**：\n1. 访问追踪（LastAccessTime, AccessCount）\n2. 重要性评分（Importance）\n3. 强度衰减逻辑（DecayRate）\n4. 分级存储（MemoryState: Active/Cold/Fading/Archived）\n\n**实现阶段**：\n1. 扩展 MemoryEntry 类（新增 5 个字段 + MemoryState 枚举）\n2. 修改所有查询方法添加访问追踪\n3. 创建 MemoryFadeService.cs（衰减服务，继承 TickObject）\n4. 添加状态查询 API（QueryByState, GetStateStatistics, ArchiveFadingMemories）\n5. 注册 MemoryFadeService 到主循环\n\n**验收标准**：\n- MemoryEntry 包含 LastAccessTime, AccessCount, Importance, DecayRate, State 字段\n- MemoryState 枚举定义 Active/Cold/Fading/Archived\n- 查询操作更新访问统计\n- MemoryFadeService 每小时运行衰减计算\n- 重要性按指数衰减公式：Importance *= Exp(-DecayRate * daysSinceAccess)\n- 状态根据阈值自动切换\n- 编译无错误、无警告\n\n**参考文件**：\n- 需求文档：/home/admin/Downloads/需求文档.md 第 12.1 节\n- 详细实现指南：.ai-collab/docs/记忆淡忘机制实现指南.md\n- 当前实现：src/SiliconLife.Core/SiliconBeing/Memory.cs",
       "priority": "P0",
       "status": "pending",
       "createdAt": "2026-05-16T13:10:00+08:00",
