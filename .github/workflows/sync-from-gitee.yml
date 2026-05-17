@@ -24,7 +24,7 @@ jobs:
 
       - name: Add Gitee remote with token
         run: |
-          git remote add gitee https://${{ secrets.GITEE_TOKEN }}@gitee.com/hoshinokennji/SiliconLifeCollective.git
+          git remote add gitee https://hoshinokennji:${{ secrets.GITEE_TOKEN }}@gitee.com/hoshinokennji/SiliconLifeCollective.git
 
       - name: Fetch from Gitee
         run: |
