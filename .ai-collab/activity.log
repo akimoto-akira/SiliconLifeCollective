@@ -194,3 +194,22 @@
 2026-05-17T06:25:00+08:00 | coze-agent | session_start | sessionId=coze-agent-20260517-0625
 2026-05-17T06:25:00+08:00 | coze-agent | file_created | .ai-collab/docs/think-on-project-design.md | intent=ThinkOnProject设计方案：无模板项目主理人驱动编排，与工作流互斥
 2026-05-17T06:30:30+08:00 | coze-agent | session_end | sessionId=coze-agent-20260517-0625 | status=completed
+2026-05-17T07:10:00+08:00 | trae-glm5 | session_start | sessionId=trae-20260517-0710
+2026-05-17T07:10:00+08:00 | trae-glm5 | task_claim | task=task-201 | type=feature | title=群聊决策逻辑：实现 ShouldReplyInGroupChat
+2026-05-17T07:12:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/Chat/ChatMessage.cs | intent=增加 MentionedIds 字段
+2026-05-17T07:14:00+08:00 | trae-glm5 | file_created | src/SiliconLife.Core/Chat/MentionParser.cs | intent=@提及解析器：解析@name/@all/@everyone提取被提及ID
+2026-05-17T07:18:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Controllers/ChatController.cs | intent=SendMessage中群聊消息解析@提及
+2026-05-17T07:19:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/IM/WebUIProvider.cs | intent=HandleChatMessage中群聊消息解析@提及
+2026-05-17T07:20:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Tools/ChatTool.cs | intent=AI发送群聊消息时解析@提及
+2026-05-17T07:22:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeing.cs | intent=增加ShouldReplyInGroupChat判定+GroupChatMentionStatus枚举
+2026-05-17T07:25:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/AI/ContextManager.cs | intent=BuildGroupChatScenarioContext注入提及状态上下文
+2026-05-17T07:30:00+08:00 | trae-glm5 | task_complete | task=task-201 | build=pass
+2026-05-17T07:35:00+08:00 | trae-glm5 | task_claim | task=task-205 | type=refactor | title=IAIClient 接口增加 ToolCall 能力声明
+2026-05-17T07:37:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/AI/IAIClient.cs | intent=新增 SupportsToolCalls 属性
+2026-05-17T07:39:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/AI/ContextManager.cs | intent=BuildRequest中SupportsToolCalls==false时跳过工具注入
+2026-05-17T07:40:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/AI/OllamaClient.cs | intent=补充 SupportsToolCalls => true
+2026-05-17T07:41:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/AI/DashScopeClient.cs | intent=补充 SupportsToolCalls => true
+2026-05-17T07:42:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/AI/VolcengineArkClient.cs | intent=补充 SupportsToolCalls => true
+2026-05-17T07:45:00+08:00 | trae-glm5 | task_complete | task=task-205 | build=pass
+2026-05-17T07:50:00+08:00 | trae-glm5 | task_claim | task=task-208 | type=feature | title=群聊@提及可视化
+2026-05-17T16:30:00+08:00 | trae-glm5 | task_complete | task=task-208 | files=ChatView.cs,SSEHandler.cs,ChatController.cs | summary=群聊@提及可视化：后端传递mentionedIds和sessionMembers，前端实现@高亮、过滤按钮、输入下拉选择

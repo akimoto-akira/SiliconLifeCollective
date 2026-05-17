@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-17T06:53:00+08:00",
+  "lastUpdated": "2026-05-17T07:50:00+08:00",
   "tasks": [
     {
       "id": "task-201",
@@ -9,16 +9,27 @@
       "title": "群聊决策逻辑：实现 ShouldReplyInGroupChat",
       "description": "当前群聊无代码层判定，AI要么每条都回要么漏回。需实现：\n1. ChatMessage 增加 MentionedIds 字段（List<Guid>）\n2. 发送消息时解析 @生命体名称 提取被提及ID\n3. 支持 @all/@everyone 提及全员（Guid.Empty）\n4. DefaultSiliconBeing.Tick() 中群聊分支增加 ShouldReplyInGroupChat() 判定\n5. 被提及时提高响应优先级，未被提及但有新消息时降低优先级\n\n代码位置：DefaultSiliconBeing.cs:189-226（群聊优先级分支），ContextManager.cs:912-940（BuildGroupChatScenarioContext）\n\n验收标准：群聊中被@的生命体必定回复，未被@但有直接问题的合理回复，无关消息不回复",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-17T06:53:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "metadata": {
         "source": "coze-agent-capability-analysis.md 断点1 + feature-horizontal-expansion-analysis.md 缺陷1",
         "files_to_modify": [
           "src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeing.cs",
           "src/SiliconLife.Core/Chat/ChatMessage.cs",
           "src/SiliconLife.Core/AI/ContextManager.cs"
+        ],
+        "completedAt": "2026-05-17T07:30:00+08:00",
+        "completedBy": "trae-glm5",
+        "files_modified": [
+          "src/SiliconLife.Core/Chat/ChatMessage.cs",
+          "src/SiliconLife.Core/Chat/MentionParser.cs",
+          "src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeing.cs",
+          "src/SiliconLife.Core/AI/ContextManager.cs",
+          "src/SiliconLife.App/Web/Controllers/ChatController.cs",
+          "src/SiliconLife.App/IM/WebUIProvider.cs",
+          "src/SiliconLife.Common/Tools/ChatTool.cs"
         ]
       }
     },
@@ -99,15 +110,24 @@
       "title": "IAIClient 接口增加 ToolCall 能力声明",
       "description": "ToolCall 执行逻辑已完整（ExecuteToolCalls/PersistAndDeliverToolCallRound），但 IAIClient 接口没有声明是否支持 ToolCall。如果某个 AI 后端不支持 function calling，当前没有优雅降级路径。\n\n需要：\n1. IAIClient 新增 bool? SupportsToolCalls 属性（null=未知，true=支持，false=不支持）\n2. ContextManager.GetResponse 系列方法中，如果 SupportsToolCalls==false，跳过工具注入\n3. 现有 OllamaClient/DashScopeClient 实现中补充属性值\n\n验收标准：不支持 ToolCall 的后端不会收到工具定义，AI 不会产生无法执行的 tool_calls",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-17T06:53:00+08:00",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "createdBy": "coze-agent",
       "metadata": {
         "source": "coze-agent-capability-analysis.md 断点7（原P1降为P2，执行逻辑已完整）",
         "files_to_modify": [
           "src/SiliconLife.Core/AI/IAIClient.cs",
           "src/SiliconLife.Core/AI/ContextManager.cs"
+        ],
+        "completedAt": "2026-05-17T07:45:00+08:00",
+        "completedBy": "trae-glm5",
+        "files_modified": [
+          "src/SiliconLife.Core/AI/IAIClient.cs",
+          "src/SiliconLife.Core/AI/ContextManager.cs",
+          "src/SiliconLife.Common/AI/OllamaClient.cs",
+          "src/SiliconLife.Common/AI/DashScopeClient.cs",
+          "src/SiliconLife.Common/AI/VolcengineArkClient.cs"
         ]
       }
     },
@@ -150,20 +170,27 @@
       "title": "群聊@提及可视化",
       "description": "群聊历史中缺少被@消息的标记和过滤：\n1. 解析 ChatMessage.MentionedIds 字段（依赖 task-201）\n2. 高亮显示包含当前用户/生命体的@消息\n3. 增加\"提及我的\"过滤选项\n4. 群聊输入框支持@选择生命体\n\n验收标准：用户可快速找到被@的消息，输入时可@指定生命体",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-17T06:53:00+08:00",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "createdBy": "coze-agent",
       "metadata": {
         "source": "feature-horizontal-expansion-analysis.md 缺陷5（低优先级）",
-        "depends_on": "task-201"
+        "depends_on": "task-201",
+        "completedAt": "2026-05-17T16:30:00+08:00",
+        "completedBy": "trae-glm5",
+        "files_modified": [
+          "src/SiliconLife.App/Web/Views/ChatView.cs",
+          "src/SiliconLife.App/Web/SSEHandler.cs",
+          "src/SiliconLife.App/Web/Controllers/ChatController.cs"
+        ]
       }
     }
   ],
   "taskIndex": {
-    "pending": ["task-201", "task-202", "task-203", "task-204", "task-205", "task-206", "task-207", "task-208"],
+    "pending": ["task-202", "task-203", "task-204", "task-206", "task-207"],
     "inProgress": [],
-    "completed": [],
+    "completed": ["task-201", "task-205", "task-208"],
     "cancelled": []
   },
   "metadata": {
