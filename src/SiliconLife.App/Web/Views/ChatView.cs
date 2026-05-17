@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -68,9 +68,17 @@ public class ChatView : ViewBase
                     H.Span("")
                         .Id("being-status-badge")
                         .Class("being-status-badge")
+                        .Style(new CssBuilder().InlineProperty("display", "none")),
+                    H.Button("@\u6211")
+                        .Id("mention-filter-btn")
+                        .Class("mention-filter-btn")
+                        .OnClick("toggleMentionFilter()")
                         .Style(new CssBuilder().InlineProperty("display", "none"))
                 ).Id("chat-header").Class("chat-header"),
                 H.Div(msgItems.ToArray()).Id("chat-messages").Class("chat-messages"),
+                H.Div(
+                    H.Div("").Id("mention-dropdown").Class("mention-dropdown").Style(new CssBuilder().InlineProperty("display", "none"))
+                ).Class("mention-dropdown-wrapper"),
                 H.Div(
                     H.Div("").Class("loading-spinner"),
                     H.Div(vm.Localization.ChatLoading).Class("loading-text")
@@ -1059,6 +1067,75 @@ public class ChatView : ViewBase
                 .Property("background", "var(--bg-card, var(--bg-secondary, #fff))")
                 .Property("color", "var(--text-primary)")
                 .Property("cursor", "pointer")
+            .EndSelector()
+            .Selector(".mention-filter-btn")
+                .Property("font-size", "12px")
+                .Property("padding", "2px 8px")
+                .Property("border", "1px solid var(--border)")
+                .Property("border-radius", "12px")
+                .Property("background", "transparent")
+                .Property("color", "var(--text-secondary)")
+                .Property("cursor", "pointer")
+                .Property("margin-left", "8px")
+                .Property("white-space", "nowrap")
+                .Property("transition", "all 0.2s")
+            .EndSelector()
+            .Selector(".mention-filter-btn.active")
+                .Property("background", "var(--accent-primary, #4a90d9)")
+                .Property("color", "#fff")
+                .Property("border-color", "var(--accent-primary, #4a90d9)")
+            .EndSelector()
+            .Selector(".mention-filter-btn:hover")
+                .Property("opacity", "0.85")
+            .EndSelector()
+            .Selector(".msg-mentioned")
+                .Property("border-left", "3px solid var(--accent-primary, #4a90d9)")
+                .Property("padding-left", "8px")
+            .EndSelector()
+            .Selector(".msg-mentioned-me")
+                .Property("border-left-color", "var(--accent-warning, #f0a030)")
+                .Property("background", "rgba(240, 160, 48, 0.05)")
+            .EndSelector()
+            .Selector(".msg-filtered-out")
+                .Property("display", "none")
+            .EndSelector()
+            .Selector(".mention-tag")
+                .Property("color", "var(--accent-primary, #4a90d9)")
+                .Property("font-weight", "600")
+                .Property("cursor", "pointer")
+                .Property("background", "rgba(74, 144, 217, 0.1)")
+                .Property("padding", "1px 4px")
+                .Property("border-radius", "3px")
+            .EndSelector()
+            .Selector(".mention-tag:hover")
+                .Property("background", "rgba(74, 144, 217, 0.2)")
+            .EndSelector()
+            .Selector(".mention-dropdown-wrapper")
+                .Property("position", "relative")
+            .EndSelector()
+            .Selector(".mention-dropdown")
+                .Property("position", "absolute")
+                .Property("bottom", "100%")
+                .Property("left", "0")
+                .Property("right", "0")
+                .Property("background", "var(--bg-card, var(--bg-secondary, #fff))")
+                .Property("border", "1px solid var(--border)")
+                .Property("border-radius", "8px")
+                .Property("max-height", "200px")
+                .Property("overflow-y", "auto")
+                .Property("z-index", "100")
+                .Property("box-shadow", "0 4px 12px rgba(0,0,0,0.15)")
+            .EndSelector()
+            .Selector(".mention-item")
+                .Property("padding", "8px 12px")
+                .Property("cursor", "pointer")
+                .Property("font-size", "13px")
+                .Property("color", "var(--text-primary)")
+                .Property("transition", "background 0.15s")
+            .EndSelector()
+            .Selector(".mention-item:hover, .mention-item.selected")
+                .Property("background", "rgba(74, 144, 217, 0.1)")
+            .EndSelector()
             .EndSelector();
     }
 
@@ -1091,6 +1168,10 @@ public class ChatView : ViewBase
             .Add(() => Js.Let(() => "toolCallMap", () => Js.New(() => Js.Id(() => "Map"))))
             .Add(() => Js.Const(() => "toolDisplayNames", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Str(() => toolDisplayNamesLiteral))))
             .Add(() => Js.Const(() => "activityNameMap", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Str(() => activityStatusNamesLiteral))))
+            .Add(() => Js.Let(() => "sessionMembers", () => Js.New(() => Js.Id(() => "Array"))))
+            .Add(() => Js.Let(() => "mentionFilterActive", () => Js.Bool(() => false)))
+            .Add(() => Js.Let(() => "currentSessionType", () => Js.Str(() => "single")))
+            .Add(() => Js.Let(() => "mentionSelectedIndex", () => Js.Num(() => "0")))
             // Being status polling
             .Add(() => Js.Let(() => "beingStatusInterval", () => Js.Null()))
             .Add(() => Js.Let(() => "currentBeingId", () => currentBeingId.Length > 0 ? Js.Str(() => currentBeingId) : Js.Null()));
@@ -1202,6 +1283,14 @@ public class ChatView : ViewBase
             .Add(() => Js.Assign(() => Js.Id(() => "messageCache"), () => Js.New(() => Js.Id(() => "Array"))))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
+                { (Js.Id(() => "data").Prop(() => "sessionMembers"), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "sessionMembers"), () => Js.Id(() => "data").Prop(() => "sessionMembers"))
+                    }
+                )}
+            }))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
                 { (Js.Id(() => "messages"), new List<JsSyntax>
                     {
                         Js.Id(() => "messages").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "m" }, () => Js.Id(() => "messageCache").Call(() => "push", () => Js.Id(() => "m")))).Stmt()
@@ -1286,7 +1375,8 @@ public class ChatView : ViewBase
                 .Prop(() => "senderName", () => Js.Id(() => "data").Prop(() => "senderName"))
                 .Prop(() => "promptTokens", () => Js.Id(() => "data").Prop(() => "promptTokens"))
                 .Prop(() => "completionTokens", () => Js.Id(() => "data").Prop(() => "completionTokens"))
-                .Prop(() => "totalTokens", () => Js.Id(() => "data").Prop(() => "totalTokens"))).Stmt())
+                .Prop(() => "totalTokens", () => Js.Id(() => "data").Prop(() => "totalTokens"))
+                .Prop(() => "mentionedIds", () => Js.Id(() => "data").Prop(() => "mentionedIds"))).Stmt())
             .Add(() => Js.Id(() => "messageCache").Call(() => "push", () => Js.Obj()
                 .Prop(() => "role", () => Js.Ternary(() => Js.Id(() => "isCurrentUser"), () => Js.Str(() => "User"), () => Js.Str(() => "Assistant")))
                 .Prop(() => "content", () => Js.Id(() => "data").Prop(() => "content"))
@@ -1297,7 +1387,8 @@ public class ChatView : ViewBase
                 .Prop(() => "toolResults", () => Js.Null())
                 .Prop(() => "promptTokens", () => Js.Id(() => "data").Prop(() => "promptTokens"))
                 .Prop(() => "completionTokens", () => Js.Id(() => "data").Prop(() => "completionTokens"))
-                .Prop(() => "totalTokens", () => Js.Id(() => "data").Prop(() => "totalTokens"))).Stmt());
+                .Prop(() => "totalTokens", () => Js.Id(() => "data").Prop(() => "totalTokens"))
+                .Prop(() => "mentionedIds", () => Js.Id(() => "data").Prop(() => "mentionedIds"))).Stmt());
         js.Add(() => Js.Func(() => "handleMessage", () => new List<string> { "data" }, () => handleMessageBody));
 
         var handleToolBody = Js.Block()
@@ -1692,7 +1783,8 @@ public class ChatView : ViewBase
                     .Prop(() => "toolResults", () => Js.Id(() => "toolResults"))
                     .Prop(() => "promptTokens", () => Js.Id(() => "m").Prop(() => "promptTokens"))
                     .Prop(() => "completionTokens", () => Js.Id(() => "m").Prop(() => "completionTokens"))
-                    .Prop(() => "totalTokens", () => Js.Id(() => "m").Prop(() => "totalTokens"))).Stmt())
+                    .Prop(() => "totalTokens", () => Js.Id(() => "m").Prop(() => "totalTokens"))
+                    .Prop(() => "mentionedIds", () => Js.Id(() => "m").Prop(() => "mentionedIds"))).Stmt())
             )))
             .Add(() => Js.Id(() => "container").Call(() => "scrollTo", () => Js.Obj().Prop(() => "top", () => Js.Id(() => "container").Prop(() => "scrollHeight")).Prop(() => "behavior", () => Js.Str(() => "smooth"))).Stmt());
         js.Add(() => Js.Func(() => "renderMessages", () => new List<string>(), () => renderMessagesBody));
@@ -1737,6 +1829,38 @@ public class ChatView : ViewBase
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages")).Call(() => "setAttribute", () => Js.Str(() => "data-session-id"), () => Js.Id(() => "sessionId")).Stmt())
             .Add(() => Js.Assign(() => Js.Id(() => "messageCache"), () => Js.New(() => Js.Id(() => "Array"))))
             .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages")).Prop(() => "innerHTML"), () => Js.Str(() => "")))
+            .Add(() => Js.Const(() => "activeItem", () => Js.Id(() => "document").Call(() => "querySelector", () => Js.Str(() => ".being-item.active"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "activeItem"), new List<JsSyntax>
+                {
+                    Js.Assign(() => Js.Id(() => "currentSessionType"), () => Js.Id(() => "activeItem").Prop(() => "dataset").Prop(() => "type")),
+                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "activeItem").Prop(() => "dataset").Prop(() => "members"), new List<JsSyntax>
+                        {
+                            Js.Assign(() => Js.Id(() => "sessionMembers"), () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "activeItem").Prop(() => "dataset").Prop(() => "members")))
+                        }),
+                        (null, new List<JsSyntax>
+                        {
+                            Js.Assign(() => Js.Id(() => "sessionMembers"), () => Js.New(() => Js.Id(() => "Array")))
+                        })
+                    })
+                })
+            }))
+            .Add(() => Js.Const(() => "mentionBtn", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "mention-filter-btn"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "currentSessionType").Op(() => "===", () => Js.Str(() => "group")), new List<JsSyntax>
+                {
+                    Js.Assign(() => Js.Id(() => "mentionBtn").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "inline-block"))
+                }),
+                (null, new List<JsSyntax>
+                {
+                    Js.Assign(() => Js.Id(() => "mentionBtn").Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "none"))
+                })
+            }))
+            .Add(() => Js.Assign(() => Js.Id(() => "mentionFilterActive"), () => Js.Bool(() => false)))
             .Add(() => Js.Id(() => "showLoading").Invoke().Stmt())
             .Add(() => Js.Id(() => "connectSSE").Invoke().Stmt())
             .Add(() => Js.Id(() => "startStatusPolling").Invoke().Stmt());
@@ -1752,9 +1876,195 @@ public class ChatView : ViewBase
                     })
                 }
             }));
+
+        var handleMentionInputBody = Js.Block()
+            .Add(() => Js.Const(() => "input", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "message-input"))))
+            .Add(() => Js.Const(() => "val", () => Js.Id(() => "input").Prop(() => "value")))
+            .Add(() => Js.Const(() => "pos", () => Js.Id(() => "input").Prop(() => "selectionStart")))
+            .Add(() => Js.Const(() => "textBefore", () => Js.Id(() => "val").Call(() => "substring", () => Js.Num(() => "0"), () => Js.Id(() => "pos"))))
+            .Add(() => Js.Const(() => "atIdx", () => Js.Id(() => "textBefore").Call(() => "lastIndexOf", () => Js.Str(() => "@"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "atIdx").Op(() => "!==", () => Js.Num(() => "-1")).Op(() => "&&", () => Js.Id(() => "sessionMembers").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0"))), new List<JsSyntax>
+                {
+                    Js.Const(() => "query", () => Js.Id(() => "textBefore").Call(() => "substring", () => Js.Id(() => "atIdx").Op(() => "+", () => Js.Num(() => "1")))),
+                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "query").Call(() => "includes", () => Js.Str(() => " ")).Not(), new List<JsSyntax>
+                        {
+                            Js.Id(() => "showMentionDropdown").Invoke(() => Js.Id(() => "query")).Stmt()
+                        }),
+                        (null, new List<JsSyntax>
+                        {
+                            Js.Id(() => "hideMentionDropdown").Invoke().Stmt()
+                        })
+                    })
+                }),
+                (null, new List<JsSyntax>
+                {
+                    Js.Id(() => "hideMentionDropdown").Invoke().Stmt()
+                })
+            }));
+
+        var mentionDropdownKeydownBody = Js.Block()
+            .Add(() => Js.Const(() => "dropdown", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "mention-dropdown"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "dropdown").Prop(() => "style").Prop(() => "display").Op(() => "===", () => Js.Str(() => "block")), new List<JsSyntax>
+                {
+                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "e").Prop(() => "key").Op(() => "===", () => Js.Str(() => "ArrowDown")), new List<JsSyntax>
+                        {
+                            Js.Id(() => "e").Call(() => "preventDefault").Stmt(),
+                            Js.Id(() => "navigateMentionDropdown").Invoke(() => Js.Num(() => "1")).Stmt()
+                        }),
+                        (Js.Id(() => "e").Prop(() => "key").Op(() => "===", () => Js.Str(() => "ArrowUp")), new List<JsSyntax>
+                        {
+                            Js.Id(() => "e").Call(() => "preventDefault").Stmt(),
+                            Js.Id(() => "navigateMentionDropdown").Invoke(() => Js.Num(() => "-1")).Stmt()
+                        }),
+                        (Js.Id(() => "e").Prop(() => "key").Op(() => "===", () => Js.Str(() => "Enter")), new List<JsSyntax>
+                        {
+                            Js.Id(() => "e").Call(() => "preventDefault").Stmt(),
+                            Js.Id(() => "selectMentionItem").Invoke().Stmt()
+                        }),
+                        (Js.Id(() => "e").Prop(() => "key").Op(() => "===", () => Js.Str(() => "Escape")), new List<JsSyntax>
+                        {
+                            Js.Id(() => "hideMentionDropdown").Invoke().Stmt()
+                        })
+                    })
+                })
+            }));
+
+        var showMentionDropdownBody = Js.Block()
+            .Add(() => Js.Const(() => "dropdown",
+                () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "mention-dropdown"))))
+            .Add(() => Js.Const(() => "filtered",
+                () => Js.Id(() => "sessionMembers").Call(() => "filter",
+                    () => Js.Arrow(() => new List<string> { "m" },
+                        () => Js.Id(() => "query")
+                            .Op(() => "===", () => Js.Str(() => ""))
+                            .Op(() => "||", () => Js.Id(() => "m").Prop(() => "name")
+                                .Call(() => "toLowerCase")
+                                .Call(() => "includes", () => Js.Id(() => "query").Call(() => "toLowerCase")))))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "filtered").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0")), new List<JsSyntax>
+                {
+                    Js.Const(() => "htmlParts",
+                        () => Js.Id(() => "filtered").Call(() => "map",
+                            () => Js.Arrow(() => new List<string> { "m" },
+                                () => Js.Str(() => "<div class=\"mention-item\" data-id=\"")
+                                    .Op(() => "+", () => Js.Id(() => "m").Prop(() => "id"))
+                                    .Op(() => "+", () => Js.Str(() => "\" data-name=\""))
+                                    .Op(() => "+", () => Js.Id(() => "m").Prop(() => "name"))
+                                    .Op(() => "+", () => Js.Str(() => "\">@"))
+                                    .Op(() => "+", () => Js.Id(() => "m").Prop(() => "name"))
+                                    .Op(() => "+", () => Js.Str(() => "</div>"))))),
+                    Js.Assign(() => Js.Id(() => "dropdown").Prop(() => "innerHTML"),
+                        () => Js.Id(() => "htmlParts").Call(() => "join", () => Js.Str(() => ""))),
+                    Js.Assign(() => Js.Id(() => "dropdown").Prop(() => "style").Prop(() => "display"),
+                        () => Js.Str(() => "block")),
+                    Js.Assign(() => Js.Id(() => "mentionSelectedIndex"), () => Js.Num(() => "0")),
+                }),
+                (null, new List<JsSyntax>
+                {
+                    Js.Id(() => "hideMentionDropdown").Invoke().Stmt()
+                })
+            }));
+        js.Add(() => Js.Func(() => "showMentionDropdown", () => new List<string> { "query" }, () => showMentionDropdownBody));
+
+        var initMentionDropdownBody = Js.Block()
+            .Add(() => Js.Id(() => "document")
+                .Call(() => "getElementById", () => Js.Str(() => "mention-dropdown"))
+                .Call(() => "addEventListener",
+                    () => Js.Str(() => "click"),
+                    () => Js.Arrow(() => new List<string> { "e" }, () => Js.Block()
+                        .Add(() => Js.Const(() => "target",
+                            () => Js.Id(() => "e").Prop(() => "target")
+                                .Call(() => "closest", () => Js.Str(() => ".mention-item"))))
+                        .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                        {
+                            (Js.Id(() => "target"), new List<JsSyntax>
+                            {
+                                Js.Assign(() => Js.Id(() => "mentionSelectedIndex"), () => Js.Num(() => "0")),
+                                Js.Const(() => "items",
+                                    () => Js.Id(() => "document")
+                                        .Call(() => "querySelectorAll", () => Js.Str(() => "#mention-dropdown .mention-item"))),
+                                Js.Id(() => "items").Call(() => "forEach",
+                                    () => Js.Arrow(() => new List<string> { "item", "idx" },
+                                        () => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                                        {
+                                            (Js.Id(() => "item").Op(() => "===", () => Js.Id(() => "target")), new List<JsSyntax>
+                                            {
+                                                Js.Assign(() => Js.Id(() => "mentionSelectedIndex"), () => Js.Id(() => "idx"))
+                                            })
+                                        }))),
+                                Js.Id(() => "selectMentionItem").Invoke().Stmt()
+                            })
+                        })
+                    )).Stmt()));
+        js.Add(() => Js.Func(() => "initMentionDropdown", () => new List<string>(), () => initMentionDropdownBody));
+
+        var hideMentionDropdownBody = Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "mention-dropdown")).Prop(() => "style").Prop(() => "display"), () => Js.Str(() => "none")));
+        js.Add(() => Js.Func(() => "hideMentionDropdown", () => new List<string>(), () => hideMentionDropdownBody));
+
+        var navigateMentionDropdownBody = Js.Block()
+            .Add(() => Js.Const(() => "items", () => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => "#mention-dropdown .mention-item"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "items").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0")), new List<JsSyntax>
+                {
+                    Js.Id(() => "items").Index(() => Js.Id(() => "mentionSelectedIndex")).Prop(() => "classList").Call(() => "remove", () => Js.Str(() => "selected")).Stmt(),
+                    Js.Assign(() => Js.Id(() => "mentionSelectedIndex"), () => Js.Id(() => "mentionSelectedIndex").Op(() => "+", () => Js.Id(() => "dir")).Op(() => "%", () => Js.Id(() => "items").Prop(() => "length"))),
+                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "mentionSelectedIndex").Op(() => "<", () => Js.Num(() => "0")), new List<JsSyntax>
+                        {
+                            Js.Assign(() => Js.Id(() => "mentionSelectedIndex"), () => Js.Id(() => "items").Prop(() => "length").Op(() => "-", () => Js.Num(() => "1")))
+                        })
+                    }),
+                    Js.Id(() => "items").Index(() => Js.Id(() => "mentionSelectedIndex")).Prop(() => "classList").Call(() => "add", () => Js.Str(() => "selected")).Stmt()
+                })
+            }));
+        js.Add(() => Js.Func(() => "navigateMentionDropdown", () => new List<string> { "dir" }, () => navigateMentionDropdownBody));
+
+        var selectMentionItemBody = Js.Block()
+            .Add(() => Js.Const(() => "items", () => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => "#mention-dropdown .mention-item"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "items").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0")).Op(() => "&&", () => Js.Id(() => "mentionSelectedIndex").Op(() => ">=", () => Js.Num(() => "0"))), new List<JsSyntax>
+                {
+                    Js.Const(() => "selected", () => Js.Id(() => "items").Index(() => Js.Id(() => "mentionSelectedIndex"))),
+                    Js.Const(() => "name", () => Js.Id(() => "selected").Prop(() => "dataset").Prop(() => "name")),
+                    Js.Const(() => "input", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "message-input"))),
+                    Js.Const(() => "val", () => Js.Id(() => "input").Prop(() => "value")),
+                    Js.Const(() => "pos", () => Js.Id(() => "input").Prop(() => "selectionStart")),
+                    Js.Const(() => "textBefore", () => Js.Id(() => "val").Call(() => "substring", () => Js.Num(() => "0"), () => Js.Id(() => "pos"))),
+                    Js.Const(() => "atIdx", () => Js.Id(() => "textBefore").Call(() => "lastIndexOf", () => Js.Str(() => "@"))),
+                    Js.Assign(() => Js.Id(() => "input").Prop(() => "value"),
+                        () => Js.Id(() => "val")
+                            .Call(() => "substring", () => Js.Num(() => "0"), () => Js.Id(() => "atIdx"))
+                            .Op(() => "+", () => Js.Str(() => "@"))
+                            .Op(() => "+", () => Js.Id(() => "name"))
+                            .Op(() => "+", () => Js.Str(() => " "))
+                            .Op(() => "+", () => Js.Id(() => "val")
+                                .Call(() => "substring", () => Js.Id(() => "pos")))),
+                    Js.Assign(() => Js.Id(() => "input").Prop(() => "selectionStart"), () => Js.Id(() => "atIdx").Op(() => "+", () => Js.Id(() => "name").Prop(() => "length")).Op(() => "+", () => Js.Num(() => "2"))),
+                    Js.Assign(() => Js.Id(() => "input").Prop(() => "selectionEnd"), () => Js.Id(() => "input").Prop(() => "selectionStart")),
+                    Js.Id(() => "hideMentionDropdown").Invoke().Stmt(),
+                    Js.Id(() => "input").Call(() => "focus").Stmt()
+                })
+            }));
+        js.Add(() => Js.Func(() => "selectMentionItem", () => new List<string>(), () => selectMentionItemBody));
+
         var initInputBody = Js.Block()
             .Add(() => Js.Const(() => "input", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "message-input"))))
             .Add(() => Js.Id(() => "input").Call(() => "addEventListener", () => Js.Str(() => "keydown"), () => Js.Arrow(() => new List<string> { "e" }, () => keydownHandlerBody)).Stmt())
+            .Add(() => Js.Id(() => "input").Call(() => "addEventListener", () => Js.Str(() => "input"), () => Js.Arrow(() => new List<string> { "e" }, () => handleMentionInputBody)).Stmt())
+            .Add(() => Js.Id(() => "input").Call(() => "addEventListener", () => Js.Str(() => "keydown"), () => Js.Arrow(() => new List<string> { "e" }, () => mentionDropdownKeydownBody)).Stmt())
             .Add(() => Js.Id(() => "autoResize").Invoke(() => Js.Id(() => "input")).Stmt());
         js.Add(() => Js.Func(() => "initInput", () => new List<string>(), () => initInputBody));
 
@@ -1789,6 +2099,8 @@ public class ChatView : ViewBase
                 .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "dataset").Prop(() => "id"), () => Js.Id(() => "item").Prop(() => "sessionId")))
                 .Add(() => Js.Id(() => "console").Call(() => "log", () => Js.Str(() => "Rendering session:"), () => Js.Id(() => "item").Prop(() => "displayName"), () => Js.Str(() => "beingId:"), () => Js.Id(() => "item").Prop(() => "beingId")).Stmt())
                 .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "dataset").Prop(() => "beingId"), () => Js.Id(() => "item").Prop(() => "beingId")))
+                .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "dataset").Prop(() => "type"), () => Js.Id(() => "item").Prop(() => "type")))
+                .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "dataset").Prop(() => "members"), () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "item").Prop(() => "members"))))
                 .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"being-name\">").Op(() => "+", () => (JsSyntax)Js.Id(() => "item").Prop(() => "displayName")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div><div class=\"being-last-message\">")).Op(() => "+", () => (JsSyntax)Js.Id(() => "item").Prop(() => "lastMessage")).Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"))))
                 .Add(() => Js.Id(() => "list").Call(() => "appendChild", () => Js.Id(() => "div")).Stmt())
             )))
@@ -2041,7 +2353,6 @@ public class ChatView : ViewBase
         var appendMessageBody = Js.Block()
             .Add(() => Js.Const(() => "messages", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "chat-messages"))))
             .Add(() => Js.Const(() => "div", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
-            // Skip Tool-role messages — they are merged into tool call messages during rendering
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 (Js.Id(() => "msg").Prop(() => "role").Op(() => "===", () => Js.Str(() => "Tool")), new List<JsSyntax>
@@ -2054,12 +2365,101 @@ public class ChatView : ViewBase
                 { (msgIsUserCond, userMsgBody) },
                 { (null, beingMsgBody) }
             }))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "msg").Prop(() => "mentionedIds").Op(() => "&&", () => Js.Id(() => "msg").Prop(() => "mentionedIds").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0"))), new List<JsSyntax>
+                {
+                    Js.Id(() => "div").Prop(() => "classList").Call(() => "add", () => Js.Str(() => "msg-mentioned")).Stmt(),
+                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "msg").Prop(() => "mentionedIds").Call(() => "some", () => Js.Arrow(() => new List<string> { "id" }, () => Js.Id(() => "id").Op(() => "===", () => Js.Str(() => userId)))), new List<JsSyntax>
+                        {
+                            Js.Id(() => "div").Prop(() => "classList").Call(() => "add", () => Js.Str(() => "msg-mentioned-me")).Stmt()
+                        })
+                    })
+                })
+            }))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "mentionFilterActive")
+                    .Op(() => "&&", () => Js.Id(() => "msg").Prop(() => "mentionedIds").Not()
+                        .Op(() => "||", () => Js.Id(() => "msg").Prop(() => "mentionedIds")
+                            .Call(() => "some",
+                                () => Js.Arrow(() => new List<string> { "id" },
+                                    () => Js.Id(() => "id").Op(() => "===", () => Js.Str(() => userId))))
+                            .Not())), new List<JsSyntax>
+                {
+                    Js.Id(() => "div").Prop(() => "classList").Call(() => "add", () => Js.Str(() => "msg-filtered-out")).Stmt()
+                })
+            }))
             .Add(() => Js.Id(() => "messages").Call(() => "appendChild", () => Js.Id(() => "div")).Stmt())
             .Add(() => Js.Id(() => "renderMarkdownBody").Invoke(() => Js.Id(() => "div")).Stmt())
+            .Add(() => Js.Id(() => "highlightMentions").Invoke(() => Js.Id(() => "div")).Stmt())
             .Add(() => Js.Id(() => "messages").Call(() => "scrollTo", () => Js.Obj().Prop(() => "top", () => Js.Id(() => "messages").Prop(() => "scrollHeight")).Prop(() => "behavior", () => Js.Str(() => "smooth"))).Stmt());
         js.Add(() => Js.Func(() => "appendMessage", () => new List<string> { "msg" }, () => appendMessageBody));
 
+        var highlightMentionsBody = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "sessionMembers").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0")), new List<JsSyntax>
+                {
+                    Js.Const(() => "textEls", () => Js.Id(() => "root").Call(() => "querySelectorAll", () => Js.Str(() => ".msg-being-text, .msg-user-bubble"))),
+                    Js.Id(() => "textEls").Call(() => "forEach",
+                        () => Js.Arrow(() => new List<string> { "el" }, () => Js.Block()
+                            .Add(() => Js.Let(() => "html", () => Js.Id(() => "el").Prop(() => "innerHTML")))
+                            .Add(() => Js.Id(() => "sessionMembers").Call(() => "forEach",
+                                () => Js.Arrow(() => new List<string> { "member" }, () => Js.Block()
+                                    .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                                    {
+                                        (Js.Id(() => "member").Prop(() => "name")
+                                            .Op(() => "&&", () => Js.Id(() => "html")
+                                                .Call(() => "includes",
+                                                    () => Js.Str(() => "@")
+                                                        .Op(() => "+", () => Js.Id(() => "member").Prop(() => "name")))), new List<JsSyntax>
+                                        {
+                                            Js.Const(() => "mention",
+                                                () => Js.Str(() => "@")
+                                                    .Op(() => "+", () => Js.Id(() => "member").Prop(() => "name"))),
+                                            Js.Const(() => "openTag",
+                                                () => Js.Str(() => "<span class=\"mention-tag\" data-member-id=\"")
+                                                    .Op(() => "+", () => Js.Id(() => "member").Prop(() => "id"))
+                                                    .Op(() => "+", () => Js.Str(() => "\">"))),
+                                            Js.Const(() => "replacement",
+                                                () => Js.Id(() => "openTag")
+                                                    .Op(() => "+", () => Js.Id(() => "mention"))
+                                                    .Op(() => "+", () => Js.Str(() => "</span>"))),
+                                            Js.Assign(() => Js.Id(() => "html"),
+                                                () => Js.Id(() => "html")
+                                                    .Call(() => "split", () => Js.Id(() => "mention"))
+                                                    .Call(() => "join", () => Js.Id(() => "replacement")))
+                                        })
+                                    }))
+                                )))
+                            .Add(() => Js.Assign(() => Js.Id(() => "el").Prop(() => "innerHTML"), () => Js.Id(() => "html")))
+                        )).Stmt(),
+                })
+            }));
+        js.Add(() => Js.Func(() => "highlightMentions", () => new List<string> { "root" }, () => highlightMentionsBody));
+
+        var toggleMentionFilterBody = Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "mentionFilterActive"), () => Js.Id(() => "mentionFilterActive").Not()))
+            .Add(() => Js.Const(() => "btn", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "mention-filter-btn"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "mentionFilterActive"), new List<JsSyntax>
+                {
+                    Js.Id(() => "btn").Prop(() => "classList").Call(() => "add", () => Js.Str(() => "active")).Stmt()
+                }),
+                (null, new List<JsSyntax>
+                {
+                    Js.Id(() => "btn").Prop(() => "classList").Call(() => "remove", () => Js.Str(() => "active")).Stmt()
+                })
+            }))
+            .Add(() => Js.Id(() => "renderMessages").Invoke().Stmt());
+        js.Add(() => Js.Func(() => "toggleMentionFilter", () => new List<string>(), () => toggleMentionFilterBody));
+
         js.Add(() => Js.Id(() => "initInput").Invoke().Stmt());
+        js.Add(() => Js.Id(() => "initMentionDropdown").Invoke().Stmt());
         js.Add(() => Js.Id(() => "initSessionList").Invoke().Stmt());
         js.Add(() => Js.Id(() => "renderMarkdownBody").Invoke(() => Js.Id(() => "document")).Stmt());
         js.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>

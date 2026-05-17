@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -181,7 +181,7 @@ public class SSEHandler : IDisposable
         }
     }
 
-    public async Task SendHistoryAsync(SSEClient client, List<ChatMessage> messages, Guid requestUserId)
+    public async Task SendHistoryAsync(SSEClient client, List<ChatMessage> messages, Guid requestUserId, List<Guid>? sessionMembers = null)
     {
         var beingManager = ServiceLocator.Instance.BeingManager;
         var beingDict = beingManager?.GetAllBeings()?.ToDictionary(b => b.Id);
@@ -207,11 +207,18 @@ public class SSEHandler : IDisposable
                 toolCallId = m.ToolCallId,
                 promptTokens = m.PromptTokens,
                 completionTokens = m.CompletionTokens,
-                totalTokens = m.TotalTokens
+                totalTokens = m.TotalTokens,
+                mentionedIds = m.MentionedIds?.Select(id => id.ToString()).ToList()
             };
         }).ToList();
 
-        await client.SendEventAsync("history", new { messages = historyData });
+        var memberList = sessionMembers?.Select(id =>
+        {
+            string name = id == requestUserId ? "User" : beingDict?.GetValueOrDefault(id)?.Name ?? id.ToString("N").Substring(0, 8);
+            return new { id = id.ToString(), name };
+        }).ToList();
+
+        await client.SendEventAsync("history", new { messages = historyData, sessionMembers = memberList });
     }
 
     public int ClientCount

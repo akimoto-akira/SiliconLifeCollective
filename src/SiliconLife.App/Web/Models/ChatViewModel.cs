@@ -44,4 +44,12 @@ public class ChatSessionItem
     public DateTime LastMessageAt { get; set; }
     public int UnreadCount { get; set; }
     public Guid? BeingId { get; set; }
+    public string Type { get; set; } = "single";
+    public List<SessionMemberInfo> Members { get; set; } = new();
+}
+
+public class SessionMemberInfo
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
 }

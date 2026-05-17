@@ -151,7 +151,13 @@ public class ChatController : Controller
                 Name = displayName,
                 LastMessage = lastMsg?.Content ?? "",
                 LastMessageAt = lastMsg?.Timestamp ?? DateTime.MinValue,
-                BeingId = beingId
+                BeingId = beingId,
+                Type = session.Type == SessionType.GroupChat ? "group" : "single",
+                Members = session.Members.Select(id => new SessionMemberInfo
+                {
+                    Id = id,
+                    Name = id == _userId ? userNickname : beingDict.GetValueOrDefault(id)?.Name ?? id.ToString("N").Substring(0, 8)
+                }).ToList()
             });
         }
 
@@ -360,7 +366,8 @@ public class ChatController : Controller
                     senderName = senderBeing?.Name ?? "",
                     timestamp = m.Timestamp,
                     toolCallsJson = m.ToolCallsJson,
-                    toolCallId = m.ToolCallId
+                    toolCallId = m.ToolCallId,
+                    mentionedIds = m.MentionedIds?.Select(id => id.ToString()).ToList()
                 };
             });
 
@@ -394,6 +401,12 @@ public class ChatController : Controller
                 Type = MessageType.Text,
                 Role = MessageRole.User
             };
+
+            var session = _chatSystem.GetSessionByChannelId(channelId);
+            if (session != null && session.Type == SessionType.GroupChat)
+            {
+                message.MentionedIds = MentionParser.ParseMentionedIds(body.Content, session.Members);
+            }
 
             // Add message to chat system - this will trigger AI processing
             _chatSystem.AddMessage(message);
