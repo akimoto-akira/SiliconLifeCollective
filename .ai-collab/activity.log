@@ -213,3 +213,9 @@
 2026-05-17T07:45:00+08:00 | trae-glm5 | task_complete | task=task-205 | build=pass
 2026-05-17T07:50:00+08:00 | trae-glm5 | task_claim | task=task-208 | type=feature | title=群聊@提及可视化
 2026-05-17T16:30:00+08:00 | trae-glm5 | task_complete | task=task-208 | files=ChatView.cs,SSEHandler.cs,ChatController.cs | summary=群聊@提及可视化：后端传递mentionedIds和sessionMembers，前端实现@高亮、过滤按钮、输入下拉选择
+2026-05-17T16:45:00+08:00 | trae-glm5 | task_claim | task=task-202 | type=feature | title=ThinkOnProject：无模板项目的主理人驱动编排
+2026-05-17T17:30:00+08:00 | trae-glm5 | task_complete | task=task-202 | files=ToolScenarioAttribute.cs,DefaultSiliconBeing.cs,ContextManager.cs,ProjectWorkTool.cs,ProjectManager.cs(Default+Fast) | summary=ThinkOnProject完整实现：新增Project场景标志、Tick触发逻辑、上下文构建、ProjectWorkTool六个action、有模板项目自动创建工作流实例
+2026-05-17T17:35:00+08:00 | trae-glm5 | task_claim | task=task-204 | type=refactor | title=清理 ThinkOnProject 残留引用
+2026-05-17T17:40:00+08:00 | trae-glm5 | task_complete | task=task-204 | files=ContextManager.cs | summary=清理2处过时注释：ThinkOnProject已移除注释块、BuildProjectScenarioContext残留注释。BeingActivity.Project枚举已被新实现正确使用，无需修改
+2026-05-17T17:45:00+08:00 | trae-glm5 | task_claim | task=task-203 | type=feature | title=项目列表页增加创建项目入口和工作流模板选择
+2026-05-17T18:00:00+08:00 | trae-glm5 | task_complete | task=task-203 | files=ProjectView.cs,ProjectController.cs,DefaultLocalizationBase.cs,ZhCN.cs,EnUS.cs,ZhHK.cs,JaJP.cs,KoKR.cs,DeDE.cs,FrFR.cs,EsES.cs,ItIT.cs,CsCZ.cs,PlPL.cs | summary=项目列表页创建项目完整实现：新增创建按钮、模态框表单（名称/描述/工作流模板下拉）、ListWorkflowTemplates API端点、11种语言本地化、前端JS交互逻辑

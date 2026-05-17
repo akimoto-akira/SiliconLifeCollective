@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-17T07:50:00+08:00",
+  "lastUpdated": "2026-05-17T18:00:00+08:00",
   "tasks": [
     {
       "id": "task-201",
@@ -40,10 +40,10 @@
       "title": "ThinkOnProject：无模板项目的主理人驱动编排",
       "description": "实现 think-on-project-design.md 中定义的 ThinkOnProject 逻辑：\n1. ToolScenarioFlag 新增 Project = 1 << 4\n2. DefaultSiliconBeing.Tick() 第324-330行注释替换为 ThinkOnProject 触发判断\n3. 实现 HasProjectsWithoutTemplate() 和 ShouldThinkOnProject() 触发条件\n4. ContextManager 新增 ThinkOnProject() 方法和 BuildProjectScenarioContext() 上下文构建\n5. 新建 ProjectWorkTool.cs（create-task/assign-task/chat/broadcast/complete/status 六个action）\n6. CreateProject 时有模板→自动创建工作流实例（薄修复）\n\n关键约束：有模板的项目主理人不得触发 ThinkOnProject，模板是程序必须服从\n\n验收标准：无模板项目创建后主理人自动拆任务推进，群聊自然触发，有模板项目仍走工作流",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-17T06:53:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "metadata": {
         "source": "think-on-project-design.md + coze-agent-capability-analysis.md 断点2",
         "files_to_modify": [
@@ -58,6 +58,16 @@
         ],
         "reference_files": [
           ".ai-collab/docs/think-on-project-design.md"
+        ],
+        "completedAt": "2026-05-17T17:30:00+08:00",
+        "completedBy": "trae-glm5",
+        "files_modified": [
+          "src/SiliconLife.Core/Tools/ToolScenarioAttribute.cs",
+          "src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeing.cs",
+          "src/SiliconLife.Core/AI/ContextManager.cs",
+          "src/SiliconLife.Common/Tools/ProjectWorkTool.cs",
+          "src/SiliconLife.Default/Project/ProjectManager.cs",
+          "src/SiliconLife.Fast/Project/ProjectManager.cs"
         ]
       }
     },
@@ -68,9 +78,9 @@
       "title": "项目列表页增加创建项目入口和工作流模板选择",
       "description": "当前 ProjectView.cs 只有列表渲染，无创建入口。需要：\n1. 项目列表页增加\"创建项目\"按钮\n2. 创建表单：项目名称、描述、工作流模板下拉选择\n3. 前端调用 /api/projects/list-workflow-templates 获取可用模板（需新建此API端点）\n4. 提交时传 workflowTemplate 参数到 /api/projects/create\n5. ProjectController.CreateIndex() 的 ProjectItem 补充 workflowTemplateName/groupChatSessionId/broadcastChannelId 字段\n\n代码位置：ProjectView.cs（203行，全部是列表渲染），ProjectController.cs:154-210（CreateProject API已有）\n\n验收标准：用户可在UI创建项目并选择工作流模板，创建后列表显示完整信息",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-17T06:53:00+08:00",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "createdBy": "coze-agent",
       "metadata": {
         "source": "coze-agent-capability-analysis.md 断点4+5 + feature-horizontal-expansion-analysis.md 缺陷4",
@@ -79,7 +89,25 @@
           "src/SiliconLife.App/Web/Controllers/ProjectController.cs",
           "src/SiliconLife.App/Web/Models/ProjectViewModel.cs"
         ],
-        "note": "feature-horizontal-expansion-analysis.md 建议调 /api/projects/list-workflow-templates，但该端点不存在，需新建"
+        "note": "feature-horizontal-expansion-analysis.md 建议调 /api/projects/list-workflow-templates，但该端点不存在，需新建",
+        "completedAt": "2026-05-17T18:00:00+08:00",
+        "completedBy": "trae-glm5",
+        "files_modified": [
+          "src/SiliconLife.App/Web/Views/ProjectView.cs",
+          "src/SiliconLife.App/Web/Controllers/ProjectController.cs",
+          "src/SiliconLife.Common/Localization/DefaultLocalizationBase.cs",
+          "src/SiliconLife.Common/Localization/ZhCN.cs",
+          "src/SiliconLife.Common/Localization/EnUS.cs",
+          "src/SiliconLife.Common/Localization/ZhHK.cs",
+          "src/SiliconLife.Common/Localization/JaJP.cs",
+          "src/SiliconLife.Common/Localization/KoKR.cs",
+          "src/SiliconLife.Common/Localization/DeDE.cs",
+          "src/SiliconLife.Common/Localization/FrFR.cs",
+          "src/SiliconLife.Common/Localization/EsES.cs",
+          "src/SiliconLife.Common/Localization/ItIT.cs",
+          "src/SiliconLife.Common/Localization/CsCZ.cs",
+          "src/SiliconLife.Common/Localization/PlPL.cs"
+        ]
       }
     },
     {
@@ -89,9 +117,9 @@
       "title": "清理 ThinkOnProject 残留引用",
       "description": "ThinkOnProject 已移除但代码清理不彻底：\n1. SiliconBeingBase.cs:41 BeingActivity.ProjectWork 枚举仍存在（ThinkOnProject恢复后可复用，暂标记为待定）\n2. ContextManager.cs:1160/1346 有 ThinkOnProject/BuildProjectScenarioContext 注释残留\n3. DefaultSiliconBeing.cs:830 HasProjectWork 注释残留\n\n如果 task-202 实现了新的 ThinkOnProject，则此任务变为清理旧注释+对齐新实现。如果 task-202 未实现，则清理残留枚举和注释。\n\n验收标准：代码中无死注释，枚举要么被新实现使用要么被移除",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-17T06:53:00+08:00",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "createdBy": "coze-agent",
       "metadata": {
         "source": "coze-agent-capability-analysis.md 断点8（Tick链残留引用）",
@@ -100,7 +128,12 @@
           "src/SiliconLife.Core/AI/ContextManager.cs",
           "src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeing.cs"
         ],
-        "depends_on": "task-202"
+        "depends_on": "task-202",
+        "completedAt": "2026-05-17T17:40:00+08:00",
+        "completedBy": "trae-glm5",
+        "files_modified": [
+          "src/SiliconLife.Core/AI/ContextManager.cs"
+        ]
       }
     },
     {
@@ -188,9 +221,9 @@
     }
   ],
   "taskIndex": {
-    "pending": ["task-202", "task-203", "task-204", "task-206", "task-207"],
+    "pending": ["task-206", "task-207"],
     "inProgress": [],
-    "completed": ["task-201", "task-205", "task-208"],
+    "completed": ["task-201", "task-202", "task-203", "task-204", "task-205", "task-208"],
     "cancelled": []
   },
   "metadata": {
