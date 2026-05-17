@@ -125,6 +125,11 @@ public class DashScopeClient : IAIClient
     public bool? StreamingMode => null;
 
     /// <summary>
+    /// DashScope supports function/tool calling via the OpenAI-compatible tools API.
+    /// </summary>
+    public bool? SupportsToolCalls => true;
+
+    /// <summary>
     /// Creates a new DashScope client with the specified configuration
     /// </summary>
     /// <param name="apiKey">DashScope API key for authentication</param>

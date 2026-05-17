@@ -121,6 +121,11 @@ public class VolcengineArkClient : IAIClient
     public bool? StreamingMode => null;
 
     /// <summary>
+    /// Volcengine Ark supports function/tool calling via the OpenAI-compatible tools API.
+    /// </summary>
+    public bool? SupportsToolCalls => true;
+
+    /// <summary>
     /// Creates a new Volcengine Ark client with the specified configuration
     /// </summary>
     /// <param name="apiKey">Volcengine Ark API key for authentication</param>

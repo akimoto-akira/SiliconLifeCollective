@@ -37,6 +37,16 @@ public interface IAIClient
     bool? StreamingMode { get; }
 
     /// <summary>
+    /// Gets whether this AI client supports function/tool calling.
+    /// true  = supports tool calls (function calling);
+    /// false = does not support tool calls, tools should not be injected;
+    /// null  = unknown, assume supported (default behavior).
+    /// When false, ContextManager will skip tool injection to prevent
+    /// the AI from generating unexecutable tool_calls.
+    /// </summary>
+    bool? SupportsToolCalls { get; }
+
+    /// <summary>
     /// Sends a chat request to the AI service and returns the response
     /// </summary>
     /// <param name="request">The AI request to send</param>

@@ -144,6 +144,11 @@ public class OllamaClient : IAIClient
     public bool? StreamingMode => null;
 
     /// <summary>
+    /// Ollama supports function/tool calling via the tools API.
+    /// </summary>
+    public bool? SupportsToolCalls => true;
+
+    /// <summary>
     /// Creates a new Ollama client with the specified endpoint
     /// </summary>
     public OllamaClient(string endpoint = "http://localhost:11434", string defaultModel = "llama3.2")
