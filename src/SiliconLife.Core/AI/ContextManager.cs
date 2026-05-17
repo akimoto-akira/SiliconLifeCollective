@@ -390,6 +390,19 @@ public class ContextManager
             });
         }
 
+        // Knowledge network context (placed after scenario, before memory).
+        // Provides the AI with awareness of what knowledge is available in the graph,
+        // enabling it to query and use knowledge for decision-making.
+        string? knowledgeContext = BuildKnowledgeContext();
+        if (!string.IsNullOrEmpty(knowledgeContext))
+        {
+            request.Messages.Add(new ChatMessage
+            {
+                Role = MessageRole.System,
+                Content = knowledgeContext,
+            });
+        }
+
         // Memory context (placed at the end of system prompts, immediately before the
         // conversation). Rationale:
         // - Closest to the dialog, so the model's attention is strongest here.
@@ -503,6 +516,43 @@ public class ContextManager
     /// so the silicon being can recall past interactions like a human would.
     /// Returns null when memory is unavailable or empty.
     /// </summary>
+    private string? BuildKnowledgeContext()
+    {
+        var knowledgeNetwork = ServiceLocator.Instance.Get<IKnowledgeNetwork>();
+        if (knowledgeNetwork == null) return null;
+
+        try
+        {
+            var stats = knowledgeNetwork.GetStatistics();
+            if (stats.TotalTriples == 0) return null;
+
+            StringBuilder sb = new();
+            sb.AppendLine("Knowledge network available:");
+            sb.AppendLine($"- {stats.TotalTriples} knowledge triples, {stats.TotalSubjects} subjects, {stats.TotalPredicates} relation types");
+
+            // Provide top hub nodes as navigation hints
+            var degreeDist = knowledgeNetwork.GetDegreeDistribution();
+            if (degreeDist.TopHubNodes.Count > 0)
+            {
+                sb.AppendLine("- Key concepts:");
+                foreach (var hub in degreeDist.TopHubNodes.Take(5))
+                {
+                    sb.AppendLine($"  * {hub.Entity} (out: {hub.OutDegree}, in: {hub.InDegree})");
+                }
+            }
+
+            sb.AppendLine();
+            sb.AppendLine("You can use the 'knowledge' tool to query, search, traverse, or find paths in the knowledge network.");
+
+            return sb.ToString();
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(_being.Id, "Failed to build knowledge context: {0}", ex.Message);
+            return null;
+        }
+    }
+
     private string? BuildMemoryContext()
     {
         if (_being.Memory == null) return null;

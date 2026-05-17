@@ -123,6 +123,28 @@ public interface IKnowledgeNetwork
     List<string> DfsTraversal(string startEntity, int maxDepth = 3);
 
     /// <summary>
+    /// Get N-hop neighbors from a start entity, returning detailed relation info
+    /// </summary>
+    /// <param name="startEntity">Start entity</param>
+    /// <param name="maxHops">Maximum number of hops</param>
+    /// <param name="direction">Direction: "outgoing", "incoming", or "both"</param>
+    /// <returns>List of neighbor info with distance and relations</returns>
+    List<NeighborInfo> GetNeighbors(string startEntity, int maxHops = 1, string direction = "both");
+
+    /// <summary>
+    /// Get the degree (in-degree, out-degree, total) of a specific node
+    /// </summary>
+    /// <param name="entity">Entity name</param>
+    /// <returns>Node degree information</returns>
+    NodeDegree GetNodeDegree(string entity);
+
+    /// <summary>
+    /// Get degree distribution across all nodes in the graph
+    /// </summary>
+    /// <returns>Degree distribution statistics</returns>
+    DegreeDistribution GetDegreeDistribution();
+
+    /// <summary>
     /// Detect cycles
     /// </summary>
     /// <returns>Whether a cycle exists</returns>
@@ -187,4 +209,109 @@ public class RelationshipPath
         }
         return string.Join(" ", parts);
     }
+}
+
+/// <summary>
+/// Neighbor information - describes a neighbor entity with its relation details
+/// </summary>
+public class NeighborInfo
+{
+    /// <summary>
+    /// Neighbor entity name
+    /// </summary>
+    public string Entity { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Distance (number of hops) from the start entity
+    /// </summary>
+    public int Distance { get; set; }
+
+    /// <summary>
+    /// Relation type connecting to this neighbor
+    /// </summary>
+    public string Predicate { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Direction: "outgoing" or "incoming"
+    /// </summary>
+    public string Direction { get; set; } = string.Empty;
+
+    /// <summary>
+    /// String representation
+    /// </summary>
+    public override string ToString() => Direction == "outgoing"
+        ? $"-[{Predicate}]-> {Entity} (hop {Distance})"
+        : $"{Entity} -[{Predicate}]-> (hop {Distance})";
+}
+
+/// <summary>
+/// Node degree information
+/// </summary>
+public class NodeDegree
+{
+    /// <summary>
+    /// Entity name
+    /// </summary>
+    public string Entity { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Out-degree: number of outgoing relations
+    /// </summary>
+    public int OutDegree { get; set; }
+
+    /// <summary>
+    /// In-degree: number of incoming relations
+    /// </summary>
+    public int InDegree { get; set; }
+
+    /// <summary>
+    /// Total degree
+    /// </summary>
+    public int TotalDegree => OutDegree + InDegree;
+}
+
+/// <summary>
+/// Degree distribution statistics for the entire graph
+/// </summary>
+public class DegreeDistribution
+{
+    /// <summary>
+    /// Total number of nodes
+    /// </summary>
+    public int TotalNodes { get; set; }
+
+    /// <summary>
+    /// Average out-degree
+    /// </summary>
+    public double AverageOutDegree { get; set; }
+
+    /// <summary>
+    /// Average in-degree
+    /// </summary>
+    public double AverageInDegree { get; set; }
+
+    /// <summary>
+    /// Maximum out-degree
+    /// </summary>
+    public int MaxOutDegree { get; set; }
+
+    /// <summary>
+    /// Maximum in-degree
+    /// </summary>
+    public int MaxInDegree { get; set; }
+
+    /// <summary>
+    /// Distribution of out-degree: degree -> count of nodes with that degree
+    /// </summary>
+    public Dictionary<int, int> OutDegreeDistribution { get; set; } = new();
+
+    /// <summary>
+    /// Distribution of in-degree: degree -> count of nodes with that degree
+    /// </summary>
+    public Dictionary<int, int> InDegreeDistribution { get; set; } = new();
+
+    /// <summary>
+    /// Top nodes by total degree (hub nodes)
+    /// </summary>
+    public List<NodeDegree> TopHubNodes { get; set; } = new();
 }

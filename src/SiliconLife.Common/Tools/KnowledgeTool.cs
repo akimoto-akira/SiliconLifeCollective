@@ -84,8 +84,8 @@ public class KnowledgeTool : ITool
                 ["action"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["enum"] = new[] { "add", "query", "update", "delete", "search", "get_path", "validate", "stats" },
-                    ["description"] = "Operation type: add-query-update-delete-search-get_path-validate-stats"
+                    ["enum"] = new[] { "add", "query", "update", "delete", "search", "get_path", "get_neighbors", "get_degree", "degree_distribution", "traverse", "has_cycle", "validate", "stats" },
+                    ["description"] = "Operation type: add-query-update-delete-search-get_path-get_neighbors-get_degree-degree_distribution-traverse-has_cycle-validate-stats"
                 },
                 ["subject"] = new Dictionary<string, object>
                 {
@@ -155,6 +155,31 @@ public class KnowledgeTool : ITool
                     ["type"] = "integer",
                     ["description"] = "Maximum number of results (for search)",
                     ["default"] = 50
+                },
+                ["entity"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["description"] = "Entity name (for get_neighbors, get_degree, traverse)"
+                },
+                ["max_hops"] = new Dictionary<string, object>
+                {
+                    ["type"] = "integer",
+                    ["description"] = "Maximum number of hops (for get_neighbors)",
+                    ["default"] = 1
+                },
+                ["direction"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["enum"] = new[] { "outgoing", "incoming", "both" },
+                    ["description"] = "Direction for neighbor query: outgoing, incoming, or both",
+                    ["default"] = "both"
+                },
+                ["traverse_method"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["enum"] = new[] { "bfs", "dfs" },
+                    ["description"] = "Traversal method (for traverse)",
+                    ["default"] = "bfs"
                 }
             },
             ["required"] = new[] { "action" }
@@ -188,6 +213,11 @@ public class KnowledgeTool : ITool
                 "delete" => ExecuteDeleteKnowledge(callerId, parameters),
                 "search" => ExecuteSearchKnowledge(parameters),
                 "get_path" => ExecuteGetRelationshipPath(parameters),
+                "get_neighbors" => ExecuteGetNeighbors(parameters),
+                "get_degree" => ExecuteGetNodeDegree(parameters),
+                "degree_distribution" => ExecuteGetDegreeDistribution(),
+                "traverse" => ExecuteTraversal(parameters),
+                "has_cycle" => ExecuteHasCycle(),
                 "validate" => ExecuteValidateKnowledge(callerId, parameters),
                 "stats" => ExecuteGetKnowledgeStats(),
                 _ => ToolResult.Failed($"Unknown operation type: {action}")
@@ -411,6 +441,131 @@ public class KnowledgeTool : ITool
             total_predicates = stats.TotalPredicates,
             avg_relations_per_subject = Math.Round(stats.AverageRelationsPerSubject, 2),
             avg_relations_per_object = Math.Round(stats.AverageRelationsPerObject, 2)
+        });
+    }
+
+    /// <summary>
+    /// Execute get neighbors
+    /// </summary>
+    private ToolResult ExecuteGetNeighbors(Dictionary<string, object> parameters)
+    {
+        if (!parameters.TryGetValue("entity", out var entityObj))
+        {
+            return ToolResult.Failed("Getting neighbors requires entity parameter");
+        }
+
+        var entity = entityObj?.ToString() ?? string.Empty;
+        var maxHops = parameters.TryGetValue("max_hops", out var hopsObj) ? SafeConvertToInt32(hopsObj, 1) : 1;
+        var direction = parameters.TryGetValue("direction", out var dirObj) ? dirObj?.ToString() ?? "both" : "both";
+
+        var neighbors = _knowledgeNetwork.GetNeighbors(entity, maxHops, direction);
+
+        var neighborResults = neighbors.Select(n => new
+        {
+            entity = n.Entity,
+            distance = n.Distance,
+            predicate = n.Predicate,
+            direction = n.Direction
+        }).ToList();
+
+        return ToolResult.Successful($"Found {neighborResults.Count} neighbors within {maxHops} hops", new
+        {
+            start_entity = entity,
+            max_hops = maxHops,
+            direction,
+            count = neighborResults.Count,
+            neighbors = neighborResults
+        });
+    }
+
+    /// <summary>
+    /// Execute get node degree
+    /// </summary>
+    private ToolResult ExecuteGetNodeDegree(Dictionary<string, object> parameters)
+    {
+        if (!parameters.TryGetValue("entity", out var entityObj))
+        {
+            return ToolResult.Failed("Getting node degree requires entity parameter");
+        }
+
+        var entity = entityObj?.ToString() ?? string.Empty;
+        var degree = _knowledgeNetwork.GetNodeDegree(entity);
+
+        return ToolResult.Successful("Node degree retrieved successfully", new
+        {
+            entity = degree.Entity,
+            out_degree = degree.OutDegree,
+            in_degree = degree.InDegree,
+            total_degree = degree.TotalDegree
+        });
+    }
+
+    /// <summary>
+    /// Execute get degree distribution
+    /// </summary>
+    private ToolResult ExecuteGetDegreeDistribution()
+    {
+        var distribution = _knowledgeNetwork.GetDegreeDistribution();
+
+        var topHubs = distribution.TopHubNodes.Select(n => new
+        {
+            entity = n.Entity,
+            out_degree = n.OutDegree,
+            in_degree = n.InDegree,
+            total_degree = n.TotalDegree
+        }).ToList();
+
+        return ToolResult.Successful("Degree distribution retrieved successfully", new
+        {
+            total_nodes = distribution.TotalNodes,
+            avg_out_degree = Math.Round(distribution.AverageOutDegree, 2),
+            avg_in_degree = Math.Round(distribution.AverageInDegree, 2),
+            max_out_degree = distribution.MaxOutDegree,
+            max_in_degree = distribution.MaxInDegree,
+            out_degree_distribution = distribution.OutDegreeDistribution,
+            in_degree_distribution = distribution.InDegreeDistribution,
+            top_hub_nodes = topHubs
+        });
+    }
+
+    /// <summary>
+    /// Execute traversal
+    /// </summary>
+    private ToolResult ExecuteTraversal(Dictionary<string, object> parameters)
+    {
+        if (!parameters.TryGetValue("entity", out var entityObj))
+        {
+            return ToolResult.Failed("Traversal requires entity parameter");
+        }
+
+        var entity = entityObj?.ToString() ?? string.Empty;
+        var maxDepth = parameters.TryGetValue("max_depth", out var depthObj) ? SafeConvertToInt32(depthObj, 3) : 3;
+        var method = parameters.TryGetValue("traverse_method", out var methodObj) ? methodObj?.ToString() ?? "bfs" : "bfs";
+
+        var visited = method == "dfs"
+            ? _knowledgeNetwork.DfsTraversal(entity, maxDepth)
+            : _knowledgeNetwork.BfsTraversal(entity, maxDepth);
+
+        return ToolResult.Successful($"Traversal ({method}) found {visited.Count} entities", new
+        {
+            start_entity = entity,
+            method,
+            max_depth = maxDepth,
+            count = visited.Count,
+            entities = visited
+        });
+    }
+
+    /// <summary>
+    /// Execute has cycle detection
+    /// </summary>
+    private ToolResult ExecuteHasCycle()
+    {
+        var hasCycle = _knowledgeNetwork.HasCycle();
+
+        return ToolResult.Successful("Cycle detection completed", new
+        {
+            has_cycle = hasCycle
         });
     }
 

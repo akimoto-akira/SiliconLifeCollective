@@ -377,6 +377,164 @@ public class KnowledgeNetwork : IKnowledgeNetwork
     }
 
     /// <summary>
+    /// Get N-hop neighbors from a start entity, returning detailed relation info
+    /// </summary>
+    public List<NeighborInfo> GetNeighbors(string startEntity, int maxHops = 1, string direction = "both")
+    {
+        _lock.EnterReadLock();
+        try
+        {
+            var result = new List<NeighborInfo>();
+            var visited = new HashSet<string> { startEntity };
+            var currentLevel = new List<string> { startEntity };
+
+            for (int hop = 1; hop <= maxHops; hop++)
+            {
+                var nextLevel = new List<string>();
+
+                foreach (var entity in currentLevel)
+                {
+                    if (direction is "outgoing" or "both")
+                    {
+                        var outRelations = _graph.GetSubjectRelations(entity);
+                        foreach (var (predicate, obj) in outRelations)
+                        {
+                            if (!visited.Contains(obj))
+                            {
+                                visited.Add(obj);
+                                nextLevel.Add(obj);
+                                result.Add(new NeighborInfo
+                                {
+                                    Entity = obj,
+                                    Distance = hop,
+                                    Predicate = predicate,
+                                    Direction = "outgoing"
+                                });
+                            }
+                        }
+                    }
+
+                    if (direction is "incoming" or "both")
+                    {
+                        var inRelations = _graph.GetObjectRelations(entity);
+                        foreach (var (predicate, subj) in inRelations)
+                        {
+                            if (!visited.Contains(subj))
+                            {
+                                visited.Add(subj);
+                                nextLevel.Add(subj);
+                                result.Add(new NeighborInfo
+                                {
+                                    Entity = subj,
+                                    Distance = hop,
+                                    Predicate = predicate,
+                                    Direction = "incoming"
+                                });
+                            }
+                        }
+                    }
+                }
+
+                currentLevel = nextLevel;
+            }
+
+            return result;
+        }
+        finally
+        {
+            _lock.ExitReadLock();
+        }
+    }
+
+    /// <summary>
+    /// Get the degree of a specific node
+    /// </summary>
+    public NodeDegree GetNodeDegree(string entity)
+    {
+        _lock.EnterReadLock();
+        try
+        {
+            var outDegree = _graph.GetSubjectRelations(entity).Count;
+            var inDegree = _graph.GetObjectRelations(entity).Count;
+
+            return new NodeDegree
+            {
+                Entity = entity,
+                OutDegree = outDegree,
+                InDegree = inDegree
+            };
+        }
+        finally
+        {
+            _lock.ExitReadLock();
+        }
+    }
+
+    /// <summary>
+    /// Get degree distribution across all nodes
+    /// </summary>
+    public DegreeDistribution GetDegreeDistribution()
+    {
+        _lock.EnterReadLock();
+        try
+        {
+            var allEntities = new HashSet<string>();
+            allEntities.UnionWith(_graph.GetAllSubjects());
+            allEntities.UnionWith(_graph.GetAllObjects());
+
+            var outDegreeDist = new Dictionary<int, int>();
+            var inDegreeDist = new Dictionary<int, int>();
+            var nodeDegrees = new List<NodeDegree>();
+            int maxOutDegree = 0, maxInDegree = 0;
+            int totalOutDegree = 0, totalInDegree = 0;
+
+            foreach (var entity in allEntities)
+            {
+                var outDegree = _graph.GetSubjectRelations(entity).Count;
+                var inDegree = _graph.GetObjectRelations(entity).Count;
+
+                totalOutDegree += outDegree;
+                totalInDegree += inDegree;
+                maxOutDegree = Math.Max(maxOutDegree, outDegree);
+                maxInDegree = Math.Max(maxInDegree, inDegree);
+
+                if (!outDegreeDist.ContainsKey(outDegree))
+                    outDegreeDist[outDegree] = 0;
+                outDegreeDist[outDegree]++;
+
+                if (!inDegreeDist.ContainsKey(inDegree))
+                    inDegreeDist[inDegree] = 0;
+                inDegreeDist[inDegree]++;
+
+                nodeDegrees.Add(new NodeDegree
+                {
+                    Entity = entity,
+                    OutDegree = outDegree,
+                    InDegree = inDegree
+                });
+            }
+
+            var totalNodes = allEntities.Count;
+
+            return new DegreeDistribution
+            {
+                TotalNodes = totalNodes,
+                AverageOutDegree = totalNodes > 0 ? (double)totalOutDegree / totalNodes : 0,
+                AverageInDegree = totalNodes > 0 ? (double)totalInDegree / totalNodes : 0,
+                MaxOutDegree = maxOutDegree,
+                MaxInDegree = maxInDegree,
+                OutDegreeDistribution = outDegreeDist,
+                InDegreeDistribution = inDegreeDist,
+                TopHubNodes = nodeDegrees.OrderByDescending(n => n.TotalDegree).Take(10).ToList()
+            };
+        }
+        finally
+        {
+            _lock.ExitReadLock();
+        }
+    }
+
+    /// <summary>
     /// Detect cycles
     /// </summary>
     public bool HasCycle()

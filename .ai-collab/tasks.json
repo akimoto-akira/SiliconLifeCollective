@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-17T22:05:00+08:00",
+  "lastUpdated": "2026-05-17T22:15:00+08:00",
   "tasks": [
     {
       "id": "task-201",
@@ -187,9 +187,9 @@
       "title": "知识网络补全：高级查询和图谱遍历",
       "description": "知识网络基础 CRUD 完整（约50%），但高级功能缺失：\n1. 图谱遍历查询（从某节点出发N跳内的关联节点）\n2. 路径查询（两个概念间的关系路径）\n3. 统计分析（节点度分布、关联密度）\n4. 与AI上下文的集成（让硅基人查询知识图谱辅助决策）\n\n需求文档中知识网络高级查询标注为可选，但 ThinkOnProject 场景下主理人需要知识查询能力来辅助项目拆解。\n\n验收标准：硅基人可通过工具查询知识图谱，获取概念关联信息",
       "priority": "P2",
-      "status": "pending",
+      "status": "inProgress",
       "createdAt": "2026-05-17T06:53:00+08:00",
-      "assignedTo": null,
+      "assignedTo": "catpaw",
       "createdBy": "coze-agent",
       "metadata": {
         "source": "coze-agent-capability-analysis.md 知识网络50% + 需求文档第13章",
@@ -242,8 +242,8 @@
     }
   ],
   "taskIndex": {
-    "pending": ["task-206", "task-207"],
-    "inProgress": [],
+    "pending": ["task-206"],
+    "inProgress": ["task-207"],
     "completed": ["task-201", "task-202", "task-203", "task-204", "task-205", "task-208", "task-209"],
     "cancelled": []
   },
