@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-17T18:00:00+08:00",
+  "lastUpdated": "2026-05-17T22:05:00+08:00",
   "tasks": [
     {
       "id": "task-201",
@@ -218,12 +218,33 @@
           "src/SiliconLife.App/Web/Controllers/ChatController.cs"
         ]
       }
+    },
+    {
+      "id": "task-209",
+      "type": "bugfix",
+      "target": "src/SiliconLife.App/Web/Views/ChatView.cs",
+      "title": "修复群聊发送消息时 appendMessage TypeError",
+      "description": "发送消息时报错：Cannot read properties of undefined (reading 'some') at appendMessage。\n\n根因：\n1. JsBinOp 生成代码时不加括号，导致 mentionFilterActive && (!mentionedIds || !mentionedIds.some()) 被生成为 mentionFilterActive && !mentionedIds || !mentionedIds.some()，由于 && 优先级高于 ||，实际等价于 (mentionFilterActive && !mentionedIds) || !mentionedIds.some()，当 mentionedIds 为 undefined 且 mentionFilterActive 为 false 时，会执行 undefined.some() 报错\n2. sendMessage/streamingMessage 等调用 appendMessage 时未传递 mentionedIds 字段\n\n修复：\n1. 在 || 表达式外加 .Paren() 确保正确的运算符优先级\n2. 在 sendMessage/streamingMessage/SSE 工具调用消息中补充 mentionedIds 字段",
+      "priority": "P0",
+      "status": "completed",
+      "createdAt": "2026-05-17T22:00:00+08:00",
+      "assignedTo": "catpaw",
+      "createdBy": "catpaw",
+      "metadata": {
+        "source": "用户报告：chat:2116 Uncaught TypeError: Cannot read properties of undefined (reading 'some')",
+        "depends_on": "task-208",
+        "completedAt": "2026-05-17T22:05:00+08:00",
+        "completedBy": "catpaw",
+        "files_modified": [
+          "src/SiliconLife.App/Web/Views/ChatView.cs"
+        ]
+      }
     }
   ],
   "taskIndex": {
     "pending": ["task-206", "task-207"],
     "inProgress": [],
-    "completed": ["task-201", "task-202", "task-203", "task-204", "task-205", "task-208"],
+    "completed": ["task-201", "task-202", "task-203", "task-204", "task-205", "task-208", "task-209"],
     "cancelled": []
   },
   "metadata": {

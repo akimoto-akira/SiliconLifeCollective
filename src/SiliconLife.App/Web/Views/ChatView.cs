@@ -1471,7 +1471,8 @@ public class ChatView : ViewBase
                             .Prop(() => "toolResults", () => Js.Id(() => "data").Prop(() => "toolResults"))
                             .Prop(() => "promptTokens", () => Js.Id(() => "data").Prop(() => "promptTokens"))
                             .Prop(() => "completionTokens", () => Js.Id(() => "data").Prop(() => "completionTokens"))
-                            .Prop(() => "totalTokens", () => Js.Id(() => "data").Prop(() => "totalTokens"))).Stmt()
+                            .Prop(() => "totalTokens", () => Js.Id(() => "data").Prop(() => "totalTokens"))
+                            .Prop(() => "mentionedIds", () => Js.Id(() => "data").Prop(() => "mentionedIds"))).Stmt()
                     }
                 )},
                 // Tool result: has toolCallId + role=Tool → update existing tool message with response
@@ -1648,7 +1649,8 @@ public class ChatView : ViewBase
                             .Prop(() => "toolResults", () => Js.Null())
                             .Prop(() => "promptTokens", () => Js.Id(() => "streamingMessage").Prop(() => "promptTokens"))
                             .Prop(() => "completionTokens", () => Js.Id(() => "streamingMessage").Prop(() => "completionTokens"))
-                            .Prop(() => "totalTokens", () => Js.Id(() => "streamingMessage").Prop(() => "totalTokens"))).Stmt(),
+                            .Prop(() => "totalTokens", () => Js.Id(() => "streamingMessage").Prop(() => "totalTokens"))
+                            .Prop(() => "mentionedIds", () => Js.Id(() => "streamingMessage").Prop(() => "mentionedIds"))).Stmt(),
                         Js.Assign(() => Js.Id(() => "streamingMessage"), () => Js.Null()),
                         Js.Return(() => Js.Id(() => "undefined"))
                     }
@@ -1666,6 +1668,7 @@ public class ChatView : ViewBase
                             .Prop(() => "promptTokens", () => Js.Null())
                             .Prop(() => "completionTokens", () => Js.Null())
                             .Prop(() => "totalTokens", () => Js.Null())
+                            .Prop(() => "mentionedIds", () => Js.Array())
                             .Prop(() => "elementId", () => Js.Str(() => "stream-").Op(() => "+", () => (JsSyntax)Js.Id(() => "streamId")))),
                         Js.Id(() => "appendMessage").Invoke(() => Js.Id(() => "streamingMessage")).Stmt()
                     }
@@ -1801,7 +1804,8 @@ public class ChatView : ViewBase
             .Add(() => Js.Id(() => "autoResize").Invoke(() => Js.Id(() => "input")).Stmt())
             .Add(() => Js.Id(() => "appendMessage").Invoke(() => Js.Obj()
                 .Prop(() => "isUser", () => Js.Bool(() => true))
-                .Prop(() => "text", () => Js.Id(() => "text"))).Stmt())
+                .Prop(() => "text", () => Js.Id(() => "text"))
+                .Prop(() => "mentionedIds", () => Js.Array())).Stmt())
             .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/chat/send"), () => Js.Obj()
                 .Prop(() => "method", () => Js.Str(() => "POST"))
                 .Prop(() => "headers", () => Js.Obj().Prop(() => "Content-Type", () => Js.Str(() => "application/json")))
@@ -1976,35 +1980,38 @@ public class ChatView : ViewBase
         js.Add(() => Js.Func(() => "showMentionDropdown", () => new List<string> { "query" }, () => showMentionDropdownBody));
 
         var initMentionDropdownBody = Js.Block()
-            .Add(() => Js.Id(() => "document")
-                .Call(() => "getElementById", () => Js.Str(() => "mention-dropdown"))
-                .Call(() => "addEventListener",
-                    () => Js.Str(() => "click"),
-                    () => Js.Arrow(() => new List<string> { "e" }, () => Js.Block()
-                        .Add(() => Js.Const(() => "target",
-                            () => Js.Id(() => "e").Prop(() => "target")
-                                .Call(() => "closest", () => Js.Str(() => ".mention-item"))))
-                        .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
-                        {
-                            (Js.Id(() => "target"), new List<JsSyntax>
+            .Add(() =>
+            {
+                var addListenerCall = Js.Id(() => "document")
+                    .Call(() => "getElementById", () => Js.Str(() => "mention-dropdown"))
+                    .Call(() => "addEventListener",
+                        () => Js.Str(() => "click"),
+                        () => Js.Arrow(() => new List<string> { "e" }, () => Js.Block()
+                            .Add(() => Js.Const(() => "target",
+                                () => Js.Id(() => "e").Prop(() => "target")
+                                    .Call(() => "closest", () => Js.Str(() => ".mention-item"))))
+                            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                             {
-                                Js.Assign(() => Js.Id(() => "mentionSelectedIndex"), () => Js.Num(() => "0")),
-                                Js.Const(() => "items",
-                                    () => Js.Id(() => "document")
-                                        .Call(() => "querySelectorAll", () => Js.Str(() => "#mention-dropdown .mention-item"))),
-                                Js.Id(() => "items").Call(() => "forEach",
-                                    () => Js.Arrow(() => new List<string> { "item", "idx" },
-                                        () => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
-                                        {
-                                            (Js.Id(() => "item").Op(() => "===", () => Js.Id(() => "target")), new List<JsSyntax>
+                                (Js.Id(() => "target"), new List<JsSyntax>
+                                {
+                                    Js.Assign(() => Js.Id(() => "mentionSelectedIndex"), () => Js.Num(() => "0")),
+                                    Js.Const(() => "items",
+                                        () => Js.Id(() => "document")
+                                            .Call(() => "querySelectorAll", () => Js.Str(() => "#mention-dropdown .mention-item"))),
+                                    Js.Id(() => "items").Call(() => "forEach",
+                                        () => Js.Arrow(() => new List<string> { "item", "idx" },
+                                            () => Js.Block().Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                                             {
-                                                Js.Assign(() => Js.Id(() => "mentionSelectedIndex"), () => Js.Id(() => "idx"))
-                                            })
-                                        }))),
-                                Js.Id(() => "selectMentionItem").Invoke().Stmt()
-                            })
-                        })
-                    )).Stmt()));
+                                                (Js.Id(() => "item").Op(() => "===", () => Js.Id(() => "target")), new List<JsSyntax>
+                                                {
+                                                    Js.Assign(() => Js.Id(() => "mentionSelectedIndex"), () => Js.Id(() => "idx"))
+                                                })
+                                            })))).Stmt(),
+                                    Js.Id(() => "selectMentionItem").Invoke().Stmt()
+                                })
+                            }))));
+                return addListenerCall.Stmt();
+            });
         js.Add(() => Js.Func(() => "initMentionDropdown", () => new List<string>(), () => initMentionDropdownBody));
 
         var hideMentionDropdownBody = Js.Block()
@@ -2387,7 +2394,7 @@ public class ChatView : ViewBase
                             .Call(() => "some",
                                 () => Js.Arrow(() => new List<string> { "id" },
                                     () => Js.Id(() => "id").Op(() => "===", () => Js.Str(() => userId))))
-                            .Not())), new List<JsSyntax>
+                            .Not()).Paren()), new List<JsSyntax>
                 {
                     Js.Id(() => "div").Prop(() => "classList").Call(() => "add", () => Js.Str(() => "msg-filtered-out")).Stmt()
                 })
