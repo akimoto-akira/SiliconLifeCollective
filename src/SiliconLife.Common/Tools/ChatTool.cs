@@ -164,6 +164,11 @@ public class ChatTool : ITool
             Role = MessageRole.Assistant,
         };
 
+        if (chatType == "group" && session.Type == SessionType.GroupChat)
+        {
+            chatMsg.MentionedIds = MentionParser.ParseMentionedIds(content, session.Members);
+        }
+
         // Persist message to ChatSystem
         chatSystem.AddMessage(chatMsg);
 

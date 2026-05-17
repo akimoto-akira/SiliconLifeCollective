@@ -244,8 +244,16 @@ public class DefaultSiliconBeing : SiliconBeingBase
 
                     if (session.Type == SessionType.GroupChat)
                     {
+                        var mentionStatus = ShouldReplyInGroupChat(session, brain);
+                        if (mentionStatus == GroupChatMentionStatus.NotMentionedSkip)
+                        {
+                            brain.CommitMessagesAsRead();
+                            _logger.Info(Id, "Being {0}: skipping group chat session {1} - not mentioned and no direct question", Name, session.Id);
+                            continue;
+                        }
+
                         _activityRaw = (int)BeingActivity.GroupChat;
-                        _logger.Info(Id, "Being {0}: detected pending messages in group chat session {1}", Name, session.Id);
+                        _logger.Info(Id, "Being {0}: detected pending messages in group chat session {1} (mention={2})", Name, session.Id, mentionStatus);
                         if (!ExecuteBrain("ThinkOnGroupChat", session, _ => brain.ThinkOnGroupChat()))
                             errorOccurred = true;
                         return;
@@ -653,6 +661,97 @@ public class DefaultSiliconBeing : SiliconBeingBase
         if (clientType.EndsWith("Factory"))
             return clientType.Substring(0, clientType.Length - 7);
         return clientType;
+    }
+
+    /// <summary>
+    /// Determines whether a silicon being should reply in a group chat based on mention status.
+    /// </summary>
+    private enum GroupChatMentionStatus
+    {
+        DirectlyMentioned,
+        AllMentioned,
+        NotMentionedMayReply,
+        NotMentionedSkip
+    }
+
+    /// <summary>
+    /// Determines whether this being should reply in a group chat session.
+    /// Checks pending messages for @mentions targeting this being.
+    /// - Directly mentioned (@name) → must reply
+    /// - @all/@everyone → must reply
+    /// - Not mentioned but pending messages → may reply (AI decides)
+    /// - Not mentioned and no relevant context → skip (mark as read)
+    /// </summary>
+    private GroupChatMentionStatus ShouldReplyInGroupChat(SessionBase session, ContextManager brain)
+    {
+        if (session.Type != SessionType.GroupChat)
+        {
+            return GroupChatMentionStatus.NotMentionedMayReply;
+        }
+
+        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
+        if (chatSystem == null)
+        {
+            return GroupChatMentionStatus.NotMentionedMayReply;
+        }
+
+        List<ChatMessage> pendingMessages = chatSystem.GetPendingMessages(Id)
+            .Where(m => m.ChannelId == session.Id)
+            .ToList();
+
+        if (pendingMessages.Count == 0)
+        {
+            return GroupChatMentionStatus.NotMentionedSkip;
+        }
+
+        bool anyDirectMention = false;
+        bool anyAllMention = false;
+        bool anyUnmentioned = false;
+
+        foreach (var msg in pendingMessages)
+        {
+            if (msg.SenderId == Id)
+            {
+                continue;
+            }
+
+            if (msg.MentionedIds != null && msg.MentionedIds.Count > 0)
+            {
+                if (msg.MentionedIds.Contains(Guid.Empty))
+                {
+                    anyAllMention = true;
+                }
+                else if (msg.MentionedIds.Contains(Id))
+                {
+                    anyDirectMention = true;
+                }
+                else
+                {
+                    anyUnmentioned = true;
+                }
+            }
+            else
+            {
+                anyUnmentioned = true;
+            }
+        }
+
+        if (anyDirectMention)
+        {
+            return GroupChatMentionStatus.DirectlyMentioned;
+        }
+
+        if (anyAllMention)
+        {
+            return GroupChatMentionStatus.AllMentioned;
+        }
+
+        if (anyUnmentioned)
+        {
+            return GroupChatMentionStatus.NotMentionedMayReply;
+        }
+
+        return GroupChatMentionStatus.NotMentionedSkip;
     }
 
     /// <summary>

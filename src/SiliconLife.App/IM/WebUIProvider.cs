@@ -155,7 +155,7 @@ public class WebUIProvider : IIMProvider
 
         List<ChatMessage> messages = session.GetMessages(500);
         _logger.Info(null, $"SendHistoryToClientAsync: found {messages.Count} messages for session {session.Id}");
-        await _sseHandler.SendHistoryAsync(client, messages, client.UserId);
+        await _sseHandler.SendHistoryAsync(client, messages, client.UserId, session.Members);
     }
 
     public void HandleChatMessage(Guid senderId, Guid channelId, string content)
@@ -169,6 +169,17 @@ public class WebUIProvider : IIMProvider
             Timestamp = DateTime.Now,
             Type = MessageType.Text
         };
+
+        ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
+        if (chatSystem != null)
+        {
+            var session = chatSystem.GetSessionByChannelId(channelId);
+            if (session != null && session.Type == SessionType.GroupChat)
+            {
+                chatMessage.MentionedIds = MentionParser.ParseMentionedIds(content, session.Members);
+            }
+        }
+
         MessageReceived?.Invoke(this, new IMMessageEventArgs(chatMessage));
     }
 

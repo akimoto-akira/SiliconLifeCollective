@@ -408,7 +408,7 @@ public class ContextManager
         request.Messages.AddRange(_messages);
 
         ToolManager? toolManager = _being.ToolManager;
-        if (toolManager != null && toolManager.ToolCount > 0)
+        if (toolManager != null && toolManager.ToolCount > 0 && _aiClient.SupportsToolCalls != false)
         {
             if (task?.RequiredTools != null && task.RequiredTools.Count > 0)
             {
@@ -921,12 +921,36 @@ public class ContextManager
         sb.AppendLine($"Session ID: {_session.Id}");
         sb.AppendLine($"Members: {_session.Members.Count} participants");
 
+        var pendingMessages = _messages.Where(m => m.SenderId != _being.Id && !m.ReadBy.Contains(_being.Id)).ToList();
+        bool isDirectlyMentioned = pendingMessages.Any(m => m.MentionedIds != null && m.MentionedIds.Contains(_being.Id));
+        bool isAllMentioned = pendingMessages.Any(m => m.MentionedIds != null && m.MentionedIds.Contains(Guid.Empty));
+        bool isNotMentioned = !isDirectlyMentioned && !isAllMentioned && pendingMessages.Any(m => m.MentionedIds == null || m.MentionedIds.Count == 0 || !m.MentionedIds.Contains(_being.Id));
+
+        sb.AppendLine();
+        sb.AppendLine("MENTION STATUS:");
+        if (isDirectlyMentioned)
+        {
+            sb.AppendLine("- You were DIRECTLY MENTIONED (@name) in this conversation. You MUST respond.");
+        }
+        else if (isAllMentioned)
+        {
+            sb.AppendLine("- You were mentioned via @all/@everyone. You MUST respond.");
+        }
+        else if (isNotMentioned)
+        {
+            sb.AppendLine("- You were NOT mentioned in this conversation. You may respond only if you have valuable and relevant input. Otherwise, use the 'mark_read' action to acknowledge without replying.");
+        }
+
         sb.AppendLine();
         sb.AppendLine("GROUP CHAT GUIDELINES:");
         sb.AppendLine("- Only respond when addressed or when you have valuable input.");
         sb.AppendLine("- Be concise to avoid overwhelming the group.");
         sb.AppendLine("- Reference specific members by name when responding to them.");
         sb.AppendLine("- Avoid repeating information already shared in the conversation.");
+        if (isNotMentioned)
+        {
+            sb.AppendLine("- Since you were not mentioned, prefer using 'mark_read' unless the message clearly requires your expertise or direct involvement.");
+        }
 
         return sb.ToString();
     }

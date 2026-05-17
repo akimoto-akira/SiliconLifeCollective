@@ -67,6 +67,13 @@ public class ChatMessage
     public List<Guid> ReadBy { get; set; } = [];
 
     /// <summary>
+    /// List of being/user IDs mentioned in this message via @name syntax.
+    /// Guid.Empty means @all/@everyone (mention all participants).
+    /// Populated when the message is created by parsing @mentions in the content.
+    /// </summary>
+    public List<Guid> MentionedIds { get; set; } = [];
+
+    /// <summary>
     /// Message role for AI conversation context.
     /// Defaults to User. Used to persist Tool-related messages that cannot be inferred from sender alone.
     /// </summary>
