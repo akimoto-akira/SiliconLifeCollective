@@ -417,6 +417,17 @@ public class DeDE : DefaultLocalizationBase
     
     public override string ProjectTasksBackToProjects => "← Zurück zur Projektliste";
     public override string ProjectTasksNoAssigneesLabel => "Keine";
+
+    public override string ProjectCreateButton => "Projekt erstellen";
+    public override string ProjectCreateModalTitle => "Neues Projekt erstellen";
+    public override string ProjectCreateNameLabel => "Projektname";
+    public override string ProjectCreateDescriptionLabel => "Beschreibung";
+    public override string ProjectCreateWorkflowLabel => "Workflow-Vorlage";
+    public override string ProjectCreateNoWorkflow => "Keine (Kurator-gesteuert)";
+    public override string ProjectCreateSubmitButton => "Erstellen";
+    public override string ProjectCreateCancelButton => "Abbrechen";
+    public override string ProjectCreateNameRequired => "Projektname ist erforderlich";
+    public override string ProjectCreateSuccess => "Projekt erfolgreich erstellt";
     
     // ===== Code Browser Page Localization =====
 

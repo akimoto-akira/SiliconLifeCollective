@@ -318,6 +318,17 @@ public class PlPL : DefaultLocalizationBase
     public override string ProjectTasksBackToProjects => "← Powrót do projektów";
     public override string ProjectTasksNoAssigneesLabel => "Brak";
 
+    public override string ProjectCreateButton => "Utwórz projekt";
+    public override string ProjectCreateModalTitle => "Utwórz nowy projekt";
+    public override string ProjectCreateNameLabel => "Nazwa projektu";
+    public override string ProjectCreateDescriptionLabel => "Opis";
+    public override string ProjectCreateWorkflowLabel => "Szablon przepływu pracy";
+    public override string ProjectCreateNoWorkflow => "Brak (kurator-driven)";
+    public override string ProjectCreateSubmitButton => "Utwórz";
+    public override string ProjectCreateCancelButton => "Anuluj";
+    public override string ProjectCreateNameRequired => "Nazwa projektu jest wymagana";
+    public override string ProjectCreateSuccess => "Projekt utworzony pomyślnie";
+
     // ===== Logs Page =====
     public override string LogsPageHeader => "Dzienniki";
     public override string LogsTotalCount => "Łącznie";

@@ -423,6 +423,17 @@ public class ItIT : DefaultLocalizationBase
 
     public override string ProjectTasksNoAssigneesLabel => "Nessuno";
 
+    public override string ProjectCreateButton => "Crea progetto";
+    public override string ProjectCreateModalTitle => "Crea nuovo progetto";
+    public override string ProjectCreateNameLabel => "Nome del progetto";
+    public override string ProjectCreateDescriptionLabel => "Descrizione";
+    public override string ProjectCreateWorkflowLabel => "Modello di workflow";
+    public override string ProjectCreateNoWorkflow => "Nessuno (guidato dal curator)";
+    public override string ProjectCreateSubmitButton => "Crea";
+    public override string ProjectCreateCancelButton => "Annulla";
+    public override string ProjectCreateNameRequired => "Il nome del progetto è obbligatorio";
+    public override string ProjectCreateSuccess => "Progetto creato con successo";
+
     // ===== Executor Page Localization =====
 
     public override string ExecutorPageHeader => "Monitoraggio esecutori";

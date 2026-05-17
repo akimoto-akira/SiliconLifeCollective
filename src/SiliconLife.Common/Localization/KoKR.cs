@@ -443,6 +443,17 @@ public class KoKR : DefaultLocalizationBase
     
     public override string ProjectTasksBackToProjects => "← 프로젝트 목록으로 돌아가기";
     public override string ProjectTasksNoAssigneesLabel => "없음";
+
+    public override string ProjectCreateButton => "프로젝트 만들기";
+    public override string ProjectCreateModalTitle => "새 프로젝트 만들기";
+    public override string ProjectCreateNameLabel => "프로젝트 이름";
+    public override string ProjectCreateDescriptionLabel => "설명";
+    public override string ProjectCreateWorkflowLabel => "워크플로우 템플릿";
+    public override string ProjectCreateNoWorkflow => "없음 (큐레이터 주도)";
+    public override string ProjectCreateSubmitButton => "만들기";
+    public override string ProjectCreateCancelButton => "취소";
+    public override string ProjectCreateNameRequired => "프로젝트 이름은 필수입니다";
+    public override string ProjectCreateSuccess => "프로젝트가 생성되었습니다";
     
     // ===== Code Browser Page Localization =====
 

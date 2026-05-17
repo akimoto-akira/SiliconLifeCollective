@@ -298,6 +298,17 @@ public class ZhHK : DefaultLocalizationBase
     
     public override string ProjectTasksBackToProjects => "← 返回項目列表";
     public override string ProjectTasksNoAssigneesLabel => "無";
+
+    public override string ProjectCreateButton => "建立專案";
+    public override string ProjectCreateModalTitle => "建立新專案";
+    public override string ProjectCreateNameLabel => "專案名稱";
+    public override string ProjectCreateDescriptionLabel => "專案描述";
+    public override string ProjectCreateWorkflowLabel => "工作流範本";
+    public override string ProjectCreateNoWorkflow => "無（主理人驅動）";
+    public override string ProjectCreateSubmitButton => "建立";
+    public override string ProjectCreateCancelButton => "取消";
+    public override string ProjectCreateNameRequired => "專案名稱不能為空";
+    public override string ProjectCreateSuccess => "專案建立成功";
     
     // ===== Code Browser Page Localization =====
 

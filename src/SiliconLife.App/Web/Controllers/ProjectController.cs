@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -36,6 +36,8 @@ public class ProjectController : Controller
             ProjectWorkNotesPage();
         else if (path == "/api/projects/list")
             GetList();
+        else if (path == "/api/projects/list-workflow-templates")
+            ListWorkflowTemplates();
         else if (path == "/api/projects/create")
             CreateProject();
         else if (path.StartsWith("/api/projects/") && path.EndsWith("/archive"))
@@ -105,7 +107,11 @@ public class ProjectController : Controller
                 Description = p.Description,
                 CreatedAt = p.CreatedAt,
                 UpdatedAt = p.UpdatedAt,
-                Status = p.Status.ToString().ToLowerInvariant()
+                Status = p.Status.ToString().ToLowerInvariant(),
+                BeingCount = p.AssignedBeings.Count,
+                WorkflowTemplateName = p.WorkflowTemplateName ?? "",
+                GroupChatSessionId = p.GroupChatSessionId,
+                BroadcastChannelId = p.BroadcastChannelId
             }).ToList()
         };
         var html = view.Render(vm);
@@ -144,6 +150,34 @@ public class ProjectController : Controller
             }).ToList();
 
             RenderJson(new { success = true, data, total = data.Count });
+        }
+        catch (Exception ex)
+        {
+            RenderJson(new { success = false, error = ex.Message, data = new List<object>() });
+        }
+    }
+
+    private void ListWorkflowTemplates()
+    {
+        try
+        {
+            var workflowEngine = ServiceLocator.Instance.GetService<WorkflowEngine>();
+            if (workflowEngine == null)
+            {
+                RenderJson(new { success = false, error = "Workflow engine not available", data = new List<object>() });
+                return;
+            }
+
+            var templates = workflowEngine.GetAllTemplates();
+            var data = templates.Select(t => new
+            {
+                name = t.Name,
+                description = t.Description,
+                states = t.States.Count,
+                initialState = t.InitialState
+            }).ToList();
+
+            RenderJson(new { success = true, data });
         }
         catch (Exception ex)
         {

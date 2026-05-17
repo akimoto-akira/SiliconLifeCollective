@@ -443,6 +443,17 @@ public class ZhCN : DefaultLocalizationBase
     
     public override string ProjectTasksBackToProjects => "← 返回项目列表";
     public override string ProjectTasksNoAssigneesLabel => "无";
+
+    public override string ProjectCreateButton => "创建项目";
+    public override string ProjectCreateModalTitle => "创建新项目";
+    public override string ProjectCreateNameLabel => "项目名称";
+    public override string ProjectCreateDescriptionLabel => "项目描述";
+    public override string ProjectCreateWorkflowLabel => "工作流模板";
+    public override string ProjectCreateNoWorkflow => "无（主理人驱动）";
+    public override string ProjectCreateSubmitButton => "创建";
+    public override string ProjectCreateCancelButton => "取消";
+    public override string ProjectCreateNameRequired => "项目名称不能为空";
+    public override string ProjectCreateSuccess => "项目创建成功";
     
     // ===== Code Browser Page Localization =====
 

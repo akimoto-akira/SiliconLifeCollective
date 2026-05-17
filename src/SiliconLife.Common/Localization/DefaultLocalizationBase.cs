@@ -1560,6 +1560,56 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// </summary>
     public abstract string ProjectTasksNoAssigneesLabel { get; }
 
+    /// <summary>
+    /// Gets the create project button text
+    /// </summary>
+    public abstract string ProjectCreateButton { get; }
+
+    /// <summary>
+    /// Gets the create project modal title
+    /// </summary>
+    public abstract string ProjectCreateModalTitle { get; }
+
+    /// <summary>
+    /// Gets the project name label for create form
+    /// </summary>
+    public abstract string ProjectCreateNameLabel { get; }
+
+    /// <summary>
+    /// Gets the project description label for create form
+    /// </summary>
+    public abstract string ProjectCreateDescriptionLabel { get; }
+
+    /// <summary>
+    /// Gets the workflow template label for create form
+    /// </summary>
+    public abstract string ProjectCreateWorkflowLabel { get; }
+
+    /// <summary>
+    /// Gets the no template option text
+    /// </summary>
+    public abstract string ProjectCreateNoWorkflow { get; }
+
+    /// <summary>
+    /// Gets the submit button text for create project form
+    /// </summary>
+    public abstract string ProjectCreateSubmitButton { get; }
+
+    /// <summary>
+    /// Gets the cancel button text for create project form
+    /// </summary>
+    public abstract string ProjectCreateCancelButton { get; }
+
+    /// <summary>
+    /// Gets the project name required validation message
+    /// </summary>
+    public abstract string ProjectCreateNameRequired { get; }
+
+    /// <summary>
+    /// Gets the project created success message
+    /// </summary>
+    public abstract string ProjectCreateSuccess { get; }
+
     // ===== Code Browser Page Localization =====
 
     /// <summary>

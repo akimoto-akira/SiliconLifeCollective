@@ -443,6 +443,17 @@ public class JaJP : DefaultLocalizationBase
     
     public override string ProjectTasksBackToProjects => "← プロジェクト一覧に戻る";
     public override string ProjectTasksNoAssigneesLabel => "なし";
+
+    public override string ProjectCreateButton => "プロジェクト作成";
+    public override string ProjectCreateModalTitle => "新規プロジェクト作成";
+    public override string ProjectCreateNameLabel => "プロジェクト名";
+    public override string ProjectCreateDescriptionLabel => "説明";
+    public override string ProjectCreateWorkflowLabel => "ワークフローテンプレート";
+    public override string ProjectCreateNoWorkflow => "なし（キュレーター主導）";
+    public override string ProjectCreateSubmitButton => "作成";
+    public override string ProjectCreateCancelButton => "キャンセル";
+    public override string ProjectCreateNameRequired => "プロジェクト名は必須です";
+    public override string ProjectCreateSuccess => "プロジェクトが作成されました";
     
     // ===== Code Browser Page Localization =====
 

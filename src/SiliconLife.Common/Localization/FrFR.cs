@@ -423,6 +423,17 @@ public class FrFR : DefaultLocalizationBase
 
     public override string ProjectTasksNoAssigneesLabel => "Aucun";
 
+    public override string ProjectCreateButton => "Créer un projet";
+    public override string ProjectCreateModalTitle => "Créer un nouveau projet";
+    public override string ProjectCreateNameLabel => "Nom du projet";
+    public override string ProjectCreateDescriptionLabel => "Description";
+    public override string ProjectCreateWorkflowLabel => "Modèle de workflow";
+    public override string ProjectCreateNoWorkflow => "Aucun (dirigé par le curator)";
+    public override string ProjectCreateSubmitButton => "Créer";
+    public override string ProjectCreateCancelButton => "Annuler";
+    public override string ProjectCreateNameRequired => "Le nom du projet est requis";
+    public override string ProjectCreateSuccess => "Projet créé avec succès";
+
     // ===== Executor Page Localization =====
 
     public override string ExecutorPageHeader => "Surveillance des exécuteurs";

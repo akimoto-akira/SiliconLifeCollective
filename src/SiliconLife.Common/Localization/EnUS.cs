@@ -443,6 +443,17 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     
     public override string ProjectTasksBackToProjects => "← Back to Projects";
     public override string ProjectTasksNoAssigneesLabel => "None";
+
+    public override string ProjectCreateButton => "Create Project";
+    public override string ProjectCreateModalTitle => "Create New Project";
+    public override string ProjectCreateNameLabel => "Project Name";
+    public override string ProjectCreateDescriptionLabel => "Description";
+    public override string ProjectCreateWorkflowLabel => "Workflow Template";
+    public override string ProjectCreateNoWorkflow => "None (Curator-driven)";
+    public override string ProjectCreateSubmitButton => "Create";
+    public override string ProjectCreateCancelButton => "Cancel";
+    public override string ProjectCreateNameRequired => "Project name is required";
+    public override string ProjectCreateSuccess => "Project created successfully";
     
     // ===== Code Browser Page Localization =====
 

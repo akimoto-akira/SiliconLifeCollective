@@ -320,6 +320,17 @@ public class CsCZ : DefaultLocalizationBase
     public override string ProjectTasksBackToProjects => "← Zpět na projekty";
     public override string ProjectTasksNoAssigneesLabel => "Žádný";
 
+    public override string ProjectCreateButton => "Vytvořit projekt";
+    public override string ProjectCreateModalTitle => "Vytvořit nový projekt";
+    public override string ProjectCreateNameLabel => "Název projektu";
+    public override string ProjectCreateDescriptionLabel => "Popis";
+    public override string ProjectCreateWorkflowLabel => "Šablona workflow";
+    public override string ProjectCreateNoWorkflow => "Žádná (řízeno kurátorem)";
+    public override string ProjectCreateSubmitButton => "Vytvořit";
+    public override string ProjectCreateCancelButton => "Zrušit";
+    public override string ProjectCreateNameRequired => "Název projektu je povinný";
+    public override string ProjectCreateSuccess => "Projekt byl úspěšně vytvořen";
+
     // ===== Logs Page =====
     public override string LogsPageHeader => "Logy";
     public override string LogsTotalCount => "Celkem";

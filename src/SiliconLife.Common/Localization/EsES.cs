@@ -443,6 +443,17 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     
     public override string ProjectTasksBackToProjects => "← Volver a proyectos";
     public override string ProjectTasksNoAssigneesLabel => "Ninguno";
+
+    public override string ProjectCreateButton => "Crear proyecto";
+    public override string ProjectCreateModalTitle => "Crear nuevo proyecto";
+    public override string ProjectCreateNameLabel => "Nombre del proyecto";
+    public override string ProjectCreateDescriptionLabel => "Descripción";
+    public override string ProjectCreateWorkflowLabel => "Plantilla de flujo de trabajo";
+    public override string ProjectCreateNoWorkflow => "Ninguna (dirigido por curator)";
+    public override string ProjectCreateSubmitButton => "Crear";
+    public override string ProjectCreateCancelButton => "Cancelar";
+    public override string ProjectCreateNameRequired => "El nombre del proyecto es obligatorio";
+    public override string ProjectCreateSuccess => "Proyecto creado con éxito";
     
     // ===== Code Browser Page Localization =====
 
