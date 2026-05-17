@@ -1,11 +1,26 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-17T21:11:48+08:00",
-  "tasks": [],
+  "lastUpdated": "2026-05-18T12:00:00+08:00",
+  "tasks": [
+    {
+      "id": "task-201",
+      "type": "bugfix",
+      "target": "src/SiliconLife.App/Web/Controllers/MemoryController.cs",
+      "title": "修复记忆时间线摘要条目层级显示错误",
+      "description": "记忆时间线中，摘要条目（IsSummary=true）被同时渲染为摘要块和最底层记忆卡片，导致分钟摘要与秒级原始条目同级显示。修复内容：1) Items 过滤排除 IsSummary 条目；2) 各层级 Count 改为只统计原始条目数；3) 添加空节点过滤，跳过无原始条目也无摘要的层级",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-18T11:30:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-18T12:00:00+08:00"
+    }
+  ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": [],
+    "completed": ["task-201"],
     "cancelled": []
   },
   "metadata": {
