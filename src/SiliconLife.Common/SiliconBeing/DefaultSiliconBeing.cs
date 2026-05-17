@@ -329,13 +329,14 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 }
             }
 
-            // Project work: query project-related tasks from TaskCenter instead of ThinkOnProject
-            // This has been replaced by the centralized task management strategy:
-            // - Project scenarios are now handled through TaskCenter
-            // - Project-related tasks are queried from TaskCenter
-            // - Being uses ThinkOnTask to handle project tasks
-            // ThinkOnProject has been removed to simplify the Tick scheduling logic
-            // Project work is now handled through the regular task processing pipeline
+            if (IsCurator && HasProjectsWithoutTemplate())
+            {
+                _activityRaw = (int)BeingActivity.Project;
+                _logger.Info(Id, "Being {0}: checking projects without workflow template", Name);
+                if (!ExecuteBrain("ThinkOnProject", null, brain => brain.ThinkOnProject()))
+                    errorOccurred = true;
+                return;
+            }
 
             if (Memory != null && Memory.ShouldCompress(out var compressData))
             {
@@ -925,8 +926,45 @@ public class DefaultSiliconBeing : SiliconBeingBase
         }
     }
 
-    /// <summary>
-    // HasProjectWork has been removed as part of the ThinkOnProject removal.
-    // Project work is now handled through the centralized task management strategy
-    // and processed through the regular task pipeline using ThinkOnTask.
+    private bool HasProjectsWithoutTemplate()
+    {
+        var projectManager = ServiceLocator.Instance.ProjectManager;
+        if (projectManager == null) return false;
+
+        var projects = projectManager.ListProjects(includeArchived: false);
+        foreach (var project in projects)
+        {
+            if (project.CreatedBy == Id
+                && string.IsNullOrEmpty(project.WorkflowTemplateName)
+                && project.Status == ProjectStatus.Active)
+            {
+                if (ShouldThinkOnProject(project))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private bool ShouldThinkOnProject(ProjectSpace project)
+    {
+        var taskSystem = ServiceLocator.Instance.ProjectManager?.GetTaskSystem(project.Id);
+        if (taskSystem == null) return true;
+
+        var tasks = taskSystem.GetAll();
+
+        if (tasks.Count == 0) return true;
+
+        if (tasks.All(t => t.Status == Collective.TaskStatus.Completed)) return true;
+
+        if (DateTime.UtcNow - project.UpdatedAt > TimeSpan.FromMinutes(10))
+        {
+            var hasStuckTasks = tasks.Any(t =>
+                t.Status == Collective.TaskStatus.Running &&
+                t.StartedAt.HasValue &&
+                DateTime.UtcNow - t.StartedAt.Value > TimeSpan.FromMinutes(15));
+            if (hasStuckTasks) return true;
+        }
+
+        return false;
+    }
 }

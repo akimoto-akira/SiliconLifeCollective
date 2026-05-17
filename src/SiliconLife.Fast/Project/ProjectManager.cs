@@ -120,6 +120,26 @@ public class ProjectManager : IProjectManager
             string.IsNullOrEmpty(project.WorkflowTemplateName) ? "None" : project.WorkflowTemplateName,
             project.GroupChatSessionId,
             project.BroadcastChannelId);
+
+        if (!string.IsNullOrEmpty(project.WorkflowTemplateName) && _workflowEngine != null)
+        {
+            try
+            {
+                _workflowEngine.CreateInstanceAsync(
+                    project.Id,
+                    project.WorkflowTemplateName,
+                    project.Id.ToString(),
+                    createdBy).GetAwaiter().GetResult();
+                _logger.Info(createdBy, "Auto-created workflow instance for project '{0}' with template '{1}'",
+                    project.Name, project.WorkflowTemplateName);
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(createdBy, "Failed to auto-create workflow instance for project '{0}': {1}",
+                    project.Name, ex.Message);
+            }
+        }
+
         return project;
     }
 

@@ -1181,9 +1181,131 @@ public class ContextManager
         return lastMsg.Role == MessageRole.Tool || lastMsg.Role == MessageRole.Assistant;
     }
 
-    // ThinkOnProject has been removed as part of the centralized task management strategy.
-    // Project scenarios are now handled through TaskCenter and processed using ThinkOnTask.
-    // This simplifies Tick scheduling logic and unifies the task processing pipeline.
+    public AIResponse ThinkOnProject()
+    {
+        var project = FindProjectNeedingAttention();
+        if (project == null)
+        {
+            return AIResponse.Successful("No project needs attention at this time.");
+        }
+
+        _logger.Info(_being.Id, "ThinkOnProject: being={0}, project={1} ({2})", _being.Name, project.Name, project.Id);
+
+        string scenarioContext = BuildProjectScenarioContext(project);
+        AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Project);
+
+        if (response.Success && !string.IsNullOrEmpty(response.Content))
+        {
+            Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+            RecordToMemory(loc.FormatMemoryEventTask($"ThinkOnProject: {response.Content}"));
+        }
+
+        return response;
+    }
+
+    private ProjectSpace? FindProjectNeedingAttention()
+    {
+        var projectManager = ServiceLocator.Instance.ProjectManager;
+        if (projectManager == null) return null;
+
+        var projects = projectManager.ListProjects(includeArchived: false);
+        foreach (var project in projects)
+        {
+            if (project.CreatedBy == _being.Id
+                && string.IsNullOrEmpty(project.WorkflowTemplateName)
+                && project.Status == ProjectStatus.Active)
+            {
+                var taskSystem = projectManager.GetTaskSystem(project.Id);
+                if (taskSystem == null) return project;
+
+                var tasks = taskSystem.GetAll();
+                if (tasks.Count == 0) return project;
+                if (tasks.All(t => t.Status == TaskStatus.Completed)) return project;
+                if (DateTime.UtcNow - project.UpdatedAt > TimeSpan.FromMinutes(10))
+                {
+                    var hasStuckTasks = tasks.Any(t =>
+                        t.Status == TaskStatus.Running &&
+                        t.StartedAt.HasValue &&
+                        DateTime.UtcNow - t.StartedAt.Value > TimeSpan.FromMinutes(15));
+                    if (hasStuckTasks) return project;
+                }
+            }
+        }
+        return null;
+    }
+
+    private string BuildProjectScenarioContext(ProjectSpace project)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine("Scene: Project management (ThinkOnProject)");
+        sb.AppendLine($"You are the curator of project \"{project.Name}\".");
+        sb.AppendLine($"Project ID: {project.Id}");
+        sb.AppendLine($"Project goal: {project.Description}");
+
+        var beingManager = ServiceLocator.Instance.BeingManager;
+        sb.AppendLine("Team members:");
+        foreach (var beingId in project.AssignedBeings)
+        {
+            var being = beingManager?.GetBeing(beingId);
+            sb.AppendLine($"  - {being?.Name ?? beingId.ToString()}");
+        }
+
+        var taskSystem = ServiceLocator.Instance.ProjectManager?.GetTaskSystem(project.Id);
+        sb.AppendLine("Current task status:");
+        if (taskSystem != null)
+        {
+            var tasks = taskSystem.GetAll();
+            if (tasks.Count == 0)
+            {
+                sb.AppendLine("  (No tasks yet - project needs initialization)");
+            }
+            else
+            {
+                foreach (var task in tasks)
+                {
+                    var executor = beingManager?.GetBeing(task.ExecutorGuid);
+                    sb.AppendLine($"  [{task.Status}] #{task.Priority} {task.Title} (executor: {executor?.Name ?? "unassigned"})");
+                }
+            }
+        }
+        else
+        {
+            sb.AppendLine("  (No task system)");
+        }
+
+        if (project.GroupChatSessionId.HasValue)
+        {
+            var chatSystem = ServiceLocator.Instance.ChatSystem;
+            var session = chatSystem?.GetSession(project.GroupChatSessionId.Value);
+            if (session != null)
+            {
+                var recentMessages = session.GetMessages(10);
+                if (recentMessages.Count > 0)
+                {
+                    sb.AppendLine("Recent group chat messages:");
+                    foreach (var msg in recentMessages)
+                    {
+                        var sender = beingManager?.GetBeing(msg.SenderId);
+                        sb.AppendLine($"  {sender?.Name ?? msg.SenderId.ToString()}: {msg.Content}");
+                    }
+                }
+            }
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("PROJECT MANAGEMENT GUIDELINES:");
+        sb.AppendLine("- As the curator, you decide the next step for this project.");
+        sb.AppendLine("- Create tasks to break down the project into actionable items.");
+        sb.AppendLine("- Assign tasks to team members using their being IDs.");
+        sb.AppendLine("- Use 'chat' action to communicate with the team in the project group chat.");
+        sb.AppendLine("- Use 'broadcast' action for project-wide announcements.");
+        sb.AppendLine("- Use 'complete' action when all project work is done.");
+        sb.AppendLine("- Use 'status' action to review the current project state.");
+        sb.AppendLine("- Be decisive and action-oriented. Create specific, well-defined tasks.");
+
+        return sb.ToString();
+    }
 
     /// <summary>
     /// Scene: scheduled timer.
@@ -1366,10 +1488,6 @@ public class ContextManager
 
         return sb.ToString();
     }
-
-    // BuildProjectScenarioContext has been removed as part of the ThinkOnProject removal.
-    // Project scenarios are now handled through TaskCenter and processed using ThinkOnTask.
-    // This simplifies the context building logic and unifies the task processing pipeline.
 
     private static string BuildTimerScenarioContext(TimerItem timer)
     {

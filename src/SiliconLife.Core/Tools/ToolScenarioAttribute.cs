@@ -32,5 +32,6 @@ public enum ToolScenarioFlag
     Task = 1 << 1,
     Timer = 1 << 2,
     MemoryCompression = 1 << 3,
-    All = Chat | Task | Timer | MemoryCompression,
+    Project = 1 << 4,
+    All = Chat | Task | Timer | MemoryCompression | Project,
 }
