@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-18T22:30:00+08:00",
+  "lastUpdated": "2026-05-19T15:00:00+08:00",
   "tasks": [
     {
       "id": "task-201",
@@ -29,12 +29,26 @@
       "assignedTo": "trae-glm5",
       "relatedCommit": null,
       "completedAt": "2026-05-18T22:30:00+08:00"
+    },
+    {
+      "id": "task-203",
+      "type": "feature",
+      "target": "src/SiliconLife.Core/Plugins/, src/TravelCodeWikiWithAI/Data/",
+      "title": "实现 PluginLoader 安全扫描绕过的安全替代方案",
+      "description": "TravelCodeWikiWithAI 插件中存在 12 处 Activator.CreateInstance 和 AppDomain.CurrentDomain 调用，违反 PluginLoader 的 5 层安全扫描机制。解决方案：1) 在 Core 层创建 ITypeRegistry/TypeRegistry 替代 AppDomain.CurrentDomain.GetAssemblies() 反射扫描；2) 创建 IObjectFactory/ObjectFactory 替代 Activator.CreateInstance，支持 RegisterAutoFactory 自动工厂注册；3) 注册到 ServiceLocator 和 CoreHost；4) 替换 GeoDataBase.FindType() 使用 ITypeRegistry.FindType()；5) 替换 GeoDataBase/GeoDataNode/CreateChild() 和 Copy() 中的 Activator.CreateInstance 为 IObjectFactory.CreateInstance()；6) 替换 DocumentBase.GetAllWordTypes() 使用 ITypeRegistry.FindSubtypesOf()；7) 替换 WordDic.LoadXMLWithNode() 中的 Activator.CreateInstance；8) 在 TravelCodeWikiWithAIPlugin.OnLoad() 中注册类型和工厂",
+      "priority": "P0",
+      "status": "completed",
+      "createdAt": "2026-05-19T10:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-19T15:00:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": ["task-201", "task-202"],
+    "completed": ["task-201", "task-202", "task-203"],
     "cancelled": []
   },
   "metadata": {

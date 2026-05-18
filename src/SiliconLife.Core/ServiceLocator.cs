@@ -75,6 +75,12 @@ public class ServiceLocator
     /// <summary>Gets the registered <see cref="IProjectManager"/>, or <c>null</c>.</summary>
     public IProjectManager? ProjectManager => Get<IProjectManager>();
 
+    /// <summary>Gets the registered <see cref="ITypeRegistry"/>, or <c>null</c>.</summary>
+    public ITypeRegistry? TypeRegistry => Get<ITypeRegistry>();
+
+    /// <summary>Gets the registered <see cref="IObjectFactory"/>, or <c>null</c>.</summary>
+    public IObjectFactory? ObjectFactory => Get<IObjectFactory>();
+
     /// <summary>Gets the registered <typeparamref name="T"/> service, or <c>null</c>.</summary>
     public T? GetService<T>() where T : class => Get<T>();
 

@@ -249,3 +249,23 @@
 2026-05-18T22:25:00+08:00 | trae-glm5 | build | result=success | project=SiliconLife.Speedy.Manager | errors=0
 2026-05-18T22:30:00+08:00 | trae-glm5 | task_complete | task=task-202 | summary=WinForms→Avalonia完整迁移：6文件创建+3文件删除+2文件修改，构建通过
 2026-05-18T22:30:00+08:00 | trae-glm5 | session_end | completed=task-202
+2026-05-19T10:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260519-1000 | task=task-203
+2026-05-19T10:00:00+08:00 | trae-glm5 | task_create | task=task-203 | type=feature | title=实现 PluginLoader 安全扫描绕过的安全替代方案
+2026-05-19T10:00:00+08:00 | trae-glm5 | task_claim | task=task-203
+2026-05-19T10:05:00+08:00 | trae-glm5 | file_created | src/SiliconLife.Core/Plugins/ITypeRegistry.cs | intent=受控类型注册表接口
+2026-05-19T10:10:00+08:00 | trae-glm5 | file_created | src/SiliconLife.Core/Plugins/TypeRegistry.cs | intent=线程安全 ITypeRegistry 实现
+2026-05-19T10:15:00+08:00 | trae-glm5 | file_created | src/SiliconLife.Core/Plugins/IObjectFactory.cs | intent=受控对象工厂接口
+2026-05-19T10:20:00+08:00 | trae-glm5 | file_created | src/SiliconLife.Core/Plugins/ObjectFactory.cs | intent=线程安全 IObjectFactory 实现
+2026-05-19T10:25:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/ServiceLocator.cs | intent=添加 TypeRegistry/ObjectFactory 便利属性
+2026-05-19T10:30:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/Runtime/CoreHost.cs | intent=注册 TypeRegistry 和 ObjectFactory 服务
+2026-05-19T11:00:00+08:00 | trae-glm5 | file_modified | src/TravelCodeWikiWithAI/Data/GeoDataBase.cs | intent=替换 FindType() 使用 ITypeRegistry + 替换 5 处 Activator.CreateInstance
+2026-05-19T11:15:00+08:00 | trae-glm5 | file_modified | src/TravelCodeWikiWithAI/Data/GeoDataNode.cs | intent=替换 CreateChild() 中 2 处 Activator.CreateInstance
+2026-05-19T11:30:00+08:00 | trae-glm5 | file_modified | src/TravelCodeWikiWithAI/Data/DocumentBase.cs | intent=替换 AppDomain.CurrentDomain + Activator.CreateInstance
+2026-05-19T11:45:00+08:00 | trae-glm5 | file_modified | src/TravelCodeWikiWithAI/TravelCodeWikiWithAIPlugin.cs | intent=OnLoad() 注册类型和工厂
+2026-05-19T12:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/Plugins/ITypeRegistry.cs | intent=添加 RegisterFromAssembly 批量注册方法
+2026-05-19T12:05:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/Plugins/TypeRegistry.cs | intent=实现 RegisterFromAssembly
+2026-05-19T12:10:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/Plugins/IObjectFactory.cs | intent=添加 RegisterAutoFactory/RegisterAutoFactoryFromAssembly
+2026-05-19T12:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/Plugins/ObjectFactory.cs | intent=实现自动工厂注册
+2026-05-19T14:50:00+08:00 | trae-glm5 | build | result=success | project=SiliconLifeCollective.sln | errors=0 | warnings=104
+2026-05-19T15:00:00+08:00 | trae-glm5 | task_complete | task=task-203 | summary=消除12处安全扫描违规：ITypeRegistry替代AppDomain，IObjectFactory替代Activator.CreateInstance
+2026-05-19T15:00:00+08:00 | trae-glm5 | session_end | completed=task-203
