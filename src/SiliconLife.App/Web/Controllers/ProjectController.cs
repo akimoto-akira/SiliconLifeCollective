@@ -213,9 +213,9 @@ public class ProjectController : Controller
             }
 
             Guid createdBy = Guid.Empty;
-            if (body.TryGetValue("createdBy", out var creatorObj) && !Guid.TryParse(creatorObj?.ToString(), out createdBy))
+            bool hasCreator = body.TryGetValue("createdBy", out var creatorObj) && Guid.TryParse(creatorObj?.ToString(), out createdBy);
+            if (!hasCreator)
             {
-                // Try to use curator GUID from config
                 createdBy = Config.Instance?.Data?.CuratorGuid ?? Guid.Empty;
             }
 

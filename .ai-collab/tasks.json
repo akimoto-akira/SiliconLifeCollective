@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-19T15:00:00+08:00",
+  "lastUpdated": "2026-05-19T22:10:00+08:00",
   "tasks": [
     {
       "id": "task-201",
@@ -43,12 +43,26 @@
       "assignedTo": "trae-glm5",
       "relatedCommit": "cd72846",
       "completedAt": "2026-05-19T15:00:00+08:00"
+    },
+    {
+      "id": "task-204",
+      "type": "bugfix",
+      "target": "src/SiliconLife.App/Web/Controllers/ProjectController.cs",
+      "title": "修复创建项目时 Creator ID is required 错误",
+      "description": "前端创建项目按钮点击后发送 {name, description, workflowTemplate} 请求，后端 CreateProject 方法中 createdBy 回退逻辑存在短路求值 bug：`body.TryGetValue(\"createdBy\", ...) && !Guid.TryParse(...)` 当前端未传 createdBy 时 TryGetValue 返回 false，由于 && 短路，回退到 CuratorGuid 的代码永远不会执行，导致 createdBy 保持 Guid.Empty 并报错。修复：将逻辑拆分为 bool hasCreator = TryGetValue && Guid.TryParse，当 !hasCreator 时回退到 CuratorGuid",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-19T22:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-19T22:10:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": ["task-201", "task-202", "task-203"],
+    "completed": ["task-201", "task-202", "task-203", "task-204"],
     "cancelled": []
   },
   "metadata": {
