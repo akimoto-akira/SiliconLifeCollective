@@ -1,0 +1,118 @@
+{
+  "actor": "trae-glm5",
+  "sessionId": "trae-20260518-2200",
+  "timestamp": "2026-05-18T22:30:00+08:00",
+  "type": "framework_migration",
+  "summary": "将 SiliconLife.Speedy.Manager 从 WinForms 完全改造为 Avalonia UI 11.2.0，实现跨平台支持",
+  "task": {
+    "id": "task-202",
+    "title": "将 Speedy.Manager 从 WinForms 完全改造为 Avalonia",
+    "status": "completed"
+  },
+  "changes": {
+    "files_deleted": [
+      {
+        "path": "src/SiliconLife.Speedy.Manager/MainForm.cs",
+        "intent": "移除 WinForms 主窗体逻辑",
+        "details": ["WinForms Form 子类，包含 SpeedyPack 浏览器所有交互逻辑"]
+      },
+      {
+        "path": "src/SiliconLife.Speedy.Manager/MainForm.Designer.cs",
+        "intent": "移除 WinForms 设计器生成代码",
+        "details": ["约505行 WinForms 控件初始化代码"]
+      },
+      {
+        "path": "src/SiliconLife.Speedy.Manager/MainForm.resx",
+        "intent": "移除 WinForms 资源文件",
+        "details": ["包含图标等 WinForms 资源"]
+      }
+    ],
+    "files_created": [
+      {
+        "path": "src/SiliconLife.Speedy.Manager/App.axaml",
+        "intent": "Avalonia 应用定义",
+        "details": ["FluentTheme", "RequestedThemeVariant=Light"]
+      },
+      {
+        "path": "src/SiliconLife.Speedy.Manager/App.axaml.cs",
+        "intent": "Avalonia 应用入口",
+        "details": ["继承 Application", "AvaloniaXamlLoader.Load", "创建 MainWindow"]
+      },
+      {
+        "path": "src/SiliconLife.Speedy.Manager/MainWindow.axaml",
+        "intent": "主窗体 XAML 布局",
+        "details": [
+          "Ribbon 面板 (Open/Refresh/Compact 按钮)",
+          "面包屑导航 (ItemsControl + WrapPanel)",
+          "左侧 TreeView (目录树)",
+          "右上 DataGrid (文件列表, 4列: Name/Type/Size/Modified)",
+          "右下 TextBox (内容预览)",
+          "底部状态栏",
+          "GridSplitter 分隔"
+        ]
+      },
+      {
+        "path": "src/SiliconLife.Speedy.Manager/MainWindow.axaml.cs",
+        "intent": "主窗体逻辑代码",
+        "details": [
+          "DirectoryTreeNode 数据模型 (ObservableCollection 子节点)",
+          "FileEntryItem 数据模型 (Name/Type/Size/Modified/ItemType/ItemPath)",
+          "BreadcrumbItem 数据模型",
+          "IStorageProvider 文件打开对话框",
+          "自定义 ShowErrorAsync/ShowWarningAsync 对话框",
+          "DecodeUnicodeEscapes Unicode 解码",
+          "所有原有业务逻辑保留 (Open/Refresh/Compact/Preview/View)"
+        ]
+      },
+      {
+        "path": "src/SiliconLife.Speedy.Manager/ContentViewerWindow.axaml",
+        "intent": "内容查看器窗口 XAML",
+        "details": ["只读 TextBox, Consolas 字体, TextWrapping"]
+      },
+      {
+        "path": "src/SiliconLife.Speedy.Manager/ContentViewerWindow.axaml.cs",
+        "intent": "内容查看器逻辑",
+        "details": ["替代原 ContentViewerForm (WinForms Form)"]
+      }
+    ],
+    "files_modified": [
+      {
+        "path": "src/SiliconLife.Speedy.Manager/Program.cs",
+        "intent": "从 WinForms Application.Run 改为 Avalonia AppBuilder",
+        "details": [
+          "移除 ApplicationConfiguration.Initialize()",
+          "移除 Application.Run(new MainForm())",
+          "新增 BuildAvaloniaApp() 方法",
+          "使用 AppBuilder.Configure<App>().UsePlatformDetect().WithInterFont().LogToTrace()"
+        ]
+      },
+      {
+        "path": "src/SiliconLife.Speedy.Manager/SiliconLife.Speedy.Manager.csproj",
+        "intent": "更新项目文件依赖",
+        "details": [
+          "移除 EmbeddedResource Remove='MainForm.resx'",
+          "新增 PackageReference System.Reactive 6.0.0",
+          "新增 None Update='slc.ico' CopyToOutputDirectory"
+        ]
+      }
+    ]
+  },
+  "migration_mapping": {
+    "WinForms_to_Avalonia": {
+      "Form → Window": "MainForm → MainWindow",
+      "TreeView → TreeView": "使用 DirectoryTreeNode 数据模型 + ObservableCollection",
+      "ListView (Details) → DataGrid": "使用 FileEntryItem 数据模型 + ObservableCollection",
+      "SplitContainer → GridSplitter": "两个方向均使用 GridSplitter",
+      "StatusStrip → Border+TextBlock": "DockPanel.Dock=Bottom",
+      "FlowLayoutPanel → ItemsControl+WrapPanel": "面包屑导航",
+      "OpenFileDialog → IStorageProvider": "跨平台文件选择",
+      "MessageBox → 自定义 Window": "ShowErrorAsync/ShowWarningAsync",
+      "Form (ContentViewerForm) → Window": "ContentViewerWindow"
+    }
+  },
+  "verification": {
+    "build_result": "0 errors, build succeeded",
+    "project": "SiliconLife.Speedy.Manager",
+    "target_framework": "net9.0"
+  }
+}

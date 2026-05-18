@@ -11,22 +11,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls;
 
 namespace SiliconLife.Speedy.Manager;
 
-internal static class Program
+public partial class ContentViewerWindow : Window
 {
-    [STAThread]
-    static void Main(string[] args)
+    public ContentViewerWindow()
     {
-        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        InitializeComponent();
     }
 
-    public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
-            .UsePlatformDetect()
-            .WithInterFont()
-            .LogToTrace();
+    public ContentViewerWindow(string title, string content) : this()
+    {
+        Title = $"View: {title}";
+        ContentTextBox.Text = content;
+    }
 }

@@ -1,0 +1,21 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SiliconLife.Speedy.Manager.ContentViewerWindow"
+        Width="800" Height="600"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True"
+        Background="#FAFAFA">
+
+    <DockPanel>
+        <TextBox x:Name="ContentTextBox"
+                 IsReadOnly="True"
+                 AcceptsReturn="True"
+                 TextWrapping="Wrap"
+                 FontFamily="Consolas,Courier New"
+                 FontSize="13"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 Padding="12"
+                 Margin="0" />
+    </DockPanel>
+</Window>

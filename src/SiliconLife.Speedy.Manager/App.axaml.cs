@@ -13,20 +13,24 @@
 
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml;
 
 namespace SiliconLife.Speedy.Manager;
 
-internal static class Program
+public class App : Application
 {
-    [STAThread]
-    static void Main(string[] args)
+    public override void Initialize()
     {
-        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        AvaloniaXamlLoader.Load(this);
     }
 
-    public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
-            .UsePlatformDetect()
-            .WithInterFont()
-            .LogToTrace();
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.MainWindow = new MainWindow();
+        }
+
+        base.OnFrameworkInitializationCompleted();
+    }
 }

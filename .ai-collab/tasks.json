@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-18T12:00:00+08:00",
+  "lastUpdated": "2026-05-18T22:30:00+08:00",
   "tasks": [
     {
       "id": "task-201",
@@ -15,12 +15,26 @@
       "assignedTo": "trae-glm5",
       "relatedCommit": null,
       "completedAt": "2026-05-18T12:00:00+08:00"
+    },
+    {
+      "id": "task-202",
+      "type": "refactor",
+      "target": "src/SiliconLife.Speedy.Manager/",
+      "title": "将 Speedy.Manager 从 WinForms 完全改造为 Avalonia",
+      "description": "将 SiliconLife.Speedy.Manager 项目从 System.Windows.Forms 完全迁移到 Avalonia UI 11.2.0 框架。改造内容包括：1) 替换 WinForms Application 为 Avalonia AppBuilder 模式；2) 将 MainForm.Designer.cs 代码式布局转换为 Avalonia XAML 声明式布局；3) TreeView/ListView/TextBox 等控件映射为 Avalonia 对应控件；4) 使用 ObservableCollection 数据绑定替代手动控件操作；5) 使用 IStorageProvider 替代 WinForms 文件对话框；6) 自定义对话框替代 MessageBox；7) 添加 System.Reactive 依赖；8) 实现跨平台支持（Windows/macOS/Linux）",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-18T22:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-18T22:30:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": ["task-201"],
+    "completed": ["task-201", "task-202"],
     "cancelled": []
   },
   "metadata": {
