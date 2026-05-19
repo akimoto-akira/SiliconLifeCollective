@@ -1,8 +1,8 @@
 name: Sync from Gitee
 
+# 已改用 Gitee 推送镜像（Gitee → GitHub），此 workflow 仅作备用手动触发
+# 配置方法：Gitee 仓库 → 管理 → 仓库镜像管理 → 添加 Push 方向镜像
 on:
-  schedule:
-    - cron: '0 */2 * * *'
   workflow_dispatch:
 
 permissions:
@@ -31,7 +31,6 @@ jobs:
       - name: Fetch from Gitee (with retry)
         run: |
           MAX_RETRIES=5
-          RETRY_DELAY=10
           for i in $(seq 1 $MAX_RETRIES); do
             echo "Attempt $i/$MAX_RETRIES: fetching from Gitee..."
             if git fetch gitee --tags --force; then
@@ -39,7 +38,7 @@ jobs:
               exit 0
             fi
             if [ $i -lt $MAX_RETRIES ]; then
-              DELAY=$((RETRY_DELAY * i))
+              DELAY=$((10 * i))
               echo "Fetch failed, retrying in ${DELAY}s..."
               sleep $DELAY
             fi
