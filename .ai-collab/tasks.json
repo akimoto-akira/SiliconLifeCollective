@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-19T21:30:00+08:00",
+  "lastUpdated": "2026-05-20T03:54:00+08:00",
   "tasks": [
     {
       "id": "task-201",
@@ -85,12 +85,26 @@
       "assignedTo": "catpaw",
       "relatedCommit": null,
       "completedAt": "2026-05-19T21:30:00+08:00"
+    },
+    {
+      "id": "task-207",
+      "type": "bugfix",
+      "target": "src/SiliconLife.App/Web/Controllers/ProjectController.cs, src/SiliconLife.App/Web/Views/ProjectTaskView.cs",
+      "title": "修复项目任务列表无法显示——前后端字段名不匹配",
+      "description": "前端 ProjectTaskView.js 期望后端返回 assigneeGuids/assigneeNames（数组），但后端 ProjectController.ListProjectTasks() 返回 assigneeGuid/assigneeName（单值字符串），导致 JS 对 undefined 调用 .map() 抛出 TypeError，页面空白。修复：后端增加 assigneeGuids/assigneeNames 数组字段，createdByGuid 转 .ToString()",
+      "priority": "P0",
+      "status": "completed",
+      "createdAt": "2026-05-20T03:48:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": "coze-agent",
+      "relatedCommit": null,
+      "completedAt": "2026-05-20T04:10:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": ["task-201", "task-202", "task-203", "task-204", "task-205", "task-206"],
+    "completed": ["task-201", "task-202", "task-203", "task-204", "task-205", "task-206", "task-207"],
     "cancelled": []
   },
   "metadata": {

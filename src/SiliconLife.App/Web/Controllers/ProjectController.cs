@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -964,26 +964,32 @@ public class ProjectController : Controller
 
             var beingManager = ServiceLocator.Instance.BeingManager;
             var tasks = taskSystem.GetAll();
-            var taskList = tasks.Select(t => new
+            var taskList = tasks.Select(t =>
             {
-                id = t.Id,
-                title = t.Title,
-                description = t.Description,
-                status = t.Status.ToString().ToLowerInvariant(),
-                priority = t.Priority,
-                createdAt = t.CreatedAt,
-                createdAtFormatted = t.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
-                startedAt = t.StartedAt,
-                completedAt = t.CompletedAt,
-                assigneeGuid = t.AssigneeGuid,
-                assigneeName = beingManager?.GetBeing(t.AssigneeGuid)?.Name ?? t.AssigneeGuid.ToString().Substring(0, 8),
-                executorGuid = t.ExecutorGuid,
-                executorName = beingManager?.GetBeing(t.ExecutorGuid)?.Name ?? t.ExecutorGuid.ToString().Substring(0, 8),
-                reviewerGuid = t.ReviewerGuid,
-                reviewerName = t.ReviewerGuid.HasValue ? (beingManager?.GetBeing(t.ReviewerGuid.Value)?.Name ?? t.ReviewerGuid.Value.ToString().Substring(0, 8)) : "",
-                createdByGuid = t.CreatedByGuid,
-                createdByName = beingManager?.GetBeing(t.CreatedByGuid)?.Name ?? t.CreatedByGuid.ToString().Substring(0, 8),
-                errorMessage = t.ErrorMessage ?? ""
+                var assigneeName = beingManager?.GetBeing(t.AssigneeGuid)?.Name ?? t.AssigneeGuid.ToString().Substring(0, 8);
+                return new
+                {
+                    id = t.Id,
+                    title = t.Title,
+                    description = t.Description,
+                    status = t.Status.ToString().ToLowerInvariant(),
+                    priority = t.Priority,
+                    createdAt = t.CreatedAt,
+                    createdAtFormatted = t.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+                    startedAt = t.StartedAt,
+                    completedAt = t.CompletedAt,
+                    assigneeGuid = t.AssigneeGuid,
+                    assigneeName = assigneeName,
+                    assigneeGuids = new List<string> { t.AssigneeGuid.ToString() },
+                    assigneeNames = new List<string> { assigneeName },
+                    executorGuid = t.ExecutorGuid,
+                    executorName = beingManager?.GetBeing(t.ExecutorGuid)?.Name ?? t.ExecutorGuid.ToString().Substring(0, 8),
+                    reviewerGuid = t.ReviewerGuid,
+                    reviewerName = t.ReviewerGuid.HasValue ? (beingManager?.GetBeing(t.ReviewerGuid.Value)?.Name ?? t.ReviewerGuid.Value.ToString().Substring(0, 8)) : "",
+                    createdByGuid = t.CreatedByGuid.ToString(),
+                    createdByName = beingManager?.GetBeing(t.CreatedByGuid)?.Name ?? t.CreatedByGuid.ToString().Substring(0, 8),
+                    errorMessage = t.ErrorMessage ?? ""
+                };
             }).ToList();
 
             RenderJson(new { success = true, data = taskList, total = taskList.Count });

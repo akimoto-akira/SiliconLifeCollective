@@ -294,3 +294,7 @@
 2026-05-19T21:30:00+08:00 | catpaw | build | result=success | projects=SiliconLife.Speedy.Manager | errors=0
 2026-05-19T21:30:00+08:00 | catpaw | task_complete | task=task-206 | summary=Speedy.Manager全面功能增强：新建/导入/导出/TreeView层级/进度窗口/多轮bug修复
 2026-05-19T21:30:00+08:00 | catpaw | session_end | completed=task-206
+2026-05-20T03:48:00+08:00 | coze-agent | session_start | sessionId=coze-20260520-0348
+2026-05-20T03:48:00+08:00 | coze-agent | bugfix | issue=项目任务列表页面空白 | root_cause=前后端字段名不匹配：前端期望assigneeGuids/assigneeNames(数组)，后端返回assigneeGuid/assigneeName(单值) | fix=后端增加数组字段，createdByGuid转.ToString()
+2026-05-20T03:54:00+08:00 | coze-agent | task_complete | task=task-207
+2026-05-20T04:00:00+08:00 | coze-agent | session_end | completed=task-207
