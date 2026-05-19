@@ -1,11 +1,8 @@
 name: Sync from Gitee
 
-# 已禁用 - 等待 Gitee 官方同步方案
-# on:
-#   schedule:
-#     - cron: '0 * * * *'
-#   workflow_dispatch:
 on:
+  schedule:
+    - cron: '0 */2 * * *'
   workflow_dispatch:
 
 permissions:
@@ -14,6 +11,8 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,25 +28,57 @@ jobs:
         run: |
           git remote add gitee https://hoshinokennji:${{ secrets.GITEE_TOKEN }}@gitee.com/hoshinokennji/SiliconLifeCollective.git
 
-      - name: Fetch from Gitee
+      - name: Fetch from Gitee (with retry)
         run: |
-          git fetch gitee --tags --force
+          MAX_RETRIES=5
+          RETRY_DELAY=10
+          for i in $(seq 1 $MAX_RETRIES); do
+            echo "Attempt $i/$MAX_RETRIES: fetching from Gitee..."
+            if git fetch gitee --tags --force; then
+              echo "Fetch succeeded on attempt $i"
+              exit 0
+            fi
+            if [ $i -lt $MAX_RETRIES ]; then
+              DELAY=$((RETRY_DELAY * i))
+              echo "Fetch failed, retrying in ${DELAY}s..."
+              sleep $DELAY
+            fi
+          done
+          echo "All $MAX_RETRIES attempts failed"
+          exit 1
         env:
           GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
 
+      - name: Check for changes
+        id: check
+        run: |
+          LOCAL=$(git rev-parse HEAD)
+          REMOTE=$(git rev-parse gitee/master)
+          if [ "$LOCAL" = "$REMOTE" ]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No changes to sync"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Changes detected: $LOCAL -> $REMOTE"
+          fi
+
       - name: Sync master branch
+        if: steps.check.outputs.has_changes == 'true'
         run: |
           git checkout master
           git merge gitee/master --allow-unrelated-histories --strategy-option=theirs
           git push origin master --force
 
       - name: Sync all branches
+        if: steps.check.outputs.has_changes == 'true'
         run: |
           for branch in $(git branch -r | grep 'gitee/' | grep -v 'HEAD' | sed 's/gitee\///'); do
+            if [ "$branch" = "master" ]; then continue; fi
             git checkout $branch 2>/dev/null || git checkout -b $branch gitee/$branch
             git push origin $branch --force
           done
 
       - name: Sync tags
+        if: steps.check.outputs.has_changes == 'true'
         run: |
           git push origin --tags --force
