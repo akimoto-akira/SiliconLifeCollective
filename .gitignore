@@ -62,9 +62,6 @@ artifacts/
 publish/
 
 debug.log
-
-YInfo/
-YLog/
 总文档/
 细需求/
 .lingma/
@@ -77,3 +74,4 @@ YDoc/
 src/TravelCodeWikiWithAI/
 .trae/
 .catpaw/
+cldr/
