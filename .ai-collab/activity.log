@@ -280,3 +280,17 @@
 2026-05-19T23:10:00+08:00 | trae-glm5 | build | result=success | projects=Core,Default,Fast | errors=0
 2026-05-19T23:15:00+08:00 | trae-glm5 | task_complete | task=task-205 | summary=修复服务注册时序：Program.cs 提前注册+CoreHost 条件注册避免覆盖
 2026-05-19T23:15:00+08:00 | trae-glm5 | session_end | completed=task-205
+2026-05-19T20:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260519-2000 | task=task-206
+2026-05-19T20:00:00+08:00 | catpaw | task_create | task=task-206 | type=feature | title=Speedy.Manager 功能增强：新建/导入/导出/TreeView层级显示/进度窗口
+2026-05-19T20:00:00+08:00 | catpaw | task_claim | task=task-206
+2026-05-19T20:05:00+08:00 | catpaw | file_modified | src/SiliconLife.Speedy.Manager/MainWindow.axaml | intent=工具栏新增新建/导入文件按钮，TreeView添加右键菜单，替换HierarchicalDataTemplate为TreeDataTemplate，移除FileList
+2026-05-19T20:15:00+08:00 | catpaw | file_modified | src/SiliconLife.Speedy.Manager/MainWindow.axaml.cs | intent=实现新建SPK/导入文件/导入文件夹/导出功能，修复TreeView层级显示，实现目录概要预览，添加_isImporting互斥标志
+2026-05-19T20:30:00+08:00 | catpaw | file_modified | src/SiliconLife.Speedy.Manager/ProgressWindow.axaml | intent=新建导入进度模态窗口XAML布局
+2026-05-19T20:30:00+08:00 | catpaw | file_modified | src/SiliconLife.Speedy.Manager/ProgressWindow.axaml.cs | intent=新建导入进度模态窗口代码逻辑
+2026-05-19T20:45:00+08:00 | catpaw | bugfix | issue=TreeView不显示内容，HierarchicalDataTemplate在Avalonia 11中已废弃 | fix=替换为TreeDataTemplate
+2026-05-19T21:00:00+08:00 | catpaw | bugfix | issue=导入文件夹进度不累加，importedCount变量名不一致 | fix=统一使用totalImported全局计数器
+2026-05-19T21:15:00+08:00 | catpaw | bugfix | issue=导入窗口关闭后主窗口视图未立即刷新 | fix=将RefreshView()移至progressWindow.Close()之前执行
+2026-05-19T21:15:00+08:00 | catpaw | bugfix | issue=CS8602解引用可能出现空引用 | fix=Path.GetFileName返回null时使用原路径作为默认值
+2026-05-19T21:30:00+08:00 | catpaw | build | result=success | projects=SiliconLife.Speedy.Manager | errors=0
+2026-05-19T21:30:00+08:00 | catpaw | task_complete | task=task-206 | summary=Speedy.Manager全面功能增强：新建/导入/导出/TreeView层级/进度窗口/多轮bug修复
+2026-05-19T21:30:00+08:00 | catpaw | session_end | completed=task-206

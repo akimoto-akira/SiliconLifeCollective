@@ -19,6 +19,7 @@ using Avalonia.Platform.Storage;
 using SiliconLife.Speedy;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 
 namespace SiliconLife.Speedy.Manager;
 
@@ -27,8 +28,8 @@ public partial class MainWindow : Window
     private SpeedyPack? _currentPack;
     private string _currentFilePath = string.Empty;
     private string _currentPath = string.Empty;
+    private bool _isImporting;
 
-    private readonly ObservableCollection<FileEntryItem> _fileItems = [];
     private readonly ObservableCollection<DirectoryTreeNode> _rootNodes = [];
 
     public MainWindow() : this(null) { }
@@ -37,14 +38,18 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        FileList.ItemsSource = _fileItems;
         DirectoryTree.ItemsSource = _rootNodes;
 
+        BtnNew.Click += async (_, _) => await NewFile_ClickAsync();
         BtnOpen.Click += async (_, _) => await OpenFile_ClickAsync();
+        BtnImportFile.Click += async (_, _) => await ImportFile_ClickAsync();
         BtnRefresh.Click += (_, _) => RefreshView();
         BtnCompact.Click += async (_, _) => await Compact_ClickAsync();
 
         DirectoryTree.SelectionChanged += DirectoryTree_SelectionChanged;
+
+        MenuImportFolder.Click += async (_, _) => await ImportFolder_ClickAsync();
+        MenuExportEntry.Click += async (_, _) => await ExportEntry_ClickAsync();
 
         KeyDown += MainWindow_KeyDown;
 
@@ -56,13 +61,21 @@ public partial class MainWindow : Window
             StatusLabel.Text = "Internal launch";
             BtnRefresh.IsEnabled = true;
             BtnCompact.IsEnabled = false;
+            BtnImportFile.IsEnabled = true;
             RefreshView();
         }
     }
 
     private async void MainWindow_KeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.KeyModifiers.HasFlag(KeyModifiers.Control) && e.Key == Key.O)
+        if (_isImporting) return;
+
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Control) && e.Key == Key.N)
+        {
+            await NewFile_ClickAsync();
+            e.Handled = true;
+        }
+        else if (e.KeyModifiers.HasFlag(KeyModifiers.Control) && e.Key == Key.O)
         {
             await OpenFile_ClickAsync();
             e.Handled = true;
@@ -74,8 +87,64 @@ public partial class MainWindow : Window
         }
     }
 
+    // ─── New File ──────────────────────────────────────────────────────────────
+
+    private async Task NewFile_ClickAsync()
+    {
+        if (_isImporting) return;
+
+        var storageProvider = TopLevel.GetTopLevel(this)?.StorageProvider;
+        if (storageProvider == null) return;
+
+        var file = await storageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Create New Speedy Pack File",
+            SuggestedFileName = "Untitled",
+            FileTypeChoices =
+            [
+                new FilePickerFileType("Speedy Pack Files") { Patterns = ["*.spk"] }
+            ]
+        });
+
+        if (file == null) return;
+
+        var filePath = file.TryGetLocalPath();
+        if (filePath == null) return;
+
+        // Ensure the file has .spk extension
+        if (!filePath.EndsWith(".spk", StringComparison.OrdinalIgnoreCase))
+            filePath += ".spk";
+
+        try
+        {
+            _currentPack?.Dispose();
+            _currentPack = SpeedyPack.Create(filePath);
+            _currentFilePath = filePath;
+            _currentPath = string.Empty;
+
+            var fileName = Path.GetFileName(filePath);
+
+            Title = $"Speedy Pack Manager - {fileName}";
+            UpdateBreadcrumb();
+            StatusLabel.Text = $"Created: {fileName}";
+
+            BtnRefresh.IsEnabled = true;
+            BtnCompact.IsEnabled = true;
+            BtnImportFile.IsEnabled = true;
+
+            RefreshView();
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync($"Failed to create file: {ex.Message}");
+            StatusLabel.Text = "Failed to create file";
+        }
+    }
+
     private async Task OpenFile_ClickAsync()
     {
+        if (_isImporting) return;
+
         var storageProvider = TopLevel.GetTopLevel(this)?.StorageProvider;
         if (storageProvider == null) return;
 
@@ -102,7 +171,7 @@ public partial class MainWindow : Window
 
     private async Task Compact_ClickAsync()
     {
-        if (_currentPack == null) return;
+        if (_currentPack == null || _isImporting) return;
 
         try
         {
@@ -137,6 +206,7 @@ public partial class MainWindow : Window
 
             BtnRefresh.IsEnabled = true;
             BtnCompact.IsEnabled = true;
+            BtnImportFile.IsEnabled = true;
 
             RefreshView();
         }
@@ -147,12 +217,327 @@ public partial class MainWindow : Window
         }
     }
 
-    private void RefreshView()
+    // ─── Import File ────────────────────────────────────────────────────────────
+
+    private async Task ImportFile_ClickAsync()
+    {
+        if (_currentPack == null || _isImporting) return;
+
+        var storageProvider = TopLevel.GetTopLevel(this)?.StorageProvider;
+        if (storageProvider == null) return;
+
+        var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Select Files to Import",
+            AllowMultiple = true
+        });
+
+        if (files.Count == 0) return;
+
+        try
+        {
+            StatusLabel.Text = $"Importing {files.Count} file(s)...";
+
+            foreach (var file in files)
+            {
+                var localPath = file.TryGetLocalPath();
+                if (localPath == null) continue;
+
+                var fileName = Path.GetFileName(localPath);
+                var packPath = string.IsNullOrEmpty(_currentPath)
+                    ? fileName
+                    : $"{_currentPath}/{fileName}";
+
+                await using var stream = await file.OpenReadAsync();
+                using var ms = new MemoryStream();
+                await stream.CopyToAsync(ms);
+                var data = ms.ToArray();
+
+                var contentType = InferContentType(fileName);
+                _currentPack.Write(packPath, data, contentType);
+            }
+
+            await _currentPack.FlushAsync();
+            StatusLabel.Text = $"Imported {files.Count} file(s)";
+            RefreshView();
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync($"Import failed: {ex.Message}");
+            StatusLabel.Text = "Import failed";
+        }
+    }
+
+    // ─── Import Folder (Tree Context Menu) ──────────────────────────────────────
+
+    private async Task ImportFolder_ClickAsync()
     {
         if (_currentPack == null) return;
 
+        var selectedNode = DirectoryTree.SelectedItem as DirectoryTreeNode;
+        var targetPath = selectedNode?.Path ?? string.Empty;
+
+        var storageProvider = TopLevel.GetTopLevel(this)?.StorageProvider;
+        if (storageProvider == null) return;
+
+        var folders = await storageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = "Select Folder to Import",
+            AllowMultiple = false
+        });
+
+        if (folders.Count == 0) return;
+
+        var folderPath = folders[0].TryGetLocalPath();
+        if (folderPath == null) return;
+
+        var folderName = Path.GetFileName(folderPath);
+        var importRoot = string.IsNullOrEmpty(targetPath)
+            ? folderName
+            : $"{targetPath}/{folderName}";
+
+        // Phase 1: Scan total file count
+        var progressWindow = new ProgressWindow($"Importing '{folderName}'");
+        progressWindow.SetIndeterminate("Scanning files...");
+        _isImporting = true;
+
+        try
+        {
+            // Show modal progress dialog — blocks main window interaction
+            var dialogTask = progressWindow.ShowDialog(this);
+
+            // Give the dialog a moment to render
+            await Task.Delay(50);
+
+            var totalFiles = CountFiles(folderPath);
+
+            if (totalFiles == 0)
+            {
+                progressWindow.Complete("No files found to import.");
+                await Task.Delay(800);
+                progressWindow.Close();
+                await dialogTask;
+                _isImporting = false;
+                StatusLabel.Text = "No files found to import.";
+                return;
+            }
+
+            progressWindow.ProgressBar.Maximum = totalFiles;
+            progressWindow.ProgressBar.IsIndeterminate = false;
+            progressWindow.ProgressBar.Value = 0;
+            progressWindow.StatusLabel.Text = $"0 / {totalFiles} files...";
+
+            // Phase 2: Import with progress
+            var totalImported = 0;
+
+            await Task.Run(() =>
+            {
+                ImportDirectoryRecursive(folderPath, importRoot, (fileName) =>
+                {
+                    totalImported++;
+                    var captured = totalImported;
+                    Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                    {
+                        progressWindow.ProgressBar.Value = captured;
+                        progressWindow.StatusLabel.Text = $"{captured} / {totalFiles} — {fileName}";
+                    });
+                });
+            });
+
+            await _currentPack.FlushAsync();
+
+            progressWindow.Complete($"Imported {totalImported} file(s).");
+            _isImporting = false;
+
+            StatusLabel.Text = $"Imported {totalImported} file(s) from '{folderName}'";
+            RefreshView();
+
+            // Brief pause so the user can see the completion message
+            await Task.Delay(600);
+            progressWindow.Close();
+            await dialogTask;
+        }
+        catch (Exception ex)
+        {
+            try { progressWindow.Close(); } catch { /* ignore */ }
+            await ShowErrorAsync($"Folder import failed: {ex.Message}");
+            StatusLabel.Text = "Folder import failed";
+        }
+        finally
+        {
+            _isImporting = false;
+        }
+    }
+
+    private static int CountFiles(string path)
+    {
+        var count = Directory.GetFiles(path).Length;
+        foreach (var dir in Directory.GetDirectories(path))
+            count += CountFiles(dir);
+        return count;
+    }
+
+    private void ImportDirectoryRecursive(string physicalDir, string packDir, Action<string> onFileImported)
+    {
+        var pack = _currentPack!;
+
+        foreach (var file in Directory.GetFiles(physicalDir))
+        {
+            var fileName = Path.GetFileName(file) ?? file;
+            var packPath = $"{packDir}/{fileName}";
+            var data = File.ReadAllBytes(file);
+            var contentType = InferContentType(fileName);
+            pack.Write(packPath, data, contentType);
+            onFileImported(fileName);
+        }
+
+        foreach (var dir in Directory.GetDirectories(physicalDir))
+        {
+            var dirName = Path.GetFileName(dir) ?? dir;
+            var subPackDir = $"{packDir}/{dirName}";
+            ImportDirectoryRecursive(dir, subPackDir, onFileImported);
+        }
+    }
+
+    // ─── Export Entry (Tree Context Menu) ───────────────────────────────────────
+
+    private async Task ExportEntry_ClickAsync()
+    {
+        if (_currentPack == null || _isImporting) return;
+
+        var selectedNode = DirectoryTree.SelectedItem as DirectoryTreeNode;
+        if (selectedNode == null)
+        {
+            await ShowWarningAsync("Please select a directory or file in the tree first.");
+            return;
+        }
+
+        var storageProvider = TopLevel.GetTopLevel(this)?.StorageProvider;
+        if (storageProvider == null) return;
+
+        if (selectedNode.IsFile)
+        {
+            await ExportSingleFileAsync(selectedNode.Path, storageProvider);
+        }
+        else
+        {
+            await ExportDirectoryAsync(selectedNode.Path, selectedNode.Name, storageProvider);
+        }
+    }
+
+    private async Task ExportSingleFileAsync(string packPath, IStorageProvider storageProvider)
+    {
+        var bytes = _currentPack!.Read(packPath);
+        if (bytes == null)
+        {
+            await ShowWarningAsync("Entry not found or cannot be read.");
+            return;
+        }
+
+        var fileName = Path.GetFileName(packPath);
+        var file = await storageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Export File",
+            SuggestedFileName = fileName
+        });
+
+        if (file == null) return;
+
+        try
+        {
+            await using var stream = await file.OpenWriteAsync();
+            await stream.WriteAsync(bytes);
+            await stream.FlushAsync();
+
+            StatusLabel.Text = $"Exported: {fileName}";
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync($"Export failed: {ex.Message}");
+        }
+    }
+
+    private async Task ExportDirectoryAsync(string packDir, string dirName, IStorageProvider storageProvider)
+    {
+        var folders = await storageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = "Select Export Destination Folder",
+            AllowMultiple = false
+        });
+
+        if (folders.Count == 0) return;
+
+        var destPath = folders[0].TryGetLocalPath();
+        if (destPath == null) return;
+
+        try
+        {
+            StatusLabel.Text = $"Exporting '{dirName}'...";
+
+            var exportedCount = 0;
+            await Task.Run(() =>
+            {
+                exportedCount = ExportDirectoryRecursive(packDir, Path.Combine(destPath, dirName));
+            });
+
+            StatusLabel.Text = $"Exported {exportedCount} file(s) to '{dirName}'";
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync($"Export failed: {ex.Message}");
+            StatusLabel.Text = "Export failed";
+        }
+    }
+
+    private int ExportDirectoryRecursive(string packDir, string physicalDir)
+    {
+        var count = 0;
+        Directory.CreateDirectory(physicalDir);
+
+        // Export entries in this directory
+        foreach (var entry in _currentPack!.ListEntries(packDir))
+        {
+            var bytes = _currentPack.Read(entry);
+            if (bytes == null) continue;
+
+            var fileName = Path.GetFileName(entry);
+            var filePath = Path.Combine(physicalDir, fileName);
+            File.WriteAllBytes(filePath, bytes);
+            count++;
+        }
+
+        // Recursively export subdirectories
+        foreach (var subDir in _currentPack.ListDirectories(packDir))
+        {
+            var dirName = subDir.Contains('/') ? subDir.Split('/').Last() : subDir;
+            count += ExportDirectoryRecursive(subDir, Path.Combine(physicalDir, dirName));
+        }
+
+        return count;
+    }
+
+    // ─── Content Type Inference ─────────────────────────────────────────────────
+
+    private static string InferContentType(string fileName)
+    {
+        var ext = Path.GetExtension(fileName).ToLowerInvariant();
+        return ext switch
+        {
+            ".json" or ".jsonl" => "json",
+            ".txt" or ".md" or ".csv" or ".xml" or ".yaml" or ".yml" or ".log" or ".ini" or ".cfg" or ".conf" or ".toml" => "text",
+            _ => "raw"
+        };
+    }
+
+    private void RefreshView()
+    {
+        if (_currentPack == null || _isImporting) return;
+
         RefreshTree();
-        RefreshListView(_currentPath);
+        var dirName = string.IsNullOrEmpty(_currentPath)
+            ? Path.GetFileName(_currentFilePath) ?? "Root"
+            : _currentPath.Split('/').Last();
+        PreviewDirectorySummary(_currentPath, dirName);
     }
 
     private void UpdateBreadcrumb()
@@ -190,8 +575,8 @@ public partial class MainWindow : Window
         if (sender is Button btn && btn.DataContext is BreadcrumbItem item && item.Path != null)
         {
             _currentPath = item.Path;
-            RefreshListView(_currentPath);
             UpdateBreadcrumb();
+            PreviewDirectorySummary(item.Path, item.Label);
         }
     }
 
@@ -221,6 +606,8 @@ public partial class MainWindow : Window
         var rootNode = new DirectoryTreeNode(Path.GetFileName(_currentFilePath) ?? "Root", string.Empty);
 
         var dirTree = new Dictionary<string, DirectoryTreeNode>(StringComparer.Ordinal);
+        dirTree[string.Empty] = rootNode;
+
         foreach (var dir in allPaths.OrderBy(d => d))
         {
             var parts = dir.Split('/');
@@ -243,82 +630,91 @@ public partial class MainWindow : Window
             }
         }
 
+        // Add file entries as leaf nodes under their parent directories
+        foreach (var dir in allPaths.Append(string.Empty))
+        {
+            if (!dirTree.TryGetValue(dir, out var parentNode)) continue;
+
+            var entries = _currentPack.ListEntries(dir);
+            foreach (var entry in entries)
+            {
+                var fileName = Path.GetFileName(entry) ?? entry;
+                var meta = _currentPack.GetEntryMetadata(entry);
+                var contentType = meta?.ContentType ?? "raw";
+                var fileNode = new DirectoryTreeNode(fileName, entry, isFile: true, contentType: contentType);
+                parentNode.Children.Add(fileNode);
+            }
+        }
+
         rootNode.IsExpanded = true;
         _rootNodes.Add(rootNode);
     }
 
-    private void RefreshListView(string directoryPath)
-    {
-        _fileItems.Clear();
-
-        if (_currentPack == null) return;
-
-        var directories = _currentPack.ListDirectories(directoryPath);
-
-        foreach (var dir in directories)
-        {
-            var dirName = dir.Contains('/') ? dir.Split('/').Last() : dir;
-            _fileItems.Add(new FileEntryItem(dirName, "Folder", string.Empty, string.Empty, "dir", dir));
-        }
-
-        var entries = _currentPack.ListEntries(directoryPath);
-
-        foreach (var entry in entries)
-        {
-            var metadata = _currentPack.GetEntryMetadata(entry);
-            if (metadata.HasValue)
-            {
-                var fileName = Path.GetFileName(entry);
-                _fileItems.Add(new FileEntryItem(
-                    fileName,
-                    metadata.Value.ContentType.ToUpper(),
-                    FormatSize(metadata.Value.Length),
-                    metadata.Value.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
-                    "entry",
-                    entry));
-            }
-        }
-
-        ItemCountLabel.Text = $"{_fileItems.Count} items";
-    }
-
     private void DirectoryTree_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (_currentPack == null) return;
+        if (_currentPack == null || _isImporting) return;
 
         if (DirectoryTree.SelectedItem is DirectoryTreeNode node)
         {
-            _currentPath = node.Path;
-            RefreshListView(_currentPath);
-            UpdateBreadcrumb();
+            if (node.IsFile)
+            {
+                PreviewContent(node.Path);
+            }
+            else
+            {
+                _currentPath = node.Path;
+                UpdateBreadcrumb();
+                PreviewDirectorySummary(node.Path, node.Name);
+            }
         }
     }
 
-    private void FileList_DoubleTapped(object? sender, TappedEventArgs e)
+    private void PreviewDirectorySummary(string path, string name)
     {
-        if (FileList.SelectedItem is not FileEntryItem item) return;
+        if (_currentPack == null) return;
 
-        if (item.ItemType == "dir")
+        try
         {
-            _currentPath = item.ItemPath;
-            RefreshListView(_currentPath);
-            UpdateBreadcrumb();
-        }
-        else
-        {
-            ViewContent(item.ItemPath);
-        }
-    }
+            var subDirs = _currentPack.ListDirectories(path);
+            var entries = _currentPack.ListEntries(path);
 
-    private void FileList_SelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        if (FileList.SelectedItem is FileEntryItem item && item.ItemType == "entry")
-        {
-            PreviewContent(item.ItemPath);
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine($"📁 {name}");
+            sb.AppendLine($"Path: {(string.IsNullOrEmpty(path) ? "/" : path)}");
+            sb.AppendLine();
+            sb.AppendLine($"Folders: {subDirs.Count}");
+            sb.AppendLine($"Files:   {entries.Count}");
+
+            if (entries.Count > 0)
+            {
+                long totalSize = 0;
+                var typeCounts = new Dictionary<string, int>();
+                foreach (var entry in entries)
+                {
+                    var meta = _currentPack.GetEntryMetadata(entry);
+                    if (meta.HasValue)
+                    {
+                        totalSize += meta.Value.Length;
+                        var ct = meta.Value.ContentType.ToUpper();
+                        typeCounts.TryGetValue(ct, out var c);
+                        typeCounts[ct] = c + 1;
+                    }
+                }
+
+                sb.AppendLine($"Size:    {FormatSize((int)totalSize)}");
+                sb.AppendLine();
+                sb.AppendLine("Content types:");
+                foreach (var (type, count) in typeCounts.OrderBy(t => t.Key))
+                {
+                    sb.AppendLine($"  {type}: {count}");
+                }
+            }
+
+            PreviewTextBox.Text = sb.ToString();
         }
-        else
+        catch (Exception ex)
         {
-            PreviewTextBox.Text = "Select a file to preview content";
+            PreviewTextBox.Text = $"Error reading directory info: {ex.Message}";
         }
     }
 
@@ -545,33 +941,17 @@ public class DirectoryTreeNode
 {
     public string Name { get; }
     public string Path { get; }
+    public bool IsFile { get; }
+    public string ContentType { get; }
     public ObservableCollection<DirectoryTreeNode> Children { get; } = [];
     public bool IsExpanded { get; set; }
 
-    public DirectoryTreeNode(string name, string path)
+    public DirectoryTreeNode(string name, string path, bool isFile = false, string contentType = "")
     {
         Name = name;
         Path = path;
-    }
-}
-
-public class FileEntryItem
-{
-    public string Name { get; }
-    public string Type { get; }
-    public string Size { get; }
-    public string Modified { get; }
-    public string ItemType { get; }
-    public string ItemPath { get; }
-
-    public FileEntryItem(string name, string type, string size, string modified, string itemType, string itemPath)
-    {
-        Name = name;
-        Type = type;
-        Size = size;
-        Modified = modified;
-        ItemType = itemType;
-        ItemPath = itemPath;
+        IsFile = isFile;
+        ContentType = contentType;
     }
 }
 

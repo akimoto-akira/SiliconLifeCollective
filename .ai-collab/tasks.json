@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-19T22:10:00+08:00",
+  "lastUpdated": "2026-05-19T21:30:00+08:00",
   "tasks": [
     {
       "id": "task-201",
@@ -63,7 +63,7 @@
       "type": "bugfix",
       "target": "src/SiliconLife.Default/Program.cs, src/SiliconLife.Fast/Program.cs, src/SiliconLife.Core/Runtime/CoreHost.cs",
       "title": "修复 ITypeRegistry/IObjectFactory 未在插件加载前注册的问题",
-      "description": "task-203 创建了 ITypeRegistry/TypeRegistry 和 IObjectFactory/ObjectFactory，ServiceLocator.cs 也已添加属性，但实际注册存在时序问题：1) SiliconLife.Default 和 SiliconLife.Fast 的 Program.cs 中 PluginLoader.LoadAll() 在 CoreHost.StartAsync() 之前执行，而 CoreHost.StartAsync() 才注册 ITypeRegistry/IObjectFactory，导致插件 OnLoad() 时这两个服务不可用；2) CoreHost.StartAsync() 无条件 new TypeRegistry()/ObjectFactory() 会覆盖 Program.cs 中先注册的实例，导致插件注册的类型/工厂被清空。修复：1) 在两个 Program.cs 的插件加载之前注册 TypeRegistry 和 ObjectFactory；2) CoreHost.StartAsync() 改为仅在未注册时才创建新实例",
+      "description": "task-203 创建了 ITypeRegistry/TypeRegistry 和 IObjectRegistry/ObjectFactory，ServiceLocator.cs 也已添加属性，但实际注册存在时序问题：1) SiliconLife.Default 和 SiliconLife.Fast 的 Program.cs 中 PluginLoader.LoadAll() 在 CoreHost.StartAsync() 之前执行，而 CoreHost.StartAsync() 才注册 ITypeRegistry/IObjectFactory，导致插件 OnLoad() 时这两个服务不可用；2) CoreHost.StartAsync() 无条件 new TypeRegistry()/ObjectFactory() 会覆盖 Program.cs 中先注册的实例，导致插件注册的类型/工厂被清空。修复：1) 在两个 Program.cs 的插件加载之前注册 TypeRegistry 和 ObjectFactory；2) CoreHost.StartAsync() 改为仅在未注册时才创建新实例",
       "priority": "P0",
       "status": "completed",
       "createdAt": "2026-05-19T23:00:00+08:00",
@@ -71,12 +71,26 @@
       "assignedTo": "trae-glm5",
       "relatedCommit": null,
       "completedAt": "2026-05-19T23:15:00+08:00"
+    },
+    {
+      "id": "task-206",
+      "type": "feature",
+      "target": "src/SiliconLife.Speedy.Manager/",
+      "title": "Speedy.Manager 功能增强：新建/导入/导出/TreeView层级显示/进度窗口",
+      "description": "对 SpeedyPack Manager 进行全面功能增强和 UI 修复：1) 工具栏新增"新建"按钮，用于创建 .spk 文件；2) 工具栏新增"导入文件"按钮，将单个或多个文件导入到当前包的根目录或当前选定目录的子级；3) TreeView 右键菜单新增"导入文件夹"和"导出文件（夹）"功能；4) 修复 TreeView 不显示文件内容的问题，使其正确显示文件和文件夹的层级结构（替换 HierarchicalDataTemplate 为 TreeDataTemplate，添加 IsFile/ContentType 属性到 DirectoryTreeNode）；5) 修复选中节点后预览界面无变化的问题，文件显示内容预览，目录显示概要信息（子目录数、文件数、总大小、内容类型统计）；6) 移除 DataGrid (FileList) 和 GridSplitter，让预览框占据整个右侧面板；7) 为导入文件夹功能添加模态进度窗口（ProgressWindow），导入过程中禁用主窗口所有操作（_isImporting 标志）；8) 修复导入文件夹进度显示不累加的问题，通过全局 totalImported 计数器确保进度条正确反映全局进度；9) 修复导入窗口关闭后主窗口视图未立即刷新的问题，将 RefreshView() 移至 progressWindow.Close() 之前执行",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-19T20:00:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": "catpaw",
+      "relatedCommit": null,
+      "completedAt": "2026-05-19T21:30:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": ["task-201", "task-202", "task-203", "task-204", "task-205"],
+    "completed": ["task-201", "task-202", "task-203", "task-204", "task-205", "task-206"],
     "cancelled": []
   },
   "metadata": {

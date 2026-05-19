@@ -1,0 +1,26 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SiliconLife.Speedy.Manager.ProgressWindow"
+        Title="Importing..."
+        Width="480" Height="200"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False">
+
+    <DockPanel Margin="24">
+        <TextBlock x:Name="TitleLabel"
+                   DockPanel.Dock="Top"
+                   FontSize="16" FontWeight="SemiBold"
+                   Margin="0,0,0,12" />
+
+        <StackPanel DockPanel.Dock="Bottom" Spacing="8">
+            <ProgressBar x:Name="ProgressBar"
+                         IsIndeterminate="False"
+                         Minimum="0" Maximum="100"
+                         Value="0"
+                         Height="20" />
+            <TextBlock x:Name="StatusLabel"
+                       FontSize="12" Foreground="#606060" />
+        </StackPanel>
+    </DockPanel>
+</Window>
