@@ -269,3 +269,14 @@
 2026-05-19T14:50:00+08:00 | trae-glm5 | build | result=success | project=SiliconLifeCollective.sln | errors=0 | warnings=104
 2026-05-19T15:00:00+08:00 | trae-glm5 | task_complete | task=task-203 | summary=消除12处安全扫描违规：ITypeRegistry替代AppDomain，IObjectFactory替代Activator.CreateInstance
 2026-05-19T15:00:00+08:00 | trae-glm5 | session_end | completed=task-203
+2026-05-19T22:00:00+08:00 | trae-glm5 | task_create | task=task-204 | type=bugfix | title=修复创建项目时 Creator ID is required 错误
+2026-05-19T22:10:00+08:00 | trae-glm5 | task_complete | task=task-204 | summary=修复 ProjectController.CreateProject 中 createdBy 回退逻辑短路求值 bug
+2026-05-19T23:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260519-2300 | task=task-205
+2026-05-19T23:00:00+08:00 | trae-glm5 | task_create | task=task-205 | type=bugfix | title=修复 ITypeRegistry/IObjectFactory 未在插件加载前注册的问题
+2026-05-19T23:00:00+08:00 | trae-glm5 | task_claim | task=task-205
+2026-05-19T23:02:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Default/Program.cs | intent=在 PluginLoader.LoadAll() 之前注册 ITypeRegistry 和 IObjectFactory
+2026-05-19T23:04:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Program.cs | intent=在 PluginLoader.LoadAll() 之前注册 ITypeRegistry 和 IObjectFactory
+2026-05-19T23:06:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/Runtime/CoreHost.cs | intent=StartAsync 中 ITypeRegistry/IObjectFactory 改为条件注册，避免覆盖已注册实例
+2026-05-19T23:10:00+08:00 | trae-glm5 | build | result=success | projects=Core,Default,Fast | errors=0
+2026-05-19T23:15:00+08:00 | trae-glm5 | task_complete | task=task-205 | summary=修复服务注册时序：Program.cs 提前注册+CoreHost 条件注册避免覆盖
+2026-05-19T23:15:00+08:00 | trae-glm5 | session_end | completed=task-205

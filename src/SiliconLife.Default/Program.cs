@@ -59,6 +59,12 @@ public class Program
         DefaultConfigData configData = (DefaultConfigData)config.Data;
         LogManager.Instance.AddProvider(new FileSystemLoggerProvider(configData));
 
+        // Register TypeRegistry and ObjectFactory before loading plugins,
+        // so plugins can register types/factories during OnLoad()
+        ServiceLocator.Instance.Register<ITypeRegistry>(new TypeRegistry());
+        ServiceLocator.Instance.Register<IObjectFactory>(new ObjectFactory());
+        _logger.Info(null, "Registered: TypeRegistry, ObjectFactory");
+
         // Load plugins after logging is initialized
         string pluginDir = Path.Combine(AppContext.BaseDirectory, "plugins");
         _pluginLoader = new PluginLoader(pluginDir);

@@ -57,12 +57,26 @@
       "assignedTo": "trae-glm5",
       "relatedCommit": null,
       "completedAt": "2026-05-19T22:10:00+08:00"
+    },
+    {
+      "id": "task-205",
+      "type": "bugfix",
+      "target": "src/SiliconLife.Default/Program.cs, src/SiliconLife.Fast/Program.cs, src/SiliconLife.Core/Runtime/CoreHost.cs",
+      "title": "修复 ITypeRegistry/IObjectFactory 未在插件加载前注册的问题",
+      "description": "task-203 创建了 ITypeRegistry/TypeRegistry 和 IObjectFactory/ObjectFactory，ServiceLocator.cs 也已添加属性，但实际注册存在时序问题：1) SiliconLife.Default 和 SiliconLife.Fast 的 Program.cs 中 PluginLoader.LoadAll() 在 CoreHost.StartAsync() 之前执行，而 CoreHost.StartAsync() 才注册 ITypeRegistry/IObjectFactory，导致插件 OnLoad() 时这两个服务不可用；2) CoreHost.StartAsync() 无条件 new TypeRegistry()/ObjectFactory() 会覆盖 Program.cs 中先注册的实例，导致插件注册的类型/工厂被清空。修复：1) 在两个 Program.cs 的插件加载之前注册 TypeRegistry 和 ObjectFactory；2) CoreHost.StartAsync() 改为仅在未注册时才创建新实例",
+      "priority": "P0",
+      "status": "completed",
+      "createdAt": "2026-05-19T23:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-19T23:15:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": ["task-201", "task-202", "task-203", "task-204"],
+    "completed": ["task-201", "task-202", "task-203", "task-204", "task-205"],
     "cancelled": []
   },
   "metadata": {

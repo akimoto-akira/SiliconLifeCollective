@@ -111,11 +111,25 @@ public class CoreHost
             _logger.Debug(null, "Registered service: {0}", nameof(StreamCancellationManager));
         }
 
-        ServiceLocator.Instance.Register<ITypeRegistry>(new TypeRegistry());
-        _logger.Debug(null, "Registered service: {0}", nameof(ITypeRegistry));
+        if (ServiceLocator.Instance.TypeRegistry == null)
+        {
+            ServiceLocator.Instance.Register<ITypeRegistry>(new TypeRegistry());
+            _logger.Debug(null, "Registered service: {0}", nameof(ITypeRegistry));
+        }
+        else
+        {
+            _logger.Debug(null, "Service already registered: {0}", nameof(ITypeRegistry));
+        }
 
-        ServiceLocator.Instance.Register<IObjectFactory>(new ObjectFactory());
-        _logger.Debug(null, "Registered service: {0}", nameof(IObjectFactory));
+        if (ServiceLocator.Instance.ObjectFactory == null)
+        {
+            ServiceLocator.Instance.Register<IObjectFactory>(new ObjectFactory());
+            _logger.Debug(null, "Registered service: {0}", nameof(IObjectFactory));
+        }
+        else
+        {
+            _logger.Debug(null, "Service already registered: {0}", nameof(IObjectFactory));
+        }
 
         if (_builder.PluginDirectory != null)
         {
