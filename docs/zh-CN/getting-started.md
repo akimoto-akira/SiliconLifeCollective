@@ -74,11 +74,13 @@ dotnet build
     "DashScope": {
       "ApiKey": "your-api-key-here",
       "Model": "qwen-plus",
-      "Region": "cn-hangzhou"
+      "Region": "beijing"
     }
   }
 }
 ```
+
+> **可用区域**：`beijing`（北京）、`virginia`（弗吉尼亚）、`singapore`（新加坡）、`hongkong`（香港）、`frankfurt`（法兰克福）
 
 #### 选项 C：火山引擎 Ark（云端）
 
@@ -226,8 +228,8 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # 默认实现 + 入口点（控制台版）
 │   ├── SiliconLife.Fast/            # 高性能实现 + 入口点（窗体版）
 │   ├── SiliconLife.Speedy/          # SpeedyPack 高性能存储引擎
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理工具（Windows Forms）
-├── docs/                            # 文档（多语言，29 种语言变体）
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理工具（Avalonia UI）
+├── docs/                            # 文档（多语言，33 种语言变体）
 │   ├── en/                          # 英语
 │   ├── zh-CN/                       # 简体中文
 │   ├── zh-HK/                       # 繁体中文

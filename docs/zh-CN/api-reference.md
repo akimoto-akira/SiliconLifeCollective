@@ -10,87 +10,39 @@
 
 ### 认证
 
-大多数端点需要通过 Web UI 管理的会话 cookie 进行认证。
+大多数端点需要通过 Web UI 管理的会话 cookie 进行认证。系统初始化前，除帮助页面外的所有请求将重定向到初始化页面。
 
 ---
 
-## 硅基生命体管理
+## 仪表板
 
-### 获取所有生命体
+### 获取仪表板统计数据
 
-**GET** `/api/beings`
+**GET** `/api/dashboard/stats`
 
-**响应**：
-```json
-{
-  "beings": [
-    {
-      "id": "being-uuid",
-      "name": "Assistant",
-      "status": "running",
-      "soul": "path/to/soul.md"
-    }
-  ]
-}
-```
+返回系统概览数据（生命体数量、运行状态等）。
 
-**状态值**：`idle` | `running` | `waiting_permission` | `stopped`
+### 获取性能指标
 
-### 创建生命体
+**GET** `/api/dashboard/metrics`
 
-**POST** `/api/beings`
-
-**请求**：
-```json
-{
-  "name": "New Being",
-  "soul": "# Personality\nYou are helpful..."
-}
-```
-
-**响应**：`201 Created`
-
-### 启动生命体
-
-**POST** `/api/beings/{id}/start`
-
-### 停止生命体
-
-**POST** `/api/beings/{id}/stop`
-
-### 获取生命体详情
-
-**GET** `/api/beings/{id}`
+返回实时性能指标数据。
 
 ---
 
 ## 聊天系统
 
-### 发送消息
+### 聊天页面
 
-**POST** `/api/chat`
+**GET** `/chat`
 
-**请求**：
-```json
-{
-  "beingId": "being-uuid",
-  "message": "Hello, how are you?",
-  "sessionId": "optional-session-id"
-}
-```
-
-**响应**（非流式）：
-```json
-{
-  "reply": "I'm doing well, thank you!",
-  "sessionId": "session-uuid",
-  "timestamp": "2026-04-20T10:30:00Z"
-}
-```
+返回聊天界面页面。
 
 ### 流式聊天（SSE）
 
-**GET** `/api/chat/stream?beingId={id}&message={msg}`
+**GET** `/api/chat/stream`
+
+通过服务器发送事件（SSE）进行流式聊天。
 
 **响应**：服务器发送事件流
 
@@ -101,76 +53,323 @@ data: {"type": "chunk", "content": " thinking..."}
 data: {"type": "complete", "sessionId": "uuid"}
 ```
 
-### 获取聊天历史
+### 获取会话列表
 
-**GET** `/api/chat/{sessionId}/history`
+**GET** `/api/chat/conversations`
 
-**响应**：
+返回所有活跃的聊天会话列表。
+
+**响应示例**：
 ```json
 {
-  "messages": [
+  "conversations": [
     {
-      "role": "user",
-      "content": "Hello",
-      "timestamp": "2026-04-20T10:30:00Z"
-    },
-    {
-      "role": "assistant",
-      "content": "Hi there!",
-      "timestamp": "2026-04-20T10:30:05Z"
+      "sessionId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
+      "beingId": "being-uuid",
+      "type": "single",
+      "displayName": "与小游聊天",
+      "lastMessage": "最后消息内容",
+      "lastTime": "2026-05-20T10:30:00Z"
     }
   ]
 }
 ```
 
----
+### 获取消息历史
 
-## 配置
+**GET** `/api/chat/messages`
 
-### 获取配置
+查询参数：`channelId` — 频道/会话 ID
 
-**GET** `/api/config`
+返回指定会话的消息历史记录。
+
+### 获取聊天历史
+
+**GET** `/api/chat/history`
+
+返回全局聊天历史记录。
+
+### 发送消息
+
+**POST** `/api/chat/send`
+
+**请求体**：
+```json
+{
+  "channelId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
+  "content": "测试消息内容"
+}
+```
 
 **响应**：
 ```json
 {
-  "aiClients": {
-    "Ollama": {
-      "baseUrl": "http://localhost:11434",
-      "model": "qwen2.5:7b"
-    }
-  },
-  "storage": {
-    "basePath": "./data"
-  }
+  "success": true,
+  "messageId": "50156b26-f3b9-4735-be3d-51e547bd3a4a"
 }
 ```
 
-### 更新配置
+### 停止 AI 思考
 
-**POST** `/api/config`
+**POST** `/api/chat/stop`
 
-**请求**：
+停止当前正在进行的 AI 响应生成。
+
+**请求体**：
 ```json
 {
-  "aiClients": {
-    "Ollama": {
-      "baseUrl": "http://localhost:11434",
-      "model": "qwen2.5:14b"
+  "channelId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d"
+}
+```
+
+### 上传文件
+
+**POST** `/api/chat/upload`
+
+上传文件到聊天会话中（支持 multipart/form-data）。
+
+---
+
+## 硅基生命体管理
+
+### 生命体管理页面
+
+**GET** `/beings`
+
+返回硅基生命体管理界面页面。
+
+### 获取生命体列表
+
+**GET** `/api/beings` 或 **GET** `/api/beings/list`
+
+返回所有已注册的硅基生命体列表。
+
+**响应示例**：
+```json
+{
+  "beings": [
+    {
+      "id": "being-uuid",
+      "name": "Assistant",
+      "status": "running",
+      "soulPath": "path/to/soul.md"
     }
+  ]
+}
+```
+
+**状态值**：`idle` | `running` | `waiting_permission` | `stopped`
+
+### 获取生命体详情
+
+**GET** `/api/beings/detail`
+
+查询参数：`beingId` — 生命体 ID
+
+返回指定生命体的详细信息。
+
+### 获取生命体活动状态
+
+**GET** `/api/beings/activity`
+
+返回各生命体的活动状态信息。
+
+### 灵魂文件编辑器页面
+
+**GET** `/beings/soul`
+
+返回灵魂文件编辑器界面。
+
+### 保存灵魂文件
+
+**POST** `/api/beings/soul/save`
+
+**请求体**：
+```json
+{
+  "beingId": "being-uuid",
+  "soulContent": "# Personality\nYou are helpful..."
+}
+```
+
+### AI 配置编辑器页面
+
+**GET** `/beings/ai-config`
+
+返回 AI 配置编辑器界面。
+
+### 保存 AI 配置
+
+**POST** `/api/beings/ai-config/save`
+
+**请求体**：
+```json
+{
+  "beingId": "being-uuid",
+  "aiClientType": "DashScope",
+  "config": {
+    "apiKey": "...",
+    "region": "beijing",
+    "model": "qwen3.6-plus"
   }
 }
 ```
+
+### 获取可用 AI 模型列表
+
+**GET** `/api/beings/ai-config/models`
+
+查询参数：`clientType`, `apiKey`, `region`
+
+返回指定 AI 客户端的可用模型列表。
+
+---
+
+## 聊天历史查看
+
+### 聊天历史页面
+
+**GET** `/chat-history`
+
+返回聊天历史主页面。
+
+### 聊天历史详情页面
+
+**GET** `/chat-history-detail`
+
+返回指定会话的聊天历史详情页面。
+
+### 群聊历史详情页面
+
+**GET** `/group-chat-history-detail`
+
+返回群聊的历史详情页面。
+
+### 广播历史详情页面
+
+**GET** `/broadcast-history-detail`
+
+返回广播频道的历史详情页面。
+
+### 获取历史会话列表
+
+**GET** `/api/chat-history/conversations`
+
+返回所有历史会话列表。
+
+### 获取历史消息
+
+**GET** `/api/chat-history/messages`
+
+查询参数：`sessionId` — 会话 ID
+
+返回指定历史会话的消息记录。
+
+---
+
+## 定时器管理
+
+### 定时器页面
+
+**GET** `/timers`
+
+返回定时器管理界面页面。
+
+### 获取定时器列表
+
+**GET** `/api/timers/list`
+
+返回所有定时器的列表。
+
+### 定时器周期详情页面
+
+**GET** `/timer-cycles/{timerId}`
+
+返回指定定时器的执行周期详情页面。
+
+### 获取定时器周期列表
+
+**GET** `/api/timer-cycles/list`
+
+查询参数：`timerId` — 定时器 ID
+
+返回指定定时器的所有执行周期列表。
+
+### 单次执行周期详情页面
+
+**GET** `/timer-cycle/{cycleIndex}`
+
+返回单次执行的详细页面。
+
+### 获取周期消息
+
+**GET** `/api/timer-cycle/messages`
+
+查询参数：`cycleIndex` — 周期索引
+
+返回指定执行周期的相关消息。
+
+---
+
+## 任务管理
+
+### 任务页面
+
+**GET** `/tasks`
+
+返回任务管理界面页面。
+
+### 获取任务列表
+
+**GET** `/api/tasks/list`
+
+返回所有任务的列表。
+
+### 任务周期详情页面
+
+**GET** `/task-cycles/{taskId}`
+
+返回指定任务的执行周期详情页面。
+
+### 获取任务周期列表
+
+**GET** `/api/task-cycles/list`
+
+查询参数：`taskId` — 任务 ID
+
+返回指定任务的所有执行周期列表。
+
+### 单次执行周期详情页面
+
+**GET** `/task-cycle/{cycleIndex}`
+
+返回单次任务执行的详细页面。
+
+### 获取周期消息
+
+**GET** `/api/task-cycle/messages`
+
+查询参数：`cycleIndex` — 周期索引
+
+返回指定任务执行周期的相关消息。
 
 ---
 
 ## 权限系统
 
-### 获取权限
+### 权限管理页面
 
-**GET** `/api/permissions`
+**GET** `/permissions`
 
-**响应**：
+返回权限管理界面页面。
+
+### 获取权限规则列表
+
+**GET** `/api/permissions/list`
+
+返回当前配置的所有权限规则。
+
+**响应示例**：
 ```json
 {
   "rules": [
@@ -184,11 +383,11 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 授予权限
+### 保存权限规则
 
-**POST** `/api/permissions`
+**POST** `/api/permissions/save`
 
-**请求**：
+**请求体**：
 ```json
 {
   "userId": "user-uuid",
@@ -198,198 +397,9 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 撤销权限
+### 权限请求页面
 
-**DELETE** `/api/permissions/{id}`
-
-### 检查权限
-
-**POST** `/api/permissions/check`
-
-**请求**：
-```json
-{
-  "userId": "user-uuid",
-  "resource": "network:http"
-}
-```
-
-**响应**：
-```json
-{
-  "allowed": true,
-  "reason": "Granted by curator"
-}
-```
-
----
-
-## 任务和定时器系统
-
-### 创建任务
-
-**POST** `/api/tasks`
-
-**请求**：
-```json
-{
-  "beingId": "being-uuid",
-  "description": "Review code",
-  "priority": 5,
-  "dueDate": "2026-04-21T12:00:00Z"
-}
-```
-
-### 获取任务
-
-**GET** `/api/tasks?beingId={id}&status=pending`
-
-### 更新任务状态
-
-**PATCH** `/api/tasks/{id}`
-
-**请求**：
-```json
-{
-  "status": "completed"
-}
-```
-
-### 创建定时器
-
-**POST** `/api/timers`
-
-**请求**：
-```json
-{
-  "beingId": "being-uuid",
-  "interval": 3600,
-  "action": "think",
-  "repeat": true
-}
-```
-
-### 删除定时器
-
-**DELETE** `/api/timers/{id}`
-
----
-
-## 审计和日志
-
-### 获取 Token 使用
-
-**GET** `/api/audit/tokens?startDate={date}&endDate={date}`
-
-**响应**：
-```json
-{
-  "summary": {
-    "totalTokens": 150000,
-    "promptTokens": 100000,
-    "completionTokens": 50000,
-    "totalCost": 0.15
-  },
-  "byModel": {
-    "qwen2.5:7b": {
-      "tokens": 100000,
-      "cost": 0.10
-    }
-  }
-}
-```
-
-### 获取日志
-
-**GET** `/api/logs?level=error&limit=100`
-
-**响应**：
-```json
-{
-  "logs": [
-    {
-      "timestamp": "2026-04-20T10:30:00Z",
-      "level": "error",
-      "message": "Failed to connect to AI service",
-      "source": "OllamaClient"
-    }
-  ]
-}
-```
-
----
-
-## 存储 API
-
-### 读取值
-
-**GET** `/api/storage?key={key}`
-
-**响应**：
-```json
-{
-  "key": "being:uuid:memory",
-  "value": "{...}",
-  "timestamp": "2026-04-20T10:30:00Z"
-}
-```
-
-### 写入值
-
-**POST** `/api/storage`
-
-**请求**：
-```json
-{
-  "key": "being:uuid:memory",
-  "value": "{...}"
-}
-```
-
-### 按时间范围查询
-
-**GET** `/api/storage/time?start={start}&end={end}&prefix={prefix}`
-
-**响应**：
-```json
-{
-  "entries": [
-    {
-      "key": "being:uuid:chat:2026-04-20",
-      "value": "{...}",
-      "timestamp": "2026-04-20T10:30:00Z"
-    }
-  ]
-}
-```
-
----
-
-## 系统信息
-
-### 获取关于页面
-
-**GET** `/about`
-
-返回关于页面，包含系统信息和已加载的插件列表。
-
-**插件列表数据**：
-```json
-{
-  "plugins": {
-    "plugin-id": {
-      "name": "My Plugin",
-      "version": "1.0.0",
-      "description": "Plugin description",
-      "author": "Author Name"
-    }
-  }
-}
-```
-
-### 权限请求
-
-**GET** `/permission/request?userId={id}&type={type}&resource={resource}`
+**GET** `/permission/request`
 
 显示权限请求页面，允许用户批准或拒绝硅基生命体的权限请求。
 
@@ -403,9 +413,11 @@ data: {"type": "complete", "sessionId": "uuid"}
 | `allowCode` | `string` | 允许操作的代码标识 |
 | `denyCode` | `string` | 拒绝操作的代码标识 |
 
-**检查待处理权限请求**：
+### 检查待处理权限请求
 
-**GET** `/permission/check?userId={id}`
+**GET** `/permission/check`
+
+查询参数：`userId` — 硅基生命体 ID
 
 **响应**：
 ```json
@@ -414,9 +426,9 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-**响应权限请求**：
+### 响应权限请求
 
-**GET** `/permission/respond?userId={id}&allowed={bool}&addToCache={bool}&cacheDuration={hours}`
+**GET** `/permission/respond`
 
 **查询参数**：
 
@@ -434,41 +446,693 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 获取仪表板数据
+---
 
-**GET** `/api/dashboard`
+## 日志系统
 
-**响应**：
+### 日志页面
+
+**GET** `/logs`
+
+返回日志查看界面页面。
+
+### 获取日志列表
+
+**GET** `/api/logs/list`
+
+查询参数支持按级别、时间范围过滤。
+
+**响应示例**：
 ```json
 {
-  "beings": {
-    "total": 5,
-    "running": 3,
-    "stopped": 2
-  },
-  "performance": {
-    "cpu": 45.2,
-    "memory": 1024,
-    "uptime": 86400
-  },
-  "aiUsage": {
-    "todayTokens": 50000,
-    "todayCost": 0.05
+  "logs": [
+    {
+      "timestamp": "2026-04-20T10:30:00Z",
+      "level": "error",
+      "message": "Failed to connect to AI service",
+      "source": "OllamaClient"
+    }
+  ]
+}
+```
+
+### 获取日志按生命体分组
+
+**GET** `/api/logs/beings`
+
+按硅基生命体分组的日志统计。
+
+### 获取可用日志级别
+
+**GET** `/api/logs/levels`
+
+返回系统中可用的日志级别列表。
+
+---
+
+## 使用统计
+
+### 使用统计页面
+
+**GET** `/usage`
+
+返回使用统计界面页面。
+
+### 获取使用摘要
+
+**GET** `/api/usage/summary`
+
+返回 Token 使用量和费用摘要。
+
+### 获取趋势数据
+
+**GET** `/api/usage/trend`
+
+查询参数：`startDate`, `endDate`
+
+返回指定时间段内的使用趋势数据。
+
+### 导出使用数据
+
+**GET** `/api/usage/export`
+
+导出使用数据为可下载格式。
+
+---
+
+## 审计跟踪
+
+### 审计页面
+
+**GET** `/audit`
+
+返回审计跟踪界面页面。
+
+### 获取审计列表
+
+**GET** `/api/audit/list`
+
+返回审计日志条目列表。
+
+### 获取审计摘要
+
+**GET** `/api/audit/summary`
+
+返回审计数据的汇总统计。
+
+### 获取审计按生命体分组
+
+**GET** `/api/audit/beings`
+
+按硅基生命体分组的审计统计。
+
+---
+
+## 配置管理
+
+### 配置页面
+
+**GET** `/config`
+
+返回系统配置界面页面。
+
+### 保存配置
+
+**POST** `/config/save`
+
+**请求体**：
+```json
+{
+  "language": "ZhCN",
+  "port": 8080,
+  "aiClients": {
+    "Ollama": {
+      "baseUrl": "http://localhost:11434",
+      "model": "qwen2.5:7b"
+    },
+    "DashScope": {
+      "apiKey": "...",
+      "region": "beijing",
+      "model": "qwen3.6-plus"
+    }
   }
 }
 ```
 
-### 获取系统状态
+### 获取 AI 配置选项
 
-**GET** `/api/status`
+**GET** `/config/aioptions`
+
+返回可用的 AI 客户端类型及其动态选项（可用模型、区域等）。
+
+---
+
+## 记忆系统
+
+### 记忆页面
+
+**GET** `/memory`
+
+返回记忆管理界面页面。
+
+### 获取记忆列表
+
+**GET** `/api/memory/list`
+
+返回硅基生命体的记忆条目列表。
+
+### 获取记忆详情
+
+**GET** `/api/memory/detail/{id}`
+
+路径参数：`id` — 记忆条目 ID
+
+返回指定记忆条目的完整内容。
+
+### 获取记忆统计
+
+**GET** `/api/memory/stats`
+
+返回记忆系统的统计信息。
+
+### 搜索记忆
+
+**GET** `/api/memory/search`
+
+查询参数：`keyword` — 搜索关键词
+
+搜索匹配的记忆条目。
+
+### 获取记忆按生命体分组
+
+**GET** `/api/memory/beings`
+
+按硅基生命体分组的记忆统计。
+
+### 获取记忆追溯
+
+**GET** `/api/memory/trace/{id}`
+
+路径参数：`id` — 记忆条目 ID
+
+返回指定记忆条目的来源追溯链。
+
+### 获取记忆时间线 HTML
+
+**GET** `/api/memory/timeline-html`
+
+返回记忆时间线的 HTML 视图。
+
+---
+
+## 工作笔记
+
+### 工作笔记页面
+
+**GET** `/work-notes`
+
+返回工作笔记界面页面。
+
+### 获取工作笔记列表
+
+**GET** `/api/work-notes/list`
+
+返回工作笔记列表。
+
+### 读取工作笔记
+
+**GET** `/api/work-notes/read`
+
+查询参数：`noteId` — 笔记 ID
+
+返回指定笔记的内容。
+
+### 获取笔记目录
+
+**GET** `/api/work-notes/directory`
+
+返回笔记目录结构。
+
+### 搜索工作笔记
+
+**GET** `/api/work-notes/search`
+
+查询参数：`keyword` — 搜索关键词
+
+搜索匹配的工作笔记。
+
+### 创建工作笔记
+
+**POST** `/api/work-notes/create`
+
+**请求体**：
+```json
+{
+  "title": "笔记标题",
+  "content": "笔记内容",
+  "keywords": ["关键词1", "关键词2"]
+}
+```
+
+### 更新工作笔记
+
+**POST** `/api/work-notes/update`
+
+**请求体**：
+```json
+{
+  "noteId": "note-uuid",
+  "title": "更新后的标题",
+  "content": "更新后的内容"
+}
+```
+
+### 删除工作笔记
+
+**POST** `/api/work-notes/delete`
+
+**请求体**：
+```json
+{
+  "noteId": "note-uuid"
+}
+```
+
+---
+
+## 知识网络
+
+### 知识网络页面
+
+**GET** `/knowledge`
+
+返回知识网络管理界面页面。
+
+### 获取知识图谱
+
+**GET** `/api/knowledge/graph`
+
+返回知识三元组图谱数据（主体-关系-客体）。
+
+---
+
+## 项目管理
+
+### 项目页面
+
+**GET** `/project`
+
+返回项目管理界面页面。
+
+### 项目工作笔记页面
+
+**GET** `/project/{id}/work-notes`
+
+路径参数：`id` — 项目 ID
+
+返回指定项目的工作笔记页面。
+
+### 项目任务页面
+
+**GET** `/project/{id}/tasks`
+
+路径参数：`id` — 项目 ID
+
+返回指定项目的任务管理页面。
+
+### 获取项目列表
+
+**GET** `/api/projects/list`
+
+返回所有项目的列表。
+
+### 获取项目工作流模板列表
+
+**GET** `/api/projects/list-workflow-templates`
+
+返回可用的工作流模板列表。
+
+### 创建项目
+
+**POST** `/api/projects/create`
+
+**请求体**：
+```json
+{
+  "name": "My Project",
+  "description": "Project description"
+}
+```
+
+### 归档项目
+
+**POST** `/api/projects/{id}/archive`
+
+路径参数：`id` — 项目 ID
+
+归档指定项目。
+
+### 恢复项目
+
+**POST** `/api/projects/{id}/restore`
+
+路径参数：`id` — 项目 ID
+
+恢复已归档的项目。
+
+### 销毁项目
+
+**POST** `/api/projects/{id}/destroy`
+
+路径参数：`id` — 项目 ID
+
+永久删除指定项目（不可恢复）。
+
+### 获取项目详情
+
+**GET** `/api/projects/detail`
+
+查询参数：`projectId` — 项目 ID
+
+返回项目的详细信息。
+
+### 更新项目
+
+**POST** `/api/projects/update`
+
+**请求体**：
+```json
+{
+  "projectId": "project-uuid",
+  "name": "Updated Name",
+  "description": "Updated description"
+}
+```
+
+### 分配成员到项目
+
+**POST** `/api/projects/assign`
+
+**请求体**：
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid"
+}
+```
+
+### 从项目中移除成员
+
+**POST** `/api/projects/remove`
+
+**请求体**：
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid"
+}
+```
+
+### 获取项目工作笔记列表
+
+**GET** `/api/projects/{id}/work-notes/list`
+
+路径参数：`id` — 项目 ID
+
+返回指定项目的工作笔记列表。
+
+### 读取项目工作笔记
+
+**GET** `/api/projects/{id}/work-notes/read`
+
+路径参数：`id` — 项目 ID
+
+返回指定项目的工作笔记内容。
+
+### 创建项目工作笔记
+
+**POST** `/api/projects/{id}/work-notes/create`
+
+路径参数：`id` — 项目 ID
+
+在指定项目中创建新的工作笔记。
+
+### 更新项目工作笔记
+
+**POST** `/api/projects/{id}/work-notes/update`
+
+路径参数：`id` — 项目 ID
+
+更新指定项目中的工作笔记。
+
+### 删除项目工作笔记
+
+**POST** `/api/projects/{id}/work-notes/delete`
+
+路径参数：`id` — 项目 ID
+
+删除指定项目中的工作笔记。
+
+### 获取项目任务列表
+
+**GET** `/api/projects/{id}/tasks/list`
+
+路径参数：`id` — 项目 ID
+
+返回指定项目的任务列表。
+
+### 创建项目任务
+
+**POST** `/api/projects/{id}/tasks/create`
+
+路径参数：`id` — 项目 ID
+
+在指定项目中创建新任务。
+
+### 更新项目任务
+
+**POST** `/api/projects/{id}/tasks/update`
+
+路径参数：`id` — 项目 ID
+
+更新指定项目中的任务。
+
+### 删除项目任务
+
+**POST** `/api/projects/{id}/tasks/delete`
+
+路径参数：`id` — 项目 ID
+
+删除指定项目中的任务。
+
+### 分配任务负责人
+
+**POST** `/api/projects/{id}/tasks/assign`
+
+路径参数：`id` — 项目 ID
+
+为项目任务分配负责人。
+
+### 移除任务负责人
+
+**POST** `/api/projects/{id}/tasks/remove-assignee`
+
+路径参数：`id` — 项目 ID
+
+移除项目任务的负责人。
+
+### 标记任务完成
+
+**POST** `/api/projects/{id}/tasks/complete`
+
+路径参数：`id` — 项目 ID
+
+标记项目任务为已完成。
+
+### 标记任务失败
+
+**POST** `/api/projects/{id}/tasks/fail`
+
+路径参数：`id` — 项目 ID
+
+标记项目任务为失败。
+
+### 取消任务
+
+**POST** `/api/projects/{id}/tasks/cancel`
+
+路径参数：`id` — 项目 ID
+
+取消项目任务。
+
+---
+
+## 执行器管理
+
+### 执行器页面
+
+**GET** `/executor`
+
+返回执行器管理界面页面。
+
+### 获取执行器状态
+
+**GET** `/api/executors/status`
+
+返回各执行器（磁盘、网络、命令行）的运行状态。
+
+---
+
+## 代码浏览器
+
+### 代码浏览器页面
+
+**GET** `/code`
+
+返回代码浏览器界面页面。
+
+### 获取代码类型列表
+
+**GET** `/api/code/types`
+
+返回支持的代码类型/语言列表。
+
+### 获取代码详情
+
+**GET** `/api/code/detail`
+
+查询参数：`filePath`, `lineNumber`
+
+返回指定文件的代码详情。
+
+---
+
+## 代码悬浮提示
+
+### 获取悬浮提示
+
+**GET** `/api/code/hover`
+**POST** `/api/code/hover`
+
+获取代码位置的悬浮提示信息（类似 IDE 的智能提示）。
+
+### 注册代码位置
+
+**POST** `/api/code/register`
+
+注册需要监控的代码位置。
+
+### 更新代码位置
+
+**POST** `/api/code/update`
+
+更新已注册的代码位置信息。
+
+### 注销代码位置
+
+**POST** `/api/code/unregister`
+
+注销不再需要的代码位置监控。
+
+---
+
+## 帮助文档系统
+
+### 帮助页面
+
+**GET** `/help` 或 **GET** `/help/index`
+
+返回帮助文档主页。
+
+### 帮助主题页面
+
+**GET** `/help/{topic}`
+
+路径参数：`topic` — 主题标识符
+
+返回指定主题的帮助文档页面。
+
+### 搜索帮助文档
+
+**GET** `/api/help/search`
+
+查询参数：`keyword` — 搜索关键词
+
+搜索匹配的帮助文档主题。
+
+---
+
+## 初始化
+
+### 初始化向导页面
+
+**GET** `/init`
+
+返回首次运行初始化向导页面。
+
+### 提交初始化
+
+**POST** `/init`
+
+提交首次运行的初始化配置。
+
+### 浏览选择数据目录
+
+**GET** `/init/browse`
+
+打开目录浏览器以选择数据存储位置。
+
+### 获取 AI 配置元数据
+
+**GET** `/init/ai-config-metadata`
+
+返回可用的 AI 客户端类型及其配置字段元数据。
+
+---
+
+## 系统控制
+
+### 优雅关闭
+
+**POST** `/api/system/shutdown`
+
+> **注意**：仅允许来自 localhost 的请求
+
+触发应用程序的优雅关闭流程：
+
+1. 停止主循环（MainLoop）
+2. 保存当前配置
+3. 关闭 HTTP 监听器
 
 **响应**：
 ```json
 {
-  "version": "1.0.0",
-  "runtime": ".NET 9.0",
-  "uptime": 86400,
-  "health": "healthy"
+  "status": "shutting_down",
+  "message": "Application is shutting down gracefully"
+}
+```
+
+---
+
+## 关于
+
+### 关于页面
+
+**GET** `/about`
+
+返回关于页面，包含系统信息和已加载的插件列表。
+
+**插件列表数据**：
+```json
+{
+  "plugins": {
+    "plugin-id": {
+      "name": "My Plugin",
+      "version": "1.0.0",
+      "description": "Plugin description",
+      "author": "Author Name"
+    }
+  }
 }
 ```
 
@@ -507,7 +1171,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 ### 聊天事件
 
 ```javascript
-const eventSource = new EventSource('/api/chat/stream?beingId=xxx&message=xxx');
+const eventSource = new EventSource('/api/chat/stream');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);
@@ -529,20 +1193,9 @@ eventSource.onmessage = (event) => {
 };
 ```
 
-### 生命体状态事件
-
-```javascript
-const beingEvents = new EventSource('/api/beings/events');
-
-beingEvents.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  console.log(`Being ${data.beingId} status: ${data.status}`);
-};
-```
-
 ---
 
-## AI 客户端 API
+## AI 客户端接口
 
 ### IAIClient 接口
 
@@ -584,314 +1237,7 @@ public class AIResponse
 
 ---
 
-## 工作笔记 API
-
-### 获取工作笔记列表
-
-**GET** `/api/beings/{id}/work-notes`
-
-**响应**：
-```json
-{
-  "notes": [
-    {
-      "id": "note-uuid",
-      "pageNumber": 1,
-      "summary": "完成用户认证模块",
-      "keywords": ["认证", "JWT", "OAuth2"],
-      "createdAt": "2026-04-25T10:00:00Z",
-      "updatedAt": "2026-04-25T10:00:00Z"
-    }
-  ],
-  "totalCount": 15
-}
-```
-
-### 获取单条笔记详情
-
-**GET** `/api/beings/{id}/work-notes/{pageNumber}`
-
-**响应**：
-```json
-{
-  "id": "note-uuid",
-  "pageNumber": 1,
-  "summary": "完成用户认证模块",
-  "content": "## 实现细节\n\n- 使用 JWT token\n- 支持 OAuth2",
-  "keywords": ["认证", "JWT", "OAuth2"],
-  "createdAt": "2026-04-25T10:00:00Z",
-  "updatedAt": "2026-04-25T10:00:00Z"
-}
-```
-
-### 创建新笔记
-
-**POST** `/api/beings/{id}/work-notes`
-
-**请求**：
-```json
-{
-  "summary": "完成用户认证模块",
-  "content": "## 实现细节\n\n- 使用 JWT token",
-  "keywords": "认证,JWT,OAuth2"
-}
-```
-
-**响应**：`201 Created`
-
-### 更新笔记
-
-**PUT** `/api/beings/{id}/work-notes/{pageNumber}`
-
-**请求**：
-```json
-{
-  "summary": "完成用户认证模块及测试",
-  "content": "## 更新后的内容\n\n添加了单元测试",
-  "keywords": "认证,JWT,OAuth2,测试"
-}
-```
-
-### 删除笔记
-
-**DELETE** `/api/beings/{id}/work-notes/{pageNumber}`
-
-### 搜索笔记
-
-**GET** `/api/beings/{id}/work-notes/search?keyword=认证&maxResults=10`
-
-### 获取笔记目录
-
-**GET** `/api/beings/{id}/work-notes/directory`
-
----
-
-## 知识网络 API
-
-### 获取知识统计
-
-**GET** `/api/knowledge/stats`
-
-**响应**：
-```json
-{
-  "totalTriples": 1523,
-  "totalSubjects": 450,
-  "totalPredicates": 85,
-  "totalObjects": 892,
-  "averageConfidence": 0.87
-}
-```
-
-### 添加知识三元组
-
-**POST** `/api/knowledge/triples`
-
-**请求**：
-```json
-{
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language",
-  "confidence": 0.95,
-  "tags": ["programming", "language"]
-}
-```
-
-**响应**：`201 Created`
-
-### 查询知识
-
-**GET** `/api/knowledge/query?subject=Python&predicate=is_a`
-
-**响应**：
-```json
-{
-  "triples": [
-    {
-      "subject": "Python",
-      "predicate": "is_a",
-      "object": "programming_language",
-      "confidence": 0.95,
-      "tags": ["programming", "language"]
-    }
-  ]
-}
-```
-
-### 搜索知识
-
-**GET** `/api/knowledge/search?query=programming+language&limit=10`
-
-### 获取知识路径
-
-**GET** `/api/knowledge/path?from=Python&to=computer_science`
-
-**响应**：
-```json
-{
-  "path": [
-    {"subject": "Python", "predicate": "is_a", "object": "programming_language"},
-    {"subject": "programming_language", "predicate": "belongs_to", "object": "computer_science"}
-  ],
-  "length": 2
-}
-```
-
-### 验证知识
-
-**POST** `/api/knowledge/validate`
-
-**请求**：
-```json
-{
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language"
-}
-```
-
-### 删除知识
-
-**DELETE** `/api/knowledge/triples/{id}`
-
----
-
-## 帮助文档系统 API
-
-### 获取帮助文档列表
-
-**GET** `/api/help`
-
-**响应**：
-```json
-{
-  "topics": [
-    {
-      "id": "getting-started",
-      "title": "快速开始",
-      "category": "入门指南"
-    }
-  ]
-}
-```
-
-### 获取帮助文档详情
-
-**GET** `/api/help/{topicId}`
-
-**响应**：
-```json
-{
-  "id": "getting-started",
-  "title": "快速开始",
-  "content": "# 快速开始\n\n...",
-  "category": "入门指南"
-}
-```
-
----
-
-## WebView 浏览器 API
-
-### 获取浏览器状态
-
-**GET** `/api/beings/{id}/browser/status`
-
-**响应**：
-```json
-{
-  "is_open": true,
-  "current_url": "https://example.com",
-  "page_title": "Example Page",
-  "is_loading": false,
-  "last_operation_time": "2026-04-26T10:00:00Z"
-}
-```
-
-### 打开浏览器
-
-**POST** `/api/beings/{id}/browser/open`
-
-### 关闭浏览器
-
-**POST** `/api/beings/{id}/browser/close`
-
-### 导航到 URL
-
-**POST** `/api/beings/{id}/browser/navigate`
-
-**请求**：
-```json
-{
-  "url": "https://example.com"
-}
-```
-
-### 执行 JavaScript
-
-**POST** `/api/beings/{id}/browser/execute-script`
-
-**请求**：
-```json
-{
-  "script": "return document.title;"
-}
-```
-
-### 获取页面截图
-
-**GET** `/api/beings/{id}/browser/screenshot`
-
----
-
-## 项目工作区 API
-
-### 获取项目列表
-
-**GET** `/api/projects`
-
-**响应**：
-```json
-{
-  "projects": [
-    {
-      "id": "project-uuid",
-      "name": "My Project",
-      "description": "Project description",
-      "createdAt": "2026-04-25T10:00:00Z"
-    }
-  ]
-}
-```
-
-### 创建项目
-
-**POST** `/api/projects`
-
-**请求**：
-```json
-{
-  "name": "My Project",
-  "description": "Project description"
-}
-```
-
-### 获取项目详情
-
-**GET** `/api/projects/{id}`
-
-### 更新项目
-
-**PUT** `/api/projects/{id}`
-
-### 删除项目
-
-**DELETE** `/api/projects/{id}`
-
----
-
-## 工具系统 API
+## 工具系统接口
 
 ### ITool 接口
 

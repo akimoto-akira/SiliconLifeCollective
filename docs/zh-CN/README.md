@@ -26,7 +26,7 @@
 - **热重载工具** — 支持 SiliconLife.Fast 在运行中自动编译、更新文件并重启，无需手动干预
 - **工具调用循环** — AI 返回工具调用 → 执行工具 → 结果反馈给 AI → 持续循环直到返回纯文本响应
 - **执行器-权限安全** — 所有 I/O 操作通过执行器进行严格的权限验证
-  - 5 级权限链：IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+  - 5 级权限链：UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL)
   - 完整的审计日志记录所有权限决策
 
 ### AI 与知识
@@ -40,11 +40,11 @@
 ### Web 界面
 - **现代化 Web UI** — 内置 HTTP 服务器，支持 SSE 实时更新
 - **7 种皮肤主题** — 管理版、聊天版、创作版、开发版、高对比度、浅色、极简，支持自动发现和切换
-- **20+ 个控制器** — 完整的系统管理、聊天、配置、监控功能
+- **20+ 个控制器** — 23 个控制器，完整的系统管理、聊天、配置、监控功能
 - **零前端框架依赖** — 通过 `H`、`CssBuilder` 和 `JsBuilder` 在服务端生成 HTML/CSS/JS
 
 ### 国际化与本地化
-- **29 种语言实现**全面支持，涵盖 2 种书写系统和多个地区变体
+- **33 种语言变体**全面支持，涵盖 2 种书写系统和多个地区变体
   - **简体中文**：zh-CN（中国大陆）、zh-SG（新加坡）、zh-MY（马来西亚）（3 种）
   - **繁体中文**：zh-HK（香港）、zh-TW（台湾）、zh-MO（澳门）（3 种）
   - **英语**：en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY（10 种）
@@ -52,6 +52,7 @@
   - **德语**：de-DE, de-AT, de-CH, de-LU, de-LI（5 种）
   - **法语**：fr-FR, fr-CA, fr-CH（3 种）
   - **日语**：ja-JP | **韩语**：ko-KR | **捷克语**：cs-CZ（3 种）
+  - **意大利语**：it-IT | **波兰语**：pl-PL | **葡萄牙语**：pt-PT, pt-BR（4 种）
 
 ### 数据与存储
 - **SpeedyPack 高性能存储** — Fast 版本使用自研 .spk 存储引擎，内存目录映射 + 条目缓存 + 异步写入队列
@@ -83,7 +84,7 @@
   - 极致性能优化
   - Windows/macOS 托盘后台运行，支持托盘状态窗口实时监控；Linux 状态窗口直接显示
   - SpeedyPack 引擎 + 自动压缩保证数据安全
-  - Component UI 架构，30+ 声明式组件
+  - Component UI 架构，27 个声明式组件
   - 7 种皮肤主题，支持自动发现和切换
   - 热重载工具支持在线更新和重启
 - **性能提升**：存储读取延迟降低 1000 倍，写入延迟降低 15000 倍，并发处理能力提升 50 倍
@@ -153,11 +154,11 @@ SiliconLifeCollective.sln
 │   ├── SiliconLife.Common/                # 共享实现（两个版本共用）
 │   │   ├── AI/                            # AI 客户端与工厂（Ollama、DashScope、VolcengineArk）
 │   │   ├── Calendar/                      # 32 种日历实现
-│   │   ├── Localization/                  # 本地化基类与 29 种语言/地区变体实现
+│   │   ├── Localization/                  # 本地化基类与 33 种语言/地区变体实现
 │   │   ├── Resources/                     # 共享资源文件
 │   │   ├── Security/                      # 权限管理器
 │   │   ├── SiliconBeing/                  # 默认硅基生命体实现
-│   │   ├── Tools/                         # 23 个通用工具实现（含热重载工具）
+│   │   ├── Tools/                         # 24 个通用工具实现（含热重载工具）
 │   │   ├── Web/                           # Web 基础设施
 │   │   └── WebView/                       # Playwright WebView 实现
 │   │
@@ -166,8 +167,8 @@ SiliconLifeCollective.sln
 │   │   ├── Data/                          # 数据目录
 │   │   ├── Help/                          # 帮助文档本地化（多语言）
 │   │   └── Web/                           # Web UI 实现
-│   │       ├── Component/                 # UI 组件库（30+ 组件）
-│   │       ├── Controllers/               # 22 个控制器
+│   │       ├── Component/                 # UI 组件库（27 个组件）
+│   │       ├── Controllers/               # 23 个控制器
 │   │       ├── Models/                    # 视图模型
 │   │       ├── Views/                     # HTML 视图
 │   │       └── Skins/                     # 7 种皮肤主题
@@ -175,25 +176,20 @@ SiliconLifeCollective.sln
 │   ├── SiliconLife.Default/               # 默认实现 + 应用程序入口（控制台版）
 │   │   ├── Program.cs                     # 入口点（装配所有组件）
 │   │   ├── Config/                        # 默认配置数据
-│   │   ├── IM/                            # WebUI 提供者
 │   │   ├── Knowledge/                     # 知识网络实现
-│   │   ├── Logging/                       # 日志提供者实现
+│   │   ├── Logging/                       # 日志提供者实现（控制台 + 文件系统）
 │   │   ├── Project/                       # 项目系统实现
-│   │   ├── Security/                      # 默认权限回调
-│   │   ├── Storage/                       # 文件系统存储实现
-│   │   └── Tools/                         # 版本特有的工具实现（HelpTool）
+│   │   └── Storage/                       # 文件系统存储实现
 │   │
 │   ├── SiliconLife.Fast/                  # 高性能实现 + 应用程序入口（窗体版）
 │   │   ├── Program.cs                     # 入口点（窗体应用程序）
+│   │   ├── App.axaml / App.cs             # Avalonia 应用定义
 │   │   ├── Config/                        # 配置数据（与 Default 共享）
-│   │   ├── IM/                            # WebUI 提供者
 │   │   ├── Knowledge/                     # 知识网络实现（内存优化）
 │   │   ├── Logging/                       # 高性能日志提供者
 │   │   ├── Project/                       # 项目系统实现
-│   │   ├── Security/                      # 优化权限回调
 │   │   ├── Storage/                       # SpeedyPack 存储适配器
-│   │   ├── Tools/                         # 版本特有的工具实现（HelpTool）
-│   │   └── Tray/                          # 系统托盘（29 种语言变体本地化）
+│   │   └── Tray/                          # 系统托盘（33 种语言变体本地化）
 │   │
 │   ├── SiliconLife.Speedy/                # SpeedyPack 高性能存储引擎
 │   │   ├── SpeedyPack.cs                  # 核心类（内存目录映射 + 缓存 + 异步写入）
@@ -212,7 +208,7 @@ SiliconLifeCollective.sln
 │   │       ├── SpkHeader.cs               # 包文件头
 │   │       └── PathNormalizer.cs          # 路径规范化
 │   │
-│   └── SiliconLife.Speedy.Manager/        # SpeedyPack 管理工具（Windows Forms）
+│   └── SiliconLife.Speedy.Manager/        # SpeedyPack 管理工具（Avalonia UI）
 │       ├── MainForm.cs                    # 主窗体
 │       ├── Program.cs                     # 入口点
 │       └── slc.ico                        # 应用图标
@@ -246,7 +242,7 @@ SiliconLifeCollective.sln
 所有 AI 发起的 I/O 操作必须通过严格的安全链：
 
 ```
-工具调用 → 执行器 → 权限管理器 → [IsCurator → 频率缓存 → 全局ACL → 回调 → 询问用户]
+工具调用 → 执行器 → 权限管理器 → [频率缓存 → 回调 → (IsCurator: 询问用户 | Non-curator: 全局ACL)]
 ```
 
 ## 🚀 快速开始
@@ -336,8 +332,8 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] 阶段 7：动态编译 + 自我进化（Roslyn）
 - [x] 阶段 8：长期记忆 + 任务 + 定时器
 - [x] 阶段 9：核心主机 + 多智能体协作
-- [x] 阶段 10：Web UI（HTTP + SSE，20+ 控制器，4 种皮肤）
-- [x] 阶段 10.5：增量增强（广播频道、Token 审计、32 种日历、工具增强、21 语言本地化）
+- [x] 阶段 10：Web UI（HTTP + SSE，23 个控制器，7 种皮肤）
+- [x] 阶段 10.5：增量增强（广播频道、Token 审计、32 种日历、工具增强、33 种语言变体本地化）
 - [x] 阶段 10.6：完善与优化（WebView、帮助系统、项目工作区、知识网络）
 - [x] 阶段 11：SpeedyPack 存储引擎（替换 LiteDB、内存映射、异步写入队列、自动压缩）
 - [x] 阶段 12：插件系统（IPlugin 接口、PluginLoader 安全沙箱、隔离加载、工具集成）

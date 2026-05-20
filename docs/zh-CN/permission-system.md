@@ -14,32 +14,20 @@
 ┌─────────────────────────────────────────────┐
 │          权限验证                            │
 ├─────────────────────────────────────────────┤
-│  级别 1：IsCurator                           │
-│  ↓ 如果为真则绕过                            │
-│  级别 2：UserFrequencyCache                  │
-│  ↓ 速率限制                                  │
-│  级别 3：GlobalACL                           │
-│  ↓ 访问控制列表                              │
-│  级别 4：IPermissionCallback                 │
+│  级别 1：UserFrequencyCache                  │
+│  ↓ 速率限制缓存                              │
+│  级别 2：IPermissionCallback                 │
 │  ↓ 自定义逻辑                                │
-│  级别 5：IPermissionAskHandler               │
-│  ↓ 询问用户                                  │
+│  级别 3：分支判断                             │
+│  ├─ IsCurator → IPermissionAskHandler        │
+│  │  ↓ 主理人：询问用户确认                    │
+│  └─ Non-curator → GlobalACL                  │
+│     ↓ 非主理人：访问控制列表                  │
 │  结果：允许或拒绝                            │
 └─────────────────────────────────────────────┘
 ```
 
-## 级别 1：IsCurator
-
-管理员/主理人绕过所有权限检查。
-
-```csharp
-if (user.IsCurator)
-{
-    return PermissionResult.Allowed("Curator access");
-}
-```
-
-## 级别 2：UserFrequencyCache
+## 级别 1：UserFrequencyCache
 
 每个用户的速率限制以防止滥用。
 
@@ -51,39 +39,7 @@ if (!cache.CheckLimit(userId, resource))
 }
 ```
 
-## 级别 3：GlobalACL
-
-全局访问控制列表定义明确规则。
-
-### ACL 结构
-
-```json
-{
-  "rules": [
-    {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
-    }
-  ]
-}
-```
-
-### 资源格式
-
-```
-{type}:{action}
-
-示例：
-- disk:read
-- disk:write
-- network:http
-- compile:execute
-- system:info
-```
-
-## 级别 4：IPermissionCallback
+## 级别 2：IPermissionCallback
 
 用于动态权限逻辑的自定义回调。
 
@@ -126,9 +82,60 @@ public class DefaultPermissionCallback : IPermissionCallback
 }
 ```
 
-## 级别 5：IPermissionAskHandler
+## 级别 3：分支判断（IsCurator / GlobalACL）
 
-当所有其他级别都未决定时询问用户权限。
+当级别 1 和级别 2 都未做出决定时，系统根据调用者身份进行分支：
+
+### 主理人分支（IsCurator = true）
+
+如果调用者是主理人，则进入 `IPermissionAskHandler` 询问用户确认：
+
+```csharp
+if (IsCurator)
+{
+    if (_askHandler != null)
+    {
+        var result = await _askHandler.AskAsync(request);
+        // 用户在 Web UI 中确认或拒绝
+    }
+}
+```
+
+### 非主理人分支（IsCurator = false）
+
+如果调用者不是主理人，则检查 `GlobalACL` 访问控制列表：
+
+### GlobalACL 结构
+
+```json
+{
+  "rules": [
+    {
+      "userId": "user-uuid",
+      "resource": "disk:read",
+      "allowed": true,
+      "expiresAt": "2026-04-21T00:00:00Z"
+    }
+  ]
+}
+```
+
+### 资源格式
+
+```
+{type}:{action}
+
+示例：
+- disk:read
+- disk:write
+- network:http
+- compile:execute
+- system:info
+```
+
+## IPermissionAskHandler
+
+当主理人操作需要用户确认时，通过 `IPermissionAskHandler` 询问用户权限。
 
 ### IMPermissionAskHandler 实现
 
@@ -219,7 +226,7 @@ public PermissionResult EvaluatePermission(
 
 **通过 API**：
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "user-uuid",
@@ -231,14 +238,12 @@ curl -X POST http://localhost:8080/api/permissions \
 
 ### 撤销权限
 
-```bash
-curl -X DELETE http://localhost:8080/api/permissions/{rule-id}
-```
+通过 Web UI 的权限管理页面操作。
 
 ### 查看权限
 
 ```bash
-curl http://localhost:8080/api/permissions?userId=user-uuid
+curl http://localhost:8080/api/permissions/list
 ```
 
 ## 最佳实践
@@ -297,9 +302,9 @@ public async Task<PermissionResult> CheckAsync(PermissionRequest request)
 AI："我需要读取 config.json"
 ↓
 权限链：
-1. IsCurator？否
-2. 速率限制？正常
-3. GlobalACL？找到规则：disk:read = 允许
+1. 速率限制？正常
+2. 回调？返回未决定
+3. IsCurator？否 → GlobalACL？找到规则：disk:read = 允许
 4. 结果：允许
 ```
 
@@ -309,12 +314,10 @@ AI："我需要读取 config.json"
 AI："我想编译和运行代码"
 ↓
 权限链：
-1. IsCurator？否
-2. 速率限制？正常
-3. GlobalACL？未找到规则
-4. 回调？返回未决定
-5. 询问用户？用户批准
-6. 结果：允许
+1. 速率限制？正常
+2. 回调？返回未决定
+3. IsCurator？是 → IPermissionAskHandler → 用户批准
+4. 结果：允许
 ```
 
 ### 场景 3：超过速率限制
@@ -323,9 +326,8 @@ AI："我想编译和运行代码"
 AI："我需要发出 100 个 HTTP 请求"
 ↓
 权限链：
-1. IsCurator？否
-2. 速率限制？已超过
-3. 结果：拒绝
+1. 速率限制？已超过
+2. 结果：拒绝
 ```
 
 ## 故障排除

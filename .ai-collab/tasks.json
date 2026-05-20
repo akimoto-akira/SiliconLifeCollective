@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-20T15:30:00+08:00",
+  "lastUpdated": "2026-05-20T16:00:00+08:00",
   "tasks": [
     {
       "id": "task-201",
@@ -111,14 +111,28 @@
       "createdAt": "2026-05-20T10:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "relatedCommit": "aa7b586",
+      "relatedCommit": "65176d4",
       "completedAt": "2026-05-20T15:30:00+08:00"
+    },
+    {
+      "id": "task-209",
+      "type": "docs",
+      "target": "docs/zh-CN/api-reference.md, docs/zh-CN/README.md, docs/zh-CN/permission-system.md, docs/zh-CN/security.md, docs/zh-CN/development-guide.md, docs/zh-CN/getting-started.md",
+      "title": "修复中文文档与源代码不一致问题（全部 6 个文件）",
+      "description": "通过系统性对比 src/ 源代码与 docs/zh-CN/ 文档，发现并修复以下不一致：\n\n**api-reference.md（完全重写）**：移除19个不存在的API端点（如POST /api/chat、GET /api/beings），新增实际存在的100+路由（按23个控制器分组），修正请求体格式（channelId而非beingId）。\n\n**README.md（8处）**：权限链顺序从IsCurator优先改为UserFrequencyCache优先；语言数29→33；控制器22→23；Common工具23→24；UI组件30+→27；Default/Fast目录结构移除不存在的IM/Security/Tools目录；SpeedyPack.Manager从Windows Forms改为Avalonia UI。\n\n**permission-system.md（权限链重写）**：重写5级权限验证流程图和场景示例，反映实际PermissionManager.cs实现。\n\n**security.md（3处）**：修正权限验证流程图（IsCurator不再是第一级短路）；修正主理人角色描述（不再直接绕过检查）；将DynamicCompilationExecutor从I/O执行器表移出并加注释说明其属于Compilation命名空间。\n\n**development-guide.md（5处）**：依赖方向修正为Default/Fast→Common→Core；权限链顺序修正；工具创建路径移除不存在的Default/Tools和Fast/Tools；Default目录结构修正；语言29→33；SpeedyPack.Manager描述修正。\n\n**getting-started.md（3处）**：DashScope Region值cn-hangzhou→beijing并新增可用区域列表；SpeedyPack.Manager描述修正；语言29→33。",
+      "priority": "P0",
+      "status": "completed",
+      "createdAt": "2026-05-20T15:35:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-20T16:00:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": ["task-201", "task-202", "task-203", "task-204", "task-205", "task-206", "task-207", "task-208"],
+    "completed": ["task-201", "task-202", "task-203", "task-204", "task-205", "task-206", "task-207", "task-208", "task-209"],
     "cancelled": []
   },
   "metadata": {

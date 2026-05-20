@@ -18,13 +18,13 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # 默认实现、入口点（验证架构可行性）
 │   ├── SiliconLife.Fast/            # 高性能实现、入口点（主推生产版本）
 │   ├── SiliconLife.Speedy/          # SpeedyPack 高性能存储引擎
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理工具（Windows Forms）
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理工具（Avalonia UI）
 └── docs/                            # 多语言文档
 ```
 
 **依赖方向**：
-- `SiliconLife.Default` → `SiliconLife.Core`（单向）
-- `SiliconLife.Fast` → `SiliconLife.Core`（单向）
+- `SiliconLife.Default` → `SiliconLife.Common` → `SiliconLife.Core`
+- `SiliconLife.Fast` → `SiliconLife.Common` → `SiliconLife.Core`
 - `SiliconLife.Common` → `SiliconLife.Core`（单向）
 
 **版本角色说明**：
@@ -57,7 +57,7 @@ public interface ITool
 
 5 级权限验证链：
 ```
-IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL)
 ```
 
 ### 4. 服务定位器
@@ -75,7 +75,9 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### 添加新工具
 
-1. 在 `src/SiliconLife.Common/Tools/` 中创建新类（两个版本共享的工具）或 `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/`（版本特有工具）：
+1. 在 `src/SiliconLife.Common/Tools/` 中创建新类（两个版本共享的工具）：
+
+> **注意**：`SiliconLife.Default` 和 `SiliconLife.Fast` 不再有独立的 `Tools/` 目录，所有共享工具统一放在 `SiliconLife.Common/Tools/` 中。
 
 ```csharp
 public class MyCustomTool : ITool
@@ -265,7 +267,7 @@ public class MyCustomSkin : ISkin
 SiliconLife.Common/
 ├── AI/                    # AI 客户端与工厂实现
 ├── Calendar/              # 32 种日历实现
-├── Localization/          # 本地化基类与 29 种语言实现
+├── Localization/          # 本地化基类与 33 种语言变体实现
 ├── Security/              # 权限管理器
 ├── SiliconBeing/          # 默认硅基生命体实现
 ├── Tools/                 # 共享的内置工具
@@ -284,13 +286,10 @@ SiliconLife.App/          # Default 与 Fast 共享的应用层
 
 SiliconLife.Default/      # 版本特有目录
 ├── Config/                # 默认配置数据
-├── IM/                    # WebUI 提供者
 ├── Knowledge/             # 知识网络实现
-├── Logging/               # 日志提供者实现
+├── Logging/               # 日志提供者实现（控制台 + 文件系统）
 ├── Project/               # 项目系统实现
-├── Security/              # 默认权限回调
-├── Storage/               # 文件系统存储实现
-└── Tools/                 # 版本特有的工具（HelpTool）
+└── Storage/               # 文件系统存储实现
 ```
 
 ### 文档
