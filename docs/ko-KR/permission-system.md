@@ -8,84 +8,54 @@
 
 권한 시스템은 모든 AI 시작 작업이 적절하게 검증되고 감사되도록 보장합니다.
 
-## 5단계 권한 체인
+## 3단계 분기 권한 체인
 
 ```
 ┌─────────────────────────────────────────────┐
 │          권한 검증                           │
 ├─────────────────────────────────────────────┤
-│  레벨 1: IsCurator                           │
-│  ↓ 참이면 우회                               │
-│  레벨 2: UserFrequencyCache                  │
-│  ↓ 속도 제한                                 │
-│  레벨 3: GlobalACL                           │
-│  ↓ 접근 제어 목록                            │
-│  레벨 4: IPermissionCallback                 │
-│  ↓ 맞춤형 로직                               │
-│  레벨 5: IPermissionAskHandler               │
-│  ↓ 사용자에게 문의                           │
+│  레벨 1: UserFrequencyCache                  │
+│  ↓ 캐시된 사용자 결정 (고거부/고허용)        │
+│  레벨 2: IPermissionCallback                 │
+│  ↓ 맞춤형 콜백 (허용/거부/사용자에게 문의)    │
+│  레벨 3: IsCurator 분기                      │
+│  ↓ 참 → IPermissionAskHandler (사용자에게 문의)│
+│  ↓ 거짓 → GlobalACL → 기본 거부              │
 │  결과: 허용 또는 거부                        │
 └─────────────────────────────────────────────┘
 ```
 
-## 레벨 1: IsCurator
+> **참고**: 이전 버전의 문서에서는 5단계 선형 체인으로 설명했으나, 실제 소스 코드(`PermissionManager.cs`)는 3단계 분기 구조입니다. IsCurator는 체인의 최상단이 아니라 콜백이 `AskUser`를 반환한 후의 분기 조건입니다.
 
-관리자/큐레이터는 모든 권한 검사를 우회합니다.
+## 레벨 1: UserFrequencyCache
+
+사용자의 고빈도 결정을 캐시하여 반복적인 권한 프롬프트를 줄입니다.
+
+### 캐시 종류
+
+| 캐시 | 용도 |
+|-------|---------|
+| **HighDeny (고거부)** | 사용자가 자주 거부한 리소스 — 즉시 거부 |
+| **HighAllow (고허용)** | 사용자가 자주 허용한 리소스 — 즉시 허용 |
+
+### 작동 방식
+
+- **우선순위**: 고거부가 고허용보다 우선순위 높음
+- **메모리 전용**: 캐시는 영속화되지 않음. 재시작 시 손실
+- **접두사 매칭**: 리소스 경로 접두사 매칭 지원
+- **구성 가능한 만료**: 기본 1시간, 사용자가 캐시 항목의 유효 기간 설정 가능
 
 ```csharp
-if (user.IsCurator)
+PermissionResult? cachedResult = _frequencyCache.Query(permissionType, resource);
+if (cachedResult.HasValue)
 {
-    return PermissionResult.Allowed("Curator access");
+    return cachedResult.Value == PermissionResult.Allowed;
 }
 ```
 
-## 레벨 2: UserFrequencyCache
+## 레벨 2: IPermissionCallback
 
-남용 방지를 위한 사용자별 속도 제한.
-
-```csharp
-var cache = new UserFrequencyCache();
-if (!cache.CheckLimit(userId, resource))
-{
-    return PermissionResult.Denied("Rate limit exceeded");
-}
-```
-
-## 레벨 3: GlobalACL
-
-명확한 규칙을 정의하는 전역 접근 제어 목록.
-
-### ACL 구조
-
-```json
-{
-  "rules": [
-    {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
-    }
-  ]
-}
-```
-
-### 리소스 형식
-
-```
-{type}:{action}
-
-예시:
-- disk:read
-- disk:write
-- network:http
-- compile:execute
-- system:info
-```
-
-## 레벨 4: IPermissionCallback
-
-동적 권한 로직을 위한 맞춤형 콜백.
+동적 권한 로직을 위한 맞춤형 콜백. `Allowed`, `Denied` 또는 `AskUser`를 반환합니다.
 
 ### DefaultPermissionCallback 기본 구현
 
@@ -113,35 +83,109 @@ if (!cache.CheckLimit(userId, resource))
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {
-    public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+    public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
     {
         // 맞춤형 로직
-        if (IsSafeOperation(request))
+        if (IsSafeOperation(permissionType, resource))
         {
-            return PermissionResult.Allowed("Safe operation");
+            return PermissionResult.Allowed;
         }
         
-        return PermissionResult.Undecided("Needs user confirmation");
+        return PermissionResult.AskUser;
     }
 }
 ```
 
-## 레벨 5: IPermissionAskHandler
+## 레벨 3: IsCurator 분기
 
-다른 모든 레벨이 미결정일 때 사용자에게 권한 문의.
+콜백이 `AskUser`를 반환하거나 콜백이 없을 때, 시스템은 호출자의 IsCurator 상태에 따라 분기합니다.
+
+### 큐레이터 분기 (IsCurator = true)
+
+큐레이터인 경우 `IPermissionAskHandler`를 통해 사용자에게 권한을 문의합니다:
+
+```csharp
+if (IsCurator)
+{
+    if (_askHandler != null)
+    {
+        AskPermissionResult userDecision = _askHandler.AskUser(callerId, permissionType, resource);
+        PermissionResult userResult = userDecision.Allowed ? PermissionResult.Allowed : PermissionResult.Denied;
+        _frequencyCache.Record(permissionType, resource, userResult, userDecision.AddToCache, userDecision.CacheDuration);
+        return userDecision.Allowed;
+    }
+    return false; // AskHandler 없으면 기본 거부
+}
+```
+
+> **참고**: 큐레이터는 모든 권한 검사를 우회하는 것이 아닙니다. 큐레이터는 콜백이 `AskUser`를 반환할 때 사용자에게 문의하는 경로로 진입합니다. 캐시나 콜백에서 명시적으로 허용/거부되면 큐레이터 여부와 관계없이 해당 결과가 적용됩니다.
+
+### 비큐레이터 분기 (IsCurator = false)
+
+비큐레이터인 경우 `GlobalACL`을 확인하고, 일치하는 규칙이 없으면 기본 거부합니다:
+
+```csharp
+// Non-curator: check Global ACL
+PermissionResult? aclResult = _globalAcl.Query(permissionType, resource);
+if (aclResult.HasValue)
+{
+    return aclResult.Value == PermissionResult.Allowed;
+}
+
+// No matching rule — deny by default
+return false;
+```
+
+### GlobalACL
+
+명확한 규칙을 정의하는 전역 접근 제어 목록. 비큐레이터 분기에서만 참조됩니다.
+
+#### ACL 구조
+
+```json
+{
+  "rules": [
+    {
+      "userId": "user-uuid",
+      "resource": "disk:read",
+      "allowed": true,
+      "expiresAt": "2026-04-21T00:00:00Z"
+    }
+  ]
+}
+```
+
+#### 리소스 형식
+
+```
+{type}:{action}
+
+예시:
+- disk:read
+- disk:write
+- network:http
+- compile:execute
+- system:info
+```
+
+## IPermissionAskHandler
+
+큐레이터 분기에서 사용자에게 권한을 문의하는 핸들러입니다.
+
+### IMPermissionAskHandler 구현
 
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
 {
-    public async Task<AskPermissionResult> AskAsync(PermissionRequest request)
+    public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
     {
         // 인스턴트 메시지로 사용자에게 메시지 전송
-        await SendMessageAsync($"Allow {request.Resource}?");
-        
+        SendMessageAsync($"Allow {resource}?");
+
         // 사용자 응답 대기
-        var response = await WaitForResponseAsync();
-        
-        return response.Approved 
+        var response = WaitForResponseAsync();
+
+        return response.Approved
             ? AskPermissionResult.Approved()
             : AskPermissionResult.Denied();
     }
@@ -152,7 +196,7 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 
 `PermissionRequestQueue`는 대기 중인 권한 요청을 관리하며, 사용자 응답을 비동기적으로 대기합니다:
 
-- **요청 인큐** — 권한 체인이 레벨 5에 도달하면 `TaskCompletionSource<AskPermissionResult>`를 생성하여 인큐
+- **요청 인큐** — 권한 체인이 큐레이터 분기에 도달하면 `TaskCompletionSource<AskPermissionResult>`를 생성하여 인큐
 - **Web UI 표시** — `PermissionRequestController`를 통해 Web UI에 대기 중인 권한 요청 표시
 - **사용자 응답** — 사용자가 Web UI에서 승인 또는 거부, 선택적으로 의사 결정 캐시 및 캐시 지속 시간 설정 가능
 - **캐시 옵션** — 사용자는 권한 의사 결정을 1시간, 24시간, 7일 또는 30일 동안 캐시 가능
@@ -168,8 +212,8 @@ public class IMPermissionAskHandler : IPermissionAskHandler
   "userId": "user-uuid",
   "resource": "disk:write",
   "allowed": true,
-  "level": "GlobalACL",
-  "reason": "Explicit rule granted"
+  "level": "Frequency cache",
+  "reason": "Cached decision"
 }
 ```
 
@@ -267,21 +311,21 @@ curl http://localhost:8080/api/permissions?userId=user-uuid
 복잡한 로직의 경우 `IPermissionCallback` 사용:
 
 ```csharp
-public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
 {
     // 시간 기반 권한
     if (IsOutsideBusinessHours())
     {
-        return PermissionResult.Denied("Outside business hours");
+        return PermissionResult.Denied;
     }
     
     // 리소스 기반 권한
-    if (IsSensitiveResource(request.Resource))
+    if (IsSensitiveResource(resource))
     {
-        return PermissionResult.Undecided("Requires approval");
+        return PermissionResult.AskUser;
     }
     
-    return PermissionResult.Allowed();
+    return PermissionResult.Allowed;
 }
 ```
 
@@ -293,35 +337,45 @@ public async Task<PermissionResult> CheckAsync(PermissionRequest request)
 AI: "config.json을 읽어야 합니다"
 ↓
 권한 체인:
-1. IsCurator? 아니오
-2. 속도 제한? 정상
-3. GlobalACL? 규칙 찾음: disk:read = 허용
-4. 결과: 허용
+1. 주파수 캐시? 캐시된 결정 없음
+2. 콜백? disk:read = 안전한 작업 → 허용
+3. 결과: 허용
 ```
 
-### 시나리오 2: AI가 코드 실행 원함
+### 시나리오 2: 큐레이터가 코드 실행 원함
 
 ```
-AI: "코드를 컴파일하고 실행하고 싶습니다"
+AI (큐레이터): "코드를 컴파일하고 실행하고 싶습니다"
 ↓
 권한 체인:
-1. IsCurator? 아니오
-2. 속도 제한? 정상
-3. GlobalACL? 규칙 없음
-4. 콜백? 미결정 반환
-5. 사용자에게 문의? 사용자 승인
-6. 결과: 허용
+1. 주파수 캐시? 캐시된 결정 없음
+2. 콜백? compile:execute = AskUser 반환
+3. IsCurator? 참 → 사용자에게 문의
+4. 사용자 승인 → 주파수 캐시에 기록
+5. 결과: 허용
 ```
 
-### 시나리오 3: 속도 제한 초과
+### 시나리오 3: 비큐레이터가 네트워크 접근 원함
+
+```
+AI (비큐레이터): "HTTP 요청을 보내야 합니다"
+↓
+권한 체인:
+1. 주파수 캐시? 캐시된 결정 없음
+2. 콜백? network:http = AskUser 반환
+3. IsCurator? 거짓 → GlobalACL 확인
+4. GlobalACL? 규칙 없음
+5. 결과: 거부 (기본 거부)
+```
+
+### 시나리오 4: 속도 제한 초과
 
 ```
 AI: "100개의 HTTP 요청을 보내야 합니다"
 ↓
 권한 체인:
-1. IsCurator? 아니오
-2. 속도 제한? 이미 초과
-3. 결과: 거부
+1. 주파수 캐시? 고거부 캐시에 일치 → 거부
+2. 결과: 거부
 ```
 
 ## 문제 해결
@@ -329,10 +383,10 @@ AI: "100개의 HTTP 요청을 보내야 합니다"
 ### 예기치 않은 권한 거부
 
 **확인**:
-1. 사용자의 IsCurator 상태
-2. 속도 제한 설정
-3. GlobalACL 규칙
-4. 콜백 로직
+1. 사용자의 IsCurator 상태 — 비큐레이터는 GlobalACL에서 명시적 허용 필요
+2. 주파수 캐시 설정 — 고거부 캐시가 고허용보다 우선
+3. 콜백 로직 — AskUser 반환 시 큐레이터와 비큐레이터 분기 다름
+4. GlobalACL 규칙 — 비큐레이터의 경우 ACL에 명시적 규칙 필요
 5. 사용자 응답 타임아웃
 
 ### 권한 만료 안 됨

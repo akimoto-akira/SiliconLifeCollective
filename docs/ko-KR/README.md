@@ -26,7 +26,7 @@
 - **핫 리로드 도구** — SiliconLife.Fast 가 실행 중인 동안 자동으로 컴파일, 파일 업데이트 및 재시작 지원, 수동 개입 불필요
 - **도구 호출 루프** — AI가 도구 호출 반환 → 도구 실행 → 결과를 AI에 피드백 → 순수 텍스트 응답 반환까지 지속 루프
 - **실행기-권한 보안** — 모든 I/O 작업은 실행기를 통해 엄격한 권한 검증 수행
-  - 5단계 권한 체인: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+  - 3단계 분기 권한 체인: UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL)
   - 모든 권한 결정을 완전한 감사 로그로 기록
 
 ### AI 및 지식
@@ -40,11 +40,11 @@
 ### 웹 인터페이스
 - **모던 Web UI** — 내장 HTTP 서버, SSE 실시간 업데이트 지원
 - **7가지 스킨 테마** — 관리자 버전, 채팅 버전, 창작 버전, 개발 버전, 고대비, 라이트, 미니멀, 자동 감지 및 전환 지원
-- **20개 이상 컨트롤러** — 완전한 시스템 관리, 채팅, 설정, 모니터링 기능
+- **23개 컨트롤러** — 완전한 시스템 관리, 채팅, 설정, 모니터링 기능
 - **프론트엔드 프레임워크 의존성 제로** — `H`, `CssBuilder`, `JsBuilder`를 통해 서버에서 HTML/CSS/JS 생성
 
 ### 국제화 및 지역화
-- **29 개 언어 구현** 전면 지원, 2 가지 문자 시스템과 여러 지역 변형 커버
+- **33 개 언어 변형** 전면 지원, 2 가지 문자 시스템과 여러 지역 변형 커버
   - **중국어 간체**：zh-CN (중국 본토), zh-SG (싱가포르), zh-MY (말레이시아) (3 개)
   - **중국어 번체**：zh-HK (홍콩), zh-TW (대만), zh-MO (마카오) (3 개)
   - **영어**：en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 개)
@@ -52,6 +52,7 @@
   - **독일어**：de-DE, de-AT, de-CH, de-LU, de-LI (5 개)
   - **프랑스어**：fr-FR, fr-CA, fr-CH (3 개)
   - **일본어**：ja-JP | **한국어**：ko-KR | **체코어**：cs-CZ (3 개)
+  - **이탈리아어**：it-IT | **폴란드어**：pl-PL | **포르투갈어**：pt-PT, pt-BR (4 개)
 
 ### 데이터 및 스토리지
 - **SpeedyPack 고성능 스토리지** — Fast 버전에서 자체 개발 .spk 스토리지 엔진 사용, 메모리 디렉토리 매핑 + 항목 캐시 + 비동기 쓰기 큐
@@ -83,7 +84,7 @@
   - 극한 성능 최적화
   - Windows/macOS 시스템 트레이 백그라운드 실행, 트레이 상태 창 실시간 모니터링; Linux 상태 창 직접 표시 지원
   - SpeedyPack 엔진 + 자동 압축으로 데이터 보안 보장
-  - Component UI 아키텍처, 30개 이상의 선언형 컴포넌트
+  - Component UI 아키텍처, 27개 선언형 컴포넌트
   - 7가지 스킨 테마, 자동 감지 및 전환 지원
   - 핫 리로드 도구로 온라인 업데이트 및 재시작 지원
 - **성능 향상**: 저장소 읽기 지연 시간 1000배 감소, 쓰기 지연 시간 15000배 감소, 동시 실행 처리 능력 50배 향상
@@ -111,9 +112,9 @@
 
 | 구성 요소 | SiliconLife.Default | SiliconLife.Fast |
 |------|---------------------|------------------|
-| 런타임 | .NET 9 | .NET 9 Windows |
+| 런타임 | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | 프로그래밍 언어 | C# | C# |
-| 애플리케이션 유형 | 콘솔 애플리케이션 | Windows 폼 애플리케이션 |
+| 애플리케이션 유형 | 콘솔 애플리케이션 | 데스크톱 애플리케이션 (Windows/macOS 시스템 트레이 / Linux 상태 창) |
 | AI 통합 | Ollama (로컬), 알리바바 클라우드 Bailian (클라우드) | Ollama (로컬), 알리바바 클라우드 Bailian (클라우드), Volcengine Ark (클라우드) |
 | 데이터 스토리지 | 파일 시스템 (JSON + 시간 인덱스 디렉토리) | SpeedyPack (.spk 형식, 메모리 매핑 + 비동기 영속화) |
 | 웹 서버 | HttpListener (.NET 내장) | HttpListener (.NET 내장) |
@@ -153,11 +154,11 @@ SiliconLifeCollective.sln
 │   ├── SiliconLife.Common/                # 공유 구현 (두 버전 공용)
 │   │   ├── AI/                            # AI 클라이언트 및 팩토리 (Ollama, DashScope, VolcengineArk)
 │   │   ├── Calendar/                      # 32가지 달력 구현
-│   │   ├── Localization/                  # 지역화 베이스 클래스 및 29개 언어/지역 변형 구현
+│   │   ├── Localization/                  # 지역화 베이스 클래스 및 33개 언어/지역 변형 구현
 │   │   ├── Resources/                     # 공유 리소스 파일
 │   │   ├── Security/                      # 권한 관리자
 │   │   ├── SiliconBeing/                  # 기본 실리콘 생명체 구현
-│   │   ├── Tools/                         # 23개 일반 도구 구현 (핫 리로드 도구 포함)
+│   │   ├── Tools/                         # 24개 일반 도구 구현 (핫 리로드 도구 포함)
 │   │   ├── Web/                           # Web 기반 시설
 │   │   └── WebView/                       # Playwright WebView 구현
 │   │
@@ -166,8 +167,8 @@ SiliconLifeCollective.sln
 │   │   ├── Data/                          # 데이터 디렉토리
 │   │   ├── Help/                          # 도움말 문서 지역화 (다국어)
 │   │   └── Web/                           # Web UI 구현
-│   │       ├── Component/                 # UI 컴포넌트 라이브러리 (30+ 컴포넌트)
-│   │       ├── Controllers/               # 22개 컨트롤러
+│   │       ├── Component/                 # UI 컴포넌트 라이브러리 (27개 컴포넌트)
+│   │       ├── Controllers/               # 23개 컨트롤러
 │   │       ├── Models/                    # 뷰 모델
 │   │       ├── Views/                     # HTML 뷰
 │   │       └── Skins/                     # 7가지 스킨 테마
@@ -183,8 +184,9 @@ SiliconLifeCollective.sln
 │   │   ├── Storage/                       # 파일 시스템 스토리지 구현
 │   │   └── Tools/                         # 버전별 도구 구현 (HelpTool)
 │   │
-│   ├── SiliconLife.Fast/                  # 고성능 구현 + 애플리케이션 진입점 (폼 버전)
-│   │   ├── Program.cs                     # 진입점 (폼 애플리케이션)
+│   ├── SiliconLife.Fast/                  # 고성능 구현 + 애플리케이션 진입점 (데스크톱 버전)
+│   │   ├── Program.cs                     # 진입점 (데스크톱 애플리케이션)
+│   │   ├── App.axaml / App.cs             # Avalonia 애플리케이션 정의
 │   │   ├── Config/                        # 설정 데이터 (Default와 공유)
 │   │   ├── IM/                            # WebUI 제공자
 │   │   ├── Knowledge/                     # 지식 네트워크 구현 (메모리 최적화)
@@ -193,7 +195,7 @@ SiliconLifeCollective.sln
 │   │   ├── Security/                      # 최적화 권한 콜백
 │   │   ├── Storage/                       # SpeedyPack 스토리지 어댑터
 │   │   ├── Tools/                         # 버전별 도구 구현 (HelpTool)
-│   │   └── Tray/                          # 시스템 트레이 (29개 언어 변형 지역화)
+│   │   └── Tray/                          # 시스템 트레이 (33개 언어 변형 지역화)
 │   │
 │   ├── SiliconLife.Speedy/                # SpeedyPack 고성능 스토리지 엔진
 │   │   ├── SpeedyPack.cs                  # 핵심 클래스 (메모리 디렉토리 매핑 + 캐시 + 비동기 쓰기)
@@ -212,8 +214,9 @@ SiliconLifeCollective.sln
 │   │       ├── SpkHeader.cs               # 팩 파일 헤더
 │   │       └── PathNormalizer.cs          # 경로 정규화
 │   │
-│   └── SiliconLife.Speedy.Manager/        # SpeedyPack 관리 도구 (Windows Forms)
-│       ├── MainForm.cs                    # 메인 폼
+│   └── SiliconLife.Speedy.Manager/        # SpeedyPack 관리 도구 (Avalonia UI)
+│       ├── MainWindow.axaml               # 메인 윈도우
+│       ├── MainWindow.axaml.cs            # 메인 윈도우 로직
 │       ├── Program.cs                     # 진입점
 │       └── slc.ico                        # 애플리케이션 아이콘
 │
@@ -248,7 +251,7 @@ SiliconLifeCollective.sln
 모든 AI가 시작하는 I/O 작업은 엄격한 보안 체인을 통과해야 합니다:
 
 ```
-도구 호출 → 실행기 → 권한 관리자 → [IsCurator → 주파수 캐시 → 글로벌 ACL → 콜백 → 사용자에게 문의]
+도구 호출 → 실행기 → 권한 관리자 → [주파수 캐시 → 콜백 → (IsCurator: 사용자에게 문의 | Non-curator: 글로벌 ACL)]
 ```
 
 ## 🚀 빠른 시작
@@ -284,13 +287,13 @@ dotnet run --project src/SiliconLife.Default
 - ✅ 데이터 양이 적고 단기 사용
 - ✅ 개발 디버깅 단계
 
-#### 방식 2: Fast 버전 실행 (Windows 폼 애플리케이션)
+#### 방식 2: Fast 버전 실행 (크로스 플랫폼 데스크톱 애플리케이션)
 
 ```bash
 dotnet run --project src/SiliconLife.Fast
 ```
 
-애플리케이션이 폼 모드로 시작되어 시스템 트레이로 최소화되고 백그라운드에서 지속 실행됩니다.
+애플리케이션이 데스크톱 모드로 시작되어 시스템 트레이로 최소화되고 백그라운드에서 지속 실행됩니다.
 
 **적용 시나리오**:
 - ✅ 높은 동시 실행 시나리오 (> 5 사용자)
@@ -328,12 +331,12 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] 단계 3: 첫 번째 소울 파일 포함 실리콘 생명체 (신체-두뇌 아키텍처)
 - [x] 단계 4: 영속성 메모리 (채팅 시스템 + 시간 스토리지 인터페이스)
 - [x] 단계 5: 도구 시스템 + 실행기
-- [x] 단계 6: 권한 시스템 (5단계 체인, 감사 로거, 글로벌 액세스 제어 목록)
+- [x] 단계 6: 권한 시스템 (3단계 분기 체인, 감사 로거, 글로벌 액세스 제어 목록)
 - [x] 단계 7: 동적 컴파일 + 자가 진화 (Roslyn)
 - [x] 단계 8: 장기 메모리 + 작업 + 타이머
 - [x] 단계 9: 핵심 호스트 + 멀티 에이전트 협업
-- [x] 단계 10: Web UI (HTTP + SSE, 20개 이상 컨트롤러, 7가지 스킨)
-- [x] 단계 10.5: 점진적 향상 (브로드캐스트 채널, Token 감사, 32개 달력, 도구 향상, 29개 언어 지역화)
+- [x] 단계 10: Web UI (HTTP + SSE, 23개 컨트롤러, 7가지 스킨)
+- [x] 단계 10.5: 점진적 향상 (브로드캐스트 채널, Token 감사, 32개 달력, 도구 향상, 33개 언어 변형 지역화)
 - [x] 단계 10.6: 완성 및 최적화 (WebView, 도움말 시스템, 프로젝트 워크스페이스, 지식 네트워크)
 - [x] 단계 11: SpeedyPack 스토리지 엔진 (LiteDB 교체, 메모리 매핑, 비동기 쓰기 큐, 자동 압축)
 - [x] 단계 12: 플러그인 시스템 (IPlugin 인터페이스, PluginLoader 보안 샌드박스, 격리 로딩, 도구 통합)

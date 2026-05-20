@@ -409,7 +409,7 @@
 
 #### 프로젝트 인프라
 - `2664b0c` - 프로젝트 인프라 및 종속성 업데이트
-  - SiliconLife.Speedy.Manager에 새 WPF 관리 인터페이스 추가 (MainForm.Designer.cs, MainForm.resx)
+  - SiliconLife.Speedy.Manager에 새 Avalonia 관리 인터페이스 추가
   - 새 slc.ico 아이콘 리소스 추가 (1.5MB)
   - PluginLoader 보안 스캔 대폭 강화 (622행 추가)
   - 새 PermissionedStreamFactory 권한 스트림 팩토리 추가 (779행)
@@ -500,7 +500,7 @@
     - SpkFileInfo 파일 정보 클래스
     - Internal 디렉토리: DirectoryMap, EntryCache, PackFileReader, PackFileWriter, WriteQueue, WriteOperation, SpeedyTransaction, SpkHeader, PathNormalizer, FreeList
     - 이진 직렬화를 위한 MessagePack 3.1.4 종속성 (LZ4 압축)
-  - **새 SiliconLife.Speedy.Manager 프로젝트**: WPF 관리 도구
+  - **새 SiliconLife.Speedy.Manager 프로젝트**: Avalonia 관리 도구
     - MVVM 아키텍처: MainViewModel, DirectoryTreeViewModel, ContentViewerViewModel 등
     - 서비스 계층: PackService, FileDialogService, RecentFilesService, NotificationService
     - 변환기: BoolToVisibility, ByteSizeToString, ContentTypeToIcon, NullToCollapsed
@@ -623,9 +623,9 @@
 
 #### SiliconLife.Fast 고성능 버전
 - `54a0307` - SiliconLife.Fast 프로젝트 추가 및 컴파일 오류 수정 완료
-  - 완전한 Windows 폼 애플리케이션 엔트리 포인트
+  - 완전한 크로스 플랫폼 데스크톱 애플리케이션 엔트리 포인트 (Windows / macOS / Linux)
   - 시스템 트레이 지원 (NotifyIcon)
-  - 모든 Web UI 컨트롤러 이식 (20+개)
+  - 모든 Web UI 컨트롤러 이식 (23개)
   - 모든 Web 뷰 컴포넌트 이식
   - 4가지 스킨 테마 이식 (Admin, Chat, Creative, Dev)
   - 125개의 파일 변경, 61186행 추가

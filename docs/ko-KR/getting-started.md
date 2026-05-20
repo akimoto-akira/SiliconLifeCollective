@@ -114,7 +114,7 @@ cd src/SiliconLife.Fast
 dotnet run
 ```
 
-**Windows/macOS**: 애플리케이션이 양식 모드로 시작되어 시스템 트레이로 최소화되며, 웹 서버도 `http://localhost:8080`에서 시작됩니다.
+**Windows/macOS**: 애플리케이션이 데스크톱 모드로 시작되어 시스템 트레이로 최소화되며, 웹 서버도 `http://localhost:8080`에서 시작됩니다.
 
 **Linux**: 애플리케이션이 상태 창을 표시하고 (시스템 트레이 아이콘 없음) 브라우저를 자동으로 열어 Web UI에 접속합니다. `--no-tray` 매개변수로 브라우저 자동 실행을 건너뛸 수 있습니다:
 
@@ -179,7 +179,7 @@ You are a helpful assistant specializing in code review.
 
 ### 도구 시스템
 
-생명체는 다양한 작업을 수행하기 위해 23개의 내장 도구에 접근할 수 있습니다:
+생명체는 다양한 작업을 수행하기 위해 24개의 내장 도구에 접근할 수 있습니다:
 
 - **캘린더 도구** - 32가지 달력 시스템 지원
 - **채팅 도구** - 생명체 간 통신
@@ -195,13 +195,11 @@ You are a helpful assistant specializing in code review.
 
 ### 권한 시스템
 
-모든 AI 시작 작업은 5단계 권한 체인을 통과합니다:
+모든 AI 시작 작업은 3단계 분기 권한 체인을 통과합니다:
 
-1. **IsCurator** - 큐레이터 권한 확인
-2. **사용자 빈도 캐시** - 자주 사용하는 결정 캐싱
-3. **글로벌 ACL** - 전역 액세스 제어 목록
-4. **권한 콜백** - 커스텀 권한 로직
-5. **사용자에게 문의** - 사용자 확인 필요
+1. **UserFrequencyCache** - 사용자 고빈도 결정 캐시 (고거부/고허용)
+2. **IPermissionCallback** - 맞춤형 권한 콜백 (허용/거부/AskUser)
+3. **IsCurator 분기** - 큐레이터: IPermissionAskHandler (사용자에게 문의) / 비큐레이터: GlobalACL → 기본 거부
 
 ### 지식 네트워크
 
@@ -272,10 +270,10 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Common/          # 공유 구현 (두 버전 모두 사용)
 │   ├── SiliconLife.App/             # Default와 Fast가 공유하는 애플리케이션 계층
 │   ├── SiliconLife.Default/         # 기본 구현 + 진입점 (콘솔 버전)
-│   ├── SiliconLife.Fast/            # 고성능 구현 + 진입점 (폼 버전)
+│   ├── SiliconLife.Fast/            # 고성능 구현 + 진입점 (데스크톱 버전)
 │   ├── SiliconLife.Speedy/          # SpeedyPack 고성능 스토리지 엔진
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 관리 도구 (Windows Forms)
-├── docs/                            # 문서 (다국어, 29개 언어 변형)
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 관리 도구 (Avalonia)
+├── docs/                            # 문서 (다국어, 33개 언어 변형)
 │   ├── en/                          # 영어
 │   ├── zh-CN/                       # 간체 중국어
 │   ├── zh-HK/                       # 번체 중국어

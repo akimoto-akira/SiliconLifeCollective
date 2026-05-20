@@ -708,13 +708,11 @@
 
 ## 권한 검증
 
-모든 도구 실행은 5단계 권한 체인을 통과합니다:
+모든 도구 실행은 3단계 분기 권한 체인을 통과합니다:
 
-1. **IsCurator** — 실리콘 큐레이터는 모든 검사 우회
-2. **UserFrequencyCache** — 사용자 고빈도 허용/거부 캐시
-3. **GlobalACL** — 글로벌 접근 제어 목록
-4. **IPermissionCallback** — 맞춤형 권한 콜백 함수
-5. **IPermissionAskHandler** — 사용자에게 문의
+1. **UserFrequencyCache** — 사용자 고빈도 허용/거부 캐시
+2. **IPermissionCallback** — 맞춤형 권한 콜백 함수 (허용/거부/AskUser)
+3. **IsCurator 분기** — 큐레이터: IPermissionAskHandler (사용자에게 문의) / 비큐레이터: GlobalACL → 기본 거부
 
 ## 맞춤형 도구 만들기
 

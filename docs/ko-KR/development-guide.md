@@ -18,7 +18,7 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # 기본 구현, 진입점 (아키텍처 실현 가능성 검증)
 │   ├── SiliconLife.Fast/            # 고성능 구현, 진입점 (주력 프로덕션 버전)
 │   ├── SiliconLife.Speedy/          # SpeedyPack 고성능 스토리지 엔진
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 관리 도구 (Windows Forms)
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 관리 도구 (Avalonia)
 └── docs/                            # 다국어 문서
 ```
 
@@ -55,9 +55,9 @@ public interface ITool
 
 ### 3. 권한 시스템
 
-5단계 권한 검증 체인:
+3단계 분기 권한 검증 체인:
 ```
-IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+UserFrequencyCache → IPermissionCallback → IsCurator 분기 (큐레이터: AskHandler / 비큐레이터: GlobalACL → 기본 거부)
 ```
 
 ### 4. 서비스 로케이터
@@ -265,7 +265,7 @@ public class MyPluginTool : ITool
 SiliconLife.Common/
 ├── AI/                    # AI 클라이언트 및 팩토리 구현
 ├── Calendar/              # 32가지 캘린더 구현
-├── Localization/          # 현지화 기본 클래스 및 29개 언어 구현
+├── Localization/          # 현지화 기본 클래스 및 33개 언어 구현
 ├── Security/              # 권한 관리자
 ├── SiliconBeing/          # 기본 실리콘 비잉 구현
 ├── Tools/                 # 공유 내장 도구

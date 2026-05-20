@@ -405,3 +405,36 @@
 2026-05-21T01:30:00+08:00 | catpaw | session_end | completed=task-214
 2026-05-21T08:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260521-0800 | task=task-215
 2026-05-21T08:00:00+08:00 | catpaw | task_claim | task=task-215 | type=docs | scope=修复日语文档与源代码不一致问题
+2026-05-21T08:05:00+08:00 | catpaw | file_modified | docs/ja-JP/tools-reference.md | fix=完全重写：24种工具完整文档、5级权限链正确描述
+2026-05-21T08:30:00+08:00 | catpaw | file_modified | docs/ja-JP/api-reference.md | fix=Chat API端点(/api/chat→/api/chat/send)、请求体(beingId→channelId)、添加conversations/messages/stop端点
+2026-05-21T08:45:00+08:00 | catpaw | file_modified | docs/ja-JP/architecture.md | fix=组件图添加PluginLoader和KnowledgeNetwork、语言变体数修正为33
+2026-05-21T09:00:00+08:00 | catpaw | file_modified | docs/ja-JP/getting-started.md | fix=DashScope默认区域修正(cn-hangzhou→beijing)、Speedy.Manager描述更新为Avalonia UI
+2026-05-21T09:15:00+08:00 | catpaw | file_modified | docs/ja-JP/development-guide.md | fix=UI框架引用修正(Windows Forms→Avalonia UI)、权限链深度修正
+2026-05-21T09:30:00+08:00 | catpaw | file_modified | docs/ja-JP/permission-system.md | fix=权限链5级→3级分支结构重写、IsCurator不再短路、超时60s→30min
+2026-05-21T09:45:00+08:00 | catpaw | file_modified | docs/ja-JP/security.md | fix=权限验证流程图重写、执行器架构(独立线程→静态类模型)、超时值修正
+2026-05-21T10:00:00+08:00 | catpaw | file_modified | docs/ja-JP/README.md | fix=权限链顺序修正、控制器数20+→23、语言数29→33、UI组件数30+→27
+2026-05-21T10:15:00+08:00 | catpaw | file_modified | docs/ja-JP/web-ui-guide.md | fix=ChatHistory API路由修正(路径参数→查询参数)
+2026-05-21T10:30:00+08:00 | catpaw | file_modified | docs/ja-JP/contributing.md | fix=Fast版技术栈修正(Windowsフォーム→Avalonia UI)、添加谢辞/许可证/下一步章节
+2026-05-21T10:45:00+08:00 | catpaw | file_modified | docs/ja-JP/promo.md | fix=日历系统数修正(30→32)、Fast版描述修正(Windowsアプリ→Avalonia UIアプリ)
+2026-05-21T11:00:00+08:00 | catpaw | file_modified | docs/ja-JP/roadmap.md | fix=Speedy.Manager修正(Windows Forms→Avalonia UI)、添加フェーズ3.6/4/10.6、フェーズ12.2标记完成、修复表格格式错误
+2026-05-21T11:15:00+08:00 | catpaw | file_modified | docs/ja-JP/silicon-being-guide.md | fix=作業ノートWeb UI管理步骤修正(プロジェクトページ→生命体管理→作業ノートタブ)
+2026-05-21T11:30:00+08:00 | catpaw | file_modified | docs/ja-JP/troubleshooting.md | fix=権限問題部分重写(添加症状示例和API解決策)、SSE問題添加症状描述、添加UI壊れ問題
+2026-05-21T12:00:00+08:00 | catpaw | task_complete | task=task-215 | files_modified=15 | summary=修复日语文档与源码不一致：权限链顺序、执行器架构、API端点、控制器数、DashScope配置、工具路径、超时值、Avalonia UI迁移、语言数33、Web UI路由、roadmap更新
+2026-05-21T12:00:00+08:00 | catpaw | session_end | sessionId=catpaw-20260521-0800 | completed=task-215 | commit=626ebc9
+2026-05-21T13:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260521-1300 | task=task-216
+2026-05-21T13:00:00+08:00 | catpaw | task_claim | task=task-216 | type=docs | scope=修复韩语文档与源代码不一致问题
+2026-05-21T14:00:00+08:00 | catpaw | file_modified | docs/ko-KR/README.md | fix=권한 체인 5단계→3단계 분기, 언어 수 29→33, 컨트롤러 수 20+→23, UI 컴포넌트 30+→27, Speedy.Manager WinForms→Avalonia, 폼 모드→데스크톱 모드
+2026-05-21T14:30:00+08:00 | catpaw | file_modified | docs/ko-KR/api-reference.md | fix=Chat API 엔드포인트(POST /api/chat→/api/chat/send), 요청 본문(beingId→channelId, message→content)
+2026-05-21T15:00:00+08:00 | catpaw | file_modified | docs/ko-KR/permission-system.md | fix=권한 체인 5단계 선형→3단계 분기 구조 재작성, IsCurator 단락 제거, GlobalACL 구조 추가
+2026-05-21T15:30:00+08:00 | catpaw | file_modified | docs/ko-KR/security.md | fix=권한 검증 흐름도 재작성, 실행기 아키텍처(독립 스레드→정적 클래스 모델), 큐레이터 역할 설명 수정
+2026-05-21T16:00:00+08:00 | catpaw | file_modified | docs/ko-KR/architecture.md | fix=컨트롤러 수 22→23, 언어 변형 29→33, UI 컴포넌트 30+→27, Speedy.Manager WPF→Avalonia
+2026-05-21T16:15:00+08:00 | catpaw | file_modified | docs/ko-KR/development-guide.md | fix=권한 체인 3단계 분기, Speedy.Manager Avalonia, 33개 언어, 32가지 캘린더
+2026-05-21T16:30:00+08:00 | catpaw | file_modified | docs/ko-KR/getting-started.md | fix=권한 체인 3단계 분기, 24개 내장 도구, 양식 모드→데스크톱 모드, 폼 버전→데스크톱 버전
+2026-05-21T16:45:00+08:00 | catpaw | file_modified | docs/ko-KR/tools-reference.md | fix=권한 검증 3단계 분기 체인
+2026-05-21T17:00:00+08:00 | catpaw | file_modified | docs/ko-KR/web-ui-guide.md | fix=언어 변형 33개
+2026-05-21T17:15:00+08:00 | catpaw | file_modified | docs/ko-KR/contributing.md | fix=Fast 버전 Windows 양식→크로스 플랫폼 데스크톱(Avalonia), 적합한 사람 Windows→크로스 플랫폼
+2026-05-21T17:30:00+08:00 | catpaw | file_modified | docs/ko-KR/promo.md | fix=Fast 버전 고성능 Windows→크로스 플랫폼 데스크톱(Windows/macOS/Linux)
+2026-05-21T17:45:00+08:00 | catpaw | file_modified | docs/ko-KR/roadmap.md | fix=Speedy.Manager Windows Forms→Avalonia
+2026-05-21T18:00:00+08:00 | catpaw | file_modified | docs/ko-KR/changelog.md | fix=WPF→Avalonia, Windows 폼→크로스 플랫폼 데스크톱, 컨트롤러 20+→23
+2026-05-21T18:00:00+08:00 | catpaw | task_complete | task=task-216 | files_modified=13 | summary=修复韩语文档与源码不一致：权限链3级分支、执行器架构、API端点、控制器数23、Avalonia迁移、语言数33、工具数24、UI组件27、跨平台描述
+2026-05-21T18:00:00+08:00 | catpaw | session_end | sessionId=catpaw-20260521-1300 | completed=task-216

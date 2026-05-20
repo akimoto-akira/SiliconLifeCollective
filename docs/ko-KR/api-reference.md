@@ -68,13 +68,13 @@
 
 ### 메시지 보내기
 
-**POST** `/api/chat`
+**POST** `/api/chat/send`
 
 **요청**:
 ```json
 {
-  "beingId": "being-uuid",
-  "message": "Hello, how are you?",
+  "channelId": "channel-uuid",
+  "content": "Hello, how are you?",
   "sessionId": "optional-session-id"
 }
 ```
@@ -90,7 +90,15 @@
 
 ### 스트리밍 채팅 (SSE)
 
-**GET** `/api/chat/stream?beingId={id}&message={msg}`
+**POST** `/api/chat/stream`
+
+**요청**:
+```json
+{
+  "channelId": "channel-uuid",
+  "content": "Hello, how are you?"
+}
+```
 
 **응답**: 서버 전송 이벤트 스트림
 
@@ -103,7 +111,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ### 채팅 기록 가져오기
 
-**GET** `/api/chat/{sessionId}/history`
+**GET** `/api/chat-history/{beingId}/conversations`
+
+세션 목록을 가져옵니다.
+
+**GET** `/api/chat-history/{beingId}/conversation/{conversationId}`
+
+특정 세션의 메시지 세부정보를 가져옵니다.
 
 **응답**:
 ```json
@@ -507,7 +521,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 ### 채팅 이벤트
 
 ```javascript
-const eventSource = new EventSource('/api/chat/stream?beingId=xxx&message=xxx');
+const eventSource = new EventSource('/api/chat/stream');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);
