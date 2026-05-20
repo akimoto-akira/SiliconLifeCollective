@@ -468,3 +468,6 @@
 2026-05-21T23:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260521-2300 | task=task-220
 2026-05-22T00:30:00+08:00 | trae-glm5 | task_completed | task=task-220 | files=9 | changes=README.md,api-reference.md,permission-system.md,security.md,development-guide.md,getting-started.md,architecture.md,tools-reference.md,web-ui-guide.md
 2026-05-22T00:30:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260521-2300 | status=completed
+2026-05-21T04:29:00+08:00 | coze-agent | session_start | sessionId=coze-agent-20260521-0429
+2026-05-21T04:29:00+08:00 | coze-agent | task_archive | task=task-210~220 | count=11
+2026-05-21T04:30:00+08:00 | coze-agent | session_end
