@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-20T03:54:00+08:00",
+  "lastUpdated": "2026-05-20T15:30:00+08:00",
   "tasks": [
     {
       "id": "task-201",
@@ -99,12 +99,26 @@
       "assignedTo": "coze-agent",
       "relatedCommit": null,
       "completedAt": "2026-05-20T04:10:00+08:00"
+    },
+    {
+      "id": "task-208",
+      "type": "feature",
+      "target": "src/SiliconLife.Common/Localization/, src/SiliconLife.Core/Localization/, src/SiliconLife.Common/Calendar/ChineseHistorical/, src/SiliconLife.Fast/Tray/, docs/pt-PT/",
+      "title": "添加葡萄牙语（pt-PT + pt-BR）完整本地化支持",
+      "description": "按照《添加新语言流程.md》文档，为项目添加葡萄牙语完整本地化支持。包括：1) Language 枚举添加 PtPT 和 PtBR；2) 创建 PtPT.cs 核心本地化实现（~1800行，覆盖所有UI文本、日历、权限规则、代码编辑器提示、记忆系统等）；3) 创建 PtOther.cs 包含 PtBR 巴西葡萄牙语变体；4) 创建 ChineseHistoricalPtPT.cs 翻译28个朝代和296个年号；5) 创建 TrayPtPT.cs 和 TrayPtOther.cs 系统托盘本地化；6) 在 SiliconLife.Fast/Program.cs 和 SiliconLife.Default/Program.cs 中注册 PtPT 和 PtBR 本地化；7) 创建 docs/pt-PT/ 目录下16个文档文件（README、troubleshooting、api-reference、architecture、calendar-system、changelog、contributing、development-guide、getting-started、permission-system、security、tools-reference、web-ui-guide、roadmap、promo、silicon-being-guide）；8) 更新所有语言的 README.md 添加葡萄牙语导航链接",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-20T10:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": "aa7b586",
+      "completedAt": "2026-05-20T15:30:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": ["task-201", "task-202", "task-203", "task-204", "task-205", "task-206", "task-207"],
+    "completed": ["task-201", "task-202", "task-203", "task-204", "task-205", "task-206", "task-207", "task-208"],
     "cancelled": []
   },
   "metadata": {

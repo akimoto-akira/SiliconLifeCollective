@@ -4,7 +4,7 @@
 
 **Versione: v0.2.0-alpha** | **Silicon Life Collective** — Una piattaforma di collaborazione multi-agente basata su .NET 9, dove gli agenti IA sono chiamati **Silicon Beings** e possono auto-evolversi attraverso la compilazione dinamica Roslyn.
 
-[English](../README.md) | [Deutsch](../de-DE/README.md) | [Français](../fr-FR/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Čeština](../cs-CZ/README.md) | **Italiano** | [Polski](../pl-PL/README.md)
+[English](../README.md) | [Deutsch](../de-DE/README.md) | [Français](../fr-FR/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Čeština](../cs-CZ/README.md) | **Italiano** | [Polski](../pl-PL/README.md) | [Português](../pt-PT/README.md)
 
 ## 🌟 Funzionalità principali
 

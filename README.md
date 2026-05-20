@@ -19,6 +19,7 @@ Choose your preferred language:
 - **[Français](docs/fr-FR/README.md)**
 - **[Italiano](docs/it-IT/README.md)**
 - **[Polski](docs/pl-PL/README.md)**
+- **[Português](docs/pt-PT/README.md)**
 
 ## Quick Links
 

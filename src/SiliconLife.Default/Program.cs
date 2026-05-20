@@ -332,6 +332,10 @@ public class Program
         
         // Italian
         LocalizationManager.Instance.Register<ItIT>(Language.ItIT);
+
+        // Portuguese
+        LocalizationManager.Instance.Register<PtPT>(Language.PtPT);
+        LocalizationManager.Instance.Register<PtBR>(Language.PtBR);
     }
 
     public static void RequestExit()

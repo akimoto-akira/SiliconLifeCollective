@@ -171,5 +171,15 @@ public enum Language
     /// <summary>
     /// Polish (Poland)
     /// </summary>
-    PlPL
+    PlPL,
+
+    /// <summary>
+    /// Portuguese (Portugal)
+    /// </summary>
+    PtPT,
+
+    /// <summary>
+    /// Portuguese (Brazil)
+    /// </summary>
+    PtBR
 }
