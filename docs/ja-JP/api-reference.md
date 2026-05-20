@@ -10,87 +10,39 @@
 
 ### 認証
 
-ほとんどのエンドポイントは、Web UI によって管理されるセッションクッキーを介した認証が必要です。
+ほとんどのエンドポイントは、Web UI によって管理されるセッションクッキーを介した認証が必要です。システム初期化前は、ヘルプページを除くすべてのリクエストが初期化ページにリダイレクトされます。
 
 ---
 
-## シリコンビーイング管理
+## ダッシュボード
 
-### すべての生命体を取得
+### ダッシュボード統計データを取得
 
-**GET** `/api/beings`
+**GET** `/api/dashboard/stats`
 
-**レスポンス**：
-```json
-{
-  "beings": [
-    {
-      "id": "being-uuid",
-      "name": "Assistant",
-      "status": "running",
-      "soul": "path/to/soul.md"
-    }
-  ]
-}
-```
+システム概要データ（生命体数、稼働状況など）を返します。
 
-**ステータス値**：`idle` | `running` | `waiting_permission` | `stopped`
+### パフォーマンスメトリクスを取得
 
-### 生命体を作成
+**GET** `/api/dashboard/metrics`
 
-**POST** `/api/beings`
-
-**リクエスト**：
-```json
-{
-  "name": "New Being",
-  "soul": "# Personality\nYou are helpful..."
-}
-```
-
-**レスポンス**：`201 Created`
-
-### 生命体を開始
-
-**POST** `/api/beings/{id}/start`
-
-### 生命体を停止
-
-**POST** `/api/beings/{id}/stop`
-
-### 生命体の詳細を取得
-
-**GET** `/api/beings/{id}`
+リアルタイムのパフォーマンスメトリクスデータを返します。
 
 ---
 
 ## チャットシステム
 
-### メッセージを送信
+### チャットページ
 
-**POST** `/api/chat`
+**GET** `/chat`
 
-**リクエスト**：
-```json
-{
-  "beingId": "being-uuid",
-  "message": "Hello, how are you?",
-  "sessionId": "optional-session-id"
-}
-```
+チャットインターフェースのページを返します。
 
-**レスポンス**（非ストリーミング）：
-```json
-{
-  "reply": "I'm doing well, thank you!",
-  "sessionId": "session-uuid",
-  "timestamp": "2026-04-20T10:30:00Z"
-}
-```
+### ストリームチャット（SSE）
 
-### チャットをストリーム（SSE）
+**GET** `/api/chat/stream`
 
-**GET** `/api/chat/stream?beingId={id}&message={msg}`
+サーバー送信イベント（SSE）によるストリームチャット。
 
 **レスポンス**：Server-Sent Events ストリーム
 
@@ -101,76 +53,323 @@ data: {"type": "chunk", "content": " thinking..."}
 data: {"type": "complete", "sessionId": "uuid"}
 ```
 
-### チャット履歴を取得
+### セッションリストを取得
 
-**GET** `/api/chat/{sessionId}/history`
+**GET** `/api/chat/conversations`
 
-**レスポンス**：
+すべてのアクティブなチャットセッションのリストを返します。
+
+**レスポンス例**：
 ```json
 {
-  "messages": [
+  "conversations": [
     {
-      "role": "user",
-      "content": "Hello",
-      "timestamp": "2026-04-20T10:30:00Z"
-    },
-    {
-      "role": "assistant",
-      "content": "Hi there!",
-      "timestamp": "2026-04-20T10:30:05Z"
+      "sessionId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
+      "beingId": "being-uuid",
+      "type": "single",
+      "displayName": "小遊とのチャット",
+      "lastMessage": "最後のメッセージ内容",
+      "lastTime": "2026-05-20T10:30:00Z"
     }
   ]
 }
 ```
 
----
+### メッセージ履歴を取得
 
-## 設定
+**GET** `/api/chat/messages`
 
-### 設定を取得
+クエリパラメータ：`channelId` — チャンネル/セッション ID
 
-**GET** `/api/config`
+指定されたセッションのメッセージ履歴を返します。
+
+### チャット履歴を取得
+
+**GET** `/api/chat/history`
+
+グローバルチャット履歴を返します。
+
+### メッセージを送信
+
+**POST** `/api/chat/send`
+
+**リクエストボディ**：
+```json
+{
+  "channelId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
+  "content": "テストメッセージ内容"
+}
+```
 
 **レスポンス**：
 ```json
 {
-  "aiClients": {
-    "Ollama": {
-      "baseUrl": "http://localhost:11434",
-      "model": "qwen2.5:7b"
-    }
-  },
-  "storage": {
-    "basePath": "./data"
-  }
+  "success": true,
+  "messageId": "50156b26-f3b9-4735-be3d-51e547bd3a4a"
 }
 ```
 
-### 設定を更新
+### AI 思考を停止
 
-**POST** `/api/config`
+**POST** `/api/chat/stop`
 
-**リクエスト**：
+現在進行中の AI レスポンス生成を停止します。
+
+**リクエストボディ**：
 ```json
 {
-  "aiClients": {
-    "Ollama": {
-      "baseUrl": "http://localhost:11434",
-      "model": "qwen2.5:14b"
+  "channelId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d"
+}
+```
+
+### ファイルをアップロード
+
+**POST** `/api/chat/upload`
+
+チャットセッションにファイルをアップロードします（multipart/form-data 対応）。
+
+---
+
+## シリコンビーイング管理
+
+### 生命体管理ページ
+
+**GET** `/beings`
+
+シリコン生命体管理インターフェースのページを返します。
+
+### 生命体リストを取得
+
+**GET** `/api/beings` または **GET** `/api/beings/list`
+
+すべての登録済みシリコン生命体のリストを返します。
+
+**レスポンス例**：
+```json
+{
+  "beings": [
+    {
+      "id": "being-uuid",
+      "name": "Assistant",
+      "status": "running",
+      "soulPath": "path/to/soul.md"
     }
+  ]
+}
+```
+
+**ステータス値**：`idle` | `running` | `waiting_permission` | `stopped`
+
+### 生命体詳細を取得
+
+**GET** `/api/beings/detail`
+
+クエリパラメータ：`beingId` — 生命体 ID
+
+指定された生命体の詳細情報を返します。
+
+### 生命体活動状態を取得
+
+**GET** `/api/beings/activity`
+
+各生命体の活動状態情報を返します。
+
+### ソウルファイルエディタページ
+
+**GET** `/beings/soul`
+
+ソウルファイルエディタインターフェースを返します。
+
+### ソウルファイルを保存
+
+**POST** `/api/beings/soul/save`
+
+**リクエストボディ**：
+```json
+{
+  "beingId": "being-uuid",
+  "soulContent": "# Personality\nYou are helpful..."
+}
+```
+
+### AI 設定エディタページ
+
+**GET** `/beings/ai-config`
+
+AI 設定エディタインターフェースを返します。
+
+### AI 設定を保存
+
+**POST** `/api/beings/ai-config/save`
+
+**リクエストボディ**：
+```json
+{
+  "beingId": "being-uuid",
+  "aiClientType": "DashScope",
+  "config": {
+    "apiKey": "...",
+    "region": "beijing",
+    "model": "qwen3.6-plus"
   }
 }
 ```
+
+### 利用可能な AI モデルリストを取得
+
+**GET** `/api/beings/ai-config/models`
+
+クエリパラメータ：`clientType`, `apiKey`, `region`
+
+指定された AI クライアントの利用可能なモデルリストを返します。
+
+---
+
+## チャット履歴閲覧
+
+### チャット履歴ページ
+
+**GET** `/chat-history`
+
+チャット履歴メインページを返します。
+
+### チャット履歴詳細ページ
+
+**GET** `/chat-history-detail`
+
+指定されたセッションのチャット履歴詳細ページを返します。
+
+### グループチャット履歴詳細ページ
+
+**GET** `/group-chat-history-detail`
+
+グループチャットの履歴詳細ページを返します。
+
+### ブロードキャスト履歴詳細ページ
+
+**GET** `/broadcast-history-detail`
+
+ブロードキャストチャンネルの履歴詳細ページを返します。
+
+### 履歴セッションリストを取得
+
+**GET** `/api/chat-history/conversations`
+
+すべての履歴セッションリストを返します。
+
+### 履歴メッセージを取得
+
+**GET** `/api/chat-history/messages`
+
+クエリパラメータ：`sessionId` — セッション ID
+
+指定された履歴セッションのメッセージ記録を返します。
+
+---
+
+## タイマー管理
+
+### タイマーページ
+
+**GET** `/timers`
+
+タイマー管理インターフェースのページを返します。
+
+### タイマーリストを取得
+
+**GET** `/api/timers/list`
+
+すべてのタイマーのリストを返します。
+
+### タイマーサイクル詳細ページ
+
+**GET** `/timer-cycles/{timerId}`
+
+指定されたタイマーの実行サイクル詳細ページを返します。
+
+### タイマーサイクルリストを取得
+
+**GET** `/api/timer-cycles/list`
+
+クエリパラメータ：`timerId` — タイマー ID
+
+指定されたタイマーのすべての実行サイクルリストを返します。
+
+### 単一実行サイクル詳細ページ
+
+**GET** `/timer-cycle/{cycleIndex}`
+
+単一実行の詳細ページを返します。
+
+### サイクルメッセージを取得
+
+**GET** `/api/timer-cycle/messages`
+
+クエリパラメータ：`cycleIndex` — サイクルインデックス
+
+指定された実行サイクルの関連メッセージを返します。
+
+---
+
+## タスク管理
+
+### タスクページ
+
+**GET** `/tasks`
+
+タスク管理インターフェースのページを返します。
+
+### タスクリストを取得
+
+**GET** `/api/tasks/list`
+
+すべてのタスクのリストを返します。
+
+### タスクサイクル詳細ページ
+
+**GET** `/task-cycles/{taskId}`
+
+指定されたタスクの実行サイクル詳細ページを返します。
+
+### タスクサイクルリストを取得
+
+**GET** `/api/task-cycles/list`
+
+クエリパラメータ：`taskId` — タスク ID
+
+指定されたタスクのすべての実行サイクルリストを返します。
+
+### 単一実行サイクル詳細ページ
+
+**GET** `/task-cycle/{cycleIndex}`
+
+単一タスク実行の詳細ページを返します。
+
+### サイクルメッセージを取得
+
+**GET** `/api/task-cycle/messages`
+
+クエリパラメータ：`cycleIndex` — サイクルインデックス
+
+指定されたタスク実行サイクルの関連メッセージを返します。
 
 ---
 
 ## 権限システム
 
-### 権限を取得
+### 権限管理ページ
 
-**GET** `/api/permissions`
+**GET** `/permissions`
 
-**レスポンス**：
+権限管理インターフェースのページを返します。
+
+### 権限ルールリストを取得
+
+**GET** `/api/permissions/list`
+
+現在設定されているすべての権限ルールを返します。
+
+**レスポンス例**：
 ```json
 {
   "rules": [
@@ -184,11 +383,11 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 権限を付与
+### 権限ルールを保存
 
-**POST** `/api/permissions`
+**POST** `/api/permissions/save`
 
-**リクエスト**：
+**リクエストボディ**：
 ```json
 {
   "userId": "user-uuid",
@@ -198,112 +397,72 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 権限を取り消し
+### 権限リクエストページ
 
-**DELETE** `/api/permissions/{id}`
+**GET** `/permission/request`
 
-### 権限をチェック
+権限リクエストページを表示し、ユーザーがシリコン生命体の権限リクエストを承認または拒否できるようにします。
 
-**POST** `/api/permissions/check`
+**クエリパラメータ**：
 
-**リクエスト**：
-```json
-{
-  "userId": "user-uuid",
-  "resource": "network:http"
-}
-```
+|| パラメータ | タイプ | 説明 |
+||------|------|------|
+|| `userId` | `Guid` | 権限をリクエストするシリコン生命体 ID |
+|| `type` | `string` | 権限タイプ |
+|| `resource` | `string` | リクエストするリソースパス |
+|| `allowCode` | `string` | 許可操作のコード識別子 |
+|| `denyCode` | `string` | 拒否操作のコード識別子 |
+
+### 保留中の権限リクエストを確認
+
+**GET** `/permission/check`
+
+クエリパラメータ：`userId` — シリコン生命体 ID
 
 **レスポンス**：
 ```json
 {
-  "allowed": true,
-  "reason": "Granted by curator"
+  "pending": true
+}
+```
+
+### 権限リクエストに応答
+
+**GET** `/permission/respond`
+
+**クエリパラメータ**：
+
+|| パラメータ | タイプ | 説明 |
+||------|------|------|
+|| `userId` | `Guid` | シリコン生命体 ID |
+|| `allowed` | `bool` | 許可するかどうか |
+|| `addToCache` | `bool` | 決定をキャッシュするかどうか |
+|| `cacheDuration` | `double` | キャッシュ期間（時間） |
+
+**レスポンス**：
+```json
+{
+  "success": true
 }
 ```
 
 ---
 
-## タスク＆タイマーシステム
+## ログシステム
 
-### タスクを作成
+### ログページ
 
-**POST** `/api/tasks`
+**GET** `/logs`
 
-**リクエスト**：
-```json
-{
-  "beingId": "being-uuid",
-  "description": "Review code",
-  "priority": 5,
-  "dueDate": "2026-04-21T12:00:00Z"
-}
-```
+ログ閲覧インターフェースのページを返します。
 
-### タスクを取得
+### ログリストを取得
 
-**GET** `/api/tasks?beingId={id}&status=pending`
+**GET** `/api/logs/list`
 
-### タスクステータスを更新
+クエリパラメータでレベル、時間範囲によるフィルタリングをサポートします。
 
-**PATCH** `/api/tasks/{id}`
-
-**リクエスト**：
-```json
-{
-  "status": "completed"
-}
-```
-
-### タイマーを作成
-
-**POST** `/api/timers`
-
-**リクエスト**：
-```json
-{
-  "beingId": "being-uuid",
-  "interval": 3600,
-  "action": "think",
-  "repeat": true
-}
-```
-
-### タイマーを削除
-
-**DELETE** `/api/timers/{id}`
-
----
-
-## 監査＆ログ
-
-### トークン使用を取得
-
-**GET** `/api/audit/tokens?startDate={date}&endDate={date}`
-
-**レスポンス**：
-```json
-{
-  "summary": {
-    "totalTokens": 150000,
-    "promptTokens": 100000,
-    "completionTokens": 50000,
-    "totalCost": 0.15
-  },
-  "byModel": {
-    "qwen2.5:7b": {
-      "tokens": 100000,
-      "cost": 0.10
-    }
-  }
-}
-```
-
-### ログを取得
-
-**GET** `/api/logs?level=error&limit=100`
-
-**レスポンス**：
+**レスポンス例**：
 ```json
 {
   "logs": [
@@ -317,61 +476,651 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
+### 生命体別ロググループを取得
+
+**GET** `/api/logs/beings`
+
+シリコン生命体別にグループ化されたログ統計を返します。
+
+### 利用可能なログレベルを取得
+
+**GET** `/api/logs/levels`
+
+システムで利用可能なログレベルのリストを返します。
+
 ---
 
-## ストレージ API
+## 使用統計
 
-### 値を読み取り
+### 使用統計ページ
 
-**GET** `/api/storage?key={key}`
+**GET** `/usage`
 
-**レスポンス**：
+使用統計インターフェースのページを返します。
+
+### 使用サマリーを取得
+
+**GET** `/api/usage/summary`
+
+トークン使用量と費用のサマリーを返します。
+
+### トレンドデータを取得
+
+**GET** `/api/usage/trend`
+
+クエリパラメータ：`startDate`, `endDate`
+
+指定された期間の使用トレンドデータを返します。
+
+### 使用データをエクスポート
+
+**GET** `/api/usage/export`
+
+使用データをダウンロード可能な形式でエクスポートします。
+
+---
+
+## 監査トレイル
+
+### 監査ページ
+
+**GET** `/audit`
+
+監査トレイルインターフェースのページを返します。
+
+### 監査リストを取得
+
+**GET** `/api/audit/list`
+
+監査ログエントリのリストを返します。
+
+### 監査サマリーを取得
+
+**GET** `/api/audit/summary`
+
+監査データの集計統計を返します。
+
+### 生命体別監査グループを取得
+
+**GET** `/api/audit/beings`
+
+シリコン生命体別にグループ化された監査統計を返します。
+
+---
+
+## 設定管理
+
+### 設定ページ
+
+**GET** `/config`
+
+システム設定インターフェースのページを返します。
+
+### 設定を保存
+
+**POST** `/config/save`
+
+**リクエストボディ**：
 ```json
 {
-  "key": "being:uuid:memory",
-  "value": "{...}",
-  "timestamp": "2026-04-20T10:30:00Z"
-}
-```
-
-### 値を書き込み
-
-**POST** `/api/storage`
-
-**リクエスト**：
-```json
-{
-  "key": "being:uuid:memory",
-  "value": "{...}"
-}
-```
-
-### 時間範囲でクエリ
-
-**GET** `/api/storage/time?start={start}&end={end}&prefix={prefix}`
-
-**レスポンス**：
-```json
-{
-  "entries": [
-    {
-      "key": "being:uuid:chat:2026-04-20",
-      "value": "{...}",
-      "timestamp": "2026-04-20T10:30:00Z"
+  "language": "ZhCN",
+  "port": 8080,
+  "aiClients": {
+    "Ollama": {
+      "baseUrl": "http://localhost:11434",
+      "model": "qwen2.5:7b"
+    },
+    "DashScope": {
+      "apiKey": "...",
+      "region": "beijing",
+      "model": "qwen3.6-plus"
     }
-  ]
+  }
+}
+```
+
+### AI 設定オプションを取得
+
+**GET** `/config/aioptions`
+
+利用可能な AI クライアントタイプとその動的オプション（利用可能なモデル、リージョンなど）を返します。
+
+---
+
+## メモリシステム
+
+### メモリページ
+
+**GET** `/memory`
+
+メモリ管理インターフェースのページを返します。
+
+### メモリリストを取得
+
+**GET** `/api/memory/list`
+
+シリコン生命体のメモリエントリリストを返します。
+
+### メモリ詳細を取得
+
+**GET** `/api/memory/detail/{id}`
+
+パスパラメータ：`id` — メモリエントリ ID
+
+指定されたメモリエントリの完全な内容を返します。
+
+### メモリ統計を取得
+
+**GET** `/api/memory/stats`
+
+メモリシステムの統計情報を返します。
+
+### メモリを検索
+
+**GET** `/api/memory/search`
+
+クエリパラメータ：`keyword` — 検索キーワード
+
+一致するメモリエントリを検索します。
+
+### 生命体別メモリグループを取得
+
+**GET** `/api/memory/beings`
+
+シリコン生命体別にグループ化されたメモリ統計を返します。
+
+### メモリトレースを取得
+
+**GET** `/api/memory/trace/{id}`
+
+パスパラメータ：`id` — メモリエントリ ID
+
+指定されたメモリエントリのソーストレースチェーンを返します。
+
+### メモリタイムライン HTML を取得
+
+**GET** `/api/memory/timeline-html`
+
+メモリタイムラインの HTML ビューを返します。
+
+---
+
+## 作業ノート
+
+### 作業ノートページ
+
+**GET** `/work-notes`
+
+作業ノートインターフェースのページを返します。
+
+### 作業ノートリストを取得
+
+**GET** `/api/work-notes/list`
+
+作業ノートのリストを返します。
+
+### 作業ノートを読み取り
+
+**GET** `/api/work-notes/read`
+
+クエリパラメータ：`noteId` — ノート ID
+
+指定されたノートの内容を返します。
+
+### ノート目次を取得
+
+**GET** `/api/work-notes/directory`
+
+ノートのディレクトリ構造を返します。
+
+### 作業ノートを検索
+
+**GET** `/api/work-notes/search`
+
+クエリパラメータ：`keyword` — 検索キーワード
+
+一致する作業ノートを検索します。
+
+### 作業ノートを作成
+
+**POST** `/api/work-notes/create`
+
+**リクエストボディ**：
+```json
+{
+  "title": "ノートタイトル",
+  "content": "ノート内容",
+  "keywords": ["キーワード1", "キーワード2"]
+}
+```
+
+### 作業ノートを更新
+
+**POST** `/api/work-notes/update`
+
+**リクエストボディ**：
+```json
+{
+  "noteId": "note-uuid",
+  "title": "更新後のタイトル",
+  "content": "更新後の内容"
+}
+```
+
+### 作業ノートを削除
+
+**POST** `/api/work-notes/delete`
+
+**リクエストボディ**：
+```json
+{
+  "noteId": "note-uuid"
 }
 ```
 
 ---
 
-## システム情報
+## ナレッジネットワーク
 
-### バージョン情報を取得
+### ナレッジネットワークページ
+
+**GET** `/knowledge`
+
+ナレッジネットワーク管理インターフェースのページを返します。
+
+### ナレッジグラフを取得
+
+**GET** `/api/knowledge/graph`
+
+ナレッジトリプルグラフデータ（主語-関係-目的語）を返します。
+
+---
+
+## プロジェクト管理
+
+### プロジェクトページ
+
+**GET** `/project`
+
+プロジェクト管理インターフェースのページを返します。
+
+### プロジェクト作業ノートページ
+
+**GET** `/project/{id}/work-notes`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトの作業ノートページを返します。
+
+### プロジェクトタスクページ
+
+**GET** `/project/{id}/tasks`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトのタスク管理ページを返します。
+
+### プロジェクトリストを取得
+
+**GET** `/api/projects/list`
+
+すべてのプロジェクトのリストを返します。
+
+### プロジェクトワークフローテンプレートリストを取得
+
+**GET** `/api/projects/list-workflow-templates`
+
+利用可能なワークフローテンプレートのリストを返します。
+
+### プロジェクトを作成
+
+**POST** `/api/projects/create`
+
+**リクエストボディ**：
+```json
+{
+  "name": "My Project",
+  "description": "Project description"
+}
+```
+
+### プロジェクトをアーカイブ
+
+**POST** `/api/projects/{id}/archive`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトをアーカイブします。
+
+### プロジェクトを復元
+
+**POST** `/api/projects/{id}/restore`
+
+パスパラメータ：`id` — プロジェクト ID
+
+アーカイブ済みのプロジェクトを復元します。
+
+### プロジェクトを破棄
+
+**POST** `/api/projects/{id}/destroy`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトを永久に削除します（復元不可）。
+
+### プロジェクト詳細を取得
+
+**GET** `/api/projects/detail`
+
+クエリパラメータ：`projectId` — プロジェクト ID
+
+プロジェクトの詳細情報を返します。
+
+### プロジェクトを更新
+
+**POST** `/api/projects/update`
+
+**リクエストボディ**：
+```json
+{
+  "projectId": "project-uuid",
+  "name": "Updated Name",
+  "description": "Updated description"
+}
+```
+
+### メンバーをプロジェクトに割り当て
+
+**POST** `/api/projects/assign`
+
+**リクエストボディ**：
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid"
+}
+```
+
+### メンバーをプロジェクトから削除
+
+**POST** `/api/projects/remove`
+
+**リクエストボディ**：
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid"
+}
+```
+
+### プロジェクト作業ノートリストを取得
+
+**GET** `/api/projects/{id}/work-notes/list`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトの作業ノートリストを返します。
+
+### プロジェクト作業ノートを読み取り
+
+**GET** `/api/projects/{id}/work-notes/read`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトの作業ノート内容を返します。
+
+### プロジェクト作業ノートを作成
+
+**POST** `/api/projects/{id}/work-notes/create`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトに新しい作業ノートを作成します。
+
+### プロジェクト作業ノートを更新
+
+**POST** `/api/projects/{id}/work-notes/update`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトの作業ノートを更新します。
+
+### プロジェクト作業ノートを削除
+
+**POST** `/api/projects/{id}/work-notes/delete`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトの作業ノートを削除します。
+
+### プロジェクトタスクリストを取得
+
+**GET** `/api/projects/{id}/tasks/list`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトのタスクリストを返します。
+
+### プロジェクトタスクを作成
+
+**POST** `/api/projects/{id}/tasks/create`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトに新しいタスクを作成します。
+
+### プロジェクトタスクを更新
+
+**POST** `/api/projects/{id}/tasks/update`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトのタスクを更新します。
+
+### プロジェクトタスクを削除
+
+**POST** `/api/projects/{id}/tasks/delete`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトのタスクを削除します。
+
+### タスク担当者を割り当て
+
+**POST** `/api/projects/{id}/tasks/assign`
+
+パスパラメータ：`id` — プロジェクト ID
+
+プロジェクトタスクに担当者を割り当てます。
+
+### タスク担当者を削除
+
+**POST** `/api/projects/{id}/tasks/remove-assignee`
+
+パスパラメータ：`id` — プロジェクト ID
+
+プロジェクトタスクの担当者を削除します。
+
+### タスクを完了としてマーク
+
+**POST** `/api/projects/{id}/tasks/complete`
+
+パスパラメータ：`id` — プロジェクト ID
+
+プロジェクトタスクを完了としてマークします。
+
+### タスクを失敗としてマーク
+
+**POST** `/api/projects/{id}/tasks/fail`
+
+パスパラメータ：`id` — プロジェクト ID
+
+プロジェクトタスクを失敗としてマークします。
+
+### タスクをキャンセル
+
+**POST** `/api/projects/{id}/tasks/cancel`
+
+パスパラメータ：`id` — プロジェクト ID
+
+プロジェクトタスクをキャンセルします。
+
+---
+
+## 実行器管理
+
+### 実行器ページ
+
+**GET** `/executor`
+
+実行器管理インターフェースのページを返します。
+
+### 実行器ステータスを取得
+
+**GET** `/api/executors/status`
+
+各実行器（ディスク、ネットワーク、コマンドライン）の稼働状態を返します。
+
+---
+
+## コードブラウザ
+
+### コードブラウザページ
+
+**GET** `/code`
+
+コードブラウザインターフェースのページを返します。
+
+### コードタイプリストを取得
+
+**GET** `/api/code/types`
+
+サポートされているコードタイプ/言語のリストを返します。
+
+### コード詳細を取得
+
+**GET** `/api/code/detail`
+
+クエリパラメータ：`filePath`, `lineNumber`
+
+指定されたファイルのコード詳細を返します。
+
+---
+
+## コードホバー
+
+### ホバー情報を取得
+
+**GET** `/api/code/hover`
+**POST** `/api/code/hover`
+
+コード位置のホバー情報を取得します（IDE のインテリセンスのような機能）。
+
+### コード位置を登録
+
+**POST** `/api/code/register`
+
+監視が必要なコード位置を登録します。
+
+### コード位置を更新
+
+**POST** `/api/code/update`
+
+登録済みのコード位置情報を更新します。
+
+### コード位置を登録解除
+
+**POST** `/api/code/unregister`
+
+不要になったコード位置監視を登録解除します。
+
+---
+
+## ヘルプドキュメントシステム
+
+### ヘルプページ
+
+**GET** `/help` または **GET** `/help/index`
+
+ヘルプドキュメントのメインページを返します。
+
+### ヘルプトピックページ
+
+**GET** `/help/{topic}`
+
+パスパラメータ：`topic` — トピック識別子
+
+指定されたトピックのヘルプドキュメントページを返します。
+
+### ヘルプドキュメントを検索
+
+**GET** `/api/help/search`
+
+クエリパラメータ：`keyword` — 検索キーワード
+
+一致するヘルプドキュメントトピックを検索します。
+
+---
+
+## 初期化
+
+### 初期化ウィザードページ
+
+**GET** `/init`
+
+初回起動時の初期化ウィザードページを返します。
+
+### 初期化を送信
+
+**POST** `/init`
+
+初回起動時の初期化設定を送信します。
+
+### データディレクトリの参照選択
+
+**GET** `/init/browse`
+
+データ保存場所を選択するためのディレクトリブラウザを開きます。
+
+### AI 設定メタデータを取得
+
+**GET** `/init/ai-config-metadata`
+
+利用可能な AI クライアントタイプとその設定フィールドメタデータを返します。
+
+---
+
+## システム制御
+
+### グレースフルシャットダウン
+
+**POST** `/api/system/shutdown`
+
+> **注意**：localhost からのリクエストのみ許可されています
+
+アプリケーションのグレースフルシャットダウンをトリガーします：
+
+1. メインループ（MainLoop）を停止
+2. 現在の設定を保存
+3. HTTP リスナーを閉じる
+
+**レスポンス**：
+```json
+{
+  "status": "shutting_down",
+  "message": "Application is shutting down gracefully"
+}
+```
+
+---
+
+## バージョン情報
+
+### バージョン情報ページ
 
 **GET** `/about`
 
-バージョン情報ページを返します。システム情報と読み込み済みプラグインリストを含みます。
+システム情報と読み込み済みプラグインリストを含むバージョン情報ページを返します。
 
 **プラグインリストデータ**：
 ```json
@@ -384,91 +1133,6 @@ data: {"type": "complete", "sessionId": "uuid"}
       "author": "Author Name"
     }
   }
-}
-```
-
-### 権限リクエスト
-
-**GET** `/permission/request?userId={id}&type={type}&resource={resource}`
-
-権限リクエストページを表示し、ユーザーがシリコン生命体の権限リクエストを承認または拒否できるようにします。
-
-**クエリパラメータ**：
-
-| パラメータ | タイプ | 説明 |
-|------|------|------|
-| `userId` | `Guid` | 権限をリクエストするシリコン生命体 ID |
-| `type` | `string` | 権限タイプ |
-| `resource` | `string` | リクエストするリソースパス |
-| `allowCode` | `string` | 許可操作のコード識別子 |
-| `denyCode` | `string` | 拒否操作のコード識別子 |
-
-**保留中の権限リクエストを確認**：
-
-**GET** `/permission/check?userId={id}`
-
-**レスポンス**：
-```json
-{
-  "pending": true
-}
-```
-
-**権限リクエストに応答**：
-
-**GET** `/permission/respond?userId={id}&allowed={bool}&addToCache={bool}&cacheDuration={hours}`
-
-**クエリパラメータ**：
-
-| パラメータ | タイプ | 説明 |
-|------|------|------|
-| `userId` | `Guid` | シリコン生命体 ID |
-| `allowed` | `bool` | 許可するかどうか |
-| `addToCache` | `bool` | 決定をキャッシュするかどうか |
-| `cacheDuration` | `double` | キャッシュ期間（時間） |
-
-**レスポンス**：
-```json
-{
-  "success": true
-}
-```
-
-### ダッシュボードデータを取得
-
-**GET** `/api/dashboard`
-
-**レスポンス**：
-```json
-{
-  "beings": {
-    "total": 5,
-    "running": 3,
-    "stopped": 2
-  },
-  "performance": {
-    "cpu": 45.2,
-    "memory": 1024,
-    "uptime": 86400
-  },
-  "aiUsage": {
-    "todayTokens": 50000,
-    "todayCost": 0.05
-  }
-}
-```
-
-### システムステータスを取得
-
-**GET** `/api/status`
-
-**レスポンス**：
-```json
-{
-  "version": "1.0.0",
-  "runtime": ".NET 9.0",
-  "uptime": 86400,
-  "health": "healthy"
 }
 ```
 
@@ -490,13 +1154,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ### 一般的なエラーコード
 
-| コード | HTTP ステータス | 説明 |
-|------|-------------|-------------|
-| `PERMISSION_DENIED` | 403 | 権限不足 |
-| `NOT_FOUND` | 404 | リソースが見つからない |
-| `VALIDATION_ERROR` | 400 | リクエストパラメータが無効 |
-| `INTERNAL_ERROR` | 500 | 内部サーバーエラー |
-| `SERVICE_UNAVAILABLE` | 503 | AI サービスが利用不可 |
+|| コード | HTTP ステータス | 説明 |
+||------|-------------|-------------|
+|| `PERMISSION_DENIED` | 403 | 権限不足 |
+|| `NOT_FOUND` | 404 | リソースが見つからない |
+|| `VALIDATION_ERROR` | 400 | リクエストパラメータが無効 |
+|| `INTERNAL_ERROR` | 500 | 内部サーバーエラー |
+|| `SERVICE_UNAVAILABLE` | 503 | AI サービスが利用不可 |
 
 ---
 
@@ -507,7 +1171,7 @@ Server-Sent Events はリアルタイム更新に使用されます：
 ### チャットイベント
 
 ```javascript
-const eventSource = new EventSource('/api/chat/stream?beingId=xxx&message=xxx');
+const eventSource = new EventSource('/api/chat/stream');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);
@@ -529,20 +1193,9 @@ eventSource.onmessage = (event) => {
 };
 ```
 
-### 生命体ステータスイベント
-
-```javascript
-const beingEvents = new EventSource('/api/beings/events');
-
-beingEvents.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  console.log(`生命体 ${data.beingId} ステータス：${data.status}`);
-};
-```
-
 ---
 
-## AI クライアント API
+## AI クライアントインターフェース
 
 ### IAIClient インターフェース
 
@@ -584,7 +1237,7 @@ public class AIResponse
 
 ---
 
-## ツールシステム API
+## ツールシステムインターフェース
 
 ### ITool インターフェース
 
@@ -623,228 +1276,9 @@ public class ToolResult
 
 ---
 
-## 作業ノート API
-
-### 作業ノートリスト取得
-
-**GET** `/api/beings/{id}/work-notes`
-
-**レスポンス**:
-```json
-{
-  "notes": [
-    {
-      "id": "note-uuid",
-      "pageNumber": 1,
-      "summary": "ユーザー認証モジュール完了",
-      "keywords": ["認証", "JWT", "OAuth2"],
-      "createdAt": "2026-04-25T10:00:00Z",
-      "updatedAt": "2026-04-25T10:00:00Z"
-    }
-  ],
-  "totalCount": 15
-}
-```
-
-### 単一ノート詳細取得
-
-**GET** `/api/beings/{id}/work-notes/{pageNumber}`
-
-**レスポンス**:
-```json
-{
-  "id": "note-uuid",
-  "pageNumber": 1,
-  "summary": "ユーザー認証モジュール完了",
-  "content": "## 実装詳細\n\n- JWT token使用\n- OAuth2対応",
-  "keywords": ["認証", "JWT", "OAuth2"],
-  "createdAt": "2026-04-25T10:00:00Z",
-  "updatedAt": "2026-04-25T10:00:00Z"
-}
-```
-
-### 新規ノート作成
-
-**POST** `/api/beings/{id}/work-notes`
-
-**リクエスト**:
-```json
-{
-  "summary": "ユーザー認証モジュール完了",
-  "content": "## 実装詳細\n\n- JWT token使用",
-  "keywords": "認証,JWT,OAuth2"
-}
-```
-
-**レスポンス**: `201 Created`
-
-### ノート更新
-
-**PUT** `/api/beings/{id}/work-notes/{pageNumber}`
-
-**リクエスト**:
-```json
-{
-  "summary": "ユーザー認証モジュールおよびテスト完了",
-  "content": "## 更新後の内容\n\nユニットテスト追加",
-  "keywords": "認証,JWT,OAuth2,テスト"
-}
-```
-
-### ノート削除
-
-**DELETE** `/api/beings/{id}/work-notes/{pageNumber}`
-
-### ノート検索
-
-**GET** `/api/beings/{id}/work-notes/search?keyword=認証&maxResults=10`
-
-### ノート目次取得
-
-**GET** `/api/beings/{id}/work-notes/directory`
-
----
-
-## ナレッジネットワーク API
-
-### ナレッジ統計取得
-
-**GET** `/api/knowledge/stats`
-
-**レスポンス**:
-```json
-{
-  "totalTriples": 1523,
-  "totalSubjects": 450,
-  "totalPredicates": 85,
-  "totalObjects": 892,
-  "averageConfidence": 0.87
-}
-```
-
-### ナレッジトリプル追加
-
-**POST** `/api/knowledge/triples`
-
-**リクエスト**:
-```json
-{
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language",
-  "confidence": 0.95,
-  "tags": ["programming", "language"]
-}
-```
-
-**レスポンス**: `201 Created`
-
-### ナレッジ照会
-
-**GET** `/api/knowledge/query?subject=Python&predicate=is_a`
-
-**レスポンス**:
-```json
-{
-  "triples": [
-    {
-      "subject": "Python",
-      "predicate": "is_a",
-      "object": "programming_language",
-      "confidence": 0.95,
-      "tags": ["programming", "language"]
-    }
-  ]
-}
-```
-
-### ナレッジ検索
-
-**GET** `/api/knowledge/search?query=programming+language&limit=10`
-
-### ナレッジパス取得
-
-**GET** `/api/knowledge/path?from=Python&to=computer_science`
-
-**レスポンス**:
-```json
-{
-  "path": [
-    {"subject": "Python", "predicate": "is_a", "object": "programming_language"},
-    {"subject": "programming_language", "predicate": "belongs_to", "object": "computer_science"}
-  ],
-  "length": 2
-}
-```
-
-### ナレッジ検証
-
-**POST** `/api/knowledge/validate`
-
-**リクエスト**:
-```json
-{
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language"
-}
-```
-
-### ナレッジ削除
-
-**DELETE** `/api/knowledge/triples/{id}`
-
----
-
-## プロジェクト管理 API
-
-### プロジェクトリスト取得
-
-**GET** `/api/projects`
-
-**レスポンス**:
-```json
-{
-  "projects": [
-    {
-      "id": "project-uuid",
-      "name": "My Project",
-      "description": "Project description",
-      "createdAt": "2026-04-25T10:00:00Z"
-    }
-  ]
-}
-```
-
-### プロジェクト作成
-
-**POST** `/api/projects`
-
-**リクエスト**:
-```json
-{
-  "name": "My Project",
-  "description": "Project description"
-}
-```
-
-### プロジェクト詳細取得
-
-**GET** `/api/projects/{id}`
-
-### プロジェクト更新
-
-**PUT** `/api/projects/{id}`
-
-### プロジェクト削除
-
-**DELETE** `/api/projects/{id}`
-
----
-
 ## 次のステップ
 
-- 🚀 [はじめにガイド](getting-started.md)を確認
+- 🚀 [クイックスタートガイド](getting-started.md)を確認
 - 🛠️ [開発ガイド](development-guide.md)を読む
 - 📚 [アーキテクチャドキュメント](architecture.md)を確認
 - 🔒 [セキュリティモデル](security.md)を理解

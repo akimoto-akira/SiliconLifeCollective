@@ -74,11 +74,13 @@ dotnet build
     "DashScope": {
       "ApiKey": "your-api-key-here",
       "Model": "qwen-plus",
-      "Region": "cn-hangzhou"
+      "Region": "beijing"
     }
   }
 }
 ```
+
+> **利用可能なリージョン**：`beijing`（北京）、`virginia`（バージニア）、`singapore`（シンガポール）、`hongkong`（香港）、`frankfurt`（フランクフルト）
 
 #### オプション C：Volcengine Ark（クラウド）
 
@@ -226,8 +228,8 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # デフォルト実装 + エントリーポイント（コンソール版）
 │   ├── SiliconLife.Fast/            # 高性能実装 + エントリーポイント（フォーム版）
 │   ├── SiliconLife.Speedy/          # SpeedyPack 高性能ストレージエンジン
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理ツール（Windows Forms）
-├── docs/                      # ドキュメント（多言語、29種類の言語バリアント）
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理ツール（Avalonia UI）
+├── docs/                      # ドキュメント（多言語、33種類の言語バリアント）
 │   ├── en/                    # 英語
 │   ├── zh-CN/                 # 簡体字中国語
 │   ├── zh-HK/                 # 繁体字中国語

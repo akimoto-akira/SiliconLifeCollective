@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-21T01:30:00+08:00",
+  "lastUpdated": "2026-05-21T08:00:00+08:00",
   "tasks": [
     {
       "id": "task-210",
@@ -69,7 +69,7 @@
       "createdAt": "2026-05-20T12:04:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "catpaw",
-      "relatedCommit": "ccb9be1",
+      "relatedCommit": "48d061b",
       "completedAt": "2026-05-21T01:30:00+08:00"
     },
     {
@@ -79,12 +79,12 @@
       "title": "修复日语文档与源代码不一致问题",
       "description": "对照 src/ 源代码，系统性检查 docs/ja-JP/ 下所有 16 个文档文件与源码的一致性。参照 task-209 修复 zh-CN 的方法执行。\n\n重点检查项：\n1. api-reference.md：验证所有 API 端点是否存在于 src/SiliconLife.App/Web/Controllers/，请求体格式是否正确\n2. README.md：权限链顺序、语言数、控制器数、工具数、UI 组件数、目录结构描述是否与源码匹配\n3. permission-system.md：权限验证流程是否与 PermissionManager.cs 一致\n4. security.md：权限验证流程、主理人角色描述、执行器分类是否准确\n5. development-guide.md：依赖方向、权限链顺序、工具创建路径、目录结构是否正确\n6. getting-started.md：DashScope Region 值、项目描述是否准确\n7. 其他文档：检查代码引用、配置示例、功能描述是否与当前源码一致\n\n要求：保持Japanese的自然表达，不要机械翻译；修复所有不一致；确保文档准确反映当前源码",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-20T12:04:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null,
+      "assignedTo": "catpaw",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-21T12:00:00+08:00"
     },
     {
       "id": "task-216",
@@ -159,7 +159,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-215",
       "task-216",
       "task-217",
       "task-218",
@@ -167,6 +166,7 @@
     ],
     "inProgress": [],
     "completed": [
+      "task-215",
       "task-214",
       "task-219",
       "task-210",

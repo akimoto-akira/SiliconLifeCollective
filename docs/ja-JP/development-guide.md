@@ -18,13 +18,13 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # デフォルト実装、エントリーポイント（アーキテクチャ実現可能性検証）
 │   ├── SiliconLife.Fast/            # 高性能実装、エントリーポイント（主力本番バージョン）
 │   ├── SiliconLife.Speedy/          # SpeedyPack 高性能ストレージエンジン
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理ツール（Windows Forms）
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理ツール（Avalonia UI）
 └── docs/                            # 多言語ドキュメント
 ```
 
 **依存方向**：
-- `SiliconLife.Default` → `SiliconLife.Core`（単方向）
-- `SiliconLife.Fast` → `SiliconLife.Core`（単方向）
+- `SiliconLife.Default` → `SiliconLife.Common` → `SiliconLife.Core`
+- `SiliconLife.Fast` → `SiliconLife.Common` → `SiliconLife.Core`
 - `SiliconLife.Common` → `SiliconLife.Core`（単方向）
 
 **バージョン役割説明**：
@@ -57,7 +57,7 @@ public interface ITool
 
 5段階権限検証チェーン：
 ```
-IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | 非主理人: GlobalACL)
 ```
 
 ### 4. サービスロケーター
@@ -75,7 +75,9 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### 新ツールの追加
 
-1. `src/SiliconLife.Common/Tools/`（2つのバージョンで共有するツール）または `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/`（バージョン固有のツール）に新クラスを作成：
+1. `src/SiliconLife.Common/Tools/` に新クラスを作成（2つのバージョンで共有するツール）：
+
+> **注意**：`SiliconLife.Default` と `SiliconLife.Fast` には独立した `Tools/` ディレクトリはもうありません。すべての共有ツールは `SiliconLife.Common/Tools/` に統一されています。
 
 ```csharp
 public class MyCustomTool : ITool
@@ -265,7 +267,7 @@ public class MyCustomSkin : ISkin
 SiliconLife.Common/
 ├── AI/                    # AI クライアントとファクトリー実装
 ├── Calendar/              # 32種類のカレンダー実装
-├── Localization/          # ローカライゼーションベースクラスと29種類の言語実装
+├── Localization/          # ローカライゼーションベースクラスと33種類の言語変種実装
 ├── Security/              # 権限マネージャー
 ├── SiliconBeing/          # デフォルトシリコン生命体実装
 ├── Tools/                 # 共有の内蔵ツール
@@ -284,13 +286,10 @@ SiliconLife.App/          # Default と Fast で共有のアプリケーショ�
 
 SiliconLife.Default/      # バージョン固有ディレクトリ
 ├── Config/                # デフォルト設定データ
-├── IM/                    # WebUI 提供者
 ├── Knowledge/             # ナレッジネットワーク実装
-├── Logging/               # ログプロバイダー実装
+├── Logging/               # ログプロバイダー実装（コンソール + ファイルシステム）
 ├── Project/               # プロジェクトシステム実装
-├── Security/              # デフォルト権限コールバック
-├── Storage/               # ファイルシステムストレージ実装
-└── Tools/                 # バージョン固有のツール（HelpTool）
+└── Storage/               # ファイルシステムストレージ実装
 ```
 
 ### ドキュメント

@@ -8,38 +8,26 @@
 
 権限システムは、AI が開始するすべての操作が適切に検証および監査されることを保証します。
 
-## 5段階権限チェーン
+## 3段階分岐権限チェーン
 
 ```
 ┌─────────────────────────────────────────────┐
 │          権限検証                            │
 ├─────────────────────────────────────────────┤
-│  レベル 1：IsCurator                         │
-│  ↓ 真の場合はバイパス                         │
-│  レベル 2：UserFrequencyCache                │
-│  ↓ レートリミット                             │
-│  レベル 3：GlobalACL                         │
-│  ↓ アクセスコントロールリスト                 │
-│  レベル 4：IPermissionCallback               │
+│  レベル 1：UserFrequencyCache                │
+│  ↓ レートリミットキャッシュ                   │
+│  レベル 2：IPermissionCallback               │
 │  ↓ カスタムロジック                           │
-│  レベル 5：IPermissionAskHandler             │
-│  ↓ ユーザーに確認                             │
+│  レベル 3：分岐判断                           │
+│  ├─ IsCurator → IPermissionAskHandler        │
+│  │  ↓ 主理人：ユーザー確認を尋ねる             │
+│  └─ Non-curator → GlobalACL                  │
+│     ↓ 非主理人：アクセスコントロールリスト       │
 │  結果：許可または拒否                         │
 └─────────────────────────────────────────────┘
 ```
 
-## レベル 1：IsCurator
-
-管理者/管理人はすべての権限チェックをバイパス。
-
-```csharp
-if (user.IsCurator)
-{
-    return PermissionResult.Allowed("Curator access");
-}
-```
-
-## レベル 2：UserFrequencyCache
+## レベル 1：UserFrequencyCache
 
 ユーザーごとのレートリミットで不正使用を防止。
 
@@ -51,45 +39,13 @@ if (!cache.CheckLimit(userId, resource))
 }
 ```
 
-## レベル 3：GlobalACL
-
-グローバルアクセスコントロールリストが明確なルールを定義。
-
-### ACL 構造
-
-```json
-{
-  "rules": [
-    {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
-    }
-  ]
-}
-```
-
-### リソース形式
-
-```
-{type}:{action}
-
-例：
-- disk:read
-- disk:write
-- network:http
-- compile:execute
-- system:info
-```
-
-## レベル 4：IPermissionCallback
+## レベル 2：IPermissionCallback
 
 動的権限ロジック用のカスタムコールバック。
 
 ### DefaultPermissionCallback デフォルト実装
 
-`DefaultPermissionCallback` は包括的なデフォルト権限ルールを提供：
+`DefaultPermissionCallback` は包括的なデフォルト権限ルールを提供します：
 
 #### ネットワークアクセスルール
 - **ループバックアドレス**：localhost, 127.0.0.1, ::1 を許可
@@ -126,16 +82,71 @@ public class DefaultPermissionCallback : IPermissionCallback
 }
 ```
 
-## レベル 5：IPermissionAskHandler
+## レベル 3：分岐判断（IsCurator / GlobalACL）
 
-他のすべてのレベルが未決定の場合、ユーザーに権限を確認。
+レベル 1 とレベル 2 のいずれも決定を下さなかった場合、システムは呼び出し元の身分に基づいて分岐します：
+
+### 主理人分岐（IsCurator = true）
+
+呼び出し元が主理人の場合、`IPermissionAskHandler` を介してユーザー確認を求めます：
+
+```csharp
+if (IsCurator)
+{
+    if (_askHandler != null)
+    {
+        var result = await _askHandler.AskAsync(request);
+        // ユーザーが Web UI で承認または拒否
+    }
+}
+```
+
+### 非主理人分岐（IsCurator = false）
+
+呼び出し元が主理人でない場合、`GlobalACL` アクセスコントロールリストを確認します：
+
+### GlobalACL 構造
+
+```json
+{
+  "rules": [
+    {
+      "userId": "user-uuid",
+      "resource": "disk:read",
+      "allowed": true,
+      "expiresAt": "2026-04-21T00:00:00Z"
+    }
+  ]
+}
+```
+
+### リソース形式
+
+```
+{type}:{action}
+
+例：
+- disk:read
+- disk:write
+- network:http
+- compile:execute
+- system:info
+```
+
+## IPermissionAskHandler
+
+主理人の操作にユーザー確認が必要な場合、`IPermissionAskHandler` を通じてユーザーに権限を確認します。
+
+### IMPermissionAskHandler 実装
+
+`IMPermissionAskHandler` は Web UI を介してユーザーに権限リクエストを送信します：
 
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
 {
     public async Task<AskPermissionResult> AskAsync(PermissionRequest request)
     {
-        // IM を介してユーザーにメッセージを送信
+        // インスタントメッセージでユーザーにメッセージを送信
         await SendMessageAsync($"Allow {request.Resource}?");
         
         // ユーザーの応答を待機
@@ -150,13 +161,13 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 
 ### PermissionRequestQueue 権限リクエストキュー
 
-`PermissionRequestQueue` は保留中の権限リクエストを管理し、ユーザー応答の非同期待機をサポート：
+`PermissionRequestQueue` は保留中の権限リクエストを管理し、ユーザー応答の非同期待機をサポートします：
 
-- **リクエストのエンキュー** — 権限チェーンがレベル 5 に達した場合、`TaskCompletionSource<AskPermissionResult>` を作成してエンキュー
+- **リクエストのエンキュー** — 権限チェーンがレベル 3 の主理人分岐に達した場合、`TaskCompletionSource<AskPermissionResult>` を作成してエンキュー
 - **Web UI 表示** — `PermissionRequestController` を介して Web UI に保留中の権限リクエストを表示
 - **ユーザー応答** — ユーザーが Web UI で承認または拒否、決定のキャッシュとキャッシュ期間の設定が可能
 - **キャッシュオプション** — ユーザーは権限決定を 1 時間、24 時間、7 日間、または 30 日間キャッシュ可能
-- **タイムアウトメカニズム** — 60 秒間応答がない場合、リクエストページが自動的に閉じる
+- **タイムアウトメカニズム** — 30 分間応答がない場合、リクエストページが自動的に閉じる
 
 ## 監査システム
 
@@ -194,7 +205,7 @@ public PermissionResult EvaluatePermission(
 **評価順序**：
 1. **周波数キャッシュ** - キャッシュされたユーザー決定を確認
 2. **IPermissionCallback** - カスタムコールバック評価
-3. **管理人状態** - 管理人の場合、`AskUser` を返す（確認が必要）
+3. **主理人状態** - 主理人の場合、`AskUser` を返す（確認が必要）
 4. **グローバル ACL** - アクセスコントロールルールを確認
 5. **デフォルト** - ルールが一致しない場合、拒否
 
@@ -215,7 +226,7 @@ public PermissionResult EvaluatePermission(
 
 **API 経由**：
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "user-uuid",
@@ -227,14 +238,12 @@ curl -X POST http://localhost:8080/api/permissions \
 
 ### 権限の取消
 
-```bash
-curl -X DELETE http://localhost:8080/api/permissions/{rule-id}
-```
+Web UI の権限管理ページから操作します。
 
 ### 権限の表示
 
 ```bash
-curl http://localhost:8080/api/permissions?userId=user-uuid
+curl http://localhost:8080/api/permissions/list
 ```
 
 ## ベストプラクティス
@@ -293,9 +302,9 @@ public async Task<PermissionResult> CheckAsync(PermissionRequest request)
 AI：「config.json を読み取る必要があります」
 ↓
 権限チェーン：
-1. IsCurator？いいえ
-2. レートリミット？正常
-3. GlobalACL？ルール発見：disk:read = 許可
+1. レートリミット？正常
+2. コールバック？未決定を返す
+3. IsCurator？いいえ → GlobalACL？ルール発見：disk:read = 許可
 4. 結果：許可
 ```
 
@@ -305,12 +314,10 @@ AI：「config.json を読み取る必要があります」
 AI：「コードをコンパイルして実行したい」
 ↓
 権限チェーン：
-1. IsCurator？いいえ
-2. レートリミット？正常
-3. GlobalACL？ルールなし
-4. コールバック？未決定を返す
-5. ユーザーに確認？ユーザー承認
-6. 結果：許可
+1. レートリミット？正常
+2. コールバック？未決定を返す
+3. IsCurator？はい → IPermissionAskHandler → ユーザー承認
+4. 結果：許可
 ```
 
 ### シナリオ 3：レートリミット超過
@@ -319,9 +326,8 @@ AI：「コードをコンパイルして実行したい」
 AI：「100回の HTTP リクエストが必要です」
 ↓
 権限チェーン：
-1. IsCurator？いいえ
-2. レートリミット？超過
-3. 結果：拒否
+1. レートリミット？超過
+2. 結果：拒否
 ```
 
 ## トラブルシューティング

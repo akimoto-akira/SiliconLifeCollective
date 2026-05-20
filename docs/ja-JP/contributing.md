@@ -16,7 +16,7 @@ SiliconLifeCollective へのコントリビューションに興味をお寄せ�
 - **適した人**：すべての開発者
 
 ### SiliconLife.Fast（高性能バージョン）
-- **技術スタック**：.NET 9 Windowsフォームアプリ
+- **技術スタック**：.NET 9 Avalonia UI デスクトップアプリ
 - **コントリビューション方向**：パフォーマンス最適化、SpeedyPack ストレージ、システムトレイ、ロックフリー並行性
 - **適した人**：Windows開発経験があり、パフォーマンス最適化に興味がある開発者
 
@@ -396,3 +396,29 @@ git push --force-with-lease
 - 緊急事項の場合はメンテナーにメンション
 
 ご協力ありがとうございます！🎉
+
+---
+
+## 謝辞
+
+コントリビューターは以下の場所で認められます：
+- README.md コントリビューターセクション
+- リリースノート
+- プロジェクトドキュメント
+
+---
+
+## ライセンス
+
+コントリビューションを行うことで、あなたのコントリビューションが Apache 2.0 ライセンスの下でライセンスされることに同意したことになります。
+
+---
+
+## 次のステップ
+
+- 📚 [ドキュメント](../)を読む
+- 🐛 [オープンなイシュー](https://github.com/akimoto-akira/SiliconLifeCollective/issues)を確認
+- 💬 [ディスカッション](https://github.com/akimoto-akira/SiliconLifeCollective/discussions)を開始
+- 🚀 フォークしてコントリビューションを開始！
+
+SiliconLifeCollective へのコントリビューションに感謝します！🎉
