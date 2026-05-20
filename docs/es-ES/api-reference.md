@@ -68,42 +68,45 @@ La mayoría de los endpoints requieren autenticación a través de cookie de ses
 
 ### Enviar Mensaje
 
-**POST** `/api/chat`
+**POST** `/api/chat/send`
 
 **Solicitud**:
 ```json
 {
-  "beingId": "being-uuid",
-  "message": "Hello, how are you?",
-  "sessionId": "optional-session-id"
+  "channelId": "session-uuid",
+  "content": "Hello, how are you?"
 }
 ```
 
-**Respuesta** (no streaming):
+**Respuesta**:
 ```json
 {
-  "reply": "I'm doing well, thank you!",
-  "sessionId": "session-uuid",
-  "timestamp": "2026-04-20T10:30:00Z"
+  "success": true,
+  "messageId": "50156b26-f3b9-4735-be3d-51e547bd3a4a"
 }
 ```
 
-### Chat en Streaming (SSE)
+### Obtener Lista de Sesiones
 
-**GET** `/api/chat/stream?beingId={id}&message={msg}`
+**GET** `/api/chat/conversations`
 
-**Respuesta**: Stream de eventos enviados por el servidor
-
+**Respuesta**:
+```json
+[
+  {
+    "sessionId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
+    "beingId": "being-uuid",
+    "type": "single",
+    "displayName": "Chat con Being",
+    "lastMessage": "Último mensaje",
+    "lastTime": "2026-04-20T10:30:00Z"
+  }
+]
 ```
-data: {"type": "chunk", "content": "I"}
-data: {"type": "chunk", "content": "'m"}
-data: {"type": "chunk", "content": " thinking..."}
-data: {"type": "complete", "sessionId": "uuid"}
-```
 
-### Obtener Historial de Chat
+### Obtener Historial de Mensajes
 
-**GET** `/api/chat/{sessionId}/history`
+**GET** `/api/chat/messages?channelId={sessionId}`
 
 **Respuesta**:
 ```json
@@ -121,6 +124,35 @@ data: {"type": "complete", "sessionId": "uuid"}
     }
   ]
 }
+```
+
+### Detener Pensamiento de IA
+
+**POST** `/api/chat/stop`
+
+**Solicitud**:
+```json
+{
+  "channelId": "session-uuid"
+}
+```
+
+### Chat en Streaming (SSE)
+
+**GET** `/api/chat/stream?channelId={sessionId}`
+
+**Ejemplo**:
+```javascript
+const eventSource = new EventSource('/api/chat/stream?channelId=xxx');
+```
+
+**Respuesta**: Stream de eventos enviados por el servidor
+
+```
+data: {"type": "chunk", "content": "I"}
+data: {"type": "chunk", "content": "'m"}
+data: {"type": "chunk", "content": " thinking..."}
+data: {"type": "complete", "sessionId": "uuid"}
 ```
 
 ---

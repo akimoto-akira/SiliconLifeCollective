@@ -710,11 +710,9 @@ El sistema de herramientas permite a los Seres Silicona interactuar con el mundo
 
 Todas las ejecuciones de herramientas pasan por la cadena de permisos de 5 niveles:
 
-1. **IsCurator** — El Curador Silicona omite todas las verificaciones
-2. **UserFrequencyCache** — Caché de alta permitida/denegada del usuario
-3. **GlobalACL** — Lista de control de acceso global
-4. **IPermissionCallback** — Función callback de permisos personalizada
-5. **IPermissionAskHandler** — Preguntar al usuario
+1. **UserFrequencyCache** — Decisiones de usuario en caché (HighDeny/HighAllow)
+2. **IPermissionCallback** — Función callback de permisos personalizada
+3. **Bifurcación IsCurator** — Curador→IPermissionAskHandler / No-Curador→GlobalACL→Denegado
 
 ## Crear Herramientas Personalizadas
 
@@ -764,7 +762,7 @@ public class MyCustomTool : ITool
 
 ### Paso 2: Añadir al proyecto
 
-Colocar el archivo de herramienta en el directorio `src/SiliconLife.Common/Tools/` (herramientas compartidas) o en el directorio `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (herramientas específicas de versión). `ToolManager` descubrirá y registrará automáticamente a través de reflexión al inicio.
+Colocar el archivo de herramienta en el directorio `src/SiliconLife.Common/Tools/` (herramientas compartidas) o en el directorio `src/SiliconLife.App/Tools/` (herramientas específicas de versión). `ToolManager` descubrirá y registrará automáticamente a través de reflexión al inicio.
 
 ### Paso 2a: Registrar herramientas a través de plugins
 

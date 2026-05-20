@@ -38,7 +38,7 @@ Cada verificación de permisos devuelve uno de tres resultados:
 
 ### Rol Especial: Curador Silicona
 
-El Curador Silicona tiene el nivel más alto de permisos (`IsCurator = true`). Las verificaciones de permisos del curador se cortocircuitan a **Permitido**, a menos que el usuario las sobrescriba explícitamente.
+El Curador Silicona tiene el nivel más alto de permisos (`IsCurator = true`). Las verificaciones de permisos del curador activan prompts de usuario; otros seres consultan GlobalACL sincrónicamente.
 
 ### Gestor de Permisos Privado
 
@@ -64,29 +64,30 @@ Prioridad de consulta: **1. Alta denegación de usuario → 2. Alta permitida de
 └─────────────┘            │
                            ▼
                   ┌─────────────────┐
-                  │ 1. ¿IsCurator?  │──Sí──▶ Permitido
+                  │ 1. UserFrequency│
+                  │    Cache        │──HighDeny──▶ Denegado
+                  │(HighDeny/       │──HighAllow─▶ Permitido
+                  │ HighAllow)      │
                   └────────┬────────┘
+                           │ Sin caché
+                           ▼
+                  ┌─────────────────┐
+                  │ 2. IPermission  │──▶ Permitido / Denegado / Preguntar
+                  │    Callback     │
+                  └────────┬────────┘
+                           │ Preguntar
+                           ▼
+                  ┌─────────────────┐
+                  │ 3. ¿IsCurator?  │──Sí──▶ IPermissionAskHandler
+                  └────────┬────────┘       (preguntar al usuario)
                            │ No
                            ▼
                   ┌─────────────────┐
-                  │ 2. Alta         │──Coincide──▶ Denegado
-                  │ Denegación      │
-                  │ (caché memoria) │
+                  │ 4. GlobalACL    │──▶ Permitido / Denegado
                   └────────┬────────┘
-                           │ Sin coincidencia
+                           │ Sin regla
                            ▼
-                  ┌─────────────────┐
-                  │ 3. Alta         │──Coincide──▶ Permitido
-                  │ Permitida       │
-                  │ (caché memoria) │
-                  └────────┬────────┘
-                           │ Sin coincidencia
-                           ▼
-                  ┌─────────────────┐
-                  │ 4. Función      │
-                  │ Callback de     │──▶ Permitido / Denegado / Preguntar
-                  │ Permisos        │
-                  └─────────────────┘
+                      Denegado
 ```
 
 **Punto clave**: Los ejecutores solo ven booleanos (permitido/denegado). El gestor de permisos maneja internamente la decisión ternaria (permitido/denegado/preguntar) y resuelve preguntar al usuario antes de devolver al ejecutor.
@@ -97,31 +98,24 @@ Prioridad de consulta: **1. Alta denegación de usuario → 2. Alta permitida de
 
 Los ejecutores son el **único** camino para operaciones de E/S. Refuerzan:
 
-### Hilos de Programación Independientes
+### Modelo de Clases Estáticas
 
-Cada ejecutor tiene su **propio hilo de programación independiente**:
+Los ejecutores están implementados como **clases estáticas**:
 
-- Aislamiento de hilos entre ejecutores — el bloqueo del hilo de un ejecutor no afecta a otros ejecutores.
-- Cada ejecutor puede establecer límites de recursos independientes (CPU, memoria, etc.).
-- Gestión de pool de hilos para hilos de ejecutores.
-
-### Cola de Solicitudes
-
-Cada ejecutor mantiene una cola de solicitudes:
-
-- Las solicitudes se enrutan por tipo al ejecutor correspondiente.
-- Soporte para cola prioritaria.
-- Control de timeout por solicitud.
+- Cada ejecutor es una clase estática con método `Execute` sincrónico
+- La verificación de permisos bloquea el hilo de llamada hasta que se toma una decisión
+- Seguridad de hilos garantizada mediante bloqueos internos
+- Control de timeout por solicitud
 
 ### Bloqueo de Hilos para Verificación de Permisos
 
 Cuando una herramienta inicia acceso a recursos:
 
-1. El ejecutor recibe la solicitud y **bloquea su hilo**.
+1. El ejecutor recibe la solicitud y **bloquea el hilo de llamada**.
 2. El ejecutor consulta el gestor de permisos privado del ser.
-3. Si el callback devuelve preguntar al usuario, el hilo del ejecutor **permanece bloqueado** esperando respuesta del usuario.
+3. Si el callback devuelve preguntar al usuario y el ser es curador, el hilo del ejecutor **permanece bloqueado** esperando respuesta del usuario.
 4. El ser solo ve el resultado final (éxito o denegado) — nunca ve el estado intermedio "pendiente" o "esperando".
-5. Solo el Curador Silicona activará prompts reales de usuario. Los seres normales consultan la ACL global sincrónicamente sin bloquear.
+5. Los seres normales (no-curadores) consultan la ACL global sincrónicamente sin bloqueo.
 6. En timeout, la solicitud se trata como denegada, y el bloqueo del hilo se libera.
 
 ### Tipos de Ejecutores
@@ -129,9 +123,9 @@ Cuando una herramienta inicia acceso a recursos:
 | Ejecutor | Alcance | Timeout Predeterminado |
 |----------|-------|-----------------|
 | `DiskExecutor` | Lectura/escritura de archivos, operaciones de directorio | 30 segundos |
-| `NetworkExecutor` | Solicitudes HTTP, conexiones WebSocket | 60 segundos |
-| `CommandLineExecutor` | Ejecución de comandos de shell | 120 segundos |
-| `DynamicCompilationExecutor` | Compilación en memoria Roslyn | 60 segundos |
+| `NetworkExecutor` | Solicitudes HTTP, conexiones WebSocket | 30 segundos |
+| `CommandLineExecutor` | Ejecución de comandos de shell | 30 segundos |
+| `DynamicCompilationExecutor` | Compilación en memoria Roslyn | 30 segundos |
 
 ### Aislamiento de Excepciones y Tolerancia a Fallos
 

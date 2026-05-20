@@ -344,8 +344,8 @@ Al pasar el cursor sobre cualquier identificador:
   - `ChatHistoryListView` - Lista de sesiones
   - `ChatHistoryDetailView` - Detalles de mensajes
 - **Rutas API**:
-  - `/api/chat-history/{beingId}/conversations` - Obtener lista de sesiones
-  - `/api/chat-history/{beingId}/conversation/{conversationId}` - Obtener detalles de mensajes
+  - `/api/chat/conversations` - Obtener lista de sesiones
+  - `/api/chat/messages?channelId={channelId}` - Obtener detalles de mensajes
 
 ---
 

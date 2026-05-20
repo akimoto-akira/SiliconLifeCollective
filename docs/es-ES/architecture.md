@@ -485,7 +485,7 @@ La Web UI evita completamente archivos de plantillas, generando todo el marcado 
 
 ### Sistema de Controladores
 
-La Web UI sigue un **patrón similar a MVC**, con 22 controladores manejando diferentes aspectos:
+La Web UI sigue un **patrón similar a MVC**, con 23 controladores manejando diferentes aspectos:
 
 | Controlador | Propósito |
 |------------|---------|

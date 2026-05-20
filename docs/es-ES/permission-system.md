@@ -14,76 +14,34 @@ El sistema de permisos asegura que todas las operaciones iniciadas por IA sean a
 ┌─────────────────────────────────────────────┐
 │          Verificación de Permisos            │
 ├─────────────────────────────────────────────┤
-│  Nivel 1: IsCurator                          │
-│  ↓ Omitir si es verdadero                   │
-│  Nivel 2: UserFrequencyCache                 │
-│  ↓ Límite de velocidad                       │
-│  Nivel 3: GlobalACL                          │
-│  ↓ Lista de control de acceso                │
-│  Nivel 4: IPermissionCallback                │
-│  ↓ Lógica personalizada                      │
-│  Nivel 5: IPermissionAskHandler              │
-│  ↓ Preguntar al usuario                      │
+│  Nivel 1: UserFrequencyCache                 │
+│  ↓ Decisiones de usuario en caché (HighDeny/HighAllow)│
+│  Nivel 2: IPermissionCallback                │
+│  ↓ Lógica personalizada (Permitido/Denegado/PreguntarUsuario)│
+│  Nivel 3: IsCurator?                         │
+│  ↓ Sí → IPermissionAskHandler (preguntar al usuario)│
+│  ↓ No → GlobalACL → Denegación predeterminada │
 │  Resultado: Permitido o Denegado             │
 └─────────────────────────────────────────────┘
 ```
 
-## Nivel 1: IsCurator
+## Nivel 1: UserFrequencyCache
 
-Los administradores/curadores omiten todas las verificaciones de permisos.
+Decisiones de usuario en caché para evitar consultas repetidas.
 
-```csharp
-if (user.IsCurator)
-{
-    return PermissionResult.Allowed("Curator access");
-}
-```
-
-## Nivel 2: UserFrequencyCache
-
-Límites de velocidad por usuario para prevenir abuso.
+- **HighDeny** — El usuario denegó recientemente este recurso, denegar automáticamente
+- **HighAllow** — El usuario permitió recientemente este recurso, permitir automáticamente
 
 ```csharp
 var cache = new UserFrequencyCache();
-if (!cache.CheckLimit(userId, resource))
+var cached = cache.Check(userId, resource);
+if (cached != null)
 {
-    return PermissionResult.Denied("Rate limit exceeded");
+    return cached; // HighDeny → Denied, HighAllow → Allowed
 }
 ```
 
-## Nivel 3: GlobalACL
-
-La lista de control de acceso global define reglas explícitas.
-
-### Estructura de ACL
-
-```json
-{
-  "rules": [
-    {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
-    }
-  ]
-}
-```
-
-### Formato de Recurso
-
-```
-{tipo}:{acción}
-
-Ejemplos:
-- disk:read
-- disk:write
-- network:http
-- compile:execute
-- system:info
-```
-
-## Nivel 4: IPermissionCallback
+## Nivel 2: IPermissionCallback
 
 Callbacks personalizados para lógica de permisos dinámica.
 
@@ -126,9 +84,65 @@ public class DefaultPermissionCallback : IPermissionCallback
 }
 ```
 
-## Nivel 5: IPermissionAskHandler
+## Nivel 3: Bifurcación IsCurator
 
-Preguntar al usuario por permisos cuando todos los otros niveles son indecisos.
+Después de la decisión de IPermissionCallback, se produce una bifurcación basada en el estado de curador:
+
+### Ruta de Curador → IPermissionAskHandler
+
+Si el Being es un curador (`IsCurator = true`), se invoca `IPermissionAskHandler` para preguntar interactivamente al usuario.
+
+```csharp
+if (being.IsCurator)
+{
+    return await askHandler.AskAsync(request);
+}
+```
+
+### Ruta de No-Curador → GlobalACL → Denegación predeterminada
+
+Los Beings normales consultan GlobalACL sincrónicamente sin bloqueo. Si no hay regla ACL coincidente, se deniega por defecto.
+
+```csharp
+var aclResult = globalACL.Check(request);
+return aclResult ?? PermissionResult.Denied("No matching ACL rule");
+```
+
+## Global ACL (Lista de Control de Acceso)
+
+Tabla de reglas compartida persistente en Storage, gestionada solo por el Silicon Curador.
+
+### Estructura de ACL
+
+```json
+{
+  "rules": [
+    {
+      "userId": "user-uuid",
+      "resource": "disk:read",
+      "allowed": true,
+      "expiresAt": "2026-04-21T00:00:00Z"
+    }
+  ]
+}
+```
+
+### Formato de Recurso
+
+```
+{tipo}:{acción}
+
+Ejemplos:
+- disk:read
+- disk:write
+- network:http
+- compile:execute
+- system:info
+```
+
+## IPermissionAskHandler (Ruta de Curador)
+
+Invocado cuando el Being es un curador y IPermissionCallback devuelve AskUser.
 
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
@@ -152,11 +166,11 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 
 `PermissionRequestQueue` gestiona las solicitudes de permiso pendientes, soportando espera asíncrona de respuesta del usuario:
 
-- **Encolar solicitud** — Cuando la cadena de permisos llega al nivel 5, se crea un `TaskCompletionSource<AskPermissionResult>` y se encola
+- **Encolar solicitud** — Cuando se alcanza la ruta de curador, se crea un `TaskCompletionSource<AskPermissionResult>` y se encola
 - **Visualización en Web UI** — Las solicitudes de permiso pendientes se muestran en la Web UI a través de `PermissionRequestController`
 - **Respuesta del usuario** — El usuario aprueba o deniega en la Web UI, con opción de almacenar en caché la decisión y establecer la duración de la caché
 - **Opciones de caché** — El usuario puede almacenar en caché la decisión de permisos por 1 hora, 24 horas, 7 días o 30 días
-- **Mecanismo de timeout** — La página de solicitud se cierra automáticamente después de 60 segundos sin respuesta
+- **Mecanismo de timeout** — La página de solicitud se cierra automáticamente después de 30 minutos sin respuesta
 
 ## Sistema de Auditoría
 
@@ -192,11 +206,11 @@ public PermissionResult EvaluatePermission(
 - `AskUser` - Requiere confirmación de usuario al ejecutar
 
 **Orden de evaluación**:
-1. **Caché de frecuencia** - Verificar decisiones de usuario en caché
-2. **IPermissionCallback** - Evaluación de callback personalizado
-3. **Estado de curador** - Si es curador, devolver `AskUser` (requiere confirmación)
-4. **ACL global** - Verificar reglas de control de acceso
-5. **Predeterminado** - Denegar cuando no hay reglas coincidentes
+1. **Caché de frecuencia** — Verificar decisiones de usuario en caché
+2. **IPermissionCallback** — Evaluación de callback personalizado
+3. **Estado de curador** — Si es curador, devolver `AskUser` (requiere confirmación)
+4. **ACL global** — Verificar reglas de control de acceso
+5. **Predeterminado** — Denegar cuando no hay reglas coincidentes
 
 > **Nota**: A diferencia de la cadena completa de permisos, `EvaluatePermission` **no** llama a `IPermissionAskHandler`. Solo informa cuál *sería* el resultado al ejecutar.
 

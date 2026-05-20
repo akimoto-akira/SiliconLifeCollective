@@ -364,3 +364,16 @@
 2026-05-20T18:58:00+08:00 | trae-glm5 | file_modified | docs/de-DE/web-ui-guide.md | fix=ChatHistory API路由修正(路径参数→查询参数)
 2026-05-20T19:00:00+08:00 | trae-glm5 | task_complete | task=task-211 | files_modified=9 | summary=修复德语文档与源码不一致：权限链顺序、执行器架构、API端点、控制器数、DashScope配置、工具路径、超时值、权限请求超时
 2026-05-20T19:00:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260520-1800 | completed=task-211
+2026-05-20T19:05:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260520-1900 | task=task-212
+2026-05-20T19:05:00+08:00 | trae-glm5 | task_claim | task=task-212 | type=docs | scope=修复西班牙语文档与源代码不一致问题
+2026-05-20T19:30:00+08:00 | trae-glm5 | file_modified | docs/es-ES/README.md | fix: 权限链顺序、控制器数量20+→23
+2026-05-20T19:30:00+08:00 | trae-glm5 | file_modified | docs/es-ES/permission-system.md | fix: 权限链5级流程图重写、IsCurator不再短路
+2026-05-20T19:30:00+08:00 | trae-glm5 | file_modified | docs/es-ES/security.md | fix: 权限流程图重写、执行器架构修正、超时值修正
+2026-05-20T19:30:00+08:00 | trae-glm5 | file_modified | docs/es-ES/development-guide.md | fix: 权限链顺序、工具路径修正
+2026-05-20T19:30:00+08:00 | trae-glm5 | file_modified | docs/es-ES/getting-started.md | fix: DashScope配置修正
+2026-05-20T19:30:00+08:00 | trae-glm5 | file_modified | docs/es-ES/api-reference.md | fix: API端点修正、请求体格式修正
+2026-05-20T19:30:00+08:00 | trae-glm5 | file_modified | docs/es-ES/tools-reference.md | fix: 权限链描述修正、工具路径修正
+2026-05-20T19:30:00+08:00 | trae-glm5 | file_modified | docs/es-ES/architecture.md | fix: 控制器数量22→23
+2026-05-20T19:30:00+08:00 | trae-glm5 | file_modified | docs/es-ES/web-ui-guide.md | fix: ChatHistory API路由修正
+2026-05-20T19:30:00+08:00 | trae-glm5 | task_complete | task=task-212 | files=9 | changes=20+
+2026-05-20T19:30:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260520-1900

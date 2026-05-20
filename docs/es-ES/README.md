@@ -26,7 +26,7 @@
 - **Herramienta de Recarga en Caliente** — Soporta compilación automática, actualización de archivos y reinicio de SiliconLife.Fast durante la ejecución, sin intervención manual
 - **Ciclo de Invocación de Herramientas** — IA devuelve invocación de herramienta → Ejecutar herramienta → Retroalimentar resultados a IA → Ciclo continuo hasta devolver respuesta de texto puro
 - **Seguridad Ejecutor-Permiso** — Todas las operaciones de E/S pasan por verificación estricta de permisos a través de ejecutores
-  - Cadena de permisos de 5 niveles: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+  - Cadena de permisos de 5 niveles: UserFrequencyCache → IPermissionCallback → (Curador→IPermissionAskHandler / No-Curador→GlobalACL→Denegado)
   - Registro de auditoría completo para todas las decisiones de permisos
 
 ### IA y Conocimiento
@@ -40,7 +40,7 @@
 ### Interfaz Web
 - **Web UI Moderna** — Servidor HTTP integrado, soporte para actualizaciones en tiempo real SSE
 - **7 Temas de Piel** — Versión de gestión, versión de chat, versión de creación, versión de desarrollo, alto contraste, claro, minimalista, soporte para descubrimiento y cambio automáticos
-- **20+ Controladores** — Funcionalidad completa de gestión del sistema, chat, configuración y monitoreo
+- **23 Controladores** — Funcionalidad completa de gestión del sistema, chat, configuración y monitoreo
 - **Sin Dependencias de Framework Frontend** — Generación de HTML/CSS/JS en el servidor mediante `H`, `CssBuilder` y `JsBuilder`
 
 ### Internacionalización y Localización
@@ -167,7 +167,7 @@ SiliconLifeCollective.sln
 │   │   ├── Help/                          # Documentación de ayuda localizada (multilingüe)
 │   │   └── Web/                           # Implementación Web UI
 │   │       ├── Component/                 # Biblioteca de componentes UI (30+ componentes)
-│   │       ├── Controllers/               # 22 controladores
+│   │       ├── Controllers/               # 23 controladores
 │   │       ├── Models/                    # Modelos de vista
 │   │       ├── Views/                     # Vistas HTML
 │   │       └── Skins/                     # 7 temas de piel
@@ -331,7 +331,7 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] Fase 7: Compilación dinámica + auto-evolución (Roslyn)
 - [x] Fase 8: Memoria a largo plazo + tareas + temporizadores
 - [x] Fase 9: Host central + colaboración multiagente
-- [x] Fase 10: Web UI (HTTP + SSE, 20+ controladores, 7 pieles)
+- [x] Fase 10: Web UI (HTTP + SSE, 23 controladores, 7 pieles)
 - [x] Fase 10.5: Mejoras incrementales (canales de broadcast, auditoría de tokens, 32 calendarios, mejoras de herramientas, localización en 29 idiomas)
 - [x] Fase 10.6: Perfeccionamiento y optimización (WebView, sistema de ayuda, espacio de trabajo de proyectos, red de conocimiento)
 - [x] Fase 11: Motor de almacenamiento SpeedyPack (reemplazo de LiteDB, mapeo en memoria, cola de escritura asíncrona, compresión automática)
