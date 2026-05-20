@@ -455,3 +455,16 @@
 2026-05-21T21:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260521-2100 | task=task-218
 2026-05-21T21:00:00+08:00 | trae-glm5 | task_claim | task=task-218 | type=docs | target=docs/zh-HK/
 2026-05-21T22:30:00+08:00 | trae-glm5 | task_complete | task=task-218 | summary=Fixed 9 zh-HK docs: README, api-reference, permission-system, security, development-guide, getting-started, architecture, web-ui-guide, roadmap. Key fixes: permission chain order (UserFrequencyCacheIPermissionCallbackbranch), 2933 language variants, 2223 controllers, Windows FormsAvalonia UI, DashScope region cn-hangzhoubeijing, missing Spanish locale, missing roadmap stages 3.6/4, architecture diagram missing plugin loader and knowledge network
+2026-05-21T21:00:00+08:00 | trae-glm5 | file_modified | docs/zh-HK/README.md | fix=权限链顺序、语言变体29->33、控制器20->23、工具22->24、UI组件25->27
+2026-05-21T21:10:00+08:00 | trae-glm5 | file_modified | docs/zh-HK/api-reference.md | fix=完整重写API参考，修复22+个无效端点，与Controller源码对齐
+2026-05-21T21:20:00+08:00 | trae-glm5 | file_modified | docs/zh-HK/permission-system.md | fix=权限链从IsCurator->UserFrequencyCache->GlobalACL->IPermissionCallback改为UserFrequencyCache->IPermissionCallback->(IsCurator:AskHandler|Non-curator:GlobalACL)
+2026-05-21T21:30:00+08:00 | trae-glm5 | file_modified | docs/zh-HK/security.md | fix=修正权限链、添加使用者询问机制和Token稽核章节
+2026-05-21T21:40:00+08:00 | trae-glm5 | file_modified | docs/zh-HK/development-guide.md | fix=依赖方向Default->Common->Core、工具路径、Speedy.Manager Windows Forms->Avalonia UI
+2026-05-21T21:50:00+08:00 | trae-glm5 | file_modified | docs/zh-HK/getting-started.md | fix=DashScope Region cn-hangzhou->beijing、添加区域列表、语言变体29->33
+2026-05-21T22:00:00+08:00 | trae-glm5 | file_modified | docs/zh-HK/architecture.md | fix=控制器22->23、语言变体29->33、添加西班牙语、组件图添加外挂程式载入器和知识网络
+2026-05-21T22:10:00+08:00 | trae-glm5 | file_modified | docs/zh-HK/web-ui-guide.md | fix=语言变体29->33、添加西班牙语行
+2026-05-21T22:20:00+08:00 | trae-glm5 | file_modified | docs/zh-HK/roadmap.md | fix=Windows Forms->Avalonia UI、添加阶段3.6(外挂程式系统)和阶段4(系统匣应用)
+2026-05-21T22:30:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260521-2100 | completed=task-218 | commit=3332987
+2026-05-21T23:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260521-2300 | task=task-220
+2026-05-22T00:30:00+08:00 | trae-glm5 | task_completed | task=task-220 | files=9 | changes=README.md,api-reference.md,permission-system.md,security.md,development-guide.md,getting-started.md,architecture.md,tools-reference.md,web-ui-guide.md
+2026-05-22T00:30:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260521-2300 | status=completed

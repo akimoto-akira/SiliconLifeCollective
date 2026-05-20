@@ -74,11 +74,13 @@ Edita `src/SiliconLife.Default/Config/DefaultConfigData.cs` ou altera a configur
     "DashScope": {
       "ApiKey": "a-tua-chave-api-aqui",
       "Model": "qwen-plus",
-      "Region": "cn-hangzhou"
+      "Region": "beijing"
     }
   }
 }
 ```
+
+> **Regiões disponíveis**: `beijing` (Pequim), `virginia` (Virgínia), `singapore` (Singapura), `hongkong` (Hong Kong), `frankfurt` (Frankfurt)
 
 #### Opção C: Volcengine Ark (nuvem)
 
@@ -226,8 +228,8 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # Implementação padrão + ponto de entrada (versão consola)
 │   ├── SiliconLife.Fast/            # Implementação de alto desempenho + ponto de entrada (versão Forms)
 │   ├── SiliconLife.Speedy/          # Motor de armazenamento de alto desempenho SpeedyPack
-│   └── SiliconLife.Speedy.Manager/  # Ferramenta de gestão SpeedyPack (Windows Forms)
-├── docs/                            # Documentação (multilingue, 32 variantes linguísticas)
+│   └── SiliconLife.Speedy.Manager/  # Ferramenta de gestão SpeedyPack (Avalonia UI)
+├── docs/                            # Documentação (multilingue, 33 variantes linguísticas)
 │   ├── en/                          # Inglês
 │   ├── zh-CN/                       # Chinês simplificado
 │   ├── zh-HK/                       # Chinês tradicional

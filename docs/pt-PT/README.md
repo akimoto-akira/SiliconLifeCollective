@@ -26,7 +26,7 @@
 - **Ferramenta de hot reload** — Suporta compilação automática, atualização de ficheiros e reinício do SiliconLife.Fast durante a execução, sem intervenção manual
 - **Ciclo de chamada de ferramentas** — A IA retorna uma chamada de ferramenta → Executa a ferramenta → Retorna os resultados à IA → Continua o ciclo até uma resposta em texto puro
 - **Segurança de permissões do executor** — Todas as operações I/O passam por uma validação rigorosa de permissões através dos executores
-  - Cadeia de permissões de 5 níveis: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+  - Cadeia de permissões de 5 níveis: UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curador: GlobalACL)
   - Registo de auditoria completo de todas as decisões de permissões
 
 ### IA e Conhecimento
@@ -40,20 +40,19 @@
 ### Interface Web
 - **Interface Web moderna** — Servidor HTTP integrado com atualizações em tempo real SSE
 - **7 temas visuais** — Versões Admin, Chat, Creative, Dev, Alto contraste, Light, Minimal, suporta deteção e comutação automática
-- **20+ controladores** — Gestão completa do sistema, chat, configuração, funcionalidades de monitorização
+- **23 controladores** — Gestão completa do sistema, chat, configuração, funcionalidades de monitorização
 - **Zero dependências de framework frontend** — HTML/CSS/JS gerados no lado do servidor através de `H`, `CssBuilder` e `JsBuilder`
 
 ### Internacionalização e Localização
-- **Suporte completo para 32 implementações linguísticas**, cobrindo 2 sistemas de escrita e múltiplas variantes regionais
+- **Suporte completo para 33 variantes linguísticas**, cobrindo 2 sistemas de escrita e múltiplas variantes regionais
   - **Chinês simplificado**: zh-CN (China continental), zh-SG (Singapura), zh-MY (Malásia) (3 variantes)
   - **Chinês tradicional**: zh-HK (Hong Kong), zh-TW (Taiwan), zh-MO (Macau) (3 variantes)
   - **Inglês**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variantes)
   - **Espanhol**: es-ES, es-MX (2 variantes)
   - **Alemão**: de-DE, de-AT, de-CH, de-LU, de-LI (5 variantes)
   - **Francês**: fr-FR, fr-CA, fr-CH (3 variantes)
-  - **Italiano**: it-IT (1 variante)
-  - **Português**: pt-PT, pt-BR (2 variantes)
-  - **Japonês**: ja-JP | **Coreano**: ko-KR | **Checo**: cs-CZ | **Polaco**: pl-PL (4 variantes)
+  - **Japonês**: ja-JP | **Coreano**: ko-KR | **Checo**: cs-CZ (3 variantes)
+  - **Italiano**: it-IT | **Polaco**: pl-PL | **Português**: pt-PT, pt-BR (4 variantes)
 
 ### Dados e Armazenamento
 - **Armazenamento SpeedyPack de alto desempenho** — A versão Fast utiliza o motor de armazenamento proprietário .spk, mapeamento de diretórios em memória + cache de entradas + fila de escrita assíncrona
@@ -85,7 +84,7 @@ Este projeto oferece duas versões de implementação para satisfazer diferentes
   - Otimização de desempenho extrema
   - Windows/macOS execução em segundo plano na bandeja do sistema com monitorização em tempo real; Linux janela de estado exibida diretamente
   - Motor SpeedyPack + compressão automática que garante a segurança dos dados
-  - Arquitetura Component UI, 30+ componentes declarativos
+  - Arquitetura Component UI, 27 componentes declarativos
   - 7 temas visuais, suporta deteção e comutação automática
   - Ferramenta de hot reload para atualizações e reinícios online
 - **Melhoria de desempenho**: Latência de leitura em memória reduzida 1000x, latência de escrita reduzida 15000x, capacidade de processamento paralelo aumentada 50x
@@ -96,10 +95,10 @@ Este projeto oferece duas versões de implementação para satisfazer diferentes
 
 | Característica | SiliconLife.Default | SiliconLife.Fast |
 |---------|---------------------|------------------|
-| **Modo de execução** | Aplicação de consola | Aplicação Forms (bandeja de estado) |
-| **Interface do utilizador** | Interface Web (acesso browser) | Ícone da bandeja + Janela da bandeja + Interface Web |
-| **Bandeja do sistema** | ❌ Não | ✅ Suporta minimização para a bandeja do sistema |
-| **Execução em segundo plano** | ❌ Termina ao fechar a consola | ✅ Execução contínua em segundo plano na bandeja |
+| **Modo de execução** | Aplicação de consola | Aplicação desktop (Windows/macOS bandeja do sistema / Linux janela de estado) |
+| **Interface do utilizador** | Interface Web (acesso browser) | Windows/macOS: Ícone da bandeja + Janela da bandeja + Interface Web; Linux: Janela de estado + Interface Web |
+| **Bandeja do sistema** | ❌ Não | ✅ Windows/macOS suporta minimização para a bandeja do sistema; Linux sem ícone na bandeja |
+| **Execução em segundo plano** | ❌ Termina ao fechar a consola | ✅ Windows/macOS execução contínua em segundo plano na bandeja; Linux janela de estado em execução |
 | **Método de armazenamento** | Armazenamento JSON em sistema de ficheiros | Armazenamento em memória SpeedyPack + persistência assíncrona |
 | **Motor de armazenamento** | I/O em sistema de ficheiros | SiliconLife.Speedy (formato .spk) |
 | **Latência de leitura** | ~10ms (I/O em disco) | ~0.01ms (operação em memória) |
@@ -116,13 +115,13 @@ Este projeto oferece duas versões de implementação para satisfazer diferentes
 | Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Linguagem de programação | C# | C# |
 | Tipo de aplicação | Aplicação de consola | Aplicação desktop (Windows/macOS bandeja do sistema / Linux janela de estado) |
-| Integração IA | Ollama (local), Alibaba Cloud DashScope (nuvem) | Ollama (local), Alibaba Cloud DashScope (nuvem), Volcengine Ark (nuvem) |
+| Integração IA | Ollama (local), Alibaba Cloud DashScope (nuvem), Volcengine Ark (nuvem) | Ollama (local), Alibaba Cloud DashScope (nuvem), Volcengine Ark (nuvem) |
 | Armazenamento de dados | Sistema de ficheiros (JSON + diretório de índice temporal) | SpeedyPack (formato .spk, mapeamento em memória + persistência assíncrona) |
 | Servidor Web | HttpListener (.NET integrado) | HttpListener (.NET integrado) |
 | Compilação dinâmica | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
 | Automação de browser | Playwright (WebView) | Playwright (WebView) |
 | Sistema de plugins | ✅ Suportado (IPlugin + PluginLoader) | ✅ Suportado (IPlugin + PluginLoader) |
-| Bandeja do sistema | ❌ Não suportado | ✅ Suportado (NotifyIcon) |
+| Bandeja do sistema | ❌ Não suportado | ✅ Windows/macOS suportado (NotifyIcon); Linux sem ícone na bandeja |
 | Licença | Apache-2.0 | Apache-2.0 |
 
 ## 📁 Estrutura do projeto
@@ -155,11 +154,11 @@ SiliconLifeCollective.sln
 │   ├── SiliconLife.Common/                # Implementação comum (ambas as versões)
 │   │   ├── AI/                            # Clientes IA e fábricas (Ollama, DashScope, VolcengineArk)
 │   │   ├── Calendar/                      # 32 implementações de calendários
-│   │   ├── Localization/                  # Classe base de localização e 31 variantes linguísticas/regionais
+│   │   ├── Localization/                  # Classe base de localização e 33 variantes linguísticas/regionais
 │   │   ├── Resources/                     # Ficheiros de recursos partilhados
 │   │   ├── Security/                      # Gestor de Permissões
 │   │   ├── SiliconBeing/                  # Implementação padrão do Silicon Being
-│   │   ├── Tools/                         # 23 ferramentas comuns (incluindo hot reload)
+│   │   ├── Tools/                         # 24 ferramentas comuns (incluindo hot reload)
 │   │   ├── Web/                           # Infraestrutura Web
 │   │   └── WebView/                       # Implementação Playwright WebView
 │   │
@@ -168,8 +167,8 @@ SiliconLifeCollective.sln
 │   │   ├── Data/                          # Diretório de dados
 │   │   ├── Help/                          # Localização da documentação de ajuda (multilingue)
 │   │   └── Web/                           # Implementação da interface Web
-│   │       ├── Component/                 # Biblioteca de componentes UI (30+ componentes)
-│   │       ├── Controllers/               # 22 controladores
+│   │       ├── Component/                 # Biblioteca de componentes UI (27 componentes)
+│   │       ├── Controllers/               # 23 controladores
 │   │       ├── Models/                    # ViewModels
 │   │       ├── Views/                     # Vistas HTML
 │   │       └── Skins/                     # 7 temas visuais
@@ -177,25 +176,20 @@ SiliconLifeCollective.sln
 │   ├── SiliconLife.Default/               # Implementação padrão + ponto de entrada (versão consola)
 │   │   ├── Program.cs                     # Ponto de entrada (montagem de todos os componentes)
 │   │   ├── Config/                        # Dados de configuração padrão
-│   │   ├── IM/                            # Fornecedor WebUI
 │   │   ├── Knowledge/                     # Implementação da rede de conhecimento
-│   │   ├── Logging/                       # Implementações de fornecedores de registo
+│   │   ├── Logging/                       # Implementações de fornecedores de registo (consola + sistema de ficheiros)
 │   │   ├── Project/                       # Implementação do sistema de projetos
-│   │   ├── Security/                      # Callback de permissões padrão
-│   │   ├── Storage/                       # Implementação de armazenamento em sistema de ficheiros
-│   │   └── Tools/                         # Ferramentas específicas da versão (HelpTool)
+│   │   └── Storage/                       # Implementação de armazenamento em sistema de ficheiros
 │   │
-│   ├── SiliconLife.Fast/                  # Implementação de alto desempenho + ponto de entrada (versão Forms)
-│   │   ├── Program.cs                     # Ponto de entrada (aplicação Forms)
+│   ├── SiliconLife.Fast/                  # Implementação de alto desempenho + ponto de entrada (versão desktop)
+│   │   ├── Program.cs                     # Ponto de entrada (aplicação desktop)
+│   │   ├── App.axaml / App.cs             # Definição da aplicação Avalonia
 │   │   ├── Config/                        # Dados de configuração (partilhados com Default)
-│   │   ├── IM/                            # Fornecedor WebUI
 │   │   ├── Knowledge/                     # Implementação da rede de conhecimento (otimizada para memória)
 │   │   ├── Logging/                       # Fornecedores de registo de alto desempenho
 │   │   ├── Project/                       # Implementação do sistema de projetos
-│   │   ├── Security/                      # Callback de permissões otimizado
 │   │   ├── Storage/                       # Adaptador de armazenamento SpeedyPack
-│   │   ├── Tools/                         # Ferramentas específicas da versão (HelpTool)
-│   │   └── Tray/                          # Bandeja do sistema (31 variantes linguísticas)
+│   │   └── Tray/                          # Bandeja do sistema (33 variantes linguísticas)
 │   │
 │   ├── SiliconLife.Speedy/                # Motor de armazenamento de alto desempenho SpeedyPack
 │   │   ├── SpeedyPack.cs                  # Classe principal (mapeamento de diretórios em memória + cache + escrita assíncrona)
@@ -214,7 +208,7 @@ SiliconLifeCollective.sln
 │       │   ├── SpkHeader.cs              # Cabeçalho do ficheiro de pacote
 │       │   └── PathNormalizer.cs          # Normalização de caminho
 │   │
-│   └── SiliconLife.Speedy.Manager/        # Ferramenta de gestão SpeedyPack (Windows Forms)
+│   └── SiliconLife.Speedy.Manager/        # Ferramenta de gestão SpeedyPack (Avalonia UI)
 │       ├── MainForm.cs                    # Formulário principal
 │       ├── Program.cs                     # Ponto de entrada
 │       └── slc.ico                        # Ícone da aplicação
@@ -243,7 +237,7 @@ Loop principal (thread dedicado, watchdog + circuit breaker)
 Todas as operações I/O iniciadas pela IA devem passar por uma cadeia de segurança rigorosa:
 
 ```
-Chamada de ferramenta → Executor → Gestor de permissões → [IsCurator → Cache de frequência → GlobalACL → Callback → Pedido ao utilizador]
+Chamada de ferramenta → Executor → Gestor de permissões → [UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curador: GlobalACL)]
 ```
 
 ## 🚀 Arranque rápido

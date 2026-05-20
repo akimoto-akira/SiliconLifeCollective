@@ -24,7 +24,7 @@ Este projeto oferece duas versões de implementação, que partilham o mesmo des
 - **Características**:
   - Windows/macOS execução em segundo plano na bandeja do sistema, monitorização em tempo real através da janela de estado; Linux janela de estado exibida diretamente
   - Motor SpeedyPack + compressão automática que garante a segurança dos dados
-  - Arquitetura Component UI, 30+ componentes declarativos
+  - Arquitetura Component UI, 27 componentes declarativos
   - 7 temas visuais, suporta deteção e comutação automática
   - Ferramenta de hot reload para atualizações e reinícios online
   - Linux abre automaticamente o browser para acesso à Web UI, suporta o parâmetro `--no-tray`
@@ -320,3 +320,407 @@ A factory fornece:
 |------------|--------|------|-------------|
 | Ollama | ✅ | Local | Serviço IA local, suporta implementação de modelos locais |
 | DashScope (Alibaba Cloud) | ✅ | Nuvem | Serviço IA DashScope da Alibaba Cloud, implementação multi-região |
+| Baidu Qianfan | 📋 | Nuvem | Serviço IA Wenxin Yiyan da Baidu |
+| Zhipu AI (GLM) | 📋 | Nuvem | Serviço IA ChatGLM |
+| Moonshot (Kimi) | 📋 | Nuvem | Serviço IA Kimi |
+| Volcengine Ark (Doubao) | ✅ | Nuvem | Serviço IA Doubao da ByteDance |
+| DeepSeek | 📋 | Nuvem | Serviço IA DeepSeek |
+| 01.AI | 📋 | Nuvem | Serviço IA Yi |
+| Tencent Hunyuan | 📋 | Nuvem | Serviço IA Hunyuan da Tencent |
+| SiliconFlow | 📋 | Nuvem | Serviço IA SiliconFlow |
+| MiniMax | 📋 | Nuvem | Serviço IA MiniMax |
+| OpenAI | 💡 | Nuvem | Serviço OpenAI API (série GPT) |
+| Anthropic | 💡 | Nuvem | Serviço Anthropic Claude AI |
+| Google DeepMind | 💡 | Nuvem | Serviço Google Gemini |
+| Mistral AI | 💡 | Nuvem | Serviço Mistral AI |
+| Groq | 💡 | Nuvem | Serviço de inferência IA de alta velocidade Groq |
+| Together AI | 💡 | Nuvem | Serviço de modelos open-source Together AI |
+| xAI | 💡 | Nuvem | Serviço xAI Grok |
+| Cohere | 💡 | Nuvem | Serviço NLP empresarial Cohere |
+| Replicate | 💡 | Nuvem | Plataforma de alojamento de modelos open-source Replicate |
+| Hugging Face | 💡 | Nuvem | Comunidade e plataforma de modelos IA open-source Hugging Face |
+| Cerebras | 💡 | Nuvem | Serviço de inferência IA otimizado Cerebras |
+| Databricks | 💡 | Nuvem | Plataforma IA empresarial Databricks (MosaicML) |
+| Perplexity AI | 💡 | Nuvem | Serviço de pesquisa e respostas Perplexity AI |
+| NVIDIA NIM | 💡 | Nuvem | Microsserviço de inferência IA NVIDIA |
+
+---
+
+## Decisões de design chave
+
+### Armazenamento como classe de instância (não estática)
+
+`IStorage` foi concebido como uma instância injetável, não como um utilitário estático. Isto garante:
+
+- Acesso direto ao sistema de ficheiros — IStorage é o canal de persistência interno do sistema, **não** roteado através do executor.
+- **A IA não controla o IStorage** — O executor gere o IO iniciado pelas ferramentas da IA; o IStorage gere a leitura e escrita interna do próprio framework. Estes são preocupações fundamentalmente diferentes.
+- Pode ser testado com implementações simuladas.
+- Suporte futuro para diferentes backends de armazenamento sem modificação dos consumidores.
+
+### Executor como fronteira de segurança
+
+O executor é o **único** caminho para operações de I/O. Ferramentas que necessitam de acesso a disco, rede ou linha de comando **têm** de passar pelo executor. Este design impõe:
+
+- **Thread de despacho independente** por executor, com bloqueio de thread para verificação de permissões.
+- Verificação de permissões centralizada — O executor consulta o **gestor de permissões privado** do Being.
+- Fila de pedidos com suporte a prioridade e controlo de timeout.
+- Registo de auditoria de todas as operações externas.
+- Isolamento de exceções — A falha de um executor não afeta os outros.
+- Disjuntor — Falhas consecutivas param temporariamente o executor para evitar falhas em cascata.
+
+### ContextManager como objeto leve
+
+Cada `ExecuteOneRound()` cria uma nova instância de `ContextManager`:
+
+1. Carrega o ficheiro da alma + o histórico de chat recente.
+2. Envia o pedido ao cliente IA.
+3. Processa em ciclo as chamadas de ferramenta até a IA retornar texto simples.
+4. Persiste a resposta no sistema de chat.
+5. Liberta os recursos.
+
+---
+
+## Auditoria de utilização de tokens
+
+O sistema rastreia o consumo de tokens IA para cada pedido:
+
+- `TokenUsageRecord` — Registo de cada pedido (ID do Being, modelo, tokens do prompt, tokens da compleção, timestamp)
+- `TokenUsageSummary` — Estatísticas agregadas
+- `TokenUsageQuery` — Parâmetros de consulta para filtrar registos
+- Persistido através de `ITimeStorage` para consultas de séries temporais
+- Acessível através da Web UI (UsageController) e `TokenAuditTool` (apenas Curator)
+
+---
+
+### Sistema de calendário
+
+O sistema inclui **32 implementações de calendário**, derivadas da classe abstrata `CalendarBase`, cobrindo os principais sistemas de calendário do mundo:
+
+| Calendário | ID | Descrição |
+|------------|-----|-------------|
+| BuddhistCalendar | `buddhist` | Calendário budista (BE), ano + 543 |
+| CherokeeCalendar | `cherokee` | Sistema de calendário Cherokee |
+| ChineseLunarCalendar | `lunar` | Calendário lunar chinês, com meses intercalares |
+| ChineseHistoricalCalendar | `chinese_historical` | Calendário histórico chinês, suporta Ganzhi e eras imperiais |
+| ChulaSakaratCalendar | `chula_sakarat` | Calendário Chula Sakarat (CS), ano - 638 |
+| CopticCalendar | `coptic` | Calendário Copta |
+| DaiCalendar | `dai` | Calendário Dai, com cálculo lunar completo |
+| DehongDaiCalendar | `dehong_dai` | Variante do calendário Dai de Dehong |
+| EthiopianCalendar | `ethiopian` | Calendário Etíope |
+| FrenchRepublicanCalendar | `french_republican` | Calendário Republicano Francês |
+| GregorianCalendar | `gregorian` | Calendário Gregoriano padrão |
+| HebrewCalendar | `hebrew` | Calendário Hebraico (Judaico) |
+| IndianCalendar | `indian` | Calendário Nacional Indiano |
+| InuitCalendar | `inuit` | Sistema de calendário Inuit |
+| IslamicCalendar | `islamic` | Calendário Islâmico (Hijri) |
+| JapaneseCalendar | `japanese` | Calendário Japonês (Nengo) |
+| JavaneseCalendar | `javanese` | Calendário Islâmico Javanês |
+| JucheCalendar | `juche` | Calendário Juche (Coreia do Norte), ano - 1911 |
+| JulianCalendar | `julian` | Calendário Juliano |
+| KhmerCalendar | `khmer` | Calendário Khmer |
+| MayanCalendar | `mayan` | Calendário Longo Conto Maia |
+| MongolianCalendar | `mongolian` | Calendário Mongol |
+| PersianCalendar | `persian` | Calendário Persa (Solar Hijri) |
+| RepublicOfChinaCalendar | `roc` | Calendário da República da China (Minguo), ano - 1911 |
+| RomanCalendar | `roman` | Calendário Romano |
+| SakaCalendar | `saka` | Calendário Saka (Indonésia) |
+| SexagenaryCalendar | `sexagenary` | Calendário Ganzhi Chinês |
+| TibetanCalendar | `tibetan` | Calendário Tibetano |
+| VietnameseCalendar | `vietnamese` | Calendário Lunar Vietnamita (variante do zodíaco do gato) |
+| VikramSamvatCalendar | `vikram_samvat` | Calendário Vikram Samvat |
+| YiCalendar | `yi` | Sistema de calendário Yi |
+| ZoroastrianCalendar | `zoroastrian` | Calendário Zoroastriano |
+
+`CalendarTool` fornece as operações: `now`, `format`, `add_days`, `diff`, `list_calendars`, `get_components`, `get_now_components`, `convert` (conversão de datas entre calendários).
+
+---
+
+## Arquitetura Web UI
+
+### Sistema de temas
+
+A Web UI possui um **sistema de temas plugável**, permitindo personalização completa da interface sem alterar a lógica da aplicação:
+
+- **Interface ISkin** — Define o contrato para todos os temas, incluindo:
+  - Métodos de renderização principal (`RenderHtml`, `RenderError`)
+  - 20+ métodos de componentes UI (botão, input, cartão, tabela, badge, bolha, progresso, tab, etc.)
+  - Geração de CSS temático através de `CssBuilder`
+  - `SkinPreviewInfo` — Paleta de cores e ícone para o seletor de temas na página de inicialização
+
+- **Temas incorporados** — 7 temas prontos para produção:
+  - **Admin** — Interface de gestão do sistema profissional, focada em dados
+  - **Chat** — Design centrado em conversação e mensagens, para interação IA
+  - **Creative** — Layout de fluxo de trabalho criativo, artístico e visualmente rico
+  - **Dev** — Interface centrada no programador e no código, com destaque de sintaxe
+  - **HighContrast** — Tema de acessibilidade de alto contraste
+  - **Light** — Tema claro e fresco
+  - **Minimal** — Tema minimalista
+
+- **Descoberta de temas** — `SkinManager` descobre e regista automaticamente todas as implementações de `ISkin` através de reflexão
+
+### Construtores HTML / CSS / JS
+
+A Web UI evita completamente ficheiros de template, gerando toda a marcação em C#:
+
+- **`H`** — DSL de construção HTML em fluxo, para construir árvores HTML em código
+- **`CssBuilder`** — Construtor CSS, com suporte a seletores e media queries
+- **`JsBuilder` (`JsSyntax`)** — Construtor JavaScript, para scripts inline
+
+### Sistema de controladores
+
+A Web UI segue um **padrão tipo MVC**, com 23 controladores a gerir diferentes aspetos:
+
+| Controlador | Função |
+|------------|---------|
+| About | Página sobre e informações do projeto |
+| Audit | Auditoria de utilização de tokens |
+| Being | Gestão e estado dos Silicon Beings |
+| Chat | Interface de chat em tempo real com SSE |
+| ChatHistory | Visualização do histórico de chat, com lista de sessões e detalhes das mensagens |
+| CodeBrowser | Visualização e edição de código |
+| CodeHover | Dicas flutuantes de código, com destaque de sintaxe |
+| Config | Gestão da configuração do sistema |
+| Dashboard | Visão geral e métricas do sistema |
+| Executor | Estado e gestão dos executores |
+| Help | Sistema de documentação de ajuda, suporte multilingue |
+| Init | Assistente de inicialização para primeira execução |
+| Knowledge | Visualização e consulta do grafo de conhecimento |
+| Log | Visualizador de logs do sistema, com filtro por Being |
+| Memory | Browser de memória de longo prazo, com filtros avançados, estatísticas e vista de detalhes |
+| Permission | Gestão de permissões |
+| PermissionRequest | Fila de pedidos de permissão |
+| Project | Gestão de projetos, com notas de trabalho e sistema de tarefas |
+| System | Gestão do sistema e monitorização do runtime |
+| Task | Interface do sistema de tarefas |
+| Timer | Gestão do sistema de temporizadores, com histórico de execuções |
+| Usage | Painel de auditoria de utilização de tokens, com gráficos de tendência e exportação |
+| WorkNote | Gestão de notas de trabalho, com pesquisa e geração de índice |
+
+### Atualizações em tempo real
+
+- **SSE (Server-Sent Events)** — Atualizações de mensagens de chat, estado dos Beings e eventos do sistema via `SSEHandler`
+- **Sem WebSocket** — Arquitetura mais simples usando SSE para a maioria das necessidades em tempo real
+- **Reconexão automática** — Lógica de reconexão do cliente para ligações resilientes
+
+### Localização
+
+O sistema suporta localização completa em **29 variantes linguísticas**:
+- **Chinês (6 variantes)**: zh-CN (simplificado), zh-HK (tradicional), zh-SG (Singapura), zh-MO (Macau), zh-TW (Taiwan), zh-MY (Malásia)
+- **Inglês (10 variantes)**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY
+- **Espanhol (2 variantes)**: es-ES, es-MX
+- **Alemão (5 variantes)**: de-DE, de-AT, de-CH, de-LU, de-LI
+- **Francês (3 variantes)**: fr-FR, fr-CA, fr-CH
+- **Outras (3 variantes)**: ja-JP (Japonês), ko-KR (Coreano), cs-CZ (Checo)
+
+Selecionado através de `DefaultConfigData.Language` e resolvido via `LocalizationManager`.
+
+---
+
+### Sistema de automação do browser WebView
+
+O sistema integra funcionalidades de automação de browser WebView baseadas em **Playwright**:
+
+- **Isolamento individual**: Cada Silicon Being possui uma instância de browser independente, Cookies e armazenamento de sessão, completamente isolados entre si.
+- **Modo headless**: O browser corre em modo headless, completamente invisível para o utilizador, com os Beings a operar autonomamente em segundo plano.
+- **WebViewBrowserTool**: Fornece capacidades completas de operação do browser, incluindo:
+  - Navegação de páginas, cliques, introdução de texto, obtenção de conteúdo da página
+  - Execução de JavaScript, obtenção de capturas de ecrã, espera por elementos
+  - Gestão do estado do browser e limpeza de recursos
+- **Controlo de segurança**: Todas as operações do browser passam pela cadeia de verificação de permissões, impedindo acessos maliciosos a páginas web.
+
+### Sistema de rede de conhecimento
+
+O sistema inclui um grafo de conhecimento incorporado baseado em **estrutura de triplas**:
+
+- **Representação do conhecimento**: Utiliza a estrutura de triplas "sujeito-relação-objeto" (ex: Python-is_a-programming_language)
+- **KnowledgeTool**: Fornece gestão do ciclo de vida completo do conhecimento:
+  - `add`/`query`/`update`/`delete` - Operações CRUD básicas
+  - `search` - Pesquisa de texto completo e correspondência por palavras-chave
+  - `get_path` - Descoberta de caminhos de associação entre dois conceitos
+  - `validate` - Verificação de integridade do conhecimento
+  - `stats` - Estatísticas e análise da rede de conhecimento
+- **Armazenamento persistente**: As triplas de conhecimento são persistidas no sistema de ficheiros, com suporte a consultas por índice temporal.
+- **Pontuação de confiança**: Cada entrada de conhecimento possui uma pontuação de confiança (0-1), suportando correspondência difusa e ordenação do conhecimento.
+- **Classificação por etiquetas**: Suporta a adição de etiquetas ao conhecimento, facilitando a categorização e recuperação.
+
+---
+
+## Estrutura do diretório de dados
+
+```
+data/
+└── SiliconManager/
+    ├── {curator-guid}/
+    │   ├── soul.md          # Ficheiro da alma do Curator
+    │   ├── state.json       # Estado do runtime
+    │   ├── code.enc         # Código de classe personalizado encriptado com AES
+    │   └── permission.enc   # Callback de permissão personalizado encriptado com AES
+    │
+    └── {being-guid}/
+        ├── soul.md
+        ├── state.json
+        ├── code.enc
+        └── permission.enc
+```
+
+---
+
+## Motor de armazenamento SpeedyPack
+
+O SiliconLife.Fast utiliza o motor de armazenamento SpeedyPack auto-desenvolvido (formato .spk), substituindo a anterior solução LiteDB, alcançando desempenho extremo de leitura e escrita.
+
+### Design da arquitetura
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    SpeedyPack                             │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
+│  │ DirectoryMap  │  │  EntryCache   │  │  WriteQueue   │  │
+│  │ (mapeamento  │  │  (cache de   │  │ (fila de      │  │
+│  │  de diretório │  │   entradas)  │  │  escrita      │  │
+│  │  em memória)  │  │              │  │  assíncrona)  │  │
+│  └──────┬───────┘  └──────┬───────┘  └───────┬───────┘  │
+│         │                  │                   │          │
+│  ┌──────▼──────────────────▼───────────────────▼───────┐  │
+│  │              PackFileReader / PackFileWriter          │  │
+│  │              (leitor/escritor de ficheiros pack)      │  │
+│  └──────────────────────────┬──────────────────────────┘  │
+│                              │                             │
+│  ┌──────────────────────────▼──────────────────────────┐  │
+│  │              Ficheiro .spk (MessagePack + compressão LZ4) │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐                      │
+│  │  FreeList     │  │ SpeedyPack   │                      │
+│  │ (gestão de   │  │ AutoCompactor│                      │
+│  │  espaço livre)│  │ (compactação │                      │
+│  │              │  │  automática) │                      │
+│  └──────────────┘  └──────────────┘                      │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Componentes principais
+
+| Componente | Descrição |
+|------------|-----------|
+| `SpeedyPack` | Classe principal, combina DirectoryMap, EntryCache e WriteQueue para fornecer leitura e escrita de baixa latência |
+| `DirectoryMap` | Mapeamento de diretório em memória, mantém o mapeamento de caminhos virtuais para entradas de ficheiros |
+| `EntryCache` | Cache de entradas, cache de entradas acedidas recentemente baseada em TTL |
+| `WriteQueue` | Fila de escrita assíncrona, enfileira operações de escrita para execução em thread de segundo plano |
+| `FreeList` | Gestão de espaço livre, rastreia o espaço reutilizável nos ficheiros .spk |
+| `PackFileReader` | Leitor de ficheiros pack, lê dados dos ficheiros .spk |
+| `PackFileWriter` | Escritor de ficheiros pack, escreve dados nos ficheiros .spk |
+| `SpeedyPackAutoCompactor` | Temporizador de compactação automática, compacta periodicamente os ficheiros .spk para recuperar espaço livre |
+| `SpeedyPackRegistry` | Gestor singleton ao nível do processo, garante que toda a aplicação usa a mesma instância SpeedyPack |
+
+### Adaptadores de armazenamento
+
+O SiliconLife.Fast integra o SpeedyPack nas interfaces do sistema através dos seguintes adaptadores:
+
+| Adaptador | Interface | Descrição |
+|-----------|-----------|-----------|
+| `SpeedyStorage` | `IStorage` | Adaptador de armazenamento chave-valor genérico |
+| `SpeedyTimeStorage` | `ITimeStorage` | Adaptador de armazenamento com índice temporal |
+| `SpeedyWorkNoteStorage` | `IWorkNoteStorage` | Adaptador de armazenamento de notas de trabalho |
+
+### Opções de configuração
+
+`SpeedyPackOptions` fornece as seguintes configurações:
+
+| Opção | Tipo | Valor por defeito | Descrição |
+|-------|------|-------------------|-----------|
+| `CacheTtl` | `TimeSpan` | 5 minutos | Tempo de vida das entradas na cache |
+| `MaxCacheEntries` | `int` | 1000 | Número máximo de entradas na cache |
+| `ReadOnly` | `bool` | false | Modo apenas de leitura |
+
+### Suporte a transações
+
+O SpeedyPack suporta operações de escrita atómica através da interface `IPackTransaction`:
+
+- `SpeedyTransaction` implementa o mecanismo de transações
+- Suporta atomicidade em escritas em lote
+- Na confirmação da transação, todas as operações de escrita são bem-sucedidas ou todas são revertidas
+
+---
+
+## Sistema de plugins
+
+O SiliconLife suporta extensão de funcionalidades através de um sistema de plugins, permitindo que programadores terceiros adicionem novas funcionalidades à plataforma.
+
+### Interface principal
+
+```csharp
+public interface IPlugin
+{
+    string Id { get; }
+    string GetName(Language language);
+    string Version { get; }
+    string GetDescription(Language language);
+    string GetAuthor(Language language);
+    void OnLoad();
+    void OnStart();
+    void OnStop();
+    void OnUnload();
+}
+```
+
+### Carregador de plugins
+
+O `PluginLoader` é responsável por carregar DLLs de plugins a partir de um diretório especificado, executando verificações de segurança rigorosas:
+
+1. **Pesquisa de diretório** — Pesquisa todos os ficheiros .dll no diretório de plugins
+2. **Verificação de segurança** — Verifica se o plugin referencia namespaces proibidos
+3. **Carregamento isolado** — Carrega plugins de forma isolada usando um `AssemblyLoadContext` personalizado
+4. **Gestão do ciclo de vida** — Chama os métodos OnLoad, OnStart, OnStop, OnUnload do plugin
+
+### Sandbox de segurança
+
+O carregador de plugins executa as seguintes verificações de segurança:
+
+| Verificação | Descrição |
+|-------------|-----------|
+| Namespaces proibidos | System.IO, System.Net.Http, System.Net.WebSockets, System.Net.Sockets, Microsoft.CodeAnalysis |
+| Lista branca de assemblies confiáveis | Google.Protobuf, Newtonsoft.Json, MessagePack, Serilog, Microsoft.Extensions.Logging.Abstractions, Dapper |
+| Verificação de tipos proibidos | Pesquisa de tipos perigosos referenciados no plugin |
+| Verificação de membros proibidos | Pesquisa de métodos perigosos chamados no plugin |
+
+### Integração de ferramentas
+
+Os plugins podem registar ferramentas personalizadas implementando a interface `ITool`:
+
+- O método `ToolManager.ScanAllPluginAssemblies()` pesquisa implementações ITool em todos os plugins carregados
+- As ferramentas do plugin são automaticamente integradas no ciclo de chamada de ferramentas
+- As ferramentas do plugin estão sujeitas ao mesmo sistema de permissões
+
+### Ciclo de vida dos plugins
+
+```
+Carregar (OnLoad) → Iniciar (OnStart) → Em execução → Parar (OnStop) → Descarregar (OnUnload)
+```
+
+---
+
+## Estados de atividade dos Silicon Beings
+
+Os Silicon Beings possuem os seguintes estados de atividade:
+
+| Estado | Descrição |
+|--------|-----------|
+| `Idle` | Estado de inatividade, aguardando ativação do relógio |
+| `Working` | A executar um ciclo de pedido IA + chamada de ferramenta |
+| `Error` | Ocorreu um erro durante a execução |
+| `Stopped` | Parado, devido a erros consecutivos ou paragem manual |
+
+**Mecanismo do estado Stopped**:
+- Quando um Silicon Being sofre 10 erros consecutivos, entra automaticamente no estado `Stopped`
+- Após entrar no estado Stopped, o Being não executa mais nenhuma tarefa
+- É necessária intervenção manual para reiniciar
+
+Transições de estado:
+```
+Idle → Working → Idle (conclusão normal)
+Working → Error → Working (recuperação de erro)
+Working → Stopped (10 erros consecutivos ou paragem manual)
+Stopped → Idle (reinício manual)
+```

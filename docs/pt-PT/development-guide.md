@@ -18,13 +18,13 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # Implementação padrão, ponto de entrada (verificação de viabilidade)
 │   ├── SiliconLife.Fast/            # Implementação de alto desempenho, ponto de entrada (versão produção)
 │   ├── SiliconLife.Speedy/          # Motor de armazenamento de alto desempenho SpeedyPack
-│   └── SiliconLife.Speedy.Manager/  # Ferramenta de gestão SpeedyPack (Windows Forms)
+│   └── SiliconLife.Speedy.Manager/  # Ferramenta de gestão SpeedyPack (Avalonia UI)
 └── docs/                            # Documentação multilingue
 ```
 
 **Direção das dependências**:
-- `SiliconLife.Default` → `SiliconLife.Core` (unidirecional)
-- `SiliconLife.Fast` → `SiliconLife.Core` (unidirecional)
+- `SiliconLife.Default` → `SiliconLife.Common` → `SiliconLife.Core`
+- `SiliconLife.Fast` → `SiliconLife.Common` → `SiliconLife.Core`
 - `SiliconLife.Common` → `SiliconLife.Core` (unidirecional)
 
 **Descrição dos papéis das versões**:
@@ -48,7 +48,6 @@ public interface ITool
 {
     string Name { get; }
     string Description { get; }
-    ToolDefinition Definition { get; }
     Task<ToolResult> ExecuteAsync(ToolCall call);
 }
 ```
@@ -58,16 +57,19 @@ public interface ITool
 Cadeia de verificação de permissões de 5 níveis:
 
 ```
-IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curador: GlobalACL)
 ```
 
-### 4. Sistema de compilação dinâmica
+### 4. Localizador de serviços
 
-Os Silicon Beings podem reescrever o seu próprio código através da compilação dinâmica Roslyn:
+Registo e obtenção global de serviços:
+```csharp
+// Registar
+ServiceLocator.Instance.Register<IAIClient>(ollamaClient);
 
-- **CodeEncryption**: Encriptação/desencriptação AES-256
-- **DynamicCompilationExecutor**: Sandbox de compilação em memória
-- **Análise de segurança**: Análise estática em tempo de execução de padrões de código perigosos
+// Obter
+var client = ServiceLocator.Instance.Get<IAIClient>();
+```
 
 ---
 
@@ -75,73 +77,88 @@ Os Silicon Beings podem reescrever o seu próprio código através da compilaç�
 
 ### 1. Criar a classe da ferramenta
 
+Criar a nova classe em `src/SiliconLife.Common/Tools/` (ferramentas partilhadas por ambas as versões):
+
+> **Nota**: `SiliconLife.Default` e `SiliconLife.Fast` já não possuem diretórios `Tools/` independentes. Todas as ferramentas partilhadas estão unificadas em `SiliconLife.Common/Tools/`.
+
 ```csharp
-[ToolScenario(Scenario.All)]
-public class MyTool : ITool
+public class MyCustomTool : ITool
 {
-    public string Name => "my_tool";
-    public string Description => "Descrição da minha ferramenta";
-    public ToolDefinition Definition => new ToolDefinition
-    {
-        Name = Name,
-        Description = Description,
-        Parameters = new Dictionary<string, ParameterDefinition>
-        {
-            ["input"] = new() { Type = "string", Description = "Parâmetro de entrada" }
-        }
-    };
+    public string Name => "my_custom_tool";
+    public string Description => "Descrição do que esta ferramenta faz";
 
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
-        var input = call.Parameters["input"].ToString();
-        return new ToolResult { Success = true, Output = $"Resultado: {input}" };
+        var param1 = call.Parameters["param1"]?.ToString();
+
+        var result = await DoSomething(param1);
+
+        return new ToolResult
+        {
+            Success = true,
+            Output = result
+        };
     }
 }
 ```
 
 ### 2. Registar a ferramenta
 
-A ferramenta é automaticamente descoberta pelo `ToolManager` através de reflexão. Certifica-te de que a classe está no assembly correto.
+A ferramenta é automaticamente descoberta pelo `ToolManager` através de reflexão — sem necessidade de registo manual!
+
+### 3. (Opcional) Marcar como apenas para administradores
+
+```csharp
+[SiliconManagerOnly]
+public class AdminTool : ITool { ... }
+```
 
 ---
 
 ## Adicionar um novo cliente IA
 
-### 1. Implementar IAIClient
+### 1. Implementar IAIClient em `src/SiliconLife.Common/AI/`
 
 ```csharp
 public class MyAIClient : IAIClient
 {
-    public string Name => "MyAI";
+    public string Name => "my_ai";
 
     public async Task<AIResponse> ChatAsync(AIRequest request)
     {
-        // Implementação
+        var response = await CallMyAPI(request);
+
+        return new AIResponse
+        {
+            Content = response.Message,
+            ToolCalls = response.ToolCalls,
+            Usage = response.Usage
+        };
     }
 
     public async IAsyncEnumerable<string> StreamChatAsync(AIRequest request)
     {
-        // Implementação de streaming
+        await foreach (var chunk in StreamFromAPI(request))
+        {
+            yield return chunk;
+        }
     }
 }
 ```
 
-### 2. Implementar IAIClientFactory
+### 2. Criar a fábrica
 
 ```csharp
 public class MyAIClientFactory : IAIClientFactory
 {
-    public IAIClient CreateClient(Dictionary<string, object> config)
+    public IAIClient CreateClient(AIClientConfig config)
     {
         return new MyAIClient(config);
     }
-
-    public string GetDisplayName()
-    {
-        return "O Meu Serviço IA";
-    }
 }
 ```
+
+### 3. A fábrica é automaticamente descoberta e registada.
 
 ---
 
