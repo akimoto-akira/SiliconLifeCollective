@@ -23,9 +23,9 @@ SiliconLifeCollective/
 ```
 
 **Směr závislosti**:
-- `SiliconLife.Default` → `SiliconLife.Core` (jednosměrný)
-- `SiliconLife.Fast` → `SiliconLife.Core` (jednosměrný)
-- `SiliconLife.Common` → `SiliconLife.Core` (jednosměrný)
+- `SiliconLife.Core` ← `SiliconLife.Common` (Common závisí na Core)
+- `SiliconLife.Core` ← `SiliconLife.Default` (Default závisí na Core i Common)
+- `SiliconLife.Core` ← `SiliconLife.Fast` (Fast závisí na Core i Common)
 
 **Popis rolí verzí**:
 - **SiliconLife.Default**: Výchozí implementace, používána především pro ověření proveditelnosti architektury. Poskytuje jednoduché a spolehlivé souborové úložiště, vhodné pro vývojové ladění a ověření architektury.
@@ -57,7 +57,7 @@ public interface ITool
 
 5-úrovňový řetězec ověřování oprávnění:
 ```
-IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+UserFrequencyCache → IPermissionCallback → (Kurátor→IPermissionAskHandler / Nekurátor→GlobalACL→Zamítnuto)
 ```
 
 ### 4. Service Locator
@@ -75,7 +75,7 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### Přidání nového nástroje
 
-1. Vytvořte novou třídu v `src/SiliconLife.Common/Tools/` (nástroje sdílené oběma verzemi) nebo `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (nástroje specifické pro verzi):
+1. Vytvořte novou třídu v `src/SiliconLife.Common/Tools/` (sdílené nástroje) nebo `src/SiliconLife.App/Tools/` (App-specifické nástroje):
 
 ```csharp
 public class MyCustomTool : ITool
@@ -371,14 +371,14 @@ public class CustomExecutor : ExecutorBase
     
     public override async Task<ExecutorResult> ExecuteAsync(ExecutorRequest request)
     {
-        // Nejprve ověřte oprávnění
-        var permission = await CheckPermissionAsync(request);
+        var callerId = request.CallerId;
+        var pm = ServiceLocator.Instance.GetPermissionManager(callerId);
+        var permission = pm.CheckPermission(request.Resource, request.Operation);
         if (!permission.Allowed)
         {
             return ExecutorResult.Denied(permission.Reason);
         }
         
-        // Proveďte operaci
         var result = await PerformOperation(request);
         
         return ExecutorResult.Success(result);

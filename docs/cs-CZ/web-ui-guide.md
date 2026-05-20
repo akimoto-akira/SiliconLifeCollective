@@ -345,8 +345,8 @@ Najeďte myší na libovolný identifikátor pro zobrazení:
   - `ChatHistoryListView` — Seznam relací
   - `ChatHistoryDetailView` — Detaily zpráv
 - **API trasy**:
-  - `/api/chat-history/{beingId}/conversations` — Získat seznam relací
-  - `/api/chat-history/{beingId}/conversation/{conversationId}` — Získat detaily zpráv
+  - `/api/chat-history/conversations?beingId={beingId}` — Získat seznam relací
+  - `/api/chat-history/messages?sessionId={sessionId}` — Získat detaily zpráv
 
 ---
 

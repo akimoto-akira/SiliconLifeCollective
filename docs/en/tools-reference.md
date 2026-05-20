@@ -710,11 +710,11 @@ The tool system allows silicon beings to interact with the external world throug
 
 All tool executions go through a 5-level permission chain:
 
-1. **IsCurator** — Silicon Curator bypasses all checks
-2. **UserFrequencyCache** — User high-frequency allow/deny cache
-3. **GlobalACL** — Global Access Control List
-4. **IPermissionCallback** — Custom permission callback function
-5. **IPermissionAskHandler** — Ask user
+1. **UserFrequencyCache** — Cached user high-frequency allow/deny decisions
+2. **IPermissionCallback** — Custom permission callback function
+3. **Curator Branch** — If callback returns AskUser or no callback:
+   - **Curator** → `IPermissionAskHandler` (ask user via IM)
+   - **Non-curator** → `GlobalACL` → default deny
 
 ## Creating Custom Tools
 
@@ -764,7 +764,7 @@ public class MyCustomTool : ITool
 
 ### Step 2: Add to Project
 
-Place the tool file in the `src/SiliconLife.Common/Tools/` directory (shared tools) or `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` directory (version-specific tools). The `ToolManager` will automatically discover and register it through reflection at startup.
+Place the tool file in the `src/SiliconLife.Common/Tools/` directory (shared tools for both versions). The `ToolManager` will automatically discover and register it through reflection at startup.
 
 ### Step 2a: Register Tools via Plugin
 

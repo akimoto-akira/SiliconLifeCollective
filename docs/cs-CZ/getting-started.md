@@ -73,8 +73,8 @@ Upravte `src/SiliconLife.Default/Config/DefaultConfigData.cs` nebo změňte konf
   "AIClients": {
     "DashScope": {
       "ApiKey": "vas-api-klic-zde",
-      "Model": "qwen-plus",
-      "Region": "cn-hangzhou"
+      "Model": "qwen3.6-plus",
+      "Region": "beijing"
     }
   }
 }

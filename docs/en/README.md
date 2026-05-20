@@ -26,7 +26,7 @@
 - **Hot Reload Tool** — Supports automatic compilation, file update, and restarting SiliconLife.Fast during runtime, without manual intervention
 - **Tool Call Loop** — AI returns tool call → Execute tool → Results fed back to AI → Continue loop until pure text response
 - **Executor-Permission Security** — All I/O operations go through strict permission validation via executors
-  - 5-level permission chain: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+  - 5-level permission chain: UserFrequencyCache → IPermissionCallback → (Curator→IPermissionAskHandler / NonCurator→GlobalACL→Deny)
   - Complete audit logging of all permission decisions
 
 ### AI & Knowledge
@@ -40,7 +40,7 @@
 ### Web Interface
 - **Modern Web UI** — Built-in HTTP server with SSE real-time updates
 - **7 Skin Themes** — Admin, Chat, Creative, Dev, High Contrast, Light, Minimal versions, supporting auto-discovery and switching
-- **22 Controllers** — Complete system management, chat, configuration, monitoring functionality
+- **23 Controllers** — Complete system management, chat, configuration, monitoring functionality
 - **Zero Frontend Framework Dependency** — HTML/CSS/JS generated server-side via `H`, `CssBuilder`, and `JsBuilder`
 
 ### Internationalization & Localization
@@ -167,7 +167,7 @@ SiliconLifeCollective.sln
 │   │   ├── Help/                          # Help documentation localization (multi-language)
 │   │   └── Web/                           # Web UI implementation
 │   │       ├── Component/                 # UI component library (30+ components)
-│   │       ├── Controllers/               # 22 controllers
+│   │       ├── Controllers/               # 23 controllers
 │   │       ├── Models/                    # View models
 │   │       ├── Views/                     # HTML views
 │   │       └── Skins/                     # 7 skin themes
@@ -238,7 +238,7 @@ Main Loop (dedicated thread, watchdog + circuit breaker)
 All AI-initiated I/O operations must pass through a strict security chain:
 
 ```
-Tool Call → Executor → Permission Manager → [IsCurator → Frequency Cache → Global ACL → Callback → Ask User]
+Tool Call → Executor → Permission Manager → [Frequency Cache → Callback → (Curator→AskUser / NonCurator→GlobalACL→Deny)]
 ```
 
 ## 🚀 Quick Start

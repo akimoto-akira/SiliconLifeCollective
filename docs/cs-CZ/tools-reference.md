@@ -710,11 +710,10 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 Všechna provádění nástrojů procházejí 5úrovňovým řetězcem oprávnění:
 
-1. **IsCurator** — Silikonový kurátor obchází všechny kontroly
-2. **UserFrequencyCache** — Cache vysoké frekvence povolení/zamítnutí uživatele
-3. **GlobalACL** — Globální seznam řízení přístupu
-4. **IPermissionCallback** — Vlastní funkce zpětného volání oprávnění
-5. **IPermissionAskHandler** — Dotazování uživatele
+1. **UserFrequencyCache** — Cache vysoké frekvence povolení/zamítnutí uživatele
+2. **IPermissionCallback** — Vlastní funkce zpětného volání oprávnění
+3. **Větev kurátora**: IsCurator → IPermissionAskHandler (dotazování uživatele)
+4. **Větev nekurátora**: GlobalACL → Výchozí zamítnutí
 
 ## Vytvoření Vlastního Nástroje
 
@@ -764,7 +763,7 @@ public class MyCustomTool : ITool
 
 ### Krok 2: Přidání do Projektu
 
-Umístěte soubor nástroje do adresáře `src/SiliconLife.Common/Tools/` (sdílené nástroje) nebo `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (nástroje specifické pro verzi). `ToolManager` jej automaticky objeví a zaregistruje při spuštění pomocí reflexe.
+Umístěte soubor nástroje do adresáře `src/SiliconLife.Common/Tools/` (sdílené nástroje) nebo `src/SiliconLife.App/Tools/` (App-specifické nástroje). `ToolManager` jej automaticky objeví a zaregistruje při spuštění pomocí reflexe.
 
 ### Krok 2a: Registrace Nástroje přes Plugin
 

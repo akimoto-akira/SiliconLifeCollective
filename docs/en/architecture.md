@@ -323,7 +323,7 @@ Factories provide:
 | Baidu Qianfan (ERNIE) | 📋 | Cloud | Baidu ERNIE AI service |
 | Zhipu AI (GLM) | 📋 | Cloud | Zhipu AI service |
 | Moonshot AI (Kimi) | 📋 | Cloud | Moonshot Kimi AI service |
-| Volcengine Ark (Doubao) | 📋 | Cloud | ByteDance Doubao AI service |
+| Volcengine Ark (Doubao) | ✅ | Cloud | ByteDance Doubao AI service, supports streaming and non-streaming modes, built-in dual rate limiting |
 | DeepSeek (Direct) | 📋 | Cloud | DeepSeek AI service |
 | 01.AI | 📋 | Cloud | 01.AI service |
 | Tencent Hunyuan | 📋 | Cloud | Tencent Hunyuan AI service |

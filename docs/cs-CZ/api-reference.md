@@ -66,44 +66,47 @@ Většina endpointů vyžaduje autentizaci prostřednictvím session cookies spr
 
 ## Chatovací Systém
 
+### Získat Seznam Konverzací
+
+**GET** `/api/chat/conversations`
+
+**Odpověď**:
+```json
+[
+  {
+    "sessionId": "session-uuid",
+    "beingId": "being-uuid",
+    "type": "single",
+    "displayName": "Chat s bytostí",
+    "lastMessage": "Poslední zpráva...",
+    "lastTime": "2026-04-20T10:30:00Z"
+  }
+]
+```
+
 ### Odeslat Zprávu
 
-**POST** `/api/chat`
+**POST** `/api/chat/send`
 
 **Požadavek**:
 ```json
 {
-  "beingId": "being-uuid",
-  "message": "Hello, how are you?",
-  "sessionId": "optional-session-id"
+  "channelId": "session-uuid",
+  "content": "Hello, how are you?"
 }
 ```
 
-**Odpověď** (non-streaming):
+**Odpověď**:
 ```json
 {
-  "reply": "I'm doing well, thank you!",
-  "sessionId": "session-uuid",
-  "timestamp": "2026-04-20T10:30:00Z"
+  "success": true,
+  "messageId": "message-uuid"
 }
 ```
 
-### Streamovaný Chat (SSE)
+### Získat Historii Zpráv
 
-**GET** `/api/chat/stream?beingId={id}&message={msg}`
-
-**Odpověď**: Server-sent events stream
-
-```
-data: {"type": "chunk", "content": "I"}
-data: {"type": "chunk", "content": "'m"}
-data: {"type": "chunk", "content": " thinking..."}
-data: {"type": "complete", "sessionId": "uuid"}
-```
-
-### Získat Historii Chatu
-
-**GET** `/api/chat/{sessionId}/history`
+**GET** `/api/chat/messages?channelId={sessionId}`
 
 **Odpověď**:
 ```json
@@ -121,6 +124,32 @@ data: {"type": "complete", "sessionId": "uuid"}
     }
   ]
 }
+```
+
+### Zastavit AI Myšlení
+
+**POST** `/api/chat/stop`
+
+**Požadavek**:
+```json
+{
+  "channelId": "session-uuid"
+}
+```
+
+### Streamovaný Chat (SSE)
+
+**GET** `/api/chat/stream?channelId={sessionId}`
+
+**Odpověď**: Server-sent events stream
+
+```
+data: {"type": "chunk", "content": "I"}
+data: {"type": "chunk", "content": "'m"}
+data: {"type": "chunk", "content": " thinking..."}
+data: {"type": "tool_call", "tool": "disk_read", "args": {...}}
+data: {"type": "tool_result", "result": "..."}
+data: {"type": "complete", "sessionId": "uuid"}
 ```
 
 ---
@@ -440,7 +469,7 @@ Server-sent events pro aktualizace v reálném čase:
 ### Chatovací Události
 
 ```javascript
-const eventSource = new EventSource('/api/chat/stream?beingId=xxx&message=xxx');
+const eventSource = new EventSource('/api/chat/stream?channelId=session-uuid');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);

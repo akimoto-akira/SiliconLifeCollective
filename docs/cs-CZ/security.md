@@ -48,7 +48,7 @@ Každá silikonová bytost má svou vlastní **soukromou instanci PermissionMana
 
 ## Proces Ověřování Oprávnění
 
-Priorita dotazu je: **1. Uživatelské vysoké zamítnutí → 2. Uživatelské vysoké povolení → 3. Callback funkce**
+Priorita dotazu je: **1. UserFrequencyCache → 2. IPermissionCallback → 3. Větev kurátora (AskHandler/GlobalACL)**
 
 ```
 ┌─────────────┐
@@ -65,28 +65,34 @@ Priorita dotazu je: **1. Uživatelské vysoké zamítnutí → 2. Uživatelské 
                              │
                              ▼
                     ┌─────────────────┐
-                    │ 1. IsCurator?   │──Ano──▶ Povoleno
-                    └────────┬────────┘
-                             │ Ne
-                             ▼
-                    ┌─────────────────┐
-                    │ 2. Vysoké       │──Shoda──▶ Zamítnuto
-                    │ zamítnutí       │
-                    │ (Memory cache)  │
+                    │ 1. UserFrequency│──Shoda──▶ Povoleno / Zamítnuto
+                    │    Cache        │
+                    │ (HighDeny/      │
+                    │  HighAllow)     │
                     └────────┬────────┘
                              │ Žádná shoda
                              ▼
                     ┌─────────────────┐
-                    │ 3. Vysoké       │──Shoda──▶ Povoleno
-                    │ povolení        │
-                    │ (Memory cache)  │
+                    │ 2. IPermission  │──▶ Povoleno / Zamítnuto / Dotaz uživatele
+                    │    Callback     │
                     └────────┬────────┘
-                             │ Žádná shoda
+                             │ AskUser nebo žádný callback
                              ▼
                     ┌─────────────────┐
-                    │ 4. Oprávnění    │
-                    │ callback        │──▶ Povoleno / Zamítnuto / Dotaz uživatele
-                    └─────────────────┘
+                    │ 3. IsCurator?   │
+                    └────┬───────┬────┘
+                         │       │
+                    Ano  │       │ Ne
+                         ▼       ▼
+              ┌──────────┐  ┌──────────────┐
+              │ Dotaz    │  │ GlobalACL    │──Shoda──▶ Povoleno / Zamítnuto
+              │ uživatele│  └──────┬───────┘
+              │ (IM)     │         │ Žádná shoda
+              └──────────┘         ▼
+                           ┌──────────────┐
+                           │ Výchozí      │
+                           │ zamítnutí    │
+                           └──────────────┘
 ```
 
 **Klíčový bod**: Exekutor vidí pouze boolean (Povoleno/Zamítnuto). Správce oprávnění interně zpracovává tříhodnotové rozhodnutí (Povoleno/Zamítnuto/Dotaz uživatele) a řeší Dotaz uživatele před vrácením exekutoru.
@@ -97,41 +103,35 @@ Priorita dotazu je: **1. Uživatelské vysoké zamítnutí → 2. Uživatelské 
 
 Exekutory jsou **jedinou** cestou pro I/O operace. Vynucují:
 
-### Nezávislá Plánovací Vlákna
+### Statický Model Provádění
 
-Každý exekutor má své vlastní **nezávislé plánovací vlákno**:
+Současné implementace exekutorů (`DiskExecutor`, `NetworkExecutor`, `CommandLineExecutor`) jsou **statické třídy**, které poskytují synchronní provádění s kontrolou časového limitu:
 
-- Izolace vláken mezi exekutory — blokování vlákna jednoho exekutoru neovlivní ostatní.
-- Každý exekutor může nastavit nezávislé limity zdrojů (CPU, paměť atd.).
-- Správa fondu vláken pro vlákna exekutorů.
+- Každý exekutor kontroluje oprávnění prostřednictvím `PermissionManager` volajícího před provedením.
+- Operace běží na `Task.Run` s konfigurovatelným časovým limitem.
+- Při překročení časového limitu je operace považována za selhanou.
+- `ExecutorBase` poskytuje abstraktní základní třídu s podporou vlákna na pozadí a fronty požadavků pro budoucí rozšíření.
 
-### Fronta Požadavků
-
-Každý exekutor udržuje frontu požadavků:
-
-- Požadavky jsou směrovány podle typu na příslušný exekutor.
-- Podpora prioritního řazení.
-- Kontrola časového limitu pro každý požadavek.
-
-### Zámek Vlákna pro Ověřování Oprávnění
+### Ověřování Oprávnění v Exekutorech
 
 Když nástroj iniciová přístup ke zdroji:
 
-1. Exekutor přijme požadavek a **zamkne své vlákno**.
-2. Exekutor dotazuje soukromého správce oprávnění bytosti.
-3. Pokud callback vrátí Dotaz uživatele, vlákno exekutoru **zůstane zamčené** čekající na odpověď uživatele.
-4. Bytost vidí pouze konečný výsledek (Úspěch nebo Zamítnuto) — nikdy nevidí přechodný stav "Čeká" nebo "Pending".
-5. Pouze silikonový kurátor spouští skutečný uživatelský prompt. Běžné bytosti synchronně dotazují globální ACL bez blokování.
-6. Při časovém limitu je požadavek považován za zamítnutý a zámek vlákna je uvolněn.
+1. Exekutor přijme požadavek.
+2. Exekutor dotazuje soukromého správce oprávnění bytosti prostřednictvím `ServiceLocator.Instance.GetPermissionManager(callerId)`.
+3. Pokud je oprávnění zamítnuto, operace je okamžitě blokována.
+4. Pokud callback vrátí Dotaz uživatele (cesta kurátora), vlákno exekutoru **zůstane zamčené** čekající na odpověď uživatele.
+5. Bytost vidí pouze konečný výsledek (Úspěch nebo Zamítnuto) — nikdy nevidí přechodný stav "Čeká" nebo "Pending".
+6. Pouze silikonový kurátor spouští skutečný uživatelský prompt. Běžné bytosti synchronně dotazují globální ACL bez blokování.
+7. Při časovém limitu je požadavek považován za zamítnutý a zámek vlákna je uvolněn.
 
 ### Typy Exekutorů
 
 | Exekutor | Rozsah | Výchozí časový limit |
 |----------|-------|---------------------|
 | `DiskExecutor` | Čtení/zápis souborů, operace s adresáři | 30 sekund |
-| `NetworkExecutor` | HTTP požadavky, WebSocket připojení | 60 sekund |
-| `CommandLineExecutor` | Provádění shell příkazů | 120 sekund |
-| `DynamicCompilationExecutor` | Paměťová kompilace Roslyn | 60 sekund |
+| `NetworkExecutor` | HTTP požadavky, WebSocket připojení | 30 sekund |
+| `CommandLineExecutor` | Provádění shell příkazů | 30 sekund |
+| `DynamicCompilationExecutor` | Paměťová kompilace Roslyn | N/A (deleguje na CompilationCore) |
 
 ### Izolace Výjimek a Tolerance Chyb
 
@@ -143,7 +143,9 @@ Když nástroj iniciová přístup ke zdroji:
 
 ## Globální ACL (Seznam Řízení Přístupu)
 
-Sdílená tabulka pravidel perzistentní do úložiště, spravovaná pouze silikonovým kurátorem:
+GlobalACL je **poslední úroveň** ověřování oprávnění (pouze pro nekurátorské bytosti), která poskytuje globální pravidla řízení přístupu. Sdílená tabulka pravidel perzistentní do úložiště, spravovaná pouze silikonovým kurátorem:
+
+- **Pouze pro nekurátorské bytosti**: Když IPermissionCallback vrátí AskUser a volající není kurátor, systém přechází na GlobalACL.
 
 ```json
 {
@@ -158,7 +160,7 @@ Sdílená tabulka pravidel perzistentní do úložiště, spravovaná pouze sili
 - Pravidla jsou vyhodnocována v pořadí; první shoda vyhrává.
 - Pouze silikonový kurátor může upravovat globální ACL (prostřednictvím svého specializovaného nástroje).
 - Změny jsou okamžitě platné.
-- Globální ACL **není** v výše uvedeném prioritním řetězci pro každý dotaz — interně je odkazováno callback funkcí.
+- **Výchozí zamítnutí**: Pokud GlobalACL nenajde odpovídající pravidlo, operace je zamítnuta.
 
 ---
 

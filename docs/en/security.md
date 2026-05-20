@@ -9,7 +9,7 @@
 Security in Silicon Life Collective is built on a **defense in depth** model. Core principle: **All I/O operations must go through executors**, and executors enforce permission checks before execution.
 
 ```
-Tool Call → Executor → Permission Manager → High Deny Cache → High Allow Cache → Callback → Ask User
+Tool Call → Executor → Permission Manager → Frequency Cache → Callback → (Curator→AskUser / NonCurator→GlobalACL→Deny)
 ```
 
 ---
@@ -48,7 +48,7 @@ Each silicon being has its own **private PermissionManager** instance. Permissio
 
 ## Permission Verification Flow
 
-Query priority is: **1. User High Deny → 2. User High Allow → 3. Callback Function**
+Query priority is: **1. UserFrequencyCache → 2. IPermissionCallback → 3. Curator Branch (AskHandler/GlobalACL)**
 
 ```
 ┌─────────────┐
@@ -63,26 +63,33 @@ Query priority is: **1. User High Deny → 2. User High Allow → 3. Callback Fu
 └─────────────┘            │
                            ▼
                   ┌─────────────────┐
-                  │ 1. IsCurator?   │──Yes──▶ Allowed
-                  └────────┬────────┘
-                           │ No
-                           ▼
-                  ┌─────────────────┐
-                  │ 2. User High    │──Match──▶ Denied
-                  │ Deny Cache      │
+                  │ 1. UserFrequency│──Match──▶ Allowed / Denied
+                  │    Cache        │
+                  │ (HighDeny/      │
+                  │  HighAllow)     │
                   └────────┬────────┘
                            │ No Match
                            ▼
                   ┌─────────────────┐
-                  │ 3. User High    │──Match──▶ Allowed
-                  │ Allow Cache     │
+                  │ 2. IPermission  │──▶ Allowed / Denied / AskUser
+                  │    Callback     │
                   └────────┬────────┘
-                           │ No Match
+                           │ AskUser or no callback
                            ▼
                   ┌─────────────────┐
-                  │ 4. Permission   │
-                  │ Callback        │──▶ Allowed / Denied / AskUser
-                  └─────────────────┘
+                  │ 3. IsCurator?   │
+                  └────┬───────┬────┘
+                       │       │
+                  Yes  │       │ No
+                       ▼       ▼
+            ┌──────────┐  ┌──────────────┐
+            │ Ask User │  │ GlobalACL    │──Match──▶ Allowed / Denied
+            │ (IM)     │  └──────┬───────┘
+            └──────────┘         │ No Match
+                                 ▼
+                          ┌──────────────┐
+                          │ Default Deny │
+                          └──────────────┘
 ```
 
 **Key Point**: Executors only see booleans (Allowed/Denied). The permission manager internally handles the ternary decision (Allowed/Denied/AskUser) and resolves AskUser before returning to the executor.
@@ -93,41 +100,35 @@ Query priority is: **1. User High Deny → 2. User High Allow → 3. Callback Fu
 
 Executors are the **only** path for I/O operations. They enforce:
 
-### Independent Scheduling Threads
+### Static Execution Model
 
-Each executor has its **own scheduling thread**:
+Current executor implementations (`DiskExecutor`, `NetworkExecutor`, `CommandLineExecutor`) are **static classes** that provide synchronous execution with timeout control:
 
-- Thread isolation between executors — one executor's thread blocking doesn't affect others.
-- Each executor can set independent resource limits (CPU, memory, etc.).
-- Thread pool management for executor threads.
+- Each executor checks permission via the caller's `PermissionManager` before executing.
+- Operations run on `Task.Run` with configurable timeout.
+- On timeout, the operation is treated as failed.
+- `ExecutorBase` provides an abstract base class with background thread and request queue support for future extensions.
 
-### Request Queues
-
-Each executor maintains a request queue:
-
-- Requests are routed to the appropriate executor by type.
-- Priority queuing support.
-- Timeout control per request.
-
-### Thread Locking for Permission Verification
+### Permission Verification in Executors
 
 When a tool initiates resource access:
 
-1. Executor receives the request and **locks its thread**.
-2. Executor queries the being's private permission manager.
-3. If callback returns AskUser, the executor thread **remains locked** waiting for user response.
-4. The being only sees the final result (success or denial) — it never sees the intermediate "pending" or "waiting" state.
-5. Only the silicon curator triggers real user prompts. Normal beings query the global ACL synchronously without blocking.
-6. On timeout, the request is treated as denied, and the thread lock is released.
+1. Executor receives the request.
+2. Executor queries the being's private permission manager via `ServiceLocator.Instance.GetPermissionManager(callerId)`.
+3. If permission is denied, the operation is blocked immediately.
+4. If callback returns AskUser (curator path), the executor thread **remains locked** waiting for user response.
+5. The being only sees the final result (success or denial) — it never sees the intermediate "pending" or "waiting" state.
+6. Only the silicon curator triggers real user prompts. Normal beings query the global ACL synchronously without blocking.
+7. On timeout, the request is treated as denied, and the thread lock is released.
 
 ### Executor Types
 
 | Executor | Scope | Default Timeout |
 |----------|-------|-----------------|
 | `DiskExecutor` | File read/write, directory operations | 30 seconds |
-| `NetworkExecutor` | HTTP requests, WebSocket connections | 60 seconds |
-| `CommandLineExecutor` | Shell command execution | 120 seconds |
-| `DynamicCompilationExecutor` | Roslyn in-memory compilation | 60 seconds |
+| `NetworkExecutor` | HTTP requests, WebSocket connections | 30 seconds |
+| `CommandLineExecutor` | Shell command execution | 30 seconds |
+| `DynamicCompilationExecutor` | Roslyn in-memory compilation | N/A (delegates to CompilationCore) |
 
 ### Exception Isolation and Fault Tolerance
 
@@ -154,7 +155,7 @@ Shared rule table persisted to storage, managed only by the silicon curator:
 - Rules are evaluated in order; first match wins.
 - Only the silicon curator can modify the global ACL (via its dedicated tools).
 - Changes take effect immediately.
-- Global ACL is **not** in the priority chain per query mentioned above — it is referenced internally by the callback function.
+- Global ACL is checked directly by `PermissionManager` for **non-curator** beings when the callback returns AskUser or no callback is configured. It is **not** referenced by the callback function.
 
 ---
 

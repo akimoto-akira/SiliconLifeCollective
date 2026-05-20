@@ -23,9 +23,10 @@ SiliconLifeCollective/
 ```
 
 **Dependency direction**:
-- `SiliconLife.Default` → `SiliconLife.Core` (one-way)
-- `SiliconLife.Fast` → `SiliconLife.Core` (one-way)
-- `SiliconLife.Common` → `SiliconLife.Core` (one-way)
+- `SiliconLife.Default` → `SiliconLife.Core` + `SiliconLife.Common` + `SiliconLife.App`
+- `SiliconLife.Fast` → `SiliconLife.Core` + `SiliconLife.Common` + `SiliconLife.App` + `SiliconLife.Speedy`
+- `SiliconLife.Common` → `SiliconLife.Core`
+- `SiliconLife.App` → `SiliconLife.Core` + `SiliconLife.Common`
 
 **Version Role Description**:
 - **SiliconLife.Default**: Default implementation, primarily used for architecture feasibility verification. Provides a simple and reliable file system storage implementation, suitable for development debugging and architecture verification.
@@ -57,7 +58,7 @@ public interface ITool
 
 5-level permission verification chain:
 ```
-IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+UserFrequencyCache → IPermissionCallback → (Curator→IPermissionAskHandler / NonCurator→GlobalACL→Deny)
 ```
 
 ### 4. Service Locator
@@ -75,7 +76,7 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### Adding a New Tool
 
-1. Create a new class in `src/SiliconLife.Common/Tools/` (shared tools for both versions) or `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (version-specific tools):
+1. Create a new class in `src/SiliconLife.Common/Tools/` (shared tools for both versions):
 
 ```csharp
 public class MyCustomTool : ITool
@@ -365,23 +366,45 @@ public class MyCustomCalendar : CalendarBase
 ### Example: Adding a Custom Executor
 
 ```csharp
-public class CustomExecutor : ExecutorBase
+// Executors are currently static classes (DiskExecutor, NetworkExecutor, CommandLineExecutor)
+// that check permissions via ServiceLocator before executing.
+// ExecutorBase provides an abstract base with background thread and request queue support.
+
+public static class CustomExecutor
 {
-    public override string Name => "custom";
-    
-    public override async Task<ExecutorResult> ExecuteAsync(ExecutorRequest request)
+    private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);
+
+    public static ExecutorResult Execute(ExecutorRequest request, TimeSpan? timeout = null)
     {
-        // Verify permissions first
-        var permission = await CheckPermissionAsync(request);
-        if (!permission.Allowed)
+        // Check permission first
+        PermissionManager? pm = ServiceLocator.Instance.GetPermissionManager(request.CallerId);
+        if (pm == null || !pm.CheckPermission(request.CallerId, PermissionType.Function, request.ResourcePath))
         {
-            return ExecutorResult.Denied(permission.Reason);
+            return ExecutorResult.Failed($"Permission denied: {request.ResourcePath}");
         }
-        
+
+        TimeSpan actualTimeout = timeout ?? DefaultTimeout;
+
+        try
+        {
+            Task<ExecutorResult> task = Task.Run(() => ExecuteCore(request));
+            if (task.Wait(actualTimeout))
+            {
+                return task.Result;
+            }
+            return ExecutorResult.Failed("Operation timed out");
+        }
+        catch (AggregateException ex)
+        {
+            return ExecutorResult.Failed(ex.InnerException?.Message ?? ex.Message);
+        }
+    }
+
+    private static ExecutorResult ExecuteCore(ExecutorRequest request)
+    {
         // Execute operation
-        var result = await PerformOperation(request);
-        
-        return ExecutorResult.Success(result);
+        var result = PerformOperation(request);
+        return ExecutorResult.Successful(result);
     }
 }
 ```
@@ -448,10 +471,10 @@ Test complete flows:
 Any AI-initiated operation must go through permission chain:
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+PermissionManager? pm = ServiceLocator.Instance.GetPermissionManager(callerId);
+if (pm == null || !pm.CheckPermission(callerId, permissionType, resource))
 {
-    return Result.Denied(permission.Reason);
+    return ExecutorResult.Failed("Permission denied");
 }
 ```
 

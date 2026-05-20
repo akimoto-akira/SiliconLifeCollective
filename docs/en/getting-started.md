@@ -72,12 +72,14 @@ Edit `src/SiliconLife.Default/Config/DefaultConfigData.cs` or modify configurati
   "AIClients": {
     "DashScope": {
       "ApiKey": "your-api-key-here",
-      "Model": "qwen-plus",
-      "Region": "cn-hangzhou"
+      "Model": "qwen3.6-plus",
+      "Region": "beijing"
     }
   }
 }
 ```
+
+**Available Regions**: `beijing` (China North 2), `virginia` (US), `singapore` (Singapore), `hongkong` (Hong Kong, China), `frankfurt` (Germany)
 
 ### 4. Run the Application
 

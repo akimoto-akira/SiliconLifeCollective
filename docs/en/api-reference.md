@@ -68,60 +68,87 @@ Most endpoints require authentication via session cookies managed by the Web UI.
 
 ### Send Message
 
-**POST** `/api/chat`
+**POST** `/api/chat/send`
 
 **Request**:
 ```json
 {
-  "beingId": "being-uuid",
-  "message": "Hello, how are you?",
-  "sessionId": "optional-session-id"
+  "channelId": "session-uuid",
+  "content": "Hello, how are you?"
 }
 ```
 
-**Response** (non-streaming):
+**Response**:
 ```json
 {
-  "reply": "I'm doing well, thank you!",
-  "sessionId": "session-uuid",
-  "timestamp": "2026-04-20T10:30:00Z"
+  "success": true,
+  "messageId": "message-uuid"
 }
 ```
 
 ### Streaming Chat (SSE)
 
-**GET** `/api/chat/stream?beingId={id}&message={msg}`
+**GET** `/api/chat/stream`
 
-**Response**: Server-Sent Events stream
+Server-Sent Events stream for real-time chat updates.
 
+### Get Conversations
+
+**GET** `/api/chat/conversations`
+
+**Response**:
+```json
+{
+  "conversations": [
+    {
+      "sessionId": "session-uuid",
+      "beingId": "being-uuid",
+      "type": "single",
+      "displayName": "Chat with Assistant",
+      "lastMessage": "Hello!",
+      "lastTime": "2026-04-20T10:30:00Z"
+    }
+  ]
+}
 ```
-data: {"type": "chunk", "content": "I"}
-data: {"type": "chunk", "content": "'m"}
-data: {"type": "chunk", "content": " thinking..."}
-data: {"type": "complete", "sessionId": "uuid"}
-```
 
-### Get Chat History
+### Get Messages
 
-**GET** `/api/chat/{sessionId}/history`
+**GET** `/api/chat/messages?channelId={sessionId}`
 
 **Response**:
 ```json
 {
   "messages": [
     {
-      "role": "user",
+      "id": "message-uuid",
+      "senderId": "sender-uuid",
+      "channelId": "session-uuid",
       "content": "Hello",
-      "timestamp": "2026-04-20T10:30:00Z"
-    },
-    {
-      "role": "assistant",
-      "content": "Hi there!",
-      "timestamp": "2026-04-20T10:30:05Z"
+      "timestamp": "2026-04-20T10:30:00Z",
+      "role": "user"
     }
   ]
 }
 ```
+
+### Get Chat History
+
+**GET** `/api/chat/history`
+
+Returns chat history sessions.
+
+### Stop AI Thinking
+
+**POST** `/api/chat/stop`
+
+Stops the current AI streaming response.
+
+### Upload File
+
+**POST** `/api/chat/upload`
+
+Uploads a file to the chat session.
 
 ---
 
@@ -361,6 +388,87 @@ data: {"type": "complete", "sessionId": "uuid"}
     }
   ]
 }
+```
+
+---
+
+## Memory API
+
+### Get Memory List
+
+**GET** `/api/memory/list`
+
+**Query Parameters**: `beingId`, `type`, `limit`
+
+### Get Memory Detail
+
+**GET** `/api/memory/detail/{id}`
+
+### Get Memory Statistics
+
+**GET** `/api/memory/stats`
+
+**Query Parameters**: `beingId`
+
+### Search Memory
+
+**GET** `/api/memory/search`
+
+**Query Parameters**: `beingId`, `keyword`, `limit`
+
+### Get Memory Beings
+
+**GET** `/api/memory/beings`
+
+Returns list of beings with memory data.
+
+### Trace Memory Original
+
+**GET** `/api/memory/trace/{id}`
+
+Traces the original source of a memory entry.
+
+### Get Memory Timeline HTML
+
+**GET** `/api/memory/timeline-html`
+
+**Query Parameters**: `beingId`
+
+Returns HTML fragment for memory timeline visualization.
+
+---
+
+## Code Browser API
+
+### Get Code Types
+
+**GET** `/api/code/types`
+
+Returns all available types for code browsing.
+
+### Get Code Detail
+
+**GET** `/api/code/detail`
+
+**Query Parameters**: `type`, `member`
+
+Returns detailed information about a specific type or member.
+
+---
+
+## Executor API
+
+### Get Executor Status
+
+**GET** `/api/executors/status`
+
+**Response**:
+```json
+[
+  { "name": "DiskExecutor", "status": "Idle", "queueCount": 0 },
+  { "name": "NetworkExecutor", "status": "Idle", "queueCount": 0 },
+  { "name": "CommandLineExecutor", "status": "Idle", "queueCount": 0 }
+]
 ```
 
 ---

@@ -379,7 +379,7 @@ Web UI se zcela vyhýbá šablonovým souborům a generuje veškerý markup v C#
 
 ### Kontrolerový Systém
 
-Web UI následuje **MVC-like pattern** s 22 kontrolery zpracovávajícími různé aspekty:
+Web UI následuje **MVC-like pattern** s 23 kontrolery zpracovávajícími různé aspekty:
 
 | Kontroler | Účel |
 |------------|---------|

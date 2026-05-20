@@ -14,76 +14,42 @@ The permission system ensures all AI-initiated operations are properly validated
 ┌─────────────────────────────────────────────┐
 │          Permission Verification             │
 ├─────────────────────────────────────────────┤
-│  Level 1: IsCurator                          │
-│  ↓ Bypasses if true                          │
-│  Level 2: UserFrequencyCache                 │
-│  ↓ Rate limiting                             │
-│  Level 3: GlobalACL                          │
-│  ↓ Access control list                       │
-│  Level 4: IPermissionCallback                │
-│  ↓ Custom logic                              │
-│  Level 5: IPermissionAskHandler              │
-│  ↓ Ask user                                  │
+│  Level 1: UserFrequencyCache                 │
+│  ↓ Cached user decisions (HighDeny/HighAllow)│
+│  Level 2: IPermissionCallback                │
+│  ↓ Custom logic (Allowed/Denied/AskUser)     │
+│  Level 3: IsCurator?                         │
+│  ↓ Yes → IPermissionAskHandler (ask user)    │
+│  ↓ No  → GlobalACL → Default Deny            │
 │  Result: Allowed or Denied                   │
 └─────────────────────────────────────────────┘
 ```
 
-## Level 1: IsCurator
+> **Note**: The actual query priority in `PermissionManager.CheckPermission()` is:
+> 1. **UserFrequencyCache** — Check cached high-frequency user decisions first
+> 2. **IPermissionCallback** — Evaluate custom callback rules
+> 3. **Curator branch** — If callback returns AskUser or no callback:
+>    - **Curator** → `IPermissionAskHandler` (prompt user via IM)
+>    - **Non-curator** → `GlobalACL` → default deny
 
-Administrator/Curator bypasses all permission checks.
+## Level 1: UserFrequencyCache
 
-```csharp
-if (user.IsCurator)
-{
-    return PermissionResult.Allowed("Curator access");
-}
-```
-
-## Level 2: UserFrequencyCache
-
-Per-user rate limiting to prevent abuse.
+Per-being, memory-only cache of high-frequency user decisions (HighDeny/HighAllow).
 
 ```csharp
 var cache = new UserFrequencyCache();
-if (!cache.CheckLimit(userId, resource))
+PermissionResult? cachedResult = cache.Query(permissionType, resource);
+if (cachedResult.HasValue)
 {
-    return PermissionResult.Denied("Rate limit exceeded");
+    return cachedResult.Value == PermissionResult.Allowed;
 }
 ```
 
-## Level 3: GlobalACL
+- **HighDeny** takes priority over **HighAllow**
+- **Memory-only**: Caches are not persisted, lost on restart
+- **Configurable expiration**: Users can set validity period for cache entries
 
-Global Access Control List defines explicit rules.
-
-### ACL Structure
-
-```json
-{
-  "rules": [
-    {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
-    }
-  ]
-}
-```
-
-### Resource Format
-
-```
-{type}:{action}
-
-Examples:
-- disk:read
-- disk:write
-- network:http
-- compile:execute
-- system:info
-```
-
-## Level 4: IPermissionCallback
+## Level 2: IPermissionCallback
 
 Custom callbacks for dynamic permission logic.
 
@@ -126,26 +92,62 @@ public class DefaultPermissionCallback : IPermissionCallback
 }
 ```
 
-## Level 5: IPermissionAskHandler
+## Level 3: Curator Branch (IsCurator → AskHandler / GlobalACL)
 
-Ask user for permission when all other levels are undecided.
+When the callback returns `AskUser` or no callback is configured, the system branches based on curator status:
+
+### Curator Path: IPermissionAskHandler
+
+For the silicon curator, the system prompts the user for a decision via IM.
 
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
 {
     public async Task<AskPermissionResult> AskAsync(PermissionRequest request)
     {
-        // Send message to user via IM
         await SendMessageAsync($"Allow {request.Resource}?");
-        
-        // Wait for user response
+
         var response = await WaitForResponseAsync();
-        
+
         return response.Approved 
             ? AskPermissionResult.Approved()
             : AskPermissionResult.Denied();
     }
 }
+```
+
+### Non-Curator Path: GlobalACL → Default Deny
+
+For non-curator beings, the system checks the Global Access Control List. If no matching rule is found, the request is denied by default.
+
+#### GlobalACL Structure
+
+```json
+{
+  "rules": [
+    {
+      "prefix": "network:api.github.com",
+      "result": "Allowed"
+    },
+    {
+      "prefix": "file:C:\\Windows",
+      "result": "Denied"
+    }
+  ]
+}
+```
+
+Rules are evaluated in order; first match wins. Only the silicon curator can modify the global ACL.
+
+#### Resource Format
+
+```
+{type}:{path}
+
+Examples:
+- network:api.github.com
+- file:C:\\Windows
+- cli:rm -rf
 ```
 
 ## Audit System
@@ -283,10 +285,11 @@ public async Task<PermissionResult> CheckAsync(PermissionRequest request)
 AI: "I need to read config.json"
 ↓
 Permission chain:
-1. IsCurator? No
-2. Rate limit? OK
-3. GlobalACL? Found rule: disk:read = Allowed
-4. Result: Allowed
+1. UserFrequencyCache? No cached decision
+2. IPermissionCallback? Returns AskUser (not explicitly allowed)
+3. IsCurator? No → Check GlobalACL
+4. GlobalACL? Found rule: file:... = Allowed
+5. Result: Allowed
 ```
 
 ### Scenario 2: AI Wants to Execute Code
@@ -295,23 +298,21 @@ Permission chain:
 AI: "I want to compile and run code"
 ↓
 Permission chain:
-1. IsCurator? No
-2. Rate limit? OK
-3. GlobalACL? No rule found
-4. Callback? Returns Undecided
-5. AskUser? User approves
-6. Result: Allowed
+1. UserFrequencyCache? No cached decision
+2. IPermissionCallback? Returns AskUser
+3. IsCurator? Yes → IPermissionAskHandler
+4. User approves
+5. Result: Allowed
 ```
 
-### Scenario 3: Rate Limit Exceeded
+### Scenario 3: Cached Denial
 
 ```
-AI: "I need to make 100 HTTP requests"
+AI: "I need to access C:\Windows"
 ↓
 Permission chain:
-1. IsCurator? No
-2. Rate limit? Already exceeded
-3. Result: Denied
+1. UserFrequencyCache? Found in HighDeny cache
+2. Result: Denied (no further checks needed)
 ```
 
 ## Troubleshooting

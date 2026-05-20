@@ -14,16 +14,13 @@ Systém oprávnění zajišťuje, že všechny operace iniciované AI jsou řád
 ┌─────────────────────────────────────────────┐
 │          Ověření Oprávnění                   │
 ├─────────────────────────────────────────────┤
-│  Úroveň 1: IsCurator                         │
-│  ↓ Pokud true, obejde všechny kontroly       │
-│  Úroveň 2: UserFrequencyCache                │
-│  ↓ Omezení rychlosti                         │
-│  Úroveň 3: GlobalACL                         │
-│  ↓ Seznam řízení přístupu                    │
-│  Úroveň 4: IPermissionCallback               │
-│  ↓ Vlastní logika                            │
-│  Úroveň 5: IPermissionAskHandler             │
-│  ↓ Dotazování uživatele                      │
+│  Úroveň 1: UserFrequencyCache                │
+│  ↓ Cacheovaná rozhodnutí uživatele (HighDeny/HighAllow)│
+│  Úroveň 2: IPermissionCallback               │
+│  ↓ Vlastní logika (Povoleno/Zamítnuto/AskUser)│
+│  Úroveň 3: IsCurator?                        │
+│  ↓ Ano → IPermissionAskHandler (dotaz uživatele)│
+│  ↓ Ne  → GlobalACL → Výchozí zamítnutí       │
 │  Výsledek: Povoleno nebo Zamítnuto           │
 └─────────────────────────────────────────────┘
 ```
@@ -156,7 +153,7 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 - **Zobrazení ve Web UI** — Čekající požadavky na oprávnění se zobrazují ve Web UI prostřednictvím `PermissionRequestController`
 - **Odpověď uživatele** — Uživatel může ve Web UI schválit nebo zamítnout, s možností cacheování rozhodnutí a nastavením doby trvání cache
 - **Možnosti cache** — Uživatel může cacheovat rozhodnutí o oprávnění na 1 hodinu, 24 hodin, 7 dní nebo 30 dní
-- **Mechanismus časového limitu** — Po 60 sekundách bez odpovědi se stránka požadavku automaticky zavře
+- **Mechanismus časového limitu** — Po 30 minutách bez odpovědi se požadavek automaticky zamítne
 
 ## Auditní Systém
 
@@ -293,10 +290,9 @@ public async Task<PermissionResult> CheckAsync(PermissionRequest request)
 AI: "Potřebuji číst config.json"
 ↓
 Řetězec oprávnění:
-1. IsCurator? Ne
-2. Omezení rychlosti? Normální
-3. GlobalACL? Nalezeno pravidlo: disk:read = Povoleno
-4. Výsledek: Povoleno
+1. Frekvenční cache? Žádná shoda
+2. Callback? Povoleno (bezpečná operace)
+3. Výsledek: Povoleno
 ```
 
 ### Scénář 2: AI Chce Spustit Kód
@@ -305,12 +301,11 @@ AI: "Potřebuji číst config.json"
 AI: "Chci kompilovat a spustit kód"
 ↓
 Řetězec oprávnění:
-1. IsCurator? Ne
-2. Omezení rychlosti? Normální
-3. GlobalACL? Žádné pravidlo nenalezeno
-4. Callback? Vráceno nerozhodné
-5. Dotaz uživatele? Uživatel schválil
-6. Výsledek: Povoleno
+1. Frekvenční cache? Žádná shoda
+2. Callback? Vráceno AskUser
+3. IsCurator? Ano → Dotaz uživatele
+4. Uživatel schválil
+5. Výsledek: Povoleno
 ```
 
 ### Scénář 3: Překročení Omezení Rychlosti
@@ -319,9 +314,8 @@ AI: "Chci kompilovat a spustit kód"
 AI: "Potřebuji provést 100 HTTP požadavků"
 ↓
 Řetězec oprávnění:
-1. IsCurator? Ne
-2. Omezení rychlosti? Již překročeno
-3. Výsledek: Zamítnuto
+1. Frekvenční cache? Vysoké zamítnutí nalezeno
+2. Výsledek: Zamítnuto
 ```
 
 ## Řešení Problémů

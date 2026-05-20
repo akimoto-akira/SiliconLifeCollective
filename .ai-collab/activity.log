@@ -326,3 +326,28 @@
 2026-05-20T16:00:00+08:00 | trae-glm5 | session_end | completed=task-209
 2026-05-20T12:04:00+08:00 | coze-agent | task_create | task=task-210~220 | summary=11种语言文档与源码一致性修复，参照task-209模式，每种语言独立任务
 2026-05-20T12:13:00+08:00 | coze-agent | session_end
+2026-05-20T14:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-20260520-1400 | task=task-219
+2026-05-20T14:00:00+08:00 | trae-glm5 | task_claim | task=task-219 | type=docs | scope=修复英语文档与源代码不一致问题
+2026-05-20T14:30:00+08:00 | trae-glm5 | file_modified | docs/en/permission-system.md | fix=权限链顺序修正为 UserFrequencyCache→IPermissionCallback→Curator Branch
+2026-05-20T15:00:00+08:00 | trae-glm5 | file_modified | docs/en/security.md | fix=权限链流程图、执行器超时值(30s)、执行器架构描述(静态类)、GlobalACL描述
+2026-05-20T15:30:00+08:00 | trae-glm5 | file_modified | docs/en/development-guide.md | fix=依赖方向、权限链顺序、工具路径、执行器示例代码、权限验证代码
+2026-05-20T15:45:00+08:00 | trae-glm5 | file_modified | docs/en/getting-started.md | fix=DashScope Region(cn-hangzhou→beijing)、默认模型(qwen-plus→qwen3.6-plus)、添加可用区域列表
+2026-05-20T16:00:00+08:00 | trae-glm5 | file_modified | docs/en/README.md | fix=控制器数(22→23)、权限链顺序、安全架构流程图
+2026-05-20T16:10:00+08:00 | trae-glm5 | file_modified | docs/en/api-reference.md | fix=Chat端点(POST /api/chat/send)、请求体格式(channelId+content)、添加Memory/Code/Executor API
+2026-05-20T16:15:00+08:00 | trae-glm5 | file_modified | docs/en/tools-reference.md | fix=权限链顺序、工具创建路径
+2026-05-20T16:20:00+08:00 | trae-glm5 | file_modified | docs/en/architecture.md | fix=VolcengineArk状态(📋→✅)、添加功能描述
+2026-05-20T16:30:00+08:00 | trae-glm5 | task_complete | task=task-219 | files_modified=8 | summary=修复英语文档与源码不一致：权限链顺序、执行器架构、API端点、控制器数、DashScope配置、VolcengineArk状态
+2026-05-20T16:35:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260520-1700 | task=task-210
+2026-05-20T16:35:00+08:00 | trae-glm5 | task_claim | task=task-210 | type=docs | scope=修复捷克语文档与源代码不一致问题
+2026-05-20T16:40:00+08:00 | trae-glm5 | file_modified | docs/cs-CZ/README.md | fix=权限链顺序修正、控制器数20+→23、安全架构流程图、阶段描述(4 skiny→7 skinů)
+2026-05-20T16:45:00+08:00 | trae-glm5 | file_modified | docs/cs-CZ/permission-system.md | fix=权限链顺序修正(UserFrequencyCache→IPermissionCallback→Kurátor větev)、场景示例更新、超时时间60s→30min
+2026-05-20T16:50:00+08:00 | trae-glm5 | file_modified | docs/cs-CZ/security.md | fix=权限验证流程图重写、执行器架构(静态类模型)、超时值(60s/120s→30s)、GlobalACL描述修正
+2026-05-20T16:55:00+08:00 | trae-glm5 | file_modified | docs/cs-CZ/development-guide.md | fix=依赖方向修正、权限链顺序、工具创建路径(Common/App)、执行器示例代码
+2026-05-20T17:00:00+08:00 | trae-glm5 | file_modified | docs/cs-CZ/getting-started.md | fix=DashScope Region(cn-hangzhou→beijing)、Model(qwen-plus→qwen3.6-plus)
+2026-05-20T17:05:00+08:00 | trae-glm5 | file_modified | docs/cs-CZ/api-reference.md | fix=Chat API端点(/api/chat→/api/chat/send)、请求体(beingId→channelId)、添加conversations/messages/stop端点
+2026-05-20T17:10:00+08:00 | trae-glm5 | file_modified | docs/cs-CZ/tools-reference.md | fix=权限链顺序修正、工具创建路径(Common/App)
+2026-05-20T17:15:00+08:00 | trae-glm5 | file_modified | docs/cs-CZ/architecture.md | fix=控制器数22→23
+2026-05-20T17:18:00+08:00 | trae-glm5 | file_modified | docs/cs-CZ/web-ui-guide.md | fix=ChatHistory API路由修正(路径参数→查询参数)
+2026-05-20T17:20:00+08:00 | trae-glm5 | file_modified | docs/cs-CZ/contributing.md | fix=工具创建路径(SiliconLife.Default/Tools→Common/App/Tools)
+2026-05-20T17:30:00+08:00 | trae-glm5 | task_complete | task=task-210 | files_modified=9 | summary=修复捷克语文档与源码不一致：权限链顺序、执行器架构、API端点、控制器数、DashScope配置、工具路径、超时值、权限请求超时
+2026-05-20T17:30:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260520-1700 | completed=task-210

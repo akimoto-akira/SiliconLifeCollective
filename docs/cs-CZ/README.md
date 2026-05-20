@@ -26,7 +26,7 @@
 - **Nástroj Hot Reload** — Podporuje automatickou kompilaci, aktualizaci souborů a restart SiliconLife.Fast za běhu, bez manuálního zásahu
 - **Cyklus volání nástrojů** — AI vrací volání nástroje → provádění nástroje → výsledky zpět AI → pokračuje dokud nevrací čistý text
 - **Bezpečnost oprávnění-exekutor** — Všechny I/O operace procházejí přísným ověřováním oprávnění prostřednictvím exekutorů
-  - 5úrovňový řetězec oprávnění: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+  - 5úrovňový řetězec oprávnění: UserFrequencyCache → IPermissionCallback → (Kurátor→IPermissionAskHandler / Nekurátor→GlobalACL→Zamítnuto)
   - Kompletní auditní záznam všech rozhodnutí o oprávněních
 
 ### AI a znalosti
@@ -40,7 +40,7 @@
 ### Webové rozhraní
 - **Moderní Web UI** — Vestavěný HTTP server s podporou SSE pro aktualizace v reálném čase
 - **7 témat skinů** — Administrační, chat, kreativní, vývojářská, vysoký kontrast, světlý, minimalistický, s automatickou detekcí a přepínáním
-- **20+ kontrolerů** — Kompletní správa systému, chat, konfigurace, monitoring
+- **23 kontrolerů** — Kompletní správa systému, chat, konfigurace, monitoring
 - **Žádná závislost na frontendovém frameworku** — Generování HTML/CSS/JS na serveru pomocí `H`, `CssBuilder` a `JsBuilder`
 
 ### Internacionalizace a lokalizace
@@ -176,7 +176,7 @@ SiliconLifeCollective.sln
 │   │   ├── Tools/                         # Implementace vestavěných nástrojů
 │   │   ├── WebView/                       # Implementace Playwright WebView
 │   │   └── Web/                           # Implementace Web UI
-│   │       ├── Controllers/               # 20+ kontrolerů
+│   │       ├── Controllers/               # 23 kontrolerů
 │   │       ├── Models/                    # View modely
 │   │       ├── Views/                     # HTML pohledy
 │   │       └── Skins/                     # 4 témata skinů
@@ -199,7 +199,7 @@ SiliconLifeCollective.sln
 │       ├── WebView/                       # Implementace Playwright WebView
 │       └── Web/                           # Vysoce výkonná implementace Web UI
 │           ├── Component/                 # Knihovna UI komponent (30+ komponent)
-│           ├── Controllers/               # 20+ kontrolerů
+│           ├── Controllers/               # 23 kontrolerů
 │           ├── Models/                    # View modely
 │           ├── Views/                     # HTML pohledy
 │           └── Skins/                     # 7 témat skinů
@@ -255,7 +255,7 @@ Hlavní smyčka (vyhrazený thread, watchdog + jistič)
 Všechny I/O operace iniciované AI musí procházet přísným bezpečnostním řetězcem:
 
 ```
-Volání nástroje → Exekutor → Správce oprávnění → [IsCurator → Frekvenční cache → GlobalACL → Zpětné volání → Dotaz uživatele]
+Volání nástroje → Exekutor → Správce oprávnění → [Frekvenční cache → Callback → (Kurátor→Dotaz uživatele / Nekurátor→GlobalACL→Zamítnuto)]
 ```
 
 ## 🚀 Rychlý start
@@ -345,7 +345,7 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] Fáze 7: Dynamická kompilace + Sebevývoj (Roslyn)
 - [x] Fáze 8: Dlouhodobá paměť + Úkoly + Časovače
 - [x] Fáze 9: Core Hostitel + Spolupráce více agentů
-- [x] Fáze 10: Web UI (HTTP + SSE, 20+ kontrolerů, 4 skiny)
+- [x] Fáze 10: Web UI (HTTP + SSE, 23 kontrolerů, 7 skinů)
 - [x] Fáze 10.5: Přírůstková vylepšení (broadcast kanál, audit tokenů, 32 kalendářů, vylepšení nástrojů, lokalizace 21 jazyků)
 - [x] Fáze 10.6: Dokončení a optimalizace (WebView, systém nápovědy, pracovní prostor projektu, znalostní síť)
 - [x] Fáze 11: SpeedyPack úložný engine (náhrada LiteDB, mapování paměti, asynchronní fronta zápisu, automatická komprese)

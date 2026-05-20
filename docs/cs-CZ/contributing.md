@@ -251,7 +251,7 @@ src/
 
 ## Přidávání Nových Nástrojů
 
-1. Vytvořte nový soubor v `src/SiliconLife.Default/Tools/`:
+1. Vytvořte nový soubor v `src/SiliconLife.Common/Tools/` nebo `src/SiliconLife.App/Tools/`:
 
 ```csharp
 public class MujVlastniNastroj : ITool
