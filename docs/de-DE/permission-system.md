@@ -14,76 +14,34 @@ Das Berechtigungssystem stellt sicher, dass alle von KI initiierten Operationen 
 ┌─────────────────────────────────────────────┐
 │          Berechtigungsvalidierung            │
 ├─────────────────────────────────────────────┤
-│  Stufe 1: IsCurator                          │
-│  ↓ Umgeht wenn true                          │
-│  Stufe 2: UserFrequencyCache                 │
-│  ↓ Ratenbegrenzung                           │
-│  Stufe 3: GlobalACL                          │
-│  ↓ Access Control List                       │
-│  Stufe 4: IPermissionCallback                │
-│  ↓ Benutzerdefinierte Logik                  │
-│  Stufe 5: IPermissionAskHandler              │
-│  ↓ Benutzer fragen                           │
+│  Stufe 1: UserFrequencyCache                 │
+│  ↓ Zwischengespeicherte Benutzerentscheidungen (HighDeny/HighAllow)│
+│  Stufe 2: IPermissionCallback                │
+│  ↓ Benutzerdefinierte Logik (Erlaubt/Verweigert/BenutzerFragen)│
+│  Stufe 3: IsCurator?                         │
+│  ↓ Ja → IPermissionAskHandler (Benutzer fragen)│
+│  ↓ Nein → GlobalACL → Standardverweigerung    │
 │  Ergebnis: Erlaubt oder Verweigert           │
 └─────────────────────────────────────────────┘
 ```
 
-## Stufe 1: IsCurator
+## Stufe 1: UserFrequencyCache
 
-Administratoren/Curatoren umgehen alle Berechtigungsprüfungen.
+Zwischengespeicherte Benutzerentscheidungen zur Vermeidung wiederholter Rückfragen.
 
-```csharp
-if (user.IsCurator)
-{
-    return PermissionResult.Allowed("Curator access");
-}
-```
-
-## Stufe 2: UserFrequencyCache
-
-Ratenbegrenzung pro Benutzer zur Missbrauchsprävention.
+- **HighDeny** — Benutzer hat diese Ressource kürzlich verweigert, automatisch ablehnen
+- **HighAllow** — Benutzer hat diese Ressource kürzlich erlaubt, automatisch genehmigen
 
 ```csharp
 var cache = new UserFrequencyCache();
-if (!cache.CheckLimit(userId, resource))
+var cached = cache.Check(userId, resource);
+if (cached != null)
 {
-    return PermissionResult.Denied("Rate limit exceeded");
+    return cached; // HighDeny → Denied, HighAllow → Allowed
 }
 ```
 
-## Stufe 3: GlobalACL
-
-Globale Access Control List definiert explizite Regeln.
-
-### ACL-Struktur
-
-```json
-{
-  "rules": [
-    {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
-    }
-  ]
-}
-```
-
-### Ressourcenformat
-
-```
-{type}:{action}
-
-Beispiele:
-- disk:read
-- disk:write
-- network:http
-- compile:execute
-- system:info
-```
-
-## Stufe 4: IPermissionCallback
+## Stufe 2: IPermissionCallback
 
 Benutzerdefinierte Callbacks für dynamische Berechtigungslogik.
 
@@ -126,9 +84,63 @@ public class DefaultPermissionCallback : IPermissionCallback
 }
 ```
 
-## Stufe 5: IPermissionAskHandler
+## Stufe 3: IsCurator-Verzweigung
 
-Fragt Benutzer um Erlaubnis, wenn alle anderen Stufen unentschieden sind.
+Nach IPermissionCallback-Entscheidung erfolgt Verzweigung basierend auf Curator-Status:
+
+### Curator-Pfad → IPermissionAskHandler
+
+Wenn das Being ein Curator ist (`IsCurator = true`), wird `IPermissionAskHandler` aufgerufen, um den Benutzer interaktiv zu fragen.
+
+```csharp
+if (being.IsCurator)
+{
+    return await askHandler.AskAsync(request);
+}
+```
+
+### Nicht-Curator-Pfad → GlobalACL → Standardverweigerung
+
+Normale Beings fragen GlobalACL synchron ohne Blockierung. Wenn keine ACL-Regel matcht, wird standardmäßig verweigert.
+
+```csharp
+var aclResult = globalACL.Check(request);
+return aclResult ?? PermissionResult.Denied("No matching ACL rule");
+```
+
+## Global ACL (Access Control List)
+
+Gemeinsame Regeltabelle persistent im Storage, nur vom Silicon Curator verwaltet.
+
+### ACL-Struktur
+
+```json
+{
+  "rules": [
+    {
+      "userId": "user-uuid",
+      "resource": "disk:read",
+      "allowed": true,
+      "expiresAt": "2026-04-21T00:00:00Z"
+    }
+  ]
+}
+```
+
+### Ressourcenformat
+
+```
+{type}:{action}
+
+Beispiele:
+- disk:read
+- disk:write
+- network:http
+- compile:execute
+- system:info
+```
+
+## IPermissionAskHandler (Curator-Pfad)
 
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
@@ -152,11 +164,11 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 
 `PermissionRequestQueue` verwaltet ausstehende Berechtigungsanfragen und unterstützt asynchrones Warten auf Benutzerantworten:
 
-- **Anfrage einreihen** — Wenn die Berechtigungskette Stufe 5 erreicht, wird ein `TaskCompletionSource<AskPermissionResult>` erstellt und eingereiht
+- **Anfrage einreihen** — Wenn der Curator-Pfad erreicht wird, wird ein `TaskCompletionSource<AskPermissionResult>` erstellt und eingereiht
 - **Web-UI-Anzeige** — Ausstehende Berechtigungsanfragen werden über den `PermissionRequestController` in der Web-UI angezeigt
 - **Benutzerantwort** — Benutzer genehmigen oder verweigern in der Web-UI, mit optionaler Zwischenspeicherung der Entscheidung und Cache-Dauer
 - **Cache-Optionen** — Benutzer können Berechtigungsentscheidungen für 1 Stunde, 24 Stunden, 7 Tage oder 30 Tage zwischenspeichern
-- **Timeout-Mechanismus** — Automatisches Schließen der Anfrageseite nach 60 Sekunden ohne Antwort
+- **Timeout-Mechanismus** — Automatisches Schließen der Anfrageseite nach 30 Minuten ohne Antwort
 
 ## Audit-System
 
@@ -192,11 +204,11 @@ public PermissionResult EvaluatePermission(
 - `AskUser` - Erfordert Benutzerbestätigung bei Ausführung
 
 **Auswertungsreihenfolge**:
-1. **Frequency Cache** - Cached-Benutzerentscheidungen prüfen
-2. **IPermissionCallback** - Benutzerdefinierte Callback-Auswertung
-3. **Curator-Status** - Wenn Curator, gibt `AskUser` zurück (Bestätigung erforderlich)
-4. **Global ACL** - Access-Control-Regeln prüfen
-5. **Default** - Verweigert wenn keine Regel matcht
+1. **Frequency Cache** — Zwischengespeicherte Benutzerentscheidungen prüfen
+2. **IPermissionCallback** — Benutzerdefinierte Callback-Auswertung
+3. **Curator-Status** — Wenn Curator, gibt `AskUser` zurück (Bestätigung erforderlich)
+4. **Global ACL** — Access-Control-Regeln prüfen
+5. **Default** — Verweigert wenn keine Regel matcht
 
 > **Hinweis**: Im Gegensatz zur vollständigen Berechtigungskette ruft `EvaluatePermission` **nicht** den `IPermissionAskHandler` auf. Es meldet nur, was das Ergebnis bei Ausführung *sein würde*.
 

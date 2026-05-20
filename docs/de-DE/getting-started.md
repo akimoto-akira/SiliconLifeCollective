@@ -73,8 +73,8 @@ Bearbeiten Sie `src/SiliconLife.Default/Config/DefaultConfigData.cs` oder änder
   "AIClients": {
     "DashScope": {
       "ApiKey": "ihr-api-key-hier",
-      "Model": "qwen-plus",
-      "Region": "cn-hangzhou"
+      "Model": "qwen3.6-plus",
+      "Region": "beijing"
     }
   }
 }

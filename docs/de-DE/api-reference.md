@@ -68,42 +68,45 @@ Die meisten Endpunkte erfordern Authentifizierung über Sitzungs-Cookies, die vo
 
 ### Nachricht senden
 
-**POST** `/api/chat`
+**POST** `/api/chat/send`
 
 **Anfrage**:
 ```json
 {
-  "beingId": "being-uuid",
-  "message": "Hello, how are you?",
-  "sessionId": "optional-session-id"
+  "channelId": "session-uuid",
+  "content": "Hello, how are you?"
 }
 ```
 
-**Antwort** (nicht gestreamt):
+**Antwort**:
 ```json
 {
-  "reply": "I'm doing well, thank you!",
-  "sessionId": "session-uuid",
-  "timestamp": "2026-04-20T10:30:00Z"
+  "success": true,
+  "messageId": "50156b26-f3b9-4735-be3d-51e547bd3a4a"
 }
 ```
 
-### Gestreamter Chat (SSE)
+### Sitzungsliste abrufen
 
-**GET** `/api/chat/stream?beingId={id}&message={msg}`
+**GET** `/api/chat/conversations`
 
-**Antwort**: Server-Sent Events-Stream
-
+**Antwort**:
+```json
+[
+  {
+    "sessionId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
+    "beingId": "being-uuid",
+    "type": "single",
+    "displayName": "Chat mit Being",
+    "lastMessage": "Letzte Nachricht",
+    "lastTime": "2026-04-20T10:30:00Z"
+  }
+]
 ```
-data: {"type": "chunk", "content": "I"}
-data: {"type": "chunk", "content": "'m"}
-data: {"type": "chunk", "content": " thinking..."}
-data: {"type": "complete", "sessionId": "uuid"}
-```
 
-### Chat-Verlauf abrufen
+### Nachrichtenverlauf abrufen
 
-**GET** `/api/chat/{sessionId}/history`
+**GET** `/api/chat/messages?channelId={sessionId}`
 
 **Antwort**:
 ```json
@@ -121,6 +124,30 @@ data: {"type": "complete", "sessionId": "uuid"}
     }
   ]
 }
+```
+
+### AI-Denken stoppen
+
+**POST** `/api/chat/stop`
+
+**Anfrage**:
+```json
+{
+  "channelId": "session-uuid"
+}
+```
+
+### Gestreamter Chat (SSE)
+
+**GET** `/api/chat/stream?channelId={sessionId}`
+
+**Antwort**: Server-Sent Events-Stream
+
+```
+data: {"type": "chunk", "content": "I"}
+data: {"type": "chunk", "content": "'m"}
+data: {"type": "chunk", "content": " thinking..."}
+data: {"type": "complete", "sessionId": "uuid"}
 ```
 
 ---
@@ -507,7 +534,7 @@ Server-Sent Events für Echtzeit-Updates:
 ### Chat-Ereignisse
 
 ```javascript
-const eventSource = new EventSource('/api/chat/stream?beingId=xxx&message=xxx');
+const eventSource = new EventSource('/api/chat/stream?channelId=xxx');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);

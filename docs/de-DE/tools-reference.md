@@ -710,11 +710,9 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 
 Alle Tool-Ausführungen durchlaufen eine 5-stufige Berechtigungskette:
 
-1. **IsCurator** — Silicon Curator umgeht alle Prüfungen
-2. **UserFrequencyCache** — Benutzer-Häufigkeit-Cache für Allow/Deny
-3. **GlobalACL** — Globale Access Control List
-4. **IPermissionCallback** — Benutzerdefinierte Berechtigungs-Callback-Funktion
-5. **IPermissionAskHandler** — Benutzer fragen
+1. **UserFrequencyCache** — Zwischengespeicherte Benutzerentscheidungen (HighDeny/HighAllow)
+2. **IPermissionCallback** — Benutzerdefinierte Berechtigungs-Callback-Funktion
+3. **IsCurator-Verzweigung** — Kurator→IPermissionAskHandler / Nicht-Kurator→GlobalACL→Verweigert
 
 ## Benutzerdefinierte Tools erstellen
 
@@ -764,7 +762,7 @@ public class MyCustomTool : ITool
 
 ### Schritt 2: Zum Projekt hinzufügen
 
-Platzieren Sie die Tool-Datei im Verzeichnis `src/SiliconLife.Common/Tools/` (gemeinsame Tools) oder `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (versionsspezifische Tools). Der `ToolManager` wird sie beim Start automatisch durch Reflektion entdecken und registrieren.
+Platzieren Sie die Tool-Datei im Verzeichnis `src/SiliconLife.Common/Tools/` (gemeinsame Tools) oder `src/SiliconLife.App/Tools/` (versionsspezifische Tools). Der `ToolManager` wird sie beim Start automatisch durch Reflektion entdecken und registrieren.
 
 ### Schritt 2a: Über Plugin registrieren
 

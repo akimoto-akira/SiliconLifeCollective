@@ -57,7 +57,7 @@ public interface ITool
 
 5-stufige Berechtigungsvalidierungskette:
 ```
-IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+UserFrequencyCache → IPermissionCallback → (Kurator→IPermissionAskHandler / Nicht-Kurator→GlobalACL→Verweigert)
 ```
 
 ### 4. Service Locator
@@ -75,7 +75,7 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### Neues Tool hinzufügen
 
-1. Neue Klasse in `src/SiliconLife.Common/Tools/` erstellen (von beiden Versionen geteilte Tools) oder `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (versionsspezifische Tools):
+1. Neue Klasse in `src/SiliconLife.Common/Tools/` erstellen (von beiden Versionen geteilte Tools) oder `src/SiliconLife.App/Tools/` (versionsspezifische Tools):
 
 ```csharp
 public class MyCustomTool : ITool

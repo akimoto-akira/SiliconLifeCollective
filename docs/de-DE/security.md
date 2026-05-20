@@ -38,7 +38,7 @@ Jede Berechtigungsprüfung gibt eines von drei Ergebnissen zurück:
 
 ### Sonderrolle: Silicon Curator
 
-Der Silicon Curator hat höchste Berechtigungsstufe (`IsCurator = true`). Berechtigungsprüfungen des Curators werden zu **Allowed** kurzgeschlossen, außer Benutzer überschreibt explizit.
+Der Silicon Curator hat höchste Berechtigungsstufe (`IsCurator = true`). Berechtigungsprüfungen des Curators lösen Benutzer-Eingabeaufforderung aus, andere Beings fragen GlobalACL synchron.
 
 ### Privater PermissionManager
 
@@ -64,28 +64,30 @@ Abfragepriorität: **1. Benutzer HighDeny → 2. Benutzer HighAllow → 3. Callb
                              │
                              ▼
                     ┌─────────────────┐
-                    │ 1. IsCurator?   │──Ja──▶ Allowed
+                    │ 1. UserFrequency│
+                    │    Cache        │──HighDeny──▶ Denied
+                    │(HighDeny/       │──HighAllow─▶ Allowed
+                    │ HighAllow)      │
                     └────────┬────────┘
+                             │ Kein Cache-Treffer
+                             ▼
+                    ┌─────────────────┐
+                    │ 2. IPermission  │──▶ Allowed / Denied / AskUser
+                    │    Callback     │
+                    └────────┬────────┘
+                             │ AskUser
+                             ▼
+                    ┌─────────────────┐
+                    │ 3. IsCurator?   │──Ja──▶ IPermissionAskHandler
+                    └────────┬────────┘       (Benutzer fragen)
                              │ Nein
                              ▼
                     ┌─────────────────┐
-                    │ 2. Benutzer     │──Match──▶ Denied
-                    │ HighDeny        │
-                    │(Speicher-Cache) │
+                    │ 4. GlobalACL    │──▶ Allowed / Denied
                     └────────┬────────┘
-                             │ Kein Match
+                             │ Keine Regel
                              ▼
-                    ┌─────────────────┐
-                    │ 3. Benutzer     │──Match──▶ Allowed
-                    │ HighAllow       │
-                    │(Speicher-Cache) │
-                    └────────┬────────┘
-                             │ Kein Match
-                             ▼
-                    ┌─────────────────┐
-                    │ 4. Berechtigungs│
-                    │  Callback       │──▶ Allowed / Denied / AskUser
-                    └─────────────────┘
+                        Verweigert
 ```
 
 **Wichtig**: Executor sieht nur Boolean (Allowed/Denied). PermissionManager verarbeitet intern Ternärentscheidung (Allowed/Denied/AskUser) und löst AskUser auf bevor Rückgabe an Executor.
@@ -96,31 +98,24 @@ Abfragepriorität: **1. Benutzer HighDeny → 2. Benutzer HighAllow → 3. Callb
 
 Executoren sind der **einzige** Pfad für I/O-Operationen. Sie erzwingen:
 
-### Separate Scheduling-Threads
+### Statische Klassen-Modell
 
-Jeder Executor hat **separaten Scheduling-Thread**:
+Executoren sind als **statische Klassen** implementiert:
 
-- Thread-Isolation zwischen Executoren — Blockierung eines Executor-Threads beeinflusst andere Executoren nicht.
-- Jeder Executor kann separate Ressourcenlimits setzen (CPU, Speicher etc.).
-- Thread-Pool-Verwaltung für Executor-Threads.
-
-### Anfrage-Warteschlange
-
-Jeder Executor verwaltet eine Anfrage-Warteschlange:
-
-- Anfragen nach Typ zum entsprechenden Executor geroutet.
-- Unterstützt priorisierte Warteschlange.
-- Timeout-Kontrolle pro Anfrage.
+- Jeder Executor ist eine statische Klasse mit synchroner `Execute`-Methode
+- Berechtigungsvalidierung blockiert den Aufruf-Thread bis Entscheidung getroffen
+- Thread-Sicherheit durch interne Sperren gewährleistet
+- Timeout-Kontrolle pro Anfrage
 
 ### Thread-Sperrung für Berechtigungsvalidierung
 
 Wenn Tool Ressourcenzugriff initiiert:
 
-1. Executor empfängt Anfrage und **sperrt seinen Thread**.
+1. Executor empfängt Anfrage und **blockiert den Aufruf-Thread**.
 2. Executor queryt privaten PermissionManager des Beings.
-3. Wenn Callback AskUser zurückgibt, Executor-Thread **bleibt gesperrt** wartend auf Benutzerantwort.
+3. Wenn Callback AskUser zurückgibt und Being ist Curator, Executor-Thread **bleibt blockiert** wartend auf Benutzerantwort.
 4. Being sieht nur Endergebnis (Erfolg oder Verweigerung) — es sieht nie intermediären "Pending" oder "Waiting" Status.
-5. Nur Silicon Curator triggert echte Benutzer-Eingabeaufforderung. Normale Beings queryen synchron GlobalACL ohne Blockierung.
+5. Normale Beings (Nicht-Curator) queryen synchron GlobalACL ohne Blockierung.
 6. Bei Timeout, Anfrage als Denied behandelt, Thread-Sperre freigegeben.
 
 ### Executor-Typen
@@ -128,9 +123,9 @@ Wenn Tool Ressourcenzugriff initiiert:
 | Executor | Umfang | Standard-Timeout |
 |----------|-------|-----------------|
 | `DiskExecutor` | Datei Lesen/Schreiben, Verzeichnisoperationen | 30 Sekunden |
-| `NetworkExecutor` | HTTP-Anfragen, WebSocket-Verbindungen | 60 Sekunden |
-| `CommandLineExecutor` | Shell-Befehlsausführung | 120 Sekunden |
-| `DynamicCompilationExecutor` | Roslyn In-Memory-Kompilierung | 60 Sekunden |
+| `NetworkExecutor` | HTTP-Anfragen, WebSocket-Verbindungen | 30 Sekunden |
+| `CommandLineExecutor` | Shell-Befehlsausführung | 30 Sekunden |
+| `DynamicCompilationExecutor` | Roslyn In-Memory-Kompilierung | 30 Sekunden |
 
 ### Ausnahmeisolation und Fehlertoleranz
 

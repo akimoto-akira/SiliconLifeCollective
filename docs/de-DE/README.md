@@ -26,7 +26,7 @@
 - **Hot-Reload-Tool** — Unterstützt automatische Kompilierung, Dateiaktualisierung und Neustart von SiliconLife.Fast während der Laufzeit, ohne manuelles Eingreifen
 - **Tool-Aufruf-Schleife** — KI gibt Tool-Aufruf zurück → Tool ausführen → Ergebnisse an KI zurückgeben → Schleife fortsetzen bis reine Textantwort
 - **Executor-Berechtigungssicherheit** — Alle I/O-Operationen durchlaufen strenge Berechtigungsvalidierung über Executoren
-  - 5-stufige Berechtigungskette: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+  - 5-stufige Berechtigungskette: UserFrequencyCache → IPermissionCallback → (Kurator→IPermissionAskHandler / Nicht-Kurator→GlobalACL→Verweigert)
   - Vollständige Audit-Protokollierung aller Berechtigungsentscheidungen
 
 ### KI & Wissen
@@ -40,7 +40,7 @@
 ### Web-Oberfläche
 - **Moderne Web-UI** — Integrierter HTTP-Server mit SSE-Echtzeitaktualisierungen
 - **7 Skin-Themes** — Admin-, Chat-, Creative-, Dev-, High-Contrast-, Light-, Minimal-Versionen, unterstützt automatische Erkennung und Umschaltung
-- **22 Controller** — Vollständige Systemverwaltung, Chat, Konfiguration, Überwachungsfunktionalität
+- **23 Controller** — Vollständige Systemverwaltung, Chat, Konfiguration, Überwachungsfunktionalität
 - **Null Frontend-Framework-Abhängigkeit** — HTML/CSS/JS serverseitig generiert durch `H`, `CssBuilder` und `JsBuilder`
 
 ### Internationalisierung & Lokalisierung
@@ -166,7 +166,7 @@ SiliconLifeCollective.sln
 │   │   ├── Help/                          # Hilfedokumentations-Lokalisierung (mehrsprachig)
 │   │   └── Web/                           # Web-UI-Implementierung
 │   │       ├── Component/                 # UI-Komponentenbibliothek (30+ Komponenten)
-│   │       ├── Controllers/               # 22 Controller
+│   │       ├── Controllers/               # 23 Controller
 │   │       ├── Models/                    # View-Modelle
 │   │       ├── Views/                     # HTML-Ansichten
 │   │       └── Skins/                     # 7 Skin-Themes
@@ -330,7 +330,7 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] Phase 7: Dynamikkompilierung + Selbstentwicklung (Roslyn)
 - [x] Phase 8: Langzeitspeicher + Aufgaben + Timer
 - [x] Phase 9: Kern-Host + Multi-Agenten-Kollaboration
-- [x] Phase 10: Web-UI (HTTP + SSE, 20+ Controller, 4 Skins)
+- [x] Phase 10: Web-UI (HTTP + SSE, 23 Controller, 7 Skins)
 - [x] Phase 10.5: Inkrementelle Verbesserungen (Broadcast-Kanäle, Token-Audit, 32 Kalender, Tool-Verbesserungen, 21-Sprach-Lokalisierung)
 - [x] Phase 10.6: Vervollständigung & Optimierung (WebView, Hilfesystem, Projekt-Workspace, Wissensnetzwerk)
 - [x] Phase 11: SpeedyPack-Speicher-Engine (Ersetzung von LiteDB, In-Memory-Zuordnung, asynchrone Schreibwarteschlange, automatische Komprimierung)

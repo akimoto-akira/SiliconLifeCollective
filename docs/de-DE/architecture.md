@@ -482,7 +482,7 @@ Die Web-UI vermeidet vollständig Template-Dateien, generiert alle Markierungen 
 
 ### Controller-System
 
-Die Web-UI folgt **MVC-ähnlichem Pattern**, 22 Controller behandeln verschiedene Aspekte:
+Die Web-UI folgt **MVC-ähnlichem Pattern**, 23 Controller behandeln verschiedene Aspekte:
 
 | Controller | Zweck |
 |------------|---------|

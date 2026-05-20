@@ -345,8 +345,8 @@ Mauszeiger über Bezeichner bewegen für:
   - `ChatHistoryListView` - Sitzungsliste
   - `ChatHistoryDetailView` - Nachrichtendetails
 - **API-Routen**:
-  - `/api/chat-history/{beingId}/conversations` - Sitzungsliste abrufen
-  - `/api/chat-history/{beingId}/conversation/{conversationId}` - Nachrichtendetails abrufen
+  - `/api/chat/conversations` - Sitzungsliste abrufen
+  - `/api/chat/messages?channelId={channelId}` - Nachrichtendetails abrufen
 
 ---
 
