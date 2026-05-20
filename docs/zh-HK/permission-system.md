@@ -2,46 +2,34 @@
 
 > **版本：v0.2.0-alpha**
 
-[English](../en/permission-system.md) | [中文](../zh-CN/permission-system.md) | **繁體中文** | [Español](../es-ES/permission-system.md) | [日本語](../ja-JP/permission-system.md) | [한국어](../ko-KR/permission-system.md) | [Čeština](../cs-CZ/permission-system.md)
+[English](../en/permission-system.md) | [中文](../zh-CN/permission-system.md) | **繁體中文** | [Español](../es-ES/permission-system.md) | [日本語](../ja-JP/permission-system.md) | [한국어](../ko-KR/permission-system.md) | [Čeština](../cs-CZ/api-reference.md)
 
 ## 概述
 
 權限系統確保所有 AI 發起的操作都經過適當驗證和稽核。
 
-## 5 級權限链
+## 5 級權限鏈
 
 ```
 ┌─────────────────────────────────────────────┐
 │          權限驗證                            │
 ├─────────────────────────────────────────────┤
-│  級别 1：IsCurator                           │
-│  ↓ 如果為真則绕過                            │
-│  級别 2：UserFrequencyCache                  │
-│  ↓ 速率限制                                  │
-│  級别 3：GlobalACL                           │
-│  ↓ 訪問控制列表                              │
-│  級别 4：IPermissionCallback                 │
-│  ↓ 自定義逻辑                                │
-│  級别 5：IPermissionAskHandler               │
-│  ↓ 询問使用者                                  │
+│  級別 1：UserFrequencyCache                  │
+│  ↓ 速率限制快取                              │
+│  級別 2：IPermissionCallback                 │
+│  ↓ 自訂邏輯                                  │
+│  級別 3：分支判斷                             │
+│  ├─ IsCurator → IPermissionAskHandler        │
+│  │  ↓ 主理人：詢問使用者確認                  │
+│  └─ Non-curator → GlobalACL                  │
+│     ↓ 非主理人：存取控制列表                  │
 │  結果：允許或拒絕                            │
 └─────────────────────────────────────────────┘
 ```
 
-## 級别 1：IsCurator
+## 級別 1：UserFrequencyCache
 
-管理員/館長绕過所有權限檢查。
-
-```csharp
-if (user.IsCurator)
-{
-    return PermissionResult.Allowed("Curator access");
-}
-```
-
-## 級别 2：UserFrequencyCache
-
-每個使用者的速率限制以防止滥用。
+每個使用者的速率限制以防止濫用。
 
 ```csharp
 var cache = new UserFrequencyCache();
@@ -51,11 +39,73 @@ if (!cache.CheckLimit(userId, resource))
 }
 ```
 
-## 級别 3：GlobalACL
+## 級別 2：IPermissionCallback
 
-全局訪問控制列表定義明确規則。
+用於動態權限邏輯的自訂回呼。
 
-### ACL 結構
+### DefaultPermissionCallback 預設實作
+
+`DefaultPermissionCallback` 提供了全面的預設權限規則，包括：
+
+#### 網絡存取規則
+- **環回位址**：允許 localhost, 127.0.0.1, ::1
+- **私有 IP 位址**：
+  - 192.168.x.x (Class C) - 允許
+  - 10.x.x.x (Class A) - 允許
+  - 172.16-31.x.x (Class B) - 詢問使用者
+- **域名白名單**：
+  - 搜尋引擎：Google, Bing, DuckDuckGo, Yandex, Sogou 等
+  - AI 服務：OpenAI, Anthropic, HuggingFace, Ollama 等
+  - 開發者服務：GitHub, StackOverflow, npm, NuGet 等
+  - 社交媒體：微博、知乎、Reddit、Discord 等
+  - 影片平台：YouTube, Bilibili, 抖音、TikTok 等
+  - **天氣資訊**：wttr.in
+  - 政府網站：.gov, .go.jp, .go.kr
+- **域名黑名單**：
+  - AI 冒充網站：chatgpt, openai, deepseek 等仿冒域名
+  - 惡意 AI 工具：wormgpt, darkgpt, fraudgpt 等
+  - AI 內容農場和黑色市場相關域名
+
+```csharp
+public class DefaultPermissionCallback : IPermissionCallback
+{
+    public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+    {
+        // 自訂邏輯
+        if (IsSafeOperation(request))
+        {
+            return PermissionResult.Allowed("Safe operation");
+        }
+        
+        return PermissionResult.Undecided("Needs user confirmation");
+    }
+}
+```
+
+## 級別 3：分支判斷（IsCurator / GlobalACL）
+
+當級別 1 和級別 2 都未做出決定時，系統根據呼叫者身份進行分支：
+
+### 主理人分支（IsCurator = true）
+
+如果呼叫者是主理人，則進入 `IPermissionAskHandler` 詢問使用者確認：
+
+```csharp
+if (IsCurator)
+{
+    if (_askHandler != null)
+    {
+        var result = await _askHandler.AskAsync(request);
+        // 使用者在 Web UI 中確認或拒絕
+    }
+}
+```
+
+### 非主理人分支（IsCurator = false）
+
+如果呼叫者不是主理人，則檢查 `GlobalACL` 存取控制列表：
+
+### GlobalACL 結構
 
 ```json
 {
@@ -75,7 +125,7 @@ if (!cache.CheckLimit(userId, resource))
 ```
 {type}:{action}
 
-示例：
+範例：
 - disk:read
 - disk:write
 - network:http
@@ -83,54 +133,11 @@ if (!cache.CheckLimit(userId, resource))
 - system:info
 ```
 
-## 級别 4：IPermissionCallback
+## IPermissionAskHandler
 
-用於動態權限邏輯的自訂回呼。
+當主理人操作需要使用者確認時，透過 `IPermissionAskHandler` 詢問使用者權限。
 
-### DefaultPermissionCallback 預設實現
-
-`DefaultPermissionCallback` 提供了全面的預設權限規則，包括：
-
-#### 網絡訪問規則
-- **環回地址**：允許 localhost, 127.0.0.1, ::1
-- **私有 IP 地址**：
-  - 192.168.x.x (Class C) - 允許
-  - 10.x.x.x (Class A) - 允許
-  - 172.16-31.x.x (Class B) - 詢問用戶
-- **域名白名單**：
-  - 搜尋引擎：Google, Bing, DuckDuckGo, Yandex, Sogou 等
-  - AI 服務：OpenAI, Anthropic, HuggingFace, Ollama 等
-  - 開發者服務：GitHub, StackOverflow, npm, NuGet 等
-  - 社交媒體：微博、知乎、Reddit、Discord 等
-  - 視頻平台：YouTube, Bilibili, 抖音、TikTok 等
-  - **天氣資訊**：wttr.in
-  - 政府網站：.gov, .go.jp, .go.kr
-- **域名黑名單**：
-  - AI 冒充網站：chatgpt, openai, deepseek 等仿冒域名
-  - 惡意 AI 工具：wormgpt, darkgpt, fraudgpt 等
-  - AI 內容農場和黑色市場相關域名
-
-```csharp
-public class DefaultPermissionCallback : IPermissionCallback
-{
-    public async Task<PermissionResult> CheckAsync(PermissionRequest request)
-    {
-        // 自定義逻辑
-        if (IsSafeOperation(request))
-        {
-            return PermissionResult.Allowed("Safe operation");
-        }
-        
-        return PermissionResult.Undecided("Needs user confirmation");
-    }
-}
-```
-
-## 級别 5：IPermissionAskHandler
-
-當所有其他級别都未決定时询問使用者權限。
-
-### IMPermissionAskHandler 實現
+### IMPermissionAskHandler 實作
 
 `IMPermissionAskHandler` 透過 Web UI 向使用者發送權限請求：
 
@@ -154,17 +161,17 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 
 ### PermissionRequestQueue 權限請求佇列
 
-`PermissionRequestQueue` 管理待處理的權限請求，支援異步等待使用者回應：
+`PermissionRequestQueue` 管理待處理的權限請求，支援非同步等待使用者回應：
 
-- **請求入隊** — 當權限鏈到達級别 5 時，建立一個 `TaskCompletionSource<AskPermissionResult>` 並入隊
+- **請求入隊** — 當權限鏈到達級別 5 時，建立一個 `TaskCompletionSource<AskPermissionResult>` 並入隊
 - **Web UI 展示** — 透過 `PermissionRequestController` 在 Web UI 中展示待處理的權限請求
 - **使用者回應** — 使用者在 Web UI 中批准或拒絕，可選擇快取決策和設定快取持續時間
 - **快取選項** — 使用者可以將權限決策快取 1 小時、24 小時、7 天或 30 天
-- **超時機制** — 60 秒無回應自動關閉請求頁面
+- **逾時機制** — 60 秒無回應自動關閉請求頁面
 
 ## 稽核系統
 
-所有權限決策都被記录：
+所有權限決策都被記錄：
 
 ```json
 {
@@ -190,19 +197,19 @@ public PermissionResult EvaluatePermission(
     string resource)
 ```
 
-**返回值**：三態 `PermissionResult`：
+**回傳值**：三態 `PermissionResult`：
 - `Allowed` - 操作被允許
 - `Denied` - 操作被拒絕
 - `AskUser` - 執行時需要使用者確認
 
 **評估順序**：
 1. **頻率快取** - 檢查快取的使用者決策
-2. **IPermissionCallback** - 自定義回調評估
-3. **館長狀態** - 如果是館長，返回 `AskUser`（需要確認）
-4. **全局 ACL** - 檢查訪問控制規則
+2. **IPermissionCallback** - 自訂回呼評估
+3. **主理人狀態** - 如果是主理人，回傳 `AskUser`（需要確認）
+4. **全域 ACL** - 檢查存取控制規則
 5. **預設** - 無匹配規則時拒絕
 
-> **注意**：與完整權限鏈不同，`EvaluatePermission` **不會**調用 `IPermissionAskHandler`。它僅報告執行時的結果*將會是*什麼。
+> **注意**：與完整權限鏈不同，`EvaluatePermission` **不會**呼叫 `IPermissionAskHandler`。它僅報告執行時的結果*將會是*什麼。
 
 ## 管理權限
 
@@ -210,8 +217,8 @@ public PermissionResult EvaluatePermission(
 
 **透過 Web UI**：
 1. 導航到**權限管理**
-2. 点擊**添加規則**
-3. 設定：
+2. 點擊**新增規則**
+3. 配置：
    - 使用者
    - 資源
    - 允許/拒絕
@@ -219,7 +226,7 @@ public PermissionResult EvaluatePermission(
 
 **透過 API**：
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "user-uuid",
@@ -229,16 +236,14 @@ curl -X POST http://localhost:8080/api/permissions \
   }'
 ```
 
-### 撤销權限
+### 撤銷權限
+
+透過 Web UI 的權限管理頁面操作。
+
+### 檢視權限
 
 ```bash
-curl -X DELETE http://localhost:8080/api/permissions/{rule-id}
-```
-
-### 查看權限
-
-```bash
-curl http://localhost:8080/api/permissions?userId=user-uuid
+curl http://localhost:8080/api/permissions/list
 ```
 
 ## 最佳實踐
@@ -251,22 +256,22 @@ curl http://localhost:8080/api/permissions?userId=user-uuid
 {
   "resource": "disk:read",  // 不是 disk:*
   "allowed": true,
-  "expiresAt": "2026-04-21T00:00:00Z"  // 始终設定過期
+  "expiresAt": "2026-04-21T00:00:00Z"  // 始終設定過期
 }
 ```
 
 ### 2. 使用時間限制權限
 
-除非绝對必要，否則永遠不要授予永久權限。
+除非絕對必要，否則永遠不要授予永久權限。
 
-### 3. 監控權限記錄
+### 3. 監控權限日誌
 
-定期查看稽核記錄以了解：
-- 拒絕的訪問尝试
-- 例外模式
+定期檢視稽核日誌以了解：
+- 拒絕的存取嘗試
+- 異常模式
 - 權限升級
 
-### 4. 實現自訂回呼
+### 4. 實作自訂回呼
 
 對於複雜邏輯，使用 `IPermissionCallback`：
 
@@ -291,15 +296,15 @@ public async Task<PermissionResult> CheckAsync(PermissionRequest request)
 
 ## 常見場景
 
-### 場景 1：AI 想要读取檔案
+### 場景 1：AI 想要讀取檔案
 
 ```
-AI："我需要读取 config.json"
+AI："我需要讀取 config.json"
 ↓
-權限链：
-1. IsCurator？否
-2. 速率限制？正常
-3. GlobalACL？找到規則：disk:read = 允許
+權限鏈：
+1. 速率限制？正常
+2. 回呼？返回未決定
+3. IsCurator？否 → GlobalACL？找到規則：disk:read = 允許
 4. 結果：允許
 ```
 
@@ -308,24 +313,21 @@ AI："我需要读取 config.json"
 ```
 AI："我想編譯和執行程式碼"
 ↓
-權限链：
-1. IsCurator？否
-2. 速率限制？正常
-3. GlobalACL？未找到規則
-4. 回呼？返回未決定
-5. 询問使用者？使用者核准
-6. 結果：允許
+權限鏈：
+1. 速率限制？正常
+2. 回呼？返回未決定
+3. IsCurator？是 → IPermissionAskHandler → 使用者批准
+4. 結果：允許
 ```
 
 ### 場景 3：超過速率限制
 
 ```
-AI："我需要發出 100 個 HTTP 要求"
+AI："我需要發出 100 個 HTTP 請求"
 ↓
-權限链：
-1. IsCurator？否
-2. 速率限制？已超過
-3. 結果：拒絕
+權限鏈：
+1. 速率限制？已超過
+2. 結果：拒絕
 ```
 
 ## 故障排除
@@ -337,25 +339,25 @@ AI："我需要發出 100 個 HTTP 要求"
 2. 速率限制設定
 3. GlobalACL 規則
 4. 回呼邏輯
-5. 使用者回應超时
+5. 使用者回應逾時
 
 ### 權限未過期
 
 **檢查**：
-- `expiresAt` 字段設定正确
-- 时區正确
-- 时钟同步
+- `expiresAt` 欄位設定正確
+- 時區正確
+- 時鐘同步
 
-### 稽核記錄未記录
+### 稽核日誌未記錄
 
 **檢查**：
-- 稽核記錄器已註冊
-- 儲存後端可訪問
-- 磁碟空间充足
+- 稽核日誌器已註冊
+- 儲存後端可存取
+- 磁碟空間充足
 
 ## 下一步
 
-- 📚 阅读[架構指南](architecture.md)
+- 📚 閱讀[架構指南](architecture.md)
 - 🛠️ 查看[開發指南](development-guide.md)
-- 🔒 查看[安全文檔](security.md)
+- 🔒 查看[安全文件](security.md)
 - 🚀 查看[快速開始指南](getting-started.md)

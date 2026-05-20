@@ -452,3 +452,6 @@
 2026-05-21T18:00:00+08:00 | catpaw | task_complete | task=task-216 | files_modified=13 | commit=2e2b18b | summary=修复韩语文档与源码不一致：权限链3级分支、执行器架构、API端点、控制器数23、Avalonia迁移、语言数33、工具数24、UI组件27、跨平台描述
 2026-05-21T18:00:00+08:00 | catpaw | session_end | sessionId=catpaw-20260521-1300 | completed=task-216 | commit=2e2b18b2026-05-21T19:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260521-1900
 2026-05-21T19:00:00+08:00 | trae-glm5 | task_claim | task=task-217 | type=docs | scope=�޸��������ĵ���Դ���벻һ������
+2026-05-21T21:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260521-2100 | task=task-218
+2026-05-21T21:00:00+08:00 | trae-glm5 | task_claim | task=task-218 | type=docs | target=docs/zh-HK/
+2026-05-21T22:30:00+08:00 | trae-glm5 | task_complete | task=task-218 | summary=Fixed 9 zh-HK docs: README, api-reference, permission-system, security, development-guide, getting-started, architecture, web-ui-guide, roadmap. Key fixes: permission chain order (UserFrequencyCacheIPermissionCallbackbranch), 2933 language variants, 2223 controllers, Windows FormsAvalonia UI, DashScope region cn-hangzhoubeijing, missing Spanish locale, missing roadmap stages 3.6/4, architecture diagram missing plugin loader and knowledge network
