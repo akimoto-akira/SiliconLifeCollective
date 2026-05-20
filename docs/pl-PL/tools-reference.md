@@ -710,13 +710,11 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 ## Weryfikacja uprawnień
 
-Wszystkie wykonania narzędzi przechodzą przez 5-poziomowy łańcuch uprawnień:
+Wszystkie wykonania narzędzi przechodzą przez 3-poziomowy łańcuch uprawnień:
 
-1. **IsCurator** — Kurator Krzemowy pomija wszystkie sprawdzenia
-2. **UserFrequencyCache** — pamięć podręczna częstych zezwoleń/odmów użytkownika
-3. **GlobalACL** — globalna lista kontroli dostępu
-4. **IPermissionCallback** — niestandardowa funkcja wywołania zwrotnego uprawnień
-5. **IPermissionAskHandler** — zapytanie użytkownika
+1. **UserFrequencyCache** — pamięć podręczna częstych zezwoleń/odmów użytkownika
+2. **IPermissionCallback** — niestandardowa funkcja wywołania zwrotnego uprawnień
+3. **Rozgałęzienie** — IsCurator: `IPermissionAskHandler` (zapytanie użytkownika) | Non-curator: `GlobalACL` (lista kontroli dostępu)
 
 ## Tworzenie niestandardowych narzędzi
 
@@ -766,7 +764,9 @@ public class MyCustomTool : ITool
 
 ### Krok 2: Dodanie do projektu
 
-Umieść plik narzędzia w katalogu `src/SiliconLife.Common/Tools/` (narzędzia współdzielone) lub w katalogu `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (narzędzia specyficzne dla wersji). `ToolManager` automatycznie odkryje i zarejestruje narzędzie podczas uruchamiania poprzez refleksję.
+Umieść plik narzędzia w katalogu `src/SiliconLife.Common/Tools/` (narzędzia współdzielone). `ToolManager` automatycznie odkryje i zarejestruje narzędzie podczas uruchamiania poprzez refleksję.
+
+> **Uwaga**: `SiliconLife.Default` i `SiliconLife.Fast` nie mają już oddzielnych katalogów `Tools/`, wszystkie współdzielone narzędzia są umieszczane w `SiliconLife.Common/Tools/`.
 
 ### Krok 2a: Rejestracja narzędzia przez wtyczkę
 

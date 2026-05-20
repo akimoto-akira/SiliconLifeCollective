@@ -20,7 +20,7 @@
 - ✅ Etap 1: Migracja podstawowej struktury projektu i systemu konfiguracji
 - ✅ Etap 2: Migracja Web UI i kontrolerów
 - ✅ Etap 3: Optymalizacja systemu przechowywania (pamięć SpeedyPack + asynchroniczna trwałość)
-- ✅ Etap 3.5: Narzędzie zarządzania SpeedyPack (aplikacja Windows Forms SiliconLife.Speedy.Manager)
+- ✅ Etap 3.5: Narzędzie zarządzania SpeedyPack (aplikacja Avalonia UI SiliconLife.Speedy.Manager)
 - ✅ Etap 3.6: System wtyczek (interfejs IPlugin, bezpieczna piaskownica, izolacja AssemblyLoadContext)
 - 🚧 Etap 4: Rozwój zasobnika systemowego i aplikacji okienkowej
 - 📋 Etap 5: Optymalizacja wydajności (pule połączeń, pule obiektów, współbieżność bez blokad)

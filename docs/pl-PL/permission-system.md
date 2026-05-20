@@ -8,40 +8,28 @@
 
 System uprawnień zapewnia, że wszystkie operacje inicjowane przez AI są odpowiednio weryfikowane i audytowane.
 
-## Łańcuch uprawnień 5 poziomów
+## Łańcuch uprawnień 3 poziomów
 
 ```
 ┌─────────────────────────────────────────────┐
 │          Weryfikacja uprawnień              │
 ├─────────────────────────────────────────────┤
-│  Poziom 1: IsCurator                        │
-│  ↓ Jeśli prawda, pomija                     │
-│  Poziom 2: UserFrequencyCache               │
-│  ↓ Ograniczenie szybkości                   │
-│  Poziom 3: GlobalACL                        │
-│  ↓ Lista kontroli dostępu                   │
-│  Poziom 4: IPermissionCallback              │
+│  Poziom 1: UserFrequencyCache               │
+│  ↓ Ograniczenie szybkości / buforowane      │
+│  Poziom 2: IPermissionCallback              │
 │  ↓ Niestandardowa logika                    │
-│  Poziom 5: IPermissionAskHandler            │
-│  ↓ Zapytanie użytkownika                    │
+│  Poziom 3: Rozgałęzienie                    │
+│  ├─ IsCurator → IPermissionAskHandler       │
+│  │  ↓ Kurator: zapytanie użytkownika        │
+│  └─ Non-curator → GlobalACL                 │
+│     ↓ Nie-kurator: lista kontroli dostępu   │
 │  Wynik: Zezwól lub Odmów                   │
 └─────────────────────────────────────────────┘
 ```
 
-## Poziom 1: IsCurator
+## Poziom 1: UserFrequencyCache
 
-Administrator/Kurator pomija wszystkie sprawdzanie uprawnień.
-
-```csharp
-if (user.IsCurator)
-{
-    return PermissionResult.Allowed("Curator access");
-}
-```
-
-## Poziom 2: UserFrequencyCache
-
-Ograniczenie szybkości dla każdego użytkownika w celu zapobiegania nadużyciom.
+Ograniczenie szybkości dla każdego użytkownika w celu zapobiegania nadużyciom. Buforuje również poprzednie decyzje użytkownika, aby uniknąć powtarzających się monitów.
 
 ```csharp
 var cache = new UserFrequencyCache();
@@ -51,39 +39,7 @@ if (!cache.CheckLimit(userId, resource))
 }
 ```
 
-## Poziom 3: GlobalACL
-
-Globalna lista kontroli dostępu definiująca jawne reguły.
-
-### Struktura ACL
-
-```json
-{
-  "rules": [
-    {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
-    }
-  ]
-}
-```
-
-### Format zasobów
-
-```
-{typ}:{akcja}
-
-Przykłady:
-- disk:read
-- disk:write
-- network:http
-- compile:execute
-- system:info
-```
-
-## Poziom 4: IPermissionCallback
+## Poziom 2: IPermissionCallback
 
 Niestandardowe wywołanie zwrotne dla dynamicznej logiki uprawnień.
 
@@ -126,7 +82,57 @@ public class DefaultPermissionCallback : IPermissionCallback
 }
 ```
 
-## Poziom 5: IPermissionAskHandler
+## Poziom 3: Rozgałęzienie (IsCurator / GlobalACL)
+
+Gdy poziom 1 i poziom 2 nie podejmą decyzji, system rozgałęzia się na podstawie tożsamości wywołującego:
+
+### Gałąź kuratora (IsCurator = true)
+
+Jeśli wywołujący jest kuratorem, wchodzi do `IPermissionAskHandler` w celu potwierdzenia przez użytkownika:
+
+```csharp
+if (IsCurator)
+{
+    if (_askHandler != null)
+    {
+        var result = await _askHandler.AskAsync(request);
+    }
+}
+```
+
+### Gałąź nie-kuratora (IsCurator = false)
+
+Jeśli wywołujący nie jest kuratorem, sprawdza `GlobalACL` listę kontroli dostępu:
+
+### Struktura GlobalACL
+
+```json
+{
+  "rules": [
+    {
+      "userId": "user-uuid",
+      "resource": "disk:read",
+      "allowed": true,
+      "expiresAt": "2026-04-21T00:00:00Z"
+    }
+  ]
+}
+```
+
+### Format zasobów
+
+```
+{typ}:{akcja}
+
+Przykłady:
+- disk:read
+- disk:write
+- network:http
+- compile:execute
+- system:info
+```
+
+## IPermissionAskHandler
 
 Zapytanie użytkownika o uprawnienia, gdy wszystkie inne poziomy są nierozstrzygnięte.
 
@@ -156,7 +162,7 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 
 `PermissionRequestQueue` zarządza oczekującymi żądaniami uprawnień, obsługując asynchroniczne oczekiwanie na odpowiedź użytkownika:
 
-- **Kolejkowanie żądań** — gdy łańcuch uprawnień osiągnie poziom 5, tworzy `TaskCompletionSource<AskPermissionResult>` i kolejkuje
+- **Kolejkowanie żądań** — gdy łańcuch uprawnień osiąga rozgałęzienie IsCurator, tworzy `TaskCompletionSource<AskPermissionResult>` i kolejkuje
 - **Wyświetlanie w Web UI** — wyświetla oczekujące żądania uprawnień w Web UI przez `PermissionRequestController`
 - **Odpowiedź użytkownika** — użytkownik zatwierdza lub odrzuca w Web UI, z opcją buforowania decyzji i ustawienia czasu trwania bufora
 - **Opcje buforowania** — użytkownik może buforować decyzje uprawnień na 1 godzinę, 24 godziny, 7 dni lub 30 dni
@@ -219,7 +225,7 @@ public PermissionResult EvaluatePermission(
 
 **Przez API**:
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "user-uuid",
@@ -231,14 +237,12 @@ curl -X POST http://localhost:8080/api/permissions \
 
 ### Odwoływanie uprawnień
 
-```bash
-curl -X DELETE http://localhost:8080/api/permissions/{rule-id}
-```
+Przez stronę zarządzania uprawnieniami w Web UI.
 
 ### Przegląd uprawnień
 
 ```bash
-curl http://localhost:8080/api/permissions?userId=user-uuid
+curl http://localhost:8080/api/permissions/list
 ```
 
 ## Najlepsze praktyki
@@ -297,9 +301,9 @@ public async Task<PermissionResult> CheckAsync(PermissionRequest request)
 AI: "Muszę odczytać config.json"
 ↓
 Łańcuch uprawnień:
-1. IsCurator? Nie
-2. Ograniczenie szybkości? Normalne
-3. GlobalACL? Znaleziono regułę: disk:read = zezwolone
+1. Ograniczenie szybkości? Normalne
+2. Wywołanie zwrotne? Zwraca nierozstrzygnięte
+3. IsCurator? Nie → GlobalACL? Znaleziono regułę: disk:read = zezwolone
 4. Wynik: Zezwól
 ```
 
@@ -309,12 +313,10 @@ AI: "Muszę odczytać config.json"
 AI: "Chcę skompilować i uruchomić kod"
 ↓
 Łańcuch uprawnień:
-1. IsCurator? Nie
-2. Ograniczenie szybkości? Normalne
-3. GlobalACL? Nie znaleziono reguły
-4. Wywołanie zwrotne? Zwraca nierozstrzygnięte
-5. Zapytanie użytkownika? Użytkownik zatwierdza
-6. Wynik: Zezwól
+1. Ograniczenie szybkości? Normalne
+2. Wywołanie zwrotne? Zwraca nierozstrzygnięte
+3. IsCurator? Tak → IPermissionAskHandler → Użytkownik zatwierdza
+4. Wynik: Zezwól
 ```
 
 ### Scenariusz 3: Przekroczenie ograniczenia szybkości
@@ -323,9 +325,8 @@ AI: "Chcę skompilować i uruchomić kod"
 AI: "Muszę wysłać 100 żądań HTTP"
 ↓
 Łańcuch uprawnień:
-1. IsCurator? Nie
-2. Ograniczenie szybkości? Przekroczone
-3. Wynik: Odmów
+1. Ograniczenie szybkości? Przekroczone
+2. Wynik: Odmów
 ```
 
 ## Rozwiązywanie problemów

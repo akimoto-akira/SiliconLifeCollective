@@ -382,6 +382,19 @@
 2026-05-20T20:30:00+08:00 | catpaw | file_modified | docs/fr-FR/README.md | fix=权限链顺序修正、控制器数22→23、语言数29→33、UI组件数30+→27、Phase 10描述(20+→23控制器)
 2026-05-20T21:00:00+08:00 | catpaw | file_modified | docs/fr-FR/api-reference.md | fix=Chat API端点(/api/chat→/api/chat/send)、请求体(beingId→channelId)、添加conversations/messages/stop端点
 2026-05-20T21:30:00+08:00 | catpaw | file_modified | docs/fr-FR/permission-system.md | fix=权限链5级→3级分支结构重写、IsCurator不再短路、超时60s→30min、添加GlobalACL结构
+2026-05-21T19:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260521-1900
+2026-05-21T19:00:00+08:00 | trae-glm5 | task_claim | task=task-217 | type=docs | scope=修复波兰语文档与源代码不一致问题
+2026-05-21T19:30:00+08:00 | trae-glm5 | file_modified | docs/pl-PL/api-reference.md | fix=Chat API端点(/api/chat→/api/chat/send)、请求体(beingId→channelId)、添加conversations/messages/stop端点
+2026-05-21T19:45:00+08:00 | trae-glm5 | file_modified | docs/pl-PL/README.md | fix=权限链5级→3级、控制器数20+→23、语言数29→33、UI组件数30+→27、Speedy.Manager(Windows Forms→Avalonia UI)、目录结构修正
+2026-05-21T20:00:00+08:00 | trae-glm5 | file_modified | docs/pl-PL/permission-system.md | fix=权限链5级→3级分支结构重写、IsCurator不再短路为允许、API端点修正(/api/permissions→/api/permissions/save)、场景示例步骤修正
+2026-05-21T20:10:00+08:00 | trae-glm5 | file_modified | docs/pl-PL/security.md | fix=权限流程图重写(4级→3级分支)、IsCurator角色修正(不再短路为允许)、DynamicCompilationExecutor移出I/O执行器表、插件权限链5级→3级
+2026-05-21T20:15:00+08:00 | trae-glm5 | file_modified | docs/pl-PL/development-guide.md | fix=依赖方向(Default/Fast→Common→Core)、权限链5级→3级、工具路径(移除Default/Fast Tools目录)、语言数29→33、Speedy.Manager(Windows Forms→Avalonia UI)
+2026-05-21T20:20:00+08:00 | trae-glm5 | file_modified | docs/pl-PL/getting-started.md | fix=DashScope Region(cn-hangzhou→beijing)、Model(qwen-plus→qwen3.6-plus)、Speedy.Manager(Windows Forms→Avalonia UI)、语言数29→33
+2026-05-21T20:25:00+08:00 | trae-glm5 | file_modified | docs/pl-PL/tools-reference.md | fix=权限链5级→3级、IsCurator不再旁路、工具路径(移除Default/Fast Tools目录)
+2026-05-21T20:25:00+08:00 | trae-glm5 | file_modified | docs/pl-PL/roadmap.md | fix=Speedy.Manager(Windows Forms→Avalonia UI)
+2026-05-21T20:25:00+08:00 | trae-glm5 | file_modified | docs/pl-PL/architecture.md | fix=控制器数22→23、UI组件数30+→27
+2026-05-21T20:30:00+08:00 | trae-glm5 | task_complete | task=task-217 | files_modified=9 | summary=修复波兰语文档与源码不一致：权限链5级→3级、IsCurator角色修正、API端点修正、控制器数/语言数/组件数更新、DashScope配置修正、Speedy.Manager框架修正、工具路径修正、目录结构修正
+2026-05-21T20:30:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260521-1900 | completed=task-217
 2026-05-20T21:45:00+08:00 | catpaw | file_modified | docs/fr-FR/security.md | fix=权限验证流程图重写、执行器架构(独立线程→静态类模型)、超时值60s/120s→30s、Curator角色描述修正
 2026-05-20T22:00:00+08:00 | catpaw | file_modified | docs/fr-FR/development-guide.md | fix=权限链顺序修正、依赖方向、工具创建路径、语言数29→33
 2026-05-20T22:15:00+08:00 | catpaw | file_modified | docs/fr-FR/getting-started.md | fix=DashScope Region(cn-hangzhou→beijing)、Model(qwen-plus→qwen3.6-plus)、语言数29→33
@@ -436,5 +449,6 @@
 2026-05-21T17:30:00+08:00 | catpaw | file_modified | docs/ko-KR/promo.md | fix=Fast 버전 고성능 Windows→크로스 플랫폼 데스크톱(Windows/macOS/Linux)
 2026-05-21T17:45:00+08:00 | catpaw | file_modified | docs/ko-KR/roadmap.md | fix=Speedy.Manager Windows Forms→Avalonia
 2026-05-21T18:00:00+08:00 | catpaw | file_modified | docs/ko-KR/changelog.md | fix=WPF→Avalonia, Windows 폼→크로스 플랫폼 데스크톱, 컨트롤러 20+→23
-2026-05-21T18:00:00+08:00 | catpaw | task_complete | task=task-216 | files_modified=13 | summary=修复韩语文档与源码不一致：权限链3级分支、执行器架构、API端点、控制器数23、Avalonia迁移、语言数33、工具数24、UI组件27、跨平台描述
-2026-05-21T18:00:00+08:00 | catpaw | session_end | sessionId=catpaw-20260521-1300 | completed=task-216
+2026-05-21T18:00:00+08:00 | catpaw | task_complete | task=task-216 | files_modified=13 | commit=2e2b18b | summary=修复韩语文档与源码不一致：权限链3级分支、执行器架构、API端点、控制器数23、Avalonia迁移、语言数33、工具数24、UI组件27、跨平台描述
+2026-05-21T18:00:00+08:00 | catpaw | session_end | sessionId=catpaw-20260521-1300 | completed=task-216 | commit=2e2b18b2026-05-21T19:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260521-1900
+2026-05-21T19:00:00+08:00 | trae-glm5 | task_claim | task=task-217 | type=docs | scope=�޸��������ĵ���Դ���벻һ������

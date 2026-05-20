@@ -73,8 +73,8 @@ Edytuj `src/SiliconLife.Default/Config/DefaultConfigData.cs` lub modyfikuj konfi
   "AIClients": {
     "DashScope": {
       "ApiKey": "twój-klucz-api-tutaj",
-      "Model": "qwen-plus",
-      "Region": "cn-hangzhou"
+      "Model": "qwen3.6-plus",
+      "Region": "beijing"
     }
   }
 }
@@ -226,15 +226,17 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # Domyślna implementacja + punkt wejścia (wersja konsolowa)
 │   ├── SiliconLife.Fast/            # Wysokowydajna implementacja + punkt wejścia (wersja okienkowa)
 │   ├── SiliconLife.Speedy/          # Wysokowydajny silnik przechowywania SpeedyPack
-│   └── SiliconLife.Speedy.Manager/  # Narzędzie zarządzania SpeedyPack (Windows Forms)
-├── docs/                            # Dokumentacja (wielojęzyczna, 29 wariantów językowych)
+│   └── SiliconLife.Speedy.Manager/  # Narzędzie zarządzania SpeedyPack (Avalonia UI)
+├── docs/                            # Dokumentacja (wielojęzyczna, 33 warianty językowe)
 │   ├── en/                          # Angielski
 │   ├── zh-CN/                       # Chiński uproszczony
 │   ├── zh-HK/                       # Chiński tradycyjny
 │   ├── es-ES/                       # Hiszpański
 │   ├── ja-JP/                       # Japoński
 │   ├── ko-KR/                       # Koreański
-│   └── cs-CZ/                       # Czeski
+│   ├── cs-CZ/                       # Czeski
+│   ├── pl-PL/                       # Polski
+│   └── it-IT/                       # Włoski
 ├── 总文档/                           # Dokumentacja wymagań i architektury (chińska)
 └── README.md                        # Opis projektu
 ```

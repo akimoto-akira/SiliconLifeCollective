@@ -24,7 +24,7 @@ Ten projekt oferuje dwie wersje implementacji, współdzielące tę samą archit
 - **Cechy**:
   - Windows/macOS działanie w tle w zasobniku systemowym, okno stanu zasobnika z monitorowaniem w czasie rzeczywistym; Linux okno stanu wyświetlane bezpośrednio
   - Silnik SpeedyPack + automatyczna kompresja gwarantująca bezpieczeństwo danych
-  - Architektura Component UI, 30+ deklaratywnych komponentów
+  - Architektura Component UI, 27 deklaratywnych komponentów
   - 7 motywów skórek, obsługa automatycznego wykrywania i przełączania
   - Narzędzie gorącego przeładowania obsługujące aktualizacje online i restart
   - Linux automatycznie otwiera przeglądarkę dla dostępu do Web UI, obsługuje parametr `--no-tray`
@@ -485,7 +485,7 @@ Web UI całkowicie unika plików szablonów, generując wszystkie znaczniki w C#
 
 ### System kontrolerów
 
-Web UI jest zgodny ze **wzorcem podobnym do MVC**, z 22 kontrolerami obsługującymi różne aspekty:
+Web UI jest zgodny ze **wzorcem podobnym do MVC**, z 23 kontrolerami obsługującymi różne aspekty:
 
 | Kontroler | Przeznaczenie |
 |------------|---------|

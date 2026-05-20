@@ -9,7 +9,7 @@
 Bezpieczeństwo Silicon Life Collective opiera się na modelu **obrony warstwowej**. Kluczowa zasada: **wszystkie operacje I/O muszą przechodzić przez wykonawców**, którzy wymuszają sprawdzanie uprawnień przed wykonaniem.
 
 ```
-Wywołanie narzędzia → Wykonawca → Menedżer uprawnień → Pamięć podręczna wysokiego odmówienia → Pamięć podręczna wysokiego zezwolenia → Wywołanie zwrotne → Zapytanie użytkownika
+Wywołanie narzędzia → Wykonawca → Menedżer uprawnień → Pamięć podręczna częstotliwości → Wywołanie zwrotne → (IsCurator: Zapytanie użytkownika | Non-curator: Globalne ACL)
 ```
 
 ---
@@ -38,7 +38,7 @@ Każde sprawdzenie uprawnień zwraca jeden z trzech wyników:
 
 ### Specjalna rola: Kurator Krzemowy
 
-Kurator Krzemowy posiada najwyższy poziom uprawnień (`IsCurator = true`). Sprawdzanie uprawnień Kuratora jest zwierane do **zezwolenia**, chyba że użytkownik jawnie nadpisze.
+Kurator Krzemowy posiada najwyższy poziom uprawnień (`IsCurator = true`). Gdy łańcuch uprawnień osiąga rozgałęzienie, operacje kuratora przechodzą przez `IPermissionAskHandler` w celu potwierdzenia przez użytkownika, a nie są bezpośrednio zwierane do zezwolenia. Nie-kuratorzy natomiast odpytują globalne ACL.
 
 ### Prywatny menedżer uprawnień
 
@@ -48,7 +48,7 @@ Każda Istota Krzemowa ma swoją własną **prywatną instancję PermissionManag
 
 ## Przepływ weryfikacji uprawnień
 
-Priorytet zapytania: **1. Wysokie odmówienie użytkownika → 2. Wysokie zezwolenie użytkownika → 3. Funkcja wywołania zwrotnego**
+Priorytet zapytania: **1. Pamięć podręczna częstotliwości → 2. Funkcja wywołania zwrotnego → 3. Rozgałęzienie (IsCurator/GlobalACL)**
 
 ```
 ┌─────────────┐
@@ -65,32 +65,34 @@ Priorytet zapytania: **1. Wysokie odmówienie użytkownika → 2. Wysokie zezwol
 │ poleceń...) │              │
 └─────────────┘              ▼
                     ┌─────────────────┐
-                    │ 1. IsCurator?   │──Tak──▶ Zezwól
-                    └────────┬────────┘
-                             │ Nie
-                             ▼
-                    ┌─────────────────┐
-                    │ 2. Wysokie      │──Dopasowanie──▶ Odmów
-                    │ odmówienie      │
-                    │ użytkownika     │
-                    │ (pamięć podręczna)│
+                    │ 1. Pamięć       │──Dopasowanie──▶ Zezwól / Odmów
+                    │ podręczna       │
+                    │ częstotliwości  │
+                    │ (wys. odmów     │
+                    │ ma priorytet)   │
                     └────────┬────────┘
                              │ Brak dopasowania
                              ▼
                     ┌─────────────────┐
-                    │ 3. Wysokie      │──Dopasowanie──▶ Zezwól
-                    │ zezwolenie      │
-                    │ użytkownika     │
-                    │ (pamięć podręczna)│
-                    └────────┬────────┘
-                             │ Brak dopasowania
-                             ▼
-                    ┌─────────────────┐
-                    │ 4. Funkcja      │
+                    │ 2. Funkcja      │
                     │ wywołania       │──▶ Zezwól / Odmów / Zapytaj użytkownika
                     │ zwrotnego       │
                     │ uprawnień       │
-                    └─────────────────┘
+                    └────────┬────────┘
+                             │ Zapytaj użytkownika
+                             ▼
+                    ┌─────────────────┐
+                    │ 3. IsCurator?   │
+                    └────────┬────────┘
+                             │
+                 ┌───────────┴───────────┐
+                 │                       │
+                 ▼ Tak                   ▼ Nie
+          ┌─────────────┐    ┌─────────────┐
+          │ Zapytanie   │    │ Globalne    │
+          │ użytkownika │    │ ACL         │
+          │ (AskHandler)│    │ zapytanie   │
+          └─────────────┘    └─────────────┘
 ```
 
 **Kluczowy punkt**: Wykonawca widzi tylko wartość logiczną (zezwól/odmów). Menedżer uprawnień wewnętrznie obsługuje decyzję trójstanową (zezwól/odmów/zapytaj użytkownika) i rozstrzyga zapytanie użytkownika przed zwróceniem do wykonawcy.
@@ -135,7 +137,8 @@ Gdy narzędzie inicjuje dostęp do zasobów:
 | `DiskExecutor` | Odczyt/zapis plików, operacje na katalogach | 30 sekund |
 | `NetworkExecutor` | Żądania HTTP, połączenia WebSocket | 60 sekund |
 | `CommandLineExecutor` | Wykonanie poleceń Shell | 120 sekund |
-| `DynamicCompilationExecutor` | Kompilacja w pamięci Roslyn | 60 sekund |
+
+> **Uwaga**: `DynamicCompilationExecutor` (znajdujący się w przestrzeni nazw `SiliconLife.Core.Compilation`) odpowiada za kompilację Roslyn w pamięci i nie należy do kategorii wykonawców I/O, ale podlega tym samym ograniczeniom systemu uprawnień.
 
 ### Izolacja wyjątków i odporność na błędy
 
@@ -348,5 +351,5 @@ System wtyczek wprowadza zagrożenia bezpieczeństwa związane z wykonywaniem ko
 ### Ograniczenia uprawnień narzędzi
 
 - Narzędzia zarejestrowane przez wtyczki poprzez interfejs `ITool` podlegają tym samym ograniczeniom systemu uprawnień
-- Narzędzia wtyczek nie mogą ominąć łańcucha uprawnień 5 poziomów
+- Narzędzia wtyczek nie mogą ominąć łańcucha uprawnień 3 poziomów
 - Narzędzia wtyczek podlegają oznaczeniu `[SiliconManagerOnly]`

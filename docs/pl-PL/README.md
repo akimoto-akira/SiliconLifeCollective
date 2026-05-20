@@ -26,7 +26,7 @@
 - **Narzędzie gorącego przeładowania** — obsługa automatycznej kompilacji, aktualizacji plików i restartu SiliconLife.Fast podczas działania, bez ręcznej interwencji
 - **Pętla wywołań narzędzi** — AI zwraca wywołanie narzędzia → wykonanie narzędzia → wynik przekazywany do AI → ciągła pętla aż do zwrócenia czystej odpowiedzi tekstowej
 - **Bezpieczeństwo wykonawcy-uprawnień** — wszystkie operacje I/O przechodzą przez wykonawcę z rygorystyczną weryfikacją uprawnień
-  - Łańcuch uprawnień 5 poziomów: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+  - Łańcuch uprawnień 3 poziomów: Pamięć podręczna częstotliwości → Wywołanie zwrotne → (IsCurator: Zapytanie użytkownika | Non-curator: Globalna ACL)
   - Kompletny dziennik audytu rejestrujący wszystkie decyzje dotyczące uprawnień
 
 ### AI i wiedza
@@ -40,11 +40,11 @@
 ### Interfejs Web
 - **Nowoczesny Web UI** — wbudowany serwer HTTP, obsługa aktualizacji w czasie rzeczywistym SSE
 - **7 motywów skórek** — zarządczy, czatowy, twórczy, deweloperski, wysoki kontrast, jasny, minimalistyczny, obsługa automatycznego wykrywania i przełączania
-- **20+ kontrolerów** — kompletna funkcjonalność zarządzania systemem, czatu, konfiguracji, monitorowania
+- **23 kontrolery** — kompletna funkcjonalność zarządzania systemem, czatu, konfiguracji, monitorowania
 - **Zero zależności od frameworków frontendowych** — generowanie HTML/CSS/JS po stronie serwera poprzez `H`, `CssBuilder` i `JsBuilder`
 
 ### Internacjonalizacja i lokalizacja
-- **29 implementacji językowych** pełne wsparcie, obejmujące 2 systemy pisma i wiele wariantów regionalnych
+- **33 implementacje językowe** pełne wsparcie, obejmujące 2 systemy pisma i wiele wariantów regionalnych
   - **Chiński uproszczony**: zh-CN (Chiny kontynentalne), zh-SG (Singapur), zh-MY (Malezja) (3)
   - **Chiński tradycyjny**: zh-HK (Hongkong), zh-TW (Tajwan), zh-MO (Makau) (3)
   - **Angielski**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10)
@@ -52,7 +52,7 @@
   - **Niemiecki**: de-DE, de-AT, de-CH, de-LU, de-LI (5)
   - **Francuski**: fr-FR, fr-CA, fr-CH (3)
   - **Japoński**: ja-JP | **Koreański**: ko-KR | **Czeski**: cs-CZ (3)
-  - **Polski**: pl-PL (1)
+  - **Włoski**: it-IT | **Polski**: pl-PL | **Portugalski**: pt-PT, pt-BR (4)
 
 ### Dane i przechowywanie
 - **Wysokowydajna pamięć SpeedyPack** — wersja Fast korzysta z autorskiego silnika przechowywania .spk, mapowanie katalogów w pamięci + pamięć podręczna wpisów + asynchroniczna kolejka zapisu
@@ -84,7 +84,7 @@ Ten projekt oferuje dwie wersje implementacji, spełniające różne scenariusze
   - Ekstremalna optymalizacja wydajności
   - Windows/macOS działanie w tle w zasobniku z monitorowaniem w czasie rzeczywistym; Linux okno stanu wyświetlane bezpośrednio
   - Silnik SpeedyPack + automatyczna kompresja gwarantująca bezpieczeństwo danych
-  - Architektura Component UI, 30+ deklaratywnych komponentów
+  - Architektura Component UI, 27 deklaratywnych komponentów
   - 7 motywów skórek, obsługa automatycznego wykrywania i przełączania
   - Narzędzie gorącego przeładowania obsługujące aktualizacje online i restart
 - **Poprawa wydajności**: opóźnienie odczytu przechowywania zmniejszone 1000-krotnie, opóźnienie zapisu zmniejszone 15000-krotnie, zdolność obsługi współbieżnej zwiększona 50-krotnie
@@ -154,11 +154,11 @@ SiliconLifeCollective.sln
 │   ├── SiliconLife.Common/                # Współdzielona implementacja (wspólna dla obu wersji)
 │   │   ├── AI/                            # Klienci AI i fabryki (Ollama, DashScope, VolcengineArk)
 │   │   ├── Calendar/                      # 32 implementacje kalendarzy
-│   │   ├── Localization/                  # Klasy bazowe lokalizacji i 29 implementacji językowych/wariantów regionalnych
+│   │   ├── Localization/                  # Klasy bazowe lokalizacji i 33 implementacje językowe/wariantów regionalnych
 │   │   ├── Resources/                     # Współdzielone pliki zasobów
 │   │   ├── Security/                      # Menedżer uprawnień
 │   │   ├── SiliconBeing/                  # Domyślna implementacja Istoty Krzemowej
-│   │   ├── Tools/                         # 23 implementacje narzędzi ogólnych (w tym narzędzie gorącego przeładowania)
+│   │   ├── Tools/                         # 24 implementacje narzędzi ogólnych (w tym narzędzie gorącego przeładowania)
 │   │   ├── Web/                           # Infrastruktura Web
 │   │   └── WebView/                       # Implementacja Playwright WebView
 │   │
@@ -167,8 +167,8 @@ SiliconLifeCollective.sln
 │   │   ├── Data/                          # Katalog danych
 │   │   ├── Help/                          # Lokalizacja dokumentacji pomocy (wielojęzyczna)
 │   │   └── Web/                           # Implementacja Web UI
-│   │       ├── Component/                 # Biblioteka komponentów UI (30+ komponentów)
-│   │       ├── Controllers/               # 22 kontrolery
+│   │       ├── Component/                 # Biblioteka komponentów UI (27 komponentów)
+│   │       ├── Controllers/               # 23 kontrolery
 │   │       ├── Models/                    # Modele widoków
 │   │       ├── Views/                     # Widoki HTML
 │   │       └── Skins/                     # 7 motywów skórek
@@ -176,25 +176,20 @@ SiliconLifeCollective.sln
 │   ├── SiliconLife.Default/               # Domyślna implementacja + punkt wejścia aplikacji (wersja konsolowa)
 │   │   ├── Program.cs                     # Punkt wejścia (montowanie wszystkich komponentów)
 │   │   ├── Config/                        # Domyślne dane konfiguracyjne
-│   │   ├── IM/                            # Dostawca WebUI
 │   │   ├── Knowledge/                     # Implementacja sieci wiedzy
-│   │   ├── Logging/                       # Implementacja dostawcy logowania
+│   │   ├── Logging/                       # Implementacja dostawcy logowania (konsola + system plików)
 │   │   ├── Project/                       # Implementacja systemu projektów
-│   │   ├── Security/                      # Domyślne wywołanie zwrotne uprawnień
-│   │   ├── Storage/                       # Implementacja przechowywania w systemie plików
-│   │   └── Tools/                         # Implementacje narzędzi specyficzne dla wersji (HelpTool)
+│   │   └── Storage/                       # Implementacja przechowywania w systemie plików
 │   │
 │   ├── SiliconLife.Fast/                  # Wysokowydajna implementacja + punkt wejścia aplikacji (wersja okienkowa)
 │   │   ├── Program.cs                     # Punkt wejścia (aplikacja okienkowa)
+│   │   ├── App.axaml / App.cs             # Definicja aplikacji Avalonia
 │   │   ├── Config/                        # Dane konfiguracyjne (współdzielone z Default)
-│   │   ├── IM/                            # Dostawca WebUI
 │   │   ├── Knowledge/                     # Implementacja sieci wiedzy (optymalizacja pamięci)
 │   │   ├── Logging/                       # Wysokowydajny dostawca logowania
 │   │   ├── Project/                       # Implementacja systemu projektów
-│   │   ├── Security/                      # Optymalizowane wywołanie zwrotne uprawnień
 │   │   ├── Storage/                       # Adapter przechowywania SpeedyPack
-│   │   ├── Tools/                         # Implementacje narzędzi specyficzne dla wersji (HelpTool)
-│   │   └── Tray/                          # Zasobnik systemowy (lokalizacja w 29 wariantach językowych)
+│   │   └── Tray/                          # Zasobnik systemowy (lokalizacja w 33 wariantach językowych)
 │   │
 │   ├── SiliconLife.Speedy/                # Wysokowydajny silnik przechowywania SpeedyPack
 │   │   ├── SpeedyPack.cs                  # Klasa rdzenna (mapowanie katalogów w pamięci + pamięć podręczna + asynchroniczny zapis)
@@ -213,7 +208,7 @@ SiliconLifeCollective.sln
 │   │       ├── SpkHeader.cs               # Nagłówek pliku pakietu
 │   │       └── PathNormalizer.cs          # Normalizacja ścieżek
 │   │
-│   └── SiliconLife.Speedy.Manager/        # Narzędzie zarządzania SpeedyPack (Windows Forms)
+│   └── SiliconLife.Speedy.Manager/        # Narzędzie zarządzania SpeedyPack (Avalonia UI)
 │       ├── MainForm.cs                    # Formularz główny
 │       ├── Program.cs                     # Punkt wejścia
 │       └── slc.ico                        # Ikona aplikacji
@@ -247,7 +242,7 @@ Pętla główna (dedykowany wątek, strażnik + bezpiecznik)
 Wszystkie operacje I/O inicjowane przez AI muszą przejść przez rygorystyczny łańcuch bezpieczeństwa:
 
 ```
-Wywołanie narzędzia → Wykonawca → Menedżer uprawnień → [IsCurator → Pamięć podręczna częstotliwości → Globalna ACL → Wywołanie zwrotne → Zapytanie użytkownika]
+Wywołanie narzędzia → Wykonawca → Menedżer uprawnień → [Pamięć podręczna częstotliwości → Wywołanie zwrotne → (IsCurator: Zapytanie użytkownika | Non-curator: Globalna ACL)]
 ```
 
 ## 🚀 Szybki start
@@ -333,12 +328,12 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] Faza 3: Pierwsza Istota Krzemowa z plikiem duszy (architektura ciało-mózg)
 - [x] Faza 4: Trwała pamięć (system czatu + interfejs przechowywania czasowego)
 - [x] Faza 5: System narzędzi + wykonawcy
-- [x] Faza 6: System uprawnień (łańcuch 5 poziomów, audytor, globalna lista kontroli dostępu)
+- [x] Faza 6: System uprawnień (łańcuch 3 poziomów, audytor, globalna lista kontroli dostępu)
 - [x] Faza 7: Kompilacja dynamiczna + samewolucja (Roslyn)
 - [x] Faza 8: Pamięć długoterminowa + zadania + czasomierze
 - [x] Faza 9: Rdzenny host + współpraca wieloagentowa
-- [x] Faza 10: Web UI (HTTP + SSE, 20+ kontrolerów, 4 motywy skórek)
-- [x] Faza 10.5: Rozszerzenia przyrostowe (kanały nadawcze, audyt Tokenów, 32 kalendarze, ulepszenia narzędzi, lokalizacja w 21 językach)
+- [x] Faza 10: Web UI (HTTP + SSE, 23 kontrolery, 7 motywów skórek)
+- [x] Faza 10.5: Rozszerzenia przyrostowe (kanały nadawcze, audyt Tokenów, 32 kalendarze, ulepszenia narzędzi, lokalizacja w 33 wariantach językowych)
 - [x] Faza 10.6: Udoskonalenie i optymalizacja (WebView, system pomocy, obszar roboczy projektów, sieć wiedzy)
 - [x] Faza 11: Silnik przechowywania SpeedyPack (zastąpienie LiteDB, mapowanie w pamięci, asynchroniczna kolejka zapisu, automatyczna kompresja)
 - [x] Faza 12: System wtyczek (interfejs IPlugin, piaskownica bezpieczeństwa PluginLoader, izolowane ładowanie, integracja narzędzi)

@@ -18,13 +18,13 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # Domyślna implementacja, punkt wejścia (weryfikacja wykonalności architektury)
 │   ├── SiliconLife.Fast/            # Wysokowydajna implementacja, punkt wejścia (główna wersja produkcyjna)
 │   ├── SiliconLife.Speedy/          # Wysokowydajny silnik przechowywania SpeedyPack
-│   └── SiliconLife.Speedy.Manager/  # Narzędzie zarządzania SpeedyPack (Windows Forms)
+│   └── SiliconLife.Speedy.Manager/  # Narzędzie zarządzania SpeedyPack (Avalonia UI)
 └── docs/                            # Dokumentacja wielojęzyczna
 ```
 
 **Kierunek zależności**:
-- `SiliconLife.Default` → `SiliconLife.Core` (jednokierunkowe)
-- `SiliconLife.Fast` → `SiliconLife.Core` (jednokierunkowe)
+- `SiliconLife.Default` → `SiliconLife.Common` → `SiliconLife.Core`
+- `SiliconLife.Fast` → `SiliconLife.Common` → `SiliconLife.Core`
 - `SiliconLife.Common` → `SiliconLife.Core` (jednokierunkowe)
 
 **Opis ról wersji**:
@@ -55,9 +55,9 @@ public interface ITool
 
 ### 3. System uprawnień
 
-Łańcuch weryfikacji uprawnień 5 poziomów:
+Łańcuch weryfikacji uprawnień 3 poziomów:
 ```
-IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL)
 ```
 
 ### 4. Lokalizator usług
@@ -75,7 +75,9 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### Dodawanie nowego narzędzia
 
-1. Utwórz nową klasę w `src/SiliconLife.Common/Tools/` (narzędzia współdzielone przez obie wersje) lub `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (narzędzia specyficzne dla wersji):
+1. Utwórz nową klasę w `src/SiliconLife.Common/Tools/` (narzędzia współdzielone przez obie wersje):
+
+> **Uwaga**: `SiliconLife.Default` i `SiliconLife.Fast` nie mają już oddzielnych katalogów `Tools/`, wszystkie współdzielone narzędzia są umieszczane w `SiliconLife.Common/Tools/`.
 
 ```csharp
 public class MyCustomTool : ITool
@@ -265,7 +267,7 @@ public class MyCustomSkin : ISkin
 SiliconLife.Common/
 ├── AI/                    # Implementacje klientów i fabryk AI
 ├── Calendar/              # 32 implementacje kalendarzy
-├── Localization/          # Klasy bazowe lokalizacji i 29 implementacji językowych
+├── Localization/          # Klasy bazowe lokalizacji i 33 implementacje językowe
 ├── Security/              # Menedżer uprawnień
 ├── SiliconBeing/          # Domyślna implementacja istoty krzemowej
 ├── Tools/                 # Współdzielone wbudowane narzędzia
@@ -284,13 +286,10 @@ SiliconLife.App/          # Warstwa aplikacji współdzielona przez Default i Fa
 
 SiliconLife.Default/      # Katalogi specyficzne dla wersji
 ├── Config/                # Domyślne dane konfiguracyjne
-├── IM/                    # Dostawca WebUI
 ├── Knowledge/             # Implementacja sieci wiedzy
-├── Logging/               # Implementacja dostawcy logowania
+├── Logging/               # Implementacja dostawcy logowania (konsola + system plików)
 ├── Project/               # Implementacja systemu projektów
-├── Security/              # Domyślne wywołania zwrotne uprawnień
-├── Storage/               # Implementacja przechowywania w systemie plików
-└── Tools/                 # Narzędzia specyficzne dla wersji (HelpTool)
+└── Storage/               # Implementacja przechowywania w systemie plików
 ```
 
 ### Dokumentacja
