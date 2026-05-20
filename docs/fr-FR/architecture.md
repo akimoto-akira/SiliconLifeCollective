@@ -128,6 +128,9 @@ Cela garantit la réactivité aux interactions utilisateur sans perturber les t�
 │  │  ┌──────────┐ ┌──────────┐                        │   │
 │  │  │ Chargeur │  │ Réseau   │                        │   │
 │  │  │ de plugins│  │ de conn. │                        │   │
+│  │  ┌──────────┐ ┌──────────┐                        │   │
+│  │  │ Réseau   │ │          │                        │   │
+│  │  │ de conn. │ │          │                        │   │
 │  │  └──────────┘ └──────────┘                        │   │
 │  └──────────────────────────────────────────────────┘   │
 │                                                         │
@@ -413,6 +416,57 @@ Le code est stocké sur disque chiffré en AES-256. La clé de chiffrement est d
 
 Le système comprend **32 implémentations de calendriers**, dérivées de la classe abstraite `CalendarBase`, couvrant les principaux systèmes calendaires du monde :
 
+|| Calendrier | ID | Description |
+||------------|-----|-------------||
+|| BuddhistCalendar | `buddhist` | Calendrier bouddhiste (BE), année + 543 |
+|| CherokeeCalendar | `cherokee` | Système de calendrier cherokee |
+|| ChineseLunarCalendar | `lunar` | Calendrier lunaire chinois, avec mois intercalaires |
+|| ChineseHistoricalCalendar | `chinese_historical` | Calendrier historique chinois, cycle Ganzhi et ères impériales |
+|| ChulaSakaratCalendar | `chula_sakarat` | Calendrier Chula Sakarat (CS), année - 638 |
+|| CopticCalendar | `coptic` | Calendrier copte |
+|| DaiCalendar | `dai` | Calendrier Dai avec calcul lunaire complet |
+|| DehongDaiCalendar | `dehong_dai` | Variante Dai Dehong |
+|| EthiopianCalendar | `ethiopian` | Calendrier éthiopien |
+|| FrenchRepublicanCalendar | `french_republican` | Calendrier républicain français |
+|| GregorianCalendar | `gregorian` | Calendrier grégorien standard |
+|| HebrewCalendar | `hebrew` | Calendrier hébraïque (juif) |
+|| IndianCalendar | `indian` | Calendrier national indien |
+|| InuitCalendar | `inuit` | Système de calendrier inuit |
+|| IslamicCalendar | `islamic` | Calendrier islamique (Hégire) |
+|| JapaneseCalendar | `japanese` | Calendrier des ères japonaises (Nengo) |
+|| JavaneseCalendar | `javanese` | Calendrier islamique javanais |
+|| JucheCalendar | `juche` | Calendrier Juche (Corée du Nord), année - 1911 |
+|| JulianCalendar | `julian` | Calendrier julien |
+|| KhmerCalendar | `khmer` | Calendrier khmer |
+|| MayanCalendar | `mayan` | Calendrier long maya |
+|| MongolianCalendar | `mongolian` | Calendrier mongol |
+|| PersianCalendar | `persian` | Calendrier persan (Hégire solaire) |
+|| RepublicOfChinaCalendar | `roc` | Calendrier de la République de Chine (Minguo), année - 1911 |
+|| RomanCalendar | `roman` | Calendrier romain |
+|| SakaCalendar | `saka` | Calendrier Saka (Indonésie) |
+|| SexagenaryCalendar | `sexagenary` | Calendrier Ganzhi chinois (sexagésimal) |
+|| TibetanCalendar | `tibetan` | Calendrier tibétain |
+|| VietnameseCalendar | `vietnamese` | Calendrier lunaire vietnamien (variante zodiaque du Chat) |
+|| VikramSamvatCalendar | `vikram_samvat` | Calendrier Vikram Samvat |
+|| YiCalendar | `yi` | Système de calendrier Yi |
+|| ZoroastrianCalendar | `zoroastrian` | Calendrier zoroastrien |
+
+`CalendarTool` fournit les opérations : `now`, `format`, `add_days`, `diff`, `list_calendars`, `get_components`, `get_now_components`, `convert` (conversion de dates entre calendriers).
+
+`TokenUsageAuditManager` suit la consommation de tokens IA de tous les Beings :
+
+- `TokenUsageRecord` — Enregistrement par requête (ID du Being, modèle, tokens prompt, tokens complétion, horodatage)
+- `TokenUsageSummary` — Statistiques agrégées
+- `TokenUsageQuery` — Paramètres de requête pour filtrer les enregistrements
+- Persistance via `ITimeStorage` pour les requêtes de séries temporelles
+- Accessible via l'interface Web (UsageController) et `TokenAuditTool` (Curator uniquement)
+
+---
+
+### Système de calendrier
+
+Le système comprend **32 implémentations de calendriers**, dérivées de la classe abstraite `CalendarBase`, couvrant les principaux systèmes calendaires du monde :
+
 | Calendrier | ID | Description |
 |------------|-----|-------------|
 | BuddhistCalendar | `buddhist` | Calendrier bouddhiste (BE), année + 543 |
@@ -456,7 +510,9 @@ Le système comprend **32 implémentations de calendriers**, dérivées de la cl
 
 ### Système de skins
 
-L'interface Web dispose d'un **système de skins enfichable**, permettant une personnalisation complète de l'interface sans modifier la logique applicative :
+L'interface Web dispose d'un **système de skins enfichable**, permettant une personnalisation complète de l'interface sans modifier la logique applicative.
+
+La langue active est sélectionnée via `DefaultConfigData.Language` et résolue par `LocalizationManager`.
 
 - **Interface ISkin** — Définit le contrat pour tous les skins, incluant :
   - Méthodes de rendu principales (`RenderHtml`, `RenderError`)
@@ -475,7 +531,190 @@ L'interface Web dispose d'un **système de skins enfichable**, permettant une pe
 
 - **Découverte de skins** — `SkinManager` découvre et enregistre automatiquement toutes les implémentations `ISkin` via réflexion
 
-### Constructeurs HTML / CSS / JS
+### Système d'automatisation de navigateur WebView (Nouveau)
+
+Le système intègre une automatisation de navigateur WebView basée sur **Playwright** :
+
+- **Isolation individuelle** : Chaque Silicon Being possède sa propre instance de navigateur, ses cookies et son stockage de session, entièrement isolés.
+- **Mode headless** : Le navigateur fonctionne en mode headless totalement invisible pour l'utilisateur, les Silicon Beings opèrent de manière autonome en arrière-plan.
+- **WebViewBrowserTool** : Fournit des capacités complètes de navigation :
+  - Navigation de page, clics, saisie de texte, obtention du contenu de la page
+  - Exécution de JavaScript, captures d'écran, attente d'éléments
+  - Gestion de l'état du navigateur et nettoyage des ressources
+- **Contrôle de sécurité** : Toutes les opérations du navigateur passent par la chaîne de vérification des permissions, empêchant l'accès malveillant aux pages web.
+
+### Système de réseau de connaissances (Nouveau)
+
+Le système intègre un graphe de connaissances basé sur une **structure de triplets** :
+
+- **Représentation des connaissances** : Structure de triplet « sujet-relation-objet » (ex. : Python-is_a-programming_language)
+- **KnowledgeTool** : Fournit la gestion du cycle de vie complet des connaissances :
+  - `add`/`query`/`update`/`delete` — Opérations CRUD de base
+  - `search` — Recherche en texte intégral et correspondance par mots-clés
+  - `get_path` — Découverte de chemins d'association entre deux concepts
+  - `validate` — Vérification de l'intégrité des connaissances
+  - `stats` — Analyse statistique du réseau de connaissances
+- **Stockage persistant** : Les triplets de connaissances sont persistés sur le système de fichiers, avec support des requêtes par index temporel.
+- **Score de confiance** : Chaque entrée de connaissance est associée à un score de confiance (0-1), permettant la correspondance floue et le classement.
+- **Étiquetage** : Support de l'ajout d'étiquettes aux connaissances pour la catégorisation et la recherche.
+
+---
+
+## Structure du répertoire de données
+
+```
+data/
+└── SiliconManager/
+    ├── {curator-guid}/
+    │   ├── soul.md          # Fichier âme du Curateur
+    │   ├── state.json       # État d'exécution
+    │   ├── code.enc         # Code de classe personnalisé chiffré AES
+    │   └── permission.enc   # Rappel de permission personnalisé chiffré AES
+    │
+    └── {being-guid}/
+        ├── soul.md
+        ├── state.json
+        ├── code.enc
+        └── permission.enc
+```
+
+---
+
+## Moteur de stockage SpeedyPack
+
+SiliconLife.Fast utilise le moteur de stockage SpeedyPack propriétaire (format .spk), remplaçant la solution LiteDB précédente, pour atteindre des performances de lecture/écriture extrêmes.
+
+### Conception architecturale
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    SpeedyPack                             │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
+│  │ DirectoryMap  │  │  EntryCache   │  │  WriteQueue   │  │
+│  │ (Cartographie │  │  (Cache des   │  │ (File d'écrit.│  │
+│  │  répertoire)  │  │   entrées)    │  │  asynchrone)  │  │
+│  └──────┬───────┘  └──────┬───────┘  └───────┬───────┘  │
+│         │                  │                   │          │
+│  ┌──────▼──────────────────▼───────────────────▼───────┐  │
+│  │              PackFileReader / PackFileWriter          │  │
+│  │              (Lecteur/Écrivain de fichiers paquet)    │  │
+│  └──────────────────────────┬──────────────────────────┘  │
+│                              │                             │
+│  ┌──────────────────────────▼──────────────────────────┐  │
+│  │              Fichier .spk (MessagePack + compression LZ4) │
+│  └─────────────────────────────────────────────────────┘  │
+│                                                          │
+│  ┌──────────────┐  ┌──────────────┐                      │
+│  │  FreeList     │  │ SpeedyPack   │                      │
+│  │ (Gestion des  │  │ AutoCompactor│                      │
+│  │  espaces libres) │ (Auto-compaction) │                      │
+│  └──────────────┘  └──────────────┘                      │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Composants principaux
+
+|| Composant | Description |
+||-----------|-------------||
+|| `SpeedyPack` | Classe centrale, combinant DirectoryMap, EntryCache et WriteQueue pour fournir des lectures/écritures à faible latence |
+|| `DirectoryMap` | Cartographie de répertoire en mémoire, maintient les correspondances entre chemins virtuels et entrées de fichiers |
+|| `EntryCache` | Cache des entrées, basé sur TTL pour les entrées récemment accédées |
+|| `WriteQueue` | File d'écriture asynchrone, met en file d'attente les opérations d'écriture pour exécution sur un thread d'arrière-plan |
+|| `FreeList` | Gestion des espaces libres, suit l'espace réutilisable dans les fichiers .spk |
+|| `PackFileReader` | Lecteur de fichiers paquet, lit les données depuis les fichiers .spk |
+|| `PackFileWriter` | Écrivain de fichiers paquet, écrit les données dans les fichiers .spk |
+|| `SpeedyPackAutoCompactor` | Minuterie d'auto-compaction, compresse périodiquement les fichiers .spk pour récupérer l'espace libre |
+|| `SpeedyPackRegistry` | Gestionnaire singleton au niveau du processus, garantit que toute l'application utilise la même instance SpeedyPack |
+
+### Adaptateurs de stockage
+
+SiliconLife.Fast intègre SpeedyPack aux interfaces système via les adaptateurs suivants :
+
+|| Adaptateur | Interface | Description |
+||------------|-----------|-------------||
+|| `SpeedyStorage` | `IStorage` | Adaptateur de stockage clé-valeur générique |
+|| `SpeedyTimeStorage` | `ITimeStorage` | Adaptateur de stockage à index temporel |
+|| `SpeedyWorkNoteStorage` | `IWorkNoteStorage` | Adaptateur de stockage des notes de travail |
+
+### Options de configuration
+
+`SpeedyPackOptions` fournit les configurations suivantes :
+
+|| Option | Type | Valeur par défaut | Description |
+||--------|------|-------------------|-------------||
+|| `CacheTtl` | `TimeSpan` | 5 minutes | Durée de vie des entrées en cache |
+|| `MaxCacheEntries` | `int` | 1000 | Nombre maximum d'entrées en cache |
+|| `ReadOnly` | `bool` | false | Mode lecture seule |
+
+### Support des transactions
+
+SpeedyPack supporte les opérations d'écriture atomiques via l'interface `IPackTransaction` :
+
+- `SpeedyTransaction` implémente le mécanisme de transaction
+- Support de l'atomicité pour les écritures par lot
+- À la validation, toutes les écritures réussissent entièrement ou sont entièrement annulées
+
+---
+
+## Système de plugins
+
+SiliconLife prend en charge l'extension de fonctionnalités via un système de plugins, permettant aux développeurs tiers d'ajouter de nouvelles fonctionnalités à la plateforme.
+
+### Interface principale
+
+```csharp
+public interface IPlugin
+{
+    string Id { get; }
+    string GetName(Language language);
+    string Version { get; }
+    string GetDescription(Language language);
+    string GetAuthor(Language language);
+    void OnLoad();
+    void OnStart();
+    void OnStop();
+    void OnUnload();
+}
+```
+
+### Chargeur de plugins
+
+`PluginLoader` est responsable du chargement des DLL de plugins depuis un répertoire spécifié et effectue des vérifications de sécurité strictes :
+
+1. **Analyse de répertoire** — Analyse tous les fichiers .dll dans le répertoire des plugins
+2. **Analyse de sécurité** — Vérifie si le plugin référence des espaces de noms interdits
+3. **Chargement isolé** — Charge les plugins de manière isolée via un `AssemblyLoadContext` personnalisé
+4. **Gestion du cycle de vie** — Appelle les méthodes OnLoad, OnStart, OnStop, OnUnload du plugin
+
+### Bac à sable de sécurité
+
+Le chargeur de plugins effectue les vérifications de sécurité suivantes :
+
+|| Vérification | Description |
+||--------------|-------------||
+|| Espaces de noms interdits | System.IO, System.Net.Http, System.Net.WebSockets, System.Net.Sockets, Microsoft.CodeAnalysis |
+|| Liste blanche d'assemblies de confiance | Google.Protobuf, Newtonsoft.Json, MessagePack, Serilog, Microsoft.Extensions.Logging.Abstractions, Dapper |
+|| Vérification des types interdits | Analyse les types dangereux référencés dans le plugin |
+|| Vérification des membres interdits | Analyse les méthodes dangereuses appelées dans le plugin |
+
+### Intégration d'outils
+
+Les plugins peuvent enregistrer des outils personnalisés en implémentant l'interface `ITool` :
+
+- La méthode `ToolManager.ScanAllPluginAssemblies()` analyse toutes les implémentations ITool dans les plugins chargés
+- Les outils de plugins sont automatiquement intégrés dans la boucle d'appel d'outils
+- Les outils de plugins sont soumis au même système de permissions
+
+### Cycle de vie des plugins
+
+```
+Chargement (OnLoad) → Démarrage (OnStart) → En cours d'exécution → Arrêt (OnStop) → Déchargement (OnUnload)
+```
+
+---
+
+## Constructeurs HTML / CSS / JS
 
 L'interface Web évite entièrement les fichiers de modèles, générant tout le balisage en C# :
 
@@ -485,7 +724,7 @@ L'interface Web évite entièrement les fichiers de modèles, générant tout le
 
 ### Système de contrôleurs
 
-L'interface Web suit un **pattern de type MVC**, avec 22 contrôleurs gérant différents aspects :
+L'interface Web suit un **pattern de type MVC**, avec 23 contrôleurs gérant différents aspects :
 
 | Contrôleur | Objectif |
 |------------|----------|
@@ -506,7 +745,7 @@ L'interface Web suit un **pattern de type MVC**, avec 22 contrôleurs gérant di
 | Permission | Gestion des permissions |
 | PermissionRequest | File d'attente des requêtes de permissions |
 | Project | Gestion de projets, avec notes de travail et système de tâches |
-| System | Surveillance des performances système et métriques |
+| System | Gestion système et surveillance d'exécution |
 | Task | Interface du système de tâches |
 | Timer | Gestion du système de minuteries, avec historique d'exécution |
 | Usage | Tableau de bord d'utilisation des tokens, avec graphiques de tendance et export |
@@ -520,12 +759,14 @@ L'interface Web suit un **pattern de type MVC**, avec 22 contrôleurs gérant di
 
 ### Localisation
 
-Le système prend en charge la localisation complète de **29 variantes linguistiques** :
-- **Chinois (6)** : zh-CN (simplifié), zh-HK (traditionnel), zh-SG (Singapour), zh-MO (Macao), zh-TW (Taïwan), zhMY (Malaisie)
+Le système prend en charge la localisation complète de **33 variantes linguistiques** :
+- **Chinois (6)** : zh-CN (simplifié), zh-HK (traditionnel), zh-SG (Singapour), zh-MO (Macao), zh-TW (Taïwan), zh-MY (Malaisie)
 - **Anglais (10)** : en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY
+- **Espagnol (2)** : es-ES, es-MX
 - **Allemand (5)** : de-DE, de-AT, de-CH, de-LU, de-LI
 - **Français (3)** : fr-FR, fr-CA, fr-CH
-- **Autres (3)** : ja-JP (japonais), ko-KR (coréen), cs-CZ (tchèque)
+- **Portugais (2)** : pt-PT, pt-BR
+- **Autres (5)** : ja-JP (japonais), ko-KR (coréen), cs-CZ (tchèque), pl-PL (polonais), it-IT (italien)
 
 ---
 

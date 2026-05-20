@@ -68,29 +68,27 @@ La plupart des points de terminaison nécessitent une authentification via des c
 
 ### Envoyer un message
 
-**POST** `/api/chat`
+**POST** `/api/chat/send`
 
 **Requête** :
 ```json
 {
-  "beingId": "being-uuid",
-  "message": "Bonjour, comment allez-vous ?",
-  "sessionId": "optional-session-id"
+  "channelId": "channel-uuid",
+  "content": "Bonjour, comment allez-vous ?"
 }
 ```
 
-**Réponse** (non streamé) :
+**Réponse** :
 ```json
 {
-  "reply": "Je vais bien, merci !",
-  "sessionId": "session-uuid",
-  "timestamp": "2026-04-20T10:30:00Z"
+  "success": true,
+  "messageId": "message-uuid"
 }
 ```
 
 ### Chat en streaming (SSE)
 
-**GET** `/api/chat/stream?beingId={id}&message={msg}`
+**GET** `/api/chat/stream?channelId={id}`
 
 **Réponse** : Flux Server-Sent Events
 
@@ -101,9 +99,17 @@ data: {"type": "chunk", "content": " suis..."}
 data: {"type": "complete", "sessionId": "uuid"}
 ```
 
+### Obtenir les conversations
+
+**GET** `/api/chat/conversations`
+
+### Obtenir les messages
+
+**GET** `/api/chat/messages?beingId={id}`
+
 ### Obtenir l'historique de chat
 
-**GET** `/api/chat/{sessionId}/history`
+**GET** `/api/chat/history?sessionId={sessionId}`
 
 **Réponse** :
 ```json
@@ -120,6 +126,17 @@ data: {"type": "complete", "sessionId": "uuid"}
       "timestamp": "2026-04-20T10:30:05Z"
     }
   ]
+}
+```
+
+### Arrêter la réflexion
+
+**POST** `/api/chat/stop`
+
+**Requête** :
+```json
+{
+  "channelId": "channel-uuid"
 }
 ```
 
@@ -168,7 +185,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ### Obtenir les permissions
 
-**GET** `/api/permissions`
+**GET** `/api/permissions/list`
 
 **Réponse** :
 ```json
@@ -186,7 +203,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ### Accorder une permission
 
-**POST** `/api/permissions`
+**POST** `/api/permissions/save`
 
 **Requête** :
 ```json
@@ -507,7 +524,7 @@ Server-Sent Events pour les mises à jour en temps réel :
 ### Événements de chat
 
 ```javascript
-const eventSource = new EventSource('/api/chat/stream?beingId=xxx&message=xxx');
+const eventSource = new EventSource('/api/chat/stream?channelId=xxx');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);

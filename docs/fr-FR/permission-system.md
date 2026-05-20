@@ -8,40 +8,28 @@
 
 Le système de permissions garantit que toutes les opérations initiées par l'IA sont correctement vérifiées et auditées.
 
-## Chaîne de permissions à 5 niveaux
+## Chaîne de permissions à 3 niveaux
 
 ```
 ┌─────────────────────────────────────────────┐
 │          Vérification des permissions        │
 ├─────────────────────────────────────────────┤
-│  Niveau 1 : IsCurator                       │
-│  ↓ Si vrai, contourner                     │
-│  Niveau 2 : UserFrequencyCache              │
-│  ↓ Limitation du débit                      │
-│  Niveau 3 : GlobalACL                       │
-│  ↓ Liste de contrôle d'accès                │
-│  Niveau 4 : IPermissionCallback             │
+│  Niveau 1 : UserFrequencyCache              │
+│  ↓ Cache de décisions utilisateur           │
+│  Niveau 2 : IPermissionCallback             │
 │  ↓ Logique personnalisée                    │
-│  Niveau 5 : IPermissionAskHandler           │
-│  ↓ Demander à l'utilisateur                 │
+│  Niveau 3 : Branchement conditionnel        │
+│  ├─ Curateur → IPermissionAskHandler        │
+│  │  ↓ Curateur : demander confirmation      │
+│  └─ Non-curateur → GlobalACL                │
+│     ↓ Non-curateur : liste de contrôle      │
 │  Résultat : Autorisé ou Refusé              │
 └─────────────────────────────────────────────┘
 ```
 
-## Niveau 1 : IsCurator
+## Niveau 1 : UserFrequencyCache
 
-Les administrateurs/curateurs contournent toutes les vérifications de permissions.
-
-```csharp
-if (user.IsCurator)
-{
-    return PermissionResult.Allowed("Curator access");
-}
-```
-
-## Niveau 2 : UserFrequencyCache
-
-Limitation du débit par utilisateur pour prévenir les abus.
+Cache des décisions utilisateur à haute fréquence pour éviter de re-demander confirmation.
 
 ```csharp
 var cache = new UserFrequencyCache();
@@ -51,39 +39,7 @@ if (!cache.CheckLimit(userId, resource))
 }
 ```
 
-## Niveau 3 : GlobalACL
-
-La liste de contrôle d'accès globale définit des règles explicites.
-
-### Structure ACL
-
-```json
-{
-  "rules": [
-    {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
-    }
-  ]
-}
-```
-
-### Format des ressources
-
-```
-{type}:{action}
-
-Exemples :
-- disk:read
-- disk:write
-- network:http
-- compile:execute
-- system:info
-```
-
-## Niveau 4 : IPermissionCallback
+## Niveau 2 : IPermissionCallback
 
 Rappels personnalisés pour la logique de permissions dynamique.
 
@@ -126,9 +82,60 @@ public class DefaultPermissionCallback : IPermissionCallback
 }
 ```
 
-## Niveau 5 : IPermissionAskHandler
+## Niveau 3 : Branchement conditionnel (Curateur / GlobalACL)
 
-Demander la permission à l'utilisateur lorsque tous les autres niveaux sont indécis.
+Lorsque les niveaux 1 et 2 n'ont pas pris de décision, le système effectue un branchement selon l'identité de l'appelant :
+
+### Branche curateur (IsCurator = true)
+
+Si l'appelant est le curateur, le système invoque `IPermissionAskHandler` pour demander confirmation à l'utilisateur :
+
+```csharp
+if (IsCurator)
+{
+    if (_askHandler != null)
+    {
+        var result = await _askHandler.AskAsync(request);
+        // L'utilisateur confirme ou refuse dans le Web UI
+    }
+}
+```
+
+### Branche non-curateur (IsCurator = false)
+
+Si l'appelant n'est pas le curateur, le système vérifie la liste de contrôle d'accès `GlobalACL` :
+
+### Structure GlobalACL
+
+```json
+{
+  "rules": [
+    {
+      "userId": "user-uuid",
+      "resource": "disk:read",
+      "allowed": true,
+      "expiresAt": "2026-04-21T00:00:00Z"
+    }
+  ]
+}
+```
+
+### Format des ressources
+
+```
+{type}:{action}
+
+Exemples :
+- disk:read
+- disk:write
+- network:http
+- compile:execute
+- system:info
+```
+
+## IPermissionAskHandler
+
+Lorsqu'une opération du curateur nécessite la confirmation de l'utilisateur, le système utilise `IPermissionAskHandler` pour demander la permission.
 
 ### Implémentation IMPermissionAskHandler
 
@@ -156,11 +163,11 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 
 `PermissionRequestQueue` gère les demandes de permission en attente, prenant en charge l'attente asynchrone des réponses utilisateur :
 
-- **Mise en file d'attente** — Lorsque la chaîne de permissions atteint le niveau 5, crée un `TaskCompletionSource<AskPermissionResult>` et le met en file d'attente
+- **Mise en file d'attente** — Lorsque la chaîne de permissions atteint le niveau 3 (branche curateur), crée un `TaskCompletionSource<AskPermissionResult>` et le met en file d'attente
 - **Affichage Web UI** — Affiche les demandes de permission en attente via `PermissionRequestController` dans l'interface Web
 - **Réponse utilisateur** — L'utilisateur approuve ou refuse dans l'interface Web, avec possibilité de mettre en cache la décision et de définir la durée du cache
 - **Options de cache** — L'utilisateur peut mettre en cache la décision de permission pour 1 heure, 24 heures, 7 jours ou 30 jours
-- **Mécanisme de délai d'attente** — Fermeture automatique de la page de demande après 60 secondes sans réponse
+- **Mécanisme de délai d'attente** — Fermeture automatique de la page de demande après 30 minutes sans réponse
 
 ## Système d'audit
 
@@ -219,7 +226,7 @@ public PermissionResult EvaluatePermission(
 
 **Via l'API** :
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "user-uuid",
@@ -231,14 +238,12 @@ curl -X POST http://localhost:8080/api/permissions \
 
 ### Révoquer une permission
 
-```bash
-curl -X DELETE http://localhost:8080/api/permissions/{rule-id}
-```
+Via la page de gestion des permissions dans le Web UI.
 
 ### Consulter les permissions
 
 ```bash
-curl http://localhost:8080/api/permissions?userId=user-uuid
+curl http://localhost:8080/api/permissions/list
 ```
 
 ## Meilleures pratiques
@@ -297,9 +302,9 @@ public async Task<PermissionResult> CheckAsync(PermissionRequest request)
 IA : "Je dois lire config.json"
 ↓
 Chaîne de permissions :
-1. IsCurator ? Non
-2. Limitation de débit ? Normal
-3. GlobalACL ? Règle trouvée : disk:read = Autorisé
+1. Cache de fréquence ? Normal
+2. Rappel ? Retourne Indécis
+3. Curateur ? Non → GlobalACL ? Règle trouvée : disk:read = Autorisé
 4. Résultat : Autorisé
 ```
 
@@ -309,12 +314,10 @@ Chaîne de permissions :
 IA : "Je veux compiler et exécuter du code"
 ↓
 Chaîne de permissions :
-1. IsCurator ? Non
-2. Limitation de débit ? Normal
-3. GlobalACL ? Aucune règle trouvée
-4. Rappel ? Retourne Indécis
-5. Demander à l'utilisateur ? Utilisateur approuve
-6. Résultat : Autorisé
+1. Cache de fréquence ? Normal
+2. Rappel ? Retourne Indécis
+3. Curateur ? Oui → IPermissionAskHandler → Utilisateur approuve
+4. Résultat : Autorisé
 ```
 
 ### Scénario 3 : Dépassement de la limitation de débit
@@ -323,9 +326,8 @@ Chaîne de permissions :
 IA : "Je dois faire 100 requêtes HTTP"
 ↓
 Chaîne de permissions :
-1. IsCurator ? Non
-2. Limitation de débit ? Dépassé
-3. Résultat : Refusé
+1. Cache de fréquence ? Dépassé
+2. Résultat : Refusé
 ```
 
 ## Dépannage

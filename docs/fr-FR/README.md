@@ -26,7 +26,7 @@
 - **Outil de rechargement à chaud** — Prend en charge la compilation automatique, la mise à jour des fichiers et le redémarrage de SiliconLife.Fast pendant l'exécution, sans intervention manuelle
 - **Boucle d'appel d'outils** — L'IA retourne un appel d'outil → Exécuter l'outil → Retourner les résultats à l'IA → Continuer la boucle jusqu'à une réponse en texte pur
 - **Sécurité des permissions de l'exécuteur** — Toutes les opérations E/S passent par une validation de permissions stricte via les exécuteurs
-  - Chaîne de permissions à 5 niveaux : IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+  - Chaîne de permissions à 3 niveaux : UserFrequencyCache → IPermissionCallback → (Curateur : IPermissionAskHandler | Non-curateur : GlobalACL)
   - Journalisation d'audit complète de toutes les décisions de permissions
 
 ### IA & Connaissances
@@ -40,11 +40,11 @@
 ### Interface Web
 - **Interface Web moderne** — Serveur HTTP intégré avec mises à jour en temps réel SSE
 - **7 thèmes d'apparence** — Versions Admin, Chat, Creative, Dev, Contraste élevé, Light, Minimal, prend en charge la détection et la commutation automatiques
-- **20+ contrôleurs** — Gestion complète du système, chat, configuration, fonctionnalités de surveillance
+- **23 contrôleurs** — Gestion complète du système, chat, configuration, fonctionnalités de surveillance
 - **Zéro dépendance framework frontend** — HTML/CSS/JS générés côté serveur via `H`, `CssBuilder` et `JsBuilder`
 
 ### Internationalisation & Localisation
-- **Prise en charge complète de 29 implémentations linguistiques**, couvrant 2 systèmes d'écriture et multiples variantes régionales
+- **33 variantes linguistiques** en prise en charge complète, couvrant 2 systèmes d'écriture et multiples variantes régionales
   - **Chinois simplifié** : zh-CN (Chine continentale), zh-SG (Singapour), zh-MY (Malaisie) (3 variantes)
   - **Chinois traditionnel** : zh-HK (Hong Kong), zh-TW (Taïwan), zh-MO (Macao) (3 variantes)
   - **Anglais** : en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variantes)
@@ -52,6 +52,7 @@
   - **Allemand** : de-DE, de-AT, de-CH, de-LU, de-LI (5 variantes)
   - **Français** : fr-FR, fr-CA, fr-CH (3 variantes)
   - **Japonais** : ja-JP | **Coréen** : ko-KR | **Tchèque** : cs-CZ (3 variantes)
+  - **Italien** : it-IT | **Polonais** : pl-PL | **Portugais** : pt-PT, pt-BR (4 variantes)
 
 ### Données & Stockage
 - **Stockage haute performance SpeedyPack** — La version Fast utilise le moteur de stockage .spk propriétaire, mappage de répertoires en mémoire + cache d'entrées + file d'écriture asynchrone
@@ -83,7 +84,7 @@ Ce projet propose deux versions d'implémentation pour répondre à différents 
   - Optimisation de performance extrême
   - Windows/macOS exécution en arrière-plan dans la barre d'état avec surveillance en temps réel ; Linux fenêtre d'état affichée directement
   - Moteur SpeedyPack + compression automatique garantissant la sécurité des données
-  - Architecture Component UI, 30+ composants déclaratifs
+    - Architecture Component UI, 27 composants déclaratifs
   - 7 thèmes d'apparence, prend en charge la détection et la commutation automatiques
   - Outil de rechargement à chaud pour les mises à jour et redémarrages en ligne
 - **Amélioration des performances** : Latence de lecture mémoire réduite de 1000x, latence d'écriture réduite de 15000x, capacité de traitement parallèle augmentée de 50x
@@ -153,7 +154,7 @@ SiliconLifeCollective.sln
 │   ├── SiliconLife.Common/                # Implémentation commune (les deux versions)
 │   │   ├── AI/                            # Clients IA et fabriques (Ollama, DashScope, VolcengineArk)
 │   │   ├── Calendar/                      # 32 implémentations de calendriers
-│   │   ├── Localization/                  # Classe de base de localisation et 29 variantes linguistiques/régionales
+│   │   ├── Localization/                  # Classe de base de localisation et 33 variantes linguistiques/régionales
 │   │   ├── Resources/                     # Fichiers de ressources partagés
 │   │   ├── Security/                      # Gestionnaire de permissions
 │   │   ├── SiliconBeing/                  # Implémentation standard du Silicon Being
@@ -166,8 +167,8 @@ SiliconLifeCollective.sln
 │   │   ├── Data/                          # Répertoire de données
 │   │   ├── Help/                          # Localisation de la documentation d'aide (multilingue)
 │   │   └── Web/                           # Implémentation de l'interface Web
-│   │       ├── Component/                 # Bibliothèque de composants UI (30+ composants)
-│   │       ├── Controllers/               # 22 contrôleurs
+│   │       ├── Component/                 # Bibliothèque de composants UI (27 composants)
+│   │       ├── Controllers/               # 23 contrôleurs
 │   │       ├── Models/                    # Modèles de vue
 │   │       ├── Views/                     # Vues HTML
 │   │       └── Skins/                     # 7 thèmes d'apparence
@@ -193,7 +194,7 @@ SiliconLifeCollective.sln
 │   │   ├── Security/                      # Rappels de permissions optimisés
 │   │   ├── Storage/                       # Adaptateur de stockage SpeedyPack
 │   │   ├── Tools/                         # Outils spécifiques à la version (HelpTool)
-│   │   └── Tray/                          # Barre d'état système (29 variantes linguistiques)
+│   │   └── Tray/                          # Barre d'état système (33 variantes linguistiques)
 │   │
 │   ├── SiliconLife.Speedy/                # Moteur de stockage haute performance SpeedyPack
 │   │   ├── SpeedyPack.cs                  # Classe principale (mappage de répertoires en mémoire + cache + écriture asynchrone)
@@ -241,7 +242,7 @@ Boucle principale (thread dédié, watchdog + disjoncteur)
 Toutes les opérations E/S initiées par l'IA doivent traverser une chaîne de sécurité stricte :
 
 ```
-Appel d'outil → Exécuteur → Gestionnaire de permissions → [IsCurator → Cache de fréquence → GlobalACL → Rappel → Demande utilisateur]
+Appel d'outil → Exécuteur → Gestionnaire de permissions → [Cache de fréquence → Rappel → (Curateur : Demande utilisateur | Non-curateur : GlobalACL)]
 ```
 
 ## 🚀 Démarrage rapide
@@ -327,12 +328,12 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] Phase 3 : Premier Silicon Being avec fichier âme (architecture Body-Brain)
 - [x] Phase 4 : Stockage persistant (système de chat + interface Time Storage)
 - [x] Phase 5 : Système d'outils + exécuteurs
-- [x] Phase 6 : Système de permissions (chaîne à 5 niveaux, journal d'audit, GlobalACL)
+- [x] Phase 6 : Système de permissions (chaîne à 3 niveaux en structure ramifiée, journal d'audit, GlobalACL)
 - [x] Phase 7 : Compilation dynamique + auto-développement (Roslyn)
 - [x] Phase 8 : Stockage à long terme + tâches + minuteries
 - [x] Phase 9 : Hôte principal + collaboration multi-agents
-- [x] Phase 10 : Interface Web (HTTP + SSE, 20+ contrôleurs, 7 thèmes)
-- [x] Phase 10.5 : Améliorations incrémentales (canaux de diffusion, audit de tokens, 32 calendriers, améliorations d'outils, localisation en 29 langues)
+- [x] Phase 10 : Interface Web (HTTP + SSE, 23 contrôleurs, 7 thèmes)
+- [x] Phase 10.5 : Améliorations incrémentales (canaux de diffusion, audit de tokens, 32 calendriers, améliorations d'outils, localisation en 33 variantes linguistiques)
 - [x] Phase 10.6 : Complétion & Optimisation (WebView, système d'aide, espace de projet, réseau de connaissances)
 - [x] Phase 11 : Moteur de stockage SpeedyPack (remplacement de LiteDB, mappage en mémoire, file d'écriture asynchrone, compression automatique)
 - [x] Phase 12 : Système de plugins (interface IPlugin, bac à sable de sécurité PluginLoader, chargement isolé, intégration d'outils)

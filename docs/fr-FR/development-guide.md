@@ -54,10 +54,15 @@ public interface ITool
 
 ### 3. Système de permissions
 
-Chaîne de vérification des permissions à 5 niveaux :
+Chaîne de vérification des permissions à 3 niveaux en structure ramifiée :
 ```
-IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+IsCurator → UserFrequencyCache → (IPermissionCallback | GlobalACL) → IPermissionAskHandler
 ```
+- **IsCurator** : Le Silicon Curateur contourne toutes les vérifications
+- **UserFrequencyCache** : Cache des autorisations/refus fréquents de l'utilisateur ; en cas de cache absent, bifurque vers :
+  - **IPermissionCallback** : Fonction de rappel de permission personnalisée du Being (si définie)
+  - **GlobalACL** : Liste de contrôle d'accès globale (si aucun callback défini)
+- **IPermissionAskHandler** : Demander à l'utilisateur (si les niveaux précédents n'ont pas pris de décision)
 
 ### 4. Localisateur de services
 
@@ -264,7 +269,7 @@ public class MyCustomSkin : ISkin
 SiliconLife.Common/
 ├── AI/                    # Implémentations des clients IA et fabriques
 ├── Calendar/              # 32 implémentations de calendriers
-├── Localization/          # Classe de base de localisation et 29 implémentations linguistiques
+├── Localization/          # Classe de base de localisation et 33 variantes linguistiques
 ├── Security/              # Gestionnaire de permissions
 ├── SiliconBeing/          # Implémentation du Silicon Being par défaut
 ├── Tools/                 # Outils intégrés partagés

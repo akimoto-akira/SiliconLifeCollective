@@ -681,6 +681,8 @@ Le système d'outils permet aux Silicon Beings d'interagir avec le monde extéri
 - Nécessite HotReload.exe dans le répertoire tools/HotReload
 - Brève interruption de service pendant le redémarrage (environ 3-5 secondes)
 
+---
+
 ## Flux d'appel d'outil
 
 ```
@@ -708,13 +710,13 @@ Le système d'outils permet aux Silicon Beings d'interagir avec le monde extéri
 
 ## Vérification des permissions
 
-Toutes les exécutions d'outils passent par la chaîne de permissions à 5 niveaux :
+Toutes les exécutions d'outils passent par la chaîne de permissions à 3 niveaux en structure ramifiée :
 
 1. **IsCurator** — Le Silicon Curateur contourne toutes les vérifications
-2. **UserFrequencyCache** — Cache des autorisations/refus fréquents de l'utilisateur
-3. **GlobalACL** — Liste de contrôle d'accès globale
-4. **IPermissionCallback** — Fonction de rappel de permission personnalisée
-5. **IPermissionAskHandler** — Demander à l'utilisateur
+2. **UserFrequencyCache** — Cache des autorisations/refus fréquents de l'utilisateur ; en cas de cache absent, bifurque vers :
+   - **IPermissionCallback** — Fonction de rappel de permission personnalisée du Being (si définie)
+   - **GlobalACL** — Liste de contrôle d'accès globale (si aucun callback défini)
+3. **IPermissionAskHandler** — Demander à l'utilisateur (si les niveaux précédents n'ont pas pris de décision)
 
 ## Créer un outil personnalisé
 

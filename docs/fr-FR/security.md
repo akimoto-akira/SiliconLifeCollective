@@ -9,7 +9,7 @@
 La sécurité de Silicon Life Collective repose sur un modèle de **défense en couches multiples**. Principe fondamental : **Toutes les opérations d'E/S doivent passer par des exécuteurs**, les exécuteurs appliquent les vérifications de permissions avant l'exécution.
 
 ```
-Appel d'outil → Exécuteur → PermissionManager → Cache HighDeny → Cache HighAllow → Rappel → Demander à l'utilisateur
+Appel d'outil → Exécuteur → PermissionManager → Cache de fréquence → Rappel → (Curateur : Demande utilisateur | Non-curateur : GlobalACL)
 ```
 
 ---
@@ -38,7 +38,7 @@ Chaque vérification de permission retourne l'un des trois résultats :
 
 ### Rôle spécial : Silicon Curator
 
-Le Silicon Curator a le niveau de permission le plus élevé (`IsCurator = true`). Les vérifications de permissions du Curator sont court-circuitées vers **Allowed**, sauf si l'utilisateur remplace explicitement.
+Le Silicon Curator a le niveau de permission le plus élevé (`IsCurator = true`). Lorsqu'une opération du Curator nécessite une confirmation, le système invoque `IPermissionAskHandler` pour demander à l'utilisateur via l'interface Web ou la messagerie instantanée.
 
 ### PermissionManager privé
 
@@ -48,7 +48,7 @@ Chaque Silicon Being a sa propre instance **privée** de PermissionManager. Les 
 
 ## Flux de validation des permissions
 
-Priorité de requête : **1. HighDeny utilisateur → 2. HighAllow utilisateur → 3. Fonction de rappel**
+Priorité de requête : **1. Cache de fréquence utilisateur → 2. Fonction de rappel → 3. Branchement conditionnel**
 
 ```
 ┌─────────────┐
@@ -64,27 +64,26 @@ Priorité de requête : **1. HighDeny utilisateur → 2. HighAllow utilisateur �
                              │
                              ▼
                     ┌─────────────────┐
-                    │ 1. IsCurator ?  │──Oui──▶ Allowed
-                    └────────┬────────┘
-                             │ Non
-                             ▼
-                    ┌─────────────────┐
-                    │ 2. HighDeny     │──Correspond──▶ Denied
+                    │ 1. Cache de     │──Correspond──▶ Allowed / Denied
+                    │ fréquence       │
                     │ utilisateur     │
-                    │(Cache mémoire)  │
                     └────────┬────────┘
                              │ Pas de correspondance
                              ▼
                     ┌─────────────────┐
-                    │ 3. HighAllow    │──Correspond──▶ Allowed
-                    │ utilisateur     │
-                    │(Cache mémoire)  │
+                    │ 2. Rappel de    │──▶ Allowed / Denied / AskUser
+                    │ permission      │
                     └────────┬────────┘
-                             │ Pas de correspondance
+                             │ AskUser ou pas de rappel
                              ▼
                     ┌─────────────────┐
-                    │ 4. Rappel de    │
-                    │ permission      │──▶ Allowed / Denied / AskUser
+                    │ 3. Branchement  │
+                    │ conditionnel    │
+                    ├─────────────────┤
+                    │ Curateur ?      │──Oui──▶ IPermissionAskHandler
+                    │                 │         (confirmation utilisateur)
+                    │ Non-curateur ?  │──Oui──▶ GlobalACL
+                    │                 │         (règles d'accès)
                     └─────────────────┘
 ```
 
@@ -96,13 +95,13 @@ Priorité de requête : **1. HighDeny utilisateur → 2. HighAllow utilisateur �
 
 Les exécuteurs sont le **seul** chemin pour les opérations d'E/S. Ils appliquent :
 
-### Threads d'ordonnancement séparés
+### Modèle de classe statique
 
-Chaque exécuteur a un **thread d'ordonnancement séparé** :
+Chaque exécuteur est une classe statique avec un thread de traitement interne :
 
 - Isolation de thread entre exécuteurs — le blocage d'un thread d'exécuteur n'affecte pas les autres exécuteurs.
 - Chaque exécuteur peut définir des limites de ressources séparées (CPU, mémoire, etc.).
-- Gestion de pool de threads pour les threads d'exécuteurs.
+- File d'attente de requêtes interne pour le traitement ordonné.
 
 ### File d'attente de requêtes
 
@@ -128,9 +127,8 @@ Lorsqu'un outil initie un accès aux ressources :
 | Exécuteur | Portée | Timeout par défaut |
 |-----------|--------|-------------------|
 | `DiskExecutor` | Lecture/écriture de fichiers, opérations sur répertoires | 30 secondes |
-| `NetworkExecutor` | Requêtes HTTP, connexions WebSocket | 60 secondes |
-| `CommandLineExecutor` | Exécution de commandes shell | 120 secondes |
-| `DynamicCompilationExecutor` | Compilation en mémoire Roslyn | 60 secondes |
+| `NetworkExecutor` | Requêtes HTTP, connexions WebSocket | 30 secondes |
+| `CommandLineExecutor` | Exécution de commandes shell | 30 secondes |
 
 ### Isolation des exceptions et tolérance aux pannes
 
@@ -157,7 +155,7 @@ Table de règles commune persistée dans le stockage, gérée uniquement par le 
 - Les règles sont évaluées séquentiellement ; la première correspondance l'emporte.
 - Seul le Silicon Curator peut modifier l'ACL globale (via un outil dédié).
 - Les modifications prennent effet immédiatement.
-- L'ACL globale n'est **pas** dans la chaîne de priorité mentionnée ci-dessus par requête — elle est référencée en interne par la fonction de rappel.
+- L'ACL globale est utilisée dans la branche non-curateur du niveau 3 de la chaîne de permissions.
 
 ---
 
@@ -343,5 +341,5 @@ Le `PluginLoader` effectue des vérifications de sécurité strictes lors du cha
 ### Restrictions de permissions des outils
 
 - Les plugins qui enregistrent des outils via l'interface `ITool` sont soumis au même système de permissions
-- Les outils de plugin ne peuvent pas contourner la chaîne de permissions à 5 niveaux
+- Les outils de plugin ne peuvent pas contourner la chaîne de permissions
 - Les outils de plugin sont soumis au marquage `[SiliconManagerOnly]`
