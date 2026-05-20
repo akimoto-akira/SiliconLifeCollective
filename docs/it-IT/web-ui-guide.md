@@ -133,13 +133,15 @@ Configurare il backend IA:
 
 ### Localizzazione
 
-Passare tra 30 varianti linguistiche:
-- Cinese (6): Semplificato, Tradizionale, Singapore, Macao, Taiwan, Malesia
+Passare tra 33 varianti linguistiche:
+- Cinese semplificato (3): Cina continentale, Singapore, Malesia
+- Cinese tradizionale (3): Hong Kong, Taiwan, Macao
 - Inglese (10): US, UK, Canadese, Australiano, Indiano, Singapore, Sudafricano, Irlandese, Neozelandese, Malesiano
+- Spagnolo (2): Spagna, Messico
 - Tedesco (5): Germania, Austria, Svizzera, Lussemburgo, Liechtenstein
 - Francese (3): Francia, Canada, Svizzera
-- Italiano (1): Italia
-- Giapponese, Coreano, Ceco
+- Giapponese, Coreano, Ceco (3)
+- Italiano, Polacco, Portoghese (Portogallo, Brasile) (4)
 
 ---
 
@@ -345,8 +347,8 @@ Passare il mouse su un identificatore per:
   - `ChatHistoryListView` - Elenco sessioni
   - `ChatHistoryDetailView` - Dettagli messaggi
 - **Route API**:
-  - `/api/chat-history/{beingId}/conversations` - Ottenere elenco sessioni
-  - `/api/chat-history/{beingId}/conversation/{conversationId}` - Ottenere dettagli messaggi
+  - `/api/chat-history/conversations?beingId={id}` - Ottenere l'elenco delle sessioni
+  - `/api/chat-history/messages?sessionId={id}` - Ottenere i dettagli dei messaggi
 
 ---
 
@@ -433,8 +435,8 @@ I Silicon Beings possono accedere all'aiuto tramite lo strumento `help`:
 - **Controller**: `HelpController`
 - **Strumento**: `HelpTool`
 - **Route API**:
-  - `/api/help` - Ottenere elenco argomenti aiuto
-  - `/api/help/{topicId}` - Ottenere dettagli argomento
+  - `/help` o `/help/index` - Pagina principale della documentazione aiuto
+  - `/help/{topic}` - Pagina di un argomento specifico
   - `/api/help/search?q=keyword` - Cercare nella documentazione aiuto
 
 ---
@@ -481,11 +483,13 @@ Note di lavoro personali dei Silicon Beings, simili a un diario:
 - **Controller**: `WorkNoteController`
 - **Strumenti**: `WorkNoteTool`, `ProjectTool`, `ProjectWorkNoteTool`
 - **Route API**:
-  - `/api/worknotes` - Ottenere elenco note lavoro
-  - `/api/worknotes/{id}` - Ottenere dettagli nota
-  - `/api/worknotes/search?q=keyword` - Cercare note
-  - `/api/worknotes/directory` - Generare indice note
-  - `/api/projects` - API gestione progetti
+  - `/api/work-notes/list` - Ottenere l'elenco delle note di lavoro
+  - `/api/work-notes/read` - Leggere una nota di lavoro
+  - `/api/work-notes/search` - Cercare nelle note di lavoro
+  - `/api/work-notes/directory` - Generare l'indice delle note
+  - `/api/projects/list` - Elenco dei progetti
+  - `/api/projects/create` - Creare un progetto
+  - `/api/projects/{id}/work-notes/list` - Note di lavoro del progetto
 
 ---
 

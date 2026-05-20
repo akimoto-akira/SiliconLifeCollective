@@ -710,11 +710,9 @@ Il sistema di strumenti permette ai Silicon Beings di interagire con il mondo es
 
 Tutte le esecuzioni di strumenti passano attraverso la catena di permessi a 5 livelli :
 
-1. **IsCurator** — Il Silicon Curator bypassa tutte le verifiche
-2. **UserFrequencyCache** — Cache delle autorizzazioni/rifiuti frequenti dell'utente
-3. **GlobalACL** — Lista di controllo di accesso globale
-4. **IPermissionCallback** — Funzione di callback di permesso personalizzata
-5. **IPermissionAskHandler** — Chiedere all'utente
+1. **UserFrequencyCache** — Cache delle autorizzazioni/rifiuti frequenti dell'utente
+2. **IPermissionCallback** — Funzione di callback di permesso personalizzata
+3. **Giudizio ramificato** — IsCurator → IPermissionAskHandler (chiedi utente) | Non-curatore → GlobalACL (lista controllo accessi)
 
 ## Creare uno strumento personalizzato
 
@@ -764,7 +762,7 @@ public class MyCustomTool : ITool
 
 ### Passo 2 : Aggiungere al progetto
 
-Posizionare il file dello strumento nella directory `src/SiliconLife.Common/Tools/` (strumenti condivisi) o `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (strumenti specifici di una versione). `ToolManager` scoprirà e registrerà automaticamente lo strumento tramite reflection all'avvio.
+Posizionare il file dello strumento nella directory `src/SiliconLife.Common/App/Tools/` (strumenti condivisi) o `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (strumenti specifici di una versione). `ToolManager` scoprirà e registrerà automaticamente lo strumento tramite reflection all'avvio.
 
 ### Passo 2a : Registrare uno strumento tramite plugin
 

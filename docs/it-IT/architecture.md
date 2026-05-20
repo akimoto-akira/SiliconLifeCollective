@@ -24,7 +24,7 @@ Questo progetto offre due versioni di implementazione, che condividono lo stesso
 - **Caratteristiche**:
   - Windows/macOS esecuzione in background nella barra di stato, monitoraggio in tempo reale tramite la finestra di stato; Linux finestra di stato visualizzata direttamente
   - Motore SpeedyPack + compressione automatica che garantisce la sicurezza dei dati
-  - Architettura Component UI, 30+ componenti dichiarativi
+  - Architettura Component UI, 27 componenti dichiarativi
   - 7 temi d'aspetto, supporta rilevamento e commutazione automatici
   - Strumento di hot reload per aggiornamenti e riavvii online
   - Linux apre automaticamente il browser per l'accesso alla Web UI, supporta il parametro `--no-tray`
@@ -485,7 +485,7 @@ L'interfaccia Web evita interamente i file di template, generando tutto il marku
 
 ### Sistema di controller
 
-L'interfaccia Web segue un **pattern di tipo MVC**, con 22 controller che gestiscono diversi aspetti:
+L'interfaccia Web segue un **pattern di tipo MVC**, con 23 controller che gestiscono diversi aspetti:
 
 | Controller | Scopo |
 |------------|--------|
@@ -520,12 +520,14 @@ L'interfaccia Web segue un **pattern di tipo MVC**, con 22 controller che gestis
 
 ### Localizzazione
 
-Il sistema supporta la localizzazione completa di **30 varianti linguistiche**:
+Il sistema supporta la localizzazione completa di **33 varianti linguistiche**:
 - **Cinese (6)**: zh-CN (semplificato), zh-HK (tradizionale), zh-SG (Singapore), zh-MO (Macao), zh-TW (Taiwan), zh-MY (Malesia)
 - **Inglese (10)**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY
 - **Tedesco (5)**: de-DE, de-AT, de-CH, de-LU, de-LI
 - **Francese (3)**: fr-FR, fr-CA, fr-CH
 - **Italiano (1)**: it-IT
+- **Polacco (1)**: pl-PL
+- **Portoghese (2)**: pt-PT (Portogallo), pt-BR (Brasile)
 - **Altri (3)**: ja-JP (giapponese), ko-KR (coreano), cs-CZ (ceco)
 
 ---

@@ -73,8 +73,8 @@ Modifica `src/SiliconLife.Default/Config/DefaultConfigData.cs` o cambia la confi
   "AIClients": {
     "DashScope": {
       "ApiKey": "la-tua-chiave-api-qui",
-      "Model": "qwen-plus",
-      "Region": "cn-hangzhou"
+      "Model": "qwen3.6-plus",
+      "Region": "beijing"
     }
   }
 }
@@ -227,7 +227,7 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Fast/            # Implementazione alte prestazioni + punto ingresso (versione Forms)
 │   ├── SiliconLife.Speedy/          # Motore storage alte prestazioni SpeedyPack
 │   └── SiliconLife.Speedy.Manager/  # Strumento gestione SpeedyPack (Windows Forms)
-├── docs/                            # Documentazione (multilingue, 30 varianti linguistiche)
+├── docs/                            # Documentazione (multilingue, 33 varianti linguistiche)
 │   ├── en/                          # Inglese
 │   ├── zh-CN/                       # Cinese semplificato
 │   ├── zh-HK/                       # Cinese tradizionale

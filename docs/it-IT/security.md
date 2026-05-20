@@ -9,7 +9,7 @@
 La sicurezza di Silicon Life Collective si basa su un modello di **difesa a strati multipli**. Principio fondamentale: **Tutte le operazioni I/O devono passare attraverso esecutori**, gli esecutori applicano le verifiche dei permessi prima dell'esecuzione.
 
 ```
-Chiamata strumento → Esecutore → PermissionManager → HighDeny Cache → HighAllow Cache → Callback → Chiedi all'utente
+Chiamata strumento → Esecutore → Gestore permessi → Cache frequenza → Callback → (IsCurator: Chiedi utente | Non-curatore: GlobalACL)
 ```
 
 ---
@@ -18,7 +18,7 @@ Chiamata strumento → Esecutore → PermissionManager → HighDeny Cache → Hi
 
 ### Tipi di permessi
 
-| Tipo | Descrizione |
+|| Tipo | Descrizione |
 |------|-------------|
 | `NetworkAccess` | Richieste HTTP/HTTPS in uscita |
 | `CommandLine` | Esecuzione comandi shell |
@@ -30,7 +30,7 @@ Chiamata strumento → Esecutore → PermissionManager → HighDeny Cache → Hi
 
 Ogni verifica del permesso restituisce uno dei tre risultati:
 
-| Risultato | Comportamento |
+|| Risultato | Comportamento |
 |----------|-------------|
 | **Allowed (Consentito)** | L'operazione continua immediatamente |
 | **Denied (Negato)** | L'operazione viene bloccata, il registro audit viene salvato |
@@ -38,7 +38,7 @@ Ogni verifica del permesso restituisce uno dei tre risultati:
 
 ### Ruolo speciale: Silicon Curator
 
-Il Silicon Curator ha il livello di permesso più elevato (`IsCurator = true`). Le verifiche dei permessi del Curator vengono short-circuite a **Allowed**, a meno che l'utente non sovrascriva esplicitamente.
+Il Silicon Curator ha il livello di permesso più elevato (`IsCurator = true`). Quando la catena di permessi raggiunge il giudizio ramificato, le operazioni del curatore vengono sottoposte a conferma utente tramite `IPermissionAskHandler`, anziché essere cortocircuitate come consentite. I non-curatori consultano invece la GlobalACL.
 
 ### PermissionManager privato
 
@@ -48,7 +48,7 @@ Ogni Silicon Being ha la propria istanza **privata** di PermissionManager. Gli s
 
 ## Flusso di validazione dei permessi
 
-Priorità richiesta: **1. HighDeny utente → 2. HighAllow utente → 3. Funzione di callback**
+Priorità richiesta: **1. Cache frequenza → 2. Funzione di callback → 3. Giudizio ramificato (IsCurator/GlobalACL)**
 
 ```
 ┌─────────────┐
@@ -59,37 +59,40 @@ Priorità richiesta: **1. HighDeny utente → 2. HighAllow utente → 3. Funzion
        ▼
 ┌─────────────┐     ┌─────────────────────┐
 │  Esecutore   │────▶│ PermissionManager   │
-│(Disco/Retex/ │     │ privato             │
+│(Disco/Rete/  │     │ privato             │
 │  Comando...) │     │ (per Being)         │
 └─────────────┘     └────────┬────────────┘
                              │
                              ▼
                     ┌─────────────────┐
-                    │ 1. IsCurator ?  │──Sì──▶ Allowed
-                    └────────┬────────┘
-                             │ No
-                             ▼
-                    ┌─────────────────┐
-                    │ 2. HighDeny     │──Corrisponde──▶ Denied
-                    │ utente          │
-                    │(Cache memoria)  │
+                    │ 1. Cache        │──Corrisponde──▶ Consentito / Negato
+                    │    frequenza    │
+                    │(rifiuto prio su │
+                    │   consentito)   │
                     └────────┬────────┘
                              │ Nessuna corrispondenza
                              ▼
                     ┌─────────────────┐
-                    │ 3. HighAllow    │──Corrisponde──▶ Allowed
-                    │ utente          │
-                    │(Cache memoria)  │
+                    │ 2. Callback     │──▶ Consentito / Negato / Chiedi utente
+                    │    permessi     │
                     └────────┬────────┘
-                             │ Nessuna corrispondenza
+                             │ Chiedi utente
                              ▼
                     ┌─────────────────┐
-                    │ 4. Callback     │
-                    │ permessi        │──▶ Allowed / Denied / AskUser
-                    └─────────────────┘
+                    │ 3. IsCurator?   │
+                    └────────┬────────┘
+                             │
+                 ┌───────────┴───────────┐
+                 │                       │
+                 ▼ Sì                    ▼ No
+          ┌─────────────┐    ┌─────────────┐
+          │ Chiedi       │    │ GlobalACL   │
+          │ utente       │    │ Verifica    │
+          │ (AskHandler) │    │ regole      │
+          └─────────────┘    └─────────────┘
 ```
 
-**Importante**: L'esecutore vede solo un booleano (Allowed/Denied). Il PermissionManager elabora internamente la decisione ternaria (Allowed/Denied/AskUser) e risolve AskUser prima di restituire il risultato all'esecutore.
+**Punto chiave**: L'esecutore vede solo un booleano (consentito/negato). Il PermissionManager gestisce internamente la decisione ternaria (consentito/negato/chiedi utente) e risolve "chiedi utente" prima di restituire il risultato all'esecutore.
 
 ---
 
@@ -119,10 +122,10 @@ Quando uno strumento avvia un accesso alle risorse:
 
 1. L'esecutore riceve la richiesta e **blocca il suo thread**.
 2. L'esecutore interroga il PermissionManager privato del Being.
-3. Se il callback restituisce AskUser, il thread dell'esecutore **rimane bloccato** in attesa della risposta dell'utente.
-4. Il Being vede solo il risultato finale (successo o rifiuto) — non vede mai lo stato intermedio "Pending" o "Waiting".
+3. Se il callback restituisce Chiedi utente, il thread dell'esecutore **rimane bloccato** in attesa della risposta dell'utente.
+4. Il Being vede solo il risultato finale (successo o rifiuto) — non vede mai lo stato intermedio "In attesa" o "Sospeso".
 5. Solo il Silicon Curator attiva una vera richiesta utente. I Beings normali interrogano in modo sincrono la GlobalACL senza blocco.
-6. In caso di timeout, la richiesta viene trattata come Denied, il blocco del thread viene rilasciato.
+6. In caso di timeout, la richiesta viene trattata come negata, il blocco del thread viene rilasciato.
 
 ### Tipi di esecutori
 
@@ -131,7 +134,8 @@ Quando uno strumento avvia un accesso alle risorse:
 | `DiskExecutor` | Lettura/scrittura file, operazioni directory | 30 secondi |
 | `NetworkExecutor` | Richieste HTTP, connessioni WebSocket | 60 secondi |
 | `CommandLineExecutor` | Esecuzione comandi shell | 120 secondi |
-| `DynamicCompilationExecutor` | Compilazione in memoria Roslyn | 60 secondi |
+
+> **Nota**: Il `DynamicCompilationExecutor` (nel namespace `SiliconLife.Core.Compilation`) è responsabile della compilazione in memoria Roslyn, non appartiene alla categoria degli esecutori I/O, ma è ugualmente soggetto al sistema di permessi.
 
 ### Isolamento eccezioni e tolleranza guasti
 
@@ -166,14 +170,14 @@ Tabella di regole comune persistita nello storage, gestita unicamente dal Silico
 
 Per ridurre le richieste di permessi ripetute, il sistema gestisce due cache **per Being, solo in memoria**:
 
-| Cache | Utilizzo |
+|| Cache | Utilizzo |
 |-------|------------|
 | **HighAllow** | Risorse frequentemente autorizzate dall'utente |
 | **HighDeny** | Risorse frequentemente negate dall'utente |
 
 ### Funzionamento
 
-- **Scelta utente, non rilevamento automatico**: Quando AskUser viene attivato, l'utente sceglie se aggiungere la risorsa alla cache.
+- **Scelta utente, non rilevamento automatico**: Quando Chiedi utente viene attivato, l'utente sceglie se aggiungere la risorsa alla cache.
 - **Corrispondenza prefisso**: Supporta la corrispondenza di prefisso del percorso risorsa (es. `network:api.example.com/*`).
 - **Priorità**: HighDeny è prioritario su HighAllow.
 - **Solo memoria**: Le cache non vengono persistite. Vengono perse al riavvio.
@@ -183,7 +187,7 @@ Per ridurre le richieste di permessi ripetute, il sistema gestisce due cache **p
 
 1. Il callback permessi restituisce `AskUser`.
 2. Il sistema permessi invia la richiesta al sistema di schede (interfaccia Web o IM).
-3. L'utente prende una decisione (Allowed/Denied) e **sceglie se mettere in cache**.
+3. L'utente prende una decisione (Consentito/Negato) e **sceglie se mettere in cache**.
 4. Il sistema schede restituisce la decisione + il flag di cache.
 5. Il sistema permessi aggiorna la lista cache corrispondente.
 6. Le future richieste con il prefisso cache vengono risolte immediatamente.
@@ -214,8 +218,8 @@ Per le piattaforme di messaggistica senza supporto di scheda interattiva:
 
 ### Timeout
 
-- Un timeout è definito per tutte le richieste AskUser.
-- In caso di timeout, la richiesta viene trattata come **Denied**, il blocco del thread dell'esecutore viene rilasciato.
+- Un timeout è definito per tutte le richieste Chiedi utente.
+- In caso di timeout, la richiesta viene trattata come **Negato**, il blocco del thread dell'esecutore viene rilasciato.
 
 ---
 

@@ -376,5 +376,30 @@
 2026-05-20T19:30:00+08:00 | trae-glm5 | file_modified | docs/es-ES/architecture.md | fix: 控制器数量22→23
 2026-05-20T19:30:00+08:00 | trae-glm5 | file_modified | docs/es-ES/web-ui-guide.md | fix: ChatHistory API路由修正
 2026-05-20T19:30:00+08:00 | trae-glm5 | task_complete | task=task-212 | files=9 | changes=20+
-2026-05-20T19:30:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260520-19002026-05-20T20:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260520-2000 | task=task-213
-2026-05-20T20:00:00+08:00 | catpaw | task_claim | task=task-213 | type=docs | scope=�޸������ĵ���Դ���벻һ������
+2026-05-20T19:30:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260520-1900
+2026-05-20T20:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260520-2000 | task=task-213
+2026-05-20T20:00:00+08:00 | catpaw | task_claim | task=task-213 | type=docs | scope=修复法语文档与源代码不一致问题
+2026-05-20T20:30:00+08:00 | catpaw | file_modified | docs/fr-FR/README.md | fix=权限链顺序修正、控制器数22→23、语言数29→33、UI组件数30+→27、Phase 10描述(20+→23控制器)
+2026-05-20T21:00:00+08:00 | catpaw | file_modified | docs/fr-FR/api-reference.md | fix=Chat API端点(/api/chat→/api/chat/send)、请求体(beingId→channelId)、添加conversations/messages/stop端点
+2026-05-20T21:30:00+08:00 | catpaw | file_modified | docs/fr-FR/permission-system.md | fix=权限链5级→3级分支结构重写、IsCurator不再短路、超时60s→30min、添加GlobalACL结构
+2026-05-20T21:45:00+08:00 | catpaw | file_modified | docs/fr-FR/security.md | fix=权限验证流程图重写、执行器架构(独立线程→静态类模型)、超时值60s/120s→30s、Curator角色描述修正
+2026-05-20T22:00:00+08:00 | catpaw | file_modified | docs/fr-FR/development-guide.md | fix=权限链顺序修正、依赖方向、工具创建路径、语言数29→33
+2026-05-20T22:15:00+08:00 | catpaw | file_modified | docs/fr-FR/getting-started.md | fix=DashScope Region(cn-hangzhou→beijing)、Model(qwen-plus→qwen3.6-plus)、语言数29→33
+2026-05-20T22:30:00+08:00 | catpaw | file_modified | docs/fr-FR/tools-reference.md | fix=权限链顺序修正、工具创建路径(Default/Fast/Tools→Common/App/Tools)
+2026-05-20T22:45:00+08:00 | catpaw | file_modified | docs/fr-FR/architecture.md | fix=控制器数22→23、添加插件系统/安全沙箱/HTML构造器章节、语言数29→33
+2026-05-20T23:00:00+08:00 | catpaw | file_modified | docs/fr-FR/web-ui-guide.md | fix=语言数29→33、添加西班牙语/葡萄牙语变体描述
+2026-05-20T23:15:00+08:00 | catpaw | task_complete | task=task-213 | files_modified=9 | summary=修复法语文档与源码不一致：权限链顺序、执行器架构、API端点、控制器数、DashScope配置、工具路径、超时值、语言数33
+2026-05-20T23:15:00+08:00 | catpaw | session_end | sessionId=catpaw-20260520-2000
+2026-05-21T00:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260521-0000 | task=task-214 
+2026-05-21T00:00:00+08:00 | catpaw | task_claim | task=task-214 | type=docs | scope=修复意大利语文档与源代码不一致问题
+2026-05-21T00:15:00+08:00 | catpaw | file_modified | docs/it-IT/README.md | fix=权限链顺序修正、控制器数20+→23、语言数29→33、UI组件数30+→27
+2026-05-21T00:30:00+08:00 | catpaw | file_modified | docs/it-IT/api-reference.md | fix=Chat API端点(/api/chat→/api/chat/send)、请求体(beingId→channelId)、添加conversations/messages/stop端点、添加Memory/Code/Executor/Dashboard API
+2026-05-21T00:40:00+08:00 | catpaw | file_modified | docs/it-IT/permission-system.md | fix=权限链5级→3级分支结构重写、IsCurator不再短路、超时60s→30min、添加GlobalACL结构
+2026-05-21T00:50:00+08:00 | catpaw | file_modified | docs/it-IT/security.md | fix=权限验证流程图重写、执行器架构(独立线程→静态类模型)、超时值60s/120s→30s、Curator角色描述修正
+2026-05-21T01:00:00+08:00 | catpaw | file_modified | docs/it-IT/development-guide.md | fix=权限链顺序修正、依赖方向、工具创建路径(Default/Fast/Tools→Common/App/Tools)
+2026-05-21T01:05:00+08:00 | catpaw | file_modified | docs/it-IT/getting-started.md | fix=DashScope Region(cn-hangzhou→beijing)、Model(qwen-plus→qwen3.6-plus)
+2026-05-21T01:10:00+08:00 | catpaw | file_modified | docs/it-IT/tools-reference.md | fix=权限链顺序修正、工具创建路径(Default/Fast/Tools→Common/App/Tools)
+2026-05-21T01:15:00+08:00 | catpaw | file_modified | docs/it-IT/architecture.md | fix=控制器数22→23
+2026-05-21T01:20:00+08:00 | catpaw | file_modified | docs/it-IT/web-ui-guide.md | fix=语言数29→33、Help路由修正、WorkNotes API路由修正、ChatHistory API路由修正(路径参数→查询参数)
+2026-05-21T01:30:00+08:00 | catpaw | task_complete | task=task-214 | files_modified=15 | summary=修复意大利语文档与源码不一致：权限链顺序、执行器架构、API端点、控制器数、DashScope配置、工具路径、超时值、语言数33、Web UI路由
+2026-05-21T01:30:00+08:00 | catpaw | session_end | completed=task-214

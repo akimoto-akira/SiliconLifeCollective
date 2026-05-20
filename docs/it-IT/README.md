@@ -26,7 +26,7 @@
 - **Strumento di hot reload** — Supporta la compilazione automatica, l'aggiornamento dei file e il riavvio di SiliconLife.Fast durante l'esecuzione, senza intervento manuale
 - **Ciclo di chiamata degli strumenti** — L'IA restituisce una chiamata di strumento → Esegue lo strumento → Restituisce i risultati all'IA → Continua il ciclo fino a una risposta in testo puro
 - **Sicurezza dei permessi dell'esecutore** — Tutte le operazioni I/O passano attraverso una validazione rigorosa dei permessi tramite gli esecutori
-  - Catena di permessi a 5 livelli: IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+  - Catena di permessi a 5 livelli: UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL)
   - Registrazione di audit completa di tutte le decisioni sui permessi
 
 ### IA e Conoscenza
@@ -40,18 +40,18 @@
 ### Interfaccia Web
 - **Interfaccia Web moderna** — Server HTTP integrato con aggiornamenti in tempo reale SSE
 - **7 temi d'aspetto** — Versioni Admin, Chat, Creative, Dev, Alto contrasto, Light, Minimal, supporta rilevamento e commutazione automatici
-- **20+ controller** — Gestione completa del sistema, chat, configurazione, funzionalità di monitoraggio
+- **23 controller** — Gestione completa del sistema, chat, configurazione, funzionalità di monitoraggio
 - **Zero dipendenze framework frontend** — HTML/CSS/JS generati lato server tramite `H`, `CssBuilder` e `JsBuilder`
 
 ### Internazionalizzazione e Localizzazione
-- **Supporto completo per 30 implementazioni linguistiche**, che coprono 2 sistemi di scrittura e molteplici varianti regionali
+- **33 varianti linguistiche**supporto completo, che coprono 2 sistemi di scrittura e molteplici varianti regionali
   - **Cinese semplificato**: zh-CN (Cina continentale), zh-SG (Singapore), zh-MY (Malesia) (3 varianti)
   - **Cinese tradizionale**: zh-HK (Hong Kong), zh-TW (Taiwan), zh-MO (Macao) (3 varianti)
   - **Inglese**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 varianti)
   - **Spagnolo**: es-ES, es-MX (2 varianti)
   - **Tedesco**: de-DE, de-AT, de-CH, de-LU, de-LI (5 varianti)
   - **Francese**: fr-FR, fr-CA, fr-CH (3 varianti)
-  - **Italiano**: it-IT (1 variante)
+  - **Italiano**: it-IT | **Polacco**: pl-PL | **Portoghese**: pt-PT, pt-BR (4 varianti)
   - **Giapponese**: ja-JP | **Coreano**: ko-KR | **Ceco**: cs-CZ (3 varianti)
 
 ### Dati e Archiviazione
@@ -84,7 +84,7 @@ Questo progetto offre due versioni di implementazione per soddisfare diverse esi
   - Ottimizzazione delle prestazioni estrema
   - Windows/macOS esecuzione in background nella tray di sistema con monitoraggio in tempo reale; Linux finestra di stato visualizzata direttamente
   - Motore SpeedyPack + compressione automatica che garantisce la sicurezza dei dati
-  - Architettura Component UI, 30+ componenti dichiarativi
+  - Architettura Component UI, 27 componenti dichiarativi
   - 7 temi d'aspetto, supporta rilevamento e commutazione automatici
   - Strumento di hot reload per aggiornamenti e riavvii online
 - **Miglioramento delle prestazioni**: Latenza di lettura memoria ridotta di 1000x, latenza di scrittura ridotta di 15000x, capacità di elaborazione parallela aumentata di 50x
@@ -115,7 +115,7 @@ Questo progetto offre due versioni di implementazione per soddisfare diverse esi
 | Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Linguaggio di programmazione | C# | C# |
 | Tipo di applicazione | Applicazione console | Applicazione desktop (Windows/macOS tray di sistema / Linux finestra di stato) |
-| Integrazione IA | Ollama (locale), Alibaba Cloud DashScope (cloud) | Ollama (locale), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud) |
+| Integrazione IA | Ollama (locale), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud) | Ollama (locale), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud) |
 | Archiviazione dati | File system (JSON + directory indice temporale) | SpeedyPack (formato .spk, mappatura in memoria + persistenza asincrona) |
 | Server Web | HttpListener (.NET integrato) | HttpListener (.NET integrato) |
 | Compilazione dinamica | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -154,11 +154,11 @@ SiliconLifeCollective.sln
 │   ├── SiliconLife.Common/                # Implementazione comune (entrambe le versioni)
 │   │   ├── AI/                            # Client IA e factory (Ollama, DashScope, VolcengineArk)
 │   │   ├── Calendar/                      # 32 implementazioni calendari
-│   │   ├── Localization/                  # Classe base localizzazione e 29 varianti linguistiche/regionali
+│   │   ├── Localization/                  # Classe base localizzazione e 33 varianti linguistiche/regionali
 │   │   ├── Resources/                     # File risorse condivisi
 │   │   ├── Security/                      # Permission Manager
 │   │   ├── SiliconBeing/                  # Implementazione standard Silicon Being
-│   │   ├── Tools/                         # 23 strumenti comuni (incluso hot reload)
+│   │   ├── Tools/                         # 24 strumenti comuni (incluso hot reload)
 │   │   ├── Web/                           # Infrastruttura Web
 │   │   └── WebView/                       # Implementazione Playwright WebView
 │   │
@@ -167,8 +167,8 @@ SiliconLifeCollective.sln
 │   │   ├── Data/                          # Directory dati
 │   │   ├── Help/                          # Localizzazione documentazione aiuto (multilingue)
 │   │   └── Web/                           # Implementazione interfaccia Web
-│   │       ├── Component/                 # Libreria componenti UI (30+ componenti)
-│   │       ├── Controllers/               # 22 controller
+│   │       ├── Component/                 # Libreria componenti UI (27 componenti)
+│   │       ├── Controllers/               # 23 controller
 │   │       ├── Models/                    # ViewModel
 │   │       ├── Views/                     # Viste HTML
 │   │       └── Skins/                     # 7 temi d'aspetto
@@ -194,7 +194,7 @@ SiliconLifeCollective.sln
 │   │   ├── Security/                      # Callback permessi ottimizzati
 │   │   ├── Storage/                       # Adattatore storage SpeedyPack
 │   │   ├── Tools/                         # Strumenti specifici versione (HelpTool)
-│   │   └── Tray/                          # Barra di stato sistema (29 varianti linguistiche)
+│   │   └── Tray/                          # Barra di stato sistema (33 varianti linguistiche)
 │   │
 │   ├── SiliconLife.Speedy/                # Motore storage alte prestazioni SpeedyPack
 │   │   ├── SpeedyPack.cs                  # Classe principale (mappatura directory in memoria + cache + scrittura asincrona)
@@ -242,7 +242,7 @@ Loop principale (thread dedicato, watchdog + circuit breaker)
 Tutte le operazioni I/O iniziate dall'IA devono attraversare una catena di sicurezza rigorosa:
 
 ```
-Chiamata strumento → Esecutore → Gestore permessi → [IsCurator → Cache frequenza → GlobalACL → Callback → Richiesta utente]
+Chiamata strumento → Esecutore → Gestore permessi → [Cache frequenza → Callback → (IsCurator: Chiedi utente | Non-curator: GlobalACL)]
 ```
 
 ## 🚀 Avvio rapido
@@ -332,8 +332,8 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] Fase 7: Compilazione dinamica + auto-sviluppo (Roslyn)
 - [x] Fase 8: Storage lungo termine + attività + timer
 - [x] Fase 9: Host principale + collaborazione multi-agente
-- [x] Fase 10: Interfaccia Web (HTTP + SSE, 20+ controller, 7 temi)
-- [x] Fase 10.5: Miglioramenti incrementali (canali broadcast, audit token, 32 calendari, miglioramenti strumenti, localizzazione 29 lingue)
+- [x] Fase 10: Interfaccia Web (HTTP + SSE, 23 controller, 7 skin)
+- [x] Fase 10.5: Miglioramenti incrementali (canali broadcast, audit token, 32 calendari, miglioramenti strumenti, 33 varianti linguistiche localizzazione)
 - [x] Fase 10.6: Completamento & Ottimizzazione (WebView, sistema aiuto, spazio progetti, rete conoscenza)
 - [x] Fase 11: Motore storage SpeedyPack (sostituzione LiteDB, mappatura memoria, coda scrittura asincrona, compressione automatica)
 - [x] Fase 12: Sistema plugin (interfaccia IPlugin, sandbox sicurezza PluginLoader, caricamento isolato, integrazione strumenti)

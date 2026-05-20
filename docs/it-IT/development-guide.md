@@ -56,7 +56,7 @@ public interface ITool
 
 Catena di verifica dei permessi a 5 livelli:
 ```
-IsCurator → UserFrequencyCache → GlobalACL → IPermissionCallback → IPermissionAskHandler
+UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL)
 ```
 
 ### 4. Localizzatore di servizi
@@ -74,7 +74,7 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### Aggiungere un nuovo strumento
 
-1. Creare una nuova classe in `src/SiliconLife.Common/Tools/` (strumenti condivisi tra entrambe le versioni) o `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (strumenti specifici di versione):
+1. Creare una nuova classe in `src/SiliconLife.Common/App/Tools/` (strumenti condivisi tra entrambe le versioni) o `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (strumenti specifici di versione):
 
 ```csharp
 public class MyCustomTool : ITool
@@ -264,7 +264,7 @@ public class MyCustomSkin : ISkin
 SiliconLife.Common/
 ├── AI/                    # Implementazioni client IA e factory
 ├── Calendar/              # 32 implementazioni calendari
-├── Localization/          # Classe base localizzazione e 29 implementazioni linguistiche
+├── Localization/          # Classe base localizzazione e 33 implementazioni linguistiche
 ├── Security/              # Permission manager
 ├── SiliconBeing/          # Implementazione Silicon Being predefinita
 ├── Tools/                 # Strumenti integrati condivisi
