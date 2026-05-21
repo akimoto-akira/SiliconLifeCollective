@@ -13,7 +13,7 @@
 - **Impulsado por Archivo de Alma** — Cada Ser Silicona es impulsado por un archivo de indicación central (`soul.md`), definiendo personalidad y patrones de comportamiento únicos
 - **Arquitectura Cuerpo-Cerebro** — El *Cuerpo* (SiliconBeing) mantiene signos vitales y detecta escenarios de activación; el *Cerebro* (ContextManager) carga historial, invoca IA, ejecuta herramientas y persiste respuestas
 - **Capacidad de Auto-Evolución** — Mediante tecnología de compilación dinámica Roslyn, los Seres Silicona pueden reescribir su propio código para evolucionar
-- **Gestión de Estados de Actividad** — Soporta cuatro estados de actividad: Idle (inactivo), Working (trabajando), Error (error), Stopped (detenido). Entrada automática al estado Stopped tras 10 errores consecutivos
+- **Gestión de Estados de Actividad** — Soporta estados de actividad: Idle (inactivo), SingleChat (chat individual), GroupChat (chat grupal), Task (tarea), Timer (temporizador), Broadcast (difusión), Project (proyecto), MemoryCompression (compresión de memoria), Stopped (detenido). Entrada automática al estado Stopped tras 10 errores consecutivos
 
 ### Sistema de Plugins
 - **Arquitectura de Extensión por Plugins** — Extensión de funcionalidad mediante la interfaz IPlugin, soportando carga dinámica de DLLs de plugins desde directorios
@@ -26,7 +26,7 @@
 - **Herramienta de Recarga en Caliente** — Soporta compilación automática, actualización de archivos y reinicio de SiliconLife.Fast durante la ejecución, sin intervención manual
 - **Ciclo de Invocación de Herramientas** — IA devuelve invocación de herramienta → Ejecutar herramienta → Retroalimentar resultados a IA → Ciclo continuo hasta devolver respuesta de texto puro
 - **Seguridad Ejecutor-Permiso** — Todas las operaciones de E/S pasan por verificación estricta de permisos a través de ejecutores
-  - Cadena de permisos de 5 niveles: UserFrequencyCache → IPermissionCallback → (Curador→IPermissionAskHandler / No-Curador→GlobalACL→Denegado)
+  - Cadena de permisos de 3 niveles: UserFrequencyCache → IPermissionCallback → (Curador→IPermissionAskHandler / No-Curador→GlobalACL→Denegación predeterminada)
   - Registro de auditoría completo para todas las decisiones de permisos
 
 ### IA y Conocimiento
@@ -40,17 +40,20 @@
 ### Interfaz Web
 - **Web UI Moderna** — Servidor HTTP integrado, soporte para actualizaciones en tiempo real SSE
 - **7 Temas de Piel** — Versión de gestión, versión de chat, versión de creación, versión de desarrollo, alto contraste, claro, minimalista, soporte para descubrimiento y cambio automáticos
-- **23 Controladores** — Funcionalidad completa de gestión del sistema, chat, configuración y monitoreo
+- **22 Controladores** — Funcionalidad completa de gestión del sistema, chat, configuración y monitoreo
 - **Sin Dependencias de Framework Frontend** — Generación de HTML/CSS/JS en el servidor mediante `H`, `CssBuilder` y `JsBuilder`
 
 ### Internacionalización y Localización
-- Soporte completo para **29 implementaciones de idioma**, cubriendo 2 sistemas de escritura y múltiples variantes regionales
+- Soporte completo para **33 implementaciones de idioma**, cubriendo 4 sistemas de escritura y múltiples variantes regionales
   - **Chino simplificado**: zh-CN (China continental), zh-SG (Singapur), zh-MY (Malasia) (3 variantes)
   - **Chino tradicional**: zh-HK (Hong Kong), zh-TW (Taiwán), zh-MO (Macao) (3 variantes)
   - **Inglés**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variantes)
   - **Español**: es-ES, es-MX (2 variantes)
   - **Alemán**: de-DE, de-AT, de-CH, de-LU, de-LI (5 variantes)
   - **Francés**: fr-FR, fr-CA, fr-CH (3 variantes)
+  - **Italiano**: it-IT (1 variante)
+  - **Polaco**: pl-PL (1 variante)
+  - **Portugués**: pt-PT, pt-BR (2 variantes)
   - **Japonés**: ja-JP | **Coreano**: ko-KR | **Checo**: cs-CZ (3 variantes)
 
 ### Datos y Almacenamiento
@@ -83,7 +86,7 @@ Este proyecto proporciona dos versiones de implementación para satisfacer difer
   - Optimización extrema de rendimiento
   - Windows/macOS ejecución en segundo plano en la bandeja con monitoreo en tiempo real; Linux ventana de estado mostrada directamente
   - Motor SpeedyPack + compresión automática garantizan seguridad de datos
-  - Arquitectura Component UI, 30+ componentes declarativos
+  - Arquitectura Component UI, 27 componentes declarativos
   - 7 Temas de Piel, soporte para descubrimiento y cambio automáticos
   - Herramienta de recarga en caliente para actualizaciones y reinicios en línea
 - **Mejora de Rendimiento**: Latencia de lectura de almacenamiento reducida 1000x, latencia de escritura reducida 15000x, capacidad de procesamiento concurrente aumentada 50x
@@ -153,11 +156,11 @@ SiliconLifeCollective.sln
 │   ├── SiliconLife.Common/                # Implementación compartida (común a ambas versiones)
 │   │   ├── AI/                            # Clientes IA y fábricas (Ollama, DashScope, VolcengineArk)
 │   │   ├── Calendar/                      # 32 implementaciones de calendario
-│   │   ├── Localization/                  # Clase base de localización y 29 variantes lingüísticas/regionales
+│   │   ├── Localization/                  # Clase base de localización y 33 variantes lingüísticas/regionales
 │   │   ├── Resources/                     # Archivos de recursos compartidos
 │   │   ├── Security/                      # Gestor de permisos
 │   │   ├── SiliconBeing/                  # Implementación predeterminada de Ser Silicona
-│   │   ├── Tools/                         # 23 herramientas comunes (incluye herramienta de recarga en caliente)
+│   │   ├── Tools/                         # 24 herramientas comunes (incluye herramienta de recarga en caliente)
 │   │   ├── Web/                           # Infraestructura Web
 │   │   └── WebView/                       # Implementación Playwright WebView
 │   │
@@ -166,8 +169,8 @@ SiliconLifeCollective.sln
 │   │   ├── Data/                          # Directorio de datos
 │   │   ├── Help/                          # Documentación de ayuda localizada (multilingüe)
 │   │   └── Web/                           # Implementación Web UI
-│   │       ├── Component/                 # Biblioteca de componentes UI (30+ componentes)
-│   │       ├── Controllers/               # 23 controladores
+│   │       ├── Component/                 # Biblioteca de componentes UI (27 componentes)
+│   │       ├── Controllers/               # 22 controladores
 │   │       ├── Models/                    # Modelos de vista
 │   │       ├── Views/                     # Vistas HTML
 │   │       └── Skins/                     # 7 temas de piel
@@ -193,7 +196,7 @@ SiliconLifeCollective.sln
 │       ├── Security/                      # Callbacks de permisos optimizados
 │       ├── Storage/                       # Adaptador de almacenamiento SpeedyPack
 │       ├── Tools/                         # Herramientas específicas de versión (HelpTool)
-│       └── Tray/                          # Bandeja del sistema (localización en 29 variantes)
+│       └── Tray/                          # Bandeja del sistema (localización en 33 variantes)
 │
 │   ├── SiliconLife.Speedy/                # Motor de almacenamiento de alto rendimiento SpeedyPack
 │   │   ├── SpeedyPack.cs                  # Clase central (mapeo de directorios en memoria + caché + escritura asíncrona)
@@ -212,7 +215,7 @@ SiliconLifeCollective.sln
 │       │   ├── SpkHeader.cs              # Cabecera de archivo de paquete
 │       │   └── PathNormalizer.cs          # Normalización de rutas
 │   │
-│   └── SiliconLife.Speedy.Manager/        # Herramienta de gestión SpeedyPack (Windows Forms)
+│   └── SiliconLife.Speedy.Manager/        # Herramienta de gestión SpeedyPack (Avalonia UI)
 │       ├── MainForm.cs                    # Ventana principal
 │       ├── Program.cs                     # Punto de entrada
 │       └── slc.ico                        # Icono de la aplicación
@@ -241,7 +244,7 @@ Bucle principal (hilo dedicado, watchdog + cortacircuitos)
 Todas las operaciones de E/S iniciadas por IA deben pasar por una cadena de seguridad estricta:
 
 ```
-Invocación de herramienta → Ejecutor → Gestor de permisos → [IsCurator → caché de frecuencia → ACL global → callback → preguntar al usuario]
+Invocación de herramienta → Ejecutor → Gestor de permisos → UserFrequencyCache → IPermissionCallback → (Curador→IPermissionAskHandler / No-Curador→GlobalACL→Denegación predeterminada)
 ```
 
 ## 🚀 Inicio Rápido

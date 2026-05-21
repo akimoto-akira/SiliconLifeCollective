@@ -8,7 +8,7 @@
 
 El sistema de permisos asegura que todas las operaciones iniciadas por IA sean apropiadamente verificadas y auditadas.
 
-## Cadena de Permisos de 5 Niveles
+## Cadena de Permisos de 3 Niveles
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -25,21 +25,29 @@ El sistema de permisos asegura que todas las operaciones iniciadas por IA sean a
 └─────────────────────────────────────────────┘
 ```
 
+> **Nota**: La prioridad de consulta real en `PermissionManager.CheckPermission()` es:
+> 1. **UserFrequencyCache** — Verificar primero las decisiones de usuario de alta frecuencia en caché
+> 2. **IPermissionCallback** — Evaluar reglas de callback personalizadas
+> 3. **Bifurcación de curador** — Si el callback devuelve AskUser o no hay callback configurado:
+>    - **Curador** → `IPermissionAskHandler` (preguntar al usuario vía IM)
+>    - **No-curador** → `GlobalACL` → denegación predeterminada
+
 ## Nivel 1: UserFrequencyCache
 
-Decisiones de usuario en caché para evitar consultas repetidas.
-
-- **HighDeny** — El usuario denegó recientemente este recurso, denegar automáticamente
-- **HighAllow** — El usuario permitió recientemente este recurso, permitir automáticamente
+Caché por ser, solo en memoria, de decisiones de usuario de alta frecuencia (HighDeny/HighAllow).
 
 ```csharp
 var cache = new UserFrequencyCache();
-var cached = cache.Check(userId, resource);
-if (cached != null)
+PermissionResult? cachedResult = cache.Query(permissionType, resource);
+if (cachedResult.HasValue)
 {
-    return cached; // HighDeny → Denied, HighAllow → Allowed
+    return cachedResult.Value == PermissionResult.Allowed;
 }
 ```
+
+- **HighDeny** tiene prioridad sobre **HighAllow**
+- **Solo memoria**: Los cachés no se persisten, se pierden al reiniciar
+- **Expiración configurable**: Los usuarios pueden establecer período de validez para entradas de caché
 
 ## Nivel 2: IPermissionCallback
 
@@ -71,22 +79,21 @@ Callbacks personalizados para lógica de permisos dinámica.
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {
-    public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+    public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
     {
-        // Lógica personalizada
-        if (IsSafeOperation(request))
+        if (IsSafeOperation(permissionType, resource))
         {
-            return PermissionResult.Allowed("Safe operation");
+            return PermissionResult.Allowed;
         }
         
-        return PermissionResult.Undecided("Needs user confirmation");
+        return PermissionResult.AskUser;
     }
 }
 ```
 
-## Nivel 3: Bifurcación IsCurator
+## Nivel 3: Bifurcación de Curador (IsCurator → AskHandler / GlobalACL)
 
-Después de la decisión de IPermissionCallback, se produce una bifurcación basada en el estado de curador:
+Cuando el callback devuelve `AskUser` o no hay callback configurado, el sistema se bifurca según el estado de curador:
 
 ### Ruta de Curador → IPermissionAskHandler
 
@@ -95,7 +102,7 @@ Si el Being es un curador (`IsCurator = true`), se invoca `IPermissionAskHandler
 ```csharp
 if (being.IsCurator)
 {
-    return await askHandler.AskAsync(request);
+    return askHandler.AskUser(callerId, permissionType, resource);
 }
 ```
 
@@ -118,10 +125,12 @@ Tabla de reglas compartida persistente en Storage, gestionada solo por el Silico
 {
   "rules": [
     {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
+      "prefix": "network:api.github.com",
+      "result": "Allowed"
+    },
+    {
+      "prefix": "file:C:\\Windows",
+      "result": "Denied"
     }
   ]
 }
@@ -130,14 +139,12 @@ Tabla de reglas compartida persistente en Storage, gestionada solo por el Silico
 ### Formato de Recurso
 
 ```
-{tipo}:{acción}
+{tipo}:{ruta}
 
 Ejemplos:
-- disk:read
-- disk:write
-- network:http
-- compile:execute
-- system:info
+- network:api.github.com
+- file:C:\\Windows
+- cli:rm -rf
 ```
 
 ## IPermissionAskHandler (Ruta de Curador)
@@ -147,17 +154,18 @@ Invocado cuando el Being es un curador y IPermissionCallback devuelve AskUser.
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
 {
-    public async Task<AskPermissionResult> AskAsync(PermissionRequest request)
+    public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
     {
-        // Enviar mensaje al usuario a través de mensajería instantánea
-        await SendMessageAsync($"Allow {request.Resource}?");
-        
-        // Esperar respuesta del usuario
-        var response = await WaitForResponseAsync();
-        
-        return response.Approved 
-            ? AskPermissionResult.Approved()
-            : AskPermissionResult.Denied();
+        SendMessage($"¿Permitir {resource}?");
+
+        var response = WaitForResponse();
+
+        return new AskPermissionResult
+        {
+            Allowed = response.Approved,
+            AddToCache = response.AddToCache,
+            CacheDuration = response.CacheDuration
+        };
     }
 }
 ```
@@ -208,9 +216,7 @@ public PermissionResult EvaluatePermission(
 **Orden de evaluación**:
 1. **Caché de frecuencia** — Verificar decisiones de usuario en caché
 2. **IPermissionCallback** — Evaluación de callback personalizado
-3. **Estado de curador** — Si es curador, devolver `AskUser` (requiere confirmación)
-4. **ACL global** — Verificar reglas de control de acceso
-5. **Predeterminado** — Denegar cuando no hay reglas coincidentes
+3. **Bifurcación de curador** — Si es curador, devuelve `AskUser` (requiere confirmación); si no es curador, verifica **GlobalACL**, luego denegación predeterminada
 
 > **Nota**: A diferencia de la cadena completa de permisos, `EvaluatePermission` **no** llama a `IPermissionAskHandler`. Solo informa cuál *sería* el resultado al ejecutar.
 
@@ -281,21 +287,19 @@ Revisar regularmente registros de auditoría para:
 Para lógica compleja, usar `IPermissionCallback`:
 
 ```csharp
-public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
 {
-    // Permisos basados en tiempo
     if (IsOutsideBusinessHours())
     {
-        return PermissionResult.Denied("Outside business hours");
+        return PermissionResult.Denied;
     }
     
-    // Permisos basados en recurso
-    if (IsSensitiveResource(request.Resource))
+    if (IsSensitiveResource(resource))
     {
-        return PermissionResult.Undecided("Requires approval");
+        return PermissionResult.AskUser;
     }
     
-    return PermissionResult.Allowed();
+    return PermissionResult.Allowed;
 }
 ```
 

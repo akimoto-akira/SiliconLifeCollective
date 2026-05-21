@@ -27,14 +27,14 @@ La mayoría de los endpoints requieren autenticación a través de cookie de ses
     {
       "id": "being-uuid",
       "name": "Assistant",
-      "status": "running",
+      "activity": "Idle",
       "soul": "path/to/soul.md"
     }
   ]
 }
 ```
 
-**Valores de estado**: `idle` | `running` | `waiting_permission` | `stopped`
+**Valores de actividad**: `Idle` | `SingleChat` | `GroupChat` | `Task` | `Timer` | `Broadcast` | `Project` | `MemoryCompression` | `Stopped`
 
 ### Crear Ser
 
@@ -126,34 +126,29 @@ La mayoría de los endpoints requieren autenticación a través de cookie de ses
 }
 ```
 
+### Chat en Streaming (SSE)
+
+**GET** `/api/chat/stream`
+
+Eventos enviados por el servidor para actualizaciones de chat en tiempo real.
+
+### Obtener Historial de Chat
+
+**GET** `/api/chat/history`
+
+Devuelve sesiones de historial de chat.
+
 ### Detener Pensamiento de IA
 
 **POST** `/api/chat/stop`
 
-**Solicitud**:
-```json
-{
-  "channelId": "session-uuid"
-}
-```
+Detiene la respuesta de streaming de IA actual.
 
-### Chat en Streaming (SSE)
+### Subir Archivo
 
-**GET** `/api/chat/stream?channelId={sessionId}`
+**POST** `/api/chat/upload`
 
-**Ejemplo**:
-```javascript
-const eventSource = new EventSource('/api/chat/stream?channelId=xxx');
-```
-
-**Respuesta**: Stream de eventos enviados por el servidor
-
-```
-data: {"type": "chunk", "content": "I"}
-data: {"type": "chunk", "content": "'m"}
-data: {"type": "chunk", "content": " thinking..."}
-data: {"type": "complete", "sessionId": "uuid"}
-```
+Sube un archivo a la sesión de chat.
 
 ---
 
@@ -393,6 +388,87 @@ data: {"type": "complete", "sessionId": "uuid"}
     }
   ]
 }
+```
+
+---
+
+## API de Memoria
+
+### Obtener Lista de Memoria
+
+**GET** `/api/memory/list`
+
+**Parámetros de Consulta**: `beingId`, `type`, `limit`
+
+### Obtener Detalle de Memoria
+
+**GET** `/api/memory/detail/{id}`
+
+### Obtener Estadísticas de Memoria
+
+**GET** `/api/memory/stats`
+
+**Parámetros de Consulta**: `beingId`
+
+### Buscar Memoria
+
+**GET** `/api/memory/search`
+
+**Parámetros de Consulta**: `beingId`, `keyword`, `limit`
+
+### Obtener Beings con Memoria
+
+**GET** `/api/memory/beings`
+
+Devuelve lista de beings con datos de memoria.
+
+### Rastrear Origen de Memoria
+
+**GET** `/api/memory/trace/{id}`
+
+Rastrea la fuente original de una entrada de memoria.
+
+### Obtener HTML de Línea de Tiempo de Memoria
+
+**GET** `/api/memory/timeline-html`
+
+**Parámetros de Consulta**: `beingId`
+
+Devuelve fragmento HTML para visualización de línea de tiempo de memoria.
+
+---
+
+## API de Navegador de Código
+
+### Obtener Tipos de Código
+
+**GET** `/api/code/types`
+
+Devuelve todos los tipos disponibles para navegación de código.
+
+### Obtener Detalle de Código
+
+**GET** `/api/code/detail`
+
+**Parámetros de Consulta**: `type`, `member`
+
+Devuelve información detallada sobre un tipo o miembro específico.
+
+---
+
+## API de Ejecutores
+
+### Obtener Estado de Ejecutores
+
+**GET** `/api/executors/status`
+
+**Respuesta**:
+```json
+[
+  { "name": "DiskExecutor", "status": "Idle", "queueCount": 0 },
+  { "name": "NetworkExecutor", "status": "Idle", "queueCount": 0 },
+  { "name": "CommandLineExecutor", "status": "Idle", "queueCount": 0 }
+]
 ```
 
 ---

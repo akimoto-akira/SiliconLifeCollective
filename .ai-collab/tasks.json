@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-22T15:30:00+08:00",
+  "lastUpdated": "2026-05-22T19:00:00+08:00",
   "tasks": [
     {
       "id": "task-301",
@@ -167,7 +167,7 @@
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "relatedCommit": null,
+      "relatedCommit": "9e07b27",
       "completedAt": "2026-05-22T15:30:00+08:00",
       "modifiedFiles": [
         "docs/fr-FR/README.md",
@@ -184,12 +184,19 @@
       "title": "Analyse der Konsistenz der deutschen Dokumentation (de-DE) mit dem Quellcode und Korrektur der Abweichungen",
       "description": "Alle Dokumente im Verzeichnis docs/de-DE/ mit der aktuellen Implementierung des Quellcodes vergleichen, veraltete, ungenaue oder fehlende Inhalte in der Dokumentation identifizieren, die Vollständigkeit der Übersetzung anhand des englischen Referenzdokuments (en) überprüfen, eine Liste der Abweichungen erstellen und die Dokumentation korrigieren, um sie mit dem Quellcode zu synchronisieren.",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
-      "assignedTo": null,
-      "relatedCommit": null,
-      "completedAt": null
+      "assignedTo": "trae-glm5",
+      "relatedCommit": "9e3be72",
+      "completedAt": "2026-05-22T17:30:00+08:00",
+      "modifiedFiles": [
+        "docs/de-DE/README.md",
+        "docs/de-DE/architecture.md",
+        "docs/de-DE/permission-system.md",
+        "docs/de-DE/api-reference.md",
+        "docs/de-DE/security.md"
+      ]
     },
     {
       "id": "task-309",
@@ -198,12 +205,19 @@
       "title": "Analizar la coherencia de la documentación en español (es-ES) con el código fuente y corregir las discrepancias",
       "description": "Comparar todos los documentos del directorio docs/es-ES/ con la implementación actual del código fuente, identificar contenido obsoleto, inexacto o omitido en la documentación, verificar la integridad de la traducción con respecto al documento de referencia en inglés (en), elaborar una lista de discrepancias y corregir la documentación para sincronizarla con el código fuente.",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-22T19:00:00+08:00",
+      "modifiedFiles": [
+        "docs/es-ES/README.md",
+        "docs/es-ES/architecture.md",
+        "docs/es-ES/permission-system.md",
+        "docs/es-ES/api-reference.md",
+        "docs/es-ES/security.md"
+      ]
     },
     {
       "id": "task-310",
@@ -264,15 +278,13 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-308",
-      "task-309",
       "task-310",
       "task-311",
       "task-312",
       "task-313"
     ],
     "inProgress": [],
-    "completed": ["task-301", "task-302", "task-303", "task-304", "task-305", "task-306", "task-307"],
+    "completed": ["task-301", "task-302", "task-303", "task-304", "task-305", "task-306", "task-307", "task-308", "task-309"],
     "cancelled": []
   },
   "metadata": {

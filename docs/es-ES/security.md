@@ -9,7 +9,7 @@
 La seguridad de Silicon Life Collective se basa en un modelo de **defensa en profundidad**. Principio central: **todas las operaciones de E/S deben pasar por ejecutores**, y los ejecutores refuerzan verificaciones de permisos antes de la ejecución.
 
 ```
-Invocación de herramienta → Ejecutor → Gestor de permisos → caché de alta denegación → caché de alta permitida → callback → preguntar al usuario
+Invocación de herramienta → Ejecutor → Gestor de permisos → UserFrequencyCache → IPermissionCallback → (Curador→IPermissionAskHandler / No-Curador→GlobalACL→Denegación predeterminada)
 ```
 
 ---
@@ -38,7 +38,7 @@ Cada verificación de permisos devuelve uno de tres resultados:
 
 ### Rol Especial: Curador Silicona
 
-El Curador Silicona tiene el nivel más alto de permisos (`IsCurator = true`). Las verificaciones de permisos del curador activan prompts de usuario; otros seres consultan GlobalACL sincrónicamente.
+El Curador Silicona tiene el nivel más alto de permisos (`IsCurator = true`). Las verificaciones de permisos del curador se cortocircuitan a **Permitido**, a menos que el usuario las anule explícitamente.
 
 ### Gestor de Permisos Privado
 
@@ -48,7 +48,7 @@ Cada Ser Silicona tiene su propia instancia **privada de PermissionManager**. El
 
 ## Flujo de Verificación de Permisos
 
-Prioridad de consulta: **1. Alta denegación de usuario → 2. Alta permitida de usuario → 3. Función callback**
+Prioridad de consulta: **1. UserFrequencyCache → 2. IPermissionCallback → 3. Bifurcación de curador**
 
 ```
 ┌─────────────┐
@@ -75,15 +75,15 @@ Prioridad de consulta: **1. Alta denegación de usuario → 2. Alta permitida de
                   │ 2. IPermission  │──▶ Permitido / Denegado / Preguntar
                   │    Callback     │
                   └────────┬────────┘
-                           │ Preguntar
+                           │ Preguntar o sin callback
                            ▼
                   ┌─────────────────┐
-                  │ 3. ¿IsCurator?  │──Sí──▶ IPermissionAskHandler
-                  └────────┬────────┘       (preguntar al usuario)
+                  │ 3. ¿IsCurator?  │──Sí──▶ Cortocircuito a Permitido
+                  └────────┬────────┘
                            │ No
                            ▼
                   ┌─────────────────┐
-                  │ 4. GlobalACL    │──▶ Permitido / Denegado
+                  │ GlobalACL       │──▶ Permitido / Denegado
                   └────────┬────────┘
                            │ Sin regla
                            ▼
@@ -106,6 +106,7 @@ Los ejecutores están implementados como **clases estáticas**:
 - La verificación de permisos bloquea el hilo de llamada hasta que se toma una decisión
 - Seguridad de hilos garantizada mediante bloqueos internos
 - Control de timeout por solicitud
+- `ExecutorBase` proporciona una clase base abstracta con hilo en segundo plano y soporte de cola de solicitudes para futuras extensiones.
 
 ### Bloqueo de Hilos para Verificación de Permisos
 
@@ -125,7 +126,7 @@ Cuando una herramienta inicia acceso a recursos:
 | `DiskExecutor` | Lectura/escritura de archivos, operaciones de directorio | 30 segundos |
 | `NetworkExecutor` | Solicitudes HTTP, conexiones WebSocket | 30 segundos |
 | `CommandLineExecutor` | Ejecución de comandos de shell | 30 segundos |
-| `DynamicCompilationExecutor` | Compilación en memoria Roslyn | 30 segundos |
+| `DynamicCompilationExecutor` | Compilación en memoria Roslyn | N/A |
 
 ### Aislamiento de Excepciones y Tolerancia a Fallos
 
@@ -152,7 +153,7 @@ Tabla de reglas compartidas persistida al almacenamiento, gestionada solo por el
 - Las reglas se evalúan en orden; la primera coincidencia gana.
 - Solo el Curador Silicona puede modificar la ACL global (a través de su herramienta dedicada).
 - Los cambios surten efecto inmediatamente.
-- La ACL global **no está** en la cadena de prioridad para cada consulta mencionada arriba — es referenciada internamente por la función callback.
+- La ACL global es referenciada internamente por el gestor de permisos en la ruta de no-curador — es la primera verificación antes de la denegación predeterminada para beings que no son curadores.
 
 ---
 
@@ -338,5 +339,5 @@ El sistema de plugins introduce riesgos de seguridad por ejecución de código d
 ### Restricciones de Permisos de Herramientas
 
 - Las herramientas registradas por plugins a través de la interfaz `ITool` están sujetas al mismo sistema de permisos
-- Las herramientas de plugins no pueden eludir la cadena de permisos de 5 niveles
+- Las herramientas de plugins no pueden eludir la cadena de permisos de 3 niveles
 - Las herramientas de plugins están sujetas a la marca `[SiliconManagerOnly]`

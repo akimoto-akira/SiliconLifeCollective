@@ -1,0 +1,35 @@
+{
+  "sessionId": "trae-glm5-20260522-1600",
+  "actorId": "trae-glm5",
+  "taskId": "task-308",
+  "commitHash": "9e3be72",
+  "timestamp": "2026-05-22T17:30:00+08:00",
+  "summary": "Korrektur der deutschen Dokumentation (de-DE) Konsistenz mit Quellcode und englischem Referenzdokument",
+  "changes": [
+    {
+      "file": "docs/de-DE/README.md",
+      "type": "modified",
+      "description": "Berechtigungskette von 5-stufig auf 3-stufig korrigiert; Sprachunterstützung von 29 auf 33 aktualisiert (Italienisch, Polnisch, Portugiesisch hinzugefügt); UI-Komponentenanzahl von 30+ auf 27 korrigiert; Controller-Anzahl von 23 auf 22 korrigiert; SiliconLife.Fast Anwendungstyp auf Desktop-Anwendung (Windows/macOS/Linux) aktualisiert; Speedy.Manager als Avalonia UI statt Windows Forms; Tool-Implementierungen von 23 auf 24 korrigiert; Tray-Lokalisierung von 29 auf 33 aktualisiert; Berechtigungsflussdiagramm aktualisiert; Linux-spezifische Startanweisungen hinzugefügt"
+    },
+    {
+      "file": "docs/de-DE/architecture.md",
+      "type": "modified",
+      "description": "UI-Komponentenanzahl von 30+ auf 27 korrigiert; Controller-Anzahl von 23 auf 22 korrigiert; Lokalisierungsvarianten von 29 auf 33 aktualisiert (Italienisch, Polnisch, Portugiesisch hinzugefügt); Chinesisch Sprachbezeichnungen von Englisch auf Deutsch korrigiert"
+    },
+    {
+      "file": "docs/de-DE/permission-system.md",
+      "type": "modified",
+      "description": "Berechtigungskette von 5-stufig auf 3-stufig korrigiert; UserFrequencyCache Beschreibung aktualisiert (Pro-Being, nur Speicher); IPermissionCallback.Evaluate Signatur korrigiert (synchron statt async); GlobalACL-Struktur von userId/resource/allowed auf prefix/result Format korrigiert; Ressourcenformat von {type}:{action} auf {type}:{path} korrigiert; IPermissionAskHandler.AskUser Signatur korrigiert (synchron statt async); EvaluatePermission Rückgabewert und Auswertungsreihenfolge aktualisiert; Doppelte Beschreibungen entfernt"
+    },
+    {
+      "file": "docs/de-DE/api-reference.md",
+      "type": "modified",
+      "description": "Being Aktivitätswerte von status/idle/running auf activity/Idle/SingleChat/etc. korrigiert; Chat-API Endpunkte aktualisiert (SSE ohne channelId Parameter, /api/chat/history und /api/chat/upload hinzugefügt); IAIClient Schnittstelle vollständig aktualisiert (Endpoint, DefaultModel, StreamingMode, SupportsToolCalls, Chat/Generate Methoden); AIRequest/AIResponse Strukturen korrigiert; ITool Schnittstelle korrigiert (GetDisplayName, GetParameterSchema, Execute); ToolCall.Arguments statt Parameters; ToolResult.Message statt Output; Fehlende Memory API, Code Browser API, Executor API hinzugefügt; Chinesische Texte in Arbeitsnotizen auf Deutsch übersetzt"
+    },
+    {
+      "file": "docs/de-DE/security.md",
+      "type": "modified",
+      "description": "Berechtigungskette in Übersicht von 5-stufig auf 3-stufig korrigiert; Curator-Verhalten korrigiert (Kurzschluss zu Allowed statt Benutzerabfrage); Berechtigungsvalidierungsablauf-Diagramm aktualisiert (3-stufig mit Kurator/Nicht-Kurator Verzweigung); Executor-Modell aktualisiert (ExecutorBase abstrakte Basisklasse, ServiceLocator Referenz); DynamicCompilationExecutor Timeout auf N/A korrigiert; GlobalACL Referenzbeschreibung korrigiert; Tabellenformatierungsfehler behoben (| statt -); Plugin-Berechtigungskette von 5-stufig auf 3-stufig korrigiert; Englische Wörter in deutschem Text korrigiert"
+    }
+  ]
+}

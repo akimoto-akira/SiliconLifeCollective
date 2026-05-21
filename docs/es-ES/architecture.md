@@ -24,7 +24,7 @@ Este proyecto proporciona dos versiones de implementación que comparten el mism
 - **Características**:
   - Windows/macOS ejecución en segundo plano de la bandeja del sistema, monitoreo en tiempo real mediante ventana de estado; Linux ventana de estado mostrada directamente
   - Motor SpeedyPack + compresión automática garantizan seguridad de datos
-  - Arquitectura Component UI, 30+ componentes declarativos
+  - Arquitectura Component UI, 27 componentes declarativos
   - 7 temas de piel, soporte para descubrimiento y cambio automáticos
   - Herramienta de recarga en caliente para actualizaciones y reinicios en línea
   - Linux abre automáticamente el navegador para acceder a la Web UI, soporta el parámetro `--no-tray`
@@ -485,7 +485,7 @@ La Web UI evita completamente archivos de plantillas, generando todo el marcado 
 
 ### Sistema de Controladores
 
-La Web UI sigue un **patrón similar a MVC**, con 23 controladores manejando diferentes aspectos:
+La Web UI sigue un **patrón similar a MVC**, con 22 controladores manejando diferentes aspectos:
 
 | Controlador | Propósito |
 |------------|---------|
@@ -520,12 +520,15 @@ La Web UI sigue un **patrón similar a MVC**, con 23 controladores manejando dif
 
 ### Localización
 
-El sistema soporta localización completa para **29 variantes de idioma**:
+El sistema soporta localización completa para **33 variantes de idioma**:
 - **Chino (6 variantes)**: zh-CN (simplificado), zh-HK (tradicional), zh-SG (Singapur), zh-MO (Macao), zh-TW (Taiwán), zh-MY (Malasia)
 - **Inglés (10 variantes)**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY
 - **Español (2 variantes)**: es-ES, es-MX
 - **Alemán (5 variantes)**: de-DE, de-AT, de-CH, de-LU, de-LI
 - **Francés (3 variantes)**: fr-FR, fr-CA, fr-CH
+- **Italiano (1 variante)**: it-IT
+- **Polaco (1 variante)**: pl-PL
+- **Portugués (2 variantes)**: pt-PT, pt-BR
 - **Otros (3 variantes)**: ja-JP (japonés), ko-KR (coreano), cs-CZ (checo)
 
 El locale activo se selecciona a través de `DefaultConfigData.Language` y se resuelve a través de `LocalizationManager`.
