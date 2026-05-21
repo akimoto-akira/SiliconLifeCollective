@@ -708,7 +708,7 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ## Ověřování Oprávnění
 
-Všechna provádění nástrojů procházejí 5úrovňovým řetězcem oprávnění:
+Všechna provádění nástrojů procházejí 3úrovňovým řetězcem oprávnění:
 
 1. **UserFrequencyCache** — Cache vysoké frekvence povolení/zamítnutí uživatele
 2. **IPermissionCallback** — Vlastní funkce zpětného volání oprávnění
@@ -814,7 +814,7 @@ catch (Exception ex)
 Nikdy neobcházejte kontroly oprávnění. Vždy přistupujte ke zdrojům prostřednictvím exekutorů:
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
+var permission = permissionManager.EvaluatePermission(callerId, permissionType, resource);
 if (!permission.Allowed)
 {
     return ToolResult.Denied(permission.Reason);

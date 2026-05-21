@@ -13,7 +13,7 @@
 - **Řízeno souborem duše** — Každá silikonová bytost je řízena souborem core prompt (`soul.md`), který definuje jedinečnou osobnost a vzorce chování
 - **Architektura Tělo-Mozek** — *Tělo* (SiliconBeing) udržuje stav života a detekuje spouštěcí scénáře; *Mozek* (ContextManager) načítá historii, volá AI, provádí nástroje a perzistuje odpovědi
 - **Schopnost sebevývoje** — Prostřednictvím technologie dynamické kompilace Roslyn mohou silikonové bytosti přepisovat svůj vlastní kód pro evoluci
-- **Správa stavů aktivity** — Podporuje čtyři stavy aktivity: Idle (nečinný), Working (pracující), Error (chyba), Stopped (zastavený). Automatický přechod do stavu Stopped po 10 po sobě jdoucích chybách
+- **Správa stavů aktivity** — Podporuje 9 stavů aktivity: Idle (nečinný), SingleChat (soukromý chat), GroupChat (skupinový chat), Task (úkol), Timer (časovač), Broadcast (vysílání), Project (projekt), MemoryCompression (komprese paměti), Stopped (zastavený). Automatický přechod do stavu Stopped po 10 po sobě jdoucích chybách
 
 ### Plugin systém
 - **Architektura rozšíření pluginů** — Rozšíření funkcí prostřednictvím rozhraní IPlugin, podpora dynamického načítání plugin DLL z adresáře
@@ -26,7 +26,7 @@
 - **Nástroj Hot Reload** — Podporuje automatickou kompilaci, aktualizaci souborů a restart SiliconLife.Fast za běhu, bez manuálního zásahu
 - **Cyklus volání nástrojů** — AI vrací volání nástroje → provádění nástroje → výsledky zpět AI → pokračuje dokud nevrací čistý text
 - **Bezpečnost oprávnění-exekutor** — Všechny I/O operace procházejí přísným ověřováním oprávnění prostřednictvím exekutorů
-  - 5úrovňový řetězec oprávnění: UserFrequencyCache → IPermissionCallback → (Kurátor→IPermissionAskHandler / Nekurátor→GlobalACL→Zamítnuto)
+  - 3úrovňový řetězec oprávnění: UserFrequencyCache → IPermissionCallback → (Kurátor→IPermissionAskHandler / Nekurátor→GlobalACL→Zamítnuto)
   - Kompletní auditní záznam všech rozhodnutí o oprávněních
 
 ### AI a znalosti
@@ -44,13 +44,16 @@
 - **Žádná závislost na frontendovém frameworku** — Generování HTML/CSS/JS na serveru pomocí `H`, `CssBuilder` a `JsBuilder`
 
 ### Internacionalizace a lokalizace
-- **Plná podpora 29 jazykových implementací**, pokrývající 2 psací systémy a více regionálních variant
+- **Plná podpora 33 jazykových implementací**, pokrývající 4 psací systémy a více regionálních variant
   - **Zjednodušená čínština**: zh-CN (pevninská Čína), zh-SG (Singapur), zh-MY (Malajsie) (3 varianty)
   - **Tradiční čínština**: zh-HK (Hongkong), zh-TW (Tchaj-wan), zh-MO (Macao) (3 varianty)
   - **Angličtina**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variant)
   - **Španělština**: es-ES, es-MX (2 varianty)
   - **Němčina**: de-DE, de-AT, de-CH, de-LU, de-LI (5 variant)
   - **Francouzština**: fr-FR, fr-CA, fr-CH (3 varianty)
+  - **Italština**: it-IT (1 varianta)
+  - **Polština**: pl-PL (1 varianta)
+  - **Portugalština**: pt-PT, pt-BR (2 varianty)
   - **Japonština**: ja-JP | **Korejština**: ko-KR | **Čeština**: cs-CZ (3 varianty)
 
 ### Data a úložiště
@@ -341,12 +344,12 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] Fáze 3: První silikonová bytost se souborem duše (architektura Tělo-Mozek)
 - [x] Fáze 4: Perzistentní paměť (systém chatu + rozhraní časového úložiště)
 - [x] Fáze 5: Systém nástrojů + Exekutory
-- [x] Fáze 6: Systém oprávnění (5úrovňový řetězec, audit logger, Global ACL)
+- [x] Fáze 6: Systém oprávnění (3úrovňový řetězec, audit logger, Global ACL)
 - [x] Fáze 7: Dynamická kompilace + Sebevývoj (Roslyn)
 - [x] Fáze 8: Dlouhodobá paměť + Úkoly + Časovače
 - [x] Fáze 9: Core Hostitel + Spolupráce více agentů
 - [x] Fáze 10: Web UI (HTTP + SSE, 23 kontrolerů, 7 skinů)
-- [x] Fáze 10.5: Přírůstková vylepšení (broadcast kanál, audit tokenů, 32 kalendářů, vylepšení nástrojů, lokalizace 21 jazyků)
+- [x] Fáze 10.5: Přírůstková vylepšení (broadcast kanál, audit tokenů, 24 kalendářů, vylepšení nástrojů, lokalizace 21 jazyků)
 - [x] Fáze 10.6: Dokončení a optimalizace (WebView, systém nápovědy, pracovní prostor projektu, znalostní síť)
 - [x] Fáze 11: SpeedyPack úložný engine (náhrada LiteDB, mapování paměti, asynchronní fronta zápisu, automatická komprese)
 - [x] Fáze 12: Plugin systém (rozhraní IPlugin, bezpečnostní sandbox PluginLoader, izolované načítání, integrace nástrojů)

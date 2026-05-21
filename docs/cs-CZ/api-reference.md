@@ -34,7 +34,7 @@ Většina endpointů vyžaduje autentizaci prostřednictvím session cookies spr
 }
 ```
 
-**Hodnoty stavu**: `idle` | `running` | `waiting_permission` | `stopped`
+**Hodnoty aktivity**: `Idle` | `SingleChat` | `GroupChat` | `Task` | `Timer` | `Broadcast` | `Project` | `MemoryCompression` | `Stopped`
 
 ### Vytvořit Bytost
 
@@ -204,10 +204,12 @@ data: {"type": "complete", "sessionId": "uuid"}
 {
   "rules": [
     {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
+      "prefix": "network:api.github.com",
+      "result": "Allowed"
+    },
+    {
+      "prefix": "file:C:\\Windows",
+      "result": "Denied"
     }
   ]
 }

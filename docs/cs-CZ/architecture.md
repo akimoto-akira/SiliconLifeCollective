@@ -681,8 +681,13 @@ Silikonové bytosti mají následující stavy aktivity:
 | Stav | Popis |
 |------|------|
 | `Idle` | Nečinný stav, čeká na spuštění hodin |
-| `Working` | Provádí jedno kolo AI požadavku + volání nástrojů |
-| `Error` | Během provádění došlo k chybě |
+| `SingleChat` | Soukromý chat s uživatelem |
+| `GroupChat` | Skupinový chat |
+| `Task` | Provádění úkolu |
+| `Timer` | Časovač spuštěn |
+| `Broadcast` | Vysílání zpráv |
+| `Project` | Práce na projektu |
+| `MemoryCompression` | Komprese paměti |
 | `Stopped` | Zastaveno, z důvodu po sobě jdoucích chyb nebo ručního zastavení |
 
 **Mechanismus stavu Stopped**:
@@ -692,8 +697,13 @@ Silikonové bytosti mají následující stavy aktivity:
 
 Přechody stavů:
 ```
-Idle → Working → Idle (normální dokončení)
-Working → Error → Working (obnovení po chybě)
-Working → Stopped (10 po sobě jdoucích chyb nebo ruční zastavení)
+Idle → SingleChat → Idle
+Idle → GroupChat → Idle
+Idle → Task → Idle
+Idle → Timer → Idle
+Idle → Broadcast → Idle
+Idle → Project → Idle
+Idle → MemoryCompression → Idle
+Jakýkoli stav → Stopped (10 po sobě jdoucích chyb nebo ruční zastavení)
 Stopped → Idle (restartování)
 ```

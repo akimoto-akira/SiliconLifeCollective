@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-22T23:30:00+08:00",
+  "lastUpdated": "2026-05-23T01:00:00+08:00",
   "tasks": [
     {
       "id": "task-301",
@@ -282,7 +282,7 @@
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "relatedCommit": null,
+      "relatedCommit": "7646923",
       "completedAt": "2026-05-22T23:30:00+08:00",
       "modifiedFiles": [
         "docs/pt-PT/README.md",
@@ -301,20 +301,27 @@
       "title": "Analýza souladu české dokumentace (cs-CZ) se zdrojovým kódem a oprava rozdílů",
       "description": "Porovnat všechny dokumenty v adresáři docs/cs-CZ/ se současnou implementací zdrojového kódu, identifikovat zastaralý, nepřesný nebo chybějící obsah v dokumentaci, ověřit úplnost překladu vůči anglickému referenčnímu dokumentu (en), sestavit seznam rozdílů a opravit dokumentaci tak, aby byla synchronizována se zdrojovým kódem.",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-23T01:00:00+08:00",
+      "modifiedFiles": [
+        "docs/cs-CZ/permission-system.md",
+        "docs/cs-CZ/api-reference.md",
+        "docs/cs-CZ/README.md",
+        "docs/cs-CZ/architecture.md",
+        "docs/cs-CZ/silicon-being-guide.md",
+        "docs/cs-CZ/development-guide.md",
+        "docs/cs-CZ/tools-reference.md"
+      ]
     }
   ],
   "taskIndex": {
-    "pending": [
-      "task-313"
-    ],
+    "pending": [],
     "inProgress": [],
-    "completed": ["task-301", "task-302", "task-303", "task-304", "task-305", "task-306", "task-307", "task-308", "task-309", "task-310", "task-311", "task-312"],
+    "completed": ["task-301", "task-302", "task-303", "task-304", "task-305", "task-306", "task-307", "task-308", "task-309", "task-310", "task-311", "task-312", "task-313"],
     "cancelled": []
   },
   "metadata": {

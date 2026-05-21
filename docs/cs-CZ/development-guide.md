@@ -18,14 +18,15 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # Výchozí implementace, vstupní bod (ověření proveditelnosti architektury)
 │   ├── SiliconLife.Fast/            # Vysoce výkonná implementace, vstupní bod (hlavní produkční verze)
 │   ├── SiliconLife.Speedy/          # SpeedyPack vysoce výkonný storage engine
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack správcovský nástroj (WPF)
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack správcovský nástroj (Windows Forms)
 └── docs/                            # Vícejazyčná dokumentace
 ```
 
 **Směr závislosti**:
-- `SiliconLife.Core` ← `SiliconLife.Common` (Common závisí na Core)
-- `SiliconLife.Core` ← `SiliconLife.Default` (Default závisí na Core i Common)
-- `SiliconLife.Core` ← `SiliconLife.Fast` (Fast závisí na Core i Common)
+- `SiliconLife.Default` → `SiliconLife.Core` + `SiliconLife.Common` + `SiliconLife.App`
+- `SiliconLife.Fast` → `SiliconLife.Core` + `SiliconLife.Common` + `SiliconLife.App` + `SiliconLife.Speedy`
+- `SiliconLife.Common` → `SiliconLife.Core`
+- `SiliconLife.App` → `SiliconLife.Core` + `SiliconLife.Common`
 
 **Popis rolí verzí**:
 - **SiliconLife.Default**: Výchozí implementace, používána především pro ověření proveditelnosti architektury. Poskytuje jednoduché a spolehlivé souborové úložiště, vhodné pro vývojové ladění a ověření architektury.
@@ -448,7 +449,7 @@ Testování kompletního toku:
 Jakákoli operace iniciovaná AI musí projít řetězcem oprávnění:
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
+var permission = permissionManager.EvaluatePermission(callerId, permissionType, resource);
 if (!permission.Allowed)
 {
     return Result.Denied(permission.Reason);
