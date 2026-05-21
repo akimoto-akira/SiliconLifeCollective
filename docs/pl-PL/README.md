@@ -13,7 +13,7 @@
 - **Sterowanie plikiem duszy** — każda Istota Krzemowa jest napędzana przez rdzenny plik podpowiedzi (`soul.md`), definiujący unikalną osobowość i wzorce zachowań
 - **Architektura ciało-mózg** — *Ciało* (SiliconBeing) utrzymuje parametry życiowe i wykrywa scenariusze wyzwalające; *Mózg* (ContextManager) odpowiada za ładowanie historii, wywoływanie AI, wykonywanie narzędzi i utrwalanie odpowiedzi
 - **Zdolność samewolucji** — dzięki dynamicznej kompilacji Roslyn, Istoty Krzemowe mogą przepisywać swój własny kod, realizując ewolucję
-- **Zarządzanie stanem aktywności** — obsługa czterech stanów aktywności: Idle (bezczynny), Working (pracujący), Error (błąd), Stopped (zatrzymany); po 10 kolejnych błędach automatyczne przejście do stanu Stopped
+- **Zarządzanie stanem aktywności** — obsługa dziewięciu stanów aktywności: Idle (bezczynny), SingleChat (czat indywidualny), GroupChat (czat grupowy), Task (wykonywanie zadania), Timer (wykonywanie czasomierza), Broadcast (przetwarzanie komunikatu), Project (praca nad projektem), MemoryCompression (kompresja pamięci), Stopped (zatrzymany); po 10 kolejnych błędach automatyczne przejście do stanu Stopped
 
 ### System wtyczek
 - **Architektura rozszerzeń wtyczek** — rozszerzanie funkcjonalności poprzez interfejs IPlugin, obsługa dynamicznego ładowania bibliotek DLL z katalogu
@@ -44,7 +44,7 @@
 - **Zero zależności od frameworków frontendowych** — generowanie HTML/CSS/JS po stronie serwera poprzez `H`, `CssBuilder` i `JsBuilder`
 
 ### Internacjonalizacja i lokalizacja
-- **33 implementacje językowe** pełne wsparcie, obejmujące 2 systemy pisma i wiele wariantów regionalnych
+- **33 implementacje językowe** pełne wsparcie, obejmujące 4 systemy pisma i wiele wariantów regionalnych
   - **Chiński uproszczony**: zh-CN (Chiny kontynentalne), zh-SG (Singapur), zh-MY (Malezja) (3)
   - **Chiński tradycyjny**: zh-HK (Hongkong), zh-TW (Tajwan), zh-MO (Makau) (3)
   - **Angielski**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10)

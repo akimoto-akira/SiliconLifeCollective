@@ -817,10 +817,10 @@ catch (Exception ex)
 Nigdy nie omijaj sprawdzania uprawnień. Zawsze uzyskuj dostęp do zasobów przez wykonawców:
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+var permission = permissionManager.EvaluatePermission(callerId, permissionType, resource);
+if (permission == PermissionResult.Denied)
 {
-    return ToolResult.Denied(permission.Reason);
+    return ToolResult.Denied("Permission denied");
 }
 ```
 

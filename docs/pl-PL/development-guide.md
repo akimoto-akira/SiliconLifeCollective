@@ -447,10 +447,10 @@ Testowanie pełnego przepływu:
 Każda operacja zainicjowana przez AI musi przejść przez łańcuch uprawnień:
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+var permission = permissionManager.EvaluatePermission(callerId, permissionType, resource);
+if (permission == PermissionResult.Denied)
 {
-    return Result.Denied(permission.Reason);
+    return Result.Denied("Permission denied");
 }
 ```
 

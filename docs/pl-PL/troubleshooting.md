@@ -185,17 +185,18 @@ Permission denied: disk:write
 **Rozwiązanie**:
 1. Sprawdź bieżące uprawnienia:
 ```bash
-curl http://localhost:8080/api/permissions
+curl http://localhost:8080/api/permissions/list?beingId=being-uuid
 ```
 
 2. Nadaj uprawnienia:
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "resource": "disk:write",
-    "allowed": true,
-    "duration": 3600
+    "beingId": "being-uuid",
+    "permissionType": "Disk",
+    "resourcePrefix": "disk:write",
+    "result": "Allowed"
   }'
 ```
 

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-22T19:00:00+08:00",
+  "lastUpdated": "2026-05-22T21:00:00+08:00",
   "tasks": [
     {
       "id": "task-301",
@@ -209,7 +209,7 @@
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "relatedCommit": null,
+      "relatedCommit": "2bc7151",
       "completedAt": "2026-05-22T19:00:00+08:00",
       "modifiedFiles": [
         "docs/es-ES/README.md",
@@ -226,12 +226,25 @@
       "title": "Analizzare la coerenza della documentazione italiana (it-IT) con il codice sorgente e correggere le discrepanze",
       "description": "Confrontare tutti i documenti nella directory docs/it-IT/ con l'implementazione attuale del codice sorgente, identificare contenuti obsoleti, imprecisi o mancanti nella documentazione, verificare la completezza della traduzione rispetto al documento di riferimento inglese (en), stilare un elenco delle discrepanze e correggere la documentazione per sincronizzarla con il codice sorgente.",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
-      "assignedTo": null,
-      "relatedCommit": null,
-      "completedAt": null
+      "assignedTo": "trae-glm5",
+      "relatedCommit": "f95088e",
+      "completedAt": "2026-05-22T20:00:00+08:00",
+      "modifiedFiles": [
+        "docs/it-IT/README.md",
+        "docs/it-IT/architecture.md",
+        "docs/it-IT/permission-system.md",
+        "docs/it-IT/api-reference.md",
+        "docs/it-IT/security.md",
+        "docs/it-IT/development-guide.md",
+        "docs/it-IT/tools-reference.md",
+        "docs/it-IT/getting-started.md",
+        "docs/it-IT/roadmap.md",
+        "docs/it-IT/contributing.md",
+        "docs/it-IT/troubleshooting.md"
+      ]
     },
     {
       "id": "task-311",
@@ -240,12 +253,23 @@
       "title": "Analiza spójności dokumentacji polskiej (pl-PL) z kodem źródłowym i korekta rozbieżności",
       "description": "Porównać wszystkie dokumenty w katalogu docs/pl-PL/ z aktualną implementacją kodu źródłowego, zidentyfikować przestarzałe, niedokładne lub brakujące treści w dokumentacji, sprawdzić kompletność tłumaczenia w odniesieniu do angielskiego dokumentu referencyjnego (en), sporządzić listę rozbieżności i skorygować dokumentację, aby zsynchronizować ją z kodem źródłowym.",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-22T21:00:00+08:00",
+      "modifiedFiles": [
+        "docs/pl-PL/README.md",
+        "docs/pl-PL/architecture.md",
+        "docs/pl-PL/permission-system.md",
+        "docs/pl-PL/api-reference.md",
+        "docs/pl-PL/security.md",
+        "docs/pl-PL/development-guide.md",
+        "docs/pl-PL/tools-reference.md",
+        "docs/pl-PL/silicon-being-guide.md",
+        "docs/pl-PL/troubleshooting.md"
+      ]
     },
     {
       "id": "task-312",
@@ -278,13 +302,11 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-310",
-      "task-311",
       "task-312",
       "task-313"
     ],
     "inProgress": [],
-    "completed": ["task-301", "task-302", "task-303", "task-304", "task-305", "task-306", "task-307", "task-308", "task-309"],
+    "completed": ["task-301", "task-302", "task-303", "task-304", "task-305", "task-306", "task-307", "task-308", "task-309", "task-310", "task-311"],
     "cancelled": []
   },
   "metadata": {

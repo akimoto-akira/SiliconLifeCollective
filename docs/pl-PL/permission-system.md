@@ -29,13 +29,13 @@ System uprawnień zapewnia, że wszystkie operacje inicjowane przez AI są odpow
 
 ## Poziom 1: UserFrequencyCache
 
-Ograniczenie szybkości dla każdego użytkownika w celu zapobiegania nadużyciom. Buforuje również poprzednie decyzje użytkownika, aby uniknąć powtarzających się monitów.
+Pamięć podręczna buforująca poprzednie decyzje użytkownika, aby uniknąć powtarzających się monitów. **HighDeny** ma priorytet nad **HighAllow**. Pamięć podręczna jest tylko w pamięci, tracona po restarcie.
 
 ```csharp
 var cache = new UserFrequencyCache();
-if (!cache.CheckLimit(userId, resource))
+if (cache.CheckLimit(callerId, resource, out var cachedResult))
 {
-    return PermissionResult.Denied("Rate limit exceeded");
+    return cachedResult.Value == PermissionResult.Allowed;
 }
 ```
 
@@ -69,15 +69,15 @@ Niestandardowe wywołanie zwrotne dla dynamicznej logiki uprawnień.
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {
-    public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+    public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
     {
         // Niestandardowa logika
-        if (IsSafeOperation(request))
+        if (IsSafeOperation(permissionType, resource))
         {
-            return PermissionResult.Allowed("Safe operation");
+            return PermissionResult.Allowed;
         }
 
-        return PermissionResult.Undecided("Needs user confirmation");
+        return PermissionResult.AskUser;
     }
 }
 ```
@@ -88,21 +88,21 @@ Gdy poziom 1 i poziom 2 nie podejmą decyzji, system rozgałęzia się na podsta
 
 ### Gałąź kuratora (IsCurator = true)
 
-Jeśli wywołujący jest kuratorem, wchodzi do `IPermissionAskHandler` w celu potwierdzenia przez użytkownika:
+Jeśli wywołujący jest kuratorem, system pyta użytkownika o decyzję za pośrednictwem komunikacji natychmiastowej:
 
 ```csharp
 if (IsCurator)
 {
     if (_askHandler != null)
     {
-        var result = await _askHandler.AskAsync(request);
+        var result = _askHandler.AskUser(callerId, permissionType, resource);
     }
 }
 ```
 
 ### Gałąź nie-kuratora (IsCurator = false)
 
-Jeśli wywołujący nie jest kuratorem, sprawdza `GlobalACL` listę kontroli dostępu:
+Jeśli wywołujący nie jest kuratorem, sprawdza `GlobalACL` listę kontroli dostępu. Jeśli nie znaleziono pasującej reguły, żądanie jest domyślnie odrzucane.
 
 ### Struktura GlobalACL
 
@@ -110,14 +110,22 @@ Jeśli wywołujący nie jest kuratorem, sprawdza `GlobalACL` listę kontroli dos
 {
   "rules": [
     {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
+      "prefix": "network:api.github.com",
+      "result": "Allowed"
+    },
+    {
+      "prefix": "file:C:\\Windows",
+      "result": "Denied"
+    },
+    {
+      "prefix": "cli:rm -rf",
+      "result": "Denied"
     }
   ]
 }
 ```
+
+Reguły są oceniane w kolejności; pierwsze dopasowanie wygrywa. Tylko Kurator Krzemowy może modyfikować globalne ACL.
 
 ### Format zasobów
 
@@ -143,17 +151,20 @@ Zapytanie użytkownika o uprawnienia, gdy wszystkie inne poziomy są nierozstrzy
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
 {
-    public async Task<AskPermissionResult> AskAsync(PermissionRequest request)
+    public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
     {
         // Wysłanie wiadomości do użytkownika przez komunikację natychmiastową
-        await SendMessageAsync($"Zezwolić na {request.Resource}?");
+        SendMessage($"Zezwolić na {resource}?");
 
         // Oczekiwanie na odpowiedź użytkownika
-        var response = await WaitForResponseAsync();
+        var response = WaitForResponse();
 
-        return response.Approved
-            ? AskPermissionResult.Approved()
-            : AskPermissionResult.Denied();
+        return new AskPermissionResult
+        {
+            Allowed = response.Approved,
+            AddToCache = response.AddToCache,
+            CacheDuration = response.CacheDuration
+        };
     }
 }
 ```
@@ -166,7 +177,7 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 - **Wyświetlanie w Web UI** — wyświetla oczekujące żądania uprawnień w Web UI przez `PermissionRequestController`
 - **Odpowiedź użytkownika** — użytkownik zatwierdza lub odrzuca w Web UI, z opcją buforowania decyzji i ustawienia czasu trwania bufora
 - **Opcje buforowania** — użytkownik może buforować decyzje uprawnień na 1 godzinę, 24 godziny, 7 dni lub 30 dni
-- **Mechanizm przekroczenia czasu** — automatyczne zamknięcie strony żądania po 60 sekundach braku odpowiedzi
+- **Mechanizm przekroczenia czasu** — automatyczne zamknięcie strony żądania po 30 sekundach braku odpowiedzi
 
 ## System audytu
 
@@ -179,7 +190,7 @@ Wszystkie decyzje dotyczące uprawnień są rejestrowane:
   "resource": "disk:write",
   "allowed": true,
   "level": "GlobalACL",
-  "reason": "Explicit rule granted"
+  "reason": "Prefix match: disk:write"
 }
 ```
 
@@ -204,9 +215,7 @@ public PermissionResult EvaluatePermission(
 **Kolejność oceny**:
 1. **Pamięć podręczna częstotliwości** - sprawdzenie buforowanych decyzji użytkownika
 2. **IPermissionCallback** - ocena niestandardowego wywołania zwrotnego
-3. **Status kuratora** - jeśli to kurator, zwraca `AskUser` (wymaga potwierdzenia)
-4. **Globalne ACL** - sprawdzenie reguł kontroli dostępu
-5. **Domyślnie** - odrzucenie, gdy brak pasującej reguły
+3. **Rozgałęzienie kuratora** - jeśli to kurator, zwraca `AskUser` (wymaga potwierdzenia); jeśli nie-kurator, sprawdza **GlobalACL**, następnie domyślnie odrzuca
 
 > **Uwaga**: W przeciwieństwie do pełnego łańcucha uprawnień, `EvaluatePermission` **nie wywołuje** `IPermissionAskHandler`. Raportuje jedynie, jaki wynik *będzie* przy wykonaniu.
 
@@ -228,10 +237,11 @@ public PermissionResult EvaluatePermission(
 curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "userId": "user-uuid",
-    "resource": "disk:write",
-    "allowed": true,
-    "duration": 3600
+    "beingId": "being-uuid",
+    "permissionType": "Disk",
+    "resourcePrefix": "disk:write",
+    "result": "Allowed",
+    "description": "Zezwolenie na zapis na dysku"
   }'
 ```
 
@@ -242,7 +252,7 @@ Przez stronę zarządzania uprawnieniami w Web UI.
 ### Przegląd uprawnień
 
 ```bash
-curl http://localhost:8080/api/permissions/list
+curl http://localhost:8080/api/permissions/list?beingId=being-uuid
 ```
 
 ## Najlepsze praktyki
@@ -253,9 +263,9 @@ Nadawaj tylko minimalne wymagane uprawnienia:
 
 ```json
 {
-  "resource": "disk:read",  // nie disk:*
-  "allowed": true,
-  "expiresAt": "2026-04-21T00:00:00Z"  // zawsze ustawiaj wygaśnięcie
+  "resourcePrefix": "disk:read",  // nie disk:*
+  "result": "Allowed",
+  "description": "Tylko odczyt dysku"
 }
 ```
 
@@ -275,21 +285,21 @@ Regularnie przeglądaj logi audytu, aby zrozumieć:
 Dla złożonej logiki używaj `IPermissionCallback`:
 
 ```csharp
-public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
 {
     // Uprawnienia oparte na czasie
     if (IsOutsideBusinessHours())
     {
-        return PermissionResult.Denied("Outside business hours");
+        return PermissionResult.Denied;
     }
 
     // Uprawnienia oparte na zasobach
-    if (IsSensitiveResource(request.Resource))
+    if (IsSensitiveResource(resource))
     {
-        return PermissionResult.Undecided("Requires approval");
+        return PermissionResult.AskUser;
     }
 
-    return PermissionResult.Allowed();
+    return PermissionResult.Allowed;
 }
 ```
 
@@ -301,10 +311,11 @@ public async Task<PermissionResult> CheckAsync(PermissionRequest request)
 AI: "Muszę odczytać config.json"
 ↓
 Łańcuch uprawnień:
-1. Ograniczenie szybkości? Normalne
-2. Wywołanie zwrotne? Zwraca nierozstrzygnięte
-3. IsCurator? Nie → GlobalACL? Znaleziono regułę: disk:read = zezwolone
-4. Wynik: Zezwól
+1. Pamięć podręczna częstotliwości? Brak buforowanej decyzji
+2. IPermissionCallback? Zwraca AskUser (nie jawnie zezwolone)
+3. IsCurator? Nie → Sprawdź GlobalACL
+4. GlobalACL? Znaleziono regułę: file:... = Zezwolone
+5. Wynik: Zezwól
 ```
 
 ### Scenariusz 2: AI chce wykonać kod
@@ -313,10 +324,11 @@ AI: "Muszę odczytać config.json"
 AI: "Chcę skompilować i uruchomić kod"
 ↓
 Łańcuch uprawnień:
-1. Ograniczenie szybkości? Normalne
-2. Wywołanie zwrotne? Zwraca nierozstrzygnięte
-3. IsCurator? Tak → IPermissionAskHandler → Użytkownik zatwierdza
-4. Wynik: Zezwól
+1. Pamięć podręczna częstotliwości? Brak buforowanej decyzji
+2. IPermissionCallback? Zwraca AskUser
+3. IsCurator? Tak → IPermissionAskHandler
+4. Użytkownik zatwierdza
+5. Wynik: Zezwól
 ```
 
 ### Scenariusz 3: Przekroczenie ograniczenia szybkości
@@ -325,8 +337,8 @@ AI: "Chcę skompilować i uruchomić kod"
 AI: "Muszę wysłać 100 żądań HTTP"
 ↓
 Łańcuch uprawnień:
-1. Ograniczenie szybkości? Przekroczone
-2. Wynik: Odmów
+1. Pamięć podręczna częstotliwości? Znaleziono w buforze HighDeny
+2. Wynik: Odmów (brak dalszych sprawdzeń)
 ```
 
 ## Rozwiązywanie problemów
@@ -335,7 +347,7 @@ AI: "Muszę wysłać 100 żądań HTTP"
 
 **Sprawdź**:
 1. Status IsCurator użytkownika
-2. Ustawienia ograniczenia szybkości
+2. Ustawienia pamięci podręcznej częstotliwości
 3. Reguły GlobalACL
 4. Logikę wywołania zwrotnego
 5. Przekroczenie czasu odpowiedzi użytkownika

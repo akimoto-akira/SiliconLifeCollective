@@ -1,0 +1,63 @@
+{
+  "sessionId": "trae-glm5-20260522-2030",
+  "actorId": "trae-glm5",
+  "startTime": "2026-05-22T20:30:00+08:00",
+  "endTime": "2026-05-22T21:00:00+08:00",
+  "files": [
+    {
+      "path": "docs/pl-PL/README.md",
+      "intent": "Poprawić stany aktywności 4→9, systemy pisma 2→4",
+      "changeSummary": { "additions": 2, "deletions": 2, "modifications": 2 },
+      "relatedTask": "task-311"
+    },
+    {
+      "path": "docs/pl-PL/architecture.md",
+      "intent": "Poprawić stany aktywności 4→9 (Idle/Working/Error/Stopped → pełna enumeracja BeingActivity)",
+      "changeSummary": { "additions": 8, "deletions": 5, "modifications": 4 },
+      "relatedTask": "task-311"
+    },
+    {
+      "path": "docs/pl-PL/permission-system.md",
+      "intent": "Poprawić: IPermissionCallback async→sync, IPermissionAskHandler async→sync, GlobalACL userId/resource/allowed→prefix/result, UserFrequencyCache rate limiter→cache, timeout 60s→30s, API format",
+      "changeSummary": { "additions": 35, "deletions": 25, "modifications": 12 },
+      "relatedTask": "task-311"
+    },
+    {
+      "path": "docs/pl-PL/api-reference.md",
+      "intent": "Poprawić: /api/beings status→activity, /api/permissions format, SSE stream params, /api/beings/activity params",
+      "changeSummary": { "additions": 25, "deletions": 15, "modifications": 6 },
+      "relatedTask": "task-311"
+    },
+    {
+      "path": "docs/pl-PL/security.md",
+      "intent": "Dodać domyślną odmowę dla ścieżki nie-kuratora w diagramie ACL",
+      "changeSummary": { "additions": 3, "deletions": 2, "modifications": 1 },
+      "relatedTask": "task-311"
+    },
+    {
+      "path": "docs/pl-PL/development-guide.md",
+      "intent": "Poprawić CheckAsync→EvaluatePermission w przykładzie kodu",
+      "changeSummary": { "additions": 2, "deletions": 2, "modifications": 2 },
+      "relatedTask": "task-311"
+    },
+    {
+      "path": "docs/pl-PL/tools-reference.md",
+      "intent": "Poprawić CheckAsync→EvaluatePermission w przykładzie kodu",
+      "changeSummary": { "additions": 2, "deletions": 2, "modifications": 2 },
+      "relatedTask": "task-311"
+    },
+    {
+      "path": "docs/pl-PL/silicon-being-guide.md",
+      "intent": "Poprawić stany aktywności 4→9",
+      "changeSummary": { "additions": 8, "deletions": 5, "modifications": 4 },
+      "relatedTask": "task-311"
+    },
+    {
+      "path": "docs/pl-PL/troubleshooting.md",
+      "intent": "Poprawić endpointy API uprawnień: /api/permissions→/api/permissions/list?beingId=, /api/permissions/save",
+      "changeSummary": { "additions": 5, "deletions": 4, "modifications": 3 },
+      "relatedTask": "task-311"
+    }
+  ],
+  "tasksCompleted": ["task-311"]
+}

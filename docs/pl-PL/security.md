@@ -89,10 +89,11 @@ Priorytet zapytania: **1. Pamięć podręczna częstotliwości → 2. Funkcja wy
                  │                       │
                  ▼ Tak                   ▼ Nie
           ┌─────────────┐    ┌─────────────┐
-          │ Zapytanie   │    │ Globalne    │
+          │ Zapytanie   │    │ Globalne    │──▶ Zezwól / Odmów
           │ użytkownika │    │ ACL         │
-          │ (AskHandler)│    │ zapytanie   │
-          └─────────────┘    └─────────────┘
+          │ (AskHandler)│    │ (domyślnie  │
+          └─────────────┘    │  odmów)     │
+                             └─────────────┘
 ```
 
 **Kluczowy punkt**: Wykonawca widzi tylko wartość logiczną (zezwól/odmów). Menedżer uprawnień wewnętrznie obsługuje decyzję trójstanową (zezwól/odmów/zapytaj użytkownika) i rozstrzyga zapytanie użytkownika przed zwróceniem do wykonawcy.

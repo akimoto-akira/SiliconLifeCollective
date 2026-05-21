@@ -44,6 +44,8 @@ Zwraca stronę interfejsu czatu.
 
 Strumieniowy czat za pomocą zdarzeń wysyłanych przez serwer (SSE).
 
+**Parametry zapytania**: `channelId` — identyfikator kanału czatu
+
 **Odpowiedź**: Strumień zdarzeń wysyłanych przez serwer
 
 ```
@@ -146,19 +148,18 @@ Zwraca listę wszystkich zarejestrowanych istot krzemowych.
 
 **Przykładowa odpowiedź**:
 ```json
-{
-  "beings": [
-    {
-      "id": "being-uuid",
-      "name": "Assistant",
-      "status": "running",
-      "soulPath": "path/to/soul.md"
-    }
-  ]
-}
+[
+  {
+    "id": "being-uuid",
+    "name": "Assistant",
+    "activity": "Idle",
+    "isCustomCompiled": false,
+    "customTypeName": ""
+  }
+]
 ```
 
-**Wartości stanu**: `idle` | `running` | `waiting_permission` | `stopped`
+**Wartości aktywności**: `Idle` | `SingleChat` | `GroupChat` | `Task` | `Timer` | `Broadcast` | `Project` | `MemoryCompression` | `Stopped`
 
 ### Pobranie szczegółów istoty
 
@@ -172,7 +173,18 @@ Zwraca szczegółowe informacje o określonej istocie.
 
 **GET** `/api/beings/activity`
 
-Zwraca informacje o stanie aktywności poszczególnych istot.
+Parametr zapytania: `id` — identyfikator istoty
+
+Zwraca informacje o stanie aktywności określonej istoty.
+
+**Przykładowa odpowiedź**:
+```json
+{
+  "id": "being-uuid",
+  "name": "Assistant",
+  "activity": "Idle"
+}
+```
 
 ### Strona edytora pliku duszy
 
@@ -371,16 +383,20 @@ Zwraca wszystkie aktualnie skonfigurowane reguły uprawnień.
 
 **Przykładowa odpowiedź**:
 ```json
-{
-  "rules": [
-    {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
-    }
-  ]
-}
+[
+  {
+    "permissionType": "Network",
+    "resourcePrefix": "network:api.github.com",
+    "result": "Allowed",
+    "description": "GitHub API access"
+  },
+  {
+    "permissionType": "Disk",
+    "resourcePrefix": "file:C:\\Windows",
+    "result": "Denied",
+    "description": ""
+  }
+]
 ```
 
 ### Zapisanie reguły uprawnień
@@ -390,10 +406,11 @@ Zwraca wszystkie aktualnie skonfigurowane reguły uprawnień.
 **Treść żądania**:
 ```json
 {
-  "userId": "user-uuid",
-  "resource": "disk:write",
-  "allowed": true,
-  "duration": 3600
+  "beingId": "being-uuid",
+  "permissionType": "Disk",
+  "resourcePrefix": "disk:write",
+  "result": "Allowed",
+  "description": "Zezwolenie na zapis na dysku"
 }
 ```
 
@@ -1171,7 +1188,7 @@ Zdarzenia wysyłane przez serwer są używane do aktualizacji w czasie rzeczywis
 ### Zdarzenia czatu
 
 ```javascript
-const eventSource = new EventSource('/api/chat/stream');
+const eventSource = new EventSource('/api/chat/stream?channelId=channel-uuid');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);

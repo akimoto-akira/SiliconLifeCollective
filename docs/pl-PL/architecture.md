@@ -724,8 +724,13 @@ Istoty Krzemowe posiadają następujące stany aktywności:
 | Stan | Opis |
 |------|------|
 | `Idle` | Stan bezczynności, oczekiwanie na wyzwolenie zegara |
-| `Working` | Wykonywanie jednej rundy żądania AI + wywołania narzędzi |
-| `Error` | Wystąpił błąd podczas wykonywania |
+| `SingleChat` | Udział w czacie indywidualnym |
+| `GroupChat` | Udział w czacie grupowym |
+| `Task` | Wykonywanie zadania |
+| `Timer` | Wykonywanie czasomierza |
+| `Broadcast` | Przetwarzanie komunikatu |
+| `Project` | Praca nad projektem |
+| `MemoryCompression` | Kompresja pamięci |
 | `Stopped` | Zatrzymana, z powodu kolejnych błędów lub ręcznego zatrzymania |
 
 **Mechanizm stanu Stopped**:
@@ -735,8 +740,7 @@ Istoty Krzemowe posiadają następujące stany aktywności:
 
 Przejścia stanów:
 ```
-Idle → Working → Idle (normalne zakończenie)
-Working → Error → Working (odzyskiwanie po błędzie)
-Working → Stopped (10 kolejnych błędów lub ręczne zatrzymanie)
+Idle → SingleChat/GroupChat/Task/Timer/Broadcast/Project/MemoryCompression → Idle (normalne zakończenie)
+Dowolny stan → Stopped (10 kolejnych błędów lub ręczne zatrzymanie)
 Stopped → Idle (ponowne uruchomienie)
 ```
