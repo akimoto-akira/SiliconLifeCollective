@@ -61,8 +61,6 @@ Beide Versionen teilen die gleichen Schnittstellen und Funktionen und unterschei
 
 ## [Unveröffentlicht]
 
-## Alpha-0.2
-
 ### 2026-05-22
 
 #### Dokumentationskonsistenz-Korrekturen
@@ -274,6 +272,9 @@ Beide Versionen teilen die gleichen Schnittstellen und Funktionen und unterschei
 
 - `7223b6f` - Sitzungsende-Aufzeichnung catpaw-20260517-2200
   - 4 Dateien geändert
+
+
+## [Alpha-0.2] - 2026-05-16
 
 ### 2026-05-16
 

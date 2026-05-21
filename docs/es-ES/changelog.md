@@ -61,8 +61,6 @@ Ambas versiones comparten las mismas interfaces y funcionalidades, difiriendo so
 
 ## [Sin Publicar]
 
-## Alpha-0.2
-
 ### 2026-05-22
 
 #### Correcciones de consistencia de documentación
@@ -274,6 +272,9 @@ Ambas versiones comparten las mismas interfaces y funcionalidades, difiriendo so
 
 - `7223b6f` - Registro de fin de sesión catpaw-20260517-2200
   - 4 archivos modificados
+
+
+## [Alpha-0.2] - 2026-05-16
 
 ### 2026-05-16
 

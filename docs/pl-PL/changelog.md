@@ -61,8 +61,6 @@ Obie wersje współdzielą te same interfejsy i funkcjonalność, różniąc si�
 
 ## [Nieopublikowane]
 
-## Alpha-0.2
-
 ### 2026-05-22
 
 #### Poprawki spójności dokumentacji
@@ -274,6 +272,9 @@ Obie wersje współdzielą te same interfejsy i funkcjonalność, różniąc si�
 
 - `7223b6f` - Rekord zakończenia sesji catpaw-20260517-2200
   - 4 plików zmienionych
+
+
+## [Alpha-0.2] - 2026-05-16
 
 ### 2026-05-16
 

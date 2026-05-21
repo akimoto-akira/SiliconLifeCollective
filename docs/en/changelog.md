@@ -61,8 +61,6 @@ Both versions share the same interfaces and functionality, differing only in sto
 
 ## [Unreleased]
 
-## Alpha-0.2
-
 ### 2026-05-22
 
 #### Documentation Consistency Fixes
@@ -274,6 +272,9 @@ Both versions share the same interfaces and functionality, differing only in sto
 
 - `7223b6f` - Session end record catpaw-20260517-2200
   - 4 files changed
+
+
+## [Alpha-0.2] - 2026-05-16
 
 ### 2026-05-16
 

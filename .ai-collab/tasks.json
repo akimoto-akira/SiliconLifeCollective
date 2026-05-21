@@ -1,27 +1,42 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-22T05:12:00+08:00",
+  "lastUpdated": "2026-05-22T05:35:00+08:00",
   "tasks": [
     {
       "id": "task-314",
       "type": "docs",
       "target": "docs/*/changelog.md",
       "title": "根据git记录补充所有语言changelog缺失的版本条目",
-      "description": "所有12种语言的changelog.md当前最新日期停在2026-05-16，但git记录显示项目持续活跃至2026-05-22。需要从git log逐条检查，将2026-05-17之后的所有提交按日期分类补充到每个语言的changelog.md中。注意：1) 从git第一条记录开始检查，确保早期记录也没有遗漏；2) 保持各语言changelog的现有格式和分类风格（如基础设施/功能/修复/文档等）；3) 每条记录包含commit hash和简要描述；4) 12种语言: zh-CN, en, zh-HK, ja-JP, ko-KR, fr-FR, de-DE, es-ES, it-IT, pl-PL, pt-PT, cs-CZ",
+      "description": "所有12种语言的changelog.md当前最新日期停在2026-05-16，但git记录显示项目持续活跃至2026-05-22。需要从git log逐条检查，将2026-05-17之后的所有提交按日期分类补充到每个语言的changelog.md中。",
       "priority": "P1",
       "status": "completed",
       "createdAt": "2026-05-22T04:45:57+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "coze-agent",
-      "relatedCommit": null,
+      "relatedCommit": "76546d0",
       "completedAt": "2026-05-22T05:12:00+08:00"
+    },
+    {
+      "id": "task-315",
+      "type": "docs",
+      "target": "docs/*/changelog.md",
+      "title": "修正changelog版本标记位置：Alpha-0.2对齐git tag，标记后日期归入未发布",
+      "description": "当前所有12种语言changelog.md的Alpha-0.2标记后包含了05-17至05-22的条目，但v0.2.0-alpha git tag位于2026-05-16。需将05-17及之后的条目移至[未发布]部分，Alpha-0.2标记改为[Alpha-0.2] - 2026-05-16格式。12种语言均需修改。",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-22T05:31:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": "coze-agent",
+      "relatedCommit": null,
+      "completedAt": "2026-05-22T05:35:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
     "completed": [
-      "task-314"
+      "task-314",
+      "task-315"
     ],
     "cancelled": []
   },

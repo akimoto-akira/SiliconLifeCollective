@@ -61,8 +61,6 @@ Les deux versions partagent les mêmes interfaces et fonctionnalités, différan
 
 ## [Non publié]
 
-## Alpha-0.2
-
 ### 2026-05-22
 
 #### Corrections de cohérence de la documentation
@@ -274,6 +272,9 @@ Les deux versions partagent les mêmes interfaces et fonctionnalités, différan
 
 - `7223b6f` - Enregistrement de fin de session catpaw-20260517-2200
   - 4 fichiers modifiés
+
+
+## [Alpha-0.2] - 2026-05-16
 
 ### 2026-05-16
 

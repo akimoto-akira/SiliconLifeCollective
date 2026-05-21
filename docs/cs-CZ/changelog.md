@@ -61,8 +61,6 @@ Obě verze sdílejí stejná rozhraní a funkce, liší se pouze implementací �
 
 ## [Neuvedeno]
 
-## Alpha-0.2
-
 ### 2026-05-22
 
 #### Opravy konzistence dokumentace
@@ -274,6 +272,9 @@ Obě verze sdílejí stejná rozhraní a funkce, liší se pouze implementací �
 
 - `7223b6f` - Záznam konce relace catpaw-20260517-2200
   - 4 souborů změněno
+
+
+## [Alpha-0.2] - 2026-05-16
 
 ### 2026-05-16
 

@@ -61,8 +61,6 @@ Entrambe le versioni condividono le stesse interfacce e funzionalità, differend
 
 ## [Non pubblicato]
 
-## Alpha-0.2
-
 ### 2026-05-22
 
 #### Correzioni di coerenza della documentazione
@@ -274,6 +272,9 @@ Entrambe le versioni condividono le stesse interfacce e funzionalità, differend
 
 - `7223b6f` - Registrazione fine sessione catpaw-20260517-2200
   - 4 file modificati
+
+
+## [Alpha-0.2] - 2026-05-16
 
 ### 2026-05-16
 
