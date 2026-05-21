@@ -116,7 +116,7 @@ Retorna a lista de todos os Silicon Beings.
 ]
 ```
 
-**Valores de estado**: `idle` | `running` | `waiting_permission` | `stopped`
+**Valores de atividade**: `Idle` | `SingleChat` | `GroupChat` | `Task` | `Timer` | `Broadcast` | `Project` | `MemoryCompression` | `Stopped`
 
 ### Iniciar um Being
 
@@ -311,7 +311,7 @@ Retorna a página da interface de gestão de permissões.
 
 ### Obter a lista de regras de permissão
 
-**GET** `/api/permissions/list`
+**GET** `/api/permissions`
 
 Retorna todas as regras de permissão configuradas atualmente.
 
@@ -320,10 +320,12 @@ Retorna todas as regras de permissão configuradas atualmente.
 {
   "rules": [
     {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
+      "prefix": "network:api.github.com",
+      "result": "Allowed"
+    },
+    {
+      "prefix": "file:C:\\Windows",
+      "result": "Denied"
     }
   ]
 }
@@ -331,7 +333,7 @@ Retorna todas as regras de permissão configuradas atualmente.
 
 ### Guardar regra de permissão
 
-**POST** `/api/permissions/save`
+**POST** `/api/permissions`
 
 **Pedido**:
 ```json
@@ -340,6 +342,30 @@ Retorna todas as regras de permissão configuradas atualmente.
   "resource": "disk:write",
   "allowed": true,
   "duration": 3600
+}
+```
+
+### Revogar regra de permissão
+
+**DELETE** `/api/permissions/{id}`
+
+### Verificar permissão
+
+**POST** `/api/permissions/check`
+
+**Pedido**:
+```json
+{
+  "userId": "user-uuid",
+  "resource": "network:http"
+}
+```
+
+**Resposta**:
+```json
+{
+  "allowed": true,
+  "reason": "Granted by curator"
 }
 ```
 

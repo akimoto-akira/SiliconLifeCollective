@@ -13,7 +13,7 @@
 - **Orientado por ficheiro da alma** — Cada Silicon Being é controlado por um ficheiro prompt central (`soul.md`) que define uma personalidade única e padrões de comportamento
 - **Arquitetura Body-Brain** — O *Body* (SiliconBeing) recebe os sinais vitais e deteta os cenários de ativação; o *Brain* (ContextManager) é responsável pelo carregamento do histórico, chamadas IA, execução de ferramentas e persistência das respostas
 - **Capacidade de auto-desenvolvimento** — Através da tecnologia de compilação dinâmica Roslyn, os Silicon Beings podem reescrever o seu próprio código para realizar a evolução
-- **Gestão dos estados de atividade** — Suporte para quatro estados de atividade: Idle (inativo), Working (em trabalho), Error (erro), Stopped (parado). Entrada automática no estado Stopped após 10 erros consecutivos
+- **Gestão dos estados de atividade** — Suporte para nove estados de atividade: Idle (inativo), SingleChat (chat individual), GroupChat (chat de grupo), Task (tarefa), Timer (temporizador), Broadcast (difusão), Project (projeto), MemoryCompression (compressão de memória), Stopped (parado). Entrada automática no estado Stopped após 10 erros consecutivos
 
 ### Sistema de plugins
 - **Arquitetura de extensão via plugins** — Extensão de funcionalidades através da interface IPlugin, suporta carregamento dinâmico de DLLs de plugins a partir de um diretório
@@ -44,15 +44,17 @@
 - **Zero dependências de framework frontend** — HTML/CSS/JS gerados no lado do servidor através de `H`, `CssBuilder` e `JsBuilder`
 
 ### Internacionalização e Localização
-- **Suporte completo para 33 variantes linguísticas**, cobrindo 2 sistemas de escrita e múltiplas variantes regionais
+- **Suporte completo para 33 variantes linguísticas**, cobrindo 4 sistemas de escrita e múltiplas variantes regionais
   - **Chinês simplificado**: zh-CN (China continental), zh-SG (Singapura), zh-MY (Malásia) (3 variantes)
   - **Chinês tradicional**: zh-HK (Hong Kong), zh-TW (Taiwan), zh-MO (Macau) (3 variantes)
   - **Inglês**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variantes)
   - **Espanhol**: es-ES, es-MX (2 variantes)
   - **Alemão**: de-DE, de-AT, de-CH, de-LU, de-LI (5 variantes)
   - **Francês**: fr-FR, fr-CA, fr-CH (3 variantes)
+  - **Italiano**: it-IT (1 variante)
+  - **Polaco**: pl-PL (1 variante)
+  - **Português**: pt-PT, pt-BR (2 variantes)
   - **Japonês**: ja-JP | **Coreano**: ko-KR | **Checo**: cs-CZ (3 variantes)
-  - **Italiano**: it-IT | **Polaco**: pl-PL | **Português**: pt-PT, pt-BR (4 variantes)
 
 ### Dados e Armazenamento
 - **Armazenamento SpeedyPack de alto desempenho** — A versão Fast utiliza o motor de armazenamento proprietário .spk, mapeamento de diretórios em memória + cache de entradas + fila de escrita assíncrona

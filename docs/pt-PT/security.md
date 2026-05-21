@@ -2,7 +2,7 @@
 
 > **Versão: v0.2.0-alpha**
 
-[English](../en/security.md) | [Deutsch](../de-DE/security.md) | [Français](../fr-FR/security.md) | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Čeština](../cs-CZ/security.md) | [Italiano](../it-IT/permission-system.md) | [Polski](../pl-PL/security.md) | **Português**
+[English](../en/security.md) | [Deutsch](../de-DE/security.md) | [Français](../fr-FR/security.md) | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Čeština](../cs-CZ/security.md) | [Italiano](../it-IT/security.md) | [Polski](../pl-PL/security.md) | **Português**
 
 ## Visão geral
 
@@ -38,7 +38,7 @@ Cada verificação de permissão retorna um de três resultados:
 
 ### Papel especial: Curator de silício
 
-O Curator de silício possui o nível mais alto de permissões (`IsCurator = true`). Quando a cadeia de permissões atinge a ramificação, as operações do curator passam pelo `IPermissionAskHandler` para pedir confirmação ao utilizador, em vez de serem automaticamente permitidas. Os não-curators consultam a ACL global.
+O Curator de silício possui o nível mais alto de permissões (`IsCurator = true`). As verificações de permissões para o curator são abreviadas para **Permitido**, a menos que o utilizador substitua explicitamente.
 
 ### Gestor de permissões privado
 
@@ -100,13 +100,14 @@ A prioridade de consulta é: **1. Cache de frequência → 2. Função callback 
 
 Os executores são o **único** caminho para operações I/O. Eles impõem:
 
-### Thread de despacho independente
+### Modelo de execução estático
 
-Cada executor possui uma **thread de despacho independente**:
+As implementações atuais dos executores (`DiskExecutor`, `NetworkExecutor`, `CommandLineExecutor`) são **classes estáticas** que fornecem execução síncrona com controlo de timeout:
 
-- Isolamento de threads entre executores — o bloqueio da thread de um executor não afeta os outros.
-- Cada executor pode ter limites de recursos independentes (CPU, memória, etc.).
-- Gestão do pool de threads das threads do executor.
+- Cada executor verifica as permissões através do `PermissionManager` do chamador antes de executar.
+- As operações são executadas em `Task.Run` com timeout configurável.
+- Em caso de timeout, a operação é tratada como falhada.
+- `ExecutorBase` fornece uma classe abstrata base com suporte a thread em segundo plano e fila de pedidos para extensões futuras.
 
 ### Fila de pedidos
 
@@ -116,32 +117,32 @@ Cada executor mantém uma fila de pedidos:
 - Suporta filas de prioridade.
 - Controlo de timeout por pedido.
 
-### Bloqueio de thread para verificação de permissões
+### Verificação de permissões nos executores
 
 Quando uma ferramenta inicia um acesso a recursos:
 
-1. O executor recebe o pedido e **bloqueia a sua thread**.
-2. O executor consulta o gestor de permissões privado do being.
-3. Se o callback retornar "perguntar ao utilizador", a thread do executor **mantém-se bloqueada** à espera da resposta do utilizador.
-4. O being apenas vê o resultado final (sucesso ou recusa) — nunca vê o estado intermédio de "pendente" ou "em espera".
-5. Apenas o Curator de silício aciona um pedido real ao utilizador. Os beings comuns consultam a ACL global de forma síncrona sem bloquear.
-6. Em caso de timeout, o pedido é tratado como negado e o bloqueio da thread é libertado.
+1. O executor recebe o pedido.
+2. O executor consulta o gestor de permissões privado do being através de `ServiceLocator.Instance.GetPermissionManager(callerId)`.
+3. Se a permissão for negada, a operação é bloqueada imediatamente.
+4. Se o callback retornar AskUser (caminho do curator), a thread do executor **mantém-se bloqueada** à espera da resposta do utilizador.
+5. O being apenas vê o resultado final (sucesso ou recusa) — nunca vê o estado intermédio de "pendente" ou "em espera".
+6. Apenas o Curator de silício aciona um pedido real ao utilizador. Os beings comuns consultam a ACL global de forma síncrona sem bloquear.
+7. Em caso de timeout, o pedido é tratado como negado e o bloqueio da thread é libertado.
 
 ### Tipos de executores
 
 | Executor | Âmbito | Timeout predefinido |
 |----------|-------|-----------------|
 | `DiskExecutor` | Leitura/escrita de ficheiros, operações de diretórios | 30 segundos |
-| `NetworkExecutor` | Pedidos HTTP, ligações WebSocket | 60 segundos |
-| `CommandLineExecutor` | Execução de comandos shell | 120 segundos |
-
-> **Nota**: O `DynamicCompilationExecutor` (localizado no namespace `SiliconLife.Core.Compilation`) é responsável pela compilação em memória Roslyn, não pertence à categoria de executores I/O, mas está igualmente sujeito ao sistema de permissões.
+| `NetworkExecutor` | Pedidos HTTP, ligações WebSocket | 30 segundos |
+| `CommandLineExecutor` | Execução de comandos shell | 30 segundos |
+| `DynamicCompilationExecutor` | Compilação em memória Roslyn | N/A (delega para CompilationCore) |
 
 ### Isolamento de exceções e tolerância a falhas
 
 - Uma exceção num executor não afeta os outros.
 - Reinício automático em caso de falha da thread.
-| Disjuntor: para temporariamente o executor após falhas consecutivas para prevenir falhas em cascata.
+- Disjuntor: para temporariamente o executor após falhas consecutivas para prevenir falhas em cascata.
 
 ---
 
@@ -162,7 +163,7 @@ Tabela de regras partilhada persistida no armazenamento, gerida apenas pelo Cura
 - As regras são avaliadas por ordem; a primeira correspondência vence.
 - Apenas o Curator de silício pode modificar a ACL global (através das suas ferramentas dedicadas).
 - As alterações entram em vigor imediatamente.
-- A ACL global **não** está na cadeia de prioridade de consulta acima — é referenciada internamente pela função callback.
+- A ACL global é verificada diretamente pelo `PermissionManager` para beings **não-curators** quando o callback retorna AskUser ou não há callback configurado. **Não** é referenciada pela função callback.
 
 ---
 
@@ -205,7 +206,7 @@ A interface Web exibe imediatamente um **cartão interativo**, mostrando:
 - Tipo e caminho do recurso
 - Descrição da operação
 - Botões Permitir / Negar
-| Caixa de seleção opcional "Permitir sempre" / "Negar sempre" (adicionar à cache de frequência)
+- Caixa de seleção opcional "Permitir sempre" / "Negar sempre" (adicionar à cache de frequência)
 
 ### Mensageiro instantâneo (sem suporte para cartões): Código aleatório
 
@@ -219,7 +220,7 @@ Para plataformas de mensagens que não suportam cartões interativos:
 ### Timeout
 
 - Um timeout é definido para todos os pedidos de "perguntar ao utilizador".
-| Em caso de timeout, o pedido é tratado como **negado** e o bloqueio da thread do executor é libertado.
+- Em caso de timeout, o pedido é tratado como **negado** e o bloqueio da thread do executor é libertado.
 
 ---
 

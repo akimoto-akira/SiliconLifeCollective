@@ -52,7 +52,7 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 - Maia (Mayan)
 - Budista (Buddhist)
 - Tibetano (Tibetan)
-- E mais 22 outros calendários...
+- E mais 24 outros calendários...
 
 **Exemplo de uso**:
 ```json

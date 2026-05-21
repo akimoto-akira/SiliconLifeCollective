@@ -20,7 +20,7 @@ Este projeto oferece duas versões de implementação, que partilham o mesmo des
 - **Modo de execução**: Aplicação desktop (Windows/macOS bandeja do sistema / Linux janela de estado)
 - **Método de armazenamento**: Armazenamento em memória SpeedyPack + persistência em lote assíncrona (formato de ficheiro .spk)
 - **Cenários aplicáveis**: Alta concorrência, baixa latência, grandes volumes de dados
-- **Suporte de plataforma**: Windows (funcionalidades completas, incluindo bandeja do sistema), Linux (janela de estado, sem ícone na bandeja)
+- **Suporte de plataforma**: Windows/macOS (funcionalidades completas, incluindo bandeja do sistema), Linux (janela de estado, sem ícone na bandeja)
 - **Características**:
   - Windows/macOS execução em segundo plano na bandeja do sistema, monitorização em tempo real através da janela de estado; Linux janela de estado exibida diretamente
   - Motor SpeedyPack + compressão automática que garante a segurança dos dados

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-22T21:00:00+08:00",
+  "lastUpdated": "2026-05-22T23:30:00+08:00",
   "tasks": [
     {
       "id": "task-301",
@@ -257,7 +257,7 @@
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "relatedCommit": null,
+      "relatedCommit": "6ea9f4a",
       "completedAt": "2026-05-22T21:00:00+08:00",
       "modifiedFiles": [
         "docs/pl-PL/README.md",
@@ -278,12 +278,21 @@
       "title": "Analisar a coerência da documentação em português (pt-PT) com o código-fonte e corrigir as discrepâncias",
       "description": "Comparar todos os documentos no diretório docs/pt-PT/ com a implementação atual do código-fonte, identificar conteúdo desatualizado, impreciso ou omisso na documentação, verificar a integridade da tradução em relação ao documento de referência em inglês (en), elaborar uma lista de discrepâncias e corrigir a documentação para a sincronizar com o código-fonte.",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-22T23:30:00+08:00",
+      "modifiedFiles": [
+        "docs/pt-PT/README.md",
+        "docs/pt-PT/architecture.md",
+        "docs/pt-PT/permission-system.md",
+        "docs/pt-PT/api-reference.md",
+        "docs/pt-PT/security.md",
+        "docs/pt-PT/development-guide.md",
+        "docs/pt-PT/tools-reference.md"
+      ]
     },
     {
       "id": "task-313",
@@ -302,11 +311,10 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-312",
       "task-313"
     ],
     "inProgress": [],
-    "completed": ["task-301", "task-302", "task-303", "task-304", "task-305", "task-306", "task-307", "task-308", "task-309", "task-310", "task-311"],
+    "completed": ["task-301", "task-302", "task-303", "task-304", "task-305", "task-306", "task-307", "task-308", "task-309", "task-310", "task-311", "task-312"],
     "cancelled": []
   },
   "metadata": {
