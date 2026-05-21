@@ -8,36 +8,46 @@
 
 权限系统确保所有 AI 发起的操作都经过适当验证和审计。
 
-## 5 级权限链
+## 权限验证链
 
 ```
 ┌─────────────────────────────────────────────┐
 │          权限验证                            │
 ├─────────────────────────────────────────────┤
 │  级别 1：UserFrequencyCache                  │
-│  ↓ 速率限制缓存                              │
+│  ↓ 高频用户决策缓存（HighDeny/HighAllow）    │
 │  级别 2：IPermissionCallback                 │
-│  ↓ 自定义逻辑                                │
-│  级别 3：分支判断                             │
-│  ├─ IsCurator → IPermissionAskHandler        │
-│  │  ↓ 主理人：询问用户确认                    │
-│  └─ Non-curator → GlobalACL                  │
-│     ↓ 非主理人：访问控制列表                  │
+│  ↓ 自定义逻辑（Allowed/Denied/AskUser）     │
+│  级别 3：IsCurator?                          │
+│  ↓ 是 → IPermissionAskHandler（询问用户）    │
+│  ↓ 否 → GlobalACL → 默认拒绝                │
 │  结果：允许或拒绝                            │
 └─────────────────────────────────────────────┘
 ```
 
+> **注意**：`PermissionManager.CheckPermission()` 的实际查询优先级为：
+> 1. **UserFrequencyCache** — 首先检查高频用户决策缓存
+> 2. **IPermissionCallback** — 评估自定义回调规则
+> 3. **主理人分支** — 当回调返回 AskUser 或无回调时：
+>    - **主理人** → `IPermissionAskHandler`（通过 IM 询问用户）
+>    - **非主理人** → `GlobalACL` → 默认拒绝
+
 ## 级别 1：UserFrequencyCache
 
-每个用户的速率限制以防止滥用。
+每个生命体的高频用户决策缓存（HighDeny/HighAllow），仅存在于内存中。
 
 ```csharp
 var cache = new UserFrequencyCache();
-if (!cache.CheckLimit(userId, resource))
+PermissionResult? cachedResult = cache.Query(permissionType, resource);
+if (cachedResult.HasValue)
 {
-    return PermissionResult.Denied("Rate limit exceeded");
+    return cachedResult.Value == PermissionResult.Allowed;
 }
 ```
+
+- **HighDeny 优先于 HighAllow**
+- **仅内存**：缓存不持久化，重启后丢失
+- **可配置过期时间**：用户可以设置缓存条目的有效期
 
 ## 级别 2：IPermissionCallback
 
@@ -69,33 +79,32 @@ if (!cache.CheckLimit(userId, resource))
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {
-    public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+    public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
     {
-        // 自定义逻辑
-        if (IsSafeOperation(request))
+        if (IsSafeOperation(permissionType, resource))
         {
-            return PermissionResult.Allowed("Safe operation");
+            return PermissionResult.Allowed;
         }
         
-        return PermissionResult.Undecided("Needs user confirmation");
+        return PermissionResult.AskUser;
     }
 }
 ```
 
 ## 级别 3：分支判断（IsCurator / GlobalACL）
 
-当级别 1 和级别 2 都未做出决定时，系统根据调用者身份进行分支：
+当回调返回 `AskUser` 或没有配置回调时，系统根据主理人身份进行分支：
 
 ### 主理人分支（IsCurator = true）
 
-如果调用者是主理人，则进入 `IPermissionAskHandler` 询问用户确认：
+对于硅基主理人，系统通过即时通讯向用户请求决策：
 
 ```csharp
 if (IsCurator)
 {
     if (_askHandler != null)
     {
-        var result = await _askHandler.AskAsync(request);
+        AskPermissionResult userDecision = _askHandler.AskUser(callerId, permissionType, resource);
         // 用户在 Web UI 中确认或拒绝
     }
 }
@@ -103,7 +112,7 @@ if (IsCurator)
 
 ### 非主理人分支（IsCurator = false）
 
-如果调用者不是主理人，则检查 `GlobalACL` 访问控制列表：
+对于非主理人生命体，系统检查全局访问控制列表。如果没有匹配的规则，默认拒绝请求。
 
 ### GlobalACL 结构
 
@@ -111,26 +120,30 @@ if (IsCurator)
 {
   "rules": [
     {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
+      "permissionType": "NetworkAccess",
+      "resourcePrefix": "api.github.com",
+      "result": "Allowed"
+    },
+    {
+      "permissionType": "FileAccess",
+      "resourcePrefix": "C:\\Windows",
+      "result": "Denied"
     }
   ]
 }
 ```
 
+规则按顺序评估，第一个匹配的规则生效。只有硅基主理人可以修改全局 ACL。
+
 ### 资源格式
 
 ```
-{type}:{action}
+{type}:{path}
 
 示例：
-- disk:read
-- disk:write
-- network:http
-- compile:execute
-- system:info
+- network:api.github.com
+- file:C:\\Windows
+- cli:rm -rf
 ```
 
 ## IPermissionAskHandler
@@ -144,14 +157,14 @@ if (IsCurator)
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
 {
-    public async Task<AskPermissionResult> AskAsync(PermissionRequest request)
+    public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
     {
         // 通过即时通讯向用户发送消息
-        await SendMessageAsync($"Allow {request.Resource}?");
-        
+        SendMessageAsync($"Allow {resource}?");
+
         // 等待用户响应
-        var response = await WaitForResponseAsync();
-        
+        var response = WaitForResponseAsync();
+
         return response.Approved 
             ? AskPermissionResult.Approved()
             : AskPermissionResult.Denied();
@@ -176,11 +189,11 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 ```json
 {
   "timestamp": "2026-04-20T10:30:00Z",
-  "userId": "user-uuid",
-  "resource": "disk:write",
-  "allowed": true,
-  "level": "GlobalACL",
-  "reason": "Explicit rule granted"
+  "callerId": "being-uuid",
+  "permissionType": "FileAccess",
+  "resource": "C:\\data\\config.json",
+  "result": "Allowed",
+  "reason": "Global ACL"
 }
 ```
 
@@ -229,10 +242,10 @@ public PermissionResult EvaluatePermission(
 curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "userId": "user-uuid",
-    "resource": "disk:write",
-    "allowed": true,
-    "duration": 3600
+    "permissionType": "FileAccess",
+    "resourcePrefix": "C:\\Projects",
+    "result": "Allowed",
+    "description": "Allow project directory access"
   }'
 ```
 
@@ -254,9 +267,9 @@ curl http://localhost:8080/api/permissions/list
 
 ```json
 {
-  "resource": "disk:read",  // 不是 disk:*
-  "allowed": true,
-  "expiresAt": "2026-04-21T00:00:00Z"  // 始终设置过期
+  "permissionType": "FileAccess",
+  "resourcePrefix": "C:\\Projects\\MyApp\\config.json",
+  "result": "Allowed"
 }
 ```
 
@@ -276,21 +289,21 @@ curl http://localhost:8080/api/permissions/list
 对于复杂逻辑，使用 `IPermissionCallback`：
 
 ```csharp
-public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
 {
     // 基于时间的权限
     if (IsOutsideBusinessHours())
     {
-        return PermissionResult.Denied("Outside business hours");
+        return PermissionResult.Denied;
     }
     
     // 基于资源的权限
-    if (IsSensitiveResource(request.Resource))
+    if (IsSensitiveResource(resource))
     {
-        return PermissionResult.Undecided("Requires approval");
+        return PermissionResult.AskUser;
     }
     
-    return PermissionResult.Allowed();
+    return PermissionResult.Allowed;
 }
 ```
 
@@ -302,10 +315,11 @@ public async Task<PermissionResult> CheckAsync(PermissionRequest request)
 AI："我需要读取 config.json"
 ↓
 权限链：
-1. 速率限制？正常
-2. 回调？返回未决定
-3. IsCurator？否 → GlobalACL？找到规则：disk:read = 允许
-4. 结果：允许
+1. UserFrequencyCache？无缓存决策
+2. IPermissionCallback？返回 AskUser（未明确允许）
+3. IsCurator？否 → 检查 GlobalACL
+4. GlobalACL？找到规则：file:... = Allowed
+5. 结果：允许
 ```
 
 ### 场景 2：AI 想要执行代码
@@ -314,20 +328,21 @@ AI："我需要读取 config.json"
 AI："我想编译和运行代码"
 ↓
 权限链：
-1. 速率限制？正常
-2. 回调？返回未决定
-3. IsCurator？是 → IPermissionAskHandler → 用户批准
-4. 结果：允许
+1. UserFrequencyCache？无缓存决策
+2. IPermissionCallback？返回 AskUser
+3. IsCurator？是 → IPermissionAskHandler
+4. 用户批准
+5. 结果：允许
 ```
 
-### 场景 3：超过速率限制
+### 场景 3：缓存拒绝
 
 ```
-AI："我需要发出 100 个 HTTP 请求"
+AI："我需要访问 C:\Windows"
 ↓
 权限链：
-1. 速率限制？已超过
-2. 结果：拒绝
+1. UserFrequencyCache？在 HighDeny 缓存中找到
+2. 结果：拒绝（无需进一步检查）
 ```
 
 ## 故障排除
@@ -336,7 +351,7 @@ AI："我需要发出 100 个 HTTP 请求"
 
 **检查**：
 1. 用户的 IsCurator 状态
-2. 速率限制设置
+2. 频率缓存中的 HighDeny 条目
 3. GlobalACL 规则
 4. 回调逻辑
 5. 用户响应超时

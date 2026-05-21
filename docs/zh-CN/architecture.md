@@ -717,19 +717,23 @@ public interface IPlugin
 | 状态 | 描述 |
 |------|------|
 | `Idle` | 空闲状态，等待时钟触发 |
-| `Working` | 正在执行一轮 AI 请求 + 工具调用 |
-| `Error` | 执行过程中出现错误 |
+| `SingleChat` | 正在进行一对一聊天 |
+| `GroupChat` | 正在进行群聊 |
+| `Task` | 正在执行任务 |
+| `Timer` | 正在执行定时器 |
 | `Stopped` | 已停止，因连续错误或手动停止 |
 
 **Stopped 状态机制**：
 - 当硅基生命体连续发生 10 次错误时，自动进入 `Stopped` 状态
 - 进入 Stopped 状态后，生命体将不再执行任何任务
-- 需要手动干预才能重新启动
+- 当有新的聊天消息到达时，错误计数器会被重置，生命体恢复运行
 
 状态转换：
 ```
-Idle → Working → Idle（正常完成）
-Working → Error → Working（错误恢复）
-Working → Stopped（连续 10 次错误或手动停止）
-Stopped → Idle（重新启动）
+Idle → SingleChat → Idle（聊天完成）
+Idle → GroupChat → Idle（群聊完成）
+Idle → Task → Idle（任务完成）
+Idle → Timer → Idle（定时器完成）
+任意 → Stopped（连续 10 次错误）
+Stopped → Idle（新聊天消息到达或手动重启）
 ```

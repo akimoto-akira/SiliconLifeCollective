@@ -192,10 +192,10 @@ public class MySkin : ISkin
 
 1. 点击**添加规则**
 2. 配置：
-   - 用户
-   - 资源（例如 `disk:read`）
+   - 权限类型（如 `FileAccess`, `NetworkAccess`）
+   - 资源前缀（如 `C:\Projects`, `api.github.com`）
    - 允许/拒绝
-   - 持续时间
+   - 描述
 3. 保存
 
 ### 审计跟踪

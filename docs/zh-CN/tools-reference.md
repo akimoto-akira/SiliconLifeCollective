@@ -185,7 +185,7 @@
 - `read_lines` — 读取指定行
 - `replace_text` — 替换文本
 
-**权限要求**: `disk:read`, `disk:write`
+**权限要求**: `FileAccess`
 
 **使用示例**:
 ```json
@@ -710,13 +710,11 @@
 
 ## 权限验证
 
-所有工具执行都通过 5 级权限链：
+所有工具执行都通过权限验证链：
 
-1. **IsCurator** — 硅基主理人绕过所有检查
-2. **UserFrequencyCache** — 用户高频允许/拒绝缓存
-3. **GlobalACL** — 全局访问控制列表
-4. **IPermissionCallback** — 自定义权限回调函数
-5. **IPermissionAskHandler** — 询问用户
+1. **UserFrequencyCache** — 高频用户决策缓存（HighDeny 优先于 HighAllow）
+2. **IPermissionCallback** — 自定义权限回调函数（Allowed/Denied/AskUser）
+3. **IsCurator 分支** — 主理人通过 IPermissionAskHandler 询问用户；非主理人查询 GlobalACL，无匹配规则则默认拒绝
 
 ## 创建自定义工具
 
@@ -817,10 +815,10 @@ catch (Exception ex)
 永远不要绕过权限检查。始终通过执行器访问资源：
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+bool allowed = permissionManager.CheckPermission(callerId, permissionType, resource);
+if (!allowed)
 {
-    return ToolResult.Denied(permission.Reason);
+    return ToolResult.Denied("Permission denied");
 }
 ```
 

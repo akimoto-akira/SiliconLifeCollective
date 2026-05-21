@@ -55,9 +55,9 @@ public interface ITool
 
 ### 3. 权限系统
 
-5 级权限验证链：
+3 级权限验证链：
 ```
-UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL)
+UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL → 默认拒绝)
 ```
 
 ### 4. 服务定位器
@@ -447,10 +447,10 @@ public class MyToolTests
 任何 AI 发起的操作必须通过权限链：
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+bool allowed = permissionManager.CheckPermission(callerId, permissionType, resource);
+if (!allowed)
 {
-    return Result.Denied(permission.Reason);
+    return Result.Denied("Permission denied");
 }
 ```
 

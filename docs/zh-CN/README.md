@@ -26,7 +26,7 @@
 - **热重载工具** — 支持 SiliconLife.Fast 在运行中自动编译、更新文件并重启，无需手动干预
 - **工具调用循环** — AI 返回工具调用 → 执行工具 → 结果反馈给 AI → 持续循环直到返回纯文本响应
 - **执行器-权限安全** — 所有 I/O 操作通过执行器进行严格的权限验证
-  - 5 级权限链：UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL)
+  - 3 级权限验证链：UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL → 默认拒绝)
   - 完整的审计日志记录所有权限决策
 
 ### AI 与知识

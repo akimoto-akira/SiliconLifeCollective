@@ -32,9 +32,9 @@ Silicon Life Collective 的安全性建立在**分层防御**模型之上。核�
 
 | 结果 | 行为 |
 |--------|----------|
-| [Deutsch](../de-DE/security.md) | **Allowed（允许）** | 操作立即进行 |
-| [Deutsch](../de-DE/security.md) | **Denied（拒绝）** | 操作被阻止，记录审计日志 |
-| [Deutsch](../de-DE/security.md) | **AskUser（询问用户）** | 操作暂停，需要用户确认 |
+| **Allowed（允许）** | 操作立即进行 |
+| **Denied（拒绝）** | 操作被阻止，记录审计日志 |
+| **AskUser（询问用户）** | 操作暂停，需要用户确认 |
 
 ### 特殊角色：硅基主理人
 
@@ -344,5 +344,5 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 ### 工具权限约束
 
 - 插件通过 `ITool` 接口注册的工具受相同的权限系统约束
-- 插件工具不能绕过 5 级权限链
+- 插件工具不能绕过权限验证链
 - 插件工具受 `[SiliconManagerOnly]` 标记约束

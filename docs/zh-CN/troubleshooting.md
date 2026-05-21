@@ -179,23 +179,24 @@ mkdir logs
 
 **症状**：
 ```
-Permission denied: disk:write
+Permission denied: FileAccess C:\Windows
 ```
 
 **解决方案**：
 1. 检查当前权限：
 ```bash
-curl http://localhost:8080/api/permissions
+curl http://localhost:8080/api/permissions/list
 ```
 
 2. 授予权限：
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "resource": "disk:write",
-    "allowed": true,
-    "duration": 3600
+    "permissionType": "FileAccess",
+    "resourcePrefix": "C:\\Projects",
+    "result": "Allowed",
+    "description": "Allow project directory access"
   }'
 ```
 
