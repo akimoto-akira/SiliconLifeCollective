@@ -527,3 +527,18 @@
 2026-05-22T12:00:00+08:00 | trae-glm5 | task_claim | task=task-305 | type=docs | target=docs/ja-JP
 2026-05-22T14:30:00+08:00 | trae-glm5 | task_complete | task=task-305 | type=docs | target=docs/ja-JP | files=permission-system.md,architecture.md,security.md,tools-reference.md,api-reference.md
 2026-05-22T14:30:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260522-1200
+2026-05-22T13:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260522-1300 | task=task-306
+2026-05-22T13:00:00+08:00 | trae-glm5 | task_claim | task=task-306 | type=docs | target=docs/ko-KR
+2026-05-22T13:30:00+08:00 | trae-glm5 | file_modified | docs/ko-KR/development-guide.md | fix=의존방향,권한5단계→3단계,도구/AI클라이언트/스킨경로,Executor예제
+2026-05-22T13:45:00+08:00 | trae-glm5 | file_modified | docs/ko-KR/README.md | fix=4가지문자체계,5단계→3단계권한체인,DashScope(Bailian),시스템트레이
+2026-05-22T14:00:00+08:00 | trae-glm5 | file_modified | docs/ko-KR/getting-started.md | fix=Bailian→DashScope,qwen3.6-plus,beijing지역,soul.md예제,5단계권한체인
+2026-05-22T14:15:00+08:00 | trae-glm5 | file_modified | docs/ko-KR/troubleshooting.md | fix=백련→DashScope
+2026-05-22T14:20:00+08:00 | trae-glm5 | file_modified | docs/ko-KR/web-ui-guide.md | fix=Bailian→DashScope
+2026-05-22T14:30:00+08:00 | trae-glm5 | file_modified | docs/ko-KR/permission-system.md | fix=3단계분기→3단계권한체인,HighDeny/HighAllow,IsCurator분기설명
+2026-05-22T14:45:00+08:00 | trae-glm5 | file_modified | docs/ko-KR/security.md | fix=Curator→AskUser/NonCurator→GlobalACL,큐레이터설명,권한흐름도,HighDeny/HighAllow
+2026-05-22T15:00:00+08:00 | trae-glm5 | file_modified | docs/ko-KR/tools-reference.md | fix=3단계분기→5단계권한검증체인
+2026-05-22T15:15:00+08:00 | trae-glm5 | file_modified | docs/ko-KR/roadmap.md | fix=백련→DashScope,IsCurator분기
+2026-05-22T15:30:00+08:00 | trae-glm5 | file_modified | docs/ko-KR/architecture.md | fix=Bailian→DashScope API
+2026-05-22T15:45:00+08:00 | trae-glm5 | file_modified | docs/ko-KR/changelog.md | fix=알리바이백련→알리바바클라우드DashScope
+2026-05-22T16:00:00+08:00 | trae-glm5 | task_complete | task=task-306 | modifiedFiles=11 | summary=修正ko-KR文档与源代码一致性差异(权限链级别,AI客户端命名,依赖方向,模型/区域配置等)
+2026-05-22T16:00:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260522-1300 | task=task-306

@@ -275,7 +275,7 @@
   - **추론**: qwq-plus
   - **서드파티**: deepseek-v3.2, deepseek-r1, glm-5.1, kimi-k2.5, llama-4-maverick
 - **설정**: `apiKey`, `region`, `model`
-- **모델 발견**: 런타임에 Bailian API에서 사용 가능한 모델 가져오기; 네트워크 장애 시 선별된 목록으로 폴백
+- **모델 발견**: 런타임에 DashScope API에서 사용 가능한 모델 가져오기; 네트워크 장애 시 선별된 목록으로 폴백
 
 ### VolcengineArkClient (Volcengine Ark)
 

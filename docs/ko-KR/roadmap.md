@@ -133,7 +133,7 @@
 
 | # | 모듈 | 설명 |
 |---|--------|-------------|
-| 6.1 | PermissionManager | 생명체별 프라이빗 인스턴스. 콜백 기반, 3항 결과 (허용/거부/사용자에게 문의). 쿼리 우선순위: HighDeny → HighAllow → Callback. IsCurator 플래그 |
+| 6.1 | PermissionManager | 생명체별 프라이빗 인스턴스. 콜백 기반, 3항 결과 (허용/거부/사용자에게 문의). 쿼리 우선순위: HighDeny → HighAllow → Callback. IsCurator 분기 |
 | 6.2 | PermissionType 열거형 | NetworkAccess, CommandLine, FileAccess, Function, DataAccess |
 | 6.3 | DefaultPermissionCallback | 네트워크 화이트리스트/블랙리스트, CLI 분류, 파일 경로 보안 규칙 |
 | 6.4 | GlobalACL | 접두사 일치 규칙 테이블, 저장소에 지속 |
@@ -244,14 +244,14 @@
 | 10.5.8 | DiskTool 향상 | 새 작업: count_lines, read_lines, clear_file, replace_lines, replace_text, replace_text_all, list_drives |
 | 10.5.9 | SystemTool 향상 | 새 작업: find_process (와일드카드 지원), resource_usage |
 | 10.5.10 | CalendarTool 향상 | 새 작업: diff, list_calendars, get_components, get_now_components, convert (캘린더 간 변환) |
-| 10.5.11 | DashScopeClient | 알리바운 백련 AI 클라이언트, OpenAI API 호환. 스트리밍, 도구 호출, 추론 콘텐츠 지원 |
-| 10.5.12 | DashScopeClientFactory | 백련 클라이언트 생성을 위한 팩토리. API를 통한 동적 모델 발견. 다중 지역 지원 (베이징, 버지니아, 싱가포르, 홍콩, 프랑크푸르트) |
+| 10.5.11 | DashScopeClient | 알리바바 클라우드 DashScope AI 클라이언트, OpenAI API 호환. 스트리밍, 도구 호출, 추론 콘텐츠 지원 |
+| 10.5.12 | DashScopeClientFactory | DashScope 클라이언트 생성을 위한 팩토리. API를 통한 동적 모델 발견. 다중 지역 지원 (베이징, 버지니아, 싱가포르, 홍콩, 프랑크푸르트) |
 | 10.5.13 | AI 클라이언트 구성 시스템 | 생명체별 AI 클라이언트 구성. 동적 구성 키 옵션 (모델, 지역). 로컬라이제이션 표시 이름 |
-| 10.5.14 | 로컬라이제이션 확장 | 백련 구성 옵션, 모델 이름 및 지역 이름을 위한 중국어 간체, 중국어 번체, 영어 및 일본어 로컬라이제이션 |
+| 10.5.14 | 로컬라이제이션 확장 | DashScope 구성 옵션, 모델 이름 및 지역 이름을 위한 중국어 간체, 중국어 번체, 영어 및 일본어 로컬라이제이션 |
 
 **결과물**: 향상된 도구, 가시성, 캘린더 범위 및 다중 AI 백엔드 지원.
 
-**검증**: 큐레이터가 TokenAuditTool로 토큰 사용 쿼리 → 감사 대시보드에 추세 표시 → CalendarTool이 32개 캘린더 시스템 간 날짜 변환 → AI 백엔드를 백련으로 전환 → 클라우드 API를 통해 통의천문 모델과 채팅.
+**검증**: 큐레이터가 TokenAuditTool로 토큰 사용 쿼리 → 감사 대시보드에 추세 표시 → CalendarTool이 32개 캘린더 시스템 간 날짜 변환 → AI 백엔드를 DashScope로 전환 → 클라우드 API를 통해 통의천문 모델과 채팅.
 
 ---
 

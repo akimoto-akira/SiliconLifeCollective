@@ -1,0 +1,22 @@
+{
+  "sessionId": "trae-glm5-20260522-1300",
+  "actorId": "trae-glm5",
+  "startTime": "2026-05-22T13:00:00+08:00",
+  "endTime": "2026-05-22T16:00:00+08:00",
+  "status": "completed",
+  "selectedTask": "task-306",
+  "modifiedFiles": [
+    "docs/ko-KR/development-guide.md",
+    "docs/ko-KR/README.md",
+    "docs/ko-KR/getting-started.md",
+    "docs/ko-KR/troubleshooting.md",
+    "docs/ko-KR/web-ui-guide.md",
+    "docs/ko-KR/permission-system.md",
+    "docs/ko-KR/security.md",
+    "docs/ko-KR/tools-reference.md",
+    "docs/ko-KR/roadmap.md",
+    "docs/ko-KR/architecture.md",
+    "docs/ko-KR/changelog.md"
+  ],
+  "changeRecord": "changes/trae-glm5-20260522-1300.json"
+}

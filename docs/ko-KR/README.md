@@ -26,14 +26,14 @@
 - **핫 리로드 도구** — SiliconLife.Fast 가 실행 중인 동안 자동으로 컴파일, 파일 업데이트 및 재시작 지원, 수동 개입 불필요
 - **도구 호출 루프** — AI가 도구 호출 반환 → 도구 실행 → 결과를 AI에 피드백 → 순수 텍스트 응답 반환까지 지속 루프
 - **실행기-권한 보안** — 모든 I/O 작업은 실행기를 통해 엄격한 권한 검증 수행
-  - 3단계 분기 권한 체인: UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL)
+  - 5단계 권한 체인: UserFrequencyCache → IPermissionCallback → (Curator→IPermissionAskHandler / NonCurator→GlobalACL→Deny)
   - 모든 권한 결정을 완전한 감사 로그로 기록
 
 ### AI 및 지식
 - **다중 AI 백엔드 지원**
   - **Ollama** — 로컬 모델 배포, 네이티브 HTTP API 사용
-  - **알리바바 클라우드 Bailian(DashScope)** — 클라우드 AI 서비스, OpenAI API 호환, 13개 이상 모델 지원, 다중 지역 배포
-  - **Volcengine Ark(VolcengineArk)** — ByteDance 클라우드 AI 서비스, 스트리밍 및 비스트리밍 모드 지원, 내장 속도 제어
+  - **알리바바 클라우드 DashScope(Bailian)** — 클라우드 AI 서비스, OpenAI API 호환, 13개 이상 모델 지원, 다중 지역 배포
+  - **Volcengine Ark** — ByteDance 클라우드 AI 서비스, 스트리밍 및 비스트리밍 모드 지원, 내장 이중 속도 제어
 - **32가지 달력 시스템** — 전 세계 주요 달력 완전 커버, 양력, 음력, 이슬람력, 히브리력, 일본력, 페르시아력, 마야력, 중국 역사력 등 포함
 - **지식 네트워크 시스템** — 트리플(주어-관계-목적어) 기반 지식 그래프, 저장, 쿼리 및 경로 발견 지원
 
@@ -44,15 +44,17 @@
 - **프론트엔드 프레임워크 의존성 제로** — `H`, `CssBuilder`, `JsBuilder`를 통해 서버에서 HTML/CSS/JS 생성
 
 ### 국제화 및 지역화
-- **33 개 언어 변형** 전면 지원, 2 가지 문자 시스템과 여러 지역 변형 커버
+- **33 개 언어 변형** 전면 지원, 4 가지 문자 체계와 여러 지역 변형 커버
   - **중국어 간체**：zh-CN (중국 본토), zh-SG (싱가포르), zh-MY (말레이시아) (3 개)
   - **중국어 번체**：zh-HK (홍콩), zh-TW (대만), zh-MO (마카오) (3 개)
   - **영어**：en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 개)
   - **스페인어**：es-ES, es-MX (2 개)
   - **독일어**：de-DE, de-AT, de-CH, de-LU, de-LI (5 개)
   - **프랑스어**：fr-FR, fr-CA, fr-CH (3 개)
+  - **이탈리아어**：it-IT (1 개)
+  - **폴란드어**：pl-PL (1 개)
+  - **포르투갈어**：pt-PT, pt-BR (2 개)
   - **일본어**：ja-JP | **한국어**：ko-KR | **체코어**：cs-CZ (3 개)
-  - **이탈리아어**：it-IT | **폴란드어**：pl-PL | **포르투갈어**：pt-PT, pt-BR (4 개)
 
 ### 데이터 및 스토리지
 - **SpeedyPack 고성능 스토리지** — Fast 버전에서 자체 개발 .spk 스토리지 엔진 사용, 메모리 디렉토리 매핑 + 항목 캐시 + 비동기 쓰기 큐
@@ -115,13 +117,13 @@
 | 런타임 | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | 프로그래밍 언어 | C# | C# |
 | 애플리케이션 유형 | 콘솔 애플리케이션 | 데스크톱 애플리케이션 (Windows/macOS 시스템 트레이 / Linux 상태 창) |
-| AI 통합 | Ollama (로컬), 알리바바 클라우드 Bailian (클라우드) | Ollama (로컬), 알리바바 클라우드 Bailian (클라우드), Volcengine Ark (클라우드) |
+| AI 통합 | Ollama (로컬), 알리바바 클라우드 DashScope (클라우드) | Ollama (로컬), 알리바바 클라우드 DashScope (클라우드), Volcengine Ark (클라우드) |
 | 데이터 스토리지 | 파일 시스템 (JSON + 시간 인덱스 디렉토리) | SpeedyPack (.spk 형식, 메모리 매핑 + 비동기 영속화) |
 | 웹 서버 | HttpListener (.NET 내장) | HttpListener (.NET 내장) |
 | 동적 컴파일 | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
 | 브라우저 자동화 | Playwright (WebView) | Playwright (WebView) |
 | 플러그인 시스템 | ✅ 지원 (IPlugin + PluginLoader) | ✅ 지원 (IPlugin + PluginLoader) |
-| 시스템 트레이 | ❌ 미지원 | ✅ 지원 (NotifyIcon) |
+| 시스템 트레이 | ❌ 미지원 | ✅ Windows/macOS 지원 (NotifyIcon); Linux 트레이 아이콘 없음 |
 | 라이선스 | Apache-2.0 | Apache-2.0 |
 
 ## 📁 프로젝트 구조
@@ -251,7 +253,7 @@ SiliconLifeCollective.sln
 모든 AI가 시작하는 I/O 작업은 엄격한 보안 체인을 통과해야 합니다:
 
 ```
-도구 호출 → 실행기 → 권한 관리자 → [주파수 캐시 → 콜백 → (IsCurator: 사용자에게 문의 | Non-curator: 글로벌 ACL)]
+도구 호출 → 실행기 → 권한 관리자 → [주파수 캐시 → 콜백 → (Curator→AskUser / NonCurator→GlobalACL→Deny)]
 ```
 
 ## 🚀 빠른 시작
@@ -261,7 +263,7 @@ SiliconLifeCollective.sln
 - **.NET 9 SDK** — [다운로드 링크](https://dotnet.microsoft.com/download/dotnet/9.0)
 - **AI 백엔드** (둘 중 하나 선택):
   - **Ollama**: [Ollama 설치](https://ollama.com) 및 모델 풀 (예: `ollama pull llama3`)
-  - **알리바바 클라우드 Bailian**: [Bailian 콘솔](https://bailian.console.aliyun.com/)에서 API 키 획득
+  - **알리바바 클라우드 DashScope**: [DashScope 콘솔](https://bailian.console.aliyun.com/)에서 API 키 획득
   - **Volcengine Ark**: [Volcengine 콘솔](https://console.volcengine.com/ark)에서 API 키 획득
 
 ### 프로젝트 빌드
@@ -331,7 +333,7 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] 단계 3: 첫 번째 소울 파일 포함 실리콘 생명체 (신체-두뇌 아키텍처)
 - [x] 단계 4: 영속성 메모리 (채팅 시스템 + 시간 스토리지 인터페이스)
 - [x] 단계 5: 도구 시스템 + 실행기
-- [x] 단계 6: 권한 시스템 (3단계 분기 체인, 감사 로거, 글로벌 액세스 제어 목록)
+- [x] 단계 6: 권한 시스템 (3단계 권한 체인, 감사 로거, 글로벌 액세스 제어 목록)
 - [x] 단계 7: 동적 컴파일 + 자가 진화 (Roslyn)
 - [x] 단계 8: 장기 메모리 + 작업 + 타이머
 - [x] 단계 9: 핵심 호스트 + 멀티 에이전트 협업

@@ -23,9 +23,10 @@ SiliconLifeCollective/
 ```
 
 **의존 방향**:
-- `SiliconLife.Default` → `SiliconLife.Core` (단방향)
-- `SiliconLife.Fast` → `SiliconLife.Core` (단방향)
-- `SiliconLife.Common` → `SiliconLife.Core` (단방향)
+- `SiliconLife.Default` → `SiliconLife.Core` + `SiliconLife.Common` + `SiliconLife.App`
+- `SiliconLife.Fast` → `SiliconLife.Core` + `SiliconLife.Common` + `SiliconLife.App` + `SiliconLife.Speedy`
+- `SiliconLife.Common` → `SiliconLife.Core`
+- `SiliconLife.App` → `SiliconLife.Core` + `SiliconLife.Common`
 
 **버전 역할 설명**:
 - **SiliconLife.Default**: 기본 구현, 아키텍처 실현 가능성 검증에 주로 사용. 단순하고 신뢰성 높은 파일 시스템 저장소 구현을 제공하며, 개발 디버깅과 아키텍처 검증에 적합합니다.
@@ -55,9 +56,9 @@ public interface ITool
 
 ### 3. 권한 시스템
 
-3단계 분기 권한 검증 체인:
+5단계 권한 검증 체인:
 ```
-UserFrequencyCache → IPermissionCallback → IsCurator 분기 (큐레이터: AskHandler / 비큐레이터: GlobalACL → 기본 거부)
+UserFrequencyCache → IPermissionCallback → (Curator→IPermissionAskHandler / NonCurator→GlobalACL→Deny)
 ```
 
 ### 4. 서비스 로케이터
@@ -75,7 +76,7 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### 새 도구 추가
 
-1. `src/SiliconLife.Default/Tools/`에 새 클래스 생성:
+1. `src/SiliconLife.Common/Tools/`에 새 클래스 생성 (두 버전 모두에서 사용하는 공유 도구):
 
 ```csharp
 public class MyCustomTool : ITool
@@ -111,7 +112,7 @@ public class AdminTool : ITool { ... }
 
 ### 새 AI 클라이언트 추가
 
-1. `src/SiliconLife.Default/AI/`에 `IAIClient` 구현:
+1. `src/SiliconLife.Common/AI/`에 `IAIClient` 구현:
 
 ```csharp
 public class MyAIClient : IAIClient
@@ -158,7 +159,7 @@ public class MyAIClientFactory : IAIClientFactory
 
 ### 새 저장소 백엔드 추가
 
-1. `src/SiliconLife.Default/Storage/`에 `IStorage` 및 `ITimeStorage` 구현:
+1. `src/SiliconLife.Default/Storage/` (파일 시스템 구현) 또는 `src/SiliconLife.Fast/Storage/` (SpeedyPack 어댑터)에 `IStorage` 및 `ITimeStorage` 구현:
 
 ```csharp
 public class DatabaseStorage : IStorage, ITimeStorage
@@ -182,7 +183,7 @@ public class DatabaseStorage : IStorage, ITimeStorage
 
 ### 새 스킨 추가
 
-1. `src/SiliconLife.Default/Web/Skins/`에 `ISkin` 구현:
+1. `src/SiliconLife.App/Web/Skins/`에 `ISkin` 구현:
 
 ```csharp
 public class MyCustomSkin : ISkin
@@ -365,23 +366,45 @@ public class MyCustomCalendar : CalendarBase
 ### 예시: 사용자 정의 Executor 추가
 
 ```csharp
-public class CustomExecutor : ExecutorBase
+// Executor는 현재 정적 클래스(DiskExecutor, NetworkExecutor, CommandLineExecutor)로,
+// 실행 전 ServiceLocator를 통해 권한을 검사합니다.
+// ExecutorBase는 백그라운드 스레드와 요청 큐 지원을 제공하는 추상 기반 클래스입니다.
+
+public static class CustomExecutor
 {
-    public override string Name => "custom";
-    
-    public override async Task<ExecutorResult> ExecuteAsync(ExecutorRequest request)
+    private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);
+
+    public static ExecutorResult Execute(ExecutorRequest request, TimeSpan? timeout = null)
     {
         // 먼저 권한 검증
-        var permission = await CheckPermissionAsync(request);
-        if (!permission.Allowed)
+        PermissionManager? pm = ServiceLocator.Instance.GetPermissionManager(request.CallerId);
+        if (pm == null || !pm.CheckPermission(request.CallerId, PermissionType.Function, request.ResourcePath))
         {
-            return ExecutorResult.Denied(permission.Reason);
+            return ExecutorResult.Failed($"Permission denied: {request.ResourcePath}");
         }
-        
+
+        TimeSpan actualTimeout = timeout ?? DefaultTimeout;
+
+        try
+        {
+            Task<ExecutorResult> task = Task.Run(() => ExecuteCore(request));
+            if (task.Wait(actualTimeout))
+            {
+                return task.Result;
+            }
+            return ExecutorResult.Failed("Operation timed out");
+        }
+        catch (AggregateException ex)
+        {
+            return ExecutorResult.Failed(ex.InnerException?.Message ?? ex.Message);
+        }
+    }
+
+    private static ExecutorResult ExecuteCore(ExecutorRequest request)
+    {
         // 작업 실행
-        var result = await PerformOperation(request);
-        
-        return ExecutorResult.Success(result);
+        var result = PerformOperation(request);
+        return ExecutorResult.Successful(result);
     }
 }
 ```
@@ -448,10 +471,10 @@ public class MyToolTests
 AI가 시작한 모든 작업은 권한 체인을 통과해야 합니다:
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+PermissionManager? pm = ServiceLocator.Instance.GetPermissionManager(callerId);
+if (pm == null || !pm.CheckPermission(callerId, permissionType, resource))
 {
-    return Result.Denied(permission.Reason);
+    return ExecutorResult.Failed("Permission denied");
 }
 ```
 

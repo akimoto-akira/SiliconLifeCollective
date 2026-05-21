@@ -487,6 +487,43 @@
 
 ---
 
+## 提交实践规则
+
+### 规则 1：relatedCommit 不可 amend 循环
+
+**问题**：任务完成后需要填写 `relatedCommit`，但如果用 `git commit --amend` 把 hash 写回 `tasks.json`，amend 会产生新 hash，导致 hash 永远对不上。
+
+**正确做法**：
+
+```
+1. 先提交代码变更 → 拿到 commit hash（如 abc1234）
+2. 更新 tasks.json 中的 relatedCommit = abc1234
+3. git add .ai-collab/tasks.json（暂存，不提交）
+4. 留到下次 commit 时一并带入，或单独提交：
+   git commit -m "[actorId] chore: 更新 task-XXX relatedCommit"
+```
+
+**禁止**：`git commit --amend` 来回修改 hash。
+
+### 规则 2：changes/ 记录在提交前创建
+
+`changes/<actor>-<timestamp>.json` 应在最终提交前创建并纳入同一次 commit，不要提交后再补。
+
+### 规则 3：会话结束流程顺序
+
+```
+1. 创建 changes/ 修改记录
+2. 更新 sessions/ 会话文件（status=completed）
+3. 更新 state.json（currentActor=null）
+4. 追加 activity.log（session_end）
+5. 更新 tasks.json（status=completed, relatedCommit 暂留 null）
+6. git add 所有 .ai-collab/ 变更 + 代码变更
+7. git commit → 拿到 hash
+8. 更新 tasks.json 的 relatedCommit → 不暂存也不提交，留到下次 commit 时一并带入
+```
+
+---
+
 ## 人类操作指南
 
 ### 添加新任务

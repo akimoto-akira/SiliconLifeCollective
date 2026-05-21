@@ -122,7 +122,7 @@ AI가 도구 호출 시:
 
 AI 백엔드 설정:
 - Ollama (로컬)
-- Bailian (클라우드)
+- DashScope (클라우드)
 - Volcengine Ark (클라우드)
 - 맞춤형 클라이언트
 

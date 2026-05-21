@@ -31,7 +31,7 @@
 - **.NET 9 SDK** - [다운로드](https://dotnet.microsoft.com/download/dotnet/9.0)
 - **Git** - [다운로드](https://git-scm.com/)
 - **Ollama** (선택 사항, 로컬 AI용) - [다운로드](https://ollama.com/)
-- **Bailian API 키** (선택 사항, 클라우드 AI용) - [신청](https://bailian.console.aliyun.com/)
+- **DashScope API 키** (선택 사항, 클라우드 AI용) - [신청](https://bailian.console.aliyun.com/)
 - **Volcengine Ark API 키** (선택 사항, 클라우드 AI용) - [신청](https://console.volcengine.com/ark)
 
 ## 빠른 시작
@@ -66,19 +66,21 @@ dotnet build
 }
 ```
 
-#### 옵션 B: Bailian (클라우드)
+#### 옵션 B: DashScope (클라우드)
 
 ```json
 {
   "AIClients": {
     "DashScope": {
       "ApiKey": "your-api-key-here",
-      "Model": "qwen-plus",
-      "Region": "cn-hangzhou"
+      "Model": "qwen3.6-plus",
+      "Region": "beijing"
     }
   }
 }
 ```
+
+**사용 가능한 지역**: `beijing` (중국 북부 2), `virginia` (미국), `singapore` (싱가포르), `hongkong` (중국 홍콩), `frankfurt` (독일)
 
 #### 옵션 C: Volcengine Ark (클라우드)
 
@@ -156,7 +158,12 @@ You are a helpful assistant specializing in code review.
 ## Capabilities
 - Review code quality
 - Suggest improvements
-- Follow best practices
+- Explain complex concepts
+
+## Behavior
+- Always provide constructive feedback
+- Use clear examples
+- Be concise but thorough
 ```
 
 ### 생명체 시작
@@ -195,11 +202,13 @@ You are a helpful assistant specializing in code review.
 
 ### 권한 시스템
 
-모든 AI 시작 작업은 3단계 분기 권한 체인을 통과합니다:
+모든 AI 시작 작업은 5단계 권한 검증 체인을 통과합니다:
 
-1. **UserFrequencyCache** - 사용자 고빈도 결정 캐시 (고거부/고허용)
-2. **IPermissionCallback** - 맞춤형 권한 콜백 (허용/거부/AskUser)
-3. **IsCurator 분기** - 큐레이터: IPermissionAskHandler (사용자에게 문의) / 비큐레이터: GlobalACL → 기본 거부
+1. **UserFrequencyCache** - 사용자 고빈도 결정 캐시 (메모리 전용)
+2. **IPermissionCallback** - 도메인별 콜백 규칙
+3. **Curator 분기** - 큐레이터: IPermissionAskHandler (사용자에게 문의)
+4. **NonCurator 분기** - 비큐레이터: GlobalACL (글로벌 ACL 규칙)
+5. **기본 거부** - 일치하는 규칙이 없으면 기본 거부
 
 ### 지식 네트워크
 
@@ -252,7 +261,7 @@ public LogLevel LogLevel = LogLevel.Debug;
 ### AI 연결 실패
 
 - Ollama: `ollama list`로 모델이 풀되어 있는지 확인
-- Bailian: API 키가 올바른지 확인
+- DashScope: API 키가 올바른지 확인
 - 인터넷 연결 상태 확인
 
 ### Web UI에 접속할 수 없음
