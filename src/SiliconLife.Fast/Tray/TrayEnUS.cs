@@ -31,6 +31,7 @@ public class TrayEnUS : TrayLocalizationBase
     public override string Dashboard => "Dashboard";
     public override string ManageSiliconBeings => "Manage Silicon Beings";
     public override string Configuration => "Configuration";
+    public override string OpenStorageViewer => "View Storage (Read Only)";
     public override string Exit => "Exit";
     public override string ExitConfirmation => "Are you sure you want to exit?\n\nClicking \"Yes\" will close the application.";
     public override string Yes => "Yes";

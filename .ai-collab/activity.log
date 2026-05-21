@@ -471,3 +471,28 @@
 2026-05-21T04:29:00+08:00 | coze-agent | session_start | sessionId=coze-agent-20260521-0429
 2026-05-21T04:29:00+08:00 | coze-agent | task_archive | task=task-210~220 | count=11
 2026-05-21T04:30:00+08:00 | coze-agent | session_end
+2026-05-21T22:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260521-2200 | task=task-301
+2026-05-21T22:00:00+08:00 | trae-glm5 | task_claim | task=task-301 | type=feature | scope=右键菜单添加「查看存储（只读）」功能
+2026-05-21T22:05:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Speedy.Manager/Program.cs | change=添加命令行参数解析(--readonly/-r, 文件路径)
+2026-05-21T22:10:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Speedy.Manager/App.axaml.cs | change=启动时根据命令行参数以只读模式打开SpeedyPack
+2026-05-21T22:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Speedy.Manager/MainWindow.axaml.cs | change=添加_isReadOnly和_ownsPack字段、新构造函数重载、只读模式禁用写操作UI和守卫
+2026-05-21T22:20:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Tray/TrayLocalizationBase.cs | change=添加OpenStorageViewer抽象属性
+2026-05-21T22:25:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Tray/TrayZhCN.cs | change=添加OpenStorageViewer=>"查看存储（只读）"
+2026-05-21T22:25:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Tray/TrayZhHK.cs | change=添加OpenStorageViewer=>"檢視儲存（唯讀）"
+2026-05-21T22:25:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Tray/TrayEnUS.cs | change=添加OpenStorageViewer=>"View Storage (Read Only)"
+2026-05-21T22:25:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Tray/TrayJaJP.cs | change=添加OpenStorageViewer=>"ストレージを表示（読み取り専用）"
+2026-05-21T22:25:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Tray/TrayKoKR.cs | change=添加OpenStorageViewer=>"스토리지 보기 (읽기 전용)"
+2026-05-21T22:25:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Tray/TrayFrFR.cs | change=添加OpenStorageViewer=>"Voir le stockage (Lecture seule)"
+2026-05-21T22:25:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Tray/TrayDeDE.cs | change=添加OpenStorageViewer=>"Speicher anzeigen (Schreibgeschützt)"
+2026-05-21T22:25:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Tray/TrayEsES.cs | change=添加OpenStorageViewer=>"Ver almacenamiento (Solo lectura)"
+2026-05-21T22:25:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Tray/TrayItIT.cs | change=添加OpenStorageViewer=>"Visualizza archivio (Sola lettura)"
+2026-05-21T22:25:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Tray/TrayPlPL.cs | change=添加OpenStorageViewer=>"Wyświetl magazyn (Tylko do odczytu)"
+2026-05-21T22:25:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Tray/TrayPtPT.cs | change=添加OpenStorageViewer=>"Ver armazenamento (Apenas leitura)"
+2026-05-21T22:25:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Tray/TrayCsCZ.cs | change=添加OpenStorageViewer=>"Zobrazit úložiště (Pouze pro čtení)"
+2026-05-21T22:30:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Tray/TrayStatusWindow.cs | change=ShowContextMenu添加OpenStorageViewer菜单项、添加OpenStorageViewer()方法（进程内实例化MainWindow）
+2026-05-21T22:35:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/SiliconLife.Fast.csproj | change=添加对SiliconLife.Speedy.Manager的项目引用
+2026-05-21T23:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Speedy.Manager/MainWindow.axaml | change=添加RequestedThemeVariant="Light"修复Dark主题宿主内白底白字
+2026-05-21T23:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Speedy.Manager/ContentViewerWindow.axaml | change=添加RequestedThemeVariant="Light"
+2026-05-21T23:00:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Speedy.Manager/ProgressWindow.axaml | change=添加RequestedThemeVariant="Light"
+2026-05-21T23:30:00+08:00 | trae-glm5 | task_complete | task=task-301 | files_modified=22 | summary=右键菜单添加「查看存储（只读）」功能，进程内直接实例化MainWindow传入_pack，只读模式禁用写操作，_ownsPack防止释放共享pack，RequestedThemeVariant=Light修复主题冲突
+2026-05-21T23:30:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260521-2200 | completed=task-301

@@ -5,6 +5,7 @@
         Width="1200" Height="800"
         MinWidth="900" MinHeight="600"
         WindowStartupLocation="CenterScreen"
+        RequestedThemeVariant="Light"
         Background="#FBFBFB">
 
     <DockPanel>

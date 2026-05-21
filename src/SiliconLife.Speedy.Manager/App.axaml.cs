@@ -11,9 +11,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IO;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using SiliconLife.Speedy;
 
 namespace SiliconLife.Speedy.Manager;
 
@@ -28,7 +30,18 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow();
+            var filePath = Program.FilePathArgument;
+            var readOnly = Program.ReadOnlyArgument;
+
+            if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+            {
+                var pack = SpeedyPack.Open(filePath, new SpeedyPackOptions { ReadOnly = readOnly });
+                desktop.MainWindow = new MainWindow(pack, readOnly);
+            }
+            else
+            {
+                desktop.MainWindow = new MainWindow();
+            }
         }
 
         base.OnFrameworkInitializationCompleted();

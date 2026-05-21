@@ -18,10 +18,29 @@ namespace SiliconLife.Speedy.Manager;
 
 internal static class Program
 {
+    internal static string? FilePathArgument { get; private set; }
+    internal static bool ReadOnlyArgument { get; private set; }
+
     [STAThread]
     static void Main(string[] args)
     {
+        ParseArguments(args);
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+    }
+
+    private static void ParseArguments(string[] args)
+    {
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (args[i] is "--readonly" or "-r")
+            {
+                ReadOnlyArgument = true;
+            }
+            else if (!args[i].StartsWith("-"))
+            {
+                FilePathArgument = args[i];
+            }
+        }
     }
 
     public static AppBuilder BuildAvaloniaApp()

@@ -1,11 +1,50 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-21T04:29:15+08:00",
-  "tasks": [],
+  "lastUpdated": "2026-05-21T23:30:00+08:00",
+  "tasks": [
+    {
+      "id": "task-301",
+      "type": "feature",
+      "target": "src/SiliconLife.Fast/Tray/TrayStatusWindow.cs",
+      "title": "右键菜单添加「查看存储（只读）」功能，进程内调用 Speedy.Manager",
+      "description": "在 TrayStatusWindow 右键菜单中插入一项「查看存储（只读）」，点击后以只读模式通过 SiliconLife.Speedy.Manager 打开 SpeedyPackRegistry._pack 对应的 .spk 文件。采用进程内直接实例化 MainWindow 的方式（而非 Process.Start），将 _pack 实例直接传入，确保共享同一 pack 且不释放。同时修复 Manager 窗口在 Dark 主题宿主进程内白底白字的问题。",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-21T22:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-21T23:30:00+08:00",
+      "modifiedFiles": [
+        "src/SiliconLife.Fast/SiliconLife.Fast.csproj",
+        "src/SiliconLife.Fast/Tray/TrayLocalizationBase.cs",
+        "src/SiliconLife.Fast/Tray/TrayZhCN.cs",
+        "src/SiliconLife.Fast/Tray/TrayZhHK.cs",
+        "src/SiliconLife.Fast/Tray/TrayEnUS.cs",
+        "src/SiliconLife.Fast/Tray/TrayJaJP.cs",
+        "src/SiliconLife.Fast/Tray/TrayKoKR.cs",
+        "src/SiliconLife.Fast/Tray/TrayFrFR.cs",
+        "src/SiliconLife.Fast/Tray/TrayDeDE.cs",
+        "src/SiliconLife.Fast/Tray/TrayEsES.cs",
+        "src/SiliconLife.Fast/Tray/TrayItIT.cs",
+        "src/SiliconLife.Fast/Tray/TrayPlPL.cs",
+        "src/SiliconLife.Fast/Tray/TrayPtPT.cs",
+        "src/SiliconLife.Fast/Tray/TrayCsCZ.cs",
+        "src/SiliconLife.Fast/Tray/TrayStatusWindow.cs",
+        "src/SiliconLife.Speedy.Manager/Program.cs",
+        "src/SiliconLife.Speedy.Manager/App.axaml.cs",
+        "src/SiliconLife.Speedy.Manager/MainWindow.axaml.cs",
+        "src/SiliconLife.Speedy.Manager/MainWindow.axaml",
+        "src/SiliconLife.Speedy.Manager/ContentViewerWindow.axaml",
+        "src/SiliconLife.Speedy.Manager/ProgressWindow.axaml",
+        "src/SiliconLife.Fast/SiliconLife.Fast.csproj.targets"
+      ]
+    }
+  ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": [],
+    "completed": ["task-301"],
     "cancelled": []
   },
   "metadata": {

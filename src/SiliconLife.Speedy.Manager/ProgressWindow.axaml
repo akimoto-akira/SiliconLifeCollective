@@ -5,7 +5,8 @@
         Width="480" Height="200"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
-        ShowInTaskbar="False">
+        ShowInTaskbar="False"
+        RequestedThemeVariant="Light">
 
     <DockPanel Margin="24">
         <TextBlock x:Name="TitleLabel"

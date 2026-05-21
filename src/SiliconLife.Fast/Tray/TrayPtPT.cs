@@ -31,6 +31,7 @@ public class TrayPtPT : TrayLocalizationBase
     public override string Dashboard => "Painel";
     public override string ManageSiliconBeings => "Gerir Silicon Beings";
     public override string Configuration => "Configuração";
+    public override string OpenStorageViewer => "Ver armazenamento (Apenas leitura)";
     public override string Exit => "Sair";
     public override string ExitConfirmation => "Tem a certeza que deseja sair?\n\nAo clicar em \"Sim\", a aplicação será encerrada.";
     public override string Yes => "Sim";

@@ -31,6 +31,7 @@ public class TrayCsCZ : TrayLocalizationBase
     public override string Dashboard => "Dashboard";
     public override string ManageSiliconBeings => "Spravovat křemíkové bytosti";
     public override string Configuration => "Konfigurace";
+    public override string OpenStorageViewer => "Zobrazit úložiště (Pouze pro čtení)";
     public override string Exit => "Ukončit";
     public override string ExitConfirmation => "Opravdu chcete ukončit program?\n\nVýběrem \"Ano\" aplikaci zavřete.";
     public override string Yes => "Ano";

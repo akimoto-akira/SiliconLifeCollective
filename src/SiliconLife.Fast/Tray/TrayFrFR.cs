@@ -31,6 +31,7 @@ public class TrayFrFR : TrayLocalizationBase
     public override string Dashboard => "Tableau de bord";
     public override string ManageSiliconBeings => "Gérer les Silicon Beings";
     public override string Configuration => "Configuration";
+    public override string OpenStorageViewer => "Voir le stockage (Lecture seule)";
     public override string Exit => "Quitter";
     public override string ExitConfirmation => "Voulez-vous vraiment quitter ?\n\nEn cliquant sur \"Oui\", l'application se fermera.";
     public override string Yes => "Oui";

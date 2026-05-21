@@ -23,6 +23,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using SiliconLife.Collective;
 using SiliconLife.Common.SiliconBeing;
+using SiliconLife.Fast;
 
 namespace SiliconLife.Fast.Tray;
 
@@ -144,6 +145,7 @@ public partial class TrayStatusWindow : Window
         menu.Items.Add(new MenuItem { Header = _localization.Dashboard });
         menu.Items.Add(new MenuItem { Header = _localization.ManageSiliconBeings });
         menu.Items.Add(new MenuItem { Header = _localization.Configuration });
+        menu.Items.Add(new MenuItem { Header = _localization.OpenStorageViewer });
         menu.Items.Add(new Separator());
         menu.Items.Add(new MenuItem { Header = _localization.Exit });
         
@@ -152,7 +154,8 @@ public partial class TrayStatusWindow : Window
         ((MenuItem)menu.Items[1]).Click += (s, e) => OpenDashboard();
         ((MenuItem)menu.Items[2]).Click += (s, e) => ManageBeings();
         ((MenuItem)menu.Items[3]).Click += (s, e) => OpenConfiguration();
-        ((MenuItem)menu.Items[5]).Click += (s, e) => RequestExit();
+        ((MenuItem)menu.Items[4]).Click += (s, e) => OpenStorageViewer();
+        ((MenuItem)menu.Items[6]).Click += (s, e) => RequestExit();
         
         menu.Open(this);
     }
@@ -218,6 +221,20 @@ public partial class TrayStatusWindow : Window
         catch (Exception ex)
         {
             Console.WriteLine($"Failed to open configuration: {ex.Message}");
+        }
+    }
+
+    private void OpenStorageViewer()
+    {
+        try
+        {
+            var pack = SpeedyPackRegistry.Pack;
+            var viewer = new SiliconLife.Speedy.Manager.MainWindow(pack, readOnly: true, ownsPack: false);
+            viewer.Show();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to open storage viewer: {ex.Message}");
         }
     }
 

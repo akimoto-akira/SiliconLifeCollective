@@ -31,6 +31,7 @@ public class TrayEsES : TrayLocalizationBase
     public override string Dashboard => "Panel de control";
     public override string ManageSiliconBeings => "Gestionar seres de silicio";
     public override string Configuration => "Configuración";
+    public override string OpenStorageViewer => "Ver almacenamiento (Solo lectura)";
     public override string Exit => "Salir";
     public override string ExitConfirmation => "¿Está seguro de que desea salir?\n\nAl seleccionar \"Sí\" se cerrará la aplicación.";
     public override string Yes => "Sí";

@@ -31,6 +31,7 @@ public class TrayZhHK : TrayLocalizationBase
     public override string Dashboard => "儀表板";
     public override string ManageSiliconBeings => "管理硅基生命體";
     public override string Configuration => "設定";
+    public override string OpenStorageViewer => "檢視儲存（唯讀）";
     public override string Exit => "退出應用程式";
     public override string ExitConfirmation => "確定要退出程式嗎？\n\n選擇「是」將關閉應用程式。";
     public override string Yes => "是";

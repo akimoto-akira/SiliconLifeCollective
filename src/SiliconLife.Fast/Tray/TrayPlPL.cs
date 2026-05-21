@@ -31,6 +31,7 @@ public class TrayPlPL : TrayLocalizationBase
     public override string Dashboard => "Panel";
     public override string ManageSiliconBeings => "Zarządzaj byciami krzemowymi";
     public override string Configuration => "Konfiguracja";
+    public override string OpenStorageViewer => "Wyświetl magazyn (Tylko do odczytu)";
     public override string Exit => "Zakończ";
     public override string ExitConfirmation => "Czy na pewno chcesz zakończyć?\n\nWybranie \"Tak\" zamknie aplikację.";
     public override string Yes => "Tak";

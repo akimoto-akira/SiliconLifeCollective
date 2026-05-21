@@ -31,6 +31,7 @@ public class TrayZhCN : TrayLocalizationBase
     public override string Dashboard => "仪表板";
     public override string ManageSiliconBeings => "管理硅基生命体";
     public override string Configuration => "配置设置";
+    public override string OpenStorageViewer => "查看存储（只读）";
     public override string Exit => "退出应用";
     public override string ExitConfirmation => "确定要退出程序吗？\n\n选择\"是\"将关闭应用程序。";
     public override string Yes => "是";

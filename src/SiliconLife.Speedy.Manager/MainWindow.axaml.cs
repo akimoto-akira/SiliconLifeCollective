@@ -29,13 +29,22 @@ public partial class MainWindow : Window
     private string _currentFilePath = string.Empty;
     private string _currentPath = string.Empty;
     private bool _isImporting;
+    private readonly bool _isReadOnly;
+    private readonly bool _ownsPack;
 
     private readonly ObservableCollection<DirectoryTreeNode> _rootNodes = [];
 
-    public MainWindow() : this(null) { }
+    public MainWindow() : this(null, false) { }
 
-    public MainWindow(SpeedyPack? pack)
+    public MainWindow(SpeedyPack? pack) : this(pack, false) { }
+
+    public MainWindow(SpeedyPack? pack, bool readOnly) : this(pack, readOnly, ownsPack: pack == null) { }
+
+    public MainWindow(SpeedyPack? pack, bool readOnly, bool ownsPack)
     {
+        _isReadOnly = readOnly;
+        _ownsPack = ownsPack;
+
         InitializeComponent();
 
         DirectoryTree.ItemsSource = _rootNodes;
@@ -53,15 +62,32 @@ public partial class MainWindow : Window
 
         KeyDown += MainWindow_KeyDown;
 
+        if (readOnly)
+        {
+            BtnNew.IsEnabled = false;
+            BtnImportFile.IsEnabled = false;
+            BtnCompact.IsEnabled = false;
+            MenuImportFolder.IsEnabled = false;
+        }
+
+        if (!_ownsPack)
+        {
+            BtnNew.IsEnabled = false;
+            BtnOpen.IsEnabled = false;
+        }
+
         if (pack != null)
         {
             _currentPack = pack;
-            Title = "Speedy Pack Manager - Inside";
+            Title = readOnly ? "Speedy Pack Manager - [Read Only]" : "Speedy Pack Manager - Inside";
             UpdateBreadcrumb();
-            StatusLabel.Text = "Internal launch";
+            StatusLabel.Text = readOnly ? "Read-only mode" : "Internal launch";
             BtnRefresh.IsEnabled = true;
-            BtnCompact.IsEnabled = false;
-            BtnImportFile.IsEnabled = true;
+            if (!readOnly)
+            {
+                BtnCompact.IsEnabled = false;
+                BtnImportFile.IsEnabled = true;
+            }
             RefreshView();
         }
     }
@@ -91,7 +117,7 @@ public partial class MainWindow : Window
 
     private async Task NewFile_ClickAsync()
     {
-        if (_isImporting) return;
+        if (_isImporting || _isReadOnly || !_ownsPack) return;
 
         var storageProvider = TopLevel.GetTopLevel(this)?.StorageProvider;
         if (storageProvider == null) return;
@@ -143,7 +169,7 @@ public partial class MainWindow : Window
 
     private async Task OpenFile_ClickAsync()
     {
-        if (_isImporting) return;
+        if (_isImporting || _isReadOnly || !_ownsPack) return;
 
         var storageProvider = TopLevel.GetTopLevel(this)?.StorageProvider;
         if (storageProvider == null) return;
@@ -171,7 +197,7 @@ public partial class MainWindow : Window
 
     private async Task Compact_ClickAsync()
     {
-        if (_currentPack == null || _isImporting) return;
+        if (_currentPack == null || _isImporting || _isReadOnly) return;
 
         try
         {
@@ -221,7 +247,7 @@ public partial class MainWindow : Window
 
     private async Task ImportFile_ClickAsync()
     {
-        if (_currentPack == null || _isImporting) return;
+        if (_currentPack == null || _isImporting || _isReadOnly) return;
 
         var storageProvider = TopLevel.GetTopLevel(this)?.StorageProvider;
         if (storageProvider == null) return;
@@ -272,7 +298,7 @@ public partial class MainWindow : Window
 
     private async Task ImportFolder_ClickAsync()
     {
-        if (_currentPack == null) return;
+        if (_currentPack == null || _isReadOnly) return;
 
         var selectedNode = DirectoryTree.SelectedItem as DirectoryTreeNode;
         var targetPath = selectedNode?.Path ?? string.Empty;
@@ -932,7 +958,8 @@ public partial class MainWindow : Window
 
     protected override void OnClosing(WindowClosingEventArgs e)
     {
-        _currentPack?.Dispose();
+        if (_ownsPack)
+            _currentPack?.Dispose();
         base.OnClosing(e);
     }
 }
