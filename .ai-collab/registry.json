@@ -83,6 +83,21 @@
         "timezone": "Asia/Shanghai",
         "channel": "coze"
       }
+    },
+    {
+      "id": "marvis",
+      "type": "resident-ai",
+      "platform": "Marvis",
+      "model": "Marvis",
+      "description": "Windows 桌面 AI 助手，具备文件系统操作、代码分析、系统管理、应用操作、网页搜索等综合能力，擅长代码审查、单元测试编写、重构方案输出、多语言文档校对",
+      "runtimeEnv": {
+        "host": "PURELIGHT-WJX",
+        "os": "Windows 11 (x64)",
+        "shell": "PowerShell",
+        "workspace": "D:\\SiliconLifeCollective",
+        "timezone": "Asia/Shanghai",
+        "channel": "marvis-desktop"
+      }
     }
   ],
   "rules": {
