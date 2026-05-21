@@ -708,11 +708,11 @@ Il sistema di strumenti permette ai Silicon Beings di interagire con il mondo es
 
 ## Verifica dei permessi
 
-Tutte le esecuzioni di strumenti passano attraverso la catena di permessi a 5 livelli :
+Tutte le esecuzioni di strumenti passano attraverso la catena di permessi a 3 livelli :
 
-1. **UserFrequencyCache** — Cache delle autorizzazioni/rifiuti frequenti dell'utente
-2. **IPermissionCallback** — Funzione di callback di permesso personalizzata
-3. **Giudizio ramificato** — IsCurator → IPermissionAskHandler (chiedi utente) | Non-curatore → GlobalACL (lista controllo accessi)
+1. **UserFrequencyCache** — Cache delle decisioni utente ad alta frequenza (HighDeny/HighAllow)
+2. **IPermissionCallback** — Valutazione callback personalizzata (Consentito/Negato/ChiediUtente)
+3. **Biforcazione curatore** — Curatore → IPermissionAskHandler (chiedi utente) | Non-curatore → GlobalACL → Negazione predefinita
 
 ## Creare uno strumento personalizzato
 
@@ -813,8 +813,8 @@ catch (Exception ex)
 Non bypassare mai le verifiche dei permessi. Accedere sempre alle risorse tramite gli executor :
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+var permission = permissionManager.EvaluatePermission(callerId, permissionType, resource);
+if (permission != PermissionResult.Allowed)
 {
     return ToolResult.Denied(permission.Reason);
 }

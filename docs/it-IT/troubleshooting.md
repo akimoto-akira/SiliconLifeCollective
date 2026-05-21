@@ -190,11 +190,11 @@ curl http://localhost:8080/api/permissions
 
 2. Concedere il permesso :
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "resource": "disk:write",
-    "allowed": true,
+    "prefix": "disk:write",
+    "result": "Allowed",
     "duration": 3600
   }'
 ```
@@ -208,7 +208,7 @@ curl -X POST http://localhost:8080/api/permissions \
 
 **Soluzione** :
 1. Verificare la sincronizzazione dell'orologio di sistema
-2. Verificare che il campo `expiresAt` sia impostato correttamente
+2. Verificare che le voci nella cache frequenza non siano scadute
 3. Svuotare la cache dei permessi
 
 ---

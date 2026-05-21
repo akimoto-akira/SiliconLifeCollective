@@ -18,7 +18,7 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # Implementazione predefinita, punto ingresso (verifica fattibilità)
 │   ├── SiliconLife.Fast/            # Implementazione alte prestazioni, punto ingresso (versione produzione)
 │   ├── SiliconLife.Speedy/          # Motore storage alte prestazioni SpeedyPack
-│   └── SiliconLife.Speedy.Manager/  # Strumento gestione SpeedyPack (Windows Forms)
+│   └── SiliconLife.Speedy.Manager/  # Strumento gestione SpeedyPack (Avalonia UI)
 └── docs/                            # Documentazione multilingue
 ```
 
@@ -54,9 +54,9 @@ public interface ITool
 
 ### 3. Sistema di permessi
 
-Catena di verifica dei permessi a 5 livelli:
+Catena di verifica dei permessi a 3 livelli:
 ```
-UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL)
+UserFrequencyCache → IPermissionCallback → (Curatore→IPermissionAskHandler / Non-curatore→GlobalACL→Negazione predefinita)
 ```
 
 ### 4. Localizzatore di servizi
@@ -447,8 +447,8 @@ Testare il flusso completo:
 Qualsiasi operazione avviata dall'IA deve passare attraverso la catena di permessi:
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+var permission = permissionManager.EvaluatePermission(callerId, permissionType, resource);
+if (permission != PermissionResult.Allowed)
 {
     return Result.Denied(permission.Reason);
 }

@@ -42,7 +42,7 @@ Restituisce la pagina dell'interfaccia della chat.
 
 **GET** `/api/chat/stream`
 
-Chat in streaming tramite Server-Sent Events (SSE).
+Chat in streaming tramite Server-Sent Events (SSE). Non richiede parametri, il flusso invia automaticamente gli eventi di tutte le sessioni attive.
 
 **Risposta** : Flusso Server-Sent Events
 
@@ -151,14 +151,14 @@ Restituisce l'elenco di tutti i Silicon Beings registrati.
     {
       "id": "being-uuid",
       "name": "Assistant",
-      "status": "running",
+      "activity": "Idle",
       "soulPath": "path/to/soul.md"
     }
   ]
 }
 ```
 
-**Valori di stato** : `idle` | `running` | `waiting_permission` | `stopped`
+**Valori di attività** : `Idle` | `SingleChat` | `GroupChat` | `Task` | `Timer` | `Broadcast` | `Project` | `MemoryCompression` | `Stopped`
 
 ### Ottenere i dettagli di un Being
 
@@ -374,10 +374,12 @@ Restituisce tutte le regole di permesso attualmente configurate.
 {
   "rules": [
     {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
+      "prefix": "disk:read",
+      "result": "Allowed"
+    },
+    {
+      "prefix": "compile:execute",
+      "result": "Denied"
     }
   ]
 }
@@ -390,9 +392,8 @@ Restituisce tutte le regole di permesso attualmente configurate.
 **Corpo della richiesta** :
 ```json
 {
-  "userId": "user-uuid",
-  "resource": "disk:write",
-  "allowed": true,
+  "prefix": "disk:write",
+  "result": "Allowed",
   "duration": 3600
 }
 ```

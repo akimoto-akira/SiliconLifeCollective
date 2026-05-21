@@ -20,7 +20,7 @@
 - ✅ Fase 1 : Porting della struttura di progetto di base e del sistema di configurazione
 - ✅ Fase 2 : Porting dell'interfaccia Web e dei controller
 - ✅ Fase 3 : Ottimizzazione del sistema di storage (storage in memoria SpeedyPack + persistenza asincrona)
-- ✅ Fase 3.5 : Strumento di gestione SpeedyPack (applicazione Windows Forms SiliconLife.Speedy.Manager)
+- ✅ Fase 3.5 : Strumento di gestione SpeedyPack (applicazione Avalonia UI SiliconLife.Speedy.Manager)
 - 📋 Fase 5 : Ottimizzazione delle prestazioni (connection pool, object pool, concorrenza senza lock)
 - 📋 Fase 6 : Sostituzione del server Web Kestrel
 - 📋 Fase 7 : Serializzazione binaria MessagePack
@@ -133,7 +133,7 @@ Ogni fase si conclude con un sistema **funzionante e osservabile**. Nessuna fase
 
 | # | Modulo | Descrizione |
 |---|--------|-------------|
-| 6.1 | PermissionManager | Istanza privata per Being. Basato su callback, risultato ternario (Allowed/Deny/AskUser). Priorità richiesta : HighDeny → HighAllow → Callback. Flag IsCurator |
+| 6.1 | PermissionManager | Istanza privata per Being. Catena di permessi a 3 livelli: UserFrequencyCache → IPermissionCallback → (Curatore→IPermissionAskHandler / Non-curatore→GlobalACL→Negazione predefinita). Risultato ternario (Allowed/Deny/AskUser) |
 | 6.2 | Enum PermissionType | NetworkAccess, CommandLine, FileAccess, Function, DataAccess |
 | 6.3 | DefaultPermissionCallback | Whitelist/blacklist rete, classificazione CLI, regole di sicurezza percorso file |
 | 6.4 | GlobalACL | Tabella di regole per corrispondenza prefisso, persistita nello storage |

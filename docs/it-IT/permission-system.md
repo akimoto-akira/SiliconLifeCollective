@@ -8,36 +8,46 @@
 
 Il sistema di permessi garantisce che tutte le operazioni avviate dall'IA siano correttamente verificate e sottoposte ad audit.
 
-## Catena di permessi a 5 livelli
+## Catena di permessi a 3 livelli
 
 ```
 ┌─────────────────────────────────────────────┐
 │          Verifica dei permessi              │
 ├─────────────────────────────────────────────┤
 │  Livello 1 : UserFrequencyCache             │
-│  ↓ Limitazione della frequenza              │
+│  ↓ Decisioni utente in cache (HighDeny/HighAllow)│
 │  Livello 2 : IPermissionCallback            │
-│  ↓ Logica personalizzata                    │
-│  Livello 3 : Giudizio ramificato            │
-│  ├─ IsCurator → IPermissionAskHandler       │
-│  │  ↓ Curatore: chiedi conferma utente      │
-│  └─ Non-curatore → GlobalACL                │
-│     ↓ Non-curatore: lista controllo accessi │
+│  ↓ Logica personalizzata (Consentito/Negato/ChiediUtente)│
+│  Livello 3 : IsCurator?                     │
+│  ↓ Sì → IPermissionAskHandler (chiedi all'utente)│
+│  ↓ No → GlobalACL → Negazione predefinita   │
 │  Risultato : Consentito o Negato            │
 └─────────────────────────────────────────────┘
 ```
 
+> **Nota**: La priorità di consultazione effettiva in `PermissionManager.CheckPermission()` è:
+> 1. **UserFrequencyCache** — Verificare prima le decisioni utente ad alta frequenza in cache
+> 2. **IPermissionCallback** — Valutare le regole callback personalizzate
+> 3. **Biforcazione curatore** — Se il callback restituisce AskUser o non c'è callback configurato:
+>    - **Curatore** → `IPermissionAskHandler` (chiedere all'utente tramite IM)
+>    - **Non-curatore** → `GlobalACL` → negazione predefinita
+
 ## Livello 1: UserFrequencyCache
 
-Limitazione della frequenza per utente per prevenire abusi.
+Cache per essere, solo in memoria, delle decisioni utente ad alta frequenza (HighDeny/HighAllow).
 
 ```csharp
 var cache = new UserFrequencyCache();
-if (!cache.CheckLimit(userId, resource))
+PermissionResult? cachedResult = cache.Query(permissionType, resource);
+if (cachedResult.HasValue)
 {
-    return PermissionResult.Denied("Rate limit exceeded");
+    return cachedResult.Value == PermissionResult.Allowed;
 }
 ```
+
+- **HighDeny** ha priorità su **HighAllow**
+- **Solo memoria**: Le cache non vengono persistite, vengono perse al riavvio
+- **Scadenza configurabile**: Gli utenti possono impostare il periodo di validità per le voci della cache
 
 ## Livello 2: IPermissionCallback
 
@@ -69,41 +79,39 @@ Callback personalizzati per la logica di permessi dinamica.
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {
-    public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+    public PermissionResult Evaluate(PermissionRequest request)
     {
-        // Logica personalizzata
         if (IsSafeOperation(request))
         {
             return PermissionResult.Allowed("Safe operation");
         }
         
-        return PermissionResult.Undecided("Needs user confirmation");
+        return PermissionResult.AskUser("Needs user confirmation");
     }
 }
 ```
 
-## Livello 3: Giudizio ramificato (IsCurator / GlobalACL)
+## Livello 3: Biforcazione curatore (IsCurator / GlobalACL)
 
-Quando i livelli 1 e 2 non hanno preso una decisione, il sistema si ramifica in base all'identità del chiamante:
+Quando i livelli 1 e 2 non hanno preso una decisione (il callback restituisce AskUser o non c'è callback configurato), il sistema si ramifica in base all'identità del chiamante:
 
 ### Ramo curatore (IsCurator = true)
 
-Se il chiamante è il curatore, entra in `IPermissionAskHandler` per chiedere conferma all'utente:
+Se il chiamante è il curatore, il callback restituisce AskUser e il sistema richiede conferma dell'utente tramite `IPermissionAskHandler`:
 
 ```csharp
 if (IsCurator)
 {
     if (_askHandler != null)
     {
-        var result = await _askHandler.AskAsync(request);
-        // L'utente conferma o rifiuta nella Web UI
+        var result = _askHandler.AskUser(request);
     }
 }
 ```
 
 ### Ramo non-curatore (IsCurator = false)
 
-Se il chiamante non è il curatore, verifica la `GlobalACL` lista di controllo accessi:
+Se il chiamante non è il curatore, verifica la `GlobalACL` lista di controllo accessi. Se non c'è una regola corrispondente, l'accesso viene negato per impostazione predefinita.
 
 ### Struttura GlobalACL
 
@@ -111,14 +119,22 @@ Se il chiamante non è il curatore, verifica la `GlobalACL` lista di controllo a
 {
   "rules": [
     {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
+      "prefix": "disk:read",
+      "result": "Allowed"
+    },
+    {
+      "prefix": "network:http",
+      "result": "Allowed"
+    },
+    {
+      "prefix": "compile:execute",
+      "result": "Denied"
     }
   ]
 }
 ```
+
+> **Nota**: GlobalACL utilizza la corrispondenza per prefisso. La regola `"prefix": "disk:read"` corrisponde a tutte le risorse che iniziano con `disk:read`. Se non c'è alcuna regola corrispondente, l'accesso viene negato per impostazione predefinita.
 
 ### Formato delle risorse
 
@@ -144,13 +160,13 @@ Quando un'operazione del curatore richiede la conferma dell'utente, questa viene
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
 {
-    public async Task<AskPermissionResult> AskAsync(PermissionRequest request)
+    public AskPermissionResult AskUser(PermissionRequest request)
     {
         // Inviare un messaggio all'utente tramite messaggistica istantanea
-        await SendMessageAsync($"Consentire {request.Resource}?");
+        SendMessage($"Consentire {request.Resource}?");
         
         // Attendere la risposta dell'utente
-        var response = await WaitForResponseAsync();
+        var response = WaitForResponse();
         
         return response.Approved 
             ? AskPermissionResult.Approved()
@@ -176,11 +192,11 @@ Tutte le decisioni sui permessi vengono registrate:
 ```json
 {
   "timestamp": "2026-04-20T10:30:00Z",
-  "userId": "user-uuid",
+  "beingId": "being-uuid",
   "resource": "disk:write",
-  "allowed": true,
+  "result": "Allowed",
   "level": "GlobalACL",
-  "reason": "Explicit rule granted"
+  "reason": "Prefix rule matched"
 }
 ```
 
@@ -229,9 +245,8 @@ public PermissionResult EvaluatePermission(
 curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "userId": "user-uuid",
-    "resource": "disk:write",
-    "allowed": true,
+    "prefix": "disk:write",
+    "result": "Allowed",
     "duration": 3600
   }'
 ```
@@ -254,11 +269,12 @@ Concedere solo i permessi minimi necessari:
 
 ```json
 {
-  "resource": "disk:read",  // Non disk:*
-  "allowed": true,
-  "expiresAt": "2026-04-21T00:00:00Z"  // Impostare sempre una scadenza
+  "prefix": "disk:read",
+  "result": "Allowed"
 }
 ```
+
+> **Nota**: Utilizzare prefissi specifici come `disk:read` anziché `disk:*` per seguire il principio del minimo privilegio.
 
 ### 2. Utilizzare permessi a durata limitata
 
@@ -276,18 +292,16 @@ Consultare regolarmente i log di audit per identificare:
 Per logica complessa, utilizzare `IPermissionCallback`:
 
 ```csharp
-public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+public PermissionResult Evaluate(PermissionRequest request)
 {
-    // Permessi basati sul tempo
     if (IsOutsideBusinessHours())
     {
         return PermissionResult.Denied("Outside business hours");
     }
     
-    // Permessi basati sulle risorse
     if (IsSensitiveResource(request.Resource))
     {
-        return PermissionResult.Undecided("Requires approval");
+        return PermissionResult.AskUser("Requires approval");
     }
     
     return PermissionResult.Allowed();
@@ -302,8 +316,8 @@ public async Task<PermissionResult> CheckAsync(PermissionRequest request)
 IA: "Devo leggere config.json"
 ↓
 Catena permessi:
-1. Limitazione frequenza? Normale
-2. Callback? Restituisce indeciso
+1. Cache frequenza? Nessuna voce in cache
+2. Callback? Restituisce AskUser
 3. IsCurator? No → GlobalACL? Regola trovata: disk:read = Consentito
 4. Risultato: Consentito
 ```
@@ -314,19 +328,19 @@ Catena permessi:
 IA: "Voglio compilare ed eseguire codice"
 ↓
 Catena permessi:
-1. Limitazione frequenza? Normale
-2. Callback? Restituisce indeciso
+1. Cache frequenza? Nessuna voce in cache
+2. Callback? Restituisce AskUser
 3. IsCurator? Sì → IPermissionAskHandler → Utente approva
 4. Risultato: Consentito
 ```
 
-### Scenario 3: Superamento limite frequenza
+### Scenario 3: Decisione in cache
 
 ```
 IA: "Devo fare 100 richieste HTTP"
 ↓
 Catena permessi:
-1. Limitazione frequenza? Superata
+1. Cache frequenza? HighDeny trovato
 2. Risultato: Negato
 ```
 
@@ -336,15 +350,15 @@ Catena permessi:
 
 **Verificare**:
 1. Lo stato IsCurator dell'utente
-2. Le impostazioni di limitazione frequenza
-3. Le regole GlobalACL
+2. Le voci nella cache frequenza (HighDeny ha priorità su HighAllow)
+3. Le regole GlobalACL (negazione predefinita se nessuna regola corrisponde)
 4. La logica del callback
 5. Il timeout della risposta utente
 
 ### Permesso non scaduto
 
 **Verificare**:
-- Il campo `expiresAt` è correttamente impostato
+- Le voci nella cache frequenza non sono scadute
 - Il fuso orario è corretto
 - L'orologio è sincronizzato
 

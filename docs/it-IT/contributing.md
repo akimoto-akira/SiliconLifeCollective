@@ -16,7 +16,7 @@ Questo progetto ha due versioni di implementazione. Puoi contribuire secondo i t
 - **Pubblico target** : Tutti gli sviluppatori
 
 ### SiliconLife.Fast (Versione ad alte prestazioni)
-- **Stack tecnologico** : Applicazione Windows Forms .NET 9
+- **Stack tecnologico** : Applicazione desktop Avalonia UI .NET 9
 - **Direzione del contributo** : Ottimizzazione prestazioni, storage SpeedyPack, barra di sistema, concorrenza senza lock
 - **Pubblico target** : Sviluppatori con esperienza Windows e interesse per l'ottimizzazione delle prestazioni
 

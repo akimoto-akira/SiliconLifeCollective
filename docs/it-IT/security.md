@@ -9,7 +9,7 @@
 La sicurezza di Silicon Life Collective si basa su un modello di **difesa a strati multipli**. Principio fondamentale: **Tutte le operazioni I/O devono passare attraverso esecutori**, gli esecutori applicano le verifiche dei permessi prima dell'esecuzione.
 
 ```
-Chiamata strumento → Esecutore → Gestore permessi → Cache frequenza → Callback → (IsCurator: Chiedi utente | Non-curatore: GlobalACL)
+Chiamata strumento → Esecutore → Gestore permessi → UserFrequencyCache → IPermissionCallback → (Curatore→IPermissionAskHandler / Non-curatore→GlobalACL→Negazione predefinita)
 ```
 
 ---
@@ -38,7 +38,7 @@ Ogni verifica del permesso restituisce uno dei tre risultati:
 
 ### Ruolo speciale: Silicon Curator
 
-Il Silicon Curator ha il livello di permesso più elevato (`IsCurator = true`). Quando la catena di permessi raggiunge il giudizio ramificato, le operazioni del curatore vengono sottoposte a conferma utente tramite `IPermissionAskHandler`, anziché essere cortocircuitate come consentite. I non-curatori consultano invece la GlobalACL.
+Il Silicon Curator ha il livello di permesso più elevato (`IsCurator = true`). Quando la catena di permessi raggiunge il livello 3 e il callback restituisce AskUser, le operazioni del curatore vengono sottoposte a conferma utente tramite `IPermissionAskHandler`. I non-curatori consultano invece la GlobalACL e, se non c'è una regola corrispondente, l'accesso viene negato per impostazione predefinita.
 
 ### PermissionManager privato
 
@@ -48,7 +48,7 @@ Ogni Silicon Being ha la propria istanza **privata** di PermissionManager. Gli s
 
 ## Flusso di validazione dei permessi
 
-Priorità richiesta: **1. Cache frequenza → 2. Funzione di callback → 3. Giudizio ramificato (IsCurator/GlobalACL)**
+Priorità richiesta: **1. UserFrequencyCache → 2. IPermissionCallback → 3. Biforcazione curatore (IsCurator/GlobalACL)**
 
 ```
 ┌─────────────┐
@@ -132,10 +132,9 @@ Quando uno strumento avvia un accesso alle risorse:
 | Esecutore | Ambito | Timeout predefinito |
 |-----------|--------|-------------------|
 | `DiskExecutor` | Lettura/scrittura file, operazioni directory | 30 secondi |
-| `NetworkExecutor` | Richieste HTTP, connessioni WebSocket | 60 secondi |
-| `CommandLineExecutor` | Esecuzione comandi shell | 120 secondi |
-
-> **Nota**: Il `DynamicCompilationExecutor` (nel namespace `SiliconLife.Core.Compilation`) è responsabile della compilazione in memoria Roslyn, non appartiene alla categoria degli esecutori I/O, ma è ugualmente soggetto al sistema di permessi.
+| `NetworkExecutor` | Richieste HTTP, connessioni WebSocket | 30 secondi |
+| `CommandLineExecutor` | Esecuzione comandi shell | 30 secondi |
+| `DynamicCompilationExecutor` | Compilazione in memoria Roslyn | N/A (delegato a CompilationCore) |
 
 ### Isolamento eccezioni e tolleranza guasti
 
@@ -162,7 +161,7 @@ Tabella di regole comune persistita nello storage, gestita unicamente dal Silico
 - Le regole vengono valutate sequenzialmente; la prima corrispondenza vince.
 - Solo il Silicon Curator può modificare l'ACL globale (tramite uno strumento dedicato).
 - Le modifiche hanno effetto immediato.
-- L'ACL globale **non** è nella catena di priorità menzionata sopra per richiesta — viene referenziata internamente dalla funzione di callback.
+- L'ACL globale **è** nella catena di priorità menzionata sopra — viene consultata al livello 3 quando il chiamante non è un curatore.
 
 ---
 
@@ -348,5 +347,5 @@ Il `PluginLoader` esegue verifiche di sicurezza rigorose durante il caricamento:
 ### Restrizioni permessi strumenti
 
 - I plugin che registrano strumenti tramite l'interfaccia `ITool` sono soggetti allo stesso sistema di permessi
-- Gli strumenti plugin non possono bypassare la catena di permessi a 5 livelli
+- Gli strumenti plugin non possono bypassare la catena di permessi a 3 livelli
 - Gli strumenti plugin sono soggetti alla marcatura `[SiliconManagerOnly]`

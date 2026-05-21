@@ -224,9 +224,9 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Common/          # Implementazione comune (usata da entrambe le versioni)
 │   ├── SiliconLife.App/             # Livello applicativo condiviso tra Default e Fast
 │   ├── SiliconLife.Default/         # Implementazione standard + punto ingresso (versione console)
-│   ├── SiliconLife.Fast/            # Implementazione alte prestazioni + punto ingresso (versione Forms)
+│   ├── SiliconLife.Fast/            # Implementazione alte prestazioni + punto ingresso (versione desktop)
 │   ├── SiliconLife.Speedy/          # Motore storage alte prestazioni SpeedyPack
-│   └── SiliconLife.Speedy.Manager/  # Strumento gestione SpeedyPack (Windows Forms)
+│   └── SiliconLife.Speedy.Manager/  # Strumento gestione SpeedyPack (Avalonia UI)
 ├── docs/                            # Documentazione (multilingue, 33 varianti linguistiche)
 │   ├── en/                          # Inglese
 │   ├── zh-CN/                       # Cinese semplificato

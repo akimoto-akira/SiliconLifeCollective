@@ -485,7 +485,7 @@ L'interfaccia Web evita interamente i file di template, generando tutto il marku
 
 ### Sistema di controller
 
-L'interfaccia Web segue un **pattern di tipo MVC**, con 23 controller che gestiscono diversi aspetti:
+L'interfaccia Web segue un **pattern di tipo MVC**, con 22 controller che gestiscono diversi aspetti:
 
 | Controller | Scopo |
 |------------|--------|

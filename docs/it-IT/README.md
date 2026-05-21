@@ -13,7 +13,7 @@
 - **Guidato da file dell'anima** — Ogni Silicon Being è controllato da un file prompt centrale (`soul.md`) che definisce una personalità unica e modelli di comportamento
 - **Architettura Body-Brain** — Il *Body* (SiliconBeing) riceve i segni vitali e rileva gli scenari di attivazione; il *Brain* (ContextManager) è responsabile del caricamento della cronologia, delle chiamate IA, dell'esecuzione degli strumenti e della persistenza delle risposte
 - **Capacità di auto-sviluppo** — Attraverso la tecnologia di compilazione dinamica Roslyn, i Silicon Beings possono riscrivere il proprio codice per realizzare l'evoluzione
-- **Gestione degli stati di attività** — Supporto per quattro stati di attività: Idle (inattivo), Working (in lavoro), Error (errore), Stopped (arrestato). Entrata automatica nello stato Stopped dopo 10 errori consecutivi
+- **Gestione degli stati di attività** — Supporto per stati di attività: Idle (inattivo), SingleChat (chat individuale), GroupChat (chat di gruppo), Task (attività), Timer (timer), Broadcast (diffusione), Project (progetto), MemoryCompression (compressione memoria), Stopped (arrestato). Entrata automatica nello stato Stopped dopo 10 errori consecutivi
 
 ### Sistema di plugin
 - **Architettura di estensione tramite plugin** — Estensione delle funzionalità tramite l'interfaccia IPlugin, supporta il caricamento dinamico di DLL di plugin da una directory
@@ -26,7 +26,7 @@
 - **Strumento di hot reload** — Supporta la compilazione automatica, l'aggiornamento dei file e il riavvio di SiliconLife.Fast durante l'esecuzione, senza intervento manuale
 - **Ciclo di chiamata degli strumenti** — L'IA restituisce una chiamata di strumento → Esegue lo strumento → Restituisce i risultati all'IA → Continua il ciclo fino a una risposta in testo puro
 - **Sicurezza dei permessi dell'esecutore** — Tutte le operazioni I/O passano attraverso una validazione rigorosa dei permessi tramite gli esecutori
-  - Catena di permessi a 5 livelli: UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL)
+  - Catena di permessi a 3 livelli: UserFrequencyCache → IPermissionCallback → (Curatore→IPermissionAskHandler / Non-curatore→GlobalACL→Negazione predefinita)
   - Registrazione di audit completa di tutte le decisioni sui permessi
 
 ### IA e Conoscenza
@@ -40,11 +40,11 @@
 ### Interfaccia Web
 - **Interfaccia Web moderna** — Server HTTP integrato con aggiornamenti in tempo reale SSE
 - **7 temi d'aspetto** — Versioni Admin, Chat, Creative, Dev, Alto contrasto, Light, Minimal, supporta rilevamento e commutazione automatici
-- **23 controller** — Gestione completa del sistema, chat, configurazione, funzionalità di monitoraggio
+- **22 controller** — Gestione completa del sistema, chat, configurazione, funzionalità di monitoraggio
 - **Zero dipendenze framework frontend** — HTML/CSS/JS generati lato server tramite `H`, `CssBuilder` e `JsBuilder`
 
 ### Internazionalizzazione e Localizzazione
-- **33 varianti linguistiche**supporto completo, che coprono 2 sistemi di scrittura e molteplici varianti regionali
+- **33 varianti linguistiche**supporto completo, che coprono 4 sistemi di scrittura e molteplici varianti regionali
   - **Cinese semplificato**: zh-CN (Cina continentale), zh-SG (Singapore), zh-MY (Malesia) (3 varianti)
   - **Cinese tradizionale**: zh-HK (Hong Kong), zh-TW (Taiwan), zh-MO (Macao) (3 varianti)
   - **Inglese**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 varianti)
@@ -95,7 +95,7 @@ Questo progetto offre due versioni di implementazione per soddisfare diverse esi
 
 | Caratteristica | SiliconLife.Default | SiliconLife.Fast |
 |---------|---------------------|------------------|
-| **Modalità di esecuzione** | Applicazione console | Applicazione Forms (barra di stato) |
+| **Modalità di esecuzione** | Applicazione console | Applicazione desktop (Windows/macOS tray di sistema / Linux finestra di stato) |
 | **Interfaccia utente** | Interfaccia Web (accesso browser) | Icona barra di stato + Finestra barra di stato + Interfaccia Web |
 | **Barra di stato di sistema** | ❌ No | ✅ Supporta la minimizzazione nella barra di stato |
 | **Esecuzione in background** | ❌ Termina alla chiusura della console | ✅ Esecuzione continua in background nella barra di stato |
@@ -168,7 +168,7 @@ SiliconLifeCollective.sln
 │   │   ├── Help/                          # Localizzazione documentazione aiuto (multilingue)
 │   │   └── Web/                           # Implementazione interfaccia Web
 │   │       ├── Component/                 # Libreria componenti UI (27 componenti)
-│   │       ├── Controllers/               # 23 controller
+│   │       ├── Controllers/               # 22 controller
 │   │       ├── Models/                    # ViewModel
 │   │       ├── Views/                     # Viste HTML
 │   │       └── Skins/                     # 7 temi d'aspetto
@@ -213,7 +213,7 @@ SiliconLifeCollective.sln
 │       │   ├── SpkHeader.cs              # Header file pacchetto
 │       │   └── PathNormalizer.cs          # Normalizzazione percorso
 │   │
-│   └── SiliconLife.Speedy.Manager/        # Strumento gestione SpeedyPack (Windows Forms)
+│   └── SiliconLife.Speedy.Manager/        # Strumento gestione SpeedyPack (Avalonia UI)
 │       ├── MainForm.cs                    # Form principale
 │       ├── Program.cs                     # Punto ingresso
 │       └── slc.ico                        # Icona applicazione
@@ -242,7 +242,7 @@ Loop principale (thread dedicato, watchdog + circuit breaker)
 Tutte le operazioni I/O iniziate dall'IA devono attraversare una catena di sicurezza rigorosa:
 
 ```
-Chiamata strumento → Esecutore → Gestore permessi → [Cache frequenza → Callback → (IsCurator: Chiedi utente | Non-curator: GlobalACL)]
+Chiamata strumento → Esecutore → Gestore permessi → UserFrequencyCache → IPermissionCallback → (Curatore→IPermissionAskHandler / Non-curatore→GlobalACL→Negazione predefinita)
 ```
 
 ## 🚀 Avvio rapido
@@ -328,11 +328,11 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] Fase 3: Primo Silicon Being con file dell'anima (architettura Body-Brain)
 - [x] Fase 4: Storage persistente (sistema chat + interfaccia Time Storage)
 - [x] Fase 5: Sistema strumenti + esecutori
-- [x] Fase 6: Sistema permessi (catena 5 livelli, log audit, GlobalACL)
+- [x] Fase 6: Sistema permessi (catena 3 livelli, log audit, GlobalACL)
 - [x] Fase 7: Compilazione dinamica + auto-sviluppo (Roslyn)
 - [x] Fase 8: Storage lungo termine + attività + timer
 - [x] Fase 9: Host principale + collaborazione multi-agente
-- [x] Fase 10: Interfaccia Web (HTTP + SSE, 23 controller, 7 skin)
+- [x] Fase 10: Interfaccia Web (HTTP + SSE, 22 controller, 7 skin)
 - [x] Fase 10.5: Miglioramenti incrementali (canali broadcast, audit token, 32 calendari, miglioramenti strumenti, 33 varianti linguistiche localizzazione)
 - [x] Fase 10.6: Completamento & Ottimizzazione (WebView, sistema aiuto, spazio progetti, rete conoscenza)
 - [x] Fase 11: Motore storage SpeedyPack (sostituzione LiteDB, mappatura memoria, coda scrittura asincrona, compressione automatica)
