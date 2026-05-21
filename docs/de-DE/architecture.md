@@ -24,7 +24,7 @@ Dieses Projekt bietet zwei Implementierungsversionen, die dasselbe Architekturen
 - **Merkmale**:
   - Windows/macOS System Tray-Hintergrundausführung mit Echtzeitüberwachung über Tray-Statusfenster; Linux Statusfenster direkt angezeigt
   - SpeedyPack-Engine + automatische Komprimierung gewährleisten Datensicherheit
-  - Component-UI-Architektur, 30+ deklarative Komponenten
+  - Component-UI-Architektur, 27 deklarative UI-Komponenten
   - 7 Skin-Themes, unterstützt automatische Erkennung und Umschaltung
   - Hot-Reload-Tool für Online-Updates und Neustarts
   - Linux öffnet automatisch den Browser für Web-UI-Zugriff, unterstützt `--no-tray` Parameter
@@ -482,7 +482,7 @@ Die Web-UI vermeidet vollständig Template-Dateien, generiert alle Markierungen 
 
 ### Controller-System
 
-Die Web-UI folgt **MVC-ähnlichem Pattern**, 23 Controller behandeln verschiedene Aspekte:
+Die Web-UI folgt **MVC-ähnlichem Pattern**, 22 Controller behandeln verschiedene Aspekte:
 
 | Controller | Zweck |
 |------------|---------|
@@ -517,12 +517,15 @@ Die Web-UI folgt **MVC-ähnlichem Pattern**, 23 Controller behandeln verschieden
 
 ### Lokalisierung
 
-Das System unterstützt umfassende Lokalisierung für **29 Sprachvarianten**:
-- **Chinesisch (6)**: zh-CN (Simplified), zh-HK (Traditional), zh-SG (Singapur), zh-MO (Macau), zh-TW (Taiwan), zh-MY (Malaysia)
+Das System unterstützt umfassende Lokalisierung für **33 Sprachvarianten**:
+- **Chinesisch (6)**: zh-CN (Vereinfacht), zh-HK (Traditionell), zh-SG (Singapur), zh-MO (Macao), zh-TW (Taiwan), zh-MY (Malaysia)
 - **Englisch (10)**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY
 - **Spanisch (2)**: es-ES, es-MX
 - **Deutsch (5)**: de-DE, de-AT, de-CH, de-LU, de-LI
 - **Französisch (3)**: fr-FR, fr-CA, fr-CH
+- **Italienisch (1)**: it-IT
+- **Polnisch (1)**: pl-PL
+- **Portugiesisch (2)**: pt-PT, pt-BR
 - **Andere (3)**: ja-JP (Japanisch), ko-KR (Koreanisch), cs-CZ (Tschechisch)
 
 Aktives Locale ausgewählt durch `DefaultConfigData.Language`, aufgelöst durch `LocalizationManager`.

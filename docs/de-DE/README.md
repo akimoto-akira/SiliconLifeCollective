@@ -26,7 +26,7 @@
 - **Hot-Reload-Tool** — Unterstützt automatische Kompilierung, Dateiaktualisierung und Neustart von SiliconLife.Fast während der Laufzeit, ohne manuelles Eingreifen
 - **Tool-Aufruf-Schleife** — KI gibt Tool-Aufruf zurück → Tool ausführen → Ergebnisse an KI zurückgeben → Schleife fortsetzen bis reine Textantwort
 - **Executor-Berechtigungssicherheit** — Alle I/O-Operationen durchlaufen strenge Berechtigungsvalidierung über Executoren
-  - 5-stufige Berechtigungskette: UserFrequencyCache → IPermissionCallback → (Kurator→IPermissionAskHandler / Nicht-Kurator→GlobalACL→Verweigert)
+  - 3-stufige Berechtigungskette: UserFrequencyCache → IPermissionCallback → (Kurator→IPermissionAskHandler / Nicht-Kurator→GlobalACL→Standardverweigerung)
   - Vollständige Audit-Protokollierung aller Berechtigungsentscheidungen
 
 ### KI & Wissen
@@ -40,17 +40,20 @@
 ### Web-Oberfläche
 - **Moderne Web-UI** — Integrierter HTTP-Server mit SSE-Echtzeitaktualisierungen
 - **7 Skin-Themes** — Admin-, Chat-, Creative-, Dev-, High-Contrast-, Light-, Minimal-Versionen, unterstützt automatische Erkennung und Umschaltung
-- **23 Controller** — Vollständige Systemverwaltung, Chat, Konfiguration, Überwachungsfunktionalität
+- **22 Controller** — Vollständige Systemverwaltung, Chat, Konfiguration, Überwachungsfunktionalität
 - **Null Frontend-Framework-Abhängigkeit** — HTML/CSS/JS serverseitig generiert durch `H`, `CssBuilder` und `JsBuilder`
 
 ### Internationalisierung & Lokalisierung
-- **Umfassende Unterstützung für 29 Sprachimplementierungen**, abdeckend 2 Schriftsysteme und mehrere regionale Varianten
+- **Umfassende Unterstützung für 33 Sprachimplementierungen**, abdeckend 4 Schriftsysteme und mehrere regionale Varianten
   - **Chinesisch (Vereinfacht)**: zh-CN (China Festland), zh-SG (Singapur), zh-MY (Malaysia) (3 Varianten)
   - **Chinesisch (Traditionell)**: zh-HK (Hongkong), zh-TW (Taiwan), zh-MO (Macao) (3 Varianten)
   - **Englisch**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 Varianten)
   - **Spanisch**: es-ES, es-MX (2 Varianten)
   - **Deutsch**: de-DE, de-AT, de-CH, de-LU, de-LI (5 Varianten)
   - **Französisch**: fr-FR, fr-CA, fr-CH (3 Varianten)
+  - **Italienisch**: it-IT (1 Variante)
+  - **Polnisch**: pl-PL (1 Variante)
+  - **Portugiesisch**: pt-PT, pt-BR (2 Varianten)
   - **Japanisch**: ja-JP | **Koreanisch**: ko-KR | **Tschechisch**: cs-CZ (3 Varianten)
 
 ### Daten & Speicherung
@@ -75,14 +78,14 @@ Dieses Projekt bietet zwei Implementierungsversionen, um unterschiedliche Szenar
 
 ### SiliconLife.Fast (Hochleistungsversion)
 - **Positionierung**: Haupt-Produktionsversion
-- **Ausführungsmodus**: Windows Forms-Anwendung (unterstützt Systemtray)
+- **Ausführungsmodus**: Desktop-Anwendung (Windows/macOS System Tray / Linux Statusfenster)
 - **Speichermethode**: SpeedyPack-In-Memory-Speicher + asynchrone Batch-Persistenz (.spk-Dateiformat)
 - **Anwendbare Szenarien**: Hohe Parallelität, niedrige Latenz, große Datenmengen
 - **Merkmale**:
   - Extreme Performance-Optimierung
   - Tray-Hintergrundausführung mit Echtzeitüberwachung über Tray-Statusfenster
   - SpeedyPack-Engine + automatische Komprimierung gewährleisten Datensicherheit
-  - Component-UI-Architektur, 30+ deklarative Komponenten
+  - Component-UI-Architektur, 27 deklarative UI-Komponenten
   - 7 Skin-Themes, unterstützt automatische Erkennung und Umschaltung
   - Hot-Reload-Tool für Online-Updates und Neustarts
 - **Performance-Verbesserung**: Speicherlese-Latenz um 1000x reduziert, Schreiblatenz um 15000x reduziert, parallele Verarbeitungskapazität um 50x erhöht
@@ -110,9 +113,9 @@ Dieses Projekt bietet zwei Implementierungsversionen, um unterschiedliche Szenar
 
 | Komponente | SiliconLife.Default | SiliconLife.Fast |
 |------|---------------------|------------------|
-| Runtime | .NET 9 | .NET 9 Windows |
+| Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Programmiersprache | C# | C# |
-| Anwendungstyp | Konsolenanwendung | Windows Forms-Anwendung |
+| Anwendungstyp | Konsolenanwendung | Desktop-Anwendung (Windows/macOS System Tray / Linux Statusfenster) |
 | KI-Integration | Ollama (lokal), Alibaba Cloud DashScope (Cloud) | Ollama (lokal), Alibaba Cloud DashScope (Cloud), Volcengine Ark (Cloud) |
 | Datenspeicherung | Dateisystem (JSON + Zeitindex-Verzeichnis) | SpeedyPack (.spk-Format, In-Memory-Zuordnung + asynchrone Persistenz) |
 | Webserver | HttpListener (.NET integriert) | HttpListener (.NET integriert) |
@@ -150,13 +153,13 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # Globaler Service-Locator
 │   │
 │   ├── SiliconLife.Common/                # Gemeinsame Implementierung (beide Versionen)
-│   │   ├── AI/                            # KI-Client-Factory (Ollama, DashScope, VolcengineArk)
+│   │   ├── AI/                            # KI-Client-Factories (Ollama, DashScope, VolcengineArk)
 │   │   ├── Calendar/                      # 32 Kalenderimplementierungen
-│   │   ├── Localization/                  # Lokalisierung-Basisklasse mit 29 Sprach-/Regionvarianten
+│   │   ├── Localization/                  # Lokalisierung-Basisklasse mit 33 Sprach-/Regionvarianten
 │   │   ├── Resources/                     # Gemeinsame Ressourcendateien
 │   │   ├── Security/                      # Berechtigungsmanager
 │   │   ├── SiliconBeing/                  # Standard-Silicon-Being-Implementierung
-│   │   ├── Tools/                         # 23 gemeinsame Tool-Implementierungen (inkl. Hot-Reload-Tool)
+│   │   ├── Tools/                         # 24 gemeinsame Tool-Implementierungen (inkl. Hot-Reload-Tool)
 │   │   ├── Web/                           # Web-Infrastruktur
 │   │   └── WebView/                       # Playwright WebView-Implementierung
 │   │
@@ -165,8 +168,8 @@ SiliconLifeCollective.sln
 │   │   ├── Data/                          # Datenverzeichnis
 │   │   ├── Help/                          # Hilfedokumentations-Lokalisierung (mehrsprachig)
 │   │   └── Web/                           # Web-UI-Implementierung
-│   │       ├── Component/                 # UI-Komponentenbibliothek (30+ Komponenten)
-│   │       ├── Controllers/               # 23 Controller
+│   │       ├── Component/                 # UI-Komponentenbibliothek (27 UI-Komponenten)
+│   │       ├── Controllers/               # 22 Controller
 │   │       ├── Models/                    # View-Modelle
 │   │       ├── Views/                     # HTML-Ansichten
 │   │       └── Skins/                     # 7 Skin-Themes
@@ -180,7 +183,7 @@ SiliconLifeCollective.sln
 │   │   ├── Project/                       # Projektssystem-Implementierung
 │   │   ├── Security/                      # Standard-Berechtigungs-Callbacks
 │   │   ├── Storage/                       # Dateisystem-Speicherimplementierung
-│   │   └── Tools/                         # Versionsspezifische Tool-Implementierungen (HelpTool)
+│   │   └── Tools/                         # Versionsspezifische Tool-Implementierungen
 │   │
 │   ├── SiliconLife.Fast/                  # Hochleistungsimplementierung + Anwendungseinstieg (Forms-Version)
 │   │   ├── Program.cs                     # Einstiegspunkt (Forms-Anwendung)
@@ -191,8 +194,8 @@ SiliconLifeCollective.sln
 │   │   ├── Project/                       # Projektssystem-Implementierung
 │   │   ├── Security/                      # Optimierte Berechtigungs-Callbacks
 │   │   ├── Storage/                       # SpeedyPack-Speicheradapter
-│   │   ├── Tools/                         # Versionsspezifische Tool-Implementierungen (HelpTool)
-│   │   └── Tray/                          # Systemtray (29 Sprachlokalisierungen)
+│   │   ├── Tools/                         # Versionsspezifische Tool-Implementierungen
+│   │   └── Tray/                          # Systemtray (33 Sprachlokalisierungen)
 │   │
 │   ├── SiliconLife.Speedy/                # SpeedyPack Hochleistungsspeicher-Engine
 │   │   ├── SpeedyPack.cs                  # Kernklasse (In-Memory-Verzeichniszuordnung + Cache + asynchrones Schreiben)
@@ -211,9 +214,12 @@ SiliconLifeCollective.sln
 │   │       ├── SpkHeader.cs               # Paketdatei-Header
 │   │       └── PathNormalizer.cs          # Pfadnormalisierung
 │   │
-│   └── SiliconLife.Speedy.Manager/        # SpeedyPack-Verwaltungstool (Windows Forms)
-│       ├── MainForm.cs                    # Hauptformular
+│   └── SiliconLife.Speedy.Manager/        # SpeedyPack-Verwaltungstool (Avalonia UI)
+│       ├── MainWindow.axaml.cs           # Hauptfenster
+│       ├── App.axaml.cs                  # Anwendungseinstieg
 │       ├── Program.cs                     # Einstiegspunkt
+│       ├── ProgressWindow.axaml.cs       # Fortschrittsfenster
+│       ├── ContentViewerWindow.axaml.cs  # Inhaltsbetrachter-Fenster
 │       └── slc.ico                        # Anwendungssymbol
 │
 ├── docs/                                  # Mehrsprachige Dokumentation
@@ -246,7 +252,7 @@ Hauptschleife (dedizierter Thread, Watchdog + Circuit Breaker)
 Alle von KI initiierten I/O-Operationen müssen eine strenge Sicherheitskette durchlaufen:
 
 ```
-Tool-Aufruf → Executor → Berechtigungsmanager → [IsCurator → Frequenz-Cache → GlobalACL → Callback → Benutzer fragen]
+Tool-Aufruf → Executor → Berechtigungsmanager → [Frequenz-Cache → Callback → (Kurator→BenutzerFragen / Nicht-Kurator→GlobalACL→Verweigern)]
 ```
 
 ## 🚀 Schnellstart
@@ -282,13 +288,19 @@ Die Anwendung startet den Webserver und öffnet automatisch die Web-UI im Browse
 - ✅ Kleines Datenvolumen, kurzfristige Nutzung
 - ✅ Entwicklungs- und Debugging-Phase
 
-#### Methode 2: Fast-Version ausführen (Windows Forms-Anwendung)
+#### Methode 2: Fast-Version ausführen (Desktop-Anwendung)
 
 ```bash
 dotnet run --project src/SiliconLife.Fast
 ```
 
-Die Anwendung startet im Forms-Modus, minimiert sich in den Systemtray und läuft im Hintergrund weiter.
+**Windows/macOS**: Die Anwendung startet im Forms-Modus, minimiert sich in den Systemtray und läuft im Hintergrund weiter.
+
+**Linux**: Die Anwendung zeigt ein Statusfenster an (kein Systemtray-Icon) und öffnet automatisch den Browser für Web-UI-Zugriff. Sie können auch den Parameter `--no-tray` verwenden, um das automatische Öffnen des Browsers zu überspringen:
+
+```bash
+dotnet run --project src/SiliconLife.Fast -- --no-tray
+```
 
 **Anwendbare Szenarien**:
 - ✅ Hochparallele Szenarien (> 5 Benutzer)
@@ -330,8 +342,8 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] Phase 7: Dynamikkompilierung + Selbstentwicklung (Roslyn)
 - [x] Phase 8: Langzeitspeicher + Aufgaben + Timer
 - [x] Phase 9: Kern-Host + Multi-Agenten-Kollaboration
-- [x] Phase 10: Web-UI (HTTP + SSE, 23 Controller, 7 Skins)
-- [x] Phase 10.5: Inkrementelle Verbesserungen (Broadcast-Kanäle, Token-Audit, 32 Kalender, Tool-Verbesserungen, 21-Sprach-Lokalisierung)
+- [x] Phase 10: Web-UI (HTTP + SSE, 22 Controller, 7 Skins)
+- [x] Phase 10.5: Inkrementelle Verbesserungen (Broadcast-Kanäle, Token-Audit, 32 Kalender, Tool-Verbesserungen, 29-Sprach-Lokalisierung)
 - [x] Phase 10.6: Vervollständigung & Optimierung (WebView, Hilfesystem, Projekt-Workspace, Wissensnetzwerk)
 - [x] Phase 11: SpeedyPack-Speicher-Engine (Ersetzung von LiteDB, In-Memory-Zuordnung, asynchrone Schreibwarteschlange, automatische Komprimierung)
 - [x] Phase 12: Plugin-System (IPlugin-Schnittstelle, PluginLoader-Sicherheits-Sandkasten, isoliertes Laden, Tool-Integration)

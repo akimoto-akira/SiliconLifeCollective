@@ -9,7 +9,7 @@
 Die Sicherheit von Silicon Life Collective basiert auf einem **Mehrschichtigen Verteidigungs**modell. Kernprinzip: **Alle I/O-Operationen müssen durch Executoren**, Executoren erzwingen Berechtigungsprüfungen vor Ausführung.
 
 ```
-Tool-Aufruf → Executor → PermissionManager → HighDeny-Cache → HighAllow-Cache → Callback → Benutzer fragen
+Tool-Aufruf → Executor → PermissionManager → Frequenz-Cache → Callback → (Kurator→BenutzerFragen / Nicht-Kurator→GlobalACL→Verweigern)
 ```
 
 ---
@@ -38,7 +38,7 @@ Jede Berechtigungsprüfung gibt eines von drei Ergebnissen zurück:
 
 ### Sonderrolle: Silicon Curator
 
-Der Silicon Curator hat höchste Berechtigungsstufe (`IsCurator = true`). Berechtigungsprüfungen des Curators lösen Benutzer-Eingabeaufforderung aus, andere Beings fragen GlobalACL synchron.
+Der Silicon Curator hat höchste Berechtigungsstufe (`IsCurator = true`). Berechtigungsprüfungen des Curators werden zu **Allowed** kurzgeschlossen, es sei denn der Benutzer überschreibt explizit.
 
 ### Privater PermissionManager
 
@@ -48,7 +48,7 @@ Jedes Silicon Being hat seine eigene **private PermissionManager**-Instanz. Bere
 
 ## Berechtigungsvalidierungsablauf
 
-Abfragepriorität: **1. Benutzer HighDeny → 2. Benutzer HighAllow → 3. Callback-Funktion**
+Abfragepriorität: **1. UserFrequencyCache → 2. IPermissionCallback → 3. Kurator-Verzweigung (AskHandler/GlobalACL)**
 
 ```
 ┌─────────────┐
@@ -64,9 +64,9 @@ Abfragepriorität: **1. Benutzer HighDeny → 2. Benutzer HighAllow → 3. Callb
                              │
                              ▼
                     ┌─────────────────┐
-                    │ 1. UserFrequency│
-                    │    Cache        │──HighDeny──▶ Denied
-                    │(HighDeny/       │──HighAllow─▶ Allowed
+                    │ 1. UserFrequency│──Match──▶ Allowed / Denied
+                    │    Cache        │
+                    │(HighDeny/       │
                     │ HighAllow)      │
                     └────────┬────────┘
                              │ Kein Cache-Treffer
@@ -75,48 +75,52 @@ Abfragepriorität: **1. Benutzer HighDeny → 2. Benutzer HighAllow → 3. Callb
                     │ 2. IPermission  │──▶ Allowed / Denied / AskUser
                     │    Callback     │
                     └────────┬────────┘
-                             │ AskUser
+                             │ AskUser oder kein Callback
                              ▼
                     ┌─────────────────┐
-                    │ 3. IsCurator?   │──Ja──▶ IPermissionAskHandler
-                    └────────┬────────┘       (Benutzer fragen)
-                             │ Nein
-                             ▼
-                    ┌─────────────────┐
-                    │ 4. GlobalACL    │──▶ Allowed / Denied
-                    └────────┬────────┘
-                             │ Keine Regel
-                             ▼
-                        Verweigert
+                    │ 3. IsCurator?   │
+                    └────┬───────┬────┘
+                         │       │
+                    Ja   │       │ Nein
+                         ▼       ▼
+              ┌──────────┐  ┌──────────────┐
+              │ Benutzer │  │ GlobalACL    │──Match──▶ Allowed / Denied
+              │ fragen   │  └──────┬───────┘
+              │ (IM)     │         │ Kein Match
+              └──────────┘         ▼
+                            ┌──────────────┐
+                            │ Standard-    │
+                            │ verweigerung │
+                            └──────────────┘
 ```
 
 **Wichtig**: Executor sieht nur Boolean (Allowed/Denied). PermissionManager verarbeitet intern Ternärentscheidung (Allowed/Denied/AskUser) und löst AskUser auf bevor Rückgabe an Executor.
-
 ---
 
 ## Executoren (Sicherheitsgrenze)
 
 Executoren sind der **einzige** Pfad für I/O-Operationen. Sie erzwingen:
 
-### Statische Klassen-Modell
+### Statisches Ausführungsmodell
 
-Executoren sind als **statische Klassen** implementiert:
+Aktuelle Executor-Implementierungen (`DiskExecutor`, `NetworkExecutor`, `CommandLineExecutor`) sind **statische Klassen** mit synchroner Ausführung und Timeout-Kontrolle:
 
-- Jeder Executor ist eine statische Klasse mit synchroner `Execute`-Methode
-- Berechtigungsvalidierung blockiert den Aufruf-Thread bis Entscheidung getroffen
-- Thread-Sicherheit durch interne Sperren gewährleistet
-- Timeout-Kontrolle pro Anfrage
+- Jeder Executor prüft Berechtigung über den privaten `PermissionManager` des Aufrufers via `ServiceLocator.Instance.GetPermissionManager(callerId)`.
+- Operationen laufen auf `Task.Run` mit konfigurierbarem Timeout.
+- Bei Timeout wird die Operation als fehlgeschlagen behandelt.
+- `ExecutorBase` bietet eine abstrakte Basisklasse mit Hintergrund-Thread und Anfragewarteschlange für zukünftige Erweiterungen.
 
 ### Thread-Sperrung für Berechtigungsvalidierung
 
 Wenn Tool Ressourcenzugriff initiiert:
 
-1. Executor empfängt Anfrage und **blockiert den Aufruf-Thread**.
-2. Executor queryt privaten PermissionManager des Beings.
-3. Wenn Callback AskUser zurückgibt und Being ist Curator, Executor-Thread **bleibt blockiert** wartend auf Benutzerantwort.
-4. Being sieht nur Endergebnis (Erfolg oder Verweigerung) — es sieht nie intermediären "Pending" oder "Waiting" Status.
-5. Normale Beings (Nicht-Curator) queryen synchron GlobalACL ohne Blockierung.
-6. Bei Timeout, Anfrage als Denied behandelt, Thread-Sperre freigegeben.
+1. Executor empfängt Anfrage.
+2. Executor fragt privaten PermissionManager des Beings via `ServiceLocator.Instance.GetPermissionManager(callerId)`.
+3. Wenn Berechtigung verweigert, Operation sofort blockiert.
+4. Wenn Callback AskUser zurückgibt (Kurator-Pfad), Executor-Thread **bleibt blockiert** wartend auf Benutzerantwort.
+5. Being sieht nur Endergebnis (Erfolg oder Verweigerung) — es sieht nie intermediären "Pending" oder "Waiting" Status.
+6. Nur der Silicon Curator löst echte Benutzerabfragen aus. Normale Beings fragen GlobalACL synchron ohne Blockierung.
+7. Bei Timeout, Anfrage als verweigert behandelt, Thread-Sperre freigegeben.
 
 ### Executor-Typen
 
@@ -125,7 +129,7 @@ Wenn Tool Ressourcenzugriff initiiert:
 | `DiskExecutor` | Datei Lesen/Schreiben, Verzeichnisoperationen | 30 Sekunden |
 | `NetworkExecutor` | HTTP-Anfragen, WebSocket-Verbindungen | 30 Sekunden |
 | `CommandLineExecutor` | Shell-Befehlsausführung | 30 Sekunden |
-| `DynamicCompilationExecutor` | Roslyn In-Memory-Kompilierung | 30 Sekunden |
+| `DynamicCompilationExecutor` | Roslyn In-Memory-Kompilierung | N/A (delegiert an CompilationCore) |
 
 ### Ausnahmeisolation und Fehlertoleranz
 
@@ -152,7 +156,7 @@ Gemeinsame Regeltabelle persistent im Storage, nur vom Silicon Curator verwaltet
 - Regeln sequentiell bewertet; erster Match gewinnt.
 - Nur Silicon Curator kann Global ACL modifizieren (durch dediziertes Tool).
 - Änderungen sofort wirksam.
-- Global ACL ist **nicht** in oben genannter Prioritätskette pro Abfrage — intern durch Callback-Funktion referenziert.
+- Global ACL wird direkt von `PermissionManager` für **Nicht-Kurator**-Beings geprüft, wenn der Callback AskUser zurückgibt oder kein Callback konfiguriert ist. Sie wird **nicht** von der Callback-Funktion referenziert.
 
 ---
 
@@ -194,7 +198,7 @@ Web-Frontend zeigt sofort **interaktive Card** mit:
 
 - Ressourcentyp und -pfad
 - Aktionsbeschreibung
-| Allowed / Denied Buttons
+- Erlauben / Verweigern Buttons
 - Optional "Immer erlauben" / "Immer verweigern" Checkbox (zum Frequenz-Cache hinzufügen)
 
 ### Instant Messaging (ohne Card-Unterstützung): Zufallscode
@@ -209,13 +213,13 @@ Für Messaging-Plattformen ohne interaktive Card-Unterstützung:
 ### Timeout
 
 - Timeout für alle AskUser-Anfragen gesetzt.
-| Bei Timeout, Anfrage als **Denied** behandelt, Executor-Thread-Sperre freigegeben.
+- Bei Timeout, Anfrage als **Denied** behandelt, Executor-Thread-Sperre freigegeben.
 
 ---
 
 ## Dynamische Kompilierungssicherheit
 
-Selbstentwicklung (Klassenüberschreibung) introduces einzigartige Sicherheitsrisiken. System mildert sie durch **Mehrschichtige Strategie**:
+Selbstentwicklung (Klassenüberschreibung) führt einzigartige Sicherheitsrisiken ein. System mildert sie durch **Mehrschichtige Strategie**:
 
 ### Schicht 1: Kompilierzeit-Referenzkontrolle (Primärverteidigung)
 
@@ -223,13 +227,13 @@ Selbstentwicklung (Klassenüberschreibung) introduces einzigartige Sicherheitsri
 - **Erlaubt**: `System.Runtime`, `System.Private.CoreLib`, Projekt-Assemblies (ITool-Schnittstelle etc.)
 - **Blockiert**: `System.IO`, `System.Reflection`, `System.Runtime.InteropServices` etc.
 - Wenn Code blockierte Assembly referenziert, **Compiler selbst lehnt** Code ab.
-| Zuverlässiger als Runtime-Scanning — gefährliche Operationen auf Typebene unmöglich.
+- Zuverlässiger als Runtime-Scanning — gefährliche Operationen auf Typebene unmöglich.
 
 ### Schicht 2: Runtime-Statische Analyse (Sekundärverteidigung)
 
 - Selbst nach erfolgreicher Kompilierung, Code gescannt nach statischen Mustern.
-| Erkennt gefährliche Operationsmuster (direktes I/O, Systemaufrufe etc.).
-| Bei gefährlichem Code, Laden abgelehnt, System fällt zurück auf Standardfunktionalität.
+- Erkennt gefährliche Operationsmuster (direktes I/O, Systemaufrufe etc.).
+- Bei gefährlichem Code, Laden abgelehnt, System fällt zurück auf Standardfunktionalität.
 
 ### Vererbungsbeschränkung
 
@@ -338,5 +342,5 @@ Das Plugin-System führt Sicherheitsrisiken durch Drittanbieter-Code-Ausführung
 ### Tool-Berechtigungsbeschränkungen
 
 - Plugins, die Tools über `ITool`-Schnittstelle registrieren, unterliegen demselben Berechtigungssystem
-- Plugin-Tools können die 5-stufige Berechtigungskette nicht umgehen
+- Plugin-Tools können die 3-stufige Berechtigungskette nicht umgehen
 - Plugin-Tools unterliegen der `[SiliconManagerOnly]`-Markierung

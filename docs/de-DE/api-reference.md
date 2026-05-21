@@ -27,14 +27,14 @@ Die meisten Endpunkte erfordern Authentifizierung über Sitzungs-Cookies, die vo
     {
       "id": "being-uuid",
       "name": "Assistant",
-      "status": "running",
+      "activity": "Idle",
       "soul": "path/to/soul.md"
     }
   ]
 }
 ```
 
-**Statuswerte**: `idle` | `running` | `waiting_permission` | `stopped`
+**Aktivitätswerte**: `Idle` | `SingleChat` | `GroupChat` | `Task` | `Timer` | `Broadcast` | `Project` | `MemoryCompression` | `Stopped`
 
 ### Being erstellen
 
@@ -82,9 +82,15 @@ Die meisten Endpunkte erfordern Authentifizierung über Sitzungs-Cookies, die vo
 ```json
 {
   "success": true,
-  "messageId": "50156b26-f3b9-4735-be3d-51e547bd3a4a"
+  "messageId": "message-uuid"
 }
 ```
+
+### Gestreamter Chat (SSE)
+
+**GET** `/api/chat/stream`
+
+Server-Sent Events-Stream für Echtzeit-Chat-Updates.
 
 ### Sitzungsliste abrufen
 
@@ -92,16 +98,18 @@ Die meisten Endpunkte erfordern Authentifizierung über Sitzungs-Cookies, die vo
 
 **Antwort**:
 ```json
-[
-  {
-    "sessionId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
-    "beingId": "being-uuid",
-    "type": "single",
-    "displayName": "Chat mit Being",
-    "lastMessage": "Letzte Nachricht",
-    "lastTime": "2026-04-20T10:30:00Z"
-  }
-]
+{
+  "conversations": [
+    {
+      "sessionId": "session-uuid",
+      "beingId": "being-uuid",
+      "type": "single",
+      "displayName": "Chat mit Being",
+      "lastMessage": "Hallo!",
+      "lastTime": "2026-04-20T10:30:00Z"
+    }
+  ]
+}
 ```
 
 ### Nachrichtenverlauf abrufen
@@ -113,42 +121,34 @@ Die meisten Endpunkte erfordern Authentifizierung über Sitzungs-Cookies, die vo
 {
   "messages": [
     {
-      "role": "user",
-      "content": "Hello",
-      "timestamp": "2026-04-20T10:30:00Z"
-    },
-    {
-      "role": "assistant",
-      "content": "Hi there!",
-      "timestamp": "2026-04-20T10:30:05Z"
+      "id": "message-uuid",
+      "senderId": "sender-uuid",
+      "channelId": "session-uuid",
+      "content": "Hallo",
+      "timestamp": "2026-04-20T10:30:00Z",
+      "role": "user"
     }
   ]
 }
 ```
 
+### Chat-Verlauf abrufen
+
+**GET** `/api/chat/history`
+
+Gibt Chat-Verlaufssitzungen zurück.
+
 ### AI-Denken stoppen
 
 **POST** `/api/chat/stop`
 
-**Anfrage**:
-```json
-{
-  "channelId": "session-uuid"
-}
-```
+Stoppt die aktuelle KI-Streaming-Antwort.
 
-### Gestreamter Chat (SSE)
+### Datei hochladen
 
-**GET** `/api/chat/stream?channelId={sessionId}`
+**POST** `/api/chat/upload`
 
-**Antwort**: Server-Sent Events-Stream
-
-```
-data: {"type": "chunk", "content": "I"}
-data: {"type": "chunk", "content": "'m"}
-data: {"type": "chunk", "content": " thinking..."}
-data: {"type": "complete", "sessionId": "uuid"}
-```
+Lädt eine Datei in die Chat-Sitzung hoch.
 
 ---
 
@@ -392,6 +392,87 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ---
 
+## Speicher-API
+
+### Speicherliste abrufen
+
+**GET** `/api/memory/list`
+
+**Abfrageparameter**: `beingId`, `type`, `limit`
+
+### Speicherdetails abrufen
+
+**GET** `/api/memory/detail/{id}`
+
+### Speicherstatistiken abrufen
+
+**GET** `/api/memory/stats`
+
+**Abfrageparameter**: `beingId`
+
+### Speicher durchsuchen
+
+**GET** `/api/memory/search`
+
+**Abfrageparameter**: `beingId`, `keyword`, `limit`
+
+### Speicher-Beings abrufen
+
+**GET** `/api/memory/beings`
+
+Gibt Liste der Beings mit Speicherdaten zurück.
+
+### Speicher-Ursprung zurückverfolgen
+
+**GET** `/api/memory/trace/{id}`
+
+Verfolgt die ursprüngliche Quelle eines Speichereintrags.
+
+### Speicher-Zeitachse HTML abrufen
+
+**GET** `/api/memory/timeline-html`
+
+**Abfrageparameter**: `beingId`
+
+Gibt HTML-Fragment für Speicher-Zeitachsenvisualisierung zurück.
+
+---
+
+## Code-Browser-API
+
+### Code-Typen abrufen
+
+**GET** `/api/code/types`
+
+Gibt alle verfügbaren Typen für Code-Browsing zurück.
+
+### Code-Details abrufen
+
+**GET** `/api/code/detail`
+
+**Abfrageparameter**: `type`, `member`
+
+Gibt detaillierte Informationen über einen bestimmten Typ oder Member zurück.
+
+---
+
+## Executor-API
+
+### Executor-Status abrufen
+
+**GET** `/api/executors/status`
+
+**Antwort**:
+```json
+[
+  { "name": "DiskExecutor", "status": "Idle", "queueCount": 0 },
+  { "name": "NetworkExecutor", "status": "Idle", "queueCount": 0 },
+  { "name": "CommandLineExecutor", "status": "Idle", "queueCount": 0 }
+]
+```
+
+---
+
 ## Systeminformationen
 
 ### Über-Seite abrufen
@@ -534,7 +615,7 @@ Server-Sent Events für Echtzeit-Updates:
 ### Chat-Ereignisse
 
 ```javascript
-const eventSource = new EventSource('/api/chat/stream?channelId=xxx');
+const eventSource = new EventSource('/api/chat/stream?beingId=xxx&message=xxx');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);
@@ -576,11 +657,24 @@ beingEvents.onmessage = (event) => {
 ```csharp
 public interface IAIClient
 {
-    string Name { get; }
+    string Endpoint { get; }
+    string DefaultModel { get; }
+    bool? StreamingMode { get; }
+    bool? SupportsToolCalls { get; }
     
+    AIResponse Chat(AIRequest request);
     Task<AIResponse> ChatAsync(AIRequest request);
+    IAsyncEnumerable<AIResponse> ChatStreamAsync(AIRequest request, CancellationToken cancellationToken = default);
     
-    IAsyncEnumerable<string> StreamChatAsync(AIRequest request);
+    AIResponse Chat(string userMessage);
+    Task<AIResponse> ChatAsync(string userMessage);
+    AIResponse Chat(string systemPrompt, string userMessage);
+    Task<AIResponse> ChatAsync(string systemPrompt, string userMessage);
+    
+    AIResponse Generate(string prompt);
+    Task<AIResponse> GenerateAsync(string prompt);
+    AIResponse Generate(string systemPrompt, string prompt);
+    Task<AIResponse> GenerateAsync(string systemPrompt, string prompt);
 }
 ```
 
@@ -589,11 +683,9 @@ public interface IAIClient
 ```csharp
 public class AIRequest
 {
-    public List<Message> Messages { get; set; }
-    public List<ToolDefinition> Tools { get; set; }
-    public double Temperature { get; set; } = 0.7;
-    public int MaxTokens { get; set; } = 2000;
-    public string Model { get; set; }
+    public string Model { get; set; } = string.Empty;
+    public List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
+    public List<ToolDefinition>? Tools { get; set; }
 }
 ```
 
@@ -602,10 +694,17 @@ public class AIRequest
 ```csharp
 public class AIResponse
 {
-    public string Content { get; set; }
-    public List<ToolCall> ToolCalls { get; set; }
-    public TokenUsage Usage { get; set; }
-    public string Model { get; set; }
+    public string Model { get; set; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
+    public string? Thinking { get; set; }
+    public List<ToolCall>? ToolCalls { get; set; }
+    public int? PromptTokens { get; set; }
+    public int? CompletionTokens { get; set; }
+    public int? TotalTokens { get; set; }
+    public bool Success { get; set; } = true;
+    public string? ErrorMessage { get; set; }
+    public bool IsStreamFinal { get; set; }
+    public bool HasToolCalls => ToolCalls != null && ToolCalls.Count > 0;
 }
 ```
 
@@ -624,8 +723,8 @@ public class AIResponse
     {
       "id": "note-uuid",
       "pageNumber": 1,
-      "summary": "完成用户认证模块",
-      "keywords": ["认证", "JWT", "OAuth2"],
+      "summary": "Benutzerauthentifizierungsmodul abgeschlossen",
+      "keywords": ["Authentifizierung", "JWT", "OAuth2"],
       "createdAt": "2026-04-25T10:00:00Z",
       "updatedAt": "2026-04-25T10:00:00Z"
     }
@@ -643,9 +742,9 @@ public class AIResponse
 {
   "id": "note-uuid",
   "pageNumber": 1,
-  "summary": "完成用户认证模块",
-  "content": "## 实现细节\n\n- 使用 JWT token\n- 支持 OAuth2",
-  "keywords": ["认证", "JWT", "OAuth2"],
+  "summary": "Benutzerauthentifizierungsmodul abgeschlossen",
+  "content": "## Implementierungsdetails\n\n- JWT-Token verwenden\n- OAuth2 unterstützen",
+  "keywords": ["Authentifizierung", "JWT", "OAuth2"],
   "createdAt": "2026-04-25T10:00:00Z",
   "updatedAt": "2026-04-25T10:00:00Z"
 }
@@ -658,9 +757,9 @@ public class AIResponse
 **Anfrage**:
 ```json
 {
-  "summary": "完成用户认证模块",
-  "content": "## 实现细节\n\n- 使用 JWT token",
-  "keywords": "认证,JWT,OAuth2"
+  "summary": "Benutzerauthentifizierungsmodul abgeschlossen",
+  "content": "## Implementierungsdetails\n\n- JWT-Token verwenden",
+  "keywords": "Authentifizierung,JWT,OAuth2"
 }
 ```
 
@@ -673,9 +772,9 @@ public class AIResponse
 **Anfrage**:
 ```json
 {
-  "summary": "完成用户认证模块及测试",
-  "content": "## 更新后的内容\n\n添加了单元测试",
-  "keywords": "认证,JWT,OAuth2,测试"
+  "summary": "Benutzerauthentifizierungsmodul und Tests abgeschlossen",
+  "content": "## Aktualisierter Inhalt\n\nUnit-Tests hinzugefügt",
+  "keywords": "Authentifizierung,JWT,OAuth2,Tests"
 }
 ```
 
@@ -685,7 +784,7 @@ public class AIResponse
 
 ### Notizen suchen
 
-**GET** `/api/beings/{id}/work-notes/search?keyword=认证&maxResults=10`
+**GET** `/api/beings/{id}/work-notes/search?keyword=Authentifizierung&maxResults=10`
 
 ### Notizverzeichnis abrufen
 
@@ -796,8 +895,8 @@ public class AIResponse
   "topics": [
     {
       "id": "getting-started",
-      "title": "快速开始",
-      "category": "入门指南"
+      "title": "Schnellstart",
+      "category": "Einstiegsleitfaden"
     }
   ]
 }
@@ -811,9 +910,9 @@ public class AIResponse
 ```json
 {
   "id": "getting-started",
-  "title": "快速开始",
-  "content": "# 快速开始\n\n...",
-  "category": "入门指南"
+  "title": "Schnellstart",
+  "content": "# Schnellstart\n\n...",
+  "category": "Einstiegsleitfaden"
 }
 ```
 
@@ -927,9 +1026,10 @@ public interface ITool
 {
     string Name { get; }
     string Description { get; }
-    ToolDefinition Definition { get; }
+    string GetDisplayName(Language language);
+    Dictionary<string, object> GetParameterSchema();
     
-    Task<ToolResult> ExecuteAsync(ToolCall call);
+    ToolResult Execute(Guid callerId, Dictionary<string, object> parameters);
 }
 ```
 
@@ -938,9 +1038,9 @@ public interface ITool
 ```csharp
 public class ToolCall
 {
-    public string Id { get; set; }
-    public string Name { get; set; }
-    public Dictionary<string, object> Parameters { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public Dictionary<string, object> Arguments { get; set; } = new();
 }
 ```
 
@@ -949,9 +1049,9 @@ public class ToolCall
 ```csharp
 public class ToolResult
 {
-    public bool Success { get; set; }
-    public string Output { get; set; }
-    public string Error { get; set; }
+    public bool Success { get; }
+    public string Message { get; }
+    public object? Data { get; }
 }
 ```
 

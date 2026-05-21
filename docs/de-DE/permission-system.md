@@ -8,7 +8,7 @@
 
 Das Berechtigungssystem stellt sicher, dass alle von KI initiierten Operationen angemessen validiert und überwacht werden.
 
-## 5-stufige Berechtigungskette
+## 3-stufige Berechtigungskette
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -25,21 +25,29 @@ Das Berechtigungssystem stellt sicher, dass alle von KI initiierten Operationen 
 └─────────────────────────────────────────────┘
 ```
 
+> **Hinweis**: Die tatsächliche Abfragepriorität in `PermissionManager.CheckPermission()` ist:
+> 1. **UserFrequencyCache** — Zuerst zwischengespeicherte Benutzerentscheidungen prüfen
+> 2. **IPermissionCallback** — Benutzerdefinierte Callback-Regeln auswerten
+> 3. **Kurator-Verzweigung** — Wenn Callback AskUser zurückgibt oder kein Callback konfiguriert:
+>    - **Kurator** → `IPermissionAskHandler` (Benutzer über IM fragen)
+>    - **Nicht-Kurator** → `GlobalACL` → Standardverweigerung
+
 ## Stufe 1: UserFrequencyCache
 
-Zwischengespeicherte Benutzerentscheidungen zur Vermeidung wiederholter Rückfragen.
-
-- **HighDeny** — Benutzer hat diese Ressource kürzlich verweigert, automatisch ablehnen
-- **HighAllow** — Benutzer hat diese Ressource kürzlich erlaubt, automatisch genehmigen
+Pro-Being, nur im Speicher befindlicher Cache häufiger Benutzerentscheidungen (HighDeny/HighAllow).
 
 ```csharp
 var cache = new UserFrequencyCache();
-var cached = cache.Check(userId, resource);
-if (cached != null)
+PermissionResult? cachedResult = cache.Query(permissionType, resource);
+if (cachedResult.HasValue)
 {
-    return cached; // HighDeny → Denied, HighAllow → Allowed
+    return cachedResult.Value == PermissionResult.Allowed;
 }
 ```
+
+- **HighDeny** hat Priorität über **HighAllow**
+- **Nur im Speicher**: Caches werden nicht persistent gespeichert, bei Neustart verloren
+- **Konfigurierbarer Ablauf**: Benutzer können Gültigkeitsdauer für Cache-Einträge setzen
 
 ## Stufe 2: IPermissionCallback
 
@@ -71,91 +79,96 @@ Benutzerdefinierte Callbacks für dynamische Berechtigungslogik.
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {
-    public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+    public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
     {
-        // Benutzerdefinierte Logik
-        if (IsSafeOperation(request))
+        if (IsSafeOperation(permissionType, resource))
         {
-            return PermissionResult.Allowed("Safe operation");
+            return PermissionResult.Allowed;
         }
         
-        return PermissionResult.Undecided("Needs user confirmation");
+        return PermissionResult.AskUser;
     }
 }
 ```
 
-## Stufe 3: IsCurator-Verzweigung
+## Stufe 3: Kurator-Verzweigung (IsCurator → AskHandler / GlobalACL)
 
-Nach IPermissionCallback-Entscheidung erfolgt Verzweigung basierend auf Curator-Status:
+Wenn der Callback `AskUser` zurückgibt oder kein Callback konfiguriert ist, verzweigt das System basierend auf dem Kurator-Status:
 
-### Curator-Pfad → IPermissionAskHandler
+### Kurator-Pfad: IPermissionAskHandler
 
-Wenn das Being ein Curator ist (`IsCurator = true`), wird `IPermissionAskHandler` aufgerufen, um den Benutzer interaktiv zu fragen.
+Für den Silicon Curator fragt das System den Benutzer über IM nach einer Entscheidung.
 
 ```csharp
-if (being.IsCurator)
+public class IMPermissionAskHandler : IPermissionAskHandler
 {
-    return await askHandler.AskAsync(request);
+    public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
+    {
+        SendMessage($"Allow {resource}?");
+
+        var response = WaitForResponse();
+
+        return new AskPermissionResult
+        {
+            Allowed = response.Approved,
+            AddToCache = response.AddToCache,
+            CacheDuration = response.CacheDuration
+        };
+    }
 }
 ```
 
-### Nicht-Curator-Pfad → GlobalACL → Standardverweigerung
+### Nicht-Kurator-Pfad: GlobalACL → Standardverweigerung
 
-Normale Beings fragen GlobalACL synchron ohne Blockierung. Wenn keine ACL-Regel matcht, wird standardmäßig verweigert.
+Für Nicht-Kurator-Beings prüft das System die globale Zugriffssteuerungsliste. Wenn keine passende Regel gefunden wird, wird die Anfrage standardmäßig verweigert.
 
-```csharp
-var aclResult = globalACL.Check(request);
-return aclResult ?? PermissionResult.Denied("No matching ACL rule");
-```
-
-## Global ACL (Access Control List)
-
-Gemeinsame Regeltabelle persistent im Storage, nur vom Silicon Curator verwaltet.
-
-### ACL-Struktur
+#### GlobalACL-Struktur
 
 ```json
 {
   "rules": [
     {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
+      "prefix": "network:api.github.com",
+      "result": "Allowed"
+    },
+    {
+      "prefix": "file:C:\\Windows",
+      "result": "Denied"
     }
   ]
 }
 ```
 
-### Ressourcenformat
+Regeln werden sequentiell ausgewertet; erster Match gewinnt. Nur der Silicon Curator kann die globale ACL modifizieren.
+
+#### Ressourcenformat
 
 ```
-{type}:{action}
+{type}:{path}
 
 Beispiele:
-- disk:read
-- disk:write
-- network:http
-- compile:execute
-- system:info
+- network:api.github.com
+- file:C:\\Windows
+- cli:rm -rf
 ```
 
-## IPermissionAskHandler (Curator-Pfad)
+## IPermissionAskHandler (Kurator-Pfad)
 
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
 {
-    public async Task<AskPermissionResult> AskAsync(PermissionRequest request)
+    public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
     {
-        // Nachricht über IM an Benutzer senden
-        await SendMessageAsync($"Allow {request.Resource}?");
-        
-        // Auf Benutzerantwort warten
-        var response = await WaitForResponseAsync();
-        
-        return response.Approved 
-            ? AskPermissionResult.Approved()
-            : AskPermissionResult.Denied();
+        SendMessage($"Allow {resource}?");
+
+        var response = WaitForResponse();
+
+        return new AskPermissionResult
+        {
+            Allowed = response.Approved,
+            AddToCache = response.AddToCache,
+            CacheDuration = response.CacheDuration
+        };
     }
 }
 ```
@@ -198,19 +211,17 @@ public PermissionResult EvaluatePermission(
     string resource)
 ```
 
-**Rückgabewert**: Drei-Zustand `PermissionResult`:
-- `Allowed` - Operation erlaubt
-- `Denied` - Operation verweigert
-- `AskUser` - Erfordert Benutzerbestätigung bei Ausführung
+**Rückgabewert**: Drei-Zustands-`PermissionResult`:
+- `Allowed` - Operation ist erlaubt
+- `Denied` - Operation ist verweigert
+- `AskUser` - Benutzerbestätigung bei Ausführung erforderlich
 
 **Auswertungsreihenfolge**:
-1. **Frequency Cache** — Zwischengespeicherte Benutzerentscheidungen prüfen
-2. **IPermissionCallback** — Benutzerdefinierte Callback-Auswertung
-3. **Curator-Status** — Wenn Curator, gibt `AskUser` zurück (Bestätigung erforderlich)
-4. **Global ACL** — Access-Control-Regeln prüfen
-5. **Default** — Verweigert wenn keine Regel matcht
+1. **UserFrequencyCache** - Zwischengespeicherte Benutzerentscheidungen prüfen
+2. **IPermissionCallback** - Benutzerdefinierte Callback-Auswertung
+3. **Kurator-Verzweigung** - Wenn Kurator, gibt `AskUser` zurück (Bestätigung erforderlich); wenn Nicht-Kurator, prüft **GlobalACL**, dann Standardverweigerung
 
-> **Hinweis**: Im Gegensatz zur vollständigen Berechtigungskette ruft `EvaluatePermission` **nicht** den `IPermissionAskHandler` auf. Es meldet nur, was das Ergebnis bei Ausführung *sein würde*.
+> **Hinweis**: Im Gegensatz zur vollständigen Berechtigungskette ruft `EvaluatePermission` **nicht** `IPermissionAskHandler` auf. Es meldet nur, was das Ergebnis bei Ausführung *wäre*.
 
 ## Berechtigungen verwalten
 
