@@ -24,7 +24,7 @@ This project provides two implementation versions that share the same architectu
 - **Features**:
   - Windows/macOS system tray background operation with real-time monitoring via tray status window; Linux status window displayed directly
   - SpeedyPack engine + auto-compaction ensures data security
-  - Component UI architecture, 30+ declarative components
+  - Component UI architecture, 27 declarative UI components
   - 7 Skin Themes with auto-discovery and switching
   - Hot reload tool for online updates and restarts
   - Linux auto-opens browser for Web UI access, supports `--no-tray` parameter

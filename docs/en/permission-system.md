@@ -8,7 +8,7 @@
 
 The permission system ensures all AI-initiated operations are properly validated and audited.
 
-## 5-Level Permission Chain
+## 3-Level Permission Chain
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -79,15 +79,15 @@ Custom callbacks for dynamic permission logic.
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {
-    public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+    public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
     {
         // Custom logic
-        if (IsSafeOperation(request))
+        if (IsSafeOperation(permissionType, resource))
         {
-            return PermissionResult.Allowed("Safe operation");
+            return PermissionResult.Allowed;
         }
         
-        return PermissionResult.Undecided("Needs user confirmation");
+        return PermissionResult.AskUser;
     }
 }
 ```
@@ -103,15 +103,18 @@ For the silicon curator, the system prompts the user for a decision via IM.
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
 {
-    public async Task<AskPermissionResult> AskAsync(PermissionRequest request)
+    public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
     {
-        await SendMessageAsync($"Allow {request.Resource}?");
+        SendMessage($"Allow {resource}?");
 
-        var response = await WaitForResponseAsync();
+        var response = WaitForResponse();
 
-        return response.Approved 
-            ? AskPermissionResult.Approved()
-            : AskPermissionResult.Denied();
+        return new AskPermissionResult
+        {
+            Allowed = response.Approved,
+            AddToCache = response.AddToCache,
+            CacheDuration = response.CacheDuration
+        };
     }
 }
 ```
@@ -184,11 +187,9 @@ public PermissionResult EvaluatePermission(
 - `AskUser` - User confirmation required on execution
 
 **Evaluation order**:
-1. **Frequency Cache** - Check cached user decisions
+1. **UserFrequencyCache** - Check cached user decisions
 2. **IPermissionCallback** - Custom callback evaluation
-3. **Curator Status** - If curator, returns `AskUser` (needs confirmation)
-4. **Global ACL** - Check access control rules
-5. **Default** - Deny when no rules match
+3. **Curator branch** - If curator, returns `AskUser` (needs confirmation); if non-curator, checks **GlobalACL**, then default deny
 
 > **Note**: Unlike the full permission chain, `EvaluatePermission` does **not** call `IPermissionAskHandler`. It only reports what the result *would be* on execution.
 
@@ -259,21 +260,21 @@ Regularly review audit logs for:
 For complex logic, use `IPermissionCallback`:
 
 ```csharp
-public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
 {
     // Time-based permissions
     if (IsOutsideBusinessHours())
     {
-        return PermissionResult.Denied("Outside business hours");
+        return PermissionResult.Denied;
     }
     
     // Resource-based permissions
-    if (IsSensitiveResource(request.Resource))
+    if (IsSensitiveResource(resource))
     {
-        return PermissionResult.Undecided("Requires approval");
+        return PermissionResult.AskUser;
     }
     
-    return PermissionResult.Allowed();
+    return PermissionResult.Allowed;
 }
 ```
 

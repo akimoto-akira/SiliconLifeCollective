@@ -44,13 +44,16 @@
 - **Zero Frontend Framework Dependency** — HTML/CSS/JS generated server-side via `H`, `CssBuilder`, and `JsBuilder`
 
 ### Internationalization & Localization
-- **Comprehensive support for 29 language implementations**, covering 2 writing systems and multiple regional variants
+- **Comprehensive support for 33 language implementations**, covering 4 writing systems and multiple regional variants
   - **Simplified Chinese**: zh-CN (China mainland), zh-SG (Singapore), zh-MY (Malaysia) (3 variants)
   - **Traditional Chinese**: zh-HK (Hong Kong), zh-TW (Taiwan), zh-MO (Macau) (3 variants)
   - **English**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variants)
   - **Spanish**: es-ES, es-MX (2 variants)
   - **German**: de-DE, de-AT, de-CH, de-LU, de-LI (5 variants)
   - **French**: fr-FR, fr-CA, fr-CH (3 variants)
+  - **Italian**: it-IT (1 variant)
+  - **Polish**: pl-PL (1 variant)
+  - **Portuguese**: pt-PT, pt-BR (2 variants)
   - **Japanese**: ja-JP | **Korean**: ko-KR | **Czech**: cs-CZ (3 variants)
 
 ### Data & Storage
@@ -83,7 +86,7 @@ This project provides two implementation versions to meet different scenario nee
   - Extreme performance optimization
   - Windows/macOS tray background operation with real-time monitoring via tray status window; Linux status window displayed directly
   - SpeedyPack engine + auto-compaction ensures data security
-  - Component UI architecture, 30+ declarative components
+  - Component UI architecture, 27 declarative UI components
   - 7 Skin Themes with auto-discovery and switching
   - Hot reload tool for online updates and restarts
 - **Performance Improvement**: Storage read latency reduced by 1000x, write latency reduced by 15000x, concurrent processing capacity increased by 50x
@@ -153,11 +156,11 @@ SiliconLifeCollective.sln
 │   ├── SiliconLife.Common/                # Shared implementation (used by both versions)
 │   │   ├── AI/                            # AI clients and factories (Ollama, DashScope, VolcengineArk)
 │   │   ├── Calendar/                      # 32 calendar implementations
-│   │   ├── Localization/                  # Localization base classes and 29 language/region variant implementations
+│   │   ├── Localization/                  # Localization base classes and 33 language/region variant implementations
 │   │   ├── Resources/                     # Shared resource files
 │   │   ├── Security/                      # Permission manager
 │   │   ├── SiliconBeing/                  # Default silicon being implementation
-│   │   ├── Tools/                         # 23 common tool implementations (including hot reload tool)
+│   │   ├── Tools/                         # 24 common tool implementations (including hot reload tool)
 │   │   ├── Web/                           # Web infrastructure
 │   │   └── WebView/                       # Playwright WebView implementation
 │   │
@@ -166,7 +169,7 @@ SiliconLifeCollective.sln
 │   │   ├── Data/                          # Data directory
 │   │   ├── Help/                          # Help documentation localization (multi-language)
 │   │   └── Web/                           # Web UI implementation
-│   │       ├── Component/                 # UI component library (30+ components)
+│   │       ├── Component/                 # UI component library (27 UI components)
 │   │       ├── Controllers/               # 23 controllers
 │   │       ├── Models/                    # View models
 │   │       ├── Views/                     # HTML views
@@ -181,7 +184,7 @@ SiliconLifeCollective.sln
 │   │   ├── Project/                       # Project system implementation
 │   │   ├── Security/                      # Default permission callbacks
 │   │   ├── Storage/                       # File system storage implementation
-│   │   └── Tools/                         # Version-specific tool implementations (HelpTool)
+│   │   └── Tools/                         # Version-specific tool implementations
 │   │
 │   ├── SiliconLife.Fast/                  # High-performance implementation + application entry (forms version)
 │   │   ├── Program.cs                     # Entry point (forms application)
@@ -192,8 +195,8 @@ SiliconLifeCollective.sln
 │   │   ├── Project/                       # Project system implementation
 │   │   ├── Security/                      # Optimized permission callbacks
 │   │   ├── Storage/                       # SpeedyPack storage adapter
-│   │   ├── Tools/                         # Version-specific tool implementations (HelpTool)
-│   │   └── Tray/                          # System tray (29 language variant localization)
+│   │   ├── Tools/                         # Version-specific tool implementations
+│   │   └── Tray/                          # System tray (33 language variant localization)
 │
 │   ├── SiliconLife.Speedy/                # SpeedyPack high-performance storage engine
 │   │   ├── SpeedyPack.cs                  # Core class (in-memory directory mapping + cache + async write)
@@ -212,10 +215,13 @@ SiliconLifeCollective.sln
 │       │   ├── SpkHeader.cs              # Pack file header
 │       │   └── PathNormalizer.cs          # Path normalization
 │   │
-│   └── SiliconLife.Speedy.Manager/        # SpeedyPack management tool (Windows Forms)
-│       ├── MainForm.cs                    # Main form
-│       ├── Program.cs                     # Entry point
-│       └── slc.ico                        # Application icon
+│   └── SiliconLife.Speedy.Manager/        # SpeedyPack management tool (Avalonia UI)
+│       ├── MainWindow.axaml.cs           # Main window
+│       ├── App.axaml.cs                  # Application entry
+│       ├── Program.cs                    # Entry point
+│       ├── ProgressWindow.axaml.cs       # Progress window
+│       ├── ContentViewerWindow.axaml.cs  # Content viewer window
+│       └── slc.ico                       # Application icon
 │
 ├── docs/                                  # Multi-language documentation
 ```

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-22T02:30:00+08:00",
+  "lastUpdated": "2026-05-22T10:30:00+08:00",
   "tasks": [
     {
       "id": "task-301",
@@ -47,12 +47,18 @@
       "title": "分析英文(en)文档与源代码的一致性并修正差异",
       "description": "逐一比对 docs/en/ 目录下所有文档（README.md, api-reference.md, architecture.md, calendar-system.md, changelog.md, contributing.md, development-guide.md, getting-started.md, permission-system.md, promo.md, roadmap.md, security.md, silicon-being-guide.md, tools-reference.md, troubleshooting.md, web-ui-guide.md）与当前源代码的实际实现，识别文档中过时、不准确或遗漏的内容，列出差异清单并修正文档使其与源代码保持同步。英文文档作为基准语言，修正后需确保其他语言翻译任务以此为参照。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-22T10:30:00+08:00",
+      "modifiedFiles": [
+        "docs/en/README.md",
+        "docs/en/architecture.md",
+        "docs/en/permission-system.md",
+        "docs/en/api-reference.md"
+      ]
     },
     {
       "id": "task-303",
@@ -65,7 +71,7 @@
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "relatedCommit": null,
+      "relatedCommit": "7f65cf1",
       "completedAt": "2026-05-22T02:30:00+08:00",
       "modifiedFiles": [
         "docs/zh-CN/permission-system.md",
@@ -223,7 +229,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-302",
       "task-304",
       "task-305",
       "task-306",
@@ -236,7 +241,7 @@
       "task-313"
     ],
     "inProgress": [],
-    "completed": ["task-301", "task-303"],
+    "completed": ["task-301", "task-302", "task-303"],
     "cancelled": []
   },
   "metadata": {

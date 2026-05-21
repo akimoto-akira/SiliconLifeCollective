@@ -27,14 +27,14 @@ Most endpoints require authentication via session cookies managed by the Web UI.
     {
       "id": "being-uuid",
       "name": "Assistant",
-      "status": "running",
+      "activity": "Idle",
       "soul": "path/to/soul.md"
     }
   ]
 }
 ```
 
-**Status Values**: `idle` | `running` | `waiting_permission` | `stopped`
+**Activity Values**: `Idle` | `SingleChat` | `GroupChat` | `Task` | `Timer` | `Broadcast` | `Project` | `MemoryCompression` | `Stopped`
 
 ### Create Being
 
@@ -657,11 +657,24 @@ beingEvents.onmessage = (event) => {
 ```csharp
 public interface IAIClient
 {
-    string Name { get; }
+    string Endpoint { get; }
+    string DefaultModel { get; }
+    bool? StreamingMode { get; }
+    bool? SupportsToolCalls { get; }
     
+    AIResponse Chat(AIRequest request);
     Task<AIResponse> ChatAsync(AIRequest request);
+    IAsyncEnumerable<AIResponse> ChatStreamAsync(AIRequest request, CancellationToken cancellationToken = default);
     
-    IAsyncEnumerable<string> StreamChatAsync(AIRequest request);
+    AIResponse Chat(string userMessage);
+    Task<AIResponse> ChatAsync(string userMessage);
+    AIResponse Chat(string systemPrompt, string userMessage);
+    Task<AIResponse> ChatAsync(string systemPrompt, string userMessage);
+    
+    AIResponse Generate(string prompt);
+    Task<AIResponse> GenerateAsync(string prompt);
+    AIResponse Generate(string systemPrompt, string prompt);
+    Task<AIResponse> GenerateAsync(string systemPrompt, string prompt);
 }
 ```
 
@@ -670,11 +683,9 @@ public interface IAIClient
 ```csharp
 public class AIRequest
 {
-    public List<Message> Messages { get; set; }
-    public List<ToolDefinition> Tools { get; set; }
-    public double Temperature { get; set; } = 0.7;
-    public int MaxTokens { get; set; } = 2000;
-    public string Model { get; set; }
+    public string Model { get; set; } = string.Empty;
+    public List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
+    public List<ToolDefinition>? Tools { get; set; }
 }
 ```
 
@@ -683,10 +694,17 @@ public class AIRequest
 ```csharp
 public class AIResponse
 {
-    public string Content { get; set; }
-    public List<ToolCall> ToolCalls { get; set; }
-    public TokenUsage Usage { get; set; }
-    public string Model { get; set; }
+    public string Model { get; set; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
+    public string? Thinking { get; set; }
+    public List<ToolCall>? ToolCalls { get; set; }
+    public int? PromptTokens { get; set; }
+    public int? CompletionTokens { get; set; }
+    public int? TotalTokens { get; set; }
+    public bool Success { get; set; } = true;
+    public string? ErrorMessage { get; set; }
+    public bool IsStreamFinal { get; set; }
+    public bool HasToolCalls => ToolCalls != null && ToolCalls.Count > 0;
 }
 ```
 
@@ -1008,9 +1026,10 @@ public interface ITool
 {
     string Name { get; }
     string Description { get; }
-    ToolDefinition Definition { get; }
+    string GetDisplayName(Language language);
+    Dictionary<string, object> GetParameterSchema();
     
-    Task<ToolResult> ExecuteAsync(ToolCall call);
+    ToolResult Execute(Guid callerId, Dictionary<string, object> parameters);
 }
 ```
 
@@ -1019,9 +1038,9 @@ public interface ITool
 ```csharp
 public class ToolCall
 {
-    public string Id { get; set; }
-    public string Name { get; set; }
-    public Dictionary<string, object> Parameters { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public Dictionary<string, object> Arguments { get; set; } = new();
 }
 ```
 
@@ -1030,9 +1049,9 @@ public class ToolCall
 ```csharp
 public class ToolResult
 {
-    public bool Success { get; set; }
-    public string Output { get; set; }
-    public string Error { get; set; }
+    public bool Success { get; }
+    public string Message { get; }
+    public object? Data { get; }
 }
 ```
 
