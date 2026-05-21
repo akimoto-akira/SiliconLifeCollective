@@ -24,7 +24,7 @@
 - **特點**：
   - Windows/macOS 系統託盤後臺執行，託盤狀態視窗實時監控；Linux 狀態視窗直接顯示
   - SpeedyPack 引擎 + 自動壓縮保證資料安全
-  - Component UI 架構，30+ 宣告式元件
+  - Component UI 架構，27 個宣告式元件
   - 7 種皮膚主題，支援自動發現和切換
   - 熱重載工具支援線上更新和重啟
   - Linux 自動開啟瀏覽器存取 Web UI，支援 `--no-tray` 參數

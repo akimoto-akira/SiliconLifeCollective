@@ -54,7 +54,7 @@ public interface ITool
 
 ### 3. 權限系統
 
-5 級權限驗證鏈：
+3 級權限驗證鏈：
 ```
 UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL)
 ```

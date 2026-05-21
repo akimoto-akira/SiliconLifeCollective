@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-22T10:30:00+08:00",
+  "lastUpdated": "2026-05-22T11:30:00+08:00",
   "tasks": [
     {
       "id": "task-301",
@@ -51,7 +51,7 @@
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "relatedCommit": null,
+      "relatedCommit": "a9e2a2c",
       "completedAt": "2026-05-22T10:30:00+08:00",
       "modifiedFiles": [
         "docs/en/README.md",
@@ -93,12 +93,20 @@
       "title": "分析繁體中文(zh-HK)文檔與源代碼的一致性並修正差異",
       "description": "逐一比對 docs/zh-HK/ 目錄下所有文檔與當前源代碼的實際實現，識別文檔中過時、不準確或遺漏的內容，同時與英文基準文檔(en)對比檢查翻譯完整性，列出差異清單並修正文檔使其與源代碼保持同步。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
-      "assignedTo": null,
-      "relatedCommit": null,
-      "completedAt": null
+      "assignedTo": "trae-glm5",
+      "relatedCommit": "4318b75",
+      "completedAt": "2026-05-22T11:30:00+08:00",
+      "modifiedFiles": [
+        "docs/zh-HK/permission-system.md",
+        "docs/zh-HK/security.md",
+        "docs/zh-HK/README.md",
+        "docs/zh-HK/architecture.md",
+        "docs/zh-HK/development-guide.md",
+        "docs/zh-HK/tools-reference.md"
+      ]
     },
     {
       "id": "task-305",
@@ -229,7 +237,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-304",
       "task-305",
       "task-306",
       "task-307",
@@ -241,7 +248,7 @@
       "task-313"
     ],
     "inProgress": [],
-    "completed": ["task-301", "task-302", "task-303"],
+    "completed": ["task-301", "task-302", "task-303", "task-304"],
     "cancelled": []
   },
   "metadata": {

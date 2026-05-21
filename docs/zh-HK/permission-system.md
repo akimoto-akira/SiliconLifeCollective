@@ -8,36 +8,46 @@
 
 權限系統確保所有 AI 發起的操作都經過適當驗證和稽核。
 
-## 5 級權限鏈
+## 3 級權限鏈
 
 ```
 ┌─────────────────────────────────────────────┐
 │          權限驗證                            │
 ├─────────────────────────────────────────────┤
 │  級別 1：UserFrequencyCache                  │
-│  ↓ 速率限制快取                              │
+│  ↓ 快取的使用者決策（HighDeny/HighAllow）    │
 │  級別 2：IPermissionCallback                 │
-│  ↓ 自訂邏輯                                  │
-│  級別 3：分支判斷                             │
-│  ├─ IsCurator → IPermissionAskHandler        │
-│  │  ↓ 主理人：詢問使用者確認                  │
-│  └─ Non-curator → GlobalACL                  │
-│     ↓ 非主理人：存取控制列表                  │
+│  ↓ 自訂邏輯（Allowed/Denied/AskUser）       │
+│  級別 3：IsCurator?                          │
+│  ↓ 是 → IPermissionAskHandler（詢問使用者）  │
+│  ↓ 否 → GlobalACL → 預設拒絕                │
 │  結果：允許或拒絕                            │
 └─────────────────────────────────────────────┘
 ```
 
+> **注意**：`PermissionManager.CheckPermission()` 的實際查詢優先順序為：
+> 1. **UserFrequencyCache** — 首先檢查快取的高頻使用者決策
+> 2. **IPermissionCallback** — 評估自訂回呼規則
+> 3. **主理人分支** — 如果回呼返回 AskUser 或無回呼：
+>    - **主理人** → `IPermissionAskHandler`（透過 IM 提示使用者）
+>    - **非主理人** → `GlobalACL` → 預設拒絕
+
 ## 級別 1：UserFrequencyCache
 
-每個使用者的速率限制以防止濫用。
+每個生命體的記憶體快取，存儲高頻使用者決策（HighDeny/HighAllow）。
 
 ```csharp
 var cache = new UserFrequencyCache();
-if (!cache.CheckLimit(userId, resource))
+PermissionResult? cachedResult = cache.Query(permissionType, resource);
+if (cachedResult.HasValue)
 {
-    return PermissionResult.Denied("Rate limit exceeded");
+    return cachedResult.Value == PermissionResult.Allowed;
 }
 ```
+
+- **HighDeny** 優先於 **HighAllow**
+- **僅存於記憶體**：快取不會持久化，重啟後遺失
+- **可設定過期時間**：使用者可為快取條目設定有效期
 
 ## 級別 2：IPermissionCallback
 
@@ -69,41 +79,48 @@ if (!cache.CheckLimit(userId, resource))
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {
-    public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+    public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
     {
-        // 自訂邏輯
-        if (IsSafeOperation(request))
+        if (IsSafeOperation(permissionType, resource))
         {
-            return PermissionResult.Allowed("Safe operation");
+            return PermissionResult.Allowed;
         }
         
-        return PermissionResult.Undecided("Needs user confirmation");
+        return PermissionResult.AskUser;
     }
 }
 ```
 
-## 級別 3：分支判斷（IsCurator / GlobalACL）
+## 級別 3：主理人分支（IsCurator → AskHandler / GlobalACL）
 
-當級別 1 和級別 2 都未做出決定時，系統根據呼叫者身份進行分支：
+當回呼返回 `AskUser` 或未配置回呼時，系統根據主理人狀態進行分支：
 
-### 主理人分支（IsCurator = true）
+### 主理人路徑：IPermissionAskHandler
 
-如果呼叫者是主理人，則進入 `IPermissionAskHandler` 詢問使用者確認：
+對於矽基主理人，系統透過 IM 提示使用者做出決定。
 
 ```csharp
-if (IsCurator)
+public class IMPermissionAskHandler : IPermissionAskHandler
 {
-    if (_askHandler != null)
+    public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
     {
-        var result = await _askHandler.AskAsync(request);
-        // 使用者在 Web UI 中確認或拒絕
+        SendMessage($"Allow {resource}?");
+
+        var response = WaitForResponse();
+
+        return new AskPermissionResult
+        {
+            Allowed = response.Approved,
+            AddToCache = response.AddToCache,
+            CacheDuration = response.CacheDuration
+        };
     }
 }
 ```
 
-### 非主理人分支（IsCurator = false）
+### 非主理人路徑：GlobalACL → 預設拒絕
 
-如果呼叫者不是主理人，則檢查 `GlobalACL` 存取控制列表：
+對於非主理人生命體，系統檢查全域存取控制列表。如果沒有匹配的規則，請求預設被拒絕。
 
 ### GlobalACL 結構
 
@@ -111,26 +128,28 @@ if (IsCurator)
 {
   "rules": [
     {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
+      "prefix": "network:api.github.com",
+      "result": "Allowed"
+    },
+    {
+      "prefix": "file:C:\\Windows",
+      "result": "Denied"
     }
   ]
 }
 ```
 
+規則按順序評估；首個匹配的規則生效。僅矽基主理人可以修改全域 ACL。
+
 ### 資源格式
 
 ```
-{type}:{action}
+{type}:{path}
 
 範例：
-- disk:read
-- disk:write
-- network:http
-- compile:execute
-- system:info
+- network:api.github.com
+- file:C:\\Windows
+- cli:rm -rf
 ```
 
 ## IPermissionAskHandler
@@ -144,17 +163,18 @@ if (IsCurator)
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
 {
-    public async Task<AskPermissionResult> AskAsync(PermissionRequest request)
+    public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
     {
-        // 透過即時通訊向使用者發送訊息
-        await SendMessageAsync($"Allow {request.Resource}?");
-        
-        // 等待使用者回應
-        var response = await WaitForResponseAsync();
-        
-        return response.Approved 
-            ? AskPermissionResult.Approved()
-            : AskPermissionResult.Denied();
+        SendMessage($"Allow {resource}?");
+
+        var response = WaitForResponse();
+
+        return new AskPermissionResult
+        {
+            Allowed = response.Approved,
+            AddToCache = response.AddToCache,
+            CacheDuration = response.CacheDuration
+        };
     }
 }
 ```
@@ -163,7 +183,7 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 
 `PermissionRequestQueue` 管理待處理的權限請求，支援非同步等待使用者回應：
 
-- **請求入隊** — 當權限鏈到達級別 5 時，建立一個 `TaskCompletionSource<AskPermissionResult>` 並入隊
+- **請求入隊** — 當權限鏈到達主理人分支時，建立一個 `TaskCompletionSource<AskPermissionResult>` 並入隊
 - **Web UI 展示** — 透過 `PermissionRequestController` 在 Web UI 中展示待處理的權限請求
 - **使用者回應** — 使用者在 Web UI 中批准或拒絕，可選擇快取決策和設定快取持續時間
 - **快取選項** — 使用者可以將權限決策快取 1 小時、24 小時、7 天或 30 天
@@ -203,11 +223,9 @@ public PermissionResult EvaluatePermission(
 - `AskUser` - 執行時需要使用者確認
 
 **評估順序**：
-1. **頻率快取** - 檢查快取的使用者決策
+1. **UserFrequencyCache** - 檢查快取的使用者決策
 2. **IPermissionCallback** - 自訂回呼評估
-3. **主理人狀態** - 如果是主理人，回傳 `AskUser`（需要確認）
-4. **全域 ACL** - 檢查存取控制規則
-5. **預設** - 無匹配規則時拒絕
+3. **主理人分支** - 如果是主理人，回傳 `AskUser`（需要確認）；如果是非主理人，檢查 **GlobalACL**，然後預設拒絕
 
 > **注意**：與完整權限鏈不同，`EvaluatePermission` **不會**呼叫 `IPermissionAskHandler`。它僅報告執行時的結果*將會是*什麼。
 
@@ -226,7 +244,7 @@ public PermissionResult EvaluatePermission(
 
 **透過 API**：
 ```bash
-curl -X POST http://localhost:8080/api/permissions/save \
+curl -X POST http://localhost:8080/api/permissions \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "user-uuid",
@@ -238,12 +256,14 @@ curl -X POST http://localhost:8080/api/permissions/save \
 
 ### 撤銷權限
 
-透過 Web UI 的權限管理頁面操作。
+```bash
+curl -X DELETE http://localhost:8080/api/permissions/{rule-id}
+```
 
 ### 檢視權限
 
 ```bash
-curl http://localhost:8080/api/permissions/list
+curl http://localhost:8080/api/permissions?userId=user-uuid
 ```
 
 ## 最佳實踐
@@ -276,21 +296,21 @@ curl http://localhost:8080/api/permissions/list
 對於複雜邏輯，使用 `IPermissionCallback`：
 
 ```csharp
-public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
 {
     // 基於時間的權限
     if (IsOutsideBusinessHours())
     {
-        return PermissionResult.Denied("Outside business hours");
+        return PermissionResult.Denied;
     }
     
     // 基於資源的權限
-    if (IsSensitiveResource(request.Resource))
+    if (IsSensitiveResource(resource))
     {
-        return PermissionResult.Undecided("Requires approval");
+        return PermissionResult.AskUser;
     }
     
-    return PermissionResult.Allowed();
+    return PermissionResult.Allowed;
 }
 ```
 
@@ -302,10 +322,11 @@ public async Task<PermissionResult> CheckAsync(PermissionRequest request)
 AI："我需要讀取 config.json"
 ↓
 權限鏈：
-1. 速率限制？正常
-2. 回呼？返回未決定
-3. IsCurator？否 → GlobalACL？找到規則：disk:read = 允許
-4. 結果：允許
+1. UserFrequencyCache？無快取決策
+2. IPermissionCallback？返回 AskUser（未明確允許）
+3. IsCurator？否 → 檢查 GlobalACL
+4. GlobalACL？找到規則：file:... = 允許
+5. 結果：允許
 ```
 
 ### 場景 2：AI 想要執行程式碼
@@ -314,20 +335,21 @@ AI："我需要讀取 config.json"
 AI："我想編譯和執行程式碼"
 ↓
 權限鏈：
-1. 速率限制？正常
-2. 回呼？返回未決定
-3. IsCurator？是 → IPermissionAskHandler → 使用者批准
-4. 結果：允許
+1. UserFrequencyCache？無快取決策
+2. IPermissionCallback？返回 AskUser
+3. IsCurator？是 → IPermissionAskHandler
+4. 使用者批准
+5. 結果：允許
 ```
 
-### 場景 3：超過速率限制
+### 場景 3：快取拒絕
 
 ```
-AI："我需要發出 100 個 HTTP 請求"
+AI："我需要存取 C:\Windows"
 ↓
 權限鏈：
-1. 速率限制？已超過
-2. 結果：拒絕
+1. UserFrequencyCache？在 HighDeny 快取中找到
+2. 結果：拒絕（無需進一步檢查）
 ```
 
 ## 故障排除

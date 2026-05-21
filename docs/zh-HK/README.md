@@ -26,7 +26,7 @@
 - **熱重載工具** — 支援 SiliconLife.Fast 在執行中自動編譯、更新檔案並重啟，無需手動干預
 - **工具呼叫循環** — AI 返回工具呼叫 → 執行工具 → 結果反饋給 AI → 持續循環直到返回純文字響應
 - **執行器-權限安全** — 所有 I/O 操作通過執行器進行嚴格的權限驗證
-  - 5 級權限鏈：UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL)
+  - 3 級權限鏈：UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL)
   - 完整的審計日誌記錄所有權限決策
 
 ### AI 與知識
@@ -44,7 +44,7 @@
 - **零前端框架依賴** — 通過 `H`、`CssBuilder` 和 `JsBuilder` 在服務端生成 HTML/CSS/JS
 
 ### 國際化與本地化
-- **33 種語言變體**全面支援，涵蓋 2 種書寫系統和多個地區變體
+- **33 種語言變體**全面支援，涵蓋 4 種書寫系統（拉丁、CJK、阿拉伯、天城文）和多個地區變體
   - **簡體中文**：zh-CN（中國大陸）、zh-SG（新加坡）、zh-MY（馬來西亞）（3 種）
   - **繁體中文**：zh-HK（香港）、zh-TW（台灣）、zh-MO（澳門）（3 種）
   - **英語**：en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY（10 種）
@@ -209,8 +209,11 @@ SiliconLifeCollective.sln
 │   │       └── PathNormalizer.cs          # 路徑規範化
 │   │
 │   └── SiliconLife.Speedy.Manager/        # SpeedyPack 管理工具（Avalonia UI）
-│       ├── MainForm.cs                    # 主視窗
+│       ├── MainWindow.axaml.cs            # 主視窗
+│       ├── App.axaml.cs                   # 應用定義
 │       ├── Program.cs                     # 入口點
+│       ├── ProgressWindow.axaml.cs        # 進度視窗
+│       ├── ContentViewerWindow.axaml.cs   # 內容檢視器視窗
 │       └── slc.ico                        # 應用程式圖示
 │
 ├── docs/                                  # 多語言文件
@@ -328,7 +331,7 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] 階段 3：第一個帶有靈魂文件的矽基生命體（身體-大腦架構）
 - [x] 階段 4：持久化記憶（聊天系統 + 時間儲存介面）
 - [x] 階段 5：工具系統 + 執行器
-- [x] 階段 6：權限系統（5 級鏈、審計日誌器、全域存取控制清單）
+- [x] 階段 6：權限系統（3 級鏈、審計日誌器、全域存取控制清單）
 - [x] 階段 7：動態編譯 + 自我進化（Roslyn）
 - [x] 階段 8：長期記憶 + 任務 + 定時器
 - [x] 階段 9：核心主機 + 多智能體協作
