@@ -710,13 +710,13 @@
 
 ## 権限検証
 
-すべてのツール実行は 5 段階権限チェーンを通過します：
+すべてのツール実行は 3 段階権限チェーンを通過します：
 
-1. **IsCurator** — シリコン主理人はすべてのチェックをバイパス
-2. **UserFrequencyCache** — ユーザーの高頻度許可/拒否キャッシュ
-3. **GlobalACL** — グローバルアクセス制御リスト
-4. **IPermissionCallback** — カスタム権限コールバック関数
-5. **IPermissionAskHandler** — ユーザーに確認
+1. **UserFrequencyCache** — キャッシュされたユーザーの高頻度許可/拒否決定
+2. **IPermissionCallback** — カスタム権限コールバック関数
+3. **主理人分岐** — コールバックが AskUser を返す、またはコールバックなしの場合：
+   - **主理人** → `IPermissionAskHandler`（IM 経由でユーザーに確認）
+   - **非主理人** → `GlobalACL` → デフォルト拒否
 
 ## カスタムツールの作成
 

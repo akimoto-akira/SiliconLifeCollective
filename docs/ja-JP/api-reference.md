@@ -365,7 +365,7 @@ AI 設定エディタインターフェースを返します。
 
 ### 権限ルールリストを取得
 
-**GET** `/api/permissions/list`
+**GET** `/api/permissions`
 
 現在設定されているすべての権限ルールを返します。
 
@@ -385,7 +385,7 @@ AI 設定エディタインターフェースを返します。
 
 ### 権限ルールを保存
 
-**POST** `/api/permissions/save`
+**POST** `/api/permissions`
 
 **リクエストボディ**：
 ```json
@@ -394,6 +394,32 @@ AI 設定エディタインターフェースを返します。
   "resource": "disk:write",
   "allowed": true,
   "duration": 3600
+}
+```
+
+### 権限ルールを削除
+
+**DELETE** `/api/permissions/{id}`
+
+指定された権限ルールを削除します。
+
+### 権限をチェック
+
+**POST** `/api/permissions/check`
+
+**リクエストボディ**：
+```json
+{
+  "userId": "user-uuid",
+  "resource": "network:http"
+}
+```
+
+**レスポンス**：
+```json
+{
+  "allowed": true,
+  "reason": "Granted by curator"
 }
 ```
 
@@ -967,6 +993,52 @@ AI 設定エディタインターフェースを返します。
 
 ---
 
+## ストレージ API
+
+### 値を読み取り
+
+**GET** `/api/storage?key={key}`
+
+**レスポンス**：
+```json
+{
+  "key": "being:uuid:memory",
+  "value": "{...}",
+  "timestamp": "2026-04-20T10:30:00Z"
+}
+```
+
+### 値を書き込み
+
+**POST** `/api/storage`
+
+**リクエストボディ**：
+```json
+{
+  "key": "being:uuid:memory",
+  "value": "{...}"
+}
+```
+
+### 時間範囲でクエリ
+
+**GET** `/api/storage/time?start={start}&end={end}&prefix={prefix}`
+
+**レスポンス**：
+```json
+{
+  "entries": [
+    {
+      "key": "being:uuid:chat:2026-04-20",
+      "value": "{...}",
+      "timestamp": "2026-04-20T10:30:00Z"
+    }
+  ]
+}
+```
+
+---
+
 ## 実行器管理
 
 ### 実行器ページ
@@ -1215,11 +1287,9 @@ public interface IAIClient
 ```csharp
 public class AIRequest
 {
-    public List<Message> Messages { get; set; }
-    public List<ToolDefinition> Tools { get; set; }
-    public double Temperature { get; set; } = 0.7;
-    public int MaxTokens { get; set; } = 2000;
-    public string Model { get; set; }
+    public string Model { get; set; } = string.Empty;
+    public List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
+    public List<ToolDefinition>? Tools { get; set; }
 }
 ```
 
@@ -1228,10 +1298,17 @@ public class AIRequest
 ```csharp
 public class AIResponse
 {
-    public string Content { get; set; }
-    public List<ToolCall> ToolCalls { get; set; }
-    public TokenUsage Usage { get; set; }
-    public string Model { get; set; }
+    public string Model { get; set; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
+    public string? Thinking { get; set; }
+    public List<ToolCall>? ToolCalls { get; set; }
+    public int? PromptTokens { get; set; }
+    public int? CompletionTokens { get; set; }
+    public int? TotalTokens { get; set; }
+    public bool Success { get; set; } = true;
+    public string? ErrorMessage { get; set; }
+    public bool IsStreamFinal { get; set; }
+    public bool HasToolCalls => ToolCalls != null && ToolCalls.Count > 0;
 }
 ```
 
@@ -1246,9 +1323,10 @@ public interface ITool
 {
     string Name { get; }
     string Description { get; }
-    ToolDefinition Definition { get; }
+    string GetDisplayName(Language language);
+    Dictionary<string, object> GetParameterSchema();
     
-    Task<ToolResult> ExecuteAsync(ToolCall call);
+    ToolResult Execute(Guid callerId, Dictionary<string, object> parameters);
 }
 ```
 
@@ -1257,9 +1335,9 @@ public interface ITool
 ```csharp
 public class ToolCall
 {
-    public string Id { get; set; }
-    public string Name { get; set; }
-    public Dictionary<string, object> Parameters { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public Dictionary<string, object> Arguments { get; set; } = new();
 }
 ```
 
@@ -1268,9 +1346,9 @@ public class ToolCall
 ```csharp
 public class ToolResult
 {
-    public bool Success { get; set; }
-    public string Output { get; set; }
-    public string Error { get; set; }
+    public bool Success { get; }
+    public string Message { get; }
+    public object? Data { get; }
 }
 ```
 

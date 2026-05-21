@@ -15,29 +15,39 @@
 │          権限検証                            │
 ├─────────────────────────────────────────────┤
 │  レベル 1：UserFrequencyCache                │
-│  ↓ レートリミットキャッシュ                   │
+│  ↓ キャッシュされたユーザー決定 (HighDeny/HighAllow)│
 │  レベル 2：IPermissionCallback               │
-│  ↓ カスタムロジック                           │
-│  レベル 3：分岐判断                           │
-│  ├─ IsCurator → IPermissionAskHandler        │
-│  │  ↓ 主理人：ユーザー確認を尋ねる             │
-│  └─ Non-curator → GlobalACL                  │
-│     ↓ 非主理人：アクセスコントロールリスト       │
+│  ↓ カスタムロジック (Allowed/Denied/AskUser)  │
+│  レベル 3：IsCurator?                        │
+│  ↓ はい → IPermissionAskHandler（ユーザーに確認）│
+│  ↓ いいえ → GlobalACL → デフォルト拒否        │
 │  結果：許可または拒否                         │
 └─────────────────────────────────────────────┘
 ```
 
+> **注意**：`PermissionManager.CheckPermission()` の実際のクエリ優先度は以下の通り：
+> 1. **UserFrequencyCache** — キャッシュされた高頻度ユーザー決定を最初に確認
+> 2. **IPermissionCallback** — カスタムコールバックルールを評価
+> 3. **主理人分岐** — コールバックが AskUser を返す、またはコールバックなしの場合：
+>    - **主理人** → `IPermissionAskHandler`（IM 経由でユーザーにプロンプト）
+>    - **非主理人** → `GlobalACL` → デフォルト拒否
+
 ## レベル 1：UserFrequencyCache
 
-ユーザーごとのレートリミットで不正使用を防止。
+生命体ごとの、メモリのみの高頻度ユーザー決定キャッシュ（HighDeny/HighAllow）。
 
 ```csharp
 var cache = new UserFrequencyCache();
-if (!cache.CheckLimit(userId, resource))
+PermissionResult? cachedResult = cache.Query(permissionType, resource);
+if (cachedResult.HasValue)
 {
-    return PermissionResult.Denied("Rate limit exceeded");
+    return cachedResult.Value == PermissionResult.Allowed;
 }
 ```
+
+- **高拒否（HighDeny）**は**高許可（HighAllow）**より優先度が高い
+- **メモリのみ**：キャッシュは永続化されない。再起動時に失われる
+- **設定可能な有効期限**：ユーザーはキャッシュエントリの有効期間を設定可能
 
 ## レベル 2：IPermissionCallback
 
@@ -45,7 +55,7 @@ if (!cache.CheckLimit(userId, resource))
 
 ### DefaultPermissionCallback デフォルト実装
 
-`DefaultPermissionCallback` は包括的なデフォルト権限ルールを提供します：
+`DefaultPermissionCallback` は包括的なデフォルト権限ルールを提供します。以下を含む：
 
 #### ネットワークアクセスルール
 - **ループバックアドレス**：localhost, 127.0.0.1, ::1 を許可
@@ -69,41 +79,48 @@ if (!cache.CheckLimit(userId, resource))
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {
-    public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+    public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
     {
-        // カスタムロジック
-        if (IsSafeOperation(request))
+        if (IsSafeOperation(permissionType, resource))
         {
-            return PermissionResult.Allowed("Safe operation");
+            return PermissionResult.Allowed;
         }
         
-        return PermissionResult.Undecided("Needs user confirmation");
+        return PermissionResult.AskUser;
     }
 }
 ```
 
-## レベル 3：分岐判断（IsCurator / GlobalACL）
+## レベル 3：主理人分岐（IsCurator → AskHandler / GlobalACL）
 
-レベル 1 とレベル 2 のいずれも決定を下さなかった場合、システムは呼び出し元の身分に基づいて分岐します：
+コールバックが `AskUser` を返す、またはコールバックが設定されていない場合、システムは主理人ステータスに基づいて分岐します：
 
-### 主理人分岐（IsCurator = true）
+### 主理人パス：IPermissionAskHandler
 
-呼び出し元が主理人の場合、`IPermissionAskHandler` を介してユーザー確認を求めます：
+シリコン主理人の場合、システムは IM を介してユーザーに決定を求めます。
 
 ```csharp
-if (IsCurator)
+public class IMPermissionAskHandler : IPermissionAskHandler
 {
-    if (_askHandler != null)
+    public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
     {
-        var result = await _askHandler.AskAsync(request);
-        // ユーザーが Web UI で承認または拒否
+        SendMessage($"Allow {resource}?");
+
+        var response = WaitForResponse();
+
+        return new AskPermissionResult
+        {
+            Allowed = response.Approved,
+            AddToCache = response.AddToCache,
+            CacheDuration = response.CacheDuration
+        };
     }
 }
 ```
 
-### 非主理人分岐（IsCurator = false）
+### 非主理人パス：GlobalACL → デフォルト拒否
 
-呼び出し元が主理人でない場合、`GlobalACL` アクセスコントロールリストを確認します：
+非主理人の生命体の場合、システムはグローバルアクセスコントロールリストを確認します。一致するルールが見つからない場合、リクエストはデフォルトで拒否されます。
 
 ### GlobalACL 構造
 
@@ -111,63 +128,33 @@ if (IsCurator)
 {
   "rules": [
     {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
+      "prefix": "network:api.github.com",
+      "result": "Allowed"
+    },
+    {
+      "prefix": "file:C:\\Windows",
+      "result": "Denied"
     }
   ]
 }
 ```
 
+ルールは順番に評価され、最初のマッチが勝利します。シリコン主理人のみがグローバル ACL を変更可能です。
+
 ### リソース形式
 
 ```
-{type}:{action}
+{type}:{path}
 
 例：
-- disk:read
-- disk:write
-- network:http
-- compile:execute
-- system:info
+- network:api.github.com
+- file:C:\\Windows
+- cli:rm -rf
 ```
 
 ## IPermissionAskHandler
 
-主理人の操作にユーザー確認が必要な場合、`IPermissionAskHandler` を通じてユーザーに権限を確認します。
-
-### IMPermissionAskHandler 実装
-
-`IMPermissionAskHandler` は Web UI を介してユーザーに権限リクエストを送信します：
-
-```csharp
-public class IMPermissionAskHandler : IPermissionAskHandler
-{
-    public async Task<AskPermissionResult> AskAsync(PermissionRequest request)
-    {
-        // インスタントメッセージでユーザーにメッセージを送信
-        await SendMessageAsync($"Allow {request.Resource}?");
-        
-        // ユーザーの応答を待機
-        var response = await WaitForResponseAsync();
-        
-        return response.Approved 
-            ? AskPermissionResult.Approved()
-            : AskPermissionResult.Denied();
-    }
-}
-```
-
-### PermissionRequestQueue 権限リクエストキュー
-
-`PermissionRequestQueue` は保留中の権限リクエストを管理し、ユーザー応答の非同期待機をサポートします：
-
-- **リクエストのエンキュー** — 権限チェーンがレベル 3 の主理人分岐に達した場合、`TaskCompletionSource<AskPermissionResult>` を作成してエンキュー
-- **Web UI 表示** — `PermissionRequestController` を介して Web UI に保留中の権限リクエストを表示
-- **ユーザー応答** — ユーザーが Web UI で承認または拒否、決定のキャッシュとキャッシュ期間の設定が可能
-- **キャッシュオプション** — ユーザーは権限決定を 1 時間、24 時間、7 日間、または 30 日間キャッシュ可能
-- **タイムアウトメカニズム** — 30 分間応答がない場合、リクエストページが自動的に閉じる
+主理人の操作にユーザー確認が必要な場合、`IPermissionAskHandler` を通じてユーザーに権限を確認します。上記の `IMPermissionAskHandler` 実装を参照してください。
 
 ## 監査システム
 
@@ -205,9 +192,7 @@ public PermissionResult EvaluatePermission(
 **評価順序**：
 1. **周波数キャッシュ** - キャッシュされたユーザー決定を確認
 2. **IPermissionCallback** - カスタムコールバック評価
-3. **主理人状態** - 主理人の場合、`AskUser` を返す（確認が必要）
-4. **グローバル ACL** - アクセスコントロールルールを確認
-5. **デフォルト** - ルールが一致しない場合、拒否
+3. **主理人分岐** - 主理人の場合、`AskUser` を返す（確認が必要）。非主理人の場合、**GlobalACL** を確認し、デフォルト拒否
 
 > **注意**：完全な権限チェーンとは異なり、`EvaluatePermission` は `IPermissionAskHandler` を呼び出し**ません**。実行時の結果が*どうなるか*のみを報告します。
 
@@ -226,7 +211,7 @@ public PermissionResult EvaluatePermission(
 
 **API 経由**：
 ```bash
-curl -X POST http://localhost:8080/api/permissions/save \
+curl -X POST http://localhost:8080/api/permissions \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "user-uuid",
@@ -238,12 +223,14 @@ curl -X POST http://localhost:8080/api/permissions/save \
 
 ### 権限の取消
 
-Web UI の権限管理ページから操作します。
+```bash
+curl -X DELETE http://localhost:8080/api/permissions/{rule-id}
+```
 
 ### 権限の表示
 
 ```bash
-curl http://localhost:8080/api/permissions/list
+curl http://localhost:8080/api/permissions?userId=user-uuid
 ```
 
 ## ベストプラクティス
@@ -276,21 +263,21 @@ curl http://localhost:8080/api/permissions/list
 複雑なロジックには `IPermissionCallback` を使用：
 
 ```csharp
-public async Task<PermissionResult> CheckAsync(PermissionRequest request)
+public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
 {
     // 時間ベースの権限
     if (IsOutsideBusinessHours())
     {
-        return PermissionResult.Denied("Outside business hours");
+        return PermissionResult.Denied;
     }
     
     // リソースベースの権限
-    if (IsSensitiveResource(request.Resource))
+    if (IsSensitiveResource(resource))
     {
-        return PermissionResult.Undecided("Requires approval");
+        return PermissionResult.AskUser;
     }
     
-    return PermissionResult.Allowed();
+    return PermissionResult.Allowed;
 }
 ```
 
@@ -302,10 +289,11 @@ public async Task<PermissionResult> CheckAsync(PermissionRequest request)
 AI：「config.json を読み取る必要があります」
 ↓
 権限チェーン：
-1. レートリミット？正常
-2. コールバック？未決定を返す
-3. IsCurator？いいえ → GlobalACL？ルール発見：disk:read = 許可
-4. 結果：許可
+1. 周波数キャッシュ？キャッシュされた決定なし
+2. IPermissionCallback？AskUser を返す（明示的に許可されていない）
+3. IsCurator？いいえ → GlobalACL を確認
+4. GlobalACL？ルール発見：file:... = Allowed
+5. 結果：許可
 ```
 
 ### シナリオ 2：AI がコードを実行したい
@@ -314,20 +302,21 @@ AI：「config.json を読み取る必要があります」
 AI：「コードをコンパイルして実行したい」
 ↓
 権限チェーン：
-1. レートリミット？正常
-2. コールバック？未決定を返す
-3. IsCurator？はい → IPermissionAskHandler → ユーザー承認
-4. 結果：許可
+1. 周波数キャッシュ？キャッシュされた決定なし
+2. IPermissionCallback？AskUser を返す
+3. IsCurator？はい → IPermissionAskHandler
+4. ユーザーが承認
+5. 結果：許可
 ```
 
-### シナリオ 3：レートリミット超過
+### シナリオ 3：キャッシュされた拒否
 
 ```
-AI：「100回の HTTP リクエストが必要です」
+AI：「C:\Windows にアクセスする必要があります」
 ↓
 権限チェーン：
-1. レートリミット？超過
-2. 結果：拒否
+1. 周波数キャッシュ？高拒否キャッシュに発見
+2. 結果：拒否（以降のチェック不要）
 ```
 
 ## トラブルシューティング

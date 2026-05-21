@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-22T11:30:00+08:00",
+  "lastUpdated": "2026-05-22T12:00:00+08:00",
   "tasks": [
     {
       "id": "task-301",
@@ -97,7 +97,7 @@
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "relatedCommit": "4318b75",
+      "relatedCommit": "2549105",
       "completedAt": "2026-05-22T11:30:00+08:00",
       "modifiedFiles": [
         "docs/zh-HK/permission-system.md",
@@ -115,12 +115,19 @@
       "title": "分析日本語(ja-JP)ドキュメントとソースコードの整合性を確認し差異を修正",
       "description": "docs/ja-JP/ ディレクトリ内の全ドキュメントを現在のソースコードの実際の実装と照合し、ドキュメント内の古い情報、不正確な記述、欠落している内容を特定する。同時に英語ベースドキュメント(en)と比較して翻訳の完全性を確認し、差異リストを作成してドキュメントをソースコードと同期させるよう修正する。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-22T14:30:00+08:00",
+      "modifiedFiles": [
+        "docs/ja-JP/permission-system.md",
+        "docs/ja-JP/architecture.md",
+        "docs/ja-JP/security.md",
+        "docs/ja-JP/tools-reference.md",
+        "docs/ja-JP/api-reference.md"
+      ]
     },
     {
       "id": "task-306",
@@ -237,7 +244,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-305",
       "task-306",
       "task-307",
       "task-308",
@@ -248,7 +254,7 @@
       "task-313"
     ],
     "inProgress": [],
-    "completed": ["task-301", "task-302", "task-303", "task-304"],
+    "completed": ["task-301", "task-302", "task-303", "task-304", "task-305"],
     "cancelled": []
   },
   "metadata": {

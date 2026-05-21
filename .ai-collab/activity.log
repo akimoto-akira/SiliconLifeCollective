@@ -523,3 +523,7 @@
 2026-05-22T11:15:00+08:00 | trae-glm5 | file_modified | docs/zh-HK/tools-reference.md | fix=展開工具15-23詳細描述,新增權限驗證和故障排除章節,修正工具目錄路徑
 2026-05-22T11:30:00+08:00 | trae-glm5 | task_complete | task=task-304 | modifiedFiles=6 | summary=修正zh-HK文檔與源代碼一致性差異(權限鏈級別,執行器描述,宣告式元件數量,工具詳細描述等)
 2026-05-22T11:30:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260522-1000 | task=task-304
+2026-05-22T12:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260522-1200 | task=task-305
+2026-05-22T12:00:00+08:00 | trae-glm5 | task_claim | task=task-305 | type=docs | target=docs/ja-JP
+2026-05-22T14:30:00+08:00 | trae-glm5 | task_complete | task=task-305 | type=docs | target=docs/ja-JP | files=permission-system.md,architecture.md,security.md,tools-reference.md,api-reference.md
+2026-05-22T14:30:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260522-1200
