@@ -63,6 +63,218 @@ Both versions share the same interfaces and functionality, differing only in sto
 
 ## Alpha-0.2
 
+### 2026-05-22
+
+#### Documentation Consistency Fixes
+- `9e07b27` - Fix French (fr-FR) documentation inconsistencies with source code (ref task-307)
+  - 10 files changed
+
+- `9e3be72` - Fix German (de-DE) documentation inconsistencies with source code (ref task-308)
+  - 5 files changed
+
+- `2bc7151` - Fix Spanish (es-ES) documentation inconsistencies with source code (ref task-309)
+  - 13 files changed
+
+- `f95088e` - Fix Italian (it-IT) documentation inconsistencies with source code (ref task-310)
+  - 11 files changed
+
+- `6ea9f4a` - Fix Polish (pl-PL) documentation inconsistencies with source code (ref task-311)
+  - 16 files changed
+
+- `7646923` - Fix Portuguese (pt-PT) documentation inconsistencies with source code (ref task-312)
+  - 12 files changed
+
+- `7eaf9db` - Fix Czech (cs-CZ) documentation inconsistencies with source code (ref task-313)
+  - 12 files changed
+
+#### Collaboration Framework
+- `3cb7347` - Update task-313 relatedCommit=7eaf9db
+  - 1 files changed
+
+### 2026-05-21
+
+#### New Features
+- `99eca78` - Add "View Storage (Read-only)" to context menu, in-process Speedy.Manager call (ref task-301)
+  - 26 files changed
+
+#### Documentation Consistency Fixes
+- `7f65cf1` - Fix zh-CN documentation inconsistencies with source code (ref task-303)
+  - 15 files changed
+
+- `a9e2a2c` - Fix English (en) documentation inconsistencies with source code (ref task-302)
+  - 9 files changed
+
+- `2549105` - Fix Traditional Chinese (zh-HK) documentation inconsistencies with source code (ref task-304)
+  - 12 files changed
+
+- `277eb50` - Fix Japanese (ja-JP) documentation inconsistencies with source code (ref task-305)
+  - 10 files changed
+
+- `edce413` - Fix Korean (ko-KR) documentation inconsistencies with source code (ref task-306)
+  - 18 files changed
+
+- `f2adcae` - Fix Portuguese documentation inconsistencies with source code (ref task-220)
+  - 15 files changed
+
+- `3332987` - Fix Traditional Chinese (Hong Kong) documentation inconsistencies with source code (ref task-218)
+  - 14 files changed
+
+- `af9f715` - Fix Polish documentation inconsistencies with source code (ref task-217)
+  - 15 files changed
+
+- `2e2b18b` - Fix Korean documentation inconsistencies with source code (ref task-216)
+  - 16 files changed
+
+- `626ebc9` - Fix Japanese documentation inconsistencies with source code (ref task-215)
+  - 19 files changed
+
+- `48d061b` - Fix Italian documentation inconsistencies with source code (ref task-214)
+  - 14 files changed
+
+#### Collaboration Framework
+- `6683bee` - Register Marvis AI team, update task status
+  - 3 files changed
+
+- `03fc905` - Archive task-210~220
+  - 5 files changed
+
+### 2026-05-20
+
+#### New Features
+- `65176d4` - Add complete Portuguese (pt-PT + pt-BR) localization support (ref task-208)
+  - 41 files changed
+
+#### Documentation Consistency Fixes
+- `af4dffd` - Fix all zh-CN documentation inconsistencies with source code (ref task-209)
+  - 11 files changed
+
+- `144b945` - Fix English (en) and Czech (cs-CZ) documentation inconsistencies with source code (ref task-219, task-210)
+  - 22 files changed
+
+- `08bec55` - Fix German (de-DE) documentation inconsistencies with source code (ref task-211)
+  - 14 files changed
+
+- `7ff28de` - Fix Spanish (es-ES) documentation inconsistencies with source code (ref task-212)
+  - 14 files changed
+
+- `15e2133` - Fix French (fr-FR) documentation inconsistencies with source code (ref task-213)
+  - 13 files changed
+
+#### Bug Fixes
+- `7dac388` - Fix project task list not displaying (ref task-207)
+  - 6 files changed
+
+#### Collaboration Framework
+- `7890223` - Archive task-201~209, publish task-210~220 documentation consistency fix tasks
+  - 5 files changed
+
+### 2026-05-19
+
+#### New Features
+- `cd72846` - Implement safe alternative for PluginLoader security scan bypass (ref task-203)
+  - 13 files changed
+
+- `fc0c00c` - Speedy.Manager enhancements - Create/Import/Export/TreeView hierarchy/Progress window (ref task-206)
+  - 9 files changed
+
+#### Bug Fixes
+- `ec07118` - Fix ITypeRegistry/IObjectFactory not registered before plugin loading (ref task-205)
+  - 8 files changed
+
+- `9e749db` - Fix Creator ID is required error when creating project (ref task-204)
+  - 4 files changed
+
+#### Infrastructure
+- `43dc092` - CLDR migration - add CldrDataProvider, remove .github
+  - 1 files changed
+
+- `c09ec1f` - Add cldr/ to .gitignore
+  - 1 files changed
+
+- `221f818` - Switch GitHub sync to Gitee push mirror scheme, keep workflow as manual backup only
+  - 1 files changed
+
+- `08cdf1a` - Fix GitHub sync workflow - add retry logic and no-change skip
+  - 1 files changed
+
+- `fb4e77d` - Update SiliconLife.Speedy.Manager.csproj
+  - 1 files changed
+
+#### Collaboration Framework
+- `df90af0` - Update task-203 relatedCommit=cd72846
+  - 1 files changed
+
+### 2026-05-18
+
+#### Refactoring
+- `e720d06` - Refactor Speedy.Manager from WinForms to Avalonia completely (ref task-202)
+  - 17 files changed
+
+#### Bug Fixes
+- `08894a9` - Fix memory timeline summary entry level display error (ref task-201)
+  - 3 files changed
+
+#### Collaboration Framework
+- `2871afb` - Archive all tasks, clear tasks.json
+  - 2 files changed
+
+### 2026-05-17
+
+#### New Features
+- `d6eb994` - Add project creation entry and workflow template selection to project list page (ref task-203)
+  - 14 files changed
+
+- `0872134` - ThinkOnProject curator-driven orchestration for template-less projects (ref task-202)
+  - 6 files changed
+
+- `cb3188e` - Group chat @mention visualization (ref task-208)
+  - 4 files changed
+
+- `f9968e5` - AI client ToolCall capability declaration and graceful degradation (ref task-205)
+  - 4 files changed
+
+- `0d2b843` - Group chat decision logic ShouldReplyInGroupChat (ref task-201)
+  - 6 files changed
+
+- `277a2b1` - Knowledge network completion - advanced queries and graph traversal (ref task-207)
+  - 9 files changed
+
+#### Bug Fixes
+- `6d0b66e` - Fix appendMessage TypeError when sending group chat messages (ref task-209)
+  - 5 files changed
+
+- `b15167c` - Submit missing list-workflow-templates route registration from task-203 (ref task-203)
+  - 1 files changed
+
+- `dc549a2` - Fix Gitee sync workflow - add username to token URL
+  - 1 files changed
+
+#### Infrastructure
+- `e5fa3ad` - Disable GitHub auto-sync schedule, awaiting official Gitee sync solution
+  - 1 files changed
+
+#### Collaboration Framework
+- `4a58c82` - Add system capability analysis report + ThinkOnProject design proposal
+  - 5 files changed
+
+- `8ab29e6` - Archive system capability completeness analysis report to .ai-collab/docs
+  - 2 files changed
+
+- `b412d9c` - Archive old tasks, re-publish task-201~208 based on comprehensive analysis
+  - 2 files changed
+
+- `437884a` - Update collaboration metadata - task-202/203/204 completed (ref task-202, task-203, task-204)
+  - 2 files changed
+
+- `bf78d79` - Update collaboration metadata - task-201/205/208 completed
+  - 2 files changed
+
+- `de6ee0e` - Session end record catpaw-20260517-2215
+  - 5 files changed
+
+- `7223b6f` - Session end record catpaw-20260517-2200
+  - 4 files changed
+
 ### 2026-05-16
 
 #### Release Preparation

@@ -63,6 +63,218 @@ Ambas versiones comparten las mismas interfaces y funcionalidades, difiriendo so
 
 ## Alpha-0.2
 
+### 2026-05-22
+
+#### Correcciones de consistencia de documentación
+- `9e07b27` - Corregir discrepancias de la documentación francesa (fr-FR) con el código fuente (ref task-307)
+  - 10 archivos modificados
+
+- `9e3be72` - Corregir discrepancias de la documentación alemana (de-DE) con el código fuente (ref task-308)
+  - 5 archivos modificados
+
+- `2bc7151` - Corregir discrepancias de la documentación española (es-ES) con el código fuente (ref task-309)
+  - 13 archivos modificados
+
+- `f95088e` - Corregir discrepancias de la documentación italiana (it-IT) con el código fuente (ref task-310)
+  - 11 archivos modificados
+
+- `6ea9f4a` - Corregir discrepancias de la documentación polaca (pl-PL) con el código fuente (ref task-311)
+  - 16 archivos modificados
+
+- `7646923` - Corregir discrepancias de la documentación portuguesa (pt-PT) con el código fuente (ref task-312)
+  - 12 archivos modificados
+
+- `7eaf9db` - Corregir discrepancias de la documentación checa (cs-CZ) con el código fuente (ref task-313)
+  - 12 archivos modificados
+
+#### Framework de colaboración
+- `3cb7347` - Actualizar task-313 relatedCommit=7eaf9db
+  - 1 archivos modificados
+
+### 2026-05-21
+
+#### Nuevas funcionalidades
+- `99eca78` - Añadir 'Ver almacenamiento (solo lectura)' al menú contextual, llamada intra-proceso a Speedy.Manager (ref task-301)
+  - 26 archivos modificados
+
+#### Correcciones de consistencia de documentación
+- `7f65cf1` - Corregir discrepancias de la documentación zh-CN con el código fuente (ref task-303)
+  - 15 archivos modificados
+
+- `a9e2a2c` - Corregir discrepancias de la documentación inglesa (en) con el código fuente (ref task-302)
+  - 9 archivos modificados
+
+- `2549105` - Corregir discrepancias de la documentación chino tradicional (zh-HK) con el código fuente (ref task-304)
+  - 12 archivos modificados
+
+- `277eb50` - Corregir discrepancias de la documentación japonesa con el código fuente (ref task-305)
+  - 10 archivos modificados
+
+- `edce413` - Corregir discrepancias de la documentación coreana (ko-KR) con el código fuente (ref task-306)
+  - 18 archivos modificados
+
+- `f2adcae` - Corregir inconsistencias de la documentación portuguesa con el código fuente (ref task-220)
+  - 15 archivos modificados
+
+- `3332987` - Corregir inconsistencias de la documentación chino tradicional (Hong Kong) con el código fuente (ref task-218)
+  - 14 archivos modificados
+
+- `af9f715` - Corregir inconsistencias de la documentación polaca con el código fuente (ref task-217)
+  - 15 archivos modificados
+
+- `2e2b18b` - Corregir inconsistencias de la documentación coreana con el código fuente (ref task-216)
+  - 16 archivos modificados
+
+- `626ebc9` - Corregir inconsistencias de la documentación japonesa con el código fuente (ref task-215)
+  - 19 archivos modificados
+
+- `48d061b` - Corregir inconsistencias de la documentación italiana con el código fuente (ref task-214)
+  - 14 archivos modificados
+
+#### Framework de colaboración
+- `6683bee` - Registrar equipo Marvis AI, actualizar estado de tareas
+  - 3 archivos modificados
+
+- `03fc905` - Archivar task-210~220
+  - 5 archivos modificados
+
+### 2026-05-20
+
+#### Nuevas funcionalidades
+- `65176d4` - Añadir soporte completo de localización portuguesa (pt-PT + pt-BR) (ref task-208)
+  - 41 archivos modificados
+
+#### Correcciones de consistencia de documentación
+- `af4dffd` - Corregir todas las inconsistencias de la documentación zh-CN con el código fuente (ref task-209)
+  - 11 archivos modificados
+
+- `144b945` - Corregir inconsistencias de la documentación inglesa (en) y checa (cs-CZ) con el código fuente (ref task-219, task-210)
+  - 22 archivos modificados
+
+- `08bec55` - Corregir inconsistencias de la documentación alemana (de-DE) con el código fuente (ref task-211)
+  - 14 archivos modificados
+
+- `7ff28de` - Corregir inconsistencias de la documentación española (es-ES) con el código fuente (ref task-212)
+  - 14 archivos modificados
+
+- `15e2133` - Corregir inconsistencias de la documentación francesa (fr-FR) con el código fuente (ref task-213)
+  - 13 archivos modificados
+
+#### Correcciones de errores
+- `7dac388` - Corregir la lista de tareas del proyecto que no se muestra (ref task-207)
+  - 6 archivos modificados
+
+#### Framework de colaboración
+- `7890223` - Archivar task-201~209, publicar tareas de corrección de consistencia de documentación task-210~220
+  - 5 archivos modificados
+
+### 2026-05-19
+
+#### Nuevas funcionalidades
+- `cd72846` - Implementar alternativa segura para el bypass del escaneo de seguridad de PluginLoader (ref task-203)
+  - 13 archivos modificados
+
+- `fc0c00c` - Mejoras de Speedy.Manager - Crear/Importar/Exportar/Jerarquía TreeView/Ventana de progreso (ref task-206)
+  - 9 archivos modificados
+
+#### Correcciones de errores
+- `ec07118` - Corregir el problema de ITypeRegistry/IObjectFactory no registrados antes de la carga de plugins (ref task-205)
+  - 8 archivos modificados
+
+- `9e749db` - Corregir el error Creator ID is required al crear proyecto (ref task-204)
+  - 4 archivos modificados
+
+#### Infraestructura
+- `43dc092` - Migración CLDR - añadir CldrDataProvider, eliminar .github
+  - 1 archivos modificados
+
+- `c09ec1f` - Añadir cldr/ a .gitignore
+  - 1 archivos modificados
+
+- `221f818` - Sincronización GitHub cambiada a esquema de espejo push Gitee, workflow conservado solo como backup manual
+  - 1 archivos modificados
+
+- `08cdf1a` - Corregir workflow de sincronización GitHub - añadir lógica de reintento y salto sin cambios
+  - 1 archivos modificados
+
+- `fb4e77d` - Actualizar SiliconLife.Speedy.Manager.csproj
+  - 1 archivos modificados
+
+#### Framework de colaboración
+- `df90af0` - Actualizar task-203 relatedCommit=cd72846
+  - 1 archivos modificados
+
+### 2026-05-18
+
+#### Refactorización
+- `e720d06` - Refactorizar completamente Speedy.Manager de WinForms a Avalonia (ref task-202)
+  - 17 archivos modificados
+
+#### Correcciones de errores
+- `08894a9` - Corregir error de visualización del nivel de entradas de resumen de la línea temporal de memoria (ref task-201)
+  - 3 archivos modificados
+
+#### Framework de colaboración
+- `2871afb` - Archivar todas las tareas, limpiar tasks.json
+  - 2 archivos modificados
+
+### 2026-05-17
+
+#### Nuevas funcionalidades
+- `d6eb994` - Añadir entrada de creación de proyecto y selección de plantilla de flujo de trabajo a la página de lista de proyectos (ref task-203)
+  - 14 archivos modificados
+
+- `0872134` - Orquestación impulsada por curador ThinkOnProject para proyectos sin plantilla (ref task-202)
+  - 6 archivos modificados
+
+- `cb3188e` - Visualización de @menciones en chat grupal (ref task-208)
+  - 4 archivos modificados
+
+- `f9968e5` - Declaración de capacidad ToolCall del cliente IA y degradación elegante (ref task-205)
+  - 4 archivos modificados
+
+- `0d2b843` - Lógica de decisión de chat grupal ShouldReplyInGroupChat (ref task-201)
+  - 6 archivos modificados
+
+- `277a2b1` - Completitud de red de conocimiento - consultas avanzadas y traversal de grafos (ref task-207)
+  - 9 archivos modificados
+
+#### Correcciones de errores
+- `6d0b66e` - Corregir TypeError de appendMessage al enviar mensajes en chat grupal (ref task-209)
+  - 5 archivos modificados
+
+- `b15167c` - Envío adicional del registro de ruta list-workflow-templates omitido en task-203 (ref task-203)
+  - 1 archivos modificados
+
+- `dc549a2` - Corregir workflow de sincronización Gitee - añadir nombre de usuario a la URL del token
+  - 1 archivos modificados
+
+#### Infraestructura
+- `e5fa3ad` - Desactivar la sincronización automática de GitHub schedule, esperando solución oficial de Gitee
+  - 1 archivos modificados
+
+#### Framework de colaboración
+- `4a58c82` - Añadir informe de análisis de capacidades del sistema + propuesta de diseño ThinkOnProject
+  - 5 archivos modificados
+
+- `8ab29e6` - Archivar informe de análisis de completitud de capacidades del sistema en .ai-collab/docs
+  - 2 archivos modificados
+
+- `b412d9c` - Archivar tareas antiguas, republicar task-201~208 basado en análisis integral
+  - 2 archivos modificados
+
+- `437884a` - Actualizar metadatos de colaboración - task-202/203/204 completadas (ref task-202, task-203, task-204)
+  - 2 archivos modificados
+
+- `bf78d79` - Actualizar metadatos de colaboración - task-201/205/208 completadas
+  - 2 archivos modificados
+
+- `de6ee0e` - Registro de fin de sesión catpaw-20260517-2215
+  - 5 archivos modificados
+
+- `7223b6f` - Registro de fin de sesión catpaw-20260517-2200
+  - 4 archivos modificados
+
 ### 2026-05-16
 
 #### Preparación del Lanzamiento

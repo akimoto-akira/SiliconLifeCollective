@@ -63,6 +63,218 @@ Obě verze sdílejí stejná rozhraní a funkce, liší se pouze implementací �
 
 ## Alpha-0.2
 
+### 2026-05-22
+
+#### Opravy konzistence dokumentace
+- `9e07b27` - Opravit nesrovnalosti francouzské dokumentace (fr-FR) se zdrojovým kódem (ref task-307)
+  - 10 souborů změněno
+
+- `9e3be72` - Opravit nesrovnalosti německé dokumentace (de-DE) se zdrojovým kódem (ref task-308)
+  - 5 souborů změněno
+
+- `2bc7151` - Opravit nesrovnalosti španělské dokumentace (es-ES) se zdrojovým kódem (ref task-309)
+  - 13 souborů změněno
+
+- `f95088e` - Opravit nesrovnalosti italské dokumentace (it-IT) se zdrojovým kódem (ref task-310)
+  - 11 souborů změněno
+
+- `6ea9f4a` - Opravit nesrovnalosti polské dokumentace (pl-PL) se zdrojovým kódem (ref task-311)
+  - 16 souborů změněno
+
+- `7646923` - Opravit nesrovnalosti portugalské dokumentace (pt-PT) se zdrojovým kódem (ref task-312)
+  - 12 souborů změněno
+
+- `7eaf9db` - Opravit nesrovnalosti české dokumentace (cs-CZ) se zdrojovým kódem (ref task-313)
+  - 12 souborů změněno
+
+#### Rámec spolupráce
+- `3cb7347` - Aktualizace task-313 relatedCommit=7eaf9db
+  - 1 souborů změněno
+
+### 2026-05-21
+
+#### Nové funkce
+- `99eca78` - Přidat 'Zobrazit úložiště (jen pro čtení)' do kontextové nabídky, volání Speedy.Manager v procesu (ref task-301)
+  - 26 souborů změněno
+
+#### Opravy konzistence dokumentace
+- `7f65cf1` - Opravit nesrovnalosti dokumentace zh-CN se zdrojovým kódem (ref task-303)
+  - 15 souborů změněno
+
+- `a9e2a2c` - Opravit nesrovnalosti anglické dokumentace (en) se zdrojovým kódem (ref task-302)
+  - 9 souborů změněno
+
+- `2549105` - Opravit nesrovnalosti tradiční čínské dokumentace (zh-HK) se zdrojovým kódem (ref task-304)
+  - 12 souborů změněno
+
+- `277eb50` - Opravit nesrovnalosti japonské dokumentace se zdrojovým kódem (ref task-305)
+  - 10 souborů změněno
+
+- `edce413` - Opravit nesrovnalosti korejské dokumentace (ko-KR) se zdrojovým kódem (ref task-306)
+  - 18 souborů změněno
+
+- `f2adcae` - Opravit nekonzistence portugalské dokumentace se zdrojovým kódem (ref task-220)
+  - 15 souborů změněno
+
+- `3332987` - Opravit nekonzistence tradiční čínské (Hong Kong) dokumentace se zdrojovým kódem (ref task-218)
+  - 14 souborů změněno
+
+- `af9f715` - Opravit nekonzistence polské dokumentace se zdrojovým kódem (ref task-217)
+  - 15 souborů změněno
+
+- `2e2b18b` - Opravit nekonzistence korejské dokumentace se zdrojovým kódem (ref task-216)
+  - 16 souborů změněno
+
+- `626ebc9` - Opravit nekonzistence japonské dokumentace se zdrojovým kódem (ref task-215)
+  - 19 souborů změněno
+
+- `48d061b` - Opravit nekonzistence italské dokumentace se zdrojovým kódem (ref task-214)
+  - 14 souborů změněno
+
+#### Rámec spolupráce
+- `6683bee` - Registrace týmu Marvis AI, aktualizace stavu úkolů
+  - 3 souborů změněno
+
+- `03fc905` - Archivace task-210~220
+  - 5 souborů změněno
+
+### 2026-05-20
+
+#### Nové funkce
+- `65176d4` - Přidání úplné podpory portugalské lokalizace (pt-PT + pt-BR) (ref task-208)
+  - 41 souborů změněno
+
+#### Opravy konzistence dokumentace
+- `af4dffd` - Opravit všechny nekonzistence dokumentace zh-CN se zdrojovým kódem (ref task-209)
+  - 11 souborů změněno
+
+- `144b945` - Opravit nekonzistence anglické (en) a české (cs-CZ) dokumentace se zdrojovým kódem (ref task-219, task-210)
+  - 22 souborů změněno
+
+- `08bec55` - Opravit nekonzistence německé dokumentace (de-DE) se zdrojovým kódem (ref task-211)
+  - 14 souborů změněno
+
+- `7ff28de` - Opravit nekonzistence španělské dokumentace (es-ES) se zdrojovým kódem (ref task-212)
+  - 14 souborů změněno
+
+- `15e2133` - Opravit nekonzistence francouzské dokumentace (fr-FR) se zdrojovým kódem (ref task-213)
+  - 13 souborů změněno
+
+#### Opravy chyb
+- `7dac388` - Opravit nezobrazující se seznam úkolů projektu (ref task-207)
+  - 6 souborů změněno
+
+#### Rámec spolupráce
+- `7890223` - Archivace task-201~209, publikování úkolů opravy konzistence dokumentace task-210~220
+  - 5 souborů změněno
+
+### 2026-05-19
+
+#### Nové funkce
+- `cd72846` - Implementace bezpečné alternativy pro obejití bezpečnostní kontroly PluginLoader (ref task-203)
+  - 13 souborů změněno
+
+- `fc0c00c` - Vylepšení Speedy.Manager - Vytvořit/Importovat/Exportovat/Hierarchie TreeView/Okno průběhu (ref task-206)
+  - 9 souborů změněno
+
+#### Opravy chyb
+- `ec07118` - Opravit problém ITypeRegistry/IObjectFactory neregistrovaných před načtením pluginů (ref task-205)
+  - 8 souborů změněno
+
+- `9e749db` - Opravit chybu Creator ID is required při vytváření projektu (ref task-204)
+  - 4 souborů změněno
+
+#### Infrastruktura
+- `43dc092` - Migrace CLDR - přidání CldrDataProvider, odebrání .github
+  - 1 souborů změněno
+
+- `c09ec1f` - Přidat cldr/ do .gitignore
+  - 1 souborů změněno
+
+- `221f818` - Synchronizace GitHub změněna na schéma Gitee push mirror, workflow ponechán pouze jako ruční záloha
+  - 1 souborů změněno
+
+- `08cdf1a` - Opravit workflow synchronizace GitHub - přidat logiku opakování a přeskočení bez změn
+  - 1 souborů změněno
+
+- `fb4e77d` - Aktualizace SiliconLife.Speedy.Manager.csproj
+  - 1 souborů změněno
+
+#### Rámec spolupráce
+- `df90af0` - Aktualizace task-203 relatedCommit=cd72846
+  - 1 souborů změněno
+
+### 2026-05-18
+
+#### Refaktoring
+- `e720d06` - Kompletní refaktoring Speedy.Manager z WinForms na Avalonia (ref task-202)
+  - 17 souborů změněno
+
+#### Opravy chyb
+- `08894a9` - Opravit chybu zobrazení úrovně položek shrnutí časové osy paměti (ref task-201)
+  - 3 souborů změněno
+
+#### Rámec spolupráce
+- `2871afb` - Archivovat všechny úkoly, vyčistit tasks.json
+  - 2 souborů změněno
+
+### 2026-05-17
+
+#### Nové funkce
+- `d6eb994` - Přidat vstup pro vytvoření projektu a výběr šablony workflow na stránku seznamu projektů (ref task-203)
+  - 14 souborů změněno
+
+- `0872134` - Orchestrace řízená kurátorem ThinkOnProject pro projekty bez šablony (ref task-202)
+  - 6 souborů změněno
+
+- `cb3188e` - Vizualizace @zmínek ve skupinovém chatu (ref task-208)
+  - 4 souborů změněno
+
+- `f9968e5` - Deklarace schopností ToolCall AI klienta a elegantní degradace (ref task-205)
+  - 4 souborů změněno
+
+- `0d2b843` - Rozhodovací logika skupinového chatu ShouldReplyInGroupChat (ref task-201)
+  - 6 souborů změněno
+
+- `277a2b1` - Doplnění znalostní sítě - pokročilé dotazy a průchod grafy (ref task-207)
+  - 9 souborů změněno
+
+#### Opravy chyb
+- `6d0b66e` - Opravit TypeError appendMessage při odesílání zpráv ve skupinovém chatu (ref task-209)
+  - 5 souborů změněno
+
+- `b15167c` - Doplňující odeslání chybějící registrace trasy list-workflow-templates z task-203 (ref task-203)
+  - 1 souborů změněno
+
+- `dc549a2` - Opravit workflow synchronizace Gitee - přidat uživatelské jméno do URL tokenu
+  - 1 souborů změněno
+
+#### Infrastruktura
+- `e5fa3ad` - Deaktivovat automatickou synchronizaci GitHub schedule, čekání na oficiální řešení Gitee
+  - 1 souborů změněno
+
+#### Rámec spolupráce
+- `4a58c82` - Přidat zprávu o analýze systémových schopností + návrh ThinkOnProject
+  - 5 souborů změněno
+
+- `8ab29e6` - Archivace zprávy o analýze úplnosti systémových schopností v .ai-collab/docs
+  - 2 souborů změněno
+
+- `b412d9c` - Archivovat staré úkoly, znovu publikovat task-201~208 na základě komplexní analýzy
+  - 2 souborů změněno
+
+- `437884a` - Aktualizace metadat spolupráce - task-202/203/204 dokončeny (ref task-202, task-203, task-204)
+  - 2 souborů změněno
+
+- `bf78d79` - Aktualizace metadat spolupráce - task-201/205/208 dokončeny
+  - 2 souborů změněno
+
+- `de6ee0e` - Záznam konce relace catpaw-20260517-2215
+  - 5 souborů změněno
+
+- `7223b6f` - Záznam konce relace catpaw-20260517-2200
+  - 4 souborů změněno
+
 ### 2026-05-16
 
 #### Příprava vydání

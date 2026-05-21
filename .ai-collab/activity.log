@@ -587,3 +587,7 @@
 2026-05-23T00:40:00+08:00 | trae-glm5 | file_modified | docs/cs-CZ/tools-reference.md
 2026-05-23T01:00:00+08:00 | trae-glm5 | task_complete | task=task-313 | files=7
 2026-05-23T01:00:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260523-0000
+2026-05-22T04:44:00+08:00 | coze-agent | session_start | sessionId=coze-agent-20260522-0444
+2026-05-22T04:44:00+08:00 | coze-agent | task_archive | task=task-301~313 | count=13
+2026-05-22T04:44:00+08:00 | coze-agent | task_create | task=task-314 | summary=根据git记录补充所有12种语言changelog缺失版本2026-05-22T05:12:00+08:00 | coze-agent | task_complete | task=task-314 | summary=补充12种语言changelog缺失版本条目(2026-05-17~22新增6天53条提交,fr-FR/it-IT补4/23,pt-PT补36天完整历史)
+2026-05-22T05:12:00+08:00 | coze-agent | session_end | sessionId=coze-agent-20260522-0444

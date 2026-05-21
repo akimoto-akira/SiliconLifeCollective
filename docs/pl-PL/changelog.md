@@ -63,6 +63,218 @@ Obie wersje współdzielą te same interfejsy i funkcjonalność, różniąc si�
 
 ## Alpha-0.2
 
+### 2026-05-22
+
+#### Poprawki spójności dokumentacji
+- `9e07b27` - Poprawa niespójności dokumentacji francuskiej (fr-FR) z kodem źródłowym (ref task-307)
+  - 10 plików zmienionych
+
+- `9e3be72` - Poprawa niespójności dokumentacji niemieckiej (de-DE) z kodem źródłowym (ref task-308)
+  - 5 plików zmienionych
+
+- `2bc7151` - Poprawa niespójności dokumentacji hiszpańskiej (es-ES) z kodem źródłowym (ref task-309)
+  - 13 plików zmienionych
+
+- `f95088e` - Poprawa niespójności dokumentacji włoskiej (it-IT) z kodem źródłowym (ref task-310)
+  - 11 plików zmienionych
+
+- `6ea9f4a` - Poprawa niespójności dokumentacji polskiej (pl-PL) z kodem źródłowym (ref task-311)
+  - 16 plików zmienionych
+
+- `7646923` - Poprawa niespójności dokumentacji portugalskiej (pt-PT) z kodem źródłowym (ref task-312)
+  - 12 plików zmienionych
+
+- `7eaf9db` - Poprawa niespójności dokumentacji czeskiej (cs-CZ) z kodem źródłowym (ref task-313)
+  - 12 plików zmienionych
+
+#### Framework współpracy
+- `3cb7347` - Aktualizacja task-313 relatedCommit=7eaf9db
+  - 1 plików zmienionych
+
+### 2026-05-21
+
+#### Nowe funkcje
+- `99eca78` - Dodanie 'Wyświetl magazyn (tylko do odczytu)' do menu kontekstowego, wywołanie Speedy.Manager w procesie (ref task-301)
+  - 26 plików zmienionych
+
+#### Poprawki spójności dokumentacji
+- `7f65cf1` - Poprawa niespójności dokumentacji zh-CN z kodem źródłowym (ref task-303)
+  - 15 plików zmienionych
+
+- `a9e2a2c` - Poprawa niespójności dokumentacji angielskiej (en) z kodem źródłowym (ref task-302)
+  - 9 plików zmienionych
+
+- `2549105` - Poprawa niespójności dokumentacji chińskiego tradycyjnego (zh-HK) z kodem źródłowym (ref task-304)
+  - 12 plików zmienionych
+
+- `277eb50` - Poprawa niespójności dokumentacji japońskiej z kodem źródłowym (ref task-305)
+  - 10 plików zmienionych
+
+- `edce413` - Poprawa niespójności dokumentacji koreańskiej (ko-KR) z kodem źródłowym (ref task-306)
+  - 18 plików zmienionych
+
+- `f2adcae` - Poprawa niespójności dokumentacji portugalskiej z kodem źródłowym (ref task-220)
+  - 15 plików zmienionych
+
+- `3332987` - Poprawa niespójności dokumentacji chińskiego tradycyjnego (Hong Kong) z kodem źródłowym (ref task-218)
+  - 14 plików zmienionych
+
+- `af9f715` - Poprawa niespójności dokumentacji polskiej z kodem źródłowym (ref task-217)
+  - 15 plików zmienionych
+
+- `2e2b18b` - Poprawa niespójności dokumentacji koreańskiej z kodem źródłowym (ref task-216)
+  - 16 plików zmienionych
+
+- `626ebc9` - Poprawa niespójności dokumentacji japońskiej z kodem źródłowym (ref task-215)
+  - 19 plików zmienionych
+
+- `48d061b` - Poprawa niespójności dokumentacji włoskiej z kodem źródłowym (ref task-214)
+  - 14 plików zmienionych
+
+#### Framework współpracy
+- `6683bee` - Rejestracja zespołu Marvis AI, aktualizacja statusu zadań
+  - 3 plików zmienionych
+
+- `03fc905` - Archiwizacja task-210~220
+  - 5 plików zmienionych
+
+### 2026-05-20
+
+#### Nowe funkcje
+- `65176d4` - Dodanie pełnego wsparcia lokalizacji portugalskiej (pt-PT + pt-BR) (ref task-208)
+  - 41 plików zmienionych
+
+#### Poprawki spójności dokumentacji
+- `af4dffd` - Poprawa wszystkich niespójności dokumentacji zh-CN z kodem źródłowym (ref task-209)
+  - 11 plików zmienionych
+
+- `144b945` - Poprawa niespójności dokumentacji angielskiej (en) i czeskiej (cs-CZ) z kodem źródłowym (ref task-219, task-210)
+  - 22 plików zmienionych
+
+- `08bec55` - Poprawa niespójności dokumentacji niemieckiej (de-DE) z kodem źródłowym (ref task-211)
+  - 14 plików zmienionych
+
+- `7ff28de` - Poprawa niespójności dokumentacji hiszpańskiej (es-ES) z kodem źródłowym (ref task-212)
+  - 14 plików zmienionych
+
+- `15e2133` - Poprawa niespójności dokumentacji francuskiej (fr-FR) z kodem źródłowym (ref task-213)
+  - 13 plików zmienionych
+
+#### Poprawki błędów
+- `7dac388` - Poprawa niewyświetlającej się listy zadań projektu (ref task-207)
+  - 6 plików zmienionych
+
+#### Framework współpracy
+- `7890223` - Archiwizacja task-201~209, publikacja zadań poprawy spójności dokumentacji task-210~220
+  - 5 plików zmienionych
+
+### 2026-05-19
+
+#### Nowe funkcje
+- `cd72846` - Implementacja bezpiecznej alternatywy dla obejścia skanowania bezpieczeństwa PluginLoader (ref task-203)
+  - 13 plików zmienionych
+
+- `fc0c00c` - Ulepszenia Speedy.Manager - Utwórz/Importuj/Eksportuj/Hierarchia TreeView/Okno postępu (ref task-206)
+  - 9 plików zmienionych
+
+#### Poprawki błędów
+- `ec07118` - Poprawa problemu ITypeRegistry/IObjectFactory niezarejestrowanych przed ładowaniem wtyczek (ref task-205)
+  - 8 plików zmienionych
+
+- `9e749db` - Poprawa błędu Creator ID is required podczas tworzenia projektu (ref task-204)
+  - 4 plików zmienionych
+
+#### Infrastruktura
+- `43dc092` - Migracja CLDR - dodanie CldrDataProvider, usunięcie .github
+  - 1 plików zmienionych
+
+- `c09ec1f` - Dodanie cldr/ do .gitignore
+  - 1 plików zmienionych
+
+- `221f818` - Synchronizacja GitHub zmieniona na schemat push-mirror Gitee, workflow zachowany tylko jako backup ręczny
+  - 1 plików zmienionych
+
+- `08cdf1a` - Poprawa workflow synchronizacji GitHub - dodanie logiki ponownych prób i pomijania braku zmian
+  - 1 plików zmienionych
+
+- `fb4e77d` - Aktualizacja SiliconLife.Speedy.Manager.csproj
+  - 1 plików zmienionych
+
+#### Framework współpracy
+- `df90af0` - Aktualizacja task-203 relatedCommit=cd72846
+  - 1 plików zmienionych
+
+### 2026-05-18
+
+#### Refaktoryzacja
+- `e720d06` - Pełna refaktoryzacja Speedy.Manager z WinForms do Avalonia (ref task-202)
+  - 17 plików zmienionych
+
+#### Poprawki błędów
+- `08894a9` - Poprawa błędu wyświetlania poziomu wpisów podsumowania osi czasu pamięci (ref task-201)
+  - 3 plików zmienionych
+
+#### Framework współpracy
+- `2871afb` - Archiwizacja wszystkich zadań, wyczyszczenie tasks.json
+  - 2 plików zmienionych
+
+### 2026-05-17
+
+#### Nowe funkcje
+- `d6eb994` - Dodanie punktu tworzenia projektu i wyboru szablonu workflow do strony listy projektów (ref task-203)
+  - 14 plików zmienionych
+
+- `0872134` - Orkiestracja prowadzona przez kuratora ThinkOnProject dla projektów bez szablonu (ref task-202)
+  - 6 plików zmienionych
+
+- `cb3188e` - Wizualizacja @wspomnień w czacie grupowym (ref task-208)
+  - 4 plików zmienionych
+
+- `f9968e5` - Deklaracja możliwości ToolCall klienta IA i elegancka degradacja (ref task-205)
+  - 4 plików zmienionych
+
+- `0d2b843` - Logika decyzyjna czatu grupowego ShouldReplyInGroupChat (ref task-201)
+  - 6 plików zmienionych
+
+- `277a2b1` - Uzupełnienie sieci wiedzy - zaawansowane zapytania i traversacja grafów (ref task-207)
+  - 9 plików zmienionych
+
+#### Poprawki błędów
+- `6d0b66e` - Poprawa TypeError appendMessage podczas wysyłania wiadomości w czacie grupowym (ref task-209)
+  - 5 plików zmienionych
+
+- `b15167c` - Dodatkowe przesłanie pominiętej rejestracji trasy list-workflow-templates z task-203 (ref task-203)
+  - 1 plików zmienionych
+
+- `dc549a2` - Poprawa workflow synchronizacji Gitee - dodanie nazwy użytkownika do URL tokenu
+  - 1 plików zmienionych
+
+#### Infrastruktura
+- `e5fa3ad` - Wyłączenie automatycznej synchronizacji GitHub schedule, oczekiwanie na oficjalne rozwiązanie Gitee
+  - 1 plików zmienionych
+
+#### Framework współpracy
+- `4a58c82` - Dodanie raportu analizy możliwości systemu + propozycja designu ThinkOnProject
+  - 5 plików zmienionych
+
+- `8ab29e6` - Archiwizacja raportu analizy kompletności możliwości systemu w .ai-collab/docs
+  - 2 plików zmienionych
+
+- `b412d9c` - Archiwizacja starych zadań, ponowna publikacja task-201~208 na podstawie kompleksowej analizy
+  - 2 plików zmienionych
+
+- `437884a` - Aktualizacja metadanych współpracy - task-202/203/204 ukończone (ref task-202, task-203, task-204)
+  - 2 plików zmienionych
+
+- `bf78d79` - Aktualizacja metadanych współpracy - task-201/205/208 ukończone
+  - 2 plików zmienionych
+
+- `de6ee0e` - Rekord zakończenia sesji catpaw-20260517-2215
+  - 5 plików zmienionych
+
+- `7223b6f` - Rekord zakończenia sesji catpaw-20260517-2200
+  - 4 plików zmienionych
+
 ### 2026-05-16
 
 #### Przygotowanie wydania

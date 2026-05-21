@@ -63,6 +63,218 @@ Entrambe le versioni condividono le stesse interfacce e funzionalità, differend
 
 ## Alpha-0.2
 
+### 2026-05-22
+
+#### Correzioni di coerenza della documentazione
+- `9e07b27` - Correggere discrepanze della documentazione francese (fr-FR) con il codice sorgente (ref task-307)
+  - 10 file modificati
+
+- `9e3be72` - Correggere discrepanze della documentazione tedesca (de-DE) con il codice sorgente (ref task-308)
+  - 5 file modificati
+
+- `2bc7151` - Correggere discrepanze della documentazione spagnola (es-ES) con il codice sorgente (ref task-309)
+  - 13 file modificati
+
+- `f95088e` - Correggere discrepanze della documentazione italiana (it-IT) con il codice sorgente (ref task-310)
+  - 11 file modificati
+
+- `6ea9f4a` - Correggere discrepanze della documentazione polacca (pl-PL) con il codice sorgente (ref task-311)
+  - 16 file modificati
+
+- `7646923` - Correggere discrepanze della documentazione portoghese (pt-PT) con il codice sorgente (ref task-312)
+  - 12 file modificati
+
+- `7eaf9db` - Correggere discrepanze della documentazione ceca (cs-CZ) con il codice sorgente (ref task-313)
+  - 12 file modificati
+
+#### Framework di collaborazione
+- `3cb7347` - Aggiornamento task-313 relatedCommit=7eaf9db
+  - 1 file modificati
+
+### 2026-05-21
+
+#### Nuove funzionalità
+- `99eca78` - Aggiunta di 'Visualizza archiviazione (sola lettura)' al menu contestuale, chiamata intra-processo a Speedy.Manager (ref task-301)
+  - 26 file modificati
+
+#### Correzioni di coerenza della documentazione
+- `7f65cf1` - Correggere discrepanze della documentazione zh-CN con il codice sorgente (ref task-303)
+  - 15 file modificati
+
+- `a9e2a2c` - Correggere discrepanze della documentazione inglese (en) con il codice sorgente (ref task-302)
+  - 9 file modificati
+
+- `2549105` - Correggere discrepanze della documentazione cinese tradizionale (zh-HK) con il codice sorgente (ref task-304)
+  - 12 file modificati
+
+- `277eb50` - Correggere discrepanze della documentazione giapponese con il codice sorgente (ref task-305)
+  - 10 file modificati
+
+- `edce413` - Correggere discrepanze della documentazione coreana (ko-KR) con il codice sorgente (ref task-306)
+  - 18 file modificati
+
+- `f2adcae` - Correggere incoerenze della documentazione portoghese con il codice sorgente (ref task-220)
+  - 15 file modificati
+
+- `3332987` - Correggere incoerenze della documentazione cinese tradizionale (Hong Kong) con il codice sorgente (ref task-218)
+  - 14 file modificati
+
+- `af9f715` - Correggere incoerenze della documentazione polacca con il codice sorgente (ref task-217)
+  - 15 file modificati
+
+- `2e2b18b` - Correggere incoerenze della documentazione coreana con il codice sorgente (ref task-216)
+  - 16 file modificati
+
+- `626ebc9` - Correggere incoerenze della documentazione giapponese con il codice sorgente (ref task-215)
+  - 19 file modificati
+
+- `48d061b` - Correggere incoerenze della documentazione italiana con il codice sorgente (ref task-214)
+  - 14 file modificati
+
+#### Framework di collaborazione
+- `6683bee` - Registrare il team Marvis AI, aggiornare lo stato delle attività
+  - 3 file modificati
+
+- `03fc905` - Archiviare task-210~220
+  - 5 file modificati
+
+### 2026-05-20
+
+#### Nuove funzionalità
+- `65176d4` - Aggiungere supporto completo alla localizzazione portoghese (pt-PT + pt-BR) (ref task-208)
+  - 41 file modificati
+
+#### Correzioni di coerenza della documentazione
+- `af4dffd` - Correggere tutte le incoerenze della documentazione zh-CN con il codice sorgente (ref task-209)
+  - 11 file modificati
+
+- `144b945` - Correggere incoerenze della documentazione inglese (en) e ceca (cs-CZ) con il codice sorgente (ref task-219, task-210)
+  - 22 file modificati
+
+- `08bec55` - Correggere incoerenze della documentazione tedesca (de-DE) con il codice sorgente (ref task-211)
+  - 14 file modificati
+
+- `7ff28de` - Correggere incoerenze della documentazione spagnola (es-ES) con il codice sorgente (ref task-212)
+  - 14 file modificati
+
+- `15e2133` - Correggere incoerenze della documentazione francese (fr-FR) con il codice sorgente (ref task-213)
+  - 13 file modificati
+
+#### Correzioni di bug
+- `7dac388` - Correggere la lista delle attività di progetto non visualizzabile (ref task-207)
+  - 6 file modificati
+
+#### Framework di collaborazione
+- `7890223` - Archiviare task-201~209, pubblicare attività di correzione coerenza documentazione task-210~220
+  - 5 file modificati
+
+### 2026-05-19
+
+#### Nuove funzionalità
+- `cd72846` - Implementare alternativa sicura per il bypass della scansione di sicurezza PluginLoader (ref task-203)
+  - 13 file modificati
+
+- `fc0c00c` - Miglioramenti Speedy.Manager - Crea/Importa/Esporta/Gerarchia TreeView/Finestra di avanzamento (ref task-206)
+  - 9 file modificati
+
+#### Correzioni di bug
+- `ec07118` - Correggere il problema di ITypeRegistry/IObjectFactory non registrati prima del caricamento dei plugin (ref task-205)
+  - 8 file modificati
+
+- `9e749db` - Correggere l'errore Creator ID is required durante la creazione del progetto (ref task-204)
+  - 4 file modificati
+
+#### Infrastruttura
+- `43dc092` - Migrazione CLDR - aggiunta di CldrDataProvider, rimozione di .github
+  - 1 file modificati
+
+- `c09ec1f` - Aggiungere cldr/ a .gitignore
+  - 1 file modificati
+
+- `221f818` - Sincronizzazione GitHub passata a schema mirror push Gitee, workflow mantenuto solo come backup manuale
+  - 1 file modificati
+
+- `08cdf1a` - Correggere workflow di sincronizzazione GitHub - aggiunta logica di retry e salto senza modifiche
+  - 1 file modificati
+
+- `fb4e77d` - Aggiornamento di SiliconLife.Speedy.Manager.csproj
+  - 1 file modificati
+
+#### Framework di collaborazione
+- `df90af0` - Aggiornamento task-203 relatedCommit=cd72846
+  - 1 file modificati
+
+### 2026-05-18
+
+#### Refactoring
+- `e720d06` - Refactoring completo di Speedy.Manager da WinForms ad Avalonia (ref task-202)
+  - 17 file modificati
+
+#### Correzioni di bug
+- `08894a9` - Correggere errore di visualizzazione del livello delle voci di riepilogo della timeline di memoria (ref task-201)
+  - 3 file modificati
+
+#### Framework di collaborazione
+- `2871afb` - Archiviare tutte le attività, svuotare tasks.json
+  - 2 file modificati
+
+### 2026-05-17
+
+#### Nuove funzionalità
+- `d6eb994` - Aggiungere punto di creazione progetto e selezione modello workflow alla pagina elenco progetti (ref task-203)
+  - 14 file modificati
+
+- `0872134` - Orchestrazione guidata dal curatore ThinkOnProject per progetti senza modello (ref task-202)
+  - 6 file modificati
+
+- `cb3188e` - Visualizzazione @menzione nella chat di gruppo (ref task-208)
+  - 4 file modificati
+
+- `f9968e5` - Dichiarazione di capacità ToolCall del client IA e degradazione elegante (ref task-205)
+  - 4 file modificati
+
+- `0d2b843` - Logica decisionale chat di gruppo ShouldReplyInGroupChat (ref task-201)
+  - 6 file modificati
+
+- `277a2b1` - Completamento rete di conoscenza - query avanzate e attraversamento grafi (ref task-207)
+  - 9 file modificati
+
+#### Correzioni di bug
+- `6d0b66e` - Correggere TypeError di appendMessage durante l'invio di messaggi nella chat di gruppo (ref task-209)
+  - 5 file modificati
+
+- `b15167c` - Invio aggiuntivo della registrazione route list-workflow-templates omessa in task-203 (ref task-203)
+  - 1 file modificati
+
+- `dc549a2` - Correggere workflow di sincronizzazione Gitee - aggiunta nome utente all'URL del token
+  - 1 file modificati
+
+#### Infrastruttura
+- `e5fa3ad` - Disattivare sincronizzazione automatica GitHub schedule, in attesa di soluzione ufficiale Gitee
+  - 1 file modificati
+
+#### Framework di collaborazione
+- `4a58c82` - Aggiungere rapporto di analisi delle capacità di sistema + proposta di design ThinkOnProject
+  - 5 file modificati
+
+- `8ab29e6` - Archiviare rapporto di analisi di completezza delle capacità di sistema in .ai-collab/docs
+  - 2 file modificati
+
+- `b412d9c` - Archiviare vecchie attività, ripubblicare task-201~208 basato su analisi completa
+  - 2 file modificati
+
+- `437884a` - Aggiornamento metadati di collaborazione - task-202/203/204 completate (ref task-202, task-203, task-204)
+  - 2 file modificati
+
+- `bf78d79` - Aggiornamento metadati di collaborazione - task-201/205/208 completate
+  - 2 file modificati
+
+- `de6ee0e` - Registrazione fine sessione catpaw-20260517-2215
+  - 5 file modificati
+
+- `7223b6f` - Registrazione fine sessione catpaw-20260517-2200
+  - 4 file modificati
+
 ### 2026-05-16
 
 #### Preparazione del rilascio
@@ -802,6 +1014,47 @@ Entrambe le versioni condividono le stesse interfacce e funzionalità, differend
 #### Aggiornamento della documentazione
 - `8111e92` - Aggiunta del link Wiki nella sezione repository del README
   - 1 file modificato, 3 righe aggiunte, 1 riga eliminata
+
+### 2026-04-23
+
+#### Localizzazione degli strumenti
+- `192fc6e` - Aggiunta dei nomi degli strumenti mancanti per 5 strumenti
+  - 6 file modificati, 30 righe aggiunte
+
+#### Aggiornamento della documentazione
+- `882c08f` - Aggiornamento di tutti i file changelog, aggiunta della cronologia Git completa e rimozione dei numeri di versione falsi
+  - 45 file modificati, 8815 righe aggiunte, 1611 righe eliminate
+
+#### Miglioramento della pagina chat
+- `65c157b` - Aggiunta di indicatori di caricamento per le pagine di chat e selezione automatica della sessione del curator
+  - 10 file modificati, 211 righe aggiunte, 7 righe eliminate
+
+#### Funzionalità cronologia chat
+- `e483348` - Implementazione della funzionalità di visualizzazione della cronologia chat dei Silicon Beings
+  - Nuovo ChatHistoryController
+  - Creazione di ChatHistoryViewModel
+  - Implementazione delle pagine ChatHistoryListView e ChatHistoryDetailView
+  - Aggiunta delle chiavi di localizzazione della cronologia chat (5 lingue)
+  - 12 file modificati, 1178 righe aggiunte
+
+#### Miglioramento del controllo di flusso IA
+- `30a2d4e` - Miglioramento dell'annullamento del flusso IA, dell'integrazione IM e dell'inizializzazione del core host
+  - 11 file modificati, 387 righe aggiunte, 12 righe eliminate
+
+#### Coda di messaggi chat
+- `db48c51` - Aggiunta della coda di messaggi di chat, metadati di file e supporto di annullamento dello stream
+  - 4 file modificati, 357 righe aggiunte
+
+#### Supporto upload file
+- `28fb344` - Implementazione del dialogo di origine file e supporto upload file
+  - 3 file modificati, 1100 righe aggiunte, 2 righe eliminate
+- `1d3e2cc` - Aggiunta delle stringhe di localizzazione del dialogo di origine file (6 lingue)
+  - 6 file modificati, 30 righe aggiunte
+
+#### Aggiornamento della documentazione
+- `8111e92` - Aggiunta del link Wiki nella sezione repository del README
+  - 1 file modificato, 3 righe aggiunte, 1 riga eliminata
+
 
 ### 2026-04-22
 

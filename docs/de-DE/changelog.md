@@ -63,6 +63,218 @@ Beide Versionen teilen die gleichen Schnittstellen und Funktionen und unterschei
 
 ## Alpha-0.2
 
+### 2026-05-22
+
+#### Dokumentationskonsistenz-Korrekturen
+- `9e07b27` - Korrektur der Inkonsistenzen der französischen Dokumentation (fr-FR) mit dem Quellcode (ref task-307)
+  - 10 Dateien geändert
+
+- `9e3be72` - Korrektur der Inkonsistenzen der deutschen Dokumentation (de-DE) mit dem Quellcode (ref task-308)
+  - 5 Dateien geändert
+
+- `2bc7151` - Korrektur der Inkonsistenzen der spanischen Dokumentation (es-ES) mit dem Quellcode (ref task-309)
+  - 13 Dateien geändert
+
+- `f95088e` - Korrektur der Inkonsistenzen der italienischen Dokumentation (it-IT) mit dem Quellcode (ref task-310)
+  - 11 Dateien geändert
+
+- `6ea9f4a` - Korrektur der Inkonsistenzen der polnischen Dokumentation (pl-PL) mit dem Quellcode (ref task-311)
+  - 16 Dateien geändert
+
+- `7646923` - Korrektur der Inkonsistenzen der portugiesischen Dokumentation (pt-PT) mit dem Quellcode (ref task-312)
+  - 12 Dateien geändert
+
+- `7eaf9db` - Korrektur der Inkonsistenzen der tschechischen Dokumentation (cs-CZ) mit dem Quellcode (ref task-313)
+  - 12 Dateien geändert
+
+#### Kollaborations-Framework
+- `3cb7347` - Aktualisierung task-313 relatedCommit=7eaf9db
+  - 1 Dateien geändert
+
+### 2026-05-21
+
+#### Neue Funktionen
+- `99eca78` - Kontextmenü um 'Speicher anzeigen (schreibgeschützt)' erweitert, prozessinterner Speedy.Manager-Aufruf (ref task-301)
+  - 26 Dateien geändert
+
+#### Dokumentationskonsistenz-Korrekturen
+- `7f65cf1` - Korrektur der Inkonsistenzen der zh-CN-Dokumentation mit dem Quellcode (ref task-303)
+  - 15 Dateien geändert
+
+- `a9e2a2c` - Korrektur der Inkonsistenzen der englischen Dokumentation (en) mit dem Quellcode (ref task-302)
+  - 9 Dateien geändert
+
+- `2549105` - Korrektur der Inkonsistenzen der traditionell-chinesischen Dokumentation (zh-HK) mit dem Quellcode (ref task-304)
+  - 12 Dateien geändert
+
+- `277eb50` - Korrektur der Inkonsistenzen der japanischen Dokumentation mit dem Quellcode (ref task-305)
+  - 10 Dateien geändert
+
+- `edce413` - Korrektur der Inkonsistenzen der koreanischen Dokumentation (ko-KR) mit dem Quellcode (ref task-306)
+  - 18 Dateien geändert
+
+- `f2adcae` - Korrektur der Inkonsistenzen der portugiesischen Dokumentation mit dem Quellcode (ref task-220)
+  - 15 Dateien geändert
+
+- `3332987` - Korrektur der Inkonsistenzen der traditionell-chinesischen (Hong Kong) Dokumentation mit dem Quellcode (ref task-218)
+  - 14 Dateien geändert
+
+- `af9f715` - Korrektur der Inkonsistenzen der polnischen Dokumentation mit dem Quellcode (ref task-217)
+  - 15 Dateien geändert
+
+- `2e2b18b` - Korrektur der Inkonsistenzen der koreanischen Dokumentation mit dem Quellcode (ref task-216)
+  - 16 Dateien geändert
+
+- `626ebc9` - Korrektur der Inkonsistenzen der japanischen Dokumentation mit dem Quellcode (ref task-215)
+  - 19 Dateien geändert
+
+- `48d061b` - Korrektur der Inkonsistenzen der italienischen Dokumentation mit dem Quellcode (ref task-214)
+  - 14 Dateien geändert
+
+#### Kollaborations-Framework
+- `6683bee` - Registrierung des Marvis AI-Teams, Aktualisierung des Aufgabenstatus
+  - 3 Dateien geändert
+
+- `03fc905` - Archivierung task-210~220
+  - 5 Dateien geändert
+
+### 2026-05-20
+
+#### Neue Funktionen
+- `65176d4` - Vollständige portugiesische Lokalisierungsunterstützung (pt-PT + pt-BR) hinzugefügt (ref task-208)
+  - 41 Dateien geändert
+
+#### Dokumentationskonsistenz-Korrekturen
+- `af4dffd` - Korrektur aller Inkonsistenzen der zh-CN-Dokumentation mit dem Quellcode (ref task-209)
+  - 11 Dateien geändert
+
+- `144b945` - Korrektur der Inkonsistenzen der englischen (en) und tschechischen (cs-CZ) Dokumentation mit dem Quellcode (ref task-219, task-210)
+  - 22 Dateien geändert
+
+- `08bec55` - Korrektur der Inkonsistenzen der deutschen Dokumentation (de-DE) mit dem Quellcode (ref task-211)
+  - 14 Dateien geändert
+
+- `7ff28de` - Korrektur der Inkonsistenzen der spanischen Dokumentation (es-ES) mit dem Quellcode (ref task-212)
+  - 14 Dateien geändert
+
+- `15e2133` - Korrektur der Inkonsistenzen der französischen Dokumentation (fr-FR) mit dem Quellcode (ref task-213)
+  - 13 Dateien geändert
+
+#### Fehlerbehebungen
+- `7dac388` - Korrektur der nicht anzeigbaren Projektaufgabenliste (ref task-207)
+  - 6 Dateien geändert
+
+#### Kollaborations-Framework
+- `7890223` - Archivierung task-201~209, Veröffentlichung der Dokumentationskonsistenz-Korrekturaufgaben task-210~220
+  - 5 Dateien geändert
+
+### 2026-05-19
+
+#### Neue Funktionen
+- `cd72846` - Implementierung einer sicheren Alternative zum PluginLoader-Sicherheits Scan-Umgehung (ref task-203)
+  - 13 Dateien geändert
+
+- `fc0c00c` - Speedy.Manager-Erweiterungen - Erstellen/Importieren/Exportieren/TreeView-Hierarchie/Fortschrittsfenster (ref task-206)
+  - 9 Dateien geändert
+
+#### Fehlerbehebungen
+- `ec07118` - Korrektur des Problems, dass ITypeRegistry/IObjectFactory vor dem Plugin-Laden nicht registriert wurden (ref task-205)
+  - 8 Dateien geändert
+
+- `9e749db` - Korrektur des Fehlers 'Creator ID is required' bei der Projekterstellung (ref task-204)
+  - 4 Dateien geändert
+
+#### Infrastruktur
+- `43dc092` - CLDR-Migration - CldrDataProvider hinzugefügt, .github entfernt
+  - 1 Dateien geändert
+
+- `c09ec1f` - cldr/ zur .gitignore hinzugefügt
+  - 1 Dateien geändert
+
+- `221f818` - GitHub-Sync auf Gitee-Push-Spiegel-Schema umgestellt, Workflow nur als manuelles Backup beibehalten
+  - 1 Dateien geändert
+
+- `08cdf1a` - Korrektur des GitHub-Sync-Workflows - Retry-Logik und Skip-bei-keiner-Änderung hinzugefügt
+  - 1 Dateien geändert
+
+- `fb4e77d` - Aktualisierung von SiliconLife.Speedy.Manager.csproj
+  - 1 Dateien geändert
+
+#### Kollaborations-Framework
+- `df90af0` - Aktualisierung task-203 relatedCommit=cd72846
+  - 1 Dateien geändert
+
+### 2026-05-18
+
+#### Refaktorierung
+- `e720d06` - Vollständige Refaktorierung von Speedy.Manager von WinForms zu Avalonia (ref task-202)
+  - 17 Dateien geändert
+
+#### Fehlerbehebungen
+- `08894a9` - Korrektur des Anzeigefehlers der Zusammenfassungseinträge der Memory-Timeline (ref task-201)
+  - 3 Dateien geändert
+
+#### Kollaborations-Framework
+- `2871afb` - Alle Aufgaben archiviert, tasks.json geleert
+  - 2 Dateien geändert
+
+### 2026-05-17
+
+#### Neue Funktionen
+- `d6eb994` - Projekterstellungseintrag und Workflow-Vorlagenauswahl zur Projektlistenseite hinzugefügt (ref task-203)
+  - 14 Dateien geändert
+
+- `0872134` - ThinkOnProject Kurator-gesteuerte Orchestrierung für vorlagenlose Projekte (ref task-202)
+  - 6 Dateien geändert
+
+- `cb3188e` - Gruppenchat @Erwähnung-Visualisierung (ref task-208)
+  - 4 Dateien geändert
+
+- `f9968e5` - KI-Client ToolCall-Fähigkeitsdeklaration und graziöse Degradation (ref task-205)
+  - 4 Dateien geändert
+
+- `0d2b843` - Gruppenchat-Entscheidungslogik ShouldReplyInGroupChat (ref task-201)
+  - 6 Dateien geändert
+
+- `277a2b1` - Wissensnetzwerk-Vervollständigung - erweiterte Abfragen und Graphtraversal (ref task-207)
+  - 9 Dateien geändert
+
+#### Fehlerbehebungen
+- `6d0b66e` - Korrektur des appendMessage TypeError beim Senden von Gruppenchat-Nachrichten (ref task-209)
+  - 5 Dateien geändert
+
+- `b15167c` - Nachreichen der fehlenden list-workflow-templates Routenregistrierung aus task-203 (ref task-203)
+  - 1 Dateien geändert
+
+- `dc549a2` - Korrektur des Gitee-Sync-Workflows - Benutzername zur Token-URL hinzugefügt
+  - 1 Dateien geändert
+
+#### Infrastruktur
+- `e5fa3ad` - Deaktivierung des GitHub Auto-Sync-Schedule, Warten auf offizielle Gitee-Sync-Lösung
+  - 1 Dateien geändert
+
+#### Kollaborations-Framework
+- `4a58c82` - Systemfähigkeitsanalysebericht + ThinkOnProject-Designvorschlag hinzugefügt
+  - 5 Dateien geändert
+
+- `8ab29e6` - Archivierung des Systemfähigkeitsvollständigkeitsanalyseberichts in .ai-collab/docs
+  - 2 Dateien geändert
+
+- `b412d9c` - Alte Aufgaben archiviert, task-201~208 basierend auf umfassender Analyse neu veröffentlicht
+  - 2 Dateien geändert
+
+- `437884a` - Aktualisierung der Kollaborationsmetadaten - task-202/203/204 abgeschlossen (ref task-202, task-203, task-204)
+  - 2 Dateien geändert
+
+- `bf78d79` - Aktualisierung der Kollaborationsmetadaten - task-201/205/208 abgeschlossen
+  - 2 Dateien geändert
+
+- `de6ee0e` - Sitzungsende-Aufzeichnung catpaw-20260517-2215
+  - 5 Dateien geändert
+
+- `7223b6f` - Sitzungsende-Aufzeichnung catpaw-20260517-2200
+  - 4 Dateien geändert
+
 ### 2026-05-16
 
 #### Veröffentlichungsvorbereitung
