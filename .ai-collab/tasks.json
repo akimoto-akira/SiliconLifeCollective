@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-22T13:00:00+08:00",
+  "lastUpdated": "2026-05-22T15:30:00+08:00",
   "tasks": [
     {
       "id": "task-301",
@@ -163,12 +163,19 @@
       "title": "Analyser la cohérence des documents français (fr-FR) avec le code source et corriger les écarts",
       "description": "Comparer tous les documents du répertoire docs/fr-FR/ avec l'implémentation actuelle du code source, identifier le contenu obsolète, inexact ou manquant dans la documentation, vérifier l'exhaustivité de la traduction par rapport au document de référence anglais (en), établir une liste des écarts et corriger la documentation pour la synchroniser avec le code source.",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-22T00:00:00+08:00",
       "createdBy": "trae-glm5",
-      "assignedTo": null,
+      "assignedTo": "trae-glm5",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-22T15:30:00+08:00",
+      "modifiedFiles": [
+        "docs/fr-FR/README.md",
+        "docs/fr-FR/architecture.md",
+        "docs/fr-FR/permission-system.md",
+        "docs/fr-FR/api-reference.md",
+        "docs/fr-FR/security.md"
+      ]
     },
     {
       "id": "task-308",
@@ -257,7 +264,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-307",
       "task-308",
       "task-309",
       "task-310",
@@ -266,7 +272,7 @@
       "task-313"
     ],
     "inProgress": [],
-    "completed": ["task-301", "task-302", "task-303", "task-304", "task-305", "task-306"],
+    "completed": ["task-301", "task-302", "task-303", "task-304", "task-305", "task-306", "task-307"],
     "cancelled": []
   },
   "metadata": {

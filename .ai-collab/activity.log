@@ -542,3 +542,12 @@
 2026-05-22T15:45:00+08:00 | trae-glm5 | file_modified | docs/ko-KR/changelog.md | fix=알리바이백련→알리바바클라우드DashScope
 2026-05-22T16:00:00+08:00 | trae-glm5 | task_complete | task=task-306 | modifiedFiles=11 | summary=修正ko-KR文档与源代码一致性差异(权限链级别,AI客户端命名,依赖方向,模型/区域配置等)
 2026-05-22T16:00:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260522-1300 | task=task-306
+2026-05-22T14:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260522-1400
+2026-05-22T14:00:00+08:00 | trae-glm5 | task_claim | task=task-307 | type=docs | target=docs/fr-FR
+2026-05-22T14:15:00+08:00 | trae-glm5 | file_modified | docs/fr-FR/README.md | fix=权限链3级→5级,Speedy.Manager→Avalonia UI,工具数23→24
+2026-05-22T14:30:00+08:00 | trae-glm5 | file_modified | docs/fr-FR/architecture.md | fix=UI组件数30+→27
+2026-05-22T14:50:00+08:00 | trae-glm5 | file_modified | docs/fr-FR/permission-system.md | fix=IPermissionCallback签名,GlobalACL prefix格式,资源格式{type}:{path},AskUser场景
+2026-05-22T15:10:00+08:00 | trae-glm5 | file_modified | docs/fr-FR/api-reference.md | fix=Being activity枚举,IAIClient接口,ITool/ToolCall/ToolResult,SSE端点
+2026-05-22T15:25:00+08:00 | trae-glm5 | file_modified | docs/fr-FR/security.md | fix=执行器模型,DynamicCompilationExecutor,流程图,权限链5级
+2026-05-22T15:30:00+08:00 | trae-glm5 | task_complete | task=task-307 | modifiedFiles=5 | summary=修正fr-FR文档与源代码一致性差异(权限链级别,执行器模型,接口签名,API端点,组件数量等)
+2026-05-22T15:30:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260522-1400 | task=task-307

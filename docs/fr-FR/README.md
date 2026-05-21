@@ -26,7 +26,7 @@
 - **Outil de rechargement à chaud** — Prend en charge la compilation automatique, la mise à jour des fichiers et le redémarrage de SiliconLife.Fast pendant l'exécution, sans intervention manuelle
 - **Boucle d'appel d'outils** — L'IA retourne un appel d'outil → Exécuter l'outil → Retourner les résultats à l'IA → Continuer la boucle jusqu'à une réponse en texte pur
 - **Sécurité des permissions de l'exécuteur** — Toutes les opérations E/S passent par une validation de permissions stricte via les exécuteurs
-  - Chaîne de permissions à 3 niveaux : UserFrequencyCache → IPermissionCallback → (Curateur : IPermissionAskHandler | Non-curateur : GlobalACL)
+  - Chaîne de permissions à 5 niveaux : UserFrequencyCache → IPermissionCallback → (Curateur→IPermissionAskHandler / NonCurateur→GlobalACL→Deny)
   - Journalisation d'audit complète de toutes les décisions de permissions
 
 ### IA & Connaissances
@@ -158,7 +158,7 @@ SiliconLifeCollective.sln
 │   │   ├── Resources/                     # Fichiers de ressources partagés
 │   │   ├── Security/                      # Gestionnaire de permissions
 │   │   ├── SiliconBeing/                  # Implémentation standard du Silicon Being
-│   │   ├── Tools/                         # 23 outils communs (dont outil de rechargement à chaud)
+│   │   ├── Tools/                         # 24 outils communs (dont outil de rechargement à chaud)
 │   │   ├── Web/                           # Infrastructure Web
 │   │   └── WebView/                       # Implémentation Playwright WebView
 │   │
@@ -213,9 +213,12 @@ SiliconLifeCollective.sln
 │       │   ├── SpkHeader.cs              # En-tête de fichier paquet
 │       │   └── PathNormalizer.cs          # Normalisation de chemin
 │   │
-│   └── SiliconLife.Speedy.Manager/        # Outil de gestion SpeedyPack (Windows Forms)
-│       ├── MainForm.cs                    # Formulaire principal
+│   └── SiliconLife.Speedy.Manager/        # Outil de gestion SpeedyPack (Avalonia UI)
+│       ├── MainWindow.axaml.cs           # Fenêtre principale
+│       ├── App.axaml.cs                  # Point d'entrée de l'application
 │       ├── Program.cs                     # Point d'entrée
+│       ├── ProgressWindow.axaml.cs       # Fenêtre de progression
+│       ├── ContentViewerWindow.axaml.cs  # Fenêtre de visualisation de contenu
 │       └── slc.ico                        # Icône de l'application
 │
 ├── docs/                                  # Documentation multilingue

@@ -24,7 +24,7 @@ Ce projet propose deux versions d'implémentation, partageant la même conceptio
 - **Caractéristiques** :
   - Windows/macOS exécution en arrière-plan dans la barre d'état, surveillance en temps réel via la fenêtre d'état ; Linux fenêtre d'état affichée directement
   - Moteur SpeedyPack + compression automatique garantissant la sécurité des données
-  - Architecture Component UI, 30+ composants déclaratifs
+  - Architecture Component UI, 27 composants déclaratifs
   - 7 thèmes d'apparence, prend en charge la détection et la commutation automatiques
   - Outil de rechargement à chaud pour les mises à jour et redémarrages en ligne
   - Linux ouvre automatiquement le navigateur pour accéder à l'interface Web, prend en charge le paramètre `--no-tray`

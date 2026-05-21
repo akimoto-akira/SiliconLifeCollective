@@ -27,14 +27,14 @@ La plupart des points de terminaison nécessitent une authentification via des c
     {
       "id": "being-uuid",
       "name": "Assistant",
-      "status": "running",
+      "activity": "Idle",
       "soul": "path/to/soul.md"
     }
   ]
 }
 ```
 
-**Valeurs de statut** : `idle` | `running` | `waiting_permission` | `stopped`
+**Valeurs d'activité** : `Idle` | `SingleChat` | `GroupChat` | `Task` | `Timer` | `Broadcast` | `Project` | `MemoryCompression` | `Stopped`
 
 ### Créer un Being
 
@@ -88,16 +88,9 @@ La plupart des points de terminaison nécessitent une authentification via des c
 
 ### Chat en streaming (SSE)
 
-**GET** `/api/chat/stream?channelId={id}`
+**GET** `/api/chat/stream`
 
-**Réponse** : Flux Server-Sent Events
-
-```
-data: {"type": "chunk", "content": "Je"}
-data: {"type": "chunk", "content": " réfléchis"}
-data: {"type": "chunk", "content": " suis..."}
-data: {"type": "complete", "sessionId": "uuid"}
-```
+Flux Server-Sent Events pour les mises à jour de chat en temps réel.
 
 ### Obtenir les conversations
 
@@ -105,40 +98,25 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ### Obtenir les messages
 
-**GET** `/api/chat/messages?beingId={id}`
+**GET** `/api/chat/messages?channelId={sessionId}`
 
 ### Obtenir l'historique de chat
 
-**GET** `/api/chat/history?sessionId={sessionId}`
+**GET** `/api/chat/history`
 
-**Réponse** :
-```json
-{
-  "messages": [
-    {
-      "role": "user",
-      "content": "Bonjour",
-      "timestamp": "2026-04-20T10:30:00Z"
-    },
-    {
-      "role": "assistant",
-      "content": "Salut !",
-      "timestamp": "2026-04-20T10:30:05Z"
-    }
-  ]
-}
-```
+Retourne les sessions d'historique de chat.
 
 ### Arrêter la réflexion
 
 **POST** `/api/chat/stop`
 
-**Requête** :
-```json
-{
-  "channelId": "channel-uuid"
-}
-```
+Arrête la réponse IA en streaming actuelle.
+
+### Télécharger un fichier
+
+**POST** `/api/chat/upload`
+
+Télécharge un fichier dans la session de chat.
 
 ---
 
@@ -185,7 +163,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ### Obtenir les permissions
 
-**GET** `/api/permissions/list`
+**GET** `/api/permissions`
 
 **Réponse** :
 ```json
@@ -203,7 +181,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ### Accorder une permission
 
-**POST** `/api/permissions/save`
+**POST** `/api/permissions`
 
 **Requête** :
 ```json
@@ -524,7 +502,7 @@ Server-Sent Events pour les mises à jour en temps réel :
 ### Événements de chat
 
 ```javascript
-const eventSource = new EventSource('/api/chat/stream?channelId=xxx');
+const eventSource = new EventSource('/api/chat/stream?beingId=xxx&message=xxx');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);
@@ -566,11 +544,24 @@ beingEvents.onmessage = (event) => {
 ```csharp
 public interface IAIClient
 {
-    string Name { get; }
+    string Endpoint { get; }
+    string DefaultModel { get; }
+    bool? StreamingMode { get; }
+    bool? SupportsToolCalls { get; }
     
+    AIResponse Chat(AIRequest request);
     Task<AIResponse> ChatAsync(AIRequest request);
+    IAsyncEnumerable<AIResponse> ChatStreamAsync(AIRequest request, CancellationToken cancellationToken = default);
     
-    IAsyncEnumerable<string> StreamChatAsync(AIRequest request);
+    AIResponse Chat(string userMessage);
+    Task<AIResponse> ChatAsync(string userMessage);
+    AIResponse Chat(string systemPrompt, string userMessage);
+    Task<AIResponse> ChatAsync(string systemPrompt, string userMessage);
+    
+    AIResponse Generate(string prompt);
+    Task<AIResponse> GenerateAsync(string prompt);
+    AIResponse Generate(string systemPrompt, string prompt);
+    Task<AIResponse> GenerateAsync(string systemPrompt, string prompt);
 }
 ```
 
@@ -579,11 +570,9 @@ public interface IAIClient
 ```csharp
 public class AIRequest
 {
-    public List<Message> Messages { get; set; }
-    public List<ToolDefinition> Tools { get; set; }
-    public double Temperature { get; set; } = 0.7;
-    public int MaxTokens { get; set; } = 2000;
-    public string Model { get; set; }
+    public string Model { get; set; } = string.Empty;
+    public List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
+    public List<ToolDefinition>? Tools { get; set; }
 }
 ```
 
@@ -592,10 +581,17 @@ public class AIRequest
 ```csharp
 public class AIResponse
 {
-    public string Content { get; set; }
-    public List<ToolCall> ToolCalls { get; set; }
-    public TokenUsage Usage { get; set; }
-    public string Model { get; set; }
+    public string Model { get; set; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
+    public string? Thinking { get; set; }
+    public List<ToolCall>? ToolCalls { get; set; }
+    public int? PromptTokens { get; set; }
+    public int? CompletionTokens { get; set; }
+    public int? TotalTokens { get; set; }
+    public bool Success { get; set; } = true;
+    public string? ErrorMessage { get; set; }
+    public bool IsStreamFinal { get; set; }
+    public bool HasToolCalls => ToolCalls != null && ToolCalls.Count > 0;
 }
 ```
 
@@ -917,9 +913,10 @@ public interface ITool
 {
     string Name { get; }
     string Description { get; }
-    ToolDefinition Definition { get; }
+    string GetDisplayName(Language language);
+    Dictionary<string, object> GetParameterSchema();
     
-    Task<ToolResult> ExecuteAsync(ToolCall call);
+    ToolResult Execute(Guid callerId, Dictionary<string, object> parameters);
 }
 ```
 
@@ -928,9 +925,9 @@ public interface ITool
 ```csharp
 public class ToolCall
 {
-    public string Id { get; set; }
-    public string Name { get; set; }
-    public Dictionary<string, object> Parameters { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public Dictionary<string, object> Arguments { get; set; } = new();
 }
 ```
 
@@ -939,9 +936,9 @@ public class ToolCall
 ```csharp
 public class ToolResult
 {
-    public bool Success { get; set; }
-    public string Output { get; set; }
-    public string Error { get; set; }
+    public bool Success { get; }
+    public string Message { get; }
+    public object? Data { get; }
 }
 ```
 

@@ -9,7 +9,7 @@
 La sécurité de Silicon Life Collective repose sur un modèle de **défense en couches multiples**. Principe fondamental : **Toutes les opérations d'E/S doivent passer par des exécuteurs**, les exécuteurs appliquent les vérifications de permissions avant l'exécution.
 
 ```
-Appel d'outil → Exécuteur → PermissionManager → Cache de fréquence → Rappel → (Curateur : Demande utilisateur | Non-curateur : GlobalACL)
+Appel d'outil → Exécuteur → PermissionManager → Cache de fréquence → Rappel → (Curateur→AskUser / NonCurateur→GlobalACL→Deny)
 ```
 
 ---
@@ -48,7 +48,7 @@ Chaque Silicon Being a sa propre instance **privée** de PermissionManager. Les 
 
 ## Flux de validation des permissions
 
-Priorité de requête : **1. Cache de fréquence utilisateur → 2. Fonction de rappel → 3. Branchement conditionnel**
+Priorité de requête : **1. Cache de fréquence utilisateur → 2. IPermissionCallback → 3. Branche curateur (AskHandler/GlobalACL)**
 
 ```
 ┌─────────────┐
@@ -64,27 +64,34 @@ Priorité de requête : **1. Cache de fréquence utilisateur → 2. Fonction de 
                              │
                              ▼
                     ┌─────────────────┐
-                    │ 1. Cache de     │──Correspond──▶ Allowed / Denied
-                    │ fréquence       │
-                    │ utilisateur     │
+                    │ 1. UserFrequency│──Correspondance──▶ Allowed / Denied
+                    │    Cache        │
+                    │ (HighDeny/      │
+                    │  HighAllow)     │
                     └────────┬────────┘
                              │ Pas de correspondance
                              ▼
                     ┌─────────────────┐
-                    │ 2. Rappel de    │──▶ Allowed / Denied / AskUser
-                    │ permission      │
+                    │ 2. IPermission  │──▶ Allowed / Denied / AskUser
+                    │    Callback     │
                     └────────┬────────┘
                              │ AskUser ou pas de rappel
                              ▼
                     ┌─────────────────┐
-                    │ 3. Branchement  │
-                    │ conditionnel    │
-                    ├─────────────────┤
-                    │ Curateur ?      │──Oui──▶ IPermissionAskHandler
-                    │                 │         (confirmation utilisateur)
-                    │ Non-curateur ?  │──Oui──▶ GlobalACL
-                    │                 │         (règles d'accès)
-                    └─────────────────┘
+                    │ 3. IsCurator ?  │
+                    └────┬───────┬────┘
+                         │       │
+                    Oui  │       │ Non
+                         ▼       ▼
+              ┌──────────┐  ┌──────────────┐
+              │ AskUser  │  │ GlobalACL    │──Correspondance──▶ Allowed / Denied
+              │ (IM)     │  └──────┬───────┘
+              └──────────┘         │ Pas de correspondance
+                                   ▼
+                            ┌──────────────┐
+                            │ Refus par    │
+                            │ défaut       │
+                            └──────────────┘
 ```
 
 **Important** : L'exécuteur ne voit qu'un booléen (Allowed/Denied). Le PermissionManager traite en interne la décision ternaire (Allowed/Denied/AskUser) et résout AskUser avant de retourner le résultat à l'exécuteur.
@@ -95,13 +102,14 @@ Priorité de requête : **1. Cache de fréquence utilisateur → 2. Fonction de 
 
 Les exécuteurs sont le **seul** chemin pour les opérations d'E/S. Ils appliquent :
 
-### Modèle de classe statique
+### Modèle d'exécution statique
 
-Chaque exécuteur est une classe statique avec un thread de traitement interne :
+Les implémentations actuelles des exécuteurs (`DiskExecutor`, `NetworkExecutor`, `CommandLineExecutor`) sont des **classes statiques** fournissant une exécution synchrone avec contrôle de timeout :
 
-- Isolation de thread entre exécuteurs — le blocage d'un thread d'exécuteur n'affecte pas les autres exécuteurs.
-- Chaque exécuteur peut définir des limites de ressources séparées (CPU, mémoire, etc.).
-- File d'attente de requêtes interne pour le traitement ordonné.
+- Chaque exécuteur vérifie les permissions via le `PermissionManager` de l'appelant avant l'exécution.
+- Les opérations s'exécutent sur `Task.Run` avec un timeout configurable.
+- En cas de timeout, l'opération est traitée comme échouée.
+- `ExecutorBase` fournit une classe abstraite de base avec thread d'arrière-plan et file d'attente de requêtes pour les extensions futures.
 
 ### File d'attente de requêtes
 
@@ -111,16 +119,17 @@ Chaque exécuteur gère une file d'attente de requêtes :
 - Supporte la file d'attente prioritaire.
 - Contrôle de timeout par requête.
 
-### Verrouillage de thread pour la validation des permissions
+### Vérification des permissions dans les exécuteurs
 
 Lorsqu'un outil initie un accès aux ressources :
 
-1. L'exécuteur reçoit la requête et **verrouille son thread**.
-2. L'exécuteur interroge le PermissionManager privé du Being.
-3. Si le rappel retourne AskUser, le thread de l'exécuteur **reste verrouillé** en attente de la réponse de l'utilisateur.
-4. Le Being ne voit que le résultat final (succès ou refus) — il ne voit jamais l'état intermédiaire « Pending » ou « Waiting ».
-5. Seul le Silicon Curator déclenche une véritable invite utilisateur. Les Beings normaux interrogent de manière synchrone la GlobalACL sans blocage.
-6. En cas de timeout, la requête est traitée comme Denied, le verrouillage du thread est libéré.
+1. L'exécuteur reçoit la requête.
+2. L'exécuteur interroge le gestionnaire de permissions privé du Being via `ServiceLocator.Instance.GetPermissionManager(callerId)`.
+3. Si la permission est refusée, l'opération est bloquée immédiatement.
+4. Si le rappel retourne AskUser (branche curateur), le thread de l'exécuteur **reste verrouillé** en attente de la réponse de l'utilisateur.
+5. Le Being ne voit que le résultat final (succès ou refus) — il ne voit jamais l'état intermédiaire « Pending » ou « Waiting ».
+6. Seul le Silicon Curator déclenche une véritable invite utilisateur. Les Beings normaux interrogent de manière synchrone l'ACL globale sans blocage.
+7. En cas de timeout, la requête est traitée comme Denied, le verrouillage du thread est libéré.
 
 ### Types d'exécuteurs
 
@@ -129,6 +138,7 @@ Lorsqu'un outil initie un accès aux ressources :
 | `DiskExecutor` | Lecture/écriture de fichiers, opérations sur répertoires | 30 secondes |
 | `NetworkExecutor` | Requêtes HTTP, connexions WebSocket | 30 secondes |
 | `CommandLineExecutor` | Exécution de commandes shell | 30 secondes |
+| `DynamicCompilationExecutor` | Compilation Roslyn en mémoire | N/A (délègue à CompilationCore) |
 
 ### Isolation des exceptions et tolérance aux pannes
 
@@ -341,5 +351,5 @@ Le `PluginLoader` effectue des vérifications de sécurité strictes lors du cha
 ### Restrictions de permissions des outils
 
 - Les plugins qui enregistrent des outils via l'interface `ITool` sont soumis au même système de permissions
-- Les outils de plugin ne peuvent pas contourner la chaîne de permissions
+- Les outils de plugin ne peuvent pas contourner la chaîne de permissions à 5 niveaux
 - Les outils de plugin sont soumis au marquage `[SiliconManagerOnly]`
