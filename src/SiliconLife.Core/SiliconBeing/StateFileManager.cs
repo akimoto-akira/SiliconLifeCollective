@@ -30,6 +30,12 @@ public static class StateFileManager
         public string Name { get; set; } = string.Empty;
         public string AIClientType { get; set; } = string.Empty;
         public Dictionary<string, object> AIConfig { get; set; } = new();
+
+        /// <summary>
+        /// Per-being tool action permission configuration.
+        /// null or empty means all actions are allowed (backward compatible).
+        /// </summary>
+        public ToolActionPermissionConfig? ToolActionPermissions { get; set; }
     }
 
     /// <summary>

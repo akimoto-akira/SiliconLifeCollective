@@ -23,6 +23,7 @@ namespace SiliconLife.Common.Tools;
 /// Configuration reading tool. Only available to the Silicon Curator (main administrator).
 /// Reads the current runtime configuration via Config.Instance.
 /// </summary>
+[ToolAction("get_all", "get_group", "get_field", "get_enum_values")]
 [SiliconManagerOnly]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class ConfigTool : ITool

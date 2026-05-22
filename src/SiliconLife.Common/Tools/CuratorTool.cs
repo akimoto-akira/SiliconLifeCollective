@@ -23,6 +23,7 @@ namespace SiliconLife.Common.Tools;
 /// The curator is a normal silicon being with IsCurator=true and access to all tools
 /// (including this one). All management logic is handled directly by this tool.
 /// </summary>
+[ToolAction("list_beings", "create_being", "get_code", "reset")]
 [SiliconManagerOnly]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class CuratorTool : ITool

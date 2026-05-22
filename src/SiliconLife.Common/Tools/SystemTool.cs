@@ -22,6 +22,7 @@ namespace SiliconLife.Common.Tools;
 /// Queries processes and environment variables through CommandLineExecutor.
 /// Verifies the executor pipeline.
 /// </summary>
+[ToolAction("list_processes", "find_process", "get_env", "get_env_all", "system_info", "resource_usage")]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class SystemTool : ITool
 {

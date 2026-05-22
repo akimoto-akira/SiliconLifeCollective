@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -257,6 +257,11 @@ public class ProjectView : ViewBase
                 .Op(() => "+", () => Js.Id(() => "p").Prop(() => "id"))
                 .Op(() => "+", () => Js.Str(() => "/work-notes'>"))
                 .Op(() => "+", () => Js.Str(() => loc.ProjectWorkNotesLinkLabel))
+                .Op(() => "+", () => Js.Str(() => "</a>"))
+                .Op(() => "+", () => Js.Str(() => "<a class='project-link tool-perms-link' href='/project/"))
+                .Op(() => "+", () => Js.Id(() => "p").Prop(() => "id"))
+                .Op(() => "+", () => Js.Str(() => "/tool-permissions'>"))
+                .Op(() => "+", () => Js.Str(() => loc.ToolAuthPageTitle))
                 .Op(() => "+", () => Js.Str(() => "</a>"))
                 .Op(() => "+", () => Js.Id(() => "gcHtml"))
                 .Op(() => "+", () => Js.Id(() => "bcHtml"))

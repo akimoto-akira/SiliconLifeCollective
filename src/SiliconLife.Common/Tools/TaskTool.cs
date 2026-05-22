@@ -21,6 +21,7 @@ namespace SiliconLife.Common.Tools;
 /// <summary>
 /// Tool for managing silicon being tasks.
 /// </summary>
+[ToolAction("create", "list", "get", "complete", "fail", "cancel", "delete", "update_priority", "add_dependency", "submit_for_review", "stats")]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class TaskTool : ITool
 {

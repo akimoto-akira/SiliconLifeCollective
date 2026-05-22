@@ -82,8 +82,9 @@ public class ZhHK : DefaultLocalizationBase
         PermissionType.CommandLine => "命令列執行",
         PermissionType.FileAccess => "檔案存取",
         PermissionType.Function => "函式呼叫",
-        PermissionType.DataAccess => "資料存取",
-        _ => permissionType.ToString()
+PermissionType.DataAccess => "資料存取",
+PermissionType.ToolAction => "工具動作",
+_ => permissionType.ToString()
     };
 
     public override string PermissionDialogTitle => "權限請求";
@@ -489,6 +490,16 @@ public class ZhHK : DefaultLocalizationBase
     public override string BeingsDetailWorkNoteLabel => "工作筆記：";
     public override string BeingsDetailChatHistoryLink => "查看聊天記錄";
     public override string BeingsDetailWorkNoteLink => "查看工作筆記";
+    public override string BeingsDetailToolAuthLabel => "工具授權：";
+    public override string BeingsDetailToolAuthEditLink => "配置";
+    public override string ToolAuthPageTitle => "工具授權配置";
+    public override string ToolAuthPageHeader => "工具授權配置";
+    public override string ToolAuthTemplateLabel => "預設模板";
+    public override string ToolAuthSaveButton => "儲存";
+    public override string ToolAuthSelectAll => "全選";
+    public override string ToolAuthDeselectAll => "全不選";
+    public override string ToolAuthNoRestrictions => "無限制";
+    public override string ToolAuthHasRestrictions => "有限制";
     public override string WorkNotePageTitle => "工作筆記";
     public override string WorkNotePageHeader => "工作筆記列表";
     public override string WorkNotePageDescription => "管理和查看硅基人的工作筆記";

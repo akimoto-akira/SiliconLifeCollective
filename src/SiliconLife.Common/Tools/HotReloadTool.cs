@@ -26,6 +26,7 @@ namespace SiliconLife.Common.Tools;
 /// running Fast instance, overwrites deployment files from the build output, and
 /// restarts Fast — giving the system a basic "self-development" capability.
 /// </summary>
+[ToolAction("execute", "build_only")]
 [SiliconManagerOnly]
 [ToolScenario(ToolScenarioFlag.Chat)]
 public class HotReloadTool : ITool

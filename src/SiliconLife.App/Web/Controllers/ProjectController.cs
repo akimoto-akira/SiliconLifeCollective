@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -34,6 +34,8 @@ public class ProjectController : Controller
             Index();
         else if (path.StartsWith("/project/") && path.EndsWith("/work-notes"))
             ProjectWorkNotesPage();
+        else if (path.StartsWith("/project/") && path.EndsWith("/tool-permissions"))
+            ProjectToolPermissionPage();
         else if (path == "/api/projects/list")
             GetList();
         else if (path == "/api/projects/list-workflow-templates")
@@ -530,6 +532,52 @@ public class ProjectController : Controller
             }
         }
         return Guid.Empty;
+    }
+
+    private void ProjectToolPermissionPage()
+    {
+        try
+        {
+            if (_projectManager == null)
+            {
+                Response.StatusCode = 500;
+                RenderHtml("<p>Project manager not available</p>");
+                return;
+            }
+
+            Guid projectId = ExtractProjectIdFromPagePath();
+            if (projectId == Guid.Empty)
+            {
+                Response.StatusCode = 400;
+                RenderHtml("<p>Invalid project ID</p>");
+                return;
+            }
+
+            var project = _projectManager.GetProject(projectId);
+            if (project == null)
+            {
+                Response.StatusCode = 404;
+                RenderHtml("<p>Project not found</p>");
+                return;
+            }
+
+            var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
+            var view = new Views.ProjectToolPermissionView();
+            var vm = new Models.ProjectToolPermissionViewModel
+            {
+                Skin = skin,
+                ActiveMenu = "projects",
+                ProjectId = projectId,
+                ProjectName = project.Name
+            };
+            var html = view.Render(vm);
+            RenderHtml(html);
+        }
+        catch (Exception ex)
+        {
+            Response.StatusCode = 500;
+            RenderHtml($"<p>Error: {ex.Message}</p>");
+        }
     }
 
     private void ProjectWorkNotesPage()

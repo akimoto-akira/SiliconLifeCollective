@@ -22,6 +22,7 @@ namespace SiliconLife.Common.Tools;
 /// WebView browser operation tool
 /// Provides browser automation capabilities for silicon beings
 /// </summary>
+[ToolAction("open", "close", "navigate", "click", "input", "scroll", "execute_script", "get_page_text", "get_screenshot", "wait_for_element", "get_element_info", "upload_file", "get_browser_status", "set_timeout", "clear_session")]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class WebViewBrowserTool : ITool
 {

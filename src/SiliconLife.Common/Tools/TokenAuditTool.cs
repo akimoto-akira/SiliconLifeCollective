@@ -22,6 +22,7 @@ namespace SiliconLife.Common.Tools;
 /// Provides token usage statistics and trends for AI requests.
 /// Returns aggregated data similar to the Web audit dashboard.
 /// </summary>
+[ToolAction("summary", "trend")]
 [SiliconManagerOnly]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class TokenAuditTool : ITool

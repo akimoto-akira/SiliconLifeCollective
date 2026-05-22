@@ -23,6 +23,7 @@ namespace SiliconLife.Common.Tools;
 /// Permission management tool for dynamically adjusting silicon being tool access permissions.
 /// Only available to the Silicon Curator (main administrator).
 /// </summary>
+[ToolAction("query_permission", "manage_acl")]
 [SiliconManagerOnly]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class PermissionTool : ITool

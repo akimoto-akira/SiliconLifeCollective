@@ -188,8 +188,9 @@ public class ZhCN : DefaultLocalizationBase
         PermissionType.CommandLine => "命令行执行",
         PermissionType.FileAccess => "文件访问",
         PermissionType.Function => "函数调用",
-        PermissionType.DataAccess => "数据访问",
-        _ => permissionType.ToString()
+PermissionType.DataAccess => "数据访问",
+PermissionType.ToolAction => "工具动作",
+_ => permissionType.ToString()
     };
 
     /// <summary>
@@ -634,6 +635,16 @@ public class ZhCN : DefaultLocalizationBase
     public override string BeingsDetailWorkNoteLabel => "工作笔记：";
     public override string BeingsDetailChatHistoryLink => "查看聊天记录";
     public override string BeingsDetailWorkNoteLink => "查看工作笔记";
+    public override string BeingsDetailToolAuthLabel => "工具授权：";
+    public override string BeingsDetailToolAuthEditLink => "配置";
+    public override string ToolAuthPageTitle => "工具授权配置";
+    public override string ToolAuthPageHeader => "工具授权配置";
+    public override string ToolAuthTemplateLabel => "预设模板";
+    public override string ToolAuthSaveButton => "保存";
+    public override string ToolAuthSelectAll => "全选";
+    public override string ToolAuthDeselectAll => "全不选";
+    public override string ToolAuthNoRestrictions => "无限制";
+    public override string ToolAuthHasRestrictions => "有限制";
     public override string WorkNotePageTitle => "工作笔记";
     public override string WorkNotePageHeader => "工作笔记列表";
     public override string WorkNotePageDescription => "管理和查看硅基人的工作笔记";

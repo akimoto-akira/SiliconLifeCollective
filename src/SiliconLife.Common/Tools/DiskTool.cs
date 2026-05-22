@@ -22,6 +22,7 @@ namespace SiliconLife.Common.Tools;
 /// Performs file read/write and directory operations through DiskExecutor.
 /// Verifies the disk executor pipeline.
 /// </summary>
+[ToolAction("read_file", "write_file", "list_directory", "delete_file", "create_directory", "exists", "get_file_info", "count_lines", "read_lines", "clear_file", "replace_lines", "replace_text", "replace_text_all", "list_drives", "search_files", "search_content")]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class DiskTool : ITool
 {

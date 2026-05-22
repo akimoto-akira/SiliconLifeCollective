@@ -24,6 +24,7 @@ namespace SiliconLife.Common.Tools;
 /// Only available to the Silicon Curator (main administrator) or through IPermissionCallback approval.
 /// Supports SQLite, PostgreSQL, MySQL and other databases.
 /// </summary>
+[ToolAction("query", "manage", "list_connections")]
 [SiliconManagerOnly]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class DatabaseTool : ITool

@@ -21,6 +21,7 @@ namespace SiliconLife.Common.Tools;
 /// Tool for managing work notes within project spaces.
 /// Supports creating, reading, updating, deleting, listing, searching, and generating directories.
 /// </summary>
+[ToolAction("create", "read", "update", "delete", "list", "directory", "search")]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class ProjectWorkNoteTool : ITool
 {

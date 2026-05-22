@@ -79,7 +79,8 @@ public class DefaultSiliconBeing : SiliconBeingBase
             {
                 Name = Name,
                 AIClientType = AIClientType ?? "",
-                AIConfig = AIClientConfig ?? new Dictionary<string, object>()
+                AIConfig = AIClientConfig ?? new Dictionary<string, object>(),
+                ToolActionPermissions = ToolActionPermissions
             };
             
             StateFileManager.SaveState(Storage, state);
@@ -108,6 +109,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
             Name = state.Name;
             AIClientType = state.AIClientType;
             AIClientConfig = state.AIConfig;
+            ToolActionPermissions = state.ToolActionPermissions;
             
             // Initialize backup config
             BackupAIClientConfig = AIClientConfig?.ToDictionary(k => k.Key, v => v.Value);

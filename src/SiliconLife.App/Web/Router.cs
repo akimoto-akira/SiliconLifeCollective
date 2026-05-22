@@ -45,6 +45,7 @@ public class Router
         RegisterController(() => new BeingController(), "/beings");
         RegisterController(() => new BeingController(), "/beings/soul");
         RegisterController(() => new BeingController(), "/beings/ai-config");
+        RegisterController(() => new BeingController(), "/beings/tool-permissions");
         RegisterController(() => new BeingController(), "/api/beings/list");
         RegisterController(() => new BeingController(), "/api/beings/detail");
         RegisterController(() => new BeingController(), "/api/beings/activity");
@@ -155,6 +156,10 @@ public class Router
         RegisterController(() => new InitController(), "/init/browse", "GET");
         RegisterController(() => new InitController(), "/init/ai-config-metadata", "GET");
         RegisterController(() => new SystemController(), "/api/system/shutdown", "POST");
+        RegisterController(() => new ToolPermissionController(), "/api/beings/tool-permissions");
+        RegisterController(() => new ToolPermissionController(), "/api/beings/tool-permissions/templates");
+        RegisterController(() => new ToolPermissionController(), "/api/beings/tool-permissions/apply-template", "POST");
+        RegisterController(() => new ToolPermissionController(), "/api/projects/{id}/tool-permissions");
     }
 
     /// <summary>Sets the callback invoked when first-run initialization completes.</summary>

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿﻿﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -50,6 +50,8 @@ public class BeingController : Controller
             SoulEditor();
         else if (path == "/beings/ai-config")
             AIConfigEditor();
+        else if (path == "/beings/tool-permissions")
+            ToolPermissionEditor();
         else if (path == "/api/beings/ai-config/save")
             SaveAIConfig();
         else if (path == "/api/beings/ai-config/models")
@@ -311,6 +313,37 @@ public class BeingController : Controller
                 : "{}",
             AIClientTypeOptions = options
         };
+    }
+
+    private void ToolPermissionEditor()
+    {
+        var idStr = Request.QueryString["beingId"];
+        if (string.IsNullOrEmpty(idStr) || !Guid.TryParse(idStr, out var id))
+        {
+            Response.StatusCode = 400;
+            RenderHtml("<h1>Invalid Being ID</h1>");
+            return;
+        }
+
+        var being = _beingManager.GetBeing(id);
+        if (being == null)
+        {
+            Response.StatusCode = 404;
+            RenderHtml("<h1>Being Not Found</h1>");
+            return;
+        }
+
+        var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
+        var view = new Views.ToolPermissionView();
+        var vm = new Models.ToolPermissionViewModel
+        {
+            Skin = skin,
+            ActiveMenu = "beings",
+            BeingId = being.Id,
+            BeingName = being.Name
+        };
+        var html = view.Render(vm);
+        RenderHtml(html);
     }
 
     private void SaveAIConfig()

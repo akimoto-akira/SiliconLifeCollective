@@ -188,8 +188,9 @@ public class EnUS : DefaultLocalizationBase
         PermissionType.CommandLine => "Command execution",
         PermissionType.FileAccess => "File access",
         PermissionType.Function => "Function invocation",
-        PermissionType.DataAccess => "Data access",
-        _ => permissionType.ToString()
+PermissionType.DataAccess => "Data access",
+PermissionType.ToolAction => "Tool action",
+_ => permissionType.ToString()
     };
 
     /// <summary>
@@ -634,6 +635,16 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string BeingsDetailWorkNoteLabel => "Work Notes: ";
     public override string BeingsDetailChatHistoryLink => "View Chat History";
     public override string BeingsDetailWorkNoteLink => "View Work Notes";
+    public override string BeingsDetailToolAuthLabel => "Tool Auth: ";
+    public override string BeingsDetailToolAuthEditLink => "Configure";
+    public override string ToolAuthPageTitle => "Tool Authorization";
+    public override string ToolAuthPageHeader => "Tool Authorization";
+    public override string ToolAuthTemplateLabel => "Preset Template";
+    public override string ToolAuthSaveButton => "Save";
+    public override string ToolAuthSelectAll => "Select All";
+    public override string ToolAuthDeselectAll => "Deselect All";
+    public override string ToolAuthNoRestrictions => "No Restrictions";
+    public override string ToolAuthHasRestrictions => "Has Restrictions";
     public override string WorkNotePageTitle => "Work Notes";
     public override string WorkNotePageHeader => "Work Note List";
     public override string WorkNotePageDescription => "Manage and view silicon being work notes";

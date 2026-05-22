@@ -22,6 +22,7 @@ namespace SiliconLife.Default.Knowledge;
 /// Knowledge network tool - provides unified entry point for AI to operate knowledge network
 /// Implements ITool interface, supporting knowledge add, query, update, delete and other operations
 /// </summary>
+[ToolAction("add", "query", "update", "delete", "search", "get_path", "get_neighbors", "get_degree", "degree_distribution", "traverse", "has_cycle", "validate", "stats")]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class KnowledgeTool : ITool
 {

@@ -188,8 +188,9 @@ public class DeDE : DefaultLocalizationBase
         PermissionType.CommandLine => "Befehlszeilenausführung",
         PermissionType.FileAccess => "Dateizugriff",
         PermissionType.Function => "Funktionsaufruf",
-        PermissionType.DataAccess => "Datenzugriff",
-        _ => permissionType.ToString()
+PermissionType.DataAccess => "Datenzugriff",
+PermissionType.ToolAction => "Werkzeugaktion",
+_ => permissionType.ToString()
     };
 
     /// <summary>
@@ -602,6 +603,16 @@ public class DeDE : DefaultLocalizationBase
     public override string BeingsDetailWorkNoteLabel => "Arbeitsnotiz: ";
     public override string BeingsDetailChatHistoryLink => "Chatverlauf anzeigen";
     public override string BeingsDetailWorkNoteLink => "Arbeitsnotiz anzeigen";
+    public override string BeingsDetailToolAuthLabel => "Tool-Berechtigung: ";
+    public override string BeingsDetailToolAuthEditLink => "Konfigurieren";
+    public override string ToolAuthPageTitle => "Tool-Berechtigungseinstellungen";
+    public override string ToolAuthPageHeader => "Tool-Berechtigungseinstellungen";
+    public override string ToolAuthTemplateLabel => "Vorlage";
+    public override string ToolAuthSaveButton => "Speichern";
+    public override string ToolAuthSelectAll => "Alle auswählen";
+    public override string ToolAuthDeselectAll => "Alle abwählen";
+    public override string ToolAuthNoRestrictions => "Keine Einschränkungen";
+    public override string ToolAuthHasRestrictions => "Einschränkungen vorhanden";
     public override string WorkNotePageTitle => "Arbeitsnotizen";
     public override string WorkNotePageHeader => "Arbeitsnotizliste";
     public override string WorkNotePageDescription => "Verwaltung und Anzeige der Arbeitsnotizen des Silicon Beings";

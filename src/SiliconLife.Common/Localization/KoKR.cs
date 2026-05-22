@@ -188,8 +188,9 @@ public class KoKR : DefaultLocalizationBase
         PermissionType.CommandLine => "명령줄 실행",
         PermissionType.FileAccess => "파일 접근",
         PermissionType.Function => "함수 호출",
-        PermissionType.DataAccess => "데이터 접근",
-        _ => permissionType.ToString()
+PermissionType.DataAccess => "데이터 접근",
+PermissionType.ToolAction => "도구 작업",
+_ => permissionType.ToString()
     };
 
     /// <summary>
@@ -634,6 +635,16 @@ public class KoKR : DefaultLocalizationBase
     public override string BeingsDetailWorkNoteLabel => "작업 노트:";
     public override string BeingsDetailChatHistoryLink => "채팅 기록 보기";
     public override string BeingsDetailWorkNoteLink => "작업 노트 보기";
+    public override string BeingsDetailToolAuthLabel => "도구 권한: ";
+    public override string BeingsDetailToolAuthEditLink => "설정";
+    public override string ToolAuthPageTitle => "도구 권한 설정";
+    public override string ToolAuthPageHeader => "도구 권한 설정";
+    public override string ToolAuthTemplateLabel => "프리셋 템플릿";
+    public override string ToolAuthSaveButton => "저장";
+    public override string ToolAuthSelectAll => "전체 선택";
+    public override string ToolAuthDeselectAll => "전체 해제";
+    public override string ToolAuthNoRestrictions => "제한 없음";
+    public override string ToolAuthHasRestrictions => "제한 있음";
     public override string WorkNotePageTitle => "작업 노트";
     public override string WorkNotePageHeader => "작업 노트 목록";
     public override string WorkNotePageDescription => "硅基人의 작업 노트 관리 및 보기";

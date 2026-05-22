@@ -17,6 +17,7 @@ using SiliconLife.Common.Localization;
 
 namespace SiliconLife.Common.Tools;
 
+[ToolAction("compile", "save", "self_replace", "activate", "preview_saved", "clear_saved")]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class DynamicCompileTool : ITool
 {

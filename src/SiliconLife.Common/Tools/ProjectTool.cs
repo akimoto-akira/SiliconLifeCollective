@@ -22,6 +22,7 @@ namespace SiliconLife.Common.Tools;
 /// Supports creating, archiving, restoring, destroying, listing, and updating projects,
 /// as well as assigning/removing silicon beings from projects.
 /// </summary>
+[ToolAction("create", "archive", "restore", "destroy", "list", "get", "assign", "remove", "update", "list-workflow-templates")]
 [SiliconManagerOnly]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class ProjectTool : ITool

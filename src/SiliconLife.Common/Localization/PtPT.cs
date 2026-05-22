@@ -66,8 +66,9 @@ public class PtPT : DefaultLocalizationBase
         PermissionType.CommandLine => "Execução em linha de comandos",
         PermissionType.FileAccess => "Acesso a ficheiro",
         PermissionType.Function => "Chamada de função",
-        PermissionType.DataAccess => "Acesso a dados",
-        _ => permissionType.ToString()
+PermissionType.DataAccess => "Acesso a dados",
+PermissionType.ToolAction => "Ação de ferramenta",
+_ => permissionType.ToString()
     };
 
     public override string PermissionDialogTitle => "Pedido de permissão";
@@ -437,6 +438,16 @@ public class PtPT : DefaultLocalizationBase
     public override string BeingsDetailWorkNoteLabel => "Nota de trabalho: ";
     public override string BeingsDetailChatHistoryLink => "Ver histórico";
     public override string BeingsDetailWorkNoteLink => "Ver nota de trabalho";
+    public override string BeingsDetailToolAuthLabel => "Autorização de ferramentas: ";
+    public override string BeingsDetailToolAuthEditLink => "Configurar";
+    public override string ToolAuthPageTitle => "Autorização de ferramentas";
+    public override string ToolAuthPageHeader => "Configuração de autorização de ferramentas";
+    public override string ToolAuthTemplateLabel => "Modelo predefinido";
+    public override string ToolAuthSaveButton => "Guardar";
+    public override string ToolAuthSelectAll => "Selecionar tudo";
+    public override string ToolAuthDeselectAll => "Desselecionar tudo";
+    public override string ToolAuthNoRestrictions => "Sem restrições";
+    public override string ToolAuthHasRestrictions => "Com restrições";
     public override string WorkNotePageTitle => "Notas de trabalho";
     public override string WorkNotePageHeader => "Lista de notas de trabalho";
     public override string WorkNotePageDescription => "Gestão e consulta das notas de trabalho do Silicon Being";

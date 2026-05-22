@@ -1,0 +1,59 @@
+{
+  "sessionId": "catpaw-20260522-2100",
+  "actorId": "catpaw",
+  "startTime": "2026-05-22T19:00:00+08:00",
+  "endTime": "2026-05-22T21:30:00+08:00",
+  "files": [
+    {
+      "path": "src/SiliconLife.Core/Project/ProjectSpace.cs",
+      "intent": "项目级权限从per-being字典重构为统一单一配置(BeingToolActionOverrides→ToolActionPermissions)",
+      "changeSummary": { "additions": 6, "deletions": 6, "modifications": 4 },
+      "relatedTask": "task-320"
+    },
+    {
+      "path": "src/SiliconLife.Core/Tools/ToolActionPermissionHelper.cs",
+      "intent": "合并逻辑简化：移除beingId参数和per-being查找，直接合并两个ToolActionPermissionConfig",
+      "changeSummary": { "additions": 10, "deletions": 12, "modifications": 6 },
+      "relatedTask": "task-320"
+    },
+    {
+      "path": "src/SiliconLife.App/Web/Controllers/ToolPermissionController.cs",
+      "intent": "项目级API重构为单一配置(无beingId)，新增GetAllDeclaredActionsFromAnyBeing/GetToolDisplayName辅助方法",
+      "changeSummary": { "additions": 55, "deletions": 65, "modifications": 20 },
+      "relatedTask": "task-320"
+    },
+    {
+      "path": "src/SiliconLife.App/Web/Views/ProjectToolPermissionView.cs",
+      "intent": "新建项目级工具授权页面视图：全量工具矩阵，无globallyDisabled/locked逻辑",
+      "changeSummary": { "additions": 489, "deletions": 0, "modifications": 0 },
+      "relatedTask": "task-320"
+    },
+    {
+      "path": "src/SiliconLife.App/Web/Models/ProjectToolPermissionViewModel.cs",
+      "intent": "新建项目级工具授权ViewModel(ProjectId, ProjectName)",
+      "changeSummary": { "additions": 18, "deletions": 0, "modifications": 0 },
+      "relatedTask": "task-320"
+    },
+    {
+      "path": "src/SiliconLife.App/Web/Controllers/ProjectController.cs",
+      "intent": "添加/project/{id}/tool-permissions路由和ProjectToolPermissionPage()方法",
+      "changeSummary": { "additions": 38, "deletions": 1, "modifications": 1 },
+      "relatedTask": "task-320"
+    },
+    {
+      "path": "src/SiliconLife.App/Web/Views/ProjectView.cs",
+      "intent": "项目链接区域添加工具授权入口",
+      "changeSummary": { "additions": 4, "deletions": 0, "modifications": 1 },
+      "relatedTask": "task-320"
+    },
+    {
+      "path": ".ai-collab/tasks.json",
+      "intent": "task-320标记completed、task-321标记cancelled、更新taskIndex",
+      "changeSummary": { "additions": 8, "deletions": 8, "modifications": 6 },
+      "relatedTask": "task-320"
+    }
+  ],
+  "commitHash": null,
+  "tasksCompleted": ["task-320"],
+  "tasksCreated": []
+}

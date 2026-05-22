@@ -22,6 +22,7 @@ namespace SiliconLife.Common.Tools;
 /// Allows silicon beings to send messages to other beings through ChatSystem.
 /// Verifies the tool-to-chat-system pipeline.
 /// </summary>
+[ToolAction("send", "mark_read")]
 [ToolScenario(ToolScenarioFlag.Chat)]
 [ChatOnly]
 public class ChatTool : ITool

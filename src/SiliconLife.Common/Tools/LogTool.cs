@@ -23,6 +23,7 @@ namespace SiliconLife.Common.Tools;
 /// Log query tool for silicon beings to access their historical operation records and system logs.
 /// Enables self-auditing and reviewing of past activities.
 /// </summary>
+[ToolAction("query_operations", "query_tool_calls", "query_conversations", "export", "get_system_info")]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class LogTool : ITool
 {

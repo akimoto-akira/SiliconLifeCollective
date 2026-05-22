@@ -24,6 +24,7 @@ namespace SiliconLife.Common.Tools;
 /// Only available to the Silicon Curator (main administrator).
 /// All code is compiled through DynamicCompilationExecutor with security checks.
 /// </summary>
+[ToolAction("run_script")]
 [SiliconManagerOnly]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class ExecuteCodeTool : ITool

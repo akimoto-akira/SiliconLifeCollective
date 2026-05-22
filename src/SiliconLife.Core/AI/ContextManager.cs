@@ -350,7 +350,7 @@ public class ContextManager
     /// Builds an AIRequest from the current context
     /// </summary>
     /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
-    private AIRequest BuildRequest(string? scenarioContext = null, TaskItem? task = null, ToolScenarioFlag scenario = ToolScenarioFlag.All)
+    private AIRequest BuildRequest(string? scenarioContext = null, TaskItem? task = null, ToolScenarioFlag scenario = ToolScenarioFlag.All, Guid? projectId = null)
     {
         // Record unread user messages to memory before building the request
         RecordUnreadMessagesToMemory();
@@ -423,13 +423,19 @@ public class ContextManager
         ToolManager? toolManager = _being.ToolManager;
         if (toolManager != null && toolManager.ToolCount > 0 && _aiClient.SupportsToolCalls != false)
         {
+            // Use ToolActionPermissionHelper to merge global + project-level permissions
+            var effectivePermissions = ToolActionPermissionHelper.GetEffectivePermissions(_being, projectId);
             if (task?.RequiredTools != null && task.RequiredTools.Count > 0)
             {
-                request.Tools = toolManager.GetToolDefinitions(task.RequiredTools);
+                request.Tools = (effectivePermissions.GetRestrictedToolNames().Count > 0)
+                    ? toolManager.GetToolDefinitions(task.RequiredTools, _being.Id, effectivePermissions)
+                    : toolManager.GetToolDefinitions(task.RequiredTools);
             }
             else
             {
-                request.Tools = toolManager.GetToolDefinitions(scenario);
+                request.Tools = (effectivePermissions.GetRestrictedToolNames().Count > 0)
+                    ? toolManager.GetToolDefinitions(scenario, _being.Id, effectivePermissions)
+                    : toolManager.GetToolDefinitions(scenario);
             }
         }
 
@@ -654,11 +660,11 @@ public class ContextManager
     /// </summary>
     /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
     /// <returns>The AI response (may contain tool_calls or plain text)</returns>
-    public AIResponse GetResponse(string? scenarioContext = null, TaskItem? task = null, ToolScenarioFlag scenario = ToolScenarioFlag.All)
+    public AIResponse GetResponse(string? scenarioContext = null, TaskItem? task = null, ToolScenarioFlag scenario = ToolScenarioFlag.All, Guid? projectId = null)
     {
         _logger.Info(_being.Id, "Getting AI response for being {0}", _being.Name);
 
-        AIRequest request = BuildRequest(scenarioContext, task, scenario);
+        AIRequest request = BuildRequest(scenarioContext, task, scenario, projectId);
         AIResponse response = _aiClient.Chat(request);
 
 #if DEBUG
@@ -686,9 +692,9 @@ public class ContextManager
     /// </summary>
     /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
     /// <returns>The AI response (may contain tool_calls or plain text)</returns>
-    public async Task<AIResponse> GetResponseAsync(string? scenarioContext = null, ToolScenarioFlag scenario = ToolScenarioFlag.All)
-    {
-        AIRequest request = BuildRequest(scenarioContext, scenario: scenario);
+public async Task<AIResponse> GetResponseAsync(string? scenarioContext = null, ToolScenarioFlag scenario = ToolScenarioFlag.All, Guid? projectId = null)
+{
+AIRequest request = BuildRequest(scenarioContext, scenario: scenario, projectId: projectId);
         
         try
         {
@@ -729,16 +735,16 @@ public class ContextManager
     /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
     /// <param name="cancellationToken">Cancellation token to abort the stream</param>
     /// <returns>The final AI response (assembled from all stream chunks)</returns>
-    public async Task<AIResponse> GetResponseStreamAsync(string? scenarioContext = null, CancellationToken cancellationToken = default, ToolScenarioFlag scenario = ToolScenarioFlag.All)
+    public async Task<AIResponse> GetResponseStreamAsync(string? scenarioContext = null, CancellationToken cancellationToken = default, ToolScenarioFlag scenario = ToolScenarioFlag.All, Guid? projectId = null)
     {
         bool? streamingMode = _aiClient.StreamingMode;
         if (streamingMode == false)
         {
             _logger.Warn(_being.Id, "Falling back to non-streaming mode");
-            return await GetResponseAsync(scenarioContext, scenario);
+            return await GetResponseAsync(scenarioContext, scenario, projectId);
         }
 
-        AIRequest request = BuildRequest(scenarioContext, scenario: scenario);
+        AIRequest request = BuildRequest(scenarioContext, scenario: scenario, projectId: projectId);
         StringBuilder contentBuilder = new();
         StringBuilder thinkingBuilder = new();
         List<ToolCall>? toolCalls = null;
@@ -1242,7 +1248,7 @@ public class ContextManager
         _logger.Info(_being.Id, "ThinkOnProject: being={0}, project={1} ({2})", _being.Name, project.Name, project.Id);
 
         string scenarioContext = BuildProjectScenarioContext(project);
-        AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Project);
+        AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Project, projectId: project.Id);
 
         if (response.Success && !string.IsNullOrEmpty(response.Content))
         {

@@ -20,6 +20,7 @@ namespace SiliconLife.Common.Tools;
 /// <summary>
 /// Tool for managing silicon being memory/notes.
 /// </summary>
+[ToolAction("add", "recent", "query", "stats")]
 [ToolScenario(ToolScenarioFlag.All)]
 public class MemoryTool : ITool
 {

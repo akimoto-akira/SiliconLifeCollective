@@ -175,6 +175,16 @@ public class PlPL : DefaultLocalizationBase
     public override string BeingsDetailChatHistoryLink => "Historia czatu";
     public override string BeingsDetailWorkNoteLabel => "Notatka robocza";
     public override string BeingsDetailWorkNoteLink => "Wyświetl";
+    public override string BeingsDetailToolAuthLabel => "Uprawnienia narzędzi: ";
+    public override string BeingsDetailToolAuthEditLink => "Konfiguruj";
+    public override string ToolAuthPageTitle => "Uprawnienia narzędzi";
+    public override string ToolAuthPageHeader => "Konfiguracja uprawnień narzędzi";
+    public override string ToolAuthTemplateLabel => "Szablon";
+    public override string ToolAuthSaveButton => "Zapisz";
+    public override string ToolAuthSelectAll => "Zaznacz wszystko";
+    public override string ToolAuthDeselectAll => "Odznacz wszystko";
+    public override string ToolAuthNoRestrictions => "Bez ograniczeń";
+    public override string ToolAuthHasRestrictions => "Z ograniczeniami";
     public override string WorkNotePageTitle => "Notatka robocza";
     public override string WorkNotePageHeader => "Notatka robocza";
     public override string WorkNotePageDescription => "Notatki dla tego bycia";

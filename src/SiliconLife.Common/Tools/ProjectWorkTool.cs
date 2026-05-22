@@ -17,6 +17,7 @@ using SiliconLife.Common.Localization;
 
 namespace SiliconLife.Common.Tools;
 
+[ToolAction("create-task", "assign-task", "chat", "broadcast", "complete", "status")]
 [SiliconManagerOnly]
 [ToolScenario(ToolScenarioFlag.Project)]
 public class ProjectWorkTool : ITool

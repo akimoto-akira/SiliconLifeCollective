@@ -188,8 +188,9 @@ public class JaJP : DefaultLocalizationBase
         PermissionType.CommandLine => "コマンドライン実行",
         PermissionType.FileAccess => "ファイルアクセス",
         PermissionType.Function => "関数呼び出し",
-        PermissionType.DataAccess => "データアクセス",
-        _ => permissionType.ToString()
+PermissionType.DataAccess => "データアクセス",
+PermissionType.ToolAction => "ツールアクション",
+_ => permissionType.ToString()
     };
 
     /// <summary>
@@ -634,6 +635,16 @@ public class JaJP : DefaultLocalizationBase
     public override string BeingsDetailWorkNoteLabel => "作業ノート：";
     public override string BeingsDetailChatHistoryLink => "チャット履歴を表示";
     public override string BeingsDetailWorkNoteLink => "作業ノートを表示";
+    public override string BeingsDetailToolAuthLabel => "ツール認可：";
+    public override string BeingsDetailToolAuthEditLink => "設定";
+    public override string ToolAuthPageTitle => "ツール認可設定";
+    public override string ToolAuthPageHeader => "ツール認可設定";
+    public override string ToolAuthTemplateLabel => "プリセットテンプレート";
+    public override string ToolAuthSaveButton => "保存";
+    public override string ToolAuthSelectAll => "全選択";
+    public override string ToolAuthDeselectAll => "全解除";
+    public override string ToolAuthNoRestrictions => "制限なし";
+    public override string ToolAuthHasRestrictions => "制限あり";
     public override string WorkNotePageTitle => "作業ノート";
     public override string WorkNotePageHeader => "作業ノートリスト";
     public override string WorkNotePageDescription => "硅基人の作業ノートの管理と表示";

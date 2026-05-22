@@ -31,5 +31,8 @@ public enum PermissionType
     Function,
 
     /// <summary>Data access (database, storage queries)</summary>
-    DataAccess
+    DataAccess,
+
+    /// <summary>Tool action invocation (fine-grained action-level control within a tool)</summary>
+    ToolAction
 }

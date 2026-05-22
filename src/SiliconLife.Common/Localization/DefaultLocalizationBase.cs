@@ -715,6 +715,56 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string BeingsDetailWorkNoteLink { get; }
 
     /// <summary>
+    /// Gets the tool authorization label in being detail view
+    /// </summary>
+    public abstract string BeingsDetailToolAuthLabel { get; }
+
+    /// <summary>
+    /// Gets the tool authorization edit link text in being detail view
+    /// </summary>
+    public abstract string BeingsDetailToolAuthEditLink { get; }
+
+    /// <summary>
+    /// Gets the tool authorization page title
+    /// </summary>
+    public abstract string ToolAuthPageTitle { get; }
+
+    /// <summary>
+    /// Gets the tool authorization page header
+    /// </summary>
+    public abstract string ToolAuthPageHeader { get; }
+
+    /// <summary>
+    /// Gets the label for template selection in tool auth page
+    /// </summary>
+    public abstract string ToolAuthTemplateLabel { get; }
+
+    /// <summary>
+    /// Gets the text for the save button in tool auth page
+    /// </summary>
+    public abstract string ToolAuthSaveButton { get; }
+
+    /// <summary>
+    /// Gets the text for the "select all" button for a tool
+    /// </summary>
+    public abstract string ToolAuthSelectAll { get; }
+
+    /// <summary>
+    /// Gets the text for the "deselect all" button for a tool
+    /// </summary>
+    public abstract string ToolAuthDeselectAll { get; }
+
+    /// <summary>
+    /// Gets the text shown when all actions are allowed (no restrictions)
+    /// </summary>
+    public abstract string ToolAuthNoRestrictions { get; }
+
+    /// <summary>
+    /// Gets the text shown when some actions are disabled
+    /// </summary>
+    public abstract string ToolAuthHasRestrictions { get; }
+
+    /// <summary>
     /// Gets the work note page title
     /// </summary>
     public abstract string WorkNotePageTitle { get; }

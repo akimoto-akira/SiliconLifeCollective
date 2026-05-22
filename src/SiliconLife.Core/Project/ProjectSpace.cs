@@ -89,6 +89,16 @@ public sealed class ProjectSpace
     public Guid? BroadcastChannelId { get; set; }
 
     /// <summary>
+    /// Gets or sets the project-level tool action permission config for this project.
+    /// This is a single unified config that applies to all beings in the project.
+    /// At runtime, the effective permissions are computed as:
+    /// EffectiveDisabled = BeingGlobalDisabled ∪ ProjectDisabled
+    /// (i.e., intersection of allowed actions — both must allow for an action to be permitted).
+    /// null means no project-level restrictions (all beings inherit their global permissions).
+    /// </summary>
+    public ToolActionPermissionConfig? ToolActionPermissions { get; set; }
+
+    /// <summary>
     /// Creates a new project space with default values
     /// </summary>
     public ProjectSpace()

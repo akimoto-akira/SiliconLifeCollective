@@ -182,6 +182,16 @@ public class CsCZ : DefaultLocalizationBase
     public override string BeingsDetailChatHistoryLink => "Historie chatu";
     public override string BeingsDetailWorkNoteLabel => "Pracovní poznámka";
     public override string BeingsDetailWorkNoteLink => "Zobrazit";
+    public override string BeingsDetailToolAuthLabel => "Oprávnění nástrojů: ";
+    public override string BeingsDetailToolAuthEditLink => "Konfigurovat";
+    public override string ToolAuthPageTitle => "Oprávnění nástrojů";
+    public override string ToolAuthPageHeader => "Konfigurace oprávnění nástrojů";
+    public override string ToolAuthTemplateLabel => "Předvolba";
+    public override string ToolAuthSaveButton => "Uložit";
+    public override string ToolAuthSelectAll => "Vybrat vše";
+    public override string ToolAuthDeselectAll => "Zrušit výběr";
+    public override string ToolAuthNoRestrictions => "Bez omezení";
+    public override string ToolAuthHasRestrictions => "S omezeními";
     public override string WorkNotePageTitle => "Pracovní poznámka";
     public override string WorkNotePageHeader => "Pracovní poznámka";
     public override string WorkNotePageDescription => "Poznámky pro toto bytí";

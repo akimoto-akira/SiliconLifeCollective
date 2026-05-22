@@ -2,9 +2,9 @@
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,12 +20,14 @@ namespace SiliconLife.Collective;
 /// Manages tools available to a silicon being.
 /// Each silicon being holds its own ToolManager instance.
 /// Supports reflection-based assembly scanning for tool discovery.
+/// Supports ToolAction-level permission filtering based on per-being config.
 /// </summary>
 public class ToolManager
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<ToolManager>();
     private readonly Dictionary<string, ITool> _tools = new();
     private readonly Dictionary<string, ToolScenarioFlag> _toolScenarios = new();
+    private readonly Dictionary<string, string[]> _toolActions = new();
     private readonly HashSet<string> _chatOnlyTools = new();
     private readonly object _lock = new();
     private readonly bool _curatorOnly;
@@ -66,6 +68,12 @@ public class ToolManager
             Type toolType = tool.GetType();
             var scenarioAttr = toolType.GetCustomAttribute<ToolScenarioAttribute>();
             _toolScenarios[tool.Name] = scenarioAttr?.Scenarios ?? ToolScenarioFlag.All;
+
+            var actionAttr = toolType.GetCustomAttribute<ToolActionAttribute>();
+            if (actionAttr != null && actionAttr.Actions.Length > 0)
+            {
+                _toolActions[tool.Name] = actionAttr.Actions;
+            }
 
             if (toolType.GetCustomAttribute<ChatOnlyAttribute>() != null)
             {
@@ -301,6 +309,178 @@ public class ToolManager
         }
     }
 
+    /// <summary>
+    /// Gets tool definitions for a specific scenario, filtered by the being's
+    /// ToolAction permission configuration. Disabled actions are removed from
+    /// the "action" parameter's enum list in the tool schema.
+    /// </summary>
+    /// <param name="scenario">The tool scenario flag</param>
+    /// <param name="beingId">The being ID to filter actions for</param>
+    /// <param name="permissions">The being's tool action permission config (null = all allowed)</param>
+    /// <returns>List of tool definitions with action enums filtered</returns>
+    public List<ToolDefinition> GetToolDefinitions(ToolScenarioFlag scenario, Guid beingId, ToolActionPermissionConfig? permissions)
+    {
+        lock (_lock)
+        {
+            var definitions = new List<ToolDefinition>();
+            foreach (var kvp in _tools)
+            {
+                if ((_toolScenarios.TryGetValue(kvp.Key, out var flags) && (flags & scenario) != 0) ||
+                    !_toolScenarios.ContainsKey(kvp.Key))
+                {
+                    var schema = kvp.Value.GetParameterSchema();
+                    
+                    // Filter action enum based on permissions
+                    if (permissions != null && _toolActions.TryGetValue(kvp.Key, out var declaredActions))
+                    {
+                        schema = FilterActionEnum(schema, declaredActions, permissions, kvp.Key);
+                    }
+                    
+                    definitions.Add(new ToolDefinition(
+                        kvp.Value.Name,
+                        kvp.Value.Description,
+                        schema
+                    ));
+                }
+            }
+            return definitions;
+        }
+    }
+
+    /// <summary>
+    /// Gets tool definitions for specific tool names, filtered by the being's
+    /// ToolAction permission configuration. Disabled actions are removed from
+    /// the "action" parameter's enum list in the tool schema.
+    /// </summary>
+    /// <param name="requiredToolNames">List of tool names to get definitions for</param>
+    /// <param name="beingId">The being ID to filter actions for</param>
+    /// <param name="permissions">The being's tool action permission config (null = all allowed)</param>
+    /// <returns>List of tool definitions with action enums filtered</returns>
+    public List<ToolDefinition> GetToolDefinitions(List<string> requiredToolNames, Guid beingId, ToolActionPermissionConfig? permissions)
+    {
+        if (requiredToolNames == null || requiredToolNames.Count == 0)
+        {
+            return GetToolDefinitions(ToolScenarioFlag.All, beingId, permissions);
+        }
+
+        lock (_lock)
+        {
+            var definitions = new List<ToolDefinition>();
+            foreach (var toolName in requiredToolNames)
+            {
+                if (_tools.TryGetValue(toolName, out ITool? tool))
+                {
+                    var schema = tool.GetParameterSchema();
+                    
+                    // Filter action enum based on permissions
+                    if (permissions != null && _toolActions.TryGetValue(toolName, out var declaredActions))
+                    {
+                        schema = FilterActionEnum(schema, declaredActions, permissions, toolName);
+                    }
+                    
+                    definitions.Add(new ToolDefinition(
+                        tool.Name,
+                        tool.Description,
+                        schema
+                    ));
+                }
+                else
+                {
+                    _logger?.Warn(null, "Required tool '{0}' not found in tool manager", toolName);
+                }
+            }
+            return definitions;
+        }
+    }
+
+    /// <summary>
+    /// Filters the "action" parameter's enum list in a tool schema based on
+    /// the being's permission configuration. Removes disabled actions from the enum.
+    /// If all actions are disabled, the tool definition is still returned but
+    /// the action enum will be empty (the AI will not be able to call it).
+    /// </summary>
+    private static Dictionary<string, object> FilterActionEnum(
+        Dictionary<string, object> schema,
+        string[] declaredActions,
+        ToolActionPermissionConfig permissions,
+        string toolName)
+    {
+        // Get the set of disabled actions for this tool
+        var disabledActions = permissions.GetDisabledActions(toolName);
+        if (disabledActions.Count == 0)
+        {
+            return schema; // No filtering needed
+        }
+
+        // Deep clone the schema to avoid modifying the original
+        var filteredSchema = new Dictionary<string, object>(schema);
+        
+        if (filteredSchema.TryGetValue("properties", out var propsObj) &&
+            propsObj is Dictionary<string, object> properties &&
+            properties.TryGetValue("action", out var actionObj) &&
+            actionObj is Dictionary<string, object> actionDef)
+        {
+            // Clone the action definition
+            var filteredActionDef = new Dictionary<string, object>(actionDef);
+            
+            if (filteredActionDef.TryGetValue("enum", out var enumObj) && enumObj is object[] enumValues)
+            {
+                // Filter out disabled actions from the enum
+                var filteredEnum = enumValues
+                    .Where(v => !disabledActions.Contains(v?.ToString() ?? ""))
+                    .ToArray();
+                
+                filteredActionDef["enum"] = filteredEnum;
+                var filteredProperties = new Dictionary<string, object>(properties);
+                filteredProperties["action"] = filteredActionDef;
+                filteredSchema["properties"] = filteredProperties;
+            }
+        }
+
+        return filteredSchema;
+    }
+
+    /// <summary>
+    /// Checks whether a specific action on a tool is allowed for a given being.
+    /// Used for runtime validation in ExecuteTool.
+    /// </summary>
+    /// <param name="toolName">The tool name</param>
+    /// <param name="actionName">The action being invoked</param>
+    /// <param name="permissions">The being's tool action permission config (null = all allowed)</param>
+    /// <returns>True if the action is allowed, false if denied</returns>
+    public bool IsActionAllowed(string toolName, string actionName, ToolActionPermissionConfig? permissions)
+    {
+        if (permissions == null) return true;
+        if (!_toolActions.ContainsKey(toolName)) return true; // No ToolActionAttribute = no restriction
+        return permissions.IsActionAllowed(toolName, actionName);
+    }
+
+    /// <summary>
+    /// Gets the declared actions for a tool (from ToolActionAttribute).
+    /// Returns null if the tool has no ToolActionAttribute.
+    /// </summary>
+    /// <param name="toolName">The tool name</param>
+    /// <returns>Array of action names, or null if not declared</returns>
+    public string[]? GetDeclaredActions(string toolName)
+    {
+        lock (_lock)
+        {
+            return _toolActions.TryGetValue(toolName, out var actions) ? actions : null;
+        }
+    }
+
+    /// <summary>
+    /// Gets all tool names that have ToolActionAttribute declarations.
+    /// </summary>
+    /// <returns>Dictionary of tool name → declared action names</returns>
+    public Dictionary<string, string[]> GetAllDeclaredActions()
+    {
+        lock (_lock)
+        {
+            return new Dictionary<string, string[]>(_toolActions);
+        }
+    }
+
     public bool IsChatOnlyTool(string toolName)
     {
         lock (_lock)
@@ -310,7 +490,9 @@ public class ToolManager
     }
 
     /// <summary>
-    /// Executes a tool by name with the given parameters
+    /// Executes a tool by name with the given parameters.
+    /// Performs Action-level permission check if the tool has ToolActionAttribute
+    /// and the being has a ToolActionPermissionConfig.
     /// </summary>
     /// <param name="name">The tool name</param>
     /// <param name="parameters">The parameters for the tool</param>
@@ -332,10 +514,24 @@ public class ToolManager
             return ToolResult.Failed($"Tool '{name}' not found");
         }
 
+        // Action-level permission check
+        var convertedParams = ConvertParameters(parameters ?? new Dictionary<string, object>());
+        if (_toolActions.ContainsKey(name) && being?.ToolActionPermissions != null)
+        {
+            if (convertedParams.TryGetValue("action", out var actionObj) && actionObj != null)
+            {
+                string actionName = actionObj.ToString() ?? "";
+                if (!string.IsNullOrEmpty(actionName) && !IsActionAllowed(name, actionName, being.ToolActionPermissions))
+                {
+                    _logger.Warn(callerId, $"Action '{actionName}' on tool '{name}' denied for being {being.Name}");
+                    return ToolResult.Failed($"Action '{actionName}' on tool '{name}' is not allowed for this being");
+                }
+            }
+        }
+
         _logger.Info(null, $"Tool execution: {name}, caller={callerId}");
         try
         {
-            var convertedParams = ConvertParameters(parameters ?? new Dictionary<string, object>());
             ToolResult result = tool.Execute(callerId, convertedParams);
             
             // Record tool execution to memory

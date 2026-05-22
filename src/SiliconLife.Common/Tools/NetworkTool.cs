@@ -23,6 +23,7 @@ namespace SiliconLife.Common.Tools;
 /// Makes HTTP requests through NetworkExecutor.
 /// Verifies the network executor pipeline.
 /// </summary>
+[ToolAction("GET", "POST")]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class NetworkTool : ITool
 {

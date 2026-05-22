@@ -188,8 +188,9 @@ public class EsES : DefaultLocalizationBase
         PermissionType.CommandLine => "Ejecución de comandos",
         PermissionType.FileAccess => "Acceso a archivos",
         PermissionType.Function => "Invocación de funciones",
-        PermissionType.DataAccess => "Acceso a datos",
-        _ => permissionType.ToString()
+PermissionType.DataAccess => "Acceso a datos",
+PermissionType.ToolAction => "Acción de herramienta",
+_ => permissionType.ToString()
     };
 
     /// <summary>
@@ -634,6 +635,16 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string BeingsDetailWorkNoteLabel => "Notas de trabajo: ";
     public override string BeingsDetailChatHistoryLink => "Ver historial de chat";
     public override string BeingsDetailWorkNoteLink => "Ver notas de trabajo";
+    public override string BeingsDetailToolAuthLabel => "Autorización de herramientas: ";
+    public override string BeingsDetailToolAuthEditLink => "Configurar";
+    public override string ToolAuthPageTitle => "Autorización de herramientas";
+    public override string ToolAuthPageHeader => "Configuración de autorización de herramientas";
+    public override string ToolAuthTemplateLabel => "Plantilla predefinida";
+    public override string ToolAuthSaveButton => "Guardar";
+    public override string ToolAuthSelectAll => "Seleccionar todo";
+    public override string ToolAuthDeselectAll => "Deseleccionar todo";
+    public override string ToolAuthNoRestrictions => "Sin restricciones";
+    public override string ToolAuthHasRestrictions => "Con restricciones";
     public override string WorkNotePageTitle => "Notas de Trabajo";
     public override string WorkNotePageHeader => "Lista de Notas de Trabajo";
     public override string WorkNotePageDescription => "Gestionar y ver las notas de trabajo del ser de silicio";

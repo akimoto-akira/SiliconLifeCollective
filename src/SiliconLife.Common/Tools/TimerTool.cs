@@ -22,6 +22,7 @@ namespace SiliconLife.Common.Tools;
 /// <summary>
 /// Tool for managing silicon being timers and alarms with calendar-based scheduling.
 /// </summary>
+[ToolAction("create_once", "create_recurring", "list", "get", "pause", "resume", "cancel", "delete", "stats", "tick")]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class TimerTool : ITool
 {

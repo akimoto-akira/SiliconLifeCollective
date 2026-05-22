@@ -23,6 +23,7 @@ namespace SiliconLife.Common.Tools;
 /// Supports multiple calendar systems derived from <see cref="CalendarBase"/>.
 /// The desired calendar is selected via the optional <c>calendar</c> parameter (defaults to "gregorian").
 /// </summary>
+[ToolAction("now", "format", "add_days", "diff", "list_calendars", "get_components", "get_now_components", "convert")]
 [ToolScenario(ToolScenarioFlag.All)]
 public class CalendarTool : ITool
 {
