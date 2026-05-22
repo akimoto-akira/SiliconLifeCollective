@@ -185,6 +185,9 @@ public class PlPL : DefaultLocalizationBase
     public override string ToolAuthDeselectAll => "Odznacz wszystko";
     public override string ToolAuthNoRestrictions => "Bez ograniczeń";
     public override string ToolAuthHasRestrictions => "Z ograniczeniami";
+    public override string ToolAuthSaveSuccess => "Uprawnienia narzędzi zapisane pomyślnie";
+    public override string ToolAuthSaveFailed => "Błąd zapisu";
+    public override string ToolAuthDialogClose => "Zamknij";
     public override string WorkNotePageTitle => "Notatka robocza";
     public override string WorkNotePageHeader => "Notatka robocza";
     public override string WorkNotePageDescription => "Notatki dla tego bycia";

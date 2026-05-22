@@ -645,6 +645,9 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string ToolAuthDeselectAll => "Deseleccionar todo";
     public override string ToolAuthNoRestrictions => "Sin restricciones";
     public override string ToolAuthHasRestrictions => "Con restricciones";
+    public override string ToolAuthSaveSuccess => "Autorización de herramientas guardada correctamente";
+    public override string ToolAuthSaveFailed => "Error al guardar";
+    public override string ToolAuthDialogClose => "Cerrar";
     public override string WorkNotePageTitle => "Notas de Trabajo";
     public override string WorkNotePageHeader => "Lista de Notas de Trabajo";
     public override string WorkNotePageDescription => "Gestionar y ver las notas de trabajo del ser de silicio";

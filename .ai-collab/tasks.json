@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-22T21:35:00+08:00",
+  "lastUpdated": "2026-05-22T22:30:00+08:00",
   "tasks": [
     {
       "id": "task-316",
@@ -99,6 +99,20 @@
       "assignedTo": "catpaw-agent",
       "relatedCommit": "05c1ee0",
       "completedAt": "2026-05-22T21:30:00+08:00"
+    },
+    {
+      "id": "task-323",
+      "type": "fix",
+      "target": "SiliconLife.App/Web/Router.cs, SiliconLife.App/Web/Views/ProjectToolPermissionView.cs, SiliconLife.App/Web/Views/ToolPermissionView.cs, SiliconLife.Common/Localization/",
+      "title": "修复工具授权保存功能+保存结果弹窗",
+      "description": "1) Router.cs缺少PUT路由注册导致/api/beings/tool-permissions和/api/projects/{id}/tool-permissions的PUT请求404；2) JS中disabledActions[tool]初始化为{}后调用push()报TypeError(应为[]);3) 保存成功/失败改用居中弹窗替代行内alert，新增ToolAuthSaveSuccess/ToolAuthSaveFailed/ToolAuthDialogClose本地化字段(12语言)",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-22T21:35:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": "catpaw",
+      "relatedCommit": null,
+      "completedAt": "2026-05-22T22:20:00+08:00"
     }
   ],
   "taskIndex": {
@@ -110,7 +124,8 @@
       "task-318",
       "task-319",
       "task-320",
-      "task-322"
+      "task-322",
+      "task-323"
     ],
     "cancelled": [
       "task-321"

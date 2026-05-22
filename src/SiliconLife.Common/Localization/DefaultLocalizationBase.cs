@@ -765,6 +765,21 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string ToolAuthHasRestrictions { get; }
 
     /// <summary>
+    /// Gets the text shown in the dialog when permissions are saved successfully
+    /// </summary>
+    public abstract string ToolAuthSaveSuccess { get; }
+
+    /// <summary>
+    /// Gets the text shown in the dialog when saving permissions fails
+    /// </summary>
+    public abstract string ToolAuthSaveFailed { get; }
+
+    /// <summary>
+    /// Gets the text for the close button in the save result dialog
+    /// </summary>
+    public abstract string ToolAuthDialogClose { get; }
+
+    /// <summary>
     /// Gets the work note page title
     /// </summary>
     public abstract string WorkNotePageTitle { get; }

@@ -158,9 +158,11 @@ public class Router
         RegisterController(() => new InitController(), "/init/ai-config-metadata", "GET");
         RegisterController(() => new SystemController(), "/api/system/shutdown", "POST");
         RegisterController(() => new ToolPermissionController(), "/api/beings/tool-permissions");
+        RegisterController(() => new ToolPermissionController(), "/api/beings/tool-permissions", "PUT");
         RegisterController(() => new ToolPermissionController(), "/api/beings/tool-permissions/templates");
         RegisterController(() => new ToolPermissionController(), "/api/beings/tool-permissions/apply-template", "POST");
         RegisterController(() => new ToolPermissionController(), "/api/projects/{id}/tool-permissions");
+        RegisterController(() => new ToolPermissionController(), "/api/projects/{id}/tool-permissions", "PUT");
     }
 
     /// <summary>Sets the callback invoked when first-run initialization completes.</summary>

@@ -43,12 +43,24 @@ public class ProjectToolPermissionView : ViewBase
                 H.H1(vm.ProjectName).Class("tool-auth-title"),
                 H.P(loc.ToolAuthPageHeader).Class("tool-auth-subtitle")
             ).Class("tool-auth-header"),
-            H.Div().Id("alert").Class("alert"),
             H.Div().Id("permission-matrix").Class("permission-matrix"),
             H.Div(
                 H.Create("button", loc.ToolAuthSaveButton).Class("btn btn-primary")
                     .Attr("type", "button").Attr("onclick", "savePermissions()")
-            ).Class("form-actions")
+            ).Class("form-actions"),
+            // Save result dialog
+            H.Div(
+                H.Div(
+                    H.Div(
+                        H.Create("h3", "").Id("save-dialog-title"),
+                        H.Create("p", "").Id("save-dialog-message"),
+                        H.Div(
+                            H.Create("button", loc.ToolAuthDialogClose).Class("btn btn-primary")
+                                .Attr("type", "button").Attr("onclick", "closeSaveDialog()")
+                        ).Class("save-dialog-actions")
+                    ).Class("save-dialog-content")
+                ).Class("save-dialog-box")
+            ).Id("save-dialog").Class("save-dialog")
         ).Class("page-content");
     }
 
@@ -82,7 +94,8 @@ public class ProjectToolPermissionView : ViewBase
         BuildToggleToolActions(js);
         BuildUpdateToolGroupStatus(js, loc);
         BuildSavePermissions(js, loc);
-        BuildShowAlert(js);
+        BuildShowSaveDialog(js, loc);
+        BuildCloseSaveDialog(js);
 
         js.Add(() => Js.Id(() => "window").Prop(() => "addEventListener").Invoke(
             () => Js.Str(() => "load"),
@@ -261,7 +274,7 @@ public class ProjectToolPermissionView : ViewBase
                         Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                         {
                             { (Js.Id(() => "disabledActions").Index(() => Js.Id(() => "tool")).Op(() => "===", () => Js.Id(() => "undefined")), new List<JsSyntax>
-                                { Js.Assign(() => Js.Id(() => "disabledActions").Index(() => Js.Id(() => "tool")), () => Js.Obj()) }
+                                { Js.Assign(() => Js.Id(() => "disabledActions").Index(() => Js.Id(() => "tool")), () => Js.Array()) }
                             )}
                         }),
                         Js.Id(() => "disabledActions").Index(() => Js.Id(() => "tool")).Call(() => "push", () => Js.Id(() => "action")).Stmt()
@@ -273,10 +286,10 @@ public class ProjectToolPermissionView : ViewBase
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 { (Js.Id(() => "data").Prop(() => "success"), new List<JsSyntax>
-                    { Js.Id(() => "showAlert").Invoke(() => Js.Str(() => loc.ToolAuthSaveButton + " ✓"), () => Js.Str(() => "success")).Stmt() }
+                    { Js.Id(() => "showSaveDialog").Invoke(() => Js.Bool(() => true), () => Js.Null()).Stmt() }
                 )},
                 { (null, new List<JsSyntax>
-                    { Js.Id(() => "showAlert").Invoke(() => Js.Id(() => "data").Prop(() => "error").Op(() => "||", () => (JsSyntax)Js.Str(() => "Error")), () => Js.Str(() => "error")).Stmt() }
+                    { Js.Id(() => "showSaveDialog").Invoke(() => Js.Bool(() => false), () => Js.Id(() => "data").Prop(() => "error")).Stmt() }
                 )}
             }));
 
@@ -296,16 +309,40 @@ public class ProjectToolPermissionView : ViewBase
         js.Add(() => Js.Func(() => "savePermissions", () => new List<string>(), () => saveBody));
     }
 
-    private static void BuildShowAlert(JsBlock js)
+    private static void BuildShowSaveDialog(JsBlock js, DefaultLocalizationBase loc)
     {
-        var showAlertBody = Js.Block()
-            .Add(() => Js.Const(() => "el", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "alert"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "el").Prop(() => "className"), () => Js.Str(() => "alert alert-").Op(() => "+", () => (JsSyntax)Js.Id(() => "type"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "el").Prop(() => "textContent"), () => Js.Id(() => "message")))
-            .Add(() => Js.Id(() => "setTimeout").Invoke(
-                () => Js.Arrow(() => new List<string>(), () => Js.Assign(() => Js.Id(() => "el").Prop(() => "className"), () => Js.Str(() => "alert"))),
-                () => Js.Num(() => "3000")).Stmt());
-        js.Add(() => Js.Func(() => "showAlert", () => new List<string> { "message", "type" }, () => showAlertBody));
+        var showBody = Js.Block()
+            .Add(() => Js.Const(() => "dialog", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "save-dialog"))))
+            .Add(() => Js.Const(() => "titleEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "save-dialog-title"))))
+            .Add(() => Js.Const(() => "msgEl", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "save-dialog-message"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "isSuccess"), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "titleEl").Prop(() => "textContent"), () => Js.Str(() => loc.ToolAuthSaveButton + " ✓")),
+                        Js.Assign(() => Js.Id(() => "titleEl").Prop(() => "className"), () => Js.Str(() => "save-dialog-title success")),
+                        Js.Assign(() => Js.Id(() => "msgEl").Prop(() => "textContent"), () => Js.Str(() => loc.ToolAuthSaveSuccess)),
+                        Js.Assign(() => Js.Id(() => "dialog").Prop(() => "className"), () => Js.Str(() => "save-dialog active"))
+                    }
+                )},
+                { (null, new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "titleEl").Prop(() => "textContent"), () => Js.Str(() => loc.ToolAuthSaveButton + " ✗")),
+                        Js.Assign(() => Js.Id(() => "titleEl").Prop(() => "className"), () => Js.Str(() => "save-dialog-title error")),
+                        Js.Assign(() => Js.Id(() => "msgEl").Prop(() => "textContent"), () => Js.Id(() => "errorMessage").Op(() => "||", () => (JsSyntax)Js.Str(() => loc.ToolAuthSaveFailed))),
+                        Js.Assign(() => Js.Id(() => "dialog").Prop(() => "className"), () => Js.Str(() => "save-dialog active"))
+                    }
+                )}
+            }));
+        js.Add(() => Js.Func(() => "showSaveDialog", () => new List<string> { "isSuccess", "errorMessage" }, () => showBody));
+    }
+
+    private static void BuildCloseSaveDialog(JsBlock js)
+    {
+        var closeBody = Js.Block()
+            .Add(() => Js.Const(() => "dialog", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "save-dialog"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "dialog").Prop(() => "className"), () => Js.Str(() => "save-dialog")));
+        js.Add(() => Js.Func(() => "closeSaveDialog", () => new List<string>(), () => closeBody));
     }
 
     private static CssBuilder GetStyles()
@@ -465,24 +502,51 @@ public class ProjectToolPermissionView : ViewBase
                 .Property("background", "var(--accent-secondary, var(--accent-primary))")
                 .Property("border-color", "var(--accent-secondary, var(--accent-primary))")
             .EndSelector()
-            .Selector(".alert")
-                .Property("padding", "12px 16px")
-                .Property("border-radius", "6px")
-                .Property("margin-bottom", "16px")
-                .Property("font-size", "14px")
+            .Selector(".save-dialog")
                 .Property("display", "none")
+                .Property("position", "fixed")
+                .Property("top", "0")
+                .Property("left", "0")
+                .Property("width", "100%")
+                .Property("height", "100%")
+                .Property("background", "rgba(0,0,0,0.5)")
+                .Property("z-index", "1000")
+                .Property("justify-content", "center")
+                .Property("align-items", "center")
             .EndSelector()
-            .Selector(".alert-success")
-                .Property("display", "block")
-                .Property("background", "rgba(107,203,119,0.15)")
+            .Selector(".save-dialog.active")
+                .Property("display", "flex")
+            .EndSelector()
+            .Selector(".save-dialog-box")
+                .Property("width", "100%")
+                .Property("max-width", "400px")
+            .EndSelector()
+            .Selector(".save-dialog-content")
+                .Property("background", "var(--bg-primary)")
+                .Property("border-radius", "12px")
+                .Property("padding", "28px")
+                .Property("box-shadow", "0 20px 60px rgba(0,0,0,0.3)")
+                .Property("text-align", "center")
+            .EndSelector()
+            .Selector(".save-dialog-title")
+                .Property("font-size", "20px")
+                .Property("font-weight", "700")
+                .Property("margin", "0 0 12px 0")
+            .EndSelector()
+            .Selector(".save-dialog-title.success")
                 .Property("color", "var(--accent-success)")
-                .Property("border", "1px solid rgba(107,203,119,0.3)")
             .EndSelector()
-            .Selector(".alert-error")
-                .Property("display", "block")
-                .Property("background", "rgba(255,107,107,0.15)")
+            .Selector(".save-dialog-title.error")
                 .Property("color", "var(--accent-error)")
-                .Property("border", "1px solid rgba(255,107,107,0.3)")
+            .EndSelector()
+            .Selector(".save-dialog-content p")
+                .Property("font-size", "14px")
+                .Property("color", "var(--text-secondary)")
+                .Property("margin", "0 0 24px 0")
+            .EndSelector()
+            .Selector(".save-dialog-actions")
+                .Property("display", "flex")
+                .Property("justify-content", "center")
             .EndSelector();
     }
 }

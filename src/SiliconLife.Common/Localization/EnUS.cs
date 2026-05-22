@@ -645,6 +645,9 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string ToolAuthDeselectAll => "Deselect All";
     public override string ToolAuthNoRestrictions => "No Restrictions";
     public override string ToolAuthHasRestrictions => "Has Restrictions";
+    public override string ToolAuthSaveSuccess => "Tool authorization saved successfully";
+    public override string ToolAuthSaveFailed => "Save failed";
+    public override string ToolAuthDialogClose => "Close";
     public override string WorkNotePageTitle => "Work Notes";
     public override string WorkNotePageHeader => "Work Note List";
     public override string WorkNotePageDescription => "Manage and view silicon being work notes";
