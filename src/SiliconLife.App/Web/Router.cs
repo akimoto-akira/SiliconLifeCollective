@@ -112,6 +112,7 @@ public class Router
         RegisterController(() => new ProjectController(), "/project");
         RegisterController(() => new ProjectController(), "/project/{id}/work-notes");
         RegisterController(() => new ProjectController(), "/project/{id}/tasks");
+        RegisterController(() => new ProjectController(), "/project/{id}/tool-permissions");
         RegisterController(() => new ProjectController(), "/api/projects/list");
         RegisterController(() => new ProjectController(), "/api/projects/list-workflow-templates");
         RegisterController(() => new ProjectController(), "/api/projects/create", "POST");
