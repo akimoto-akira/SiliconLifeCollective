@@ -1,43 +1,102 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-22T05:35:00+08:00",
+  "lastUpdated": "2026-05-22T13:28:00+08:00",
   "tasks": [
     {
-      "id": "task-314",
-      "type": "docs",
-      "target": "docs/*/changelog.md",
-      "title": "根据git记录补充所有语言changelog缺失的版本条目",
-      "description": "所有12种语言的changelog.md当前最新日期停在2026-05-16，但git记录显示项目持续活跃至2026-05-22。需要从git log逐条检查，将2026-05-17之后的所有提交按日期分类补充到每个语言的changelog.md中。",
-      "priority": "P1",
-      "status": "completed",
-      "createdAt": "2026-05-22T04:45:57+08:00",
+      "id": "task-316",
+      "type": "feature",
+      "target": "SiliconLife.Core/Tools/, SiliconLife.Common/Tools/",
+      "title": "ToolAction权限框架基础设施",
+      "description": "实现Tool级别的Action精确权限控制框架。当前工具权限只有两级（SiliconManagerOnly/普通），需细化到Tool内部的Action级别。核心改动：\n1) 新增ToolActionAttribute，声明每个Tool的可枚举Action（如ChatTool的send/mark_read）\n2) ToolManager.GetToolDefinitions()支持按beingId过滤，动态移除被禁止的Action（修改schema中的enum列表）\n3) ToolManager.ExecuteTool()增加Action级运行时校验，被禁止的Action直接拒绝\n4) 新增ToolActionPermissionType加入PermissionType枚举\n5) Per-being的Action权限配置持久化到being config\n6) 保持向后兼容：无配置时等同于当前行为（全部允许）\n\n参考路线A（Attribute声明），不改动ITool接口签名。依赖分析：ToolManager.cs、ContextManager.cs、PermissionManager、DefaultSiliconBeingFactory.cs、各Tool实现类",
+      "priority": "P0",
+      "status": "pending",
+      "createdAt": "2026-05-22T13:28:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": "coze-agent",
-      "relatedCommit": "76546d0",
-      "completedAt": "2026-05-22T05:12:00+08:00"
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null
     },
     {
-      "id": "task-315",
-      "type": "docs",
-      "target": "docs/*/changelog.md",
-      "title": "修正changelog版本标记位置：Alpha-0.2对齐git tag，标记后日期归入未发布",
-      "description": "当前所有12种语言changelog.md的Alpha-0.2标记后包含了05-17至05-22的条目，但v0.2.0-alpha git tag位于2026-05-16。需将05-17及之后的条目移至[未发布]部分，Alpha-0.2标记改为[Alpha-0.2] - 2026-05-16格式。12种语言均需修改。",
+      "id": "task-317",
+      "type": "feature",
+      "target": "SiliconLife.Common/Project/, SiliconLife.Core/Tools/",
+      "title": "项目级工具授权叠加过滤",
+      "description": "实现项目级的工具授权叠加机制。同一个硅基人在不同项目中应有不同的工具权限。运行时取 Being全局权限 ∩ 项目级权限 的交集。核心改动：\n1) ProjectData新增ToolActionPermissions字段（项目级白名单/黑名单）\n2) 项目级权限持久化到项目配置\n3) ContextManager构建AI请求时，若当前上下文属于某个项目，额外叠加项目级过滤\n4) ToolManager新增GetToolDefinitions(scenario, beingId, projectId)重载\n5) 项目级配置UI由前端任务(task-319)负责，本任务只做后端数据模型和过滤逻辑\n\n依赖task-316（ToolAction权限框架）",
       "priority": "P1",
-      "status": "completed",
-      "createdAt": "2026-05-22T05:31:00+08:00",
+      "status": "pending",
+      "createdAt": "2026-05-22T13:28:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": "coze-agent",
+      "assignedTo": null,
       "relatedCommit": null,
-      "completedAt": "2026-05-22T05:35:00+08:00"
+      "completedAt": null
+    },
+    {
+      "id": "task-318",
+      "type": "feature",
+      "target": "SiliconLife.App/Web/Controllers/, SiliconLife.App/Web/Views/",
+      "title": "工具授权配置API接口（Being + Project）",
+      "description": "新增工具授权配置的REST API接口，供前端页面调用。接口设计：\n1) GET /api/beings/tool-permissions?beingId=xxx — 获取指定Being的工具权限矩阵（Tool×Action×enabled）\n2) PUT /api/beings/tool-permissions?beingId=xxx — 更新Being的全局工具权限\n3) GET /api/projects/{id}/tool-permissions?beingId=xxx — 获取项目级Being工具权限\n4) PUT /api/projects/{id}/tool-permissions?beingId=xxx — 更新项目级Being工具权限\n5) GET /api/beings/tool-permissions/templates — 获取预设权限模板列表（只聊天/只执行任务/完全控制等）\n6) POST /api/beings/tool-permissions/apply-template — 批量应用模板\n\n接口需读取ToolActionAttribute反射信息返回全量Action清单，与当前配置取差集。依赖task-316（框架）和task-317（项目级）",
+      "priority": "P1",
+      "status": "pending",
+      "createdAt": "2026-05-22T13:28:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null
+    },
+    {
+      "id": "task-319",
+      "type": "feature",
+      "target": "SiliconLife.App/Web/Views/BeingView.cs",
+      "title": "硅基人详情页工具授权配置Tab",
+      "description": "在Being详情页新增「工具授权」Tab，作为工具权限的主配置入口。UI设计：\n1) 按Tool分组的Action清单，每个Action一个开关（toggle/checkbox）\n2) Tool级全选/全不选快捷操作\n3) 预设模板快速应用（只聊天/只执行任务/完全控制），应用后可微调\n4) 当前配置与默认值的差异高亮显示\n5) 与现有Tab（Soul编辑器、AI配置）并列\n\n调用task-318定义的API接口。UI风格与现有页面一致（自渲染HTML，无前端框架）。依赖task-318（API接口）",
+      "priority": "P1",
+      "status": "pending",
+      "createdAt": "2026-05-22T13:28:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null
+    },
+    {
+      "id": "task-320",
+      "type": "feature",
+      "target": "SiliconLife.App/Web/Views/ProjectView.cs",
+      "title": "项目详情页成员工具授权面板",
+      "description": "在项目详情页的成员列表中，为每个成员添加工具授权配置入口。UI设计：\n1) 成员列表每行增加权限图标，点击展开项目级授权面板\n2) 面板只显示与全局权限的差集（项目级叠加层）\n3) 支持按成员批量设置（同一权限应用到所有成员）\n4) 视觉上区分「继承全局」和「项目级覆盖」两种状态\n\n调用task-318定义的项目级API接口。依赖task-317（项目级过滤）和task-318（API接口）",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-22T13:28:00+08:00",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null
+    },
+    {
+      "id": "task-321",
+      "type": "feature",
+      "target": "SiliconLife.App/Web/Views/BeingView.cs",
+      "title": "硅基人列表页快捷权限模板",
+      "description": "在硅基人列表页增加快捷权限操作。UI设计：\n1) 列表每行增加「快捷权限」下拉按钮\n2) 下拉菜单包含预设模板：只聊天/只执行任务/完全控制/自定义\n3) 选择预设后跳转到详情页授权Tab确认并保存\n4) 支持多选硅基人后批量应用模板\n\n这是低频操作的快捷入口，完整配置在详情页。依赖task-318（API接口）和task-319（详情页Tab）",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-22T13:28:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null
     }
   ],
   "taskIndex": {
-    "pending": [],
-    "inProgress": [],
-    "completed": [
-      "task-314",
-      "task-315"
+    "pending": [
+      "task-316",
+      "task-317",
+      "task-318",
+      "task-319",
+      "task-320",
+      "task-321"
     ],
+    "inProgress": [],
+    "completed": [],
     "cancelled": []
   },
   "metadata": {
@@ -50,11 +109,12 @@
       ".ai-collab/docs/think-on-project-design.md"
     ],
     "previousTasksArchived": {
-      "archivedAt": "2026-05-20T12:03:35+08:00",
+      "archivedAt": "2026-05-22T13:28:00+08:00",
       "archiveFile": ".ai-collab/archive/tasks-archived-20260520.json",
-      "count": 9,
+      "count": 2,
       "taskIds": [
-        "task-201~209"
+        "task-314",
+        "task-315"
       ]
     }
   }

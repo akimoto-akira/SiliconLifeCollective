@@ -596,3 +596,12 @@
 2026-05-22T05:31:00+08:00 | coze-agent | task_pick | task=task-315
 2026-05-22T05:35:00+08:00 | coze-agent | task_complete | task=task-315 | summary=修正12种语言changelog版本标记：Alpha-0.2对齐git tag日期2026-05-16，05-17后条目移至未发布
 2026-05-22T05:35:00+08:00 | coze-agent | session_end | sessionId=coze-agent-20260522-0531
+2026-05-22T13:28:00+08:00 | coze-agent | session_start | sessionId=coze-agent-20260522-1328
+2026-05-22T13:28:00+08:00 | coze-agent | task_archive | task=task-314~315 | count=2
+2026-05-22T13:28:00+08:00 | coze-agent | task_create | task=task-316 | summary=ToolAction权限框架基础设施
+2026-05-22T13:28:00+08:00 | coze-agent | task_create | task=task-317 | summary=项目级工具授权叠加过滤
+2026-05-22T13:28:00+08:00 | coze-agent | task_create | task=318 | summary=工具授权配置API接口(Being+Project)
+2026-05-22T13:28:00+08:00 | coze-agent | task_create | task=task-319 | summary=硅基人详情页工具授权配置Tab
+2026-05-22T13:28:00+08:00 | coze-agent | task_create | task=task-320 | summary=项目详情页成员工具授权面板
+2026-05-22T13:28:00+08:00 | coze-agent | task_create | task=task-321 | summary=硅基人列表页快捷权限模板
+2026-05-22T13:30:00+08:00 | coze-agent | session_end | sessionId=coze-agent-20260522-1328
