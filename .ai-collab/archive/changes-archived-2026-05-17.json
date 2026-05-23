@@ -1,0 +1,114 @@
+{
+  "archiveDate": "2026-05-17",
+  "type": "changes",
+  "count": 2,
+  "archivedAt": "2026-05-17T21:44:00+08:00",
+  "changes": [
+    {
+      "sessionId": "catpaw-20260517-2200",
+      "actorId": "catpaw",
+      "startTime": "2026-05-17T22:00:00+08:00",
+      "endTime": "2026-05-17T22:10:00+08:00",
+      "files": [
+        {
+          "path": "src/SiliconLife.App/Web/Views/ChatView.cs",
+          "intent": "修复appendMessage中mentionedIds运算符优先级错误和缺失字段",
+          "gitDiff": "git diff 5951f55 e71358f -- src/SiliconLife.App/Web/Views/ChatView.cs",
+          "changeSummary": {
+            "additions": 8,
+            "deletions": 3,
+            "modifications": 4
+          },
+          "relatedTask": "task-209"
+        }
+      ],
+      "commitHash": "6d0b66e",
+      "tasksCompleted": [
+        "task-209"
+      ],
+      "tasksCreated": [
+        "task-209"
+      ]
+    },
+    {
+      "sessionId": "catpaw-20260517-2215",
+      "actorId": "catpaw",
+      "startTime": "2026-05-17T22:15:00+08:00",
+      "endTime": "2026-05-17T22:30:00+08:00",
+      "files": [
+        {
+          "path": "src/SiliconLife.Core/Knowledge/IKnowledgeNetwork.cs",
+          "intent": "新增 GetNeighbors/GetNodeDegree/GetDegreeDistribution 接口和 NeighborInfo/NodeDegree/DegreeDistribution 数据模型",
+          "changeSummary": {
+            "additions": 120,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-207"
+        },
+        {
+          "path": "src/SiliconLife.Default/Knowledge/KnowledgeNetwork.cs",
+          "intent": "实现 GetNeighbors/GetNodeDegree/GetDegreeDistribution 三个高级查询方法",
+          "changeSummary": {
+            "additions": 140,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-207"
+        },
+        {
+          "path": "src/SiliconLife.Fast/Knowledge/KnowledgeNetwork.cs",
+          "intent": "实现 GetNeighbors/GetNodeDegree/GetDegreeDistribution 三个高级查询方法",
+          "changeSummary": {
+            "additions": 140,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-207"
+        },
+        {
+          "path": "src/SiliconLife.Common/Tools/KnowledgeTool.cs",
+          "intent": "暴露 get_neighbors/get_degree/degree_distribution/traverse/has_cycle 五个新 action",
+          "changeSummary": {
+            "additions": 180,
+            "deletions": 5,
+            "modifications": 5
+          },
+          "relatedTask": "task-207"
+        },
+        {
+          "path": "src/SiliconLife.Core/AI/ContextManager.cs",
+          "intent": "新增 BuildKnowledgeContext 方法，在 AI 上下文中注入知识网络概览",
+          "changeSummary": {
+            "additions": 40,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-207"
+        }
+      ],
+      "commitHash": "277a2b1",
+      "tasksCompleted": [
+        "task-207"
+      ],
+      "tasksCreated": []
+    }
+  ],
+  "index": {
+    "byActor": {
+      "catpaw": [
+        "catpaw-20260517-2200",
+        "catpaw-20260517-2215"
+      ]
+    },
+    "byTask": {
+      "task-209": [
+        "catpaw-20260517-2200",
+        "catpaw-20260517-2200"
+      ],
+      "task-207": [
+        "catpaw-20260517-2215"
+      ]
+    }
+  }
+}

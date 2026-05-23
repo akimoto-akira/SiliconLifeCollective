@@ -1,0 +1,805 @@
+{
+  "archiveDate": "2026-05-14",
+  "type": "changes",
+  "count": 4,
+  "archivedAt": "2026-05-14T21:44:00+08:00",
+  "changes": [
+    {
+      "sessionId": "catpaw-20260514-0130",
+      "actorId": "catpaw",
+      "startTime": "2026-05-14T01:30:00+08:00",
+      "endTime": "2026-05-14T01:50:00+08:00",
+      "files": [
+        {
+          "path": "src/SiliconLife.Fast/Storage/SpeedyPackAutoCompactor.cs",
+          "intent": "添加错误日志记录到 catch 块，替换静默异常处理",
+          "changeSummary": {
+            "additions": 3,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": "task-101"
+        },
+        {
+          "path": "src/SiliconLife.Core/Workflow/WorkflowEngine.cs",
+          "intent": "实现 Workflow 超时异常处理流程：标记 Blocked、通知 Being、记录日志",
+          "changeSummary": {
+            "additions": 20,
+            "deletions": 1,
+            "modifications": 1
+          },
+          "relatedTask": "task-102"
+        },
+        {
+          "path": "src/SiliconLife.Fast/Tray/TrayLocalizationBase.cs",
+          "intent": "添加 ExitConfirmation、Yes、No 国际化属性",
+          "changeSummary": {
+            "additions": 6,
+            "deletions": 1,
+            "modifications": 1
+          },
+          "relatedTask": "task-103"
+        },
+        {
+          "path": "src/SiliconLife.Fast/Tray/TrayStatusWindow.cs",
+          "intent": "替换硬编码中文字符串为 TrayLocalizationBase 国际化属性",
+          "changeSummary": {
+            "additions": 3,
+            "deletions": 3,
+            "modifications": 3
+          },
+          "relatedTask": "task-103"
+        },
+        {
+          "path": "src/SiliconLife.Fast/Tray/TrayZhCN.cs",
+          "intent": "添加 ExitConfirmation、Yes、No 中文翻译",
+          "changeSummary": {
+            "additions": 3,
+            "deletions": 0,
+            "modifications": 1
+          },
+          "relatedTask": "task-103"
+        },
+        {
+          "path": "src/SiliconLife.Fast/Tray/TrayEnUS.cs",
+          "intent": "添加 ExitConfirmation、Yes、No 英文翻译",
+          "changeSummary": {
+            "additions": 3,
+            "deletions": 0,
+            "modifications": 1
+          },
+          "relatedTask": "task-103"
+        },
+        {
+          "path": "src/SiliconLife.Fast/Tray/TrayJaJP.cs",
+          "intent": "添加 ExitConfirmation、Yes、No 日文翻译",
+          "changeSummary": {
+            "additions": 3,
+            "deletions": 0,
+            "modifications": 1
+          },
+          "relatedTask": "task-103"
+        },
+        {
+          "path": "src/SiliconLife.Fast/Tray/TrayKoKR.cs",
+          "intent": "添加 ExitConfirmation、Yes、No 韩文翻译",
+          "changeSummary": {
+            "additions": 3,
+            "deletions": 0,
+            "modifications": 1
+          },
+          "relatedTask": "task-103"
+        },
+        {
+          "path": "src/SiliconLife.Fast/Tray/TrayZhHK.cs",
+          "intent": "添加 ExitConfirmation、Yes、No 繁体中文翻译",
+          "changeSummary": {
+            "additions": 3,
+            "deletions": 0,
+            "modifications": 1
+          },
+          "relatedTask": "task-103"
+        },
+        {
+          "path": "src/SiliconLife.Fast/Tray/TrayDeDE.cs",
+          "intent": "添加 ExitConfirmation、Yes、No 德文翻译",
+          "changeSummary": {
+            "additions": 3,
+            "deletions": 0,
+            "modifications": 1
+          },
+          "relatedTask": "task-103"
+        },
+        {
+          "path": "src/SiliconLife.Fast/Tray/TrayFrFR.cs",
+          "intent": "添加 ExitConfirmation、Yes、No 法文翻译",
+          "changeSummary": {
+            "additions": 3,
+            "deletions": 0,
+            "modifications": 1
+          },
+          "relatedTask": "task-103"
+        },
+        {
+          "path": "src/SiliconLife.Fast/Tray/TrayEsES.cs",
+          "intent": "添加 ExitConfirmation、Yes、No 西班牙文翻译",
+          "changeSummary": {
+            "additions": 3,
+            "deletions": 0,
+            "modifications": 1
+          },
+          "relatedTask": "task-103"
+        },
+        {
+          "path": "src/SiliconLife.Fast/Tray/TrayItIT.cs",
+          "intent": "添加 ExitConfirmation、Yes、No 意大利文翻译",
+          "changeSummary": {
+            "additions": 3,
+            "deletions": 0,
+            "modifications": 1
+          },
+          "relatedTask": "task-103"
+        },
+        {
+          "path": "src/SiliconLife.Fast/Tray/TrayPlPL.cs",
+          "intent": "添加 ExitConfirmation、Yes、No 波兰文翻译",
+          "changeSummary": {
+            "additions": 3,
+            "deletions": 0,
+            "modifications": 1
+          },
+          "relatedTask": "task-103"
+        },
+        {
+          "path": "src/SiliconLife.Fast/Tray/TrayCsCZ.cs",
+          "intent": "添加 ExitConfirmation、Yes、No 捷克文翻译",
+          "changeSummary": {
+            "additions": 3,
+            "deletions": 0,
+            "modifications": 1
+          },
+          "relatedTask": "task-103"
+        },
+        {
+          "path": "src/SiliconLife.Core/Runtime/MainLoop.cs",
+          "intent": "优化 WatchdogRun 锁使用模式（task-104）；添加 ExecuteWithTimeout 异常日志（task-110）",
+          "changeSummary": {
+            "additions": 8,
+            "deletions": 4,
+            "modifications": 2
+          },
+          "relatedTask": "task-104,task-110"
+        },
+        {
+          "path": "src/SiliconLife.Core/SiliconBeing/SiliconBeingManager.cs",
+          "intent": "改用反射自动迁移 SiliconBeingBase 可写属性，避免字段遗漏",
+          "changeSummary": {
+            "additions": 25,
+            "deletions": 10,
+            "modifications": 1
+          },
+          "relatedTask": "task-105"
+        },
+        {
+          "path": "src/SiliconLife.Core/Workflow/CodeReviewWorkflow.cs",
+          "intent": "实现三处 TODO：审查任务创建检查、拒绝状态检查、代码合并检查",
+          "changeSummary": {
+            "additions": 18,
+            "deletions": 3,
+            "modifications": 3
+          },
+          "relatedTask": "task-106"
+        },
+        {
+          "path": "src/SiliconLife.App/Web/Controllers/SystemController.cs",
+          "intent": "实现系统优雅关闭功能：停止 MainLoop、保存配置",
+          "changeSummary": {
+            "additions": 18,
+            "deletions": 1,
+            "modifications": 1
+          },
+          "relatedTask": "task-107"
+        },
+        {
+          "path": "src/SiliconLife.App/Web/Views/HelpView.cs",
+          "intent": "实现帮助系统搜索结果显示：添加前端 DOM 渲染和 CSS 样式",
+          "changeSummary": {
+            "additions": 30,
+            "deletions": 2,
+            "modifications": 2
+          },
+          "relatedTask": "task-108"
+        },
+        {
+          "path": "src/SiliconLife.Core/Config/Config.cs",
+          "intent": "使用 ReaderWriterLockSlim 替换 object lock，优化锁粒度",
+          "changeSummary": {
+            "additions": 30,
+            "deletions": 25,
+            "modifications": 5
+          },
+          "relatedTask": "task-109"
+        }
+      ],
+      "commitHash": "fac9435",
+      "tasksCompleted": [
+        "task-101",
+        "task-102",
+        "task-103",
+        "task-104",
+        "task-105",
+        "task-106",
+        "task-107",
+        "task-108",
+        "task-109",
+        "task-110"
+      ],
+      "tasksCreated": []
+    },
+    {
+      "sessionId": "openclaw-20260514-0002",
+      "actorId": "openclaw-main",
+      "startTime": "2026-05-14T00:02:00+08:00",
+      "endTime": "2026-05-14T00:03:00+08:00",
+      "files": [
+        {
+          "path": "src/SiliconLife.Fast/Program.cs",
+          "intent": "添加 Linux 平台检测，自动显示窗口并打开浏览器",
+          "changeSummary": {
+            "additions": 31,
+            "deletions": 10,
+            "modifications": 1
+          }
+        },
+        {
+          "path": "src/SiliconLife.Fast/App.cs",
+          "intent": "传递命令行参数到 StartAsync，添加 try-catch 处理托盘初始化失败",
+          "changeSummary": {
+            "additions": 18,
+            "deletions": 7,
+            "modifications": 1
+          }
+        },
+        {
+          "path": "src/SiliconLife.Fast/Tray/TrayStatusWindow.cs",
+          "intent": "添加平台检测、Linux 窗口置顶、关闭确认对话框",
+          "changeSummary": {
+            "additions": 157,
+            "deletions": 12,
+            "modifications": 1
+          }
+        }
+      ],
+      "commitHash": "d335aaf17cc83f73f354007e28c4d5e1a9ec3de2",
+      "commitMessage": "[openclaw-main] feat: Linux 平台窗口始终显示 + 关闭确认对话框",
+      "tasksCompleted": [],
+      "tasksCreated": []
+    },
+    {
+      "sessionId": "openclaw-20260514-1132",
+      "actorId": "openclaw-main",
+      "startTime": "2026-05-14T11:32:00+08:00",
+      "endTime": "2026-05-14T12:18:00+08:00",
+      "files": [
+        {
+          "path": "src/SiliconLife.McpServer/SiliconLife.McpServer.csproj",
+          "intent": "创建 MCP 服务器项目文件",
+          "changeSummary": {
+            "additions": 18,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-111"
+        },
+        {
+          "path": "src/SiliconLife.McpServer/Program.cs",
+          "intent": "实现 HTTP API 服务器，提供 10 个浏览器操作端点",
+          "changeSummary": {
+            "additions": 120,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-111"
+        },
+        {
+          "path": "src/SiliconLife.McpServer/BrowserPool.cs",
+          "intent": "实现浏览器池管理，复用 Playwright WebView 实例",
+          "changeSummary": {
+            "additions": 95,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-111"
+        },
+        {
+          "path": "src/SiliconLife.McpServer/README.md",
+          "intent": "添加使用文档",
+          "changeSummary": {
+            "additions": 85,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-111"
+        },
+        {
+          "path": "SiliconLifeCollective.sln",
+          "intent": "将 MCP Server 项目添加到解决方案",
+          "changeSummary": {
+            "additions": 15,
+            "deletions": 0,
+            "modifications": 3
+          },
+          "relatedTask": "task-111"
+        },
+        {
+          "path": ".ai-collab/registry.json",
+          "intent": "注册 MCP Server 为新参与者",
+          "changeSummary": {
+            "additions": 18,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-111"
+        },
+        {
+          "path": ".ai-collab/tasks.json",
+          "intent": "添加 task-111 任务记录",
+          "changeSummary": {
+            "additions": 35,
+            "deletions": 1,
+            "modifications": 2
+          },
+          "relatedTask": "task-111"
+        },
+        {
+          "path": ".ai-collab/state.json",
+          "intent": "更新会话状态",
+          "changeSummary": {
+            "additions": 2,
+            "deletions": 2,
+            "modifications": 0
+          },
+          "relatedTask": "task-111"
+        },
+        {
+          "path": ".ai-collab/activity.log",
+          "intent": "追加活动日志",
+          "changeSummary": {
+            "additions": 10,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-111"
+        }
+      ],
+      "commitHash": null,
+      "tasksCompleted": [
+        "task-111"
+      ],
+      "tasksCreated": [],
+      "summary": "创建 SiliconLife.McpServer 项目，为 AI IDE 提供浏览器能力开放服务。解决无影云电脑 AI 与本地 AI IDE 之间的能力差异问题。"
+    },
+    {
+      "sessionId": "trae-20260514-0200",
+      "actorId": "trae-glm5",
+      "startTime": "2026-05-14T02:00:00+08:00",
+      "endTime": "2026-05-14T02:05:00+08:00",
+      "files": [
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationBase.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationCsCZ.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationDeDE.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationDeOther.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationEnOther.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationEnUS.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationEsES.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationEsMX.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationFactory.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationFrOther.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationJaJP.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationKoKR.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationPlPL.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationZhCN.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationZhHK.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpLocalizationZhOther.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Help/HelpTopics.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Tools/HelpTool.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Web/Controllers/HelpController.cs",
+          "intent": "统一版权声明 + 移除 UTF-8 BOM 字符（EF BB BF），使编码与项目其他文件一致",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 2
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Web/JsBuilder.cs",
+          "intent": "删除版权声明后多余的空行",
+          "changeSummary": {
+            "additions": 0,
+            "deletions": 1,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Web/Models/HelpViewModel.cs",
+          "intent": "统一版权声明：从 Silicon Life Collective 改为 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Web/Views/HelpView.cs",
+          "intent": "统一版权声明 + 修复搜索结果渲染 JS 语法错误（括号位置修正）+ 完善搜索结果展示逻辑",
+          "changeSummary": {
+            "additions": 43,
+            "deletions": 7,
+            "modifications": 3
+          },
+          "relatedTask": "task-108"
+        },
+        {
+          "path": "src/SiliconLife.App/Web/Views/TaskExecutionDetailView.cs",
+          "intent": "新增 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 13,
+            "deletions": 0,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.App/Web/Views/TaskExecutionHistoryView.cs",
+          "intent": "新增 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 13,
+            "deletions": 0,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.Common/Calendar/ChineseHistorical/ChineseHistoricalEraDatabase.cs",
+          "intent": "将 using 语句从许可证头之前移到之后，修正文件头部顺序",
+          "changeSummary": {
+            "additions": 1,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.Common/Localization/CsCZ.cs",
+          "intent": "统一版权声明：从 2024 Silicon Life Collective 改为 2026 Hoshino Kennji，补全 Apache 2.0 完整许可证头",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.Common/Tools/KnowledgeTool.cs",
+          "intent": "统一版权声明：从 Copyright 2026 Silicon Life Collective 改为 Copyright (c) 2026 Hoshino Kennji，删除多余空行",
+          "changeSummary": {
+            "additions": 1,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.Core/Knowledge/IKnowledgeNetwork.cs",
+          "intent": "统一版权声明：从 Copyright 2026 Silicon Life Collective 改为 Copyright (c) 2026 Hoshino Kennji，删除多余空行",
+          "changeSummary": {
+            "additions": 1,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.Core/Knowledge/KnowledgeEntry.cs",
+          "intent": "统一版权声明：从 Copyright 2026 Silicon Life Collective 改为 Copyright (c) 2026 Hoshino Kennji，删除多余空行",
+          "changeSummary": {
+            "additions": 1,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.Core/Knowledge/KnowledgeGraph.cs",
+          "intent": "统一版权声明：从 Copyright 2026 Silicon Life Collective 改为 Copyright (c) 2026 Hoshino Kennji，删除多余空行",
+          "changeSummary": {
+            "additions": 1,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.Core/Knowledge/KnowledgeTriple.cs",
+          "intent": "统一版权声明：从 Copyright 2026 Silicon Life Collective 改为 Copyright (c) 2026 Hoshino Kennji，删除多余空行",
+          "changeSummary": {
+            "additions": 1,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.Default/Knowledge/KnowledgeNetwork.cs",
+          "intent": "统一版权声明：从 Copyright 2026 Silicon Life Collective 改为 Copyright (c) 2026 Hoshino Kennji，删除多余空行",
+          "changeSummary": {
+            "additions": 1,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.Fast/App.cs",
+          "intent": "新增 Apache 2.0 完整许可证头（原文件无版权声明）",
+          "changeSummary": {
+            "additions": 13,
+            "deletions": 0,
+            "modifications": 1
+          },
+          "relatedTask": null
+        },
+        {
+          "path": "src/SiliconLife.Fast/Knowledge/KnowledgeNetwork.cs",
+          "intent": "统一版权声明：从 Copyright 2026 Silicon Life Collective 改为 Copyright (c) 2026 Hoshino Kennji，删除多余空行",
+          "changeSummary": {
+            "additions": 1,
+            "deletions": 2,
+            "modifications": 1
+          },
+          "relatedTask": null
+        }
+      ],
+      "commitHash": null,
+      "tasksCompleted": [],
+      "tasksCreated": [],
+      "changeCategories": {
+        "copyright-update": {
+          "description": "统一版权声明和许可证头",
+          "fileCount": 34,
+          "details": "将所有文件的版权声明从 'Silicon Life Collective' 统一为 'Hoshino Kennji'，补全 Apache 2.0 完整许可证头，移除多余空行"
+        },
+        "bugfix": {
+          "description": "修复 HelpController.cs UTF-8 BOM 字符",
+          "fileCount": 1,
+          "details": "移除 HelpController.cs 开头的 UTF-8 BOM (EF BB BF)，使编码与项目其他文件一致"
+        },
+        "bugfix-js": {
+          "description": "修复 HelpView.cs 搜索结果渲染 JS 语法错误",
+          "fileCount": 1,
+          "details": "修正搜索结果渲染中括号位置错误，完善搜索结果展示逻辑（与 task-108 关联）"
+        },
+        "code-style": {
+          "description": "修正文件头部顺序和格式",
+          "fileCount": 2,
+          "details": "ChineseHistoricalEraDatabase.cs 将 using 移到许可证头之后；JsBuilder.cs 删除多余空行"
+        }
+      }
+    }
+  ],
+  "index": {
+    "byActor": {
+      "catpaw": [
+        "catpaw-20260514-0130"
+      ],
+      "openclaw-main": [
+        "openclaw-20260514-0002",
+        "openclaw-20260514-1132"
+      ],
+      "trae-glm5": [
+        "trae-20260514-0200"
+      ]
+    },
+    "byTask": {
+      "task-101": [
+        "catpaw-20260514-0130"
+      ],
+      "task-102": [
+        "catpaw-20260514-0130"
+      ],
+      "task-103": [
+        "catpaw-20260514-0130"
+      ],
+      "task-104": [
+        "catpaw-20260514-0130"
+      ],
+      "task-105": [
+        "catpaw-20260514-0130"
+      ],
+      "task-106": [
+        "catpaw-20260514-0130"
+      ],
+      "task-107": [
+        "catpaw-20260514-0130"
+      ],
+      "task-108": [
+        "catpaw-20260514-0130"
+      ],
+      "task-109": [
+        "catpaw-20260514-0130"
+      ],
+      "task-110": [
+        "catpaw-20260514-0130"
+      ],
+      "task-111": [
+        "openclaw-20260514-1132"
+      ]
+    }
+  }
+}

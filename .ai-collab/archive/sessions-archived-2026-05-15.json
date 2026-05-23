@@ -1,0 +1,67 @@
+{
+  "archiveDate": "2026-05-15",
+  "type": "sessions",
+  "count": 2,
+  "archivedAt": "2026-05-15T21:44:00+08:00",
+  "sessions": [
+    {
+      "sessionId": "trae-20260515-2000",
+      "actorId": "trae-glm5",
+      "startTime": "2026-05-15T20:00:00+08:00",
+      "endTime": null,
+      "status": "active",
+      "changeRecord": null,
+      "selectedTask": "task-113",
+      "modifiedFiles": []
+    },
+    {
+      "sessionId": "trae-20260515-2130",
+      "actorId": "trae-glm5",
+      "startTime": "2026-05-15T21:30:00+08:00",
+      "endTime": "2026-05-15T21:45:00+08:00",
+      "status": "completed",
+      "changeRecord": "changes/trae-20260515-2130.json",
+      "selectedTask": "task-112",
+      "modifiedFiles": [
+        "docs/zh-CN/getting-started.md",
+        "docs/zh-CN/architecture.md",
+        "docs/en/getting-started.md",
+        "docs/en/architecture.md",
+        "docs/ja-JP/getting-started.md",
+        "docs/ja-JP/architecture.md",
+        "docs/ko-KR/getting-started.md",
+        "docs/ko-KR/architecture.md",
+        "docs/de-DE/getting-started.md",
+        "docs/de-DE/architecture.md",
+        "docs/it-IT/getting-started.md",
+        "docs/it-IT/architecture.md",
+        "docs/pl-PL/getting-started.md",
+        "docs/pl-PL/architecture.md",
+        "docs/cs-CZ/getting-started.md",
+        "docs/cs-CZ/architecture.md",
+        "docs/es-ES/getting-started.md",
+        "docs/es-ES/architecture.md",
+        "docs/fr-FR/getting-started.md",
+        "docs/fr-FR/architecture.md",
+        "docs/zh-HK/getting-started.md",
+        "docs/zh-HK/architecture.md"
+      ]
+    }
+  ],
+  "index": {
+    "byActor": {
+      "trae-glm5": [
+        "trae-20260515-2000",
+        "trae-20260515-2130"
+      ]
+    },
+    "byTask": {
+      "task-113": [
+        "trae-20260515-2000"
+      ],
+      "task-112": [
+        "trae-20260515-2130"
+      ]
+    }
+  }
+}

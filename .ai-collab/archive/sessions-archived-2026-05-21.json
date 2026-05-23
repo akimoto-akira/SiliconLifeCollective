@@ -1,0 +1,183 @@
+{
+  "archiveDate": "2026-05-21",
+  "type": "sessions",
+  "count": 7,
+  "archivedAt": "2026-05-21T21:44:00+08:00",
+  "sessions": [
+    {
+      "sessionId": "catpaw-20260521-0000",
+      "actorId": "catpaw",
+      "startTime": "2026-05-21T00:00:00+08:00",
+      "endTime": "2026-05-21T01:30:00+08:00",
+      "status": "completed",
+      "selectedTask": "task-214",
+      "modifiedFiles": [
+        "docs/it-IT/README.md",
+        "docs/it-IT/api-reference.md",
+        "docs/it-IT/permission-system.md",
+        "docs/it-IT/security.md",
+        "docs/it-IT/development-guide.md",
+        "docs/it-IT/getting-started.md",
+        "docs/it-IT/tools-reference.md",
+        "docs/it-IT/architecture.md",
+        "docs/it-IT/web-ui-guide.md",
+        ".ai-collab/activity.log",
+        ".ai-collab/tasks.json",
+        ".ai-collab/state.json"
+      ],
+      "changeRecord": "changes/catpaw-20260521-0000.json"
+    },
+    {
+      "sessionId": "catpaw-20260521-0800",
+      "actorId": "catpaw",
+      "startTime": "2026-05-21T08:00:00+08:00",
+      "endTime": null,
+      "status": "active",
+      "selectedTask": "task-215",
+      "modifiedFiles": []
+    },
+    {
+      "sessionId": "coze-agent-20260521-0429",
+      "actorId": "coze-agent",
+      "startTime": "2026-05-21T04:29:00+08:00",
+      "endTime": "2026-05-21T04:30:00+08:00",
+      "status": "completed",
+      "selectedTask": null,
+      "modifiedFiles": [
+        ".ai-collab/tasks.json",
+        ".ai-collab/archive/tasks-archived-20260520.json",
+        ".ai-collab/activity.log",
+        ".ai-collab/sessions/coze-agent-20260521-0429.json",
+        ".ai-collab/state.json"
+      ]
+    },
+    {
+      "sessionId": "trae-glm5-20260521-1900",
+      "actorId": "trae-glm5",
+      "startTime": "2026-05-21T19:00:00+08:00",
+      "endTime": "2026-05-21T20:30:00+08:00",
+      "status": "completed",
+      "selectedTask": "task-217",
+      "modifiedFiles": [
+        "docs/pl-PL/api-reference.md",
+        "docs/pl-PL/README.md",
+        "docs/pl-PL/permission-system.md",
+        "docs/pl-PL/security.md",
+        "docs/pl-PL/development-guide.md",
+        "docs/pl-PL/getting-started.md",
+        "docs/pl-PL/tools-reference.md",
+        "docs/pl-PL/roadmap.md",
+        "docs/pl-PL/architecture.md"
+      ]
+    },
+    {
+      "sessionId": "trae-glm5-20260521-2100",
+      "actorId": "trae-glm5",
+      "startTime": "2026-05-21T21:00:00+08:00",
+      "endTime": "2026-05-21T22:30:00+08:00",
+      "status": "completed",
+      "selectedTask": "task-218",
+      "modifiedFiles": [
+        "docs/zh-HK/README.md",
+        "docs/zh-HK/api-reference.md",
+        "docs/zh-HK/permission-system.md",
+        "docs/zh-HK/security.md",
+        "docs/zh-HK/development-guide.md",
+        "docs/zh-HK/getting-started.md",
+        "docs/zh-HK/architecture.md",
+        "docs/zh-HK/web-ui-guide.md",
+        "docs/zh-HK/roadmap.md"
+      ],
+      "changeRecord": "changes/trae-glm5-20260521-2100.json"
+    },
+    {
+      "sessionId": "trae-glm5-20260521-2200",
+      "actorId": "trae-glm5",
+      "startTime": "2026-05-21T22:00:00+08:00",
+      "endTime": "2026-05-21T23:30:00+08:00",
+      "status": "completed",
+      "selectedTask": "task-301",
+      "modifiedFiles": [
+        "src/SiliconLife.Fast/SiliconLife.Fast.csproj",
+        "src/SiliconLife.Fast/Tray/TrayLocalizationBase.cs",
+        "src/SiliconLife.Fast/Tray/TrayZhCN.cs",
+        "src/SiliconLife.Fast/Tray/TrayZhHK.cs",
+        "src/SiliconLife.Fast/Tray/TrayEnUS.cs",
+        "src/SiliconLife.Fast/Tray/TrayJaJP.cs",
+        "src/SiliconLife.Fast/Tray/TrayKoKR.cs",
+        "src/SiliconLife.Fast/Tray/TrayFrFR.cs",
+        "src/SiliconLife.Fast/Tray/TrayDeDE.cs",
+        "src/SiliconLife.Fast/Tray/TrayEsES.cs",
+        "src/SiliconLife.Fast/Tray/TrayItIT.cs",
+        "src/SiliconLife.Fast/Tray/TrayPlPL.cs",
+        "src/SiliconLife.Fast/Tray/TrayPtPT.cs",
+        "src/SiliconLife.Fast/Tray/TrayCsCZ.cs",
+        "src/SiliconLife.Fast/Tray/TrayStatusWindow.cs",
+        "src/SiliconLife.Speedy.Manager/Program.cs",
+        "src/SiliconLife.Speedy.Manager/App.axaml.cs",
+        "src/SiliconLife.Speedy.Manager/MainWindow.axaml.cs",
+        "src/SiliconLife.Speedy.Manager/MainWindow.axaml",
+        "src/SiliconLife.Speedy.Manager/ContentViewerWindow.axaml",
+        "src/SiliconLife.Speedy.Manager/ProgressWindow.axaml",
+        "src/SiliconLife.Fast/SiliconLife.Fast.csproj.targets"
+      ],
+      "changeRecord": "changes/trae-glm5-20260521-2200.json"
+    },
+    {
+      "sessionId": "trae-glm5-20260521-2300",
+      "actorId": "trae-glm5",
+      "startTime": "2026-05-21T23:00:00+08:00",
+      "endTime": "2026-05-22T00:30:00+08:00",
+      "status": "completed",
+      "selectedTask": "task-220",
+      "modifiedFiles": [
+        "docs/pt-PT/README.md",
+        "docs/pt-PT/api-reference.md",
+        "docs/pt-PT/permission-system.md",
+        "docs/pt-PT/security.md",
+        "docs/pt-PT/development-guide.md",
+        "docs/pt-PT/getting-started.md",
+        "docs/pt-PT/architecture.md",
+        "docs/pt-PT/tools-reference.md",
+        "docs/pt-PT/web-ui-guide.md"
+      ]
+    }
+  ],
+  "index": {
+    "byActor": {
+      "catpaw": [
+        "catpaw-20260521-0000",
+        "catpaw-20260521-0800"
+      ],
+      "coze-agent": [
+        "coze-agent-20260521-0429"
+      ],
+      "trae-glm5": [
+        "trae-glm5-20260521-1900",
+        "trae-glm5-20260521-2100",
+        "trae-glm5-20260521-2200",
+        "trae-glm5-20260521-2300"
+      ]
+    },
+    "byTask": {
+      "task-214": [
+        "catpaw-20260521-0000"
+      ],
+      "task-215": [
+        "catpaw-20260521-0800"
+      ],
+      "task-217": [
+        "trae-glm5-20260521-1900"
+      ],
+      "task-218": [
+        "trae-glm5-20260521-2100"
+      ],
+      "task-301": [
+        "trae-glm5-20260521-2200"
+      ],
+      "task-220": [
+        "trae-glm5-20260521-2300"
+      ]
+    }
+  }
+}

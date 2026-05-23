@@ -1,0 +1,252 @@
+{
+  "archiveDate": "2026-05-15",
+  "type": "changes",
+  "count": 1,
+  "archivedAt": "2026-05-15T21:44:00+08:00",
+  "changes": [
+    {
+      "sessionId": "trae-20260515-2130",
+      "actorId": "trae-glm5",
+      "startTime": "2026-05-15T21:30:00+08:00",
+      "endTime": "2026-05-15T21:45:00+08:00",
+      "files": [
+        {
+          "path": "docs/zh-CN/getting-started.md",
+          "intent": "更新 Fast 版本平台支持说明，从'仅 Windows'改为'Windows + Linux'",
+          "changeSummary": {
+            "additions": 8,
+            "deletions": 3,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/zh-CN/architecture.md",
+          "intent": "更新 Fast 版本架构描述，添加 Linux 平台支持和特性说明",
+          "changeSummary": {
+            "additions": 4,
+            "deletions": 1,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/en/getting-started.md",
+          "intent": "更新英文版 Fast 版本平台支持说明",
+          "changeSummary": {
+            "additions": 8,
+            "deletions": 3,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/en/architecture.md",
+          "intent": "更新英文版架构描述",
+          "changeSummary": {
+            "additions": 4,
+            "deletions": 1,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/ja-JP/getting-started.md",
+          "intent": "更新日文版 Fast 版本平台支持说明",
+          "changeSummary": {
+            "additions": 8,
+            "deletions": 3,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/ja-JP/architecture.md",
+          "intent": "更新日文版架构描述",
+          "changeSummary": {
+            "additions": 4,
+            "deletions": 1,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/ko-KR/getting-started.md",
+          "intent": "更新韩文版 Fast 版本平台支持说明",
+          "changeSummary": {
+            "additions": 8,
+            "deletions": 3,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/ko-KR/architecture.md",
+          "intent": "更新韩文版架构描述",
+          "changeSummary": {
+            "additions": 4,
+            "deletions": 1,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/de-DE/getting-started.md",
+          "intent": "更新德文版 Fast 版本平台支持说明",
+          "changeSummary": {
+            "additions": 8,
+            "deletions": 3,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/de-DE/architecture.md",
+          "intent": "更新德文版架构描述",
+          "changeSummary": {
+            "additions": 4,
+            "deletions": 1,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/it-IT/getting-started.md",
+          "intent": "更新意大利文版 Fast 版本平台支持说明",
+          "changeSummary": {
+            "additions": 8,
+            "deletions": 3,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/it-IT/architecture.md",
+          "intent": "更新意大利文版架构描述",
+          "changeSummary": {
+            "additions": 4,
+            "deletions": 1,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/pl-PL/getting-started.md",
+          "intent": "更新波兰文版 Fast 版本平台支持说明",
+          "changeSummary": {
+            "additions": 8,
+            "deletions": 3,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/pl-PL/architecture.md",
+          "intent": "更新波兰文版架构描述",
+          "changeSummary": {
+            "additions": 4,
+            "deletions": 1,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/cs-CZ/getting-started.md",
+          "intent": "更新捷克文版 Fast 版本平台支持说明",
+          "changeSummary": {
+            "additions": 8,
+            "deletions": 3,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/cs-CZ/architecture.md",
+          "intent": "更新捷克文版架构描述",
+          "changeSummary": {
+            "additions": 4,
+            "deletions": 1,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/es-ES/getting-started.md",
+          "intent": "更新西班牙文版 Fast 版本平台支持说明",
+          "changeSummary": {
+            "additions": 8,
+            "deletions": 3,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/es-ES/architecture.md",
+          "intent": "更新西班牙文版架构描述",
+          "changeSummary": {
+            "additions": 4,
+            "deletions": 1,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/fr-FR/getting-started.md",
+          "intent": "更新法文版 Fast 版本平台支持说明",
+          "changeSummary": {
+            "additions": 8,
+            "deletions": 3,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/fr-FR/architecture.md",
+          "intent": "更新法文版架构描述",
+          "changeSummary": {
+            "additions": 4,
+            "deletions": 1,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/zh-HK/getting-started.md",
+          "intent": "更新繁体中文版 Fast 版本平台支持说明",
+          "changeSummary": {
+            "additions": 8,
+            "deletions": 3,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        },
+        {
+          "path": "docs/zh-HK/architecture.md",
+          "intent": "更新繁体中文版架构描述",
+          "changeSummary": {
+            "additions": 4,
+            "deletions": 1,
+            "modifications": 2
+          },
+          "relatedTask": "task-112"
+        }
+      ],
+      "tasksCompleted": [
+        "task-112"
+      ],
+      "tasksCreated": []
+    }
+  ],
+  "index": {
+    "byActor": {
+      "trae-glm5": [
+        "trae-20260515-2130"
+      ]
+    },
+    "byTask": {
+      "task-112": [
+        "trae-20260515-2130"
+      ]
+    }
+  }
+}
