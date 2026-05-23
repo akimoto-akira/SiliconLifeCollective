@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-22T22:30:00+08:00",
+  "lastUpdated": "2026-05-23T11:08:00+08:00",
   "tasks": [
     {
       "id": "task-316",
@@ -91,7 +91,7 @@
       "type": "fix",
       "target": "SiliconLife.App/Web/Router.cs",
       "title": "修复项目级工具授权页面路由缺失(404)",
-      "description": "访问 /project/{id}/tool-permissions 页面返回404，原因是Router.cs中未注册该路径模式。修复：在RegisterControllers()中添加 RegisterController(() => new ProjectController(), \"/project/{id}/tool-permissions\") 路由注册。同时更新.ai-collab元数据文件。", 
+      "description": "访问 /project/{id}/tool-permissions 页面返回404，原因是Router.cs中未注册该路径模式。修复：在RegisterControllers()中添加 RegisterController(() => new ProjectController(), \"/project/{id}/tool-permissions\") 路由注册。同时更新.ai-collab元数据文件。",
       "priority": "P1",
       "status": "completed",
       "createdAt": "2026-05-22T21:00:00+08:00",
@@ -113,10 +113,71 @@
       "assignedTo": "catpaw",
       "relatedCommit": null,
       "completedAt": "2026-05-22T22:20:00+08:00"
+    },
+    {
+      "id": "task-324",
+      "type": "fix",
+      "target": "SiliconLife.Core/Tools/ToolManager.cs, SiliconLife.Core/AI/ContextManager.cs",
+      "title": "修复ExecuteTool运行时权限校验绕过项目级限制",
+      "description": "安全漏洞：ToolManager.ExecuteTool()的Action级运行时校验只检查being.ToolActionPermissions（全局权限），完全未考虑项目级叠加。ContextManager构建AI请求时已用GetEffectivePermissions合并全局+项目级权限过滤tool definitions，但ExecuteTool只查全局，项目级限制可被绕过。\n\n复现路径：1) 在项目级禁用disk.write_file 2) AI从旧上下文或缓存中拿到未过滤的schema 3) 调用disk.write_file 4) ExecuteTool只查全局权限（write_file未被全局禁用）5) 请求通过，项目级限制形同虚设\n\n修法：\n1) ExecuteTool签名增加可选参数Guid? projectId = null\n2) 当projectId有值时，调用ToolActionPermissionHelper.GetEffectivePermissions(being, projectId)获取合并后的权限\n3) 用合并后的权限做运行时校验\n4) ContextManager调用ExecuteTool时传入当前项目上下文的projectId\n5) 确保无项目上下文时行为不变（向后兼容）\n\n涉及文件：ToolManager.cs(ExecuteTool)、ContextManager.cs(所有调用ExecuteTool的位置)",
+      "priority": "P0",
+      "status": "pending",
+      "createdAt": "2026-05-23T11:08:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null
+    },
+    {
+      "id": "task-325",
+      "type": "fix",
+      "target": "SiliconLife.App/Web/Controllers/ToolPermissionController.cs, SiliconLife.Common/Tools/",
+      "title": "修复权限模板定义与ToolActionAttribute声明不一致",
+      "description": "ToolPermissionController中的GetChatOnlyDisabledActions()/GetTaskExecutionDisabledActions()硬编码的action列表与各Tool类[ToolAction]声明已严重漂移，导致模板应用后部分工具权限配置错误。\n\n已确认的不一致：\n1) webview_browser命名不一致：模板写webview_browser，Tool注册名为web_view_browser，chat_only模板对此工具完全无效\n2) memory缺recent：Attribute声明add/recent/query/stats，模板只列add/query/stats\n3) 7个有ToolAction的工具模板完全没覆盖：config、curator、database、hot_reload、execute_code、permission、token_audit、project、project_work——选chat_only这些工具反而全部放行\n\n修法：\n1) 将GetChatOnlyDisabledActions/GetTaskExecutionDisabledActions改为从GetAllDeclaredActions()动态生成，不再硬编码\n2) chat_only模板：保留chat的send/mark_read，禁用其他所有工具的所有action\n3) task_execution模板：禁用危险action（disk写操作、network.POST、system敏感操作、dynamic_compile危险操作、webview_browser危险操作），其他保留\n4) 删除webview_browser硬编码条目，改用注册名web_view_browser\n5) 启动时加校验：如果模板引用的tool名不在GetAllDeclaredActions()中，log warning\n6) 确保新增工具时模板自动覆盖，无需手动同步",
+      "priority": "P1",
+      "status": "pending",
+      "createdAt": "2026-05-23T11:08:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null
+    },
+    {
+      "id": "task-326",
+      "type": "fix",
+      "target": "SiliconLife.Core/Tools/ToolManager.cs",
+      "title": "全部Action被禁的工具应从AI请求中整体移除",
+      "description": "当某个Tool的所有action都被禁用时，FilterActionEnum返回空enum的tool definition仍然会出现在AI请求中。AI看到空enum的action参数可能产生困惑或尝试传入任意值导致错误。\n\n修法：\n1) GetToolDefinitions(scenario, beingId, permissions)和GetToolDefinitions(requiredToolNames, beingId, permissions)中，FilterActionEnum后检查结果enum是否为空\n2) 如果某个工具所有declared action都被禁用，跳过该工具（不加入definitions列表）\n3) 对于没有ToolActionAttribute的工具（如一些简单工具），不受此逻辑影响（仍全部允许）\n4) 在ExecuteTool中也增加对应逻辑：如果工具的all declared actions都被禁用，直接拒绝整个工具调用\n\n依赖task-324（ExecuteTool项目级权限校验修复）",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-23T11:08:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null
+    },
+    {
+      "id": "task-327",
+      "type": "fix",
+      "target": "SiliconLife.App/Web/Controllers/ToolPermissionController.cs",
+      "title": "工具权限API增加Action名输入校验",
+      "description": "当前PUT /api/beings/tool-permissions和PUT /api/projects/{id}/tool-permissions接口不校验disabledActions中的action名是否真实存在于ToolActionAttribute声明中。可以存入任意字符串，导致：\n1) 配置中存在无效的disabled action条目\n2) 前端显示与实际运行不一致\n3) 占用存储且无法被清理\n\n修法：\n1) UpdateBeingToolPermissions和UpdateProjectToolPermissions中，解析完requestData后，用GetAllDeclaredActionsFromAnyBeing()获取所有声明的action\n2) 过滤掉不在声明中的action名（log warning提示被忽略的action）\n3) 同理，ApplyTemplate中的GetConfigFromTemplateId也要做校验\n4) 返回值中增加ignoredActions字段，告知调用方哪些action名无效被忽略",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-23T11:08:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null
     }
   ],
   "taskIndex": {
-    "pending": [],
+    "pending": [
+      "task-324",
+      "task-325",
+      "task-326",
+      "task-327"
+    ],
     "inProgress": [],
     "completed": [
       "task-316",
