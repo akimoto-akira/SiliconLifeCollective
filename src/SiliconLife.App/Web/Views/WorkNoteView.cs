@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -249,11 +249,18 @@ public class WorkNoteView : ViewBase
                 {
                     (Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRaw").Op(() => "&&", () => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRendered").Not()), new List<JsSyntax>
                     {
-                        Js.Assign(() => Js.Id(() => "el").Prop(() => "innerHTML"), () => Js.Ternary(
-                            () => Js.Id(() => "typeof").Invoke(() => Js.Id(() => "marked")).Op(() => "!==", () => Js.Str(() => "undefined")),
-                            () => Js.Id(() => "marked").Call(() => "parse", () => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRaw")),
-                            () => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRaw"))),
-                        Js.Assign(() => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRendered"), () => Js.Str(() => "1"))
+                        Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                        {
+                            (Js.Id(() => "typeof").Invoke(() => Js.Id(() => "marked")).Op(() => "!==", () => Js.Str(() => "undefined")), new List<JsSyntax>
+                            {
+                                Js.Assign(() => Js.Id(() => "el").Prop(() => "innerHTML"), () => Js.Id(() => "marked").Call(() => "parse", () => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRaw"))),
+                                Js.Assign(() => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRendered"), () => Js.Str(() => "1"))
+                            }),
+                            (null, new List<JsSyntax>
+                            {
+                                Js.Assign(() => Js.Id(() => "el").Prop(() => "textContent"), () => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRaw"))
+                            })
+                        })
                     })
                 })))).Stmt());
     

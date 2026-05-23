@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-23T14:00:00+08:00",
+  "lastUpdated": "2026-05-23T16:00:00+08:00",
   "tasks": [
     {
       "id": "task-316",
@@ -167,7 +167,7 @@
       "createdAt": "2026-05-23T11:08:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "catpaw",
-      "relatedCommit": null,
+      "relatedCommit": "32c7d8a",
       "completedAt": "2026-05-23T12:30:00+08:00"
     },
     {
@@ -181,7 +181,7 @@
       "createdAt": "2026-05-23T14:00:00+08:00",
       "createdBy": "catpaw",
       "assignedTo": "catpaw",
-      "relatedCommit": null,
+      "relatedCommit": "32c7d8a",
       "completedAt": "2026-05-23T14:30:00+08:00"
     },
     {
@@ -195,14 +195,29 @@
       "createdAt": "2026-05-23T14:00:00+08:00",
       "createdBy": "catpaw",
       "assignedTo": "catpaw",
-      "relatedCommit": null,
+      "relatedCommit": "32c7d8a",
       "completedAt": "2026-05-23T14:30:00+08:00"
+    },
+    {
+      "id": "task-330",
+      "type": "fix",
+      "target": "SiliconLife.App/Web/Views/ChatView.cs, SiliconLife.App/Web/Views/ChatHistoryDetailView.cs, SiliconLife.App/Web/Views/WorkNoteView.cs",
+      "title": "修复Markdown渲染fallback错误设置mdRendered导致marked加载后不重新渲染",
+      "description": "renderMdElementBody中，当marked未加载时，fallback逻辑使用Ternary运算符：marked已加载则parse并设置mdRendered='1'，未加载则直接设置innerHTML为原始文本。但无论哪个分支都会设置mdRendered='1'，导致marked.js加载完成后调用renderMarkdownBody(document)时，因为mdRendered已为'1'而跳过渲染。根因：mdRendered标记在fallback分支被错误设置。\n\n修法：\n1) 将Ternary改为if/else结构\n2) marked已加载：parse + 设置mdRendered='1'\n3) marked未加载：只设置textContent显示原始文本，不设置mdRendered\n4) 使用textContent代替innerHTML确保原始文本安全显示（自动转义HTML）\n5) 统一修复ChatView、ChatHistoryDetailView、WorkNoteView三个视图",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-23T16:00:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": "catpaw",
+      "relatedCommit": null,
+      "completedAt": "2026-05-23T16:15:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
     "completed": [
+      "task-330",
       "task-328",
       "task-329",
       "task-327",
