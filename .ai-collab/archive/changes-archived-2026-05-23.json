@@ -1,0 +1,212 @@
+{
+  "archiveDate": "2026-05-23",
+  "type": "changes",
+  "count": 5,
+  "archivedAt": "2026-05-24T00:52:08+08:00",
+  "changes": [
+    {
+      "sessionId": "catpaw-20260523-1130",
+      "actorId": "catpaw",
+      "startTime": "2026-05-23T11:08:00+08:00",
+      "endTime": "2026-05-23T11:30:00+08:00",
+      "files": [
+        {
+          "path": "src/SiliconLife.Core/Tools/ToolManager.cs",
+          "intent": "ExecuteTool签名增加projectId参数，运行时权限校验改用GetEffectivePermissions合并全局+项目级权限",
+          "changeSummary": {
+            "additions": 18,
+            "deletions": 8,
+            "modifications": 5
+          },
+          "relatedTask": "task-324"
+        },
+        {
+          "path": "src/SiliconLife.Core/AI/ContextManager.cs",
+          "intent": "ExecuteToolCalls/PersistToolCallRound/PersistAndDeliverToolCallRound增加projectId参数传递；修复3处PersistAndDeliverToolCallRound调用未传projectId；修复2处GetResponseAsync fallback调用未传projectId",
+          "changeSummary": {
+            "additions": 12,
+            "deletions": 6,
+            "modifications": 8
+          },
+          "relatedTask": "task-324"
+        },
+        {
+          "path": ".ai-collab/tasks.json",
+          "intent": "task-324状态更新：inProgress→completed",
+          "changeSummary": {
+            "additions": 2,
+            "deletions": 2,
+            "modifications": 3
+          },
+          "relatedTask": "task-324"
+        }
+      ],
+      "commitHash": "9c3c64e",
+      "tasksCompleted": [
+        "task-324"
+      ],
+      "tasksCreated": []
+    },
+    {
+      "sessionId": "catpaw-20260523-1145",
+      "actorId": "catpaw",
+      "startTime": "2026-05-23T11:40:00+08:00",
+      "endTime": "2026-05-23T11:45:00+08:00",
+      "files": [
+        {
+          "path": "src/SiliconLife.App/Web/Controllers/ToolPermissionController.cs",
+          "intent": "将硬编码模板改为动态生成，修复模板与ToolActionAttribute声明不一致；新增ValidateTemplates校验逻辑",
+          "changeSummary": {
+            "additions": 95,
+            "deletions": 30,
+            "modifications": 8
+          },
+          "relatedTask": "task-325"
+        },
+        {
+          "path": ".ai-collab/tasks.json",
+          "intent": "task-325状态更新：inProgress→completed",
+          "changeSummary": {
+            "additions": 2,
+            "deletions": 2,
+            "modifications": 3
+          },
+          "relatedTask": "task-325"
+        }
+      ],
+      "commitHash": null,
+      "tasksCompleted": [
+        "task-325"
+      ],
+      "tasksCreated": []
+    },
+    {
+      "sessionId": "catpaw-20260523-1200",
+      "actorId": "catpaw",
+      "startTime": "2026-05-23T11:50:00+08:00",
+      "endTime": "2026-05-23T12:00:00+08:00",
+      "files": [
+        {
+          "path": "src/SiliconLife.Core/Tools/ToolManager.cs",
+          "intent": "FilterActionEnum全禁返回null；GetToolDefinitions跳过全禁工具；ExecuteTool增加全禁工具拒绝逻辑",
+          "changeSummary": {
+            "additions": 25,
+            "deletions": 5,
+            "modifications": 4
+          },
+          "relatedTask": "task-326"
+        },
+        {
+          "path": ".ai-collab/tasks.json",
+          "intent": "task-326状态更新：inProgress→completed",
+          "changeSummary": {
+            "additions": 2,
+            "deletions": 2,
+            "modifications": 3
+          },
+          "relatedTask": "task-326"
+        }
+      ],
+      "commitHash": null,
+      "tasksCompleted": [
+        "task-326"
+      ],
+      "tasksCreated": []
+    },
+    {
+      "sessionId": "catpaw-20260523-1400",
+      "actorId": "catpaw",
+      "startTime": "2026-05-23T14:00:00+08:00",
+      "endTime": "2026-05-23T14:30:00+08:00",
+      "files": [
+        {
+          "path": "src/SiliconLife.App/Web/Controllers/ToolPermissionController.cs",
+          "intent": "添加 FilterDisabledActions 校验辅助方法，UpdateBeingToolPermissions、UpdateProjectToolPermissions、ApplyTemplate 增加 action 名输入校验",
+          "relatedTask": "task-327"
+        },
+        {
+          "path": "src/SiliconLife.App/Web/Views/ChatHistoryDetailView.cs",
+          "intent": "修复 renderMdElementBody 缺少 marked 存在性检查导致 Markdown 不渲染；补充 msg.content HTML 实体转义",
+          "relatedTask": "task-328,task-329"
+        }
+      ],
+      "commitHash": "32c7d8a",
+      "tasksCompleted": [
+        "task-327",
+        "task-328",
+        "task-329"
+      ],
+      "tasksCreated": [
+        "task-328",
+        "task-329"
+      ]
+    },
+    {
+      "sessionId": "catpaw-20260523-1600",
+      "actorId": "catpaw",
+      "startTime": "2026-05-23T16:00:00+08:00",
+      "endTime": "2026-05-23T16:15:00+08:00",
+      "files": [
+        {
+          "path": "src/SiliconLife.App/Web/Views/ChatView.cs",
+          "intent": "修复 renderMdElementBody：当 marked 未加载时只设置 textContent 显示原始文本，不设置 mdRendered 标记，使 marked 加载后可以重新渲染",
+          "relatedTask": "task-330"
+        },
+        {
+          "path": "src/SiliconLife.App/Web/Views/ChatHistoryDetailView.cs",
+          "intent": "同步修复 renderMdElementBody 的同一问题",
+          "relatedTask": "task-330"
+        },
+        {
+          "path": "src/SiliconLife.App/Web/Views/WorkNoteView.cs",
+          "intent": "同步修复 renderMdElementBody 的同一问题",
+          "relatedTask": "task-330"
+        }
+      ],
+      "commitHash": "797db8c",
+      "tasksCompleted": [
+        "task-330"
+      ],
+      "tasksCreated": [
+        "task-330"
+      ]
+    }
+  ],
+  "index": {
+    "byActor": {
+      "catpaw": [
+        "catpaw-20260523-1130",
+        "catpaw-20260523-1145",
+        "catpaw-20260523-1200",
+        "catpaw-20260523-1400",
+        "catpaw-20260523-1600"
+      ]
+    },
+    "byTask": {
+      "task-324": [
+        "catpaw-20260523-1130"
+      ],
+      "task-325": [
+        "catpaw-20260523-1145"
+      ],
+      "task-326": [
+        "catpaw-20260523-1200"
+      ],
+      "task-327": [
+        "catpaw-20260523-1400"
+      ],
+      "task-328": [
+        "catpaw-20260523-1400",
+        "catpaw-20260523-1400"
+      ],
+      "task-329": [
+        "catpaw-20260523-1400",
+        "catpaw-20260523-1400"
+      ],
+      "task-330": [
+        "catpaw-20260523-1600",
+        "catpaw-20260523-1600"
+      ]
+    }
+  }
+}
