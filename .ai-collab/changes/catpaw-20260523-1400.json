@@ -1,0 +1,21 @@
+{
+  "sessionId": "catpaw-20260523-1400",
+  "actorId": "catpaw",
+  "startTime": "2026-05-23T14:00:00+08:00",
+  "endTime": "2026-05-23T14:30:00+08:00",
+  "files": [
+    {
+      "path": "src/SiliconLife.App/Web/Controllers/ToolPermissionController.cs",
+      "intent": "添加 FilterDisabledActions 校验辅助方法，UpdateBeingToolPermissions、UpdateProjectToolPermissions、ApplyTemplate 增加 action 名输入校验",
+      "relatedTask": "task-327"
+    },
+    {
+      "path": "src/SiliconLife.App/Web/Views/ChatHistoryDetailView.cs",
+      "intent": "修复 renderMdElementBody 缺少 marked 存在性检查导致 Markdown 不渲染；补充 msg.content HTML 实体转义",
+      "relatedTask": "task-328,task-329"
+    }
+  ],
+  "commitHash": null,
+  "tasksCompleted": ["task-327", "task-328", "task-329"],
+  "tasksCreated": ["task-328", "task-329"]
+}

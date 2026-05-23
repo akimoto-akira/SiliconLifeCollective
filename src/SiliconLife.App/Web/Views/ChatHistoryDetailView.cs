@@ -625,14 +625,14 @@ public class ChatHistoryDetailView : ViewBase
                         .Op(() => "+", () => Js.Str(() => "</div></details>"))).Stmt()
                 })
             }))
-            // Content with markdown - escape quotes
+            // Content with markdown - escape HTML entities for safe embedding in data-md-raw attribute
             .Add(() =>
             {
                 var escapedContent = Js.Id(() => "msg").Prop(() => "content")
-                    .Call(() => "replace",
-                        () => Js.Regex(() => "\"", () => "g"),
-                        () => Js.Str(() => "&quot;")
-                    );
+                    .Call(() => "replace", () => Js.Regex(() => @"&", () => "g"), () => Js.Str(() => "&amp;"))
+                    .Call(() => "replace", () => Js.Regex(() => "\"", () => "g"), () => Js.Str(() => "&quot;"))
+                    .Call(() => "replace", () => Js.Regex(() => @"<", () => "g"), () => Js.Str(() => "&lt;"))
+                    .Call(() => "replace", () => Js.Regex(() => @">", () => "g"), () => Js.Str(() => "&gt;"));
                 var divStart = Js.Str(() => "<div class='message-content markdown-body' data-md-raw='");
                 var divEnd = Js.Str(() => "'></div>");
                 return Js.Assign(
@@ -649,13 +649,17 @@ public class ChatHistoryDetailView : ViewBase
         
         // Markdown rendering functions
         var renderMdElementBody = Js.Block()
-            .Add(() => Js.Const(() => "raw", () => Js.Id(() => "el").Call(() => "getAttribute", () => Js.Str(() => "data-md-raw"))))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
-                (Js.Id(() => "raw"), new List<JsSyntax>
-                {
-                    Js.Assign(() => Js.Id(() => "el").Prop(() => "innerHTML"), () => Js.Id(() => "marked").Call(() => "parse", () => Js.Id(() => "raw"))).Stmt()
-                })
+                { (Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRaw").Op(() => "&&", () => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRendered").Not()), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "el").Prop(() => "innerHTML"), () => Js.Ternary(
+                            () => Js.Id(() => "typeof").Invoke(() => Js.Id(() => "marked")).Op(() => "!==", () => Js.Str(() => "undefined")),
+                            () => Js.Id(() => "marked").Call(() => "parse", () => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRaw")),
+                            () => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRaw"))),
+                        Js.Assign(() => Js.Id(() => "el").Prop(() => "dataset").Prop(() => "mdRendered"), () => Js.Str(() => "1"))
+                    }
+                )}
             }));
             
         var renderMarkdownBodyBody = Js.Block()

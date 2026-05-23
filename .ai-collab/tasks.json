@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-23T11:08:00+08:00",
+  "lastUpdated": "2026-05-23T14:00:00+08:00",
   "tasks": [
     {
       "id": "task-316",
@@ -153,7 +153,7 @@
       "createdAt": "2026-05-23T11:08:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "catpaw",
-      "relatedCommit": null,
+      "relatedCommit": "e8d8371",
       "completedAt": "2026-05-23T12:00:00+08:00"
     },
     {
@@ -163,20 +163,49 @@
       "title": "工具权限API增加Action名输入校验",
       "description": "当前PUT /api/beings/tool-permissions和PUT /api/projects/{id}/tool-permissions接口不校验disabledActions中的action名是否真实存在于ToolActionAttribute声明中。可以存入任意字符串，导致：\n1) 配置中存在无效的disabled action条目\n2) 前端显示与实际运行不一致\n3) 占用存储且无法被清理\n\n修法：\n1) UpdateBeingToolPermissions和UpdateProjectToolPermissions中，解析完requestData后，用GetAllDeclaredActionsFromAnyBeing()获取所有声明的action\n2) 过滤掉不在声明中的action名（log warning提示被忽略的action）\n3) 同理，ApplyTemplate中的GetConfigFromTemplateId也要做校验\n4) 返回值中增加ignoredActions字段，告知调用方哪些action名无效被忽略",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-23T11:08:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null,
+      "assignedTo": "catpaw",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-23T12:30:00+08:00"
+    },
+    {
+      "id": "task-328",
+      "type": "fix",
+      "target": "SiliconLife.App/Web/Views/ChatHistoryDetailView.cs",
+      "title": "修复聊天历史详情页Markdown不渲染",
+      "description": "ChatHistoryDetailView的renderMdElementBody直接调用marked.parse(raw)而没有检查marked是否已加载。当marked.js CDN加载慢或失败时，renderMarkdownBody在marked未定义时被调用，抛出ReferenceError导致Markdown内容完全不渲染（显示为空白）。\n\n修法：\n1) renderMdElementBody中增加typeof marked !== 'undefined'检查\n2) 如果marked未加载，用原始文本作为fallback（与ChatView逻辑一致）\n3) 添加data-md-rendered标记防止重复渲染\n4) 确保marked.js加载后重新调用renderMarkdownBody",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-23T14:00:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": "catpaw",
+      "relatedCommit": null,
+      "completedAt": "2026-05-23T14:30:00+08:00"
+    },
+    {
+      "id": "task-329",
+      "type": "fix",
+      "target": "SiliconLife.App/Web/Views/ChatHistoryDetailView.cs",
+      "title": "修复硅基人详情面板聊天记录不显示内容",
+      "description": "从硅基人详情面板进入聊天记录页面后，聊天内容不显示。根因与task-328相同：ChatHistoryDetailView的Markdown渲染函数因marked未定义报错，导致整个消息渲染流程中断。修复task-328后此问题同步解决。此外，renderMessageItem中msg.content的HTML转义不完整（只转义引号），可能导致含有<或>的内容在data-md-raw属性中被截断，需补充完整的HTML实体转义。",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-23T14:00:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": "catpaw",
+      "relatedCommit": null,
+      "completedAt": "2026-05-23T14:30:00+08:00"
     }
   ],
   "taskIndex": {
-    "pending": [
-      "task-327"
-    ],
+    "pending": [],
     "inProgress": [],
     "completed": [
+      "task-328",
+      "task-329",
+      "task-327",
       "task-316",
       "task-317",
       "task-318",

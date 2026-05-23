@@ -144,6 +144,7 @@ public class ToolPermissionController : Controller
     /// <summary>
     /// PUT: Updates the being's global tool action permissions.
     /// Body: { "beingId": "...", "permissions": { "toolName": ["disabledAction1", "disabledAction2"], ... } }
+    /// Invalid tool names or action names are filtered out and reported in ignoredActions.
     /// </summary>
     private void UpdateBeingToolPermissions()
     {
@@ -171,17 +172,7 @@ public class ToolPermissionController : Controller
                 return;
             }
 
-            var config = new ToolActionPermissionConfig();
-            if (requestData.DisabledActions != null)
-            {
-                foreach (var kvp in requestData.DisabledActions)
-                {
-                    foreach (var action in kvp.Value)
-                    {
-                        config.DisableAction(kvp.Key, action);
-                    }
-                }
-            }
+            var (config, ignoredActions) = FilterDisabledActions(requestData.DisabledActions);
 
             being.ToolActionPermissions = config;
 
@@ -192,7 +183,7 @@ public class ToolPermissionController : Controller
             }
 
             _logger.Info(beingId, "Updated tool action permissions for being {0}", being.Name);
-            RenderJson(new { success = true });
+            RenderJson(new { success = true, ignoredActions });
         }
         catch (Exception ex)
         {
@@ -279,7 +270,7 @@ public class ToolPermissionController : Controller
                 return;
             }
 
-            var config = GetConfigFromTemplateId(requestData.TemplateId);
+            var (config, templateIgnored) = GetConfigFromTemplateIdWithValidation(requestData.TemplateId);
             int successCount = 0;
             var errors = new List<string>();
 
@@ -301,7 +292,7 @@ public class ToolPermissionController : Controller
             }
 
             _logger.Info(null, "Applied template '{0}' to {1} being(s)", requestData.TemplateId, successCount);
-            RenderJson(new { success = true, appliedCount = successCount, errors });
+            RenderJson(new { success = true, appliedCount = successCount, errors, ignoredActions = templateIgnored });
         }
         catch (Exception ex)
         {
@@ -398,6 +389,7 @@ public class ToolPermissionController : Controller
     /// <summary>
     /// PUT: Update project-level tool permissions.
     /// Body: { "disabledActions": { "toolName": ["action1", "action2"] } }
+    /// Invalid tool names or action names are filtered out and reported in ignoredActions.
     /// </summary>
     private void UpdateProjectToolPermissions(ProjectSpace project)
     {
@@ -411,23 +403,13 @@ public class ToolPermissionController : Controller
                 return;
             }
 
-            var config = new ToolActionPermissionConfig();
-            if (requestData.DisabledActions != null)
-            {
-                foreach (var kvp in requestData.DisabledActions)
-                {
-                    foreach (var action in kvp.Value)
-                    {
-                        config.DisableAction(kvp.Key, action);
-                    }
-                }
-            }
+            var (config, ignoredActions) = FilterDisabledActions(requestData.DisabledActions);
 
             project.ToolActionPermissions = config.GetRestrictedToolNames().Count == 0 ? null : config;
             project.UpdatedAt = DateTime.UtcNow;
 
             _logger.Info(null, "Updated project tool permissions for project {0}", project.Name);
-            RenderJson(new { success = true });
+            RenderJson(new { success = true, ignoredActions });
         }
         catch (Exception ex)
         {
@@ -468,6 +450,58 @@ public class ToolPermissionController : Controller
             }
         }
         return toolName;
+    }
+
+    // ===== Action Validation =====
+
+    /// <summary>
+    /// Filters a disabledActions map against all declared tool actions, removing
+    /// any tool names or action names that do not exist in ToolActionAttribute declarations.
+    /// Logs warnings for each ignored entry. Returns the validated config and a list
+    /// of ignored actions (each as { tool, action }) for caller reporting.
+    /// </summary>
+    private (ToolActionPermissionConfig config, List<object> ignoredActions) FilterDisabledActions(
+        Dictionary<string, string[]>? disabledActions)
+    {
+        var config = new ToolActionPermissionConfig();
+        var ignored = new List<object>();
+
+        if (disabledActions == null || disabledActions.Count == 0)
+            return (config, ignored);
+
+        var allDeclared = GetAllDeclaredActionsFromAnyBeing();
+
+        foreach (var kvp in disabledActions)
+        {
+            string toolName = kvp.Key;
+
+            if (!allDeclared.ContainsKey(toolName))
+            {
+                // Entire tool name is unknown — ignore all its actions
+                foreach (var action in kvp.Value)
+                {
+                    _logger.Warn(null, "Ignored unknown tool '{0}' action '{1}' in permission update", toolName, action);
+                    ignored.Add(new { tool = toolName, action });
+                }
+                continue;
+            }
+
+            var declaredSet = new HashSet<string>(allDeclared[toolName]);
+            foreach (var action in kvp.Value)
+            {
+                if (declaredSet.Contains(action))
+                {
+                    config.DisableAction(toolName, action);
+                }
+                else
+                {
+                    _logger.Warn(null, "Ignored unknown action '{0}' on tool '{1}' in permission update", action, toolName);
+                    ignored.Add(new { tool = toolName, action });
+                }
+            }
+        }
+
+        return (config, ignored);
     }
 
     // ===== Template Helpers =====
@@ -549,9 +583,8 @@ public class ToolPermissionController : Controller
         return result;
     }
 
-    private ToolActionPermissionConfig GetConfigFromTemplateId(string? templateId)
+    private (ToolActionPermissionConfig config, List<object> ignoredActions) GetConfigFromTemplateIdWithValidation(string? templateId)
     {
-        var config = new ToolActionPermissionConfig();
         var disabledMap = templateId switch
         {
             "chat_only" => GetChatOnlyDisabledActions(),
@@ -560,15 +593,8 @@ public class ToolPermissionController : Controller
             _ => new Dictionary<string, string[]>()
         };
 
-        foreach (var kvp in disabledMap)
-        {
-            foreach (var action in kvp.Value)
-            {
-                config.DisableAction(kvp.Key, action);
-            }
-        }
-
-        return config;
+        var (config, ignoredActions) = FilterDisabledActions(disabledMap);
+        return (config, ignoredActions);
     }
 
     /// <summary>
