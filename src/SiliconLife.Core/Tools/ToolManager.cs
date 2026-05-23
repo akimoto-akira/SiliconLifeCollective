@@ -333,7 +333,14 @@ public class ToolManager
                     // Filter action enum based on permissions
                     if (permissions != null && _toolActions.TryGetValue(kvp.Key, out var declaredActions))
                     {
-                        schema = FilterActionEnum(schema, declaredActions, permissions, kvp.Key);
+                        var filteredSchema = FilterActionEnum(schema, declaredActions, permissions, kvp.Key);
+                        if (filteredSchema == null)
+                        {
+                            // All declared actions are disabled — skip this tool entirely
+                            _logger.Debug(null, $"Tool '{kvp.Key}' skipped: all declared actions are disabled for being {beingId}");
+                            continue;
+                        }
+                        schema = filteredSchema;
                     }
                     
                     definitions.Add(new ToolDefinition(
@@ -375,7 +382,14 @@ public class ToolManager
                     // Filter action enum based on permissions
                     if (permissions != null && _toolActions.TryGetValue(toolName, out var declaredActions))
                     {
-                        schema = FilterActionEnum(schema, declaredActions, permissions, toolName);
+                        var filteredSchema = FilterActionEnum(schema, declaredActions, permissions, toolName);
+                        if (filteredSchema == null)
+                        {
+                            // All declared actions are disabled — skip this tool entirely
+                            _logger.Debug(null, $"Tool '{toolName}' skipped: all declared actions are disabled for being {beingId}");
+                            continue;
+                        }
+                        schema = filteredSchema;
                     }
                     
                     definitions.Add(new ToolDefinition(
@@ -396,10 +410,11 @@ public class ToolManager
     /// <summary>
     /// Filters the "action" parameter's enum list in a tool schema based on
     /// the being's permission configuration. Removes disabled actions from the enum.
-    /// If all actions are disabled, the tool definition is still returned but
-    /// the action enum will be empty (the AI will not be able to call it).
+    /// Returns null if ALL declared actions are disabled — the caller should skip
+    /// the tool definition entirely in that case (the AI should not see a tool
+    /// with an empty action enum).
     /// </summary>
-    private static Dictionary<string, object> FilterActionEnum(
+    private static Dictionary<string, object>? FilterActionEnum(
         Dictionary<string, object> schema,
         string[] declaredActions,
         ToolActionPermissionConfig permissions,
@@ -410,6 +425,13 @@ public class ToolManager
         if (disabledActions.Count == 0)
         {
             return schema; // No filtering needed
+        }
+
+        // Check if ALL declared actions are disabled
+        var allDisabled = declaredActions.All(a => disabledActions.Contains(a));
+        if (allDisabled)
+        {
+            return null; // Signal caller to skip this tool entirely
         }
 
         // Deep clone the schema to avoid modifying the original
@@ -526,6 +548,16 @@ public class ToolManager
             var effectivePermissions = ToolActionPermissionHelper.GetEffectivePermissions(being, projectId);
             if (effectivePermissions.GetRestrictedToolNames().Count > 0)
             {
+                // Check if ALL declared actions are disabled for this tool
+                var declaredActions = _toolActions[name];
+                var disabledActions = effectivePermissions.GetDisabledActions(name);
+                var allDisabled = declaredActions.All(a => disabledActions.Contains(a));
+                if (allDisabled)
+                {
+                    _logger.Warn(callerId, $"Tool '{name}' denied for being {being.Name}: all declared actions are disabled (projectId={projectId})");
+                    return ToolResult.Failed($"Tool '{name}' is not allowed for this being (all actions disabled)");
+                }
+
                 if (convertedParams.TryGetValue("action", out var actionObj) && actionObj != null)
                 {
                     string actionName = actionObj.ToString() ?? "";

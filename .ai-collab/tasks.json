@@ -139,7 +139,7 @@
       "createdAt": "2026-05-23T11:08:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "catpaw",
-      "relatedCommit": null,
+      "relatedCommit": "94a9e35",
       "completedAt": "2026-05-23T11:45:00+08:00"
     },
     {
@@ -149,12 +149,12 @@
       "title": "全部Action被禁的工具应从AI请求中整体移除",
       "description": "当某个Tool的所有action都被禁用时，FilterActionEnum返回空enum的tool definition仍然会出现在AI请求中。AI看到空enum的action参数可能产生困惑或尝试传入任意值导致错误。\n\n修法：\n1) GetToolDefinitions(scenario, beingId, permissions)和GetToolDefinitions(requiredToolNames, beingId, permissions)中，FilterActionEnum后检查结果enum是否为空\n2) 如果某个工具所有declared action都被禁用，跳过该工具（不加入definitions列表）\n3) 对于没有ToolActionAttribute的工具（如一些简单工具），不受此逻辑影响（仍全部允许）\n4) 在ExecuteTool中也增加对应逻辑：如果工具的all declared actions都被禁用，直接拒绝整个工具调用\n\n依赖task-324（ExecuteTool项目级权限校验修复）",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-23T11:08:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null,
+      "assignedTo": "catpaw",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-23T12:00:00+08:00"
     },
     {
       "id": "task-327",
@@ -173,7 +173,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-326",
       "task-327"
     ],
     "inProgress": [],
@@ -186,7 +185,8 @@
       "task-322",
       "task-323",
       "task-324",
-      "task-325"
+      "task-325",
+      "task-326"
     ],
     "cancelled": [
       "task-321"
