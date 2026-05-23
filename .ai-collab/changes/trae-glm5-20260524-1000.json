@@ -1,0 +1,161 @@
+{
+  "sessionId": "trae-glm5-20260524-1000",
+  "actorId": "trae-glm5",
+  "startTime": "2026-05-24T10:00:00+08:00",
+  "endTime": "2026-05-24T12:00:00+08:00",
+  "files": [
+    {
+      "path": "src/SiliconLife.App/Web/Controllers/ToolPermissionController.cs",
+      "intent": "修改后端API返回所有工具（含无ToolAction声明的工具），新增hasDeclaredActions字段和GetAllToolNamesFromAnyBeing辅助方法",
+      "changeSummary": {
+        "additions": 85,
+        "deletions": 25,
+        "modifications": 3
+      },
+      "relatedTask": "task-331"
+    },
+    {
+      "path": "src/SiliconLife.Common/Localization/DefaultLocalizationBase.cs",
+      "intent": "添加ToolAuthNoDeclaredActions抽象属性",
+      "changeSummary": {
+        "additions": 6,
+        "deletions": 0,
+        "modifications": 1
+      },
+      "relatedTask": "task-332"
+    },
+    {
+      "path": "src/SiliconLife.Common/Localization/Languages/ZhCN.cs",
+      "intent": "实现中文ToolAuthNoDeclaredActions=无法设置",
+      "changeSummary": {
+        "additions": 1,
+        "deletions": 0,
+        "modifications": 1
+      },
+      "relatedTask": "task-332"
+    },
+    {
+      "path": "src/SiliconLife.Common/Localization/Languages/EnUS.cs",
+      "intent": "实现英文ToolAuthNoDeclaredActions=Cannot configure",
+      "changeSummary": {
+        "additions": 1,
+        "deletions": 0,
+        "modifications": 1
+      },
+      "relatedTask": "task-332"
+    },
+    {
+      "path": "src/SiliconLife.Common/Localization/Languages/DeDE.cs",
+      "intent": "实现德文ToolAuthNoDeclaredActions",
+      "changeSummary": {
+        "additions": 1,
+        "deletions": 0,
+        "modifications": 1
+      },
+      "relatedTask": "task-332"
+    },
+    {
+      "path": "src/SiliconLife.Common/Localization/Languages/FrFR.cs",
+      "intent": "实现法文ToolAuthNoDeclaredActions",
+      "changeSummary": {
+        "additions": 1,
+        "deletions": 0,
+        "modifications": 1
+      },
+      "relatedTask": "task-332"
+    },
+    {
+      "path": "src/SiliconLife.Common/Localization/Languages/JaJP.cs",
+      "intent": "实现日文ToolAuthNoDeclaredActions",
+      "changeSummary": {
+        "additions": 1,
+        "deletions": 0,
+        "modifications": 1
+      },
+      "relatedTask": "task-332"
+    },
+    {
+      "path": "src/SiliconLife.Common/Localization/Languages/KoKR.cs",
+      "intent": "实现韩文ToolAuthNoDeclaredActions",
+      "changeSummary": {
+        "additions": 1,
+        "deletions": 0,
+        "modifications": 1
+      },
+      "relatedTask": "task-332"
+    },
+    {
+      "path": "src/SiliconLife.Common/Localization/Languages/CsCZ.cs",
+      "intent": "实现捷克文ToolAuthNoDeclaredActions",
+      "changeSummary": {
+        "additions": 1,
+        "deletions": 0,
+        "modifications": 1
+      },
+      "relatedTask": "task-332"
+    },
+    {
+      "path": "src/SiliconLife.Common/Localization/Languages/EsES.cs",
+      "intent": "实现西班牙文ToolAuthNoDeclaredActions",
+      "changeSummary": {
+        "additions": 1,
+        "deletions": 0,
+        "modifications": 1
+      },
+      "relatedTask": "task-332"
+    },
+    {
+      "path": "src/SiliconLife.Common/Localization/Languages/ItIT.cs",
+      "intent": "实现意大利文ToolAuthNoDeclaredActions",
+      "changeSummary": {
+        "additions": 1,
+        "deletions": 0,
+        "modifications": 1
+      },
+      "relatedTask": "task-332"
+    },
+    {
+      "path": "src/SiliconLife.Common/Localization/Languages/PlPL.cs",
+      "intent": "实现波兰文ToolAuthNoDeclaredActions",
+      "changeSummary": {
+        "additions": 1,
+        "deletions": 0,
+        "modifications": 1
+      },
+      "relatedTask": "task-332"
+    },
+    {
+      "path": "src/SiliconLife.Common/Localization/Languages/ZhHK.cs",
+      "intent": "实现繁体中文ToolAuthNoDeclaredActions",
+      "changeSummary": {
+        "additions": 1,
+        "deletions": 0,
+        "modifications": 1
+      },
+      "relatedTask": "task-332"
+    },
+    {
+      "path": "src/SiliconLife.App/Web/Views/ToolPermissionView.cs",
+      "intent": "前端工具权限视图支持无ToolAction工具显示，hasDeclaredActions===false时显示无法设置提示，隐藏全选/全不选按钮，新增CSS样式",
+      "changeSummary": {
+        "additions": 55,
+        "deletions": 15,
+        "modifications": 4
+      },
+      "relatedTask": "task-333"
+    },
+    {
+      "path": "src/SiliconLife.App/Web/Views/ProjectToolPermissionView.cs",
+      "intent": "项目级工具权限视图同样支持无ToolAction工具显示",
+      "changeSummary": {
+        "additions": 55,
+        "deletions": 15,
+        "modifications": 4
+      },
+      "relatedTask": "task-333"
+    }
+  ],
+  "commitHash": null,
+  "tasksCompleted": ["task-331", "task-332", "task-333"],
+  "tasksCreated": []
+}

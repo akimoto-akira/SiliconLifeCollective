@@ -648,6 +648,7 @@ _ => permissionType.ToString()
     public override string ToolAuthSaveSuccess => "工具授权配置已保存成功";
     public override string ToolAuthSaveFailed => "保存失败";
     public override string ToolAuthDialogClose => "关闭";
+    public override string ToolAuthNoDeclaredActions => "无法设置";
     public override string WorkNotePageTitle => "工作笔记";
     public override string WorkNotePageHeader => "工作笔记列表";
     public override string WorkNotePageDescription => "管理和查看硅基人的工作笔记";

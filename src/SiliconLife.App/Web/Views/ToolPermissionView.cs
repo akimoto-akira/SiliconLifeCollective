@@ -146,7 +146,7 @@ public class ToolPermissionView : ViewBase
         var forEachToolBody = Js.Block()
             .Add(() => Js.Const(() => "group", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
             .Add(() => Js.Const(() => "disabledCount", () => Js.Id(() => "tool").Prop(() => "actions").Call(() => "filter", () => Js.Arrow(() => new List<string> { "a" }, () => Js.Id(() => "a").Prop(() => "enabled").Op(() => "===", () => Js.Bool(() => false)))).Prop(() => "length")))
-            .Add(() => Js.Assign(() => Js.Id(() => "group").Prop(() => "className"), () => Js.Str(() => "tool-group").Op(() => "+", () => (JsSyntax)Js.Ternary(() => Js.Id(() => "disabledCount").Op(() => ">", () => Js.Num(() => "0")), () => Js.Str(() => " has-restrictions"), () => Js.Str(() => "")))))
+            .Add(() => Js.Assign(() => Js.Id(() => "group").Prop(() => "className"), () => Js.Str(() => "tool-group").Op(() => "+", () => (JsSyntax)Js.Ternary(() => Js.Id(() => "disabledCount").Op(() => ">", () => Js.Num(() => "0")), () => Js.Str(() => " has-restrictions"), () => Js.Str(() => ""))).Op(() => "+", () => (JsSyntax)Js.Ternary(() => Js.Id(() => "tool").Prop(() => "hasDeclaredActions").Op(() => "===", () => Js.Bool(() => false)), () => Js.Str(() => " no-declared-actions"), () => Js.Str(() => "")))))
             .Add(() => Js.Id(() => "group").Call(() => "setAttribute", () => Js.Str(() => "data-tool"), () => Js.Id(() => "tool").Prop(() => "toolName")).Stmt())
             .Add(() => Js.Const(() => "header", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
             .Add(() => Js.Assign(() => Js.Id(() => "header").Prop(() => "className"), () => Js.Str(() => "tool-group-header")))
@@ -163,6 +163,12 @@ public class ToolPermissionView : ViewBase
             .Add(() => Js.Const(() => "statusSpan", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "span"))))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
+                { (Js.Id(() => "tool").Prop(() => "hasDeclaredActions").Op(() => "===", () => Js.Bool(() => false)), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "statusSpan").Prop(() => "className"), () => Js.Str(() => "tool-group-status no-declared-actions")),
+                        Js.Assign(() => Js.Id(() => "statusSpan").Prop(() => "textContent"), () => Js.Str(() => loc.ToolAuthNoDeclaredActions))
+                    }
+                )},
                 { (Js.Id(() => "disabledCount").Op(() => ">", () => Js.Num(() => "0")), new List<JsSyntax>
                     {
                         Js.Assign(() => Js.Id(() => "statusSpan").Prop(() => "className"), () => Js.Str(() => "tool-group-status has-restrictions")),
@@ -178,22 +184,44 @@ public class ToolPermissionView : ViewBase
                 )}
             }))
             .Add(() => Js.Id(() => "actionsDiv").Call(() => "appendChild", () => Js.Id(() => "statusSpan")).Stmt())
-            .Add(() => Js.Const(() => "selectAllBtn", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "button"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "selectAllBtn").Prop(() => "className"), () => Js.Str(() => "btn-sm")))
-            .Add(() => Js.Assign(() => Js.Id(() => "selectAllBtn").Prop(() => "textContent"), () => Js.Str(() => loc.ToolAuthSelectAll)))
-            .Add(() => Js.Assign(() => Js.Id(() => "selectAllBtn").Prop(() => "onclick"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "toggleToolActions").Invoke(() => Js.Id(() => "tool").Prop(() => "toolName"), () => Js.Bool(() => true)))))
-            .Add(() => Js.Id(() => "actionsDiv").Call(() => "appendChild", () => Js.Id(() => "selectAllBtn")).Stmt())
-            .Add(() => Js.Const(() => "deselectAllBtn", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "button"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "deselectAllBtn").Prop(() => "className"), () => Js.Str(() => "btn-sm")))
-            .Add(() => Js.Assign(() => Js.Id(() => "deselectAllBtn").Prop(() => "textContent"), () => Js.Str(() => loc.ToolAuthDeselectAll)))
-            .Add(() => Js.Assign(() => Js.Id(() => "deselectAllBtn").Prop(() => "onclick"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "toggleToolActions").Invoke(() => Js.Id(() => "tool").Prop(() => "toolName"), () => Js.Bool(() => false)))))
-            .Add(() => Js.Id(() => "actionsDiv").Call(() => "appendChild", () => Js.Id(() => "deselectAllBtn")).Stmt())
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "tool").Prop(() => "hasDeclaredActions").Op(() => "!==", () => Js.Bool(() => false)), new List<JsSyntax>
+                    {
+                        Js.Const(() => "selectAllBtn", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "button"))),
+                        Js.Assign(() => Js.Id(() => "selectAllBtn").Prop(() => "className"), () => Js.Str(() => "btn-sm")),
+                        Js.Assign(() => Js.Id(() => "selectAllBtn").Prop(() => "textContent"), () => Js.Str(() => loc.ToolAuthSelectAll)),
+                        Js.Assign(() => Js.Id(() => "selectAllBtn").Prop(() => "onclick"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "toggleToolActions").Invoke(() => Js.Id(() => "tool").Prop(() => "toolName"), () => Js.Bool(() => true)))),
+                        Js.Id(() => "actionsDiv").Call(() => "appendChild", () => Js.Id(() => "selectAllBtn")).Stmt(),
+                        Js.Const(() => "deselectAllBtn", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "button"))),
+                        Js.Assign(() => Js.Id(() => "deselectAllBtn").Prop(() => "className"), () => Js.Str(() => "btn-sm")),
+                        Js.Assign(() => Js.Id(() => "deselectAllBtn").Prop(() => "textContent"), () => Js.Str(() => loc.ToolAuthDeselectAll)),
+                        Js.Assign(() => Js.Id(() => "deselectAllBtn").Prop(() => "onclick"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "toggleToolActions").Invoke(() => Js.Id(() => "tool").Prop(() => "toolName"), () => Js.Bool(() => false)))),
+                        Js.Id(() => "actionsDiv").Call(() => "appendChild", () => Js.Id(() => "deselectAllBtn")).Stmt()
+                    }
+                )}
+            }))
             .Add(() => Js.Id(() => "header").Call(() => "appendChild", () => Js.Id(() => "actionsDiv")).Stmt())
             .Add(() => Js.Id(() => "group").Call(() => "appendChild", () => Js.Id(() => "header")).Stmt())
-            .Add(() => Js.Const(() => "actionList", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
-            .Add(() => Js.Assign(() => Js.Id(() => "actionList").Prop(() => "className"), () => Js.Str(() => "tool-action-list")))
-            .Add(() => Js.Id(() => "tool").Prop(() => "actions").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "action" }, () => forEachActionBody)).Stmt())
-            .Add(() => Js.Id(() => "group").Call(() => "appendChild", () => Js.Id(() => "actionList")).Stmt())
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "tool").Prop(() => "hasDeclaredActions").Op(() => "===", () => Js.Bool(() => false)), new List<JsSyntax>
+                    {
+                        Js.Const(() => "noActionsDiv", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))),
+                        Js.Assign(() => Js.Id(() => "noActionsDiv").Prop(() => "className"), () => Js.Str(() => "tool-no-actions-message")),
+                        Js.Assign(() => Js.Id(() => "noActionsDiv").Prop(() => "textContent"), () => Js.Str(() => loc.ToolAuthNoDeclaredActions)),
+                        Js.Id(() => "group").Call(() => "appendChild", () => Js.Id(() => "noActionsDiv")).Stmt()
+                    }
+                )},
+                { (null, new List<JsSyntax>
+                    {
+                        Js.Const(() => "actionList", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))),
+                        Js.Assign(() => Js.Id(() => "actionList").Prop(() => "className"), () => Js.Str(() => "tool-action-list")),
+                        Js.Id(() => "tool").Prop(() => "actions").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "action" }, () => forEachActionBody)).Stmt(),
+                        Js.Id(() => "group").Call(() => "appendChild", () => Js.Id(() => "actionList")).Stmt()
+                    }
+                )}
+            }))
             .Add(() => Js.Id(() => "container").Call(() => "appendChild", () => Js.Id(() => "group")).Stmt());
 
         var renderBody = Js.Block()
@@ -518,6 +546,19 @@ public class ToolPermissionView : ViewBase
             .Selector(".tool-group-status.has-restrictions")
                 .Property("background", "rgba(245,158,11,0.15)")
                 .Property("color", "var(--accent-warning, #f59e0b)")
+            .EndSelector()
+            .Selector(".tool-group-status.no-declared-actions")
+                .Property("background", "rgba(107,114,128,0.15)")
+                .Property("color", "var(--text-muted)")
+            .EndSelector()
+            .Selector(".tool-group.no-declared-actions")
+                .Property("opacity", "0.7")
+            .EndSelector()
+            .Selector(".tool-no-actions-message")
+                .Property("padding", "12px 16px")
+                .Property("font-size", "13px")
+                .Property("color", "var(--text-muted)")
+                .Property("font-style", "italic")
             .EndSelector()
             .Selector(".btn-sm")
                 .Property("padding", "4px 10px")

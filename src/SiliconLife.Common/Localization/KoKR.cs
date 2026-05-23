@@ -648,6 +648,7 @@ _ => permissionType.ToString()
     public override string ToolAuthSaveSuccess => "도구 권한 설정이 저장되었습니다";
     public override string ToolAuthSaveFailed => "저장 실패";
     public override string ToolAuthDialogClose => "닫기";
+    public override string ToolAuthNoDeclaredActions => "설정 불가";
     public override string WorkNotePageTitle => "작업 노트";
     public override string WorkNotePageHeader => "작업 노트 목록";
     public override string WorkNotePageDescription => "硅基人의 작업 노트 관리 및 보기";

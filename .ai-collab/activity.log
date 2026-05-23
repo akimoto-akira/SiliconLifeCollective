@@ -649,9 +649,32 @@
 2026-05-23T14:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260523-1400 | task=task-328,task-329
 2026-05-23T14:30:00+08:00 | catpaw | session_end | completed=task-327,task-328,task-329
 2026-05-23T16:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260523-1600 | task=task-330
-2026-05-23T16:00:00+08:00 | catpaw | task_claim | task=task-330 | type=bugfix | fix=Markdown��Ⱦfallback��������mdRendered����marked���غ�������Ⱦ
+2026-05-23T16:00:00+08:00 | catpaw | task_claim | task=task-330 | type=bugfix | fix=Markdown��Ⱦfallback��������mdRendered����marked���غ�������Ⱦ
 2026-05-23T16:05:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Views/ChatView.cs
 2026-05-23T16:05:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Views/ChatHistoryDetailView.cs
 2026-05-23T16:05:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Views/WorkNoteView.cs
 2026-05-23T16:15:00+08:00 | catpaw | task_complete | task=task-330
 2026-05-23T16:15:00+08:00 | catpaw | session_end | completed=task-330
+2026-05-24T10:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260524-1000 | task=task-331,task-332,task-333
+2026-05-24T10:00:00+08:00 | trae-glm5 | task_start | task=task-331
+2026-05-24T10:30:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Controllers/ToolPermissionController.cs
+2026-05-24T11:00:00+08:00 | trae-glm5 | task_complete | task=task-331 | fix=后端API返回所有工具并新增hasDeclaredActions字段
+2026-05-24T11:00:00+08:00 | trae-glm5 | task_start | task=task-332
+2026-05-24T11:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/DefaultLocalizationBase.cs
+2026-05-24T11:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/Languages/ZhCN.cs
+2026-05-24T11:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/Languages/EnUS.cs
+2026-05-24T11:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/Languages/DeDE.cs
+2026-05-24T11:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/Languages/FrFR.cs
+2026-05-24T11:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/Languages/JaJP.cs
+2026-05-24T11:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/Languages/KoKR.cs
+2026-05-24T11:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/Languages/CsCZ.cs
+2026-05-24T11:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/Languages/EsES.cs
+2026-05-24T11:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/Languages/ItIT.cs
+2026-05-24T11:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/Languages/PlPL.cs
+2026-05-24T11:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/Languages/ZhHK.cs
+2026-05-24T11:20:00+08:00 | trae-glm5 | task_complete | task=task-332 | fix=添加ToolAuthNoDeclaredActions本地化字符串到所有语言文件
+2026-05-24T11:20:00+08:00 | trae-glm5 | task_start | task=task-333
+2026-05-24T11:30:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Views/ToolPermissionView.cs
+2026-05-24T11:45:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Views/ProjectToolPermissionView.cs
+2026-05-24T12:00:00+08:00 | trae-glm5 | task_complete | task=task-333 | fix=前端视图支持无ToolAction工具显示无法设置
+2026-05-24T12:00:00+08:00 | trae-glm5 | session_end | completed=task-331,task-332,task-333

@@ -195,6 +195,7 @@ public class CsCZ : DefaultLocalizationBase
     public override string ToolAuthSaveSuccess => "Oprávnění nástrojů byla úspěšně uložena";
     public override string ToolAuthSaveFailed => "Uložení se nezdařilo";
     public override string ToolAuthDialogClose => "Zavřít";
+    public override string ToolAuthNoDeclaredActions => "Nelze nastavit";
     public override string WorkNotePageTitle => "Pracovní poznámka";
     public override string WorkNotePageHeader => "Pracovní poznámka";
     public override string WorkNotePageDescription => "Poznámky pro toto bytí";

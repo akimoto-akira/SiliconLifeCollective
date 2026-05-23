@@ -780,6 +780,11 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string ToolAuthDialogClose { get; }
 
     /// <summary>
+    /// Gets the text shown for tools without declared actions (no ToolAction attribute)
+    /// </summary>
+    public abstract string ToolAuthNoDeclaredActions { get; }
+
+    /// <summary>
     /// Gets the work note page title
     /// </summary>
     public abstract string WorkNotePageTitle { get; }

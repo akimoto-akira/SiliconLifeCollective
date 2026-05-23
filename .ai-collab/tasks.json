@@ -1,11 +1,54 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-23T21:41:00+08:00",
-  "tasks": [],
+  "lastUpdated": "2026-05-24T12:00:00+08:00",
+  "tasks": [
+    {
+      "id": "task-331",
+      "type": "feature",
+      "target": "src/SiliconLife.App/Web/Controllers/ToolPermissionController.cs",
+      "title": "工具权限列表显示无 ToolAction 声明的工具",
+      "description": "前端工具权限列表仅显示带 [ToolAction] 属性的工具，导致 GeoLanguageTool 等缺少该属性的工具不在列表中。修改后端 API 返回所有工具并新增 hasDeclaredActions 字段，前端对无声明 actions 的工具显示\"无法设置\"提示",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-24T10:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-24T12:00:00+08:00"
+    },
+    {
+      "id": "task-332",
+      "type": "feature",
+      "target": "src/SiliconLife.Common/Localization/DefaultLocalizationBase.cs",
+      "title": "添加 ToolAuthNoDeclaredActions 本地化字符串",
+      "description": "新增本地化字符串 ToolAuthNoDeclaredActions，用于前端显示无 [ToolAction] 声明工具的\"无法设置\"提示。已在所有语言文件中实现（ZhCN: \"无法设置\", EnUS: \"Cannot configure\" 等）",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-24T10:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-24T11:00:00+08:00"
+    },
+    {
+      "id": "task-333",
+      "type": "feature",
+      "target": "src/SiliconLife.App/Web/Views/ToolPermissionView.cs",
+      "title": "前端工具权限视图支持无 ToolAction 工具的显示",
+      "description": "修改 ToolPermissionView 和 ProjectToolPermissionView 的 BuildRenderMatrix 方法，当 hasDeclaredActions===false 时：状态标签显示\"无法设置\"（灰色），不渲染全选/全不选按钮，工具组内容区显示斜体提示文字，工具组降低透明度。新增 CSS 样式 .no-declared-actions 和 .tool-no-actions-message",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-24T11:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-24T12:00:00+08:00"
+    }
+  ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": [],
+    "completed": ["task-331", "task-332", "task-333"],
     "cancelled": []
   },
   "metadata": {

@@ -81,8 +81,9 @@ public class ToolPermissionController : Controller
 
     /// <summary>
     /// GET: Returns the tool permission matrix for a specific being.
-    /// The matrix includes: for each tool with ToolActionAttribute,
-    /// the list of all declared actions and their enabled/disabled status.
+    /// The matrix includes all registered tools. Tools with ToolActionAttribute
+    /// show their declared actions with enabled/disabled status.
+    /// Tools without ToolActionAttribute are shown with hasDeclaredActions=false.
     /// </summary>
     private void GetBeingToolPermissions()
     {
@@ -108,28 +109,44 @@ public class ToolPermissionController : Controller
         }
 
         var allActions = toolManager.GetAllDeclaredActions();
+        var allToolNames = toolManager.GetToolNames();
         var permissions = being.ToolActionPermissions;
         var currentLanguage = Config.Instance.Data.Language;
         var matrix = new List<object>();
 
-        foreach (var kvp in allActions)
+        foreach (string toolName in allToolNames)
         {
-            string toolName = kvp.Key;
-            string[] actions = kvp.Value;
             var tool = toolManager.GetTool(toolName);
             string displayName = tool?.GetDisplayName(currentLanguage) ?? toolName;
-            var actionList = actions.Select(a => new
-            {
-                name = a,
-                enabled = permissions?.IsActionAllowed(toolName, a) ?? true
-            }).ToList();
+            bool hasDeclaredActions = allActions.ContainsKey(toolName);
 
-            matrix.Add(new
+            if (hasDeclaredActions)
             {
-                toolName,
-                displayName,
-                actions = actionList
-            });
+                string[] actions = allActions[toolName];
+                var actionList = actions.Select(a => new
+                {
+                    name = a,
+                    enabled = permissions?.IsActionAllowed(toolName, a) ?? true
+                }).ToList();
+
+                matrix.Add(new
+                {
+                    toolName,
+                    displayName,
+                    hasDeclaredActions = true,
+                    actions = actionList
+                });
+            }
+            else
+            {
+                matrix.Add(new
+                {
+                    toolName,
+                    displayName,
+                    hasDeclaredActions = false,
+                    actions = new List<object>()
+                });
+            }
         }
 
         RenderJson(new
@@ -349,32 +366,49 @@ public class ToolPermissionController : Controller
     /// <summary>
     /// GET: Get project-level tool permission matrix.
     /// Returns the full tool/action matrix with the project-level enabled/disabled status.
+    /// Includes tools without declared actions, marked with hasDeclaredActions=false.
     /// No being-specific info — project permissions are unified.
     /// </summary>
     private void GetProjectToolPermissions(ProjectSpace project)
     {
         var allActions = GetAllDeclaredActionsFromAnyBeing();
+        var allToolNames = GetAllToolNamesFromAnyBeing();
         var permissions = project.ToolActionPermissions;
         var currentLanguage = Config.Instance.Data.Language;
         var matrix = new List<object>();
 
-        foreach (var kvp in allActions)
+        foreach (string toolName in allToolNames)
         {
-            string toolName = kvp.Key;
-            string[] actions = kvp.Value;
             string displayName = GetToolDisplayName(toolName, currentLanguage);
-            var actionList = actions.Select(a => new
-            {
-                name = a,
-                enabled = permissions?.IsActionAllowed(toolName, a) ?? true
-            }).ToList();
+            bool hasDeclaredActions = allActions.ContainsKey(toolName);
 
-            matrix.Add(new
+            if (hasDeclaredActions)
             {
-                toolName,
-                displayName,
-                actions = actionList
-            });
+                string[] actions = allActions[toolName];
+                var actionList = actions.Select(a => new
+                {
+                    name = a,
+                    enabled = permissions?.IsActionAllowed(toolName, a) ?? true
+                }).ToList();
+
+                matrix.Add(new
+                {
+                    toolName,
+                    displayName,
+                    hasDeclaredActions = true,
+                    actions = actionList
+                });
+            }
+            else
+            {
+                matrix.Add(new
+                {
+                    toolName,
+                    displayName,
+                    hasDeclaredActions = false,
+                    actions = new List<object>()
+                });
+            }
         }
 
         RenderJson(new
@@ -433,6 +467,23 @@ public class ToolPermissionController : Controller
             }
         }
         return new Dictionary<string, string[]>();
+    }
+
+    /// <summary>
+    /// Gets all registered tool names by borrowing from any available being's tool manager.
+    /// Tool registrations are the same across all beings (they scan the same assemblies).
+    /// </summary>
+    private List<string> GetAllToolNamesFromAnyBeing()
+    {
+        var beings = _beingManager.GetAllBeings();
+        foreach (var being in beings)
+        {
+            if (being.ToolManager != null)
+            {
+                return being.ToolManager.GetToolNames();
+            }
+        }
+        return new List<string>();
     }
 
     /// <summary>

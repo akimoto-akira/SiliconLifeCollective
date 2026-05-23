@@ -451,6 +451,7 @@ _ => permissionType.ToString()
     public override string ToolAuthSaveSuccess => "Autorização de ferramentas guardada com sucesso";
     public override string ToolAuthSaveFailed => "Falha ao guardar";
     public override string ToolAuthDialogClose => "Fechar";
+    public override string ToolAuthNoDeclaredActions => "Não configurável";
     public override string WorkNotePageTitle => "Notas de trabalho";
     public override string WorkNotePageHeader => "Lista de notas de trabalho";
     public override string WorkNotePageDescription => "Gestão e consulta das notas de trabalho do Silicon Being";
