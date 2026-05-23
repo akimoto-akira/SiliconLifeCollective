@@ -206,6 +206,9 @@ public class ToolPermissionController : Controller
     /// </summary>
     private void GetTemplates()
     {
+        // Validate templates on access to catch drift early
+        ValidateTemplates();
+
         var templates = new[]
         {
             new
@@ -469,42 +472,84 @@ public class ToolPermissionController : Controller
 
     // ===== Template Helpers =====
 
-    private static Dictionary<string, string[]> GetChatOnlyDisabledActions()
+    /// <summary>
+    /// chat_only template: only allow chat's send and mark_read actions.
+    /// All other tools' all actions are disabled.
+    /// Dynamically generated from GetAllDeclaredActionsFromAnyBeing() so that
+    /// new tools are automatically covered without manual sync.
+    /// </summary>
+    private Dictionary<string, string[]> GetChatOnlyDisabledActions()
     {
-        // Everything except chat's send and mark_read actions is disabled
-        return new Dictionary<string, string[]>
+        var allActions = GetAllDeclaredActionsFromAnyBeing();
+        var result = new Dictionary<string, string[]>();
+
+        foreach (var kvp in allActions)
         {
-            ["task"] = new[] { "create", "list", "get", "complete", "fail", "cancel", "delete", "update_priority", "add_dependency", "submit_for_review", "stats" },
-            ["timer"] = new[] { "create_once", "create_recurring", "list", "get", "pause", "resume", "cancel", "delete", "stats", "tick" },
-            ["memory"] = new[] { "add", "query", "stats" },
-            ["disk"] = new[] { "read_file", "write_file", "list_directory", "delete_file", "create_directory", "exists", "get_file_info", "count_lines", "read_lines", "clear_file", "replace_lines", "replace_text", "replace_text_all", "list_drives", "search_files", "search_content" },
-            ["network"] = new[] { "GET", "POST" },
-            ["system"] = new[] { "list_processes", "find_process", "get_env", "get_env_all", "system_info", "resource_usage" },
-            ["knowledge"] = new[] { "add", "query", "update", "delete", "search", "get_path", "get_neighbors", "get_degree", "degree_distribution", "traverse", "has_cycle", "validate", "stats" },
-            ["work_note"] = new[] { "create", "read", "update", "delete", "list", "directory", "search" },
-            ["dynamic_compile"] = new[] { "compile", "save", "self_replace", "activate", "preview_saved", "clear_saved" },
-            ["calendar"] = new[] { "now", "format", "add_days", "diff", "list_calendars", "get_components", "get_now_components", "convert" },
-            ["webview_browser"] = new[] { "open", "close", "navigate", "click", "input", "scroll", "execute_script", "get_page_text", "get_screenshot", "wait_for_element", "get_element_info", "upload_file", "get_browser_status", "set_timeout", "clear_session" },
-            ["log"] = new[] { "query_operations", "query_tool_calls", "query_conversations", "export", "get_system_info" },
-            ["project_task"] = new[] { "create", "list", "get", "update", "assign", "remove_assignee", "start", "complete", "fail", "cancel", "delete", "stats" },
-            ["project_work_note"] = new[] { "create", "read", "update", "delete", "list", "directory", "search" }
-        };
+            string toolName = kvp.Key;
+            string[] actions = kvp.Value;
+
+            if (toolName == "chat")
+            {
+                // Keep send and mark_read, disable any other chat actions (future-proof)
+                var disabled = actions.Where(a => a != "send" && a != "mark_read").ToArray();
+                if (disabled.Length > 0)
+                    result[toolName] = disabled;
+            }
+            else
+            {
+                // Disable all actions for every other tool
+                result[toolName] = actions;
+            }
+        }
+
+        return result;
     }
 
-    private static Dictionary<string, string[]> GetTaskExecutionDisabledActions()
+    /// <summary>
+    /// task_execution template: disable dangerous actions but allow most tools.
+    /// Dangerous action rules (tool → set of disabled actions):
+    ///   disk: write_file, delete_file, clear_file, replace_lines, replace_text, replace_text_all
+    ///   network: POST
+    ///   system: list_processes, find_process, get_env_all, resource_usage
+    ///   dynamic_compile: save, self_replace, activate, clear_saved
+    ///   webview_browser: execute_script, upload_file
+    /// All other tools/actions are allowed.
+    /// Dynamically generated from GetAllDeclaredActionsFromAnyBeing() so that
+    /// new tools default to allowed (safe) unless explicitly added below.
+    /// </summary>
+    private Dictionary<string, string[]> GetTaskExecutionDisabledActions()
     {
-        // Deny dangerous file/disk/network operations, but allow task, chat, memory, etc.
-        return new Dictionary<string, string[]>
+        var allActions = GetAllDeclaredActionsFromAnyBeing();
+        var result = new Dictionary<string, string[]>();
+
+        // Define dangerous action rules: tool name → actions to disable
+        var dangerousActions = new Dictionary<string, HashSet<string>>
         {
-            ["disk"] = new[] { "write_file", "delete_file", "clear_file", "replace_lines", "replace_text", "replace_text_all" },
-            ["network"] = new[] { "POST" },
-            ["system"] = new[] { "list_processes", "find_process", "get_env_all", "resource_usage" },
-            ["dynamic_compile"] = new[] { "save", "self_replace", "activate", "clear_saved" },
-            ["webview_browser"] = new[] { "execute_script", "upload_file" }
+            ["disk"] = new HashSet<string> { "write_file", "delete_file", "clear_file", "replace_lines", "replace_text", "replace_text_all" },
+            ["network"] = new HashSet<string> { "POST" },
+            ["system"] = new HashSet<string> { "list_processes", "find_process", "get_env_all", "resource_usage" },
+            ["dynamic_compile"] = new HashSet<string> { "save", "self_replace", "activate", "clear_saved" },
+            ["webview_browser"] = new HashSet<string> { "execute_script", "upload_file" }
         };
+
+        foreach (var kvp in allActions)
+        {
+            string toolName = kvp.Key;
+            string[] actions = kvp.Value;
+
+            if (dangerousActions.TryGetValue(toolName, out var dangerous))
+            {
+                var disabled = actions.Where(a => dangerous.Contains(a)).ToArray();
+                if (disabled.Length > 0)
+                    result[toolName] = disabled;
+            }
+            // Tools not in dangerousActions are fully allowed (no entries = all allowed)
+        }
+
+        return result;
     }
 
-    private static ToolActionPermissionConfig GetConfigFromTemplateId(string? templateId)
+    private ToolActionPermissionConfig GetConfigFromTemplateId(string? templateId)
     {
         var config = new ToolActionPermissionConfig();
         var disabledMap = templateId switch
@@ -524,6 +569,57 @@ public class ToolPermissionController : Controller
         }
 
         return config;
+    }
+
+    /// <summary>
+    /// Validates that template disabled-actions reference real tool and action names.
+    /// Logs warnings for any mismatches. Called on first template access to catch
+    /// drift between templates and ToolActionAttribute declarations early.
+    /// </summary>
+    private void ValidateTemplates()
+    {
+        try
+        {
+            var allActions = GetAllDeclaredActionsFromAnyBeing();
+
+            // Validate chat_only template
+            var chatOnly = GetChatOnlyDisabledActions();
+            ValidateTemplateActions("chat_only", chatOnly, allActions);
+
+            // Validate task_execution template
+            var taskExec = GetTaskExecutionDisabledActions();
+            ValidateTemplateActions("task_execution", taskExec, allActions);
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(null, "Template validation failed: {0}", ex.Message);
+        }
+    }
+
+    private void ValidateTemplateActions(
+        string templateId,
+        Dictionary<string, string[]> templateActions,
+        Dictionary<string, string[]> allDeclared)
+    {
+        foreach (var kvp in templateActions)
+        {
+            string toolName = kvp.Key;
+
+            if (!allDeclared.ContainsKey(toolName))
+            {
+                _logger.Warn(null, "Template '{0}' references unknown tool '{1}'", templateId, toolName);
+                continue;
+            }
+
+            var declared = new HashSet<string>(allDeclared[toolName]);
+            foreach (var action in kvp.Value)
+            {
+                if (!declared.Contains(action))
+                {
+                    _logger.Warn(null, "Template '{0}' references unknown action '{1}' on tool '{2}'", templateId, action, toolName);
+                }
+            }
+        }
     }
 
     // ===== Request Models =====

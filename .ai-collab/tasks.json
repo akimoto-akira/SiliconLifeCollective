@@ -125,7 +125,7 @@
       "createdAt": "2026-05-23T11:08:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "catpaw",
-      "relatedCommit": null,
+      "relatedCommit": "9c3c64e",
       "completedAt": "2026-05-23T11:30:00+08:00"
     },
     {
@@ -135,12 +135,12 @@
       "title": "修复权限模板定义与ToolActionAttribute声明不一致",
       "description": "ToolPermissionController中的GetChatOnlyDisabledActions()/GetTaskExecutionDisabledActions()硬编码的action列表与各Tool类[ToolAction]声明已严重漂移，导致模板应用后部分工具权限配置错误。\n\n已确认的不一致：\n1) webview_browser命名不一致：模板写webview_browser，Tool注册名为web_view_browser，chat_only模板对此工具完全无效\n2) memory缺recent：Attribute声明add/recent/query/stats，模板只列add/query/stats\n3) 7个有ToolAction的工具模板完全没覆盖：config、curator、database、hot_reload、execute_code、permission、token_audit、project、project_work——选chat_only这些工具反而全部放行\n\n修法：\n1) 将GetChatOnlyDisabledActions/GetTaskExecutionDisabledActions改为从GetAllDeclaredActions()动态生成，不再硬编码\n2) chat_only模板：保留chat的send/mark_read，禁用其他所有工具的所有action\n3) task_execution模板：禁用危险action（disk写操作、network.POST、system敏感操作、dynamic_compile危险操作、webview_browser危险操作），其他保留\n4) 删除webview_browser硬编码条目，改用注册名web_view_browser\n5) 启动时加校验：如果模板引用的tool名不在GetAllDeclaredActions()中，log warning\n6) 确保新增工具时模板自动覆盖，无需手动同步",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-23T11:08:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null,
+      "assignedTo": "catpaw",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-23T11:45:00+08:00"
     },
     {
       "id": "task-326",
@@ -173,7 +173,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-325",
       "task-326",
       "task-327"
     ],
@@ -186,7 +185,8 @@
       "task-320",
       "task-322",
       "task-323",
-      "task-324"
+      "task-324",
+      "task-325"
     ],
     "cancelled": [
       "task-321"
