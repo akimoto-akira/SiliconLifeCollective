@@ -111,7 +111,7 @@
       "createdAt": "2026-05-22T21:35:00+08:00",
       "createdBy": "catpaw",
       "assignedTo": "catpaw",
-      "relatedCommit": null,
+      "relatedCommit": "6f4e465",
       "completedAt": "2026-05-22T22:20:00+08:00"
     },
     {
@@ -121,12 +121,12 @@
       "title": "修复ExecuteTool运行时权限校验绕过项目级限制",
       "description": "安全漏洞：ToolManager.ExecuteTool()的Action级运行时校验只检查being.ToolActionPermissions（全局权限），完全未考虑项目级叠加。ContextManager构建AI请求时已用GetEffectivePermissions合并全局+项目级权限过滤tool definitions，但ExecuteTool只查全局，项目级限制可被绕过。\n\n复现路径：1) 在项目级禁用disk.write_file 2) AI从旧上下文或缓存中拿到未过滤的schema 3) 调用disk.write_file 4) ExecuteTool只查全局权限（write_file未被全局禁用）5) 请求通过，项目级限制形同虚设\n\n修法：\n1) ExecuteTool签名增加可选参数Guid? projectId = null\n2) 当projectId有值时，调用ToolActionPermissionHelper.GetEffectivePermissions(being, projectId)获取合并后的权限\n3) 用合并后的权限做运行时校验\n4) ContextManager调用ExecuteTool时传入当前项目上下文的projectId\n5) 确保无项目上下文时行为不变（向后兼容）\n\n涉及文件：ToolManager.cs(ExecuteTool)、ContextManager.cs(所有调用ExecuteTool的位置)",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-23T11:08:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null,
+      "assignedTo": "catpaw",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-23T11:30:00+08:00"
     },
     {
       "id": "task-325",
@@ -173,7 +173,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-324",
       "task-325",
       "task-326",
       "task-327"
@@ -186,7 +185,8 @@
       "task-319",
       "task-320",
       "task-322",
-      "task-323"
+      "task-323",
+      "task-324"
     ],
     "cancelled": [
       "task-321"

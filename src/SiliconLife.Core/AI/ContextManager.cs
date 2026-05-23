@@ -589,8 +589,10 @@ public class ContextManager
     /// <summary>
     /// Executes tool calls and returns tool result messages.
     /// Each tool result is added to the context messages.
+    /// Passes projectId to ToolManager.ExecuteTool so that project-level
+    /// permission restrictions are enforced at runtime.
     /// </summary>
-    private List<ChatMessage> ExecuteToolCalls(List<ToolCall> toolCalls)
+    private List<ChatMessage> ExecuteToolCalls(List<ToolCall> toolCalls, Guid? projectId = null)
     {
         _logger.Info(_being.Id, "Executing {0} tool calls for being {1}", toolCalls.Count, _being.Name);
 
@@ -602,7 +604,7 @@ public class ContextManager
             ToolResult result;
             if (toolManager != null)
             {
-                result = toolManager.ExecuteTool(toolCall.Name, toolCall.Arguments, being: _being);
+                result = toolManager.ExecuteTool(toolCall.Name, toolCall.Arguments, being: _being, projectId: projectId);
             }
             else
             {
@@ -674,7 +676,7 @@ public class ContextManager
         if (response.Success && response.HasToolCalls)
         {
             _logger.Debug(_being.Id, "AI returned tool calls, persisting intermediate round");
-            PersistAndDeliverToolCallRound(response);
+            PersistAndDeliverToolCallRound(response, projectId);
         }
         else if (response.Success)
         {
@@ -707,7 +709,7 @@ AIRequest request = BuildRequest(scenarioContext, scenario: scenario, projectId:
             if (response.Success && response.HasToolCalls)
             {
                 _logger.Debug(_being.Id, "AI returned tool calls (async), persisting intermediate round");
-                PersistAndDeliverToolCallRound(response);
+                PersistAndDeliverToolCallRound(response, projectId);
             }
             else if (response.Success)
             {
@@ -810,8 +812,8 @@ AIRequest request = BuildRequest(scenarioContext, scenario: scenario, projectId:
             {
                 return AIResponse.Failed("AI client requires streaming but ChatStreamAsync is not implemented");
             }
-            _logger.Warn(_being.Id, "Streaming not implemented, falling back to non-streaming mode");
-            return await GetResponseAsync(scenarioContext, scenario);
+_logger.Warn(_being.Id, "Streaming not implemented, falling back to non-streaming mode");
+return await GetResponseAsync(scenarioContext, scenario, projectId);
         }
 
         // If the token was cancelled (OllamaClient may have swallowed OperationCanceledException
@@ -824,8 +826,8 @@ AIRequest request = BuildRequest(scenarioContext, scenario: scenario, projectId:
             {
                 return AIResponse.Failed("AI client requires streaming but stream ended without final chunk");
             }
-            _logger.Warn(_being.Id, "Stream ended without final chunk, falling back to non-streaming mode");
-            return await GetResponseAsync(scenarioContext, scenario);
+_logger.Warn(_being.Id, "Stream ended without final chunk, falling back to non-streaming mode");
+return await GetResponseAsync(scenarioContext, scenario, projectId);
         }
 
         StreamChunk endChunk = StreamChunk.End(streamId, promptTokens: promptTokens, completionTokens: completionTokens, totalTokens: totalTokens);
@@ -852,7 +854,7 @@ AIRequest request = BuildRequest(scenarioContext, scenario: scenario, projectId:
 
         if (response.Success && response.HasToolCalls)
         {
-            PersistAndDeliverToolCallRound(response);
+            PersistAndDeliverToolCallRound(response, projectId);
         }
         else if (response.Success)
         {
@@ -1772,7 +1774,7 @@ AIRequest request = BuildRequest(scenarioContext, scenario: scenario, projectId:
     /// Executes tool calls from an AI response and persists all intermediate messages
     /// (assistant with tool_calls + tool results) to chat history, then yields the time slice.
     /// </summary>
-    private List<ChatMessage>? PersistToolCallRound(AIResponse response)
+    private List<ChatMessage>? PersistToolCallRound(AIResponse response, Guid? projectId = null)
     {
         ChatMessage assistantMsg = new(_being.Id, _session?.Id ?? Guid.Empty, response.Content)
         {
@@ -1785,14 +1787,14 @@ AIRequest request = BuildRequest(scenarioContext, scenario: scenario, projectId:
         };
         _messages.Add(assistantMsg);
 
-        return ExecuteToolCalls(response.ToolCalls!);
+        return ExecuteToolCalls(response.ToolCalls!, projectId);
     }
 
     /// <summary>
     /// Persists the tool call round (assistant + tool results) to storage
     /// and delivers SSE events for real-time frontend display.
     /// </summary>
-    private void PersistAndDeliverToolCallRound(AIResponse response)
+    private void PersistAndDeliverToolCallRound(AIResponse response, Guid? projectId = null)
     {
         ChatMessage assistantMsg = new(_being.Id, _session?.Id ?? Guid.Empty, response.Content)
         {
@@ -1805,7 +1807,7 @@ AIRequest request = BuildRequest(scenarioContext, scenario: scenario, projectId:
         };
         _messages.Add(assistantMsg);
 
-        List<ChatMessage> toolResultMessages = ExecuteToolCalls(response.ToolCalls!);
+        List<ChatMessage> toolResultMessages = ExecuteToolCalls(response.ToolCalls!, projectId);
 
         if (_timerForContext != null)
         {

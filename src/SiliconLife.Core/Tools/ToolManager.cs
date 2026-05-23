@@ -493,12 +493,16 @@ public class ToolManager
     /// Executes a tool by name with the given parameters.
     /// Performs Action-level permission check if the tool has ToolActionAttribute
     /// and the being has a ToolActionPermissionConfig.
+    /// When projectId is provided, merges global and project-level permissions
+    /// for runtime validation, preventing project-level restrictions from being
+    /// bypassed via stale/cached tool schemas.
     /// </summary>
     /// <param name="name">The tool name</param>
     /// <param name="parameters">The parameters for the tool</param>
     /// <param name="being">The silicon being instance (callerId will be obtained from being.Id)</param>
+    /// <param name="projectId">Optional project ID for project-level permission filtering</param>
     /// <returns>The tool execution result</returns>
-    public ToolResult ExecuteTool(string name, Dictionary<string, object>? parameters = null, SiliconBeingBase? being = null)
+    public ToolResult ExecuteTool(string name, Dictionary<string, object>? parameters = null, SiliconBeingBase? being = null, Guid? projectId = null)
     {
         Guid callerId = being?.Id ?? Guid.Empty;
         
@@ -514,17 +518,22 @@ public class ToolManager
             return ToolResult.Failed($"Tool '{name}' not found");
         }
 
-        // Action-level permission check
+        // Action-level permission check using effective (merged) permissions
         var convertedParams = ConvertParameters(parameters ?? new Dictionary<string, object>());
-        if (_toolActions.ContainsKey(name) && being?.ToolActionPermissions != null)
+        if (_toolActions.ContainsKey(name) && being != null)
         {
-            if (convertedParams.TryGetValue("action", out var actionObj) && actionObj != null)
+            // Merge global + project-level permissions when projectId is provided
+            var effectivePermissions = ToolActionPermissionHelper.GetEffectivePermissions(being, projectId);
+            if (effectivePermissions.GetRestrictedToolNames().Count > 0)
             {
-                string actionName = actionObj.ToString() ?? "";
-                if (!string.IsNullOrEmpty(actionName) && !IsActionAllowed(name, actionName, being.ToolActionPermissions))
+                if (convertedParams.TryGetValue("action", out var actionObj) && actionObj != null)
                 {
-                    _logger.Warn(callerId, $"Action '{actionName}' on tool '{name}' denied for being {being.Name}");
-                    return ToolResult.Failed($"Action '{actionName}' on tool '{name}' is not allowed for this being");
+                    string actionName = actionObj.ToString() ?? "";
+                    if (!string.IsNullOrEmpty(actionName) && !IsActionAllowed(name, actionName, effectivePermissions))
+                    {
+                        _logger.Warn(callerId, $"Action '{actionName}' on tool '{name}' denied for being {being.Name} (projectId={projectId})");
+                        return ToolResult.Failed($"Action '{actionName}' on tool '{name}' is not allowed for this being");
+                    }
                 }
             }
         }
