@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-24T10:08:00+08:00",
+  "lastUpdated": "2026-05-24T22:15:00+08:00",
   "tasks": [
     {
       "id": "task-341",
@@ -51,23 +51,24 @@
       "title": "去除DefaultSiliconBeing向下转型，直接调用基类SaveState()",
       "description": "BeingController.cs:385 和 ToolPermissionController.cs:197/304 中使用 `being is DefaultSiliconBeing defaultBeing` 向下转型，仅为调用SaveState()。但SaveState()是SiliconBeingBase的virtual方法，所有子类都可调用，无需转型。\n\n修法：\n1) BeingController.cs:385-387: 将 `if (being is DefaultSiliconBeing defaultBeing) { defaultBeing.SaveState(); }` 改为 `being.SaveState();`\n2) ToolPermissionController.cs:197-199: 同上\n3) ToolPermissionController.cs:304-306: 同上\n4) 删除不再需要的using引用（如有）\n\n注意：SiliconBeingBase.SaveState()已有Storage==null的null check保护，安全可直接调用。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-24T10:08:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null,
+      "assignedTo": "catpaw",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-24T22:15:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [
       "task-341",
       "task-342",
-      "task-343",
-      "task-344"
+      "task-343"
     ],
     "inProgress": [],
-    "completed": [],
+    "completed": [
+      "task-344"
+    ],
     "cancelled": []
   },
   "metadata": {

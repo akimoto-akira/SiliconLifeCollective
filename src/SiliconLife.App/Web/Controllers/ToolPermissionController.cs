@@ -12,7 +12,6 @@
 using System.Text.Json;
 using SiliconLife.Collective;
 using SiliconLife.Common.Localization;
-using SiliconLife.Common.SiliconBeing;
 
 namespace SiliconLife.App.Web.Controllers;
 
@@ -194,10 +193,7 @@ public class ToolPermissionController : Controller
             being.ToolActionPermissions = config;
 
             // Persist to state
-            if (being is DefaultSiliconBeing defaultBeing)
-            {
-                defaultBeing.SaveState();
-            }
+            being.SaveState();
 
             _logger.Info(beingId, "Updated tool action permissions for being {0}", being.Name);
             RenderJson(new { success = true, ignoredActions });
@@ -301,10 +297,7 @@ public class ToolPermissionController : Controller
                 }
 
                 being.ToolActionPermissions = config;
-                if (being is DefaultSiliconBeing defaultBeing)
-                {
-                    defaultBeing.SaveState();
-                }
+                being.SaveState();
                 successCount++;
             }
 
