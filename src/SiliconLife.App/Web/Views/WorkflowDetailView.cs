@@ -295,8 +295,8 @@ public class WorkflowDetailView : ViewBase
                 .Op(() => "+", () => Js.Id(() => "role").Prop(() => "roleName"))
                 .Op(() => "+", () => Js.Str(() => "' data-being-id='"))
                 .Op(() => "+", () => Js.Id(() => "b").Prop(() => "id"))
-                .Op(() => "+", () => Js.Str(() => $"' title='{loc.WorkflowRemoveFromRoleButton}'>×</span></span>")))
-                .Call(() => "join", () => Js.Str(() => "")))))
+                .Op(() => "+", () => Js.Str(() => $"' title='{loc.WorkflowRemoveFromRoleButton}'>×</span></span>"))))
+                .Call(() => "join", () => Js.Str(() => ""))))
             .Add(() => Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () =>
                 Js.Str(() => "<div class='role-header'><span class='role-name'>")
                 .Op(() => "+", () => Js.Id(() => "role").Prop(() => "roleName"))
