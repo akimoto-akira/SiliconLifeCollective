@@ -60,7 +60,7 @@
       "relatedTask": "task-358"
     }
   ],
-  "commitHash": null,
+  "commitHash": "baad5df",
   "tasksCompleted": ["task-358"],
   "tasksCreated": [],
   "note": "代码文件位于 .gitignore 忽略目录 src/TravelCodeWikiWithAI/ 中，无法通过 git commit 追踪代码变更。编译验证通过（0错误0警告）。relatedCommit 将留为 null。"

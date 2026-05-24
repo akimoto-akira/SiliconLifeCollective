@@ -12,5 +12,6 @@
     "src/TravelCodeWikiWithAI/Data/GeoLocation.cs",
     "src/TravelCodeWikiWithAI/WikiPublicationTick.cs",
     "src/TravelCodeWikiWithAI/TravelCodeWikiWithAIPlugin.cs"
-  ]
+  ],
+  "commitHash": "baad5df"
 }
