@@ -8,5 +8,6 @@
   "modifiedFiles": [
     "src/TravelCodeWikiWithAI/GeoDataTool.cs"
   ],
-  "changeRecord": "changes/catpaw-20260525-008.json"
+  "changeRecord": "changes/catpaw-20260525-008.json",
+  "commitHash": "873ef23"
 }

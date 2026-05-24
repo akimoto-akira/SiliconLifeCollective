@@ -1,0 +1,32 @@
+{
+  "sessionId": "catpaw-20260525-009",
+  "actorId": "catpaw",
+  "timestamp": "2026-05-25T07:30:00+08:00",
+  "task": {
+    "id": "task-351",
+    "title": "新增GeoContentTool（MediaWikiWord内容读写）",
+    "status": "completed"
+  },
+  "changes": {
+    "files_modified": [
+      {
+        "path": "src/TravelCodeWikiWithAI/GeoContentTool.cs",
+        "intent": "新增GeoContentTool工具，封装MediaWikiWord内容读写能力，4个动作：list_sections/read_section/write_section/preview_wiki",
+        "details": [
+          "list_sections — 通过反射扫描GeoLocation实体的WordBase属性，列出所有内容字段及状态（空/已填充/字数/是否含语言数据）",
+          "read_section — 读取指定内容字段，递归描述MediaWikiWord树结构（Section/Language/Bold/Link/List等节点类型）",
+          "write_section — 从结构化JSON描述构建MediaWikiWord对象树并写入实体属性，支持NoLanguage/Language/Section/Bold/Link/ExternalLink/NoSortList/SortList/NewLine/Geo/Map/Table/TemplateInclude/SystemMessage/IgnoreLanguage",
+          "preview_wiki — 调用BuildDocument预览实体的MediaWiki标记输出，支持按语言代码筛选，自动截断过长页面",
+          "自动注册：GeoContentTool在同一程序集中，RegisterToolAssembly已覆盖",
+          "EstimateWordCount — 递归估算WordBase树的内容量（用于list_sections状态展示）",
+          "DescribeWordTree — 递归描述MediaWikiWord树为嵌套字典（用于read_section结构返回）",
+          "BuildWordTree — 从JSON字典构建MediaWikiWord实例（用于write_section内容写入）"
+        ]
+      }
+    ],
+    "verification": {
+      "build_result": "0 errors, build succeeded",
+      "projects_built": ["TravelCodeWikiWithAI"]
+    }
+  }
+}

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-25T06:00:00+08:00",
+  "lastUpdated": "2026-05-25T07:30:00+08:00",
   "tasks": [
     {
       "id": "task-346",
@@ -79,9 +79,12 @@
       "title": "新增GeoContentTool（MediaWikiWord内容读写）",
       "description": "封装 MediaWikiWord 内容的读写能力，使硅基人能为地理实体编写结构化富文本文章。\n\n动作设计：\n1) list_sections — 列出实体的所有内容字段及其状态（空/已填充/字数）\n2) read_section — 读取实体的某个内容字段（返回 MediaWikiWord 树的结构描述）\n3) write_section — 向实体的某个内容字段写入 MediaWikiWord 富文本对象树\n4) preview_wiki — 预览实体的 MediaWiki 标记输出（调用 BuildDocument）\n\n关键设计：write_section 的输入是结构化的 MediaWikiWord 描述（Section/Language/Bold/Link/List等），不是纯文本。\n\n对应7步流程：步骤5（AI编写文章）",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-25T00:10:00+08:00",
-      "createdBy": "qoder"
+      "createdBy": "qoder",
+      "assignedTo": "catpaw",
+      "relatedCommit": null,
+      "completedAt": "2026-05-25T07:30:00+08:00"
     },
     {
       "id": "task-352",
@@ -94,7 +97,7 @@
       "createdAt": "2026-05-25T00:10:00+08:00",
       "createdBy": "qoder",
       "assignedTo": "catpaw",
-      "relatedCommit": "00e48ab",
+      "relatedCommit": "873ef23",
       "completedAt": "2026-05-25T06:30:00+08:00"
     },
     {
@@ -254,7 +257,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-351",
       "task-355",
       "task-356",
       "task-357",
@@ -262,6 +264,7 @@
     ],
     "inProgress": [],
     "completed": [
+      "task-351",
       "task-352",
       "task-359",
       "task-354",
