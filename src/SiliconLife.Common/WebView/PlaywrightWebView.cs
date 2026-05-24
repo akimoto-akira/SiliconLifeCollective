@@ -13,7 +13,6 @@
 
 using Microsoft.Playwright;
 using SiliconLife.Collective;
-using SiliconLife.Common.SiliconBeing;
 using System.Text.Json;
 
 namespace SiliconLife.Common.WebView;
@@ -21,18 +20,23 @@ namespace SiliconLife.Common.WebView;
 /// <summary>
 /// Playwright cross-platform WebView unified implementation.
 /// All platforms use the same code.
+/// Browser state is persisted via IStorage with a temp-file bridge for Playwright compatibility.
 /// </summary>
 public class PlaywrightWebView : IWebViewCore
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<PlaywrightWebView>();
     
+    private const string BrowserStateKey = "browser_state.json";
+    
     private IBrowser? _browser;
     private IPage? _page;
-    private readonly DefaultSiliconBeing _being;
+    private IBrowserContext? _context;
+    private readonly SiliconBeingBase _being;
     private int _timeoutSeconds = 30;
     private DateTime _lastOperationTime;
+    private string? _browserStateTempFile;
     
-    public PlaywrightWebView(DefaultSiliconBeing being)
+    public PlaywrightWebView(SiliconBeingBase being)
     {
         _being = being ?? throw new ArgumentNullException(nameof(being));
         _lastOperationTime = DateTime.UtcNow;
@@ -286,10 +290,18 @@ public class PlaywrightWebView : IWebViewCore
     {
         _logger.Info(_being.Id, "WebView: Clearing session");
         
+        await PersistBrowserStateAsync();
+        
         if (_page != null)
         {
             await _page.CloseAsync();
             _page = null;
+        }
+        
+        if (_context != null)
+        {
+            await _context.CloseAsync();
+            _context = null;
         }
         
         if (_browser != null)
@@ -297,6 +309,8 @@ public class PlaywrightWebView : IWebViewCore
             await _browser.CloseAsync();
             _browser = null;
         }
+        
+        CleanupTempFile();
     }
     
     public BrowserStatus GetStatus()
@@ -319,13 +333,12 @@ public class PlaywrightWebView : IWebViewCore
         {
             _logger.Info(_being.Id, "WebView: Initializing browser");
             
-            // Auto-install browsers on first run if needed
             await InstallBrowsersIfNeeded();
             
             var playwright = await Playwright.CreateAsync();
             _browser = await playwright.Chromium.LaunchAsync(new()
             {
-                Headless = true, // Headless mode, not visible to user
+                Headless = true,
                 Args = new[] { 
                     "--disable-gpu",
                     "--no-sandbox",
@@ -338,21 +351,20 @@ public class PlaywrightWebView : IWebViewCore
                 IgnoreHTTPSErrors = true
             };
             
-            // Only load storage state if file exists
-            var statePath = GetSessionStoragePath();
-            if (!string.IsNullOrEmpty(statePath) && File.Exists(statePath))
+            string? stateTempFile = PrepareBrowserStateFile();
+            if (!string.IsNullOrEmpty(stateTempFile))
             {
-                contextOptions.StorageStatePath = statePath;
-                _logger.Debug(_being.Id, "WebView: Loading browser state from {0}", statePath);
+                contextOptions.StorageStatePath = stateTempFile;
+                _logger.Debug(_being.Id, "WebView: Loading browser state from IStorage bridge");
             }
             else
             {
                 _logger.Debug(_being.Id, "WebView: No existing browser state, starting fresh");
             }
             
-            var context = await _browser.NewContextAsync(contextOptions);
+            _context = await _browser.NewContextAsync(contextOptions);
             
-            _page = await context.NewPageAsync();
+            _page = await _context.NewPageAsync();
             _page.SetDefaultTimeout(_timeoutSeconds * 1000);
             
             _logger.Info(_being.Id, "WebView: Browser initialized successfully");
@@ -433,24 +445,78 @@ public class PlaywrightWebView : IWebViewCore
     }
 
     
-    private string? GetSessionStoragePath()
+    private string? PrepareBrowserStateFile()
     {
         try
         {
-            // Use the being's directory directly
-            if (string.IsNullOrEmpty(_being.BeingDirectory))
+            if (_being.Storage == null)
             {
-                _logger.Warn(_being.Id, "WebView: Being directory is not set");
+                _logger.Warn(_being.Id, "WebView: Being storage is not available");
                 return null;
             }
+
+            if (!_being.Storage.Exists(BrowserStateKey))
+            {
+                return null;
+            }
+
+            var stateData = _being.Storage.Read<string>(BrowserStateKey);
+            if (stateData == null || stateData.Length == 0)
+            {
+                return null;
+            }
+
+            string tempDir = Path.Combine(Path.GetTempPath(), "SiliconLife_WebView", _being.Id.ToString());
+            Directory.CreateDirectory(tempDir);
+            _browserStateTempFile = Path.Combine(tempDir, BrowserStateKey);
+            File.WriteAllText(_browserStateTempFile, stateData[0]);
             
-            // Store browser state in the being's directory
-            return Path.Combine(_being.BeingDirectory, "browser_state.json");
+            _logger.Debug(_being.Id, "WebView: Exported browser state from IStorage to temp file");
+            return _browserStateTempFile;
         }
         catch (Exception ex)
         {
-            _logger.Warn(_being.Id, "WebView: Failed to get session storage path: {0}", ex.Message);
+            _logger.Warn(_being.Id, "WebView: Failed to prepare browser state file: {0}", ex.Message);
             return null;
+        }
+    }
+    
+    private async Task PersistBrowserStateAsync()
+    {
+        try
+        {
+            if (_being.Storage == null || string.IsNullOrEmpty(_browserStateTempFile) || !File.Exists(_browserStateTempFile))
+            {
+                return;
+            }
+
+            if (_context != null)
+            {
+                var stateJson = await _context.StorageStateAsync();
+                string serialized = JsonSerializer.Serialize(stateJson);
+                _being.Storage.Write(BrowserStateKey, serialized);
+                _logger.Debug(_being.Id, "WebView: Persisted browser state from Playwright to IStorage");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(_being.Id, "WebView: Failed to persist browser state: {0}", ex.Message);
+        }
+    }
+    
+    private void CleanupTempFile()
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(_browserStateTempFile) && File.Exists(_browserStateTempFile))
+            {
+                File.Delete(_browserStateTempFile);
+                _browserStateTempFile = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Debug(_being.Id, "WebView: Failed to cleanup temp file: {0}", ex.Message);
         }
     }
     

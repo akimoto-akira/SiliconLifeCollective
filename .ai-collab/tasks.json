@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-24T18:00:00+08:00",
+  "lastUpdated": "2026-05-24T19:00:00+08:00",
   "tasks": [
     {
       "id": "task-331",
@@ -92,10 +92,11 @@
       "title": "PlaywrightWebView 直接操作文件系统读写浏览器状态",
       "description": "全域扫描发现：PlaywrightWebView.GetSessionStoragePath() 使用 Path.Combine(_being.BeingDirectory, \"browser_state.json\") 构造路径，并使用 File.Exists 检查文件，直接操作文件系统绕过 IStorage。在 Fast 项目中 BeingDirectory 是逻辑路径（如 \"SiliconManager/{guid}\"），不是文件系统路径，导致 Playwright 无法正确读写浏览器状态。修复方案：需设计 IStorage ↔ 临时文件的桥接机制——从 IStorage 读取 browser_state.json 内容导出为临时文件供 Playwright.StorageStatePath 使用，会话结束时将更新后的文件写回 IStorage。",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-24T18:00:00+08:00",
       "createdBy": "trae-glm5",
-      "assignedTo": "trae-glm5"
+      "assignedTo": "trae-glm5",
+      "completedAt": "2026-05-24T19:00:00+08:00"
     },
     {
       "id": "task-338",
@@ -128,16 +129,17 @@
       "title": "WebViewBrowserTool 强制类型转换为 DefaultSiliconBeing 违反抽象原则",
       "description": "全域扫描发现：WebViewBrowserTool.Execute 方法中使用 being is not DefaultSiliconBeing defaultBeing 强制类型转换，公共层代码直接依赖 DefaultSiliconBeing 具体类型而非 SiliconBeingBase 基类或接口。这违反了公共层不应依赖具体实现的原则，且 SiliconBeingBase 已有 GetWebView() 方法可返回 IWebViewCore。修复方案：移除 DefaultSiliconBeing 类型转换，改为通过 SiliconBeingBase.GetWebView() 方法访问 WebView，使 WebViewBrowserTool 与具体硅基人类型解耦。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-24T18:00:00+08:00",
       "assignedTo": "trae-glm5",
-      "createdBy": "trae-glm5"
+      "createdBy": "trae-glm5",
+      "completedAt": "2026-05-24T19:00:00+08:00"
     }
   ],
   "taskIndex": {
-    "pending": ["task-337", "task-338", "task-339", "task-340"],
+    "pending": ["task-338", "task-339"],
     "inProgress": [],
-    "completed": ["task-331", "task-332", "task-333", "task-334", "task-335", "task-336"],
+    "completed": ["task-331", "task-332", "task-333", "task-334", "task-335", "task-336", "task-337", "task-340"],
     "cancelled": []
   },
   "metadata": {

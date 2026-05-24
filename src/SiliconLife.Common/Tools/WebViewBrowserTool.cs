@@ -12,7 +12,6 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
-using SiliconLife.Common.SiliconBeing;
 
 using SiliconLife.Common.Localization;
 
@@ -160,29 +159,23 @@ public class WebViewBrowserTool : ITool
                 return ToolResult.Failed($"Silicon being {callerId} not found");
             }
 
-            // Cast to DefaultSiliconBeing to access WebView
-            if (being is not DefaultSiliconBeing defaultBeing)
-            {
-                return ToolResult.Failed("WebView is only supported in DefaultSiliconBeing");
-            }
-
             return action switch
             {
-                "open" => ExecuteOpen(defaultBeing),
-                "close" => ExecuteClose(defaultBeing),
-                "navigate" => ExecuteNavigate(defaultBeing, parameters).Result,
-                "click" => ExecuteClick(defaultBeing, parameters).Result,
-                "input" => ExecuteInput(defaultBeing, parameters).Result,
-                "scroll" => ExecuteScroll(defaultBeing, parameters).Result,
-                "execute_script" => ExecuteScript(defaultBeing, parameters).Result,
-                "get_page_text" => ExecuteGetPageText(defaultBeing).Result,
-                "get_screenshot" => ExecuteGetScreenshot(defaultBeing, parameters).Result,
-                "wait_for_element" => ExecuteWaitForElement(defaultBeing, parameters).Result,
-                "get_element_info" => ExecuteGetElementInfo(defaultBeing, parameters).Result,
-                "upload_file" => ExecuteUploadFile(defaultBeing, parameters).Result,
-                "get_browser_status" => ExecuteGetBrowserStatus(defaultBeing),
-                "set_timeout" => ExecuteSetTimeout(defaultBeing, parameters),
-                "clear_session" => ExecuteClearSession(defaultBeing).Result,
+                "open" => ExecuteOpen(being),
+                "close" => ExecuteClose(being),
+                "navigate" => ExecuteNavigate(being, parameters).Result,
+                "click" => ExecuteClick(being, parameters).Result,
+                "input" => ExecuteInput(being, parameters).Result,
+                "scroll" => ExecuteScroll(being, parameters).Result,
+                "execute_script" => ExecuteScript(being, parameters).Result,
+                "get_page_text" => ExecuteGetPageText(being).Result,
+                "get_screenshot" => ExecuteGetScreenshot(being, parameters).Result,
+                "wait_for_element" => ExecuteWaitForElement(being, parameters).Result,
+                "get_element_info" => ExecuteGetElementInfo(being, parameters).Result,
+                "upload_file" => ExecuteUploadFile(being, parameters).Result,
+                "get_browser_status" => ExecuteGetBrowserStatus(being),
+                "set_timeout" => ExecuteSetTimeout(being, parameters),
+                "clear_session" => ExecuteClearSession(being).Result,
                 _ => ToolResult.Failed($"Unknown action: {action}")
             };
         }
@@ -192,19 +185,19 @@ public class WebViewBrowserTool : ITool
         }
     }
 
-    private ToolResult ExecuteOpen(DefaultSiliconBeing being)
+    private ToolResult ExecuteOpen(SiliconBeingBase being)
     {
         var webView = being.GetWebView();
         return ToolResult.Successful("Browser opened successfully");
     }
 
-    private ToolResult ExecuteClose(DefaultSiliconBeing being)
+    private ToolResult ExecuteClose(SiliconBeingBase being)
     {
         being.CloseWebView();
         return ToolResult.Successful("Browser closed successfully");
     }
 
-    private async Task<ToolResult> ExecuteNavigate(DefaultSiliconBeing being, Dictionary<string, object> parameters)
+    private async Task<ToolResult> ExecuteNavigate(SiliconBeingBase being, Dictionary<string, object> parameters)
     {
         if (!parameters.TryGetValue("url", out object? urlObj) || string.IsNullOrWhiteSpace(urlObj?.ToString()))
         {
@@ -218,7 +211,7 @@ public class WebViewBrowserTool : ITool
         return ToolResult.Successful($"Navigated to {url}");
     }
 
-    private async Task<ToolResult> ExecuteClick(DefaultSiliconBeing being, Dictionary<string, object> parameters)
+    private async Task<ToolResult> ExecuteClick(SiliconBeingBase being, Dictionary<string, object> parameters)
     {
         if (!parameters.TryGetValue("selector", out object? selectorObj) || string.IsNullOrWhiteSpace(selectorObj?.ToString()))
         {
@@ -232,7 +225,7 @@ public class WebViewBrowserTool : ITool
         return ToolResult.Successful($"Clicked element: {selector}");
     }
 
-    private async Task<ToolResult> ExecuteInput(DefaultSiliconBeing being, Dictionary<string, object> parameters)
+    private async Task<ToolResult> ExecuteInput(SiliconBeingBase being, Dictionary<string, object> parameters)
     {
         if (!parameters.TryGetValue("selector", out object? selectorObj) || string.IsNullOrWhiteSpace(selectorObj?.ToString()))
         {
@@ -252,7 +245,7 @@ public class WebViewBrowserTool : ITool
         return ToolResult.Successful($"Input text into element: {selector}");
     }
 
-    private async Task<ToolResult> ExecuteScroll(DefaultSiliconBeing being, Dictionary<string, object> parameters)
+    private async Task<ToolResult> ExecuteScroll(SiliconBeingBase being, Dictionary<string, object> parameters)
     {
         int x = parameters.TryGetValue("x", out var xObj) ? Convert.ToInt32(xObj) : 0;
         int y = parameters.TryGetValue("y", out var yObj) ? Convert.ToInt32(yObj) : 0;
@@ -263,7 +256,7 @@ public class WebViewBrowserTool : ITool
         return ToolResult.Successful($"Scrolled to ({x}, {y})");
     }
 
-    private async Task<ToolResult> ExecuteScript(DefaultSiliconBeing being, Dictionary<string, object> parameters)
+    private async Task<ToolResult> ExecuteScript(SiliconBeingBase being, Dictionary<string, object> parameters)
     {
         if (!parameters.TryGetValue("script", out object? scriptObj) || string.IsNullOrWhiteSpace(scriptObj?.ToString()))
         {
@@ -277,14 +270,14 @@ public class WebViewBrowserTool : ITool
         return ToolResult.Successful($"Script executed. Result: {result ?? "null"}");
     }
 
-    private async Task<ToolResult> ExecuteGetPageText(DefaultSiliconBeing being)
+    private async Task<ToolResult> ExecuteGetPageText(SiliconBeingBase being)
     {
         var webView = being.GetWebView();
         var text = await webView.GetPageTextAsync();
         return ToolResult.Successful(text);
     }
 
-    private async Task<ToolResult> ExecuteGetScreenshot(DefaultSiliconBeing being, Dictionary<string, object> parameters)
+    private async Task<ToolResult> ExecuteGetScreenshot(SiliconBeingBase being, Dictionary<string, object> parameters)
     {
         var options = new ScreenshotOptions
         {
@@ -324,7 +317,7 @@ public class WebViewBrowserTool : ITool
         return ToolResult.Successful($"Screenshot saved to {filepath} ({screenshot.Length} bytes)");
     }
 
-    private async Task<ToolResult> ExecuteWaitForElement(DefaultSiliconBeing being, Dictionary<string, object> parameters)
+    private async Task<ToolResult> ExecuteWaitForElement(SiliconBeingBase being, Dictionary<string, object> parameters)
     {
         if (!parameters.TryGetValue("selector", out object? selectorObj) || string.IsNullOrWhiteSpace(selectorObj?.ToString()))
         {
@@ -340,7 +333,7 @@ public class WebViewBrowserTool : ITool
         return ToolResult.Successful($"Element appeared: {selector}");
     }
 
-    private async Task<ToolResult> ExecuteGetElementInfo(DefaultSiliconBeing being, Dictionary<string, object> parameters)
+    private async Task<ToolResult> ExecuteGetElementInfo(SiliconBeingBase being, Dictionary<string, object> parameters)
     {
         if (!parameters.TryGetValue("selector", out object? selectorObj) || string.IsNullOrWhiteSpace(selectorObj?.ToString()))
         {
@@ -365,7 +358,7 @@ public class WebViewBrowserTool : ITool
         return ToolResult.Successful(result);
     }
 
-    private async Task<ToolResult> ExecuteUploadFile(DefaultSiliconBeing being, Dictionary<string, object> parameters)
+    private async Task<ToolResult> ExecuteUploadFile(SiliconBeingBase being, Dictionary<string, object> parameters)
     {
         if (!parameters.TryGetValue("selector", out object? selectorObj) || string.IsNullOrWhiteSpace(selectorObj?.ToString()))
         {
@@ -386,7 +379,7 @@ public class WebViewBrowserTool : ITool
         return ToolResult.Successful($"File uploaded: {filePath}");
     }
 
-    private ToolResult ExecuteGetBrowserStatus(DefaultSiliconBeing being)
+    private ToolResult ExecuteGetBrowserStatus(SiliconBeingBase being)
     {
         var webView = being.GetWebView();
         var status = webView.GetStatus();
@@ -402,7 +395,7 @@ public class WebViewBrowserTool : ITool
         return ToolResult.Successful(result);
     }
 
-    private ToolResult ExecuteSetTimeout(DefaultSiliconBeing being, Dictionary<string, object> parameters)
+    private ToolResult ExecuteSetTimeout(SiliconBeingBase being, Dictionary<string, object> parameters)
     {
         if (!parameters.TryGetValue("timeout_seconds", out object? timeoutObj))
         {
@@ -416,7 +409,7 @@ public class WebViewBrowserTool : ITool
         return ToolResult.Successful($"Timeout set to {timeoutSeconds} seconds");
     }
 
-    private async Task<ToolResult> ExecuteClearSession(DefaultSiliconBeing being)
+    private async Task<ToolResult> ExecuteClearSession(SiliconBeingBase being)
     {
         var webView = being.GetWebView();
         await webView.ClearSessionAsync();

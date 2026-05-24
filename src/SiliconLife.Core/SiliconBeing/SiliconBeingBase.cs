@@ -186,6 +186,36 @@ public abstract class SiliconBeingBase
     /// </summary>
     public string? BeingDirectory { get; set; }
 
+    private IWebViewCore? _webView;
+
+    /// <summary>
+    /// Get or create WebView instance.
+    /// Created on demand, only when silicon being needs browser operations.
+    /// </summary>
+    public IWebViewCore GetWebView()
+    {
+        if (_webView == null && Storage != null)
+        {
+            var webViewFactory = ServiceLocator.Instance.WebViewFactory
+                ?? throw new InvalidOperationException("WebViewFactory not registered in ServiceLocator");
+            _webView = (IWebViewCore)webViewFactory(this);
+        }
+        return _webView!;
+    }
+
+    /// <summary>
+    /// Close WebView.
+    /// Cleans up browser instance and related resources.
+    /// </summary>
+    public void CloseWebView()
+    {
+        if (_webView != null)
+        {
+            _webView.Dispose();
+            _webView = null;
+        }
+    }
+
     /// <summary>
     /// Gets whether this silicon being is a curator (highest privilege level).
     /// Determined by comparing Id with Config.CuratorGuid.

@@ -119,7 +119,7 @@ public class Program
         });
         ServiceLocator.Instance.Register<Func<string, IWorkNoteStorage>>(dir => new SpeedyWorkNoteStorage());
         ServiceLocator.Instance.Register<Func<Guid, string>>(id => $"SiliconManager/{id}");
-        ServiceLocator.Instance.Register<Func<SiliconBeingBase, object>>(being => new PlaywrightWebView((DefaultSiliconBeing)being));
+        ServiceLocator.Instance.Register<Func<SiliconBeingBase, object>>(being => new PlaywrightWebView(being));
         _logger.Info(null, "Registered: Storage Factories");
 
         TaskCenter.Instance.Initialize(storage);

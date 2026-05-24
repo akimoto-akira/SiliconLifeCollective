@@ -31,9 +31,6 @@ public class DefaultSiliconBeing : SiliconBeingBase
     private int _consecutiveErrorCount;
     private const int ConsecutiveErrorStopCount = 10;
     
-    // WebView instance (nullable, created on demand)
-    private IWebViewCore? _webView;
-
     /// <summary>
     /// Gets the current activity of this silicon being.
     /// Updated by <see cref="Tick"/> when entering a brain scene, and kept
@@ -845,35 +842,6 @@ public class DefaultSiliconBeing : SiliconBeingBase
         }
 
         return result;
-    }
-    
-    /// <summary>
-    /// Get or create WebView instance
-    /// Created on demand, only when silicon being needs browser operations
-    /// </summary>
-    public IWebViewCore GetWebView()
-    {
-        if (_webView == null && !string.IsNullOrEmpty(BeingDirectory))
-        {
-            var webViewFactory = ServiceLocator.Instance.WebViewFactory 
-                ?? throw new InvalidOperationException("WebViewFactory not registered in ServiceLocator");
-            _webView = (IWebViewCore)webViewFactory(this);
-        }
-        return _webView!;
-    }
-    
-    /// <summary>
-    /// Close WebView
-    /// Cleans up browser instance and related resources
-    /// </summary>
-    public void CloseWebView()
-    {
-        if (_webView != null)
-        {
-            _webView.Dispose();
-            _webView = null;
-            _logger.Info(Id, "Being {0}: WebView closed", Name);
-        }
     }
 
     private bool HasProjectsWithoutTemplate()
