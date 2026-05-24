@@ -89,6 +89,14 @@ public sealed class ProjectSpace
     public Guid? BroadcastChannelId { get; set; }
 
     /// <summary>
+    /// Gets or sets the role assignments for this project.
+    /// Key: role name (must match a RoleDefinition.RoleName in the project's WorkflowTemplate),
+    /// Value: list of silicon being GUIDs assigned to that role.
+    /// Roles are managed by the curator via ProjectTool (assign_role / remove_role / list_roles).
+    /// </summary>
+    public Dictionary<string, List<Guid>> RoleAssignments { get; set; } = new();
+
+    /// <summary>
     /// Gets or sets the project-level tool action permission config for this project.
     /// This is a single unified config that applies to all beings in the project.
     /// At runtime, the effective permissions are computed as:

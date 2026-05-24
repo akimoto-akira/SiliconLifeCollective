@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-25T01:00:00+08:00",
+  "lastUpdated": "2026-05-25T02:00:00+08:00",
   "tasks": [
     {
       "id": "task-346",
@@ -13,7 +13,8 @@
       "createdAt": "2026-05-25T00:10:00+08:00",
       "createdBy": "qoder",
       "assignedTo": "catpaw",
-      "completedAt": "2026-05-25T01:00:00+08:00"
+      "relatedCommit": "6004a7f",
+      "completedAt": "2026-05-25T02:00:00+08:00"
     },
     {
       "id": "task-347",
@@ -22,9 +23,11 @@
       "title": "ProjectSpace角色池与ProjectTool角色管理动作",
       "description": "项目空间需要维护角色池，并通过ProjectTool暴露管理能力。\n\n改造内容：\n1) ProjectSpace 增加 RoleAssignments 属性：Dictionary<string, List<Guid>>（角色名→硅基人GUID列表）\n2) 角色池持久化到项目存储\n3) ProjectTool 新增 assign_role 动作：主理人将硅基人分配到指定角色\n4) ProjectTool 新增 remove_role 动作：主理人将硅基人从角色移除\n5) ProjectTool 新增 list_roles 动作：查看当前角色池状态\n\n依赖：task-346（WorkflowTemplate角色定义）",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-25T00:10:00+08:00",
-      "createdBy": "qoder"
+      "createdBy": "qoder",
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-25T03:00:00+08:00"
     },
     {
       "id": "task-348",
@@ -219,7 +222,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-347",
       "task-348",
       "task-349",
       "task-350",
@@ -234,6 +236,7 @@
     ],
     "inProgress": [],
     "completed": [
+      "task-347",
       "task-346",
       "task-345",
       "task-344",

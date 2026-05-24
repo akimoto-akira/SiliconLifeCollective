@@ -778,3 +778,13 @@
 2026-05-25T01:40:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Tools/DiskTool.cs | intent=IsTextFile改为委托DiskExecutor.IsTextFile消除重复代码
 2026-05-25T02:00:00+08:00 | catpaw | task_complete | task=task-346 | fix=WorkflowTemplate增加角色定义支持+12语言本地化+DiskTool编译修复+IsTextFile去重
 2026-05-25T02:00:00+08:00 | catpaw | session_end | completed=task-346
+2026-05-25T02:10:00+08:00 | catpaw | session_start | sessionId=catpaw-20260525-002 | task=task-347
+2026-05-25T02:10:00+08:00 | catpaw | task_start | task=task-347
+2026-05-25T02:15:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/Project/ProjectSpace.cs | intent=增加RoleAssignments属性
+2026-05-25T02:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/Project/IProjectManager.cs | intent=新增AssignRole/RemoveRole方法
+2026-05-25T02:30:00+08:00 | catpaw | file_modified | src/SiliconLife.Default/Project/ProjectManager.cs | intent=实现AssignRole/RemoveRole
+2026-05-25T02:30:00+08:00 | catpaw | file_modified | src/SiliconLife.Fast/Project/ProjectManager.cs | intent=实现AssignRole/RemoveRole
+2026-05-25T02:40:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Tools/ProjectTool.cs | intent=新增assign_role/remove_role/list_roles动作
+2026-05-25T02:50:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/Workflow/WorkflowEngine.cs | intent=反射改为直接访问RoleAssignments
+2026-05-25T03:00:00+08:00 | catpaw | task_complete | task=task-347 | fix=ProjectSpace角色池+IProjectManager角色管理+ProjectTool三动作+反射改直接访问
+2026-05-25T03:00:00+08:00 | catpaw | session_end | completed=task-347

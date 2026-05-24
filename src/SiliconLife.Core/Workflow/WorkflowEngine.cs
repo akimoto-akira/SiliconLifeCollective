@@ -14,7 +14,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace SiliconLife.Collective;
@@ -184,25 +183,13 @@ public class WorkflowEngine
     }
 
     /// <summary>
-    /// Safely reads RoleAssignments from ProjectSpace using reflection.
-    /// This method provides forward compatibility — it works whether or not
-    /// ProjectSpace.RoleAssignments has been added (task-347).
-    /// Once task-347 is implemented, this can be replaced with direct property access.
+    /// Gets the role assignments from a project space.
+    /// Now that ProjectSpace.RoleAssignments is implemented (task-347),
+    /// direct property access replaces the previous reflection-based approach.
     /// </summary>
     private static Dictionary<string, List<Guid>>? GetRoleAssignmentsFromProject(ProjectSpace project)
     {
-        var prop = typeof(ProjectSpace).GetProperty("RoleAssignments");
-        if (prop == null)
-            return null;
-
-        try
-        {
-            return prop.GetValue(project) as Dictionary<string, List<Guid>>;
-        }
-        catch
-        {
-            return null;
-        }
+        return project.RoleAssignments.Count > 0 ? project.RoleAssignments : null;
     }
 
     /// <summary>

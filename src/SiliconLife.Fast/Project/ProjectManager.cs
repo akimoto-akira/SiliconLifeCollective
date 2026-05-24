@@ -502,6 +502,74 @@ public class ProjectManager : IProjectManager
     }
 
     /// <inheritdoc/>
+    public bool AssignRole(Guid projectId, string roleName, Guid beingId)
+    {
+        if (string.IsNullOrWhiteSpace(roleName))
+            return false;
+
+        roleName = roleName.Trim();
+
+        lock (_lock)
+        {
+            var projects = LoadProjectsInternal();
+            var project = projects.FirstOrDefault(p => p.Id == projectId);
+            if (project == null)
+                return false;
+
+            // Being must be assigned to the project first
+            if (!project.AssignedBeings.Contains(beingId))
+                return false;
+
+            if (!project.RoleAssignments.TryGetValue(roleName, out var beings))
+            {
+                beings = new List<Guid>();
+                project.RoleAssignments[roleName] = beings;
+            }
+
+            if (!beings.Contains(beingId))
+            {
+                beings.Add(beingId);
+                project.UpdatedAt = DateTime.UtcNow;
+                SaveProjectsInternal(projects);
+                _logger.Info(beingId, "Assigned being {0} to role '{1}' in project {2}", beingId, roleName, projectId);
+            }
+
+            return true;
+        }
+    }
+
+    /// <inheritdoc/>
+    public bool RemoveRole(Guid projectId, string roleName, Guid beingId)
+    {
+        if (string.IsNullOrWhiteSpace(roleName))
+            return false;
+
+        roleName = roleName.Trim();
+
+        lock (_lock)
+        {
+            var projects = LoadProjectsInternal();
+            var project = projects.FirstOrDefault(p => p.Id == projectId);
+            if (project == null)
+                return false;
+
+            if (project.RoleAssignments.TryGetValue(roleName, out var beings) && beings.Remove(beingId))
+            {
+                // Clean up empty role lists
+                if (beings.Count == 0)
+                    project.RoleAssignments.Remove(roleName);
+
+                project.UpdatedAt = DateTime.UtcNow;
+                SaveProjectsInternal(projects);
+                _logger.Info(beingId, "Removed being {0} from role '{1}' in project {2}", beingId, roleName, projectId);
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    /// <inheritdoc/>
     public WorkflowEngine? GetWorkflowEngine()
     {
         return _workflowEngine;

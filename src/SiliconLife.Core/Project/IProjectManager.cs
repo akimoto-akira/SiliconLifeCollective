@@ -126,6 +126,25 @@ public interface IProjectManager
     ProjectTaskSystem? GetTaskSystem(Guid projectId);
 
     /// <summary>
+    /// Assigns a silicon being to a specific role in a project.
+    /// The being must already be assigned to the project (via AssignBeing).
+    /// </summary>
+    /// <param name="projectId">The project ID</param>
+    /// <param name="roleName">The role name (must match a RoleDefinition in the project's workflow template)</param>
+    /// <param name="beingId">The silicon being GUID to assign to the role</param>
+    /// <returns>True if assigned successfully, false if project not found or being not in project</returns>
+    bool AssignRole(Guid projectId, string roleName, Guid beingId);
+
+    /// <summary>
+    /// Removes a silicon being from a specific role in a project.
+    /// </summary>
+    /// <param name="projectId">The project ID</param>
+    /// <param name="roleName">The role name</param>
+    /// <param name="beingId">The silicon being GUID to remove from the role</param>
+    /// <returns>True if removed successfully, false if project not found or being not in role</returns>
+    bool RemoveRole(Guid projectId, string roleName, Guid beingId);
+
+    /// <summary>
     /// Gets the workflow engine for managing workflow instances.
     /// Returns null if workflow engine is not initialized.
     /// </summary>

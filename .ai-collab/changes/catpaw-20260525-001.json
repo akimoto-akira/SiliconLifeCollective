@@ -3,6 +3,7 @@
   "actorId": "catpaw",
   "startTime": "2026-05-25T00:30:00+08:00",
   "endTime": "2026-05-25T02:00:00+08:00",
+  "commitHash": "6004a7f",
   "files": [
     {
       "path": "src/SiliconLife.Core/Workflow/RoleDefinition.cs",

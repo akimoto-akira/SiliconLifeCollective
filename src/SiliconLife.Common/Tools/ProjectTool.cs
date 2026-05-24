@@ -22,7 +22,7 @@ namespace SiliconLife.Common.Tools;
 /// Supports creating, archiving, restoring, destroying, listing, and updating projects,
 /// as well as assigning/removing silicon beings from projects.
 /// </summary>
-[ToolAction("create", "archive", "restore", "destroy", "list", "get", "assign", "remove", "update", "list-workflow-templates")]
+[ToolAction("create", "archive", "restore", "destroy", "list", "get", "assign", "remove", "update", "list-workflow-templates", "assign_role", "remove_role", "list_roles")]
 [SiliconManagerOnly]
 [ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
 public class ProjectTool : ITool
@@ -37,7 +37,9 @@ public class ProjectTool : ITool
         "'restore' (restore an archived project), 'destroy' (destroy a project and clean up data), " +
         "'list' (list all projects), 'get' (get project details), " +
         "'assign' (assign a silicon being to a project), 'remove' (remove a being from a project), " +
-        "'update' (update project name/description), 'list-workflow-templates' (list all available workflow templates).";
+        "'update' (update project name/description), 'list-workflow-templates' (list all available workflow templates), " +
+        "'assign_role' (assign a being to a role in the project), 'remove_role' (remove a being from a role), " +
+        "'list_roles' (list role assignments for the project).";
 
     /// <inheritdoc/>
     public string GetDisplayName(Language language)
@@ -59,8 +61,8 @@ public class ProjectTool : ITool
                 ["action"] = new Dictionary<string, object>
                 {
                     ["type"] = "string",
-                    ["description"] = "The action to perform: create, archive, restore, destroy, list, get, assign, remove, update, list-workflow-templates",
-                    ["enum"] = new[] { "create", "archive", "restore", "destroy", "list", "get", "assign", "remove", "update", "list-workflow-templates" }
+                    ["description"] = "The action to perform: create, archive, restore, destroy, list, get, assign, remove, update, list-workflow-templates, assign_role, remove_role, list_roles",
+                    ["enum"] = new[] { "create", "archive", "restore", "destroy", "list", "get", "assign", "remove", "update", "list-workflow-templates", "assign_role", "remove_role", "list_roles" }
                 },
                 ["name"] = new Dictionary<string, object>
                 {
@@ -91,6 +93,11 @@ public class ProjectTool : ITool
                 {
                     ["type"] = "string",
                     ["description"] = "Workflow template name for the project (used with create, cannot be changed after creation)"
+                },
+                ["role_name"] = new Dictionary<string, object>
+                {
+                    ["type"] = "string",
+                    ["description"] = "Role name to assign/remove (used with assign_role, remove_role). Must match a RoleDefinition in the project's workflow template."
                 }
             },
             ["required"] = new[] { "action" }
@@ -142,6 +149,9 @@ public class ProjectTool : ITool
                 "remove" => ExecuteRemove(projectManager, parameters),
                 "update" => ExecuteUpdate(projectManager, parameters),
                 "list-workflow-templates" => ExecuteListWorkflowTemplates(),
+                "assign_role" => ExecuteAssignRole(projectManager, parameters),
+                "remove_role" => ExecuteRemoveRole(projectManager, parameters),
+                "list_roles" => ExecuteListRoles(projectManager, parameters),
                 _ => ToolResult.Failed($"Unknown action: {action}")
             };
         }
@@ -395,5 +405,144 @@ public class ProjectTool : ITool
         }
 
         return ToolResult.Successful(string.Join("\n", lines), templates.Select(t => t.Name).ToList());
+    }
+
+    private static ToolResult ExecuteAssignRole(IProjectManager pm, Dictionary<string, object> parameters)
+    {
+        if (!parameters.TryGetValue("project_id", out var pidObj) || !Guid.TryParse(pidObj?.ToString(), out Guid projectId))
+        {
+            return ToolResult.Failed("Missing or invalid parameter: project_id (for assign_role action)");
+        }
+
+        if (!parameters.TryGetValue("role_name", out var rnObj) || string.IsNullOrWhiteSpace(rnObj?.ToString()))
+        {
+            return ToolResult.Failed("Missing required parameter: role_name (for assign_role action)");
+        }
+
+        if (!parameters.TryGetValue("being_id", out var bidObj) || !Guid.TryParse(bidObj?.ToString(), out Guid beingId))
+        {
+            return ToolResult.Failed("Missing or invalid parameter: being_id (for assign_role action)");
+        }
+
+        string roleName = rnObj!.ToString()!.Trim();
+
+        // Verify the being is already assigned to the project
+        if (!pm.IsBeingAssigned(projectId, beingId))
+        {
+            return ToolResult.Failed($"Being {beingId} is not assigned to project {projectId}. Assign the being to the project first using the 'assign' action.");
+        }
+
+        bool result = pm.AssignRole(projectId, roleName, beingId);
+        if (result)
+        {
+            return ToolResult.Successful($"Assigned being {beingId} to role '{roleName}' in project {projectId}.");
+        }
+        return ToolResult.Failed($"Failed to assign being to role in project {projectId} (project not found).");
+    }
+
+    private static ToolResult ExecuteRemoveRole(IProjectManager pm, Dictionary<string, object> parameters)
+    {
+        if (!parameters.TryGetValue("project_id", out var pidObj) || !Guid.TryParse(pidObj?.ToString(), out Guid projectId))
+        {
+            return ToolResult.Failed("Missing or invalid parameter: project_id (for remove_role action)");
+        }
+
+        if (!parameters.TryGetValue("role_name", out var rnObj) || string.IsNullOrWhiteSpace(rnObj?.ToString()))
+        {
+            return ToolResult.Failed("Missing required parameter: role_name (for remove_role action)");
+        }
+
+        if (!parameters.TryGetValue("being_id", out var bidObj) || !Guid.TryParse(bidObj?.ToString(), out Guid beingId))
+        {
+            return ToolResult.Failed("Missing or invalid parameter: being_id (for remove_role action)");
+        }
+
+        string roleName = rnObj!.ToString()!.Trim();
+
+        bool result = pm.RemoveRole(projectId, roleName, beingId);
+        if (result)
+        {
+            return ToolResult.Successful($"Removed being {beingId} from role '{roleName}' in project {projectId}.");
+        }
+        return ToolResult.Failed($"Failed to remove being from role '{roleName}' in project {projectId} (project not found or being not in role).");
+    }
+
+    private static ToolResult ExecuteListRoles(IProjectManager pm, Dictionary<string, object> parameters)
+    {
+        if (!parameters.TryGetValue("project_id", out var pidObj) || !Guid.TryParse(pidObj?.ToString(), out Guid projectId))
+        {
+            return ToolResult.Failed("Missing or invalid parameter: project_id (for list_roles action)");
+        }
+
+        var project = pm.GetProject(projectId);
+        if (project == null)
+        {
+            return ToolResult.Failed($"Project not found: {projectId}");
+        }
+
+        // Get workflow template role definitions if available
+        var workflowEngine = ServiceLocator.Instance.GetService<WorkflowEngine>();
+        WorkflowTemplate? template = null;
+        if (!string.IsNullOrEmpty(project.WorkflowTemplateName) && workflowEngine != null)
+        {
+            template = workflowEngine.GetTemplate(project.WorkflowTemplateName);
+        }
+
+        var lines = new List<string>
+        {
+            $"Role assignments for project '{project.Name}' (ID: {projectId}):"
+        };
+
+        if (project.RoleAssignments.Count == 0)
+        {
+            lines.Add("  No role assignments.");
+        }
+        else
+        {
+            foreach (var kvp in project.RoleAssignments)
+            {
+                string roleName = kvp.Key;
+                var beingIds = kvp.Value;
+                var beingNames = new List<string>();
+                foreach (var bId in beingIds)
+                {
+                    var being = ServiceLocator.Instance.BeingManager?.GetBeing(bId);
+                    beingNames.Add(being?.Name ?? bId.ToString());
+                }
+
+                // Get role definition info if available
+                string roleInfo = "";
+                if (template != null && template.RoleDefinitions.TryGetValue(roleName, out var roleDef))
+                {
+                    roleInfo = $" (min={roleDef.MinCount}, max={(roleDef.MaxCount > 0 ? roleDef.MaxCount.ToString() : "∞")})";
+                    string statusText = roleDef.GetStatusText(beingIds.Count);
+                    roleInfo += $" — {statusText}";
+                }
+
+                lines.Add($"  {roleName}{roleInfo}: [{string.Join(", ", beingNames)}]");
+            }
+        }
+
+        // Also show required roles from template that have no assignments yet
+        if (template != null)
+        {
+            var unassignedRoles = template.RoleDefinitions.Keys
+                .Where(rn => !project.RoleAssignments.ContainsKey(rn))
+                .ToList();
+
+            if (unassignedRoles.Count > 0)
+            {
+                lines.Add("  Unassigned required roles:");
+                foreach (var rn in unassignedRoles)
+                {
+                    if (template.RoleDefinitions.TryGetValue(rn, out var roleDef))
+                    {
+                        lines.Add($"    {rn}: {roleDef.Description} (min={roleDef.MinCount}, max={(roleDef.MaxCount > 0 ? roleDef.MaxCount.ToString() : "∞")}) — {roleDef.GetStatusText(0)}");
+                    }
+                }
+            }
+        }
+
+        return ToolResult.Successful(string.Join("\n", lines), project.RoleAssignments);
     }
 }
