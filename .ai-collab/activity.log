@@ -907,5 +907,5 @@
 2026-05-25T13:10:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/*.cs | intent=12种语言本地化实现
 2026-05-25T13:20:00+08:00 | catpaw | bugfix | CsCZ.cs截断错误修复
 2026-05-25T13:25:00+08:00 | catpaw | bugfix | WorkflowDetailView.cs CS1026编译错误修复-Js.If分支列表提取为局部变量
-2026-05-25T13:30:00+08:00 | catpaw | task_complete | task=task-361 | relatedCommit=null(uncommitted)
+2026-05-25T13:30:00+08:00 | catpaw | task_complete | task=task-361 | relatedCommit=b846a21
 2026-05-25T13:30:00+08:00 | catpaw | session_end | completed=task-361
