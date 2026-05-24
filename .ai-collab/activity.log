@@ -862,3 +862,11 @@
 2026-05-25T07:30:00+08:00 | catpaw | session_end | completed=task-351
 2026-05-25T08:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260525-010  
 2026-05-25T08:00:00+08:00 | catpaw | task_claim | task=task-355 | type=refactor | title=重写TravelCodeWikiPublishWorkflow阶段映射7步操作 
+2026-05-25T08:15:00+08:00 | catpaw | file_modified | src/TravelCodeWikiWithAI/TravelCodeWikiWithAIWorkflow/TravelCodeWikiPublishWorkflow.cs | intent=重写为7步状态机(DataImport-POIClassify-CodeAssign-ContentCreation-Translation-WikiPublish-Published)+清理强制追踪文件  
+2026-05-25T08:30:00+08:00 | catpaw | task_complete | task=task-355 | commit=3243ae6  
+2026-05-25T08:30:00+08:00 | catpaw | session_end | completed=task-355 
+2026-05-25T09:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260525-011  
+2026-05-25T09:00:00+08:00 | catpaw | task_claim | task=task-356 | type=feature | title=扩展GeoLanguageTool（ObjectPath支持与set_word） 
+2026-05-25T09:15:00+08:00 | catpaw | file_modified | src/TravelCodeWikiWithAI/GeoLanguageTool.cs | intent=扩展GeoLanguageTool:+ObjectPath解析+set_language/get_language扩展+set_word动作  
+2026-05-25T09:30:00+08:00 | catpaw | task_complete | task=task-356  
+2026-05-25T09:30:00+08:00 | catpaw | session_end | completed=task-356 
