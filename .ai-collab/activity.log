@@ -678,3 +678,12 @@
 2026-05-24T11:45:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Views/ProjectToolPermissionView.cs
 2026-05-24T12:00:00+08:00 | trae-glm5 | task_complete | task=task-333 | fix=前端视图支持无ToolAction工具显示无法设置
 2026-05-24T12:00:00+08:00 | trae-glm5 | session_end | completed=task-331,task-332,task-333
+2026-05-24T14:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260524-1400 | task=task-334
+2026-05-24T14:00:00+08:00 | trae-glm5 | task_start | task=task-334
+2026-05-24T14:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/SiliconBeing/ISiliconBeingFactory.cs | intent=新增DiscoverPersistedBeingIds接口方法
+2026-05-24T14:20:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/SiliconBeing/SiliconBeingManager.cs | intent=新增LoadPersistedBeings方法发现并加载已持久化硅基人
+2026-05-24T14:30:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeingFactory.cs | intent=实现DiscoverPersistedBeingIds支持文件系统和SpeedyPack两种存储后端
+2026-05-24T14:35:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Program.cs | intent=启动时调用LoadPersistedBeings加载非curator硅基人
+2026-05-24T14:35:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Default/Program.cs | intent=启动时调用LoadPersistedBeings加载非curator硅基人
+2026-05-24T15:00:00+08:00 | trae-glm5 | task_complete | task=task-334 | fix=系统重启后自动加载通过CuratorTool创建的硅基人
+2026-05-24T15:00:00+08:00 | trae-glm5 | session_end | completed=task-334

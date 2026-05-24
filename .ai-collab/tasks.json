@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-24T12:00:00+08:00",
+  "lastUpdated": "2026-05-24T15:00:00+08:00",
   "tasks": [
     {
       "id": "task-331",
@@ -13,7 +13,7 @@
       "createdAt": "2026-05-24T10:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "relatedCommit": null,
+      "relatedCommit": "ed539d7",
       "completedAt": "2026-05-24T12:00:00+08:00"
     },
     {
@@ -27,7 +27,7 @@
       "createdAt": "2026-05-24T10:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "relatedCommit": null,
+      "relatedCommit": "ed539d7",
       "completedAt": "2026-05-24T11:00:00+08:00"
     },
     {
@@ -41,14 +41,28 @@
       "createdAt": "2026-05-24T11:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "relatedCommit": null,
+      "relatedCommit": "ed539d7",
       "completedAt": "2026-05-24T12:00:00+08:00"
+    },
+    {
+      "id": "task-334",
+      "type": "bugfix",
+      "target": "src/SiliconLife.Core/SiliconBeing/ISiliconBeingFactory.cs, src/SiliconLife.Core/SiliconBeing/SiliconBeingManager.cs, src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeingFactory.cs, src/SiliconLife.Fast/Program.cs, src/SiliconLife.Default/Program.cs",
+      "title": "通过 CuratorTool 新建的硅基人重启后丢失",
+      "description": "通过 CuratorTool 创建的硅基人在系统重启后不会被加载。修复方案：1) 在 ISiliconBeingFactory 接口新增 DiscoverPersistedBeingIds() 方法；2) DefaultSiliconBeingFactory 实现该方法，支持文件系统目录扫描(Default)和 SpeedyPack ListKeys(Fast)两种存储后端；3) SiliconBeingManager 新增 LoadPersistedBeings(factory) 方法，发现并加载所有非 curator 的已持久化硅基人；4) 两个 Program.cs 在注册 curator 后调用 LoadPersistedBeings",
+      "priority": "P0",
+      "status": "completed",
+      "createdAt": "2026-05-24T14:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-24T15:00:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": ["task-331", "task-332", "task-333"],
+    "completed": ["task-331", "task-332", "task-333", "task-334"],
     "cancelled": []
   },
   "metadata": {

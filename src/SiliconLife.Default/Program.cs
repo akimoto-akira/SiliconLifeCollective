@@ -187,6 +187,9 @@ public class Program
             RegisterAndConfigureCurator(defaultBeing, configData, dynamicBeingLoader);
         }
 
+        // Load all persisted non-curator beings from SiliconManager directory
+        MainLoop.BeingManager.LoadPersistedBeings(beingFactory);
+
         await StartWebServerAsync(configData, router, (WebUIProvider)imProvider, beingFactory, dynamicBeingLoader, localization);
 
         Console.CancelKeyPress += async (s, e) =>

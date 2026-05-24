@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -108,6 +108,62 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         {
             return null;
         }
+    }
+
+    /// <summary>
+    /// Discovers the IDs of all persisted silicon beings by scanning the SiliconManager directory.
+    /// Works with both file-system storage (Default) and SpeedyPack storage (Fast).
+    /// </summary>
+    /// <returns>A collection of GUIDs for beings that have persisted data</returns>
+    public IEnumerable<Guid> DiscoverPersistedBeingIds()
+    {
+        string siliconManagerDir = Path.Combine(_dataDirectory, "SiliconManager");
+        var ids = new List<Guid>();
+
+        if (Directory.Exists(siliconManagerDir))
+        {
+            try
+            {
+                foreach (string dir in Directory.GetDirectories(siliconManagerDir))
+                {
+                    string dirName = Path.GetFileName(dir);
+                    if (Guid.TryParse(dirName, out Guid id))
+                    {
+                        ids.Add(id);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(null, "DiscoverPersistedBeingIds: error scanning directory {0}: {1}", siliconManagerDir, ex.Message);
+            }
+        }
+        else
+        {
+            try
+            {
+                var storageFactory = ServiceLocator.Instance.StorageFactory;
+                if (storageFactory != null)
+                {
+                    IStorage rootStorage = storageFactory("");
+                    foreach (string key in rootStorage.ListKeys("SiliconManager"))
+                    {
+                        string segment = key.TrimEnd('/').Split('/').Last();
+                        if (Guid.TryParse(segment, out Guid id))
+                        {
+                            ids.Add(id);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(null, "DiscoverPersistedBeingIds: error listing storage keys: {0}", ex.Message);
+            }
+        }
+
+        _logger.Info(null, "DiscoverPersistedBeingIds: found {0} persisted being(s)", ids.Count);
+        return ids;
     }
 
     /// <summary>

@@ -255,6 +255,71 @@ public class SiliconBeingManager : TickObject
         }
     }
 
+    /// <summary>
+    /// Discovers and loads all persisted silicon beings from the data store.
+    /// Skips the curator (already loaded separately) and beings that fail to load.
+    /// Should be called once during startup after the curator has been registered.
+    /// </summary>
+    /// <param name="factory">The factory used to discover and load beings</param>
+    /// <returns>The number of beings successfully loaded</returns>
+    public int LoadPersistedBeings(ISiliconBeingFactory factory)
+    {
+        if (factory == null)
+        {
+            _logger.Warn(null, "LoadPersistedBeings: factory is null");
+            return 0;
+        }
+
+        Guid curatorGuid = Config.Instance?.Data?.CuratorGuid ?? Guid.Empty;
+        int loadedCount = 0;
+
+        try
+        {
+            foreach (Guid beingId in factory.DiscoverPersistedBeingIds())
+            {
+                if (beingId == curatorGuid)
+                {
+                    _logger.Debug(beingId, "LoadPersistedBeings: skipping curator {0}", beingId);
+                    continue;
+                }
+
+                lock (_lock)
+                {
+                    if (_beings.Any(b => b.Id == beingId))
+                    {
+                        _logger.Debug(beingId, "LoadPersistedBeings: being {0} already registered, skipping", beingId);
+                        continue;
+                    }
+                }
+
+                try
+                {
+                    SiliconBeingBase? being = factory.LoadBeing(beingId.ToString());
+                    if (being == null)
+                    {
+                        _logger.Warn(beingId, "LoadPersistedBeings: failed to load being {0}", beingId);
+                        continue;
+                    }
+
+                    RegisterBeing(being);
+                    loadedCount++;
+                    _logger.Info(beingId, "LoadPersistedBeings: loaded being {0} ({1})", being.Name, being.Id);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Warn(beingId, "LoadPersistedBeings: error loading being {0}: {1}", beingId, ex.Message);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(null, "LoadPersistedBeings: error discovering persisted beings: {0}", ex.Message);
+        }
+
+        _logger.Info(null, "LoadPersistedBeings: loaded {0} persisted being(s)", loadedCount);
+        return loadedCount;
+    }
+
     public SiliconBeingBase? GetBeing(Guid beingId)
     {
         lock (_lock)

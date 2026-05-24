@@ -32,4 +32,11 @@ public interface ISiliconBeingFactory
     /// <param name="beingDirectory">The directory path of the silicon being</param>
     /// <returns>The loaded silicon being instance, or null if loading fails</returns>
     SiliconBeingBase? LoadBeing(string beingDirectory);
+
+    /// <summary>
+    /// Discovers the IDs of all persisted silicon beings in the data store.
+    /// Used during startup to load beings that were created in previous sessions.
+    /// </summary>
+    /// <returns>A collection of GUIDs for beings that have persisted state</returns>
+    IEnumerable<Guid> DiscoverPersistedBeingIds();
 }
