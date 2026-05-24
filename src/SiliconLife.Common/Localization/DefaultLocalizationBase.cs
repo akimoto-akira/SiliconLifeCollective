@@ -3404,4 +3404,50 @@ public abstract class DefaultLocalizationBase : LocalizationBase
 
     /// <summary>Next</summary>
     public abstract string Help_Next { get; }
+
+    // ===== Role Staffing Localization =====
+
+    /// <summary>Understaffed (role has fewer members than required)</summary>
+    public abstract string RoleStaffing_Understaffed { get; }
+
+    /// <summary>Overstaffed (role has more members than allowed)</summary>
+    public abstract string RoleStaffing_Overstaffed { get; }
+
+    /// <summary>Full (role has reached maximum capacity)</summary>
+    public abstract string RoleStaffing_Full { get; }
+
+    /// <summary>Sufficient (role has enough members)</summary>
+    public abstract string RoleStaffing_Sufficient { get; }
+
+    /// <summary>Role staffing detail: understaffed. {0}=minCount, {1}=assignedCount</summary>
+    public abstract string RoleStaffing_UnderstaffedDetail { get; }
+
+    /// <summary>Role staffing detail: overstaffed. {0}=maxCount, {1}=assignedCount</summary>
+    public abstract string RoleStaffing_OverstaffedDetail { get; }
+
+    /// <summary>Role staffing detail: full. {0}=assignedCount, {1}=maxCount</summary>
+    public abstract string RoleStaffing_FullDetail { get; }
+
+    /// <summary>Role staffing detail: sufficient. {0}=assignedCount, {1}=minCount</summary>
+    public abstract string RoleStaffing_SufficientDetail { get; }
+
+    /// <inheritdoc/>
+    public override string GetRoleStaffingStatusName(RoleStaffingStatus status) => status switch
+    {
+        RoleStaffingStatus.Understaffed => RoleStaffing_Understaffed,
+        RoleStaffingStatus.Overstaffed => RoleStaffing_Overstaffed,
+        RoleStaffingStatus.Full => RoleStaffing_Full,
+        RoleStaffingStatus.Sufficient => RoleStaffing_Sufficient,
+        _ => status.ToString()
+    };
+
+    /// <inheritdoc/>
+    public override string GetRoleStaffingStatusText(RoleStaffingStatus status, int minCount, int maxCount, int assignedCount) => status switch
+    {
+        RoleStaffingStatus.Understaffed => string.Format(RoleStaffing_UnderstaffedDetail, minCount, assignedCount),
+        RoleStaffingStatus.Overstaffed => string.Format(RoleStaffing_OverstaffedDetail, maxCount, assignedCount),
+        RoleStaffingStatus.Full => string.Format(RoleStaffing_FullDetail, assignedCount, maxCount),
+        RoleStaffingStatus.Sufficient => string.Format(RoleStaffing_SufficientDetail, assignedCount, minCount),
+        _ => $"{status} ({assignedCount})"
+    };
 }

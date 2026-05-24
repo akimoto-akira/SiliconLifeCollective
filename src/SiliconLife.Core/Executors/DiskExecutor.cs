@@ -607,7 +607,7 @@ public static class DiskExecutor
     /// <summary>
     /// Check if a file is likely a text/code file based on extension.
     /// </summary>
-    internal static bool IsTextFile(string filePath)
+    public static bool IsTextFile(string filePath)
     {
         string extension = Path.GetExtension(filePath).ToLowerInvariant();
 

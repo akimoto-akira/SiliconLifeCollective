@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace SiliconLife.Collective;
@@ -86,6 +87,8 @@ public class WorkflowEngine
 
     /// <summary>
     /// Creates and starts a new workflow instance.
+    /// If the template defines RoleDefinitions, validates the role pool and logs warnings
+    /// for any unsatisfied roles (does not block instance creation — roles may be assigned later).
     /// </summary>
     public async Task<WorkflowInstance> CreateInstanceAsync(
         Guid projectId,
@@ -106,6 +109,9 @@ public class WorkflowEngine
             CreatedBy = createdBy
         };
 
+        // Validate role pool against template's RoleDefinitions (non-blocking)
+        ValidateRolePoolForInstance(template, instance);
+
         lock (_lock)
         {
             _instances[instance.Id] = instance;
@@ -117,6 +123,86 @@ public class WorkflowEngine
             instance.Id, templateName, projectId, businessKey);
 
         return instance;
+    }
+
+    /// <summary>
+    /// Validates the project's role assignments against the template's role definitions.
+    /// Logs warnings for unsatisfied roles and records them in the instance metadata.
+    /// Does not block instance creation — roles may be assigned after creation by the curator.
+    /// </summary>
+    private void ValidateRolePoolForInstance(WorkflowTemplate template, WorkflowInstance instance)
+    {
+        if (template.RoleDefinitions.Count == 0)
+            return;
+
+        // Attempt to read role assignments from ProjectSpace via ProjectManager
+        var projectManager = _serviceProvider.GetService(typeof(IProjectManager)) as IProjectManager;
+        if (projectManager == null)
+        {
+            _logger.Warn(null, "Cannot validate role pool: ProjectManager not available for workflow {0}", instance.Id);
+            return;
+        }
+
+        var project = projectManager.GetProject(instance.ProjectId);
+        if (project == null)
+        {
+            _logger.Warn(null, "Cannot validate role pool: Project {0} not found for workflow {1}",
+                instance.ProjectId, instance.Id);
+            return;
+        }
+
+        // Read RoleAssignments from ProjectSpace (available after task-347 is implemented).
+        // Before task-347, this property doesn't exist yet, so we use reflection to safely check.
+        var roleAssignments = GetRoleAssignmentsFromProject(project);
+        if (roleAssignments == null)
+        {
+            // RoleAssignments not yet available (task-347 not implemented),
+            // log info and skip validation
+            _logger.Info(null, "Role assignments not yet available on project {0}, skipping role validation for workflow {1}",
+                instance.ProjectId, instance.Id);
+
+            // Record in metadata that role validation was skipped
+            instance.Metadata["RoleValidationStatus"] = "Skipped_NoRoleAssignments";
+            instance.Metadata["RequiredRoles"] = string.Join(", ", template.RoleDefinitions.Keys);
+            return;
+        }
+
+        // Validate role assignments against template definitions
+        if (!template.ValidateRoleAssignments(roleAssignments, out var unsatisfiedRoles))
+        {
+            _logger.Warn(null, "Role pool validation failed for workflow {0}: {1}",
+                instance.Id, string.Join(", ", unsatisfiedRoles));
+
+            instance.Metadata["RoleValidationStatus"] = "Unsatisfied";
+            instance.Metadata["UnsatisfiedRoles"] = string.Join("; ", unsatisfiedRoles);
+        }
+        else
+        {
+            _logger.Info(null, "Role pool validation passed for workflow {0}", instance.Id);
+            instance.Metadata["RoleValidationStatus"] = "Satisfied";
+        }
+    }
+
+    /// <summary>
+    /// Safely reads RoleAssignments from ProjectSpace using reflection.
+    /// This method provides forward compatibility — it works whether or not
+    /// ProjectSpace.RoleAssignments has been added (task-347).
+    /// Once task-347 is implemented, this can be replaced with direct property access.
+    /// </summary>
+    private static Dictionary<string, List<Guid>>? GetRoleAssignmentsFromProject(ProjectSpace project)
+    {
+        var prop = typeof(ProjectSpace).GetProperty("RoleAssignments");
+        if (prop == null)
+            return null;
+
+        try
+        {
+            return prop.GetValue(project) as Dictionary<string, List<Guid>>;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     /// <summary>

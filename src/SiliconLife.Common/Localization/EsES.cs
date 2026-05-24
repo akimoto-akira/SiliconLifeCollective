@@ -2012,4 +2012,14 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string Help_NoResults => "No se encontraron documentos";
     public override string Help_Previous => "Anterior";
     public override string Help_Next => "Siguiente";
+
+    // Role Staffing
+    public override string RoleStaffing_Understaffed => "Personal insuficiente";
+    public override string RoleStaffing_Overstaffed => "Personal excedido";
+    public override string RoleStaffing_Full => "Completo";
+    public override string RoleStaffing_Sufficient => "Suficiente";
+    public override string RoleStaffing_UnderstaffedDetail => "Personal insuficiente (necesita {0}, tiene {1})";
+    public override string RoleStaffing_OverstaffedDetail => "Personal excedido (máx. {0}, tiene {1})";
+    public override string RoleStaffing_FullDetail => "Completo ({0}/{1})";
+    public override string RoleStaffing_SufficientDetail => "Suficiente ({0}/{1}+)";
 }

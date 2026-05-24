@@ -2012,4 +2012,14 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string Help_NoResults => "No documents found";
     public override string Help_Previous => "Previous";
     public override string Help_Next => "Next";
+
+    // Role Staffing
+    public override string RoleStaffing_Understaffed => "Understaffed";
+    public override string RoleStaffing_Overstaffed => "Overstaffed";
+    public override string RoleStaffing_Full => "Full";
+    public override string RoleStaffing_Sufficient => "Sufficient";
+    public override string RoleStaffing_UnderstaffedDetail => "Understaffed (need {0}, have {1})";
+    public override string RoleStaffing_OverstaffedDetail => "Overstaffed (max {0}, have {1})";
+    public override string RoleStaffing_FullDetail => "Full ({0}/{1})";
+    public override string RoleStaffing_SufficientDetail => "Sufficient ({0}/{1}+)";
 }

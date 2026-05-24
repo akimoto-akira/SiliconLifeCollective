@@ -1864,4 +1864,14 @@ _ => permissionType.ToString()
     public override string Help_NoResults => "未找到相關文檔";
     public override string Help_Previous => "上一篇";
     public override string Help_Next => "下一篇";
+
+    // Role Staffing
+    public override string RoleStaffing_Understaffed => "人員不足";
+    public override string RoleStaffing_Overstaffed => "人員超編";
+    public override string RoleStaffing_Full => "已滿員";
+    public override string RoleStaffing_Sufficient => "人員充足";
+    public override string RoleStaffing_UnderstaffedDetail => "人員不足（需要{0}人，目前{1}人）";
+    public override string RoleStaffing_OverstaffedDetail => "人員超編（最多{0}人，目前{1}人）";
+    public override string RoleStaffing_FullDetail => "已滿員（{0}/{1}）";
+    public override string RoleStaffing_SufficientDetail => "人員充足（{0}/{1}+）";
 }

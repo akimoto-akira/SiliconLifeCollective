@@ -2009,4 +2009,14 @@ Verwendung: Rufe das chat-Tool auf, setze action=""mark_read"", target_id=Gegen�
 
     private readonly ChineseHistoricalDeDE _chineseHistorical = new();
     public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
+
+    // Role Staffing
+    public override string RoleStaffing_Understaffed => "Unterbesetzt";
+    public override string RoleStaffing_Overstaffed => "Überbesetzt";
+    public override string RoleStaffing_Full => "Voll";
+    public override string RoleStaffing_Sufficient => "Ausreichend";
+    public override string RoleStaffing_UnderstaffedDetail => "Unterbesetzt (brauche {0}, habe {1})";
+    public override string RoleStaffing_OverstaffedDetail => "Überbesetzt (max. {0}, habe {1})";
+    public override string RoleStaffing_FullDetail => "Voll ({0}/{1})";
+    public override string RoleStaffing_SufficientDetail => "Ausreichend ({0}/{1}+)";
 }

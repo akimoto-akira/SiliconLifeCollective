@@ -1810,4 +1810,14 @@ Uso: Chama a ferramenta chat, define action=""mark_read"", target_id=GUID do int
 
     private readonly ChineseHistoricalPtPT _chineseHistorical = new();
     public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
+
+    // Role Staffing
+    public override string RoleStaffing_Understaffed => "Subdimensionado";
+    public override string RoleStaffing_Overstaffed => "Sobredimensionado";
+    public override string RoleStaffing_Full => "Cheio";
+    public override string RoleStaffing_Sufficient => "Suficiente";
+    public override string RoleStaffing_UnderstaffedDetail => "Subdimensionado (precisa de {0}, tem {1})";
+    public override string RoleStaffing_OverstaffedDetail => "Sobredimensionado (máx. {0}, tem {1})";
+    public override string RoleStaffing_FullDetail => "Cheio ({0}/{1})";
+    public override string RoleStaffing_SufficientDetail => "Suficiente ({0}/{1}+)";
 }

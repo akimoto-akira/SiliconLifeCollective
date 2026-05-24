@@ -446,6 +446,31 @@ public class DiskTool : ITool
             : ToolResult.Failed(result.Error ?? "Search files failed");
     }
 
+    private ToolResult ExecuteSearchContent(Guid callerId, Dictionary<string, object> parameters)
+    {
+        if (!parameters.TryGetValue("keyword", out object? keywordObj) || string.IsNullOrWhiteSpace(keywordObj?.ToString()))
+        {
+            return ToolResult.Failed("Missing 'keyword' parameter for search_content action");
+        }
+
+        string directory = parameters.TryGetValue("directory", out object? dirObj) && dirObj != null
+            ? dirObj.ToString()!
+            : Directory.GetCurrentDirectory();
+
+        var executorParams = new Dictionary<string, object>();
+        executorParams["keyword"] = keywordObj.ToString()!;
+        if (parameters.TryGetValue("pattern", out object? patObj) && patObj != null) executorParams["pattern"] = patObj.ToString()!;
+        if (parameters.TryGetValue("max_results", out object? maxObj) && maxObj != null) executorParams["max_results"] = maxObj.ToString()!;
+        if (parameters.TryGetValue("case_sensitive", out object? csObj) && csObj != null) executorParams["case_sensitive"] = csObj.ToString()!;
+        if (parameters.TryGetValue("max_file_size", out object? mfsObj) && mfsObj != null) executorParams["max_file_size"] = mfsObj.ToString()!;
+
+        ExecutorRequest request = new(callerId, directory, "search_content", executorParams);
+        ExecutorResult result = DiskExecutor.Execute(request);
+        return result.Success
+            ? ToolResult.Successful(result.Output ?? "")
+            : ToolResult.Failed(result.Error ?? "Search content failed");
+    }
+
     /// <summary>
     /// Check if a file is likely a text/code file based on extension.
     /// Delegates to DiskExecutor.IsTextFile for consistent logic.

@@ -1073,4 +1073,14 @@ public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
     public override string Help_NoResults => "Nebyly nalezeny žádné dokumenty";
     public override string Help_Previous => "Předchozí";
     public override string Help_Next => "Další";
+
+    // Role Staffing
+    public override string RoleStaffing_Understaffed => "Nedostatečně obsazeno";
+    public override string RoleStaffing_Overstaffed => "Přes obsazenost";
+    public override string RoleStaffing_Full => "Plné";
+    public override string RoleStaffing_Sufficient => "Dostatečné";
+    public override string RoleStaffing_UnderstaffedDetail => "Nedostatečně obsazeno (potřeba {0}, aktuálně {1})";
+    public override string RoleStaffing_OverstaffedDetail => "Přes obsazenost (max. {0}, aktuálně {1})";
+    public override string RoleStaffing_FullDetail => "Plné ({0}/{1})";
+    public override string RoleStaffing_SufficientDetail => "Dostatečné ({0}/{1}+)";
 }

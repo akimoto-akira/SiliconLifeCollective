@@ -2017,4 +2017,14 @@ _ => permissionType.ToString()
     public override string Help_NoResults => "未找到相关文档";
     public override string Help_Previous => "上一篇";
     public override string Help_Next => "下一篇";
+
+    // Role Staffing
+    public override string RoleStaffing_Understaffed => "人员不足";
+    public override string RoleStaffing_Overstaffed => "人员超编";
+    public override string RoleStaffing_Full => "已满员";
+    public override string RoleStaffing_Sufficient => "人员充足";
+    public override string RoleStaffing_UnderstaffedDetail => "人员不足（需要{0}人，当前{1}人）";
+    public override string RoleStaffing_OverstaffedDetail => "人员超编（最多{0}人，当前{1}人）";
+    public override string RoleStaffing_FullDetail => "已满员（{0}/{1}）";
+    public override string RoleStaffing_SufficientDetail => "人员充足（{0}/{1}+）";
 }

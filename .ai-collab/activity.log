@@ -732,14 +732,14 @@
 2026-05-24T19:30:00+08:00 | trae-glm5 | session_end | completed=task-339
 2026-05-24T22:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260524-2200 | task=task-344
 2026-05-24T22:00:00+08:00 | catpaw | task_start | task=task-344
-2026-05-24T22:05:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Controllers/BeingController.cs | intent=ȥ��DefaultSiliconBeing����ת��ֱ�ӵ��û���SaveState
-2026-05-24T22:10:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Controllers/ToolPermissionController.cs | intent=ȥ������DefaultSiliconBeing����ת��ֱ�ӵ��û���SaveState�Ƴ�����using
-2026-05-24T22:15:00+08:00 | catpaw | task_complete | task=task-344 | fix=ȥ��3��DefaultSiliconBeing����ת��ֱ�ӵ���SiliconBeingBase.SaveState
+2026-05-24T22:05:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Controllers/BeingController.cs | intent=ȥ��DefaultSiliconBeing����ת��ֱ�ӵ��û���SaveState
+2026-05-24T22:10:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Controllers/ToolPermissionController.cs | intent=ȥ������DefaultSiliconBeing����ת��ֱ�ӵ��û���SaveState�Ƴ�����using
+2026-05-24T22:15:00+08:00 | catpaw | task_complete | task=task-344 | fix=ȥ��3��DefaultSiliconBeing����ת��ֱ�ӵ���SiliconBeingBase.SaveState
 2026-05-24T22:15:00+08:00 | catpaw | session_end | completed=task-344
 2026-05-24T22:15:00+08:00 | catpaw | session_start | sessionId=catpaw-20260524-2215 | task=task-341
 2026-05-24T22:15:00+08:00 | catpaw | task_start | task=task-341
-2026-05-24T22:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/WebView/PlaywrightWebView.cs | intent=���������״̬��ʱ�ļ��ŽӸ���Playwright StorageState JSON�ַ���ֱ��ͨ��IStorage��д
-2026-05-24T22:30:00+08:00 | catpaw | task_complete | task=task-341 | fix=PlaywrightWebView�����״̬������Ҫ��ʱ�ļ��ŽӸ���StorageState����ֱ�Ӵ�JSON
+2026-05-24T22:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/WebView/PlaywrightWebView.cs | intent=���������״̬��ʱ�ļ��ŽӸ���Playwright StorageState JSON�ַ���ֱ��ͨ��IStorage��д
+2026-05-24T22:30:00+08:00 | catpaw | task_complete | task=task-341 | fix=PlaywrightWebView�����״̬������Ҫ��ʱ�ļ��ŽӸ���StorageState����ֱ�Ӵ�JSON
 2026-05-24T22:30:00+08:00 | catpaw | session_end | completed=task-341
 2026-05-24T22:30:00+08:00 | catpaw | session_start | sessionId=catpaw-20260524-2230 | task=task-342
 2026-05-24T22:30:00+08:00 | catpaw | task_start | task=task-342
@@ -753,3 +753,28 @@
 2026-05-24T23:25:00+08:00 | qoder | file_deleted | tools/HotReload/
 2026-05-24T23:26:00+08:00 | qoder | task_complete | task=task-345 | commit=5c63047
 2026-05-24T23:26:00+08:00 | qoder | session_end | completed=task-345
+2026-05-25T00:30:00+08:00 | catpaw | session_start | sessionId=catpaw-20260525-001 | task=task-346
+2026-05-25T00:30:00+08:00 | catpaw | task_start | task=task-346
+2026-05-25T00:35:00+08:00 | catpaw | file_created | src/SiliconLife.Core/Workflow/RoleDefinition.cs | intent=新增RoleDefinition类定义工作流角色
+2026-05-25T00:40:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/Workflow/WorkflowTemplate.cs | intent=增加RoleDefinitions属性和ValidateRoleAssignments方法
+2026-05-25T00:45:00+08:00 | catpaw | file_modified | src/TravelCodeWikiWithAI/TravelCodeWikiWithAIWorkflow/TravelCodeWikiPublishWorkflow.cs | intent=声明4个角色定义
+2026-05-25T00:50:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/Workflow/WorkflowEngine.cs | intent=工作流实例化时校验角色池
+2026-05-25T01:10:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/Localization/LocalizationBase.cs | intent=扩展本地化基类新增GetRoleStaffingStatusName和GetRoleStaffingStatusText抽象方法
+2026-05-25T01:15:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/DefaultLocalizationBase.cs | intent=实现角色状态本地化逻辑新增8个抽象属性和2个override方法
+2026-05-25T01:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/ZhCN.cs | intent=中文简体角色状态本地化字符串
+2026-05-25T01:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/EnUS.cs | intent=英文角色状态本地化字符串
+2026-05-25T01:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/ZhHK.cs | intent=繁体中文(香港)角色状态本地化字符串
+2026-05-25T01:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/JaJP.cs | intent=日文角色状态本地化字符串
+2026-05-25T01:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/KoKR.cs | intent=韩文角色状态本地化字符串
+2026-05-25T01:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/EsES.cs | intent=西班牙文角色状态本地化字符串
+2026-05-25T01:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/CsCZ.cs | intent=捷克文角色状态本地化字符串
+2026-05-25T01:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/DeDE.cs | intent=德文角色状态本地化字符串
+2026-05-25T01:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/FrFR.cs | intent=法文角色状态本地化字符串
+2026-05-25T01:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/ItIT.cs | intent=意大利文角色状态本地化字符串
+2026-05-25T01:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/PlPL.cs | intent=波兰文角色状态本地化字符串
+2026-05-25T01:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/PtPT.cs | intent=葡萄牙文角色状态本地化字符串
+2026-05-25T01:30:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Tools/DiskTool.cs | intent=新增ExecuteSearchContent方法委托DiskExecutor执行搜索
+2026-05-25T01:35:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/Executors/DiskExecutor.cs | intent=IsTextFile从internal改为public消除DiskTool重复代码
+2026-05-25T01:40:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Tools/DiskTool.cs | intent=IsTextFile改为委托DiskExecutor.IsTextFile消除重复代码
+2026-05-25T02:00:00+08:00 | catpaw | task_complete | task=task-346 | fix=WorkflowTemplate增加角色定义支持+12语言本地化+DiskTool编译修复+IsTextFile去重
+2026-05-25T02:00:00+08:00 | catpaw | session_end | completed=task-346

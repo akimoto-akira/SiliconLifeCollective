@@ -2010,4 +2010,14 @@ _ => permissionType.ToString()
     public override string Help_NoResults => "ドキュメントが見つかりません";
     public override string Help_Previous => "前へ";
     public override string Help_Next => "次へ";
+
+    // Role Staffing
+    public override string RoleStaffing_Understaffed => "人員不足";
+    public override string RoleStaffing_Overstaffed => "人員超過";
+    public override string RoleStaffing_Full => "満員";
+    public override string RoleStaffing_Sufficient => "人員充足";
+    public override string RoleStaffing_UnderstaffedDetail => "人員不足（必要{0}名、現在{1}名）";
+    public override string RoleStaffing_OverstaffedDetail => "人員超過（最大{0}名、現在{1}名）";
+    public override string RoleStaffing_FullDetail => "満員（{0}/{1}）";
+    public override string RoleStaffing_SufficientDetail => "人員充足（{0}/{1}+）";
 }

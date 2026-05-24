@@ -1972,4 +1972,14 @@ Utilisation : Appelle l'outil chat, définis action=""mark_read"", target_id=GUI
 
     private readonly ChineseHistoricalFrFR _chineseHistorical = new();
     public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
+
+    // Role Staffing
+    public override string RoleStaffing_Understaffed => "Sous-effectif";
+    public override string RoleStaffing_Overstaffed => "Sur-effectif";
+    public override string RoleStaffing_Full => "Complet";
+    public override string RoleStaffing_Sufficient => "Suffisant";
+    public override string RoleStaffing_UnderstaffedDetail => "Sous-effectif (besoin de {0}, a {1})";
+    public override string RoleStaffing_OverstaffedDetail => "Sur-effectif (max {0}, a {1})";
+    public override string RoleStaffing_FullDetail => "Complet ({0}/{1})";
+    public override string RoleStaffing_SufficientDetail => "Suffisant ({0}/{1}+)";
 }

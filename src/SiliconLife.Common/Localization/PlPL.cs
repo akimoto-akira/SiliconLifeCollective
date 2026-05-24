@@ -1112,4 +1112,14 @@ Oznacza to, że przeczytałeś wiadomość, ale zdecydowałeś się nie odpowiad
 Użycie: wywołaj narzędzie chat, ustaw action=""mark_read"", target_id=GUID rozmówcy, bez parametru message.";
 
     public override string GetTranslation(string key) => key;
+
+    // Role Staffing
+    public override string RoleStaffing_Understaffed => "Niedostatecznie obsadzone";
+    public override string RoleStaffing_Overstaffed => "Przeobsadzone";
+    public override string RoleStaffing_Full => "Pełne";
+    public override string RoleStaffing_Sufficient => "Wystarczające";
+    public override string RoleStaffing_UnderstaffedDetail => "Niedostatecznie obsadzone (potrzeba {0}, jest {1})";
+    public override string RoleStaffing_OverstaffedDetail => "Przeobsadzone (maks. {0}, jest {1})";
+    public override string RoleStaffing_FullDetail => "Pełne ({0}/{1})";
+    public override string RoleStaffing_SufficientDetail => "Wystarczające ({0}/{1}+)";
 }

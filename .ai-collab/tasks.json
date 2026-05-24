@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-25T00:10:00+08:00",
+  "lastUpdated": "2026-05-25T01:00:00+08:00",
   "tasks": [
     {
       "id": "task-346",
@@ -9,9 +9,11 @@
       "title": "WorkflowTemplate增加角色定义支持",
       "description": "工作流模板需要能声明本工作流需要的角色。\n\n改造内容：\n1) WorkflowTemplate 增加 RoleDefinitions 属性（Dictionary<string, RoleDefinition>）\n2) RoleDefinition 包含：角色名、描述、最小/最大人数\n3) TravelCodeWikiPublishWorkflow 声明4个角色：POIClassifier、CodeAssigner、ContentWriter、Translator\n4) 工作流实例化时校验角色池是否满足模板要求\n\n这是角色池体系的基础设施，其他任务依赖此项。",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-25T00:10:00+08:00",
-      "createdBy": "qoder"
+      "createdBy": "qoder",
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-25T01:00:00+08:00"
     },
     {
       "id": "task-347",
@@ -217,7 +219,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-346",
       "task-347",
       "task-348",
       "task-349",
@@ -233,6 +234,7 @@
     ],
     "inProgress": [],
     "completed": [
+      "task-346",
       "task-345",
       "task-344",
       "task-341",

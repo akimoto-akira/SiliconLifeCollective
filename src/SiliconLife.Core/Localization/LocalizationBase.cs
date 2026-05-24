@@ -150,4 +150,24 @@ public abstract class LocalizationBase
     /// <param name="timerName">The name of the timer</param>
     /// <param name="error">The error message</param>
     public abstract string FormatTimerErrorNotification(string timerName, string error);
+
+    // ===== Role Staffing Localization =====
+
+    /// <summary>
+    /// Gets the localized display name for a role staffing status.
+    /// </summary>
+    /// <param name="status">The staffing status</param>
+    /// <returns>The localized display name (e.g., "Understaffed", "Sufficient")</returns>
+    public abstract string GetRoleStaffingStatusName(RoleStaffingStatus status);
+
+    /// <summary>
+    /// Gets the localized detailed staffing status text for a role.
+    /// Includes the status name with count details.
+    /// </summary>
+    /// <param name="status">The staffing status</param>
+    /// <param name="minCount">The minimum required count</param>
+    /// <param name="maxCount">The maximum allowed count (0 = unlimited)</param>
+    /// <param name="assignedCount">The currently assigned count</param>
+    /// <returns>A localized status text with count details</returns>
+    public abstract string GetRoleStaffingStatusText(RoleStaffingStatus status, int minCount, int maxCount, int assignedCount);
 }

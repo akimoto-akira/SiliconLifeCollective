@@ -2010,4 +2010,14 @@ _ => permissionType.ToString()
     public override string Help_NoResults => "문서를 찾을 수 없습니다";
     public override string Help_Previous => "이전";
     public override string Help_Next => "다음";
+
+    // Role Staffing
+    public override string RoleStaffing_Understaffed => "인원 부족";
+    public override string RoleStaffing_Overstaffed => "인원 초과";
+    public override string RoleStaffing_Full => "만원";
+    public override string RoleStaffing_Sufficient => "인원 충분";
+    public override string RoleStaffing_UnderstaffedDetail => "인원 부족 (필요 {0}명, 현재 {1}명)";
+    public override string RoleStaffing_OverstaffedDetail => "인원 초과 (최대 {0}명, 현재 {1}명)";
+    public override string RoleStaffing_FullDetail => "만원 ({0}/{1})";
+    public override string RoleStaffing_SufficientDetail => "인원 충분 ({0}/{1}+)";
 }

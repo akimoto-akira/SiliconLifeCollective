@@ -1968,4 +1968,14 @@ Uso: Chiama lo strumento chat, imposta action=""mark_read"", target_id=GUID dell
 
     private readonly ChineseHistoricalItIT _chineseHistorical = new();
     public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
+
+    // Role Staffing
+    public override string RoleStaffing_Understaffed => "Sottoorganico";
+    public override string RoleStaffing_Overstaffed => "Sovraorganico";
+    public override string RoleStaffing_Full => "Pieno";
+    public override string RoleStaffing_Sufficient => "Sufficiente";
+    public override string RoleStaffing_UnderstaffedDetail => "Sottoorganico (necessari {0}, attuali {1})";
+    public override string RoleStaffing_OverstaffedDetail => "Sovraorganico (max {0}, attuali {1})";
+    public override string RoleStaffing_FullDetail => "Pieno ({0}/{1})";
+    public override string RoleStaffing_SufficientDetail => "Sufficiente ({0}/{1}+)";
 }
