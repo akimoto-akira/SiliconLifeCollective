@@ -897,3 +897,15 @@
 2026-05-25T11:40:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Views/TaskView.cs | intent=GetScripts接收TaskViewModel并在fetch URL拼接beingId参数
 2026-05-25T12:00:00+08:00 | catpaw | task_complete | task=task-360 | relatedCommit=null(uncommitted)
 2026-05-25T12:00:00+08:00 | catpaw | session_end | completed=task-360
+2026-05-25T12:30:00+08:00 | catpaw | session_start | sessionId=catpaw-20260525-015
+2026-05-25T12:35:00+08:00 | catpaw | task_start | task=task-361
+2026-05-25T12:40:00+08:00 | catpaw | file_created | src/SiliconLife.App/Web/Views/WorkflowDetailView.cs | intent=新建工作流详情页面视图
+2026-05-25T12:45:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Controllers/ProjectController.cs | intent=新增工作流详情路由与API
+2026-05-25T12:50:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Models/ProjectViewModel.cs | intent=新增WorkflowDetailViewModel
+2026-05-25T12:55:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Views/ProjectView.cs | intent=工作流标签改为详情页链接
+2026-05-25T13:00:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/DefaultLocalizationBase.cs | intent=新增20+本地化属性
+2026-05-25T13:10:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/*.cs | intent=12种语言本地化实现
+2026-05-25T13:20:00+08:00 | catpaw | bugfix | CsCZ.cs截断错误修复
+2026-05-25T13:25:00+08:00 | catpaw | bugfix | WorkflowDetailView.cs CS1026编译错误修复-Js.If分支列表提取为局部变量
+2026-05-25T13:30:00+08:00 | catpaw | task_complete | task=task-361 | relatedCommit=null(uncommitted)
+2026-05-25T13:30:00+08:00 | catpaw | session_end | completed=task-361

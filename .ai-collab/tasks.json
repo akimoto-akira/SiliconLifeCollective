@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-25T12:00:00+08:00",
+  "lastUpdated": "2026-05-25T13:30:00+08:00",
   "tasks": [
     {
       "id": "task-346",
@@ -180,7 +180,7 @@
       "createdAt": "2026-05-25T11:30:00+08:00",
       "createdBy": "catpaw",
       "assignedTo": "catpaw",
-      "relatedCommit": null,
+      "relatedCommit": "69a8cba",
       "completedAt": "2026-05-25T12:00:00+08:00"
     },
     {
@@ -279,12 +279,27 @@
       "assignedTo": "catpaw",
       "relatedCommit": "ab428cd",
       "completedAt": "2026-05-24T22:15:00+08:00"
+    },
+    {
+      "id": "task-361",
+      "type": "feature",
+      "target": "src/SiliconLife.App/Web/Views/WorkflowDetailView.cs, src/SiliconLife.App/Web/Controllers/ProjectController.cs, src/SiliconLife.App/Web/Models/ProjectViewModel.cs",
+      "title": "实现工作流详情页面",
+      "description": "设计并实现项目工作流详情页面，展示角色分配情况、已加入项目但未分配角色的硅基人、任务状态流转方式，支持在页面上进行角色分配与移除操作。\n\n实现内容：\n1) 新建 WorkflowDetailView.cs 视图，包含角色分配卡片、未分配硅基人列表（含角色选择下拉框和分配按钮）、状态流转可视化\n2) ProjectController 新增页面路由 /project/{id}/workflow 及 API /api/projects/workflow-detail、assign-role、remove-role\n3) ProjectViewModel 新增 WorkflowDetailViewModel 及相关数据项\n4) ProjectView 项目列表中工作流标签改为可点击链接指向详情页\n5) DefaultLocalizationBase 及 12 种语言实现新增 20+ 本地化属性\n6) 修复 CsCZ.cs 截断错误和 Js.If 嵌套 Lambda 元组列表的 CS1026 编译错误",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-25T12:30:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": "catpaw",
+      "relatedCommit": null,
+      "completedAt": "2026-05-25T13:30:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
     "completed": [
+      "task-361",
       "task-360",
       "task-358",
       "task-357",

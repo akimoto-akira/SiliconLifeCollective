@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -36,6 +36,8 @@ public class ProjectController : Controller
             ProjectWorkNotesPage();
         else if (path.StartsWith("/project/") && path.EndsWith("/tool-permissions"))
             ProjectToolPermissionPage();
+        else if (path.StartsWith("/project/") && path.EndsWith("/workflow"))
+            WorkflowDetailPage();
         else if (path == "/api/projects/list")
             GetList();
         else if (path == "/api/projects/list-workflow-templates")
@@ -50,6 +52,12 @@ public class ProjectController : Controller
             DestroyProject();
         else if (path == "/api/projects/detail")
             GetProjectDetail();
+        else if (path == "/api/projects/workflow-detail")
+            GetWorkflowDetail();
+        else if (path == "/api/projects/assign-role")
+            AssignRole();
+        else if (path == "/api/projects/remove-role")
+            RemoveRole();
         else if (path == "/api/projects/update")
             UpdateProject();
         else if (path == "/api/projects/assign")
@@ -925,6 +933,285 @@ public class ProjectController : Controller
 
             bool deleted = workNoteSystem.DeleteNote(pageNum);
             RenderJson(new { success = deleted, error = deleted ? (string?)null : $"Note page {pageNum} not found" });
+        }
+        catch (Exception ex)
+        {
+            RenderJson(new { success = false, error = ex.Message });
+        }
+    }
+
+    #endregion
+
+    #region Workflow Detail
+
+    private void WorkflowDetailPage()
+    {
+        try
+        {
+            if (_projectManager == null)
+            {
+                Response.StatusCode = 500;
+                RenderHtml("<p>Project manager not available</p>");
+                return;
+            }
+
+            Guid projectId = ExtractProjectIdFromPagePath();
+            if (projectId == Guid.Empty)
+            {
+                Response.StatusCode = 400;
+                RenderHtml("<p>Invalid project ID</p>");
+                return;
+            }
+
+            var project = _projectManager.GetProject(projectId);
+            if (project == null)
+            {
+                Response.StatusCode = 404;
+                RenderHtml("<p>Project not found</p>");
+                return;
+            }
+
+            var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
+            var view = new Views.WorkflowDetailView();
+            var vm = new Models.WorkflowDetailViewModel
+            {
+                Skin = skin,
+                ActiveMenu = "projects",
+                ProjectId = projectId,
+                ProjectName = project.Name,
+                WorkflowTemplateName = project.WorkflowTemplateName ?? ""
+            };
+            var html = view.Render(vm);
+            RenderHtml(html);
+        }
+        catch (Exception ex)
+        {
+            Response.StatusCode = 500;
+            RenderHtml($"<p>Error: {ex.Message}</p>");
+        }
+    }
+
+    private void GetWorkflowDetail()
+    {
+        try
+        {
+            if (_projectManager == null)
+            {
+                RenderJson(new { success = false, error = "Project manager not available" });
+                return;
+            }
+
+            string projectIdStr = GetQueryValue("id");
+            if (string.IsNullOrEmpty(projectIdStr))
+                projectIdStr = GetQueryValue("projectId");
+
+            if (!Guid.TryParse(projectIdStr, out Guid projectId))
+            {
+                RenderJson(new { success = false, error = "Missing or invalid project ID" });
+                return;
+            }
+
+            var project = _projectManager.GetProject(projectId);
+            if (project == null)
+            {
+                RenderJson(new { success = false, error = "Project not found" });
+                return;
+            }
+
+            if (string.IsNullOrEmpty(project.WorkflowTemplateName))
+            {
+                RenderJson(new { success = false, error = "No workflow template" });
+                return;
+            }
+
+            var workflowEngine = _projectManager.GetWorkflowEngine();
+            if (workflowEngine == null)
+            {
+                RenderJson(new { success = false, error = "Workflow engine not available" });
+                return;
+            }
+
+            var template = workflowEngine.GetTemplate(project.WorkflowTemplateName);
+            if (template == null)
+            {
+                RenderJson(new { success = false, error = "Workflow template not found" });
+                return;
+            }
+
+            var beingManager = ServiceLocator.Instance.BeingManager;
+
+            // Build roles with assigned beings
+            var roles = template.RoleDefinitions.Select(kvp =>
+            {
+                var roleDef = kvp.Value;
+                int assignedCount = project.RoleAssignments.TryGetValue(roleDef.RoleName, out var beings) ? beings.Count : 0;
+                var staffingStatus = roleDef.GetStaffingStatus(assignedCount);
+
+                var assignedBeingList = new List<object>();
+                if (beings != null)
+                {
+                    foreach (var bId in beings)
+                    {
+                        var being = beingManager?.GetBeing(bId);
+                        assignedBeingList.Add(new
+                        {
+                            id = bId.ToString(),
+                            name = being?.Name ?? bId.ToString().Substring(0, 8)
+                        });
+                    }
+                }
+
+                return new
+                {
+                    roleName = roleDef.RoleName,
+                    description = roleDef.Description,
+                    minCount = roleDef.MinCount,
+                    maxCount = roleDef.MaxCount,
+                    staffingStatus = staffingStatus.ToString(),
+                    assignedBeings = assignedBeingList
+                };
+            }).ToList();
+
+            // Build unassigned beings (in project but not in any role)
+            var assignedBeingIds = new HashSet<Guid>();
+            foreach (var roleBeings in project.RoleAssignments.Values)
+            {
+                foreach (var bId in roleBeings)
+                    assignedBeingIds.Add(bId);
+            }
+
+            var unassignedBeings = new List<object>();
+            foreach (var bId in project.AssignedBeings)
+            {
+                if (!assignedBeingIds.Contains(bId))
+                {
+                    var being = beingManager?.GetBeing(bId);
+                    unassignedBeings.Add(new
+                    {
+                        id = bId.ToString(),
+                        name = being?.Name ?? bId.ToString().Substring(0, 8)
+                    });
+                }
+            }
+
+            // Build states
+            var states = template.States.Select(s => new
+            {
+                name = s,
+                isInitial = s == template.InitialState,
+                isTerminal = template.TerminalStates.Contains(s)
+            }).ToList();
+
+            // Build transitions
+            var transitions = template.Transitions.Select(t => new
+            {
+                transitionName = t.TransitionName,
+                fromState = t.FromState,
+                toState = t.ToState
+            }).ToList();
+
+            RenderJson(new
+            {
+                success = true,
+                templateName = template.Name,
+                templateDescription = template.Description,
+                roles,
+                unassignedBeings,
+                states,
+                transitions
+            });
+        }
+        catch (Exception ex)
+        {
+            RenderJson(new { success = false, error = ex.Message });
+        }
+    }
+
+    private void AssignRole()
+    {
+        try
+        {
+            if (_projectManager == null)
+            {
+                RenderJson(new { success = false, error = "Project manager not available" });
+                return;
+            }
+
+            var body = GetJsonBody<Dictionary<string, object>>();
+            if (body == null)
+            {
+                RenderJson(new { success = false, error = "Invalid request body" });
+                return;
+            }
+
+            if (!body.TryGetValue("projectId", out var pidObj) || !Guid.TryParse(pidObj?.ToString(), out Guid projectId))
+            {
+                RenderJson(new { success = false, error = "Missing or invalid projectId" });
+                return;
+            }
+
+            if (!body.TryGetValue("roleName", out var roleObj) || string.IsNullOrWhiteSpace(roleObj?.ToString()))
+            {
+                RenderJson(new { success = false, error = "Missing roleName" });
+                return;
+            }
+
+            string roleName = roleObj.ToString()!;
+
+            if (!body.TryGetValue("beingId", out var bidObj) || !Guid.TryParse(bidObj?.ToString(), out Guid beingId))
+            {
+                RenderJson(new { success = false, error = "Missing or invalid beingId" });
+                return;
+            }
+
+            bool result = _projectManager.AssignRole(projectId, roleName, beingId);
+            RenderJson(new { success = result, error = result ? (string?)null : "Failed to assign role (project not found or being not in project)" });
+        }
+        catch (Exception ex)
+        {
+            RenderJson(new { success = false, error = ex.Message });
+        }
+    }
+
+    private void RemoveRole()
+    {
+        try
+        {
+            if (_projectManager == null)
+            {
+                RenderJson(new { success = false, error = "Project manager not available" });
+                return;
+            }
+
+            var body = GetJsonBody<Dictionary<string, object>>();
+            if (body == null)
+            {
+                RenderJson(new { success = false, error = "Invalid request body" });
+                return;
+            }
+
+            if (!body.TryGetValue("projectId", out var pidObj) || !Guid.TryParse(pidObj?.ToString(), out Guid projectId))
+            {
+                RenderJson(new { success = false, error = "Missing or invalid projectId" });
+                return;
+            }
+
+            if (!body.TryGetValue("roleName", out var roleObj) || string.IsNullOrWhiteSpace(roleObj?.ToString()))
+            {
+                RenderJson(new { success = false, error = "Missing roleName" });
+                return;
+            }
+
+            string roleName = roleObj.ToString()!;
+
+            if (!body.TryGetValue("beingId", out var bidObj) || !Guid.TryParse(bidObj?.ToString(), out Guid beingId))
+            {
+                RenderJson(new { success = false, error = "Missing or invalid beingId" });
+                return;
+            }
+
+            bool result = _projectManager.RemoveRole(projectId, roleName, beingId);
+            RenderJson(new { success = result, error = result ? (string?)null : "Failed to remove role (project or role assignment not found)" });
         }
         catch (Exception ex)
         {

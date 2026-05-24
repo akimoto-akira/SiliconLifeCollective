@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -101,10 +101,9 @@ public class ProjectView : ViewBase
                 .Property("background", "rgba(139,92,246,0.12)")
                 .Property("color", "#8b5cf6")
             .EndSelector()
-            .Selector(".workflow-names")
+            .Selector(".workflow-link")
                 .Property("background", "rgba(16,185,129,0.12)")
                 .Property("color", "#10b981")
-                .Property("cursor", "default")
             .EndSelector()
             .Selector(".groupchat-link")
                 .Property("background", "rgba(245,158,11,0.12)")
@@ -222,9 +221,11 @@ public class ProjectView : ViewBase
                 .Op(() => "+", () => Js.Id(() => "statusLabel"))
                 .Op(() => "+", () => Js.Str(() => "</span>"))))
             .Add(() => Js.Const(() => "wfHtml", () => Js.Id(() => "p").Prop(() => "workflowTemplateName").Op(() => "!==", () => Js.Str(() => ""))
-                .Op(() => "?", () => Js.Str(() => $"<span class='project-link workflow-names'>{loc.ProjectWorkflowsLinkLabel}: "))
-                .Op(() => "+", () => Js.Id(() => "p").Prop(() => "workflowTemplateName"))
-                .Op(() => "+", () => Js.Str(() => "</span>"))
+                .Op(() => "?", () => Js.Str(() => "<a class='project-link workflow-link' href='/project/"))
+                .Op(() => "+", () => Js.Id(() => "p").Prop(() => "id"))
+                .Op(() => "+", () => Js.Str(() => "/workflow'>"))
+                .Op(() => "+", () => Js.Str(() => loc.ProjectWorkflowsLinkLabel))
+                .Op(() => "+", () => Js.Str(() => "</a>"))
                 .Op(() => ":", () => Js.Str(() => ""))))
             .Add(() => Js.Const(() => "gcHtml", () => Js.Id(() => "p").Prop(() => "groupChatSessionId")
                 .Op(() => "?", () => Js.Str(() => "<a class='project-link groupchat-link' href='/group-chat-history-detail?sessionId="))

@@ -1529,6 +1529,86 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string WorkflowInstanceIdLabel { get; }
 
     /// <summary>
+    /// Gets the workflow detail page header text
+    /// </summary>
+    public abstract string WorkflowDetailPageHeader { get; }
+
+    /// <summary>
+    /// Gets the role assignments section header
+    /// </summary>
+    public abstract string WorkflowRoleAssignmentsHeader { get; }
+
+    /// <summary>
+    /// Gets the unassigned beings section header
+    /// </summary>
+    public abstract string WorkflowUnassignedBeingsHeader { get; }
+
+    /// <summary>
+    /// Gets the no unassigned beings message
+    /// </summary>
+    public abstract string WorkflowNoUnassignedBeings { get; }
+
+    /// <summary>
+    /// Gets the state transitions section header
+    /// </summary>
+    public abstract string WorkflowStateTransitionsHeader { get; }
+
+    /// <summary>
+    /// Gets the no workflow template message for detail page
+    /// </summary>
+    public abstract string WorkflowNoTemplateMessage { get; }
+
+    /// <summary>
+    /// Gets the no role definitions message
+    /// </summary>
+    public abstract string WorkflowNoRoleDefinitions { get; }
+
+    /// <summary>
+    /// Gets the no transitions message
+    /// </summary>
+    public abstract string WorkflowNoTransitions { get; }
+
+    /// <summary>
+    /// Gets the role assigned count label
+    /// </summary>
+    public abstract string WorkflowRoleAssignedCountLabel { get; }
+
+    /// <summary>
+    /// Gets the role required count label
+    /// </summary>
+    public abstract string WorkflowRoleRequiredCountLabel { get; }
+
+    /// <summary>
+    /// Gets the transition from state label
+    /// </summary>
+    public abstract string WorkflowTransitionFromLabel { get; }
+
+    /// <summary>
+    /// Gets the transition to state label
+    /// </summary>
+    public abstract string WorkflowTransitionToLabel { get; }
+
+    /// <summary>
+    /// Gets the assign role button text
+    /// </summary>
+    public abstract string WorkflowAssignRoleButton { get; }
+
+    /// <summary>
+    /// Gets the remove from role button text
+    /// </summary>
+    public abstract string WorkflowRemoveFromRoleButton { get; }
+
+    /// <summary>
+    /// Gets the terminal state label
+    /// </summary>
+    public abstract string WorkflowTerminalStateLabel { get; }
+
+    /// <summary>
+    /// Gets the initial state label
+    /// </summary>
+    public abstract string WorkflowInitialStateLabel { get; }
+
+    /// <summary>
     /// Gets the project work notes page header text
     /// </summary>
     public abstract string ProjectWorkNotesPageHeader { get; }

@@ -34,3 +34,40 @@ public class ProjectItem
     public Guid? GroupChatSessionId { get; set; }
     public Guid? BroadcastChannelId { get; set; }
 }
+
+public class WorkflowDetailViewModel : ViewModelBase
+{
+    public Guid ProjectId { get; set; }
+    public string ProjectName { get; set; } = "";
+    public string WorkflowTemplateName { get; set; } = "";
+}
+
+public class WorkflowRoleItem
+{
+    public string RoleName { get; set; } = "";
+    public string Description { get; set; } = "";
+    public int MinCount { get; set; }
+    public int MaxCount { get; set; }
+    public List<WorkflowBeingItem> AssignedBeings { get; set; } = new();
+}
+
+public class WorkflowBeingItem
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = "";
+    public string? RoleName { get; set; }
+}
+
+public class WorkflowTransitionItem
+{
+    public string TransitionName { get; set; } = "";
+    public string FromState { get; set; } = "";
+    public string ToState { get; set; } = "";
+}
+
+public class WorkflowStateItem
+{
+    public string Name { get; set; } = "";
+    public bool IsInitial { get; set; }
+    public bool IsTerminal { get; set; }
+}
