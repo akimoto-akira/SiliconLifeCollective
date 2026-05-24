@@ -157,13 +157,13 @@ public class DynamicBeingLoader
     }
 
     /// <summary>
-    /// Persists a silicon being's custom code to disk (encrypted).
+    /// Persists a silicon being's custom code to storage (encrypted).
     /// </summary>
     /// <param name="beingId">The silicon being's GUID</param>
-    /// <param name="beingDirectory">The silicon being's data directory</param>
+    /// <param name="storage">The silicon being's storage</param>
     /// <param name="sourceCode">The C# source code</param>
     /// <returns>True if persistence succeeded</returns>
-    public bool SaveBeingCode(Guid beingId, string beingDirectory, string sourceCode)
+    public bool SaveBeingCode(Guid beingId, IStorage storage, string sourceCode)
     {
         ArgumentNullException.ThrowIfNull(sourceCode);
 
@@ -176,16 +176,13 @@ public class DynamicBeingLoader
 
         try
         {
-            if (!Directory.Exists(beingDirectory))
-            {
-                Directory.CreateDirectory(beingDirectory);
-            }
-
             byte[] encrypted = CodeEncryption.Encrypt(sourceCode, beingId);
-            string codePath = Path.Combine(beingDirectory, CodeFileName);
-            File.WriteAllBytes(codePath, encrypted);
-            _logger.Info(null, "Custom code saved for being {0}", beingId);
-            return true;
+            bool saved = BeingCodeFileManager.SaveCode(storage, encrypted);
+            if (saved)
+            {
+                _logger.Info(null, "Custom code saved for being {0}", beingId);
+            }
+            return saved;
         }
         catch (Exception ex)
         {

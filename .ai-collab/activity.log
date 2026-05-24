@@ -703,3 +703,8 @@
 2026-05-24T18:00:00+08:00 | trae-glm5 | task_created | task=task-339 | desc=DefaultPermissionCallback硬编码SiliconManager路径
 2026-05-24T18:00:00+08:00 | trae-glm5 | task_created | task=task-340 | desc=WebViewBrowserTool强制类型转换DefaultSiliconBeing
 2026-05-24T18:00:00+08:00 | trae-glm5 | session_end | completed=task-335 | created=task-336,task-337,task-338,task-339,task-340
+2026-05-24T18:15:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260524-1830 | task=task-336
+2026-05-24T18:15:00+08:00 | trae-glm5 | task_start | task=task-336
+2026-05-24T18:20:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/Compilation/DynamicBeingLoader.cs | intent=SaveBeingCode从直接文件系统操作重构为使用IStorage
+2026-05-24T18:30:00+08:00 | trae-glm5 | task_complete | task=task-336 | fix=SaveBeingCode使用BeingCodeFileManager.SaveCode替代Directory/File操作
+2026-05-24T18:30:00+08:00 | trae-glm5 | session_end | completed=task-336

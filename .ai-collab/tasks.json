@@ -69,7 +69,8 @@
       "createdAt": "2026-05-24T16:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "completedAt": "2026-05-24T17:00:00+08:00"
+      "completedAt": "2026-05-24T17:00:00+08:00",
+      "relatedCommit": "aac9e15"
     },
     {
       "id": "task-336",
@@ -78,10 +79,11 @@
       "title": "DynamicBeingLoader.SaveBeingCode 绕过 IStorage 直接操作文件系统",
       "description": "全域扫描发现：DynamicBeingLoader.SaveBeingCode(Guid beingId, string beingDirectory, string sourceCode) 方法直接使用 Directory.Exists/CreateDirectory、Path.Combine、File.WriteAllBytes 操作文件系统，绕过了 IStorage 抽象层。同一类中的 LoadBeingType 和 SavePermissionCallback 都已正确使用 IStorage，但 SaveBeingCode 仍绕过抽象。在 Fast 项目（SpeedyStorage）中，此方法会在磁盘创建不兼容的目录和文件。修复方案：将参数从 string beingDirectory 改为 IStorage storage，使用 BeingCodeFileManager.SaveCode(storage, encryptedCode) 替代直接文件操作。注意：当前此方法无调用方（属于死代码），但仍应修复以保持一致性。",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-24T18:00:00+08:00",
       "createdBy": "trae-glm5",
-      "assignedTo": "trae-glm5"
+      "assignedTo": "trae-glm5",
+      "completedAt": "2026-05-24T18:30:00+08:00"
     },
     {
       "id": "task-337",
@@ -133,9 +135,9 @@
     }
   ],
   "taskIndex": {
-    "pending": ["task-336", "task-337", "task-338", "task-339", "task-340"],
+    "pending": ["task-337", "task-338", "task-339", "task-340"],
     "inProgress": [],
-    "completed": ["task-331", "task-332", "task-333", "task-334", "task-335"],
+    "completed": ["task-331", "task-332", "task-333", "task-334", "task-335", "task-336"],
     "cancelled": []
   },
   "metadata": {
