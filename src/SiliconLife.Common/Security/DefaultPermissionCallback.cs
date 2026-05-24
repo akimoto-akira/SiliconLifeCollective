@@ -555,14 +555,29 @@ public class DefaultPermissionCallback : IPermissionCallback
         // But allow: own Temp directory
         if (!string.IsNullOrEmpty(_appDataDirectory))
         {
-            // Allow: own Temp directory
-            var ownTempDir = Path.Combine(_appDataDirectory, "SiliconManager", callerId.ToString(), "Temp").ToLowerInvariant();
-            if (filePathLower.StartsWith(ownTempDir))
+            var beingPathResolver = ServiceLocator.Instance.BeingPathResolver;
+            string? ownTempDir = null;
+            if (beingPathResolver != null)
+            {
+                var beingPath = beingPathResolver(callerId);
+                if (!string.IsNullOrEmpty(beingPath))
+                {
+                    if (Path.IsPathRooted(beingPath))
+                    {
+                        ownTempDir = Path.Combine(beingPath, "Temp").ToLowerInvariant();
+                    }
+                    else if (!string.IsNullOrEmpty(_appDataDirectory))
+                    {
+                        ownTempDir = Path.Combine(_appDataDirectory, beingPath, "Temp").ToLowerInvariant();
+                    }
+                }
+            }
+
+            if (ownTempDir != null && filePathLower.StartsWith(ownTempDir))
             {
                 return PermissionResult.Allowed;
             }
 
-            // Deny: other paths in data directory (including other silicon beings' directories)
             if (filePathLower.StartsWith(_appDataDirectory))
             {
                 return PermissionResult.Denied;

@@ -118,10 +118,11 @@
       "title": "DefaultPermissionCallback 硬编码 SiliconManager 路径结构",
       "description": "全域扫描发现：DefaultPermissionCallback.EvaluateFileAccess 中硬编码 Path.Combine(_appDataDirectory, \"SiliconManager\", callerId.ToString(), \"Temp\") 路径结构。这是 Default 项目的文件系统布局，在 Fast 项目中 _appDataDirectory 是 Environment.CurrentDirectory，\"SiliconManager\" 是 SpeedyStorage 的键前缀而非目录名，导致权限判断可能错误——无法正确识别硅基人的临时目录。修复方案：需通过 BeingPathResolver 委托或 IStorage 来判断路径归属，而非硬编码路径结构。可考虑引入 IPermissionPathResolver 接口，由各项目注册路径判断逻辑。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-24T18:00:00+08:00",
       "createdBy": "trae-glm5",
-      "assignedTo": "trae-glm5"
+      "assignedTo": "trae-glm5",
+      "completedAt": "2026-05-24T19:30:00+08:00"
     },
     {
       "id": "task-340",
@@ -138,9 +139,9 @@
     }
   ],
   "taskIndex": {
-    "pending": ["task-339"],
+    "pending": [],
     "inProgress": [],
-    "completed": ["task-331", "task-332", "task-333", "task-334", "task-335", "task-336", "task-337", "task-338", "task-340"],
+    "completed": ["task-331", "task-332", "task-333", "task-334", "task-335", "task-336", "task-337", "task-338", "task-339", "task-340"],
     "cancelled": []
   },
   "metadata": {
