@@ -113,6 +113,7 @@ public class Router
         RegisterController(() => new ProjectController(), "/project/{id}/work-notes");
         RegisterController(() => new ProjectController(), "/project/{id}/tasks");
         RegisterController(() => new ProjectController(), "/project/{id}/tool-permissions");
+        RegisterController(() => new ProjectController(), "/project/{id}/workflow");
         RegisterController(() => new ProjectController(), "/api/projects/list");
         RegisterController(() => new ProjectController(), "/api/projects/list-workflow-templates");
         RegisterController(() => new ProjectController(), "/api/projects/create", "POST");
@@ -120,6 +121,9 @@ public class Router
         RegisterController(() => new ProjectController(), "/api/projects/{id}/restore", "POST");
         RegisterController(() => new ProjectController(), "/api/projects/{id}/destroy", "POST");
         RegisterController(() => new ProjectController(), "/api/projects/detail");
+        RegisterController(() => new ProjectController(), "/api/projects/workflow-detail");
+        RegisterController(() => new ProjectController(), "/api/projects/assign-role", "POST");
+        RegisterController(() => new ProjectController(), "/api/projects/remove-role", "POST");
         RegisterController(() => new ProjectController(), "/api/projects/update", "POST");
         RegisterController(() => new ProjectController(), "/api/projects/assign", "POST");
         RegisterController(() => new ProjectController(), "/api/projects/remove", "POST");
