@@ -41,7 +41,8 @@
       "createdAt": "2026-05-25T00:10:00+08:00",
       "createdBy": "qoder",
       "assignedTo": "catpaw",
-      "completedAt": "2026-05-25T04:00:00+08:00"
+      "completedAt": "2026-05-25T04:00:00+08:00",
+      "relatedCommit": "edfb600"
     },
     {
       "id": "task-349",
@@ -50,9 +51,12 @@
       "title": "HasProjectsWithoutTemplate扩展为HasProjectsNeedingAttention",
       "description": "当前 HasProjectsWithoutTemplate 只检查项目是否缺工作流模板。需要扩展检查范围。\n\n改造内容：\n1) 重命名为 HasProjectsNeedingAttention（或保留原名并扩展逻辑）\n2) 增加检查：有模板但角色池为空的项目\n3) 增加检查：角色池人数不满足模板要求的项目\n4) 返回值包含具体原因（缺模板/缺角色）\n\n依赖：task-346, task-347",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-25T00:10:00+08:00",
-      "createdBy": "qoder"
+      "createdBy": "qoder",
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-25T04:20:00+08:00",
+      "relatedCommit": "6a2d713"
     },
     {
       "id": "task-350",
@@ -61,9 +65,12 @@
       "title": "工作流任务创建改用角色池分配执行者",
       "description": "当前 CreateTaskForStage 写死 CreatedBy，需改为从角色池取执行者。\n\n改造内容：\n1) CreateTaskForStage 根据当前阶段确定所需角色名\n2) 从 ProjectSpace.RoleAssignments 中获取该角色的硅基人列表\n3) 选择策略：轮询/负载最少/随机（初期可用轮询）\n4) 将选中的硅基人设为任务的 AssignedTo\n5) 角色池为空时创建任务但不指派（等待主理人分配角色）\n\n依赖：task-347",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-25T00:10:00+08:00",
-      "createdBy": "qoder"
+      "createdBy": "qoder",
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-25T04:40:00+08:00",
+      "relatedCommit": null
     },
     {
       "id": "task-351",
@@ -225,8 +232,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-349",
-      "task-350",
       "task-351",
       "task-352",
       "task-353",
@@ -238,6 +243,8 @@
     ],
     "inProgress": [],
     "completed": [
+      "task-350",
+      "task-349",
       "task-348",
       "task-347",
       "task-346",
