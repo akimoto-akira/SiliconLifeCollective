@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-25T10:30:00+08:00",
+  "lastUpdated": "2026-05-25T10:35:00+08:00",
   "tasks": [
     {
       "id": "task-346",
@@ -166,7 +166,8 @@
       "createdAt": "2026-05-25T00:10:00+08:00",
       "createdBy": "qoder",
       "assignedTo": "catpaw",
-      "completedAt": "2026-05-25T10:30:00+08:00"
+      "completedAt": "2026-05-25T10:30:00+08:00",
+      "relatedCommit": "4eff807"
     },
     {
       "id": "task-358",
@@ -175,9 +176,12 @@
       "title": "实现MediaWiki API发布服务",
       "description": "将生成的 wiki 标记页面发布到 MediaWiki 站点。封装为程序内部服务。\n\n实现要点：\n1) 封装 MediaWiki API 调用（登录、编辑页面、上传媒体）\n2) 通过 NetworkExecutor 发起 HTTP 请求（遵循 Executor 模式）\n3) WikiPublicationTick 步骤7检测文档就绪后调用此服务\n4) 支持批量发布（一个实体可能产生多个语言版本页面）\n5) 发布结果回写到实体状态（已发布/发布失败）\n6) 发布方式沿用原工程的最优解实现\n\n对应7步流程：步骤7（发布到MediaWiki）",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-25T00:10:00+08:00",
-      "createdBy": "qoder"
+      "createdBy": "qoder",
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-25T11:15:00+08:00",
+      "relatedCommit": null
     },
     {
       "id": "task-359",
@@ -264,10 +268,10 @@
     }
   ],
   "taskIndex": {
-    "pending": [
+    "pending": [],
+    "inProgress": [
       "task-358"
     ],
-    "inProgress": [],
     "completed": [
       "task-357",
       "task-351",
