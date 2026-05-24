@@ -521,21 +521,29 @@ public class ChatController : Controller
                 return;
             }
 
-            // Check file exists - using SpeedyPackRegistry
-            // Note: For local file paths, we still need to check existence directly
-            // since SpeedyPackRegistry manages the .spk file, not arbitrary files
-            if (!File.Exists(fullPath))
+            // Check file exists and get file info via DiskExecutor
+            var existsRequest = new ExecutorRequest(_userId, fullPath, "exists");
+            var existsResult = DiskExecutor.Execute(existsRequest);
+            if (!existsResult.Success || existsResult.Output != "true")
             {
                 RenderJson(new { success = false, error = "File not found" });
                 return;
             }
 
-            // Get file info
-            var fileInfo = new FileInfo(fullPath);
+            var infoRequest = new ExecutorRequest(_userId, fullPath, "get_file_info");
+            var infoResult = DiskExecutor.Execute(infoRequest);
+            if (!infoResult.Success)
+            {
+                RenderJson(new { success = false, error = "Cannot read file info" });
+                return;
+            }
+
+            // Parse file info from DiskExecutor output
+            var fileInfo = ParseFileInfo(infoResult.Output ?? "", fullPath);
 
             // Validate file size (100MB limit)
             const long maxFileSize = 100 * 1024 * 1024;
-            if (fileInfo.Length > maxFileSize)
+            if (fileInfo.Size > maxFileSize)
             {
                 RenderJson(new { success = false, error = "File too large (max 100MB)" });
                 return;
@@ -554,7 +562,7 @@ public class ChatController : Controller
                 {
                     FilePath = fullPath,
                     FileName = fileInfo.Name,
-                    FileSize = fileInfo.Length,
+                    FileSize = fileInfo.Size,
                     MimeType = GetMimeType(fileInfo.Extension),
                     IsLocalPath = body.IsLocalPath
                 }
@@ -570,7 +578,7 @@ public class ChatController : Controller
                 success = true,
                 messageId = fileMessage.Id.ToString(),
                 fileName = fileInfo.Name,
-                fileSize = fileInfo.Length,
+                fileSize = fileInfo.Size,
                 isLocalPath = body.IsLocalPath
             });
         }
@@ -578,6 +586,35 @@ public class ChatController : Controller
         {
             RenderJson(new { success = false, error = ex.Message });
         }
+    }
+
+    /// <summary>
+    /// Parses file info from DiskExecutor get_file_info output format.
+    /// Expected format:
+    ///   File: {fullPath}
+    ///   Size: {bytes} bytes
+    ///   Created: {datetime}
+    ///   Modified: {datetime}
+    ///   Attributes: {attributes}
+    /// </summary>
+    private static (string Name, long Size, string Extension) ParseFileInfo(string output, string fullPath)
+    {
+        long size = 0;
+        foreach (var line in output.Split('\n'))
+        {
+            if (line.StartsWith("Size:", StringComparison.OrdinalIgnoreCase))
+            {
+                var sizePart = line["Size:".Length..].Trim();
+                // Format: "12345 bytes"
+                var spaceIdx = sizePart.IndexOf(' ');
+                if (spaceIdx > 0 && long.TryParse(sizePart[..spaceIdx], out var parsedSize))
+                {
+                    size = parsedSize;
+                }
+                break;
+            }
+        }
+        return (Path.GetFileName(fullPath), size, Path.GetExtension(fullPath));
     }
 
     /// <summary>
