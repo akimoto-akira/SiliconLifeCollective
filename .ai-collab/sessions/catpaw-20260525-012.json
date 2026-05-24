@@ -1,0 +1,20 @@
+{
+  "sessionId": "catpaw-20260525-012",
+  "actor": "catpaw",
+  "startTime": "2026-05-25T10:00:00+08:00",
+  "endTime": "2026-05-25T10:30:00+08:00",
+  "task": "task-357",
+  "status": "completed",
+  "changeRecord": "changes/catpaw-20260525-012.json",
+  "actions": [
+    "实现 GeoLocation.GetWikiDocuments() 默认逻辑（名称+坐标+属性表+内容段）",
+    "实现 GeoLocation.CreateBaseInfoTable() 基类信息表",
+    "实现 GeoLocation.AddWordBaseSections() 反射收集 [Description] 标注的 WordBase 属性",
+    "实现 GeoLocation.AddInfoTableRow(WordBase) 重载",
+    "实现 GeoLocation.CreateGeoLink() 辅助方法",
+    "为 GeoCountry/GeoContinent/GeoWorld/GeoSAR/GeoProvince/GeoCity 重写 CreateBaseInfoTable 和 GetWikiDocuments",
+    "为 GeoCounty/GeoAttraction/GeoTransportation/GeoAirport/GeoPort 重写 CreateBaseInfoTable",
+    "修复12个编译错误（类型转换：WordBase→MediaWikiWord、GeoLocation→MediaWikiLink）",
+    "编译验证通过：0错误0警告"
+  ]
+}

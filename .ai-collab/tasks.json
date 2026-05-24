@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-25T09:30:00+08:00",
+  "lastUpdated": "2026-05-25T10:30:00+08:00",
   "tasks": [
     {
       "id": "task-346",
@@ -152,7 +152,7 @@
       "createdAt": "2026-05-25T00:10:00+08:00",
       "createdBy": "qoder",
       "assignedTo": "catpaw",
-      "relatedCommit": null,
+      "relatedCommit": "6e60ad1",
       "completedAt": "2026-05-25T09:30:00+08:00"
     },
     {
@@ -162,9 +162,11 @@
       "title": "各GeoLocation子类实现GetWikiDocuments()",
       "description": "当前各 GeoLocation 子类的 GetWikiDocuments() 为 stub/NotImplementedException。需要实现返回 MediaWikiDocument[] 的逻辑。\n\n实现要点：\n1) 每个子类根据自身内容字段组装 MediaWikiDocument\n2) MediaWikiDocument 包含该实体的所有 WordBase 内容段\n3) BuildDocument() 遍历 GetBaseLanguage()，对每个语言调用 MWBuildWord() 生成 wiki 标记\n4) 输出 Dictionary<string, string>（key=Title/语言代码，value=wiki标记文本）\n\n对应7步流程：步骤7（发布前的文档生成）",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-25T00:10:00+08:00",
-      "createdBy": "qoder"
+      "createdBy": "qoder",
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-25T10:30:00+08:00"
     },
     {
       "id": "task-358",
@@ -263,11 +265,11 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-357",
       "task-358"
     ],
     "inProgress": [],
     "completed": [
+      "task-357",
       "task-351",
       "task-352",
       "task-356",
