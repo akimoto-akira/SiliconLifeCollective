@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-24T22:30:00+08:00",
+  "lastUpdated": "2026-05-24T22:50:00+08:00",
   "tasks": [
     {
       "id": "task-341",
@@ -13,7 +13,7 @@
       "createdAt": "2026-05-24T10:08:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "catpaw",
-      "relatedCommit": null,
+      "relatedCommit": "1e6eb80",
       "completedAt": "2026-05-24T22:30:00+08:00"
     },
     {
@@ -23,12 +23,12 @@
       "title": "DiskTool.search_content绕过DiskExecutor直接文件操作",
       "description": "DiskTool.cs的search_content动作（L585-625）直接使用Directory.EnumerateFiles + File.ReadAllText搜索文件内容，绕过了DiskExecutor层。DiskTool的其他动作都通过DiskExecutor执行（已走IStorage），search_content是唯一例外的动作。\n\n修法：\n1) 将search_content的文件枚举和内容读取逻辑移入DiskExecutor\n2) DiskTool.search_content通过DiskExecutor调用\n3) DiskExecutor内部可使用IStorage或直接IO（DiskExecutor本身职责就是文件操作）\n4) 保持search_content的行为不变（递归搜索、跳过二进制文件、最大结果数限制）",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-24T10:08:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null,
+      "assignedTo": "catpaw",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-24T22:50:00+08:00"
     },
     {
       "id": "task-343",
@@ -61,13 +61,13 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-342",
       "task-343"
     ],
     "inProgress": [],
     "completed": [
       "task-344",
-      "task-341"
+      "task-341",
+      "task-342"
     ],
     "cancelled": []
   },

@@ -76,6 +76,8 @@ public static class DiskExecutor
             "create_directory" => ExecuteCreateDirectory(path),
             "exists" => ExecuteExists(path),
             "get_file_info" => ExecuteGetFileInfo(path),
+            "search_content" => ExecuteSearchContent(path, request.Parameters),
+            "search_files" => ExecuteSearchFiles(path, request.Parameters),
             _ => ExecutorResult.Failed($"Unknown disk operation type: {request.Type}")
         };
     }
@@ -397,6 +399,299 @@ public static class DiskExecutor
             _logger.Error(null, "Disk get file info failed: {0}, {1}", ex, path);
             return ExecutorResult.Failed($"Failed to get file info: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Searches file contents recursively for a keyword.
+    /// Parameters: keyword, pattern, max_results, case_sensitive, max_file_size
+    /// </summary>
+    private static ExecutorResult ExecuteSearchContent(string directory, Dictionary<string, object> parameters)
+    {
+        try
+        {
+            if (!parameters.TryGetValue("keyword", out object? keywordObj) || string.IsNullOrWhiteSpace(keywordObj?.ToString()))
+            {
+                return ExecutorResult.Failed("Missing 'keyword' parameter for search_content");
+            }
+
+            if (!Directory.Exists(directory))
+            {
+                return ExecutorResult.Failed($"Directory not found: {directory}");
+            }
+
+            string keyword = keywordObj.ToString()!;
+            string pattern = parameters.TryGetValue("pattern", out object? patternObj) && patternObj != null
+                ? patternObj.ToString()!
+                : "*.*";
+            int maxResults = GetIntParameter(parameters, "max_results", 50);
+            bool caseSensitive = GetBoolParameter(parameters, "case_sensitive", false);
+            long maxFileSize = GetIntParameter(parameters, "max_file_size", 10 * 1024 * 1024); // 10MB default
+
+            var results = new List<string>();
+            var comparison = caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+
+            SearchContentRecursive(directory, pattern, keyword, comparison, maxResults, maxFileSize, results);
+
+            _logger.Info(null, "Disk search_content: dir={0}, keyword={1}, matches={2}", directory, keyword, results.Count);
+
+            if (results.Count == 0)
+            {
+                return ExecutorResult.Successful($"No file contents found matching keyword '{keyword}' in {directory}");
+            }
+
+            return ExecutorResult.Successful($"Found {results.Count} matches for keyword '{keyword}':\n" +
+                string.Join("\n", results.Take(maxResults)));
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(null, "Disk search_content failed: {0}, {1}", ex, directory);
+            return ExecutorResult.Failed($"Failed to search file contents: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Recursively search file contents, handling UnauthorizedAccessException per directory.
+    /// Only searches text and code files, skipping binary files and oversized files.
+    /// </summary>
+    private static void SearchContentRecursive(
+        string directory, string pattern, string keyword,
+        StringComparison comparison, int maxResults, long maxFileSize, List<string> results)
+    {
+        if (results.Count >= maxResults) return;
+
+        // 1. Search file contents in current directory
+        try
+        {
+            foreach (var file in Directory.EnumerateFiles(directory, pattern, SearchOption.TopDirectoryOnly))
+            {
+                if (results.Count >= maxResults) return;
+
+                // Skip binary files - only search text and code files
+                if (!IsTextFile(file)) continue;
+
+                // Skip oversized files
+                try
+                {
+                    var fileInfo = new FileInfo(file);
+                    if (fileInfo.Length > maxFileSize) continue;
+                }
+                catch { continue; }
+
+                try
+                {
+                    var content = File.ReadAllText(file);
+                    var lines = content.Split('\n');
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        if (lines[i].Contains(keyword, comparison))
+                        {
+                            results.Add($"{file}:{i + 1}: {lines[i].Trim()}");
+                            if (results.Count >= maxResults) return;
+                        }
+                    }
+                }
+                catch { /* Skip files we can't read */ }
+            }
+        }
+        catch (UnauthorizedAccessException) { }
+        catch (IOException) { }
+
+        // 2. Recurse into subdirectories
+        try
+        {
+            foreach (var subDir in Directory.EnumerateDirectories(directory))
+            {
+                if (results.Count >= maxResults) return;
+                try
+                {
+                    SearchContentRecursive(subDir, pattern, keyword, comparison, maxResults, maxFileSize, results);
+                }
+                catch (UnauthorizedAccessException) { }
+                catch (IOException) { }
+            }
+        }
+        catch (UnauthorizedAccessException) { }
+        catch (IOException) { }
+    }
+
+    /// <summary>
+    /// Searches files by name recursively for a keyword.
+    /// Parameters: keyword, pattern, max_results, case_sensitive
+    /// </summary>
+    private static ExecutorResult ExecuteSearchFiles(string directory, Dictionary<string, object> parameters)
+    {
+        try
+        {
+            if (!parameters.TryGetValue("keyword", out object? keywordObj) || string.IsNullOrWhiteSpace(keywordObj?.ToString()))
+            {
+                return ExecutorResult.Failed("Missing 'keyword' parameter for search_files");
+            }
+
+            if (!Directory.Exists(directory))
+            {
+                return ExecutorResult.Failed($"Directory not found: {directory}");
+            }
+
+            string keyword = keywordObj.ToString()!;
+            string pattern = parameters.TryGetValue("pattern", out object? patternObj) && patternObj != null
+                ? patternObj.ToString()!
+                : "*.*";
+            int maxResults = GetIntParameter(parameters, "max_results", 50);
+            bool caseSensitive = GetBoolParameter(parameters, "case_sensitive", false);
+
+            var results = new List<string>();
+            var comparison = caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+
+            SearchFilesRecursive(directory, pattern, keyword, comparison, maxResults, results);
+
+            _logger.Info(null, "Disk search_files: dir={0}, keyword={1}, matches={2}", directory, keyword, results.Count);
+
+            if (results.Count == 0)
+            {
+                return ExecutorResult.Successful($"No files found matching keyword '{keyword}' in {directory}");
+            }
+
+            return ExecutorResult.Successful($"Found {results.Count} files matching keyword '{keyword}':\n" +
+                string.Join("\n", results));
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(null, "Disk search_files failed: {0}, {1}", ex, directory);
+            return ExecutorResult.Failed($"Failed to search files: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Recursively search files by name, handling UnauthorizedAccessException per directory.
+    /// </summary>
+    private static void SearchFilesRecursive(
+        string directory, string pattern, string keyword,
+        StringComparison comparison, int maxResults, List<string> results)
+    {
+        if (results.Count >= maxResults) return;
+
+        // 1. Search files in current directory first
+        try
+        {
+            foreach (var file in Directory.EnumerateFiles(directory, pattern, SearchOption.TopDirectoryOnly))
+            {
+                var fileName = Path.GetFileName(file);
+                if (fileName.Contains(keyword, comparison))
+                {
+                    results.Add(file);
+                    if (results.Count >= maxResults) return;
+                }
+            }
+        }
+        catch (UnauthorizedAccessException) { }
+        catch (IOException) { }
+
+        // 2. Recurse into subdirectories
+        try
+        {
+            foreach (var subDir in Directory.EnumerateDirectories(directory))
+            {
+                if (results.Count >= maxResults) return;
+                try
+                {
+                    SearchFilesRecursive(subDir, pattern, keyword, comparison, maxResults, results);
+                }
+                catch (UnauthorizedAccessException) { }
+                catch (IOException) { }
+            }
+        }
+        catch (UnauthorizedAccessException) { }
+        catch (IOException) { }
+    }
+
+    /// <summary>
+    /// Check if a file is likely a text/code file based on extension.
+    /// </summary>
+    internal static bool IsTextFile(string filePath)
+    {
+        string extension = Path.GetExtension(filePath).ToLowerInvariant();
+
+        // Text and code file extensions
+        var textExtensions = new HashSet<string>
+        {
+            // Code files
+            ".cs", ".vb", ".fs", ".cpp", ".c", ".h", ".hpp", ".cxx", ".cc",
+            ".java", ".kt", ".scala", ".groovy",
+            ".py", ".pyw", ".pyi", ".pyx",
+            ".js", ".jsx", ".ts", ".tsx", ".mjs",
+            ".html", ".htm", ".xhtml",
+            ".css", ".scss", ".sass", ".less",
+            ".json", ".xml", ".yaml", ".yml", ".toml", ".ini", ".cfg", ".conf",
+            ".md", ".markdown", ".txt", ".log",
+            ".sql", ".sh", ".bash", ".zsh", ".ps1", ".bat", ".cmd",
+            ".rb", ".php", ".go", ".rs", ".swift", ".m", ".mm",
+            ".r", ".R", ".pl", ".pm", ".t", ".lua", ".dart",
+            ".vue", ".svelte", ".astro",
+            ".dockerfile", ".gitignore", ".editorconfig",
+            ".csproj", ".vbproj", ".fsproj", ".sln",
+            ".props", ".targets", ".nuspec",
+
+            // Config and data files
+            ".env", ".properties", ".gradle",
+            ".makefile", ".cmake",
+            ".graphql", ".proto",
+            ".svg", ".xaml",
+            ".resx", ".licx",
+            ".mdx",
+
+            // Markup and template files
+            ".ejs", ".pug", ".jade", ".hbs", ".mustache",
+            ".liquid", ".jinja", ".jinja2",
+            ".blade.php", ".twig",
+        };
+
+        // Check if file has no extension (could be Dockerfile, Makefile, etc.)
+        if (string.IsNullOrEmpty(extension))
+        {
+            string fileName = Path.GetFileName(filePath).ToLowerInvariant();
+            var specialFiles = new HashSet<string>
+            {
+                "dockerfile", "makefile", "rakefile", "gemfile",
+                "vagrantfile", "jenkinsfile", "brewfile",
+                ".gitignore", ".dockerignore", ".editorconfig",
+                ".env", ".env.example", ".env.local",
+                "license", "readme", "changelog",
+                "authors", "contributors"
+            };
+            return specialFiles.Contains(fileName);
+        }
+
+        return textExtensions.Contains(extension);
+    }
+
+    /// <summary>
+    /// Gets an integer parameter from the parameters dictionary with a default value.
+    /// </summary>
+    private static int GetIntParameter(Dictionary<string, object> parameters, string key, int defaultValue)
+    {
+        if (parameters.TryGetValue(key, out object? valueObj) && valueObj != null)
+        {
+            if (int.TryParse(valueObj.ToString(), out int parsedValue))
+            {
+                return parsedValue;
+            }
+        }
+        return defaultValue;
+    }
+
+    /// <summary>
+    /// Gets a boolean parameter from the parameters dictionary with a default value.
+    /// </summary>
+    private static bool GetBoolParameter(Dictionary<string, object> parameters, string key, bool defaultValue)
+    {
+        if (parameters.TryGetValue(key, out object? valueObj) && valueObj != null)
+        {
+            if (bool.TryParse(valueObj.ToString(), out bool parsedValue))
+            {
+                return parsedValue;
+            }
+        }
+        return defaultValue;
     }
 
     /// <summary>
