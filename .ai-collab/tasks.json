@@ -1,9 +1,71 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-24T09:56:00+08:00",
-  "tasks": [],
+  "lastUpdated": "2026-05-24T10:08:00+08:00",
+  "tasks": [
+    {
+      "id": "task-341",
+      "type": "refactor",
+      "target": "SiliconLife.Common/WebView/PlaywrightWebView.cs",
+      "title": "PlaywrightWebView残留直接文件IO改用IStorage",
+      "description": "PlaywrightWebView.cs仍有6处直接文件系统操作未走IStorage：\n1) L390: Directory.Exists + Directory.EnumerateDirectories 检查playwright安装路径\n2) L398: File.Exists 检查安装脚本\n3) L470: Directory.CreateDirectory 创建临时目录\n4) L472: File.WriteAllText 写浏览器状态临时文件\n5) L488: File.Exists 检查临时文件\n6) L511-513: File.Exists + File.Delete 清理临时文件\n\n其中L390/398是检查playwright运行时安装路径（非应用数据），可保留直接IO。L470/472/488/511-513是浏览器状态的临时文件读写，应改用being.Storage（IStorage接口）。\n\n注意：task-337/338已部分重构过此文件（截图保存改用IStorage），但临时文件+状态文件部分仍残留。",
+      "priority": "P1",
+      "status": "pending",
+      "createdAt": "2026-05-24T10:08:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null
+    },
+    {
+      "id": "task-342",
+      "type": "refactor",
+      "target": "SiliconLife.Common/Tools/DiskTool.cs",
+      "title": "DiskTool.search_content绕过DiskExecutor直接文件操作",
+      "description": "DiskTool.cs的search_content动作（L585-625）直接使用Directory.EnumerateFiles + File.ReadAllText搜索文件内容，绕过了DiskExecutor层。DiskTool的其他动作都通过DiskExecutor执行（已走IStorage），search_content是唯一例外的动作。\n\n修法：\n1) 将search_content的文件枚举和内容读取逻辑移入DiskExecutor\n2) DiskTool.search_content通过DiskExecutor调用\n3) DiskExecutor内部可使用IStorage或直接IO（DiskExecutor本身职责就是文件操作）\n4) 保持search_content的行为不变（递归搜索、跳过二进制文件、最大结果数限制）",
+      "priority": "P1",
+      "status": "pending",
+      "createdAt": "2026-05-24T10:08:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null
+    },
+    {
+      "id": "task-343",
+      "type": "refactor",
+      "target": "SiliconLife.App/Web/Controllers/ChatController.cs",
+      "title": "ChatController附件检查改用IStorage",
+      "description": "ChatController.cs L527/534 使用File.Exists和FileInfo检查附件文件存在性，应改用IStorage接口。\n\n修法：\n1) 通过being.Storage访问文件系统\n2) 使用Storage.Exists()替代File.Exists\n3) 使用Storage.GetFileInfo()或类似方法替代new FileInfo\n4) 如果IStorage缺少必要方法，需先扩展IStorage接口",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-24T10:08:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null
+    },
+    {
+      "id": "task-344",
+      "type": "refactor",
+      "target": "SiliconLife.App/Web/Controllers/BeingController.cs, SiliconLife.App/Web/Controllers/ToolPermissionController.cs",
+      "title": "去除DefaultSiliconBeing向下转型，直接调用基类SaveState()",
+      "description": "BeingController.cs:385 和 ToolPermissionController.cs:197/304 中使用 `being is DefaultSiliconBeing defaultBeing` 向下转型，仅为调用SaveState()。但SaveState()是SiliconBeingBase的virtual方法，所有子类都可调用，无需转型。\n\n修法：\n1) BeingController.cs:385-387: 将 `if (being is DefaultSiliconBeing defaultBeing) { defaultBeing.SaveState(); }` 改为 `being.SaveState();`\n2) ToolPermissionController.cs:197-199: 同上\n3) ToolPermissionController.cs:304-306: 同上\n4) 删除不再需要的using引用（如有）\n\n注意：SiliconBeingBase.SaveState()已有Storage==null的null check保护，安全可直接调用。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-24T10:08:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null,
+      "relatedCommit": null,
+      "completedAt": null
+    }
+  ],
   "taskIndex": {
-    "pending": [],
+    "pending": [
+      "task-341",
+      "task-342",
+      "task-343",
+      "task-344"
+    ],
     "inProgress": [],
     "completed": [],
     "cancelled": []
