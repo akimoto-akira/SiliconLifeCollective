@@ -70,7 +70,7 @@
       "createdBy": "qoder",
       "assignedTo": "catpaw",
       "completedAt": "2026-05-25T04:40:00+08:00",
-      "relatedCommit": null
+      "relatedCommit": "a773224"
     },
     {
       "id": "task-351",
@@ -101,9 +101,12 @@
       "title": "扩展TravelCodeWikiTool（实体查询与状态）",
       "description": "当前 TravelCodeWikiTool 只有 get_all_languages 一个动作，需要扩展为地理实体的入口工具。\n\n新增动作：\n1) list_entities — 列出地理实体（支持按层级筛选、按类型筛选、分页）\n2) get_entity — 获取实体详情（名称、ID、OSM数据、MapInfo、内容状态摘要）\n3) get_entity_status — 获取实体完成度（哪些字段为空、哪些语言缺失、编码状态）\n\n保留已有：get_all_languages\n\n这是硅基人操作地理数据的信息入口。",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-25T00:10:00+08:00",
-      "createdBy": "qoder"
+      "createdBy": "qoder",
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-25T05:10:00+08:00",
+      "relatedCommit": null
     },
     {
       "id": "task-354",
@@ -234,7 +237,6 @@
     "pending": [
       "task-351",
       "task-352",
-      "task-353",
       "task-354",
       "task-355",
       "task-356",
@@ -243,6 +245,7 @@
     ],
     "inProgress": [],
     "completed": [
+      "task-353",
       "task-350",
       "task-349",
       "task-348",
