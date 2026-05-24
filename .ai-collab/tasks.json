@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-24T19:00:00+08:00",
+  "lastUpdated": "2026-05-24T19:45:00+08:00",
   "tasks": [
     {
       "id": "task-331",
@@ -83,7 +83,8 @@
       "createdAt": "2026-05-24T18:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "completedAt": "2026-05-24T18:30:00+08:00"
+      "completedAt": "2026-05-24T18:30:00+08:00",
+      "relatedCommit": "0ec0929"
     },
     {
       "id": "task-337",
@@ -96,7 +97,8 @@
       "createdAt": "2026-05-24T18:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "completedAt": "2026-05-24T19:00:00+08:00"
+      "completedAt": "2026-05-24T19:00:00+08:00",
+      "relatedCommit": "9a44b48"
     },
     {
       "id": "task-338",
@@ -109,7 +111,8 @@
       "createdAt": "2026-05-24T18:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "completedAt": "2026-05-24T19:15:00+08:00"
+      "completedAt": "2026-05-24T19:15:00+08:00",
+      "relatedCommit": "8fea742"
     },
     {
       "id": "task-339",
@@ -122,7 +125,8 @@
       "createdAt": "2026-05-24T18:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "completedAt": "2026-05-24T19:30:00+08:00"
+      "completedAt": "2026-05-24T19:30:00+08:00",
+      "relatedCommit": "4c24e6d"
     },
     {
       "id": "task-340",
@@ -133,9 +137,10 @@
       "priority": "P2",
       "status": "completed",
       "createdAt": "2026-05-24T18:00:00+08:00",
-      "assignedTo": "trae-glm5",
       "createdBy": "trae-glm5",
-      "completedAt": "2026-05-24T19:00:00+08:00"
+      "assignedTo": "trae-glm5",
+      "completedAt": "2026-05-24T19:00:00+08:00",
+      "relatedCommit": "9a44b48"
     }
   ],
   "taskIndex": {
