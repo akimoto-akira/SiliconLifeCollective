@@ -1,7 +1,150 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-24T23:20:00+08:00",
+  "lastUpdated": "2026-05-25T00:10:00+08:00",
   "tasks": [
+    {
+      "id": "task-346",
+      "type": "feature",
+      "target": "SiliconLife.Core/Workflow/WorkflowTemplate.cs",
+      "title": "WorkflowTemplate增加角色定义支持",
+      "description": "工作流模板需要能声明本工作流需要的角色。\n\n改造内容：\n1) WorkflowTemplate 增加 RoleDefinitions 属性（Dictionary<string, RoleDefinition>）\n2) RoleDefinition 包含：角色名、描述、最小/最大人数\n3) TravelCodeWikiPublishWorkflow 声明4个角色：POIClassifier、CodeAssigner、ContentWriter、Translator\n4) 工作流实例化时校验角色池是否满足模板要求\n\n这是角色池体系的基础设施，其他任务依赖此项。",
+      "priority": "P0",
+      "status": "pending",
+      "createdAt": "2026-05-25T00:10:00+08:00",
+      "createdBy": "qoder"
+    },
+    {
+      "id": "task-347",
+      "type": "feature",
+      "target": "SiliconLife.Core/Project/ProjectSpace.cs, SiliconLife.Common/Tools/ProjectTool.cs",
+      "title": "ProjectSpace角色池与ProjectTool角色管理动作",
+      "description": "项目空间需要维护角色池，并通过ProjectTool暴露管理能力。\n\n改造内容：\n1) ProjectSpace 增加 RoleAssignments 属性：Dictionary<string, List<Guid>>（角色名→硅基人GUID列表）\n2) 角色池持久化到项目存储\n3) ProjectTool 新增 assign_role 动作：主理人将硅基人分配到指定角色\n4) ProjectTool 新增 remove_role 动作：主理人将硅基人从角色移除\n5) ProjectTool 新增 list_roles 动作：查看当前角色池状态\n\n依赖：task-346（WorkflowTemplate角色定义）",
+      "priority": "P0",
+      "status": "pending",
+      "createdAt": "2026-05-25T00:10:00+08:00",
+      "createdBy": "qoder"
+    },
+    {
+      "id": "task-348",
+      "type": "feature",
+      "target": "SiliconLife.Core/AI/ContextManager.cs",
+      "title": "BuildProjectScenarioContext增加角色信息",
+      "description": "AI的项目场景上下文中需要展示角色定义和角色池状态，让硅基人知道项目需要哪些角色、当前角色池是否满员。\n\n改造内容：\n1) BuildProjectScenarioContext 中读取工作流模板的 RoleDefinitions\n2) 展示角色定义列表（角色名、描述、需要人数）\n3) 展示当前角色池状态（已分配的硅基人）\n4) 如果角色池不满，提示主理人需要分配\n\n依赖：task-346, task-347",
+      "priority": "P0",
+      "status": "pending",
+      "createdAt": "2026-05-25T00:10:00+08:00",
+      "createdBy": "qoder"
+    },
+    {
+      "id": "task-349",
+      "type": "feature",
+      "target": "SiliconLife.Common/SiliconBeing/DefaultSiliconBeing.cs",
+      "title": "HasProjectsWithoutTemplate扩展为HasProjectsNeedingAttention",
+      "description": "当前 HasProjectsWithoutTemplate 只检查项目是否缺工作流模板。需要扩展检查范围。\n\n改造内容：\n1) 重命名为 HasProjectsNeedingAttention（或保留原名并扩展逻辑）\n2) 增加检查：有模板但角色池为空的项目\n3) 增加检查：角色池人数不满足模板要求的项目\n4) 返回值包含具体原因（缺模板/缺角色）\n\n依赖：task-346, task-347",
+      "priority": "P0",
+      "status": "pending",
+      "createdAt": "2026-05-25T00:10:00+08:00",
+      "createdBy": "qoder"
+    },
+    {
+      "id": "task-350",
+      "type": "feature",
+      "target": "src/TravelCodeWikiWithAI/TravelCodeWikiPublishWorkflow.cs",
+      "title": "工作流任务创建改用角色池分配执行者",
+      "description": "当前 CreateTaskForStage 写死 CreatedBy，需改为从角色池取执行者。\n\n改造内容：\n1) CreateTaskForStage 根据当前阶段确定所需角色名\n2) 从 ProjectSpace.RoleAssignments 中获取该角色的硅基人列表\n3) 选择策略：轮询/负载最少/随机（初期可用轮询）\n4) 将选中的硅基人设为任务的 AssignedTo\n5) 角色池为空时创建任务但不指派（等待主理人分配角色）\n\n依赖：task-347",
+      "priority": "P0",
+      "status": "pending",
+      "createdAt": "2026-05-25T00:10:00+08:00",
+      "createdBy": "qoder"
+    },
+    {
+      "id": "task-351",
+      "type": "feature",
+      "target": "src/TravelCodeWikiWithAI/Tools/GeoContentTool.cs",
+      "title": "新增GeoContentTool（MediaWikiWord内容读写）",
+      "description": "封装 MediaWikiWord 内容的读写能力，使硅基人能为地理实体编写结构化富文本文章。\n\n动作设计：\n1) list_sections — 列出实体的所有内容字段及其状态（空/已填充/字数）\n2) read_section — 读取实体的某个内容字段（返回 MediaWikiWord 树的结构描述）\n3) write_section — 向实体的某个内容字段写入 MediaWikiWord 富文本对象树\n4) preview_wiki — 预览实体的 MediaWiki 标记输出（调用 BuildDocument）\n\n关键设计：write_section 的输入是结构化的 MediaWikiWord 描述（Section/Language/Bold/Link/List等），不是纯文本。\n\n对应7步流程：步骤5（AI编写文章）",
+      "priority": "P0",
+      "status": "pending",
+      "createdAt": "2026-05-25T00:10:00+08:00",
+      "createdBy": "qoder"
+    },
+    {
+      "id": "task-352",
+      "type": "feature",
+      "target": "src/TravelCodeWikiWithAI/Tools/GeoDataTool.cs",
+      "title": "新增GeoDataTool（OSM数据操作与POI归类）",
+      "description": "封装 OSM 数据操作能力，使硅基人能浏览POI数据、归类挂载、分配编码。\n\n动作设计：\n1) list_osm_pois — 列出指定区域内的 OSM POI 数据（名称、类型标签、坐标）\n2) classify_poi — 将 POI 归类并挂载到地理实体树（创建 GeoAttraction/GeoAirport/GeoPort 节点）\n3) assign_code — 为无 ISO 代码的地理实体分配不超过5字母的标识编码\n4) refresh_osm — 刷新实体的 OSM 数据\n5) expand_children — 展开实体的子区域（从 PBF 数据中提取）\n\n对应7步流程：步骤3（POI归类）+ 步骤4（编码分配）",
+      "priority": "P0",
+      "status": "pending",
+      "createdAt": "2026-05-25T00:10:00+08:00",
+      "createdBy": "qoder"
+    },
+    {
+      "id": "task-353",
+      "type": "feature",
+      "target": "src/TravelCodeWikiWithAI/TravelCodeWikiTool.cs",
+      "title": "扩展TravelCodeWikiTool（实体查询与状态）",
+      "description": "当前 TravelCodeWikiTool 只有 get_all_languages 一个动作，需要扩展为地理实体的入口工具。\n\n新增动作：\n1) list_entities — 列出地理实体（支持按层级筛选、按类型筛选、分页）\n2) get_entity — 获取实体详情（名称、ID、OSM数据、MapInfo、内容状态摘要）\n3) get_entity_status — 获取实体完成度（哪些字段为空、哪些语言缺失、编码状态）\n\n保留已有：get_all_languages\n\n这是硅基人操作地理数据的信息入口。",
+      "priority": "P0",
+      "status": "pending",
+      "createdAt": "2026-05-25T00:10:00+08:00",
+      "createdBy": "qoder"
+    },
+    {
+      "id": "task-354",
+      "type": "refactor",
+      "target": "src/TravelCodeWikiWithAI/WikiPublicationTick.cs",
+      "title": "重写WikiPublicationTick为7步流程调度中枢",
+      "description": "当前 WikiPublicationTick 只做一件事：检测缺失语言并创建翻译任务。需要升级为7步流程的调度中枢。\n\n改造后逻辑（每帧只创建一个任务，防爆炸）：\n扫描优先级：\n1) 步骤4：发现ID为空或低质量 -> 创建[编码分配]任务\n2) 步骤3：发现未归类POI -> 创建[POI分类]任务\n3) 步骤5：发现内容字段为空 -> 创建[内容编写]任务\n4) 步骤6：发现LanguageData缺失语言 -> 创建[翻译]任务（已有，保留优化）\n5) 步骤7：发现文档就绪（文章+语言齐备） -> 触发BuildDocument+发布\n\n任务创建时从角色池取执行者（依赖task-350）。\n前置条件保持：_pbf.OK == true",
+      "priority": "P0",
+      "status": "pending",
+      "createdAt": "2026-05-25T00:10:00+08:00",
+      "createdBy": "qoder"
+    },
+    {
+      "id": "task-355",
+      "type": "refactor",
+      "target": "src/TravelCodeWikiWithAI/TravelCodeWikiPublishWorkflow.cs",
+      "title": "重写TravelCodeWikiPublishWorkflow阶段映射7步操作",
+      "description": "当前工作流阶段是通用阶段（DataImport→QualityCheck→ContentReview→WikiPublish），与7步操作不对应。\n\n改造后状态机：\nDataImport → POIClassify → CodeAssign → ContentCreation → Translation → WikiPublish → Published\n任意阶段 → Rejected → Rework → 回到对应阶段\n\n角色定义（RoleDefinitions）：\n- POIClassifier — POI分类人员（步骤3）\n- CodeAssigner — 编码分配人员（步骤4）\n- ContentWriter — 内容创作人员（步骤5）\n- Translator — 翻译人员（步骤6）\n\n转移条件：基于 TaskSystem 中对应任务的完成状态。\n\n依赖：task-346（角色定义基础设施）",
+      "priority": "P0",
+      "status": "pending",
+      "createdAt": "2026-05-25T00:10:00+08:00",
+      "createdBy": "qoder"
+    },
+    {
+      "id": "task-356",
+      "type": "feature",
+      "target": "src/TravelCodeWikiWithAI/GeoLanguageTool.cs",
+      "title": "扩展GeoLanguageTool（ObjectPath支持与set_word）",
+      "description": "当前 GeoLanguageTool 的 set_language/get_language 只支持实体名称的 LanguageData。需要扩展支持任意 LanguageData 和词表管理。\n\n改造内容：\n1) 扩展 set_language：支持通过 ObjectPath 定位任意 LanguageData（包括 MediaWikiLanguage 内部的）\n2) 扩展 get_language：支持通过 ObjectPath 读取任意 LanguageData 的已有翻译\n3) 新增 set_word 动作：设置 GeoWordTable 词条（中外文对照翻译词典）\n\nObjectPath 示例：geo/root.World.Continents[0].Countries[2].Name 或 geo/root.World.Continents[0].Understand.Sections[0].Content\n\n对应7步流程：步骤6（翻译补充）",
+      "priority": "P1",
+      "status": "pending",
+      "createdAt": "2026-05-25T00:10:00+08:00",
+      "createdBy": "qoder"
+    },
+    {
+      "id": "task-357",
+      "type": "feature",
+      "target": "src/TravelCodeWikiWithAI/GeoData/GeoCountry.cs, GeoProvince.cs, GeoCity.cs, GeoCounty.cs, GeoAttraction.cs, GeoAirport.cs, GeoPort.cs",
+      "title": "各GeoLocation子类实现GetWikiDocuments()",
+      "description": "当前各 GeoLocation 子类的 GetWikiDocuments() 为 stub/NotImplementedException。需要实现返回 MediaWikiDocument[] 的逻辑。\n\n实现要点：\n1) 每个子类根据自身内容字段组装 MediaWikiDocument\n2) MediaWikiDocument 包含该实体的所有 WordBase 内容段\n3) BuildDocument() 遍历 GetBaseLanguage()，对每个语言调用 MWBuildWord() 生成 wiki 标记\n4) 输出 Dictionary<string, string>（key=Title/语言代码，value=wiki标记文本）\n\n对应7步流程：步骤7（发布前的文档生成）",
+      "priority": "P1",
+      "status": "pending",
+      "createdAt": "2026-05-25T00:10:00+08:00",
+      "createdBy": "qoder"
+    },
+    {
+      "id": "task-358",
+      "type": "feature",
+      "target": "src/TravelCodeWikiWithAI/Services/MediaWikiPublishService.cs",
+      "title": "实现MediaWiki API发布服务",
+      "description": "将生成的 wiki 标记页面发布到 MediaWiki 站点。封装为程序内部服务。\n\n实现要点：\n1) 封装 MediaWiki API 调用（登录、编辑页面、上传媒体）\n2) 通过 NetworkExecutor 发起 HTTP 请求（遵循 Executor 模式）\n3) WikiPublicationTick 步骤7检测文档就绪后调用此服务\n4) 支持批量发布（一个实体可能产生多个语言版本页面）\n5) 发布结果回写到实体状态（已发布/发布失败）\n6) 发布方式沿用原工程的最优解实现\n\n对应7步流程：步骤7（发布到MediaWiki）",
+      "priority": "P1",
+      "status": "pending",
+      "createdAt": "2026-05-25T00:10:00+08:00",
+      "createdBy": "qoder"
+    },
     {
       "id": "task-345",
       "type": "cleanup",
@@ -12,6 +155,7 @@
       "status": "completed",
       "createdAt": "2026-05-24T23:25:00+08:00",
       "createdBy": "qoder",
+      "relatedCommit": "d685288",
       "completedAt": "2026-05-24T23:26:00+08:00"
     },
     {
@@ -72,7 +216,21 @@
     }
   ],
   "taskIndex": {
-    "pending": [],
+    "pending": [
+      "task-346",
+      "task-347",
+      "task-348",
+      "task-349",
+      "task-350",
+      "task-351",
+      "task-352",
+      "task-353",
+      "task-354",
+      "task-355",
+      "task-356",
+      "task-357",
+      "task-358"
+    ],
     "inProgress": [],
     "completed": [
       "task-345",
