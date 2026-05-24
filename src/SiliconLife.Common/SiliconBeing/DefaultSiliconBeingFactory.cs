@@ -20,6 +20,8 @@ namespace SiliconLife.Common.SiliconBeing;
 /// <summary>
 /// Default factory for creating silicon being instances.
 /// Creates ToolManager and PermissionManager for each being.
+/// Uses <see cref="ServiceLocator.BeingPathResolver"/> to construct per-being storage paths,
+/// keeping this layer free of file-system or SpeedyPack-specific path logic.
 /// </summary>
 public class DefaultSiliconBeingFactory : ISiliconBeingFactory
 {
@@ -27,51 +29,37 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
     private readonly Dictionary<string, object> _globalAIConfig;
     private readonly IStorage _storage;
     private readonly ITimeStorage _timeStorage;
-    private readonly string _dataDirectory;
     private readonly IPermissionCallback? _permissionCallback;
     private readonly IPermissionAskHandler? _askHandler;
 
-    /// <summary>
-    /// Initializes a new instance of the DefaultSiliconBeingFactory class
-    /// </summary>
-    /// <param name="globalAIConfig">The global AI configuration for beings without independent config</param>
-    /// <param name="storage">The storage instance to use</param>
-    /// <param name="dataDirectory">The base data directory</param>
     public DefaultSiliconBeingFactory(
         Dictionary<string, object> globalAIConfig,
         IStorage storage,
-        ITimeStorage timeStorage,
-        string dataDirectory)
-        : this(globalAIConfig, storage, timeStorage, dataDirectory, null, null)
+        ITimeStorage timeStorage)
+        : this(globalAIConfig, storage, timeStorage, null, null)
     {
     }
 
-    /// <summary>
-    /// Initializes a new instance with permission components
-    /// </summary>
     public DefaultSiliconBeingFactory(
         Dictionary<string, object> globalAIConfig,
         IStorage storage,
         ITimeStorage timeStorage,
-        string dataDirectory,
         IPermissionCallback? permissionCallback,
         IPermissionAskHandler? askHandler)
     {
         _globalAIConfig = globalAIConfig;
         _storage = storage;
         _timeStorage = timeStorage;
-        _dataDirectory = dataDirectory;
         _permissionCallback = permissionCallback;
         _askHandler = askHandler;
     }
 
-    /// <summary>
-    /// Creates a silicon being with the specified ID and name.
-    /// Automatically creates a ToolManager and PermissionManager.
-    /// </summary>
-    /// <param name="id">The unique identifier for the silicon being</param>
-    /// <param name="name">The name of the silicon being</param>
-    /// <returns>The created silicon being instance</returns>
+    private static Func<Guid, string> ResolvePathResolver()
+    {
+        return ServiceLocator.Instance.BeingPathResolver
+            ?? throw new InvalidOperationException("BeingPathResolver not registered in ServiceLocator");
+    }
+
     public SiliconBeingBase CreateBeing(Guid id, string name)
     {
         if (id == Guid.Empty)
@@ -79,28 +67,23 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
             id = Guid.NewGuid();
         }
 
-        string beingDirectory = Path.Combine(_dataDirectory, "SiliconManager", id.ToString());
-
+        string beingDirectory = ResolvePathResolver()(id);
         return CreateAndConfigureBeing(id, name, beingDirectory);
     }
 
-    /// <summary>
-    /// Loads a silicon being from its directory
-    /// </summary>
-    /// <param name="beingDirectory">The directory path of the silicon being</param>
-    /// <returns>The loaded silicon being instance, or null if loading fails</returns>
     public SiliconBeingBase? LoadBeing(string beingDirectory)
     {
         try
         {
-            string directoryName = Path.GetFileName(beingDirectory);
+            string directoryName = beingDirectory.TrimEnd('/', '\\').Split('/', '\\').Last();
 
             if (!Guid.TryParse(directoryName, out Guid id))
             {
                 return null;
             }
 
-            DefaultSiliconBeing being = (DefaultSiliconBeing)CreateAndConfigureBeing(id, "", beingDirectory);
+            string resolvedDirectory = ResolvePathResolver()(id);
+            DefaultSiliconBeing being = (DefaultSiliconBeing)CreateAndConfigureBeing(id, "", resolvedDirectory);
             being.LoadState();
             return being;
         }
@@ -110,106 +93,65 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         }
     }
 
-    /// <summary>
-    /// Discovers the IDs of all persisted silicon beings by scanning the SiliconManager directory.
-    /// Works with both file-system storage (Default) and SpeedyPack storage (Fast).
-    /// </summary>
-    /// <returns>A collection of GUIDs for beings that have persisted data</returns>
     public IEnumerable<Guid> DiscoverPersistedBeingIds()
     {
-        string siliconManagerDir = Path.Combine(_dataDirectory, "SiliconManager");
         var ids = new List<Guid>();
 
-        if (Directory.Exists(siliconManagerDir))
+        try
         {
-            try
+            var storageFactory = ServiceLocator.Instance.StorageFactory;
+            if (storageFactory != null)
             {
-                foreach (string dir in Directory.GetDirectories(siliconManagerDir))
+                IStorage rootStorage = storageFactory("");
+                foreach (string key in rootStorage.ListKeys("SiliconManager"))
                 {
-                    string dirName = Path.GetFileName(dir);
-                    if (Guid.TryParse(dirName, out Guid id))
+                    string segment = key.TrimEnd('/').Split('/').Last();
+                    if (Guid.TryParse(segment, out Guid id))
                     {
                         ids.Add(id);
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                _logger.Warn(null, "DiscoverPersistedBeingIds: error scanning directory {0}: {1}", siliconManagerDir, ex.Message);
-            }
         }
-        else
+        catch (Exception ex)
         {
-            try
-            {
-                var storageFactory = ServiceLocator.Instance.StorageFactory;
-                if (storageFactory != null)
-                {
-                    IStorage rootStorage = storageFactory("");
-                    foreach (string key in rootStorage.ListKeys("SiliconManager"))
-                    {
-                        string segment = key.TrimEnd('/').Split('/').Last();
-                        if (Guid.TryParse(segment, out Guid id))
-                        {
-                            ids.Add(id);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Warn(null, "DiscoverPersistedBeingIds: error listing storage keys: {0}", ex.Message);
-            }
+            _logger.Warn(null, "DiscoverPersistedBeingIds: error listing storage keys: {0}", ex.Message);
         }
 
         _logger.Info(null, "DiscoverPersistedBeingIds: found {0} persisted being(s)", ids.Count);
         return ids;
     }
 
-    /// <summary>
-    /// Creates a DefaultSiliconBeing and configures its properties, ToolManager, and PermissionManager.
-    /// Curators (IsCurator=true) get ALL tools; normal beings get only non-curator tools.
-    /// The only difference between curator and normal being is tool access.
-    /// </summary>
     private SiliconBeingBase CreateAndConfigureBeing(Guid id, string name, string beingDirectory)
     {
-        // Determine if this is the curator
         Guid curatorGuid = Config.Instance?.Data?.CuratorGuid ?? Guid.Empty;
         bool isCurator = id == curatorGuid;
 
         DefaultSiliconBeing being = new(id, name);
         being.BeingDirectory = beingDirectory;
 
-        // Create per-being storage for soul, TaskSystem and TimerSystem (data stored in SiliconManager\{GUID})
-        var storageFactory = ServiceLocator.Instance.StorageFactory 
+        var storageFactory = ServiceLocator.Instance.StorageFactory
             ?? throw new InvalidOperationException("StorageFactory not registered in ServiceLocator");
         IStorage beingStorage = storageFactory(beingDirectory);
         being.Storage = beingStorage;
 
-        // Load soul content from storage
         string? soulContent = SoulFileManager.LoadSoul(beingStorage);
         being.SoulContent = soulContent;
 
-        // Load or save state — the being manages its own data (includes AI config)
         if (!being.LoadState() && !string.IsNullOrEmpty(name))
         {
             being.SaveState();
         }
-        
-        // Create AI client for this being based on its configuration
+
         try
         {
             being.AIClient = CreateAIClientForBeing(being);
         }
         catch (Exception ex)
         {
-            // Log error but don't block being creation; will retry on next tick
             _logger.Warn(Guid.Empty, "Being {0}: failed to create AI client, will retry on next tick. Error: {1}", name, ex.Message);
         }
 
-        // Create and configure ToolManager for this being
-        // Curators get ALL tools (normal + curator-only); normal beings get only non-curator tools
-        // Tools are gathered from the default assembly, additional tool assemblies, AND from every loaded plugin assembly.
         ToolManager toolManager = new ToolManager(curatorOnly: isCurator);
         if (isCurator)
         {
@@ -227,7 +169,6 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         }
         being.ToolManager = toolManager;
 
-        // Create PermissionManager for this being
         GlobalACL? globalAcl = ServiceLocator.Instance.GlobalAcl;
         if (globalAcl != null)
         {
@@ -241,14 +182,11 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
             ServiceLocator.Instance.RegisterPermissionManager(id, pm);
         }
 
-        // Create TimeStorage for this being (separate directory per being)
-        string beingTimeStorageDir = Path.Combine(_dataDirectory, "SiliconManager", id.ToString());
-        var timeStorageFactory = ServiceLocator.Instance.TimeStorageFactory 
+        var timeStorageFactory = ServiceLocator.Instance.TimeStorageFactory
             ?? throw new InvalidOperationException("TimeStorageFactory not registered in ServiceLocator");
-        ITimeStorage beingTimeStorage = timeStorageFactory(beingTimeStorageDir);
+        ITimeStorage beingTimeStorage = timeStorageFactory(beingDirectory);
         being.TimeStorage = beingTimeStorage;
 
-        // Create Memory, TaskSystem, TimerSystem for this being
         being.Memory = new Memory(beingTimeStorage);
         being.TaskSystem = new TaskSystem(being);
         being.TaskEnumerator = new TaskEnumerator(id);
@@ -259,55 +197,41 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         TimerPendingChecker pendingChecker = CalendarTimerResolvers.CreatePendingChecker();
         being.TimerSystem = new TimerSystem(being, beingStorage, resolver, converter, pendingChecker);
 
-        // Create WorkNoteSystem for this being (stores in beingDirectory/work_notes.json)
-        var workNoteStorageFactory = ServiceLocator.Instance.WorkNoteStorageFactory 
+        var workNoteStorageFactory = ServiceLocator.Instance.WorkNoteStorageFactory
             ?? throw new InvalidOperationException("WorkNoteStorageFactory not registered in ServiceLocator");
         IWorkNoteStorage workNoteStorage = workNoteStorageFactory(beingDirectory);
         being.WorkNoteSystem = new WorkNoteSystem(workNoteStorage, id);
 
         return being;
     }
-    
-    /// <summary>
-    /// Creates an AI client for a being based on its configuration
-    /// </summary>
+
     private IAIClient CreateAIClientForBeing(DefaultSiliconBeing being)
     {
-        // Determine which config to use
         Dictionary<string, object> configToUse;
         string clientType;
-        
+
         if (being.AIClientConfig != null && being.AIClientConfig.Count > 0)
         {
-            // Has independent config, use being's config
             configToUse = being.AIClientConfig;
             clientType = ResolveClientType(being.AIClientType);
         }
         else
         {
-            // No independent config, use global config
             configToUse = _globalAIConfig;
             clientType = ResolveClientType(null);
         }
-        
+
         if (configToUse == null || configToUse.Count == 0)
         {
             throw new InvalidOperationException($"Being {being.Name}: no AI config available");
         }
-        
-        // Create factory based on client type
+
         IAIClientFactory factory = CreateFactoryByType(clientType);
-        
-        // Create client using factory
         IAIClient client = factory.CreateClient(configToUse);
-        
+
         return client;
     }
-    
-    /// <summary>
-    /// Resolves AI client type, treating empty strings as null.
-    /// Priority: provided type → global config type → default "OllamaClient".
-    /// </summary>
+
     private static string ResolveClientType(string? beingType)
     {
         if (!string.IsNullOrEmpty(beingType))
@@ -317,16 +241,12 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
             return globalType;
         return "OllamaClient";
     }
-    
-    /// <summary>
-    /// Creates an AI client factory based on client type
-    /// </summary>
+
     private IAIClientFactory CreateFactoryByType(string clientType)
     {
-        // Normalize: strip "Factory" suffix if present (config may store "DashScopeClientFactory")
         if (clientType.EndsWith("Factory"))
             clientType = clientType.Substring(0, clientType.Length - 7);
-        
+
         return clientType switch
         {
             "OllamaClient" => new OllamaClientFactory(),

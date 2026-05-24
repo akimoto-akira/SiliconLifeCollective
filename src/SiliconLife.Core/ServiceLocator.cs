@@ -69,6 +69,8 @@ public class ServiceLocator
     /// <summary>Gets the registered factory for creating <see cref="IWorkNoteStorage"/>, or <c>null</c>.</summary>
     public Func<string, IWorkNoteStorage>? WorkNoteStorageFactory => Get<Func<string, IWorkNoteStorage>>();
 
+    public Func<Guid, string>? BeingPathResolver => Get<Func<Guid, string>>();
+
     /// <summary>Gets the registered factory for creating WebView, or <c>null</c>.</summary>
     public Func<SiliconBeingBase, object>? WebViewFactory => Get<Func<SiliconBeingBase, object>>();
 

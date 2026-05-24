@@ -61,75 +61,23 @@ public class DefaultSiliconBeing : SiliconBeingBase
         _activityRaw = (int)BeingActivity.Idle;
     }
 
-    /// <summary>
-    /// Saves this being's state (name, AI config) to storage.
-    /// Called by the factory on first creation and when config changes.
-    /// </summary>
-    public void SaveState()
+    public override void SaveState()
     {
-        if (Storage == null)
-        {
-            _logger.Warn(Id, "Being {0}: Storage is not available, cannot save state", Name);
-            return;
-        }
-        
-        try
-        {
-            var state = new StateFileManager.BeingState
-            {
-                Name = Name,
-                AIClientType = AIClientType ?? "",
-                AIConfig = AIClientConfig ?? new Dictionary<string, object>(),
-                ToolActionPermissions = ToolActionPermissions
-            };
-            
-            StateFileManager.SaveState(Storage, state);
-            _logger.Debug(Id, "Being {0}: state saved to storage", Name);
-        }
-        catch (Exception ex)
-        {
-            _logger.Warn(Id, "Being {0}: failed to save state", Name, ex);
-        }
+        base.SaveState();
     }
 
-    /// <summary>
-    /// Loads this being's name and AI config from storage.
-    /// Returns true if state was loaded successfully.
-    /// </summary>
-    public bool LoadState()
+    public override bool LoadState()
     {
-        if (Storage == null) return false;
-        
-        try
+        if (!base.LoadState()) return false;
+
+        Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+        if (LocalizationManager.Instance.TryGetLocalization(language, out LocalizationBase? loc) &&
+            loc is DefaultLocalizationBase defaultLoc)
         {
-            var state = StateFileManager.LoadState(Storage);
-            if (state == null) return false;
-
-            // Apply loaded state
-            Name = state.Name;
-            AIClientType = state.AIClientType;
-            AIClientConfig = state.AIConfig;
-            ToolActionPermissions = state.ToolActionPermissions;
-            
-            // Initialize backup config
-            BackupAIClientConfig = AIClientConfig?.ToDictionary(k => k.Key, v => v.Value);
-            
-            _logger.Debug(Id, "Being {0}: state loaded from storage", Name);
-
-            Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
-            if (LocalizationManager.Instance.TryGetLocalization(language, out LocalizationBase? loc) &&
-                loc is DefaultLocalizationBase defaultLoc)
-            {
-                Memory?.Add(defaultLoc.FormatMemoryEventStartup());
-            }
-
-            return true;
+            Memory?.Add(defaultLoc.FormatMemoryEventStartup());
         }
-        catch (Exception ex)
-        {
-            _logger.Warn(Id, "Being {0}: failed to load state", Name, ex);
-        }
-        return false;
+
+        return true;
     }
     
     /// <summary>

@@ -687,3 +687,19 @@
 2026-05-24T14:35:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Default/Program.cs | intent=启动时调用LoadPersistedBeings加载非curator硅基人
 2026-05-24T15:00:00+08:00 | trae-glm5 | task_complete | task=task-334 | fix=系统重启后自动加载通过CuratorTool创建的硅基人
 2026-05-24T15:00:00+08:00 | trae-glm5 | session_end | completed=task-334
+2026-05-24T17:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260524-1700 | task=task-335
+2026-05-24T17:00:00+08:00 | trae-glm5 | task_start | task=task-335
+2026-05-24T17:10:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/SiliconBeing/SiliconBeingBase.cs | intent=将SaveState/LoadState提升到基类
+2026-05-24T17:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeing.cs | intent=重写SaveState/LoadState为基类虚方法调用
+2026-05-24T17:20:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Tools/CuratorTool.cs | intent=移除DefaultSiliconBeing类型检查直接调用基类SaveState
+2026-05-24T17:30:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Core/ServiceLocator.cs | intent=新增BeingPathResolver属性
+2026-05-24T17:40:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeingFactory.cs | intent=重构移除文件系统路径硬编码引入BeingPathResolver委托
+2026-05-24T17:45:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Default/Program.cs | intent=注册BeingPathResolver委托移除工厂dataDirectory参数
+2026-05-24T17:50:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Fast/Program.cs | intent=注册BeingPathResolver委托移除工厂dataDirectory参数
+2026-05-24T18:00:00+08:00 | trae-glm5 | task_complete | task=task-335 | fix=公共层DefaultSiliconBeingFactory不再硬编码文件系统路径
+2026-05-24T18:00:00+08:00 | trae-glm5 | task_created | task=task-336 | desc=DynamicBeingLoader.SaveBeingCode绕过IStorage
+2026-05-24T18:00:00+08:00 | trae-glm5 | task_created | task=task-337 | desc=PlaywrightWebView直接操作文件系统
+2026-05-24T18:00:00+08:00 | trae-glm5 | task_created | task=task-338 | desc=WebViewBrowserTool截图保存绕过IStorage
+2026-05-24T18:00:00+08:00 | trae-glm5 | task_created | task=task-339 | desc=DefaultPermissionCallback硬编码SiliconManager路径
+2026-05-24T18:00:00+08:00 | trae-glm5 | task_created | task=task-340 | desc=WebViewBrowserTool强制类型转换DefaultSiliconBeing
+2026-05-24T18:00:00+08:00 | trae-glm5 | session_end | completed=task-335 | created=task-336,task-337,task-338,task-339,task-340

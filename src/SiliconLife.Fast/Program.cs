@@ -118,6 +118,7 @@ public class Program
             return new SpeedyStorage(relativePath);
         });
         ServiceLocator.Instance.Register<Func<string, IWorkNoteStorage>>(dir => new SpeedyWorkNoteStorage());
+        ServiceLocator.Instance.Register<Func<Guid, string>>(id => $"SiliconManager/{id}");
         ServiceLocator.Instance.Register<Func<SiliconBeingBase, object>>(being => new PlaywrightWebView((DefaultSiliconBeing)being));
         _logger.Info(null, "Registered: Storage Factories");
 
@@ -182,7 +183,6 @@ public class Program
             configData.AIConfig,
             storage,
             timeStorage,
-            Environment.CurrentDirectory,
             permissionCallback,
             askHandler);
 

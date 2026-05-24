@@ -226,4 +226,59 @@ public abstract class SiliconBeingBase
     /// </summary>
     /// <param name="deltaTime">Time elapsed since the last tick</param>
     public abstract void Tick(TimeSpan deltaTime);
+
+    private static readonly ILogger _stateLogger = LogManager.Instance.GetLogger(typeof(SiliconBeingBase));
+
+    public virtual void SaveState()
+    {
+        if (Storage == null)
+        {
+            _stateLogger.Warn(Id, "Being {0}: Storage is not available, cannot save state", Name);
+            return;
+        }
+
+        try
+        {
+            var state = new StateFileManager.BeingState
+            {
+                Name = Name,
+                AIClientType = AIClientType ?? "",
+                AIConfig = AIClientConfig ?? new Dictionary<string, object>(),
+                ToolActionPermissions = ToolActionPermissions
+            };
+
+            StateFileManager.SaveState(Storage, state);
+            _stateLogger.Debug(Id, "Being {0}: state saved to storage", Name);
+        }
+        catch (Exception ex)
+        {
+            _stateLogger.Warn(Id, "Being {0}: failed to save state", Name, ex);
+        }
+    }
+
+    public virtual bool LoadState()
+    {
+        if (Storage == null) return false;
+
+        try
+        {
+            var state = StateFileManager.LoadState(Storage);
+            if (state == null) return false;
+
+            Name = state.Name;
+            AIClientType = state.AIClientType;
+            AIClientConfig = state.AIConfig;
+            ToolActionPermissions = state.ToolActionPermissions;
+
+            BackupAIClientConfig = AIClientConfig?.ToDictionary(k => k.Key, v => v.Value);
+
+            _stateLogger.Debug(Id, "Being {0}: state loaded from storage", Name);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _stateLogger.Warn(Id, "Being {0}: failed to load state", Name, ex);
+            return false;
+        }
+    }
 }

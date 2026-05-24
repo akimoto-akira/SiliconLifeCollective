@@ -12,7 +12,6 @@
 // limitations under the License.
 
 using SiliconLife.Collective;
-
 using SiliconLife.Common.Localization;
 
 namespace SiliconLife.Common.Tools;
@@ -162,7 +161,9 @@ public class CuratorTool : ITool
 
         // Update the being's SoulContent property (will also trigger auto-save)
         newBeing.SoulContent = soulContent;
-        
+
+        newBeing.SaveState();
+
         beingManager.RegisterBeing(newBeing);
 
         RecordMemoryForCaller(callerId, loc => loc.FormatMemoryEventBeingCreated(name, newId.ToString("N")));

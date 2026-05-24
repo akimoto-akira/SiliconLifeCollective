@@ -90,6 +90,7 @@ public class Program
         ServiceLocator.Instance.Register<Func<string, ITimeStorage>>(dir => new FileSystemTimeStorage(dir));
         ServiceLocator.Instance.Register<Func<string, IStorage>>(dir => new FileSystemStorage(dir));
         ServiceLocator.Instance.Register<Func<string, IWorkNoteStorage>>(dir => new FileSystemWorkNoteStorage(dir));
+        ServiceLocator.Instance.Register<Func<Guid, string>>(id => Path.Combine(configData.DataDirectory.FullName, "SiliconManager", id.ToString()));
         ServiceLocator.Instance.Register<Func<SiliconBeingBase, object>>(being => new PlaywrightWebView((DefaultSiliconBeing)being));
         _logger.Info(null, "Registered: Storage Factories");
 
@@ -151,7 +152,6 @@ public class Program
             configData.AIConfig,
             storage,
             timeStorage,
-            configData.DataDirectory.FullName,
             permissionCallback,
             askHandler);
 
