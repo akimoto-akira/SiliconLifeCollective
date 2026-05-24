@@ -302,19 +302,16 @@ public class WebViewBrowserTool : ITool
         var webView = being.GetWebView();
         var screenshot = await webView.GetScreenshotAsync(options);
         
-        // Save screenshot to being's directory
-        var screenshotDir = Path.Combine(being.BeingDirectory ?? ".", "screenshots");
-        if (!Directory.Exists(screenshotDir))
-        {
-            Directory.CreateDirectory(screenshotDir);
-        }
-
         var filename = $"screenshot_{DateTime.UtcNow:yyyyMMdd_HHmmss}.{(options.Format == ScreenshotFormat.Jpeg ? "jpg" : "png")}";
-        var filepath = Path.Combine(screenshotDir, filename);
+        string storageKey = $"screenshots/{filename}";
         
-        await File.WriteAllBytesAsync(filepath, screenshot);
+        if (being.Storage != null)
+        {
+            being.Storage.Write(storageKey, screenshot);
+            return ToolResult.Successful($"Screenshot saved to storage:{storageKey} ({screenshot.Length} bytes)");
+        }
         
-        return ToolResult.Successful($"Screenshot saved to {filepath} ({screenshot.Length} bytes)");
+        return ToolResult.Successful($"Screenshot captured ({screenshot.Length} bytes) but not saved: storage unavailable");
     }
 
     private async Task<ToolResult> ExecuteWaitForElement(SiliconBeingBase being, Dictionary<string, object> parameters)

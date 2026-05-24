@@ -105,10 +105,11 @@
       "title": "WebViewBrowserTool 截图保存绕过 IStorage 直接操作文件系统",
       "description": "全域扫描发现：WebViewBrowserTool.ExecuteGetScreenshot 方法使用 Path.Combine(being.BeingDirectory, \"screenshots\") 构造路径，并使用 Directory.Exists/CreateDirectory、File.WriteAllBytesAsync 直接操作文件系统保存截图。在 Fast 项目中 BeingDirectory 是逻辑路径而非文件系统路径。修复方案：改为通过 IStorage 保存截图数据，或通过 ServiceLocator.BeingPathResolver 获取正确的存储路径后使用对应的 Storage 工厂创建存储实例。",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-24T18:00:00+08:00",
+      "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "createdBy": "trae-glm5"
+      "completedAt": "2026-05-24T19:15:00+08:00"
     },
     {
       "id": "task-339",
@@ -137,9 +138,9 @@
     }
   ],
   "taskIndex": {
-    "pending": ["task-338", "task-339"],
+    "pending": ["task-339"],
     "inProgress": [],
-    "completed": ["task-331", "task-332", "task-333", "task-334", "task-335", "task-336", "task-337", "task-340"],
+    "completed": ["task-331", "task-332", "task-333", "task-334", "task-335", "task-336", "task-337", "task-338", "task-340"],
     "cancelled": []
   },
   "metadata": {
