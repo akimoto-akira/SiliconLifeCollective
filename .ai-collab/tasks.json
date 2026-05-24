@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-24T14:17:20+08:00",
+  "lastUpdated": "2026-05-25T06:00:00+08:00",
   "tasks": [
     {
       "id": "task-346",
@@ -86,13 +86,16 @@
     {
       "id": "task-352",
       "type": "feature",
-      "target": "src/TravelCodeWikiWithAI/Tools/GeoDataTool.cs",
+      "target": "src/TravelCodeWikiWithAI/GeoDataTool.cs",
       "title": "新增GeoDataTool（OSM数据操作与POI归类）",
       "description": "封装 OSM 数据操作能力，使硅基人能浏览POI数据、归类挂载、分配编码。\n\n动作设计：\n1) list_osm_pois — 列出指定区域内的 OSM POI 数据（名称、类型标签、坐标）\n2) classify_poi — 将 POI 归类并挂载到地理实体树（创建 GeoAttraction/GeoAirport/GeoPort 节点）\n3) assign_code — 为无 ISO 代码的地理实体分配不超过5字母的标识编码\n4) refresh_osm — 刷新实体的 OSM 数据\n5) expand_children — 展开实体的子区域（从 PBF 数据中提取）\n\n对应7步流程：步骤3（POI归类）+ 步骤4（编码分配）",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-25T00:10:00+08:00",
-      "createdBy": "qoder"
+      "createdBy": "qoder",
+      "assignedTo": "catpaw",
+      "relatedCommit": "00e48ab",
+      "completedAt": "2026-05-25T06:30:00+08:00"
     },
     {
       "id": "task-353",
@@ -176,7 +179,7 @@
       "createdAt": "2026-05-24T14:17:20+08:00",
       "createdBy": "marvis",
       "assignedTo": "marvis",
-      "relatedCommit": null,
+      "relatedCommit": "f1789d1",
       "completedAt": "2026-05-24T14:17:20+08:00"
     },
     {
@@ -252,7 +255,6 @@
   "taskIndex": {
     "pending": [
       "task-351",
-      "task-352",
       "task-355",
       "task-356",
       "task-357",
@@ -260,6 +262,7 @@
     ],
     "inProgress": [],
     "completed": [
+      "task-352",
       "task-359",
       "task-354",
       "task-353",

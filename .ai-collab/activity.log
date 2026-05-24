@@ -845,7 +845,12 @@
 2026-05-25T05:40:00+08:00 | catpaw | session_end | completed=task-354
 
 2026-05-24T14:17:20+08:00 | marvis | session_start | sessionId=marvis-20260524-1417 | task=task-359
-2026-05-24T14:17:20+08:00 | marvis | task_claim | task=task-359 | type=docs | title=ÓÅ»¯README.mdÃèÊöĞĞ£¬ÌáÉıÏîÄ¿¼ÛÖµÎüÒıÁ¦
-2026-05-24T14:17:20+08:00 | marvis | file_modified | README.md | intent=ÓÅ»¯ÏîÄ¿ÃèÊöĞĞ+×ÔĞŞ¸Ä´úÂë+Roslyn¶¯Ì¬±àÒë+µ¥½ø³ÌÔËĞĞÊ±+ÁãÒÀÀµ
-2026-05-24T14:17:20+08:00 | marvis | task_complete | task=task-359 | changed=README.mdÃèÊöĞĞ
+2026-05-24T14:17:20+08:00 | marvis | task_claim | task=task-359 | type=docs | title=ï¿½Å»ï¿½README.mdï¿½ï¿½ï¿½ï¿½ï¿½Ğ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+2026-05-24T14:17:20+08:00 | marvis | file_modified | README.md | intent=ï¿½Å»ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½+ï¿½ï¿½ï¿½Ş¸Ä´ï¿½ï¿½ï¿½+Roslynï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+2026-05-24T14:17:20+08:00 | marvis | task_complete | task=task-359 | changed=README.mdï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 2026-05-24T14:17:20+08:00 | marvis | session_end | completed=task-359
+2026-05-25T06:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260525-008 | task=task-352
+2026-05-25T06:00:00+08:00 | catpaw | task_claim | task=task-352 | type=feature | title=æ–°å¢GeoDataToolï¼ˆOSMæ•°æ®æ“ä½œä¸POIå½’ç±»ï¼‰
+2026-05-25T06:15:00+08:00 | catpaw | file_modified | src/TravelCodeWikiWithAI/GeoDataTool.cs | intent=æ–°å¢GeoDataToolå·¥å…·+5ä¸ªåŠ¨ä½œ(list_osm_pois/classify_poi/assign_code/refresh_osm/expand_children)
+2026-05-25T06:30:00+08:00 | catpaw | task_complete | task=task-352 | commit=00e48ab
+2026-05-25T06:30:00+08:00 | catpaw | session_end | completed=task-352

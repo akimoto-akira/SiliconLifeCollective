@@ -6,5 +6,6 @@
   "status": "completed",
   "selectedTask": "task-359",
   "modifiedFiles": ["README.md"],
-  "changeRecord": "changes/marvis-20260524-1417.json"
+  "changeRecord": "changes/marvis-20260524-1417.json",
+  "commitHash": "f1789d1"
 }

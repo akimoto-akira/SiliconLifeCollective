@@ -1,0 +1,32 @@
+{
+  "sessionId": "catpaw-20260525-008",
+  "actorId": "catpaw",
+  "timestamp": "2026-05-25T06:30:00+08:00",
+  "task": {
+    "id": "task-352",
+    "title": "新增GeoDataTool（OSM数据操作与POI归类）",
+    "status": "completed"
+  },
+  "changes": {
+    "files_modified": [
+      {
+        "path": "src/TravelCodeWikiWithAI/GeoDataTool.cs",
+        "intent": "新增GeoDataTool工具，封装OSM数据操作与POI归类能力，5个动作：list_osm_pois/classify_poi/assign_code/refresh_osm/expand_children",
+        "details": [
+          "list_osm_pois — 从PBF数据源列出指定区域内OSM POI数据，支持tag_filter筛选和分页",
+          "classify_poi — 将POI归类并挂载到地理实体树，支持创建GeoAttraction/GeoAirport/GeoPort节点，自动从OSM标签提取名称/坐标等信息",
+          "assign_code — 为无ISO代码的地理实体分配不超过5字母标识编码，含重复代码检测",
+          "refresh_osm — 从PBF数据源刷新实体的OSM数据（名称/wikidata/MapInfo），调用FlushOSMData()",
+          "expand_children — 从PBF数据中提取实体子区域，根据admin_level创建对应GeoLocation子类",
+          "自动注册：GeoDataTool在同一程序集中，RegisterToolAssembly已覆盖",
+          "POI分类策略：从OSM Relation的member节点中提取POI（tourism/aeroway/harbour等标签）",
+          "挂载策略：优先GetAttractions()/GetSubArea()，回退到反射SubArea属性"
+        ]
+      }
+    ],
+    "verification": {
+      "build_result": "0 errors, warnings only (pre-existing nullability warnings)",
+      "projects_built": ["TravelCodeWikiWithAI"]
+    }
+  }
+}
