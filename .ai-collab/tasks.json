@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-25T07:30:00+08:00",
+  "lastUpdated": "2026-05-25T08:00:00+08:00",
   "tasks": [
     {
       "id": "task-346",
@@ -83,7 +83,7 @@
       "createdAt": "2026-05-25T00:10:00+08:00",
       "createdBy": "qoder",
       "assignedTo": "catpaw",
-      "relatedCommit": null,
+      "relatedCommit": "feaccab",
       "completedAt": "2026-05-25T07:30:00+08:00"
     },
     {
@@ -130,13 +130,14 @@
     {
       "id": "task-355",
       "type": "refactor",
-      "target": "src/TravelCodeWikiWithAI/TravelCodeWikiPublishWorkflow.cs",
+      "target": "src/TravelCodeWikiWithAI/TravelCodeWikiWithAIWorkflow/TravelCodeWikiPublishWorkflow.cs",
       "title": "重写TravelCodeWikiPublishWorkflow阶段映射7步操作",
       "description": "当前工作流阶段是通用阶段（DataImport→QualityCheck→ContentReview→WikiPublish），与7步操作不对应。\n\n改造后状态机：\nDataImport → POIClassify → CodeAssign → ContentCreation → Translation → WikiPublish → Published\n任意阶段 → Rejected → Rework → 回到对应阶段\n\n角色定义（RoleDefinitions）：\n- POIClassifier — POI分类人员（步骤3）\n- CodeAssigner — 编码分配人员（步骤4）\n- ContentWriter — 内容创作人员（步骤5）\n- Translator — 翻译人员（步骤6）\n\n转移条件：基于 TaskSystem 中对应任务的完成状态。\n\n依赖：task-346（角色定义基础设施）",
       "priority": "P0",
-      "status": "pending",
+      "status": "inProgress",
       "createdAt": "2026-05-25T00:10:00+08:00",
-      "createdBy": "qoder"
+      "createdBy": "qoder",
+      "assignedTo": "catpaw",
     },
     {
       "id": "task-356",
@@ -257,12 +258,13 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-355",
       "task-356",
       "task-357",
       "task-358"
     ],
-    "inProgress": [],
+    "inProgress": [
+      "task-355"
+    ],
     "completed": [
       "task-351",
       "task-352",
