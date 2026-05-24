@@ -2,7 +2,7 @@
 
 # Silicon Life Collective
 
-A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Beings** self-evolve through Roslyn dynamic compilation.
+AI agents that rewrite their own source code. Roslyn dynamic compilation. Single-process runtime. Zero dependencies.
 
 ## 📖 Documentation
 

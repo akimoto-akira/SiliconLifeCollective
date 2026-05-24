@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-25T02:00:00+08:00",
+  "lastUpdated": "2026-05-24T14:17:20+08:00",
   "tasks": [
     {
       "id": "task-346",
@@ -106,7 +106,7 @@
       "createdBy": "qoder",
       "assignedTo": "catpaw",
       "completedAt": "2026-05-25T05:10:00+08:00",
-      "relatedCommit": null
+      "relatedCommit": "77a27f9"
     },
     {
       "id": "task-354",
@@ -115,9 +115,11 @@
       "title": "重写WikiPublicationTick为7步流程调度中枢",
       "description": "当前 WikiPublicationTick 只做一件事：检测缺失语言并创建翻译任务。需要升级为7步流程的调度中枢。\n\n改造后逻辑（每帧只创建一个任务，防爆炸）：\n扫描优先级：\n1) 步骤4：发现ID为空或低质量 -> 创建[编码分配]任务\n2) 步骤3：发现未归类POI -> 创建[POI分类]任务\n3) 步骤5：发现内容字段为空 -> 创建[内容编写]任务\n4) 步骤6：发现LanguageData缺失语言 -> 创建[翻译]任务（已有，保留优化）\n5) 步骤7：发现文档就绪（文章+语言齐备） -> 触发BuildDocument+发布\n\n任务创建时从角色池取执行者（依赖task-350）。\n前置条件保持：_pbf.OK == true",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-25T00:10:00+08:00",
-      "createdBy": "qoder"
+      "createdBy": "qoder",
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-25T05:40:00+08:00"
     },
     {
       "id": "task-355",
@@ -162,6 +164,20 @@
       "status": "pending",
       "createdAt": "2026-05-25T00:10:00+08:00",
       "createdBy": "qoder"
+    },
+    {
+      "id": "task-359",
+      "type": "docs",
+      "target": "README.md",
+      "title": "优化README.md描述行，提升项目价值吸引力",
+      "description": "将README.md中的描述行从：\n'A .NET 9 multi-agent collaboration platform where AI agents called **Silicon Beings** self-evolve through Roslyn dynamic compilation.'\n改为：\n'AI agents that rewrite their own source code. Roslyn dynamic compilation. Single-process runtime. Zero dependencies.'\n\n新描述更简洁、更有冲击力，突出核心卖点：自修改代码、Roslyn动态编译、单进程运行时、零依赖。",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-24T14:17:20+08:00",
+      "createdBy": "marvis",
+      "assignedTo": "marvis",
+      "relatedCommit": null,
+      "completedAt": "2026-05-24T14:17:20+08:00"
     },
     {
       "id": "task-345",
@@ -237,7 +253,6 @@
     "pending": [
       "task-351",
       "task-352",
-      "task-354",
       "task-355",
       "task-356",
       "task-357",
@@ -245,6 +260,8 @@
     ],
     "inProgress": [],
     "completed": [
+      "task-359",
+      "task-354",
       "task-353",
       "task-350",
       "task-349",

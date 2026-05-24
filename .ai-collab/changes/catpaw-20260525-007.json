@@ -1,0 +1,34 @@
+{
+  "sessionId": "catpaw-20260525-007",
+  "actorId": "catpaw",
+  "timestamp": "2026-05-25T05:40:00+08:00",
+  "task": {
+    "id": "task-354",
+    "title": "重写WikiPublicationTick为7步流程调度中枢",
+    "status": "completed"
+  },
+  "changes": {
+    "files_modified": [
+      {
+        "path": "src/TravelCodeWikiWithAI/WikiPublicationTick.cs",
+        "intent": "重写WikiPublicationTick为7步流程调度中枢，从单功能（翻译检测）升级为5级优先级扫描的完整调度系统",
+        "details": [
+          "新增步骤4扫描：ScanForCodeAssignment — 发现ID为空或UNKNW开头的实体，创建编码分配任务（CodeAssigner角色）",
+          "新增步骤3扫描：ScanForPOIClassification — 发现未归类POI的实体，创建POI分类任务（POIClassifier角色）",
+          "新增步骤5扫描：ScanForContentCreation — 发现Understand为空且有OSM数据的实体，创建内容编写任务（ContentWriter角色）",
+          "保留步骤6：ScanForTranslation — 保留原有翻译扫描逻辑，增加Step=6元数据标记和Translator角色分配",
+          "新增步骤7扫描：ScanForPublishing — 发现文档就绪的实体（有ID+有内容+语言齐备），创建发布任务",
+          "新增HasExistingTask统一去重：支持按TaskType+ObjectPath或MissingLanguage两种去重模式",
+          "新增SelectExecutorFromRole角色池选择：负载最少策略（选当前任务数最少的角色成员），替代原写死CreatedBy",
+          "各任务Metadata增加Step字段标记步骤编号（3/4/5/6/7），便于追踪",
+          "翻译任务优先级从100调整为10，编码分配40，POI分类30，内容编写20，发布5",
+          "IsDocumentReady判断逻辑：有效ID+有Understand+Name覆盖所有基础语言"
+        ]
+      }
+    ],
+    "verification": {
+      "build_result": "0 errors, warnings only (pre-existing nullability warnings)",
+      "projects_built": ["TravelCodeWikiWithAI"]
+    }
+  }
+}
