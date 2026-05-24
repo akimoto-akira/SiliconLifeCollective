@@ -1123,6 +1123,11 @@ Użycie: wywołaj narzędzie chat, ustaw action=""mark_read"", target_id=GUID ro
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
     public override string ProjectCtx_RoleAssignedCount => "Przypisano";
     public override string ProjectCtx_UnassignedRoles => "Nieprzypisane wymagane role";
+    public override string ProjectCtx_AttentionReasonsHeader => "Powody wymagające uwagi projektu";
+    public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "Szczegóły niespełnionych ról";
+    public override string ProjectAttention_MissingTemplate => "Brak szablonu przepływu pracy";
+    public override string ProjectAttention_EmptyRolePool => "Pula ról pusta (brak przypisanych ról)";
+    public override string ProjectAttention_UnsatisfiedRoles => "Niektóre role nie spełniają wymagań kadrowych";
 
     // Role Staffing
     public override string RoleStaffing_Understaffed => "Niedostatecznie obsadzone";

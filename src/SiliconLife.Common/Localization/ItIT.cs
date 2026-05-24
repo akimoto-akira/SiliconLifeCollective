@@ -1979,6 +1979,11 @@ Uso: Chiama lo strumento chat, imposta action=""mark_read"", target_id=GUID dell
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
     public override string ProjectCtx_RoleAssignedCount => "Assegnati";
     public override string ProjectCtx_UnassignedRoles => "Ruoli richiesti non assegnati";
+    public override string ProjectCtx_AttentionReasonsHeader => "Motivi per cui il progetto richiede attenzione";
+    public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "Dettagli dei ruoli non soddisfatti";
+    public override string ProjectAttention_MissingTemplate => "Modello di workflow mancante";
+    public override string ProjectAttention_EmptyRolePool => "Pool di ruoli vuoto (nessun ruolo assegnato)";
+    public override string ProjectAttention_UnsatisfiedRoles => "Alcuni ruoli non soddisfano i requisiti di personale";
 
     // Role Staffing
     public override string RoleStaffing_Understaffed => "Sottoorganico";

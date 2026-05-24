@@ -3434,6 +3434,21 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <summary>Label for unassigned required roles</summary>
     public abstract string ProjectCtx_UnassignedRoles { get; }
 
+    /// <summary>Header for project attention reasons section</summary>
+    public abstract string ProjectCtx_AttentionReasonsHeader { get; }
+
+    /// <summary>Header for unsatisfied role details section</summary>
+    public abstract string ProjectCtx_UnsatisfiedRolesDetailHeader { get; }
+
+    /// <summary>Reason: project has no workflow template assigned</summary>
+    public abstract string ProjectAttention_MissingTemplate { get; }
+
+    /// <summary>Reason: project has template but role pool is completely empty</summary>
+    public abstract string ProjectAttention_EmptyRolePool { get; }
+
+    /// <summary>Reason: some roles in the project's template are not satisfied</summary>
+    public abstract string ProjectAttention_UnsatisfiedRoles { get; }
+
     /// <inheritdoc/>
     public override string ProjectRoleDefinitionsHeader => ProjectCtx_RoleDefinitionsHeader;
 
@@ -3460,6 +3475,21 @@ public abstract class DefaultLocalizationBase : LocalizationBase
 
     /// <inheritdoc/>
     public override string ProjectUnassignedRolesLabel => ProjectCtx_UnassignedRoles;
+
+    /// <inheritdoc/>
+    public override string ProjectAttentionReasonsHeader => ProjectCtx_AttentionReasonsHeader;
+
+    /// <inheritdoc/>
+    public override string ProjectUnsatisfiedRolesDetailHeader => ProjectCtx_UnsatisfiedRolesDetailHeader;
+
+    /// <inheritdoc/>
+    public override string GetProjectAttentionReasonName(ProjectAttentionReason reason) => reason switch
+    {
+        ProjectAttentionReason.MissingTemplate => ProjectAttention_MissingTemplate,
+        ProjectAttentionReason.EmptyRolePool => ProjectAttention_EmptyRolePool,
+        ProjectAttentionReason.UnsatisfiedRoles => ProjectAttention_UnsatisfiedRoles,
+        _ => reason.ToString()
+    };
 
     // ===== Role Staffing Localization =====
 

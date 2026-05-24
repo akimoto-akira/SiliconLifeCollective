@@ -2028,6 +2028,11 @@ _ => permissionType.ToString()
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
     public override string ProjectCtx_RoleAssignedCount => "已分配";
     public override string ProjectCtx_UnassignedRoles => "未分配的角色";
+    public override string ProjectCtx_AttentionReasonsHeader => "项目需要关注的原因";
+    public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "不满足要求的角色详情";
+    public override string ProjectAttention_MissingTemplate => "缺少工作流模板";
+    public override string ProjectAttention_EmptyRolePool => "角色池为空（尚未分配任何角色）";
+    public override string ProjectAttention_UnsatisfiedRoles => "部分角色人员不满足要求";
 
     // Role Staffing
     public override string RoleStaffing_Understaffed => "人员不足";

@@ -2021,6 +2021,11 @@ _ => permissionType.ToString()
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
     public override string ProjectCtx_RoleAssignedCount => "할당됨";
     public override string ProjectCtx_UnassignedRoles => "미할당 필수 역할";
+    public override string ProjectCtx_AttentionReasonsHeader => "프로젝트 주의 필요 사유";
+    public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "충족되지 않은 역할 상세";
+    public override string ProjectAttention_MissingTemplate => "워크플로 템플릿 없음";
+    public override string ProjectAttention_EmptyRolePool => "역할 풀이 비어 있음 (역할 미할당)";
+    public override string ProjectAttention_UnsatisfiedRoles => "일부 역할이 인원 요건을 충족하지 않음";
 
     // Role Staffing
     public override string RoleStaffing_Understaffed => "인원 부족";

@@ -276,10 +276,10 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 }
             }
 
-            if (IsCurator && HasProjectsWithoutTemplate())
+            if (IsCurator && HasProjectsNeedingAttention())
             {
                 _activityRaw = (int)BeingActivity.Project;
-                _logger.Info(Id, "Being {0}: checking projects without workflow template", Name);
+                _logger.Info(Id, "Being {0}: checking projects needing attention", Name);
                 if (!ExecuteBrain("ThinkOnProject", null, brain => brain.ThinkOnProject()))
                     errorOccurred = true;
                 return;
@@ -844,7 +844,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
         return result;
     }
 
-    private bool HasProjectsWithoutTemplate()
+    private bool HasProjectsNeedingAttention()
     {
         var projectManager = ServiceLocator.Instance.ProjectManager;
         if (projectManager == null) return false;
@@ -852,15 +852,57 @@ public class DefaultSiliconBeing : SiliconBeingBase
         var projects = projectManager.ListProjects(includeArchived: false);
         foreach (var project in projects)
         {
-            if (project.CreatedBy == Id
-                && string.IsNullOrEmpty(project.WorkflowTemplateName)
-                && project.Status == ProjectStatus.Active)
+            if (project.CreatedBy == Id && project.Status == ProjectStatus.Active)
             {
-                if (ShouldThinkOnProject(project))
+                if (!ShouldThinkOnProject(project))
+                    continue;
+
+                var reasons = GetProjectAttentionReasons(project);
+                if (reasons.Count > 0)
                     return true;
             }
         }
         return false;
+    }
+
+    /// <summary>
+    /// Determines the specific reasons why a project needs curator attention.
+    /// Returns a list of reasons (empty means no attention needed).
+    /// </summary>
+    private static List<ProjectAttentionReason> GetProjectAttentionReasons(ProjectSpace project)
+    {
+        var reasons = new List<ProjectAttentionReason>();
+
+        // 1) Missing workflow template
+        if (string.IsNullOrEmpty(project.WorkflowTemplateName))
+        {
+            reasons.Add(ProjectAttentionReason.MissingTemplate);
+            return reasons; // No point checking roles without a template
+        }
+
+        // 2) Has template but role pool is completely empty
+        if (project.RoleAssignments.Count == 0)
+        {
+            reasons.Add(ProjectAttentionReason.EmptyRolePool);
+            return reasons; // If no roles assigned at all, no need to check individual roles
+        }
+
+        // 3) Has template and role pool, but some roles don't meet requirements
+        var workflowEngine = ServiceLocator.Instance.ProjectManager?.GetWorkflowEngine();
+        if (workflowEngine != null)
+        {
+            var template = workflowEngine.GetTemplate(project.WorkflowTemplateName);
+            if (template != null && template.RoleDefinitions.Count > 0)
+            {
+                template.ValidateRoleAssignments(project.RoleAssignments, out var unsatisfiedRoles);
+                if (unsatisfiedRoles.Count > 0)
+                {
+                    reasons.Add(ProjectAttentionReason.UnsatisfiedRoles);
+                }
+            }
+        }
+
+        return reasons;
     }
 
     private bool ShouldThinkOnProject(ProjectSpace project)

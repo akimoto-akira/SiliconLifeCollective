@@ -2023,6 +2023,11 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
     public override string ProjectCtx_RoleAssignedCount => "Assigned";
     public override string ProjectCtx_UnassignedRoles => "Unassigned required roles";
+    public override string ProjectCtx_AttentionReasonsHeader => "Reasons this project needs attention";
+    public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "Unsatisfied role details";
+    public override string ProjectAttention_MissingTemplate => "Missing workflow template";
+    public override string ProjectAttention_EmptyRolePool => "Empty role pool (no roles assigned yet)";
+    public override string ProjectAttention_UnsatisfiedRoles => "Some roles do not meet staffing requirements";
 
     // Role Staffing
     public override string RoleStaffing_Understaffed => "Understaffed";

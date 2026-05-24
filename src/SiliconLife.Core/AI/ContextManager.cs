@@ -1241,15 +1241,18 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
 
     public AIResponse ThinkOnProject()
     {
-        var project = FindProjectNeedingAttention();
-        if (project == null)
+        var attentionInfo = FindProjectNeedingAttention();
+        if (attentionInfo == null)
         {
             return AIResponse.Successful("No project needs attention at this time.");
         }
 
-        _logger.Info(_being.Id, "ThinkOnProject: being={0}, project={1} ({2})", _being.Name, project.Name, project.Id);
+        var project = attentionInfo.Project;
+        _logger.Info(_being.Id, "ThinkOnProject: being={0}, project={1} ({2}), reasons=[{3}]",
+            _being.Name, project.Name, project.Id,
+            string.Join(", ", attentionInfo.Reasons));
 
-        string scenarioContext = BuildProjectScenarioContext(project);
+        string scenarioContext = BuildProjectScenarioContext(project, attentionInfo);
         AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Project, projectId: project.Id);
 
         if (response.Success && !string.IsNullOrEmpty(response.Content))
@@ -1262,7 +1265,7 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
         return response;
     }
 
-    private ProjectSpace? FindProjectNeedingAttention()
+    private ProjectAttentionInfo? FindProjectNeedingAttention()
     {
         var projectManager = ServiceLocator.Instance.ProjectManager;
         if (projectManager == null) return null;
@@ -1270,30 +1273,93 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
         var projects = projectManager.ListProjects(includeArchived: false);
         foreach (var project in projects)
         {
-            if (project.CreatedBy == _being.Id
-                && string.IsNullOrEmpty(project.WorkflowTemplateName)
-                && project.Status == ProjectStatus.Active)
+            if (project.CreatedBy == _being.Id && project.Status == ProjectStatus.Active)
             {
+                // Check ShouldThinkOnProject logic inline
                 var taskSystem = projectManager.GetTaskSystem(project.Id);
-                if (taskSystem == null) return project;
-
-                var tasks = taskSystem.GetAll();
-                if (tasks.Count == 0) return project;
-                if (tasks.All(t => t.Status == TaskStatus.Completed)) return project;
-                if (DateTime.UtcNow - project.UpdatedAt > TimeSpan.FromMinutes(10))
+                bool shouldThink = true;
+                if (taskSystem != null)
                 {
-                    var hasStuckTasks = tasks.Any(t =>
-                        t.Status == TaskStatus.Running &&
-                        t.StartedAt.HasValue &&
-                        DateTime.UtcNow - t.StartedAt.Value > TimeSpan.FromMinutes(15));
-                    if (hasStuckTasks) return project;
+                    var tasks = taskSystem.GetAll();
+                    if (tasks.Count > 0)
+                    {
+                        if (!tasks.All(t => t.Status == TaskStatus.Completed))
+                        {
+                            shouldThink = false;
+                            if (DateTime.UtcNow - project.UpdatedAt > TimeSpan.FromMinutes(10))
+                            {
+                                var hasStuckTasks = tasks.Any(t =>
+                                    t.Status == TaskStatus.Running &&
+                                    t.StartedAt.HasValue &&
+                                    DateTime.UtcNow - t.StartedAt.Value > TimeSpan.FromMinutes(15));
+                                if (hasStuckTasks) shouldThink = true;
+                            }
+                        }
+                    }
+                }
+
+                if (!shouldThink) continue;
+
+                var reasons = GetProjectAttentionReasons(project, projectManager);
+                if (reasons.Count > 0)
+                {
+                    return new ProjectAttentionInfo
+                    {
+                        Project = project,
+                        Reasons = reasons.Select(r => r.reason).ToList(),
+                        UnsatisfiedRoleDetails = reasons
+                            .Where(r => r.details != null)
+                            .SelectMany(r => r.details!)
+                            .ToList()
+                    };
                 }
             }
         }
         return null;
     }
 
-    private string BuildProjectScenarioContext(ProjectSpace project)
+    /// <summary>
+    /// Determines the specific reasons why a project needs curator attention.
+    /// Returns a list of (reason, details) tuples.
+    /// </summary>
+    private static List<(ProjectAttentionReason reason, List<string>? details)> GetProjectAttentionReasons(
+        ProjectSpace project, IProjectManager projectManager)
+    {
+        var reasons = new List<(ProjectAttentionReason, List<string>?)>();
+
+        // 1) Missing workflow template
+        if (string.IsNullOrEmpty(project.WorkflowTemplateName))
+        {
+            reasons.Add((ProjectAttentionReason.MissingTemplate, null));
+            return reasons; // No point checking roles without a template
+        }
+
+        // 2) Has template but role pool is completely empty
+        if (project.RoleAssignments.Count == 0)
+        {
+            reasons.Add((ProjectAttentionReason.EmptyRolePool, null));
+            return reasons; // If no roles assigned at all, no need to check individual roles
+        }
+
+        // 3) Has template and role pool, but some roles don't meet requirements
+        var workflowEngine = projectManager.GetWorkflowEngine();
+        if (workflowEngine != null)
+        {
+            var template = workflowEngine.GetTemplate(project.WorkflowTemplateName);
+            if (template != null && template.RoleDefinitions.Count > 0)
+            {
+                template.ValidateRoleAssignments(project.RoleAssignments, out var unsatisfiedRoles);
+                if (unsatisfiedRoles.Count > 0)
+                {
+                    reasons.Add((ProjectAttentionReason.UnsatisfiedRoles, unsatisfiedRoles));
+                }
+            }
+        }
+
+        return reasons;
+    }
+
+    private string BuildProjectScenarioContext(ProjectSpace project, ProjectAttentionInfo? attentionInfo = null)
     {
         Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
         LocalizationBase loc = LocalizationManager.Instance.GetLocalization(language);
@@ -1303,6 +1369,25 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
         sb.AppendLine($"You are the curator of project \"{project.Name}\".");
         sb.AppendLine($"Project ID: {project.Id}");
         sb.AppendLine($"Project goal: {project.Description}");
+
+        // Show attention reasons summary if provided
+        if (attentionInfo != null && attentionInfo.Reasons.Count > 0)
+        {
+            sb.AppendLine();
+            sb.AppendLine(loc.ProjectAttentionReasonsHeader + ":");
+            foreach (var reason in attentionInfo.Reasons)
+            {
+                sb.AppendLine($"  - {loc.GetProjectAttentionReasonName(reason)}");
+            }
+            if (attentionInfo.UnsatisfiedRoleDetails.Count > 0)
+            {
+                sb.AppendLine(loc.ProjectUnsatisfiedRolesDetailHeader + ":");
+                foreach (var detail in attentionInfo.UnsatisfiedRoleDetails)
+                {
+                    sb.AppendLine($"  - {detail}");
+                }
+            }
+        }
 
         var beingManager = ServiceLocator.Instance.BeingManager;
         sb.AppendLine("Team members:");

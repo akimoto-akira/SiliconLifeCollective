@@ -1821,6 +1821,11 @@ Uso: Chama a ferramenta chat, define action=""mark_read"", target_id=GUID do int
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
     public override string ProjectCtx_RoleAssignedCount => "Atribuídos";
     public override string ProjectCtx_UnassignedRoles => "Funções obrigatórias não atribuídas";
+    public override string ProjectCtx_AttentionReasonsHeader => "Razões pelas quais o projeto precisa de atenção";
+    public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "Detalhes das funções não satisfeitas";
+    public override string ProjectAttention_MissingTemplate => "Modelo de workflow em falta";
+    public override string ProjectAttention_EmptyRolePool => "Pool de funções vazio (sem funções atribuídas)";
+    public override string ProjectAttention_UnsatisfiedRoles => "Algumas funções não cumprem os requisitos de pessoal";
 
     // Role Staffing
     public override string RoleStaffing_Understaffed => "Subdimensionado";

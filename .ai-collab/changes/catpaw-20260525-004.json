@@ -1,0 +1,29 @@
+{
+  "changeId": "catpaw-20260525-004",
+  "actorId": "catpaw",
+  "sessionId": "catpaw-20260525-004",
+  "taskId": "task-349",
+  "changeType": "feature",
+  "description": "HasProjectsWithoutTemplate扩展为HasProjectsNeedingAttention，增加角色池空/角色不满足检查，返回具体原因",
+  "modifiedFiles": [
+    "src/SiliconLife.Core/Workflow/RoleDefinition.cs",
+    "src/SiliconLife.Core/AI/ContextManager.cs",
+    "src/SiliconLife.Core/Localization/LocalizationBase.cs",
+    "src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeing.cs",
+    "src/SiliconLife.Common/Localization/DefaultLocalizationBase.cs",
+    "src/SiliconLife.Common/Localization/ZhCN.cs",
+    "src/SiliconLife.Common/Localization/ZhHK.cs",
+    "src/SiliconLife.Common/Localization/EnUS.cs",
+    "src/SiliconLife.Common/Localization/JaJP.cs",
+    "src/SiliconLife.Common/Localization/KoKR.cs",
+    "src/SiliconLife.Common/Localization/FrFR.cs",
+    "src/SiliconLife.Common/Localization/DeDE.cs",
+    "src/SiliconLife.Common/Localization/EsES.cs",
+    "src/SiliconLife.Common/Localization/ItIT.cs",
+    "src/SiliconLife.Common/Localization/PtPT.cs",
+    "src/SiliconLife.Common/Localization/PlPL.cs",
+    "src/SiliconLife.Common/Localization/CsCZ.cs"
+  ],
+  "commitHash": null,
+  "timestamp": "2026-05-25T04:20:00+08:00"
+}

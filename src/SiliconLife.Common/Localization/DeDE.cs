@@ -2020,6 +2020,11 @@ Verwendung: Rufe das chat-Tool auf, setze action=""mark_read"", target_id=Gegen�
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
     public override string ProjectCtx_RoleAssignedCount => "Zugewiesen";
     public override string ProjectCtx_UnassignedRoles => "Nicht zugewiesene erforderliche Rollen";
+    public override string ProjectCtx_AttentionReasonsHeader => "Gründe für die Projektaufmerksamkeit";
+    public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "Details zu nicht erfüllten Rollen";
+    public override string ProjectAttention_MissingTemplate => "Workflow-Vorlage fehlt";
+    public override string ProjectAttention_EmptyRolePool => "Rollenpool leer (keine Rollen zugewiesen)";
+    public override string ProjectAttention_UnsatisfiedRoles => "Einige Rollen erfüllen nicht die Personalanforderungen";
 
     // Role Staffing
     public override string RoleStaffing_Understaffed => "Unterbesetzt";

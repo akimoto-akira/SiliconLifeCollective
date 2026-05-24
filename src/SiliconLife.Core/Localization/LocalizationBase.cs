@@ -207,6 +207,25 @@ public abstract class LocalizationBase
     /// </summary>
     public abstract string ProjectUnassignedRolesLabel { get; }
 
+    // ===== Project Attention Reason Localization =====
+
+    /// <summary>
+    /// Gets the localized section header for project attention reasons in project scenario context.
+    /// </summary>
+    public abstract string ProjectAttentionReasonsHeader { get; }
+
+    /// <summary>
+    /// Gets the localized section header for unsatisfied role details when project needs attention.
+    /// </summary>
+    public abstract string ProjectUnsatisfiedRolesDetailHeader { get; }
+
+    /// <summary>
+    /// Gets the localized display name for a project attention reason.
+    /// </summary>
+    /// <param name="reason">The attention reason</param>
+    /// <returns>The localized display name (e.g., "Missing workflow template", "Empty role pool")</returns>
+    public abstract string GetProjectAttentionReasonName(ProjectAttentionReason reason);
+
     // ===== Role Staffing Localization =====
 
     /// <summary>

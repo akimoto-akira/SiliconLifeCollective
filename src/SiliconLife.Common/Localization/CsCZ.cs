@@ -1084,6 +1084,11 @@ public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
     public override string ProjectCtx_RoleAssignedCount => "Přiřazeno";
     public override string ProjectCtx_UnassignedRoles => "Nepřiřazené požadované role";
+    public override string ProjectCtx_AttentionReasonsHeader => "Důvody vyžadující pozornost projektu";
+    public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "Detail neuspokojených rolí";
+    public override string ProjectAttention_MissingTemplate => "Chybí šablona pracovního postupu";
+    public override string ProjectAttention_EmptyRolePool => "Fond rolí prázdný (žádné role nepřiřazeny)";
+    public override string ProjectAttention_UnsatisfiedRoles => "Některé role nesplňují personální požadavky";
 
     // Role Staffing
     public override string RoleStaffing_Understaffed => "Nedostatečně obsazeno";

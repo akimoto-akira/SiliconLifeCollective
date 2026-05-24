@@ -14,6 +14,54 @@
 namespace SiliconLife.Collective;
 
 /// <summary>
+/// Represents the reason why a project needs curator attention.
+/// Used by HasProjectsNeedingAttention to provide specific reasons.
+/// </summary>
+public enum ProjectAttentionReason
+{
+    /// <summary>
+    /// The project has no workflow template assigned.
+    /// </summary>
+    MissingTemplate,
+
+    /// <summary>
+    /// The project has a template but the role pool is completely empty.
+    /// No beings have been assigned to any role.
+    /// </summary>
+    EmptyRolePool,
+
+    /// <summary>
+    /// Some roles in the project's template are not satisfied
+    /// (understaffed or overstaffed).
+    /// </summary>
+    UnsatisfiedRoles
+}
+
+/// <summary>
+/// Represents the result of checking whether a project needs curator attention.
+/// Contains the project and the specific reason(s) why it needs attention.
+/// </summary>
+public class ProjectAttentionInfo
+{
+    /// <summary>
+    /// Gets the project that needs attention.
+    /// </summary>
+    public required ProjectSpace Project { get; init; }
+
+    /// <summary>
+    /// Gets the list of reasons why this project needs attention.
+    /// A project may have multiple reasons (e.g., missing template AND empty role pool).
+    /// </summary>
+    public required List<ProjectAttentionReason> Reasons { get; init; }
+
+    /// <summary>
+    /// Gets the list of unsatisfied role descriptions (only populated when Reasons contains UnsatisfiedRoles).
+    /// Each entry is a formatted string from RoleDefinition.GetStatusText().
+    /// </summary>
+    public List<string> UnsatisfiedRoleDetails { get; init; } = new();
+}
+
+/// <summary>
 /// Represents the staffing status of a workflow role.
 /// Used by LocalizationBase.GetRoleStaffingStatusName() for localized display.
 /// </summary>

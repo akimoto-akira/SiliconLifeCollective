@@ -2021,6 +2021,11 @@ _ => permissionType.ToString()
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
     public override string ProjectCtx_RoleAssignedCount => "割り当て済み";
     public override string ProjectCtx_UnassignedRoles => "未割り当ての必須ロール";
+    public override string ProjectCtx_AttentionReasonsHeader => "プロジェクトが注意を必要とする理由";
+    public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "満たされていないロールの詳細";
+    public override string ProjectAttention_MissingTemplate => "ワークフローテンプレート未設定";
+    public override string ProjectAttention_EmptyRolePool => "ロールプールが空（ロール未割り当て）";
+    public override string ProjectAttention_UnsatisfiedRoles => "一部のロールが人員要件を満たしていない";
 
     // Role Staffing
     public override string RoleStaffing_Understaffed => "人員不足";

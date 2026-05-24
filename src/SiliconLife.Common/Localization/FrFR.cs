@@ -1983,6 +1983,11 @@ Utilisation : Appelle l'outil chat, définis action=""mark_read"", target_id=GUI
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
     public override string ProjectCtx_RoleAssignedCount => "Attribués";
     public override string ProjectCtx_UnassignedRoles => "Rôles requis non attribués";
+    public override string ProjectCtx_AttentionReasonsHeader => "Raisons nécessitant l'attention du projet";
+    public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "Détails des rôles non satisfaits";
+    public override string ProjectAttention_MissingTemplate => "Modèle de workflow manquant";
+    public override string ProjectAttention_EmptyRolePool => "Pool de rôles vide (aucun rôle attribué)";
+    public override string ProjectAttention_UnsatisfiedRoles => "Certains rôles ne satisfont pas les exigences de personnel";
 
     // Role Staffing
     public override string RoleStaffing_Understaffed => "Sous-effectif";
