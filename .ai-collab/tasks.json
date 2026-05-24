@@ -3,6 +3,18 @@
   "lastUpdated": "2026-05-24T23:20:00+08:00",
   "tasks": [
     {
+      "id": "task-345",
+      "type": "cleanup",
+      "target": "src/SiliconLife.Common/Tools/HotReloadTool.cs, tools/HotReload/",
+      "title": "删除HotReloadTool.cs和tools/HotReload目录",
+      "description": "删除HotReloadTool.cs热重载工具文件及其相关的tools/HotReload目录。该工具已通过外部HotReload.exe实现，代码库中的HotReloadTool.cs不再需要。\n\n删除内容：\n1) src/SiliconLife.Common/Tools/HotReloadTool.cs - 热重载工具类\n2) tools/HotReload/ - 整个HotReload工具目录（包含HotReload.csproj、Program.cs、HotReload.exe等）\n\n影响：移除后系统将不再支持通过AI工具触发的热重载功能，外部HotReload.exe程序保留在项目外或其他位置。",
+      "priority": "P2",
+      "status": "completed",
+      "createdAt": "2026-05-24T23:25:00+08:00",
+      "createdBy": "qoder",
+      "completedAt": "2026-05-24T23:26:00+08:00"
+    },
+    {
       "id": "task-341",
       "type": "refactor",
       "target": "SiliconLife.Common/WebView/PlaywrightWebView.cs",
@@ -41,7 +53,7 @@
       "createdAt": "2026-05-24T10:08:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "catpaw",
-      "relatedCommit": null,
+      "relatedCommit": "8158703",
       "completedAt": "2026-05-24T23:20:00+08:00"
     },
     {
@@ -63,6 +75,7 @@
     "pending": [],
     "inProgress": [],
     "completed": [
+      "task-345",
       "task-344",
       "task-341",
       "task-342",
