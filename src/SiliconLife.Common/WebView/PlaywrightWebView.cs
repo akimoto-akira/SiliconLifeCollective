@@ -20,7 +20,7 @@ namespace SiliconLife.Common.WebView;
 /// <summary>
 /// Playwright cross-platform WebView unified implementation.
 /// All platforms use the same code.
-/// Browser state is persisted via IStorage with a temp-file bridge for Playwright compatibility.
+/// Browser state is persisted via IStorage directly using Playwright's StorageState JSON string.
 /// </summary>
 public class PlaywrightWebView : IWebViewCore
 {
@@ -34,7 +34,6 @@ public class PlaywrightWebView : IWebViewCore
     private readonly SiliconBeingBase _being;
     private int _timeoutSeconds = 30;
     private DateTime _lastOperationTime;
-    private string? _browserStateTempFile;
     
     public PlaywrightWebView(SiliconBeingBase being)
     {
@@ -310,7 +309,6 @@ public class PlaywrightWebView : IWebViewCore
             _browser = null;
         }
         
-        CleanupTempFile();
     }
     
     public BrowserStatus GetStatus()
@@ -351,11 +349,11 @@ public class PlaywrightWebView : IWebViewCore
                 IgnoreHTTPSErrors = true
             };
             
-            string? stateTempFile = PrepareBrowserStateFile();
-            if (!string.IsNullOrEmpty(stateTempFile))
+            string? browserStateJson = GetBrowserStateJson();
+            if (!string.IsNullOrEmpty(browserStateJson))
             {
-                contextOptions.StorageStatePath = stateTempFile;
-                _logger.Debug(_being.Id, "WebView: Loading browser state from IStorage bridge");
+                contextOptions.StorageState = browserStateJson;
+                _logger.Debug(_being.Id, "WebView: Loading browser state from IStorage");
             }
             else
             {
@@ -445,7 +443,11 @@ public class PlaywrightWebView : IWebViewCore
     }
 
     
-    private string? PrepareBrowserStateFile()
+    /// <summary>
+    /// Reads browser state JSON directly from IStorage.
+    /// No temp file is needed — Playwright's StorageState property accepts JSON strings.
+    /// </summary>
+    private string? GetBrowserStateJson()
     {
         try
         {
@@ -466,17 +468,11 @@ public class PlaywrightWebView : IWebViewCore
                 return null;
             }
 
-            string tempDir = Path.Combine(Path.GetTempPath(), "SiliconLife_WebView", _being.Id.ToString());
-            Directory.CreateDirectory(tempDir);
-            _browserStateTempFile = Path.Combine(tempDir, BrowserStateKey);
-            File.WriteAllText(_browserStateTempFile, stateData[0]);
-            
-            _logger.Debug(_being.Id, "WebView: Exported browser state from IStorage to temp file");
-            return _browserStateTempFile;
+            return stateData[0];
         }
         catch (Exception ex)
         {
-            _logger.Warn(_being.Id, "WebView: Failed to prepare browser state file: {0}", ex.Message);
+            _logger.Warn(_being.Id, "WebView: Failed to read browser state from IStorage: {0}", ex.Message);
             return null;
         }
     }
@@ -485,18 +481,15 @@ public class PlaywrightWebView : IWebViewCore
     {
         try
         {
-            if (_being.Storage == null || string.IsNullOrEmpty(_browserStateTempFile) || !File.Exists(_browserStateTempFile))
+            if (_being.Storage == null || _context == null)
             {
                 return;
             }
 
-            if (_context != null)
-            {
-                var stateJson = await _context.StorageStateAsync();
-                string serialized = JsonSerializer.Serialize(stateJson);
-                _being.Storage.Write(BrowserStateKey, serialized);
-                _logger.Debug(_being.Id, "WebView: Persisted browser state from Playwright to IStorage");
-            }
+            var stateJson = await _context.StorageStateAsync();
+            string serialized = JsonSerializer.Serialize(stateJson);
+            _being.Storage.Write(BrowserStateKey, serialized);
+            _logger.Debug(_being.Id, "WebView: Persisted browser state from Playwright to IStorage");
         }
         catch (Exception ex)
         {
@@ -504,21 +497,6 @@ public class PlaywrightWebView : IWebViewCore
         }
     }
     
-    private void CleanupTempFile()
-    {
-        try
-        {
-            if (!string.IsNullOrEmpty(_browserStateTempFile) && File.Exists(_browserStateTempFile))
-            {
-                File.Delete(_browserStateTempFile);
-                _browserStateTempFile = null;
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.Debug(_being.Id, "WebView: Failed to cleanup temp file: {0}", ex.Message);
-        }
-    }
     
     public void Dispose()
     {

@@ -736,3 +736,8 @@
 2026-05-24T22:10:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Controllers/ToolPermissionController.cs | intent=去除两处DefaultSiliconBeing向下转型直接调用基类SaveState移除多余using
 2026-05-24T22:15:00+08:00 | catpaw | task_complete | task=task-344 | fix=去除3处DefaultSiliconBeing向下转型直接调用SiliconBeingBase.SaveState
 2026-05-24T22:15:00+08:00 | catpaw | session_end | completed=task-344
+2026-05-24T22:15:00+08:00 | catpaw | session_start | sessionId=catpaw-20260524-2215 | task=task-341
+2026-05-24T22:15:00+08:00 | catpaw | task_start | task=task-341
+2026-05-24T22:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/WebView/PlaywrightWebView.cs | intent=消除浏览器状态临时文件桥接改用Playwright StorageState JSON字符串直接通过IStorage读写
+2026-05-24T22:30:00+08:00 | catpaw | task_complete | task=task-341 | fix=PlaywrightWebView浏览器状态不再需要临时文件桥接改用StorageState属性直接传JSON
+2026-05-24T22:30:00+08:00 | catpaw | session_end | completed=task-341

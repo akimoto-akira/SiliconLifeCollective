@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-24T22:15:00+08:00",
+  "lastUpdated": "2026-05-24T22:30:00+08:00",
   "tasks": [
     {
       "id": "task-341",
@@ -9,12 +9,12 @@
       "title": "PlaywrightWebView残留直接文件IO改用IStorage",
       "description": "PlaywrightWebView.cs仍有6处直接文件系统操作未走IStorage：\n1) L390: Directory.Exists + Directory.EnumerateDirectories 检查playwright安装路径\n2) L398: File.Exists 检查安装脚本\n3) L470: Directory.CreateDirectory 创建临时目录\n4) L472: File.WriteAllText 写浏览器状态临时文件\n5) L488: File.Exists 检查临时文件\n6) L511-513: File.Exists + File.Delete 清理临时文件\n\n其中L390/398是检查playwright运行时安装路径（非应用数据），可保留直接IO。L470/472/488/511-513是浏览器状态的临时文件读写，应改用being.Storage（IStorage接口）。\n\n注意：task-337/338已部分重构过此文件（截图保存改用IStorage），但临时文件+状态文件部分仍残留。",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-24T10:08:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null,
+      "assignedTo": "catpaw",
       "relatedCommit": null,
-      "completedAt": null
+      "completedAt": "2026-05-24T22:30:00+08:00"
     },
     {
       "id": "task-342",
@@ -55,19 +55,19 @@
       "createdAt": "2026-05-24T10:08:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "catpaw",
-      "relatedCommit": null,
+      "relatedCommit": "ab428cd",
       "completedAt": "2026-05-24T22:15:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [
-      "task-341",
       "task-342",
       "task-343"
     ],
     "inProgress": [],
     "completed": [
-      "task-344"
+      "task-344",
+      "task-341"
     ],
     "cancelled": []
   },
