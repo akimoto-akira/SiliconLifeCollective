@@ -22,7 +22,7 @@ public class TaskView : ViewBase
         var vm = model as TaskViewModel;
         if (vm == null) return string.Empty;
         var body = RenderBody(vm);
-        return RenderPage(vm.Skin, vm.Localization.PageTitleTasks, "tasks", vm.Localization, body, GetScripts(vm.Localization), GetStyles(), "task");
+        return RenderPage(vm.Skin, vm.Localization.PageTitleTasks, "tasks", vm.Localization, body, GetScripts(vm), GetStyles(), "task");
     }
 
     private static H RenderBody(TaskViewModel vm)
@@ -101,8 +101,11 @@ public class TaskView : ViewBase
             .EndSelector();
     }
 
-     private static JsSyntax GetScripts(DefaultLocalizationBase loc)
+     private static JsSyntax GetScripts(TaskViewModel vm)
     {
+        var loc = vm.Localization;
+        var currentBeingId = vm.CurrentBeingId?.ToString() ?? "";
+
         var forEachBody = Js.Block()
             .Add(() => Js.Const(() => "item", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
             .Add(() => Js.Assign(() => Js.Id(() => "item").Prop(() => "className"), () => Js.Str(() => "task-item")))
@@ -169,8 +172,10 @@ public class TaskView : ViewBase
                 )}
             }));
 
+        var apiUrl = string.IsNullOrEmpty(currentBeingId) ? "/api/tasks/list" : $"/api/tasks/list?beingId={currentBeingId}";
+
         var loadTasksBody = Js.Block()
-            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/tasks/list")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => apiUrl)).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
 
         return Js.Block()
             .Add(() => Js.Func(() => "loadTasks", () => new List<string>(), () => loadTasksBody))

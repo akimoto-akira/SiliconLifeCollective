@@ -1,0 +1,15 @@
+{
+  "sessionId": "catpaw-20260525-014",
+  "actorId": "catpaw",
+  "startTime": "2026-05-25T11:30:00+08:00",
+  "endTime": "2026-05-25T12:00:00+08:00",
+  "task": "task-360",
+  "status": "completed",
+  "summary": "修复任务页面不按beingId过滤的Bug：TaskViewModel添加CurrentBeingId属性，TaskController.Index()读取beingId查询参数，TaskView前端fetch请求拼接beingId参数",
+  "filesModified": [
+    "src/SiliconLife.App/Web/Models/TaskViewModel.cs",
+    "src/SiliconLife.App/Web/Controllers/TaskController.cs",
+    "src/SiliconLife.App/Web/Views/TaskView.cs"
+  ],
+  "commitHash": null
+}

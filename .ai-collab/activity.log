@@ -890,3 +890,10 @@
 2026-05-25T10:35:00+08:00 | catpaw | task_claim | task=task-358
 2026-05-25T11:15:00+08:00 | catpaw | task_complete | task=task-358 | relatedCommit=null(gitignored)
 2026-05-25T11:15:00+08:00 | catpaw | session_end | completed=task-358
+2026-05-25T11:30:00+08:00 | catpaw | session_start | sessionId=catpaw-20260525-014 | task=task-360
+2026-05-25T11:30:00+08:00 | catpaw | task_claim | task=task-360
+2026-05-25T11:30:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Models/TaskViewModel.cs | intent=添加CurrentBeingId属性
+2026-05-25T11:35:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Controllers/TaskController.cs | intent=Index方法读取beingId查询参数传入ViewModel
+2026-05-25T11:40:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Views/TaskView.cs | intent=GetScripts接收TaskViewModel并在fetch URL拼接beingId参数
+2026-05-25T12:00:00+08:00 | catpaw | task_complete | task=task-360 | relatedCommit=null(uncommitted)
+2026-05-25T12:00:00+08:00 | catpaw | session_end | completed=task-360

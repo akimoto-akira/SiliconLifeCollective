@@ -55,7 +55,11 @@ public class TaskController : Controller
     {
         var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
         var view = new Views.TaskView();
-        var vm = new Models.TaskViewModel { Skin = skin, ActiveMenu = "tasks" };
+        var beingIdStr = Request.QueryString["beingId"];
+        Guid? beingId = null;
+        if (!string.IsNullOrEmpty(beingIdStr) && Guid.TryParse(beingIdStr, out var parsedId))
+            beingId = parsedId;
+        var vm = new Models.TaskViewModel { Skin = skin, ActiveMenu = "tasks", CurrentBeingId = beingId };
         var html = view.Render(vm);
         RenderHtml(html);
     }

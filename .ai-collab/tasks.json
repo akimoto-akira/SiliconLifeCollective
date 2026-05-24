@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-25T10:35:00+08:00",
+  "lastUpdated": "2026-05-25T12:00:00+08:00",
   "tasks": [
     {
       "id": "task-346",
@@ -170,6 +170,20 @@
       "relatedCommit": "4eff807"
     },
     {
+      "id": "task-360",
+      "type": "bugfix",
+      "target": "SiliconLife.App/Web/Views/TaskView.cs, SiliconLife.App/Web/Controllers/TaskController.cs, SiliconLife.App/Web/Models/TaskViewModel.cs",
+      "title": "修复任务页面不按beingId过滤的Bug",
+      "description": "从硅基人页面点击任务链接时，URL携带beingId参数（如/tasks?beingId=xxx），但任务列表前端JS始终请求/api/tasks/list，未将beingId传递给API，导致后端返回全部硅基人任务。\n\n修复内容：\n1) TaskViewModel 添加 CurrentBeingId 属性，用于从Controller传递beingId到View\n2) TaskController.Index() 从查询参数读取beingId并传入ViewModel\n3) TaskView.GetScripts() 改为接收TaskViewModel，提取currentBeingId，在fetch URL中拼接beingId参数\n\n有beingId时：请求/api/tasks/list?beingId=xxx，后端只返回该硅基人的任务\n无beingId时：请求/api/tasks/list，后端返回全部任务（保持原有行为）",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-25T11:30:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": "catpaw",
+      "relatedCommit": null,
+      "completedAt": "2026-05-25T12:00:00+08:00"
+    },
+    {
       "id": "task-358",
       "type": "feature",
       "target": "src/TravelCodeWikiWithAI/Services/MediaWikiPublishService.cs",
@@ -269,10 +283,10 @@
   ],
   "taskIndex": {
     "pending": [],
-    "inProgress": [
-      "task-358"
-    ],
+    "inProgress": [],
     "completed": [
+      "task-360",
+      "task-358",
       "task-357",
       "task-351",
       "task-352",

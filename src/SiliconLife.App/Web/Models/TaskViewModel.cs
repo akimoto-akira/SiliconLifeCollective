@@ -17,6 +17,7 @@ public class TaskViewModel : ViewModelBase
 {
     public List<TaskItem> Tasks { get; set; } = new();
     public string Filter { get; set; } = "all";
+    public Guid? CurrentBeingId { get; set; }
 }
 
 public class TaskItem
