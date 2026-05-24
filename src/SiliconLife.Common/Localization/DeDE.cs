@@ -2010,6 +2010,17 @@ Verwendung: Rufe das chat-Tool auf, setze action=""mark_read"", target_id=Gegen�
     private readonly ChineseHistoricalDeDE _chineseHistorical = new();
     public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
 
+    // Project Role Context
+    public override string ProjectCtx_RoleDefinitionsHeader => "Rollendefinitionen";
+    public override string ProjectCtx_RoleAssignmentsHeader => "Rollenzuweisungen";
+    public override string ProjectCtx_NoWorkflowTemplate => "Keine Workflow-Vorlage zugewiesen, keine Rollendefinitionen verfügbar";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} Rolle(n) sind unterbesetzt. Verwenden Sie assign_role zur Zuweisung von Siliziumwesen";
+    public override string ProjectCtx_RoleMinCount => "Min";
+    public override string ProjectCtx_RoleMaxCount => "Max";
+    public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
+    public override string ProjectCtx_RoleAssignedCount => "Zugewiesen";
+    public override string ProjectCtx_UnassignedRoles => "Nicht zugewiesene erforderliche Rollen";
+
     // Role Staffing
     public override string RoleStaffing_Understaffed => "Unterbesetzt";
     public override string RoleStaffing_Overstaffed => "Überbesetzt";

@@ -1969,6 +1969,17 @@ Uso: Chiama lo strumento chat, imposta action=""mark_read"", target_id=GUID dell
     private readonly ChineseHistoricalItIT _chineseHistorical = new();
     public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
 
+    // Project Role Context
+    public override string ProjectCtx_RoleDefinitionsHeader => "Definizioni dei ruoli";
+    public override string ProjectCtx_RoleAssignmentsHeader => "Assegnazioni dei ruoli";
+    public override string ProjectCtx_NoWorkflowTemplate => "Nessun modello di workflow assegnato, nessuna definizione di ruolo disponibile";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} ruolo/i sono sottoorganico. Usa assign_role per assegnare esseri di silicio";
+    public override string ProjectCtx_RoleMinCount => "Min";
+    public override string ProjectCtx_RoleMaxCount => "Max";
+    public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
+    public override string ProjectCtx_RoleAssignedCount => "Assegnati";
+    public override string ProjectCtx_UnassignedRoles => "Ruoli richiesti non assegnati";
+
     // Role Staffing
     public override string RoleStaffing_Understaffed => "Sottoorganico";
     public override string RoleStaffing_Overstaffed => "Sovraorganico";

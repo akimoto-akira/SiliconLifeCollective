@@ -2011,6 +2011,17 @@ _ => permissionType.ToString()
     public override string Help_Previous => "前へ";
     public override string Help_Next => "次へ";
 
+    // Project Role Context
+    public override string ProjectCtx_RoleDefinitionsHeader => "ロール定義";
+    public override string ProjectCtx_RoleAssignmentsHeader => "ロール割り当て";
+    public override string ProjectCtx_NoWorkflowTemplate => "ワークフローテンプレート未指定、ロール定義なし";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0}つのロールが人員不足です。assign_roleでシリコンビーイングを割り当ててください";
+    public override string ProjectCtx_RoleMinCount => "最少";
+    public override string ProjectCtx_RoleMaxCount => "最多";
+    public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
+    public override string ProjectCtx_RoleAssignedCount => "割り当て済み";
+    public override string ProjectCtx_UnassignedRoles => "未割り当ての必須ロール";
+
     // Role Staffing
     public override string RoleStaffing_Understaffed => "人員不足";
     public override string RoleStaffing_Overstaffed => "人員超過";

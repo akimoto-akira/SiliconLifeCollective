@@ -1113,6 +1113,17 @@ Użycie: wywołaj narzędzie chat, ustaw action=""mark_read"", target_id=GUID ro
 
     public override string GetTranslation(string key) => key;
 
+    // Project Role Context
+    public override string ProjectCtx_RoleDefinitionsHeader => "Definicje ról";
+    public override string ProjectCtx_RoleAssignmentsHeader => "Przypisania ról";
+    public override string ProjectCtx_NoWorkflowTemplate => "Brak przypisanego szablonu workflow, brak definicji ról";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} ról ma niedobór personelu. Użyj assign_role do przypisania istot krzemowych";
+    public override string ProjectCtx_RoleMinCount => "Min";
+    public override string ProjectCtx_RoleMaxCount => "Max";
+    public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
+    public override string ProjectCtx_RoleAssignedCount => "Przypisano";
+    public override string ProjectCtx_UnassignedRoles => "Nieprzypisane wymagane role";
+
     // Role Staffing
     public override string RoleStaffing_Understaffed => "Niedostatecznie obsadzone";
     public override string RoleStaffing_Overstaffed => "Przeobsadzone";

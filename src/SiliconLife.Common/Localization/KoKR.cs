@@ -2011,6 +2011,17 @@ _ => permissionType.ToString()
     public override string Help_Previous => "이전";
     public override string Help_Next => "다음";
 
+    // Project Role Context
+    public override string ProjectCtx_RoleDefinitionsHeader => "역할 정의";
+    public override string ProjectCtx_RoleAssignmentsHeader => "역할 할당";
+    public override string ProjectCtx_NoWorkflowTemplate => "워크플로 템플릿 미지정, 역할 정의 없음";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0}개 역할이 인력 부족입니다. assign_role로 실리콘 빙을 할당하세요";
+    public override string ProjectCtx_RoleMinCount => "최소";
+    public override string ProjectCtx_RoleMaxCount => "최대";
+    public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
+    public override string ProjectCtx_RoleAssignedCount => "할당됨";
+    public override string ProjectCtx_UnassignedRoles => "미할당 필수 역할";
+
     // Role Staffing
     public override string RoleStaffing_Understaffed => "인원 부족";
     public override string RoleStaffing_Overstaffed => "인원 초과";

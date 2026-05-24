@@ -1865,6 +1865,17 @@ _ => permissionType.ToString()
     public override string Help_Previous => "上一篇";
     public override string Help_Next => "下一篇";
 
+    // Project Role Context
+    public override string ProjectCtx_RoleDefinitionsHeader => "角色定義";
+    public override string ProjectCtx_RoleAssignmentsHeader => "角色分配";
+    public override string ProjectCtx_NoWorkflowTemplate => "未指定工作流範本，暫無角色定義";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ 有{0}個角色人員不足，請使用 assign_role 分配硅基人";
+    public override string ProjectCtx_RoleMinCount => "最少";
+    public override string ProjectCtx_RoleMaxCount => "最多";
+    public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
+    public override string ProjectCtx_RoleAssignedCount => "已分配";
+    public override string ProjectCtx_UnassignedRoles => "未分配的角色";
+
     // Role Staffing
     public override string RoleStaffing_Understaffed => "人員不足";
     public override string RoleStaffing_Overstaffed => "人員超編";

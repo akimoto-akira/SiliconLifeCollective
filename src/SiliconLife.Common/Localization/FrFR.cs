@@ -1973,6 +1973,17 @@ Utilisation : Appelle l'outil chat, définis action=""mark_read"", target_id=GUI
     private readonly ChineseHistoricalFrFR _chineseHistorical = new();
     public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
 
+    // Project Role Context
+    public override string ProjectCtx_RoleDefinitionsHeader => "Définitions des rôles";
+    public override string ProjectCtx_RoleAssignmentsHeader => "Attributions des rôles";
+    public override string ProjectCtx_NoWorkflowTemplate => "Aucun modèle de workflow attribué, aucune définition de rôle disponible";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} rôle(s) sont sous-effectif(s). Utilisez assign_role pour attribuer des êtres de silicium";
+    public override string ProjectCtx_RoleMinCount => "Min";
+    public override string ProjectCtx_RoleMaxCount => "Max";
+    public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
+    public override string ProjectCtx_RoleAssignedCount => "Attribués";
+    public override string ProjectCtx_UnassignedRoles => "Rôles requis non attribués";
+
     // Role Staffing
     public override string RoleStaffing_Understaffed => "Sous-effectif";
     public override string RoleStaffing_Overstaffed => "Sur-effectif";

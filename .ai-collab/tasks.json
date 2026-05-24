@@ -27,7 +27,8 @@
       "createdAt": "2026-05-25T00:10:00+08:00",
       "createdBy": "qoder",
       "assignedTo": "catpaw",
-      "completedAt": "2026-05-25T03:00:00+08:00"
+      "completedAt": "2026-05-25T03:00:00+08:00",
+      "relatedCommit": "75ce452"
     },
     {
       "id": "task-348",
@@ -36,9 +37,11 @@
       "title": "BuildProjectScenarioContext增加角色信息",
       "description": "AI的项目场景上下文中需要展示角色定义和角色池状态，让硅基人知道项目需要哪些角色、当前角色池是否满员。\n\n改造内容：\n1) BuildProjectScenarioContext 中读取工作流模板的 RoleDefinitions\n2) 展示角色定义列表（角色名、描述、需要人数）\n3) 展示当前角色池状态（已分配的硅基人）\n4) 如果角色池不满，提示主理人需要分配\n\n依赖：task-346, task-347",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-25T00:10:00+08:00",
-      "createdBy": "qoder"
+      "createdBy": "qoder",
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-25T04:00:00+08:00"
     },
     {
       "id": "task-349",
@@ -222,7 +225,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-348",
       "task-349",
       "task-350",
       "task-351",
@@ -236,6 +238,7 @@
     ],
     "inProgress": [],
     "completed": [
+      "task-348",
       "task-347",
       "task-346",
       "task-345",

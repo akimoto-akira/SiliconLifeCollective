@@ -1811,6 +1811,17 @@ Uso: Chama a ferramenta chat, define action=""mark_read"", target_id=GUID do int
     private readonly ChineseHistoricalPtPT _chineseHistorical = new();
     public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
 
+    // Project Role Context
+    public override string ProjectCtx_RoleDefinitionsHeader => "Definições de funções";
+    public override string ProjectCtx_RoleAssignmentsHeader => "Atribuições de funções";
+    public override string ProjectCtx_NoWorkflowTemplate => "Sem modelo de workflow atribuído, sem definições de funções disponíveis";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} função(ões) com pessoal insuficiente. Use assign_role para atribuir seres de silício";
+    public override string ProjectCtx_RoleMinCount => "Mín";
+    public override string ProjectCtx_RoleMaxCount => "Máx";
+    public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
+    public override string ProjectCtx_RoleAssignedCount => "Atribuídos";
+    public override string ProjectCtx_UnassignedRoles => "Funções obrigatórias não atribuídas";
+
     // Role Staffing
     public override string RoleStaffing_Understaffed => "Subdimensionado";
     public override string RoleStaffing_Overstaffed => "Sobredimensionado";

@@ -1074,6 +1074,17 @@ public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
     public override string Help_Previous => "Předchozí";
     public override string Help_Next => "Další";
 
+    // Project Role Context
+    public override string ProjectCtx_RoleDefinitionsHeader => "Definice rolí";
+    public override string ProjectCtx_RoleAssignmentsHeader => "Přiřazení rolí";
+    public override string ProjectCtx_NoWorkflowTemplate => "Nebyla přiřazena šablona workflowu, definice rolí nejsou k dispozici";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} role(í) má nedostatek personálu. Použijte assign_role k přiřazení křemíkových bytostí";
+    public override string ProjectCtx_RoleMinCount => "Min";
+    public override string ProjectCtx_RoleMaxCount => "Max";
+    public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
+    public override string ProjectCtx_RoleAssignedCount => "Přiřazeno";
+    public override string ProjectCtx_UnassignedRoles => "Nepřiřazené požadované role";
+
     // Role Staffing
     public override string RoleStaffing_Understaffed => "Nedostatečně obsazeno";
     public override string RoleStaffing_Overstaffed => "Přes obsazenost";

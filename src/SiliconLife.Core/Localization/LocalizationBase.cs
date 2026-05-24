@@ -151,6 +151,62 @@ public abstract class LocalizationBase
     /// <param name="error">The error message</param>
     public abstract string FormatTimerErrorNotification(string timerName, string error);
 
+    // ===== Project Role Context Localization =====
+
+    /// <summary>
+    /// Gets the localized section header for role definitions in project scenario context.
+    /// </summary>
+    public abstract string ProjectRoleDefinitionsHeader { get; }
+
+    /// <summary>
+    /// Gets the localized section header for role assignments in project scenario context.
+    /// </summary>
+    public abstract string ProjectRoleAssignmentsHeader { get; }
+
+    /// <summary>
+    /// Gets the localized message when no workflow template is assigned to a project.
+    /// </summary>
+    public abstract string ProjectNoWorkflowTemplate { get; }
+
+    /// <summary>
+    /// Gets the localized message when role pool is not fully staffed and needs curator attention.
+    /// {0} is replaced with the number of understaffed roles.
+    /// </summary>
+    public abstract string ProjectRoleNeedsAttentionFormat { get; }
+
+    /// <summary>
+    /// Formats a message indicating that some roles need attention (understaffed).
+    /// </summary>
+    /// <param name="understaffedCount">Number of roles that are understaffed</param>
+    /// <returns>The formatted attention message</returns>
+    public string FormatProjectRoleNeedsAttention(int understaffedCount) =>
+        string.Format(ProjectRoleNeedsAttentionFormat, understaffedCount);
+
+    /// <summary>
+    /// Gets the localized label for minimum count in a role definition.
+    /// </summary>
+    public abstract string RoleMinCountLabel { get; }
+
+    /// <summary>
+    /// Gets the localized label for maximum count in a role definition.
+    /// </summary>
+    public abstract string RoleMaxCountLabel { get; }
+
+    /// <summary>
+    /// Gets the localized text for unlimited maximum count (e.g., "∞" or "Unlimited").
+    /// </summary>
+    public abstract string RoleMaxCountUnlimited { get; }
+
+    /// <summary>
+    /// Gets the localized label for assigned count in a role.
+    /// </summary>
+    public abstract string RoleAssignedCountLabel { get; }
+
+    /// <summary>
+    /// Gets the localized message for unassigned required roles.
+    /// </summary>
+    public abstract string ProjectUnassignedRolesLabel { get; }
+
     // ===== Role Staffing Localization =====
 
     /// <summary>

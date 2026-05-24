@@ -2013,6 +2013,17 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string Help_Previous => "Anterior";
     public override string Help_Next => "Siguiente";
 
+    // Project Role Context
+    public override string ProjectCtx_RoleDefinitionsHeader => "Definiciones de roles";
+    public override string ProjectCtx_RoleAssignmentsHeader => "Asignaciones de roles";
+    public override string ProjectCtx_NoWorkflowTemplate => "Sin plantilla de flujo de trabajo asignada, sin definiciones de roles";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} rol(es) con personal insuficiente. Use assign_role para asignar seres de silicio";
+    public override string ProjectCtx_RoleMinCount => "Mín";
+    public override string ProjectCtx_RoleMaxCount => "Máx";
+    public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
+    public override string ProjectCtx_RoleAssignedCount => "Asignados";
+    public override string ProjectCtx_UnassignedRoles => "Roles requeridos sin asignar";
+
     // Role Staffing
     public override string RoleStaffing_Understaffed => "Personal insuficiente";
     public override string RoleStaffing_Overstaffed => "Personal excedido";

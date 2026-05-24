@@ -1295,6 +1295,9 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
 
     private string BuildProjectScenarioContext(ProjectSpace project)
     {
+        Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+        LocalizationBase loc = LocalizationManager.Instance.GetLocalization(language);
+
         StringBuilder sb = new();
         sb.AppendLine("Scene: Project management (ThinkOnProject)");
         sb.AppendLine($"You are the curator of project \"{project.Name}\".");
@@ -1309,7 +1312,83 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
             sb.AppendLine($"  - {being?.Name ?? beingId.ToString()}");
         }
 
+        // Role definitions and assignments
+        sb.AppendLine();
+        if (string.IsNullOrEmpty(project.WorkflowTemplateName))
+        {
+            sb.AppendLine(loc.ProjectNoWorkflowTemplate);
+        }
+        else
+        {
+            var workflowEngine = ServiceLocator.Instance.ProjectManager?.GetWorkflowEngine();
+            var template = workflowEngine?.GetTemplate(project.WorkflowTemplateName);
+            if (template != null && template.RoleDefinitions.Count > 0)
+            {
+                sb.AppendLine(loc.ProjectRoleDefinitionsHeader + ":");
+                foreach (var kvp in template.RoleDefinitions)
+                {
+                    var roleDef = kvp.Value;
+                    string maxText = roleDef.MaxCount > 0 ? roleDef.MaxCount.ToString() : loc.RoleMaxCountUnlimited;
+                    int assignedCount = project.RoleAssignments.TryGetValue(roleDef.RoleName, out var beings) ? beings.Count : 0;
+                    var staffingStatus = roleDef.GetStaffingStatus(assignedCount);
+                    string statusText = loc.GetRoleStaffingStatusText(staffingStatus, roleDef.MinCount, roleDef.MaxCount, assignedCount);
+
+                    sb.AppendLine($"  {roleDef.RoleName}: {roleDef.Description}");
+                    sb.AppendLine($"    {loc.RoleMinCountLabel}={roleDef.MinCount}, {loc.RoleMaxCountLabel}={maxText}, {loc.RoleAssignedCountLabel}={assignedCount} — {statusText}");
+
+                    // List assigned beings for this role
+                    if (assignedCount > 0)
+                    {
+                        var beingNames = new List<string>();
+                        foreach (var bId in beings)
+                        {
+                            var b = beingManager?.GetBeing(bId);
+                            beingNames.Add(b?.Name ?? bId.ToString());
+                        }
+                        sb.AppendLine($"    Members: [{string.Join(", ", beingNames)}]");
+                    }
+                }
+
+                // Check for unassigned required roles
+                var unassignedRoles = template.RoleDefinitions.Keys
+                    .Where(rn => !project.RoleAssignments.ContainsKey(rn) || project.RoleAssignments[rn].Count == 0)
+                    .ToList();
+
+                if (unassignedRoles.Count > 0)
+                {
+                    sb.AppendLine();
+                    sb.AppendLine(loc.ProjectUnassignedRolesLabel + ":");
+                    foreach (var rn in unassignedRoles)
+                    {
+                        if (template.RoleDefinitions.TryGetValue(rn, out var roleDef))
+                        {
+                            sb.AppendLine($"  {rn}: {roleDef.Description} ({loc.RoleMinCountLabel}={roleDef.MinCount})");
+                        }
+                    }
+                }
+
+                // Alert if any role is understaffed
+                int understaffedCount = 0;
+                foreach (var kvp in template.RoleDefinitions)
+                {
+                    int count = project.RoleAssignments.TryGetValue(kvp.Key, out var list) ? list.Count : 0;
+                    if (kvp.Value.GetStaffingStatus(count) == RoleStaffingStatus.Understaffed)
+                        understaffedCount++;
+                }
+                if (understaffedCount > 0)
+                {
+                    sb.AppendLine();
+                    sb.AppendLine(loc.FormatProjectRoleNeedsAttention(understaffedCount));
+                }
+            }
+            else
+            {
+                sb.AppendLine(loc.ProjectNoWorkflowTemplate);
+            }
+        }
+
         var taskSystem = ServiceLocator.Instance.ProjectManager?.GetTaskSystem(project.Id);
+        sb.AppendLine();
         sb.AppendLine("Current task status:");
         if (taskSystem != null)
         {

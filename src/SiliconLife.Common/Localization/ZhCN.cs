@@ -2018,6 +2018,17 @@ _ => permissionType.ToString()
     public override string Help_Previous => "上一篇";
     public override string Help_Next => "下一篇";
 
+    // Project Role Context
+    public override string ProjectCtx_RoleDefinitionsHeader => "角色定义";
+    public override string ProjectCtx_RoleAssignmentsHeader => "角色分配";
+    public override string ProjectCtx_NoWorkflowTemplate => "未指定工作流模板，暂无角色定义";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ 有{0}个角色人员不足，请使用 assign_role 分配硅基人";
+    public override string ProjectCtx_RoleMinCount => "最少";
+    public override string ProjectCtx_RoleMaxCount => "最多";
+    public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
+    public override string ProjectCtx_RoleAssignedCount => "已分配";
+    public override string ProjectCtx_UnassignedRoles => "未分配的角色";
+
     // Role Staffing
     public override string RoleStaffing_Understaffed => "人员不足";
     public override string RoleStaffing_Overstaffed => "人员超编";

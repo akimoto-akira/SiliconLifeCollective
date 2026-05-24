@@ -3405,6 +3405,62 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <summary>Next</summary>
     public abstract string Help_Next { get; }
 
+    // ===== Project Role Context Localization =====
+
+    /// <summary>Role Definitions header in project scenario context</summary>
+    public abstract string ProjectCtx_RoleDefinitionsHeader { get; }
+
+    /// <summary>Role Assignments header in project scenario context</summary>
+    public abstract string ProjectCtx_RoleAssignmentsHeader { get; }
+
+    /// <summary>Message when no workflow template is assigned</summary>
+    public abstract string ProjectCtx_NoWorkflowTemplate { get; }
+
+    /// <summary>Message when role pool needs attention. {0}=understaffedCount</summary>
+    public abstract string ProjectCtx_RoleNeedsAttention { get; }
+
+    /// <summary>Label for minimum count</summary>
+    public abstract string ProjectCtx_RoleMinCount { get; }
+
+    /// <summary>Label for maximum count</summary>
+    public abstract string ProjectCtx_RoleMaxCount { get; }
+
+    /// <summary>Text for unlimited maximum count</summary>
+    public abstract string ProjectCtx_RoleMaxCountUnlimited { get; }
+
+    /// <summary>Label for assigned count</summary>
+    public abstract string ProjectCtx_RoleAssignedCount { get; }
+
+    /// <summary>Label for unassigned required roles</summary>
+    public abstract string ProjectCtx_UnassignedRoles { get; }
+
+    /// <inheritdoc/>
+    public override string ProjectRoleDefinitionsHeader => ProjectCtx_RoleDefinitionsHeader;
+
+    /// <inheritdoc/>
+    public override string ProjectRoleAssignmentsHeader => ProjectCtx_RoleAssignmentsHeader;
+
+    /// <inheritdoc/>
+    public override string ProjectNoWorkflowTemplate => ProjectCtx_NoWorkflowTemplate;
+
+    /// <inheritdoc/>
+    public override string ProjectRoleNeedsAttentionFormat => ProjectCtx_RoleNeedsAttention;
+
+    /// <inheritdoc/>
+    public override string RoleMinCountLabel => ProjectCtx_RoleMinCount;
+
+    /// <inheritdoc/>
+    public override string RoleMaxCountLabel => ProjectCtx_RoleMaxCount;
+
+    /// <inheritdoc/>
+    public override string RoleMaxCountUnlimited => ProjectCtx_RoleMaxCountUnlimited;
+
+    /// <inheritdoc/>
+    public override string RoleAssignedCountLabel => ProjectCtx_RoleAssignedCount;
+
+    /// <inheritdoc/>
+    public override string ProjectUnassignedRolesLabel => ProjectCtx_UnassignedRoles;
+
     // ===== Role Staffing Localization =====
 
     /// <summary>Understaffed (role has fewer members than required)</summary>

@@ -2013,6 +2013,17 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string Help_Previous => "Previous";
     public override string Help_Next => "Next";
 
+    // Project Role Context
+    public override string ProjectCtx_RoleDefinitionsHeader => "Role Definitions";
+    public override string ProjectCtx_RoleAssignmentsHeader => "Role Assignments";
+    public override string ProjectCtx_NoWorkflowTemplate => "No workflow template assigned, no role definitions available";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} role(s) are understaffed. Use assign_role to assign silicon beings";
+    public override string ProjectCtx_RoleMinCount => "Min";
+    public override string ProjectCtx_RoleMaxCount => "Max";
+    public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
+    public override string ProjectCtx_RoleAssignedCount => "Assigned";
+    public override string ProjectCtx_UnassignedRoles => "Unassigned required roles";
+
     // Role Staffing
     public override string RoleStaffing_Understaffed => "Understaffed";
     public override string RoleStaffing_Overstaffed => "Overstaffed";
