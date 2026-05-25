@@ -183,6 +183,91 @@ public abstract class LocalizationBase
         string.Format(ProjectRoleNeedsAttentionFormat, understaffedCount);
 
     /// <summary>
+    /// Gets the localized header for the staffing action plan section.
+    /// </summary>
+    public abstract string StaffingActionPlanHeader { get; }
+
+    /// <summary>
+    /// Gets the localized format string for total beings needed to create.
+    /// {0} is replaced with the total count.
+    /// </summary>
+    public abstract string TotalBeingsNeededFormat { get; }
+
+    /// <summary>
+    /// Formats a message indicating the total number of beings to create.
+    /// </summary>
+    /// <param name="count">Total beings needed</param>
+    /// <returns>The formatted message</returns>
+    public string FormatTotalBeingsNeeded(int count) =>
+        string.Format(TotalBeingsNeededFormat, count);
+
+    /// <summary>
+    /// Gets the localized header for the per-role shortage breakdown section.
+    /// </summary>
+    public abstract string StaffingRoleBreakdownHeader { get; }
+
+    /// <summary>
+    /// Gets the localized format string for per-role shortage detail.
+    /// {0}=roleName, {1}=minCount, {2}=assignedCount, {3}=shortage
+    /// </summary>
+    public abstract string RoleShortageDetailFormat { get; }
+
+    /// <summary>
+    /// Formats a per-role shortage detail line.
+    /// </summary>
+    /// <param name="roleName">The role name</param>
+    /// <param name="minCount">Minimum required count</param>
+    /// <param name="assignedCount">Currently assigned count</param>
+    /// <param name="shortage">Number of additional beings needed</param>
+    /// <returns>The formatted detail line</returns>
+    public string FormatRoleShortageDetail(string roleName, int minCount, int assignedCount, int shortage) =>
+        string.Format(RoleShortageDetailFormat, roleName, minCount, assignedCount, shortage);
+
+    /// <summary>
+    /// Gets the localized header for the suggested action steps section.
+    /// </summary>
+    public abstract string StaffingActionStepsHeader { get; }
+
+    /// <summary>
+    /// Gets the localized step 1: create beings using silicon_manager.
+    /// {0} is replaced with the total count of beings to create.
+    /// </summary>
+    public abstract string StaffingStepCreateBeingsFormat { get; }
+
+    /// <summary>
+    /// Formats step 1 instruction.
+    /// </summary>
+    /// <param name="count">Total beings to create</param>
+    /// <returns>The formatted step instruction</returns>
+    public string FormatStaffingStepCreateBeings(int count) =>
+        string.Format(StaffingStepCreateBeingsFormat, count);
+
+    /// <summary>
+    /// Gets the localized step 2: assign beings to project.
+    /// </summary>
+    public abstract string StaffingStepAssignToProject { get; }
+
+    /// <summary>
+    /// Gets the localized step 3: assign beings to roles.
+    /// </summary>
+    public abstract string StaffingStepAssignToRoles { get; }
+
+    /// <summary>
+    /// Gets the localized message for the empty role pool scenario,
+    /// providing actionable guidance when no roles have been assigned at all.
+    /// {0} is replaced with the total number of required roles.
+    /// </summary>
+    public abstract string EmptyRolePoolActionFormat { get; }
+
+    /// <summary>
+    /// Formats a message for the empty role pool scenario.
+    /// </summary>
+    /// <param name="requiredRoleCount">Number of required roles from the template</param>
+    /// <returns>The formatted message</returns>
+    public string FormatEmptyRolePoolAction(int requiredRoleCount) =>
+        string.Format(EmptyRolePoolActionFormat, requiredRoleCount);
+
+    /// <summary>
     /// Gets the localized label for minimum count in a role definition.
     /// </summary>
     public abstract string RoleMinCountLabel { get; }

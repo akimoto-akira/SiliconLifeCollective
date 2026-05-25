@@ -1831,7 +1831,16 @@ Uso: Chama a ferramenta chat, define action=""mark_read"", target_id=GUID do int
     public override string ProjectCtx_RoleDefinitionsHeader => "Definições de funções";
     public override string ProjectCtx_RoleAssignmentsHeader => "Atribuições de funções";
     public override string ProjectCtx_NoWorkflowTemplate => "Sem modelo de workflow atribuído, sem definições de funções disponíveis";
-    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} função(ões) com pessoal insuficiente. Use assign_role para atribuir seres de silício";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} função(ões) com pessoal insuficiente. Precisa criar seres de silício e atribuí-los às funções";
+    public override string ProjectCtx_StaffingActionPlanHeader => "Plano de ação de dotação de pessoal";
+    public override string ProjectCtx_TotalBeingsNeeded => "Total de seres de silício a criar: {0}";
+    public override string ProjectCtx_StaffingRoleBreakdownHeader => "Detalhe da escassez por função";
+    public override string ProjectCtx_RoleShortageDetail => "{0}: precisa de {1}, tem {2} → falta {3}";
+    public override string ProjectCtx_StaffingActionStepsHeader => "Passos de ação sugeridos";
+    public override string ProjectCtx_StaffingStepCreateBeings => "1. Use silicon_manager create_being para criar {0} seres de silício (pelo menos 1 por função)";
+    public override string ProjectCtx_StaffingStepAssignToProject => "2. Use project assign para adicionar os novos seres ao projeto";
+    public override string ProjectCtx_StaffingStepAssignToRoles => "3. Use project assign_role para atribuir cada ser à função correspondente";
+    public override string ProjectCtx_EmptyRolePoolAction => "⚠ O pool de funções está vazio! O workflow define {0} funções. Crie seres de silício e atribua-os a cada função";
     public override string ProjectCtx_RoleMinCount => "Mín";
     public override string ProjectCtx_RoleMaxCount => "Máx";
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";

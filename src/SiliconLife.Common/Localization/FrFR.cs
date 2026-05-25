@@ -1993,7 +1993,16 @@ Utilisation : Appelle l'outil chat, définis action=""mark_read"", target_id=GUI
     public override string ProjectCtx_RoleDefinitionsHeader => "Définitions des rôles";
     public override string ProjectCtx_RoleAssignmentsHeader => "Attributions des rôles";
     public override string ProjectCtx_NoWorkflowTemplate => "Aucun modèle de workflow attribué, aucune définition de rôle disponible";
-    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} rôle(s) sont sous-effectif(s). Utilisez assign_role pour attribuer des êtres de silicium";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} rôle(s) sont sous-effectif(s). Vous devez créer des êtres de silicium et les attribuer aux rôles";
+    public override string ProjectCtx_StaffingActionPlanHeader => "Plan d'action de dotation en personnel";
+    public override string ProjectCtx_TotalBeingsNeeded => "Nombre total d'êtres de silicium à créer : {0}";
+    public override string ProjectCtx_StaffingRoleBreakdownHeader => "Détail des pénuries par rôle";
+    public override string ProjectCtx_RoleShortageDetail => "{0} : besoin de {1}, actuellement {2} → manque {3}";
+    public override string ProjectCtx_StaffingActionStepsHeader => "Étapes d'action suggérées";
+    public override string ProjectCtx_StaffingStepCreateBeings => "1. Utilisez silicon_manager create_being pour créer {0} êtres de silicium (au moins 1 par rôle)";
+    public override string ProjectCtx_StaffingStepAssignToProject => "2. Utilisez project assign pour ajouter les nouveaux êtres au projet";
+    public override string ProjectCtx_StaffingStepAssignToRoles => "3. Utilisez project assign_role pour attribuer chaque être au rôle correspondant";
+    public override string ProjectCtx_EmptyRolePoolAction => "⚠ Le pool de rôles est vide ! Le workflow définit {0} rôles. Créez des êtres de silicium et attribuez-les à chaque rôle";
     public override string ProjectCtx_RoleMinCount => "Min";
     public override string ProjectCtx_RoleMaxCount => "Max";
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";

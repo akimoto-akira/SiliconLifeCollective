@@ -1452,18 +1452,56 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
                     }
                 }
 
-                // Alert if any role is understaffed
-                int understaffedCount = 0;
+                // Detailed staffing action plan if any role is understaffed
+                bool isEmptyRolePool = project.RoleAssignments.Count == 0;
+                var understaffedRoles = new List<(string roleName, RoleDefinition def, int assigned, int shortage)>();
                 foreach (var kvp in template.RoleDefinitions)
                 {
                     int count = project.RoleAssignments.TryGetValue(kvp.Key, out var list) ? list.Count : 0;
                     if (kvp.Value.GetStaffingStatus(count) == RoleStaffingStatus.Understaffed)
-                        understaffedCount++;
+                    {
+                        understaffedRoles.Add((kvp.Key, kvp.Value, count, kvp.Value.MinCount - count));
+                    }
                 }
-                if (understaffedCount > 0)
+                if (isEmptyRolePool && template.RoleDefinitions.Count > 0)
                 {
+                    int totalNeeded = template.RoleDefinitions.Values.Sum(r => r.MinCount);
                     sb.AppendLine();
-                    sb.AppendLine(loc.FormatProjectRoleNeedsAttention(understaffedCount));
+                    sb.AppendLine(loc.FormatEmptyRolePoolAction(template.RoleDefinitions.Count));
+                    sb.AppendLine();
+                    sb.AppendLine(loc.StaffingActionPlanHeader + ":");
+                    sb.AppendLine($"  {loc.FormatTotalBeingsNeeded(totalNeeded)}");
+                    sb.AppendLine();
+                    sb.AppendLine(loc.StaffingRoleBreakdownHeader + ":");
+                    foreach (var kvp in template.RoleDefinitions)
+                    {
+                        sb.AppendLine($"  {loc.FormatRoleShortageDetail(kvp.Key, kvp.Value.MinCount, 0, kvp.Value.MinCount)}");
+                    }
+                    sb.AppendLine();
+                    sb.AppendLine(loc.StaffingActionStepsHeader + ":");
+                    sb.AppendLine($"  {loc.FormatStaffingStepCreateBeings(totalNeeded)}");
+                    sb.AppendLine($"  {loc.StaffingStepAssignToProject}");
+                    sb.AppendLine($"  {loc.StaffingStepAssignToRoles}");
+                }
+                else if (understaffedRoles.Count > 0)
+                {
+                    int totalShortage = understaffedRoles.Sum(r => r.shortage);
+                    sb.AppendLine();
+                    sb.AppendLine(loc.FormatProjectRoleNeedsAttention(understaffedRoles.Count));
+                    sb.AppendLine();
+                    sb.AppendLine(loc.StaffingActionPlanHeader + ":");
+                    sb.AppendLine($"  {loc.FormatTotalBeingsNeeded(totalShortage)}");
+                    sb.AppendLine();
+                    sb.AppendLine(loc.StaffingRoleBreakdownHeader + ":");
+                    foreach (var (roleName, roleDef, assigned, shortage) in understaffedRoles)
+                    {
+                        sb.AppendLine($"  {loc.FormatRoleShortageDetail(roleName, roleDef.MinCount, assigned, shortage)}");
+                    }
+                    sb.AppendLine();
+                    sb.AppendLine(loc.StaffingActionStepsHeader + ":");
+                    sb.AppendLine($"  {loc.FormatStaffingStepCreateBeings(totalShortage)}");
+                    sb.AppendLine($"  {loc.StaffingStepAssignToProject}");
+                    sb.AppendLine($"  {loc.StaffingStepAssignToRoles}");
                 }
             }
             else

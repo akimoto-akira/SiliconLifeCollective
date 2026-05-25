@@ -2033,7 +2033,16 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string ProjectCtx_RoleDefinitionsHeader => "Definiciones de roles";
     public override string ProjectCtx_RoleAssignmentsHeader => "Asignaciones de roles";
     public override string ProjectCtx_NoWorkflowTemplate => "Sin plantilla de flujo de trabajo asignada, sin definiciones de roles";
-    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} rol(es) con personal insuficiente. Use assign_role para asignar seres de silicio";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} rol(es) con personal insuficiente. Debe crear seres de silicio y asignarlos a los roles";
+    public override string ProjectCtx_StaffingActionPlanHeader => "Plan de acción de dotación de personal";
+    public override string ProjectCtx_TotalBeingsNeeded => "Total de seres de silicio a crear: {0}";
+    public override string ProjectCtx_StaffingRoleBreakdownHeader => "Desglose de escasez por rol";
+    public override string ProjectCtx_RoleShortageDetail => "{0}: necesita {1}, tiene {2} → falta {3}";
+    public override string ProjectCtx_StaffingActionStepsHeader => "Pasos de acción sugeridos";
+    public override string ProjectCtx_StaffingStepCreateBeings => "1. Use silicon_manager create_being para crear {0} seres de silicio (al menos 1 por rol)";
+    public override string ProjectCtx_StaffingStepAssignToProject => "2. Use project assign para agregar los nuevos seres al proyecto";
+    public override string ProjectCtx_StaffingStepAssignToRoles => "3. Use project assign_role para asignar cada ser al rol correspondiente";
+    public override string ProjectCtx_EmptyRolePoolAction => "⚠ ¡El pool de roles está vacío! El flujo de trabajo define {0} roles. Cree seres de silicio y asígnelos a cada rol";
     public override string ProjectCtx_RoleMinCount => "Mín";
     public override string ProjectCtx_RoleMaxCount => "Máx";
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";

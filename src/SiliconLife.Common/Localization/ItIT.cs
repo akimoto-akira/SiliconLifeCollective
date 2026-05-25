@@ -1989,7 +1989,16 @@ Uso: Chiama lo strumento chat, imposta action=""mark_read"", target_id=GUID dell
     public override string ProjectCtx_RoleDefinitionsHeader => "Definizioni dei ruoli";
     public override string ProjectCtx_RoleAssignmentsHeader => "Assegnazioni dei ruoli";
     public override string ProjectCtx_NoWorkflowTemplate => "Nessun modello di workflow assegnato, nessuna definizione di ruolo disponibile";
-    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} ruolo/i sono sottoorganico. Usa assign_role per assegnare esseri di silicio";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} ruolo/i sono sottoorganico. Devi creare esseri di silicio e assegnarli ai ruoli";
+    public override string ProjectCtx_StaffingActionPlanHeader => "Piano d'azione per la dotazione del personale";
+    public override string ProjectCtx_TotalBeingsNeeded => "Numero totale di esseri di silicio da creare: {0}";
+    public override string ProjectCtx_StaffingRoleBreakdownHeader => "Dettaglio della carenza per ruolo";
+    public override string ProjectCtx_RoleShortageDetail => "{0}: necessari {1}, attuali {2} → mancano {3}";
+    public override string ProjectCtx_StaffingActionStepsHeader => "Passaggi d'azione suggeriti";
+    public override string ProjectCtx_StaffingStepCreateBeings => "1. Usa silicon_manager create_being per creare {0} esseri di silicio (almeno 1 per ruolo)";
+    public override string ProjectCtx_StaffingStepAssignToProject => "2. Usa project assign per aggiungere i nuovi esseri al progetto";
+    public override string ProjectCtx_StaffingStepAssignToRoles => "3. Usa project assign_role per assegnare ogni essere al ruolo corrispondente";
+    public override string ProjectCtx_EmptyRolePoolAction => "⚠ Il pool di ruoli è vuoto! Il workflow definisce {0} ruoli. Crea esseri di silicio e assegnali a ciascun ruolo";
     public override string ProjectCtx_RoleMinCount => "Min";
     public override string ProjectCtx_RoleMaxCount => "Max";
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";

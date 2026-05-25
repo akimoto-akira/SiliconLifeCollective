@@ -3499,6 +3499,33 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <summary>Message when role pool needs attention. {0}=understaffedCount</summary>
     public abstract string ProjectCtx_RoleNeedsAttention { get; }
 
+    /// <summary>Header for staffing action plan section</summary>
+    public abstract string ProjectCtx_StaffingActionPlanHeader { get; }
+
+    /// <summary>Total beings needed format. {0}=totalCount</summary>
+    public abstract string ProjectCtx_TotalBeingsNeeded { get; }
+
+    /// <summary>Header for per-role shortage breakdown section</summary>
+    public abstract string ProjectCtx_StaffingRoleBreakdownHeader { get; }
+
+    /// <summary>Per-role shortage detail format. {0}=roleName, {1}=minCount, {2}=assignedCount, {3}=shortage</summary>
+    public abstract string ProjectCtx_RoleShortageDetail { get; }
+
+    /// <summary>Header for suggested action steps section</summary>
+    public abstract string ProjectCtx_StaffingActionStepsHeader { get; }
+
+    /// <summary>Step 1: create beings. {0}=totalCount</summary>
+    public abstract string ProjectCtx_StaffingStepCreateBeings { get; }
+
+    /// <summary>Step 2: assign beings to project</summary>
+    public abstract string ProjectCtx_StaffingStepAssignToProject { get; }
+
+    /// <summary>Step 3: assign beings to roles</summary>
+    public abstract string ProjectCtx_StaffingStepAssignToRoles { get; }
+
+    /// <summary>Empty role pool action message. {0}=requiredRoleCount</summary>
+    public abstract string ProjectCtx_EmptyRolePoolAction { get; }
+
     /// <summary>Label for minimum count</summary>
     public abstract string ProjectCtx_RoleMinCount { get; }
 
@@ -3540,6 +3567,33 @@ public abstract class DefaultLocalizationBase : LocalizationBase
 
     /// <inheritdoc/>
     public override string ProjectRoleNeedsAttentionFormat => ProjectCtx_RoleNeedsAttention;
+
+    /// <inheritdoc/>
+    public override string StaffingActionPlanHeader => ProjectCtx_StaffingActionPlanHeader;
+
+    /// <inheritdoc/>
+    public override string TotalBeingsNeededFormat => ProjectCtx_TotalBeingsNeeded;
+
+    /// <inheritdoc/>
+    public override string StaffingRoleBreakdownHeader => ProjectCtx_StaffingRoleBreakdownHeader;
+
+    /// <inheritdoc/>
+    public override string RoleShortageDetailFormat => ProjectCtx_RoleShortageDetail;
+
+    /// <inheritdoc/>
+    public override string StaffingActionStepsHeader => ProjectCtx_StaffingActionStepsHeader;
+
+    /// <inheritdoc/>
+    public override string StaffingStepCreateBeingsFormat => ProjectCtx_StaffingStepCreateBeings;
+
+    /// <inheritdoc/>
+    public override string StaffingStepAssignToProject => ProjectCtx_StaffingStepAssignToProject;
+
+    /// <inheritdoc/>
+    public override string StaffingStepAssignToRoles => ProjectCtx_StaffingStepAssignToRoles;
+
+    /// <inheritdoc/>
+    public override string EmptyRolePoolActionFormat => ProjectCtx_EmptyRolePoolAction;
 
     /// <inheritdoc/>
     public override string RoleMinCountLabel => ProjectCtx_RoleMinCount;

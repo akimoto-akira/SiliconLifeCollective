@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-25T14:30:00+08:00",
+  "lastUpdated": "2026-05-25T16:30:00+08:00",
   "tasks": [
     {
       "id": "task-362",
@@ -13,14 +13,28 @@
       "createdAt": "2026-05-25T14:00:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
-      "relatedCommit": null,
+      "relatedCommit": "1c0b9ed",
       "completedAt": "2026-05-25T14:30:00+08:00"
+    },
+    {
+      "id": "task-363",
+      "type": "feature",
+      "target": "src/SiliconLife.Core/AI/ContextManager.cs",
+      "title": "细化 ThinkOnProject 人员配备提示词：从模糊警告改为详细可执行行动计划",
+      "description": "当前 ThinkOnProject 场景中，角色人员不足时仅输出一行模糊警告（如'有4个角色人员不足，请使用 assign_role 分配硅基人'），导致 AI 只创建1个硅基人便停止。改进为：1) 输出每个角色缺多少人的明细；2) 给出需创建的硅基人总数；3) 提供三步操作指引（create_being → assign → assign_role）；4) 区分空角色池和部分缺人两种场景。涉及 LocalizationBase、DefaultLocalizationBase、ContextManager 及12个语言文件。",
+      "priority": "P1",
+      "status": "inProgress",
+      "createdAt": "2026-05-25T16:30:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-25T16:35:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": ["task-362"],
+    "completed": ["task-362", "task-363"],
     "cancelled": []
   },
   "metadata": {

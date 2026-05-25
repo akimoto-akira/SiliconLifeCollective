@@ -2033,7 +2033,16 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string ProjectCtx_RoleDefinitionsHeader => "Role Definitions";
     public override string ProjectCtx_RoleAssignmentsHeader => "Role Assignments";
     public override string ProjectCtx_NoWorkflowTemplate => "No workflow template assigned, no role definitions available";
-    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} role(s) are understaffed. Use assign_role to assign silicon beings";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} role(s) are understaffed. You need to create silicon beings and assign them to roles";
+    public override string ProjectCtx_StaffingActionPlanHeader => "Staffing Action Plan";
+    public override string ProjectCtx_TotalBeingsNeeded => "Total silicon beings to create: {0}";
+    public override string ProjectCtx_StaffingRoleBreakdownHeader => "Per-Role Shortage Breakdown";
+    public override string ProjectCtx_RoleShortageDetail => "{0}: need {1}, have {2} → shortage of {3}";
+    public override string ProjectCtx_StaffingActionStepsHeader => "Suggested Action Steps";
+    public override string ProjectCtx_StaffingStepCreateBeings => "1. Use silicon_manager create_being to create {0} silicon beings (at least 1 per role)";
+    public override string ProjectCtx_StaffingStepAssignToProject => "2. Use project assign to add the new beings to the project";
+    public override string ProjectCtx_StaffingStepAssignToRoles => "3. Use project assign_role to assign each being to the corresponding role";
+    public override string ProjectCtx_EmptyRolePoolAction => "⚠ Role pool is empty! The workflow defines {0} roles. You need to create silicon beings and assign each to a role";
     public override string ProjectCtx_RoleMinCount => "Min";
     public override string ProjectCtx_RoleMaxCount => "Max";
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";

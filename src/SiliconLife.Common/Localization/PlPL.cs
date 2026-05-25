@@ -1133,7 +1133,16 @@ Użycie: wywołaj narzędzie chat, ustaw action=""mark_read"", target_id=GUID ro
     public override string ProjectCtx_RoleDefinitionsHeader => "Definicje ról";
     public override string ProjectCtx_RoleAssignmentsHeader => "Przypisania ról";
     public override string ProjectCtx_NoWorkflowTemplate => "Brak przypisanego szablonu workflow, brak definicji ról";
-    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} ról ma niedobór personelu. Użyj assign_role do przypisania istot krzemowych";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} ról ma niedobór personelu. Musisz utworzyć istoty krzemowe i przypisać je do ról";
+    public override string ProjectCtx_StaffingActionPlanHeader => "Plan działania obsady personalnej";
+    public override string ProjectCtx_TotalBeingsNeeded => "Całkowita liczba istot krzemowych do utworzenia: {0}";
+    public override string ProjectCtx_StaffingRoleBreakdownHeader => "Szczegóły niedoboru według roli";
+    public override string ProjectCtx_RoleShortageDetail => "{0}: potrzeba {1}, obecnie {2} → brakuje {3}";
+    public override string ProjectCtx_StaffingActionStepsHeader => "Sugerowane kroki działania";
+    public override string ProjectCtx_StaffingStepCreateBeings => "1. Użyj silicon_manager create_being, aby utworzyć {0} istot krzemowych (minimum 1 na rolę)";
+    public override string ProjectCtx_StaffingStepAssignToProject => "2. Użyj project assign, aby dodać nowe istoty do projektu";
+    public override string ProjectCtx_StaffingStepAssignToRoles => "3. Użyj project assign_role, aby przypisać każdą istotę do odpowiedniej roli";
+    public override string ProjectCtx_EmptyRolePoolAction => "⚠ Pula ról jest pusta! Workflow definiuje {0} ról. Utwórz istoty krzemowe i przypisz je do poszczególnych ról";
     public override string ProjectCtx_RoleMinCount => "Min";
     public override string ProjectCtx_RoleMaxCount => "Max";
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";

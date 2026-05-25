@@ -2030,7 +2030,16 @@ Verwendung: Rufe das chat-Tool auf, setze action=""mark_read"", target_id=Gegen�
     public override string ProjectCtx_RoleDefinitionsHeader => "Rollendefinitionen";
     public override string ProjectCtx_RoleAssignmentsHeader => "Rollenzuweisungen";
     public override string ProjectCtx_NoWorkflowTemplate => "Keine Workflow-Vorlage zugewiesen, keine Rollendefinitionen verfügbar";
-    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} Rolle(n) sind unterbesetzt. Verwenden Sie assign_role zur Zuweisung von Siliziumwesen";
+    public override string ProjectCtx_RoleNeedsAttention => "⚠ {0} Rolle(n) sind unterbesetzt. Sie müssen Siliziumwesen erstellen und den Rollen zuweisen";
+    public override string ProjectCtx_StaffingActionPlanHeader => "Personalbesetzungs-Aktionsplan";
+    public override string ProjectCtx_TotalBeingsNeeded => "Gesamtzahl der zu erstellenden Siliziumwesen: {0}";
+    public override string ProjectCtx_StaffingRoleBreakdownHeader => "Mangelübersicht nach Rolle";
+    public override string ProjectCtx_RoleShortageDetail => "{0}: benötigt {1}, aktuell {2} → fehlt {3}";
+    public override string ProjectCtx_StaffingActionStepsHeader => "Vorgeschlagene Aktionsschritte";
+    public override string ProjectCtx_StaffingStepCreateBeings => "1. Verwenden Sie silicon_manager create_being, um {0} Siliziumwesen zu erstellen (mindestens 1 pro Rolle)";
+    public override string ProjectCtx_StaffingStepAssignToProject => "2. Verwenden Sie project assign, um die neuen Wesen zum Projekt hinzuzufügen";
+    public override string ProjectCtx_StaffingStepAssignToRoles => "3. Verwenden Sie project assign_role, um jedes Wesen der entsprechenden Rolle zuzuweisen";
+    public override string ProjectCtx_EmptyRolePoolAction => "⚠ Rollenpool ist leer! Der Workflow definiert {0} Rollen. Erstellen Sie Siliziumwesen und weisen Sie sie den Rollen zu";
     public override string ProjectCtx_RoleMinCount => "Min";
     public override string ProjectCtx_RoleMaxCount => "Max";
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
