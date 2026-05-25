@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-25T16:30:00+08:00",
+  "lastUpdated": "2026-05-26T01:30:00+08:00",
   "tasks": [
     {
       "id": "task-362",
@@ -23,18 +23,32 @@
       "title": "细化 ThinkOnProject 人员配备提示词：从模糊警告改为详细可执行行动计划",
       "description": "当前 ThinkOnProject 场景中，角色人员不足时仅输出一行模糊警告（如'有4个角色人员不足，请使用 assign_role 分配硅基人'），导致 AI 只创建1个硅基人便停止。改进为：1) 输出每个角色缺多少人的明细；2) 给出需创建的硅基人总数；3) 提供三步操作指引（create_being → assign → assign_role）；4) 区分空角色池和部分缺人两种场景。涉及 LocalizationBase、DefaultLocalizationBase、ContextManager 及12个语言文件。",
       "priority": "P1",
-      "status": "inProgress",
+      "status": "completed",
       "createdAt": "2026-05-25T16:30:00+08:00",
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
       "relatedCommit": "14721a9",
       "completedAt": "2026-05-25T16:35:00+08:00"
+    },
+    {
+      "id": "task-364",
+      "type": "feature",
+      "target": "src/SiliconLife.Common/Localization/RuRU.cs",
+      "title": "添加俄语(ru-RU)本地化支持",
+      "description": "按照添加新语言流程文档，为项目添加完整的俄语本地化支持。包括：1) RuRU.cs 主本地化文件（300+属性）；2) ChineseHistoricalRuRU.cs 中国历史日历翻译（28朝代+296年号+26注释）；3) TrayRuRU.cs 系统托盘本地化；4) Language.cs 注册 RuRU 枚举；5) SiliconLife.Fast/Program.cs 注册本地化和托盘映射；6) SiliconLife.Default/Program.cs 注册本地化；7) docs/ru-RU/ 16个俄语文档文件；8) glossary.md 添加俄语列；9) README.md 和各语言 README.md 添加俄语链接；10) 编译验证通过（0错误）。",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-26T00:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": "a49041b",
+      "completedAt": "2026-05-26T01:30:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": ["task-362", "task-363"],
+    "completed": ["task-362", "task-363", "task-364"],
     "cancelled": []
   },
   "metadata": {
