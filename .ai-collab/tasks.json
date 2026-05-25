@@ -1,11 +1,26 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-25T01:10:00+08:00",
-  "tasks": [],
+  "lastUpdated": "2026-05-25T14:30:00+08:00",
+  "tasks": [
+    {
+      "id": "task-362",
+      "type": "bugfix",
+      "target": "src/SiliconLife.App/Web/Views/WorkflowDetailView.cs",
+      "title": "修复 WorkflowDetailView 中 states-overview 渲染导致 state-initial 重复字符串 bug",
+      "description": "WorkflowDetailView 中 states-overview div 的 JS 生成代码存在 Js.Str 字符串拼接错误，导致 state-initial 等 CSS 类名被当作 HTML 可见文本重复渲染。删除整个 states-overview 功能（JS 生成代码 + CSS 样式），因为任务流转示意中该概览行不需要。",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-25T14:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-25T14:30:00+08:00"
+    }
+  ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": [],
+    "completed": ["task-362"],
     "cancelled": []
   },
   "metadata": {

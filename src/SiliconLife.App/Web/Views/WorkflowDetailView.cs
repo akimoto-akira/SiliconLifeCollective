@@ -250,19 +250,6 @@ public class WorkflowDetailView : ViewBase
                 .Property("display", "flex")
                 .Property("align-items", "center")
                 .Property("gap", "6px")
-            .EndSelector()
-            .Selector(".states-overview")
-                .Property("display", "flex")
-                .Property("flex-wrap", "wrap")
-                .Property("gap", "8px")
-                .Property("margin-bottom", "16px")
-                .Property("padding-bottom", "12px")
-                .Property("border-bottom", "1px solid var(--border-color)")
-            .EndSelector()
-            .Selector(".state-label-tag")
-                .Property("font-size", "11px")
-                .Property("margin-left", "4px")
-                .Property("opacity", "0.7")
             .EndSelector();
     }
 
@@ -386,16 +373,6 @@ public class WorkflowDetailView : ViewBase
                 .Op(() => "+", () => Js.Str(() => "</span>"))))
             .Add(() => Js.Id(() => "container").Call(() => "appendChild", () => Js.Id(() => "div")).Stmt());
 
-        var statesOverviewIfBranches = new List<(JsSyntax? Condition, List<JsSyntax> Body)>
-        {
-            (Js.Id(() => "statesHtml").Op(() => "!==", () => Js.Str(() => "")), new List<JsSyntax>
-            {
-                Js.Const(() => "statesOverview", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))),
-                Js.Assign(() => Js.Id(() => "statesOverview").Prop(() => "className"), () => Js.Str(() => "states-overview")),
-                Js.Assign(() => Js.Id(() => "statesOverview").Prop(() => "innerHTML"), () => Js.Id(() => "statesHtml")),
-                Js.Id(() => "container").Call(() => "appendChild", () => Js.Id(() => "statesOverview")).Stmt()
-            })
-        };
         var transitionsIfBranches = new List<(JsSyntax? Condition, List<JsSyntax> Body)>
         {
             (Js.Id(() => "data").Prop(() => "transitions").Prop(() => "length").Op(() => "===", () => Js.Num(() => "0")), new List<JsSyntax>
@@ -410,20 +387,6 @@ public class WorkflowDetailView : ViewBase
         var renderTransitionsBody = Js.Block()
             .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "state-transitions"))))
             .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Str(() => "")))
-            .Add(() => Js.Const(() => "statesSet", () => Js.Id(() => "data").Prop(() => "states")))
-            .Add(() => Js.Const(() => "statesHtml", () => Js.Id(() => "statesSet").Call(() => "map", () => Js.Arrow(() => new List<string> { "s" }, () =>
-            {
-                var stateClass = Js.Id(() => "s").Prop(() => "isInitial").Op(() => "?", () => Js.Str(() => "state-initial")).Op(() => ":", () => Js.Id(() => "s").Prop(() => "isTerminal").Op(() => "?", () => Js.Str(() => "state-terminal")).Op(() => ":", () => Js.Str(() => "state-normal")));
-                var stateLabel = Js.Id(() => "s").Prop(() => "isInitial").Op(() => "?", () => Js.Str(() => loc.WorkflowInitialStateLabel)).Op(() => ":", () => Js.Id(() => "s").Prop(() => "isTerminal").Op(() => "?", () => Js.Str(() => loc.WorkflowTerminalStateLabel)).Op(() => ":", () => Js.Str(() => "")));
-                return (JsSyntax)Js.Str(() => "<span class='state-node ' + ")
-                .Op(() => "+", () => stateClass)
-                .Op(() => "+", () => Js.Str(() => " + ''>"))
-                .Op(() => "+", () => Js.Id(() => "s").Prop(() => "name"))
-                .Op(() => "+", () => Js.Str(() => " <span class='state-label-tag'>"))
-                .Op(() => "+", () => stateLabel)
-                .Op(() => "+", () => Js.Str(() => "</span></span>"));
-            })).Call(() => "join", () => Js.Str(() => ""))))
-            .Add(() => Js.If(() => statesOverviewIfBranches))
             .Add(() => Js.If(() => transitionsIfBranches));
 
         // Fetch and dispatch
