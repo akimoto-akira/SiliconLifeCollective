@@ -1,8 +1,8 @@
-# Beitragsleitfaden
+﻿# Beitragsleitfaden
 
 > **Version: v0.2.0-alpha**
 
-[English](../en/contributing.md) | **Deutsch** | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md)
+[English](../en/contributing.md) | **Deutsch** | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md) | [Русский](../ru-RU/contributing.md)
 
 Vielen Dank für Ihr Interesse an einem Beitrag zu SiliconLifeCollective!
 

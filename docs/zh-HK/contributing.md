@@ -1,8 +1,8 @@
-# 貢獻指南
+﻿# 貢獻指南
 
 > **版本：v0.2.0-alpha**
 
-[English](../en/contributing.md) | [中文](../zh-CN/contributing.md) | **繁體中文** | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md)
+[English](../en/contributing.md) | [中文](../zh-CN/contributing.md) | **繁體中文** | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md) | [Русский](../ru-RU/contributing.md)
 
 感謝您有興趣為 SiliconLifeCollective 做出貢獻！
 

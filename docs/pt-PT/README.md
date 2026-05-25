@@ -4,7 +4,7 @@
 
 **Versão: v0.2.0-alpha** | **Silicon Life Collective** — Uma plataforma de colaboração multi-agente baseada em .NET 9, onde os agentes IA são chamados **Silicon Beings** e podem auto-evoluir-se através da compilação dinâmica Roslyn.
 
-[English](../README.md) | [Deutsch](../de-DE/README.md) | [Français](../fr-FR/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Čeština](../cs-CZ/README.md) | [Italiano](../it-IT/README.md) | [Polski](../pl-PL/README.md) | **Português**
+[English](../README.md) | [Deutsch](../de-DE/README.md) | [Français](../fr-FR/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Čeština](../cs-CZ/README.md) | [Italiano](../it-IT/README.md) | [Polski](../pl-PL/README.md) | **Português** | [Русский](../ru-RU/README.md)
 
 ## 🌟 Funcionalidades principais
 

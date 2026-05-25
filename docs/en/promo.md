@@ -1,8 +1,8 @@
-# Meet Your Digital Companions
+﻿# Meet Your Digital Companions
 
 > **Version: v0.2.0-alpha**
 
-**English** | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Deutsch](../de-DE/promo.md) | [Čeština](../cs-CZ/promo.md)
+**English** | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Deutsch](../de-DE/promo.md) | [Čeština](../cs-CZ/promo.md) | [Русский](../ru-RU/promo.md)
 
 ## What if your computer could think for itself?
 

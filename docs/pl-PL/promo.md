@@ -1,8 +1,8 @@
-# Poznaj swoich cyfrowych towarzyszy
+﻿# Poznaj swoich cyfrowych towarzyszy
 
 > **Wersja: v0.2.0-alpha**
 
-[English](../en/promo.md) | [Deutsch](../de-DE/promo.md) | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Čeština](../cs-CZ/promo.md) | [Polski](../pl-PL/promo.md)
+[English](../en/promo.md) | [Deutsch](../de-DE/promo.md) | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Čeština](../cs-CZ/promo.md) | [Русский](../ru-RU/promo.md) | [Polski](../pl-PL/promo.md)
 
 ## Co by było, gdyby Twój komputer potrafił sam myśleć?
 

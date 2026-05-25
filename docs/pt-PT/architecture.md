@@ -1,8 +1,8 @@
-# Arquitetura
+﻿# Arquitetura
 
 > **Versão: v0.2.0-alpha**
 
-[English](../en/architecture.md) | [Deutsch](../de-DE/architecture.md) | [Français](../fr-FR/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md) | [Italiano](../it-IT/architecture.md) | [Polski](../pl-PL/architecture.md) | **Português**
+[English](../en/architecture.md) | [Deutsch](../de-DE/architecture.md) | [Français](../fr-FR/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md) | [Русский](../ru-RU/architecture.md) | [Italiano](../it-IT/architecture.md) | [Polski](../pl-PL/architecture.md) | **Português**
 
 ## Arquitetura de dupla versão
 

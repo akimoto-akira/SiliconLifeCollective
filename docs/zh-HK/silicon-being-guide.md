@@ -1,8 +1,8 @@
-# 矽基生命體指南
+﻿# 矽基生命體指南
 
 > **版本：v0.2.0-alpha**
 
-[English](../en/silicon-being-guide.md) | [中文](../zh-CN/silicon-being-guide.md) | **繁體中文** | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | [한국어](../ko-KR/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md)
+[English](../en/silicon-being-guide.md) | [中文](../zh-CN/silicon-being-guide.md) | **繁體中文** | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | [한국어](../ko-KR/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md) | [Русский](../ru-RU/silicon-being-guide.md)
 
 ## 概述
 

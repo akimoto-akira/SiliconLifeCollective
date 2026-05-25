@@ -1,10 +1,10 @@
-# ツールリファレンス
+﻿# ツールリファレンス
 
 > **バージョン: v0.2.0-alpha**
 
 本ドキュメントでは、Silicon Life Collective プラットフォームのすべての組み込みツールについて詳しく説明します。
 
-[English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | **日本語** | [한국어](../ko-KR/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md)
+[English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | **日本語** | [한국어](../ko-KR/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md) | [Русский](../ru-RU/tools-reference.md)
 
 ## 概要
 

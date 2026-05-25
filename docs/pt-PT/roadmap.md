@@ -1,8 +1,8 @@
-# Roteiro
+﻿# Roteiro
 
 > **Versão: v0.2.0-alpha**
 
-[English](../en/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | [Français](../fr-FR/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Čeština](../cs-CZ/roadmap.md) | [Italiano](../it-IT/roadmap.md) | [Polski](../pl-PL/roadmap.md) | **Português**
+[English](../en/roadmap.md) | [Deutsch](../de-DE/roadmap.md) | [Français](../fr-FR/roadmap.md) | [中文](../zh-CN/roadmap.md) | [繁體中文](../zh-HK/roadmap.md) | [Español](../es-ES/roadmap.md) | [日本語](../ja-JP/roadmap.md) | [한국어](../ko-KR/roadmap.md) | [Čeština](../cs-CZ/roadmap.md) | [Русский](../ru-RU/roadmap.md) | [Italiano](../it-IT/roadmap.md) | [Polski](../pl-PL/roadmap.md) | **Português**
 
 ## Roteiro de dupla versão
 

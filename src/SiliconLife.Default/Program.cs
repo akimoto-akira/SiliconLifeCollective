@@ -339,6 +339,9 @@ public class Program
         // Portuguese
         LocalizationManager.Instance.Register<PtPT>(Language.PtPT);
         LocalizationManager.Instance.Register<PtBR>(Language.PtBR);
+
+        // Russian
+        LocalizationManager.Instance.Register<RuRU>(Language.RuRU);
     }
 
     public static void RequestExit()

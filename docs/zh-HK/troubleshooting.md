@@ -1,8 +1,8 @@
-# 故障排除指南
+﻿# 故障排除指南
 
 > **版本：v0.2.0-alpha**
 
-[English](../en/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | **繁體中文** | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md)
+[English](../en/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | **繁體中文** | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md) | [Русский](../ru-RU/troubleshooting.md)
 
 ## 常見問題
 

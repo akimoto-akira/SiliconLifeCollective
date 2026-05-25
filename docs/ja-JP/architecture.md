@@ -1,8 +1,8 @@
-# アーキテクチャ
+﻿# アーキテクチャ
 
 > **バージョン: v0.2.0-alpha**
 
-[English](../en/architecture.md) | [Deutsch](../de-DE/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | **日本語** | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md)
+[English](../en/architecture.md) | [Deutsch](../de-DE/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | **日本語** | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md) | [Русский](../ru-RU/architecture.md)
 
 ## デュアルバージョンアーキテクチャ
 

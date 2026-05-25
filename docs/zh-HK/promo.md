@@ -1,8 +1,8 @@
-# 認識您的數位伴侶
+﻿# 認識您的數位伴侶
 
 > **版本：v0.2.0-alpha**
 
-[English](../en/promo.md) | [中文](../zh-CN/promo.md) | **繁體中文** | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Čeština](../cs-CZ/promo.md)
+[English](../en/promo.md) | [中文](../zh-CN/promo.md) | **繁體中文** | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Čeština](../cs-CZ/promo.md) | [Русский](../ru-RU/promo.md)
 
 ## 如果您的計算機能自己思考會怎样？
 

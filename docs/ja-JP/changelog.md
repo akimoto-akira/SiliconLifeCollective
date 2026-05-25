@@ -1,6 +1,6 @@
-# 変更ログ
+﻿# 変更ログ
 
-[English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | **日本語** | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md)
+[English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | **日本語** | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md) | [Русский](../ru-RU/changelog.md)
 
 このプロジェクトのすべての重要な変更は、このファイルに記録されます。
 

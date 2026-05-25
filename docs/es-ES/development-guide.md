@@ -1,8 +1,8 @@
-# Guía de Desarrollo
+﻿# Guía de Desarrollo
 
 > **Versión: v0.2.0-alpha**
 
-[English](../en/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | **Español** | [Deutsch](../de-DE/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/development-guide.md)
+[English](../en/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | **Español** | [Deutsch](../de-DE/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/development-guide.md) | [Русский](../ru-RU/development-guide.md)
 
 ## Resumen de Arquitectura
 

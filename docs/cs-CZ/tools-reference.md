@@ -1,10 +1,10 @@
-# Reference Nástrojů
+﻿# Reference Nástrojů
 
 > **Verze: v0.2.0-alpha**
 
 Tento dokument poskytuje podrobné informace o všech vestavěných nástrojích platformy Silicon Life Collective.
 
-[English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | **Čeština**
+[English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | **Čeština** | [Русский](../ru-RU/tools-reference.md)
 
 ## Přehled
 

@@ -1,8 +1,8 @@
-# Přispívání
+﻿# Přispívání
 
 > **Verze: v0.2.0-alpha**
 
-[English](../en/contributing.md) | [Deutsch](../de-DE/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | **Čeština**
+[English](../en/contributing.md) | [Deutsch](../de-DE/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | **Čeština** | [Русский](../ru-RU/contributing.md)
 
 Děkujeme vám za zájem přispět do SiliconLifeCollective!
 

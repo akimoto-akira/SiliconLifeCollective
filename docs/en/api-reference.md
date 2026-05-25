@@ -1,8 +1,8 @@
-# API Reference
+﻿# API Reference
 
 > **Version: v0.2.0-alpha**
 
-**English** | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [Čeština](../cs-CZ/api-reference.md)
+**English** | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [Čeština](../cs-CZ/api-reference.md) | [Русский](../ru-RU/api-reference.md)
 
 ## Web API Endpoints
 

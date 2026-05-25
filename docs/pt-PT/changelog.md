@@ -1,6 +1,6 @@
-# Registo de alterações
+﻿# Registo de alterações
 
-[English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [Français](../fr-FR/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md) | [Italiano](../it-IT/changelog.md) | [Polski](../pl-PL/changelog.md) | **Português**
+[English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [Français](../fr-FR/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md) | [Русский](../ru-RU/changelog.md) | [Italiano](../it-IT/changelog.md) | [Polski](../pl-PL/changelog.md) | **Português**
 
 Todas as alterações importantes deste projeto serão documentadas neste ficheiro.
 

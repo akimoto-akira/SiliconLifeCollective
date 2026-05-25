@@ -1,8 +1,8 @@
-# 開發指南
+﻿# 開發指南
 
 > **版本：v0.2.0-alpha**
 
-[English](../en/development-guide.md) | [中文](../zh-CN/development-guide.md) | **繁體中文** | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/security.md)
+[English](../en/development-guide.md) | [中文](../zh-CN/development-guide.md) | **繁體中文** | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/security.md) | [Русский](../ru-RU/security.md)
 
 ## 架構概述
 

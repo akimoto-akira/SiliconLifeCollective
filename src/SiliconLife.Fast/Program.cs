@@ -443,9 +443,12 @@ public class Program
         // Italian
         LocalizationManager.Instance.Register<ItIT>(Language.ItIT);
 
-        // Portuguese
+        // Portuguese variants
         LocalizationManager.Instance.Register<PtPT>(Language.PtPT);
         LocalizationManager.Instance.Register<PtBR>(Language.PtBR);
+
+        // Russian
+        LocalizationManager.Instance.Register<RuRU>(Language.RuRU);
     }
 
     public static void RequestExit()
@@ -526,6 +529,9 @@ public class Program
             // Portuguese variants
             Language.PtPT => new TrayPtPT(),
             Language.PtBR => new TrayPtBR(),
+
+            // Russian
+            Language.RuRU => new TrayRuRU(),
 
             // Default to English
             _ => new TrayEnUS()

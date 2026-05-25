@@ -181,5 +181,10 @@ public enum Language
     /// <summary>
     /// Portuguese (Brazil)
     /// </summary>
-    PtBR
+    PtBR,
+
+    /// <summary>
+    /// Russian (Russia)
+    /// </summary>
+    RuRU
 }
