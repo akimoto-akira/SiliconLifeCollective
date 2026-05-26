@@ -1,4 +1,4 @@
-﻿# 빠른 시작
+# 빠른 시작
 
 > **버전: v0.2.0-alpha**
 
@@ -6,37 +6,37 @@
 
 ## 버전 선택
 
-이 프로젝트는 두 구현 버전을 제공합니다:
+이 프로젝트는 두 가지 구현 버전을 제공합니다:
 
 ### SiliconLife.Default (기본 버전)
-- **포지셔닝**: 기본 구현, 아키텍처 실현 가능성 검증에 주로 사용
+- **포지션**: 기본 구현, 주로 아키텍처 타당성 검증에 사용
 - **실행 모드**: 콘솔 애플리케이션
-- **저장소**: 파일 시스템 JSON 저장소
-- **적용 시나리오**: 데이터 보안 우선, 소량 데이터, 개발 디버깅, 아키텍처 검증
+- **저장 방식**: 파일 시스템 JSON 저장
+- **적용 시나리오**: 데이터 보안 우선, 소규모 데이터, 개발 디버깅, 아키텍처 검증
 - **플랫폼 지원**: Windows, Linux, macOS
-- **역할 설명**: 아키텍처 검증의 기준 구현으로, 단순하고 신뢰성 높은 실행 방식을 제공하며, 이 프로젝트에 처음 접촉하거나 개발 디버깅에 적합합니다
+- **역할 설명**: 아키텍처 검증의 기준 구현으로, 간단하고 안정적인 실행 방식을 제공하며, 처음 접하는 사용자나 개발 디버깅에 적합
 
 ### SiliconLife.Fast (고성능 버전)
-- **포지셔닝**: 주력 프로덕션 버전
+- **포지션**: 주력 프로덕션 버전
 - **실행 모드**: 데스크톱 애플리케이션 (Windows/macOS 시스템 트레이 / Linux 상태 창)
-- **저장소**: SpeedyPack 메모리 스토리지 + 비동기 영속성 (.spk 파일 형식)
-- **적용 시나리오**: 높은 동시성, 낮은 지연 시간, 대용량 데이터, 장기 프로덕션 운영
-- **플랫폼 지원**: Windows/macOS (전체 기능, 시스템 트레이 포함), Linux (상태 창, 트레이 아이콘 없음)
-- **역할 설명**: 심층 최적화가 적용된 프로덕션급 구현으로, 장기 운영 및 실제 프로덕션 환경의 최선의 선택
+- **저장 방식**: SpeedyPack 메모리 저장 + 비동기 영속화 (.spk 파일 형식)
+- **적용 시나리오**: 고동시성, 저지연, 대규모 데이터, 장기 프로덕션 운영
+- **플랫폼 지원**: Windows/macOS (시스템 트레이 포함 전체 기능), Linux (상태 창, 트레이 아이콘 없음)
+- **역할 설명**: 심층 최적화된 프로덕션급 구현으로, 장기 실행 및 실제 프로덕션 환경에 최적의 선택
 
-> **초보자 권장**: 처음 사용자는 **SiliconLife.Default** 부터 시작하여 아키텍처 실현 가능성을 빠르게 검증하세요. 시스템에 익숙해진 후에는 **SiliconLife.Fast**로 마이그레이션하는 것을 강력히 권장합니다.
+> **초보자 권장**: 처음 사용 시 **SiliconLife.Default**부터 시작하여 아키텍처 타당성을 빠르게 검증하는 것을 권장합니다. 시스템에 익숙해진 후, 프로덕션 환경 실행 버전으로 **SiliconLife.Fast**로 마이그레이션할 것을 강력히 권장합니다.
 
-## 사전 요구사항
+## 사전 조건
 
 - **.NET 9 SDK** - [다운로드](https://dotnet.microsoft.com/download/dotnet/9.0)
 - **Git** - [다운로드](https://git-scm.com/)
-- **Ollama** (선택 사항, 로컬 AI용) - [다운로드](https://ollama.com/)
-- **DashScope API 키** (선택 사항, 클라우드 AI용) - [신청](https://bailian.console.aliyun.com/)
-- **Volcengine Ark API 키** (선택 사항, 클라우드 AI용) - [신청](https://console.volcengine.com/ark)
+- **Ollama** (선택, 로컬 AI용) - [다운로드](https://ollama.com/)
+- **바이리안 API 키** (선택, 클라우드 AI용) - [신청](https://bailian.console.aliyun.com/)
+- **Volcano Engine Ark API 키** (선택, 클라우드 AI용) - [신청](https://console.volcengine.com/ark)
 
 ## 빠른 시작
 
-### 1. 저장소 복제
+### 1. 저장소 클론
 
 ```bash
 git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
@@ -49,9 +49,9 @@ cd SiliconLifeCollective
 dotnet build
 ```
 
-### 3. AI 백엔드 설정
+### 3. AI 백엔드 구성
 
-`src/SiliconLife.Default/Config/DefaultConfigData.cs` 파일을 수정하거나 Web UI를 통해 런타임에 설정을 변경하세요.
+`src/SiliconLife.Default/Config/DefaultConfigData.cs`를 편집하거나 Web UI를 통해 런타임에 구성을 수정합니다.
 
 #### 옵션 A: Ollama (로컬)
 
@@ -66,23 +66,23 @@ dotnet build
 }
 ```
 
-#### 옵션 B: DashScope (클라우드)
+#### 옵션 B: 바이리안 (클라우드)
 
 ```json
 {
   "AIClients": {
     "DashScope": {
       "ApiKey": "your-api-key-here",
-      "Model": "qwen3.6-plus",
+      "Model": "qwen-plus",
       "Region": "beijing"
     }
   }
 }
 ```
 
-**사용 가능한 지역**: `beijing` (중국 북부 2), `virginia` (미국), `singapore` (싱가포르), `hongkong` (중국 홍콩), `frankfurt` (독일)
+> **사용 가능한 리전**: `beijing` (베이징), `virginia` (버지니아), `singapore` (싱가포르), `hongkong` (홍콩), `frankfurt` (프랑크푸르트)
 
-#### 옵션 C: Volcengine Ark (클라우드)
+#### 옵션 C: Volcano Engine Ark (클라우드)
 
 ```json
 {
@@ -96,7 +96,7 @@ dotnet build
 }
 ```
 
-> **참고**: Volcengine Ark의 Model 매개변수는 모델 이름이 아닌 추론 엔드포인트 ID(예: `ep-20241212123456-abcde`)를 사용합니다.
+> **참고**: Volcano Engine Ark의 Model 매개변수는 모델 이름이 아닌 추론 엔드포인트 ID(예: `ep-20241212123456-abcde`)를 받습니다.
 
 ### 4. 애플리케이션 실행
 
@@ -107,7 +107,7 @@ cd src/SiliconLife.Default
 dotnet run
 ```
 
-웹 서버가 `http://localhost:8080`에서 시작됩니다.
+웹 서버가 `http://localhost:8080`에서 시작됩니다
 
 #### Fast 버전 실행
 
@@ -116,9 +116,9 @@ cd src/SiliconLife.Fast
 dotnet run
 ```
 
-**Windows/macOS**: 애플리케이션이 데스크톱 모드로 시작되어 시스템 트레이로 최소화되며, 웹 서버도 `http://localhost:8080`에서 시작됩니다.
+**Windows/macOS**: 애플리케이션이 창 모드로 시작되어 시스템 트레이로 최소화되며, 웹 서버 역시 `http://localhost:8080`에서 시작됩니다
 
-**Linux**: 애플리케이션이 상태 창을 표시하고 (시스템 트레이 아이콘 없음) 브라우저를 자동으로 열어 Web UI에 접속합니다. `--no-tray` 매개변수로 브라우저 자동 실행을 건너뛸 수 있습니다:
+**Linux**: 애플리케이션이 상태 창을 표시하며(시스템 트레이 아이콘 없음), 자동으로 브라우저를 열어 Web UI에 접속합니다. `--no-tray` 매개변수를 사용하여 브라우저 자동 열기를 건너뛸 수도 있습니다:
 
 ```bash
 dotnet run -- --no-tray
@@ -126,26 +126,26 @@ dotnet run -- --no-tray
 
 ### 5. Web UI 접속
 
-브라우저를 열고 다음 주소로 이동하세요:
+브라우저를 열고 다음 주소로 이동합니다:
 
 ```
 http://localhost:8080
 ```
 
-다음 내용을 포함한 대시보드가 표시됩니다:
-- 실리콘 생명체 관리
+다음 내용이 포함된 대시보드를 볼 수 있습니다:
+- 실리콘 비잉 관리
 - 채팅 인터페이스
-- 설정 패널
+- 구성 패널
 - 시스템 모니터링
 
-## 첫 번째 실리콘 생명체
+## 첫 번째 실리콘 비잉
 
-### 첫 번째 생명체 생성
+### 첫 번째 비잉 만들기
 
-1. Web UI에서 **생명체 관리**로 이동
-2. **새 생명체 생성** 클릭
-3. 개성과 행동을 정의하는 소울 파일(`soul.md`) 설정
-4. 생명체 시작
+1. Web UI에서 **비잉 관리**로 이동합니다
+2. **새 비잉 만들기**를 클릭합니다
+3. 성격과 행동이 포함된 소울 파일(`soul.md`)을 구성합니다
+4. 비잉을 시작합니다
 
 ### soul.md 예시
 
@@ -166,123 +166,70 @@ You are a helpful assistant specializing in code review.
 - Be concise but thorough
 ```
 
-### 생명체 시작
+## 자주 묻는 질문
 
-생명체가 생성되면:
-- 독립적인 스케줄링 타임슬롯을 할당받습니다
-- 고유한 데이터 디렉토리를 가집니다 (`data/beings/{id}/`)
-- AI 요청에 소울 파일이 자동으로 포함됩니다
-- 시스템 내에서 독립적으로 실행됩니다
+### Ollama 연결 거부
 
-## 주요 기능 탐색
+**문제**: `http://localhost:11434`의 Ollama에 연결할 수 없음
 
-### 채팅 시스템
+**해결 방법**:
+```bash
+# Ollama가 실행 중인지 확인
+ollama list
 
-생명체와 직접 채팅:
-1. Web UI에서 **채팅**으로 이동
-2. 대화할 생명체 선택
-3. 메시지 입력 및 전송
-4. AI 응답 및 도구 실행 확인
-
-### 도구 시스템
-
-생명체는 다양한 작업을 수행하기 위해 24개의 내장 도구에 접근할 수 있습니다:
-
-- **캘린더 도구** - 32가지 달력 시스템 지원
-- **채팅 도구** - 생명체 간 통신
-- **설정 도구** - 설정 읽기/쓰기
-- **디스크 도구** - 파일 작업
-- **네트워크 도구** - HTTP 요청
-- **메모리 도구** - 장기/단기 메모리 관리
-- **작업 도구** - 작업 추적
-- **타이머 도구** - 예약 작업
-- **지식 도구** - 지식 그래프 관리
-- **작업 노트 도구** - 작업 기록
-- **WebView 도구** - 브라우저 자동화
-
-### 권한 시스템
-
-모든 AI 시작 작업은 5단계 권한 검증 체인을 통과합니다:
-
-1. **UserFrequencyCache** - 사용자 고빈도 결정 캐시 (메모리 전용)
-2. **IPermissionCallback** - 도메인별 콜백 규칙
-3. **Curator 분기** - 큐레이터: IPermissionAskHandler (사용자에게 문의)
-4. **NonCurator 분기** - 비큐레이터: GlobalACL (글로벌 ACL 규칙)
-5. **기본 거부** - 일치하는 규칙이 없으면 기본 거부
-
-### 지식 네트워크
-
-생명체는 지식을 트리플(주어-관계-목적어)로 저장하고 쿼리할 수 있습니다:
-
-```json
-{
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language",
-  "confidence": 0.95
-}
+# Ollama 시작이 필요한 경우
+ollama serve
 ```
 
-## 설정 커스터마이징
+### 모델을 찾을 수 없음
 
-### 포트 변경
+**문제**: `model "qwen2.5:7b" not found`
 
-`DefaultConfigData.cs`에서 HTTP 포트 수정:
-
-```csharp
-public int HttpPort = 8080; // 원하는 포트로 변경
+**해결 방법**:
+```bash
+# 필요한 모델 다운로드
+ollama pull qwen2.5:7b
 ```
 
-### 로그 레벨 설정
+### 포트가 이미 사용 중임
 
-디버깅을 위해 상세 로깅 활성화:
+**문제**: `HttpListenerException: Address already in use`
 
-```csharp
-public LogLevel LogLevel = LogLevel.Debug;
+**해결 방법**:
+- 구성에서 포트 변경
+- 또는 포트 8080을 사용하는 프로세스 종료:
+
+```bash
+# Windows
+netstat -ano | findstr :8080
+taskkill /PID <PID> /F
+
+# Linux/Mac
+lsof -ti:8080 | xargs kill -9
 ```
 
-### AI 모델 전환
+## 다음 단계
 
-런타임에 다른 AI 모델로 전환:
-
-1. Web UI에서 **설정**으로 이동
-2. **AI 클라이언트** 섹션 찾기
-3. 모델 이름 수정
-4. 변경사항 저장
-
-## 문제 해결
-
-### 애플리케이션이 시작되지 않음
-
-- .NET 9 SDK가 설치되어 있는지 확인: `dotnet --version`
-- 포트 8080이 사용 중이지 않은지 확인
-- 설정 파일 구문 오류 확인
-
-### AI 연결 실패
-
-- Ollama: `ollama list`로 모델이 풀되어 있는지 확인
-- DashScope: API 키가 올바른지 확인
-- 인터넷 연결 상태 확인
-
-### Web UI에 접속할 수 없음
-
-- 서버가 실행 중인지 확인: `http://localhost:8080`
-- 브라우저 콘솔에서 JavaScript 오류 확인
-- 방화벽 설정 확인
+- 📚 [아키텍처 가이드](architecture.md)를 읽고 시스템 설계 이해하기
+- 🛠️ [개발 가이드](development-guide.md)를 확인하고 시스템 확장하기
+- 📖 [API 레퍼런스](api-reference.md)를 탐색하고 통합 세부사항 알아보기
+- 🔒 [보안 문서](security.md)를 확인하고 권한 시스템 이해하기
+- 🧰 [툴 레퍼런스](tools-reference.md)를 확인하고 모든 내장 툴 알아보기
+- 🌐 [Web UI 가이드](web-ui-guide.md)를 확인하고 인터페이스 기능 알아보기
 
 ## 프로젝트 구조
 
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/            # 핵심 인터페이스 및 추상 클래스
-│   ├── SiliconLife.Common/          # 공유 구현 (두 버전 모두 사용)
-│   ├── SiliconLife.App/             # Default와 Fast가 공유하는 애플리케이션 계층
+│   ├── SiliconLife.Core/            # 코어 인터페이스 및 추상 클래스
+│   ├── SiliconLife.Common/          # 공유 구현 (두 버전 공통)
+│   ├── SiliconLife.App/             # Default와 Fast 공유 애플리케이션 계층
 │   ├── SiliconLife.Default/         # 기본 구현 + 진입점 (콘솔 버전)
-│   ├── SiliconLife.Fast/            # 고성능 구현 + 진입점 (데스크톱 버전)
+│   ├── SiliconLife.Fast/            # 고성능 구현 + 진입점 (창 버전)
 │   ├── SiliconLife.Speedy/          # SpeedyPack 고성능 스토리지 엔진
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 관리 도구 (Avalonia)
-├── docs/                            # 문서 (다국어, 33개 언어 변형)
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack 매니저 (Avalonia UI)
+├── docs/                            # 문서 (다국어, 34개 언어 변형)
 │   ├── en/                          # 영어
 │   ├── zh-CN/                       # 간체 중국어
 │   ├── zh-HK/                       # 번체 중국어
@@ -290,22 +237,13 @@ SiliconLifeCollective/
 │   ├── ja-JP/                       # 일본어
 │   ├── ko-KR/                       # 한국어
 │   └── cs-CZ/                       # 체코어
-├── 总文档/                           # 요구 사항 및 아키텍처 문서 (중국어)
+├── 总文档/                           # 요구사항 및 아키텍처 문서 (중국어)
 └── README.md                        # 프로젝트 설명
 ```
 
-## 다음 단계
-
-- 📚 [아키텍처 가이드](architecture.md) 읽어 시스템 설계 이해
-- 🛠️ [개발 가이드](development-guide.md) 확인하여 시스템 확장
-- 📖 [API 레퍼런스](api-reference.md) 탐색하여 통합 세부 정보 파악
-- 🔒 [보안 문서](security.md) 확인하여 권한 시스템 이해
-- 🧰 [도구 참고](tools-reference.md) 확인하여 모든 내장 도구 파악
-- 🌐 [Web UI 가이드](web-ui-guide.md) 확인하여 인터페이스 기능 학습
-
 ## 도움이 필요하신가요?
 
-- 📖 [도움말 문서 시스템](web-ui-guide.md#도움말-문서-시스템) 확인 (다국어 지원)
+- 📖 [도움말 문서 시스템](web-ui-guide.md#帮助文档系统新增) 확인 (다국어 지원)
 - 📚 [전체 문서](docs/) 읽기
-- 🐛 [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)에서 문제 보고
+- 🐛 [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)에 문제 보고
 - 💬 커뮤니티 토론 참여

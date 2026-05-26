@@ -1,8 +1,8 @@
-﻿# Quick Start
+# Quick Start
 
 > **Version: v0.2.0-alpha**
 
-**English** | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | [Čeština](../cs-CZ/getting-started.md) | [Русский](../ru-RU/getting-started.md)
+[**English**](../en/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md) | [Русский](../ru-RU/getting-started.md)
 
 ## Choose Version
 
@@ -14,7 +14,7 @@ This project provides two implementation versions:
 - **Storage**: File system JSON storage
 - **Use Case**: Data security priority, small data volume, development debugging, architecture verification
 - **Platform Support**: Windows, Linux, macOS
-- **Role Description**: Serves as the baseline implementation for architecture verification, providing a simple and reliable runtime mode, suitable for first-time contact with this project or development debugging
+- **Role Description**: Serves as the baseline implementation for architecture verification, providing a simple and reliable runtime mode, suitable for first-time users or development debugging
 
 ### SiliconLife.Fast (High-Performance Version)
 - **Positioning**: Main production version
@@ -32,6 +32,7 @@ This project provides two implementation versions:
 - **Git** - [Download](https://git-scm.com/)
 - **Ollama** (optional, for local AI) - [Download](https://ollama.com/)
 - **DashScope API Key** (optional, for cloud AI) - [Apply](https://bailian.console.aliyun.com/)
+- **Volcengine Ark API Key** (optional, for cloud AI) - [Apply](https://console.volcengine.com/ark)
 
 ## Quick Start
 
@@ -72,14 +73,30 @@ Edit `src/SiliconLife.Default/Config/DefaultConfigData.cs` or modify configurati
   "AIClients": {
     "DashScope": {
       "ApiKey": "your-api-key-here",
-      "Model": "qwen3.6-plus",
+      "Model": "qwen-plus",
       "Region": "beijing"
     }
   }
 }
 ```
 
-**Available Regions**: `beijing` (China North 2), `virginia` (US), `singapore` (Singapore), `hongkong` (Hong Kong, China), `frankfurt` (Germany)
+> **Available Regions**: `beijing` (Beijing), `virginia` (Virginia), `singapore` (Singapore), `hongkong` (Hong Kong), `frankfurt` (Frankfurt)
+
+#### Option C: Volcengine Ark (Cloud)
+
+```json
+{
+  "AIClients": {
+    "VolcengineArk": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
+      "Model": "ep-xxxxxxxxxxxxx-xxxxx"
+    }
+  }
+}
+```
+
+> **Note**: The Model parameter for Volcengine Ark accepts an inference endpoint ID (e.g., `ep-20241212123456-abcde`), not a model name.
 
 ### 4. Run the Application
 
@@ -127,7 +144,7 @@ You will see a dashboard with:
 
 1. Navigate to **Being Management** in the Web UI
 2. Click **Create New Being**
-3. Configure the soul file (`soul.md`) with personality and behavior
+3. Configure the Soul File (`soul.md`) with personality and behavior
 4. Start the being
 
 ### Example soul.md
@@ -211,8 +228,8 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Default/         # Default implementation + entry point (console version)
 │   ├── SiliconLife.Fast/            # High-performance implementation + entry point (forms version)
 │   ├── SiliconLife.Speedy/          # SpeedyPack high-performance storage engine
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack management tool (Windows Forms)
-├── docs/                            # Documentation (multi-language, 29 language variants)
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack management tool (Avalonia UI)
+├── docs/                            # Documentation (multi-language, 34 language variants)
 │   ├── en/                          # English
 │   ├── zh-CN/                       # Simplified Chinese
 │   ├── zh-HK/                       # Traditional Chinese
@@ -220,13 +237,13 @@ SiliconLifeCollective/
 │   ├── ja-JP/                       # Japanese
 │   ├── ko-KR/                       # Korean
 │   └── cs-CZ/                       # Czech
-├── 总文档/                           # Requirements and architecture docs
+├── 总文档/                           # Requirements and architecture docs (Chinese)
 └── README.md                        # Project readme
 ```
 
 ## Need Help?
 
-- 📖 Check the [Help Documentation System](web-ui-guide.md#help-documentation-system-new) (multi-language support)
+- 📖 Check the [Help Documentation System](web-ui-guide.md#帮助文档系统新增) (multi-language support)
 - 📚 Read the [Full Documentation](docs/)
 - 🐛 Report issues on [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
 - 💬 Join community discussions

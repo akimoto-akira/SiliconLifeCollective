@@ -1,30 +1,30 @@
-﻿# Guide de contribution
+# Guide de contribution
 
 > **Version : v0.2.0-alpha**
 
-[English](../en/contributing.md) | [Deutsch](../de-DE/contributing.md) | **Français** | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md) | [Русский](../ru-RU/contributing.md)
+[English](../en/contributing.md) | [Deutsch](../de-DE/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md) | [Русский](../ru-RU/contributing.md)
 
 Merci de votre intérêt pour contribuer à SiliconLifeCollective !
 
-## Contributions en double version
+## Contribution en double version
 
-Ce projet a deux versions d'implémentation. Vous pouvez contribuer selon vos intérêts :
+Ce projet propose deux versions d'implémentation, vous pouvez choisir votre direction de contribution selon vos centres d'intérêt :
 
-### SiliconLife.Default (Version standard)
-- **Stack technologique** : Application console .NET 9
-- **Direction de contribution** : Développement de fonctionnalités principales, implémentation d'outils, localisation, documentation
-- **Public cible** : Tous les développeurs
+### SiliconLife.Default (version par défaut)
+- **Stack technique** : Application console .NET 9
+- **Direction de contribution** : Développement des fonctionnalités principales, implémentation d'outils, localisation, documentation
+- **Public concerné** : Tous les développeurs
 
-### SiliconLife.Fast (Version haute performance)
-- **Stack technologique** : Application Windows Forms .NET 9
+### SiliconLife.Fast (version haute performance)
+- **Stack technique** : Application de bureau multiplateforme .NET 9 (Avalonia UI)
 - **Direction de contribution** : Optimisation des performances, stockage SpeedyPack, barre d'état système, concurrence sans verrou
-- **Public cible** : Développeurs avec expérience Windows et intérêt pour l'optimisation des performances
+- **Public concerné** : Développeurs ayant une expérience en développement desktop et intéressés par l'optimisation des performances
 
-> **Note importante** : Les deux versions partagent les projets SiliconLife.Core et SiliconLife.Common. Les améliorations des interfaces principales affectent les deux versions.
+> **Important** : Les deux versions partagent les projets SiliconLife.Core et SiliconLife.Common. Les améliorations des interfaces principales affecteront les deux versions simultanément.
 
 ## Code de conduite
 
-Ce projet suit la licence Apache 2.0. Restez respectueux et professionnel dans toutes les interactions.
+Ce projet est sous licence Apache 2.0. Veuillez rester respectueux et professionnel dans toutes les interactions.
 
 ---
 
@@ -34,7 +34,7 @@ Ce projet suit la licence Apache 2.0. Restez respectueux et professionnel dans t
 
 Cliquez sur le bouton « Fork » sur GitHub pour créer votre propre copie.
 
-### 2. Cloner votre fork
+### 2. Cloner votre Fork
 
 ```bash
 git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
@@ -44,7 +44,7 @@ cd SiliconLifeCollective
 ### 3. Configurer l'environnement de développement
 
 ```bash
-# Installer .NET 9 SDK
+# Installer le SDK .NET 9
 # https://dotnet.microsoft.com/download/dotnet/9.0
 
 # Restaurer les dépendances
@@ -60,14 +60,14 @@ dotnet test
 ### 4. Créer une branche de fonctionnalité
 
 ```bash
-git checkout -b feature/nom-de-votre-fonctionnalité
+git checkout -b feature/your-feature-name
 ```
 
 ### 5. Choisir le projet de développement
 
 Selon votre type de contribution, choisissez le projet approprié :
 
-- **Interfaces principales/classes abstraites** → Modifier `SiliconLife.Core`
+- **Interfaces/Classes abstraites principales** → Modifier `SiliconLife.Core`
 - **Implémentations partagées** → Modifier `SiliconLife.Common`
 - **Spécifique à la version Default** → Modifier `SiliconLife.Default`
 - **Spécifique à la version Fast** → Modifier `SiliconLife.Fast`
@@ -82,7 +82,7 @@ Selon votre type de contribution, choisissez le projet approprié :
 
 ### Style de code
 
-- Suivre les conventions C#
+- Suivre les conventions de codage C#
 - Noms de classes en PascalCase
 - Paramètres de méthodes en camelCase
 - Champs privés en `_camelCase`
@@ -90,19 +90,19 @@ Selon votre type de contribution, choisissez le projet approprié :
 
 ### Messages de commit
 
-Suivre le format des **commits conventionnels** :
+Suivre le format des **Commits Conventionnels** :
 
 ```
-<type>(<portée>): <description>
+<type>(<scope>): <description>
 ```
 
 **Types** :
 - `feat` : Nouvelle fonctionnalité
 - `fix` : Correction de bug
 - `docs` : Modification de documentation
-- `style` : Formatage de code
-- `refactor` : Refactorisation de code
-- `test` : Modification de tests
+- `style` : Formatage du code
+- `refactor` : Refactorisation du code
+- `test` : Modification des tests
 - `chore` : Modification de build/outils
 
 **Exemples** :
@@ -124,8 +124,8 @@ refactor(web): simplify controller structure
    ```bash
    # Exécuter tous les tests
    dotnet test
-   
-   # Construire en mode release
+
+   # Construire en mode Release
    dotnet build --configuration Release
    ```
 
@@ -137,16 +137,16 @@ refactor(web): simplify controller structure
 4. **Committer les modifications**
    ```bash
    git add .
-   git commit -m "feat(portée): description"
+   git commit -m "feat(scope): description"
    ```
 
-5. **Pousser vers votre fork**
+5. **Pousser vers votre Fork**
    ```bash
-   git push origin feature/nom-de-votre-fonctionnalité
+   git push origin feature/your-feature-name
    ```
 
 6. **Créer une Pull Request**
-   - Aller au dépôt original
+   - Aller sur le dépôt d'origine
    - Cliquer sur « Compare & pull request »
    - Remplir le modèle de PR
    - Soumettre
@@ -189,18 +189,18 @@ Ajout de la localisation coréenne pour tous les composants UI et la documentati
 ## Tests
 - Vérification que tous les éléments UI affichent correctement le coréen
 - Test de la fonctionnalité de changement de langue
-- Revue des traductions avec un locuteur natif
+- Revue des traductions avec des locuteurs natifs
 ```
 
 ---
 
-## Types de contributions
+## Types de contribution
 
 ### 1. Correction de bugs
 
 **Processus** :
-1. Vérifier les issues existantes
-2. Créer une issue si elle n'existe pas
+1. Vérifier les problèmes existants
+2. Créer un problème s'il n'existe pas
 3. Corriger le bug
 4. Ajouter des cas de test
 5. Soumettre une PR
@@ -224,7 +224,7 @@ Ajout de la localisation coréenne pour tous les composants UI et la documentati
 - Proposition de fonctionnalité approuvée
 - Couverture de test complète
 - Documentation mise à jour
-- Compatibilité ascendante
+- Rétrocompatible
 
 ### 3. Documentation
 
@@ -234,15 +234,15 @@ Ajout de la localisation coréenne pour tous les composants UI et la documentati
 3. Soumettre une PR
 
 **Exigences** :
-- Clair et concis
+- Claire et concise
 - Inclure des exemples
-- Support multilingue si applicable
+- Prendre en charge le multilingue si applicable
 
-### 4. Refactorisation de code
+### 4. Refactorisation du code
 
 **Processus** :
 1. Proposer la refactorisation dans une Issue
-2. Obtenir l'approbation
+2. Obtenir une approbation
 3. Refactoriser le code
 4. S'assurer que tous les tests passent
 5. Soumettre une PR
@@ -255,7 +255,7 @@ Ajout de la localisation coréenne pour tous les composants UI et la documentati
 
 ---
 
-## Guide des tests
+## Guide de test
 
 ### Tests unitaires
 
@@ -265,10 +265,10 @@ public void MyFeature_ShouldWork_AsExpected()
 {
     // Arrangement
     var service = new MyService();
-    
+
     // Exécution
     var result = service.DoSomething();
-    
+
     // Assertion
     Assert.IsTrue(result.Success);
 }
@@ -277,9 +277,9 @@ public void MyFeature_ShouldWork_AsExpected()
 ### Tests d'intégration
 
 Tester les flux de travail complets :
-- Interaction IA
+- Interactions IA
 - Exécution d'outils
-- Validation des permissions
+- Vérification des autorisations
 - Opérations de stockage
 
 ### Tests manuels
@@ -291,17 +291,17 @@ Pour les modifications UI :
 
 ---
 
-## Guide de la documentation
+## Guide de documentation
 
 ### Commentaires de code
 
-- Utiliser les commentaires XML pour toutes les API publiques
+- Utiliser des commentaires XML pour toutes les API publiques
 - Utiliser des commentaires en ligne pour la logique complexe
 - Les commentaires de code doivent être en anglais
 
 ### Fichiers de documentation
 
-- Placer dans `docs/{langue}/`
+- Placés dans `docs/{language}/`
 - Mettre à jour toutes les versions linguistiques
 - Suivre la structure existante
 
@@ -309,7 +309,7 @@ Pour les modifications UI :
 
 Lors de l'ajout de documentation :
 1. Créer d'abord la version anglaise
-2. Traduire dans les autres langues
+2. Traduire dans d'autres langues
 3. Maintenir le contenu synchronisé
 
 ---
@@ -324,7 +324,7 @@ Lors de l'ajout de documentation :
    - Bien documenté
 
 2. **Tests**
-   - Couverture adéquate
+   - Couverture suffisante
    - Tous les tests passent
    - Couvre les cas limites
 
@@ -334,13 +334,13 @@ Lors de l'ajout de documentation :
    - Multilingue
 
 4. **Compatibilité**
-   - Compatible avec les versions antérieures
-   - Pas de changements cassants (sauf notification)
+   - Rétrocompatible
+   - Pas de changement cassant (sauf notification)
    - Suit la gestion sémantique de version
 
-### Délai de revue
+### Délais de revue
 
-- Revue initiale : 1-3 jours
+- Revue initiale : 1 à 3 jours
 - Intégration des retours : selon les besoins
 - Fusion : après approbation
 
@@ -350,10 +350,10 @@ Lors de l'ajout de documentation :
 
 ### PR rejetée
 
-**Raisons** :
+**Causes** :
 - Ne suit pas les directives
 - Tests insuffisants
-- Changements cassants non notifiés
+- Changement cassant non notifié
 - Mauvaise qualité du code
 
 **Solutions** :
@@ -363,7 +363,7 @@ Lors de l'ajout de documentation :
 
 ### Conflits de fusion
 
-**Solutions** :
+**Solution** :
 ```bash
 # Mettre à jour votre branche
 git fetch origin
@@ -385,7 +385,7 @@ git push --force-with-lease
 ### Ressources
 
 - **Documentation** : [docs/](../)
-- **Issues** : GitHub Issues
+- **Problèmes** : GitHub Issues
 - **Discussions** : GitHub Discussions
 - **Code de conduite** : CODE_OF_CONDUCT.md
 
@@ -415,8 +415,8 @@ En contribuant, vous acceptez que vos contributions soient sous licence Apache 2
 ## Prochaines étapes
 
 - 📚 Lire la [documentation](../)
-- 🐛 Voir les [issues ouvertes](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
-- 💬 Commencer une [discussion](https://github.com/akimoto-akira/SiliconLifeCollective/discussions)
+- 🐛 Consulter les [problèmes ouverts](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 💬 Lancer une [discussion](https://github.com/akimoto-akira/SiliconLifeCollective/discussions)
 - 🚀 Forker et commencer à contribuer !
 
 Merci de contribuer à SiliconLifeCollective ! 🎉

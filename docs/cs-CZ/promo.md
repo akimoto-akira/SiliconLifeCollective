@@ -1,94 +1,94 @@
-﻿# Seznamte se se Svými Digitálními Společníky
+# Poznejte svého digitálního společníka
 
 > **Verze: v0.2.0-alpha**
 
 [English](../en/promo.md) | [Deutsch](../de-DE/promo.md) | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | **Čeština** | [Русский](../ru-RU/promo.md)
 
-## Co kdyby váš počítač dokázal přemýšlet sám?
+## Co kdyby váš počítač mohl sám přemýšlet?
 
-Představte si skupinu užitečných asistentů žijících ve vašem počítači. Nejsou to jen programy čekající na vaše příkazy — mají své vlastní osobnosti, pamatují si věci, které jste jim řekli, a mohou spolupracovat na plnění úkolů.
+Představte si, že máte skupinu nápomocných asistentů, kteří bydlí ve vašem počítači. Nejsou to jen programy čekající na vaše příkazy — mají svou vlastní osobnost, pamatují si, co jste jim řekli, a mohou spolupracovat na plnění úkolů.
 
-To je to, co jsme vytvořili.
+To je přesně to, co jsme postavili.
 
 ---
 
-## Co pro vás mohou udělat?
+## Co mohou pro vás udělat?
 
-### 🗓️ Nikdy nezmeškáte důležitá data
+### 🗓️ Nikdy nezmeškají důležitá data
 
-Zeptejte se jich na jakékoli datum v jakémkoli kalendářním systému:
-- "Kdy je letos čínský Nový rok?"
-- "Kdy začíná Ramadán?"
+Zeptejte se jich na jakékoliv datum v jakémkoliv kalendářním systému:
+- "Kdy je letos čínský nový rok?"
+- "Kdy začíná ramadán?"
 - "Kolik dní zbývá do mého výročí?"
 
-Rozumí více než 30 různým kalendářním systémům z celého světa.
+Rozumí 32 různým kalendářním systémům z celého světa.
 
-### 💬 Chatujte s nimi kdykoli
+### 💬 Chatujte s nimi kdykoliv
 
-Mluvte s nimi jako s přáteli. Pamatují si vaše předchozí konverzace, takže se nemusíte opakovat. Každý má jedinečnou osobnost — někteří jsou vážnější, jiní hravější. Vyberete si, s kým chcete pracovat.
+Zmluvte s nimi jako s přítelem. Pamatuji si vaše předchozí konverzace, takže se nemusíte opakovat. Každý má jedinečnou osobnost — někteří jsou vážnější, jiní hravější. Vy si vyberete, s kým chcete pracovat.
 
-### 📝 Pomoc s každodenními úkoly
+### 📝 Pomohou s každodenními úkoly
 
-Řekněte jim, co potřebujete, a oni přijdou na to, jak to udělat:
+Řekněte jim, co potřebujete, a oni vymyslí, jak to udělat:
 - "Přečti mi tento soubor a shrň ho"
-- "Zkontroluj, které webové stránky jsou nyní dostupné"
-- "Pošli zprávu mému kolegovi"
-- "Připomeň mi každé pondělí v 9:00 zkontrolovat e-maily"
+- "Zkontroluj, které weby jsou nyní dostupné"
+- "Pošli mému kolegovi zprávu"
+- "Připomeň mi kontrolovat e-mail každé pondělí v 9 hodin"
 
-### ⏰ Nastavte chytré připomínky
+### ⏰ Nastavte si chytrá připomenutí
 
-Nejen běžné budíky — rozumí složitým plánům:
-- "Připomeň mi patnáctého dne každého lunárního měsíce"
-- "Připomeň mi 3 dny před jakýmkoli státním svátkem"
-- "Každé ráno v 8:00 se se mnou spoj"
+Ne jen obyčejné budíky — rozumí složitým rozvrhům:
+- "Připomeň mi každý patnáctý den lunárního měsíce"
+- "Upozorni mě 3 dny před jakýmkoliv státním svátkem"
+- "Každé ráno v 8 hodin se mi ozvi"
 
-### 🤝 Práce jako tým
+### 🤝 Pracují jako tým
 
-Vytvořte více asistentů s různými specializacemi. Jeden může být skvělý v organizování vašeho rozvrhu, jiný v hledání informací, další v kreativním psaní. Mohou dokonce komunikovat navzájem a koordinovat svou práci!
+Vytvořte si více asistentů s různými specializacemi. Jeden může být dobrý v organizování vašeho rozvrhu, další ve vyhledávání informací, další v kreativním psaní. Mohou dokonce spolu mluvit a koordinovat svou práci!
 
 ---
 
-## Jak se to liší od běžné AI?
+## Čím se to liší od běžné AI?
 
 ### Mají paměť
 
-Většina AI zapomene vše po každé konverzaci. Tito společníci si pamatují důležité věci, které jste jim řekli, a postupem času akumulují znalosti.
+Většina AI po každé konverzaci zapomene vše. Tito společníci si pamatují důležité věci, které jste jim řekli, a postupně hromadí znalosti.
 
-### Mohou podnikat akce
+### Mohou jednat
 
-Nejen že vám dávají rady, mohou skutečně **dělat věci** — číst soubory, procházet internet, posílat zprávy, vytvářet připomínky a mnoho dalšího.
+Nejenže vám dávají rady, ale mohou skutečně **dělat věci** — číst soubory, procházet internet, posílat zprávy, vytvářet připomenutí a mnohem více.
 
-### Pracují, zatímco spíte
+### Pracují, zatímco vy spíte
 
-Nastavte jim úkoly a budou pokračovat v práci, i když nebudete poblíž. Vraťte se a zjistěte, že práce je hotová.
+Nastavte jim úkoly a budou pokračovat v práci, i když nejste poblíž. Vrátíte se a zjistíte, že práce je hotová.
 
 ### Mají osobnost
 
-Každý společník je formován "souborem duše" — představte si to jako jejich profil postavy. Můžete vytvářet asistenty s různými komunikačními styly, oblastmi odbornosti a pracovními metodami.
+Každého společníka formuje "Soubor Duše" — představte si to jako jeho charakterový list. Můžete vytvořit asistenty s různými komunikačními styly, oblastmi odbornosti a pracovními metodami.
 
 ---
 
-## Pro koho je to určeno?
+## Pro koho to je?
 
 ### 🏠 Domácí uživatelé
-- Sledování rodinných událostí v různých kalendářních systémech
-- Nastavení osobních asistentů pro správu vašich denních rutin
+- Sledování rodinných aktivit v různých kalendářních systémech
+- Nastavení osobního asistenta pro správu denní rutiny
 - Zábavné konverzace s různými AI osobnostmi
 
 ### 💼 Freelanceři a tvůrci
-- Výzkumní asistenti pro shromažďování informací pro vaše projekty
-- Psací partneři pro brainstormování nápadů
-- Správci rozvrhu, kteří vás udrží v termínech
+- Výzkumný asistent pro sběr informací o vašich projektech
+- Psaní partner pro brainstorming nápadů
+- Správce rozvrhu, který vám pomůže dodržovat termíny
 
 ### 🎓 Studenti a výzkumníci
-- Studijní kamarádi pro pomoc s organizováním učení
-- Kalendářní experti pro historický nebo kulturní výzkum
-- Správci úkolů pro dlouhodobé projekty
+- Studijní partner pro organizaci učení
+- Kalendářní expert pro historický nebo kulturní výzkum
+- Správce úkolů pro dlouhodobé projekty
 
 ### 👨‍💻 Techničtí nadšenci
-- Průzkum nejnovějších technologií AI agentů
+- Průzkum hranice technologie AI agentů
 - Vytváření vlastních asistentů pro specifické úkoly
-- Budování týmů specializovaných AI pracovníků
+- Budování týmu specializovaných AI pracovníků
 
 ---
 
@@ -96,103 +96,103 @@ Každý společník je formován "souborem duše" — představte si to jako jej
 
 1. **Stáhněte a spusťte** — funguje hned po vybalení
 2. **Vytvořte svého prvního společníka** — dejte mu jméno a osobnost
-3. **Začněte konverzovat** — jednoduše napište, co potřebujete, jako byste si povídali s přítelem
-4. **Sledujte je pracovat** — sledujte, jak plní úkoly, nastavují připomínky a učí se z vašich interakcí
+3. **Začněte konverzovat** — prostě napište, co potřebujete, jako byste chatovali s přítelem
+4. **Sledujte je v práci** — sledujte, jak plní úkoly, nastavují připomenutí a učí se z vašich interakcí
 
-Nejsou potřeba žádné technické znalosti. Pokud umíte posílat zprávy, můžete to používat.
+Nejsou potřeba žádné technické znalosti. Pokud umíte psát zprávy, můžete to používat.
 
 ---
 
-## Co to dělá speciálním?
+## Co to dělá výjimečným?
 
-### Priorita soukromí
+### Soukromí na prvním místě
 
-Vše běží na **vašem vlastním počítači**. Vaše konverzace, vzpomínky a data nikdy neopustí váš stroj, pokud výslovně nepožádáte o přístup k internetu. Máte úplnou kontrolu.
+Vše běží na **vašem vlastním počítači**. Vaše konverzace, paměti a data nikdy neopustí váš stroj, pokud výslovně nepožádáte o přístup k internetu. Máte plnou kontrolu.
 
-### Žádné předplatné
+### Žádné poplatky za předplatné
 
-Toto je open-source software. Používejte zdarma, upravujte, sdílejte s přáteli. Žádné měsíční poplatky, žádné prémiové úrovně, žádné zamčené funkce.
+Toto je open-source software. Svobodně používejte, upravujte, sdílejte s přáteli. Žádné měsíční poplatky, žádné prémiové úrovně, žádné uzamčené funkce.
 
 ### Roste s vámi
 
-Začněte s jedním jednoduchým asistentem. Jak objevíte, co je možné, vytvořte více specializovaných společníků. Systém je navržen tak, aby škáloval od příležitostného používání až po seriózní produktivní pracovní postupy.
+Začněte s jednoduchým asistentem. Jakmile objevíte, co je možné, vytvořte si více specializovaných společníků. Systém je navržen tak, aby škáloval od volného použití až po vážné produktivní pracovní postupy.
 
-### Rozšiřitelný systém pluginů
+### Rozšiřitelný systém zásuvných modulů
 
-Rozšiřte funkčnost pomocí pluginů — nástroje a schopnosti vytvořené komunitou, které lze snadno přidat. Každý plugin běží v bezpečném sandboxu, což zajišťuje bezpečnost systému.
+Rozšiřte funkce pomocí zásuvných modulů — nástroje a schopnosti vytvořené komunitou lze snadno přidat. Každý zásuvný modul běží v bezpečném sandboxu, což zaručuje bezpečnost systému.
 
-### Výběr duální verze
+### Výběr duálních verzí
 
-- **Verze Default**: Lehká konzolová aplikace, vhodná pro vývojové ladění a prostředí s omezenými zdroji
-- **Verze Fast**: Vysoce výkonná Windows aplikace s paměťovým storage enginem SpeedyPack, vhodná pro produkční nasazení
+- **Verze Default**: Lehká konzolová aplikace, vhodná pro vývoj, ladění a prostředí s omezenými prostředky
+- **Verze Fast**: Výkonná multiplatformní desktopová aplikace (Windows/macOS/Linux), používá SpeedyPack paměťový úložný engine, vhodná pro produkční nasazení
 
-### Vytvořeno komunitou
+### Budováno komunitou
 
-Vývojáři z celého světa pracují na tom, aby to bylo lepší. Nové funkce, kalendářní systémy, jazyková podpora a schopnosti jsou přidávány pravidelně.
+Vývojáři z celého světa přispívají k jeho vylepšování. Nové funkce, kalendářní systémy, jazyková podpora a schopnosti jsou přidávány pravidelně.
 
 ---
 
-## Příklady z Reálného Světa
+## Příklady ze skutečného světa
 
 ### Příklad 1: Plánování cesty
 
-**Vy**: "Příští měsíc jedu do Japonska. Můžeš mi pomoci naplánovat?"
+**Vy**: "Příští měsíc jedu do Japonska. Můžeš mi pomoci s plánováním?"
 
 **Váš asistent**:
 - Zkontroluje svátky v japonském kalendáři během vaší návštěvy
 - Prozkoumá předpověď počasí
 - Vytvoří dokument s denním itinerářem
-- Nastaví připomínky na termíny rezervací
-- Sdílí plán s asistenty vašich spolucestujících
+- Nastaví připomenutí pro rezervace
+- Sdílí plán s asistenty vašich cestovních společníků
 
-### Příklad 2: Správa projektu
+### Příklad 2: Řízení projektu
 
-**Vy**: "Potřebuji dokončit tento výzkumný papír do konce měsíce."
+**Vy**: "Potřebuji dokončit tuto výzkumnou práci do konce měsíce."
 
 **Váš tým**:
-- **Výzkumný asistent**: Shromažďuje relevantní zdroje a shrnuje je
-- **Psací partner**: Pomáhá strukturovat argumenty a upravovat text
-- **Správce rozvrhu**: Nastavuje milníky a odesílá připomínky na postup
-- **Kontrolor faktů**: Ověřuje citace a křížové reference informací
+- **Výzkumný asistent**: Shromáždí relevantní zdroje a shrne je
+- **Psaní partner**: Pomůže vám strukturovat argumenty a zdokonalit prózu
+- **Správce rozvrhu**: Nastaví milníky a pošle připomenutí postupu
+- **Ověřovač faktů**: Ověří citace a křížově zkontroluje informace
 
-Automaticky se koordinují a vzájemně aktualizují svůj postup.
+Automaticky koordinují a vzájemně se aktualizují o postupu.
 
 ### Příklad 3: Kulturní kalendář
 
-**Vy**: "Jaké jsou důležité svátky letos?"
+**Vy**: "Jaké jsou důležité svátky tento rok?"
 
 **Váš asistent**:
-- Zkontroluje čínský lunární kalendář pro Čínský Nový rok, festival středního podzimu
-- Najde Ramadán a Eid v islámském kalendáři
-- Zjistí data vysokých svátků v hebrejském kalendáři
+- Zkontroluje čínský lunární kalendář pro nový rok a festival středou podzimu
+- Najde ramadán a Eid al-Fitr v islámském kalendáři
+- Najde data Vysokých svátků v hebrejském kalendáři
 - Vytvoří sjednocený kalendář se všemi důležitými daty
-- Nastaví připomínky týden před každou událostí
+- Nastaví připomenutí týden před každou událostí
 
 ---
 
 ## Vize
 
-Věříme, že budoucnost výpočetní techniky není o výkonnějších nástrojích — je o **chytřejších společnících**.
+Věříme, že budoucnost výpočetní techniky není o výkonnějších nástrojích — ale o **chytřejších společnících**.
 
-Místo toho, abyste trávili hodiny klikáním na aplikace a organizováním informací, představte si mít důvěryhodné digitální partnery, kteří:
+Místo toho, abyste strávili hodiny klikáním v aplikacích a organizováním informací, představte si, že máte důvěryhodné digitální partnery, kteří:
 - Rozumí tomu, co potřebujete
-- Pamatují si vaše preference
+- Pamatuji si vaše preference
 - Proaktivně zpracovávají rutinní úkoly
 - Bezproblémově spolupracují
 - Respektují vaše soukromí
 
-Tato budoucnost je již zde. A teprve začíná.
+Ta budoucnost je tady. A teprve začíná.
 
 ---
 
 ## Připojte se k nám
 
-Ať už jste zvědaví na AI, potřebujete pomoc s organizací, nebo si jen chcete vyzkoušet něco nového — máte zde své místo.
+Ať už jste zvědaví na AI, potřebujete pomoci s organizací, nebo si prostě chcete vyzkoušet něco nového — tady je vaše místo.
 
-**Vyzkoušejte ještě dnes. Vytvořte svého prvního digitálního společníka. Podívejte se, co je možné.**
+**Vyzkoušejte to dnes. Vytvořte svého prvního digitálního společníka. Podívejte se, co je možné.**
 
 ---
 
-*Vytvořeno s láskou Hoshino Kennji a open-source komunitou*
+*Pečlivě vytvořeno Tianyuan Kenji a open-source komunitou*
 
 [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective) | [Gitee](https://gitee.com/hoshinokennji/SiliconLifeCollective) | [YouTube](https://www.youtube.com/@hoshinokennji) | [Bilibili](https://space.bilibili.com/617827040)

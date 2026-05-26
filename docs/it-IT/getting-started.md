@@ -1,59 +1,59 @@
-﻿# Guida introduttiva
+# Inizio Rapido
 
 > **Versione: v0.2.0-alpha**
 
-[English](../en/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | [Français](../fr-FR/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md) | [Русский](../ru-RU/getting-started.md) | **Italiano**
+[English](../en/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md) | [Русский](../ru-RU/getting-started.md)
 
-## Scegliere una versione
+## Scegli la Versione
 
-Questo progetto offre due versioni di implementazione:
+Questo progetto fornisce due versioni di implementazione:
 
-### SiliconLife.Default (Versione standard)
-- **Posizionamento**: Implementazione standard, principalmente per la verifica della fattibilità architetturale
+### SiliconLife.Default (Versione Predefinita)
+- **Posizionamento**: Implementazione predefinita, utilizzata principalmente per verificare la fattibilità dell'architettura
 - **Modalità di esecuzione**: Applicazione console
-- **Archiviazione**: Archiviazione JSON su file system
-- **Scenario d'uso**: Priorità alla sicurezza dei dati, piccolo volume di dati, debug di sviluppo, verifica architetturale
+- **Metodo di archiviazione**: Archiviazione JSON su file system
+- **Scenari applicabili**: Priorità alla sicurezza dei dati, piccola quantità di dati, sviluppo e debug, verifica dell'architettura
 - **Supporto piattaforma**: Windows, Linux, macOS
-- **Descrizione del ruolo**: Implementazione di riferimento per la verifica architetturale, offre un'esecuzione semplice e affidabile, adatta al primo contatto o al debug di sviluppo
+- **Descrizione del ruolo**: Come implementazione di riferimento per la verifica dell'architettura, fornisce un modo di esecuzione semplice e affidabile, adatta per il primo contatto con il progetto o per lo sviluppo e il debug
 
-### SiliconLife.Fast (Versione ad alte prestazioni)
-- **Posizionamento**: Versione principale di produzione
-- **Modalità di esecuzione**: Applicazione desktop (Windows/macOS barra di stato di sistema / Linux finestra di stato)
-- **Archiviazione**: Archiviazione in memoria SpeedyPack + persistenza asincrona (formato file .spk)
-- **Scenario d'uso**: Alta concorrenza, bassa latenza, grande volume di dati, sfruttamento in produzione a lungo termine
-- **Supporto piattaforma**: Windows/macOS (funzionalità complete, inclusa barra di stato), Linux (finestra di stato, nessuna icona nella barra)
-- **Descrizione del ruolo**: Implementazione pronta per la produzione con ottimizzazione approfondita, la scelta migliore per lo sfruttamento a lungo termine e i veri ambienti di produzione
+### SiliconLife.Fast (Versione ad Alte Prestazioni)
+- **Posizionamento**: Versione di produzione raccomandata
+- **Modalità di esecuzione**: Applicazione desktop (area di notifica di Windows/macOS / finestra di stato su Linux)
+- **Metodo di archiviazione**: Archiviazione in memoria SpeedyPack + persistenza asincrona (formato file .spk)
+- **Scenari applicabili**: Alta concorrenza, bassa latenza, grandi volumi di dati, esecuzione di produzione a lungo termine
+- **Supporto piattaforma**: Windows/macOS (funzionalità complete, inclusa area di notifica), Linux (finestra di stato, senza icona nell'area di notifica)
+- **Descrizione del ruolo**: Implementazione di livello produttivo profondamente ottimizzata, prima scelta per esecuzione a lungo termine e ambienti di produzione effettivi
 
-> **Raccomandazione per i principianti**: I nuovi utenti dovrebbero iniziare con **SiliconLife.Default** per verificare rapidamente la fattibilità architetturale. Dopo aver familiarizzato con il sistema, si consiglia vivamente la migrazione a **SiliconLife.Fast**.
+> **Consiglio per i principianti**: Per il primo utilizzo si raccomanda di iniziare con **SiliconLife.Default** per verificare rapidamente la fattibilità dell'architettura; dopo aver familiarizzato con il sistema, si consiglia vivamente di migrare a **SiliconLife.Fast** come versione di esecuzione per l'ambiente di produzione.
 
 ## Prerequisiti
 
-- **.NET 9 SDK** - [Scarica](https://dotnet.microsoft.com/download/dotnet/9.0)
-- **Git** - [Scarica](https://git-scm.com/)
-- **Ollama** (opzionale, per IA locale) - [Scarica](https://ollama.com/)
-- **Chiave API DashScope** (opzionale, per IA cloud) - [Richiedi](https://bailian.console.aliyun.com/)
-- **Chiave API Volcengine Ark** (opzionale, per IA cloud) - [Richiedi](https://console.volcengine.com/ark)
+- **.NET 9 SDK** - [Download](https://dotnet.microsoft.com/download/dotnet/9.0)
+- **Git** - [Download](https://git-scm.com/)
+- **Ollama** (opzionale, per AI locale) - [Download](https://ollama.com/)
+- **Chiave API Bailian** (opzionale, per AI cloud) - [Richiedi](https://bailian.console.aliyun.com/)
+- **Chiave API Volcengine Ark** (opzionale, per AI cloud) - [Richiedi](https://console.volcengine.com/ark)
 
-## Avvio rapido
+## Inizio Rapido
 
-### 1. Clonare il repository
+### 1. Clona il Repository
 
 ```bash
 git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 ```
 
-### 2. Compilare il progetto
+### 2. Compila il Progetto
 
 ```bash
 dotnet build
 ```
 
-### 3. Configurare il backend IA
+### 3. Configura il Backend AI
 
-Modifica `src/SiliconLife.Default/Config/DefaultConfigData.cs` o cambia la configurazione in fase di esecuzione tramite l'interfaccia Web.
+Modifica `src/SiliconLife.Default/Config/DefaultConfigData.cs` o modifica la configurazione tramite la Web UI durante l'esecuzione.
 
-#### Opzione A: Ollama (locale)
+#### Opzione A: Ollama (Locale)
 
 ```json
 {
@@ -66,27 +66,29 @@ Modifica `src/SiliconLife.Default/Config/DefaultConfigData.cs` o cambia la confi
 }
 ```
 
-#### Opzione B: DashScope (cloud)
+#### Opzione B: Bailian (Cloud)
 
 ```json
 {
   "AIClients": {
     "DashScope": {
-      "ApiKey": "la-tua-chiave-api-qui",
-      "Model": "qwen3.6-plus",
+      "ApiKey": "your-api-key-here",
+      "Model": "qwen-plus",
       "Region": "beijing"
     }
   }
 }
 ```
 
-#### Opzione C: Volcengine Ark (cloud)
+> **Regioni disponibili**: `beijing` (Pechino), `virginia` (Virginia), `singapore` (Singapore), `hongkong` (Hong Kong), `frankfurt` (Francoforte)
+
+#### Opzione C: Volcengine Ark (Cloud)
 
 ```json
 {
   "AIClients": {
     "VolcengineArk": {
-      "ApiKey": "la-tua-chiave-api-qui",
+      "ApiKey": "your-api-key-here",
       "Endpoint": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
       "Model": "ep-xxxxxxxxxxxxx-xxxxx"
     }
@@ -94,77 +96,77 @@ Modifica `src/SiliconLife.Default/Config/DefaultConfigData.cs` o cambia la confi
 }
 ```
 
-> **Nota**: Il parametro Model di Volcengine Ark accetta un ID endpoint di inferenza (es. `ep-20241212123456-abcde`), non un nome modello.
+> **Nota**: Il parametro Model di Volcengine Ark accetta l'ID dell'endpoint di inferenza (ad esempio `ep-20241212123456-abcde`), non il nome del modello.
 
-### 4. Eseguire l'applicazione
+### 4. Esegui l'Applicazione
 
-#### Eseguire la versione Default
+#### Esegui la versione Default
 
 ```bash
 cd src/SiliconLife.Default
 dotnet run
 ```
 
-Il server Web si avvia su `http://localhost:8080`
+Il server Web si avvierà su `http://localhost:8080`
 
-#### Eseguire la versione Fast
+#### Esegui la versione Fast
 
 ```bash
 cd src/SiliconLife.Fast
 dotnet run
 ```
 
-**Windows/macOS**: L'applicazione si avvia in modalità Forms, minimizzata nella barra di stato di sistema, con il server Web anche su `http://localhost:8080`
+**Windows/macOS**: L'applicazione si avvierà in modalità finestra, si minimizzerà nell'area di notifica di sistema, il server Web si avvierà anch'esso su `http://localhost:8080`
 
-**Linux**: L'applicazione mostra una finestra di stato (nessuna icona nella barra di sistema) e apre automaticamente il browser per accedere alla Web UI. È possibile utilizzare il parametro `--no-tray` per saltare l'apertura automatica del browser:
+**Linux**: L'applicazione mostrerà una finestra di stato (senza icona nell'area di notifica di sistema) e aprirà automaticamente il browser per accedere alla Web UI. È anche possibile utilizzare il parametro `--no-tray` per saltare l'apertura automatica del browser:
 
 ```bash
 dotnet run -- --no-tray
 ```
 
-### 5. Accedere all'interfaccia Web
+### 5. Accedi alla Web UI
 
-Apri un browser e accedi a:
+Apri il browser e naviga verso:
 
 ```
 http://localhost:8080
 ```
 
-Vedrai una dashboard con:
-- Gestione Silicon Beings
-- Interfaccia chat
-- Pannello configurazione
-- Monitoraggio sistema
+Vedrai una dashboard che include:
+- Gestione degli Esseri di Silicio
+- Interfaccia di chat
+- Pannello di configurazione
+- Monitoraggio del sistema
 
-## Il tuo primo Silicon Being
+## Primo Essere di Silicio
 
-### Creare il tuo primo Being
+### Crea il tuo primo essere
 
-1. Nell'interfaccia Web, naviga verso **Gestione Beings**
-2. Clicca su **Crea nuovo Being**
-3. Configura il file dell'anima (`soul.md`) con personalità e comportamento
-4. Avvia il Being
+1. Naviga verso **Gestione Esseri** nella Web UI
+2. Clicca su **Crea nuovo essere**
+3. Configura il File dell'Anima (`soul.md`), includendo personalità e comportamento
+4. Avvia l'essere
 
-### Esempio soul.md
+### Esempio di soul.md
 
 ```markdown
-# Il mio primo Silicon Being
+# My First Silicon Being
 
-## Personalità
-Sei un assistente utile specializzato nella revisione codice.
+## Personality
+You are a helpful assistant specializing in code review.
 
-## Capacità
-- Revisionare la qualità del codice
-- Suggerire miglioramenti
-- Spiegare concetti complessi
+## Capabilities
+- Review code quality
+- Suggest improvements
+- Explain complex concepts
 
-## Comportamento
-- Fornire sempre feedback costruttivo
-- Usare esempi chiari
-- Essere concisi ma esaustivi
+## Behavior
+- Always provide constructive feedback
+- Use clear examples
+- Be concise but thorough
 ```
 
-## Domande frequenti
+## Domande Frequenti
 
 ### Connessione Ollama rifiutata
 
@@ -172,10 +174,10 @@ Sei un assistente utile specializzato nella revisione codice.
 
 **Soluzione**:
 ```bash
-# Verificare se Ollama è in esecuzione
+# Verifica che Ollama sia in esecuzione
 ollama list
 
-# Avviare Ollama se necessario
+# Se necessario, avvia Ollama
 ollama serve
 ```
 
@@ -185,17 +187,17 @@ ollama serve
 
 **Soluzione**:
 ```bash
-# Scaricare il modello richiesto
+# Scarica il modello richiesto
 ollama pull qwen2.5:7b
 ```
 
-### Porta già occupata
+### Porta già in uso
 
 **Problema**: `HttpListenerException: Address already in use`
 
 **Soluzione**:
-- Cambiare la porta nella configurazione
-- O terminare il processo sulla porta 8080:
+- Cambia la porta nella configurazione
+- Oppure termina il processo che utilizza la porta 8080:
 
 ```bash
 # Windows
@@ -206,45 +208,42 @@ taskkill /PID <PID> /F
 lsof -ti:8080 | xargs kill -9
 ```
 
-## Prossimi passi
+## Prossimi Passi
 
-- 📚 Leggere la [guida architettura](architecture.md) per comprendere il design sistema
-- 🛠️ Consultare la [guida sviluppo](development-guide.md) per estendere il sistema
-- 📖 Esplorare il [riferimento API](api-reference.md) per i dettagli integrazione
-- 🔒 Consultare la [documentazione sicurezza](security.md) per il sistema permessi
-- 🧰 Sfogliare il [riferimento strumenti](tools-reference.md) per tutti gli strumenti integrati
-- 🌐 Leggere la [guida interfaccia Web](web-ui-guide.md) per le funzionalità interfaccia
+- 📚 Leggi la [guida all'architettura](architecture.md) per comprendere la progettazione del sistema
+- 🛠️ Consulta la [guida allo sviluppo](development-guide.md) per estendere il sistema
+- 📖 Esplora il [riferimento API](api-reference.md) per i dettagli sull'integrazione
+- 🔒 Consulta la [documentazione sulla sicurezza](security.md) per il sistema di permessi
+- 🧰 Consulta il [riferimento strumenti](tools-reference.md) per tutti gli strumenti integrati
+- 🌐 Consulta la [Guida Web UI](web-ui-guide.md) per le funzionalità dell'interfaccia
 
-## Struttura del progetto
+## Struttura del Progetto
 
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/            # Interfacce principali e classi astratte
-│   ├── SiliconLife.Common/          # Implementazione comune (usata da entrambe le versioni)
-│   ├── SiliconLife.App/             # Livello applicativo condiviso tra Default e Fast
-│   ├── SiliconLife.Default/         # Implementazione standard + punto ingresso (versione console)
-│   ├── SiliconLife.Fast/            # Implementazione alte prestazioni + punto ingresso (versione desktop)
-│   ├── SiliconLife.Speedy/          # Motore storage alte prestazioni SpeedyPack
-│   └── SiliconLife.Speedy.Manager/  # Strumento gestione SpeedyPack (Avalonia UI)
-├── docs/                            # Documentazione (multilingue, 33 varianti linguistiche)
+│   ├── SiliconLife.Core/            # Interfacce e classi astratte principali
+│   ├── SiliconLife.Common/          # Implementazione condivisa (comune a entrambe le versioni)
+│   ├── SiliconLife.App/             # Livello applicazione condiviso tra Default e Fast
+│   ├── SiliconLife.Default/         # Implementazione predefinita + punto di ingresso (versione console)
+│   ├── SiliconLife.Fast/            # Implementazione ad alte prestazioni + punto di ingresso (versione finestra)
+│   ├── SiliconLife.Speedy/          # Motore di archiviazione ad alte prestazioni SpeedyPack
+│   └── SiliconLife.Speedy.Manager/  # Strumento di gestione SpeedyPack (Avalonia UI)
+├── docs/                            # Documentazione (multilingue, 34 varianti linguistiche)
 │   ├── en/                          # Inglese
 │   ├── zh-CN/                       # Cinese semplificato
 │   ├── zh-HK/                       # Cinese tradizionale
-│   ├── de-DE/                       # Tedesco
-│   ├── fr-FR/                       # Francese
 │   ├── es-ES/                       # Spagnolo
 │   ├── ja-JP/                       # Giapponese
 │   ├── ko-KR/                       # Coreano
-│   ├── cs-CZ/                       # Ceco
-│   └── it-IT/                       # Italiano
-├── 总文档/                           # Documenti requisiti e architettura (Cinese)
-└── README.md                        # Panoramica progetto
+│   └── cs-CZ/                       # Ceco
+├── 总文档/                           # Documenti di requisiti e architettura (cinese)
+└── README.md                        # Descrizione del progetto
 ```
 
 ## Hai bisogno di aiuto?
 
-- 📖 Consultare il [sistema documentazione aiuto](web-ui-guide.md#帮助文档系统新增) (supporto multilingue)
-- 📚 Leggere la [documentazione completa](docs/)
-- 🐛 Segnalare i problemi su [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
-- 💬 Partecipare alle discussioni della comunità
+- 📖 Consulta il [sistema di documentazione di aiuto](web-ui-guide.md#sistema-di-documentazione-di-aiuto-nuovo) (supporto multilingue)
+- 📚 Leggi la [documentazione completa](docs/)
+- 🐛 Segnala problemi su [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 💬 Partecipa alle discussioni della community

@@ -1,98 +1,103 @@
-﻿# API Reference
+# API reference
 
 > **Verze: v0.2.0-alpha**
 
 [English](../en/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | **Čeština** | [Русский](../ru-RU/api-reference.md)
 
-## Webové API Endpointy
+## Web API koncové body
 
 Základní URL: `http://localhost:8080`
 
 ### Autentizace
 
-Většina endpointů vyžaduje autentizaci prostřednictvím session cookies spravovaných Web UI.
+Většina koncových bodů vyžaduje autentizaci pomocí session cookie spravované přes Web UI. Před inicializací systému budou všechny požadavky kromě stránky nápovědy přesměrovány na inicializační stránku.
 
 ---
 
-## Správa Silikonových Bytostí
+## Řídicí panel
 
-### Získat Všechny Bytosti
+### Získání statistik řídicího panelu
 
-**GET** `/api/beings`
+**GET** `/api/dashboard/stats`
 
-**Odpověď**:
+Vrací přehledná data systému (počet bytostí, stav běhu atd.).
+
+### Získání metrik výkonu
+
+**GET** `/api/dashboard/metrics`
+
+Vrací data metrik výkonu v reálném čase.
+
+---
+
+## Chatovací systém
+
+### Chatovací stránka
+
+**GET** `/chat`
+
+Vrací stránku chatovacího rozhraní.
+
+### Streamový chat (SSE)
+
+**GET** `/api/chat/stream`
+
+Streamový chat prostřednictvím Server-Sent Events (SSE).
+
+**Odpověď**: Server-Sent Events stream
+
+```
+data: {"type": "chunk", "content": "I"}
+data: {"type": "chunk", "content": "'m"}
+data: {"type": "chunk", "content": " thinking..."}
+data: {"type": "complete", "sessionId": "uuid"}
+```
+
+### Získání seznamu relací
+
+**GET** `/api/chat/conversations`
+
+Vrací seznam všech aktivních chatovacích relací.
+
+**Příklad odpovědi**:
 ```json
 {
-  "beings": [
+  "conversations": [
     {
-      "id": "being-uuid",
-      "name": "Assistant",
-      "status": "running",
-      "soul": "path/to/soul.md"
+      "sessionId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
+      "beingId": "being-uuid",
+      "type": "single",
+      "displayName": "Chat s Xiaoyou",
+      "lastMessage": "Obsah poslední zprávy",
+      "lastTime": "2026-05-20T10:30:00Z"
     }
   ]
 }
 ```
 
-**Hodnoty aktivity**: `Idle` | `SingleChat` | `GroupChat` | `Task` | `Timer` | `Broadcast` | `Project` | `MemoryCompression` | `Stopped`
+### Získání historie zpráv
 
-### Vytvořit Bytost
+**GET** `/api/chat/messages`
 
-**POST** `/api/beings`
+Parametr dotazu: `channelId` — ID kanálu/relace
 
-**Požadavek**:
-```json
-{
-  "name": "New Being",
-  "soul": "# Personality\nYou are helpful..."
-}
-```
+Vrací historii zpráv zadané relace.
 
-**Odpověď**: `201 Created`
+### Získání historie chatu
 
-### Spustit Bytost
+**GET** `/api/chat/history`
 
-**POST** `/api/beings/{id}/start`
+Vrací globální historii chatu.
 
-### Zastavit Bytost
-
-**POST** `/api/beings/{id}/stop`
-
-### Získat Detaily Bytosti
-
-**GET** `/api/beings/{id}`
-
----
-
-## Chatovací Systém
-
-### Získat Seznam Konverzací
-
-**GET** `/api/chat/conversations`
-
-**Odpověď**:
-```json
-[
-  {
-    "sessionId": "session-uuid",
-    "beingId": "being-uuid",
-    "type": "single",
-    "displayName": "Chat s bytostí",
-    "lastMessage": "Poslední zpráva...",
-    "lastTime": "2026-04-20T10:30:00Z"
-  }
-]
-```
-
-### Odeslat Zprávu
+### Odeslání zprávy
 
 **POST** `/api/chat/send`
 
-**Požadavek**:
+**Tělo požadavku**:
 ```json
 {
-  "channelId": "session-uuid",
-  "content": "Hello, how are you?"
+  "channelId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
+  "content": "Obsah testovací zprávy"
 }
 ```
 
@@ -100,241 +105,364 @@ Většina endpointů vyžaduje autentizaci prostřednictvím session cookies spr
 ```json
 {
   "success": true,
-  "messageId": "message-uuid"
+  "messageId": "50156b26-f3b9-4735-be3d-51e547bd3a4a"
 }
 ```
 
-### Získat Historii Zpráv
+### Zastavení AI přemýšlení
 
-**GET** `/api/chat/messages?channelId={sessionId}`
+**POST** `/api/chat/stop`
 
-**Odpověď**:
+Zastaví aktuálně probíhající generování AI odpovědi.
+
+**Tělo požadavku**:
 ```json
 {
-  "messages": [
+  "channelId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d"
+}
+```
+
+### Nahrání souboru
+
+**POST** `/api/chat/upload`
+
+Nahraje soubor do chatovací relace (podpora multipart/form-data).
+
+---
+
+## Správa Křemíkových Bytostí
+
+### Stránka správy bytostí
+
+**GET** `/beings`
+
+Vrací stránku rozhraní pro správu Křemíkových Bytostí.
+
+### Získání seznamu bytostí
+
+**GET** `/api/beings` nebo **GET** `/api/beings/list`
+
+Vrací seznam všech registrovaných Křemíkových Bytostí.
+
+**Příklad odpovědi**:
+```json
+{
+  "beings": [
     {
-      "role": "user",
-      "content": "Hello",
-      "timestamp": "2026-04-20T10:30:00Z"
-    },
-    {
-      "role": "assistant",
-      "content": "Hi there!",
-      "timestamp": "2026-04-20T10:30:05Z"
+      "id": "being-uuid",
+      "name": "Assistant",
+      "status": "running",
+      "soulPath": "path/to/soul.md"
     }
   ]
 }
 ```
 
-### Zastavit AI Myšlení
+**Hodnoty stavu**: `idle` | `running` | `waiting_permission` | `stopped`
 
-**POST** `/api/chat/stop`
+### Získání detailů bytosti
 
-**Požadavek**:
+**GET** `/api/beings/detail`
+
+Parametr dotazu: `beingId` — ID bytosti
+
+Vrací detailní informace o zadané bytosti.
+
+### Získání aktivních stavů bytostí
+
+**GET** `/api/beings/activity`
+
+Vrací informace o aktivních stavech jednotlivých bytostí.
+
+### Stránka editoru Souboru Duše
+
+**GET** `/beings/soul`
+
+Vrací rozhraní editoru Souboru Duše.
+
+### Uložení Souboru Duše
+
+**POST** `/api/beings/soul/save`
+
+**Tělo požadavku**:
 ```json
 {
-  "channelId": "session-uuid"
+  "beingId": "being-uuid",
+  "soulContent": "# Personality\nYou are helpful..."
 }
 ```
 
-### Streamovaný Chat (SSE)
+### Stránka editoru AI konfigurace
 
-**GET** `/api/chat/stream?channelId={sessionId}`
+**GET** `/beings/ai-config`
 
-**Odpověď**: Server-sent events stream
+Vrací rozhraní editoru AI konfigurace.
 
-```
-data: {"type": "chunk", "content": "I"}
-data: {"type": "chunk", "content": "'m"}
-data: {"type": "chunk", "content": " thinking..."}
-data: {"type": "tool_call", "tool": "disk_read", "args": {...}}
-data: {"type": "tool_result", "result": "..."}
-data: {"type": "complete", "sessionId": "uuid"}
-```
+### Uložení AI konfigurace
 
----
+**POST** `/api/beings/ai-config/save`
 
-## Konfigurace
-
-### Získat Konfiguraci
-
-**GET** `/api/config`
-
-**Odpověď**:
+**Tělo požadavku**:
 ```json
 {
-  "aiClients": {
-    "Ollama": {
-      "baseUrl": "http://localhost:11434",
-      "model": "qwen2.5:7b"
-    }
-  },
-  "storage": {
-    "basePath": "./data"
+  "beingId": "being-uuid",
+  "aiClientType": "DashScope",
+  "config": {
+    "apiKey": "...",
+    "region": "beijing",
+    "model": "qwen3.6-plus"
   }
 }
 ```
 
-### Aktualizovat Konfiguraci
+### Získání seznamu dostupných AI modelů
 
-**POST** `/api/config`
+**GET** `/api/beings/ai-config/models`
 
-**Požadavek**:
-```json
-{
-  "aiClients": {
-    "Ollama": {
-      "baseUrl": "http://localhost:11434",
-      "model": "qwen2.5:14b"
-    }
-  }
-}
-```
+Parametry dotazu: `clientType`, `apiKey`, `region`
+
+Vrací seznam dostupných modelů pro zadaného AI klienta.
 
 ---
 
-## Systém Oprávnění
+## Zobrazení historie chatu
 
-### Získat Oprávnění
+### Stránka historie chatu
 
-**GET** `/api/permissions`
+**GET** `/chat-history`
 
-**Odpověď**:
+Vrací hlavní stránku historie chatu.
+
+### Stránka detailů historie chatu
+
+**GET** `/chat-history-detail`
+
+Vrací stránku s detaily historie chatu pro zadanou relaci.
+
+### Stránka detailů historie skupinového chatu
+
+**GET** `/group-chat-history-detail`
+
+Vrací stránku s detaily historie skupinového chatu.
+
+### Stránka detailů historie vysílání
+
+**GET** `/broadcast-history-detail`
+
+Vrací stránku s detaily historie vysílacího kanálu.
+
+### Získání seznamu historických relací
+
+**GET** `/api/chat-history/conversations`
+
+Vrací seznam všech historických relací.
+
+### Získání historických zpráv
+
+**GET** `/api/chat-history/messages`
+
+Parametr dotazu: `sessionId` — ID relace
+
+Vrací záznamy zpráv zadané historické relace.
+
+---
+
+## Správa časovačů
+
+### Stránka časovačů
+
+**GET** `/timers`
+
+Vrací stránku rozhraní pro správu časovačů.
+
+### Získání seznamu časovačů
+
+**GET** `/api/timers/list`
+
+Vrací seznam všech časovačů.
+
+### Stránka detailů cyklů časovače
+
+**GET** `/timer-cycles/{timerId}`
+
+Vrací stránku s detaily prováděcích cyklů zadaného časovače.
+
+### Získání seznamu cyklů časovače
+
+**GET** `/api/timer-cycles/list`
+
+Parametr dotazu: `timerId` — ID časovače
+
+Vrací seznam všech prováděcích cyklů zadaného časovače.
+
+### Stránka detailů jednoho cyklu
+
+**GET** `/timer-cycle/{cycleIndex}`
+
+Vrací stránku s detaily jednoho provedení.
+
+### Získání zpráv cyklu
+
+**GET** `/api/timer-cycle/messages`
+
+Parametr dotazu: `cycleIndex` — index cyklu
+
+Vrací zprávy související se zadaným prováděcím cyklem.
+
+---
+
+## Správa úkolů
+
+### Stránka úkolů
+
+**GET** `/tasks`
+
+Vrací stránku rozhraní pro správu úkolů.
+
+### Získání seznamu úkolů
+
+**GET** `/api/tasks/list`
+
+Vrací seznam všech úkolů.
+
+### Stránka detailů cyklů úkolu
+
+**GET** `/task-cycles/{taskId}`
+
+Vrací stránku s detaily prováděcích cyklů zadaného úkolu.
+
+### Získání seznamu cyklů úkolu
+
+**GET** `/api/task-cycles/list`
+
+Parametr dotazu: `taskId` — ID úkolu
+
+Vrací seznam všech prováděcích cyklů zadaného úkolu.
+
+### Stránka detailů jednoho cyklu úkolu
+
+**GET** `/task-cycle/{cycleIndex}`
+
+Vrací stránku s detaily jednoho provedení úkolu.
+
+### Získání zpráv cyklu úkolu
+
+**GET** `/api/task-cycle/messages`
+
+Parametr dotazu: `cycleIndex` — index cyklu
+
+Vrací zprávy související se zadaným prováděcím cyklem úkolu.
+
+---
+
+## Systém oprávnění
+
+### Stránka správy oprávnění
+
+**GET** `/permissions`
+
+Vrací stránku rozhraní pro správu oprávnění.
+
+### Získání seznamu pravidel oprávnění
+
+**GET** `/api/permissions/list`
+
+Vrací všechna aktuálně nakonfigurovaná pravidla oprávnění.
+
+**Příklad odpovědi**:
 ```json
 {
   "rules": [
     {
-      "prefix": "network:api.github.com",
-      "result": "Allowed"
-    },
-    {
-      "prefix": "file:C:\\Windows",
-      "result": "Denied"
+      "permissionType": "NetworkAccess",
+      "resourcePrefix": "api.github.com",
+      "result": "Allowed",
+      "description": "Allow GitHub API access"
     }
   ]
 }
 ```
 
-### Udělit Oprávnění
+### Uložení pravidla oprávnění
 
-**POST** `/api/permissions`
+**POST** `/api/permissions/save`
 
-**Požadavek**:
+**Tělo požadavku**:
 ```json
 {
-  "userId": "user-uuid",
-  "resource": "disk:write",
-  "allowed": true,
-  "duration": 3600
+  "permissionType": "FileAccess",
+  "resourcePrefix": "C:\\Projects",
+  "result": "Allowed",
+  "description": "Allow project directory access"
 }
 ```
 
-### Odvolat Oprávnění
+### Stránka žádosti o oprávnění
 
-**DELETE** `/api/permissions/{id}`
+**GET** `/permission/request`
 
-### Zkontrolovat Oprávnění
+Zobrazuje stránku žádosti o oprávnění, umožňuje uživateli schválit nebo zamítnout žádost Křemíkové Bytosti o oprávnění.
 
-**POST** `/api/permissions/check`
+**Parametry dotazu**:
 
-**Požadavek**:
-```json
-{
-  "userId": "user-uuid",
-  "resource": "network:http"
-}
-```
+| Parametr | Typ | Popis |
+|------|------|------|
+| `userId` | `Guid` | ID Křemíkové Bytosti žádající o oprávnění |
+| `type` | `string` | Typ oprávnění |
+| `resource` | `string` | Cesta k požadovanému prostředku |
+| `allowCode` | `string` | Kódový identifikátor pro povolení operace |
+| `denyCode` | `string` | Kódový identifikátor pro zamítnutí operace |
+
+### Kontrola nevyřízených žádostí o oprávnění
+
+**GET** `/permission/check`
+
+Parametr dotazu: `userId` — ID Křemíkové Bytosti
 
 **Odpověď**:
 ```json
 {
-  "allowed": true,
-  "reason": "Granted by curator"
+  "pending": true
+}
+```
+
+### Odpověď na žádost o oprávnění
+
+**GET** `/permission/respond`
+
+**Parametry dotazu**:
+
+| Parametr | Typ | Popis |
+|------|------|------|
+| `userId` | `Guid` | ID Křemíkové Bytosti |
+| `allowed` | `bool` | Zda povolit |
+| `addToCache` | `bool` | Zda uložit rozhodnutí do mezipaměti |
+| `cacheDuration` | `double` | Doba trvání mezipaměti (hodiny) |
+
+**Odpověď**:
+```json
+{
+  "success": true
 }
 ```
 
 ---
 
-## Systém Úkolů a Časovačů
+## Protokolový systém
 
-### Vytvořit Úkol
+### Stránka protokolů
 
-**POST** `/api/tasks`
+**GET** `/logs`
 
-**Požadavek**:
-```json
-{
-  "beingId": "being-uuid",
-  "description": "Review code",
-  "priority": 5,
-  "dueDate": "2026-04-21T12:00:00Z"
-}
-```
+Vrací stránku rozhraní pro prohlížení protokolů.
 
-### Získat Úkoly
+### Získání seznamu protokolů
 
-**GET** `/api/tasks?beingId={id}&status=pending`
+**GET** `/api/logs/list`
 
-### Aktualizovat Stav Úkolu
+Parametry dotazu podporují filtrování podle úrovně a časového rozsahu.
 
-**PATCH** `/api/tasks/{id}`
-
-**Požadavek**:
-```json
-{
-  "status": "completed"
-}
-```
-
-### Vytvořit Časovač
-
-**POST** `/api/timers`
-
-**Požadavek**:
-```json
-{
-  "beingId": "being-uuid",
-  "interval": 3600,
-  "action": "think",
-  "repeat": true
-}
-```
-
-### Smazat Časovač
-
-**DELETE** `/api/timers/{id}`
-
----
-
-## Audit a Logy
-
-### Získat Využití Tokenů
-
-**GET** `/api/audit/tokens?startDate={date}&endDate={date}`
-
-**Odpověď**:
-```json
-{
-  "summary": {
-    "totalTokens": 150000,
-    "promptTokens": 100000,
-    "completionTokens": 50000,
-    "totalCost": 0.15
-  },
-  "byModel": {
-    "qwen2.5:7b": {
-      "tokens": 100000,
-      "cost": 0.10
-    }
-  }
-}
-```
-
-### Získat Logy
-
-**GET** `/api/logs?level=error&limit=100`
-
-**Odpověď**:
+**Příklad odpovědi**:
 ```json
 {
   "logs": [
@@ -348,130 +476,823 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
+### Získání protokolů seskupených podle bytostí
+
+**GET** `/api/logs/beings`
+
+Statistiky protokolů seskupené podle Křemíkových Bytostí.
+
+### Získání dostupných úrovní protokolů
+
+**GET** `/api/logs/levels`
+
+Vrací seznam úrovní protokolů dostupných v systému.
+
 ---
 
-## Storage API
+## Statistiky využití
 
-### Číst Hodnotu
+### Stránka statistik využití
 
-**GET** `/api/storage?key={key}`
+**GET** `/usage`
 
-**Odpověď**:
+Vrací stránku rozhraní pro statistiky využití.
+
+### Získání shrnutí využití
+
+**GET** `/api/usage/summary`
+
+Vrací shrnutí využití Tokenů a nákladů.
+
+### Získání dat trendu
+
+**GET** `/api/usage/trend`
+
+Parametry dotazu: `startDate`, `endDate`
+
+Vrací data trendu využití za zadané časové období.
+
+### Export dat využití
+
+**GET** `/api/usage/export`
+
+Exportuje data využití ve formátu ke stažení.
+
+---
+
+## Auditní stopa
+
+### Stránka auditu
+
+**GET** `/audit`
+
+Vrací stránku rozhraní auditní stopy.
+
+### Získání seznamu auditů
+
+**GET** `/api/audit/list`
+
+Vrací seznam položek auditního protokolu.
+
+### Získání shrnutí auditu
+
+**GET** `/api/audit/summary`
+
+Vrací souhrnné statistiky auditních dat.
+
+### Získání auditů seskupených podle bytostí
+
+**GET** `/api/audit/beings`
+
+Statistiky auditů seskupené podle Křemíkových Bytostí.
+
+---
+
+## Správa konfigurace
+
+### Stránka konfigurace
+
+**GET** `/config`
+
+Vrací stránku rozhraní pro konfiguraci systému.
+
+### Uložení konfigurace
+
+**POST** `/config/save`
+
+**Tělo požadavku**:
 ```json
 {
-  "key": "being:uuid:memory",
-  "value": "{...}",
-  "timestamp": "2026-04-20T10:30:00Z"
-}
-```
-
-### Zapisovat Hodnotu
-
-**POST** `/api/storage`
-
-**Požadavek**:
-```json
-{
-  "key": "being:uuid:memory",
-  "value": "{...}"
-}
-```
-
-### Dotaz podle Časového Rozsahu
-
-**GET** `/api/storage/time?start={start}&end={end}&prefix={prefix}`
-
-**Odpověď**:
-```json
-{
-  "entries": [
-    {
-      "key": "being:uuid:chat:2026-04-20",
-      "value": "{...}",
-      "timestamp": "2026-04-20T10:30:00Z"
+  "language": "ZhCN",
+  "port": 8080,
+  "aiClients": {
+    "Ollama": {
+      "baseUrl": "http://localhost:11434",
+      "model": "qwen2.5:7b"
+    },
+    "DashScope": {
+      "apiKey": "...",
+      "region": "beijing",
+      "model": "qwen3.6-plus"
     }
-  ]
-}
-```
-
----
-
-## Systémové Informace
-
-### Získat Data Dashboardu
-
-**GET** `/api/dashboard`
-
-**Odpověď**:
-```json
-{
-  "beings": {
-    "total": 5,
-    "running": 3,
-    "stopped": 2
-  },
-  "performance": {
-    "cpu": 45.2,
-    "memory": 1024,
-    "uptime": 86400
-  },
-  "aiUsage": {
-    "todayTokens": 50000,
-    "todayCost": 0.05
   }
 }
 ```
 
-### Získat Stav Systému
+### Získání možností AI konfigurace
 
-**GET** `/api/status`
+**GET** `/config/aioptions`
 
-**Odpověď**:
+Vrací dostupné typy AI klientů a jejich dynamické možnosti (dostupné modely, regiony atd.).
+
+---
+
+## Paměťový systém
+
+### Stránka paměti
+
+**GET** `/memory`
+
+Vrací stránku rozhraní pro správu paměti.
+
+### Získání seznamu pamětí
+
+**GET** `/api/memory/list`
+
+Vrací seznam položek paměti Křemíkových Bytostí.
+
+### Získání detailů paměti
+
+**GET** `/api/memory/detail/{id}`
+
+Parametr cesty: `id` — ID položky paměti
+
+Vrací kompletní obsah zadané položky paměti.
+
+### Získání statistik paměti
+
+**GET** `/api/memory/stats`
+
+Vrací statistické informace paměťového systému.
+
+### Vyhledávání v paměti
+
+**GET** `/api/memory/search`
+
+Parametr dotazu: `keyword` — klíčové slovo pro vyhledávání
+
+Vyhledává odpovídající položky paměti.
+
+### Získání pamětí seskupených podle bytostí
+
+**GET** `/api/memory/beings`
+
+Statistiky pamětí seskupené podle Křemíkových Bytostí.
+
+### Získání sledování paměti
+
+**GET** `/api/memory/trace/{id}`
+
+Parametr cesty: `id` — ID položky paměti
+
+Vrací řetězec sledování původu zadané položky paměti.
+
+### Získání HTML časové osy paměti
+
+**GET** `/api/memory/timeline-html`
+
+Vrací HTML zobrazení časové osy paměti.
+
+---
+
+## Pracovní poznámky
+
+### Stránka pracovních poznámek
+
+**GET** `/work-notes`
+
+Vrací stránku rozhraní pracovních poznámek.
+
+### Získání seznamu pracovních poznámek
+
+**GET** `/api/work-notes/list`
+
+Vrací seznam pracovních poznámek.
+
+### Čtení pracovní poznámky
+
+**GET** `/api/work-notes/read`
+
+Parametr dotazu: `noteId` — ID poznámky
+
+Vrací obsah zadané poznámky.
+
+### Získání adresáře poznámek
+
+**GET** `/api/work-notes/directory`
+
+Vrací adresářovou strukturu poznámek.
+
+### Vyhledávání v pracovních poznámkách
+
+**GET** `/api/work-notes/search`
+
+Parametr dotazu: `keyword` — klíčové slovo pro vyhledávání
+
+Vyhledává odpovídající pracovní poznámky.
+
+### Vytvoření pracovní poznámky
+
+**POST** `/api/work-notes/create`
+
+**Tělo požadavku**:
 ```json
 {
-  "version": "1.0.0",
-  "runtime": ".NET 9.0",
-  "uptime": 86400,
-  "health": "healthy"
+  "title": "Název poznámky",
+  "content": "Obsah poznámky",
+  "keywords": ["klíčové slovo 1", "klíčové slovo 2"]
+}
+```
+
+### Aktualizace pracovní poznámky
+
+**POST** `/api/work-notes/update`
+
+**Tělo požadavku**:
+```json
+{
+  "noteId": "note-uuid",
+  "title": "Aktualizovaný název",
+  "content": "Aktualizovaný obsah"
+}
+```
+
+### Smazání pracovní poznámky
+
+**POST** `/api/work-notes/delete`
+
+**Tělo požadavku**:
+```json
+{
+  "noteId": "note-uuid"
 }
 ```
 
 ---
 
-## Chybové Odpovědi
+## Znalostní síť
 
-Všechny endpointy vrací standardizované chybové odpovědi:
+### Stránka znalostní sítě
+
+**GET** `/knowledge`
+
+Vrací stránku rozhraní pro správu znalostní sítě.
+
+### Získání znalostního grafu
+
+**GET** `/api/knowledge/graph`
+
+Vrací data grafu znalostních trojic (subjekt-relace-objekt).
+
+---
+
+## Správa projektů
+
+### Stránka projektů
+
+**GET** `/project`
+
+Vrací stránku rozhraní pro správu projektů.
+
+### Stránka projektových pracovních poznámek
+
+**GET** `/project/{id}/work-notes`
+
+Parametr cesty: `id` — ID projektu
+
+Vrací stránku pracovních poznámek zadaného projektu.
+
+### Stránka projektových úkolů
+
+**GET** `/project/{id}/tasks`
+
+Parametr cesty: `id` — ID projektu
+
+Vrací stránku správy úkolů zadaného projektu.
+
+### Stránka projektových oprávnění nástrojů
+
+**GET** `/project/{id}/tool-permissions`
+
+Parametr cesty: `id` — ID projektu
+
+Vrací stránku správy oprávnění nástrojů zadaného projektu.
+
+### Stránka projektových pracovních postupů
+
+**GET** `/project/{id}/workflow`
+
+Parametr cesty: `id` — ID projektu
+
+Vrací stránku správy pracovních postupů zadaného projektu.
+
+### Získání detailů projektového pracovního postupu
+
+**GET** `/api/projects/workflow-detail`
+
+Parametr dotazu: `projectId` — ID projektu
+
+Vrací detaily pracovního postupu přidruženého k projektu.
+
+### Přiřazení projektové role
+
+**POST** `/api/projects/assign-role`
+
+**Tělo požadavku**:
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid",
+  "roleName": "developer"
+}
+```
+
+### Odebrání projektové role
+
+**POST** `/api/projects/remove-role`
+
+**Tělo požadavku**:
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid",
+  "roleName": "developer"
+}
+```
+
+### Získání seznamu projektů
+
+**GET** `/api/projects/list`
+
+Vrací seznam všech projektů.
+
+### Získání seznamu šablon projektových pracovních postupů
+
+**GET** `/api/projects/list-workflow-templates`
+
+Vrací seznam dostupných šablon pracovních postupů.
+
+### Vytvoření projektu
+
+**POST** `/api/projects/create`
+
+**Tělo požadavku**:
+```json
+{
+  "name": "Můj projekt",
+  "description": "Popis projektu"
+}
+```
+
+### Archivace projektu
+
+**POST** `/api/projects/{id}/archive`
+
+Parametr cesty: `id` — ID projektu
+
+Archivuje zadaný projekt.
+
+### Obnovení projektu
+
+**POST** `/api/projects/{id}/restore`
+
+Parametr cesty: `id` — ID projektu
+
+Obnovuje archivovaný projekt.
+
+### Zničení projektu
+
+**POST** `/api/projects/{id}/destroy`
+
+Parametr cesty: `id` — ID projektu
+
+Trvale odstraňuje zadaný projekt (není obnovitelné).
+
+### Získání detailů projektu
+
+**GET** `/api/projects/detail`
+
+Parametr dotazu: `projectId` — ID projektu
+
+Vrací detailní informace o projektu.
+
+### Aktualizace projektu
+
+**POST** `/api/projects/update`
+
+**Tělo požadavku**:
+```json
+{
+  "projectId": "project-uuid",
+  "name": "Aktualizovaný název",
+  "description": "Aktualizovaný popis"
+}
+```
+
+### Přiřazení člena do projektu
+
+**POST** `/api/projects/assign`
+
+**Tělo požadavku**:
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid"
+}
+```
+
+### Odebrání člena z projektu
+
+**POST** `/api/projects/remove`
+
+**Tělo požadavku**:
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid"
+}
+```
+
+### Získání seznamu projektových pracovních poznámek
+
+**GET** `/api/projects/{id}/work-notes/list`
+
+Parametr cesty: `id` — ID projektu
+
+Vrací seznam pracovních poznámek zadaného projektu.
+
+### Čtení projektové pracovní poznámky
+
+**GET** `/api/projects/{id}/work-notes/read`
+
+Parametr cesty: `id` — ID projektu
+
+Vrací obsah pracovních poznámek zadaného projektu.
+
+### Vytvoření projektové pracovní poznámky
+
+**POST** `/api/projects/{id}/work-notes/create`
+
+Parametr cesty: `id` — ID projektu
+
+Vytváří novou pracovní poznámku v zadaném projektu.
+
+### Aktualizace projektové pracovní poznámky
+
+**POST** `/api/projects/{id}/work-notes/update`
+
+Parametr cesty: `id` — ID projektu
+
+Aktualizuje pracovní poznámku v zadaném projektu.
+
+### Smazání projektové pracovní poznámky
+
+**POST** `/api/projects/{id}/work-notes/delete`
+
+Parametr cesty: `id` — ID projektu
+
+Maže pracovní poznámku v zadaném projektu.
+
+### Získání seznamu projektových úkolů
+
+**GET** `/api/projects/{id}/tasks/list`
+
+Parametr cesty: `id` — ID projektu
+
+Vrací seznam úkolů zadaného projektu.
+
+### Vytvoření projektového úkolu
+
+**POST** `/api/projects/{id}/tasks/create`
+
+Parametr cesty: `id` — ID projektu
+
+Vytváří nový úkol v zadaném projektu.
+
+### Aktualizace projektového úkolu
+
+**POST** `/api/projects/{id}/tasks/update`
+
+Parametr cesty: `id` — ID projektu
+
+Aktualizuje úkol v zadaném projektu.
+
+### Smazání projektového úkolu
+
+**POST** `/api/projects/{id}/tasks/delete`
+
+Parametr cesty: `id` — ID projektu
+
+Maže úkol v zadaném projektu.
+
+### Přiřazení zodpovědné osoby k úkolu
+
+**POST** `/api/projects/{id}/tasks/assign`
+
+Parametr cesty: `id` — ID projektu
+
+Přiřazuje zodpovědnou osobu k projektovému úkolu.
+
+### Odebrání zodpovědné osoby z úkolu
+
+**POST** `/api/projects/{id}/tasks/remove-assignee`
+
+Parametr cesty: `id` — ID projektu
+
+Odebírá zodpovědnou osobu z projektového úkolu.
+
+### Označení úkolu jako dokončeného
+
+**POST** `/api/projects/{id}/tasks/complete`
+
+Parametr cesty: `id` — ID projektu
+
+Označuje projektový úkol jako dokončený.
+
+### Označení úkolu jako selhaného
+
+**POST** `/api/projects/{id}/tasks/fail`
+
+Parametr cesty: `id` — ID projektu
+
+Označuje projektový úkol jako selhaný.
+
+### Zrušení úkolu
+
+**POST** `/api/projects/{id}/tasks/cancel`
+
+Parametr cesty: `id` — ID projektu
+
+Ruší projektový úkol.
+
+---
+
+## Správa oprávnění nástrojů
+
+### Získání oprávnění nástrojů Křemíkové Bytosti
+
+**GET** `/api/beings/tool-permissions`
+
+Parametr dotazu: `beingId` — ID Křemíkové Bytosti
+
+Vrací konfiguraci oprávnění nástrojů zadané Křemíkové Bytosti.
+
+### Aktualizace oprávnění nástrojů Křemíkové Bytosti
+
+**PUT** `/api/beings/tool-permissions`
+
+**Tělo požadavku**:
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "network": "allowed",
+    "disk_read": "allowed",
+    "disk_write": "denied"
+  }
+}
+```
+
+### Získání šablon oprávnění nástrojů
+
+**GET** `/api/beings/tool-permissions/templates`
+
+Vrací seznam dostupných šablon oprávnění nástrojů.
+
+### Aplikace šablony oprávnění nástrojů
+
+**POST** `/api/beings/tool-permissions/apply-template`
+
+**Tělo požadavku**:
+```json
+{
+  "beingId": "being-uuid",
+  "templateName": "readonly"
+}
+```
+
+### Získání projektových oprávnění nástrojů
+
+**GET** `/api/projects/{id}/tool-permissions`
+
+Parametr cesty: `id` — ID projektu
+
+Vrací konfiguraci oprávnění nástrojů zadaného projektu.
+
+### Aktualizace projektových oprávnění nástrojů
+
+**PUT** `/api/projects/{id}/tool-permissions`
+
+Parametr cesty: `id` — ID projektu
+
+**Tělo požadavku**:
+```json
+{
+  "permissions": {
+    "network": "allowed",
+    "disk_read": "allowed",
+    "disk_write": "denied"
+  }
+}
+```
+
+---
+
+## Správa exekutorů
+
+### Stránka exekutorů
+
+**GET** `/executor`
+
+Vrací stránku rozhraní pro správu exekutorů.
+
+### Získání stavu exekutorů
+
+**GET** `/api/executors/status`
+
+Vrací stav běhu jednotlivých exekutorů (disk, síť, příkazový řádek).
+
+---
+
+## Prohlížeč kódu
+
+### Stránka prohlížeče kódu
+
+**GET** `/code`
+
+Vrací stránku rozhraní prohlížeče kódu.
+
+### Získání seznamu typů kódu
+
+**GET** `/api/code/types`
+
+Vrací seznam podporovaných typů/jazyků kódu.
+
+### Získání detailů kódu
+
+**GET** `/api/code/detail`
+
+Parametry dotazu: `filePath`, `lineNumber`
+
+Vrací detaily kódu zadaného souboru.
+
+---
+
+## Plovoucí tipy kódu
+
+### Získání plovoucího tipu
+
+**GET** `/api/code/hover`
+**POST** `/api/code/hover`
+
+Získání informací o plovoucím tipu pro umístění v kódu (podobné inteligentním tipům v IDE).
+
+### Registrace umístění v kódu
+
+**POST** `/api/code/register`
+
+Registruje umístění v kódu pro sledování.
+
+### Aktualizace umístění v kódu
+
+**POST** `/api/code/update`
+
+Aktualizuje informace o registrovaném umístění v kódu.
+
+### Zrušení registrace umístění v kódu
+
+**POST** `/api/code/unregister`
+
+Zruší registraci sledování umístění v kódu, které již není potřeba.
+
+---
+
+## Systém dokumentace nápovědy
+
+### Stránka nápovědy
+
+**GET** `/help` nebo **GET** `/help/index`
+
+Vrací hlavní stránku dokumentace nápovědy.
+
+### Stránka tématu nápovědy
+
+**GET** `/help/{topic}`
+
+Parametr cesty: `topic` — identifikátor tématu
+
+Vrací stránku dokumentace nápovědy pro zadané téma.
+
+### Vyhledávání v dokumentaci nápovědy
+
+**GET** `/api/help/search`
+
+Parametr dotazu: `keyword` — klíčové slovo pro vyhledávání
+
+Vyhledává odpovídající témata dokumentace nápovědy.
+
+---
+
+## Inicializace
+
+### Stránka průvodce inicializací
+
+**GET** `/init`
+
+Vrací stránku průvodce inicializací při prvním spuštění.
+
+### Odeslání inicializace
+
+**POST** `/init`
+
+Odesílá konfiguraci inicializace při prvním spuštění.
+
+### Procházení a výběr datového adresáře
+
+**GET** `/init/browse`
+
+Otevírá prohlížeč adresářů pro výběr umístění datového úložiště.
+
+### Získání metadat AI konfigurace
+
+**GET** `/init/ai-config-metadata`
+
+Vrací dostupné typy AI klientů a metadata jejich konfiguračních polí.
+
+---
+
+## Řízení systému
+
+### Elegantní vypnutí
+
+**POST** `/api/system/shutdown`
+
+> **Poznámka**: Povoleno pouze požadavky z localhost
+
+Spouští proces elegantního vypnutí aplikace:
+
+1. Zastavení Hlavní Smyčky (MainLoop)
+2. Uložení aktuální konfigurace
+3. Zavření HTTP naslouchávače
+
+**Odpověď**:
+```json
+{
+  "status": "shutting_down",
+  "message": "Application is shutting down gracefully"
+}
+```
+
+---
+
+## O projektu
+
+### Stránka o projektu
+
+**GET** `/about`
+
+Vrací stránku o projektu, obsahující systémové informace a seznam načtených zásuvných modulů.
+
+**Data seznamu zásuvných modulů**:
+```json
+{
+  "plugins": {
+    "plugin-id": {
+      "name": "My Plugin",
+      "version": "1.0.0",
+      "description": "Plugin description",
+      "author": "Author Name"
+    }
+  }
+}
+```
+
+---
+
+## Chybové odpovědi
+
+Všechny koncové body vrací standardizované chybové odpovědi:
 
 ```json
 {
   "error": {
     "code": "PERMISSION_DENIED",
     "message": "You don't have permission to access this resource",
-    "details": "Required: disk:write, Current: disk:read"
+    "details": "Required: FileAccess, Denied by GlobalACL"
   }
 }
 ```
 
-### Běžné Chybové Kódy
+### Běžné chybové kódy
 
-| Kód | HTTP Stav | Popis |
-|------|-------------|-------------|
-| `PERMISSION_DENIED` | 403 | Nedostatečné oprávnění |
-| `NOT_FOUND` | 404 | Zdroj nenalezen |
+| Kód | HTTP stav | Popis |
+|------|-------------|------|
+| `PERMISSION_DENIED` | 403 | Nedostatečná oprávnění |
+| `NOT_FOUND` | 404 | Prostředek nenalezen |
 | `VALIDATION_ERROR` | 400 | Neplatné parametry požadavku |
 | `INTERNAL_ERROR` | 500 | Interní chyba serveru |
-| `SERVICE_UNAVAILABLE` | 503 | AI služba není dostupná |
+| `SERVICE_UNAVAILABLE` | 503 | AI služba nedostupná |
 
 ---
 
-## SSE Události
+## SSE události
 
-Server-sent events pro aktualizace v reálném čase:
+Server-Sent Events se používají pro aktualizace v reálném čase:
 
-### Chatovací Události
+### Chatovací události
 
 ```javascript
-const eventSource = new EventSource('/api/chat/stream?channelId=session-uuid');
+const eventSource = new EventSource('/api/chat/stream');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);
@@ -493,20 +1314,9 @@ eventSource.onmessage = (event) => {
 };
 ```
 
-### Události Stavu Bytosti
-
-```javascript
-const beingEvents = new EventSource('/api/beings/events');
-
-beingEvents.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  console.log(`Being ${data.beingId} status: ${data.status}`);
-};
-```
-
 ---
 
-## AI Klientské API
+## Rozhraní AI klienta
 
 ### Rozhraní IAIClient
 
@@ -548,314 +1358,7 @@ public class AIResponse
 
 ---
 
-## API Pracovních Poznámek
-
-### Získat Seznam Pracovních Poznámek
-
-**GET** `/api/beings/{id}/work-notes`
-
-**Odpověď**:
-```json
-{
-  "notes": [
-    {
-      "id": "note-uuid",
-      "pageNumber": 1,
-      "summary": "Dokončen modul autentizace uživatelů",
-      "keywords": ["autentizace", "JWT", "OAuth2"],
-      "createdAt": "2026-04-25T10:00:00Z",
-      "updatedAt": "2026-04-25T10:00:00Z"
-    }
-  ],
-  "totalCount": 15
-}
-```
-
-### Získat Detail Jedné Poznámky
-
-**GET** `/api/beings/{id}/work-notes/{pageNumber}`
-
-**Odpověď**:
-```json
-{
-  "id": "note-uuid",
-  "pageNumber": 1,
-  "summary": "Dokončen modul autentizace uživatelů",
-  "content": "## Implementační detaily\n\n- Použití JWT tokenu\n- Podpora OAuth2",
-  "keywords": ["autentizace", "JWT", "OAuth2"],
-  "createdAt": "2026-04-25T10:00:00Z",
-  "updatedAt": "2026-04-25T10:00:00Z"
-}
-```
-
-### Vytvořit Novou Poznámku
-
-**POST** `/api/beings/{id}/work-notes`
-
-**Požadavek**:
-```json
-{
-  "summary": "Dokončen modul autentizace uživatelů",
-  "content": "## Implementační detaily\n\n- Použití JWT tokenu",
-  "keywords": "autentizace,JWT,OAuth2"
-}
-```
-
-**Odpověď**: `201 Created`
-
-### Aktualizovat Poznámku
-
-**PUT** `/api/beings/{id}/work-notes/{pageNumber}`
-
-**Požadavek**:
-```json
-{
-  "summary": "Dokončen modul autentizace uživatelů a testy",
-  "content": "## Aktualizovaný obsah\n\nPřidány unit testy",
-  "keywords": "autentizace,JWT,OAuth2,testy"
-}
-```
-
-### Smazat Poznámku
-
-**DELETE** `/api/beings/{id}/work-notes/{pageNumber}`
-
-### Vyhledat Poznámky
-
-**GET** `/api/beings/{id}/work-notes/search?keyword=autentizace&maxResults=10`
-
-### Získat Adresář Poznámek
-
-**GET** `/api/beings/{id}/work-notes/directory`
-
----
-
-## API Znalostní Sítě
-
-### Získat Statistiky Znalostí
-
-**GET** `/api/knowledge/stats`
-
-**Odpověď**:
-```json
-{
-  "totalTriples": 1523,
-  "totalSubjects": 450,
-  "totalPredicates": 85,
-  "totalObjects": 892,
-  "averageConfidence": 0.87
-}
-```
-
-### Přidat Znalostní Triple
-
-**POST** `/api/knowledge/triples`
-
-**Požadavek**:
-```json
-{
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language",
-  "confidence": 0.95,
-  "tags": ["programming", "language"]
-}
-```
-
-**Odpověď**: `201 Created`
-
-### Dotazovat Znalosti
-
-**GET** `/api/knowledge/query?subject=Python&predicate=is_a`
-
-**Odpověď**:
-```json
-{
-  "triples": [
-    {
-      "subject": "Python",
-      "predicate": "is_a",
-      "object": "programming_language",
-      "confidence": 0.95,
-      "tags": ["programming", "language"]
-    }
-  ]
-}
-```
-
-### Vyhledat Znalosti
-
-**GET** `/api/knowledge/search?query=programming+language&limit=10`
-
-### Získat Cestu Znalostí
-
-**GET** `/api/knowledge/path?from=Python&to=computer_science`
-
-**Odpověď**:
-```json
-{
-  "path": [
-    {"subject": "Python", "predicate": "is_a", "object": "programming_language"},
-    {"subject": "programming_language", "predicate": "belongs_to", "object": "computer_science"}
-  ],
-  "length": 2
-}
-```
-
-### Ověřit Znalost
-
-**POST** `/api/knowledge/validate`
-
-**Požadavek**:
-```json
-{
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language"
-}
-```
-
-### Smazat Znalost
-
-**DELETE** `/api/knowledge/triples/{id}`
-
----
-
-## API Nápovědní Dokumentace
-
-### Získat Seznam Nápovědních Dokumentů
-
-**GET** `/api/help`
-
-**Odpověď**:
-```json
-{
-  "topics": [
-    {
-      "id": "getting-started",
-      "title": "Rychlý start",
-      "category": "Úvodní příručka"
-    }
-  ]
-}
-```
-
-### Získat Detail Nápovědního Dokumentu
-
-**GET** `/api/help/{topicId}`
-
-**Odpověď**:
-```json
-{
-  "id": "getting-started",
-  "title": "Rychlý start",
-  "content": "# Rychlý start\n\n...",
-  "category": "Úvodní příručka"
-}
-```
-
----
-
-## API WebView Prohlížeče
-
-### Získat Stav Prohlížeče
-
-**GET** `/api/beings/{id}/browser/status`
-
-**Odpověď**:
-```json
-{
-  "is_open": true,
-  "current_url": "https://example.com",
-  "page_title": "Example Page",
-  "is_loading": false,
-  "last_operation_time": "2026-04-26T10:00:00Z"
-}
-```
-
-### Otevřít Prohlížeč
-
-**POST** `/api/beings/{id}/browser/open`
-
-### Zavřít Prohlížeč
-
-**POST** `/api/beings/{id}/browser/close`
-
-### Navigovat na URL
-
-**POST** `/api/beings/{id}/browser/navigate`
-
-**Požadavek**:
-```json
-{
-  "url": "https://example.com"
-}
-```
-
-### Spustit JavaScript
-
-**POST** `/api/beings/{id}/browser/execute-script`
-
-**Požadavek**:
-```json
-{
-  "script": "return document.title;"
-}
-```
-
-### Získat Screenshot Stránky
-
-**GET** `/api/beings/{id}/browser/screenshot`
-
----
-
-## API Projektového Pracovního Prostoru
-
-### Získat Seznam Projektů
-
-**GET** `/api/projects`
-
-**Odpověď**:
-```json
-{
-  "projects": [
-    {
-      "id": "project-uuid",
-      "name": "My Project",
-      "description": "Project description",
-      "createdAt": "2026-04-25T10:00:00Z"
-    }
-  ]
-}
-```
-
-### Vytvořit Projekt
-
-**POST** `/api/projects`
-
-**Požadavek**:
-```json
-{
-  "name": "My Project",
-  "description": "Project description"
-}
-```
-
-### Získat Detail Projektu
-
-**GET** `/api/projects/{id}`
-
-### Aktualizovat Projekt
-
-**PUT** `/api/projects/{id}`
-
-### Smazat Projekt
-
-**DELETE** `/api/projects/{id}`
-
----
-
-## API Systému Nástrojů
+## Rozhraní systému nástrojů
 
 ### Rozhraní ITool
 
@@ -894,9 +1397,9 @@ public class ToolResult
 
 ---
 
-## Další Kroky
+## Další kroky
 
-- 🚀 Podívejte se na [Průvodce rychlým startem](getting-started.md)
-- 🛠️ Přečtěte si [Vývojářskou příručku](development-guide.md)
-- 📚 Prozkoumejte [Dokument architektury](architecture.md)
-- 🔒 Pochopte [Bezpečnostní model](security.md)
+- 🚀 Prohlédněte [příručku rychlého startu](getting-started.md)
+- 🛠️ Přečtěte [vývojářskou příručku](development-guide.md)
+- 📚 Prohlédněte [dokumentaci architektury](architecture.md)
+- 🔒 Přečtěte o [bezpečnostním modelu](security.md)

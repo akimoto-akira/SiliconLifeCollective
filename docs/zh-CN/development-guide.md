@@ -111,6 +111,25 @@ public class MyCustomTool : ITool
 public class AdminTool : ITool { ... }
 ```
 
+4. （可选）标记工具可用场景：
+```csharp
+[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task)]
+public class MyTool : ITool { ... }
+```
+
+5. （可选）标记为仅聊天场景可用：
+```csharp
+[ChatOnly]
+public class HelpTool : ITool { ... }
+```
+
+6. （可选）标记为仅项目场景可用：
+```csharp
+[ToolScenario(ToolScenarioFlag.Project)]
+[SiliconManagerOnly]
+public class ProjectWorkTool : ITool { ... }
+```
+
 ### 添加新 AI 客户端
 
 1. 在 `src/SiliconLife.Common/AI/` 中实现 `IAIClient`：
@@ -267,22 +286,23 @@ public class MyCustomSkin : ISkin
 SiliconLife.Common/
 ├── AI/                    # AI 客户端与工厂实现
 ├── Calendar/              # 32 种日历实现
-├── Localization/          # 本地化基类与 33 种语言变体实现
+├── Localization/          # 本地化基类与 34 种语言变体实现
 ├── Security/              # 权限管理器
 ├── SiliconBeing/          # 默认硅基生命体实现
-├── Tools/                 # 共享的内置工具
+├── Tools/                 # 共享的内置工具（25 个）
 ├── Web/                   # Web 基础设施
 └── WebView/               # Playwright WebView 实现
 
 SiliconLife.App/          # Default 与 Fast 共享的应用层
 ├── Config/                # 应用配置
 ├── Help/                  # 帮助文档本地化
+├── Project/               # 项目系统（工作流引擎、项目角色）
 └── Web/                   # Web UI 实现
-    ├── Component/         # UI 组件库
-    ├── Controllers/       # 路由控制器
+    ├── Component/         # 27 个 UI 组件
+    ├── Controllers/       # 24 个路由控制器
     ├── Models/            # 视图模型
     ├── Views/             # HTML 视图
-    └── Skins/             # 皮肤主题
+    └── Skins/             # 7 个皮肤主题
 
 SiliconLife.Default/      # 版本特有目录
 ├── Config/                # 默认配置数据
@@ -290,6 +310,12 @@ SiliconLife.Default/      # 版本特有目录
 ├── Logging/               # 日志提供者实现（控制台 + 文件系统）
 ├── Project/               # 项目系统实现
 └── Storage/               # 文件系统存储实现
+
+SiliconLife.Fast/         # 版本特有目录
+├── Config/                # Fast 版本配置数据
+├── Logging/               # 日志提供者实现（控制台 + 文件系统）
+├── Storage/               # SpeedyPack 存储适配器
+└── Tray/                  # 系统托盘本地化
 ```
 
 ### 文档
@@ -370,20 +396,48 @@ public class CustomExecutor : ExecutorBase
     
     public override async Task<ExecutorResult> ExecuteAsync(ExecutorRequest request)
     {
-        // 首先验证权限
         var permission = await CheckPermissionAsync(request);
         if (!permission.Allowed)
         {
             return ExecutorResult.Denied(permission.Reason);
         }
         
-        // 执行操作
         var result = await PerformOperation(request);
         
         return ExecutorResult.Success(result);
     }
 }
 ```
+
+### 示例：添加自定义工作流模板
+
+```csharp
+public class MyWorkflowTemplate : WorkflowTemplate
+{
+    public override string Name => "my_workflow";
+    public override string Description => "A custom workflow template";
+    
+    public override void DefineStates()
+    {
+        AddState("start", "开始", isInitial: true);
+        AddState("processing", "处理中");
+        AddState("review", "审核");
+        AddState("done", "完成", isFinal: true);
+    }
+    
+    public override void DefineTransitions()
+    {
+        AddTransition("start", "processing", "开始处理");
+        AddTransition("processing", "review", "提交审核");
+        AddTransition("review", "done", "审核通过");
+        AddTransition("review", "processing", "审核退回");
+    }
+}
+```
+
+### 示例：添加项目角色
+
+项目角色通过 `ProjectTool` 的 `assign_role` 和 `remove_role` 操作管理。角色名称是自定义字符串，用于在工作流和任务分配中区分硅基生命体的职责。
 
 ## 测试指南
 

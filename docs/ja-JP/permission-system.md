@@ -1,40 +1,40 @@
-﻿# 権限システム
+# 権限システム
 
-> **バージョン: v0.2.0-alpha**
+> **バージョン：v0.2.0-alpha**
 
 [English](../en/permission-system.md) | [Deutsch](../de-DE/permission-system.md) | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | [Español](../es-ES/permission-system.md) | **日本語** | [한국어](../ko-KR/permission-system.md) | [Čeština](../cs-CZ/permission-system.md) | [Русский](../ru-RU/permission-system.md)
 
 ## 概要
 
-権限システムは、AI が開始するすべての操作が適切に検証および監査されることを保証します。
+権限システムは、すべての AI が開始する操作が適切に検証および監査されることを保証します。
 
-## 3段階分岐権限チェーン
+## パーミッション検証チェーン
 
 ```
 ┌─────────────────────────────────────────────┐
-│          権限検証                            │
+│          パーミッション検証                   │
 ├─────────────────────────────────────────────┤
 │  レベル 1：UserFrequencyCache                │
-│  ↓ キャッシュされたユーザー決定 (HighDeny/HighAllow)│
+│  ↓ 高頻度ユーザー決定キャッシュ（HighDeny/HighAllow）│
 │  レベル 2：IPermissionCallback               │
-│  ↓ カスタムロジック (Allowed/Denied/AskUser)  │
+│  ↓ カスタムロジック（Allowed/Denied/AskUser） │
 │  レベル 3：IsCurator?                        │
 │  ↓ はい → IPermissionAskHandler（ユーザーに確認）│
-│  ↓ いいえ → GlobalACL → デフォルト拒否        │
+│  ↓ いいえ → グローバルACL → デフォルト拒否     │
 │  結果：許可または拒否                         │
 └─────────────────────────────────────────────┘
 ```
 
 > **注意**：`PermissionManager.CheckPermission()` の実際のクエリ優先度は以下の通り：
-> 1. **UserFrequencyCache** — キャッシュされた高頻度ユーザー決定を最初に確認
+> 1. **UserFrequencyCache** — まず高頻度ユーザー決定キャッシュを確認
 > 2. **IPermissionCallback** — カスタムコールバックルールを評価
-> 3. **主理人分岐** — コールバックが AskUser を返す、またはコールバックなしの場合：
->    - **主理人** → `IPermissionAskHandler`（IM 経由でユーザーにプロンプト）
->    - **非主理人** → `GlobalACL` → デフォルト拒否
+> 3. **キュレーター分岐** — コールバックが AskUser を返す、またはコールバックなしの場合：
+>    - **キュレーター** → `IPermissionAskHandler`（IM 経由でユーザーに確認）
+>    - **非キュレーター** → `グローバルACL` → デフォルト拒否
 
 ## レベル 1：UserFrequencyCache
 
-生命体ごとの、メモリのみの高頻度ユーザー決定キャッシュ（HighDeny/HighAllow）。
+各ビーイングの高頻度ユーザー決定キャッシュ（HighDeny/HighAllow）、メモリ内のみに存在。
 
 ```csharp
 var cache = new UserFrequencyCache();
@@ -45,17 +45,17 @@ if (cachedResult.HasValue)
 }
 ```
 
-- **高拒否（HighDeny）**は**高許可（HighAllow）**より優先度が高い
-- **メモリのみ**：キャッシュは永続化されない。再起動時に失われる
+- **HighDeny は HighAllow より優先**
+- **メモリのみ**：キャッシュは永続化されず、再起動後に消失
 - **設定可能な有効期限**：ユーザーはキャッシュエントリの有効期間を設定可能
 
 ## レベル 2：IPermissionCallback
 
-動的権限ロジック用のカスタムコールバック。
+動的パーミッションロジック用のカスタムコールバック。
 
 ### DefaultPermissionCallback デフォルト実装
 
-`DefaultPermissionCallback` は包括的なデフォルト権限ルールを提供します。以下を含む：
+`DefaultPermissionCallback` は包括的なデフォルトパーミッションルールを提供します。以下を含む：
 
 #### ネットワークアクセスルール
 - **ループバックアドレス**：localhost, 127.0.0.1, ::1 を許可
@@ -72,9 +72,9 @@ if (cachedResult.HasValue)
   - **天気情報**：wttr.in
   - 政府サイト：.gov, .go.jp, .go.kr
 - **ドメインブラックリスト**：
-  - AI 偽装サイト：chatgpt, openai, deepseek などのフィッシングドメイン
+  - AI 偽装サイト：chatgpt, openai, deepseek などの偽装ドメイン
   - 悪意のある AI ツール：wormgpt, darkgpt, fraudgpt など
-  - AI コンテンツファームとブラックマーケット関連ドメイン
+  - AI コンテンツファームおよびブラックマーケット関連ドメイン
 
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
@@ -91,55 +91,49 @@ public class DefaultPermissionCallback : IPermissionCallback
 }
 ```
 
-## レベル 3：主理人分岐（IsCurator → AskHandler / GlobalACL）
+## レベル 3：分岐判定（IsCurator / グローバルACL）
 
-コールバックが `AskUser` を返す、またはコールバックが設定されていない場合、システムは主理人ステータスに基づいて分岐します：
+コールバックが `AskUser` を返す、またはコールバックが設定されていない場合、システムはキュレーター身份に基づいて分岐します：
 
-### 主理人パス：IPermissionAskHandler
+### キュレーター分岐（IsCurator = true）
 
-シリコン主理人の場合、システムは IM を介してユーザーに決定を求めます。
+シリコンキュレーターの場合、システムは IM を介してユーザーに決定を求めます：
 
 ```csharp
-public class IMPermissionAskHandler : IPermissionAskHandler
+if (IsCurator)
 {
-    public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
+    if (_askHandler != null)
     {
-        SendMessage($"Allow {resource}?");
-
-        var response = WaitForResponse();
-
-        return new AskPermissionResult
-        {
-            Allowed = response.Approved,
-            AddToCache = response.AddToCache,
-            CacheDuration = response.CacheDuration
-        };
+        AskPermissionResult userDecision = _askHandler.AskUser(callerId, permissionType, resource);
+        // 用户在 Web UI 中确认或拒绝
     }
 }
 ```
 
-### 非主理人パス：GlobalACL → デフォルト拒否
+### 非キュレーター分岐（IsCurator = false）
 
-非主理人の生命体の場合、システムはグローバルアクセスコントロールリストを確認します。一致するルールが見つからない場合、リクエストはデフォルトで拒否されます。
+非キュレーターのビーイングの場合、システムはグローバルACLを確認します。一致するルールがない場合、リクエストはデフォルトで拒否されます。
 
-### GlobalACL 構造
+### グローバルACL 構造
 
 ```json
 {
   "rules": [
     {
-      "prefix": "network:api.github.com",
+      "permissionType": "NetworkAccess",
+      "resourcePrefix": "api.github.com",
       "result": "Allowed"
     },
     {
-      "prefix": "file:C:\\Windows",
+      "permissionType": "FileAccess",
+      "resourcePrefix": "C:\\Windows",
       "result": "Denied"
     }
   ]
 }
 ```
 
-ルールは順番に評価され、最初のマッチが勝利します。シリコン主理人のみがグローバル ACL を変更可能です。
+ルールは順番に評価され、最初に一致したルールが適用されます。シリコンキュレーターのみがグローバルACLを変更できます。
 
 ### リソース形式
 
@@ -154,28 +148,60 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 
 ## IPermissionAskHandler
 
-主理人の操作にユーザー確認が必要な場合、`IPermissionAskHandler` を通じてユーザーに権限を確認します。上記の `IMPermissionAskHandler` 実装を参照してください。
+キュレーターの操作にユーザー確認が必要な場合、`IPermissionAskHandler` を通じてユーザーにパーミッションを確認します。
+
+### IMPermissionAskHandler 実装
+
+`IMPermissionAskHandler` は Web UI を介してユーザーにパーミッションリクエストを送信します：
+
+```csharp
+public class IMPermissionAskHandler : IPermissionAskHandler
+{
+    public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
+    {
+        // 通过即时通讯向用户发送消息
+        SendMessageAsync($"Allow {resource}?");
+
+        // 等待用户响应
+        var response = WaitForResponseAsync();
+
+        return response.Approved 
+            ? AskPermissionResult.Approved()
+            : AskPermissionResult.Denied();
+    }
+}
+```
+
+### PermissionRequestQueue パーミッションリクエストキュー
+
+`PermissionRequestQueue` は保留中のパーミッションリクエストを管理し、非同期でのユーザー応答待機をサポートします：
+
+- **リクエストのエンキュー** — パーミッションチェーンがレベル 5 に到達した際、`TaskCompletionSource<AskPermissionResult>` を作成してエンキュー
+- **Web UI 表示** — `PermissionRequestController` を介して Web UI に保留中のパーミッションリクエストを表示
+- **ユーザー応答** — ユーザーが Web UI で承認または拒否、決定のキャッシュとキャッシュ期間の設定が可能
+- **キャッシュオプション** — ユーザーはパーミッション決定を 1 時間、24 時間、7 日間、または 30 日間キャッシュ可能
+- **タイムアウトメカニズム** — 60 秒間応答がない場合、リクエストページを自動的に閉じる
 
 ## 監査システム
 
-すべての権限決定が記録されます：
+すべてのパーミッション決定が記録されます：
 
 ```json
 {
   "timestamp": "2026-04-20T10:30:00Z",
-  "userId": "user-uuid",
-  "resource": "disk:write",
-  "allowed": true,
-  "level": "GlobalACL",
-  "reason": "Explicit rule granted"
+  "callerId": "being-uuid",
+  "permissionType": "FileAccess",
+  "resource": "C:\\data\\config.json",
+  "result": "Allowed",
+  "reason": "Global ACL"
 }
 ```
 
-## プログラムによる権限評価
+## プログラム的パーミッション評価
 
 ### EvaluatePermission API
 
-`PermissionManager.EvaluatePermission()` メソッドは、ユーザープロンプトをトリガーしない読み取り専用の権限事前評価を提供します。`PermissionTool` はこのメソッドを使用して、AI が操作を試みる前に権限状態を確認します。
+`PermissionManager.EvaluatePermission()` メソッドは、ユーザープロンプトをトリガーしない読み取り専用のパーミッション事前評価を提供します。`PermissionTool` はこのメソッドを使用して、AI が操作を試みる前にパーミッション状態を確認します。
 
 ```csharp
 public PermissionResult EvaluatePermission(
@@ -190,18 +216,20 @@ public PermissionResult EvaluatePermission(
 - `AskUser` - 実行時にユーザー確認が必要
 
 **評価順序**：
-1. **周波数キャッシュ** - キャッシュされたユーザー決定を確認
+1. **頻度キャッシュ** - キャッシュされたユーザー決定を確認
 2. **IPermissionCallback** - カスタムコールバック評価
-3. **主理人分岐** - 主理人の場合、`AskUser` を返す（確認が必要）。非主理人の場合、**GlobalACL** を確認し、デフォルト拒否
+3. **キュレーター状態** - キュレーターの場合、`AskUser` を返す（確認が必要）
+4. **グローバルACL** - アクセス制御ルールを確認
+5. **デフォルト** - 一致するルールがない場合は拒否
 
-> **注意**：完全な権限チェーンとは異なり、`EvaluatePermission` は `IPermissionAskHandler` を呼び出し**ません**。実行時の結果が*どうなるか*のみを報告します。
+> **注意**：完全なパーミッションチェーンとは異なり、`EvaluatePermission` は `IPermissionAskHandler` を呼び出し**ません**。実行時の結果が*どうなるか*のみを報告します。
 
-## 権限の管理
+## パーミッションの管理
 
-### 権限の付与
+### パーミッションの付与
 
 **Web UI 経由**：
-1. **権限管理**に移動
+1. **パーミッション管理**に移動
 2. **ルールを追加**をクリック
 3. 設定：
    - ユーザー
@@ -211,67 +239,121 @@ public PermissionResult EvaluatePermission(
 
 **API 経由**：
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "userId": "user-uuid",
-    "resource": "disk:write",
-    "allowed": true,
-    "duration": 3600
+    "permissionType": "FileAccess",
+    "resourcePrefix": "C:\\Projects",
+    "result": "Allowed",
+    "description": "Allow project directory access"
   }'
 ```
 
-### 権限の取消
+### パーミッションの取り消し
+
+Web UI のパーミッション管理ページから操作します。
+
+### パーミッションの表示
 
 ```bash
-curl -X DELETE http://localhost:8080/api/permissions/{rule-id}
+curl http://localhost:8080/api/permissions/list
 ```
 
-### 権限の表示
+## ツールパーミッションシステム
 
-```bash
-curl http://localhost:8080/api/permissions?userId=user-uuid
+操作レベルのパーミッション検証チェーンに加えて、システムはシリコンビーイングが使用できるツールを制御するための**ツールパーミッション**管理メカニズムを提供します。
+
+### 2レベルのツールパーミッション
+
+ツールパーミッションは2つのレベルに分かれます：
+
+1. **シリコンビーイングレベル** — 個々のシリコンビーイングが使用できるツール操作を制御
+2. **プロジェクトレベル** — プロジェクトスペース内で使用可能なツール操作を制御、シリコンビーイングレベルのパーミッションとは独立
+
+### ツールパーミッション設定
+
+各ツールの各操作は、個別に許可または拒否として設定できます：
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "network:get": "allowed",
+    "network:post": "denied",
+    "disk:read": "allowed",
+    "disk:write": "denied",
+    "database:query": "allowed"
+  }
+}
 ```
+
+### パーミッションテンプレート
+
+システムは定義済みのツールパーミッションテンプレートを提供し、シリコンビーイングに迅速に適用できます：
+
+- **readonly** — 読み取り専用パーミッション（読み取り操作を許可、書き込み操作を拒否）
+- **full** — フルパーミッション（すべての操作を許可）
+- **restricted** — 制限付きパーミッション（基本操作のみ許可）
+
+### Web UI 管理
+
+Web UI でツールパーミッションを管理：
+
+- **シリコンビーイングツールパーミッションページ** — `/beings/tool-permissions`
+- **プロジェクトツールパーミッションページ** — `/project/{id}/tool-permissions`
+
+### API エンドポイント
+
+| エンドポイント | メソッド | 説明 |
+|------|------|------|
+| `/api/beings/tool-permissions` | GET | シリコンビーイングツールパーミッションの取得 |
+| `/api/beings/tool-permissions` | PUT | シリコンビーイングツールパーミッションの更新 |
+| `/api/beings/tool-permissions/templates` | GET | パーミッションテンプレート一覧の取得 |
+| `/api/beings/tool-permissions/apply-template` | POST | パーミッションテンプレートの適用 |
+| `/api/projects/{id}/tool-permissions` | GET | プロジェクトツールパーミッションの取得 |
+| `/api/projects/{id}/tool-permissions` | PUT | プロジェクトツールパーミッションの更新 |
+
+---
 
 ## ベストプラクティス
 
 ### 1. 最小権限の原則
 
-必要な最小限の権限のみを付与：
+必要な最小限のパーミッションのみを付与：
 
 ```json
 {
-  "resource": "disk:read",  // disk:* ではない
-  "allowed": true,
-  "expiresAt": "2026-04-21T00:00:00Z"  // 常に有効期限を設定
+  "permissionType": "FileAccess",
+  "resourcePrefix": "C:\\Projects\\MyApp\\config.json",
+  "result": "Allowed"
 }
 ```
 
-### 2. 時間制限付き権限を使用
+### 2. 時間制限付きパーミッションを使用
 
-絶対に必要でない限り、永久権限を付与しないでください。
+絶対に必要でない限り、永久パーミッションを付与しないでください。
 
-### 3. 権限ログをモニタリング
+### 3. パーミッションログをモニタリング
 
-定期的に監査ログを確認：
-- 拒否されたアクセストライ
+定期的に監査ログを確認して以下を把握：
+- 拒否されたアクセス試行
 - 異常なパターン
-- 権限昇格
+- パーミッションのエスカレーション
 
-### 4. カスタムコールバックを実装
+### 4. カスタムコールバックの実装
 
 複雑なロジックには `IPermissionCallback` を使用：
 
 ```csharp
 public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
 {
-    // 時間ベースの権限
+    // 基于时间的权限
     if (IsOutsideBusinessHours())
     {
         return PermissionResult.Denied;
     }
     
-    // リソースベースの権限
+    // 基于资源的权限
     if (IsSensitiveResource(resource))
     {
         return PermissionResult.AskUser;
@@ -288,11 +370,11 @@ public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, s
 ```
 AI：「config.json を読み取る必要があります」
 ↓
-権限チェーン：
-1. 周波数キャッシュ？キャッシュされた決定なし
+パーミッションチェーン：
+1. UserFrequencyCache？キャッシュされた決定なし
 2. IPermissionCallback？AskUser を返す（明示的に許可されていない）
-3. IsCurator？いいえ → GlobalACL を確認
-4. GlobalACL？ルール発見：file:... = Allowed
+3. IsCurator？いいえ → グローバルACLを確認
+4. グローバルACL？ルール発見：file:... = Allowed
 5. 結果：許可
 ```
 
@@ -301,8 +383,8 @@ AI：「config.json を読み取る必要があります」
 ```
 AI：「コードをコンパイルして実行したい」
 ↓
-権限チェーン：
-1. 周波数キャッシュ？キャッシュされた決定なし
+パーミッションチェーン：
+1. UserFrequencyCache？キャッシュされた決定なし
 2. IPermissionCallback？AskUser を返す
 3. IsCurator？はい → IPermissionAskHandler
 4. ユーザーが承認
@@ -314,28 +396,28 @@ AI：「コードをコンパイルして実行したい」
 ```
 AI：「C:\Windows にアクセスする必要があります」
 ↓
-権限チェーン：
-1. 周波数キャッシュ？高拒否キャッシュに発見
+パーミッションチェーン：
+1. UserFrequencyCache？HighDeny キャッシュに発見
 2. 結果：拒否（以降のチェック不要）
 ```
 
 ## トラブルシューティング
 
-### 予期しない権限拒否
+### 予期しないパーミッション拒否
 
 **確認**：
 1. ユーザーの IsCurator 状態
-2. レートリミット設定
-3. GlobalACL ルール
+2. 頻度キャッシュの HighDeny エントリ
+3. グローバルACLルール
 4. コールバックロジック
 5. ユーザー応答タイムアウト
 
-### 権限が期限切れにならない
+### パーミッションが期限切れにならない
 
 **確認**：
-- `expiresAt` フィールドが正しく設定
+- `expiresAt` フィールドが正しく設定されている
 - タイムゾーンが正確
-- クロックが同期
+- クロックが同期されている
 
 ### 監査ログが記録されない
 
@@ -347,6 +429,6 @@ AI：「C:\Windows にアクセスする必要があります」
 ## 次のステップ
 
 - 📚 [アーキテクチャガイド](architecture.md)を読む
-- 🛠️ [開発ガイド](development-guide.md)をチェック
+- 🛠️ [開発ガイド](development-guide.md)を確認
 - 🔒 [セキュリティドキュメント](security.md)を確認
-- 🚀 [クイックスタートガイド](getting-started.md)を見る
+- 🚀 [クイックスタートガイド](getting-started.md)を確認

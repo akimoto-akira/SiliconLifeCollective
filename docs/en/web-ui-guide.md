@@ -1,12 +1,12 @@
-﻿# Web UI Guide
+# Web UI Guide
 
 > **Version: v0.2.0-alpha**
 
-**English** | [中文](../zh-CN/web-ui-guide.md) | [繁體中文](../zh-HK/web-ui-guide.md) | [Español](../es-ES/web-ui-guide.md) | [日本語](../ja-JP/web-ui-guide.md) | [한국어](../ko-KR/web-ui-guide.md) | [Deutsch](../de-DE/web-ui-guide.md) | [Čeština](../cs-CZ/web-ui-guide.md) | [Русский](../ru-RU/web-ui-guide.md)
+[**English**](../en/web-ui-guide.md) | [Deutsch](../de-DE/web-ui-guide.md) | [中文](../zh-CN/web-ui-guide.md) | [繁體中文](../zh-HK/web-ui-guide.md) | [Español](../es-ES/web-ui-guide.md) | [日本語](../ja-JP/web-ui-guide.md) | [한국어](../ko-KR/web-ui-guide.md) | [Čeština](../cs-CZ/web-ui-guide.md) | [Русский](../ru-RU/web-ui-guide.md)
 
 ## Overview
 
-The Web UI provides a comprehensive interface for managing silicon beings, monitoring system status, and interacting with AI agents. The system uses a pure server-side rendering architecture with zero frontend framework dependencies, generating HTML, CSS, and JavaScript through `H`, `CssBuilder`, and `JsBuilder` builders.
+The Web UI provides a comprehensive interface for managing Silicon Beings, monitoring system status, and interacting with AI agents. The system uses a pure server-side rendering architecture with zero frontend framework dependencies, generating HTML, CSS, and JavaScript through `H`, `CssBuilder`, and `JsBuilder` builders.
 
 ## Access
 
@@ -17,20 +17,20 @@ Default URL: `http://localhost:8080`
 ### Main Sections
 
 1. **Dashboard** - System overview and metrics
-2. **Beings** - Manage silicon beings
+2. **Beings** - Manage Silicon Beings
 3. **Chat** - Interact with beings (supports file upload, real-time SSE)
-4. **Chat History** - View silicon being chat history (session list, message details)
+4. **Chat History** - View chat history of Silicon Beings (conversation list, message details)
 5. **Tasks** - Task management (personal tasks)
 6. **Timers** - Timer configuration (create, pause, execution history)
-7. **Config** - System settings (AI clients, localization)
+7. **Configuration** - System settings (AI clients, localization)
 8. **Permissions** - Access control (ACL management, permission queries)
 9. **Logs** - System logs (filter by level, time range queries)
 10. **Audit** - Token usage and audit trail
 11. **Memory** - Being memory (timeline view, advanced filtering)
-12. **Knowledge** - Knowledge base (triple management, path discovery)
+12. **Knowledge** - Knowledge base (triplet management, path discovery)
 13. **Code Browser** - Code exploration (file tree, syntax highlighting)
-14. **Code Editor** - Code editing with hover hints (Monaco Editor)
-15. **Projects** - Project management (workspace, tasks, work notes)
+14. **Code Editor** - Code editing with hover tooltips (Monaco Editor)
+15. **Projects** - Project management (workspaces, tasks, work notes)
 16. **Executors** - Executor management (disk, network, command line)
 17. **Help** - Help documentation system (multi-language support, topic search)
 18. **About** - System information and version
@@ -48,7 +48,7 @@ Default URL: `http://localhost:8080`
 
 ### Real-time Updates
 
-Uses SSE (Server-Sent Events) for live data:
+Uses SSE (Server-Sent Events) for real-time data:
 
 ```javascript
 const dashboard = new EventSource('/api/dashboard/events');
@@ -64,21 +64,21 @@ dashboard.onmessage = (event) => {
 
 ### Being List
 
-Displays all beings with:
+Displays all beings, including:
 - Name and ID
 - Current status (Running/Stopped/Error)
-- Soul file link
+- Soul File link
 - Quick actions (Start/Stop/Configure)
 
 ### Being Details
 
 - Full configuration
-- Soul file editor
+- Soul File editor
 - Task history
 - Memory viewer
 - Performance metrics
 
-### Create Being
+### Create a Being
 
 1. Click **Create New Being**
 2. Fill in:
@@ -96,22 +96,22 @@ Displays all beings with:
 - Real-time message streaming
 - Message history
 - Multi-session support
-- Tool call visualization
+- Tool Call visualization
 
 ### Using Chat
 
 1. Select a being
-2. Enter message
+2. Enter a message
 3. View streaming response
-4. See tool execution in real-time
+4. Watch tool execution in real time
 
 ### Tool Call Display
 
-When AI calls a tool:
+When the AI calls a tool:
 ```
 🔧 Tool: calendar
 📥 Input: {"date": "2026-04-20"}
-📤 Output: "Lunar calendar fourth month, third day"
+📤 Output: "Lunar calendar: third day of the fourth month"
 ```
 
 ---
@@ -122,22 +122,25 @@ When AI calls a tool:
 
 Configure AI backends:
 - Ollama (local)
-- DashScope (cloud)
+- Bailian (cloud)
+- Volcano Engine Ark (cloud)
 - Custom clients
 
 ### Storage Settings
 
-- Default version: Base path, time indexing, cleanup strategy
-- Fast version: SpeedyPack storage engine configuration, .spk file management, auto-compaction settings
+- Default version: base path, time index, cleanup policy
+- Fast version: SpeedyPack Storage Engine configuration, .spk file management, auto-compaction settings
 
 ### Localization
 
-Switch between 29 language variants:
-- Chinese (6): Simplified, Traditional, Singapore, Macau, Taiwan, Malaysia
-- English (10): US, UK, Canadian, Australian, Indian, Singapore, South African, Irish, New Zealand, Malaysian
+Switch between 34 language variants:
+- Chinese (6): Simplified Chinese, Traditional Chinese, Singapore Chinese, Macau Chinese, Taiwan Chinese, Malaysian Chinese
+- English (10): American, British, Canadian, Australian, Indian, Singaporean, South African, Irish, New Zealand, Malaysian English
+- Spanish (2): Spain, Mexico
 - German (5): Germany, Austria, Switzerland, Luxembourg, Liechtenstein
 - French (3): France, Canada, Switzerland
 - Japanese, Korean, Czech
+- Russian, Portuguese (2), Italian, Dutch, Polish, Swedish
 
 ---
 
@@ -145,17 +148,20 @@ Switch between 29 language variants:
 
 ### Available Skins
 
-1. **Admin** - Professional administration interface
+1. **Admin** - Professional management interface
 2. **Chat** - Conversation-centric design
 3. **Creative** - Creative and artistic style
 4. **Dev** - Developer-oriented layout
+5. **HighContrast** - High contrast theme (Fast version)
+6. **Minimal** - Minimalist style (Fast version)
+7. **Light** - Light theme (Fast version)
 
 ### Switching Skins
 
 1. Click **Settings** (gear icon)
 2. Select **Skin**
-3. Choose desired skin
-4. UI updates immediately
+3. Choose the desired skin
+4. The interface updates immediately
 
 ### Custom Skins
 
@@ -187,10 +193,10 @@ public class MySkin : ISkin
 
 1. Click **Add Rule**
 2. Configure:
-   - User
-   - Resource (e.g., `disk:read`)
+   - Permission Type (e.g., `FileAccess`, `NetworkAccess`)
+   - Resource prefix (e.g., `C:\Projects`, `api.github.com`)
    - Allow/Deny
-   - Duration
+   - Description
 3. Save
 
 ### Audit Trail
@@ -202,13 +208,28 @@ View all permission decisions:
 - Decision
 - Reason
 
+### Tool Permission Management
+
+Manage tool operation permissions for Silicon Beings and projects:
+
+1. **Silicon Being Tool Permissions**:
+   - Navigate to **Beings** → Select a being → **Tool Permissions**
+   - View current permission configuration
+   - Set allow/deny per operation
+   - Apply permission templates (readonly/restricted/full)
+
+2. **Project Tool Permissions**:
+   - Navigate to **Projects** → Select a project → **Tool Permissions**
+   - Project-level tool permissions are independent of Silicon Being level
+   - Implement permission isolation across projects
+
 ---
 
 ## Task Management
 
 ### Task List
 
-- All tasks with their status
+- All tasks and their statuses
 - Filter by being or status
 - Priority indicators
 
@@ -296,12 +317,12 @@ Download audit data:
 
 - Syntax highlighting (Monaco Editor)
 - Code completion
-- Hover hints for identifiers
+- Hover tooltips for identifiers
 - Live compilation
 
-### Hover Hints
+### Hover Tooltips
 
-Hover over any identifier to see:
+Hover over any identifier to view:
 - Type information
 - Documentation
 - Definition location
@@ -309,38 +330,38 @@ Hover over any identifier to see:
 
 ---
 
-## Chat History Viewing
+## Chat History Viewer
 
 ### Features
 
-- Silicon being chat history browsing
-- Session list display
+- Browse Silicon Being chat history
+- Conversation list display
 - Message detail viewing
 - Timeline view
 
 ### Using Chat History
 
-1. Navigate to **Beings** page
-2. Click **Chat History** link for a silicon being
-3. View session list:
-   - Session title
+1. Navigate to the **Beings** page
+2. Click the **Chat History** link for a Silicon Being
+3. View the conversation list:
+   - Conversation title
    - Creation time
    - Message count
-4. Click session to view details:
-   - Complete message history
+4. Click a conversation to view details:
+   - Full message history
    - Timestamps
    - Sender information
-   - Tool call records
+   - Tool Call records
 
 ### Technical Implementation
 
 - **Controller**: `ChatHistoryController`
-- **ViewModel**: `ChatHistoryViewModel`
+- **View Model**: `ChatHistoryViewModel`
 - **Views**:
-  - `ChatHistoryListView` - Session list
+  - `ChatHistoryListView` - Conversation list
   - `ChatHistoryDetailView` - Message details
 - **API Routes**:
-  - `/api/chat-history/{beingId}/conversations` - Get session list
+  - `/api/chat-history/{beingId}/conversations` - Get conversation list
   - `/api/chat-history/{beingId}/conversation/{conversationId}` - Get message details
 
 ---
@@ -356,14 +377,14 @@ Hover over any identifier to see:
 
 ### Using File Upload
 
-1. Click **Upload File** button in chat interface
-2. File source dialog opens
-3. Select file source:
-   - Local files
-   - Filesystem path
+1. Click the **Upload File** button in the chat interface
+2. The file source dialog opens
+3. Select a file source:
+   - Local file
+   - File system path
 4. Select files (multi-select supported)
 5. Confirm upload
-6. File information will be attached to message
+6. File information will be attached to the message
 
 ### Supported File Types
 
@@ -379,15 +400,15 @@ Hover over any identifier to see:
 ### Features
 
 - Chat page loading status display
-- Auto-selection of curator session
+- Silicon Curator session auto-selection
 - Data loading progress feedback
 
 ### Behavior
 
-- Shows loading animation when page loads
-- Automatically hides after data loading completes
-- Curator session auto-selected (if exists)
-- Multi-language loading prompt text
+- Loading animation displayed on page load
+- Automatically hidden when data loading completes
+- Silicon Curator session auto-selected (if it exists)
+- Multi-language loading tip text
 
 ---
 
@@ -395,28 +416,28 @@ Hover over any identifier to see:
 
 ### Feature Overview
 
-The help documentation system provides multi-language help documentation support for silicon beings and users.
+The help documentation system provides multi-language help documentation support for Silicon Beings and users.
 
 ### Using Help Documentation
 
-1. Navigate to **Help** page
-2. View list of help topics:
-   - Getting Started Guide
-   - Tool Usage Reference
-   - Permission Management Guide
-   - Troubleshooting Manual
-   - Development Guide
-3. Click topic to view detailed content:
-   - Structured document content (Markdown rendering)
+1. Navigate to the **Help** page
+2. View the list of help topics:
+   - Quick start guide
+   - Tool usage reference
+   - Permission management guide
+   - Troubleshooting manual
+   - Development guide
+3. Click a topic to view detailed content:
+   - Structured documentation content (Markdown rendered)
    - Multi-language support (follows system localization settings)
    - Related topic recommendations
-4. Use search function for quick location:
-   - Keyword search (supports Chinese, English)
+4. Use the search function to quickly locate:
+   - Keyword search (supports Chinese and English)
    - Search results sorted by relevance
 
 ### Silicon Being Access to Help
 
-Silicon beings can access help documentation through the `help` tool:
+Silicon Beings can access help documentation through the `help` tool:
 ```json
 {
   "action": "get_topics"
@@ -438,38 +459,47 @@ Silicon beings can access help documentation through the `help` tool:
 
 ### Feature Overview
 
-The project workspace provides a structured working environment supporting project management, task tracking, and work notes.
+The project workspace provides a structured work environment that supports project management, task tracking, and work notes.
 
 ### Project Management
 
 1. **Create Project**:
    - Project name and description
-   - Project tags (categorization)
-   - Project status (Active, Completed, Archived)
+   - Project tags (categories)
+   - Project status (In Progress, Completed, Archived)
 2. **View Project Details**:
-   - Basic project information
+   - Project basic information
    - Associated task list
    - Work note list
    - Project progress statistics
-3. **Archive Project**: Retains historical data but no longer active
+3. **Archive Project**: Retain historical data but no longer active
+4. **Project Role Management**:
+   - Assign project roles to Silicon Beings (e.g., developer, reviewer, manager)
+   - Remove role assignments
+   - View project members and role list
+5. **Project Workflow**:
+   - View workflow template list
+   - Bind workflow templates to projects
+   - View workflow instance status
+   - View workflow execution logs
 
 ### Work Notes (Private)
 
-Personal work notes for silicon beings, similar to a diary:
+Personal work notes for Silicon Beings, similar to a journal:
 
 1. **Create Note**:
    - Summary (brief description)
    - Content (supports Markdown format)
-   - Keywords (for search)
+   - Keywords (for searching)
    - Automatic timestamp recording
 2. **Manage Notes**:
-   - Browse by timeline (page design)
+   - Browse by timeline (paginated design)
    - Search notes (by keyword, summary, content)
-   - Generate table of contents (quick browsing of note structure)
+   - Generate table of contents (quick overview of note structure)
    - Update and delete notes
 3. **Permission Control**:
    - Private by default, only accessible by the being itself
-   - Silicon curator can manage all notes
+   - Silicon Curator can manage all notes
 
 ### Technical Implementation
 
@@ -479,7 +509,7 @@ Personal work notes for silicon beings, similar to a diary:
   - `/api/worknotes` - Get work note list
   - `/api/worknotes/{id}` - Get note details
   - `/api/worknotes/search?q=keyword` - Search notes
-  - `/api/worknotes/directory` - Generate note directory
+  - `/api/worknotes/directory` - Generate note table of contents
   - `/api/projects` - Project management API
 
 ---
@@ -524,7 +554,7 @@ The Web UI adapts to different screen sizes:
 
 **Optimize**:
 - Reduce log verbosity
-- Clean old audit data
+- Clean up old audit data
 - Check system resources
 
 ---

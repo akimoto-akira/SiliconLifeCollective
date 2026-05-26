@@ -1,8 +1,8 @@
-﻿# 開發指南
+# 開發指南
 
 > **版本：v0.2.0-alpha**
 
-[English](../en/development-guide.md) | [中文](../zh-CN/development-guide.md) | **繁體中文** | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/security.md) | [Русский](../ru-RU/security.md)
+[English](../en/development-guide.md) | [Deutsch](../de-DE/development-guide.md) | [中文](../zh-CN/development-guide.md) | **繁體中文** | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/development-guide.md) | [Русский](../ru-RU/development-guide.md)
 
 ## 架構概述
 
@@ -19,7 +19,7 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Fast/            # 高效能實作、入口點（主推生產版本）
 │   ├── SiliconLife.Speedy/          # SpeedyPack 高效能儲存引擎
 │   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理工具（Avalonia UI）
-└── docs/                            # 多語言文檔
+└── docs/                            # 多語言文件
 ```
 
 **依賴方向**：
@@ -33,10 +33,10 @@ SiliconLifeCollective/
 
 ## 核心概念
 
-### 1. 矽基生命體
+### 1. 矽基生命體（矽基生命體）
 
 每個 AI 智慧體由以下部分組成：
-- **身體**（`DefaultSiliconBeing`）：維持存活狀態，偵測觸發場景
+- **身體**（`DefaultSiliconBeing`）：維持存活狀態，檢測觸發場景
 - **大腦**（`ContextManager`）：載入歷史、呼叫 AI、執行工具、持久化回應
 
 ### 2. 工具系統
@@ -44,6 +44,7 @@ SiliconLifeCollective/
 工具透過反射自動發現和註冊：
 
 ```csharp
+// 所有工具实现 ITool 接口
 public interface ITool
 {
     string Name { get; }
@@ -52,23 +53,25 @@ public interface ITool
 }
 ```
 
-### 3. 權限系統
+### 3. 权限系统
 
-3 級權限驗證鏈：
+3 级权限验证链：
 ```
-UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL)
+UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL → 预设拒绝)
 ```
 
-### 4. 服務定位器
+### 4. 服务定位器
 
-全域服務註冊和檢索：
+全局服务注册和检索：
 ```csharp
+// 注册
 ServiceLocator.Instance.Register<IAIClient>(ollamaClient);
 
+// 获取
 var client = ServiceLocator.Instance.Get<IAIClient>();
 ```
 
-## 擴充系統
+## 擴展系統
 
 ### 新增新工具
 
@@ -81,17 +84,20 @@ public class MyCustomTool : ITool
 {
     public string Name => "my_custom_tool";
     public string Description => "Description of what this tool does";
-    
+
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
+        // 解析参数
         var param1 = call.Parameters["param1"]?.ToString();
-        
+
+        // 执行逻辑
         var result = await DoSomething(param1);
-        
-        return new ToolResult 
-        { 
-            Success = true, 
-            Output = result 
+
+        // 返回结果
+        return new ToolResult
+        {
+            Success = true,
+            Output = result
         };
     }
 }
@@ -105,7 +111,26 @@ public class MyCustomTool : ITool
 public class AdminTool : ITool { ... }
 ```
 
-### 新增新 AI 客戶端
+4. （可選）標記工具可用場景：
+```csharp
+[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task)]
+public class MyTool : ITool { ... }
+```
+
+5. （可選）標記為僅聊天場景可用：
+```csharp
+[ChatOnly]
+public class HelpTool : ITool { ... }
+```
+
+6. （可選）標記為僅專案場景可用：
+```csharp
+[ToolScenario(ToolScenarioFlag.Project)]
+[SiliconManagerOnly]
+public class ProjectWorkTool : ITool { ... }
+```
+
+### 新增新 AI 用戶端
 
 1. 在 `src/SiliconLife.Common/AI/` 中實作 `IAIClient`：
 
@@ -113,11 +138,12 @@ public class AdminTool : ITool { ... }
 public class MyAIClient : IAIClient
 {
     public string Name => "my_ai";
-    
+
     public async Task<AIResponse> ChatAsync(AIRequest request)
     {
+        // 调用您的 AI API
         var response = await CallMyAPI(request);
-        
+
         return new AIResponse
         {
             Content = response.Message,
@@ -125,9 +151,10 @@ public class MyAIClient : IAIClient
             Usage = response.Usage
         };
     }
-    
+
     public async IAsyncEnumerable<string> StreamChatAsync(AIRequest request)
     {
+        // 实现流式传输
         await foreach (var chunk in StreamFromAPI(request))
         {
             yield return chunk;
@@ -152,21 +179,24 @@ public class MyAIClientFactory : IAIClientFactory
 
 ### 新增新儲存後端
 
-1. 在 `src/SiliconLife.Default/Storage/`（檔案系統實作）或 `src/SiliconLife.Fast/Storage/`（SpeedyPack 配接器）中實作 `IStorage` 和 `ITimeStorage`：
+1. 在 `src/SiliconLife.Default/Storage/`（檔案系統實作）或 `src/SiliconLife.Fast/Storage/`（SpeedyPack 適配器）中實作 `IStorage` 和 `ITimeStorage`：
 
 ```csharp
 public class DatabaseStorage : IStorage, ITimeStorage
 {
     public async Task<string> ReadAsync(string key)
     {
+        // 从您的数据库读取
     }
-    
+
     public async Task WriteAsync(string key, string value)
     {
+        // 写入您的数据库
     }
-    
+
     public async Task<IEnumerable<string>> ReadByTimeAsync(DateTime start, DateTime end)
     {
+        // 时间索引查询
     }
 }
 ```
@@ -184,11 +214,11 @@ public class MyPlugin : IPlugin
 {
     public string Id => "my-plugin";
     public string Version => "1.0.0";
-    
+
     public string GetName(Language language) => "My Plugin";
     public string GetDescription(Language language) => "A custom plugin";
     public string GetAuthor(Language language) => "Author Name";
-    
+
     public void OnLoad() { }
     public void OnStart() { }
     public void OnStop() { }
@@ -203,7 +233,7 @@ public class MyPluginTool : ITool
 {
     public string Name => "my_plugin_tool";
     public string Description => "A tool provided by my plugin";
-    
+
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
         return new ToolResult { Success = true, Output = "Done" };
@@ -224,7 +254,7 @@ public class MyCustomSkin : ISkin
 {
     public string Name => "MySkin";
     public string Description => "A custom skin description";
-    
+
     public string GetCss()
     {
         return @"
@@ -232,6 +262,7 @@ public class MyCustomSkin : ISkin
                 --primary-color: #your-color;
                 --bg-color: #your-bg;
             }
+            /* Your custom styles */
         ";
     }
 }
@@ -247,75 +278,89 @@ public class MyCustomSkin : ISkin
 - **介面**：以 `I` 開頭（例如 `IAIClient`、`ITool`）
 - **實作**：以介面名結尾（例如 `OllamaClient` 實作 `IAIClient`）
 - **工具**：以 `Tool` 結尾（例如 `CalendarTool`、`ChatTool`）
-- **視圖模型**：以 `ViewModel` 結尾（例如 `BeingViewModel`）
+- **檢視模型**：以 `ViewModel` 結尾（例如 `BeingViewModel`）
 
 ### 程式碼組織
 
 ```
 SiliconLife.Common/
-├── AI/                    # AI 客戶端與工廠實作
+├── AI/                    # AI 用戶端與工廠實作
 ├── Calendar/              # 32 種日曆實作
-├── Localization/          # 本地化基類與 33 種語言變體實作
+├── Localization/          # 在地化基底類別與 34 種語言變體實作
 ├── Security/              # 權限管理器
 ├── SiliconBeing/          # 預設矽基生命體實作
-├── Tools/                 # 共享的內建工具
+├── Tools/                 # 共享的內建工具（25 個）
 ├── Web/                   # Web 基礎設施
 └── WebView/               # Playwright WebView 實作
 
 SiliconLife.App/          # Default 與 Fast 共享的應用層
-├── Config/                # 應用配置
-├── Help/                  # 幫助文檔本地化
+├── Config/                # 應用程式設定
+├── Help/                  # 說明文件在地化
+├── Project/               # 專案系統（工作流引擎、專案角色）
 └── Web/                   # Web UI 實作
-    ├── Component/         # UI 組件庫
-    ├── Controllers/       # 路由控制器
-    ├── Models/            # 視圖模型
-    ├── Views/             # HTML 視圖
-    └── Skins/             # 皮膚主題
+    ├── Component/         # 27 個 UI 元件
+    ├── Controllers/       # 24 個路由控制器
+    ├── Models/            # 檢視模型
+    ├── Views/             # HTML 檢視
+    └── Skins/             # 7 個皮膚主題
 
 SiliconLife.Default/      # 版本特有目錄
-├── Config/                # 預設配置資料
+├── Config/                # 預設設定資料
 ├── Knowledge/             # 知識網絡實作
 ├── Logging/               # 日誌提供者實作（主控台 + 檔案系統）
 ├── Project/               # 專案系統實作
 └── Storage/               # 檔案系統儲存實作
+
+SiliconLife.Fast/         # 版本特有目錄
+├── Config/                # Fast 版本設定資料
+├── Logging/               # 日誌提供者實作（主控台 + 檔案系統）
+├── Storage/               # SpeedyPack 儲存適配器
+└── Tray/                  # 系統匣在地化
 ```
 
-### 文檔
+### 文件
 
-- 所有公共 API 必須有 XML 文檔註釋
-- 所有原始檔使用 Apache 2.0 授權標頭
-- 利用 .NET 9 特性（隱式 using、可空引用類型）
+- 所有公共 API 必須有 XML 文件註解
+- 所有原始檔案使用 Apache 2.0 授權標頭
+- 利用 .NET 9 特性（隱式 using、可空參考類型）
 
 ## 開發工作流程
 
 ### 1. 設定開發環境
 
 ```bash
+# 克隆仓库
 git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 
+# 恢复依赖
 dotnet restore
 
+# 构建
 dotnet build
 ```
 
 ### 2. 執行測試
 
 ```bash
+# 运行所有测试
 dotnet test
 
+# 运行特定测试项目
 dotnet test tests/SiliconLife.Core.Tests
 ```
 
 ### 3. 除錯
 
 ```bash
+# 以调试输出运行
 dotnet run --project src/SiliconLife.Default --configuration Debug
 ```
 
 ### 4. 程式碼格式化
 
 ```bash
+# 格式化代码
 dotnet format
 ```
 
@@ -327,14 +372,16 @@ dotnet format
 public class MyCustomCalendar : CalendarBase
 {
     public override string Name => "MyCalendar";
-    
+
     public override CalendarDate ConvertFromGregorian(GregorianDate date)
     {
+        // 您的转换逻辑
         return new CalendarDate(year, month, day);
     }
-    
+
     public override GregorianDate ConvertToGregorian(CalendarDate date)
     {
+        // 反向转换
         return new GregorianDate(year, month, day);
     }
 }
@@ -346,7 +393,7 @@ public class MyCustomCalendar : CalendarBase
 public class CustomExecutor : ExecutorBase
 {
     public override string Name => "custom";
-    
+
     public override async Task<ExecutorResult> ExecuteAsync(ExecutorRequest request)
     {
         var permission = await CheckPermissionAsync(request);
@@ -354,13 +401,43 @@ public class CustomExecutor : ExecutorBase
         {
             return ExecutorResult.Denied(permission.Reason);
         }
-        
+
         var result = await PerformOperation(request);
-        
+
         return ExecutorResult.Success(result);
     }
 }
 ```
+
+### 範例：新增自訂工作流範本
+
+```csharp
+public class MyWorkflowTemplate : WorkflowTemplate
+{
+    public override string Name => "my_workflow";
+    public override string Description => "A custom workflow template";
+
+    public override void DefineStates()
+    {
+        AddState("start", "开始", isInitial: true);
+        AddState("processing", "处理中");
+        AddState("review", "审核");
+        AddState("done", "完成", isFinal: true);
+    }
+
+    public override void DefineTransitions()
+    {
+        AddTransition("start", "processing", "开始处理");
+        AddTransition("processing", "review", "提交审核");
+        AddTransition("review", "done", "审核通过");
+        AddTransition("review", "processing", "审核退回");
+    }
+}
+```
+
+### 範例：新增專案角色
+
+專案角色透過 `ProjectTool` 的 `assign_role` 和 `remove_role` 操作管理。角色名稱是自訂字串，用於在工作流和任務分配中區分矽基生命體的職責。
 
 ## 測試指南
 
@@ -373,18 +450,21 @@ public class MyToolTests
     [TestMethod]
     public async Task ExecuteAsync_ValidInput_ReturnsSuccess()
     {
+        // 安排
         var tool = new MyCustomTool();
-        var call = new ToolCall 
-        { 
+        var call = new ToolCall
+        {
             Name = "my_custom_tool",
-            Parameters = new Dictionary<string, object> 
-            { 
-                ["param1"] = "test" 
+            Parameters = new Dictionary<string, object>
+            {
+                ["param1"] = "test"
             }
         };
-        
+
+        // 执行
         var result = await tool.ExecuteAsync(call);
-        
+
+        // 断言
         Assert.IsTrue(result.Success);
         Assert.IsNotNull(result.Output);
     }
@@ -394,10 +474,10 @@ public class MyToolTests
 ### 整合測試
 
 測試完整流程：
-1. AI 回傳工具呼叫
+1. AI 傳回工具呼叫
 2. 工具執行
 3. 結果回饋給 AI
-4. AI 回傳最終回應
+4. AI 傳回最終回應
 
 ## 效能考量
 
@@ -408,10 +488,10 @@ public class MyToolTests
 - SpeedyPack 採用記憶體目錄映射 + 條目快取 + 非同步寫入佇列
 - 時間索引查詢使用 `ITimeStorage` 介面
 
-### 主循環排程器
+### 主迴圈排程器
 
 - 基於時鐘的時切片公平排程
-- 看門狗計時器用於偵測卡死操作
+- 看門狗定時器用於檢測卡死操作
 - 熔斷器用於防止級聯失敗
 
 ## 最佳實踐
@@ -421,10 +501,10 @@ public class MyToolTests
 任何 AI 發起的操作必須透過權限鏈：
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+bool allowed = permissionManager.CheckPermission(callerId, permissionType, resource);
+if (!allowed)
 {
-    return Result.Denied(permission.Reason);
+    return Result.Denied("Permission denied");
 }
 ```
 
@@ -433,8 +513,10 @@ if (!permission.Allowed)
 全域註冊和檢索服務：
 
 ```csharp
+// 初始化期间
 ServiceLocator.Instance.Register<ICustomService>(myService);
 
+// 需要时
 var service = ServiceLocator.Instance.Get<ICustomService>();
 ```
 
@@ -471,7 +553,7 @@ catch (Exception ex)
 ```
 <type>(<scope>): <description>
 
-範例：
+示例：
 feat(tool): add custom calendar tool
 fix(permission): fix null pointer in callback
 docs: update development guide
@@ -481,5 +563,5 @@ docs: update development guide
 
 - 📚 閱讀[架構指南](architecture.md)
 - 📖 探索[API 參考](api-reference.md)
-- 🔒 查看[安全文檔](security.md)
-- 🚀 查看[快速開始指南](getting-started.md)
+- 🔒 檢視[安全文件](security.md)
+- 🚀 檢視[快速開始指南](getting-started.md)

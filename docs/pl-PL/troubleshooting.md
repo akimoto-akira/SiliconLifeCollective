@@ -1,14 +1,14 @@
-﻿# Przewodnik rozwiązywania problemów
+# Przewodnik rozwiązywania problemów
 
 > **Wersja: v0.2.0-alpha**
 
-[English](../en/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md) | [Русский](../ru-RU/troubleshooting.md) | [Polski](../pl-PL/troubleshooting.md)
+[English](../en/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md) | [Русский](../ru-RU/troubleshooting.md)
 
-## Często zadawane pytania
+## Częste problemy
 
 ### Budowanie i kompilacja
 
-#### Problem: Budowanie nie powiodło się, brakujące zależności
+#### Problem: budowanie nie powiodło się, brakujące zależności
 
 **Objawy**:
 ```
@@ -21,7 +21,7 @@ dotnet restore
 dotnet build
 ```
 
-#### Problem: Nie znaleziono .NET SDK
+#### Problem: nie znaleziono .NET SDK
 
 **Objawy**:
 ```
@@ -39,7 +39,7 @@ dotnet --version
 
 ### Problemy z połączeniem AI
 
-#### Problem: Odrzucono połączenie z Ollama
+#### Problem: połączenie z Ollama odrzucone
 
 **Objawy**:
 ```
@@ -48,7 +48,7 @@ Failed to connect to Ollama at http://localhost:11434
 
 **Rozwiązanie**:
 ```bash
-# Sprawdź, czy Ollama jest uruchomione
+# Sprawdź, czy Ollama jest uruchomiona
 ollama list
 
 # Uruchom Ollama
@@ -58,7 +58,7 @@ ollama serve
 curl http://localhost:11434/api/tags
 ```
 
-#### Problem: Nie znaleziono modelu
+#### Problem: nie znaleziono modelu
 
 **Objawy**:
 ```
@@ -74,7 +74,7 @@ ollama pull qwen2.5:7b
 ollama list
 ```
 
-#### Problem: Błąd 404 Bailian
+#### Problem: błąd 404 DashScope
 
 **Objawy**:
 ```
@@ -83,11 +83,11 @@ HTTP 404: Model not found
 
 **Rozwiązanie**:
 1. Zweryfikuj poprawność klucza API
-2. Sprawdź, czy nazwa modelu jest zgodna z katalogiem Bailian
-3. Zweryfikuj poprawność punktu końcowego regionalnego
+2. Sprawdź, czy nazwa modelu odpowiada katalogowi DashScope
+3. Zweryfikuj poprawność punktu końcowego regionu
 4. Sprawdź, czy konto ma dostęp do tego modelu
 
-#### Problem: Niepowodzenie połączenia Volcengine Ark
+#### Problem: niepowodzenie połączenia Volcengine Ark
 
 **Objawy**:
 ```
@@ -98,15 +98,15 @@ HTTP 404: Endpoint not found
 
 **Rozwiązanie**:
 1. Zweryfikuj poprawność klucza API
-2. Sprawdź poprawność formatu URL punktu końcowego (domyślnie: `https://ark.cn-beijing.volces.com/api/v3/chat/completions`)
-3. Potwierdź, że parametr Model używa identyfikatora punktu dostępowego wnioskowania (np. `ep-20241212123456-abcde`), a nie nazwy modelu
+2. Sprawdź, czy format URL punktu końcowego jest poprawny (domyślnie: `https://ark.cn-beijing.volces.com/api/v3/chat/completions`)
+3. Upewnij się, że parametr Model używa ID punktu dostępowego wnioskowania (np. `ep-20241212123456-abcde`), a nie nazwy modelu
 4. Sprawdź, czy konto ma dostęp do tego punktu dostępowego
 
 ---
 
-### Problemy w czasie działania
+### Problemy w czasie wykonywania
 
-#### Problem: Port jest zajęty
+#### Problem: port jest już zajęty
 
 **Objawy**:
 ```
@@ -128,21 +128,21 @@ lsof -ti:8080 | xargs kill -9
 
 **Lub zmień port w konfiguracji**.
 
-#### Problem: Istota nie może się uruchomić
+#### Problem: istota nie może się uruchomić
 
 **Objawy**:
-- Stan istoty wyświetla "Error"
-- Logi pokazują niepowodzenie inicjalizacji
+- Stan istoty wyświetla „Error"
+- Dzienniki pokazują niepowodzenie inicjalizacji
 
 **Rozwiązanie**:
-1. Sprawdź, czy plik duszy istnieje i jest prawidłowy
-2. Zweryfikuj, czy klient AI jest skonfigurowany
-3. Sprawdź logi w poszukiwaniu konkretnych błędów:
+1. Sprawdź, czy Plik Duszy istnieje i jest prawidłowy
+2. Zweryfikuj, że klient AI jest skonfigurowany
+3. Sprawdź dzienniki, aby uzyskać szczegółowy błąd:
 ```bash
 tail -f logs/*.log
 ```
 
-#### Problem: Brak pamięci
+#### Problem: brak pamięci
 
 **Objawy**:
 ```
@@ -155,107 +155,107 @@ OutOfMemoryException
 dotnet run --project src/SiliconLife.Default --server.gcHeapCount 4
 ```
 
-2. **SiliconLife.Fast**: wersja Fast sama w sobie zużywa więcej pamięci (~500MB), jeśli pamięć stale brakuje, zaleca się:
+2. **SiliconLife.Fast**: wersja Fast sama w sobie zużywa więcej pamięci (~500 MB), jeśli pamięci stale brakuje, zaleca się:
    - Zmniejszenie liczby współbieżnych Istot Krzemowych
-   - Oczyszczenie starych danych w celu zwolnienia pamięci
+   - Czyszczenie starych danych w celu zwolnienia pamięci
 
-3. Oczyszczenie starych danych:
+3. Czyszczenie starych danych:
 ```bash
-# Archiwizacja starych logów
+# Zarchiwizuj stare dzienniki
 mv logs/ logs-archive/
 mkdir logs
 
-# Oczyszczenie starych wspomnień
-# Przez Web UI: Zarządzanie pamięcią > Oczyszczanie
+# Wyczyść stare wspomnienia
+# Przez Web UI: Zarządzanie pamięcią > Czyszczenie
 ```
 
-> **Wskazówka**: SiliconLife.Default ma niższe zużycie pamięci (~200MB), odpowiednie dla środowisk z ograniczoną pamięcią; SiliconLife.Fast ma wyższe zużycie pamięci, ale lepszą wydajność, odpowiednie dla środowisk produkcyjnych.
+> **Wskazówka**: SiliconLife.Default zużywa mniej pamięci (~200 MB), co jest odpowiednie dla środowisk z ograniczoną pamięcią; SiliconLife.Fast zużywa więcej pamięci, ale oferuje lepszą wydajność, odpowiednią dla środowisk produkcyjnych.
 
 ---
 
 ### Problemy z uprawnieniami
 
-#### Problem: Odmowa uprawnień
+#### Problem: uprawnienie odrzucone
 
 **Objawy**:
 ```
-Permission denied: disk:write
+Permission denied: FileAccess C:\Windows
 ```
 
 **Rozwiązanie**:
 1. Sprawdź bieżące uprawnienia:
 ```bash
-curl http://localhost:8080/api/permissions/list?beingId=being-uuid
+curl http://localhost:8080/api/permissions/list
 ```
 
-2. Nadaj uprawnienia:
+2. Nadaj uprawnienie:
 ```bash
 curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "beingId": "being-uuid",
-    "permissionType": "Disk",
-    "resourcePrefix": "disk:write",
-    "result": "Allowed"
+    "permissionType": "FileAccess",
+    "resourcePrefix": "C:\\Projects",
+    "result": "Allowed",
+    "description": "Allow project directory access"
   }'
 ```
 
 3. Lub użyj Web UI: Zarządzanie uprawnieniami
 
-#### Problem: Uprawnienia nie wygasają
+#### Problem: uprawnienia nie wygasają
 
 **Objawy**:
 - Uprawnienia są nadal ważne po czasie wygaśnięcia
 
 **Rozwiązanie**:
 1. Sprawdź synchronizację zegara systemowego
-2. Zweryfikuj, czy pole `expiresAt` jest ustawione poprawnie
+2. Zweryfikuj, że pole `expiresAt` jest poprawnie ustawione
 3. Wyczyść pamięć podręczną uprawnień
 
 ---
 
 ### Problemy z Web UI
 
-#### Problem: Brak dostępu do Web UI
+#### Problem: brak dostępu do Web UI
 
 **Objawy**:
-- Przeglądarka wyświetla "Connection refused"
+- Przeglądarka wyświetla „Connection refused"
 
 **Rozwiązanie**:
 1. Zweryfikuj, że serwer jest uruchomiony
 2. Sprawdź poprawny URL: `http://localhost:8080`
 3. Sprawdź ustawienia zapory sieciowej
-4. Sprawdź logi w poszukiwaniu błędów uruchamiania
+4. Sprawdź dzienniki pod kątem błędów uruchamiania
 
 #### Problem: SSE nie działa
 
 **Objawy**:
 - Aktualizacje w czasie rzeczywistym nie pojawiają się
-- Czat nie jest przesyłany strumieniowo
+- Czat nie jest strumieniowany
 
 **Rozwiązanie**:
 1. Sprawdź, czy przeglądarka obsługuje SSE
 2. Wyłącz buforowanie proxy dla SSE
 3. Sprawdź stabilność sieci
-4. Spróbuj użyć innej przeglądarki
+4. Spróbuj innej przeglądarki
 
-#### Problem: Interfejs wygląda uszkodzony
+#### Problem: UI wygląda uszkodzony
 
 **Objawy**:
-- Style są nieprawidłowe
+- Style są niepoprawne
 - Układ jest zepsuty
 
 **Rozwiązanie**:
 1. Wyczyść pamięć podręczną przeglądarki
-2. Spróbuj użyć innego motywu: Ustawienia > Motyw
+2. Spróbuj innej skórki: Ustawienia > Skórka
 3. Sprawdź błędy w konsoli przeglądarki
 4. Wyłącz rozszerzenia przeglądarki
 
 ---
 
-### Problemy z przechowywaniem danych
+### Problemy z przechowywaniem
 
-#### Problem: Nie można odczytać/zapisać danych
+#### Problem: nie można odczytać/zapisać danych
 
 **Objawy**:
 ```
@@ -264,11 +264,11 @@ IOException: Access denied
 
 **Rozwiązanie**:
 1. Sprawdź uprawnienia plików
-2. Zweryfikuj, czy ścieżka przechowywania istnieje
+2. Zweryfikuj, że ścieżka przechowywania istnieje
 3. Sprawdź miejsce na dysku
 4. Uruchom z odpowiednimi uprawnieniami
 
-#### Problem: Uszkodzenie danych
+#### Problem: uszkodzenie danych
 
 **Objawy**:
 - Błędy parsowania JSON
@@ -283,35 +283,35 @@ IOException: Access denied
 
 3. Ręcznie napraw uszkodzone pliki
 
-#### Problem: Uszkodzenie pliku przechowywania SpeedyPack (wersja Fast)
+#### Problem: uszkodzenie pliku przechowywania SpeedyPack (wersja Fast)
 
 **Objawy**:
-- Plik `.spk` nie może zostać załadowany
+- Pliki `.spk` nie mogą być załadowane
 - Inicjalizacja SpeedyStorage nie powiodła się
 
 **Rozwiązanie**:
 1. Użyj narzędzia `SiliconLife.Speedy.Manager` do sprawdzenia i naprawy plików `.spk`
-2. Sprawdź, czy plik indeksu `.spk.idx` jest zgodny z plikiem `.spk`
-3. Jeśli plik indeksu jest uszkodzony, usuń plik `.spk.idx`, system automatycznie odbuduje indeks
+2. Sprawdź, czy plik indeksu `.spk.idx` odpowiada plikowi `.spk`
+3. Jeśli plik indeksu jest uszkodzony, usuń plik `.spk.idx` — system automatycznie odbuduje indeks
 4. Przywróć plik `.spk` z kopii zapasowej
 
-#### Problem: Niepowodzenie automatycznej kompresji SpeedyPack (wersja Fast)
+#### Problem: niepowodzenie automatycznej kompakcji SpeedyPack (wersja Fast)
 
 **Objawy**:
-- Plik `.spk` stale rośnie
+- Pliki `.spk` stale rosną
 - Brak miejsca na dysku
 
 **Rozwiązanie**:
 1. Sprawdź, czy `SpeedyPackAutoCompactor` działa poprawnie
-2. Ręcznie wyzwól operację kompresji
-3. Sprawdź konfigurację progu kompresji
-4. Użyj narzędzia `SiliconLife.Speedy.Manager` do ręcznej kompresji
+2. Ręcznie wyzwól operację kompakcji
+3. Sprawdź konfigurację progu kompakcji
+4. Użyj narzędzia `SiliconLife.Speedy.Manager` do ręcznej kompakcji
 
 ---
 
 ### Problemy z wykonywaniem narzędzi
 
-#### Problem: Nie znaleziono narzędzia
+#### Problem: nie znaleziono narzędzia
 
 **Objawy**:
 ```
@@ -321,10 +321,10 @@ Tool "xyz" not found
 **Rozwiązanie**:
 1. Zweryfikuj poprawność nazwy narzędzia
 2. Sprawdź, czy narzędzie znajduje się w katalogu Tools
-3. Przebuduj projekt
+3. Odbuduj projekt
 4. Sprawdź, czy narzędzie jest poprawnie zaimplementowane
 
-#### Problem: Narzędzie zwraca błąd
+#### Problem: narzędzie zwraca błąd
 
 **Objawy**:
 ```
@@ -332,7 +332,7 @@ Tool execution failed: ...
 ```
 
 **Rozwiązanie**:
-1. Sprawdź logi narzędzia
+1. Sprawdź dzienniki narzędzia
 2. Zweryfikuj parametry wejściowe
 3. Przetestuj narzędzie niezależnie
 4. Sprawdź uprawnienia
@@ -341,7 +341,7 @@ Tool execution failed: ...
 
 ### Problemy z wtyczkami
 
-#### Problem: Niepowodzenie ładowania wtyczki
+#### Problem: ładowanie wtyczki nie powiodło się
 
 **Objawy**:
 ```
@@ -349,27 +349,27 @@ Plugin load failed: Security check failed
 ```
 
 **Rozwiązanie**:
-1. Sprawdź, czy wtyczka odwołuje się do zabronionych przestrzeni nazw (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
-2. Zweryfikuj, czy wtyczka odwołuje się tylko do zestawów z białej listy zaufanych zestawów
+1. Sprawdź, czy wtyczka odwołuje się do zakazanych przestrzeni nazw (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
+2. Zweryfikuj, że wtyczka odwołuje się tylko do zestawów z białej listy zaufanych zestawów
 3. Sprawdź, czy wtyczka poprawnie implementuje interfejs `IPlugin`
-4. Przejrzyj logi, aby uzyskać szczegółowe przyczyny niepowodzenia sprawdzania bezpieczeństwa
+4. Zobacz dzienniki, aby uzyskać szczegółowe przyczyny niepowodzenia sprawdzania bezpieczeństwa
 
-#### Problem: Narzędzia wtyczki nie są zarejestrowane
+#### Problem: narzędzia wtyczki nie są zarejestrowane
 
 **Objawy**:
-- Wtyczka została załadowana pomyślnie, ale narzędzia nie pojawiają się na liście narzędzi
+- Wtyczka załadowana pomyślnie, ale narzędzia nie pojawiają się na liście narzędzi
 
 **Rozwiązanie**:
-1. Potwierdź, że klasy narzędzi w wtyczce poprawnie implementują interfejs `ITool`
-2. Sprawdź, czy klasy narzędzi są publiczne
+1. Upewnij się, że klasa narzędzia w wtyczce poprawnie implementuje interfejs `ITool`
+2. Sprawdź, czy klasa narzędzia jest publiczna
 3. Zweryfikuj, czy `ToolManager.ScanAllPluginAssemblies()` zostało wywołane
-4. Przebuduj wtyczkę i uruchom ponownie aplikację
+4. Odbuduj wtyczkę i uruchom ponownie aplikację
 
 ---
 
-### Problemy z notatkami roboczymi
+### Problemy z notatkami pracy
 
-#### Problem: Nie można utworzyć notatki roboczej
+#### Problem: nie można utworzyć notatki pracy
 
 **Objawy**:
 ```
@@ -377,40 +377,40 @@ Failed to create work note
 ```
 
 **Rozwiązanie**:
-1. Sprawdź, czy istota istnieje i jest w stanie działania
-2. Zweryfikuj, czy ścieżka przechowywania ma uprawnienia do zapisu
+1. Sprawdź, czy istota istnieje i jest w stanie uruchomionym
+2. Zweryfikuj, że ścieżka przechowywania ma uprawnienia do zapisu
 3. Sprawdź, czy treść nie jest pusta (treść jest wymagana)
-4. Przejrzyj logi, aby uzyskać szczegółowe informacje o błędach
+4. Zobacz dzienniki, aby uzyskać szczegółowe informacje o błędzie
 
-#### Problem: Wyszukiwanie notatek nie zwraca wyników
+#### Problem: wyszukiwanie notatek nie zwraca wyników
 
 **Objawy**:
-- Wyszukiwanie słów kluczowych zwraca puste wyniki
+- Wyszukiwanie słowa kluczowego zwraca puste wyniki
 - Ale na pewno istnieją powiązane notatki
 
 **Rozwiązanie**:
-1. Sprawdź poprawność pisowni słów kluczowych
-2. Spróbuj użyć bardziej ogólnych słów kluczowych
+1. Sprawdź poprawność pisowni słowa kluczowego
+2. Spróbuj użyć bardziej ogólnego słowa kluczowego
 3. Zweryfikuj, czy notatki zawierają to słowo kluczowe (wielkość liter ma znaczenie)
 4. Zwiększ wartość parametru `max_results`
 
-#### Problem: Wolne generowanie katalogu notatek
+#### Problem: powolne generowanie spisu treści notatek
 
 **Objawy**:
-- Długi czas odpowiedzi podczas generowania katalogu
+- Długi czas odpowiedzi podczas generowania spisu treści
 - Istota ma dużą liczbę notatek (>1000 stron)
 
 **Rozwiązanie**:
-1. Jest to normalne zjawisko, wymaga przejścia przez wszystkie notatki
+1. Jest to normalne zjawisko — wymaga przejścia przez wszystkie notatki
 2. Rozważ regularne archiwizowanie starych notatek
-3. Użyj funkcji wyszukiwania zamiast przeglądania katalogu
-4. Planowana optymalizacja: dodanie mechanizmu buforowania katalogu
+3. Użyj funkcji wyszukiwania zamiast przeglądania spisu treści
+4. Planowana optymalizacja: dodanie mechanizmu pamięci podręcznej spisu treści
 
 ---
 
-### Problemy z siecią wiedzy
+### Problemy z Siecią Wiedzy
 
-#### Problem: Zapytanie o wiedzę zwraca puste wyniki
+#### Problem: zapytanie wiedzy zwraca puste wyniki
 
 **Objawy**:
 ```
@@ -424,11 +424,11 @@ No knowledge triples found
 ```json
 {
   "action": "search",
-  "query": "słowo kluczowe"
+  "query": "słowo_kluczowe"
 }
 ```
 
-#### Problem: Niepowodzenie wyszukiwania ścieżki wiedzy
+#### Problem: niepowodzenie wyszukiwania ścieżki wiedzy
 
 **Objawy**:
 ```
@@ -436,12 +436,12 @@ No path found between concepts
 ```
 
 **Rozwiązanie**:
-1. Zweryfikuj, czy oba pojęcia istnieją w sieci wiedzy
+1. Zweryfikuj, że oba pojęcia istnieją w Sieci Wiedzy
 2. Sprawdź, czy istnieje ścieżka powiązania (może nie być bezpośredniego lub pośredniego związku)
 3. Spróbuj dodać więcej wiedzy, aby nawiązać połączenie
 4. Zmniejsz limit długości ścieżki (jeśli jest ustawiony)
 
-#### Problem: Niepowodzenie walidacji wiedzy
+#### Problem: niepowodzenie walidacji wiedzy
 
 **Objawy**:
 ```
@@ -450,27 +450,27 @@ Knowledge validation failed
 
 **Rozwiązanie**:
 1. Sprawdź, czy format trójki jest poprawny (podmiot, orzeczenie, dopełnienie są wymagane)
-2. Zweryfikuj, czy pewność siebie jest w zakresie 0.0-1.0
+2. Zweryfikuj, że pewność jest w zakresie 0.0–1.0
 3. Sprawdź, czy nie ma zduplikowanych trójek
-4. Przejrzyj szczegóły błędu walidacji, aby zrozumieć konkretny problem
+4. Zobacz szczegóły błędu walidacji, aby poznać konkretny problem
 
-#### Problem: Nieprawidłowe statystyki sieci wiedzy
+#### Problem: niedokładne statystyki Sieci Wiedzy
 
 **Objawy**:
-- Liczby statystyczne nie są zgodne z oczekiwaniami
+- Liczby statystyczne nie zgadzają się z oczekiwaniami
 - Statystyki nie są aktualizowane po dodaniu wiedzy
 
 **Rozwiązanie**:
 1. Statystyki mogą wymagać kilku sekund na aktualizację (pamięć podręczna)
 2. Sprawdź, czy operacje usuwania zostały pomyślnie wykonane
 3. Uruchom ponownie aplikację, aby wymusić odświeżenie statystyk
-4. Ponownie zapytaj o statystyki przez API
+4. Ponownie odpytaj statystyki przez API
 
 ---
 
 ### Problemy z zarządzaniem projektami
 
-#### Problem: Nie można utworzyć projektu
+#### Problem: nie można utworzyć projektu
 
 **Objawy**:
 ```
@@ -478,12 +478,12 @@ Failed to create project
 ```
 
 **Rozwiązanie**:
-1. Sprawdź, czy nazwa projektu nie jest pusta (wymagana)
-2. Zweryfikuj, czy nazwa projektu nie jest zduplikowana
+1. Sprawdź, czy nazwa projektu nie jest pusta (wymagane)
+2. Zweryfikuj, że nazwa projektu nie jest zduplikowana
 3. Sprawdź, czy ścieżka przechowywania ma uprawnienia do zapisu
-4. Przejrzyj logi, aby uzyskać szczegółowe informacje o błędach
+4. Zobacz dzienniki, aby uzyskać szczegółowe informacje o błędzie
 
-#### Problem: Utrata danych projektu
+#### Problem: utrata danych projektu
 
 **Objawy**:
 - Informacje o projekcie nie mogą być załadowane
@@ -492,14 +492,81 @@ Failed to create project
 **Rozwiązanie**:
 1. Sprawdź, czy katalog przechowywania projektu istnieje
 2. Przywróć dane projektu z kopii zapasowej
-3. Zweryfikuj, czy format pliku JSON jest poprawny
-4. Ręcznie napraw uszkodzone pliki projektu
+3. Zweryfikuj, że format pliku JSON jest poprawny
+4. Ręcznie napraw uszkodzony plik projektu
+
+#### Problem: niepowodzenie przypisania roli w projekcie
+
+**Objawy**:
+```
+Failed to assign role
+```
+
+**Rozwiązanie**:
+1. Upewnij się, że Istota Krzemowa dołączyła do projektu
+2. Sprawdź, czy nazwa roli jest prawidłowa
+3. Zweryfikuj, czy operatorem jest Kurator Krzemowy
+4. Zobacz dzienniki, aby uzyskać szczegółowe informacje o błędzie
+
+#### Problem: przepływ pracy nie może się uruchomić
+
+**Objawy**:
+- Utworzenie instancji przepływu pracy nie powiodło się
+- Przejścia stanów nie są wykonywane
+
+**Rozwiązanie**:
+1. Sprawdź, czy szablon przepływu pracy jest zdefiniowany
+2. Zweryfikuj, że stan początkowy jest poprawnie ustawiony
+3. Upewnij się, że projekt ma przypisany szablon przepływu pracy
+4. Sprawdź dzienniki przepływu pracy pod kątem błędów przejść
+
+---
+
+### Problemy z uprawnieniami narzędzi
+
+#### Problem: operacja narzędzia odrzucona
+
+**Objawy**:
+```
+Tool operation denied: network:post
+```
+
+**Rozwiązanie**:
+1. Sprawdź konfigurację uprawnień narzędzi Istoty Krzemowej:
+```bash
+curl http://localhost:8080/api/beings/tool-permissions?beingId=<id>
+```
+
+2. Zaktualizuj uprawnienia narzędzi:
+```bash
+curl -X PUT http://localhost:8080/api/beings/tool-permissions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "beingId": "being-uuid",
+    "permissions": {
+      "network:post": "allowed"
+    }
+  }'
+```
+
+3. Lub użyj Web UI: Istoty → Uprawnienia narzędzi
+
+#### Problem: uprawnienia narzędzi projektu nie działają
+
+**Objawy**:
+- Uprawnienia narzędzi na poziomie projektu nie działają zgodnie z oczekiwaniami
+
+**Rozwiązanie**:
+1. Upewnij się, że uprawnienia na poziomie projektu są poprawnie skonfigurowane
+2. Sprawdź, czy uprawnienia na poziomie Istoty Krzemowej i projektu nie są w konflikcie
+3. Uprawnienia na poziomie projektu są niezależne od poziomu Istoty Krzemowej — stosowane jest przecięcie obu
+4. Sprawdź dziennik audytu, aby potwierdzić wyniki sprawdzania uprawnień
 
 ---
 
 ## Debugowanie
 
-### Włączanie szczegółowych logów
+### Włączenie szczegółowych dzienników
 
 Edytuj konfigurację:
 ```json
@@ -510,9 +577,9 @@ Edytuj konfigurację:
 }
 ```
 
-### Sprawdzanie logów
+### Sprawdzanie dzienników
 
-Logi są przechowywane w:
+Dzienniki są przechowywane w:
 ```
 logs/
 ├── system.log
@@ -526,9 +593,9 @@ Podgląd w czasie rzeczywistym:
 tail -f logs/*.log
 ```
 
-### Używanie debugera
+### Korzystanie z debugera
 
-**SiliconLife.Default (implementacja domyślna)**:
+**SiliconLife.Default (domyślna implementacja)**:
 ```bash
 # Uruchom z debugerem
 dotnet run --project src/SiliconLife.Default --configuration Debug
@@ -546,7 +613,7 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 # Przez IDE: Dołącz do procesu > SiliconLife.Fast
 ```
 
-> **Zalecenie**: Na etapie debugowania rozwoju zaleca się używanie SiliconLife.Default, a po weryfikacji architektury używać SiliconLife.Fast do wdrożenia produkcyjnego.
+> **Zalecenie**: na etapie debugowania rozwoju zaleca się używanie SiliconLife.Default; po weryfikacji architektury użyj SiliconLife.Fast do wdrożenia produkcyjnego.
 
 ---
 
@@ -554,35 +621,35 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 
 ### Wolny czas odpowiedzi
 
-**Optymalizacja**:
+**Optymalizacje**:
 1. Zmniejsz złożoność modelu AI
-2. Włącz buforowanie
-3. Oczyść stare dane
+2. Włącz pamięć podręczną
+3. Czyńć stare dane
 4. Zwiększ zasoby systemowe
 
 ### Wysokie użycie CPU
 
 **Sprawdź**:
-- Uruchomiono zbyt wiele istot
-- Nieskończona pętla w narzędziach
-- Częste wykonywanie timerów
+- Zbyt wiele uruchomionych istot
+- Nieskończone pętle w narzędziach
+- Częste wykonywanie czasomierzy
 
 **Rozwiązanie**:
 - Zmniejsz liczbę współbieżnych istot
 - Zoptymalizuj kod narzędzi
-- Dostosuj interwały timerów
+| Dostosuj interwały czasomierzy
 
 ### Wysokie użycie pamięci
 
 **Monitorowanie**:
 ```bash
-# Przez Web UI: Pulpit nawigacyjny > Pamięć
+# Przez Web UI: Pulpit > Pamięć
 ```
 
-**Optymalizacja**:
-- Oczyść stare wspomnienia
+**Optymalizacje**:
+- Czyńć stare wspomnienia
 - Zmniejsz rozmiar kontekstu
-- Wdróż stronicowanie
+- Zaimplementuj stronicowanie
 
 ---
 
@@ -595,9 +662,9 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 - [Referencja API](api-reference.md)
 - [Przewodnik architektury](architecture.md)
 
-### Sprawdzanie logów
+### Sprawdzanie dzienników
 
-Zawsze najpierw sprawdzaj logi, aby uzyskać szczegóły błędów.
+Zawsze najpierw sprawdzaj dzienniki, aby uzyskać szczegóły błędów.
 
 ### Wsparcie społeczności
 
@@ -611,10 +678,10 @@ Zawsze najpierw sprawdzaj logi, aby uzyskać szczegóły błędów.
 
 ### Awaria systemu
 
-1. Sprawdź logi, aby ustalić przyczynę
+1. Sprawdź dzienniki, aby ustalić przyczynę
 2. Uruchom ponownie aplikację:
 
-**SiliconLife.Default (implementacja domyślna)**:
+**SiliconLife.Default (domyślna implementacja)**:
 ```bash
 dotnet run --project src/SiliconLife.Default
 ```
@@ -637,7 +704,7 @@ dotnet run --project src/SiliconLife.Fast
 
 1. Zatrzymaj wszystkie istoty
 2. Odwołaj wszystkie uprawnienia
-3. Sprawdź logi audytu
+3. Sprawdź dzienniki audytu
 4. Przejrzyj kontrolę dostępu
 5. Uruchom ponownie z ograniczonymi uprawnieniami
 
@@ -650,12 +717,12 @@ dotnet run --project src/SiliconLife.Fast
 1. **Regularne kopie zapasowe**
    - Twórz kopie zapasowe katalogu danych
    - Twórz kopie zapasowe konfiguracji
-   - Testuj proces przywracania
+   - Testuj procedury przywracania
 
 2. **Monitorowanie zasobów**
    - Monitoruj użycie CPU/pamięci
    - Monitoruj miejsce na dysku
-   - Sprawdzaj połączenie sieciowe
+   - Sprawdzaj połączenia sieciowe
 
 3. **Utrzymywanie aktualności**
    - Aktualizuj .NET SDK
@@ -671,7 +738,7 @@ dotnet run --project src/SiliconLife.Fast
 
 ## Następne kroki
 
-- 📚 Przeczytaj [Przewodnik architektury](architecture.md)
-- 🛠️ Zobacz [Przewodnik rozwoju](development-guide.md)
-- 🚀 Zobacz [Przewodnik szybkiego startu](getting-started.md)
-- 🔒 Zobacz [Dokumentację bezpieczeństwa](security.md)
+- 📚 Przeczytaj [przewodnik architektury](architecture.md)
+- 🛠️ Zobacz [przewodnik rozwoju](development-guide.md)
+- 🚀 Zobacz [przewodnik szybkiego startu](getting-started.md)
+- 🔒 Zobacz [dokumentację bezpieczeństwa](security.md)

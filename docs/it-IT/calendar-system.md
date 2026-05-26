@@ -1,76 +1,76 @@
-﻿# Sistema di calendario
+# Sistema di Calendario
 
-> **Versione : v0.2.0-alpha**
+> **Versione: v0.2.0-alpha**
 
-[English](../en/calendar-system.md) | [Deutsch](../de-DE/calendar-system.md) | [Français](../fr-FR/calendar-system.md) | [中文](../zh-CN/calendar-system.md) | [繁體中文](../zh-HK/calendar-system.md) | [Español](../es-ES/calendar-system.md) | [日本語](../ja-JP/calendar-system.md) | [한국어](../ko-KR/calendar-system.md) | [Čeština](../cs-CZ/calendar-system.md) | [Русский](../ru-RU/calendar-system.md) | **Italiano**
+[English](../en/calendar-system.md) | [Deutsch](../de-DE/calendar-system.md) | [中文](../zh-CN/calendar-system.md) | [繁體中文](../zh-HK/calendar-system.md) | [Español](../es-ES/calendar-system.md) | [日本語](../ja-JP/calendar-system.md) | [한국어](../ko-KR/calendar-system.md) | [Čeština](../cs-CZ/calendar-system.md) | [Русский](../ru-RU/calendar-system.md) | **Italiano**
 
 ## Panoramica
 
-SiliconLifeCollective supporta 32 diversi sistemi di calendario per la conversione delle date e la precisione storica.
+SiliconLifeCollective supporta 32 diversi sistemi calendariali per la conversione delle date e la precisione storica.
 
-## Calendari supportati (32)
+## Calendari Supportati (32)
 
-### Calendari principali (6)
+### Calendari Principali (6)
 
-1. **Calendario gregoriano (Gregorian)** - Calendario standard internazionale, ID : `gregorian`
-2. **Calendario lunare cinese (Chinese Lunar)** - Calendario cinese tradizionale con calcolo dei mesi intercalari, ID : `lunar`
-3. **Calendario islamico (Islamic)** - Calendario dell'Egira islamica, ID : `islamic`
-4. **Calendario ebraico (Hebrew)** - Calendario ebraico, ID : `hebrew`
-5. **Calendario persiano (Persian)** - Calendario solare iraniano, ID : `persian`
-6. **Calendario indiano (Indian)** - Calendario nazionale indiano, ID : `indian`
+1. **Calendario Gregoriano (Gregorian)** - Calendario internazionale standard, ID: `gregorian`
+2. **Calendario Lunare Cinese (Chinese Lunar)** - Calendario tradizionale cinese, con calcolo del mese intercalare, ID: `lunar`
+3. **Calendario Islamico (Islamic)** - Calendario Hijri islamico, ID: `islamic`
+4. **Calendario Ebraico (Hebrew)** - Calendario ebraico, ID: `hebrew`
+5. **Calendario Persiano (Persian)** - Calendario solare iraniano, ID: `persian`
+6. **Calendario Indiano (Indian)** - Calendario nazionale indiano, ID: `indian`
 
-### Calendari storici cinesi (2)
+### Calendari Storici Cinesi (2)
 
-7. **Calendario storico cinese (Chinese Historical)** - Supporta il ciclo Ganzhi e le ere imperiali, ID : `chinese_historical`
-   - **Ciclo Ganzhi** : Ciclo di 60 anni (Steli celesti + Rami terrestri)
-   - **Ere imperiali** : Supporta le ere di tutte le dinastie cinesi (Kangxi, Qianlong, Zhenguan, ecc.)
-   - **Database dinamico** : Database completo integrato di dinastie ed ere cinesi
-8. **Calendario sessagesimale (Sexagenary)** - Ciclo Ganzhi di 60 anni, ID : `sexagenary`
+7. **Calendario Storico Cinese (Chinese Historical)** - Supporta la cronologia Ganzhi e le ere imperiali, ID: `chinese_historical`
+   - **Cronologia Ganzhi**: Ciclo di 60 anni (Tronchi Celesti + Rami Terrestri)
+   - **Ere imperiali**: Supporta le ere delle dinastie della storia cinese (Kangxi, Qianlong, Zhenguan, ecc.)
+   - **Database dinamico**: Database integrato completo delle dinastie e delle ere della storia cinese
+8. **Calendario Ganzhi (Sexagenary)** - Ciclo sessagenario di 60 anni, ID: `sexagenary`
 
-### Calendari dell'Asia orientale (6)
+### Calendari dell'Asia Orientale (6)
 
-9. **Calendario giapponese (Japanese)** - Calendario delle ere Nengo giapponesi, ID : `japanese`
-10. **Calendario vietnamita (Vietnamese)** - Calendario lunare vietnamita (variante zodiacale del Gatto), ID : `vietnamese`
-11. **Calendario tibetano (Tibetan)** - Sistema di calendario tibetano, ID : `tibetan`
-12. **Calendario mongolo (Mongolian)** - Calendario mongolo, ID : `mongolian`
-13. **Calendario Dai (Dai)** - Calendario Dai con calcolo lunare completo, ID : `dai`
-14. **Calendario Dai Dehong (Dehong Dai)** - Variante Dai Dehong, ID : `dehong_dai`
+9. **Calendario Giapponese (Japanese)** - Calendario delle ere giapponesi (Nengo), ID: `japanese`
+10. **Calendario Vietnamita (Vietnamese)** - Calendario lunare vietnamita (variante con il Gatto come zodiaco), ID: `vietnamese`
+11. **Calendario Tibetano (Tibetan)** - Sistema calendariale tibetano, ID: `tibetan`
+12. **Calendario Mongolo (Mongolian)** - Calendario mongolo, ID: `mongolian`
+13. **Calendario Dai (Dai)** - Calendario Dai, con calcolo lunare completo, ID: `dai`
+14. **Calendario Dai di Dehong (Dehong Dai)** - Variante del calendario Dai di Dehong, ID: `dehong_dai`
 
-### Calendari storici (6)
+### Calendari Storici (6)
 
-15. **Calendario maya (Mayan)** - Calendario lungo maya, ID : `mayan`
-16. **Calendario romano (Roman)** - Calendario romano antico, ID : `roman`
-17. **Calendario giuliano (Julian)** - Calendario giuliano, ID : `julian`
-18. **Calendario repubblicano francese (French Republican)** - Calendario della Rivoluzione francese, ID : `french_republican`
-19. **Calendario copto (Coptic)** - Calendario copto ortodosso, ID : `coptic`
-20. **Calendario etiope (Ethiopian)** - Calendario etiope, ID : `ethiopian`
+15. **Calendario Maya (Mayan)** - Calendario lungo maya, ID: `mayan`
+16. **Calendario Romano (Roman)** - Calendario romano antico, ID: `roman`
+17. **Calendario Giuliano (Julian)** - Calendario giuliano, ID: `julian`
+18. **Calendario Repubblicano Francese (French Republican)** - Calendario della Rivoluzione Francese, ID: `french_republican`
+19. **Calendario Copto (Coptic)** - Calendario della Chiesa copta ortodossa, ID: `coptic`
+20. **Calendario Etiope (Ethiopian)** - Calendario etiope, ID: `ethiopian`
 
-### Calendari regionali (6)
+### Calendari Regionali (6)
 
-21. **Calendario buddista (Buddhist)** - Era buddista (BE), anno + 543, ID : `buddhist`
-22. **Calendario Saka (Saka)** - Era Saka (Indonesia), ID : `saka`
-23. **Calendario Vikram Samvat (Vikram Samvat)** - Calendario indù, ID : `vikram_samvat`
-24. **Calendario giavanese (Javanese)** - Calendario islamico giavanese, ID : `javanese`
-25. **Calendario Chula Sakarat (Chula Sakarat)** - Calendario buddista del sud-est asiatico, anno - 638, ID : `chula_sakarat`
-26. **Calendario khmer (Khmer)** - Calendario khmer, ID : `khmer`
+21. **Calendario Buddhista (Buddhist)** - Era buddista (BE), anno + 543, ID: `buddhist`
+22. **Calendario Saka (Saka)** - Era Saka (Indonesia), ID: `saka`
+23. **Calendario Vikram Samvat (Vikram Samvat)** - Calendario indù, ID: `vikram_samvat`
+24. **Calendario Giavanese (Javanese)** - Calendario islamico giavanese, ID: `javanese`
+25. **Calendario Chula Sakarat (Chula Sakarat)** - Calendario buddista del Sud-est asiatico, anno - 638, ID: `chula_sakarat`
+26. **Calendario Khmer (Khmer)** - Calendario khmer, ID: `khmer`
 
-### Calendari moderni (3)
+### Calendari Moderni (3)
 
-27. **Calendario ROC (ROC)** - Calendario Minguo, anno - 1911, ID : `roc`
-28. **Calendario Juche (Juche)** - Calendario nordcoreano, anno - 1911, ID : `juche`
-29. **Calendario zoroastriano (Zoroastrian)** - Calendario zoroastriano, ID : `zoroastrian`
+27. **Calendario della Repubblica di Cina (ROC)** - Calendario della Repubblica, anno - 1911, ID: `roc`
+28. **Calendario Juche (Juche)** - Calendario nord-coreano, anno - 1911, ID: `juche`
+29. **Calendario Zoroastriano (Zoroastrian)** - Calendario zoroastriano, ID: `zoroastrian`
 
-### Calendari etnici (3)
+### Calendari Etnici (3)
 
-30. **Calendario Yi (Yi)** - Sistema di calendario Yi, ID : `yi`
-31. **Calendario Cherokee (Cherokee)** - Calendario Cherokee, ID : `cherokee`
-32. **Calendario Inuit (Inuit)** - Calendario Inuit, ID : `inuit`
+30. **Calendario Yi (Yi)** - Sistema calendariale Yi, ID: `yi`
+31. **Calendario Cherokee (Cherokee)** - Calendario Cherokee, ID: `cherokee`
+32. **Calendario Inuit (Inuit)** - Calendario Inuit, ID: `inuit`
 
 ---
 
-## Utilizzare lo strumento calendario
+## Utilizzo dello Strumento Calendario
 
-### Conversione di base
+### Conversione Base
 
 ```json
 {
@@ -81,7 +81,7 @@ SiliconLifeCollective supporta 32 diversi sistemi di calendario per la conversio
 }
 ```
 
-**Risposta** :
+**Risposta**:
 ```json
 {
   "result": "农历丙午年四月初三",
@@ -92,7 +92,7 @@ SiliconLifeCollective supporta 32 diversi sistemi di calendario per la conversio
 }
 ```
 
-### Richiesta multi-calendario
+### Query Multi-Calendario
 
 ```json
 {
@@ -101,11 +101,11 @@ SiliconLifeCollective supporta 32 diversi sistemi di calendario per la conversio
 }
 ```
 
-**Risposta** : Restituisce la data in tutti i 32 sistemi di calendario.
+**Risposta**: Restituisce la data in tutti i 32 sistemi calendariali.
 
 ---
 
-## API di calendario
+## API del Calendario
 
 ### Interfaccia CalendarBase
 
@@ -124,7 +124,7 @@ public abstract class CalendarBase
 }
 ```
 
-### Esempio : Calendario personalizzato
+### Esempio: Calendario Personalizzato
 
 ```csharp
 public class MyCustomCalendar : CalendarBase
@@ -147,27 +147,27 @@ public class MyCustomCalendar : CalendarBase
 
 ---
 
-## Funzionalità speciali
+## Funzionalità Speciali
 
-### Calendario storico cinese in dettaglio (Nuovo)
+### Dettagli del Calendario Storico Cinese (Nuovo)
 
-Il calendario storico cinese è una funzionalità di punta del sistema con due funzioni principali :
+Il calendario storico cinese è una delle caratteristiche principali di questo sistema, e supporta due funzionalità fondamentali:
 
-#### 1. Sistema di ciclo annuale Ganzhi
+#### 1. Sistema di Cronologia Ganzhi
 
-Utilizza un ciclo di 60 anni, combinando gli Steli celesti e i Rami terrestri :
+Adotta un ciclo di 60 anni, formato dalla combinazione di Tronchi Celesti e Rami Terrestri:
 
 ```
-Steli celesti (10) : 甲、乙、丙、丁、戊、己、庚、辛、壬、癸
-Rami terrestri (12) : 子、丑、寅、卯、辰、巳、午、未、申、酉、戌、亥
+Tronchi Celesti (10): 甲、乙、丙、丁、戊、己、庚、辛、壬、癸
+Rami Terrestri (12): 子、丑、寅、卯、辰、巳、午、未、申、酉、戌、亥
 ```
 
-**Esempi** :
+**Esempi**:
 - 2026 = 丙午年
 - 2025 = 乙巳年 (Anno del Serpente)
 - 2024 = 甲辰年 (Anno del Drago)
 
-**Esempio di utilizzo** :
+**Esempio di utilizzo**:
 ```json
 {
   "action": "convert",
@@ -177,7 +177,7 @@ Rami terrestri (12) : 子、丑、寅、卯、辰、巳、午、未、申、酉�
 }
 ```
 
-**Risposta** :
+**Risposta**:
 ```json
 {
   "result": "丙午年 三月 初九",
@@ -186,18 +186,18 @@ Rami terrestri (12) : 子、丑、寅、卯、辰、巳、午、未、申、酉�
 }
 ```
 
-#### 2. Sistema di ere imperiali
+#### 2. Sistema delle Ere Imperiali
 
-Database completo integrato di dinastie ed ere imperiali cinesi :
+Database integrato completo delle dinastie e delle ere imperiali della storia cinese:
 
-**Dinastie supportate** (estratto) :
-- Dinastia Qing : Kangxi, Yongzheng, Qianlong, Jiaqing, Daoguang, Xianfeng, Tongzhi, Guangxu, Xuantong
-- Dinastia Ming : Hongwu, Yongle, Jiajing, Wanli, Chongzhen, ecc.
-- Dinastia Tang : Zhenguan, Kaiyuan, Tianbao, ecc.
-- Dinastia Han : Jianyuan, Yuanguang, Yuanshuo, ecc.
+**Dinastie supportate** (in parte):
+- Dinastia Qing: Kangxi, Yongzheng, Qianlong, Jiaqing, Daoguang, Xianfeng, Tongzhi, Guangxu, Xuantong
+- Dinastia Ming: Hongwu, Yongle, Jiajing, Wanli, Chongzhen, ecc.
+- Dinastia Tang: Zhenguan, Kaiyuan, Tianbao, ecc.
+- Dinastia Han: Jianyuan, Yuanguang, Yuanshuo, ecc.
 - Altre dinastie...
 
-**Esempio di utilizzo** :
+**Esempio di utilizzo**:
 ```json
 {
   "action": "convert",
@@ -207,7 +207,7 @@ Database completo integrato di dinastie ed ere imperiali cinesi :
 }
 ```
 
-**Risposta** :
+**Risposta**:
 ```json
 {
   "result": "康熙六十年 三月 十五日",
@@ -217,13 +217,13 @@ Database completo integrato di dinastie ed ere imperiali cinesi :
 }
 ```
 
-### Gestione dei mesi intercalari
+### Gestione del Mese Intercalare
 
-Calendari con mesi intercalari :
-- Calendario lunare cinese
-- Calendario ebraico
-- Calendario buddista
-- Calendario vietnamita
+Calendari con mese intercalare:
+- Calendario Lunare Cinese
+- Calendario Ebraico
+- Calendario Buddhista
+- Calendario Vietnamita
 
 ```json
 {
@@ -235,73 +235,73 @@ Calendari con mesi intercalari :
 
 ---
 
-## Precisione dei calendari
+## Accuratezza del Calendario
 
-### Calcoli astronomici
+### Calcoli Astronomici
 
 - Basati su dati astronomici reali
-- Supporta le date storiche
-- Gestisce le riforme calendariali
+- Supporto per date storiche
+- Gestione delle riforme calendariali
 
-### Limitazioni note
+### Limitazioni Note
 
 - Alcune date antiche sono approssimative
-- Le riforme calendariali variano in base alla regione
+- Le riforme calendariali variano per regione
 - Non include la gestione dei secondi intercalari
 
 ---
 
-## Casi d'uso
+## Casi d'Uso
 
-### Ricerca storica
+### Ricerca Storica
 
-Convertire date storiche in calendari moderni :
-
-```
-Domanda : "Quando è avvenuta la Rivoluzione francese ?"
-Risposta : "14 luglio 1789 (Gregoriano)"
-           "26 Termidoro I (Repubblicano francese)"
-```
-
-### Applicazioni culturali
-
-Supporto per le feste tradizionali :
+Convertire date storiche in calendari moderni:
 
 ```
-Capodanno cinese 2026 :
-- Gregoriano : 17 febbraio 2026
-- Calendario lunare : 1° giorno del 1° mese
+Domanda: "Quando è avvenuta la Rivoluzione Francese?"
+Risposta: "14 luglio 1789 (calendario gregoriano)"
+         "26 Termidoro dell'Anno I (calendario repubblicano francese)"
 ```
 
-### Pianificazione multiculturale
+### Applicazioni Culturali
 
-Pianificare eventi tenendo conto di più calendari :
+Supporto per le festività tradizionali:
 
 ```
-Riunione : 2026-04-20
-- Evitare la preghiera del venerdì islamico
+Capodanno cinese 2026:
+- Calendario gregoriano: 17 febbraio 2026
+- Calendario lunare: Primo giorno del primo mese
+```
+
+### Pianificazione Multiculturale
+
+Organizzare eventi che rispettino più calendari:
+
+```
+Riunione: 2026-04-20
+- Evitare la preghiera del venerdì islamica
 - Rispettare lo Shabbat ebraico
 - Considerare le festività cinesi
 ```
 
 ---
 
-## Buone pratiche
+## Best Practices
 
-### 1. Specificare sempre il calendario
+### 1. Specificare Sempre il Calendario
 
-Non presupporre mai il sistema di calendario :
+Non dare mai per scontato il sistema calendariale:
 
 ```json
 {
   "date": "2026-04-20",
-  "calendar": "gregorian"  // Specificare esplicitamente !
+  "calendar": "gregorian"  // Specifica esplicitamente!
 }
 ```
 
-### 2. Gestire le date non valide
+### 2. Gestire le Date Non Valide
 
-Alcune date non esistono in alcuni calendari :
+Alcune date non esistono in certi calendari:
 
 ```json
 {
@@ -309,9 +309,9 @@ Alcune date non esistono in alcuni calendari :
 }
 ```
 
-### 3. Considerare i fusi orari
+### 3. Considerare i Fusi Orari
 
-La conversione delle date può variare in base al fuso orario :
+La conversione delle date può variare in base al fuso orario:
 
 ```
 2026-04-20 23:00 UTC+8
@@ -321,9 +321,9 @@ La conversione delle date può variare in base al fuso orario :
 
 ---
 
-## Prossimi passi
+## Prossimi Passi
 
-- 📚 Leggere la [guida all'architettura](architecture.md)
-- 🛠️ Consultare la [guida di sviluppo](development-guide.md)
-- 🔧 Vedere il [riferimento degli strumenti](tools-reference.md)
-- 🚀 Iniziare con la [guida rapida](getting-started.md)
+- 📚 Leggi la [Guida all'Architettura](architecture.md)
+- 🛠️ Consulta la [Guida allo Sviluppo](development-guide.md)
+- 🔧 Consulta il [Riferimento degli Strumenti](tools-reference.md)
+- 🚀 Consulta la [Guida Rapida](getting-started.md)

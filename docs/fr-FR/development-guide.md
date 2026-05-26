@@ -1,12 +1,12 @@
-﻿# Guide de développement
+# Guide de développement
 
 > **Version : v0.2.0-alpha**
 
-[English](../en/development-guide.md) | [Deutsch](../de-DE/development-guide.md) | **Français** | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/development-guide.md) | [Русский](../ru-RU/development-guide.md)
+[English](../en/development-guide.md) | [Deutsch](../de-DE/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/development-guide.md) | [Русский](../ru-RU/development-guide.md)
 
-## Aperçu de l'architecture
+## Vue d'ensemble de l'architecture
 
-SiliconLifeCollective suit une **architecture corps-cerveau**, avec une séparation stricte entre les interfaces principales et les implémentations par défaut.
+SiliconLifeCollective suit une **architecture Corps-Cerveau**, avec une séparation stricte entre les interfaces principales et les implémentations par défaut.
 
 ### Structure du projet
 
@@ -15,35 +15,36 @@ SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/            # Interfaces, classes abstraites, infrastructure commune
 │   ├── SiliconLife.Common/          # Implémentations partagées (communes aux deux versions)
-│   ├── SiliconLife.Default/         # Implémentation par défaut, point d'entrée (vérification de faisabilité)
-│   ├── SiliconLife.Fast/            # Implémentation haute performance, point d'entrée (version de production)
+│   ├── SiliconLife.Default/         # Implémentation par défaut, point d'entrée (validation de l'architecture)
+│   ├── SiliconLife.Fast/            # Implémentation haute performance, point d'entrée (version de production recommandée)
 │   ├── SiliconLife.Speedy/          # Moteur de stockage haute performance SpeedyPack
-│   └── SiliconLife.Speedy.Manager/  # Outil de gestion SpeedyPack (Windows Forms)
+│   └── SiliconLife.Speedy.Manager/  # Outil de gestion SpeedyPack (Avalonia UI)
 └── docs/                            # Documentation multilingue
 ```
 
 **Direction des dépendances** :
-- `SiliconLife.Default` → `SiliconLife.Core` (unidirectionnel)
-- `SiliconLife.Fast` → `SiliconLife.Core` (unidirectionnel)
+- `SiliconLife.Default` → `SiliconLife.Common` → `SiliconLife.Core`
+- `SiliconLife.Fast` → `SiliconLife.Common` → `SiliconLife.Core`
 - `SiliconLife.Common` → `SiliconLife.Core` (unidirectionnel)
 
-**Description des rôles des versions** :
-- **SiliconLife.Default** : Implémentation par défaut, principalement pour la vérification de faisabilité architecturale. Fournit une implémentation de stockage en système de fichiers simple et fiable, adaptée au débogage de développement et à la vérification architecturale.
-- **SiliconLife.Fast** : Version principale de production. Sur la base de l'architecture vérifiée par Default, adopte le stockage en mémoire SpeedyPack + persistance asynchrone, offrant une optimisation des performances extrême, le meilleur choix pour l'exploitation à long terme et les véritables environnements de production.
+**Rôle des versions** :
+- **SiliconLife.Default** : Implémentation par défaut, principalement utilisée pour valider la faisabilité de l'architecture. Fournit une implémentation de stockage sur système de fichiers simple et fiable, adaptée au débogage de développement et à la validation de l'architecture.
+- **SiliconLife.Fast** : Version de production recommandée. Sur la base de l'architecture validée par Default, adopte le stockage en mémoire SpeedyPack + persistance asynchrone, offrant des optimisations de performance extrêmes, c'est le choix recommandé pour l'exécution à long terme et les environnements de production réels.
 
 ## Concepts fondamentaux
 
-### 1. Silicon Being
+### 1. Être de Silicium
 
-Chaque agent IA est composé de :
-- **Corps** (`DefaultSiliconBeing`) : Maintient l'état de survie, détecte les scénarios de déclenchement
+Chaque agent IA est composé des éléments suivants :
+- **Corps** (`DefaultSiliconBeing`) : Maintient les signes vitaux, détecte les scénarios de déclenchement
 - **Cerveau** (`ContextManager`) : Charge l'historique, appelle l'IA, exécute les outils, persiste les réponses
 
 ### 2. Système d'outils
 
-Les outils sont automatiquement découverts et enregistrés via réflexion :
+Les outils sont découverts et enregistrés automatiquement par réflexion :
 
 ```csharp
+// Tous les outils implémentent l'interface ITool
 public interface ITool
 {
     string Name { get; }
@@ -52,26 +53,21 @@ public interface ITool
 }
 ```
 
-### 3. Système de permissions
+### 3. Système d'autorisations
 
-Chaîne de vérification des permissions à 3 niveaux en structure ramifiée :
+Chaîne de vérification des autorisations à 3 niveaux :
 ```
-IsCurator → UserFrequencyCache → (IPermissionCallback | GlobalACL) → IPermissionAskHandler
+UserFrequencyCache → IPermissionCallback → (IsCurateur : IPermissionAskHandler | Non-curateur : GlobalACL → refus par défaut)
 ```
-- **IsCurator** : Le Silicon Curateur contourne toutes les vérifications
-- **UserFrequencyCache** : Cache des autorisations/refus fréquents de l'utilisateur ; en cas de cache absent, bifurque vers :
-  - **IPermissionCallback** : Fonction de rappel de permission personnalisée du Being (si définie)
-  - **GlobalACL** : Liste de contrôle d'accès globale (si aucun callback défini)
-- **IPermissionAskHandler** : Demander à l'utilisateur (si les niveaux précédents n'ont pas pris de décision)
 
 ### 4. Localisateur de services
 
-Enregistrement et récupération globale des services :
+Enregistrement et récupération globaux des services :
 ```csharp
-// Enregistrement
+// Enregistrer
 ServiceLocator.Instance.Register<IAIClient>(ollamaClient);
 
-// Récupération
+// Obtenir
 var client = ServiceLocator.Instance.Get<IAIClient>();
 ```
 
@@ -79,7 +75,9 @@ var client = ServiceLocator.Instance.Get<IAIClient>();
 
 ### Ajouter un nouvel outil
 
-1. Créer une nouvelle classe dans `src/SiliconLife.Common/Tools/` (outils partagés entre les deux versions) ou `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (outils spécifiques à une version) :
+1. Créer une nouvelle classe dans `src/SiliconLife.Common/Tools/` (outils partagés entre les deux versions) :
+
+> **Note** : `SiliconLife.Default` et `SiliconLife.Fast` n'ont plus de répertoire `Tools/` indépendant, tous les outils partagés sont placés dans `SiliconLife.Common/Tools/`.
 
 ```csharp
 public class MyCustomTool : ITool
@@ -105,12 +103,31 @@ public class MyCustomTool : ITool
 }
 ```
 
-2. L'outil est automatiquement découvert via réflexion — pas d'enregistrement manuel !
+2. L'outil est découvert automatiquement par réflexion — pas besoin d'enregistrement manuel !
 
-3. (Optionnel) Marquer comme réservé aux administrateurs :
+3. (Facultatif) Marquer comme réservé à l'administrateur :
 ```csharp
 [SiliconManagerOnly]
 public class AdminTool : ITool { ... }
+```
+
+4. (Facultatif) Marquer les scénarios disponibles de l'outil :
+```csharp
+[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task)]
+public class MyTool : ITool { ... }
+```
+
+5. (Facultatif) Marquer comme disponible uniquement dans le scénario de chat :
+```csharp
+[ChatOnly]
+public class HelpTool : ITool { ... }
+```
+
+6. (Facultatif) Marquer comme disponible uniquement dans le scénario de projet :
+```csharp
+[ToolScenario(ToolScenarioFlag.Project)]
+[SiliconManagerOnly]
+public class ProjectWorkTool : ITool { ... }
 ```
 
 ### Ajouter un nouveau client IA
@@ -146,7 +163,7 @@ public class MyAIClient : IAIClient
 }
 ```
 
-2. Créer la fabrique :
+2. Créer une fabrique :
 
 ```csharp
 public class MyAIClientFactory : IAIClientFactory
@@ -158,7 +175,7 @@ public class MyAIClientFactory : IAIClientFactory
 }
 ```
 
-3. La fabrique est automatiquement découverte et enregistrée.
+3. La fabrique est découverte et enregistrée automatiquement.
 
 ### Ajouter un nouveau backend de stockage
 
@@ -199,8 +216,8 @@ public class MyPlugin : IPlugin
     public string Version => "1.0.0";
     
     public string GetName(Language language) => "My Plugin";
-    public string GetDescription(Language language) => "Un plugin personnalisé";
-    public string GetAuthor(Language language) => "Nom de l'auteur";
+    public string GetDescription(Language language) => "A custom plugin";
+    public string GetAuthor(Language language) => "Author Name";
     
     public void OnLoad() { }
     public void OnStart() { }
@@ -209,17 +226,17 @@ public class MyPlugin : IPlugin
 }
 ```
 
-2. (Optionnel) Implémenter l'interface `ITool` dans le plugin pour enregistrer des outils personnalisés :
+2. (Facultatif) Implémenter l'interface `ITool` dans le plugin pour enregistrer des outils personnalisés :
 
 ```csharp
 public class MyPluginTool : ITool
 {
     public string Name => "my_plugin_tool";
-    public string Description => "Un outil fourni par mon plugin";
+    public string Description => "A tool provided by my plugin";
     
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
-        return new ToolResult { Success = true, Output = "Terminé" };
+        return new ToolResult { Success = true, Output = "Done" };
     }
 }
 ```
@@ -228,7 +245,7 @@ public class MyPluginTool : ITool
 
 > **Restrictions de sécurité** : Les plugins ne peuvent pas référencer les espaces de noms `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`, etc. Les plugins sont chargés de manière isolée via `AssemblyLoadContext`.
 
-### Ajouter un nouveau skin
+### Ajouter un nouveau thème
 
 1. Implémenter `ISkin` dans `src/SiliconLife.App/Web/Skins/` :
 
@@ -236,7 +253,7 @@ public class MyPluginTool : ITool
 public class MyCustomSkin : ISkin
 {
     public string Name => "MySkin";
-    public string Description => "Description d'un skin personnalisé";
+    public string Description => "A custom skin description";
     
     public string GetCss()
     {
@@ -245,23 +262,23 @@ public class MyCustomSkin : ISkin
                 --primary-color: #your-color;
                 --bg-color: #your-bg;
             }
-            /* Vos styles personnalisés */
+            /* Your custom styles */
         ";
     }
 }
 ```
 
-2. Le skin est automatiquement découvert par `SkinManager`.
+2. Le thème est découvert automatiquement par `SkinManager`.
 
-## Guide du style de code
+## Guide de style de code
 
 ### Conventions de nommage
 
-- **Classes** : PascalCase, avec préfixe fonctionnel (ex. `DefaultSiliconBeing`)
-- **Interfaces** : Commencent par `I` (ex. `IAIClient`, `ITool`)
-- **Implémentations** : Se terminent par le nom de l'interface (ex. `OllamaClient` implémente `IAIClient`)
-- **Outils** : Se terminent par `Tool` (ex. `CalendarTool`, `ChatTool`)
-- **Modèles de vue** : Se terminent par `ViewModel` (ex. `BeingViewModel`)
+- **Classes** : PascalCase, avec préfixe fonctionnel (par ex. `DefaultSiliconBeing`)
+- **Interfaces** : Commencent par `I` (par ex. `IAIClient`, `ITool`)
+- **Implémentations** : Se terminent par le nom de l'interface (par ex. `OllamaClient` implémente `IAIClient`)
+- **Outils** : Se terminent par `Tool` (par ex. `CalendarTool`, `ChatTool`)
+- **Modèles de vue** : Se terminent par `ViewModel` (par ex. `BeingViewModel`)
 
 ### Organisation du code
 
@@ -269,39 +286,43 @@ public class MyCustomSkin : ISkin
 SiliconLife.Common/
 ├── AI/                    # Implémentations des clients IA et fabriques
 ├── Calendar/              # 32 implémentations de calendriers
-├── Localization/          # Classe de base de localisation et 33 variantes linguistiques
-├── Security/              # Gestionnaire de permissions
-├── SiliconBeing/          # Implémentation du Silicon Being par défaut
-├── Tools/                 # Outils intégrés partagés
+├── Localization/          # Classe de base de localisation et 34 variantes linguistiques
+├── Security/              # Gestionnaire d'Autorisations
+├── SiliconBeing/          # Implémentation par défaut de l'Être de Silicium
+├── Tools/                 # Outils intégrés partagés (25)
 ├── Web/                   # Infrastructure Web
 └── WebView/               # Implémentation Playwright WebView
 
 SiliconLife.App/          # Couche applicative partagée entre Default et Fast
-├── Config/                # Configuration applicative
+├── Config/                # Configuration de l'application
 ├── Help/                  # Localisation de la documentation d'aide
-└── Web/                   # Implémentation de l'interface Web
-    ├── Component/         # Bibliothèque de composants UI
-    ├── Controllers/       # Contrôleurs de routage
+├── Project/               # Système de projet (moteur de flux de travail, rôles de projet)
+└── Web/                   # Implémentation Web UI
+    ├── Component/         # 27 composants UI
+    ├── Controllers/       # 24 contrôleurs de routage
     ├── Models/            # Modèles de vue
     ├── Views/             # Vues HTML
-    └── Skins/             # Thèmes de skins
+    └── Skins/             # 7 thèmes d'apparence
 
 SiliconLife.Default/      # Répertoires spécifiques à la version
 ├── Config/                # Données de configuration par défaut
-├── IM/                    # Fournisseur WebUI
-├── Knowledge/             # Implémentation du réseau de connaissances
-├── Logging/               # Implémentations des fournisseurs de journaux
-├── Project/               # Implémentation du système de projets
-├── Security/              # Rappels de permissions par défaut
-├── Storage/               # Implémentation du stockage en système de fichiers
-└── Tools/                 # Outils spécifiques à la version (HelpTool)
+├── Knowledge/             # Implémentation du Réseau de Connaissances
+├── Logging/               # Implémentation du fournisseur de journal (console + système de fichiers)
+├── Project/               # Implémentation du système de projet
+└── Storage/               # Implémentation du stockage sur système de fichiers
+
+SiliconLife.Fast/         # Répertoires spécifiques à la version
+├── Config/                # Données de configuration de la version Fast
+├── Logging/               # Implémentation du fournisseur de journal (console + système de fichiers)
+├── Storage/               # Adaptateurs de stockage SpeedyPack
+└── Tray/                  # Localisation de la barre d'état système
 ```
 
 ### Documentation
 
 - Toutes les API publiques doivent avoir des commentaires de documentation XML
 - Tous les fichiers source utilisent l'en-tête de licence Apache 2.0
-- Exploiter les fonctionnalités .NET 9 (using implicites, types de référence nullables)
+- Utiliser les fonctionnalités .NET 9 (using implicites, types de référence nullables)
 
 ## Flux de travail de développement
 
@@ -375,14 +396,12 @@ public class CustomExecutor : ExecutorBase
     
     public override async Task<ExecutorResult> ExecuteAsync(ExecutorRequest request)
     {
-        // D'abord vérifier les permissions
         var permission = await CheckPermissionAsync(request);
         if (!permission.Allowed)
         {
             return ExecutorResult.Denied(permission.Reason);
         }
         
-        // Exécuter l'opération
         var result = await PerformOperation(request);
         
         return ExecutorResult.Success(result);
@@ -390,7 +409,37 @@ public class CustomExecutor : ExecutorBase
 }
 ```
 
-## Guide des tests
+### Exemple : Ajouter un modèle de flux de travail personnalisé
+
+```csharp
+public class MyWorkflowTemplate : WorkflowTemplate
+{
+    public override string Name => "my_workflow";
+    public override string Description => "A custom workflow template";
+    
+    public override void DefineStates()
+    {
+        AddState("start", "Début", isInitial: true);
+        AddState("processing", "En cours de traitement");
+        AddState("review", "En revue");
+        AddState("done", "Terminé", isFinal: true);
+    }
+    
+    public override void DefineTransitions()
+    {
+        AddTransition("start", "processing", "Démarrer le traitement");
+        AddTransition("processing", "review", "Soumettre pour revue");
+        AddTransition("review", "done", "Revue approuvée");
+        AddTransition("review", "processing", "Revue rejetée");
+    }
+}
+```
+
+### Exemple : Ajouter un rôle de projet
+
+Les rôles de projet sont gérés via les opérations `assign_role` et `remove_role` de `ProjectTool`. Les noms de rôles sont des chaînes personnalisées utilisées pour distinguer les responsabilités des Êtres de Silicium dans les flux de travail et l'attribution des tâches.
+
+## Guide de test
 
 ### Tests unitaires
 
@@ -401,7 +450,7 @@ public class MyToolTests
     [TestMethod]
     public async Task ExecuteAsync_ValidInput_ReturnsSuccess()
     {
-        // Arrangement
+        // Préparer
         var tool = new MyCustomTool();
         var call = new ToolCall 
         { 
@@ -412,10 +461,10 @@ public class MyToolTests
             }
         };
         
-        // Exécution
+        // Exécuter
         var result = await tool.ExecuteAsync(call);
         
-        // Assertion
+        // Vérifier
         Assert.IsTrue(result.Success);
         Assert.IsNotNull(result.Output);
     }
@@ -434,47 +483,47 @@ Tester le flux complet :
 
 ### Système de stockage
 
-- La version Default utilise le stockage JSON basé sur les fichiers
+- La version Default utilise le stockage JSON basé sur des fichiers
 - La version Fast utilise le moteur de stockage en mémoire SpeedyPack (format .spk)
-- SpeedyPack adopte le mappage de répertoire en mémoire + cache d'entrées + file d'attente d'écriture asynchrone
+- SpeedyPack utilise la cartographie de répertoires en mémoire + cache d'entrées + file d'écriture asynchrone
 - Les requêtes par index temporel utilisent l'interface `ITimeStorage`
 
-### Ordonnanceur de la boucle principale
+### Ordonnanceur de la Boucle Principale
 
-- Ordonnancement équitable par time-slice basé sur l'horloge
+- Ordonnancement équitable par créneaux temporels piloté par horloge
 - Chien de garde pour détecter les opérations bloquées
 - Disjoncteur pour prévenir les défaillances en cascade
 
-## Meilleures pratiques
+## Bonnes pratiques
 
-### 1. Toujours vérifier les permissions
+### 1. Toujours vérifier les autorisations
 
-Toute opération initiée par l'IA doit passer par la chaîne de permissions :
+Toute opération initiée par l'IA doit passer par la chaîne d'autorisations :
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+bool allowed = permissionManager.CheckPermission(callerId, permissionType, resource);
+if (!allowed)
 {
-    return Result.Denied(permission.Reason);
+    return Result.Denied("Permission denied");
 }
 ```
 
 ### 2. Utiliser le localisateur de services
 
-Enregistrement et récupération globale des services :
+Enregistrement et récupération globaux des services :
 
 ```csharp
 // Pendant l'initialisation
 ServiceLocator.Instance.Register<ICustomService>(myService);
 
-// Quand nécessaire
+// Lorsque nécessaire
 var service = ServiceLocator.Instance.Get<ICustomService>();
 ```
 
-### 3. Suivre la séparation corps-cerveau
+### 3. Suivre la séparation Corps-Cerveau
 
-- Le corps gère l'état et les déclenchements
-- Le cerveau gère les interactions IA et l'exécution des outils
+- Le Corps gère l'état et les déclenchements
+- Le Cerveau gère les interactions IA et l'exécution des outils
 
 ### 4. Implémenter une gestion des erreurs appropriée
 
@@ -495,14 +544,14 @@ catch (Exception ex)
 
 1. Forker le dépôt
 2. Créer une branche de fonctionnalité (`git checkout -b feature/amazing-feature`)
-3. Committer vos modifications avec des commits conventionnels
+3. Commiter vos modifications avec des commits conventionnels
 4. Pousser vers la branche (`git push origin feature/amazing-feature`)
 5. Ouvrir une Pull Request
 
 ### Format des messages de commit
 
 ```
-<type>(<portée>): <description>
+<type>(<scope>): <description>
 
 Exemples :
 feat(tool): add custom calendar tool
@@ -513,3 +562,6 @@ docs: update development guide
 ## Prochaines étapes
 
 - 📚 Lire le [guide d'architecture](architecture.md)
+- 📖 Explorer la [référence API](api-reference.md)
+- 🔒 Consulter la [documentation de sécurité](security.md)
+- 🚀 Consulter le [guide de démarrage rapide](getting-started.md)

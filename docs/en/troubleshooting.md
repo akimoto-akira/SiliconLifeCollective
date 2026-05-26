@@ -1,8 +1,8 @@
-﻿# Troubleshooting Guide
+# Troubleshooting Guide
 
 > **Version: v0.2.0-alpha**
 
-**English** | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md) | [Русский](../ru-RU/troubleshooting.md)
+**English** | [Deutsch](../de-DE/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md) | [Русский](../ru-RU/troubleshooting.md)
 
 ## Common Issues
 
@@ -74,7 +74,7 @@ ollama pull qwen2.5:7b
 ollama list
 ```
 
-#### Issue: DashScope 404 error
+#### Issue: Bailian 404 error
 
 **Symptoms**:
 ```
@@ -82,10 +82,25 @@ HTTP 404: Model not found
 ```
 
 **Solution**:
-1. Verify API key is correct
-2. Check model name matches DashScope catalog
-3. Verify region endpoint is correct
-4. Check account has access to the model
+1. Verify the API key is correct
+2. Check that the model name matches the Bailian catalog
+3. Verify the regional endpoint is correct
+4. Check that the account has access to the model
+
+#### Issue: Volcengine Ark connection failed
+
+**Symptoms**:
+```
+HTTP 401: Unauthorized
+or
+HTTP 404: Endpoint not found
+```
+
+**Solution**:
+1. Verify the API key is correct
+2. Check that the Endpoint URL format is correct (default: `https://ark.cn-beijing.volces.com/api/v3/chat/completions`)
+3. Confirm the Model parameter uses the inference endpoint ID (e.g., `ep-20241212123456-abcde`), not the model name
+4. Check that the account has access to the endpoint
 
 ---
 
@@ -111,17 +126,17 @@ taskkill /PID <PID> /F
 lsof -ti:8080 | xargs kill -9
 ```
 
-**Or change the port in configuration**.
+**Or change the port in the configuration.**
 
-#### Issue: Being won't start
+#### Issue: Silicon Being fails to start
 
 **Symptoms**:
-- Being status shows "Error"
+- Silicon Being status shows "Error"
 - Logs show initialization failure
 
 **Solution**:
-1. Check soul file exists and is valid
-2. Verify AI client is configured
+1. Check that the Soul File exists and is valid
+2. Verify the AI client is configured
 3. Check logs for specific errors:
 ```bash
 tail -f logs/*.log
@@ -140,18 +155,18 @@ OutOfMemoryException
 dotnet run --project src/SiliconLife.Default --server.gcHeapCount 4
 ```
 
-2. **SiliconLife.Fast**: Fast version itself has higher memory usage (~500MB). If memory is persistently insufficient, it is recommended to:
-   - Reduce the number of concurrent silicon beings
-   - Clean old data to free up memory
+2. **SiliconLife.Fast**: The Fast version inherently has higher memory usage (~500MB). If memory remains insufficient, consider:
+   - Reducing the number of concurrent Silicon Beings
+   - Cleaning up old data to free memory
 
-3. Clean old data:
+3. Clean up old data:
 ```bash
 # Archive old logs
 mv logs/ logs-archive/
 mkdir logs
 
-# Clean old memories
-# Via Web UI: Memory Management > Cleanup
+# Clean up old memories
+# Via Web UI: Memory Management > Clean
 ```
 
 > **Tip**: SiliconLife.Default has lower memory usage (~200MB), suitable for memory-constrained environments; SiliconLife.Fast has higher memory usage but better performance, suitable for production environments.
@@ -164,37 +179,38 @@ mkdir logs
 
 **Symptoms**:
 ```
-Permission denied: disk:write
+Permission denied: FileAccess C:\Windows
 ```
 
 **Solution**:
 1. Check current permissions:
 ```bash
-curl http://localhost:8080/api/permissions
+curl http://localhost:8080/api/permissions/list
 ```
 
-2. Grant permission:
+2. Grant permissions:
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "resource": "disk:write",
-    "allowed": true,
-    "duration": 3600
+    "permissionType": "FileAccess",
+    "resourcePrefix": "C:\\Projects",
+    "result": "Allowed",
+    "description": "Allow project directory access"
   }'
 ```
 
-3. Or use Web UI: Permission Management
+3. Or use the Web UI: Permission Management
 
 #### Issue: Permissions not expiring
 
 **Symptoms**:
-- Permissions remain active after expiration time
+- Permissions remain valid after expiration time
 
 **Solution**:
 1. Check system clock synchronization
-2. Verify `expiresAt` field set correctly
-3. Clear permission cache
+2. Verify the `expiresAt` field is set correctly
+3. Clear the permission cache
 
 ---
 
@@ -206,8 +222,8 @@ curl -X POST http://localhost:8080/api/permissions \
 - Browser shows "Connection refused"
 
 **Solution**:
-1. Verify server is running
-2. Check correct URL: `http://localhost:8080`
+1. Verify the server is running
+2. Check the correct URL: `http://localhost:8080`
 3. Check firewall settings
 4. Check logs for startup errors
 
@@ -218,20 +234,20 @@ curl -X POST http://localhost:8080/api/permissions \
 - Chat not streaming
 
 **Solution**:
-1. Check browser supports SSE
+1. Check browser SSE support
 2. Disable proxy buffering for SSE
 3. Check network stability
-4. Try different browser
+4. Try a different browser
 
 #### Issue: UI looks broken
 
 **Symptoms**:
-- Styles incorrect
-- Layout broken
+- Styles are incorrect
+- Layout is broken
 
 **Solution**:
 1. Clear browser cache
-2. Try different skin: Settings > Skin
+2. Try a different skin: Settings > Skin
 3. Check browser console for errors
 4. Disable browser extensions
 
@@ -248,7 +264,7 @@ IOException: Access denied
 
 **Solution**:
 1. Check file permissions
-2. Verify storage path exists
+2. Verify the storage path exists
 3. Check disk space
 4. Run with appropriate permissions
 
@@ -265,29 +281,29 @@ IOException: Access denied
 # Via Web UI: System > Storage Check
 ```
 
-3. Manually fix corrupted files
+3. Manually repair corrupted files
 
-#### Issue: SpeedyPack Storage File Corruption (Fast Version)
+#### Issue: SpeedyPack storage file corruption (Fast version)
 
 **Symptoms**:
-- `.spk` file cannot be loaded
+- `.spk` files cannot be loaded
 - SpeedyStorage initialization fails
 
 **Solution**:
 1. Use the `SiliconLife.Speedy.Manager` tool to check and repair `.spk` files
-2. Check if the `.spk.idx` index file matches the `.spk` file
+2. Check that the `.spk.idx` index file matches the `.spk` file
 3. If the index file is corrupted, delete the `.spk.idx` file and the system will automatically rebuild the index
-4. Restore the `.spk` file from backup
+4. Restore `.spk` files from backup
 
-#### Issue: SpeedyPack Auto-Compaction Failure (Fast Version)
+#### Issue: SpeedyPack auto-compaction failure (Fast version)
 
 **Symptoms**:
-- `.spk` file keeps growing
+- `.spk` files keep growing
 - Disk space running low
 
 **Solution**:
-1. Check if `SpeedyPackAutoCompactor` is running normally
-2. Manually trigger compaction
+1. Check that `SpeedyPackAutoCompactor` is running properly
+2. Manually trigger a compaction operation
 3. Check compaction threshold configuration
 4. Use the `SiliconLife.Speedy.Manager` tool for manual compaction
 
@@ -303,10 +319,10 @@ Tool "xyz" not found
 ```
 
 **Solution**:
-1. Verify tool name is correct
-2. Check tool exists in Tools directory
+1. Verify the tool name is correct
+2. Check that the tool is in the Tools directory
 3. Rebuild the project
-4. Check tool is properly implemented
+4. Check that the tool is properly implemented
 
 #### Issue: Tool returns error
 
@@ -318,14 +334,14 @@ Tool execution failed: ...
 **Solution**:
 1. Check tool logs
 2. Verify input parameters
-3. Test tool independently
+3. Test the tool independently
 4. Check permissions
 
 ---
 
 ### Plugin Issues
 
-#### Issue: Plugin Load Failure
+#### Issue: Plugin load failure
 
 **Symptoms**:
 ```
@@ -335,23 +351,23 @@ Plugin load failed: Security check failed
 **Solution**:
 1. Check if the plugin references forbidden namespaces (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
 2. Verify the plugin only references assemblies in the trusted assembly whitelist
-3. Check if the plugin correctly implements the `IPlugin` interface
+3. Check that the plugin correctly implements the `IPlugin` interface
 4. Check logs for detailed security check failure reasons
 
-#### Issue: Plugin Tool Not Registered
+#### Issue: Plugin tools not registered
 
 **Symptoms**:
-- Plugin loads successfully but tools don't appear in the tool list
+- Plugin loads successfully but tools do not appear in the tool list
 
 **Solution**:
-1. Confirm the tool class in the plugin correctly implements the `ITool` interface
-2. Check if the tool class is public
-3. Verify `ToolManager.ScanAllPluginAssemblies()` is being called
+1. Confirm that the tool class in the plugin correctly implements the `ITool` interface
+2. Check that the tool class is public
+3. Verify that `ToolManager.ScanAllPluginAssemblies()` is being called
 4. Rebuild the plugin and restart the application
 
 ---
 
-### Work Notes Issues
+### Work Note Issues
 
 #### Issue: Cannot create work note
 
@@ -361,34 +377,34 @@ Failed to create work note
 ```
 
 **Solution**:
-1. Check being exists and is running
-2. Verify storage path has write permissions
-3. Check content is not empty (content required)
-4. View logs for detailed error
+1. Check that the Silicon Being exists and is in a running state
+2. Verify the storage path has write permissions
+3. Check that the content is not empty (content is required)
+4. Check logs for detailed error information
 
 #### Issue: Note search returns no results
 
 **Symptoms**:
-- Search keyword returns empty results
-- But certain relevant notes exist
+- Search keywords return empty results
+- But relevant notes are known to exist
 
 **Solution**:
-1. Check keyword spelling is correct
+1. Check keyword spelling
 2. Try using more general keywords
-3. Verify note contains the keyword (case-sensitive)
-4. Increase `max_results` parameter value
+3. Verify that the notes contain the keyword (case-sensitive)
+4. Increase the `max_results` parameter value
 
 #### Issue: Note directory generation is slow
 
 **Symptoms**:
 - Long response time when generating directory
-- Being has large number of notes (>1000 pages)
+- Silicon Being has a large number of notes (>1000 pages)
 
 **Solution**:
-1. This is normal, needs to iterate through all notes
-2. Consider archiving old notes regularly
-3. Use search function instead of directory browsing
-4. Planned optimization: Add directory caching mechanism
+1. This is normal behavior — all notes need to be traversed
+2. Consider periodically archiving old notes
+3. Use search functionality instead of directory browsing
+4. Planned optimization: add directory caching mechanism
 
 ---
 
@@ -402,9 +418,9 @@ No knowledge triples found
 ```
 
 **Solution**:
-1. Verify subject and predicate spelling
-2. Check if knowledge has been added to network
-3. Use search function for fuzzy matching:
+1. Verify the spelling of subject and predicate
+2. Check that the knowledge has been added to the network
+3. Use the search function for fuzzy matching:
 ```json
 {
   "action": "search",
@@ -412,7 +428,7 @@ No knowledge triples found
 }
 ```
 
-#### Issue: Knowledge path finding fails
+#### Issue: Knowledge path lookup failure
 
 **Symptoms**:
 ```
@@ -420,12 +436,12 @@ No path found between concepts
 ```
 
 **Solution**:
-1. Verify both concepts exist in knowledge network
-2. Check if association path exists (may have no direct or indirect relationship)
+1. Verify that both concepts exist in the Knowledge Network
+2. Check if there is a connecting path (there may be no direct or indirect relationship)
 3. Try adding more knowledge to establish connections
-4. Reduce path length limit (if set)
+4. Lower the path length limit (if one is set)
 
-#### Issue: Knowledge validation fails
+#### Issue: Knowledge validation failure
 
 **Symptoms**:
 ```
@@ -433,12 +449,12 @@ Knowledge validation failed
 ```
 
 **Solution**:
-1. Check triple format is correct (subject, predicate, object required)
-2. Verify confidence is in 0.0-1.0 range
+1. Check that the triple format is correct (subject, predicate, object are all required)
+2. Verify the confidence score is in the 0.0–1.0 range
 3. Check for duplicate triples
-4. View validation error details for specific issues
+4. Review validation error details for specific issues
 
-#### Issue: Knowledge network statistics inaccurate
+#### Issue: Knowledge Network statistics are inaccurate
 
 **Symptoms**:
 - Statistics don't match expectations
@@ -446,8 +462,8 @@ Knowledge validation failed
 
 **Solution**:
 1. Statistics may take a few seconds to update (caching)
-2. Check if delete operation didn't execute successfully
-3. Restart application to force statistics refresh
+2. Check if any delete operations failed
+3. Restart the application to force a statistics refresh
 4. Re-query statistics via API
 
 ---
@@ -462,22 +478,89 @@ Failed to create project
 ```
 
 **Solution**:
-1. Check project name is not empty (required)
-2. Verify project name is not duplicate
-3. Check storage path has write permissions
-4. View logs for detailed error
+1. Check that the project name is not empty (required)
+2. Verify the project name is not a duplicate
+3. Check that the storage path has write permissions
+4. Check logs for detailed error information
 
-#### Issue: Project data lost
+#### Issue: Project data loss
 
 **Symptoms**:
-- Project information cannot load
-- Project files corrupted
+- Project information cannot be loaded
+- Project files are corrupted
 
 **Solution**:
-1. Check if project storage directory exists
+1. Check that the project storage directory exists
 2. Restore project data from backup
-3. Verify JSON file format is correct
-4. Manually fix corrupted project files
+3. Verify the JSON file format is correct
+4. Manually repair corrupted project files
+
+#### Issue: Project role assignment failure
+
+**Symptoms**:
+```
+Failed to assign role
+```
+
+**Solution**:
+1. Confirm that the Silicon Being has joined the project
+2. Check that the role name is valid
+3. Verify that the operator is a Silicon Curator
+4. Check logs for detailed error information
+
+#### Issue: Workflow cannot start
+
+**Symptoms**:
+- Workflow instance creation fails
+- State transitions not executing
+
+**Solution**:
+1. Check that a workflow template has been defined
+2. Verify the initial state is set correctly
+3. Confirm the project has a workflow template bound to it
+4. Check workflow logs for transition errors
+
+---
+
+### Tool Permission Issues
+
+#### Issue: Tool operation denied
+
+**Symptoms**:
+```
+Tool operation denied: network:post
+```
+
+**Solution**:
+1. Check the Silicon Being's tool permission configuration:
+```bash
+curl http://localhost:8080/api/beings/tool-permissions?beingId=<id>
+```
+
+2. Update tool permissions:
+```bash
+curl -X PUT http://localhost:8080/api/beings/tool-permissions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "beingId": "being-uuid",
+    "permissions": {
+      "network:post": "allowed"
+    }
+  }'
+```
+
+3. Or use the Web UI: Silicon Being → Tool Permissions
+
+#### Issue: Project tool permissions not taking effect
+
+**Symptoms**:
+- Project-level tool permissions not working as expected
+
+**Solution**:
+1. Confirm that project-level permissions are configured correctly
+2. Check for conflicts between Silicon Being-level and project-level permissions
+3. Project-level permissions are independent of Silicon Being-level permissions; the intersection of both is used
+4. Check audit logs to confirm permission check results
 
 ---
 
@@ -496,7 +579,7 @@ Edit configuration:
 
 ### Check Logs
 
-Logs are stored at:
+Logs are stored in:
 ```
 logs/
 ├── system.log
@@ -505,14 +588,14 @@ logs/
 └── error.log
 ```
 
-View in real-time:
+View in real time:
 ```bash
 tail -f logs/*.log
 ```
 
-### Using Debugger
+### Using the Debugger
 
-**SiliconLife.Default (Default Implementation)**:
+**SiliconLife.Default (default implementation)**:
 ```bash
 # Run with debugger
 dotnet run --project src/SiliconLife.Default --configuration Debug
@@ -521,7 +604,7 @@ dotnet run --project src/SiliconLife.Default --configuration Debug
 # Via IDE: Attach to Process > SiliconLife.Default
 ```
 
-**SiliconLife.Fast (High-Performance Version)**:
+**SiliconLife.Fast (high-performance version)**:
 ```bash
 # Run with debugger
 dotnet run --project src/SiliconLife.Fast --configuration Debug
@@ -530,7 +613,7 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 # Via IDE: Attach to Process > SiliconLife.Fast
 ```
 
-> **Suggestion**: For development debugging, it is recommended to use SiliconLife.Default. After architecture verification passes, use SiliconLife.Fast for production deployment.
+> **Recommendation**: Use SiliconLife.Default during development and debugging, then switch to SiliconLife.Fast for production deployment after architecture validation is complete.
 
 ---
 
@@ -538,21 +621,21 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 
 ### Slow Response Time
 
-**Optimize**:
+**Optimization**:
 1. Reduce AI model complexity
 2. Enable caching
-3. Clean old data
+3. Clean up old data
 4. Increase system resources
 
 ### High CPU Usage
 
-**Check**:
-- Too many beings running
+**Check for**:
+- Too many Silicon Beings running
 - Infinite loops in tools
 - Frequent timer executions
 
 **Solution**:
-- Reduce concurrent beings
+- Reduce concurrent Silicon Beings
 - Optimize tool code
 - Adjust timer intervals
 
@@ -564,7 +647,7 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 ```
 
 **Optimize**:
-- Clean old memories
+- Clean up old memories
 - Reduce context size
 - Implement pagination
 
@@ -572,9 +655,9 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 
 ## Getting Help
 
-### View Documentation
+### Read the Documentation
 
-- [Quick Start Guide](getting-started.md)
+- [Getting Started Guide](getting-started.md)
 - [Development Guide](development-guide.md)
 - [API Reference](api-reference.md)
 - [Architecture Guide](architecture.md)
@@ -595,15 +678,15 @@ Always check logs first for error details.
 
 ### System Crash
 
-1. Check logs for cause
-2. Restart application:
+1. Check logs for the cause
+2. Restart the application:
 
-**SiliconLife.Default (Default Implementation)**:
+**SiliconLife.Default (default implementation)**:
 ```bash
 dotnet run --project src/SiliconLife.Default
 ```
 
-**SiliconLife.Fast (Main Production Version)**:
+**SiliconLife.Fast (recommended production version)**:
 ```bash
 dotnet run --project src/SiliconLife.Fast
 ```
@@ -612,14 +695,14 @@ dotnet run --project src/SiliconLife.Fast
 
 ### Data Loss
 
-1. Stop application immediately
+1. Stop the application immediately
 2. Check backup files
 3. Restore data
 4. Verify integrity
 
 ### Security Breach
 
-1. Stop all beings
+1. Stop all Silicon Beings
 2. Revoke all permissions
 3. Check audit logs
 4. Review access controls
@@ -632,14 +715,14 @@ dotnet run --project src/SiliconLife.Fast
 ### Best Practices
 
 1. **Regular Backups**
-   - Backup data directory
-   - Backup configuration
-   - Test recovery process
+   - Back up data directories
+   - Back up configurations
+   - Test restore procedures
 
 2. **Monitor Resources**
-   - Watch CPU/memory usage
+   - Monitor CPU/memory usage
    - Monitor disk space
-   - Check network connectivity
+   - Check network connections
 
 3. **Stay Updated**
    - Update .NET SDK
@@ -657,5 +740,5 @@ dotnet run --project src/SiliconLife.Fast
 
 - 📚 Read the [Architecture Guide](architecture.md)
 - 🛠️ Check the [Development Guide](development-guide.md)
-- 🚀 See the [Quick Start Guide](getting-started.md)
-- 🔒 Review the [Security Documentation](security.md)
+- 🚀 See the [Getting Started Guide](getting-started.md)
+- 🔒 Check the [Security Documentation](security.md)

@@ -1,4 +1,4 @@
-﻿# Web-UI-Leitfaden
+# Web-UI-Leitfaden
 
 > **Version: v0.2.0-alpha**
 
@@ -16,23 +16,23 @@ Standard-URL: `http://localhost:8080`
 
 ### Hauptbereiche
 
-1. **Dashboard** - Systemübersicht und Metriken
+1. **Dashboard** - Systemübersicht und Kennzahlen
 2. **Beings** - Silicon Beings verwalten
-3. **Chat** - Mit Beings interagieren (mit Datei-Upload, Live-SSE)
-4. **Chat-Verlauf** - Chat-Historie von Silicon Beings anzeigen (Sitzungsliste, Nachrichtendetails)
+3. **Chat** - Mit Beings interagieren (Datei-Upload, Echtzeit-SSE unterstützt)
+4. **Chat-Historie** - Chat-Historie der Silicon Beings einsehen (Sitzungsliste, Nachrichtendetails)
 5. **Aufgaben** - Aufgabenverwaltung (persönliche Aufgaben)
-6. **Timer** - Timer-Konfiguration (Erstellen, Pausieren, Ausführungshistorie)
+6. **Timer** - Timer-Konfiguration (erstellen, anhalten, Ausführungshistorie)
 7. **Konfiguration** - Systemeinstellungen (KI-Clients, Lokalisierung)
-8. **Berechtigungen** - Zugriffskontrolle (ACL-Verwaltung, Berechtigungsabfragen)
-9. **Protokolle** - Systemprotokolle (nach Level filtern, Zeitbereichsabfragen)
+8. **Berechtigungen** - Zugriffssteuerung (ACL-Verwaltung, Berechtigungsabfrage)
+9. **Protokolle** - Systemprotokolle (Filterung nach Stufe, Zeitbereichsabfrage)
 10. **Audit** - Token-Nutzung und Audit-Trail
-11. **Speicher** - Being-Speicher (Timeline-Ansicht, erweiterte Filterung)
-12. **Wissen** - Wissensdatenbank (Tripelverwaltung, Pfadfindung)
-13. **Code-Browser** - Code-Exploration (Dateibaum, Syntax-Hervorhebung)
+11. **Speicher** - Being-Speicher (Zeitleistenansicht, erweiterte Filterung)
+12. **Wissen** - Wissensdatenbank (Tripel-Verwaltung, Pfadfindung)
+13. **Code-Browser** - Code-Exploration (Dateibaum, Syntaxhervorhebung)
 14. **Code-Editor** - Code-Bearbeitung mit Hover-Tooltips (Monaco Editor)
-15. **Projekte** - Projektverwaltung (Workspaces, Aufgaben, Arbeitsnotizen)
-16. **Executoren** - Executor-Verwaltung (Festplatte, Netzwerk, Befehlszeile)
-17. **Hilfe** - Hilfedokumentationssystem (mehrsprachige Unterstützung, Themensuche)
+15. **Projekte** - Projektverwaltung (Arbeitsbereiche, Aufgaben, Arbeitsnotizen)
+16. **Executoren** - Executor-Verwaltung (Disk, Netzwerk, Kommandozeile)
+17. **Hilfe** - Hilfedokumentationssystem (Mehrsprachigkeitsunterstützung, Themensuche)
 18. **Über** - Systeminformationen und Version
 
 ---
@@ -41,14 +41,14 @@ Standard-URL: `http://localhost:8080`
 
 ### Funktionen
 
-- Systemleistungsmetriken (CPU, Speicher, Betriebszeit)
+- Systemleistungskennzahlen (CPU, Speicher, Laufzeit)
 - Being-Statusübersicht
 - KI-Nutzungsstatistiken
 - Schnellaktionen
 
 ### Echtzeit-Updates
 
-Verwenden Sie SSE (Server-Sent Events) für Echtzeitdaten:
+Echtzeitdaten über SSE (Server-Sent Events) abrufen:
 
 ```javascript
 const dashboard = new EventSource('/api/dashboard/events');
@@ -66,17 +66,17 @@ dashboard.onmessage = (event) => {
 
 Zeigt alle Beings mit:
 - Name und ID
-- Aktueller Status (Läuft/Gestoppt/Fehler)
+- Aktuellem Status (Läuft/Gestoppt/Fehler)
 - Soul-Datei-Link
-- Schnellaktionen (Start/Stopp/Konfiguration)
+- Schnellaktionen (Starten/Stoppen/Konfigurieren)
 
 ### Being-Details
 
 - Vollständige Konfiguration
 - Soul-Datei-Editor
 - Aufgabenhistorie
-- Speicher-Viewer
-- Leistungsmetriken
+- Speicher-Betrachter
+- Leistungskennzahlen
 
 ### Being erstellen
 
@@ -93,25 +93,25 @@ Zeigt alle Beings mit:
 
 ### Funktionen
 
-- Echtzeit-Nachrichtenstream
+- Echtzeit-Nachrichtenstrom
 - Nachrichtenverlauf
-- Multi-Sitzungs-Unterstützung
-- Tool-Aufruf-Visualisierung
+- Mehrere Sitzungen unterstützt
+- Werkzeugaufruf-Visualisierung
 
 ### Chat verwenden
 
 1. Being auswählen
 2. Nachricht eingeben
-3. Gestreamte Antwort anzeigen
-4. Tool-Ausführung in Echtzeit beobachten
+3. Streaming-Antwort anzeigen
+4. Werkzeugausführung in Echtzeit verfolgen
 
-### Tool-Aufruf-Anzeige
+### Werkzeugaufruf-Anzeige
 
-Wenn KI ein Tool aufruft:
+Wenn die KI ein Werkzeug aufruft:
 ```
-🔧 Tool: calendar
+🔧 Werkzeug: calendar
 📥 Eingabe: {"date": "2026-04-20"}
-📤 Ausgabe: "农历四月初三"
+📤 Ausgabe: "Dritter Tag des vierten Mondmonats"
 ```
 
 ---
@@ -120,26 +120,27 @@ Wenn KI ein Tool aufruft:
 
 ### KI-Clients
 
-KI-Backend konfigurieren:
+KI-Backends konfigurieren:
 - Ollama (lokal)
-- DashScope (Cloud)
-- Volcengine Ark (Cloud)
-- Benutzerdefinierte Clients
+- Bailian (Cloud)
+- Volcano Engine Ark (Cloud)
+- Benutzerdefinierter Client
 
-### Storage-Einstellungen
+### Speichereinstellungen
 
-- Default-Version: Basispfad, Zeitindex, Bereinigungsstrategie
-- Fast-Version: SpeedyPack-Speicher-Engine-Konfiguration, .spk-Dateiverwaltung, Auto-Komprimierungseinstellungen
+- Default-Version: Basispfad, Zeitindex, Bereinigungsrichtlinie
+- Fast-Version: SpeedyPack-Speicher-Engine-Konfiguration, .spk-Dateiverwaltung, automatische Komprimierungseinstellungen
 
 ### Lokalisierung
 
-Zwischen 29 Sprachvarianten wechseln:
-- Chinesisch (6): Simplified, Traditional, Singapore, Macau, Taiwan, Malaysia
-- Englisch (10): US, UK, Canadian, Australian, Indian, Singapore, South African, Irish, New Zealand, Malaysia
-- Spanisch (2): Spanien, Mexiko
-- Deutsch (5): Deutschland, Österreich, Schweiz, Luxemburg, Liechtenstein
-- Französisch (3): Frankreich, Kanada, Schweiz
+Umschalten zwischen 34 Sprachvarianten:
+- Chinesisch (6 Varianten): Vereinfachtes Chinesisch, Traditionelles Chinesisch, Singapur-Chinesisch, Macau-Chinesisch, Taiwan-Chinesisch, Malaysia-Chinesisch
+- Englisch (10 Varianten): Amerikanisch, Britisch, Kanadisch, Australisch, Indisch, Singapur, Südafrika, Irisch, Neuseeland, Malaysia
+- Spanisch (2 Varianten): Spanien, Mexiko
+- Deutsch (5 Varianten): Deutschland, Österreich, Schweiz, Luxemburg, Liechtenstein
+- Französisch (3 Varianten): Frankreich, Kanada, Schweiz
 - Japanisch, Koreanisch, Tschechisch
+- Russisch, Portugiesisch (2 Varianten), Italienisch, Niederländisch, Polnisch, Schwedisch
 
 ---
 
@@ -147,13 +148,13 @@ Zwischen 29 Sprachvarianten wechseln:
 
 ### Verfügbare Skins
 
-1. **Admin** - Professionelle Admin-Oberfläche
-2. **Chat** - Konversationszentriertes Design
+1. **Admin** - Professionelle Verwaltungsoberfläche
+2. **Chat** - Chat-zentriertes Design
 3. **Creative** - Kreativer und künstlerischer Stil
 4. **Dev** - Entwicklerorientiertes Layout
-5. **HighContrast** - Hoher Kontrast (Fast-Version)
+5. **HighContrast** - Hochkontrast-Theme (Fast-Version)
 6. **Minimal** - Minimalistischer Stil (Fast-Version)
-7. **Light** - Helles Thema (Fast-Version)
+7. **Light** - Helles Theme (Fast-Version)
 
 ### Skin wechseln
 
@@ -162,9 +163,9 @@ Zwischen 29 Sprachvarianten wechseln:
 3. Gewünschten Skin wählen
 4. Oberfläche aktualisiert sich sofort
 
-### Benutzerdefinierter Skin
+### Benutzerdefinierte Skins
 
-Erstellen Sie benutzerdefinierte Skins durch Implementierung von `ISkin`:
+Benutzerdefinierte Skins durch Implementierung von `ISkin` erstellen:
 
 ```csharp
 public class MySkin : ISkin
@@ -182,30 +183,45 @@ public class MySkin : ISkin
 
 ## Berechtigungsverwaltung
 
-### Berechtigungen anzeigen
+### Berechtigungen einsehen
 
 - Alle Berechtigungsregeln auflisten
 - Nach Benutzer oder Ressource filtern
-- Ablaufdatum anzeigen
+- Ablaufdaten einsehen
 
 ### Berechtigungsregel hinzufügen
 
 1. Auf **Regel hinzufügen** klicken
 2. Konfigurieren:
-   - Benutzer
-   - Ressource (z.B. `disk:read`)
+   - Berechtigungstyp (z. B. `FileAccess`, `NetworkAccess`)
+   - Ressourcenpräfix (z. B. `C:\Projects`, `api.github.com`)
    - Erlauben/Verweigern
-   - Dauer
+   - Beschreibung
 3. Speichern
 
 ### Audit-Trail
 
-Alle Berechtigungsentscheidungen anzeigen:
+Alle Berechtigungsentscheidungen einsehen:
 - Zeitstempel
 - Benutzer
 - Ressource
 - Entscheidung
-- Grund
+- Begründung
+
+### Werkzeug-Berechtigungsverwaltung
+
+Werkzeug-Operationsberechtigungen für Silicon Beings und Projekte verwalten:
+
+1. **Silicon Being Werkzeugberechtigungen**:
+   - Zu **Beings** navigieren → Being auswählen → **Werkzeugberechtigungen**
+   - Aktuelle Berechtigungskonfiguration einsehen
+   - Pro Operation Erlauben/Verweigern festlegen
+   - Berechtigungsvorlagen anwenden (readonly/restricted/full)
+
+2. **Projekt-Werkzeugberechtigungen**:
+   - Zu **Projekte** navigieren → Projekt auswählen → **Werkzeugberechtigungen**
+   - Projektweite Werkzeugberechtigungen sind unabhängig von Being-Ebene
+   - Berechtigungsisolierung zwischen Projekten umsetzen
 
 ---
 
@@ -257,11 +273,11 @@ Alle Berechtigungsentscheidungen anzeigen:
 
 ---
 
-## Protokoll-Viewer
+## Protokoll-Betrachter
 
 ### Funktionen
 
-- Nach Level filtern (Info/Warnung/Fehler)
+- Nach Stufe filtern (Info/Warnung/Fehler)
 - Nach Schlüsselwort suchen
 - Zeitbereichsauswahl
 - Echtzeit-Updates
@@ -270,10 +286,10 @@ Alle Berechtigungsentscheidungen anzeigen:
 
 Jeder Protokolleintrag zeigt:
 - Zeitstempel
-- Level
+- Stufe
 - Quelle
 - Nachricht
-- Stack-Trace (für Fehler)
+- Stack-Trace (bei Fehlern)
 
 ---
 
@@ -281,12 +297,12 @@ Jeder Protokolleintrag zeigt:
 
 ### Token-Nutzung
 
-- Insgesamt verwendete Tokens
+- Verwendete Gesamt-Token
 - Aufschlüsselung nach Modell
 - Kostenberechnung
 - Zeitbasierte Diagramme
 
-### Berichte exportieren
+### Bericht exportieren
 
 Audit-Daten herunterladen:
 - CSV-Format
@@ -299,54 +315,54 @@ Audit-Daten herunterladen:
 
 ### Funktionen
 
-- Syntax-Hervorhebung (Monaco Editor)
+- Syntaxhervorhebung (Monaco Editor)
 - Code-Vervollständigung
 - Hover-Tooltips für Bezeichner
 - Echtzeit-Kompilierung
 
 ### Hover-Tooltips
 
-Mauszeiger über Bezeichner bewegen für:
+Maus über einen beliebigen Bezeichner bewegen, um zu sehen:
 - Typinformationen
 - Dokumentation
-- Definitionsort
-- Referenzen
+- Definitionsposition
+- Verweise
 
 ---
 
-## Chat-Verlauf-Anzeige
+## Chat-Historie-Anzeige
 
 ### Funktionen
 
-- Silicon Being Chat-Historie durchsuchen
-- Sitzungslistenanzeige
-- Nachrichtendetails anzeigen
-- Timeline-Ansicht
+- Chat-Historie der Silicon Beings durchsuchen
+- Sitzungsliste anzeigen
+- Nachrichtendetails einsehen
+- Zeitleistenansicht
 
-### Chat-Verlauf verwenden
+### Chat-Historie verwenden
 
-1. Zu **Beings**-Seite navigieren
-2. Auf **Chat-Verlauf**-Link des Silicon Being klicken
-3. Sitzungsliste anzeigen:
+1. Zur **Beings**-Seite navigieren
+2. Auf den **Chat-Historie**-Link des Silicon Beings klicken
+3. Sitzungsliste einsehen:
    - Sitzungstitel
    - Erstellungszeit
    - Nachrichtenanzahl
-4. Sitzung für Details anklicken:
+4. Auf Sitzung klicken, um Details zu sehen:
    - Vollständige Nachrichtenhistorie
    - Zeitstempel
-   - Senderinformationen
-   - Tool-Aufrufprotokoll
+   - Absenderinformationen
+   - Werkzeugaufruf-Datensätze
 
 ### Technische Implementierung
 
 - **Controller**: `ChatHistoryController`
-- **ViewModel**: `ChatHistoryViewModel`
+- **View-Modell**: `ChatHistoryViewModel`
 - **Views**:
   - `ChatHistoryListView` - Sitzungsliste
   - `ChatHistoryDetailView` - Nachrichtendetails
 - **API-Routen**:
-  - `/api/chat/conversations` - Sitzungsliste abrufen
-  - `/api/chat/messages?channelId={channelId}` - Nachrichtendetails abrufen
+  - `/api/chat-history/{beingId}/conversations` - Sitzungsliste abrufen
+  - `/api/chat-history/{beingId}/conversation/{conversationId}` - Nachrichtendetails abrufen
 
 ---
 
@@ -354,45 +370,45 @@ Mauszeiger über Bezeichner bewegen für:
 
 ### Funktionen
 
-- Dateiquelldialog
-- Multi-Datei-Upload-Unterstützung
-- Datei-Metadatenverwaltung
+- Dateiquellen-Dialog
+- Multi-Datei-Upload unterstützt
+- Dateimetadaten-Verwaltung
 - Upload-Fortschrittsanzeige
 
 ### Datei-Upload verwenden
 
-1. Auf **Datei hochladen**-Button im Chat klicken
-2. Dateiquelldialog öffnet sich
-3. Dateiquelle wählen:
+1. In der Chat-Oberfläche auf **Datei hochladen** klicken
+2. Dateiquellen-Dialog öffnet sich
+3. Dateiquelle auswählen:
    - Lokale Datei
    - Dateisystempfad
-4. Dateien auswählen (Mehrfachauswahl unterstützt)
+4. Datei(en) auswählen (Mehrfachauswahl unterstützt)
 5. Upload bestätigen
-6. Dateiinformationen werden an Nachricht angehängt
+6. Dateiinformationen werden an die Nachricht angehängt
 
 ### Unterstützte Dateitypen
 
-- Textdateien (.txt, .md, .json, .xml, etc.)
-- Codedateien (.cs, .js, .py, .java, etc.)
-- Konfigurationsdateien (.yml, .yaml, .ini, .conf, etc.)
-- Dokumentdateien (.csv, .log, etc.)
+- Textdateien (.txt, .md, .json, .xml, usw.)
+- Codedateien (.cs, .js, .py, .java, usw.)
+- Konfigurationsdateien (.yml, .yaml, .ini, .conf, usw.)
+- Dokumentdateien (.csv, .log, usw.)
 
 ---
 
-## Ladeindikator
+## Ladeanzeige
 
 ### Funktionen
 
-- Ladestatusanzeige auf Chat-Seite
+- Ladezustandsanzeige auf der Chat-Seite
 - Automatische Curator-Sitzungsauswahl
-- Datenladefortschrittsfeedback
+- Datenlade-Fortschrittsrückmeldung
 
 ### Verhalten
 
-- Ladeanimation bei Seitenladung
-- Automatisch ausgeblendet nach Datenladung
-- Curator-Sitzung automatisch ausgewählt (wenn vorhanden)
-- Mehrsprachige Ladetexte
+- Ladeanimation beim Laden der Seite anzeigen
+- Automatisch ausblenden, wenn Daten geladen sind
+- Curator-Sitzung automatisch auswählen (falls vorhanden)
+- Mehrsprachige Ladetipp-Texte
 
 ---
 
@@ -400,28 +416,28 @@ Mauszeiger über Bezeichner bewegen für:
 
 ### Funktionsübersicht
 
-Das Hilfedokumentationssystem bietet mehrsprachige Hilfeunterstützung für Silicon Beings und Benutzer.
+Das Hilfedokumentationssystem bietet mehrsprachige Hilfedokumentation für Silicon Beings und Benutzer.
 
-### Hilfe verwenden
+### Hilfedokumentation verwenden
 
-1. Zu **Hilfe**-Seite navigieren
-2. Hilfe-Themenliste anzeigen:
-   - Schnellstartanleitung
-   - Tool-Nutzungsreferenz
-   - Berechtigungsverwaltungsleitfaden
-   - Fehlerbehebungshandbuch
+1. Zur **Hilfe**-Seite navigieren
+2. Hilfethemen-Liste einsehen:
+   - Schnellstart-Leitfaden
+   - Werkzeug-Referenz
+   - Berechtigungsverwaltungs-Leitfaden
+   - Fehlerbehebungs-Handbuch
    - Entwicklungsleitfaden
-3. Thema für Details anklicken:
-   - Strukturierter Dokumentinhalt (Markdown-Rendering)
-   - Mehrsprachige Unterstützung (folgt Systemlokalisierung)
-   - Verwandte Themenempfehlungen
-4. Suchfunktion für schnelle Lokalisierung:
-   - Schlüsselwortsuche (unterstützt Chinesisch, Englisch)
+3. Auf Thema klicken, um detaillierten Inhalt zu sehen:
+   - Strukturierte Dokumentation (Markdown-gerendert)
+   - Mehrsprachige Unterstützung (folgt System-Lokalisierungseinstellungen)
+   - Verwandte Themen-Empfehlungen
+4. Suchfunktion zur schnellen Lokalisierung verwenden:
+   - Schlüsselwortsuche (Chinesisch und Englisch unterstützt)
    - Suchergebnisse nach Relevanz sortiert
 
-### Hilfe für Silicon Beings
+### Silicon Being Zugriff auf Hilfe
 
-Silicon Beings können über das `help`-Tool auf Hilfe zugreifen:
+Silicon Beings können über das `help`-Werkzeug auf die Hilfedokumentation zugreifen:
 ```json
 {
   "action": "get_topics"
@@ -431,59 +447,68 @@ Silicon Beings können über das `help`-Tool auf Hilfe zugreifen:
 ### Technische Implementierung
 
 - **Controller**: `HelpController`
-- **Tool**: `HelpTool`
+- **Werkzeug**: `HelpTool`
 - **API-Routen**:
-  - `/api/help` - Hilfe-Themenliste abrufen
-  - `/api/help/{topicId}` - Themandetails abrufen
-  - `/api/help/search?q=keyword` - Hilfedokumentation suchen
+  - `/api/help` - Hilfethemen-Liste abrufen
+  - `/api/help/{topicId}` - Themendetails abrufen
+  - `/api/help/search?q=keyword` - Hilfedokumentation durchsuchen
 
 ---
 
-## Projekt-Workspace (Neu)
+## Projektarbeitsbereich (Neu)
 
 ### Funktionsübersicht
 
-Der Projekt-Workspace bietet eine strukturierte Arbeitsumgebung mit Projektverwaltung, Aufgabenverfolgung und Arbeitsnotizen.
+Der Projektarbeitsbereich bietet eine strukturierte Arbeitsumgebung mit Unterstützung für Projektverwaltung, Aufgabenverfolgung und Arbeitsnotizen.
 
 ### Projektverwaltung
 
 1. **Projekt erstellen**:
    - Projektname und Beschreibung
    - Projekt-Tags (Kategorisierung)
-   - Projektstatus (Aktiv, Abgeschlossen, Archiviert)
-2. **Projektdetails anzeigen**:
-   - Projektgrundinformationen
+   - Projektstatus (In Bearbeitung, Abgeschlossen, Archiviert)
+2. **Projektdetails einsehen**:
+   - Projekt-Basisinformationen
    - Zugehörige Aufgabenliste
-   - Arbeitsnotizenliste
-   - Projektfortschrittsstatistik
+   - Arbeitsnotizen-Liste
+   - Projektfortschrittsstatistiken
 3. **Projekt archivieren**: Historische Daten behalten, aber nicht mehr aktiv
+4. **Projektrollenverwaltung**:
+   - Silicon Beings Projektrollen zuweisen (z. B. developer, reviewer, manager)
+   - Rollenzuweisungen entfernen
+   - Projektmitglieder und Rollenliste einsehen
+5. **Projekt-Workflows**:
+   - Workflow-Vorlagenliste einsehen
+   - Workflow-Vorlage an Projekt binden
+   - Workflow-Instanzstatus einsehen
+   - Workflow-Ausführungsprotokolle einsehen
 
 ### Arbeitsnotizen (Privat)
 
-Persönliche Arbeitsnotizen von Silicon Beings, ähnlich einem Tagebuch:
+Persönliche Arbeitsnotizen der Silicon Beings, ähnlich einem Tagebuch:
 
 1. **Notiz erstellen**:
-   - Zusammenfassung (kurze Beschreibung)
-   - Inhalt (Markdown-Unterstützung)
-   - Schlüsselwörter (für Suche)
-   - Automatischer Zeitstempel
+   - Zusammenfassung (Kurzbeschreibung)
+   - Inhalt (Markdown-Format unterstützt)
+   - Schlüsselwörter (für die Suche)
+   - Automatische Zeitstempel-Erfassung
 2. **Notizen verwalten**:
-   - Timeline-Browsing (Seitendesign)
-   - Notizen suchen (nach Schlüsselwort, Zusammenfassung, Inhalt)
-   - Inhaltsverzeichnis generieren (schnelle Strukturanzeige)
+   - Zeitleistenbasiertes Durchblättern (seitenbasiertes Design)
+   - Notizen durchsuchen (nach Schlüsselwort, Zusammenfassung, Inhalt)
+   - Verzeichnis generieren (schnelle Übersicht der Notizstruktur)
    - Notizen aktualisieren und löschen
-3. **Berechtigungskontrolle**:
-   - Standardmäßig privat, nur für Being selbst zugänglich
+3. **Berechtigungssteuerung**:
+   - Standardmäßig privat, nur das Being selbst hat Zugriff
    - Silicon Curator kann alle Notizen verwalten
 
 ### Technische Implementierung
 
 - **Controller**: `WorkNoteController`
-- **Tools**: `WorkNoteTool`, `ProjectTool`, `ProjectWorkNoteTool`
+- **Werkzeuge**: `WorkNoteTool`, `ProjectTool`, `ProjectWorkNoteTool`
 - **API-Routen**:
-  - `/api/worknotes` - Arbeitsnotizenliste abrufen
+  - `/api/worknotes` - Arbeitsnotizen-Liste abrufen
   - `/api/worknotes/{id}` - Notizdetails abrufen
-  - `/api/worknotes/search?q=keyword` - Notizen suchen
+  - `/api/worknotes/search?q=keyword` - Notizen durchsuchen
   - `/api/worknotes/directory` - Notizverzeichnis generieren
   - `/api/projects` - Projektverwaltungs-API
 
@@ -493,7 +518,7 @@ Persönliche Arbeitsnotizen von Silicon Beings, ähnlich einem Tagebuch:
 
 Die Web-UI passt sich verschiedenen Bildschirmgrößen an:
 - Desktop: Vollständiges Layout
-- Tablet: Komprimierte Seitenleiste
+- Tablet: Verkleinerte Seitenleiste
 - Mobil: Einklappbares Menü
 
 ---
@@ -511,24 +536,24 @@ Die Web-UI passt sich verschiedenen Bildschirmgrößen an:
 
 ## Fehlerbehebung
 
-### Keine Verbindung möglich
+### Verbindung nicht möglich
 
 **Prüfen**:
 - Server läuft
-- Port 8080 nicht blockiert
+- Port 8080 wird nicht blockiert
 - Firewall-Einstellungen
 
 ### SSE funktioniert nicht
 
 **Prüfen**:
 - Browser unterstützt SSE
-- Kein Proxy buffered SSE
+- Kein Proxy puffert SSE
 - Netzwerkstabilität
 
 ### Langsame Leistung
 
 **Optimieren**:
-- Protokolldetailgrad reduzieren
+- Protokollierungsdetaillierungsgrad verringern
 - Alte Audit-Daten bereinigen
 - Systemressourcen prüfen
 
@@ -536,7 +561,7 @@ Die Web-UI passt sich verschiedenen Bildschirmgrößen an:
 
 ## Nächste Schritte
 
-- 📚 [Architekturleitfaden](architecture.md) lesen
-- 🛠️ [Entwicklungsleitfaden](development-guide.md) prüfen
+- 📚 [Architektur-Leitfaden](architecture.md) lesen
+- 🛠️ [Entwicklungsleitfaden](development-guide.md) ansehen
 - 📖 [API-Referenz](api-reference.md) erkunden
 - 🚀 [Schnellstart-Leitfaden](getting-started.md) ansehen

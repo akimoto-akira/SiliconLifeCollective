@@ -1,170 +1,170 @@
-﻿# Descobre os teus companheiros digitais
+# Conheça os Seus Companheiros Digitais
 
 > **Versão: v0.2.0-alpha**
 
-[English](../en/promo.md) | [Deutsch](../de-DE/promo.md) | [Français](../fr-FR/promo.md) | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Čeština](../cs-CZ/promo.md) | [Русский](../ru-RU/promo.md) | [Italiano](../it-IT/promo.md) | [Polski](../pl-PL/promo.md) | **Português**
+[English](../en/promo.md) | [Deutsch](../de-DE/promo.md) | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Čeština](../cs-CZ/promo.md) | [Русский](../ru-RU/promo.md)
 
-## E se o teu computador pudesse pensar sozinho?
+## E se o seu computador pudesse pensar por si mesmo?
 
-Imagina um grupo de assistentes úteis que vivem no teu computador. Não são simples programas à espera das tuas ordens — têm a sua própria personalidade, lembram-se do que lhes disseste e podem colaborar para completar tarefas.
+Imagine ter um grupo de assistentes prestativos a viver no seu computador. Eles não são apenas programas à espera dos seus comandos — têm as suas próprias personalidades, lembram-se do que lhes disse e podem trabalhar em equipa para completar tarefas.
 
-Isto é exatamente o que construímos.
+É isto que construímos.
 
 ---
 
-## O que podem fazer por ti?
+## O que eles podem fazer por si?
 
-### 🗓️ Nunca mais percas um compromisso importante
+### 🗓️ Nunca mais perca datas importantes
 
-Pergunta-lhes qualquer data em qualquer sistema de calendário:
-- "Quando é o Ano Novo Lunar este ano?"
+Pergunte-lhes sobre qualquer data em qualquer sistema de calendário:
+- "Quando é o Ano Novo Chinês este ano?"
 - "Quando começa o Ramadão?"
 - "Quantos dias faltam para o meu aniversário?"
 
-Compreendem mais de 30 sistemas de calendário diferentes em todo o mundo.
+Eles compreendem 32 sistemas de calendário diferentes de todo o mundo.
 
-### 💬 Conversa com eles a qualquer momento
+### 💬 Converse com eles a qualquer momento
 
-Fala com eles como com um amigo. Lembram-se das conversas anteriores, por isso não precisas de te repetir. Cada um tem uma personalidade única — alguns são mais sérios, outros mais brincalhões. Tu escolhes com quem queres trabalhar.
+Fale com eles como falaria com um amigo. Eles lembram-se das conversas anteriores, para que não tenha de se repetir. Cada um tem uma personalidade única — alguns mais sérios, outros mais brincalhões. Escolha com quem quer trabalhar.
 
-### 📝 Ajuda nas tarefas do dia a dia
+### 📝 Ajuda com tarefas diárias
 
-Diz-lhes do que precisas, e encontrarão uma forma de o fazer:
-- "Lê este ficheiro para mim e resume-o"
-- "Verifica que sites estão disponíveis agora"
-- "Envia uma mensagem ao meu colega"
-- "Lembra-me todas as segundas-feiras às 9 para verificar os emails"
+Diga-lhes o que precisa e eles descobrirão como fazer:
+- "Leia este ficheiro e faça um resumo para mim"
+- "Verifique que sites estão disponíveis agora"
+- "Envie uma mensagem ao meu colega"
+- "Lembre-me de verificar o email toda segunda-feira às 9h"
 
-### ⏰ Define lembretes inteligentes
+### ⏰ Defina lembretes inteligentes
 
-Não são apenas simples alarmes — compreendem esquemas complexos:
-- "Lembra-me no décimo quinto dia de cada mês lunar"
-- "Lembra-me 3 dias antes de cada feriado nacional"
-- "Avisa-me todas as manhãs às 8"
+Não são apenas alarmes comuns — eles compreendem horários complexos:
+- "Lembre-me no décimo quinto dia de cada mês lunar"
+- "Avise-me 3 dias antes de qualquer feriado nacional"
+- "Faça check-in comigo todos os dias às 8h da manhã"
 
-### 🤝 Colaborar em equipa
+### 🤝 Trabalhem em equipa
 
-Cria múltiplos assistentes com diferentes especializações. Um pode especializar-se na organização da tua agenda, outro na pesquisa de informações, outro ainda na escrita criativa. Podem até falar entre si e coordenar o trabalho!
-
----
-
-## Em que se diferenciam da IA clássica?
-
-### Têm memória
-
-A maioria das IAs esquece tudo após cada conversa. Estes companheiros lembram-se das coisas importantes que lhes disseste e acumulam conhecimentos ao longo do tempo.
-
-### Podem agir
-
-Não te dão apenas conselhos — podem efetivamente **fazer coisas** — ler ficheiros, pesquisar na Internet, enviar mensagens, criar lembretes e muito mais.
-
-### Trabalham enquanto dormes
-
-Atribui-lhes tarefas, e continuarão a trabalhar mesmo quando não estás. Regressa e descobre que o trabalho está feito.
-
-### Têm personalidade
-
-Cada companheiro é moldado por um "ficheiro da alma" — imagina como a sua ficha de personagem. Podes criar assistentes com diferentes estilos de comunicação, especializações e métodos de trabalho.
+Crie múltiplos assistentes com diferentes especialidades. Um pode ser bom a organizar o seu horário, outro a pesquisar informações, outro a escrita criativa. Eles podem até falar entre si e coordenar o seu trabalho!
 
 ---
 
-## Para quem é?
+## Como é que isto é diferente de uma IA normal?
 
-### 🏠 Utiladores privados
-- Acompanha os eventos familiares em diferentes sistemas de calendário
-- Configura assistentes pessoais para a tua rotina diária
-- Faz conversas divertidas com diferentes personalidades IA
+### Eles têm memória
 
-### 💼 Freelancers e criativos
-- Assistentes de pesquisa que recolhem informações para os teus projetos
-- Parceiros de escrita que te ajudam a fazer brainstorming de ideias
-- Gestores de agenda que te mantêm no caminho certo
+A maioria das IAs esquece tudo após cada conversa. Estes companheiros lembram-se das coisas importantes que lhes disse, acumulando conhecimento ao longo do tempo.
 
-### 🎓 Estudantes e investigadores
-- Companheiros de aprendizagem que te ajudam a organizar os teus estudos
-- Especialistas em calendários para pesquisa histórica ou cultural
-- Gestores de tarefas para projetos de longo prazo
+### Eles podem agir
 
-### 👨‍💻 Entusiastas de tecnologia
-- Explora os limites da tecnologia dos agentes IA
-- Cria assistentes personalizados para tarefas específicas
-- Constrói uma equipa de trabalhadores IA especializados
+Em vez de apenas lhe darem conselhos, eles podem realmente **fazer coisas** — ler ficheiros, navegar na internet, enviar mensagens, criar lembretes e muito mais.
+
+### Eles trabalham enquanto dorme
+
+Defina tarefas para eles e continuarão a trabalhar mesmo quando não está por perto. Volte e encontre o trabalho já concluído.
+
+### Eles têm personalidade
+
+Cada companheiro é moldado por um "Ficheiro da Alma" — pense nisso como a sua ficha de personagem. Pode criar assistentes com diferentes estilos de comunicação, áreas de especialização e métodos de trabalho.
 
 ---
 
-## Começar é simples
+## Para quem é isto?
 
-1. **Descarrega e inicia** — Funciona imediatamente
-2. **Cria o teu primeiro companheiro** — Dá-lhe um nome e uma personalidade
-3. **Inicia a conversa** — Escreve simplesmente do que precisas, como se estivesses a conversar com um amigo
-4. **Observa-os a trabalhar** — Vê-os enquanto realizam tarefas, definem lembretes e aprendem com as tuas interações
+### 🏠 Utilizadores Domésticos
+- Acompanhar eventos familiares em diferentes sistemas de calendário
+- Configurar assistentes pessoais para gerir a rotina diária
+- Conversas divertidas com diferentes personalidades de IA
 
-Nenhum conhecimento técnico necessário. Se sabes enviar uma mensagem, sabes usar isto.
+### 💼 Freelancers e Criadores
+- Assistentes de pesquisa para recolher informação para os seus projectos
+- Parceiros de escrita para ajudar a brainstorming de ideias
+- Gestores de agenda para o manter dentro dos prazos
+
+### 🎓 Estudantes e Investigadores
+- Companheiros de estudo para ajudar a organizar a aprendizagem
+- Especialistas em calendário para pesquisa histórica ou cultural
+- Gestores de tarefas para projectos de longo prazo
+
+### 👨‍💻 Entusiastas de Tecnologia
+- Explorar a vanguarda da tecnologia de agentes de IA
+- Criar assistentes personalizados para tarefas específicas
+- Construir equipas de trabalhadores de IA especializados
+
+---
+
+## Começar é fácil
+
+1. **Descarregue e execute** — Funciona logo de saída da caixa
+2. **Crie o seu primeiro companheiro** — Dê-lhe um nome e uma personalidade
+3. **Comece a conversar** — Basta escrever o que precisa, como conversaria com um amigo
+4. **Veja-os trabalhar** — Observe-os completar tarefas, definir lembretes e aprender com as suas interacções
+
+Não precisa de conhecimentos técnicos. Se sabe enviar mensagens de texto, sabe usar isto.
 
 ---
 
 ## O que o torna especial?
 
-### Privacidade em primeiro lugar
+### Privacidade em Primeiro Lugar
 
-Tudo funciona no **teu computador**. As tuas conversas, memórias e dados nunca saem da tua máquina, a menos que peças explicitamente para aceder à Internet. Manténs o controlo total.
+Tudo corre no **seu próprio computador**. As suas conversas, memórias e dados nunca saem da sua máquina, a menos que peça explicitamente para acederem à internet. Tem controlo total.
 
-### Sem custos de subscrição
+### Sem Taxas de Subscrição
 
-Este é um software open source. Usa-o gratuitamente, modifica-o, partilha-o com os teus amigos. Sem mensalidade, sem nível premium, sem funcionalidades bloqueadas.
+Este é software open source. Use gratuitamente, modifique, partilhe com amigos. Sem mensalidades, sem tiers premium, sem funcionalidades bloqueadas.
 
-### Cresce contigo
+### Cresce Consigo
 
-Começa com um assistente simples. À medida que descobres o que é possível, cria companheiros mais especializados. O sistema está desenhado para passar do uso ocasional a fluxos de trabalho de produtividade sérios.
+Comece com um assistente simples. Quando descobrir o que é possível, crie companheiros mais especializados. O sistema é desenhado para escalar desde uso casual até fluxos de trabalho de produtividade séria.
 
-### Sistema de plugins extensível
+### Sistema de Plugins Extensível
 
-Estende as funcionalidades através de plugins — ferramentas e capacidades criadas pela comunidade, fáceis de adicionar. Cada plugin é executado numa sandbox segura, garantindo a segurança do sistema.
+Expanda as funcionalidades com plugins — ferramentas e capacidades construídas pela comunidade que podem ser adicionadas facilmente. Cada plugin corre numa sandbox segura, garantindo a segurança do sistema.
 
-### Escolha de dupla versão
+### Escolha de Duas Versões
 
-- **Versão Default**: Aplicação de consola leve, adequada para desenvolvimento, depuração e ambientes com recursos limitados
-- **Versão Fast**: Aplicação Windows de alto desempenho com motor de armazenamento em memória SpeedyPack, adequada para implementações em produção
+- **Versão Default**: Aplicação de consola leve, adequada para depuração de desenvolvimento e ambientes com recursos limitados
+- **Versão Fast**: Aplicação de ambiente de trabalho multiplataforma de alto desempenho (Windows/macOS/Linux), usando motor de armazenamento em memória SpeedyPack, adequada para implantação de produção
 
-### Construído pela comunidade
+### Construído pela Comunidade
 
-Programadores de todo o mundo trabalham para o melhorar. Regularmente são adicionadas novas funcionalidades, sistemas de calendário, línguas e capacidades.
+Programadores de todo o mundo contribuem para torná-lo melhor. Novas funcionalidades, sistemas de calendário, suporte de idiomas e capacidades são adicionados regularmente.
 
 ---
 
-## Exemplos concretos
+## Exemplos do Mundo Real
 
-### Exemplo 1: Planear uma viagem
+### Exemplo 1: Planear uma Viagem
 
-**Tu**: "Vou viajar para o Japão no mês que vem. Podes ajudar-me a planear?"
+**Você**: "Vou ao Japão no próximo mês. Podes ajudar-me a planear?"
 
-**O teu assistente**:
-- Verifica os feriados japoneses durante a tua visita
+**O seu assistente**:
+- Verifica os feriados no calendário japonês durante a sua visita
 - Pesquisa as previsões meteorológicas
-- Cria um programa de viagem dia a dia
+- Cria um documento de itinerário dia a dia
 - Define lembretes para os prazos de reserva
-- Partilha o programa com os assistentes dos teus companheiros de viagem
+- Partilha o plano com os assistentes dos seus companheiros de viagem
 
-### Exemplo 2: Gerir um projeto
+### Exemplo 2: Gerir um Projecto
 
-**Tu**: "Preciso de terminar este trabalho de pesquisa até ao fim do mês."
+**Você**: "Preciso de terminar este artigo de pesquisa até ao fim do mês."
 
-**A tua equipa**:
-- **Assistente de pesquisa**: Recolhe e resume as fontes relevantes
-- **Parceiro de escrita**: Ajuda-te a estruturar os argumentos e a refinar o texto
+**A sua equipa**:
+- **Assistente de pesquisa**: Recolhe fontes relevantes e resume-as
+- **Parceiro de escrita**: Ajuda-o a estruturar o argumento e a refinar a prosa
 - **Gestor de agenda**: Define marcos e envia lembretes de progresso
-- **Verificador de factos**: Verifica as citações e cruza as informações
+- **Verificador de factos**: Valida citações e verifica informações cruzadas
 
-Coordenam-se automaticamente e mantêm-se mutuamente informados sobre o progresso.
+Eles coordenam-se automaticamente, actualizando-se mutuamente sobre o progresso.
 
-### Exemplo 3: Calendário cultural
+### Exemplo 3: Calendário Cultural
 
-**Tu**: "Quais são os feriados importantes este ano?"
+**Você**: "Quais são os feriados importantes deste ano?"
 
-**O teu assistente**:
-- Verifica o Ano Novo Lunar e o Festival do Meio do Outono no calendário lunar chinês
-- Encontra o Ramadão e o Eid al-Fitr no calendário islâmico
-- Determina as datas das Grandes Festas no calendário hebraico
+**O seu assistente**:
+- Verifica o Ano Novo Chinês e o Festival do Meio do Outono no calendário lunar chinês
+- Procura o Ramadão e o Eid al-Fitr no calendário islâmico
+- Encontra as datas dos Dias Sagrados no calendário hebraico
 - Cria um calendário unificado com todas as datas importantes
 - Define lembretes uma semana antes de cada evento
 
@@ -172,27 +172,27 @@ Coordenam-se automaticamente e mantêm-se mutuamente informados sobre o progress
 
 ## Visão
 
-Acreditamos que o futuro da computação não reside em ferramentas mais poderosas — mas em **companheiros mais inteligentes**.
+Acreditamos que o futuro da computação não é sobre ferramentas mais poderosas — é sobre **companheiros mais inteligentes**.
 
-Em vez de passares horas a clicar em aplicações e a organizar informações, imagina ter parceiros digitais de confiança que:
-- Compreendem do que precisas
-- Lembram as tuas preferências
-- Realizam proativamente as tarefas de rotina
-- Colaboram sem problemas
-- Respeitam a tua privacidade
+Em vez de passar horas a clicar em aplicações e organizar informação, imagine ter parceiros digitais de confiança que:
+- Compreendem o que precisa
+- Lembram-se das suas preferências
+- Tratam proactivamente das tarefas rotineiras
+- Trabalham em equipa de forma integrada
+- Respeitam a sua privacidade
 
-Este futuro está aqui. E está apenas a começar.
-
----
-
-## Junta-te a nós
-
-Quer estejas curioso sobre a IA, que precises de ajuda para te organizares ou que queiras simplesmente experimentar algo novo — há lugar para ti aqui.
-
-**Experimenta hoje. Cria o teu primeiro companheiro digital. Descobre o que é possível.**
+Esse futuro já chegou. E está apenas no início.
 
 ---
 
-*Construído com cuidado por Akimoto Akira e pela comunidade open source*
+## Junte-se a Nós
+
+Quer seja curioso sobre IA, precise de ajuda para se organizar, ou apenas queira experimentar algo novo — há um lugar para si aqui.
+
+**Experimente hoje. Crie o seu primeiro companheiro digital. Veja o que é possível.**
+
+---
+
+*Construído com dedicação por 天源垦骥 e pela comunidade open source*
 
 [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective) | [Gitee](https://gitee.com/hoshinokennji/SiliconLifeCollective) | [YouTube](https://www.youtube.com/@hoshinokennji) | [Bilibili](https://space.bilibili.com/617827040)

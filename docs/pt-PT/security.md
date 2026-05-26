@@ -1,154 +1,154 @@
-﻿# Segurança
+# Desenho de Segurança
 
 > **Versão: v0.2.0-alpha**
 
-[English](../en/security.md) | [Deutsch](../de-DE/security.md) | [Français](../fr-FR/security.md) | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Čeština](../cs-CZ/security.md) | [Русский](../ru-RU/security.md) | [Italiano](../it-IT/security.md) | [Polski](../pl-PL/security.md) | **Português**
+[English](../en/security.md) | [Deutsch](../de-DE/security.md) | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Čeština](../cs-CZ/security.md) | [Русский](../ru-RU/security.md)
 
-## Visão geral
+## Visão Geral
 
-A segurança do Silicon Life Collective é baseada num modelo de **defesa em camadas**. Princípio central: **todas as operações I/O devem passar por executores**, que impõem verificações de permissões antes da execução.
+A segurança do Silicon Life Collective é construída sobre um modelo de **defesa em camadas**. Princípio central: **Todas as operações de I/O devem passar por executores**, que impõem verificação de permissões antes da execução.
 
 ```
-Chamada de ferramenta → Executor → Gestor de permissões → Cache de frequência → Callback → (IsCurator: perguntar ao utilizador | Non-curator: ACL global)
+Chamada de Ferramenta → Executor → Gestor de Permissões → Cache de Frequência → Callback → (IsCurator: Perguntar ao Utilizador | Non-curator: ACL Global)
 ```
 
 ---
 
-## Modelo de permissões
+## Modelo de Permissões
 
-### Tipos de permissões
+### Tipos de Permissão
 
 | Tipo | Descrição |
 |------|-------------|
 | `NetworkAccess` | Pedidos HTTP/HTTPS de saída |
 | `CommandLine` | Execução de comandos shell |
-| `FileAccess` | Operações de ficheiros e diretórios |
+| `FileAccess` | Operações de ficheiros e directórios |
 | `Function` | Chamadas de funções sensíveis |
 | `DataAccess` | Acesso a dados do sistema ou do utilizador |
 
-### Resultados de permissões
+### Resultados de Permissão
 
-Cada verificação de permissão retorna um de três resultados:
+Cada verificação de permissões retorna um de três resultados:
 
 | Resultado | Comportamento |
 |--------|----------|
 | **Allowed (Permitido)** | A operação prossegue imediatamente |
-| **Denied (Negado)** | A operação é bloqueada, registada no log de auditoria |
-| **AskUser (Perguntar ao utilizador)** | A operação é pausada, requer confirmação do utilizador |
+| **Denied (Negado)** | A operação é bloqueada, registo de auditoria gravado |
+| **AskUser (Perguntar ao Utilizador)** | A operação é suspensa, requer confirmação do utilizador |
 
-### Papel especial: Curator de silício
+### Papel Especial: Silicon Curator
 
-O Curator de silício possui o nível mais alto de permissões (`IsCurator = true`). As verificações de permissões para o curator são abreviadas para **Permitido**, a menos que o utilizador substitua explicitamente.
+O Silicon Curator possui o nível mais elevado de permissões (`IsCurator = true`). Quando a cadeia de permissões atinge a ramificação, as operações do Curator solicitam confirmação do utilizador via `IPermissionAskHandler`, em vez de serem automaticamente permitidas. Os beings não Curator consultam a ACL Global.
 
-### Gestor de permissões privado
+### Gestor de Permissões Privado
 
-Cada Silicon Being tem a sua própria instância **privada de PermissionManager**. O estado das permissões não é partilhado entre os beings.
+Cada Silicon Being tem a sua própria instância **privada de PermissionManager**. O estado das permissões não é partilhado entre beings.
 
 ---
 
-## Fluxo de verificação de permissões
+## Fluxo de Verificação de Permissões
 
-A prioridade de consulta é: **1. Cache de frequência → 2. Função callback → 3. Ramificação (IsCurator/GlobalACL)**
+A prioridade de consulta é: **1. Cache de Frequência → 2. Função Callback → 3. Ramificação (IsCurator/GlobalACL)**
 
 ```
 ┌─────────────┐
-│ Chamada de  │
-│ ferramenta  │
+│ Chamada de   │
+│ Ferramenta   │
 └──────┬──────┘
        │
        ▼
 ┌─────────────┐     ┌─────────────────────┐
-│  Executor   │────▶│ Gestor de permissões│
-│ (disco/rede/│     │ privado (por being) │
-│  cmd...)    │     └────────┬────────────┘
-└─────────────┘            │
-                           ▼
-                  ┌─────────────────┐
-                  │ 1. Cache de     │──Correspondência──▶ Permitir / Negar
-                  │    frequência   │
-                  │ (alta negação   │
-                  │  > alta         │
-                  │  permissão)     │
-                  └────────┬────────┘
-                           │ Sem correspondência
-                           ▼
-                  ┌─────────────────┐
-                  │ 2. Callback de  │
-                  │    permissão    │──▶ Permitir / Negar / Perguntar
-                  └────────┬────────┘
-                           │ Perguntar ao utilizador
-                           ▼
-                  ┌─────────────────┐
-                  │ 3. IsCurator?   │
-                  └────────┬────────┘
-                           │
-                 ┌─────────┴─────────┐
-                 │                   │
-                 ▼ Sim               ▼ Não
-          ┌─────────────┐    ┌─────────────┐
-          │ Perguntar ao│    │ ACL global  │
-          │ utilizador  │    │ Consultar   │
-          │ (AskHandler)│    │ regras      │
-          └─────────────┘    └─────────────┘
+│  Executor    │────▶│ Gestor de           │
+│ (Disco/Rede/ │     │ Permissões Privado  │
+│  Linha Cmd.) │     │ (por being)         │
+└─────────────┘     └────────┬────────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │ 1. Cache de     │──Correspondência──▶ Permitido / Negado
+                    │    Frequência   │
+                    │ (HighDeny tem   │
+                    │  prioridade     │
+                    │  sobre HighAllow│
+                    └────────┬────────┘
+                             │ Sem correspondência
+                             ▼
+                    ┌─────────────────┐
+                    │ 2. Callback de  │──▶ Permitido / Negado / Perguntar ao Utilizador
+                    │    Permissões   │
+                    └────────┬────────┘
+                             │ Perguntar ao Utilizador
+                             ▼
+                    ┌─────────────────┐
+                    │ 3. IsCurator?   │
+                    └────────┬────────┘
+                             │
+                   ┌─────────┴─────────┐
+                   │                   │
+                   ▼ Sim               ▼ Não
+            ┌─────────────┐    ┌─────────────┐
+            │ Perguntar   │    │ ACL Global  │
+            │ ao Utiliz.  │    │ Consultar   │
+            │ (AskHandler)│    │ regras      │
+            └─────────────┘    └─────────────┘
 ```
 
-**Ponto-chave**: O executor apenas vê um valor booleano (permitir/negar). O gestor de permissões processa internamente a decisão tri-estado (permitir/negar/perguntar ao utilizador) e resolve a pergunta ao utilizador antes de retornar ao executor.
+**Ponto chave**: Os executores apenas veem valores booleanos (permitido/negado). O Gestor de Permissões processa internamente a decisão de três estados (permitido/negado/perguntar ao utilizador) e resolve a pergunta ao utilizador antes de retornar ao executor.
 
 ---
 
-## Executores (fronteira de segurança)
+## Executors (Fronteira de Segurança)
 
-Os executores são o **único** caminho para operações I/O. Eles impõem:
+Os executores são o **único** caminho para operações de I/O. Eles impõem:
 
-### Modelo de execução estático
+### Thread de Despacho Independente
 
-As implementações atuais dos executores (`DiskExecutor`, `NetworkExecutor`, `CommandLineExecutor`) são **classes estáticas** que fornecem execução síncrona com controlo de timeout:
+Cada executor possui uma **thread de despacho independente**:
 
-- Cada executor verifica as permissões através do `PermissionManager` do chamador antes de executar.
-- As operações são executadas em `Task.Run` com timeout configurável.
-- Em caso de timeout, a operação é tratada como falhada.
-- `ExecutorBase` fornece uma classe abstrata base com suporte a thread em segundo plano e fila de pedidos para extensões futuras.
+- Isolamento de threads entre executores — o bloqueio da thread de um executor não afecta os outros.
+- Cada executor pode definir limites de recursos independentes (CPU, memória, etc.).
+- Gestão de pool de threads para as threads dos executores.
 
-### Fila de pedidos
+### Fila de Pedidos
 
 Cada executor mantém uma fila de pedidos:
 
 - Os pedidos são encaminhados para o executor correspondente por tipo.
-- Suporta filas de prioridade.
+- Suporte a fila com prioridade.
 - Controlo de timeout por pedido.
 
-### Verificação de permissões nos executores
+### Bloqueio de Thread para Verificação de Permissões
 
-Quando uma ferramenta inicia um acesso a recursos:
+Quando uma ferramenta inicia o acesso a recursos:
 
-1. O executor recebe o pedido.
-2. O executor consulta o gestor de permissões privado do being através de `ServiceLocator.Instance.GetPermissionManager(callerId)`.
-3. Se a permissão for negada, a operação é bloqueada imediatamente.
-4. Se o callback retornar AskUser (caminho do curator), a thread do executor **mantém-se bloqueada** à espera da resposta do utilizador.
-5. O being apenas vê o resultado final (sucesso ou recusa) — nunca vê o estado intermédio de "pendente" ou "em espera".
-6. Apenas o Curator de silício aciona um pedido real ao utilizador. Os beings comuns consultam a ACL global de forma síncrona sem bloquear.
-7. Em caso de timeout, o pedido é tratado como negado e o bloqueio da thread é libertado.
+1. O executor recebe o pedido e **bloqueia a sua thread**.
+2. O executor consulta o Gestor de Permissões privado do being.
+3. Se o callback retornar Perguntar ao Utilizador, a thread do executor **mantém-se bloqueada** aguardando a resposta do utilizador.
+4. O being apenas vê o resultado final (sucesso ou recusa) — nunca vê o estado intermédio "pendente" ou "aguardando".
+5. Apenas o Silicon Curator acciona verdadeiramente prompts ao utilizador. Os beings comuns consultam a ACL Global de forma síncrona sem bloquear.
+6. Em caso de timeout, o pedido é tratado como negado e o bloqueio da thread é libertado.
 
-### Tipos de executores
+### Tipos de Executor
 
-| Executor | Âmbito | Timeout predefinido |
+| Executor | Âmbito | Timeout Predefinido |
 |----------|-------|-----------------|
-| `DiskExecutor` | Leitura/escrita de ficheiros, operações de diretórios | 30 segundos |
-| `NetworkExecutor` | Pedidos HTTP, ligações WebSocket | 30 segundos |
-| `CommandLineExecutor` | Execução de comandos shell | 30 segundos |
-| `DynamicCompilationExecutor` | Compilação em memória Roslyn | N/A (delega para CompilationCore) |
+| `DiskExecutor` | Leitura/escrita de ficheiros, operações de directório | 30 segundos |
+| `NetworkExecutor` | Pedidos HTTP, ligações WebSocket | 60 segundos |
+| `CommandLineExecutor` | Execução de comandos shell | 120 segundos |
 
-### Isolamento de exceções e tolerância a falhas
+> **Nota**: O `DynamicCompilationExecutor` (localizado no namespace `SiliconLife.Core.Compilation`) é responsável pela compilação em memória Roslyn, não pertence à categoria de executores de I/O, mas está igualmente sujeito ao sistema de permissões.
 
-- Uma exceção num executor não afeta os outros.
+### Isolamento de Excepções e Tolerância a Falhas
+
+- As excepções de um executor não afectam os outros executores.
 - Reinício automático em caso de falha da thread.
-- Disjuntor: para temporariamente o executor após falhas consecutivas para prevenir falhas em cascata.
+- Circuit breaker: Após falhas consecutivas, o executor é temporariamente parado para prevenir falhas em cascata.
 
 ---
 
-## ACL global (lista de controlo de acesso)
+## ACL Global (Lista de Controlo de Acesso)
 
-Tabela de regras partilhada persistida no armazenamento, gerida apenas pelo Curator de silício:
+Tabela de regras partilhada persistida no armazenamento, gerida apenas pelo Silicon Curator:
 
 ```json
 {
@@ -160,126 +160,126 @@ Tabela de regras partilhada persistida no armazenamento, gerida apenas pelo Cura
 }
 ```
 
-- As regras são avaliadas por ordem; a primeira correspondência vence.
-- Apenas o Curator de silício pode modificar a ACL global (através das suas ferramentas dedicadas).
-- As alterações entram em vigor imediatamente.
-- A ACL global é verificada diretamente pelo `PermissionManager` para beings **não-curators** quando o callback retorna AskUser ou não há callback configurado. **Não** é referenciada pela função callback.
+- As regras são avaliadas por ordem; a primeira correspondência prevalece.
+- Apenas o Silicon Curator pode modificar a ACL Global (através das suas ferramentas dedicadas).
+- As alterações produzem efeito imediatamente.
+- A ACL Global **não está** na cadeia de prioridade por consulta acima — é referenciada internamente pela função callback.
 
 ---
 
-## Cache de frequência do utilizador
+## Cache de Frequência do Utilizador
 
-Para reduzir pedidos de permissão repetidos, o sistema mantém duas caches **por being, apenas em memória**:
+Para reduzir prompts de permissões repetidos, o sistema mantém dois caches **por being, apenas em memória**:
 
 | Cache | Propósito |
 |-------|---------|
-| **HighAllow (Alta permissão)** | Recursos que o utilizador permite frequentemente |
-| **HighDeny (Alta negação)** | Recursos que o utilizador nega frequentemente |
+| **HighAllow (Alta Permissão)** | Recursos que o utilizador permite frequentemente |
+| **HighDeny (Alta Negação)** | Recursos que o utilizador nega frequentemente |
 
-### Como funciona
+### Como Funciona
 
-- **Escolha do utilizador, não deteção automática**: Quando "perguntar ao utilizador" é acionado, o utilizador escolhe se adiciona o recurso à cache.
-- **Correspondência por prefixo**: Suporta correspondência de prefixo de caminho de recurso (ex: `network:api.example.com/*`).
-- **Prioridade**: Alta negação tem prioridade sobre alta permissão.
-- **Apenas em memória**: A cache não é persistida. Perde-se ao reiniciar.
-- **Expiração configurável**: O utilizador pode definir o prazo de validade das entradas da cache.
+- **Escolha do utilizador, não detecção automática**: Quando Perguntar ao Utilizador é accionado, o utilizador escolhe se adiciona o recurso ao cache.
+- **Correspondência por prefixo**: Suporta correspondência por prefixo de caminho de recurso (por exemplo `network:api.example.com/*`).
+- **Prioridade**: HighDeny tem prioridade sobre HighAllow.
+- **Apenas em memória**: O cache não é persistido. Perde-se após reinício.
+- **Expiração configurável**: O utilizador pode definir o período de validade das entradas do cache.
 
-### Fluxo de atualização da cache
+### Fluxo de Actualização do Cache
 
 1. O callback de permissões retorna `AskUser`.
-2. O sistema de permissões envia uma consulta ao sistema de cartões (interface Web ou mensageiro instantâneo).
-3. O utilizador toma uma decisão (permitir/negar) e **escolhe se armazena em cache**.
+2. O sistema de permissões envia uma consulta ao sistema de cartões (Web UI ou IM).
+3. O utilizador toma uma decisão (permitir/negar) e **escolhe se deve cachear**.
 4. O sistema de cartões retorna a decisão + flag de cache.
-5. O sistema de permissões atualiza a lista de cache correspondente.
-6. Pedidos futuros que correspondam ao prefixo da cache são resolvidos imediatamente.
+5. O sistema de permissões actualiza a lista de cache correspondente.
+6. Pedidos futuros que correspondam ao prefixo do cache são resolvidos imediatamente.
 
 ---
 
-## Mecanismo de pergunta ao utilizador
+## Mecanismo de Pergunta ao Utilizador
 
 Quando a verificação de permissões retorna `AskUser`:
 
-### Interface Web: Cartão interativo
+### Web UI: Cartão Interactivo
 
-A interface Web exibe imediatamente um **cartão interativo**, mostrando:
+O frontend Web exibe imediatamente um **cartão interactivo**, mostrando:
 
 - Tipo e caminho do recurso
 - Descrição da operação
 - Botões Permitir / Negar
-- Caixa de seleção opcional "Permitir sempre" / "Negar sempre" (adicionar à cache de frequência)
+- Caixa de selecção opcional "Permitir sempre" / "Negar sempre" (adiciona ao cache de frequência)
 
-### Mensageiro instantâneo (sem suporte para cartões): Código aleatório
+### Mensageiro Instantâneo (sem suporte a cartões): Código Aleatório
 
-Para plataformas de mensagens que não suportam cartões interativos:
+Para plataformas de mensagens que não suportam cartões interactivos:
 
 1. O sistema gera dois códigos aleatórios de 6 dígitos: **código de permissão** e **código de negação**.
-2. Envia uma mensagem com as informações do recurso e os dois códigos.
-3. O utilizador deve responder com o código de permissão exato para autorizar. Qualquer outra resposta é tratada como negação.
-4. Os códigos são de uso único para prevenir ataques de replay.
+2. Envia uma mensagem contendo as informações do recurso e os dois códigos.
+3. O utilizador deve responder com o código de permissão exacto para autorizar. Qualquer outra resposta é tratada como negação.
+4. Os códigos são de uso único, para prevenir ataques de replay.
 
 ### Timeout
 
-- Um timeout é definido para todos os pedidos de "perguntar ao utilizador".
+- É definido um timeout para todos os pedidos de pergunta ao utilizador.
 - Em caso de timeout, o pedido é tratado como **negado** e o bloqueio da thread do executor é libertado.
 
 ---
 
-## Segurança da compilação dinâmica
+## Segurança da Compilação Dinâmica
 
-A autoevolução (tipo reescrita) introduz riscos de segurança únicos. O sistema mitiga-os com uma **estratégia em camadas**:
+A auto-evolução (reescrita de classes) introduz riscos de segurança únicos. O sistema mitiga-os usando uma **estratégia em camadas**:
 
-### Camada 1: Controlo de referências em tempo de compilação (defesa principal)
+### Camada 1: Controlo de Referências na Compilação (Defesa Primária)
 
-- O compilador apenas obtém a **lista permitida de referências de assembly**.
-- **Permitido**: `System.Runtime`, `System.Private.CoreLib`, assemblies do projeto (interface ITool, etc.)
+- O compilador recebe apenas a **lista de referências de assembly permitidas**.
+- **Permitido**: `System.Runtime`, `System.Private.CoreLib`, assemblies do projecto (interface ITool, etc.)
 - **Bloqueado**: `System.IO`, `System.Reflection`, `System.Runtime.InteropServices`, etc.
 - Se o código referenciar um assembly bloqueado, **o próprio compilador recusa** o código.
 - Isto é mais fiável do que a análise em tempo de execução — operações perigosas são impossíveis ao nível do tipo.
 
-### Camada 2: Análise estática em tempo de execução (defesa secundária)
+### Camada 2: Análise Estática em Tempo de Execução (Defesa Secundária)
 
-- Mesmo após uma compilação bem-sucedida, o código é submetido a uma análise de padrões estáticos.
-- Deteta padrões de operações perigosas (I/O direto, chamadas de sistema, etc.).
-- Se for encontrado código perigoso, o carregamento é recusado e o sistema reverte para a funcionalidade predefinida.
+- Mesmo após compilação bem-sucedida, o código é submetido a análise de padrões estáticos.
+- Detecta padrões de operações perigosas (I/O directo, chamadas de sistema, etc.).
+- Se código perigoso for encontrado, o carregamento é recusado e o sistema reverte para a funcionalidade padrão.
 
-### Restrição de herança
+### Restrição de Herança
 
 Todas as classes personalizadas de Silicon Beings **devem** herdar de `SiliconBeingBase`. O compilador impõe esta restrição ao nível do tipo.
 
-### Armazenamento encriptado
+### Armazenamento Encriptado
 
-O código compilado é armazenado encriptado em disco com AES-256:
+O código compilado é armazenado no disco com encriptação AES-256:
 
-- **Derivação de chave**: A partir do GUID do being (maiúsculas) usando PBKDF2.
-- **Falha na desencriptação**: Reverte para a implementação predefinida.
-- **Recompilação em tempo de execução**: O novo código é primeiro compilado em memória; só é persistido após compilação bem-sucedida e substituição da instância.
+- **Derivação de chave**: Do GUID do being (maiúsculas) usando PBKDF2.
+- **Falha na desencriptação**: Reverte para a implementação padrão.
+- **Recompilação em tempo de execução**: O novo código é primeiro compilado em memória; apenas após compilação bem-sucedida e substituição da instância é persistido.
 
-### Substituição atómica
+### Substituição Atómica
 
 O processo de substituição é atómico:
 
 1. Compilar o novo código em memória → obter o `Type`.
-2. Criar uma nova instância a partir do `Type`.
+2. Criar nova instância a partir do `Type`.
 3. Migrar o estado da instância antiga para a nova.
 4. Trocar as referências.
 5. Persistir o código encriptado.
 
-Se qualquer passo falhar, a instância antiga mantém-se ativa.
+Se qualquer passo falhar, a instância antiga mantém-se activa.
 
 ---
 
-## Função callback de permissões
+## Função Callback de Permissões
 
-### Design
+### Desenho
 
-Cada PermissionManager possui uma **variável de função callback**:
+Cada PermissionManager detém uma **variável de função callback**:
 
-- **Predefinição**: Aponta para a função de permissões predefinida incorporada.
-- **Após compilação dinâmica**: É substituída pela função de permissões personalizada do being.
-- **Exclusiva**: Apenas um callback está ativo em qualquer momento.
-- **Falha na compilação**: Não afeta o callback atual — a função predefinida ou a última função personalizada bem-sucedida mantém-se ativa.
+- **Padrão**: Aponta para a função de permissões padrão incorporada.
+- **Após compilação dinâmica**: É sobrescrita pela função de permissões personalizada do being.
+- **Um ou outro**: Apenas um callback está activo em qualquer momento.
+- **Falha na compilação**: Não afecta o callback actual — a função padrão ou a última função personalizada bem-sucedida mantém-se activa.
 
-### Assinatura do callback
+### Assinatura do Callback
 
 ```
 PermissionResult Callback(PermissionType type, string resourcePath, Guid callerId)
@@ -289,7 +289,7 @@ Retorna `Allowed`, `Denied` ou `AskUser`.
 
 ---
 
-## Registo de auditoria
+## Registo de Auditoria
 
 Todas as decisões de permissões são registadas:
 
@@ -300,27 +300,27 @@ Todas as decisões de permissões são registadas:
 [2026-04-01 15:30:28] ALLOWED  | Being:Curator    | Type:CommandLine   | Resource:del /f /q *.log | Source:UserDecision
 ```
 
-Os registos são persistidos no armazenamento e podem ser consultados através da interface Web (controlador de registos).
+Os registos são persistidos no armazenamento e podem ser visualizados através da Web UI (controlador de registos).
 
 ---
 
-## Auditoria de utilização de Tokens
+## Auditoria de Utilização de Tokens
 
-O `TokenUsageAuditManager` fornece rastreamento do consumo de tokens de IA relacionado com a segurança:
+O `TokenUsageAuditManager` fornece rastreamento do consumo de tokens de IA relacionado com segurança:
 
-- **Registo por pedido** — Cada chamada à IA regista o ID do being, o modelo, os tokens de prompt, os tokens de completion e o carimbo temporal.
-- **Deteção de anomalias** — Padrões de consumo de tokens invulgares podem indicar injeção de prompts ou abuso de recursos.
-- **Acesso apenas do curator** — O `TokenAuditTool` (marcado com `[SiliconManagerOnly]`) permite ao curator consultar e resumir a utilização de tokens.
-- **Painel Web** — O `UsageController` fornece um painel baseado no browser, com gráficos de tendências e exportação de dados.
-- **Armazenamento persistente** — Os registos são armazenados através do `ITimeStorage`, para consultas de séries temporais e análise de longo prazo.
+- **Registo por pedido** — Cada chamada de IA regista o ID do being, modelo, tokens do prompt, tokens de conclusão e timestamp.
+- **Detecção de anomalias** — Padrões anómalos de consumo de tokens podem indicar injeção de prompt ou abuso de recursos.
+- **Acesso apenas do Curator** — O `TokenAuditTool` (marcado com `[SiliconManagerOnly]`) permite ao Curator consultar e resumir a utilização de tokens.
+- **Dashboard Web** — O `UsageController` fornece um dashboard baseado no navegador, com gráficos de tendência e exportação de dados.
+- **Armazenamento persistido** — Os registos são armazenados via `ITimeStorage`, para consultas de séries temporais e análise de longo prazo.
 
 ---
 
-## Segurança de plugins
+## Segurança de Plugins
 
-O sistema de plugins introduz riscos de segurança na execução de código de terceiros, mitigados pelos seguintes mecanismos:
+O sistema de plugins introduz riscos de segurança de execução de código de terceiros, mitigados pelos seguintes mecanismos:
 
-### Sandbox de segurança
+### Sandbox Segura
 
 O `PluginLoader` executa uma verificação de segurança rigorosa ao carregar plugins:
 
@@ -328,10 +328,10 @@ O `PluginLoader` executa uma verificação de segurança rigorosa ao carregar pl
    - `System.IO` — Acesso ao sistema de ficheiros
    - `System.Net.Http` — Pedidos HTTP
    - `System.Net.WebSockets` — Ligações WebSocket
-   - `System.Net.Sockets` — Sockets brutos
+   - `System.Net.Sockets` — Sockets raw
    - `Microsoft.CodeAnalysis` — API do compilador
 
-2. **Lista de permissão de assemblies fidedignos** — Referências aos seguintes assemblies são permitidas:
+2. **Lista branca de assemblies fiáveis** — Referências aos seguintes assemblies são permitidas:
    - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
    - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
    - `Dapper`
@@ -340,14 +340,40 @@ O `PluginLoader` executa uma verificação de segurança rigorosa ao carregar pl
 
 4. **Verificação de membros proibidos** — Analisa métodos perigosos chamados no plugin
 
-### Carregamento isolado
+### Carregamento Isolado
 
-- Cada plugin é carregado de forma isolada usando um `AssemblyLoadContext` personalizado
-- Tipos e assemblies entre plugins não interferem uns com os outros
-- Os recursos relacionados podem ser libertados quando o plugin é descarregado
+- Usa `AssemblyLoadContext` personalizado para carregar cada plugin de forma isolada
+- Tipos e assemblies entre plugins não interferem entre si
+- Os recursos associados podem ser libertados quando o plugin é descarregado
 
-### Restrições de permissões de ferramentas
+### Restrições de Permissões de Ferramentas
 
-- As ferramentas registadas pelos plugins através da interface `ITool` estão sujeitas ao mesmo sistema de permissões
-- As ferramentas de plugins não podem contornar a cadeia de permissões de 5 níveis
-- As ferramentas de plugins estão sujeitas à marcação `[SiliconManagerOnly]`
+- As ferramentas registadas pelos plugins via interface `ITool` estão sujeitas ao mesmo sistema de permissões
+- As ferramentas dos plugins não podem contornar a cadeia de verificação de permissões
+- As ferramentas dos plugins estão sujeitas à marca `[SiliconManagerOnly]`
+
+---
+
+## Segurança de Permissões de Ferramentas
+
+O sistema de permissões de ferramentas fornece uma camada de segurança adicional, controlando quais operações de ferramentas os Silicon Beings podem usar:
+
+### Isolamento de Permissões em Dois Níveis
+
+1. **Nível do Silicon Being** — Cada Silicon Being tem uma configuração de permissões de ferramentas independente
+2. **Nível do Projecto** — As permissões de ferramentas no espaço do projecto são independentes do nível do Silicon Being, realizando isolamento de permissões entre projectos
+
+### Modelos de Permissões
+
+O sistema fornece modelos de permissões predefinidos, garantindo uma linha de base de segurança:
+
+- **readonly** — Privilégios mínimos, apenas permite operações de leitura
+- **restricted** — Permissões restritas, apenas permite operações básicas
+- **full** — Permissões completas (usado apenas pelo Curator)
+
+### Características de Segurança
+
+- **Negação por defeito** — Operações de ferramentas não explicitamente permitidas são negadas por defeito
+- **Granularidade por operação** — Cada operação de cada ferramenta é controlada independentemente (por exemplo `network:get` permitido mas `network:post` negado)
+- **Gestão pelo Curator** — As permissões de ferramentas só podem ser configuradas pelo Silicon Curator
+- **Rasto de auditoria** — As alterações de permissões de ferramentas são registadas no registo de auditoria

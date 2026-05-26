@@ -1,58 +1,74 @@
-﻿# Referencja narzędzi
+# Referencja narzędzi
 
 > **Wersja: v0.2.0-alpha**
 
 Ten dokument szczegółowo opisuje wszystkie wbudowane narzędzia platformy Silicon Life Collective.
 
-[English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md) | [Русский](../ru-RU/tools-reference.md) | [Polski](../pl-PL/tools-reference.md)
+[English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md) | [Русский](../ru-RU/tools-reference.md)
 
 ## Przegląd
 
-System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrznym poprzez ustandaryzowany interfejs. Każde narzędzie implementuje interfejs `ITool`, automatycznie odkrywany i rejestrowany przez `ToolManager` poprzez refleksję.
+System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrznym przez ustandaryzowany interfejs. Każde narzędzie implementuje interfejs `ITool`, automatycznie odkrywany i rejestrowany przez `ToolManager` przez refleksję.
 
 ### Klasyfikacja narzędzi
 
-- **Narzędzia zarządzania systemem** — konfiguracja, uprawnienia, kompilacja dynamiczna
+- **Narzędzia zarządzania systemem** — konfiguracja, uprawnienia, kompilacja dynamiczna, zarządzanie Kuratorem
 - **Narzędzia komunikacyjne** — czat, żądania sieciowe
 - **Narzędzia przechowywania danych** — operacje dyskowe, baza danych, pamięć, notatki pracy
 - **Narzędzia zarządzania czasem** — kalendarz, czasomierze, zadania
 - **Narzędzia deweloperskie** — wykonywanie kodu, zapytania logów
-- **Narzędzia użytkowe** — informacje systemowe, audyt Tokenów, dokumentacja pomocy, sieć wiedzy
+- **Narzędzia użytkowe** — informacje systemowe, audyt tokenów, dokumentacja pomocy, Sieć Wiedzy
 - **Narzędzia przeglądarki** — automatyzacja przeglądarki WebView
-- **Narzędzia wtyczek** — narzędzia firm trzecich rejestrowane przez system wtyczek
+- **Narzędzia projektowe** — zarządzanie projektami, zadania projektowe, notatki pracy projektu, praca projektowa
+- **Narzędzia wtyczek** — narzędzia firm trzecich zarejestrowane przez system wtyczek
+
+### System scenariuszy narzędzi
+
+Każde narzędzie deklaruje swoje dostępne scenariusze przez atrybut `[ToolScenario]`:
+
+| Flaga scenariusza | Wartość | Opis |
+|----------|------|-------------|
+| `Chat` | `1 << 0` | Scenariusz czatu (gdy użytkownik rozmawia z Istotą Krzemową) |
+| `Task` | `1 << 1` | Scenariusz zadania (gdy Istota Krzemowa wykonuje zadanie) |
+| `Timer` | `1 << 2` | Scenariusz czasomierza (gdy Istota Krzemowa wykonuje zadanie czasowe) |
+| `MemoryCompression` | `1 << 3` | Scenariusz kompresji pamięci |
+| `Project` | `1 << 4` | Scenariusz projektu (tryb ThinkOnProject) |
+| `All` | Powyższe wszystkie | Wszystkie scenariusze dostępne |
+
+Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w scenariuszu czatu (np. HelpTool) i nie pojawiają się w scenariuszach zadań i czasomierzy.
 
 ---
 
 ## Lista wbudowanych narzędzi
 
-### 1. Narzędzie kalendarzowe (CalendarTool)
+### 1. Narzędzie kalendarza (CalendarTool)
 
 **Nazwa narzędzia**: `calendar`
 
-**Opis funkcji**: Obsługa konwersji dat i obliczeń w 32 systemach kalendarzowych.
+**Opis funkcji**: obsługa konwersji i obliczeń dat w 32 systemach kalendarzowych.
 
 **Obsługiwane operacje**:
-- `now` — uzyskanie bieżącego czasu
+- `now` — pobranie bieżącego czasu
 - `format` — formatowanie daty
 - `add_days` — dodawanie/odejmowanie dni
 - `diff` — obliczanie różnicy dat
 - `list_calendars` — lista wszystkich obsługiwanych kalendarzy
-- `get_components` — uzyskanie komponentów daty
-- `get_now_components` — uzyskanie komponentów bieżącego czasu
+- `get_components` — pobranie komponentów daty
+- `get_now_components` — pobranie komponentów bieżącego czasu
 - `convert` — konwersja między systemami kalendarzowymi
 
 **Obsługiwane systemy kalendarzowe** (32):
 - Gregoriański (Gregorian)
 - Chiński księżycowy (Chinese Lunar)
-- Chiński historyczny (Chinese Historical) — cykl ganzhi, ery cesarskie
+- Chiński historyczny (Chinese Historical) — era ganzhi, epoki cesarskie
 - Islamski (Islamic)
 - Hebrajski (Hebrew)
 - Japoński (Japanese)
 - Perski (Persian)
-- Majański (Mayan)
+- Majski (Mayan)
 - Buddyjski (Buddhist)
 - Tybetański (Tibetan)
-- i 24 inne kalendarze...
+- I 24 inne kalendarze...
 
 **Przykład użycia**:
 ```json
@@ -70,15 +86,15 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 **Nazwa narzędzia**: `chat`
 
-**Opis funkcji**: Zarządzanie sesjami czatu i wysyłanie wiadomości.
+**Opis funkcji**: zarządzanie sesjami czatu i wysyłanie wiadomości.
 
 **Obsługiwane operacje**:
 - `send_message` — wysłanie wiadomości
-- `get_messages` — uzyskanie historii wiadomości
+- `get_messages` — pobranie historii wiadomości
 - `create_group` — utworzenie czatu grupowego
 - `add_member` — dodanie członka grupy
 - `remove_member` — usunięcie członka grupy
-- `get_chat_info` — uzyskanie informacji o czacie
+- `get_chat_info` — pobranie informacji o czacie
 - `terminate_chat` — zakończenie czatu (przeczytane bez odpowiedzi)
 
 **Przykład użycia**:
@@ -96,13 +112,13 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 **Nazwa narzędzia**: `config`
 
-**Opis funkcji**: Odczyt i modyfikacja konfiguracji systemu.
+**Opis funkcji**: odczyt i modyfikacja konfiguracji systemu.
 
 **Obsługiwane operacje**:
 - `read` — odczyt elementu konfiguracji
 - `write` — zapis elementu konfiguracji
 - `list` — lista wszystkich konfiguracji
-- `get_ai_config` — uzyskanie konfiguracji klienta AI
+- `get_ai_config` — pobranie konfiguracji klienta AI
 - `set_ai_config` — ustawienie konfiguracji klienta AI
 
 **Przykład użycia**:
@@ -117,25 +133,26 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 ### 4. Narzędzie Kuratora (CuratorTool) 🔒
 
-**Nazwa narzędzia**: `curator`
+**Nazwa narzędzia**: `silicon_manager`
 
-**Wymagania uprawnień**: Tylko dla Kuratora Krzemowego
+**Wymagania uprawnień**: tylko dla Kuratora Krzemowego (`[SiliconManagerOnly]`)
 
-**Opis funkcji**: Narzędzie zarządzania systemem przeznaczone wyłącznie dla Kuratora Krzemowego.
+**Dostępne scenariusze**: Chat, Task, Timer
+
+**Opis funkcji**: narzędzie zarządzania systemem wyłącznie dla Kuratora Krzemowego, służące do zarządzania tworzeniem, przeglądaniem i resetowaniem Istot Krzemowych.
 
 **Obsługiwane operacje**:
-- `create_being` — utworzenie nowej Istoty Krzemowej
-- `list_beings` — lista wszystkich Istot Krzemowych
-- `get_being_info` — uzyskanie informacji o istocie
-- `assign_task` — przypisanie zadania
-- `manage_permissions` — zarządzanie uprawnieniami
+- `list_beings` — lista wszystkich Istot Krzemowych i ich statusu
+- `create_being` — utworzenie nowej Istoty Krzemowej (wymaga parametrów `name` i `soul`)
+- `get_code` — przeglądanie niestandardowego kodu źródłowego Istoty Krzemowej
+- `reset` — przywrócenie Istoty Krzemowej do domyślnej implementacji
 
 **Przykład użycia**:
 ```json
 {
   "action": "create_being",
   "name": "Asystent",
-  "soul_file": "assistant_soul.md"
+  "soul": "Jesteś pomocnym asystentem..."
 }
 ```
 
@@ -145,7 +162,7 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 **Nazwa narzędzia**: `database`
 
-**Opis funkcji**: Strukturalne zapytania bazodanowe i operacje.
+**Opis funkcji**: ustrukturyzowane zapytania i operacje bazodanowe.
 
 **Obsługiwane operacje**:
 - `query` — zapytanie o dane
@@ -171,7 +188,7 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 **Nazwa narzędzia**: `disk`
 
-**Opis funkcji**: Operacje na systemie plików i wyszukiwanie lokalne.
+**Opis funkcji**: operacje systemu plików i wyszukiwanie lokalne.
 
 **Obsługiwane operacje**:
 - `read` — odczyt pliku
@@ -183,9 +200,9 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 - `search_content` — wyszukiwanie treści plików
 - `count_lines` — zliczanie linii
 - `read_lines` — odczyt określonych linii
-- `replace_text` — zamiana tekstu
+- `replace_text` — zastąpienie tekstu
 
-**Wymagania uprawnień**: `disk:read`, `disk:write`
+**Wymagania uprawnień**: `FileAccess`
 
 **Przykład użycia**:
 ```json
@@ -201,7 +218,7 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 **Nazwa narzędzia**: `compile`
 
-**Opis funkcji**: Dynamiczna kompilacja kodu C# (do samorozwoju Istot Krzemowych).
+**Opis funkcji**: dynamiczna kompilacja kodu C# (do samewolucji Istot Krzemowych).
 
 **Obsługiwane operacje**:
 - `compile_class` — kompilacja klasy
@@ -227,9 +244,9 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 **Nazwa narzędzia**: `execute_code`
 
-**Wymagania uprawnień**: Tylko dla Kuratora Krzemowego
+**Wymagania uprawnień**: tylko dla Kuratora Krzemowego
 
-**Opis funkcji**: Kompilacja i wykonywanie fragmentów kodu C#.
+**Opis funkcji**: kompilacja i wykonywanie fragmentów kodu C#.
 
 **Obsługiwane operacje**:
 - `run_script` — wykonanie skryptu kodu
@@ -249,27 +266,30 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 **Nazwa narzędzia**: `help`
 
-**Opis funkcji**: Uzyskanie dokumentacji pomocy systemu i przewodników użytkowania.
+**Dostępne scenariusze**: Chat (`[ChatOnly]`, dostępne tylko w scenariuszu czatu)
+
+**Opis funkcji**: wyszukiwanie i pobieranie treści dokumentacji pomocy systemowej, pozwalające AI na zapytania o metody korzystania z funkcji systemu.
 
 **Obsługiwane operacje**:
-- `get_topics` — uzyskanie listy tematów pomocy
-- `get_topic` — uzyskanie szczegółów konkretnego tematu
-- `search` — wyszukiwanie dokumentacji pomocy
+- `list` — lista wszystkich identyfikatorów tematów pomocy
+- `search` — wyszukiwanie dokumentacji pomocy po słowach kluczowych
+- `get` — pobranie treści dokumentacji pomocy o określonym identyfikatorze
 
 **Przykład użycia**:
 ```json
 {
-  "action": "get_topics"
+  "action": "search",
+  "keyword": "uprawnienia"
 }
 ```
 
 ---
 
-### 10. Narzędzie sieci wiedzy (KnowledgeTool)
+### 10. Narzędzie Sieci Wiedzy (KnowledgeTool)
 
 **Nazwa narzędzia**: `knowledge`
 
-**Opis funkcji**: Operacje na grafie wiedzy (oparte na trójkach: podmiot-relacja-obiekt).
+**Opis funkcji**: operacje na grafie wiedzy (oparte na trójkach: podmiot-relacja-obiekt).
 
 **Obsługiwane operacje**:
 - `add` — dodanie trójki wiedzy
@@ -277,9 +297,9 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 - `update` — aktualizacja wiedzy
 - `delete` — usunięcie wiedzy
 - `search` — wyszukiwanie wiedzy
-- `get_path` — uzyskanie ścieżki wiedzy
+- `get_path` — pobranie ścieżki wiedzy
 - `validate` — walidacja wiedzy
-- `stats` — uzyskanie statystyk
+- `stats` — pobranie statystyk
 
 **Przykład użycia**:
 ```json
@@ -298,12 +318,12 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 **Nazwa narzędzia**: `log`
 
-**Opis funkcji**: Zapytania o historię operacji i historię rozmów.
+**Opis funkcji**: zapytania o historię operacji i historię konwersacji.
 
 **Obsługiwane operacje**:
 - `query_logs` — zapytanie o logi systemowe
-- `query_conversations` — zapytanie o historię rozmów
-- `get_stats` — uzyskanie statystyk logów
+- `query_conversations` — zapytanie o historię konwersacji
+- `get_stats` — pobranie statystyk logów
 
 **Przykład użycia**:
 ```json
@@ -322,7 +342,7 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 **Nazwa narzędzia**: `memory`
 
-**Opis funkcji**: Zarządzanie długoterminową i krótkoterminową pamięcią Istot Krzemowych.
+**Opis funkcji**: zarządzanie pamięcią długotrwałą i krótkotrwałą Istoty Krzemowej.
 
 **Obsługiwane operacje**:
 - `read` — odczyt pamięci
@@ -330,7 +350,7 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 - `search` — wyszukiwanie pamięci
 - `delete` — usunięcie pamięci
 - `list` — lista pamięci
-- `get_stats` — uzyskanie statystyk pamięci
+- `get_stats` — pobranie statystyk pamięci
 - `compress` — kompresja pamięci
 
 **Przykład użycia**:
@@ -351,7 +371,7 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 **Nazwa narzędzia**: `network`
 
-**Opis funkcji**: Inicjowanie żądań HTTP/HTTPS.
+**Opis funkcji**: wysyłanie żądań HTTP/HTTPS.
 
 **Obsługiwane operacje**:
 - `get` — żądanie GET
@@ -377,14 +397,14 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 **Nazwa narzędzia**: `permission`
 
-**Wymagania uprawnień**: Tylko dla Kuratora Krzemowego
+**Wymagania uprawnień**: tylko dla Kuratora Krzemowego
 
-**Opis funkcji**: Zarządzanie uprawnieniami i listami kontroli dostępu.
+**Opis funkcji**: zarządzanie uprawnieniami i listami kontroli dostępu.
 
 **Obsługiwane operacje**:
 - `query_permission` — zapytanie o uprawnienia
-- `manage_acl` — zarządzanie globalnym ACL
-- `get_callback` — uzyskanie funkcji wywołania zwrotnego uprawnień
+- `manage_acl` — zarządzanie globalną ACL
+- `get_callback` — pobranie funkcji wywołania zwrotnego uprawnień
 - `set_callback` — ustawienie funkcji wywołania zwrotnego uprawnień
 
 **Przykład użycia**:
@@ -400,24 +420,36 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 ---
 
-### 15. Narzędzie projektów (ProjectTool)
+### 15. Narzędzie projektowe (ProjectTool) 🔒
 
 **Nazwa narzędzia**: `project`
 
-**Opis funkcji**: Zarządzanie obszarem roboczym projektów.
+**Wymagania uprawnień**: tylko dla Kuratora Krzemowego (`[SiliconManagerOnly]`)
+
+**Dostępne scenariusze**: Chat, Task, Timer
+
+**Opis funkcji**: zarządzanie przestrzenią projektową, obsługa zarządzania cyklem życia projektu, przypisywania członków i zarządzania rolami.
 
 **Obsługiwane operacje**:
-- `create` — utworzenie projektu
-- `list` — lista projektów
-- `get_info` — uzyskanie informacji o projekcie
-- `update` — aktualizacja projektu
+- `create` — utworzenie nowej przestrzeni projektowej
 - `archive` — archiwizacja projektu
+- `restore` — przywrócenie zarchiwizowanego projektu
+- `destroy` — zniszczenie projektu i oczyszczenie danych (nieodwracalne)
+- `list` — lista wszystkich projektów
+- `get` — pobranie szczegółów projektu
+- `assign` — przypisanie Istoty Krzemowej do projektu
+- `remove` — usunięcie Istoty Krzemowej z projektu
+- `update` — aktualizacja nazwy/opisu projektu
+- `list-workflow-templates` — lista dostępnych szablonów przepływu pracy
+- `assign_role` — przypisanie roli projektowej Istocie Krzemowej
+- `remove_role` — usunięcie roli projektowej Istoty Krzemowej
+- `list_roles` — lista przypisań ról w projekcie
 
 **Przykład użycia**:
 ```json
 {
   "action": "create",
-  "name": "My Project",
+  "name": "Mój Projekt",
   "description": "Opis projektu"
 }
 ```
@@ -428,14 +460,23 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 **Nazwa narzędzia**: `project_task`
 
-**Opis funkcji**: Zarządzanie zadaniami projektowymi.
+**Dostępne scenariusze**: Chat, Task, Timer
+
+**Opis funkcji**: zarządzanie zadaniami w przestrzeni projektowej, obsługa pełnego cyklu życia zadań.
 
 **Obsługiwane operacje**:
-- `create` — utworzenie zadania
-- `list` — lista zadań
-- `update` — aktualizacja zadania
-- `complete` — ukończenie zadania
-- `get_stats` — uzyskanie statystyk zadań
+- `create` — utworzenie zadania projektowego
+- `list` — lista zadań projektowych
+- `get` — pobranie szczegółów zadania
+- `update` — aktualizacja tytułu/opisu/priorytetu zadania
+- `assign` — przypisanie osoby odpowiedzialnej do zadania
+- `remove_assignee` — usunięcie osoby odpowiedzialnej za zadanie
+- `start` — rozpoczęcie zadania
+- `complete` — oznaczenie zadania jako ukończone
+- `fail` — oznaczenie zadania jako nieudane
+- `cancel` — anulowanie zadania
+- `delete` — usunięcie zadania
+- `stats` — pobranie statystyk zadań
 
 **Przykład użycia**:
 ```json
@@ -449,20 +490,22 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 ---
 
-### 17. Narzędzie notatek pracy projektów (ProjectWorkNoteTool)
+### 17. Narzędzie notatek pracy projektu (ProjectWorkNoteTool)
 
 **Nazwa narzędzia**: `project_work_note`
 
-**Opis funkcji**: Zarządzanie notatkami pracy projektów (publiczne, podobne do notesu roboczego).
+**Dostępne scenariusze**: Chat, Task, Timer
+
+**Opis funkcji**: zarządzanie notatkami pracy w przestrzeni projektowej (publicznymi, podobnymi do zeszytu roboczego), obsługa stronicowego zarządzania notatkami.
 
 **Obsługiwane operacje**:
-- `create` — utworzenie notatki
-- `read` — odczyt notatki
-- `update` — aktualizacja notatki
-- `delete` — usunięcie notatki
-- `list` — lista notatek
-- `search` — wyszukiwanie notatek
-- `directory` — generowanie katalogu
+- `create` — utworzenie strony notatki (wymaga `project_id`, `summary` i `content`, opcjonalnie `keywords`)
+- `read` — odczyt strony notatki (wymaga `project_id` i `page_number` lub `note_id`)
+- `update` — aktualizacja strony notatki (wymaga `project_id`, `page_number` i `content`, opcjonalnie `summary` i `keywords`)
+- `delete` — usunięcie strony notatki (wymaga `project_id` i `page_number` lub `note_id`)
+- `list` — lista podsumowań wszystkich stron notatek projektu
+- `directory` — generowanie spisu treści/przeglądu notatek
+- `search` — wyszukiwanie notatek po słowach kluczowych (wymaga `project_id` i `keyword`, opcjonalnie `max_results`)
 
 **Przykład użycia**:
 ```json
@@ -470,23 +513,52 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
   "action": "create",
   "project_id": "project-uuid",
   "summary": "Ukończono moduł uwierzytelniania użytkowników",
-  "content": "## Szczegóły implementacji\n\n- Użycie tokena JWT",
+  "content": "## Szczegóły implementacji\n\n- Użycie JWT token",
   "keywords": "uwierzytelnianie,JWT"
 }
 ```
 
 ---
 
-### 18. Narzędzie systemowe (SystemTool)
+### 18. Narzędzie pracy projektowej (ProjectWorkTool) 🔒
+
+**Nazwa narzędzia**: `project_work`
+
+**Wymagania uprawnień**: tylko dla Kuratora Krzemowego (`[SiliconManagerOnly]`)
+
+**Dostępne scenariusze**: Project (`[ToolScenario(ToolScenarioFlag.Project)]`, dostępne tylko w scenariuszu projektu)
+
+**Opis funkcji**: narzędzie operacji pracy projektowej, służące Kuratorowi do zarządzania przepływem pracy projektu w scenariuszu ThinkOnProject.
+
+**Obsługiwane operacje**:
+- `create-task` — utworzenie zadania projektowego
+- `assign-task` — przypisanie Istoty Krzemowej do zadania
+- `chat` — wysłanie wiadomości do czatu grupowego projektu
+- `broadcast` — transmisja wiadomości do kanału projektu
+- `complete` — oznaczenie projektu jako ukończony
+- `status` — pobranie statusu projektu
+
+**Przykład użycia**:
+```json
+{
+  "action": "create-task",
+  "project_id": "project-uuid",
+  "title": "Implementacja uwierzytelniania użytkowników"
+}
+```
+
+---
+
+### 19. Narzędzie systemowe (SystemTool)
 
 **Nazwa narzędzia**: `system`
 
-**Opis funkcji**: Uzyskanie informacji o systemie i użyciu zasobów.
+**Opis funkcji**: pobieranie informacji o systemie i użyciu zasobów.
 
 **Obsługiwane operacje**:
-- `info` — uzyskanie informacji o systemie
-- `resource_usage` — uzyskanie użycia zasobów
-- `find_process` — znalezienie procesu
+- `info` — pobranie informacji o systemie
+- `resource_usage` — pobranie użycia zasobów
+- `find_process` — wyszukiwanie procesu
 - `list_beings` — lista Istot Krzemowych
 
 **Przykład użycia**:
@@ -498,11 +570,11 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 ---
 
-### 19. Narzędzie zadań (TaskTool)
+### 20. Narzędzie zadań (TaskTool)
 
 **Nazwa narzędzia**: `task`
 
-**Opis funkcji**: Zarządzanie zadaniami osobistymi Istoty Krzemowej.
+**Opis funkcji**: zarządzanie osobistymi zadaniami Istoty Krzemowej.
 
 **Obsługiwane operacje**:
 - `create` — utworzenie zadania
@@ -510,7 +582,7 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 - `update` — aktualizacja zadania
 - `complete` — ukończenie zadania
 - `delete` — usunięcie zadania
-- `get_dependencies` — uzyskanie relacji zależności
+- `get_dependencies` — pobranie zależności
 
 **Przykład użycia**:
 ```json
@@ -523,11 +595,11 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 ---
 
-### 20. Narzędzie czasomierza (TimerTool)
+### 21. Narzędzie czasomierzy (TimerTool)
 
 **Nazwa narzędzia**: `timer`
 
-**Opis funkcji**: Tworzenie i zarządzanie czasomierzami.
+**Opis funkcji**: tworzenie i zarządzanie czasomierzami.
 
 **Obsługiwane operacje**:
 - `create` — utworzenie czasomierza
@@ -535,7 +607,7 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 - `delete` — usunięcie czasomierza
 - `pause` — wstrzymanie czasomierza
 - `resume` — wznowienie czasomierza
-- `get_execution_history` — uzyskanie historii wykonania
+- `get_execution_history` — pobranie historii wykonania
 
 **Przykład użycia**:
 ```json
@@ -549,54 +621,65 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 ---
 
-### 21. Narzędzie audytu Tokenów (TokenAuditTool) 🔒
+### 22. Narzędzie audytu tokenów (TokenAuditTool) 🔒
 
 **Nazwa narzędzia**: `token_audit`
 
-**Wymagania uprawnień**: Tylko dla Kuratora Krzemowego
+**Wymagania uprawnień**: tylko dla Kuratora Krzemowego (`[SiliconManagerOnly]`)
 
-**Opis funkcji**: Zapytania i podsumowanie użycia tokenów AI.
+**Dostępne scenariusze**: Chat, Task, Timer
+
+**Opis funkcji**: zapytania o statystyki użycia tokenów AI i dane trendów.
 
 **Obsługiwane operacje**:
-- `get_usage` — uzyskanie statystyk użycia tokenów
-- `get_by_being` — uzyskanie użycia według istoty
-- `get_by_model` — uzyskanie użycia według modelu
-- `get_trend` — uzyskanie trendu użycia
-- `export` — eksport danych
+- `summary` — pobranie podsumowania statystyk użycia tokenów
+- `trend` — pobranie punktów danych trendu użycia tokenów
+
+**Obsługiwane zakresy czasowe**:
+- `today` — ostatnie 24 godziny
+- `week` — ostatnie 7×24 godzin
+- `month` — statystyki dzienne
+- `year` — statystyki miesięczne
 
 **Przykład użycia**:
 ```json
 {
-  "action": "get_usage",
-  "start_date": "2026-04-01",
-  "end_date": "2026-04-26"
+  "action": "summary",
+  "time_range": "week"
 }
 ```
 
 ---
 
-### 22. Narzędzie przeglądarki WebView (WebViewBrowserTool)
+### 23. Narzędzie przeglądarki WebView (WebViewBrowserTool)
 
-**Nazwa narzędzia**: `webview`
+**Nazwa narzędzia**: `webview_browser`
 
-**Opis funkcji**: Automatyzacja przeglądarki oparta na Playwright.
+**Dostępne scenariusze**: Chat, Task, Timer
+
+**Opis funkcji**: automatyzacja przeglądarki oparta na Playwright, zapewniająca pełne możliwości nawigacji po stronach, interakcji i ekstrakcji danych.
 
 **Obsługiwane operacje**:
-- `open_browser` — otwarcie przeglądarki
-- `close_browser` — zamknięcie przeglądarki
+- `open` — otwarcie przeglądarki
+- `close` — zamknięcie przeglądarki
 - `navigate` — nawigacja do URL
 - `click` — kliknięcie elementu
 - `input` — wprowadzenie tekstu
-- `get_page_text` — uzyskanie tekstu strony
-- `get_screenshot` — uzyskanie zrzutu ekranu
+- `scroll` — przewijanie strony
 - `execute_script` — wykonanie JavaScript
+- `get_page_text` — pobranie tekstu strony
+- `get_screenshot` — pobranie zrzutu ekranu
 - `wait_for_element` — oczekiwanie na pojawienie się elementu
-- `get_browser_status` — uzyskanie stanu przeglądarki
+- `get_element_info` — pobranie informacji o elemencie
+- `upload_file` — przesłanie pliku
+- `get_browser_status` — pobranie statusu przeglądarki
+- `set_timeout` — ustawienie czasu oczekiwania
+- `clear_session` — wyczyszczenie sesji przeglądarki
 
 **Cechy**:
 - Niezależna instancja dla każdej Istoty Krzemowej
 - Całkowicie odizolowane ciasteczka i sesje
-- Całkowicie niewidoczne dla użytkownika (tryb bezgłowy)
+- Całkowicie niewidoczne dla użytkownika (tryb headless)
 - Pełna obsługa JavaScript i CSS
 
 **Przykład użycia**:
@@ -609,11 +692,11 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 ---
 
-### 23. Narzędzie notatek pracy (WorkNoteTool)
+### 24. Narzędzie notatek pracy (WorkNoteTool)
 
 **Nazwa narzędzia**: `work_note`
 
-**Opis funkcji**: Zarządzanie osobistymi notatkami pracy Istoty Krzemowej (prywatne, podobne do dziennika).
+**Opis funkcji**: zarządzanie osobistymi notatkami pracy Istoty Krzemowej (prywatne, podobne do dziennika).
 
 **Obsługiwane operacje**:
 - `create` — utworzenie notatki
@@ -622,25 +705,25 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 - `delete` — usunięcie notatki
 - `list` — lista notatek
 - `search` — wyszukiwanie notatek
-- `directory` — generowanie katalogu
+- `directory` — generowanie spisu treści
 
 **Przykład użycia**:
 ```json
 {
   "action": "create",
   "summary": "Ukończono moduł uwierzytelniania użytkowników",
-  "content": "## Szczegóły implementacji\n\n- Użycie tokena JWT\n- Obsługa OAuth2",
+  "content": "## Szczegóły implementacji\n\n- Użycie JWT token\n- Obsługa OAuth2",
   "keywords": "uwierzytelnianie,JWT,OAuth2"
 }
 ```
 
 ---
 
-### 24. Narzędzie gorącego przeładowania (HotReloadTool)
+### 25. Narzędzie gorącego przeładowania (HotReloadTool)
 
 **Nazwa narzędzia**: `hot_reload`
 
-**Opis funkcji**: Obsługa automatycznej kompilacji, aktualizacji plików i restartu SiliconLife.Fast w czasie działania, bez ręcznej interwencji.
+**Opis funkcji**: obsługa automatycznej kompilacji, aktualizacji plików i restartu SiliconLife.Fast w trakcie działania, bez konieczności ręcznej interwencji.
 
 **Obsługiwane operacje**:
 - `execute` — wykonanie pełnego procesu budowania, kopiowania i restartu
@@ -683,7 +766,7 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 
 ---
 
-## Przepływ wywołania narzędzi
+## Przepływ wywołań narzędzi
 
 ```
 ┌──────────┐
@@ -704,17 +787,17 @@ System narzędzi pozwala Istotom Krzemowym na interakcję ze światem zewnętrzn
 └────┬─────────┘
      ↓
 ┌──────────┐
-│   AI     │ Otrzymuje wynik narzędzia, kontynuuje myślenie
+│   AI     │ Otrzymuje wyniki narzędzia, kontynuuje myślenie
 └──────────┘
 ```
 
 ## Weryfikacja uprawnień
 
-Wszystkie wykonania narzędzi przechodzą przez 3-poziomowy łańcuch uprawnień:
+Wszystkie wykonania narzędzi przechodzą przez łańcuch weryfikacji uprawnień:
 
-1. **UserFrequencyCache** — pamięć podręczna częstych zezwoleń/odmów użytkownika
-2. **IPermissionCallback** — niestandardowa funkcja wywołania zwrotnego uprawnień
-3. **Rozgałęzienie** — IsCurator: `IPermissionAskHandler` (zapytanie użytkownika) | Non-curator: `GlobalACL` (lista kontroli dostępu)
+1. **UserFrequencyCache** — pamięć podręczna decyzji użytkownika o wysokiej częstotliwości (HighDeny ma priorytet nad HighAllow)
+2. **IPermissionCallback** — niestandardowa funkcja wywołania zwrotnego uprawnień (Allowed/Denied/AskUser)
+3. **Gałąź IsCurator** — Kurator pyta użytkownika przez IPermissionAskHandler; nie-Kurator odpytuje GlobalACL, domyślnie odmawia przy braku pasującej reguły
 
 ## Tworzenie niestandardowych narzędzi
 
@@ -764,9 +847,7 @@ public class MyCustomTool : ITool
 
 ### Krok 2: Dodanie do projektu
 
-Umieść plik narzędzia w katalogu `src/SiliconLife.Common/Tools/` (narzędzia współdzielone). `ToolManager` automatycznie odkryje i zarejestruje narzędzie podczas uruchamiania poprzez refleksję.
-
-> **Uwaga**: `SiliconLife.Default` i `SiliconLife.Fast` nie mają już oddzielnych katalogów `Tools/`, wszystkie współdzielone narzędzia są umieszczane w `SiliconLife.Common/Tools/`.
+Umieść plik narzędzia w katalogu `src/SiliconLife.Common/Tools/` (narzędzia współdzielone) lub w katalogu `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (narzędzia specyficzne dla wersji). `ToolManager` automatycznie odkryje i zarejestruje narzędzie przez refleksję podczas uruchomienia.
 
 ### Krok 2a: Rejestracja narzędzia przez wtyczkę
 
@@ -777,7 +858,7 @@ Można również zarejestrować niestandardowe narzędzia przez system wtyczek:
 3. `ToolManager.ScanAllPluginAssemblies()` automatycznie przeskanuje wszystkie załadowane wtyczki w poszukiwaniu implementacji ITool
 4. Narzędzia wtyczek podlegają tym samym ograniczeniom systemu uprawnień
 
-### Krok 3: (Opcjonalnie) Oznaczenie jako przeznaczone tylko dla Kuratora
+### Krok 3: (Opcjonalnie) Oznaczenie jako wyłącznie dla Kuratora
 
 ```csharp
 [SiliconManagerOnly]
@@ -803,7 +884,7 @@ if (!call.Parameters.ContainsKey("required_param"))
 ```csharp
 try
 {
-    // Wykonanie operacji
+    // Wykonaj operację
 }
 catch (Exception ex)
 {
@@ -817,14 +898,14 @@ catch (Exception ex)
 Nigdy nie omijaj sprawdzania uprawnień. Zawsze uzyskuj dostęp do zasobów przez wykonawców:
 
 ```csharp
-var permission = permissionManager.EvaluatePermission(callerId, permissionType, resource);
-if (permission == PermissionResult.Denied)
+bool allowed = permissionManager.CheckPermission(callerId, permissionType, resource);
+if (!allowed)
 {
     return ToolResult.Denied("Permission denied");
 }
 ```
 
-### 4. Zapewnij jasne opisy narzędzi
+### 4. Dostarczaj jasne opisy narzędzi
 
 Pomóż AI zrozumieć, kiedy i jak używać narzędzia:
 
@@ -847,27 +928,27 @@ public string Description =>
 
 ### Uprawnienia odrzucone
 
-**Problem**: Wykonanie narzędzia nie powiodło się, zwrócono błąd uprawnień.
+**Problem**: wykonanie narzędzia nie powiodło się, zwrócono błąd uprawnień.
 
 **Rozwiązanie**:
 - Sprawdź dziennik audytu uprawnień
 - Zweryfikuj, czy Istota Krzemowa posiada wymagane uprawnienia
-- Sprawdź ustawienia globalnego ACL
-- Jeśli jesteś Kuratorem, sprawdź, czy użyto atrybutu `[SiliconManagerOnly]`
+- Przejrzyj ustawienia globalnej ACL
+- Jeśli to Kurator, sprawdź, czy użyto znacznika `[SiliconManagerOnly]`
 
-### Narzędzie zwraca błąd wykonania
+### Wykonanie narzędzia zwraca błąd
 
-**Problem**: Narzędzie zostało wykonane, ale zwróciło wynik niepowodzenia.
+**Problem**: narzędzie wykonuje się, ale zwraca niepowodzenie.
 
 **Rozwiązanie**:
 - Sprawdź komunikat błędu zwrócony przez narzędzie
 - Zweryfikuj poprawność formatu parametrów wejściowych
-- Zobacz logi systemowe, aby uzyskać szczegółowe informacje o błędzie
+- Przejrzyj logi systemowe w celu uzyskania szczegółowych informacji o błędzie
 - Przetestuj funkcjonalność narzędzia niezależnie
 
 ## Następne kroki
 
 - 📚 Przeczytaj [przewodnik architektury](architecture.md)
-- 🛠️ Zobacz [przewodnik programistyczny](development-guide.md)
+- 🛠️ Zobacz [przewodnik deweloperski](development-guide.md)
 - 🔒 Poznaj [system uprawnień](permission-system.md)
 - 🚀 Zobacz [przewodnik szybkiego startu](getting-started.md)

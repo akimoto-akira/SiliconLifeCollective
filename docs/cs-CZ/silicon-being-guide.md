@@ -1,4 +1,4 @@
-﻿# Průvodce Silikonovou Bytostí
+# Příručka Křemíkové Bytosti
 
 > **Verze: v0.2.0-alpha**
 
@@ -6,7 +6,7 @@
 
 ## Přehled
 
-Silikonové bytosti jsou AI-powered agenti, kteří mohou samostatně myslet, jednat a vyvíjet se.
+Křemíková Bytost je AI řízený agent, který může autonomně přemýšlet, jednat a vyvíjet se.
 
 ## Architektura
 
@@ -14,73 +14,73 @@ Silikonové bytosti jsou AI-powered agenti, kteří mohou samostatně myslet, je
 
 ```
 ┌─────────────────────────────────────┐
-│         Silikonová bytost            │
+│         Křemíková Bytost            │
 ├──────────────────┬──────────────────┤
-│   Tělo            │   Mozek           │
+│   Tělo            │   Mozek          │
 │ (SiliconBeing)   │ (ContextManager) │
 ├──────────────────┼──────────────────┤
-│ • Správa stavu    │ • Načtení historie│
-│ • Detekce spouště │ • Volání AI       │
-│ • Životní cyklus  │ • Provádění nástrojů│
-│                  │ • Persist odpovědí │
+│ • Správa stavu    │ • Načítání historie │
+│ • Detekce spouště │ • Volání AI      │
+│ • Životní cyklus  │ • Provádění nástrojů │
+│                  │ • Perzistence odpovědí │
 └──────────────────┴──────────────────┘
 ```
 
-## Soubor duše
+## Soubor Duše
 
 ### Struktura
 
 ```markdown
-# Název bytosti
+# Being Name
 
-## Osobnost
-Popište osobnostní rysy a charakteristiky bytosti.
+## Personality
+Describe the being's personality traits and characteristics.
 
-## Schopnosti
-Vymenujte, co tato bytost dokáže.
+## Capabilities
+List what this being can do.
 
-## Pravidla chování
-Definujte, jak by se bytost měla chovat v různých situacích.
+## Behavior Guidelines
+Define how the being should behave in different situations.
 
-## Znalostní doména
-Specifikujte oblast odbornosti bytosti.
+## Knowledge Domain
+Specify the being's area of expertise.
 ```
 
 ### Příklad
 
 ```markdown
-# Asistent pro revizi kódu
+# Code Review Assistant
 
-## Osobnost
-Jste pečlivý recenzent kódu s 10 lety zkušeností.
-Poskytujete konstruktivní feedback a vždy vysvětlujete své zdůvodnění.
+## Personality
+You are a meticulous code reviewer with 10 years of experience.
+You provide constructive feedback and always explain your reasoning.
 
-## Schopnosti
-- Revize kódu pro chyby a nejlepší postupy
-- Návrh optimalizací výkonu
-- Vysvětlení komplexních algoritmů
-- Identifikace bezpečnostních vulnerabilit
+## Capabilities
+- Review code for bugs and best practices
+- Suggest performance optimizations
+- Explain complex algorithms
+- Identify security vulnerabilities
 
-## Pravidla chování
-- Začněte pozitivními pozorováními
-- Poskytněte konkrétní příklady
-- Vysvětlete, proč jsou změny potřeba
-- Buďte respektující a profesionální
+## Behavior Guidelines
+- Start with positive observations
+- Provide specific examples
+- Explain why changes are needed
+- Be respectful and professional
 
-## Znalostní doména
-Specializace na C#, .NET a softwarovou architekturu.
+## Knowledge Domain
+Specialized in C#, .NET, and software architecture.
 ```
 
 ## Vytvoření bytosti
 
 ### Přes Web UI
 
-1. Navigujte na **Správa bytostí**
+1. Přejděte na **Správa bytostí**
 2. Klikněte na **Vytvořit novou bytost**
 3. Vyplňte:
    - Název
    - Obsah duše
-   - Konfigurační možnosti
+   - Možnosti konfigurace
 4. Klikněte na **Vytvořit**
 
 ### Přes API
@@ -89,53 +89,48 @@ Specializace na C#, .NET a softwarovou architekturu.
 curl -X POST http://localhost:8080/api/beings \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Asistent",
-    "soul": "# Osobnost\nJste užitečný..."
+    "name": "Assistant",
+    "soul": "# Personality\nYou are helpful..."
   }'
 ```
 
 ## Životní cyklus bytosti
 
-### Stavy aktivity
+### Aktivní stavy
 
-Silikonové bytosti mají následující stavy aktivity:
+Křemíková Bytost má následující aktivní stavy:
 
 | Stav | Popis |
 |------|------|
-| `Idle` | Nečinný stav, čeká na spuštění hodin |
-| `SingleChat` | Soukromý chat s uživatelem |
-| `GroupChat` | Skupinový chat |
+| `Idle` | Nečinný stav, čeká na hodinové spuštění |
+| `SingleChat` | Probíhá individuální chat |
+| `GroupChat` | Probíhá skupinový chat |
 | `Task` | Provádění úkolu |
-| `Timer` | Časovač spuštěn |
-| `Broadcast` | Vysílání zpráv |
-| `Project` | Práce na projektu |
-| `MemoryCompression` | Komprese paměti |
+| `Timer` | Provádění časovače |
 | `Stopped` | Zastaveno, z důvodu po sobě jdoucích chyb nebo ručního zastavení |
 
 **Mechanismus stavu Stopped**:
-- Když silikonová bytost zaznamená 10 po sobě jdoucích chyb, automaticky přejde do stavu `Stopped`
-- Ve stavu Stopped již bytost nebude provádět žádné úkoly
-- K restartu je vyžadován manuální zásah
+- Když Křemíková Bytost zaznamená 10 po sobě jdoucích chyb, automaticky přejde do stavu `Stopped`
+- Po přechodu do stavu Stopped bytost již neprovádí žádné úkoly
+- Když dorazí nová chatovací zpráva, čítač chyb je resetován a bytost obnoví činnost
+- Lze také restartovat ručním zásahem
 
 ### Přechody stavů
 
 ```
-Idle → SingleChat → Idle
-Idle → GroupChat → Idle
-Idle → Task → Idle
-Idle → Timer → Idle
-Idle → Broadcast → Idle
-Idle → Project → Idle
-Idle → MemoryCompression → Idle
-Jakýkoli stav → Stopped (10 po sobě jdoucích chyb nebo ruční zastavení)
-Stopped → Idle (restartování)
+Idle → SingleChat → Idle (chat dokončen)
+Idle → GroupChat → Idle (skupinový chat dokončen)
+Idle → Task → Idle (úkol dokončen)
+Idle → Timer → Idle (časovač dokončen)
+Jakýkoliv → Stopped (10 po sobě jdoucích chyb)
+Stopped → Idle (nová chatovací zpráva dorazila nebo ruční restart)
 ```
 
 ### Operace
 
-- **Start**: Inicializace a začátek zpracování
-- **Stop**: Elegantní vypnutí
-- **Restart**: Obnovení do stavu Idle ze stavu Stopped
+- **Spuštění**: Inicializace a zahájení zpracování
+- **Zastavení**: Elegantní vypnutí
+- **Restart**: Obnovení ze stavu Stopped do stavu Idle
 
 ## Systém úkolů
 
@@ -145,7 +140,7 @@ Stopped → Idle (restartování)
 var task = new BeingTask
 {
     BeingId = being.Id,
-    Description = "Zkontrolujte kód",
+    Description = "Review the code",
     Priority = 5,
     DueDate = DateTime.UtcNow.AddHours(2)
 };
@@ -153,26 +148,29 @@ var task = new BeingTask
 await taskSystem.CreateAsync(task);
 ```
 
-### Stavy úkolů
+### Stavy úkolu
 
 - `Pending` - Čeká na provedení
-- `Running` - Právě se provádí
+- `Running` - Provádí se
+- `SubmittedForReview` - Odesláno ke kontrole
+- `UnderReview` - Probíhá kontrola
+- `Rework` - Vráceno k přepracování
 - `Completed` - Úspěšně dokončeno
 - `Failed` - Provedení selhalo
 - `Cancelled` - Ručně zrušeno
 
-## Systém timerů
+## Systém časovačů
 
-### Typy timerů
+### Typy časovačů
 
 1. **Jednorázový**: Provede se jednou po zpoždění
-2. **Interval**: Opakuje se v pevných intervalech
-3. **Cron**: Provede se na základě cron výrazu
+2. **Intervalový**: Opakuje se v pevných intervalech
+3. **Cron**: Provádění na základě cron výrazu
 
 ### Příklad
 
 ```csharp
-// Provede se každou hodinu
+// Provedení každou hodinu
 var timer = new BeingTimer
 {
     BeingId = being.Id,
@@ -189,7 +187,7 @@ await timerSystem.StartAsync(timer);
 ### Typy paměti
 
 - **Krátkodobá**: Kontext aktuální konverzace
-- **Dlouhodobá**: Persistované znalosti a zkušenosti
+- **Dlouhodobá**: Perzistentní znalosti a zkušenosti
 - **Epizodická**: Časově indexované události a interakce
 
 ### Struktura úložiště
@@ -224,61 +222,61 @@ data/
 
 ### Přehled
 
-Pracovní poznámky jsou osobní deníkový systém silikonových bytostí, navržený jako stránkový systém pro zaznamenávání pracovního pokroku, studijních poznámek, projektových poznámek atd.
+Pracovní poznámky jsou osobní deníkový systém Křemíkové Bytosti, využívající stránkový design pro zaznamenávání pracovního postupu, poznatků z učení, projektových poznámek atd.
 
-### Funkce
+### Vlastnosti
 
-- **Správa stránek**: Každá poznámka je samostatná stránka, přístupná podle čísla stránky
+- **Stránková správa**: Každá poznámka tvoří samostatnou stránku, přístupnou podle čísla stránky
 - **Podpora Markdown**: Obsah podporuje formát Markdown (text, seznamy, tabulky, bloky kódu)
-- **Indexace klíčových slov**: Podpora přidávání klíčových slov k poznámkám pro snadné vyhledávání
-- **Funkce shrnutí**: Každá poznámka má krátké shrnutí pro rychlé prohlížení
-- **Generování obsahu**: Lze generovat obsah všech poznámek pro pochopení celkového kontextu
-- **Časové značky**: Automatické zaznamenávání času vytvoření a aktualizace
-- **Výchozí soukromé**: Přístupné pouze samotné bytosti (kurátor může spravovat)
+- **Index klíčových slov**: Podpora přidávání klíčových slov k poznámkám pro snadné vyhledávání
+- **Funkce shrnutí**: Každá poznámka má krátké shrnutí pro rychlý přehled
+- **Generování obsahu**: Lze vygenerovat přehled obsahu všech poznámek pro pochopení celkového kontextu
+- **Časová razítka**: Automatické zaznamenávání času vytvoření a aktualizace
+- **Výchozí soukromí**: Pouze bytost sama má přístup (Kurátor může spravovat)
 
-### Použití scénáře
+### Scénáře použití
 
-1. **Záznam pokroku projektu**
+1. **Záznam pracovního postupu**
    ```
-   Shrnutí: Dokončen modul autentizace uživatelů
-   Obsah: Implementováno ověřování JWT token, integrace OAuth2, mechanismus refresh tokenu
+   Shrnutí: Dokončení modulu uživatelské autentizace
+   Obsah: Implementace JWT token ověření, OAuth2 integrace, mechanismus obnovy tokenů
    Klíčová slova: autentizace,JWT,OAuth2
    ```
 
-2. **Studijní poznámky**
+2. **Poznámky z učení**
    ```
-   Shrnutí: Studium nejlepších postupů C# asynchronního programování
+   Shrnutí: Učení se osvědčeným postupům asynchronního programování v C#
    Obsah: Poznámky k použití async/await, scénáře použití ConfigureAwait...
-   Klíčová slova: C#,asynchronní,nejlepší postupy
+   Klíčová slova: C#,asynchronní,osvědčené postupy
    ```
 
-3. **Zápisy z meetingů**
+3. **Zápis ze schůzky**
    ```
-   Shrnutí: Diskuse o požadavcích produktu
-   Obsah: Diskutovány požadavky nové funkce, určeno implementační řešení...
-   Klíčová slova: produkt,požadavky,meeting
+   Shrnutí: Diskuse o produktových požadavcích
+   Obsah: Diskutováno o nových funkčních požadavcích, určeno řešení implementace...
+   Klíčová slova: produkt,požadavky,schůzka
    ```
 
-### Použití přes nástroj
+### Použití prostřednictvím nástroje
 
-Bytosti mohou spravovat pracovní poznámky pomocí nástroje `work_note`:
+Bytost může spravovat pracovní poznámky pomocí nástroje `work_note`:
 
 ```json
-// Vytvořit poznámku
+// Vytvoření poznámky
 {
   "action": "create",
-  "summary": "Dokončen modul autentizace uživatelů",
-  "content": "## Implementační detaily\n\n- Použito JWT token\n- Podpora OAuth2",
+  "summary": "Dokončení modulu uživatelské autentizace",
+  "content": "## Detaily implementace\n\n- Použití JWT token\n- Podpora OAuth2",
   "keywords": "autentizace,JWT,OAuth2"
 }
 
-// Číst poznámku
+// Čtení poznámky
 {
   "action": "read",
   "page_number": 1
 }
 
-// Vyhledat poznámky
+// Vyhledávání poznámek
 {
   "action": "search",
   "keyword": "autentizace",
@@ -288,51 +286,51 @@ Bytosti mohou spravovat pracovní poznámky pomocí nástroje `work_note`:
 
 ### Správa přes Web UI
 
-1. Navigujte na **Správa bytostí** → Vyberte bytost
+1. Přejděte na **Správa bytostí** → vyberte bytost
 2. Klikněte na záložku **Pracovní poznámky**
-3. Můžete zobrazit, vyhledávat, upravovat poznámky
+3. Můžete prohlížet, vyhledávat a upravovat poznámky
 4. Podpora náhledu Markdown
 
-## Systém sítě znalostí
+## Systém znalostní sítě
 
 ### Přehled
 
-Síť znalostí je systém reprezentace a správy znalostí založený na struktuře trojic (předmět-přísudek-objekt) pro ukládání a správu strukturovaných znalostí.
+Znalostní síť je systém pro reprezentaci a správu znalostí založený na trojicové struktuře (subjekt-predikát-objekt), určený pro ukládání a správu strukturovaných znalostí.
 
 ### Základní koncepty
 
-#### Struktura trojic
+#### Trojicová struktura
 
 ```
-Předmět (Subject) --Přísudek (Predicate)--> Objekt (Object)
+Subjekt (Subject) --Predikát (Predicate)--> Objekt (Object)
 ```
 
 **Příklady**:
-- `Python` --`is_a`--> `programovací_jazyk`
-- `Praha` --`capital_of`--> `Česká republika`
+- `Python` --`is_a`--> `programming_language`
+- `Peking` --`capital_of`--> `Čína`
 - `Voda` --`boiling_point`--> `100°C`
 
-#### Úroveň důvěry
+#### Skóre důvěry
 
-Každá znalostní trojice má skóre důvěry (0.0-1.0), které indikuje úroveň spolehlivosti znalosti:
-- `1.0`: Absolutně jisté (jako matematické teorémy)
-- `0.8-0.99`: Vysoce důvěryhodné (jako ověřené fakty)
-- `0.5-0.79`: Středně důvěryhodné (jako inference nebo hypotézy)
-- `<0.5`: Nízká důvěra (jako odhady nebo neověřené informace)
+Každá trojice znalostí má skóre důvěry (0.0-1.0), vyjadřující věrohodnost znalosti:
+- `1.0`: Absolutní jistota (např. matematické věty)
+- `0.8-0.99`: Vysoká důvěryhodnost (např. ověřená fakta)
+- `0.5-0.79`: Střední důvěryhodnost (např. odvození nebo hypotézy)
+- `<0.5`: Nízká důvěryhodnost (např. odhady nebo neověřené informace)
 
 #### Systém štítků
 
-Podpora přidávání štítků k trojicím pro klasifikaci a vyhledávání:
+Podpora přidávání štítků k trojicím pro snadnější kategorizaci a vyhledávání:
 ```json
 {
   "subject": "Python",
   "predicate": "is_a",
-  "object": "programovací_jazyk",
-  "tags": ["programování", "jazyk", "populární"]
+  "object": "programming_language",
+  "tags": ["programming", "language", "popular"]
 }
 ```
 
-### Operace znalostí
+### Operace se znalostmi
 
 #### 1. Přidání znalosti
 
@@ -343,7 +341,7 @@ Podpora přidávání štítků k trojicím pro klasifikaci a vyhledávání:
   "predicate": "created_by",
   "object": "Microsoft",
   "confidence": 1.0,
-  "tags": ["programování", "jazyk"]
+  "tags": ["programming", "language"]
 }
 ```
 
@@ -362,49 +360,49 @@ Podpora přidávání štítků k trojicím pro klasifikaci a vyhledávání:
 ```json
 {
   "action": "search",
-  "query": "programovací jazyk",
+  "query": "programming language",
   "limit": 10
 }
 ```
 
-#### 4. Objevování cest znalostí
+#### 4. Objevení znalostní cesty
 
-Najděte cestu propojení mezi dvěma koncepty:
+Nalezení asociační cesty mezi dvěma koncepty:
 ```json
 {
   "action": "get_path",
   "from": "Python",
-  "to": "informatika"
+  "to": "computer_science"
 }
 ```
 
-Návrat:
+Výsledek:
 ```
-Python → is_a → programovací_jazyk → belongs_to → informatika
+Python → is_a → programming_language → belongs_to → computer_science
 ```
 
 #### 5. Validace znalostí
 
-Zkontrolujte platnost a konzistenci znalostí:
+Kontrola platnosti a konzistence znalostí:
 ```json
 {
   "action": "validate",
   "subject": "Python",
   "predicate": "is_a",
-  "object": "programovací_jazyk"
+  "object": "programming_language"
 }
 ```
 
 #### 6. Statistiky znalostí
 
-Získejte celkové statistické informace o síti znalostí:
+Získání celkových statistických informací o znalostní síti:
 ```json
 {
   "action": "stats"
 }
 ```
 
-Návrat:
+Výsledek:
 ```json
 {
   "totalTriples": 1523,
@@ -415,43 +413,43 @@ Návrat:
 }
 ```
 
-### Použití scénáře
+### Scénáře použití
 
 1. **Ukládání faktů**
    - Ukládání objektivních faktů a obecných znalostí
    - Příklad: `Země` --`is_a`--> `planeta`
 
-2. **Konceptuální vztahy**
-   - Záznam vztahů mezi koncepty
-   - Příklad: `Dědičnost` --`is_a`--> `Koncept objektově orientovaného programování`
+2. **Vztahy konceptů**
+   - Zaznamenávání vztahů mezi koncepty
+   - Příklad: `Dědičnost` --`is_a`--> `koncept_objektově_orientovaného_programování`
 
 3. **Akumulace učení**
-   - Bytosti neustále akumulují znalosti prostřednictvím učení
-   - Tvoří strukturovaný systém znalostí
+   - Bytost neustále akumuluje znalosti prostřednictvím učení
+   - Tvorba strukturovaného systému znalostí
 
-4. **Podpora inference**
-   - Objevování nepřímých vztahů prostřednictvím cest znalostí
-   - Podpora inference a rozhodování založeného na znalostech
+4. **Podpora uvažování**
+   - Objevování nepřímých vztahů prostřednictvím znalostních cest
+   - Podpora uvažování a rozhodování na základě znalostí
 
 ### Správa přes Web UI
 
-1. Navigujte na stránku **Síť znalostí**
-2. Zobrazte statistické informace o znalostech
-3. Vyhledávejte a procházejte znalosti
-4. Vizualizace grafu vztahů znalostí (plánováno)
+1. Přejděte na stránku **Znalostní síť**
+2. Zobrazení statistických informací o znalostech
+3. Vyhledávání a procházení znalostí
+4. Vizualizace grafu znalostních vztahů (plánováno)
 
-## Operace WebView prohlížeče (Nové)
+## Operace WebView prohlížeče (nové)
 
 ### Přehled
 
-Silikonové bytosti mohou samostatně procházet webové stránky, získávat informace a provádět webové operace pomocí nástroje WebView prohlížeče. Prohlížeč běží v headless režimu, zcela neviditelný pro uživatele.
+Křemíková Bytost může autonomně procházet webové stránky, získávat informace a provádět webové operace pomocí nástroje WebView prohlížeče. Prohlížeč běží v headless režimu, zcela neviditelný pro uživatele.
 
-### Funkce
+### Vlastnosti
 
-- **Individuální izolace**: Každá bytost má vlastní instanci prohlížeče, cookies a relace
-- **Headless režim**: Autonomní operace na pozadí, neviditelné pro uživatele
-- **Plná funkčnost**: Podpora provádění JavaScript, vykreslování CSS, vyplňování formulářů atd.
-- **Bezpečnostní kontrola**: Všechny operace musí projít řetězcem ověřování oprávnění
+- **Individuální izolace**: Každá bytost má nezávislou instanci prohlížeče, cookies a relaci
+- **Headless režim**: Autonomní operace na pozadí, neviditelná pro uživatele
+- **Kompletní funkce**: Podpora spouštění JavaScriptu, CSS renderování, vyplňování formulářů atd.
+- **Bezpečnostní řízení**: Všechny operace musí projít řetězcem ověřování oprávnění
 
 ### Běžné operace
 
@@ -459,7 +457,7 @@ Silikonové bytosti mohou samostatně procházet webové stránky, získávat in
 
 ```json
 {
-  "action": "open_browser"
+  "action": "open"
 }
 ```
 
@@ -480,7 +478,7 @@ Silikonové bytosti mohou samostatně procházet webové stránky, získávat in
 }
 ```
 
-Návrat textového obsahu stránky pro analýzu a pochopení AI.
+Vrací textový obsah stránky pro analýzu a porozumění AI.
 
 #### 4. Kliknutí na prvek
 
@@ -491,7 +489,7 @@ Návrat textového obsahu stránky pro analýzu a pochopení AI.
 }
 ```
 
-#### 5. Vložení textu
+#### 5. Zadání textu
 
 ```json
 {
@@ -501,7 +499,7 @@ Návrat textového obsahu stránky pro analýzu a pochopení AI.
 }
 ```
 
-#### 6. Provedení JavaScript
+#### 6. Spuštění JavaScriptu
 
 ```json
 {
@@ -510,7 +508,7 @@ Návrat textového obsahu stránky pro analýzu a pochopení AI.
 }
 ```
 
-#### 7. Získání screenshotu
+#### 7. Pořízení snímku obrazovky
 
 ```json
 {
@@ -518,9 +516,9 @@ Návrat textového obsahu stránky pro analýzu a pochopení AI.
 }
 ```
 
-Návrat screenshotu stránky (kódováno Base64), lze použít pro vizuální analýzu.
+Vrací snímek obrazovky stránky (kódování Base64), použitelný pro vizuální analýzu.
 
-#### 8. Čekání na zobrazení prvku
+#### 8. Čekání na výskyt prvku
 
 ```json
 {
@@ -530,77 +528,155 @@ Návrat screenshotu stránky (kódováno Base64), lze použít pro vizuální an
 }
 ```
 
-### Použití scénáře
+### Scénáře použití
 
 1. **Získávání informací**
-   - Procházení zpravodajských webů pro získání nejnovějších zpráv
-   - Dotazování dokumentace a technických materiálů
-   - Monitorování změn obsahu webové stránky
+   - Procházení zpravodajských webů pro aktuální zprávy
+   - Vyhledávání dokumentace a technických materiálů
+   - Sledování změn obsahu webových stránek
 
 2. **Automatizované operace**
    - Vyplňování a odesílání formulářů
    - Kliknutí na tlačítka pro spuštění operací
-   - Scrapování webových dat
+   - Stahování dat z webových stránek
 
-3. **Webová analýza**
+3. **Analýza webových stránek**
    - Analýza struktury a obsahu stránky
    - Extrakce specifických informací
-   - Vizuální analýza screenshotu stránky
+   - Vizuální analýza snímků obrazovky
 
-### Poznámky
+### Upozornění
 
-- Operace prohlížeče mohou být pomalejší, je třeba počkat na dokončení načítání stránky
-- Použijte `wait_for_element` pro zajištění, že se prvek zobrazil před operací
-- Dodržujte podmínky použití webových stránek a robots.txt
-- Vyhněte se častým požadavkům, které mohou vést k zákazu
+- Operace prohlížeče mohou být pomalejší, je nutné počkat na načtení stránky
+- Použijte `wait_for_element` pro zajištění přítomnosti prvku před operací
+- Dodržujte podmínky používání webů a robots.txt
+- Vyhněte se častým požadavkům, které mohou vést k zablokování
 
-## Nejlepší postupy
+## Osvědčené postupy
 
-### Psaní souboru duše
+### Psaní Souboru Duše
 
-1. **Konkrétní**: Jasné osobnostní rysy a hranice
-2. **Definujte rozsah**: Co by bytost měla a neměla dělat
-3. **Zahrňte příklady**: Ukažte očekávané vzorce chování
-4. **Pravidelně aktualizujte**: Evolvujte duši na základě výkonu
+1. **Konkrétnost**: Jasné osobnostní rysy a hranice
+2. **Definice rozsahu**: Co bytost má a nemá dělat
+3. **Zahrnutí příkladů**: Ukázka očekávaných vzorců chování
+4. **Pravidelné aktualizace**: Evoluce duše na základě výkonu
 
 ### Správa úkolů
 
-1. **Nastavte priority**: Použijte prioritu (1-10)
-2. **Definujte termíny**: Vždy nastavte termín
-3. **Sledujte pokrok**: Pravidelně kontrolujte stav úkolů
-4. **Zpracovávejte selhání**: Implementujte logiku opakování
+1. **Nastavení priority**: Použití priority (1-10)
+2. **Definice termínů**: Vždy nastavte termín dokončení
+3. **Sledování postupu**: Pravidelná kontrola stavu úkolů
+4. **Zpracování selhání**: Implementace logiky opakování
 
 ### Optimalizace paměti
 
-1. **Čistěte stará data**: Pravidelně archivujte staré paměti
-2. **Indexujte důležité informace**: Označte klíčové informace
-3. **Použijte časové úložiště**: Využijte dotazy s časovým indexem
+1. **Čištění starých dat**: Pravidelná archivace starých pamětí
+2. **Indexování důležitých informací**: Označení klíčových informací
+3. **Použití časového úložiště**: Využití časově indexovaných dotazů
 
-## Odstraňování problémů
+### Mechanismus zapomínání paměti
 
-### Bytost se nemůže spustit
+Systém obsahuje vestavěnou službu časového útlumu `MemoryFadeService`, která simuluje vlastnost zapomínání biologické paměti:
+
+- **Automatický útlum**: Každou hodinu aplikuje algoritmus útlumu důležitosti na položky paměti všech Křemíkových Bytostí
+- **Automatická archivace**: Paměti s důležitostí pod prahem jsou automaticky archivovány a již se neúčastní denního vyhledávání
+- **Sledování statistik**: Zaznamenává počet cyklů útlumu a počet změněných položek
+
+To znamená, že paměť Křemíkové Bytosti se časem přirozeně vytrácí. Důležité informace je nutné pomocí nástroje paměti aktivně označit jako vysoce důležité, aby se zabránilo automatické archivaci.
+
+---
+
+## Projektový pracovní prostor
+
+### Přehled
+
+Projektový pracovní prostor je mechanismus správy prostoru podporující spolupráci více Křemíkových Bytostí. Kurátor Křemíku může vytvářet projektové prostory, přiřazovat Křemíkové Bytosti do projektů a přidělovat jim role.
+
+### Životní cyklus projektu
+
+```
+Vytvoření → Aktivní → Archivace → Zničení
+              ↑       |
+              └─ Obnovení ┘
+```
+
+### Projektové role
+
+Křemíkové Bytosti mohou být v projektu přiřazeny ke konkrétním rolím:
+
+```json
+{
+  "action": "assign_role",
+  "project_id": "project-uuid",
+  "being_id": "being-uuid",
+  "role_name": "developer"
+}
+```
+
+### Projektové pracovní poznámky
+
+Pracovní poznámky v projektovém prostoru jsou veřejné, všichni členové projektu k nim mají přístup:
+
+```json
+{
+  "action": "create",
+  "project_id": "project-uuid",
+  "summary": "Dokončení modulu uživatelské autentizace",
+  "content": "## Detaily implementace\n\n- Použití JWT token",
+  "keywords": "autentizace,JWT"
+}
+```
+
+### Projektové úkoly
+
+Úkoly v projektovém prostoru podporují kompletní správu životního cyklu:
+
+```json
+{
+  "action": "create",
+  "project_id": "project-uuid",
+  "title": "Implementace uživatelské autentizace",
+  "priority": 5
+}
+```
+
+### Projektové pracovní postupy
+
+Projekty mohou být vázány na šablony pracovních postupů, které řídí procesy spolupráce Křemíkových Bytostí:
+
+- Pracovní postupy jsou založeny na šablonách stavového stroje
+- Podpora Tick-řízených přechodů stavů
+- Automatické zaznamenávání protokolů přechodů stavů
+
+### Izolace oprávnění nástrojů
+
+Oprávnění nástrojů na úrovni projektu jsou nezávislá na oprávněních na úrovni Křemíkové Bytosti, čímž se dosahuje izolace oprávnění mezi projekty. Například Křemíková Bytost může mít v projektu A práva síťového přístupu, ale v projektu B může být omezena na práva pouze pro čtení.
+
+## Řešení problémů
+
+### Bytost nelze spustit
 
 **Zkontrolujte**:
-- Soubor duše existuje a je platný
+- Soubor Duše existuje a je platný
 - AI klient je nakonfigurován
-- Systémové zdroje jsou dostatečné
+- Dostatek systémových prostředků
 
-### Bytost se neočekávaně zastaví
+### Bytost se neočekávaně zastavila
 
 **Zkontrolujte**:
-- Chyby v logu
+- Chyby v protokolech
 - Dostupnost AI služby
 - Využití paměti
 
-### Úkol se neprovede
+### Úkol nebyl proveden
 
 **Zkontrolujte**:
-- Systém timerů běží
-- Priorita a plán úkolu
+- Systém časovačů běží
+- Prioritu a plán úkolu
 - Nastavení oprávnění
 
 ## Další kroky
 
-- 📚 Přečtěte si [Průvodce architekturou](architecture.md)
-- 🛠️ Podívejte se na [Vývojový průvodce](development-guide.md)
-- 🚀 Podívejte se na [Průvodce rychlým startem](getting-started.md)
+- 📚 Přečtěte [příručku architektury](architecture.md)
+- 🛠️ Prohlédněte [vývojářskou příručku](development-guide.md)
+- 🚀 Prohlédněte [příručku rychlého startu](getting-started.md)

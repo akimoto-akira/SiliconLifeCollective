@@ -1,12 +1,12 @@
-﻿# Silicon Being Guide
+# Silicon Being Guide
 
 > **Version: v0.2.0-alpha**
 
-**English** | [中文](../zh-CN/silicon-being-guide.md) | [繁體中文](../zh-HK/silicon-being-guide.md) | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | [한국어](../ko-KR/silicon-being-guide.md) | [Deutsch](../de-DE/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md) | [Русский](../ru-RU/silicon-being-guide.md)
+[English](../en/silicon-being-guide.md) | [Deutsch](../de-DE/silicon-being-guide.md) | [中文](../zh-CN/silicon-being-guide.md) | [繁體中文](../zh-HK/silicon-being-guide.md) | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | [한국어](../ko-KR/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md) | [Русский](../ru-RU/silicon-being-guide.md)
 
 ## Overview
 
-Silicon beings are AI-driven agents that can think, act, and evolve autonomously.
+Silicon Beings are AI-driven agents that can think, act, and evolve autonomously.
 
 ## Architecture
 
@@ -19,10 +19,10 @@ Silicon beings are AI-driven agents that can think, act, and evolve autonomously
 │   Body            │   Brain          │
 │ (SiliconBeing)   │ (ContextManager) │
 ├──────────────────┼──────────────────┤
-│ • State          │ • Load history   │
-│ • Trigger detect │ • Call AI        │
-│ • Lifecycle      │ • Execute tools  │
-│                  │ • Persist        │
+│ • State management│ • Load history   │
+│ • Trigger detect  │ • Call AI        │
+│ • Lifecycle       │ • Execute tools  │
+│                   │ • Persist response│
 └──────────────────┴──────────────────┘
 ```
 
@@ -98,27 +98,32 @@ curl -X POST http://localhost:8080/api/beings \
 
 ### Activity States
 
-Silicon beings have the following activity states:
+Silicon Beings have the following activity states:
 
 | State | Description |
 |------|------|
 | `Idle` | Idle state, waiting for clock trigger |
-| `Working` | Executing a round of AI request + tool calls |
-| `Error` | Error occurred during execution |
+| `SingleChat` | Engaged in a one-on-one chat |
+| `GroupChat` | Engaged in a group chat |
+| `Task` | Executing a task |
+| `Timer` | Executing a timer |
 | `Stopped` | Stopped, due to consecutive errors or manual stop |
 
 **Stopped State Mechanism**:
-- When a silicon being encounters 10 consecutive errors, it automatically enters the `Stopped` state
+- When a Silicon Being encounters 10 consecutive errors, it automatically enters the `Stopped` state
 - Once in Stopped state, the being will no longer execute any tasks
-- Manual intervention is required to restart
+- When a new chat message arrives, the error counter is reset and the being resumes operation
+- It can also be restarted through manual intervention
 
 ### State Transitions
 
 ```
-Idle → Working → Idle (normal completion)
-Working → Error → Working (error recovery)
-Working → Stopped (10 consecutive errors or manual stop)
-Stopped → Idle (restart)
+Idle → SingleChat → Idle (chat completed)
+Idle → GroupChat → Idle (group chat completed)
+Idle → Task → Idle (task completed)
+Idle → Timer → Idle (timer completed)
+Any → Stopped (10 consecutive errors)
+Stopped → Idle (new chat message arrives or manual restart)
 ```
 
 ### Operations
@@ -145,8 +150,11 @@ await taskSystem.CreateAsync(task);
 
 ### Task States
 
-- `Pending` - Waiting execution
+- `Pending` - Waiting for execution
 - `Running` - Currently executing
+- `SubmittedForReview` - Submitted for review
+- `UnderReview` - Under review
+- `Rework` - Rework required
 - `Completed` - Successfully completed
 - `Failed` - Execution failed
 - `Cancelled` - Manually cancelled
@@ -162,7 +170,7 @@ await taskSystem.CreateAsync(task);
 ### Example
 
 ```csharp
-// Execute every hour
+// 每小时执行
 var timer = new BeingTimer
 {
     BeingId = being.Id,
@@ -184,7 +192,7 @@ await timerSystem.StartAsync(timer);
 
 ### Storage Structure
 
-Default version (File system storage):
+Default version:
 ```
 data/
 └── beings/
@@ -210,21 +218,21 @@ data/
         └── soul.md
 ```
 
-## Work Notes System
+## Work Note System
 
 ### Overview
 
-Work notes are a personal diary system for silicon beings, using a page-based design to record work progress, learning notes, project notes, etc.
+Work notes are a personal diary system for Silicon Beings, using a page-based design to record work progress, learning notes, project notes, etc.
 
 ### Features
 
-- **Page-based management**: Each note is independent, accessed by page number
+- **Page-based management**: Each note is an independent page, accessed by page number
 - **Markdown support**: Content supports Markdown format (text, lists, tables, code blocks)
 - **Keyword indexing**: Supports adding keywords to notes for easy search
 - **Summary feature**: Each note has a brief summary for quick browsing
-- **Table of contents generation**: Can generate directory overview of all notes to help understand overall context
+- **Table of contents generation**: Can generate a directory overview of all notes to help understand overall context
 - **Timestamps**: Automatically records creation and update times
-- **Private by default**: Only accessible by the being itself (curator can manage)
+- **Private by default**: Only accessible by the being itself (Silicon Curator can manage)
 
 ### Use Cases
 
@@ -254,24 +262,24 @@ Work notes are a personal diary system for silicon beings, using a page-based de
 Beings can manage work notes through the `work_note` tool:
 
 ```json
-// Create note
+// 创建笔记
 {
   "action": "create",
-  "summary": "Completed user authentication module",
-  "content": "## Implementation Details\n\n- Used JWT token\n- Supports OAuth2",
-  "keywords": "authentication,JWT,OAuth2"
+  "summary": "完成用户认证模块",
+  "content": "## 实现细节\n\n- 使用 JWT token\n- 支持 OAuth2",
+  "keywords": "认证,JWT,OAuth2"
 }
 
-// Read note
+// 读取笔记
 {
   "action": "read",
   "page_number": 1
 }
 
-// Search notes
+// 搜索笔记
 {
   "action": "search",
-  "keyword": "authentication",
+  "keyword": "认证",
   "max_results": 10
 }
 ```
@@ -287,7 +295,7 @@ Beings can manage work notes through the `work_note` tool:
 
 ### Overview
 
-The knowledge network is a knowledge representation and management system based on triple structure (subject-predicate-object), used to store and manage structured knowledge.
+The Knowledge Network is a knowledge representation and management system based on triple structure (subject-predicate-object), used to store and manage structured knowledge.
 
 ### Core Concepts
 
@@ -387,7 +395,7 @@ Check knowledge validity and consistency:
 
 #### 6. Knowledge Statistics
 
-Get overall statistics of the knowledge network:
+Get overall statistics of the Knowledge Network:
 ```json
 {
   "action": "stats"
@@ -417,7 +425,7 @@ Returns:
 
 3. **Learning Accumulation**
    - Beings continuously accumulate knowledge through learning
-   - Form structured knowledge system
+   - Form structured knowledge systems
 
 4. **Reasoning Support**
    - Discover indirect relationships through knowledge paths
@@ -434,14 +442,14 @@ Returns:
 
 ### Overview
 
-Silicon beings can autonomously browse web pages, obtain information, and perform web operations through the WebView browser tool. The browser runs in headless mode, completely invisible to users.
+Silicon Beings can autonomously browse web pages, obtain information, and perform web operations through the WebView browser tool. The browser runs in headless mode, completely invisible to users.
 
 ### Features
 
 - **Individual isolation**: Each being has independent browser instance, cookies, and sessions
 - **Headless mode**: Autonomous operation in background, invisible to users
 - **Full functionality**: Supports JavaScript execution, CSS rendering, form filling, etc.
-- **Security control**: All operations must pass through permission verification chain
+- **Security control**: All operations must pass through the permission verification chain
 
 ### Common Operations
 
@@ -449,7 +457,7 @@ Silicon beings can autonomously browse web pages, obtain information, and perfor
 
 ```json
 {
-  "action": "open_browser"
+  "action": "open"
 }
 ```
 
@@ -487,7 +495,7 @@ Returns page text content for AI analysis and understanding.
 {
   "action": "input",
   "selector": "#search-input",
-  "text": "Search keyword"
+  "text": "搜索关键词"
 }
 ```
 
@@ -539,7 +547,7 @@ Returns page screenshot (Base64 encoded), can be used for visual analysis.
 
 ### Notes
 
-- Browser operations may be slower, need to wait for page loading
+- Browser operations may be slower, need to wait for page loading to complete
 - Use `wait_for_element` to ensure element appears before operating
 - Comply with website terms of use and robots.txt
 - Avoid frequent requests that may lead to banning
@@ -566,12 +574,90 @@ Returns page screenshot (Base64 encoded), can be used for visual analysis.
 2. **Index important info**: Tag critical information
 3. **Use time storage**: Leverage time-indexed queries
 
+### Memory Fade Mechanism
+
+The system includes a built-in `MemoryFadeService` periodic decay service that simulates the forgetting characteristics of biological memory:
+
+- **Automatic decay**: Applies an importance decay algorithm to all Silicon Beings' memory entries every hour
+- **Automatic archiving**: Memories with importance below the threshold are automatically archived and no longer participate in daily retrieval
+- **Statistics tracking**: Records the number of decay cycles and the number of status-changed entries
+
+This means that Silicon Beings' memories naturally fade over time. Important information needs to be actively marked as high importance through the Memory Tool to avoid being automatically archived.
+
+---
+
+## Project Workspace
+
+### Overview
+
+Project Workspace is a space management mechanism that supports multi-Silicon Being collaboration. Silicon Curators can create project spaces, assign Silicon Beings to projects, and assign roles to them.
+
+### Project Lifecycle
+
+```
+Created → Active → Archived → Destroyed
+              ↑       |
+              └─ Restore ┘
+```
+
+### Project Roles
+
+Silicon Beings can be assigned specific roles in a project:
+
+```json
+{
+  "action": "assign_role",
+  "project_id": "project-uuid",
+  "being_id": "being-uuid",
+  "role_name": "developer"
+}
+```
+
+### Project Work Notes
+
+Work notes within a project space are public and accessible to all project members:
+
+```json
+{
+  "action": "create",
+  "project_id": "project-uuid",
+  "summary": "完成用户认证模块",
+  "content": "## 实现细节\n\n- 使用 JWT token",
+  "keywords": "认证,JWT"
+}
+```
+
+### Project Tasks
+
+Tasks within a project space support full lifecycle management:
+
+```json
+{
+  "action": "create",
+  "project_id": "project-uuid",
+  "title": "实现用户认证",
+  "priority": 5
+}
+```
+
+### Project Workflow
+
+Projects can be bound to workflow templates to drive the collaboration process of Silicon Beings:
+
+- Workflows are based on state machine templates
+- Support Tick-driven state transitions
+- Automatically record state transition logs
+
+### Tool Permission Isolation
+
+Project-level tool permissions are independent of Silicon Being-level permissions, achieving permission isolation between projects. For example, a Silicon Being may have network access permissions in Project A, but be restricted to read-only permissions in Project B.
+
 ## Troubleshooting
 
 ### Being Won't Start
 
 **Check**:
-- Soul file exists and is valid
+- Soul File exists and is valid
 - AI client is configured
 - Sufficient system resources
 
@@ -585,7 +671,7 @@ Returns page screenshot (Base64 encoded), can be used for visual analysis.
 ### Tasks Not Executing
 
 **Check**:
-- Timer system is running
+- Timer System is running
 - Task priority and scheduling
 - Permission settings
 

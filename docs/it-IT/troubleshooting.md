@@ -1,91 +1,91 @@
-﻿# Guida alla risoluzione dei problemi
+# Guida alla Risoluzione dei Problemi
 
-> **Versione : v0.2.0-alpha**
+> **Versione: v0.2.0-alpha**
 
-[English](../en/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [Français](../fr-FR/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md) | [Русский](../ru-RU/troubleshooting.md) | **Italiano**
+[English](../en/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md) | [Русский](../ru-RU/troubleshooting.md) | **Italiano**
 
-## Problemi comuni
+## Problemi Comuni
 
-### Compilazione e build
+### Compilazione e Build
 
-#### Problema : Build fallita, dipendenze mancanti
+#### Problema: Build fallita, dipendenze mancanti
 
-**Sintomi** :
+**Sintomi**:
 ```
 error CS0246: The type or namespace name 'Microsoft.CodeAnalysis' could not be found
 ```
 
-**Soluzione** :
+**Soluzione**:
 ```bash
 dotnet restore
 dotnet build
 ```
 
-#### Problema : SDK .NET non trovato
+#### Problema: .NET SDK non trovato
 
-**Sintomi** :
+**Sintomi**:
 ```
 The .NET SDK could not be found
 ```
 
-**Soluzione** :
-1. Installare il SDK .NET 9 : https://dotnet.microsoft.com/download/dotnet/9.0
-2. Verificare l'installazione :
+**Soluzione**:
+1. Installa .NET 9 SDK: https://dotnet.microsoft.com/download/dotnet/9.0
+2. Verifica l'installazione:
 ```bash
 dotnet --version
 ```
 
 ---
 
-### Problemi di connessione IA
+### Problemi di Connessione AI
 
-#### Problema : Connessione Ollama rifiutata
+#### Problema: Connessione Ollama rifiutata
 
-**Sintomi** :
+**Sintomi**:
 ```
 Failed to connect to Ollama at http://localhost:11434
 ```
 
-**Soluzione** :
+**Soluzione**:
 ```bash
-# Verificare se Ollama funziona
+# Verifica che Ollama sia in esecuzione
 ollama list
 
-# Avviare Ollama
+# Avvia Ollama
 ollama serve
 
-# Testare la connessione
+# Testa la connessione
 curl http://localhost:11434/api/tags
 ```
 
-#### Problema : Modello non trovato
+#### Problema: Modello non trovato
 
-**Sintomi** :
+**Sintomi**:
 ```
 model "qwen2.5:7b" not found
 ```
 
-**Soluzione** :
+**Soluzione**:
 ```bash
-# Scaricare il modello necessario
+# Scarica il modello richiesto
 ollama pull qwen2.5:7b
 
-# Elencare i modelli disponibili
+# Elenca i modelli disponibili
 ollama list
 ```
 
-#### Problema : Errore DashScope 404
+#### Problema: Errore 404 Bailian
 
-**Sintomi** :
+**Sintomi**:
 ```
 HTTP 404: Model not found
 ```
 
-**Soluzione** :
-1. Verificare la chiave API
-2. Verificare il nome del modello con il catalogo DashScope
-3. Verificare l'endpoint regionale
-4. Verificare l'accesso dell'account al modello
+**Soluzione**:
+1. Verifica che la chiave API sia corretta
+2. Controlla che il nome del modello corrisponda alla directory Bailian
+3. Verifica che l'endpoint regionale sia corretto
+4. Controlla che l'account abbia accesso al modello
 
 #### Problema: Connessione Volcengine Ark fallita
 
@@ -96,411 +96,479 @@ oppure
 HTTP 404: Endpoint not found
 ```
 
-**Soluzione** :
-1. Verificare la chiave API
-2. Verificare il formato dell'URL dell'endpoint (predefinito: `https://ark.cn-beijing.volces.com/api/v3/chat/completions`)
-3. Verificare che il parametro Model utilizzi un ID endpoint di inferenza (es. `ep-20241212123456-abcde`), non un nome modello
-4. Verificare l'accesso dell'account all'endpoint
+**Soluzione**:
+1. Verifica che la chiave API sia corretta
+2. Controlla che il formato dell'URL dell'endpoint sia corretto (predefinito: `https://ark.cn-beijing.volces.com/api/v3/chat/completions`)
+3. Conferma che il parametro Model utilizzi l'ID del punto di accesso all'inferenza (es. `ep-20241212123456-abcde`), non il nome del modello
+4. Verifica che l'account abbia accesso al punto di accesso
 
 ---
 
-### Problemi di esecuzione
+### Problemi di Runtime
 
-#### Problema : Porta già in uso
+#### Problema: Porta già in uso
 
-**Sintomi** :
+**Sintomi**:
 ```
 HttpListenerException: Address already in use
 ```
 
-**Soluzione** :
+**Soluzione**:
 
-**Windows** :
+**Windows**:
 ```bash
 netstat -ano | findstr :8080
 taskkill /PID <PID> /F
 ```
 
-**Linux/Mac** :
+**Linux/Mac**:
 ```bash
 lsof -ti:8080 | xargs kill -9
 ```
 
-**Oppure cambiare la porta nella configurazione**.
+**Oppure cambia la porta nella configurazione**.
 
-#### Problema : Il Being non si avvia
+#### Problema: L'essere non si avvia
 
-**Sintomi** :
-- Lo stato del Being mostra « Error »
-- I log mostrano errori di inizializzazione
+**Sintomi**:
+- Lo stato dell'essere mostra "Error"
+- I log mostrano un fallimento dell'inizializzazione
 
-**Soluzione** :
-1. Verificare che il file anima esista e sia valido
-2. Verificare che il client IA sia configurato
-3. Esaminare i log per errori specifici :
+**Soluzione**:
+1. Controlla che il File dell'Anima esista e sia valido
+2. Verifica che il client AI sia configurato
+3. Controlla i log per l'errore specifico:
 ```bash
 tail -f logs/*.log
 ```
 
-#### Problema : Memoria insufficiente
+#### Problema: Memoria insufficiente
 
-**Sintomi** :
+**Sintomi**:
 ```
 OutOfMemoryException
 ```
 
-**Soluzione** :
-1. **SiliconLife.Default** : Aumentare la dimensione dell'heap :
+**Soluzione**:
+1. **SiliconLife.Default**: Aumenta la dimensione dell'heap:
 ```bash
 dotnet run --project src/SiliconLife.Default --server.gcHeapCount 4
 ```
 
-2. **SiliconLife.Fast** : La versione Fast ha un consumo di memoria elevato (~500 MB). Se la memoria è costantemente limitata, si consiglia di :
-   - Ridurre il numero di Silicon Beings funzionanti simultaneamente
+2. **SiliconLife.Fast**: La versione Fast ha un utilizzo di memoria intrinsecamente più alto (~500MB); se la memoria continua a essere insufficiente, si consiglia di:
+   - Ridurre il numero di Esseri di Silicio concorrenti
    - Pulire i vecchi dati per liberare memoria
 
-3. Pulire i vecchi dati :
+3. Pulisci i vecchi dati:
 ```bash
-# Archiviare i vecchi log
+# Archivia i vecchi log
 mv logs/ logs-archive/
 mkdir logs
 
-# Pulire il vecchio storage
-# Tramite interfaccia Web : Gestione storage > Pulizia
+# Pulisci le vecchie memorie
+# Tramite Web UI: Gestione memoria > Pulizia
 ```
 
-> **Suggerimento** : SiliconLife.Default ha un basso consumo di memoria (~200 MB), adatto per ambienti con memoria limitata ; SiliconLife.Fast ha un consumo di memoria più elevato ma prestazioni migliori, adatto per ambienti di produzione.
+> **Suggerimento**: SiliconLife.Default ha un utilizzo di memoria inferiore (~200MB), adatto per ambienti con memoria limitata; SiliconLife.Fast ha un utilizzo di memoria superiore ma prestazioni migliori, adatto per ambienti di produzione.
 
 ---
 
-### Problemi di permessi
+### Problemi di Permessi
 
-#### Problema : Permesso negato
+#### Problema: Permesso negato
 
-**Sintomi** :
+**Sintomi**:
 ```
-Permission denied: disk:write
+Permission denied: FileAccess C:\Windows
 ```
 
-**Soluzione** :
-1. Verificare i permessi attuali :
+**Soluzione**:
+1. Controlla i permessi correnti:
 ```bash
-curl http://localhost:8080/api/permissions
+curl http://localhost:8080/api/permissions/list
 ```
 
-2. Concedere il permesso :
+2. Concedi il permesso:
 ```bash
 curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "prefix": "disk:write",
+    "permissionType": "FileAccess",
+    "resourcePrefix": "C:\\Projects",
     "result": "Allowed",
-    "duration": 3600
+    "description": "Allow project directory access"
   }'
 ```
 
-3. Oppure usare l'interfaccia Web : Gestione permessi
+3. Oppure utilizza la Web UI: Gestione permessi
 
-#### Problema : Il permesso non scade
+#### Problema: I permessi non scadono
 
-**Sintomi** :
-- Il permesso è ancora attivo dopo il termine di scadenza
+**Sintomi**:
+- I permessi rimangono validi dopo il tempo di scadenza
 
-**Soluzione** :
-1. Verificare la sincronizzazione dell'orologio di sistema
-2. Verificare che le voci nella cache frequenza non siano scadute
-3. Svuotare la cache dei permessi
+**Soluzione**:
+1. Controlla la sincronizzazione dell'orologio di sistema
+2. Verifica che il campo `expiresAt` sia impostato correttamente
+3. Cancella la cache dei permessi
 
 ---
 
-### Problemi dell'interfaccia Web
+### Problemi della Web UI
 
-#### Problema : Interfaccia Web inaccessibile
+#### Problema: Impossibile accedere alla Web UI
 
-**Sintomi** :
-- Il browser mostra « Connection refused »
+**Sintomi**:
+- Il browser mostra "Connection refused"
 
-**Soluzione** :
-1. Verificare che il server funzioni
-2. Verificare l'URL corretto : `http://localhost:8080`
-3. Verificare le impostazioni del firewall
-4. Esaminare i log per errori di avvio
+**Soluzione**:
+1. Verifica che il server sia in esecuzione
+2. Controlla l'URL corretto: `http://localhost:8080`
+3. Controlla le impostazioni del firewall
+4. Controlla i log per errori di avvio
 
-#### Problema : SSE non funziona
+#### Problema: SSE non funziona
 
-**Sintomi** :
+**Sintomi**:
 - Gli aggiornamenti in tempo reale non appaiono
-- La chat non viene streammata
+- La chat non trasmette in streaming
 
-**Soluzione** :
-1. Verificare il supporto SSE del browser
-2. Disabilitare il buffering del proxy per SSE
-3. Verificare la stabilità della rete
-4. Provare un altro browser
+**Soluzione**:
+1. Verifica che il browser supporti SSE
+2. Disabilita il buffering del proxy per SSE
+3. Controlla la stabilità della rete
+4. Prova un browser diverso
 
-#### Problema : L'interfaccia sembra rotta
+#### Problema: L'UI appare danneggiata
 
-**Sintomi** :
-- Stili incorretti
-- Layout rotto
+**Sintomi**:
+- Stili non corretti
+- Layout interrotto
 
-**Soluzione** :
-1. Svuotare la cache del browser
-2. Provare un altro skin : Impostazioni > Skin
-3. Verificare la console del browser per errori
-4. Disabilitare le estensioni del browser
+**Soluzione**:
+1. Cancella la cache del browser
+2. Prova una skin diversa: Impostazioni > Skin
+3. Controlla gli errori nella console del browser
+4. Disabilita le estensioni del browser
 
 ---
 
-### Problemi di storage
+### Problemi di Archiviazione
 
-#### Problema : Dati non leggibili/scrivibili
+#### Problema: Impossibile leggere/scrivere dati
 
-**Sintomi** :
+**Sintomi**:
 ```
 IOException: Access denied
 ```
 
-**Soluzione** :
-1. Verificare i permessi dei file
-2. Verificare che il percorso di storage esista
-3. Verificare lo spazio su disco
-4. Eseguire con i permessi appropriati
+**Soluzione**:
+1. Controlla i permessi dei file
+2. Verifica che il percorso di archiviazione esista
+3. Controlla lo spazio su disco
+4. Esegui con i permessi appropriati
 
-#### Problema : Corruzione dati
+#### Problema: Dati danneggiati
 
-**Sintomi** :
-- Errori di parsing JSON
-- Perdita di dati
+**Sintomi**:
+- Errori di analisi JSON
+- Dati mancanti
 
-**Soluzione** :
-1. Ripristinare da un backup
-2. Verificare l'integrità dello storage :
+**Soluzione**:
+1. Ripristina da backup
+2. Controlla l'integrità dell'archiviazione:
 ```bash
-# Tramite interfaccia Web : Sistema > Verifica storage
+# Tramite Web UI: Sistema > Controllo archiviazione
 ```
 
-3. Riparare manualmente i file corrotti
+3. Ripara manualmente i file danneggiati
 
-#### Problema : File di storage SpeedyPack corrotto (versione Fast)
+#### Problema: File di archiviazione SpeedyPack danneggiati (versione Fast)
 
-**Sintomi** :
-- Il file `.spk` non può essere caricato
-- L'inizializzazione di SpeedyStorage fallisce
+**Sintomi**:
+- I file `.spk` non possono essere caricati
+- Inizializzazione di SpeedyStorage fallita
 
-**Soluzione** :
-1. Usare lo strumento `SiliconLife.Speedy.Manager` per verificare e riparare i file `.spk`
-2. Verificare che il file di indice `.spk.idx` corrisponda al file `.spk`
-3. Se il file di indice è corrotto, eliminare il file `.spk.idx` — il sistema ricreerà l'indice automaticamente
-4. Ripristinare il file `.spk` da un backup
+**Soluzione**:
+1. Utilizza lo strumento `SiliconLife.Speedy.Manager` per controllare e riparare i file `.spk`
+2. Verifica che il file di indice `.spk.idx` corrisponda al file `.spk`
+3. Se il file di indice è danneggiato, elimina il file `.spk.idx`, il sistema ricostruirà automaticamente l'indice
+4. Ripristina i file `.spk` dal backup
 
-#### Problema : Auto-compattazione SpeedyPack fallita (versione Fast)
+#### Problema: Compressione automatica SpeedyPack fallita (versione Fast)
 
-**Sintomi** :
-- Il file `.spk` cresce continuamente
-- Lo spazio su disco diventa insufficiente
+**Sintomi**:
+- I file `.spk` continuano a crescere
+- Spazio su disco insufficiente
 
-**Soluzione** :
-1. Verificare che `SpeedyPackAutoCompactor` funzioni correttamente
-2. Attivare manualmente l'operazione di compattazione
-3. Verificare la configurazione della soglia di compattazione
-4. Usare lo strumento `SiliconLife.Speedy.Manager` per la compattazione manuale
+**Soluzione**:
+1. Verifica che `SpeedyPackAutoCompactor` funzioni correttamente
+2. Attiva manualmente l'operazione di compressione
+3. Controlla la configurazione della soglia di compressione
+4. Utilizza lo strumento `SiliconLife.Speedy.Manager` per la compressione manuale
 
 ---
 
-### Problemi di esecuzione degli strumenti
+### Problemi di Esecuzione degli Strumenti
 
-#### Problema : Strumento non trovato
+#### Problema: Strumento non trovato
 
-**Sintomi** :
+**Sintomi**:
 ```
 Tool "xyz" not found
 ```
 
-**Soluzione** :
-1. Verificare che il nome dello strumento sia corretto
-2. Verificare lo strumento nella directory degli strumenti
-3. Ricostruire il progetto
-4. Verificare che lo strumento sia implementato correttamente
+**Soluzione**:
+1. Verifica che il nome dello strumento sia corretto
+2. Controlla che lo strumento sia nella directory Tools
+3. Ricompila il progetto
+4. Verifica che lo strumento sia implementato correttamente
 
-#### Problema : Lo strumento restituisce un errore
+#### Problema: Lo strumento restituisce un errore
 
-**Sintomi** :
+**Sintomi**:
 ```
 Tool execution failed: ...
 ```
 
-**Soluzione** :
-1. Esaminare i log dello strumento
-2. Verificare i parametri di input
-3. Testare lo strumento indipendentemente
-4. Verificare i permessi
+**Soluzione**:
+1. Controlla i log dello strumento
+2. Verifica i parametri di input
+3. Testa lo strumento indipendentemente
+4. Controlla i permessi
 
 ---
 
-### Problemi di plugin
+### Problemi dei Plugin
 
-#### Problema : Caricamento plugin fallito
+#### Problema: Caricamento del plugin fallito
 
-**Sintomi** :
+**Sintomi**:
 ```
 Plugin load failed: Security check failed
 ```
 
-**Soluzione** :
-1. Verificare se il plugin referenzia namespace proibiti (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
-2. Verificare che il plugin referenzi solo assembly dalla whitelist di fiducia
-3. Verificare che il plugin implementi correttamente l'interfaccia `IPlugin`
-4. Esaminare i log per i dettagli degli errori di verifica di sicurezza
+**Soluzione**:
+1. Controlla che il plugin non faccia riferimento a namespace proibiti (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
+2. Verifica che il plugin faccia riferimento solo ad assembly nella whitelist degli assembly attendibili
+3. Verifica che il plugin implementi correttamente l'interfaccia `IPlugin`
+4. Consulta i log per i dettagli sul fallimento del controllo di sicurezza
 
-#### Problema : Strumenti del plugin non registrati
+#### Problema: Strumenti del plugin non registrati
 
-**Sintomi** :
-- Il plugin è caricato con successo, ma gli strumenti non appaiono nella lista
+**Sintomi**:
+- Il plugin si carica con successo ma gli strumenti non compaiono nell'elenco
 
-**Soluzione** :
-1. Confermare che la classe dello strumento nel plugin implementi correttamente l'interfaccia `ITool`
-2. Verificare che la classe dello strumento sia pubblica
-3. Verificare che `ToolManager.ScanAllPluginAssemblies()` sia stato chiamato
-4. Ricostruire il plugin e riavviare l'applicazione
+**Soluzione**:
+1. Conferma che la classe dello strumento nel plugin implementi correttamente l'interfaccia `ITool`
+2. Controlla che la classe dello strumento sia pubblica
+3. Verifica che `ToolManager.ScanAllPluginAssemblies()` venga chiamato
+4. Ricompila il plugin e riavvia l'applicazione
 
 ---
 
-### Problemi di note di lavoro
+### Problemi delle Note di Lavoro
 
-#### Problema : Impossibile creare una nota di lavoro
+#### Problema: Impossibile creare note di lavoro
 
-**Sintomi** :
+**Sintomi**:
 ```
 Failed to create work note
 ```
 
-**Soluzione** :
-1. Verificare che il Being esista e funzioni
-2. Verificare che il percorso di storage abbia i diritti di scrittura
-3. Verificare che il contenuto non sia vuoto (contenuto richiesto)
-4. Esaminare i log per i dettagli dell'errore
+**Soluzione**:
+1. Controlla che l'essere esista e sia in esecuzione
+2. Verifica che il percorso di archiviazione abbia i permessi di scrittura
+3. Controlla che il contenuto non sia vuoto (il contenuto è obbligatorio)
+4. Consulta i log per informazioni dettagliate sull'errore
 
-#### Problema : Ricerca di note senza risultati
+#### Problema: La ricerca nelle note non restituisce risultati
 
-**Sintomi** :
-- La ricerca per parola chiave restituisce risultati vuoti
-- Ma note pertinenti esistono sicuramente
+**Sintomi**:
+- La ricerca per parole chiave restituisce risultati vuoti
+- Ma si è certi che esistano note pertinenti
 
-**Soluzione** :
-1. Verificare l'ortografia della parola chiave
-2. Provare una parola chiave più generica
-3. Verificare che la nota contenga la parola chiave (case-sensitive)
-4. Aumentare il valore del parametro `max_results`
+**Soluzione**:
+1. Controlla che l'ortografia delle parole chiave sia corretta
+2. Prova con parole chiave più generiche
+3. Verifica che le note contengano la parola chiave (distingue maiuscole/minuscole)
+4. Aumenta il valore del parametro `max_results`
 
-#### Problema : Generazione della directory delle note lenta
+#### Problema: Generazione dell'indice delle note lenta
 
-**Sintomi** :
-- Tempo di risposta lungo per la generazione della directory
-- Il Being ha molte note (>1000 pagine)
+**Sintomi**:
+- Tempo di risposta lungo durante la generazione dell'indice
+- L'essere ha un gran numero di note (>1000 pagine)
 
-**Soluzione** :
-1. È normale, deve scorrere tutte le note
-2. Archiviare regolarmente le note vecchie
-3. Usare la funzione di ricerca invece dello scorrimento della directory
-4. Ottimizzazione prevista : meccanismo di cache della directory
+**Soluzione**:
+1. Questo è normale, richiede l'attraversamento di tutte le note
+2. Considera l'archiviazione periodica delle vecchie note
+3. Usa la funzione di ricerca invece della navigazione per indice
+4. Ottimizzazione pianificata: aggiunta di un meccanismo di cache dell'indice
 
 ---
 
-### Problemi della rete di conoscenze
+### Problemi della Rete di Conoscenza
 
-#### Problema : La query di conoscenze restituisce risultati vuoti
+#### Problema: La query di conoscenza restituisce risultati vuoti
 
-**Sintomi** :
+**Sintomi**:
 ```
 No knowledge triples found
 ```
 
-**Soluzione** :
-1. Verificare l'ortografia del soggetto e del predicato
-2. Verificare che la conoscenza sia stata aggiunta alla rete
-3. Usare la funzione di ricerca per la corrispondenza fuzzy :
+**Soluzione**:
+1. Verifica l'ortografia del soggetto e del predicato
+2. Controlla che la conoscenza sia stata aggiunta alla rete
+3. Usa la funzione di ricerca per la corrispondenza fuzzy:
 ```json
 {
   "action": "search",
-  "query": "parola-chiave"
+  "query": "parola chiave"
 }
 ```
 
-#### Problema : Ricerca del percorso di conoscenza fallita
+#### Problema: Ricerca del percorso di conoscenza fallita
 
-**Sintomi** :
+**Sintomi**:
 ```
 No path found between concepts
 ```
 
-**Soluzione** :
-1. Verificare che entrambi i concetti esistano nella rete di conoscenze
-2. Verificare che esista un percorso di connessione (forse nessuna relazione diretta/indiretta)
-3. Aggiungere più conoscenze per stabilire una connessione
-4. Ridurre il limite di lunghezza del percorso (se impostato)
+**Soluzione**:
+1. Verifica che entrambi i concetti esistano nella rete di conoscenza
+2. Controlla se esiste un percorso di associazione (potrebbe non esserci una relazione diretta o indiretta)
+3. Prova ad aggiungere più conoscenza per stabilire connessioni
+4. Riduci il limite di lunghezza del percorso (se impostato)
 
-#### Problema : Convalida della conoscenza fallita
+#### Problema: Validazione della conoscenza fallita
 
-**Sintomi** :
+**Sintomi**:
 ```
 Knowledge validation failed
 ```
 
-**Soluzione** :
-1. Verificare che il formato della tripletta sia corretto (soggetto, predicato, oggetto richiesti)
-2. Verificare che il valore di confidenza sia nell'intervallo 0.0-1.0
-3. Verificare le triplette duplicate
-4. Esaminare i dettagli dell'errore di convalida per il problema specifico
+**Soluzione**:
+1. Controlla che il formato della tripla sia corretto (soggetto, predicato, oggetto sono obbligatori)
+2. Verifica che la confidenza sia nell'intervallo 0.0-1.0
+3. Controlla se ci sono triple duplicate
+4. Consulta i dettagli dell'errore di validazione per comprendere il problema specifico
 
-#### Problema : Statistiche della rete di conoscenze imprecise
+#### Problema: Statistiche della rete di conoscenza imprecise
 
-**Sintomi** :
-- I numeri delle statistiche non sono quelli previsti
-- Le statistiche non vengono aggiornate dopo l'aggiunta di conoscenze
+**Sintomi**:
+- I numeri statistici non corrispondono alle aspettative
+- Le statistiche non si aggiornano dopo l'aggiunta di conoscenza
 
-**Soluzione** :
+**Soluzione**:
 1. Le statistiche potrebbero richiedere alcuni secondi per aggiornarsi (cache)
-2. Verificare che l'operazione di eliminazione sia stata eseguita con successo
-3. Riavviare l'applicazione per forzare l'aggiornamento delle statistiche
-4. Richiedere le statistiche tramite API
+2. Controlla se le operazioni di eliminazione non sono state eseguite con successo
+3. Riavvia l'applicazione per forzare l'aggiornamento delle statistiche
+4. Interroga nuovamente le statistiche tramite API
 
 ---
 
-### Problemi di gestione del progetto
+### Problemi di Gestione dei Progetti
 
-#### Problema : Impossibile creare un progetto
+#### Problema: Impossibile creare un progetto
 
-**Sintomi** :
+**Sintomi**:
 ```
 Failed to create project
 ```
 
-**Soluzione** :
-1. Verificare che il nome del progetto non sia vuoto (richiesto)
-2. Verificare che il nome del progetto non sia duplicato
-3. Verificare che il percorso di storage abbia i diritti di scrittura
-4. Esaminare i log per i dettagli dell'errore
+**Soluzione**:
+1. Controlla che il nome del progetto non sia vuoto (obbligatorio)
+2. Verifica che il nome del progetto non sia duplicato
+3. Controlla che il percorso di archiviazione abbia i permessi di scrittura
+4. Consulta i log per informazioni dettagliate sull'errore
 
-#### Problema : Dati di progetto persi
+#### Problema: Dati del progetto persi
 
-**Sintomi** :
-- Le informazioni del progetto non sono caricabili
-- I file del progetto sono corrotti
+**Sintomi**:
+- Le informazioni del progetto non possono essere caricate
+- I file del progetto sono danneggiati
 
-**Soluzione** :
-1. Verificare che la directory di storage del progetto esista
-2. Ripristinare i dati del progetto da un backup
-3. Verificare che il formato del file JSON sia corretto
-4. Riparare manualmente i file di progetto corrotti
+**Soluzione**:
+1. Controlla che la directory di archiviazione del progetto esista
+2. Ripristina i dati del progetto dal backup
+3. Verifica che il formato dei file JSON sia corretto
+4. Ripara manualmente i file del progetto danneggiati
+
+#### Problema: Assegnazione del ruolo di progetto fallita
+
+**Sintomi**:
+```
+Failed to assign role
+```
+
+**Soluzione**:
+1. Conferma che l'Essere di Silicio sia stato aggiunto al progetto
+2. Controlla che il nome del ruolo sia valido
+3. Verifica che l'operatore sia il Curatore di Silicio
+4. Consulta i log per informazioni dettagliate sull'errore
+
+#### Problema: Il workflow non si avvia
+
+**Sintomi**:
+- Creazione dell'istanza del workflow fallita
+- Le transizioni di stato non vengono eseguite
+
+**Soluzione**:
+1. Controlla che il template del workflow sia definito
+2. Verifica che lo stato iniziale sia impostato correttamente
+3. Conferma che il progetto sia collegato a un template di workflow
+4. Controlla i log del workflow per errori di transizione
+
+---
+
+### Problemi dei Permessi degli Strumenti
+
+#### Problema: Operazione dello strumento negata
+
+**Sintomi**:
+```
+Tool operation denied: network:post
+```
+
+**Soluzione**:
+1. Controlla la configurazione dei permessi degli strumenti dell'Essere di Silicio:
+```bash
+curl http://localhost:8080/api/beings/tool-permissions?beingId=<id>
+```
+
+2. Aggiorna i permessi degli strumenti:
+```bash
+curl -X PUT http://localhost:8080/api/beings/tool-permissions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "beingId": "being-uuid",
+    "permissions": {
+      "network:post": "allowed"
+    }
+  }'
+```
+
+3. Oppure utilizza la Web UI: Esseri → Permessi strumenti
+
+#### Problema: I permessi degli strumenti di progetto non funzionano
+
+**Sintomi**:
+- I permessi degli strumenti a livello di progetto non funzionano come previsto
+
+**Soluzione**:
+1. Conferma che i permessi a livello di progetto siano configurati correttamente
+2. Controlla se ci sono conflitti tra i permessi a livello di Essere di Silicio e a livello di progetto
+3. I permessi a livello di progetto sono indipendenti dal livello dell'Essere di Silicio; si applica l'intersezione dei due
+4. Consulta i log di audit per confermare i risultati del controllo dei permessi
 
 ---
 
 ## Debug
 
-### Attivare i log dettagliati
+### Abilitare i Log Dettagliati
 
-Modificare la configurazione :
+Modifica la configurazione:
 ```json
 {
   "logging": {
@@ -509,9 +577,9 @@ Modificare la configurazione :
 }
 ```
 
-### Esaminare i log
+### Controllare i Log
 
-I log sono memorizzati in :
+I log sono archiviati in:
 ```
 logs/
 ├── system.log
@@ -520,157 +588,157 @@ logs/
 └── error.log
 ```
 
-Visualizzazione in tempo reale :
+Visualizzazione in tempo reale:
 ```bash
 tail -f logs/*.log
 ```
 
-### Usare il debugger
+### Utilizzare il Debugger
 
-**SiliconLife.Default (implementazione standard)** :
+**SiliconLife.Default (implementazione predefinita)**:
 ```bash
-# Eseguire con il debugger
+# Esegui con il debugger
 dotnet run --project src/SiliconLife.Default --configuration Debug
 
-# Collegare il debugger
-# Tramite IDE : Collega a processo > SiliconLife.Default
+# Collega il debugger
+# Tramite IDE: Connetti al processo > SiliconLife.Default
 ```
 
-**SiliconLife.Fast (versione ad alte prestazioni)** :
+**SiliconLife.Fast (versione ad alte prestazioni)**:
 ```bash
-# Eseguire con il debugger
+# Esegui con il debugger
 dotnet run --project src/SiliconLife.Fast --configuration Debug
 
-# Collegare il debugger
-# Tramite IDE : Collega a processo > SiliconLife.Fast
+# Collega il debugger
+# Tramite IDE: Connetti al processo > SiliconLife.Fast
 ```
 
-> **Raccomandazione** : Per il debug di sviluppo, usare SiliconLife.Default è raccomandato. Dopo la verifica architetturale riuscita, usare SiliconLife.Fast per il deployment in produzione.
+> **Suggerimento**: Durante la fase di sviluppo e debug, si consiglia di utilizzare SiliconLife.Default; dopo la validazione dell'architettura, utilizzare SiliconLife.Fast per il deployment di produzione.
 
 ---
 
-## Problemi di prestazioni
+## Problemi di Prestazioni
 
-### Tempi di risposta lenti
+### Tempi di Risposta Lenti
 
-**Ottimizzare** :
-1. Ridurre la complessità del modello IA
-2. Attivare la cache
-3. Pulire i vecchi dati
-4. Aumentare le risorse di sistema
+**Ottimizzazione**:
+1. Riduci la complessità del modello AI
+2. Abilita la cache
+3. Pulisci i vecchi dati
+4. Aumenta le risorse di sistema
 
-### Utilizzo CPU elevato
+### Utilizzo CPU Elevato
 
-**Verificare** :
-- Troppi Being in esecuzione
-- Ciclo infinito negli strumenti
+**Verifica**:
+- Troppi esseri in esecuzione
+- Cicli infiniti negli strumenti
 - Esecuzione frequente dei timer
 
-**Soluzione** :
-- Ridurre i Being paralleli
-- Ottimizzare il codice degli strumenti
-- Regolare l'intervallo dei timer
+**Soluzione**:
+- Riduci gli esseri concorrenti
+- Ottimizza il codice degli strumenti
+- Regola gli intervalli dei timer
 
-### Utilizzo memoria elevato
+### Utilizzo Memoria Elevato
 
-**Monitorare** :
+**Monitoraggio**:
 ```bash
-# Tramite interfaccia Web : Dashboard > Memoria
+# Tramite Web UI: Dashboard > Memoria
 ```
 
-**Ottimizzare** :
-- Pulire i vecchi ricordi
-- Ridurre la dimensione del contesto
-- Implementare la paginazione
+**Ottimizzazione**:
+- Pulisci le vecchie memorie
+- Riduci la dimensione del contesto
+- Implementa la paginazione
 
 ---
 
-## Ottenere aiuto
+## Ottenere Aiuto
 
-### Consultare la documentazione
+### Consultare la Documentazione
 
-- [Guida rapida](getting-started.md)
-- [Guida di sviluppo](development-guide.md)
+- [Guida Rapida](getting-started.md)
+- [Guida allo Sviluppo](development-guide.md)
 - [Riferimento API](api-reference.md)
-- [Guida all'architettura](architecture.md)
+- [Guida all'Architettura](architecture.md)
 
-### Esaminare i log
+### Controllare i Log
 
-Esaminare sempre prima i log per i dettagli degli errori.
+Controlla sempre prima i log per i dettagli sugli errori.
 
-### Supporto della comunità
+### Supporto della Community
 
-- GitHub Issues : Segnalare bug
-- Discussions : Fare domande
-- Documentazione : Cercare soluzioni
+- GitHub Issues: Segnala bug
+- Discussions: Fai domande
+- Documentazione: Cerca soluzioni
 
 ---
 
-## Procedure di emergenza
+## Procedure di Emergenza
 
-### Crash del sistema
+### Crash di Sistema
 
-1. Esaminare i log per la causa
-2. Riavviare l'applicazione :
+1. Controlla i log per la causa
+2. Riavvia l'applicazione:
 
-**SiliconLife.Default (implementazione standard)** :
+**SiliconLife.Default (implementazione predefinita)**:
 ```bash
 dotnet run --project src/SiliconLife.Default
 ```
 
-**SiliconLife.Fast (versione principale di produzione)** :
+**SiliconLife.Fast (versione di produzione raccomandata)**:
 ```bash
 dotnet run --project src/SiliconLife.Fast
 ```
 
-3. Ripristinare da un backup se necessario
+3. Se necessario, ripristina dal backup
 
-### Perdita di dati
+### Perdita di Dati
 
-1. Fermare immediatamente l'applicazione
-2. Verificare i file di backup
-3. Ripristinare i dati
-4. Verificare l'integrità
+1. Ferma immediatamente l'applicazione
+2. Controlla i file di backup
+3. Ripristina i dati
+4. Verifica l'integrità
 
-### Violazione di sicurezza
+### Vulnerabilità di Sicurezza
 
-1. Fermare tutti i Being
-2. Revocare tutti i permessi
-3. Esaminare i log di audit
-4. Verificare il controllo di accesso
-5. Riavviare con permessi limitati
+1. Ferma tutti gli esseri
+2. Revoca tutti i permessi
+3. Controlla i log di audit
+4. Verifica i controlli di accesso
+5. Riavvia con permessi limitati
 
 ---
 
 ## Prevenzione
 
-### Buone pratiche
+### Best Practices
 
 1. **Backup regolari**
-   - Eseguire il backup della directory dati
-   - Eseguire il backup della configurazione
-   - Testare il processo di ripristino
+   - Esegui il backup della directory dei dati
+   - Esegui il backup della configurazione
+   - Testa il processo di ripristino
 
-2. **Monitorare le risorse**
-   - Monitorare l'utilizzo CPU/memoria
-   - Monitorare lo spazio su disco
-   - Verificare la connessione di rete
+2. **Monitoraggio delle risorse**
+   - Sorveglia l'utilizzo CPU/memoria
+   - Monitora lo spazio su disco
+   - Controlla le connessioni di rete
 
-3. **Rimanere aggiornati**
-   - Aggiornare il SDK .NET
-   - Aggiornare le dipendenze
-   - Applicare le patch di sicurezza
+3. **Mantieni aggiornato**
+   - Aggiorna .NET SDK
+   - Aggiorna le dipendenze
+   - Applica le patch di sicurezza
 
-4. **Testare le modifiche**
-   - Testare prima in sviluppo
-   - Usare il controllo di versione
-   - Documentare le modifiche
+4. **Testa le modifiche**
+   - Testa prima in sviluppo
+   - Usa il controllo di versione
+   - Documenta le modifiche
 
 ---
 
-## Prossimi passi
+## Prossimi Passi
 
-- 📚 Leggere la [guida all'architettura](architecture.md)
-- 🛠️ Consultare la [guida di sviluppo](development-guide.md)
-- 🚀 Vedere la [guida rapida](getting-started.md)
-- 🔒 Consultare la [documentazione sulla sicurezza](security.md)
+- 📚 Leggi la [Guida all'Architettura](architecture.md)
+- 🛠️ Consulta la [Guida allo Sviluppo](development-guide.md)
+- 🚀 Consulta la [Guida Rapida](getting-started.md)
+- 🔒 Consulta la [Documentazione sulla Sicurezza](security.md)

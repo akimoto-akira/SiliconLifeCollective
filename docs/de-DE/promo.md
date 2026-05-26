@@ -1,4 +1,4 @@
-﻿# Lernen Sie Ihre digitalen Begleiter kennen
+# Lernen Sie Ihre digitalen Begleiter kennen
 
 > **Version: v0.2.0-alpha**
 
@@ -21,7 +21,7 @@ Fragen Sie sie nach jedem Datum in jedem Kalendersystem:
 - "Wann beginnt der Ramadan?"
 - "Wie viele Tage bis zu meinem Jahrestag?"
 
-Sie verstehen über 30 verschiedene Kalendersysteme weltweit.
+Sie verstehen 32 verschiedene Kalendersysteme weltweit.
 
 ### 💬 Chatten Sie jederzeit mit ihnen
 
@@ -64,7 +64,7 @@ Weisen Sie ihnen Aufgaben zu, und sie arbeiten weiter, auch wenn Sie nicht da si
 
 ### Sie haben Persönlichkeit
 
-Jeder Begleiter wird durch eine "Soul-Datei" geformt — stellen Sie sich das als ihren Charakterbogen vor. Sie können Assistenten mit unterschiedlichen Kommunikationsstilen, Fachgebieten und Arbeitsmethoden erstellen.
+Jeder Begleiter wird durch eine „Soul-Datei" geformt — stellen Sie sich das als ihren Charakterbogen vor. Sie können Assistenten mit unterschiedlichen Kommunikationsstilen, Fachgebieten und Arbeitsmethoden erstellen.
 
 ---
 
@@ -119,12 +119,12 @@ Beginnen Sie mit einem einfachen Assistenten. Wenn Sie entdecken, was möglich i
 
 ### Erweiterbares Plugin-System
 
-Erweitern Sie die Funktionalität durch Plugins — von der Community erstellte Tools und Fähigkeiten, die einfach hinzugefügt werden können. Jedes Plugin läuft in einer sicheren Sandbox und gewährleistet die Systemsicherheit.
+Erweitern Sie die Funktionalität durch Plugins — von der Community erstellte Werkzeuge und Fähigkeiten, die einfach hinzugefügt werden können. Jedes Plugin läuft in einem sicheren Sandkasten und gewährleistet die Systemsicherheit.
 
 ### Dual-Version-Auswahl
 
 - **Default-Version**: Leichte Konsolenanwendung, geeignet für Entwicklung, Debugging und ressourcenbeschränkte Umgebungen
-- **Fast-Version**: Hochleistungs-Windows-Anwendung mit SpeedyPack-In-Memory-Speicher-Engine, geeignet für Produktivbereitstellungen
+- **Fast-Version**: Hochleistungs-Desktop-Anwendung (Windows/macOS/Linux) mit SpeedyPack-In-Memory-Speicher-Engine, geeignet für Produktivbereitstellungen
 
 ### Von der Community gebaut
 

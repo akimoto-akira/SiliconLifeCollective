@@ -1,32 +1,32 @@
-﻿# Inicio Rápido
+# Inicio Rápido
 
 > **Versión: v0.2.0-alpha**
 
-[English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | **Español** | [Deutsch](../de-DE/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md) | [Русский](../ru-RU/getting-started.md)
+[English](../en/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | **Español** | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md) | [Русский](../ru-RU/getting-started.md)
 
 ## Elegir Versión
 
 Este proyecto proporciona dos versiones de implementación:
 
-### SiliconLife.Default (Versión Predeterminada)
-- **Posicionamiento**: Implementación predeterminada, utilizada principalmente para verificación de viabilidad de arquitectura
-- **Modo de Ejecución**: Aplicación de consola
-- **Almacenamiento**: Almacenamiento JSON del sistema de archivos
-- **Escenario de Aplicación**: Prioridad de seguridad de datos, bajo volumen de datos, depuración de desarrollo, verificación de arquitectura
-- **Soporte de Plataforma**: Windows, Linux, macOS
-- **Descripción de Rol**: Implementación de referencia para verificación de arquitectura que proporciona una ejecución simple y confiable, adecuada para primer contacto o depuración de desarrollo
+### SiliconLife.Default (Versión por defecto)
+- **Posicionamiento**: Implementación por defecto, principalmente para verificar la viabilidad de la arquitectura
+- **Modo de ejecución**: Aplicación de consola
+- **Método de almacenamiento**: Almacenamiento JSON en sistema de archivos
+- **Escenarios aplicables**: Seguridad de datos prioritaria, volúmenes de datos pequeños, depuración de desarrollo, verificación de arquitectura
+- **Soporte de plataforma**: Windows, Linux, macOS
+- **Descripción del rol**: Como implementación de referencia para verificación de arquitectura, proporciona una forma de ejecución simple y fiable, adecuada para primeros contactos con este proyecto o para depuración de desarrollo
 
-### SiliconLife.Fast (Versión de Alto Rendimiento)
-- **Posicionamiento**: Versión de producción principal
-- **Modo de Ejecución**: Aplicación de escritorio (Windows/macOS bandeja del sistema / Linux ventana de estado)
-- **Almacenamiento**: Almacenamiento en memoria SpeedyPack + persistencia asíncrona (formato de archivo .spk)
-- **Escenario de Aplicación**: Alta concurrencia, baja latencia, gran volumen de datos, operaciones de producción a largo plazo
-- **Soporte de Plataforma**: Windows/macOS (funciones completas, incluyendo bandeja del sistema), Linux (ventana de estado, sin icono en bandeja)
-- **Descripción de Rol**: Implementación de nivel de producción con optimización profunda, la mejor opción para operaciones a largo plazo y entornos de producción reales
+### SiliconLife.Fast (Versión de alto rendimiento)
+- **Posicionamiento**: Versión de producción recomendada
+- **Modo de ejecución**: Aplicación de escritorio (bandeja del sistema en Windows/macOS / ventana de estado en Linux)
+- **Método de almacenamiento**: Almacenamiento en memoria SpeedyPack + persistencia asíncrona (formato de archivo .spk)
+- **Escenarios aplicables**: Alta concurrencia, baja latencia, grandes volúmenes de datos, ejecución de producción a largo plazo
+- **Soporte de plataforma**: Windows/macOS (funcionalidad completa, incluyendo bandeja del sistema), Linux (ventana de estado, sin icono en bandeja)
+- **Descripción del rol**: Implementación de grado de producción profundamente optimizada, es la opción preferida para ejecución a largo plazo y entornos de producción reales
 
-> **Sugerencia para Principiantes**: Se recomienda que los usuarios primerizos comiencen con **SiliconLife.Default** para verificar rápidamente la viabilidad de la arquitectura. Después de familiarizarse con el sistema, se recomienda encarecidamente migrar a **SiliconLife.Fast**.
+> **Recomendación para principiantes**: Para el primer uso, se recomienda comenzar con **SiliconLife.Default** para verificar rápidamente la viabilidad de la arquitectura; una vez familiarizado con el sistema, se recomienda encarecidamente migrar a **SiliconLife.Fast** como versión de ejecución para el entorno de producción.
 
-## Prerrequisitos
+## Requisitos Previos
 
 - **.NET 9 SDK** - [Descargar](https://dotnet.microsoft.com/download/dotnet/9.0)
 - **Git** - [Descargar](https://git-scm.com/)
@@ -49,11 +49,11 @@ cd SiliconLifeCollective
 dotnet build
 ```
 
-### 3. Configurar Backend de IA
+### 3. Configurar el Backend de IA
 
-Editar `src/SiliconLife.Default/Config/DefaultConfigData.cs` o modificar la configuración en tiempo de ejecución a través de la Web UI.
+Edite `src/SiliconLife.Default/Config/DefaultConfigData.cs` o modifique la configuración en tiempo de ejecución a través de la Web UI.
 
-#### Opción A: Ollama (Local)
+#### Opción A: Ollama (local)
 
 ```json
 {
@@ -66,27 +66,29 @@ Editar `src/SiliconLife.Default/Config/DefaultConfigData.cs` o modificar la conf
 }
 ```
 
-#### Opción B: Bailian (Nube)
+#### Opción B: Bailian (nube)
 
 ```json
 {
   "AIClients": {
     "DashScope": {
-      "ApiKey": "tu-clave-api-aqui",
-      "Model": "qwen3.6-plus",
+      "ApiKey": "your-api-key-here",
+      "Model": "qwen-plus",
       "Region": "beijing"
     }
   }
 }
 ```
 
-#### Opción C: Volcengine Ark (Nube)
+> **Regiones disponibles**: `beijing` (Pekín), `virginia` (Virginia), `singapore` (Singapur), `hongkong` (Hong Kong), `frankfurt` (Fráncfort)
+
+#### Opción C: Volcengine Ark (nube)
 
 ```json
 {
   "AIClients": {
     "VolcengineArk": {
-      "ApiKey": "tu-clave-api-aqui",
+      "ApiKey": "your-api-key-here",
       "Endpoint": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
       "Model": "ep-xxxxxxxxxxxxx-xxxxx"
     }
@@ -94,29 +96,29 @@ Editar `src/SiliconLife.Default/Config/DefaultConfigData.cs` o modificar la conf
 }
 ```
 
-> **Nota**: El parámetro Model de Volcengine Ark acepta un ID de endpoint de inferencia (ej. `ep-20241212123456-abcde`), no un nombre de modelo.
+> **Nota**: El parámetro Model de Volcengine Ark acepta un ID de punto de acceso de inferencia (por ejemplo, `ep-20241212123456-abcde`), no un nombre de modelo.
 
 ### 4. Ejecutar la Aplicación
 
-#### Ejecutar Versión Default
+#### Ejecutar la versión Default
 
 ```bash
 cd src/SiliconLife.Default
 dotnet run
 ```
 
-El servidor web se iniciará en `http://localhost:8080`
+El servidor Web se iniciará en `http://localhost:8080`
 
-#### Ejecutar Versión Fast
+#### Ejecutar la versión Fast
 
 ```bash
 cd src/SiliconLife.Fast
 dotnet run
 ```
 
-**Windows/macOS**: La aplicación se iniciará en modo formulario, minimizada en la bandeja del sistema, con el servidor web también iniciándose en `http://localhost:8080`
+**Windows/macOS**: La aplicación se iniciará en modo ventana, se minimizará a la bandeja del sistema, y el servidor Web también se iniciará en `http://localhost:8080`
 
-**Linux**: La aplicación mostrará una ventana de estado (sin icono en la bandeja del sistema) y abrirá automáticamente el navegador para acceder a la Web UI. Puede usar el parámetro `--no-tray` para omitir la apertura automática del navegador:
+**Linux**: La aplicación mostrará una ventana de estado (sin icono en la bandeja del sistema) y abrirá automáticamente el navegador para acceder a la Web UI. También se puede usar el parámetro `--no-tray` para omitir la apertura automática del navegador:
 
 ```bash
 dotnet run -- --no-tray
@@ -124,26 +126,26 @@ dotnet run -- --no-tray
 
 ### 5. Acceder a la Web UI
 
-Abrir un navegador y navegar a:
+Abra el navegador y navegue a:
 
 ```
 http://localhost:8080
 ```
 
-Verá un panel de control que incluye:
-- Gestión de Seres Silicona
+Verá un panel que incluye:
+- Gestión de Seres de Silicio
 - Interfaz de chat
 - Panel de configuración
 - Monitoreo del sistema
 
-## Tu Primer Ser Silicona
+## Primer Ser de Silicio
 
-### Crear Tu Primer Ser
+### Crear su Primer Ser
 
-1. Navegar a **Gestión de Seres** en la Web UI
-2. Hacer clic en **Crear Nuevo Ser**
-3. Configurar el archivo de alma (`soul.md`) con personalidad y comportamiento
-4. Iniciar el ser
+1. En la Web UI, navegue a **Gestión de Seres**
+2. Haga clic en **Crear Nuevo Ser**
+3. Configure el Archivo de Alma (`soul.md`) con personalidad y comportamiento
+4. Inicie el ser
 
 ### Ejemplo de soul.md
 
@@ -166,36 +168,36 @@ You are a helpful assistant specializing in code review.
 
 ## Preguntas Frecuentes
 
-### Conexión a Ollama Rechazada
+### Conexión a Ollama rechazada
 
 **Problema**: No se puede conectar a Ollama en `http://localhost:11434`
 
 **Solución**:
 ```bash
-# Verificar que Ollama esté ejecutándose
+# Verificar si Ollama está ejecutándose
 ollama list
 
-# Para iniciar Ollama
+# Iniciar Ollama si es necesario
 ollama serve
 ```
 
-### Modelo No Encontrado
+### Modelo no encontrado
 
 **Problema**: `model "qwen2.5:7b" not found`
 
 **Solución**:
 ```bash
-# Obtener el modelo requerido
+# Extraer el modelo requerido
 ollama pull qwen2.5:7b
 ```
 
-### Puerto en Uso
+### Puerto ya en uso
 
 **Problema**: `HttpListenerException: Address already in use`
 
 **Solución**:
-- Cambiar el puerto en la configuración
-- O terminar el proceso que usa el puerto 8080:
+- Cambie el puerto en la configuración
+- O termine el proceso que usa el puerto 8080:
 
 ```bash
 # Windows
@@ -206,28 +208,28 @@ taskkill /PID <PID> /F
 lsof -ti:8080 | xargs kill -9
 ```
 
-## Próximos Pasos
+## Siguientes Pasos
 
-- 📚 Leer la [Guía de Arquitectura](architecture.md) para entender el diseño del sistema
-- 🛠️ Consultar la [Guía de Desarrollo](development-guide.md) para extender el sistema
-- 📖 Explorar la [Referencia de API](api-reference.md) para detalles de integración
-- 🔒 Ver la [Documentación de Seguridad](security.md) para el sistema de permisos
-- 🧰 Consultar la [Referencia de Herramientas](tools-reference.md) para todas las herramientas integradas
-- 🌐 Ver la [Guía de Web UI](web-ui-guide.md) para funciones de la interfaz
+- 📚 Lea la [guía de arquitectura](architecture.md) para comprender el diseño del sistema
+- 🛠️ Consulte la [guía de desarrollo](development-guide.md) para extender el sistema
+- 📖 Explore la [referencia de API](api-reference.md) para detalles de integración
+- 🔒 Consulte la [documentación de seguridad](security.md) para el sistema de permisos
+- 🧰 Consulte la [referencia de herramientas](tools-reference.md) para todas las herramientas integradas
+- 🌐 Consulte la [guía de Web UI](web-ui-guide.md) para las funciones de la interfaz
 
 ## Estructura del Proyecto
 
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/            # Interfaces centrales y clases abstractas
-│   ├── SiliconLife.Common/          # Implementación compartida (común a ambas versiones)
-│   ├── SiliconLife.App/             # Capa de aplicación compartida entre Default y Fast
-│   ├── SiliconLife.Default/         # Implementación predeterminada + punto de entrada (versión consola)
-│   ├── SiliconLife.Fast/            # Implementación de alto rendimiento + punto de entrada (versión formularios)
+│   ├── SiliconLife.Core/            # Interfaces y clases abstractas principales
+│   ├── SiliconLife.Common/          # Implementaciones compartidas (usadas por ambas versiones)
+│   ├── SiliconLife.App/             # Capa de aplicación compartida por Default y Fast
+│   ├── SiliconLife.Default/         # Implementación por defecto + punto de entrada (versión de consola)
+│   ├── SiliconLife.Fast/            # Implementación de alto rendimiento + punto de entrada (versión de escritorio)
 │   ├── SiliconLife.Speedy/          # Motor de almacenamiento de alto rendimiento SpeedyPack
-│   └── SiliconLife.Speedy.Manager/  # Herramienta de gestión SpeedyPack (Windows Forms)
-├── docs/                            # Documentación (multilingüe, 29 variantes de idioma)
+│   └── SiliconLife.Speedy.Manager/  # Herramienta de gestión SpeedyPack (Avalonia UI)
+├── docs/                            # Documentación (multilingüe, 34 variantes de idioma)
 │   ├── en/                          # Inglés
 │   ├── zh-CN/                       # Chino simplificado
 │   ├── zh-HK/                       # Chino tradicional
@@ -239,9 +241,9 @@ SiliconLifeCollective/
 └── README.md                        # Descripción del proyecto
 ```
 
-## ¿Necesitas Ayuda?
+## ¿Necesita Ayuda?
 
-- 📖 Consultar el [Sistema de Documentos de Ayuda](web-ui-guide.md#帮助文档系统新增) (soporte multilingüe)
-- 📚 Leer la [Documentación Completa](docs/)
-- 🐛 Reportar problemas en [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
-- 💬 Participar en discusiones de la comunidad
+- 📖 Consulte el [sistema de documentación de ayuda](web-ui-guide.md#sistema-de-documentacion-de-ayuda-nuevo) (soporte multilingüe)
+- 📚 Lea la [documentación completa](docs/)
+- 🐛 Reporte problemas en [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 💬 Participe en las discusiones de la comunidad

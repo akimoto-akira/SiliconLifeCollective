@@ -1,50 +1,66 @@
-﻿# Referência de ferramentas
+# Referência de Ferramentas
 
 > **Versão: v0.2.0-alpha**
 
-Este documento detalha todas as ferramentas incorporadas da plataforma Silicon Life Collective.
+Este documento descreve detalhadamente todas as ferramentas incorporadas da plataforma Silicon Life Collective.
 
-[English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [Français](../fr-FR/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md) | [Русский](../ru-RU/tools-reference.md) | [Italiano](../it-IT/tools-reference.md) | [Polski](../pl-PL/tools-reference.md) | **Português**
+[English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md) | [Русский](../ru-RU/tools-reference.md)
 
-## Visão geral
+## Visão Geral
 
-O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exterior através de uma interface padronizada. Cada ferramenta implementa a interface `ITool`, descoberta e registada automaticamente pelo `ToolManager` através de reflexão.
+O sistema de ferramentas permite que os Silicon Beings interajam com o mundo exterior através de uma interface padronizada. Cada ferramenta implementa a interface `ITool`, descoberta e registada automaticamente pelo `ToolManager` via reflexão.
 
-### Categorias de ferramentas
+### Categorização de Ferramentas
 
-- **Ferramentas de gestão do sistema** — Configuração, permissões, compilação dinâmica
+- **Ferramentas de gestão do sistema** — Configuração, permissões, compilação dinâmica, gestão do Curator
 - **Ferramentas de comunicação** — Chat, pedidos de rede
 - **Ferramentas de armazenamento de dados** — Operações de disco, base de dados, memória, notas de trabalho
 - **Ferramentas de gestão de tempo** — Calendário, temporizadores, tarefas
-- **Ferramentas de desenvolvimento** — Execução de código, consulta de logs
+- **Ferramentas de desenvolvimento** — Execução de código, consulta de registos
 - **Ferramentas utilitárias** — Informação do sistema, auditoria de tokens, documentação de ajuda, rede de conhecimento
-- **Ferramentas de browser** — Automação do browser WebView
+- **Ferramentas de navegador** — Automação do navegador WebView
+- **Ferramentas de projecto** — Gestão de projecto, tarefas de projecto, notas de trabalho de projecto, trabalho de projecto
 - **Ferramentas de plugins** — Ferramentas de terceiros registadas através do sistema de plugins
+
+### Sistema de Cenários de Ferramentas
+
+Cada ferramenta declara os seus cenários disponíveis através do atributo `[ToolScenario]`:
+
+| Flag de Cenário | Valor | Descrição |
+|----------|------|-------------|
+| `Chat` | `1 << 0` | Cenário de chat (quando o utilizador conversa com o Silicon Being) |
+| `Task` | `1 << 1` | Cenário de tarefa (quando o Silicon Being executa uma tarefa) |
+| `Timer` | `1 << 2` | Cenário de temporizador (quando o Silicon Being executa uma tarefa temporizada) |
+| `MemoryCompression` | `1 << 3` | Cenário de compressão de memória |
+| `Project` | `1 << 4` | Cenário de projecto (modo ThinkOnProject) |
+| `All` | Todos os acima | Disponível em todos os cenários |
+
+Além disso, as ferramentas marcadas com `[ChatOnly]` estão disponíveis apenas no cenário de chat (como o HelpTool), não aparecendo nos cenários de tarefa e temporizador.
 
 ---
 
-## Lista de ferramentas incorporadas
+## Lista de Ferramentas Incorporadas
 
-### 1. Ferramenta de calendário (CalendarTool)
+### 1. Ferramenta de Calendário (CalendarTool)
 
 **Nome da ferramenta**: `calendar`
 
-**Descrição**: Conversão e cálculo de datas em 32 sistemas de calendário.
+**Descrição**: Suporta conversão e cálculo de datas em 32 sistemas de calendário.
 
 **Operações suportadas**:
-- `now` — Obter a hora atual
+- `now` — Obter a hora actual
 - `format` — Formatar data
 - `add_days` — Adicionar/subtrair dias
 - `diff` — Calcular diferença entre datas
 - `list_calendars` — Listar todos os calendários suportados
 - `get_components` — Obter componentes da data
-- `get_now_components` — Obter componentes da hora atual
-- `convert` — Converter entre sistemas de calendário
+- `get_now_components` — Obter componentes da hora actual
+- `convert` — Conversão entre sistemas de calendário
 
 **Sistemas de calendário suportados** (32):
 - Gregoriano (Gregorian)
 - Lunar Chinês (Chinese Lunar)
-- Histórico Chinês (Chinese Historical) — Ganzhi, eras imperiais
+- Histórico Chinês (Chinese Historical) — Era Ganzhi, era imperial
 - Islâmico (Islamic)
 - Hebraico (Hebrew)
 - Japonês (Japanese)
@@ -52,7 +68,7 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 - Maia (Mayan)
 - Budista (Buddhist)
 - Tibetano (Tibetan)
-- E mais 24 outros calendários...
+- E 24 outros calendários...
 
 **Exemplo de uso**:
 ```json
@@ -66,20 +82,20 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ---
 
-### 2. Ferramenta de chat (ChatTool)
+### 2. Ferramenta de Chat (ChatTool)
 
 **Nome da ferramenta**: `chat`
 
-**Descrição**: Gestão de sessões de chat e envio de mensagens.
+**Descrição**: Gerir sessões de chat e envio de mensagens.
 
 **Operações suportadas**:
 - `send_message` — Enviar mensagem
-- `get_messages` — Obter histórico de mensagens
+- `get_messages` — Obter mensagens do histórico
 - `create_group` — Criar chat de grupo
 - `add_member` — Adicionar membro ao grupo
 - `remove_member` — Remover membro do grupo
-- `get_chat_info` — Obter informação do chat
-- `terminate_chat` — Terminar chat (lido sem resposta)
+- `get_chat_info` — Obter informações do chat
+- `terminate_chat` — Terminar chat (lido sem responder)
 
 **Exemplo de uso**:
 ```json
@@ -92,18 +108,18 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ---
 
-### 3. Ferramenta de configuração (ConfigTool)
+### 3. Ferramenta de Configuração (ConfigTool)
 
 **Nome da ferramenta**: `config`
 
-**Descrição**: Leitura e modificação da configuração do sistema.
+**Descrição**: Ler e modificar a configuração do sistema.
 
 **Operações suportadas**:
 - `read` — Ler item de configuração
 - `write` — Escrever item de configuração
 - `list` — Listar todas as configurações
-- `get_ai_config` — Obter configuração do cliente IA
-- `set_ai_config` — Definir configuração do cliente IA
+- `get_ai_config` — Obter configuração do cliente de IA
+- `set_ai_config` — Definir configuração do cliente de IA
 
 **Exemplo de uso**:
 ```json
@@ -117,31 +133,32 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ### 4. Ferramenta do Curator (CuratorTool) 🔒
 
-**Nome da ferramenta**: `curator`
+**Nome da ferramenta**: `silicon_manager`
 
-**Requisito de permissão**: Apenas para o Silicon Curator
+**Requisito de permissão**: Apenas para o Silicon Curator (`[SiliconManagerOnly]`)
 
-**Descrição**: Ferramenta de gestão do sistema exclusiva do Silicon Curator.
+**Cenários disponíveis**: Chat, Task, Timer
+
+**Descrição**: Ferramenta de gestão do sistema exclusiva do Silicon Curator, usada para gerir a criação, visualização e reposição dos Silicon Beings.
 
 **Operações suportadas**:
-- `create_being` — Criar novo Silicon Being
-- `list_beings` — Listar todos os Silicon Beings
-- `get_being_info` — Obter informação do Being
-- `assign_task` — Atribuir tarefa
-- `manage_permissions` — Gerir permissões
+- `list_beings` — Listar todos os Silicon Beings e o seu estado
+- `create_being` — Criar novo Silicon Being (requer parâmetros `name` e `soul`)
+- `get_code` — Visualizar o código fonte personalizado do Silicon Being
+- `reset` — Repor o Silicon Being para a implementação padrão
 
 **Exemplo de uso**:
 ```json
 {
   "action": "create_being",
   "name": "Assistente",
-  "soul_file": "assistant_soul.md"
+  "soul": "És um assistente útil..."
 }
 ```
 
 ---
 
-### 5. Ferramenta de base de dados (DatabaseTool)
+### 5. Ferramenta de Base de Dados (DatabaseTool)
 
 **Nome da ferramenta**: `database`
 
@@ -150,7 +167,7 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 **Operações suportadas**:
 - `query` — Consultar dados
 - `insert` — Inserir dados
-- `update` — Atualizar dados
+- `update` — Actualizar dados
 - `delete` — Eliminar dados
 - `create_table` — Criar tabela
 - `list_tables` — Listar todas as tabelas
@@ -167,7 +184,7 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ---
 
-### 6. Ferramenta de disco (DiskTool)
+### 6. Ferramenta de Disco (DiskTool)
 
 **Nome da ferramenta**: `disk`
 
@@ -176,16 +193,16 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 **Operações suportadas**:
 - `read` — Ler ficheiro
 - `write` — Escrever ficheiro
-- `list` — Listar diretório
+- `list` — Listar directório
 - `delete` — Eliminar ficheiro
-- `create_directory` — Criar diretório
+- `create_directory` — Criar directório
 - `search_files` — Pesquisar ficheiros
 - `search_content` — Pesquisar conteúdo de ficheiros
 - `count_lines` — Contar linhas
 - `read_lines` — Ler linhas específicas
 - `replace_text` — Substituir texto
 
-**Requisito de permissão**: `disk:read`, `disk:write`
+**Requisito de permissão**: `FileAccess`
 
 **Exemplo de uso**:
 ```json
@@ -197,20 +214,20 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ---
 
-### 7. Ferramenta de compilação dinâmica (DynamicCompileTool) 🔒
+### 7. Ferramenta de Compilação Dinâmica (DynamicCompileTool) 🔒
 
 **Nome da ferramenta**: `compile`
 
-**Descrição**: Compilação dinâmica de código C# (para auto-evolução dos Silicon Beings).
+**Descrição**: Compilação dinâmica de código C# (usada para auto-evolução dos Silicon Beings).
 
 **Operações suportadas**:
 - `compile_class` — Compilar classe
-- `compile_callback` — Compilar função de callback de permissão
+- `compile_callback` — Compilar função de callback de permissões
 - `validate_code` — Validar segurança do código
 
 **Mecanismos de segurança**:
 - Controlo de referências na compilação (exclusão de assemblies perigosos)
-- Análise estática de código no runtime
+- Análise estática de código em tempo de execução
 - Armazenamento encriptado com AES-256
 
 **Exemplo de uso**:
@@ -223,13 +240,13 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ---
 
-### 8. Ferramenta de execução de código (ExecuteCodeTool) 🔒
+### 8. Ferramenta de Execução de Código (ExecuteCodeTool) 🔒
 
 **Nome da ferramenta**: `execute_code`
 
 **Requisito de permissão**: Apenas para o Silicon Curator
 
-**Descrição**: Compila e executa fragmentos de código C#.
+**Descrição**: Compilar e executar fragmentos de código C#.
 
 **Operações suportadas**:
 - `run_script` — Executar script de código
@@ -245,36 +262,39 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ---
 
-### 9. Ferramenta de ajuda (HelpTool)
+### 9. Ferramenta de Ajuda (HelpTool)
 
 **Nome da ferramenta**: `help`
 
-**Descrição**: Obter documentação de ajuda do sistema e guias de utilização.
+**Cenários disponíveis**: Chat (`[ChatOnly]`, apenas disponível no cenário de chat)
+
+**Descrição**: Pesquisar e obter conteúdo da documentação de ajuda do sistema, permitindo à IA consultar métodos de utilização das funcionalidades do sistema.
 
 **Operações suportadas**:
-- `get_topics` — Obter lista de tópicos de ajuda
-- `get_topic` — Obter detalhes de um tópico específico
-- `search` — Pesquisar documentação de ajuda
+- `list` — Listar todos os IDs de tópicos de ajuda
+- `search` — Pesquisar documentação de ajuda por palavra-chave
+- `get` — Obter conteúdo da documentação de ajuda para o ID especificado
 
 **Exemplo de uso**:
 ```json
 {
-  "action": "get_topics"
+  "action": "search",
+  "keyword": "permissões"
 }
 ```
 
 ---
 
-### 10. Ferramenta de rede de conhecimento (KnowledgeTool)
+### 10. Ferramenta de Rede de Conhecimento (KnowledgeTool)
 
 **Nome da ferramenta**: `knowledge`
 
-**Descrição**: Operações no grafo de conhecimento (baseado em triplas: sujeito-relação-objeto).
+**Descrição**: Operações no grafo de conhecimento (baseado em triplas: sujeito-relação-objecto).
 
 **Operações suportadas**:
 - `add` — Adicionar tripla de conhecimento
 - `query` — Consultar conhecimento
-- `update` — Atualizar conhecimento
+- `update` — Actualizar conhecimento
 - `delete` — Eliminar conhecimento
 - `search` — Pesquisar conhecimento
 - `get_path` — Obter caminho de conhecimento
@@ -294,16 +314,16 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ---
 
-### 11. Ferramenta de logs (LogTool)
+### 11. Ferramenta de Registos (LogTool)
 
 **Nome da ferramenta**: `log`
 
-**Descrição**: Consulta do histórico de operações e histórico de conversações.
+**Descrição**: Consultar histórico de operações e histórico de conversações.
 
 **Operações suportadas**:
-- `query_logs` — Consultar logs do sistema
+- `query_logs` — Consultar registos do sistema
 - `query_conversations` — Consultar histórico de conversações
-- `get_stats` — Obter estatísticas de logs
+- `get_stats` — Obter estatísticas de registos
 
 **Exemplo de uso**:
 ```json
@@ -318,11 +338,11 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ---
 
-### 12. Ferramenta de memória (MemoryTool)
+### 12. Ferramenta de Memória (MemoryTool)
 
 **Nome da ferramenta**: `memory`
 
-**Descrição**: Gestão da memória de longo e curto prazo dos Silicon Beings.
+**Descrição**: Gerir a memória de longo e curto prazo dos Silicon Beings.
 
 **Operações suportadas**:
 - `read` — Ler memória
@@ -347,7 +367,7 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ---
 
-### 13. Ferramenta de rede (NetworkTool)
+### 13. Ferramenta de Rede (NetworkTool)
 
 **Nome da ferramenta**: `network`
 
@@ -373,19 +393,19 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ---
 
-### 14. Ferramenta de permissões (PermissionTool) 🔒
+### 14. Ferramenta de Permissões (PermissionTool) 🔒
 
 **Nome da ferramenta**: `permission`
 
 **Requisito de permissão**: Apenas para o Silicon Curator
 
-**Descrição**: Gestão de permissões e listas de controlo de acesso.
+**Descrição**: Gerir permissões e listas de controlo de acesso.
 
 **Operações suportadas**:
-- `query_permission` — Consultar permissão
-- `manage_acl` — Gerir ACL global
-- `get_callback` — Obter função de callback de permissão
-- `set_callback` — Definir função de callback de permissão
+- `query_permission` — Consultar permissões
+- `manage_acl` — Gerir ACL Global
+- `get_callback` — Obter função de callback de permissões
+- `set_callback` — Definir função de callback de permissões
 
 **Exemplo de uso**:
 ```json
@@ -400,69 +420,92 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ---
 
-### 15. Ferramenta de projeto (ProjectTool)
+### 15. Ferramenta de Projecto (ProjectTool) 🔒
 
 **Nome da ferramenta**: `project`
 
-**Descrição**: Gestão de espaços de trabalho de projeto.
+**Requisito de permissão**: Apenas para o Silicon Curator (`[SiliconManagerOnly]`)
+
+**Cenários disponíveis**: Chat, Task, Timer
+
+**Descrição**: Gerir espaços de trabalho de projecto, suportando gestão do ciclo de vida do projecto, atribuição de membros e gestão de funções.
 
 **Operações suportadas**:
-- `create` — Criar projeto
-- `list` — Listar projetos
-- `get_info` — Obter informação do projeto
-- `update` — Atualizar projeto
-- `archive` — Arquivar projeto
+- `create` — Criar novo espaço de projecto
+- `archive` — Arquivar projecto
+- `restore` — Restaurar projecto arquivado
+- `destroy` — Destruir projecto e limpar dados (irreversível)
+- `list` — Listar todos os projectos
+- `get` — Obter detalhes do projecto
+- `assign` — Atribuir Silicon Being ao projecto
+- `remove` — Remover Silicon Being do projecto
+- `update` — Actualizar nome/descrição do projecto
+- `list-workflow-templates` — Listar modelos de fluxos de trabalho disponíveis
+- `assign_role` — Atribuir função de projecto ao Silicon Being
+- `remove_role` — Remover função de projecto do Silicon Being
+- `list_roles` — Listar atribuições de funções do projecto
 
 **Exemplo de uso**:
 ```json
 {
   "action": "create",
-  "name": "O Meu Projeto",
-  "description": "Descrição do projeto"
+  "name": "My Project",
+  "description": "Descrição do projecto"
 }
 ```
 
 ---
 
-### 16. Ferramenta de tarefas de projeto (ProjectTaskTool)
+### 16. Ferramenta de Tarefas de Projecto (ProjectTaskTool)
 
 **Nome da ferramenta**: `project_task`
 
-**Descrição**: Gestão de tarefas de projeto.
+**Cenários disponíveis**: Chat, Task, Timer
+
+**Descrição**: Gerir tarefas dentro do espaço de projecto, suportando o ciclo de vida completo das tarefas.
 
 **Operações suportadas**:
-- `create` — Criar tarefa
-- `list` — Listar tarefas
-- `update` — Atualizar tarefa
-- `complete` — Completar tarefa
-- `get_stats` — Obter estatísticas de tarefas
+- `create` — Criar tarefa de projecto
+- `list` — Listar tarefas do projecto
+- `get` — Obter detalhes da tarefa
+- `update` — Actualizar título/descrição/prioridade da tarefa
+- `assign` — Atribuir responsável à tarefa
+- `remove_assignee` — Remover responsável da tarefa
+- `start` — Iniciar tarefa
+- `complete` — Marcar tarefa como concluída
+- `fail` — Marcar tarefa como falhada
+- `cancel` — Cancelar tarefa
+- `delete` — Eliminar tarefa
+- `stats` — Obter estatísticas das tarefas
 
 **Exemplo de uso**:
 ```json
 {
   "action": "create",
   "project_id": "project-uuid",
-  "description": "Descrição da tarefa a completar",
+  "description": "Descrição da tarefa a concluir",
   "priority": 5
 }
 ```
 
 ---
 
-### 17. Ferramenta de notas de trabalho de projeto (ProjectWorkNoteTool)
+### 17. Ferramenta de Notas de Trabalho de Projecto (ProjectWorkNoteTool)
 
 **Nome da ferramenta**: `project_work_note`
 
-**Descrição**: Gestão de notas de trabalho de projeto (públicas, semelhante a um caderno de trabalho).
+**Cenários disponíveis**: Chat, Task, Timer
+
+**Descrição**: Gerir notas de trabalho dentro do espaço de projecto (públicas, semelhante a um caderno de trabalho), suportando gestão de notas em formato de página.
 
 **Operações suportadas**:
-- `create` — Criar nota
-- `read` — Ler nota
-- `update` — Atualizar nota
-- `delete` — Eliminar nota
-- `list` — Listar notas
-- `search` — Pesquisar notas
-- `directory` — Gerar índice
+- `create` — Criar página de nota (requer `project_id`, `summary` e `content`, opcional `keywords`)
+- `read` — Ler página de nota (requer `project_id` e `page_number` ou `note_id`)
+- `update` — Actualizar página de nota (requer `project_id`, `page_number` e `content`, opcional `summary` e `keywords`)
+- `delete` — Eliminar página de nota (requer `project_id` e `page_number` ou `note_id`)
+- `list` — Listar resumos de todas as páginas de notas do projecto
+- `directory` — Gerar directório/visão geral das notas
+- `search` — Pesquisar notas por palavra-chave (requer `project_id` e `keyword`, opcional `max_results`)
 
 **Exemplo de uso**:
 ```json
@@ -470,21 +513,50 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
   "action": "create",
   "project_id": "project-uuid",
   "summary": "Módulo de autenticação de utilizadores concluído",
-  "content": "## Detalhes de implementação\n\n- Utilização de JWT token",
+  "content": "## Detalhes de Implementação\n\n- Usar JWT token",
   "keywords": "autenticação,JWT"
 }
 ```
 
 ---
 
-### 18. Ferramenta do sistema (SystemTool)
+### 18. Ferramenta de Trabalho de Projecto (ProjectWorkTool) 🔒
+
+**Nome da ferramenta**: `project_work`
+
+**Requisito de permissão**: Apenas para o Silicon Curator (`[SiliconManagerOnly]`)
+
+**Cenários disponíveis**: Project (`[ToolScenario(ToolScenarioFlag.Project)]`, apenas disponível no cenário de projecto)
+
+**Descrição**: Ferramenta de operações de trabalho do projecto, usada pelo Curator para gerir fluxos de trabalho do projecto no cenário ThinkOnProject.
+
+**Operações suportadas**:
+- `create-task` — Criar tarefa de projecto
+- `assign-task` — Atribuir Silicon Being à tarefa
+- `chat` — Enviar mensagem para o chat de grupo do projecto
+- `broadcast` — Difundir mensagem para o canal do projecto
+- `complete` — Marcar projecto como concluído
+- `status` — Obter estado do projecto
+
+**Exemplo de uso**:
+```json
+{
+  "action": "create-task",
+  "project_id": "project-uuid",
+  "title": "Implementar autenticação de utilizadores"
+}
+```
+
+---
+
+### 19. Ferramenta do Sistema (SystemTool)
 
 **Nome da ferramenta**: `system`
 
-**Descrição**: Obter informação do sistema e utilização de recursos.
+**Descrição**: Obter informações do sistema e utilização de recursos.
 
 **Operações suportadas**:
-- `info` — Obter informação do sistema
+- `info` — Obter informações do sistema
 - `resource_usage` — Obter utilização de recursos
 - `find_process` — Encontrar processo
 - `list_beings` — Listar Silicon Beings
@@ -498,17 +570,17 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ---
 
-### 19. Ferramenta de tarefas (TaskTool)
+### 20. Ferramenta de Tarefas (TaskTool)
 
 **Nome da ferramenta**: `task`
 
-**Descrição**: Gestão de tarefas pessoais dos Silicon Beings.
+**Descrição**: Gerir tarefas pessoais dos Silicon Beings.
 
 **Operações suportadas**:
 - `create` — Criar tarefa
 - `list` — Listar tarefas
-- `update` — Atualizar tarefa
-- `complete` — Completar tarefa
+- `update` — Actualizar tarefa
+- `complete` — Concluir tarefa
 - `delete` — Eliminar tarefa
 - `get_dependencies` — Obter dependências
 
@@ -523,11 +595,11 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ---
 
-### 20. Ferramenta de temporizador (TimerTool)
+### 21. Ferramenta de Temporizadores (TimerTool)
 
 **Nome da ferramenta**: `timer`
 
-**Descrição**: Criação e gestão de temporizadores.
+**Descrição**: Criar e gerir temporizadores.
 
 **Operações suportadas**:
 - `create` — Criar temporizador
@@ -535,7 +607,7 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 - `delete` — Eliminar temporizador
 - `pause` — Pausar temporizador
 - `resume` — Retomar temporizador
-- `get_execution_history` — Obter histórico de execuções
+- `get_execution_history` — Obter histórico de execução
 
 **Exemplo de uso**:
 ```json
@@ -549,49 +621,60 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ---
 
-### 21. Ferramenta de auditoria de tokens (TokenAuditTool) 🔒
+### 22. Ferramenta de Auditoria de Tokens (TokenAuditTool) 🔒
 
 **Nome da ferramenta**: `token_audit`
 
-**Requisito de permissão**: Apenas para o Silicon Curator
+**Requisito de permissão**: Apenas para o Silicon Curator (`[SiliconManagerOnly]`)
 
-**Descrição**: Consulta e agregação da utilização de tokens IA.
+**Cenários disponíveis**: Chat, Task, Timer
+
+**Descrição**: Consultar estatísticas e dados de tendência de utilização de Tokens de IA.
 
 **Operações suportadas**:
-- `get_usage` — Obter estatísticas de utilização de tokens
-- `get_by_being` — Obter utilização por Being
-- `get_by_model` — Obter utilização por modelo
-- `get_trend` — Obter tendência de utilização
-- `export` — Exportar dados
+- `summary` — Obter estatísticas sumárias de utilização de Tokens
+- `trend` — Obter pontos de dados de tendência de utilização de Tokens
+
+**Intervalos de tempo suportados**:
+- `today` — Últimas 24 horas
+- `week` — Últimas 7×24 horas
+- `month` — Estatísticas por dia
+- `year` — Estatísticas por mês
 
 **Exemplo de uso**:
 ```json
 {
-  "action": "get_usage",
-  "start_date": "2026-04-01",
-  "end_date": "2026-04-26"
+  "action": "summary",
+  "time_range": "week"
 }
 ```
 
 ---
 
-### 22. Ferramenta de browser WebView (WebViewBrowserTool)
+### 23. Ferramenta de Navegador WebView (WebViewBrowserTool)
 
-**Nome da ferramenta**: `webview`
+**Nome da ferramenta**: `webview_browser`
 
-**Descrição**: Automação de browser baseada em Playwright.
+**Cenários disponíveis**: Chat, Task, Timer
+
+**Descrição**: Automação de navegador baseada em Playwright, fornecendo capacidades completas de navegação web, interacção e extracção de dados.
 
 **Operações suportadas**:
-- `open_browser` — Abrir browser
-- `close_browser` — Fechar browser
+- `open` — Abrir navegador
+- `close` — Fechar navegador
 - `navigate` — Navegar para URL
 - `click` — Clicar em elemento
 - `input` — Introduzir texto
+- `scroll` — Deslocar página
+- `execute_script` — Executar JavaScript
 - `get_page_text` — Obter texto da página
 - `get_screenshot` — Obter captura de ecrã
-- `execute_script` — Executar JavaScript
-- `wait_for_element` — Aguardar que elemento apareça
-- `get_browser_status` — Obter estado do browser
+- `wait_for_element` — Aguardar aparecimento de elemento
+- `get_element_info` — Obter informações do elemento
+- `upload_file` — Carregar ficheiro
+- `get_browser_status` — Obter estado do navegador
+- `set_timeout` — Definir tempo limite
+- `clear_session` — Limpar sessão do navegador
 
 **Características**:
 - Instância independente por Silicon Being
@@ -609,52 +692,52 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 
 ---
 
-### 23. Ferramenta de notas de trabalho (WorkNoteTool)
+### 24. Ferramenta de Notas de Trabalho (WorkNoteTool)
 
 **Nome da ferramenta**: `work_note`
 
-**Descrição**: Gestão de notas de trabalho pessoais dos Silicon Beings (privadas, semelhante a um diário).
+**Descrição**: Gerir notas de trabalho pessoais dos Silicon Beings (privadas, semelhante a um diário).
 
 **Operações suportadas**:
 - `create` — Criar nota
 - `read` — Ler nota
-- `update` — Atualizar nota
+- `update` — Actualizar nota
 - `delete` — Eliminar nota
 - `list` — Listar notas
 - `search` — Pesquisar notas
-- `directory` — Gerar índice
+- `directory` — Gerar directório
 
 **Exemplo de uso**:
 ```json
 {
   "action": "create",
   "summary": "Módulo de autenticação de utilizadores concluído",
-  "content": "## Detalhes de implementação\n\n- Utilização de JWT token\n- Suporte a OAuth2",
+  "content": "## Detalhes de Implementação\n\n- Usar JWT token\n- Suportar OAuth2",
   "keywords": "autenticação,JWT,OAuth2"
 }
 ```
 
 ---
 
-### 24. Ferramenta de hot reload (HotReloadTool)
+### 25. Ferramenta de Recarregamento a Quente (HotReloadTool)
 
 **Nome da ferramenta**: `hot_reload`
 
-**Descrição**: Suporta a compilação automática, atualização de ficheiros e reinício do SiliconLife.Fast em execução, sem intervenção manual.
+**Descrição**: Suporta a compilação automática, actualização de ficheiros e reinício em execução do SiliconLife.Fast, sem intervenção manual.
 
 **Operações suportadas**:
 - `execute` — Executar o fluxo completo de compilação, cópia e reinício
-- `build_only` — Apenas compilar o projeto, sem copiar e reiniciar
+- `build_only` — Apenas compilar o projecto, sem copiar e reiniciar
 
 **Fluxo de trabalho**:
-1. Compilar o projeto SiliconLife.Fast
-2. Encerrar graciosamente a instância Fast atualmente em execução (via HTTP API)
+1. Compilar o projecto SiliconLife.Fast
+2. Encerrar elegantemente a instância Fast actual (via API HTTP)
 3. Aguardar que o processo termine e a porta seja libertada
-4. Copiar o resultado da compilação para o diretório de destino (saltando os ficheiros do HotReload)
+4. Copiar o resultado da compilação para o directório de destino (saltar os ficheiros do próprio HotReload)
 5. Reiniciar a instância Fast
 
 **Características**:
-- Deteção e encerramento automático do processo antigo
+- Detecção automática e encerramento do processo antigo
 - Cópia segura de ficheiros (não sobrescreve o HotReload.exe)
 - Mecanismo de espera pela libertação da porta
 - Suporte a configuração de porta personalizada
@@ -671,19 +754,19 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 ```
 
 **Descrição dos parâmetros**:
-- `project_path`: Caminho do projeto (relativo à raiz da solução)
-- `source_path`: Diretório de saída da compilação
+- `project_path`: Caminho do projecto (relativo à raiz da solução)
+- `source_path`: Directório de saída da compilação
 - `configuration`: Configuração de compilação (Debug/Release)
-- `port`: Porta Web da instância Fast (por defeito 8080)
+- `port`: Porta Web da instância Fast (predefinição 8080)
 
 **Notas**:
-- Aplicável apenas à versão SiliconLife.Fast
-- Requer que o HotReload.exe esteja no diretório tools/HotReload
-- Haverá uma breve interrupção do serviço durante o reinício (aprox. 3-5 segundos)
+- Apenas aplicável à versão SiliconLife.Fast
+- Requer que o HotReload.exe esteja no directório tools/HotReload
+- Haverá uma breve interrupção do serviço durante o reinício (cerca de 3-5 segundos)
 
 ---
 
-## Fluxo de chamada de ferramentas
+## Fluxo de Chamada de Ferramentas
 
 ```
 ┌──────────┐
@@ -691,34 +774,32 @@ O sistema de ferramentas permite aos Silicon Beings interagir com o mundo exteri
 └────┬─────┘
      ↓
 ┌──────────────┐
-│ ToolManager  │ Pesquisa e valida o direito de uso da ferramenta
+│ ToolManager  │ Procurar e validar direito de uso da ferramenta
 └────┬─────────┘
      ↓
 ┌──────────────┐
-│ Permission   │ Verifica a cadeia de permissões
+│ Permission   │ Verificar cadeia de permissões
 │   Manager    │
 └────┬─────────┘
      ↓
 ┌──────────────┐
-│  Executor    │ Executa operações de acesso a recursos
+│  Executor    │ Executar operação de acesso a recursos
 └────┬─────────┘
      ↓
 ┌──────────┐
-│   IA     │ Recebe o resultado da ferramenta, continua a pensar
+│   IA     │ Receber resultado da ferramenta, continuar a pensar
 └──────────┘
 ```
 
-## Verificação de permissões
+## Verificação de Permissões
 
-Todas as execuções de ferramentas passam pela cadeia de permissões de 5 níveis:
+Todas as execuções de ferramentas passam pela cadeia de verificação de permissões:
 
-1. **UserFrequencyCache** — Cache de frequência de permissão/negação do utilizador
-2. **IPermissionCallback** — Função de callback de permissão personalizada
-3. **Ramificação**:
-   - IsCurator → **IPermissionAskHandler** — O Curator pede confirmação ao utilizador
-   - Non-curador → **GlobalACL** — Lista de controlo de acesso global
+1. **UserFrequencyCache** — Cache de decisões frequentes do utilizador (HighDeny tem prioridade sobre HighAllow)
+2. **IPermissionCallback** — Função de callback de permissões personalizada (Allowed/Denied/AskUser)
+3. **Ramificação IsCurator** — O Curator pergunta ao utilizador via IPermissionAskHandler; os não Curator consultam a GlobalACL, sem regra correspondente resulta em negação por defeito
 
-## Criar uma ferramenta personalizada
+## Criar Ferramentas Personalizadas
 
 ### Passo 1: Implementar a interface ITool
 
@@ -728,6 +809,16 @@ public class MyCustomTool : ITool
     public string Name => "my_tool";
     
     public string Description => "Descrição da ferramenta";
+    
+    public ToolDefinition Definition => new ToolDefinition
+    {
+        Name = Name,
+        Description = Description,
+        Parameters = new Dictionary<string, object>
+        {
+            ["param1"] = new { type = "string", description = "Descrição do parâmetro" }
+        }
+    };
     
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
@@ -754,32 +845,32 @@ public class MyCustomTool : ITool
 }
 ```
 
-### Passo 2: Adicionar ao projeto
+### Passo 2: Adicionar ao Projecto
 
-Colocar o ficheiro da ferramenta no diretório `src/SiliconLife.Common/Tools/` (ferramentas partilhadas) ou no diretório `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (ferramentas específicas da versão). O `ToolManager` descobre e regista automaticamente as ferramentas através de reflexão no arranque.
+Colocar o ficheiro da ferramenta no directório `src/SiliconLife.Common/Tools/` (ferramentas partilhadas) ou nos directórios `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (ferramentas específicas da versão). O `ToolManager` descobrirá e registará automaticamente via reflexão no arranque.
 
-### Passo 2a: Registar ferramenta através de plugin
+### Passo 2a: Registar Ferramenta via Plugin
 
 Também é possível registar ferramentas personalizadas através do sistema de plugins:
 
-1. Implementar a interface `ITool` no projeto do plugin
-2. Compilar a DLL do plugin e colocá-la no diretório de plugins
-3. `ToolManager.ScanAllPluginAssemblies()` pesquisa automaticamente implementações ITool em todos os plugins carregados
+1. Implementar a interface `ITool` no projecto do plugin
+2. Compilar a DLL do plugin e colocá-la no directório de plugins
+3. O `ToolManager.ScanAllPluginAssemblies()` analisará automaticamente as implementações de ITool em todos os plugins carregados
 4. As ferramentas do plugin estão sujeitas ao mesmo sistema de permissões
 
-### Passo 3: (Opcional) Marcar como exclusiva do Curator
+### Passo 3: (Opcional) Marcar como Exclusiva do Curator
 
 ```csharp
 [SiliconManagerOnly]
 public class AdminOnlyTool : ITool
 {
-    // Apenas o Silicon Curator pode aceder
+    // Apenas o Silicon Curator tem acesso
 }
 ```
 
-## Boas práticas
+## Melhores Práticas
 
-### 1. Validar sempre os parâmetros
+### 1. Validar Sempre os Parâmetros
 
 ```csharp
 if (!call.Parameters.ContainsKey("required_param"))
@@ -788,7 +879,7 @@ if (!call.Parameters.ContainsKey("required_param"))
 }
 ```
 
-### 2. Lidar com erros de forma elegante
+### 2. Tratar Erros Elegantemente
 
 ```csharp
 try
@@ -797,67 +888,67 @@ try
 }
 catch (Exception ex)
 {
-    Logger.Error($"Ferramenta {Name} falhou: {ex.Message}");
+    Logger.Error($"Falha na execução da ferramenta {Name}: {ex.Message}");
     return ToolResult.Failure(ex.Message);
 }
 ```
 
-### 3. Respeitar o sistema de permissões
+### 3. Respeitar o Sistema de Permissões
 
-Nunca contornar as verificações de permissões. Aceder sempre aos recursos através do executor:
+Nunca contornar as verificações de permissões. Aceder sempre aos recursos através de executores:
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+bool allowed = permissionManager.CheckPermission(callerId, permissionType, resource);
+if (!allowed)
 {
-    return ToolResult.Denied(permission.Reason);
+    return ToolResult.Denied("Permission denied");
 }
 ```
 
-### 4. Fornecer descrições claras das ferramentas
+### 4. Fornecer Descrições Claras da Ferramenta
 
 Ajudar a IA a compreender quando e como usar a ferramenta:
 
 ```csharp
 public string Description => 
-    "Utilizado para converter datas entre diferentes sistemas de calendário." +
+    "Usado para converter datas entre diferentes sistemas de calendário." +
     "Requer os parâmetros 'date', 'from_calendar' e 'to_calendar'.";
 ```
 
-## Resolução de problemas
+## Resolução de Problemas
 
-### Ferramenta não encontrada
+### Ferramenta Não Encontrada
 
 **Problema**: A IA tenta chamar uma ferramenta que não existe.
 
 **Solução**:
-- Verificar se o nome da ferramenta corresponde exatamente
-- Validar que o ficheiro da ferramenta está no diretório `Tools/`
-- Reconstruir o projeto (`dotnet build`)
+- Verificar se o nome da ferramenta corresponde exactamente
+- Confirmar que o ficheiro da ferramenta está no directório `Tools/`
+- Reconstruir o projecto (`dotnet build`)
 
-### Permissão negada
+### Permissão Negada
 
 **Problema**: A execução da ferramenta falha, retornando erro de permissão.
 
 **Solução**:
-- Verificar o registo de auditoria de permissões
-- Validar que o Silicon Being possui as permissões necessárias
-- Verificar as definições da ACL global
-- Se for o Curator, verificar se a ferramenta está marcada com `[SiliconManagerOnly]`
+- Verificar os registos de auditoria de permissões
+- Confirmar que o Silicon Being tem as permissões necessárias
+- Verificar as definições da ACL Global
+- Se for o Curator, verificar se a marca `[SiliconManagerOnly]` foi usada
 
-### Execução da ferramenta retorna erro
+### Execução da Ferramenta Retorna Erro
 
 **Problema**: A ferramenta executa mas retorna um resultado de falha.
 
 **Solução**:
 - Verificar a mensagem de erro retornada pela ferramenta
-- Validar que o formato dos parâmetros de entrada está correto
-- Consultar os logs do sistema para informação detalhada do erro
-- Testar a funcionalidade da ferramenta de forma independente
+- Validar que o formato dos parâmetros de entrada está correcto
+- Consultar os registos do sistema para obter informações detalhadas do erro
+- Testar a funcionalidade da ferramenta independentemente
 
-## Próximos passos
+## Próximos Passos
 
-- 📚 Ler a [documentação de arquitetura](architecture.md)
-- 🛠️ Consultar o [guia de desenvolvimento](development-guide.md)
-- 🔒 Compreender o [sistema de permissões](permission-system.md)
-- 🚀 Ver o [guia de introdução](getting-started.md)
+- 📚 Leia o [guia de arquitectura](architecture.md)
+- 🛠️ Consulte o [guia de desenvolvimento](development-guide.md)
+- 🔒 Compreenda o [sistema de permissões](permission-system.md)
+- 🚀 Consulte o [guia de início rápido](getting-started.md)

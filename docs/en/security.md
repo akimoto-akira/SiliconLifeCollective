@@ -1,15 +1,15 @@
-﻿# Security Design
+# Security Design
 
 > **Version: v0.2.0-alpha**
 
-**English** | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Deutsch](../de-DE/security.md) | [Čeština](../cs-CZ/security.md) | [Русский](../ru-RU/security.md)
+[**English**](../en/security.md) | [Deutsch](../de-DE/security.md) | [中文](../zh-CN/security.md) | [繁體中文](../zh-HK/security.md) | [Español](../es-ES/security.md) | [日本語](../ja-JP/security.md) | [한국어](../ko-KR/security.md) | [Čeština](../cs-CZ/security.md) | [Русский](../ru-RU/security.md)
 
 ## Overview
 
 Security in Silicon Life Collective is built on a **defense in depth** model. Core principle: **All I/O operations must go through executors**, and executors enforce permission checks before execution.
 
 ```
-Tool Call → Executor → Permission Manager → Frequency Cache → Callback → (Curator→AskUser / NonCurator→GlobalACL→Deny)
+Tool Call → Executor → Permission Manager → Frequency Cache → Callback → (IsCurator: Ask User | Non-curator: Global ACL)
 ```
 
 ---
@@ -38,17 +38,17 @@ Each permission check returns one of three outcomes:
 
 ### Special Role: Silicon Curator
 
-The silicon curator has the highest permission level (`IsCurator = true`). Permission checks for the curator are short-circuited to **Allowed**, unless the user explicitly overrides.
+The Silicon Curator has the highest permission level (`IsCurator = true`). When the permission chain reaches the branch decision, the curator's operations are routed through `IPermissionAskHandler` to ask the user for confirmation, rather than being short-circuited to Allowed. Non-curator beings query the Global ACL instead.
 
 ### Private Permission Manager
 
-Each silicon being has its own **private PermissionManager** instance. Permission state is not shared between beings.
+Each Silicon Being has its own **private PermissionManager** instance. Permission state is not shared between beings.
 
 ---
 
 ## Permission Verification Flow
 
-Query priority is: **1. UserFrequencyCache → 2. IPermissionCallback → 3. Curator Branch (AskHandler/GlobalACL)**
+Query priority is: **1. Frequency Cache → 2. Callback Function → 3. Branch Decision (IsCurator/GlobalACL)**
 
 ```
 ┌─────────────┐
@@ -63,36 +63,34 @@ Query priority is: **1. UserFrequencyCache → 2. IPermissionCallback → 3. Cur
 └─────────────┘            │
                            ▼
                   ┌─────────────────┐
-                  │ 1. UserFrequency│──Match──▶ Allowed / Denied
+                  │ 1. Frequency    │──Match──▶ Allowed / Denied
                   │    Cache        │
-                  │ (HighDeny/      │
+                  │ (HighDeny takes │
+                  │  priority over  │
                   │  HighAllow)     │
                   └────────┬────────┘
                            │ No Match
                            ▼
                   ┌─────────────────┐
-                  │ 2. IPermission  │──▶ Allowed / Denied / AskUser
+                  │ 2. Permission   │──▶ Allowed / Denied / AskUser
                   │    Callback     │
                   └────────┬────────┘
-                           │ AskUser or no callback
+                           │ AskUser
                            ▼
                   ┌─────────────────┐
                   │ 3. IsCurator?   │
-                  └────┬───────┬────┘
-                       │       │
-                  Yes  │       │ No
-                       ▼       ▼
-            ┌──────────┐  ┌──────────────┐
-            │ Ask User │  │ GlobalACL    │──Match──▶ Allowed / Denied
-            │ (IM)     │  └──────┬───────┘
-            └──────────┘         │ No Match
-                                 ▼
-                          ┌──────────────┐
-                          │ Default Deny │
-                          └──────────────┘
+                  └────────┬────────┘
+                           │
+                 ┌─────────┴─────────┐
+                 │                   │
+                 ▼ Yes               ▼ No
+          ┌─────────────┐    ┌─────────────┐
+          │ Ask User    │    │ Global ACL  │
+          │ (AskHandler)│    │ Query Rules │
+          └─────────────┘    └─────────────┘
 ```
 
-**Key Point**: Executors only see booleans (Allowed/Denied). The permission manager internally handles the ternary decision (Allowed/Denied/AskUser) and resolves AskUser before returning to the executor.
+**Key Point**: Executors only see booleans (Allowed/Denied). The Permission Manager internally handles the ternary decision (Allowed/Denied/AskUser) and resolves AskUser before returning to the executor.
 
 ---
 
@@ -100,35 +98,42 @@ Query priority is: **1. UserFrequencyCache → 2. IPermissionCallback → 3. Cur
 
 Executors are the **only** path for I/O operations. They enforce:
 
-### Static Execution Model
+### Independent Scheduling Thread
 
-Current executor implementations (`DiskExecutor`, `NetworkExecutor`, `CommandLineExecutor`) are **static classes** that provide synchronous execution with timeout control:
+Each executor has an **independent scheduling thread**:
 
-- Each executor checks permission via the caller's `PermissionManager` before executing.
-- Operations run on `Task.Run` with configurable timeout.
-- On timeout, the operation is treated as failed.
-- `ExecutorBase` provides an abstract base class with background thread and request queue support for future extensions.
+- Thread isolation between executors — one executor's thread blocking does not affect other executors.
+- Each executor can set independent resource limits (CPU, memory, etc.).
+- Thread pool management for executor threads.
 
-### Permission Verification in Executors
+### Request Queue
+
+Each executor maintains a request queue:
+
+- Requests are routed to the corresponding executor by type.
+- Priority queuing is supported.
+- Per-request timeout control.
+
+### Thread Locking for Permission Verification
 
 When a tool initiates resource access:
 
-1. Executor receives the request.
-2. Executor queries the being's private permission manager via `ServiceLocator.Instance.GetPermissionManager(callerId)`.
-3. If permission is denied, the operation is blocked immediately.
-4. If callback returns AskUser (curator path), the executor thread **remains locked** waiting for user response.
-5. The being only sees the final result (success or denial) — it never sees the intermediate "pending" or "waiting" state.
-6. Only the silicon curator triggers real user prompts. Normal beings query the global ACL synchronously without blocking.
-7. On timeout, the request is treated as denied, and the thread lock is released.
+1. Executor receives the request and **locks its thread**.
+2. Executor queries the being's private Permission Manager.
+3. If the callback returns AskUser, the executor thread **remains locked** waiting for user response.
+4. The being only sees the final result (success or denial) — it never sees the intermediate "pending" or "waiting" state.
+5. Only the Silicon Curator triggers real user prompts. Normal beings query the Global ACL synchronously without blocking.
+6. On timeout, the request is treated as Denied, and the thread lock is released.
 
 ### Executor Types
 
 | Executor | Scope | Default Timeout |
 |----------|-------|-----------------|
 | `DiskExecutor` | File read/write, directory operations | 30 seconds |
-| `NetworkExecutor` | HTTP requests, WebSocket connections | 30 seconds |
-| `CommandLineExecutor` | Shell command execution | 30 seconds |
-| `DynamicCompilationExecutor` | Roslyn in-memory compilation | N/A (delegates to CompilationCore) |
+| `NetworkExecutor` | HTTP requests, WebSocket connections | 60 seconds |
+| `CommandLineExecutor` | Shell command execution | 120 seconds |
+
+> **Note**: `DynamicCompilationExecutor` (located in the `SiliconLife.Core.Compilation` namespace) handles Roslyn in-memory compilation and is not an I/O executor, but is still subject to the permission system.
 
 ### Exception Isolation and Fault Tolerance
 
@@ -140,7 +145,7 @@ When a tool initiates resource access:
 
 ## Global ACL (Access Control List)
 
-Shared rule table persisted to storage, managed only by the silicon curator:
+Shared rule table persisted to storage, managed only by the Silicon Curator:
 
 ```json
 {
@@ -153,9 +158,9 @@ Shared rule table persisted to storage, managed only by the silicon curator:
 ```
 
 - Rules are evaluated in order; first match wins.
-- Only the silicon curator can modify the global ACL (via its dedicated tools).
+- Only the Silicon Curator can modify the Global ACL (via its dedicated tools).
 - Changes take effect immediately.
-- Global ACL is checked directly by `PermissionManager` for **non-curator** beings when the callback returns AskUser or no callback is configured. It is **not** referenced by the callback function.
+- The Global ACL is **not** in the per-query priority chain described above — it is referenced internally by the callback function.
 
 ---
 
@@ -236,7 +241,7 @@ Self-evolution (class override) introduces unique security risks. The system mit
 
 ### Inheritance Constraint
 
-All custom silicon being classes **must** inherit `SiliconBeingBase`. The compiler enforces this constraint at the type level.
+All custom Silicon Being classes **must** inherit `SiliconBeingBase`. The compiler enforces this constraint at the type level.
 
 ### Encrypted Storage
 
@@ -302,7 +307,7 @@ Logs are persisted to storage and viewable via Web UI (Log Controller).
 
 - **Per-request logging** — Each AI call records being ID, model, prompt tokens, completion tokens, and timestamp.
 - **Anomaly detection** — Unusual token consumption patterns may indicate prompt injection or resource abuse.
-- **Curator-only access** — `TokenAuditTool` (marked `[SiliconManagerOnly]`) allows curator to query and summarize token usage.
+- **Curator-only access** — `TokenAuditTool` (marked `[SiliconManagerOnly]`) allows the Silicon Curator to query and summarize token usage.
 - **Web dashboard** — `UsageController` provides browser-based dashboard with trend charts and data export.
 - **Persistent storage** — Records are stored via `ITimeStorage` for time-series queries and long-term analysis.
 
@@ -341,5 +346,31 @@ The plugin system introduces security risks from third-party code execution, mit
 ### Tool Permission Constraints
 
 - Tools registered by plugins via the `ITool` interface are subject to the same permission system constraints
-- Plugin tools cannot bypass the 5-level permission chain
+- Plugin tools cannot bypass the permission verification chain
 - Plugin tools are subject to `[SiliconManagerOnly]` attribute constraints
+
+---
+
+## Tool Permission Security
+
+The tool permission system provides an additional security layer controlling which tool operations Silicon Beings can use:
+
+### Two-Level Permission Isolation
+
+1. **Silicon Being Level** — Each Silicon Being has independent tool permission configuration
+2. **Project Level** — Tool permissions within a project space are independent of the Silicon Being level, achieving permission isolation between projects
+
+### Permission Templates
+
+The system provides predefined permission templates to ensure a security baseline:
+
+- **readonly** — Minimal permissions, only allows read operations
+- **restricted** — Restricted permissions, only allows basic operations
+- **full** — Full permissions (only used by the Silicon Curator)
+
+### Security Features
+
+- **Default Deny** — Tool operations not explicitly allowed are denied by default
+- **Operation Granularity** — Each operation of each tool is independently controlled (e.g., `network:get` allowed but `network:post` denied)
+- **Curator Management** — Tool permissions can only be configured by the Silicon Curator
+- **Audit Trail** — Tool permission changes are recorded in the audit log

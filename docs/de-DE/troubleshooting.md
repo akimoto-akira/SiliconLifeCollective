@@ -1,4 +1,4 @@
-﻿# Fehlerbehebungsleitfaden
+# Fehlerbehebungsleitfaden
 
 > **Version: v0.2.0-alpha**
 
@@ -8,7 +8,7 @@
 
 ### Bauen und Kompilieren
 
-#### Problem: Build fehlschlägt, fehlende Abhängigkeiten
+#### Problem: Build schlägt fehl, fehlende Abhängigkeiten
 
 **Symptome**:
 ```
@@ -74,7 +74,7 @@ ollama pull qwen2.5:7b
 ollama list
 ```
 
-#### Problem: DashScope 404 Fehler
+#### Problem: DashScope 404-Fehler
 
 **Symptome**:
 ```
@@ -82,10 +82,10 @@ HTTP 404: Model not found
 ```
 
 **Lösung**:
-1. API-Schlüssel verifizieren
-2. Modellnamen mit DashScope-Katalog abgleichen
-3. Regionalen Endpunkt prüfen
-4. Konto-Zugriff auf Modell prüfen
+1. API-Schlüssel auf Richtigkeit prüfen
+2. Modellnamen mit dem DashScope-Katalog abgleichen
+3. Regionalen Endpunkt verifizieren
+4. Kontozugriff auf das Modell prüfen
 
 #### Problem: Volcengine Ark-Verbindung fehlgeschlagen
 
@@ -97,10 +97,10 @@ HTTP 404: Endpoint not found
 ```
 
 **Lösung**:
-1. API-Schlüssel verifizieren
-2. Endpunkt-URL-Format prüfen (Standard: `https://ark.cn-beijing.volces.com/api/v3/chat/completions`)
-3. Bestätigen, dass der Model-Parameter eine Inferenz-Endpunkt-ID (z.B. `ep-20241212123456-abcde`) verwendet, keinen Modellnamen
-4. Konto-Zugriff auf Endpunkt prüfen
+1. API-Schlüssel auf Richtigkeit prüfen
+2. Endpunkt-URL-Format überprüfen (Standard: `https://ark.cn-beijing.volces.com/api/v3/chat/completions`)
+3. Bestätigen, dass der Model-Parameter eine Inferenz-Endpunkt-ID verwendet (z.B. `ep-20241212123456-abcde`), keinen Modellnamen
+4. Kontozugriff auf den Endpunkt prüfen
 
 ---
 
@@ -126,17 +126,17 @@ taskkill /PID <PID> /F
 lsof -ti:8080 | xargs kill -9
 ```
 
-**Oder Port in Konfiguration ändern**.
+**Oder den Port in der Konfiguration ändern**.
 
 #### Problem: Being startet nicht
 
 **Symptome**:
-- Being-Status zeigt "Error"
+- Being-Status zeigt „Error"
 - Logs zeigen Initialisierungsfehler
 
 **Lösung**:
-1. Soul-Datei existiert und ist valide prüfen
-2. KI-Client konfiguriert verifizieren
+1. Prüfen, ob die Soul-Datei existiert und gültig ist
+2. Verifizieren, dass der KI-Client konfiguriert ist
 3. Logs auf spezifische Fehler prüfen:
 ```bash
 tail -f logs/*.log
@@ -155,8 +155,8 @@ OutOfMemoryException
 dotnet run --project src/SiliconLife.Default --server.gcHeapCount 4
 ```
 
-2. **SiliconLife.Fast**: Die Fast-Version selbst hat einen hohen Speicherverbrauch (~500MB). Wenn der Speicher dauerhaft knapp ist, wird empfohlen:
-   - Anzahl gleichzeitig laufender Silicon Beings reduzieren
+2. **SiliconLife.Fast**: Die Fast-Version hat selbst einen höheren Speicherverbrauch (~500 MB). Wenn der Speicher dauerhaft knapp ist, wird empfohlen:
+   - Anzahl der gleichzeitig laufenden Silicon Beings reduzieren
    - Alte Daten bereinigen, um Speicher freizugeben
 
 3. Alte Daten bereinigen:
@@ -165,11 +165,11 @@ dotnet run --project src/SiliconLife.Default --server.gcHeapCount 4
 mv logs/ logs-archive/
 mkdir logs
 
-# Alte Speicher bereinigen
+# Alte Erinnerungen bereinigen
 # Über Web-UI: Speicherverwaltung > Bereinigen
 ```
 
-> **Tipp**: SiliconLife.Default hat einen niedrigen Speicherverbrauch (~200MB), geeignet für Umgebungen mit begrenztem Speicher; SiliconLife.Fast hat einen höheren Speicherverbrauch, aber bessere Performance, geeignet für Produktionsumgebungen.
+> **Tipp**: SiliconLife.Default hat einen niedrigen Speicherverbrauch (~200 MB), geeignet für Umgebungen mit begrenztem Speicher; SiliconLife.Fast hat einen höheren Speicherverbrauch, aber bessere Performance, geeignet für Produktionsumgebungen.
 
 ---
 
@@ -179,23 +179,24 @@ mkdir logs
 
 **Symptome**:
 ```
-Permission denied: disk:write
+Permission denied: FileAccess C:\Windows
 ```
 
 **Lösung**:
 1. Aktuelle Berechtigungen prüfen:
 ```bash
-curl http://localhost:8080/api/permissions
+curl http://localhost:8080/api/permissions/list
 ```
 
 2. Berechtigung erteilen:
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "resource": "disk:write",
-    "allowed": true,
-    "duration": 3600
+    "permissionType": "FileAccess",
+    "resourcePrefix": "C:\\Projects",
+    "result": "Allowed",
+    "description": "Allow project directory access"
   }'
 ```
 
@@ -208,7 +209,7 @@ curl -X POST http://localhost:8080/api/permissions \
 
 **Lösung**:
 1. System-Clock-Synchronisation prüfen
-2. `expiresAt`-Feld korrekt gesetzt verifizieren
+2. Verifizieren, dass das `expiresAt`-Feld korrekt gesetzt ist
 3. Berechtigungs-Cache leeren
 
 ---
@@ -218,10 +219,10 @@ curl -X POST http://localhost:8080/api/permissions \
 #### Problem: Web-UI nicht erreichbar
 
 **Symptome**:
-- Browser zeigt "Connection refused"
+- Browser zeigt „Connection refused"
 
 **Lösung**:
-1. Server läuft verifizieren
+1. Verifizieren, dass der Server läuft
 2. Korrekte URL prüfen: `http://localhost:8080`
 3. Firewall-Einstellungen prüfen
 4. Logs auf Startfehler prüfen
@@ -233,7 +234,7 @@ curl -X POST http://localhost:8080/api/permissions \
 - Chat streamt nicht
 
 **Lösung**:
-1. Browser SSE-Unterstützung prüfen
+1. Browser-SSE-Unterstützung prüfen
 2. Proxy-Buffering für SSE deaktivieren
 3. Netzwerkstabilität prüfen
 4. Anderen Browser versuchen
@@ -241,8 +242,8 @@ curl -X POST http://localhost:8080/api/permissions \
 #### Problem: UI sieht beschädigt aus
 
 **Symptome**:
-- Styles falsch
-- Layout kaputt
+- Styles sind falsch
+- Layout ist beschädigt
 
 **Lösung**:
 1. Browser-Cache leeren
@@ -252,7 +253,7 @@ curl -X POST http://localhost:8080/api/permissions \
 
 ---
 
-### Storage-Probleme
+### Speicherprobleme
 
 #### Problem: Daten nicht lesbar/schreibbar
 
@@ -263,7 +264,7 @@ IOException: Access denied
 
 **Lösung**:
 1. Dateiberechtigungen prüfen
-2. Storage-Pfad existiert verifizieren
+2. Verifizieren, dass der Speicherpfad existiert
 3. Festplattenspeicher prüfen
 4. Mit angemessenen Berechtigungen ausführen
 
@@ -275,9 +276,9 @@ IOException: Access denied
 
 **Lösung**:
 1. Aus Backup wiederherstellen
-2. Storage-Integrität prüfen:
+2. Speicherintegrität prüfen:
 ```bash
-# Über Web-UI: System > Storage-Prüfung
+# Über Web-UI: System > Speicherprüfung
 ```
 
 3. Korrupte Dateien manuell reparieren
@@ -286,22 +287,22 @@ IOException: Access denied
 
 **Symptome**:
 - `.spk`-Datei kann nicht geladen werden
-- SpeedyStorage-Initialisierung fehlschlägt
+- SpeedyStorage-Initialisierung schlägt fehl
 
 **Lösung**:
 1. `SiliconLife.Speedy.Manager`-Tool zum Prüfen und Reparieren von `.spk`-Dateien verwenden
-2. Prüfen ob `.spk.idx`-Indexdatei mit `.spk`-Datei übereinstimmt
-3. Wenn Indexdatei beschädigt ist, `.spk.idx`-Datei löschen — das System erstellt den Index automatisch neu
+2. Prüfen, ob die `.spk.idx`-Indexdatei mit der `.spk`-Datei übereinstimmt
+3. Wenn die Indexdatei beschädigt ist, `.spk.idx`-Datei löschen — das System erstellt den Index automatisch neu
 4. `.spk`-Datei aus Backup wiederherstellen
 
-#### Problem: SpeedyPack-Auto-Komprimierung fehlschlägt (Fast-Version)
+#### Problem: SpeedyPack-Auto-Komprimierung schlägt fehl (Fast-Version)
 
 **Symptome**:
 - `.spk`-Datei wächst kontinuierlich
 - Festplattenspeicher wird knapp
 
 **Lösung**:
-1. Prüfen ob `SpeedyPackAutoCompactor` ordnungsgemäß läuft
+1. Prüfen, ob `SpeedyPackAutoCompactor` ordnungsgemäß läuft
 2. Komprimierungsoperation manuell auslösen
 3. Komprimierungsschwellenwert-Konfiguration prüfen
 4. `SiliconLife.Speedy.Manager`-Tool für manuelle Komprimierung verwenden
@@ -318,10 +319,10 @@ Tool "xyz" not found
 ```
 
 **Lösung**:
-1. Tool-Name korrekt verifizieren
+1. Tool-Namen auf Richtigkeit prüfen
 2. Tool im Tools-Verzeichnis prüfen
 3. Projekt neu bauen
-4. Tool korrekt implementiert prüfen
+4. Prüfen, ob das Tool korrekt implementiert ist
 
 #### Problem: Tool gibt Fehler zurück
 
@@ -348,9 +349,9 @@ Plugin load failed: Security check failed
 ```
 
 **Lösung**:
-1. Prüfen ob das Plugin verbotene Namespaces referenziert (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
-2. Verifizieren dass das Plugin nur Assemblys aus der vertrauenswürdigen Assembly-Whitelist referenziert
-3. Prüfen ob das Plugin die `IPlugin`-Schnittstelle korrekt implementiert
+1. Prüfen, ob das Plugin verbotene Namespaces referenziert (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
+2. Verifizieren, dass das Plugin nur Assemblys aus der vertrauenswürdigen Assembly-Whitelist referenziert
+3. Prüfen, ob das Plugin die `IPlugin`-Schnittstelle korrekt implementiert
 4. Logs auf detaillierte Sicherheitsprüfungsfehler prüfen
 
 #### Problem: Plugin-Tools nicht registriert
@@ -359,9 +360,9 @@ Plugin load failed: Security check failed
 - Plugin erfolgreich geladen, aber Tools erscheinen nicht in der Tool-Liste
 
 **Lösung**:
-1. Bestätigen dass die Tool-Klasse im Plugin die `ITool`-Schnittstelle korrekt implementiert
-2. Prüfen ob die Tool-Klasse public ist
-3. Verifizieren dass `ToolManager.ScanAllPluginAssemblies()` aufgerufen wurde
+1. Bestätigen, dass die Tool-Klasse im Plugin die `ITool`-Schnittstelle korrekt implementiert
+2. Prüfen, ob die Tool-Klasse public ist
+3. Verifizieren, dass `ToolManager.ScanAllPluginAssemblies()` aufgerufen wurde
 4. Plugin neu bauen und Anwendung neu starten
 
 ---
@@ -376,21 +377,21 @@ Failed to create work note
 ```
 
 **Lösung**:
-1. Being existiert und läuft prüfen
-2. Storage-Pfad hat Schreibrechte verifizieren
-3. Inhalt nicht leer prüfen (Inhalt erforderlich)
-4. Logs auf detaillierte Fehler prüfen
+1. Prüfen, ob das Being existiert und läuft
+2. Verifizieren, dass der Speicherpfad Schreibrechte hat
+3. Prüfen, ob der Inhalt nicht leer ist (Inhalt ist erforderlich)
+4. Logs auf detaillierte Fehlerinformationen prüfen
 
 #### Problem: Notizsuche ohne Ergebnisse
 
 **Symptome**:
-- Schlüsselwortsuche gibt leere Ergebnisse
-- Aber relevante Notizen existieren sicher
+- Schlüsselwortsuche gibt leere Ergebnisse zurück
+- Es sind jedoch sicher relevante Notizen vorhanden
 
 **Lösung**:
-1. Schlüsselwort-Schreibweise prüfen
+1. Schreibweise des Schlüsselworts prüfen
 2. Generischeres Schlüsselwort versuchen
-3. Notiz enthält Schlüsselwort prüfen (Case-sensitive)
+3. Verifizieren, dass die Notiz das Schlüsselwort enthält (Groß-/Kleinschreibung beachten)
 4. `max_results`-Parameterwert erhöhen
 
 #### Problem: Notizverzeichnis-Generierung langsam
@@ -400,10 +401,10 @@ Failed to create work note
 - Being hat viele Notizen (>1000 Seiten)
 
 **Lösung**:
-1. Normal, muss alle Notizen durchlaufen
+1. Dies ist normal, da alle Notizen durchlaufen werden müssen
 2. Alte Notizen regelmäßig archivieren
 3. Suchfunktion statt Verzeichnis-Browsing verwenden
-4. Geplante Optimierung: Verzeichnis-Cache-Mechanismus
+4. Geplante Optimierung: Verzeichnis-Cache-Mechanismus hinzufügen
 
 ---
 
@@ -417,17 +418,17 @@ No knowledge triples found
 ```
 
 **Lösung**:
-1. Subjekt und Prädikat-Schreibweise verifizieren
-2. Wissen wurde zum Netzwerk hinzugefügt prüfen
+1. Schreibweise von Subjekt und Prädikat verifizieren
+2. Prüfen, ob das Wissen zum Netzwerk hinzugefügt wurde
 3. Suchfunktion für Fuzzy-Matching verwenden:
 ```json
 {
   "action": "search",
-  "query": "关键词"
+  "query": "Schlüsselwort"
 }
 ```
 
-#### Problem: Wissenspfad-Suche fehlschlägt
+#### Problem: Wissenspfad-Suche schlägt fehl
 
 **Symptome**:
 ```
@@ -435,12 +436,12 @@ No path found between concepts
 ```
 
 **Lösung**:
-1. Beide Konzepte im Wissensnetzwerk existieren prüfen
-2. Verbindungspfad existiert prüfen (vielleicht keine direkte/indirekte Beziehung)
-3. Mehr Wissen hinzufügen um Verbindung herzustellen
-4. Pfadlängenlimit senken (wenn gesetzt)
+1. Prüfen, ob beide Konzepte im Wissensnetzwerk existieren
+2. Prüfen, ob ein Verbindungspfad existiert (möglicherweise keine direkte oder indirekte Beziehung)
+3. Mehr Wissen hinzufügen, um Verbindungen herzustellen
+4. Pfadlängenlimit senken (falls gesetzt)
 
-#### Problem: Wissensvalidierung fehlschlägt
+#### Problem: Wissensvalidierung schlägt fehl
 
 **Symptome**:
 ```
@@ -448,21 +449,21 @@ Knowledge validation failed
 ```
 
 **Lösung**:
-1. Tripel-Format korrekt prüfen (Subjekt, Prädikat, Objekt erforderlich)
-2. Konfidenzwert im Bereich 0.0-1.0 verifizieren
-3. Duplizierte Tripel prüfen
-4. Validierungsfehlerdetails auf spezifisches Problem prüfen
+1. Prüfen, ob das Tripel-Format korrekt ist (Subjekt, Prädikat, Objekt sind erforderlich)
+2. Konfidenzwert im Bereich 0.0–1.0 verifizieren
+3. Auf duplizierte Tripel prüfen
+4. Validierungsfehlerdetails auf spezifische Probleme prüfen
 
 #### Problem: Wissensnetzwerk-Statistiken ungenau
 
 **Symptome**:
-- Statistikzahlen wie erwartet
-- Statistik nach Wissen-Hinzufügen nicht aktualisiert
+- Statistikzahlen entsprechen nicht den Erwartungen
+- Statistik nach Hinzufügen von Wissen nicht aktualisiert
 
 **Lösung**:
-1. Statistiken brauchen vielleicht Sekunden zum Aktualisieren (Cache)
-2. Lösch-Operation erfolgreich ausgeführt prüfen
-3. Anwendung neu starten um Statistik zu forcieren
+1. Statistiken benötigen möglicherweise einige Sekunden zum Aktualisieren (Cache)
+2. Prüfen, ob Löschoperationen erfolgreich ausgeführt wurden
+3. Anwendung neu starten, um Statistikaktualisierung zu erzwingen
 4. Statistik über API neu abfragen
 
 ---
@@ -477,22 +478,89 @@ Failed to create project
 ```
 
 **Lösung**:
-1. Projektname nicht leer prüfen (erforderlich)
-2. Projektname nicht doppelt verifizieren
-3. Storage-Pfad hat Schreibrechte prüfen
-4. Logs auf detaillierte Fehler prüfen
+1. Prüfen, ob der Projektname nicht leer ist (erforderlich)
+2. Verifizieren, dass der Projektname nicht bereits existiert
+3. Prüfen, ob der Speicherpfad Schreibrechte hat
+4. Logs auf detaillierte Fehlerinformationen prüfen
 
 #### Problem: Projektdaten verloren
 
 **Symptome**:
-- Projektinformationen nicht ladbar
-- Projektdateien korrupt
+- Projektinformationen können nicht geladen werden
+- Projektdateien sind beschädigt
 
 **Lösung**:
-1. Projekt-Storage-Verzeichnis existiert prüfen
+1. Prüfen, ob das Projekt-Speicherverzeichnis existiert
 2. Projektdaten aus Backup wiederherstellen
-3. JSON-Dateiformat korrekt verifizieren
-4. Korrupte Projektdateien manuell reparieren
+3. Verifizieren, dass das JSON-Dateiformat korrekt ist
+4. Beschädigte Projektdateien manuell reparieren
+
+#### Problem: Projektrollenzuweisung schlägt fehl
+
+**Symptome**:
+```
+Failed to assign role
+```
+
+**Lösung**:
+1. Bestätigen, dass das Silicon Being dem Projekt beigetreten ist
+2. Prüfen, ob der Rollenname gültig ist
+3. Verifizieren, dass der Ausführende der Silicon Curator ist
+4. Logs auf detaillierte Fehlerinformationen prüfen
+
+#### Problem: Workflow kann nicht gestartet werden
+
+**Symptome**:
+- Workflow-Instanzerstellung schlägt fehl
+- Zustandsübergänge werden nicht ausgeführt
+
+**Lösung**:
+1. Prüfen, ob eine Workflow-Vorlage definiert ist
+2. Verifizieren, dass der Anfangszustand korrekt gesetzt ist
+3. Bestätigen, dass das Projekt an eine Workflow-Vorlage gebunden ist
+4. Workflow-Logs auf Übergangsfehler prüfen
+
+---
+
+### Tool-Berechtigungsprobleme
+
+#### Problem: Tool-Operation verweigert
+
+**Symptome**:
+```
+Tool operation denied: network:post
+```
+
+**Lösung**:
+1. Tool-Berechtigungskonfiguration des Silicon Beings prüfen:
+```bash
+curl http://localhost:8080/api/beings/tool-permissions?beingId=<id>
+```
+
+2. Tool-Berechtigungen aktualisieren:
+```bash
+curl -X PUT http://localhost:8080/api/beings/tool-permissions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "beingId": "being-uuid",
+    "permissions": {
+      "network:post": "allowed"
+    }
+  }'
+```
+
+3. Oder Web-UI verwenden: Beings → Tool-Berechtigungen
+
+#### Problem: Projekt-Tool-Berechtigungen werden nicht wirksam
+
+**Symptome**:
+- Tool-Berechtigungen auf Projektebene funktionieren nicht wie erwartet
+
+**Lösung**:
+1. Bestätigen, dass die Berechtigungen auf Projektebene korrekt konfiguriert sind
+2. Prüfen, ob Konflikte zwischen Being-Ebene und Projektebene bestehen
+3. Berechtigungen auf Projektebene sind unabhängig von der Being-Ebene; es gilt die Schnittmenge beider
+4. Audit-Protokoll prüfen, um Berechtigungsprüfungsergebnisse zu bestätigen
 
 ---
 
@@ -532,8 +600,8 @@ tail -f logs/*.log
 # Mit Debugger ausführen
 dotnet run --project src/SiliconLife.Default --configuration Debug
 
-# Debugger attachen
-# Über IDE: An Prozess attachen > SiliconLife.Default
+# Debugger anhängen
+# Über IDE: An Prozess anhängen > SiliconLife.Default
 ```
 
 **SiliconLife.Fast (Hochleistungsversion)**:
@@ -541,11 +609,11 @@ dotnet run --project src/SiliconLife.Default --configuration Debug
 # Mit Debugger ausführen
 dotnet run --project src/SiliconLife.Fast --configuration Debug
 
-# Debugger attachen
-# Über IDE: An Prozess attachen > SiliconLife.Fast
+# Debugger anhängen
+# Über IDE: An Prozess anhängen > SiliconLife.Fast
 ```
 
-> **Empfehlung**: Für Entwicklungs-Debugging wird die Verwendung von SiliconLife.Default empfohlen. Nach erfolgreicher Architekturverifizierung SiliconLife.Fast für Produktionsbereitstellung verwenden.
+> **Empfehlung**: Für die Entwicklungs- und Debugging-Phase wird SiliconLife.Default empfohlen. Nach erfolgreicher Architekturverifizierung SiliconLife.Fast für Produktionsbereitstellung verwenden.
 
 ---
 
@@ -553,7 +621,7 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 
 ### Langsame Antwortzeiten
 
-**Optimieren**:
+**Optimierung**:
 1. KI-Modell-Komplexität senken
 2. Cache aktivieren
 3. Alte Daten bereinigen
@@ -563,7 +631,7 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 
 **Prüfen**:
 - Zu viele Beings laufen
-- Endlosschleife in Tools
+- Endlosschleifen in Tools
 - Häufige Timer-Ausführung
 
 **Lösung**:
@@ -573,13 +641,13 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 
 ### Hohe Speichernutzung
 
-**Monitor**:
+**Überwachen**:
 ```bash
 # Über Web-UI: Dashboard > Speicher
 ```
 
-**Optimieren**:
-- Alte Speicher bereinigen
+**Optimierung**:
+- Alte Erinnerungen bereinigen
 - Kontextgröße reduzieren
 - Paginierung implementieren
 
@@ -636,8 +704,8 @@ dotnet run --project src/SiliconLife.Fast
 
 1. Alle Beings stoppen
 2. Alle Berechtigungen widerrufen
-3. Audit-Logs prüfen
-4. Zugriffskontrolle prüfen
+3. Audit-Protokolle prüfen
+4. Zugriffskontrolle überprüfen
 5. Mit eingeschränkten Berechtigungen neu starten
 
 ---
@@ -647,12 +715,12 @@ dotnet run --project src/SiliconLife.Fast
 ### Best Practices
 
 1. **Regelmäßige Backups**
-   - Datenverzeichnis backupen
-   - Konfiguration backupen
+   - Datenverzeichnis sichern
+   - Konfiguration sichern
    - Wiederherstellungsprozess testen
 
 2. **Ressourcen überwachen**
-   - CPU/Speicher-Nutzung monitorieren
+   - CPU/Speicher-Nutzung überwachen
    - Festplattenspeicher überwachen
    - Netzwerkverbindung prüfen
 
@@ -662,7 +730,7 @@ dotnet run --project src/SiliconLife.Fast
    - Sicherheitspatches anwenden
 
 4. **Änderungen testen**
-   - Zuerst in Entwicklung testen
+   - Zuerst in der Entwicklungsumgebung testen
    - Versionskontrolle verwenden
    - Änderungen dokumentieren
 
@@ -671,6 +739,6 @@ dotnet run --project src/SiliconLife.Fast
 ## Nächste Schritte
 
 - 📚 [Architekturleitfaden](architecture.md) lesen
-- 🛠️ [Entwicklungsleitfaden](development-guide.md) prüfen
-- 🚀 [Schnellstart-Leitfaden](getting-started.md) ansehen
-- 🔒 [Sicherheitsdokumentation](security.md) prüfen
+- 🛠️ [Entwicklungsleitfaden](development-guide.md) ansehen
+- 🚀 [Schnellstart-Leitfaden](getting-started.md) lesen
+- 🔒 [Sicherheitsdokumentation](security.md) ansehen

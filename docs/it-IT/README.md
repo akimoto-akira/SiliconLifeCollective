@@ -2,303 +2,309 @@
 
 # Silicon Life Collective
 
-**Versione: v0.2.0-alpha** | **Silicon Life Collective** — Una piattaforma di collaborazione multi-agente basata su .NET 9, dove gli agenti IA sono chiamati **Silicon Beings** e possono auto-evolversi attraverso la compilazione dinamica Roslyn.
+**Versione: v0.2.0-alpha** | **Silicon Life Collective** — Una piattaforma di collaborazione multi-agente basata su .NET 9, dove gli agenti AI sono chiamati **Esseri di Silicio**, che realizzano l'auto-evoluzione attraverso la compilazione dinamica Roslyn.
 
-[English](../README.md) | [Deutsch](../de-DE/README.md) | [Français](../fr-FR/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Čeština](../cs-CZ/README.md) | **Italiano** | [Polski](../pl-PL/README.md) | [Português](../pt-PT/README.md) | [Русский](../ru-RU/README.md)
+[English](../README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md) | **Italiano** | [Polski](../pl-PL/README.md) | [Português](../pt-PT/README.md) | [Русский](../ru-RU/README.md)
 
-## 🌟 Funzionalità principali
+## 🌟 Caratteristiche Principali
 
-### Sistema di agenti
-- **Orchestrazione multi-agente** — Gestione centralizzata dal *Silicon Curator*, con meccanismo di pianificazione equa per time-slice controllato da orologio
-- **Guidato da file dell'anima** — Ogni Silicon Being è controllato da un file prompt centrale (`soul.md`) che definisce una personalità unica e modelli di comportamento
-- **Architettura Body-Brain** — Il *Body* (SiliconBeing) riceve i segni vitali e rileva gli scenari di attivazione; il *Brain* (ContextManager) è responsabile del caricamento della cronologia, delle chiamate IA, dell'esecuzione degli strumenti e della persistenza delle risposte
-- **Capacità di auto-sviluppo** — Attraverso la tecnologia di compilazione dinamica Roslyn, i Silicon Beings possono riscrivere il proprio codice per realizzare l'evoluzione
-- **Gestione degli stati di attività** — Supporto per stati di attività: Idle (inattivo), SingleChat (chat individuale), GroupChat (chat di gruppo), Task (attività), Timer (timer), Broadcast (diffusione), Project (progetto), MemoryCompression (compressione memoria), Stopped (arrestato). Entrata automatica nello stato Stopped dopo 10 errori consecutivi
+### Sistema di Agenti
+- **Orchestrazione multi-agente** — Gestito uniformemente dal *Curatore di Silicio*, utilizza un meccanismo di pianificazione equo basato su time-slot guidato da clock
+- **Guidato dal File dell'Anima** — Ogni Essere di Silicio è guidato da un file di prompt principale (`soul.md`), che definisce personalità e modelli comportamentali unici
+- **Architettura Corpo-Cervello** — Il *Corpo* (SiliconBeing) mantiene i segni vitali e rileva gli scenari di attivazione; il *Cervello* (ContextManager) è responsabile del caricamento della cronologia, della chiamata all'AI, dell'esecuzione degli strumenti e della persistenza delle risposte
+- **Capacità di auto-evoluzione** — Attraverso la tecnologia di compilazione dinamica Roslyn, gli Esseri di Silicio possono riscrivere il proprio codice per realizzare l'evoluzione
+- **Gestione dello stato di attività** — Supporta quattro stati di attività: Idle (inattivo), Working (lavoro), Error (errore), Stopped (fermato); dopo 10 errori consecutivi entra automaticamente nello stato Stopped
 
-### Sistema di plugin
-- **Architettura di estensione tramite plugin** — Estensione delle funzionalità tramite l'interfaccia IPlugin, supporta il caricamento dinamico di DLL di plugin da una directory
-- **Sandbox sicura** — Il caricatore di plugin esegue analisi di sicurezza rigorose, vieta l'accesso a System.IO, System.Net e altri namespace
-- **Caricamento isolato** — Utilizzo di un AssemblyLoadContext personalizzato per il caricamento isolato, impedendo ai plugin di compromettere la stabilità del programma principale
-- **Integrazione degli strumenti** — I plugin possono registrare strumenti personalizzati tramite l'interfaccia ITool, automaticamente integrati nel ciclo di chiamata degli strumenti
+### Sistema di Plugin
+- **Architettura di estensione tramite plugin** — Implementa l'estensione delle funzionalità attraverso l'interfaccia IPlugin, supporta il caricamento dinamico di DLL di plugin da directory
+- **Sandbox di Sicurezza** — Il caricatore di plugin esegue scansioni di sicurezza rigorose, vietando l'accesso agli spazi dei nomi System.IO, System.Net, ecc.
+- **Caricamento isolato** — Utilizza AssemblyLoadContext personalizzato per il caricamento isolato, impedendo ai plugin di influenzare la stabilità del programma principale
+- **Integrazione degli strumenti** — I plugin possono registrare strumenti personalizzati tramite l'interfaccia ITool, integrandosi automaticamente nel ciclo di chiamata degli strumenti
 
 ### Strumenti ed Esecuzione
-- **24 strumenti integrati** — Coprono calendario, chat, configurazione, disco, rete, memoria, attività, timer, base di conoscenza, note di lavoro, browser WebView, hot reload, ecc.
-- **Strumento di hot reload** — Supporta la compilazione automatica, l'aggiornamento dei file e il riavvio di SiliconLife.Fast durante l'esecuzione, senza intervento manuale
-- **Ciclo di chiamata degli strumenti** — L'IA restituisce una chiamata di strumento → Esegue lo strumento → Restituisce i risultati all'IA → Continua il ciclo fino a una risposta in testo puro
-- **Sicurezza dei permessi dell'esecutore** — Tutte le operazioni I/O passano attraverso una validazione rigorosa dei permessi tramite gli esecutori
-  - Catena di permessi a 3 livelli: UserFrequencyCache → IPermissionCallback → (Curatore→IPermissionAskHandler / Non-curatore→GlobalACL→Negazione predefinita)
-  - Registrazione di audit completa di tutte le decisioni sui permessi
+- **24 strumenti integrati** — Coprono calendario, chat, configurazione, disco, rete, memoria, attività, timer, knowledge base, note di lavoro, area di lavoro del progetto, browser WebView, ricarica a caldo, ecc.
+- **Isolamento dello scenario degli strumenti** — Ogni strumento dichiara gli scenari disponibili tramite l'attributo `ToolScenario` (Chat, Task, Timer, MemoryCompression, Project), l'attributo `ChatOnly` limita gli strumenti all'uso solo nello scenario di chat
+- **Strumento di ricarica a caldo** — Supporta la compilazione automatica, l'aggiornamento dei file e il riavvio di SiliconLife.Fast durante l'esecuzione, senza intervento manuale
+- **Ciclo di chiamata degli strumenti** — L'AI restituisce una chiamata di strumento → esegue lo strumento → il risultato viene restituito all'AI → continua il ciclo finché non viene restituita una risposta di testo puro
+- **Sicurezza Esecutore-Permesso** — Tutte le operazioni I/O passano attraverso una rigorosa verifica dei permessi tramite l'Esecutore
+  - Catena di verifica dei permessi a 3 livelli: UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL → rifiuto predefinito)
+  - Registro di audit completo che registra tutte le decisioni sui permessi
 
-### IA e Conoscenza
-- **Supporto per molteplici backend IA**
-  - **Ollama** — Distribuzione di modelli locali, con API HTTP nativa
-  - **Alibaba Cloud DashScope (Bailian)** — Servizio IA cloud, compatibile con API OpenAI, supporta 13+ modelli, distribuzione multi-regione
-  - **Volcengine Ark (VolcengineArk)** — Servizio IA cloud di ByteDance, supporta modalità streaming e non-streaming, controllo di velocità integrato
-- **32 sistemi di calendario** — Copertura completa dei principali calendari mondiali, inclusi calendario gregoriano, calendario lunare cinese, calendario islamico, calendario ebraico, calendario giapponese, calendario persiano, calendario maya, calendario storico cinese, ecc.
-- **Sistema di rete di conoscenza** — Grafo della conoscenza basato su triple (soggetto-relazione-oggetto), supporta archiviazione, query e scoperta di percorsi
+### AI e Conoscenza
+- **Supporto multi-backend AI**
+  - **Ollama** — Distribuzione di modelli locali, utilizza l'API HTTP nativa
+  - **Alibaba Cloud Bailian (DashScope)** — Servizio AI cloud, compatibile con l'API OpenAI, supporta 13+ modelli, distribuzione multi-regione
+  - **Volcengine Ark** — Servizio AI cloud di ByteDance, supporta modalità streaming e non streaming, controllo della velocità integrato
+- **32 sistemi di calendario** — Copertura completa dei principali calendari del mondo, inclusi gregoriano, lunare cinese, islamico, ebraico, giapponese, persiano, maya, calendari storici cinesi, ecc.
+- **Sistema di Rete di Conoscenza** — Grafo di conoscenza basato su triple (soggetto-relazione-oggetto), supporta archiviazione, interrogazione e scoperta di percorsi
+- **Area di Lavoro del Progetto** — Gestione dello spazio del progetto, supporta creazione/archiviazione/distruzione di progetti, assegnazione di ruoli, note di lavoro, tracciamento delle attività e isolamento dei permessi degli strumenti
+- **Motore di Workflow** — Motore di macchina a stati basato su modelli, supporta modelli di workflow personalizzati, transizioni di stato, esecuzione guidata da Tick e gestione del ciclo di vita delle istanze
+- **Meccanismo di dissolvenza della memoria** — Servizio di decadimento temporizzato (MemoryFadeService), applica automaticamente il decadimento dell'importanza e l'archiviazione automatica delle memorie di tutti gli Esseri di Silicio ogni ora
 
 ### Interfaccia Web
-- **Interfaccia Web moderna** — Server HTTP integrato con aggiornamenti in tempo reale SSE
-- **7 temi d'aspetto** — Versioni Admin, Chat, Creative, Dev, Alto contrasto, Light, Minimal, supporta rilevamento e commutazione automatici
-- **22 controller** — Gestione completa del sistema, chat, configurazione, funzionalità di monitoraggio
-- **Zero dipendenze framework frontend** — HTML/CSS/JS generati lato server tramite `H`, `CssBuilder` e `JsBuilder`
+- **Web UI moderna** — Server HTTP integrato, supporta aggiornamenti in tempo reale SSE
+- **7 temi skin** — Gestione, Chat, Creativo, Sviluppo, Alto Contrasto, Chiaro, Minimalista, supporta scoperta automatica e cambio
+- **24 controller** — Funzionalità complete di gestione del sistema, chat, configurazione, monitoraggio
+- **Zero dipendenze da framework frontend** — Genera HTML/CSS/JS lato server tramite `H`, `CssBuilder` e `JsBuilder`
 
 ### Internazionalizzazione e Localizzazione
-- **33 varianti linguistiche**supporto completo, che coprono 4 sistemi di scrittura e molteplici varianti regionali
+- **34 varianti linguistiche** pienamente supportate, che coprono 2 sistemi di scrittura e multiple varianti regionali
   - **Cinese semplificato**: zh-CN (Cina continentale), zh-SG (Singapore), zh-MY (Malesia) (3 varianti)
-  - **Cinese tradizionale**: zh-HK (Hong Kong), zh-TW (Taiwan), zh-MO (Macao) (3 varianti)
+  - **Cinese tradizionale**: zh-HK (Hong Kong), zh-TW (Taiwan), zh-MO (Macau) (3 varianti)
   - **Inglese**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 varianti)
   - **Spagnolo**: es-ES, es-MX (2 varianti)
   - **Tedesco**: de-DE, de-AT, de-CH, de-LU, de-LI (5 varianti)
   - **Francese**: fr-FR, fr-CA, fr-CH (3 varianti)
-  - **Italiano**: it-IT | **Polacco**: pl-PL | **Portoghese**: pt-PT, pt-BR (4 varianti)
   - **Giapponese**: ja-JP | **Coreano**: ko-KR | **Ceco**: cs-CZ (3 varianti)
+  - **Italiano**: it-IT | **Polacco**: pl-PL | **Portoghese**: pt-PT, pt-BR (4 varianti)
 
 ### Dati e Archiviazione
-- **Archiviazione SpeedyPack ad alte prestazioni** — La versione Fast utilizza il motore di archiviazione proprietario .spk, mappatura delle directory in memoria + cache delle voci + coda di scrittura asincrona
-- **Archiviazione su file system** — La versione Default utilizza un'archiviazione pura su file system JSON
-- **Query per indice temporale** — Query efficienti per intervallo di tempo tramite l'interfaccia `ITimeStorage`
-- **Compressione automatica** — SpeedyPack supporta la compressione automatica pianificata per recuperare lo spazio di archiviazione
+- **Archiviazione ad alte prestazioni SpeedyPack** — La versione Fast utilizza il motore di archiviazione .spk proprietario, mappatura delle directory in memoria + cache delle voci + coda di scrittura asincrona
+- **Archiviazione su file system** — La versione Default utilizza l'archiviazione JSON su puro file system
+- **Interrogazione con indice temporale** — Supporta interrogazioni efficienti per intervallo di tempo tramite l'interfaccia `ITimeStorage`
+- **Compressione automatica** — SpeedyPack supporta la compressione automatica periodica, recuperando spazio libero
 - **Dipendenze minime** — La libreria principale dipende solo da Microsoft.CodeAnalysis.CSharp per la compilazione dinamica
 
-## 🔄 Architettura a doppia versione
+## 🔄 Architettura a Doppia Versione
 
-Questo progetto offre due versioni di implementazione per soddisfare diverse esigenze di scenari:
+Questo progetto fornisce due versioni di implementazione per soddisfare diverse esigenze di scenario:
 
-### SiliconLife.Default (Versione standard)
-- **Posizionamento**: Implementazione standard, principalmente per la verifica della fattibilità architetturale
+### SiliconLife.Default (Versione Predefinita)
+- **Posizionamento**: Implementazione predefinita, utilizzata principalmente per verificare la fattibilità dell'architettura
 - **Modalità di esecuzione**: Applicazione console
-- **Metodo di archiviazione**: Archiviazione JSON pura su file system
-- **Scenari applicabili**: Elevati requisiti di sicurezza dei dati, risorse di memoria limitate, piccolo volume di dati
-- **Caratteristiche**: Semplice e affidabile, persistenza immediata dei dati, nessun rischio di perdita di dati
-- **Descrizione del ruolo**: Implementazione di riferimento per la verifica architetturale, adatta al primo contatto, al debug di sviluppo o agli scenari con priorità alla sicurezza dei dati
+- **Metodo di archiviazione**: Archiviazione JSON su puro file system
+- **Scenari applicabili**: Scenari con alti requisiti di sicurezza dei dati, risorse di memoria limitate, piccola quantità di dati
+- **Caratteristiche**: Semplice e affidabile, persistenza dei dati immediata, nessun rischio di perdita di dati in memoria
+- **Descrizione del ruolo**: Come implementazione di riferimento per la verifica dell'architettura, adatta per il primo contatto, lo sviluppo e il debug o scenari con priorità alla sicurezza dei dati
 - **Comando di avvio**: `dotnet run --project src/SiliconLife.Default`
 
-### SiliconLife.Fast (Versione ad alte prestazioni)
-- **Posizionamento**: Versione principale di produzione
-- **Modalità di esecuzione**: Applicazione desktop (Windows/macOS tray di sistema / Linux finestra di stato)
+### SiliconLife.Fast (Versione ad Alte Prestazioni)
+- **Posizionamento**: Versione di produzione raccomandata
+- **Modalità di esecuzione**: Applicazione desktop (area di notifica di Windows/macOS / finestra di stato su Linux)
 - **Metodo di archiviazione**: Archiviazione in memoria SpeedyPack + persistenza batch asincrona (formato file .spk)
-- **Scenari applicabili**: Alta concorrenza, bassa latenza, grandi volumi di dati
-- **Supporto piattaforma**: Windows/macOS (funzionalità complete, inclusa tray di sistema), Linux (finestra di stato, nessuna icona tray)
+- **Scenari applicabili**: Scenari ad alta concorrenza, bassa latenza, grandi volumi di dati
+- **Supporto piattaforma**: Windows/macOS (funzionalità complete, inclusa area di notifica), Linux (finestra di stato, senza icona nell'area di notifica)
 - **Caratteristiche**:
   - Ottimizzazione delle prestazioni estrema
-  - Windows/macOS esecuzione in background nella tray di sistema con monitoraggio in tempo reale; Linux finestra di stato visualizzata direttamente
-  - Motore SpeedyPack + compressione automatica che garantisce la sicurezza dei dati
+  - Esecuzione in background nell'area di notifica di Windows/macOS, supporta monitoraggio in tempo reale della finestra di stato dell'area di notifica; la finestra di stato di Linux si mostra direttamente
+  - Motore SpeedyPack + compressione automatica garantiscono la sicurezza dei dati
   - Architettura Component UI, 27 componenti dichiarativi
-  - 7 temi d'aspetto, supporta rilevamento e commutazione automatici
-  - Strumento di hot reload per aggiornamenti e riavvii online
-- **Miglioramento delle prestazioni**: Latenza di lettura memoria ridotta di 1000x, latenza di scrittura ridotta di 15000x, capacità di elaborazione parallela aumentata di 50x
-- **Descrizione del ruolo**: Implementazione pronta per la produzione con ottimizzazione approfondita, la scelta migliore per lo sfruttamento a lungo termine e i veri ambienti di produzione
+  - 7 temi skin, supporta scoperta automatica e cambio
+  - Strumento di ricarica a caldo supporta aggiornamento e riavvio online
+- **Miglioramento delle prestazioni**: Latenza di lettura dell'archiviazione ridotta di 1000 volte, latenza di scrittura ridotta di 15000 volte, capacità di elaborazione concorrente aumentata di 50 volte
+- **Descrizione del ruolo**: Implementazione di livello produttivo profondamente ottimizzata, prima scelta per esecuzione a lungo termine e ambienti di produzione effettivi
 - **Comando di avvio**: `dotnet run --project src/SiliconLife.Fast`
 
-### Confronto delle versioni
+### Confronto tra le Versioni
 
 | Caratteristica | SiliconLife.Default | SiliconLife.Fast |
-|---------|---------------------|------------------|
-| **Modalità di esecuzione** | Applicazione console | Applicazione desktop (Windows/macOS tray di sistema / Linux finestra di stato) |
-| **Interfaccia utente** | Interfaccia Web (accesso browser) | Icona barra di stato + Finestra barra di stato + Interfaccia Web |
-| **Barra di stato di sistema** | ❌ No | ✅ Supporta la minimizzazione nella barra di stato |
-| **Esecuzione in background** | ❌ Termina alla chiusura della console | ✅ Esecuzione continua in background nella barra di stato |
+|------|---------------------|------------------|
+| **Modalità di esecuzione** | Applicazione console | Applicazione desktop (area di notifica di Windows/macOS / finestra di stato su Linux) |
+| **Interfaccia utente** | Web UI (accesso tramite browser) | Windows/macOS: icona area di notifica + finestra area di notifica + Web UI; Linux: finestra di stato + Web UI |
+| **Area di notifica di sistema** | ❌ Nessuna | ✅ Windows/macOS supporta la minimizzazione nell'area di notifica; Linux senza icona nell'area di notifica |
+| **Esecuzione in background** | ❌ La chiusura della console termina l'applicazione | ✅ Windows/macOS esecuzione continua in background nell'area di notifica; Linux esecuzione nella finestra di stato |
 | **Metodo di archiviazione** | Archiviazione JSON su file system | Archiviazione in memoria SpeedyPack + persistenza asincrona |
 | **Motore di archiviazione** | I/O su file system | SiliconLife.Speedy (formato .spk) |
-| **Latenza di lettura** | ~10ms (I/O su disco) | ~0.01ms (operazione in memoria) |
+| **Latenza di lettura** | ~10ms (I/O disco) | ~0.01ms (operazione in memoria) |
 | **Latenza di scrittura** | ~15ms (scrittura sincrona) | ~0.001ms (scrittura asincrona) |
-| **Concorrenza** | ~100 req/s | ~5000 req/s |
-| **Utilizzo memoria** | ~200MB | ~500MB |
-| **Sicurezza dei dati** | Estremamente elevata (persistenza immediata) | Elevata (persistenza asincrona + compressione automatica) |
-| **Scenario consigliato** | Priorità alla sicurezza dei dati, piccoli dati | Priorità alle prestazioni, grandi dati, alta concorrenza |
+| **Capacità concorrente** | ~100 req/s | ~5000 req/s |
+| **Utilizzo di memoria** | ~200MB | ~500MB |
+| **Sicurezza dei dati** | Molto alta (persistenza immediata) | Alta (persistenza asincrona + compressione automatica) |
+| **Scenari applicabili** | Priorità alla sicurezza dei dati, piccola quantità di dati | Priorità alle prestazioni, grandi volumi di dati, alta concorrenza |
 
-## 🛠️ Stack tecnologico
+## 🛠️ Stack Tecnologico
 
 | Componente | SiliconLife.Default | SiliconLife.Fast |
 |------|---------------------|------------------|
 | Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Linguaggio di programmazione | C# | C# |
-| Tipo di applicazione | Applicazione console | Applicazione desktop (Windows/macOS tray di sistema / Linux finestra di stato) |
-| Integrazione IA | Ollama (locale), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud) | Ollama (locale), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud) |
-| Archiviazione dati | File system (JSON + directory indice temporale) | SpeedyPack (formato .spk, mappatura in memoria + persistenza asincrona) |
+| Tipo di applicazione | Applicazione console | Applicazione desktop (area di notifica di Windows/macOS / finestra di stato su Linux) |
+| Integrazione AI | Ollama (locale), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud) | Ollama (locale), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud) |
+| Archiviazione dati | File system (JSON + directory con indice temporale) | SpeedyPack (formato .spk, mappatura in memoria + persistenza asincrona) |
 | Server Web | HttpListener (.NET integrato) | HttpListener (.NET integrato) |
 | Compilazione dinamica | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
 | Automazione browser | Playwright (WebView) | Playwright (WebView) |
 | Sistema di plugin | ✅ Supportato (IPlugin + PluginLoader) | ✅ Supportato (IPlugin + PluginLoader) |
-| Barra di stato di sistema | ❌ Non supportato | ✅ Supportato (NotifyIcon) |
+| Area di notifica di sistema | ❌ Non supportata | ✅ Windows/macOS supportato (NotifyIcon); Linux senza icona nell'area di notifica |
 | Licenza | Apache-2.0 | Apache-2.0 |
 
-## 📁 Struttura del progetto
+## 📁 Struttura del Progetto
 
 ```
 SiliconLifeCollective.sln
 ├── src/
 │   ├── SiliconLife.Core/                  # Libreria principale (interfacce, classi astratte)
-│   │   ├── AI/                            # Interfacce client IA, ContextManager, modelli messaggi
-│   │   ├── Audit/                         # Sistema audit utilizzo token
-│   │   ├── Chat/                          # Sistema chat, gestione sessioni, canali broadcast
-│   │   ├── Compilation/                   # Compilazione dinamica, analisi sicurezza, crittografia codice
-│   │   ├── Config/                        # Sistema gestione configurazione
-│   │   ├── Executors/                     # Esecutori (disco, rete, riga comando)
-│   │   ├── IM/                            # Interfacce provider messaggistica istantanea
-│   │   ├── Knowledge/                     # Sistema rete conoscenza
-│   │   ├── Localization/                  # Sistema localizzazione
-│   │   ├── Logging/                       # Sistema logging
-│   │   ├── Plugins/                       # Sistema plugin (interfaccia IPlugin, PluginLoader)
-│   │   ├── Project/                       # Sistema gestione progetti
-│   │   ├── Runtime/                       # Loop principale, oggetti orologio, host principale
-│   │   ├── Security/                      # Sistema gestione permessi
-│   │   ├── SiliconBeing/                  # Classe base Silicon Being, manager, factory
-│   │   ├── Storage/                       # Interfacce storage
-│   │   ├── Time/                          # Date incomplete (query per intervallo temporale)
-│   │   ├── Tools/                         # Interfacce strumenti e tool manager
-│   │   ├── WebView/                       # Interfacce browser WebView
-│   │   └── ServiceLocator.cs              # Localizzatore servizi globale
+│   │   ├── AI/                            # Interfacce client AI, Gestore del Contesto, modelli di messaggi
+│   │   ├── Audit/                         # Sistema di audit utilizzo Token
+│   │   ├── Chat/                          # Sistema di chat, gestione sessioni, canale di trasmissione
+│   │   ├── Compilation/                   # Compilazione dinamica, scansione di sicurezza, crittografia del codice
+│   │   ├── Config/                        # Sistema di gestione della configurazione
+│   │   ├── Executors/                     # Esecutori (disco, rete, riga di comando)
+│   │   ├── IM/                            # Interfaccia del fornitore di messaggistica istantanea
+│   │   ├── Knowledge/                     # Sistema di rete di conoscenza
+│   │   ├── Localization/                  # Sistema di localizzazione
+│   │   ├── Logging/                       # Sistema di registrazione
+│   │   ├── Plugins/                       # Sistema di plugin (interfaccia IPlugin, caricatore PluginLoader)
+│   │   ├── Project/                       # Sistema di gestione dei progetti
+│   │   ├── Runtime/                       # Ciclo Principale, oggetti clock, Host Principale
+│   │   ├── Security/                      # Sistema di gestione dei permessi
+│   │   ├── SiliconBeing/                  # Classe base Essere di Silicio, gestore, fabbrica
+│   │   ├── Storage/                       # Interfacce di archiviazione
+│   │   ├── Time/                          # Data incompleta (interrogazione per intervallo di tempo)
+│   │   ├── Tools/                         # Interfaccia degli strumenti e Gestore degli Strumenti
+│   │   ├── WebView/                       # Interfaccia browser WebView
+│   │   ├── Workflow/                      # Motore di workflow (modelli, istanze, transizioni di stato)
+│   │   └── ServiceLocator.cs              # Localizzatore di servizi globale
 │   │
-│   ├── SiliconLife.Common/                # Implementazione comune (entrambe le versioni)
-│   │   ├── AI/                            # Client IA e factory (Ollama, DashScope, VolcengineArk)
-│   │   ├── Calendar/                      # 32 implementazioni calendari
-│   │   ├── Localization/                  # Classe base localizzazione e 33 varianti linguistiche/regionali
-│   │   ├── Resources/                     # File risorse condivisi
-│   │   ├── Security/                      # Permission Manager
-│   │   ├── SiliconBeing/                  # Implementazione standard Silicon Being
-│   │   ├── Tools/                         # 24 strumenti comuni (incluso hot reload)
+│   ├── SiliconLife.Common/                # Implementazione condivisa (comune a entrambe le versioni)
+│   │   ├── AI/                            # Client e fabbriche AI (Ollama, DashScope, VolcengineArk)
+│   │   ├── Calendar/                      # 32 implementazioni di calendario
+│   │   ├── Localization/                  # Classe base di localizzazione e 34 implementazioni di varianti linguistiche/regionali
+│   │   ├── Resources/                     # File di risorse condivise
+│   │   ├── Security/                      # Gestore dei Permessi
+│   │   ├── SiliconBeing/                  # Implementazione predefinita dell'Essere di Silicio
+│   │   ├── Tools/                         # 23 implementazioni di strumenti comuni
 │   │   ├── Web/                           # Infrastruttura Web
 │   │   └── WebView/                       # Implementazione Playwright WebView
 │   │
-│   ├── SiliconLife.App/                   # Livello applicativo (Web UI + aiuto, condiviso tra Default e Fast)
-│   │   ├── Config/                        # Configurazione applicativa
-│   │   ├── Data/                          # Directory dati
-│   │   ├── Help/                          # Localizzazione documentazione aiuto (multilingue)
-│   │   └── Web/                           # Implementazione interfaccia Web
-│   │       ├── Component/                 # Libreria componenti UI (27 componenti)
-│   │       ├── Controllers/               # 22 controller
-│   │       ├── Models/                    # ViewModel
+│   ├── SiliconLife.App/                   # Livello applicazione (Web UI + documentazione di aiuto, condiviso tra Default e Fast)
+│   │   ├── Config/                        # Configurazione dell'applicazione
+│   │   ├── Data/                          # Directory dei dati
+│   │   ├── Help/                          # Localizzazione della documentazione di aiuto (multilingue)
+│   │   ├── Tools/                         # HelpTool (strumento di consultazione della documentazione di aiuto)
+│   │   └── Web/                           # Implementazione Web UI
+│   │       ├── Component/                 # Libreria di componenti UI (27 componenti)
+│   │       ├── Controllers/               # 24 controller
+│   │       ├── Models/                    # Modelli di vista
 │   │       ├── Views/                     # Viste HTML
-│   │       └── Skins/                     # 7 temi d'aspetto
+│   │       └── Skins/                     # 7 temi skin
 │   │
-│   ├── SiliconLife.Default/               # Implementazione standard + punto ingresso (versione console)
-│   │   ├── Program.cs                     # Punto ingresso (assemblaggio tutti i componenti)
-│   │   ├── Config/                        # Dati configurazione standard
-│   │   ├── IM/                            # Provider WebUI
-│   │   ├── Knowledge/                     # Implementazione rete conoscenza
-│   │   ├── Logging/                       # Implementazioni provider logging
-│   │   ├── Project/                       # Implementazione sistema progetti
-│   │   ├── Security/                      # Callback permessi standard
-│   │   ├── Storage/                       # Implementazione storage su file system
-│   │   └── Tools/                         # Strumenti specifici versione (HelpTool)
+│   ├── SiliconLife.Default/               # Implementazione predefinita + punto di ingresso dell'applicazione (versione console)
+│   │   ├── Program.cs                     # Punto di ingresso (assemblaggio di tutti i componenti)
+│   │   ├── Config/                        # Dati di configurazione predefiniti
+│   │   ├── Knowledge/                     # Implementazione della rete di conoscenza
+│   │   ├── Logging/                       # Implementazione del fornitore di registro (console + file system)
+│   │   ├── Project/                       # Implementazione del sistema di progetto
+│   │   └── Storage/                       # Implementazione dell'archiviazione su file system
 │   │
-│   ├── SiliconLife.Fast/                  # Implementazione alte prestazioni + punto ingresso (versione Forms)
-│   │   ├── Program.cs                     # Punto ingresso (applicazione Forms)
-│   │   ├── Config/                        # Dati configurazione (condivisi con Default)
-│   │   ├── IM/                            # Provider WebUI
-│   │   ├── Knowledge/                     # Implementazione rete conoscenza (ottimizzata memoria)
-│   │   ├── Logging/                       # Provider logging alte prestazioni
-│   │   ├── Project/                       # Implementazione sistema progetti
-│   │   ├── Security/                      # Callback permessi ottimizzati
-│   │   ├── Storage/                       # Adattatore storage SpeedyPack
-│   │   ├── Tools/                         # Strumenti specifici versione (HelpTool)
-│   │   └── Tray/                          # Barra di stato sistema (33 varianti linguistiche)
+│   ├── SiliconLife.Fast/                  # Implementazione ad alte prestazioni + punto di ingresso dell'applicazione (versione finestra)
+│   │   ├── Program.cs                     # Punto di ingresso (applicazione finestra)
+│   │   ├── App.axaml / App.cs             # Definizione applicazione Avalonia
+│   │   ├── Config/                        # Dati di configurazione (condivisi con Default)
+│   │   ├── Knowledge/                     # Implementazione della rete di conoscenza (ottimizzazione memoria)
+│   │   ├── Logging/                       # Fornitore di registro ad alte prestazioni
+│   │   ├── Project/                       # Implementazione del sistema di progetto
+│   │   ├── Storage/                       # Adattatore di archiviazione SpeedyPack
+│   │   └── Tray/                          # Area di notifica di sistema (localizzazione per 34 varianti linguistiche)
 │   │
-│   ├── SiliconLife.Speedy/                # Motore storage alte prestazioni SpeedyPack
+│   ├── SiliconLife.Speedy/                # Motore di archiviazione ad alte prestazioni SpeedyPack
 │   │   ├── SpeedyPack.cs                  # Classe principale (mappatura directory in memoria + cache + scrittura asincrona)
-│   │   ├── SpeedyPackOptions.cs           # Opzioni configurazione (TTL cache, max voci, ecc.)
+│   │   ├── SpeedyPackOptions.cs           # Opzioni di configurazione (TTL cache, numero massimo di voci, ecc.)
 │   │   ├── IPackTransaction.cs            # Interfaccia transazione
-│   │   ├── SpkFileInfo.cs                 # Informazioni file
+│   │   ├── SpkFileInfo.cs                 # Informazioni sul file
 │   │   └── Internal/                      # Implementazione interna
-│       │   ├── DirectoryMap.cs            # Mappatura directory in memoria
-│       │   ├── EntryCache.cs              # Cache voci
-│       │   ├── FreeList.cs                # Gestione spazio libero
-│       │   ├── PackFileReader.cs          # Lettore file pacchetto
-│       │   ├── PackFileWriter.cs          # Scrittore file pacchetto
-│       │   ├── WriteQueue.cs              # Coda scrittura asincrona
-│       │   ├── WriteOperation.cs          # Operazione scrittura
-│       │   ├── SpeedyTransaction.cs       # Implementazione transazione
-│       │   ├── SpkHeader.cs              # Header file pacchetto
-│       │   └── PathNormalizer.cs          # Normalizzazione percorso
+│   │       ├── DirectoryMap.cs            # Mappatura directory in memoria
+│   │       ├── EntryCache.cs              # Cache delle voci
+│   │       ├── FreeList.cs                # Gestione dello spazio libero
+│   │       ├── PackFileReader.cs          # Lettore di file pacchetto
+│   │       ├── PackFileWriter.cs          # Scrittore di file pacchetto
+│   │       ├── WriteQueue.cs              # Coda di scrittura asincrona
+│   │       ├── WriteOperation.cs          # Operazione di scrittura
+│   │       ├── SpeedyTransaction.cs       # Implementazione della transazione
+│   │       ├── SpkHeader.cs               # Intestazione del file pacchetto
+│   │       └── PathNormalizer.cs          # Normalizzazione del percorso
 │   │
-│   └── SiliconLife.Speedy.Manager/        # Strumento gestione SpeedyPack (Avalonia UI)
-│       ├── MainForm.cs                    # Form principale
-│       ├── Program.cs                     # Punto ingresso
-│       └── slc.ico                        # Icona applicazione
+│   └── SiliconLife.Speedy.Manager/        # Strumento di gestione SpeedyPack (Avalonia UI)
+│       ├── MainForm.cs                    # Finestra principale
+│       ├── Program.cs                     # Punto di ingresso
+│       └── slc.ico                        # Icona dell'applicazione
 │
 ├── docs/                                  # Documentazione multilingue
-│   ├── zh-CN/                             # Cinese semplificato
-│   ├── en/                                # Inglese
-│   └── ...                                # Altre lingue
+│   ├── zh-CN/                             # Documentazione in cinese semplificato
+│   ├── en/                                # Documentazione in inglese
+│   └── ...                                # Documentazione in altre lingue
+│
+└── 总文档/                                 # Documenti di requisiti e architettura
+    ├── 需求文档.md
+    ├── 架构大纲.md
+    └── 实现顺序.md
 ```
 
-## 🏗️ Panoramica architettura
+## 🏗️ Panoramica dell'Architettura
 
-### Architettura scheduling
+### Architettura di Pianificazione
 ```
-Loop principale (thread dedicato, watchdog + circuit breaker)
-  └── Oggetto orologio (ordinato per priorità)
-       └── Gestore Silicon Beings
-            └── Esecutore Silicon Being (thread temporaneo, timeout + circuit breaker)
-                 └── SiliconBeing.Tick()
-                      └── ContextManager.Pensare()
-                           └── Client-IA.Chat()
-                                └── Loop chiamata strumenti → Persistenza nel sistema chat
-```
-
-### Architettura sicurezza
-Tutte le operazioni I/O iniziate dall'IA devono attraversare una catena di sicurezza rigorosa:
-
-```
-Chiamata strumento → Esecutore → Gestore permessi → UserFrequencyCache → IPermissionCallback → (Curatore→IPermissionAskHandler / Non-curatore→GlobalACL→Negazione predefinita)
+Ciclo Principale (thread dedicato, Cane da Guardia + Interruttore)
+  └── Oggetto Clock (ordinato per priorità)
+       └── Gestore di Esseri di Silicio
+            └── Runner Essere di Silicio (thread temporaneo, timeout + Interruttore)
+                 └── Essere di Silicio.Tick()
+                      └── Gestore del Contesto.Pensa()
+                           └── Client AI.Chat()
+                                └── Ciclo di chiamata degli strumenti → Persistenza nel Sistema di Chat
 ```
 
-## 🚀 Avvio rapido
+### Architettura di Sicurezza
+Tutte le operazioni I/O avviate dall'AI devono passare attraverso una rigida catena di sicurezza:
+
+```
+Chiamata strumento → Esecutore → Gestore dei Permessi → [Cache frequenza → Callback → (IsCurator: chiedi all'utente | Non-curator: ACL Globale)]
+```
+
+## 🚀 Inizio Rapido
 
 ### Prerequisiti
 
-- **.NET 9 SDK** — [Link download](https://dotnet.microsoft.com/download/dotnet/9.0)
-- **Backend IA** (scegline uno):
-  - **Ollama**: [Installa Ollama](https://ollama.com) e scarica un modello (es. `ollama pull llama3`)
-  - **Alibaba Cloud DashScope**: Ottieni una chiave API dalla [console DashScope](https://bailian.console.aliyun.com/)
+- **.NET 9 SDK** — [Link di download](https://dotnet.microsoft.com/download/dotnet/9.0)
+- **Backend AI** (sceglierne uno):
+  - **Ollama**: [Installa Ollama](https://ollama.com) e scarica un modello (ad esempio `ollama pull llama3`)
+  - **Alibaba Cloud Bailian**: Ottieni una chiave API dalla [console Bailian](https://bailian.console.aliyun.com/)
   - **Volcengine Ark**: Ottieni una chiave API dalla [console Volcengine](https://console.volcengine.com/ark)
 
-### Compilare il progetto
+### Compila il Progetto
 
 ```bash
 dotnet restore
 dotnet build
 ```
 
-### Eseguire il sistema
+### Esegui il Sistema
 
-#### Metodo 1: Eseguire la versione Default (applicazione console)
+#### Metodo 1: Esegui la versione Default (applicazione console)
 
 ```bash
 dotnet run --project src/SiliconLife.Default
 ```
 
-L'applicazione avvia il server Web e apre automaticamente l'interfaccia Web nel browser.
+L'applicazione avvierà il server Web e aprirà automaticamente la Web UI nel browser.
 
 **Scenari applicabili**:
-- ✅ Requisiti sicurezza dati estremamente elevati
-- ✅ Risorse memoria limitate (RAM < 2GB)
-- ✅ Piccolo volume dati, utilizzo a breve termine
-- ✅ Fase sviluppo e debug
+- ✅ Requisiti di sicurezza dei dati molto elevati
+- ✅ Risorse di memoria limitate (RAM < 2GB)
+- ✅ Piccola quantità di dati, utilizzo a breve termine
+- ✅ Fase di sviluppo e debug
 
-#### Metodo 2: Eseguire la versione Fast (Applicazione desktop)
+#### Metodo 2: Esegui la versione Fast (applicazione desktop)
 
 ```bash
 dotnet run --project src/SiliconLife.Fast
 ```
 
-**Windows/macOS**: L'applicazione si avvierà in modalità finestra, si minimizzerà nella tray di sistema e continuerà a funzionare in background.
+**Windows/macOS**: L'applicazione si avvierà in modalità finestra, si minimizzerà nell'area di notifica di sistema e continuerà a funzionare in background.
 
-**Linux**: L'applicazione mostrerà una finestra di stato (nessuna icona nella tray di sistema) e aprirà automaticamente il browser per accedere alla Web UI. È possibile utilizzare il parametro `--no-tray` per saltare l'apertura automatica del browser:
+**Linux**: L'applicazione mostrerà una finestra di stato (senza icona nell'area di notifica di sistema) e aprirà automaticamente il browser per accedere alla Web UI. È anche possibile utilizzare il parametro `--no-tray` per saltare l'apertura automatica del browser:
 
 ```bash
 dotnet run --project src/SiliconLife.Fast -- --no-tray
 ```
 
 **Scenari applicabili**:
-- ✅ Scenari altamente paralleli (> 5 utenti)
-- ✅ Grandi volumi dati (utilizzo oltre 3 mesi)
-- ✅ Requisiti bassa latenza
-- ✅ Esecuzione in background nella barra di stato richiesta
+- ✅ Scenari ad alta concorrenza (> 5 utenti)
+- ✅ Grandi volumi di dati (utilizzo superiore a 3 mesi)
+- ✅ Necessità di risposta a bassa latenza
+- ✅ Necessità di esecuzione in background nell'area di notifica
 
-### Pubblicazione in file singolo
+### Pubblicazione come File Singolo
 
 ```bash
 # Windows - Versione Default
@@ -320,76 +326,114 @@ dotnet publish src/SiliconLife.Default -c Release -r osx-x64 --self-contained -p
 dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:PublishSingleFile=true
 ```
 
-## 📋 Roadmap sviluppo
+## 📋 Roadmap di Sviluppo
 
 ### ✅ Completato
-- [x] Fase 1: Chat IA in console
-- [x] Fase 2: Scheletro framework (loop principale + oggetti orologio + watchdog + circuit breaker)
-- [x] Fase 3: Primo Silicon Being con file dell'anima (architettura Body-Brain)
-- [x] Fase 4: Storage persistente (sistema chat + interfaccia Time Storage)
-- [x] Fase 5: Sistema strumenti + esecutori
-- [x] Fase 6: Sistema permessi (catena 3 livelli, log audit, GlobalACL)
-- [x] Fase 7: Compilazione dinamica + auto-sviluppo (Roslyn)
-- [x] Fase 8: Storage lungo termine + attività + timer
-- [x] Fase 9: Host principale + collaborazione multi-agente
-- [x] Fase 10: Interfaccia Web (HTTP + SSE, 22 controller, 7 skin)
-- [x] Fase 10.5: Miglioramenti incrementali (canali broadcast, audit token, 32 calendari, miglioramenti strumenti, 33 varianti linguistiche localizzazione)
-- [x] Fase 10.6: Completamento & Ottimizzazione (WebView, sistema aiuto, spazio progetti, rete conoscenza)
-- [x] Fase 11: Motore storage SpeedyPack (sostituzione LiteDB, mappatura memoria, coda scrittura asincrona, compressione automatica)
-- [x] Fase 12: Sistema plugin (interfaccia IPlugin, sandbox sicurezza PluginLoader, caricamento isolato, integrazione strumenti)
+- [x] Fase 1: Chat AI da console
+- [x] Fase 2: Scheletro del framework (Ciclo Principale + Oggetto Clock + Cane da Guardia + Interruttore)
+- [x] Fase 3: Primo Essere di Silicio con File dell'Anima (architettura Corpo-Cervello)
+- [x] Fase 4: Memoria persistente (Sistema di Chat + interfaccia Archiviazione Temporale)
+- [x] Fase 5: Sistema di strumenti + Esecutori
+- [x] Fase 6: Sistema di permessi (catena a 5 livelli, logger di audit, Lista di Controllo degli Accessi Globale)
+- [x] Fase 7: Compilazione dinamica + auto-evoluzione (Roslyn)
+- [x] Fase 8: Memoria a lungo termine + attività + timer
+- [x] Fase 9: Host Principale + collaborazione multi-agente
+- [x] Fase 10: Web UI (HTTP + SSE, 24 controller, 7 skin)
+- [x] Fase 10.5: Miglioramenti incrementali (canale di trasmissione, audit Token, 32 calendari, miglioramento strumenti, localizzazione per 34 varianti linguistiche)
+- [x] Fase 10.6: Perfezionamento e ottimizzazione (WebView, sistema di aiuto, area di lavoro del progetto, rete di conoscenza, motore di workflow)
+- [x] Fase 11: Motore di archiviazione SpeedyPack (sostituisce LiteDB, mappatura in memoria, coda di scrittura asincrona, compressione automatica)
+- [x] Fase 12: Sistema di plugin (interfaccia IPlugin, Sandbox di Sicurezza PluginLoader, caricamento isolato, integrazione strumenti)
 
-### 🚧 Pianificato
-- [ ] Fase 13: Integrazione IM esterna (Feishu / WhatsApp / Telegram)
-- [ ] Fase 14: Ecosistema competenze (marketplace plugin, distribuzione pacchetti competenze)
+### 🚧 In Pianificazione
+- [ ] Fase 13: Integrazione messaggistica istantanea esterna (Feishu / WhatsApp / Telegram)
+- [ ] Fase 14: Ecosistema di competenze (marketplace di plugin, distribuzione di pacchetti di competenze)
 
 ## 📚 Documentazione
 
-- [Progettazione architetturale](architecture.md) — Design sistema, meccanismi scheduling, architettura componenti
-- [Modello sicurezza](security.md) — Modello permessi, esecutori, sicurezza compilazione dinamica
-- [Guida sviluppo](development-guide.md) — Sviluppo strumenti, guida estensione
-- [Riferimento API](api-reference.md) — Documentazione endpoint API Web
-- [Riferimento strumenti](tools-reference.md) — Descrizione dettagliata strumenti integrati
-- [Guida interfaccia Web](web-ui-guide.md) — Guida utente interfaccia Web
-- [Guida Silicon Being](silicon-being-guide.md) — Guida sviluppo agenti
-- [Sistema permessi](permission-system.md) — Gestione permessi in dettaglio
-- [Sistema calendario](calendar-system.md) — Descrizione 32 sistemi calendario
-- [Avvio rapido](getting-started.md) — Guida dettagliata per principianti
-- [Risoluzione problemi](troubleshooting.md) — Domande frequenti
-- [Roadmap](roadmap.md) — Piano sviluppo completo
-- [Changelog](changelog.md) — Cronologia aggiornamenti versione
-- [Guida contribuzione](contributing.md) — Come partecipare al progetto
+- [Progettazione dell'architettura](architecture.md) — Progettazione del sistema, meccanismo di pianificazione, architettura dei componenti
+- [Modello di sicurezza](security.md) — Modello di permessi, Esecutori, sicurezza della compilazione dinamica
+- [Guida allo sviluppo](development-guide.md) — Sviluppo di strumenti, guida all'estensione
+- [Riferimento API](api-reference.md) — Documentazione degli endpoint Web API
+- [Riferimento strumenti](tools-reference.md) — Descrizione dettagliata degli strumenti integrati
+- [Guida Web UI](web-ui-guide.md) — Guida all'uso dell'interfaccia Web
+- [Guida all'Essere di Silicio](silicon-being-guide.md) — Guida allo sviluppo degli agenti
+- [Sistema di permessi](permission-system.md) — Spiegazione dettagliata della gestione dei permessi
+- [Sistema di calendario](calendar-system.md) — Descrizione dei 32 sistemi di calendario
+- [Inizio rapido](getting-started.md) — Guida introduttiva dettagliata
+- [Risoluzione dei problemi](troubleshooting.md) — Domande frequenti
+- [Roadmap](roadmap.md) — Piano di sviluppo completo
+- [Registro delle modifiche](changelog.md) — Cronologia degli aggiornamenti delle versioni
+- [Guida ai contributi](contributing.md) — Come partecipare al progetto
 
-## 💡 Guida scelta versione
+## 🤝 Partecipa con un Contributo
 
-### Quale versione usare?
+Accogliamo ogni forma di contributo! Per i dettagli, consulta la [Guida ai contributi](contributing.md).
 
-**SiliconLife.Default (implementazione standard — verifica fattibilità architetturale):**
-- 📌 Scopri questo progetto per la prima volta e vuoi capire rapidamente l'architettura sistema
-- 📌 Sei in fase sviluppo e debug e hai bisogno di un metodo esecuzione semplice e diretto
-
-**SiliconLife.Fast (versione alte prestazioni — utilizzo produzione):**
-- 📌 Hai bisogno di sfruttamento lungo termine e alte prestazioni
-- 📌 Hai grandi volumi dati o requisiti alta concorrenza
-- 📌 Vuoi che l'applicazione funzioni in background nella barra di stato sistema
-
-## 🤝 Contribuire
-
-Accogliamo con favore tutti i contributi! Per favore leggi la [guida contribuzione](contributing.md) per maggiori dettagli.
-
-### Flusso lavoro sviluppo
-1. Forka questo repository
+### Flusso di lavoro di sviluppo
+1. Fai fork di questo repository
 2. Crea un branch per la funzionalità (`git checkout -b feature/AmazingFeature`)
-3. Esegui commit delle modifiche (`git commit -m 'feat: add some AmazingFeature'`)
-4. Pusha verso il branch (`git push origin feature/AmazingFeature`)
+3. Conferma le modifiche (`git commit -m 'feat: add some AmazingFeature'`)
+4. Pusha nel branch (`git push origin feature/AmazingFeature`)
 5. Invia una Pull Request
+
+## 💡 Guida alla Scelta della Versione
+
+### Quale versione dovrei usare?
+
+**SiliconLife.Default (Implementazione predefinita — verifica della fattibilità dell'architettura):**
+- 📌 È la prima volta che entri in contatto con questo progetto e vuoi comprendere rapidamente l'architettura del sistema
+- 📌 Stai sviluppando e facendo debug, hai bisogno di un modo di esecuzione semplice e diretto
+- 📌 La sicurezza dei dati è la tua priorità principale
+- 📌 La memoria del tuo sistema è inferiore a 4GB
+- 📌 Hai bisogno di uso singolo o una piccola quantità di dati
+
+**SiliconLife.Fast (Versione di produzione raccomandata):**
+- ⚡ Hai bisogno di un ambiente di produzione stabile a lungo termine
+- ⚡ Conosci già l'architettura del sistema e sei pronto per la distribuzione effettiva
+- ⚡ Devi supportare l'accesso concorrente di più utenti
+- ⚡ Hai bisogno dell'esecuzione in background nell'area di notifica di sistema
+- ⚡ Cerchi l'esperienza di prestazioni estreme
+
+> **Consiglio generale**: SiliconLife.Default è adatto come verifica dell'architettura e esperienza iniziale; per ambienti di produzione effettivi, si raccomanda vivamente l'uso di SiliconLife.Fast.
+
+### Posso migrare da Default a Fast?
+
+**Assolutamente sì!** Le due versioni condividono lo stesso:
+- ✅ Formato dei file di configurazione (config.json)
+- ✅ Interfacce degli strumenti
+- ✅ Configurazione dei Being
+- ✅ Interfaccia Web UI
+
+**Passaggi di migrazione:**
+1. Esegui il backup della directory dei dati di Default
+2. Avvia la versione Fast utilizzando la stessa directory dei dati
+3. Fast importerà automaticamente i dati esistenti nel motore di archiviazione SpeedyPack
+4. Dopo aver verificato che le funzionalità funzionano correttamente, puoi utilizzare la versione Fast quotidianamente
+
+### Le due versioni possono coesistere?
+
+**Sì!** Si raccomanda la seguente strategia di distribuzione:
+
+**Strategia 1: Default per la verifica, Fast per la produzione**
+```
+Ambiente di sviluppo/verifica: SiliconLife.Default (verifica dell'architettura, debug delle funzionalità)
+Ambiente di produzione: SiliconLife.Fast (alte prestazioni, esecuzione in background, elaborazione richieste in tempo reale)
+```
+
+**Strategia 2: Fast per l'esecuzione principale, Default per backup periodici**
+```
+SiliconLife.Fast (uso quotidiano, elaborazione richieste in tempo reale)
+    ↓ Backup periodico
+SiliconLife.Default (archiviazione dati freddi, sicurezza dei dati come rete di salvataggio)
+```
 
 ## 📄 Licenza
 
-Questo progetto è sotto licenza Apache License 2.0 — vedi il file [LICENSE](../../LICENSE).
+Questo progetto è concesso in licenza sotto la Apache License 2.0 — vedi il file [LICENSE](../../LICENSE) per i dettagli.
 
 ## 👨‍💻 Autore
 
-**Hoshino Kennji**
+**天源垦骥**
 
 - GitHub: [@akimoto-akira](https://github.com/akimoto-akira/SiliconLifeCollective)
 - Gitee: [hoshinokennji](https://gitee.com/hoshinokennji/SiliconLifeCollective)
@@ -398,8 +442,8 @@ Questo progetto è sotto licenza Apache License 2.0 — vedi il file [LICENSE](.
 
 ## 🙏 Ringraziamenti
 
-Grazie a tutti gli sviluppatori e fornitori piattaforme IA che hanno contribuito a questo progetto.
+Grazie a tutti gli sviluppatori e ai fornitori di piattaforme AI che hanno contribuito a questo progetto.
 
 ---
 
-**Silicon Life Collective** — Rendere gli agenti IA veramente "viventi"
+**Silicon Life Collective** — Fai in modo che gli agenti AI "vivano" davvero

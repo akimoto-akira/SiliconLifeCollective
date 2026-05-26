@@ -1,4 +1,4 @@
-﻿# Sicherheitsdesign
+# Sicherheitsdesign
 
 > **Version: v0.2.0-alpha**
 
@@ -6,10 +6,10 @@
 
 ## Übersicht
 
-Die Sicherheit von Silicon Life Collective basiert auf einem **Mehrschichtigen Verteidigungs**modell. Kernprinzip: **Alle I/O-Operationen müssen durch Executoren**, Executoren erzwingen Berechtigungsprüfungen vor Ausführung.
+Die Sicherheit von Silicon Life Collective basiert auf einem **Mehrschichtigen Verteidigungs**modell. Kernprinzip: **Alle I/O-Operationen müssen durch Executoren**, Executoren erzwingen Berechtigungsprüfungen vor der Ausführung.
 
 ```
-Tool-Aufruf → Executor → PermissionManager → Frequenz-Cache → Callback → (Kurator→BenutzerFragen / Nicht-Kurator→GlobalACL→Verweigern)
+Werkzeugaufruf → Executor → Berechtigungsmanager → Frequenz-Cache → Callback → (IsCurator: Benutzer fragen | Nicht-Kurator: Globale ACL)
 ```
 
 ---
@@ -32,104 +32,110 @@ Jede Berechtigungsprüfung gibt eines von drei Ergebnissen zurück:
 
 | Ergebnis | Verhalten |
 |--------|----------|
-| **Allowed (Erlaubt)** | Operation fährt sofort fort |
+| **Allowed (Erlaubt)** | Operation wird sofort fortgesetzt |
 | **Denied (Verweigert)** | Operation blockiert, Audit-Protokoll erfasst |
 | **AskUser (Benutzer fragen)** | Operation pausiert, erfordert Benutzerbestätigung |
 
 ### Sonderrolle: Silicon Curator
 
-Der Silicon Curator hat höchste Berechtigungsstufe (`IsCurator = true`). Berechtigungsprüfungen des Curators werden zu **Allowed** kurzgeschlossen, es sei denn der Benutzer überschreibt explizit.
+Der Silicon Curator hat die höchste Berechtigungsstufe (`IsCurator = true`). Wenn die Berechtigungsprüfung die Verzweigung erreicht, werden die Aktionen des Curators über `IPermissionAskHandler` den Benutzer zur Bestätigung gefragt, anstatt direkt zu Allowed kurzgeschlossen zu werden. Nicht-Kuratoren fragen die globale ACL ab.
 
-### Privater PermissionManager
+### Privater Berechtigungsmanager
 
-Jedes Silicon Being hat seine eigene **private PermissionManager**-Instanz. Berechtigungsstatus werden nicht zwischen Beings geteilt.
+Jedes Silicon Being hat seine eigene **private Berechtigungsmanager**-Instanz. Berechtigungsstatus werden nicht zwischen Beings geteilt.
 
 ---
 
 ## Berechtigungsvalidierungsablauf
 
-Abfragepriorität: **1. UserFrequencyCache → 2. IPermissionCallback → 3. Kurator-Verzweigung (AskHandler/GlobalACL)**
+Abfragepriorität: **1. Frequenz-Cache → 2. Callback-Funktion → 3. Verzweigungsentscheidung (IsCurator/Globale ACL)**
 
 ```
 ┌─────────────┐
-│ Tool-Aufruf  │
+│ Werkzeugaufruf │
 └──────┬──────┘
        │
        ▼
 ┌─────────────┐     ┌─────────────────────┐
 │  Executor    │────▶│ Privater            │
-│(Disk/Network/│     │ PermissionManager    │
-│  Command...) │     │ (pro Being)          │
+│(Disk/Netzwerk/│     │ Berechtigungs-     │
+│  Kommando...) │     │ manager (pro Being) │
 └─────────────┘     └────────┬────────────┘
                              │
                              ▼
                     ┌─────────────────┐
-                    │ 1. UserFrequency│──Match──▶ Allowed / Denied
+                    │ 1. Frequenz-    │──Treffer──▶ Erlaubt / Verweigert
                     │    Cache        │
-                    │(HighDeny/       │
+                    │(HighDeny hat    │
+                    │ Vorrang vor     │
                     │ HighAllow)      │
                     └────────┬────────┘
-                             │ Kein Cache-Treffer
+                             │ Kein Treffer
                              ▼
                     ┌─────────────────┐
-                    │ 2. IPermission  │──▶ Allowed / Denied / AskUser
+                    │ 2. Berechtigungs│──▶ Erlaubt / Verweigert / Benutzer fragen
                     │    Callback     │
                     └────────┬────────┘
-                             │ AskUser oder kein Callback
+                             │ Benutzer fragen
                              ▼
                     ┌─────────────────┐
                     │ 3. IsCurator?   │
-                    └────┬───────┬────┘
-                         │       │
-                    Ja   │       │ Nein
-                         ▼       ▼
-              ┌──────────┐  ┌──────────────┐
-              │ Benutzer │  │ GlobalACL    │──Match──▶ Allowed / Denied
-              │ fragen   │  └──────┬───────┘
-              │ (IM)     │         │ Kein Match
-              └──────────┘         ▼
-                            ┌──────────────┐
-                            │ Standard-    │
-                            │ verweigerung │
-                            └──────────────┘
+                    └────────┬────────┘
+                             │
+                    ┌────────┴────────┐
+                    │                 │
+                    ▼ Ja              ▼ Nein
+             ┌─────────────┐   ┌─────────────┐
+             │ Benutzer    │   │ Globale ACL │
+             │ fragen      │   │ Regeln      │
+             │(AskHandler) │   │ abfragen    │
+             └─────────────┘   └─────────────┘
 ```
 
-**Wichtig**: Executor sieht nur Boolean (Allowed/Denied). PermissionManager verarbeitet intern Ternärentscheidung (Allowed/Denied/AskUser) und löst AskUser auf bevor Rückgabe an Executor.
+**Wichtiger Punkt**: Executor sieht nur Boolean-Werte (Erlaubt/Verweigert). Der Berechtigungsmanager verarbeitet intern die Ternärentscheidung (Erlaubt/Verweigert/Benutzer fragen) und löst „Benutzer fragen" auf, bevor er an den Executor zurückgibt.
+
 ---
 
 ## Executoren (Sicherheitsgrenze)
 
 Executoren sind der **einzige** Pfad für I/O-Operationen. Sie erzwingen:
 
-### Statisches Ausführungsmodell
+### Unabhängige Dispatcher-Threads
 
-Aktuelle Executor-Implementierungen (`DiskExecutor`, `NetworkExecutor`, `CommandLineExecutor`) sind **statische Klassen** mit synchroner Ausführung und Timeout-Kontrolle:
+Jeder Executor besitzt einen **unabhängigen Dispatcher-Thread**:
 
-- Jeder Executor prüft Berechtigung über den privaten `PermissionManager` des Aufrufers via `ServiceLocator.Instance.GetPermissionManager(callerId)`.
-- Operationen laufen auf `Task.Run` mit konfigurierbarem Timeout.
-- Bei Timeout wird die Operation als fehlgeschlagen behandelt.
-- `ExecutorBase` bietet eine abstrakte Basisklasse mit Hintergrund-Thread und Anfragewarteschlange für zukünftige Erweiterungen.
+- Thread-Isolation zwischen Executoren — ein blockierter Executor-Thread beeinflusst andere Executoren nicht.
+- Jeder Executor kann eigene Ressourcenlimits (CPU, Speicher etc.) setzen.
+- Thread-Pool-Management für Executor-Threads.
+
+### Anfragewarteschlange
+
+Jeder Executor verwaltet eine Anfragewarteschlange:
+
+- Anfragen werden nach Typ an den entsprechenden Executor geroutet.
+- Prioritäts-Warteschlange wird unterstützt.
+- Timeout-Kontrolle pro Anfrage.
 
 ### Thread-Sperrung für Berechtigungsvalidierung
 
-Wenn Tool Ressourcenzugriff initiiert:
+Wenn ein Tool Ressourcenzugriff initiiert:
 
-1. Executor empfängt Anfrage.
-2. Executor fragt privaten PermissionManager des Beings via `ServiceLocator.Instance.GetPermissionManager(callerId)`.
-3. Wenn Berechtigung verweigert, Operation sofort blockiert.
-4. Wenn Callback AskUser zurückgibt (Kurator-Pfad), Executor-Thread **bleibt blockiert** wartend auf Benutzerantwort.
-5. Being sieht nur Endergebnis (Erfolg oder Verweigerung) — es sieht nie intermediären "Pending" oder "Waiting" Status.
-6. Nur der Silicon Curator löst echte Benutzerabfragen aus. Normale Beings fragen GlobalACL synchron ohne Blockierung.
-7. Bei Timeout, Anfrage als verweigert behandelt, Thread-Sperre freigegeben.
+1. Executor empfängt Anfrage und **sperrt seinen Thread**.
+2. Executor fragt den privaten Berechtigungsmanager des Beings ab.
+3. Wenn der Callback „Benutzer fragen" zurückgibt, bleibt der Executor-Thread **gesperrt** und wartet auf die Benutzerantwort.
+4. Das Being sieht nur das Endergebnis (Erfolg oder Verweigerung) — es sieht niemals den intermediären „Ausstehend"- oder „Wartend"-Status.
+5. Nur der Silicon Curator löst echte Benutzerabfragen aus. Normale Beings fragen die globale ACL synchron ohne Blockierung ab.
+6. Bei Timeout wird die Anfrage als verweigert behandelt und die Thread-Sperre freigegeben.
 
 ### Executor-Typen
 
 | Executor | Umfang | Standard-Timeout |
 |----------|-------|-----------------|
 | `DiskExecutor` | Datei Lesen/Schreiben, Verzeichnisoperationen | 30 Sekunden |
-| `NetworkExecutor` | HTTP-Anfragen, WebSocket-Verbindungen | 30 Sekunden |
-| `CommandLineExecutor` | Shell-Befehlsausführung | 30 Sekunden |
-| `DynamicCompilationExecutor` | Roslyn In-Memory-Kompilierung | N/A (delegiert an CompilationCore) |
+| `NetworkExecutor` | HTTP-Anfragen, WebSocket-Verbindungen | 60 Sekunden |
+| `CommandLineExecutor` | Shell-Befehlsausführung | 120 Sekunden |
+
+> **Hinweis**: `DynamicCompilationExecutor` (im Namespace `SiliconLife.Core.Compilation`) ist für Roslyn-In-Memory-Kompilierung zuständig und gehört nicht zum I/O-Executor-Bereich, unterliegt jedoch ebenfalls dem Berechtigungssystem.
 
 ### Ausnahmeisolation und Fehlertoleranz
 
@@ -139,9 +145,9 @@ Wenn Tool Ressourcenzugriff initiiert:
 
 ---
 
-## Global ACL (Access Control List)
+## Globale ACL (Access Control List)
 
-Gemeinsame Regeltabelle persistent im Storage, nur vom Silicon Curator verwaltet:
+Gemeinsame Regeltabelle persistent im Speicher, nur vom Silicon Curator verwaltet:
 
 ```json
 {
@@ -153,103 +159,103 @@ Gemeinsame Regeltabelle persistent im Storage, nur vom Silicon Curator verwaltet
 }
 ```
 
-- Regeln sequentiell bewertet; erster Match gewinnt.
-- Nur Silicon Curator kann Global ACL modifizieren (durch dediziertes Tool).
-- Änderungen sofort wirksam.
-- Global ACL wird direkt von `PermissionManager` für **Nicht-Kurator**-Beings geprüft, wenn der Callback AskUser zurückgibt oder kein Callback konfiguriert ist. Sie wird **nicht** von der Callback-Funktion referenziert.
+- Regeln werden sequentiell bewertet; der erste Treffer gewinnt.
+- Nur der Silicon Curator kann die globale ACL modifizieren (durch sein dediziertes Tool).
+- Änderungen sind sofort wirksam.
+- Die globale ACL steht **nicht** in der oben genannten Abfrageprioritätskette — sie wird intern von der Callback-Funktion referenziert.
 
 ---
 
 ## Benutzer-Frequenz-Cache
 
-Zur Reduzierung wiederholter Berechtigungsabfragen verwaltet System zwei **pro Being, nur Speicher** Caches:
+Zur Reduzierung wiederholter Berechtigungsabfragen verwaltet das System zwei **pro Being, nur im Speicher** Caches:
 
 | Cache | Verwendung |
 |-------|---------|
-| **HighAllow** | Ressourcen häufig vom Benutzer erlaubt |
-| **HighDeny** | Ressourcen häufig vom Benutzer verweigert |
+| **HighAllow** | Ressourcen, die vom Benutzer häufig erlaubt wurden |
+| **HighDeny** | Ressourcen, die vom Benutzer häufig verweigert wurden |
 
 ### Funktionsweise
 
-- **Benutzerwahl, nicht Auto-Erkennung**: Bei AskUser-Triggern wählt Benutzer ob Ressource zum Cache hinzugefügt.
-- **Prefix-Matching**: Unterstützt Ressourcenpfad-Prefix-Matching (z.B. `network:api.example.com/*`).
-- **Priorität**: HighDeny priorisiert über HighAllow.
-- **Nur Speicher**: Caches nicht persistent. Bei Neustart verloren.
-- **Konfigurierbarer Ablauf**: Benutzer kann Gültigkeitsdauer für Cache-Einträge setzen.
+- **Benutzerwahl, nicht Auto-Erkennung**: Wenn „Benutzer fragen" ausgelöst wird, wählt der Benutzer, ob die Ressource zum Cache hinzugefügt wird.
+- **Präfix-Matching**: Unterstützt Ressourcenpfad-Präfix-Matching (z.B. `network:api.example.com/*`).
+- **Priorität**: HighDeny hat Vorrang vor HighAllow.
+- **Nur im Speicher**: Caches werden nicht persistent gespeichert. Bei Neustart verloren.
+- **Konfigurierbarer Ablauf**: Benutzer kann Gültigkeitsdauer für Cache-Einträge festlegen.
 
 ### Cache-Aktualisierungsablauf
 
-1. Permission-Callback gibt `AskUser` zurück.
-2. Berechtigungssystem sendet Anfrage an Card-System (Web UI oder IM).
-3. Benutzer trifft Entscheidung (Allowed/Denied) und **wählt ob Caching**.
+1. Berechtigungs-Callback gibt `AskUser` zurück.
+2. Berechtigungssystem sendet Anfrage an das Card-System (Web-UI oder IM).
+3. Benutzer trifft Entscheidung (Erlaubt/Verweigert) und **wählt ob Caching**.
 4. Card-System gibt Entscheidung + Cache-Flag zurück.
-5. Berechtigungssystem aktualisiert entsprechende Cache-Liste.
-6. Zukünftige Anfragen mit Cache-Prefix sofort aufgelöst.
+5. Berechtigungssystem aktualisiert die entsprechende Cache-Liste.
+6. Zukünftige Anfragen mit passendem Cache-Präfix werden sofort aufgelöst.
 
 ---
 
 ## Benutzerabfragemechanismus
 
-Wenn Berechtigungsprüfung `AskUser` zurückgibt:
+Wenn die Berechtigungsprüfung `AskUser` zurückgibt:
 
-### Web UI: Interaktive Cards
+### Web-UI: Interaktive Cards
 
-Web-Frontend zeigt sofort **interaktive Card** mit:
+Das Web-Frontend zeigt sofort eine **interaktive Card** mit:
 
 - Ressourcentyp und -pfad
 - Aktionsbeschreibung
 - Erlauben / Verweigern Buttons
-- Optional "Immer erlauben" / "Immer verweigern" Checkbox (zum Frequenz-Cache hinzufügen)
+- Optionale „Immer erlauben" / „Immer verweigern" Checkbox (zum Frequenz-Cache hinzufügen)
 
 ### Instant Messaging (ohne Card-Unterstützung): Zufallscode
 
 Für Messaging-Plattformen ohne interaktive Card-Unterstützung:
 
-1. System generiert zwei zufällige 6-stellige Codes: **Allow-Code** und **Deny-Code**.
+1. Das System generiert zwei zufällige 6-stellige Codes: **Allow-Code** und **Deny-Code**.
 2. Sendet Nachricht mit Ressourceninfo und beiden Codes.
-3. Benutzer muss exakten Allow-Code antworten zur Autorisierung. Jede andere Antwort als Denied behandelt.
-4. Codes einmalig verwendbar, verhindert Replay-Angriffe.
+3. Der Benutzer muss den exakten Allow-Code antworten, um zu autorisieren. Jede andere Antwort wird als Verweigerung behandelt.
+4. Codes sind einmalig verwendbar, um Replay-Angriffe zu verhindern.
 
 ### Timeout
 
-- Timeout für alle AskUser-Anfragen gesetzt.
-- Bei Timeout, Anfrage als **Denied** behandelt, Executor-Thread-Sperre freigegeben.
+- Timeout für alle „Benutzer fragen"-Anfragen gesetzt.
+- Bei Timeout wird die Anfrage als **verweigert** behandelt und die Executor-Thread-Sperre freigegeben.
 
 ---
 
 ## Dynamische Kompilierungssicherheit
 
-Selbstentwicklung (Klassenüberschreibung) führt einzigartige Sicherheitsrisiken ein. System mildert sie durch **Mehrschichtige Strategie**:
+Selbstevolution (Klassenüberschreibung) bringt einzigartige Sicherheitsrisiken mit sich. Das System mildert sie durch eine **mehrschichtige Strategie**:
 
 ### Schicht 1: Kompilierzeit-Referenzkontrolle (Primärverteidigung)
 
-- Compiler erhält nur **Liste erlaubter Assembly-Referenzen**.
+- Der Compiler erhält nur eine **Liste erlaubter Assembly-Referenzen**.
 - **Erlaubt**: `System.Runtime`, `System.Private.CoreLib`, Projekt-Assemblies (ITool-Schnittstelle etc.)
 - **Blockiert**: `System.IO`, `System.Reflection`, `System.Runtime.InteropServices` etc.
-- Wenn Code blockierte Assembly referenziert, **Compiler selbst lehnt** Code ab.
-- Zuverlässiger als Runtime-Scanning — gefährliche Operationen auf Typebene unmöglich.
+- Wenn Code eine blockierte Assembly referenziert, **lehnt der Compiler selbst** den Code ab.
+- Dies ist zuverlässiger als Runtime-Scanning — gefährliche Operationen sind auf Typebene unmöglich.
 
 ### Schicht 2: Runtime-Statische Analyse (Sekundärverteidigung)
 
-- Selbst nach erfolgreicher Kompilierung, Code gescannt nach statischen Mustern.
+- Selbst nach erfolgreicher Kompilierung wird der Code auf statische Muster gescannt.
 - Erkennt gefährliche Operationsmuster (direktes I/O, Systemaufrufe etc.).
-- Bei gefährlichem Code, Laden abgelehnt, System fällt zurück auf Standardfunktionalität.
+- Bei gefährlichem Code wird das Laden abgelehnt und das System fällt auf Standardfunktionalität zurück.
 
 ### Vererbungsbeschränkung
 
-Alle benutzerdefinierten Silicon Being-Klassen **müssen** `SiliconBeingBase` erben. Compiler erzwingt diese Beschränkung auf Typebene.
+Alle benutzerdefinierten Silicon Being-Klassen **müssen** `SiliconBeingBase` erben. Der Compiler erzwingt diese Beschränkung auf Typebene.
 
 ### Verschlüsselte Speicherung
 
-Kompilierter Code auf Festplatte mit AES-256 verschlüsselt gespeichert:
+Kompilierter Code wird auf der Festplatte mit AES-256 verschlüsselt gespeichert:
 
-- **Schlüsselableitung**: Von Being-GUID (Großschrift) mittels PBKDF2.
+- **Schlüsselableitung**: Von der GUID des Beings (Großschreibung) mittels PBKDF2.
 - **Entschlüsselungsfehler**: Fällt zurück auf Standardimplementierung.
-- **Runtime-Neukompilierung**: Neuer Code zuerst im Speicher kompiliert; erst nach erfolgreicher Kompilierung und Instanzersetzung persistent.
+- **Runtime-Neukompilierung**: Neuer Code wird zuerst im Speicher kompiliert; erst nach erfolgreicher Kompilierung und Instanzersetzung persistent gespeichert.
 
 ### Atomare Ersetzung
 
-Ersetzungsprozess ist atomar:
+Der Ersetzungsprozess ist atomar:
 
 1. Neuen Code im Speicher kompilieren → `Type` erhalten.
 2. Neue Instanz aus `Type` erstellen.
@@ -257,20 +263,20 @@ Ersetzungsprozess ist atomar:
 4. Referenz austauschen.
 5. Verschlüsselten Code persistent speichern.
 
-Wenn irgendein Schritt fehlschlägt, alte Instanz bleibt aktiv.
+Wenn irgendein Schritt fehlschlägt, bleibt die alte Instanz aktiv.
 
 ---
 
-## Permission-Callback-Funktionen
+## Berechtigungs-Callback-Funktionen
 
 ### Design
 
-Jeder PermissionManager hält **Callback-Funktionsvariable**:
+Jeder Berechtigungsmanager hält eine **Callback-Funktionsvariable**:
 
-- **Standard**: Zeigt auf integrierte Standard-Permission-Funktion.
-- **Nach dynamischer Kompilierung**: Überschrieben durch benutzerdefinierte Permission-Funktion des Beings.
-- **Entweder-Oder**: Nur ein Callback jederzeit aktiv.
-- **Kompilierungsfehler**: Beeinflusst aktuellen Callback nicht — Standard oder letzte erfolgreiche benutzerdefinierte Funktion bleibt aktiv.
+- **Standard**: Zeigt auf integrierte Standard-Berechtigungsfunktion.
+- **Nach dynamischer Kompilierung**: Überschrieben durch benutzerdefinierte Berechtigungsfunktion des Beings.
+- **Entweder-Oder**: Nur ein Callback ist jederzeit aktiv.
+- **Kompilierungsfehler**: Beeinflusst den aktuellen Callback nicht — Standard oder letzte erfolgreiche benutzerdefinierte Funktion bleibt aktiv.
 
 ### Callback-Signatur
 
@@ -284,7 +290,7 @@ Gibt `Allowed`, `Denied` oder `AskUser` zurück.
 
 ## Audit-Protokoll
 
-Alle Berechtigungsentscheidungen protokolliert:
+Alle Berechtigungsentscheidungen werden protokolliert:
 
 ```
 [2026-04-01 15:30:25] ALLOWED  | Being:AssistantA | Type:NetworkAccess | Resource:api.github.com | Source:HighAllowCache
@@ -293,19 +299,19 @@ Alle Berechtigungsentscheidungen protokolliert:
 [2026-04-01 15:30:28] ALLOWED  | Being:Curator    | Type:CommandLine   | Resource:del /f /q *.log | Source:UserDecision
 ```
 
-Protokolle persistent im Storage, einsehbar durch Web UI (Log-Controller).
+Protokolle werden persistent im Speicher abgelegt und sind über die Web-UI (Log-Controller) einsehbar.
 
 ---
 
 ## Token-Nutzungsaudit
 
-`TokenUsageAuditManager` bietet sicherheitsrelevantes KI-Token-Verbrauchs-Tracking:
+Der `TokenUsageAuditManager` bietet sicherheitsrelevantes KI-Token-Verbrauchs-Tracking:
 
-- **Pro Anfrage Datensatz** — Jeder KI-Aufruf protokolliert Being-ID, Modell, Prompt-Token, Completion-Token und Zeitstempel.
-- **Anomalie-Erkennung** — Ungewöhnliche Token-Verbrauchsmuster können Prompt-Injection oder Ressourcenmissbrauch indizieren.
-- **Nur Curator-Zugriff** — `TokenAuditTool` (markiert `[SiliconManagerOnly]`) erlaubt Curator Token-Nutzung abzufragen und zusammenzufassen.
-- **Web-Dashboard** — `UsageController` bietet browserbasiertes Dashboard mit Trendgrafiken und Datenexport.
-- **Persistenter Storage** — Datensätze gespeichert durch `ITimeStorage` für Zeitreihenabfragen und Langzeitanalyse.
+- **Pro-Anfrage-Datensatz** — Jeder KI-Aufruf protokolliert Being-ID, Modell, Prompt-Token, Completion-Token und Zeitstempel.
+- **Anomalie-Erkennung** — Ungewöhnliche Token-Verbrauchsmuster können auf Prompt-Injection oder Ressourcenmissbrauch hindeuten.
+- **Nur Curator-Zugriff** — Das `TokenAuditTool` (markiert mit `[SiliconManagerOnly]`) erlaubt dem Curator, die Token-Nutzung abzufragen und zusammenzufassen.
+- **Web-Dashboard** — Der `UsageController` bietet ein browserbasiertes Dashboard mit Trendgrafiken und Datenexport.
+- **Persistenter Speicher** — Datensätze werden über `ITimeStorage` gespeichert, für Zeitreihenabfragen und Langzeitanalyse.
 
 ---
 
@@ -315,7 +321,7 @@ Das Plugin-System führt Sicherheitsrisiken durch Drittanbieter-Code-Ausführung
 
 ### Sicherheits-Sandbox
 
-`PluginLoader` führt beim Laden strege Sicherheitsprüfungen durch:
+Der `PluginLoader` führt beim Laden strenge Sicherheitsprüfungen durch:
 
 1. **Verbotene Namespace-Prüfung** — Plugins dürfen nicht auf folgende Namespaces verweisen:
    - `System.IO` — Dateisystemzugriff
@@ -341,6 +347,32 @@ Das Plugin-System führt Sicherheitsrisiken durch Drittanbieter-Code-Ausführung
 
 ### Tool-Berechtigungsbeschränkungen
 
-- Plugins, die Tools über `ITool`-Schnittstelle registrieren, unterliegen demselben Berechtigungssystem
-- Plugin-Tools können die 3-stufige Berechtigungskette nicht umgehen
+- Plugins, die Tools über die `ITool`-Schnittstelle registrieren, unterliegen demselben Berechtigungssystem
+- Plugin-Tools können die Berechtigungsvalidierungskette nicht umgehen
 - Plugin-Tools unterliegen der `[SiliconManagerOnly]`-Markierung
+
+---
+
+## Tool-Berechtigungssicherheit
+
+Das Tool-Berechtigungssystem bietet eine zusätzliche Sicherheitsschicht, die kontrolliert, welche Tool-Operationen Silicon Beings verwenden dürfen:
+
+### Zwei-Ebenen-Berechtigungsisolation
+
+1. **Silicon Being-Ebene** — Jedes Silicon Being hat eine unabhängige Tool-Berechtigungskonfiguration
+2. **Projektebene** — Tool-Berechtigungen innerhalb eines Projektbereichs sind unabhängig von der Being-Ebene, wodurch bereichsübergreifende Berechtigungsisolation erreicht wird
+
+### Berechtigungsvorlagen
+
+Das System bietet vordefinierte Berechtigungsvorlagen, die eine Sicherheitsbaseline gewährleisten:
+
+- **readonly** — Minimale Berechtigung, nur Leseoperationen erlaubt
+- **restricted** — Eingeschränkte Berechtigung, nur grundlegende Operationen erlaubt
+- **full** — Volle Berechtigung (nur für Curator)
+
+### Sicherheitsmerkmale
+
+- **Standardmäßig verweigert** — Nicht explizit erlaubte Tool-Operationen werden standardmäßig verweigert
+- **Operationsgranularität** — Jede Operation jedes Tools wird unabhängig kontrolliert (z.B. `network:get` erlaubt, aber `network:post` verweigert)
+- **Curator-Verwaltung** — Tool-Berechtigungen können nur vom Silicon Curator konfiguriert werden
+- **Audit-Trail** — Tool-Berechtigungsänderungen werden im Audit-Protokoll erfasst

@@ -1,4 +1,4 @@
-﻿# Web UI Průvodce
+# Příručka Web UI
 
 > **Verze: v0.2.0-alpha**
 
@@ -6,7 +6,7 @@
 
 ## Přehled
 
-Web UI poskytuje komplexní rozhraní pro správu silikonových bytostí, monitorování stavu systému a interakci s AI agenty. Systém používá čistou serverovou architekturu vykreslování, nulovou závislost na frontendovém frameworku, generuje HTML, CSS a JavaScript prostřednictvím konstruktorů `H`, `CssBuilder` a `JsBuilder`.
+Web UI poskytuje komplexní rozhraní pro správu Křemíkových Bytostí, sledování stavu systému a interakci s AI agenty. Systém využívá čistě serverovou architekturu renderování, s nulovou závislostí na frontendovém frameworku, a generuje HTML, CSS a JavaScript pomocí builderů `H`, `CssBuilder` a `JsBuilder`.
 
 ## Přístup
 
@@ -14,41 +14,41 @@ Výchozí URL: `http://localhost:8080`
 
 ## Navigace
 
-### Hlavní Sekce
+### Hlavní sekce
 
-1. **Dashboard** — Přehled systému a metriky
-2. **Bytosti** — Správa silikonových bytostí
-3. **Chat** — Interakce s bytostmi (podpora nahrávání souborů, SSE v reálném čase)
-4. **Historie Chatu** — Zobrazení historie chatu silikonových bytostí (seznam relací, detaily zpráv)
-5. **Úkoly** — Správa úkolů (osobní úkoly)
-6. **Časovače** — Konfigurace časovačů (vytváření, pozastavení, historie provádění)
-7. **Konfigurace** — Nastavení systému (AI klienti, lokalizace)
-8. **Oprávnění** — Řízení přístupu (správa ACL, dotazování oprávnění)
-9. **Logy** — Systémové logy (filtrování podle úrovně, dotazování podle časového rozsahu)
-10. **Audit** — Využití tokenů a auditní stopy
-11. **Paměť** — Paměť bytostí (zobrazení časové osy, pokročilé filtrování)
-12. **Znalosti** — Znalostní báze (správa tripletů, objevování cest)
-13. **Prohlížeč Kódu** — Průzkum kódu (strom souborů, zvýraznění syntaxe)
-14. **Editor Kódu** — Úprava kódu s plovoucími nápovědami (Monaco Editor)
-15. **Projekty** — Správa projektů (pracovní prostory, úkoly, pracovní poznámky)
-16. **Exekutory** — Správa exekutorů (disk, síť, příkazový řádek)
-17. **Nápověda** — Systém nápovědní dokumentace (vícejazyčná podpora, vyhledávání témat)
-18. **O Aplikaci** — Informace o systému a verze
+1. **Řídicí panel** - Přehled systému a metriky
+2. **Bytosti** - Správa Křemíkových Bytostí
+3. **Chat** - Interakce s bytostmi (podpora nahrávání souborů, SSE v reálném čase)
+4. **Historie chatu** - Zobrazení historie chatu Křemíkových Bytostí (seznam relací, detaily zpráv)
+5. **Úkoly** - Správa úkolů (osobní úkoly)
+6. **Časovače** - Konfigurace časovačů (vytvoření, pozastavení, historie provádění)
+7. **Konfigurace** - Nastavení systému (AI klienti, lokalizace)
+8. **Oprávnění** - Řízení přístupu (správa ACL, dotazy na oprávnění)
+9. **Protokoly** - Systémové protokoly (filtrování podle úrovně, dotazy na časové rozsahy)
+10. **Audit** - Využití Tokenů a auditní stopa
+11. **Paměť** - Paměť bytostí (časová osa, pokročilé filtrování)
+12. **Znalosti** - Znalostní báze (správa trojic, objevování cest)
+13. **Prohlížeč kódu** - Průzkum kódu (strom souborů, zvýraznění syntaxe)
+14. **Editor kódu** - Editace kódu s plovoucími tipy (Monaco Editor)
+15. **Projekty** - Správa projektů (pracovní prostor, úkoly, pracovní poznámky)
+16. **Exekutoři** - Správa exekutorů (disk, síť, příkazový řádek)
+17. **Nápověda** - Systém dokumentace nápovědy (vícejazyčná podpora, vyhledávání témat)
+18. **O projektu** - Informace o systému a verze
 
 ---
 
-## Dashboard
+## Řídicí panel
 
 ### Funkce
 
-- Metriky výkonu systému (CPU, paměť, doba běhu)
+- Metriky systémového výkonu (CPU, paměť, doba běhu)
 - Přehled stavu bytostí
 - Statistiky využití AI
 - Rychlé akce
 
-### Aktualizace v Reálném Čase
+### Aktualizace v reálném čase
 
-Použijte SSE (Server-Sent Events) pro získání dat v reálném čase:
+Použití SSE (Server-Sent Events) pro data v reálném čase:
 
 ```javascript
 const dashboard = new EventSource('/api/dashboard/events');
@@ -60,111 +60,112 @@ dashboard.onmessage = (event) => {
 
 ---
 
-## Správa Bytostí
+## Správa bytostí
 
-### Seznam Bytostí
+### Seznam bytostí
 
-Zobrazuje všechny bytosti včetně:
-- Jména a ID
-- Aktuálního stavu (Běží/Zastaveno/Chyba)
-- Odkazu na soubor duše
-- Rychlých akcí (Spustit/Zastavit/Konfigurovat)
+Zobrazuje všechny bytosti, včetně:
+- Název a ID
+- Aktuální stav (běžící/zastavený/chyba)
+- Odkaz na Soubor Duše
+- Rychlé akce (spuštění/zastavení/konfigurace)
 
-### Detaily Bytosti
+### Detaily bytosti
 
 - Kompletní konfigurace
-- Editor souboru duše
+- Editor Souboru Duše
 - Historie úkolů
 - Prohlížeč paměti
 - Metriky výkonu
 
-### Vytvoření Bytosti
+### Vytvoření bytosti
 
-1. Klikněte na **Vytvořit Novou Bytost**
+1. Klikněte na **Vytvořit novou bytost**
 2. Vyplňte:
-   - Jméno
+   - Název
    - Obsah duše (Markdown editor)
    - Počáteční konfigurace
 3. Klikněte na **Vytvořit**
 
 ---
 
-## Rozhraní Chatu
+## Chatovací rozhraní
 
 ### Funkce
 
-- Proud zpráv v reálném čase
+- Stream zpráv v reálném čase
 - Historie zpráv
 - Podpora více relací
 - Vizualizace volání nástrojů
 
-### Používání Chatu
+### Používání chatu
 
 1. Vyberte bytost
 2. Zadejte zprávu
-3. Zobrazte odpověď ve streamu
+3. Zobrazte streamovanou odpověď
 4. Sledujte provádění nástrojů v reálném čase
 
-### Zobrazení Volání Nástrojů
+### Zobrazení volání nástrojů
 
 Když AI volá nástroj:
 ```
 🔧 Nástroj: calendar
 📥 Vstup: {"date": "2026-04-20"}
-📤 Výstup: "Lunární duben třetí den"
+📤 Výstup: "Čínský lunární 3. den 4. měsíce"
 ```
 
 ---
 
 ## Konfigurace
 
-### AI Klienti
+### AI klienti
 
 Konfigurace AI backendu:
 - Ollama (lokální)
-- Bailian (cloudový)
-- Volcengine Ark (cloudový)
+- Bailian (cloud)
+- Volcengine Ark (cloud)
 - Vlastní klienti
 
-### Nastavení Úložiště
+### Nastavení úložiště
 
-- Verze Default: základní cesta, časový index, strategie čištění
-- Verze Fast: konfigurace úložného engine SpeedyPack, správa .spk souborů, nastavení automatické komprese
+- Verze Default: základní cesta, časové indexování, strategie čištění
+- Verze Fast: konfigurace úložného enginu SpeedyPack, správa .spk souborů, nastavení automatické komprimace
 
 ### Lokalizace
 
-Přepínejte mezi 29 jazykovými variantami:
-- Čínština (6 variant): Zjednodušená čínština, Tradiční čínština, Singapurská čínština, Macajská čínština, Tchajwanská čínština, Malajsijská čínština
-- Angličtina (10 variant): Americká, Britská, Kanadská, Australská, Indická, Singapurská, Jihoafrická, Irská, Novozélandská, Malajsijská angličtina
-- Španělština (2 varianty): Španělská, Mexická
-- Němčina (5 variant): Německá, Rakouská, Švýcarská, Lucemburská, Lichtenštejnská
-- Francouzština (3 varianty): Francouzská, Kanadská, Švýcarská
-- Japonština, Korejština, Čeština
+Přepínání mezi 34 jazykovými variantami:
+- Čínština (6 variant): zjednodušená, tradiční, singapurská, macajská, tchajwanská, malajsijská
+- Angličtina (10 variant): americká, britská, kanadská, australská, indická, singapurská, jihoafrická, irská, novozélandská, malajsijská
+- Španělština (2 varianty): španělská, mexická
+- Němčina (5 variant): německá, rakouská, švýcarská, lucemburská, lichtenštejnská
+- Francouzština (3 varianty): francouzská, kanadská, švýcarská
+- Japonština, korejština, čeština
+- Ruština, portugalština (2 varianty), italština, nizozemština, polština, švédština
 
 ---
 
-## Systém Skinů
+## Systém skinů
 
-### Dostupné Skiny
+### Dostupné skiny
 
-1. **Admin** — Profesionální správcovské rozhraní
-2. **Chat** — Design zaměřený na konverzaci
-3. **Creative** — Kreativní a umělecký styl
-4. **Dev** — Rozložení orientované na vývojáře
-5. **HighContrast** — Téma s vysokým kontrastem (verze Fast)
-6. **Minimal** — Minimalistický styl (verze Fast)
-7. **Light** — Světlé téma (verze Fast)
+1. **Admin** - Profesionální administrativní rozhraní
+2. **Chat** - Na konverzaci zaměřený design
+3. **Creative** - Kreativní a umělecký styl
+4. **Dev** - Rozhraní pro vývojáře
+5. **HighContrast** - Téma s vysokým kontrastem (verze Fast)
+6. **Minimal** - Minimalistický styl (verze Fast)
+7. **Light** - Světlé téma (verze Fast)
 
-### Přepnutí Skinu
+### Přepínání skinů
 
-1. Klikněte na **Nastavení** (ikona ozubeného kolečka)
-2. Vyberte **Skin**
-3. Vyberte požadovaný skin
+1. Klikněte na **Nastavení** (ikona ozubeného kola)
+2. Vyberte **Skiny**
+3. Zvolte požadovaný skin
 4. Rozhraní se okamžitě aktualizuje
 
-### Vlastní Skin
+### Vlastní skiny
 
-Vytvořte vlastní skin implementací `ISkin`:
+Vytvoření vlastního skinu implementací `ISkin`:
 
 ```csharp
 public class MySkin : ISkin
@@ -180,153 +181,168 @@ public class MySkin : ISkin
 
 ---
 
-## Správa Oprávnění
+## Správa oprávnění
 
-### Zobrazení Oprávnění
+### Zobrazení oprávnění
 
 - Seznam všech pravidel oprávnění
-- Filtrování podle uživatele nebo zdroje
-- Zobrazení data vypršení platnosti
+- Filtrování podle uživatele nebo prostředku
+- Zobrazení dat vypršení
 
-### Přidání Pravidla Oprávnění
+### Přidání pravidla oprávnění
 
-1. Klikněte na **Přidat Pravidlo**
-2. Konfigurujte:
-   - Uživatel
-   - Zdroj (např. `disk:read`)
+1. Klikněte na **Přidat pravidlo**
+2. Nakonfigurujte:
+   - Typ oprávnění (např. `FileAccess`, `NetworkAccess`)
+   - Předpona prostředku (např. `C:\Projects`, `api.github.com`)
    - Povolit/Zamítnout
-   - Doba trvání
-3. Uložit
+   - Popis
+3. Uložte
 
-### Auditní Stopa
+### Auditní stopa
 
-Zobrazit všechna rozhodnutí o oprávněních:
+Zobrazení všech rozhodnutí o oprávněních:
 - Časové razítko
 - Uživatel
-- Zdroj
+- Prostředek
 - Rozhodnutí
 - Důvod
 
+### Správa oprávnění nástrojů
+
+Správa oprávnění operací nástrojů pro Křemíkové Bytosti a projekty:
+
+1. **Oprávnění nástrojů Křemíkové Bytosti**:
+   - Přejděte na **Bytosti** → vyberte bytost → **Oprávnění nástrojů**
+   - Zobrazení aktuální konfigurace oprávnění
+   - Nastavení povolit/zamítnout pro jednotlivé operace
+   - Aplikace šablony oprávnění (readonly/restricted/full)
+
+2. **Oprávnění nástrojů projektu**:
+   - Přejděte na **Projekty** → vyberte projekt → **Oprávnění nástrojů**
+   - Oprávnění nástrojů na úrovni projektu jsou nezávislá na úrovni Křemíkové Bytosti
+   - Dosahování izolace oprávnění mezi projekty
+
 ---
 
-## Správa Úkolů
+## Správa úkolů
 
-### Seznam Úkolů
+### Seznam úkolů
 
 - Všechny úkoly a jejich stavy
 - Filtrování podle bytosti nebo stavu
-- Indikátor priority
+- Indikátory priority
 
-### Detaily Úkolu
+### Detaily úkolu
 
 - Popis
 - Priorita
-- Termín splnění
+- Termín dokončení
 - Historie provádění
 - Výstup výsledku
 
-### Vytvoření Úkolu
+### Vytvoření úkolu
 
-1. Klikněte na **Vytvořit Úkol**
+1. Klikněte na **Vytvořit úkol**
 2. Vyplňte:
    - Přiřazení bytosti
    - Popis
    - Priorita (1-10)
-   - Termín splnění
-3. Vytvořit
+   - Termín dokončení
+3. Vytvořte
 
 ---
 
-## Správa Časovačů
+## Správa časovačů
 
-### Aktivní Časovače
+### Aktivní časovače
 
 - Seznam běžících časovačů
-- Příští čas provedení
+- Čas dalšího provedení
 - Stav opakování
 
-### Vytvoření Časovače
+### Vytvoření časovače
 
-1. Klikněte na **Vytvořit Časovač**
-2. Konfigurujte:
+1. Klikněte na **Vytvořit časovač**
+2. Nakonfigurujte:
    - Přiřazení bytosti
    - Interval nebo cron výraz
    - Akce k provedení
    - Nastavení opakování
-3. Spustit
+3. Spusťte
 
 ---
 
-## Prohlížeč Logů
+## Prohlížeč protokolů
 
 ### Funkce
 
-- Filtrování podle úrovně (Info/Warning/Error)
-- Vyhledávání podle klíčového slova
+- Filtrování podle úrovně (informace/varování/chyba)
+- Vyhledávání podle klíčových slov
 - Výběr časového rozsahu
 - Aktualizace v reálném čase
 
-### Detaily Logu
+### Detaily protokolu
 
-Každý záznam logu zobrazuje:
+Každá položka protokolu zobrazuje:
 - Časové razítko
 - Úroveň
 - Zdroj
 - Zpráva
-- Sledování zásobníku (pro chyby)
+- Trasování zásobníku (pro chyby)
 
 ---
 
-## Auditní Zprávy
+## Auditní reporty
 
 ### Využití Tokenů
 
-- Celkový počet použitých tokenů
+- Celkové použité tokeny
 - Rozdělení podle modelu
 - Výpočet nákladů
 - Grafy založené na čase
 
-### Export Zpráv
+### Export reportů
 
-Stáhněte si auditní data:
+Stahování auditních dat:
 - Formát CSV
-- Výběr časového rozsahu
+- Výběr rozsahu dat
 - Filtrování podle bytosti nebo modelu
 
 ---
 
-## Editor Kódu
+## Editor kódu
 
 ### Funkce
 
 - Zvýraznění syntaxe (Monaco Editor)
 - Doplňování kódu
-- Plovoucí nápovědy pro identifikátory
+- Plovoucí tipy pro identifikátory
 - Kompilace v reálném čase
 
-### Plovoucí Nápovědy
+### Plovoucí tipy
 
-Najeďte myší na libovolný identifikátor pro zobrazení:
+Najetím myší na jakýkoliv identifikátor zobrazíte:
 - Informace o typu
-- Dokumentace
-- Umístění definice
+- Dokumentaci
+- Místo definice
 - Reference
 
 ---
 
-## Prohlížení Historie Chatu
+## Zobrazení historie chatu
 
 ### Funkce
 
-- Prohlížení historie chatu silikonových bytostí
+- Procházení historie chatu Křemíkových Bytostí
 - Zobrazení seznamu relací
 - Zobrazení detailů zpráv
-- Zobrazení časové osy
+- Zobrazení na časové ose
 
-### Používání Historie Chatu
+### Používání historie chatu
 
-1. Navigujte na stránku **Bytosti**
-2. Klikněte na odkaz **Historie Chatu** u silikonové bytosti
+1. Přejděte na stránku **Bytosti**
+2. Klikněte na odkaz **Historie chatu** Křemíkové Bytosti
 3. Zobrazte seznam relací:
    - Název relace
    - Čas vytvoření
@@ -337,20 +353,20 @@ Najeďte myší na libovolný identifikátor pro zobrazení:
    - Informace o odesílateli
    - Záznamy volání nástrojů
 
-### Technická Implementace
+### Technická implementace
 
 - **Kontroler**: `ChatHistoryController`
-- **View Model**: `ChatHistoryViewModel`
+- **Model pohledu**: `ChatHistoryViewModel`
 - **Pohledy**:
-  - `ChatHistoryListView` — Seznam relací
-  - `ChatHistoryDetailView` — Detaily zpráv
+  - `ChatHistoryListView` - Seznam relací
+  - `ChatHistoryDetailView` - Detaily zpráv
 - **API trasy**:
-  - `/api/chat-history/conversations?beingId={beingId}` — Získat seznam relací
-  - `/api/chat-history/messages?sessionId={sessionId}` — Získat detaily zpráv
+  - `/api/chat-history/{beingId}/conversations` - Získání seznamu relací
+  - `/api/chat-history/{beingId}/conversation/{conversationId}` - Získání detailů zpráv
 
 ---
 
-## Nahrávání Souborů
+## Nahrávání souborů
 
 ### Funkce
 
@@ -359,18 +375,18 @@ Najeďte myší na libovolný identifikátor pro zobrazení:
 - Správa metadat souborů
 - Zobrazení průběhu nahrávání
 
-### Používání Nahrávání Souborů
+### Používání nahrávání souborů
 
-1. Klikněte na tlačítko **Nahrát Soubor** v rozhraní chatu
+1. V chatovacím rozhraní klikněte na tlačítko **Nahrát soubor**
 2. Otevře se dialog zdroje souborů
 3. Vyberte zdroj souborů:
-   - Lokální soubory
-   - Cesta k souborovému systému
-4. Vyberte soubory (podpora více výběrů)
-5. Potvrďte nahrávání
+   - Lokální soubor
+   - Cesta souborového systému
+4. Vyberte soubory (podpora vícenásobného výběru)
+5. Potvrďte nahrání
 6. Informace o souboru budou připojeny ke zprávě
 
-### Podporované Typy Souborů
+### Podporované typy souborů
 
 - Textové soubory (.txt, .md, .json, .xml, atd.)
 - Kódové soubory (.cs, .js, .py, .java, atd.)
@@ -379,164 +395,173 @@ Najeďte myší na libovolný identifikátor pro zobrazení:
 
 ---
 
-## Indikátor Načítání
+## Indikátor načítání
 
 ### Funkce
 
-- Zobrazení stavu načítání stránky chatu
-- Automatický výběr relace kurátora
+- Zobrazení stavu načítání chatovací stránky
+- Automatický výběr relace Kurátora
 - Zpětná vazba o průběhu načítání dat
 
 ### Chování
 
-- Při načítání stránky se zobrazí animační načítání
+- Při načítání stránky se zobrazí animace načítání
 - Po dokončení načítání dat se automaticky skryje
-- Relace kurátora je automaticky vybrána (pokud existuje)
-- Vícejazyčný text výzvy k načítání
+- Relace Kurátora je automaticky vybrána (pokud existuje)
+- Vícejazyčné texty indikátoru načítání
 
 ---
 
-## Systém Nápovědní Dokumentace (Nové)
+## Systém dokumentace nápovědy (nové)
 
-### Přehled Funkcí
+### Přehled funkcí
 
-Systém nápovědní dokumentace poskytuje vícejazyčnou podporu nápovědních dokumentů pro silikonové bytosti a uživatele.
+Systém dokumentace nápovědy poskytuje vícejazyčnou podporu dokumentace pro Křemíkové Bytosti a uživatele.
 
-### Používání Nápovědní Dokumentace
+### Používání dokumentace nápovědy
 
-1. Navigujte na stránku **Nápověda**
-2. Zobrazte seznam nápovědních témat:
-   - Průvodce rychlým startem
-   - Reference používání nástrojů
-   - Průvodce správou oprávnění
+1. Přejděte na stránku **Nápověda**
+2. Zobrazte seznam témat nápovědy:
+   - Příručka rychlého startu
+   - Reference použití nástrojů
+   - Příručka správy oprávnění
    - Příručka řešení problémů
    - Vývojářská příručka
-3. Klikněte na téma pro zobrazení podrobného obsahu:
-   - Strukturovaný obsah dokumentu (vykreslování Markdown)
-   - Vícejazyčná podpora (sleduje nastavení lokalizace systému)
+3. Klikněte na téma pro zobrazení detailního obsahu:
+   - Strukturovaný obsah dokumentace (vykreslování Markdown)
+   - Vícejazyčná podpora (následuje systémové nastavení lokalizace)
    - Doporučení souvisejících témat
-4. Použijte funkci vyhledávání pro rychlé nalezení:
-   - Vyhledávání klíčových slov (podpora čínštiny, angličtiny)
-   - Výsledky vyhledávání řazené podle relevance
+4. Použijte funkci vyhledávání pro rychlou navigaci:
+   - Vyhledávání podle klíčových slov (podpora češtiny, angličtiny)
+   - Výsledky vyhledávání seřazené podle relevance
 
-### Přístup Silikonových Bytostí k Nápovědě
+### Přístup Křemíkových Bytostí k nápovědě
 
-Silikonové bytosti mohou přistupovat k nápovědní dokumentaci prostřednictvím nástroje `help`:
+Křemíkové Bytosti mohou přistupovat k dokumentaci nápovědy pomocí nástroje `help`:
 ```json
 {
   "action": "get_topics"
 }
 ```
 
-### Technická Implementace
+### Technická implementace
 
 - **Kontroler**: `HelpController`
 - **Nástroj**: `HelpTool`
 - **API trasy**:
-  - `/api/help` — Získat seznam nápovědních témat
-  - `/api/help/{topicId}` — Získat detaily tématu
-  - `/api/help/search?q=keyword` — Vyhledat nápovědní dokumenty
+  - `/api/help` - Získání seznamu témat nápovědy
+  - `/api/help/{topicId}` - Získání detailů tématu
+  - `/api/help/search?q=keyword` - Vyhledávání v dokumentaci nápovědy
 
 ---
 
-## Projektový Pracovní Prostor (Nové)
+## Projektový pracovní prostor (nové)
 
-### Přehled Funkcí
+### Přehled funkcí
 
-Projektový pracovní prostor poskytuje strukturované pracovní prostředí podporující správu projektů, sledování úkolů a pracovní poznámky.
+Projektový pracovní prostor poskytuje strukturované pracovní prostředí, podporuje správu projektů, sledování úkolů a pracovní poznámky.
 
-### Správa Projektů
+### Správa projektů
 
-1. **Vytvoření Projektu**:
-   - Jméno a popis projektu
+1. **Vytvoření projektu**:
+   - Název a popis projektu
    - Štítky projektu (kategorizace)
-   - Stav projektu (probíhá, dokončen, archivován)
-2. **Zobrazení Detailů Projektu**:
+   - Stav projektu (probíhající, dokončený, archivovaný)
+2. **Zobrazení detailů projektu**:
    - Základní informace o projektu
-   - Seznam přidružených úkolů
+   - Seznam souvisejících úkolů
    - Seznam pracovních poznámek
    - Statistiky postupu projektu
-3. **Archivace Projektu**: Zachování historických dat, ale již není aktivní
+3. **Archivace projektu**: Zachování historických dat, ale projekt již není aktivní
+4. **Správa projektových rolí**:
+   - Přiřazení projektových rolí Křemíkovým Bytostem (např. developer, reviewer, manager)
+   - Odebrání přiřazení rolí
+   - Zobrazení členů projektu a seznamu rolí
+5. **Projektové pracovní postupy**:
+   - Zobrazení seznamu šablon pracovních postupů
+   - Vázání šablony pracovního postupu na projekt
+   - Zobrazení stavu instance pracovního postupu
+   - Zobrazení protokolů provádění pracovního postupu
 
-### Pracovní Poznámky (Soukromé)
+### Pracovní poznámky (soukromé)
 
-Osobní pracovní poznámky silikonových bytostí, podobné deníku:
+Osobní pracovní poznámky Křemíkové Bytosti, podobné deníku:
 
-1. **Vytvoření Poznámky**:
-   - Shrnutí (stručný popis)
+1. **Vytvoření poznámky**:
+   - Shrnutí (krátký popis)
    - Obsah (podpora formátu Markdown)
    - Klíčová slova (pro vyhledávání)
-   - Automatické zaznamenání časového razítka
-2. **Správa Poznámek**:
-   - Prohlížení podle časové osy (stránkování)
+   - Automatické zaznamenávání časových razítek
+2. **Správa poznámek**:
+   - Procházení na časové ose (stránkový design)
    - Vyhledávání poznámek (podle klíčových slov, shrnutí, obsahu)
-   - Generování obsahu (rychlé prohlížení struktury poznámek)
+   - Generování obsahu (rychlý přehled struktury poznámek)
    - Aktualizace a mazání poznámek
-3. **Řízení Oprávnění**:
-   - Výchozí soukromé, přístupné pouze bytosti samotné
-   - Silikonový kurátor může spravovat všechny poznámky
+3. **Řízení přístupu**:
+   - Výchozí soukromé, pouze bytost sama má přístup
+   - Kurátor Křemíku může spravovat všechny poznámky
 
-### Technická Implementace
+### Technická implementace
 
 - **Kontroler**: `WorkNoteController`
 - **Nástroje**: `WorkNoteTool`, `ProjectTool`, `ProjectWorkNoteTool`
 - **API trasy**:
-  - `/api/worknotes` — Získat seznam pracovních poznámek
-  - `/api/worknotes/{id}` — Získat detaily poznámky
-  - `/api/worknotes/search?q=keyword` — Vyhledat poznámky
-  - `/api/worknotes/directory` — Generovat obsah poznámek
-  - `/api/projects` — API správy projektů
+  - `/api/worknotes` - Získání seznamu pracovních poznámek
+  - `/api/worknotes/{id}` - Získání detailů poznámky
+  - `/api/worknotes/search?q=keyword` - Vyhledávání poznámek
+  - `/api/worknotes/directory` - Generování obsahu poznámek
+  - `/api/projects` - API správy projektů
 
 ---
 
-## Responzivní Design
+## Responzivní design
 
-Web UI se přizpůsobuje různým velikostem obrazovek:
-- Desktop: Kompletní rozložení
-- Tablet: Komprimovaný postranní panel
-- Mobilní: Skládací menu
+Web UI se přizpůsobuje různým velikostem obrazovky:
+- Desktop: kompletní rozložení
+- Tablet: komprimovaný postranní panel
+- Mobil: sbalitelné menu
 
 ---
 
-## Klávesové Zkratky
+## Klávesové zkratky
 
 | Zkratka | Akce |
 |----------|--------|
 | `Ctrl+K` | Rychlé vyhledávání |
-| `Ctrl+B` | Přepnout postranní panel |
-| `Ctrl+Enter` | Odeslat zprávu |
+| `Ctrl+B` | Přepnutí postranního panelu |
+| `Ctrl+Enter` | Odeslání zprávy |
 | `Esc` | Zrušit/Zavřít |
 
 ---
 
-## Řešení Problémů
+## Řešení problémů
 
-### Nelze se Připojit
+### Nelze se připojit
 
 **Zkontrolujte**:
 - Server běží
 - Port 8080 není blokován
-- Nastavení firewallu
+- Nastavení brány firewall
 
-### SSE Nefunguje
+### SSE nefunguje
 
 **Zkontrolujte**:
 - Prohlížeč podporuje SSE
-- Žádný proxy server nebufferuje SSE
+- Žádný proxy nebufferuje SSE
 - Stabilita sítě
 
-### Pomalý Výkon
+### Pomalý výkon
 
-**Optimalizujte**:
-- Snižte podrobnost logů
-- Vyčistěte stará auditní data
-- Zkontrolujte systémové zdroje
+**Optimalizace**:
+- Snížení úrovně detailů protokolů
+- Vyčištění starých auditních dat
+- Kontrola systémových prostředků
 
 ---
 
-## Další Kroky
+## Další kroky
 
-- 📚 Přečtěte si [Průvodce architekturou](architecture.md)
-- 🛠️ Podívejte se na [Vývojářskou příručku](development-guide.md)
-- 📖 Prozkoumejte [Referenci API](api-reference.md)
-- 🚀 Podívejte se na [Průvodce rychlým startem](getting-started.md)
+- 📚 Přečtěte [příručku architektury](architecture.md)
+- 🛠️ Prohlédněte [vývojářskou příručku](development-guide.md)
+- 📖 Prozkoumejte [API referenci](api-reference.md)
+- 🚀 Prohlédněte [příručku rychlého startu](getting-started.md)

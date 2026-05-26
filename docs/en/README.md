@@ -4,57 +4,59 @@
 
 **Version: v0.2.0-alpha** | **Silicon Life Collective** — A multi-agent collaboration platform based on .NET 9, where AI agents are called **Silicon Beings**, capable of self-evolution through Roslyn dynamic compilation.
 
-**English** | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Deutsch](../de-DE/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md) | [Italiano](../it-IT/README.md) | [Polski](../pl-PL/README.md) | [Português](../pt-PT/README.md) | [Русский](../ru-RU/README.md)
+[English](../README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | [繁體中文](../zh-HK/README.md) | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md) | [Italiano](../it-IT/README.md) | [Polski](../pl-PL/README.md) | [Português](../pt-PT/README.md) | [Русский](../ru-RU/README.md)
 
 ## 🌟 Core Features
 
 ### Agent System
-- **Multi-Agent Orchestration** — Unified management by *Silicon Curator*, using clock-driven time-slice fair scheduling mechanism
-- **Soul File Driven** — Each silicon being is driven by a core prompt file (`soul.md`), defining unique personality and behavior patterns
+- **Multi-Agent Orchestration** — Unified management by the *Silicon Curator*, using a clock-driven time-slice fair scheduling mechanism
+- **Soul File Driven** — Each Silicon Being is driven by a core prompt file (`soul.md`), defining unique personality and behavior patterns
 - **Body-Brain Architecture** — *Body* (SiliconBeing) maintains vital signs and detects trigger scenarios; *Brain* (ContextManager) handles loading history, calling AI, executing tools, and persisting responses
-- **Self-Evolution Capability** — Through Roslyn dynamic compilation technology, silicon beings can rewrite their own code to achieve evolution
+- **Self-Evolution Capability** — Through Roslyn dynamic compilation technology, Silicon Beings can rewrite their own code to achieve evolution
 - **Activity State Management** — Supports four activity states: Idle, Working, Error, Stopped. Automatically enters Stopped state after 10 consecutive errors
 
 ### Plugin System
 - **Plugin Extension Architecture** — Feature extension via IPlugin interface, supporting dynamic loading of plugin DLLs from directories
-- **Security Sandbox** — Plugin loader performs strict security scanning, blocking access to System.IO, System.Net, and other namespaces
+- **Security Sandbox** — Plugin Loader performs strict security scanning, blocking access to System.IO, System.Net, and other namespaces
 - **Isolated Loading** — Uses custom AssemblyLoadContext for isolated loading, preventing plugins from affecting main program stability
 - **Tool Integration** — Plugins can register custom tools via ITool interface, automatically integrated into the tool call loop
 
 ### Tools & Execution
-- **24 Built-in Tools** — Covering calendar, chat, configuration, disk, network, memory, tasks, timers, knowledge base, work notes, WebView browser, hot reload, etc.
+- **24 Built-in Tools** — Covering calendar, chat, configuration, disk, network, memory, tasks, timers, knowledge base, work notes, project workspace, WebView browser, hot reload, and more
+- **Tool Scenario Isolation** — Each tool declares available scenarios via the `ToolScenario` attribute (Chat, Task, Timer, MemoryCompression, Project); the `ChatOnly` attribute restricts tools to chat scenarios only
 - **Hot Reload Tool** — Supports automatic compilation, file update, and restarting SiliconLife.Fast during runtime, without manual intervention
 - **Tool Call Loop** — AI returns tool call → Execute tool → Results fed back to AI → Continue loop until pure text response
 - **Executor-Permission Security** — All I/O operations go through strict permission validation via executors
-  - 5-level permission chain: UserFrequencyCache → IPermissionCallback → (Curator→IPermissionAskHandler / NonCurator→GlobalACL→Deny)
+  - 3-level permission validation chain: UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL → Deny by default)
   - Complete audit logging of all permission decisions
 
 ### AI & Knowledge
 - **Multiple AI Backend Support**
   - **Ollama** — Local model deployment, using native HTTP API
   - **Alibaba Cloud DashScope (Bailian)** — Cloud AI service, OpenAI API compatible, supporting 13+ models, multi-region deployment
-  - **Volcengine Ark** — ByteDance cloud AI service, supporting streaming and non-streaming modes, built-in dual rate limiting
-- **32 Calendar Systems** — Comprehensive coverage of global major calendars, including Gregorian, Chinese Lunar, Islamic, Hebrew, Japanese, Persian, Mayan, Chinese Historical Calendar, etc.
+  - **Volcengine Ark** — ByteDance cloud AI service, supporting streaming and non-streaming modes, built-in rate control
+- **32 Calendar Systems** — Comprehensive coverage of global major calendars, including Gregorian, Chinese Lunar, Islamic, Hebrew, Japanese, Persian, Mayan, Chinese Historical Calendar, and more
 - **Knowledge Network System** — Knowledge graph based on triplets (subject-relation-object), supporting storage, querying, and path discovery
+- **Project Workspace** — Project space management, supporting project creation/archival/destruction, role assignment, work notes, task tracking, and tool permission isolation
+- **Workflow Engine** — Template-based state machine engine, supporting custom workflow templates, state transitions, tick-driven execution, and instance lifecycle management
+- **Memory Fade Mechanism** — Scheduled decay service (MemoryFadeService) that automatically performs importance decay and auto-archival on all Silicon Beings' memories every hour
 
 ### Web Interface
 - **Modern Web UI** — Built-in HTTP server with SSE real-time updates
-- **7 Skin Themes** — Admin, Chat, Creative, Dev, High Contrast, Light, Minimal versions, supporting auto-discovery and switching
-- **23 Controllers** — Complete system management, chat, configuration, monitoring functionality
+- **7 Skin Themes** — Admin, Chat, Creative, Dev, High Contrast, Light, Minimal, supporting auto-discovery and switching
+- **24 Controllers** — Complete system management, chat, configuration, and monitoring functionality
 - **Zero Frontend Framework Dependency** — HTML/CSS/JS generated server-side via `H`, `CssBuilder`, and `JsBuilder`
 
 ### Internationalization & Localization
-- **Comprehensive support for 33 language implementations**, covering 4 writing systems and multiple regional variants
+- **34 Language Variants** fully supported, covering 2 writing systems and multiple regional variants
   - **Simplified Chinese**: zh-CN (China mainland), zh-SG (Singapore), zh-MY (Malaysia) (3 variants)
   - **Traditional Chinese**: zh-HK (Hong Kong), zh-TW (Taiwan), zh-MO (Macau) (3 variants)
   - **English**: en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY (10 variants)
   - **Spanish**: es-ES, es-MX (2 variants)
   - **German**: de-DE, de-AT, de-CH, de-LU, de-LI (5 variants)
   - **French**: fr-FR, fr-CA, fr-CH (3 variants)
-  - **Italian**: it-IT (1 variant)
-  - **Polish**: pl-PL (1 variant)
-  - **Portuguese**: pt-PT, pt-BR (2 variants)
   - **Japanese**: ja-JP | **Korean**: ko-KR | **Czech**: cs-CZ (3 variants)
+  - **Italian**: it-IT | **Polish**: pl-PL | **Portuguese**: pt-PT, pt-BR (4 variants)
 
 ### Data & Storage
 - **SpeedyPack High-Performance Storage** — Fast version uses custom .spk storage engine, in-memory directory mapping + entry cache + asynchronous write queue
@@ -86,8 +88,8 @@ This project provides two implementation versions to meet different scenario nee
   - Extreme performance optimization
   - Windows/macOS tray background operation with real-time monitoring via tray status window; Linux status window displayed directly
   - SpeedyPack engine + auto-compaction ensures data security
-  - Component UI architecture, 27 declarative UI components
-  - 7 Skin Themes with auto-discovery and switching
+  - Component UI architecture, 27 declarative components
+  - 7 skin themes with auto-discovery and switching
   - Hot reload tool for online updates and restarts
 - **Performance Improvement**: Storage read latency reduced by 1000x, write latency reduced by 15000x, concurrent processing capacity increased by 50x
 - **Role Description**: A production-grade implementation with deep optimization, the first choice for long-term operation and actual production environments
@@ -117,7 +119,7 @@ This project provides two implementation versions to meet different scenario nee
 | Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Programming Language | C# | C# |
 | Application Type | Console application | Desktop application (Windows/macOS system tray / Linux status window) |
-| AI Integration | Ollama (local), Alibaba Cloud DashScope (cloud) | Ollama (local), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud) |
+| AI Integration | Ollama (local), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud) | Ollama (local), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud) |
 | Data Storage | File system (JSON + time-indexed directories) | SpeedyPack (.spk format, memory mapping + asynchronous persistence) |
 | Web Server | HttpListener (.NET built-in) | HttpListener (.NET built-in) |
 | Dynamic Compilation | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -146,21 +148,22 @@ SiliconLifeCollective.sln
 │   │   ├── Project/                       # Project management system
 │   │   ├── Runtime/                       # Main loop, clock objects, core host
 │   │   ├── Security/                      # Permission management system
-│   │   ├── SiliconBeing/                  # Silicon being base class, manager, factory
+│   │   ├── SiliconBeing/                  # Silicon Being base class, manager, factory
 │   │   ├── Storage/                       # Storage interfaces
 │   │   ├── Time/                          # Incomplete dates (time range queries)
 │   │   ├── Tools/                         # Tool interfaces and tool manager
 │   │   ├── WebView/                       # WebView browser interface
+│   │   ├── Workflow/                      # Workflow engine (templates, instances, state transitions)
 │   │   └── ServiceLocator.cs              # Global service locator
 │   │
 │   ├── SiliconLife.Common/                # Shared implementation (used by both versions)
 │   │   ├── AI/                            # AI clients and factories (Ollama, DashScope, VolcengineArk)
 │   │   ├── Calendar/                      # 32 calendar implementations
-│   │   ├── Localization/                  # Localization base classes and 33 language/region variant implementations
+│   │   ├── Localization/                  # Localization base classes and 34 language/region variant implementations
 │   │   ├── Resources/                     # Shared resource files
 │   │   ├── Security/                      # Permission manager
-│   │   ├── SiliconBeing/                  # Default silicon being implementation
-│   │   ├── Tools/                         # 24 common tool implementations (including hot reload tool)
+│   │   ├── SiliconBeing/                  # Default Silicon Being implementation
+│   │   ├── Tools/                         # 23 common tool implementations
 │   │   ├── Web/                           # Web infrastructure
 │   │   └── WebView/                       # Playwright WebView implementation
 │   │
@@ -168,9 +171,10 @@ SiliconLifeCollective.sln
 │   │   ├── Config/                        # Application configuration
 │   │   ├── Data/                          # Data directory
 │   │   ├── Help/                          # Help documentation localization (multi-language)
+│   │   ├── Tools/                         # HelpTool (help documentation query tool)
 │   │   └── Web/                           # Web UI implementation
-│   │       ├── Component/                 # UI component library (27 UI components)
-│   │       ├── Controllers/               # 23 controllers
+│   │       ├── Component/                 # UI component library (27 components)
+│   │       ├── Controllers/               # 24 controllers
 │   │       ├── Models/                    # View models
 │   │       ├── Views/                     # HTML views
 │   │       └── Skins/                     # 7 skin themes
@@ -178,52 +182,52 @@ SiliconLifeCollective.sln
 │   ├── SiliconLife.Default/               # Default implementation + application entry (console version)
 │   │   ├── Program.cs                     # Entry point (assembles all components)
 │   │   ├── Config/                        # Default configuration data
-│   │   ├── IM/                            # WebUI provider
 │   │   ├── Knowledge/                     # Knowledge network implementation
-│   │   ├── Logging/                       # Log provider implementations
+│   │   ├── Logging/                       # Log provider implementations (console + file system)
 │   │   ├── Project/                       # Project system implementation
-│   │   ├── Security/                      # Default permission callbacks
-│   │   ├── Storage/                       # File system storage implementation
-│   │   └── Tools/                         # Version-specific tool implementations
+│   │   └── Storage/                       # File system storage implementation
 │   │
 │   ├── SiliconLife.Fast/                  # High-performance implementation + application entry (forms version)
 │   │   ├── Program.cs                     # Entry point (forms application)
+│   │   ├── App.axaml / App.cs             # Avalonia application definition
 │   │   ├── Config/                        # Configuration data (shared with Default)
-│   │   ├── IM/                            # WebUI provider
 │   │   ├── Knowledge/                     # Knowledge network implementation (memory-optimized)
 │   │   ├── Logging/                       # High-performance log providers
 │   │   ├── Project/                       # Project system implementation
-│   │   ├── Security/                      # Optimized permission callbacks
 │   │   ├── Storage/                       # SpeedyPack storage adapter
-│   │   ├── Tools/                         # Version-specific tool implementations
-│   │   └── Tray/                          # System tray (33 language variant localization)
-│
+│   │   └── Tray/                          # System tray (34 language variant localization)
+│   │
 │   ├── SiliconLife.Speedy/                # SpeedyPack high-performance storage engine
 │   │   ├── SpeedyPack.cs                  # Core class (in-memory directory mapping + cache + async write)
 │   │   ├── SpeedyPackOptions.cs           # Configuration options (cache TTL, max entries, etc.)
 │   │   ├── IPackTransaction.cs            # Transaction interface
 │   │   ├── SpkFileInfo.cs                 # File information
 │   │   └── Internal/                      # Internal implementation
-│       │   ├── DirectoryMap.cs            # In-memory directory mapping
-│       │   ├── EntryCache.cs              # Entry cache
-│       │   ├── FreeList.cs                # Free space management
-│       │   ├── PackFileReader.cs          # Pack file reader
-│       │   ├── PackFileWriter.cs          # Pack file writer
-│       │   ├── WriteQueue.cs              # Asynchronous write queue
-│       │   ├── WriteOperation.cs          # Write operation
-│       │   ├── SpeedyTransaction.cs       # Transaction implementation
-│       │   ├── SpkHeader.cs              # Pack file header
-│       │   └── PathNormalizer.cs          # Path normalization
+│   │       ├── DirectoryMap.cs            # In-memory directory mapping
+│   │       ├── EntryCache.cs              # Entry cache
+│   │       ├── FreeList.cs                # Free space management
+│   │       ├── PackFileReader.cs          # Pack file reader
+│   │       ├── PackFileWriter.cs          # Pack file writer
+│   │       ├── WriteQueue.cs              # Asynchronous write queue
+│   │       ├── WriteOperation.cs          # Write operation
+│   │       ├── SpeedyTransaction.cs       # Transaction implementation
+│   │       ├── SpkHeader.cs               # Pack file header
+│   │       └── PathNormalizer.cs          # Path normalization
 │   │
 │   └── SiliconLife.Speedy.Manager/        # SpeedyPack management tool (Avalonia UI)
-│       ├── MainWindow.axaml.cs           # Main window
-│       ├── App.axaml.cs                  # Application entry
-│       ├── Program.cs                    # Entry point
-│       ├── ProgressWindow.axaml.cs       # Progress window
-│       ├── ContentViewerWindow.axaml.cs  # Content viewer window
-│       └── slc.ico                       # Application icon
+│       ├── MainForm.cs                    # Main form
+│       ├── Program.cs                     # Entry point
+│       └── slc.ico                        # Application icon
 │
 ├── docs/                                  # Multi-language documentation
+│   ├── zh-CN/                             # Simplified Chinese documentation
+│   ├── en/                                # English documentation
+│   └── ...                                # Other language documentation
+│
+└── 总文档/                                 # Requirements and architecture documentation
+    ├── 需求文档.md
+    ├── 架构大纲.md
+    └── 实现顺序.md
 ```
 
 ## 🏗️ Architecture Overview
@@ -244,7 +248,7 @@ Main Loop (dedicated thread, watchdog + circuit breaker)
 All AI-initiated I/O operations must pass through a strict security chain:
 
 ```
-Tool Call → Executor → Permission Manager → [Frequency Cache → Callback → (Curator→AskUser / NonCurator→GlobalACL→Deny)]
+Tool Call → Executor → Permission Manager → [Frequency Cache → Callback → (IsCurator: Ask User | Non-curator: Global ACL)]
 ```
 
 ## 🚀 Quick Start
@@ -255,6 +259,7 @@ Tool Call → Executor → Permission Manager → [Frequency Cache → Callback 
 - **AI Backend** (choose one):
   - **Ollama**: [Install Ollama](https://ollama.com) and pull models (e.g., `ollama pull llama3`)
   - **Alibaba Cloud DashScope**: Get API key from [DashScope Console](https://bailian.console.aliyun.com/)
+  - **Volcengine Ark**: Get API key from [Volcengine Console](https://console.volcengine.com/ark)
 
 ### Build the Project
 
@@ -329,15 +334,15 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] Phase 3: First Silicon Being with Soul File (Body-Brain Architecture)
 - [x] Phase 4: Persistent Memory (Chat System + Time Storage Interface)
 - [x] Phase 5: Tool System + Executors
-- [x] Phase 6: Permission System (5-Level Chain, Audit Logger, Global ACL)
+- [x] Phase 6: Permission System (5-level chain, Audit Logger, Global ACL)
 - [x] Phase 7: Dynamic Compilation + Self-Evolution (Roslyn)
 - [x] Phase 8: Long-term Memory + Tasks + Timers
 - [x] Phase 9: Core Host + Multi-Agent Collaboration
-- [x] Phase 10: Web UI (HTTP + SSE, 22 Controllers, 7 Skins)
-- [x] Phase 10.5: Incremental Enhancements (Broadcast Channels, Token Audit, 32 Calendars, Tool Enhancements, 29 Language Localization)
-- [x] Phase 10.6: Refinement & Optimization (WebView, Help System, Project Workspace, Knowledge Network)
+- [x] Phase 10: Web UI (HTTP + SSE, 24 Controllers, 7 Skins)
+- [x] Phase 10.5: Incremental Enhancements (Broadcast Channels, Token Audit, 32 Calendars, Tool Enhancements, 34 Language Variant Localization)
+- [x] Phase 10.6: Refinement & Optimization (WebView, Help System, Project Workspace, Knowledge Network, Workflow Engine)
 - [x] Phase 11: SpeedyPack Storage Engine (Replaced LiteDB, memory mapping, async write queue, auto-compaction)
-- [x] Phase 12: Plugin System (IPlugin interface, PluginLoader security sandbox, isolated loading, tool integration)
+- [x] Phase 12: Plugin System (IPlugin interface, PluginLoader Security Sandbox, isolated loading, tool integration)
 
 ### 🚧 Planned
 - [ ] Phase 13: External IM Integration (Feishu / WhatsApp / Telegram)
@@ -378,6 +383,9 @@ We welcome contributions of all kinds! Please see the [Contributing Guide](contr
 **SiliconLife.Default (Default Implementation — Architecture Verification):**
 - 📌 You're new to this project and want to quickly understand the system architecture
 - 📌 You're doing development debugging and need a simple, straightforward runtime
+- 📌 Data security is your top priority
+- 📌 Your system has less than 4GB of memory
+- 📌 You only need single-user access or have a small data volume
 
 **SiliconLife.Fast (Recommended Production Version):**
 - ⚡ You need a long-term stable production environment
@@ -425,7 +433,7 @@ This project is licensed under the Apache License 2.0 — see the [LICENSE](../.
 
 ## 👨‍💻 Author
 
-**Hoshino Kennji**
+**天源垦骥**
 
 - GitHub: [@akimoto-akira](https://github.com/akimoto-akira/SiliconLifeCollective)
 - Gitee: [hoshinokennji](https://gitee.com/hoshinokennji/SiliconLifeCollective)

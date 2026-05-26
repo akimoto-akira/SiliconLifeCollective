@@ -1,4 +1,4 @@
-﻿# 권한 시스템
+# 퍼미션 시스템
 
 > **버전: v0.2.0-alpha**
 
@@ -6,18 +6,18 @@
 
 ## 개요
 
-권한 시스템은 모든 AI 시작 작업이 적절하게 검증되고 감사되도록 보장합니다.
+퍼미션 시스템은 모든 AI가 시작한 작업이 적절하게 검증되고 감사되도록 보장합니다.
 
-## 3단계 권한 체인
+## 퍼미션 검증 체인
 
 ```
 ┌─────────────────────────────────────────────┐
-│          권한 검증                           │
+│          퍼미션 검증                         │
 ├─────────────────────────────────────────────┤
 │  레벨 1: UserFrequencyCache                  │
-│  ↓ 캐시된 사용자 결정 (HighDeny/HighAllow)   │
+│  ↓ 고빈도 사용자 결정 캐시 (HighDeny/HighAllow)│
 │  레벨 2: IPermissionCallback                 │
-│  ↓ 맞춤형 로직 (허용/거부/AskUser)           │
+│  ↓ 맞춤형 로직 (Allowed/Denied/AskUser)      │
 │  레벨 3: IsCurator?                          │
 │  ↓ 예 → IPermissionAskHandler (사용자에게 문의)│
 │  ↓ 아니오 → GlobalACL → 기본 거부            │
@@ -26,45 +26,36 @@
 ```
 
 > **참고**: `PermissionManager.CheckPermission()`의 실제 쿼리 우선순위는 다음과 같습니다:
-> 1. **UserFrequencyCache** — 캐시된 고빈도 사용자 결정을 먼저 확인
+> 1. **UserFrequencyCache** — 고빈도 사용자 결정 캐시를 먼저 확인
 > 2. **IPermissionCallback** — 맞춤형 콜백 규칙 평가
-> 3. **Curator 분기** — 콜백이 AskUser를 반환하거나 콜백이 없는 경우:
->    - **Curator** → `IPermissionAskHandler` (IM을 통해 사용자에게 프롬프트)
->    - **Non-curator** → `GlobalACL` → 기본 거부
+> 3. **큐레이터 분기** — 콜백이 AskUser를 반환하거나 콜백이 없는 경우:
+>    - **큐레이터** → `IPermissionAskHandler` (IM을 통해 사용자에게 문의)
+>    - **비큐레이터** → `GlobalACL` → 기본 거부
 
 ## 레벨 1: UserFrequencyCache
 
-사용자의 고빈도 결정을 캐시하여 반복적인 권한 프롬프트를 줄입니다.
-
-### 캐시 종류
-
-| 캐시 | 용도 |
-|-------|---------|
-| **HighDeny** | 사용자가 자주 거부한 리소스 — 즉시 거부 |
-| **HighAllow** | 사용자가 자주 허용한 리소스 — 즉시 허용 |
-
-### 작동 방식
-
-- **우선순위**: HighDeny가 HighAllow보다 우선순위 높음
-- **메모리 전용**: 캐시는 영속화되지 않음. 재시작 시 손실
-- **접두사 매칭**: 리소스 경로 접두사 매칭 지원
-- **구성 가능한 만료**: 기본 1시간, 사용자가 캐시 항목의 유효 기간 설정 가능
+각 비잉의 고빈도 사용자 결정 캐시(HighDeny/HighAllow)로, 메모리에만 존재합니다.
 
 ```csharp
-PermissionResult? cachedResult = _frequencyCache.Query(permissionType, resource);
+var cache = new UserFrequencyCache();
+PermissionResult? cachedResult = cache.Query(permissionType, resource);
 if (cachedResult.HasValue)
 {
     return cachedResult.Value == PermissionResult.Allowed;
 }
 ```
 
+- **HighDeny가 HighAllow보다 우선**
+- **메모리 전용**: 캐시는 영속화되지 않으며, 재시작 시 손실
+- **구성 가능한 만료 시간**: 사용자가 캐시 항목의 유효 기간을 설정 가능
+
 ## 레벨 2: IPermissionCallback
 
-동적 권한 로직을 위한 맞춤형 콜백. `Allowed`, `Denied` 또는 `AskUser`를 반환합니다.
+동적 퍼미션 로직을 위한 맞춤형 콜백입니다.
 
 ### DefaultPermissionCallback 기본 구현
 
-`DefaultPermissionCallback`은 다음을 포함한 포괄적인 기본 권한 규칙을 제공합니다:
+`DefaultPermissionCallback`은 다음을 포함한 포괄적인 기본 퍼미션 규칙을 제공합니다:
 
 #### 네트워크 접근 규칙
 - **루프백 주소**: localhost, 127.0.0.1, ::1 허용
@@ -81,7 +72,7 @@ if (cachedResult.HasValue)
   - **날씨 정보**: wttr.in
   - 정부 웹사이트: .gov, .go.jp, .go.kr
 - **도메인 블랙리스트**:
-  - AI 사칭 웹사이트: chatgpt, openai, deepseek 등 피싱 도메인
+  - AI 사칭 웹사이트: chatgpt, openai, deepseek 등 사칭 도메인
   - 악성 AI 도구: wormgpt, darkgpt, fraudgpt 등
   - AI 콘텐츠 팜 및 블랙 마켓 관련 도메인
 
@@ -90,24 +81,23 @@ public class DefaultPermissionCallback : IPermissionCallback
 {
     public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
     {
-        // 맞춤형 로직
         if (IsSafeOperation(permissionType, resource))
         {
             return PermissionResult.Allowed;
         }
-        
+
         return PermissionResult.AskUser;
     }
 }
 ```
 
-## 레벨 3: IsCurator 분기
+## 레벨 3: 분기 판정 (IsCurator / GlobalACL)
 
-콜백이 `AskUser`를 반환하거나 콜백이 없을 때, 시스템은 호출자의 IsCurator 상태에 따라 분기합니다.
+콜백이 `AskUser`를 반환하거나 콜백이 구성되지 않은 경우, 시스템은 큐레이터 신원에 따라 분기합니다:
 
 ### 큐레이터 분기 (IsCurator = true)
 
-큐레이터인 경우 `IPermissionAskHandler`를 통해 사용자에게 권한을 문의합니다:
+실리콘 큐레이터의 경우, 시스템은 인스턴트 메시지를 통해 사용자에게 결정을 요청합니다:
 
 ```csharp
 if (IsCurator)
@@ -115,69 +105,54 @@ if (IsCurator)
     if (_askHandler != null)
     {
         AskPermissionResult userDecision = _askHandler.AskUser(callerId, permissionType, resource);
-        PermissionResult userResult = userDecision.Allowed ? PermissionResult.Allowed : PermissionResult.Denied;
-        _frequencyCache.Record(permissionType, resource, userResult, userDecision.AddToCache, userDecision.CacheDuration);
-        return userDecision.Allowed;
+        // 사용자가 Web UI에서 확인 또는 거부
     }
-    return false; // AskHandler 없으면 기본 거부
 }
 ```
-
-> **참고**: 큐레이터는 모든 권한 검사를 우회하는 것이 아닙니다. 큐레이터는 콜백이 `AskUser`를 반환할 때 사용자에게 문의하는 경로로 진입합니다. 캐시나 콜백에서 명시적으로 허용/거부되면 큐레이터 여부와 관계없이 해당 결과가 적용됩니다.
 
 ### 비큐레이터 분기 (IsCurator = false)
 
-비큐레이터인 경우 `GlobalACL`을 확인하고, 일치하는 규칙이 없으면 기본 거부합니다:
+비큐레이터 비잉의 경우, 시스템은 글로벌 ACL을 확인합니다. 일치하는 규칙이 없으면 기본적으로 요청을 거부합니다.
 
-```csharp
-// Non-curator: check Global ACL
-PermissionResult? aclResult = _globalAcl.Query(permissionType, resource);
-if (aclResult.HasValue)
-{
-    return aclResult.Value == PermissionResult.Allowed;
-}
-
-// No matching rule — deny by default
-return false;
-```
-
-### GlobalACL
-
-명확한 규칙을 정의하는 전역 접근 제어 목록. 비큐레이터 분기에서만 참조됩니다.
-
-#### ACL 구조
+### GlobalACL 구조
 
 ```json
 {
   "rules": [
     {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
+      "permissionType": "NetworkAccess",
+      "resourcePrefix": "api.github.com",
+      "result": "Allowed"
+    },
+    {
+      "permissionType": "FileAccess",
+      "resourcePrefix": "C:\\Windows",
+      "result": "Denied"
     }
   ]
 }
 ```
 
-#### 리소스 형식
+규칙은 순서대로 평가되며, 첫 번째로 일치하는 규칙이 적용됩니다. 실리콘 큐레이터만 글로벌 ACL을 수정할 수 있습니다.
+
+### 리소스 형식
 
 ```
-{type}:{action}
+{type}:{path}
 
 예시:
-- disk:read
-- disk:write
-- network:http
-- compile:execute
-- system:info
+- network:api.github.com
+- file:C:\\Windows
+- cli:rm -rf
 ```
 
 ## IPermissionAskHandler
 
-큐레이터 분기에서 사용자에게 권한을 문의하는 핸들러입니다.
+큐레이터 작업에 사용자 확인이 필요한 경우, `IPermissionAskHandler`를 통해 사용자에게 퍼미션을 문의합니다.
 
 ### IMPermissionAskHandler 구현
+
+`IMPermissionAskHandler`는 Web UI를 통해 사용자에게 퍼미션 요청을 전송합니다:
 
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
@@ -197,36 +172,36 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 }
 ```
 
-### PermissionRequestQueue 권한 요청 큐
+### PermissionRequestQueue 퍼미션 요청 큐
 
-`PermissionRequestQueue`는 대기 중인 권한 요청을 관리하며, 사용자 응답을 비동기적으로 대기합니다:
+`PermissionRequestQueue`는 대기 중인 퍼미션 요청을 관리하며, 사용자 응답을 비동기적으로 대기합니다:
 
-- **요청 인큐** — 권한 체인이 큐레이터 분기에 도달하면 `TaskCompletionSource<AskPermissionResult>`를 생성하여 인큐
-- **Web UI 표시** — `PermissionRequestController`를 통해 Web UI에 대기 중인 권한 요청 표시
-- **사용자 응답** — 사용자가 Web UI에서 승인 또는 거부, 선택적으로 의사 결정 캐시 및 캐시 지속 시간 설정 가능
-- **캐시 옵션** — 사용자는 권한 의사 결정을 1시간, 24시간, 7일 또는 30일 동안 캐시 가능
+- **요청 인큐** — 퍼미션 체인이 레벨 5에 도달하면 `TaskCompletionSource<AskPermissionResult>`를 생성하여 인큐
+- **Web UI 표시** — `PermissionRequestController`를 통해 Web UI에 대기 중인 퍼미션 요청 표시
+- **사용자 응답** — 사용자가 Web UI에서 승인 또는 거부, 선택적으로 결정 캐시 및 캐시 지속 시간 설정 가능
+- **캐시 옵션** — 사용자는 퍼미션 결정을 1시간, 24시간, 7일 또는 30일 동안 캐시 가능
 - **타임아웃 메커니즘** — 60초 무응답 시 자동으로 요청 페이지 닫힘
 
 ## 감사 시스템
 
-모든 권한 결정이 기록됩니다:
+모든 퍼미션 결정이 기록됩니다:
 
 ```json
 {
   "timestamp": "2026-04-20T10:30:00Z",
-  "userId": "user-uuid",
-  "resource": "disk:write",
-  "allowed": true,
-  "level": "Frequency cache",
-  "reason": "Cached decision"
+  "callerId": "being-uuid",
+  "permissionType": "FileAccess",
+  "resource": "C:\\data\\config.json",
+  "result": "Allowed",
+  "reason": "Global ACL"
 }
 ```
 
-## 프로그래매틱 권한 평가
+## 프로그래매틱 퍼미션 평가
 
 ### EvaluatePermission API
 
-`PermissionManager.EvaluatePermission()` 메서드는 사용자 프롬프트를 트리거하지 않는 읽기 전용 권한 사전 평가를 제공합니다. `PermissionTool`은 이 메서드를 사용하여 AI가 작업 시도 전 권한 상태를 확인합니다.
+`PermissionManager.EvaluatePermission()` 메서드는 사용자 프롬프트를 트리거하지 않는 읽기 전용 퍼미션 사전 평가를 제공합니다. `PermissionTool`은 이 메서드를 사용하여 AI가 작업 시도 전 퍼미션 상태를 확인합니다.
 
 ```csharp
 public PermissionResult EvaluatePermission(
@@ -241,20 +216,20 @@ public PermissionResult EvaluatePermission(
 - `AskUser` - 실행 시 사용자 확인 필요
 
 **평가 순서**:
-1. **주파수 캐시** - 캐시된 사용자 결정 확인
+1. **빈도 캐시** - 캐시된 사용자 결정 확인
 2. **IPermissionCallback** - 맞춤형 콜백 평가
 3. **큐레이터 상태** - 큐레이터인 경우 `AskUser` 반환 (확인 필요)
-4. **전역 ACL** - 접근 제어 규칙 확인
+4. **글로벌 ACL** - 접근 제어 규칙 확인
 5. **기본값** - 일치하는 규칙 없을 시 거부
 
-> **참고**: 전체 권한 체인과 달리, `EvaluatePermission`은 `IPermissionAskHandler`를 호출하지 **않습니다**. 실행 시 결과가 *무엇일지*만 보고합니다.
+> **참고**: 전체 퍼미션 체인과 달리, `EvaluatePermission`은 `IPermissionAskHandler`를 호출하지 **않습니다**. 실행 시 결과가 *무엇일지*만 보고합니다.
 
-## 권한 관리
+## 퍼미션 관리
 
-### 권한 부여
+### 퍼미션 부여
 
-**Web UI 통해**:
-1. **권한 관리**로 이동
+**Web UI를 통해**:
+1. **퍼미션 관리**로 이동
 2. **규칙 추가** 클릭
 3. 설정:
    - 사용자
@@ -262,54 +237,108 @@ public PermissionResult EvaluatePermission(
    - 허용/거부
    - 지속 시간
 
-**API 통해**:
+**API를 통해**:
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "userId": "user-uuid",
-    "resource": "disk:write",
-    "allowed": true,
-    "duration": 3600
+    "permissionType": "FileAccess",
+    "resourcePrefix": "C:\\Projects",
+    "result": "Allowed",
+    "description": "Allow project directory access"
   }'
 ```
 
-### 권한 취소
+### 퍼미션 취소
+
+Web UI의 퍼미션 관리 페이지에서 조작합니다.
+
+### 퍼미션 보기
 
 ```bash
-curl -X DELETE http://localhost:8080/api/permissions/{rule-id}
+curl http://localhost:8080/api/permissions/list
 ```
 
-### 권한 보기
+## 툴 퍼미션 시스템
 
-```bash
-curl http://localhost:8080/api/permissions?userId=user-uuid
+작업 레벨의 퍼미션 검증 체인 외에도, 시스템은 실리콘 비잉이 사용할 수 있는 툴을 제어하기 위한 **툴 퍼미션** 관리 메커니즘을 제공합니다.
+
+### 2단계 툴 퍼미션
+
+툴 퍼미션은 두 가지 레벨로 나뉩니다:
+
+1. **실리콘 비잉 레벨** — 개별 실리콘 비잉이 사용할 수 있는 툴 작업을 제어
+2. **프로젝트 레벨** — 프로젝트 공간 내에서 사용 가능한 툴 작업을 제어하며, 실리콘 비잉 레벨 퍼미션과 독립적
+
+### 툴 퍼미션 구성
+
+각 툴의 각 작업은 독립적으로 허용 또는 거부로 구성할 수 있습니다:
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "network:get": "allowed",
+    "network:post": "denied",
+    "disk:read": "allowed",
+    "disk:write": "denied",
+    "database:query": "allowed"
+  }
+}
 ```
+
+### 퍼미션 템플릿
+
+시스템은 실리콘 비잉에 빠르게 적용할 수 있는 사전 정의된 툴 퍼미션 템플릿을 제공합니다:
+
+- **readonly** — 읽기 전용 퍼미션 (읽기 작업 허용, 쓰기 작업 거부)
+- **full** — 전체 퍼미션 (모든 작업 허용)
+- **restricted** — 제한된 퍼미션 (기본 작업만 허용)
+
+### Web UI 관리
+
+Web UI를 통해 툴 퍼미션 관리:
+
+- **실리콘 비잉 툴 퍼미션 페이지** — `/beings/tool-permissions`
+- **프로젝트 툴 퍼미션 페이지** — `/project/{id}/tool-permissions`
+
+### API 엔드포인트
+
+| 엔드포인트 | 메서드 | 설명 |
+|------|------|------|
+| `/api/beings/tool-permissions` | GET | 실리콘 비잉 툴 퍼미션 조회 |
+| `/api/beings/tool-permissions` | PUT | 실리콘 비잉 툴 퍼미션 업데이트 |
+| `/api/beings/tool-permissions/templates` | GET | 퍼미션 템플릿 목록 조회 |
+| `/api/beings/tool-permissions/apply-template` | POST | 퍼미션 템플릿 적용 |
+| `/api/projects/{id}/tool-permissions` | GET | 프로젝트 툴 퍼미션 조회 |
+| `/api/projects/{id}/tool-permissions` | PUT | 프로젝트 툴 퍼미션 업데이트 |
+
+---
 
 ## 모범 사례
 
 ### 1. 최소 권한 원칙
 
-필요한 최소 권한만 부여:
+필요한 최소 퍼미션만 부여:
 
 ```json
 {
-  "resource": "disk:read",  // disk:* 아님
-  "allowed": true,
-  "expiresAt": "2026-04-21T00:00:00Z"  // 항상 만료 설정
+  "permissionType": "FileAccess",
+  "resourcePrefix": "C:\\Projects\\MyApp\\config.json",
+  "result": "Allowed"
 }
 ```
 
-### 2. 시간 제한 권한 사용
+### 2. 시간 제한 퍼미션 사용
 
-절대적으로 필요하지 않은 한 영구 권한 부여 금지.
+절대적으로 필요하지 않은 한 영구 퍼미션을 부여하지 마세요.
 
-### 3. 권한 로그 모니터링
+### 3. 퍼미션 로그 모니터링
 
-정기적으로 감사 로그 확인:
+정기적으로 감사 로그를 확인하여 다음 사항을 파악:
 - 거부된 접근 시도
 - 비정상 패턴
-- 권한 상승
+- 퍼미션 권한 상승
 
 ### 4. 맞춤형 콜백 구현
 
@@ -318,94 +347,83 @@ curl http://localhost:8080/api/permissions?userId=user-uuid
 ```csharp
 public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
 {
-    // 시간 기반 권한
+    // 시간 기반 퍼미션
     if (IsOutsideBusinessHours())
     {
         return PermissionResult.Denied;
     }
-    
-    // 리소스 기반 권한
+
+    // 리소스 기반 퍼미션
     if (IsSensitiveResource(resource))
     {
         return PermissionResult.AskUser;
     }
-    
+
     return PermissionResult.Allowed;
 }
 ```
 
 ## 일반 시나리오
 
-### 시나리오 1: AI가 파일 읽기 원함
+### 시나리오 1: AI가 파일을 읽으려는 경우
 
 ```
 AI: "config.json을 읽어야 합니다"
 ↓
-권한 체인:
-1. 빈도 캐시? 캐시된 결정 없음
-2. 콜백? disk:read = 안전한 작업 → 허용
-3. 결과: 허용
-```
-
-### 시나리오 2: 큐레이터가 코드 실행 원함
-
-```
-AI (큐레이터): "코드를 컴파일하고 실행하고 싶습니다"
-↓
-권한 체인:
-1. 빈도 캐시? 캐시된 결정 없음
-2. 콜백? compile:execute = AskUser 반환
-3. IsCurator? 참 → 사용자에게 문의
-4. 사용자 승인 → 빈도 캐시에 기록
+퍼미션 체인:
+1. UserFrequencyCache? 캐시된 결정 없음
+2. IPermissionCallback? AskUser 반환 (명시적으로 허용되지 않음)
+3. IsCurator? 아니오 → GlobalACL 확인
+4. GlobalACL? 규칙 발견: file:... = Allowed
 5. 결과: 허용
 ```
 
-### 시나리오 3: 비큐레이터가 네트워크 접근 원함
+### 시나리오 2: AI가 코드를 실행하려는 경우
 
 ```
-AI (비큐레이터): "HTTP 요청을 보내야 합니다"
+AI: "코드를 컴파일하고 실행하고 싶습니다"
 ↓
-권한 체인:
-1. 빈도 캐시? 캐시된 결정 없음
-2. 콜백? network:http = AskUser 반환
-3. IsCurator? 거짓 → GlobalACL 확인
-4. GlobalACL? 규칙 없음
-5. 결과: 거부 (기본 거부)
+퍼미션 체인:
+1. UserFrequencyCache? 캐시된 결정 없음
+2. IPermissionCallback? AskUser 반환
+3. IsCurator? 예 → IPermissionAskHandler
+4. 사용자 승인
+5. 결과: 허용
 ```
 
-### 시나리오 4: 속도 제한 초과
+### 시나리오 3: 캐시된 거부
 
 ```
-AI: "100개의 HTTP 요청을 보내야 합니다"
+AI: "C:\Windows에 접근해야 합니다"
 ↓
-권한 체인:
-1. 빈도 캐시? 고빈도 거부 캐시에 일치 → 거부
-2. 결과: 거부
+퍼미션 체인:
+1. UserFrequencyCache? HighDeny 캐시에서 발견
+2. 결과: 거부 (추가 확인 없음)
 ```
 
 ## 문제 해결
 
-### 예기치 않은 권한 거부
+### 예기치 않은 퍼미션 거부
 
 **확인**:
-1. 사용자의 IsCurator 상태 — 비큐레이터는 GlobalACL에서 명시적 허용 필요
-2. 빈도 캐시 설정 — HighDeny 캐시가 HighAllow보다 우선
-3. 콜백 로직 — AskUser 반환 시 큐레이터와 비큐레이터 분기 다름
-4. GlobalACL 규칙 — 비큐레이터의 경우 ACL에 명시적 규칙 필요
+1. 사용자의 IsCurator 상태
+2. 빈도 캐시의 HighDeny 항목
+3. GlobalACL 규칙
+4. 콜백 로직
 5. 사용자 응답 타임아웃
 
-### 권한 만료 안 됨
+### 퍼미션이 만료되지 않는 경우
 
 **확인**:
-- `expiresAt` 필드 올바르게 설정
-- 시간대 정확
+- `expiresAt` 필드가 올바르게 설정됨
+- 시간대가 정확함
 - 클록 동기화
 
-### 감사 로그 기록 안 됨
+### 감사 로그가 기록되지 않는 경우
 
 **확인**:
-- 감사 로거 등록됨
-- 저장소 백엔드 접근 가능
+- 감사 로거가 등록됨
+- 스토리지 백엔드에 접근 가능
 - 디스크 공간 충분
 
 ## 다음 단계

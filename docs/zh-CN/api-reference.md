@@ -760,6 +760,56 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 返回指定项目的任务管理页面。
 
+### 项目工具权限页面
+
+**GET** `/project/{id}/tool-permissions`
+
+路径参数：`id` — 项目 ID
+
+返回指定项目的工具权限管理页面。
+
+### 项目工作流页面
+
+**GET** `/project/{id}/workflow`
+
+路径参数：`id` — 项目 ID
+
+返回指定项目的工作流管理页面。
+
+### 获取项目工作流详情
+
+**GET** `/api/projects/workflow-detail`
+
+查询参数：`projectId` — 项目 ID
+
+返回项目关联的工作流详情。
+
+### 分配项目角色
+
+**POST** `/api/projects/assign-role`
+
+**请求体**：
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid",
+  "roleName": "developer"
+}
+```
+
+### 移除项目角色
+
+**POST** `/api/projects/remove-role`
+
+**请求体**：
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid",
+  "roleName": "developer"
+}
+```
+
 ### 获取项目列表
 
 **GET** `/api/projects/list`
@@ -964,6 +1014,77 @@ data: {"type": "complete", "sessionId": "uuid"}
 路径参数：`id` — 项目 ID
 
 取消项目任务。
+
+---
+
+## 工具权限管理
+
+### 获取硅基生命体工具权限
+
+**GET** `/api/beings/tool-permissions`
+
+查询参数：`beingId` — 硅基生命体 ID
+
+返回指定硅基生命体的工具权限配置。
+
+### 更新硅基生命体工具权限
+
+**PUT** `/api/beings/tool-permissions`
+
+**请求体**：
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "network": "allowed",
+    "disk_read": "allowed",
+    "disk_write": "denied"
+  }
+}
+```
+
+### 获取工具权限模板
+
+**GET** `/api/beings/tool-permissions/templates`
+
+返回可用的工具权限模板列表。
+
+### 应用工具权限模板
+
+**POST** `/api/beings/tool-permissions/apply-template`
+
+**请求体**：
+```json
+{
+  "beingId": "being-uuid",
+  "templateName": "readonly"
+}
+```
+
+### 获取项目工具权限
+
+**GET** `/api/projects/{id}/tool-permissions`
+
+路径参数：`id` — 项目 ID
+
+返回指定项目的工具权限配置。
+
+### 更新项目工具权限
+
+**PUT** `/api/projects/{id}/tool-permissions`
+
+路径参数：`id` — 项目 ID
+
+**请求体**：
+```json
+{
+  "permissions": {
+    "network": "allowed",
+    "disk_read": "allowed",
+    "disk_write": "denied"
+  }
+}
+```
 
 ---
 

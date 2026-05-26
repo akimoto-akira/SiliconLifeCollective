@@ -1,12 +1,12 @@
-﻿# Przewodnik Web UI
+# Przewodnik Web UI
 
 > **Wersja: v0.2.0-alpha**
 
-[English](../en/web-ui-guide.md) | [Deutsch](../de-DE/web-ui-guide.md) | [中文](../zh-CN/web-ui-guide.md) | [繁體中文](../zh-HK/web-ui-guide.md) | [Español](../es-ES/web-ui-guide.md) | [日本語](../ja-JP/web-ui-guide.md) | [한국어](../ko-KR/web-ui-guide.md) | [Čeština](../cs-CZ/web-ui-guide.md) | [Русский](../ru-RU/web-ui-guide.md) | [Polski](../pl-PL/web-ui-guide.md)
+[English](../en/web-ui-guide.md) | [Deutsch](../de-DE/web-ui-guide.md) | [中文](../zh-CN/web-ui-guide.md) | [繁體中文](../zh-HK/web-ui-guide.md) | [Español](../es-ES/web-ui-guide.md) | [日本語](../ja-JP/web-ui-guide.md) | [한국어](../ko-KR/web-ui-guide.md) | [Čeština](../cs-CZ/web-ui-guide.md) | [Русский](../ru-RU/web-ui-guide.md)
 
 ## Przegląd
 
-Web UI zapewnia kompleksowy interfejs do zarządzania Istotami Krzemowymi, monitorowania stanu systemu i interakcji z agentami AI. System wykorzystuje architekturę renderowania po stronie serwera, z zerowymi zależnościami od frameworków frontendowych, generując HTML, CSS i JavaScript poprzez kreatory `H`, `CssBuilder` i `JsBuilder`.
+Web UI zapewnia kompleksowy interfejs do zarządzania Istotami Krzemowymi, monitorowania stanu systemu i interakcji z agentami AI. System wykorzystuje architekturę czystego renderowania po stronie serwera, bez zależności od frameworków frontendowych, generując HTML, CSS i JavaScript przez konstruktory `H`, `CssBuilder` i `JsBuilder`.
 
 ## Dostęp
 
@@ -16,39 +16,39 @@ Domyślny URL: `http://localhost:8080`
 
 ### Główne sekcje
 
-1. **Pulpit nawigacyjny** - Przegląd systemu i wskaźniki
-2. **Istoty** - Zarządzanie Istotami Krzemowymi
-3. **Czat** - Interakcja z istotami (obsługa przesyłania plików, SSE w czasie rzeczywistym)
-4. **Historia czatu** - Przeglądanie historii czatu Istot Krzemowych (lista sesji, szczegóły wiadomości)
-5. **Zadania** - Zarządzanie zadaniami (zadania osobiste)
-6. **Czasomierze** - Konfiguracja czasomierzy (tworzenie, wstrzymywanie, historia wykonania)
-7. **Konfiguracja** - Ustawienia systemu (klienci AI, lokalizacja)
-8. **Uprawnienia** - Kontrola dostępu (zarządzanie ACL, zapytania o uprawnienia)
-9. **Logi** - Logi systemowe (filtrowanie według poziomu, zapytania o zakres czasowy)
-10. **Audyt** - Użycie Tokenów i ślad audytu
-11. **Pamięć** - Pamięć istot (widok osi czasu, zaawansowane filtrowanie)
-12. **Wiedza** - Baza wiedzy (zarządzanie trójkami, odkrywanie ścieżek)
-13. **Przeglądarka kodu** - Eksploracja kodu (drzewo plików, podświetlanie składni)
-14. **Edytor kodu** - Edycja kodu z podpowiedziami przy najechaniu (Monaco Editor)
-15. **Projekty** - Zarządzanie projektami (obszary robocze, zadania, notatki pracy)
-16. **Wykonawcy** - Zarządzanie wykonawcami (dyskowy, sieciowy, wiersz poleceń)
-17. **Pomoc** - System dokumentacji pomocy (obsługa wielojęzyczna, wyszukiwanie tematyczne)
-18. **O systemie** - Informacje o systemie i wersja
+1. **Panel nawigacyjny** — przegląd systemu i wskaźniki
+2. **Istoty** — zarządzanie Istotami Krzemowymi
+3. **Czat** — interakcja z istotami (obsługa przesyłania plików, SSE w czasie rzeczywistym)
+4. **Historia czatu** — przeglądanie historii czatu Istot Krzemowych (lista sesji, szczegóły wiadomości)
+5. **Zadania** — zarządzanie zadaniami (zadania osobiste)
+6. **Czasomierze** — konfiguracja czasomierzy (tworzenie, wstrzymywanie, historia wykonania)
+7. **Konfiguracja** — ustawienia systemu (klienci AI, lokalizacja)
+8. **Uprawnienia** — kontrola dostępu (zarządzanie ACL, zapytania o uprawnienia)
+9. **Logi** — logi systemowe (filtrowanie według poziomu, zapytania o zakres czasu)
+10. **Audyt** — użycie tokenów i ślad audytu
+11. **Pamięć** — pamięć istot (widok osi czasu, zaawansowane filtrowanie)
+12. **Wiedza** — baza wiedzy (zarządzanie trójkami, odkrywanie ścieżek)
+13. **Przeglądarka kodu** — eksploracja kodu (drzewo plików, podświetlanie składni)
+14. **Edytor kodu** — edycja kodu z podpowiedziami (Monaco Editor)
+15. **Projekty** — zarządzanie projektami (obszar roboczy, zadania, notatki pracy)
+16. **Wykonawcy** — zarządzanie wykonawcami (dyskowy, sieciowy, wiersza poleceń)
+17. **Pomoc** — system dokumentacji pomocy (obsługa wielojęzyczna, wyszukiwanie tematów)
+18. **O projekcie** — informacje o systemie i wersji
 
 ---
 
-## Pulpit nawigacyjny
+## Panel nawigacyjny
 
 ### Funkcje
 
 - Wskaźniki wydajności systemu (CPU, pamięć, czas działania)
-- Przegląd stanu istot
+- Przegląd statusu istot
 - Statystyki użycia AI
 - Szybkie akcje
 
 ### Aktualizacje w czasie rzeczywistym
 
-Wykorzystanie SSE (zdarzeń wysyłanych przez serwer) do danych w czasie rzeczywistym:
+Wykorzystanie SSE (zdarzeń wysyłanych przez serwer) do pobierania danych w czasie rzeczywistym:
 
 ```javascript
 const dashboard = new EventSource('/api/dashboard/events');
@@ -64,16 +64,16 @@ dashboard.onmessage = (event) => {
 
 ### Lista istot
 
-Wyświetla wszystkie istoty, zawierające:
-- Nazwę i ID
-- Bieżący stan (uruchomiona/zatrzymana/błąd)
-- Link do pliku duszy
+Wyświetla wszystkie istoty, zawierając:
+- Nazwę i identyfikator
+- Bieżący status (uruchomiona/zatrzymana/błąd)
+- Link do Pliku Duszy
 - Szybkie akcje (uruchom/zatrzymaj/konfiguruj)
 
 ### Szczegóły istoty
 
 - Pełna konfiguracja
-- Edytor pliku duszy
+- Edytor Pliku Duszy
 - Historia zadań
 - Przeglądarka pamięci
 - Wskaźniki wydajności
@@ -82,9 +82,9 @@ Wyświetla wszystkie istoty, zawierające:
 
 1. Kliknij **Utwórz nową istotę**
 2. Wypełnij:
-   - Nazwę
+   - Nazwa
    - Treść duszy (edytor Markdown)
-   - Konfigurację początkową
+   - Konfiguracja początkowa
 3. Kliknij **Utwórz**
 
 ---
@@ -93,7 +93,7 @@ Wyświetla wszystkie istoty, zawierające:
 
 ### Funkcje
 
-- Strumieniowanie wiadomości w czasie rzeczywistym
+- Strumień wiadomości w czasie rzeczywistym
 - Historia wiadomości
 - Obsługa wielu sesji
 - Wizualizacja wywołań narzędzi
@@ -111,7 +111,7 @@ Gdy AI wywołuje narzędzie:
 ```
 🔧 Narzędzie: calendar
 📥 Wejście: {"date": "2026-04-20"}
-📤 Wyjście: "Księżycowy 4. miesiąc, 3. dzień"
+📤 Wyjście: "Czwarty miesiąc księżycowy, trzeci dzień"
 ```
 
 ---
@@ -121,26 +121,26 @@ Gdy AI wywołuje narzędzie:
 ### Klienci AI
 
 Konfiguracja backendów AI:
-- Ollama (lokalne)
-- Bailian (chmura)
-- Volcengine Ark (chmura)
-- Klienci niestandardowi
+- Ollama (lokalna)
+- Bailian (chmurowa)
+- Volcengine Ark (chmurowa)
+- Niestandardowi klienci
 
 ### Ustawienia przechowywania
 
-- Wersja Default: ścieżka bazowa, indeks czasowy, zasady oczyszczania
-- Wersja Fast: konfiguracja silnika przechowywania SpeedyPack, zarządzanie plikami .spk, ustawienia automatycznej kompresji
+- Wersja Default: ścieżka bazowa, indeksowanie czasowe, zasady czyszczenia
+- Wersja Fast: konfiguracja silnika przechowywania SpeedyPack, zarządzanie plikami .spk, ustawienia automatycznej kompakcji
 
 ### Lokalizacja
 
-Przełączanie między 29 wariantami językowymi:
-- Chiński (6): uproszczony, tradycyjny Hongkong, tradycyjny Tajwan, tradycyjny Makau, singapurski, malezyjski
+Przełączanie między 34 wariantami językowymi:
+- Chiński (6): uproszczony, tradycyjny, Singapur, Makau, Tajwan, Malezja
 - Angielski (10): amerykański, brytyjski, kanadyjski, australijski, indyjski, singapurski, południowoafrykański, irlandzki, nowozelandzki, malezyjski
 - Hiszpański (2): hiszpański, meksykański
 - Niemiecki (5): niemiecki, austriacki, szwajcarski, luksemburski, liechtensteiński
 - Francuski (3): francuski, kanadyjski, szwajcarski
 - Japoński, koreański, czeski
-- Polski
+- Rosyjski, portugalski (2), włoski, niderlandzki, polski, szwedzki
 
 ---
 
@@ -148,30 +148,30 @@ Przełączanie między 29 wariantami językowymi:
 
 ### Dostępne skórki
 
-1. **Admin** - Profesjonalny interfejs zarządczy
-2. **Chat** - Projekt skoncentrowany na rozmowie
-3. **Creative** - Styl kreatywny i artystyczny
-4. **Dev** - Układ zorientowany na deweloperów
-5. **HighContrast** - Motyw wysokiego kontrastu (wersja Fast)
-6. **Minimal** - Styl minimalistyczny (wersja Fast)
-7. **Light** - Jasny motyw (wersja Fast)
+1. **Admin** — profesjonalny interfejs zarządzania
+2. **Chat** — design zorientowany na konwersację
+3. **Creative** — styl kreatywny i artystyczny
+4. **Dev** — układ zorientowany na deweloperów
+5. **HighContrast** — motyw o wysokim kontraście (wersja Fast)
+6. **Minimal** — styl minimalistyczny (wersja Fast)
+7. **Light** — jasny motyw (wersja Fast)
 
 ### Przełączanie skórek
 
 1. Kliknij **Ustawienia** (ikona zębatki)
-2. Wybierz **Skórka**
-3. Wybierz pożądaną skórkę
-4. Interfejs aktualizuje się natychmiast
+2. Wybierz **Skórki**
+3. Wybierz żądaną skórkę
+4. Interfejs natychmiast się aktualizuje
 
-### Niestandardowa skórka
+### Niestandardowe skórki
 
-Utwórz niestandardową skórkę implementując `ISkin`:
+Tworzenie niestandardowych skórek przez implementację `ISkin`:
 
 ```csharp
 public class MySkin : ISkin
 {
     public string Name => "MySkin";
-
+    
     public string GetCss()
     {
         return ":root { --primary: #color; }";
@@ -183,30 +183,45 @@ public class MySkin : ISkin
 
 ## Zarządzanie uprawnieniami
 
-### Przegląd uprawnień
+### Przeglądanie uprawnień
 
 - Lista wszystkich reguł uprawnień
 - Filtrowanie według użytkownika lub zasobu
-- Przegląd dat wygaśnięcia
+- Przeglądanie dat wygaśnięcia
 
-### Dodawanie reguły uprawnień
+### Dodawanie reguł uprawnień
 
 1. Kliknij **Dodaj regułę**
 2. Skonfiguruj:
-   - Użytkownika
-   - Zasób (np. `disk:read`)
+   - Typ uprawnień (np. `FileAccess`, `NetworkAccess`)
+   - Prefiks zasobu (np. `C:\Projects`, `api.github.com`)
    - Zezwól/Odmów
-   - Czas trwania
+   - Opis
 3. Zapisz
 
 ### Ślad audytu
 
-Przegląd wszystkich decyzji dotyczących uprawnień:
+Przeglądanie wszystkich decyzji dotyczących uprawnień:
 - Znacznik czasu
 - Użytkownik
 - Zasób
 - Decyzja
 - Przyczyna
+
+### Zarządzanie uprawnieniami narzędzi
+
+Zarządzanie uprawnieniami operacji narzędzi dla Istot Krzemowych i projektów:
+
+1. **Uprawnienia narzędzi Istoty Krzemowej**:
+   - Przejdź do **Istoty** → wybierz istotę → **Uprawnienia narzędzi**
+   - Przeglądaj bieżącą konfigurację uprawnień
+   - Ustaw zezwolenie/odmowę dla każdej operacji
+   - Zastosuj szablon uprawnień (readonly/restricted/full)
+
+2. **Uprawnienia narzędzi projektu**:
+   - Przejdź do **Projekty** → wybierz projekt → **Uprawnienia narzędzi**
+   - Uprawnienia narzędzi na poziomie projektu są niezależne od uprawnień na poziomie Istoty Krzemowej
+   - Realizują izolację uprawnień między projektami
 
 ---
 
@@ -214,7 +229,7 @@ Przegląd wszystkich decyzji dotyczących uprawnień:
 
 ### Lista zadań
 
-- Wszystkie zadania wraz ze statusem
+- Wszystkie zadania i ich status
 - Filtrowanie według istoty lub statusu
 - Wskaźniki priorytetu
 
@@ -243,7 +258,7 @@ Przegląd wszystkich decyzji dotyczących uprawnień:
 ### Aktywne czasomierze
 
 - Lista uruchomionych czasomierzy
-- Następny czas wykonania
+- Czas następnego wykonania
 - Status powtarzania
 
 ### Tworzenie czasomierza
@@ -252,7 +267,7 @@ Przegląd wszystkich decyzji dotyczących uprawnień:
 2. Skonfiguruj:
    - Przypisanie istoty
    - Interwał lub wyrażenie cron
-   - Akcję do wykonania
+   - Akcja do wykonania
    - Ustawienia powtarzania
 3. Uruchom
 
@@ -263,11 +278,11 @@ Przegląd wszystkich decyzji dotyczących uprawnień:
 ### Funkcje
 
 - Filtrowanie według poziomu (informacja/ostrzeżenie/błąd)
-- Wyszukiwanie według słów kluczowych
-- Wybór zakresu czasowego
+- Wyszukiwanie po słowach kluczowych
+- Wybór zakresu czasu
 - Aktualizacje w czasie rzeczywistym
 
-### Szczegóły logów
+### Szczegóły logu
 
 Każdy wpis logu wyświetla:
 - Znacznik czasu
@@ -278,18 +293,18 @@ Każdy wpis logu wyświetla:
 
 ---
 
-## Raporty audytowe
+## Raport audytu
 
-### Użycie Tokenów
+### Użycie tokenów
 
-- Łączna liczba użytych tokenów
+- Całkowita liczba wykorzystanych tokenów
 - Podział według modeli
 - Kalkulacja kosztów
 - Wykresy oparte na czasie
 
-### Eksport raportów
+### Eksport raportu
 
-Pobierz dane audytowe:
+Pobieranie danych audytu:
 - Format CSV
 - Wybór zakresu dat
 - Filtrowanie według istoty lub modelu
@@ -302,10 +317,10 @@ Pobierz dane audytowe:
 
 - Podświetlanie składni (Monaco Editor)
 - Uzupełnianie kodu
-- Podpowiedzi przy najechaniu na identyfikatory
+- Podpowiedzi dla identyfikatorów
 - Kompilacja w czasie rzeczywistym
 
-### Podpowiedzi przy najechaniu
+### Podpowiedzi
 
 Najedź kursorem na dowolnym identyfikatorze, aby zobaczyć:
 - Informacje o typie
@@ -315,7 +330,7 @@ Najedź kursorem na dowolnym identyfikatorze, aby zobaczyć:
 
 ---
 
-## Przeglądanie historii czatu
+## Przegląd historii czatu
 
 ### Funkcje
 
@@ -328,7 +343,7 @@ Najedź kursorem na dowolnym identyfikatorze, aby zobaczyć:
 
 1. Przejdź do strony **Istoty**
 2. Kliknij link **Historia czatu** Istoty Krzemowej
-3. Przejrzyj listę sesji:
+3. Przeglądaj listę sesji:
    - Tytuł sesji
    - Czas utworzenia
    - Liczba wiadomości
@@ -343,11 +358,11 @@ Najedź kursorem na dowolnym identyfikatorze, aby zobaczyć:
 - **Kontroler**: `ChatHistoryController`
 - **Model widoku**: `ChatHistoryViewModel`
 - **Widoki**:
-  - `ChatHistoryListView` - Lista sesji
-  - `ChatHistoryDetailView` - Szczegóły wiadomości
+  - `ChatHistoryListView` — lista sesji
+  - `ChatHistoryDetailView` — szczegóły wiadomości
 - **Trasy API**:
-  - `/api/chat-history/{beingId}/conversations` - Pobierz listę sesji
-  - `/api/chat-history/{beingId}/conversation/{conversationId}` - Pobierz szczegóły wiadomości
+  - `/api/chat-history/{beingId}/conversations` — pobranie listy sesji
+  - `/api/chat-history/{beingId}/conversation/{conversationId}` — pobranie szczegółów wiadomości
 
 ---
 
@@ -355,15 +370,15 @@ Najedź kursorem na dowolnym identyfikatorze, aby zobaczyć:
 
 ### Funkcje
 
-- Okno dialogowe źródła plików
-- Obsługa przesyłania wielu plików
-- Zarządzanie metadanymi plików
+- Okno dialogowe źródła pliku
+- Obsługa wieloplikowego przesyłania
+- Zarządzanie metadanymi pliku
 - Wyświetlanie postępu przesyłania
 
 ### Korzystanie z przesyłania plików
 
 1. W interfejsie czatu kliknij przycisk **Prześlij plik**
-2. Otworzy się okno dialogowe źródła plików
+2. Otworzy się okno dialogowe źródła pliku
 3. Wybierz źródło pliku:
    - Plik lokalny
    - Ścieżka systemu plików
@@ -376,24 +391,24 @@ Najedź kursorem na dowolnym identyfikatorze, aby zobaczyć:
 - Pliki tekstowe (.txt, .md, .json, .xml, itp.)
 - Pliki kodu (.cs, .js, .py, .java, itp.)
 - Pliki konfiguracyjne (.yml, .yaml, .ini, .conf, itp.)
-- Pliki dokumentowe (.csv, .log, itp.)
+- Pliki dokumentów (.csv, .log, itp.)
 
 ---
 
-## Wskaźniki ładowania
+## Wskaźnik ładowania
 
 ### Funkcje
 
-- Wyświetlanie stanu ładowania strony czatu
-- Automatyczny wybór sesji kuratora
+- Wyświetlanie statusu ładowania strony czatu
+- Automatyczny wybór sesji Kuratora
 - Informacja zwrotna o postępie ładowania danych
 
 ### Zachowanie
 
-- Animacja ładowania podczas ładowania strony
+- Wyświetlanie animacji ładowania podczas ładowania strony
 - Automatyczne ukrywanie po zakończeniu ładowania danych
-- Automatyczne zaznaczenie sesji kuratora (jeśli istnieje)
-- Wielojęzyczne teksty wskazówek ładowania
+- Automatyczne zaznaczenie sesji Kuratora (jeśli istnieje)
+- Wielojęzyczne teksty wskazujące ładowanie
 
 ---
 
@@ -401,28 +416,28 @@ Najedź kursorem na dowolnym identyfikatorze, aby zobaczyć:
 
 ### Przegląd funkcji
 
-System dokumentacji pomocy zapewnia wielojęzyczne wsparcie dokumentacji pomocy dla Istot Krzemowych i użytkowników.
+System dokumentacji pomocy zapewnia wielojęzyczną obsługę dokumentacji pomocy dla Istot Krzemowych i użytkowników.
 
 ### Korzystanie z dokumentacji pomocy
 
 1. Przejdź do strony **Pomoc**
-2. Przejrzyj listę tematów pomocy:
+2. Przeglądaj listę tematów pomocy:
    - Przewodnik szybkiego startu
-   - Referencja użycia narzędzi
+   - Referencja korzystania z narzędzi
    - Przewodnik zarządzania uprawnieniami
    - Podręcznik rozwiązywania problemów
-   - Przewodnik rozwoju
+   - Przewodnik deweloperski
 3. Kliknij temat, aby zobaczyć szczegółową treść:
    - Ustrukturyzowana treść dokumentacji (renderowanie Markdown)
-   - Obsługa wielu języków (zgodnie z ustawieniami lokalizacji systemu)
+   - Obsługa wielojęzyczna (zgodna z ustawieniami lokalizacji systemu)
    - Rekomendacje powiązanych tematów
 4. Użyj funkcji wyszukiwania do szybkiej lokalizacji:
-   - Wyszukiwanie słów kluczowych (obsługa chińskiego, angielskiego)
+   - Wyszukiwanie po słowach kluczowych (obsługa chińskiego i angielskiego)
    - Wyniki wyszukiwania posortowane według trafności
 
 ### Dostęp Istot Krzemowych do pomocy
 
-Istoty Krzemowe mogą uzyskać dostęp do dokumentacji pomocy za pomocą narzędzia `help`:
+Istoty Krzemowe mogą uzyskać dostęp do dokumentacji pomocy przez narzędzie `help`:
 ```json
 {
   "action": "get_topics"
@@ -434,17 +449,17 @@ Istoty Krzemowe mogą uzyskać dostęp do dokumentacji pomocy za pomocą narzęd
 - **Kontroler**: `HelpController`
 - **Narzędzie**: `HelpTool`
 - **Trasy API**:
-  - `/api/help` - Pobierz listę tematów pomocy
-  - `/api/help/{topicId}` - Pobierz szczegóły tematu
-  - `/api/help/search?q=keyword` - Wyszukaj dokumentację pomocy
+  - `/api/help` — pobranie listy tematów pomocy
+  - `/api/help/{topicId}` — pobranie szczegółów tematu
+  - `/api/help/search?q=keyword` — wyszukiwanie dokumentacji pomocy
 
 ---
 
-## Obszar roboczy projektów (nowość)
+## Obszar roboczy projektu (nowość)
 
 ### Przegląd funkcji
 
-Obszar roboczy projektów zapewnia ustrukturyzowane środowisko pracy, obsługujące zarządzanie projektami, śledzenie zadań i notatki robocze.
+Obszar roboczy projektu zapewnia ustrukturyzowane środowisko pracy, obsługujące zarządzanie projektami, śledzenie zadań i notatki pracy.
 
 ### Zarządzanie projektami
 
@@ -455,23 +470,32 @@ Obszar roboczy projektów zapewnia ustrukturyzowane środowisko pracy, obsługuj
 2. **Przegląd szczegółów projektu**:
    - Podstawowe informacje o projekcie
    - Lista powiązanych zadań
-   - Lista notatek roboczych
+   - Lista notatek pracy
    - Statystyki postępu projektu
-3. **Archiwizacja projektu**: Zachowanie danych historycznych bez aktywnej aktywności
+3. **Archiwizacja projektu**: zachowanie danych historycznych, ale projekt nie jest już aktywny
+4. **Zarządzanie rolami projektowymi**:
+   - Przypisywanie ról projektowych Istotom Krzemowym (np. developer, reviewer, manager)
+   - Usuwanie przypisań ról
+   - Przeglądanie listy członków i ról projektu
+5. **Przepływ pracy projektu**:
+   - Przeglądanie listy szablonów przepływu pracy
+   - Powiązanie szablonu przepływu pracy z projektem
+   - Przeglądanie statusu instancji przepływu pracy
+   - Przeglądanie dzienników wykonania przepływu pracy
 
-### Notatki robocze (prywatne)
+### Notatki pracy (prywatne)
 
-Osobiste notatki robocze Istot Krzemowych, podobne do dziennika:
+Osobiste notatki pracy Istoty Krzemowej, podobne do dziennika:
 
 1. **Tworzenie notatki**:
    - Podsumowanie (krótki opis)
-   - Treść (obsługa formatu Markdown)
+   - Treść (obsługa formatowania Markdown)
    - Słowa kluczowe (do wyszukiwania)
-   - Automatyczny znacznik czasu
+   - Automatyczne rejestrowanie znacznika czasu
 2. **Zarządzanie notatkami**:
    - Przeglądanie według osi czasu (projekt stronicowy)
-   - Wyszukiwanie notatek (według słów kluczowych, podsumowania, treści)
-   - Generowanie katalogu (szybki przegląd struktury notatek)
+   - Wyszukiwanie notatek (po słowach kluczowych, podsumowaniu, treści)
+   - Generowanie spisu treści (szybki przegląd struktury notatek)
    - Aktualizacja i usuwanie notatek
 3. **Kontrola uprawnień**:
    - Domyślnie prywatne, dostępne tylko dla samej istoty
@@ -482,11 +506,11 @@ Osobiste notatki robocze Istot Krzemowych, podobne do dziennika:
 - **Kontroler**: `WorkNoteController`
 - **Narzędzia**: `WorkNoteTool`, `ProjectTool`, `ProjectWorkNoteTool`
 - **Trasy API**:
-  - `/api/worknotes` - Pobierz listę notatek roboczych
-  - `/api/worknotes/{id}` - Pobierz szczegóły notatki
-  - `/api/worknotes/search?q=keyword` - Wyszukaj notatki
-  - `/api/worknotes/directory` - Generuj katalog notatek
-  - `/api/projects` - API zarządzania projektami
+  - `/api/worknotes` — pobranie listy notatek pracy
+  - `/api/worknotes/{id}` — pobranie szczegółów notatki
+  - `/api/worknotes/search?q=keyword` — wyszukiwanie notatek
+  - `/api/worknotes/directory` — generowanie spisu treści notatek
+  - `/api/projects` — API zarządzania projektami
 
 ---
 
@@ -494,8 +518,8 @@ Osobiste notatki robocze Istot Krzemowych, podobne do dziennika:
 
 Web UI dostosowuje się do różnych rozmiarów ekranu:
 - Pulpit: pełny układ
-- Tablet: skompresowany pasek boczny
-- Urządzenie mobilne: składane menu
+- Tablet: zwinięty pasek boczny
+- Mobilny: składane menu
 
 ---
 
@@ -504,15 +528,15 @@ Web UI dostosowuje się do różnych rozmiarów ekranu:
 | Skrót | Akcja |
 |----------|--------|
 | `Ctrl+K` | Szybkie wyszukiwanie |
-| `Ctrl+B` | Przełącz pasek boczny |
-| `Ctrl+Enter` | Wyślij wiadomość |
+| `Ctrl+B` | Przełączanie paska bocznego |
+| `Ctrl+Enter` | Wysłanie wiadomości |
 | `Esc` | Anuluj/Zamknij |
 
 ---
 
 ## Rozwiązywanie problemów
 
-### Nie można połączyć
+### Brak połączenia
 
 **Sprawdź**:
 - Serwer jest uruchomiony
@@ -523,21 +547,21 @@ Web UI dostosowuje się do różnych rozmiarów ekranu:
 
 **Sprawdź**:
 - Przeglądarka obsługuje SSE
-- Brak buforowania proxy dla SSE
+- Brak buforowania SSE przez proxy
 - Stabilność sieci
 
-### Wolna wydajność
+### Niska wydajność
 
 **Optymalizacja**:
-- Zmniejsz poziom szczegółowości logów
-- Oczyść stare dane audytowe
+- Zmniejsz szczegółowość logów
+- Oczyść stare dane audytu
 - Sprawdź zasoby systemowe
 
 ---
 
 ## Następne kroki
 
-- 📚 Przeczytaj [Przewodnik architektury](architecture.md)
-- 🛠️ Zobacz [Przewodnik rozwoju](development-guide.md)
-- 📖 Przeglądaj [Referencję API](api-reference.md)
-- 🚀 Zobacz [Przewodnik szybkiego startu](getting-started.md)
+- 📚 Przeczytaj [przewodnik architektury](architecture.md)
+- 🛠️ Zobacz [przewodnik deweloperski](development-guide.md)
+- 📖 Przeglądaj [referencję API](api-reference.md)
+- 🚀 Zobacz [przewodnik szybkiego startu](getting-started.md)

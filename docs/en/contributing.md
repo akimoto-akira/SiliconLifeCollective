@@ -2,6 +2,8 @@
 
 > **Version: v0.2.0-alpha**
 
+[**English**](../en/contributing.md) | [Deutsch](../de-DE/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md) | [Русский](../ru-RU/contributing.md)
+
 Thank you for your interest in contributing to SiliconLifeCollective!
 
 ## Dual-Version Contribution
@@ -14,9 +16,9 @@ This project has two implementation versions. You can choose your contribution d
 - **Suitable For**: All developers
 
 ### SiliconLife.Fast (High-Performance Version)
-- **Tech Stack**: .NET 9 Windows Forms Application
-- **Contribution Direction**: Performance optimization, SpeedyPack storage, system tray, lock-free concurrency
-- **Suitable For**: Developers with Windows development experience and interest in performance optimization
+- **Tech Stack**: .NET 9 Cross-Platform Desktop Application (Avalonia UI)
+- **Contribution Direction**: Performance optimization, SpeedyPack Storage Engine, system tray, lock-free concurrency
+- **Suitable For**: Developers with desktop development experience and interest in performance optimization
 
 > **Important Note**: Both versions share the SiliconLife.Core and SiliconLife.Common projects. Improvements to core interfaces will affect both versions simultaneously.
 
@@ -122,7 +124,7 @@ refactor(web): simplify controller structure
    ```bash
    # Run all tests
    dotnet test
-   
+
    # Build in release mode
    dotnet build --configuration Release
    ```
@@ -263,10 +265,10 @@ public void MyFeature_ShouldWork_AsExpected()
 {
     // Arrange
     var service = new MyService();
-    
+
     // Act
     var result = service.DoSomething();
-    
+
     // Assert
     Assert.IsTrue(result.Success);
 }

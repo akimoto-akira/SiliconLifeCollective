@@ -1,50 +1,50 @@
-﻿# Riferimento API
+# Riferimento API
 
-> **Versione : v0.2.0-alpha**
+> **Versione: v0.2.0-alpha**
 
-[English](../en/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [Français](../fr-FR/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md) | [Русский](../ru-RU/api-reference.md) | **Italiano**
+[English](../en/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md) | [Русский](../ru-RU/api-reference.md) | **Italiano**
 
-## Endpoint dell'API Web
+## Endpoint Web API
 
-URL di base : `http://localhost:8080`
+URL di base: `http://localhost:8080`
 
 ### Autenticazione
 
-La maggior parte degli endpoint richiede l'autenticazione tramite cookie di sessione gestiti dall'interfaccia Web. Prima dell'inizializzazione del sistema, tutte le richieste verranno reindirizzate alla pagina di inizializzazione, ad eccezione della pagina di aiuto.
+La maggior parte degli endpoint richiede l'autenticazione tramite cookie di sessione gestiti dalla Web UI. Prima dell'inizializzazione del sistema, tutte le richieste, ad eccezione della pagina di aiuto, verranno reindirizzate alla pagina di inizializzazione.
 
 ---
 
 ## Dashboard
 
-### Ottenere le statistiche della dashboard
+### Ottieni Statistiche Dashboard
 
 **GET** `/api/dashboard/stats`
 
-Restituisce i dati di panoramica del sistema (numero di esseri, stato di esecuzione, ecc.).
+Restituisce dati di panoramica del sistema (numero di esseri, stato di esecuzione, ecc.).
 
-### Ottenere le metriche delle prestazioni
+### Ottieni Metriche delle Prestazioni
 
 **GET** `/api/dashboard/metrics`
 
-Restituisce i dati delle metriche delle prestazioni in tempo reale.
+Restituisce dati delle metriche delle prestazioni in tempo reale.
 
 ---
 
-## Sistema di chat
+## Sistema di Chat
 
-### Pagina della chat
+### Pagina Chat
 
 **GET** `/chat`
 
-Restituisce la pagina dell'interfaccia della chat.
+Restituisce la pagina dell'interfaccia di chat.
 
-### Chat in streaming (SSE)
+### Chat in Streaming (SSE)
 
 **GET** `/api/chat/stream`
 
-Chat in streaming tramite Server-Sent Events (SSE). Non richiede parametri, il flusso invia automaticamente gli eventi di tutte le sessioni attive.
+Chat in streaming tramite Server-Sent Events (SSE).
 
-**Risposta** : Flusso Server-Sent Events
+**Risposta**: Flusso di eventi inviati dal server
 
 ```
 data: {"type": "chunk", "content": "I"}
@@ -53,13 +53,13 @@ data: {"type": "chunk", "content": " thinking..."}
 data: {"type": "complete", "sessionId": "uuid"}
 ```
 
-### Ottenere l'elenco delle conversazioni
+### Ottieni Elenco delle Conversazioni
 
 **GET** `/api/chat/conversations`
 
 Restituisce l'elenco di tutte le sessioni di chat attive.
 
-**Esempio di risposta** :
+**Esempio di risposta**:
 ```json
 {
   "conversations": [
@@ -67,7 +67,7 @@ Restituisce l'elenco di tutte le sessioni di chat attive.
       "sessionId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
       "beingId": "being-uuid",
       "type": "single",
-      "displayName": "Chat con Assistente",
+      "displayName": "Chat con XiaoYou",
       "lastMessage": "Contenuto dell'ultimo messaggio",
       "lastTime": "2026-05-20T10:30:00Z"
     }
@@ -75,25 +75,25 @@ Restituisce l'elenco di tutte le sessioni di chat attive.
 }
 ```
 
-### Ottenere la cronologia dei messaggi
+### Ottieni Cronologia dei Messaggi
 
 **GET** `/api/chat/messages`
 
-Parametro di query : `channelId` — ID del canale/sessione
+Parametro di query: `channelId` — ID canale/sessione
 
 Restituisce la cronologia dei messaggi della sessione specificata.
 
-### Ottenere la cronologia chat
+### Ottieni Cronologia Chat
 
 **GET** `/api/chat/history`
 
-Restituisce la cronologia globale della chat.
+Restituisce la cronologia globale delle chat.
 
-### Inviare un messaggio
+### Invia Messaggio
 
 **POST** `/api/chat/send`
 
-**Corpo della richiesta** :
+**Corpo della richiesta**:
 ```json
 {
   "channelId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
@@ -101,7 +101,7 @@ Restituisce la cronologia globale della chat.
 }
 ```
 
-**Risposta** :
+**Risposta**:
 ```json
 {
   "success": true,
@@ -109,20 +109,20 @@ Restituisce la cronologia globale della chat.
 }
 ```
 
-### Interrompere il pensiero dell'IA
+### Ferma il Ragionamento dell'AI
 
 **POST** `/api/chat/stop`
 
-Interrompe la generazione della risposta IA in corso.
+Ferma la generazione della risposta AI in corso.
 
-**Corpo della richiesta** :
+**Corpo della richiesta**:
 ```json
 {
   "channelId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d"
 }
 ```
 
-### Caricare un file
+### Carica File
 
 **POST** `/api/chat/upload`
 
@@ -130,61 +130,61 @@ Carica un file nella sessione di chat (supporta multipart/form-data).
 
 ---
 
-## Gestione dei Silicon Beings
+## Gestione degli Esseri di Silicio
 
-### Pagina di gestione dei Being
+### Pagina Gestione Esseri
 
 **GET** `/beings`
 
-Restituisce la pagina dell'interfaccia di gestione dei Silicon Beings.
+Restituisce la pagina dell'interfaccia di gestione degli Esseri di Silicio.
 
-### Ottenere l'elenco dei Being
+### Ottieni Elenco degli Esseri
 
 **GET** `/api/beings` o **GET** `/api/beings/list`
 
-Restituisce l'elenco di tutti i Silicon Beings registrati.
+Restituisce l'elenco di tutti gli Esseri di Silicio registrati.
 
-**Esempio di risposta** :
+**Esempio di risposta**:
 ```json
 {
   "beings": [
     {
       "id": "being-uuid",
       "name": "Assistant",
-      "activity": "Idle",
+      "status": "running",
       "soulPath": "path/to/soul.md"
     }
   ]
 }
 ```
 
-**Valori di attività** : `Idle` | `SingleChat` | `GroupChat` | `Task` | `Timer` | `Broadcast` | `Project` | `MemoryCompression` | `Stopped`
+**Valori dello stato**: `idle` | `running` | `waiting_permission` | `stopped`
 
-### Ottenere i dettagli di un Being
+### Ottieni Dettagli dell'Essere
 
 **GET** `/api/beings/detail`
 
-Parametro di query : `beingId` — ID del Silicon Being
+Parametro di query: `beingId` — ID dell'Essere di Silicio
 
-Restituisce le informazioni dettagliate del Silicon Being specificato.
+Restituisce informazioni dettagliate sull'Essere di Silicio specificato.
 
-### Ottenere lo stato di attività dei Being
+### Ottieni Stato di Attività degli Esseri
 
 **GET** `/api/beings/activity`
 
-Restituisce le informazioni sullo stato di attività di ciascun Silicon Being.
+Restituisce le informazioni sullo stato di attività di ciascun Essere di Silicio.
 
-### Pagina dell'editor del file anima (soul)
+### Pagina Editor del File dell'Anima
 
 **GET** `/beings/soul`
 
-Restituisce l'interfaccia dell'editor del file anima.
+Restituisce l'interfaccia dell'editor del File dell'Anima.
 
-### Salvare il file anima
+### Salva il File dell'Anima
 
 **POST** `/api/beings/soul/save`
 
-**Corpo della richiesta** :
+**Corpo della richiesta**:
 ```json
 {
   "beingId": "being-uuid",
@@ -192,17 +192,17 @@ Restituisce l'interfaccia dell'editor del file anima.
 }
 ```
 
-### Pagina dell'editor della configurazione IA
+### Pagina Editor Configurazione AI
 
 **GET** `/beings/ai-config`
 
-Restituisce l'interfaccia dell'editor della configurazione IA.
+Restituisce l'interfaccia dell'editor della configurazione AI.
 
-### Salvare la configurazione IA
+### Salva Configurazione AI
 
 **POST** `/api/beings/ai-config/save`
 
-**Corpo della richiesta** :
+**Corpo della richiesta**:
 ```json
 {
   "beingId": "being-uuid",
@@ -215,232 +215,231 @@ Restituisce l'interfaccia dell'editor della configurazione IA.
 }
 ```
 
-### Ottenere l'elenco dei modelli IA disponibili
+### Ottieni Elenco dei Modelli AI Disponibili
 
 **GET** `/api/beings/ai-config/models`
 
-Parametri di query : `clientType`, `apiKey`, `region`
+Parametri di query: `clientType`, `apiKey`, `region`
 
-Restituisce l'elenco dei modelli disponibili per il client IA specificato.
+Restituisce l'elenco dei modelli disponibili per il client AI specificato.
 
 ---
 
-## Visualizzazione cronologia chat
+## Visualizzazione Cronologia Chat
 
-### Pagina della cronologia chat
+### Pagina Cronologia Chat
 
 **GET** `/chat-history`
 
 Restituisce la pagina principale della cronologia chat.
 
-### Pagina dei dettagli della cronologia chat
+### Pagina Dettagli Cronologia Chat
 
 **GET** `/chat-history-detail`
 
-Restituisce la pagina dei dettagli della cronologia chat per una sessione specificata.
+Restituisce la pagina dei dettagli della cronologia chat per la sessione specificata.
 
-### Pagina dei dettagli della cronologia chat di gruppo
+### Pagina Dettagli Cronologia Chat di Gruppo
 
 **GET** `/group-chat-history-detail`
 
 Restituisce la pagina dei dettagli della cronologia della chat di gruppo.
 
-### Pagina dei dettagli della cronologia broadcast
+### Pagina Dettagli Cronologia Trasmissioni
 
 **GET** `/broadcast-history-detail`
 
-Restituisce la pagina dei dettagli della cronologia del canale broadcast.
+Restituisce la pagina dei dettagli della cronologia del canale di trasmissione.
 
-### Ottenere l'elenco delle sessioni storiche
+### Ottieni Elenco delle Sessioni Storiche
 
 **GET** `/api/chat-history/conversations`
 
 Restituisce l'elenco di tutte le sessioni storiche.
 
-### Ottenere i messaggi storici
+### Ottieni Messaggi Storici
 
 **GET** `/api/chat-history/messages`
 
-Parametro di query : `sessionId` — ID della sessione
+Parametro di query: `sessionId` — ID sessione
 
 Restituisce i record dei messaggi della sessione storica specificata.
 
 ---
 
-## Gestione dei timer
+## Gestione dei Timer
 
-### Pagina dei timer
+### Pagina Timer
 
 **GET** `/timers`
 
 Restituisce la pagina dell'interfaccia di gestione dei timer.
 
-### Ottenere l'elenco dei timer
+### Ottieni Elenco dei Timer
 
 **GET** `/api/timers/list`
 
 Restituisce l'elenco di tutti i timer.
 
-### Pagina dei dettagli dei cicli del timer
+### Pagina Dettagli Ciclo del Timer
 
 **GET** `/timer-cycles/{timerId}`
 
-Restituisce la pagina dei dettagli dei cicli di esecuzione del timer specificato.
+Restituisce la pagina dei dettagli del ciclo di esecuzione del timer specificato.
 
-### Ottenere l'elenco dei cicli del timer
+### Ottieni Elenco dei Cicli del Timer
 
 **GET** `/api/timer-cycles/list`
 
-Parametro di query : `timerId` — ID del timer
+Parametro di query: `timerId` — ID timer
 
 Restituisce l'elenco di tutti i cicli di esecuzione del timer specificato.
 
-### Pagina dei dettagli di un singolo ciclo di esecuzione
+### Pagina Dettagli Singolo Ciclo di Esecuzione
 
 **GET** `/timer-cycle/{cycleIndex}`
 
-Restituisce la pagina dettagliata di una singola esecuzione.
+Restituisce la pagina dei dettagli di una singola esecuzione.
 
-### Ottenere i messaggi del ciclo
+### Ottieni Messaggi del Ciclo
 
 **GET** `/api/timer-cycle/messages`
 
-Parametro di query : `cycleIndex` — Indice del ciclo
+Parametro di query: `cycleIndex` — Indice del ciclo
 
 Restituisce i messaggi relativi al ciclo di esecuzione specificato.
 
 ---
 
-## Gestione dei compiti
+## Gestione delle Attività
 
-### Pagina dei compiti
+### Pagina Attività
 
 **GET** `/tasks`
 
-Restituisce la pagina dell'interfaccia di gestione dei compiti.
+Restituisce la pagina dell'interfaccia di gestione delle attività.
 
-### Ottenere l'elenco dei compiti
+### Ottieni Elenco delle Attività
 
 **GET** `/api/tasks/list`
 
-Restituisce l'elenco di tutti i compiti.
+Restituisce l'elenco di tutte le attività.
 
-### Pagina dei dettagli dei cicli dei compiti
+### Pagina Dettagli Ciclo dell'Attività
 
 **GET** `/task-cycles/{taskId}`
 
-Restituisce la pagina dei dettagli dei cicli di esecuzione del compito specificato.
+Restituisce la pagina dei dettagli del ciclo di esecuzione dell'attività specificata.
 
-### Ottenere l'elenco dei cicli dei compiti
+### Ottieni Elenco dei Cicli dell'Attività
 
 **GET** `/api/task-cycles/list`
 
-Parametro di query : `taskId` — ID del compito
+Parametro di query: `taskId` — ID attività
 
-Restituisce l'elenco di tutti i cicli di esecuzione del compito specificato.
+Restituisce l'elenco di tutti i cicli di esecuzione dell'attività specificata.
 
-### Pagina dei dettagli di un singolo ciclo di esecuzione
+### Pagina Dettagli Singolo Ciclo di Esecuzione
 
 **GET** `/task-cycle/{cycleIndex}`
 
-Restituisce la pagina dettagliata di una singola esecuzione del compito.
+Restituisce la pagina dei dettagli di una singola esecuzione dell'attività.
 
-### Ottenere i messaggi del ciclo
+### Ottieni Messaggi del Ciclo
 
 **GET** `/api/task-cycle/messages`
 
-Parametro di query : `cycleIndex` — Indice del ciclo
+Parametro di query: `cycleIndex` — Indice del ciclo
 
-Restituisce i messaggi relativi al ciclo di esecuzione del compito specificato.
+Restituisce i messaggi relativi al ciclo di esecuzione dell'attività specificata.
 
 ---
 
-## Sistema di permessi
+## Sistema di Permessi
 
-### Pagina di gestione dei permessi
+### Pagina Gestione Permessi
 
 **GET** `/permissions`
 
 Restituisce la pagina dell'interfaccia di gestione dei permessi.
 
-### Ottenere l'elenco delle regole di permesso
+### Ottieni Elenco delle Regole di Permesso
 
 **GET** `/api/permissions/list`
 
 Restituisce tutte le regole di permesso attualmente configurate.
 
-**Esempio di risposta** :
+**Esempio di risposta**:
 ```json
 {
   "rules": [
     {
-      "prefix": "disk:read",
-      "result": "Allowed"
-    },
-    {
-      "prefix": "compile:execute",
-      "result": "Denied"
+      "permissionType": "NetworkAccess",
+      "resourcePrefix": "api.github.com",
+      "result": "Allowed",
+      "description": "Allow GitHub API access"
     }
   ]
 }
 ```
 
-### Salvare una regola di permesso
+### Salva Regola di Permesso
 
 **POST** `/api/permissions/save`
 
-**Corpo della richiesta** :
+**Corpo della richiesta**:
 ```json
 {
-  "prefix": "disk:write",
+  "permissionType": "FileAccess",
+  "resourcePrefix": "C:\\Projects",
   "result": "Allowed",
-  "duration": 3600
+  "description": "Allow project directory access"
 }
 ```
 
-### Pagina di richiesta di permesso
+### Pagina Richiesta di Permesso
 
 **GET** `/permission/request`
 
-Mostra la pagina di richiesta di permesso che permette agli utenti di approvare o rifiutare le richieste di permesso dei Silicon Beings.
+Mostra la pagina di richiesta di permesso, permettendo all'utente di approvare o rifiutare le richieste di permesso degli Esseri di Silicio.
 
-**Parametri di query** :
+**Parametri di query**:
 
 | Parametro | Tipo | Descrizione |
 |-----------|------|-------------|
-| `userId` | `Guid` | ID del Silicon Being che richiede il permesso |
+| `userId` | `Guid` | ID dell'Essere di Silicio che richiede il permesso |
 | `type` | `string` | Tipo di permesso |
 | `resource` | `string` | Percorso della risorsa richiesta |
-| `allowCode` | `string` | ID codice per l'operazione di autorizzazione |
-| `denyCode` | `string` | ID codice per l'operazione di rifiuto |
+| `allowCode` | `string` | Codice identificativo per l'operazione di consenso |
+| `denyCode` | `string` | Codice identificativo per l'operazione di rifiuto |
 
-### Verificare le richieste di permesso in attesa
+### Verifica Richieste di Permesso in Sospeso
 
 **GET** `/permission/check`
 
-Parametro di query : `userId` — ID del Silicon Being
+Parametro di query: `userId` — ID dell'Essere di Silicio
 
-**Risposta** :
+**Risposta**:
 ```json
 {
   "pending": true
 }
 ```
 
-### Rispondere a una richiesta di permesso
+### Rispondi a una Richiesta di Permesso
 
 **GET** `/permission/respond`
 
-**Parametri di query** :
+**Parametri di query**:
 
 | Parametro | Tipo | Descrizione |
 |-----------|------|-------------|
-| `userId` | `Guid` | ID del Silicon Being |
-| `allowed` | `bool` | Se autorizzato |
-| `addToCache` | `bool` | Se la decisione deve essere memorizzata nella cache |
+| `userId` | `Guid` | ID dell'Essere di Silicio |
+| `allowed` | `bool` | Se consentire |
+| `addToCache` | `bool` | Se memorizzare nella cache la decisione |
 | `cacheDuration` | `double` | Durata della cache (ore) |
 
-**Risposta** :
+**Risposta**:
 ```json
 {
   "success": true
@@ -449,41 +448,41 @@ Parametro di query : `userId` — ID del Silicon Being
 
 ---
 
-## Sistema di log
+## Sistema di Log
 
-### Pagina dei log
+### Pagina Log
 
 **GET** `/logs`
 
 Restituisce la pagina dell'interfaccia di visualizzazione dei log.
 
-### Ottenere l'elenco dei log
+### Ottieni Elenco dei Log
 
 **GET** `/api/logs/list`
 
-I parametri di query supportano il filtro per livello e intervallo di tempo.
+I parametri di query supportano il filtraggio per livello e intervallo temporale.
 
-**Esempio di risposta** :
+**Esempio di risposta**:
 ```json
 {
   "logs": [
     {
       "timestamp": "2026-04-20T10:30:00Z",
       "level": "error",
-      "message": "Connessione al servizio IA fallita",
+      "message": "Failed to connect to AI service",
       "source": "OllamaClient"
     }
   ]
 }
 ```
 
-### Ottenere i log raggruppati per Being
+### Ottieni Log Raggruppati per Essere
 
 **GET** `/api/logs/beings`
 
-Statistiche dei log raggruppate per Silicon Being.
+Statistiche dei log raggruppate per Essere di Silicio.
 
-### Ottenere i livelli di log disponibili
+### Ottieni Livelli di Log Disponibili
 
 **GET** `/api/logs/levels`
 
@@ -491,29 +490,29 @@ Restituisce l'elenco dei livelli di log disponibili nel sistema.
 
 ---
 
-## Statistiche di utilizzo
+## Statistiche di Utilizzo
 
-### Pagina delle statistiche di utilizzo
+### Pagina Statistiche di Utilizzo
 
 **GET** `/usage`
 
 Restituisce la pagina dell'interfaccia delle statistiche di utilizzo.
 
-### Ottenere il riepilogo dell'utilizzo
+### Ottieni Riepilogo Utilizzo
 
 **GET** `/api/usage/summary`
 
-Restituisce il riepilogo dell'utilizzo dei token e dei costi.
+Restituisce un riepilogo dell'utilizzo dei token e dei costi.
 
-### Ottenere i dati di tendenza
+### Ottieni Dati di Tendenza
 
 **GET** `/api/usage/trend`
 
-Parametri di query : `startDate`, `endDate`
+Parametri di query: `startDate`, `endDate`
 
 Restituisce i dati di tendenza dell'utilizzo per il periodo specificato.
 
-### Esportare i dati di utilizzo
+### Esporta Dati di Utilizzo
 
 **GET** `/api/usage/export`
 
@@ -521,47 +520,47 @@ Esporta i dati di utilizzo in un formato scaricabile.
 
 ---
 
-## Audit trail
+## Traccia di Audit
 
-### Pagina di audit
+### Pagina di Audit
 
 **GET** `/audit`
 
-Restituisce la pagina dell'interfaccia dell'audit trail.
+Restituisce la pagina dell'interfaccia della traccia di audit.
 
-### Ottenere l'elenco di audit
+### Ottieni Elenco di Audit
 
 **GET** `/api/audit/list`
 
 Restituisce l'elenco delle voci del log di audit.
 
-### Ottenere il riepilogo di audit
+### Ottieni Riepilogo di Audit
 
 **GET** `/api/audit/summary`
 
-Restituisce le statistiche di riepilogo dei dati di audit.
+Restituisce statistiche riepilogative dei dati di audit.
 
-### Ottenere l'audit raggruppato per Being
+### Ottieni Audit Raggruppato per Essere
 
 **GET** `/api/audit/beings`
 
-Statistiche di audit raggruppate per Silicon Being.
+Statistiche di audit raggruppate per Essere di Silicio.
 
 ---
 
-## Gestione della configurazione
+## Gestione della Configurazione
 
-### Pagina della configurazione
+### Pagina Configurazione
 
 **GET** `/config`
 
 Restituisce la pagina dell'interfaccia di configurazione del sistema.
 
-### Salvare la configurazione
+### Salva Configurazione
 
 **POST** `/config/save`
 
-**Corpo della richiesta** :
+**Corpo della richiesta**:
 ```json
 {
   "language": "ZhCN",
@@ -580,65 +579,65 @@ Restituisce la pagina dell'interfaccia di configurazione del sistema.
 }
 ```
 
-### Ottenere le opzioni di configurazione IA
+### Ottieni Opzioni di Configurazione AI
 
 **GET** `/config/aioptions`
 
-Restituisce i tipi di client IA disponibili e le relative opzioni dinamiche (modelli disponibili, regioni, ecc.).
+Restituisce i tipi di client AI disponibili e le relative opzioni dinamiche (modelli disponibili, regioni, ecc.).
 
 ---
 
-## Sistema di memoria
+## Sistema di Memoria
 
-### Pagina della memoria
+### Pagina Memoria
 
 **GET** `/memory`
 
 Restituisce la pagina dell'interfaccia di gestione della memoria.
 
-### Ottenere l'elenco delle memorie
+### Ottieni Elenco della Memoria
 
 **GET** `/api/memory/list`
 
-Restituisce l'elenco delle voci di memoria dei Silicon Beings.
+Restituisce l'elenco delle voci di memoria degli Esseri di Silicio.
 
-### Ottenere i dettagli di una memoria
+### Ottieni Dettagli della Memoria
 
 **GET** `/api/memory/detail/{id}`
 
-Parametro di percorso : `id` — ID della voce di memoria
+Parametro di percorso: `id` — ID voce di memoria
 
 Restituisce il contenuto completo della voce di memoria specificata.
 
-### Ottenere le statistiche della memoria
+### Ottieni Statistiche della Memoria
 
 **GET** `/api/memory/stats`
 
-Restituisce le informazioni statistiche del sistema di memoria.
+Restituisce informazioni statistiche del sistema di memoria.
 
-### Cercare nella memoria
+### Cerca nella Memoria
 
 **GET** `/api/memory/search`
 
-Parametro di query : `keyword` — Parola chiave di ricerca
+Parametro di query: `keyword` — Parola chiave di ricerca
 
-Cerca le voci di memoria corrispondenti.
+Cerca voci di memoria corrispondenti.
 
-### Ottenere le memorie raggruppate per Being
+### Ottieni Memoria Raggruppata per Essere
 
 **GET** `/api/memory/beings`
 
-Statistiche della memoria raggruppate per Silicon Being.
+Statistiche della memoria raggruppate per Essere di Silicio.
 
-### Ottenere la tracciabilità della memoria
+### Ottieni Tracciamento della Memoria
 
 **GET** `/api/memory/trace/{id}`
 
-Parametro di percorso : `id` — ID della voce di memoria
+Parametro di percorso: `id` — ID voce di memoria
 
-Restituisce la catena di tracciabilità delle origini della voce di memoria specificata.
+Restituisce la catena di tracciamento delle origini della voce di memoria specificata.
 
-### Ottenere la timeline della memoria in HTML
+### Ottieni HTML della Timeline della Memoria
 
 **GET** `/api/memory/timeline-html`
 
@@ -646,60 +645,60 @@ Restituisce la vista HTML della timeline della memoria.
 
 ---
 
-## Note di lavoro
+## Note di Lavoro
 
-### Pagina delle note di lavoro
+### Pagina Note di Lavoro
 
 **GET** `/work-notes`
 
 Restituisce la pagina dell'interfaccia delle note di lavoro.
 
-### Ottenere l'elenco delle note di lavoro
+### Ottieni Elenco delle Note di Lavoro
 
 **GET** `/api/work-notes/list`
 
 Restituisce l'elenco delle note di lavoro.
 
-### Leggere una nota di lavoro
+### Leggi una Nota di Lavoro
 
 **GET** `/api/work-notes/read`
 
-Parametro di query : `noteId` — ID della nota
+Parametro di query: `noteId` — ID nota
 
 Restituisce il contenuto della nota specificata.
 
-### Ottenere la directory delle note
+### Ottieni Indice delle Note
 
 **GET** `/api/work-notes/directory`
 
-Restituisce la struttura della directory delle note.
+Restituisce la struttura dell'indice delle note.
 
-### Cercare nelle note di lavoro
+### Cerca nelle Note di Lavoro
 
 **GET** `/api/work-notes/search`
 
-Parametro di query : `keyword` — Parola chiave di ricerca
+Parametro di query: `keyword` — Parola chiave di ricerca
 
-Cerca le note di lavoro corrispondenti.
+Cerca note di lavoro corrispondenti.
 
-### Creare una nota di lavoro
+### Crea una Nota di Lavoro
 
 **POST** `/api/work-notes/create`
 
-**Corpo della richiesta** :
+**Corpo della richiesta**:
 ```json
 {
   "title": "Titolo della nota",
   "content": "Contenuto della nota",
-  "keywords": ["parola1", "parola2"]
+  "keywords": ["parola chiave 1", "parola chiave 2"]
 }
 ```
 
-### Aggiornare una nota di lavoro
+### Aggiorna una Nota di Lavoro
 
 **POST** `/api/work-notes/update`
 
-**Corpo della richiesta** :
+**Corpo della richiesta**:
 ```json
 {
   "noteId": "note-uuid",
@@ -708,11 +707,11 @@ Cerca le note di lavoro corrispondenti.
 }
 ```
 
-### Eliminare una nota di lavoro
+### Elimina una Nota di Lavoro
 
 **POST** `/api/work-notes/delete`
 
-**Corpo della richiesta** :
+**Corpo della richiesta**:
 ```json
 {
   "noteId": "note-uuid"
@@ -721,15 +720,15 @@ Cerca le note di lavoro corrispondenti.
 
 ---
 
-## Rete di conoscenze
+## Rete di Conoscenza
 
-### Pagina della rete di conoscenze
+### Pagina Rete di Conoscenza
 
 **GET** `/knowledge`
 
-Restituisce la pagina dell'interfaccia di gestione della rete di conoscenze.
+Restituisce la pagina dell'interfaccia di gestione della rete di conoscenza.
 
-### Ottenere il grafo delle conoscenze
+### Ottieni Grafo di Conoscenza
 
 **GET** `/api/knowledge/graph`
 
@@ -737,104 +736,154 @@ Restituisce i dati del grafo delle triple di conoscenza (soggetto-relazione-ogge
 
 ---
 
-## Gestione dei progetti
+## Gestione dei Progetti
 
-### Pagina dei progetti
+### Pagina Progetti
 
 **GET** `/project`
 
 Restituisce la pagina dell'interfaccia di gestione dei progetti.
 
-### Pagina delle note di lavoro del progetto
+### Pagina Note di Lavoro di Progetto
 
 **GET** `/project/{id}/work-notes`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
 Restituisce la pagina delle note di lavoro del progetto specificato.
 
-### Pagina dei compiti del progetto
+### Pagina Attività di Progetto
 
 **GET** `/project/{id}/tasks`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
-Restituisce la pagina di gestione dei compiti del progetto specificato.
+Restituisce la pagina di gestione delle attività del progetto specificato.
 
-### Ottenere l'elenco dei progetti
+### Pagina Permessi Strumenti di Progetto
+
+**GET** `/project/{id}/tool-permissions`
+
+Parametro di percorso: `id` — ID progetto
+
+Restituisce la pagina di gestione dei permessi degli strumenti del progetto specificato.
+
+### Pagina Workflow di Progetto
+
+**GET** `/project/{id}/workflow`
+
+Parametro di percorso: `id` — ID progetto
+
+Restituisce la pagina di gestione del workflow del progetto specificato.
+
+### Ottieni Dettagli Workflow di Progetto
+
+**GET** `/api/projects/workflow-detail`
+
+Parametro di query: `projectId` — ID progetto
+
+Restituisce i dettagli del workflow associato al progetto.
+
+### Assegna Ruolo di Progetto
+
+**POST** `/api/projects/assign-role`
+
+**Corpo della richiesta**:
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid",
+  "roleName": "developer"
+}
+```
+
+### Rimuovi Ruolo di Progetto
+
+**POST** `/api/projects/remove-role`
+
+**Corpo della richiesta**:
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid",
+  "roleName": "developer"
+}
+```
+
+### Ottieni Elenco dei Progetti
 
 **GET** `/api/projects/list`
 
 Restituisce l'elenco di tutti i progetti.
 
-### Ottenere l'elenco dei modelli di flusso di lavoro
+### Ottieni Elenco dei Template di Workflow di Progetto
 
 **GET** `/api/projects/list-workflow-templates`
 
-Restituisce l'elenco dei modelli di flusso di lavoro disponibili.
+Restituisce l'elenco dei template di workflow disponibili.
 
-### Creare un progetto
+### Crea un Progetto
 
 **POST** `/api/projects/create`
 
-**Corpo della richiesta** :
+**Corpo della richiesta**:
 ```json
 {
-  "name": "Il Mio Progetto",
+  "name": "Il mio Progetto",
   "description": "Descrizione del progetto"
 }
 ```
 
-### Archiviare un progetto
+### Archivia un Progetto
 
 **POST** `/api/projects/{id}/archive`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
 Archivia il progetto specificato.
 
-### Ripristinare un progetto
+### Ripristina un Progetto
 
 **POST** `/api/projects/{id}/restore`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
-Ripristina un progetto precedentemente archiviato.
+Ripristina un progetto archiviato.
 
-### Distruggere un progetto
+### Distruggi un Progetto
 
 **POST** `/api/projects/{id}/destroy`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
 Elimina definitivamente il progetto specificato (irreversibile).
 
-### Ottenere i dettagli di un progetto
+### Ottieni Dettagli del Progetto
 
 **GET** `/api/projects/detail`
 
-Parametro di query : `projectId` — ID del progetto
+Parametro di query: `projectId` — ID progetto
 
-Restituisce le informazioni dettagliate del progetto.
+Restituisce informazioni dettagliate sul progetto.
 
-### Aggiornare un progetto
+### Aggiorna un Progetto
 
 **POST** `/api/projects/update`
 
-**Corpo della richiesta** :
+**Corpo della richiesta**:
 ```json
 {
   "projectId": "project-uuid",
-  "name": "Nome aggiornato",
+  "name": "Nome Aggiornato",
   "description": "Descrizione aggiornata"
 }
 ```
 
-### Assegnare un membro a un progetto
+### Assegna un Membro al Progetto
 
 **POST** `/api/projects/assign`
 
-**Corpo della richiesta** :
+**Corpo della richiesta**:
 ```json
 {
   "projectId": "project-uuid",
@@ -842,11 +891,11 @@ Restituisce le informazioni dettagliate del progetto.
 }
 ```
 
-### Rimuovere un membro da un progetto
+### Rimuovi un Membro dal Progetto
 
 **POST** `/api/projects/remove`
 
-**Corpo della richiesta** :
+**Corpo della richiesta**:
 ```json
 {
   "projectId": "project-uuid",
@@ -854,129 +903,200 @@ Restituisce le informazioni dettagliate del progetto.
 }
 ```
 
-### Ottenere l'elenco delle note di lavoro del progetto
+### Ottieni Elenco delle Note di Lavoro di Progetto
 
 **GET** `/api/projects/{id}/work-notes/list`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
 Restituisce l'elenco delle note di lavoro del progetto specificato.
 
-### Leggere una nota di lavoro del progetto
+### Leggi Note di Lavoro di Progetto
 
 **GET** `/api/projects/{id}/work-notes/read`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
-Restituisce il contenuto della nota di lavoro del progetto specificato.
+Restituisce il contenuto delle note di lavoro del progetto specificato.
 
-### Creare una nota di lavoro del progetto
+### Crea Note di Lavoro di Progetto
 
 **POST** `/api/projects/{id}/work-notes/create`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
-Crea una nuova nota di lavoro nel progetto specificato.
+Crea nuove note di lavoro nel progetto specificato.
 
-### Aggiornare una nota di lavoro del progetto
+### Aggiorna Note di Lavoro di Progetto
 
 **POST** `/api/projects/{id}/work-notes/update`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
-Aggiorna una nota di lavoro nel progetto specificato.
+Aggiorna le note di lavoro nel progetto specificato.
 
-### Eliminare una nota di lavoro del progetto
+### Elimina Note di Lavoro di Progetto
 
 **POST** `/api/projects/{id}/work-notes/delete`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
-Elimina una nota di lavoro dal progetto specificato.
+Elimina le note di lavoro nel progetto specificato.
 
-### Ottenere l'elenco dei compiti del progetto
+### Ottieni Elenco delle Attività di Progetto
 
 **GET** `/api/projects/{id}/tasks/list`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
-Restituisce l'elenco dei compiti del progetto specificato.
+Restituisce l'elenco delle attività del progetto specificato.
 
-### Creare un compito del progetto
+### Crea un'Attività di Progetto
 
 **POST** `/api/projects/{id}/tasks/create`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
-Crea un nuovo compito nel progetto specificato.
+Crea una nuova attività nel progetto specificato.
 
-### Aggiornare un compito del progetto
+### Aggiorna un'Attività di Progetto
 
 **POST** `/api/projects/{id}/tasks/update`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
-Aggiorna un compito nel progetto specificato.
+Aggiorna un'attività nel progetto specificato.
 
-### Eliminare un compito del progetto
+### Elimina un'Attività di Progetto
 
 **POST** `/api/projects/{id}/tasks/delete`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
-Elimina un compito dal progetto specificato.
+Elimina un'attività nel progetto specificato.
 
-### Assegnare un responsabile al compito
+### Assegna un Responsabile all'Attività
 
 **POST** `/api/projects/{id}/tasks/assign`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
-Assegna un responsabile al compito del progetto.
+Assegna un responsabile all'attività del progetto.
 
-### Rimuovere il responsabile del compito
+### Rimuovi il Responsabile dell'Attività
 
 **POST** `/api/projects/{id}/tasks/remove-assignee`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
-Rimuove il responsabile del compito del progetto.
+Rimuove il responsabile dall'attività del progetto.
 
-### Contrassegnare un compito come completato
+### Contrassegna un'Attività come Completata
 
 **POST** `/api/projects/{id}/tasks/complete`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
-Contrassegna il compito del progetto come completato.
+Contrassegna l'attività del progetto come completata.
 
-### Contrassegnare un compito come fallito
+### Contrassegna un'Attività come Fallita
 
 **POST** `/api/projects/{id}/tasks/fail`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
-Contrassegna il compito del progetto come fallito.
+Contrassegna l'attività del progetto come fallita.
 
-### Annullare un compito
+### Annulla un'Attività
 
 **POST** `/api/projects/{id}/tasks/cancel`
 
-Parametro di percorso : `id` — ID del progetto
+Parametro di percorso: `id` — ID progetto
 
-Annulla il compito del progetto.
+Annulla l'attività del progetto.
 
 ---
 
-## Gestione degli esecutori
+## Gestione dei Permessi degli Strumenti
 
-### Pagina degli esecutori
+### Ottieni Permessi Strumenti dell'Essere di Silicio
+
+**GET** `/api/beings/tool-permissions`
+
+Parametro di query: `beingId` — ID dell'Essere di Silicio
+
+Restituisce la configurazione dei permessi degli strumenti per l'Essere di Silicio specificato.
+
+### Aggiorna Permessi Strumenti dell'Essere di Silicio
+
+**PUT** `/api/beings/tool-permissions`
+
+**Corpo della richiesta**:
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "network": "allowed",
+    "disk_read": "allowed",
+    "disk_write": "denied"
+  }
+}
+```
+
+### Ottieni Template dei Permessi degli Strumenti
+
+**GET** `/api/beings/tool-permissions/templates`
+
+Restituisce l'elenco dei template di permessi degli strumenti disponibili.
+
+### Applica un Template di Permessi degli Strumenti
+
+**POST** `/api/beings/tool-permissions/apply-template`
+
+**Corpo della richiesta**:
+```json
+{
+  "beingId": "being-uuid",
+  "templateName": "readonly"
+}
+```
+
+### Ottieni Permessi Strumenti di Progetto
+
+**GET** `/api/projects/{id}/tool-permissions`
+
+Parametro di percorso: `id` — ID progetto
+
+Restituisce la configurazione dei permessi degli strumenti per il progetto specificato.
+
+### Aggiorna Permessi Strumenti di Progetto
+
+**PUT** `/api/projects/{id}/tool-permissions`
+
+Parametro di percorso: `id` — ID progetto
+
+**Corpo della richiesta**:
+```json
+{
+  "permissions": {
+    "network": "allowed",
+    "disk_read": "allowed",
+    "disk_write": "denied"
+  }
+}
+```
+
+---
+
+## Gestione degli Esecutori
+
+### Pagina Esecutori
 
 **GET** `/executor`
 
 Restituisce la pagina dell'interfaccia di gestione degli esecutori.
 
-### Ottenere lo stato degli esecutori
+### Ottieni Stato degli Esecutori
 
 **GET** `/api/executors/status`
 
@@ -984,128 +1104,128 @@ Restituisce lo stato di esecuzione di ciascun esecutore (disco, rete, riga di co
 
 ---
 
-## Browser del codice
+## Browser del Codice
 
-### Pagina del browser del codice
+### Pagina Browser del Codice
 
 **GET** `/code`
 
 Restituisce la pagina dell'interfaccia del browser del codice.
 
-### Ottenere l'elenco dei tipi di codice
+### Ottieni Elenco dei Tipi di Codice
 
 **GET** `/api/code/types`
 
 Restituisce l'elenco dei tipi/linguaggi di codice supportati.
 
-### Ottenere i dettagli del codice
+### Ottieni Dettagli del Codice
 
 **GET** `/api/code/detail`
 
-Parametri di query : `filePath`, `lineNumber`
+Parametri di query: `filePath`, `lineNumber`
 
 Restituisce i dettagli del codice del file specificato.
 
 ---
 
-## Suggerimenti del codice (hover)
+## Tooltip del Codice
 
-### Ottenere suggerimenti hover
+### Ottieni Tooltip Sospeso
 
 **GET** `/api/code/hover`
 **POST** `/api/code/hover`
 
-Ottiene le informazioni di suggerimento hover per la posizione del codice (simile agli smart hint degli IDE).
+Ottieni informazioni di tooltip sospeso per la posizione del codice (simile ai suggerimenti intelligenti dell'IDE).
 
-### Registrare una posizione del codice
+### Registra Posizione del Codice
 
 **POST** `/api/code/register`
 
-Registra le posizioni del codice da monitorare.
+Registra una posizione del codice da monitorare.
 
-### Aggiornare una posizione del codice
+### Aggiorna Posizione del Codice
 
 **POST** `/api/code/update`
 
-Aggiorna le informazioni delle posizioni del codice registrate.
+Aggiorna le informazioni di una posizione del codice registrata.
 
-### Deregistrare una posizione del codice
+### Deregistra Posizione del Codice
 
 **POST** `/api/code/unregister`
 
-Deregistra il monitoraggio delle posizioni del codice non più necessarie.
+Deregistra il monitoraggio di una posizione del codice non più necessaria.
 
 ---
 
-## Sistema di documentazione di aiuto
+## Sistema di Documentazione di Aiuto
 
-### Pagina di aiuto
+### Pagina di Aiuto
 
 **GET** `/help` o **GET** `/help/index`
 
 Restituisce la pagina principale della documentazione di aiuto.
 
-### Pagina di un argomento di aiuto
+### Pagina Argomento di Aiuto
 
 **GET** `/help/{topic}`
 
-Parametro di percorso : `topic` — Identificatore dell'argomento
+Parametro di percorso: `topic` — Identificatore dell'argomento
 
 Restituisce la pagina della documentazione di aiuto per l'argomento specificato.
 
-### Cercare nella documentazione di aiuto
+### Cerca nella Documentazione di Aiuto
 
 **GET** `/api/help/search`
 
-Parametro di query : `keyword` — Parola chiave di ricerca
+Parametro di query: `keyword` — Parola chiave di ricerca
 
-Cerca gli argomenti della documentazione di aiuto corrispondenti.
+Cerca argomenti della documentazione di aiuto corrispondenti.
 
 ---
 
 ## Inizializzazione
 
-### Pagina della procedura guidata di inizializzazione
+### Pagina Procedura Guidata di Inizializzazione
 
 **GET** `/init`
 
-Restituisce la pagina della procedura guidata di inizializzazione per la prima esecuzione.
+Restituisce la pagina della procedura guidata di inizializzazione alla prima esecuzione.
 
-### Inviare l'inizializzazione
+### Invia Inizializzazione
 
 **POST** `/init`
 
 Invia la configurazione di inizializzazione per la prima esecuzione.
 
-### Sfogliare per selezionare la directory dei dati
+### Sfoglia per Selezionare la Directory dei Dati
 
 **GET** `/init/browse`
 
 Apre il browser delle directory per selezionare la posizione di archiviazione dei dati.
 
-### Ottenere i metadati della configurazione IA
+### Ottieni Metadati della Configurazione AI
 
 **GET** `/init/ai-config-metadata`
 
-Restituisce i tipi di client IA disponibili e i metadati dei campi di configurazione.
+Restituisce i tipi di client AI disponibili e i metadati dei campi di configurazione.
 
 ---
 
-## Controllo del sistema
+## Controllo di Sistema
 
-### Spegnimento elegante
+### Chiusura Elegante
 
 **POST** `/api/system/shutdown`
 
-> **Nota** : Sono consentite solo le richieste provenienti da localhost
+> **Nota**: Sono consentite solo le richieste provenienti da localhost
 
-Attiva la procedura di spegnimento elegante dell'applicazione :
+Attiva la procedura di chiusura elegante dell'applicazione:
 
 1. Ferma il ciclo principale (MainLoop)
 2. Salva la configurazione corrente
 3. Chiude il listener HTTP
 
-**Risposta** :
+**Risposta**:
 ```json
 {
   "status": "shutting_down",
@@ -1121,17 +1241,17 @@ Attiva la procedura di spegnimento elegante dell'applicazione :
 
 **GET** `/about`
 
-Restituisce la pagina Informazioni con le informazioni di sistema e la lista dei plugin caricati.
+Restituisce la pagina delle informazioni, contenente informazioni di sistema e l'elenco dei plugin caricati.
 
-**Dati della lista plugin** :
+**Dati dell'elenco dei plugin**:
 ```json
 {
   "plugins": {
     "plugin-id": {
-      "name": "Il Mio Plugin",
+      "name": "My Plugin",
       "version": "1.0.0",
-      "description": "Descrizione del plugin",
-      "author": "Nome dell'autore"
+      "description": "Plugin description",
+      "author": "Author Name"
     }
   }
 }
@@ -1139,37 +1259,37 @@ Restituisce la pagina Informazioni con le informazioni di sistema e la lista dei
 
 ---
 
-## Risposte di errore
+## Risposte di Errore
 
-Tutti gli endpoint restituiscono risposte di errore standardizzate :
+Tutti gli endpoint restituiscono risposte di errore standardizzate:
 
 ```json
 {
   "error": {
     "code": "PERMISSION_DENIED",
-    "message": "Non hai il permesso di accedere a questa risorsa",
-    "details": "Richiesto : disk:write, Attuale : disk:read"
+    "message": "You don't have permission to access this resource",
+    "details": "Required: FileAccess, Denied by GlobalACL"
   }
 }
 ```
 
-### Codici di errore comuni
+### Codici di Errore Comuni
 
 | Codice | Stato HTTP | Descrizione |
 |--------|------------|-------------|
 | `PERMISSION_DENIED` | 403 | Permessi insufficienti |
 | `NOT_FOUND` | 404 | Risorsa non trovata |
-| `VALIDATION_ERROR` | 400 | Parametri di richiesta non validi |
+| `VALIDATION_ERROR` | 400 | Parametri della richiesta non validi |
 | `INTERNAL_ERROR` | 500 | Errore interno del server |
-| `SERVICE_UNAVAILABLE` | 503 | Servizio IA non disponibile |
+| `SERVICE_UNAVAILABLE` | 503 | Servizio AI non disponibile |
 
 ---
 
 ## Eventi SSE
 
-Server-Sent Events per aggiornamenti in tempo reale :
+Gli eventi inviati dal server vengono utilizzati per aggiornamenti in tempo reale:
 
-### Eventi chat
+### Eventi di Chat
 
 ```javascript
 const eventSource = new EventSource('/api/chat/stream');
@@ -1182,13 +1302,13 @@ eventSource.onmessage = (event) => {
       console.log('Streaming:', data.content);
       break;
     case 'tool_call':
-      console.log('Strumento in esecuzione:', data.tool);
+      console.log('Tool executing:', data.tool);
       break;
     case 'complete':
-      console.log('Chat completata, sessione:', data.sessionId);
+      console.log('Chat complete, session:', data.sessionId);
       break;
     case 'error':
-      console.error('Errore:', data.message);
+      console.error('Error:', data.message);
       break;
   }
 };
@@ -1196,7 +1316,7 @@ eventSource.onmessage = (event) => {
 
 ---
 
-## Interfaccia del client IA
+## Interfaccia del Client AI
 
 ### Interfaccia IAIClient
 
@@ -1238,7 +1358,7 @@ public class AIResponse
 
 ---
 
-## Interfaccia del sistema di strumenti
+## Interfaccia del Sistema degli Strumenti
 
 ### Interfaccia ITool
 
@@ -1277,9 +1397,9 @@ public class ToolResult
 
 ---
 
-## Prossimi passi
+## Prossimi Passi
 
-- 🚀 Vedere la [guida rapida](getting-started.md)
-- 🛠️ Leggere la [guida di sviluppo](development-guide.md)
-- 📚 Consultare la [documentazione di architettura](architecture.md)
-- 🔒 Comprendere il [modello di sicurezza](security.md)
+- 🚀 Consulta la [Guida Rapida](getting-started.md)
+- 🛠️ Leggi la [Guida allo Sviluppo](development-guide.md)
+- 📚 Consulta la [Documentazione sull'Architettura](architecture.md)
+- 🔒 Comprendi il [Modello di Sicurezza](security.md)

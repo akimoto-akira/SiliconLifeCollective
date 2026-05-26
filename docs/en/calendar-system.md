@@ -1,8 +1,8 @@
-﻿# Calendar System
+# Calendar System
 
 > **Version: v0.2.0-alpha**
 
-**English** | [中文](../zh-CN/calendar-system.md) | [繁體中文](../zh-HK/calendar-system.md) | [Español](../es-ES/calendar-system.md) | [日本語](../ja-JP/calendar-system.md) | [한국어](../ko-KR/calendar-system.md) | [Deutsch](../de-DE/calendar-system.md) | [Čeština](../cs-CZ/calendar-system.md) | [Русский](../ru-RU/calendar-system.md)
+[English](../en/calendar-system.md) | [Deutsch](../de-DE/calendar-system.md) | [中文](../zh-CN/calendar-system.md) | [繁體中文](../zh-HK/calendar-system.md) | [Español](../es-ES/calendar-system.md) | [日本語](../ja-JP/calendar-system.md) | [한국어](../ko-KR/calendar-system.md) | [Čeština](../cs-CZ/calendar-system.md) | [Русский](../ru-RU/calendar-system.md)
 
 ## Overview
 
@@ -84,7 +84,7 @@ SiliconLifeCollective supports 32 different calendar systems for date conversion
 **Response**:
 ```json
 {
-  "result": "Lunar calendar Bingwu year, fourth month, third day",
+  "result": "农历丙午年四月初三",
   "year": 2026,
   "month": 4,
   "day": 3,
@@ -113,13 +113,13 @@ SiliconLifeCollective supports 32 different calendar systems for date conversion
 public abstract class CalendarBase
 {
     public abstract string Name { get; }
-    
+
     public abstract CalendarDate ConvertFromGregorian(GregorianDate date);
-    
+
     public abstract GregorianDate ConvertToGregorian(CalendarDate date);
-    
+
     public virtual bool IsLeapYear(int year) => false;
-    
+
     public virtual int GetDaysInMonth(int year, int month) => 30;
 }
 ```
@@ -130,16 +130,16 @@ public abstract class CalendarBase
 public class MyCustomCalendar : CalendarBase
 {
     public override string Name => "MyCalendar";
-    
+
     public override CalendarDate ConvertFromGregorian(GregorianDate date)
     {
-        // Conversion logic
+        // 转换逻辑
         return new CalendarDate(year, month, day);
     }
-    
+
     public override GregorianDate ConvertToGregorian(CalendarDate date)
     {
-        // Reverse conversion
+        // 反向转换
         return new GregorianDate(year, month, day);
     }
 }
@@ -158,14 +158,14 @@ The Chinese Historical Calendar is a highlight of this system, supporting two co
 Uses a 60-year cycle composed of Heavenly Stems and Earthly Branches:
 
 ```
-Heavenly Stems (10): Jia, Yi, Bing, Ding, Wu, Ji, Geng, Xin, Ren, Gui
-Earthly Branches (12): Zi, Chou, Yin, Mao, Chen, Si, Wu, Wei, Shen, You, Xu, Hai
+天干（10）：甲、乙、丙、丁、戊、己、庚、辛、壬、癸
+地支（12）：子、丑、寅、卯、辰、巳、午、未、申、酉、戌、亥
 ```
 
 **Examples**:
-- 2026 = Bingwu year
-- 2025 = Yisi year (Year of the Snake)
-- 2024 = Jiachen year (Year of the Dragon)
+- 2026 = 丙午年
+- 2025 = 乙巳年（蛇年）
+- 2024 = 甲辰年（龙年）
 
 **Usage Example**:
 ```json
@@ -180,9 +180,9 @@ Earthly Branches (12): Zi, Chou, Yin, Mao, Chen, Si, Wu, Wei, Shen, You, Xu, Hai
 **Response**:
 ```json
 {
-  "result": "Bingwu year, third month, ninth day",
-  "ganzhi_year": "Bingwu",
-  "zodiac": "Horse"
+  "result": "丙午年 三月 初九",
+  "ganzhi_year": "丙午",
+  "zodiac": "马"
 }
 ```
 
@@ -210,10 +210,10 @@ Built-in complete database of Chinese historical dynasties and imperial era name
 **Response**:
 ```json
 {
-  "result": "60th year of Kangxi, third month, fifteenth day",
-  "era": "Kangxi",
+  "result": "康熙六十年 三月 十五日",
+  "era": "康熙",
   "era_year": 60,
-  "dynasty": "Qing"
+  "dynasty": "清"
 }
 ```
 
@@ -229,7 +229,7 @@ Calendars with leap months:
 {
   "isLeapMonth": true,
   "month": 4,
-  "note": "Leap fourth month"
+  "note": "闰四月"
 }
 ```
 
@@ -295,7 +295,7 @@ Never assume the calendar system:
 ```json
 {
   "date": "2026-04-20",
-  "calendar": "gregorian"  // Specify explicitly!
+  "calendar": "gregorian"  // 明确指定！
 }
 ```
 

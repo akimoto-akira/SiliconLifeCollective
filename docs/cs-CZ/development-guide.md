@@ -1,4 +1,4 @@
-﻿# Vývojový Průvodce
+# Vývojářská příručka
 
 > **Verze: v0.2.0-alpha**
 
@@ -6,7 +6,7 @@
 
 ## Přehled architektury
 
-SiliconLifeCollective následuje **architekturu tělo-mozek** s přísným oddělením základních rozhraní a výchozích implementací.
+SiliconLifeCollective se řídí **architekturou Tělo-Mozek**, s přísným oddělením základních rozhraní a výchozí implementace.
 
 ### Struktura projektu
 
@@ -14,35 +14,34 @@ SiliconLifeCollective následuje **architekturu tělo-mozek** s přísným oddě
 SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/            # Rozhraní, abstraktní třídy, obecná infrastruktura
-│   ├── SiliconLife.Common/          # Společné implementace (používány oběma verzemi)
+│   ├── SiliconLife.Common/          # Sdílená implementace (společná pro obě verze)
 │   ├── SiliconLife.Default/         # Výchozí implementace, vstupní bod (ověření proveditelnosti architektury)
-│   ├── SiliconLife.Fast/            # Vysoce výkonná implementace, vstupní bod (hlavní produkční verze)
-│   ├── SiliconLife.Speedy/          # SpeedyPack vysoce výkonný storage engine
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack správcovský nástroj (Windows Forms)
+│   ├── SiliconLife.Fast/            # Výkonnostní implementace, vstupní bod (hlavní produkční verze)
+│   ├── SiliconLife.Speedy/          # SpeedyPack vysoce výkonný úložný engine
+│   └── SiliconLife.Speedy.Manager/  # Správa SpeedyPack (Avalonia UI)
 └── docs/                            # Vícejazyčná dokumentace
 ```
 
-**Směr závislosti**:
-- `SiliconLife.Default` → `SiliconLife.Core` + `SiliconLife.Common` + `SiliconLife.App`
-- `SiliconLife.Fast` → `SiliconLife.Core` + `SiliconLife.Common` + `SiliconLife.App` + `SiliconLife.Speedy`
-- `SiliconLife.Common` → `SiliconLife.Core`
-- `SiliconLife.App` → `SiliconLife.Core` + `SiliconLife.Common`
+**Směr závislostí**:
+- `SiliconLife.Default` → `SiliconLife.Common` → `SiliconLife.Core`
+- `SiliconLife.Fast` → `SiliconLife.Common` → `SiliconLife.Core`
+- `SiliconLife.Common` → `SiliconLife.Core` (jednosměrné)
 
 **Popis rolí verzí**:
-- **SiliconLife.Default**: Výchozí implementace, používána především pro ověření proveditelnosti architektury. Poskytuje jednoduché a spolehlivé souborové úložiště, vhodné pro vývojové ladění a ověření architektury.
-- **SiliconLife.Fast**: Hlavní produkční verze. Na základě architektury ověřené v Default přijímá paměťové úložiště SpeedyPack + asynchronní perzistenci, aby poskytla extrémní optimalizaci výkonu. Nejlepší volba pro dlouhodobý provoz a reálné produkční prostředí.
+- **SiliconLife.Default**: Výchozí implementace, primárně pro ověření proveditelnosti architektury. Poskytuje jednoduchou a spolehlivou implementaci souborového systému úložiště, vhodnou pro vývoj, ladění a ověření architektury.
+- **SiliconLife.Fast**: Hlavní produkční verze. Na architektuře ověřené verzí Default staví s využitím SpeedyPack paměťového úložiště + asynchronní perzistence, poskytuje extrémní optimalizaci výkonu a je první volbou pro dlouhodobý provoz a skutečné produkční prostředí.
 
 ## Základní koncepty
 
-### 1. Silikonová bytost (Silikonová bytost)
+### 1. Křemíková Bytost
 
 Každý AI agent se skládá z:
-- **Tělo** (`DefaultSiliconBeing`): Udržuje stav存活, detekuje spouštěcí scénáře
-- **Mozek** (`ContextManager`): Načítá historii, volá AI, provádí nástroje, persistuje odpovědi
+- **Tělo** (`DefaultSiliconBeing`): udržuje životní funkce, detekuje spouštěcí scénáře
+- **Mozek** (`ContextManager`): načítá historii, volá AI, provádí nástroje, perzistuje odpovědi
 
 ### 2. Systém nástrojů
 
-Nástroje jsou automaticky objevovány a registrovány prostřednictvím reflexe:
+Nástroje jsou automaticky objevovány a registrovány pomocí reflexe:
 
 ```csharp
 // Všechny nástroje implementují rozhraní ITool
@@ -56,43 +55,45 @@ public interface ITool
 
 ### 3. Systém oprávnění
 
-5-úrovňový řetězec ověřování oprávnění:
+3-úrovňový řetězec ověřování oprávnění:
 ```
-UserFrequencyCache → IPermissionCallback → (Kurátor→IPermissionAskHandler / Nekurátor→GlobalACL→Zamítnuto)
+UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL → výchozí zamítnutí)
 ```
 
-### 4. Service Locator
+### 4. Lokátor služeb
 
-Globální registrace a načítání služeb:
+Globální registrace a vyhledávání služeb:
 ```csharp
 // Registrace
 ServiceLocator.Instance.Register<IAIClient>(ollamaClient);
 
-// Načtení
+// Získání
 var client = ServiceLocator.Instance.Get<IAIClient>();
 ```
 
-## Rozšíření systému
+## Systém rozšíření
 
 ### Přidání nového nástroje
 
-1. Vytvořte novou třídu v `src/SiliconLife.Common/Tools/` (sdílené nástroje) nebo `src/SiliconLife.App/Tools/` (App-specifické nástroje):
+1. Vytvořte novou třídu v `src/SiliconLife.Common/Tools/` (nástroje sdílené oběma verzemi):
+
+> **Poznámka**: `SiliconLife.Default` a `SiliconLife.Fast` již nemají nezávislé adresáře `Tools/`, všechny sdílené nástroje jsou sjednoceny v `SiliconLife.Common/Tools/`.
 
 ```csharp
 public class MyCustomTool : ITool
 {
     public string Name => "my_custom_tool";
-    public string Description => "Popis toho, co tento nástroj dělá";
+    public string Description => "Description of what this tool does";
     
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
-        // Analyzujte parametry
+        // Analýza parametrů
         var param1 = call.Parameters["param1"]?.ToString();
         
-        // Proveďte logiku
+        // Provedení logiky
         var result = await DoSomething(param1);
         
-        // Vrátíte výsledek
+        // Návrat výsledku
         return new ToolResult 
         { 
             Success = true, 
@@ -102,12 +103,31 @@ public class MyCustomTool : ITool
 }
 ```
 
-2. Nástroje jsou automaticky objevovány reflexí - žádná manuální registrace není potřeba!
+2. Nástroj je automaticky objeven pomocí reflexe — není nutná manuální registrace!
 
-3. (Volitelné) Označte jako pouze pro správce:
+3. (Volitelné) Označení jako dostupné pouze pro správce:
 ```csharp
 [SiliconManagerOnly]
 public class AdminTool : ITool { ... }
+```
+
+4. (Volitelné) Označení dostupných scénářů nástroje:
+```csharp
+[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task)]
+public class MyTool : ITool { ... }
+```
+
+5. (Volitelné) Označení jako dostupné pouze ve scénáři chatu:
+```csharp
+[ChatOnly]
+public class HelpTool : ITool { ... }
+```
+
+6. (Volitelné) Označení jako dostupné pouze v projektovém scénáři:
+```csharp
+[ToolScenario(ToolScenarioFlag.Project)]
+[SiliconManagerOnly]
+public class ProjectWorkTool : ITool { ... }
 ```
 
 ### Přidání nového AI klienta
@@ -121,7 +141,7 @@ public class MyAIClient : IAIClient
     
     public async Task<AIResponse> ChatAsync(AIRequest request)
     {
-        // Zavolejte své AI API
+        // Volání vašeho AI API
         var response = await CallMyAPI(request);
         
         return new AIResponse
@@ -134,7 +154,7 @@ public class MyAIClient : IAIClient
     
     public async IAsyncEnumerable<string> StreamChatAsync(AIRequest request)
     {
-        // Implementujte streamování
+        // Implementace streamování
         await foreach (var chunk in StreamFromAPI(request))
         {
             yield return chunk;
@@ -155,11 +175,11 @@ public class MyAIClientFactory : IAIClientFactory
 }
 ```
 
-3. Továrnou je automaticky objevována a registrována.
+3. Továrna je automaticky objevena a zaregistrována.
 
-### Přidání nového backendu úložiště
+### Přidání nového úložného backendu
 
-1. Implementujte `IStorage` a `ITimeStorage` v `src/SiliconLife.Default/Storage/` (souborový systém) nebo `src/SiliconLife.Fast/Storage/` (SpeedyPack adaptér):
+1. Implementujte `IStorage` a `ITimeStorage` v `src/SiliconLife.Default/Storage/` (implementace souborového systému) nebo `src/SiliconLife.Fast/Storage/` (adaptéry SpeedyPack):
 
 ```csharp
 public class DatabaseStorage : IStorage, ITimeStorage
@@ -176,39 +196,14 @@ public class DatabaseStorage : IStorage, ITimeStorage
     
     public async Task<IEnumerable<string>> ReadByTimeAsync(DateTime start, DateTime end)
     {
-        // Dotaz s časovým indexem
+        // Časově indexovaný dotaz
     }
 }
 ```
 
-### Přidání nového skinu
+### Přidání nového zásuvného modulu
 
-1. Implementujte `ISkin` v `src/SiliconLife.App/Web/Skins/`:
-
-```csharp
-public class MyCustomSkin : ISkin
-{
-    public string Name => "MySkin";
-    public string Description => "Popis vlastního skinu";
-    
-    public string GetCss()
-    {
-        return @"
-            :root {
-                --primary-color: #vaše-barva;
-                --bg-color: #vaše-pozadí;
-            }
-            /* Vaše vlastní styly */
-        ";
-    }
-}
-```
-
-2. Skiny jsou automaticky objevovány `SkinManager`.
-
-### Přidání nového pluginu
-
-1. Vytvořte projekt knihovny tříd implementující rozhraní `IPlugin`:
+1. Vytvořte projekt knihovny tříd, implementujte rozhraní `IPlugin`:
 
 ```csharp
 using SiliconLife.Collective;
@@ -231,74 +226,103 @@ public class MyPlugin : IPlugin
 }
 ```
 
-2. (Volitelné) Implementujte rozhraní `ITool` v pluginu pro registraci vlastních nástrojů:
+2. (Volitelné) Implementujte rozhraní `ITool` v zásuvném modulu pro registraci vlastního nástroje:
 
 ```csharp
 public class MyPluginTool : ITool
 {
     public string Name => "my_plugin_tool";
-    public string Description => "Nástroj poskytovaný mým pluginem";
+    public string Description => "A tool provided by my plugin";
     
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
-        return new ToolResult { Success = true, Output = "Hotovo" };
+        return new ToolResult { Success = true, Output = "Done" };
     }
 }
 ```
 
-3. Zkompilovaný DLL vložte do adresáře pluginů, `PluginLoader` jej automaticky načte.
+3. Vložte zkompilovanou DLL do adresáře zásuvných modulů, `PluginLoader` ji automaticky načte.
 
-> **Bezpečnostní omezení**: Pluginy nemohou odkazovat na jmenné prostory `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` atd. Pluginy jsou izolovaně načítány prostřednictvím `AssemblyLoadContext`.
+> **Bezpečnostní omezení**: Zásuvné moduly nemohou odkazovat na jmenné prostory `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` atd. Zásuvné moduly jsou izolovaně načítány pomocí `AssemblyLoadContext`.
 
-## Pravidla stylu kódu
+### Přidání nového skinu
+
+1. Implementujte `ISkin` v `src/SiliconLife.App/Web/Skins/`:
+
+```csharp
+public class MyCustomSkin : ISkin
+{
+    public string Name => "MySkin";
+    public string Description => "A custom skin description";
+    
+    public string GetCss()
+    {
+        return @"
+            :root {
+                --primary-color: #your-color;
+                --bg-color: #your-bg;
+            }
+            /* Your custom styles */
+        ";
+    }
+}
+```
+
+2. Skin je automaticky objeven pomocí `SkinManager`.
+
+## Průvodce stylem kódu
 
 ### Konvence pojmenování
 
-- **Třídy**: PascalCase s funkčním prefixem (např. `DefaultSiliconBeing`)
-- **Rozhraní**: Začínají `I` (např. `IAIClient`, `ITool`)
+- **Třídy**: PascalCase, s funkční předponou (např. `DefaultSiliconBeing`)
+- **Rozhraní**: Začínají písmenem `I` (např. `IAIClient`, `ITool`)
 - **Implementace**: Končí názvem rozhraní (např. `OllamaClient` implementuje `IAIClient`)
-- **Nástroje**: Končí `Tool` (např. `CalendarTool`, `ChatTool`)
-- **View modely**: Končí `ViewModel` (např. `BeingViewModel`)
+- **Nástroje**: Končí příponou `Tool` (např. `CalendarTool`, `ChatTool`)
+- **Modely pohledů**: Končí příponou `ViewModel` (např. `BeingViewModel`)
 
 ### Organizace kódu
 
 ```
 SiliconLife.Common/
 ├── AI/                    # Implementace AI klientů a továren
-├── Calendar/              # 32 implementací kalendářů
-├── Localization/          # Základní třída lokalizace a 29 jazykových implementací
+├── Calendar/              # 32 implementací kalendáře
+├── Localization/          # Základ lokalizace a 34 jazykových variant
 ├── Security/              # Správce oprávnění
-├── SiliconBeing/          # Výchozí implementace silikonových bytostí
-├── Tools/                 # Sdílené vestavěné nástroje
+├── SiliconBeing/          # Výchozí implementace Křemíkové Bytosti
+├── Tools/                 # Sdílené vestavěné nástroje (25)
 ├── Web/                   # Webová infrastruktura
 └── WebView/               # Implementace Playwright WebView
 
-SiliconLife.App/          # Aplikační vrstva sdílená Default a Fast
-├── Config/                # Aplikační konfigurace
-├── Help/                  # Lokalizace nápovědní dokumentace
+SiliconLife.App/          # Aplikační vrstva sdílená mezi Default a Fast
+├── Config/                # Konfigurace aplikace
+├── Help/                  # Lokalizace nápovědy
+├── Project/               # Projektový systém (engine pracovních postupů, projektové role)
 └── Web/                   # Implementace Web UI
-    ├── Component/         # Knihovna UI komponent
-    ├── Controllers/       # Routovací kontrolery
-    ├── Models/            # View modely
+    ├── Component/         # 27 UI komponent
+    ├── Controllers/       # 24 směrovacích kontrolerů
+    ├── Models/            # Modely pohledů
     ├── Views/             # HTML pohledy
-    └── Skins/             # Témata skinů
+    └── Skins/             # 7 skinových témat
 
 SiliconLife.Default/      # Adresáře specifické pro verzi
 ├── Config/                # Výchozí konfigurační data
-├── IM/                    # Poskytovatel WebUI
 ├── Knowledge/             # Implementace znalostní sítě
-├── Logging/               # Implementace poskytovatelů logů
+├── Logging/               # Implementace poskytovatele protokolů (konzole + souborový systém)
 ├── Project/               # Implementace projektového systému
-├── Security/              # Výchozí zpětné volání oprávnění
-├── Storage/               # Implementace úložiště na souborovém systému
-└── Tools/                 # Nástroje specifické pro verzi (HelpTool)
+└── Storage/               # Implementace souborového systému úložiště
+
+SiliconLife.Fast/         # Adresáře specifické pro verzi
+├── Config/                # Konfigurační data verze Fast
+├── Logging/               # Implementace poskytovatele protokolů (konzole + souborový systém)
+├── Storage/               # Adaptéry úložiště SpeedyPack
+└── Tray/                  # Lokalizace systémové lišty
 ```
 
 ### Dokumentace
 
 - Všechna veřejná API musí mít XML dokumentační komentáře
-- Všechny zdrojové soubory používají záhlaví licence Apache 2.0
-- Využijte funkce .NET 9 (implicitní using, nullable reference typy)
+- Všechny zdrojové soubory používají hlavičku licence Apache 2.0
+- Využití funkcí .NET 9 (implicitní using, nullable referenční typy)
 
 ## Vývojový pracovní postup
 
@@ -329,7 +353,7 @@ dotnet test tests/SiliconLife.Core.Tests
 ### 3. Ladění
 
 ```bash
-# Spuštění s výstupem ladění
+# Spuštění s ladicím výstupem
 dotnet run --project src/SiliconLife.Default --configuration Debug
 ```
 
@@ -351,13 +375,13 @@ public class MyCustomCalendar : CalendarBase
     
     public override CalendarDate ConvertFromGregorian(GregorianDate date)
     {
-        // Vaše logika převodu
+        // Vaše konverzní logika
         return new CalendarDate(year, month, day);
     }
     
     public override GregorianDate ConvertToGregorian(CalendarDate date)
     {
-        // Reverzní převod
+        // Zpětná konverze
         return new GregorianDate(year, month, day);
     }
 }
@@ -372,9 +396,7 @@ public class CustomExecutor : ExecutorBase
     
     public override async Task<ExecutorResult> ExecuteAsync(ExecutorRequest request)
     {
-        var callerId = request.CallerId;
-        var pm = ServiceLocator.Instance.GetPermissionManager(callerId);
-        var permission = pm.CheckPermission(request.Resource, request.Operation);
+        var permission = await CheckPermissionAsync(request);
         if (!permission.Allowed)
         {
             return ExecutorResult.Denied(permission.Reason);
@@ -387,9 +409,39 @@ public class CustomExecutor : ExecutorBase
 }
 ```
 
-## Testovací pravidla
+### Příklad: Přidání vlastní šablony pracovního postupu
 
-### Unit testy
+```csharp
+public class MyWorkflowTemplate : WorkflowTemplate
+{
+    public override string Name => "my_workflow";
+    public override string Description => "A custom workflow template";
+    
+    public override void DefineStates()
+    {
+        AddState("start", "Začátek", isInitial: true);
+        AddState("processing", "Zpracování");
+        AddState("review", "Kontrola");
+        AddState("done", "Dokončeno", isFinal: true);
+    }
+    
+    public override void DefineTransitions()
+    {
+        AddTransition("start", "processing", "Zahájit zpracování");
+        AddTransition("processing", "review", "Odeslat ke kontrole");
+        AddTransition("review", "done", "Kontrola schválena");
+        AddTransition("review", "processing", "Kontrola zamítnuta");
+    }
+}
+```
+
+### Příklad: Přidání projektové role
+
+Projektové role jsou spravovány pomocí operací `assign_role` a `remove_role` nástroje `ProjectTool`. Názvy rolí jsou vlastní řetězce používané k odlišení odpovědností Křemíkových Bytostí v pracovních postupech a přiřazování úkolů.
+
+## Průvodce testováním
+
+### Jednotkové testy
 
 ```csharp
 [TestClass]
@@ -409,10 +461,10 @@ public class MyToolTests
             }
         };
         
-        // Akce
+        // Provedení
         var result = await tool.ExecuteAsync(call);
         
-        // Kontrola
+        // Tvrzení
         Assert.IsTrue(result.Success);
         Assert.IsNotNull(result.Output);
     }
@@ -421,59 +473,59 @@ public class MyToolTests
 
 ### Integrační testy
 
-Testování kompletního toku:
+Testování kompletního průběhu:
 1. AI vrací volání nástroje
-2. Provedení nástroje
-3. Výsledek je vrácen AI
-4. AI vrací finální odpověď
+2. Nástroj se provede
+3. Výsledek je předán AI
+4. AI vrací konečnou odpověď
 
-## Úvahy o výkonu
+## Aspekty výkonu
 
-### Systém úložiště
+### Úložný systém
 
-- Výchozí verze používá JSON úložiště založené na souborech
-- Verze Fast používá paměťový storage engine SpeedyPack (formát .spk)
-- SpeedyPack využívá mapování paměťových adresářů + mezipaměť záznamů + asynchronní frontu zápisu
-- Dotazy s časovým indexem používají rozhraní `ITimeStorage`
+- Verze Default používá souborové JSON úložiště
+- Verze Fast používá SpeedyPack paměťový úložný engine (formát .spk)
+- SpeedyPack využívá mapování adresářů v paměti + mezipaměť záznamů + asynchronní frontu zápisů
+- Časově indexované dotazy používají rozhraní `ITimeStorage`
 
-### Hlavní smyčkový scheduler
+### Plánovač Hlavní Smyčky
 
-- Fair scheduling založený na časových řezech hodin
-- Watchdog timer pro detekci zamrznutých operací
-- Circuit breaker pro prevenci kaskádových selhání
+- Hodinami řízené spravedlivé plánování časových slotů
+- Hlídač pro detekci zaseknutých operací
+- Jistič pro zabránění kaskádovým selháním
 
-## Nejlepší postupy
+## Osvědčené postupy
 
 ### 1. Vždy ověřujte oprávnění
 
-Jakákoli operace iniciovaná AI musí projít řetězcem oprávnění:
+Jakákoliv operace iniciovaná AI musí projít řetězcem oprávnění:
 
 ```csharp
-var permission = permissionManager.EvaluatePermission(callerId, permissionType, resource);
-if (!permission.Allowed)
+bool allowed = permissionManager.CheckPermission(callerId, permissionType, resource);
+if (!allowed)
 {
-    return Result.Denied(permission.Reason);
+    return Result.Denied("Permission denied");
 }
 ```
 
-### 2. Používejte Service Locator
+### 2. Používejte Lokátor Služeb
 
-Globální registrace a načítání služeb:
+Globální registrace a vyhledávání služeb:
 
 ```csharp
 // Během inicializace
 ServiceLocator.Instance.Register<ICustomService>(myService);
 
-// Když je potřeba
+// Při potřebě
 var service = ServiceLocator.Instance.Get<ICustomService>();
 ```
 
-### 3. Následujte oddělení tělo-mozek
+### 3. Dodržujte oddělení Tělo-Mozek
 
 - Tělo zpracovává stav a spouštěče
 - Mozek zpracovává AI interakce a provádění nástrojů
 
-### 4. Implementujte správné zpracování chyb
+### 4. Implementujte odpovídající zpracování chyb
 
 ```csharp
 try
@@ -483,23 +535,23 @@ try
 }
 catch (Exception ex)
 {
-    Logger.Error($"Operace selhala: {ex.Message}");
+    Logger.Error($"Operation failed: {ex.Message}");
     return Result.Failure(ex.Message);
 }
 ```
 
-## Pravidla příspěvků
+## Příručka přispívání
 
 1. Forkněte repozitář
-2. Vytvořte větev funkce (`git checkout -b feature/amazing-feature`)
-3. Commitněte své změny s konvenčními commity
+2. Vytvořte větev pro funkci (`git checkout -b feature/amazing-feature`)
+3. Potvrďte změny pomocí konvenčních commitů
 4. Pushněte do větve (`git push origin feature/amazing-feature`)
 5. Otevřete Pull Request
 
-### Formát zpráv commitu
+### Formát commit zpráv
 
 ```
-<type>(<scope>): <description>
+<typ>(<rozsah>): <popis>
 
 Příklady:
 feat(tool): add custom calendar tool
@@ -509,7 +561,7 @@ docs: update development guide
 
 ## Další kroky
 
-- 📚 Přečtěte si [Průvodce architekturou](architecture.md)
-- 📖 Prozkoumejte [API Reference](api-reference.md)
-- 🔒 Podívejte se na [Bezpečnostní dokumentaci](security.md)
-- 🚀 Podívejte se na [Průvodce rychlým startem](getting-started.md)
+- 📚 Přečtěte [příručku architektury](architecture.md)
+- 📖 Prozkoumejte [API referenci](api-reference.md)
+- 🔒 Prohlédněte [dokumentaci zabezpečení](security.md)
+- 🚀 Prohlédněte [příručku rychlého startu](getting-started.md)

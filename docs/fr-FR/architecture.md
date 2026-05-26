@@ -1,94 +1,94 @@
-﻿# Architecture
+# Architecture
 
 > **Version : v0.2.0-alpha**
 
-[English](../en/architecture.md) | [Deutsch](../de-DE/architecture.md) | **Français** | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md) | [Русский](../ru-RU/architecture.md)
+[English](../en/architecture.md) | [Deutsch](../de-DE/architecture.md) | [中文](../zh-CN/architecture.md) | [繁體中文](../zh-HK/architecture.md) | [Español](../es-ES/architecture.md) | [日本語](../ja-JP/architecture.md) | [한국어](../ko-KR/architecture.md) | [Čeština](../cs-CZ/architecture.md) | [Русский](../ru-RU/architecture.md)
 
-## Architecture en double version
+## Architecture double version
 
 Ce projet propose deux versions d'implémentation, partageant la même conception architecturale, mais différant dans le stockage et l'optimisation des performances :
 
-### SiliconLife.Default (Version standard)
-- **Positionnement** : Implémentation standard, principalement pour la vérification de faisabilité architecturale
+### SiliconLife.Default (version par défaut)
+- **Positionnement** : Implémentation par défaut, principalement utilisée pour valider la faisabilité de l'architecture
 - **Mode d'exécution** : Application console
-- **Méthode de stockage** : Stockage JSON pur en système de fichiers
-- **Scénarios applicables** : Exigences élevées de sécurité des données, ressources mémoire limitées, petit volume de données
-- **Description du rôle** : Implémentation de référence pour la vérification architecturale, offre une exécution simple et fiable, adaptée au premier contact, au débogage de développement ou aux scénarios prioritaires en sécurité des données
+- **Mode de stockage** : Stockage JSON pur sur système de fichiers
+- **Scénarios d'utilisation** : Exigences élevées de sécurité des données, ressources mémoire limitées, faible volume de données
+- **Rôle** : Implémentation de référence pour la validation de l'architecture, offrant un mode d'exécution simple et fiable, adaptée aux premiers contacts avec le projet, au débogage de développement ou aux scénarios privilégiant la sécurité des données
 
-### SiliconLife.Fast (Version haute performance)
-- **Positionnement** : Version principale de production
-- **Mode d'exécution** : Application de bureau (Windows/macOS barre d'état système / Linux fenêtre d'état)
-- **Méthode de stockage** : Stockage en mémoire SpeedyPack + persistance par lot asynchrone (format de fichier .spk)
-- **Scénarios applicables** : Concurrence élevée, faible latence, grands volumes de données
-- **Prise en charge de plateforme** : Windows/macOS (fonctionnalités complètes, barre d'état incluse), Linux (fenêtre d'état, pas d'icône dans la barre)
+### SiliconLife.Fast (version haute performance)
+- **Positionnement** : Version de production recommandée
+- **Mode d'exécution** : Application de bureau (barre d'état système Windows / fenêtre d'état Linux)
+- **Mode de stockage** : Stockage en mémoire SpeedyPack + persistance par lots asynchrone (format de fichier .spk)
+- **Scénarios d'utilisation** : Concurrence élevée, faible latence, grand volume de données
+- **Support de plateforme** : Windows/macOS (fonctionnalités complètes, incluant la barre d'état système) ; Linux (fenêtre d'état, sans icône de barre d'état)
 - **Caractéristiques** :
-  - Windows/macOS exécution en arrière-plan dans la barre d'état, surveillance en temps réel via la fenêtre d'état ; Linux fenêtre d'état affichée directement
+  - Fonctionnement en arrière-plan via la barre d'état Windows/macOS, surveillance en temps réel via la fenêtre d'état ; affichage direct de la fenêtre d'état sous Linux
   - Moteur SpeedyPack + compression automatique garantissant la sécurité des données
   - Architecture Component UI, 27 composants déclaratifs
-  - 7 thèmes d'apparence, prend en charge la détection et la commutation automatiques
-  - Outil de rechargement à chaud pour les mises à jour et redémarrages en ligne
-  - Linux ouvre automatiquement le navigateur pour accéder à l'interface Web, prend en charge le paramètre `--no-tray`
-- **Amélioration des performances** : Latence de lecture réduite de 1000x, latence d'écriture réduite de 15000x
-- **Description du rôle** : Implémentation prête pour la production avec optimisation approfondie, avec exécution en arrière-plan dans la barre d'état, moteur SpeedyPack + compression automatique, le meilleur choix pour l'exploitation à long terme et les véritables environnements de production
+  - 7 thèmes d'apparence, avec découverte automatique et changement
+  - Prise en charge du rechargement à chaud pour les mises à jour et redémarrages en ligne
+  - Ouverture automatique du navigateur sous Linux pour accéder à l'interface Web UI, prise en charge du paramètre `--no-tray`
+- **Amélioration des performances** : Latence de lecture réduite de 1000 fois, latence d'écriture réduite de 15000 fois
+- **Rôle** : Implémentation de niveau production profondément optimisée, dotée de fonctionnalités telles que le fonctionnement en arrière-plan via la barre d'état système, le moteur SpeedyPack + compression automatique, choix recommandé pour l'exécution à long terme et les environnements de production réels
 
-> **Note** : L'architecture décrite dans ce document s'applique aux deux versions, seules les implémentations de stockage diffèrent. SiliconLife.Default sert de référence pour la vérification architecturale, SiliconLife.Fast est la version principale recommandée pour la production.
+> **Note** : L'architecture décrite dans ce document s'applique aux deux versions, à l'exception de l'implémentation du stockage. SiliconLife.Default sert de référence pour la validation de l'architecture, SiliconLife.Fast est la version de production recommandée.
 
 ---
 
 ## Concepts fondamentaux
 
-### Silicon Being
+### Être de Silicium
 
-Chaque agent IA du système est un **Silicon Being** — une entité autonome avec sa propre identité, personnalité et capacités. Chaque Silicon Being est piloté par un **fichier âme** (prompt Markdown) qui définit ses modèles de comportement.
+Chaque agent IA du système est un **Être de Silicium** — une entité autonome dotée de sa propre identité, personnalité et capacités. Chaque Être de Silicium est piloté par un **Fichier d'Âme** (invite Markdown), définissant ses schémas comportementaux.
 
-### Silicon Curator
+### Curateur de Silicium
 
-Le **Silicon Curator** est un Silicon Being spécial avec les permissions système les plus élevées. Il agit comme administrateur système :
+Le **Curateur de Silicium** est un Être de Silicium spécial doté des autorisations système les plus élevées. Il agit comme administrateur du système :
 
-- Création et gestion des autres Silicon Beings
-- Analyse des requêtes utilisateur et décomposition en tâches
-- Distribution des tâches aux Silicon Beings appropriés
-- Surveillance de la qualité d'exécution et gestion des échecs
-- Réponse aux messages utilisateur avec **ordonnancement prioritaire** (voir ci-dessous)
+- Crée et gère les autres Êtres de Silicium
+- Analyse les requêtes des utilisateurs et les décompose en tâches
+- Distribue les tâches aux Êtres de Silicium appropriés
+- Surveille la qualité d'exécution et gère les échecs
+- Répond aux messages des utilisateurs avec un **ordonnancement prioritaire** (voir ci-dessous)
 
-### Fichier âme
+### Fichier d'Âme
 
-Fichier Markdown stocké dans le répertoire de données de chaque Silicon Being (`soul.md`). Il est injecté comme prompt système dans chaque requête IA, définissant la personnalité, les modèles de décision et les contraintes comportementales du Being.
+Fichier Markdown (`soul.md`) stocké dans le répertoire de données de chaque Être de Silicium. Il est injecté comme invite système dans chaque requête IA, définissant la personnalité, les schémas de décision et les contraintes comportementales de l'être.
 
 ---
 
-## Ordonnancement : Ordonnancement équitable par time-slice
+## Ordonnancement : Ordonnancement équitable par créneaux temporels
 
-### Boucle principale + Objets horloge
+### Boucle Principale + Objets Tick
 
-Le système exécute une **boucle principale pilotée par horloge** sur un thread dédié :
+Le système exécute une **Boucle Principale pilotée par horloge** sur un thread d'arrière-plan dédié :
 
 ```
-Boucle principale (thread dédié, chien de garde + disjoncteur)
-  └── Objet horloge A (Priorité=0, Intervalle=100ms)
-  └── Objet horloge B (Priorité=1, Intervalle=500ms)
-  └── SiliconBeingManager (déclenché par horloge de la boucle principale)
-        └── SiliconBeingRunner → Silicon Being 1 → Déclenchement horloge → Exécution d'un cycle
-        └── SiliconBeingRunner → Silicon Being 2 → Déclenchement horloge → Exécution d'un cycle
-        └── SiliconBeingRunner → Silicon Being 3 → Déclenchement horloge → Exécution d'un cycle
+Boucle Principale (thread dédié, Chien de Garde + Disjoncteur)
+  └── Objet Tick A (priorité=0, intervalle=100ms)
+  └── Objet Tick B (priorité=1, intervalle=500ms)
+  └── Gestionnaire d'Êtres de Silicium (déclenché par horloge directement par la Boucle Principale)
+        └── Exécuteur d'Être de Silicium → Être de Silicium 1 → Déclenchement par horloge → Exécution d'un cycle
+        └── Exécuteur d'Être de Silicium → Être de Silicium 2 → Déclenchement par horloge → Exécution d'un cycle
+        └── Exécuteur d'Être de Silicium → Être de Silicium 3 → Déclenchement par horloge → Exécution d'un cycle
         └── ...
 ```
 
 Décisions de conception clés :
 
-- **Les Silicon Beings n'héritent pas de l'objet horloge.** Ils ont leur propre méthode `Tick()`, appelée par `SiliconBeingManager` via `SiliconBeingRunner`, et non enregistrés directement dans la boucle principale.
-- **SiliconBeingManager** est déclenché directement par l'horloge de la boucle principale et agit comme proxy unique pour tous les Beings.
-- **SiliconBeingRunner** encapsule le `Tick()` de chaque Being sur un thread temporaire, avec timeout et disjoncteur par Being (3 timeouts consécutifs → 1 minute de refroidissement).
-- L'exécution de chaque Being est limitée à **un cycle** de requête IA + appel d'outils par déclenchement d'horloge, garantissant qu'aucun Being ne peut monopoliser la boucle principale.
-- **Moniteur de performance** suit les temps d'exécution de l'horloge pour l'observabilité.
+- **Les Êtres de Silicium n'héritent pas de l'Objet Tick.** Ils ont leur propre méthode `Tick()`, appelée par `SiliconBeingManager` via `SiliconBeingRunner`, et non enregistrée directement dans la Boucle Principale.
+- **Le Gestionnaire d'Êtres de Silicium** est déclenché directement par l'horloge de la Boucle Principale et agit comme proxy unique pour tous les êtres.
+- **L'Exécuteur d'Être de Silicium** encapsule le `Tick()` de chaque être sur un thread temporaire, avec un timeout et un Disjoncteur propre à chaque être (3 timeouts consécutifs → 1 minute de refroidissement).
+- L'exécution de chaque être est limitée à **un cycle** de requête IA + appel d'outils par déclenchement d'horloge, garantissant qu'aucun être ne peut monopoliser la Boucle Principale.
+- Le **Moniteur de Performance** suit les temps d'exécution des horloges pour la observabilité.
 
-### Réponse prioritaire du Curator
+### Réponse prioritaire du Curateur
 
-Lorsqu'un utilisateur envoie un message au Silicon Curator :
+Lorsqu'un utilisateur envoie un message au Curateur de Silicium :
 
-1. Le Being actuel (par exemple Being A) termine son cycle en cours — **pas d'interruption**.
-2. Le gestionnaire **saute le reste de la file d'attente**.
-3. La boucle **reprend depuis le Curator**, lui permettant de s'exécuter immédiatement.
+1. L'être en cours (par exemple l'Être A) termine son cycle actuel — **sans interruption**.
+2. Le gestionnaire **saute le reste de la file**.
+3. La boucle **reprend depuis le Curateur**, lui permettant de s'exécuter immédiatement.
 
 Cela garantit la réactivité aux interactions utilisateur sans perturber les tâches en cours.
 
@@ -98,55 +98,52 @@ Cela garantit la réactivité aux interactions utilisateur sans perturber les t�
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                        Hôte principal                    │
-│  (Hôte unifié — assemble et gère tous les composants)    │
+│                        Hôte Principal                    │
+│  (Hôte unifié — assemblage et gestion de tous les composants) │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
 │  ┌──────────┐  ┌──────────────┐  ┌──────────────────┐  │
-│  │ Boucle    │  │ Localisateur │  │    Configuration  │  │
-│  │ principale│  │ de services  │  │                   │  │
+│  │ Boucle    │  │ Localisateur │  │   Configuration   │  │
+│  │ Principale│  │ de services  │  │                   │  │
 │  └────┬─────┘  └──────────────┘  └──────────────────┘  │
 │       │                                                  │
 │  ┌────▼─────────────────────────────────────────────┐   │
-│  │     SiliconBeingManager (objet horloge)           │   │
+│  │      Gestionnaire d'Êtres de Silicium (Objet Tick) │   │
 │  │  ┌─────────┐ ┌─────────┐ ┌─────────┐            │   │
-│  │  │Curator   │ │Being A  │ │Being B  │  ...       │   │
+│  │  │Curateur  │ │ Être A  │ │ Être B  │  ...       │   │
 │  │  └────┬────┘ └────┬────┘ └────┬────┘            │   │
 │  └───────┼───────────┼───────────┼──────────────────┘   │
 │          │           │           │                      │
 │  ┌───────▼───────────▼───────────▼──────────────────┐   │
-│  │              Services partagés                    │   │
+│  │              Services partagés                     │   │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────────────┐  │   │
-│  │  │ Système  │  │ Stockage │  │ Gestionnaire     │  │   │
-│  │  │ de chat  │  │          │  │ de permissions   │  │   │
+│  │  │Système   │  │ Stockage │  │ Gestionnaire     │  │   │
+│  │  │de Chat   │  │          │  │ d'Autorisations  │  │   │
 │  │  └──────────┘ └────┬─────┘ └──────────────────┘  │   │
 │  │                   │                               │   │
 │  │  ┌──────────┐ ┌────▼─────┐ ┌──────────────────┐  │   │
 │  │  │ Client   │  │Exécuteur │  │ Gestionnaire     │  │   │
-│  │  │ IA       │  │          │  │ d'outils         │  │   │
+│  │  │ IA       │  │          │  │ d'Outils         │  │   │
 │  │  └──────────┘ └──────────┘ └──────────────────┘  │   │
 │  │  ┌──────────┐ ┌──────────┐                        │   │
-│  │  │ Chargeur │  │ Réseau   │                        │   │
-│  │  │ de plugins│  │ de conn. │                        │   │
-│  │  ┌──────────┐ ┌──────────┐                        │   │
-│  │  │ Réseau   │ │          │                        │   │
-│  │  │ de conn. │ │          │                        │   │
+│  │  │Chargeur  │  │Réseau de │                        │   │
+│  │  │de Plugins│  │Connaiss. │                        │   │
 │  │  └──────────┘ └──────────┘                        │   │
 │  └──────────────────────────────────────────────────┘   │
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │                  Exécuteurs                       │   │
+│  │                  Exécuteurs                        │   │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────────────┐  │   │
-│  │  │ Exécuteur│  │ Exécuteur│  │  Exécuteur       │  │   │
-│  │  │ disque   │  │ réseau   │  │  ligne de cmd.   │  │   │
+│  │  │ Exécuteur│  │ Exécuteur│  │ Exécuteur        │  │   │
+│  │  │ Disque   │  │ Réseau   │  │ Ligne de commande│  │   │
 │  │  └──────────┘ └──────────┘ └──────────────────┘  │   │
 │  └──────────────────────────────────────────────────┘   │
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │          Fournisseurs de messagerie instantanée   │   │
+│  │              Fournisseurs IM                       │   │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────────────┐  │   │
-│  │  │ Fourn.   │  │ Fourn.   │  │  Feishu / ...    │  │   │
-│  │  │ console  │  │ Web      │  │  Fournisseur     │  │   │
+│  │  │Fournisseur│ │Fournisseur│ │ Feishu / ...     │  │   │
+│  │  │Console    │  │ Web      │  │ Fournisseur      │  │   │
 │  │  └──────────┘ └──────────┘ └──────────────────┘  │   │
 │  └──────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────┘
@@ -159,43 +156,43 @@ Cela garantit la réactivité aux interactions utilisateur sans perturber les t�
 `ServiceLocator` est un registre singleton thread-safe fournissant l'accès à tous les services principaux :
 
 | Propriété | Type | Description |
-|-----------|------|-------------|
+|----------|------|-------------|
 | `ChatSystem` | `ChatSystem` | Gestionnaire central de sessions de chat |
 | `IMManager` | `IMManager` | Routeur de fournisseurs de messagerie instantanée |
-| `AuditLogger` | `AuditLogger` | Piste d'audit des permissions |
-| `GlobalAcl` | `GlobalACL` | Liste de contrôle d'accès globale |
-| `BeingFactory` | `ISiliconBeingFactory` | Fabrique de création de Beings |
-| `BeingManager` | `SiliconBeingManager` | Gestionnaire de cycle de vie des Beings actifs |
+| `AuditLogger` | `AuditLogger` | Piste d'audit des autorisations |
+| `GlobalAcl` | `GlobalACL` | ACL Global |
+| `BeingFactory` | `ISiliconBeingFactory` | Fabrique de création d'êtres |
+| `BeingManager` | `SiliconBeingManager` | Gestionnaire de cycle de vie des êtres actifs |
 | `DynamicBeingLoader` | `DynamicBeingLoader` | Chargeur de compilation dynamique |
 | `TokenUsageAudit` | `ITokenUsageAudit` | Suivi de l'utilisation des tokens |
 | `TokenUsageAuditManager` | `TokenUsageAuditManager` | Rapports d'utilisation des tokens |
 
-Il maintient également un registre de `PermissionManager` par Being, indexé par le GUID du Being.
+Il maintient également un registre de `PermissionManager` par être, indexé par le GUID de l'être.
 
 ---
 
-## Système de chat
+## Système de Chat
 
 ### Types de sessions
 
-Le système de chat prend en charge trois types de sessions via `SessionBase` :
+Le Système de Chat prend en charge trois types de sessions via `SessionBase` :
 
 | Type | Classe | Description |
-|------|--------|-------------|
+|------|-------|-------------|
 | `SingleChat` | `SingleChatSession` | Conversation en tête-à-tête entre deux participants |
 | `GroupChat` | `GroupChatSession` | Chat de groupe multi-participants |
-| `Broadcast` | `BroadcastChannel` | Canal ouvert avec ID fixe ; les Beings s'abonnent dynamiquement et ne reçoivent les messages qu'après abonnement |
+| `Broadcast` | `BroadcastChannel` | Canal ouvert avec ID fixe ; les êtres s'abonnent dynamiquement et ne reçoivent les messages qu'après leur abonnement |
 
-### Canaux de diffusion
+### Canal de Diffusion
 
-`BroadcastChannel` est un type de session spécial pour les annonces à l'échelle du système :
+`BroadcastChannel` est un type de session spécial utilisé pour les annonces à l'échelle du système :
 
 - **ID de canal fixe** — Contrairement à `SingleChatSession` et `GroupChatSession`, l'ID du canal est une constante connue, et non dérivé des GUID des membres.
-- **Abonnement dynamique** — Les Beings s'abonnent/se désabonnent à l'exécution ; ils ne reçoivent que les messages publiés après leur abonnement.
-- **Filtrage des messages en attente** — `GetPendingMessages()` ne retourne que les messages publiés après l'heure d'abonnement du Being et non encore lus.
-- **Géré par le système de chat** — `GetOrCreateBroadcastChannel()`, `Broadcast()`, `GetPendingBroadcasts()`.
+- **Abonnement dynamique** — Les êtres s'abonnent/se désabonnent à l'exécution ; ils ne reçoivent que les messages publiés après leur abonnement.
+- **Filtrage des messages en attente** — `GetPendingMessages()` ne retourne que les messages publiés après l'heure d'abonnement de l'être et non encore lus.
+- **Géré par le Système de Chat** — `GetOrCreateBroadcastChannel()`, `Broadcast()`, `GetPendingBroadcasts()`.
 
-### Messages de chat
+### Message de Chat
 
 Le modèle `ChatMessage` contient des champs pour le contexte de conversation IA et le suivi des tokens :
 
@@ -208,48 +205,48 @@ Le modèle `ChatMessage` contient des champs pour le contexte de conversation IA
 | `Timestamp` | `DateTime` | Heure d'envoi du message |
 | `Type` | `MessageType` | Texte, image, fichier ou notification système |
 | `ReadBy` | `List<Guid>` | IDs des participants ayant lu ce message |
-| `Role` | `MessageRole` | Rôle de conversation IA (utilisateur, assistant, outil) |
-| `ToolCallId` | `string?` | ID d'appel d'outil pour les messages de résultat d'outil |
-| `ToolCallsJson` | `string?` | JSON sérialisé des appels d'outils pour les messages assistant |
+| `Role` | `MessageRole` | Rôle dans la conversation IA (utilisateur, assistant, outil) |
+| `ToolCallId` | `string?` | ID de l'appel d'outil pour les messages de résultat d'outil |
+| `ToolCallsJson` | `string?` | JSON sérialisé des appels d'outil pour les messages assistant |
 | `Thinking` | `string?` | Raisonnement en chaîne de pensée de l'IA |
-| `PromptTokens` | `int?` | Nombre de tokens dans le prompt (entrée) |
+| `PromptTokens` | `int?` | Nombre de tokens dans l'invite (entrée) |
 | `CompletionTokens` | `int?` | Nombre de tokens dans la complétion (sortie) |
 | `TotalTokens` | `int?` | Nombre total de tokens utilisés (entrée + sortie) |
-| `FileMetadata` | `FileMetadata?` | Métadonnées de fichier jointes (si le message contient un fichier) |
+| `FileMetadata` | `FileMetadata?` | Métadonnées du fichier joint (si le message contient un fichier) |
 
-### File d'attente de messages de chat
+### File de messages de chat
 
-`ChatMessageQueue` est un système de file d'attente de messages thread-safe pour la gestion asynchrone des messages de chat :
+`ChatMessageQueue` est un système de file de messages thread-safe pour la gestion asynchrone des messages de chat :
 
-- **Thread-safe** — Utilise des mécanismes de verrouillage pour garantir la sécurité d'accès concurrentiel
-- **Traitement asynchrone** — Prend en charge l'enfilement et le défilement asynchrones des messages
-- **Ordonnancement des messages** — Maintient l'ordre chronologique des messages
-- **Opérations par lot** — Prend en charge la récupération par lot des messages
+- **Thread-safe** — Utilisation de mécanismes de verrouillage pour garantir la sécurité de l'accès concurrentiel
+- **Traitement asynchrone** — Prise en charge de l'enfilement et du défilement asynchrone des messages
+- **Ordonnancement des messages** — Maintien de l'ordre chronologique des messages
+- **Opérations par lots** — Prise en charge de la récupération par lots des messages
 
 ### Métadonnées de fichier
 
 `FileMetadata` gère les informations sur les fichiers joints aux messages de chat :
 
-- **Informations sur le fichier** — Nom, taille, type, chemin
-- **Horodatage de téléchargement** — Timestamp du téléchargement du fichier
-- **Téléchargeur** — ID de l'utilisateur ou du Silicon Being ayant téléchargé le fichier
+- **Informations sur le fichier** — Nom, taille, type, chemin du fichier
+- **Heure de téléchargement** — Horodatage du téléchargement du fichier
+- **Téléchargeur** — ID de l'utilisateur ou de l'Être de Silicium ayant téléchargé le fichier
 
 ### Gestionnaire d'annulation de flux
 
-`StreamCancellationManager` fournit un mécanisme d'annulation pour les réponses IA en streaming :
+`StreamCancellationManager` fournit un mécanisme d'annulation pour les réponses en flux de l'IA :
 
-- **Contrôle de flux** — Prend en charge l'annulation des réponses IA en streaming en cours
+- **Contrôle de flux** — Prise en charge de l'annulation des réponses en flux IA en cours
 - **Nettoyage des ressources** — Nettoyage correct des ressources associées lors de l'annulation
-- **Sécurité concurrentielle** — Prend en charge la gestion simultanée de plusieurs flux
+- **Sécurité concurrentielle** — Prise en charge de la gestion simultanée de plusieurs flux
 
-### Historique de chat
+### Consultation de l'historique de chat
 
-La fonctionnalité d'historique de chat permet aux utilisateurs de parcourir les conversations passées des Silicon Beings :
+La fonctionnalité de consultation de l'historique de chat permet aux utilisateurs de parcourir les conversations historiques des Êtres de Silicium :
 
 - **Liste des sessions** — Affiche toutes les sessions historiques
-- **Détails des messages** — Affiche l'historique complet des messages
-- **Vue chronologique** — Présente les messages dans l'ordre chronologique
-- **Support API** — Fournit une API RESTful pour récupérer les données de sessions et de messages
+- **Détails des messages** — Consultation de l'historique complet des messages
+- **Vue chronologique** — Affichage des messages dans l'ordre chronologique
+- **Support API** — Fourniture d'API RESTful pour récupérer les données de sessions et de messages
 
 ---
 
@@ -260,16 +257,16 @@ Le système prend en charge plusieurs backends IA via l'interface `IAIClient` :
 ### OllamaClient
 
 - **Type** : Service IA local
-- **Protocole** : API HTTP Ollama native (`/api/chat`, `/api/generate`)
+- **Protocole** : API HTTP native Ollama (`/api/chat`, `/api/generate`)
 - **Fonctionnalités** : Streaming, appels d'outils, hébergement de modèles locaux
 - **Configuration** : `endpoint`, `model`, `temperature`, `maxTokens`
 
-### DashScopeClient (Alibaba Cloud DashScope)
+### DashScopeClient (Alibaba Cloud Bailian)
 
 - **Type** : Service IA cloud
 - **Protocole** : API compatible OpenAI (`/compatible-mode/v1/chat/completions`)
 - **Authentification** : Bearer token (clé API)
-- **Fonctionnalités** : Streaming, appels d'outils, contenu de raisonnement (chaîne de pensée), déploiement multi-région
+- **Fonctionnalités** : Streaming, appels d'outils, contenu de raisonnement (chaîne de pensée), déploiement multi-régions
 - **Régions prises en charge** :
   - `beijing` — Chine du Nord 2 (Pékin)
   - `virginia` — États-Unis (Virginie)
@@ -281,30 +278,30 @@ Le système prend en charge plusieurs backends IA via l'interface `IAIClient` :
   - **Raisonnement** : qwq-plus
   - **Tiers** : deepseek-v3.2, deepseek-r1, glm-5.1, kimi-k2.5, llama-4-maverick
 - **Configuration** : `apiKey`, `region`, `model`
-- **Découverte de modèles** : Récupération des modèles disponibles depuis l'API DashScope à l'exécution ; repli vers une liste sélectionnée en cas de panne réseau
+- **Découverte de modèles** : Récupération des modèles disponibles depuis l'API Bailian à l'exécution ; repli vers une liste éditorialisée en cas de panne réseau
 
 ### VolcengineArkClient (Volcengine Ark)
 
 - **Type** : Service IA cloud
 - **Protocole** : API compatible OpenAI
 - **Authentification** : Bearer token (clé API)
-- **Fonctionnalités** : Prise en charge des modes streaming et non-streaming, contrôle de vitesse double intégré
-  - Contrôle de vitesse propre : Application d'un intervalle minimum entre les requêtes
-  - Limitation de vitesse du serveur : Gestion des erreurs 429, nouvelle tentative avec backoff exponentiel
+- **Fonctionnalités** : Modes flux et non-flux, contrôle de débit double intégré
+  - Auto-contrôle de débit : application d'un intervalle minimum entre les requêtes
+  - Limite de débit serveur : gestion des erreurs 429, retry avec backoff exponentiel
 - **Configuration** : `apiKey`, `endpoint`, `model`
-- **Caractéristiques** : Service IA de ByteDance, prend en charge divers modèles Doubao
+- **Particularité** : Service IA de ByteDance, prenant en charge plusieurs modèles Doubao
 
-### Pattern Factory de clients IA
+### Modèle de fabrique de clients
 
-Chaque type de client IA a une implémentation factory correspondante de `IAIClientFactory` :
+Chaque type de client IA dispose d'une implémentation de fabrique correspondante `IAIClientFactory` :
 
 - `OllamaClientFactory` — Crée des instances OllamaClient
 - `DashScopeClientFactory` — Crée des instances DashScopeClient
 - `VolcengineArkClientFactory` — Crée des instances VolcengineArkClient
 
-La factory fournit :
-- `CreateClient(Dictionary<string, object> config)` — Instancie un client depuis la configuration
-- `GetConfigKeyOptions(string key, ...)` — Retourne les options dynamiques pour une clé de configuration (ex. modèles disponibles, régions)
+Les fabriques fournissent :
+- `CreateClient(Dictionary<string, object> config)` — Instancie un client à partir de la configuration
+- `GetConfigKeyOptions(string key, ...)` — Retourne les options dynamiques pour une clé de configuration (par exemple modèles disponibles, régions)
 - `GetDisplayName()` — Nom d'affichage localisé du type de client
 
 ### Liste de support des plateformes IA
@@ -315,18 +312,18 @@ La factory fournit :
 - 📋 Planifié
 - 💡 En considération
 
-*Note : En raison de l'environnement réseau du développeur, la connexion aux services IA cloud internationaux marqués [En considération] peut nécessiter des outils proxy réseau, et le processus de débogage peut être instable.*
+*Note : En raison de l'environnement réseau du développeur, l'accès aux services IA cloud étrangers [en considération] peut nécessiter des outils de proxy réseau, et le processus de débogage peut être instable.*
 
 #### Liste des plateformes
 
 | Plateforme | Statut | Type | Description |
-|------------|--------|------|-------------|
-| Ollama | ✅ | Local | Service IA local, prend en charge le déploiement de modèles locaux |
-| DashScope (Alibaba Cloud) | ✅ | Cloud | Service IA DashScope d'Alibaba Cloud, déploiement multi-région |
-| Baidu Qianfan (Wenxin) | 📋 | Cloud | Service IA Wenxin de Baidu |
+|------|------|------|------|
+| Ollama | ✅ | Local | Service IA local, prenant en charge le déploiement de modèles locaux |
+| DashScope (Alibaba Cloud Bailian) | ✅ | Cloud | Service IA Alibaba Cloud Bailian, prenant en charge le déploiement multi-régions |
+| Baidu Qianfan (Wenxin Yiyan) | 📋 | Cloud | Service IA Baidu Wenxin Yiyan |
 | Zhipu AI (GLM) | 📋 | Cloud | Service IA Zhipu Qingyan |
-| Moonshot (Kimi) | 📋 | Cloud | Service IA Kimi de Moonshot AI |
-| Volcengine Ark.Doubao | ✅ | Cloud | Service IA Doubao de ByteDance |
+| Moonshot (Kimi) | 📋 | Cloud | Service IA Kimi de Moonshot |
+| Volcengine Ark · Doubao | ✅ | Cloud | Service IA Doubao de ByteDance |
 | DeepSeek (connexion directe) | 📋 | Cloud | Service IA DeepSeek |
 | 01.AI (Yi) | 📋 | Cloud | Service IA 01.AI |
 | Tencent Hunyuan | 📋 | Cloud | Service IA Tencent Hunyuan |
@@ -334,7 +331,7 @@ La factory fournit :
 | MiniMax | 📋 | Cloud | Service IA MiniMax |
 | OpenAI | 💡 | Cloud | Service API OpenAI (série GPT) |
 | Anthropic | 💡 | Cloud | Service IA Anthropic Claude |
-| Google DeepMind | 💡 | Cloud | Service Google Gemini |
+| Google DeepMind | 💡 | Cloud | Service IA Google Gemini |
 | Mistral AI | 💡 | Cloud | Service IA Mistral |
 | Groq | 💡 | Cloud | Service d'inférence IA haute vitesse Groq |
 | Together AI | 💡 | Cloud | Service de modèles open source Together AI |
@@ -342,7 +339,7 @@ La factory fournit :
 | Cohere | 💡 | Cloud | Service NLP entreprise Cohere |
 | Replicate | 💡 | Cloud | Plateforme d'hébergement de modèles open source Replicate |
 | Hugging Face | 💡 | Cloud | Communauté IA open source et plateforme de modèles Hugging Face |
-| Cerebras | 💡 | Cloud | Service d'inférence IA optimisé Cerebras |
+| Cerebras | 💡 | Cloud | Service d'optimisation d'inférence IA Cerebras |
 | Databricks | 💡 | Cloud | Plateforme IA entreprise Databricks (MosaicML) |
 | Perplexity AI | 💡 | Cloud | Service de recherche-réponse IA Perplexity |
 | NVIDIA NIM | 💡 | Cloud | Microservice d'inférence IA NVIDIA |
@@ -351,132 +348,81 @@ La factory fournit :
 
 ## Décisions de conception clés
 
-### Stockage comme classe d'instance (et non statique)
+### Le stockage comme classe d'instance (et non statique)
 
-`IStorage` est conçu comme une instance injectable, et non un utilitaire statique. Cela garantit :
+`IStorage` est conçu comme une instance injectable, et non comme un utilitaire statique. Cela garantit :
 
-- Accès direct au système de fichiers — IStorage est le canal de persistance interne du système, **non** routé via les exécuteurs.
-- **L'IA ne peut pas contrôler IStorage** — Les exécuteurs gèrent les E/S initiés par les outils IA ; IStorage gère les lectures/écritures internes du framework. Ce sont des préoccupations fondamentalement différentes.
-- Testable avec des implémentations simulées.
+- Accès direct au système de fichiers — IStorage est le canal de persistance interne du système, il n'est **pas** routé via les exécuteurs.
+- **L'IA ne peut pas contrôler IStorage** — Les exécuteurs gèrent les E/S initiées par les outils IA ; IStorage gère les lectures/écritures de données internes du framework. Ce sont des préoccupations fondamentalement différentes.
+- Testabilité avec des implémentations mock.
 - Support futur de différents backends de stockage sans modification des consommateurs.
 
-### Exécuteurs comme frontière de sécurité
+### Les exécuteurs comme frontière de sécurité
 
 Les exécuteurs sont le **seul** chemin pour les opérations d'E/S. Les outils nécessitant un accès disque, réseau ou ligne de commande **doivent** passer par les exécuteurs. Cette conception impose :
 
-- Chaque exécuteur possède un **thread d'ordonnancement séparé**, avec verrouillage de thread pour la validation des permissions.
-- Vérification centralisée des permissions — les exécuteurs interrogent le **gestionnaire de permissions privé** du Being.
-- File d'attente de requêtes avec support de priorité et contrôle de timeout.
-- Journalisation d'audit pour toutes les opérations externes.
-- Isolation des exceptions — l'échec d'un exécuteur n'affecte pas les autres.
-- Disjoncteur — les échecs consécutifs arrêtent temporairement l'exécuteur pour prévenir les défaillances en cascade.
+- Chaque exécuteur dispose d'un **thread de répartition indépendant**, avec verrouillage de thread pour la vérification des autorisations.
+- Vérification centralisée des autorisations — Les exécuteurs interrogent le **Gestionnaire d'Autorisations** privé de l'être.
+- File d'attente avec support de priorité et contrôle de timeout.
+- Journal d'audit pour toutes les opérations externes.
+- Isolation des exceptions — L'échec d'un exécuteur n'affecte pas les autres.
+- Disjoncteur — Les échecs consécutifs arrêtent temporairement l'exécuteur pour prévenir les défaillances en cascade.
 
 ### ContextManager comme objet léger
 
 Chaque `ExecuteOneRound()` crée une nouvelle instance de `ContextManager` :
 
-1. Charge le fichier âme + l'historique de chat récent.
+1. Charge le Fichier d'Âme + l'historique de chat récent.
 2. Envoie la requête au client IA.
-3. Traite en boucle les appels d'outils jusqu'à ce que l'IA retourne du texte pur.
-4. Persiste la réponse dans le système de chat.
+3. Traite en boucle les appels d'outils jusqu'à ce que l'IA retourne du texte brut.
+4. Persiste la réponse dans le Système de Chat.
 5. Libère les ressources.
 
 Cela maintient chaque cycle isolé et sans état.
 
 ### Auto-évolution par réécriture de classe
 
-Les Silicon Beings peuvent réécrire leurs propres classes C# à l'exécution :
+Les Êtres de Silicium peuvent réécrire leurs propres classes C# à l'exécution :
 
 1. L'IA génère un nouveau code de classe (doit hériter de `SiliconBeingBase`).
-2. **Contrôle des références à la compilation** (défense principale) : le compilateur ne reçoit que la liste d'assemblies autorisés — `System.IO`, `System.Reflection`, etc. sont exclus, rendant le code dangereux impossible au niveau du type.
-3. **Analyse statique à l'exécution** (défense secondaire) : `SecurityScanner` scanne le code pour des motifs dangereux après compilation réussie.
+2. **Contrôle des références à la compilation** (défense principale) : le compilateur ne reçoit que la liste d'assemblages autorisés — `System.IO`, `System.Reflection`, etc. sont exclus, donc le code dangereux est impossible au niveau du type.
+3. **Analyse statique à l'exécution** (défense secondaire) : `SecurityScanner` scanne le code à la recherche de motifs dangereux après une compilation réussie.
 4. Roslyn compile le code en mémoire.
-5. En cas de succès : `SiliconBeingManager.ReplaceBeing()` échange l'instance actuelle, migre l'état, et persiste le code chiffré sur disque.
+5. En cas de succès : `SiliconBeingManager.ReplaceBeing()` échange l'instance actuelle, migre l'état et persiste le code chiffré sur disque.
 6. En cas d'échec : le nouveau code est rejeté, l'implémentation existante est conservée.
 
-Des implémentations personnalisées de `IPermissionCallback` peuvent également être compilées et injectées via `ReplacePermissionCallback()`, permettant aux Beings de personnaliser leur propre logique de permissions.
+Une implémentation `IPermissionCallback` personnalisée peut également être compilée et injectée via `ReplacePermissionCallback()`, permettant aux êtres de personnaliser leur propre logique d'autorisation.
 
-Le code est stocké sur disque chiffré en AES-256. La clé de chiffrement est dérivée du GUID du Being (majuscules) via PBKDF2.
+Le code est stocké sur disque chiffré en AES-256. La clé de chiffrement est dérivée du GUID de l'être (en majuscules) via PBKDF2.
 
 ---
 
 ## Audit d'utilisation des tokens
 
-`TokenUsageAuditManager` suit la consommation de tokens IA de tous les Beings :
+`TokenUsageAuditManager` suit la consommation de tokens IA de tous les êtres :
 
-- `TokenUsageRecord` — Enregistrement par requête (ID du Being, modèle, tokens prompt, tokens complétion, horodatage)
+- `TokenUsageRecord` — Enregistrement par requête (ID de l'être, modèle, tokens d'invite, tokens de complétion, horodatage)
 - `TokenUsageSummary` — Statistiques agrégées
 - `TokenUsageQuery` — Paramètres de requête pour filtrer les enregistrements
-- Persistance via `ITimeStorage` pour les requêtes de séries temporelles
-- Accessible via l'interface Web (UsageController) et `TokenAuditTool` (Curator uniquement)
+- Persisté via `ITimeStorage` pour les requêtes de séries temporelles
+- Accessible via l'interface Web UI (UsageController) et `TokenAuditTool` (Curateur uniquement)
 
 ---
 
-### Système de calendrier
-
-Le système comprend **32 implémentations de calendriers**, dérivées de la classe abstraite `CalendarBase`, couvrant les principaux systèmes calendaires du monde :
-
-|| Calendrier | ID | Description |
-||------------|-----|-------------||
-|| BuddhistCalendar | `buddhist` | Calendrier bouddhiste (BE), année + 543 |
-|| CherokeeCalendar | `cherokee` | Système de calendrier cherokee |
-|| ChineseLunarCalendar | `lunar` | Calendrier lunaire chinois, avec mois intercalaires |
-|| ChineseHistoricalCalendar | `chinese_historical` | Calendrier historique chinois, cycle Ganzhi et ères impériales |
-|| ChulaSakaratCalendar | `chula_sakarat` | Calendrier Chula Sakarat (CS), année - 638 |
-|| CopticCalendar | `coptic` | Calendrier copte |
-|| DaiCalendar | `dai` | Calendrier Dai avec calcul lunaire complet |
-|| DehongDaiCalendar | `dehong_dai` | Variante Dai Dehong |
-|| EthiopianCalendar | `ethiopian` | Calendrier éthiopien |
-|| FrenchRepublicanCalendar | `french_republican` | Calendrier républicain français |
-|| GregorianCalendar | `gregorian` | Calendrier grégorien standard |
-|| HebrewCalendar | `hebrew` | Calendrier hébraïque (juif) |
-|| IndianCalendar | `indian` | Calendrier national indien |
-|| InuitCalendar | `inuit` | Système de calendrier inuit |
-|| IslamicCalendar | `islamic` | Calendrier islamique (Hégire) |
-|| JapaneseCalendar | `japanese` | Calendrier des ères japonaises (Nengo) |
-|| JavaneseCalendar | `javanese` | Calendrier islamique javanais |
-|| JucheCalendar | `juche` | Calendrier Juche (Corée du Nord), année - 1911 |
-|| JulianCalendar | `julian` | Calendrier julien |
-|| KhmerCalendar | `khmer` | Calendrier khmer |
-|| MayanCalendar | `mayan` | Calendrier long maya |
-|| MongolianCalendar | `mongolian` | Calendrier mongol |
-|| PersianCalendar | `persian` | Calendrier persan (Hégire solaire) |
-|| RepublicOfChinaCalendar | `roc` | Calendrier de la République de Chine (Minguo), année - 1911 |
-|| RomanCalendar | `roman` | Calendrier romain |
-|| SakaCalendar | `saka` | Calendrier Saka (Indonésie) |
-|| SexagenaryCalendar | `sexagenary` | Calendrier Ganzhi chinois (sexagésimal) |
-|| TibetanCalendar | `tibetan` | Calendrier tibétain |
-|| VietnameseCalendar | `vietnamese` | Calendrier lunaire vietnamien (variante zodiaque du Chat) |
-|| VikramSamvatCalendar | `vikram_samvat` | Calendrier Vikram Samvat |
-|| YiCalendar | `yi` | Système de calendrier Yi |
-|| ZoroastrianCalendar | `zoroastrian` | Calendrier zoroastrien |
-
-`CalendarTool` fournit les opérations : `now`, `format`, `add_days`, `diff`, `list_calendars`, `get_components`, `get_now_components`, `convert` (conversion de dates entre calendriers).
-
-`TokenUsageAuditManager` suit la consommation de tokens IA de tous les Beings :
-
-- `TokenUsageRecord` — Enregistrement par requête (ID du Being, modèle, tokens prompt, tokens complétion, horodatage)
-- `TokenUsageSummary` — Statistiques agrégées
-- `TokenUsageQuery` — Paramètres de requête pour filtrer les enregistrements
-- Persistance via `ITimeStorage` pour les requêtes de séries temporelles
-- Accessible via l'interface Web (UsageController) et `TokenAuditTool` (Curator uniquement)
-
----
-
-### Système de calendrier
+### Système de calendriers
 
 Le système comprend **32 implémentations de calendriers**, dérivées de la classe abstraite `CalendarBase`, couvrant les principaux systèmes calendaires du monde :
 
 | Calendrier | ID | Description |
-|------------|-----|-------------|
+|----------|-----|-------------|
 | BuddhistCalendar | `buddhist` | Calendrier bouddhiste (BE), année + 543 |
 | CherokeeCalendar | `cherokee` | Système de calendrier cherokee |
-| ChineseLunarCalendar | `lunar` | Calendrier lunaire chinois, avec mois intercalaires |
-| ChineseHistoricalCalendar | `chinese_historical` | Calendrier historique chinois, cycle Ganzhi et ères impériales |
+| ChineseLunarCalendar | `lunar` | Calendrier lunaire chinois, avec mois intercalaire |
+| ChineseHistoricalCalendar | `chinese_historical` | Calendrier historique chinois, prenant en charge la numération Ganzhi et les ères impériales |
 | ChulaSakaratCalendar | `chula_sakarat` | Calendrier Chula Sakarat (CS), année - 638 |
 | CopticCalendar | `coptic` | Calendrier copte |
-| DaiCalendar | `dai` | Calendrier Dai avec calcul lunaire complet |
-| DehongDaiCalendar | `dehong_dai` | Variante Dai Dehong |
+| DaiCalendar | `dai` | Calendrier Dai, avec calcul lunaire complet |
+| DehongDaiCalendar | `dehong_dai` | Variante du calendrier Dai de Dehong |
 | EthiopianCalendar | `ethiopian` | Calendrier éthiopien |
 | FrenchRepublicanCalendar | `french_republican` | Calendrier républicain français |
 | GregorianCalendar | `gregorian` | Calendrier grégorien standard |
@@ -484,20 +430,20 @@ Le système comprend **32 implémentations de calendriers**, dérivées de la cl
 | IndianCalendar | `indian` | Calendrier national indien |
 | InuitCalendar | `inuit` | Système de calendrier inuit |
 | IslamicCalendar | `islamic` | Calendrier islamique (Hégire) |
-| JapaneseCalendar | `japanese` | Calendrier des ères japonaises (Nengo) |
+| JapaneseCalendar | `japanese` | Calendrier japonais (ère Nengo) |
 | JavaneseCalendar | `javanese` | Calendrier islamique javanais |
 | JucheCalendar | `juche` | Calendrier Juche (Corée du Nord), année - 1911 |
 | JulianCalendar | `julian` | Calendrier julien |
 | KhmerCalendar | `khmer` | Calendrier khmer |
-| MayanCalendar | `mayan` | Calendrier long maya |
+| MayanCalendar | `mayan` | Compte long maya |
 | MongolianCalendar | `mongolian` | Calendrier mongol |
 | PersianCalendar | `persian` | Calendrier persan (Hégire solaire) |
-| RepublicOfChinaCalendar | `roc` | Calendrier de la République de Chine (Minguo), année - 1911 |
+| RepublicOfChinaCalendar | `roc` | Calendrier de la République de Chine, année - 1911 |
 | RomanCalendar | `roman` | Calendrier romain |
 | SakaCalendar | `saka` | Calendrier Saka (Indonésie) |
-| SexagenaryCalendar | `sexagenary` | Calendrier Ganzhi chinois (sexagésimal) |
+| SexagenaryCalendar | `sexagenary` | Calendrier sexagésimal chinois (Ganzhi) |
 | TibetanCalendar | `tibetan` | Calendrier tibétain |
-| VietnameseCalendar | `vietnamese` | Calendrier lunaire vietnamien (variante zodiaque du Chat) |
+| VietnameseCalendar | `vietnamese` | Calendrier lunaire vietnamien (variante zodiac du chat) |
 | VikramSamvatCalendar | `vikram_samvat` | Calendrier Vikram Samvat |
 | YiCalendar | `yi` | Système de calendrier Yi |
 | ZoroastrianCalendar | `zoroastrian` | Calendrier zoroastrien |
@@ -506,57 +452,114 @@ Le système comprend **32 implémentations de calendriers**, dérivées de la cl
 
 ---
 
-## Architecture de l'interface Web
+## Architecture de l'interface Web UI
 
-### Système de skins
+### Système de thèmes
 
-L'interface Web dispose d'un **système de skins enfichable**, permettant une personnalisation complète de l'interface sans modifier la logique applicative.
+L'interface Web UI dispose d'un **système de thèmes enfichable**, permettant une personnalisation complète de l'interface sans modifier la logique applicative :
 
-La langue active est sélectionnée via `DefaultConfigData.Language` et résolue par `LocalizationManager`.
-
-- **Interface ISkin** — Définit le contrat pour tous les skins, incluant :
+- **Interface ISkin** — Définit le contrat pour tous les thèmes, incluant :
   - Méthodes de rendu principales (`RenderHtml`, `RenderError`)
-  - 20+ méthodes de composants UI (boutons, entrées, cartes, tables, badges, bulles, progression, onglets, etc.)
+  - Plus de 20 méthodes de composants UI (boutons, entrées, cartes, tableaux, badges, bulles, progression, onglets, etc.)
   - Génération de CSS thématique via `CssBuilder`
-  - `SkinPreviewInfo` — Palette de couleurs et icône pour le sélecteur de skins de la page d'initialisation
+  - `SkinPreviewInfo` — Palette de couleurs et icônes pour le sélecteur de thèmes de la page d'initialisation
 
-- **Skins intégrés** — 7 skins prêts pour la production :
-  - **Admin** — Interface d'administration professionnelle, axée sur les données
+- **Thèmes intégrés** — 7 thèmes prêts pour la production :
+  - **Admin** — Interface de gestion système professionnelle, axée sur les données
   - **Chat** — Design conversationnel, centré sur les messages, pour l'interaction IA
-  - **Creative** — Disposition artistique et visuellement riche pour les flux de travail créatifs
+  - **Creative** — Layout créatif et artistique, visuellement riche
   - **Dev** — Interface centrée sur le développeur et le code, avec coloration syntaxique
   - **HighContrast** — Thème d'accessibilité à contraste élevé
   - **Light** — Thème clair et épuré
   - **Minimal** — Thème minimaliste
 
-- **Découverte de skins** — `SkinManager` découvre et enregistre automatiquement toutes les implémentations `ISkin` via réflexion
+- **Découverte de thèmes** — `SkinManager` découvre et enregistre automatiquement toutes les implémentations `ISkin` par réflexion
 
-### Système d'automatisation de navigateur WebView (Nouveau)
+### Constructeurs HTML / CSS / JS
 
-Le système intègre une automatisation de navigateur WebView basée sur **Playwright** :
+L'interface Web UI évite entièrement les fichiers de modèles, générant tout le balisage en C# :
 
-- **Isolation individuelle** : Chaque Silicon Being possède sa propre instance de navigateur, ses cookies et son stockage de session, entièrement isolés.
-- **Mode headless** : Le navigateur fonctionne en mode headless totalement invisible pour l'utilisateur, les Silicon Beings opèrent de manière autonome en arrière-plan.
-- **WebViewBrowserTool** : Fournit des capacités complètes de navigation :
-  - Navigation de page, clics, saisie de texte, obtention du contenu de la page
-  - Exécution de JavaScript, captures d'écran, attente d'éléments
+- **`H`** — DSL de constructeur HTML en flux, pour construire des arbres HTML en code
+- **`CssBuilder`** — Constructeur CSS, prenant en charge les sélecteurs et media queries
+- **`JsBuilder` (`JsSyntax`)** — Constructeur JavaScript, pour les scripts inline
+
+### Système de contrôleurs
+
+L'interface Web UI suit un **motif de type MVC**, avec 24 contrôleurs gérant différents aspects :
+
+| Contrôleur | Usage |
+|------------|---------|
+| About | Page À propos et informations sur le projet |
+| Audit | Tableau de bord d'audit d'utilisation des tokens |
+| Being | Gestion et état des Êtres de Silicium |
+| Chat | Interface de chat en temps réel avec SSE |
+| ChatHistory | Consultation de l'historique de chat, avec liste de sessions et détails des messages |
+| CodeBrowser | Consultation et édition de code |
+| CodeHover | Infobulles de code, avec coloration syntaxique |
+| Config | Gestion de la configuration système |
+| Dashboard | Vue d'ensemble du système et métriques |
+| Executor | État et gestion des exécuteurs |
+| Help | Système de documentation d'aide, support multilingue |
+| Init | Assistant d'initialisation pour la première exécution |
+| Knowledge | Visualisation et requêtes du graphe de connaissances |
+| Log | Consultation des journaux système, avec filtrage par Être de Silicium |
+| Memory | Navigateur de mémoire à long terme, avec filtrage avancé, statistiques et vue détaillée |
+| Permission | Gestion des autorisations |
+| PermissionRequest | File des demandes d'autorisation |
+| Project | Gestion de projet, incluant notes de travail, système de tâches et autorisations d'outils |
+| System | Administration système et surveillance à l'exécution |
+| Task | Interface du système de tâches |
+| Timer | Gestion du système de minuteurs, incluant l'historique d'exécution |
+| ToolPermission | Gestion des autorisations d'outils, prenant en charge la configuration au niveau des Êtres de Silicium et des projets |
+| Usage | Tableau de bord d'audit d'utilisation des tokens, avec graphiques de tendance et export |
+| WorkNote | Gestion des notes de travail, avec recherche et génération de sommaire |
+
+### Mises à jour en temps réel
+
+- **SSE (Server-Sent Events)** — Pousse les mises à jour des messages de chat, de l'état des êtres et des événements système via `SSEHandler`
+- **Pas de WebSocket** — Architecture plus simple utilisant SSE pour la plupart des besoins en temps réel
+- **Reconnexion automatique** — Logique de reconnexion côté client pour des connexions résilientes
+
+### Localisation
+
+Le système prend en charge la localisation complète en **34 variantes linguistiques** :
+- **Chinois (6)** : zh-CN (simplifié), zh-HK (traditionnel), zh-SG (Singapour), zh-MO (Macao), zh-TW (Taïwan), zh-MY (Malaisie)
+- **Anglais (10)** : en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY
+- **Espagnol (2)** : es-ES, es-MX
+- **Allemand (5)** : de-DE, de-AT, de-CH, de-LU, de-LI
+- **Français (3)** : fr-FR, fr-CA, fr-CH
+- **Autres (8)** : ja-JP (japonais), ko-KR (coréen), cs-CZ (tchèque), it-IT (italien), pl-PL (polonais), pt-PT (portugais), pt-BR (portugais brésilien), ru-RU (russe)
+
+La langue active est sélectionnée via `DefaultConfigData.Language` et résolue par `LocalizationManager`.
+
+---
+
+### Système d'automatisation de navigateur WebView (nouveau)
+
+Le système intègre des fonctionnalités d'automatisation de navigateur WebView basées sur **Playwright** :
+
+- **Isolation individuelle** : Chaque Être de Silicium possède sa propre instance de navigateur, ses cookies et son stockage de session, entièrement isolés et sans interférence mutuelle.
+- **Mode headless** : Le navigateur fonctionne en mode headless totalement invisible pour l'utilisateur, les Êtres de Silicium opèrent de manière autonome en arrière-plan.
+- **WebViewBrowserTool** : Fournit des capacités complètes de navigation, incluant :
+  - Navigation de pages, clics, saisie de texte, récupération du contenu de page
+  - Exécution de JavaScript, capture d'écran, attente d'apparition d'éléments
   - Gestion de l'état du navigateur et nettoyage des ressources
-- **Contrôle de sécurité** : Toutes les opérations du navigateur passent par la chaîne de vérification des permissions, empêchant l'accès malveillant aux pages web.
+- **Contrôle de sécurité** : Toutes les opérations du navigateur doivent passer par la chaîne de vérification des autorisations, empêchant l'accès malveillant aux pages web.
 
-### Système de réseau de connaissances (Nouveau)
+### Système de Réseau de Connaissances (nouveau)
 
 Le système intègre un graphe de connaissances basé sur une **structure de triplets** :
 
-- **Représentation des connaissances** : Structure de triplet « sujet-relation-objet » (ex. : Python-is_a-programming_language)
+- **Représentation des connaissances** : Utilise une structure de triplet « sujet-relation-objet » (par exemple : Python-is_a-programming_language)
 - **KnowledgeTool** : Fournit la gestion du cycle de vie complet des connaissances :
-  - `add`/`query`/`update`/`delete` — Opérations CRUD de base
-  - `search` — Recherche en texte intégral et correspondance par mots-clés
-  - `get_path` — Découverte de chemins d'association entre deux concepts
-  - `validate` — Vérification de l'intégrité des connaissances
-  - `stats` — Analyse statistique du réseau de connaissances
-- **Stockage persistant** : Les triplets de connaissances sont persistés sur le système de fichiers, avec support des requêtes par index temporel.
-- **Score de confiance** : Chaque entrée de connaissance est associée à un score de confiance (0-1), permettant la correspondance floue et le classement.
-- **Étiquetage** : Support de l'ajout d'étiquettes aux connaissances pour la catégorisation et la recherche.
+  - `add`/`query`/`update`/`delete` - Opérations CRUD de base
+  - `search` - Recherche en texte intégral et correspondance par mots-clés
+  - `get_path` - Découverte du chemin d'association entre deux concepts
+  - `validate` - Vérification de l'intégrité des connaissances
+  - `stats` - Statistiques du Réseau de Connaissances
+- **Stockage persistant** : Les triplets de connaissances sont persistés sur le système de fichiers, prenant en charge les requêtes par index temporel.
+- **Score de confiance** : Chaque entrée de connaissance possède un score de confiance (0-1), prenant en charge la correspondance floue et le classement des connaissances.
+- **Système de tags** : Prise en charge de l'ajout de tags aux connaissances, facilitant la catégorisation et la recherche.
 
 ---
 
@@ -566,10 +569,10 @@ Le système intègre un graphe de connaissances basé sur une **structure de tri
 data/
 └── SiliconManager/
     ├── {curator-guid}/
-    │   ├── soul.md          # Fichier âme du Curateur
-    │   ├── state.json       # État d'exécution
+    │   ├── soul.md          # Fichier d'Âme du Curateur
+    │   ├── state.json       # État à l'exécution
     │   ├── code.enc         # Code de classe personnalisé chiffré AES
-    │   └── permission.enc   # Rappel de permission personnalisé chiffré AES
+    │   └── permission.enc   # Rappel d'autorisation personnalisé chiffré AES
     │
     └── {being-guid}/
         ├── soul.md
@@ -582,9 +585,9 @@ data/
 
 ## Moteur de stockage SpeedyPack
 
-SiliconLife.Fast utilise le moteur de stockage SpeedyPack propriétaire (format .spk), remplaçant la solution LiteDB précédente, pour atteindre des performances de lecture/écriture extrêmes.
+SiliconLife.Fast utilise le moteur de stockage SpeedyPack propriétaire (format .spk), remplaçant la solution LiteDB précédente, pour des performances de lecture/écriture extrêmes.
 
-### Conception architecturale
+### Conception de l'architecture
 
 ```
 ┌──────────────────────────────────────────────────────────┐
@@ -592,74 +595,75 @@ SiliconLife.Fast utilise le moteur de stockage SpeedyPack propriétaire (format 
 │                                                          │
 │  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
 │  │ DirectoryMap  │  │  EntryCache   │  │  WriteQueue   │  │
-│  │ (Cartographie │  │  (Cache des   │  │ (File d'écrit.│  │
-│  │  répertoire)  │  │   entrées)    │  │  asynchrone)  │  │
+│  │ (cartographie │  │  (cache       │  │ (file d'écrit.│  │
+│  │  répertoires) │  │   d'entrées)  │  │  asynchrone)  │  │
 │  └──────┬───────┘  └──────┬───────┘  └───────┬───────┘  │
 │         │                  │                   │          │
 │  ┌──────▼──────────────────▼───────────────────▼───────┐  │
 │  │              PackFileReader / PackFileWriter          │  │
-│  │              (Lecteur/Écrivain de fichiers paquet)    │  │
+│  │              (lecteur/enregistreur de fichiers paquet) │  │
 │  └──────────────────────────┬──────────────────────────┘  │
 │                              │                             │
 │  ┌──────────────────────────▼──────────────────────────┐  │
-│  │              Fichier .spk (MessagePack + compression LZ4) │
+│  │              Fichier .spk (MessagePack + compression LZ4) │  │
 │  └─────────────────────────────────────────────────────┘  │
 │                                                          │
 │  ┌──────────────┐  ┌──────────────┐                      │
 │  │  FreeList     │  │ SpeedyPack   │                      │
-│  │ (Gestion des  │  │ AutoCompactor│                      │
-│  │  espaces libres) │ (Auto-compaction) │                      │
+│  │ (gestion      │  │ AutoCompactor│                      │
+│  │  espace libre)│  │ (compression │                      │
+│  │              │  │  automatique) │                      │
 │  └──────────────┘  └──────────────┘                      │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ### Composants principaux
 
-|| Composant | Description |
-||-----------|-------------||
-|| `SpeedyPack` | Classe centrale, combinant DirectoryMap, EntryCache et WriteQueue pour fournir des lectures/écritures à faible latence |
-|| `DirectoryMap` | Cartographie de répertoire en mémoire, maintient les correspondances entre chemins virtuels et entrées de fichiers |
-|| `EntryCache` | Cache des entrées, basé sur TTL pour les entrées récemment accédées |
-|| `WriteQueue` | File d'écriture asynchrone, met en file d'attente les opérations d'écriture pour exécution sur un thread d'arrière-plan |
-|| `FreeList` | Gestion des espaces libres, suit l'espace réutilisable dans les fichiers .spk |
-|| `PackFileReader` | Lecteur de fichiers paquet, lit les données depuis les fichiers .spk |
-|| `PackFileWriter` | Écrivain de fichiers paquet, écrit les données dans les fichiers .spk |
-|| `SpeedyPackAutoCompactor` | Minuterie d'auto-compaction, compresse périodiquement les fichiers .spk pour récupérer l'espace libre |
-|| `SpeedyPackRegistry` | Gestionnaire singleton au niveau du processus, garantit que toute l'application utilise la même instance SpeedyPack |
+| Composant | Description |
+|------|------|
+| `SpeedyPack` | Classe principale, combinant DirectoryMap, EntryCache et WriteQueue pour des lectures/écritures à faible latence |
+| `DirectoryMap` | Cartographie de répertoires en mémoire, maintenant la correspondance entre chemins virtuels et entrées de fichiers |
+| `EntryCache` | Cache d'entrées, cache des entrées récemment accédées basé sur TTL |
+| `WriteQueue` | File d'écriture asynchrone, mettant en file d'attente les opérations d'écriture pour exécution sur un thread d'arrière-plan |
+| `FreeList` | Gestion de l'espace libre, suivant l'espace réutilisable dans les fichiers .spk |
+| `PackFileReader` | Lecteur de fichiers de paquet, lisant les données depuis les fichiers .spk |
+| `PackFileWriter` | Enregistreur de fichiers de paquet, écrivant les données dans les fichiers .spk |
+| `SpeedyPackAutoCompactor` | Minuteur de compression automatique, compressant périodiquement les fichiers .spk pour récupérer l'espace libre |
+| `SpeedyPackRegistry` | Gestionnaire singleton au niveau processus, garantissant que toute l'application utilise la même instance SpeedyPack |
 
 ### Adaptateurs de stockage
 
-SiliconLife.Fast intègre SpeedyPack aux interfaces système via les adaptateurs suivants :
+SiliconLife.Fast intègre SpeedyPack dans les interfaces système via les adaptateurs suivants :
 
-|| Adaptateur | Interface | Description |
-||------------|-----------|-------------||
-|| `SpeedyStorage` | `IStorage` | Adaptateur de stockage clé-valeur générique |
-|| `SpeedyTimeStorage` | `ITimeStorage` | Adaptateur de stockage à index temporel |
-|| `SpeedyWorkNoteStorage` | `IWorkNoteStorage` | Adaptateur de stockage des notes de travail |
+| Adaptateur | Interface | Description |
+|--------|------|------|
+| `SpeedyStorage` | `IStorage` | Adaptateur de stockage clé-valeur générique |
+| `SpeedyTimeStorage` | `ITimeStorage` | Adaptateur de stockage à index temporel |
+| `SpeedyWorkNoteStorage` | `IWorkNoteStorage` | Adaptateur de stockage des notes de travail |
 
 ### Options de configuration
 
 `SpeedyPackOptions` fournit les configurations suivantes :
 
-|| Option | Type | Valeur par défaut | Description |
-||--------|------|-------------------|-------------||
-|| `CacheTtl` | `TimeSpan` | 5 minutes | Durée de vie des entrées en cache |
-|| `MaxCacheEntries` | `int` | 1000 | Nombre maximum d'entrées en cache |
-|| `ReadOnly` | `bool` | false | Mode lecture seule |
+| Option | Type | Valeur par défaut | Description |
+|------|------|--------|------|
+| `CacheTtl` | `TimeSpan` | 5 minutes | Durée de vie des entrées en cache |
+| `MaxCacheEntries` | `int` | 1000 | Nombre maximum d'entrées en cache |
+| `ReadOnly` | `bool` | false | Mode lecture seule |
 
 ### Support des transactions
 
-SpeedyPack supporte les opérations d'écriture atomiques via l'interface `IPackTransaction` :
+SpeedyPack prend en charge les opérations d'écriture atomiques via l'interface `IPackTransaction` :
 
 - `SpeedyTransaction` implémente le mécanisme de transaction
-- Support de l'atomicité pour les écritures par lot
-- À la validation, toutes les écritures réussissent entièrement ou sont entièrement annulées
+- Prise en charge de l'atomicité des écritures par lots
+- À la validation de la transaction, toutes les écritures réussissent ou échouent ensemble
 
 ---
 
 ## Système de plugins
 
-SiliconLife prend en charge l'extension de fonctionnalités via un système de plugins, permettant aux développeurs tiers d'ajouter de nouvelles fonctionnalités à la plateforme.
+SiliconLife prend en charge l'extension des fonctionnalités via un système de plugins, permettant aux développeurs tiers d'ajouter de nouvelles fonctionnalités à la plateforme.
 
 ### Interface principale
 
@@ -682,29 +686,29 @@ public interface IPlugin
 
 `PluginLoader` est responsable du chargement des DLL de plugins depuis un répertoire spécifié et effectue des vérifications de sécurité strictes :
 
-1. **Analyse de répertoire** — Analyse tous les fichiers .dll dans le répertoire des plugins
+1. **Scan de répertoire** — Scanne tous les fichiers .dll dans le répertoire des plugins
 2. **Analyse de sécurité** — Vérifie si le plugin référence des espaces de noms interdits
-3. **Chargement isolé** — Charge les plugins de manière isolée via un `AssemblyLoadContext` personnalisé
+3. **Chargement isolé** — Charge le plugin de manière isolée via un `AssemblyLoadContext` personnalisé
 4. **Gestion du cycle de vie** — Appelle les méthodes OnLoad, OnStart, OnStop, OnUnload du plugin
 
-### Bac à sable de sécurité
+### Sandbox de sécurité
 
 Le chargeur de plugins effectue les vérifications de sécurité suivantes :
 
-|| Vérification | Description |
-||--------------|-------------||
-|| Espaces de noms interdits | System.IO, System.Net.Http, System.Net.WebSockets, System.Net.Sockets, Microsoft.CodeAnalysis |
-|| Liste blanche d'assemblies de confiance | Google.Protobuf, Newtonsoft.Json, MessagePack, Serilog, Microsoft.Extensions.Logging.Abstractions, Dapper |
-|| Vérification des types interdits | Analyse les types dangereux référencés dans le plugin |
-|| Vérification des membres interdits | Analyse les méthodes dangereuses appelées dans le plugin |
+| Vérification | Description |
+|--------|------|
+| Espaces de noms interdits | System.IO, System.Net.Http, System.Net.WebSockets, System.Net.Sockets, Microsoft.CodeAnalysis |
+| Liste blanche d'assemblages de confiance | Google.Protobuf, Newtonsoft.Json, MessagePack, Serilog, Microsoft.Extensions.Logging.Abstractions, Dapper |
+| Vérification des types interdits | Scan des types dangereux référencés dans le plugin |
+| Vérification des membres interdits | Scan des méthodes dangereuses appelées dans le plugin |
 
 ### Intégration d'outils
 
 Les plugins peuvent enregistrer des outils personnalisés en implémentant l'interface `ITool` :
 
-- La méthode `ToolManager.ScanAllPluginAssemblies()` analyse toutes les implémentations ITool dans les plugins chargés
-- Les outils de plugins sont automatiquement intégrés dans la boucle d'appel d'outils
-- Les outils de plugins sont soumis au même système de permissions
+- La méthode `ToolManager.ScanAllPluginAssemblies()` scanne toutes les implémentations ITool dans les plugins chargés
+- Les outils de plugin sont automatiquement intégrés dans la boucle d'appel d'outils
+- Les outils de plugin sont soumis au même système d'autorisations
 
 ### Cycle de vie des plugins
 
@@ -714,82 +718,98 @@ Chargement (OnLoad) → Démarrage (OnStart) → En cours d'exécution → Arrê
 
 ---
 
-## Constructeurs HTML / CSS / JS
+## États d'activité des Êtres de Silicium
 
-L'interface Web évite entièrement les fichiers de modèles, générant tout le balisage en C# :
-
-- **`H`** — DSL de constructeur HTML en flux, pour construire des arbres HTML dans le code
-- **`CssBuilder`** — Constructeur CSS avec support des sélecteurs et media queries
-- **`JsBuilder` (`JsSyntax`)** — Constructeur JavaScript pour les scripts en ligne
-
-### Système de contrôleurs
-
-L'interface Web suit un **pattern de type MVC**, avec 23 contrôleurs gérant différents aspects :
-
-| Contrôleur | Objectif |
-|------------|----------|
-| About | Page À propos et informations du projet |
-| Being | Gestion et statut des Silicon Beings |
-| Chat | Interface de chat en temps réel avec SSE |
-| ChatHistory | Historique de chat, liste de sessions et détails des messages |
-| CodeBrowser | Consultation et édition de code |
-| CodeHover | Info-bulles de code avec coloration syntaxique |
-| Config | Gestion de la configuration système |
-| Dashboard | Vue d'ensemble du système et métriques |
-| Executor | Statut et gestion des exécuteurs |
-| Help | Système de documentation d'aide, support multilingue |
-| Init | Assistant d'initialisation pour la première exécution |
-| Knowledge | Visualisation et requêtes du graphe de connaissances |
-| Log | Visualiseur de journaux système, filtrage par Being |
-| Memory | Navigateur de mémoire à long terme, filtrage avancé, statistiques et vue détaillée |
-| Permission | Gestion des permissions |
-| PermissionRequest | File d'attente des requêtes de permissions |
-| Project | Gestion de projets, avec notes de travail et système de tâches |
-| System | Gestion système et surveillance d'exécution |
-| Task | Interface du système de tâches |
-| Timer | Gestion du système de minuteries, avec historique d'exécution |
-| Usage | Tableau de bord d'utilisation des tokens, avec graphiques de tendance et export |
-| WorkNote | Gestion des notes de travail, recherche et génération de sommaire |
-
-### Mises à jour en temps réel
-
-- **SSE (Server-Sent Events)** — Pousse les mises à jour des messages de chat, statut des Beings et événements système via `SSEHandler`
-- **Pas de WebSocket** — Architecture plus simple utilisant SSE pour la plupart des besoins en temps réel
-- **Reconnexion automatique** — Logique de reconnexion côté client pour des connexions résilientes
-
-### Localisation
-
-Le système prend en charge la localisation complète de **33 variantes linguistiques** :
-- **Chinois (6)** : zh-CN (simplifié), zh-HK (traditionnel), zh-SG (Singapour), zh-MO (Macao), zh-TW (Taïwan), zh-MY (Malaisie)
-- **Anglais (10)** : en-US, en-GB, en-CA, en-AU, en-IN, en-SG, en-ZA, en-IE, en-NZ, en-MY
-- **Espagnol (2)** : es-ES, es-MX
-- **Allemand (5)** : de-DE, de-AT, de-CH, de-LU, de-LI
-- **Français (3)** : fr-FR, fr-CA, fr-CH
-- **Portugais (2)** : pt-PT, pt-BR
-- **Autres (5)** : ja-JP (japonais), ko-KR (coréen), cs-CZ (tchèque), pl-PL (polonais), it-IT (italien)
-
----
-
-## États d'activité des Silicon Beings
-
-Les Silicon Beings ont les états d'activité suivants :
+Les Êtres de Silicium ont les états d'activité suivants :
 
 | État | Description |
 |------|------|
-| `Idle` | État inactif, en attente du déclencheur d'horloge |
-| `Working` | En cours d'exécution d'un tour de requête IA + appel d'outil |
-| `Error` | Une erreur s'est produite pendant l'exécution |
-| `Stopped` | Arrêté, dû à des erreurs consécutives ou un arrêt manuel |
+| `Idle` | État inactif, en attente de déclenchement par l'horloge |
+| `SingleChat` | Chat en tête-à-tête en cours |
+| `GroupChat` | Chat de groupe en cours |
+| `Task` | Exécution d'une tâche en cours |
+| `Timer` | Exécution d'un minuteur en cours |
+| `Stopped` | Arrêté, en raison d'erreurs consécutives ou d'un arrêt manuel |
 
-**Mécanisme d'état Stopped** :
-- Lorsqu'un Silicon Being subit 10 erreurs consécutives, il entre automatiquement dans l'état `Stopped`
-- Une fois dans l'état Stopped, le Being n'exécutera plus aucune tâche
-- Une intervention manuelle est requise pour redémarrer
+**Mécanisme de l'état Stopped** :
+- Lorsqu'un Être de Silicium subit 10 erreurs consécutives, il passe automatiquement à l'état `Stopped`
+- Une fois dans l'état Stopped, l'être n'exécute plus aucune tâche
+- Lorsqu'un nouveau message de chat arrive, le compteur d'erreurs est réinitialisé et l'être reprend son fonctionnement
 
 Transitions d'état :
 ```
-Idle → Working → Idle (terminaison normale)
-Working → Error → Working (récupération d'erreur)
-Working → Stopped (10 erreurs consécutives ou arrêt manuel)
-Stopped → Idle (redémarrage)
+Idle → SingleChat → Idle (chat terminé)
+Idle → GroupChat → Idle (chat de groupe terminé)
+Idle → Task → Idle (tâche terminée)
+Idle → Timer → Idle (minuteur terminé)
+Tout → Stopped (10 erreurs consécutives)
+Stopped → Idle (nouveau message de chat ou redémarrage manuel)
 ```
+
+---
+
+## Moteur de flux de travail
+
+Le moteur de flux de travail est un système à machine à états basé sur des modèles, utilisé pour piloter les processus de collaboration des Êtres de Silicium dans les espaces projet :
+
+### Composants principaux
+
+| Composant | Description |
+|------|------|
+| `WorkflowEngine` | Cœur du moteur de flux de travail, gérant les modèles et instances, exécutant les transitions d'état pilotées par Tick |
+| `WorkflowTemplate` | Modèle de flux de travail, définissant l'ensemble d'états et les règles de transition |
+| `WorkflowInstance` | Instance de flux de travail, liée à un projet spécifique, suivant l'état actuel |
+| `WorkflowLog` | Journal de flux de travail, enregistrant l'historique des transitions d'état |
+
+### Mécanisme de fonctionnement
+
+- **Enregistrement de modèles** : Enregistrement des modèles de flux de travail via `RegisterTemplate()`, définissant les états et règles de transition
+- **Création d'instances** : Création d'instances à partir de modèles, liées à un espace projet
+- **Pilotage par Tick** : Les transitions d'état sont pilotées par le mécanisme Tick de la Boucle Principale
+- **Journalisation** : Toutes les transitions d'état sont automatiquement enregistrées dans le journal
+
+---
+
+## Mécanisme d'oubli de la mémoire
+
+`MemoryFadeService` est un service de dégradation temporelle simulant les caractéristiques d'oubli de la mémoire biologique :
+
+### Mécanisme de fonctionnement
+
+- **Exécution planifiée** : Hérite de `TickObject`, exécute un cycle de dégradation par défaut toutes les heures
+- **Dégradation de l'importance** : Applique un algorithme de dégradation aux entrées de mémoire de chaque Être de Silicium, réduisant le score d'importance
+- **Archivage automatique** : Les mémoires dont l'importance est inférieure au seuil sont automatiquement archivées (`ArchiveFadingMemories()`)
+- **Suivi statistique** : Enregistrement du nombre de cycles de dégradation, du nombre d'entrées avec changement d'état, etc.
+
+### Processus de dégradation
+
+```
+MemoryFadeService.OnTick()
+  └── Parcours de tous les Êtres de Silicium
+       └── being.Memory.ApplyDecay()      # Application de la dégradation de l'importance
+       └── being.Memory.ArchiveFadingMemories()  # Archivage des mémoires de faible importance
+```
+
+---
+
+## Système d'espace de projet
+
+L'espace de projet est un mécanisme de gestion d'espace prenant en charge la collaboration multi-Êtres de Silicium :
+
+### Fonctionnalités principales
+
+- **Cycle de vie du projet** : Création → Actif → Archivage → Destruction
+- **Attribution de rôles** : Prise en charge de l'attribution de rôles de projet aux Êtres de Silicium
+- **Isolation des autorisations d'outils** : Configuration des autorisations d'outils au niveau du projet, indépendante des autorisations au niveau de l'Être de Silicium
+- **Notes de travail** : Système de notes par pages dans l'espace projet, prenant en charge la génération de sommaires et la recherche par mots-clés
+- **Suivi des tâches** : Gestion des tâches au niveau du projet, prenant en charge la création, l'attribution et le suivi de l'état
+- **Intégration de flux de travail** : Les projets peuvent être liés à des modèles de flux de travail, pilotant les processus de collaboration
+
+### Outils associés
+
+| Outil | Usage |
+|------|------|
+| `ProjectTool` | Gestion de l'espace projet (création, archivage, destruction, attribution de rôles) |
+| `ProjectTaskTool` | Gestion des tâches de projet (création, attribution, mise à jour de l'état) |
+| `ProjectWorkNoteTool` | Notes de travail de projet (création, recherche, génération de sommaires) |
+| `ProjectWorkTool` | Opérations de travail de projet (création de tâches, chat de groupe, diffusion, achèvement du projet) |

@@ -1,57 +1,73 @@
-﻿# Reference Nástrojů
+# Reference nástrojů
 
 > **Verze: v0.2.0-alpha**
 
-Tento dokument poskytuje podrobné informace o všech vestavěných nástrojích platformy Silicon Life Collective.
+Tento dokument podrobně popisuje všechny vestavěné nástroje platformy Silicon Life Collective.
 
 [English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | **Čeština** | [Русский](../ru-RU/tools-reference.md)
 
 ## Přehled
 
-Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším světem prostřednictvím standardizovaného rozhraní. Každý nástroj implementuje rozhraní `ITool` a je automaticky objeven a registrován `ToolManagerem` pomocí reflexe.
+Systém nástrojů umožňuje Křemíkovým Bytostem interagovat s vnějším světem prostřednictvím standardizovaného rozhraní. Každý nástroj implementuje rozhraní `ITool` a je automaticky objevován a registrován `ToolManager` pomocí reflexe.
 
-### Kategorie Nástrojů
+### Klasifikace nástrojů
 
-- **Nástroje pro Správu Systému** — Konfigurace, oprávnění, dynamická kompilace
-- **Komunikační Nástroje** — Chat, síťové požadavky
-- **Nástroje pro Ukládání Dat** — Operace s disky, databáze, paměť, pracovní poznámky
-- **Nástroje pro Správu Času** — Kalendář, časovače, úkoly
-- **Vývojové Nástroje** — Spouštění kódu, dotazování logů
-- **Utility Nástroje** — Systémové informace, audit tokenů, nápověda, znalostní síť
-- **Nástroje Prohlížeče** — Automatizace WebView prohlížeče
-- **Nástroje Pluginů** — Nástroje třetích stran registrované prostřednictvím systému pluginů
+- **Nástroje správy systému** — konfigurace, oprávnění, dynamická kompilace, správa Kurátora
+- **Komunikační nástroje** — chat, síťové požadavky
+- **Nástroje datového úložiště** — diskové operace, databáze, paměť, pracovní poznámky
+- **Nástroje správy času** — kalendář, časovače, úkoly
+- **Vývojářské nástroje** — spouštění kódu, dotazy na protokoly
+- **Užitkové nástroje** — systémové informace, audit Tokenů, dokumentace nápovědy, znalostní síť
+- **Nástroje prohlížeče** — automatizace WebView prohlížeče
+- **Projektové nástroje** — správa projektů, projektové úkoly, projektové pracovní poznámky, projektová práce
+- **Nástroje zásuvných modulů** — nástroje třetích stran registrované prostřednictvím systému zásuvných modulů
+
+### Systém scénářů nástrojů
+
+Každý nástroj deklaruje své dostupné scénáře pomocí atributu `[ToolScenario]`:
+
+| Příznak scénáře | Hodnota | Popis |
+|----------|------|------|
+| `Chat` | `1 << 0` | Scénář chatu (když uživatel konverzuje s Křemíkovou Bytostí) |
+| `Task` | `1 << 1` | Scénář úkolu (když Křemíková Bytost provádí úkol) |
+| `Timer` | `1 << 2` | Scénář časovače (když Křemíková Bytost provádí časovaný úkol) |
+| `MemoryCompression` | `1 << 3` | Scénář komprese paměti |
+| `Project` | `1 << 4` | Projektový scénář (režim ThinkOnProject) |
+| `All` | Všechny výše uvedené | Všechny scénáře jsou dostupné |
+
+Kromě toho nástroje označené atributem `[ChatOnly]` jsou dostupné pouze ve scénáři chatu (např. HelpTool) a neobjevují se ve scénářích úkolů a časovačů.
 
 ---
 
-## Seznam Vestavěných Nástrojů
+## Seznam vestavěných nástrojů
 
-### 1. Kalendářový Nástroj (CalendarTool)
+### 1. Kalendářní nástroj (CalendarTool)
 
 **Název nástroje**: `calendar`
 
-**Popis funkce**: Podpora převodu a výpočtu data pro 32 kalendářových systémů.
+**Popis funkce**: Podporuje konverzi a výpočty dat pro 32 kalendářních systémů.
 
 **Podporované operace**:
-- `now` — Získat aktuální čas
-- `format` — Formátovat datum
-- `add_days` — Přičíst/odečíst dny
-- `diff` — Vypočítat rozdíl dat
-- `list_calendars` — Vypsat všechny podporované kalendáře
-- `get_components` — Získat komponenty data
-- `get_now_components` — Získat komponenty aktuálního času
-- `convert` — Převod mezi kalendářovými systémy
+- `now` — Získání aktuálního času
+- `format` — Formátování data
+- `add_days` — Přičítání/odčítání dnů
+- `diff` — Výpočet rozdílu dat
+- `list_calendars` — Seznam všech podporovaných kalendářů
+- `get_components` — Získání komponent data
+- `get_now_components` — Získání komponent aktuálního času
+- `convert` — Konverze mezi kalendářními systémy
 
-**Podporované kalendářové systémy** (32 typů):
-- Gregoriánský kalendář (Gregorian)
-- Čínský lunární kalendář (Chinese Lunar)
-- Čínský historický kalendář (Chinese Historical) — cyklické letopočty, éry panovníků
-- Islámský kalendář (Islamic)
-- Hebrejský kalendář (Hebrew)
-- Japonský kalendář (Japanese)
-- Perský kalendář (Persian)
-- Mayský kalendář (Mayan)
-- Buddhistský kalendář (Buddhist)
-- Tibetský kalendář (Tibetan)
+**Podporované kalendářní systémy** (32):
+- Gregoriánský (Gregorian)
+- Čínský lunární (Chinese Lunar)
+- Čínský historický (Chinese Historical) — ganzhi letopočet, éry císařů
+- Islámský (Islamic)
+- Hebrejský (Hebrew)
+- Japonský (Japanese)
+- Perský (Persian)
+- Mayský (Mayan)
+- Buddhistský (Buddhist)
+- Tibetský (Tibetan)
 - A 24 dalších kalendářů...
 
 **Příklad použití**:
@@ -66,20 +82,20 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ---
 
-### 2. Chatovací Nástroj (ChatTool)
+### 2. Chatovací nástroj (ChatTool)
 
 **Název nástroje**: `chat`
 
 **Popis funkce**: Správa chatovacích relací a odesílání zpráv.
 
 **Podporované operace**:
-- `send_message` — Odeslat zprávu
-- `get_messages` — Získat historické zprávy
-- `create_group` — Vytvořit skupinový chat
-- `add_member` — Přidat člena skupiny
-- `remove_member` — Odebrat člena skupiny
-- `get_chat_info` — Získat informace o chatu
-- `terminate_chat` — Ukončit chat (přečteno bez odpovědi)
+- `send_message` — Odeslání zprávy
+- `get_messages` — Získání historických zpráv
+- `create_group` — Vytvoření skupinového chatu
+- `add_member` — Přidání člena do skupiny
+- `remove_member` — Odebrání člena ze skupiny
+- `get_chat_info` — Získání informací o chatu
+- `terminate_chat` — Ukončení chatu (přečteno bez odpovědi)
 
 **Příklad použití**:
 ```json
@@ -92,18 +108,18 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ---
 
-### 3. Konfigurační Nástroj (ConfigTool)
+### 3. Konfigurační nástroj (ConfigTool)
 
 **Název nástroje**: `config`
 
 **Popis funkce**: Čtení a úprava systémové konfigurace.
 
 **Podporované operace**:
-- `read` — Číst konfigurační položku
-- `write` — Zapisovat konfigurační položku
-- `list` — Vypsat všechny konfigurace
-- `get_ai_config` — Získat konfiguraci AI klienta
-- `set_ai_config` — Nastavit konfiguraci AI klienta
+- `read` — Čtení konfigurační položky
+- `write` — Zápis konfigurační položky
+- `list` — Seznam všech konfigurací
+- `get_ai_config` — Získání konfigurace AI klienta
+- `set_ai_config` — Nastavení konfigurace AI klienta
 
 **Příklad použití**:
 ```json
@@ -117,43 +133,44 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ### 4. Nástroj Kurátora (CuratorTool) 🔒
 
-**Název nástroje**: `curator`
+**Název nástroje**: `silicon_manager`
 
-**Požadavek na oprávnění**: Pouze pro silikonové kurátory
+**Požadavek na oprávnění**: Pouze pro Kurátora Křemíku (`[SiliconManagerOnly]`)
 
-**Popis funkce**: Systémový správcovský nástroj vyhrazený pro silikonové kurátory.
+**Dostupné scénáře**: Chat, Task, Timer
+
+**Popis funkce**: Nástroj správy systému určený výhradně pro Kurátora Křemíku, pro správu vytváření, prohlížení a resetování Křemíkových Bytostí.
 
 **Podporované operace**:
-- `create_being` — Vytvořit novou silikonovou bytost
-- `list_beings` — Vypsat všechny silikonové bytosti
-- `get_being_info` — Získat informace o bytosti
-- `assign_task` — Přiřadit úkol
-- `manage_permissions` — Spravovat oprávnění
+- `list_beings` — Seznam všech Křemíkových Bytostí a jejich stavů
+- `create_being` — Vytvoření nové Křemíkové Bytosti (vyžaduje parametry `name` a `soul`)
+- `get_code` — Zobrazení vlastního zdrojového kódu Křemíkové Bytosti
+- `reset` — Resetování Křemíkové Bytosti na výchozí implementaci
 
 **Příklad použití**:
 ```json
 {
   "action": "create_being",
   "name": "Asistent",
-  "soul_file": "assistant_soul.md"
+  "soul": "Jsi užitečný asistent..."
 }
 ```
 
 ---
 
-### 5. Databázový Nástroj (DatabaseTool)
+### 5. Databázový nástroj (DatabaseTool)
 
 **Název nástroje**: `database`
 
-**Popis funkce**: Dotazování a operace se strukturovanou databází.
+**Popis funkce**: Strukturované databázové dotazy a operace.
 
 **Podporované operace**:
-- `query` — Dotazovat data
-- `insert` — Vložit data
-- `update` — Aktualizovat data
-- `delete` — Smazat data
-- `create_table` — Vytvořit tabulku
-- `list_tables` — Vypsat všechny tabulky
+- `query` — Dotazování dat
+- `insert` — Vkládání dat
+- `update` — Aktualizace dat
+- `delete` — Mazání dat
+- `create_table` — Vytvoření tabulky
+- `list_tables` — Seznam všech tabulek
 
 **Příklad použití**:
 ```json
@@ -167,25 +184,25 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ---
 
-### 6. Diskový Nástroj (DiskTool)
+### 6. Diskový nástroj (DiskTool)
 
 **Název nástroje**: `disk`
 
-**Popis funkce**: Operace se souborovým systémem a lokální vyhledávání.
+**Popis funkce**: Operace souborového systému a lokální vyhledávání.
 
 **Podporované operace**:
-- `read` — Číst soubor
-- `write` — Zapisovat soubor
-- `list` — Vypsat adresář
-- `delete` — Smazat soubor
-- `create_directory` — Vytvořit adresář
-- `search_files` — Vyhledat soubory
-- `search_content` — Vyhledat obsah souborů
-- `count_lines` — Spočítat řádky
-- `read_lines` — Číst zadané řádky
-- `replace_text` — Nahradit text
+- `read` — Čtení souboru
+- `write` — Zápis souboru
+- `list` — Výpis adresáře
+- `delete` — Mazání souboru
+- `create_directory` — Vytvoření adresáře
+- `search_files` — Vyhledávání souborů
+- `search_content` — Vyhledávání obsahu souborů
+- `count_lines` — Počítání řádků
+- `read_lines` — Čtení určených řádků
+- `replace_text` — Nahrazování textu
 
-**Požadavek na oprávnění**: `disk:read`, `disk:write`
+**Požadavek na oprávnění**: `FileAccess`
 
 **Příklad použití**:
 ```json
@@ -197,21 +214,21 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ---
 
-### 7. Nástroj Dynamické Kompilace (DynamicCompileTool) 🔒
+### 7. Nástroj dynamické kompilace (DynamicCompileTool) 🔒
 
 **Název nástroje**: `compile`
 
-**Popis funkce**: Dynamická kompilace C# kódu (pro sebevývoj silikonových bytostí).
+**Popis funkce**: Dynamická kompilace kódu C# (pro sebeevoluci Křemíkové Bytosti).
 
 **Podporované operace**:
-- `compile_class` — Kompilovat třídu
-- `compile_callback` — Kompilovat funkci zpětného volání oprávnění
-- `validate_code` — Ověřit bezpečnost kódu
+- `compile_class` — Kompilace třídy
+- `compile_callback` — Kompilace funkce zpětného volání oprávnění
+- `validate_code` — Validace bezpečnosti kódu
 
 **Bezpečnostní mechanismy**:
-- Kontrola referencí při kompilaci (vyloučení nebezpečných sestav)
-- Statické skenování kódu za běhu
-- AES-256 šifrované ukládání
+- Kontrola referencí při kompilaci (vyloučení nebezpečných sestavení)
+- Statická analýza kódu za běhu
+- Šifrované úložiště AES-256
 
 **Příklad použití**:
 ```json
@@ -223,16 +240,16 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ---
 
-### 8. Nástroj Spouštění Kódu (ExecuteCodeTool) 🔒
+### 8. Nástroj spouštění kódu (ExecuteCodeTool) 🔒
 
 **Název nástroje**: `execute_code`
 
-**Požadavek na oprávnění**: Pouze pro silikonové kurátory
+**Požadavek na oprávnění**: Pouze pro Kurátora Křemíku
 
-**Popis funkce**: Kompilace a spuštění fragmentů C# kódu.
+**Popis funkce**: Kompilace a spuštění fragmentu kódu C#.
 
 **Podporované operace**:
-- `run_script` — Spustit kódový skript
+- `run_script` — Spuštění skriptu
 
 **Příklad použití**:
 ```json
@@ -245,41 +262,44 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ---
 
-### 9. Nástroj Nápovědy (HelpTool)
+### 9. Nástroj nápovědy (HelpTool)
 
 **Název nástroje**: `help`
 
-**Popis funkce**: Získání nápovědní dokumentace a uživatelských příruček.
+**Dostupné scénáře**: Chat (`[ChatOnly]`, dostupné pouze ve scénáři chatu)
+
+**Popis funkce**: Vyhledávání a získávání obsahu systémové dokumentace nápovědy, umožňuje AI dotazovat se na způsoby použití systémových funkcí.
 
 **Podporované operace**:
-- `get_topics` — Získat seznam nápovědních témat
-- `get_topic` — Získat detaily konkrétního tématu
-- `search` — Vyhledat nápovědní dokumenty
+- `list` — Seznam všech ID témat nápovědy
+- `search` — Vyhledávání v dokumentaci nápovědy podle klíčových slov
+- `get` — Získání obsahu dokumentace nápovědy pro zadané ID
 
 **Příklad použití**:
 ```json
 {
-  "action": "get_topics"
+  "action": "search",
+  "keyword": "oprávnění"
 }
 ```
 
 ---
 
-### 10. Nástroj Znalostní Sítě (KnowledgeTool)
+### 10. Nástroj znalostní sítě (KnowledgeTool)
 
 **Název nástroje**: `knowledge`
 
-**Popis funkce**: Operace se znalostním grafem (založeno na triplech: subjekt-vztah-objekt).
+**Popis funkce**: Operace se znalostním grafem (založeno na trojicích: subjekt-relace-objekt).
 
 **Podporované operace**:
-- `add` — Přidat znalostní triple
-- `query` — Dotazovat znalosti
-- `update` — Aktualizovat znalosti
-- `delete` — Smazat znalosti
-- `search` — Vyhledat znalosti
-- `get_path` — Získat cestu znalostí
-- `validate` — Ověřit znalost
-- `stats` — Získat statistiky
+- `add` — Přidání trojice znalostí
+- `query` — Dotazování znalostí
+- `update` — Aktualizace znalostí
+- `delete` — Mazání znalostí
+- `search` — Vyhledávání znalostí
+- `get_path` — Získání znalostní cesty
+- `validate` — Validace znalostí
+- `stats` — Získání statistických informací
 
 **Příklad použití**:
 ```json
@@ -294,16 +314,16 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ---
 
-### 11. Logovací Nástroj (LogTool)
+### 11. Protokolový nástroj (LogTool)
 
 **Název nástroje**: `log`
 
-**Popis funkce**: Dotazování operační historie a historie konverzací.
+**Popis funkce**: Dotazování historie operací a historie konverzací.
 
 **Podporované operace**:
-- `query_logs` — Dotazovat systémové logy
-- `query_conversations` — Dotazovat historii konverzací
-- `get_stats` — Získat statistiky logů
+- `query_logs` — Dotazování systémových protokolů
+- `query_conversations` — Dotazování historie konverzací
+- `get_stats` — Získání statistik protokolů
 
 **Příklad použití**:
 ```json
@@ -318,20 +338,20 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ---
 
-### 12. Paměťový Nástroj (MemoryTool)
+### 12. Nástroj paměti (MemoryTool)
 
 **Název nástroje**: `memory`
 
-**Popis funkce**: Správa dlouhodobé a krátkodobé paměti silikonových bytostí.
+**Popis funkce**: Správa dlouhodobé a krátkodobé paměti Křemíkové Bytosti.
 
 **Podporované operace**:
-- `read` — Číst paměť
-- `write` — Zapisovat paměť
-- `search` — Vyhledat paměť
-- `delete` — Smazat paměť
-- `list` — Vypsat paměť
-- `get_stats` — Získat statistiky paměti
-- `compress` — Komprimovat paměť
+- `read` — Čtení paměti
+- `write` — Zápis paměti
+- `search` — Vyhledávání paměti
+- `delete` — Mazání paměti
+- `list` — Seznam pamětí
+- `get_stats` — Získání statistik paměti
+- `compress` — Komprese paměti
 
 **Příklad použití**:
 ```json
@@ -347,7 +367,7 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ---
 
-### 13. Síťový Nástroj (NetworkTool)
+### 13. Síťový nástroj (NetworkTool)
 
 **Název nástroje**: `network`
 
@@ -358,8 +378,8 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 - `post` — POST požadavek
 - `put` — PUT požadavek
 - `delete` — DELETE požadavek
-- `download` — Stáhnout soubor
-- `upload` — Nahrát soubor
+- `download` — Stažení souboru
+- `upload` — Nahrání souboru
 
 **Požadavek na oprávnění**: `network:http`
 
@@ -373,19 +393,19 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ---
 
-### 14. Nástroj Oprávnění (PermissionTool) 🔒
+### 14. Nástroj oprávnění (PermissionTool) 🔒
 
 **Název nástroje**: `permission`
 
-**Požadavek na oprávnění**: Pouze pro silikonové kurátory
+**Požadavek na oprávnění**: Pouze pro Kurátora Křemíku
 
 **Popis funkce**: Správa oprávnění a seznamů řízení přístupu.
 
 **Podporované operace**:
-- `query_permission` — Dotazovat oprávnění
-- `manage_acl` — Spravovat globální ACL
-- `get_callback` — Získat funkci zpětného volání oprávnění
-- `set_callback` — Nastavit funkci zpětného volání oprávnění
+- `query_permission` — Dotazování oprávnění
+- `manage_acl` — Správa globálního ACL
+- `get_callback` — Získání funkce zpětného volání oprávnění
+- `set_callback` — Nastavení funkce zpětného volání oprávnění
 
 **Příklad použití**:
 ```json
@@ -400,94 +420,146 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ---
 
-### 15. Projektový Nástroj (ProjectTool)
+### 15. Projektový nástroj (ProjectTool) 🔒
 
 **Název nástroje**: `project`
 
-**Popis funkce**: Správa projektových pracovních prostorů.
+**Požadavek na oprávnění**: Pouze pro Kurátora Křemíku (`[SiliconManagerOnly]`)
+
+**Dostupné scénáře**: Chat, Task, Timer
+
+**Popis funkce**: Správa projektového pracovního prostoru, podpora správy životního cyklu projektu, přiřazování členů a správa rolí.
 
 **Podporované operace**:
-- `create` — Vytvořit projekt
-- `list` — Vypsat projekty
-- `get_info` — Získat informace o projektu
-- `update` — Aktualizovat projekt
-- `archive` — Archivovat projekt
+- `create` — Vytvoření nového projektového prostoru
+- `archive` — Archivace projektu
+- `restore` — Obnovení archivovaného projektu
+- `destroy` — Zničení projektu a vyčištění dat (není obnovitelné)
+- `list` — Seznam všech projektů
+- `get` — Získání detailů projektu
+- `assign` — Přiřazení Křemíkové Bytosti do projektu
+- `remove` — Odebrání Křemíkové Bytosti z projektu
+- `update` — Aktualizace názvu/popisu projektu
+- `list-workflow-templates` — Seznam dostupných šablon pracovních postupů
+- `assign_role` — Přiřazení projektové role Křemíkové Bytosti
+- `remove_role` — Odebrání projektové role Křemíkové Bytosti
+- `list_roles` — Seznam přiřazení rolí projektu
 
 **Příklad použití**:
 ```json
 {
   "action": "create",
-  "name": "Můj Projekt",
+  "name": "Můj projekt",
   "description": "Popis projektu"
 }
 ```
 
 ---
 
-### 16. Nástroj Projektových Úkolů (ProjectTaskTool)
+### 16. Nástroj projektových úkolů (ProjectTaskTool)
 
 **Název nástroje**: `project_task`
 
-**Popis funkce**: Správa projektových úkolů.
+**Dostupné scénáře**: Chat, Task, Timer
+
+**Popis funkce**: Správa úkolů v projektovém prostoru, podpora kompletního životního cyklu úkolů.
 
 **Podporované operace**:
-- `create` — Vytvořit úkol
-- `list` — Vypsat úkoly
-- `update` — Aktualizovat úkol
-- `complete` — Dokončit úkol
-- `get_stats` — Získat statistiky úkolů
+- `create` — Vytvoření projektového úkolu
+- `list` — Seznam projektových úkolů
+- `get` — Získání detailů úkolu
+- `update` — Aktualizace názvu/popisu/priority úkolu
+- `assign` — Přiřazení zodpovědné osoby k úkolu
+- `remove_assignee` — Odebrání zodpovědné osoby z úkolu
+- `start` — Zahájení úkolu
+- `complete` — Označení úkolu jako dokončeného
+- `fail` — Označení úkolu jako selhaného
+- `cancel` — Zrušení úkolu
+- `delete` — Smazání úkolu
+- `stats` — Získání statistik úkolů
 
 **Příklad použití**:
 ```json
 {
   "action": "create",
   "project_id": "project-uuid",
-  "description": "Popis úkolu k dokončení",
+  "description": "Popis úkolu",
   "priority": 5
 }
 ```
 
 ---
 
-### 17. Nástroj Projektových Pracovních Poznámek (ProjectWorkNoteTool)
+### 17. Nástroj projektových pracovních poznámek (ProjectWorkNoteTool)
 
 **Název nástroje**: `project_work_note`
 
-**Popis funkce**: Správa projektových pracovních poznámek (veřejné, podobné pracovnímu zápisníku).
+**Dostupné scénáře**: Chat, Task, Timer
+
+**Popis funkce**: Správa pracovních poznámek v projektovém prostoru (veřejné, podobné pracovnímu sešitu), podpora stránkového správy poznámek.
 
 **Podporované operace**:
-- `create` — Vytvořit poznámku
-- `read` — Číst poznámku
-- `update` — Aktualizovat poznámku
-- `delete` — Smazat poznámku
-- `list` — Vypsat poznámky
-- `search` — Vyhledat poznámky
-- `directory` — Generovat obsah
+- `create` — Vytvoření stránky poznámky (vyžaduje `project_id`, `summary` a `content`, volitelně `keywords`)
+- `read` — Čtení stránky poznámky (vyžaduje `project_id` a `page_number` nebo `note_id`)
+- `update` — Aktualizace stránky poznámky (vyžaduje `project_id`, `page_number` a `content`, volitelně `summary` a `keywords`)
+- `delete` — Smazání stránky poznámky (vyžaduje `project_id` a `page_number` nebo `note_id`)
+- `list` — Seznam všech stránek poznámek projektu
+- `directory` — Generování obsahu/přehledu poznámek
+- `search` — Vyhledávání poznámek podle klíčových slov (vyžaduje `project_id` a `keyword`, volitelně `max_results`)
 
 **Příklad použití**:
 ```json
 {
   "action": "create",
   "project_id": "project-uuid",
-  "summary": "Dokončen modul autentizace uživatelů",
-  "content": "## Implementační detaily\n\n- Použití JWT tokenu",
+  "summary": "Dokončení modulu uživatelské autentizace",
+  "content": "## Detaily implementace\n\n- Použití JWT token",
   "keywords": "autentizace,JWT"
 }
 ```
 
 ---
 
-### 18. Systémový Nástroj (SystemTool)
+### 18. Nástroj projektové práce (ProjectWorkTool) 🔒
+
+**Název nástroje**: `project_work`
+
+**Požadavek na oprávnění**: Pouze pro Kurátora Křemíku (`[SiliconManagerOnly]`)
+
+**Dostupné scénáře**: Project (`[ToolScenario(ToolScenarioFlag.Project)]`, dostupné pouze v projektovém scénáři)
+
+**Popis funkce**: Nástroj projektových pracovních operací, určený pro Kurátora ke správě projektových pracovních postupů ve scénáři ThinkOnProject.
+
+**Podporované operace**:
+- `create-task` — Vytvoření projektového úkolu
+- `assign-task` — Přiřazení Křemíkové Bytosti k úkolu
+- `chat` — Odeslání zprávy do skupinového chatu projektu
+- `broadcast` — Vysílání zprávy do projektového kanálu
+- `complete` — Označení projektu jako dokončeného
+- `status` — Získání stavu projektu
+
+**Příklad použití**:
+```json
+{
+  "action": "create-task",
+  "project_id": "project-uuid",
+  "title": "Implementace uživatelské autentizace"
+}
+```
+
+---
+
+### 19. Systémový nástroj (SystemTool)
 
 **Název nástroje**: `system`
 
-**Popis funkce**: Získání systémových informací a využití zdrojů.
+**Popis funkce**: Získávání systémových informací a využití prostředků.
 
 **Podporované operace**:
-- `info` — Získat systémové informace
-- `resource_usage` — Získat využití zdrojů
-- `find_process` — Najít proces
-- `list_beings` — Vypsat silikonové bytosti
+- `info` — Získání systémových informací
+- `resource_usage` — Získání využití prostředků
+- `find_process` — Vyhledání procesu
+- `list_beings` — Seznam Křemíkových Bytostí
 
 **Příklad použití**:
 ```json
@@ -498,44 +570,44 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ---
 
-### 19. Úkolový Nástroj (TaskTool)
+### 20. Nástroj úkolů (TaskTool)
 
 **Název nástroje**: `task`
 
-**Popis funkce**: Správa osobních úkolů silikonových bytostí.
+**Popis funkce**: Správa osobních úkolů Křemíkové Bytosti.
 
 **Podporované operace**:
-- `create` — Vytvořit úkol
-- `list` — Vypsat úkoly
-- `update` — Aktualizovat úkol
-- `complete` — Dokončit úkol
-- `delete` — Smazat úkol
-- `get_dependencies` — Získat závislosti
+- `create` — Vytvoření úkolu
+- `list` — Seznam úkolů
+- `update` — Aktualizace úkolu
+- `complete` — Dokončení úkolu
+- `delete` — Smazání úkolu
+- `get_dependencies` — Získání závislostí
 
 **Příklad použití**:
 ```json
 {
   "action": "create",
-  "description": "Zkontrolovat kód",
+  "description": "Kontrola kódu",
   "priority": 5
 }
 ```
 
 ---
 
-### 20. Časovačový Nástroj (TimerTool)
+### 21. Nástroj časovačů (TimerTool)
 
 **Název nástroje**: `timer`
 
 **Popis funkce**: Vytváření a správa časovačů.
 
 **Podporované operace**:
-- `create` — Vytvořit časovač
-- `list` — Vypsat časovače
-- `delete` — Smazat časovač
-- `pause` — Pozastavit časovač
-- `resume` — Obnovit časovač
-- `get_execution_history` — Získat historii provádění
+- `create` — Vytvoření časovače
+- `list` — Seznam časovačů
+- `delete` — Smazání časovače
+- `pause` — Pozastavení časovače
+- `resume` — Obnovení časovače
+- `get_execution_history` — Získání historie provádění
 
 **Příklad použití**:
 ```json
@@ -543,61 +615,72 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
   "action": "create",
   "interval": 3600,
   "repeat": true,
-  "message": "Každou hodinu připomenout"
+  "message": "Hodinová připomínka"
 }
 ```
 
 ---
 
-### 21. Nástroj Audit Tokenů (TokenAuditTool) 🔒
+### 22. Nástroj auditu Tokenů (TokenAuditTool) 🔒
 
 **Název nástroje**: `token_audit`
 
-**Požadavek na oprávnění**: Pouze pro silikonové kurátory
+**Požadavek na oprávnění**: Pouze pro Kurátora Křemíku (`[SiliconManagerOnly]`)
 
-**Popis funkce**: Dotazování a shrnutí využití AI tokenů.
+**Dostupné scénáře**: Chat, Task, Timer
+
+**Popis funkce**: Dotazování na statistiky a trendy využití AI Tokenů.
 
 **Podporované operace**:
-- `get_usage` — Získat statistiky využití tokenů
-- `get_by_being` — Získat využití podle bytosti
-- `get_by_model` — Získat využití podle modelu
-- `get_trend` — Získat trend využití
-- `export` — Exportovat data
+- `summary` — Získání souhrnných statistik využití Tokenů
+- `trend` — Získání datových bodů trendu využití Tokenů
+
+**Podporované časové rozsahy**:
+- `today` — Posledních 24 hodin
+- `week` — Posledních 7×24 hodin
+- `month` — Statistiky po dnech
+- `year` — Statistiky po měsících
 
 **Příklad použití**:
 ```json
 {
-  "action": "get_usage",
-  "start_date": "2026-04-01",
-  "end_date": "2026-04-26"
+  "action": "summary",
+  "time_range": "week"
 }
 ```
 
 ---
 
-### 22. Nástroj WebView Prohlížeče (WebViewBrowserTool)
+### 23. Nástroj WebView prohlížeče (WebViewBrowserTool)
 
-**Název nástroje**: `webview`
+**Název nástroje**: `webview_browser`
 
-**Popis funkce**: Automatizace prohlížeče založená na Playwright.
+**Dostupné scénáře**: Chat, Task, Timer
+
+**Popis funkce**: Automatizace prohlížeče založená na Playwright, poskytující kompletní schopnosti navigace, interakce a extrakce dat z webových stránek.
 
 **Podporované operace**:
-- `open_browser` — Otevřít prohlížeč
-- `close_browser` — Zavřít prohlížeč
-- `navigate` — Navigovat na URL
-- `click` — Kliknout na element
-- `input` — Vložit text
-- `get_page_text` — Získat text stránky
-- `get_screenshot` — Získat screenshot
-- `execute_script` — Spustit JavaScript
-- `wait_for_element` — Čekat na výskyt elementu
-- `get_browser_status` — Získat stav prohlížeče
+- `open` — Otevření prohlížeče
+- `close` — Zavření prohlížeče
+- `navigate` — Navigace na URL
+- `click` — Kliknutí na prvek
+- `input` — Zadání textu
+- `scroll` — Posouvání stránky
+- `execute_script` — Spuštění JavaScriptu
+- `get_page_text` — Získání textu stránky
+- `get_screenshot` — Získání snímku obrazovky
+- `wait_for_element` — Čekání na výskyt prvku
+- `get_element_info` — Získání informací o prvku
+- `upload_file` — Nahrání souboru
+- `get_browser_status` — Získání stavu prohlížeče
+- `set_timeout` — Nastavení časového limitu
+- `clear_session` — Vymazání relace prohlížeče
 
 **Vlastnosti**:
-- Nezávislá instance pro každou silikonovou bytost
-- Plně izolované cookies a relace
-- Plně neviditelné pro uživatele (headless mód)
-- Plná podpora JavaScriptu a CSS
+- Nezávislá instance pro každou Křemíkovou Bytost
+- Zcela izolované cookies a relace
+- Zcela neviditelné pro uživatele (headless režim)
+- Kompletní podpora JavaScript a CSS
 
 **Příklad použití**:
 ```json
@@ -609,53 +692,53 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 ---
 
-### 23. Nástroj Pracovních Poznámek (WorkNoteTool)
+### 24. Nástroj pracovních poznámek (WorkNoteTool)
 
 **Název nástroje**: `work_note`
 
-**Popis funkce**: Správa osobních pracovních poznámek silikonových bytostí (soukromé, podobné deníku).
+**Popis funkce**: Správa osobních pracovních poznámek Křemíkové Bytosti (soukromé, podobné deníku).
 
 **Podporované operace**:
-- `create` — Vytvořit poznámku
-- `read` — Číst poznámku
-- `update` — Aktualizovat poznámku
-- `delete` — Smazat poznámku
-- `list` — Vypsat poznámky
-- `search` — Vyhledat poznámky
-- `directory` — Generovat obsah
+- `create` — Vytvoření poznámky
+- `read` — Čtení poznámky
+- `update` — Aktualizace poznámky
+- `delete` — Smazání poznámky
+- `list` — Seznam poznámek
+- `search` — Vyhledávání poznámek
+- `directory` — Generování obsahu
 
 **Příklad použití**:
 ```json
 {
   "action": "create",
-  "summary": "Dokončen modul autentizace uživatelů",
-  "content": "## Implementační detaily\n\n- Použití JWT tokenu\n- Podpora OAuth2",
+  "summary": "Dokončení modulu uživatelské autentizace",
+  "content": "## Detaily implementace\n\n- Použití JWT token\n- Podpora OAuth2",
   "keywords": "autentizace,JWT,OAuth2"
 }
 ```
 
 ---
 
-### 24. Nástroj Hot Reload (HotReloadTool)
+### 25. Nástroj hot-reload (HotReloadTool)
 
 **Název nástroje**: `hot_reload`
 
-**Popis**: Podporuje automatickou kompilaci, aktualizaci souborů a restart SiliconLife.Fast za běhu, bez manuálního zásahu.
+**Popis funkce**: Podpora automatické kompilace, aktualizace souborů a restartu SiliconLife.Fast za běhu, bez nutnosti ručního zásahu.
 
-**Podporované akce**:
-- `execute` — Provede kompletní proces build, kopírování a restartu
-- `build_only` — Pouze zkompiluje projekt, bez kopírování nebo restartu
+**Podporované operace**:
+- `execute` — Provedení kompletního procesu sestavení, kopírování a restartu
+- `build_only` — Pouze sestavení projektu, bez kopírování a restartu
 
 **Pracovní postup**:
-1. Zkompiluje projekt SiliconLife.Fast
-2. Elegantně uzavře běžící instanci Fast (prostřednictvím HTTP API)
-3. Počká na ukončení procesu a uvolnění portu
-4. Zkopíruje výstup buildu do cílového adresáře (vyloučí soubory HotReload)
-5. Restartuje instanci Fast
+1. Kompilace projektu SiliconLife.Fast
+2. Elegantní vypnutí aktuálně běžící instance Fast (prostřednictvím HTTP API)
+3. Čekání na ukončení procesu a uvolnění portu
+4. Kopírování výstupu sestavení do cílového adresáře (přeskočení souborů HotReload)
+5. Opětovné spuštění instance Fast
 
-**Charakteristiky**:
-- Automatická detekce a uzavření předchozího procesu
-- Bezpečné kopírování souborů (nepřepíše HotReload.exe)
+**Vlastnosti**:
+- Automatická detekce a vypnutí starého procesu
+- Bezpečné kopírování souborů (nepřepisuje HotReload.exe)
 - Mechanismus čekání na uvolnění portu
 - Podpora vlastní konfigurace portu
 
@@ -672,52 +755,53 @@ Systém nástrojů umožňuje silikonovým bytostem interagovat s vnějším sv�
 
 **Popis parametrů**:
 - `project_path`: Cesta k projektu (relativní ke kořenovému adresáři řešení)
-- `source_path`: Adresář výstupu buildu
-- `configuration`: Konfigurace buildu (Debug/Release)
+- `source_path`: Výstupní adresář sestavení
+- `configuration`: Konfigurace sestavení (Debug/Release)
 - `port`: Webový port instance Fast (výchozí 8080)
 
-**Poznámky**:
-- Použitelné pouze pro verzi SiliconLife.Fast
+**Upozornění**:
+- Pouze pro verzi SiliconLife.Fast
 - Vyžaduje HotReload.exe v adresáři tools/HotReload
-- Krátké přerušení služby během restartu (přibližně 3-5 sekund)
+- Během restartu dojde k krátkému přerušení služby (cca 3-5 sekund)
 
-## Proces Volání Nástrojů
+---
+
+## Průběh volání nástroje
 
 ```
 ┌──────────┐
-│   AI     │ Vrátí tool_calls
+│   AI     │ Vrací tool_calls
 └────┬─────┘
      ↓
 ┌──────────────┐
-│ ToolManager  │ Vyhledá a ověří použití nástroje
+│ ToolManager  │ Vyhledání a ověření oprávnění k použití nástroje
 └────┬─────────┘
      ↓
 ┌──────────────┐
-│ Permission   │ Zkontroluje řetězec oprávnění
+│ Permission   │ Kontrola řetězce oprávnění
 │   Manager    │
 └────┬─────────┘
      ↓
 ┌──────────────┐
-│  Executor    │ Provede operaci přístupu ke zdroji
+│  Executor    │ Provedení operace přístupu k prostředkům
 └────┬─────────┘
      ↓
 ┌──────────┐
-│   AI     │ Přijme výsledek nástroje, pokračuje v myšlení
+│   AI     │ Přijetí výsledku nástroje, pokračování v uvažování
 └──────────┘
 ```
 
-## Ověřování Oprávnění
+## Ověřování oprávnění
 
-Všechna provádění nástrojů procházejí 3úrovňovým řetězcem oprávnění:
+Všechny provádění nástrojů procházejí řetězcem ověřování oprávnění:
 
-1. **UserFrequencyCache** — Cache vysoké frekvence povolení/zamítnutí uživatele
-2. **IPermissionCallback** — Vlastní funkce zpětného volání oprávnění
-3. **Větev kurátora**: IsCurator → IPermissionAskHandler (dotazování uživatele)
-4. **Větev nekurátora**: GlobalACL → Výchozí zamítnutí
+1. **UserFrequencyCache** — mezipaměť častých uživatelských rozhodnutí (HighDeny má přednost před HighAllow)
+2. **IPermissionCallback** — vlastní funkce zpětného volání oprávnění (Allowed/Denied/AskUser)
+3. **Větev IsCurator** — Kurátor se ptá uživatele prostřednictvím IPermissionAskHandler; ne-Kurátor kontroluje GlobalACL, při žádném odpovídajícím pravidle je výchozí zamítnutí
 
-## Vytvoření Vlastního Nástroje
+## Vytvoření vlastního nástroje
 
-### Krok 1: Implementace Rozhraní ITool
+### Krok 1: Implementace rozhraní ITool
 
 ```csharp
 public class MyCustomTool : ITool
@@ -761,46 +845,46 @@ public class MyCustomTool : ITool
 }
 ```
 
-### Krok 2: Přidání do Projektu
+### Krok 2: Přidání do projektu
 
-Umístěte soubor nástroje do adresáře `src/SiliconLife.Common/Tools/` (sdílené nástroje) nebo `src/SiliconLife.App/Tools/` (App-specifické nástroje). `ToolManager` jej automaticky objeví a zaregistruje při spuštění pomocí reflexe.
+Umístěte soubor nástroje do adresáře `src/SiliconLife.Common/Tools/` (sdílené nástroje) nebo do adresáře `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (nástroje specifické pro verzi). `ToolManager` nástroj automaticky objeví a zaregistruje pomocí reflexe při spuštění.
 
-### Krok 2a: Registrace Nástroje přes Plugin
+### Krok 2a: Registrace nástroje prostřednictvím zásuvného modulu
 
-Nástroje lze také registrovat prostřednictvím systému pluginů:
+Vlastní nástroje lze také registrovat prostřednictvím systému zásuvných modulů:
 
-1. Implementujte rozhraní `ITool` v projektu pluginu
-2. Zkompilujte DLL pluginu a vložte jej do adresáře pluginů
-3. `ToolManager.ScanAllPluginAssemblies()` automaticky proskenuje všechny načtené pluginy pro implementace ITool
-4. Nástroje pluginů podléhají stejnému systému oprávnění
+1. Implementujte rozhraní `ITool` v projektu zásuvného modulu
+2. Zkompilujte DLL zásuvného modulu a vložte jej do adresáře zásuvných modulů
+3. `ToolManager.ScanAllPluginAssemblies()` automaticky skenuje implementace ITool ve všech načtených zásuvných modulech
+4. Nástroje zásuvných modulů podléhají stejnému systému oprávnění
 
-### Krok 3: (Volitelné) Označení jako Vyhrazené pro Kurátora
+### Krok 3: (Volitelné) Označení jako určené pouze pro Kurátora
 
 ```csharp
 [SiliconManagerOnly]
 public class AdminOnlyTool : ITool
 {
-    // Přístupné pouze silikonovému kurátorovi
+    // Přístupné pouze Kurátorem Křemíku
 }
 ```
 
-## Nejlepší Praktiky
+## Osvědčené postupy
 
-### 1. Vždy Ověřujte Parametry
+### 1. Vždy validujte parametry
 
 ```csharp
 if (!call.Parameters.ContainsKey("required_param"))
 {
-    return ToolResult.Failure("Chybí požadovaný parametr: required_param");
+    return ToolResult.Failure("Chybí povinný parametr: required_param");
 }
 ```
 
-### 2. Elegantní Zpracování Chyb
+### 2. Elegantně zpracovávejte chyby
 
 ```csharp
 try
 {
-    // Provést operaci
+    // Provedení operace
 }
 catch (Exception ex)
 {
@@ -809,62 +893,62 @@ catch (Exception ex)
 }
 ```
 
-### 3. Respektujte Systém Oprávnění
+### 3. Respektujte systém oprávnění
 
-Nikdy neobcházejte kontroly oprávnění. Vždy přistupujte ke zdrojům prostřednictvím exekutorů:
+Nikdy neobcházejte kontrolu oprávnění. Vždy přistupujte k prostředkům prostřednictvím exekutoru:
 
 ```csharp
-var permission = permissionManager.EvaluatePermission(callerId, permissionType, resource);
-if (!permission.Allowed)
+bool allowed = permissionManager.CheckPermission(callerId, permissionType, resource);
+if (!allowed)
 {
-    return ToolResult.Denied(permission.Reason);
+    return ToolResult.Denied("Permission denied");
 }
 ```
 
-### 4. Poskytujte Jasné Popisy Nástrojů
+### 4. Poskytujte jasné popisy nástrojů
 
-Pomozte AI pochopit kdy a jak nástroj použít:
+Pomozte AI pochopit, kdy a jak nástroj používat:
 
 ```csharp
 public string Description => 
-    "Používá se k převodu dat mezi různými kalendářovými systémy." +
+    "Používá se pro konverzi dat mezi různými kalendářními systémy." +
     "Vyžaduje parametry 'date', 'from_calendar' a 'to_calendar'.";
 ```
 
-## Řešení Problémů
+## Řešení problémů
 
-### Nástroj Nenalezen
+### Nástroj nenalezen
 
-**Problém**: AI se pokouší volat neexistující nástroj.
+**Problém**: AI se pokouší zavolat neexistující nástroj.
 
 **Řešení**:
-- Zkontrolujte, zda název nástroje přesně odpovídá
+- Zkontrolujte, zda se název nástroje přesně shoduje
 - Ověřte, že soubor nástroje je v adresáři `Tools/`
 - Znovu sestavte projekt (`dotnet build`)
 
-### Oprávnění Odmítnuto
+### Oprávnění zamítnuto
 
-**Problém**: Provádění nástroje selhalo s chybou oprávnění.
+**Problém**: Provedení nástroje selhalo, vrácena chyba oprávnění.
 
 **Řešení**:
-- Zkontrolujte auditní logy oprávnění
-- Ověřte, že silikonová bytost má požadované oprávnění
+- Zkontrolujte auditní protokol oprávnění
+- Ověřte, že Křemíková Bytost má požadovaná oprávnění
 - Zkontrolujte nastavení globálního ACL
-- Pokud jste kurátor, zkontrolujte použití atributu `[SiliconManagerOnly]`
+- Pokud jde o Kurátora, zkontrolujte, zda je použit atribut `[SiliconManagerOnly]`
 
-### Nástroj Vrací Chybu
+### Provedení nástroje vrací chybu
 
-**Problém**: Nástroj se provedl, ale vrátil výsledek selhání.
+**Problém**: Nástroj se provedl, ale vrátil neúspěšný výsledek.
 
 **Řešení**:
 - Zkontrolujte chybovou zprávu vrácenou nástrojem
-- Ověřte, že vstupní parametry jsou správně formátovány
-- Prohlédněte systémové logy pro podrobné informace o chybě
-- Otestujte funkčnost nástroje samostatně
+- Ověřte správný formát vstupních parametrů
+- Zkontrolujte systémové protokoly pro podrobné informace o chybě
+- Otestujte funkci nástroje nezávisle
 
-## Další Kroky
+## Další kroky
 
-- 📚 Přečtěte si [Průvodce architekturou](architecture.md)
-- 🛠️ Podívejte se na [Vývojářskou příručku](development-guide.md)
-- 🔒 Pochopte [Systém oprávnění](permission-system.md)
-- 🚀 Podívejte se na [Průvodce rychlým startem](getting-started.md)
+- 📚 Přečtěte [příručku architektury](architecture.md)
+- 🛠️ Prohlédněte [vývojářskou příručku](development-guide.md)
+- 🔒 Přečtěte o [systému oprávnění](permission-system.md)
+- 🚀 Prohlédněte [příručku rychlého startu](getting-started.md)

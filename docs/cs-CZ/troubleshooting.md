@@ -1,14 +1,14 @@
-﻿# Průvodce Řešením Problémů
+# Řešení problémů
 
 > **Verze: v0.2.0-alpha**
 
 [English](../en/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | **Čeština** | [Русский](../ru-RU/troubleshooting.md)
 
-## Časté Problémy
+## Časté problémy
 
-### Sestavování a Kompilace
+### Sestavení a kompilace
 
-#### Problém: Sestavení selhalo, chybějící závislosti
+#### Problém: Sestavení selhalo, chybí závislosti
 
 **Příznaky**:
 ```
@@ -21,7 +21,7 @@ dotnet restore
 dotnet build
 ```
 
-#### Problém: .NET SDK Nenalezen
+#### Problém: .NET SDK nenalezeno
 
 **Příznaky**:
 ```
@@ -37,9 +37,9 @@ dotnet --version
 
 ---
 
-### Problémy s Připojením AI
+### Problémy s AI připojením
 
-#### Problém: Ollama Odmítnutí Připojení
+#### Problém: Ollama připojení zamítnuto
 
 **Příznaky**:
 ```
@@ -58,7 +58,7 @@ ollama serve
 curl http://localhost:11434/api/tags
 ```
 
-#### Problém: Model Nenalezen
+#### Problém: Model nenalezen
 
 **Příznaky**:
 ```
@@ -74,7 +74,7 @@ ollama pull qwen2.5:7b
 ollama list
 ```
 
-#### Problém: Bailian 404 Chyba
+#### Problém: Bailian 404 chyba
 
 **Příznaky**:
 ```
@@ -84,10 +84,10 @@ HTTP 404: Model not found
 **Řešení**:
 1. Ověřte, že API klíč je správný
 2. Zkontrolujte, že název modelu odpovídá katalogu Bailian
-3. Ověřte, že koncový bod regionu je správný
+3. Ověřte, že regionální endpoint je správný
 4. Zkontrolujte, že účet má přístup k modelu
 
-#### Problém: Připojení k Volcengine Ark selhalo
+#### Problém: Volcengine Ark připojení selhalo
 
 **Příznaky**:
 ```
@@ -98,15 +98,15 @@ HTTP 404: Endpoint not found
 
 **Řešení**:
 1. Ověřte, že API klíč je správný
-2. Zkontrolujte, že formát URL koncového bodu je správný (výchozí: `https://ark.cn-beijing.volces.com/api/v3/chat/completions`)
-3. Potvrďte, že parametr Model používá ID inferenčního koncového bodu (např. `ep-20241212123456-abcde`), nikoli název modelu
-4. Zkontrolujte, že účet má přístup ke koncovému bodu
+2. Zkontrolujte, že formát URL endpointu je správný (výchozí: `https://ark.cn-beijing.volces.com/api/v3/chat/completions`)
+3. Potvrďte, že parametr Model používá ID inferenčního přístupového bodu (např. `ep-20241212123456-abcde`), nikoli název modelu
+4. Zkontrolujte, že účet má přístup k přístupovému bodu
 
 ---
 
-### Problémy za Běhu
+### Problémy za běhu
 
-#### Problém: Port Již Používán
+#### Problém: Port je již obsazen
 
 **Příznaky**:
 ```
@@ -128,21 +128,21 @@ lsof -ti:8080 | xargs kill -9
 
 **Nebo změňte port v konfiguraci**.
 
-#### Problém: Bytost se Nemůže Spustit
+#### Problém: Bytost nelze spustit
 
 **Příznaky**:
 - Stav bytosti zobrazuje "Error"
-- Logy zobrazují selhání inicializace
+- Protokoly ukazují selhání inicializace
 
 **Řešení**:
-1. Zkontrolujte, že soubor duše existuje a je platný
+1. Zkontrolujte, že Soubor Duše existuje a je platný
 2. Ověřte, že AI klient je nakonfigurován
-3. Zkontrolujte logy pro konkrétní chybu:
+3. Zkontrolujte protokoly pro konkrétní chybu:
 ```bash
 tail -f logs/*.log
 ```
 
-#### Problém: Nedostatek Paměti
+#### Problém: Nedostatek paměti
 
 **Příznaky**:
 ```
@@ -150,72 +150,73 @@ OutOfMemoryException
 ```
 
 **Řešení**:
-1. **SiliconLife.Default**: Zvyšte velikost haldy:
+1. **SiliconLife.Default**: Zvětšete haldu:
 ```bash
 dotnet run --project src/SiliconLife.Default --server.gcHeapCount 4
 ```
 
-2. **SiliconLife.Fast**: Verze Fast sama o sobě má vysokou spotřebu paměti (~500MB). Pokud je paměť dlouhodobě nedostatečná, doporučuje se:
-   - Snížit počet souběžně běžících silikonových bytostí
+2. **SiliconLife.Fast**: Verze Fast má vyšší spotřebu paměti (~500MB), pokud paměť trvale nedostačuje, doporučuje se:
+   - Snížit počet souběžných Křemíkových Bytostí
    - Vyčistit stará data pro uvolnění paměti
 
 3. Vyčistěte stará data:
 ```bash
-# Archivujte staré logy
+# Archivace starých protokolů
 mv logs/ logs-archive/
 mkdir logs
 
-# Vyčistěte staré vzpomínky
-# Prostřednictvím Web UI: Správa Paměti > Vyčistit
+# Vyčištění starých pamětí
+# Přes Web UI: Správa paměti > Vyčištění
 ```
 
-> **Tip**: SiliconLife.Default má nízkou spotřebu paměti (~200MB), vhodné pro prostředí s omezenou pamětí; SiliconLife.Fast má vyšší spotřebu paměti, ale lepší výkon, vhodné pro produkční prostředí.
+> **Tip**: SiliconLife.Default má nižší spotřebu paměti (~200MB), vhodný pro prostředí s omezenou pamětí; SiliconLife.Fast má vyšší spotřebu paměti, ale lepší výkon, vhodný pro produkční prostředí.
 
 ---
 
-### Problémy s Oprávněním
+### Problémy s oprávněními
 
-#### Problém: Oprávnění Zamítnuto
+#### Problém: Oprávnění zamítnuto
 
 **Příznaky**:
 ```
-Permission denied: disk:write
+Permission denied: FileAccess C:\Windows
 ```
 
 **Řešení**:
 1. Zkontrolujte aktuální oprávnění:
 ```bash
-curl http://localhost:8080/api/permissions
+curl http://localhost:8080/api/permissions/list
 ```
 
 2. Udělte oprávnění:
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "resource": "disk:write",
-    "allowed": true,
-    "duration": 3600
+    "permissionType": "FileAccess",
+    "resourcePrefix": "C:\\Projects",
+    "result": "Allowed",
+    "description": "Allow project directory access"
   }'
 ```
 
-3. Nebo použijte Web UI: Správa Oprávnění
+3. Nebo použijte Web UI: Správa oprávnění
 
-#### Problém: Oprávnění Nevyprší
+#### Problém: Oprávnění nevypršelo
 
 **Příznaky**:
-- Oprávnění zůstávají platná po uplynutí doby platnosti
+- Oprávnění je stále platné po uplynutí doby expirace
 
 **Řešení**:
 1. Zkontrolujte synchronizaci systémových hodin
 2. Ověřte, že pole `expiresAt` je správně nastaveno
-3. Vymažte cache oprávnění
+3. Vymažte mezipaměť oprávnění
 
 ---
 
 ### Problémy s Web UI
 
-#### Problém: Nelze Přistupovat k Web UI
+#### Problém: Nelze přistoupit k Web UI
 
 **Příznaky**:
 - Prohlížeč zobrazuje "Connection refused"
@@ -223,10 +224,10 @@ curl -X POST http://localhost:8080/api/permissions \
 **Řešení**:
 1. Ověřte, že server běží
 2. Zkontrolujte správnou URL: `http://localhost:8080`
-3. Zkontrolujte nastavení firewallu
-4. Zkontrolujte logy pro chyby při spuštění
+3. Zkontrolujte nastavení brány firewall
+4. Zkontrolujte protokoly pro chyby při spuštění
 
-#### Problém: SSE Nefunguje
+#### Problém: SSE nefunguje
 
 **Příznaky**:
 - Aktualizace v reálném čase se nezobrazují
@@ -236,25 +237,25 @@ curl -X POST http://localhost:8080/api/permissions \
 1. Zkontrolujte, že prohlížeč podporuje SSE
 2. Zakažte proxy bufferování pro SSE
 3. Zkontrolujte stabilitu sítě
-4. Zkuste jiný prohlížeč
+4. Vyzkoušejte jiný prohlížeč
 
-#### Problém: UI Vypadá Poškozeně
+#### Problém: UI vypadá poškozeně
 
 **Příznaky**:
-- Styly jsou nesprávné
+- Styly nejsou správné
 - Rozložení je rozbité
 
 **Řešení**:
-1. Vymažte cache prohlížeče
-2. Zkuste jiný skin: Nastavení > Skin
+1. Vymažte mezipaměť prohlížeče
+2. Vyzkoušejte jiný skin: Nastavení > Skiny
 3. Zkontrolujte chyby v konzoli prohlížeče
 4. Zakažte rozšíření prohlížeče
 
 ---
 
-### Problémy s Úložištěm
+### Problémy s úložištěm
 
-#### Problém: Nelze Číst/Zapisovat Data
+#### Problém: Nelze číst/zapisovat data
 
 **Příznaky**:
 ```
@@ -263,54 +264,54 @@ IOException: Access denied
 
 **Řešení**:
 1. Zkontrolujte oprávnění souborů
-2. Ověřte, že cesta k úložišti existuje
+2. Ověřte, že cesta úložiště existuje
 3. Zkontrolujte místo na disku
 4. Spusťte s příslušnými oprávněními
 
-#### Problém: Poškození Dat
+#### Problém: Poškození dat
 
 **Příznaky**:
-- Chyby parsování JSON
+- Chyba parsování JSON
 - Ztráta dat
 
 **Řešení**:
 1. Obnovte ze zálohy
 2. Zkontrolujte integritu úložiště:
 ```bash
-# Prostřednictvím Web UI: Systém > Kontrola Úložiště
+# Přes Web UI: Systém > Kontrola úložiště
 ```
 
 3. Ručně opravte poškozené soubory
 
-#### Problém: Poškození Souboru SpeedyPack Úložiště (Verze Fast)
+#### Problém: SpeedyPack soubor úložiště poškozen (verze Fast)
 
 **Příznaky**:
-- Soubor `.spk` nelze načíst
-- Inicializace SpeedyStorage selhává
+- `.spk` soubor nelze načíst
+- SpeedyStorage inicializace selhala
 
 **Řešení**:
 1. Použijte nástroj `SiliconLife.Speedy.Manager` pro kontrolu a opravu `.spk` souborů
-2. Zkontrolujte, zda soubor `.spk.idx` odpovídá souboru `.spk`
-3. Pokud je indexový soubor poškozen, smažte soubor `.spk.idx`, systém automaticky obnoví index
-4. Obnovte soubor `.spk` ze zálohy
+2. Zkontrolujte, zda `.spk.idx` indexový soubor odpovídá `.spk` souboru
+3. Pokud je indexový soubor poškozen, smažte `.spk.idx` soubor, systém automaticky obnoví index
+4. Obnovte `.spk` soubor ze zálohy
 
-#### Problém: Selhání Automatické Komprese SpeedyPack (Verze Fast)
+#### Problém: SpeedyPack automatická komprimace selhala (verze Fast)
 
 **Příznaky**:
-- Soubor `.spk` neustále roste
+- `.spk` soubor neustále roste
 - Nedostatek místa na disku
 
 **Řešení**:
 1. Zkontrolujte, zda `SpeedyPackAutoCompactor` běží správně
-2. Ručně spusťte kompresní operaci
-3. Zkontrolujte konfiguraci prahu komprese
-4. Použijte nástroj `SiliconLife.Speedy.Manager` pro ruční kompresi
+2. Ručně spusťte komprimaci
+3. Zkontrolujte konfiguraci prahu komprimace
+4. Použijte nástroj `SiliconLife.Speedy.Manager` pro ruční komprimaci
 
 ---
 
-### Problémy s Prováděním Nástrojů
+### Problémy s prováděním nástrojů
 
-#### Problém: Nástroj Nenalezen
+#### Problém: Nástroj nenalezen
 
 **Příznaky**:
 ```
@@ -323,7 +324,7 @@ Tool "xyz" not found
 3. Znovu sestavte projekt
 4. Zkontrolujte, že nástroj je správně implementován
 
-#### Problém: Nástroj Vrací Chybu
+#### Problém: Nástroj vrací chybu
 
 **Příznaky**:
 ```
@@ -331,16 +332,16 @@ Tool execution failed: ...
 ```
 
 **Řešení**:
-1. Zkontrolujte logy nástroje
+1. Zkontrolujte protokoly nástroje
 2. Ověřte vstupní parametry
-3. Otestujte nástroj izolovaně
+3. Otestujte nástroj nezávisle
 4. Zkontrolujte oprávnění
 
 ---
 
-### Problémy s Pluginy
+### Problémy se zásuvnými moduly
 
-#### Problém: Načtení Pluginu Selhalo
+#### Problém: Načítání zásuvného modulu selhalo
 
 **Příznaky**:
 ```
@@ -348,27 +349,27 @@ Plugin load failed: Security check failed
 ```
 
 **Řešení**:
-1. Zkontrolujte, zda plugin neodkazuje na zakázané jmenné prostory (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
-2. Ověřte, že plugin odkazuje pouze na sestavení ze seznamu důvěryhodných sestavení
-3. Zkontrolujte, že plugin správně implementuje rozhraní `IPlugin`
-4. Zkontrolujte logy pro podrobnosti o selhání bezpečnostní kontroly
+1. Zkontrolujte, zda zásuvný modul neodkazuje na zakázané jmenné prostory (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
+2. Ověřte, že zásuvný modul odkazuje pouze na sestavení z whitelistu důvěryhodných sestavení
+3. Zkontrolujte, že zásuvný modul správně implementuje rozhraní `IPlugin`
+4. Zobrazte protokoly pro podrobné informace o selhání bezpečnostní kontroly
 
-#### Problém: Nástroje Pluginu Nejsou Registrovány
+#### Problém: Nástroj zásuvného modulu není registrován
 
 **Příznaky**:
-- Plugin se úspěšně načetl, ale nástroje se neobjevují v seznamu nástrojů
+- Zásuvný modul se načetl úspěšně, ale nástroj se neobjevil v seznamu nástrojů
 
 **Řešení**:
-1. Potvrďte, že třídy nástrojů v pluginu správně implementují rozhraní `ITool`
-2. Zkontrolujte, že třídy nástrojů jsou public
-3. Ověřte, že `ToolManager.ScanAllPluginAssemblies()` byl volán
-4. Znovu sestavte plugin a restartujte aplikaci
+1. Potvrďte, že třída nástroje v zásuvném modulu správně implementuje rozhraní `ITool`
+2. Zkontrolujte, že třída nástroje je public
+3. Ověřte, že `ToolManager.ScanAllPluginAssemblies()` byla volána
+4. Znovu sestavte zásuvný modul a restartujte aplikaci
 
 ---
 
-### Problémy s Pracovními Poznámkami
+### Problémy s pracovními poznámkami
 
-#### Problém: Nelze Vytvořit Pracovní Poznámku
+#### Problém: Nelze vytvořit pracovní poznámku
 
 **Příznaky**:
 ```
@@ -377,23 +378,23 @@ Failed to create work note
 
 **Řešení**:
 1. Zkontrolujte, že bytost existuje a je v běžícím stavu
-2. Ověřte, že cesta k úložišti má oprávnění k zápisu
+2. Ověřte, že cesta úložiště má práva zápisu
 3. Zkontrolujte, že obsah není prázdný (obsah je povinný)
-4. Zkontrolujte logy pro podrobné informace o chybě
+4. Zobrazte protokoly pro podrobné informace o chybě
 
-#### Problém: Vyhledávání Poznámek Bez Výsledků
+#### Problém: Vyhledávání poznámek bez výsledků
 
 **Příznaky**:
 - Hledání klíčového slova vrací prázdné výsledky
-- Ale jsou k dispozici relevantní poznámky
+- Ale jste si jistí, že relevantní poznámky existují
 
 **Řešení**:
-1. Zkontrolujte, zda je klíčové slovo napsáno správně
+1. Zkontrolujte, že klíčové slovo je správně napsáno
 2. Zkuste použít obecnější klíčové slovo
-3. Ověřte, že poznámka obsahuje dané klíčové slovo (rozlišují se velká a malá písmena)
+3. Ověřte, že poznámka obsahuje dané klíčové slovo (rozlišují se velká/malá písmena)
 4. Zvyšte hodnotu parametru `max_results`
 
-#### Problém: Pomalé Generování Obsahu Poznámek
+#### Problém: Generování obsahu poznámek je pomalé
 
 **Příznaky**:
 - Dlouhá doba odpovědi při generování obsahu
@@ -403,13 +404,13 @@ Failed to create work note
 1. Toto je normální jev, vyžaduje procházení všech poznámek
 2. Zvažte pravidelnou archivaci starých poznámek
 3. Použijte funkci vyhledávání místo procházení obsahu
-4. Plánovaná optimalizace: přidání mechanismu cache obsahu
+4. Plánovaná optimalizace: přidání mechanismu mezipaměti obsahu
 
 ---
 
-### Problémy se Znalostní Sítí
+### Problémy se znalostní sítí
 
-#### Problém: Dotaz na Znalosti Vrací Prázdné Výsledky
+#### Problém: Dotaz na znalosti vrací prázdné výsledky
 
 **Příznaky**:
 ```
@@ -417,8 +418,8 @@ No knowledge triples found
 ```
 
 **Řešení**:
-1. Ověřte psaní subjektu a predikátu
-2. Zkontrolujte, zda byly znalosti přidány do sítě
+1. Ověřte, že subjekt a predikát jsou správně napsány
+2. Zkontrolujte, že znalost byla přidána do sítě
 3. Použijte funkci vyhledávání pro fuzzy shodu:
 ```json
 {
@@ -427,7 +428,7 @@ No knowledge triples found
 }
 ```
 
-#### Problém: Selhání Hledání Cesty ve Znalostech
+#### Problém: Hledání znalostní cesty selhalo
 
 **Příznaky**:
 ```
@@ -436,11 +437,11 @@ No path found between concepts
 
 **Řešení**:
 1. Ověřte, že oba koncepty existují ve znalostní síti
-2. Zkontrolujte, zda existuje spojovací cesta (nemusí existovat přímá ani nepřímá relace)
+2. Zkontrolujte, zda existuje asociační cesta (možná neexistuje přímý ani nepřímý vztah)
 3. Zkuste přidat více znalostí pro vytvoření spojení
-4. Snižte limit délky cesty (pokud je nastaven)
+4. Snižte omezení délky cesty (pokud je nastaveno)
 
-#### Problém: Selhání Validace Znalostí
+#### Problém: Validace znalostí selhala
 
 **Příznaky**:
 ```
@@ -448,28 +449,28 @@ Knowledge validation failed
 ```
 
 **Řešení**:
-1. Zkontrolujte, že formát tripletu je správný (subjekt, predikát, objekt jsou povinné)
-2. Ověřte, že spolehlivost je v rozsahu 0.0-1.0
-3. Zkontrolujte, zda neexistují duplicitní triplety
-4. Zkontrolujte podrobnosti chyby validace pro konkrétní problém
+1. Zkontrolujte, že formát trojice je správný (subjekt, predikát, objekt jsou povinné)
+2. Ověřte, že skóre důvěry je v rozsahu 0.0-1.0
+3. Zkontrolujte, zda neexistují duplicitní trojice
+4. Zobrazte detaily chyby validace pro konkrétní problém
 
-#### Problém: Nepřesné Statistiky Znalostní Sítě
+#### Problém: Statistiky znalostní sítě jsou nepřesné
 
 **Příznaky**:
 - Statistiky neodpovídají očekávání
-- Statistiky se neaktualizují po přidání znalostí
+- Po přidání znalostí se statistiky neaktualizovaly
 
 **Řešení**:
-1. Statistiky se mohou aktualizovat s několikasekundovým zpožděním (cache)
-2. Zkontrolujte, zda nebyly nějaké operace smazání neúspěšné
+1. Statistiky se mohou aktualizovat s několikasekundovým zpožděním (mezipaměť)
+2. Zkontrolujte, zda operace smazání nebyla úspěšně provedena
 3. Restartujte aplikaci pro vynucení obnovení statistik
-4. Znovu dotazujte statistiky prostřednictvím API
+4. Znovu dotazujte statistiky přes API
 
 ---
 
-### Problémy se Správou Projektů
+### Problémy se správou projektů
 
-#### Problém: Nelze Vytvořit Projekt
+#### Problém: Nelze vytvořit projekt
 
 **Příznaky**:
 ```
@@ -479,26 +480,93 @@ Failed to create project
 **Řešení**:
 1. Zkontrolujte, že název projektu není prázdný (povinný)
 2. Ověřte, že název projektu není duplicitní
-3. Zkontrolujte, že cesta k úložišti má oprávnění k zápisu
-4. Zkontrolujte logy pro podrobné informace o chybě
+3. Zkontrolujte, že cesta úložiště má práva zápisu
+4. Zobrazte protokoly pro podrobné informace o chybě
 
-#### Problém: Ztráta Dat Projektu
+#### Problém: Ztráta projektových dat
 
 **Příznaky**:
 - Informace o projektu nelze načíst
-- Soubory projektu jsou poškozeny
+- Projektové soubory jsou poškozené
 
 **Řešení**:
 1. Zkontrolujte, že adresář úložiště projektu existuje
-2. Obnovte data projektu ze zálohy
-3. Ověřte, že formát JSON souboru je správný
-4. Ručně opravte poškozené soubory projektu
+2. Obnovte projektová data ze zálohy
+3. Ověřte, že formát JSON souborů je správný
+4. Ručně opravte poškozené projektové soubory
+
+#### Problém: Přiřazení projektové role selhalo
+
+**Příznaky**:
+```
+Failed to assign role
+```
+
+**Řešení**:
+1. Potvrďte, že Křemíková Bytost je členem projektu
+2. Zkontrolujte, že název role je platný
+3. Ověřte, že operátor je Kurátor Křemíku
+4. Zobrazte protokoly pro podrobné informace o chybě
+
+#### Problém: Pracovní postup nelze spustit
+
+**Příznaky**:
+- Vytvoření instance pracovního postupu selhalo
+- Přechody stavů se neprovádějí
+
+**Řešení**:
+1. Zkontrolujte, že šablona pracovního postupu je definována
+2. Ověřte, že počáteční stav je správně nastaven
+3. Potvrďte, že projekt je vázán na šablonu pracovního postupu
+4. Zkontrolujte protokoly pracovního postupu pro chyby přechodů
+
+---
+
+### Problémy s oprávněními nástrojů
+
+#### Problém: Operace nástroje zamítnuta
+
+**Příznaky**:
+```
+Tool operation denied: network:post
+```
+
+**Řešení**:
+1. Zkontrolujte konfiguraci oprávnění nástrojů Křemíkové Bytosti:
+```bash
+curl http://localhost:8080/api/beings/tool-permissions?beingId=<id>
+```
+
+2. Aktualizujte oprávnění nástrojů:
+```bash
+curl -X PUT http://localhost:8080/api/beings/tool-permissions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "beingId": "being-uuid",
+    "permissions": {
+      "network:post": "allowed"
+    }
+  }'
+```
+
+3. Nebo použijte Web UI: Bytosti → Oprávnění nástrojů
+
+#### Problém: Projektová oprávnění nástrojů nefungují
+
+**Příznaky**:
+- Oprávnění nástrojů na úrovni projektu nefungují podle očekávání
+
+**Řešení**:
+1. Potvrďte, že oprávnění na úrovni projektu jsou správně nakonfigurována
+2. Zkontrolujte, zda nejsou v konfliktu oprávnění na úrovni Křemíkové Bytosti a projektu
+3. Oprávnění na úrovni projektu jsou nezávislá na úrovni Křemíkové Bytosti, použije se průnik obou
+4. Zobrazte auditní protokol pro potvrzení výsledků kontroly oprávnění
 
 ---
 
 ## Ladění
 
-### Povolení Podrobného Logování
+### Povolení podrobného protokolování
 
 Upravte konfiguraci:
 ```json
@@ -509,9 +577,9 @@ Upravte konfiguraci:
 }
 ```
 
-### Kontrola Logů
+### Kontrola protokolů
 
-Logy jsou uloženy v:
+Protokoly jsou uloženy v:
 ```
 logs/
 ├── system.log
@@ -525,152 +593,152 @@ Zobrazení v reálném čase:
 tail -f logs/*.log
 ```
 
-### Použití Debuggeru
+### Použití debuggeru
 
-**SiliconLife.Default (Výchozí Implementace)**:
+**SiliconLife.Default (výchozí implementace)**:
 ```bash
 # Spuštění s debuggerem
 dotnet run --project src/SiliconLife.Default --configuration Debug
 
 # Připojení debuggeru
-# Prostřednictvím IDE: Připojit k Procesu > SiliconLife.Default
+# Přes IDE: Attach to Process > SiliconLife.Default
 ```
 
-**SiliconLife.Fast (Vysoce Výkonná Verze)**:
+**SiliconLife.Fast (vysoce výkonná verze)**:
 ```bash
 # Spuštění s debuggerem
 dotnet run --project src/SiliconLife.Fast --configuration Debug
 
 # Připojení debuggeru
-# Prostřednictvím IDE: Připojit k Procesu > SiliconLife.Fast
+# Přes IDE: Attach to Process > SiliconLife.Fast
 ```
 
-> **Doporučení**: Ve fázi vývoje a ladění se doporučuje používat SiliconLife.Default, po ověření architektury použijte SiliconLife.Fast pro produkční nasazení.
+> **Doporučení**: Ve fázi vývoje a ladění se doporučuje používat SiliconLife.Default, po ověření architektury přejít na SiliconLife.Fast pro produkční nasazení.
 
 ---
 
-### Problémy s Výkonem
+## Problémy s výkonem
 
-#### Pomalá Doba Odpovědi
+### Pomalá doba odpovědi
 
 **Optimalizace**:
-1. Snížte složitost AI modelu
-2. Povolte cache
-3. Vyčistěte stará data
-4. Zvyšte systémové zdroje
+1. Snížení složitosti AI modelu
+2. Povolení mezipaměti
+3. Vyčištění starých dat
+4. Zvýšení systémových prostředků
 
-#### Vysoké Využití CPU
+### Vysoké využití CPU
 
 **Kontrola**:
-- Běží příliš mnoho bytostí
-- Nekonečná smyčka v nástrojích
+- Příliš mnoho běžících bytostí
+- Nekonečné smyčky v nástrojích
 - Časté spouštění časovačů
 
 **Řešení**:
-- Snižte počet souběžných bytostí
-- Optimalizujte kód nástrojů
-- Upravte intervaly časovačů
+- Snížení počtu souběžných bytostí
+- Optimalizace kódu nástrojů
+- Úprava intervalů časovačů
 
-#### Vysoké Využití Paměti
+### Vysoké využití paměti
 
 **Monitorování**:
 ```bash
-# Prostřednictvím Web UI: Dashboard > Paměť
+# Přes Web UI: Řídicí panel > Paměť
 ```
 
 **Optimalizace**:
-- Vyčistěte staré vzpomínky
-- Snižte velikost kontextu
-- Implementujte stránkování
+- Vyčištění starých pamětí
+- Snížení velikosti kontextu
+- Implementace stránkování
 
 ---
 
-## Získání Pomoci
+## Získání pomoci
 
-### Zobrazení Dokumentace
+### Zobrazení dokumentace
 
-- [Průvodce Rychlým Startem](getting-started.md)
-- [Vývojářská Příručka](development-guide.md)
-- [Reference API](api-reference.md)
-- [Průvodce Architekturou](architecture.md)
+- [Příručka rychlého startu](getting-started.md)
+- [Vývojářská příručka](development-guide.md)
+- [API reference](api-reference.md)
+- [Příručka architektury](architecture.md)
 
-### Kontrola Logů
+### Kontrola protokolů
 
-Vždy nejprve zkontrolujte logy pro podrobnosti o chybách.
+Vždy nejprve zkontrolujte protokoly pro detaily o chybách.
 
-### Komunitní Podpora
+### Komunitní podpora
 
-- GitHub Issues: Nahlášení bugů
-- Discussions: Dotazy
-- Dokumentace: Hledání řešení
+- GitHub Issues: hlášení chyb
+- Discussions: dotazy
+- Dokumentace: hledání řešení
 
 ---
 
-### Nouzové Postupy
+## Nouzové postupy
 
-#### Pád Systému
+### Pád systému
 
-1. Zkontrolujte logy pro příčinu
+1. Zkontrolujte protokoly pro příčinu
 2. Restartujte aplikaci:
 
-**SiliconLife.Default (Výchozí Implementace)**:
+**SiliconLife.Default (výchozí implementace)**:
 ```bash
 dotnet run --project src/SiliconLife.Default
 ```
 
-**SiliconLife.Fast (Hlavní Produkční Verze)**:
+**SiliconLife.Fast (hlavní produkční verze)**:
 ```bash
 dotnet run --project src/SiliconLife.Fast
 ```
 
 3. V případě potřeby obnovte ze zálohy
 
-#### Ztráta Dat
+### Ztráta dat
 
 1. Okamžitě zastavte aplikaci
 2. Zkontrolujte záložní soubory
 3. Obnovte data
 4. Ověřte integritu
 
-#### Bezpečnostní Incident
+### Bezpečnostní incident
 
 1. Zastavte všechny bytosti
 2. Odvolejte všechna oprávnění
-3. Zkontrolujte auditní logy
+3. Zkontrolujte auditní protokoly
 4. Zkontrolujte řízení přístupu
 5. Restartujte s omezenými oprávněními
 
 ---
 
-### Prevence
+## Prevence
 
-### Nejlepší Praktiky
+### Osvědčené postupy
 
-1. **Pravidelné Zálohování**
+1. **Pravidelné zálohování**
    - Zálohujte datový adresář
    - Zálohujte konfiguraci
    - Testujte proces obnovy
 
-2. **Monitorování Zdrojů**
+2. **Monitorování prostředků**
    - Sledujte využití CPU/paměti
    - Monitorujte místo na disku
-   - Zkontrolujte síťové připojení
+   - Kontrolujte síťové připojení
 
-3. **Udržování Aktualizací**
+3. **Udržování aktualizací**
    - Aktualizujte .NET SDK
    - Aktualizujte závislosti
-   - Aplikujte bezpečnostní záplaty
+   - Aplikujte bezpečnostní opravy
 
-4. **Testování Změn**
+4. **Testování změn**
    - Nejprve testujte ve vývoji
-   - Používejte verzování
-   - Dokumentujte změny
+   - Používejte verzovací kontrolu
+   - Zaznamenávejte změny
 
 ---
 
-## Další Kroky
+## Další kroky
 
-- 📚 Přečtěte si [Průvodce Architekturou](architecture.md)
-- 🛠️ Podívejte se na [Vývojářskou Příručku](development-guide.md)
-- 🚀 Podívejte se na [Průvodce Rychlým Startem](getting-started.md)
-- 🔒 Podívejte se na [Bezpečnostní Dokumentaci](security.md)
+- 📚 Přečtěte [příručku architektury](architecture.md)
+- 🛠️ Prohlédněte [vývojářskou příručku](development-guide.md)
+- 🚀 Prohlédněte [příručku rychlého startu](getting-started.md)
+- 🔒 Prohlédněte [dokumentaci zabezpečení](security.md)

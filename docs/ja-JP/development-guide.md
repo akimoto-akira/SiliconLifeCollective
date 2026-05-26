@@ -1,4 +1,4 @@
-﻿# 開発ガイド
+# 開発ガイド
 
 > **バージョン: v0.2.0-alpha**
 
@@ -6,7 +6,7 @@
 
 ## アーキテクチャ概要
 
-SiliconLifeCollective は**身体-大脳アーキテクチャ**に従い、コアインターフェースとデフォルト実装は厳密に分離。
+SiliconLifeCollective は**身体-大脳アーキテクチャ**に従い、コアインターフェースとデフォルト実装は厳密に分離されています。
 
 ### プロジェクト構造
 
@@ -28,20 +28,20 @@ SiliconLifeCollective/
 - `SiliconLife.Common` → `SiliconLife.Core`（単方向）
 
 **バージョン役割説明**：
-- **SiliconLife.Default**：デフォルト実装、アーキテクチャの実現可能性検証に主に使用。シンプルで信頼性の高いファイルシステムストレージ実装を提供し、開発デバッグとアーキテクチャ検証に適しています。
+- **SiliconLife.Default**：デフォルト実装、主にアーキテクチャの実現可能性検証に使用。シンプルで信頼性の高いファイルシステムストレージ実装を提供し、開発デバッグとアーキテクチャ検証に適しています。
 - **SiliconLife.Fast**：主力本番バージョン。Default で検証されたアーキテクチャの基盤上に、SpeedyPack メモリストレージ + 非同期永続化を採用し、極限のパフォーマンス最適化を提供します。長期運用と実際の本番環境の第一選択です。
 
 ## コアコンセプト
 
-### 1. シリコン生命体
+### 1. シリコンビーイング（シリコンビーイング）
 
-各 AI エージェントは以下で構成：
-- **身体**（`DefaultSiliconBeing`）：生存状態を維持。トリガーシナリオを検出
-- **大脳**（`ContextManager`）：履歴の読み込み、AI 呼び出し、ツール実行、応答の永続化
+各 AI エージェントは以下で構成されます：
+- **身体**（`DefaultSiliconBeing`）：生存状態を維持し、トリガーシナリオを検出します
+- **大脳**（`ContextManager`）：履歴の読み込み、AI 呼び出し、ツール実行、応答の永続化を行います
 
 ### 2. ツールシステム
 
-ツールはリフレクションを介して自動的に発見および登録：
+ツールはリフレクションを介して自動的に発見および登録されます：
 
 ```csharp
 // すべてのツールは ITool インターフェースを実装
@@ -53,16 +53,16 @@ public interface ITool
 }
 ```
 
-### 3. 権限システム
+### 3. パーミッションシステム
 
-5段階権限検証チェーン：
+3段階パーミッション検証チェーン：
 ```
-UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | 非主理人: GlobalACL)
+UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | 非キュレーター: GlobalACL → デフォルト拒否)
 ```
 
 ### 4. サービスロケーター
 
-グローバルサービス登録と検索：
+グローバルサービスの登録と検索：
 ```csharp
 // 登録
 ServiceLocator.Instance.Register<IAIClient>(ollamaClient);
@@ -71,60 +71,79 @@ ServiceLocator.Instance.Register<IAIClient>(ollamaClient);
 var client = ServiceLocator.Instance.Get<IAIClient>();
 ```
 
-## システムの拡張
+## 拡張システム
 
-### 新ツールの追加
+### 新しいツールの追加
 
-1. `src/SiliconLife.Common/Tools/` に新クラスを作成（2つのバージョンで共有するツール）：
+1. `src/SiliconLife.Common/Tools/` に新しいクラスを作成します（両バージョンで共有するツール）：
 
-> **注意**：`SiliconLife.Default` と `SiliconLife.Fast` には独立した `Tools/` ディレクトリはもうありません。すべての共有ツールは `SiliconLife.Common/Tools/` に統一されています。
+> **注意**：`SiliconLife.Default` と `SiliconLife.Fast` には独立した `Tools/` ディレクトリはもうありません。すべての共有ツールは `SiliconLife.Common/Tools/` に統一して配置されています。
 
 ```csharp
 public class MyCustomTool : ITool
 {
     public string Name => "my_custom_tool";
     public string Description => "Description of what this tool does";
-    
+
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
         // パラメータを解析
         var param1 = call.Parameters["param1"]?.ToString();
-        
+
         // ロジックを実行
         var result = await DoSomething(param1);
-        
+
         // 結果を返す
-        return new ToolResult 
-        { 
-            Success = true, 
-            Output = result 
+        return new ToolResult
+        {
+            Success = true,
+            Output = result
         };
     }
 }
 ```
 
-2. ツールはリフレクションを介して自動発見 - 手動登録は不要！
+2. ツールはリフレクションを介して自動発見されます - 手動登録は不要です！
 
-3. （オプション）管理者のみ使用としてマーク：
+3. （オプション）管理者のみ使用可能としてマーク：
 ```csharp
 [SiliconManagerOnly]
 public class AdminTool : ITool { ... }
 ```
 
-### 新 AI クライアントの追加
+4. （オプション）ツールの利用シナリオをマーク：
+```csharp
+[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task)]
+public class MyTool : ITool { ... }
+```
 
-1. `src/SiliconLife.Common/AI/` で `IAIClient` を実装：
+5. （オプション）チャットシナリオのみ使用可能としてマーク：
+```csharp
+[ChatOnly]
+public class HelpTool : ITool { ... }
+```
+
+6. （オプション）プロジェクトシナリオのみ使用可能としてマーク：
+```csharp
+[ToolScenario(ToolScenarioFlag.Project)]
+[SiliconManagerOnly]
+public class ProjectWorkTool : ITool { ... }
+```
+
+### 新しい AI クライアントの追加
+
+1. `src/SiliconLife.Common/AI/` で `IAIClient` を実装します：
 
 ```csharp
 public class MyAIClient : IAIClient
 {
     public string Name => "my_ai";
-    
+
     public async Task<AIResponse> ChatAsync(AIRequest request)
     {
         // AI API を呼び出し
         var response = await CallMyAPI(request);
-        
+
         return new AIResponse
         {
             Content = response.Message,
@@ -132,7 +151,7 @@ public class MyAIClient : IAIClient
             Usage = response.Usage
         };
     }
-    
+
     public async IAsyncEnumerable<string> StreamChatAsync(AIRequest request)
     {
         // ストリーミングを実装
@@ -144,7 +163,7 @@ public class MyAIClient : IAIClient
 }
 ```
 
-2. ファクトリーを作成：
+2. ファクトリーを作成します：
 
 ```csharp
 public class MyAIClientFactory : IAIClientFactory
@@ -156,11 +175,11 @@ public class MyAIClientFactory : IAIClientFactory
 }
 ```
 
-3. ファクトリーは自動的に発見および登録。
+3. ファクトリーは自動的に発見および登録されます。
 
-### 新ストレージバックエンドの追加
+### 新しいストレージバックエンドの追加
 
-1. `src/SiliconLife.Default/Storage/`（ファイルシステム実装）または `src/SiliconLife.Fast/Storage/`（SpeedyPack アダプター）で `IStorage` と `ITimeStorage` を実装：
+1. `src/SiliconLife.Default/Storage/`（ファイルシステム実装）または `src/SiliconLife.Fast/Storage/`（SpeedyPack アダプター）で `IStorage` と `ITimeStorage` を実装します：
 
 ```csharp
 public class DatabaseStorage : IStorage, ITimeStorage
@@ -169,12 +188,12 @@ public class DatabaseStorage : IStorage, ITimeStorage
     {
         // データベースから読み取り
     }
-    
+
     public async Task WriteAsync(string key, string value)
     {
         // データベースに書き込み
     }
-    
+
     public async Task<IEnumerable<string>> ReadByTimeAsync(DateTime start, DateTime end)
     {
         // 時間インデックスクエリ
@@ -182,9 +201,9 @@ public class DatabaseStorage : IStorage, ITimeStorage
 }
 ```
 
-### 新プラグインの追加
+### 新しいプラグインの追加
 
-1. クラスライブラリプロジェクトを作成し、`IPlugin` インターフェースを実装：
+1. クラスライブラリプロジェクトを作成し、`IPlugin` インターフェースを実装します：
 
 ```csharp
 using SiliconLife.Collective;
@@ -195,11 +214,11 @@ public class MyPlugin : IPlugin
 {
     public string Id => "my-plugin";
     public string Version => "1.0.0";
-    
+
     public string GetName(Language language) => "My Plugin";
     public string GetDescription(Language language) => "A custom plugin";
     public string GetAuthor(Language language) => "Author Name";
-    
+
     public void OnLoad() { }
     public void OnStart() { }
     public void OnStop() { }
@@ -207,14 +226,14 @@ public class MyPlugin : IPlugin
 }
 ```
 
-2. （オプション）プラグイン内で `ITool` インターフェースを実装してカスタムツールを登録：
+2. （オプション）プラグイン内で `ITool` インターフェースを実装してカスタムツールを登録します：
 
 ```csharp
 public class MyPluginTool : ITool
 {
     public string Name => "my_plugin_tool";
     public string Description => "A tool provided by my plugin";
-    
+
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
         return new ToolResult { Success = true, Output = "Done" };
@@ -226,16 +245,16 @@ public class MyPluginTool : ITool
 
 > **セキュリティ制限**：プラグインは `System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis` などの名前空間を参照できません。プラグインは `AssemblyLoadContext` を介して分離ロードされます。
 
-### 新スキンの追加
+### 新しいスキンの追加
 
-1. `src/SiliconLife.App/Web/Skins/` で `ISkin` を実装：
+1. `src/SiliconLife.App/Web/Skins/` で `ISkin` を実装します：
 
 ```csharp
 public class MyCustomSkin : ISkin
 {
     public string Name => "MySkin";
     public string Description => "A custom skin description";
-    
+
     public string GetCss()
     {
         return @"
@@ -249,13 +268,13 @@ public class MyCustomSkin : ISkin
 }
 ```
 
-2. スキンは `SkinManager` によって自動発見。
+2. スキンは `SkinManager` によって自動発見されます。
 
 ## コードスタイルガイド
 
 ### 命名規則
 
-- **クラス**：PascalCase。機能プレフィックス付き（例：`DefaultSiliconBeing`）
+- **クラス**：PascalCase、機能プレフィックス付き（例：`DefaultSiliconBeing`）
 - **インターフェース**：`I` で開始（例：`IAIClient`、`ITool`）
 - **実装**：インターフェース名で終了（例：`OllamaClient` は `IAIClient` を実装）
 - **ツール**：`Tool` で終了（例：`CalendarTool`、`ChatTool`）
@@ -267,34 +286,41 @@ public class MyCustomSkin : ISkin
 SiliconLife.Common/
 ├── AI/                    # AI クライアントとファクトリー実装
 ├── Calendar/              # 32種類のカレンダー実装
-├── Localization/          # ローカライゼーションベースクラスと33種類の言語変種実装
-├── Security/              # 権限マネージャー
-├── SiliconBeing/          # デフォルトシリコン生命体実装
-├── Tools/                 # 共有の内蔵ツール
-├── Web/                   # Web 基盤
+├── Localization/          # ローカリゼーションベースクラスと34種類の言語変種実装
+├── Security/              # パーミッションマネージャー
+├── SiliconBeing/          # デフォルトシリコンビーイング実装
+├── Tools/                 # 共有の内蔵ツール（25個）
+├── Web/                   # Web インフラストラクチャ
 └── WebView/               # Playwright WebView 実装
 
 SiliconLife.App/          # Default と Fast で共有のアプリケーション層
 ├── Config/                # アプリケーション設定
-├── Help/                  # ヘルプドキュメントローカライゼーション
+├── Help/                  # ヘルプドキュメントローカリゼーション
+├── Project/               # プロジェクトシステム（ワークフローエンジン、プロジェクトロール）
 └── Web/                   # Web UI 実装
-    ├── Component/         # UI コンポーネントライブラリ
-    ├── Controllers/       # ルートコントローラー
+    ├── Component/         # 27個の UI コンポーネント
+    ├── Controllers/       # 24個のルートコントローラー
     ├── Models/            # ビューモデル
     ├── Views/             # HTML ビュー
-    └── Skins/             # スキンテーマ
+    └── Skins/             # 7個のスキンテーマ
 
 SiliconLife.Default/      # バージョン固有ディレクトリ
 ├── Config/                # デフォルト設定データ
 ├── Knowledge/             # ナレッジネットワーク実装
-├── Logging/               # ログプロバイダー実装（コンソール + ファイルシステム）
+├── Logging/               # ロガープロバイダー実装（コンソール + ファイルシステム）
 ├── Project/               # プロジェクトシステム実装
 └── Storage/               # ファイルシステムストレージ実装
+
+SiliconLife.Fast/         # バージョン固有ディレクトリ
+├── Config/                # Fast バージョン設定データ
+├── Logging/               # ロガープロバイダー実装（コンソール + ファイルシステム）
+├── Storage/               # SpeedyPack ストレージアダプター
+└── Tray/                  # システムトレイローカリゼーション
 ```
 
 ### ドキュメント
 
-- すべてのパブリック API には XML ドキュメントコメントが必要
+- すべてのパブリック API には XML ドキュメントコメントが必須
 - すべてのソースファイルは Apache 2.0 ライセンスヘッダーを使用
 - .NET 9 の機能を活用（暗黙的 using、null 許容参照型）
 
@@ -346,13 +372,13 @@ dotnet format
 public class MyCustomCalendar : CalendarBase
 {
     public override string Name => "MyCalendar";
-    
+
     public override CalendarDate ConvertFromGregorian(GregorianDate date)
     {
         // 変換ロジック
         return new CalendarDate(year, month, day);
     }
-    
+
     public override GregorianDate ConvertToGregorian(CalendarDate date)
     {
         // 逆変換
@@ -367,23 +393,51 @@ public class MyCustomCalendar : CalendarBase
 public class CustomExecutor : ExecutorBase
 {
     public override string Name => "custom";
-    
+
     public override async Task<ExecutorResult> ExecuteAsync(ExecutorRequest request)
     {
-        // まず権限を検証
         var permission = await CheckPermissionAsync(request);
         if (!permission.Allowed)
         {
             return ExecutorResult.Denied(permission.Reason);
         }
-        
-        // 操作を実行
+
         var result = await PerformOperation(request);
-        
+
         return ExecutorResult.Success(result);
     }
 }
 ```
+
+### 例：カスタムワークフローテンプレートの追加
+
+```csharp
+public class MyWorkflowTemplate : WorkflowTemplate
+{
+    public override string Name => "my_workflow";
+    public override string Description => "A custom workflow template";
+
+    public override void DefineStates()
+    {
+        AddState("start", "開始", isInitial: true);
+        AddState("processing", "処理中");
+        AddState("review", "レビュー");
+        AddState("done", "完了", isFinal: true);
+    }
+
+    public override void DefineTransitions()
+    {
+        AddTransition("start", "processing", "処理開始");
+        AddTransition("processing", "review", "レビュー提出");
+        AddTransition("review", "done", "レビュー承認");
+        AddTransition("review", "processing", "レビュー差し戻し");
+    }
+}
+```
+
+### 例：プロジェクトロールの追加
+
+プロジェクトロールは `ProjectTool` の `assign_role` と `remove_role` 操作で管理します。ロール名はカスタム文字列で、ワークフローとタスク割り当てにおいてシリコンビーイングの職責を区別するために使用されます。
 
 ## テストガイド
 
@@ -398,18 +452,18 @@ public class MyToolTests
     {
         // 配置
         var tool = new MyCustomTool();
-        var call = new ToolCall 
-        { 
+        var call = new ToolCall
+        {
             Name = "my_custom_tool",
-            Parameters = new Dictionary<string, object> 
-            { 
-                ["param1"] = "test" 
+            Parameters = new Dictionary<string, object>
+            {
+                ["param1"] = "test"
             }
         };
-        
+
         // 実行
         var result = await tool.ExecuteAsync(call);
-        
+
         // 検証
         Assert.IsTrue(result.Success);
         Assert.IsNotNull(result.Output);
@@ -419,10 +473,10 @@ public class MyToolTests
 
 ### 統合テスト
 
-完全なフローをテスト：
-1. AI がツール呼び出しを返す
-2. ツールが実行
-3. 結果が AI にフィードバック
+完全なフローをテストします：
+1. AI がツールコールを返す
+2. ツールが実行される
+3. 結果が AI にフィードバックされる
 4. AI が最終応答を返す
 
 ## パフォーマンス考慮事項
@@ -431,32 +485,32 @@ public class MyToolTests
 
 - Default 版はファイルベースの JSON ストレージを使用
 - Fast 版は SpeedyPack メモリストレージエンジンを使用（.spk 形式）
-- SpeedyPack はメモリディレクトリマッピング + エントリキャッシュ + 非同期書き込みキューを採用
+- SpeedyPack はメモリディレクトリマップ + エントリキャッシュ + 非同期ライトキューを採用
 - 時間インデックスクエリは `ITimeStorage` インターフェースを使用
 
 ### メインループスケジューラ
 
 - クロックベースのタイムスライス公平スケジューリング
 - ウォッチドッグタイマーでスタック操作を検出
-- ヒューズでカスケード障害を防止
+- サーキットブレーカーでカスケード障害を防止
 
 ## ベストプラクティス
 
-### 1. 常に権限を検証
+### 1. 常にパーミッションを検証する
 
-AI が開始するすべての操作は権限チェーンを通過する必要があります：
+AI が開始するすべての操作はパーミッションチェーンを通過する必要があります：
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+bool allowed = permissionManager.CheckPermission(callerId, permissionType, resource);
+if (!allowed)
 {
-    return Result.Denied(permission.Reason);
+    return Result.Denied("Permission denied");
 }
 ```
 
-### 2. サービスロケーターを使用
+### 2. サービスロケーターを使用する
 
-グローバルにサービスを登録および検索：
+グローバルにサービスを登録および検索します：
 
 ```csharp
 // 初期化時
@@ -471,7 +525,7 @@ var service = ServiceLocator.Instance.Get<ICustomService>();
 - 身体は状態とトリガーを処理
 - 大脳は AI インタラクションとツール実行を処理
 
-### 4. 適切なエラー処理を実装
+### 4. 適切なエラー処理を実装する
 
 ```csharp
 try
@@ -509,5 +563,5 @@ docs: update development guide
 
 - 📚 [アーキテクチャガイド](architecture.md)を読む
 - 📖 [API リファレンス](api-reference.md)を探る
-- 🔒 [セキュリティドキュメント](security.md)を見る
+- 🔒 [セキュリティドキュメント](security.md)を確認
 - 🚀 [クイックスタートガイド](getting-started.md)で始める

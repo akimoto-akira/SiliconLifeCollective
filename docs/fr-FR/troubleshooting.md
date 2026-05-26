@@ -1,14 +1,14 @@
-﻿# Guide de dépannage
+# Guide de dépannage
 
 > **Version : v0.2.0-alpha**
 
-[English](../en/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | **Français** | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md) | [Русский](../ru-RU/troubleshooting.md)
+[English](../en/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | [繁體中文](../zh-HK/troubleshooting.md) | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md) | [Русский](../ru-RU/troubleshooting.md)
 
 ## Problèmes courants
 
 ### Construction et compilation
 
-#### Problème : Échec du build, dépendances manquantes
+#### Problème : Échec de la construction, dépendances manquantes
 
 **Symptômes** :
 ```
@@ -21,7 +21,7 @@ dotnet restore
 dotnet build
 ```
 
-#### Problème : SDK .NET non trouvé
+#### Problème : SDK .NET introuvable
 
 **Symptômes** :
 ```
@@ -48,7 +48,7 @@ Failed to connect to Ollama at http://localhost:11434
 
 **Solution** :
 ```bash
-# Vérifier si Ollama fonctionne
+# Vérifier si Ollama est en cours d'exécution
 ollama list
 
 # Démarrer Ollama
@@ -58,7 +58,7 @@ ollama serve
 curl http://localhost:11434/api/tags
 ```
 
-#### Problème : Modèle non trouvé
+#### Problème : Modèle introuvable
 
 **Symptômes** :
 ```
@@ -67,14 +67,14 @@ model "qwen2.5:7b" not found
 
 **Solution** :
 ```bash
-# Télécharger le modèle nécessaire
+# Télécharger le modèle requis
 ollama pull qwen2.5:7b
 
 # Lister les modèles disponibles
 ollama list
 ```
 
-#### Problème : Erreur DashScope 404
+#### Problème : Erreur 404 DashScope (百炼)
 
 **Symptômes** :
 ```
@@ -82,12 +82,12 @@ HTTP 404: Model not found
 ```
 
 **Solution** :
-1. Vérifier la clé API
-2. Vérifier le nom du modèle avec le catalogue DashScope
-3. Vérifier le point de terminaison régional
-4. Vérifier l'accès du compte au modèle
+1. Vérifier que la clé API est correcte
+2. Vérifier que le nom du modèle correspond au catalogue DashScope
+3. Vérifier que le point de terminaison régional est correct
+4. Vérifier que le compte a accès au modèle
 
-#### Problème : Échec de connexion Volcengine Ark
+#### Problème : Échec de connexion Volcengine Ark (火山引擎)
 
 **Symptômes** :
 ```
@@ -97,16 +97,16 @@ HTTP 404: Endpoint not found
 ```
 
 **Solution** :
-1. Vérifier la clé API
-2. Vérifier le format de l'URL du point de terminaison (par défaut : `https://ark.cn-beijing.volces.com/api/v3/chat/completions`)
-3. Vérifier que le paramètre Model utilise un ID de point de terminaison d'inférence (ex. `ep-20241212123456-abcde`), et non un nom de modèle
-4. Vérifier l'accès du compte au point de terminaison
+1. Vérifier que la clé API est correcte
+2. Vérifier que le format de l'URL du point de terminaison est correct (par défaut : `https://ark.cn-beijing.volces.com/api/v3/chat/completions`)
+3. Confirmer que le paramètre Model utilise l'ID du point de terminaison d'inférence (par ex. `ep-20241212123456-abcde`), et non le nom du modèle
+4. Vérifier que le compte a accès au point de terminaison
 
 ---
 
 ### Problèmes d'exécution
 
-#### Problème : Port déjà utilisé
+#### Problème : Port déjà occupé
 
 **Symptômes** :
 ```
@@ -126,18 +126,18 @@ taskkill /PID <PID> /F
 lsof -ti:8080 | xargs kill -9
 ```
 
-**Ou changer le port dans la configuration**.
+**Ou modifier le port dans la configuration**.
 
-#### Problème : Le Being ne démarre pas
+#### Problème : L'être ne peut pas démarrer
 
 **Symptômes** :
-- Le statut du Being affiche « Error »
-- Les journaux montrent des erreurs d'initialisation
+- L'état de l'être affiche « Error »
+- Les journaux indiquent un échec d'initialisation
 
 **Solution** :
-1. Vérifier que le fichier âme existe et est valide
+1. Vérifier que le Fichier d'Âme existe et est valide
 2. Vérifier que le client IA est configuré
-3. Examiner les journaux pour des erreurs spécifiques :
+3. Consulter les journaux pour l'erreur spécifique :
 ```bash
 tail -f logs/*.log
 ```
@@ -150,13 +150,13 @@ OutOfMemoryException
 ```
 
 **Solution** :
-1. **SiliconLife.Default** : Augmenter la taille du heap :
+1. **SiliconLife.Default** : Augmenter la taille du tas :
 ```bash
 dotnet run --project src/SiliconLife.Default --server.gcHeapCount 4
 ```
 
-2. **SiliconLife.Fast** : La version Fast a une consommation mémoire élevée (~500 Mo). Si la mémoire est constamment limitée, il est recommandé de :
-   - Réduire le nombre de Silicon Beings fonctionnant simultanément
+2. **SiliconLife.Fast** : La version Fast a une consommation mémoire intrinsèquement plus élevée (~500 Mo). Si la mémoire reste insuffisante, il est recommandé de :
+   - Réduire le nombre d'Êtres de Silicium concurrents
    - Nettoyer les anciennes données pour libérer de la mémoire
 
 3. Nettoyer les anciennes données :
@@ -165,96 +165,97 @@ dotnet run --project src/SiliconLife.Default --server.gcHeapCount 4
 mv logs/ logs-archive/
 mkdir logs
 
-# Nettoyer l'ancien stockage
-# Via l'interface Web : Gestion du stockage > Nettoyer
+# Nettoyer les anciens souvenirs
+# Via l'UI Web : Gestion de la mémoire > Nettoyage
 ```
 
-> **Astuce** : SiliconLife.Default a une faible consommation mémoire (~200 Mo), adapté aux environnements à mémoire limitée ; SiliconLife.Fast a une consommation mémoire plus élevée mais de meilleures performances, adapté aux environnements de production.
+> **Astuce** : SiliconLife.Default a une consommation mémoire plus faible (~200 Mo), adaptée aux environnements à mémoire limitée ; SiliconLife.Fast a une consommation mémoire plus élevée mais de meilleures performances, adaptée aux environnements de production.
 
 ---
 
-### Problèmes de permissions
+### Problèmes d'autorisations
 
-#### Problème : Permission refusée
+#### Problème : Autorisation refusée
 
 **Symptômes** :
 ```
-Permission denied: disk:write
+Permission denied: FileAccess C:\Windows
 ```
 
 **Solution** :
-1. Vérifier les permissions actuelles :
+1. Vérifier les autorisations actuelles :
 ```bash
-curl http://localhost:8080/api/permissions
+curl http://localhost:8080/api/permissions/list
 ```
 
-2. Accorder la permission :
+2. Accorder une autorisation :
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "resource": "disk:write",
-    "allowed": true,
-    "duration": 3600
+    "permissionType": "FileAccess",
+    "resourcePrefix": "C:\\Projects",
+    "result": "Allowed",
+    "description": "Allow project directory access"
   }'
 ```
 
-3. Ou utiliser l'interface Web : Gestion des permissions
+3. Ou utiliser l'UI Web : Gestion des autorisations
 
-#### Problème : La permission n'expire pas
+#### Problème : Les autorisations n'expirent pas
 
 **Symptômes** :
-- La permission est encore active après le délai d'expiration
+- Les autorisations restent valides après l'heure d'expiration
 
 **Solution** :
 1. Vérifier la synchronisation de l'horloge système
 2. Vérifier que le champ `expiresAt` est correctement défini
-3. Vider le cache des permissions
+3. Vider le cache des autorisations
 
 ---
 
-### Problèmes de l'interface Web
+### Problèmes de l'UI Web
 
-#### Problème : Interface Web inaccessible
+#### Problème : Impossible d'accéder à l'UI Web
 
 **Symptômes** :
 - Le navigateur affiche « Connection refused »
 
 **Solution** :
-1. Vérifier que le serveur fonctionne
+1. Vérifier que le serveur est en cours d'exécution
 2. Vérifier l'URL correcte : `http://localhost:8080`
 3. Vérifier les paramètres du pare-feu
-4. Examiner les journaux pour les erreurs de démarrage
+4. Consulter les journaux pour les erreurs de démarrage
 
 #### Problème : SSE ne fonctionne pas
 
 **Symptômes** :
 - Les mises à jour en temps réel n'apparaissent pas
-- Le chat ne se stream pas
+- Le chat ne se diffuse pas en continu
 
 **Solution** :
-1. Vérifier le support SSE du navigateur
-2. Désactiver le buffering du proxy pour SSE
+1. Vérifier que le navigateur prend en charge SSE
+2. Désactiver la mise en tampon du proxy pour SSE
 3. Vérifier la stabilité du réseau
 4. Essayer un autre navigateur
 
-#### Problème : L'interface semble cassée
+#### Problème : L'UI semble endommagée
 
 **Symptômes** :
 - Styles incorrects
-- Mise en page brisée
+- Mise en page cassée
 
 **Solution** :
 1. Vider le cache du navigateur
-2. Essayer un autre skin : Paramètres > Skin
-3. Vérifier la console du navigateur pour les erreurs
+2. Essayer un autre habillage : Paramètres > Habillage
+3. Vérifier les erreurs dans la console du navigateur
 4. Désactiver les extensions du navigateur
 
 ---
 
 ### Problèmes de stockage
 
-#### Problème : Données illisibles/inscriptibles
+#### Problème : Impossible de lire/écrire des données
 
 **Symptômes** :
 ```
@@ -277,7 +278,7 @@ IOException: Access denied
 1. Restaurer depuis une sauvegarde
 2. Vérifier l'intégrité du stockage :
 ```bash
-# Via l'interface Web : Système > Vérification du stockage
+# Via l'UI Web : Système > Vérification du stockage
 ```
 
 3. Réparer manuellement les fichiers corrompus
@@ -285,32 +286,32 @@ IOException: Access denied
 #### Problème : Fichier de stockage SpeedyPack corrompu (version Fast)
 
 **Symptômes** :
-- Le fichier `.spk` ne peut pas être chargé
-- L'initialisation de SpeedyStorage échoue
+- Impossible de charger le fichier `.spk`
+- Échec de l'initialisation de SpeedyStorage
 
 **Solution** :
 1. Utiliser l'outil `SiliconLife.Speedy.Manager` pour vérifier et réparer les fichiers `.spk`
 2. Vérifier que le fichier d'index `.spk.idx` correspond au fichier `.spk`
-3. Si le fichier d'index est corrompu, supprimer le fichier `.spk.idx` — le système recréera l'index automatiquement
+3. Si le fichier d'index est corrompu, supprimer le fichier `.spk.idx`, le système reconstruira automatiquement l'index
 4. Restaurer le fichier `.spk` depuis une sauvegarde
 
-#### Problème : Échec de l'auto-compaction SpeedyPack (version Fast)
+#### Problème : Échec de la compression automatique SpeedyPack (version Fast)
 
 **Symptômes** :
-- Le fichier `.spk` grandit continuellement
-- L'espace disque devient insuffisant
+- Le fichier `.spk` continue de croître
+- Espace disque insuffisant
 
 **Solution** :
-1. Vérifier que `SpeedyPackAutoCompactor` fonctionne correctement
-2. Déclencher manuellement l'opération de compaction
-3. Vérifier la configuration du seuil de compaction
-4. Utiliser l'outil `SiliconLife.Speedy.Manager` pour la compaction manuelle
+1. Vérifier que le `SpeedyPackAutoCompactor` fonctionne correctement
+2. Déclencher manuellement l'opération de compression
+3. Vérifier la configuration du seuil de compression
+4. Utiliser l'outil `SiliconLife.Speedy.Manager` pour compresser manuellement
 
 ---
 
 ### Problèmes d'exécution d'outils
 
-#### Problème : Outil non trouvé
+#### Problème : Outil introuvable
 
 **Symptômes** :
 ```
@@ -319,11 +320,11 @@ Tool "xyz" not found
 
 **Solution** :
 1. Vérifier que le nom de l'outil est correct
-2. Vérifier l'outil dans le répertoire des outils
+2. Vérifier que l'outil est dans le répertoire Tools
 3. Reconstruire le projet
 4. Vérifier que l'outil est correctement implémenté
 
-#### Problème : L'outil retourne une erreur
+#### Problème : L'outil renvoie une erreur
 
 **Symptômes** :
 ```
@@ -331,10 +332,10 @@ Tool execution failed: ...
 ```
 
 **Solution** :
-1. Examiner les journaux de l'outil
+1. Consulter les journaux de l'outil
 2. Vérifier les paramètres d'entrée
 3. Tester l'outil indépendamment
-4. Vérifier les permissions
+4. Vérifier les autorisations
 
 ---
 
@@ -348,20 +349,20 @@ Plugin load failed: Security check failed
 ```
 
 **Solution** :
-1. Vérifier si le plugin référence des espaces de noms interdits (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
-2. Vérifier que le plugin ne référence que des assemblies de la liste blanche de confiance
+1. Vérifier que le plugin ne référence pas d'espaces de noms interdits (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
+2. Vérifier que le plugin ne référence que des assemblys de la liste blanche de confiance
 3. Vérifier que le plugin implémente correctement l'interface `IPlugin`
-4. Examiner les journaux pour les détails des erreurs de vérification de sécurité
+4. Consulter les journaux pour les détails de l'échec de la vérification de sécurité
 
 #### Problème : Outils du plugin non enregistrés
 
 **Symptômes** :
-- Le plugin est chargé avec succès, mais les outils n'apparaissent pas dans la liste
+- Le plugin se charge avec succès mais les outils n'apparaissent pas dans la liste
 
 **Solution** :
-1. Confirmer que la classe d'outil dans le plugin implémente correctement l'interface `ITool`
+1. Confirmer que la classe d'outil du plugin implémente correctement l'interface `ITool`
 2. Vérifier que la classe d'outil est publique
-3. Vérifier que `ToolManager.ScanAllPluginAssemblies()` a été appelé
+3. Vérifier que `ToolManager.ScanAllPluginAssemblies()` est appelé
 4. Reconstruire le plugin et redémarrer l'application
 
 ---
@@ -376,40 +377,40 @@ Failed to create work note
 ```
 
 **Solution** :
-1. Vérifier que le Being existe et fonctionne
-2. Vérifier que le chemin de stockage a les droits d'écriture
-3. Vérifier que le contenu n'est pas vide (contenu requis)
-4. Examiner les journaux pour les détails de l'erreur
+1. Vérifier que l'être existe et est en cours d'exécution
+2. Vérifier que le chemin de stockage a les permissions d'écriture
+3. Vérifier que le contenu n'est pas vide (contenu obligatoire)
+4. Consulter les journaux pour les détails de l'erreur
 
-#### Problème : Recherche de notes sans résultats
+#### Problème : La recherche de notes ne renvoie aucun résultat
 
 **Symptômes** :
-- La recherche par mot-clé retourne des résultats vides
-- Mais des notes pertinentes existent certainement
+- La recherche par mot-clé renvoie des résultats vides
+- Mais vous êtes certain qu'il existe des notes pertinentes
 
 **Solution** :
 1. Vérifier l'orthographe du mot-clé
-2. Essayer un mot-clé plus générique
+2. Essayer un mot-clé plus général
 3. Vérifier que la note contient le mot-clé (sensible à la casse)
 4. Augmenter la valeur du paramètre `max_results`
 
-#### Problème : Génération du répertoire des notes lente
+#### Problème : Génération lente du répertoire des notes
 
 **Symptômes** :
-- Temps de réponse long pour la génération du répertoire
-- Le Being a beaucoup de notes (>1000 pages)
+- Temps de réponse long lors de la génération du répertoire
+- L'être a un grand nombre de notes (>1000 pages)
 
 **Solution** :
-1. C'est normal, doit parcourir toutes les notes
-2. Archiver régulièrement les anciennes notes
-3. Utiliser la fonction de recherche au lieu du parcours du répertoire
-4. Optimisation prévue : mécanisme de cache du répertoire
+1. C'est un comportement normal, nécessitant le parcours de toutes les notes
+2. Envisager d'archiver régulièrement les anciennes notes
+3. Utiliser la fonction de recherche au lieu de la navigation par répertoire
+4. Optimisation planifiée : ajout d'un mécanisme de cache de répertoire
 
 ---
 
-### Problèmes du réseau de connaissances
+### Problèmes du Réseau de Connaissances
 
-#### Problème : La requête de connaissances retourne des résultats vides
+#### Problème : La requête de connaissances renvoie des résultats vides
 
 **Symptômes** :
 ```
@@ -419,7 +420,7 @@ No knowledge triples found
 **Solution** :
 1. Vérifier l'orthographe du sujet et du prédicat
 2. Vérifier que la connaissance a été ajoutée au réseau
-3. Utiliser la fonction de recherche pour la correspondance floue :
+3. Utiliser la fonction de recherche pour une correspondance floue :
 ```json
 {
   "action": "search",
@@ -427,7 +428,7 @@ No knowledge triples found
 }
 ```
 
-#### Problème : Échec de la recherche de chemin de connaissance
+#### Problème : Échec de la recherche de chemin de connaissances
 
 **Symptômes** :
 ```
@@ -435,12 +436,12 @@ No path found between concepts
 ```
 
 **Solution** :
-1. Vérifier que les deux concepts existent dans le réseau de connaissances
-2. Vérifier qu'un chemin de connexion existe (peut-être pas de relation directe/indirecte)
-3. Ajouter plus de connaissances pour établir une connexion
+1. Vérifier que les deux concepts existent dans le Réseau de Connaissances
+2. Vérifier s'il existe un chemin d'association (il peut ne pas y avoir de relation directe ou indirecte)
+3. Essayer d'ajouter plus de connaissances pour établir des connexions
 4. Réduire la limite de longueur de chemin (si définie)
 
-#### Problème : Échec de la validation de connaissance
+#### Problème : Échec de la validation des connaissances
 
 **Symptômes** :
 ```
@@ -448,22 +449,22 @@ Knowledge validation failed
 ```
 
 **Solution** :
-1. Vérifier que le format du triplet est correct (sujet, prédicat, objet requis)
-2. Vérifier que la valeur de confiance est dans la plage 0.0-1.0
-3. Vérifier les triplets dupliqués
-4. Examiner les détails de l'erreur de validation pour le problème spécifique
+1. Vérifier que le format du triplet est correct (sujet, prédicat, objet obligatoires)
+2. Vérifier que la confiance est dans la plage 0.0-1.0
+3. Vérifier s'il existe des triplets en double
+4. Consulter les détails de l'erreur de validation pour comprendre le problème spécifique
 
-#### Problème : Statistiques du réseau de connaissances inexactes
+#### Problème : Statistiques du Réseau de Connaissances inexactes
 
 **Symptômes** :
-- Les chiffres de statistiques ne sont pas ceux attendus
+- Les chiffres statistiques ne correspondent pas aux attentes
 - Les statistiques ne sont pas mises à jour après l'ajout de connaissances
 
 **Solution** :
-1. Les statistiques peuvent prendre quelques secondes pour se mettre à jour (cache)
-2. Vérifier que l'opération de suppression a été exécutée avec succès
-3. Redémarrer l'application pour forcer la mise à jour des statistiques
-4. Requérir les statistiques via l'API
+1. Les statistiques peuvent nécessiter quelques secondes pour se mettre à jour (cache)
+2. Vérifier si des opérations de suppression n'ont pas été exécutées avec succès
+3. Redémarrer l'application pour forcer le rafraîchissement des statistiques
+4. Requêter à nouveau les statistiques via l'API
 
 ---
 
@@ -477,22 +478,89 @@ Failed to create project
 ```
 
 **Solution** :
-1. Vérifier que le nom du projet n'est pas vide (requis)
-2. Vérifier que le nom du projet n'est pas dupliqué
-3. Vérifier que le chemin de stockage a les droits d'écriture
-4. Examiner les journaux pour les détails de l'erreur
+1. Vérifier que le nom du projet n'est pas vide (obligatoire)
+2. Vérifier que le nom du projet n'est pas en double
+3. Vérifier que le chemin de stockage a les permissions d'écriture
+4. Consulter les journaux pour les détails de l'erreur
 
-#### Problème : Données de projet perdues
+#### Problème : Perte de données du projet
 
 **Symptômes** :
-- Les informations du projet ne sont pas chargeables
-- Les fichiers du projet sont corrompus
+- Impossible de charger les informations du projet
+- Fichier de projet corrompu
 
 **Solution** :
 1. Vérifier que le répertoire de stockage du projet existe
 2. Restaurer les données du projet depuis une sauvegarde
 3. Vérifier que le format du fichier JSON est correct
-4. Réparer manuellement les fichiers de projet corrompus
+4. Réparer manuellement le fichier de projet corrompu
+
+#### Problème : Échec de l'attribution de rôle au projet
+
+**Symptômes** :
+```
+Failed to assign role
+```
+
+**Solution** :
+1. Confirmer que l'Être de Silicium a rejoint le projet
+2. Vérifier que le nom du rôle est valide
+3. Vérifier que l'opérateur est le Curateur de Silicium
+4. Consulter les journaux pour les détails de l'erreur
+
+#### Problème : Le flux de travail ne peut pas démarrer
+
+**Symptômes** :
+- Échec de la création de l'instance de flux de travail
+- Les transitions d'état ne s'exécutent pas
+
+**Solution** :
+1. Vérifier que le modèle de flux de travail est défini
+2. Vérifier que l'état initial est correctement défini
+3. Confirmer que le projet est lié à un modèle de flux de travail
+4. Consulter les journaux du flux de travail pour les erreurs de transition
+
+---
+
+### Problèmes d'autorisations d'outils
+
+#### Problème : Opération d'outil refusée
+
+**Symptômes** :
+```
+Tool operation denied: network:post
+```
+
+**Solution** :
+1. Vérifier la configuration des autorisations d'outil de l'Être de Silicium :
+```bash
+curl http://localhost:8080/api/beings/tool-permissions?beingId=<id>
+```
+
+2. Mettre à jour les autorisations d'outil :
+```bash
+curl -X PUT http://localhost:8080/api/beings/tool-permissions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "beingId": "being-uuid",
+    "permissions": {
+      "network:post": "allowed"
+    }
+  }'
+```
+
+3. Ou utiliser l'UI Web : Êtres → Autorisations d'outil
+
+#### Problème : Les autorisations d'outil du projet ne prennent pas effet
+
+**Symptômes** :
+- Les autorisations d'outil au niveau du projet ne fonctionnent pas comme prévu
+
+**Solution** :
+1. Confirmer que les autorisations au niveau du projet sont correctement configurées
+2. Vérifier s'il y a un conflit entre les autorisations au niveau de l'Être de Silicium et au niveau du projet
+3. Les autorisations au niveau du projet sont indépendantes du niveau Être de Silicium, les deux sont intersectées
+4. Consulter le journal d'audit pour confirmer les résultats de la vérification des autorisations
 
 ---
 
@@ -509,7 +577,7 @@ Modifier la configuration :
 }
 ```
 
-### Examiner les journaux
+### Consulter les journaux
 
 Les journaux sont stockés dans :
 ```
@@ -520,14 +588,14 @@ logs/
 └── error.log
 ```
 
-Affichage en temps réel :
+Consultation en temps réel :
 ```bash
 tail -f logs/*.log
 ```
 
 ### Utiliser le débogueur
 
-**SiliconLife.Default (implémentation standard)** :
+**SiliconLife.Default (implémentation par défaut)** :
 ```bash
 # Exécuter avec le débogueur
 dotnet run --project src/SiliconLife.Default --configuration Debug
@@ -545,15 +613,15 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 # Via l'IDE : Attacher au processus > SiliconLife.Fast
 ```
 
-> **Recommandation** : Pour le débogage de développement, utiliser SiliconLife.Default est recommandé. Après vérification architecturale réussie, utiliser SiliconLife.Fast pour le déploiement en production.
+> **Recommandation** : Utiliser SiliconLife.Default pendant la phase de développement et de débogage, puis passer à SiliconLife.Fast pour le déploiement en production après validation de l'architecture.
 
 ---
 
 ## Problèmes de performance
 
-### Temps de réponse lents
+### Temps de réponse lent
 
-**Optimiser** :
+**Optimisation** :
 1. Réduire la complexité du modèle IA
 2. Activer le cache
 3. Nettoyer les anciennes données
@@ -561,24 +629,24 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 
 ### Utilisation CPU élevée
 
-**Vérifier** :
-- Trop de Beings en cours d'exécution
-- Boucle infinie dans les outils
-- Exécution fréquente des minuteries
+**Vérifications** :
+- Trop d'êtres en cours d'exécution
+- Boucle infinie dans un outil
+- Exécution fréquente des minuteurs
 
-**Solution** :
-- Réduire les Beings parallèles
+**Solutions** :
+- Réduire les êtres concurrents
 - Optimiser le code des outils
-- Ajuster l'intervalle des minuteries
+- Ajuster les intervalles des minuteurs
 
 ### Utilisation mémoire élevée
 
-**Surveiller** :
+**Surveillance** :
 ```bash
-# Via l'interface Web : Tableau de bord > Mémoire
+# Via l'UI Web : Tableau de bord > Mémoire
 ```
 
-**Optimiser** :
+**Optimisation** :
 - Nettoyer les anciens souvenirs
 - Réduire la taille du contexte
 - Implémenter la pagination
@@ -594,9 +662,9 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 - [Référence API](api-reference.md)
 - [Guide d'architecture](architecture.md)
 
-### Examiner les journaux
+### Consulter les journaux
 
-Toujours examiner d'abord les journaux pour les détails des erreurs.
+Vérifiez toujours les journaux en premier pour les détails des erreurs.
 
 ### Support communautaire
 
@@ -608,17 +676,17 @@ Toujours examiner d'abord les journaux pour les détails des erreurs.
 
 ## Procédures d'urgence
 
-### Crash du système
+### Crash système
 
-1. Examiner les journaux pour la cause
+1. Consulter les journaux pour identifier la cause
 2. Redémarrer l'application :
 
-**SiliconLife.Default (implémentation standard)** :
+**SiliconLife.Default (implémentation par défaut)** :
 ```bash
 dotnet run --project src/SiliconLife.Default
 ```
 
-**SiliconLife.Fast (version principale de production)** :
+**SiliconLife.Fast (version de production recommandée)** :
 ```bash
 dotnet run --project src/SiliconLife.Fast
 ```
@@ -634,11 +702,11 @@ dotnet run --project src/SiliconLife.Fast
 
 ### Faille de sécurité
 
-1. Arrêter tous les Beings
-2. Révoquer toutes les permissions
-3. Examiner les journaux d'audit
-4. Vérifier le contrôle d'accès
-5. Redémarrer avec des permissions restreintes
+1. Arrêter tous les êtres
+2. Révoquer toutes les autorisations
+3. Consulter les journaux d'audit
+4. Vérifier les contrôles d'accès
+5. Redémarrer avec des autorisations restreintes
 
 ---
 
@@ -649,14 +717,14 @@ dotnet run --project src/SiliconLife.Fast
 1. **Sauvegardes régulières**
    - Sauvegarder le répertoire de données
    - Sauvegarder la configuration
-   - Tester le processus de restauration
+   - Tester les procédures de restauration
 
 2. **Surveiller les ressources**
    - Surveiller l'utilisation CPU/mémoire
    - Surveiller l'espace disque
-   - Vérifier la connexion réseau
+   - Vérifier les connexions réseau
 
-3. **Rester à jour**
+3. **Maintenir à jour**
    - Mettre à jour le SDK .NET
    - Mettre à jour les dépendances
    - Appliquer les correctifs de sécurité
@@ -672,5 +740,5 @@ dotnet run --project src/SiliconLife.Fast
 
 - 📚 Lire le [guide d'architecture](architecture.md)
 - 🛠️ Consulter le [guide de développement](development-guide.md)
-- 🚀 Voir le [guide de démarrage rapide](getting-started.md)
+- 🚀 Consulter le [guide de démarrage rapide](getting-started.md)
 - 🔒 Consulter la [documentation de sécurité](security.md)

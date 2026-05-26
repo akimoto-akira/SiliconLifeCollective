@@ -1,14 +1,14 @@
-﻿# Guia dos Silicon Beings
+# Guia do Silicon Being
 
 > **Versão: v0.2.0-alpha**
 
-[English](../en/silicon-being-guide.md) | [Deutsch](../de-DE/silicon-being-guide.md) | [Français](../fr-FR/silicon-being-guide.md) | [中文](../zh-CN/silicon-being-guide.md) | [繁體中文](../zh-HK/silicon-being-guide.md) | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | [한국어](../ko-KR/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md) | [Русский](../ru-RU/silicon-being-guide.md) | [Italiano](../it-IT/silicon-being-guide.md) | [Polski](../pl-PL/silicon-being-guide.md) | **Português**
+[English](../en/silicon-being-guide.md) | [Deutsch](../de-DE/silicon-being-guide.md) | [中文](../zh-CN/silicon-being-guide.md) | [繁體中文](../zh-HK/silicon-being-guide.md) | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | [한국어](../ko-KR/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md) | [Русский](../ru-RU/silicon-being-guide.md)
 
-## Visão geral
+## Visão Geral
 
-Os Silicon Beings são agentes orientados pela IA capazes de pensar, agir e evoluir autonomamente.
+Os Silicon Beings são agentes orientados por IA que podem pensar, agir e evoluir autonomamente.
 
-## Arquitetura
+## Arquitectura
 
 ### Separação Corpo-Cérebro
 
@@ -19,69 +19,72 @@ Os Silicon Beings são agentes orientados pela IA capazes de pensar, agir e evol
 │   Corpo          │   Cérebro        │
 │ (SiliconBeing)   │ (ContextManager) │
 ├──────────────────┼──────────────────┤
-│ • Gestão estado  │ • Carregar histórico│
-│ • Deteção de     │ • Chamar a IA    │
-│   ativações      │ • Executar ferramentas│
-│ • Ciclo de vida  │ • Persistir resposta│
+│ • Gestão de      │ • Carregar       │
+│   estado         │   histórico      │
+│ • Detecção de    │ • Invocar IA     │
+│   activação      │ • Executar       │
+│ • Ciclo de vida  │   ferramentas    │
+│                  │ • Persistir      │
+│                  │   respostas      │
 └──────────────────┴──────────────────┘
 ```
 
-## Ficheiro da alma
+## Ficheiro da Alma
 
 ### Estrutura
 
 ```markdown
-# Nome do Being
+# Being Name
 
-## Personalidade
-Descreve os traços de personalidade e características do being.
+## Personality
+Describe the being's personality traits and characteristics.
 
-## Capacidades
-Lista o que este being pode fazer.
+## Capabilities
+List what this being can do.
 
-## Diretrizes de comportamento
-Define como o being deve comportar-se em diferentes situações.
+## Behavior Guidelines
+Define how the being should behave in different situations.
 
-## Domínio de conhecimento
-Especifica o domínio de especialização do being.
+## Knowledge Domain
+Specify the being's area of expertise.
 ```
 
 ### Exemplo
 
 ```markdown
-# Assistente de revisão de código
+# Code Review Assistant
 
-## Personalidade
-És um revisor de código meticuloso com 10 anos de experiência.
-Forneces feedback construtivo e explicas sempre o teu raciocínio.
+## Personality
+You are a meticulous code reviewer with 10 years of experience.
+You provide constructive feedback and always explain your reasoning.
 
-## Capacidades
-- Rever código para bugs e boas práticas
-- Sugerir otimizações de desempenho
-- Explicar algoritmos complexos
-- Identificar vulnerabilidades de segurança
+## Capabilities
+- Review code for bugs and best practices
+- Suggest performance optimizations
+- Explain complex algorithms
+- Identify security vulnerabilities
 
-## Diretrizes de comportamento
-- Começar com observações positivas
-- Fornecer exemplos específicos
-- Explicar porque as alterações são necessárias
-- Ser respeitoso e profissional
+## Behavior Guidelines
+- Start with positive observations
+- Provide specific examples
+- Explain why changes are needed
+- Be respectful and professional
 
-## Domínio de conhecimento
-Especializado em C#, .NET e arquitetura de software.
+## Knowledge Domain
+Specialized in C#, .NET, and software architecture.
 ```
 
 ## Criar um Being
 
-### Através da interface Web
+### Através da Web UI
 
-1. Navegar para **Gestão de Beings**
-2. Clicar em **Criar novo Being**
-3. Preencher:
+1. Navegue para **Gestão de Beings**
+2. Clique em **Criar Novo Being**
+3. Preencha:
    - Nome
-   - Conteúdo da alma
+   - Conteúdo da Alma
    - Opções de configuração
-4. Clicar em **Criar**
+4. Clique em **Criar**
 
 ### Através da API
 
@@ -89,53 +92,58 @@ Especializado em C#, .NET e arquitetura de software.
 curl -X POST http://localhost:8080/api/beings \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Assistente",
-    "soul": "# Personalidade\nÉs útil..."
+    "name": "Assistant",
+    "soul": "# Personality\nYou are helpful..."
   }'
 ```
 
-## Ciclo de vida de um Being
+## Ciclo de Vida do Being
 
-### Estados de atividade
+### Estados de Actividade
 
-Os Silicon Beings têm os seguintes estados de atividade:
+Os Silicon Beings têm os seguintes estados de actividade:
 
 | Estado | Descrição |
-|--------|-------------|
-| `Idle` | Estado inativo, à espera do trigger do relógio |
-| `Working` | Em execução de um ciclo de pedido IA + chamada de ferramenta |
-| `Error` | Ocorreu um erro durante a execução |
+|------|------|
+| `Idle` | Estado inactivo, aguardando activação do relógio |
+| `SingleChat` | Em chat um-a-um |
+| `GroupChat` | Em chat de grupo |
+| `Task` | A executar tarefa |
+| `Timer` | A executar temporizador |
 | `Stopped` | Parado, devido a erros consecutivos ou paragem manual |
 
 **Mecanismo do estado Stopped**:
 - Quando um Silicon Being sofre 10 erros consecutivos, entra automaticamente no estado `Stopped`
-- Uma vez no estado Stopped, o Being não executará mais nenhuma atividade
-- É necessária intervenção manual para reiniciar
+- Após entrar no estado Stopped, o being não executa mais nenhuma tarefa
+- Quando uma nova mensagem de chat chega, o contador de erros é reiniciado e o being retoma a execução
+- Também pode ser reiniciado através de intervenção manual
 
-### Transições de estado
+### Transições de Estado
 
 ```
-Idle → Working → Idle (terminação normal)
-Working → Error → Working (recuperação de erro)
-Working → Stopped (10 erros consecutivos ou paragem manual)
-Stopped → Idle (reinício)
+Idle → SingleChat → Idle (chat concluído)
+Idle → GroupChat → Idle (chat de grupo concluído)
+Idle → Task → Idle (tarefa concluída)
+Idle → Timer → Idle (temporizador concluído)
+Qualquer → Stopped (10 erros consecutivos)
+Stopped → Idle (nova mensagem de chat ou reinício manual)
 ```
 
 ### Operações
 
-- **Iniciar**: Inicializar e começar o processamento
-- **Parar**: Encerramento gradual
-- **Reiniciar**: Retorno ao estado Idle a partir do estado Stopped
+- **Iniciar**: Inicializar e começar a processar
+- **Parar**: Encerramento elegante
+- **Reiniciar**: Recuperar do estado Stopped para o estado Idle
 
-## Sistema de tarefas
+## Sistema de Tarefas
 
-### Criar uma tarefa
+### Criar Tarefa
 
 ```csharp
 var task = new BeingTask
 {
     BeingId = being.Id,
-    Description = "Rever o código",
+    Description = "Review the code",
     Priority = 5,
     DueDate = DateTime.UtcNow.AddHours(2)
 };
@@ -143,21 +151,24 @@ var task = new BeingTask
 await taskSystem.CreateAsync(task);
 ```
 
-### Estados das tarefas
+### Estados da Tarefa
 
-- `Pending` - À espera de execução
-- `Running` - Em curso de execução
+- `Pending` - Aguardando execução
+- `Running` - Em execução
+- `SubmittedForReview` - Submetida para revisão
+- `UnderReview` - Em revisão
+- `Rework` - Em retrabalho
 - `Completed` - Concluída com sucesso
-- `Failed` - Execução falhada
+- `Failed` - Falha na execução
 - `Cancelled` - Cancelada manualmente
 
-## Sistema de temporizadores
+## Sistema de Temporizadores
 
-### Tipos de temporizadores
+### Tipos de Temporizador
 
-1. **Pontual**: Execução única após um atraso
-2. **Intervalo**: Repetição a intervalos fixos
-3. **Cron**: Execução baseada em expressão Cron
+1. **Uma vez**: Executa uma vez após um atraso
+2. **Intervalo**: Repete a intervalos fixos
+3. **Cron**: Executa com base em expressões cron
 
 ### Exemplo
 
@@ -174,15 +185,15 @@ var timer = new BeingTimer
 await timerSystem.StartAsync(timer);
 ```
 
-## Sistema de memória
+## Sistema de Memória
 
-### Tipos de memória
+### Tipos de Memória
 
-- **Curto prazo**: Contexto de conversação atual
-- **Longo prazo**: Conhecimentos e experiências persistidos
-- **Episódica**: Eventos e interações indexados no tempo
+- **Curto prazo**: Contexto da conversa actual
+- **Longo prazo**: Conhecimento e experiência persistidos
+- **Episódica**: Eventos e interacções indexados por tempo
 
-### Estrutura de armazenamento
+### Estrutura de Armazenamento
 
 Versão Default:
 ```
@@ -210,59 +221,59 @@ data/
         └── soul.md
 ```
 
-## Sistema de notas de trabalho
+## Sistema de Notas de Trabalho
 
-### Visão geral
+### Visão Geral
 
-As notas de trabalho são um sistema de diário pessoal dos Silicon Beings com um design paginado para registar a progressão do trabalho, experiências de aprendizagem, notas de projeto, etc.
+As notas de trabalho são o sistema de diário pessoal dos Silicon Beings, com design em formato de página, usado para registar progresso de trabalho, notas de aprendizagem, notas de projecto, etc.
 
-### Funcionalidades
+### Características
 
-- **Gestão de páginas**: Cada nota é uma página distinta, acessível por número de página
+- **Gestão por páginas**: Cada nota é uma página independente, acedida por número de página
 - **Suporte Markdown**: O conteúdo suporta formato Markdown (texto, listas, tabelas, blocos de código)
-- **Índice por palavras-chave**: As notas podem ser etiquetadas com palavras-chave para pesquisa
-- **Resumo**: Cada nota tem um breve resumo para navegação rápida
-- **Geração de índice**: Pode gerar um índice de todas as notas para uma visão geral
-- **Timestamps**: Registo automático das datas de criação e atualização
-- **Privado por defeito**: Apenas o Being tem acesso (o Curator pode gerir)
+- **Índice por palavras-chave**: Suporta a adição de palavras-chave às notas, facilitando a pesquisa
+- **Funcção de resumo**: Cada nota tem um breve resumo para navegação rápida
+- **Geração de directório**: Pode gerar uma visão geral do directório de todas as notas, ajudando a compreender o contexto geral
+- **Timestamps**: Regista automaticamente os tempos de criação e actualização
+- **Privado por defeito**: Apenas o próprio being pode aceder (o Curator pode gerir)
 
-### Cenários de utilização
+### Cenários de Utilização
 
-1. **Documentar a progressão do projeto**
+1. **Registo de progresso do projecto**
    ```
-   Resumo: Módulo de autenticação de utilizador concluído
-   Conteúdo: Verificação JWT, integração OAuth2, mecanismo de refresh token implementados
+   Resumo: Módulo de autenticação de utilizadores concluído
+   Conteúdo: Implementada verificação JWT token, integração OAuth2, mecanismo de refresh token
    Palavras-chave: autenticação,JWT,OAuth2
    ```
 
 2. **Notas de aprendizagem**
    ```
-   Resumo: Boas práticas de programação assíncrona C# aprendidas
-   Conteúdo: Notas sobre async/await, casos de uso de ConfigureAwait...
-   Palavras-chave: C#,Async,Boas práticas
+   Resumo: Aprender melhores práticas de programação assíncrona em C#
+   Conteúdo: Precauções no uso de async/await, cenários de uso de ConfigureAwait...
+   Palavras-chave: C#,assíncrono,melhores práticas
    ```
 
-3. **Atas de reunião**
+3. **Actas de reunião**
    ```
-   Resumo: Reunião de requisitos do produto
-   Conteúdo: Novos requisitos de funcionalidades discutidos, abordagem de implementação definida...
+   Resumo: Discussão de requisitos do produto
+   Conteúdo: Discutidos requisitos de novas funcionalidades, definida solução de implementação...
    Palavras-chave: produto,requisitos,reunião
    ```
 
-### Utilização através de ferramenta
+### Uso Através de Ferramentas
 
-Os Beings podem gerir as suas notas de trabalho através da ferramenta `work_note`:
+Os beings podem gerir notas de trabalho através da ferramenta `work_note`:
 
 ```json
-// Criar uma nota
+// Criar nota
 {
   "action": "create",
-  "summary": "Módulo de autenticação de utilizador concluído",
-  "content": "## Detalhes da implementação\n\n- Utilização de JWT token\n- Suporte OAuth2",
+  "summary": "Módulo de autenticação de utilizadores concluído",
+  "content": "## Detalhes de Implementação\n\n- Usar JWT token\n- Suportar OAuth2",
   "keywords": "autenticação,JWT,OAuth2"
 }
 
-// Ler uma nota
+// Ler nota
 {
   "action": "read",
   "page_number": 1
@@ -276,45 +287,43 @@ Os Beings podem gerir as suas notas de trabalho através da ferramenta `work_not
 }
 ```
 
-### Gestão através da interface Web
+### Gestão Através da Web UI
 
-1. Navegar para **Gestão de Beings** → Selecionar um Being
-2. Clicar no separador **Notas de trabalho**
-3. Visualizar, pesquisar, editar notas
-4. Pré-visualização Markdown suportada
+1. Navegue para **Gestão de Beings** → Seleccione um being
+2. Clique no separador **Notas de Trabalho**
+3. Pode visualizar, pesquisar e editar notas
+4. Suporta pré-visualização Markdown
 
----
+## Sistema de Rede de Conhecimento
 
-## Sistema de rede de conhecimentos
+### Visão Geral
 
-### Visão geral
+A rede de conhecimento é um sistema de representação e gestão de conhecimento baseado em estrutura de triplas (sujeito-predicado-objecto), usado para armazenar e gerir conhecimento estruturado.
 
-A rede de conhecimentos é um sistema de representação e gestão de conhecimentos baseado numa estrutura de triplas (Sujeito-Predicado-Objeto) para o armazenamento e gestão de conhecimentos estruturados.
+### Conceitos Principais
 
-### Conceitos-chave
-
-#### Estrutura de triplas
+#### Estrutura de Triplas
 
 ```
-Sujeito (Subject) --Predicado (Predicate)--> Objeto (Object)
+Sujeito (Subject) --Predicado (Predicate)--> Objecto (Object)
 ```
 
 **Exemplos**:
 - `Python` --`is_a`--> `programming_language`
-- `Paris` --`capital_of`--> `França`
-- `água` --`boiling_point`--> `100°C`
+- `Pequim` --`capital_of`--> `China`
+- `Água` --`boiling_point`--> `100°C`
 
-#### Valor de confiança
+#### Confiança
 
-Cada tripla de conhecimento tem um valor de confiança (0.0-1.0) que indica a fiabilidade do conhecimento:
-- `1.0`: Absolutamente certo (como teoremas matemáticos)
-- `0.8-0.99`: Alta confiança (como factos verificados)
-- `0.5-0.79`: Confiança média (como inferências ou hipóteses)
-- `<0.5`: Baixa confiança (como conjeturas ou informações não verificadas)
+Cada tripla de conhecimento tem uma pontuação de confiança (0.0-1.0), representando o nível de credibilidade do conhecimento:
+- `1.0`: Absolutamente certo (por exemplo, teoremas matemáticos)
+- `0.8-0.99`: Altamente confiável (por exemplo, factos verificados)
+- `0.5-0.79`: Confiabilidade média (por exemplo, inferências ou hipóteses)
+- `<0.5`: Baixa confiabilidade (por exemplo, especulações ou informações não verificadas)
 
-#### Sistema de etiquetas
+#### Sistema de Tags
 
-Suporta a adição de etiquetas às triplas para classificação e pesquisa:
+Suporta a adição de tags às triplas, facilitando a categorização e pesquisa:
 ```json
 {
   "subject": "Python",
@@ -324,9 +333,9 @@ Suporta a adição de etiquetas às triplas para classificação e pesquisa:
 }
 ```
 
-### Operações de conhecimento
+### Operações de Conhecimento
 
-#### 1. Adicionar conhecimento
+#### 1. Adicionar Conhecimento
 
 ```json
 {
@@ -339,7 +348,7 @@ Suporta a adição de etiquetas às triplas para classificação e pesquisa:
 }
 ```
 
-#### 2. Consultar conhecimento
+#### 2. Consultar Conhecimento
 
 ```json
 {
@@ -349,7 +358,7 @@ Suporta a adição de etiquetas às triplas para classificação e pesquisa:
 }
 ```
 
-#### 3. Pesquisar conhecimentos
+#### 3. Pesquisar Conhecimento
 
 ```json
 {
@@ -359,9 +368,9 @@ Suporta a adição de etiquetas às triplas para classificação e pesquisa:
 }
 ```
 
-#### 4. Descobrir caminhos de conhecimento
+#### 4. Descobrir Caminhos de Conhecimento
 
-Encontra os caminhos de ligação entre dois conceitos:
+Encontrar caminhos de associação entre dois conceitos:
 ```json
 {
   "action": "get_path",
@@ -370,14 +379,14 @@ Encontra os caminhos de ligação entre dois conceitos:
 }
 ```
 
-Resultado:
+Retorna:
 ```
 Python → is_a → programming_language → belongs_to → computer_science
 ```
 
-#### 5. Validar conhecimento
+#### 5. Validação de Conhecimento
 
-Verifica a validade e coerência do conhecimento:
+Verificar a validade e consistência do conhecimento:
 ```json
 {
   "action": "validate",
@@ -387,16 +396,16 @@ Verifica a validade e coerência do conhecimento:
 }
 ```
 
-#### 6. Estatísticas da rede de conhecimentos
+#### 6. Estatísticas de Conhecimento
 
-Obtém as estatísticas globais da rede de conhecimentos:
+Obter informações estatísticas gerais da rede de conhecimento:
 ```json
 {
   "action": "stats"
 }
 ```
 
-Resultado:
+Retorna:
 ```json
 {
   "totalTriples": 1523,
@@ -407,57 +416,55 @@ Resultado:
 }
 ```
 
-### Cenários de utilização
+### Cenários de Utilização
 
 1. **Armazenamento de factos**
-   - Armazenar factos objetivos e conhecimentos gerais
+   - Armazenar factos objectivos e conhecimento comum
    - Exemplo: `Terra` --`is_a`--> `planeta`
 
 2. **Relações entre conceitos**
-   - Registar as relações entre conceitos
-   - Exemplo: `herança` --`is_a`--> `conceito_programação_orientada_objetos`
+   - Registar relações entre conceitos
+   - Exemplo: `Herança` --`is_a`--> `conceito_de_programação_orientada_a_objectos`
 
 3. **Acumulação de aprendizagem**
-   - Os Beings acumulam continuamente conhecimentos através da aprendizagem
-   - Formam sistemas de conhecimentos estruturados
+   - Os beings acumulam conhecimento continuamente através da aprendizagem
+   - Formando um sistema de conhecimento estruturado
 
-4. **Suporte à inferência**
-   - Descobrir relações indiretas através dos caminhos de conhecimento
-   - Suportar a inferência e a tomada de decisão baseada em conhecimento
+4. **Suporte ao raciocínio**
+   - Descobrir relações indirectas através de caminhos de conhecimento
+   - Suportar raciocínio e tomada de decisão baseados em conhecimento
 
-### Gestão através da interface Web
+### Gestão Através da Web UI
 
-1. Navegar para a página **Rede de conhecimentos**
-2. Visualizar as estatísticas de conhecimento
-3. Pesquisar e navegar pelos conhecimentos
-4. Visualizar o diagrama de relações de conhecimento (planeado)
+1. Navegue para a página **Rede de Conhecimento**
+2. Visualize informações estatísticas do conhecimento
+3. Pesquise e navegue no conhecimento
+4. Visualização do grafo de relações de conhecimento (planeado)
 
----
+## Operações do Navegador WebView (Novo)
 
-## Operações do browser WebView (Novo)
+### Visão Geral
 
-### Visão geral
+Os Silicon Beings podem navegar autonomamente em páginas web, obter informações e executar operações web através da ferramenta de navegador WebView. O navegador funciona em modo headless, completamente invisível para o utilizador.
 
-Os Silicon Beings podem navegar autonomamente na Web, recuperar informações e executar operações Web através da ferramenta de browser WebView. O browser funciona em modo headless, totalmente invisível para o utilizador.
+### Características
 
-### Funcionalidades
-
-- **Isolamento individual**: Cada Being tem a sua própria instância do browser, cookies e sessões
+- **Isolamento individual**: Cada being possui uma instância de navegador independente, cookies e sessão
 - **Modo headless**: Operação autónoma em segundo plano, invisível para o utilizador
 - **Funcionalidade completa**: Suporta execução de JavaScript, renderização CSS, preenchimento de formulários, etc.
-- **Controlo de segurança**: Todas as operações devem passar pela cadeia de permissões
+- **Controlo de segurança**: Todas as operações passam pela cadeia de verificação de permissões
 
-### Operações comuns
+### Operações Comuns
 
-#### 1. Abrir o browser
+#### 1. Abrir o Navegador
 
 ```json
 {
-  "action": "open_browser"
+  "action": "open"
 }
 ```
 
-#### 2. Navegar para um site Web
+#### 2. Navegar para uma Página Web
 
 ```json
 {
@@ -466,7 +473,7 @@ Os Silicon Beings podem navegar autonomamente na Web, recuperar informações e 
 }
 ```
 
-#### 3. Recuperar conteúdo da página
+#### 3. Obter Conteúdo da Página
 
 ```json
 {
@@ -474,9 +481,9 @@ Os Silicon Beings podem navegar autonomamente na Web, recuperar informações e 
 }
 ```
 
-Retorna o conteúdo textual da página para análise e compreensão pela IA.
+Retorna o conteúdo textual da página, para análise e compreensão pela IA.
 
-#### 4. Clicar num elemento
+#### 4. Clicar num Elemento
 
 ```json
 {
@@ -485,7 +492,7 @@ Retorna o conteúdo textual da página para análise e compreensão pela IA.
 }
 ```
 
-#### 5. Inserir texto
+#### 5. Introduzir Texto
 
 ```json
 {
@@ -504,7 +511,7 @@ Retorna o conteúdo textual da página para análise e compreensão pela IA.
 }
 ```
 
-#### 7. Obter captura de ecrã
+#### 7. Obter Captura de Ecrã
 
 ```json
 {
@@ -512,9 +519,9 @@ Retorna o conteúdo textual da página para análise e compreensão pela IA.
 }
 ```
 
-Retorna uma captura de ecrã da página (codificada em Base64), utilizável para análise visual.
+Retorna uma captura de ecrã da página (codificada em Base64), que pode ser usada para análise visual.
 
-#### 8. Aguardar elemento
+#### 8. Aguardar Aparição de Elemento
 
 ```json
 {
@@ -524,79 +531,155 @@ Retorna uma captura de ecrã da página (codificada em Base64), utilizável para
 }
 ```
 
-### Cenários de utilização
+### Cenários de Utilização
 
-1. **Recolha de informações**
-   - Navegar em sites de notícias para informações atualizadas
-   - Consultar documentação e recursos técnicos
-   - Monitorizar alterações de conteúdo de sites Web
+1. **Obtenção de informação**
+   - Navegar em sites de notícias para obter as últimas informações
+   - Consultar documentação e materiais técnicos
+   - Monitorizar alterações no conteúdo de páginas web
 
 2. **Operações automatizadas**
    - Preencher e submeter formulários
-   - Clicar em botões para operações
-   - Extrair dados Web
+   - Clicar em botões para accionar operações
+   - Extrair dados de páginas web
 
-3. **Análise Web**
-   - Analisar a estrutura e conteúdo das páginas
+3. **Análise de páginas web**
+   - Analisar a estrutura e conteúdo da página
    - Extrair informações específicas
    - Análise visual através de capturas de ecrã
 
-### Notas
+### Precauções
 
-- As operações do browser podem ser lentas, aguardando o carregamento das páginas
-- Utilizar `wait_for_element` para garantir que o elemento está presente
-- Respeitar os termos de utilização e o ficheiro robots.txt dos sites Web
-- Evitar pedidos frequentes para prevenir banimentos
+- As operações do navegador podem ser lentas, é necessário aguardar o carregamento completo da página
+- Usar `wait_for_element` para garantir que o elemento apareceu antes de operar
+- Respeitar os termos de uso e o robots.txt dos sites
+- Evitar pedidos frequentes que possam resultar em bloqueio
 
----
+## Melhores Práticas
 
-## Boas práticas
+### Escrita do Ficheiro da Alma
 
-### Escrever um ficheiro da alma
+1. **Específico**: Traços de personalidade e limites claros
+2. **Definir âmbito**: O que o being deve e não deve fazer
+3. **Incluir exemplos**: Demonstrar os padrões de comportamento esperados
+4. **Actualizar regularmente**: Evoluir a alma com base no desempenho
 
-1. **Concreto**: Traços de personalidade e limites claros
-2. **Definir o perímetro**: O que o Being deve e não deve fazer
-3. **Incluir exemplos**: Mostrar padrões de comportamento esperados
-4. **Atualizar regularmente**: Fazer a alma evoluir com base no desempenho
+### Gestão de Tarefas
 
-### Gestão de tarefas
+1. **Definir prioridades**: Usar prioridades (1-10)
+2. **Definir prazos**: Sempre definir datas limite
+3. **Monitorizar progresso**: Verificar regularmente o estado das tarefas
+4. **Tratar falhas**: Implementar lógica de retry
 
-1. **Definir prioridades**: Utilizar prioridades (1-10)
-2. **Definir prazos**: Definir sempre uma data limite
-3. **Monitorizar a progressão**: Verificar regularmente o estado das tarefas
-4. **Gerir erros**: Implementar lógica de retry
-
-### Otimização da memória
+### Optimização de Memória
 
 1. **Limpar dados antigos**: Arquivar regularmente memórias antigas
 2. **Indexar informações importantes**: Marcar informações-chave
-3. **Utilizar armazenamento temporal**: Aproveitar consultas por índice temporal
+3. **Usar armazenamento temporal**: Utilizar consultas por índice temporal
 
-## Resolução de problemas
+### Mecanismo de Desvanecimento da Memória
 
-### O Being não inicia
+O sistema inclui o `MemoryFadeService`, um serviço de decaimento temporizado que simula a característica de esquecimento da memória biológica:
+
+- **Decaimento automático**: A cada hora, aplica um algoritmo de decaimento de importância às entradas de memória de todos os Silicon Beings
+- **Arquivamento automático**: Memórias com importância abaixo do limiar são automaticamente arquivadas, deixando de participar na pesquisa diária
+- **Rastreamento estatístico**: Regista o número de ciclos de decaimento e o número de entradas com estado alterado
+
+Isto significa que a memória dos Silicon Beings desvanece naturalmente ao longo do tempo, e informações importantes precisam de ser marcadas activamente como de alta importância através da ferramenta de memória, para evitar o arquivamento automático.
+
+---
+
+## Espaço de Trabalho de Projecto
+
+### Visão Geral
+
+O espaço de trabalho de projecto é um mecanismo de gestão de espaço que suporta a colaboração de múltiplos Silicon Beings. O Silicon Curator pode criar espaços de projecto, atribuir Silicon Beings aos projectos e atribuir-lhes funções.
+
+### Ciclo de Vida do Projecto
+
+```
+Criação → Activo → Arquivado → Destruição
+              ↑       |
+              └─ Restaurar ┘
+```
+
+### Funções do Projecto
+
+Os Silicon Beings podem ser atribuídos a funções específicas no projecto:
+
+```json
+{
+  "action": "assign_role",
+  "project_id": "project-uuid",
+  "being_id": "being-uuid",
+  "role_name": "developer"
+}
+```
+
+### Notas de Trabalho do Projecto
+
+As notas de trabalho dentro do espaço do projecto são públicas, e todos os membros do projecto podem aceder:
+
+```json
+{
+  "action": "create",
+  "project_id": "project-uuid",
+  "summary": "Módulo de autenticação de utilizadores concluído",
+  "content": "## Detalhes de Implementação\n\n- Usar JWT token",
+  "keywords": "autenticação,JWT"
+}
+```
+
+### Tarefas do Projecto
+
+As tarefas dentro do espaço do projecto suportam gestão completa do ciclo de vida:
+
+```json
+{
+  "action": "create",
+  "project_id": "project-uuid",
+  "title": "Implementar autenticação de utilizadores",
+  "priority": 5
+}
+```
+
+### Fluxos de Trabalho do Projecto
+
+Os projectos podem ser vinculados a modelos de fluxos de trabalho, impulsionando os fluxos de colaboração dos Silicon Beings:
+
+- Os fluxos de trabalho são baseados em modelos de máquina de estados
+- Suportam transições de estado orientadas por Tick
+- Registo automático do histórico de transições de estado
+
+### Isolamento de Permissões de Ferramentas
+
+As permissões de ferramentas ao nível do projecto são independentes das permissões ao nível do Silicon Being, realizando o isolamento de permissões entre projectos. Por exemplo, um Silicon Being pode ter permissões de acesso à rede no Projecto A, mas pode ser restrito a permissões só de leitura no Projecto B.
+
+## Resolução de Problemas
+
+### O Being Não Inicia
 
 **Verificar**:
-- O ficheiro da alma existe e é válido
-- O cliente IA está configurado
-- Os recursos do sistema são suficientes
+- O Ficheiro da Alma existe e é válido
+- O cliente de IA está configurado
+- Há recursos de sistema suficientes
 
-### O Being para inesperadamente
-
-**Verificar**:
-- Os erros nos logs
-- A disponibilidade do serviço IA
-- A utilização da memória
-
-### As tarefas não são executadas
+### O Being Para Inesperadamente
 
 **Verificar**:
-- O sistema de temporizadores funciona
-- A prioridade e o agendamento das tarefas
-- As definições de permissões
+- Erros nos registos
+- Disponibilidade do serviço de IA
+- Utilização de memória
 
-## Próximos passos
+### A Tarefa Não É Executada
 
-- 📚 Ler o [guia de arquitetura](architecture.md)
-- 🛠️ Consultar o [guia de desenvolvimento](development-guide.md)
-- 🚀 Ver o [guia de introdução](getting-started.md)
+**Verificar**:
+- O sistema de temporizadores está em execução
+- Prioridade e agendamento da tarefa
+- Configuração de permissões
+
+## Próximos Passos
+
+- 📚 Leia o [guia de arquitectura](architecture.md)
+- 🛠️ Consulte o [guia de desenvolvimento](development-guide.md)
+- 🚀 Consulte o [guia de início rápido](getting-started.md)

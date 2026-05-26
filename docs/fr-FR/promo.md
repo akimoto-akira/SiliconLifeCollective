@@ -1,12 +1,12 @@
-﻿# Découvrez vos compagnons numériques
+# Découvrez vos compagnons numériques
 
 > **Version : v0.2.0-alpha**
 
-[English](../en/promo.md) | [Deutsch](../de-DE/promo.md) | **Français** | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Čeština](../cs-CZ/promo.md) | [Русский](../ru-RU/promo.md)
+[English](../en/promo.md) | [Deutsch](../de-DE/promo.md) | [中文](../zh-CN/promo.md) | [繁體中文](../zh-HK/promo.md) | [Español](../es-ES/promo.md) | [日本語](../ja-JP/promo.md) | [한국어](../ko-KR/promo.md) | [Čeština](../cs-CZ/promo.md) | [Русский](../ru-RU/promo.md)
 
 ## Et si votre ordinateur pouvait penser par lui-même ?
 
-Imaginez qu'un groupe d'assistants serviables vive dans votre ordinateur. Ce ne sont pas de simples programmes attendant vos ordres — ils ont leur propre personnalité, se souviennent de ce que vous leur avez dit et peuvent collaborer pour accomplir des tâches.
+Imaginez un groupe d'assistants serviables vivant dans votre ordinateur. Ce ne sont pas de simples programmes attendant vos ordres — ils ont leur propre personnalité, se souviennent de ce que vous leur avez dit, et peuvent collaborer pour accomplir des tâches.
 
 C'est exactement ce que nous avons construit.
 
@@ -14,92 +14,92 @@ C'est exactement ce que nous avons construit.
 
 ## Que peuvent-ils faire pour vous ?
 
-### 🗓️ Ne ratez plus jamais un rendez-vous important
+### 🗓️ Ne jamais manquer une date importante
 
-Demandez-leur n'importe quelle date dans n'importe quel système de calendrier :
-- "Quand est le Nouvel An lunaire cette année ?"
-- "Quand commence le Ramadan ?"
-- "Combien de jours avant mon anniversaire ?"
+Demandez-leur une date dans n'importe quel système calendaire :
+- « Quand est le Nouvel An chinois cette année ? »
+- « Quand commence le Ramadan ? »
+- « Combien de jours avant mon anniversaire ? »
 
-Ils comprennent plus de 30 systèmes de calendrier différents dans le monde.
+Ils comprennent 32 systèmes calendaires différents dans le monde.
 
-### 💬 Discutez avec eux à tout moment
+### 💬 Discuter avec eux à tout moment
 
-Parlez-leur comme à un ami. Ils se souviennent des conversations précédentes, vous n'avez donc pas besoin de vous répéter. Chacun a une personnalité unique — certains sont plus sérieux, d'autres plus ludiques. Vous choisissez avec qui vous souhaitez travailler.
+Parlez-leur comme avec un ami. Ils se souviennent de vos conversations précédentes, vous n'avez donc pas besoin de vous répéter. Chacun a une personnalité unique — certains sont plus sérieux, d'autres plus décontractés. Vous choisissez avec qui vous souhaitez travailler.
 
-### 📝 Aide pour les tâches quotidiennes
+### 📝 Aider dans les tâches quotidiennes
 
-Dites-leur ce dont vous avez besoin, et ils trouveront un moyen de le faire :
-- "Lis ce fichier pour moi et résume-le"
-- "Vérifie quels sites Web sont disponibles maintenant"
-- "Envoie un message à mon collègue"
-- "Rappelle-moi chaque lundi à 9h de vérifier mes e-mails"
+Dites-leur ce dont vous avez besoin, ils trouveront comment le faire :
+- « Lis ce fichier et résume-le pour moi »
+- « Vérifie quels sites web sont disponibles maintenant »
+- « Envoie un message à mon collègue »
+- « Rappelle-moi de vérifier mes e-mails chaque lundi à 9h »
 
 ### ⏰ Définir des rappels intelligents
 
-Pas seulement des alarmes simples — ils comprennent les plannings complexes :
-- "Rappelle-moi le quinzième jour de chaque mois lunaire"
-- "Rappelle-moi 3 jours avant chaque jour férié national"
-- "Signale-toi chaque matin à 8h"
+Pas de simples alarmes — ils comprennent les plannings complexes :
+- « Rappelle-moi chaque quinzième jour du mois lunaire »
+- « Rappelle-moi 3 jours avant tout jour férié national »
+- « Fais un point avec moi tous les matins à 8h »
 
-### 🤝 Collaborer en équipe
+### 🤝 Travailler en équipe
 
-Créez plusieurs assistants avec différentes spécialités. L'un pourrait se spécialiser dans l'organisation de votre emploi du temps, un autre dans la recherche d'informations, un autre encore dans l'écriture créative. Ils peuvent même se parler et coordonner leur travail !
+Créez plusieurs assistants avec différentes spécialités. L'un pourrait exceller dans l'organisation de votre emploi du temps, un autre dans la recherche d'informations, un autre encore dans la rédaction créative. Ils peuvent même se parler entre eux et coordonner leur travail !
 
 ---
 
-## En quoi cela diffère-t-il de l'IA classique ?
+## En quoi est-ce différent d'une IA ordinaire ?
 
 ### Ils ont une mémoire
 
-La plupart des IA oublient tout après chaque conversation. Ces compagnons se souviennent des choses importantes que vous leur avez dites et accumulent des connaissances au fil du temps.
+La plupart des IA oublient tout après chaque conversation. Ces compagnons se souviennent des choses importantes que vous leur dites, accumulant des connaissances au fil du temps.
 
 ### Ils peuvent agir
 
-Ils ne vous donnent pas seulement des conseils — ils peuvent réellement **faire des choses** — lire des fichiers, chercher sur Internet, envoyer des messages, créer des rappels et bien plus encore.
+Ils ne se contentent pas de vous donner des conseils, ils peuvent réellement **faire** des choses — lire des fichiers, naviguer sur Internet, envoyer des messages, créer des rappels et bien plus encore.
 
 ### Ils travaillent pendant que vous dormez
 
-Assignez-leur des tâches, et ils continueront à travailler même quand vous n'êtes pas là. Revenez et constatez que le travail est fait.
+Donnez-leur des tâches et ils continueront à travailler même quand vous n'êtes pas là. Revenez et trouvez le travail déjà fait.
 
 ### Ils ont une personnalité
 
-Chaque compagnon est façonné par un "fichier âme" — imaginez cela comme sa fiche de personnage. Vous pouvez créer des assistants avec différents styles de communication, spécialités et méthodes de travail.
+Chaque compagnon est façonné par un « Fichier d'Âme » — imaginez-le comme leur fiche de personnage. Vous pouvez créer des assistants avec différents styles de communication, domaines d'expertise et méthodes de travail.
 
 ---
 
-## Pour qui est-ce ?
+## Pour qui est-ce destiné ?
 
 ### 🏠 Utilisateurs particuliers
-- Suivez les événements familiaux dans différents systèmes de calendrier
-- Configurez des assistants personnels pour votre routine quotidienne
-- Ayez des conversations divertissantes avec différentes personnalités IA
+- Suivre les événements familiaux dans différents systèmes calendaires
+- Configurer des assistants personnels pour gérer votre routine quotidienne
+- Des conversations amusantes avec différentes personnalités IA
 
 ### 💼 Freelances et créatifs
-- Assistants de recherche qui collectent des informations pour vos projets
-- Partenaires d'écriture qui vous aident à brainstormer des idées
-- Gestionnaires d'emploi du temps qui vous gardent sur la bonne voie
+- Un assistant de recherche pour collecter des informations sur vos projets
+- Un partenaire d'écriture pour vous aider à brainstormer des idées
+- Un gestionnaire d'emploi du temps pour vous aider à respecter vos délais
 
 ### 🎓 Étudiants et chercheurs
-- Compagnons d'apprentissage qui vous aident à organiser vos études
-- Experts en calendriers pour la recherche historique ou culturelle
-- Gestionnaires de tâches pour les projets à long terme
+- Un compagnon d'étude pour vous aider à organiser votre apprentissage
+- Un expert en calendriers pour la recherche historique ou culturelle
+- Un gestionnaire de tâches pour les projets à long terme
 
 ### 👨‍💻 Passionnés de technologie
-- Explorez les limites de la technologie des agents IA
-- Créez des assistants personnalisés pour des tâches spécifiques
-- Constituez une équipe de travailleurs IA spécialisés
+- Explorer la technologie de pointe des agents IA
+- Créer des assistants personnalisés pour des tâches spécifiques
+- Construire une équipe de travailleurs IA spécialisés
 
 ---
 
-## Commencer est simple
+## Commencer est facile
 
-1. **Télécharger et démarrer** — Ça fonctionne immédiatement
+1. **Télécharger et exécuter** — Ça fonctionne dès la sortie de la boîte
 2. **Créer votre premier compagnon** — Donnez-lui un nom et une personnalité
-3. **Commencer la conversation** — Tapez simplement ce dont vous avez besoin, comme si vous chattiez avec un ami
-4. **Observez-les au travail** — Regardez-les accomplir des tâches, définir des rappels et apprendre de vos interactions
+3. **Commencer à discuter** — Tapez simplement ce dont vous avez besoin, comme si vous parliez à un ami
+4. **Les voir travailler** — Regardez-les accomplir des tâches, définir des rappels et apprendre de vos interactions
 
-Aucune connaissance technique requise. Si vous savez envoyer un SMS, vous savez utiliser ceci.
+Aucune connaissance technique n'est requise. Si vous savez envoyer un SMS, vous savez utiliser ceci.
 
 ---
 
@@ -109,26 +109,26 @@ Aucune connaissance technique requise. Si vous savez envoyer un SMS, vous savez 
 
 Tout fonctionne sur **votre propre ordinateur**. Vos conversations, souvenirs et données ne quittent jamais votre machine, sauf si vous leur demandez explicitement d'accéder à Internet. Vous gardez le contrôle total.
 
-### Pas de frais d'abonnement
+### Sans frais d'abonnement
 
-Ceci est un logiciel open source. Utilisez-le gratuitement, modifiez-le, partagez-le avec vos amis. Pas de frais mensuels, pas de niveaux premium, pas de fonctionnalités verrouillées.
+C'est un logiciel open source. Utilisez, modifiez et partagez librement. Pas de frais mensuels, pas de niveau premium, pas de fonctionnalité verrouillée.
 
 ### Grandit avec vous
 
-Commencez avec un assistant simple. Au fur et à mesure que vous découvrez ce qui est possible, créez des compagnons plus spécialisés. Le système est conçu pour passer d'une utilisation occasionnelle à des flux de travail de productivité sérieux.
+Commencez avec un assistant simple. Au fur et à mesure que vous découvrez ce qui est possible, créez des compagnons plus spécialisés. Le système est conçu pour évoluer d'un usage occasionnel vers des flux de travail de productivité sérieux.
 
 ### Système de plugins extensible
 
-Étendez les fonctionnalités via des plugins — des outils et capacités créés par la communauté, faciles à ajouter. Chaque plugin s'exécute dans un bac à sable sécurisé, garantissant la sécurité du système.
+Étendez les fonctionnalités avec des plugins — des outils et capacités construits par la communauté faciles à ajouter. Chaque plugin s'exécute dans un Sandbox de sécurité, garantissant la sécurité du système.
 
 ### Choix de double version
 
-- **Version Default** : Application console légère, adaptée au développement, au débogage et aux environnements à ressources limitées
-- **Version Fast** : Application Windows haute performance avec moteur de stockage en mémoire SpeedyPack, adaptée aux déploiements en production
+- **Version Default** : Application console légère, adaptée au développement/debugging et aux environnements à ressources limitées
+- **Version Fast** : Application de bureau multiplateforme haute performance (Windows/macOS/Linux), utilisant le moteur de stockage en mémoire SpeedyPack, adaptée au déploiement en production
 
 ### Construit par la communauté
 
-Des développeurs du monde entier travaillent à l'améliorer. Régulièrement, de nouvelles fonctionnalités, systèmes de calendrier, langues et capacités sont ajoutés.
+Des développeurs du monde entier contribuent à l'améliorer. De nouvelles fonctionnalités, systèmes calendaires, supports linguistiques et capacités sont ajoutés régulièrement.
 
 ---
 
@@ -136,37 +136,37 @@ Des développeurs du monde entier travaillent à l'améliorer. Régulièrement, 
 
 ### Exemple 1 : Planifier un voyage
 
-**Vous** : "Je voyage au Japon le mois prochain. Pouvez-vous m'aider à planifier ?"
+**Vous** : « Je vais au Japon le mois prochain. Peux-tu m'aider à planifier ? »
 
 **Votre assistant** :
-- Vérifie les jours fériés japonais pendant votre visite
-- Recherche les prévisions météo
-- Crée un programme de voyage jour par jour
-- Définit des rappels pour les délais de réservation
-- Partage le programme avec les assistants de vos compagnons de voyage
+- Vérifie les jours fériés du calendrier japonais pendant votre visite
+- Recherche les prévisions météorologiques
+- Crée un document d'itinéraire jour par jour
+- Définit des rappels pour les réservations
+- Partage le plan avec l'assistant de votre compagnon de voyage
 
 ### Exemple 2 : Gérer un projet
 
-**Vous** : "Je dois terminer ce travail de recherche avant la fin du mois."
+**Vous** : « Je dois terminer ce document de recherche avant la fin du mois. »
 
 **Votre équipe** :
-- **Assistant de recherche** : Collecte et résume les sources pertinentes
-- **Partenaire d'écriture** : Vous aide à structurer vos arguments et affiner votre texte
+- **Assistant de recherche** : Collecte les sources pertinentes et les résume
+- **Partenaire d'écriture** : Vous aide à structurer votre argumentation et à affiner votre prose
 - **Gestionnaire d'emploi du temps** : Définit des jalons et envoie des rappels de progression
 - **Vérificateur de faits** : Vérifie les citations et recoupe les informations
 
-Ils se coordonnent automatiquement et se tiennent mutuellement informés de la progression.
+Ils se coordonnent automatiquement, se tenant mutuellement informés de la progression.
 
 ### Exemple 3 : Calendrier culturel
 
-**Vous** : "Quels sont les jours fériés importants cette année ?"
+**Vous** : « Quelles sont les fêtes importantes cette année ? »
 
 **Votre assistant** :
-- Vérifie le Nouvel An lunaire et la Fête de la mi-automne dans le calendrier lunaire chinois
-- Trouve le Ramadan et l'Aïd el-Fitr dans le calendrier islamique
-- Détermine les dates des Grandes Fêtes dans le calendrier hébraïque
+- Vérifie le Nouvel An chinois et la Fête de la Mi-Automne dans le calendrier lunaire chinois
+- Trouve les dates du Ramadan et de l'Aïd dans le calendrier islamique
+- Repère les dates des Grandes Fêtes dans le calendrier hébraïque
 - Crée un calendrier unifié avec toutes les dates importantes
-- Définit des rappels une semaine avant chaque événement
+- Définit un rappel une semaine avant chaque événement
 
 ---
 
@@ -174,25 +174,25 @@ Ils se coordonnent automatiquement et se tiennent mutuellement informés de la p
 
 Nous croyons que l'avenir de l'informatique ne réside pas dans des outils plus puissants — mais dans des **compagnons plus intelligents**.
 
-Au lieu de passer des heures à cliquer dans des applications et organiser des informations, imaginez que vous ayez des partenaires numériques de confiance qui :
+Au lieu de passer des heures à cliquer dans des applications et à organiser des informations, imaginez avoir des partenaires numériques de confiance qui :
 - Comprennent ce dont vous avez besoin
 - Se souviennent de vos préférences
-- Accomplissent proactivement les tâches routinières
+- Traitent proactivement les tâches routinières
 - Collaborent de manière transparente
 - Respectent votre vie privée
 
-Cet avenir est là. Et il ne fait que commencer.
+Cet avenir est déjà là. Et ce n'est que le début.
 
 ---
 
 ## Rejoignez-nous
 
-Que vous soyez curieux de l'IA, que vous ayez besoin d'aide pour vous organiser ou que vous souhaitiez simplement essayer quelque chose de nouveau — vous avez votre place ici.
+Que vous soyez curieux de l'IA, que vous ayez besoin d'aide pour vous organiser, ou que vous vouliez simplement essayer quelque chose de nouveau — il y a une place pour vous ici.
 
 **Essayez aujourd'hui. Créez votre premier compagnon numérique. Découvrez ce qui est possible.**
 
 ---
 
-*Construit avec soin par Akimoto Akira et la communauté open source*
+*Construit avec soin par 天源垦骥 et la communauté open source*
 
 [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective) | [Gitee](https://gitee.com/hoshinokennji/SiliconLifeCollective) | [YouTube](https://www.youtube.com/@hoshinokennji) | [Bilibili](https://space.bilibili.com/617827040)

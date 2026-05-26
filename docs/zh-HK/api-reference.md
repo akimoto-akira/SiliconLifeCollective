@@ -1,8 +1,8 @@
-﻿# API 參考
+# API 參考
 
 > **版本：v0.2.0-alpha**
 
-[English](../en/api-reference.md) | [中文](../zh-CN/api-reference.md) | **繁體中文** | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md) | [Русский](../ru-RU/api-reference.md)
+[English](../en/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [中文](../zh-CN/api-reference.md) | **繁體中文** | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md) | [Русский](../ru-RU/api-reference.md)
 
 ## Web API 端點
 
@@ -10,7 +10,7 @@
 
 ### 認證
 
-大多數端點需要透過 Web UI 管理的會話 cookie 進行認證。系統初始化前，除幫助頁面外的所有請求將重新導向至初始化頁面。
+大多數端點需要透過 Web UI 管理的會話 Cookie 進行認證。系統初始化前，除說明頁面外的所有請求將重新導向到初始化頁面。
 
 ---
 
@@ -20,13 +20,13 @@
 
 **GET** `/api/dashboard/stats`
 
-返回系統概覽資料（生命體數量、運行狀態等）。
+傳回系統概覽資料（生命體數量、執行狀態等）。
 
 ### 取得效能指標
 
 **GET** `/api/dashboard/metrics`
 
-返回即時效能指標資料。
+傳回即時效能指標資料。
 
 ---
 
@@ -36,15 +36,15 @@
 
 **GET** `/chat`
 
-返回聊天介面頁面。
+傳回聊天介面頁面。
 
-### 流式聊天（SSE）
+### 串流聊天（SSE）
 
 **GET** `/api/chat/stream`
 
-透過伺服器發送事件（SSE）進行流式聊天。
+透過伺服器傳送事件（SSE）進行串流聊天。
 
-**回應**：伺服器發送事件流
+**回應**：伺服器傳送事件流
 
 ```
 data: {"type": "chunk", "content": "I"}
@@ -53,11 +53,11 @@ data: {"type": "chunk", "content": " thinking..."}
 data: {"type": "complete", "sessionId": "uuid"}
 ```
 
-### 取得會話列表
+### 取得會話清單
 
 **GET** `/api/chat/conversations`
 
-返回所有活躍的聊天會話列表。
+傳回所有活躍的聊天會話清單。
 
 **回應範例**：
 ```json
@@ -81,15 +81,15 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 查詢參數：`channelId` — 頻道/會話 ID
 
-返回指定會話的訊息歷史記錄。
+傳回指定會話的訊息歷史記錄。
 
 ### 取得聊天歷史
 
 **GET** `/api/chat/history`
 
-返回全域聊天歷史記錄。
+傳回全域聊天歷史記錄。
 
-### 發送訊息
+### 傳送訊息
 
 **POST** `/api/chat/send`
 
@@ -136,13 +136,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/beings`
 
-返回矽基生命體管理介面頁面。
+傳回矽基生命體管理介面頁面。
 
-### 取得生命體列表
+### 取得生命體清單
 
 **GET** `/api/beings` 或 **GET** `/api/beings/list`
 
-返回所有已註冊的矽基生命體列表。
+傳回所有已註冊的矽基生命體清單。
 
 **回應範例**：
 ```json
@@ -166,19 +166,19 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 查詢參數：`beingId` — 生命體 ID
 
-返回指定生命體的詳細資訊。
+傳回指定生命體的詳細資訊。
 
 ### 取得生命體活動狀態
 
 **GET** `/api/beings/activity`
 
-返回各生命體的活動狀態資訊。
+傳回各生命體的活動狀態資訊。
 
 ### 靈魂檔案編輯器頁面
 
 **GET** `/beings/soul`
 
-返回靈魂檔案編輯器介面。
+傳回靈魂檔案編輯器介面。
 
 ### 儲存靈魂檔案
 
@@ -192,13 +192,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### AI 配置編輯器頁面
+### AI 設定編輯器頁面
 
 **GET** `/beings/ai-config`
 
-返回 AI 配置編輯器介面。
+傳回 AI 設定編輯器介面。
 
-### 儲存 AI 配置
+### 儲存 AI 設定
 
 **POST** `/api/beings/ai-config/save`
 
@@ -215,13 +215,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 取得可用 AI 模型列表
+### 取得可用 AI 模型清單
 
 **GET** `/api/beings/ai-config/models`
 
 查詢參數：`clientType`, `apiKey`, `region`
 
-返回指定 AI 客戶端的可用模型列表。
+傳回指定 AI 用戶端的可用模型清單。
 
 ---
 
@@ -231,31 +231,31 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/chat-history`
 
-返回聊天歷史主頁面。
+傳回聊天歷史主頁面。
 
 ### 聊天歷史詳情頁面
 
 **GET** `/chat-history-detail`
 
-返回指定會話的聊天歷史詳情頁面。
+傳回指定會話的聊天歷史詳情頁面。
 
 ### 群聊歷史詳情頁面
 
 **GET** `/group-chat-history-detail`
 
-返回群聊的歷史詳情頁面。
+傳回群聊的歷史詳情頁面。
 
 ### 廣播歷史詳情頁面
 
 **GET** `/broadcast-history-detail`
 
-返回廣播頻道的歷史詳情頁面。
+傳回廣播頻道的歷史詳情頁面。
 
-### 取得歷史會話列表
+### 取得歷史會話清單
 
 **GET** `/api/chat-history/conversations`
 
-返回所有歷史會話列表。
+傳回所有歷史會話清單。
 
 ### 取得歷史訊息
 
@@ -263,7 +263,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 查詢參數：`sessionId` — 會話 ID
 
-返回指定歷史會話的訊息記錄。
+傳回指定歷史會話的訊息記錄。
 
 ---
 
@@ -273,33 +273,33 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/timers`
 
-返回定時器管理介面頁面。
+傳回定時器管理介面頁面。
 
-### 取得定時器列表
+### 取得定時器清單
 
 **GET** `/api/timers/list`
 
-返回所有定時器的列表。
+傳回所有定時器的清單。
 
 ### 定時器週期詳情頁面
 
 **GET** `/timer-cycles/{timerId}`
 
-返回指定定時器的執行週期詳情頁面。
+傳回指定定時器的執行週期詳情頁面。
 
-### 取得定時器週期列表
+### 取得定時器週期清單
 
 **GET** `/api/timer-cycles/list`
 
 查詢參數：`timerId` — 定時器 ID
 
-返回指定定時器的所有執行週期列表。
+傳回指定定時器的所有執行週期清單。
 
 ### 單次執行週期詳情頁面
 
 **GET** `/timer-cycle/{cycleIndex}`
 
-返回單次執行的詳細頁面。
+傳回單次執行的詳細頁面。
 
 ### 取得週期訊息
 
@@ -307,7 +307,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 查詢參數：`cycleIndex` — 週期索引
 
-返回指定執行週期的相關訊息。
+傳回指定執行週期的相關訊息。
 
 ---
 
@@ -317,33 +317,33 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/tasks`
 
-返回任務管理介面頁面。
+傳回任務管理介面頁面。
 
-### 取得任務列表
+### 取得任務清單
 
 **GET** `/api/tasks/list`
 
-返回所有任務的列表。
+傳回所有任務的清單。
 
 ### 任務週期詳情頁面
 
 **GET** `/task-cycles/{taskId}`
 
-返回指定任務的執行週期詳情頁面。
+傳回指定任務的執行週期詳情頁面。
 
-### 取得任務週期列表
+### 取得任務週期清單
 
 **GET** `/api/task-cycles/list`
 
 查詢參數：`taskId` — 任務 ID
 
-返回指定任務的所有執行週期列表。
+傳回指定任務的所有執行週期清單。
 
 ### 單次執行週期詳情頁面
 
 **GET** `/task-cycle/{cycleIndex}`
 
-返回單次任務執行的詳細頁面。
+傳回單次任務執行的詳細頁面。
 
 ### 取得週期訊息
 
@@ -351,7 +351,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 查詢參數：`cycleIndex` — 週期索引
 
-返回指定任務執行週期的相關訊息。
+傳回指定任務執行週期的相關訊息。
 
 ---
 
@@ -361,23 +361,23 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/permissions`
 
-返回權限管理介面頁面。
+傳回權限管理介面頁面。
 
-### 取得權限規則列表
+### 取得權限規則清單
 
 **GET** `/api/permissions/list`
 
-返回目前配置的所有權限規則。
+傳回目前設定的所有權限規則。
 
 **回應範例**：
 ```json
 {
   "rules": [
     {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
+      "permissionType": "NetworkAccess",
+      "resourcePrefix": "api.github.com",
+      "result": "Allowed",
+      "description": "Allow GitHub API access"
     }
   ]
 }
@@ -390,10 +390,10 @@ data: {"type": "complete", "sessionId": "uuid"}
 **請求體**：
 ```json
 {
-  "userId": "user-uuid",
-  "resource": "disk:write",
-  "allowed": true,
-  "duration": 3600
+  "permissionType": "FileAccess",
+  "resourcePrefix": "C:\\Projects",
+  "result": "Allowed",
+  "description": "Allow project directory access"
 }
 ```
 
@@ -410,8 +410,8 @@ data: {"type": "complete", "sessionId": "uuid"}
 | `userId` | `Guid` | 請求權限的矽基生命體 ID |
 | `type` | `string` | 權限類型 |
 | `resource` | `string` | 請求的資源路徑 |
-| `allowCode` | `string` | 允許操作的代碼標識 |
-| `denyCode` | `string` | 拒絕操作的代碼標識 |
+| `allowCode` | `string` | 允許操作的代碼識別符 |
+| `denyCode` | `string` | 拒絕操作的代碼識別符 |
 
 ### 檢查待處理權限請求
 
@@ -454,13 +454,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/logs`
 
-返回日誌檢視介面頁面。
+傳回日誌檢視介面頁面。
 
-### 取得日誌列表
+### 取得日誌清單
 
 **GET** `/api/logs/list`
 
-查詢參數支援按級別、時間範圍過濾。
+查詢參數支援按等級、時間範圍篩選。
 
 **回應範例**：
 ```json
@@ -482,11 +482,11 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 按矽基生命體分組的日誌統計。
 
-### 取得可用日誌級別
+### 取得可用日誌等級
 
 **GET** `/api/logs/levels`
 
-返回系統中可用的日誌級別列表。
+傳回系統中可用的日誌等級清單。
 
 ---
 
@@ -496,13 +496,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/usage`
 
-返回使用統計介面頁面。
+傳回使用統計介面頁面。
 
 ### 取得使用摘要
 
 **GET** `/api/usage/summary`
 
-返回 Token 使用量和費用摘要。
+傳回 Token 使用量和費用摘要。
 
 ### 取得趨勢資料
 
@@ -510,7 +510,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 查詢參數：`startDate`, `endDate`
 
-返回指定時間段內的使用趨勢資料。
+傳回指定時間段內的使用趨勢資料。
 
 ### 匯出使用資料
 
@@ -520,43 +520,43 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ---
 
-## 稽核追蹤
+## 審計追蹤
 
-### 稽核頁面
+### 審計頁面
 
 **GET** `/audit`
 
-返回稽核追蹤介面頁面。
+傳回審計追蹤介面頁面。
 
-### 取得稽核列表
+### 取得審計清單
 
 **GET** `/api/audit/list`
 
-返回稽核日誌條目列表。
+傳回審計日誌條目清單。
 
-### 取得稽核摘要
+### 取得審計摘要
 
 **GET** `/api/audit/summary`
 
-返回稽核資料的彙總統計。
+傳回審計資料的彙總統計。
 
-### 取得稽核按生命體分組
+### 取得審計按生命體分組
 
 **GET** `/api/audit/beings`
 
-按矽基生命體分組的稽核統計。
+按矽基生命體分組的審計統計。
 
 ---
 
-## 配置管理
+## 設定管理
 
-### 配置頁面
+### 設定頁面
 
 **GET** `/config`
 
-返回系統配置介面頁面。
+傳回系統設定介面頁面。
 
-### 儲存配置
+### 儲存設定
 
 **POST** `/config/save`
 
@@ -579,11 +579,11 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 取得 AI 配置選項
+### 取得 AI 設定選項
 
 **GET** `/config/aioptions`
 
-返回可用的 AI 客戶端類型及其動態選項（可用模型、區域等）。
+傳回可用的 AI 用戶端類型及其動態選項（可用模型、區域等）。
 
 ---
 
@@ -593,13 +593,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/memory`
 
-返回記憶管理介面頁面。
+傳回記憶管理介面頁面。
 
-### 取得記憶列表
+### 取得記憶清單
 
 **GET** `/api/memory/list`
 
-返回矽基生命體的記憶條目列表。
+傳回矽基生命體的記憶條目清單。
 
 ### 取得記憶詳情
 
@@ -607,13 +607,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 路徑參數：`id` — 記憶條目 ID
 
-返回指定記憶條目的完整內容。
+傳回指定記憶條目的完整內容。
 
 ### 取得記憶統計
 
 **GET** `/api/memory/stats`
 
-返回記憶系統的統計資訊。
+傳回記憶系統的統計資訊。
 
 ### 搜尋記憶
 
@@ -635,13 +635,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 路徑參數：`id` — 記憶條目 ID
 
-返回指定記憶條目的來源追溯鏈。
+傳回指定記憶條目的來源追溯鏈。
 
 ### 取得記憶時間線 HTML
 
 **GET** `/api/memory/timeline-html`
 
-返回記憶時間線的 HTML 檢視。
+傳回記憶時間線的 HTML 檢視。
 
 ---
 
@@ -651,13 +651,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/work-notes`
 
-返回工作筆記介面頁面。
+傳回工作筆記介面頁面。
 
-### 取得工作筆記列表
+### 取得工作筆記清單
 
 **GET** `/api/work-notes/list`
 
-返回工作筆記列表。
+傳回工作筆記清單。
 
 ### 讀取工作筆記
 
@@ -665,13 +665,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 查詢參數：`noteId` — 筆記 ID
 
-返回指定筆記的內容。
+傳回指定筆記的內容。
 
 ### 取得筆記目錄
 
 **GET** `/api/work-notes/directory`
 
-返回筆記目錄結構。
+傳回筆記目錄結構。
 
 ### 搜尋工作筆記
 
@@ -726,53 +726,103 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/knowledge`
 
-返回知識網絡管理介面頁面。
+傳回知識網絡管理介面頁面。
 
 ### 取得知識圖譜
 
 **GET** `/api/knowledge/graph`
 
-返回知識三元組圖譜資料（主體-關係-客體）。
+傳回知識三元組圖譜資料（主體-關係-客體）。
 
 ---
 
-## 專案管理
+## 項目管理
 
-### 專案頁面
+### 項目頁面
 
 **GET** `/project`
 
-返回專案管理介面頁面。
+傳回項目管理介面頁面。
 
-### 專案工作筆記頁面
+### 項目工作筆記頁面
 
 **GET** `/project/{id}/work-notes`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-返回指定專案的工作筆記頁面。
+傳回指定項目的工作筆記頁面。
 
-### 專案任務頁面
+### 項目任務頁面
 
 **GET** `/project/{id}/tasks`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-返回指定專案的任務管理頁面。
+傳回指定項目的任務管理頁面。
 
-### 取得專案列表
+### 項目工具權限頁面
+
+**GET** `/project/{id}/tool-permissions`
+
+路徑參數：`id` — 項目 ID
+
+傳回指定項目的工具權限管理頁面。
+
+### 項目工作流頁面
+
+**GET** `/project/{id}/workflow`
+
+路徑參數：`id` — 項目 ID
+
+傳回指定項目的工作流管理頁面。
+
+### 取得項目工作流詳情
+
+**GET** `/api/projects/workflow-detail`
+
+查詢參數：`projectId` — 項目 ID
+
+傳回項目關聯的工作流詳情。
+
+### 分配項目角色
+
+**POST** `/api/projects/assign-role`
+
+**請求體**：
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid",
+  "roleName": "developer"
+}
+```
+
+### 移除項目角色
+
+**POST** `/api/projects/remove-role`
+
+**請求體**：
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid",
+  "roleName": "developer"
+}
+```
+
+### 取得項目清單
 
 **GET** `/api/projects/list`
 
-返回所有專案的列表。
+傳回所有項目的清單。
 
-### 取得專案工作流範本列表
+### 取得項目工作流範本清單
 
 **GET** `/api/projects/list-workflow-templates`
 
-返回可用的工作流範本列表。
+傳回可用的工作流範本清單。
 
-### 建立專案
+### 建立項目
 
 **POST** `/api/projects/create`
 
@@ -784,39 +834,39 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 歸檔專案
+### 歸檔項目
 
 **POST** `/api/projects/{id}/archive`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-歸檔指定專案。
+歸檔指定項目。
 
-### 還原專案
+### 還原項目
 
 **POST** `/api/projects/{id}/restore`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-還原已歸檔的專案。
+還原已歸檔的項目。
 
-### 銷毀專案
+### 銷毀項目
 
 **POST** `/api/projects/{id}/destroy`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-永久刪除指定專案（不可還原）。
+永久刪除指定項目（不可還原）。
 
-### 取得專案詳情
+### 取得項目詳情
 
 **GET** `/api/projects/detail`
 
-查詢參數：`projectId` — 專案 ID
+查詢參數：`projectId` — 項目 ID
 
-返回專案的詳細資訊。
+傳回項目的詳細資訊。
 
-### 更新專案
+### 更新項目
 
 **POST** `/api/projects/update`
 
@@ -829,7 +879,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 分配成員到專案
+### 分配成員到項目
 
 **POST** `/api/projects/assign`
 
@@ -841,7 +891,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 從專案中移除成員
+### 從項目中移除成員
 
 **POST** `/api/projects/remove`
 
@@ -853,117 +903,188 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 取得專案工作筆記列表
+### 取得項目工作筆記清單
 
 **GET** `/api/projects/{id}/work-notes/list`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-返回指定專案的工作筆記列表。
+傳回指定項目的工作筆記清單。
 
-### 讀取專案工作筆記
+### 讀取項目工作筆記
 
 **GET** `/api/projects/{id}/work-notes/read`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-返回指定專案的工作筆記內容。
+傳回指定項目的工作筆記內容。
 
-### 建立專案工作筆記
+### 建立項目工作筆記
 
 **POST** `/api/projects/{id}/work-notes/create`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-在指定專案中建立新的工作筆記。
+在指定項目中建立新的工作筆記。
 
-### 更新專案工作筆記
+### 更新項目工作筆記
 
 **POST** `/api/projects/{id}/work-notes/update`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-更新指定專案中的工作筆記。
+更新指定項目中的工作筆記。
 
-### 刪除專案工作筆記
+### 刪除項目工作筆記
 
 **POST** `/api/projects/{id}/work-notes/delete`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-刪除指定專案中的工作筆記。
+刪除指定項目中的工作筆記。
 
-### 取得專案任務列表
+### 取得項目任務清單
 
 **GET** `/api/projects/{id}/tasks/list`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-返回指定專案的任務列表。
+傳回指定項目的任務清單。
 
-### 建立專案任務
+### 建立項目任務
 
 **POST** `/api/projects/{id}/tasks/create`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-在指定專案中建立新任務。
+在指定項目中建立新任務。
 
-### 更新專案任務
+### 更新項目任務
 
 **POST** `/api/projects/{id}/tasks/update`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-更新指定專案中的任務。
+更新指定項目中的任務。
 
-### 刪除專案任務
+### 刪除項目任務
 
 **POST** `/api/projects/{id}/tasks/delete`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-刪除指定專案中的任務。
+刪除指定項目中的任務。
 
 ### 分配任務負責人
 
 **POST** `/api/projects/{id}/tasks/assign`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-為專案任務分配負責人。
+為項目任務分配負責人。
 
 ### 移除任務負責人
 
 **POST** `/api/projects/{id}/tasks/remove-assignee`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-移除專案任務的負責人。
+移除項目任務的負責人。
 
 ### 標記任務完成
 
 **POST** `/api/projects/{id}/tasks/complete`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-標記專案任務為已完成。
+標記項目任務為已完成。
 
 ### 標記任務失敗
 
 **POST** `/api/projects/{id}/tasks/fail`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-標記專案任務為失敗。
+標記項目任務為失敗。
 
 ### 取消任務
 
 **POST** `/api/projects/{id}/tasks/cancel`
 
-路徑參數：`id` — 專案 ID
+路徑參數：`id` — 項目 ID
 
-取消專案任務。
+取消項目任務。
+
+---
+
+## 工具權限管理
+
+### 取得矽基生命體工具權限
+
+**GET** `/api/beings/tool-permissions`
+
+查詢參數：`beingId` — 矽基生命體 ID
+
+傳回指定矽基生命體的工具權限設定。
+
+### 更新矽基生命體工具權限
+
+**PUT** `/api/beings/tool-permissions`
+
+**請求體**：
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "network": "allowed",
+    "disk_read": "allowed",
+    "disk_write": "denied"
+  }
+}
+```
+
+### 取得工具權限範本
+
+**GET** `/api/beings/tool-permissions/templates`
+
+傳回可用的工具權限範本清單。
+
+### 套用工具權限範本
+
+**POST** `/api/beings/tool-permissions/apply-template`
+
+**請求體**：
+```json
+{
+  "beingId": "being-uuid",
+  "templateName": "readonly"
+}
+```
+
+### 取得項目工具權限
+
+**GET** `/api/projects/{id}/tool-permissions`
+
+路徑參數：`id` — 項目 ID
+
+傳回指定項目的工具權限設定。
+
+### 更新項目工具權限
+
+**PUT** `/api/projects/{id}/tool-permissions`
+
+路徑參數：`id` — 項目 ID
+
+**請求體**：
+```json
+{
+  "permissions": {
+    "network": "allowed",
+    "disk_read": "allowed",
+    "disk_write": "denied"
+  }
+}
+```
 
 ---
 
@@ -973,13 +1094,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/executor`
 
-返回執行器管理介面頁面。
+傳回執行器管理介面頁面。
 
 ### 取得執行器狀態
 
 **GET** `/api/executors/status`
 
-返回各執行器（磁碟、網絡、命令列）的運行狀態。
+傳回各執行器（磁碟、網路、命令列）的執行狀態。
 
 ---
 
@@ -989,13 +1110,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/code`
 
-返回程式碼瀏覽器介面頁面。
+傳回程式碼瀏覽器介面頁面。
 
-### 取得程式碼類型列表
+### 取得程式碼類型清單
 
 **GET** `/api/code/types`
 
-返回支援的程式碼類型/語言列表。
+傳回支援的程式碼類型/語言清單。
 
 ### 取得程式碼詳情
 
@@ -1003,7 +1124,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 查詢參數：`filePath`, `lineNumber`
 
-返回指定檔案的程式碼詳情。
+傳回指定檔案的程式碼詳情。
 
 ---
 
@@ -1014,7 +1135,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 **GET** `/api/code/hover`
 **POST** `/api/code/hover`
 
-取得程式碼位置的懸浮提示資訊（類似 IDE 的智能提示）。
+取得程式碼位置的懸浮提示資訊（類似 IDE 的智慧提示）。
 
 ### 註冊程式碼位置
 
@@ -1036,29 +1157,29 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ---
 
-## 幫助文件系統
+## 說明文件系統
 
-### 幫助頁面
+### 說明頁面
 
 **GET** `/help` 或 **GET** `/help/index`
 
-返回幫助文件主頁。
+傳回說明文件主頁。
 
-### 幫助主題頁面
+### 說明主題頁面
 
 **GET** `/help/{topic}`
 
 路徑參數：`topic` — 主題識別符
 
-返回指定主題的幫助文件頁面。
+傳回指定主題的說明文件頁面。
 
-### 搜尋幫助文件
+### 搜尋說明文件
 
 **GET** `/api/help/search`
 
 查詢參數：`keyword` — 搜尋關鍵詞
 
-搜尋匹配的幫助文件主題。
+搜尋匹配的說明文件主題。
 
 ---
 
@@ -1068,13 +1189,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/init`
 
-返回首次運行初始化精靈頁面。
+傳回首次執行初始化精靈頁面。
 
 ### 提交初始化
 
 **POST** `/init`
 
-提交首次運行的初始化配置。
+提交首次執行的初始化設定。
 
 ### 瀏覽選擇資料目錄
 
@@ -1082,11 +1203,11 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 開啟目錄瀏覽器以選擇資料儲存位置。
 
-### 取得 AI 配置元資料
+### 取得 AI 設定中繼資料
 
 **GET** `/init/ai-config-metadata`
 
-返回可用的 AI 客戶端類型及其配置欄位元資料。
+傳回可用的 AI 用戶端類型及其設定欄位中繼資料。
 
 ---
 
@@ -1101,7 +1222,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 觸發應用程式的優雅關閉流程：
 
 1. 停止主迴圈（MainLoop）
-2. 儲存目前配置
+2. 儲存目前設定
 3. 關閉 HTTP 監聽器
 
 **回應**：
@@ -1120,9 +1241,9 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/about`
 
-返回關於頁面，包含系統資訊和已載入的外掛程式列表。
+傳回關於頁面，包含系統資訊和已載入的插件清單。
 
-**外掛程式列表資料**：
+**插件清單資料**：
 ```json
 {
   "plugins": {
@@ -1140,14 +1261,14 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ## 錯誤回應
 
-所有端點返回標準化的錯誤回應：
+所有端點傳回標準化的錯誤回應：
 
 ```json
 {
   "error": {
     "code": "PERMISSION_DENIED",
     "message": "You don't have permission to access this resource",
-    "details": "Required: disk:write, Current: disk:read"
+    "details": "Required: FileAccess, Denied by GlobalACL"
   }
 }
 ```
@@ -1155,7 +1276,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 ### 常見錯誤代碼
 
 | 代碼 | HTTP 狀態 | 描述 |
-|------|-------------|-------------|
+|------|-------------|------|
 | `PERMISSION_DENIED` | 403 | 權限不足 |
 | `NOT_FOUND` | 404 | 資源未找到 |
 | `VALIDATION_ERROR` | 400 | 請求參數無效 |
@@ -1166,7 +1287,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ## SSE 事件
 
-伺服器發送事件用於即時更新：
+伺服器傳送事件用於即時更新：
 
 ### 聊天事件
 
@@ -1175,7 +1296,7 @@ const eventSource = new EventSource('/api/chat/stream');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);
-  
+
   switch(data.type) {
     case 'chunk':
       console.log('Streaming:', data.content);
@@ -1195,7 +1316,7 @@ eventSource.onmessage = (event) => {
 
 ---
 
-## AI 客戶端介面
+## AI 用戶端介面
 
 ### IAIClient 介面
 
@@ -1203,9 +1324,9 @@ eventSource.onmessage = (event) => {
 public interface IAIClient
 {
     string Name { get; }
-    
+
     Task<AIResponse> ChatAsync(AIRequest request);
-    
+
     IAsyncEnumerable<string> StreamChatAsync(AIRequest request);
 }
 ```
@@ -1247,7 +1368,7 @@ public interface ITool
     string Name { get; }
     string Description { get; }
     ToolDefinition Definition { get; }
-    
+
     Task<ToolResult> ExecuteAsync(ToolCall call);
 }
 ```
@@ -1278,7 +1399,7 @@ public class ToolResult
 
 ## 下一步
 
-- 🚀 查看[快速開始指南](getting-started.md)
+- 🚀 檢視[快速開始指南](getting-started.md)
 - 🛠️ 閱讀[開發指南](development-guide.md)
-- 📚 查看[架構文件](architecture.md)
+- 📚 檢視[架構文件](architecture.md)
 - 🔒 了解[安全模型](security.md)

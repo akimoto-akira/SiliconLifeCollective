@@ -1,4 +1,4 @@
-﻿# Changelog
+# Changelog
 
 **English** | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md) | [Русский](../ru-RU/changelog.md)
 
@@ -16,33 +16,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 This project provides two implementation versions:
 
 - **SiliconLife.Default**: Default implementation, primarily used for verifying architecture feasibility. Console application with file system JSON storage.
-- **SiliconLife.Fast**: Production-ready version. Cross-platform desktop application (Windows / macOS / Linux), SpeedyPack in-memory storage + asynchronous persistence (.spk file format), deeply performance-optimized.
+- **SiliconLife.Fast**: Production-ready version. Cross-platform desktop application (Windows / macOS / Linux), SpeedyPack in-memory storage + asynchronous persistence, deeply performance-optimized.
 
-Both versions share the same interfaces and functionality, differing only in storage implementation and runtime mode. SiliconLife.Default serves as an architecture validation baseline, while SiliconLife.Fast is the production-ready flagship version.
+Both versions share the same interfaces and functionality, differing only in storage implementation and runtime mode. SiliconLife.Default serves as the architecture verification baseline, while SiliconLife.Fast is the recommended production version.
 
 ### Project Origin
 
 - This project originated on March 20, 2026.
-- Before this project, there was a verification demo that failed due to poor architecture design, preventing integration with multiple AI platforms.
+- Prior to this project, a verification Demo failed due to unreasonable architecture design, making it impossible to integrate with multiple AI platforms.
 
 ### AI IDE Tools Used
 
 #### Kiro (Amazon AWS)
-- The project was initially maintained by Kiro and started using Spec mode.
+- The project was initially maintained by Kiro, started using Spec mode.
 - Kiro is an agentic AI development environment built by Amazon AWS.
-- Based on Code OSS (VS Code), supports VS Code settings and Open VSX compatible extensions.
-- Features a spec-driven development workflow for structured AI coding.
+- Based on Code OSS (VS Code), supports VS Code settings and Open VSX compatible plugins.
+- Features spec-driven development workflow for structured AI coding.
 
-#### Comate AI IDE / Wenxin Kuaima (Baidu)
+#### Comate AI IDE (Baidu)
 - Occasionally used for copywriting and documentation work.
 - Comate AI IDE is an AI-native development environment tool released by Baidu Wenxin on June 23, 2025.
 - The industry's first multi-modal, multi-agent collaborative AI IDE.
 - Features include design-to-code conversion and full-process AI-assisted coding.
-- Powered by the Baidu Wenxin 4.0 X1 Turbo model.
+- Powered by Baidu Wenxin 4.0 X1 Turbo model.
 
 #### Trae (ByteDance)
 - Used from October 2025 to April 2026.
-- AI IDE with intelligent code generation and project management.
+- AI IDE supporting intelligent code generation and project management.
 
 #### Qoder (Alibaba)
 - Used for project maintenance since April 18, 2026.
@@ -50,83 +50,265 @@ Both versions share the same interfaces and functionality, differing only in sto
 
 #### CatPaw (Meituan)
 - Used in combination with Qoder since May 6, 2026.
-- Based on Meituan's self-developed LongCat series models, with powerful full code architecture refactoring capabilities.
+- Based on Meituan's self-developed LongCat series models, with strong full-code architecture refactoring capabilities.
 
-### Requirements Document
+### Requirements Documentation
 
-- The requirements document for this project is not publicly available.
-- Requirements have been validated through iterations with over 12 international AI platforms and large model series, producing a user story-driven requirements document of over 2000 lines that is nearly incomprehensible to humans.
+- The requirements documentation for this project is not publicly available.
+- Requirements were iteratively validated across 12+ international AI platforms and large model series, producing over 2,000 lines of nearly incomprehensible user-story-driven requirements documentation.
 
 ---
 
 ## [Unreleased]
 
+### 2026-05-26
+
+#### New Features
+- `a49041b` - Add Russian (ru-RU) localization support (ref task-364)
+  - 216 files changed
+
+#### Fixes
+- `79096f2` - Change glossary table format to standard Markdown, remove extra space alignment
+  - 1 file changed
+
+#### Documentation
+- `174a954` - Add missing Deutsch/Polski/Português term translations to glossary
+  - 1 file changed
+
+#### Collaboration Framework
+- `5b03d53` - Update .ai-collab task records - task-364 Russian localization (ref task-364)
+  - 5 files changed
+
+- `018947d` - Archive sessions and changes from 2026-05-25
+  - 2 files changed
+
+### 2026-05-25
+
+#### New Features
+- `14721a9` - Refine ThinkOnProject staffing prompt into detailed actionable plan (ref task-363)
+  - 20 files changed
+
+#### Fixes
+- `abb4285` - Fix incorrect .join() call position in beingsHtml (ref task-361)
+  - 1 file changed
+
+- `1c0b9ed` - Remove states-overview rendering in WorkflowDetailView causing duplicate state-initial string bug (ref task-362)
+  - 6 files changed
+
+#### Collaboration Framework
+- `ecc48a1` - Update .ai-collab metadata (relatedCommit and activity log) (ref task-361)
+  - 4 files changed
+
+- `64529a7` - Archive sessions and changes from 2026-05-24 (manually executed)
+  - 28 files changed
+
+- `4150e52` - Archive completed tasks task-341~361 (ref archive)
+  - 2 files changed
+
+### 2026-05-24
+
+#### New Features
+- `db60fd9` - Tool permission list displays tools without ToolAction declarations and marks them as non-configurable (ref task-331, task-332, task-333)
+  - 21 files changed
+
+- `6004a7f` - WorkflowTemplate adds role definition support + 12-language localization + DiskTool fix (ref task-346)
+  - 24 files changed
+
+- `75ce452` - ProjectSpace role pool and ProjectTool role management actions (ref task-347)
+  - 12 files changed
+
+- `edfb600` - Add role information to BuildProjectScenarioContext (ref task-348)
+  - 21 files changed
+
+- `6a2d713` - Extend HasProjectsWithoutTemplate to HasProjectsNeedingAttention (ref task-349)
+  - 21 files changed
+
+- `a773224` - Workflow task creation uses role pool to assign executors (ref task-350)
+  - 6 files changed
+
+- `77a27f9` - Extend TravelCodeWikiTool as geographic entity entry point (ref task-353)
+  - 8 files changed
+
+- `873ef23` - GeoDataTool implementation complete, .ai-collab status update (ref task-352)
+  - 7 files changed
+
+- `feaccab` - GeoContentTool implementation complete, .ai-collab status update (ref task-351)
+  - 6 files changed
+
+- `6e60ad1` - Extend GeoLanguageTool (ObjectPath support + set_word), backfill metadata (ref task-356, task-355)
+  - 7 files changed
+
+- `4eff807` - Implement GetWikiDocuments() for each GeoLocation subclass (ref task-357)
+  - 5 files changed
+
+- `baad5df` - Implement MediaWiki API publishing service (ref task-358)
+  - 6 files changed
+
+- `b846a21` - Implement workflow detail page (ref task-361)
+  - 24 files changed
+
+#### Fixes
+- `a290088` - Silicon Beings created via CuratorTool lost after restart (ref task-334)
+  - 11 files changed
+
+- `69a8cba` - Fix bug where task page does not filter by beingId (ref task-360)
+  - 8 files changed
+
+- `7dd1a65` - Register workflow detail page route in Router.cs (ref task-361)
+  - 1 file changed
+
+#### Refactoring
+- `5e02711` - Refactor common layer storage path abstraction, eliminate file system hardcoding (ref task-335)
+  - 12 files changed
+
+- `0ec0929` - DynamicBeingLoader.SaveBeingCode uses IStorage instead of direct file system operations (ref task-336)
+  - 7 files changed
+
+- `9a44b48` - PlaywrightWebView IStorage bridge + WebViewBrowserTool base class decoupling (ref task-337, task-340)
+  - 11 files changed
+
+- `8fea742` - WebViewBrowserTool screenshot saving uses IStorage instead of direct file system operations (ref task-338)
+  - 6 files changed
+
+- `4c24e6d` - DefaultPermissionCallback uses BeingPathResolver instead of hardcoded paths (ref task-339)
+  - 6 files changed
+
+- `ab428cd` - Remove downcasting in DefaultSiliconBeing, call base class SaveState() directly (ref task-344)
+  - 7 files changed
+
+- `1e6eb80` - PlaywrightWebView browser state temp file bridge uses IStorage for direct read/write (ref task-341)
+  - 7 files changed
+
+- `17f00e9` - DiskTool search operations route through DiskExecutor (ref task-342)
+  - 8 files changed
+
+- `8158703` - ChatController attachment check routes through DiskExecutor (ref task-343)
+  - 7 files changed
+
+- `3243ae6` - Rewrite TravelCodeWikiPublishWorkflow as 7-step state machine, remove forcefully tracked TravelCodeWikiWithAI file (ref task-355)
+  - 6 files changed
+
+#### Cleanup
+- `d685288` - Delete HotReloadTool.cs and tools/HotReload directory (ref task-345)
+  - 8 files changed
+
+#### Documentation
+- `f1789d1` - Optimize README.md description lines (ref task-359)
+  - 9 files changed
+
+#### Collaboration Framework
+- `982c6bb` - Add missing relatedCommit and commitHash fields to .ai-collab
+  - 6 files changed
+
+- `d91e9f8` - Archive task-331~340, task board cleared
+  - 2 files changed
+
+- `9135e30` - Publish task-341~344 common layer IStorage refactoring + abstraction corrections
+  - 1 file changed
+
+- `f70b350` - Add 13 TravelCodeWikiWithAI architecture restructuring tasks (ref task-346~358)
+  - 2 files changed
+
+- `f81d38b` - Update ai-collab session and task tracking files
+  - 3 files changed
+
+### 2026-05-23
+
+#### Fixes
+- `9c3c64e` - Fix ExecuteTool runtime permission check bypassing project-level restrictions (ref task-324)
+  - 7 files changed
+
+- `94a9e35` - Fix inconsistency between permission template definitions and ToolActionAttribute declarations (ref task-325)
+  - 6 files changed
+
+- `e8d8371` - Tools with all Actions disabled are entirely removed from AI requests (ref task-326)
+  - 6 files changed
+
+- `32c7d8a` - Add Action name validation to tool permission API + chat history Markdown rendering fix (ref task-327, task-328, task-329)
+  - 9 files changed
+
+- `797db8c` - Markdown rendering fallback incorrectly sets mdRendered causing marked not to re-render after loading (ref task-330)
+  - 9 files changed
+
+#### Collaboration Framework
+- `1496094` - Publish task-324~327 tool authorization framework fix tasks
+  - 776 files changed
+
+- `0d16e63` - Update collaboration task status, associate task-330 with commit 797db8c, prepare for archiving
+  - 2 files changed
+
+- `e602e1c` - Archive task-316~330, task board cleared (ref task-316~330)
+  - 2 files changed
+
+- `20291ce` - Archive sessions and changes by day (May 13-22)
+  - 106 files changed
+
 ### 2026-05-22
 
 #### Documentation Consistency Fixes
-- `9e07b27` - Fix French (fr-FR) documentation inconsistencies with source code (ref task-307)
+- `9e07b27` - Fix French (fr-FR) documentation consistency with source code (ref task-307)
   - 10 files changed
 
-- `9e3be72` - Fix German (de-DE) documentation inconsistencies with source code (ref task-308)
+- `9e3be72` - Fix German (de-DE) documentation consistency with source code (ref task-308)
   - 5 files changed
 
-- `2bc7151` - Fix Spanish (es-ES) documentation inconsistencies with source code (ref task-309)
+- `2bc7151` - Fix Spanish (es-ES) documentation consistency with source code (ref task-309)
   - 13 files changed
 
-- `f95088e` - Fix Italian (it-IT) documentation inconsistencies with source code (ref task-310)
+- `f95088e` - Fix Italian (it-IT) documentation consistency with source code (ref task-310)
   - 11 files changed
 
-- `6ea9f4a` - Fix Polish (pl-PL) documentation inconsistencies with source code (ref task-311)
+- `6ea9f4a` - Fix Polish (pl-PL) documentation consistency with source code (ref task-311)
   - 16 files changed
 
-- `7646923` - Fix Portuguese (pt-PT) documentation inconsistencies with source code (ref task-312)
+- `7646923` - Fix Portuguese (pt-PT) documentation consistency with source code (ref task-312)
   - 12 files changed
 
-- `7eaf9db` - Fix Czech (cs-CZ) documentation inconsistencies with source code (ref task-313)
+- `7eaf9db` - Fix Czech (cs-CZ) documentation consistency with source code (ref task-313)
   - 12 files changed
 
 #### Collaboration Framework
 - `3cb7347` - Update task-313 relatedCommit=7eaf9db
-  - 1 files changed
+  - 1 file changed
 
 ### 2026-05-21
 
 #### New Features
-- `99eca78` - Add "View Storage (Read-only)" to context menu, in-process Speedy.Manager call (ref task-301)
+- `99eca78` - Add "View Storage (Read-only)" to context menu, call Speedy.Manager in-process (ref task-301)
   - 26 files changed
 
 #### Documentation Consistency Fixes
-- `7f65cf1` - Fix zh-CN documentation inconsistencies with source code (ref task-303)
+- `7f65cf1` - Fix zh-CN documentation consistency with source code (ref task-303)
   - 15 files changed
 
-- `a9e2a2c` - Fix English (en) documentation inconsistencies with source code (ref task-302)
+- `a9e2a2c` - Fix English (en) documentation consistency with source code (ref task-302)
   - 9 files changed
 
-- `2549105` - Fix Traditional Chinese (zh-HK) documentation inconsistencies with source code (ref task-304)
+- `2549105` - Fix Traditional Chinese (zh-HK) documentation consistency with source code (ref task-304)
   - 12 files changed
 
-- `277eb50` - Fix Japanese (ja-JP) documentation inconsistencies with source code (ref task-305)
+- `277eb50` - Fix Japanese documentation consistency with source code (ref task-305)
   - 10 files changed
 
-- `edce413` - Fix Korean (ko-KR) documentation inconsistencies with source code (ref task-306)
+- `edce413` - Fix Korean (ko-KR) documentation consistency with source code (ref task-306)
   - 18 files changed
 
-- `f2adcae` - Fix Portuguese documentation inconsistencies with source code (ref task-220)
+- `f2adcae` - Fix Portuguese documentation inconsistency with source code (ref task-220)
   - 15 files changed
 
-- `3332987` - Fix Traditional Chinese (Hong Kong) documentation inconsistencies with source code (ref task-218)
+- `3332987` - Fix Traditional Chinese (Hong Kong) documentation inconsistency with source code (ref task-218)
   - 14 files changed
 
-- `af9f715` - Fix Polish documentation inconsistencies with source code (ref task-217)
+- `af9f715` - Fix Polish documentation inconsistency with source code (ref task-217)
   - 15 files changed
 
-- `2e2b18b` - Fix Korean documentation inconsistencies with source code (ref task-216)
+- `2e2b18b` - Fix Korean documentation inconsistency with source code (ref task-216)
   - 16 files changed
 
-- `626ebc9` - Fix Japanese documentation inconsistencies with source code (ref task-215)
+- `626ebc9` - Fix Japanese documentation inconsistency with source code (ref task-215)
   - 19 files changed
 
-- `48d061b` - Fix Italian documentation inconsistencies with source code (ref task-214)
+- `48d061b` - Fix Italian documentation inconsistency with source code (ref task-214)
   - 14 files changed
 
 #### Collaboration Framework
@@ -139,7 +321,7 @@ Both versions share the same interfaces and functionality, differing only in sto
 ### 2026-05-20
 
 #### New Features
-- `65176d4` - Add complete Portuguese (pt-PT + pt-BR) localization support (ref task-208)
+- `65176d4` - Add Portuguese (pt-PT + pt-BR) complete localization support (ref task-208)
   - 41 files changed
 
 #### Documentation Consistency Fixes
@@ -149,16 +331,16 @@ Both versions share the same interfaces and functionality, differing only in sto
 - `144b945` - Fix English (en) and Czech (cs-CZ) documentation inconsistencies with source code (ref task-219, task-210)
   - 22 files changed
 
-- `08bec55` - Fix German (de-DE) documentation inconsistencies with source code (ref task-211)
+- `08bec55` - Fix German (de-DE) documentation inconsistency with source code (ref task-211)
   - 14 files changed
 
-- `7ff28de` - Fix Spanish (es-ES) documentation inconsistencies with source code (ref task-212)
+- `7ff28de` - Fix Spanish (es-ES) documentation inconsistency with source code (ref task-212)
   - 14 files changed
 
-- `15e2133` - Fix French (fr-FR) documentation inconsistencies with source code (ref task-213)
+- `15e2133` - Fix French (fr-FR) documentation inconsistency with source code (ref task-213)
   - 13 files changed
 
-#### Bug Fixes
+#### Fixes
 - `7dac388` - Fix project task list not displaying (ref task-207)
   - 6 files changed
 
@@ -169,51 +351,51 @@ Both versions share the same interfaces and functionality, differing only in sto
 ### 2026-05-19
 
 #### New Features
-- `cd72846` - Implement safe alternative for PluginLoader security scan bypass (ref task-203)
+- `cd72846` - Implement secure alternative for PluginLoader security scan bypass (ref task-203)
   - 13 files changed
 
-- `fc0c00c` - Speedy.Manager enhancements - Create/Import/Export/TreeView hierarchy/Progress window (ref task-206)
+- `fc0c00c` - Speedy.Manager feature enhancement - create/import/export/TreeView hierarchy/progress window (ref task-206)
   - 9 files changed
 
-#### Bug Fixes
+#### Fixes
 - `ec07118` - Fix ITypeRegistry/IObjectFactory not registered before plugin loading (ref task-205)
   - 8 files changed
 
-- `9e749db` - Fix Creator ID is required error when creating project (ref task-204)
+- `9e749db` - Fix "Creator ID is required" error when creating projects (ref task-204)
   - 4 files changed
 
 #### Infrastructure
 - `43dc092` - CLDR migration - add CldrDataProvider, remove .github
-  - 1 files changed
+  - 1 file changed
 
 - `c09ec1f` - Add cldr/ to .gitignore
-  - 1 files changed
+  - 1 file changed
 
-- `221f818` - Switch GitHub sync to Gitee push mirror scheme, keep workflow as manual backup only
-  - 1 files changed
+- `221f818` - GitHub sync switches to Gitee push mirror approach, workflow only retains manual fallback
+  - 1 file changed
 
 - `08cdf1a` - Fix GitHub sync workflow - add retry logic and no-change skip
-  - 1 files changed
+  - 1 file changed
 
 - `fb4e77d` - Update SiliconLife.Speedy.Manager.csproj
-  - 1 files changed
+  - 1 file changed
 
 #### Collaboration Framework
 - `df90af0` - Update task-203 relatedCommit=cd72846
-  - 1 files changed
+  - 1 file changed
 
 ### 2026-05-18
 
 #### Refactoring
-- `e720d06` - Refactor Speedy.Manager from WinForms to Avalonia completely (ref task-202)
+- `e720d06` - Completely restructure Speedy.Manager from WinForms to Avalonia (ref task-202)
   - 17 files changed
 
-#### Bug Fixes
+#### Fixes
 - `08894a9` - Fix memory timeline summary entry level display error (ref task-201)
   - 3 files changed
 
 #### Collaboration Framework
-- `2871afb` - Archive all tasks, clear tasks.json
+- `2871afb` - Archive all tasks, tasks.json cleared
   - 2 files changed
 
 ### 2026-05-17
@@ -222,7 +404,7 @@ Both versions share the same interfaces and functionality, differing only in sto
 - `d6eb994` - Add project creation entry and workflow template selection to project list page (ref task-203)
   - 14 files changed
 
-- `0872134` - ThinkOnProject curator-driven orchestration for template-less projects (ref task-202)
+- `0872134` - ThinkOnProject curator-driven orchestration for projects without templates (ref task-202)
   - 6 files changed
 
 - `cb3188e` - Group chat @mention visualization (ref task-208)
@@ -234,22 +416,22 @@ Both versions share the same interfaces and functionality, differing only in sto
 - `0d2b843` - Group chat decision logic ShouldReplyInGroupChat (ref task-201)
   - 6 files changed
 
-- `277a2b1` - Knowledge network completion - advanced queries and graph traversal (ref task-207)
+- `277a2b1` - Knowledge Network completion - advanced queries and graph traversal (ref task-207)
   - 9 files changed
 
-#### Bug Fixes
+#### Fixes
 - `6d0b66e` - Fix appendMessage TypeError when sending group chat messages (ref task-209)
   - 5 files changed
 
-- `b15167c` - Submit missing list-workflow-templates route registration from task-203 (ref task-203)
-  - 1 files changed
+- `b15167c` - Add missing list-workflow-templates route registration from task-203 commit (ref task-203)
+  - 1 file changed
 
 - `dc549a2` - Fix Gitee sync workflow - add username to token URL
-  - 1 files changed
+  - 1 file changed
 
 #### Infrastructure
-- `e5fa3ad` - Disable GitHub auto-sync schedule, awaiting official Gitee sync solution
-  - 1 files changed
+- `e5fa3ad` - Disable GitHub auto-sync schedule, awaiting Gitee official sync solution
+  - 1 file changed
 
 #### Collaboration Framework
 - `4a58c82` - Add system capability analysis report + ThinkOnProject design proposal
@@ -258,7 +440,7 @@ Both versions share the same interfaces and functionality, differing only in sto
 - `8ab29e6` - Archive system capability completeness analysis report to .ai-collab/docs
   - 2 files changed
 
-- `b412d9c` - Archive old tasks, re-publish task-201~208 based on comprehensive analysis
+- `b412d9c` - Archive old tasks, republish task-201~208 based on comprehensive analysis
   - 2 files changed
 
 - `437884a` - Update collaboration metadata - task-202/203/204 completed (ref task-202, task-203, task-204)
@@ -286,42 +468,42 @@ Both versions share the same interfaces and functionality, differing only in sto
 ### 2026-05-15
 
 #### Infrastructure
-- `672627b` - Add Gitee sync workflow with permission configuration
-  - Updated sync-from-gitee.yml workflow permissions
-  - 1 file changed, 7 insertions(+), 4 deletions(-)
+- `672627b` - Add Gitee sync workflow (with permission configuration)
+  - Updated sync-from-gitee.yml workflow permission configuration
+  - 1 file changed, 7 lines added, 4 lines deleted
 
 - `3cd5256` - Add GitHub Actions auto-sync from Gitee
   - Added sync-from-gitee.yml workflow
-  - 1 file changed, 50 insertions(+)
+  - 1 file changed, 50 lines added
 
-#### Documentation Updates
-- `aa1d2ad` - Update all 11 languages README/architecture/getting-started docs to reflect SiliconLife.Fast multi-platform support (ref task-112, task-113)
-  - Corrected documentation describing SiliconLife.Fast as Windows-only to reflect actual multi-platform support (Windows / macOS / Linux)
-  - Updated README.md, architecture.md, getting-started.md for all 11 languages
-  - SelectComponent added hint property support
-  - ConfigView enum dropdowns now pass hint parameter
-  - 11 languages localization added SelectSearchHint key
-  - 53 files changed, 690 insertions(+), 194 deletions(-)
+#### Documentation Update
+- `aa1d2ad` - Update all 11-language README/architecture/getting-started docs to reflect SiliconLife.Fast multi-platform support (ref task-112, task-113)
+  - Corrected documentation describing SiliconLife.Fast as Windows-only, reflecting actual multi-platform support (Windows / macOS / Linux)
+  - Updated README.md, architecture.md, getting-started.md for 11 languages
+  - SelectComponent adds hint property support
+  - ConfigView enum dropdown passes hint
+  - 11-language localization adds SelectSearchHint key
+  - 53 files changed, 690 lines added, 194 lines deleted
 
 #### Task System
-- `3329f3d` - Add task system inspection mechanism + localization bug fix tasks
+- `3329f3d` - Add task system patrol mechanism + localization bug fix tasks
   - Created task-113: Fix about page localization issue
   - Updated task-112: Update Fast version docs for Linux support
   - Archived completed tasks (11) to .ai-collab/archive/
-  - Inspection mechanism configured: quick inspection (every 30 min) + full inspection (daily at 06:00)
-  - 2 files changed, 148 insertions(+), 171 deletions(-)
+  - Patrol mechanism configured: quick patrol (every 30 minutes) + full patrol (daily at 06:00)
+  - 2 files changed, 148 lines added, 171 lines deleted
 
 #### Collaboration Framework
-- `6038e22` - Register coze-agent to .ai-collab registry
-  - Added Coze platform resident AI registration
+- `6038e22` - Register coze-agent to .ai-collab collaboration registry
+  - Added Coze platform resident AI registration info
   - 1 file changed
 
 ### 2026-05-14
 
 #### AI Collaboration Framework
-- `7344fbb` - Remove handoff mode, switch to task-list-driven approach (v2.0)
-  - Restructured .ai-collab directory from handoff mode to task-list-driven
-  - Added tasks.json core task list file
+- `7344fbb` - Remove handoff mode, switch to task list driven (v2.0)
+  - Restructured .ai-collab directory from handoff mode to task list driven
+  - Added tasks.json task list core file
   - Added activity.log operation log
   - Added changes/ and sessions/ directories
 
@@ -329,30 +511,30 @@ Both versions share the same interfaces and functionality, differing only in sto
   - Added AI collaboration session state records
 
 - `5481bcf` - Register Qoder AI IDE to collaboration registry
-  - Added Qoder AI coding assistant registration
+  - Added Qoder AI coding assistant registration info
 
-- `e2d7b61` - Supplement tasks.json relatedCommit and changes commitHash
-  - Completed task metadata associations
+- `e2d7b61` - Add relatedCommit and changes commitHash to tasks.json
+  - Improved task metadata association
 
 - `a087f0c` - Accept all task-101~110 tasks
   - Confirmed all 10 task fixes completed
 
 #### Bug Fixes
-- `fac9435` - Complete all task-101~110 bug fixes and implementations
-  - Fixed search select component missing hint text
-  - Fixed about page localization issues
-  - Fixed help system search JS errors
-  - 39 files changed, 684 insertions(+), 121 deletions(-)
+- `fac9435` - Complete all 10 task-101~110 fixes and implementations
+  - Fix search select component missing hint text
+  - Fix about page localization issue
+  - Fix help system search JS error
+  - 39 files changed, 684 lines added, 121 lines deleted
 
 - `c46dfbc` - Complete all pending tasks (task-001~006)
   - Completed initial 6 pending tasks
 
 - `ec176b2` - Override task list - code review found 10 new bugs
-  - Created task-101~110 (10 new tasks)
+  - Created task-101~110, 10 new tasks
 
 #### Refactoring
 - `ab15915` - Unify copyright headers + fix HelpController BOM and HelpView search JS
-  - Unified Apache 2.0 copyright headers across all C# source files
+  - Unified Apache 2.0 copyright headers for all C# source files
   - Fixed HelpController BOM encoding issue
   - Fixed HelpView search JavaScript error
 
@@ -369,47 +551,47 @@ Both versions share the same interfaces and functionality, differing only in sto
 #### Localization
 - `7a62590` - Add Polish localization support
   - Added pl-PL Polish localization implementation (PlPL.cs, 1089 lines)
-  - Added Polish help documentation localization (HelpLocalizationPlPL.cs, 3972 lines)
+  - Added Polish help document localization (HelpLocalizationPlPL.cs, 3972 lines)
   - Added Polish Chinese historical calendar support (ChineseHistoricalPlPL.cs, 600 lines)
   - Added Polish tray localization (TrayPlPL.cs, 135 lines)
-  - Added Polish complete documentation set (15 documents)
-  - Language enum added Polish
-  - 35 files changed, 14379 insertions(+), 11 deletions(-)
+  - Added complete Polish document set (15 documents)
+  - Language enum adds Polish
+  - 35 files changed, 14379 lines added, 11 lines deleted
 
-- `51f9c8e` - Update documentation with Ark AI references and terminology improvements
-  - Updated AI client terminology in multilingual documentation
+- `51f9c8e` - Update Ark AI references and terminology improvements in documentation
+  - Updated AI client terminology in multi-language documentation
 
 - `7587c12` - Add changelog entries for all languages
-  - Synchronized changelog updates across all language versions
+  - Synchronized changelog updates for all language versions
 
 #### Window System Migration
 - `b49a07d` - Migrate to Avalonia window resident mode
   - Removed Windows Forms dependency, fully migrated to Avalonia UI framework
-  - Status window displays correctly on Linux (verified via remote desktop)
-  - Added window controls: right-click menu, double-click to open Web, close button
+  - Status window displays correctly on Linux (remote desktop verified)
+  - Added window controls: context menu, double-click to open Web, close button
   - Added multi-AI collaboration framework (.ai-collab/)
   - Fixed tray icon initialization (graceful degradation)
-  - Added App.axaml and App.cs Avalonia application entry
-  - 13 files changed, 1442 insertions(+), 541 deletions(-)
+  - Added App.axaml and App.cs Avalonia application entry points
+  - 13 files changed, 1442 lines added, 541 lines deleted
 
 - `d335aaf` - Linux platform window always visible + close confirmation dialog
-  - Linux automatically shows status window (no tray icon)
-  - Linux close window shows confirmation dialog
-  - Windows/macOS maintain original tray behavior
-  - Support --no-tray parameter to force disable tray
-  - Added ShowMessageBoxAsync method for confirmation dialogs
-  - 3 files changed, 206 insertions(+), 29 deletions(-)
+  - Auto-show status window on Linux (no tray icon)
+  - Show confirmation dialog when closing window on Linux
+  - Windows/macOS maintain existing tray behavior
+  - Support --no-tray parameter to force-disable tray
+  - Added ShowMessageBoxAsync method for confirmation dialog
+  - 3 files changed, 206 lines added, 29 lines deleted
 
 #### Tray System Refactoring
 - `841d384` - Refactor tray system and initialize AI collaboration framework
   - Streamlined TrayLocalizationBase removing unused properties
   - Added ShowStatus localization item
-  - App.cs added tray icon click to show status window, localized menu items
-  - Program.cs moved tray icon initialization to StartAsync
-  - TrayStatusWindow hides on close instead of exiting
-  - Registered trae-glm5 and catpaw to .ai-collab framework
+  - App.cs adds tray icon click to show status window, localized menu items
+  - Program.cs moves tray icon initialization to StartAsync
+  - TrayStatusWindow hides instead of exiting on close
+  - Registered trae-glm5 and catpaw to .ai-collab collaboration framework
   - Updated .gitignore to ensure all .ai-collab files are tracked
-  - 22 files changed, 178 insertions(+), 1226 deletions(-)
+  - 22 files changed, 178 lines added, 1226 lines deleted
 
 #### Documentation
 - `43653bc` - Update repository description and AI registry
@@ -417,68 +599,68 @@ Both versions share the same interfaces and functionality, differing only in sto
 
 ### 2026-05-12
 
-#### Task System Web Views
+#### Task System Web View
 - `0891b3c` - Add task execution detail and history views
   - Added TaskExecutionDetailView task execution detail view
   - Added TaskExecutionHistoryView task execution history view
-  - TaskController added execution detail and history query interfaces
+  - TaskController adds execution detail and history query interfaces
   - Added TaskViewModel task view model
-  - TaskCenter task center enhanced
-  - TaskSystem task system updated
-  - 9 languages localization added task-related keys
-  - 26 files changed, 803 insertions(+), 55 deletions(-)
+  - TaskCenter task center enhancement
+  - TaskSystem task system update
+  - 9-language localization adds task-related keys
+  - 26 files changed, 803 lines added, 55 lines deleted
 
 ### 2026-05-11
 
 #### Web Component Architecture Refactoring
-- `5e687ad` - Migrate component rendering from string to H-tree
+- `5e687ad` - Migrate component rendering from strings to H-tree
   - ComponentBase rendering method migrated from string pattern to H-tree structure
   - All 28 components adapted to new rendering architecture (A, Accordion, Button, Calendar, Card, Chart, etc.)
-  - SelectComponent major refactoring (889 lines improved)
-  - Controllers and views updated accordingly
-  - 33 files changed, 667 insertions(+), 435 deletions(-)
+  - SelectComponent significantly refactored (889 lines improved)
+  - Controllers and views synchronized updates
+  - 33 files changed, 667 lines added, 435 lines deleted
 
-- `bfd332d` - Migrate Style from string to CssBuilder inline styles
+- `bfd332d` - Migrate Style from strings to CssBuilder inline styles
   - Added CssBuilder style builder
-  - ComponentBase style system migrated from string to structured CssBuilder
+  - ComponentBase style system migrated from strings to structured CssBuilder
   - LoadingComponent significantly enhanced (103 lines added)
   - ConfigController, LogController, MemoryController controller style migration
   - ChatView, ConfigView, LogView, MemoryView view style migration
-  - 37 files changed, 351 insertions(+), 157 deletions(-)
+  - 37 files changed, 351 lines added, 157 lines deleted
 
 #### Storage System Optimization
-- `d67a7ee` - Optimize QueryLatest for large datasets
+- `d67a7ee` - Optimize QueryLatest for large dataset queries
   - SpeedyTimeStorage QueryLatest method performance optimization
-  - SpeedyLoggerProvider logger provider enhanced
-  - 2 files changed, 44 insertions(+), 5 deletions(-)
+  - SpeedyLoggerProvider logger provider enhancement
+  - 2 files changed, 44 lines added, 5 lines deleted
 
 #### Calendar System Refactoring
-- `9629f88` - Extract TimerExecution and enhance timer web views
-  - TimerSystem extracted TimerExecution logic (175 lines removed)
+- `9629f88` - Extract TimerExecution and enhance timer web view
+  - TimerSystem extracts TimerExecution logic (175 lines removed)
   - SelectComponent significantly enhanced (427 lines improved)
-  - TimerController and timer views enhanced
+  - TimerController and timer view enhanced
   - ContextManager context manager updated
-  - 12 files changed, 458 insertions(+), 267 deletions(-)
+  - 12 files changed, 458 lines added, 267 lines deleted
 
 #### Localization
 - `5d8ca79` - Add LogsLoading localization key
-  - 9 languages added LogsLoading key
-  - DefaultLocalizationBase base class added definition
-  - 11 files changed, 15 insertions(+)
+  - 9 languages add LogsLoading key
+  - DefaultLocalizationBase base class adds definition
+  - 11 files changed, 15 lines added
 
 ### 2026-05-10
 
 #### Task System Refactoring
-- `54394f6` - Merge task system with chat history cycles
+- `54394f6` - Merge task system with chat history cycle
   - ProjectTaskSystem project task system significantly streamlined (411 lines refactored)
   - TaskSystem task system streamlined (254 lines refactored)
   - TaskCenter task center refactored (188 lines improved)
   - ContextManager context manager optimized (347 lines refactored)
   - DefaultSiliconBeing silicon being enhanced
-  - TimerSystem timer system integrated with tasks
+  - TimerSystem timer system integrates tasks
   - IWorkNoteStorage interface updated
   - SpeedyWorkNoteStorage and FileSystemWorkNoteStorage adapted
-  - 16 files changed, 648 insertions(+), 897 deletions(-)
+  - 16 files changed, 648 lines added, 897 lines deleted
 
 ### 2026-05-09
 
@@ -491,228 +673,228 @@ Both versions share the same interfaces and functionality, differing only in sto
   - ChatController chat controller updated
   - MarkdownEditorComponent component enhanced
   - InitController initialization controller improved
-  - ChatSystem chat system added features
-  - 14 files changed, 1030 insertions(+), 112 deletions(-)
+  - ChatSystem chat system adds functionality
+  - 14 files changed, 1030 lines added, 112 lines deleted
 
 - `c9babce` - Improve tool call rendering in chat view
   - ChatView tool call block rendering enhanced
-  - 1 file changed, 54 insertions(+), 11 deletions(-)
+  - 1 file changed, 54 lines added, 11 lines deleted
 
 #### AI Tool Scenario System
 - `ff2eddd` - Implement tool scenario filtering system
   - Added ToolScenarioAttribute tool scenario attribute (36 lines)
   - Added ChatOnlyAttribute chat-only scenario attribute (19 lines)
-  - ToolManager tool manager added scenario filtering (40 lines)
-  - ContextManager context manager adapted for scenario filtering
-  - 4 files changed, 115 insertions(+), 30 deletions(-)
+  - ToolManager tool manager adds scenario filtering functionality (40 lines)
+  - ContextManager context manager adapts to scenario filtering
+  - 4 files changed, 115 lines added, 30 lines deleted
 
 - `5709a33` - Add scenario attributes to tool classes
-  - 24 tool classes added ToolScenario attribute annotations
-  - Including calendar, chat, config, curator, database, disk, dynamic compile, etc.
-  - 24 files changed, 46 insertions(+), 20 deletions(-)
+  - 24 tool classes add ToolScenario attribute annotations
+  - Including calendar, chat, config, curator, database, disk, dynamic compilation, and other tools
+  - 24 files changed, 46 lines added, 20 lines deleted
 
 #### Task System Refactoring
-- `2f19a5f` - Restructure task system with TaskCenter and TaskEnumerator
+- `2f19a5f` - Refactor task system with TaskCenter and TaskEnumerator
   - Added TaskCenter task center (235 lines)
   - Added TaskEnumerator task enumerator (297 lines)
   - TaskSystem task system refactored and streamlined
-  - DefaultSiliconBeing silicon being adapted to new architecture
+  - DefaultSiliconBeing silicon being adapts to new architecture
   - DefaultSiliconBeingFactory factory updated
   - SiliconBeingBase base class enhanced
-  - 7 files changed, 796 insertions(+), 275 deletions(-)
+  - 7 files changed, 796 lines added, 275 lines deleted
 
 #### Permission System Migration
 - `a06ed09` - Migrate IM and permission system to App project
   - PermissionRequestQueue migrated from Default/Fast to App project (443 lines added)
   - Removed Default version WebUIProvider (403 lines deleted)
   - Removed Default version HelpTool (194 lines deleted)
-  - Removed Default/Fast duplicate PermissionRequestQueue
+  - Removed Default/Fast version duplicate PermissionRequestQueue
   - Removed Default version IMPermissionAskHandler
   - PermissionRequestController controller updated
-  - 14 files changed, 496 insertions(+), 1183 deletions(-)
+  - 14 files changed, 496 lines added, 1183 lines deleted
 
 #### AI Context Optimization
 - `4c8aaff` - Optimize context manager and enhance service locator
   - ContextManager context manager streamlined and optimized
   - ServiceLocator service locator enhanced (36 lines added)
   - ToolManager tool manager enhanced (34 lines added)
-  - DashScopeClient and VolcengineArkClient clients improved
+  - DashScopeClient and VolcengineArkClient client improvements
   - Executors (CommandLine, Disk, Network) updated
-  - 8 files changed, 116 insertions(+), 98 deletions(-)
+  - 8 files changed, 116 lines added, 98 lines deleted
 
 #### Localization
 - `5c5eef7` - Add audit and task localization keys
-  - DefaultLocalizationBase added 127 lines of localization definitions
-  - 9 languages added audit and task-related keys (26 lines each)
-  - 11 files changed, 387 insertions(+)
+  - DefaultLocalizationBase adds 127 lines of localization definitions
+  - 9 languages add audit and task related keys (26 lines each)
+  - 11 files changed, 387 lines added
 
 #### Project Configuration
-- `2067db6` - Update project configs and gitignore rules
+- `2067db6` - Update project configuration and gitignore rules
   - .gitignore rules updated
-  - DefaultConfigData and Fast DefaultConfigData config enhanced
-  - SpeedyWorkNoteStorage storage improved
-  - SpeedyPack core enhanced
-  - 5 files changed, 32 insertions(+), 6 deletions(-)
+  - DefaultConfigData and Fast DefaultConfigData config enhancements
+  - SpeedyWorkNoteStorage storage improvements
+  - SpeedyPack core enhancements
+  - 5 files changed, 32 lines added, 6 lines deleted
 
 ### 2026-05-07
 
 #### Italian Localization
-- `8adc18c` - Add Italian localization support and update multilingual documentation
+- `8adc18c` - Add Italian localization support and update multi-language documentation
   - Added it-IT Italian localization
   - Added ItIT localization implementation (1909 lines)
   - Added ChineseHistoricalItIT Chinese historical calendar Italian support (586 lines)
   - Added TrayItIT tray Italian localization (135 lines)
-  - Added Italian complete documentation set (14 documents: README, API reference, architecture, calendar system, changelog, contributing guide, etc.)
-  - Updated architecture, development guide, getting-started guide, etc. for all language versions
-  - Language enum added Italian
-  - 86 files changed, 11573 insertions(+), 769 deletions(-)
+  - Added complete Italian document set (14 documents: README, API reference, architecture, calendar system, changelog, contributing guide, etc.)
+  - Updated architecture, development guide, getting-started docs for all language versions
+  - Language enum adds Italian
+  - 86 files changed, 11573 lines added, 769 lines deleted
 
 #### Documentation Sync
-- `12a5deb` - Update multilingual documentation for architecture, changelog, and silicon being guide
-  - 8 languages README updated
-  - 8 languages architecture documentation updated
-  - 8 languages changelog updated
-  - 8 languages silicon being guide updated
-  - 8 languages tools reference updated
-  - Glossary restructured
-  - 46 files changed, 1697 insertions(+), 442 deletions(-)
+- `12a5deb` - Update multi-language documentation for architecture, changelog, and silicon being guide
+  - 8-language README updates
+  - 8-language architecture document updates
+  - 8-language changelog updates
+  - 8-language silicon being guide updates
+  - 8-language tool reference updates
+  - Glossary restructuring
+  - 46 files changed, 1697 lines added, 442 lines deleted
 
 ### 2026-05-06
 
 #### Large-Scale Module Refactoring
 - `eeb3be6` - Large-scale module refactoring and reorganization
-  - SiliconLife.App project restructuring
+  - SiliconLife.App project structure adjustment
   - SiliconLife.Fast project reorganization
   - SiliconLife.Default project reorganization
-  - SiliconLife.Common shared modules reorganization
-  - SiliconLife.Core core modules reorganization
+  - SiliconLife.Common shared module reorganization
+  - SiliconLife.Core core module reorganization
   - SiliconLife.Speedy storage engine reorganization
-  - SiliconLife.Speedy.Manager management tools reorganization
+  - SiliconLife.Speedy.Manager management tool reorganization
   - 119 files changed, 6926 lines added, 3066 lines deleted
 
 ### 2026-05-04
 
 #### AI Client
-- `24d2c86` - Added VolcengineArkClient and replaced Audit with Usage tracking
-  - New VolcengineArkClient Volcengine Ark AI client
+- `24d2c86` - Add VolcengineArkClient and replace Audit with Usage tracking
+  - Added VolcengineArkClient Volcengine Ark AI client
   - Supports streaming and non-streaming modes
-  - Built-in dual rate limiting (client-side + server-side)
+  - Built-in dual-layer rate control (self rate control + server rate limit)
   - Compatible with OpenAI API protocol
-  - Replaced Audit system with Usage tracking
+  - Audit system replaced with Usage tracking
   - 24 files changed, 802 lines added, 21 lines deleted
 
 #### Tool System
-- `f27650a` - Added hot reload tool for automatic Fast restart
-  - New HotReloadTool hot reload tool
-  - Supports online compilation, update, and restart of SiliconLife.Fast
-  - New standalone HotReload.exe updater program
-  - Safe file copying mechanism (does not overwrite itself)
-  - Graceful shutdown and port release waiting
+- `f27650a` - Add hot reload tool for Fast self-restart
+  - Added HotReloadTool hot reload tool
+  - Supports SiliconLife.Fast online compilation, update, and restart
+  - Added HotReload.exe standalone updater
+  - Safe file copy mechanism (does not overwrite itself)
+  - Graceful shutdown and port release wait
   - 9 files changed, 581 lines added
 
 #### Localization
-- `6a5aad8` - Updated all files and added French localization support
-  - New fr-FR French localization
+- `6a5aad8` - Update all files and add French localization support
+  - Added fr-FR French localization
   - Updated all language versions
-  - French help documentation translation
-  - French interface translation
+  - Help document French translation
+  - Interface French translation
   - 100+ files changed
 
 ### 2026-05-03
 
 #### Project Infrastructure
-- `2664b0c` - Updated project infrastructure and dependencies
-  - SiliconLife.Speedy.Manager added WPF management interface (MainForm.Designer.cs, MainForm.resx)
+- `2664b0c` - Update project infrastructure and dependencies
+  - SiliconLife.Speedy.Manager adds WPF management interface (MainForm.Designer.cs, MainForm.resx)
   - Added slc.ico icon resource (1.5MB)
   - PluginLoader significantly enhanced security scanning (622 lines added)
   - Added PermissionedStreamFactory permission stream factory (779 lines)
   - Added PermissionRequestQueue permission request queue (Default and Fast versions)
   - Added DebugLoggerProvider debug logger provider
-  - ConfigDataBase configuration base class enhanced
-  - ToolManager added plugin tool scanning (ScanAllPluginAssemblies)
+  - ConfigDataBase config base class enhanced
+  - ToolManager adds plugin tool scanning functionality (ScanAllPluginAssemblies)
   - SiliconBeingManager lifecycle management enhanced
   - DashScopeClient Alibaba Cloud AI client significantly enhanced (227 lines added)
   - DefaultSiliconBeingFactory factory enhanced
   - Web views and controllers updated (ChatView, WorkNoteView, PermissionRequestController)
-  - 9-language localization added new keys
+  - 9-language localization adds keys
   - 35 files changed, 28080 lines added, 336 lines deleted
 
 ### 2026-05-02
 
 #### AI Client Enhancement
-- `c16f99f` - Updated AI client, Web UI, and storage components
+- `c16f99f` - Update AI clients, Web UI, and storage components
   - DashScopeClient Alibaba Cloud client significantly improved
-  - SpeedyPackAutoCompactor auto-compactor optimized
+  - SpeedyPackAutoCompactor auto compactor optimized
   - Web view base class and BeingView improved
   - 6 files changed, 240 lines added, 81 lines deleted
 
 #### Plugin System
-- `242dc98` - Added plugin list on about page
-  - AboutController added plugin information display
-  - AboutViewModel added plugin data model
-  - AboutView added plugin list rendering
-  - 9-language localization added plugin-related keys
+- `242dc98` - Add plugin list to about page
+  - AboutController adds plugin info display
+  - AboutViewModel adds plugin data model
+  - AboutView adds plugin list rendering
+  - 9-language localization adds plugin-related keys
   - 14 files changed, 160 lines added, 1 line deleted
 
 #### AI Optimization
-- `147f8f4` - Simplified context memory prompt text
-  - ContextManager optimized AI prompts
+- `147f8f4` - Simplify context memory prompt text
+  - ContextManager optimizes AI prompts
   - 1 file changed, 1 line added, 1 line deleted
 
 #### Speedy Storage Optimization
-- `8bda2d3` - Updated Speedy storage and memory controller implementation
+- `8bda2d3` - Update Speedy storage and memory controller implementation
   - SpeedyPackAutoCompactor interval correction
   - SpeedyTimeStorage path handling optimization
-  - MemoryController memory controller improvements
+  - MemoryController memory controller improved
   - SpeedyPack.Manager UI update
   - 4 files changed, 21 lines added, 18 lines deleted
 
 #### Tray Enhancement
-- `8972654` - Enhanced tray status window localization support
-  - 9-language tray localization added Speedy management entry
-  - TrayStatusWindow added Speedy management menu item
+- `8972654` - Enhance localization support for tray status window
+  - 9-language tray localization adds Speedy management entry
+  - TrayStatusWindow adds Speedy management menu item
   - 11 files changed, 72 lines added
 
 #### Speedy.Manager Optimization
-- `6f5db09` - Optimized SpeedyPack Manager UI and internal components
-  - MainForm interface refactoring
-  - FreeList memory management optimization
-  - WriteQueue write queue improvements
-  - SpeedyPack core optimization
+- `6f5db09` - Optimize SpeedyPack Manager UI and internal components
+  - MainForm interface restructured
+  - FreeList memory management optimized
+  - WriteQueue write queue improved
+  - SpeedyPack core optimized
   - 5 files changed, 96 lines added, 88 lines deleted
 
 #### Storage System Enhancement
-- `57f9d5d` - Improved storage system, added auto-compaction and incomplete date support
-  - Added SpeedyPackAutoCompactor auto-compaction timer (30-minute interval)
+- `57f9d5d` - Improve storage system, add auto-compaction and incomplete date support
+  - Added SpeedyPackAutoCompactor auto compaction timer (30-minute interval)
   - SpeedyPackRegistry singleton manager enhanced
-  - SpeedyStorage, SpeedyTimeStorage, SpeedyWorkNoteStorage adapter improvements
-  - SpeedyPack added FreeList free space management (149 lines)
-  - PackFileWriter writer refactoring optimization
-  - WriteOperation, WriteQueue write queue enhancement
-  - SpeedyPackOptions configuration options expansion
-  - IncompleteDate added comparison methods
-  - PluginLoader plugin loader improvements
-  - Default and Fast versions Program.cs initialization flow updated
-  - DefaultConfigData configuration data simplified
+  - SpeedyStorage, SpeedyTimeStorage, SpeedyWorkNoteStorage adaptation improvements
+  - SpeedyPack adds FreeList free space management (149 lines)
+  - PackFileWriter writer refactored and optimized
+  - WriteOperation, WriteQueue write queue enhanced
+  - SpeedyPackOptions config options extended
+  - IncompleteDate adds comparison methods
+  - PluginLoader plugin loader improved
+  - Default and Fast version Program.cs initialization flow updated
+  - DefaultConfigData config data simplified
   - KnowledgeNetwork knowledge network streamlined
-  - ChatController, MemoryController controller optimization
+  - ChatController, MemoryController controllers optimized
   - SpeedyPack.Manager MainForm functionality enhanced
   - 22 files changed, 639 lines added, 253 lines deleted
 
 #### Speedy.Manager Update
-- `b04ed33` - Updated Speedy.Manager files
+- `b04ed33` - Update Speedy.Manager files
 
 ### 2026-05-01
 
 #### Architecture Refactoring: Speedy Storage Replaces LiteDB
-- `6600972` - Replaced LiteDB with Speedy storage, added plugin system and Speedy projects
+- `6600972` - Replace LiteDB with Speedy storage, add plugin system and Speedy project
   - **Added SiliconLife.Speedy project**: High-performance .spk storage engine
-    - SpeedyPack core class (489 lines): In-memory directory mapping + entry cache + asynchronous write queue
-    - SpeedyPackOptions configuration class: Cache TTL, max cache entries, read-only mode
+    - SpeedyPack core class (489 lines): In-memory directory mapping + entry cache + async write queue
+    - SpeedyPackOptions config class: Cache TTL, max cache entries, read-only mode
     - IPackTransaction transaction interface: Supports atomic write operations
-    - SpkFileInfo file information class
+    - SpkFileInfo file info class
     - Internal directory: DirectoryMap, EntryCache, PackFileReader, PackFileWriter, WriteQueue, WriteOperation, SpeedyTransaction, SpkHeader, PathNormalizer, FreeList
-    - Uses MessagePack 3.1.4 for binary serialization (LZ4 compression)
+    - Depends on MessagePack 3.1.4 for binary serialization (LZ4 compression)
   - **Added SiliconLife.Speedy.Manager project**: WPF management tool
     - MVVM architecture: MainViewModel, DirectoryTreeViewModel, ContentViewerViewModel, etc.
     - Service layer: PackService, FileDialogService, RecentFilesService, NotificationService
@@ -724,118 +906,118 @@ Both versions share the same interfaces and functionality, differing only in sto
     - Added SpeedyTimeStorage (ITimeStorage adapter)
     - Added SpeedyWorkNoteStorage (IWorkNoteStorage adapter)
     - Added SpeedyPackRegistry (process-level singleton management)
-    - Added SpeedyPackAutoCompactor (auto-compaction timer)
+    - Added SpeedyPackAutoCompactor (auto compaction timer)
     - Removed LiteDB-related storage implementations (LiteDBStorage, LiteDBTimeStorage, LiteDBWorkNoteStorage, LiteDBLoggerProvider, LiteDBManager, LiteDBModels)
     - Removed LiteDB management window related code
   - **Plugin System**:
     - Added IPlugin interface (Core/Plugins/IPlugin.cs)
     - Added PluginLoader plugin loader (Core/Plugins/PluginLoader.cs)
     - Support loading plugin DLLs from directory
-    - Security scanning: Forbidden namespace checking (System.IO, System.Net, Microsoft.CodeAnalysis, etc.)
+    - Security scanning: Prohibited namespace checking (System.IO, System.Net, Microsoft.CodeAnalysis, etc.)
     - Trusted assembly whitelist (Google.Protobuf, Newtonsoft.Json, MessagePack, etc.)
     - Custom AssemblyLoadContext isolated loading
-    - ToolManager added ScanAllPluginAssemblies method
-    - CoreHost integrated plugin loader
+    - ToolManager adds ScanAllPluginAssemblies method
+    - CoreHost integrates plugin loader
   - 119 files changed, 6926 lines added, 3066 lines deleted
 
 #### Silicon Being Enhancement
-- `3aef4c3` - Added Stopped activity state and error handling improvements
-  - Silicon beings now have Stopped state
+- `3aef4c3` - Add Stopped activity state and error handling improvements
+  - Silicon Being adds Stopped state
   - Error handling and recovery mechanism enhanced
 
 #### Localization Update
-- `513c65d` - Updated all language versions and documentation
+- `513c65d` - Update all language versions and documentation
   - Added MarkdownEditorComponent component (625 lines)
   - Added DetailsComponent component (130 lines)
   - Added AccordionComponent accordion component (285 lines)
-  - BeingController, ChatController, MemoryController, PermissionController controller updates
-  - BeingView, ChatView, MemoryView, SoulEditorView view refactoring
+  - BeingController, ChatController, MemoryController, PermissionController controllers updated
+  - BeingView, ChatView, MemoryView, SoulEditorView views refactored
   - Removed old MarkdownEditorView
-  - InitController componentization migration
+  - InitController component migration
   - 115 files changed, 5761 lines added, 2362 lines deleted
 
 ### 2026-04-30
 
 #### System Tray Functionality
-- `101b203` - Implemented tray status window and ApplicationContext
+- `101b203` - Implement tray status window and ApplicationContext
   - Added tray icon resources (alpha.png, noWord.png, slc.ico, wordIcon.png)
   - Implemented TrayStatusWindow status window
-  - Supports tray localization in 9 languages (TrayCsCZ, TrayDeDE, TrayEnUS, etc.)
+  - Supports 9-language tray localization (TrayCsCZ, TrayDeDE, TrayEnUS, etc.)
   - TrayLocalizationBase abstract base class
   - 24 files changed, 27995 lines added, 1 line deleted (including resource files)
 
-#### Componentized UI Architecture
-- `e61cfaa` - Completed componentized UI architecture, implemented 24 components
-  - MVP phase (8): ComponentBase, Div, Span, Button, Input, Form, Select, Label
-  - Phase 2 (6): Accordion, Card, Tabs, Table, Modal, Message
-  - Phase 3 (5): Calendar, Tree, Chart, FileUpload, RichText
-  - Added Js, Behavior, DomUpdate and other helper classes
+#### Component-Based UI Architecture
+- `e61cfaa` - Complete component-based UI architecture, implement 24 components
+  - MVP stage (8): ComponentBase, Div, Span, Button, Input, Form, Select, Label
+  - Second stage (6): Accordion, Card, Tabs, Table, Modal, Message
+  - Third stage (5): Calendar, Tree, Chart, FileUpload, RichText
+  - Added Js, Behavior, DomUpdate, and other helper classes
   - 25 files changed, 2666 lines added
 
-- `7449e51` - Improved component system and added new skin themes
-  - Enhanced A, Button, Div, Form, Input and other components
+- `7449e51` - Improve component system and add new skin themes
+  - Enhanced A, Button, Div, Form, Input, and other components
   - Added 3 skin themes: HighContrast, Light, Minimal
   - Updated existing skins (Admin, Chat, Creative, Dev)
-  - InitController componentization migration
+  - InitController component migration
   - 32 files changed, 1466 lines added, 1238 lines deleted
 
-- `1ba8636` - Started InitController componentization migration (in progress)
+- `1ba8636` - Start InitController component migration (in progress)
   - 9 files changed, 574 lines added, 145 lines deleted
 
 #### Storage System Unification
-- `895dff9` - Unified soul.md and state.json to use IStorage interface
+- `895dff9` - Unify soul.md and state.json to use IStorage interface
   - DefaultSiliconBeing uses IStorage to read/write soul files and state
   - Added StateFileManager state file manager
   - SoulFileManager refactored to adapt to IStorage
   - 8 files changed, 201 lines added, 116 lines deleted
 
 #### LiteDB Management Enhancement
-- `a34bef4` - Added LiteDBManager and enhanced tray localization
-  - Added LiteDB management entry to tray menu
-  - Updated tray localization in 9 languages
+- `a34bef4` - Add LiteDBManager and enhance tray localization
+  - Tray menu adds LiteDB management entry
+  - 9-language tray localization updated
   - 10 files changed, 196 lines added
 
-- `c4a79ca` - Added language-aware localization factory for LiteDB management window
+- `c4a79ca` - Add language-aware localization factory for LiteDB management window
   - 1 file changed, 78 lines added
 
-- `5ebc55e` - Converted LiteDBAdminLocalization to abstract base class
+- `5ebc55e` - Convert LiteDBAdminLocalization to abstract base class
   - 10 files changed, 1356 lines added
 
-#### Configuration System Fix
-- `2da5256` - Added ConfigExists abstract method and fixed LiteDB duplicate configuration records
-  - ConfigDataBase added ConfigExists method
-  - Fast version DefaultConfigData implements LiteDB configuration existence check
-  - Fixed LiteDB duplicate configuration key issue
+#### Config System Fix
+- `2da5256` - Add ConfigExists abstract method and fix LiteDB duplicate config records
+  - ConfigDataBase adds ConfigExists method
+  - Fast version DefaultConfigData implements LiteDB config existence check
+  - Fixed LiteDB duplicate config key issue
   - 9 files changed, 210 lines added, 2 lines deleted
 
 #### Chat and View Optimization
-- `d3618ec` - Optimized chat sessions, storage system, time model, and view base classes
-  - BroadcastChannel, GroupChatSession, SingleChatSession optimizations
-  - ITimeStorage added query methods
+- `d3618ec` - Optimize chat sessions, storage system, time model, and view base classes
+  - BroadcastChannel, GroupChatSession, SingleChatSession optimized
+  - ITimeStorage adds query methods
   - FileSystemStorage and LiteDBStorage synchronized updates
-  - ViewBase refactoring optimization (Default and Fast versions)
+  - ViewBase refactored and optimized (Default and Fast versions)
   - 11 files changed, 622 lines added, 392 lines deleted
 
 ### 2026-04-29
 
 #### Architecture Refactoring: Shared Module Extraction
-- `a102428` - Migrated shared modules from SiliconLife.Default to SiliconLife.Common
+- `a102428` - Migrate shared modules from SiliconLife.Default to SiliconLife.Common
   - Extracted 32 calendar implementations to Common project
   - Extracted localization base classes and 21 language implementations to Common project
   - Extracted permission manager and default silicon being implementation to Common project
   - Extracted 23 built-in tool implementations to Common project
   - Extracted Playwright WebView implementation to Common project
-  - Updated namespace to SiliconLife.Collective
+  - Updated namespaces to SiliconLife.Collective
   - 122 files changed, 586 lines added, 343 lines deleted
 
 #### Code Quality Improvement
-- `17566fe` - Replaced Console.WriteLine with logging system in Core, Common, and Default projects
-  - ContextManager, AuditLogger, DefaultConfigData and 6 other files updated
-  - Unified use of ILogger interface, improving code maintainability
+- `17566fe` - Replace Console.WriteLine with logging system in Core, Common, and Default projects
+  - ContextManager, AuditLogger, DefaultConfigData, and 6 other files updated
+  - Unified use of ILogger interface, improved code maintainability
   - 6 files changed, 12 lines added, 8 lines deleted
 
 #### SiliconLife.Fast High-Performance Version
-- `54a0307` - Added SiliconLife.Fast project and completed compilation fixes
+- `54a0307` - Add SiliconLife.Fast project and complete compilation fixes
   - Complete Windows Forms application entry point
   - System tray support (NotifyIcon)
   - Ported all Web UI controllers (20+)
@@ -843,40 +1025,40 @@ Both versions share the same interfaces and functionality, differing only in sto
   - Ported 4 skin themes (Admin, Chat, Creative, Dev)
   - 125 files changed, 61186 lines added
 
-#### Multi-language Documentation Synchronization
-- `265fde8` - Synchronized dual-version architecture documentation to all languages
-  - Updated architecture.md, changelog.md in 7 languages
-  - Updated contributing.md in 6 languages
-  - Updated getting-started.md, roadmap.md in 7 languages
+#### Multi-Language Documentation Sync
+- `265fde8` - Sync dual-version architecture docs to all languages
+  - Updated architecture.md, changelog.md for 7 languages
+  - Updated contributing.md for 6 languages
+  - Updated getting-started.md, roadmap.md for 7 languages
   - 47 files changed, 1214 lines added, 38 lines deleted
 
 #### LiteDB Storage System (Fast Version)
-- `4704862` - Added LiteDB dependencies and infrastructure
+- `4704862` - Add LiteDB dependency and infrastructure
   - Added LiteDBManager management class
-  - Added LiteDBModels data models
+  - Added LiteDBModels data model
   - 3 files changed, 252 lines added
 
-- `4220036` - Implemented LiteDB storage classes
-  - LiteDBStorage: implements IStorage interface
-  - LiteDBTimeStorage: implements ITimeStorage interface
-  - LiteDBWorkNoteStorage: implements IWorkNoteStorage interface
+- `4220036` - Implement LiteDB storage classes
+  - LiteDBStorage: Implements IStorage interface
+  - LiteDBTimeStorage: Implements ITimeStorage interface
+  - LiteDBWorkNoteStorage: Implements IWorkNoteStorage interface
   - 3 files changed, 581 lines added
 
-- `38ebd23` - Migrated configuration and logging system to LiteDB
-  - DefaultConfigData adapted to LiteDB storage
-  - Added LiteDBLoggerProvider logging provider
+- `38ebd23` - Migrate config and logging system to LiteDB
+  - DefaultConfigData adapts to LiteDB storage
+  - Added LiteDBLoggerProvider logger provider
   - 2 files changed, 203 lines added, 67 lines deleted
 
-- `e687157` - Migrated knowledge network from file system to LiteDB
+- `e687157` - Migrate knowledge network from file system to LiteDB
   - KnowledgeNetwork fully refactored, using LiteDB to store triple data
   - 1 file changed, 231 lines added, 72 lines deleted
 
-- `4220169` - Integrated LiteDB storage into Program and ProjectManager
+- `4220169` - Integrate LiteDB storage into Program and ProjectManager
   - Program.cs initializes LiteDB storage
-  - ProjectManager adapted to LiteDB work note storage
+  - ProjectManager adapts to LiteDB work note storage
   - 2 files changed, 40 lines added, 17 lines deleted
 
-- `5f3a709` - Removed deprecated file system storage implementations
+- `5f3a709` - Remove deprecated file system storage implementations
   - Deleted FileSystemLoggerProvider, FileSystemStorage, FileSystemTimeStorage, etc.
   - 6 files changed, 1518 lines deleted
 
@@ -888,311 +1070,311 @@ Both versions share the same interfaces and functionality, differing only in sto
 ### 2026-04-28
 
 #### Storage System Refactoring
-- `8dd26e3` - Unified ITimeStorage interface to use IncompleteDate and added hierarchical query API
+- `8dd26e3` - Unify ITimeStorage interface to use IncompleteDate and add hierarchical query API
   - Removed DateTime overload methods from ITimeStorage interface, unified to use IncompleteDate
-  - Added CompareTo(DateTime) comparison method and Expand() expansion method to IncompleteDate
+  - IncompleteDate adds CompareTo(DateTime) comparison method and Expand() expansion method
   - Added GetEarliestTimestamp(), GetLatestTimestamp() hierarchical query API
-  - Added HasSummary() and QueryWithLevel() methods, supporting queries by time level
-  - Memory.cs refactored compression algorithm, using new hierarchical query API to improve efficiency
+  - Added HasSummary() and QueryWithLevel() methods, supporting time-level-based queries
+  - Memory.cs refactored compression algorithm, using new hierarchical query API for improved efficiency
   - FileSystemTimeStorage.cs fully implements new interface methods
-  - Synchronized updates to all callers: ChatSystem, ChatSession, BroadcastChannel, AuditLogger, TokenUsageRecord, etc.
-  - Tool system updates: HelpTool, LogTool, TokenAuditTool adapted to new interface
-  - Web controller updates: AuditController, ChatController, ChatHistoryController adapted to new interface
+  - Synchronized all callers: ChatSystem, ChatSession, BroadcastChannel, AuditLogger, TokenUsageRecord, etc.
+  - Tool system updated: HelpTool, LogTool, TokenAuditTool adapted to new interface
+  - Web controllers updated: AuditController, ChatController, ChatHistoryController adapted to new interface
   - 41 files changed, 1820 lines added, 903 lines deleted
 
 ### 2026-04-27
 
 #### Help Documentation System Enhancement
-- `9989d79` - Updated localization, help system, and web views
+- `9989d79` - Update localization, help system, and web views
   - Added IAIClientFactoryHelp.cs AI client factory help documentation interface
   - Completed 9-language translation for all help documents
-  - HelpTopics.cs added 40 help topic definitions
-  - Web views comprehensively updated: InitController, AuditView, ConfigView, KnowledgeView, LogView, etc.
-  - Localization system enhancement: all language versions added new localization keys
-  - AI client factory updates: DashScopeClientFactory, OllamaClientFactory improvements
+  - HelpTopics.cs adds 40 help topic definitions
+  - Web views fully updated: InitController, AuditView, ConfigView, KnowledgeView, LogView, etc.
+  - Localization system enhanced: all language versions add new localization keys
+  - AI client factory updated: DashScopeClientFactory, OllamaClientFactory improvements
   - 30 files changed, 10086 lines added, 15 lines deleted
 
 #### Help Documentation New Content
-- `e7afe94` - Added soul file and audit log help documentation
+- `e7afe94` - Add soul file and audit log help documentation
   - Added soul file management help documentation
   - Added audit log help documentation
-  - HelpTopics.cs added topic definitions
+  - HelpTopics.cs adds topic definitions
   - HelpView.cs significantly refactored, improved document rendering logic
   - PermissionView.cs refactored, improved permission management interface
-  - Core module enhancement: SiliconBeingManager, TaskSystem, ToolManager improvements
+  - Core modules enhanced: SiliconBeingManager, TaskSystem, ToolManager improvements
   - TaskTool.cs refactored, improved task management functionality
-  - Web views comprehensively updated: all view components synchronized
+  - Web views fully updated: all view components synchronized updates
   - HelpController.cs simplified, optimized controller logic
   - 30 files changed, 7100 lines added, 897 lines deleted
 
 ### 2026-04-26
 
 #### Help Documentation System
-- `07895d7` - Enhanced help documentation system, added 3 documents and completed 9-language translation
-  - Added memory system, Ollama installation configuration, Alibaba Cloud DashScope platform usage guide
+- `07895d7` - Enhance help documentation system, add 3 documents and complete 9-language translation
+  - Added memory system, Ollama installation configuration, and Alibaba Cloud Bailian platform usage guides
   - Completed 9-language translation for all 10 help documents
   - Simplified HelpView rendering logic
   - 18 files changed, 14418 lines added, 1364 lines deleted
 
 #### German Localization
-- `0cfd8a1` - Added complete German (de-DE) localization support
+- `0cfd8a1` - Add complete German (de-DE) localization support
   - Complete German localization files
   - Added Chinese historical calendar German support
-  - Added help documentation German translation
-  - Fully synchronized all documents in 9 languages
+  - Added help document German translation
+  - Fully synchronized all documents for 9 languages
   - 135 files changed, 26186 lines added, 14371 lines deleted
 
-#### Documentation Synchronization
-- `3aada7d` - Synchronized Traditional Chinese (zh-HK) documentation with Simplified Chinese
+#### Documentation Sync
+- `3aada7d` - Sync Traditional Chinese (zh-HK) documentation with Simplified Chinese
   - 3 files changed, 519 lines added, 422 lines deleted
-- `2f6abff` - Added help tool display name localization for all languages
+- `2f6abff` - Add help tool display name localization for all languages
   - 7 files changed, 47 lines added, 7 lines deleted
 
 #### Knowledge System Refactoring
-- `60944fe` - Unified namespace to SiliconLife.Collective
+- `60944fe` - Unify namespace to SiliconLife.Collective
   - 8 files changed, 5 lines added, 8 lines deleted
-- `69c51c5` - Added help documentation system and translated code comments to English
+- `69c51c5` - Add help documentation system and translate code comments to English
   - 29 files changed, 3385 lines added, 22 lines deleted
 
 ### 2026-04-25
 
 #### WebView Browser Automation
-- `41757c3` - Implemented cross-platform WebView browser automation based on Playwright
+- `41757c3` - Implement Playwright-based cross-platform WebView browser automation
   - 6 files changed, 1152 lines added
 
-#### Documentation Updates
-- `0ff797b` - Added KnowledgeTool and WorkNoteTool documentation (7 languages)
+#### Documentation Update
+- `0ff797b` - Add KnowledgeTool and WorkNoteTool documentation (7 languages)
   - 28 files changed, 4983 lines added
-- `ad77415` - Updated all changelog files, added 2026-04-25 Git history
+- `ad77415` - Update all changelog files, add 2026-04-25 Git history records
   - 7 files changed, 168 lines added
 
 #### Project Workspace Management
-- `785c551` - Implemented project workspace management with work notes and task system
+- `785c551` - Implement project workspace management, including work notes and task system
   - Added project workspace management system
-  - Work notes functionality for tracking project progress
+  - Work note functionality for tracking project progress
   - Task management system integration
   - 29 files changed, 4256 lines added, 36 lines deleted
 
 #### Czech Localization
-- `b4bbf39` - Added complete Czech (cs-CZ) localization and updated all language documentation
+- `b4bbf39` - Add complete Czech (cs-CZ) localization and update all language documentation
   - 116 files changed, 4933 lines added, 222 lines deleted
-- `faf078f` - Fixed Czech localization compilation errors
+- `faf078f` - Fix Czech localization compilation error
   - 3 files changed, 910 lines added, 1 line deleted
 
 #### Knowledge System Enhancement
-- `20adaac` - Added KnowledgeTool with full localization support
+- `20adaac` - Add KnowledgeTool and support complete localization
   - 34 files changed, 2331 lines added, 56 lines deleted
 
 ### 2026-04-24
 
-#### Memory Management Enhancement
-- `c7b2ecc` - Enhanced memory management with advanced filtering, statistics, and detail views
-  - Added advanced memory filtering
-  - Implemented memory statistics
+#### Memory Management System Enhancement
+- `c7b2ecc` - Enhance memory management features, add advanced filtering, statistics, and detail view functionality
+  - Added memory advanced filtering functionality
+  - Implemented memory statistics functionality
   - Added memory detail view page
   - Multi-language localization support (6 languages)
   - 13 files changed, 840 lines added, 86 lines deleted
 
 #### Permission System Extension
-- `4489ad6` - Added wttr.in weather service to network whitelist
-  - Complete multi-language documentation synchronization (6 languages)
+- `4489ad6` - Add wttr.in weather service to network whitelist
+  - Complete multi-language documentation synchronized updates (6 languages)
   - 14 files changed, 417 lines added, 1 line deleted
 
-#### Web Interface Fixes
-- `d9d72e9` - Fixed work note detail modal CSS priority issue
+#### Web Interface Fix
+- `d9d72e9` - Fix work note detail modal CSS priority issue
   - 19 files changed, 1744 lines added, 6 lines deleted
 
 #### Chat History Optimization
-- `0df599c` - Fixed tool results being rendered as separate chat messages
+- `0df599c` - Fix tool results being rendered as independent chat messages
   - 1 file changed, 222 lines added, 21 lines deleted
-- `057b09d` - Optimized chat history detail display, improved tool call rendering
+- `057b09d` - Optimize chat history detail display, improve tool call rendering
   - 3 files changed, 389 lines added, 68 lines deleted
 
 #### Timer Execution History
-- `fa3f06f` - Added timer execution history feature with detail view
+- `fa3f06f` - Add timer execution history functionality, including detail view
   - 8 files changed, 937 lines added, 10 lines deleted
-- `d824835` - Added timer execution history localization keys (all languages)
+- `d824835` - Add timer execution history localization keys (all languages)
   - 7 files changed, 88 lines added
 
 #### Localization Enhancement
-- `c13cb17` - Registered Spanish language variant
+- `c13cb17` - Register Spanish language variant
   - 1 file changed, 4 lines added
-- `9c44f34` - Added Chinese historical calendar multi-language localization support
+- `9c44f34` - Add Chinese historical calendar multi-language localization support
   - 16 files changed, 6049 lines added, 1 line deleted
 
-#### Core Functionality Improvements
-- `1e7c7b2` - Improved memory compression and tool execution tracking
+#### Core Functionality Improvement
+- `1e7c7b2` - Improve memory compression and tool execution tracking
   - 4 files changed, 338 lines added, 86 lines deleted
 
 ### 2026-04-23
 
 #### Tool Localization
-- `192fc6e` - Added missing tool name localization for 5 tools
+- `192fc6e` - Add missing tool name localization for 5 tools
   - 6 files changed, 30 lines added
 
-#### Documentation Updates
-- `882c08f` - Updated all changelog files, added complete Git history and removed fake version numbers
+#### Documentation Update
+- `882c08f` - Update all changelog files, add complete Git history records and remove fake version numbers
   - 45 files changed, 8815 lines added, 1611 lines deleted
 
 #### Chat Page Enhancement
-- `65c157b` - Added loading indicator to chat page and auto-selected curator session
+- `65c157b` - Add loading indicator to chat page and auto-select curator session
   - 10 files changed, 211 lines added, 7 lines deleted
 
 #### Chat History Feature
-- `e483348` - Implemented silicon being chat history viewing feature
+- `e483348` - Implement silicon being chat history viewing functionality
   - Added ChatHistoryController
   - Created ChatHistoryViewModel
   - Implemented ChatHistoryListView and ChatHistoryDetailView pages
-  - Added localization keys for chat history (5 languages)
+  - Added chat history localization keys (5 languages)
   - 12 files changed, 1178 lines added
 
 #### AI Flow Control Enhancement
-- `30a2d4e` - Enhanced AI flow cancellation, IM integration, and core host initialization
+- `30a2d4e` - Enhance AI flow cancellation, IM integration, and core host initialization
   - 11 files changed, 387 lines added, 12 lines deleted
 
 #### Chat Message Queue
-- `db48c51` - Added chat message queue, file metadata, and stream cancellation support
+- `db48c51` - Add chat message queue, file metadata, and stream cancellation support
   - 4 files changed, 357 lines added
 
 #### File Upload Support
-- `28fb344` - Implemented file source dialog and file upload support
+- `28fb344` - Implement file source dialog and file upload support
   - 3 files changed, 1100 lines added, 2 lines deleted
-- `1d3e2cc` - Added file source dialog localization strings (6 languages)
+- `1d3e2cc` - Add file source dialog localization strings (6 languages)
   - 6 files changed, 30 lines added
 
-#### Documentation Updates
-- `8111e92` - Added Wiki link to README repository section
+#### Documentation Update
+- `8111e92` - Add Wiki link to README repository section
   - 1 file changed, 3 lines added, 1 line deleted
 
 ### 2026-04-22
 
 #### Documentation Localization
-- `66c11eb` - Translated Chinese comments to English and updated all changelogs
+- `66c11eb` - Translate Chinese comments to English and update all changelogs
   - 11 files changed, 373 lines added, 163 lines deleted
 
 #### SSE Message Enhancement
-- `b574b2b` - Added senderName to historical messages for AI identification
+- `b574b2b` - Add senderName to history messages for AI identification
   - 1 file changed, 9 lines added
 
-#### Chat Features
-- `601fc14` - Added mark_read action for session end marking
+#### Chat Functionality
+- `601fc14` - Add mark_read action for session end marking
   - 7 files changed, 196 lines added, 36 lines deleted
 
 #### Tool System Optimization
-- `7a03a19` - Improved LogTool conversation query flexibility
+- `7a03a19` - Improve LogTool conversation query flexibility
   - 1 file changed, 57 lines added, 24 lines deleted
 
 #### Localization Enhancement
-- `0a8d750` - Added common system prompt for active silicon being behaviors
+- `0a8d750` - Add proactive silicon being behavior universal system prompt
   - 8 files changed, 460 lines added, 48 lines deleted
 
-#### Log System Refactoring
-- `2b771f3` - Decoupled LogController from file I/O, added log read API
+#### Logging System Refactoring
+- `2b771f3` - Decouple LogController from file I/O, add log reading API
   - 4 files changed, 172 lines added, 137 lines deleted
-- `12da302` - Added silicon being filter to log view
+- `12da302` - Add silicon being filter to log view
   - 9 files changed, 147 lines added, 10 lines deleted
-- `8f6cb1e` - Added beingId parameter to ILogger interface, implemented system/silicon being log separation
+- `8f6cb1e` - Add beingId parameter to ILogger interface, implement system/silicon being log separation
   - 47 files changed, 524 lines added, 490 lines deleted
 
-#### Permission System Improvements
-- `4c747ad` - Refactored PermissionTool, ExecuteCodeTool, added EvaluatePermission API
+#### Permission System Improvement
+- `4c747ad` - Refactor PermissionTool, ExecuteCodeTool, add EvaluatePermission API
   - 18 files changed, 680 lines added, 492 lines deleted
 
 #### Bug Fixes
-- `1c96e99` - Fixed search_files and search_content root directory search failure
+- `1c96e99` - Fix search_files and search_content root directory search failure
   - 1 file changed, 98 lines added, 41 lines deleted
 
 #### Tool Integration
-- `135710d` - Removed SearchTool, moved local search to DiskTool
+- `135710d` - Remove SearchTool, move local search to DiskTool
   - 2 files changed, 185 lines added, 365 lines deleted
 
 #### Tool System Extension
-- `70ce7fb` - Implemented DatabaseTool for structured database queries
+- `70ce7fb` - Implement DatabaseTool for structured database queries
   - 1 file changed, 382 lines added
-- `be29a09` - Implemented LogTool for operation and conversation history queries
+- `be29a09` - Implement LogTool for operation and conversation history queries
   - 1 file changed, 298 lines added
-- `4ea7702` - Implemented PermissionTool for dynamic permission management
+- `4ea7702` - Implement PermissionTool for dynamic permission management
   - 1 file changed, 457 lines added
-- `1384ff4` - Implemented ExecuteCodeTool for multi-language code execution
+- `1384ff4` - Implement ExecuteCodeTool for multi-language code execution
   - 1 file changed, 477 lines added
-- `82d1e11` - Implemented SearchTool for information retrieval
+- `82d1e11` - Implement SearchTool for information retrieval
   - 1 file changed, 363 lines added
 
 #### Web Interface Optimization
-- `0675c45` - Optimized markdown code block highlighting in preview pane
+- `0675c45` - Optimize markdown code block highlighting in preview pane
   - 1 file changed, 4 lines added, 23 lines deleted
-- `702b3f3` - Enhanced task view with status badges and metadata display
+- `702b3f3` - Enhance task view, add status badges and metadata display
   - 8 files changed, 221 lines added, 9 lines deleted
-- `6ed9a79` - Improved chat message storage and view rendering
+- `6ed9a79` - Improve chat message storage and view rendering
   - 8 files changed, 140 lines added, 29 lines deleted
 
 ### 2026-04-21
 
 #### Bug Fixes
-- `c6b518b` - Fixed timer message delivery and chat message storage
+- `c6b518b` - Fix timer message passing and chat message storage
   - 3 files changed, 297 lines added, 124 lines deleted
 
 #### Configuration Management
-- `4305769` - Added .gitattributes for line ending management
+- `4305769` - Add .gitattributes for line ending management
   - 1 file changed, 32 lines added
 
-#### Web Interface Improvements
-- `188c6f8` - Registered task list API route and added empty state display
+#### Web Interface Improvement
+- `188c6f8` - Register task list API route and add empty state display
   - 2 files changed, 35 lines added, 2 lines deleted
-- `634e8ca` - Added permission page return to list link
+- `634e8ca` - Add return to list link on permission page
   - 1 file changed, 16 lines added
-- `6ba591d` - Added independent AI configuration editor for silicon beings
+- `6ba591d` - Add standalone AI config editor for silicon beings
   - 11 files changed, 842 lines added, 18 lines deleted
-- `0a826f5` - Added save success prompt in code editor
+- `0a826f5` - Add save success notification in code editor
   - 1 file changed, 9 lines added, 2 lines deleted
-- `2940373` - Enhanced web interface with code hover hints and UI improvements
+- `2940373` - Enhance Web interface, add code hover tooltips and UI improvements
   - 11 files changed, 1054 lines added, 75 lines deleted
 
-#### Permission System Fixes
-- `592c7ab` - Fixed callback instantiation and registration order
+#### Permission System Fix
+- `592c7ab` - Fix callback instantiation and registration order
   - 2 files changed, 38 lines added, 7 lines deleted
 
 #### Security Enhancement
-- `833ead2` - Added assembly reference verification for dynamic compilation
+- `833ead2` - Add assembly reference validation for dynamic compilation
   - 4 files changed, 135 lines added, 8 lines deleted
 
 #### Permission System Enhancement
-- `5879621` - Added permission callback pre-compilation verification and enhanced error handling
+- `5879621` - Add permission callback pre-compilation validation and enhanced error handling
   - 21 files changed, 617 lines added, 26 lines deleted
 
-#### Documentation Updates
-- `4dbf659` - Updated changelog to v0.5.1, replaced GitHub placeholder URLs, added Gitee mirror, localized Bilibili name by language, updated email
+#### Documentation Update
+- `4dbf659` - Update changelog to v0.5.1, replace GitHub placeholder URLs, add Gitee mirror, localize Bilibili name by language, update email
   - 32 files changed, 489 lines added, 180 lines deleted
 
 #### Configuration and Entry
-- `0fc1693` - Updated program entry and project configuration
+- `0fc1693` - Update program entry and project configuration
   - 2 files changed, 7 lines added
 
 #### Permission System Refactoring
-- `ea9179a` - Improved permission system implementation
+- `ea9179a` - Improve permission system implementation
   - 5 files changed, 358 lines added, 152 lines deleted
 
 #### Bug Fixes
-- `928a96d` - Fixed calendar calculation implementation
+- `928a96d` - Fix calendar calculation implementation
   - 4 files changed, 12 lines added, 12 lines deleted
 
 #### AI and Calendar
-- `646813e` - Improved AI client factory implementation
+- `646813e` - Improve AI client factory implementation
   - 2 files changed, 21 lines added, 20 lines deleted
 
 #### Localization
-- `7940d9c` - Added Korean localization support
+- `7940d9c` - Add Korean localization support
   - 7 files changed, 2424 lines added, 10 lines deleted
-- `4ff98ad` - Refactored documentation for multi-language support
+- `4ff98ad` - Refactor documentation to support multiple languages
   - 81 files changed, 23818 lines added, 1886 lines deleted
 
 ### 2026-04-20
 
 #### Core Functionality Completion
-- `28905b5` - Complete multi-language support, AI client factory, permission system, and localization setup
-  - Log system with manager, entries, and different log levels
-  - Token audit system for querying and tracking token usage
-  - AI client factories for auto-discovering different AI platforms
+- `28905b5` - Complete multi-language support, AI client factory, permission system, and localization settings
+  - Logging system with managers, entries, and different log levels
+  - Token Usage Audit system for querying and tracking token usage
+  - AI client factory for auto-discovering different AI platforms
   - Permission callback system with its own storage
   - Console logger implementation
   - Multi-language support for English and Simplified Chinese
@@ -1203,12 +1385,12 @@ Both versions share the same interfaces and functionality, differing only in sto
 ### 2026-04-19
 
 #### Timer and Calendar
-- `c933fd8` - Updated localization, timer system, web views, and added tools
+- `c933fd8` - Update localization, timer system, web views, and add tools
   - Better localization manager
-  - Scheduling system for timed tasks
+  - Scheduled task system for timed tasks
   - AI configuration and context management
   - Calendar tool supporting 32 calendar types
-  - Web controller for calendar APIs
+  - Web controller for calendar API
   - Task management tool
   - 46 files changed, 4018 lines added, 975 lines deleted
 
@@ -1218,7 +1400,7 @@ Both versions share the same interfaces and functionality, differing only in sto
 
 ### 2026-04-18
 
-- `9f585e1` - Updated localization, timer system, web views, and added tools
+- `9f585e1` - Update localization, timer system, web views, and add tools
   - Timer and scheduling improvements
   - Better web views with improved UI components
   - More tool implementations
@@ -1226,25 +1408,25 @@ Both versions share the same interfaces and functionality, differing only in sto
 
 ### 2026-04-17
 
-- `9b71fcd` - Updated core modules, added zh-HK documentation, broadcast channel, config tools, and audit web views
-  - Broadcast channel for multiple silicon beings chatting together
-  - Configuration tool system
-  - Audit web views
+- `9b71fcd` - Update core modules, add zh-HK docs, broadcast channel, config tool, and audit web view
+  - Broadcast channel for multiple silicon beings to chat together
+  - Config tool system
+  - Audit web view
   - Traditional Chinese documentation
   - 42 files changed, 3533 lines added, 268 lines deleted
 
 ### 2026-04-16
 
-- `5040f05` - Updated core and default modules
+- `5040f05` - Update core and default modules
   - Module optimization and bug fixes
   - Implementation updates and improvements
   - 58 files changed, 9916 lines added, 111 lines deleted
 
 ### 2026-04-15
 
-- `3efab5f` - Updated multiple modules: AI, Chat, IM, Tools, Web, Localization, Storage
+- `3efab5f` - Update multiple modules: AI, Chat, IM, Tools, Web, Localization, Storage
   - AI client improvements
-  - Chat system enhancement
+  - Chat system enhancements
   - Messenger provider updates
   - Tool system optimization
   - Web infrastructure improvements
@@ -1254,46 +1436,46 @@ Both versions share the same interfaces and functionality, differing only in sto
 
 ### 2026-04-14
 
-- `4241a2f` - Chat features basically complete, UI upload optimization
-  - Chat system functionality completed
-  - UI optimization for file uploads
+- `4241a2f` - Chat functionality basically complete, UI upload optimization
+  - Chat system functionality complete
+  - File upload UI optimization
   - 16 files changed, 1234 lines added, 102 lines deleted
 
 ### 2026-04-13
 
 - `c498c31` - Code updates
-  - General code improvements and optimization
+  - General code improvements and optimizations
   - 32 files changed, 1045 lines added, 546 lines deleted
 
 ### 2026-04-12
 
 #### Documentation and Localization
-- `2161002` - Refactored documentation and enhanced localization
+- `2161002` - Refactor documentation and enhance localization
   - 17 files changed, 982 lines added, 92 lines deleted
-- `03d94e4` - Enhanced configuration system and localization
+- `03d94e4` - Enhance configuration system and localization
   - 25 files changed, 1378 lines added, 154 lines deleted
-- `9976a35` - Added about page and localization
+- `9976a35` - Add about page and localization
   - 14 files changed, 699 lines added, 44 lines deleted
 
 #### Chat and Web Views
-- `0c8ccfc` - Enhanced chat system, localization, and web views
+- `0c8ccfc` - Enhance chat system, localization, and web views
   - 13 files changed, 402 lines added, 56 lines deleted
-- `a8f1342` - Redesigned web communication layer, switched from WebSocket to SSE
+- `a8f1342` - Redesign web communication layer, switch from WebSocket to SSE
   - 27 files changed, 793 lines added, 935 lines deleted
 
 ### 2026-04-11
 
-#### Log System
-- `e8fe259` - Added log system and code optimization
+#### Logging System
+- `e8fe259` - Add logging system and code optimization
   - 37 files changed, 624 lines added, 91 lines deleted
-- `f01c519` - Added log system, updated AI interface and web views
+- `f01c519` - Add logging system, update AI interface and web views
   - 31 files changed, 1758 lines added, 63 lines deleted
 
 ### 2026-04-10
 
-- `4962924` - Enhanced WebSocket handler, chat views, and messenger interaction
+- `4962924` - Enhance WebSocket handler, chat view, and messenger interaction
   - Context manager improvements
-  - Chat system enhancement
+  - Chat system enhancements
   - Messenger provider interface updates
   - WebUI provider redesign
   - JavaScript builder and router updates
@@ -1303,9 +1485,9 @@ Both versions share the same interfaces and functionality, differing only in sto
 
 ### 2026-04-09
 
-- `f9302bf` - Enhanced messenger provider interface, chat system, and web UI interaction
+- `f9302bf` - Enhance messenger provider interface, chat system, and web UI interaction
   - Messenger provider interface extension
-  - Chat messages and system improvements
+  - Chat message and system improvements
   - Context manager optimization
   - Default silicon being enhancement
   - Web UI chat view improvements
@@ -1314,7 +1496,7 @@ Both versions share the same interfaces and functionality, differing only in sto
 
 ### 2026-04-07
 
-- `6831ee8` - Redesigned web views and JavaScript builder
+- `6831ee8` - Redesign web views and JavaScript builder
   - Complete web controller redesign
   - JavaScript builder complete rewrite
   - All view components updated
@@ -1324,56 +1506,56 @@ Both versions share the same interfaces and functionality, differing only in sto
 
 ### 2026-04-05
 
-- `41e97fb` - Updated multiple core modules and web controllers
+- `41e97fb` - Update multiple core modules and web controllers
   - Context manager improvements
   - Chat system and session management
   - Service locator redesign
   - Silicon being base class and manager updates
-  - Web controllers comprehensively updated (17 controllers)
+  - Comprehensive web controller updates (17 controllers)
   - Default silicon being factory improvements
   - 31 files changed, 681 lines added, 326 lines deleted
-- `67988d4` - Improved web UI module, added executor view, cleaned up views and core modules
+- `67988d4` - Improve web UI module, add executor view, clean up views and core modules
   - 61 files changed, 3148 lines added, 3726 lines deleted
 
 ### 2026-04-04
 
-- `b58bb1c` - Added initialization controller and redesigned web module
+- `b58bb1c` - Add initialization controller and redesign web module
   - Initialization controller
-  - Configuration module redesign
-  - Localization module updates
+  - Config module redesign
+  - Localization module update
   - Skin system improvements
-  - Router enhancement
+  - Router enhancements
   - 29 files changed, 1269 lines added, 289 lines deleted
-- `f03ac0b` - Added web UI module, improved messenger functionality
+- `f03ac0b` - Add web UI module, improve messenger functionality
   - 60 files changed, 8481 lines added, 165 lines deleted
 
 ### 2026-04-03
 
-- `192e57b` - Updated project structure and core runtime components
+- `192e57b` - Update project structure and core runtime components
   - 22 files changed, 446 lines added, 179 lines deleted
 - `59faec8` - Core and default implementation updates
   - 25 files changed, 3056 lines added, 18 lines deleted
-- `d488485` - Added dynamic compilation functionality and curator tool module
+- `d488485` - Add dynamic compilation functionality and curator tool module
   - 19 files changed, 1727 lines added, 11 lines deleted
-- `753d1d9` - Added security module, updated executors, messenger providers, localization, and tools
+- `753d1d9` - Add security module, update executors, messenger providers, localization, and tools
   - 29 files changed, 2352 lines added, 93 lines deleted
-- `a378697` - Completed stage 5 - tool system + executors
+- `a378697` - Complete phase 5 - tool system + executors
   - 41 files changed, 2651 lines added, 363 lines deleted
 
 ### 2026-04-02
 
-- `e6ad94b` - Fixed chat history loading failure when deleting configuration files during testing
+- `e6ad94b` - Fix chat history loading failure when config file is deleted during testing
   - 4 files changed, 49 lines added, 45 lines deleted
-- `daa56f5` - Completed stage 4: persistent memory (chat system + messenger channel)
+- `daa56f5` - Complete phase 4: persistent memory (chat system + messenger channels)
   - 29 files changed, 2051 lines added, 538 lines deleted
 
 ### 2026-04-01
 
-- `bbe2dbb` - Fixed configuration loading and chat service message routing
+- `bbe2dbb` - Fix config loading and chat service message routing
   - 27 files changed, 1633 lines added, 147 lines deleted
-- `2fa6305` - Implemented stage 2: main loop framework and clock object system
+- `2fa6305` - Implement phase 2: main loop framework and tick object system
   - 9 files changed, 594 lines added, 41 lines deleted
-- `32b99a1` - Implemented stage 1 - basic chat functionality
+- `32b99a1` - Implement phase 1 - basic chat functionality
   - 19 files changed, 1185 lines added
 - `358e368` - Initial commit: project documentation and license
   - 10 files changed, 1873 lines added

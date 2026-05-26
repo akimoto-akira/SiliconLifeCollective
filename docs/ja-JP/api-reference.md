@@ -1,6 +1,6 @@
-﻿# API リファレンス
+# API リファレンス
 
-> **バージョン: v0.2.0-alpha**
+> **バージョン：v0.2.0-alpha**
 
 [English](../en/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | **日本語** | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md) | [Русский](../ru-RU/api-reference.md)
 
@@ -20,7 +20,7 @@
 
 **GET** `/api/dashboard/stats`
 
-システム概要データ（生命体数、稼働状況など）を返します。
+システム概要データ（ビーイング数、稼働状況など）を返します。
 
 ### パフォーマンスメトリクスを取得
 
@@ -132,17 +132,17 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ## シリコンビーイング管理
 
-### 生命体管理ページ
+### ビーイング管理ページ
 
 **GET** `/beings`
 
-シリコン生命体管理インターフェースのページを返します。
+シリコンビーイング管理インターフェースのページを返します。
 
-### 生命体リストを取得
+### ビーイングリストを取得
 
 **GET** `/api/beings` または **GET** `/api/beings/list`
 
-すべての登録済みシリコン生命体のリストを返します。
+すべての登録済みシリコンビーイングのリストを返します。
 
 **レスポンス例**：
 ```json
@@ -160,19 +160,19 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **ステータス値**：`idle` | `running` | `waiting_permission` | `stopped`
 
-### 生命体詳細を取得
+### ビーイング詳細を取得
 
 **GET** `/api/beings/detail`
 
-クエリパラメータ：`beingId` — 生命体 ID
+クエリパラメータ：`beingId` — ビーイング ID
 
-指定された生命体の詳細情報を返します。
+指定されたビーイングの詳細情報を返します。
 
-### 生命体活動状態を取得
+### ビーイング活動状態を取得
 
 **GET** `/api/beings/activity`
 
-各生命体の活動状態情報を返します。
+各ビーイングの活動状態情報を返します。
 
 ### ソウルファイルエディタページ
 
@@ -243,7 +243,7 @@ AI 設定エディタインターフェースを返します。
 
 **GET** `/group-chat-history-detail`
 
-グループチャットの履歴詳細ページを返します。
+グループチャットセッションの履歴詳細ページを返します。
 
 ### ブロードキャスト履歴詳細ページ
 
@@ -355,95 +355,69 @@ AI 設定エディタインターフェースを返します。
 
 ---
 
-## 権限システム
+## パーミッションシステム
 
-### 権限管理ページ
+### パーミッション管理ページ
 
 **GET** `/permissions`
 
-権限管理インターフェースのページを返します。
+パーミッション管理インターフェースのページを返します。
 
-### 権限ルールリストを取得
+### パーミッションルールリストを取得
 
-**GET** `/api/permissions`
+**GET** `/api/permissions/list`
 
-現在設定されているすべての権限ルールを返します。
+現在設定されているすべてのパーミッションルールを返します。
 
 **レスポンス例**：
 ```json
 {
   "rules": [
     {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
+      "permissionType": "NetworkAccess",
+      "resourcePrefix": "api.github.com",
+      "result": "Allowed",
+      "description": "Allow GitHub API access"
     }
   ]
 }
 ```
 
-### 権限ルールを保存
+### パーミッションルールを保存
 
-**POST** `/api/permissions`
-
-**リクエストボディ**：
-```json
-{
-  "userId": "user-uuid",
-  "resource": "disk:write",
-  "allowed": true,
-  "duration": 3600
-}
-```
-
-### 権限ルールを削除
-
-**DELETE** `/api/permissions/{id}`
-
-指定された権限ルールを削除します。
-
-### 権限をチェック
-
-**POST** `/api/permissions/check`
+**POST** `/api/permissions/save`
 
 **リクエストボディ**：
 ```json
 {
-  "userId": "user-uuid",
-  "resource": "network:http"
+  "permissionType": "FileAccess",
+  "resourcePrefix": "C:\\Projects",
+  "result": "Allowed",
+  "description": "Allow project directory access"
 }
 ```
 
-**レスポンス**：
-```json
-{
-  "allowed": true,
-  "reason": "Granted by curator"
-}
-```
-
-### 権限リクエストページ
+### パーミッションリクエストページ
 
 **GET** `/permission/request`
 
-権限リクエストページを表示し、ユーザーがシリコン生命体の権限リクエストを承認または拒否できるようにします。
+パーミッションリクエストページを表示し、ユーザーがシリコンビーイングのパーミッションリクエストを承認または拒否できるようにします。
 
 **クエリパラメータ**：
 
-|| パラメータ | タイプ | 説明 |
-||------|------|------|
-|| `userId` | `Guid` | 権限をリクエストするシリコン生命体 ID |
-|| `type` | `string` | 権限タイプ |
-|| `resource` | `string` | リクエストするリソースパス |
-|| `allowCode` | `string` | 許可操作のコード識別子 |
-|| `denyCode` | `string` | 拒否操作のコード識別子 |
+| パラメータ | タイプ | 説明 |
+|------|------|------|
+| `userId` | `Guid` | パーミッションをリクエストするシリコンビーイング ID |
+| `type` | `string` | パーミッションタイプ |
+| `resource` | `string` | リクエストするリソースパス |
+| `allowCode` | `string` | 許可操作のコード識別子 |
+| `denyCode` | `string` | 拒否操作のコード識別子 |
 
-### 保留中の権限リクエストを確認
+### 保留中のパーミッションリクエストを確認
 
 **GET** `/permission/check`
 
-クエリパラメータ：`userId` — シリコン生命体 ID
+クエリパラメータ：`userId` — シリコンビーイング ID
 
 **レスポンス**：
 ```json
@@ -452,18 +426,18 @@ AI 設定エディタインターフェースを返します。
 }
 ```
 
-### 権限リクエストに応答
+### パーミッションリクエストに応答
 
 **GET** `/permission/respond`
 
 **クエリパラメータ**：
 
-|| パラメータ | タイプ | 説明 |
-||------|------|------|
-|| `userId` | `Guid` | シリコン生命体 ID |
-|| `allowed` | `bool` | 許可するかどうか |
-|| `addToCache` | `bool` | 決定をキャッシュするかどうか |
-|| `cacheDuration` | `double` | キャッシュ期間（時間） |
+| パラメータ | タイプ | 説明 |
+|------|------|------|
+| `userId` | `Guid` | シリコンビーイング ID |
+| `allowed` | `bool` | 許可するかどうか |
+| `addToCache` | `bool` | 決定をキャッシュするかどうか |
+| `cacheDuration` | `double` | キャッシュ期間（時間） |
 
 **レスポンス**：
 ```json
@@ -474,7 +448,7 @@ AI 設定エディタインターフェースを返します。
 
 ---
 
-## ログシステム
+## ロギングシステム
 
 ### ログページ
 
@@ -502,11 +476,11 @@ AI 設定エディタインターフェースを返します。
 }
 ```
 
-### 生命体別ロググループを取得
+### ビーイング別ロググループを取得
 
 **GET** `/api/logs/beings`
 
-シリコン生命体別にグループ化されたログ統計を返します。
+シリコンビーイング別にグループ化されたログ統計を返します。
 
 ### 利用可能なログレベルを取得
 
@@ -566,11 +540,11 @@ AI 設定エディタインターフェースを返します。
 
 監査データの集計統計を返します。
 
-### 生命体別監査グループを取得
+### ビーイング別監査グループを取得
 
 **GET** `/api/audit/beings`
 
-シリコン生命体別にグループ化された監査統計を返します。
+シリコンビーイング別にグループ化された監査統計を返します。
 
 ---
 
@@ -625,7 +599,7 @@ AI 設定エディタインターフェースを返します。
 
 **GET** `/api/memory/list`
 
-シリコン生命体のメモリエントリリストを返します。
+シリコンビーイングのメモリエントリリストを返します。
 
 ### メモリ詳細を取得
 
@@ -649,11 +623,11 @@ AI 設定エディタインターフェースを返します。
 
 一致するメモリエントリを検索します。
 
-### 生命体別メモリグループを取得
+### ビーイング別メモリグループを取得
 
 **GET** `/api/memory/beings`
 
-シリコン生命体別にグループ化されたメモリ統計を返します。
+シリコンビーイング別にグループ化されたメモリ統計を返します。
 
 ### メモリトレースを取得
 
@@ -671,21 +645,21 @@ AI 設定エディタインターフェースを返します。
 
 ---
 
-## 作業ノート
+## ワークノート
 
-### 作業ノートページ
+### ワークノートページ
 
 **GET** `/work-notes`
 
-作業ノートインターフェースのページを返します。
+ワークノートインターフェースのページを返します。
 
-### 作業ノートリストを取得
+### ワークノートリストを取得
 
 **GET** `/api/work-notes/list`
 
-作業ノートのリストを返します。
+ワークノートのリストを返します。
 
-### 作業ノートを読み取り
+### ワークノートを読み取り
 
 **GET** `/api/work-notes/read`
 
@@ -693,21 +667,21 @@ AI 設定エディタインターフェースを返します。
 
 指定されたノートの内容を返します。
 
-### ノート目次を取得
+### ノートディレクトリを取得
 
 **GET** `/api/work-notes/directory`
 
 ノートのディレクトリ構造を返します。
 
-### 作業ノートを検索
+### ワークノートを検索
 
 **GET** `/api/work-notes/search`
 
 クエリパラメータ：`keyword` — 検索キーワード
 
-一致する作業ノートを検索します。
+一致するワークノートを検索します。
 
-### 作業ノートを作成
+### ワークノートを作成
 
 **POST** `/api/work-notes/create`
 
@@ -720,7 +694,7 @@ AI 設定エディタインターフェースを返します。
 }
 ```
 
-### 作業ノートを更新
+### ワークノートを更新
 
 **POST** `/api/work-notes/update`
 
@@ -733,7 +707,7 @@ AI 設定エディタインターフェースを返します。
 }
 ```
 
-### 作業ノートを削除
+### ワークノートを削除
 
 **POST** `/api/work-notes/delete`
 
@@ -770,13 +744,13 @@ AI 設定エディタインターフェースを返します。
 
 プロジェクト管理インターフェースのページを返します。
 
-### プロジェクト作業ノートページ
+### プロジェクトワークノートページ
 
 **GET** `/project/{id}/work-notes`
 
 パスパラメータ：`id` — プロジェクト ID
 
-指定されたプロジェクトの作業ノートページを返します。
+指定されたプロジェクトのワークノートページを返します。
 
 ### プロジェクトタスクページ
 
@@ -785,6 +759,56 @@ AI 設定エディタインターフェースを返します。
 パスパラメータ：`id` — プロジェクト ID
 
 指定されたプロジェクトのタスク管理ページを返します。
+
+### プロジェクトツールパーミッションページ
+
+**GET** `/project/{id}/tool-permissions`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトのツールパーミッション管理ページを返します。
+
+### プロジェクトワークフローページ
+
+**GET** `/project/{id}/workflow`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトのワークフロー管理ページを返します。
+
+### プロジェクトワークフロー詳細を取得
+
+**GET** `/api/projects/workflow-detail`
+
+クエリパラメータ：`projectId` — プロジェクト ID
+
+プロジェクトに関連するワークフロー詳細を返します。
+
+### プロジェクトロールを割り当て
+
+**POST** `/api/projects/assign-role`
+
+**リクエストボディ**：
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid",
+  "roleName": "developer"
+}
+```
+
+### プロジェクトロールを削除
+
+**POST** `/api/projects/remove-role`
+
+**リクエストボディ**：
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid",
+  "roleName": "developer"
+}
+```
 
 ### プロジェクトリストを取得
 
@@ -879,45 +903,45 @@ AI 設定エディタインターフェースを返します。
 }
 ```
 
-### プロジェクト作業ノートリストを取得
+### プロジェクトワークノートリストを取得
 
 **GET** `/api/projects/{id}/work-notes/list`
 
 パスパラメータ：`id` — プロジェクト ID
 
-指定されたプロジェクトの作業ノートリストを返します。
+指定されたプロジェクトのワークノートリストを返します。
 
-### プロジェクト作業ノートを読み取り
+### プロジェクトワークノートを読み取り
 
 **GET** `/api/projects/{id}/work-notes/read`
 
 パスパラメータ：`id` — プロジェクト ID
 
-指定されたプロジェクトの作業ノート内容を返します。
+指定されたプロジェクトのワークノート内容を返します。
 
-### プロジェクト作業ノートを作成
+### プロジェクトワークノートを作成
 
 **POST** `/api/projects/{id}/work-notes/create`
 
 パスパラメータ：`id` — プロジェクト ID
 
-指定されたプロジェクトに新しい作業ノートを作成します。
+指定されたプロジェクトに新しいワークノートを作成します。
 
-### プロジェクト作業ノートを更新
+### プロジェクトワークノートを更新
 
 **POST** `/api/projects/{id}/work-notes/update`
 
 パスパラメータ：`id` — プロジェクト ID
 
-指定されたプロジェクトの作業ノートを更新します。
+指定されたプロジェクトのワークノートを更新します。
 
-### プロジェクト作業ノートを削除
+### プロジェクトワークノートを削除
 
 **POST** `/api/projects/{id}/work-notes/delete`
 
 パスパラメータ：`id` — プロジェクト ID
 
-指定されたプロジェクトの作業ノートを削除します。
+指定されたプロジェクトのワークノートを削除します。
 
 ### プロジェクトタスクリストを取得
 
@@ -993,65 +1017,90 @@ AI 設定エディタインターフェースを返します。
 
 ---
 
-## ストレージ API
+## ツールパーミッション管理
 
-### 値を読み取り
+### シリコンビーイングツールパーミッションを取得
 
-**GET** `/api/storage?key={key}`
+**GET** `/api/beings/tool-permissions`
 
-**レスポンス**：
-```json
-{
-  "key": "being:uuid:memory",
-  "value": "{...}",
-  "timestamp": "2026-04-20T10:30:00Z"
-}
-```
+クエリパラメータ：`beingId` — シリコンビーイング ID
 
-### 値を書き込み
+指定されたシリコンビーイングのツールパーミッション設定を返します。
 
-**POST** `/api/storage`
+### シリコンビーイングツールパーミッションを更新
+
+**PUT** `/api/beings/tool-permissions`
 
 **リクエストボディ**：
 ```json
 {
-  "key": "being:uuid:memory",
-  "value": "{...}"
+  "beingId": "being-uuid",
+  "permissions": {
+    "network": "allowed",
+    "disk_read": "allowed",
+    "disk_write": "denied"
+  }
 }
 ```
 
-### 時間範囲でクエリ
+### ツールパーミッションテンプレートを取得
 
-**GET** `/api/storage/time?start={start}&end={end}&prefix={prefix}`
+**GET** `/api/beings/tool-permissions/templates`
 
-**レスポンス**：
+利用可能なツールパーミッションテンプレートのリストを返します。
+
+### ツールパーミッションテンプレートを適用
+
+**POST** `/api/beings/tool-permissions/apply-template`
+
+**リクエストボディ**：
 ```json
 {
-  "entries": [
-    {
-      "key": "being:uuid:chat:2026-04-20",
-      "value": "{...}",
-      "timestamp": "2026-04-20T10:30:00Z"
-    }
-  ]
+  "beingId": "being-uuid",
+  "templateName": "readonly"
+}
+```
+
+### プロジェクトツールパーミッションを取得
+
+**GET** `/api/projects/{id}/tool-permissions`
+
+パスパラメータ：`id` — プロジェクト ID
+
+指定されたプロジェクトのツールパーミッション設定を返します。
+
+### プロジェクトツールパーミッションを更新
+
+**PUT** `/api/projects/{id}/tool-permissions`
+
+パスパラメータ：`id` — プロジェクト ID
+
+**リクエストボディ**：
+```json
+{
+  "permissions": {
+    "network": "allowed",
+    "disk_read": "allowed",
+    "disk_write": "denied"
+  }
 }
 ```
 
 ---
 
-## 実行器管理
+## エグゼキューター管理
 
-### 実行器ページ
+### エグゼキューターページ
 
 **GET** `/executor`
 
-実行器管理インターフェースのページを返します。
+エグゼキューター管理インターフェースのページを返します。
 
-### 実行器ステータスを取得
+### エグゼキューターステータスを取得
 
 **GET** `/api/executors/status`
 
-各実行器（ディスク、ネットワーク、コマンドライン）の稼働状態を返します。
+各エグゼキューター（ディスク、ネットワーク、コマンドライン）の稼働状態を返します。
 
 ---
 
@@ -1219,20 +1268,20 @@ AI 設定エディタインターフェースを返します。
   "error": {
     "code": "PERMISSION_DENIED",
     "message": "You don't have permission to access this resource",
-    "details": "Required: disk:write, Current: disk:read"
+    "details": "Required: FileAccess, Denied by GlobalACL"
   }
 }
 ```
 
 ### 一般的なエラーコード
 
-|| コード | HTTP ステータス | 説明 |
-||------|-------------|-------------|
-|| `PERMISSION_DENIED` | 403 | 権限不足 |
-|| `NOT_FOUND` | 404 | リソースが見つからない |
-|| `VALIDATION_ERROR` | 400 | リクエストパラメータが無効 |
-|| `INTERNAL_ERROR` | 500 | 内部サーバーエラー |
-|| `SERVICE_UNAVAILABLE` | 503 | AI サービスが利用不可 |
+| コード | HTTP ステータス | 説明 |
+|------|-------------|-------------|
+| `PERMISSION_DENIED` | 403 | パーミッション不足 |
+| `NOT_FOUND` | 404 | リソースが見つからない |
+| `VALIDATION_ERROR` | 400 | リクエストパラメータが無効 |
+| `INTERNAL_ERROR` | 500 | 内部サーバーエラー |
+| `SERVICE_UNAVAILABLE` | 503 | AI サービスが利用不可 |
 
 ---
 
@@ -1247,19 +1296,19 @@ const eventSource = new EventSource('/api/chat/stream');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);
-  
+
   switch(data.type) {
     case 'chunk':
-      console.log('ストリーミング：', data.content);
+      console.log('Streaming:', data.content);
       break;
     case 'tool_call':
-      console.log('ツール実行中：', data.tool);
+      console.log('Tool executing:', data.tool);
       break;
     case 'complete':
-      console.log('チャット完了、セッション：', data.sessionId);
+      console.log('Chat complete, session:', data.sessionId);
       break;
     case 'error':
-      console.error('エラー：', data.message);
+      console.error('Error:', data.message);
       break;
   }
 };
@@ -1275,9 +1324,9 @@ eventSource.onmessage = (event) => {
 public interface IAIClient
 {
     string Name { get; }
-    
+
     Task<AIResponse> ChatAsync(AIRequest request);
-    
+
     IAsyncEnumerable<string> StreamChatAsync(AIRequest request);
 }
 ```
@@ -1287,9 +1336,11 @@ public interface IAIClient
 ```csharp
 public class AIRequest
 {
-    public string Model { get; set; } = string.Empty;
-    public List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
-    public List<ToolDefinition>? Tools { get; set; }
+    public List<Message> Messages { get; set; }
+    public List<ToolDefinition> Tools { get; set; }
+    public double Temperature { get; set; } = 0.7;
+    public int MaxTokens { get; set; } = 2000;
+    public string Model { get; set; }
 }
 ```
 
@@ -1298,17 +1349,10 @@ public class AIRequest
 ```csharp
 public class AIResponse
 {
-    public string Model { get; set; } = string.Empty;
-    public string Content { get; set; } = string.Empty;
-    public string? Thinking { get; set; }
-    public List<ToolCall>? ToolCalls { get; set; }
-    public int? PromptTokens { get; set; }
-    public int? CompletionTokens { get; set; }
-    public int? TotalTokens { get; set; }
-    public bool Success { get; set; } = true;
-    public string? ErrorMessage { get; set; }
-    public bool IsStreamFinal { get; set; }
-    public bool HasToolCalls => ToolCalls != null && ToolCalls.Count > 0;
+    public string Content { get; set; }
+    public List<ToolCall> ToolCalls { get; set; }
+    public TokenUsage Usage { get; set; }
+    public string Model { get; set; }
 }
 ```
 
@@ -1323,10 +1367,9 @@ public interface ITool
 {
     string Name { get; }
     string Description { get; }
-    string GetDisplayName(Language language);
-    Dictionary<string, object> GetParameterSchema();
-    
-    ToolResult Execute(Guid callerId, Dictionary<string, object> parameters);
+    ToolDefinition Definition { get; }
+
+    Task<ToolResult> ExecuteAsync(ToolCall call);
 }
 ```
 
@@ -1335,9 +1378,9 @@ public interface ITool
 ```csharp
 public class ToolCall
 {
-    public string Id { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public Dictionary<string, object> Arguments { get; set; } = new();
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public Dictionary<string, object> Parameters { get; set; }
 }
 ```
 
@@ -1346,9 +1389,9 @@ public class ToolCall
 ```csharp
 public class ToolResult
 {
-    public bool Success { get; }
-    public string Message { get; }
-    public object? Data { get; }
+    public bool Success { get; set; }
+    public string Output { get; set; }
+    public string Error { get; set; }
 }
 ```
 

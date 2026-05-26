@@ -1,47 +1,47 @@
-﻿# Guía de Contribución
+# Guía de Contribución
 
 > **Versión: v0.2.0-alpha**
 
 [English](../en/contributing.md) | [Deutsch](../de-DE/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | **Español** | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md) | [Русский](../ru-RU/contributing.md)
 
-¡Gracias por tu interés en contribuir a SiliconLifeCollective!
+¡Gracias por su interés en contribuir a SiliconLifeCollective!
 
-## Contribución de Versión Dual
+## Contribución a Doble Versión
 
-Este proyecto tiene dos versiones de implementación. Puedes elegir tu dirección de contribución según tus intereses:
+Este proyecto tiene dos versiones de implementación, puede elegir la dirección de contribución según sus intereses:
 
-### SiliconLife.Default (Versión Predeterminada)
-- **Pila Tecnológica**: Aplicación de consola .NET 9
-- **Dirección de Contribución**: Desarrollo de funciones principales, implementación de herramientas, localización, documentación
-- **Adecuado Para**: Todos los desarrolladores
+### SiliconLife.Default (Versión por defecto)
+- **Stack tecnológico**: Aplicación de consola .NET 9
+- **Dirección de contribución**: Desarrollo de funcionalidades principales, implementación de herramientas, localización, documentación
+- **Adecuado para**: Todos los desarrolladores
 
-### SiliconLife.Fast (Versión de Alto Rendimiento)
-- **Pila Tecnológica**: Aplicación de formularios Windows .NET 9
-- **Dirección de Contribución**: Optimización de rendimiento, almacenamiento SpeedyPack, bandeja del sistema, concurrencia sin bloqueo
-- **Adecuado Para**: Desarrolladores con experiencia en Windows e interés en optimización de rendimiento
+### SiliconLife.Fast (Versión de alto rendimiento)
+- **Stack tecnológico**: Aplicación de escritorio multiplataforma .NET 9 (Avalonia UI)
+- **Dirección de contribución**: Optimización de rendimiento, almacenamiento SpeedyPack, bandeja del sistema, concurrencia sin bloqueos
+- **Adecuado para**: Desarrolladores con experiencia en desarrollo de escritorio e interés en optimización de rendimiento
 
-> **Nota Importante**: Ambas versiones comparten los proyectos SiliconLife.Core y SiliconLife.Common. Las mejoras a las interfaces centrales afectarán a ambas versiones simultáneamente.
+> **Nota importante**: Ambas versiones comparten los proyectos SiliconLife.Core y SiliconLife.Common, las mejoras a las interfaces principales afectarán a ambas versiones simultáneamente.
 
 ## Código de Conducta
 
-Este proyecto sigue la licencia Apache 2.0. Mantén el respeto y la profesionalidad en todas las interacciones.
+Este proyecto sigue la licencia Apache 2.0. Mantenga el respeto y la profesionalidad en todas las interacciones.
 
 ---
 
 ## Inicio Rápido
 
-### 1. Hacer Fork del Repositorio
+### 1. Hacer Fork del repositorio
 
-Haz clic en el botón "Fork" en GitHub para crear tu propia copia.
+Haga clic en el botón "Fork" en GitHub para crear su propia copia.
 
-### 2. Clonar tu Fork
+### 2. Clonar su Fork
 
 ```bash
 git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 ```
 
-### 3. Configurar Entorno de Desarrollo
+### 3. Configurar el entorno de desarrollo
 
 ```bash
 # Instalar .NET 9 SDK
@@ -57,24 +57,24 @@ dotnet build
 dotnet test
 ```
 
-### 4. Crear Rama de Característica
+### 4. Crear una rama de funcionalidad
 
 ```bash
-git checkout -b feature/nombre-de-caracteristica
+git checkout -b feature/your-feature-name
 ```
 
-### 5. Elegir Proyecto de Desarrollo
+### 5. Elegir el proyecto de desarrollo
 
-Selecciona el proyecto apropiado según tu tipo de contribución:
+Según su tipo de contribución, elija el proyecto apropiado:
 
-- **Interfaces centrales/clases abstractas** → Modificar `SiliconLife.Core`
+- **Interfaces principales/clases abstractas** → Modificar `SiliconLife.Core`
 - **Implementaciones compartidas** → Modificar `SiliconLife.Common`
 - **Específico de la versión Default** → Modificar `SiliconLife.Default`
 - **Específico de la versión Fast** → Modificar `SiliconLife.Fast`
 - **Motor de almacenamiento** → Modificar `SiliconLife.Speedy`
 - **Herramienta de gestión de almacenamiento** → Modificar `SiliconLife.Speedy.Manager`
 - **Desarrollo de plugins** → Modificar `SiliconLife.Core/Plugins`
-- **Documentación multi-idioma** → Modificar directorio `docs/`
+- **Documentación multilingüe** → Modificar el directorio `docs/`
 
 ---
 
@@ -82,45 +82,45 @@ Selecciona el proyecto apropiado según tu tipo de contribución:
 
 ### Estilo de Código
 
-- Seguir convenciones de codificación C#
-- Usar PascalCase para nombres de clases
-- Usar camelCase para parámetros de métodos
-- Usar `_camelCase` para campos privados
+- Seguir las convenciones de codificación de C#
+- Nombres de clases en PascalCase
+- Parámetros de métodos en camelCase
+- Campos privados en `_camelCase`
 - Todas las APIs públicas deben tener documentación XML
 
-### Mensajes de Commit
+### Mensajes de Confirmación
 
 Seguir el formato de **Commits Convencionales**:
 
 ```
-<tipo>(<alcance>): <descripción>
+<type>(<scope>): <description>
 ```
 
 **Tipos**:
-- `feat`: Nueva característica
+- `feat`: Nueva funcionalidad
 - `fix`: Corrección de bug
-- `docs`: Cambios de documentación
+- `docs`: Cambios en documentación
 - `style`: Formato de código
 - `refactor`: Refactorización de código
-- `test`: Cambios de pruebas
+- `test`: Cambios en pruebas
 - `chore`: Cambios de construcción/herramientas
 
 **Ejemplos**:
 ```bash
-feat(localization): añadir soporte de idioma coreano
-fix(permission): corregir puntero nulo en callback
-docs: actualizar guía de contribución
-refactor(web): simplificar estructura de controladores
+feat(localization): add Korean language support
+fix(permission): fix null pointer in callback
+docs: update contributing guide
+refactor(web): simplify controller structure
 ```
 
 ### Realizar Cambios
 
 1. **Escribir código**
-   - Seguir patrones existentes
-   - Añadir pruebas para nueva funcionalidad
-   - Actualizar documentación
+   - Seguir los patrones existentes
+   - Agregar pruebas para nuevas funcionalidades
+   - Actualizar la documentación
 
-2. **Probar tus cambios**
+2. **Probar sus cambios**
    ```bash
    # Ejecutar todas las pruebas
    dotnet test
@@ -129,23 +129,23 @@ refactor(web): simplificar estructura de controladores
    dotnet build --configuration Release
    ```
 
-3. **Formatear código**
+3. **Formatear el código**
    ```bash
    dotnet format
    ```
 
-4. **Confirmar cambios**
+4. **Confirmar los cambios**
    ```bash
    git add .
-   git commit -m "feat(alcance): descripción"
+   git commit -m "feat(scope): description"
    ```
 
-5. **Push a tu Fork**
+5. **Empujar a su Fork**
    ```bash
-   git push origin feature/nombre-de-caracteristica
+   git push origin feature/your-feature-name
    ```
 
-6. **Crear Pull Request**
+6. **Crear un Pull Request**
    - Ir al repositorio original
    - Hacer clic en "Compare & pull request"
    - Completar la plantilla de PR
@@ -153,13 +153,13 @@ refactor(web): simplificar estructura de controladores
 
 ---
 
-## Guía de Pull Request
+## Guía de Pull Requests
 
 ### Título del PR
 
-Usar el mismo formato que los mensajes de commit:
+Usar el mismo formato que los mensajes de confirmación:
 ```
-feat(localization): añadir soporte de idioma coreano
+feat(localization): add Korean language support
 ```
 
 ### Descripción del PR
@@ -168,27 +168,27 @@ Incluir:
 
 1. **Qué** - ¿Qué hace este PR?
 2. **Por qué** - ¿Por qué se necesita este cambio?
-3. **Cómo** - ¿Cómo lo implementaste?
+3. **Cómo** - ¿Cómo lo implementó?
 4. **Pruebas** - ¿Cómo se probó?
 
 ### Ejemplo de Descripción de PR
 
 ```markdown
 ## Qué
-Añadir localización al coreano para todos los componentes UI y documentación.
+Agregar localización en coreano para todos los componentes UI y documentación.
 
 ## Por qué
-Ampliar la accesibilidad del proyecto a usuarios coreanos.
+Ampliar la accesibilidad del proyecto para usuarios de coreano.
 
 ## Cómo
 - Crear archivo de localización KoKR.cs
-- Añadir 500+ claves de traducción
+- Agregar 500+ claves de traducción
 - Actualizar todas las vistas para usar localización
 - Crear documentación en coreano en docs/ko-KR/
 
 ## Pruebas
 - Verificar que todos los elementos UI muestren coreano correctamente
-- Probar funcionalidad de cambio de idioma
+- Probar la funcionalidad de cambio de idioma
 - Revisar traducciones con hablantes nativos
 ```
 
@@ -202,27 +202,27 @@ Ampliar la accesibilidad del proyecto a usuarios coreanos.
 1. Verificar issues existentes
 2. Crear un issue si no existe
 3. Corregir el bug
-4. Añadir casos de prueba
+4. Agregar casos de prueba
 5. Enviar PR
 
 **Requisitos**:
 - Descripción clara del bug
 - Pasos para reproducir
-- Pruebas para prevenir regresión
+- Pruebas para prevenir regresiones
 
-### 2. Nuevas Características
+### 2. Nuevas Funcionalidades
 
 **Proceso**:
-1. Discutir la característica en Issues/Discussions
+1. Discutir la funcionalidad en Issues/Discussions
 2. Obtener aprobación del mantenedor
-3. Implementar la característica
-4. Añadir pruebas completas
-5. Actualizar documentación
+3. Implementar la funcionalidad
+4. Agregar pruebas exhaustivas
+5. Actualizar la documentación
 6. Enviar PR
 
 **Requisitos**:
-- Propuesta de característica aprobada
-- Cobertura de pruebas completa
+- Propuesta de funcionalidad aprobada
+- Cobertura completa de pruebas
 - Documentación actualizada
 - Compatible hacia atrás
 
@@ -236,14 +236,14 @@ Ampliar la accesibilidad del proyecto a usuarios coreanos.
 **Requisitos**:
 - Clara y concisa
 - Incluir ejemplos
-- Soportar múltiples idiomas si aplica
+- Soporte multilingüe si aplica
 
 ### 4. Refactorización de Código
 
 **Proceso**:
-1. Proponer refactorización en un Issue
+1. Proponer la refactorización en un Issue
 2. Obtener aprobación
-3. Refactorizar código
+3. Refactorizar el código
 4. Asegurar que todas las pruebas pasen
 5. Enviar PR
 
@@ -261,16 +261,16 @@ Ampliar la accesibilidad del proyecto a usuarios coreanos.
 
 ```csharp
 [TestMethod]
-public void MiFuncionalidad_DeberiaFuncionar_ComoseEspera()
+public void MyFeature_ShouldWork_AsExpected()
 {
-    // Organizar
-    var servicio = new MiServicio();
+    // Preparar
+    var service = new MyService();
     
     // Ejecutar
-    var resultado = servicio.HacerAlgo();
+    var result = service.DoSomething();
     
-    // Afirmar
-    Assert.IsTrue(resultado.Success);
+    // Verificar
+    Assert.IsTrue(result.Success);
 }
 ```
 
@@ -297,17 +297,17 @@ Para cambios en UI:
 
 - Usar comentarios XML para todas las APIs públicas
 - Usar comentarios en línea para lógica compleja
-- Usar inglés para comentarios de código
+- Los comentarios de código deben estar en inglés
 
 ### Archivos de Documentación
 
-- Colocar en `docs/{idioma}/`
-- Actualizar todas las versiones de idiomas
+- Colocar en `docs/{language}/`
+- Actualizar todas las versiones de idioma
 - Seguir la estructura existente
 
-### Documentación Multi-idioma
+### Documentación Multilingüe
 
-Al añadir documentación:
+Al agregar documentación:
 1. Crear primero la versión en inglés
 2. Traducir a otros idiomas
 3. Mantener el contenido sincronizado
@@ -316,9 +316,9 @@ Al añadir documentación:
 
 ## Proceso de Revisión
 
-### Qué Verifican los Mantenedores
+### Qué revisan los mantenedores
 
-1. **Calidad del Código**
+1. **Calidad del código**
    - Sigue las convenciones
    - Claro y legible
    - Bien documentado
@@ -331,17 +331,17 @@ Al añadir documentación:
 3. **Documentación**
    - Actualizada
    - Explicaciones claras
-   - Multi-idioma
+   - Multilingüe
 
 4. **Compatibilidad**
    - Compatible hacia atrás
    - Sin cambios disruptivos (a menos que se notifique)
    - Sigue versionado semántico
 
-### Timeline de Revisión
+### Cronología de Revisión
 
 - Revisión inicial: 1-3 días
-- Integración de feedback: según sea necesario
+- Integración de comentarios: según sea necesario
 - Fusión: tras aprobación
 
 ---
@@ -350,22 +350,22 @@ Al añadir documentación:
 
 ### PR Rechazado
 
-**Razones**:
+**Causas**:
 - No sigue las guías
 - Pruebas insuficientes
 - Cambios disruptivos no notificados
 - Calidad de código deficiente
 
 **Solución**:
-- Resolver el feedback
+- Resolver los comentarios
 - Actualizar el PR
-- Reenviar
+- Volver a enviar
 
 ### Conflictos de Fusión
 
 **Solución**:
 ```bash
-# Actualizar tu rama
+# Actualizar su rama
 git fetch origin
 git rebase origin/master
 
@@ -374,7 +374,7 @@ git rebase origin/master
 git add .
 git rebase --continue
 
-# Push forzado
+# Empujar con fuerza
 git push --force-with-lease
 ```
 
@@ -385,7 +385,7 @@ git push --force-with-lease
 ### Recursos
 
 - **Documentación**: [docs/](../)
-- **Issues**: GitHub Issues
+- **Problemas**: GitHub Issues
 - **Discusiones**: GitHub Discussions
 - **Código de Conducta**: CODE_OF_CONDUCT.md
 
@@ -393,30 +393,30 @@ git push --force-with-lease
 
 - Crear un Issue para bugs
 - Iniciar una Discussion para preguntas
-- Mencionar al mantenedor para asuntos urgentes
+- Mencionar a los mantenedores para asuntos urgentes
 
 ---
 
-## Reconocimientos
+## Agradecimientos
 
-Los contribuidores serán reconocidos en:
-- Sección de contribuidores del README.md
-- Notas de lanzamiento
-- Documentación del proyecto
+Los contribuyentes serán reconocidos en:
+- La sección de contribuyentes del README.md
+- Las notas de versión
+- La documentación del proyecto
 
 ---
 
 ## Licencia
 
-Al contribuir, aceptas que tus contribuciones estén licenciadas bajo la licencia Apache 2.0.
+Al contribuir, usted acepta que sus contribuciones serán licenciadas bajo la licencia Apache 2.0.
 
 ---
 
-## Próximos Pasos
+## Siguientes Pasos
 
 - 📚 Leer la [documentación](../)
-- 🐛 Ver [issues abiertos](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 🐛 Ver los [issues abiertos](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
 - 💬 Iniciar una [discusión](https://github.com/akimoto-akira/SiliconLifeCollective/discussions)
-- 🚀 Hacer fork y comenzar a contribuir
+- 🚀 ¡Hacer Fork y comenzar a contribuir!
 
-¡Gracias por contribuir a SiliconLifeCollective!🎉
+¡Gracias por contribuir a SiliconLifeCollective! 🎉

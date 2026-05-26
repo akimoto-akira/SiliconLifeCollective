@@ -1,4 +1,4 @@
-﻿# Silicon-Being-Leitfaden
+# Silicon-Being-Leitfaden
 
 > **Version: v0.2.0-alpha**
 
@@ -6,23 +6,26 @@
 
 ## Übersicht
 
-Silicon Beings sind KI-gesteuerte Agenten, die autonom denken, handeln und sich entwickeln können.
+Silicon Beings sind KI-gesteuerte Agenten, die autonom denken, handeln und sich weiterentwickeln können.
 
 ## Architektur
 
-### Body-Brain-Trennung
+### Körper-Gehirn-Trennung
 
 ```
 ┌─────────────────────────────────────┐
-│         Silicon Being                │
+│         Silicon Being               │
 ├──────────────────┬──────────────────┤
-│   Body           │   Brain          │
+│   Körper         │   Gehirn         │
 │ (SiliconBeing)   │ (ContextManager) │
 ├──────────────────┼──────────────────┤
-│ • Statusverwaltung │ • Verlauf laden │
-│ • Trigger-Erkennung│ • KI aufrufen   │
-│ • Lebenszyklus     │ • Tools ausführen│
-│                    │ • Antwort speichern│
+│ • Zustands-      │ • Historie       │
+│   verwaltung     │   laden          │
+│ • Trigger-       │ • KI aufrufen    │
+│   erkennung      │ • Werkzeuge      │
+│ • Lebenszyklus   │   ausführen      │
+│                  │ • Antworten      │
+│                  │   persistieren   │
 └──────────────────┴──────────────────┘
 ```
 
@@ -71,19 +74,19 @@ You provide constructive feedback and always explain your reasoning.
 Specialized in C#, .NET, and software architecture.
 ```
 
-## Being erstellen
+## Lebewesen erstellen
 
-### Über Web-UI
+### Über die Web-UI
 
-1. Zu **Being-Verwaltung** navigieren
-2. Auf **Neues Being erstellen** klicken
-3. Ausfüllen:
+1. Navigieren Sie zu **Being-Verwaltung**
+2. Klicken Sie auf **Neues Being erstellen**
+3. Füllen Sie aus:
    - Name
    - Soul-Inhalt
    - Konfigurationsoptionen
-4. Auf **Erstellen** klicken
+4. Klicken Sie auf **Erstellen**
 
-### Über API
+### Über die API
 
 ```bash
 curl -X POST http://localhost:8080/api/beings \
@@ -94,40 +97,45 @@ curl -X POST http://localhost:8080/api/beings \
   }'
 ```
 
-## Being-Lebenszyklus
+## Lebenszyklus eines Beings
 
-### Aktivitätszustände
+### Aktive Zustände
 
-Silicon Beings haben folgende Aktivitätszustände:
+Ein Silicon Being hat folgende aktive Zustände:
 
-| Status | Beschreibung |
-|------|------|
-| `Idle` | Leerlauf, wartet auf Clock-Trigger |
-| `Working` | Führt eine Runde KI-Anfrage + Tool-Aufrufe aus |
-| `Error` | Fehler während der Ausführung aufgetreten |
-| `Stopped` | Gestoppt, aufgrund von aufeinanderfolgenden Fehlern oder manuellem Stopp |
+| Zustand | Beschreibung |
+|---------|--------------|
+| `Idle` | Ruhezustand, wartet auf Clock-Trigger |
+| `SingleChat` | Einzelchat läuft |
+| `GroupChat` | Gruppenchat läuft |
+| `Task` | Aufgabe wird ausgeführt |
+| `Timer` | Timer wird ausgeführt |
+| `Stopped` | Gestoppt, aufgrund aufeinanderfolgender Fehler oder manuellem Stopp |
 
-**Gestoppt-Status-Mechanismus**:
-- Wenn ein Silicon Being 10 aufeinanderfolgende Fehler auftritt, wechselt es automatisch in den `Stopped`-Status
-- Im Stopped-Status führt das Being keine Aufgaben mehr aus
-- Manueller Eingriff ist erforderlich, um es neu zu starten
+**Stopped-Zustandsmechanismus**:
+- Wenn ein Silicon Being 10 aufeinanderfolgende Fehler verursacht, wechselt es automatisch in den `Stopped`-Zustand
+- Im Stopped-Zustand führt das Being keine Aufgaben mehr aus
+- Wenn eine neue Chat-Nachricht eintrifft, wird der Fehlerzähler zurückgesetzt und das Being nimmt den Betrieb wieder auf
+- Es kann auch durch manuellen Eingriff neu gestartet werden
 
 ### Zustandsübergänge
 
 ```
-Idle → Working → Idle (Normaler Abschluss)
-Working → Error → Working (Fehlerwiederherstellung)
-Working → Stopped (10 aufeinanderfolgende Fehler oder manueller Stopp)
-Stopped → Idle (Neustart)
+Idle → SingleChat → Idle (Chat abgeschlossen)
+Idle → GroupChat → Idle (Gruppenchat abgeschlossen)
+Idle → Task → Idle (Aufgabe abgeschlossen)
+Idle → Timer → Idle (Timer abgeschlossen)
+Beliebig → Stopped (10 aufeinanderfolgende Fehler)
+Stopped → Idle (Neue Chat-Nachricht oder manueller Neustart)
 ```
 
 ### Operationen
 
-- **Start**: Initialisieren und mit Verarbeitung beginnen
-- **Stopp**: Graceful Shutdown
-- **Neustart**: Von Stopped-Status zu Idle-Status wiederherstellen
+- **Starten**: Initialisieren und mit der Verarbeitung beginnen
+- **Stoppen**: Ordentlich herunterfahren
+- **Neustarten**: Vom Stopped-Zustand in den Idle-Zustand zurückkehren
 
-## Aufgaben-System
+## Aufgabensystem
 
 ### Aufgabe erstellen
 
@@ -147,6 +155,9 @@ await taskSystem.CreateAsync(task);
 
 - `Pending` - Wartet auf Ausführung
 - `Running` - Wird ausgeführt
+- `SubmittedForReview` - Zur Prüfung eingereicht
+- `UnderReview` - In Prüfung
+- `Rework` - Nacharbeit erforderlich
 - `Completed` - Erfolgreich abgeschlossen
 - `Failed` - Ausführung fehlgeschlagen
 - `Cancelled` - Manuell abgebrochen
@@ -156,8 +167,8 @@ await taskSystem.CreateAsync(task);
 ### Timer-Typen
 
 1. **Einmalig**: Einmalige Ausführung nach Verzögerung
-2. **Intervall**: Wiederholung in festen Intervallen
-3. **Cron**: Ausführung basierend auf Cron-Ausdruck
+2. **Intervall**: Wiederholte Ausführung in festen Intervallen
+3. **Cron**: Ausführung basierend auf Cron-Ausdrücken
 
 ### Beispiel
 
@@ -178,9 +189,9 @@ await timerSystem.StartAsync(timer);
 
 ### Speichertypen
 
-- **Kurzfristig**: Aktueller Konversationskontext
-- **Langfristig**: Persistiertes Wissen und Erfahrungen
-- **Episodisch**: Zeitindexierte Ereignisse und Interaktionen
+- **Kurzzeit**: Aktueller Dialogkontext
+- **Langzeit**: Persistentes Wissen und Erfahrungen
+- **Episodisch**: Zeitindizierte Ereignisse und Interaktionen
 
 ### Speicherstruktur
 
@@ -210,56 +221,56 @@ data/
         └── soul.md
 ```
 
-## Arbeitsnotizen-System
+## Arbeitsnotiz-System
 
 ### Übersicht
 
-Arbeitsnotizen sind ein persönliches Diary-System von Silicon Beings mit seitenbasiertem Design zur Aufzeichnung von Arbeitsfortschritt, Lernerfahrungen, Projektnotizen etc.
+Arbeitsnotizen sind das persönliche Tagebuchsystem des Silicon Beings mit seitenbasiertem Design zur Aufzeichnung von Arbeitsfortschritten, Lernnotizen, Projektnotizen usw.
 
-### Features
+### Eigenschaften
 
-- **Seitenverwaltung**: Jede Notiz ist eine eigene Seite, Zugriff über Seitennummer
-- **Markdown-Unterstützung**: Inhalt unterstützt Markdown-Format (Text, Listen, Tabellen, Code-Blöcke)
-- **Schlüsselwort-Index**: Notizen können mit Schlüsselwörtern versehen werden für Suche
-- **Zusammenfassung**: Jede Notiz hat kurze Zusammenfassung für schnelles Browsen
-- **Verzeichnisgenerierung**: Kann Verzeichnis aller Notizen generieren für Gesamtüberblick
-- **Zeitstempel**: Automatische Aufzeichnung von Erstellungs- und Update-Zeit
-- **Standardmäßig privat**: Nur Being selbst hat Zugriff (Curator kann verwalten)
+- **Seitenbasierte Verwaltung**: Jede Notiz bildet eine eigenständige Seite, zugreifbar nach Seitennummer
+- **Markdown-Unterstützung**: Inhalte unterstützen Markdown-Formatierung (Text, Listen, Tabellen, Code-Blöcke)
+- **Schlüsselwortindex**: Unterstützung zum Hinzufügen von Schlüsselwörtern zu Notizen für die Suche
+- **Zusammenfassungsfunktion**: Jede Notiz hat eine kurze Zusammenfassung für schnellen Überblick
+- **Inhaltsverzeichnisgenerierung**: Kann eine Verzeichnisübersicht aller Notizen erstellen, um den Gesamtkontext zu verstehen
+- **Zeitstempel**: Automatische Aufzeichnung von Erstellungs- und Aktualisierungszeiten
+- **Standardmäßig privat**: Nur das Being selbst hat Zugriff (der Curator kann verwalten)
 
-### Anwendungsszenarien
+### Anwendungsfälle
 
-1. **Projektfortschritt dokumentieren**
+1. **Projektfortschrittsaufzeichnung**
    ```
    Zusammenfassung: Benutzerauthentifizierungsmodul abgeschlossen
-   Inhalt: JWT-Token-Verifizierung, OAuth2-Integration, Refresh-Token-Mechanismus implementiert
+   Inhalt: JWT-Token-Verifizierung, OAuth2-Integration, Token-Aktualisierungsmechanismus implementiert
    Schlüsselwörter: Authentifizierung,JWT,OAuth2
    ```
 
 2. **Lernnotizen**
    ```
-   Zusammenfassung: C# Async-Programming Best Practices gelernt
-   Inhalt: Hinweise zu async/await, Use-Cases für ConfigureAwait...
-   Schlüsselwörter: C#,Async,Best Practices
+   Zusammenfassung: Best Practices für asynchrone Programmierung in C# gelernt
+   Inhalt: Hinweise zur Verwendung von async/await, Verwendungsszenarien von ConfigureAwait...
+   Schlüsselwörter: C#,Asynchron,Best Practices
    ```
 
-3. **Meeting-Protokolle**
+3. **Besprechungsprotokolle**
    ```
-   Zusammenfassung: Produktanforderungsbesprechung
-   Inhalt: Neue Feature-Anforderungen diskutiert, Implementierungsansatz festgelegt...
-   Schlüsselwörter: Produkt,Anforderungen,Meeting
+   Zusammenfassung: Produktaanforderungsbesprechung
+   Inhalt: Neue Funktionsanforderungen besprochen, Implementierungsplan festgelegt...
+   Schlüsselwörter: Produkt,Anforderungen,Besprechung
    ```
 
-### Über Tool verwenden
+### Über Werkzeuge verwenden
 
-Beings können Arbeitsnotizen über das `work_note`-Tool verwalten:
+Das Being kann Arbeitsnotizen über das `work_note`-Werkzeug verwalten:
 
 ```json
 // Notiz erstellen
 {
   "action": "create",
-  "summary": "完成用户认证模块",
-  "content": "## 实现细节\n\n- 使用 JWT token\n- 支持 OAuth2",
-  "keywords": "认证,JWT,OAuth2"
+  "summary": "Benutzerauthentifizierungsmodul abgeschlossen",
+  "content": "## Implementierungsdetails\n\n- JWT-Token verwenden\n- OAuth2 unterstützen",
+  "keywords": "Authentifizierung,JWT,OAuth2"
 }
 
 // Notiz lesen
@@ -271,29 +282,27 @@ Beings können Arbeitsnotizen über das `work_note`-Tool verwalten:
 // Notizen suchen
 {
   "action": "search",
-  "keyword": "认证",
+  "keyword": "Authentifizierung",
   "max_results": 10
 }
 ```
 
-### Über Web-UI verwalten
+### Über die Web-UI verwalten
 
-1. Zu **Being-Verwaltung** → Being auswählen navigieren
-2. Auf **Arbeitsnotizen**-Tab klicken
-3. Notizen anzeigen, suchen, bearbeiten
-4. Markdown-Vorschau unterstützt
+1. Navigieren Sie zu **Being-Verwaltung** → Being auswählen
+2. Klicken Sie auf die Registerkarte **Arbeitsnotizen**
+3. Notizen anzeigen, suchen und bearbeiten
+4. Markdown-Vorschau wird unterstützt
 
----
-
-## Wissensnetzwerk-System
+## Wissensnetzwerk
 
 ### Übersicht
 
-Das Wissensnetzwerk ist ein Wissensrepräsentations- und Managementsystem basierend auf Tripel-Struktur (Subjekt-Prädikat-Objekt) zur Speicherung und Verwaltung von strukturiertem Wissen.
+Das Wissensnetzwerk ist ein auf Tripelstruktur (Subjekt-Prädikat-Objekt) basierendes Wissensrepräsentations- und Managementsystem zur Speicherung und Verwaltung strukturierten Wissens.
 
 ### Kernkonzepte
 
-#### Tripel-Struktur
+#### Tripelstruktur
 
 ```
 Subjekt (Subject) --Prädikat (Predicate)--> Objekt (Object)
@@ -301,20 +310,20 @@ Subjekt (Subject) --Prädikat (Predicate)--> Objekt (Object)
 
 **Beispiele**:
 - `Python` --`is_a`--> `programming_language`
-- `北京` --`capital_of`--> `中国`
-- `水` --`boiling_point`--> `100°C`
+- `Peking` --`capital_of`--> `China`
+- `Wasser` --`boiling_point`--> `100°C`
 
-#### Konfidenzwert
+#### Konfidenz
 
-Jedes Wissens-Tripel hat einen Konfidenzwert (0.0-1.0), der die Vertrauenswürdigkeit des Wissens angibt:
-- `1.0`: Absolut sicher (wie mathematische Theoreme)
-- `0.8-0.99`: Hoch vertrauenswürdig (wie verifizierte Fakten)
-- `0.5-0.79`: Mittlere Vertrauenswürdigkeit (wie Inferenzen oder Hypothesen)
-- `<0.5`: Niedrige Vertrauenswürdigkeit (wie Vermutungen oder nicht verifizierte Informationen)
+Jedes Wissenstripel hat einen Konfidenzwert (0,0–1,0), der die Glaubwürdigkeit des Wissens angibt:
+- `1.0`: Absolut sicher (z. B. mathematische Sätze)
+- `0,8–0,99`: Hochgradig glaubwürdig (z. B. verifizierte Fakten)
+- `0,5–0,79`: Mittelmäßig glaubwürdig (z. B. Schlussfolgerungen oder Hypothesen)
+- `<0,5`: Geringe Glaubwürdigkeit (z. B. Vermutungen oder unverifizierte Informationen)
 
 #### Tag-System
 
-Unterstützt das Hinzufügen von Tags zu Tripeln für Klassifizierung und Suche:
+Unterstützung zum Hinzufügen von Tags zu Tripeln für Kategorisierung und Suche:
 ```json
 {
   "subject": "Python",
@@ -361,7 +370,7 @@ Unterstützt das Hinzufügen von Tags zu Tripeln für Klassifizierung und Suche:
 
 #### 4. Wissenspfade entdecken
 
-Findet Verbindungspfade zwischen zwei Konzepten:
+Zusammenhänge zwischen zwei Konzepten finden:
 ```json
 {
   "action": "get_path",
@@ -375,9 +384,9 @@ Rückgabe:
 Python → is_a → programming_language → belongs_to → computer_science
 ```
 
-#### 5. Wissen validieren
+#### 5. Wissensvalidierung
 
-Prüft Gültigkeit und Konsistenz des Wissens:
+Gültigkeit und Konsistenz des Wissens prüfen:
 ```json
 {
   "action": "validate",
@@ -389,7 +398,7 @@ Prüft Gültigkeit und Konsistenz des Wissens:
 
 #### 6. Wissensstatistiken
 
-Erhält Gesamtstatistiken des Wissensnetzwerks:
+Gesamtstatistiken des Wissensnetzwerks abrufen:
 ```json
 {
   "action": "stats"
@@ -407,45 +416,43 @@ Rückgabe:
 }
 ```
 
-### Anwendungsszenarien
+### Anwendungsfälle
 
 1. **Faktenspeicherung**
    - Objektive Fakten und Allgemeinwissen speichern
-   - Beispiel: `地球` --`is_a`--> `行星`
+   - Beispiel: `Erde` --`is_a`--> `Planet`
 
 2. **Konzeptbeziehungen**
    - Beziehungen zwischen Konzepten aufzeichnen
-   - Beispiel: `继承` --`is_a`--> `面向对象编程概念`
+   - Beispiel: `Vererbung` --`is_a`--> `Objektorientiertes-Programmierkonzept`
 
 3. **Lernakkumulation**
-   - Beings akkumulieren kontinuierlich Wissen durch Lernen
-   - Bilden strukturierte Wissenssysteme
+   - Das Being sammelt kontinuierlich Wissen durch Lernen
+   - Bildet ein strukturiertes Wissenssystem
 
-4. **Inferenzunterstützung**
+4. **Schlussfolgerungsunterstützung**
    - Indirekte Beziehungen durch Wissenspfade entdecken
-   - Unterstützt wissensbasierte Inferenz und Entscheidungsfindung
+   - Wissensbasierte Schlussfolgerungen und Entscheidungen unterstützen
 
-### Über Web-UI verwalten
+### Über die Web-UI verwalten
 
-1. Zu **Wissensnetzwerk**-Seite navigieren
+1. Navigieren Sie zur Seite **Wissensnetzwerk**
 2. Wissensstatistiken anzeigen
-3. Wissen suchen und browsen
-4. Wissensbeziehungsdiagramm visualisieren (geplant)
-
----
+3. Wissen durchsuchen und navigieren
+4. Visuelle Wissensbeziehungsgrafik (geplant)
 
 ## WebView-Browseroperationen (Neu)
 
 ### Übersicht
 
-Silicon Beings können über das WebView-Browser-Tool autonom Webseiten browsen, Informationen abrufen und Weboperationen ausführen. Der Browser läuft im Headless-Modus, für Benutzer vollständig unsichtbar.
+Silicon Beings können über das WebView-Browserwerkzeug selbstständig Webseiten durchsuchen, Informationen abrufen und Weboperationen ausführen. Der Browser läuft im Headless-Modus und ist für den Benutzer vollständig unsichtbar.
 
-### Features
+### Eigenschaften
 
-- **Individuelle Isolation**: Jedes Being hat eigene Browser-Instanz, Cookies und Sitzungen
-- **Headless-Modus**: Autonome Operation im Hintergrund, für Benutzer unsichtbar
-- **Vollständige Funktionalität**: Unterstützt JavaScript-Ausführung, CSS-Rendering, Formularausfüllung etc.
-- **Sicherheitskontrolle**: Alle Operationen müssen Berechtigungskette durchlaufen
+- **Individuelle Isolierung**: Jedes Being hat eine eigene Browserinstanz, eigene Cookies und Sitzungen
+- **Headless-Modus**: Autonome Hintergrundoperation, für den Benutzer unsichtbar
+- **Vollständige Funktionalität**: Unterstützung für JavaScript-Ausführung, CSS-Rendering, Formularausfüllung usw.
+- **Sicherheitskontrolle**: Alle Operationen müssen die Berechtigungsprüfungskette durchlaufen
 
 ### Häufige Operationen
 
@@ -453,11 +460,11 @@ Silicon Beings können über das WebView-Browser-Tool autonom Webseiten browsen,
 
 ```json
 {
-  "action": "open_browser"
+  "action": "open"
 }
 ```
 
-#### 2. Zu Webseite navigieren
+#### 2. Zu einer Webseite navigieren
 
 ```json
 {
@@ -474,7 +481,7 @@ Silicon Beings können über das WebView-Browser-Tool autonom Webseiten browsen,
 }
 ```
 
-Rückgabe: Seiten-Textinhalt zur KI-Analyse und -Verständnis.
+Gibt den Textinhalt der Seite zurück, damit die KI ihn analysieren und verstehen kann.
 
 #### 4. Element anklicken
 
@@ -491,7 +498,7 @@ Rückgabe: Seiten-Textinhalt zur KI-Analyse und -Verständnis.
 {
   "action": "input",
   "selector": "#search-input",
-  "text": "搜索关键词"
+  "text": "Suchbegriff"
 }
 ```
 
@@ -512,7 +519,7 @@ Rückgabe: Seiten-Textinhalt zur KI-Analyse und -Verständnis.
 }
 ```
 
-Rückgabe: Seiten-Screenshot (Base64-codiert), kann für visuelle Analyse verwendet werden.
+Gibt einen Screenshot der Seite zurück (Base64-kodiert), der für die visuelle Analyse verwendet werden kann.
 
 #### 8. Auf Element warten
 
@@ -524,71 +531,147 @@ Rückgabe: Seiten-Screenshot (Base64-codiert), kann für visuelle Analyse verwen
 }
 ```
 
-### Anwendungsszenarien
+### Anwendungsfälle
 
 1. **Informationsbeschaffung**
-   - News-Webseiten browsen für aktuelle Informationen
-   - Dokumentation und technische Materialien nachschlagen
-   - Webseiten-Inhaltsänderungen überwachen
+   - Nachrichtenwebsites durchsuchen, um aktuelle Informationen zu erhalten
+   - Dokumentationen und technische Unterlagen abfragen
+   - Webseiteninhaltsänderungen überwachen
 
 2. **Automatisierte Operationen**
    - Formulare ausfüllen und absenden
-   - Buttons klicken für Operationen
-   - Web-Daten scrapen
+   - Schaltflächen klicken, um Operationen auszulösen
+   - Webseitendaten extrahieren
 
-3. **Webanalyse**
+3. **Webseitenanalyse**
    - Seitenstruktur und -inhalt analysieren
    - Spezifische Informationen extrahieren
    - Visuelle Screenshot-Analyse
 
 ### Hinweise
 
-- Browser-Operationen können langsamer sein, auf Seitenladung warten
-- `wait_for_element` verwenden um sicherzustellen, dass Element vorhanden ist
-- Nutzungsbedingungen und robots.txt der Webseiten beachten
-- Häufige Anfragen vermeiden um Bans zu verhindern
+- Browseroperationen können langsam sein; auf vollständiges Laden der Seite warten
+- `wait_for_element` verwenden, um sicherzustellen, dass ein Element vorhanden ist, bevor es bedient wird
+- Die Nutzungsbedingungen und robots.txt der Website beachten
+- Häufige Anfragen vermeiden, um Sperrungen zu verhindern
 
----
+## Bewährte Verfahren
 
-## Best Practices
+### Soul-Datei verfassen
 
-### Soul-Datei schreiben
-
-1. **Konkret**: Klare Persönlichkeitsmerkmale und Grenzen
-2. **Scope definieren**: Was Being tun soll und nicht tun soll
-3. **Beispiele einfügen**: Erwartete Verhaltensmuster zeigen
-4. **Regelmäßig aktualisieren**: Soul basierend auf Performance entwickeln
+1. **Konkret**: Klare Persönlichkeitsmerkmale und Grenzen definieren
+2. **Umfang definieren**: Was das Being tun sollte und was nicht
+3. **Beispiele einfügen**: Erwartete Verhaltensmuster aufzeigen
+4. **Regelmäßig aktualisieren**: Die Soul basierend auf der Leistung weiterentwickeln
 
 ### Aufgabenverwaltung
 
-1. **Prioritäten setzen**: Priorität (1-10) verwenden
-2. **Deadlines definieren**: Immer Deadline setzen
+1. **Prioritäten setzen**: Prioritätsskala verwenden (1–10)
+2. **Fristen definieren**: Immer Fristen setzen
 3. **Fortschritt überwachen**: Regelmäßig Aufgabenstatus prüfen
-4. **Fehler behandeln**: Retry-Logik implementieren
+4. **Fehler behandeln**: Wiederholungslogik implementieren
 
 ### Speicheroptimierung
 
 1. **Alte Daten bereinigen**: Regelmäßig alte Speicher archivieren
-2. **Wichtige Informationen indexieren**: Schlüsselinformationen markieren
-3. **Time-Storage verwenden**: Zeitindex-Abfragen nutzen
+2. **Wichtige Informationen indizieren**: Schlüsselinformationen markieren
+3. **Zeitspeicher nutzen**: Zeitindizierte Abfragen verwenden
+
+### Speicherverblasungsmechanismus
+
+Das System enthält einen integrierten `MemoryFadeService` mit zeitbasierter Zerfallssimulation, der das Vergessen biologischer Speicher nachahmt:
+
+- **Automatischer Zerfall**: Stündlich wird der Wichtigkeitszerfallsalgorithmus auf alle Speichereinträge aller Silicon Beings angewendet
+- **Automatische Archivierung**: Speicher mit einer Wichtigkeit unter dem Schwellenwert werden automatisch archiviert und nehmen nicht mehr an der täglichen Suche teil
+- **Statistikverfolgung**: Anzahl der Zerfallszyklen und der Statusänderungseinträge wird aufgezeichnet
+
+Dies bedeutet, dass sich die Speicher von Silicon Beings mit der Zeit natürlich verblasen. Wichtige Informationen müssen aktiv über das Speicherwerkzeug als hohe Wichtigkeit markiert werden, um eine automatische Archivierung zu vermeiden.
+
+---
+
+## Projektarbeitsbereich
+
+### Übersicht
+
+Der Projektarbeitsbereich ist ein Raumverwaltungsmechanismus, der die Zusammenarbeit mehrerer Silicon Beings unterstützt. Der Silicon Curator kann Projekträume erstellen, Silicon Beings Projekten zuweisen und ihnen Rollen zuordnen.
+
+### Projektlebenszyklus
+
+```
+Erstellen → Aktiv → Archiviert → Vernichtet
+              ↑           |
+              └── Wiederherstellen ┘
+```
+
+### Projektrollen
+
+Silicon Beings können in einem Projekt bestimmte Rollen zugewiesen bekommen:
+
+```json
+{
+  "action": "assign_role",
+  "project_id": "project-uuid",
+  "being_id": "being-uuid",
+  "role_name": "developer"
+}
+```
+
+### Projektarbeitsnotizen
+
+Arbeitsnotizen im Projektraum sind öffentlich; alle Projektmitglieder haben Zugriff:
+
+```json
+{
+  "action": "create",
+  "project_id": "project-uuid",
+  "summary": "Benutzerauthentifizierungsmodul abgeschlossen",
+  "content": "## Implementierungsdetails\n\n- JWT-Token verwenden",
+  "keywords": "Authentifizierung,JWT"
+}
+```
+
+### Projektaufgaben
+
+Aufgaben im Projektraum unterstützen das vollständige Lebenszyklusmanagement:
+
+```json
+{
+  "action": "create",
+  "project_id": "project-uuid",
+  "title": "Benutzerauthentifizierung implementieren",
+  "priority": 5
+}
+```
+
+### Projekt-Workflows
+
+Projekte können Workflow-Vorlagen binden, die die Zusammenarbeitsprozesse der Silicon Beings steuern:
+
+- Workflows basieren auf Zustandsmaschinenvorlagen
+- Unterstützung für Tick-gesteuerte Zustandsübergänge
+- Automatische Protokollierung von Zustandsübergängen
+
+### Werkzeugberechtigungsisolierung
+
+Werkzeugberechtigungen auf Projektebene sind unabhängig von den Berechtigungen auf Silicon-Being-Ebene und ermöglichen so eine Berechtigungsisolierung zwischen Projekten. Beispielsweise kann ein Silicon Being in Projekt A Netzwerkzugriff haben, in Projekt B jedoch auf Nur-Lese-Berechtigungen beschränkt sein.
 
 ## Fehlerbehebung
 
-### Being startet nicht
+### Being lässt sich nicht starten
 
 **Prüfen**:
-- Soul-Datei existiert und ist valide
+- Soul-Datei vorhanden und gültig
 - KI-Client konfiguriert
-- Ausreichend Systemressourcen
+- Systemressourcen ausreichend
 
 ### Being stoppt unerwartet
 
 **Prüfen**:
-- Fehler in Protokollen
-- KI-Service-Verfügbarkeit
-- Speichernutzung
+- Fehler in den Protokollen
+- KI-Dienstverfügbarkeit
+- Speicherverbrauch
 
-### Aufgaben werden nicht ausgeführt
+### Aufgabe wird nicht ausgeführt
 
 **Prüfen**:
 - Timer-System läuft
@@ -598,5 +681,5 @@ Rückgabe: Seiten-Screenshot (Base64-codiert), kann für visuelle Analyse verwen
 ## Nächste Schritte
 
 - 📚 [Architekturleitfaden](architecture.md) lesen
-- 🛠️ [Entwicklungsleitfaden](development-guide.md) prüfen
-- 🚀 [Schnellstart-Leitfaden](getting-started.md) ansehen
+- 🛠️ [Entwicklungsleitfaden](development-guide.md) ansehen
+- 🚀 [Schnellstartleitfaden](getting-started.md) ansehen

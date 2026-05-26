@@ -1,37 +1,37 @@
-﻿# 快速開始
+# 快速開始
 
 > **版本：v0.2.0-alpha**
 
-[English](../en/getting-started.md) | [中文](../zh-CN/getting-started.md) | **繁體中文** | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md) | [Русский](../ru-RU/getting-started.md)
+[English](../en/getting-started.md) | [Deutsch](../de-DE/getting-started.md) | [中文](../zh-CN/getting-started.md) | **繁體中文** | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md) | [Русский](../ru-RU/getting-started.md)
 
 ## 選擇版本
 
-本專案提供兩個實現版本：
+本專案提供兩個實作版本：
 
 ### SiliconLife.Default（預設版本）
-- **定位**：預設實現，主要用於驗證架構可行性
-- **執行模式**：主控台應用程式
+- **定位**：預設實作，主要用於驗證架構可行性
+- **運行模式**：主控台應用程式
 - **儲存方式**：檔案系統 JSON 儲存
-- **適用場景**：資料安全優先、小資料量、開發調試、架構驗證
+- **適用場景**：資料安全優先、小資料量、開發除錯、架構驗證
 - **平台支援**：Windows、Linux、macOS
-- **角色說明**：作為架構驗證的基準實現，提供簡單可靠的運行方式，適合初次接觸本項目或進行開發調試
+- **角色說明**：作為架構驗證的基準實作，提供簡單可靠的運行方式，適合初次接觸本專案或進行開發除錯
 
 ### SiliconLife.Fast（高效能版本）
 - **定位**：主推生產版本
-- **執行模式**：桌面應用程式（Windows/macOS 系統匣 / Linux 狀態視窗）
-- **儲存方式**：SpeedyPack 記憶體儲存 + 異步持久化
-- **適用場景**：高併發、低延遲、大資料量、長期生產運行
-- **平台支援**：Windows/macOS（完整功能，含系統匣）、Linux（狀態視窗，無系統匣圖示）
-- **角色說明**：經過深度優化的生產級實現，是長期運行和實際生產環境的首選
+- **運行模式**：桌面應用程式（Windows/macOS 系統匣 / Linux 狀態視窗）
+- **儲存方式**：SpeedyPack 記憶體儲存 + 非同步持久化（.spk 檔案格式）
+- **適用場景**：高並行、低延遲、大資料量、長期生產運行
+- **平台支援**：Windows/macOS（完整功能，含系統匣）、Linux（狀態視窗，無匣圖示）
+- **角色說明**：經過深度最佳化的生產級實作，是長期運行和實際生產環境的首選
 
-> **新手建議**：首次使用推薦從 **SiliconLife.Default** 開始，快速驗證架構可行性；熟悉系統後，強烈建議遷移到 **SiliconLife.Fast** 作為生產環境執行版本。
+> **新手建議**：首次使用推薦從 **SiliconLife.Default** 開始，快速驗證架構可行性；熟悉系統後，強烈建議遷移到 **SiliconLife.Fast** 作為生產環境運行版本。
 
 ## 前置條件
 
 - **.NET 9 SDK** - [下載](https://dotnet.microsoft.com/download/dotnet/9.0)
 - **Git** - [下載](https://git-scm.com/)
-- **Ollama**（可選，用於本地 AI） - [下載](https://ollama.com/)
-- **百煉 API 金鑰**（可選，用於雲端 AI） - [申請](https://bailian.console.aliyun.com/)
+- **Ollama**（可選，用於本地端 AI） - [下載](https://ollama.com/)
+- **百鍊 API 金鑰**（可選，用於雲端 AI） - [申請](https://bailian.console.aliyun.com/)
 - **火山引擎 Ark API 金鑰**（可選，用於雲端 AI） - [申請](https://console.volcengine.com/ark)
 
 ## 快速開始
@@ -43,7 +43,7 @@ git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 ```
 
-### 2. 建構專案
+### 2. 建置專案
 
 ```bash
 dotnet build
@@ -51,9 +51,9 @@ dotnet build
 
 ### 3. 設定 AI 後端
 
-編輯 `src/SiliconLife.Default/Config/DefaultConfigData.cs` 或通過 Web UI 在執行時修改設定。
+編輯 `src/SiliconLife.Default/Config/DefaultConfigData.cs` 或透過 Web UI 在執行時修改設定。
 
-#### 選項 A：Ollama（本地）
+#### 選項 A：Ollama（本地端）
 
 ```json
 {
@@ -66,7 +66,7 @@ dotnet build
 }
 ```
 
-#### 選項 B：百煉（雲端）
+#### 選項 B：百鍊（雲端）
 
 ```json
 {
@@ -80,7 +80,7 @@ dotnet build
 }
 ```
 
-> **可用區域**：`beijing`（北京）、`virginia`（弗吉尼亞）、`singapore`（新加坡）、`hongkong`（香港）、`frankfurt`（法蘭克福）
+> **可用區域**：`beijing`（北京）、`virginia`（維吉尼亞）、`singapore`（新加坡）、`hongkong`（香港）、`frankfurt`（法蘭克福）
 
 #### 選項 C：火山引擎 Ark（雲端）
 
@@ -147,7 +147,7 @@ http://localhost:8080
 3. 設定靈魂檔案（`soul.md`），包含個性和行為
 4. 啟動生命體
 
-### soul.md 範例
+### soul.md 示例
 
 ```markdown
 # My First Silicon Being
@@ -174,14 +174,14 @@ You are a helpful assistant specializing in code review.
 
 **解決方案**：
 ```bash
-# 檢查 Ollama 是否正在執行
+# 檢查 Ollama 是否正在運行
 ollama list
 
 # 如需啟動 Ollama
 ollama serve
 ```
 
-### 找不到模型
+### 未找到模型
 
 **問題**：`model "qwen2.5:7b" not found`
 
@@ -191,13 +191,13 @@ ollama serve
 ollama pull qwen2.5:7b
 ```
 
-### 連接埠已被佔用
+### 埠號已被佔用
 
 **問題**：`HttpListenerException: Address already in use`
 
 **解決方案**：
-- 在設定中更改連接埠
-- 或終止使用連接埠 8080 的行程：
+- 在設定中變更埠號
+- 或終止使用埠號 8080 的程序：
 
 ```bash
 # Windows
@@ -213,7 +213,7 @@ lsof -ti:8080 | xargs kill -9
 - 📚 閱讀[架構指南](architecture.md)了解系統設計
 - 🛠️ 查看[開發指南](development-guide.md)擴展系統
 - 📖 探索[API 參考](api-reference.md)了解整合詳情
-- 🔒 查看[安全文檔](security.md)了解權限系統
+- 🔒 查看[安全文件](security.md)了解權限系統
 - 🧰 查看[工具參考](tools-reference.md)了解所有內建工具
 - 🌐 查看[Web UI 指南](web-ui-guide.md)了解介面功能
 
@@ -223,27 +223,27 @@ lsof -ti:8080 | xargs kill -9
 SiliconLifeCollective/
 ├── src/
 │   ├── SiliconLife.Core/            # 核心介面和抽象類別
-│   ├── SiliconLife.Common/          # 共享實現
-│   ├── SiliconLife.App/             # Default 和 Fast 共享的應用層
-│   ├── SiliconLife.Default/         # 預設實現 + 入口點
-│   ├── SiliconLife.Fast/            # 高效能實現 + 入口點
+│   ├── SiliconLife.Common/          # 共享實作（兩個版本共用）
+│   ├── SiliconLife.App/             # Default 與 Fast 共享的應用層
+│   ├── SiliconLife.Default/         # 預設實作 + 進入點（主控台版）
+│   ├── SiliconLife.Fast/            # 高效能實作 + 進入點（視窗版）
 │   ├── SiliconLife.Speedy/          # SpeedyPack 高效能儲存引擎
 │   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理工具（Avalonia UI）
-├── docs/                            # 文檔（多語言，33 種語言變體）
-│   ├── en/                    # 英語
-│   ├── zh-CN/                 # 簡體中文
-│   ├── zh-HK/                 # 繁體中文
-│   ├── es-ES/                 # 西班牙語
-│   ├── ja-JP/                 # 日語
-│   ├── ko-KR/                 # 韓語
-│   └── cs-CZ/                 # 捷克語
-├── 總文件/                     # 需求和架構文件（中文）
-└── README.md                  # 專案說明
+├── docs/                            # 文件（多語言，34 種語言變體）
+│   ├── en/                          # 英語
+│   ├── zh-CN/                       # 簡體中文
+│   ├── zh-HK/                       # 繁體中文
+│   ├── es-ES/                       # 西班牙語
+│   ├── ja-JP/                       # 日語
+│   ├── ko-KR/                       # 韓語
+│   └── cs-CZ/                       # 捷克語
+├── 总文档/                           # 需求和架構文件（中文）
+└── README.md                        # 專案說明
 ```
 
-## 需要協助？
+## 需要幫助？
 
-- 📖 查看[說明文檔系統](web-ui-guide.md#幫助文檔系統新增)（多語言支援）
-- 📚 閱讀[完整文檔](docs/)
+- 📖 查看[說明文件系統](web-ui-guide.md#帮助文档系统新增)（多語言支援）
+- 📚 閱讀[完整文件](docs/)
 - 🐛 在 [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues) 上回報問題
 - 💬 參與社群討論

@@ -1,30 +1,30 @@
-﻿# Przewodnik współtworzenia
+# Przewodnik współtworzenia
 
 > **Wersja: v0.2.0-alpha**
 
-[English](../en/contributing.md) | [Deutsch](../de-DE/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md) | [Русский](../ru-RU/contributing.md) | [Polski](../pl-PL/contributing.md)
+[English](../en/contributing.md) | [Deutsch](../de-DE/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md) | [Русский](../ru-RU/contributing.md)
 
-Dziękujemy za zainteresowanie współtworzeniem SiliconLifeCollective!
+Dziękujemy za zainteresowanie współtworzeniem projektu SiliconLifeCollective!
 
 ## Współtworzenie dwóch wersji
 
-Ten projekt ma dwie wersje implementacji, możesz wybrać kierunek współtworzenia w zależności od zainteresowań:
+Projekt posiada dwie wersje implementacji — możesz wybrać kierunek współtworzenia zgodnie ze swoimi zainteresowaniami:
 
 ### SiliconLife.Default (wersja domyślna)
 - **Stos technologiczny**: aplikacja konsolowa .NET 9
-- **Kierunek współtworzenia**: rozwój rdzennych funkcji, implementacja narzędzi, lokalizacja, dokumentacja
-- **Odpowiednie dla**: wszystkich programistów
+- **Kierunek współtworzenia**: rozwój funkcji podstawowych, implementacja narzędzi, lokalizacja, dokumentacja
+- **Dla kogo**: wszyscy programiści
 
 ### SiliconLife.Fast (wersja wysokowydajna)
-- **Stos technologiczny**: aplikacja okienkowa Windows .NET 9
-- **Kierunek współtworzenia**: optymalizacja wydajności, przechowywanie SpeedyPack, zasobnik systemowy, współbieżność bez blokad
-- **Odpowiednie dla**: programistów z doświadczeniem w rozwoju Windows, zainteresowanych optymalizacją wydajności
+- **Stos technologiczny**: wieloplatformowa aplikacja desktopowa .NET 9 (Avalonia UI)
+- **Kierunek współtworzenia**: optymalizacja wydajności, pamięć masowa SpeedyPack, zasobnik systemowy, współbieżność bez blokad
+- **Dla kogo**: programiści z doświadczeniem w tworzeniu aplikacji desktopowych, zainteresowani optymalizacją wydajności
 
-> **Ważna uwaga**: Obie wersje współdzielą projekty SiliconLife.Core i SiliconLife.Common, ulepszenia rdzennych interfejsów wpłyną na obie wersje jednocześnie.
+> **Ważna uwaga**: obie wersje współdzielą projekty SiliconLife.Core i SiliconLife.Common, więc ulepszenia interfejsów podstawowych wpływają jednocześnie na obie wersje.
 
 ## Kodeks postępowania
 
-Ten projekt jest zgodny z licencją Apache 2.0. Bądźcie pełni szacunku i profesjonalni we wszystkich interakcjach.
+Projekt jest objęty licencją Apache 2.0. Wszystkie interakcje powinny być pełne szacunku i profesjonalne.
 
 ---
 
@@ -32,16 +32,16 @@ Ten projekt jest zgodny z licencją Apache 2.0. Bądźcie pełni szacunku i prof
 
 ### 1. Fork repozytorium
 
-Kliknij przycisk "Fork" na GitHub, aby utworzyć własną kopię.
+Kliknij przycisk „Fork" na GitHub, aby utworzyć własną kopię.
 
-### 2. Klonowanie Twojego Forka
+### 2. Sklonuj swój Fork
 
 ```bash
 git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 ```
 
-### 3. Konfiguracja środowiska programistycznego
+### 3. Skonfiguruj środowisko programistyczne
 
 ```bash
 # Zainstaluj .NET 9 SDK
@@ -57,23 +57,23 @@ dotnet build
 dotnet test
 ```
 
-### 4. Utworzenie gałęzi funkcjonalnej
+### 4. Utwórz gałąź funkcji
 
 ```bash
-git checkout -b feature/nazwa-twojej-funkcji
+git checkout -b feature/your-feature-name
 ```
 
-### 5. Wybór projektu programistycznego
+### 5. Wybierz projekt do rozwoju
 
 W zależności od typu współtworzenia wybierz odpowiedni projekt:
 
-- **Interfejsy rdzenne/klasy abstrakcyjne** → modyfikuj `SiliconLife.Core`
-- **Współdzielona implementacja** → modyfikuj `SiliconLife.Common`
+- **Interfejsy/klasy abstrakcyjne podstawowe** → modyfikuj `SiliconLife.Core`
+- **Współdzielone implementacje** → modyfikuj `SiliconLife.Common`
 - **Specyficzne dla wersji Default** → modyfikuj `SiliconLife.Default`
 - **Specyficzne dla wersji Fast** → modyfikuj `SiliconLife.Fast`
 - **Silnik przechowywania** → modyfikuj `SiliconLife.Speedy`
 - **Narzędzie zarządzania przechowywaniem** → modyfikuj `SiliconLife.Speedy.Manager`
-- **Rozwój wtyczek** → modyfikuj `SiliconLife.Core/Plugins`
+- **Tworzenie wtyczek** → modyfikuj `SiliconLife.Core/Plugins`
 - **Dokumentacja wielojęzyczna** → modyfikuj katalog `docs/`
 
 ---
@@ -85,15 +85,15 @@ W zależności od typu współtworzenia wybierz odpowiedni projekt:
 - Przestrzegaj konwencji kodowania C#
 - Nazwy klas używają PascalCase
 - Parametry metod używają camelCase
-- Prywatne pola używają `_camelCase`
-- Wszystkie publiczne API muszą mieć dokumentację XML
+- Pola prywatne używają `_camelCase`
+- Wszystkie publiczne API muszą posiadać dokumentację XML
 
 ### Komunikaty zatwierdzeń
 
-Przestrzegaj formatu **Konwencjonalnych Zatwierdzeń**:
+Przestrzegaj formatu **Conventional Commits**:
 
 ```
-<typ>(<zakres>): <opis>
+<type>(<scope>): <description>
 ```
 
 **Typy**:
@@ -101,7 +101,7 @@ Przestrzegaj formatu **Konwencjonalnych Zatwierdzeń**:
 - `fix`: poprawka błędu
 - `docs`: zmiany dokumentacji
 - `style`: formatowanie kodu
-- `refactor`: refaktoring kodu
+- `refactor`: refaktoryzacja kodu
 - `test`: zmiany testów
 - `chore`: zmiany budowania/narzędzi
 
@@ -115,45 +115,45 @@ refactor(web): simplify controller structure
 
 ### Wprowadzanie zmian
 
-1. **Pisanie kodu**
+1. **Pisz kod**
    - Przestrzegaj istniejących wzorców
    - Dodaj testy dla nowych funkcji
-   - Aktualizuj dokumentację
+   - Zaktualizuj dokumentację
 
-2. **Testowanie zmian**
+2. **Testuj swoje zmiany**
    ```bash
    # Uruchom wszystkie testy
    dotnet test
 
-   # Buduj w trybie wydania
+   # Zbuduj w trybie wydania
    dotnet build --configuration Release
    ```
 
-3. **Formatowanie kodu**
+3. **Formatuj kod**
    ```bash
    dotnet format
    ```
 
-4. **Zatwierdzanie zmian**
+4. **Zatwierdź zmiany**
    ```bash
    git add .
-   git commit -m "feat(zakres): opis"
+   git commit -m "feat(scope): description"
    ```
 
-5. **Wypychanie do Forka**
+5. **Wypchnij do swojego Forka**
    ```bash
-   git push origin feature/nazwa-twojej-funkcji
+   git push origin feature/your-feature-name
    ```
 
-6. **Utworzenie żądania pobrania**
+6. **Utwórz żądanie wciągnięcia**
    - Przejdź do oryginalnego repozytorium
-   - Kliknij "Compare & pull request"
+   - Kliknij „Compare & pull request"
    - Wypełnij szablon PR
    - Prześlij
 
 ---
 
-## Przewodnik żądań pobrania
+## Przewodnik żądań wciągnięcia
 
 ### Tytuł PR
 
@@ -166,37 +166,37 @@ feat(localization): add Korean language support
 
 Uwzględnij:
 
-1. **Co** - co robi ten PR?
-2. **Dlaczego** - dlaczego ta zmiana jest potrzebna?
-3. **Jak** - jak to zaimplementowałeś?
-4. **Testy** - jak to przetestowałeś?
+1. **Co** — co robi ten PR?
+2. **Dlaczego** — dlaczego ta zmiana jest potrzebna?
+3. **Jak** — jak zostało to zaimplementowane?
+4. **Testy** — jak zostało przetestowane?
 
 ### Przykład opisu PR
 
 ```markdown
 ## Co
-Dodanie koreańskiej lokalizacji dla wszystkich komponentów UI i dokumentacji.
+Dodanie lokalizacji koreańskiej dla wszystkich komponentów UI i dokumentacji.
 
 ## Dlaczego
 Rozszerzenie dostępności projektu dla użytkowników koreańskich.
 
 ## Jak
-- Utworzenie pliku lokalizacji KoKR.cs
-- Dodanie 500+ kluczy tłumaczeń
-- Aktualizacja wszystkich widoków do użycia lokalizacji
-- Utworzenie koreańskiej dokumentacji w docs/ko-KR/
+- Utworzono plik lokalizacji KoKR.cs
+- Dodano ponad 500 kluczy tłumaczeń
+- Zaktualizowano wszystkie widoki do użycia lokalizacji
+- Utworzono dokumentację koreańską w docs/ko-KR/
 
 ## Testy
-- Weryfikacja poprawnego wyświetlania koreańskiego tekstu we wszystkich elementach UI
-- Testowanie funkcji przełączania języka
-- Przegląd tłumaczeń z rodzimym użytkownikiem
+- Zweryfikowano, że wszystkie elementy UI poprawnie wyświetlają język koreański
+- Przetestowano funkcję przełączania języka
+- Przegląd tłumaczeń przez native speakera
 ```
 
 ---
 
 ## Typy współtworzenia
 
-### 1. Poprawki błędów
+### 1. Poprawka błędu
 
 **Proces**:
 1. Sprawdź istniejące zgłoszenia
@@ -206,11 +206,11 @@ Rozszerzenie dostępności projektu dla użytkowników koreańskich.
 5. Prześlij PR
 
 **Wymagania**:
-- Jasno opisz błąd
+- Jasny opis błędu
 - Kroki reprodukcji
-- Testy zapobiegające regresji
+- Test zapobiegający regresji
 
-### 2. Nowe funkcje
+### 2. Nowa funkcja
 
 **Proces**:
 1. Omów funkcję w Issues/Discussions
@@ -221,7 +221,7 @@ Rozszerzenie dostępności projektu dla użytkowników koreańskich.
 6. Prześlij PR
 
 **Wymagania**:
-- Propozycja funkcji została zatwierdzona
+- Propozycja funkcji zatwierdzona
 - Pełne pokrycie testami
 - Dokumentacja zaktualizowana
 - Zgodność wsteczna
@@ -235,15 +235,15 @@ Rozszerzenie dostępności projektu dla użytkowników koreańskich.
 
 **Wymagania**:
 - Jasna i zwięzła
-- Uwzględnij przykłady
-- Obsługa wielu języków, jeśli ma zastosowanie
+- Zawiera przykłady
+- Obsługuje wiele języków, jeśli dotyczy
 
-### 4. Refaktoring kodu
+### 4. Refaktoryzacja kodu
 
 **Proces**:
-1. Zaproponuj refaktoring w zgłoszeniu
+1. Zaproponuj refaktoryzację w Issue
 2. Uzyskaj aprobatę
-3. Refaktoryzuj kod
+3. Przeprowadź refaktoryzację
 4. Upewnij się, że wszystkie testy przechodzą
 5. Prześlij PR
 
@@ -276,17 +276,17 @@ public void MyFeature_ShouldWork_AsExpected()
 
 ### Testy integracyjne
 
-Testowanie pełnych przepływów pracy:
-- Interakcja AI
+Testuj pełne przepływy pracy:
+- Interakcja z AI
 - Wykonywanie narzędzi
 - Weryfikacja uprawnień
 - Operacje przechowywania
 
-### Testy manualne
+### Testy ręczne
 
 Dla zmian UI:
 - Testuj w wielu przeglądarkach
-- Weryfikuj projekt responsywny
+- Weryfikuj responsywny design
 - Sprawdzaj dostępność
 
 ---
@@ -295,9 +295,9 @@ Dla zmian UI:
 
 ### Komentarze w kodzie
 
-- Wszystkie publiczne API używają komentarzy XML
-- Złożona logika używa komentarzy inline
-- Komentarze w kodzie w języku angielskim
+- Używaj komentarzy XML dla wszystkich publicznych API
+- Używaj komentarzy liniowych dla złożonej logiki
+- Komentarze w kodzie pisz w języku angielskim
 
 ### Pliki dokumentacji
 
@@ -320,11 +320,11 @@ Podczas dodawania dokumentacji:
 
 1. **Jakość kodu**
    - Przestrzeganie konwencji
-   - Jasny i czytelny
-   - Dobrze udokumentowany
+   - Czytelność i przejrzystość
+   - Kompletna dokumentacja
 
 2. **Testy**
-   - Odpowiednie pokrycie
+   - Wystarczające pokrycie
    - Wszystkie testy przechodzą
    - Pokrycie przypadków brzegowych
 
@@ -335,13 +335,13 @@ Podczas dodawania dokumentacji:
 
 4. **Zgodność**
    - Zgodność wsteczna
-   - Brak zmian łamiących (chyba że zgłoszonych)
+   - Brak zmian przełamujących (chyba że zgłoszonych)
    - Przestrzeganie wersjonowania semantycznego
 
 ### Oś czasu przeglądu
 
-- Wstępny przegląd: 1-3 dni
-- Integracja opinii: w razie potrzeby
+- Wstępny przegląd: 1–3 dni
+- Integracja uwag: według potrzeb
 - Scalanie: po zatwierdzeniu
 
 ---
@@ -353,11 +353,11 @@ Podczas dodawania dokumentacji:
 **Przyczyny**:
 - Nieprzestrzeganie wytycznych
 - Niewystarczające testy
-- Niezgłoszone zmiany łamiące
+- Niezgłoszone zmiany przełamujące
 - Słaba jakość kodu
 
 **Rozwiązanie**:
-- Rozwiąż opinie
+- Rozwiąż uwagi
 - Zaktualizuj PR
 - Prześlij ponownie
 
@@ -391,16 +391,16 @@ git push --force-with-lease
 
 ### Kontakt
 
-- Utwórz zgłoszenie dla błędu
-- Rozpocznij dyskusję dla pytań
-- Oznacz opiekuna dla pilnych spraw
+- Twórz Issue dla błędów
+- Rozpocznij Discussion dla pytań
+- Oznacz opiekunów dla pilnych spraw
 
 ---
 
 ## Podziękowania
 
 Współtwórcy otrzymają uznanie w:
-- Sekcji współtwórców README.md
+- Sekcji współtwórców w README.md
 - Notkach wydania
 - Dokumentacji projektu
 
@@ -408,7 +408,7 @@ Współtwórcy otrzymają uznanie w:
 
 ## Licencja
 
-Wnosząc swój wkład, zgadzasz się, że będzie on licencjonowany na licencji Apache 2.0.
+Wnosząc swój wkład, zgadzasz się, że będzie on objęty licencją Apache 2.0.
 
 ---
 
@@ -417,6 +417,6 @@ Wnosząc swój wkład, zgadzasz się, że będzie on licencjonowany na licencji 
 - 📚 Przeczytaj [dokumentację](../)
 - 🐛 Zobacz [otwarte zgłoszenia](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
 - 💬 Rozpocznij [dyskusję](https://github.com/akimoto-akira/SiliconLifeCollective/discussions)
-- 🚀 Forkuj i zacznij współtworzyć!
+- 🚀 Zrób Fork i zacznij współtworzyć!
 
-Dziękujemy za współtworzenie SiliconLifeCollective! 🎉
+Dziękujemy za współtworzenie projektu SiliconLifeCollective!🎉

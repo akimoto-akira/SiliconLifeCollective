@@ -1,4 +1,4 @@
-﻿# 快速开始
+# 快速开始
 
 > **版本：v0.2.0-alpha**
 
@@ -229,7 +229,7 @@ SiliconLifeCollective/
 │   ├── SiliconLife.Fast/            # 高性能实现 + 入口点（窗体版）
 │   ├── SiliconLife.Speedy/          # SpeedyPack 高性能存储引擎
 │   └── SiliconLife.Speedy.Manager/  # SpeedyPack 管理工具（Avalonia UI）
-├── docs/                            # 文档（多语言，33 种语言变体）
+├── docs/                            # 文档（多语言，34 种语言变体）
 │   ├── en/                          # 英语
 │   ├── zh-CN/                       # 简体中文
 │   ├── zh-HK/                       # 繁体中文

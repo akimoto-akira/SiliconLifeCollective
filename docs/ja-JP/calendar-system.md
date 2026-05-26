@@ -1,4 +1,4 @@
-﻿# カレンダーシステム
+# カレンダーシステム
 
 > **バージョン: v0.2.0-alpha**
 
@@ -92,7 +92,7 @@ SiliconLifeCollective は、日付変換と歴史的正確性のために 32 種
 }
 ```
 
-### マルチカークエリ
+### マルチカレンダークエリ
 
 ```json
 {
@@ -113,13 +113,13 @@ SiliconLifeCollective は、日付変換と歴史的正確性のために 32 種
 public abstract class CalendarBase
 {
     public abstract string Name { get; }
-    
+
     public abstract CalendarDate ConvertFromGregorian(GregorianDate date);
-    
+
     public abstract GregorianDate ConvertToGregorian(CalendarDate date);
-    
+
     public virtual bool IsLeapYear(int year) => false;
-    
+
     public virtual int GetDaysInMonth(int year, int month) => 30;
 }
 ```
@@ -130,16 +130,16 @@ public abstract class CalendarBase
 public class MyCustomCalendar : CalendarBase
 {
     public override string Name => "MyCalendar";
-    
+
     public override CalendarDate ConvertFromGregorian(GregorianDate date)
     {
-        // 変換ロジック
+        // 转换逻辑
         return new CalendarDate(year, month, day);
     }
-    
+
     public override GregorianDate ConvertToGregorian(CalendarDate date)
     {
-        // 逆変換
+        // 反向转换
         return new GregorianDate(year, month, day);
     }
 }
@@ -151,11 +151,11 @@ public class MyCustomCalendar : CalendarBase
 
 ### 中国歴史暦の詳細（新規）
 
-中国歴史暦は本システムの大きな特徴で、2つのコア機能をサポート：
+中国歴史暦は本システムの大きな特徴であり、2つのコア機能をサポートしています。
 
 #### 1. 干支紀年システム
 
-60年周期を採用。天干と地支の組み合わせで構成：
+60年周期を採用し、天干と地支の組み合わせで構成されています。
 
 ```
 天干（10）：甲、乙、丙、丁、戊、己、庚、辛、壬、癸
@@ -188,7 +188,7 @@ public class MyCustomCalendar : CalendarBase
 
 #### 2. 帝王年号システム
 
-中国歴史の王朝と帝王年号の完全なデータベースを内蔵：
+中国歴史の王朝と帝王年号の完全なデータベースを内蔵しています。
 
 **サポートされる王朝**（一部）：
 - 清：康熙、雍正、乾隆、嘉慶、道光、咸豊、同治、光緒、宣統
@@ -245,9 +245,9 @@ public class MyCustomCalendar : CalendarBase
 
 ### 既知の制限
 
-- 一部の古代日付は概算
-- カレンダー改革は地域によって異なる
-- 閏秒処理は含まれない
+- 一部の古代日付は概算です
+- カレンダー改革は地域によって異なります
+- 閏秒処理は含まれません
 
 ---
 
@@ -258,29 +258,29 @@ public class MyCustomCalendar : CalendarBase
 歴史日付を現代カレンダーに変換：
 
 ```
-質問：「フランス大革命はいつですか？」
+問い：「フランス大革命はいつか？」
 回答：「1789年7月14日（グレゴリオ暦）」
        「元年熱月26日（フランス共和暦）」
 ```
 
 ### 文化アプリケーション
 
-伝統祭日をサポート：
+伝統的祝日をサポート：
 
 ```
-2026年春节：
+2026年春節：
 - グレゴリオ暦：2026年2月17日
 - 旧暦：正月初一
 ```
 
 ### マルチカルチャースケジューリング
 
-複数のカレンダーを尊重したイベントスケジュール：
+複数のカレンダーを尊重したイベントのスケジューリング：
 
 ```
 会議：2026-04-20
-- イスラム金曜礼拝を回避
-- ユダヤ安息日を尊重
+- イスラムの金曜礼拝を回避
+- ユダヤの安息日を尊重
 - 中国の祝日を考慮
 ```
 
@@ -288,9 +288,9 @@ public class MyCustomCalendar : CalendarBase
 
 ## ベストプラクティス
 
-### 1. 常にカレンダーを指定
+### 1. 常にカレンダーを指定する
 
-カレンダーシステムを推測しないでください：
+カレンダーシステムを前提にしないでください：
 
 ```json
 {
@@ -299,9 +299,9 @@ public class MyCustomCalendar : CalendarBase
 }
 ```
 
-### 2. 無効な日付を処理
+### 2. 無効な日付を処理する
 
-一部の日付は特定のカレンダーに存在しない：
+一部の日付は特定のカレンダーに存在しません：
 
 ```json
 {
@@ -309,9 +309,9 @@ public class MyCustomCalendar : CalendarBase
 }
 ```
 
-### 3. タイムゾーンを考慮
+### 3. タイムゾーンを考慮する
 
-日付変換はタイムゾーンによって異なる：
+日付変換はタイムゾーンによって異なる場合があります：
 
 ```
 2026-04-20 23:00 UTC+8
@@ -324,6 +324,6 @@ public class MyCustomCalendar : CalendarBase
 ## 次のステップ
 
 - 📚 [アーキテクチャガイド](architecture.md)を読む
-- 🛠️ [開発ガイド](development-guide.md)をチェック
-- 🔧 [ツールリファレンス](tools-reference.md)を見る
+- 🛠️ [開発ガイド](development-guide.md)を確認する
+- 🔧 [ツールリファレンス](tools-reference.md)を参照する
 - 🚀 [クイックスタートガイド](getting-started.md)で始める

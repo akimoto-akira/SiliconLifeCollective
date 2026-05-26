@@ -1,32 +1,32 @@
-﻿# Referencja API
+# Referencja API
 
 > **Wersja: v0.2.0-alpha**
 
-[English](../en/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md) | [Русский](../ru-RU/api-reference.md) | [Polski](../pl-PL/api-reference.md)
+[English](../en/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md) | [Русский](../ru-RU/api-reference.md)
 
-## Punkty końcowe Web API
+## Endpointy Web API
 
 Bazowy URL: `http://localhost:8080`
 
 ### Uwierzytelnianie
 
-Większość punktów końcowych wymaga uwierzytelnienia za pomocą ciasteczka sesji zarządzanego przez Web UI. Przed inicjalizacją systemu, wszystkie żądania z wyjątkiem strony pomocy zostaną przekierowane na stronę inicjalizacji.
+Większość endpointów wymaga uwierzytelniania przez ciasteczko sesyjne zarządzane przez Web UI. Przed inicjalizacją systemu, wszystkie żądania z wyjątkiem strony pomocy będą przekierowane na stronę inicjalizacji.
 
 ---
 
-## Pulpit nawigacyjny
+## Panel nawigacyjny
 
-### Pobranie statystyk pulpitu nawigacyjnego
+### Pobranie statystyk panelu
 
 **GET** `/api/dashboard/stats`
 
-Zwraca dane przeglądu systemu (liczba istot, stan działania itp.).
+Zwraca dane przeglądu systemu (liczba istot, status działania itp.).
 
-### Pobranie wskaźników wydajności
+### Pobranie metryk wydajności
 
 **GET** `/api/dashboard/metrics`
 
-Zwraca dane wskaźników wydajności w czasie rzeczywistym.
+Zwraca dane metryk wydajności w czasie rzeczywistym.
 
 ---
 
@@ -42,11 +42,9 @@ Zwraca stronę interfejsu czatu.
 
 **GET** `/api/chat/stream`
 
-Strumieniowy czat za pomocą zdarzeń wysyłanych przez serwer (SSE).
+Strumieniowy czat przez zdarzenia wysyłane przez serwer (SSE).
 
-**Parametry zapytania**: `channelId` — identyfikator kanału czatu
-
-**Odpowiedź**: Strumień zdarzeń wysyłanych przez serwer
+**Odpowiedź**: strumień zdarzeń wysyłanych przez serwer
 
 ```
 data: {"type": "chunk", "content": "I"}
@@ -59,9 +57,9 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/api/chat/conversations`
 
-Zwraca listę wszystkich aktywnych konwersacji czatowych.
+Zwraca listę wszystkich aktywnych sesji czatu.
 
-**Przykładowa odpowiedź**:
+**Przykład odpowiedzi**:
 ```json
 {
   "conversations": [
@@ -69,7 +67,7 @@ Zwraca listę wszystkich aktywnych konwersacji czatowych.
       "sessionId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
       "beingId": "being-uuid",
       "type": "single",
-      "displayName": "Czat z asystentem",
+      "displayName": "Czat z Xiaoyou",
       "lastMessage": "Treść ostatniej wiadomości",
       "lastTime": "2026-05-20T10:30:00Z"
     }
@@ -81,9 +79,9 @@ Zwraca listę wszystkich aktywnych konwersacji czatowych.
 
 **GET** `/api/chat/messages`
 
-Parametr zapytania: `channelId` — identyfikator kanału/konwersacji
+Parametr zapytania: `channelId` — identyfikator kanału/sesji
 
-Zwraca historię wiadomości określonej konwersacji.
+Zwraca historię wiadomości określonej sesji.
 
 ### Pobranie historii czatu
 
@@ -128,7 +126,7 @@ Zatrzymuje trwające generowanie odpowiedzi AI.
 
 **POST** `/api/chat/upload`
 
-Przesłanie pliku do konwersacji czatowej (obsługuje multipart/form-data).
+Przesyła plik do sesji czatu (obsługa multipart/form-data).
 
 ---
 
@@ -138,61 +136,51 @@ Przesłanie pliku do konwersacji czatowej (obsługuje multipart/form-data).
 
 **GET** `/beings`
 
-Zwraca stronę interfejsu zarządzania istotami krzemowymi.
+Zwraca stronę interfejsu zarządzania Istotami Krzemowymi.
 
 ### Pobranie listy istot
 
 **GET** `/api/beings` lub **GET** `/api/beings/list`
 
-Zwraca listę wszystkich zarejestrowanych istot krzemowych.
+Zwraca listę wszystkich zarejestrowanych Istot Krzemowych.
 
-**Przykładowa odpowiedź**:
+**Przykład odpowiedzi**:
 ```json
-[
-  {
-    "id": "being-uuid",
-    "name": "Assistant",
-    "activity": "Idle",
-    "isCustomCompiled": false,
-    "customTypeName": ""
-  }
-]
+{
+  "beings": [
+    {
+      "id": "being-uuid",
+      "name": "Assistant",
+      "status": "running",
+      "soulPath": "path/to/soul.md"
+    }
+  ]
+}
 ```
 
-**Wartości aktywności**: `Idle` | `SingleChat` | `GroupChat` | `Task` | `Timer` | `Broadcast` | `Project` | `MemoryCompression` | `Stopped`
+**Wartości statusu**: `idle` | `running` | `waiting_permission` | `stopped`
 
 ### Pobranie szczegółów istoty
 
 **GET** `/api/beings/detail`
 
-Parametr zapytania: `beingId` — identyfikator istoty
+Parametr zapytania: `beingId` — identyfikator Istoty Krzemowej
 
-Zwraca szczegółowe informacje o określonej istocie.
+Zwraca szczegółowe informacje o określonej Istocie Krzemowej.
 
-### Pobranie stanu aktywności istot
+### Pobranie statusu aktywności istot
 
 **GET** `/api/beings/activity`
 
-Parametr zapytania: `id` — identyfikator istoty
+Zwraca informacje o statusie aktywności poszczególnych Istot Krzemowych.
 
-Zwraca informacje o stanie aktywności określonej istoty.
-
-**Przykładowa odpowiedź**:
-```json
-{
-  "id": "being-uuid",
-  "name": "Assistant",
-  "activity": "Idle"
-}
-```
-
-### Strona edytora pliku duszy
+### Strona edytora Pliku Duszy
 
 **GET** `/beings/soul`
 
-Zwraca stronę interfejsu edytora pliku duszy.
+Zwraca interfejs edytora Pliku Duszy.
 
-### Zapisanie pliku duszy
+### Zapisanie Pliku Duszy
 
 **POST** `/api/beings/soul/save`
 
@@ -208,7 +196,7 @@ Zwraca stronę interfejsu edytora pliku duszy.
 
 **GET** `/beings/ai-config`
 
-Zwraca stronę interfejsu edytora konfiguracji AI.
+Zwraca interfejs edytora konfiguracji AI.
 
 ### Zapisanie konfiguracji AI
 
@@ -237,7 +225,7 @@ Zwraca listę dostępnych modeli dla określonego klienta AI.
 
 ---
 
-## Przeglądanie historii czatu
+## Przegląd historii czatu
 
 ### Strona historii czatu
 
@@ -249,7 +237,7 @@ Zwraca główną stronę historii czatu.
 
 **GET** `/chat-history-detail`
 
-Zwraca stronę szczegółów historii określonej konwersacji.
+Zwraca stronę szczegółów historii czatu określonej sesji.
 
 ### Strona szczegółów historii czatu grupowego
 
@@ -261,21 +249,21 @@ Zwraca stronę szczegółów historii czatu grupowego.
 
 **GET** `/broadcast-history-detail`
 
-Zwraca stronę szczegółów historii kanału transmisji.
+Zwraca stronę szczegółów historii kanału transmisyjnego.
 
-### Pobranie listy konwersacji historycznych
+### Pobranie listy historycznych sesji
 
 **GET** `/api/chat-history/conversations`
 
-Zwraca listę wszystkich historycznych konwersacji.
+Zwraca listę wszystkich historycznych sesji.
 
-### Pobranie wiadomości historycznych
+### Pobranie historycznych wiadomości
 
 **GET** `/api/chat-history/messages`
 
-Parametr zapytania: `sessionId` — identyfikator konwersacji
+Parametr zapytania: `sessionId` — identyfikator sesji
 
-Zwraca rekordy wiadomości określonej historycznej konwersacji.
+Zwraca rekordy wiadomości określonej historycznej sesji.
 
 ---
 
@@ -307,7 +295,7 @@ Parametr zapytania: `timerId` — identyfikator czasomierza
 
 Zwraca listę wszystkich cykli wykonania określonego czasomierza.
 
-### Strona pojedynczego cyklu wykonania
+### Strona szczegółów pojedynczego cyklu wykonania
 
 **GET** `/timer-cycle/{cycleIndex}`
 
@@ -351,7 +339,7 @@ Parametr zapytania: `taskId` — identyfikator zadania
 
 Zwraca listę wszystkich cykli wykonania określonego zadania.
 
-### Strona pojedynczego cyklu wykonania
+### Strona szczegółów pojedynczego cyklu wykonania
 
 **GET** `/task-cycle/{cycleIndex}`
 
@@ -379,24 +367,20 @@ Zwraca stronę interfejsu zarządzania uprawnieniami.
 
 **GET** `/api/permissions/list`
 
-Zwraca wszystkie aktualnie skonfigurowane reguły uprawnień.
+Zwraca wszystkie obecnie skonfigurowane reguły uprawnień.
 
-**Przykładowa odpowiedź**:
+**Przykład odpowiedzi**:
 ```json
-[
-  {
-    "permissionType": "Network",
-    "resourcePrefix": "network:api.github.com",
-    "result": "Allowed",
-    "description": "GitHub API access"
-  },
-  {
-    "permissionType": "Disk",
-    "resourcePrefix": "file:C:\\Windows",
-    "result": "Denied",
-    "description": ""
-  }
-]
+{
+  "rules": [
+    {
+      "permissionType": "NetworkAccess",
+      "resourcePrefix": "api.github.com",
+      "result": "Allowed",
+      "description": "Allow GitHub API access"
+    }
+  ]
+}
 ```
 
 ### Zapisanie reguły uprawnień
@@ -406,11 +390,10 @@ Zwraca wszystkie aktualnie skonfigurowane reguły uprawnień.
 **Treść żądania**:
 ```json
 {
-  "beingId": "being-uuid",
-  "permissionType": "Disk",
-  "resourcePrefix": "disk:write",
+  "permissionType": "FileAccess",
+  "resourcePrefix": "C:\\Projects",
   "result": "Allowed",
-  "description": "Zezwolenie na zapis na dysku"
+  "description": "Allow project directory access"
 }
 ```
 
@@ -418,15 +401,15 @@ Zwraca wszystkie aktualnie skonfigurowane reguły uprawnień.
 
 **GET** `/permission/request`
 
-Wyświetla stronę żądania uprawnień, pozwalając użytkownikowi zatwierdzić lub odrzucić żądanie uprawnień Istoty Krzemowej.
+Wyświetla stronę żądania uprawnień, pozwalając użytkownikowi zatwierdzić lub odmówić żądania uprawnień Istoty Krzemowej.
 
 **Parametry zapytania**:
 
 | Parametr | Typ | Opis |
-|----------|-----|------|
-| `userId` | `Guid` | ID Istoty Krzemowej żądającej uprawnień |
+|------|------|------|
+| `userId` | `Guid` | Identyfikator Istoty Krzemowej żądającej uprawnień |
 | `type` | `string` | Typ uprawnień |
-| `resource` | `string` | Ścieżka żądanego zasobu |
+| `resource` | `string` | Żądana ścieżka zasobu |
 | `allowCode` | `string` | Identyfikator kodu operacji zezwolenia |
 | `denyCode` | `string` | Identyfikator kodu operacji odmowy |
 
@@ -434,7 +417,7 @@ Wyświetla stronę żądania uprawnień, pozwalając użytkownikowi zatwierdzić
 
 **GET** `/permission/check`
 
-Parametr zapytania: `userId` — ID Istoty Krzemowej
+Parametr zapytania: `userId` — identyfikator Istoty Krzemowej
 
 **Odpowiedź**:
 ```json
@@ -450,10 +433,10 @@ Parametr zapytania: `userId` — ID Istoty Krzemowej
 **Parametry zapytania**:
 
 | Parametr | Typ | Opis |
-|----------|-----|------|
-| `userId` | `Guid` | ID Istoty Krzemowej |
+|------|------|------|
+| `userId` | `Guid` | Identyfikator Istoty Krzemowej |
 | `allowed` | `bool` | Czy zezwolić |
-| `addToCache` | `bool` | Czy zapisać decyzję w pamięci podręcznej |
+| `addToCache` | `bool` | Czy zbuforować decyzję |
 | `cacheDuration` | `double` | Czas trwania pamięci podręcznej (godziny) |
 
 **Odpowiedź**:
@@ -471,7 +454,7 @@ Parametr zapytania: `userId` — ID Istoty Krzemowej
 
 **GET** `/logs`
 
-Zwraca stronę interfejsu przeglądania logów.
+Zwraca stronę interfejsu przeglądarki logów.
 
 ### Pobranie listy logów
 
@@ -479,7 +462,7 @@ Zwraca stronę interfejsu przeglądania logów.
 
 Parametry zapytania obsługują filtrowanie według poziomu i zakresu czasu.
 
-**Przykładowa odpowiedź**:
+**Przykład odpowiedzi**:
 ```json
 {
   "logs": [
@@ -497,7 +480,7 @@ Parametry zapytania obsługują filtrowanie według poziomu i zakresu czasu.
 
 **GET** `/api/logs/beings`
 
-Statystyki logów zgrupowane według istot krzemowych.
+Statystyki logów zgrupowane według Istot Krzemowych.
 
 ### Pobranie dostępnych poziomów logów
 
@@ -519,15 +502,15 @@ Zwraca stronę interfejsu statystyk użycia.
 
 **GET** `/api/usage/summary`
 
-Zwraca podsumowanie użycia tokenów i kosztów.
+Zwraca podsumowanie zużycia tokenów i kosztów.
 
-### Pobranie danych trendu
+### Pobranie danych trendów
 
 **GET** `/api/usage/trend`
 
 Parametry zapytania: `startDate`, `endDate`
 
-Zwraca dane trendu użycia w określonym przedziale czasowym.
+Zwraca dane trendów użycia w określonym przedziale czasowym.
 
 ### Eksport danych użycia
 
@@ -537,15 +520,15 @@ Eksportuje dane użycia w formacie do pobrania.
 
 ---
 
-## Śledzenie audytu
+## Ślad audytu
 
 ### Strona audytu
 
 **GET** `/audit`
 
-Zwraca stronę interfejsu śledzenia audytu.
+Zwraca stronę interfejsu śladu audytu.
 
-### Pobranie listy audytów
+### Pobranie listy audytu
 
 **GET** `/api/audit/list`
 
@@ -557,11 +540,11 @@ Zwraca listę wpisów dziennika audytu.
 
 Zwraca zagregowane statystyki danych audytu.
 
-### Pobranie audytów zgrupowanych według istot
+### Pobranie audytu zgrupowanego według istot
 
 **GET** `/api/audit/beings`
 
-Statystyki audytu zgrupowane według istot krzemowych.
+Statystyki audytu zgrupowane według Istot Krzemowych.
 
 ---
 
@@ -600,7 +583,7 @@ Zwraca stronę interfejsu konfiguracji systemu.
 
 **GET** `/config/aioptions`
 
-Zwraca dostępne typy klientów AI i ich dynamiczne opcje (dostępne modele, regiony itp.).
+Zwraca dostępne typy klientów AI i ich opcje dynamiczne (dostępne modele, regiony itp.).
 
 ---
 
@@ -616,7 +599,7 @@ Zwraca stronę interfejsu zarządzania pamięcią.
 
 **GET** `/api/memory/list`
 
-Zwraca listę wpisów pamięci istot krzemowych.
+Zwraca listę wpisów pamięci Istot Krzemowych.
 
 ### Pobranie szczegółów pamięci
 
@@ -632,7 +615,7 @@ Zwraca pełną treść określonego wpisu pamięci.
 
 Zwraca informacje statystyczne systemu pamięci.
 
-### Wyszukanie w pamięci
+### Wyszukiwanie pamięci
 
 **GET** `/api/memory/search`
 
@@ -644,15 +627,15 @@ Wyszukuje pasujące wpisy pamięci.
 
 **GET** `/api/memory/beings`
 
-Statystyki pamięci zgrupowane według istot krzemowych.
+Statystyki pamięci zgrupowane według Istot Krzemowych.
 
-### Pobranie śladu pamięci
+### Pobranie śledzenia pamięci
 
 **GET** `/api/memory/trace/{id}`
 
 Parametr ścieżki: `id` — identyfikator wpisu pamięci
 
-Zwraca łańcuch śledzenia źródła określonego wpisu pamięci.
+Zwraca łańcuch śledzenia pochodzenia określonego wpisu pamięci.
 
 ### Pobranie osi czasu pamięci HTML
 
@@ -676,7 +659,7 @@ Zwraca stronę interfejsu notatek pracy.
 
 Zwraca listę notatek pracy.
 
-### Odczytanie notatki pracy
+### Odczyt notatki pracy
 
 **GET** `/api/work-notes/read`
 
@@ -684,13 +667,13 @@ Parametr zapytania: `noteId` — identyfikator notatki
 
 Zwraca treść określonej notatki.
 
-### Pobranie katalogu notatek
+### Pobranie spisu treści notatek
 
 **GET** `/api/work-notes/directory`
 
-Zwraca strukturę katalogu notatek.
+Zwraca strukturę spisu treści notatek.
 
-### Wyszukanie notatek pracy
+### Wyszukiwanie notatek pracy
 
 **GET** `/api/work-notes/search`
 
@@ -737,19 +720,19 @@ Wyszukuje pasujące notatki pracy.
 
 ---
 
-## Sieć wiedzy
+## Sieć Wiedzy
 
-### Strona sieci wiedzy
+### Strona Sieci Wiedzy
 
 **GET** `/knowledge`
 
-Zwraca stronę interfejsu zarządzania siecią wiedzy.
+Zwraca stronę interfejsu zarządzania Siecią Wiedzy.
 
 ### Pobranie grafu wiedzy
 
 **GET** `/api/knowledge/graph`
 
-Zwraca dane grafu trójek wiedzy (podmiot-relacja-orzeczenie).
+Zwraca dane grafu trójek wiedzy (podmiot-relacja-obiekt).
 
 ---
 
@@ -777,13 +760,63 @@ Parametr ścieżki: `id` — identyfikator projektu
 
 Zwraca stronę zarządzania zadaniami określonego projektu.
 
+### Strona uprawnień narzędzi projektu
+
+**GET** `/project/{id}/tool-permissions`
+
+Parametr ścieżki: `id` — identyfikator projektu
+
+Zwraca stronę zarządzania uprawnieniami narzędzi określonego projektu.
+
+### Strona przepływu pracy projektu
+
+**GET** `/project/{id}/workflow`
+
+Parametr ścieżki: `id` — identyfikator projektu
+
+Zwraca stronę zarządzania przepływem pracy określonego projektu.
+
+### Pobranie szczegółów przepływu pracy projektu
+
+**GET** `/api/projects/workflow-detail`
+
+Parametr zapytania: `projectId` — identyfikator projektu
+
+Zwraca szczegóły przepływu pracy powiązanego z projektem.
+
+### Przypisanie roli projektowej
+
+**POST** `/api/projects/assign-role`
+
+**Treść żądania**:
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid",
+  "roleName": "developer"
+}
+```
+
+### Usunięcie roli projektowej
+
+**POST** `/api/projects/remove-role`
+
+**Treść żądania**:
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid",
+  "roleName": "developer"
+}
+```
+
 ### Pobranie listy projektów
 
 **GET** `/api/projects/list`
 
 Zwraca listę wszystkich projektów.
 
-### Pobranie listy szablonów przepływu pracy
+### Pobranie listy szablonów przepływu pracy projektu
 
 **GET** `/api/projects/list-workflow-templates`
 
@@ -796,12 +829,12 @@ Zwraca listę dostępnych szablonów przepływu pracy.
 **Treść żądania**:
 ```json
 {
-  "name": "Mój projekt",
+  "name": "Mój Projekt",
   "description": "Opis projektu"
 }
 ```
 
-### Zarchiwizowanie projektu
+### Archiwizacja projektu
 
 **POST** `/api/projects/{id}/archive`
 
@@ -878,7 +911,7 @@ Parametr ścieżki: `id` — identyfikator projektu
 
 Zwraca listę notatek pracy określonego projektu.
 
-### Odczytanie notatki pracy projektu
+### Odczyt notatek pracy projektu
 
 **GET** `/api/projects/{id}/work-notes/read`
 
@@ -908,7 +941,7 @@ Aktualizuje notatkę pracy w określonym projekcie.
 
 Parametr ścieżki: `id` — identyfikator projektu
 
-Usuwa notatkę pracy z określonego projektu.
+Usuwa notatkę pracy w określonym projekcie.
 
 ### Pobranie listy zadań projektu
 
@@ -940,23 +973,23 @@ Aktualizuje zadanie w określonym projekcie.
 
 Parametr ścieżki: `id` — identyfikator projektu
 
-Usuwa zadanie z określonego projektu.
+Usuwa zadanie w określonym projekcie.
 
-### Przypisanie odpowiedzialnego za zadanie
+### Przypisanie osoby odpowiedzialnej za zadanie
 
 **POST** `/api/projects/{id}/tasks/assign`
 
 Parametr ścieżki: `id` — identyfikator projektu
 
-Przypisuje odpowiedzialnego do zadania projektu.
+Przypisuje osobę odpowiedzialną do zadania projektu.
 
-### Usunięcie odpowiedzialnego za zadanie
+### Usunięcie osoby odpowiedzialnej za zadanie
 
 **POST** `/api/projects/{id}/tasks/remove-assignee`
 
 Parametr ścieżki: `id` — identyfikator projektu
 
-Usuwa odpowiedzialnego z zadania projektu.
+Usuwa osobę odpowiedzialną za zadanie projektu.
 
 ### Oznaczenie zadania jako ukończone
 
@@ -984,19 +1017,90 @@ Anuluje zadanie projektu.
 
 ---
 
+## Zarządzanie uprawnieniami narzędzi
+
+### Pobranie uprawnień narzędzi Istoty Krzemowej
+
+**GET** `/api/beings/tool-permissions`
+
+Parametr zapytania: `beingId` — identyfikator Istoty Krzemowej
+
+Zwraca konfigurację uprawnień narzędzi określonej Istoty Krzemowej.
+
+### Aktualizacja uprawnień narzędzi Istoty Krzemowej
+
+**PUT** `/api/beings/tool-permissions`
+
+**Treść żądania**:
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "network": "allowed",
+    "disk_read": "allowed",
+    "disk_write": "denied"
+  }
+}
+```
+
+### Pobranie szablonów uprawnień narzędzi
+
+**GET** `/api/beings/tool-permissions/templates`
+
+Zwraca listę dostępnych szablonów uprawnień narzędzi.
+
+### Zastosowanie szablonu uprawnień narzędzi
+
+**POST** `/api/beings/tool-permissions/apply-template`
+
+**Treść żądania**:
+```json
+{
+  "beingId": "being-uuid",
+  "templateName": "readonly"
+}
+```
+
+### Pobranie uprawnień narzędzi projektu
+
+**GET** `/api/projects/{id}/tool-permissions`
+
+Parametr ścieżki: `id` — identyfikator projektu
+
+Zwraca konfigurację uprawnień narzędzi określonego projektu.
+
+### Aktualizacja uprawnień narzędzi projektu
+
+**PUT** `/api/projects/{id}/tool-permissions`
+
+Parametr ścieżki: `id` — identyfikator projektu
+
+**Treść żądania**:
+```json
+{
+  "permissions": {
+    "network": "allowed",
+    "disk_read": "allowed",
+    "disk_write": "denied"
+  }
+}
+```
+
+---
+
 ## Zarządzanie wykonawcami
 
 ### Strona wykonawców
 
-**GET** `/executors`
+**GET** `/executor`
 
 Zwraca stronę interfejsu zarządzania wykonawcami.
 
-### Pobranie stanu wykonawców
+### Pobranie statusu wykonawców
 
 **GET** `/api/executors/status`
 
-Zwraca stan działania poszczególnych wykonawców (dysk, sieć, wiersz poleceń).
+Zwraca status działania poszczególnych wykonawców (dyskowy, sieciowy, wiersza poleceń).
 
 ---
 
@@ -1031,7 +1135,7 @@ Zwraca szczegóły kodu określonego pliku.
 **GET** `/api/code/hover`
 **POST** `/api/code/hover`
 
-Pobiera informacje podpowiedzi dla lokalizacji kodu (podobnie jak inteligentne podpowiedzi IDE).
+Pobiera informacje podpowiedzi dla lokalizacji kodu (podobnie do inteligentnych podpowiedzi IDE).
 
 ### Rejestracja lokalizacji kodu
 
@@ -1049,7 +1153,7 @@ Aktualizuje informacje o zarejestrowanej lokalizacji kodu.
 
 **POST** `/api/code/unregister`
 
-Wyrejestrowuje niepotrzebne już monitorowanie lokalizacji kodu.
+Wyrejestrowuje monitorowanie lokalizacji kodu, która nie jest już potrzebna.
 
 ---
 
@@ -1069,7 +1173,7 @@ Parametr ścieżki: `topic` — identyfikator tematu
 
 Zwraca stronę dokumentacji pomocy dla określonego tematu.
 
-### Wyszukanie dokumentacji pomocy
+### Wyszukiwanie dokumentacji pomocy
 
 **GET** `/api/help/search`
 
@@ -1085,7 +1189,7 @@ Wyszukuje pasujące tematy dokumentacji pomocy.
 
 **GET** `/init`
 
-Zwraca stronę kreatora inicjalizacji przy pierwszym uruchomieniu.
+Zwraca stronę kreatora inicjalizacji pierwszego uruchomienia.
 
 ### Przesłanie inicjalizacji
 
@@ -1093,7 +1197,7 @@ Zwraca stronę kreatora inicjalizacji przy pierwszym uruchomieniu.
 
 Przesyła konfigurację inicjalizacji pierwszego uruchomienia.
 
-### Przeglądanie wyboru katalogu danych
+### Przegląd wyboru katalogu danych
 
 **GET** `/init/browse`
 
@@ -1103,19 +1207,19 @@ Otwiera przeglądarkę katalogów w celu wyboru lokalizacji przechowywania danyc
 
 **GET** `/init/ai-config-metadata`
 
-Zwraca dostępne typy klientów AI i metadane ich pól konfiguracyjnych.
+Zwraca dostępne typy klientów AI i metadane ich pól konfiguracji.
 
 ---
 
 ## Sterowanie systemem
 
-### Łagodne wyłączenie
+### Eleganckie zamknięcie
 
 **POST** `/api/system/shutdown`
 
 > **Uwaga**: Dozwolone tylko żądania z localhost
 
-Wyzwala proces łagodnego wyłączenia aplikacji:
+Wyzwala procedurę eleganckiego zamknięcia aplikacji:
 
 1. Zatrzymanie pętli głównej (MainLoop)
 2. Zapisanie bieżącej konfiguracji
@@ -1131,13 +1235,13 @@ Wyzwala proces łagodnego wyłączenia aplikacji:
 
 ---
 
-## O systemie
+## O projekcie
 
-### Strona o systemie
+### Strona o projekcie
 
 **GET** `/about`
 
-Zwraca stronę o systemie, zawierającą informacje o systemie i listę załadowanych wtyczek.
+Zwraca stronę o projekcie, zawierającą informacje o systemie i listę załadowanych wtyczek.
 
 **Dane listy wtyczek**:
 ```json
@@ -1157,14 +1261,14 @@ Zwraca stronę o systemie, zawierającą informacje o systemie i listę załadow
 
 ## Odpowiedzi błędów
 
-Wszystkie punkty końcowe zwracają ustandaryzowane odpowiedzi błędów:
+Wszystkie endpointy zwracają ustandaryzowane odpowiedzi błędów:
 
 ```json
 {
   "error": {
     "code": "PERMISSION_DENIED",
     "message": "You don't have permission to access this resource",
-    "details": "Required: disk:write, Current: disk:read"
+    "details": "Required: FileAccess, Denied by GlobalACL"
   }
 }
 ```
@@ -1172,7 +1276,7 @@ Wszystkie punkty końcowe zwracają ustandaryzowane odpowiedzi błędów:
 ### Typowe kody błędów
 
 | Kod | Status HTTP | Opis |
-|-----|-------------|------|
+|------|-------------|------|
 | `PERMISSION_DENIED` | 403 | Niewystarczające uprawnienia |
 | `NOT_FOUND` | 404 | Zasób nie znaleziony |
 | `VALIDATION_ERROR` | 400 | Nieprawidłowe parametry żądania |
@@ -1188,7 +1292,7 @@ Zdarzenia wysyłane przez serwer są używane do aktualizacji w czasie rzeczywis
 ### Zdarzenia czatu
 
 ```javascript
-const eventSource = new EventSource('/api/chat/stream?channelId=channel-uuid');
+const eventSource = new EventSource('/api/chat/stream');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);
@@ -1296,6 +1400,6 @@ public class ToolResult
 ## Następne kroki
 
 - 🚀 Zobacz [przewodnik szybkiego startu](getting-started.md)
-- 🛠️ Przeczytaj [przewodnik programistyczny](development-guide.md)
+- 🛠️ Przeczytaj [przewodnik deweloperski](development-guide.md)
 - 📚 Zobacz [dokumentację architektury](architecture.md)
 - 🔒 Poznaj [model bezpieczeństwa](security.md)

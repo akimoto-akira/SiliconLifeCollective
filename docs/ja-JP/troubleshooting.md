@@ -1,4 +1,4 @@
-﻿# トラブルシューティングガイド
+# トラブルシューティングガイド
 
 > **バージョン: v0.2.0-alpha**
 
@@ -74,7 +74,7 @@ ollama pull qwen2.5:7b
 ollama list
 ```
 
-#### 問題：DashScope 404 エラー
+#### 問題：百錬 404 エラー
 
 **症状**：
 ```
@@ -83,7 +83,7 @@ HTTP 404: Model not found
 
 **解決策**：
 1. API キーが正しいことを確認
-2. モデル名が DashScope カタログと一致するか確認
+2. モデル名が百錬カタログと一致するか確認
 3. リージョンエンドポイントが正しいことを確認
 4. アカウントがモデルにアクセスできるか確認
 
@@ -128,10 +128,10 @@ lsof -ti:8080 | xargs kill -9
 
 **または設定でポートを変更**。
 
-#### 問題：生命体が起動しない
+#### 問題：シリコンビーイングが起動しない
 
 **症状**：
-- 生命体状態が「Error」を表示
+- シリコンビーイングの状態が「Error」を表示
 - ログに初期化失敗が表示
 
 **解決策**：
@@ -155,8 +155,8 @@ OutOfMemoryException
 dotnet run --project src/SiliconLife.Default --server.gcHeapCount 4
 ```
 
-2. **SiliconLife.Fast**：Fast バージョン自体のメモリ使用量が高い（~500MB）。メモリが継続的に不足する場合は、以下を推奨します：
-   - 同時実行シリコン生命体の数を減らす
+2. **SiliconLife.Fast**：Fast バージョン自体のメモリ使用量が高い（~500MB）。メモリが継続的に不足する場合は、以下を推奨：
+   - 同時実行シリコンビーイング数を削減
    - 古いデータをクリーンアップしてメモリを解放
 
 3. 古いデータをクリーンアップ：
@@ -179,23 +179,24 @@ mkdir logs
 
 **症状**：
 ```
-Permission denied: disk:write
+Permission denied: FileAccess C:\Windows
 ```
 
 **解決策**：
 1. 現在の権限を確認：
 ```bash
-curl http://localhost:8080/api/permissions
+curl http://localhost:8080/api/permissions/list
 ```
 
 2. 権限を付与：
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "resource": "disk:write",
-    "allowed": true,
-    "duration": 3600
+    "permissionType": "FileAccess",
+    "resourcePrefix": "C:\\Projects",
+    "result": "Allowed",
+    "description": "Allow project directory access"
   }'
 ```
 
@@ -217,11 +218,14 @@ curl -X POST http://localhost:8080/api/permissions \
 
 #### 問題：Web UI にアクセスできない
 
+**症状**：
+- ブラウザに「Connection refused」と表示
+
 **解決策**：
 1. サーバーが実行中であることを確認
-2. ポート 8080 がブロックされていないことを確認
+2. 正しい URL を確認：`http://localhost:8080`
 3. ファイアウォール設定を確認
-4. ブラウザのコンソールでエラーを確認
+4. ログで起動エラーを確認
 
 #### 問題：SSE が機能しない
 
@@ -363,9 +367,9 @@ Plugin load failed: Security check failed
 
 ---
 
-### 作業ノート問題
+### ワークノート問題
 
-#### 問題：作業ノートを作成できない
+#### 問題：ワークノートを作成できない
 
 **症状**：
 ```
@@ -373,7 +377,7 @@ Failed to create work note
 ```
 
 **解決策**：
-1. 生命体が存在し実行状態であることを確認
+1. シリコンビーイングが存在し実行状態であることを確認
 2. ストレージパスに書き込み権限があることを確認
 3. コンテンツが空でないことを確認（コンテンツは必須）
 4. ログで詳細なエラー情報を確認
@@ -394,7 +398,7 @@ Failed to create work note
 
 **症状**：
 - 目次生成時の応答時間が長い
-- 生命体に大量のノートがある（>1000 ページ）
+- シリコンビーイングに大量のノートがある（>1000 ページ）
 
 **解決策**：
 1. これは正常な動作。すべてのノートを走査する必要がある
@@ -491,6 +495,73 @@ Failed to create project
 3. JSON ファイルの形式が正しいことを確認
 4. 破損したプロジェクトファイルを手動で修復
 
+#### 問題：プロジェクトロールの割り当てに失敗
+
+**症状**：
+```
+Failed to assign role
+```
+
+**解決策**：
+1. シリコンビーイングがプロジェクトに参加していることを確認
+2. ロール名が有効であることを確認
+3. 操作者がシリコンキュレーターであることを確認
+4. ログで詳細なエラー情報を確認
+
+#### 問題：ワークフローを開始できない
+
+**症状**：
+- ワークフローインスタンスの作成に失敗
+- 状態遷移が実行されない
+
+**解決策**：
+1. ワークフローテンプレートが定義されていることを確認
+2. 初期状態が正しく設定されていることを確認
+3. プロジェクトにワークフローテンプレートがバインドされていることを確認
+4. ワークフローログで遷移エラーを確認
+
+---
+
+### ツール権限問題
+
+#### 問題：ツール操作が拒否された
+
+**症状**：
+```
+Tool operation denied: network:post
+```
+
+**解決策**：
+1. シリコンビーイングのツール権限設定を確認：
+```bash
+curl http://localhost:8080/api/beings/tool-permissions?beingId=<id>
+```
+
+2. ツール権限を更新：
+```bash
+curl -X PUT http://localhost:8080/api/beings/tool-permissions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "beingId": "being-uuid",
+    "permissions": {
+      "network:post": "allowed"
+    }
+  }'
+```
+
+3. または Web UI を使用：シリコンビーイング → ツール権限
+
+#### 問題：プロジェクトツール権限が反映されない
+
+**症状**：
+- プロジェクトレベルのツール権限が期待通りに動作しない
+
+**解決策**：
+1. プロジェクトレベルの権限が正しく設定されていることを確認
+2. シリコンビーイングレベルとプロジェクトレベルの権限が競合していないか確認
+3. プロジェクトレベルの権限はシリコンビーイングレベルとは独立しており、両者の積集合が適用される
+4. 監査ログで権限チェック結果を確認
+
 ---
 
 ## デバッグ
@@ -559,12 +630,12 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 ### CPU 使用率が高い
 
 **確認**：
-- 多すぎる生命体が実行中
+- 多すぎるシリコンビーイングが実行中
 - ツール内の無限ループ
 - 頻繁なタイマー実行
 
 **解決策**：
-- 並行生命体を削減
+- 並行シリコンビーイングを削減
 - ツールコードを最適化
 - タイマー間隔を調整
 
@@ -631,7 +702,7 @@ dotnet run --project src/SiliconLife.Fast
 
 ### セキュリティ脆弱性
 
-1. すべての生命体を停止
+1. すべてのシリコンビーイングを停止
 2. すべての権限を取り消し
 3. 監査ログを確認
 4. アクセス制御を確認

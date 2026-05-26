@@ -1,4 +1,4 @@
-﻿# Kalendersystem
+# Kalendersystem
 
 > **Version: v0.2.0-alpha**
 
@@ -6,48 +6,48 @@
 
 ## Übersicht
 
-SiliconLifeCollective unterstützt 32 verschiedene Kalendersysteme für Datumskonvertierung und historische Genauigkeit.
+SiliconLifeCollective unterstützt 32 verschiedene Kalendersysteme für Datumsumrechnungen und historische Genauigkeit.
 
 ## Unterstützte Kalender (32)
 
 ### Hauptkalender (6)
 
 1. **Gregorianischer Kalender (Gregorian)** - Internationaler Standardkalender, ID: `gregorian`
-2. **Chinesischer Lunarkalender (Chinese Lunar)** - Traditioneller chinesischer Kalender mit Schaltmonat-Berechnung, ID: `lunar`
+2. **Chinesischer Mondkalender (Chinese Lunar)** - Traditioneller chinesischer Kalender mit Schaltmonatsberechnung, ID: `lunar`
 3. **Islamischer Kalender (Islamic)** - Islamischer Hidschra-Kalender, ID: `islamic`
 4. **Hebräischer Kalender (Hebrew)** - Jüdischer Kalender, ID: `hebrew`
 5. **Persischer Kalender (Persian)** - Iranischer Sonnenkalender, ID: `persian`
-6. **Indischer Kalender (Indian)** - Indischer Nationalkalender, ID: `indian`
+6. **Indischer Nationalkalender (Indian)** - Indischer Nationalkalender, ID: `indian`
 
 ### Chinesische historische Kalender (2)
 
-7. **Chinesischer historischer Kalender (Chinese Historical)** - Unterstützt Ganzhi-Zyklus und Kaiser-Ären, ID: `chinese_historical`
-   - **Ganzhi-Zyklus**: 60-Jahre-Zyklus (Himmelsstämme + Erdzweige)
-   - **Kaiser-Ären**: Unterstützt Ären aller chinesischen Dynastien (Kangxi, Qianlong, Zhenguan etc.)
-   - **Dynamische Datenbank**: Eingebaute vollständige Datenbank chinesischer Dynastien und Ären
-8. **Sexagenary-Kalender (Sexagenary)** - 60-Jahre-Ganzhi-Zyklus, ID: `sexagenary`
+7. **Chinesischer historischer Kalender (Chinese Historical)** - Unterstützt Sexagenarzyklus und Kaiserära-Namen, ID: `chinese_historical`
+   - **Sexagenarzyklus**: 60-Jahres-Zyklus (Himmelsstämme + Erdzweige)
+   - **Kaiserära-Namen**: Unterstützt Ära-Namen verschiedener chinesischer Dynastien (Kangxi, Qianlong, Zhenguan usw.)
+   - **Dynamische Datenbank**: Integrierte vollständige Datenbank chinesischer historischer Dynastien und Ära-Namen
+8. **Sexagenarzyklus-Kalender (Sexagenary)** - 60-Jahres-Sexagenarzyklus, ID: `sexagenary`
 
 ### Ostasiatische Kalender (6)
 
-9. **Japanischer Kalender (Japanese)** - Japanischer Nengo-Ären-Kalender, ID: `japanese`
-10. **Vietnamesischer Kalender (Vietnamese)** - Vietnamesischer Lunarkalender (Katzen-Zodiak-Variante), ID: `vietnamese`
+9. **Japanischer Kalender (Japanese)** - Japanischer Nengo-Kalender, ID: `japanese`
+10. **Vietnamesischer Kalender (Vietnamese)** - Vietnamesischer Mondkalender (Katze-Tierkreis-Variante), ID: `vietnamese`
 11. **Tibetischer Kalender (Tibetan)** - Tibetisches Kalendersystem, ID: `tibetan`
 12. **Mongolischer Kalender (Mongolian)** - Mongolischer Kalender, ID: `mongolian`
-13. **Dai-Kalender (Dai)** - Dai-Kalender mit vollständiger Lunarb erechnung, ID: `dai`
-14. **Dehong-Dai-Kalender (Dehong Dai)** - Dehong-Dai-Variante, ID: `dehong_dai`
+13. **Dai-Kalender (Dai)** - Dai-Kalender mit vollständiger Mondkalenderberechnung, ID: `dai`
+14. **Dehong-Dai-Kalender (Dehong Dai)** - Dehong-Dai-Kalender-Variante, ID: `dehong_dai`
 
 ### Historische Kalender (6)
 
-15. **Maya-Kalender (Mayan)** - Maya-Langzeitkalender, ID: `mayan`
-16. **Römischer Kalender (Roman)** - Altrömischer Kalender, ID: `roman`
+15. **Maya-Kalender (Mayan)** - Maya-Langzählungskalender, ID: `mayan`
+16. **Römischer Kalender (Roman)** - Antiker römischer Kalender, ID: `roman`
 17. **Julianischer Kalender (Julian)** - Julianischer Kalender, ID: `julian`
-18. **Französischer republikanischer Kalender (French Republican)** - Französischer Revolutionskalender, ID: `french_republican`
+18. **Französischer Republikanischer Kalender (French Republican)** - Französischer Revolutionskalender, ID: `french_republican`
 19. **Koptischer Kalender (Coptic)** - Koptisch-orthodoxer Kalender, ID: `coptic`
 20. **Äthiopischer Kalender (Ethiopian)** - Äthiopischer Kalender, ID: `ethiopian`
 
 ### Regionale Kalender (6)
 
-21. **Buddhistischer Kalender (Buddhist)** - Buddhistische Zeitrechnung (BE), Jahr + 543, ID: `buddhist`
+21. **Buddhistischer Kalender (Buddhist)** - Buddhistische Ära (BE), Jahr + 543, ID: `buddhist`
 22. **Saka-Kalender (Saka)** - Saka-Ära (Indonesien), ID: `saka`
 23. **Vikram-Samvat-Kalender (Vikram Samvat)** - Hinduistischer Kalender, ID: `vikram_samvat`
 24. **Javanischer Kalender (Javanese)** - Javanisch-islamischer Kalender, ID: `javanese`
@@ -56,7 +56,7 @@ SiliconLifeCollective unterstützt 32 verschiedene Kalendersysteme für Datumsko
 
 ### Moderne Kalender (3)
 
-27. **ROC-Kalender (ROC)** - Minguo-Kalender, Jahr - 1911, ID: `roc`
+27. **ROC-Kalender (ROC)** - Republik-China-Kalender, Jahr - 1911, ID: `roc`
 28. **Juche-Kalender (Juche)** - Nordkoreanischer Kalender, Jahr - 1911, ID: `juche`
 29. **Zoroastrischer Kalender (Zoroastrian)** - Zoroastrischer Kalender, ID: `zoroastrian`
 
@@ -68,9 +68,9 @@ SiliconLifeCollective unterstützt 32 verschiedene Kalendersysteme für Datumsko
 
 ---
 
-## Kalender-Tool verwenden
+## Kalender-Werkzeug verwenden
 
-### Grundlegende Konvertierung
+### Einfache Umrechnung
 
 ```json
 {
@@ -101,7 +101,7 @@ SiliconLifeCollective unterstützt 32 verschiedene Kalendersysteme für Datumsko
 }
 ```
 
-**Antwort**: Gibt Datum in allen 32 Kalendersystemen zurück.
+**Antwort**: Gibt das Datum in allen 32 Kalendersystemen zurück.
 
 ---
 
@@ -147,15 +147,15 @@ public class MyCustomCalendar : CalendarBase
 
 ---
 
-## Spezielle Funktionen
+## Besondere Funktionen
 
 ### Chinesischer historischer Kalender im Detail (Neu)
 
-Der chinesische historische Kalender ist ein Highlight des Systems mit zwei Kernfunktionen:
+Der chinesische historische Kalender ist ein Highlight dieses Systems und unterstützt zwei Kernfunktionen:
 
-#### 1. Ganzhi-Jahreszyklus-System
+#### 1. Sexagenarzyklus-System
 
-Verwendet 60-Jahre-Zyklus, kombiniert aus Himmelsstämmen und Erdzweigen:
+Verwendet einen 60-Jahres-Zyklus, der aus Himmelsstämmen und Erdzweigen kombiniert wird:
 
 ```
 Himmelsstämme (10): 甲、乙、丙、丁、戊、己、庚、辛、壬、癸
@@ -164,8 +164,8 @@ Erdzweige (12): 子、丑、寅、卯、辰、巳、午、未、申、酉、戌�
 
 **Beispiele**:
 - 2026 = 丙午年
-- 2025 = 乙巳年 (Jahr der Schlange)
-- 2024 = 甲辰年 (Jahr des Drachens)
+- 2025 = 乙巳年 (Schlangenjahr)
+- 2024 = 甲辰年 (Drachenjahr)
 
 **Verwendungsbeispiel**:
 ```json
@@ -186,15 +186,15 @@ Erdzweige (12): 子、丑、寅、卯、辰、巳、午、未、申、酉、戌�
 }
 ```
 
-#### 2. Kaiser-Ären-System
+#### 2. Kaiserära-System
 
-Eingebaute vollständige Datenbank chinesischer Dynastien und Kaiser-Ären:
+Integrierte vollständige Datenbank chinesischer historischer Dynastien und Kaiserära-Namen:
 
-**Unterstützte Dynastien** (Auszug):
+**Unterstützte Dynastien** (Auswahl):
 - Qing-Dynastie: Kangxi, Yongzheng, Qianlong, Jiaqing, Daoguang, Xianfeng, Tongzhi, Guangxu, Xuantong
-- Ming-Dynastie: Hongwu, Yongle, Jiajing, Wanli, Chongzhen etc.
-- Tang-Dynastie: Zhenguan, Kaiyuan, Tianbao etc.
-- Han-Dynastie: Jianyuan, Yuanguang, Yuanshuo etc.
+- Ming-Dynastie: Hongwu, Yongle, Jiajing, Wanli, Chongzhen u. a.
+- Tang-Dynastie: Zhenguan, Kaiyuan, Tianbao u. a.
+- Han-Dynastie: Jianyuan, Yuanguang, Yuanshuo u. a.
 - Weitere Dynastien...
 
 **Verwendungsbeispiel**:
@@ -217,10 +217,10 @@ Eingebaute vollständige Datenbank chinesischer Dynastien und Kaiser-Ären:
 }
 ```
 
-### Schaltmonat-Behandlung
+### Schaltmonatsbehandlung
 
 Kalender mit Schaltmonaten:
-- Chinesischer Lunarkalender
+- Chinesischer Mondkalender
 - Hebräischer Kalender
 - Buddhistischer Kalender
 - Vietnamesischer Kalender
@@ -229,68 +229,68 @@ Kalender mit Schaltmonaten:
 {
   "isLeapMonth": true,
   "month": 4,
-  "note": "闰四月"
+  "note": "Schaltmonat 4"
 }
 ```
 
 ---
 
-## Kalender-Genauigkeit
+## Kalendergenauigkeit
 
 ### Astronomische Berechnungen
 
 - Basierend auf tatsächlichen astronomischen Daten
-- Unterstützt historische Daten
-- Behandelt Kalenderreformen
+- Unterstützung historischer Daten
+- Behandlung von Kalenderreformen
 
 ### Bekannte Einschränkungen
 
-- Einige antike Daten sind approximativ
-- Kalenderreformen variieren nach Region
-- Enthält keine Schaltsekunden-Behandlung
+- Einige antike Daten sind Näherungswerte
+- Kalenderreformen variieren je nach Region
+- Keine Schaltsekundenbehandlung
 
 ---
 
-## Anwendungsfälle
+## Anwendungsbeispiele
 
 ### Historische Forschung
 
-Historische Daten in moderne Kalender konvertieren:
+Historische Daten in moderne Kalender umrechnen:
 
 ```
 Frage: "Wann war die Französische Revolution?"
 Antwort: "14. Juli 1789 (Gregorianisch)"
-        "26. Thermidor I (Französisch republikanisch)"
+   "26. Thermidor des Jahres I (Französischer Republikanischer Kalender)"
 ```
 
 ### Kulturelle Anwendungen
 
-Unterstützung traditioneller Feiertage:
+Unterstützung traditioneller Feste:
 
 ```
-Chinesisches Neujahr 2026:
+Chinesisches Neujahrsfest 2026:
 - Gregorianisch: 17. Februar 2026
-- Lunarkalender: 1. Tag des 1. Monats
+- Mondkalender: 1. Tag des 1. Monats
 ```
 
-### Multikulturelles Scheduling
+### Multikulturelle Terminplanung
 
-Events planen unter Berücksichtigung mehrerer Kalender:
+Termine planen, die mehrere Kalender berücksichtigen:
 
 ```
-Meeting: 2026-04-20
-- Islamisches Freitagsgebet vermeiden
+Besprechung: 2026-04-20
+- Islamischen Freitagsgebet ausweichen
 - Jüdischen Schabbat respektieren
-- Chinesische Feiertage beachten
+- Chinesische Feiertage berücksichtigen
 ```
 
 ---
 
 ## Best Practices
 
-### 1. Immer Kalender spezifizieren
+### 1. Kalender immer angeben
 
-Niemals Kalendersystem annehmen:
+Das Kalendersystem niemals voraussetzen:
 
 ```json
 {
@@ -301,7 +301,7 @@ Niemals Kalendersystem annehmen:
 
 ### 2. Ungültige Daten behandeln
 
-Einige Daten existieren in bestimmten Kalendern nicht:
+Bestimmte Daten existieren in bestimmten Kalendern nicht:
 
 ```json
 {
@@ -311,7 +311,7 @@ Einige Daten existieren in bestimmten Kalendern nicht:
 
 ### 3. Zeitzonen berücksichtigen
 
-Datumskonvertierung kann je nach Zeitzone variieren:
+Datumsumrechnungen können je nach Zeitzone variieren:
 
 ```
 2026-04-20 23:00 UTC+8
@@ -323,7 +323,7 @@ Datumskonvertierung kann je nach Zeitzone variieren:
 
 ## Nächste Schritte
 
-- 📚 [Architekturleitfaden](architecture.md) lesen
-- 🛠️ [Entwicklungsleitfaden](development-guide.md) prüfen
-- 🔧 [Tool-Referenz](tools-reference.md) ansehen
-- 🚀 [Schnellstart-Leitfaden](getting-started.md) beginnen
+- 📚 [Architekturhandbuch](architecture.md) lesen
+- 🛠️ [Entwicklungshandbuch](development-guide.md) ansehen
+- 🔧 [Werkzeugreferenz](tools-reference.md) ansehen
+- 🚀 Mit der [Schnellstartanleitung](getting-started.md) beginnen

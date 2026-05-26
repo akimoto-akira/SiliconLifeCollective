@@ -259,6 +259,62 @@ curl -X POST http://localhost:8080/api/permissions/save \
 curl http://localhost:8080/api/permissions/list
 ```
 
+## 工具权限系统
+
+除了操作级别的权限验证链，系统还提供了**工具权限**管理机制，用于控制硅基生命体可以使用哪些工具。
+
+### 两级工具权限
+
+工具权限分为两个级别：
+
+1. **硅基生命体级别** — 控制单个硅基生命体可以使用哪些工具操作
+2. **项目级别** — 控制项目空间内可用的工具操作，独立于硅基生命体级别的权限
+
+### 工具权限配置
+
+每个工具的每个操作都可以独立配置为允许或拒绝：
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "network:get": "allowed",
+    "network:post": "denied",
+    "disk:read": "allowed",
+    "disk:write": "denied",
+    "database:query": "allowed"
+  }
+}
+```
+
+### 权限模板
+
+系统提供预定义的工具权限模板，可快速应用到硅基生命体：
+
+- **readonly** — 只读权限（允许读取操作，拒绝写入操作）
+- **full** — 完整权限（允许所有操作）
+- **restricted** — 受限权限（仅允许基本操作）
+
+### Web UI 管理
+
+通过 Web UI 管理工具权限：
+
+- **硅基生命体工具权限页面** — `/beings/tool-permissions`
+- **项目工具权限页面** — `/project/{id}/tool-permissions`
+
+### API 端点
+
+| 端点 | 方法 | 描述 |
+|------|------|------|
+| `/api/beings/tool-permissions` | GET | 获取硅基生命体工具权限 |
+| `/api/beings/tool-permissions` | PUT | 更新硅基生命体工具权限 |
+| `/api/beings/tool-permissions/templates` | GET | 获取权限模板列表 |
+| `/api/beings/tool-permissions/apply-template` | POST | 应用权限模板 |
+| `/api/projects/{id}/tool-permissions` | GET | 获取项目工具权限 |
+| `/api/projects/{id}/tool-permissions` | PUT | 更新项目工具权限 |
+
+---
+
 ## 最佳实践
 
 ### 1. 最小权限原则

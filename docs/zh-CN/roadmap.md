@@ -1,4 +1,4 @@
-﻿# 路线图
+# 路线图
 
 > **版本：v0.2.0-alpha**
 
@@ -20,12 +20,9 @@
 - ✅ 阶段 1：基础项目结构和配置系统移植
 - ✅ 阶段 2：Web UI 和控制器移植
 - ✅ 阶段 3：存储系统优化（SpeedyPack 内存存储 + 异步持久化）
-- ✅ 阶段 3.5：SpeedyPack 管理工具（SiliconLife.Speedy.Manager Windows Forms 应用）
+- ✅ 阶段 3.5：SpeedyPack 管理工具（SiliconLife.Speedy.Manager Avalonia UI 应用）
 - ✅ 阶段 3.6：插件系统（IPlugin 接口、安全沙箱、AssemblyLoadContext 隔离）
-- 🚧 阶段 4：系统托盘和窗体应用开发
-- 📋 阶段 5：性能优化（连接池、对象池、无锁并发）
-- 📋 阶段 6：Kestrel Web 服务器替换
-- 📋 阶段 7：MessagePack 二进制序列化
+- ✅ 阶段 4：Avalonia 窗体应用（跨平台桌面应用，Windows/macOS 系统托盘，Linux 状态窗口）
 
 ---
 
@@ -284,6 +281,30 @@
 
 ---
 
+## ~~阶段 10.7：项目协作与工作流~~ ✅ 已完成
+
+**目标**：添加项目工作区、工作流引擎、记忆淡忘机制和工具权限系统。
+
+| # | 模块 | 描述 |
+|---|--------|-------------|
+| 10.7.1 | 项目角色管理 | ProjectTool 添加 assign_role、remove_role、list_roles 操作 |
+| 10.7.2 | 工作流引擎 | WorkflowEngine 核心引擎，支持模板定义、状态转换、Tick 驱动执行 |
+| 10.7.3 | 工作流模板 | WorkflowTemplate 基类，定义状态集合和转换规则 |
+| 10.7.4 | 工作流实例 | WorkflowInstance 实例管理，绑定到具体项目，跟踪当前状态 |
+| 10.7.5 | 工作流日志 | WorkflowLog 记录状态转换历史 |
+| 10.7.6 | 记忆淡忘机制 | MemoryFadeService 定时衰减服务，每小时自动对记忆进行重要性衰减和归档 |
+| 10.7.7 | 工具权限系统 | 两级工具权限（硅基生命体级别 + 项目级别），权限模板，操作粒度控制 |
+| 10.7.8 | ToolPermissionController | 工具权限管理 Web 控制器 |
+| 10.7.9 | ProjectWorkTool | 项目工作操作工具（[SiliconManagerOnly]，[ToolScenario(Project)]） |
+| 10.7.10 | 工具场景系统 | ToolScenarioAttribute 和 ChatOnlyAttribute，支持 Chat/Task/Timer/MemoryCompression/Project 场景过滤 |
+| 10.7.11 | 本地化扩展 | 添加俄语、葡萄牙语、意大利语、荷兰语、波兰语、瑞典语本地化，总计 34 种语言变体 |
+
+**交付物**：完整的项目协作系统、工作流引擎、记忆淡忘机制和工具权限管理。
+
+**验证**：创建项目 → 分配角色 → 绑定工作流模板 → 生命体在项目空间内协作 → 记忆自动衰减归档 → 工具权限隔离生效。
+
+---
+
 ## 阶段 11：外部即时通讯集成
 
 **目标**：连接到外部消息传递平台，以更广泛的用户可访问性。
@@ -305,6 +326,6 @@
 
 | # | 模块 | 描述 |
 |---|--------|-------------|
-| 12.1 | 知识网络 | 使用三元结构（主谓宾）的共享知识图谱 |
+| 12.1 | ~~知识网络~~ ✅ 已完成 | 三元结构（主谓宾）的知识图谱，支持增删改查、路径发现、高级查询和图谱遍历 |
 | 12.2 | ~~插件系统~~ ✅ 已完成 | 外部插件加载，带安全检查和沙箱（IPlugin 接口、PluginLoader、AssemblyLoadContext 隔离） |
 | 12.3 | 技能生态系统 | 可重用技能市场，用于生命体能力 |

@@ -1,96 +1,96 @@
-﻿# Přispívání
+# Příručka přispívání
 
 > **Verze: v0.2.0-alpha**
 
 [English](../en/contributing.md) | [Deutsch](../de-DE/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | **Čeština** | [Русский](../ru-RU/contributing.md)
 
-Děkujeme vám za zájem přispět do SiliconLifeCollective!
+Děkujeme za váš zájem přispět do SiliconLifeCollective!
 
-## Přispívání Duální Verze
+## Přispívání do duálních verzí
 
-Tento projekt má dvě implementační verze. Můžete si vybrat směr přispívání podle svých zájmů:
+Tento projekt má dvě implementační verze, můžete si vybrat směr příspěvku podle zájmu:
 
-### SiliconLife.Default (Výchozí Verze)
-- **Technologický Stack**: .NET 9 Konzolová aplikace
-- **Směr Přispívání**: Vývoj jádrových funkcí, implementace nástrojů, lokalizace, dokumentace
-- **Vhodné Pro**: Všechny vývojáře
+### SiliconLife.Default (výchozí verze)
+- **Technologický stack**: .NET 9 konzolová aplikace
+- **Směr příspěvku**: vývoj základních funkcí, implementace nástrojů, lokalizace, dokumentace
+- **Vhodné pro**: všechny vývojáře
 
-### SiliconLife.Fast (Vysoce Výkonná Verze)
-- **Technologický Stack**: .NET 9 Windows Forms aplikace
-- **Směr Přispívání**: Optimalizace výkonu, paměťové úložiště, systémová lišta, lock-free souběžnost
-- **Vhodné Pro**: Vývojáře s Windows vývojovými zkušenostmi a zájmem o optimalizaci výkonu
+### SiliconLife.Fast (vysoce výkonná verze)
+- **Technologický stack**: .NET 9 multiplatformní desktopová aplikace (Avalonia UI)
+- **Směr příspěvku**: optimalizace výkonu, SpeedyPack úložiště, systémová lišta, bezzámková souběžnost
+- **Vhodné pro**: vývojáře se zkušenostmi s desktopovým vývojem a zájmem o optimalizaci výkonu
 
-> **Důležitá Poznámka**: Obě verze sdílejí projekty SiliconLife.Core a SiliconLife.Common. Vylepšení jádrových rozhraní ovlivní obě verze současně.
+> **Důležité upozornění**: Obě verze sdílejí projekty SiliconLife.Core a SiliconLife.Common, vylepšení základních rozhraní ovlivní obě verze současně.
 
-## Kodex Chování
+## Kodex chování
 
-Tento projekt následuje licenci Apache 2.0. Ve všech interakcích buďte respektující a profesionální.
+Tento projekt se řídí licencí Apache 2.0. V všech interakcích zachovávejte respekt a profesionalitu.
 
 ---
 
-## Rychlý Start
+## Rychlý start
 
-### 1. Fork Repozitáře
+### 1. Forkněte repozitář
 
 Klikněte na tlačítko "Fork" na GitHubu pro vytvoření vlastní kopie.
 
-### 2. Naklonujte Váš Fork
+### 2. Klonujte svůj Fork
 
 ```bash
 git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 ```
 
-### 3. Nastavte Vývojové Prostředí
+### 3. Nastavte vývojové prostředí
 
 ```bash
-# Nainstalujte .NET 9 SDK
+# Instalace .NET 9 SDK
 # https://dotnet.microsoft.com/download/dotnet/9.0
 
-# Obnovte závislosti
+# Obnovení závislostí
 dotnet restore
 
-# Sestavte projekt
+# Sestavení projektu
 dotnet build
 
-# Spusťte testy
+# Spuštění testů
 dotnet test
 ```
 
-### 4. Vytvořte Větev Funkce
+### 4. Vytvořte větev pro funkci
 
 ```bash
-git checkout -b feature/vase-nazev-funkce
+git checkout -b feature/your-feature-name
 ```
 
-### 5. Vyberte Vývojový Projekt
+### 5. Vyberte vývojový projekt
 
-Vyberte vhodný projekt podle typu vašeho příspěvku:
+Podle typu vašeho příspěvku vyberte vhodný projekt:
 
-- **Jádrová Rozhraní/Abstraktní Třídy** → Upravit `SiliconLife.Core`
-- **Sdílené Implementace** → Upravit `SiliconLife.Common`
-- **Specifické pro Default** → Upravit `SiliconLife.Default`
-- **Specifické pro Fast** → Upravit `SiliconLife.Fast`
-- **Storage Engine** → Upravit `SiliconLife.Speedy`
-- **Správcovský nástroj úložiště** → Upravit `SiliconLife.Speedy.Manager`
-- **Vývoj pluginů** → Upravit `SiliconLife.Core/Plugins`
-- **Vícejazyčná Dokumentace** → Upravit adresář `docs/`
+- **Základní rozhraní/abstraktní třídy** → upravte `SiliconLife.Core`
+- **Sdílená implementace** → upravte `SiliconLife.Common`
+- **Specifické pro verzi Default** → upravte `SiliconLife.Default`
+- **Specifické pro verzi Fast** → upravte `SiliconLife.Fast`
+- **Úložný engine** → upravte `SiliconLife.Speedy`
+- **Správa úložiště** → upravte `SiliconLife.Speedy.Manager`
+- **Vývoj zásuvných modulů** → upravte `SiliconLife.Core/Plugins`
+- **Vícejazyčná dokumentace** → upravte adresář `docs/`
 
 ---
 
-## Vývojový Workflow
+## Vývojový pracovní postup
 
-### Styl Kódu
+### Styl kódu
 
-- Dodržujte konvence kódování C#
-- Názvy tříd používejte PascalCase
-- Parametry metod používejte camelCase
-- Soukromá pole používejte `_camelCase`
+- Dodržujte konvence C#
+- Názvy tříd používejte v PascalCase
+- Parametry metod používejte v camelCase
+- Soukromá pole používejte s předponou `_camelCase`
 - Všechna veřejná API musí mít XML dokumentaci
 
-### Zprávy o Commitu
+### Commit zprávy
 
-Následujte formát **Conventional Commits**:
+Dodržujte formát **konvenčních commitů**:
 
 ```
 <typ>(<rozsah>): <popis>
@@ -99,11 +99,11 @@ Následujte formát **Conventional Commits**:
 **Typy**:
 - `feat`: Nová funkce
 - `fix`: Oprava chyby
-- `docs`: Změny dokumentace
+- `docs`: Změna dokumentace
 - `style`: Formátování kódu
-- `refactor`: Refaktorizace kódu
-- `test`: Změny testů
-- `chore`: Změny sestavení/nástrojů
+- `refactor`: Refaktoring kódu
+- `test`: Změna testů
+- `chore`: Změna sestavení/nástrojů
 
 **Příklady**:
 ```bash
@@ -113,39 +113,39 @@ docs: update contributing guide
 refactor(web): simplify controller structure
 ```
 
-### Provádění Změn
+### Provádění změn
 
-1. **Pište kód**
+1. **Psaní kódu**
    - Dodržujte existující vzory
    - Přidejte testy pro nové funkce
    - Aktualizujte dokumentaci
 
-2. **Otestujte své změny**
+2. **Testování změn**
    ```bash
-   # Spusťte všechny testy
+   # Spuštění všech testů
    dotnet test
    
-   # Sestavte v režimu Release
+   # Sestavení v režimu Release
    dotnet build --configuration Release
    ```
 
-3. **Formátujte kód**
+3. **Formátování kódu**
    ```bash
    dotnet format
    ```
 
-4. **Commitujte změny**
+4. **Potvrzení změn**
    ```bash
    git add .
-   git commit -m "feat(rozsah): popis"
+   git commit -m "feat(scope): description"
    ```
 
-5. **Pushněte na váš Fork**
+5. **Push do vašeho Forku**
    ```bash
-   git push origin feature/vase-nazev-funkce
+   git push origin feature/your-feature-name
    ```
 
-6. **Vytvořte Pull Request**
+6. **Vytvoření Pull Requestu**
    - Přejděte na původní repozitář
    - Klikněte na "Compare & pull request"
    - Vyplňte šablonu PR
@@ -157,7 +157,7 @@ refactor(web): simplify controller structure
 
 ### Název PR
 
-Použijte stejný formát jako zprávy commitu:
+Použijte stejný formát jako pro commit zprávy:
 ```
 feat(localization): add Korean language support
 ```
@@ -171,276 +171,252 @@ Zahrňte:
 3. **Jak** - Jak jste to implementovali?
 4. **Testování** - Jak jste to testovali?
 
-### Příklad Popisu PR
+### Příklad popisu PR
 
 ```markdown
 ## Co
-Přidání korejské lokalizace pro všechny UI komponenty a dokumentaci.
+Přidána korejská lokalizace pro všechny UI komponenty a dokumentaci.
 
 ## Proč
 Rozšíření přístupnosti projektu pro korejské uživatele.
 
 ## Jak
-- Vytvořil KoKR lokalizační soubory
-- Aktualizoval všechny UI řetězce
-- Přeložil dokumentaci
-- Přidal testy
+- Vytvořen soubor KoKR.cs s lokalizací
+- Přidáno 500+ překladových klíčů
+- Aktualizovány všechny pohledy pro použití lokalizace
+- Vytvořena korejská dokumentace v docs/ko-KR/
 
 ## Testování
-- Ručně ověřeno v Web UI
-- Spuštěny všechny existující testy
-- Otestováno přepínání jazyků
+- Ověřeno, že všechny UI prvky správně zobrazují korejštinu
+- Testována funkce přepínání jazyků
+- Překlady zkontrolovány s rodilým mluvčím
 ```
 
 ---
 
-## Směrnice pro Kód
+## Typy příspěvků
 
-### Struktura Projektu
+### 1. Opravy chyb
 
-```
-src/
-├── SiliconLife.Core/      # Rozhraní a abstrakce
-│   ├── AI/                # AI klientská rozhraní
-│   ├── Chat/              # Systém chatu
-│   ├── Config/            # Konfigurační modely
-│   ├── Tools/             # Rozhraní nástrojů
-│   └── ...
-└── SiliconLife.Default/   # Konkrétní implementace
-    ├── AI/                # AI klienti
-    ├── Tools/             # Implementace nástrojů
-    ├── Web/               # Web UI
-    └── ...
-```
+**Postup**:
+1. Zkontrolujte existující Issues
+2. Pokud neexistuje, vytvořte Issue
+3. Opravte chybu
+4. Přidejte testovací případ
+5. Odešlete PR
 
-### Přidávání Nových Funkcí
+**Požadavky**:
+- Jasný popis chyby
+- Kroky k reprodukci
+- Test zabraňující regresi
 
-1. **Rozhraní nejprve v Core**
-   ```csharp
-   // SiliconLife.Core/INovaFunkce.cs
-   public interface INovaFunkce
-   {
-       Task<string> ProveďAsync(string vstup);
-   }
-   ```
+### 2. Nové funkce
 
-2. **Implementace v Default**
-   ```csharp
-   // SiliconLife.Default/NovaFunkce.cs
-   public class NovaFunkce : INovaFunkce
-   {
-       public async Task<string> ProveďAsync(string vstup)
-       {
-           // Implementace
-       }
-   }
-   ```
+**Postup**:
+1. Prodiskutujte funkci v Issues/Discussions
+2. Získejte schválení od správce
+3. Implementujte funkci
+4. Přidejte komplexní testy
+5. Aktualizujte dokumentaci
+6. Odešlete PR
 
-3. **Přidejte testy**
-   ```csharp
-   [Fact]
-   public async Task ProveďAsync_VraciOcekavanyVysledek()
-   {
-       // Test
-   }
-   ```
+**Požadavky**:
+- Návrh funkce schválen
+- Kompletní testovací pokrytí
+- Dokumentace aktualizována
+- Zpětná kompatibilita
 
-4. **Aktualizujte dokumentaci**
+### 3. Dokumentace
+
+**Postup**:
+1. Identifikujte mezery v dokumentaci
+2. Napište/aktualizujte dokumentaci
+3. Odešlete PR
+
+**Požadavky**:
+- Jasné a stručné
+- Včetně příkladů
+- Podpora více jazyků (pokud applicable)
+
+### 4. Refaktoring kódu
+
+**Postup**:
+1. Navrhněte refaktoring v Issue
+2. Získejte schválení
+3. Refaktorujte kód
+4. Ujistěte se, že všechny testy procházejí
+5. Odešlete PR
+
+**Požadavky**:
+- Žádná změna funkcionality
+- Všechny testy procházejí
+- Zlepšení kvality kódu
+- Jasné vysvětlení
 
 ---
 
-## Přidávání Nových Nástrojů
+## Průvodce testováním
 
-1. Vytvořte nový soubor v `src/SiliconLife.Common/Tools/` nebo `src/SiliconLife.App/Tools/`:
+### Jednotkové testy
 
 ```csharp
-public class MujVlastniNastroj : ITool
+[TestMethod]
+public void MyFeature_ShouldWork_AsExpected()
 {
-    public string Name => "muj_nastroj";
-    public string Description => "Popis toho, co tento nástroj dělá";
+    // Uspořádání
+    var service = new MyService();
     
-    public async Task<ToolResult> ExecuteAsync(ToolCall call)
-    {
-        // Logika nástroje
-        return new ToolResult { Success = true, Output = "výsledek" };
-    }
-}
-```
-
-2. Nástroj je automaticky objeven prostřednictvím reflexe.
-
-3. (Volitelné) Označte jako pouze pro kurátora:
-```csharp
-[SiliconManagerOnly]
-public class AdminNastroj : ITool { ... }
-```
-
----
-
-## Přidávání Nových Jazyků
-
-1. Vytvořte nový adresář v `docs/`:
-```bash
-mkdir docs/fr-FR
-```
-
-2. Zkopírujte existující dokumenty:
-```bash
-cp docs/en/* docs/fr-FR/
-```
-
-3. Přeložte všechny dokumenty
-
-4. Aktualizujte odkazy na dokumenty v každém souboru
-
-5. Přidejte lokalizaci Web UI:
-```csharp
-// SiliconLife.Default/Localization/FrFR.cs
-public class FrFR : LocalizationBase
-{
-    // Implementace
-}
-```
-
----
-
-## Přidávání Nových Skinů
-
-1. Vytvořte nový soubor v `src/SiliconLife.Default/Web/Skins/`:
-
-```csharp
-public class MujSkin : ISkin
-{
-    public string Name => "MujSkin";
-    public string Description => "Popis skinu";
+    // Provedení
+    var result = service.DoSomething();
     
-    public string GetCss()
-    {
-        return @"
-            :root {
-                --primary-color: #barva;
-            }
-        ";
-    }
+    // Tvrzení
+    Assert.IsTrue(result.Success);
 }
 ```
 
-2. Skin je automaticky objeven Správcem skinů.
+### Integrační testy
+
+Testování kompletních pracovních postupů:
+- AI interakce
+- Provádění nástrojů
+- Ověřování oprávnění
+- Operace úložiště
+
+### Manuální testování
+
+Pro změny UI:
+- Testujte ve více prohlížečích
+- Ověřte responzivní design
+- Zkontrolujte přístupnost
 
 ---
 
-## Testování
+## Průvodce dokumentací
 
-### Spouštění Testů
+### Komentáře v kódu
 
+- Pro veškerá veřejná API používejte XML komentáře
+- Pro složitou logiku používejte inline komentáře
+- Komentáře v kódu používejte v angličtině
+
+### Dokumentační soubory
+
+- Umístěte do `docs/{language}/`
+- Aktualizujte všechny jazykové verze
+- Dodržujte existující strukturu
+
+### Vícejazyčná dokumentace
+
+Při přidávání dokumentace:
+1. Nejprve vytvořte anglickou verzi
+2. Přeložte do dalších jazyků
+3. Udržujte obsah synchronizovaný
+
+---
+
+## Proces revize
+
+### Na co se správci zaměřují
+
+1. **Kvalita kódu**
+   - Dodržování konvencí
+   - Srozumitelnost a čitelnost
+   - Dokumentace
+
+2. **Testování**
+   - Dostatečné pokrytí
+   - Všechny testy procházejí
+   - Pokrytí okrajových případů
+
+3. **Dokumentace**
+   - Aktualizována
+   - Jasné vysvětlení
+   - Vícejazyčná
+
+4. **Kompatibilita**
+   - Zpětně kompatibilní
+   - Žádné breaking changes (pokud není oznámeno)
+   - Dodržování sémantického verzování
+
+### Časová osa revize
+
+- Počáteční revize: 1-3 dny
+- Integrace zpětné vazby: dle potřeby
+- Sloučení: po schválení
+
+---
+
+## Časté otázky
+
+### PR zamítnut
+
+**Důvody**:
+- Nedodržení pokynů
+- Nedostatečné testování
+- Neoznámené breaking changes
+- Špatná kvalita kódu
+
+**Řešení**:
+- Řešte zpětnou vazbu
+- Aktualizujte PR
+- Znovu odešlete
+
+### Konflikty při sloučení
+
+**Řešení**:
 ```bash
-# Všechny testy
-dotnet test
+# Aktualizace vaší větve
+git fetch origin
+git rebase origin/master
 
-# Konkrétní testovací projekt
-dotnet test tests/SiliconLife.Core.Tests/
+# Řešení konfliktů
+# Upravte konfliktní soubory
+git add .
+git rebase --continue
 
-# S detailním výstupem
-dotnet test --logger "console;verbosity=detailed"
-```
-
-### Psaní Testů
-
-```csharp
-public class MujNastrojTests
-{
-    [Fact]
-    public async Task ExecuteAsync_PlatnyVstup_VraciSuccess()
-    {
-        // Arrange
-        var tool = new MujNastroj();
-        var call = new ToolCall { Parameters = new Dictionary<string, object>() };
-        
-        // Act
-        var result = await tool.ExecuteAsync(call);
-        
-        // Assert
-        Assert.True(result.Success);
-    }
-}
+# Force push
+git push --force-with-lease
 ```
 
 ---
 
-## Dokumentace
+## Získání pomoci
 
-### Aktualizace Dokumentace
+### Zdroje
 
-Při přidávání nových funkcí:
+- **Dokumentace**: [docs/](../)
+- **Problémy**: GitHub Issues
+- **Diskuse**: GitHub Discussions
+- **Kodex chování**: CODE_OF_CONDUCT.md
 
-1. **Aktualizujte relevantní .md soubory** v `docs/`
-2. **Přidejte příklady** použití
-3. **Dokumentujte API** změny
-4. **Aktualizujte všechny jazykové verze** (nebo označte k překladu)
+### Kontakt
 
-### Styl Dokumentace
-
-- Používejte Markdown formátování
-- Zahrňte příklady kódu
-- Popište parametry a návratové hodnoty
-- Uveďte případy použití
-
----
-
-## Proces Revize
-
-### Co Hledáme
-
-- **Funkčnost**: Kód dělá to, co má?
-- **Kvalita**: Dodržuje standardy kódování?
-- **Testy**: Jsou zahrnuty testy?
-- **Dokumentace**: Je aktualizována dokumentace?
-- **Výkon**: Žádné zbytečné režie?
-- **Bezpečnost**: Žádné bezpečnostní problémy?
-
-### Čas Revize
-
-- Většina PR je revizována do 48 hodin
-- Složité změny mohou trvat déle
-- Buďte trpěliví a respektujte čas recenzentů
-
----
-
-## Časté Otázky
-
-### Mohu přispět bez znalosti C#?
-
-Ano! Můžete pomoci s:
-- Překlady dokumentace
-- Testování a hlášení chyb
-- Návrhy funkcí
-- Vylepšení dokumentace
-
-### Jak dlouho trvá schválení PR?
-
-Obvykle 1-3 dny pro jednoduché změny, déle pro komplexní funkce.
-
-### Mohu přispět k existující funkci?
-
-Ano! Otevřete issue pro diskusi o navrhovaných změnách.
-
-### Jak nahlásit chybu?
-
-1. Vyhledejte existující issues
-2. Pokud nenalezeno, vytvořte nové issue
-3. Zahrňte kroky k reprodukci
-4. Připojte relevantní logy
-
----
-
-## Licence
-
-Přispíváním souhlasíte s tím, že vaše příspěvky budou licencovány pod Apache 2.0.
+- Vytvořte Issue pro chyby
+- Zahajte Discussion pro dotazy
+- Označte správce pro naléhavé záležitosti
 
 ---
 
 ## Poděkování
 
-Děkujeme všem přispěvatelům, kteří pomáhají zlepšovat SiliconLifeCollective!
+Přispěvatelé budou uznáni v:
+- Sekci přispěvatelů v README.md
+- Poznámkách k vydání
+- Projektové dokumentaci
 
-**Začněte přispívat ještě dnes!** 🚀
+---
+
+## Licence
+
+Příspěvkem souhlasíte, že váš příspěvek bude licencován pod licencí Apache 2.0.
+
+---
+
+## Další kroky
+
+- 📚 Přečtěte [dokumentaci](../)
+- 🐛 Prohlédněte [otevřené Issues](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 💬 Zahajte [diskusi](https://github.com/akimoto-akira/SiliconLifeCollective/discussions)
+- 🚀 Forkněte a začněte přispívat!
+
+Děkujeme za přispění do SiliconLifeCollective! 🎉

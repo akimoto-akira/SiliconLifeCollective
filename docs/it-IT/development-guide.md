@@ -1,49 +1,50 @@
-﻿# Guida di sviluppo
+# Guida allo Sviluppo
 
 > **Versione: v0.2.0-alpha**
 
-[English](../en/development-guide.md) | [Deutsch](../de-DE/development-guide.md) | [Français](../fr-FR/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/development-guide.md) | [Русский](../ru-RU/development-guide.md) | **Italiano**
+[English](../en/development-guide.md) | [Deutsch](../de-DE/development-guide.md) | [中文](../zh-CN/development-guide.md) | [繁體中文](../zh-HK/development-guide.md) | [Español](../es-ES/development-guide.md) | [日本語](../ja-JP/development-guide.md) | [한국어](../ko-KR/development-guide.md) | [Čeština](../cs-CZ/development-guide.md) | [Русский](../ru-RU/development-guide.md) | **Italiano**
 
-## Panoramica architettura
+## Panoramica dell'Architettura
 
-SiliconLifeCollective segue un'**architettura corpo-cervello**, con una separazione rigorosa tra le interfacce principali e le implementazioni predefinite.
+SiliconLifeCollective segue un'**architettura Corpo-Cervello**, con separazione rigorosa tra interfacce core e implementazioni predefinite.
 
-### Struttura del progetto
+### Struttura del Progetto
 
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/            # Interfacce, classi astratte, infrastruttura comune
+│   ├── SiliconLife.Core/            # Interfacce, classi astratte, infrastruttura generica
 │   ├── SiliconLife.Common/          # Implementazioni condivise (comuni a entrambe le versioni)
-│   ├── SiliconLife.Default/         # Implementazione predefinita, punto ingresso (verifica fattibilità)
-│   ├── SiliconLife.Fast/            # Implementazione alte prestazioni, punto ingresso (versione produzione)
-│   ├── SiliconLife.Speedy/          # Motore storage alte prestazioni SpeedyPack
-│   └── SiliconLife.Speedy.Manager/  # Strumento gestione SpeedyPack (Avalonia UI)
-└── docs/                            # Documentazione multilingue
+│   ├── SiliconLife.Default/         # Implementazione predefinita, punto di ingresso (validazione architettura)
+│   ├── SiliconLife.Fast/            # Implementazione ad alte prestazioni, punto di ingresso (versione di produzione)
+│   ├── SiliconLife.Speedy/          # Motore di archiviazione SpeedyPack ad alte prestazioni
+│   └── SiliconLife.Speedy.Manager/  # Strumento di gestione SpeedyPack (Avalonia UI)
+└── docs/                            # Documentazione multilingua
 ```
 
-**Direzione dipendenze**:
-- `SiliconLife.Default` → `SiliconLife.Core` (unidirezionale)
-- `SiliconLife.Fast` → `SiliconLife.Core` (unidirezionale)
+**Direzione delle dipendenze**:
+- `SiliconLife.Default` → `SiliconLife.Common` → `SiliconLife.Core`
+- `SiliconLife.Fast` → `SiliconLife.Common` → `SiliconLife.Core`
 - `SiliconLife.Common` → `SiliconLife.Core` (unidirezionale)
 
-**Descrizione ruoli versioni**:
-- **SiliconLife.Default**: Implementazione predefinita, principalmente per verifica fattibilità architetturale. Fornisce un'implementazione di storage su file system semplice e affidabile, adatta al debug di sviluppo e alla verifica architetturale.
-- **SiliconLife.Fast**: Versione principale di produzione. Sulla base dell'architettura verificata da Default, adotta lo storage in memoria SpeedyPack + persistenza asincrona, offrendo un'ottimizzazione delle prestazioni estrema, la scelta migliore per lo sfruttamento a lungo termine e i veri ambienti di produzione.
+**Descrizione dei ruoli delle versioni**:
+- **SiliconLife.Default**: Implementazione predefinita, utilizzata principalmente per verificare la fattibilità dell'architettura. Fornisce un'implementazione di archiviazione su file system semplice e affidabile, adatta per lo sviluppo, il debug e la validazione dell'architettura.
+- **SiliconLife.Fast**: Versione di produzione raccomandata. Sulla base dell'architettura validata da Default, adotta l'archiviazione in memoria SpeedyPack + persistenza asincrona, offrendo ottimizzazioni estreme delle prestazioni, ed è la scelta preferita per l'esecuzione a lungo termine e gli ambienti di produzione reali.
 
-## Concetti fondamentali
+## Concetti Fondamentali
 
-### 1. Silicon Being
+### 1. Essere di Silicio
 
-Ogni agente IA è composto da:
-- **Corpo** (`DefaultSiliconBeing`): Mantiene lo stato di sopravvivenza, rileva gli scenari di attivazione
-- **Cervello** (`ContextManager`): Carica la cronologia, chiama l'IA, esegue gli strumenti, persiste le risposte
+Ogni agente AI è composto da:
+- **Corpo** (`DefaultSiliconBeing`): Mantiene lo stato vitale, rileva gli scenari di attivazione
+- **Cervello** (`ContextManager`): Carica la cronologia, chiama l'AI, esegue gli strumenti, persiste le risposte
 
-### 2. Sistema di strumenti
+### 2. Sistema degli Strumenti
 
-Gli strumenti vengono automaticamente scoperti e registrati tramite riflessione:
+Gli strumenti sono automaticamente scoperti e registrati tramite reflection:
 
 ```csharp
+// Tutti gli strumenti implementano l'interfaccia ITool
 public interface ITool
 {
     string Name { get; }
@@ -52,14 +53,14 @@ public interface ITool
 }
 ```
 
-### 3. Sistema di permessi
+### 3. Sistema dei Permessi
 
 Catena di verifica dei permessi a 3 livelli:
 ```
-UserFrequencyCache → IPermissionCallback → (Curatore→IPermissionAskHandler / Non-curatore→GlobalACL→Negazione predefinita)
+UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curatore: GlobalACL → rifiuto predefinito)
 ```
 
-### 4. Localizzatore di servizi
+### 4. Localizzatore di Servizi
 
 Registrazione e recupero globale dei servizi:
 ```csharp
@@ -70,27 +71,29 @@ ServiceLocator.Instance.Register<IAIClient>(ollamaClient);
 var client = ServiceLocator.Instance.Get<IAIClient>();
 ```
 
-## Sistema di estensione
+## Sistema di Estensione
 
-### Aggiungere un nuovo strumento
+### Aggiungere un Nuovo Strumento
 
-1. Creare una nuova classe in `src/SiliconLife.Common/App/Tools/` (strumenti condivisi tra entrambe le versioni) o `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (strumenti specifici di versione):
+1. Crea una nuova classe in `src/SiliconLife.Common/Tools/` (strumento condiviso tra le versioni):
+
+> **Nota**: `SiliconLife.Default` e `SiliconLife.Fast` non hanno più directory `Tools/` indipendenti; tutti gli strumenti condivisi sono collocati uniformemente in `SiliconLife.Common/Tools/`.
 
 ```csharp
 public class MyCustomTool : ITool
 {
     public string Name => "my_custom_tool";
-    public string Description => "Descrizione di cosa fa questo strumento";
+    public string Description => "Descrizione di ciò che fa questo strumento";
     
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
-        // Analizzare parametri
+        // Analisi dei parametri
         var param1 = call.Parameters["param1"]?.ToString();
         
-        // Eseguire logica
+        // Logica di esecuzione
         var result = await DoSomething(param1);
         
-        // Restituire risultato
+        // Restituzione del risultato
         return new ToolResult 
         { 
             Success = true, 
@@ -100,17 +103,36 @@ public class MyCustomTool : ITool
 }
 ```
 
-2. Lo strumento viene automaticamente scoperto tramite riflessione — nessuna registrazione manuale!
+2. Lo strumento viene automaticamente scoperto tramite reflection - nessuna registrazione manuale necessaria!
 
-3. (Opzionale) Marcare come riservato agli amministratori:
+3. (Opzionale) Contrassegna come solo amministratore:
 ```csharp
 [SiliconManagerOnly]
 public class AdminTool : ITool { ... }
 ```
 
-### Aggiungere un nuovo client IA
+4. (Opzionale) Contrassegna gli scenari disponibili dello strumento:
+```csharp
+[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task)]
+public class MyTool : ITool { ... }
+```
 
-1. Implementare `IAIClient` in `src/SiliconLife.Common/AI/`:
+5. (Opzionale) Contrassegna come disponibile solo nello scenario chat:
+```csharp
+[ChatOnly]
+public class HelpTool : ITool { ... }
+```
+
+6. (Opzionale) Contrassegna come disponibile solo nello scenario progetto:
+```csharp
+[ToolScenario(ToolScenarioFlag.Project)]
+[SiliconManagerOnly]
+public class ProjectWorkTool : ITool { ... }
+```
+
+### Aggiungere un Nuovo Client AI
+
+1. Implementa `IAIClient` in `src/SiliconLife.Common/AI/`:
 
 ```csharp
 public class MyAIClient : IAIClient
@@ -119,7 +141,7 @@ public class MyAIClient : IAIClient
     
     public async Task<AIResponse> ChatAsync(AIRequest request)
     {
-        // Chiamare la tua API IA
+        // Chiama la tua API AI
         var response = await CallMyAPI(request);
         
         return new AIResponse
@@ -132,7 +154,7 @@ public class MyAIClient : IAIClient
     
     public async IAsyncEnumerable<string> StreamChatAsync(AIRequest request)
     {
-        // Implementare lo streaming
+        // Implementa lo streaming
         await foreach (var chunk in StreamFromAPI(request))
         {
             yield return chunk;
@@ -141,7 +163,7 @@ public class MyAIClient : IAIClient
 }
 ```
 
-2. Creare la factory:
+2. Crea una factory:
 
 ```csharp
 public class MyAIClientFactory : IAIClientFactory
@@ -155,33 +177,33 @@ public class MyAIClientFactory : IAIClientFactory
 
 3. La factory viene automaticamente scoperta e registrata.
 
-### Aggiungere un nuovo backend di storage
+### Aggiungere un Nuovo Backend di Archiviazione
 
-1. Implementare `IStorage` e `ITimeStorage` in `src/SiliconLife.Default/Storage/` (implementazione file system) o `src/SiliconLife.Fast/Storage/` (adattatore SpeedyPack):
+1. Implementa `IStorage` e `ITimeStorage` in `src/SiliconLife.Default/Storage/` (implementazione file system) o `src/SiliconLife.Fast/Storage/` (adattatore SpeedyPack):
 
 ```csharp
 public class DatabaseStorage : IStorage, ITimeStorage
 {
     public async Task<string> ReadAsync(string key)
     {
-        // Leggere dal tuo database
+        // Leggi dal tuo database
     }
     
     public async Task WriteAsync(string key, string value)
     {
-        // Scrivere nel tuo database
+        // Scrivi nel tuo database
     }
     
     public async Task<IEnumerable<string>> ReadByTimeAsync(DateTime start, DateTime end)
     {
-        // Query per indice temporale
+        // Query con indice temporale
     }
 }
 ```
 
-### Aggiungere un nuovo plugin
+### Aggiungere un Nuovo Plugin
 
-1. Creare un progetto libreria di classi, implementare l'interfaccia `IPlugin`:
+1. Crea un progetto di libreria di classi che implementi l'interfaccia `IPlugin`:
 
 ```csharp
 using SiliconLife.Collective;
@@ -195,7 +217,7 @@ public class MyPlugin : IPlugin
     
     public string GetName(Language language) => "My Plugin";
     public string GetDescription(Language language) => "Un plugin personalizzato";
-    public string GetAuthor(Language language) => "Nome autore";
+    public string GetAuthor(Language language) => "Nome Autore";
     
     public void OnLoad() { }
     public void OnStart() { }
@@ -204,7 +226,7 @@ public class MyPlugin : IPlugin
 }
 ```
 
-2. (Opzionale) Implementare l'interfaccia `ITool` nel plugin per registrare strumenti personalizzati:
+2. (Opzionale) Implementa l'interfaccia `ITool` nel plugin per registrare strumenti personalizzati:
 
 ```csharp
 public class MyPluginTool : ITool
@@ -214,24 +236,24 @@ public class MyPluginTool : ITool
     
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
-        return new ToolResult { Success = true, Output = "Completato" };
+        return new ToolResult { Success = true, Output = "Done" };
     }
 }
 ```
 
-3. Posizionare la DLL compilata nella directory dei plugin, `PluginLoader` la caricherà automaticamente.
+3. Posiziona la DLL compilata nella directory dei plugin; `PluginLoader` la caricherà automaticamente.
 
-> **Restrizioni sicurezza**: I plugin non possono referenziare i namespace `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`, ecc. I plugin vengono caricati in modo isolato tramite `AssemblyLoadContext`.
+> **Limitazioni di sicurezza**: I plugin non possono fare riferimento ai namespace `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`, ecc. I plugin vengono caricati in isolamento tramite `AssemblyLoadContext`.
 
-### Aggiungere un nuovo skin
+### Aggiungere una Nuova Skin
 
-1. Implementare `ISkin` in `src/SiliconLife.App/Web/Skins/`:
+1. Implementa `ISkin` in `src/SiliconLife.App/Web/Skins/`:
 
 ```csharp
 public class MyCustomSkin : ISkin
 {
     public string Name => "MySkin";
-    public string Description => "Descrizione di uno skin personalizzato";
+    public string Description => "Descrizione di una skin personalizzata";
     
     public string GetCss()
     {
@@ -246,101 +268,105 @@ public class MyCustomSkin : ISkin
 }
 ```
 
-2. Lo skin viene automaticamente scoperto da `SkinManager`.
+2. La skin viene automaticamente scoperta da `SkinManager`.
 
-## Guida dello stile codice
+## Guida allo Stile del Codice
 
-### Convenzioni di denominazione
+### Convenzioni di Nomenclatura
 
 - **Classi**: PascalCase, con prefisso funzionale (es. `DefaultSiliconBeing`)
 - **Interfacce**: Iniziano con `I` (es. `IAIClient`, `ITool`)
 - **Implementazioni**: Terminano con il nome dell'interfaccia (es. `OllamaClient` implementa `IAIClient`)
 - **Strumenti**: Terminano con `Tool` (es. `CalendarTool`, `ChatTool`)
-- **ViewModel**: Terminano con `ViewModel` (es. `BeingViewModel`)
+- **Modelli di vista**: Terminano con `ViewModel` (es. `BeingViewModel`)
 
-### Organizzazione del codice
+### Organizzazione del Codice
 
 ```
 SiliconLife.Common/
-├── AI/                    # Implementazioni client IA e factory
-├── Calendar/              # 32 implementazioni calendari
-├── Localization/          # Classe base localizzazione e 33 implementazioni linguistiche
-├── Security/              # Permission manager
-├── SiliconBeing/          # Implementazione Silicon Being predefinita
-├── Tools/                 # Strumenti integrati condivisi
+├── AI/                    # Client e factory AI
+├── Calendar/              # 32 implementazioni calendariali
+├── Localization/          # Classi base di localizzazione e 34 varianti linguistiche
+├── Security/              # Gestore dei permessi
+├── SiliconBeing/          # Implementazione predefinita dell'Essere di Silicio
+├── Tools/                 # Strumenti integrati condivisi (25)
 ├── Web/                   # Infrastruttura Web
 └── WebView/               # Implementazione Playwright WebView
 
 SiliconLife.App/          # Livello applicativo condiviso tra Default e Fast
-├── Config/                # Configurazione applicativa
-├── Help/                  # Localizzazione documentazione aiuto
-└── Web/                   # Implementazione interfaccia Web
-    ├── Component/         # Libreria componenti UI
-    ├── Controllers/       # Controller di routing
-    ├── Models/            # ViewModel
+├── Config/                # Configurazione applicazione
+├── Help/                  # Localizzazione della documentazione di aiuto
+├── Project/               # Sistema di progetto (motore workflow, ruoli di progetto)
+└── Web/                   # Implementazione Web UI
+    ├── Component/         # 27 componenti UI
+    ├── Controllers/       # 24 controller di routing
+    ├── Models/            # Modelli di vista
     ├── Views/             # Viste HTML
-    └── Skins/             # Temi skin
+    └── Skins/             # 7 temi skin
 
-SiliconLife.Default/      # Directory specifiche della versione
-├── Config/                # Dati configurazione predefiniti
-├── IM/                    # Provider WebUI
-├── Knowledge/             # Implementazione rete conoscenza
-├── Logging/               # Implementazioni provider log
-├── Project/               # Implementazione sistema progetti
-├── Security/              # Callback permessi predefiniti
-├── Storage/               # Implementazione storage su file system
-└── Tools/                 # Strumenti specifici versione (HelpTool)
+SiliconLife.Default/      # Directory specifica della versione
+├── Config/                # Dati di configurazione predefiniti
+├── Knowledge/             # Implementazione della rete di conoscenza
+├── Logging/               # Implementazione del provider di log (console + file system)
+├── Project/               # Implementazione del sistema di progetto
+└── Storage/               # Implementazione dell'archiviazione su file system
+
+SiliconLife.Fast/         # Directory specifica della versione
+├── Config/                # Dati di configurazione della versione Fast
+├── Logging/               # Implementazione del provider di log (console + file system)
+├── Storage/               # Adattatori di archiviazione SpeedyPack
+└── Tray/                  # Localizzazione dell'area di notifica di sistema
 ```
 
 ### Documentazione
 
 - Tutte le API pubbliche devono avere commenti di documentazione XML
-- Tutti i file sorgente utilizzano l'intestazione licenza Apache 2.0
-- Sfruttare le funzionalità .NET 9 (using impliciti, tipi riferimento nullable)
+- Tutti i file sorgente utilizzano l'intestazione della licenza Apache 2.0
+- Sfruttare le funzionalità di .NET 9 (using impliciti, tipi di riferimento nullable)
 
-## Flusso di lavoro sviluppo
+## Flusso di Lavoro di Sviluppo
 
-### 1. Configurare ambiente sviluppo
+### 1. Configurazione dell'Ambiente di Sviluppo
 
 ```bash
-# Clonare repository
+# Clona il repository
 git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 
-# Restaurare dipendenze
+# Ripristina le dipendenze
 dotnet restore
 
-# Compilare
+# Compila
 dotnet build
 ```
 
-### 2. Eseguire test
+### 2. Esecuzione dei Test
 
 ```bash
-# Eseguire tutti i test
+# Esegui tutti i test
 dotnet test
 
-# Eseguire un progetto test specifico
+# Esegui un progetto di test specifico
 dotnet test tests/SiliconLife.Core.Tests
 ```
 
-### 3. Debbugare
+### 3. Debug
 
 ```bash
-# Eseguire con output debug
+# Esegui con output di debug
 dotnet run --project src/SiliconLife.Default --configuration Debug
 ```
 
-### 4. Formattare codice
+### 4. Formattazione del Codice
 
 ```bash
-# Formattare codice
+# Formatta il codice
 dotnet format
 ```
 
-## Creare funzionalità personalizzate
+## Costruire Funzionalità Personalizzate
 
-### Esempio: Aggiungere calendario personalizzato
+### Esempio: Aggiungere un Calendario Personalizzato
 
 ```csharp
 public class MyCustomCalendar : CalendarBase
@@ -361,7 +387,7 @@ public class MyCustomCalendar : CalendarBase
 }
 ```
 
-### Esempio: Aggiungere esecutore personalizzato
+### Esempio: Aggiungere un Esecutore Personalizzato
 
 ```csharp
 public class CustomExecutor : ExecutorBase
@@ -370,14 +396,12 @@ public class CustomExecutor : ExecutorBase
     
     public override async Task<ExecutorResult> ExecuteAsync(ExecutorRequest request)
     {
-        // Prima verificare i permessi
         var permission = await CheckPermissionAsync(request);
         if (!permission.Allowed)
         {
             return ExecutorResult.Denied(permission.Reason);
         }
         
-        // Eseguire operazione
         var result = await PerformOperation(request);
         
         return ExecutorResult.Success(result);
@@ -385,9 +409,39 @@ public class CustomExecutor : ExecutorBase
 }
 ```
 
-## Guida test
+### Esempio: Aggiungere un Template di Workflow Personalizzato
 
-### Test unitari
+```csharp
+public class MyWorkflowTemplate : WorkflowTemplate
+{
+    public override string Name => "my_workflow";
+    public override string Description => "Un template di workflow personalizzato";
+    
+    public override void DefineStates()
+    {
+        AddState("start", "Inizio", isInitial: true);
+        AddState("processing", "Elaborazione");
+        AddState("review", "Revisione");
+        AddState("done", "Completato", isFinal: true);
+    }
+    
+    public override void DefineTransitions()
+    {
+        AddTransition("start", "processing", "Inizia elaborazione");
+        AddTransition("processing", "review", "Invia per revisione");
+        AddTransition("review", "done", "Revisione approvata");
+        AddTransition("review", "processing", "Revisione respinta");
+    }
+}
+```
+
+### Esempio: Aggiungere un Ruolo di Progetto
+
+I ruoli di progetto vengono gestiti tramite le operazioni `assign_role` e `remove_role` di `ProjectTool`. I nomi dei ruoli sono stringhe personalizzate utilizzate per distinguere le responsabilità degli Esseri di Silicio nei workflow e nell'assegnazione delle attività.
+
+## Guida ai Test
+
+### Test Unitari
 
 ```csharp
 [TestClass]
@@ -396,7 +450,7 @@ public class MyToolTests
     [TestMethod]
     public async Task ExecuteAsync_ValidInput_ReturnsSuccess()
     {
-        // Preparazione
+        // Arrange
         var tool = new MyCustomTool();
         var call = new ToolCall 
         { 
@@ -407,71 +461,71 @@ public class MyToolTests
             }
         };
         
-        // Esecuzione
+        // Act
         var result = await tool.ExecuteAsync(call);
         
-        // Verifica
+        // Assert
         Assert.IsTrue(result.Success);
         Assert.IsNotNull(result.Output);
     }
 }
 ```
 
-### Test integrazione
+### Test di Integrazione
 
-Testare il flusso completo:
-1. L'IA restituisce una chiamata strumento
-2. Lo strumento si esegue
-3. Il risultato viene reinviato all'IA
-4. L'IA restituisce la risposta finale
+Testa il flusso completo:
+1. L'AI restituisce una chiamata strumento
+2. Lo strumento viene eseguito
+3. Il risultato viene restituito all'AI
+4. L'AI restituisce la risposta finale
 
-## Considerazioni prestazioni
+## Considerazioni sulle Prestazioni
 
-### Sistema di storage
+### Sistema di Archiviazione
 
-- La versione Default utilizza storage JSON basato su file
-- La versione Fast utilizza il motore storage in memoria SpeedyPack (formato .spk)
-- SpeedyPack adotta mappatura directory in memoria + cache voci + coda scrittura asincrona
-- Le query per indice temporale utilizzano l'interfaccia `ITimeStorage`
+- La versione Default utilizza l'archiviazione JSON basata su file
+- La versione Fast utilizza il motore di archiviazione in memoria SpeedyPack (formato .spk)
+- SpeedyPack adotta la mappa directory in memoria + cache delle voci + coda di scrittura asincrona
+- Le query con indice temporale utilizzano l'interfaccia `ITimeStorage`
 
-### Scheduler loop principale
+### Pianificatore del Ciclo Principale
 
-- Scheduling equo per time-slice basato su orologio
-- Watchdog per rilevare operazioni bloccate
-- Circuit breaker per prevenire guasti a cascata
+- Pianificazione equa basata su slot temporali guidati da clock
+- Timer watchdog per rilevare operazioni bloccate
+- Interruttore per prevenire fallimenti a cascata
 
-## Buone pratiche
+## Best Practices
 
-### 1. Verificare sempre i permessi
+### 1. Verificare Sempre i Permessi
 
-Qualsiasi operazione avviata dall'IA deve passare attraverso la catena di permessi:
+Qualsiasi operazione avviata dall'AI deve passare attraverso la catena dei permessi:
 
 ```csharp
-var permission = permissionManager.EvaluatePermission(callerId, permissionType, resource);
-if (permission != PermissionResult.Allowed)
+bool allowed = permissionManager.CheckPermission(callerId, permissionType, resource);
+if (!allowed)
 {
-    return Result.Denied(permission.Reason);
+    return Result.Denied("Permission denied");
 }
 ```
 
-### 2. Utilizzare il localizzatore di servizi
+### 2. Utilizzare il Localizzatore di Servizi
 
-Registrazione e recupero globale dei servizi:
+Registra e recupera servizi a livello globale:
 
 ```csharp
-// Durante inizializzazione
+// Durante l'inizializzazione
 ServiceLocator.Instance.Register<ICustomService>(myService);
 
 // Quando necessario
 var service = ServiceLocator.Instance.Get<ICustomService>();
 ```
 
-### 3. Seguire la separazione corpo-cervello
+### 3. Seguire la Separazione Corpo-Cervello
 
-- Il corpo gestisce lo stato e le attivazioni
-- Il cervello gestisce le interazioni IA e l'esecuzione degli strumenti
+- Il corpo gestisce lo stato e i trigger
+- Il cervello gestisce l'interazione AI e l'esecuzione degli strumenti
 
-### 4. Implementare una corretta gestione errori
+### 4. Implementare una Gestione degli Errori Appropriata
 
 ```csharp
 try
@@ -481,23 +535,23 @@ try
 }
 catch (Exception ex)
 {
-    Logger.Error($"Operazione fallita: {ex.Message}");
+    Logger.Error($"Operation failed: {ex.Message}");
     return Result.Failure(ex.Message);
 }
 ```
 
-## Guida contribuzione
+## Guida ai Contributi
 
-1. Forkare il repository
-2. Creare un branch per la funzionalità (`git checkout -b feature/amazing-feature`)
-3. Committare le modifiche con commit convenzionali
-4. Pushare verso il branch (`git push origin feature/amazing-feature`)
-5. Aprire una Pull Request
+1. Fai fork del repository
+2. Crea un branch di funzionalità (`git checkout -b feature/amazing-feature`)
+3. Committa le tue modifiche utilizzando commit convenzionali
+4. Pusha sul branch (`git push origin feature/amazing-feature`)
+5. Apri una Pull Request
 
-### Formato messaggi commit
+### Formato dei Messaggi di Commit
 
 ```
-<type>(<ambito>): <descrizione>
+<type>(<scope>): <description>
 
 Esempi:
 feat(tool): add custom calendar tool
@@ -505,6 +559,9 @@ fix(permission): fix null pointer in callback
 docs: update development guide
 ```
 
-## Prossimi passi
+## Prossimi Passi
 
-- 📚 Leggere la [guida architettura](architecture.md)
+- 📚 Leggi la [Guida all'Architettura](architecture.md)
+- 📖 Esplora il [Riferimento API](api-reference.md)
+- 🔒 Consulta la [Documentazione sulla Sicurezza](security.md)
+- 🚀 Consulta la [Guida Rapida](getting-started.md)

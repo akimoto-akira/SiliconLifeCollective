@@ -1,8 +1,8 @@
-﻿# Sistema de Calendario
+# Sistema de Calendario
 
 > **Versión: v0.2.0-alpha**
 
-[English](../en/calendar-system.md) | [中文](../zh-CN/calendar-system.md) | [繁體中文](../zh-HK/calendar-system.md) | **Español** | [Deutsch](../de-DE/calendar-system.md) | [日本語](../ja-JP/calendar-system.md) | [한국어](../ko-KR/calendar-system.md) | [Čeština](../cs-CZ/calendar-system.md) | [Русский](../ru-RU/calendar-system.md)
+[English](../en/calendar-system.md) | [Deutsch](../de-DE/calendar-system.md) | [中文](../zh-CN/calendar-system.md) | [繁體中文](../zh-HK/calendar-system.md) | **Español** | [日本語](../ja-JP/calendar-system.md) | [한국어](../ko-KR/calendar-system.md) | [Čeština](../cs-CZ/calendar-system.md) | [Русский](../ru-RU/calendar-system.md)
 
 ## Resumen
 
@@ -13,7 +13,7 @@ SiliconLifeCollective soporta 32 sistemas de calendario diferentes para conversi
 ### Calendarios Principales (6)
 
 1. **Gregoriano (Gregorian)** - Calendario estándar internacional, ID: `gregorian`
-2. **Lunar Chino (Chinese Lunar)** - Calendario tradicional chino, con cálculo de meses bisiestos, ID: `lunar`
+2. **Lunar chino (Chinese Lunar)** - Calendario tradicional chino, con cálculo de meses intercalares, ID: `lunar`
 3. **Islámico (Islamic)** - Calendario Hijri islámico, ID: `islamic`
 4. **Hebreo (Hebrew)** - Calendario judío, ID: `hebrew`
 5. **Persa (Persian)** - Calendario solar iraní, ID: `persian`
@@ -21,28 +21,28 @@ SiliconLifeCollective soporta 32 sistemas de calendario diferentes para conversi
 
 ### Calendarios Históricos Chinos (2)
 
-7. **Histórico Chino (Chinese Historical)** - Soporta ciclo Ganzhi y años de reinado imperial, ID: `chinese_historical`
-   - **Ciclo Ganzhi**: Ciclo de 60 años (troncos celestiales + ramas terrestres)
-   - **Años de reinado imperial**: Soporta años de reinado de varias dinastías chinas (Kangxi, Qianlong, Zhenguan, etc.)
-   - **Base de datos dinámica**: Base de datos completa incorporada de dinastías y años de reinado de la historia china
-8. **Sexagenario (Sexagenary)** - Ciclo Ganzhi de 60 años, ID: `sexagenary`
+7. **Calendario histórico chino (Chinese Historical)** - Soporta ciclos sexagenarios y eras imperiales, ID: `chinese_historical`
+   - **Ciclo sexagenario**: Ciclo de 60 años (Tallos Celestiales + Ramas Terrenales)
+   - **Eras imperiales**: Soporta las eras de todas las dinastías de la historia china (Kangxi, Qianlong, Zhenguan, etc.)
+   - **Base de datos dinámica**: Base de datos integrada completa de dinastías y eras de la historia china
+8. **Calendario sexagenario (Sexagenary)** - Ciclo sexagenario de 60 años, ID: `sexagenary`
 
-### Calendarios del Este de Asia (6)
+### Calendarios de Asia Oriental (6)
 
 9. **Japonés (Japanese)** - Calendario de eras japonés (Nengo), ID: `japanese`
-10. **Vietnamita (Vietnamese)** - Calendario lunar vietnamita (variante del zodiaco del gato), ID: `vietnamese`
+10. **Vietnamita (Vietnamese)** - Calendario lunar vietnamita (variante del gato zodiacal), ID: `vietnamese`
 11. **Tibetano (Tibetan)** - Sistema de calendario tibetano, ID: `tibetan`
 12. **Mongol (Mongolian)** - Calendario mongol, ID: `mongolian`
 13. **Dai (Dai)** - Calendario Dai, con cálculo lunar completo, ID: `dai`
-14. **Dehong Dai (Dehong Dai)** - Variante del calendario Dai de Dehong, ID: `dehong_dai`
+14. **Dai de Dehong (Dehong Dai)** - Variante del calendario Dai de Dehong, ID: `dehong_dai`
 
 ### Calendarios Históricos (6)
 
-15. **Maya (Mayan)** - Cuenta larga del calendario maya, ID: `mayan`
-16. **Romano (Roman)** - Calendario de la antigua Roma, ID: `roman`
+15. **Maya (Mayan)** - Cuenta larga maya, ID: `mayan`
+16. **Romano (Roman)** - Calendario romano antiguo, ID: `roman`
 17. **Juliano (Julian)** - Calendario juliano, ID: `julian`
-18. **Republicano Francés (French Republican)** - Calendario revolucionario francés, ID: `french_republican`
-19. **Copto (Coptic)** - Calendario copto ortodoxo, ID: `coptic`
+18. **Republicano francés (French Republican)** - Calendario revolucionario francés, ID: `french_republican`
+19. **Copto (Coptic)** - Calendario ortodoxo copto, ID: `coptic`
 20. **Etíope (Ethiopian)** - Calendario etíope, ID: `ethiopian`
 
 ### Calendarios Regionales (6)
@@ -50,21 +50,21 @@ SiliconLifeCollective soporta 32 sistemas de calendario diferentes para conversi
 21. **Budista (Buddhist)** - Era budista (BE), año + 543, ID: `buddhist`
 22. **Saka (Saka)** - Era Saka (Indonesia), ID: `saka`
 23. **Vikram Samvat (Vikram Samvat)** - Calendario hindú, ID: `vikram_samvat`
-24. **Javanés (Javanese)** - Calendario javanés islámico, ID: `javanese`
-25. **Chula Sakarat (Chula Sakarat)** - Era budista del sudeste asiático, año - 638, ID: `chula_sakarat`
+24. **Javanés (Javanese)** - Calendario islámico javanés, ID: `javanese`
+25. **Chula Sakarat (Chula Sakarat)** - Calendario budista del sudeste asiático, año - 638, ID: `chula_sakarat`
 26. **Jemer (Khmer)** - Calendario jemer, ID: `khmer`
 
 ### Calendarios Modernos (3)
 
-27. **ROC (ROC)** - Calendario Minguo, año - 1911, ID: `roc`
+27. **República de China (ROC)** - Calendario de la República de China, año - 1911, ID: `roc`
 28. **Juche (Juche)** - Calendario de Corea del Norte, año - 1911, ID: `juche`
 29. **Zoroástrico (Zoroastrian)** - Calendario zoroástrico, ID: `zoroastrian`
 
 ### Calendarios Étnicos (3)
 
 30. **Yi (Yi)** - Sistema de calendario Yi, ID: `yi`
-31. **Cherokee (Cherokee)** - Calendario Cherokee, ID: `cherokee`
-32. **Inuit (Inuit)** - Calendario Inuit, ID: `inuit`
+31. **Cherokee (Cherokee)** - Calendario cherokee, ID: `cherokee`
+32. **Inuit (Inuit)** - Calendario inuit, ID: `inuit`
 
 ---
 
@@ -84,7 +84,7 @@ SiliconLifeCollective soporta 32 sistemas de calendario diferentes para conversi
 **Respuesta**:
 ```json
 {
-  "result": "农历丙午年四月初三",
+  "result": "Cuarto día del tercer mes del calendario lunar del año Bingwu",
   "year": 2026,
   "month": 4,
   "day": 3,
@@ -92,7 +92,7 @@ SiliconLifeCollective soporta 32 sistemas de calendario diferentes para conversi
 }
 ```
 
-### Consulta de Múltiples Calendarios
+### Consulta Multi-Calendario
 
 ```json
 {
@@ -101,7 +101,7 @@ SiliconLifeCollective soporta 32 sistemas de calendario diferentes para conversi
 }
 ```
 
-**Respuesta**: Devuelve la fecha en los 32 sistemas de calendario.
+**Respuesta**: Retorna la fecha en los 32 sistemas de calendario.
 
 ---
 
@@ -147,25 +147,25 @@ public class MyCustomCalendar : CalendarBase
 
 ---
 
-## Funcionalidades Especiales
+## Funciones Especiales
 
 ### Detalle del Calendario Histórico Chino (Nuevo)
 
-El calendario histórico chino es un aspecto destacado de este sistema, soportando dos funcionalidades principales:
+El calendario histórico chino es una de las características destacadas de este sistema, soportando dos funciones principales:
 
-#### 1. Sistema de Ciclo Ganzhi
+#### 1. Sistema de Ciclo Sexagenario
 
-Usa un ciclo de 60 años, compuesto por troncos celestiales y ramas terrestres:
+Adopta un ciclo de 60 años, formado por la combinación de Tallos Celestiales y Ramas Terrenales:
 
 ```
-Troncos Celestiales (10): 甲、乙、丙、丁、戊、己、庚、辛、壬、癸
-Ramas Terrestres (12): 子、丑、寅、卯、辰、巳、午、未、申、酉、戌、亥
+Tallos Celestiales (10): Jia, Yi, Bing, Ding, Wu, Ji, Geng, Xin, Ren, Gui
+Ramas Terrenales (12): Zi, Chou, Yin, Mao, Chen, Si, Wu, Wei, Shen, You, Xu, Hai
 ```
 
 **Ejemplos**:
-- 2026 = 丙午年
-- 2025 = 乙巳年 (año de la serpiente)
-- 2024 = 甲辰年 (año del dragón)
+- 2026 = Año Bingwu
+- 2025 = Año Yisi (Año de la Serpiente)
+- 2024 = Año Jiachen (Año del Dragón)
 
 **Ejemplo de uso**:
 ```json
@@ -180,15 +180,15 @@ Ramas Terrestres (12): 子、丑、寅、卯、辰、巳、午、未、申、酉
 **Respuesta**:
 ```json
 {
-  "result": "丙午年 三月 初九",
-  "ganzhi_year": "丙午",
-  "zodiac": "马"
+  "result": "Año Bingwu, tercer mes, noveno día",
+  "ganzhi_year": "Bingwu",
+  "zodiac": "Caballo"
 }
 ```
 
-#### 2. Sistema de Años de Reinado Imperial
+#### 2. Sistema de Eras Imperiales
 
-Base de datos completa incorporada de dinastías y años de reinado de la historia china:
+Base de datos integrada completa de dinastías y eras imperiales de la historia china:
 
 **Dinastías soportadas** (parcial):
 - Dinastía Qing: Kangxi, Yongzheng, Qianlong, Jiaqing, Daoguang, Xianfeng, Tongzhi, Guangxu, Xuantong
@@ -210,17 +210,17 @@ Base de datos completa incorporada de dinastías y años de reinado de la histor
 **Respuesta**:
 ```json
 {
-  "result": "康熙六十年 三月 十五日",
-  "era": "康熙",
+  "result": "Kangxi año 60, tercer mes, día quince",
+  "era": "Kangxi",
   "era_year": 60,
-  "dynasty": "清"
+  "dynasty": "Qing"
 }
 ```
 
-### Manejo de Meses Bisiestos
+### Manejo de Meses Intercalares
 
-Calendarios con meses bisiestos:
-- Lunar Chino
+Calendarios con meses intercalares:
+- Lunar chino
 - Hebreo
 - Budista
 - Vietnamita
@@ -229,7 +229,7 @@ Calendarios con meses bisiestos:
 {
   "isLeapMonth": true,
   "month": 4,
-  "note": "闰四月"
+  "note": "Cuarto mes intercalar"
 }
 ```
 
@@ -239,7 +239,7 @@ Calendarios con meses bisiestos:
 
 ### Cálculos Astronómicos
 
-- Basado en datos astronómicos reales
+- Basados en datos astronómicos reales
 - Soporte para fechas históricas
 - Manejo de reformas de calendario
 
@@ -247,7 +247,7 @@ Calendarios con meses bisiestos:
 
 - Algunas fechas antiguas son aproximadas
 - Las reformas de calendario varían por región
-- No incluye manejo de segundos bisiestos
+- No incluye manejo de segundos intercalares
 
 ---
 
@@ -255,40 +255,40 @@ Calendarios con meses bisiestos:
 
 ### Investigación Histórica
 
-Convertir fechas históricas al calendario moderno:
+Convertir fechas históricas a calendarios modernos:
 
 ```
 Pregunta: "¿Cuándo fue la Revolución Francesa?"
-Respuesta: "14 de julio de 1789 (Gregoriano)"
-           "26 de Termidor del Año I (Republicano Francés)"
+Respuesta: "14 de julio de 1789 (gregoriano)"
+          "26 de Termidor del Año I (calendario republicano francés)"
 ```
 
 ### Aplicaciones Culturales
 
-Soporte para festivales tradicionales:
+Soporte para festividades tradicionales:
 
 ```
-Año Nuevo Chino 2026:
+Año Nuevo Chino de 2026:
 - Gregoriano: 17 de febrero de 2026
-- Lunar Chino: Primer día del primer mes
+- Lunar chino: Primer día del primer mes
 ```
 
 ### Programación Multicultural
 
-Programar eventos que respeten múltiples calendarios:
+Programar eventos respetando múltiples calendarios:
 
 ```
 Reunión: 2026-04-20
-- Evitar oraciones del viernes islámico
-- Respetar el Sabbath judío
-- Considerar festivos chinos
+- Evitar la oración del viernes islámico
+- Respetar el Shabat judío
+- Considerar los feriados chinos
 ```
 
 ---
 
 ## Mejores Prácticas
 
-### 1. Especificar Siempre el Calendario
+### 1. Siempre Especificar el Calendario
 
 Nunca asumir el sistema de calendario:
 
@@ -309,9 +309,9 @@ Algunas fechas no existen en ciertos calendarios:
 }
 ```
 
-### 3. Considerar Zonas Horarias
+### 3. Considerar las Zonas Horarias
 
-Las conversiones de fecha pueden variar por zona horaria:
+Las conversiones de fechas pueden variar según la zona horaria:
 
 ```
 2026-04-20 23:00 UTC+8
@@ -321,9 +321,9 @@ Las conversiones de fecha pueden variar por zona horaria:
 
 ---
 
-## Próximos Pasos
+## Siguientes Pasos
 
-- 📚 Leer la [Guía de Arquitectura](architecture.md)
-- 🛠️ Consultar la [Guía de Desarrollo](development-guide.md)
-- 🔧 Ver la [Referencia de Herramientas](tools-reference.md)
-- 🚀 Comenzar con la [Guía de Inicio Rápido](getting-started.md)
+- 📚 Leer la [guía de arquitectura](architecture.md)
+- 🛠️ Consultar la [guía de desarrollo](development-guide.md)
+- 🔧 Ver la [referencia de herramientas](tools-reference.md)
+- 🚀 Comenzar con la [guía de inicio rápido](getting-started.md)

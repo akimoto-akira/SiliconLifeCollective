@@ -1,111 +1,111 @@
-﻿# Guida al contributo
+# Guida ai Contributi
 
-> **Versione : v0.2.0-alpha**
+> **Versione: v0.2.0-alpha**
 
-[English](../en/contributing.md) | [Deutsch](../de-DE/contributing.md) | [Français](../fr-FR/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md) | [Русский](../ru-RU/contributing.md) | **Italiano**
+[English](../en/contributing.md) | [Deutsch](../de-DE/contributing.md) | [中文](../zh-CN/contributing.md) | [繁體中文](../zh-HK/contributing.md) | [Español](../es-ES/contributing.md) | [日本語](../ja-JP/contributing.md) | [한국어](../ko-KR/contributing.md) | [Čeština](../cs-CZ/contributing.md) | [Русский](../ru-RU/contributing.md) | **Italiano**
 
-Grazie per il tuo interesse nel contribuire a SiliconLifeCollective !
+Grazie per il tuo interesse nel contribuire a SiliconLifeCollective!
 
-## Contributi a doppia versione
+## Contributi alla Doppia Versione
 
-Questo progetto ha due versioni di implementazione. Puoi contribuire secondo i tuoi interessi :
+Questo progetto ha due versioni di implementazione; puoi scegliere la direzione di contribuzione in base ai tuoi interessi:
 
-### SiliconLife.Default (Versione standard)
-- **Stack tecnologico** : Applicazione console .NET 9
-- **Direzione del contributo** : Sviluppo funzionalità principali, implementazione strumenti, localizzazione, documentazione
-- **Pubblico target** : Tutti gli sviluppatori
+### SiliconLife.Default (Versione Predefinita)
+- **Stack tecnologico**: Applicazione console .NET 9
+- **Direzioni di contribuzione**: Sviluppo di funzionalità core, implementazione di strumenti, localizzazione, documentazione
+- **Adatto a**: Tutti gli sviluppatori
 
-### SiliconLife.Fast (Versione ad alte prestazioni)
-- **Stack tecnologico** : Applicazione desktop Avalonia UI .NET 9
-- **Direzione del contributo** : Ottimizzazione prestazioni, storage SpeedyPack, barra di sistema, concorrenza senza lock
-- **Pubblico target** : Sviluppatori con esperienza Windows e interesse per l'ottimizzazione delle prestazioni
+### SiliconLife.Fast (Versione ad Alte Prestazioni)
+- **Stack tecnologico**: Applicazione desktop multipiattaforma .NET 9 (Avalonia UI)
+- **Direzioni di contribuzione**: Ottimizzazione delle prestazioni, archiviazione SpeedyPack, area di notifica di sistema, concorrenza senza lock
+- **Adatto a**: Sviluppatori con esperienza di sviluppo desktop e interesse per l'ottimizzazione delle prestazioni
 
-> **Nota importante** : Entrambe le versioni condividono i progetti SiliconLife.Core e SiliconLife.Common. I miglioramenti alle interfacce principali influenzano entrambe le versioni.
+> **Nota importante**: Le due versioni condividono i progetti SiliconLife.Core e SiliconLife.Common; i miglioramenti alle interfacce core influenzano entrambe le versioni contemporaneamente.
 
-## Codice di condotta
+## Codice di Condotta
 
-Questo progetto segue la licenza Apache 2.0. Mantieni rispetto e professionalità in tutte le interazioni.
+Questo progetto segue la licenza Apache 2.0. Mantieni un atteggiamento rispettoso e professionale in tutte le interazioni.
 
 ---
 
-## Avvio rapido
+## Inizio Rapido
 
-### 1. Fare il fork del repository
+### 1. Fork del Repository
 
-Clicca sul pulsante « Fork » su GitHub per creare la tua copia.
+Clicca sul pulsante "Fork" su GitHub per creare la tua copia.
 
-### 2. Clonare il tuo fork
+### 2. Clona il tuo Fork
 
 ```bash
 git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 ```
 
-### 3. Configurare l'ambiente di sviluppo
+### 3. Configura l'Ambiente di Sviluppo
 
 ```bash
-# Installare .NET 9 SDK
+# Installa .NET 9 SDK
 # https://dotnet.microsoft.com/download/dotnet/9.0
 
-# Ripristinare le dipendenze
+# Ripristina le dipendenze
 dotnet restore
 
-# Compilare il progetto
+# Compila il progetto
 dotnet build
 
-# Eseguire i test
+# Esegui i test
 dotnet test
 ```
 
-### 4. Creare un ramo di funzionalità
+### 4. Crea un Branch di Funzionalità
 
 ```bash
-git checkout -b feature/nome-della-tua-funzionalità
+git checkout -b feature/your-feature-name
 ```
 
-### 5. Scegliere il progetto di sviluppo
+### 5. Scegli il Progetto di Sviluppo
 
-In base al tuo tipo di contributo, scegli il progetto appropriato :
+Scegli il progetto appropriato in base al tipo di contributo:
 
-- **Interfacce principali/classi astratte** → Modificare `SiliconLife.Core`
-- **Implementazioni condivise** → Modificare `SiliconLife.Common`
-- **Specifico per versione Default** → Modificare `SiliconLife.Default`
-- **Specifico per versione Fast** → Modificare `SiliconLife.Fast`
-- **Motore di storage** → Modificare `SiliconLife.Speedy`
-- **Strumento di gestione storage** → Modificare `SiliconLife.Speedy.Manager`
-- **Sviluppo plugin** → Modificare `SiliconLife.Core/Plugins`
-- **Documentazione multilingua** → Modificare la directory `docs/`
+- **Interfacce core/classi astratte** → Modifica `SiliconLife.Core`
+- **Implementazioni condivise** → Modifica `SiliconLife.Common`
+- **Specifico della versione Default** → Modifica `SiliconLife.Default`
+- **Specifico della versione Fast** → Modifica `SiliconLife.Fast`
+- **Motore di archiviazione** → Modifica `SiliconLife.Speedy`
+- **Strumento di gestione archiviazione** → Modifica `SiliconLife.Speedy.Manager`
+- **Sviluppo di plugin** → Modifica `SiliconLife.Core/Plugins`
+- **Documentazione multilingua** → Modifica la directory `docs/`
 
 ---
 
-## Flusso di lavoro di sviluppo
+## Flusso di Lavoro di Sviluppo
 
-### Stile del codice
+### Stile del Codice
 
-- Seguire le convenzioni C#
-- Nomi di classi in PascalCase
-- Parametri di metodi in camelCase
-- Campi privati in `_camelCase`
+- Segui le convenzioni di codifica C#
+- I nomi delle classi usano PascalCase
+- I parametri dei metodi usano camelCase
+- I campi privati usano `_camelCase`
 - Tutte le API pubbliche devono avere documentazione XML
 
-### Messaggi di commit
+### Messaggi di Commit
 
-Seguire il formato dei **commit convenzionali** :
+Segui il formato dei **Commit Convenzionali**:
 
 ```
-<type>(<ambito>): <descrizione>
+<type>(<scope>): <description>
 ```
 
-**Tipi** :
-- `feat` : Nuova funzionalità
-- `fix` : Correzione bug
-- `docs` : Modifica documentazione
-- `style` : Formattazione codice
-- `refactor` : Refactoring codice
-- `test` : Modifica test
-- `chore` : Modifica build/strumenti
+**Tipi**:
+- `feat`: Nuova funzionalità
+- `fix`: Correzione di bug
+- `docs`: Modifiche alla documentazione
+- `style`: Formattazione del codice
+- `refactor`: Rifattorizzazione del codice
+- `test`: Modifiche ai test
+- `chore`: Modifiche alla build/strumenti
 
-**Esempi** :
+**Esempi**:
 ```bash
 feat(localization): add Korean language support
 fix(permission): fix null pointer in callback
@@ -113,141 +113,141 @@ docs: update contributing guide
 refactor(web): simplify controller structure
 ```
 
-### Effettuare modifiche
+### Apportare Modifiche
 
-1. **Scrivere il codice**
-   - Seguire i modelli esistenti
-   - Aggiungere test per le nuove funzionalità
-   - Aggiornare la documentazione
+1. **Scrivi il codice**
+   - Segui i pattern esistenti
+   - Aggiungi test per le nuove funzionalità
+   - Aggiorna la documentazione
 
-2. **Testare le modifiche**
+2. **Testa le tue modifiche**
    ```bash
-   # Eseguire tutti i test
+   # Esegui tutti i test
    dotnet test
    
-   # Compilare in modalità release
+   # Compila in modalità Release
    dotnet build --configuration Release
    ```
 
-3. **Formattare il codice**
+3. **Formatta il codice**
    ```bash
    dotnet format
    ```
 
-4. **Commit delle modifiche**
+4. **Committa le modifiche**
    ```bash
    git add .
-   git commit -m "feat(ambito): descrizione"
+   git commit -m "feat(scope): description"
    ```
 
-5. **Push verso il tuo fork**
+5. **Pusha sul tuo Fork**
    ```bash
-   git push origin feature/nome-della-tua-funzionalità
+   git push origin feature/your-feature-name
    ```
 
-6. **Creare una Pull Request**
-   - Andare al repository originale
-   - Cliccare su « Compare & pull request »
-   - Compilare il modello di PR
-   - Inviare
+6. **Crea una Pull Request**
+   - Vai al repository originale
+   - Clicca su "Compare & pull request"
+   - Compila il template PR
+   - Invia
 
 ---
 
 ## Guida alle Pull Request
 
-### Titolo PR
+### Titolo della PR
 
-Usare lo stesso formato dei messaggi di commit :
+Usa lo stesso formato dei messaggi di commit:
 ```
 feat(localization): add Korean language support
 ```
 
-### Descrizione PR
+### Descrizione della PR
 
-Includere :
+Includi:
 
-1. **Cosa** - Cosa fa questa PR ?
-2. **Perché** - Perché questo cambiamento è necessario ?
-3. **Come** - Come lo hai implementato ?
-4. **Test** - Come è stato testato ?
+1. **Cosa** - Cosa fa questa PR?
+2. **Perché** - Perché è necessaria questa modifica?
+3. **Come** - Come l'hai implementata?
+4. **Test** - Come è stata testata?
 
-### Esempio di descrizione PR
+### Esempio di Descrizione PR
 
 ```markdown
 ## Cosa
-Aggiunta della localizzazione coreana per tutti i componenti UI e la documentazione.
+Aggiunta la localizzazione coreana per tutti i componenti UI e la documentazione.
 
 ## Perché
-Ampliare l'accessibilità del progetto agli utenti coreani.
+Espandere l'accessibilità del progetto agli utenti di lingua coreana.
 
 ## Come
-- Creazione del file di localizzazione KoKR.cs
-- Aggiunta di 500+ chiavi di traduzione
-- Aggiornamento di tutte le viste per utilizzare la localizzazione
-- Creazione della documentazione coreana in docs/ko-KR/
+- Creato il file di localizzazione KoKR.cs
+- Aggiunti 500+ tasti di traduzione
+- Aggiornate tutte le viste per utilizzare la localizzazione
+- Creata la documentazione coreana in docs/ko-KR/
 
 ## Test
-- Verifica che tutti gli elementi UI visualizzino correttamente il coreano
-- Test della funzionalità di cambio lingua
-- Revisione delle traduzioni con un madrelingua
+- Verificato che tutti gli elementi UI mostrino correttamente il coreano
+- Testata la funzionalità di cambio lingua
+- Revisionate le traduzioni con madrelingua
 ```
 
 ---
 
-## Tipi di contributi
+## Tipi di Contributi
 
-### 1. Correzione bug
+### 1. Correzione di Bug
 
-**Processo** :
-1. Verificare le issue esistenti
-2. Creare una issue se non esiste
-3. Correggere il bug
-4. Aggiungere casi di test
-5. Inviare una PR
+**Processo**:
+1. Controlla le issue esistenti
+2. Crea una issue se non esiste
+3. Correggi il bug
+4. Aggiungi casi di test
+5. Invia una PR
 
-**Requisiti** :
+**Requisiti**:
 - Descrizione chiara del bug
-- Passaggi di riproduzione
+- Passaggi per riprodurlo
 - Test per prevenire regressioni
 
-### 2. Nuove funzionalità
+### 2. Nuove Funzionalità
 
-**Processo** :
-1. Discutere la funzionalità in Issues/Discussions
-2. Ottenere l'approvazione dei manutentori
-3. Implementare la funzionalità
-4. Aggiungere test completi
-5. Aggiornare la documentazione
-6. Inviare una PR
+**Processo**:
+1. Discuti la funzionalità nelle Issues/Discussioni
+2. Ottieni l'approvazione dei manutentori
+3. Implementa la funzionalità
+4. Aggiungi test completi
+5. Aggiorna la documentazione
+6. Invia una PR
 
-**Requisiti** :
+**Requisiti**:
 - Proposta di funzionalità approvata
-- Copertura di test completa
+- Copertura completa dei test
 - Documentazione aggiornata
-- Compatibilità verso l'alto
+- Compatibilità con le versioni precedenti
 
 ### 3. Documentazione
 
-**Processo** :
-1. Identificare le lacune nella documentazione
-2. Scrivere/aggiornare la documentazione
-3. Inviare una PR
+**Processo**:
+1. Identifica le lacune nella documentazione
+2. Scrivi/aggiorna la documentazione
+3. Invia una PR
 
-**Requisiti** :
+**Requisiti**:
 - Chiaro e conciso
-- Includere esempi
+- Includi esempi
 - Supporto multilingua se applicabile
 
-### 4. Refactoring del codice
+### 4. Rifattorizzazione del Codice
 
-**Processo** :
-1. Proporre il refactoring in una Issue
-2. Ottenere l'approvazione
-3. Refactoring del codice
-4. Assicurarsi che tutti i test passino
-5. Inviare una PR
+**Processo**:
+1. Proponi la rifattorizzazione in una Issue
+2. Ottieni l'approvazione
+3. Rifattorizza il codice
+4. Assicurati che tutti i test passino
+5. Invia una PR
 
-**Requisiti** :
+**Requisiti**:
 - Nessun cambiamento di funzionalità
 - Tutti i test passano
 - Miglioramento della qualità del codice
@@ -255,9 +255,9 @@ Ampliare l'accessibilità del progetto agli utenti coreani.
 
 ---
 
-## Guida ai test
+## Guida ai Test
 
-### Test unitari
+### Test Unitari
 
 ```csharp
 [TestMethod]
@@ -274,49 +274,49 @@ public void MyFeature_ShouldWork_AsExpected()
 }
 ```
 
-### Test di integrazione
+### Test di Integrazione
 
-Testare i flussi di lavoro completi :
-- Interazione IA
-- Esecuzione strumenti
-- Convalida permessi
-- Operazioni di storage
+Testa il flusso di lavoro completo:
+- Interazione AI
+- Esecuzione degli strumenti
+- Verifica dei permessi
+- Operazioni di archiviazione
 
-### Test manuali
+### Test Manuale
 
-Per le modifiche UI :
-- Testare in più browser
-- Verificare il design responsive
-- Verificare l'accessibilità
-
----
-
-## Guida alla documentazione
-
-### Commenti del codice
-
-- Usare i commenti XML per tutte le API pubbliche
-- Usare commenti in linea per la logica complessa
-- I commenti del codice devono essere in inglese
-
-### File di documentazione
-
-- Posizionare in `docs/{lingua}/`
-- Aggiornare tutte le versioni linguistiche
-- Seguire la struttura esistente
-
-### Documentazione multilingua
-
-Quando si aggiunge documentazione :
-1. Creare prima la versione inglese
-2. Tradurre nelle altre lingue
-3. Mantenere il contenuto sincronizzato
+Per le modifiche UI:
+- Testa su browser multipli
+- Verifica il design responsivo
+- Controlla l'accessibilità
 
 ---
 
-## Processo di revisione
+## Guida alla Documentazione
 
-### Cosa controllano i manutentori
+### Commenti al Codice
+
+- Usa commenti XML per tutte le API pubbliche
+- Usa commenti inline per la logica complessa
+- I commenti al codice sono in inglese
+
+### File di Documentazione
+
+- Posiziona in `docs/{language}/`
+- Aggiorna tutte le versioni linguistiche
+- Segui la struttura esistente
+
+### Documentazione Multilingua
+
+Quando aggiungi documentazione:
+1. Crea prima la versione inglese
+2. Traduci nelle altre lingue
+3. Mantieni i contenuti sincronizzati
+
+---
+
+## Processo di Revisione
+
+### Cosa Controllano i Manutentori
 
 1. **Qualità del codice**
    - Segue le convenzioni
@@ -335,88 +335,88 @@ Quando si aggiunge documentazione :
 
 4. **Compatibilità**
    - Compatibile con le versioni precedenti
-   - Nessuna modifica sostanziale (salvo notifica)
-   - Segue la gestione semantica delle versioni
+   - Nessuna modifica dirompente (a meno che non notificata)
+   - Segue il versionamento semantico
 
-### Tempi di revisione
+### Tempistiche di Revisione
 
-- Revisione iniziale : 1-3 giorni
-- Integrazione feedback : secondo necessità
-- Fusione : dopo approvazione
+- Revisione iniziale: 1-3 giorni
+- Integrazione del feedback: secondo necessità
+- Merge: dopo l'approvazione
 
 ---
 
-## Domande frequenti
+## Domande Frequenti
 
-### PR respinta
+### PR Rifiutata
 
-**Motivi** :
+**Motivi**:
 - Non segue le linee guida
 - Test insufficienti
-- Modifiche sostanziali non notificate
-- Scarsa qualità del codice
+- Modifiche dirompenti non notificate
+- Qualità del codice scarsa
 
-**Soluzioni** :
-- Risolvere i feedback
-- Aggiornare la PR
-- Inviare nuovamente
+**Soluzione**:
+- Risolvi i feedback
+- Aggiorna la PR
+- Invia di nuovo
 
-### Conflitti di fusione
+### Conflitti di Merge
 
-**Soluzioni** :
+**Soluzione**:
 ```bash
-# Aggiornare il tuo ramo
+# Aggiorna il tuo branch
 git fetch origin
 git rebase origin/master
 
-# Risolvere i conflitti
-# Modificare i file in conflitto
+# Risolvi i conflitti
+# Modifica i file in conflitto
 git add .
 git rebase --continue
 
-# Push forzato
+# Force push
 git push --force-with-lease
 ```
 
 ---
 
-## Ottenere aiuto
+## Ottenere Aiuto
 
 ### Risorse
 
-- **Documentazione** : [docs/](../)
-- **Issues** : GitHub Issues
-- **Discussions** : GitHub Discussions
-- **Codice di condotta** : CODE_OF_CONDUCT.md
+- **Documentazione**: [docs/](../)
+- **Issue**: GitHub Issues
+- **Discussioni**: GitHub Discussions
+- **Codice di condotta**: CODE_OF_CONDUCT.md
 
-### Contatto
+### Contatti
 
-- Creare una Issue per i bug
-- Avviare una Discussione per le domande
-- Menzionare i manutentori per domande urgenti
+- Crea una Issue per i bug
+- Avvia una Discussion per domande
+- Tagga i manutentori per questioni urgenti
 
 ---
 
 ## Riconoscimenti
 
-I contributori saranno riconosciuti in :
-- La sezione contributori del README.md
-- Le note di rilascio
-- La documentazione del progetto
+I contributori saranno riconosciuti in:
+- Sezione contributori del README.md
+- Note di rilascio
+- Documentazione del progetto
 
 ---
 
 ## Licenza
 
-Contribuendo, accetti che i tuoi contributi siano sotto licenza Apache 2.0.
+Contribuendo, accetti che i tuoi contributi saranno concessi sotto la licenza Apache 2.0.
 
 ---
 
-## Prossimi passi
+## Prossimi Passi
 
-- 📚 Leggere la [documentazione](../)
-- 🐛 Vedere le [issue aperte](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
-- 💬 Avviare una [discussione](https://github.com/akimoto-akira/SiliconLifeCollective/discussions)
-- 🚀 Fare il fork e iniziare a contribuire !
+- 📚 Leggi la [documentazione](../)
+- 🐛 Controlla le [issue aperte](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 💬 Inizia una [discussione](https://github.com/akimoto-akira/SiliconLifeCollective/discussions)
+- 🚀 Fai un fork e inizia a contribuire!
 
-Grazie per contribuire a SiliconLifeCollective ! 🎉
+Grazie per il tuo contributo a SiliconLifeCollective! 🎉

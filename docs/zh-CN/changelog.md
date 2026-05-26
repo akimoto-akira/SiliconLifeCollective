@@ -61,6 +61,188 @@
 
 ## [未发布]
 
+### 2026-05-26
+
+#### 新功能
+- `a49041b` - 添加俄语(ru-RU)本地化支持 (ref task-364)
+  - 216 个文件变更
+
+#### 修复
+- `79096f2` - glossary 表格格式改为标准 Markdown，移除多余空格对齐
+  - 1 个文件变更
+
+#### 文档
+- `174a954` - 补充 glossary 缺失的 Deutsch/Polski/Português 三列术语翻译
+  - 1 个文件变更
+
+#### 协作框架
+- `5b03d53` - 更新 .ai-collab 任务记录 - task-364 俄语本地化 (ref task-364)
+  - 5 个文件变更
+
+- `018947d` - 归档 2026-05-25 的 sessions 和 changes
+  - 2 个文件变更
+
+### 2026-05-25
+
+#### 新功能
+- `14721a9` - 细化 ThinkOnProject 人员配备提示词为详细可执行行动计划 (ref task-363)
+  - 20 个文件变更
+
+#### 修复
+- `abb4285` - 修复 beingsHtml 的 .join() 调用位置错误 (ref task-361)
+  - 1 个文件变更
+
+- `1c0b9ed` - 删除 WorkflowDetailView 中 states-overview 渲染导致 state-initial 重复字符串 bug (ref task-362)
+  - 6 个文件变更
+
+#### 协作框架
+- `ecc48a1` - 更新 .ai-collab 元数据（relatedCommit 及 activity log） (ref task-361)
+  - 4 个文件变更
+
+- `64529a7` - 归档 2026-05-24 的 sessions 和 changes（手动补执行）
+  - 28 个文件变更
+
+- `4150e52` - 归档已完成任务 task-341~361 (ref archive)
+  - 2 个文件变更
+
+### 2026-05-24
+
+#### 新功能
+- `db60fd9` - 工具权限列表显示无 ToolAction 声明的工具并标注无法设置 (ref task-331, task-332, task-333)
+  - 21 个文件变更
+
+- `6004a7f` - WorkflowTemplate 增加角色定义支持 + 12 语言本地化 + DiskTool 修复 (ref task-346)
+  - 24 个文件变更
+
+- `75ce452` - ProjectSpace 角色池与 ProjectTool 角色管理动作 (ref task-347)
+  - 12 个文件变更
+
+- `edfb600` - BuildProjectScenarioContext 增加角色信息 (ref task-348)
+  - 21 个文件变更
+
+- `6a2d713` - HasProjectsWithoutTemplate 扩展为 HasProjectsNeedingAttention (ref task-349)
+  - 21 个文件变更
+
+- `a773224` - 工作流任务创建改用角色池分配执行者 (ref task-350)
+  - 6 个文件变更
+
+- `77a27f9` - 扩展 TravelCodeWikiTool 作为地理实体入口 (ref task-353)
+  - 8 个文件变更
+
+- `873ef23` - GeoDataTool 实现完成，.ai-collab 状态更新 (ref task-352)
+  - 7 个文件变更
+
+- `feaccab` - GeoContentTool 实现完成，.ai-collab 状态更新 (ref task-351)
+  - 6 个文件变更
+
+- `6e60ad1` - 扩展 GeoLanguageTool（ObjectPath 支持 + set_word），回填元数据 (ref task-356, task-355)
+  - 7 个文件变更
+
+- `4eff807` - 各 GeoLocation 子类实现 GetWikiDocuments() (ref task-357)
+  - 5 个文件变更
+
+- `baad5df` - 实现 MediaWiki API 发布服务 (ref task-358)
+  - 6 个文件变更
+
+- `b846a21` - 实现工作流详情页面 (ref task-361)
+  - 24 个文件变更
+
+#### 修复
+- `a290088` - 通过 CuratorTool 新建的硅基人重启后丢失 (ref task-334)
+  - 11 个文件变更
+
+- `69a8cba` - 修复任务页面不按 beingId 过滤的 Bug (ref task-360)
+  - 8 个文件变更
+
+- `7dd1a65` - 在 Router.cs 中注册工作流详情页路由 (ref task-361)
+  - 1 个文件变更
+
+#### 重构
+- `5e02711` - 重构公共层存储路径抽象，消除文件系统硬编码 (ref task-335)
+  - 12 个文件变更
+
+- `0ec0929` - DynamicBeingLoader.SaveBeingCode 使用 IStorage 替代直接文件系统操作 (ref task-336)
+  - 7 个文件变更
+
+- `9a44b48` - PlaywrightWebView IStorage 桥接 + WebViewBrowserTool 基类解耦 (ref task-337, task-340)
+  - 11 个文件变更
+
+- `8fea742` - WebViewBrowserTool 截图保存使用 IStorage 替代直接文件系统操作 (ref task-338)
+  - 6 个文件变更
+
+- `4c24e6d` - DefaultPermissionCallback 使用 BeingPathResolver 替代硬编码路径 (ref task-339)
+  - 6 个文件变更
+
+- `ab428cd` - 去除 DefaultSiliconBeing 向下转型，直接调用基类 SaveState() (ref task-344)
+  - 7 个文件变更
+
+- `1e6eb80` - PlaywrightWebView 浏览器状态临时文件桥接改用 IStorage 直接读写 (ref task-341)
+  - 7 个文件变更
+
+- `17f00e9` - DiskTool 搜索操作改走 DiskExecutor (ref task-342)
+  - 8 个文件变更
+
+- `8158703` - ChatController 附件检查改走 DiskExecutor (ref task-343)
+  - 7 个文件变更
+
+- `3243ae6` - 重写 TravelCodeWikiPublishWorkflow 为 7 步状态机，移除强制追踪的 TravelCodeWikiWithAI 文件 (ref task-355)
+  - 6 个文件变更
+
+#### 清理
+- `d685288` - 删除 HotReloadTool.cs 和 tools/HotReload 目录 (ref task-345)
+  - 8 个文件变更
+
+#### 文档
+- `f1789d1` - 优化 README.md 描述行 (ref task-359)
+  - 9 个文件变更
+
+#### 协作框架
+- `982c6bb` - 补充 .ai-collab 缺失的 relatedCommit 和 commitHash 字段
+  - 6 个文件变更
+
+- `d91e9f8` - 归档 task-331~340，任务板清空
+  - 2 个文件变更
+
+- `9135e30` - 发布 task-341~344 公共层 IStorage 重构 + 抽象修正
+  - 1 个文件变更
+
+- `f70b350` - 新增 TravelCodeWikiWithAI 架构改造 13 项任务 (ref task-346~358)
+  - 2 个文件变更
+
+- `f81d38b` - 更新 ai-collab session 和 task tracking 文件
+  - 3 个文件变更
+
+### 2026-05-23
+
+#### 修复
+- `9c3c64e` - 修复 ExecuteTool 运行时权限校验绕过项目级限制 (ref task-324)
+  - 7 个文件变更
+
+- `94a9e35` - 修复权限模板定义与 ToolActionAttribute 声明不一致 (ref task-325)
+  - 6 个文件变更
+
+- `e8d8371` - 全部 Action 被禁的工具从 AI 请求中整体移除 (ref task-326)
+  - 6 个文件变更
+
+- `32c7d8a` - 工具权限 API 增加 Action 名校验 + 聊天历史 Markdown 渲染修复 (ref task-327, task-328, task-329)
+  - 9 个文件变更
+
+- `797db8c` - Markdown 渲染 fallback 错误设置 mdRendered 导致 marked 加载后不重新渲染 (ref task-330)
+  - 9 个文件变更
+
+#### 协作框架
+- `1496094` - 发布 task-324~327 工具授权框架修复任务
+  - 776 个文件变更
+
+- `0d16e63` - 更新协作任务状态，关联 task-330 至提交 797db8c，为归档做准备
+  - 2 个文件变更
+
+- `e602e1c` - 归档 task-316~330，任务板清空 (ref task-316~330)
+  - 2 个文件变更
+
+- `20291ce` - 按天归档 sessions 和 changes（5 月 13-22 日）
+  - 106 个文件变更
+
 ### 2026-05-22
 
 #### 文档一致性修复

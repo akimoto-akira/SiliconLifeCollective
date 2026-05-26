@@ -1,4 +1,4 @@
-﻿# コントリビューションガイド
+# コントリビューションガイド
 
 > **バージョン: v0.2.0-alpha**
 
@@ -16,15 +16,15 @@ SiliconLifeCollective へのコントリビューションに興味をお寄せ�
 - **適した人**：すべての開発者
 
 ### SiliconLife.Fast（高性能バージョン）
-- **技術スタック**：.NET 9 Avalonia UI デスクトップアプリ
-- **コントリビューション方向**：パフォーマンス最適化、SpeedyPack ストレージ、システムトレイ、ロックフリー並行性
-- **適した人**：Windows開発経験があり、パフォーマンス最適化に興味がある開発者
+- **技術スタック**：.NET 9 クロスプラットフォームデスクトップアプリ（Avalonia UI）
+- **コントリビューション方向**：パフォーマンス最適化、SpeedyPackストレージ、システムトレイ、ロックフリー並行性
+- **適した人**：デスクトップ開発経験があり、パフォーマンス最適化に興味がある開発者
 
 > **重要なお知らせ**：両バージョンはSiliconLife.CoreとSiliconLife.Commonプロジェクトを共有しており、コアインターフェースの改善は両バージョンに同時に影響します。
 
 ## 行動規範
 
-このプロジェクトは Apache 2.0 ライセンスに従います。すべての相互作用において、尊重と専門性を保ってください。
+本プロジェクトは Apache 2.0 ライセンスに従います。すべてのやり取りにおいて、尊重と専門性を保ってください。
 
 ---
 
@@ -32,7 +32,7 @@ SiliconLifeCollective へのコントリビューションに興味をお寄せ�
 
 ### 1. リポジトリをフォーク
 
-GitHub の「Fork」ボタンをクリックして、自分のコピーを作成。
+GitHub の「Fork」ボタンをクリックして、自分のコピーを作成します。
 
 ### 2. フォークをクローン
 
@@ -41,7 +41,7 @@ git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 ```
 
-### 3. 開発環境の設定
+### 3. 開発環境のセットアップ
 
 ```bash
 # .NET 9 SDK をインストール
@@ -120,32 +120,32 @@ refactor(web): simplify controller structure
    - 新機能にテストを追加
    - ドキュメントを更新
 
-2. **変更をテスト**
+2. **変更をテストする**
    ```bash
    # すべてのテストを実行
    dotnet test
-   
+
    # リリースモードでビルド
    dotnet build --configuration Release
    ```
 
-3. **コードをフォーマット**
+3. **コードをフォーマットする**
    ```bash
    dotnet format
    ```
 
-4. **変更をコミット**
+4. **変更をコミットする**
    ```bash
    git add .
    git commit -m "feat(scope): description"
    ```
 
-5. **フォークにプッシュ**
+5. **フォークにプッシュする**
    ```bash
    git push origin feature/your-feature-name
    ```
 
-6. **プルリクエストを作成**
+6. **プルリクエストを作成する**
    - 元のリポジトリに移動
    - 「Compare & pull request」をクリック
    - PR テンプレートに記入
@@ -263,13 +263,13 @@ feat(localization): add Korean language support
 [TestMethod]
 public void MyFeature_ShouldWork_AsExpected()
 {
-    // 配置
+    // 安排
     var service = new MyService();
-    
-    // 実行
+
+    // 执行
     var result = service.DoSomething();
-    
-    // 検証
+
+    // 断言
     Assert.IsTrue(result.Success);
 }
 ```
@@ -279,7 +279,7 @@ public void MyFeature_ShouldWork_AsExpected()
 完全なワークフローをテスト：
 - AI インタラクション
 - ツール実行
-- 権限検証
+- パーミッション検証
 - ストレージ操作
 
 ### 手動テスト
@@ -341,7 +341,7 @@ UI 変更の場合：
 ### レビュー期間
 
 - 初回レビュー：1-3日
-- フィードバック統合：必要に応じて
+- フィードバック反映：必要に応じて
 - マージ：承認後
 
 ---
@@ -394,8 +394,6 @@ git push --force-with-lease
 - バグの場合は Issue を作成
 - 質問の場合は Discussion を開始
 - 緊急事項の場合はメンテナーにメンション
-
-ご協力ありがとうございます！🎉
 
 ---
 

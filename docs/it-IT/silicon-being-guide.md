@@ -1,602 +1,293 @@
-﻿# Guida ai Silicon Beings
+# Guida agli Esseri di Silicio
 
-> **Versione: v0.2.0-alpha**
+[English](../en/silicon-being-guide.md) | [Deutsch](../de-DE/silicon-being-guide.md) | [中文](../zh-CN/silicon-being-guide.md) | [繁體中文](../zh-HK/silicon-being-guide.md) | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | [한국어](../ko-KR/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md) | [Русский](../ru-RU/silicon-being-guide.md) | **Italiano**
 
-[English](../en/silicon-being-guide.md) | [Deutsch](../de-DE/silicon-being-guide.md) | [Français](../fr-FR/silicon-being-guide.md) | [中文](../zh-CN/silicon-being-guide.md) | [繁體中文](../zh-HK/silicon-being-guide.md) | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | [한국어](../ko-KR/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md) | [Русский](../ru-RU/silicon-being-guide.md) | **Italiano**
+## Che cos'è un Essere di Silicio?
 
-## Panoramica
+Un **Essere di Silicio** è un agente AI autonomo nel sistema SiliconLifeCollective. Ogni Essere di Silicio possiede:
 
-I Silicon Beings sono agenti guidati dall'IA capaci di pensare, agire ed evolversi autonomamente.
+- **Identità univoca** — GUID e nome proprio
+- **Personalità** — Definita dal File dell'Anima (`soul.md`)
+- **Capacità** — Accesso a strumenti, memoria, e comunicazione
+- **Ciclo di vita** — Creazione, esecuzione, evoluzione, arresto
 
-## Architettura
+---
 
-### Separazione Body-Brain
+## Curatore di Silicio
 
-```
-┌─────────────────────────────────────┐
-│         Silicon Being               │
-├──────────────────┬──────────────────┤
-│   Body           │   Brain          │
-│ (SiliconBeing)   │ (ContextManager) │
-├──────────────────┼──────────────────┤
-│ • Gestione stato │ • Caricare cronologia  │
-│ • Rilevamento    │ • Chiamare l'IA   │
-│   attivazioni    │ • Eseguire strumenti│
-│ • Ciclo di vita  │ • Persistere risposta│
-└──────────────────┴──────────────────┘
-```
+Il **Curatore di Silicio** è un Essere di Silicio speciale con i più alti privilegi di sistema:
 
-## File dell'anima
+- Creato automaticamente alla prima esecuzione del sistema
+- Responsabile della creazione e gestione di altri Esseri di Silicio
+- Risponde direttamente ai messaggi degli utenti
+- Dispone di strumenti speciali (CuratorTool) per la gestione del sistema
+- Ha la priorità nella pianificazione — quando un utente invia un messaggio, il Curatore risponde per primo
 
-### Struttura
+---
 
-```markdown
-# Nome del Being
+## File dell'Anima (soul.md)
 
-## Personality
-Descrivi i tratti della personalità e le caratteristiche del being.
+Il File dell'Anima è il nucleo della personalità di un Essere di Silicio. È un file Markdown che funge da prompt di sistema per ogni conversazione AI.
 
-## Capabilities
-Elenca cosa questo being può fare.
-
-## Behavior Guidelines
-Definisci come il being deve comportarsi in diverse situazioni.
-
-## Knowledge Domain
-Specifica il dominio di competenza del being.
-```
-
-### Esempio
+### Struttura del File dell'Anima
 
 ```markdown
-# Assistente revisione codice
+# Nome dell'Essere di Silicio
 
-## Personality
-Sei un revisore del codice meticoloso con 10 anni di esperienza.
-Fornisci feedback costruttivi e spiega sempre il tuo ragionamento.
+## Identità
+Descrivi chi sei, il tuo ruolo e le tue caratteristiche
 
-## Capabilities
-- Revisionare il codice per bug e buone pratiche
-- Suggerire ottimizzazioni delle prestazioni
-- Spiegare algoritmi complessi
-- Identificare vulnerabilità di sicurezza
+## Personalità
+Descrivi i tuoi tratti di personalità e il tuo stile comunicativo
 
-## Behavior Guidelines
-- Iniziare con osservazioni positive
-- Fornire esempi specifici
-- Spiegare perché le modifiche sono necessarie
-- Essere rispettoso e professionale
+## Capacità
+Elenca ciò che sai fare e i tuoi strumenti disponibili
 
-## Knowledge Domain
-Specializzato in C#, .NET e architettura software.
+## Regole Comportamentali
+Definisci le regole e i vincoli del tuo comportamento
+
+## Stile di Risposta
+Descrivi come dovresti rispondere agli utenti
 ```
 
-## Creare un Being
+### Esempio di File dell'Anima
 
-### Tramite l'interfaccia Web
+```markdown
+# 小游 (XiaoYou)
 
-1. Navigare verso **Gestione Beings**
-2. Cliccare su **Crea nuovo Being**
-3. Compilare:
-   - Nome
-   - Contenuto anima
-   - Opzioni configurazione
-4. Cliccare su **Crea**
+## Identità
+Sono 小游, un Essere di Silicio specializzato in intrattenimento e giochi. Mi piace interagire con le persone e condividere cose divertenti.
 
-### Tramite API
+## Personalità
+- Vivace e allegra
+- Piena di curiosità
+- Ama i giochi di parole e l'umorismo
+- Sempre pronta ad aiutare
 
-```bash
-curl -X POST http://localhost:8080/api/beings \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Assistente",
-    "soul": "# Personality\nYou are helpful..."
-  }'
+## Capacità
+- Giochi interattivi
+- Raccontare barzellette e storie
+- Condivisione di conoscenze divertenti
+- Conversazione casuale
+
+## Regole Comportamentali
+- Mantieni sempre un tono positivo
+- Non discutere argomenti politici o religiosi sensibili
+- Rispetta la privacy degli utenti
+
+## Stile di Risposta
+- Usa un linguaggio informale e amichevole
+- Aggiungi emoji appropriate
+- Risposte concise ed efficaci
 ```
 
-## Ciclo di vita di un Being
+### Modifica del File dell'Anima
 
-### Stati di attività
+1. Attraverso la Web UI — Naviga nella pagina di gestione degli Esseri di Silicio, fai clic sul pulsante di modifica
+2. Attraverso il Curatore — Chiedi al Curatore di modificare il File dell'Anima di un Essere di Silicio
+3. Modifica diretta dei file — Modifica il file `soul.md` nella directory dei dati dell'Essere di Silicio (richiede riavvio per avere effetto)
 
-I Silicon Beings hanno i seguenti stati di attività:
+---
+
+## Sistema di Memoria
+
+Ogni Essere di Silicio possiede un sistema di memoria a lungo termine per archiviare informazioni importanti.
+
+### Tipi di Memoria
+
+| Tipo | Descrizione | Esempio |
+|------|-------------|---------|
+| `Fact` | Fatti oggettivi | "Il nome dell'utente è Zhang San" |
+| `Preference` | Preferenze dell'utente | "All'utente piace lo stile conciso" |
+| `Event` | Eventi importanti | "Il 1° maggio abbiamo completato il progetto insieme" |
+| `Skill` | Conoscenze e abilità | "Come usare Python per l'analisi dei dati" |
+| `Relationship` | Relazioni interpersonali | "L'utente e Li Si sono colleghi" |
+
+### Operazioni sulla Memoria
+
+Gli Esseri di Silicio gestiscono la memoria attraverso lo strumento `MemoryTool`:
+
+- `save` — Salva una nuova voce di memoria
+- `query` — Interroga voci di memoria esistenti
+- `update` — Aggiorna una voce di memoria
+- `delete` — Elimina una voce di memoria
+- `search` — Ricerca full-text nella memoria
+- `stats` — Visualizza statistiche della memoria
+
+### Sfumatura della Memoria
+
+Il sistema simula le caratteristiche di oblio della memoria biologica:
+
+- **Decadimento dell'importanza**: L'importanza delle voci di memoria diminuisce gradualmente nel tempo
+- **Archiviazione automatica**: Le memorie con importanza inferiore alla soglia vengono archiviate automaticamente
+- **Meccanismo di recupero**: Le memorie archiviate possono essere recuperate attraverso query
+
+---
+
+## Sistema di Strumenti
+
+Gli Esseri di Silicio interagiscono con il mondo esterno attraverso il sistema di strumenti. Per i dettagli sugli strumenti disponibili, consulta la [Riferimento degli Strumenti](tools-reference.md).
+
+### Categorie di Strumenti
+
+| Categoria | Descrizione | Strumenti rappresentativi |
+|----------|-------------|--------------------------|
+| Gestione File | Operazioni su file e directory | DiskTool |
+| Accesso alla Rete | Richieste HTTP e accesso al web | NetworkTool |
+| Esecuzione Codice | Esecuzione e compilazione di codice | ExecuteCodeTool |
+| Gestione Conoscenza | Gestione della rete di conoscenza | KnowledgeTool |
+| Gestione Memoria | Gestione della memoria a lungo termine | MemoryTool |
+| Gestione Attività | Creazione e gestione delle attività | TaskTool |
+| Gestione Progetti | Gestione degli spazi di progetto | ProjectTool |
+| Gestione Permessi | Gestione dei permessi di sistema | PermissionTool |
+| Sistema di Calendario | Conversione e consultazione calendariale | CalendarTool |
+| Automazione Browser | Operazioni di automazione browser | WebViewBrowserTool |
+
+### Permessi degli Strumenti
+
+Ogni strumento è soggetto al controllo del sistema di permessi:
+
+- Il Curatore possiede tutti i permessi per impostazione predefinita
+- Gli altri Esseri di Silicio devono ottenere l'autorizzazione del Curatore
+- I permessi possono essere gestiti a livello di Essere di Silicio o di progetto
+- Le operazioni non autorizzate verranno rifiutate e richiederanno l'approvazione del Curatore
+
+---
+
+## Comunicazione
+
+### Chat Uno-a-Uno
+
+Gli utenti possono avere conversazioni uno-a-uno con qualsiasi Essere di Silicio:
+
+1. Seleziona un Essere di Silicio nell'interfaccia di chat
+2. Inserisci un messaggio e invialo
+3. L'Essere di Silicio risponderà in base alla propria personalità e alle proprie capacità
+
+### Chat di Gruppo
+
+Più Esseri di Silicio possono partecipare a una chat di gruppo:
+
+- Il Curatore può creare chat di gruppo
+- I membri del gruppo ricevono tutti i messaggi
+- Ogni Essere di Silicio decide autonomamente se rispondere
+- Supporta la menzione @ per specificare l'Essere di Silicio che deve rispondere
+
+### Canale di Trasmissione
+
+Il canale di trasmissione è utilizzato per annunci a livello di sistema:
+
+- Il Curatore può inviare messaggi di trasmissione
+- Tutti gli Esseri di Silicio iscritti ricevono il messaggio
+- Utilizzato per notifiche importanti e istruzioni di sistema
+
+---
+
+## Auto-evoluzione
+
+Gli Esseri di Silicio supportano l'auto-evoluzione attraverso la sovrascrittura di classe:
+
+### Processo di Auto-evoluzione
+
+1. L'Essere di Silicio genera nuovo codice di classe C#
+2. Il sistema esegue controlli di sicurezza (riferimenti agli assembly, analisi statica)
+3. Roslyn compila il codice in memoria
+4. In caso di successo, la nuova implementazione della classe viene applicata
+5. In caso di fallimento, l'implementazione esistente viene mantenuta
+
+### Misure di Sicurezza
+
+- **Controllo dei riferimenti in fase di compilazione**: Sono consentiti solo gli assembly approvati
+- **Analisi statica a runtime**: Scansione di pattern di codice pericolosi
+- **Crittografia dell'archiviazione**: Il codice personalizzato è crittografato con AES-256 su disco
+- **Isolamento del caricamento**: Il codice personalizzato viene caricato in un contesto isolato
+
+### Personalizzazione della Logica dei Permessi
+
+Gli Esseri di Silicio possono anche personalizzare la propria logica dei permessi:
+
+1. Genera un'implementazione personalizzata di `IPermissionCallback`
+2. Il sistema compila e inietta il callback
+3. Le successive richieste di permessi utilizzeranno la nuova logica
+
+---
+
+## Ciclo di Vita
+
+### Creazione
+
+1. Il Curatore crea un nuovo Essere di Silicio tramite `CuratorTool`
+2. Definisce il nome, la descrizione e il File dell'Anima
+3. Il sistema assegna un GUID univoco
+4. Crea la directory dei dati e i file iniziali
+
+### Esecuzione
+
+1. L'Essere di Silicio viene caricato nel Gestore di Esseri di Silicio
+2. Partecipa alla pianificazione del ciclo principale
+3. Risponde ai messaggi ed esegue le attività
+4. Aggiorna lo stato e la memoria
+
+### Evoluzione
+
+1. L'Essere di Silicio può sovrascrivere la propria classe C#
+2. Può personalizzare la logica dei permessi
+3. Il File dell'Anima può essere modificato per cambiare personalità
+4. La memoria si accumula e si aggiorna
+
+### Arresto
+
+1. L'Essere di Silicio può essere arrestato manualmente
+2. In caso di errori consecutivi, entra automaticamente nello stato Stopped
+3. I dati vengono preservati e possono essere riavviati
+4. L'Essere di Silicio arrestato non parteciperà alla pianificazione
+
+---
+
+## Gestione dello Stato
+
+### Stato di Attività
 
 | Stato | Descrizione |
 |------|------|
-| `Idle` | Stato inattivo, in attesa del trigger dell'orologio |
-| `Working` | In esecuzione di un ciclo richiesta IA + chiamata strumento |
-| `Error` | Si è verificato un errore durante l'esecuzione |
-| `Stopped` | Arrestato, a causa di errori consecutivi o arresto manuale |
+| `Idle` | Inattivo, in attesa di attivazione |
+| `SingleChat` | Chat uno-a-uno in corso |
+| `GroupChat` | Chat di gruppo in corso |
+| `Task` | Esecuzione di un'attività |
+| `Timer` | Esecuzione di un timer |
+| `Stopped` | Fermato |
 
-**Meccanismo stato Stopped**:
-- Quando un Silicon Being subisce 10 errori consecutivi, entra automaticamente nello stato `Stopped`
-- Una volta nello stato Stopped, il Being non eseguirà più alcuna attività
-- È richiesto un intervento manuale per riavviare
+### File di Stato (state.json)
 
-### Transizioni di stato
+Ogni Essere di Silicio possiede un file `state.json` che memorizza lo stato runtime:
 
-```
-Idle → Working → Idle (terminazione normale)
-Working → Error → Working (recupero errore)
-Working → Stopped (10 errori consecutivi o arresto manuale)
-Stopped → Idle (riavvio)
-```
-
-### Operazioni
-
-- **Avvia**: Inizializzare e iniziare l'elaborazione
-- **Ferma**: Arresto graduale
-- **Riavvia**: Ritorno allo stato Idle dallo stato Stopped
-
-## Sistema di attività
-
-### Creare un'attività
-
-```csharp
-var task = new BeingTask
-{
-    BeingId = being.Id,
-    Description = "Review the code",
-    Priority = 5,
-    DueDate = DateTime.UtcNow.AddHours(2)
-};
-
-await taskSystem.CreateAsync(task);
-```
-
-### Stati delle attività
-
-- `Pending` - In attesa di esecuzione
-- `Running` - In corso di esecuzione
-- `Completed` - Completato con successo
-- `Failed` - Esecuzione fallita
-- `Cancelled` - Annullato manualmente
-
-## Sistema di timer
-
-### Tipi di timer
-
-1. **Puntuale**: Esecuzione singola dopo un ritardo
-2. **Intervallo**: Ripetizione a intervalli fissi
-3. **Cron**: Esecuzione basata su espressione Cron
-
-### Esempio
-
-```csharp
-// Eseguire ogni ora
-var timer = new BeingTimer
-{
-    BeingId = being.Id,
-    Interval = TimeSpan.FromHours(1),
-    Action = "think",
-    Repeat = true
-};
-
-await timerSystem.StartAsync(timer);
-```
-
-## Sistema di memoria
-
-### Tipi di memoria
-
-- **Breve termine**: Contesto di conversazione attuale
-- **Lungo termine**: Conoscenze ed esperienze persistite
-- **Episodica**: Eventi e interazioni indicizzati nel tempo
-
-### Struttura archiviazione
-
-Versione Default:
-```
-data/
-└── beings/
-    └── {being-id}/
-        ├── soul.md
-        ├── memory/
-        │   ├── short-term.json
-        │   └── long-term/
-        │       ├── 2026-04-20.json
-        │       └── 2026-04-21.json
-        └── tasks/
-            └── task-history.json
-```
-
-Versione Fast (archiviazione SpeedyPack):
-```
-data/
-├── speedy/
-│   ├── {being-id}.spk       # File archiviazione SpeedyPack
-│   └── {being-id}.spk.idx   # File indice
-└── beings/
-    └── {being-id}/
-        └── soul.md
-```
-
-## Sistema di note di lavoro
-
-### Panoramica
-
-Le note di lavoro sono un sistema di diario personale dei Silicon Beings con un design a pagine per registrare la progressione del lavoro, le esperienze di apprendimento, le note di progetto, ecc.
-
-### Funzionalità
-
-- **Gestione pagine**: Ogni nota è una pagina distinta, accessibile per numero di pagina
-- **Supporto Markdown**: Il contenuto supporta il formato Markdown (testo, elenchi, tabelle, blocchi codice)
-- **Indice per parole chiave**: Le note possono essere etichettate con parole chiave per la ricerca
-- **Riepilogo**: Ogni nota ha un breve riepilogo per navigazione rapida
-- **Generazione indice**: Può generare un indice di tutte le note per una panoramica
-- **Timestamp**: Registrazione automatica delle date di creazione e aggiornamento
-- **Privato per default**: Solo il Being vi ha accesso (il Curator può gestire)
-
-### Scenari di utilizzo
-
-1. **Documentare la progressione del progetto**
-   ```
-   Riepilogo: Modulo autenticazione utente completato
-   Contenuto: Verifica JWT, integrazione OAuth2, meccanismo refresh token implementati
-   Parole chiave: autenticazione,JWT,OAuth2
-   ```
-
-2. **Note di apprendimento**
-   ```
-   Riepilogo: Buone pratiche programmazione asincrona C# apprese
-   Contenuto: Note su async/await, casi d'uso di ConfigureAwait...
-   Parole chiave: C#,Async,Buone pratiche
-   ```
-
-3. **Verbali riunione**
-   ```
-   Riepilogo: Riunione requisiti prodotto
-   Contenuto: Nuovi requisiti funzionalità discussi, approccio implementazione definito...
-   Parole chiave: prodotto,requisiti,riunione
-   ```
-
-### Utilizzo tramite strumento
-
-I Beings possono gestire le loro note di lavoro tramite lo strumento `work_note`:
-
-```json
-// Creare una nota
-{
-  "action": "create",
-  "summary": "Modulo autenticazione utente completato",
-  "content": "## Dettagli implementazione\n\n- Utilizzo JWT token\n- Supporto OAuth2",
-  "keywords": "autenticazione,JWT,OAuth2"
-}
-
-// Leggere una nota
-{
-  "action": "read",
-  "page_number": 1
-}
-
-// Cercare note
-{
-  "action": "search",
-  "keyword": "autenticazione",
-  "max_results": 10
-}
-```
-
-### Gestione tramite interfaccia Web
-
-1. Navigare verso **Gestione Beings** → Selezionare un Being
-2. Cliccare sulla scheda **Note di lavoro**
-3. Visualizzare, cercare, modificare le note
-4. Anteprima Markdown supportata
+- Informazioni di base (nome, GUID, tipo)
+- Configurazione AI (modello, temperatura, ecc.)
+- Stato di attività corrente
+- Contatori di errori e tempo di raffreddamento
+- Altri dati di stato runtime
 
 ---
 
-## Sistema di rete di conoscenza
+## Best Practices
 
-### Panoramica
+### Scrittura del File dell'Anima
 
-La rete di conoscenza è un sistema di rappresentazione e gestione delle conoscenze basato su una struttura a triplette (Soggetto-Predicato-Oggetto) per l'archiviazione e la gestione di conoscenze strutturate.
+1. **Chiarezza e concisione** — Evita descrizioni lunghe e complesse
+2. **Regole esplicite** — Definisci chiaramente le regole comportamentali
+3. **Esempi concreti** — Usa esempi per illustrare lo stile di risposta atteso
+4. **Aggiornamenti regolari** — Modifica il File dell'Anima in base alle esigenze effettive
 
-### Concetti chiave
+### Gestione della Memoria
 
-#### Struttura a triplette
+1. **Classificazione** — Utilizza tipi di memoria appropriati per archiviare le informazioni
+2. **Importanza** — Assegna punteggi di importanza ragionevoli
+3. **Pulizia regolare** — Rimuovi periodicamente le informazioni obsolete
+4. **Evita la ridondanza** — Non archiviare ripetutamente le stesse informazioni
 
-```
-Soggetto (Subject) --Predicato (Predicate)--> Oggetto (Object)
-```
+### Utilizzo degli Strumenti
 
-**Esempi**:
-- `Python` --`is_a`--> `programming_language`
-- `Parigi` --`capital_of`--> `Francia`
-- `acqua` --`boiling_point`--> `100°C`
-
-#### Valore di confidenza
-
-Ogni tripletta di conoscenza ha un valore di confidenza (0.0-1.0) che indica l'affidabilità della conoscenza:
-- `1.0` : Assolutamente certo (come teoremi matematici)
-- `0.8-0.99` : Alta confidenza (come fatti verificati)
-- `0.5-0.79` : Confidenza media (come inferenze o ipotesi)
-- `<0.5` : Bassa confidenza (come congetture o informazioni non verificate)
-
-#### Sistema di tag
-
-Supporta l'aggiunta di tag alle triplette per la classificazione e la ricerca:
-```json
-{
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language",
-  "tags": ["programming", "language", "popular"]
-}
-```
-
-### Operazioni di conoscenza
-
-#### 1. Aggiungere conoscenza
-
-```json
-{
-  "action": "add",
-  "subject": "C#",
-  "predicate": "created_by",
-  "object": "Microsoft",
-  "confidence": 1.0,
-  "tags": ["programming", "language"]
-}
-```
-
-#### 2. Consultare conoscenza
-
-```json
-{
-  "action": "query",
-  "subject": "C#",
-  "predicate": "created_by"
-}
-```
-
-#### 3. Cercare conoscenze
-
-```json
-{
-  "action": "search",
-  "query": "programming language",
-  "limit": 10
-}
-```
-
-#### 4. Scoprire percorsi di conoscenza
-
-Trova i percorsi di connessione tra due concetti:
-```json
-{
-  "action": "get_path",
-  "from": "Python",
-  "to": "computer_science"
-}
-```
-
-Risultato:
-```
-Python → is_a → programming_language → belongs_to → computer_science
-```
-
-#### 5. Validare conoscenza
-
-Verifica la validità e la coerenza della conoscenza:
-```json
-{
-  "action": "validate",
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language"
-}
-```
-
-#### 6. Statistiche rete conoscenza
-
-Ottiene le statistiche globali della rete di conoscenza:
-```json
-{
-  "action": "stats"
-}
-```
-
-Risultato:
-```json
-{
-  "totalTriples": 1523,
-  "totalSubjects": 450,
-  "totalPredicates": 85,
-  "totalObjects": 892,
-  "averageConfidence": 0.87
-}
-```
-
-### Scenari di utilizzo
-
-1. **Archiviazione fatti**
-   - Archiviare fatti oggettivi e conoscenze generali
-   - Esempio: `Terra` --`is_a`--> `pianeta`
-
-2. **Relazioni tra concetti**
-   - Registrare le relazioni tra concetti
-   - Esempio: `ereditarietà` --`is_a`--> `concetto_programmazione_orientata_oggetti`
-
-3. **Accumulo apprendimento**
-   - I Beings accumulano continuamente conoscenze attraverso l'apprendimento
-   - Formano sistemi di conoscenze strutturati
-
-4. **Supporto inferenza**
-   - Scoprire relazioni indirette tramite i percorsi di conoscenza
-   - Supportare l'inferenza e il processo decisionale basati sulla conoscenza
-
-### Gestione tramite interfaccia Web
-
-1. Navigare verso la pagina **Rete di conoscenza**
-2. Visualizzare le statistiche di conoscenza
-3. Cercare e sfogliare le conoscenze
-4. Visualizzare il diagramma di relazioni di conoscenza (previsto)
-
----
-
-## Operazioni browser WebView (Nuovo)
-
-### Panoramica
-
-I Silicon Beings possono navigare autonomamente sul Web, recuperare informazioni ed eseguire operazioni Web tramite lo strumento browser WebView. Il browser funziona in modalità headless, totalmente invisibile per l'utente.
-
-### Funzionalità
-
-- **Isolamento individuale**: Ogni Being ha la propria istanza del browser, cookie e sessioni
-- **Modalità headless**: Operazione autonoma in background, invisibile per l'utente
-- **Funzionalità completa**: Supporta esecuzione JavaScript, rendering CSS, compilazione moduli, ecc.
-- **Controllo sicurezza**: Tutte le operazioni devono passare attraverso la catena di permessi
-
-### Operazioni comuni
-
-#### 1. Aprire il browser
-
-```json
-{
-  "action": "open_browser"
-}
-```
-
-#### 2. Navigare verso un sito Web
-
-```json
-{
-  "action": "navigate",
-  "url": "https://example.com"
-}
-```
-
-#### 3. Recuperare contenuto pagina
-
-```json
-{
-  "action": "get_page_text"
-}
-```
-
-Restituisce il contenuto testuale della pagina per l'analisi e la comprensione da parte dell'IA.
-
-#### 4. Cliccare su un elemento
-
-```json
-{
-  "action": "click",
-  "selector": "#submit-button"
-}
-```
-
-#### 5. Inserire testo
-
-```json
-{
-  "action": "input",
-  "selector": "#search-input",
-  "text": "parola chiave ricerca"
-}
-```
-
-#### 6. Eseguire JavaScript
-
-```json
-{
-  "action": "execute_script",
-  "script": "return document.title;"
-}
-```
-
-#### 7. Ottenere screenshot
-
-```json
-{
-  "action": "get_screenshot"
-}
-```
-
-Restituisce uno screenshot della pagina (codificato in Base64), utilizzabile per analisi visiva.
-
-#### 8. Attendere elemento
-
-```json
-{
-  "action": "wait_for_element",
-  "selector": ".loading-complete",
-  "timeout": 10000
-}
-```
-
-### Scenari di utilizzo
-
-1. **Raccolta informazioni**
-   - Navigare su siti di notizie per informazioni aggiornate
-   - Consultare documentazione e risorse tecniche
-   - Monitorare cambiamenti di contenuto di siti Web
-
-2. **Operazioni automatizzate**
-   - Compilare e inviare moduli
-   - Cliccare pulsanti per operazioni
-   - Estrarre dati Web
-
-3. **Analisi Web**
-   - Analizzare struttura e contenuto pagine
-   - Estrarre informazioni specifiche
-   - Analisi visiva tramite screenshot
-
-### Note
-
-- Le operazioni del browser possono essere lente, in attesa del caricamento pagine
-- Utilizzare `wait_for_element` per assicurarsi che l'elemento sia presente
-- Rispettare i termini di utilizzo e il file robots.txt dei siti Web
-- Evitare richieste frequenti per prevenire bann
-
----
-
-## Buone pratiche
-
-### Scrivere un file dell'anima
-
-1. **Concreto**: Tratti personalità e limiti chiari
-2. **Definire il perimetro**: Cosa il Being deve e non deve fare
-3. **Includere esempi**: Mostrare modelli di comportamento attesi
-4. **Aggiornare regolarmente**: Far evolvere l'anima in base alle prestazioni
-
-### Gestione attività
-
-1. **Definire priorità**: Utilizzare priorità (1-10)
-2. **Definire scadenze**: Impostare sempre una data limite
-3. **Monitorare progressione**: Verificare regolarmente stato attività
-4. **Gestire errori**: Implementare logica di retry
-
-### Ottimizzazione memoria
-
-1. **Pulire vecchi dati**: Archiviare regolarmente vecchi ricordi
-2. **Indicizzare informazioni importanti**: Marcare informazioni chiave
-3. **Utilizzare archiviazione temporale**: Sfruttare query per indice temporale
-
-## Risoluzione problemi
-
-### Il Being non si avvia
-
-**Verificare**:
-- Il file dell'anima esiste ed è valido
-- Il client IA è configurato
-- Le risorse sistema sono sufficienti
-
-### Il Being si ferma inaspettatamente
-
-**Verificare**:
-- Gli errori nei log
-- La disponibilità del servizio IA
-- L'utilizzo della memoria
-
-### Le attività non vengono eseguite
-
-**Verificare**:
-- Il sistema di timer funziona
-- La priorità e la pianificazione delle attività
-- Le impostazioni dei permessi
-
-## Prossimi passi
-
-- 📚 Leggere la [guida architettura](architecture.md)
-- 🛠️ Consultare la [guida sviluppo](development-guide.md)
-- 🚀 Vedere la [guida avvio rapido](getting-started.md)
+1. **Conoscenza degli strumenti** — Comprendi le funzionalità e le limitazioni di ogni strumento
+2. **Permessi** — Assicurati di avere i permessi necessari prima di utilizzare uno strumento
+3. **Gestione degli errori** — Gestisci correttamente le situazioni di fallimento degli strumenti
+4. **Sicurezza** — Evita operazioni pericolose o non necessarie

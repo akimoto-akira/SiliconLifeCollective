@@ -1,37 +1,37 @@
-﻿# Schnellstart
+# Schnellstart
 
 > **Version: v0.2.0-alpha**
 
 [English](../en/getting-started.md) | **Deutsch** | [中文](../zh-CN/getting-started.md) | [繁體中文](../zh-HK/getting-started.md) | [Español](../es-ES/getting-started.md) | [日本語](../ja-JP/getting-started.md) | [한국어](../ko-KR/getting-started.md) | [Čeština](../cs-CZ/getting-started.md) | [Русский](../ru-RU/getting-started.md)
 
-## Version Wählen
+## Version auswählen
 
 Dieses Projekt bietet zwei Implementierungsversionen:
 
 ### SiliconLife.Default (Standardversion)
-- **Positionierung**: Standardimplementierung, hauptsächlich für Architektur-Machbarkeitsverifizierung
+- **Positionierung**: Standardimplementierung, hauptsächlich zur Validierung der Architektur
 - **Ausführungsmodus**: Konsolenanwendung
-- **Speicher**: Dateisystem-JSON-Speicher
-- **Anwendungsszenario**: Datensicherheitspriorität, kleines Datenvolumen, Entwicklungsdebugging, Architekturverifizierung
+- **Speicherart**: Dateisystem-JSON-Speicherung
+- **Einsatzszenarien**: Datensicherheit hat Priorität, kleine Datenmengen, Entwicklung und Debugging, Architekturvalidierung
 - **Plattformunterstützung**: Windows, Linux, macOS
-- **Rollenbeschreibung**: Referenzimplementierung für Architekturverifizierung, bietet eine einfache und zuverlässige Ausführung, geeignet für ersten Kontakt oder Entwicklungs-Debugging
+- **Rollenbeschreibung**: Dient als Referenzimplementierung zur Architekturvalidierung und bietet eine einfache, zuverlässige Ausführung, ideal für den ersten Kontakt mit dem Projekt oder für die Entwicklung und das Debugging
 
 ### SiliconLife.Fast (Hochleistungsversion)
-- **Positionierung**: Haupt-Produktionsversion
-- **Ausführungsmodus**: Desktop-Anwendung (Windows/macOS System Tray / Linux Statusfenster)
-- **Speicher**: SpeedyPack In-Memory-Speicher + asynchrone Persistenz (.spk-Dateiformat)
-- **Anwendungsszenario**: Hohe Parallelität, niedrige Latenz, großes Datenvolumen, Langzeit-Produktionsbetrieb
-- **Plattformunterstützung**: Windows/macOS (volle Funktionen, inkl. System Tray), Linux (Statusfenster, kein Tray-Icon)
-- **Rollenbeschreibung**: Produktionsreife Implementierung mit tiefer Optimierung, die beste Wahl für Langzeitbetrieb und echte Produktionsumgebungen
+- **Positionierung**: Empfohlene Produktivversion
+- **Ausführungsmodus**: Desktop-Anwendung (Windows/macOS System-Tray / Linux Statusfenster)
+- **Speicherart**: SpeedyPack-In-Memory-Speicherung + asynchrone Persistierung (.spk-Dateiformat)
+- **Einsatzszenarien**: Hohe Nebenläufigkeit, geringe Latenz, große Datenmengen, langfristiger Produktivbetrieb
+- **Plattformunterstützung**: Windows/macOS (volle Funktionalität inkl. System-Tray), Linux (Statusfenster, kein Tray-Icon)
+- **Rollenbeschreibung**: Eine tiefgreifend optimierte produktionsreife Implementierung, die erste Wahl für den Langzeitbetrieb und echte Produktivumgebungen
 
-> **Anfängerempfehlung**: Erstbenutzer sollten mit **SiliconLife.Default** beginnen, um schnell die Architektur-Machbarkeit zu verifizieren. Nach Vertrautheit mit dem System wird eine Migration zu **SiliconLife.Fast** dringend empfohlen.
+> **Empfehlung für Einsteiger**: Beim ersten Mal wird empfohlen, mit **SiliconLife.Default** zu beginnen, um die Architektur schnell zu validieren. Nach Vertrautheit mit dem System wird dringend empfohlen, auf **SiliconLife.Fast** als Produktivversion zu migrieren.
 
 ## Voraussetzungen
 
-- **.NET 9 SDK** - [Download](https://dotnet.microsoft.com/download/dotnet/9.0)
-- **Git** - [Download](https://git-scm.com/)
-- **Ollama** (optional, für lokale KI) - [Download](https://ollama.com/)
-- **DashScope API-Schlüssel** (optional, für Cloud-KI) - [Beantragen](https://bailian.console.aliyun.com/)
+- **.NET 9 SDK** - [Herunterladen](https://dotnet.microsoft.com/download/dotnet/9.0)
+- **Git** - [Herunterladen](https://git-scm.com/)
+- **Ollama** (optional, für lokale KI) - [Herunterladen](https://ollama.com/)
+- **Bailian API-Schlüssel** (optional, für Cloud-KI) - [Beantragen](https://bailian.console.aliyun.com/)
 - **Volcengine Ark API-Schlüssel** (optional, für Cloud-KI) - [Beantragen](https://console.volcengine.com/ark)
 
 ## Schnellstart
@@ -43,7 +43,7 @@ git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 ```
 
-### 2. Projekt bauen
+### 2. Projekt erstellen
 
 ```bash
 dotnet build
@@ -66,19 +66,21 @@ Bearbeiten Sie `src/SiliconLife.Default/Config/DefaultConfigData.cs` oder änder
 }
 ```
 
-#### Option B: DashScope (Cloud)
+#### Option B: Bailian (Cloud)
 
 ```json
 {
   "AIClients": {
     "DashScope": {
-      "ApiKey": "ihr-api-key-hier",
-      "Model": "qwen3.6-plus",
+      "ApiKey": "your-api-key-here",
+      "Model": "qwen-plus",
       "Region": "beijing"
     }
   }
 }
 ```
+
+> **Verfügbare Regionen**: `beijing` (Peking), `virginia` (Virginia), `singapore` (Singapur), `hongkong` (Hongkong), `frankfurt` (Frankfurt)
 
 #### Option C: Volcengine Ark (Cloud)
 
@@ -86,7 +88,7 @@ Bearbeiten Sie `src/SiliconLife.Default/Config/DefaultConfigData.cs` oder änder
 {
   "AIClients": {
     "VolcengineArk": {
-      "ApiKey": "ihr-api-key-hier",
+      "ApiKey": "your-api-key-here",
       "Endpoint": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
       "Model": "ep-xxxxxxxxxxxxx-xxxxx"
     }
@@ -94,7 +96,7 @@ Bearbeiten Sie `src/SiliconLife.Default/Config/DefaultConfigData.cs` oder änder
 }
 ```
 
-> **Hinweis**: Der Model-Parameter von Volcengine Ark akzeptiert eine Inferenz-Endpunkt-ID (z.B. `ep-20241212123456-abcde`), keinen Modellnamen.
+> **Hinweis**: Der Model-Parameter von Volcengine Ark akzeptiert eine Inferenz-Endpunkt-ID (z. B. `ep-20241212123456-abcde`) und keinen Modellnamen.
 
 ### 4. Anwendung ausführen
 
@@ -105,7 +107,7 @@ cd src/SiliconLife.Default
 dotnet run
 ```
 
-Der Webserver startet unter `http://localhost:8080`
+Der Webserver wird unter `http://localhost:8080` gestartet
 
 #### Fast-Version ausführen
 
@@ -114,15 +116,15 @@ cd src/SiliconLife.Fast
 dotnet run
 ```
 
-**Windows/macOS**: Die Anwendung startet im Formularmodus, minimiert im System Tray, mit dem Webserver ebenfalls unter `http://localhost:8080`
+**Windows/macOS**: Die Anwendung startet im Fenstermodus und minimiert sich in den System-Tray. Der Webserver wird ebenfalls unter `http://localhost:8080` gestartet.
 
-**Linux**: Die Anwendung zeigt ein Statusfenster an (kein Tray-Icon) und öffnet automatisch den Browser für den Zugriff auf die Web-UI. Mit dem Parameter `--no-tray` kann das automatische Öffnen des Browsers übersprungen werden:
+**Linux**: Die Anwendung zeigt ein Statusfenster an (kein System-Tray-Icon) und öffnet automatisch den Browser für den Zugriff auf die Web-UI. Der Parameter `--no-tray` verhindert das automatische Öffnen des Browsers:
 
 ```bash
 dotnet run -- --no-tray
 ```
 
-### 5. Web-UI zugreifen
+### 5. Auf die Web-UI zugreifen
 
 Öffnen Sie einen Browser und navigieren Sie zu:
 
@@ -130,22 +132,22 @@ dotnet run -- --no-tray
 http://localhost:8080
 ```
 
-Sie werden ein Dashboard sehen mit:
-- Silicon Being-Verwaltung
+Sie sehen ein Dashboard mit folgenden Inhalten:
+- Silicon Being Verwaltung
 - Chat-Oberfläche
 - Konfigurationspanel
 - Systemüberwachung
 
-## Ihr erstes Silicon Being
+## Das erste Silicon Being
 
-### Erstellen Sie Ihr erstes Being
+### Ihr erstes Wesen erstellen
 
-1. In der Web-UI zu **Being-Verwaltung** navigieren
-2. Auf **Neues Being erstellen** klicken
-3. Soul-Datei (`soul.md`) mit Persönlichkeit und Verhalten konfigurieren
-4. Being starten
+1. Navigieren Sie in der Web-UI zur **Silicon Being Verwaltung**
+2. Klicken Sie auf **Neues Wesen erstellen**
+3. Konfigurieren Sie die Soul-Datei (`soul.md`) mit Persönlichkeit und Verhalten
+4. Starten Sie das Wesen
 
-### Beispiel soul.md
+### soul.md Beispiel
 
 ```markdown
 # My First Silicon Being
@@ -164,18 +166,18 @@ You are a helpful assistant specializing in code review.
 - Be concise but thorough
 ```
 
-## Häufig gestellte Fragen
+## Häufige Probleme
 
-### Ollama-Verbindung abgelehnt
+### Ollama-Verbindung verweigert
 
-**Problem**: Keine Verbindung zu Ollama unter `http://localhost:11434` möglich
+**Problem**: Verbindung zu Ollama unter `http://localhost:11434` nicht möglich
 
 **Lösung**:
 ```bash
-# Prüfen ob Ollama läuft
+# Prüfen, ob Ollama ausgeführt wird
 ollama list
 
-# Ollama starten falls nötig
+# Ollama starten, falls erforderlich
 ollama serve
 ```
 
@@ -185,7 +187,7 @@ ollama serve
 
 **Lösung**:
 ```bash
-# Erforderliches Modell herunterladen
+# Gewünschtes Modell herunterladen
 ollama pull qwen2.5:7b
 ```
 
@@ -195,7 +197,7 @@ ollama pull qwen2.5:7b
 
 **Lösung**:
 - Port in der Konfiguration ändern
-- Oder Prozess auf Port 8080 beenden:
+- Oder den Prozess beenden, der Port 8080 verwendet:
 
 ```bash
 # Windows
@@ -208,26 +210,26 @@ lsof -ti:8080 | xargs kill -9
 
 ## Nächste Schritte
 
-- 📚 [Architekturleitfaden](architecture.md) lesen, um das Systemdesign zu verstehen
-- 🛠️ [Entwicklungsleitfaden](development-guide.md) ansehen, um das System zu erweitern
-- 📖 [API-Referenz](api-reference.md) für Integrationsdetails erkunden
-- 🔒 [Sicherheitsdokumentation](security.md) für das Berechtigungssystem prüfen
-- 🧰 [Tool-Referenz](tools-reference.md) für alle integrierten Tools durchsehen
-- 🌐 [Web-UI-Leitfaden](web-ui-guide.md) für Oberflächenfunktionen lesen
+- 📚 Lesen Sie den [Architekturleitfaden](architecture.md), um das Systemdesign zu verstehen
+- 🛠️ Sehen Sie den [Entwicklungsleitfaden](development-guide.md) zur Erweiterung des Systems
+- 📖 Erkunden Sie die [API-Referenz](api-reference.md) für Integrationsdetails
+- 🔒 Sehen Sie die [Sicherheitsdokumentation](security.md) zum Berechtigungssystem
+- 🧰 Sehen Sie die [Werkzeugreferenz](tools-reference.md) für alle integrierten Werkzeuge
+- 🌐 Sehen Sie den [Web-UI-Leitfaden](web-ui-guide.md) für die Oberflächenfunktionen
 
 ## Projektstruktur
 
 ```
 SiliconLifeCollective/
 ├── src/
-│   ├── SiliconLife.Core/            # Kernschnittstellen und abstrakte Klassen
+│   ├── SiliconLife.Core/            # Core Host und abstrakte Klassen
 │   ├── SiliconLife.Common/          # Gemeinsame Implementierung (von beiden Versionen genutzt)
 │   ├── SiliconLife.App/             # Von Default und Fast gemeinsam genutzte Anwendungsschicht
 │   ├── SiliconLife.Default/         # Standardimplementierung + Einstiegspunkt (Konsolenversion)
-│   ├── SiliconLife.Fast/            # Hochleistungsimplementierung + Einstiegspunkt (Formularversion)
-│   ├── SiliconLife.Speedy/          # SpeedyPack Hochleistungs-Speicher-Engine
-│   └── SiliconLife.Speedy.Manager/  # SpeedyPack Verwaltungstool (Windows Forms)
-├── docs/                            # Dokumentation (mehrsprachig, 29 Sprachvarianten)
+│   ├── SiliconLife.Fast/            # Hochleistungsimplementierung + Einstiegspunkt (Fensterversion)
+│   ├── SiliconLife.Speedy/          # SpeedyPack-Speicher-Engine
+│   └── SiliconLife.Speedy.Manager/  # SpeedyPack-Verwaltungswerkzeug (Avalonia UI)
+├── docs/                            # Dokumentation (mehrsprachig, 34 Sprachvarianten)
 │   ├── en/                          # Englisch
 │   ├── zh-CN/                       # Vereinfachtes Chinesisch
 │   ├── zh-HK/                       # Traditionelles Chinesisch
@@ -235,12 +237,13 @@ SiliconLifeCollective/
 │   ├── ja-JP/                       # Japanisch
 │   ├── ko-KR/                       # Koreanisch
 │   └── cs-CZ/                       # Tschechisch
-└── README.md                        # Projektübersicht
+├── 总文档/                           # Anforderungen und Architekturdokumentation (Chinesisch)
+└── README.md                        # Projektbeschreibung
 ```
 
-## Hilfe benötigt?
+## Brauchen Sie Hilfe?
 
-- 📖 [Hilfedokumentationssystem](web-ui-guide.md#帮助文档系统新增) prüfen (mehrsprachige Unterstützung)
-- 📚 [Vollständige Dokumentation](docs/) lesen
-- 🐛 Probleme auf [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues) melden
-- 💬 An Community-Diskussionen teilnehmen
+- 📖 Sehen Sie das [Hilfedokumentationssystem](web-ui-guide.md#帮助文档系统新增) (mit Mehrsprachunterstützung)
+- 📚 Lesen Sie die [vollständige Dokumentation](docs/)
+- 🐛 Melden Sie Probleme auf [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 💬 Beteiligen Sie sich an Community-Diskussionen

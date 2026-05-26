@@ -1,4 +1,4 @@
-﻿# 工具参考
+# 工具参考
 
 > **版本：v0.2.0-alpha**
 
@@ -12,14 +12,30 @@
 
 ### 工具分类
 
-- **系统管理工具** — 配置、权限、动态编译
+- **系统管理工具** — 配置、权限、动态编译、主理人管理
 - **通信工具** — 聊天、网络请求
 - **数据存储工具** — 磁盘操作、数据库、记忆、工作笔记
 - **时间管理工具** — 日历、定时器、任务
 - **开发工具** — 代码执行、日志查询
 - **实用工具** — 系统信息、Token 审计、帮助文档、知识网络
 - **浏览器工具** — WebView 浏览器自动化
+- **项目工具** — 项目管理、项目任务、项目工作笔记、项目工作
 - **插件工具** — 通过插件系统注册的第三方工具
+
+### 工具场景系统
+
+每个工具通过 `[ToolScenario]` 属性声明其可用场景：
+
+| 场景标志 | 值 | 描述 |
+|----------|------|-------------|
+| `Chat` | `1 << 0` | 聊天场景（用户与硅基生命体对话时） |
+| `Task` | `1 << 1` | 任务场景（硅基生命体执行任务时） |
+| `Timer` | `1 << 2` | 定时器场景（硅基生命体执行定时任务时） |
+| `MemoryCompression` | `1 << 3` | 记忆压缩场景 |
+| `Project` | `1 << 4` | 项目场景（ThinkOnProject 模式） |
+| `All` | 上述所有 | 所有场景均可用 |
+
+此外，`[ChatOnly]` 属性标记的工具仅在聊天场景可用（如 HelpTool），不会出现在任务和定时器场景中。
 
 ---
 
@@ -117,25 +133,26 @@
 
 ### 4. 主理人工具 (CuratorTool) 🔒
 
-**工具名称**: `curator`
+**工具名称**: `silicon_manager`
 
-**权限要求**: 仅限硅基主理人使用
+**权限要求**: 仅限硅基主理人使用（`[SiliconManagerOnly]`）
 
-**功能描述**: 硅基主理人专用的系统管理工具。
+**可用场景**: Chat、Task、Timer
+
+**功能描述**: 硅基主理人专用的系统管理工具，用于管理硅基生命体的创建、查看和重置。
 
 **支持的操作**:
-- `create_being` — 创建新硅基生命体
-- `list_beings` — 列出所有硅基生命体
-- `get_being_info` — 获取生命体信息
-- `assign_task` — 分配任务
-- `manage_permissions` — 管理权限
+- `list_beings` — 列出所有硅基生命体及其状态
+- `create_being` — 创建新硅基生命体（需要 `name` 和 `soul` 参数）
+- `get_code` — 查看硅基生命体的自定义源代码
+- `reset` — 将硅基生命体重置为默认实现
 
 **使用示例**:
 ```json
 {
   "action": "create_being",
   "name": "助手",
-  "soul_file": "assistant_soul.md"
+  "soul": "你是一个有用的助手..."
 }
 ```
 
@@ -249,17 +266,20 @@
 
 **工具名称**: `help`
 
-**功能描述**: 获取系统帮助文档和使用指南。
+**可用场景**: Chat（`[ChatOnly]`，仅在聊天场景可用）
+
+**功能描述**: 搜索和获取系统帮助文档内容，允许 AI 查询系统功能使用方法。
 
 **支持的操作**:
-- `get_topics` — 获取帮助主题列表
-- `get_topic` — 获取特定主题详情
-- `search` — 搜索帮助文档
+- `list` — 列出所有帮助主题 ID
+- `search` — 按关键词搜索帮助文档
+- `get` — 获取指定 ID 的帮助文档内容
 
 **使用示例**:
 ```json
 {
-  "action": "get_topics"
+  "action": "search",
+  "keyword": "权限"
 }
 ```
 
@@ -400,18 +420,30 @@
 
 ---
 
-### 15. 项目工具 (ProjectTool)
+### 15. 项目工具 (ProjectTool) 🔒
 
 **工具名称**: `project`
 
-**功能描述**: 管理项目工作区。
+**权限要求**: 仅限硅基主理人使用（`[SiliconManagerOnly]`）
+
+**可用场景**: Chat、Task、Timer
+
+**功能描述**: 管理项目工作区，支持项目生命周期管理、成员分配和角色管理。
 
 **支持的操作**:
-- `create` — 创建项目
-- `list` — 列出项目
-- `get_info` — 获取项目信息
-- `update` — 更新项目
+- `create` — 创建新项目空间
 - `archive` — 归档项目
+- `restore` — 恢复已归档的项目
+- `destroy` — 销毁项目并清理数据（不可恢复）
+- `list` — 列出所有项目
+- `get` — 获取项目详情
+- `assign` — 将硅基生命体分配到项目
+- `remove` — 从项目中移除硅基生命体
+- `update` — 更新项目名称/描述
+- `list-workflow-templates` — 列出可用的工作流模板
+- `assign_role` — 为硅基生命体分配项目角色
+- `remove_role` — 移除硅基生命体的项目角色
+- `list_roles` — 列出项目的角色分配
 
 **使用示例**:
 ```json
@@ -428,14 +460,23 @@
 
 **工具名称**: `project_task`
 
-**功能描述**: 管理项目任务。
+**可用场景**: Chat、Task、Timer
+
+**功能描述**: 管理项目空间内的任务，支持完整的任务生命周期。
 
 **支持的操作**:
-- `create` — 创建任务
-- `list` — 列出任务
-- `update` — 更新任务
-- `complete` — 完成任务
-- `get_stats` — 获取任务统计
+- `create` — 创建项目任务
+- `list` — 列出项目任务
+- `get` — 获取任务详情
+- `update` — 更新任务标题/描述/优先级
+- `assign` — 为任务分配负责人
+- `remove_assignee` — 移除任务负责人
+- `start` — 开始任务
+- `complete` — 标记任务完成
+- `fail` — 标记任务失败
+- `cancel` — 取消任务
+- `delete` — 删除任务
+- `stats` — 获取任务统计
 
 **使用示例**:
 ```json
@@ -453,16 +494,18 @@
 
 **工具名称**: `project_work_note`
 
-**功能描述**: 管理项目工作笔记（公开，类似工作本）。
+**可用场景**: Chat、Task、Timer
+
+**功能描述**: 管理项目空间内的工作笔记（公开，类似工作本），支持页面式笔记管理。
 
 **支持的操作**:
-- `create` — 创建笔记
-- `read` — 读取笔记
-- `update` — 更新笔记
-- `delete` — 删除笔记
-- `list` — 列出笔记
-- `search` — 搜索笔记
-- `directory` — 生成目录
+- `create` — 创建笔记页面（需要 `project_id`、`summary` 和 `content`，可选 `keywords`）
+- `read` — 读取笔记页面（需要 `project_id` 和 `page_number` 或 `note_id`）
+- `update` — 更新笔记页面（需要 `project_id`、`page_number` 和 `content`，可选 `summary` 和 `keywords`）
+- `delete` — 删除笔记页面（需要 `project_id` 和 `page_number` 或 `note_id`）
+- `list` — 列出项目的所有笔记页面摘要
+- `directory` — 生成笔记目录/概览
+- `search` — 按关键词搜索笔记（需要 `project_id` 和 `keyword`，可选 `max_results`）
 
 **使用示例**:
 ```json
@@ -477,7 +520,36 @@
 
 ---
 
-### 18. 系统工具 (SystemTool)
+### 18. 项目工作工具 (ProjectWorkTool) 🔒
+
+**工具名称**: `project_work`
+
+**权限要求**: 仅限硅基主理人使用（`[SiliconManagerOnly]`）
+
+**可用场景**: Project（`[ToolScenario(ToolScenarioFlag.Project)]`，仅在项目场景可用）
+
+**功能描述**: 项目工作操作工具，用于主理人在 ThinkOnProject 场景中管理项目工作流。
+
+**支持的操作**:
+- `create-task` — 创建项目任务
+- `assign-task` — 为任务分配硅基生命体
+- `chat` — 发送消息到项目群聊
+- `broadcast` — 广播消息到项目频道
+- `complete` — 标记项目为已完成
+- `status` — 获取项目状态
+
+**使用示例**:
+```json
+{
+  "action": "create-task",
+  "project_id": "project-uuid",
+  "title": "实现用户认证"
+}
+```
+
+---
+
+### 19. 系统工具 (SystemTool)
 
 **工具名称**: `system`
 
@@ -498,7 +570,7 @@
 
 ---
 
-### 19. 任务工具 (TaskTool)
+### 20. 任务工具 (TaskTool)
 
 **工具名称**: `task`
 
@@ -523,7 +595,7 @@
 
 ---
 
-### 20. 定时器工具 (TimerTool)
+### 21. 定时器工具 (TimerTool)
 
 **工具名称**: `timer`
 
@@ -549,49 +621,60 @@
 
 ---
 
-### 21. Token 审计工具 (TokenAuditTool) 🔒
+### 22. Token 审计工具 (TokenAuditTool) 🔒
 
 **工具名称**: `token_audit`
 
-**权限要求**: 仅限硅基主理人使用
+**权限要求**: 仅限硅基主理人使用（`[SiliconManagerOnly]`）
 
-**功能描述**: 查询和汇总 AI token 使用情况。
+**可用场景**: Chat、Task、Timer
+
+**功能描述**: 查询 AI Token 使用统计和趋势数据。
 
 **支持的操作**:
-- `get_usage` — 获取 token 使用统计
-- `get_by_being` — 按生命体获取使用情况
-- `get_by_model` — 按模型获取使用情况
-- `get_trend` — 获取使用趋势
-- `export` — 导出数据
+- `summary` — 获取 Token 使用汇总统计
+- `trend` — 获取 Token 使用趋势数据点
+
+**支持的时间范围**:
+- `today` — 最近 24 小时
+- `week` — 最近 7×24 小时
+- `month` — 按天统计
+- `year` — 按月统计
 
 **使用示例**:
 ```json
 {
-  "action": "get_usage",
-  "start_date": "2026-04-01",
-  "end_date": "2026-04-26"
+  "action": "summary",
+  "time_range": "week"
 }
 ```
 
 ---
 
-### 22. WebView 浏览器工具 (WebViewBrowserTool)
+### 23. WebView 浏览器工具 (WebViewBrowserTool)
 
-**工具名称**: `webview`
+**工具名称**: `webview_browser`
 
-**功能描述**: 基于 Playwright 的浏览器自动化操作。
+**可用场景**: Chat、Task、Timer
+
+**功能描述**: 基于 Playwright 的浏览器自动化操作，提供完整的网页导航、交互和数据提取能力。
 
 **支持的操作**:
-- `open_browser` — 打开浏览器
-- `close_browser` — 关闭浏览器
+- `open` — 打开浏览器
+- `close` — 关闭浏览器
 - `navigate` — 导航到 URL
 - `click` — 点击元素
 - `input` — 输入文本
+- `scroll` — 滚动页面
+- `execute_script` — 执行 JavaScript
 - `get_page_text` — 获取页面文本
 - `get_screenshot` — 获取截图
-- `execute_script` — 执行 JavaScript
 - `wait_for_element` — 等待元素出现
+- `get_element_info` — 获取元素信息
+- `upload_file` — 上传文件
 - `get_browser_status` — 获取浏览器状态
+- `set_timeout` — 设置超时时间
+- `clear_session` — 清除浏览器会话
 
 **特性**:
 - 每个硅基生命体独立实例
@@ -609,7 +692,7 @@
 
 ---
 
-### 23. 工作笔记工具 (WorkNoteTool)
+### 24. 工作笔记工具 (WorkNoteTool)
 
 **工具名称**: `work_note`
 
@@ -636,7 +719,7 @@
 
 ---
 
-### 24. 热重载工具 (HotReloadTool)
+### 25. 热重载工具 (HotReloadTool)
 
 **工具名称**: `hot_reload`
 

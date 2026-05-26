@@ -1,4 +1,4 @@
-﻿# Bezpečnostní Návrh
+# Bezpečnostní design
 
 > **Verze: v0.2.0-alpha**
 
@@ -6,146 +6,150 @@
 
 ## Přehled
 
-Bezpečnost Silicon Life Collective je postavena na modelu **vrstvené obrany**. Core princip: **Všechny I/O operace musí procházet přes exekutory**, které vynucují kontroly oprávnění před provedením.
+Bezpečnost Silicon Life Collective je postavena na modelu **vrstvené obrany**. Základní princip: **všechny I/O operace musí projít exekutorem**, který vynucuje kontrolu oprávnění před provedením.
 
 ```
-Volání nástroje → Exekutor → Správce oprávnění → Vysoké zamítnutí → Vysoké povolení → Callback → Dotaz uživatele
+Volání nástroje → Exekutor → Správce Oprávnění → Frekvenční mezipaměť → Zpětné volání → (IsCurator: Dotaz na uživatele | Non-curator: Globální ACL)
 ```
 
 ---
 
-## Model Oprávnění
+## Model oprávnění
 
-### Typy Oprávnění
+### Typy oprávnění
 
 | Typ | Popis |
 |------|-------------|
 | `NetworkAccess` | Odchozí HTTP/HTTPS požadavky |
-| `CommandLine` | Provádění shell příkazů |
+| `CommandLine` | Spouštění shell příkazů |
 | `FileAccess` | Operace se soubory a adresáři |
 | `Function` | Volání citlivých funkcí |
 | `DataAccess` | Přístup k systémovým nebo uživatelským datům |
 
-### Výsledky Oprávnění
+### Výsledky oprávnění
 
 Každá kontrola oprávnění vrací jeden ze tří výsledků:
 
 | Výsledek | Chování |
 |--------|----------|
-| **Allowed (Povoleno)** | Operace okamžitě pokračuje |
-| **Denied (Zamítnuto)** | Operace je blokována, zaznamenána do auditního logu |
-| **AskUser (Dotaz uživatele)** | Operace pozastavena, vyžaduje potvrzení uživatele |
+| **Allowed (Povoleno)** | Operace okamžitě proběhne |
+| **Denied (Zamítnuto)** | Operace je zablokována, zaznamenáno v auditním protokolu |
+| **AskUser (Dotaz na uživatele)** | Operace je pozastavena, vyžaduje potvrzení uživatelem |
 
-### Speciální Role: Silikonový Kurátor
+### Speciální role: Kurátor Křemíku
 
-Silikonový kurátor má nejvyšší úroveň oprávnění (`IsCurator = true`). Kontroly oprávnění pro kurátora jsou zkratkovány na **Povoleno**, pokud uživatel explicitně nepřepíše.
+Kurátor Křemíku má nejvyšší úroveň oprávnění (`IsCurator = true`). Když řetězec oprávnění dosáhne rozhodovací větve, operace Kurátora jsou odeslány uživateli k potvrzení prostřednictvím `IPermissionAskHandler`, nikoli zkratovány na povoleno. Ne-Kurátoři se dotazují na globální ACL.
 
-### Soukromý Správce Oprávnění
+### Privátní Správce Oprávnění
 
-Každá silikonová bytost má svou vlastní **soukromou instanci PermissionManager**. Stav oprávnění není sdílen mezi bytostmi.
+Každá Křemíková Bytost má svou vlastní **privátní instanci PermissionManager**. Stav oprávnění není sdílen mezi bytostmi.
 
 ---
 
-## Proces Ověřování Oprávnění
+## Průběh ověřování oprávnění
 
-Priorita dotazu je: **1. UserFrequencyCache → 2. IPermissionCallback → 3. Větev kurátora (AskHandler/GlobalACL)**
+Priorita dotazů: **1. Frekvenční mezipaměť → 2. Funkce zpětného volání → 3. Rozhodovací větev (IsCurator/GlobalACL)**
 
 ```
 ┌─────────────┐
-│ Volání       │
-│ nástroje     │
+│ Volání      │
+│ nástroje    │
 └──────┬──────┘
        │
        ▼
 ┌─────────────┐     ┌─────────────────────┐
-│  Exekutor    │────▶│ Soukromý správce     │
-│ (Disk/Síť/  │     │ oprávnění            │
-│  Příkaz...) │     │ (každá bytost)       │
-└─────────────┘     └────────┬────────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ 1. UserFrequency│──Shoda──▶ Povoleno / Zamítnuto
-                    │    Cache        │
-                    │ (HighDeny/      │
-                    │  HighAllow)     │
-                    └────────┬────────┘
-                             │ Žádná shoda
-                             ▼
-                    ┌─────────────────┐
-                    │ 2. IPermission  │──▶ Povoleno / Zamítnuto / Dotaz uživatele
-                    │    Callback     │
-                    └────────┬────────┘
-                             │ AskUser nebo žádný callback
-                             ▼
-                    ┌─────────────────┐
-                    │ 3. IsCurator?   │
-                    └────┬───────┬────┘
-                         │       │
-                    Ano  │       │ Ne
-                         ▼       ▼
-              ┌──────────┐  ┌──────────────┐
-              │ Dotaz    │  │ GlobalACL    │──Shoda──▶ Povoleno / Zamítnuto
-              │ uživatele│  └──────┬───────┘
-              │ (IM)     │         │ Žádná shoda
-              └──────────┘         ▼
-                           ┌──────────────┐
-                           │ Výchozí      │
-                           │ zamítnutí    │
-                           └──────────────┘
+│  Exekutor   │────▶│ Privátní Správce    │
+│ (disk/síť/  │     │ Oprávnění (každá    │
+│  příkazový  │     │ bytost)             │
+│  řádek...)  │     └────────┬────────────┘
+└─────────────┘            │
+                           ▼
+                  ┌─────────────────┐
+                  │ 1. Frekvenční   │──Shoda──▶ Povoleno / Zamítnuto
+                  │ mezipaměť       │
+                  │ (HighDeny má    │
+                  │ přednost před   │
+                  │ HighAllow)      │
+                  └────────┬────────┘
+                           │ Neshoda
+                           ▼
+                  ┌─────────────────┐
+                  │ 2. Zpětné       │
+                  │ volání          │──▶ Povoleno / Zamítnuto / Dotaz na uživatele
+                  │ oprávnění       │
+                  └────────┬────────┘
+                           │ Dotaz na uživatele
+                           ▼
+                  ┌─────────────────┐
+                  │ 3. IsCurator?   │
+                  └────────┬────────┘
+                           │
+                 ┌─────────┴─────────┐
+                 │                   │
+                 ▼ Ano               ▼ Ne
+          ┌─────────────┐    ┌─────────────┐
+          │ Dotaz na     │    │ Globální ACL │
+          │ uživatele    │    │ Dotaz na     │
+          │ (AskHandler) │    │ pravidla     │
+          └─────────────┘    └─────────────┘
 ```
 
-**Klíčový bod**: Exekutor vidí pouze boolean (Povoleno/Zamítnuto). Správce oprávnění interně zpracovává tříhodnotové rozhodnutí (Povoleno/Zamítnuto/Dotaz uživatele) a řeší Dotaz uživatele před vrácením exekutoru.
+**Klíčový bod**: Exekutor vidí pouze booleovskou hodnotu (povoleno/zamítnuto). Správce Oprávnění interně zpracovává trojstavové rozhodnutí (povoleno/zamítnuto/dotaz na uživatele) a řeší dotaz na uživatele před vrácením výsledku exekutoru.
 
 ---
 
-## Exekutory (Bezpečnostní Hranice)
+## Exekutoři (bezpečnostní hranice)
 
-Exekutory jsou **jedinou** cestou pro I/O operace. Vynucují:
+Exekutoři jsou **jedinou** cestou pro I/O operace. Vynucují:
 
-### Statický Model Provádění
+### Nezávislé dispečerské vlákno
 
-Současné implementace exekutorů (`DiskExecutor`, `NetworkExecutor`, `CommandLineExecutor`) jsou **statické třídy**, které poskytují synchronní provádění s kontrolou časového limitu:
+Každý exekutor má **nezávislé dispečerské vlákno**:
 
-- Každý exekutor kontroluje oprávnění prostřednictvím `PermissionManager` volajícího před provedením.
-- Operace běží na `Task.Run` s konfigurovatelným časovým limitem.
-- Při překročení časového limitu je operace považována za selhanou.
-- `ExecutorBase` poskytuje abstraktní základní třídu s podporou vlákna na pozadí a fronty požadavků pro budoucí rozšíření.
+- Izolace vláken mezi exekutory — zablokování vlákna jednoho exekutoru neovlivňuje ostatní exekutory.
+- Každý exekutor může mít nastavena nezávislá omezení prostředků (CPU, paměť atd.).
+- Správa vláknového poolu exekutoru.
 
-### Ověřování Oprávnění v Exekutorech
+### Fronta požadavků
 
-Když nástroj iniciová přístup ke zdroji:
+Každý exekutor udržuje frontu požadavků:
 
-1. Exekutor přijme požadavek.
-2. Exekutor dotazuje soukromého správce oprávnění bytosti prostřednictvím `ServiceLocator.Instance.GetPermissionManager(callerId)`.
-3. Pokud je oprávnění zamítnuto, operace je okamžitě blokována.
-4. Pokud callback vrátí Dotaz uživatele (cesta kurátora), vlákno exekutoru **zůstane zamčené** čekající na odpověď uživatele.
-5. Bytost vidí pouze konečný výsledek (Úspěch nebo Zamítnuto) — nikdy nevidí přechodný stav "Čeká" nebo "Pending".
-6. Pouze silikonový kurátor spouští skutečný uživatelský prompt. Běžné bytosti synchronně dotazují globální ACL bez blokování.
-7. Při časovém limitu je požadavek považován za zamítnutý a zámek vlákna je uvolněn.
+- Požadavky jsou směrovány podle typu do příslušného exekutoru.
+- Podpora prioritního řazení.
+- Řízení timeoutu pro každý požadavek.
 
-### Typy Exekutorů
+### Zamykání vláken pro ověřování oprávnění
 
-| Exekutor | Rozsah | Výchozí časový limit |
-|----------|-------|---------------------|
+Když nástroj iniciová přístup k prostředkům:
+
+1. Exekutor přijme požadavek a **uzamkne své vlákno**.
+2. Exekutor se dotazuje privátního Správce Oprávnění bytosti.
+3. Pokud zpětné volání vrátí dotaz na uživatele, vlákno exekutoru **zůstává uzamčeno** a čeká na odpověď uživatele.
+4. Bytost vidí pouze konečný výsledek (úspěch nebo zamítnutí) — nikdy nevidí přechodný stav "čekající" nebo "čeká na".
+5. Pouze Kurátor Křemíku spustí skutečný dotaz na uživatele. Běžné bytosti se synchronně dotazují na globální ACL bez blokování.
+6. Při timeoutu je požadavek považován za zamítnutý a zámek vlákna je uvolněn.
+
+### Typy exekutorů
+
+| Exekutor | Rozsah | Výchozí timeout |
+|----------|--------|-----------------|
 | `DiskExecutor` | Čtení/zápis souborů, operace s adresáři | 30 sekund |
-| `NetworkExecutor` | HTTP požadavky, WebSocket připojení | 30 sekund |
-| `CommandLineExecutor` | Provádění shell příkazů | 30 sekund |
-| `DynamicCompilationExecutor` | Paměťová kompilace Roslyn | N/A (deleguje na CompilationCore) |
+| `NetworkExecutor` | HTTP požadavky, WebSocket připojení | 60 sekund |
+| `CommandLineExecutor` | Spouštění shell příkazů | 120 sekund |
 
-### Izolace Výjimek a Tolerance Chyb
+> **Poznámka**: `DynamicCompilationExecutor` (v jmenném prostoru `SiliconLife.Core.Compilation`) je zodpovědný za Roslyn kompilaci v paměti, nepatří do kategorie I/O exekutorů, ale je rovněž podřízen systému oprávnění.
 
-- Výjimka jednoho exekutoru neovlivní ostatní exekutory.
+### Izolace výjimek a odolnost proti chybám
+
+- Výjimka jednoho exekutoru neovlivňuje ostatní exekutory.
 - Automatický restart při pádu vlákna.
-- Jistič (Circuit Breaker): Dočasné zastavení exekutoru po opakovaných selháních k prevenci kaskádových selhání.
+- Jistič: po sobě jdoucí selhání dočasně zastaví exekutor pro zabránění kaskádovým selháním.
 
 ---
 
-## Globální ACL (Seznam Řízení Přístupu)
+## Globální ACL (seznam řízení přístupu)
 
-GlobalACL je **poslední úroveň** ověřování oprávnění (pouze pro nekurátorské bytosti), která poskytuje globální pravidla řízení přístupu. Sdílená tabulka pravidel perzistentní do úložiště, spravovaná pouze silikonovým kurátorem:
-
-- **Pouze pro nekurátorské bytosti**: Když IPermissionCallback vrátí AskUser a volající není kurátor, systém přechází na GlobalACL.
+Sdílená tabulka pravidel perzistentní v úložišti, spravovaná pouze Kurátorem Křemíku:
 
 ```json
 {
@@ -157,71 +161,136 @@ GlobalACL je **poslední úroveň** ověřování oprávnění (pouze pro nekur�
 }
 ```
 
-- Pravidla jsou vyhodnocována v pořadí; první shoda vyhrává.
-- Pouze silikonový kurátor může upravovat globální ACL (prostřednictvím svého specializovaného nástroje).
-- Změny jsou okamžitě platné.
-- **Výchozí zamítnutí**: Pokud GlobalACL nenajde odpovídající pravidlo, operace je zamítnuta.
+- Pravidla jsou vyhodnocována v pořadí; první shoda platí.
+- Pouze Kurátor Křemíku může upravovat globální ACL (prostřednictvím svého dedikovaného nástroje).
+- Změny nabývají účinnosti okamžitě.
+- Globální ACL **není** ve výše uvedeném řetězci priorit dotazů — je interně odkazováno funkcí zpětného volání.
 
 ---
 
-## Uživatelská Frekvenční Cache
+## Uživatelská frekvenční mezipaměť
 
-Pro snížení opakovaných promptů oprávnění systém udržuje dvě **cache pouze v paměti, pro každou bytost**:
+Pro snížení opakovaných dotazů na oprávnění systém udržuje dvě **per-bytost, pouze v paměti** mezipaměti:
 
-| Cache | Použití |
+| Mezipaměť | Účel |
 |-------|---------|
-| **HighAllow (Vysoké povolení)** | Zdroje často povolené uživatelem |
-| **HighDeny (Vysoké zamítnutí)** | Zdroje často zamítnuté uživatelem |
+| **HighAllow (Vysoké povolení)** | Prostředky často povolované uživatelem |
+| **HighDeny (Vysoké zamítnutí)** | Prostředky často zamítané uživatelem |
 
-### Jak to Funguje
+### Jak to funguje
 
-- **Uživatelská volba, ne automatická detekce**: Když je spuštěn Dotaz uživatele, uživatel si zvolí, zda přidat zdroj do cache.
-- **Shoda prefixu**: Podporuje shodu prefixu cesty zdroje (např. `network:api.example.com/*`).
-- **Priorita**: HighDeny má vyšší prioritu než HighAllow.
-- **Pouze paměť**: Cache nejsou perzistentní. Ztrácí se při restartu.
-- **Konfigurovatelná expirace**: Uživatel může nastavit dobu platnosti položek cache.
+- **Výběr uživatelem, nikoli automatická detekce**: Když je spuštěn dotaz na uživatele, uživatel si vybere, zda přidat prostředek do mezipaměti.
+- **Shoda předpony**: Podpora shody předpony cesty prostředku (např. `network:api.example.com/*`).
+- **Priorita**: HighDeny má přednost před HighAllow.
+- **Pouze v paměti**: Mezipaměť není perzistentní. Při restartu je ztracena.
+- **Konfigurovatelná expirace**: Uživatel může nastavit dobu platnosti položek mezipaměti.
 
-### Proces Aktualizace Cache
+### Průběh aktualizace mezipaměti
 
-1. Oprávnění callback vrátí `AskUser`.
-2. Systém oprávnění odešle dotaz do systému karet (Web UI nebo IM).
-3. Uživatel provede rozhodnutí (Povolit/Zamítnout) a **zvolí zda cacheovat**.
-4. Systém karet vrátí rozhodnutí + příznak cache.
-5. Systém oprávnění aktualizuje příslušný seznam cache.
-6. Budoucí požadavky odpovídající prefixu cache jsou okamžitě vyřešeny.
+1. Zpětné volání oprávnění vrátí `AskUser`.
+2. Systém oprávnění odešle dotaz do karetního systému (Web UI nebo IM).
+3. Uživatel učiní rozhodnutí (povolit/zamítnout) a **vybere, zda uložit do mezipaměti**.
+4. Karetní systém vrátí rozhodnutí + příznak mezipaměti.
+5. Systém oprávnění aktualizuje příslušný seznam mezipaměti.
+6. Budoucí požadavky odpovídající předponě mezipaměti jsou okamžitě vyřešeny.
 
 ---
 
-## Mechanismus Dotazování Uživatele
+## Mechanismus dotazování uživatele
 
 Když kontrola oprávnění vrátí `AskUser`:
 
-### Web UI: Interaktivní Karty
+### Web UI: Interaktivní karta
 
-Webový frontend okamžitě zobrazí **interaktivní kartu** zobrazující:
+Web frontend okamžitě zobrazí **interaktivní kartu** s:
 
-- Typ a cestu zdroje
-- Popis operace
-- Tlačítka Povolit / Zamítnout
-- Volitelný checkbox "Vždy povolit" / "Vždy zamítnout" (přidat do frekvenční cache)
+- Typem a cestou prostředku
+- Popisem operace
+- Tlačítky Povolit / Zamítnout
+- Volitelným zaškrtávacím políčkem "Vždy povolit" / "Vždy zamítnout" (přidání do frekvenční mezipaměti)
 
-### IM (Bez Podpory Karet): Náhodný Kód
+### Okamžité zprávy (bez podpory karet): Náhodný kód
 
-Pro zasílací platformy bez podpory interaktivních karet:
+Pro platformy okamžitých zpráv nepodporující interaktivní karty:
 
-1. Systém generuje dva náhodné 6místné kódy: **kód povolení** a **kód zamítnutí**.
-2. Odešle zprávu obsahující informace o zdroji a oba kódy.
-3. Uživatel musí odpovědět přesným kódem povolení pro autorizaci. Jakákoli jiná odpověď je považována za zamítnutí.
-4. Kódy jsou jednorázové pro prevenci útoků opakováním.
+1. Systém vygeneruje dva náhodné 6místné kódy: **povolovací kód** a **zamítavací kód**.
+2. Odešle zprávu s informacemi o prostředku a oběma kódy.
+3. Uživatel musí odpovědět přesným povolovacím kódem pro autorizaci. Jakákoliv jiná odpověď je považována za zamítnutí.
+4. Kódy jsou jednorázové pro zabránění útokům opakováním.
 
-### Časový Limit
+### Timeout
 
-- Pro všechny požadavky Dotaz uživatele je nastaven časový limit.
-- Při vypršení časového limitu je požadavek považován za **zamítnutý** a zámek vlákna exekutoru je uvolněn.
+- Pro všechny dotazy na uživatele je nastaven timeout.
+- Při timeoutu je požadavek považován za **zamítnutý** a zámek vlákna exekutoru je uvolněn.
 
 ---
 
-## Auditní Logy
+## Bezpečnost dynamické kompilace
+
+Sebeevoluce (přepsání třídy) přináší unikátní bezpečnostní rizika. Systém je zmírňuje pomocí **vrstvené strategie**:
+
+### Vrstva 1: Kontrola referencí při kompilaci (primární obrana)
+
+- Kompilátor získá pouze **povolený seznam referencí na sestavení**.
+- **Povoleno**: `System.Runtime`, `System.Private.CoreLib`, projektová sestavení (rozhraní ITool atd.)
+- **Zakázáno**: `System.IO`, `System.Reflection`, `System.Runtime.InteropServices` atd.
+- Pokud kód odkazuje na zakázané sestavení, **kompilátor samotný kód odmítne**.
+- To je spolehlivější než runtime skenování — nebezpečné operace jsou nemožné na úrovni typů.
+
+### Vrstva 2: Statická analýza za běhu (sekundární obrana)
+
+- I po úspěšné kompilaci je kód podroben statickému skenování vzorů.
+- Detekce nebezpečných vzorů operací (přímé I/O, systémová volání atd.).
+- Pokud je nalezen nebezpečný kód, načtení je zamítnuto a systém se vrátí k výchozí implementaci.
+
+### Omezení dědičnosti
+
+Všechny vlastní třídy Křemíkových Bytostí **musí** dědit z `SiliconBeingBase`. Kompilátor vynucuje toto omezení na úrovni typů.
+
+### Šifrované úložiště
+
+Kompilovaný kód je na disku uložen šifrovaně pomocí AES-256:
+
+- **Odvození klíče**: Z GUID bytosti (velkými písmeny) pomocí PBKDF2.
+- **Selhání dešifrování**: Návrat k výchozí implementaci.
+- **Runtime rekompilace**: Nový kód je nejprve kompilován v paměti; perzistence šifrovaného kódu probíhá až po úspěšné kompilaci a výměně instance.
+
+### Atomická výměna
+
+Proces výměny je atomický:
+
+1. Kompilace nového kódu v paměti → získání `Type`.
+2. Vytvoření nové instance z `Type`.
+3. Migrace stavu ze staré instance do nové.
+4. Výměna reference.
+5. Perzistence šifrovaného kódu.
+
+Pokud kterýkoliv krok selže, stará instance zůstává aktivní.
+
+---
+
+## Funkce zpětného volání oprávnění
+
+### Design
+
+Každý PermissionManager drží **proměnnou funkce zpětného volání**:
+
+- **Výchozí**: Odkazuje na vestavěnou výchozí funkci oprávnění.
+- **Po dynamické kompilaci**: Přepsána vlastní funkcí oprávnění bytosti.
+- **Výběr jednoho ze dvou**: Kdykoliv je aktivní pouze jedno zpětné volání.
+- **Selhání kompilace**: Neovlivňuje aktuální zpětné volání — výchozí nebo poslední úspěšná vlastní funkce zůstává v platnosti.
+
+### Signatura zpětného volání
+
+```
+PermissionResult Callback(PermissionType type, string resourcePath, Guid callerId)
+```
+
+Vrací `Allowed`, `Denied` nebo `AskUser`.
+
+---
+
+## Auditní protokol
 
 Všechna rozhodnutí o oprávněních jsou zaznamenávána:
 
@@ -232,119 +301,80 @@ Všechna rozhodnutí o oprávněních jsou zaznamenávána:
 [2026-04-01 15:30:28] ALLOWED  | Being:Curator    | Type:CommandLine   | Resource:del /f /q *.log | Source:UserDecision
 ```
 
-Logy jsou perzistentní do úložiště, prohlížitelné prostřednictvím Web UI (kontrolér logů).
+Protokoly jsou perzistentní v úložišti a prohlížitelné přes Web UI (kontroler protokolů).
 
 ---
 
-## Audit Použití Tokenů
+## Audit využití Tokenů
 
 `TokenUsageAuditManager` poskytuje sledování spotřeby AI tokenů související s bezpečností:
 
-- **Záznam každého požadavku** — Každé volání AI zaznamenává ID bytosti, model, prompt tokeny, doplňovací tokeny a časové razítko.
-- **Detekce anomálií** — Neobvyklé vzory spotřeby tokenů mohou naznačovat prompt injekci nebo zneužití zdrojů.
-- **Přístup pouze pro kurátora** — `TokenAuditTool` (označený `[SiliconManagerOnly]`) umožňuje kurátorovi dotazovat se a shrnovat využití tokenů.
-- **Webový dashboard** — `AuditController` poskytuje dashboard založený na prohlížeči s trendy a exportem dat.
-- **Perzistentní úložiště** — Záznamy jsou uloženy prostřednictvím `ITimeStorage` pro časové řady dotazů a dlouhodobou analýzu.
+- **Záznam pro každý požadavek** — každé volání AI zaznamenává ID bytosti, model, tokeny výzvy, tokeny doplnění a časové razítko.
+- **Detekce anomálií** — abnormální vzorce spotřeby tokenů mohou indikovat injektáž výzev nebo zneužití prostředků.
+- **Přístup pouze pro Kurátora** — `TokenAuditTool` (označený `[SiliconManagerOnly]`) umožňuje Kurátorovi dotazovat se a shrnovat využití tokenů.
+- **Webový dashboard** — `UsageController` poskytuje webový dashboard s grafy trendů a exportem dat.
+- **Perzistentní úložiště** — záznamy jsou uloženy prostřednictvím `ITimeStorage` pro časové řady dotazy a dlouhodobou analýzu.
 
 ---
 
-## Zabezpečení Pluginů
+## Bezpečnost zásuvných modulů
 
-Systém pluginů zavádí bezpečnostní rizika spouštění kódu třetích stran, která jsou zmírňována následujícími mechanismy:
+Systém zásuvných modulů přináší bezpečnostní rizika spojená s prováděním kódu třetích stran, která jsou zmírňována následujícími mechanismy:
 
 ### Bezpečnostní Sandbox
 
-`PluginLoader` provádí přísné bezpečnostní skenování při načítání pluginů:
+`PluginLoader` provádí při načítání zásuvných modulů přísné bezpečnostní kontroly:
 
-1. **Kontrola zakázaných jmenných prostorů** — Pluginy nemohou odkazovat na následující jmenné prostory:
+1. **Kontrola zakázaných jmenných prostorů** — zásuvné moduly nemohou odkazovat na následující jmenné prostory:
    - `System.IO` — přístup k souborovému systému
    - `System.Net.Http` — HTTP požadavky
    - `System.Net.WebSockets` — WebSocket připojení
    - `System.Net.Sockets` — raw sockety
    - `Microsoft.CodeAnalysis` — API kompilátoru
 
-2. **Whitelist důvěryhodných sestavení** — Reference na následující sestavení jsou povoleny:
+2. **Whitelist důvěryhodných sestavení** — reference na následující sestavení jsou povoleny:
    - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
    - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
    - `Dapper`
 
-3. **Kontrola zakázaných typů** — Skenování nebezpečných typů odkazovaných v pluginu
+3. **Kontrola zakázaných typů** — skenování nebezpečných typů odkazovaných v zásuvném modulu
 
-4. **Kontrola zakázaných členů** — Skenování nebezpečných metod volaných v pluginu
+4. **Kontrola zakázaných členů** — skenování nebezpečných metod volaných v zásuvném modulu
 
-### Izolované Načítání
+### Izolované načítání
 
-- Každý plugin je izolovaně načten pomocí vlastního `AssemblyLoadContext`
-- Typy a sestavení mezi pluginy se navzájem neovlivňují
-- Při uvolnění pluginu lze uvolnit související zdroje
+- Použití vlastního `AssemblyLoadContext` pro izolované načítání každého zásuvného modulu
+- Typy a sestavení mezi zásuvnými moduly se navzájem neovlivňují
+- Při uvolnění zásuvného modulu lze uvolnit související prostředky
 
-### Omezení Oprávnění Nástrojů
+### Omezení oprávnění nástrojů
 
-- Nástroje registrované pluginy prostřednictvím rozhraní `ITool` podléhají stejnému systému oprávnění
-- Nástroje pluginů nemohou obejít 5-úrovňový řetězec oprávnění
-- Nástroje pluginů podléhají označení `[SiliconManagerOnly]`
-
----
-
-## Dynamická Kompilace: Bezpečnost
-
-Samoevoluce (přepis tříd) přináší jedinečné bezpečnostní riziko. Systém je zmírňuje pomocí **vrstvené strategie**:
-
-### Vrstva 1: Kontrola Referencí při Kompilaci (Primární Obrana)
-
-- Kompilátor získá pouze **povolený seznam referencí na sestavení**.
-- **Povoleno**: `System.Runtime`, `System.Private.CoreLib`, projektová sestavení (rozhraní ITool atd.)
-- **Blokováno**: `System.IO`, `System.Reflection`, `System.Runtime.InteropServices` atd.
-- Pokud kód odkazuje na blokované sestavení, **kompilátor sám kód odmítne**.
-- Toto je spolehlivější než běhové skenování — nebezpečné operace jsou nemožné na úrovni typů.
-
-### Vrstva 2: Běhová Statická Analýza (Sekundární Obrana)
-
-- I po úspěšné kompilaci je kód podroben statickému skenování vzorů.
-- Detekce nebezpečných vzorů operací (přímé I/O, systémová volání atd.).
-- Pokud je nalezen nebezpečný kód, načtení je odmítnuto a systém se vrátí k výchozí funkčnosti.
-
-### Omezení Dědičnosti
-
-Všechny vlastní třídy silikonových bytostí **musí** dědit z `SiliconBeingBase`. Kompilátor vynucuje toto omezení na úrovni typů.
-
-### Šifrované Úložiště
-
-Zkompilovaný kód je na disku uložen šifrovaný pomocí AES-256:
-
-- **Odvození klíče**: Z GUID bytosti (velká písmena) pomocí PBKDF2.
-- **Selhání dešifrování**: Návrat k výchozí implementaci.
-- **Běhová rekompilace**: Nový kód je nejprve zkompilován v paměti; perzistence probíhá až po úspěšné kompilaci a nahrazení instance.
-
-### Atomické Nahrazení
-
-Proces nahrazení je atomický:
-
-1. Zkompilujte nový kód v paměti → získejte `Type`.
-2. Vytvořte novou instanci z `Type`.
-3. Migrujte stav ze staré instance do nové instance.
-4. Prohoďte reference.
-5. Perzistujte šifrovaný kód.
-
-Pokud kterýkoli krok selže, stará instance zůstává aktivní.
+- Nástroje registrované zásuvnými moduly prostřednictvím rozhraní `ITool` podléhají stejnému systému oprávnění
+- Nástroje zásuvných modulů nemohou obejít řetězec ověřování oprávnění
+- Nástroje zásuvných modulů podléhají omezení atributu `[SiliconManagerOnly]`
 
 ---
 
-## Callback Funkce Oprávnění
+## Bezpečnost oprávnění nástrojů
 
-### Návrh
+Systém oprávnění nástrojů poskytuje další bezpečnostní vrstvu, která řídí, které operace nástrojů mohou Křemíkové Bytosti používat:
 
-Každý PermissionManager drží **proměnnou callback funkce**:
+### Dvouúrovňová izolace oprávnění
 
-- **Výchozí**: Odkazuje na vestavěnou výchozí funkci oprávnění.
-- **Po dynamické kompilaci**: Přepsáno vlastní funkcí oprávnění bytosti.
-- **Výběr jednoho ze dvou**: V každém okamžiku je aktivní pouze jeden callback.
-- **Selhání kompilace**: Neovlivňuje aktuální callback — výchozí nebo poslední úspěšná vlastní funkce zůstává platná.
+1. **Úroveň Křemíkové Bytosti** — každá Křemíková Bytost má nezávislou konfiguraci oprávnění nástrojů
+2. **Úroveň projektu** — oprávnění nástrojů v projektovém prostoru jsou nezávislá na úrovni Křemíkové Bytosti, čímž se dosahuje izolace oprávnění mezi projekty
 
-### Signatura Callbacku
+### Šablony oprávnění
 
-```
-PermissionResult Callback(PermissionType type, string resourcePath, Guid callerId)
-```
+Systém poskytuje předdefinované šablony oprávnění pro zajištění bezpečnostní základny:
 
-Vrací `Allowed`, `Denied` nebo `AskUser`.
+- **readonly** — minimální oprávnění, pouze operace čtení
+- **restricted** — omezená oprávnění, pouze základní operace
+- **full** — úplná oprávnění (pouze pro Kurátora)
+
+### Bezpečnostní vlastnosti
+
+- **Výchozí zamítnutí** — nástrojové operace, které nejsou výslovně povoleny, jsou ve výchozím stavu zamítnuty
+- **Granularita operací** — každá operace každého nástroje je řízena nezávisle (např. `network:get` povoleno, ale `network:post` zamítnuto)
+- **Správa Kurátorem** — oprávnění nástrojů může konfigurovat pouze Kurátor Křemíku
+- **Auditní stopa** — změny oprávnění nástrojů jsou zaznamenávány v auditním protokolu

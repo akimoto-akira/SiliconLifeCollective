@@ -1,40 +1,43 @@
-﻿# Sistema de Permisos
+# Sistema de Permisos
 
 > **Versión: v0.2.0-alpha**
 
-[English](../en/permission-system.md) | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | **Español** | [Deutsch](../de-DE/permission-system.md) | [日本語](../ja-JP/permission-system.md) | [한국어](../ko-KR/permission-system.md) | [Čeština](../cs-CZ/permission-system.md) | [Русский](../ru-RU/permission-system.md)
+[English](../en/permission-system.md) | [Deutsch](../de-DE/permission-system.md) | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | **Español** | [日本語](../ja-JP/permission-system.md) | [한국어](../ko-KR/permission-system.md) | [Čeština](../cs-CZ/permission-system.md) | [Русский](../ru-RU/permission-system.md)
 
 ## Resumen
 
-El sistema de permisos asegura que todas las operaciones iniciadas por IA sean apropiadamente verificadas y auditadas.
+El sistema de permisos asegura que todas las operaciones iniciadas por IA sean verificadas y auditadas apropiadamente.
 
-## Cadena de Permisos de 3 Niveles
+## Cadena de Verificación de Permisos
 
 ```
 ┌─────────────────────────────────────────────┐
 │          Verificación de Permisos            │
 ├─────────────────────────────────────────────┤
 │  Nivel 1: UserFrequencyCache                 │
-│  ↓ Decisiones de usuario en caché (HighDeny/HighAllow)│
+│  ↓ Caché de decisiones frecuentes del usuario│
+│    (HighDeny/HighAllow)                      │
 │  Nivel 2: IPermissionCallback                │
-│  ↓ Lógica personalizada (Permitido/Denegado/PreguntarUsuario)│
+│  ↓ Lógica personalizada (Allowed/Denied/     │
+│    AskUser)                                  │
 │  Nivel 3: IsCurator?                         │
-│  ↓ Sí → IPermissionAskHandler (preguntar al usuario)│
-│  ↓ No → GlobalACL → Denegación predeterminada │
-│  Resultado: Permitido o Denegado             │
+│  ↓ Sí → IPermissionAskHandler (preguntar     │
+│    al usuario)                               │
+│  ↓ No → GlobalACL → denegación por defecto   │
+│  Resultado: Permitir o Denegar               │
 └─────────────────────────────────────────────┘
 ```
 
-> **Nota**: La prioridad de consulta real en `PermissionManager.CheckPermission()` es:
-> 1. **UserFrequencyCache** — Verificar primero las decisiones de usuario de alta frecuencia en caché
-> 2. **IPermissionCallback** — Evaluar reglas de callback personalizadas
-> 3. **Bifurcación de curador** — Si el callback devuelve AskUser o no hay callback configurado:
->    - **Curador** → `IPermissionAskHandler` (preguntar al usuario vía IM)
->    - **No-curador** → `GlobalACL` → denegación predeterminada
+> **Nota**: La prioridad de consulta real de `PermissionManager.CheckPermission()` es:
+> 1. **UserFrequencyCache** — Verifica primero la caché de decisiones frecuentes del usuario
+> 2. **IPermissionCallback** — Evalúa las reglas de retrollamada personalizadas
+> 3. **Ramificación del Curador** — Cuando la retrollamada devuelve AskUser o no hay retrollamada:
+>    - **Curador** → `IPermissionAskHandler` (pregunta al usuario a través de IM)
+>    - **No-curador** → `GlobalACL` → denegación por defecto
 
 ## Nivel 1: UserFrequencyCache
 
-Caché por ser, solo en memoria, de decisiones de usuario de alta frecuencia (HighDeny/HighAllow).
+Caché de decisiones frecuentes del usuario (HighDeny/HighAllow) por cada ser, solo en memoria.
 
 ```csharp
 var cache = new UserFrequencyCache();
@@ -45,23 +48,23 @@ if (cachedResult.HasValue)
 }
 ```
 
-- **HighDeny** tiene prioridad sobre **HighAllow**
-- **Solo memoria**: Los cachés no se persisten, se pierden al reiniciar
-- **Expiración configurable**: Los usuarios pueden establecer período de validez para entradas de caché
+- **HighDeny tiene prioridad sobre HighAllow**
+- **Solo en memoria**: La caché no se persiste, se pierde al reiniciar
+- **Expiración configurable**: El usuario puede establecer el período de validez de las entradas de la caché
 
 ## Nivel 2: IPermissionCallback
 
-Callbacks personalizados para lógica de permisos dinámica.
+Retrollamada personalizada para lógica de permisos dinámica.
 
-### Implementación Predeterminada DefaultPermissionCallback
+### Implementación por defecto DefaultPermissionCallback
 
-`DefaultPermissionCallback` proporciona reglas de permisos predeterminadas integrales, incluyendo:
+`DefaultPermissionCallback` proporciona reglas de permisos por defecto completas, incluyendo:
 
-#### Reglas de Acceso a Red
-- **Direcciones de bucle invertido**: Permitir localhost, 127.0.0.1, ::1
+#### Reglas de acceso a red
+- **Direcciones de bucle invertido**: Permite localhost, 127.0.0.1, ::1
 - **Direcciones IP privadas**:
-  - 192.168.x.x (Clase C) - Permitir
-  - 10.x.x.x (Clase A) - Permitir
+  - 192.168.x.x (Clase C) - Permitido
+  - 10.x.x.x (Clase A) - Permitido
   - 172.16-31.x.x (Clase B) - Preguntar al usuario
 - **Lista blanca de dominios**:
   - Motores de búsqueda: Google, Bing, DuckDuckGo, Yandex, Sogou, etc.
@@ -72,9 +75,9 @@ Callbacks personalizados para lógica de permisos dinámica.
   - **Información meteorológica**: wttr.in
   - Sitios gubernamentales: .gov, .go.jp, .go.kr
 - **Lista negra de dominios**:
-  - Sitios de suplantación de IA: dominios falsos de chatgpt, openai, deepseek, etc.
+  - Sitios de suplantación de IA: chatgpt, openai, deepseek y otros dominios de imitación
   - Herramientas de IA maliciosas: wormgpt, darkgpt, fraudgpt, etc.
-  - Dominios relacionados con granjas de contenido de IA y mercados negros
+  - Granjas de contenido de IA y dominios relacionados con el mercado negro
 
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
@@ -91,52 +94,51 @@ public class DefaultPermissionCallback : IPermissionCallback
 }
 ```
 
-## Nivel 3: Bifurcación de Curador (IsCurator → AskHandler / GlobalACL)
+## Nivel 3: Ramificación (IsCurator / GlobalACL)
 
-Cuando el callback devuelve `AskUser` o no hay callback configurado, el sistema se bifurca según el estado de curador:
+Cuando la retrollamada devuelve `AskUser` o no hay retrollamada configurada, el sistema se ramifica según la identidad del Curador:
 
-### Ruta de Curador → IPermissionAskHandler
+### Rama del Curador (IsCurator = true)
 
-Si el Being es un curador (`IsCurator = true`), se invoca `IPermissionAskHandler` para preguntar interactivamente al usuario.
+Para el Curador de Silicio, el sistema solicita la decisión del usuario a través de mensajería instantánea:
 
 ```csharp
-if (being.IsCurator)
+if (IsCurator)
 {
-    return askHandler.AskUser(callerId, permissionType, resource);
+    if (_askHandler != null)
+    {
+        AskPermissionResult userDecision = _askHandler.AskUser(callerId, permissionType, resource);
+        // El usuario confirma o deniega en la Web UI
+    }
 }
 ```
 
-### Ruta de No-Curador → GlobalACL → Denegación predeterminada
+### Rama de no-curador (IsCurator = false)
 
-Los Beings normales consultan GlobalACL sincrónicamente sin bloqueo. Si no hay regla ACL coincidente, se deniega por defecto.
+Para seres que no son el Curador, el sistema verifica la lista de control de acceso global. Si no hay reglas coincidentes, la solicitud se deniega por defecto.
 
-```csharp
-var aclResult = globalACL.Check(request);
-return aclResult ?? PermissionResult.Denied("No matching ACL rule");
-```
-
-## Global ACL (Lista de Control de Acceso)
-
-Tabla de reglas compartida persistente en Storage, gestionada solo por el Silicon Curador.
-
-### Estructura de ACL
+### Estructura de GlobalACL
 
 ```json
 {
   "rules": [
     {
-      "prefix": "network:api.github.com",
+      "permissionType": "NetworkAccess",
+      "resourcePrefix": "api.github.com",
       "result": "Allowed"
     },
     {
-      "prefix": "file:C:\\Windows",
+      "permissionType": "FileAccess",
+      "resourcePrefix": "C:\\Windows",
       "result": "Denied"
     }
   ]
 }
 ```
 
-### Formato de Recurso
+Las reglas se evalúan en orden; la primera coincidencia gana. Solo el Curador de Silicio puede modificar la ACL Global.
+
+### Formato de Recursos
 
 ```
 {tipo}:{ruta}
@@ -147,38 +149,41 @@ Ejemplos:
 - cli:rm -rf
 ```
 
-## IPermissionAskHandler (Ruta de Curador)
+## IPermissionAskHandler
 
-Invocado cuando el Being es un curador y IPermissionCallback devuelve AskUser.
+Cuando una operación del Curador requiere confirmación del usuario, se solicita el permiso a través de `IPermissionAskHandler`.
+
+### Implementación IMPermissionAskHandler
+
+`IMPermissionAskHandler` envía solicitudes de permiso al usuario a través de la Web UI:
 
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
 {
     public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
     {
-        SendMessage($"¿Permitir {resource}?");
+        // Envía un mensaje al usuario a través de mensajería instantánea
+        SendMessageAsync($"¿Permitir {resource}?");
 
-        var response = WaitForResponse();
+        // Espera la respuesta del usuario
+        var response = WaitForResponseAsync();
 
-        return new AskPermissionResult
-        {
-            Allowed = response.Approved,
-            AddToCache = response.AddToCache,
-            CacheDuration = response.CacheDuration
-        };
+        return response.Approved 
+            ? AskPermissionResult.Approved()
+            : AskPermissionResult.Denied();
     }
 }
 ```
 
 ### Cola de Solicitudes de Permiso PermissionRequestQueue
 
-`PermissionRequestQueue` gestiona las solicitudes de permiso pendientes, soportando espera asíncrona de respuesta del usuario:
+`PermissionRequestQueue` gestiona las solicitudes de permisos pendientes, soportando espera asíncrona de la respuesta del usuario:
 
-- **Encolar solicitud** — Cuando se alcanza la ruta de curador, se crea un `TaskCompletionSource<AskPermissionResult>` y se encola
-- **Visualización en Web UI** — Las solicitudes de permiso pendientes se muestran en la Web UI a través de `PermissionRequestController`
+- **Encolado de solicitudes** — Cuando la cadena de permisos llega al nivel 5, se crea un `TaskCompletionSource<AskPermissionResult>` y se encola
+- **Visualización en Web UI** — Las solicitudes de permisos pendientes se muestran en la Web UI a través de `PermissionRequestController`
 - **Respuesta del usuario** — El usuario aprueba o deniega en la Web UI, con opción de almacenar en caché la decisión y establecer la duración de la caché
 - **Opciones de caché** — El usuario puede almacenar en caché la decisión de permisos por 1 hora, 24 horas, 7 días o 30 días
-- **Mecanismo de timeout** — La página de solicitud se cierra automáticamente después de 30 minutos sin respuesta
+- **Mecanismo de tiempo de espera** — Sin respuesta en 60 segundos, la página de solicitud se cierra automáticamente
 
 ## Sistema de Auditoría
 
@@ -187,11 +192,11 @@ Todas las decisiones de permisos se registran:
 ```json
 {
   "timestamp": "2026-04-20T10:30:00Z",
-  "userId": "user-uuid",
-  "resource": "disk:write",
-  "allowed": true,
-  "level": "GlobalACL",
-  "reason": "Explicit rule granted"
+  "callerId": "being-uuid",
+  "permissionType": "FileAccess",
+  "resource": "C:\\data\\config.json",
+  "result": "Allowed",
+  "reason": "Global ACL"
 }
 ```
 
@@ -199,7 +204,7 @@ Todas las decisiones de permisos se registran:
 
 ### API EvaluatePermission
 
-El método `PermissionManager.EvaluatePermission()` proporciona pre-evaluación de permisos de solo lectura, sin activar prompts de usuario. `PermissionTool` usa este método para permitir que la IA verifique el estado de permisos antes de intentar una operación.
+El método `PermissionManager.EvaluatePermission()` proporciona una pre-evaluación de permisos de solo lectura que no activa solicitudes al usuario. `PermissionTool` usa este método para que la IA verifique el estado de los permisos antes de intentar una operación.
 
 ```csharp
 public PermissionResult EvaluatePermission(
@@ -209,53 +214,109 @@ public PermissionResult EvaluatePermission(
 ```
 
 **Valor de retorno**: `PermissionResult` de tres estados:
-- `Allowed` - Operación permitida
-- `Denied` - Operación denegada
-- `AskUser` - Requiere confirmación de usuario al ejecutar
+- `Allowed` - La operación está permitida
+- `Denied` - La operación está denegada
+- `AskUser` - Se requiere confirmación del usuario en el momento de la ejecución
 
 **Orden de evaluación**:
-1. **Caché de frecuencia** — Verificar decisiones de usuario en caché
-2. **IPermissionCallback** — Evaluación de callback personalizado
-3. **Bifurcación de curador** — Si es curador, devuelve `AskUser` (requiere confirmación); si no es curador, verifica **GlobalACL**, luego denegación predeterminada
+1. **Caché de frecuencia** - Verifica las decisiones del usuario en caché
+2. **IPermissionCallback** - Evaluación de la retrollamada personalizada
+3. **Estado del Curador** - Si es el Curador, devuelve `AskUser` (requiere confirmación)
+4. **ACL Global** - Verifica las reglas de control de acceso
+5. **Por defecto** - Deniega cuando no hay reglas coincidentes
 
-> **Nota**: A diferencia de la cadena completa de permisos, `EvaluatePermission` **no** llama a `IPermissionAskHandler`. Solo informa cuál *sería* el resultado al ejecutar.
+> **Nota**: A diferencia de la cadena de permisos completa, `EvaluatePermission` **no** llama a `IPermissionAskHandler`. Solo informa cuál *será* el resultado en el momento de la ejecución.
 
-## Gestionar Permisos
+## Gestión de Permisos
 
 ### Otorgar Permisos
 
-**A través de Web UI**:
+**A través de la Web UI**:
 1. Navegar a **Gestión de Permisos**
-2. Hacer clic en **Añadir Regla**
+2. Hacer clic en **Agregar Regla**
 3. Configurar:
    - Usuario
    - Recurso
    - Permitir/Denegar
    - Duración
 
-**A través de API**:
+**A través de la API**:
 ```bash
-curl -X POST http://localhost:8080/api/permissions \
+curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "userId": "user-uuid",
-    "resource": "disk:write",
-    "allowed": true,
-    "duration": 3600
+    "permissionType": "FileAccess",
+    "resourcePrefix": "C:\\Projects",
+    "result": "Allowed",
+    "description": "Allow project directory access"
   }'
 ```
 
 ### Revocar Permisos
 
-```bash
-curl -X DELETE http://localhost:8080/api/permissions/{rule-id}
-```
+Operar a través de la página de gestión de permisos en la Web UI.
 
 ### Ver Permisos
 
 ```bash
-curl http://localhost:8080/api/permissions?userId=user-uuid
+curl http://localhost:8080/api/permissions/list
 ```
+
+## Sistema de Permisos de Herramientas
+
+Además de la cadena de verificación de permisos a nivel de operaciones, el sistema proporciona un mecanismo de gestión de **permisos de herramientas** para controlar qué herramientas pueden usar los Seres de Silicio.
+
+### Permisos de Herramientas de Dos Niveles
+
+Los permisos de herramientas se dividen en dos niveles:
+
+1. **Nivel del Ser de Silicio** — Controla qué operaciones de herramientas puede usar un Ser de Silicio individual
+2. **Nivel de proyecto** — Controla las operaciones de herramientas disponibles dentro del espacio del proyecto, independiente de los permisos a nivel del Ser de Silicio
+
+### Configuración de Permisos de Herramientas
+
+Cada operación de cada herramienta puede configurarse independientemente como permitida o denegada:
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "network:get": "allowed",
+    "network:post": "denied",
+    "disk:read": "allowed",
+    "disk:write": "denied",
+    "database:query": "allowed"
+  }
+}
+```
+
+### Plantillas de Permisos
+
+El sistema proporciona plantillas de permisos de herramientas predefinidas que se pueden aplicar rápidamente a los Seres de Silicio:
+
+- **readonly** — Permisos de solo lectura (permite operaciones de lectura, deniega operaciones de escritura)
+- **full** — Permisos completos (permite todas las operaciones)
+- **restricted** — Permisos restringidos (solo permite operaciones básicas)
+
+### Gestión en Web UI
+
+Gestionar permisos de herramientas a través de la Web UI:
+
+- **Página de permisos de herramientas del Ser de Silicio** — `/beings/tool-permissions`
+- **Página de permisos de herramientas del proyecto** — `/project/{id}/tool-permissions`
+
+### Endpoints de API
+
+| Endpoint | Método | Descripción |
+|------|------|------|
+| `/api/beings/tool-permissions` | GET | Obtener permisos de herramientas del Ser de Silicio |
+| `/api/beings/tool-permissions` | PUT | Actualizar permisos de herramientas del Ser de Silicio |
+| `/api/beings/tool-permissions/templates` | GET | Obtener lista de plantillas de permisos |
+| `/api/beings/tool-permissions/apply-template` | POST | Aplicar plantilla de permisos |
+| `/api/projects/{id}/tool-permissions` | GET | Obtener permisos de herramientas del proyecto |
+| `/api/projects/{id}/tool-permissions` | PUT | Actualizar permisos de herramientas del proyecto |
+
+---
 
 ## Mejores Prácticas
 
@@ -265,9 +326,9 @@ Otorgar solo los permisos mínimos necesarios:
 
 ```json
 {
-  "resource": "disk:read",  // No disk:*
-  "allowed": true,
-  "expiresAt": "2026-04-21T00:00:00Z"  // Siempre establecer expiración
+  "permissionType": "FileAccess",
+  "resourcePrefix": "C:\\Projects\\MyApp\\config.json",
+  "result": "Allowed"
 }
 ```
 
@@ -275,25 +336,27 @@ Otorgar solo los permisos mínimos necesarios:
 
 Nunca otorgar permisos permanentes a menos que sea absolutamente necesario.
 
-### 3. Monitorear Registros de Permisos
+### 3. Monitorear los Registros de Permisos
 
-Revisar regularmente registros de auditoría para:
+Revisar periódicamente los registros de auditoría para entender:
 - Intentos de acceso denegados
-- Patrones anómalos
-- Elevación de permisos
+- Patrones inusuales
+- Escalada de permisos
 
-### 4. Implementar Callbacks Personalizados
+### 4. Implementar Retrollamadas Personalizadas
 
 Para lógica compleja, usar `IPermissionCallback`:
 
 ```csharp
 public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
 {
+    // Permisos basados en tiempo
     if (IsOutsideBusinessHours())
     {
         return PermissionResult.Denied;
     }
     
+    // Permisos basados en recursos
     if (IsSensitiveResource(resource))
     {
         return PermissionResult.AskUser;
@@ -305,71 +368,70 @@ public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, s
 
 ## Escenarios Comunes
 
-### Escenario 1: IA Quiere Leer un Archivo
+### Escenario 1: La IA quiere leer un archivo
 
 ```
 IA: "Necesito leer config.json"
 ↓
 Cadena de permisos:
-1. ¿IsCurator? No
-2. ¿Límite de velocidad? Normal
-3. ¿GlobalACL? Regla encontrada: disk:read = Permitido
-4. Resultado: Permitido
+1. UserFrequencyCache? Sin decisión en caché
+2. IPermissionCallback? Devuelve AskUser (no explícitamente permitido)
+3. IsCurator? No → Verificar GlobalACL
+4. GlobalACL? Regla encontrada: file:... = Allowed
+5. Resultado: Permitido
 ```
 
-### Escenario 2: IA Quiere Ejecutar Código
+### Escenario 2: La IA quiere ejecutar código
 
 ```
 IA: "Quiero compilar y ejecutar código"
 ↓
 Cadena de permisos:
-1. ¿IsCurator? No
-2. ¿Límite de velocidad? Normal
-3. ¿GlobalACL? No se encontró regla
-4. ¿Callback? Devuelve indeciso
-5. ¿Preguntar al usuario? Usuario aprueba
-6. Resultado: Permitido
+1. UserFrequencyCache? Sin decisión en caché
+2. IPermissionCallback? Devuelve AskUser
+3. IsCurator? Sí → IPermissionAskHandler
+4. El usuario aprueba
+5. Resultado: Permitido
 ```
 
-### Escenario 3: Límite de Velocidad Excedido
+### Escenario 3: Denegación en caché
 
 ```
-IA: "Necesito hacer 100 solicitudes HTTP"
+IA: "Necesito acceder a C:\Windows"
 ↓
 Cadena de permisos:
-1. ¿IsCurator? No
-2. ¿Límite de velocidad? Ya excedido
-3. Resultado: Denegado
+1. UserFrequencyCache? Encontrado en caché HighDeny
+2. Resultado: Denegado (sin más verificaciones)
 ```
 
 ## Solución de Problemas
 
-### Permisos Denegados Inesperadamente
+### Permisos denegados inesperadamente
 
 **Verificar**:
-1. Estado de IsCurator del usuario
-2. Configuración de límites de velocidad
+1. Estado IsCurator del usuario
+2. Entradas HighDeny en la caché de frecuencia
 3. Reglas de GlobalACL
-4. Lógica de callback
-5. Timeout de respuesta de usuario
+4. Lógica de retrollamada
+5. Tiempo de espera agotado de la respuesta del usuario
 
-### Permisos No Expiran
-
-**Verificar**:
-- Campo `expiresAt` configurado correctamente
-- Zona horaria correcta
-- Sincronización de reloj
-
-### Registros de Auditoría No se Registran
+### Los permisos no expiran
 
 **Verificar**:
-- Registrador de auditoría registrado
-- Backend de almacenamiento accesible
-- Espacio en disco suficiente
+- El campo `expiresAt` está configurado correctamente
+- La zona horaria es correcta
+- El reloj está sincronizado
 
-## Próximos Pasos
+### Los registros de auditoría no se registran
 
-- 📚 Leer la [Guía de Arquitectura](architecture.md)
-- 🛠️ Consultar la [Guía de Desarrollo](development-guide.md)
-- 🔒 Ver la [Documentación de Seguridad](security.md)
-- 🚀 Consultar la [Guía de Inicio Rápido](getting-started.md)
+**Verificar**:
+- El registrador de auditoría está registrado
+- El backend de almacenamiento es accesible
+- Hay espacio suficiente en disco
+
+## Siguientes Pasos
+
+- 📚 Leer la [guía de arquitectura](architecture.md)
+- 🛠️ Consultar la [guía de desarrollo](development-guide.md)
+- 🔒 Consultar la [documentación de seguridad](security.md)
+- 🚀 Ver la [guía de inicio rápido](getting-started.md)

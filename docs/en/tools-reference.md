@@ -1,10 +1,10 @@
-﻿# Tools Reference
+# Tools Reference
 
 > **Version: v0.2.0-alpha**
 
 This document provides detailed information about all built-in tools in the Silicon Life Collective platform.
 
-**English** | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md) | [Русский](../ru-RU/tools-reference.md)
+[English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | [한국어](../ko-KR/tools-reference.md) | [Čeština](../cs-CZ/tools-reference.md) | [Русский](../ru-RU/tools-reference.md)
 
 ## Overview
 
@@ -12,14 +12,30 @@ The tool system allows silicon beings to interact with the external world throug
 
 ### Tool Categories
 
-- **System Management Tools** — Configuration, permissions, dynamic compilation
+- **System Management Tools** — Configuration, permissions, dynamic compilation, curator management
 - **Communication Tools** — Chat, network requests
 - **Data Storage Tools** — Disk operations, databases, memory, work notes
 - **Time Management Tools** — Calendar, timers, tasks
 - **Development Tools** — Code execution, log queries
 - **Utility Tools** — System information, token audit, help documentation, knowledge network
 - **Browser Tools** — WebView browser automation
+- **Project Tools** — Project management, project tasks, project work notes, project work
 - **Plugin Tools** — Third-party tools registered through the plugin system
+
+### Tool Scenario System
+
+Each tool declares its available scenarios through the `[ToolScenario]` attribute:
+
+| Scenario Flag | Value | Description |
+|----------|------|-------------|
+| `Chat` | `1 << 0` | Chat scenario (when users converse with silicon beings) |
+| `Task` | `1 << 1` | Task scenario (when silicon beings execute tasks) |
+| `Timer` | `1 << 2` | Timer scenario (when silicon beings execute scheduled tasks) |
+| `MemoryCompression` | `1 << 3` | Memory compression scenario |
+| `Project` | `1 << 4` | Project scenario (ThinkOnProject mode) |
+| `All` | All of the above | Available in all scenarios |
+
+Additionally, tools marked with the `[ChatOnly]` attribute are only available in the chat scenario (e.g., HelpTool) and will not appear in task and timer scenarios.
 
 ---
 
@@ -86,7 +102,7 @@ The tool system allows silicon beings to interact with the external world throug
 {
   "action": "send_message",
   "target_id": "being-uuid-or-user-0",
-  "message": "Hello, let's collaborate!"
+  "message": "你好，让我们协作吧！"
 }
 ```
 
@@ -117,25 +133,26 @@ The tool system allows silicon beings to interact with the external world throug
 
 ### 4. Curator Tool (CuratorTool) 🔒
 
-**Tool Name**: `curator`
+**Tool Name**: `silicon_manager`
 
-**Permission Requirement**: Silicon Curator only
+**Permission Requirement**: Silicon Curator only (`[SiliconManagerOnly]`)
 
-**Description**: System management tool exclusive to Silicon Curators.
+**Available Scenarios**: Chat, Task, Timer
+
+**Description**: System management tool exclusive to Silicon Curators, used to manage the creation, viewing, and resetting of silicon beings.
 
 **Supported Operations**:
-- `create_being` — Create new silicon being
-- `list_beings` — List all silicon beings
-- `get_being_info` — Get being information
-- `assign_task` — Assign task
-- `manage_permissions` — Manage permissions
+- `list_beings` — List all silicon beings and their status
+- `create_being` — Create new silicon being (requires `name` and `soul` parameters)
+- `get_code` — View custom source code of a silicon being
+- `reset` — Reset a silicon being to default implementation
 
 **Usage Example**:
 ```json
 {
   "action": "create_being",
-  "name": "Assistant",
-  "soul_file": "assistant_soul.md"
+  "name": "助手",
+  "soul": "你是一个有用的助手..."
 }
 ```
 
@@ -185,7 +202,7 @@ The tool system allows silicon beings to interact with the external world throug
 - `read_lines` — Read specified lines
 - `replace_text` — Replace text
 
-**Permission Requirements**: `disk:read`, `disk:write`
+**Permission Requirement**: `FileAccess`
 
 **Usage Example**:
 ```json
@@ -249,17 +266,20 @@ The tool system allows silicon beings to interact with the external world throug
 
 **Tool Name**: `help`
 
-**Description**: Retrieves system help documentation and usage guides.
+**Available Scenarios**: Chat (`[ChatOnly]`, only available in chat scenario)
+
+**Description**: Searches and retrieves system help documentation content, allowing AI to query how to use system features.
 
 **Supported Operations**:
-- `get_topics` — Get help topic list
-- `get_topic` — Get specific topic details
-- `search` — Search help documentation
+- `list` — List all help topic IDs
+- `search` — Search help documentation by keyword
+- `get` — Get help documentation content by ID
 
 **Usage Example**:
 ```json
 {
-  "action": "get_topics"
+  "action": "search",
+  "keyword": "权限"
 }
 ```
 
@@ -361,7 +381,7 @@ The tool system allows silicon beings to interact with the external world throug
 - `download` — Download file
 - `upload` — Upload file
 
-**Permission Requirements**: `network:http`
+**Permission Requirement**: `network:http`
 
 **Usage Example**:
 ```json
@@ -400,25 +420,37 @@ The tool system allows silicon beings to interact with the external world throug
 
 ---
 
-### 15. Project Tool (ProjectTool)
+### 15. Project Tool (ProjectTool) 🔒
 
 **Tool Name**: `project`
 
-**Description**: Manages project workspaces.
+**Permission Requirement**: Silicon Curator only (`[SiliconManagerOnly]`)
+
+**Available Scenarios**: Chat, Task, Timer
+
+**Description**: Manages project workspaces, supporting project lifecycle management, member assignment, and role management.
 
 **Supported Operations**:
-- `create` — Create project
-- `list` — List projects
-- `get_info` — Get project information
-- `update` — Update project
+- `create` — Create new project space
 - `archive` — Archive project
+- `restore` — Restore archived project
+- `destroy` — Destroy project and clean up data (irreversible)
+- `list` — List all projects
+- `get` — Get project details
+- `assign` — Assign silicon being to project
+- `remove` — Remove silicon being from project
+- `update` — Update project name/description
+- `list-workflow-templates` — List available workflow templates
+- `assign_role` — Assign project role to silicon being
+- `remove_role` — Remove project role from silicon being
+- `list_roles` — List role assignments for project
 
 **Usage Example**:
 ```json
 {
   "action": "create",
   "name": "My Project",
-  "description": "Project description"
+  "description": "项目描述"
 }
 ```
 
@@ -428,21 +460,30 @@ The tool system allows silicon beings to interact with the external world throug
 
 **Tool Name**: `project_task`
 
-**Description**: Manages project tasks.
+**Available Scenarios**: Chat, Task, Timer
+
+**Description**: Manages tasks within project spaces, supporting the complete task lifecycle.
 
 **Supported Operations**:
-- `create` — Create task
-- `list` — List tasks
-- `update` — Update task
-- `complete` — Complete task
-- `get_stats` — Get task statistics
+- `create` — Create project task
+- `list` — List project tasks
+- `get` — Get task details
+- `update` — Update task title/description/priority
+- `assign` — Assign responsible being to task
+- `remove_assignee` — Remove responsible being from task
+- `start` — Start task
+- `complete` — Mark task as completed
+- `fail` — Mark task as failed
+- `cancel` — Cancel task
+- `delete` — Delete task
+- `stats` — Get task statistics
 
 **Usage Example**:
 ```json
 {
   "action": "create",
   "project_id": "project-uuid",
-  "description": "Task description",
+  "description": "完成任务描述",
   "priority": 5
 }
 ```
@@ -453,31 +494,62 @@ The tool system allows silicon beings to interact with the external world throug
 
 **Tool Name**: `project_work_note`
 
-**Description**: Manages project work notes (public, similar to a work notebook).
+**Available Scenarios**: Chat, Task, Timer
+
+**Description**: Manages work notes within project spaces (public, similar to a work notebook), supporting page-style note management.
 
 **Supported Operations**:
-- `create` — Create note
-- `read` — Read note
-- `update` — Update note
-- `delete` — Delete note
-- `list` — List notes
-- `search` — Search notes
-- `directory` — Generate directory
+- `create` — Create note page (requires `project_id`, `summary`, and `content`; optional `keywords`)
+- `read` — Read note page (requires `project_id` and `page_number` or `note_id`)
+- `update` — Update note page (requires `project_id`, `page_number`, and `content`; optional `summary` and `keywords`)
+- `delete` — Delete note page (requires `project_id` and `page_number` or `note_id`)
+- `list` — List all note page summaries for the project
+- `directory` — Generate note directory/overview
+- `search` — Search notes by keyword (requires `project_id` and `keyword`; optional `max_results`)
 
 **Usage Example**:
 ```json
 {
   "action": "create",
   "project_id": "project-uuid",
-  "summary": "Completed user authentication module",
-  "content": "## Implementation Details\n\n- Using JWT token",
-  "keywords": "authentication,JWT"
+  "summary": "完成用户认证模块",
+  "content": "## 实现细节\n\n- 使用 JWT token",
+  "keywords": "认证,JWT"
 }
 ```
 
 ---
 
-### 18. System Tool (SystemTool)
+### 18. Project Work Tool (ProjectWorkTool) 🔒
+
+**Tool Name**: `project_work`
+
+**Permission Requirement**: Silicon Curator only (`[SiliconManagerOnly]`)
+
+**Available Scenarios**: Project (`[ToolScenario(ToolScenarioFlag.Project)]`, only available in project scenario)
+
+**Description**: Project work operation tool, used by curators to manage project workflows in the ThinkOnProject scenario.
+
+**Supported Operations**:
+- `create-task` — Create project task
+- `assign-task` — Assign silicon being to task
+- `chat` — Send message to project group chat
+- `broadcast` — Broadcast message to project channel
+- `complete` — Mark project as completed
+- `status` — Get project status
+
+**Usage Example**:
+```json
+{
+  "action": "create-task",
+  "project_id": "project-uuid",
+  "title": "实现用户认证"
+}
+```
+
+---
+
+### 19. System Tool (SystemTool)
 
 **Tool Name**: `system`
 
@@ -498,7 +570,7 @@ The tool system allows silicon beings to interact with the external world throug
 
 ---
 
-### 19. Task Tool (TaskTool)
+### 20. Task Tool (TaskTool)
 
 **Tool Name**: `task`
 
@@ -516,14 +588,14 @@ The tool system allows silicon beings to interact with the external world throug
 ```json
 {
   "action": "create",
-  "description": "Review code",
+  "description": "审查代码",
   "priority": 5
 }
 ```
 
 ---
 
-### 20. Timer Tool (TimerTool)
+### 21. Timer Tool (TimerTool)
 
 **Tool Name**: `timer`
 
@@ -543,55 +615,66 @@ The tool system allows silicon beings to interact with the external world throug
   "action": "create",
   "interval": 3600,
   "repeat": true,
-  "message": "Hourly reminder"
+  "message": "每小时提醒"
 }
 ```
 
 ---
 
-### 21. Token Audit Tool (TokenAuditTool) 🔒
+### 22. Token Audit Tool (TokenAuditTool) 🔒
 
 **Tool Name**: `token_audit`
 
-**Permission Requirement**: Silicon Curator only
+**Permission Requirement**: Silicon Curator only (`[SiliconManagerOnly]`)
 
-**Description**: Queries and aggregates AI token usage.
+**Available Scenarios**: Chat, Task, Timer
+
+**Description**: Queries AI token usage statistics and trend data.
 
 **Supported Operations**:
-- `get_usage` — Get token usage statistics
-- `get_by_being` — Get usage by being
-- `get_by_model` — Get usage by model
-- `get_trend` — Get usage trend
-- `export` — Export data
+- `summary` — Get token usage summary statistics
+- `trend` — Get token usage trend data points
+
+**Supported Time Ranges**:
+- `today` — Last 24 hours
+- `week` — Last 7×24 hours
+- `month` — Daily statistics
+- `year` — Monthly statistics
 
 **Usage Example**:
 ```json
 {
-  "action": "get_usage",
-  "start_date": "2026-04-01",
-  "end_date": "2026-04-26"
+  "action": "summary",
+  "time_range": "week"
 }
 ```
 
 ---
 
-### 22. WebView Browser Tool (WebViewBrowserTool)
+### 23. WebView Browser Tool (WebViewBrowserTool)
 
-**Tool Name**: `webview`
+**Tool Name**: `webview_browser`
 
-**Description**: Browser automation based on Playwright.
+**Available Scenarios**: Chat, Task, Timer
+
+**Description**: Playwright-based browser automation, providing full web page navigation, interaction, and data extraction capabilities.
 
 **Supported Operations**:
-- `open_browser` — Open browser
-- `close_browser` — Close browser
+- `open` — Open browser
+- `close` — Close browser
 - `navigate` — Navigate to URL
 - `click` — Click element
 - `input` — Input text
+- `scroll` — Scroll page
+- `execute_script` — Execute JavaScript
 - `get_page_text` — Get page text
 - `get_screenshot` — Get screenshot
-- `execute_script` — Execute JavaScript
-- `wait_for_element` — Wait for element
+- `wait_for_element` — Wait for element to appear
+- `get_element_info` — Get element information
+- `upload_file` — Upload file
 - `get_browser_status` — Get browser status
+- `set_timeout` — Set timeout
+- `clear_session` — Clear browser session
 
 **Features**:
 - Independent instance per silicon being
@@ -609,7 +692,7 @@ The tool system allows silicon beings to interact with the external world throug
 
 ---
 
-### 23. Work Note Tool (WorkNoteTool)
+### 24. Work Note Tool (WorkNoteTool)
 
 **Tool Name**: `work_note`
 
@@ -628,33 +711,33 @@ The tool system allows silicon beings to interact with the external world throug
 ```json
 {
   "action": "create",
-  "summary": "Completed user authentication module",
-  "content": "## Implementation Details\n\n- Using JWT token\n- Supports OAuth2",
-  "keywords": "authentication,JWT,OAuth2"
+  "summary": "完成用户认证模块",
+  "content": "## 实现细节\n\n- 使用 JWT token\n- 支持 OAuth2",
+  "keywords": "认证,JWT,OAuth2"
 }
 ```
 
 ---
 
-### 24. Hot Reload Tool (HotReloadTool)
+### 25. Hot Reload Tool (HotReloadTool)
 
 **Tool Name**: `hot_reload`
 
 **Description**: Supports automatic compilation, file update, and restarting SiliconLife.Fast during runtime, without manual intervention.
 
-**Supported Actions**:
-- `execute` — Executes the complete build, copy, and restart process
-- `build_only` — Only compiles the project, without copying or restarting
+**Supported Operations**:
+- `execute` — Execute the complete build, copy, and restart process
+- `build_only` — Only build the project, without copying or restarting
 
 **Workflow**:
-1. Compiles the SiliconLife.Fast project
-2. Gracefully closes the running Fast instance (via HTTP API)
-3. Waits for process exit and port release
-4. Copies the build output to the target directory (excludes HotReload files)
-5. Restarts the Fast instance
+1. Compile the SiliconLife.Fast project
+2. Gracefully shut down the currently running Fast instance (via HTTP API)
+3. Wait for process exit and port release
+4. Copy build output to the target directory (skip HotReload's own files)
+5. Restart the Fast instance
 
 **Features**:
-- Automatic detection and closure of the previous process
+- Automatic detection and closure of the old process
 - Safe file copying (does not overwrite HotReload.exe)
 - Port release waiting mechanism
 - Supports custom port configuration
@@ -677,9 +760,11 @@ The tool system allows silicon beings to interact with the external world throug
 - `port`: Fast instance Web port (default 8080)
 
 **Notes**:
-- Only applicable to SiliconLife.Fast version
+- Only applicable to the SiliconLife.Fast version
 - Requires HotReload.exe in the tools/HotReload directory
 - Brief service interruption during restart (approximately 3-5 seconds)
+
+---
 
 ## Tool Invocation Flow
 
@@ -708,13 +793,11 @@ The tool system allows silicon beings to interact with the external world throug
 
 ## Permission Validation
 
-All tool executions go through a 5-level permission chain:
+All tool executions go through the permission validation chain:
 
-1. **UserFrequencyCache** — Cached user high-frequency allow/deny decisions
-2. **IPermissionCallback** — Custom permission callback function
-3. **Curator Branch** — If callback returns AskUser or no callback:
-   - **Curator** → `IPermissionAskHandler` (ask user via IM)
-   - **Non-curator** → `GlobalACL` → default deny
+1. **UserFrequencyCache** — High-frequency user decision cache (HighDeny takes precedence over HighAllow)
+2. **IPermissionCallback** — Custom permission callback function (Allowed/Denied/AskUser)
+3. **IsCurator Branch** — Curators ask users via IPermissionAskHandler; non-curators query GlobalACL, defaulting to deny if no matching rule is found
 
 ## Creating Custom Tools
 
@@ -725,7 +808,7 @@ public class MyCustomTool : ITool
 {
     public string Name => "my_tool";
     
-    public string Description => "Tool description";
+    public string Description => "工具描述";
     
     public ToolDefinition Definition => new ToolDefinition
     {
@@ -733,7 +816,7 @@ public class MyCustomTool : ITool
         Description = Description,
         Parameters = new Dictionary<string, object>
         {
-            ["param1"] = new { type = "string", description = "Parameter description" }
+            ["param1"] = new { type = "string", description = "参数说明" }
         }
     };
     
@@ -764,7 +847,7 @@ public class MyCustomTool : ITool
 
 ### Step 2: Add to Project
 
-Place the tool file in the `src/SiliconLife.Common/Tools/` directory (shared tools for both versions). The `ToolManager` will automatically discover and register it through reflection at startup.
+Place the tool file in the `src/SiliconLife.Common/Tools/` directory (shared tools) or the `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` directory (version-specific tools). The `ToolManager` will automatically discover and register it through reflection at startup.
 
 ### Step 2a: Register Tools via Plugin
 
@@ -792,7 +875,7 @@ public class AdminOnlyTool : ITool
 ```csharp
 if (!call.Parameters.ContainsKey("required_param"))
 {
-    return ToolResult.Failure("Missing required parameter: required_param");
+    return ToolResult.Failure("缺少必需参数: required_param");
 }
 ```
 
@@ -801,11 +884,11 @@ if (!call.Parameters.ContainsKey("required_param"))
 ```csharp
 try
 {
-    // Perform operation
+    // 执行操作
 }
 catch (Exception ex)
 {
-    Logger.Error($"Tool {Name} execution failed: {ex.Message}");
+    Logger.Error($"工具 {Name} 执行失败: {ex.Message}");
     return ToolResult.Failure(ex.Message);
 }
 ```
@@ -815,10 +898,10 @@ catch (Exception ex)
 Never bypass permission checks. Always access resources through the executor:
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+bool allowed = permissionManager.CheckPermission(callerId, permissionType, resource);
+if (!allowed)
 {
-    return ToolResult.Denied(permission.Reason);
+    return ToolResult.Denied("Permission denied");
 }
 ```
 
@@ -828,8 +911,8 @@ Help the AI understand when and how to use the tool:
 
 ```csharp
 public string Description => 
-    "Used to convert dates between different calendar systems. " +
-    "Requires 'date', 'from_calendar', and 'to_calendar' parameters.";
+    "用于在不同日历系统之间转换日期。" +
+    "需要提供 'date'、'from_calendar' 和 'to_calendar' 参数。";
 ```
 
 ## Troubleshooting
@@ -849,7 +932,7 @@ public string Description =>
 
 **Solution**:
 - Check the permission audit log
-- Verify the silicon being has the required permission
+- Verify the silicon being has the required permissions
 - Review global ACL settings
 - If it's a curator, check if the `[SiliconManagerOnly]` attribute is used
 

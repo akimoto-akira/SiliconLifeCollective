@@ -1,8 +1,8 @@
-﻿# API Reference
+# API Reference
 
 > **Version: v0.2.0-alpha**
 
-**English** | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [Čeština](../cs-CZ/api-reference.md) | [Русский](../ru-RU/api-reference.md)
+[**English**](../en/api-reference.md) | [Deutsch](../de-DE/api-reference.md) | [中文](../zh-CN/api-reference.md) | [繁體中文](../zh-HK/api-reference.md) | [Español](../es-ES/api-reference.md) | [日本語](../ja-JP/api-reference.md) | [한국어](../ko-KR/api-reference.md) | [Čeština](../cs-CZ/api-reference.md) | [Русский](../ru-RU/api-reference.md)
 
 ## Web API Endpoints
 
@@ -10,71 +10,94 @@ Base URL: `http://localhost:8080`
 
 ### Authentication
 
-Most endpoints require authentication via session cookies managed by the Web UI.
+Most endpoints require authentication via session cookies managed through the Web UI. Before system initialization, all requests except the help page will be redirected to the initialization page.
 
 ---
 
-## Silicon Being Management
+## Dashboard
 
-### Get All Beings
+### Get Dashboard Statistics
 
-**GET** `/api/beings`
+**GET** `/api/dashboard/stats`
 
-**Response**:
-```json
-{
-  "beings": [
-    {
-      "id": "being-uuid",
-      "name": "Assistant",
-      "activity": "Idle",
-      "soul": "path/to/soul.md"
-    }
-  ]
-}
-```
+Returns system overview data (number of beings, running status, etc.).
 
-**Activity Values**: `Idle` | `SingleChat` | `GroupChat` | `Task` | `Timer` | `Broadcast` | `Project` | `MemoryCompression` | `Stopped`
+### Get Performance Metrics
 
-### Create Being
+**GET** `/api/dashboard/metrics`
 
-**POST** `/api/beings`
-
-**Request**:
-```json
-{
-  "name": "New Being",
-  "soul": "# Personality\nYou are helpful..."
-}
-```
-
-**Response**: `201 Created`
-
-### Start Being
-
-**POST** `/api/beings/{id}/start`
-
-### Stop Being
-
-**POST** `/api/beings/{id}/stop`
-
-### Get Being Details
-
-**GET** `/api/beings/{id}`
+Returns real-time performance metric data.
 
 ---
 
 ## Chat System
 
+### Chat Page
+
+**GET** `/chat`
+
+Returns the chat interface page.
+
+### Streaming Chat (SSE)
+
+**GET** `/api/chat/stream`
+
+Streaming chat via Server-Sent Events (SSE).
+
+**Response**: Server-Sent Event stream
+
+```
+data: {"type": "chunk", "content": "I"}
+data: {"type": "chunk", "content": "'m"}
+data: {"type": "chunk", "content": " thinking..."}
+data: {"type": "complete", "sessionId": "uuid"}
+```
+
+### Get Conversation List
+
+**GET** `/api/chat/conversations`
+
+Returns a list of all active Chat Sessions.
+
+**Response Example**:
+```json
+{
+  "conversations": [
+    {
+      "sessionId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
+      "beingId": "being-uuid",
+      "type": "single",
+      "displayName": "与小游聊天",
+      "lastMessage": "最后消息内容",
+      "lastTime": "2026-05-20T10:30:00Z"
+    }
+  ]
+}
+```
+
+### Get Message History
+
+**GET** `/api/chat/messages`
+
+Query parameter: `channelId` — Channel/Session ID
+
+Returns the message history for the specified session.
+
+### Get Chat History
+
+**GET** `/api/chat/history`
+
+Returns global chat history records.
+
 ### Send Message
 
 **POST** `/api/chat/send`
 
-**Request**:
+**Request Body**:
 ```json
 {
-  "channelId": "session-uuid",
-  "content": "Hello, how are you?"
+  "channelId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
+  "content": "测试消息内容"
 }
 ```
 
@@ -82,255 +105,364 @@ Most endpoints require authentication via session cookies managed by the Web UI.
 ```json
 {
   "success": true,
-  "messageId": "message-uuid"
+  "messageId": "50156b26-f3b9-4735-be3d-51e547bd3a4a"
 }
 ```
-
-### Streaming Chat (SSE)
-
-**GET** `/api/chat/stream`
-
-Server-Sent Events stream for real-time chat updates.
-
-### Get Conversations
-
-**GET** `/api/chat/conversations`
-
-**Response**:
-```json
-{
-  "conversations": [
-    {
-      "sessionId": "session-uuid",
-      "beingId": "being-uuid",
-      "type": "single",
-      "displayName": "Chat with Assistant",
-      "lastMessage": "Hello!",
-      "lastTime": "2026-04-20T10:30:00Z"
-    }
-  ]
-}
-```
-
-### Get Messages
-
-**GET** `/api/chat/messages?channelId={sessionId}`
-
-**Response**:
-```json
-{
-  "messages": [
-    {
-      "id": "message-uuid",
-      "senderId": "sender-uuid",
-      "channelId": "session-uuid",
-      "content": "Hello",
-      "timestamp": "2026-04-20T10:30:00Z",
-      "role": "user"
-    }
-  ]
-}
-```
-
-### Get Chat History
-
-**GET** `/api/chat/history`
-
-Returns chat history sessions.
 
 ### Stop AI Thinking
 
 **POST** `/api/chat/stop`
 
-Stops the current AI streaming response.
+Stops the currently ongoing AI response generation.
+
+**Request Body**:
+```json
+{
+  "channelId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d"
+}
+```
 
 ### Upload File
 
 **POST** `/api/chat/upload`
 
-Uploads a file to the chat session.
+Uploads a file to the Chat Session (supports multipart/form-data).
 
 ---
 
-## Configuration
+## Silicon Being Management
 
-### Get Configuration
+### Being Management Page
 
-**GET** `/api/config`
+**GET** `/beings`
 
-**Response**:
+Returns the Silicon Being management interface page.
+
+### Get Being List
+
+**GET** `/api/beings` or **GET** `/api/beings/list`
+
+Returns a list of all registered Silicon Beings.
+
+**Response Example**:
 ```json
 {
-  "aiClients": {
-    "Ollama": {
-      "baseUrl": "http://localhost:11434",
-      "model": "qwen2.5:7b"
-    }
-  },
-  "storage": {
-    "basePath": "./data"
-  }
-}
-```
-
-### Update Configuration
-
-**POST** `/api/config`
-
-**Request**:
-```json
-{
-  "aiClients": {
-    "Ollama": {
-      "baseUrl": "http://localhost:11434",
-      "model": "qwen2.5:14b"
-    }
-  }
-}
-```
-
----
-
-## Permission System
-
-### Get Permissions
-
-**GET** `/api/permissions`
-
-**Response**:
-```json
-{
-  "rules": [
+  "beings": [
     {
-      "userId": "user-uuid",
-      "resource": "disk:read",
-      "allowed": true,
-      "expiresAt": "2026-04-21T00:00:00Z"
+      "id": "being-uuid",
+      "name": "Assistant",
+      "status": "running",
+      "soulPath": "path/to/soul.md"
     }
   ]
 }
 ```
 
-### Grant Permission
+**Status values**: `idle` | `running` | `waiting_permission` | `stopped`
 
-**POST** `/api/permissions`
+### Get Being Detail
 
-**Request**:
-```json
-{
-  "userId": "user-uuid",
-  "resource": "disk:write",
-  "allowed": true,
-  "duration": 3600
-}
-```
+**GET** `/api/beings/detail`
 
-### Revoke Permission
+Query parameter: `beingId` — Silicon Being ID
 
-**DELETE** `/api/permissions/{id}`
+Returns detailed information about the specified Silicon Being.
 
-### Check Permission
+### Get Being Activity Status
 
-**POST** `/api/permissions/check`
+**GET** `/api/beings/activity`
 
-**Request**:
-```json
-{
-  "userId": "user-uuid",
-  "resource": "network:http"
-}
-```
+Returns activity status information for each Silicon Being.
 
-**Response**:
-```json
-{
-  "allowed": true,
-  "reason": "Granted by curator"
-}
-```
+### Soul File Editor Page
 
----
+**GET** `/beings/soul`
 
-## Task and Timer System
+Returns the Soul File editor interface.
 
-### Create Task
+### Save Soul File
 
-**POST** `/api/tasks`
+**POST** `/api/beings/soul/save`
 
-**Request**:
+**Request Body**:
 ```json
 {
   "beingId": "being-uuid",
-  "description": "Review code",
-  "priority": 5,
-  "dueDate": "2026-04-21T12:00:00Z"
+  "soulContent": "# Personality\nYou are helpful..."
 }
 ```
 
-### Get Tasks
+### AI Config Editor Page
 
-**GET** `/api/tasks?beingId={id}&status=pending`
+**GET** `/beings/ai-config`
 
-### Update Task Status
+Returns the AI configuration editor interface.
 
-**PATCH** `/api/tasks/{id}`
+### Save AI Config
 
-**Request**:
-```json
-{
-  "status": "completed"
-}
-```
+**POST** `/api/beings/ai-config/save`
 
-### Create Timer
-
-**POST** `/api/timers`
-
-**Request**:
+**Request Body**:
 ```json
 {
   "beingId": "being-uuid",
-  "interval": 3600,
-  "action": "think",
-  "repeat": true
-}
-```
-
-### Delete Timer
-
-**DELETE** `/api/timers/{id}`
-
----
-
-## Audit and Logging
-
-### Get Token Usage
-
-**GET** `/api/audit/tokens?startDate={date}&endDate={date}`
-
-**Response**:
-```json
-{
-  "summary": {
-    "totalTokens": 150000,
-    "promptTokens": 100000,
-    "completionTokens": 50000,
-    "totalCost": 0.15
-  },
-  "byModel": {
-    "qwen2.5:7b": {
-      "tokens": 100000,
-      "cost": 0.10
-    }
+  "aiClientType": "DashScope",
+  "config": {
+    "apiKey": "...",
+    "region": "beijing",
+    "model": "qwen3.6-plus"
   }
 }
 ```
 
-### Get Logs
+### Get Available AI Model List
 
-**GET** `/api/logs?level=error&limit=100`
+**GET** `/api/beings/ai-config/models`
+
+Query parameters: `clientType`, `apiKey`, `region`
+
+Returns the list of available models for the specified AI client.
+
+---
+
+## Chat History View
+
+### Chat History Page
+
+**GET** `/chat-history`
+
+Returns the chat history main page.
+
+### Chat History Detail Page
+
+**GET** `/chat-history-detail`
+
+Returns the chat history detail page for the specified session.
+
+### Group Chat History Detail Page
+
+**GET** `/group-chat-history-detail`
+
+Returns the history detail page for Group Chat Sessions.
+
+### Broadcast History Detail Page
+
+**GET** `/broadcast-history-detail`
+
+Returns the history detail page for Broadcast Channels.
+
+### Get History Conversation List
+
+**GET** `/api/chat-history/conversations`
+
+Returns a list of all historical conversations.
+
+### Get History Messages
+
+**GET** `/api/chat-history/messages`
+
+Query parameter: `sessionId` — Session ID
+
+Returns the message records for the specified historical session.
+
+---
+
+## Timer Management
+
+### Timer Page
+
+**GET** `/timers`
+
+Returns the Timer management interface page.
+
+### Get Timer List
+
+**GET** `/api/timers/list`
+
+Returns a list of all timers.
+
+### Timer Cycle Detail Page
+
+**GET** `/timer-cycles/{timerId}`
+
+Returns the execution cycle detail page for the specified timer.
+
+### Get Timer Cycle List
+
+**GET** `/api/timer-cycles/list`
+
+Query parameter: `timerId` — Timer ID
+
+Returns a list of all execution cycles for the specified timer.
+
+### Single Execution Cycle Detail Page
+
+**GET** `/timer-cycle/{cycleIndex}`
+
+Returns the detail page for a single execution.
+
+### Get Cycle Messages
+
+**GET** `/api/timer-cycle/messages`
+
+Query parameter: `cycleIndex` — Cycle index
+
+Returns the related messages for the specified execution cycle.
+
+---
+
+## Task Management
+
+### Task Page
+
+**GET** `/tasks`
+
+Returns the Task management interface page.
+
+### Get Task List
+
+**GET** `/api/tasks/list`
+
+Returns a list of all tasks.
+
+### Task Cycle Detail Page
+
+**GET** `/task-cycles/{taskId}`
+
+Returns the execution cycle detail page for the specified task.
+
+### Get Task Cycle List
+
+**GET** `/api/task-cycles/list`
+
+Query parameter: `taskId` — Task ID
+
+Returns a list of all execution cycles for the specified task.
+
+### Single Execution Cycle Detail Page
+
+**GET** `/task-cycle/{cycleIndex}`
+
+Returns the detail page for a single task execution.
+
+### Get Cycle Messages
+
+**GET** `/api/task-cycle/messages`
+
+Query parameter: `cycleIndex` — Cycle index
+
+Returns the related messages for the specified task execution cycle.
+
+---
+
+## Permission System
+
+### Permission Management Page
+
+**GET** `/permissions`
+
+Returns the Permission Manager interface page.
+
+### Get Permission Rule List
+
+**GET** `/api/permissions/list`
+
+Returns all currently configured permission rules.
+
+**Response Example**:
+```json
+{
+  "rules": [
+    {
+      "permissionType": "NetworkAccess",
+      "resourcePrefix": "api.github.com",
+      "result": "Allowed",
+      "description": "Allow GitHub API access"
+    }
+  ]
+}
+```
+
+### Save Permission Rule
+
+**POST** `/api/permissions/save`
+
+**Request Body**:
+```json
+{
+  "permissionType": "FileAccess",
+  "resourcePrefix": "C:\\Projects",
+  "result": "Allowed",
+  "description": "Allow project directory access"
+}
+```
+
+### Permission Request Page
+
+**GET** `/permission/request`
+
+Displays the permission request page, allowing users to approve or deny permission requests from Silicon Beings.
+
+**Query Parameters**:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `userId` | `Guid` | The Silicon Being ID requesting permission |
+| `type` | `string` | Permission Type |
+| `resource` | `string` | Requested resource path |
+| `allowCode` | `string` | Code identifier for the allow action |
+| `denyCode` | `string` | Code identifier for the deny action |
+
+### Check Pending Permission Requests
+
+**GET** `/permission/check`
+
+Query parameter: `userId` — Silicon Being ID
 
 **Response**:
+```json
+{
+  "pending": true
+}
+```
+
+### Respond to Permission Request
+
+**GET** `/permission/respond`
+
+**Query Parameters**:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `userId` | `Guid` | Silicon Being ID |
+| `allowed` | `bool` | Whether to allow |
+| `addToCache` | `bool` | Whether to cache the decision |
+| `cacheDuration` | `double` | Cache duration (hours) |
+
+**Response**:
+```json
+{
+  "success": true
+}
+```
+
+---
+
+## Logging System
+
+### Log Page
+
+**GET** `/logs`
+
+Returns the log viewer interface page.
+
+### Get Log List
+
+**GET** `/api/logs/list`
+
+Query parameters support filtering by level and time range.
+
+**Response Example**:
 ```json
 {
   "logs": [
@@ -344,142 +476,772 @@ Uploads a file to the chat session.
 }
 ```
 
+### Get Logs Grouped by Being
+
+**GET** `/api/logs/beings`
+
+Returns log statistics grouped by Silicon Being.
+
+### Get Available Log Levels
+
+**GET** `/api/logs/levels`
+
+Returns the list of available Log Levels in the system.
+
 ---
 
-## Storage API
+## Usage Statistics
 
-### Read Value
+### Usage Statistics Page
 
-**GET** `/api/storage?key={key}`
+**GET** `/usage`
 
-**Response**:
+Returns the usage statistics interface page.
+
+### Get Usage Summary
+
+**GET** `/api/usage/summary`
+
+Returns a Token usage and cost summary.
+
+### Get Trend Data
+
+**GET** `/api/usage/trend`
+
+Query parameters: `startDate`, `endDate`
+
+Returns usage trend data for the specified time period.
+
+### Export Usage Data
+
+**GET** `/api/usage/export`
+
+Exports usage data in a downloadable format.
+
+---
+
+## Audit Trail
+
+### Audit Page
+
+**GET** `/audit`
+
+Returns the audit trail interface page.
+
+### Get Audit List
+
+**GET** `/api/audit/list`
+
+Returns a list of audit log entries.
+
+### Get Audit Summary
+
+**GET** `/api/audit/summary`
+
+Returns summary statistics of audit data.
+
+### Get Audit Grouped by Being
+
+**GET** `/api/audit/beings`
+
+Returns audit statistics grouped by Silicon Being.
+
+---
+
+## Configuration Management
+
+### Configuration Page
+
+**GET** `/config`
+
+Returns the system configuration interface page.
+
+### Save Configuration
+
+**POST** `/config/save`
+
+**Request Body**:
 ```json
 {
-  "key": "being:uuid:memory",
-  "value": "{...}",
-  "timestamp": "2026-04-20T10:30:00Z"
-}
-```
-
-### Write Value
-
-**POST** `/api/storage`
-
-**Request**:
-```json
-{
-  "key": "being:uuid:memory",
-  "value": "{...}"
-}
-```
-
-### Query by Time Range
-
-**GET** `/api/storage/time?start={start}&end={end}&prefix={prefix}`
-
-**Response**:
-```json
-{
-  "entries": [
-    {
-      "key": "being:uuid:chat:2026-04-20",
-      "value": "{...}",
-      "timestamp": "2026-04-20T10:30:00Z"
+  "language": "ZhCN",
+  "port": 8080,
+  "aiClients": {
+    "Ollama": {
+      "baseUrl": "http://localhost:11434",
+      "model": "qwen2.5:7b"
+    },
+    "DashScope": {
+      "apiKey": "...",
+      "region": "beijing",
+      "model": "qwen3.6-plus"
     }
-  ]
+  }
 }
 ```
 
+### Get AI Configuration Options
+
+**GET** `/config/aioptions`
+
+Returns available AI client types and their dynamic options (available models, regions, etc.).
+
 ---
 
-## Memory API
+## Memory System
+
+### Memory Page
+
+**GET** `/memory`
+
+Returns the memory management interface page.
 
 ### Get Memory List
 
 **GET** `/api/memory/list`
 
-**Query Parameters**: `beingId`, `type`, `limit`
+Returns a list of memory entries for Silicon Beings.
 
 ### Get Memory Detail
 
 **GET** `/api/memory/detail/{id}`
 
+Path parameter: `id` — Memory entry ID
+
+Returns the full content of the specified memory entry.
+
 ### Get Memory Statistics
 
 **GET** `/api/memory/stats`
 
-**Query Parameters**: `beingId`
+Returns statistics for the memory system.
 
 ### Search Memory
 
 **GET** `/api/memory/search`
 
-**Query Parameters**: `beingId`, `keyword`, `limit`
+Query parameter: `keyword` — Search keyword
 
-### Get Memory Beings
+Searches for matching memory entries.
+
+### Get Memory Grouped by Being
 
 **GET** `/api/memory/beings`
 
-Returns list of beings with memory data.
+Returns memory statistics grouped by Silicon Being.
 
-### Trace Memory Original
+### Get Memory Trace
 
 **GET** `/api/memory/trace/{id}`
 
-Traces the original source of a memory entry.
+Path parameter: `id` — Memory entry ID
+
+Returns the source trace chain for the specified memory entry.
 
 ### Get Memory Timeline HTML
 
 **GET** `/api/memory/timeline-html`
 
-**Query Parameters**: `beingId`
-
-Returns HTML fragment for memory timeline visualization.
+Returns an HTML view of the memory timeline.
 
 ---
 
-## Code Browser API
+## Work Notes
 
-### Get Code Types
+### Work Notes Page
 
-**GET** `/api/code/types`
+**GET** `/work-notes`
 
-Returns all available types for code browsing.
+Returns the Work Note System interface page.
 
-### Get Code Detail
+### Get Work Notes List
 
-**GET** `/api/code/detail`
+**GET** `/api/work-notes/list`
 
-**Query Parameters**: `type`, `member`
+Returns a list of work notes.
 
-Returns detailed information about a specific type or member.
+### Read Work Note
+
+**GET** `/api/work-notes/read`
+
+Query parameter: `noteId` — Note ID
+
+Returns the content of the specified note.
+
+### Get Note Directory
+
+**GET** `/api/work-notes/directory`
+
+Returns the note directory structure.
+
+### Search Work Notes
+
+**GET** `/api/work-notes/search`
+
+Query parameter: `keyword` — Search keyword
+
+Searches for matching work notes.
+
+### Create Work Note
+
+**POST** `/api/work-notes/create`
+
+**Request Body**:
+```json
+{
+  "title": "笔记标题",
+  "content": "笔记内容",
+  "keywords": ["关键词1", "关键词2"]
+}
+```
+
+### Update Work Note
+
+**POST** `/api/work-notes/update`
+
+**Request Body**:
+```json
+{
+  "noteId": "note-uuid",
+  "title": "更新后的标题",
+  "content": "更新后的内容"
+}
+```
+
+### Delete Work Note
+
+**POST** `/api/work-notes/delete`
+
+**Request Body**:
+```json
+{
+  "noteId": "note-uuid"
+}
+```
 
 ---
 
-## Executor API
+## Knowledge Network
+
+### Knowledge Network Page
+
+**GET** `/knowledge`
+
+Returns the Knowledge Network management interface page.
+
+### Get Knowledge Graph
+
+**GET** `/api/knowledge/graph`
+
+Returns knowledge triple graph data (subject-relation-object).
+
+---
+
+## Project Management
+
+### Project Page
+
+**GET** `/project`
+
+Returns the Project System interface page.
+
+### Project Work Notes Page
+
+**GET** `/project/{id}/work-notes`
+
+Path parameter: `id` — Project ID
+
+Returns the work notes page for the specified project.
+
+### Project Tasks Page
+
+**GET** `/project/{id}/tasks`
+
+Path parameter: `id` — Project ID
+
+Returns the task management page for the specified project.
+
+### Project Tool Permissions Page
+
+**GET** `/project/{id}/tool-permissions`
+
+Path parameter: `id` — Project ID
+
+Returns the tool permission management page for the specified project.
+
+### Project Workflow Page
+
+**GET** `/project/{id}/workflow`
+
+Path parameter: `id` — Project ID
+
+Returns the workflow management page for the specified project.
+
+### Get Project Workflow Detail
+
+**GET** `/api/projects/workflow-detail`
+
+Query parameter: `projectId` — Project ID
+
+Returns the workflow details associated with the project.
+
+### Assign Project Role
+
+**POST** `/api/projects/assign-role`
+
+**Request Body**:
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid",
+  "roleName": "developer"
+}
+```
+
+### Remove Project Role
+
+**POST** `/api/projects/remove-role`
+
+**Request Body**:
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid",
+  "roleName": "developer"
+}
+```
+
+### Get Project List
+
+**GET** `/api/projects/list`
+
+Returns a list of all projects.
+
+### Get Project Workflow Template List
+
+**GET** `/api/projects/list-workflow-templates`
+
+Returns a list of available workflow templates.
+
+### Create Project
+
+**POST** `/api/projects/create`
+
+**Request Body**:
+```json
+{
+  "name": "My Project",
+  "description": "Project description"
+}
+```
+
+### Archive Project
+
+**POST** `/api/projects/{id}/archive`
+
+Path parameter: `id` — Project ID
+
+Archives the specified project.
+
+### Restore Project
+
+**POST** `/api/projects/{id}/restore`
+
+Path parameter: `id` — Project ID
+
+Restores an archived project.
+
+### Destroy Project
+
+**POST** `/api/projects/{id}/destroy`
+
+Path parameter: `id` — Project ID
+
+Permanently deletes the specified project (irreversible).
+
+### Get Project Detail
+
+**GET** `/api/projects/detail`
+
+Query parameter: `projectId` — Project ID
+
+Returns detailed information about the project.
+
+### Update Project
+
+**POST** `/api/projects/update`
+
+**Request Body**:
+```json
+{
+  "projectId": "project-uuid",
+  "name": "Updated Name",
+  "description": "Updated description"
+}
+```
+
+### Assign Member to Project
+
+**POST** `/api/projects/assign`
+
+**Request Body**:
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid"
+}
+```
+
+### Remove Member from Project
+
+**POST** `/api/projects/remove`
+
+**Request Body**:
+```json
+{
+  "projectId": "project-uuid",
+  "beingId": "being-uuid"
+}
+```
+
+### Get Project Work Notes List
+
+**GET** `/api/projects/{id}/work-notes/list`
+
+Path parameter: `id` — Project ID
+
+Returns a list of work notes for the specified project.
+
+### Read Project Work Note
+
+**GET** `/api/projects/{id}/work-notes/read`
+
+Path parameter: `id` — Project ID
+
+Returns the content of a work note in the specified project.
+
+### Create Project Work Note
+
+**POST** `/api/projects/{id}/work-notes/create`
+
+Path parameter: `id` — Project ID
+
+Creates a new work note in the specified project.
+
+### Update Project Work Note
+
+**POST** `/api/projects/{id}/work-notes/update`
+
+Path parameter: `id` — Project ID
+
+Updates a work note in the specified project.
+
+### Delete Project Work Note
+
+**POST** `/api/projects/{id}/work-notes/delete`
+
+Path parameter: `id` — Project ID
+
+Deletes a work note in the specified project.
+
+### Get Project Task List
+
+**GET** `/api/projects/{id}/tasks/list`
+
+Path parameter: `id` — Project ID
+
+Returns a list of tasks for the specified project.
+
+### Create Project Task
+
+**POST** `/api/projects/{id}/tasks/create`
+
+Path parameter: `id` — Project ID
+
+Creates a new task in the specified project.
+
+### Update Project Task
+
+**POST** `/api/projects/{id}/tasks/update`
+
+Path parameter: `id` — Project ID
+
+Updates a task in the specified project.
+
+### Delete Project Task
+
+**POST** `/api/projects/{id}/tasks/delete`
+
+Path parameter: `id` — Project ID
+
+Deletes a task in the specified project.
+
+### Assign Task Assignee
+
+**POST** `/api/projects/{id}/tasks/assign`
+
+Path parameter: `id` — Project ID
+
+Assigns an assignee to a project task.
+
+### Remove Task Assignee
+
+**POST** `/api/projects/{id}/tasks/remove-assignee`
+
+Path parameter: `id` — Project ID
+
+Removes the assignee from a project task.
+
+### Mark Task Complete
+
+**POST** `/api/projects/{id}/tasks/complete`
+
+Path parameter: `id` — Project ID
+
+Marks a project task as completed.
+
+### Mark Task Failed
+
+**POST** `/api/projects/{id}/tasks/fail`
+
+Path parameter: `id` — Project ID
+
+Marks a project task as failed.
+
+### Cancel Task
+
+**POST** `/api/projects/{id}/tasks/cancel`
+
+Path parameter: `id` — Project ID
+
+Cancels a project task.
+
+---
+
+## Tool Permission Management
+
+### Get Silicon Being Tool Permissions
+
+**GET** `/api/beings/tool-permissions`
+
+Query parameter: `beingId` — Silicon Being ID
+
+Returns the tool permission configuration for the specified Silicon Being.
+
+### Update Silicon Being Tool Permissions
+
+**PUT** `/api/beings/tool-permissions`
+
+**Request Body**:
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "network": "allowed",
+    "disk_read": "allowed",
+    "disk_write": "denied"
+  }
+}
+```
+
+### Get Tool Permission Templates
+
+**GET** `/api/beings/tool-permissions/templates`
+
+Returns a list of available tool permission templates.
+
+### Apply Tool Permission Template
+
+**POST** `/api/beings/tool-permissions/apply-template`
+
+**Request Body**:
+```json
+{
+  "beingId": "being-uuid",
+  "templateName": "readonly"
+}
+```
+
+### Get Project Tool Permissions
+
+**GET** `/api/projects/{id}/tool-permissions`
+
+Path parameter: `id` — Project ID
+
+Returns the tool permission configuration for the specified project.
+
+### Update Project Tool Permissions
+
+**PUT** `/api/projects/{id}/tool-permissions`
+
+Path parameter: `id` — Project ID
+
+**Request Body**:
+```json
+{
+  "permissions": {
+    "network": "allowed",
+    "disk_read": "allowed",
+    "disk_write": "denied"
+  }
+}
+```
+
+---
+
+## Executor Management
+
+### Executor Page
+
+**GET** `/executor`
+
+Returns the Executor management interface page.
 
 ### Get Executor Status
 
 **GET** `/api/executors/status`
 
+Returns the running status of each Executor (Disk, Network, CommandLine).
+
+---
+
+## Code Browser
+
+### Code Browser Page
+
+**GET** `/code`
+
+Returns the code browser interface page.
+
+### Get Code Type List
+
+**GET** `/api/code/types`
+
+Returns the list of supported code types/languages.
+
+### Get Code Detail
+
+**GET** `/api/code/detail`
+
+Query parameters: `filePath`, `lineNumber`
+
+Returns code details for the specified file.
+
+---
+
+## Code Hover Tips
+
+### Get Hover Tip
+
+**GET** `/api/code/hover`
+**POST** `/api/code/hover`
+
+Gets hover tip information for a code position (similar to IDE IntelliSense).
+
+### Register Code Position
+
+**POST** `/api/code/register`
+
+Registers a code position to monitor.
+
+### Update Code Position
+
+**POST** `/api/code/update`
+
+Updates a registered code position.
+
+### Unregister Code Position
+
+**POST** `/api/code/unregister`
+
+Unregisters a code position that no longer needs monitoring.
+
+---
+
+## Help Documentation System
+
+### Help Page
+
+**GET** `/help` or **GET** `/help/index`
+
+Returns the help documentation main page.
+
+### Help Topic Page
+
+**GET** `/help/{topic}`
+
+Path parameter: `topic` — Topic identifier
+
+Returns the help documentation page for the specified topic.
+
+### Search Help Documentation
+
+**GET** `/api/help/search`
+
+Query parameter: `keyword` — Search keyword
+
+Searches for matching help documentation topics.
+
+---
+
+## Initialization
+
+### Initialization Wizard Page
+
+**GET** `/init`
+
+Returns the first-run initialization wizard page.
+
+### Submit Initialization
+
+**POST** `/init`
+
+Submits the first-run initialization configuration.
+
+### Browse Data Directory
+
+**GET** `/init/browse`
+
+Opens a directory browser to select the data storage location.
+
+### Get AI Config Metadata
+
+**GET** `/init/ai-config-metadata`
+
+Returns available AI client types and their configuration field metadata.
+
+---
+
+## System Control
+
+### Graceful Shutdown
+
+**POST** `/api/system/shutdown`
+
+> **Note**: Only requests from localhost are allowed
+
+Triggers the application's graceful shutdown process:
+
+1. Stops the Main Loop
+2. Saves the current configuration
+3. Closes the HTTP listener
+
 **Response**:
 ```json
-[
-  { "name": "DiskExecutor", "status": "Idle", "queueCount": 0 },
-  { "name": "NetworkExecutor", "status": "Idle", "queueCount": 0 },
-  { "name": "CommandLineExecutor", "status": "Idle", "queueCount": 0 }
-]
+{
+  "status": "shutting_down",
+  "message": "Application is shutting down gracefully"
+}
 ```
 
 ---
 
-## System Information
+## About
 
-### Get About Page
+### About Page
 
 **GET** `/about`
 
-Returns the about page, including system information and loaded plugin list.
+Returns the about page, containing system information and a list of loaded plugins.
 
 **Plugin List Data**:
 ```json
@@ -495,91 +1257,6 @@ Returns the about page, including system information and loaded plugin list.
 }
 ```
 
-### Permission Request
-
-**GET** `/permission/request?userId={id}&type={type}&resource={resource}`
-
-Displays the permission request page, allowing users to approve or deny a silicon being's permission request.
-
-**Query Parameters**:
-
-| Parameter | Type | Description |
-|------|------|------|
-| `userId` | `Guid` | Silicon being ID requesting permission |
-| `type` | `string` | Permission type |
-| `resource` | `string` | Requested resource path |
-| `allowCode` | `string` | Code identifier for allow action |
-| `denyCode` | `string` | Code identifier for deny action |
-
-**Check Pending Permission Requests**:
-
-**GET** `/permission/check?userId={id}`
-
-**Response**:
-```json
-{
-  "pending": true
-}
-```
-
-**Respond to Permission Request**:
-
-**GET** `/permission/respond?userId={id}&allowed={bool}&addToCache={bool}&cacheDuration={hours}`
-
-**Query Parameters**:
-
-| Parameter | Type | Description |
-|------|------|------|
-| `userId` | `Guid` | Silicon being ID |
-| `allowed` | `bool` | Whether to allow |
-| `addToCache` | `bool` | Whether to cache the decision |
-| `cacheDuration` | `double` | Cache duration (hours) |
-
-**Response**:
-```json
-{
-  "success": true
-}
-```
-
-### Get Dashboard Data
-
-**GET** `/api/dashboard`
-
-**Response**:
-```json
-{
-  "beings": {
-    "total": 5,
-    "running": 3,
-    "stopped": 2
-  },
-  "performance": {
-    "cpu": 45.2,
-    "memory": 1024,
-    "uptime": 86400
-  },
-  "aiUsage": {
-    "todayTokens": 50000,
-    "todayCost": 0.05
-  }
-}
-```
-
-### Get System Status
-
-**GET** `/api/status`
-
-**Response**:
-```json
-{
-  "version": "1.0.0",
-  "runtime": ".NET 9.0",
-  "uptime": 86400,
-  "health": "healthy"
-}
-```
-
 ---
 
 ## Error Responses
@@ -591,7 +1268,7 @@ All endpoints return standardized error responses:
   "error": {
     "code": "PERMISSION_DENIED",
     "message": "You don't have permission to access this resource",
-    "details": "Required: disk:write, Current: disk:read"
+    "details": "Required: FileAccess, Denied by GlobalACL"
   }
 }
 ```
@@ -610,12 +1287,12 @@ All endpoints return standardized error responses:
 
 ## SSE Events
 
-Server-Sent Events for real-time updates:
+Server-Sent Events are used for real-time updates:
 
 ### Chat Events
 
 ```javascript
-const eventSource = new EventSource('/api/chat/stream?beingId=xxx&message=xxx');
+const eventSource = new EventSource('/api/chat/stream');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);
@@ -637,44 +1314,20 @@ eventSource.onmessage = (event) => {
 };
 ```
 
-### Being Status Events
-
-```javascript
-const beingEvents = new EventSource('/api/beings/events');
-
-beingEvents.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  console.log(`Being ${data.beingId} status: ${data.status}`);
-};
-```
-
 ---
 
-## AI Client API
+## AI Client Interface
 
 ### IAIClient Interface
 
 ```csharp
 public interface IAIClient
 {
-    string Endpoint { get; }
-    string DefaultModel { get; }
-    bool? StreamingMode { get; }
-    bool? SupportsToolCalls { get; }
+    string Name { get; }
     
-    AIResponse Chat(AIRequest request);
     Task<AIResponse> ChatAsync(AIRequest request);
-    IAsyncEnumerable<AIResponse> ChatStreamAsync(AIRequest request, CancellationToken cancellationToken = default);
     
-    AIResponse Chat(string userMessage);
-    Task<AIResponse> ChatAsync(string userMessage);
-    AIResponse Chat(string systemPrompt, string userMessage);
-    Task<AIResponse> ChatAsync(string systemPrompt, string userMessage);
-    
-    AIResponse Generate(string prompt);
-    Task<AIResponse> GenerateAsync(string prompt);
-    AIResponse Generate(string systemPrompt, string prompt);
-    Task<AIResponse> GenerateAsync(string systemPrompt, string prompt);
+    IAsyncEnumerable<string> StreamChatAsync(AIRequest request);
 }
 ```
 
@@ -683,9 +1336,11 @@ public interface IAIClient
 ```csharp
 public class AIRequest
 {
-    public string Model { get; set; } = string.Empty;
-    public List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
-    public List<ToolDefinition>? Tools { get; set; }
+    public List<Message> Messages { get; set; }
+    public List<ToolDefinition> Tools { get; set; }
+    public double Temperature { get; set; } = 0.7;
+    public int MaxTokens { get; set; } = 2000;
+    public string Model { get; set; }
 }
 ```
 
@@ -694,330 +1349,16 @@ public class AIRequest
 ```csharp
 public class AIResponse
 {
-    public string Model { get; set; } = string.Empty;
-    public string Content { get; set; } = string.Empty;
-    public string? Thinking { get; set; }
-    public List<ToolCall>? ToolCalls { get; set; }
-    public int? PromptTokens { get; set; }
-    public int? CompletionTokens { get; set; }
-    public int? TotalTokens { get; set; }
-    public bool Success { get; set; } = true;
-    public string? ErrorMessage { get; set; }
-    public bool IsStreamFinal { get; set; }
-    public bool HasToolCalls => ToolCalls != null && ToolCalls.Count > 0;
+    public string Content { get; set; }
+    public List<ToolCall> ToolCalls { get; set; }
+    public TokenUsage Usage { get; set; }
+    public string Model { get; set; }
 }
 ```
 
 ---
 
-## Work Notes API
-
-### Get Work Notes List
-
-**GET** `/api/beings/{id}/work-notes`
-
-**Response**:
-```json
-{
-  "notes": [
-    {
-      "id": "note-uuid",
-      "pageNumber": 1,
-      "summary": "Completed user authentication module",
-      "keywords": ["authentication", "JWT", "OAuth2"],
-      "createdAt": "2026-04-25T10:00:00Z",
-      "updatedAt": "2026-04-25T10:00:00Z"
-    }
-  ],
-  "totalCount": 15
-}
-```
-
-### Get Single Note Details
-
-**GET** `/api/beings/{id}/work-notes/{pageNumber}`
-
-**Response**:
-```json
-{
-  "id": "note-uuid",
-  "pageNumber": 1,
-  "summary": "Completed user authentication module",
-  "content": "## Implementation Details\n\n- Using JWT token\n- Supports OAuth2",
-  "keywords": ["authentication", "JWT", "OAuth2"],
-  "createdAt": "2026-04-25T10:00:00Z",
-  "updatedAt": "2026-04-25T10:00:00Z"
-}
-```
-
-### Create New Note
-
-**POST** `/api/beings/{id}/work-notes`
-
-**Request**:
-```json
-{
-  "summary": "Completed user authentication module",
-  "content": "## Implementation Details\n\n- Using JWT token",
-  "keywords": "authentication,JWT,OAuth2"
-}
-```
-
-**Response**: `201 Created`
-
-### Update Note
-
-**PUT** `/api/beings/{id}/work-notes/{pageNumber}`
-
-**Request**:
-```json
-{
-  "summary": "Completed user authentication module and tests",
-  "content": "## Updated Content\n\nAdded unit tests",
-  "keywords": "authentication,JWT,OAuth2,tests"
-}
-```
-
-### Delete Note
-
-**DELETE** `/api/beings/{id}/work-notes/{pageNumber}`
-
-### Search Notes
-
-**GET** `/api/beings/{id}/work-notes/search?keyword=authentication&maxResults=10`
-
-### Get Notes Directory
-
-**GET** `/api/beings/{id}/work-notes/directory`
-
----
-
-## Knowledge Network API
-
-### Get Knowledge Statistics
-
-**GET** `/api/knowledge/stats`
-
-**Response**:
-```json
-{
-  "totalTriples": 1523,
-  "totalSubjects": 450,
-  "totalPredicates": 85,
-  "totalObjects": 892,
-  "averageConfidence": 0.87
-}
-```
-
-### Add Knowledge Triple
-
-**POST** `/api/knowledge/triples`
-
-**Request**:
-```json
-{
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language",
-  "confidence": 0.95,
-  "tags": ["programming", "language"]
-}
-```
-
-**Response**: `201 Created`
-
-### Query Knowledge
-
-**GET** `/api/knowledge/query?subject=Python&predicate=is_a`
-
-**Response**:
-```json
-{
-  "triples": [
-    {
-      "subject": "Python",
-      "predicate": "is_a",
-      "object": "programming_language",
-      "confidence": 0.95,
-      "tags": ["programming", "language"]
-    }
-  ]
-}
-```
-
-### Search Knowledge
-
-**GET** `/api/knowledge/search?query=programming+language&limit=10`
-
-### Get Knowledge Path
-
-**GET** `/api/knowledge/path?from=Python&to=computer_science`
-
-**Response**:
-```json
-{
-  "path": [
-    {"subject": "Python", "predicate": "is_a", "object": "programming_language"},
-    {"subject": "programming_language", "predicate": "belongs_to", "object": "computer_science"}
-  ],
-  "length": 2
-}
-```
-
-### Validate Knowledge
-
-**POST** `/api/knowledge/validate`
-
-**Request**:
-```json
-{
-  "subject": "Python",
-  "predicate": "is_a",
-  "object": "programming_language"
-}
-```
-
-### Delete Knowledge
-
-**DELETE** `/api/knowledge/triples/{id}`
-
----
-
-## Help Documentation System API
-
-### Get Help Documentation List
-
-**GET** `/api/help`
-
-**Response**:
-```json
-{
-  "topics": [
-    {
-      "id": "getting-started",
-      "title": "Getting Started",
-      "category": "Getting Started Guide"
-    }
-  ]
-}
-```
-
-### Get Help Documentation Details
-
-**GET** `/api/help/{topicId}`
-
-**Response**:
-```json
-{
-  "id": "getting-started",
-  "title": "Getting Started",
-  "content": "# Getting Started\n\n...",
-  "category": "Getting Started Guide"
-}
-```
-
----
-
-## WebView Browser API
-
-### Get Browser Status
-
-**GET** `/api/beings/{id}/browser/status`
-
-**Response**:
-```json
-{
-  "is_open": true,
-  "current_url": "https://example.com",
-  "page_title": "Example Page",
-  "is_loading": false,
-  "last_operation_time": "2026-04-26T10:00:00Z"
-}
-```
-
-### Open Browser
-
-**POST** `/api/beings/{id}/browser/open`
-
-### Close Browser
-
-**POST** `/api/beings/{id}/browser/close`
-
-### Navigate to URL
-
-**POST** `/api/beings/{id}/browser/navigate`
-
-**Request**:
-```json
-{
-  "url": "https://example.com"
-}
-```
-
-### Execute JavaScript
-
-**POST** `/api/beings/{id}/browser/execute-script`
-
-**Request**:
-```json
-{
-  "script": "return document.title;"
-}
-```
-
-### Get Page Screenshot
-
-**GET** `/api/beings/{id}/browser/screenshot`
-
----
-
-## Project Workspace API
-
-### Get Project List
-
-**GET** `/api/projects`
-
-**Response**:
-```json
-{
-  "projects": [
-    {
-      "id": "project-uuid",
-      "name": "My Project",
-      "description": "Project description",
-      "createdAt": "2026-04-25T10:00:00Z"
-    }
-  ]
-}
-```
-
-### Create Project
-
-**POST** `/api/projects`
-
-**Request**:
-```json
-{
-  "name": "My Project",
-  "description": "Project description"
-}
-```
-
-### Get Project Details
-
-**GET** `/api/projects/{id}`
-
-### Update Project
-
-**PUT** `/api/projects/{id}`
-
-### Delete Project
-
-**DELETE** `/api/projects/{id}`
-
----
-
-## Tool System API
+## Tool System Interface
 
 ### ITool Interface
 
@@ -1026,10 +1367,9 @@ public interface ITool
 {
     string Name { get; }
     string Description { get; }
-    string GetDisplayName(Language language);
-    Dictionary<string, object> GetParameterSchema();
+    ToolDefinition Definition { get; }
     
-    ToolResult Execute(Guid callerId, Dictionary<string, object> parameters);
+    Task<ToolResult> ExecuteAsync(ToolCall call);
 }
 ```
 
@@ -1038,9 +1378,9 @@ public interface ITool
 ```csharp
 public class ToolCall
 {
-    public string Id { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public Dictionary<string, object> Arguments { get; set; } = new();
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public Dictionary<string, object> Parameters { get; set; }
 }
 ```
 
@@ -1049,9 +1389,9 @@ public class ToolCall
 ```csharp
 public class ToolResult
 {
-    public bool Success { get; }
-    public string Message { get; }
-    public object? Data { get; }
+    public bool Success { get; set; }
+    public string Output { get; set; }
+    public string Error { get; set; }
 }
 ```
 
@@ -1059,7 +1399,7 @@ public class ToolResult
 
 ## Next Steps
 
-- 🚀 View [Getting Started Guide](getting-started.md)
-- 🛠️ Read [Development Guide](development-guide.md)
-- 📚 View [Architecture Document](architecture.md)
-- 🔒 Learn about [Security Model](security.md)
+- 🚀 Check out the [Getting Started Guide](getting-started.md)
+- 🛠️ Read the [Development Guide](development-guide.md)
+- 📚 View the [Architecture Documentation](architecture.md)
+- 🔒 Learn about the [Security Model](security.md)

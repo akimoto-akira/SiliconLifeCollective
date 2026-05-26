@@ -1,4 +1,4 @@
-﻿# Meet Your Digital Companions
+# Meet Your Digital Companions
 
 > **Version: v0.2.0-alpha**
 
@@ -21,7 +21,7 @@ Ask them about any date in any calendar system:
 - "When does Ramadan start?"
 - "How many days until my anniversary?"
 
-They understand over 30 different calendar systems from around the world.
+They understand 32 different calendar systems from around the world.
 
 ### 💬 Chat with them anytime
 
@@ -124,7 +124,7 @@ Extend functionality through plugins — community-built tools and capabilities 
 ### Dual Version Options
 
 - **Default Version**: Lightweight console application, suitable for development debugging and resource-constrained environments
-- **Fast Version**: High-performance Windows application, using SpeedyPack in-memory storage engine, suitable for production deployment
+- **Fast Version**: High-performance cross-platform desktop application (Windows/macOS/Linux), using SpeedyPack in-memory storage engine, suitable for production deployment
 
 ### Built by a community
 

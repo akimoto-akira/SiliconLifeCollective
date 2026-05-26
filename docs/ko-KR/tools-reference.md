@@ -1,33 +1,51 @@
-﻿# 도구 참고
+# 툴 참고
 
 > **버전: v0.2.0-alpha**
+
+이 문서는 실리콘 라이프 콜렉티브 플랫폼의 모든 내장 툴을 자세히 소개합니다.
 
 [English](../en/tools-reference.md) | [Deutsch](../de-DE/tools-reference.md) | [中文](../zh-CN/tools-reference.md) | [繁體中文](../zh-HK/tools-reference.md) | [Español](../es-ES/tools-reference.md) | [日本語](../ja-JP/tools-reference.md) | **한국어** | [Čeština](../cs-CZ/tools-reference.md) | [Русский](../ru-RU/tools-reference.md)
 
 ## 개요
 
-도구 시스템은 실리콘 생명체가 표준화된 인터페이스를 통해 외부 세계와 상호작용할 수 있게 합니다. 각 도구는 `ITool` 인터페이스를 구현하며, `ToolManager`가 리플렉션을 통해 자동으로 발견하고 등록합니다.
+툴 시스템은 실리콘 비잉이 표준화된 인터페이스를 통해 외부 세계와 상호작용할 수 있게 합니다. 각 툴은 `ITool` 인터페이스를 구현하며, `ToolManager`가 리플렉션을 통해 자동으로 발견하고 등록합니다.
 
-### 도구 분류
+### 툴 분류
 
-- **시스템 관리 도구** — 설정, 권한, 동적 컴파일
-- **통신 도구** — 채팅, 네트워크 요청
-- **데이터 저장 도구** — 디스크 작업, 데이터베이스, 메모리, 작업 노트
-- **시간 관리 도구** — 캘린더, 타이머, 작업
-- **개발 도구** — 코드 실행, 로그 쿼리
-- **유틸리티 도구** — 시스템 정보, Token 감사, 도움말 문서, 지식 네트워크
-- **브라우저 도구** — WebView 브라우저 자동화
-- **플러그인 도구** — 플러그인 시스템을 통해 등록된 서드파티 도구
+- **시스템 관리 툴** — 설정, 권한, 동적 컴파일, 큐레이터 관리
+- **통신 툴** — 채팅, 네트워크 요청
+- **데이터 저장 툴** — 디스크 작업, 데이터베이스, 메모리, 워크 노트
+- **시간 관리 툴** — 캘린더, 타이머, 태스크
+- **개발 툴** — 코드 실행, 로그 쿼리
+- **유틸리티 툴** — 시스템 정보, 토큰 사용 감사, 도움말 문서, 노리지 네트워크
+- **브라우저 툴** — WebView 브라우저 자동화
+- **프로젝트 툴** — 프로젝트 관리, 프로젝트 태스크, 프로젝트 워크 노트, 프로젝트 워크
+- **플러그인 툴** — 플러그인 시스템을 통해 등록된 서드파티 툴
+
+### 툴 시나리오 시스템
+
+각 툴은 `[ToolScenario]` 속성을 통해 사용 가능한 시나리오를 선언합니다:
+
+| 시나리오 플래그 | 값 | 설명 |
+|----------|------|-------------|
+| `Chat` | `1 << 0` | 채팅 시나리오 (사용자가 실리콘 비잉과 대화할 때) |
+| `Task` | `1 << 1` | 태스크 시나리오 (실리콘 비잉이 태스크를 실행할 때) |
+| `Timer` | `1 << 2` | 타이머 시나리오 (실리콘 비잉이 타이머 태스크를 실행할 때) |
+| `MemoryCompression` | `1 << 3` | 메모리 압축 시나리오 |
+| `Project` | `1 << 4` | 프로젝트 시나리오 (ThinkOnProject 모드) |
+| `All` | 상기 모두 | 모든 시나리오에서 사용 가능 |
+
+또한 `[ChatOnly]` 속성이 표시된 툴은 채팅 시나리오에서만 사용 가능하며(예: HelpTool), 태스크 및 타이머 시나리오에는 나타나지 않습니다.
 
 ---
 
-## 내장 도구 목록
+## 내장 툴 목록
 
-### 1. 캘린더 도구 (CalendarTool)
+### 1. 캘린더 툴 (CalendarTool)
 
-**도구 이름**: `calendar`
+**툴 이름**: `calendar`
 
-**기능 설명**: 32가지 캘린더 시스템의 날짜 변환 및 계산 지원.
+**기능 설명**: 32가지 캘린더 시스템의 날짜 변환 및 계산을 지원합니다.
 
 **지원 작업**:
 - `now` — 현재 시간 가져오기
@@ -64,11 +82,11 @@
 
 ---
 
-### 2. 채팅 도구 (ChatTool)
+### 2. 채팅 툴 (ChatTool)
 
-**도구 이름**: `chat`
+**툴 이름**: `chat`
 
-**기능 설명**: 채팅 세션 관리 및 메시지 전송.
+**기능 설명**: 채팅 세션 및 메시지 전송 관리.
 
 **지원 작업**:
 - `send_message` — 메시지 보내기
@@ -90,9 +108,9 @@
 
 ---
 
-### 3. 설정 도구 (ConfigTool)
+### 3. 설정 툴 (ConfigTool)
 
-**도구 이름**: `config`
+**툴 이름**: `config`
 
 **기능 설명**: 시스템 설정 읽기 및 수정.
 
@@ -113,35 +131,36 @@
 
 ---
 
-### 4. 큐레이터 도구 (CuratorTool) 🔒
+### 4. 큐레이터 툴 (CuratorTool) 🔒
 
-**도구 이름**: `curator`
+**툴 이름**: `silicon_manager`
 
-**권한 요구사항**: 실리콘 큐레이터 전용
+**권한 요구사항**: 실리콘 큐레이터 전용 (`[SiliconManagerOnly]`)
 
-**기능 설명**: 실리콘 큐레이터 전용 시스템 관리 도구.
+**사용 가능 시나리오**: Chat, Task, Timer
+
+**기능 설명**: 실리콘 큐레이터 전용 시스템 관리 툴로, 실리콘 비잉의 생성, 조회 및 리셋을 관리합니다.
 
 **지원 작업**:
-- `create_being` — 새 실리콘 생명체 만들기
-- `list_beings` — 모든 실리콘 생명체 나열
-- `get_being_info` — 생명체 정보 가져오기
-- `assign_task` — 작업 할당
-- `manage_permissions` — 권한 관리
+- `list_beings` — 모든 실리콘 비잉 및 상태 나열
+- `create_being` — 새 실리콘 비잉 만들기 (`name` 및 `soul` 매개변수 필요)
+- `get_code` — 실리콘 비잉의 커스텀 소스 코드 보기
+- `reset` — 실리콘 비잉을 기본 구현으로 리셋
 
 **사용 예시**:
 ```json
 {
   "action": "create_being",
   "name": "어시스턴트",
-  "soul_file": "assistant_soul.md"
+  "soul": "당신은 유용한 어시스턴트입니다..."
 }
 ```
 
 ---
 
-### 5. 데이터베이스 도구 (DatabaseTool)
+### 5. 데이터베이스 툴 (DatabaseTool)
 
-**도구 이름**: `database`
+**툴 이름**: `database`
 
 **기능 설명**: 구조화된 데이터베이스 쿼리 및 작업.
 
@@ -165,9 +184,9 @@
 
 ---
 
-### 6. 디스크 도구 (DiskTool)
+### 6. 디스크 툴 (DiskTool)
 
-**도구 이름**: `disk`
+**툴 이름**: `disk`
 
 **기능 설명**: 파일 시스템 작업 및 로컬 검색.
 
@@ -183,7 +202,7 @@
 - `read_lines` — 지정된 행 읽기
 - `replace_text` — 텍스트 교체
 
-**권한 요구사항**: `disk:read`, `disk:write`
+**권한 요구사항**: `FileAccess`
 
 **사용 예시**:
 ```json
@@ -195,11 +214,11 @@
 
 ---
 
-### 7. 동적 컴파일 도구 (DynamicCompileTool) 🔒
+### 7. 동적 컴파일 툴 (DynamicCompileTool) 🔒
 
-**도구 이름**: `compile`
+**툴 이름**: `compile`
 
-**기능 설명**: C# 코드 동적 컴파일 (실리콘 생명체 자가 진화용).
+**기능 설명**: C# 코드 동적 컴파일 (실리콘 비잉 자가 진화용).
 
 **지원 작업**:
 - `compile_class` — 클래스 컴파일
@@ -221,9 +240,9 @@
 
 ---
 
-### 8. 코드 실행 도구 (ExecuteCodeTool) 🔒
+### 8. 코드 실행 툴 (ExecuteCodeTool) 🔒
 
-**도구 이름**: `execute_code`
+**툴 이름**: `execute_code`
 
 **권한 요구사항**: 실리콘 큐레이터 전용
 
@@ -243,29 +262,32 @@
 
 ---
 
-### 9. 도움말 도구 (HelpTool)
+### 9. 도움말 툴 (HelpTool)
 
-**도구 이름**: `help`
+**툴 이름**: `help`
 
-**기능 설명**: 시스템 도움말 문서 및 사용 가이드 가져오기.
+**사용 가능 시나리오**: Chat (`[ChatOnly]`, 채팅 시나리오에서만 사용 가능)
+
+**기능 설명**: 시스템 도움말 문서 콘텐츠 검색 및 가져오기, AI가 시스템 기능 사용 방법을 쿼리할 수 있도록 합니다.
 
 **지원 작업**:
-- `get_topics` — 도움말 주제 목록 가져오기
-- `get_topic` — 특정 주제 세부정보 가져오기
-- `search` — 도움말 문서 검색
+- `list` — 모든 도움말 주제 ID 나열
+- `search` — 키워드로 도움말 문서 검색
+- `get` — 지정된 ID의 도움말 문서 콘텐츠 가져오기
 
 **사용 예시**:
 ```json
 {
-  "action": "get_topics"
+  "action": "search",
+  "keyword": "권한"
 }
 ```
 
 ---
 
-### 10. 지식 네트워크 도구 (KnowledgeTool)
+### 10. 노리지 네트워크 툴 (KnowledgeTool)
 
-**도구 이름**: `knowledge`
+**툴 이름**: `knowledge`
 
 **기능 설명**: 지식 그래프 작업 (트리플 기반: 주어-관계-목적어).
 
@@ -292,9 +314,9 @@
 
 ---
 
-### 11. 로그 도구 (LogTool)
+### 11. 로그 툴 (LogTool)
 
-**도구 이름**: `log`
+**툴 이름**: `log`
 
 **기능 설명**: 작업 히스토리 및 대화 히스토리 쿼리.
 
@@ -316,11 +338,11 @@
 
 ---
 
-### 12. 메모리 도구 (MemoryTool)
+### 12. 메모리 툴 (MemoryTool)
 
-**도구 이름**: `memory`
+**툴 이름**: `memory`
 
-**기능 설명**: 실리콘 생명체의 장기 및 단기 메모리 관리.
+**기능 설명**: 실리콘 비잉의 장기 및 단기 메모리 관리.
 
 **지원 작업**:
 - `read` — 메모리 읽기
@@ -345,9 +367,9 @@
 
 ---
 
-### 13. 네트워크 도구 (NetworkTool)
+### 13. 네트워크 툴 (NetworkTool)
 
-**도구 이름**: `network`
+**툴 이름**: `network`
 
 **기능 설명**: HTTP/HTTPS 요청 시작.
 
@@ -371,9 +393,9 @@
 
 ---
 
-### 14. 권한 도구 (PermissionTool) 🔒
+### 14. 퍼미션 툴 (PermissionTool) 🔒
 
-**도구 이름**: `permission`
+**툴 이름**: `permission`
 
 **권한 요구사항**: 실리콘 큐레이터 전용
 
@@ -398,18 +420,30 @@
 
 ---
 
-### 15. 프로젝트 도구 (ProjectTool)
+### 15. 프로젝트 툴 (ProjectTool) 🔒
 
-**도구 이름**: `project`
+**툴 이름**: `project`
 
-**기능 설명**: 프로젝트 워크스페이스 관리.
+**권한 요구사항**: 실리콘 큐레이터 전용 (`[SiliconManagerOnly]`)
+
+**사용 가능 시나리오**: Chat, Task, Timer
+
+**기능 설명**: 프로젝트 워크스페이스 관리, 프로젝트 라이프사이클 관리, 멤버 할당 및 역할 관리를 지원합니다.
 
 **지원 작업**:
-- `create` — 프로젝트 만들기
-- `list` — 프로젝트 나열
-- `get_info` — 프로젝트 정보 가져오기
-- `update` — 프로젝트 업데이트
+- `create` — 새 프로젝트 공간 만들기
 - `archive` — 프로젝트 보관
+- `restore` — 보관된 프로젝트 복원
+- `destroy` — 프로젝트 삭제 및 데이터 정리 (복구 불가)
+- `list` — 모든 프로젝트 나열
+- `get` — 프로젝트 상세 정보 가져오기
+- `assign` — 실리콘 비잉을 프로젝트에 할당
+- `remove` — 프로젝트에서 실리콘 비잉 제거
+- `update` — 프로젝트 이름/설명 업데이트
+- `list-workflow-templates` — 사용 가능한 워크플로 템플릿 나열
+- `assign_role` — 실리콘 비잉에게 프로젝트 역할 할당
+- `remove_role` — 실리콘 비잉의 프로젝트 역할 제거
+- `list_roles` — 프로젝트의 역할 할당 나열
 
 **사용 예시**:
 ```json
@@ -422,45 +456,56 @@
 
 ---
 
-### 16. 프로젝트 작업 도구 (ProjectTaskTool)
+### 16. 프로젝트 태스크 툴 (ProjectTaskTool)
 
-**도구 이름**: `project_task`
+**툴 이름**: `project_task`
 
-**기능 설명**: 프로젝트 작업 관리.
+**사용 가능 시나리오**: Chat, Task, Timer
+
+**기능 설명**: 프로젝트 공간 내 태스크 관리, 완전한 태스크 라이프사이클을 지원합니다.
 
 **지원 작업**:
-- `create` — 작업 만들기
-- `list` — 작업 나열
-- `update` — 작업 업데이트
-- `complete` — 작업 완료
-- `get_stats` — 작업 통계 가져오기
+- `create` — 프로젝트 태스크 만들기
+- `list` — 프로젝트 태스크 나열
+- `get` — 태스크 상세 정보 가져오기
+- `update` — 태스크 제목/설명/우선순위 업데이트
+- `assign` — 태스크에 담당자 할당
+- `remove_assignee` — 태스크 담당자 제거
+- `start` — 태스크 시작
+- `complete` — 태스크 완료 표시
+- `fail` — 태스크 실패 표시
+- `cancel` — 태스크 취소
+- `delete` — 태스크 삭제
+- `stats` — 태스크 통계 가져오기
 
 **사용 예시**:
 ```json
 {
   "action": "create",
   "project_id": "project-uuid",
-  "description": "작업 설명 완료",
+  "description": "태스크 설명 완료",
   "priority": 5
 }
 ```
 
 ---
 
-### 17. 프로젝트 작업 노트 도구 (ProjectWorkNoteTool)
+### 17. 프로젝트 워크 노트 툴 (ProjectWorkNoteTool)
 
-**도구 이름**: `project_work_note`
+**툴 이름**: `project_work_note`
 
-**기능 설명**: 프로젝트 작업 노트 관리 (공개, 작업장 비슷).
+**사용 가능 시나리오**: Chat, Task, Timer
+
+**기능 설명**: 프로젝트 공간 내 워크 노트 관리 (공개, 작업장 비슷), 페이지식 노트 관리를 지원합니다.
 
 **지원 작업**:
-- `create` — 노트 만들기
-- `read` — 노트 읽기
-- `update` — 노트 업데이트
-- `delete` — 노트 삭제
-- `list` — 노트 나열
-- `search` — 노트 검색
-- `directory` — 목차 생성
+- `create` — 노트 페이지 만들기 (`project_id`, `summary` 및 `content` 필요, `keywords` 선택)
+- `read` — 노트 페이지 읽기 (`project_id` 및 `page_number` 또는 `note_id` 필요)
+- `update` — 노트 페이지 업데이트 (`project_id`, `page_number` 및 `content` 필요, `summary` 및 `keywords` 선택)
+- `delete` — 노트 페이지 삭제 (`project_id` 및 `page_number` 또는 `note_id` 필요)
+- `list` — 프로젝트의 모든 노트 페이지 요약 나열
+- `directory` — 노트 목차/개요 생성
+- `search` — 키워드로 노트 검색 (`project_id` 및 `keyword` 필요, `max_results` 선택)
 
 **사용 예시**:
 ```json
@@ -475,9 +520,38 @@
 
 ---
 
-### 18. 시스템 도구 (SystemTool)
+### 18. 프로젝트 워크 툴 (ProjectWorkTool) 🔒
 
-**도구 이름**: `system`
+**툴 이름**: `project_work`
+
+**권한 요구사항**: 실리콘 큐레이터 전용 (`[SiliconManagerOnly]`)
+
+**사용 가능 시나리오**: Project (`[ToolScenario(ToolScenarioFlag.Project)]`, 프로젝트 시나리오에서만 사용 가능)
+
+**기능 설명**: 프로젝트 워크 작업 툴로, 큐레이터가 ThinkOnProject 시나리오에서 프로젝트 워크플로를 관리하는 데 사용합니다.
+
+**지원 작업**:
+- `create-task` — 프로젝트 태스크 만들기
+- `assign-task` — 태스크에 실리콘 비잉 할당
+- `chat` — 프로젝트 그룹 채팅에 메시지 보내기
+- `broadcast` — 프로젝트 채널에 메시지 브로드캐스트
+- `complete` — 프로젝트 완료 표시
+- `status` — 프로젝트 상태 가져오기
+
+**사용 예시**:
+```json
+{
+  "action": "create-task",
+  "project_id": "project-uuid",
+  "title": "사용자 인증 구현"
+}
+```
+
+---
+
+### 19. 시스템 툴 (SystemTool)
+
+**툴 이름**: `system`
 
 **기능 설명**: 시스템 정보 및 리소스 사용 현황 가져오기.
 
@@ -485,7 +559,7 @@
 - `info` — 시스템 정보 가져오기
 - `resource_usage` — 리소스 사용 현황 가져오기
 - `find_process` — 프로세스 찾기
-- `list_beings` — 실리콘 생명체 나열
+- `list_beings` — 실리콘 비잉 나열
 
 **사용 예시**:
 ```json
@@ -496,34 +570,34 @@
 
 ---
 
-### 19. 작업 도구 (TaskTool)
+### 20. 태스크 툴 (TaskTool)
 
-**도구 이름**: `task`
+**툴 이름**: `task`
 
-**기능 설명**: 실리콘 생명체 개인 작업 관리.
+**기능 설명**: 실리콘 비잉 개인 태스크 관리.
 
 **지원 작업**:
-- `create` — 작업 만들기
-- `list` — 작업 나열
-- `update` — 작업 업데이트
-- `complete` — 작업 완료
-- `delete` — 작업 삭제
+- `create` — 태스크 만들기
+- `list` — 태스크 나열
+- `update` — 태스크 업데이트
+- `complete` — 태스크 완료
+- `delete` — 태스크 삭제
 - `get_dependencies` — 의존성 가져오기
 
 **사용 예시**:
 ```json
 {
   "action": "create",
-  "description": "코드 검토",
+  "description": "코드 리뷰",
   "priority": 5
 }
 ```
 
 ---
 
-### 20. 타이머 도구 (TimerTool)
+### 21. 타이머 툴 (TimerTool)
 
-**도구 이름**: `timer`
+**툴 이름**: `timer`
 
 **기능 설명**: 타이머 만들기 및 관리.
 
@@ -547,52 +621,63 @@
 
 ---
 
-### 21. Token 감사 도구 (TokenAuditTool) 🔒
+### 22. 토큰 사용 감사 툴 (TokenAuditTool) 🔒
 
-**도구 이름**: `token_audit`
+**툴 이름**: `token_audit`
 
-**권한 요구사항**: 실리콘 큐레이터 전용
+**권한 요구사항**: 실리콘 큐레이터 전용 (`[SiliconManagerOnly]`)
 
-**기능 설명**: AI token 사용 현황 쿼리 및 집계.
+**사용 가능 시나리오**: Chat, Task, Timer
+
+**기능 설명**: AI 토큰 사용 통계 및 추세 데이터 쿼리.
 
 **지원 작업**:
-- `get_usage` — token 사용 통계 가져오기
-- `get_by_being` — 생명체별 사용 현황 가져오기
-- `get_by_model` — 모델별 사용 현황 가져오기
-- `get_trend` — 사용 추세 가져오기
-- `export` — 데이터 내보내기
+- `summary` — 토큰 사용 요약 통계 가져오기
+- `trend` — 토큰 사용 추세 데이터 포인트 가져오기
+
+**지원 시간 범위**:
+- `today` — 최근 24시간
+- `week` — 최근 7×24시간
+- `month` — 일별 통계
+- `year` — 월별 통계
 
 **사용 예시**:
 ```json
 {
-  "action": "get_usage",
-  "start_date": "2026-04-01",
-  "end_date": "2026-04-26"
+  "action": "summary",
+  "time_range": "week"
 }
 ```
 
 ---
 
-### 22. WebView 브라우저 도구 (WebViewBrowserTool)
+### 23. WebView 브라우저 툴 (WebViewBrowserTool)
 
-**도구 이름**: `webview`
+**툴 이름**: `webview_browser`
 
-**기능 설명**: Playwright 기반 브라우저 자동화 작업.
+**사용 가능 시나리오**: Chat, Task, Timer
+
+**기능 설명**: Playwright 기반 브라우저 자동화 작업으로, 완전한 웹 페이지 탐색, 상호작용 및 데이터 추출 기능을 제공합니다.
 
 **지원 작업**:
-- `open_browser` — 브라우저 열기
-- `close_browser` — 브라우저 닫기
+- `open` — 브라우저 열기
+- `close` — 브라우저 닫기
 - `navigate` — URL로 이동
 - `click` — 요소 클릭
 - `input` — 텍스트 입력
+- `scroll` — 페이지 스크롤
+- `execute_script` — JavaScript 실행
 - `get_page_text` — 페이지 텍스트 가져오기
 - `get_screenshot` — 스크린샷 가져오기
-- `execute_script` — JavaScript 실행
 - `wait_for_element` — 요소 나타날 때까지 대기
+- `get_element_info` — 요소 정보 가져오기
+- `upload_file` — 파일 업로드
 - `get_browser_status` — 브라우저 상태 가져오기
+- `set_timeout` — 타임아웃 설정
+- `clear_session` — 브라우저 세션 초기화
 
-**기능**:
-- 각 실리콘 생명체 독립 인스턴스
+**특징**:
+- 각 실리콘 비잉 독립 인스턴스
 - 완전히 격리된 Cookie 및 세션
 - 사용자에게 완전히 보이지 않음 (헤드리스 모드)
 - 완전한 JavaScript 및 CSS 지원
@@ -607,11 +692,11 @@
 
 ---
 
-### 23. 작업 노트 도구 (WorkNoteTool)
+### 24. 워크 노트 툴 (WorkNoteTool)
 
-**도구 이름**: `work_note`
+**툴 이름**: `work_note`
 
-**기능 설명**: 실리콘 생명체 개인 작업 노트 관리 (비공개, 일기장 비슷).
+**기능 설명**: 실리콘 비잉 개인 워크 노트 관리 (비공개, 일기장 비슷).
 
 **지원 작업**:
 - `create` — 노트 만들기
@@ -634,11 +719,11 @@
 
 ---
 
-### 24. 핫 리로드 도구 (HotReloadTool)
+### 25. 핫 리로드 툴 (HotReloadTool)
 
-**도구 이름**: `hot_reload`
+**툴 이름**: `hot_reload`
 
-**기능 설명**: SiliconLife.Fast 가 실행 중인 동안 자동으로 컴파일, 파일 업데이트 및 재시작 지원, 수동 개입 불필요.
+**기능 설명**: SiliconLife.Fast가 실행 중인 동안 자동으로 컴파일, 파일 업데이트 및 재시작을 지원하며, 수동 개입이 필요 없습니다.
 
 **지원 작업**:
 - `execute` — 전체 빌드, 복사 및 재시작 프로세스 실행
@@ -647,14 +732,14 @@
 **워크플로우**:
 1. SiliconLife.Fast 프로젝트 컴파일
 2. 현재 실행 중인 Fast 인스턴스 정상 종료 (HTTP API 통해)
-3. 프로세스 종료 및 포트释放 대기
+3. 프로세스 종료 및 포트 해제 대기
 4. 빌드 출력물을 대상 디렉토리로 복사 (HotReload 자체 파일 제외)
 5. Fast 인스턴스 재시작
 
 **특징**:
 - 이전 프로세스 자동 감지 및 종료
 - 안전한 파일 복사 (HotReload.exe 덮어쓰지 않음)
-- 포트释放 대기 메커니즘
+- 포트 해제 대기 메커니즘
 - 사용자 정의 포트 구성 지원
 
 **사용 예시**:
@@ -677,11 +762,11 @@
 **주의 사항**:
 - SiliconLife.Fast 버전에서만 적용 가능
 - tools/HotReload 디렉토리에 HotReload.exe 필요
-- 재시작 과정에서 짧은 서비스 중단 있음 (약 3-5 초)
+- 재시작 과정에서 짧은 서비스 중단 있음 (약 3-5초)
 
 ---
 
-## 도구 호출 프로세스
+## 툴 호출 프로세스
 
 ```
 ┌──────────┐
@@ -689,7 +774,7 @@
 └────┬─────┘
      ↓
 ┌──────────────┐
-│ ToolManager  │ 도구 사용 권한 찾기 및 검증
+│ ToolManager  │ 툴 사용 권한 찾기 및 검증
 └────┬─────────┘
      ↓
 ┌──────────────┐
@@ -702,21 +787,19 @@
 └────┬─────────┘
      ↓
 ┌──────────┐
-│   AI     │ 도구 결과 수신, 계속 생각
+│   AI     │ 툴 결과 수신, 계속 생각
 └──────────┘
 ```
 
 ## 권한 검증
 
-모든 도구 실행은 5단계 권한 검증 체인을 통과합니다:
+모든 툴 실행은 권한 검증 체인을 통과합니다:
 
-1. **UserFrequencyCache** — 사용자 고빈도 허용/거부 캐시 (HighDeny/HighAllow)
-2. **IPermissionCallback** — 도메인별 콜백 규칙 (허용/거부/AskUser)
-3. **Curator 분기** — 큐레이터: IPermissionAskHandler (사용자에게 문의)
-4. **NonCurator 분기** — 비큐레이터: GlobalACL (글로벌 ACL 규칙)
-5. **기본 거부** — 일치하는 규칙이 없으면 기본 거부
+1. **UserFrequencyCache** — 사용자 빈도 캐시 (HighDeny가 HighAllow보다 우선)
+2. **IPermissionCallback** — 커스텀 권한 콜백 함수 (Allowed/Denied/AskUser)
+3. **IsCurator 분기** — 큐레이터는 IPermissionAskHandler를 통해 사용자에게 문의; 비큐레이터는 GlobalACL을 쿼리하며, 일치하는 규칙이 없으면 기본 거부
 
-## 맞춤형 도구 만들기
+## 커스텀 툴 만들기
 
 ### 단계 1: ITool 인터페이스 구현
 
@@ -724,9 +807,9 @@
 public class MyCustomTool : ITool
 {
     public string Name => "my_tool";
-    
-    public string Description => "도구 설명";
-    
+
+    public string Description => "툴 설명";
+
     public ToolDefinition Definition => new ToolDefinition
     {
         Name = Name,
@@ -736,14 +819,14 @@ public class MyCustomTool : ITool
             ["param1"] = new { type = "string", description = "매개변수 설명" }
         }
     };
-    
+
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
         try
         {
             var param1 = call.Parameters["param1"]?.ToString();
             var result = await DoWork(param1);
-            
+
             return new ToolResult
             {
                 Success = true,
@@ -764,16 +847,16 @@ public class MyCustomTool : ITool
 
 ### 단계 2: 프로젝트에 추가
 
-도구 파일을 `src/SiliconLife.Common/Tools/` 디렉토리(공유 도구) 또는 `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` 디렉토리(버전별 도구)에 배치합니다. `ToolManager`는 시작 시 리플렉션을 통해 자동으로 발견하고 등록합니다.
+툴 파일을 `src/SiliconLife.Common/Tools/` 디렉토리(공유 툴) 또는 `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` 디렉토리(버전별 툴)에 배치합니다. `ToolManager`는 시작 시 리플렉션을 통해 자동으로 발견하고 등록합니다.
 
-### 단계 2a: 플러그인을 통해 도구 등록
+### 단계 2a: 플러그인을 통해 툴 등록
 
-플러그인 시스템을 통해 맞춤형 도구를 등록할 수도 있습니다:
+플러그인 시스템을 통해 커스텀 툴을 등록할 수도 있습니다:
 
 1. 플러그인 프로젝트에서 `ITool` 인터페이스 구현
 2. 플러그인 DLL을 컴파일하여 플러그인 디렉토리에 배치
 3. `ToolManager.ScanAllPluginAssemblies()`가 모든 로드된 플러그인에서 ITool 구현을 자동 스캔
-4. 플러그인 도구는 동일한 권한 시스템의 제약을 받음
+4. 플러그인 툴은 동일한 권한 시스템의 제약을 받음
 
 ### 단계 3: (선택) 큐레이터 전용으로 표시
 
@@ -784,6 +867,8 @@ public class AdminOnlyTool : ITool
     // 실리콘 큐레이터만 접근 가능
 }
 ```
+
+## 모범 사례
 
 ### 1. 항상 매개변수 검증
 
@@ -803,65 +888,63 @@ try
 }
 catch (Exception ex)
 {
-    Logger.Error($"도구 {Name} 실행 실패: {ex.Message}");
+    Logger.Error($"툴 {Name} 실행 실패: {ex.Message}");
     return ToolResult.Failure(ex.Message);
 }
 ```
 
 ### 3. 권한 시스템 존중
 
-권한 검사를 절대 우회하지 마세요. 항상 실행기를 통해 리소스에 접근하세요:
+권한 검사를 절대 우회하지 마세요. 항상 이그제큐터를 통해 리소스에 접근하세요:
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+bool allowed = permissionManager.CheckPermission(callerId, permissionType, resource);
+if (!allowed)
 {
-    return ToolResult.Denied(permission.Reason);
+    return ToolResult.Denied("Permission denied");
 }
 ```
 
-### 4. 명확한 도구 설명 제공
+### 4. 명확한 툴 설명 제공
 
-AI가 도구를 언제, 어떻게 사용할지 이해하도록 도와주세요:
+AI가 툴을 언제, 어떻게 사용할지 이해하도록 도와주세요:
 
 ```csharp
-public string Description => 
+public string Description =>
     "다양한 캘린더 시스템 간 날짜 변환에 사용." +
     "'date', 'from_calendar' 및 'to_calendar' 매개변수가 필요합니다.";
 ```
 
 ## 문제 해결
 
-### 도구를 찾을 수 없음
+### 툴을 찾을 수 없음
 
-**문제**: AI가 존재하지 않는 도구를 호출하려고 함.
+**문제**: AI가 존재하지 않는 툴을 호출하려고 함.
 
 **해결 방법**:
-- 도구 이름이 정확히 일치하는지 확인
-- 도구 파일이 `Tools/` 디렉토리에 있는지 확인
+- 툴 이름이 정확히 일치하는지 확인
+- 툴 파일이 `Tools/` 디렉토리에 있는지 확인
 - 프로젝트 재빌드 (`dotnet build`)
 
 ### 권한 거부됨
 
-**문제**: 도구 실행 실패, 권한 오류 반환.
+**문제**: 툴 실행 실패, 권한 오류 반환.
 
 **해결 방법**:
 - 권한 감사 로그 확인
-- 실리콘 생명체에 필요한 권한이 있는지 확인
+- 실리콘 비잉에 필요한 권한이 있는지 확인
 - 글로벌 ACL 설정 확인
 - 큐레이터인 경우 `[SiliconManagerOnly]` 마크 사용 여부 확인
 
-### 도구 실행 오류 반환
+### 툴 실행 오류 반환
 
-**문제**: 도구가 실행되지만 실패 결과 반환.
+**문제**: 툴이 실행되지만 실패 결과 반환.
 
 **해결 방법**:
-- 도구가 반환한 오류 메시지 확인
+- 툴이 반환한 오류 메시지 확인
 - 입력 매개변수 형식이 올바른지 확인
 - 시스템 로그에서 상세 오류 정보 확인
-- 도구 기능 독립 테스트
-
----
+- 툴 기능 독립 테스트
 
 ## 다음 단계
 

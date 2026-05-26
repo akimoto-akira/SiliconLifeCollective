@@ -1,40 +1,40 @@
-﻿# Sistema di permessi
+# Sistema di Permessi
 
 > **Versione: v0.2.0-alpha**
 
-[English](../en/permission-system.md) | [Deutsch](../de-DE/permission-system.md) | [Français](../fr-FR/permission-system.md) | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | [Español](../es-ES/permission-system.md) | [日本語](../ja-JP/permission-system.md) | [한국어](../ko-KR/permission-system.md) | [Čeština](../cs-CZ/permission-system.md) | [Русский](../ru-RU/permission-system.md) | **Italiano**
+[English](../en/permission-system.md) | [Deutsch](../de-DE/permission-system.md) | [中文](../zh-CN/permission-system.md) | [繁體中文](../zh-HK/permission-system.md) | [Español](../es-ES/permission-system.md) | [日本語](../ja-JP/permission-system.md) | [한국어](../ko-KR/permission-system.md) | [Čeština](../cs-CZ/permission-system.md) | [Русский](../ru-RU/permission-system.md)
 
 ## Panoramica
 
-Il sistema di permessi garantisce che tutte le operazioni avviate dall'IA siano correttamente verificate e sottoposte ad audit.
+Il sistema di permessi garantisce che tutte le operazioni avviate dall'AI siano adeguatamente verificate e auditate.
 
-## Catena di permessi a 3 livelli
+## Catena di Verifica dei Permessi
 
 ```
 ┌─────────────────────────────────────────────┐
-│          Verifica dei permessi              │
+│          Verifica dei Permessi               │
 ├─────────────────────────────────────────────┤
-│  Livello 1 : UserFrequencyCache             │
-│  ↓ Decisioni utente in cache (HighDeny/HighAllow)│
-│  Livello 2 : IPermissionCallback            │
-│  ↓ Logica personalizzata (Consentito/Negato/ChiediUtente)│
-│  Livello 3 : IsCurator?                     │
-│  ↓ Sì → IPermissionAskHandler (chiedi all'utente)│
-│  ↓ No → GlobalACL → Negazione predefinita   │
-│  Risultato : Consentito o Negato            │
+│  Livello 1: UserFrequencyCache               │
+│  ↓ Cache delle decisioni utente ad alta frequenza (HighDeny/HighAllow) │
+│  Livello 2: IPermissionCallback              │
+│  ↓ Logica personalizzata (Allowed/Denied/AskUser) │
+│  Livello 3: IsCurator?                       │
+│  ↓ Sì → IPermissionAskHandler (chiedi all'utente) │
+│  ↓ No → GlobalACL → rifiuto predefinito     │
+│  Risultato: Permesso o Rifiuto               │
 └─────────────────────────────────────────────┘
 ```
 
-> **Nota**: La priorità di consultazione effettiva in `PermissionManager.CheckPermission()` è:
-> 1. **UserFrequencyCache** — Verificare prima le decisioni utente ad alta frequenza in cache
-> 2. **IPermissionCallback** — Valutare le regole callback personalizzate
-> 3. **Biforcazione curatore** — Se il callback restituisce AskUser o non c'è callback configurato:
->    - **Curatore** → `IPermissionAskHandler` (chiedere all'utente tramite IM)
->    - **Non-curatore** → `GlobalACL` → negazione predefinita
+> **Nota**: La priorità di interrogazione effettiva di `PermissionManager.CheckPermission()` è:
+> 1. **UserFrequencyCache** — Controlla prima la cache delle decisioni utente ad alta frequenza
+> 2. **IPermissionCallback** — Valuta le regole di callback personalizzate
+> 3. **Ramificazione del Curatore** — Quando il callback restituisce AskUser o non c'è callback:
+>    - **Curatore** → `IPermissionAskHandler` (chiede all'utente tramite IM)
+>    - **Non curatore** → `GlobalACL` → rifiuto predefinito
 
 ## Livello 1: UserFrequencyCache
 
-Cache per essere, solo in memoria, delle decisioni utente ad alta frequenza (HighDeny/HighAllow).
+Cache delle decisioni utente ad alta frequenza per ogni essere (HighDeny/HighAllow), esiste solo in memoria.
 
 ```csharp
 var cache = new UserFrequencyCache();
@@ -45,113 +45,110 @@ if (cachedResult.HasValue)
 }
 ```
 
-- **HighDeny** ha priorità su **HighAllow**
-- **Solo memoria**: Le cache non vengono persistite, vengono perse al riavvio
-- **Scadenza configurabile**: Gli utenti possono impostare il periodo di validità per le voci della cache
+- **HighDeny ha la priorità su HighAllow**
+- **Solo in memoria**: La cache non viene persistita, va persa al riavvio
+- **Scadenza configurabile**: L'utente può impostare la validità delle voci della cache
 
 ## Livello 2: IPermissionCallback
 
-Callback personalizzati per la logica di permessi dinamica.
+Callback personalizzati per la logica dinamica dei permessi.
 
-### Implementazione predefinita DefaultPermissionCallback
+### Implementazione Predefinita DefaultPermissionCallback
 
-`DefaultPermissionCallback` fornisce regole di permessi predefinite complete, includendo:
+`DefaultPermissionCallback` fornisce regole di permesso predefinite complete, tra cui:
 
-#### Regole di accesso rete
-- **Indirizzi di loopback**: Consenti localhost, 127.0.0.1, ::1
+#### Regole di accesso alla rete
+- **Indirizzi di loopback**: Permetti localhost, 127.0.0.1, ::1
 - **Indirizzi IP privati**:
-  - 192.168.x.x (Classe C) - Consentito
-  - 10.x.x.x (Classe A) - Consentito
+  - 192.168.x.x (Classe C) - Permetti
+  - 10.x.x.x (Classe A) - Permetti
   - 172.16-31.x.x (Classe B) - Chiedi all'utente
-- **Whitelist domini**:
+- **Whitelist dei domini**:
   - Motori di ricerca: Google, Bing, DuckDuckGo, Yandex, Sogou, ecc.
-  - Servizi IA: OpenAI, Anthropic, HuggingFace, Ollama, ecc.
-  - Servizi sviluppatori: GitHub, StackOverflow, npm, NuGet, ecc.
+  - Servizi AI: OpenAI, Anthropic, HuggingFace, Ollama, ecc.
+  - Servizi per sviluppatori: GitHub, StackOverflow, npm, NuGet, ecc.
   - Social media: Weibo, Zhihu, Reddit, Discord, ecc.
   - Piattaforme video: YouTube, Bilibili, Douyin, TikTok, ecc.
   - **Informazioni meteo**: wttr.in
   - Siti governativi: .gov, .go.jp, .go.kr
-- **Blacklist domini**:
-  - Siti di contraffazione IA: chatgpt, openai, deepseek e altri domini contraffatti
-  - Strumenti IA dannosi: wormgpt, darkgpt, fraudgpt, ecc.
-  - Fattorie contenuti IA e domini mercato nero
+- **Blacklist dei domini**:
+  - Siti di contraffazione AI: chatgpt, openai, deepseek, ecc. domini contraffatti
+  - Strumenti AI malevoli: wormgpt, darkgpt, fraudgpt, ecc.
+  - Fattorie di contenuti AI e domini relativi al mercato nero
 
 ```csharp
 public class DefaultPermissionCallback : IPermissionCallback
 {
-    public PermissionResult Evaluate(PermissionRequest request)
+    public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
     {
-        if (IsSafeOperation(request))
+        if (IsSafeOperation(permissionType, resource))
         {
-            return PermissionResult.Allowed("Safe operation");
+            return PermissionResult.Allowed;
         }
         
-        return PermissionResult.AskUser("Needs user confirmation");
+        return PermissionResult.AskUser;
     }
 }
 ```
 
-## Livello 3: Biforcazione curatore (IsCurator / GlobalACL)
+## Livello 3: Giudizio di Ramificazione (IsCurator / GlobalACL)
 
-Quando i livelli 1 e 2 non hanno preso una decisione (il callback restituisce AskUser o non c'è callback configurato), il sistema si ramifica in base all'identità del chiamante:
+Quando il callback restituisce `AskUser` o non è configurato alcun callback, il sistema si ramifica in base all'identità del curatore:
 
-### Ramo curatore (IsCurator = true)
+### Ramo del Curatore (IsCurator = true)
 
-Se il chiamante è il curatore, il callback restituisce AskUser e il sistema richiede conferma dell'utente tramite `IPermissionAskHandler`:
+Per il Curatore di Silicio, il sistema richiede una decisione all'utente tramite messaggistica istantanea:
 
 ```csharp
 if (IsCurator)
 {
     if (_askHandler != null)
     {
-        var result = _askHandler.AskUser(request);
+        AskPermissionResult userDecision = _askHandler.AskUser(callerId, permissionType, resource);
+        // L'utente conferma o rifiuta nella Web UI
     }
 }
 ```
 
-### Ramo non-curatore (IsCurator = false)
+### Ramo Non Curatore (IsCurator = false)
 
-Se il chiamante non è il curatore, verifica la `GlobalACL` lista di controllo accessi. Se non c'è una regola corrispondente, l'accesso viene negato per impostazione predefinita.
+Per gli esseri non curatori, il sistema verifica la Lista di Controllo degli Accessi Globale. Se non c'è una regola corrispondente, la richiesta viene rifiutata per impostazione predefinita.
 
-### Struttura GlobalACL
+### Struttura della GlobalACL
 
 ```json
 {
   "rules": [
     {
-      "prefix": "disk:read",
+      "permissionType": "NetworkAccess",
+      "resourcePrefix": "api.github.com",
       "result": "Allowed"
     },
     {
-      "prefix": "network:http",
-      "result": "Allowed"
-    },
-    {
-      "prefix": "compile:execute",
+      "permissionType": "FileAccess",
+      "resourcePrefix": "C:\\Windows",
       "result": "Denied"
     }
   ]
 }
 ```
 
-> **Nota**: GlobalACL utilizza la corrispondenza per prefisso. La regola `"prefix": "disk:read"` corrisponde a tutte le risorse che iniziano con `disk:read`. Se non c'è alcuna regola corrispondente, l'accesso viene negato per impostazione predefinita.
+Le regole vengono valutate in ordine, la prima corrispondenza ha effetto. Solo il Curatore di Silicio può modificare l'ACL Globale.
 
-### Formato delle risorse
+### Formato delle Risorse
 
 ```
-{type}:{action}
+{type}:{path}
 
 Esempi:
-- disk:read
-- disk:write
-- network:http
-- compile:execute
-- system:info
+- network:api.github.com
+- file:C:\\Windows
+- cli:rm -rf
 ```
 
 ## IPermissionAskHandler
 
-Quando un'operazione del curatore richiede la conferma dell'utente, questa viene richiesta tramite `IPermissionAskHandler`.
+Quando un'operazione del curatore richiede la conferma dell'utente, i permessi vengono richiesti tramite `IPermissionAskHandler`.
 
 ### Implementazione IMPermissionAskHandler
 
@@ -160,14 +157,14 @@ Quando un'operazione del curatore richiede la conferma dell'utente, questa viene
 ```csharp
 public class IMPermissionAskHandler : IPermissionAskHandler
 {
-    public AskPermissionResult AskUser(PermissionRequest request)
+    public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
     {
-        // Inviare un messaggio all'utente tramite messaggistica istantanea
-        SendMessage($"Consentire {request.Resource}?");
-        
-        // Attendere la risposta dell'utente
-        var response = WaitForResponse();
-        
+        // Invia un messaggio all'utente tramite messaggistica istantanea
+        SendMessageAsync($"Allow {resource}?");
+
+        // Attende la risposta dell'utente
+        var response = WaitForResponseAsync();
+
         return response.Approved 
             ? AskPermissionResult.Approved()
             : AskPermissionResult.Denied();
@@ -175,36 +172,36 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 }
 ```
 
-### Coda richieste permessi PermissionRequestQueue
+### Coda delle Richieste di Permesso PermissionRequestQueue
 
-`PermissionRequestQueue` gestisce le richieste di permessi in attesa, supportando l'attesa asincrona delle risposte utente:
+`PermissionRequestQueue` gestisce le richieste di permesso in sospeso, supportando l'attesa asincrona della risposta dell'utente:
 
-- **Accodamento** — Quando la catena permessi raggiunge il livello 3 (ramo curatore), crea un `TaskCompletionSource<AskPermissionResult>` e lo accoda
-- **Visualizzazione Web UI** — Mostra le richieste di permesso in attesa tramite `PermissionRequestController` nell'interfaccia Web
-- **Risposta utente** — L'utente approva o rifiuta nell'interfaccia Web, con possibilità di mettere in cache la decisione e impostare la durata della cache
-- **Opzioni cache** — L'utente può memorizzare nella cache la decisione del permesso per 1 ora, 24 ore, 7 giorni o 30 giorni
-- **Meccanismo timeout** — Chiusura automatica della pagina di richiesta dopo 60 secondi senza risposta
+- **Accodamento della richiesta** — Quando la catena dei permessi raggiunge il livello 5, crea un `TaskCompletionSource<AskPermissionResult>` e lo accoda
+- **Visualizzazione Web UI** — Le richieste di permesso in sospeso vengono visualizzate nella Web UI tramite `PermissionRequestController`
+- **Risposta dell'utente** — L'utente approva o rifiuta nella Web UI, con la possibilità di memorizzare nella cache la decisione e impostare la durata della cache
+- **Opzioni di cache** — L'utente può memorizzare nella cache le decisioni sui permessi per 1 ora, 24 ore, 7 giorni o 30 giorni
+- **Meccanismo di timeout** — Dopo 60 secondi senza risposta, la pagina di richiesta si chiude automaticamente
 
-## Sistema di audit
+## Sistema di Audit
 
 Tutte le decisioni sui permessi vengono registrate:
 
 ```json
 {
   "timestamp": "2026-04-20T10:30:00Z",
-  "beingId": "being-uuid",
-  "resource": "disk:write",
+  "callerId": "being-uuid",
+  "permissionType": "FileAccess",
+  "resource": "C:\\data\\config.json",
   "result": "Allowed",
-  "level": "GlobalACL",
-  "reason": "Prefix rule matched"
+  "reason": "Global ACL"
 }
 ```
 
-## Valutazione programmatica dei permessi
+## Valutazione Programmatica dei Permessi
 
 ### API EvaluatePermission
 
-Il metodo `PermissionManager.EvaluatePermission()` fornisce una pre-valutazione in sola lettura dei permessi senza attivare richieste utente. `PermissionTool` utilizza questo metodo per consentire all'IA di verificare lo stato dei permessi prima di tentare un'operazione.
+Il metodo `PermissionManager.EvaluatePermission()` fornisce una pre-valutazione dei permessi in sola lettura, senza attivare prompt all'utente. `PermissionTool` utilizza questo metodo per consentire all'AI di verificare lo stato dei permessi prima di tentare un'operazione.
 
 ```csharp
 public PermissionResult EvaluatePermission(
@@ -213,31 +210,31 @@ public PermissionResult EvaluatePermission(
     string resource)
 ```
 
-**Valore di ritorno**: `PermissionResult` a tre stati:
-- `Allowed` - L'operazione è consentita
-- `Denied` - L'operazione è negata
-- `AskUser` - Conferma utente richiesta durante l'esecuzione
+**Valore restituito**: `PermissionResult` a tre stati:
+- `Allowed` - L'operazione è permessa
+- `Denied` - L'operazione è rifiutata
+- `AskUser` - Richiede conferma dell'utente durante l'esecuzione
 
-**Ordine valutazione**:
-1. **Cache frequenza** - Verificare decisioni utente in cache
-2. **IPermissionCallback** - Valutazione tramite callback personalizzato
-3. **Stato curatore** - Se curatore, restituire `AskUser` (conferma richiesta)
-4. **ACL globale** - Verificare regole di controllo accesso
-5. **Predefinito** - Negare se nessuna regola corrisponde
+**Ordine di valutazione**:
+1. **Cache di frequenza** - Controlla le decisioni utente memorizzate nella cache
+2. **IPermissionCallback** - Valutazione del callback personalizzato
+3. **Stato del curatore** - Se è il curatore, restituisce `AskUser` (richiede conferma)
+4. **ACL Globale** - Controlla le regole di controllo degli accessi
+5. **Predefinito** - Rifiuta quando non ci sono regole corrispondenti
 
-> **Nota**: A differenza della catena permessi completa, `EvaluatePermission` **non chiama** `IPermissionAskHandler`. Segnala solo quale sarà il risultato *al momento dell'esecuzione*.
+> **Nota**: A differenza della catena di permessi completa, `EvaluatePermission` **non** chiama `IPermissionAskHandler`. Riporta solo quale *sarà* il risultato durante l'esecuzione.
 
-## Gestire i permessi
+## Gestione dei Permessi
 
-### Concedere un permesso
+### Concedere Permessi
 
-**Tramite interfaccia Web**:
-1. Navigare verso **Gestione permessi**
-2. Cliccare su **Aggiungi regola**
-3. Configurare:
+**Tramite Web UI**:
+1. Naviga verso **Gestione Permessi**
+2. Clicca su **Aggiungi regola**
+3. Configura:
    - Utente
    - Risorsa
-   - Consenti/Nega
+   - Permetti/Rifiuta
    - Durata
 
 **Tramite API**:
@@ -245,133 +242,193 @@ public PermissionResult EvaluatePermission(
 curl -X POST http://localhost:8080/api/permissions/save \
   -H "Content-Type: application/json" \
   -d '{
-    "prefix": "disk:write",
+    "permissionType": "FileAccess",
+    "resourcePrefix": "C:\\Projects",
     "result": "Allowed",
-    "duration": 3600
+    "description": "Allow project directory access"
   }'
 ```
 
-### Revocare un permesso
+### Revocare Permessi
 
-Tramite l'interfaccia Web della gestione permessi.
+Operazione tramite la pagina di gestione dei permessi della Web UI.
 
-### Consultare i permessi
+### Visualizzare i Permessi
 
 ```bash
 curl http://localhost:8080/api/permissions/list
 ```
 
-## Buone pratiche
+## Sistema dei Permessi degli Strumenti
 
-### 1. Principio del minimo privilegio
+Oltre alla catena di verifica dei permessi a livello di operazione, il sistema fornisce un meccanismo di gestione dei **permessi degli strumenti** per controllare quali strumenti possono utilizzare gli Esseri di Silicio.
 
-Concedere solo i permessi minimi necessari:
+### Permessi degli Strumenti a Due Livelli
+
+I permessi degli strumenti sono divisi in due livelli:
+
+1. **Livello Essere di Silicio** — Controlla quali operazioni degli strumenti può utilizzare un singolo Essere di Silicio
+2. **Livello Progetto** — Controlla le operazioni degli strumenti disponibili nello spazio del progetto, indipendentemente dai permessi a livello di Essere di Silicio
+
+### Configurazione dei Permessi degli Strumenti
+
+Ogni operazione di ogni strumento può essere configurata indipendentemente come permessa o rifiutata:
 
 ```json
 {
-  "prefix": "disk:read",
+  "beingId": "being-uuid",
+  "permissions": {
+    "network:get": "allowed",
+    "network:post": "denied",
+    "disk:read": "allowed",
+    "disk:write": "denied",
+    "database:query": "allowed"
+  }
+}
+```
+
+### Modelli di Permessi
+
+Il sistema fornisce modelli di permessi degli strumenti predefiniti, applicabili rapidamente agli Esseri di Silicio:
+
+- **readonly** — Permessi di sola lettura (permette operazioni di lettura, rifiuta operazioni di scrittura)
+- **full** — Permessi completi (permette tutte le operazioni)
+- **restricted** — Permessi limitati (permette solo operazioni di base)
+
+### Gestione Web UI
+
+Gestisci i permessi degli strumenti tramite la Web UI:
+
+- **Pagina permessi strumenti Essere di Silicio** — `/beings/tool-permissions`
+- **Pagina permessi strumenti progetto** — `/project/{id}/tool-permissions`
+
+### Endpoint API
+
+| Endpoint | Metodo | Descrizione |
+|------|------|------|
+| `/api/beings/tool-permissions` | GET | Ottieni i permessi degli strumenti dell'Essere di Silicio |
+| `/api/beings/tool-permissions` | PUT | Aggiorna i permessi degli strumenti dell'Essere di Silicio |
+| `/api/beings/tool-permissions/templates` | GET | Ottieni l'elenco dei modelli di permessi |
+| `/api/beings/tool-permissions/apply-template` | POST | Applica un modello di permessi |
+| `/api/projects/{id}/tool-permissions` | GET | Ottieni i permessi degli strumenti del progetto |
+| `/api/projects/{id}/tool-permissions` | PUT | Aggiorna i permessi degli strumenti del progetto |
+
+---
+
+## Best Practice
+
+### 1. Principio del Privilegio Minimo
+
+Concedi solo i permessi minimi necessari:
+
+```json
+{
+  "permissionType": "FileAccess",
+  "resourcePrefix": "C:\\Projects\\MyApp\\config.json",
   "result": "Allowed"
 }
 ```
 
-> **Nota**: Utilizzare prefissi specifici come `disk:read` anziché `disk:*` per seguire il principio del minimo privilegio.
+### 2. Utilizza Permessi con Limitazione Temporale
 
-### 2. Utilizzare permessi a durata limitata
+A meno che non sia assolutamente necessario, non concedere mai permessi permanenti.
 
-Non concedere mai permessi permanenti salvo assoluta necessità.
+### 3. Monitora i Registri dei Permessi
 
-### 3. Monitorare i log dei permessi
+Esamina regolarmente i registri di audit per comprendere:
+- Tentativi di accesso rifiutati
+- Modelli anomali
+- Escalation dei permessi
 
-Consultare regolarmente i log di audit per identificare:
-- Tentativi di accesso negati
-- Pattern insoliti
-- Elevazioni di permessi
+### 4. Implementa Callback Personalizzati
 
-### 4. Implementare callback personalizzati
-
-Per logica complessa, utilizzare `IPermissionCallback`:
+Per logiche complesse, utilizza `IPermissionCallback`:
 
 ```csharp
-public PermissionResult Evaluate(PermissionRequest request)
+public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
 {
+    // Permessi basati sul tempo
     if (IsOutsideBusinessHours())
     {
-        return PermissionResult.Denied("Outside business hours");
+        return PermissionResult.Denied;
     }
     
-    if (IsSensitiveResource(request.Resource))
+    // Permessi basati sulla risorsa
+    if (IsSensitiveResource(resource))
     {
-        return PermissionResult.AskUser("Requires approval");
+        return PermissionResult.AskUser;
     }
     
-    return PermissionResult.Allowed();
+    return PermissionResult.Allowed;
 }
 ```
 
-## Scenari comuni
+## Scenari Comuni
 
-### Scenario 1: L'IA vuole leggere un file
+### Scenario 1: L'AI vuole leggere un file
 
 ```
-IA: "Devo leggere config.json"
+AI: "Devo leggere config.json"
 ↓
-Catena permessi:
-1. Cache frequenza? Nessuna voce in cache
-2. Callback? Restituisce AskUser
-3. IsCurator? No → GlobalACL? Regola trovata: disk:read = Consentito
-4. Risultato: Consentito
+Catena dei permessi:
+1. UserFrequencyCache? Nessuna decisione in cache
+2. IPermissionCallback? Restituisce AskUser (non esplicitamente permesso)
+3. IsCurator? No → Controlla GlobalACL
+4. GlobalACL? Trova regola: file:... = Allowed
+5. Risultato: Permesso
 ```
 
-### Scenario 2: L'IA vuole eseguire codice
+### Scenario 2: L'AI vuole eseguire codice
 
 ```
-IA: "Voglio compilare ed eseguire codice"
+AI: "Voglio compilare ed eseguire codice"
 ↓
-Catena permessi:
-1. Cache frequenza? Nessuna voce in cache
-2. Callback? Restituisce AskUser
-3. IsCurator? Sì → IPermissionAskHandler → Utente approva
-4. Risultato: Consentito
+Catena dei permessi:
+1. UserFrequencyCache? Nessuna decisione in cache
+2. IPermissionCallback? Restituisce AskUser
+3. IsCurator? Sì → IPermissionAskHandler
+4. L'utente approva
+5. Risultato: Permesso
 ```
 
-### Scenario 3: Decisione in cache
+### Scenario 3: Rifiuto memorizzato nella cache
 
 ```
-IA: "Devo fare 100 richieste HTTP"
+AI: "Devo accedere a C:\Windows"
 ↓
-Catena permessi:
-1. Cache frequenza? HighDeny trovato
-2. Risultato: Negato
+Catena dei permessi:
+1. UserFrequencyCache? Trovato nella cache HighDeny
+2. Risultato: Rifiuto (nessun ulteriore controllo necessario)
 ```
 
-## Risoluzione problemi
+## Risoluzione dei Problemi
 
-### Permesso inaspettatamente negato
+### Permesso inaspettatamente rifiutato
 
-**Verificare**:
+**Verifica**:
 1. Lo stato IsCurator dell'utente
-2. Le voci nella cache frequenza (HighDeny ha priorità su HighAllow)
-3. Le regole GlobalACL (negazione predefinita se nessuna regola corrisponde)
+2. Le voci HighDeny nella cache di frequenza
+3. Le regole GlobalACL
 4. La logica del callback
-5. Il timeout della risposta utente
+5. Il timeout della risposta dell'utente
 
-### Permesso non scaduto
+### Permessi non scaduti
 
-**Verificare**:
-- Le voci nella cache frequenza non sono scadute
+**Verifica**:
+- Il campo `expiresAt` è impostato correttamente
 - Il fuso orario è corretto
 - L'orologio è sincronizzato
 
-### Log audit non registrati
+### Registro di audit non registrato
 
-**Verificare**:
+**Verifica**:
 - Il logger di audit è registrato
 - Il backend di archiviazione è accessibile
-- Lo spazio su disco è sufficiente
+- C'è spazio su disco sufficiente
 
-## Prossimi passi
+## Prossimi Passi
 
-- 📚 Leggere la [guida architettura](architecture.md)
-- 🛠️ Consultare la [guida sviluppo](development-guide.md)
-- 🔒 Consultare la [documentazione sicurezza](security.md)
-- 🚀 Consultare la [guida avvio rapido](getting-started.md)
+- 📚 Leggi la [guida all'architettura](architecture.md)
+- 🛠️ Consulta la [guida allo sviluppo](development-guide.md)
+- 🔒 Consulta la [documentazione sulla sicurezza](security.md)
+- 🚀 Consulta la [guida all'inizio rapido](getting-started.md)

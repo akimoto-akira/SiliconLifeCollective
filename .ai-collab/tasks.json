@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-26T01:30:00+08:00",
+  "lastUpdated": "2026-05-26T06:00:00+08:00",
   "tasks": [
     {
       "id": "task-362",
@@ -43,12 +43,26 @@
       "assignedTo": "trae-glm5",
       "relatedCommit": "a49041b",
       "completedAt": "2026-05-26T01:30:00+08:00"
+    },
+    {
+      "id": "task-365",
+      "type": "docs",
+      "target": "docs/",
+      "title": "完整翻译12种语言共192个文档文件",
+      "description": "以 docs/zh-CN/ 16个文件为源，docs/glossary.md 为术语基准，将所有文档完整翻译到12种语言目录（en, zh-HK, ja-JP, ko-KR, de-DE, fr-FR, es-ES, it-IT, ru-RU, pt-PT, pl-PL, cs-CZ），共192个文件。翻译规则：术语与glossary.md对应列一致，代码块内代码和注释不翻译，链接路径不翻译，保留Markdown结构。所有12批次均已完成。",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-26T02:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-26T06:00:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": ["task-362", "task-363", "task-364"],
+    "completed": ["task-362", "task-363", "task-364", "task-365"],
     "cancelled": []
   },
   "metadata": {

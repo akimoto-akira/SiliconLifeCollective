@@ -1,4 +1,4 @@
-﻿# Tool-Referenz
+# Tool-Referenz
 
 > **Version: v0.2.0-alpha**
 
@@ -8,30 +8,46 @@ Dieses Dokument beschreibt detailliert alle integrierten Tools der Silicon Life 
 
 ## Übersicht
 
-Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt über standardisierte Schnittstellen. Jedes Tool implementiert die `ITool`-Schnittstelle und wird vom `ToolManager` automatisch durch Reflektion entdeckt und registriert.
+Das Werkzeugsystem ermöglicht es Silicon Beings, über standardisierte Schnittstellen mit der Außenwelt zu interagieren. Jedes Werkzeug implementiert die `ITool`-Schnittstelle und wird vom Werkzeugmanager über Reflexion automatisch entdeckt und registriert.
 
-### Tool-Kategorien
+### Werkzeugkategorien
 
-- **Systemverwaltungstools** — Konfiguration, Berechtigungen, dynamische Kompilierung
-- **Kommunikationstools** — Chat, Netzwerkanfragen
-- **Datenspeicherungstools** — Festplattenoperationen, Datenbank, Speicher, Arbeitsnotizen
-- **Zeitmanagement-Tools** — Kalender, Timer, Aufgaben
-- **Entwicklungstools** — Codeausführung, Protokollabfragen
-- **Dienstprogramme** — Systeminformationen, Token-Audit, Hilfedokumentation, Wissensnetzwerk
-- **Browser-Tools** — WebView-Browserautomatisierung
-- **Plugin-Tools** — Über das Plugin-System registrierte Drittanbieter-Tools
+- **Systemverwaltungswerkzeuge** — Konfiguration, Berechtigungen, dynamische Kompilierung, Curator-Verwaltung
+- **Kommunikationswerkzeuge** — Chat, Netzwerkanfragen
+- **Datenspeicherwerkzeuge** — Festplattenoperationen, Datenbank, Speicher, Arbeitsnotizen
+- **Zeitverwaltungswerkzeuge** — Kalender, Timer, Aufgaben
+- **Entwicklungswerkzeuge** — Codeausführung, Protokollabfrage
+- **Dienstprogramme** — Systeminformationen, Token-Nutzungsaudit, Hilfedokumentation, Wissensnetzwerk
+- **Browserwerkzeuge** — WebView-Browser-Automatisierung
+- **Projektwerkzeuge** — Projektverwaltung, Projektaufgaben, Projekt-Arbeitsnotizen, Projektarbeit
+- **Plugin-Werkzeuge** — Über das Plugin-System registrierte Drittanbieter-Werkzeuge
+
+### Werkzeugszenario-System
+
+Jedes Werkzeug deklariert seine verfügbaren Szenarien über das `[ToolScenario]`-Attribut:
+
+| Szenario-Flag | Wert | Beschreibung |
+|----------|------|-------------|
+| `Chat` | `1 << 0` | Chat-Szenario (wenn Benutzer mit einem Silicon Being konversieren) |
+| `Task` | `1 << 1` | Aufgaben-Szenario (wenn ein Silicon Being eine Aufgabe ausführt) |
+| `Timer` | `1 << 2` | Timer-Szenario (wenn ein Silicon Being eine zeitgesteuerte Aufgabe ausführt) |
+| `MemoryCompression` | `1 << 3` | Speicherkomprimierungsszenario |
+| `Project` | `1 << 4` | Projekt-Szenario (ThinkOnProject-Modus) |
+| `All` | Alle oben genannten | In allen Szenarien verfügbar |
+
+Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Chat-Szenario verfügbar (z. B. HelpTool) und erscheinen nicht in Aufgaben- und Timer-Szenarien.
 
 ---
 
-## Integrierte Tool-Liste
+## Liste der integrierten Werkzeuge
 
-### 1. Kalender-Tool (CalendarTool)
+### 1. Kalender-Werkzeug (CalendarTool)
 
-**Tool-Name**: `calendar`
+**Werkzeugname**: `calendar`
 
-**Funktionsbeschreibung**: Unterstützt Datumskonvertierung und -berechnung für 32 Kalendersysteme.
+**Funktionsbeschreibung**: Unterstützung für Datumsumrechnung und -berechnung in 32 Kalendersystemen.
 
-**Unterstützte Aktionen**:
+**Unterstützte Operationen**:
 - `now` — Aktuelle Zeit abrufen
 - `format` — Datum formatieren
 - `add_days` — Datum addieren/subtrahieren
@@ -42,9 +58,9 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 - `convert` — Zwischen Kalendersystemen konvertieren
 
 **Unterstützte Kalendersysteme** (32):
-- Gregorianischer Kalender (Gregorian)
-- Chinesischer Lunarkalender (Chinese Lunar)
-- Chinesischer historischer Kalender (Chinese Historical) — Ganzhi-Zyklus, Kaiser-Ären
+- Gregorianischer Kalender
+- Chinesischer Mondkalender (Chinese Lunar)
+- Chinesische historische Kalender — Ganzhi-Jahreszählung, Kaiserära-Namen
 - Islamischer Kalender (Islamic)
 - Hebräischer Kalender (Hebrew)
 - Japanischer Kalender (Japanese)
@@ -66,44 +82,44 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 
 ---
 
-### 2. Chat-Tool (ChatTool)
+### 2. Chat-Werkzeug (ChatTool)
 
-**Tool-Name**: `chat`
+**Werkzeugname**: `chat`
 
-**Funktionsbeschreibung**: Verwaltung von Chat-Sitzungen und Nachrichtenversand.
+**Funktionsbeschreibung**: Verwaltung von Chat-Sitzungen und Nachrichtensendung.
 
-**Unterstützte Aktionen**:
+**Unterstützte Operationen**:
 - `send_message` — Nachricht senden
 - `get_messages` — Historische Nachrichten abrufen
 - `create_group` — Gruppenchat erstellen
 - `add_member` — Gruppenmitglied hinzufügen
 - `remove_member` — Gruppenmitglied entfernen
 - `get_chat_info` — Chat-Informationen abrufen
-- `terminate_chat` — Chat beenden (gelesen, keine Antwort)
+- `terminate_chat` — Chat beenden (gelesen, nicht beantwortet)
 
 **Verwendungsbeispiel**:
 ```json
 {
   "action": "send_message",
   "target_id": "being-uuid-or-user-0",
-  "message": "你好，让我们协作吧！"
+  "message": "Hallo, lassen Sie uns zusammenarbeiten!"
 }
 ```
 
 ---
 
-### 3. Konfigurations-Tool (ConfigTool)
+### 3. Konfigurations-Werkzeug (ConfigTool)
 
-**Tool-Name**: `config`
+**Werkzeugname**: `config`
 
-**Funktionsbeschreibung**: Systemkonfiguration lesen und ändern.
+**Funktionsbeschreibung**: Lesen und Ändern der Systemkonfiguration.
 
-**Unterstützte Aktionen**:
+**Unterstützte Operationen**:
 - `read` — Konfigurationseintrag lesen
 - `write` — Konfigurationseintrag schreiben
 - `list` — Alle Konfigurationen auflisten
 - `get_ai_config` — KI-Client-Konfiguration abrufen
-- `set_ai_config` — KI-Client-Konfiguration setzen
+- `set_ai_config` — KI-Client-Konfiguration festlegen
 
 **Verwendungsbeispiel**:
 ```json
@@ -115,39 +131,40 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 
 ---
 
-### 4. Curator-Tool (CuratorTool) 🔒
+### 4. Curator-Werkzeug (CuratorTool) 🔒
 
-**Tool-Name**: `curator`
+**Werkzeugname**: `silicon_manager`
 
-**Berechtigungsanforderung**: Nur für Silicon Curator
+**Berechtigungsanforderung**: Nur für Silicon Curator verfügbar (`[SiliconManagerOnly]`)
 
-**Funktionsbeschreibung**: Systemverwaltungstool exklusiv für Silicon Curator.
+**Verfügbare Szenarien**: Chat, Task, Timer
 
-**Unterstützte Aktionen**:
-- `create_being` — Neues Silicon Being erstellen
-- `list_beings` — Alle Silicon Beings auflisten
-- `get_being_info` — Being-Informationen abrufen
-- `assign_task` — Aufgabe zuweisen
-- `manage_permissions` — Berechtigungen verwalten
+**Funktionsbeschreibung**: Exklusives Systemverwaltungswerkzeug für den Silicon Curator, zur Verwaltung der Erstellung, Einsicht und des Zurücksetzens von Silicon Beings.
+
+**Unterstützte Operationen**:
+- `list_beings` — Alle Silicon Beings und deren Status auflisten
+- `create_being` — Neues Silicon Being erstellen (erfordert `name`- und `soul`-Parameter)
+- `get_code` — Quellcode eines Silicon Beings einsehen
+- `reset` — Silicon Being auf Standardimplementierung zurücksetzen
 
 **Verwendungsbeispiel**:
 ```json
 {
   "action": "create_being",
-  "name": "助手",
-  "soul_file": "assistant_soul.md"
+  "name": "Assistent",
+  "soul": "Du bist ein hilfreicher Assistent..."
 }
 ```
 
 ---
 
-### 5. Datenbank-Tool (DatabaseTool)
+### 5. Datenbank-Werkzeug (DatabaseTool)
 
-**Tool-Name**: `database`
+**Werkzeugname**: `database`
 
 **Funktionsbeschreibung**: Strukturierte Datenbankabfragen und -operationen.
 
-**Unterstützte Aktionen**:
+**Unterstützte Operationen**:
 - `query` — Daten abfragen
 - `insert` — Daten einfügen
 - `update` — Daten aktualisieren
@@ -167,25 +184,25 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 
 ---
 
-### 6. Festplatten-Tool (DiskTool)
+### 6. Disk-Werkzeug (DiskTool)
 
-**Tool-Name**: `disk`
+**Werkzeugname**: `disk`
 
 **Funktionsbeschreibung**: Dateisystemoperationen und lokale Suche.
 
-**Unterstützte Aktionen**:
+**Unterstützte Operationen**:
 - `read` — Datei lesen
 - `write` — Datei schreiben
 - `list` — Verzeichnis auflisten
 - `delete` — Datei löschen
 - `create_directory` — Verzeichnis erstellen
 - `search_files` — Dateien suchen
-- `search_content` — Dateiinhalt suchen
+- `search_content` — Dateiinhalte suchen
 - `count_lines` — Zeilen zählen
 - `read_lines` — Bestimmte Zeilen lesen
 - `replace_text` — Text ersetzen
 
-**Berechtigungsanforderung**: `disk:read`, `disk:write`
+**Berechtigungsanforderung**: `FileAccess`
 
 **Verwendungsbeispiel**:
 ```json
@@ -197,21 +214,21 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 
 ---
 
-### 7. Dynamisches Kompilierungs-Tool (DynamicCompileTool) 🔒
+### 7. Dynamische Kompilierungs-Werkzeug (DynamicCompileTool) 🔒
 
-**Tool-Name**: `compile`
+**Werkzeugname**: `compile`
 
-**Funktionsbeschreibung**: Dynamische C#-Code-Kompilierung (für Silicon Being-Selbstevolution).
+**Funktionsbeschreibung**: Dynamisches Kompilieren von C#-Code (für die Selbstevolution von Silicon Beings).
 
-**Unterstützte Aktionen**:
+**Unterstützte Operationen**:
 - `compile_class` — Klasse kompilieren
 - `compile_callback` — Berechtigungs-Callback-Funktion kompilieren
 - `validate_code` — Codesicherheit validieren
 
 **Sicherheitsmechanismen**:
-- Referenzkontrolle bei Kompilierung (gefährliche Assemblies ausgeschlossen)
-- Statische Code-Scans zur Laufzeit
-- AES-256 verschlüsselte Speicherung
+- Referenzkontrolle bei der Kompilierung (gefährliche Assemblys ausschließen)
+- Statische Code-Analyse zur Laufzeit
+- AES-256-verschlüsselte Speicherung
 
 **Verwendungsbeispiel**:
 ```json
@@ -223,15 +240,15 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 
 ---
 
-### 8. Codeausführungs-Tool (ExecuteCodeTool) 🔒
+### 8. Codeausführungs-Werkzeug (ExecuteCodeTool) 🔒
 
-**Tool-Name**: `execute_code`
+**Werkzeugname**: `execute_code`
 
-**Berechtigungsanforderung**: Nur für Silicon Curator
+**Berechtigungsanforderung**: Nur für Silicon Curator verfügbar
 
-**Funktionsbeschreibung**: C#-Code-Snippets kompilieren und ausführen.
+**Funktionsbeschreibung**: Kompilieren und Ausführen von C#-Code-Snippets.
 
-**Unterstützte Aktionen**:
+**Unterstützte Operationen**:
 - `run_script` — Code-Skript ausführen
 
 **Verwendungsbeispiel**:
@@ -245,33 +262,36 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 
 ---
 
-### 9. Hilfe-Tool (HelpTool)
+### 9. Hilfe-Werkzeug (HelpTool)
 
-**Tool-Name**: `help`
+**Werkzeugname**: `help`
 
-**Funktionsbeschreibung**: Systemhilfedokumentation und Bedienungsanleitungen abrufen.
+**Verfügbare Szenarien**: Chat (`[ChatOnly]`, nur im Chat-Szenario verfügbar)
 
-**Unterstützte Aktionen**:
-- `get_topics` — Hilfe-Themenliste abrufen
-- `get_topic` — Bestimmtes Thema-Details abrufen
-- `search` — Hilfedokumentation suchen
+**Funktionsbeschreibung**: Suchen und Abrufen von Systemhilfedokumentation, ermöglicht es der KI, die Verwendung von Systemfunktionen abzufragen.
+
+**Unterstützte Operationen**:
+- `list` — Alle Hilfethemen-IDs auflisten
+- `search` — Hilfedokumentation nach Schlüsselwort durchsuchen
+- `get` — Hilfedokumentation für eine bestimmte ID abrufen
 
 **Verwendungsbeispiel**:
 ```json
 {
-  "action": "get_topics"
+  "action": "search",
+  "keyword": "Berechtigung"
 }
 ```
 
 ---
 
-### 10. Wissensnetzwerk-Tool (KnowledgeTool)
+### 10. Wissensnetzwerk-Werkzeug (KnowledgeTool)
 
-**Tool-Name**: `knowledge`
+**Werkzeugname**: `knowledge`
 
 **Funktionsbeschreibung**: Wissensgraph-Operationen (basierend auf Tripeln: Subjekt-Prädikat-Objekt).
 
-**Unterstützte Aktionen**:
+**Unterstützte Operationen**:
 - `add` — Wissens-Tripel hinzufügen
 - `query` — Wissen abfragen
 - `update` — Wissen aktualisieren
@@ -294,15 +314,15 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 
 ---
 
-### 11. Protokoll-Tool (LogTool)
+### 11. Protokoll-Werkzeug (LogTool)
 
-**Tool-Name**: `log`
+**Werkzeugname**: `log`
 
-**Funktionsbeschreibung**: Operationshistorie und Konversationsverlauf abfragen.
+**Funktionsbeschreibung**: Abfrage der Operationshistorie und Chat-Historie.
 
-**Unterstützte Aktionen**:
+**Unterstützte Operationen**:
 - `query_logs` — Systemprotokolle abfragen
-- `query_conversations` — Konversationsverlauf abfragen
+- `query_conversations` — Chat-Historie abfragen
 - `get_stats` — Protokollstatistiken abrufen
 
 **Verwendungsbeispiel**:
@@ -318,18 +338,18 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 
 ---
 
-### 12. Speicher-Tool (MemoryTool)
+### 12. Speicher-Werkzeug (MemoryTool)
 
-**Tool-Name**: `memory`
+**Werkzeugname**: `memory`
 
-**Funktionsbeschreibung**: Langzeit- und Kurzzeitspeicher von Silicon Beings verwalten.
+**Funktionsbeschreibung**: Verwaltung des Langzeit- und Kurzzeitspeichers von Silicon Beings.
 
-**Unterstützte Aktionen**:
+**Unterstützte Operationen**:
 - `read` — Speicher lesen
 - `write` — Speicher schreiben
-- `search` — Speicher suchen
+- `search` — Speicher durchsuchen
 - `delete` — Speicher löschen
-- `list` — Speicher auflisten
+- `list` — Speichereinträge auflisten
 - `get_stats` — Speicherstatistiken abrufen
 - `compress` — Speicher komprimieren
 
@@ -347,13 +367,13 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 
 ---
 
-### 13. Netzwerk-Tool (NetworkTool)
+### 13. Netzwerk-Werkzeug (NetworkTool)
 
-**Tool-Name**: `network`
+**Werkzeugname**: `network`
 
-**Funktionsbeschreibung**: HTTP/HTTPS-Anfragen initiieren.
+**Funktionsbeschreibung**: HTTP/HTTPS-Anfragen durchführen.
 
-**Unterstützte Aktionen**:
+**Unterstützte Operationen**:
 - `get` — GET-Anfrage
 - `post` — POST-Anfrage
 - `put` — PUT-Anfrage
@@ -373,19 +393,19 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 
 ---
 
-### 14. Berechtigungs-Tool (PermissionTool) 🔒
+### 14. Berechtigungs-Werkzeug (PermissionTool) 🔒
 
-**Tool-Name**: `permission`
+**Werkzeugname**: `permission`
 
-**Berechtigungsanforderung**: Nur für Silicon Curator
+**Berechtigungsanforderung**: Nur für Silicon Curator verfügbar
 
-**Funktionsbeschreibung**: Berechtigungen und Access Control Lists verwalten.
+**Funktionsbeschreibung**: Verwaltung von Berechtigungen und Zugriffssteuerungslisten.
 
-**Unterstützte Aktionen**:
-- `query_permission` — Berechtigungen abfragen
+**Unterstützte Operationen**:
+- `query_permission` — Berechtigung abfragen
 - `manage_acl` — Globale ACL verwalten
 - `get_callback` — Berechtigungs-Callback-Funktion abrufen
-- `set_callback` — Berechtigungs-Callback-Funktion setzen
+- `set_callback` — Berechtigungs-Callback-Funktion festlegen
 
 **Verwendungsbeispiel**:
 ```json
@@ -400,93 +420,145 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 
 ---
 
-### 15. Projekt-Tool (ProjectTool)
+### 15. Projekt-Werkzeug (ProjectTool) 🔒
 
-**Tool-Name**: `project`
+**Werkzeugname**: `project`
 
-**Funktionsbeschreibung**: Projekt-Workspaces verwalten.
+**Berechtigungsanforderung**: Nur für Silicon Curator verfügbar (`[SiliconManagerOnly]`)
 
-**Unterstützte Aktionen**:
-- `create` — Projekt erstellen
-- `list` — Projekte auflisten
-- `get_info` — Projektinformationen abrufen
-- `update` — Projekt aktualisieren
+**Verfügbare Szenarien**: Chat, Task, Timer
+
+**Funktionsbeschreibung**: Verwaltung von Projektarbeitsbereichen, unterstützt Projekt-Lebenszyklusverwaltung, Mitgliederzuweisung und Rollenverwaltung.
+
+**Unterstützte Operationen**:
+- `create` — Neuen Projektbereich erstellen
 - `archive` — Projekt archivieren
+- `restore` — Archiviertes Projekt wiederherstellen
+- `destroy` — Projekt zerstören und Daten bereinigen (unwiderruflich)
+- `list` — Alle Projekte auflisten
+- `get` — Projektdetails abrufen
+- `assign` — Silicon Being einem Projekt zuweisen
+- `remove` — Silicon Being aus einem Projekt entfernen
+- `update` — Projektname/-beschreibung aktualisieren
+- `list-workflow-templates` — Verfügbare Workflow-Vorlagen auflisten
+- `assign_role` — Silicon Being eine Projektrolle zuweisen
+- `remove_role` — Projektrolle eines Silicon Beings entfernen
+- `list_roles` — Rollenzuweisungen des Projekts auflisten
 
 **Verwendungsbeispiel**:
 ```json
 {
   "action": "create",
   "name": "My Project",
-  "description": "项目描述"
+  "description": "Projektbeschreibung"
 }
 ```
 
 ---
 
-### 16. Projekt-Aufgaben-Tool (ProjectTaskTool)
+### 16. Projektaufgaben-Werkzeug (ProjectTaskTool)
 
-**Tool-Name**: `project_task`
+**Werkzeugname**: `project_task`
 
-**Funktionsbeschreibung**: Projektaufgaben verwalten.
+**Verfügbare Szenarien**: Chat, Task, Timer
 
-**Unterstützte Aktionen**:
-- `create` — Aufgabe erstellen
-- `list` — Aufgaben auflisten
-- `update` — Aufgabe aktualisieren
-- `complete` — Aufgabe abschließen
-- `get_stats` — Aufgabenstatistiken abrufen
+**Funktionsbeschreibung**: Verwaltung von Aufgaben innerhalb eines Projektbereichs, unterstützt den vollständigen Aufgaben-Lebenszyklus.
+
+**Unterstützte Operationen**:
+- `create` — Projektaufgabe erstellen
+- `list` — Projektaufgaben auflisten
+- `get` — Aufgabendetails abrufen
+- `update` — Aufgabentitel/-beschreibung/-priorität aktualisieren
+- `assign` — Verantwortlichen einer Aufgabe zuweisen
+- `remove_assignee` — Verantwortlichen einer Aufgabe entfernen
+- `start` — Aufgabe starten
+- `complete` — Aufgabe als abgeschlossen markieren
+- `fail` — Aufgabe als fehlgeschlagen markieren
+- `cancel` — Aufgabe abbrechen
+- `delete` — Aufgabe löschen
+- `stats` — Aufgabenstatistiken abrufen
 
 **Verwendungsbeispiel**:
 ```json
 {
   "action": "create",
   "project_id": "project-uuid",
-  "description": "完成任务描述",
+  "description": "Aufgabenbeschreibung abschließen",
   "priority": 5
 }
 ```
 
 ---
 
-### 17. Projekt-Arbeitsnotizen-Tool (ProjectWorkNoteTool)
+### 17. Projekt-Arbeitsnotiz-Werkzeug (ProjectWorkNoteTool)
 
-**Tool-Name**: `project_work_note`
+**Werkzeugname**: `project_work_note`
 
-**Funktionsbeschreibung**: Projekt-Arbeitsnotizen verwalten (öffentlich, ähnlich einem Arbeitsbuch).
+**Verfügbare Szenarien**: Chat, Task, Timer
 
-**Unterstützte Aktionen**:
-- `create` — Notiz erstellen
-- `read` — Notiz lesen
-- `update` — Notiz aktualisieren
-- `delete` — Notiz löschen
-- `list` — Notizen auflisten
-- `search` — Notizen suchen
-- `directory` — Inhaltsverzeichnis generieren
+**Funktionsbeschreibung**: Verwaltung von Arbeitsnotizen innerhalb eines Projektbereichs (öffentlich, ähnlich einem Arbeitsheft), unterstützt seitenbasierte Notizverwaltung.
+
+**Unterstützte Operationen**:
+- `create` — Notizseite erstellen (erfordert `project_id`, `summary` und `content`, optional `keywords`)
+- `read` — Notizseite lesen (erfordert `project_id` und `page_number` oder `note_id`)
+- `update` — Notizseite aktualisieren (erfordert `project_id`, `page_number` und `content`, optional `summary` und `keywords`)
+- `delete` — Notizseite löschen (erfordert `project_id` und `page_number` oder `note_id`)
+- `list` — Alle Notizseiten-Zusammenfassungen des Projekts auflisten
+- `directory` — Notizverzeichnis/-übersicht generieren
+- `search` — Notizen nach Schlüsselwort durchsuchen (erfordert `project_id` und `keyword`, optional `max_results`)
 
 **Verwendungsbeispiel**:
 ```json
 {
   "action": "create",
   "project_id": "project-uuid",
-  "summary": "完成用户认证模块",
-  "content": "## 实现细节\n\n- 使用 JWT token",
-  "keywords": "认证,JWT"
+  "summary": "Benutzerauthentifizierungsmodul abgeschlossen",
+  "content": "## Implementierungsdetails\n\n- JWT-Token verwenden",
+  "keywords": "Authentifizierung,JWT"
 }
 ```
 
 ---
 
-### 18. System-Tool (SystemTool)
+### 18. Projektarbeit-Werkzeug (ProjectWorkTool) 🔒
 
-**Tool-Name**: `system`
+**Werkzeugname**: `project_work`
+
+**Berechtigungsanforderung**: Nur für Silicon Curator verfügbar (`[SiliconManagerOnly]`)
+
+**Verfügbare Szenarien**: Project (`[ToolScenario(ToolScenarioFlag.Project)]`, nur im Projekt-Szenario verfügbar)
+
+**Funktionsbeschreibung**: Projektarbeits-Operationswerkzeug, das vom Curator zur Verwaltung von Projekt-Workflows im ThinkOnProject-Szenario verwendet wird.
+
+**Unterstützte Operationen**:
+- `create-task` — Projektaufgabe erstellen
+- `assign-task` — Silicon Being einer Aufgabe zuweisen
+- `chat` — Nachricht an Projekt-Gruppenchat senden
+- `broadcast` — Nachricht an Projekt-Kanal senden
+- `complete` — Projekt als abgeschlossen markieren
+- `status` — Projektstatus abrufen
+
+**Verwendungsbeispiel**:
+```json
+{
+  "action": "create-task",
+  "project_id": "project-uuid",
+  "title": "Benutzerauthentifizierung implementieren"
+}
+```
+
+---
+
+### 19. System-Werkzeug (SystemTool)
+
+**Werkzeugname**: `system`
 
 **Funktionsbeschreibung**: Systeminformationen und Ressourcennutzung abrufen.
 
-**Unterstützte Aktionen**:
+**Unterstützte Operationen**:
 - `info` — Systeminformationen abrufen
 - `resource_usage` — Ressourcennutzung abrufen
-- `find_process` — Prozess suchen
+- `find_process` — Prozess finden
 - `list_beings` — Silicon Beings auflisten
 
 **Verwendungsbeispiel**:
@@ -498,13 +570,13 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 
 ---
 
-### 19. Aufgaben-Tool (TaskTool)
+### 20. Aufgaben-Werkzeug (TaskTool)
 
-**Tool-Name**: `task`
+**Werkzeugname**: `task`
 
-**Funktionsbeschreibung**: Persönliche Aufgaben von Silicon Beings verwalten.
+**Funktionsbeschreibung**: Verwaltung der persönlichen Aufgaben eines Silicon Beings.
 
-**Unterstützte Aktionen**:
+**Unterstützte Operationen**:
 - `create` — Aufgabe erstellen
 - `list` — Aufgaben auflisten
 - `update` — Aufgabe aktualisieren
@@ -516,24 +588,24 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 ```json
 {
   "action": "create",
-  "description": "审查代码",
+  "description": "Code überprüfen",
   "priority": 5
 }
 ```
 
 ---
 
-### 20. Timer-Tool (TimerTool)
+### 21. Timer-Werkzeug (TimerTool)
 
-**Tool-Name**: `timer`
+**Werkzeugname**: `timer`
 
-**Funktionsbeschreibung**: Timer erstellen und verwalten.
+**Funktionsbeschreibung**: Erstellen und Verwalten von Timern.
 
-**Unterstützte Aktionen**:
+**Unterstützte Operationen**:
 - `create` — Timer erstellen
 - `list` — Timer auflisten
 - `delete` — Timer löschen
-- `pause` — Timer pausieren
+- `pause` — Timer anhalten
 - `resume` — Timer fortsetzen
 - `get_execution_history` — Ausführungshistorie abrufen
 
@@ -543,57 +615,68 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
   "action": "create",
   "interval": 3600,
   "repeat": true,
-  "message": "每小时提醒"
+  "message": "Stündliche Erinnerung"
 }
 ```
 
 ---
 
-### 21. Token-Audit-Tool (TokenAuditTool) 🔒
+### 22. Token-Nutzungsaudit-Werkzeug (TokenAuditTool) 🔒
 
-**Tool-Name**: `token_audit`
+**Werkzeugname**: `token_audit`
 
-**Berechtigungsanforderung**: Nur für Silicon Curator
+**Berechtigungsanforderung**: Nur für Silicon Curator verfügbar (`[SiliconManagerOnly]`)
 
-**Funktionsbeschreibung**: AI-Token-Nutzung abfragen und zusammenfassen.
+**Verfügbare Szenarien**: Chat, Task, Timer
 
-**Unterstützte Aktionen**:
-- `get_usage` — Token-Nutzungsstatistiken abrufen
-- `get_by_being` — Nutzung nach Being abrufen
-- `get_by_model` — Nutzung nach Modell abrufen
-- `get_trend` — Nutzungstrend abrufen
-- `export` — Daten exportieren
+**Funktionsbeschreibung**: Abfrage von KI-Token-Nutzungsstatistiken und Trenddaten.
+
+**Unterstützte Operationen**:
+- `summary` — Token-Nutzungszusammenfassung abrufen
+- `trend` — Token-Nutzungstrend-Datenpunkte abrufen
+
+**Unterstützte Zeitbereiche**:
+- `today` — Letzte 24 Stunden
+- `week` — Letzte 7×24 Stunden
+- `month` — Tagesweise Statistik
+- `year` — Monatsweise Statistik
 
 **Verwendungsbeispiel**:
 ```json
 {
-  "action": "get_usage",
-  "start_date": "2026-04-01",
-  "end_date": "2026-04-26"
+  "action": "summary",
+  "time_range": "week"
 }
 ```
 
 ---
 
-### 22. WebView-Browser-Tool (WebViewBrowserTool)
+### 23. WebView-Browser-Werkzeug (WebViewBrowserTool)
 
-**Tool-Name**: `webview`
+**Werkzeugname**: `webview_browser`
 
-**Funktionsbeschreibung**: Browserautomatisierung basierend auf Playwright.
+**Verfügbare Szenarien**: Chat, Task, Timer
 
-**Unterstützte Aktionen**:
-- `open_browser` — Browser öffnen
-- `close_browser` — Browser schließen
+**Funktionsbeschreibung**: Playwright-basierte Browser-Automatisierung, bietet vollständige Web-Navigation, Interaktion und Datenextraktion.
+
+**Unterstützte Operationen**:
+- `open` — Browser öffnen
+- `close` — Browser schließen
 - `navigate` — Zu URL navigieren
 - `click` — Element anklicken
 - `input` — Text eingeben
+- `scroll` — Seite scrollen
+- `execute_script` — JavaScript ausführen
 - `get_page_text` — Seitentext abrufen
 - `get_screenshot` — Screenshot abrufen
-- `execute_script` — JavaScript ausführen
 - `wait_for_element` — Auf Element warten
+- `get_element_info` — Elementinformationen abrufen
+- `upload_file` — Datei hochladen
 - `get_browser_status` — Browserstatus abrufen
+- `set_timeout` — Zeitüberschreitung festlegen
+- `clear_session` — Browsersitzung löschen
 
-**Features**:
+**Eigenschaften**:
 - Unabhängige Instanz pro Silicon Being
 - Vollständig isolierte Cookies und Sitzungen
 - Für Benutzer vollständig unsichtbar (Headless-Modus)
@@ -609,55 +692,55 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 
 ---
 
-### 23. Arbeitsnotizen-Tool (WorkNoteTool)
+### 24. Arbeitsnotiz-Werkzeug (WorkNoteTool)
 
-**Tool-Name**: `work_note`
+**Werkzeugname**: `work_note`
 
-**Funktionsbeschreibung**: Persönliche Arbeitsnotizen von Silicon Beings verwalten (privat, ähnlich einem Tagebuch).
+**Funktionsbeschreibung**: Verwaltung der persönlichen Arbeitsnotizen eines Silicon Beings (privat, ähnlich einem Tagebuch).
 
-**Unterstützte Aktionen**:
+**Unterstützte Operationen**:
 - `create` — Notiz erstellen
 - `read` — Notiz lesen
 - `update` — Notiz aktualisieren
 - `delete` — Notiz löschen
 - `list` — Notizen auflisten
-- `search` — Notizen suchen
-- `directory` — Inhaltsverzeichnis generieren
+- `search` — Notizen durchsuchen
+- `directory` — Verzeichnis generieren
 
 **Verwendungsbeispiel**:
 ```json
 {
   "action": "create",
-  "summary": "完成用户认证模块",
-  "content": "## 实现细节\n\n- 使用 JWT token\n- 支持 OAuth2",
-  "keywords": "认证,JWT,OAuth2"
+  "summary": "Benutzerauthentifizierungsmodul abgeschlossen",
+  "content": "## Implementierungsdetails\n\n- JWT-Token verwenden\n- OAuth2 unterstützen",
+  "keywords": "Authentifizierung,JWT,OAuth2"
 }
 ```
 
 ---
 
-### 24. Hot-Reload-Tool (HotReloadTool)
+### 25. Hot-Reload-Werkzeug (HotReloadTool)
 
-**Tool-Name**: `hot_reload`
+**Werkzeugname**: `hot_reload`
 
-**Beschreibung**: Unterstützt automatische Kompilierung, Dateiaktualisierung und Neustart von SiliconLife.Fast während der Laufzeit, ohne manuelles Eingreifen.
+**Funktionsbeschreibung**: Unterstützt automatische Kompilierung, Dateiaktualisierung und Neustart von SiliconLife.Fast während der Laufzeit ohne manuellen Eingriff.
 
-**Unterstützte Aktionen**:
-- `execute` — Führt den kompletten Build-, Kopier- und Neustartprozess aus
-- `build_only` — Kompiliert nur das Projekt, ohne zu kopieren oder neuzustarten
+**Unterstützte Operationen**:
+- `execute` — Vollständigen Build-, Kopier- und Neustart-Prozess ausführen
+- `build_only` — Nur das Projekt kompilieren, ohne Kopieren und Neustarten
 
 **Arbeitsablauf**:
-1. Kompiliert das SiliconLife.Fast-Projekt
-2. Schließt die laufende Fast-Instanz ordnungsgemäß (über HTTP-API)
-3. Wartete auf Prozessende und Portfreigabe
-4. Kopiert die Build-Ausgabe in das Zielverzeichnis (schließt HotReload-Dateien aus)
-5. Startet die Fast-Instanz neu
+1. SiliconLife.Fast-Projekt kompilieren
+2. Aktuell laufende Fast-Instanz ordnungsgemäß herunterfahren (über HTTP-API)
+3. Auf Prozessbeendigung und Portfreigabe warten
+4. Build-Ausgabe in Zielverzeichnis kopieren (HotReload-eigene Dateien überspringen)
+5. Fast-Instanz neu starten
 
-**Merkmale**:
-- Automatische Erkennung und Schließung des vorherigen Prozesses
-- Sicheres Dateikopieren (überschreibt HotReload.exe nicht)
+**Eigenschaften**:
+- Automatische Erkennung und Beendigung alter Prozesse
+- Sicheres Dateikopieren (HotReload.exe wird nicht überschrieben)
 - Portfreigabe-Wartemechanismus
-- Unterstützt benutzerdefinierte Portkonfiguration
+- Unterstützung für benutzerdefinierte Portkonfiguration
 
 **Verwendungsbeispiel**:
 ```json
@@ -671,17 +754,19 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 ```
 
 **Parameterbeschreibung**:
-- `project_path`: Projektpfad (relativ zum Lösungsstammverzeichnis)
+- `project_path`: Projektpfad (relativ zum Lösungs-Stammverzeichnis)
 - `source_path`: Build-Ausgabeverzeichnis
 - `configuration`: Build-Konfiguration (Debug/Release)
-- `port`: Fast-Instanz Web-Port (Standard 8080)
+- `port`: Web-Port der Fast-Instanz (Standard 8080)
 
 **Hinweise**:
-- Nur anwendbar für SiliconLife.Fast-Version
-- Erfordert HotReload.exe im tools/HotReload-Verzeichnis
-- Kurze Serviceunterbrechung während des Neustarts (ca. 3-5 Sekunden)
+- Nur für die SiliconLife.Fast-Version anwendbar
+- Erfordert HotReload.exe im Verzeichnis tools/HotReload
+- Während des Neustarts gibt es eine kurze Dienstunterbrechung (ca. 3-5 Sekunden)
 
-## Tool-Aufrufablauf
+---
+
+## Werkzeugaufruf-Prozess
 
 ```
 ┌──────────┐
@@ -689,32 +774,33 @@ Das Tool-System ermöglicht Silicon Beings die Interaktion mit der Außenwelt ü
 └────┬─────┘
      ↓
 ┌──────────────┐
-│ ToolManager  │ Tool finden und Nutzung berechtigen
+│ Werkzeug-    │ Sucht und validiert Werkzeugnutzungsberechtigung
+│ manager      │
 └────┬─────────┘
      ↓
 ┌──────────────┐
-│ Permission   │ Berechtigungskette prüfen
-│   Manager    │
+│ Berechtigungs│ Prüft Berechtigungskette
+│ manager      │
 └────┬─────────┘
      ↓
 ┌──────────────┐
-│  Executor    │ Ressourcenzugriffsoperation ausführen
+│  Executor    │ Führt Ressourcenzugriffsoperationen aus
 └────┬─────────┘
      ↓
 ┌──────────┐
-│   AI     │ Tool-Ergebnis empfangen, weiter denken
+│   AI     │ Empfängt Werkzeugergebnis, denkt weiter
 └──────────┘
 ```
 
 ## Berechtigungsvalidierung
 
-Alle Tool-Ausführungen durchlaufen eine 5-stufige Berechtigungskette:
+Alle Werkzeugausführungen durchlaufen die Berechtigungsvalidierungskette:
 
-1. **UserFrequencyCache** — Zwischengespeicherte Benutzerentscheidungen (HighDeny/HighAllow)
-2. **IPermissionCallback** — Benutzerdefinierte Berechtigungs-Callback-Funktion
-3. **IsCurator-Verzweigung** — Kurator→IPermissionAskHandler / Nicht-Kurator→GlobalACL→Verweigert
+1. **Benutzerfrequenz-Cache** — Hochfrequente Benutzerentscheidungen zwischengespeichert (HighDeny hat Vorrang vor HighAllow)
+2. **Berechtigungs-Callback-Schnittstelle** — Benutzerdefinierte Berechtigungs-Callback-Funktion (Allowed/Denied/AskUser)
+3. **IsCurator-Verzweigung** — Curator fragt den Benutzer über IPermissionAskHandler; Nicht-Curator fragt GlobalACL ab, bei fehlender passender Regel wird standardmäßig abgelehnt
 
-## Benutzerdefinierte Tools erstellen
+## Benutzerdefinierte Werkzeuge erstellen
 
 ### Schritt 1: ITool-Schnittstelle implementieren
 
@@ -723,7 +809,7 @@ public class MyCustomTool : ITool
 {
     public string Name => "my_tool";
     
-    public string Description => "工具描述";
+    public string Description => "Werkzeugbeschreibung";
     
     public ToolDefinition Definition => new ToolDefinition
     {
@@ -731,7 +817,7 @@ public class MyCustomTool : ITool
         Description = Description,
         Parameters = new Dictionary<string, object>
         {
-            ["param1"] = new { type = "string", description = "参数说明" }
+            ["param1"] = new { type = "string", description = "Parameterbeschreibung" }
         }
     };
     
@@ -762,16 +848,16 @@ public class MyCustomTool : ITool
 
 ### Schritt 2: Zum Projekt hinzufügen
 
-Platzieren Sie die Tool-Datei im Verzeichnis `src/SiliconLife.Common/Tools/` (gemeinsame Tools) oder `src/SiliconLife.App/Tools/` (versionsspezifische Tools). Der `ToolManager` wird sie beim Start automatisch durch Reflektion entdecken und registrieren.
+Die Werkzeugdatei im Verzeichnis `src/SiliconLife.Common/Tools/` ablegen (gemeinsame Werkzeuge) oder in `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` (versionsspezifische Werkzeuge). Der Werkzeugmanager entdeckt und registriert diese beim Start automatisch über Reflexion.
 
-### Schritt 2a: Über Plugin registrieren
+### Schritt 2a: Werkzeug über Plugin registrieren
 
-Benutzerdefinierte Tools können auch über das Plugin-System registriert werden:
+Benutzerdefinierte Werkzeuge können auch über das Plugin-System registriert werden:
 
 1. `ITool`-Schnittstelle im Plugin-Projekt implementieren
 2. Plugin-DLL kompilieren und im Plugin-Verzeichnis ablegen
-3. `ToolManager.ScanAllPluginAssemblies()` scannt automatisch alle ITool-Implementierungen in geladenen Plugins
-4. Plugin-Tools unterliegen demselben Berechtigungssystem
+3. `ToolManager.ScanAllPluginAssemblies()` scannt automatisch alle geladenen Plugins nach ITool-Implementierungen
+4. Plugin-Werkzeuge unterliegen demselben Berechtigungssystem
 
 ### Schritt 3: (Optional) Als Curator-exklusiv markieren
 
@@ -783,14 +869,14 @@ public class AdminOnlyTool : ITool
 }
 ```
 
-## Best Practices
+## Bewährte Praktiken
 
-### 1. Immer Parameter validieren
+### 1. Parameter immer validieren
 
 ```csharp
 if (!call.Parameters.ContainsKey("required_param"))
 {
-    return ToolResult.Failure("缺少必需参数: required_param");
+    return ToolResult.Failure("Erforderlicher Parameter fehlt: required_param");
 }
 ```
 
@@ -803,67 +889,67 @@ try
 }
 catch (Exception ex)
 {
-    Logger.Error($"工具 {Name} 执行失败: {ex.Message}");
+    Logger.Error($"Werkzeug {Name} Ausführung fehlgeschlagen: {ex.Message}");
     return ToolResult.Failure(ex.Message);
 }
 ```
 
 ### 3. Berechtigungssystem respektieren
 
-Umgehen Sie niemals die Berechtigungsprüfung. Greifen Sie immer über den Executor auf Ressourcen zu:
+Berechtigungsprüfungen niemals umgehen. Immer über den Executor auf Ressourcen zugreifen:
 
 ```csharp
-var permission = await permissionManager.CheckAsync(request);
-if (!permission.Allowed)
+bool allowed = permissionManager.CheckPermission(callerId, permissionType, resource);
+if (!allowed)
 {
-    return ToolResult.Denied(permission.Reason);
+    return ToolResult.Denied("Permission denied");
 }
 ```
 
-### 4. Klare Tool-Beschreibungen bereitstellen
+### 4. Klare Werkzeugbeschreibung bereitstellen
 
-Helfen Sie der KI zu verstehen, wann und wie das Tool verwendet wird:
+Hilft der KI zu verstehen, wann und wie das Werkzeug zu verwenden ist:
 
 ```csharp
 public string Description => 
-    "用于在不同日历系统之间转换日期。" +
-    "需要提供 'date'、'from_calendar' 和 'to_calendar' 参数。";
+    "Zur Konvertierung von Daten zwischen verschiedenen Kalendersystemen." +
+    "Erfordert die Parameter 'date', 'from_calendar' und 'to_calendar'.";
 ```
 
 ## Fehlerbehebung
 
-### Tool nicht gefunden
+### Werkzeug nicht gefunden
 
-**Problem**: KI versucht, ein nicht existierendes Tool aufzurufen.
+**Problem**: Die KI versucht, ein nicht existierendes Werkzeug aufzurufen.
 
 **Lösung**:
-- Prüfen Sie, ob der Tool-Name exakt übereinstimmt
-- Validieren Sie, dass die Tool-Datei im `Tools/`-Verzeichnis ist
-- Projekt neu bauen (`dotnet build`)
+- Prüfen, ob der Werkzeugname exakt übereinstimmt
+- Verifizieren, dass die Werkzeugdatei im `Tools/`-Verzeichnis liegt
+- Projekt neu erstellen (`dotnet build`)
 
 ### Berechtigung verweigert
 
-**Problem**: Tool-Ausführung fehlschlägt mit Berechtigungsfehler.
+**Problem**: Werkzeugausführung schlägt fehl, gibt Berechtigungsfehler zurück.
 
 **Lösung**:
-- Berechtigungs-Audit-Protokoll prüfen
-- Validieren Sie, dass das Being die erforderlichen Berechtigungen hat
-- Globale ACL-Einstellungen prüfen
-- Wenn Curator, prüfen Sie ob `[SiliconManagerOnly]`-Attribut verwendet wird
+- Berechtigungsaudit-Protokoll prüfen
+- Verifizieren, dass das Silicon Being die erforderlichen Berechtigungen hat
+- Globale ACL-Einstellungen überprüfen
+- Wenn es sich um den Curator handelt, prüfen, ob das `[SiliconManagerOnly]`-Attribut verwendet wurde
 
-### Tool-Ausführung gibt Fehler zurück
+### Werkzeugausführung gibt Fehler zurück
 
-**Problem**: Tool wird ausgeführt, aber gibt Fehlerergebnis zurück.
+**Problem**: Werkzeug wird ausgeführt, gibt aber ein fehlgeschlagenes Ergebnis zurück.
 
 **Lösung**:
-- Fehlermeldung des Tools prüfen
-- Validieren Sie, dass Eingabeparameter korrekt formatiert sind
-- Systemprotokolle für detaillierte Fehlerinformationen prüfen
-- Tool-Funktionalität unabhängig testen
+- Die vom Werkzeug zurückgegebene Fehlermeldung prüfen
+- Eingabeparameterformat validieren
+- Systemprotokolle für detaillierte Fehlerinformationen einsehen
+- Werkzeugfunktionalität unabhängig testen
 
 ## Nächste Schritte
 
-- 📚 [Architekturleitfaden](architecture.md) lesen
-- 🛠️ [Entwicklungsleitfaden](development-guide.md) prüfen
+- 📚 [Architektur-Leitfaden](architecture.md) lesen
+- 🛠️ [Entwicklungsleitfaden](development-guide.md) ansehen
 - 🔒 [Berechtigungssystem](permission-system.md) verstehen
 - 🚀 [Schnellstart-Leitfaden](getting-started.md) ansehen

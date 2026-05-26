@@ -1,88 +1,85 @@
-﻿# Przewodnik Istoty Krzemowej
+# Przewodnik Istoty Krzemowej
 
 > **Wersja: v0.2.0-alpha**
 
-[English](../en/silicon-being-guide.md) | [Deutsch](../de-DE/silicon-being-guide.md) | [中文](../zh-CN/silicon-being-guide.md) | [繁體中文](../zh-HK/silicon-being-guide.md) | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | [한국어](../ko-KR/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md) | [Русский](../ru-RU/silicon-being-guide.md) | [Polski](../pl-PL/silicon-being-guide.md)
+[English](../en/silicon-being-guide.md) | [Deutsch](../de-DE/silicon-being-guide.md) | [中文](../zh-CN/silicon-being-guide.md) | [繁體中文](../zh-HK/silicon-being-guide.md) | [Español](../es-ES/silicon-being-guide.md) | [日本語](../ja-JP/silicon-being-guide.md) | [한국어](../ko-KR/silicon-being-guide.md) | [Čeština](../cs-CZ/silicon-being-guide.md) | [Русский](../ru-RU/silicon-being-guide.md)
 
 ## Przegląd
 
-Istoty Krzemowe to napędzane przez AI agenty, które mogą autonomicznie myśleć, działać i ewoluować.
+Istota Krzemowa to inteligentny agent napędzany przez AI, zdolny do autonomicznego myślenia, działania i ewolucji.
 
 ## Architektura
 
-### Separacja ciało-mózg
+### Separacja Ciało-Mózg
 
 ```
 ┌─────────────────────────────────────┐
-│         Istota Krzemowa             │
+│         Istota Krzemowa              │
 ├──────────────────┬──────────────────┤
-│   Ciało          │   Mózg           │
+│   Ciało           │   Mózg            │
 │ (SiliconBeing)   │ (ContextManager) │
 ├──────────────────┼──────────────────┤
-│ • Zarządzanie    │ • Ładowanie      │
-│   stanem         │   historii       │
-│ • Wykrywanie     │ • Wywoływanie AI │
-│   wyzwalaczy     │ • Wykonywanie    │
-│ • Cykl życia     │   narzędzi       │
-│                  │ • Utrwalanie     │
-│                  │   odpowiedzi     │
+│ • Zarządzanie stanem │ • Ładowanie historii    │
+│ • Wykrywanie wyzwalaczy │ • Wywoływanie AI         │
+│ • Cykl życia      │ • Wykonywanie narzędzi        │
+│                  │ • Trwałość odpowiedzi      │
 └──────────────────┴──────────────────┘
 ```
 
-## Plik duszy
+## Plik Duszy
 
 ### Struktura
 
 ```markdown
-# Nazwa Istoty
+# Being Name
 
-## Osobowość
-Opisz cechy osobowości i charakterystykę istoty.
+## Personality
+Describe the being's personality traits and characteristics.
 
-## Zdolności
-Wymień, co ta istota potrafi zrobić.
+## Capabilities
+List what this being can do.
 
-## Wytyczne zachowania
-Zdefiniuj, jak istota powinna zachowywać się w różnych sytuacjach.
+## Behavior Guidelines
+Define how the being should behave in different situations.
 
-## Dziedzina wiedzy
-Określ obszar specjalizacji istoty.
+## Knowledge Domain
+Specify the being's area of expertise.
 ```
 
 ### Przykład
 
 ```markdown
-# Asystent Przeglądu Kodu
+# Code Review Assistant
 
-## Osobowość
-Jesteś skrupulatnym recenzentem kodu z 10-letnim doświadczeniem.
-Dostarczasz konstruktywną informację zwrotną i zawsze tłumaczysz swoje rozumowanie.
+## Personality
+You are a meticulous code reviewer with 10 years of experience.
+You provide constructive feedback and always explain your reasoning.
 
-## Zdolności
-- Przeglądanie kodu pod kątem błędów i najlepszych praktyk
-- Sugerowanie optymalizacji wydajności
-- Tłumaczenie złożonych algorytmów
-- Identyfikacja luk bezpieczeństwa
+## Capabilities
+- Review code for bugs and best practices
+- Suggest performance optimizations
+- Explain complex algorithms
+- Identify security vulnerabilities
 
-## Wytyczne zachowania
-- Zacznij od pozytywnych obserwacji
-- Podaj konkretne przykłady
-- Wyjaśnij, dlaczego zmiany są potrzebne
-- Bądź pełen szacunku i profesjonalny
+## Behavior Guidelines
+- Start with positive observations
+- Provide specific examples
+- Explain why changes are needed
+- Be respectful and professional
 
-## Dziedzina wiedzy
-Specjalizacja w C#, .NET i architekturze oprogramowania.
+## Knowledge Domain
+Specialized in C#, .NET, and software architecture.
 ```
 
-## Tworzenie istoty
+## Tworzenie Istoty
 
 ### Przez Web UI
 
 1. Przejdź do **Zarządzanie istotami**
 2. Kliknij **Utwórz nową istotę**
 3. Wypełnij:
-   - Nazwę
-   - Treść duszy
+   - Nazwa
+   - Treść Pliku Duszy
    - Opcje konfiguracji
 4. Kliknij **Utwórz**
 
@@ -97,42 +94,43 @@ curl -X POST http://localhost:8080/api/beings \
   }'
 ```
 
-## Cykl życia istoty
+## Cykl życia Istoty
 
 ### Stany aktywności
 
-Istoty Krzemowe mają następujące stany aktywności:
+Istoty Krzemowe posiadają następujące stany aktywności:
 
 | Stan | Opis |
 |------|------|
-| `Idle` | Stan bezczynności, oczekiwanie na wyzwolenie zegara |
-| `SingleChat` | Udział w czacie indywidualnym |
-| `GroupChat` | Udział w czacie grupowym |
+| `Idle` | Stan bezczynności, oczekiwanie na wyzwalanie zegarem |
+| `SingleChat` | Trwa czat jeden na jednego |
+| `GroupChat` | Trwa czat grupowy |
 | `Task` | Wykonywanie zadania |
 | `Timer` | Wykonywanie czasomierza |
-| `Broadcast` | Przetwarzanie komunikatu |
-| `Project` | Praca nad projektem |
-| `MemoryCompression` | Kompresja pamięci |
 | `Stopped` | Zatrzymana, z powodu kolejnych błędów lub ręcznego zatrzymania |
 
 **Mechanizm stanu Stopped**:
-- Gdy Istota Krzemowa napotka 10 kolejnych błędów, automatycznie przechodzi do stanu `Stopped`
+- Gdy Istota Krzemowa napotka 10 kolejnych błędów, automatycznie przechodzi w stan `Stopped`
 - Po wejściu w stan Stopped, istota nie będzie wykonywać żadnych zadań
-- Wymagana jest ręczna interwencja, aby ponownie uruchomić
+- Gdy nadejdzie nowa wiadomość czatu, licznik błędów jest resetowany, a istota wznawia działanie
+- Można również zrestartować istotę przez ręczną interwencję
 
 ### Przejścia stanów
 
 ```
-Idle → SingleChat/GroupChat/Task/Timer/Broadcast/Project/MemoryCompression → Idle (normalne zakończenie)
-Dowolny stan → Stopped (10 kolejnych błędów lub ręczne zatrzymanie)
-Stopped → Idle (ponowne uruchomienie)
+Idle → SingleChat → Idle (czat zakończony)
+Idle → GroupChat → Idle (czat grupowy zakończony)
+Idle → Task → Idle (zadanie zakończone)
+Idle → Timer → Idle (czasomierz zakończony)
+Dowolny → Stopped (10 kolejnych błędów)
+Stopped → Idle (nowa wiadomość czatu lub ręczny restart)
 ```
 
 ### Operacje
 
 - **Uruchomienie**: inicjalizacja i rozpoczęcie przetwarzania
 - **Zatrzymanie**: eleganckie zamknięcie
-- **Restart**: odzyskanie ze stanu Stopped do stanu Idle
+- **Restart**: powrót ze stanu Stopped do stanu Idle
 
 ## System zadań
 
@@ -142,7 +140,7 @@ Stopped → Idle (ponowne uruchomienie)
 var task = new BeingTask
 {
     BeingId = being.Id,
-    Description = "Przegląd kodu",
+    Description = "Review the code",
     Priority = 5,
     DueDate = DateTime.UtcNow.AddHours(2)
 };
@@ -150,26 +148,29 @@ var task = new BeingTask
 await taskSystem.CreateAsync(task);
 ```
 
-### Stany zadań
+### Statusy zadań
 
-- `Pending` - Oczekujące na wykonanie
-- `Running` - Wykonywane
-- `Completed` - Pomyślnie ukończone
-- `Failed` - Wykonanie nie powiodło się
-- `Cancelled` - Ręcznie anulowane
+- `Pending` - oczekiwanie na wykonanie
+- `Running` - trwa wykonywanie
+- `SubmittedForReview` - przesłane do przeglądu
+- `UnderReview` - w trakcie przeglądu
+- `Rework` - poprawki wymagane
+- `Completed` - pomyślnie ukończone
+- `Failed` - wykonanie nie powiodło się
+- `Cancelled` - ręcznie anulowane
 
-## System czasomierza
+## System czasomierzy
 
 ### Typy czasomierzy
 
 1. **Jednorazowy**: wykonanie raz po opóźnieniu
 2. **Interwałowy**: powtarzanie w stałych odstępach
-3. **Cron**: wykonanie na podstawie wyrażenia cron
+3. **Cron**: wykonywanie na podstawie wyrażenia cron
 
 ### Przykład
 
 ```csharp
-// Wykonywane co godzinę
+// Wykonywanie co godzinę
 var timer = new BeingTimer
 {
     BeingId = being.Id,
@@ -185,8 +186,8 @@ await timerSystem.StartAsync(timer);
 
 ### Typy pamięci
 
-- **Krótkoterminowa**: bieżący kontekst rozmowy
-- **Długoterminowa**: utrwalona wiedza i doświadczenia
+- **Krótkotrwała**: kontekst bieżącej konwersacji
+- **Długotrwała**: utrwalona wiedza i doświadczenia
 - **Epizodyczna**: zdarzenia i interakcje indeksowane czasowo
 
 ### Struktura przechowywania
@@ -217,28 +218,28 @@ data/
         └── soul.md
 ```
 
-## System notatek roboczych
+## System notatek pracy
 
 ### Przegląd
 
-Notatki robocze to osobisty system dziennika istoty krzemowej, z projektowaniem opartym na stronach, służący do rejestrowania postępu pracy, wniosków z nauki, notatek projektowych itp.
+Notatki pracy to osobisty system dziennika Istoty Krzemowej, z projektem stronicowym, służący do rejestrowania postępów w pracy, wniosków z nauki, notatek projektowych itp.
 
-### Funkcje
+### Cechy
 
-- **Zarządzanie stronami**: każda notatka jest niezależną stroną, dostępną według numeru strony
+- **Zarządzanie stronicowe**: każda notatka stanowi niezależną stronę, dostępną po numerze strony
 - **Obsługa Markdown**: treść obsługuje formatowanie Markdown (tekst, listy, tabele, bloki kodu)
-- **Indeks słów kluczowych**: obsługa dodawania słów kluczowych do notatek, ułatwiająca wyszukiwanie
+- **Indeksowanie słów kluczowych**: obsługa dodawania słów kluczowych do notatek, ułatwiająca wyszukiwanie
 - **Funkcja podsumowania**: każda notatka ma krótkie podsumowanie do szybkiego przeglądu
-- **Generowanie spisu treści**: można wygenerować przegląd spisu treści wszystkich notatek, pomagający zrozumieć ogólny kontekst
+- **Generowanie spisu treści**: możliwość wygenerowania przeglądu spisu treści wszystkich notatek, pomagającego zrozumieć ogólny kontekst
 - **Znaczniki czasu**: automatyczne rejestrowanie czasu utworzenia i aktualizacji
-- **Domyślnie prywatne**: dostępne tylko dla samej istoty (kurator może zarządzać)
+- **Domyślnie prywatne**: dostępne tylko dla samej istoty (Kurator może zarządzać)
 
 ### Scenariusze użycia
 
-1. **Rejestracja postępu projektu**
+1. **Rejestr postępów projektu**
    ```
    Podsumowanie: Ukończono moduł uwierzytelniania użytkowników
-   Treść: Zaimplementowano weryfikację tokenów JWT, integrację OAuth2, mechanizm odświeżania tokenów
+   Treść: Zaimplementowano weryfikację JWT token, integrację OAuth2, mechanizm odświeżania tokenów
    Słowa kluczowe: uwierzytelnianie,JWT,OAuth2
    ```
 
@@ -249,23 +250,23 @@ Notatki robocze to osobisty system dziennika istoty krzemowej, z projektowaniem 
    Słowa kluczowe: C#,asynchroniczne,najlepsze praktyki
    ```
 
-3. **Podsumowanie spotkań**
+3. **Podsumowanie spotkania**
    ```
    Podsumowanie: Spotkanie dyskusyjne o wymaganiach produktowych
-   Treść: Omówiono wymagania dotyczące nowych funkcji, określono plan implementacji...
+   Treść: Omówiono wymagania dotyczące nowych funkcji, ustalono plan implementacji...
    Słowa kluczowe: produkt,wymagania,spotkanie
    ```
 
 ### Użycie przez narzędzia
 
-Istota może zarządzać notatkami roboczymi za pomocą narzędzia `work_note`:
+Istota może zarządzać notatkami pracy przez narzędzie `work_note`:
 
 ```json
 // Tworzenie notatki
 {
   "action": "create",
   "summary": "Ukończono moduł uwierzytelniania użytkowników",
-  "content": "## Szczegóły implementacji\n\n- Użycie tokenów JWT\n- Obsługa OAuth2",
+  "content": "## Szczegóły implementacji\n\n- Użycie JWT token\n- Obsługa OAuth2",
   "keywords": "uwierzytelnianie,JWT,OAuth2"
 }
 
@@ -286,22 +287,22 @@ Istota może zarządzać notatkami roboczymi za pomocą narzędzia `work_note`:
 ### Zarządzanie przez Web UI
 
 1. Przejdź do **Zarządzanie istotami** → wybierz istotę
-2. Kliknij zakładkę **Notatki robocze**
-3. Możesz przeglądać, wyszukiwać, edytować notatki
+2. Kliknij zakładkę **Notatki pracy**
+3. Możesz przeglądać, wyszukiwać i edytować notatki
 4. Obsługa podglądu Markdown
 
-## System sieci wiedzy
+## System Sieci Wiedzy
 
 ### Przegląd
 
-Sieć wiedzy to system reprezentacji i zarządzania wiedzą oparty na strukturze trójek (podmiot-orzeczenie-dopełnienie), służący do przechowywania i zarządzania ustrukturyzowaną wiedzą.
+Sieć Wiedzy to system reprezentacji i zarządzania wiedzą oparty na strukturze trójkowej (podmiot-orzecznik-obiekt), służący do przechowywania i zarządzania ustrukturyzowaną wiedzą.
 
-### Podstawowe pojęcia
+### Kluczowe koncepcje
 
-#### Struktura trójki
+#### Struktura trójkowa
 
 ```
-Podmiot (Subject) --Orzeczenie (Predicate)--> Dopełnienie (Object)
+Podmiot (Subject) --Orzecznik (Predicate)--> Obiekt (Object)
 ```
 
 **Przykłady**:
@@ -309,9 +310,9 @@ Podmiot (Subject) --Orzeczenie (Predicate)--> Dopełnienie (Object)
 - `Pekin` --`capital_of`--> `Chiny`
 - `Woda` --`boiling_point`--> `100°C`
 
-#### Poziom ufności
+#### Pewność
 
-Każda trójka wiedzy ma ocenę ufności (0.0-1.0), określającą wiarygodność wiedzy:
+Każda trójka wiedzy posiada ocenę pewności (0.0-1.0), wskazującą stopień wiarygodności wiedzy:
 - `1.0`: absolutna pewność (np. twierdzenia matematyczne)
 - `0.8-0.99`: wysoka wiarygodność (np. zweryfikowane fakty)
 - `0.5-0.79`: średnia wiarygodność (np. wnioski lub hipotezy)
@@ -344,7 +345,7 @@ Obsługa dodawania tagów do trójek, ułatwiająca kategoryzację i wyszukiwani
 }
 ```
 
-#### 2. Zapytanie o wiedzę
+#### 2. Zapytania o wiedzę
 
 ```json
 {
@@ -366,7 +367,7 @@ Obsługa dodawania tagów do trójek, ułatwiająca kategoryzację i wyszukiwani
 
 #### 4. Odkrywanie ścieżek wiedzy
 
-Znajdowanie ścieżek powiązań między dwoma pojęciami:
+Odkrywanie ścieżki powiązań między dwoma pojęciami:
 ```json
 {
   "action": "get_path",
@@ -432,23 +433,23 @@ Zwraca:
 
 ### Zarządzanie przez Web UI
 
-1. Przejdź do strony **Sieć wiedzy**
+1. Przejdź do strony **Sieć Wiedzy**
 2. Przeglądaj statystyki wiedzy
 3. Wyszukuj i przeglądaj wiedzę
-4. Wizualizacja grafu relacji wiedzy (planowane)
+4. Wizualizacja grafu relacji wiedzy (w planach)
 
 ## Operacje przeglądarki WebView (nowość)
 
 ### Przegląd
 
-Istoty Krzemowe mogą autonomicznie przeglądać strony internetowe, pobierać informacje i wykonywać operacje na stronach za pomocą narzędzia przeglądarki WebView. Przeglądarka działa w trybie bezgłowym, całkowicie niewidocznym dla użytkownika.
+Istoty Krzemowe mogą autonomicznie przeglądać strony internetowe, pozyskiwać informacje i wykonywać operacje na stronach przez narzędzie przeglądarki WebView. Przeglądarka działa w trybie headless, całkowicie niewidocznym dla użytkownika.
 
-### Funkcje
+### Cechy
 
-- **Izolacja indywidualna**: każda istota posiada niezależną instancję przeglądarki, ciasteczka i sesję
-- **Tryb bezgłowy**: autonomiczne operacje w tle, niewidoczne dla użytkownika
+- **Indywidualna izolacja**: każda istota posiada niezależną instancję przeglądarki, ciasteczka i sesję
+- **Tryb headless**: autonomiczne działanie w tle, niewidoczne dla użytkownika
 - **Pełna funkcjonalność**: obsługa wykonywania JavaScript, renderowania CSS, wypełniania formularzy itp.
-- **Kontrola bezpieczeństwa**: wszystkie operacje wymagają przejścia przez łańcuch weryfikacji uprawnień
+- **Kontrola bezpieczeństwa**: wszystkie operacje muszą przejść przez łańcuch weryfikacji uprawnień
 
 ### Typowe operacje
 
@@ -456,7 +457,7 @@ Istoty Krzemowe mogą autonomicznie przeglądać strony internetowe, pobierać i
 
 ```json
 {
-  "action": "open_browser"
+  "action": "open"
 }
 ```
 
@@ -469,7 +470,7 @@ Istoty Krzemowe mogą autonomicznie przeglądać strony internetowe, pobierać i
 }
 ```
 
-#### 3. Pobranie zawartości strony
+#### 3. Pobranie treści strony
 
 ```json
 {
@@ -477,7 +478,7 @@ Istoty Krzemowe mogą autonomicznie przeglądać strony internetowe, pobierać i
 }
 ```
 
-Zwraca treść tekstową strony do analizy i zrozumienia przez AI.
+Zwraca tekstową treść strony do analizy i zrozumienia przez AI.
 
 #### 4. Kliknięcie elementu
 
@@ -515,7 +516,7 @@ Zwraca treść tekstową strony do analizy i zrozumienia przez AI.
 }
 ```
 
-Zwraca zrzut ekranu strony (kodowanie Base64), może być użyty do analizy wizualnej.
+Zwraca zrzut ekranu strony (kodowanie Base64), który może być użyty do analizy wizualnej.
 
 #### 8. Oczekiwanie na pojawienie się elementu
 
@@ -530,17 +531,17 @@ Zwraca zrzut ekranu strony (kodowanie Base64), może być użyty do analizy wizu
 ### Scenariusze użycia
 
 1. **Pozyskiwanie informacji**
-   - Przeglądanie stron informacyjnych w celu uzyskania najnowszych wiadomości
+   - Przeglądanie witryn informacyjnych w celu uzyskania najnowszych wiadomości
    - Wyszukiwanie dokumentacji i materiałów technicznych
-   - Monitorowanie zmian treści na stronach
+   - Monitorowanie zmian treści na stronach internetowych
 
 2. **Operacje automatyczne**
    - Wypełnianie i przesyłanie formularzy
    - Klikanie przycisków w celu wyzwolenia operacji
-   - Pobieranie danych ze stron
+   - Pobieranie danych ze stron internetowych
 
 3. **Analiza stron**
-   - Analiza struktury i zawartości strony
+   - Analiza struktury i treści strony
    - Ekstrakcja określonych informacji
    - Analiza wizualna zrzutów ekranu
 
@@ -548,37 +549,115 @@ Zwraca zrzut ekranu strony (kodowanie Base64), może być użyty do analizy wizu
 
 - Operacje przeglądarki mogą być powolne, należy poczekać na załadowanie strony
 - Używaj `wait_for_element`, aby upewnić się, że element pojawił się przed operacją
-- Przestrzegaj warunków korzystania ze stron i plików robots.txt
+- Przestrzegaj warunków korzystania z witryn i plików robots.txt
 - Unikaj częstych żądań, które mogą prowadzić do zablokowania
 
 ## Najlepsze praktyki
 
-### Tworzenie pliku duszy
+### Tworzenie Pliku Duszy
 
 1. **Bądź konkretny**: jasne cechy osobowości i granice
 2. **Zdefiniuj zakres**: co istota powinna i czego nie powinna robić
-3. **Dołącz przykłady**: pokazuj oczekiwane wzorce zachowania
+3. **Dołącz przykłady**: pokazuj oczekiwane wzorce zachowań
 4. **Aktualizuj regularnie**: ewoluuj duszę na podstawie wyników
 
 ### Zarządzanie zadaniami
 
 1. **Ustawiaj priorytety**: używaj priorytetów (1-10)
 2. **Definiuj terminy**: zawsze ustawiaj terminy realizacji
-3. **Monitoruj postęp**: regularnie sprawdzaj status zadań
+3. **Monitoruj postępy**: regularnie sprawdzaj status zadań
 4. **Obsługuj niepowodzenia**: implementuj logikę ponownych prób
 
 ### Optymalizacja pamięci
 
-1. **Czyść stare dane**: regularnie archiwizuj stare wspomnienia
+1. **Oczyszczaj stare dane**: regularnie archiwizuj stare wspomnienia
 2. **Indeksuj ważne informacje**: oznaczaj kluczowe informacje
-3. **Używaj przechowywania czasowego**: wykorzystuj zapytania z indeksem czasowym
+3. **Używaj przechowywania czasowego**: wykorzystuj zapytania indeksowane czasowo
+
+### Mechanizm zanikania pamięci
+
+System posiada wbudowaną usługę okresowego zanikania `MemoryFadeService`, symulującą właściwość zapominania pamięci biologicznej:
+
+- **Automatyczne zanikanie**: co godzinę stosuje algorytm zanikania ważności do wpisów pamięci wszystkich Istot Krzemowych
+- **Automatyczna archiwizacja**: pamięć o ważności poniżej progu jest automatycznie archiwizowana i nie bierze udziału w codziennym wyszukiwaniu
+- **Śledzenie statystyk**: rejestrowanie liczby cykli zanikania i liczby wpisów ze zmienionym stanem
+
+Oznacza to, że pamięć Istot Krzemowych naturalnie zanika z czasem, a ważne informacje muszą być aktywnie oznaczane jako wysoko ważne przez narzędzia pamięci, aby uniknąć automatycznej archiwizacji.
+
+---
+
+## Przestrzeń projektowa
+
+### Przegląd
+
+Przestrzeń projektowa to mechanizm zarządzania przestrzenią wspierającą współpracę wielu Istot Krzemowych. Kurator Krzemowy może tworzyć przestrzenie projektowe, przypisywać Istoty Krzemowe do projektów i przydzielać im role.
+
+### Cykl życia projektu
+
+```
+Tworzenie → Aktywny → Archiwizacja → Zniszczenie
+              ↑       |
+              └─ Przywrócenie ┘
+```
+
+### Role projektowe
+
+Istoty Krzemowe mogą mieć przypisane określone role w projektach:
+
+```json
+{
+  "action": "assign_role",
+  "project_id": "project-uuid",
+  "being_id": "being-uuid",
+  "role_name": "developer"
+}
+```
+
+### Notatki pracy projektu
+
+Notatki pracy w przestrzeni projektowej są publiczne, dostępne dla wszystkich członków projektu:
+
+```json
+{
+  "action": "create",
+  "project_id": "project-uuid",
+  "summary": "Ukończono moduł uwierzytelniania użytkowników",
+  "content": "## Szczegóły implementacji\n\n- Użycie JWT token",
+  "keywords": "uwierzytelnianie,JWT"
+}
+```
+
+### Zadania projektu
+
+Zadania w przestrzeni projektowej obsługują pełne zarządzanie cyklem życia:
+
+```json
+{
+  "action": "create",
+  "project_id": "project-uuid",
+  "title": "Implementacja uwierzytelniania użytkowników",
+  "priority": 5
+}
+```
+
+### Przepływ pracy projektu
+
+Projekty mogą być powiązane z szablonami przepływu pracy, napędzającymi procesy współpracy Istot Krzemowych:
+
+- Przepływy pracy oparte na szablonach maszyny stanów
+- Obsługa przejść stanów napędzanych przez Tick
+- Automatyczne rejestrowanie logów przejść stanów
+
+### Izolacja uprawnień narzędzi
+
+Uprawnienia narzędzi na poziomie projektu są niezależne od uprawnień na poziomie Istoty Krzemowej, realizując izolację uprawnień między projektami. Na przykład, Istota Krzemowa może mieć uprawnienia dostępu sieciowego w projekcie A, ale być ograniczona do uprawnień tylko do odczytu w projekcie B.
 
 ## Rozwiązywanie problemów
 
 ### Istota nie może się uruchomić
 
 **Sprawdź**:
-- Plik duszy istnieje i jest prawidłowy
+- Plik Duszy istnieje i jest prawidłowy
 - Klient AI jest skonfigurowany
 - Zasoby systemowe są wystarczające
 
@@ -592,12 +671,12 @@ Zwraca zrzut ekranu strony (kodowanie Base64), może być użyty do analizy wizu
 ### Zadania nie są wykonywane
 
 **Sprawdź**:
-- System czasomierza działa
+- System czasomierzy działa
 - Priorytety i harmonogram zadań
 - Ustawienia uprawnień
 
 ## Następne kroki
 
-- 📚 Przeczytaj [przewodnik po architekturze](architecture.md)
-- 🛠️ Zobacz [przewodnik programistyczny](development-guide.md)
+- 📚 Przeczytaj [przewodnik architektury](architecture.md)
+- 🛠️ Zobacz [przewodnik deweloperski](development-guide.md)
 - 🚀 Zobacz [przewodnik szybkiego startu](getting-started.md)
