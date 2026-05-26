@@ -2068,4 +2068,7 @@ _ => permissionType.ToString()
     public override string RoleStaffing_OverstaffedDetail => "人员超编（最多{0}人，当前{1}人）";
     public override string RoleStaffing_FullDetail => "已满员（{0}/{1}）";
     public override string RoleStaffing_SufficientDetail => "人员充足（{0}/{1}+）";
+
+    // ===== Workflow Role Notification =====
+    public override string WorkflowRoleBlockedNotificationFormat => "[工作流角色通知] 项目「{0}」的工作流在转移「{1}」（{2} → {3}）时被阻塞。\n\n缺失角色：{4}\n\n请使用 project_tool 的 assign_role 动作为项目分配所需角色，工作流将在下次检查时自动恢复。";
 }

@@ -330,4 +330,18 @@ public abstract class LocalizationBase
     /// <param name="assignedCount">The currently assigned count</param>
     /// <returns>A localized status text with count details</returns>
     public abstract string GetRoleStaffingStatusText(RoleStaffingStatus status, int minCount, int maxCount, int assignedCount);
+
+    // ===== Workflow Role Notification Localization =====
+
+    /// <summary>
+    /// Formats a broadcast notification message when a workflow transition is blocked due to missing roles.
+    /// </summary>
+    /// <param name="projectName">The project name</param>
+    /// <param name="transitionName">The blocked transition name</param>
+    /// <param name="fromState">Source state</param>
+    /// <param name="toState">Target state</param>
+    /// <param name="missingRoles">Comma-separated list of missing roles with details</param>
+    /// <returns>The formatted notification message</returns>
+    public abstract string FormatWorkflowRoleBlockedNotification(
+        string projectName, string transitionName, string fromState, string toState, string missingRoles);
 }

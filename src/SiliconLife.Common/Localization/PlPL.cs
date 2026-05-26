@@ -1163,4 +1163,7 @@ Użycie: wywołaj narzędzie chat, ustaw action=""mark_read"", target_id=GUID ro
     public override string RoleStaffing_OverstaffedDetail => "Przeobsadzone (maks. {0}, jest {1})";
     public override string RoleStaffing_FullDetail => "Pełne ({0}/{1})";
     public override string RoleStaffing_SufficientDetail => "Wystarczające ({0}/{1}+)";
+
+    // ===== Workflow Role Notification =====
+    public override string WorkflowRoleBlockedNotificationFormat => "[Powiadomienie o roli workflow] Workflow projektu '{0}' jest zablokowany na przejściu '{1}' ({2} → {3}).\n\nBrakujące role: {4}\n\nUżyj akcji assign_role narzędzia project_tool, aby przydzielić wymagane role. Workflow zostanie automatycznie wznowiony przy następnym sprawdzeniu.";
 }

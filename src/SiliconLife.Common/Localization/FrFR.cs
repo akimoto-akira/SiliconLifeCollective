@@ -2023,4 +2023,7 @@ Utilisation : Appelle l'outil chat, définis action=""mark_read"", target_id=GUI
     public override string RoleStaffing_OverstaffedDetail => "Sur-effectif (max {0}, a {1})";
     public override string RoleStaffing_FullDetail => "Complet ({0}/{1})";
     public override string RoleStaffing_SufficientDetail => "Suffisant ({0}/{1}+)";
+
+    // ===== Workflow Role Notification =====
+    public override string WorkflowRoleBlockedNotificationFormat => "[Notification de rôle de workflow] Le workflow du projet '{0}' est bloqué à la transition '{1}' ({2} → {3}).\n\nRôles manquants : {4}\n\nUtilisez l'action assign_role de project_tool pour attribuer les rôles nécessaires. Le workflow reprendra automatiquement lors de la prochaine vérification.";
 }

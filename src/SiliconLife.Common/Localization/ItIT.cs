@@ -2019,4 +2019,7 @@ Uso: Chiama lo strumento chat, imposta action=""mark_read"", target_id=GUID dell
     public override string RoleStaffing_OverstaffedDetail => "Sovraorganico (max {0}, attuali {1})";
     public override string RoleStaffing_FullDetail => "Pieno ({0}/{1})";
     public override string RoleStaffing_SufficientDetail => "Sufficiente ({0}/{1}+)";
+
+    // ===== Workflow Role Notification =====
+    public override string WorkflowRoleBlockedNotificationFormat => "[Notifica ruolo workflow] Il workflow del progetto '{0}' è bloccato alla transizione '{1}' ({2} → {3}).\n\nRuoli mancanti: {4}\n\nUtilizza l'azione assign_role di project_tool per assegnare i ruoli necessari. Il workflow riprenderà automaticamente al prossimo controllo.";
 }

@@ -1861,4 +1861,7 @@ Uso: Chama a ferramenta chat, define action=""mark_read"", target_id=GUID do int
     public override string RoleStaffing_OverstaffedDetail => "Sobredimensionado (máx. {0}, tem {1})";
     public override string RoleStaffing_FullDetail => "Cheio ({0}/{1})";
     public override string RoleStaffing_SufficientDetail => "Suficiente ({0}/{1}+)";
+
+    // ===== Workflow Role Notification =====
+    public override string WorkflowRoleBlockedNotificationFormat => "[Notificação de Função de Workflow] O workflow do projeto '{0}' está bloqueado na transição '{1}' ({2} → {3}).\n\nFunções em falta: {4}\n\nUtilize a ação assign_role da project_tool para atribuir as funções necessárias. O workflow será retomado automaticamente na próxima verificação.";
 }

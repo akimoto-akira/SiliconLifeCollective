@@ -280,6 +280,13 @@ public class WorkflowEngine
                 if (!conditionMet)
                     continue;
 
+                // Declarative role constraint check
+                if (transition.RequiredRoles.Count > 0)
+                {
+                    if (!CheckRequiredRoles(instance, template, transition))
+                        continue; // Role requirements not met, skip this transition
+                }
+
                 // Execute transition
                 string fromState = instance.CurrentState;
                 instance.CurrentState = transition.ToState;
@@ -369,6 +376,121 @@ public class WorkflowEngine
                 ToState = instance.CurrentState,
                 TransitionName = "Timeout"
             });
+        }
+    }
+
+    #endregion
+
+    #region Role Validation
+
+    /// <summary>
+    /// Checks if the project's role assignments satisfy the transition's RequiredRoles.
+    /// If not satisfied, sends a broadcast notification to the project channel (throttled to once per 24h).
+    /// </summary>
+    private bool CheckRequiredRoles(WorkflowInstance instance, WorkflowTemplate template, Transition transition)
+    {
+        var projectManager = _serviceProvider.GetService(typeof(IProjectManager)) as IProjectManager;
+        var project = projectManager?.GetProject(instance.ProjectId);
+        if (project == null) return false;
+
+        var missingRoles = new List<string>();
+        foreach (var roleName in transition.RequiredRoles)
+        {
+            int assignedCount = 0;
+            if (project.RoleAssignments.TryGetValue(roleName, out var beings))
+                assignedCount = beings.Count;
+
+            if (template.RoleDefinitions.TryGetValue(roleName, out var roleDef))
+            {
+                if (!roleDef.IsSatisfied(assignedCount))
+                    missingRoles.Add($"{roleName}({roleDef.GetStatusText(assignedCount)})");
+            }
+            else if (assignedCount == 0)
+            {
+                missingRoles.Add($"{roleName}");
+            }
+        }
+
+        if (missingRoles.Count == 0)
+        {
+            instance.Metadata["RoleCheckStatus"] = "Satisfied";
+            return true;
+        }
+
+        // Record in Metadata
+        instance.Metadata["RoleCheckStatus"] = "Blocked";
+        instance.Metadata["MissingRoles"] = string.Join(", ", missingRoles);
+        instance.Metadata["BlockedTransition"] = transition.TransitionName;
+
+        // Throttle broadcast: once per 24h per transition
+        string notifyKey = $"RoleNotify_{transition.TransitionName}";
+        if (instance.Metadata.TryGetValue(notifyKey, out var lastNotifyObj)
+            && lastNotifyObj is string lastNotifyStr
+            && DateTime.TryParse(lastNotifyStr, out var lastNotify)
+            && (DateTime.UtcNow - lastNotify).TotalHours < 24)
+        {
+            return false; // Already notified, silently block
+        }
+
+        // Send broadcast notification
+        BroadcastRoleInsufficiency(instance, project, transition, missingRoles);
+        instance.Metadata[notifyKey] = DateTime.UtcNow.ToString("O");
+        SaveInstance(instance);
+
+        _logger.Warn(null, "Transition '{0}' blocked for workflow {1}: missing roles [{2}]",
+            transition.TransitionName, instance.Id, string.Join(", ", missingRoles));
+
+        return false;
+    }
+
+    /// <summary>
+    /// Sends a broadcast notification to the project's broadcast channel about missing roles.
+    /// Uses the localization system for message formatting.
+    /// </summary>
+    private void BroadcastRoleInsufficiency(
+        WorkflowInstance instance, ProjectSpace project, Transition transition, List<string> missingRoles)
+    {
+        if (!project.BroadcastChannelId.HasValue)
+        {
+            _logger.Warn(null, "Cannot notify: project {0} has no broadcast channel", project.Id);
+            return;
+        }
+
+        try
+        {
+            var chatSystem = ServiceLocator.Instance.ChatSystem;
+            if (chatSystem == null) return;
+
+            // Format message using localization system
+            string message;
+            try
+            {
+                var loc = LocalizationManager.Instance.GetLocalization(
+                    Config.Instance?.Data?.Language ?? Language.ZhCN);
+                message = loc.FormatWorkflowRoleBlockedNotification(
+                    project.Name, transition.TransitionName,
+                    transition.FromState, transition.ToState,
+                    string.Join(", ", missingRoles));
+            }
+            catch
+            {
+                // Fallback if localization not available
+                message = $"[Workflow Role Notice] Project '{project.Name}' workflow blocked at transition "
+                    + $"'{transition.TransitionName}' ({transition.FromState} -> {transition.ToState}).\n\n"
+                    + $"Missing roles: {string.Join(", ", missingRoles)}\n\n"
+                    + $"Please use assign_role to assign the required roles.";
+            }
+
+            // Use system broadcast entity (02) as sender
+            Guid systemSender = new Guid("00000000-0000-0000-0000-000000000002");
+            chatSystem.Broadcast(systemSender, project.BroadcastChannelId.Value, message);
+
+            _logger.Info(null, "Broadcast sent for workflow {0}: role insufficiency in transition '{1}'",
+                instance.Id, transition.TransitionName);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(null, "Failed to broadcast role insufficiency notification", ex);
         }
     }
 

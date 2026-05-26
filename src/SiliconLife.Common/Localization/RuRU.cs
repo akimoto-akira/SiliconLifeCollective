@@ -944,6 +944,9 @@ public class RuRU : DefaultLocalizationBase
     public override string RoleStaffing_FullDetail => "Назначено {0} из {1}";
     public override string RoleStaffing_SufficientDetail => "Назначено {0}, минимум {1}";
 
+    // ===== Workflow Role Notification =====
+    public override string WorkflowRoleBlockedNotificationFormat => "[Уведомление о роли рабочего процесса] Рабочий процесс проекта '{0}' заблокирован на переходе '{1}' ({2} → {3}).\n\nНедостающие роли: {4}\n\nИспользуйте действие assign_role инструмента project_tool для назначения необходимых ролей. Рабочий процесс автоматически возобновится при следующей проверке.";
+
     public override string MemoryCompressionSystemPrompt => "Ты — ассистент сжатия памяти. Пожалуйста, сожми следующий период памяти в краткое резюме, сохранив ключевую информацию. ВАЖНО: Выведи только сжатое содержимое, НЕ ДОБАВЛЯЙ никаких временных меток, штампов времени или аннотаций дат. Предоставь только чистый сжатый текст.";
 
     public override string CommonSystemPrompt => @"## Поведенческие инструкции

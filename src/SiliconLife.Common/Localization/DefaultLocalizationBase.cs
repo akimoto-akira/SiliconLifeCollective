@@ -3670,4 +3670,15 @@ public abstract class DefaultLocalizationBase : LocalizationBase
         RoleStaffingStatus.Sufficient => string.Format(RoleStaffing_SufficientDetail, assignedCount, minCount),
         _ => $"{status} ({assignedCount})"
     };
+
+    // ===== Workflow Role Notification =====
+
+    /// <summary>Workflow role blocked notification format.
+    /// {0}=projectName, {1}=transitionName, {2}=fromState, {3}=toState, {4}=missingRoles</summary>
+    public abstract string WorkflowRoleBlockedNotificationFormat { get; }
+
+    /// <inheritdoc/>
+    public override string FormatWorkflowRoleBlockedNotification(
+        string projectName, string transitionName, string fromState, string toState, string missingRoles)
+        => string.Format(WorkflowRoleBlockedNotificationFormat, projectName, transitionName, fromState, toState, missingRoles);
 }

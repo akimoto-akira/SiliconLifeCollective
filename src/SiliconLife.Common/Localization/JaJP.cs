@@ -2061,4 +2061,7 @@ _ => permissionType.ToString()
     public override string RoleStaffing_OverstaffedDetail => "人員超過（最大{0}名、現在{1}名）";
     public override string RoleStaffing_FullDetail => "満員（{0}/{1}）";
     public override string RoleStaffing_SufficientDetail => "人員充足（{0}/{1}+）";
+
+    // ===== Workflow Role Notification =====
+    public override string WorkflowRoleBlockedNotificationFormat => "[ワークフローロール通知] プロジェクト「{0}」のワークフローが遷移「{1}」（{2} → {3}）でブロックされました。\n\n不足ロール：{4}\n\nproject_tool の assign_role アクションを使用して必要なロールを割り当ててください。ワークフローは次回のチェック時に自動的に再開されます。";
 }

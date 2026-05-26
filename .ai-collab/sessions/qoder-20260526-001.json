@@ -1,0 +1,31 @@
+{
+  "sessionId": "qoder-20260526-001",
+  "actorId": "qoder",
+  "startTime": "2026-05-26T10:00:00+08:00",
+  "endTime": "2026-05-26T10:50:00+08:00",
+  "status": "completed",
+  "selectedTask": "task-366",
+  "modifiedFiles": [
+    {
+      "path": "src/SiliconLife.Core/Workflow/Transition.cs",
+      "intent": "增加 RequiredRoles 声明式角色约束属性"
+    },
+    {
+      "path": "src/SiliconLife.Core/Workflow/WorkflowEngine.cs",
+      "intent": "在 TryTransitionAsync 中插入角色检查拦截，新增 CheckRequiredRoles 和 BroadcastRoleInsufficiency 方法"
+    },
+    {
+      "path": "src/SiliconLife.Core/Localization/LocalizationBase.cs",
+      "intent": "添加 FormatWorkflowRoleBlockedNotification 抽象方法"
+    },
+    {
+      "path": "src/SiliconLife.Common/Localization/DefaultLocalizationBase.cs",
+      "intent": "添加 WorkflowRoleBlockedNotificationFormat 抽象属性和格式化实现"
+    },
+    {
+      "path": "src/SiliconLife.Common/Localization/*.cs",
+      "intent": "为13个语言文件添加 WorkflowRoleBlockedNotificationFormat 本地化字符串"
+    }
+  ],
+  "changeRecord": "changes/qoder-20260526-001.json"
+}

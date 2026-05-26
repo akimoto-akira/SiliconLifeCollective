@@ -2063,4 +2063,7 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string RoleStaffing_OverstaffedDetail => "Personal excedido (máx. {0}, tiene {1})";
     public override string RoleStaffing_FullDetail => "Completo ({0}/{1})";
     public override string RoleStaffing_SufficientDetail => "Suficiente ({0}/{1}+)";
+
+    // ===== Workflow Role Notification =====
+    public override string WorkflowRoleBlockedNotificationFormat => "[Notificación de Rol de Flujo de Trabajo] El flujo de trabajo del proyecto '{0}' está bloqueado en la transición '{1}' ({2} → {3}).\n\nRoles faltantes: {4}\n\nUtilice la acción assign_role de project_tool para asignar los roles necesarios. El flujo de trabajo se reanudará automáticamente en la próxima verificación.";
 }

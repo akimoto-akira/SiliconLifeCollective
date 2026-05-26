@@ -2063,4 +2063,7 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string RoleStaffing_OverstaffedDetail => "Overstaffed (max {0}, have {1})";
     public override string RoleStaffing_FullDetail => "Full ({0}/{1})";
     public override string RoleStaffing_SufficientDetail => "Sufficient ({0}/{1}+)";
+
+    // ===== Workflow Role Notification =====
+    public override string WorkflowRoleBlockedNotificationFormat => "[Workflow Role Notice] Workflow in project '{0}' is blocked at transition '{1}' ({2} \u2192 {3}).\n\nMissing roles: {4}\n\nPlease use the assign_role action of project_tool to assign the required roles. The workflow will resume automatically on the next check.";
 }

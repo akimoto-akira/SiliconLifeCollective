@@ -59,6 +59,15 @@ public class Transition
     public int Priority { get; set; } = 0;
 
     /// <summary>
+    /// Gets or sets the role names required for this transition to proceed.
+    /// If specified, the workflow engine will check the project's RoleAssignments
+    /// to ensure all listed roles have at least MinCount beings assigned.
+    /// If any role is unsatisfied, the transition is blocked and a broadcast notification is sent.
+    /// Empty list means no role check is performed (default).
+    /// </summary>
+    public List<string> RequiredRoles { get; set; } = new();
+
+    /// <summary>
     /// Gets or sets the extension fields (for plugin use).
     /// </summary>
     public Dictionary<string, object> Metadata { get; set; } = new();

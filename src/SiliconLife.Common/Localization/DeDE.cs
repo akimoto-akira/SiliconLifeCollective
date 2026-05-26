@@ -2060,4 +2060,7 @@ Verwendung: Rufe das chat-Tool auf, setze action=""mark_read"", target_id=Gegen�
     public override string RoleStaffing_OverstaffedDetail => "Überbesetzt (max. {0}, habe {1})";
     public override string RoleStaffing_FullDetail => "Voll ({0}/{1})";
     public override string RoleStaffing_SufficientDetail => "Ausreichend ({0}/{1}+)";
+
+    // ===== Workflow Role Notification =====
+    public override string WorkflowRoleBlockedNotificationFormat => "[Workflow-Rollenbenachrichtigung] Der Workflow im Projekt '{0}' ist beim Übergang '{1}' ({2} → {3}) blockiert.\n\nFehlende Rollen: {4}\n\nVerwenden Sie die Aktion assign_role des project_tool, um die erforderlichen Rollen zuzuweisen. Der Workflow wird bei der nächsten Prüfung automatisch fortgesetzt.";
 }

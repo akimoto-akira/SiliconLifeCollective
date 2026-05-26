@@ -1124,4 +1124,7 @@ public override string WorkflowDetailInProgress => "Funkce detailu pracovního p
     public override string RoleStaffing_OverstaffedDetail => "Přes obsazenost (max. {0}, aktuálně {1})";
     public override string RoleStaffing_FullDetail => "Plné ({0}/{1})";
     public override string RoleStaffing_SufficientDetail => "Dostatečné ({0}/{1}+)";
+
+    // ===== Workflow Role Notification =====
+    public override string WorkflowRoleBlockedNotificationFormat => "[Oznámení role workflow] Workflow projektu '{0}' je zablokován na přechodu '{1}' ({2} → {3}).\n\nChybějící role: {4}\n\nPoužijte akci assign_role nástroje project_tool k přiřazení potřebných rolí. Workflow se automaticky obnoví při další kontrole.";
 }
