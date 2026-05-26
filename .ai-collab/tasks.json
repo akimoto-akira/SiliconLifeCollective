@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-26T06:00:00+08:00",
+  "lastUpdated": "2026-05-27T04:54:00+08:00",
   "tasks": [
     {
       "id": "task-362",
@@ -71,12 +71,30 @@
       "assignedTo": "qoder",
       "relatedCommit": "72a886f",
       "completedAt": "2026-05-26T10:30:00+08:00"
+    },
+    {
+      "id": "task-367",
+      "type": "docs",
+      "target": "PluginDemo/",
+      "title": "创建 PluginDemo 插件正反例示例集（12个示例 + 13语言README）",
+      "description": "基于 src/SiliconLife.Core/Plugins 的接口定义和安全扫描规则，在项目根目录 PluginDemo/ 下创建12个插件示例文件夹。正例6个（01-06）：MinimalPlugin, TypeRegistryUsage, ObjectFactoryUsage, SafeSystemIO, WorkflowPlugin, TrustedDependency。反例6个（07-12）：ForbiddenFileIO, ForbiddenNetwork, ForbiddenProcess, ForbiddenReflection, ForbiddenPInvoke, ForbiddenStringBypass。每个文件夹含 Plugin.cs + 13语言README（en/zh-CN/zh-HK/cs-CZ/de-DE/es-ES/fr-FR/it-IT/ja-JP/ko-KR/pl-PL/pt-PT/ru-RU）。正例展示正确用法，反例标注违规点并给出替代方案。",
+      "priority": "P2",
+      "status": "in-progress",
+      "createdAt": "2026-05-27T04:54:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": "coze-agent"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": ["task-362", "task-363", "task-364", "task-365", "task-366"],
+    "completed": [
+      "task-362",
+      "task-363",
+      "task-364",
+      "task-365",
+      "task-366"
+    ],
     "cancelled": []
   },
   "metadata": {
