@@ -2,9 +2,12 @@
   "sessionId": "coze-agent-20260527-001",
   "actorId": "coze-agent",
   "startTime": "2026-05-27T04:54:00+08:00",
-  "endTime": null,
-  "status": "in-progress",
+  "endTime": "2026-05-27T04:58:00+08:00",
+  "status": "completed",
   "selectedTask": "task-367",
   "changeRecord": null,
-  "modifiedFiles": []
+  "modifiedFiles": [
+    ".ai-collab/tasks.json",
+    ".ai-collab/sessions/coze-agent-20260527-001.json"
+  ]
 }

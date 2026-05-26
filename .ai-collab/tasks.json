@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-27T04:54:00+08:00",
+  "lastUpdated": "2026-05-27T04:58:00+08:00",
   "tasks": [
     {
       "id": "task-362",
@@ -75,14 +75,146 @@
     {
       "id": "task-367",
       "type": "docs",
-      "target": "PluginDemo/",
-      "title": "创建 PluginDemo 插件正反例示例集（12个示例 + 13语言README）",
-      "description": "基于 src/SiliconLife.Core/Plugins 的接口定义和安全扫描规则，在项目根目录 PluginDemo/ 下创建12个插件示例文件夹。正例6个（01-06）：MinimalPlugin, TypeRegistryUsage, ObjectFactoryUsage, SafeSystemIO, WorkflowPlugin, TrustedDependency。反例6个（07-12）：ForbiddenFileIO, ForbiddenNetwork, ForbiddenProcess, ForbiddenReflection, ForbiddenPInvoke, ForbiddenStringBypass。每个文件夹含 Plugin.cs + 13语言README（en/zh-CN/zh-HK/cs-CZ/de-DE/es-ES/fr-FR/it-IT/ja-JP/ko-KR/pl-PL/pt-PT/ru-RU）。正例展示正确用法，反例标注违规点并给出替代方案。",
+      "target": "PluginDemo/01-MinimalPlugin/",
+      "title": "PluginDemo-01: 最简IPlugin实现示例",
+      "description": "创建最简IPlugin实现，所有属性返回硬编码值，OnLoad/OnStart/OnStop/OnUnload空体但加注释说明用途和调用时机。Id格式: com.siliconlife.demo.minimal。每个文件夹含Plugin.cs + 13语言README(en/zh-CN/zh-HK/cs-CZ/de-DE/es-ES/fr-FR/it-IT/ja-JP/ko-KR/pl-PL/pt-PT/ru-RU)。README重点：IPlugin接口全貌、生命周期调用顺序(OnLoad→OnStart→...→OnStop→OnUnload)。",
       "priority": "P2",
-      "status": "in-progress",
+      "status": "pending",
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": "coze-agent"
+      "assignedTo": null
+    },
+    {
+      "id": "task-368",
+      "type": "docs",
+      "target": "PluginDemo/02-TypeRegistryUsage/",
+      "title": "PluginDemo-02: ITypeRegistry注册与查询示例",
+      "description": "实现IPlugin，OnLoad中通过ITypeRegistry注册3个自定义类型(GreetingTool, FarewellTool, StatusTool)，定义抽象基类DemoTool。OnStart中用FindSubtypesOf查找所有Tool子类型并打印。每个文件夹含Plugin.cs + 13语言README。README重点：ITypeRegistry注册与查询完整流程、RegisterFromAssembly用法。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T04:54:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-369",
+      "type": "docs",
+      "target": "PluginDemo/03-ObjectFactoryUsage/",
+      "title": "PluginDemo-03: IObjectFactory注册与创建示例",
+      "description": "实现IPlugin，OnLoad中RegisterAutoFactory注册类型，OnStart中CreateInstance创建实例并调用方法，展示泛型版本CreateInstance<T>。每个文件夹含Plugin.cs + 13语言README。README重点：IObjectFactory替代Activator.CreateInstance原理、RegisterAutoFactory自动分析构造函数。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T04:54:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-370",
+      "type": "docs",
+      "target": "PluginDemo/04-SafeSystemIO/",
+      "title": "PluginDemo-04: System.IO白名单安全类型示例",
+      "description": "实现IPlugin，演示使用System.IO白名单内类型：MemoryStream做内存读写、BinaryReader/BinaryWriter包装流、GZipStream做压缩/解压。MemoryStream模拟数据流经BinaryWriter→GZipStream→MemoryStream完整管线。每个文件夹含Plugin.cs + 13语言README。README重点：SystemIOAllowedTypes白名单、哪些IO类型安全可用、为什么要通过PermissionedStreamFactory获取FileStream。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T04:54:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-371",
+      "type": "docs",
+      "target": "PluginDemo/05-WorkflowPlugin/",
+      "title": "PluginDemo-05: IWorkflowPlugin工作流插件示例",
+      "description": "同时实现IPlugin和IWorkflowPlugin，RegisterTemplates返回自定义模板，InjectTransitions向现有模板注入转移规则。每个文件夹含Plugin.cs + 13语言README。README重点：IWorkflowPlugin接口用途、如何同时实现两个接口。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T04:54:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-372",
+      "type": "docs",
+      "target": "PluginDemo/06-TrustedDependency/",
+      "title": "PluginDemo-06: TrustedAssemblies受信依赖示例",
+      "description": "演示引用Newtonsoft.Json做序列化/反序列化，展示TrustedAssemblies白名单机制：Newtonsoft.Json内部使用了反射但因为是受信依赖所以不被拦截。每个文件夹含Plugin.cs + 13语言README。README重点：TrustedAssemblies白名单机制、CollectTrustedTypeRefs传递豁免原理、如何添加新的受信依赖。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T04:54:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-373",
+      "type": "docs",
+      "target": "PluginDemo/07-ForbiddenFileIO/",
+      "title": "PluginDemo-07: 禁止的文件I/O操作反例",
+      "description": "反例：演示直接使用System.IO.File.ReadAllText/File.WriteAllText/FileStream/Directory.GetFiles。每个违规操作标注⚠️VIOLATION: [TypeRef]并给出正确替代方案(PermissionedStreamFactory)。每个文件夹含Plugin.cs + 13语言README。README重点：为什么System.IO被整体禁止、哪些类型例外、如何通过PermissionedStreamFactory安全访问文件。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T04:54:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-374",
+      "type": "docs",
+      "target": "PluginDemo/08-ForbiddenNetwork/",
+      "title": "PluginDemo-08: 禁止的网络操作反例",
+      "description": "反例：演示直接使用HttpClient/TcpClient/SmtpClient/Dns。标注⚠️VIOLATION: [TypeRef]并给出正确替代方案(NetworkExecutor)。每个文件夹含Plugin.cs + 13语言README。README重点：为什么网络访问被整体禁止、6个子命名空间各自的危险点、如何通过NetworkExecutor安全访问网络。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T04:54:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-375",
+      "type": "docs",
+      "target": "PluginDemo/09-ForbiddenProcess/",
+      "title": "PluginDemo-09: 禁止的进程操作反例",
+      "description": "反例：演示使用Process.Start/ProcessStartInfo启动外部进程。标注⚠️VIOLATION: [TypeRef]并给出正确替代方案(CommandLineExecutor)。每个文件夹含Plugin.cs + 13语言README。README重点：为什么只禁止Process相关类型而不禁止整个System.Diagnostics、CommandLineExecutor的安全管控。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T04:54:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-376",
+      "type": "docs",
+      "target": "PluginDemo/10-ForbiddenReflection/",
+      "title": "PluginDemo-10: 禁止的反射操作反例",
+      "description": "反例：演示Type.GetType(string)/Activator.CreateInstance/Assembly.Load动态加载。标注⚠️VIOLATION: [MemberRef]并给出正确替代方案(ITypeRegistry.FindType + IObjectFactory.CreateInstance)。每个文件夹含Plugin.cs + 13语言README。README重点：反射绕过是PluginLoader扫描的核心威胁、typeof(X).Assembly安全而Assembly.Load不安全、ITypeRegistry/IObjectFactory如何安全替代。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T04:54:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-377",
+      "type": "docs",
+      "target": "PluginDemo/11-ForbiddenPInvoke/",
+      "title": "PluginDemo-11: 禁止的P/Invoke和unsafe代码反例",
+      "description": "反例：演示[DllImport]声明+Marshal.PtrToStringAnsi/NativeMemory.Alloc/GCHandle.Alloc。标注⚠️VIOLATION: [PInvoke]/[TypeRef]/[UnsafeMarker]并说明无法用Plugin机制安全替代(硬性禁止)。每个文件夹含Plugin.cs + 13语言README。README重点：P/Invoke和unsafe代码的扫描链路(MemberRef+UnverifiableCode+PinvokeImpl)、三重保险机制。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T04:54:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-378",
+      "type": "docs",
+      "target": "PluginDemo/12-ForbiddenStringBypass/",
+      "title": "PluginDemo-12: 禁止的字符串反射绕过反例",
+      "description": "反例：演示用ldstr字符串拼接反射绕过Type.GetType(\"System.IO.File, System.Runtime\")/Assembly.Load(\"System.Net.Http\")。标注⚠️VIOLATION: [ILString]并说明即使字符串拼接或加密也无法绕过(扫描编译后IL的#US堆)。每个文件夹含Plugin.cs + 13语言README。README重点：#US堆扫描机制、为什么字符串混淆也无法绕过、最后一道防线。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T04:54:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
     }
   ],
   "taskIndex": {
