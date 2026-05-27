@@ -167,7 +167,7 @@
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "qoder",
-      "relatedCommit": null,
+      "relatedCommit": "8636e31",
       "completedAt": "2026-05-28T00:45:00+08:00"
     },
     {
@@ -177,10 +177,12 @@
       "title": "PluginDemo-08: 禁止的网络操作反例",
       "description": "反例：演示直接使用HttpClient/TcpClient/SmtpClient/Dns。标注⚠️VIOLATION: [TypeRef]并给出正确替代方案(NetworkExecutor)。每个文件夹含Plugin.cs + 13语言README。README重点：为什么网络访问被整体禁止、6个子命名空间各自的危险点、如何通过NetworkExecutor安全访问网络。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null
+      "assignedTo": "qoder",
+      "relatedCommit": null,
+      "completedAt": "2026-05-28T01:20:00+08:00"
     },
     {
       "id": "task-375",
@@ -355,7 +357,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-374",
       "task-375",
       "task-376",
       "task-377",
@@ -363,6 +364,7 @@
     ],
     "inProgress": [],
     "completed": [
+      "task-374",
       "task-373",
       "task-372",
       "task-379",
