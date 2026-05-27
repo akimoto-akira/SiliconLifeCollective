@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-27T10:10:00+08:00",
+  "lastUpdated": "2026-05-27T10:15:00+08:00",
   "tasks": [
     {
       "id": "task-362",
@@ -233,6 +233,78 @@
       "priority": "P1",
       "status": "pending",
       "createdAt": "2026-05-27T10:10:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-380",
+      "type": "docs",
+      "target": "PluginDemo/13-CapabilityNetwork/",
+      "title": "PluginDemo-13: PluginCapability.Network 声明式网络权限示例",
+      "description": "基于task-379的PluginCapability设计，编写声明Network权限的插件示例。插件类上标注[PluginCapability(Capability.Network, Reason = \"AI API access\")]，演示插件内可直接使用HttpClient等网络类型而不被PluginLoader拦截。与07-ForbiddenFileIO形成对比：07是无声明被拦截的反例，13是声明后合法放行的正例。每个文件夹含Plugin.cs + 13语言README(en/zh-CN/zh-HK/cs-CZ/de-DE/es-ES/fr-FR/it-IT/ja-JP/ko-KR/pl-PL/pt-PT/ru-RU)。README重点：PluginCapability声明语法、Capability.Network放行的具体TypeRef/MemberRef/ILString范围、Reason字段的审计作用、与07反例的对比。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T10:15:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-381",
+      "type": "docs",
+      "target": "PluginDemo/14-CapabilityFileIO/",
+      "title": "PluginDemo-14: PluginCapability.FileIO 声明式文件权限示例",
+      "description": "基于task-379的PluginCapability设计，编写声明FileIO权限的插件示例。插件类上标注[PluginCapability(Capability.FileIO, Reason = \"Direct log file access\")]，演示插件内可直接使用System.IO.File/FileStream/Directory等类型。与04-SafeSystemIO形成对比：04只用白名单内的内存流类型，14是声明权限后合法使用直接文件访问的正例。每个文件夹含Plugin.cs + 13语言README。README重点：Capability.FileIO放行范围、声明后仍需注意的安全实践、与PermissionedStreamFactory的推荐优先级（能走受控入口就走受控入口）。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T10:15:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-382",
+      "type": "docs",
+      "target": "PluginDemo/15-CapabilityProcess/",
+      "title": "PluginDemo-15: PluginCapability.Process 声明式进程权限示例",
+      "description": "基于task-379的PluginCapability设计，编写声明Process权限的插件示例。插件类上标注[PluginCapability(Capability.Process, Reason = \"Launch build tools\")]，演示插件内可直接使用System.Diagnostics.Process/ProcessStartInfo。与09-ForbiddenProcess形成对比。每个文件夹含Plugin.cs + 13语言README。README重点：Capability.Process放行范围、声明后Process.Start的安全实践、CommandLineExecutor仍是推荐方式。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T10:15:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-383",
+      "type": "docs",
+      "target": "PluginDemo/16-CapabilityAI/",
+      "title": "PluginDemo-16: PluginCapability.AI 声明式AI服务权限示例",
+      "description": "基于task-379的PluginCapability设计，编写声明AI权限的插件示例。插件类上标注[PluginCapability(Capability.AI, Reason = \"Chat completion service\")]，演示插件通过IAIService接口调用AI能力。Capability.AI本身不直接放行网络类型，而是允许插件获取IAIService引用；如果AI客户端需要网络，需同时声明Capability.Network（展示权限叠加）。每个文件夹含Plugin.cs + 13语言README。README重点：Capability.AI的语义（允许使用AI服务而非直接网络访问）、权限叠加语法、IAIService的受控入口模式。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T10:15:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-384",
+      "type": "docs",
+      "target": "PluginDemo/17-CapabilityStacked/",
+      "title": "PluginDemo-17: PluginCapability 多权限叠加示例",
+      "description": "基于task-379的PluginCapability设计，编写声明多个Capability叠加的插件示例。模拟一个AI连接器插件：同时标注[PluginCapability(Capability.Network, Reason = \"API endpoint access\")]+[PluginCapability(Capability.AI, Reason = \"AI service provider\")]，插件内既使用HttpClient调API又通过IAIService提供AI服务。演示AttributeAllowMultiple=true的叠加语法和PluginLoader对多Capability的逐一处理。每个文件夹含Plugin.cs + 13语言README。README重点：多Capability叠加语法、PluginLoader如何合并多个声明的放行范围、叠加不等于无限权限（Reflection.Emit/PInvoke/Unsafe仍硬性禁止）。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T10:15:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-385",
+      "type": "docs",
+      "target": "PluginDemo/18-CapabilityDenied/",
+      "title": "PluginDemo-18: PluginCapability 不可声明能力反例",
+      "description": "基于task-379的PluginCapability设计，编写声明了不可声明能力的插件反例。插件类上标注[PluginCapability(Capability.Network, Reason = \"...\")]但代码内使用DllImport/Marshal/Unsafe/Reflection.Emit等硬性禁止类型，演示即使声明了Network权限，这些类型仍然被拦截。同时演示声明了不存在的Capability（如Capability.ReflectionEmit）会被PluginLoader忽略。每个文件夹含Plugin.cs + 13语言README。README重点：硬性禁止列表（PInvoke/Unsafe/Reflection.Emit/Registry）与可声明能力的边界、PluginLoader的\"声明无效\"处理逻辑、为什么这些能力不可声明（无法受控审计）。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T10:15:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": null
     }
