@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-28T00:45:00+08:00",
+  "lastUpdated": "2026-05-28T01:30:00+08:00",
   "tasks": [
     {
       "id": "task-362",
@@ -181,7 +181,7 @@
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "qoder",
-      "relatedCommit": null,
+      "relatedCommit": "7870b05",
       "completedAt": "2026-05-28T01:20:00+08:00"
     },
     {
@@ -191,10 +191,12 @@
       "title": "PluginDemo-09: 禁止的进程操作反例",
       "description": "反例：演示使用Process.Start/ProcessStartInfo启动外部进程。标注⚠️VIOLATION: [TypeRef]并给出正确替代方案(CommandLineExecutor)。每个文件夹含Plugin.cs + 13语言README。README重点：为什么只禁止Process相关类型而不禁止整个System.Diagnostics、CommandLineExecutor的安全管控。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null
+      "assignedTo": "qoder",
+      "relatedCommit": null,
+      "completedAt": "2026-05-28T01:30:00+08:00"
     },
     {
       "id": "task-376",
@@ -357,13 +359,13 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-375",
       "task-376",
       "task-377",
       "task-378"
     ],
     "inProgress": [],
     "completed": [
+      "task-375",
       "task-374",
       "task-373",
       "task-372",
