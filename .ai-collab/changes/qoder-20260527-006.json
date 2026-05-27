@@ -1,0 +1,198 @@
+{
+  "sessionId": "qoder-20260527-006",
+  "actorId": "qoder",
+  "startTime": "2026-05-27T14:15:00+08:00",
+  "endTime": "2026-05-27T14:30:00+08:00",
+  "files": [
+    {
+      "path": "PluginDemo/21-WorkflowTemplate/Plugin.cs",
+      "intent": "实现 PluginOnboarding 完整业务工作流示例（5状态、5转移、角色约束、超时检测）",
+      "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/Plugin.cs",
+      "changeSummary": {
+        "additions": 349,
+        "deletions": 0,
+        "modifications": 0
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": "PluginDemo/21-WorkflowTemplate/README.md",
+      "intent": "创建英文使用文档",
+      "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.md",
+      "changeSummary": {
+        "additions": 197,
+        "deletions": 0,
+        "modifications": 0
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": "PluginDemo/21-WorkflowTemplate/README.zh-CN.md",
+      "intent": "创建简体中文使用文档",
+      "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.zh-CN.md",
+      "changeSummary": {
+        "additions": 197,
+        "deletions": 0,
+        "modifications": 0
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": "PluginDemo/21-WorkflowTemplate/README.zh-HK.md",
+      "intent": "创建繁体中文使用文档",
+      "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.zh-HK.md",
+      "changeSummary": {
+        "additions": 169,
+        "deletions": 0,
+        "modifications": 0
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": "PluginDemo/21-WorkflowTemplate/README.cs-CZ.md",
+      "intent": "创建捷克语使用文档",
+      "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.cs-CZ.md",
+      "changeSummary": {
+        "additions": 59,
+        "deletions": 0,
+        "modifications": 0
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": "PluginDemo/21-WorkflowTemplate/README.de-DE.md",
+      "intent": "创建德语使用文档",
+      "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.de-DE.md",
+      "changeSummary": {
+        "additions": 59,
+        "deletions": 0,
+        "modifications": 0
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": "PluginDemo/21-WorkflowTemplate/README.es-ES.md",
+      "intent": "创建西班牙语使用文档",
+      "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.es-ES.md",
+      "changeSummary": {
+        "additions": 59,
+        "deletions": 0,
+        "modifications": 0
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": "PluginDemo/21-WorkflowTemplate/README.fr-FR.md",
+      "intent": "创建法语使用文档",
+      "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.fr-FR.md",
+      "changeSummary": {
+        "additions": 59,
+        "deletions": 0,
+        "modifications": 0
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": "PluginDemo/21-WorkflowTemplate/README.it-IT.md",
+      "intent": "创建意大利语使用文档",
+      "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.it-IT.md",
+      "changeSummary": {
+        "additions": 59,
+        "deletions": 0,
+        "modifications": 0
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": "PluginDemo/21-WorkflowTemplate/README.ja-JP.md",
+      "intent": "创建日语使用文档",
+      "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.ja-JP.md",
+      "changeSummary": {
+        "additions": 59,
+        "deletions": 0,
+        "modifications": 0
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": "PluginDemo/21-WorkflowTemplate/README.ko-KR.md",
+      "intent": "创建韩语使用文档",
+      "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.ko-KR.md",
+      "changeSummary": {
+        "additions": 59,
+        "deletions": 0,
+        "modifications": 0
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": "PluginDemo/21-WorkflowTemplate/README.pl-PL.md",
+      "intent": "创建波兰语使用文档",
+      "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.pl-PL.md",
+      "changeSummary": {
+        "additions": 59,
+        "deletions": 0,
+        "modifications": 0
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": "PluginDemo/21-WorkflowTemplate/README.pt-PT.md",
+      "intent": "创建葡萄牙语使用文档",
+      "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.pt-PT.md",
+      "changeSummary": {
+        "additions": 59,
+        "deletions": 0,
+        "modifications": 0
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": "PluginDemo/21-WorkflowTemplate/README.ru-RU.md",
+      "intent": "创建俄语使用文档",
+      "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.ru-RU.md",
+      "changeSummary": {
+        "additions": 59,
+        "deletions": 0,
+        "modifications": 0
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": ".ai-collab/tasks.json",
+      "intent": "更新 task-388 状态为 completed",
+      "gitDiff": "git diff HEAD~1 HEAD -- .ai-collab/tasks.json",
+      "changeSummary": {
+        "additions": 4,
+        "deletions": 4,
+        "modifications": 2
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": ".ai-collab/state.json",
+      "intent": "更新会话状态（currentActor/currentSession 清理）",
+      "gitDiff": "git diff HEAD~1 HEAD -- .ai-collab/state.json",
+      "changeSummary": {
+        "additions": 0,
+        "deletions": 0,
+        "modifications": 2
+      },
+      "relatedTask": "task-388"
+    },
+    {
+      "path": ".ai-collab/activity.log",
+      "intent": "追加 session_start/task_claim/task_complete/session_end 日志",
+      "gitDiff": "git diff HEAD~1 HEAD -- .ai-collab/activity.log",
+      "changeSummary": {
+        "additions": 4,
+        "deletions": 0,
+        "modifications": 0
+      },
+      "relatedTask": "task-388"
+    }
+  ],
+  "commitHash": "a820507da296147f5538c10249cde2dc1dd9fe8a",
+  "tasksCompleted": ["task-388"],
+  "tasksCreated": []
+}

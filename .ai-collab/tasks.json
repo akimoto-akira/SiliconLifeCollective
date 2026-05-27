@@ -357,16 +357,18 @@
       "title": "PluginDemo-21: WorkflowTemplate工作流模板完整使用示例",
       "description": "编写WorkflowTemplate完整使用示例，展示如何定义状态机工作流、注册到WorkflowEngine、创建实例并观察状态流转。\n\n【WorkflowTemplate核心模型】\n- WorkflowTemplate：模板定义，含Name/Description/States/Transitions/InitialState/TerminalStates/RoleDefinitions/Metadata\n- Transition：状态转移规则，含TransitionName/FromState/ToState/Condition(async)/Action(async)/TimeoutDays/Priority/RequiredRoles/Metadata\n- RoleDefinition：角色定义，含RoleName/Description/MinCount/MaxCount/IsSatisfied()/GetStatusText()\n- WorkflowEngine：引擎，RegisterTemplate/GetTemplate/CreateInstanceAsync/GetInstance/GetInstances/TickAsync\n- WorkflowInstance：运行实例，含CurrentState/Status(InProgress/Completed/Blocked/Cancelled)/StageOutputs/Metadata/MarkProgress()\n- WorkflowTickObject：TickObject子类，每60秒驱动WorkflowEngine.TickAsync()\n- IWorkflowPlugin：插件接口，PluginId/RegisterTemplates/InjectTransitions\n\n【示例内容】参考CodeReviewWorkflow.cs的实际写法，创建一个\"PluginOnboarding\"工作流：\n1. 定义模板：States(Submitted→Screening→Testing→Approved→Rejected), TerminalStates(Approved/Rejected)\n2. Transitions：每个转移带Condition+Action，演示async条件判断和副作用\n3. RoleDefinitions：定义Screener(min=1,max=3)和Tester(min=1,max=0)角色\n4. RequiredRoles：Testing→Approved要求Screener角色满足\n5. TimeoutDays：Screening状态3天超时\n6. 同时实现IPlugin+IWorkflowPlugin\n7. IWorkflowPlugin.RegisterTemplates返回模板，InjectTransitions向已有模板注入额外转移\n\n每个文件夹含Plugin.cs + 13语言README(en/zh-CN/zh-HK/cs-CZ/de-DE/es-ES/fr-FR/it-IT/ja-JP/ko-KR/pl-PL/pt-PT/ru-RU)。\nREADME重点：WorkflowTemplate状态机设计模式、Transition的Condition/Action异步机制、RoleDefinition角色约束与ValidateRoleAssignments、RequiredRoles的运行时检查与广播通知、TimeoutDays超时处理、WorkflowTickObject与MainLoop的集成、与05-WorkflowPlugin示例的区别(05只演示接口实现，21展示完整业务工作流)。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-27T10:24:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null
+      "assignedTo": "qoder",
+      "completedAt": "2026-05-27T14:30:00+08:00"
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
     "completed": [
+      "task-388",
       "task-378",
       "task-377",
       "task-376",
